@@ -20,6 +20,39 @@
 #ifndef __do_assert
 #include "assert-failed.h"
 #include "../features.h"
+#include "../__stdinc.h"
+
+/* Define `static_assert()', optionally with no-message
+ * overload when KOS or isoc++17 extensions are enabled. */
+#if !defined(static_assert) && (defined(__USE_ISOC11) || defined(__USE_ISOCXX11) || defined(__USE_KOS))
+#if defined(__cpp_static_assert) && __cpp_static_assert + 0 >= 201411
+/* the message argument is already optional! */
+#elif defined(__USE_KOS) || defined(__USE_ISOCXX17)
+/* Emulate `static_assert()' such that the message becomes optional. */
+#include <hybrid/pp/__va_nargs.h>
+#define __PRIVATE_static_assert_1(a) __STATIC_ASSERT(a)
+#define __PRIVATE_static_assert_2(a, msg) __STATIC_ASSERT_MSG(a, msg)
+#define __PRIVATE_static_assert_3(a, b, msg) __STATIC_ASSERT_MSG((a, b), msg)
+#define __PRIVATE_static_assert_4(a, b, c, msg) __STATIC_ASSERT_MSG((a, b, c), msg)
+#define __PRIVATE_static_assert_5(a, b, c, d, msg) __STATIC_ASSERT_MSG((a, b, c, d), msg)
+#define __PRIVATE_static_assert_6(a, b, c, d, e, msg) __STATIC_ASSERT_MSG((a, b, c, d, e), msg)
+#define __PRIVATE_static_assert_7(a, b, c, d, e, f, msg) __STATIC_ASSERT_MSG((a, b, c, d, e, f), msg)
+#define __PRIVATE_static_assert_8(a, b, c, d, e, f, g, msg) __STATIC_ASSERT_MSG((a, b, c, d, e, f, g), msg)
+#define __PRIVATE_static_assert_9(a, b, c, d, e, f, g, h, msg) __STATIC_ASSERT_MSG((a, b, c, d, e, f, g, h), msg)
+#define static_assert(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_static_assert_, (__VA_ARGS__))(__VA_ARGS__)
+#elif (__has_feature(cxx_static_assert) ||                                                                \
+       (defined(__cpp_static_assert) && __cpp_static_assert + 0 != 0) ||                                  \
+       (__GCC_VERSION_NUM >= 40300 && (defined(__GXX_EXPERIMENTAL_CXX0X__) || __cplusplus >= 201103L)) || \
+       (defined(__IBMCPP_STATIC_ASSERT) && __IBMCPP_STATIC_ASSERT + 0) ||                                 \
+       (defined(__cplusplus) &&                                                                           \
+        ((defined(__BORLANDC__) && defined(__CODEGEAR_0X_SUPPORT__) && __BORLANDC__ + 0 >= 0x610) ||      \
+         (defined(__CODEGEARC__) && __CODEGEARC__ + 0 > 0x620) ||                                         \
+         (defined(_MSC_VER) && _MSC_VER >= 1600))))
+/* `static_assert' is defined by the compiler! (don't re-define it) */
+#else /* Builtin... */
+#define static_assert __STATIC_ASSERT_MSG
+#endif /* Emulated... */
+#endif /* !static_assert */
 
 /* Need KOS extensions for compile-time `assert()' support.
  * STDC-compliant code is allowed to use `assert(0)' as an alias for `abort()',

@@ -90,14 +90,20 @@
 #define __COMPILER_HAVE_AUTOTYPE 1
 #endif
 
-#if __has_feature(cxx_static_assert) || _MSC_VER >= 1600
-#define __STATIC_ASSERT(expr)          static_assert(expr, #expr)
-#define __STATIC_ASSERT_MSG(expr, msg) static_assert(expr, msg)
-#elif __has_feature(c_static_assert) || \
-     (defined(__STDC_VERSION__) && __STDC_VERSION__+0 >= 201112L)
-/* XXX: Known Visual C/C++, checking for C11 may not actually allow us to assume this one... */
-#define __STATIC_ASSERT(expr)          _Static_assert(expr, #expr)
-#define __STATIC_ASSERT_MSG(expr, msg) _Static_assert(expr, msg)
+#if (__has_feature(cxx_static_assert) ||                               \
+     (defined(__cpp_static_assert) && __cpp_static_assert + 0 != 0) || \
+     _MSC_VER >= 1600)
+#if defined(__cpp_static_assert) && __cpp_static_assert + 0 >= 201411
+#define __STATIC_ASSERT       static_assert
+#else /* __cpp_static_assert >= 201411 */
+#define __STATIC_ASSERT(expr) static_assert(expr, #expr)
+#endif /* __cpp_static_assert < 201411 */
+#define __STATIC_ASSERT_MSG   static_assert
+#elif (__has_feature(c_static_assert) || \
+       (defined(__STDC_VERSION__) && __STDC_VERSION__ + 0 >= 201112L))
+/* XXX: Knowing Visual C/C++, checking for C11 may not actually allow us to assume this one... */
+#define __STATIC_ASSERT(expr) _Static_assert(expr, #expr)
+#define __STATIC_ASSERT_MSG   _Static_assert
 #elif defined(__TPP_COUNTER)
 #define __STATIC_ASSERT(expr)          typedef int __PP_CAT2(__static_assert_, __TPP_COUNTER(__static_assert))[(expr) ? 1 : -1]
 #define __STATIC_ASSERT_MSG(expr, msg) typedef int __PP_CAT2(__static_assert_, __TPP_COUNTER(__static_assert))[(expr) ? 1 : -1]

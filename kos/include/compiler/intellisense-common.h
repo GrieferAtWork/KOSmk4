@@ -510,6 +510,13 @@ bool __builtin_umull_overflow(unsigned long __a, unsigned long __b, unsigned lon
 bool __builtin_umulll_overflow(unsigned long long __a, unsigned long long __b, unsigned long long *__res);
 
 
+/* Fix some broken c++ feature macros */
+#ifdef __cplusplus
+#if __cplusplus >= 201406L
+#undef __cpp_static_assert
+#define __cpp_static_assert 201411
+#endif
+#endif /* __cplusplus */
 
 
 #endif /* !____INTELLISENSE_STDINC_COMMON_H */

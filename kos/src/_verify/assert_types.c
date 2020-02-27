@@ -35,244 +35,245 @@
 #include <kos/types.h>
 #include <sys/types.h>
 
+#include <assert.h>
 #include <stdalign.h>
 #include <stddef.h>
 
-STATIC_ASSERT(sizeof(char) == __SIZEOF_CHAR__);
-STATIC_ASSERT(sizeof(signed char) == __SIZEOF_CHAR__);
-STATIC_ASSERT(sizeof(unsigned char) == __SIZEOF_CHAR__);
-STATIC_ASSERT(sizeof(short) == __SIZEOF_SHORT__);
-STATIC_ASSERT(sizeof(signed short) == __SIZEOF_SHORT__);
-STATIC_ASSERT(sizeof(unsigned short) == __SIZEOF_SHORT__);
-STATIC_ASSERT(sizeof(int) == __SIZEOF_INT__);
-STATIC_ASSERT(sizeof(signed int) == __SIZEOF_INT__);
-STATIC_ASSERT(sizeof(unsigned int) == __SIZEOF_INT__);
-STATIC_ASSERT(sizeof(long) == __SIZEOF_LONG__);
-STATIC_ASSERT(sizeof(signed long) == __SIZEOF_LONG__);
-STATIC_ASSERT(sizeof(unsigned long) == __SIZEOF_LONG__);
+static_assert(sizeof(char) == __SIZEOF_CHAR__);
+static_assert(sizeof(signed char) == __SIZEOF_CHAR__);
+static_assert(sizeof(unsigned char) == __SIZEOF_CHAR__);
+static_assert(sizeof(short) == __SIZEOF_SHORT__);
+static_assert(sizeof(signed short) == __SIZEOF_SHORT__);
+static_assert(sizeof(unsigned short) == __SIZEOF_SHORT__);
+static_assert(sizeof(int) == __SIZEOF_INT__);
+static_assert(sizeof(signed int) == __SIZEOF_INT__);
+static_assert(sizeof(unsigned int) == __SIZEOF_INT__);
+static_assert(sizeof(long) == __SIZEOF_LONG__);
+static_assert(sizeof(signed long) == __SIZEOF_LONG__);
+static_assert(sizeof(unsigned long) == __SIZEOF_LONG__);
 #ifdef __COMPILER_HAVE_LONGLONG
-STATIC_ASSERT(sizeof(long long) == __SIZEOF_LONG_LONG__);
-STATIC_ASSERT(sizeof(signed long long) == __SIZEOF_LONG_LONG__);
-STATIC_ASSERT(sizeof(unsigned long long) == __SIZEOF_LONG_LONG__);
+static_assert(sizeof(long long) == __SIZEOF_LONG_LONG__);
+static_assert(sizeof(signed long long) == __SIZEOF_LONG_LONG__);
+static_assert(sizeof(unsigned long long) == __SIZEOF_LONG_LONG__);
 #endif /* __COMPILER_HAVE_LONGLONG */
-STATIC_ASSERT(sizeof(float) == __SIZEOF_FLOAT__);
-STATIC_ASSERT(sizeof(double) == __SIZEOF_DOUBLE__);
+static_assert(sizeof(float) == __SIZEOF_FLOAT__);
+static_assert(sizeof(double) == __SIZEOF_DOUBLE__);
 #ifdef __COMPILER_HAVE_LONGDOUBLE
-STATIC_ASSERT(sizeof(__LONGDOUBLE) == __SIZEOF_LONG_DOUBLE__);
+static_assert(sizeof(__LONGDOUBLE) == __SIZEOF_LONG_DOUBLE__);
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #ifdef __native_wchar_t_defined
-STATIC_ASSERT(sizeof(wchar_t) == __SIZEOF_WCHAR_T__);
+static_assert(sizeof(wchar_t) == __SIZEOF_WCHAR_T__);
 #endif /* __native_wchar_t_defined */
 #ifdef __native_char16_t_defined
-STATIC_ASSERT(sizeof(char16_t) == 2);
-STATIC_ASSERT(sizeof(char32_t) == 4);
+static_assert(sizeof(char16_t) == 2);
+static_assert(sizeof(char32_t) == 4);
 #endif /* __native_char16_t_defined */
 
-STATIC_ASSERT(sizeof(__INT8_TYPE__) == 1);
-STATIC_ASSERT(sizeof(__UINT8_TYPE__) == 1);
-STATIC_ASSERT(alignof(__INT8_TYPE__) == 1);
-STATIC_ASSERT(alignof(__UINT8_TYPE__) == 1);
+static_assert(sizeof(__INT8_TYPE__) == 1);
+static_assert(sizeof(__UINT8_TYPE__) == 1);
+static_assert(alignof(__INT8_TYPE__) == 1);
+static_assert(alignof(__UINT8_TYPE__) == 1);
 
-STATIC_ASSERT(sizeof(__INT16_TYPE__) == 2);
-STATIC_ASSERT(sizeof(__UINT16_TYPE__) == 2);
-STATIC_ASSERT(alignof(__INT16_TYPE__) == __ALIGNOF_INT16__);
-STATIC_ASSERT(alignof(__UINT16_TYPE__) == __ALIGNOF_INT16__);
+static_assert(sizeof(__INT16_TYPE__) == 2);
+static_assert(sizeof(__UINT16_TYPE__) == 2);
+static_assert(alignof(__INT16_TYPE__) == __ALIGNOF_INT16__);
+static_assert(alignof(__UINT16_TYPE__) == __ALIGNOF_INT16__);
 
-STATIC_ASSERT(sizeof(__INT32_TYPE__) == 4);
-STATIC_ASSERT(sizeof(__UINT32_TYPE__) == 4);
-STATIC_ASSERT(alignof(__INT32_TYPE__) == __ALIGNOF_INT32__);
-STATIC_ASSERT(alignof(__UINT32_TYPE__) == __ALIGNOF_INT32__);
+static_assert(sizeof(__INT32_TYPE__) == 4);
+static_assert(sizeof(__UINT32_TYPE__) == 4);
+static_assert(alignof(__INT32_TYPE__) == __ALIGNOF_INT32__);
+static_assert(alignof(__UINT32_TYPE__) == __ALIGNOF_INT32__);
 
 #ifdef __UINT64_TYPE__
-STATIC_ASSERT(sizeof(__INT64_TYPE__) == 8);
-STATIC_ASSERT(sizeof(__UINT64_TYPE__) == 8);
-STATIC_ASSERT(alignof(__INT64_TYPE__) == __ALIGNOF_INT64__);
-STATIC_ASSERT(alignof(__UINT64_TYPE__) == __ALIGNOF_INT64__);
+static_assert(sizeof(__INT64_TYPE__) == 8);
+static_assert(sizeof(__UINT64_TYPE__) == 8);
+static_assert(alignof(__INT64_TYPE__) == __ALIGNOF_INT64__);
+static_assert(alignof(__UINT64_TYPE__) == __ALIGNOF_INT64__);
 #endif /* __UINT64_TYPE__ */
 
 #ifdef __UINT128_TYPE__
-STATIC_ASSERT(sizeof(__INT128_TYPE__) == 16);
-STATIC_ASSERT(sizeof(__UINT128_TYPE__) == 16);
-STATIC_ASSERT(alignof(__INT128_TYPE__) == __ALIGNOF_INT128__);
-STATIC_ASSERT(alignof(__UINT128_TYPE__) == __ALIGNOF_INT128__);
+static_assert(sizeof(__INT128_TYPE__) == 16);
+static_assert(sizeof(__UINT128_TYPE__) == 16);
+static_assert(alignof(__INT128_TYPE__) == __ALIGNOF_INT128__);
+static_assert(alignof(__UINT128_TYPE__) == __ALIGNOF_INT128__);
 #endif /* __UINT128_TYPE__ */
 
-STATIC_ASSERT(alignof(float) == __ALIGNOF_FLOAT__);
-STATIC_ASSERT(alignof(double) == __ALIGNOF_DOUBLE__);
+static_assert(alignof(float) == __ALIGNOF_FLOAT__);
+static_assert(alignof(double) == __ALIGNOF_DOUBLE__);
 #ifdef __COMPILER_HAVE_LONGDOUBLE
-STATIC_ASSERT(alignof(__LONGDOUBLE) == __ALIGNOF_LONG_DOUBLE__);
+static_assert(alignof(__LONGDOUBLE) == __ALIGNOF_LONG_DOUBLE__);
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 #include <stdint.h>
 
-STATIC_ASSERT(__builtin_types_compatible_p(intmax_t, __INTMAX_TYPE__));
-STATIC_ASSERT(__builtin_types_compatible_p(uintmax_t, __UINTMAX_TYPE__));
-STATIC_ASSERT(sizeof(intmax_t) == __SIZEOF_INTMAX_T__);
-STATIC_ASSERT(sizeof(uintmax_t) == __SIZEOF_INTMAX_T__);
+static_assert(__builtin_types_compatible_p(intmax_t, __INTMAX_TYPE__));
+static_assert(__builtin_types_compatible_p(uintmax_t, __UINTMAX_TYPE__));
+static_assert(sizeof(intmax_t) == __SIZEOF_INTMAX_T__);
+static_assert(sizeof(uintmax_t) == __SIZEOF_INTMAX_T__);
 
-STATIC_ASSERT(__builtin_types_compatible_p(int_least8_t, __INT_LEAST8_TYPE__));
-STATIC_ASSERT(__builtin_types_compatible_p(int_least16_t, __INT_LEAST16_TYPE__));
-STATIC_ASSERT(__builtin_types_compatible_p(int_least32_t, __INT_LEAST32_TYPE__));
-STATIC_ASSERT(__builtin_types_compatible_p(uint_least8_t, __UINT_LEAST8_TYPE__));
-STATIC_ASSERT(__builtin_types_compatible_p(uint_least16_t, __UINT_LEAST16_TYPE__));
-STATIC_ASSERT(__builtin_types_compatible_p(uint_least32_t, __UINT_LEAST32_TYPE__));
-STATIC_ASSERT(sizeof(int_least8_t) == __SIZEOF_INT_LEAST8_T__);
-STATIC_ASSERT(sizeof(int_least16_t) == __SIZEOF_INT_LEAST16_T__);
-STATIC_ASSERT(sizeof(int_least32_t) == __SIZEOF_INT_LEAST32_T__);
-STATIC_ASSERT(sizeof(uint_least8_t) == __SIZEOF_INT_LEAST8_T__);
-STATIC_ASSERT(sizeof(uint_least16_t) == __SIZEOF_INT_LEAST16_T__);
-STATIC_ASSERT(sizeof(uint_least32_t) == __SIZEOF_INT_LEAST32_T__);
+static_assert(__builtin_types_compatible_p(int_least8_t, __INT_LEAST8_TYPE__));
+static_assert(__builtin_types_compatible_p(int_least16_t, __INT_LEAST16_TYPE__));
+static_assert(__builtin_types_compatible_p(int_least32_t, __INT_LEAST32_TYPE__));
+static_assert(__builtin_types_compatible_p(uint_least8_t, __UINT_LEAST8_TYPE__));
+static_assert(__builtin_types_compatible_p(uint_least16_t, __UINT_LEAST16_TYPE__));
+static_assert(__builtin_types_compatible_p(uint_least32_t, __UINT_LEAST32_TYPE__));
+static_assert(sizeof(int_least8_t) == __SIZEOF_INT_LEAST8_T__);
+static_assert(sizeof(int_least16_t) == __SIZEOF_INT_LEAST16_T__);
+static_assert(sizeof(int_least32_t) == __SIZEOF_INT_LEAST32_T__);
+static_assert(sizeof(uint_least8_t) == __SIZEOF_INT_LEAST8_T__);
+static_assert(sizeof(uint_least16_t) == __SIZEOF_INT_LEAST16_T__);
+static_assert(sizeof(uint_least32_t) == __SIZEOF_INT_LEAST32_T__);
 
-STATIC_ASSERT(sizeof(int_least8_t) >= 1);
-STATIC_ASSERT(sizeof(uint_least8_t) >= 1);
-STATIC_ASSERT(sizeof(int_least16_t) >= 2);
-STATIC_ASSERT(sizeof(uint_least16_t) >= 2);
-STATIC_ASSERT(sizeof(int_least32_t) >= 4);
-STATIC_ASSERT(sizeof(uint_least32_t) >= 4);
+static_assert(sizeof(int_least8_t) >= 1);
+static_assert(sizeof(uint_least8_t) >= 1);
+static_assert(sizeof(int_least16_t) >= 2);
+static_assert(sizeof(uint_least16_t) >= 2);
+static_assert(sizeof(int_least32_t) >= 4);
+static_assert(sizeof(uint_least32_t) >= 4);
 
 #ifdef __UINT_LEAST64_TYPE__
-STATIC_ASSERT(__builtin_types_compatible_p(int_least64_t, __INT_LEAST64_TYPE__));
-STATIC_ASSERT(__builtin_types_compatible_p(uint_least64_t, __UINT_LEAST64_TYPE__));
-STATIC_ASSERT(sizeof(int_least64_t) == __SIZEOF_INT_LEAST64_T__);
-STATIC_ASSERT(sizeof(uint_least64_t) == __SIZEOF_INT_LEAST64_T__);
-STATIC_ASSERT(sizeof(int_least64_t) >= 8);
-STATIC_ASSERT(sizeof(uint_least64_t) >= 8);
+static_assert(__builtin_types_compatible_p(int_least64_t, __INT_LEAST64_TYPE__));
+static_assert(__builtin_types_compatible_p(uint_least64_t, __UINT_LEAST64_TYPE__));
+static_assert(sizeof(int_least64_t) == __SIZEOF_INT_LEAST64_T__);
+static_assert(sizeof(uint_least64_t) == __SIZEOF_INT_LEAST64_T__);
+static_assert(sizeof(int_least64_t) >= 8);
+static_assert(sizeof(uint_least64_t) >= 8);
 #endif /* __UINT_LEAST64_TYPE__ */
 
-STATIC_ASSERT(__builtin_types_compatible_p(int_fast8_t, __INT_FAST8_TYPE__));
-STATIC_ASSERT(__builtin_types_compatible_p(int_fast16_t, __INT_FAST16_TYPE__));
-STATIC_ASSERT(__builtin_types_compatible_p(int_fast32_t, __INT_FAST32_TYPE__));
-STATIC_ASSERT(__builtin_types_compatible_p(uint_fast8_t, __UINT_FAST8_TYPE__));
-STATIC_ASSERT(__builtin_types_compatible_p(uint_fast16_t, __UINT_FAST16_TYPE__));
-STATIC_ASSERT(__builtin_types_compatible_p(uint_fast32_t, __UINT_FAST32_TYPE__));
-STATIC_ASSERT(sizeof(int_fast8_t) == __SIZEOF_INT_FAST8_T__);
-STATIC_ASSERT(sizeof(int_fast16_t) == __SIZEOF_INT_FAST16_T__);
-STATIC_ASSERT(sizeof(int_fast32_t) == __SIZEOF_INT_FAST32_T__);
-STATIC_ASSERT(sizeof(uint_fast8_t) == __SIZEOF_INT_FAST8_T__);
-STATIC_ASSERT(sizeof(uint_fast16_t) == __SIZEOF_INT_FAST16_T__);
-STATIC_ASSERT(sizeof(uint_fast32_t) == __SIZEOF_INT_FAST32_T__);
+static_assert(__builtin_types_compatible_p(int_fast8_t, __INT_FAST8_TYPE__));
+static_assert(__builtin_types_compatible_p(int_fast16_t, __INT_FAST16_TYPE__));
+static_assert(__builtin_types_compatible_p(int_fast32_t, __INT_FAST32_TYPE__));
+static_assert(__builtin_types_compatible_p(uint_fast8_t, __UINT_FAST8_TYPE__));
+static_assert(__builtin_types_compatible_p(uint_fast16_t, __UINT_FAST16_TYPE__));
+static_assert(__builtin_types_compatible_p(uint_fast32_t, __UINT_FAST32_TYPE__));
+static_assert(sizeof(int_fast8_t) == __SIZEOF_INT_FAST8_T__);
+static_assert(sizeof(int_fast16_t) == __SIZEOF_INT_FAST16_T__);
+static_assert(sizeof(int_fast32_t) == __SIZEOF_INT_FAST32_T__);
+static_assert(sizeof(uint_fast8_t) == __SIZEOF_INT_FAST8_T__);
+static_assert(sizeof(uint_fast16_t) == __SIZEOF_INT_FAST16_T__);
+static_assert(sizeof(uint_fast32_t) == __SIZEOF_INT_FAST32_T__);
 
 #ifdef __UINT_FAST64_TYPE__
-STATIC_ASSERT(__builtin_types_compatible_p(int_fast64_t, __INT_FAST64_TYPE__));
-STATIC_ASSERT(__builtin_types_compatible_p(uint_fast64_t, __UINT_FAST64_TYPE__));
-STATIC_ASSERT(sizeof(int_fast64_t) == __SIZEOF_INT_FAST64_T__);
-STATIC_ASSERT(sizeof(uint_fast64_t) == __SIZEOF_INT_FAST64_T__);
+static_assert(__builtin_types_compatible_p(int_fast64_t, __INT_FAST64_TYPE__));
+static_assert(__builtin_types_compatible_p(uint_fast64_t, __UINT_FAST64_TYPE__));
+static_assert(sizeof(int_fast64_t) == __SIZEOF_INT_FAST64_T__);
+static_assert(sizeof(uint_fast64_t) == __SIZEOF_INT_FAST64_T__);
 #endif /* __UINT_FAST64_TYPE__ */
 
-STATIC_ASSERT(sizeof(INT8_C(0x7f)) >= 1);
-STATIC_ASSERT(sizeof(UINT8_C(0xff)) >= 1);
-STATIC_ASSERT(sizeof(INT16_C(0x7fff)) >= 2);
-STATIC_ASSERT(sizeof(UINT16_C(0xffff)) >= 2);
-STATIC_ASSERT(sizeof(INT32_C(0x7fffffff)) >= 4);
-STATIC_ASSERT(sizeof(UINT32_C(0xffffffff)) >= 4);
+static_assert(sizeof(INT8_C(0x7f)) >= 1);
+static_assert(sizeof(UINT8_C(0xff)) >= 1);
+static_assert(sizeof(INT16_C(0x7fff)) >= 2);
+static_assert(sizeof(UINT16_C(0xffff)) >= 2);
+static_assert(sizeof(INT32_C(0x7fffffff)) >= 4);
+static_assert(sizeof(UINT32_C(0xffffffff)) >= 4);
 #ifdef INT64_C
-STATIC_ASSERT(sizeof(INT64_C(0x7fffffffffffffff)) >= 8);
-STATIC_ASSERT(sizeof(UINT64_C(0xffffffffffffffff)) >= 8);
+static_assert(sizeof(INT64_C(0x7fffffffffffffff)) >= 8);
+static_assert(sizeof(UINT64_C(0xffffffffffffffff)) >= 8);
 #endif /* INT64_C */
 
 
-STATIC_ASSERT(sizeof(__LONG32_TYPE__) == 4);
-STATIC_ASSERT(sizeof(__ULONG32_TYPE__) == 4);
+static_assert(sizeof(__LONG32_TYPE__) == 4);
+static_assert(sizeof(__ULONG32_TYPE__) == 4);
 #if __SIZEOF_LONG__ == 4
-STATIC_ASSERT(__builtin_types_compatible_p(__LONG32_TYPE__, signed long));
-STATIC_ASSERT(__builtin_types_compatible_p(__ULONG32_TYPE__, unsigned long));
+static_assert(__builtin_types_compatible_p(__LONG32_TYPE__, signed long));
+static_assert(__builtin_types_compatible_p(__ULONG32_TYPE__, unsigned long));
 #endif /* __SIZEOF_LONG__ == 4 */
 
 #ifdef __LONG64_TYPE__
-STATIC_ASSERT(sizeof(__LONG64_TYPE__) == 8);
-STATIC_ASSERT(sizeof(__ULONG64_TYPE__) == 8);
+static_assert(sizeof(__LONG64_TYPE__) == 8);
+static_assert(sizeof(__ULONG64_TYPE__) == 8);
 #if __SIZEOF_LONG__ == 8
-STATIC_ASSERT(__builtin_types_compatible_p(__LONG64_TYPE__, signed long));
-STATIC_ASSERT(__builtin_types_compatible_p(__ULONG64_TYPE__, unsigned long));
+static_assert(__builtin_types_compatible_p(__LONG64_TYPE__, signed long));
+static_assert(__builtin_types_compatible_p(__ULONG64_TYPE__, unsigned long));
 #endif /* __SIZEOF_LONG__ == 8 */
 #endif /* __LONG64_TYPE__ */
 
-STATIC_ASSERT(__builtin_types_compatible_p(int8_t, __INT8_TYPE__));
-STATIC_ASSERT(__builtin_types_compatible_p(int16_t, __INT16_TYPE__));
-STATIC_ASSERT(__builtin_types_compatible_p(int32_t, __INT32_TYPE__));
-STATIC_ASSERT(__builtin_types_compatible_p(uint8_t, __UINT8_TYPE__));
-STATIC_ASSERT(__builtin_types_compatible_p(uint16_t, __UINT16_TYPE__));
-STATIC_ASSERT(__builtin_types_compatible_p(uint32_t, __UINT32_TYPE__));
-STATIC_ASSERT(sizeof(int8_t) == 1);
-STATIC_ASSERT(sizeof(int16_t) == 2);
-STATIC_ASSERT(sizeof(int32_t) == 4);
-STATIC_ASSERT(sizeof(uint8_t) == 1);
-STATIC_ASSERT(sizeof(uint16_t) == 2);
-STATIC_ASSERT(sizeof(uint32_t) == 4);
+static_assert(__builtin_types_compatible_p(int8_t, __INT8_TYPE__));
+static_assert(__builtin_types_compatible_p(int16_t, __INT16_TYPE__));
+static_assert(__builtin_types_compatible_p(int32_t, __INT32_TYPE__));
+static_assert(__builtin_types_compatible_p(uint8_t, __UINT8_TYPE__));
+static_assert(__builtin_types_compatible_p(uint16_t, __UINT16_TYPE__));
+static_assert(__builtin_types_compatible_p(uint32_t, __UINT32_TYPE__));
+static_assert(sizeof(int8_t) == 1);
+static_assert(sizeof(int16_t) == 2);
+static_assert(sizeof(int32_t) == 4);
+static_assert(sizeof(uint8_t) == 1);
+static_assert(sizeof(uint16_t) == 2);
+static_assert(sizeof(uint32_t) == 4);
 #ifdef __UINT64_TYPE__
-STATIC_ASSERT(__builtin_types_compatible_p(int64_t, __INT64_TYPE__));
-STATIC_ASSERT(__builtin_types_compatible_p(uint64_t, __UINT64_TYPE__));
-STATIC_ASSERT(sizeof(int64_t) == 8);
-STATIC_ASSERT(sizeof(uint64_t) == 8);
+static_assert(__builtin_types_compatible_p(int64_t, __INT64_TYPE__));
+static_assert(__builtin_types_compatible_p(uint64_t, __UINT64_TYPE__));
+static_assert(sizeof(int64_t) == 8);
+static_assert(sizeof(uint64_t) == 8);
 #endif /* __UINT64_TYPE__ */
 
-STATIC_ASSERT(__builtin_types_compatible_p(intptr_t, __INTPTR_TYPE__));
-STATIC_ASSERT(__builtin_types_compatible_p(uintptr_t, __UINTPTR_TYPE__));
-STATIC_ASSERT(__builtin_types_compatible_p(longptr_t, __LONGPTR_TYPE__));
-STATIC_ASSERT(__builtin_types_compatible_p(ulongptr_t, __ULONGPTR_TYPE__));
-STATIC_ASSERT(sizeof(__INTPTR_TYPE__) == __SIZEOF_POINTER__);
-STATIC_ASSERT(sizeof(__UINTPTR_TYPE__) == __SIZEOF_POINTER__);
-STATIC_ASSERT(sizeof(__LONGPTR_TYPE__) == __SIZEOF_POINTER__);
-STATIC_ASSERT(sizeof(__ULONGPTR_TYPE__) == __SIZEOF_POINTER__);
-STATIC_ASSERT(sizeof(void *) == __SIZEOF_POINTER__);
+static_assert(__builtin_types_compatible_p(intptr_t, __INTPTR_TYPE__));
+static_assert(__builtin_types_compatible_p(uintptr_t, __UINTPTR_TYPE__));
+static_assert(__builtin_types_compatible_p(longptr_t, __LONGPTR_TYPE__));
+static_assert(__builtin_types_compatible_p(ulongptr_t, __ULONGPTR_TYPE__));
+static_assert(sizeof(__INTPTR_TYPE__) == __SIZEOF_POINTER__);
+static_assert(sizeof(__UINTPTR_TYPE__) == __SIZEOF_POINTER__);
+static_assert(sizeof(__LONGPTR_TYPE__) == __SIZEOF_POINTER__);
+static_assert(sizeof(__ULONGPTR_TYPE__) == __SIZEOF_POINTER__);
+static_assert(sizeof(void *) == __SIZEOF_POINTER__);
 
-STATIC_ASSERT(__builtin_types_compatible_p(size_t, __SIZE_TYPE__));
-STATIC_ASSERT(__builtin_types_compatible_p(ssize_t, __SSIZE_TYPE__));
-STATIC_ASSERT(sizeof(size_t) == __SIZEOF_SIZE_T__);
-STATIC_ASSERT(sizeof(ssize_t) == __SIZEOF_SIZE_T__);
+static_assert(__builtin_types_compatible_p(size_t, __SIZE_TYPE__));
+static_assert(__builtin_types_compatible_p(ssize_t, __SSIZE_TYPE__));
+static_assert(sizeof(size_t) == __SIZEOF_SIZE_T__);
+static_assert(sizeof(ssize_t) == __SIZEOF_SIZE_T__);
 
 
-STATIC_ASSERT(INTMAX_MIN        == __INTMAX_MIN__);
-STATIC_ASSERT(INTMAX_MAX        == __INTMAX_MAX__);
-STATIC_ASSERT(UINTMAX_MAX       == __UINTMAX_MAX__);
-STATIC_ASSERT(INT8_MIN          == __INT8_MIN__);
-STATIC_ASSERT(INT16_MIN         == __INT16_MIN__);
-STATIC_ASSERT(INT32_MIN         == __INT32_MIN__);
-STATIC_ASSERT(INT64_MIN         == __INT64_MIN__);
-STATIC_ASSERT(INT8_MAX          == __INT8_MAX__);
-STATIC_ASSERT(INT16_MAX         == __INT16_MAX__);
-STATIC_ASSERT(INT32_MAX         == __INT32_MAX__);
-STATIC_ASSERT(INT64_MAX         == __INT64_MAX__);
-STATIC_ASSERT(UINT8_MAX         == __UINT8_MAX__);
-STATIC_ASSERT(UINT16_MAX        == __UINT16_MAX__);
-STATIC_ASSERT(UINT32_MAX        == __UINT32_MAX__);
-STATIC_ASSERT(UINT64_MAX        == __UINT64_MAX__);
-STATIC_ASSERT(INT_LEAST8_MIN    == __INT_LEAST8_MIN__);
-STATIC_ASSERT(INT_LEAST16_MIN   == __INT_LEAST16_MIN__);
-STATIC_ASSERT(INT_LEAST32_MIN   == __INT_LEAST32_MIN__);
-STATIC_ASSERT(INT_LEAST64_MIN   == __INT_LEAST64_MIN__);
-STATIC_ASSERT(INT_LEAST8_MAX    == __INT_LEAST8_MAX__);
-STATIC_ASSERT(INT_LEAST16_MAX   == __INT_LEAST16_MAX__);
-STATIC_ASSERT(INT_LEAST32_MAX   == __INT_LEAST32_MAX__);
-STATIC_ASSERT(INT_LEAST64_MAX   == __INT_LEAST64_MAX__);
-STATIC_ASSERT(UINT_LEAST8_MAX   == __UINT_LEAST8_MAX__);
-STATIC_ASSERT(UINT_LEAST16_MAX  == __UINT_LEAST16_MAX__);
-STATIC_ASSERT(UINT_LEAST32_MAX  == __UINT_LEAST32_MAX__);
-STATIC_ASSERT(UINT_LEAST64_MAX  == __UINT_LEAST64_MAX__);
-STATIC_ASSERT(INT_FAST8_MIN     == __INT_FAST8_MIN__);
-STATIC_ASSERT(INT_FAST16_MIN    == __INT_FAST16_MIN__);
-STATIC_ASSERT(INT_FAST32_MIN    == __INT_FAST32_MIN__);
-STATIC_ASSERT(INT_FAST64_MIN    == __INT_FAST64_MIN__);
-STATIC_ASSERT(INT_FAST8_MAX     == __INT_FAST8_MAX__);
-STATIC_ASSERT(INT_FAST16_MAX    == __INT_FAST16_MAX__);
-STATIC_ASSERT(INT_FAST32_MAX    == __INT_FAST32_MAX__);
-STATIC_ASSERT(INT_FAST64_MAX    == __INT_FAST64_MAX__);
-STATIC_ASSERT(UINT_FAST8_MAX    == __UINT_FAST8_MAX__);
-STATIC_ASSERT(UINT_FAST16_MAX   == __UINT_FAST16_MAX__);
-STATIC_ASSERT(UINT_FAST32_MAX   == __UINT_FAST32_MAX__);
-STATIC_ASSERT(UINT_FAST64_MAX   == __UINT_FAST64_MAX__);
-STATIC_ASSERT(INTPTR_MIN        == __INTPTR_MIN__);
-STATIC_ASSERT(INTPTR_MAX        == __INTPTR_MAX__);
-STATIC_ASSERT(UINTPTR_MAX       == __UINTPTR_MAX__);
-STATIC_ASSERT(SIZE_MAX          == __SIZE_MAX__);
-STATIC_ASSERT(PTRDIFF_MIN       == __PTRDIFF_MIN__);
-STATIC_ASSERT(PTRDIFF_MAX       == __PTRDIFF_MAX__);
-STATIC_ASSERT(SIG_ATOMIC_MIN    == __SIG_ATOMIC_MIN__);
-STATIC_ASSERT(SIG_ATOMIC_MAX    == __SIG_ATOMIC_MAX__);
-STATIC_ASSERT(WCHAR_MIN         == __WCHAR_MIN__);
-STATIC_ASSERT(WCHAR_MAX         == __WCHAR_MAX__);
-STATIC_ASSERT(WINT_MIN          == __WINT_MIN__);
-STATIC_ASSERT(WINT_MAX          == __WINT_MAX__);
+static_assert(INTMAX_MIN        == __INTMAX_MIN__);
+static_assert(INTMAX_MAX        == __INTMAX_MAX__);
+static_assert(UINTMAX_MAX       == __UINTMAX_MAX__);
+static_assert(INT8_MIN          == __INT8_MIN__);
+static_assert(INT16_MIN         == __INT16_MIN__);
+static_assert(INT32_MIN         == __INT32_MIN__);
+static_assert(INT64_MIN         == __INT64_MIN__);
+static_assert(INT8_MAX          == __INT8_MAX__);
+static_assert(INT16_MAX         == __INT16_MAX__);
+static_assert(INT32_MAX         == __INT32_MAX__);
+static_assert(INT64_MAX         == __INT64_MAX__);
+static_assert(UINT8_MAX         == __UINT8_MAX__);
+static_assert(UINT16_MAX        == __UINT16_MAX__);
+static_assert(UINT32_MAX        == __UINT32_MAX__);
+static_assert(UINT64_MAX        == __UINT64_MAX__);
+static_assert(INT_LEAST8_MIN    == __INT_LEAST8_MIN__);
+static_assert(INT_LEAST16_MIN   == __INT_LEAST16_MIN__);
+static_assert(INT_LEAST32_MIN   == __INT_LEAST32_MIN__);
+static_assert(INT_LEAST64_MIN   == __INT_LEAST64_MIN__);
+static_assert(INT_LEAST8_MAX    == __INT_LEAST8_MAX__);
+static_assert(INT_LEAST16_MAX   == __INT_LEAST16_MAX__);
+static_assert(INT_LEAST32_MAX   == __INT_LEAST32_MAX__);
+static_assert(INT_LEAST64_MAX   == __INT_LEAST64_MAX__);
+static_assert(UINT_LEAST8_MAX   == __UINT_LEAST8_MAX__);
+static_assert(UINT_LEAST16_MAX  == __UINT_LEAST16_MAX__);
+static_assert(UINT_LEAST32_MAX  == __UINT_LEAST32_MAX__);
+static_assert(UINT_LEAST64_MAX  == __UINT_LEAST64_MAX__);
+static_assert(INT_FAST8_MIN     == __INT_FAST8_MIN__);
+static_assert(INT_FAST16_MIN    == __INT_FAST16_MIN__);
+static_assert(INT_FAST32_MIN    == __INT_FAST32_MIN__);
+static_assert(INT_FAST64_MIN    == __INT_FAST64_MIN__);
+static_assert(INT_FAST8_MAX     == __INT_FAST8_MAX__);
+static_assert(INT_FAST16_MAX    == __INT_FAST16_MAX__);
+static_assert(INT_FAST32_MAX    == __INT_FAST32_MAX__);
+static_assert(INT_FAST64_MAX    == __INT_FAST64_MAX__);
+static_assert(UINT_FAST8_MAX    == __UINT_FAST8_MAX__);
+static_assert(UINT_FAST16_MAX   == __UINT_FAST16_MAX__);
+static_assert(UINT_FAST32_MAX   == __UINT_FAST32_MAX__);
+static_assert(UINT_FAST64_MAX   == __UINT_FAST64_MAX__);
+static_assert(INTPTR_MIN        == __INTPTR_MIN__);
+static_assert(INTPTR_MAX        == __INTPTR_MAX__);
+static_assert(UINTPTR_MAX       == __UINTPTR_MAX__);
+static_assert(SIZE_MAX          == __SIZE_MAX__);
+static_assert(PTRDIFF_MIN       == __PTRDIFF_MIN__);
+static_assert(PTRDIFF_MAX       == __PTRDIFF_MAX__);
+static_assert(SIG_ATOMIC_MIN    == __SIG_ATOMIC_MIN__);
+static_assert(SIG_ATOMIC_MAX    == __SIG_ATOMIC_MAX__);
+static_assert(WCHAR_MIN         == __WCHAR_MIN__);
+static_assert(WCHAR_MAX         == __WCHAR_MAX__);
+static_assert(WINT_MIN          == __WINT_MIN__);
+static_assert(WINT_MAX          == __WINT_MAX__);
 
 
 
@@ -291,69 +292,69 @@ STATIC_ASSERT(WINT_MAX          == __WINT_MAX__);
 #endif /* !__DEEMON__ */
 
 #ifdef __SIZE_TYPE_IS_INT__
-STATIC_ASSERT(__builtin_types_compatible_p(size_t, unsigned int));
-STATIC_ASSERT(__builtin_types_compatible_p(ssize_t, signed int));
+static_assert(__builtin_types_compatible_p(size_t, unsigned int));
+static_assert(__builtin_types_compatible_p(ssize_t, signed int));
 #endif /* __SIZE_TYPE_IS_INT__ */
 #ifdef __SIZE_TYPE_IS_LONG__
-STATIC_ASSERT(__builtin_types_compatible_p(size_t, unsigned long));
-STATIC_ASSERT(__builtin_types_compatible_p(ssize_t, signed long));
+static_assert(__builtin_types_compatible_p(size_t, unsigned long));
+static_assert(__builtin_types_compatible_p(ssize_t, signed long));
 #endif /* __SIZE_TYPE_IS_LONG__ */
 #ifdef __SIZE_TYPE_IS_LLONG__
-STATIC_ASSERT(__builtin_types_compatible_p(size_t, __ULONGLONG));
-STATIC_ASSERT(__builtin_types_compatible_p(ssize_t, __LONGLONG));
+static_assert(__builtin_types_compatible_p(size_t, __ULONGLONG));
+static_assert(__builtin_types_compatible_p(ssize_t, __LONGLONG));
 #endif /* __SIZE_TYPE_IS_LLONG__ */
 
 #ifdef __PTRDIFF_TYPE_IS_INT__
-STATIC_ASSERT(__builtin_types_compatible_p(ptrdiff_t, signed int));
+static_assert(__builtin_types_compatible_p(ptrdiff_t, signed int));
 #endif /* __PTRDIFF_TYPE_IS_INT__ */
 #ifdef __PTRDIFF_TYPE_IS_LONG__
-STATIC_ASSERT(__builtin_types_compatible_p(ptrdiff_t, signed long));
+static_assert(__builtin_types_compatible_p(ptrdiff_t, signed long));
 #endif /* __PTRDIFF_TYPE_IS_LONG__ */
 #ifdef __PTRDIFF_TYPE_IS_LLONG__
-STATIC_ASSERT(__builtin_types_compatible_p(ptrdiff_t, __LONGLONG));
+static_assert(__builtin_types_compatible_p(ptrdiff_t, __LONGLONG));
 #endif /* __PTRDIFF_TYPE_IS_LLONG__ */
 
 
 
 
 #include <pthread.h>
-STATIC_ASSERT(sizeof(pthread_t) == __SIZEOF_PTHREAD_T);
-STATIC_ASSERT(sizeof(pthread_key_t) == __SIZEOF_PTHREAD_KEY_T);
-STATIC_ASSERT(sizeof(pthread_once_t) == __SIZEOF_PTHREAD_ONCE_T);
-STATIC_ASSERT(sizeof(pthread_attr_t) == __SIZEOF_PTHREAD_ATTR_T);
-STATIC_ASSERT(sizeof(pthread_mutex_t) == __SIZEOF_PTHREAD_MUTEX_T);
-STATIC_ASSERT(sizeof(pthread_mutexattr_t) == __SIZEOF_PTHREAD_MUTEXATTR_T);
-STATIC_ASSERT(sizeof(pthread_cond_t) == __SIZEOF_PTHREAD_COND_T);
-STATIC_ASSERT(sizeof(pthread_condattr_t) == __SIZEOF_PTHREAD_CONDATTR_T);
-STATIC_ASSERT(sizeof(pthread_rwlock_t) == __SIZEOF_PTHREAD_RWLOCK_T);
-STATIC_ASSERT(sizeof(pthread_rwlockattr_t) == __SIZEOF_PTHREAD_RWLOCKATTR_T);
-STATIC_ASSERT(sizeof(pthread_barrier_t) == __SIZEOF_PTHREAD_BARRIER_T);
-STATIC_ASSERT(sizeof(pthread_barrierattr_t) == __SIZEOF_PTHREAD_BARRIERATTR_T);
+static_assert(sizeof(pthread_t) == __SIZEOF_PTHREAD_T);
+static_assert(sizeof(pthread_key_t) == __SIZEOF_PTHREAD_KEY_T);
+static_assert(sizeof(pthread_once_t) == __SIZEOF_PTHREAD_ONCE_T);
+static_assert(sizeof(pthread_attr_t) == __SIZEOF_PTHREAD_ATTR_T);
+static_assert(sizeof(pthread_mutex_t) == __SIZEOF_PTHREAD_MUTEX_T);
+static_assert(sizeof(pthread_mutexattr_t) == __SIZEOF_PTHREAD_MUTEXATTR_T);
+static_assert(sizeof(pthread_cond_t) == __SIZEOF_PTHREAD_COND_T);
+static_assert(sizeof(pthread_condattr_t) == __SIZEOF_PTHREAD_CONDATTR_T);
+static_assert(sizeof(pthread_rwlock_t) == __SIZEOF_PTHREAD_RWLOCK_T);
+static_assert(sizeof(pthread_rwlockattr_t) == __SIZEOF_PTHREAD_RWLOCKATTR_T);
+static_assert(sizeof(pthread_barrier_t) == __SIZEOF_PTHREAD_BARRIER_T);
+static_assert(sizeof(pthread_barrierattr_t) == __SIZEOF_PTHREAD_BARRIERATTR_T);
 
 
 #include <threads.h>
-STATIC_ASSERT(sizeof(thrd_t) == __SIZEOF_PTHREAD_T);
-STATIC_ASSERT(sizeof(tss_t) == __SIZEOF_PTHREAD_KEY_T);
-STATIC_ASSERT(sizeof(once_flag) == __SIZEOF_PTHREAD_ONCE_T);
-STATIC_ASSERT(sizeof(mtx_t) == __SIZEOF_PTHREAD_MUTEX_T);
-STATIC_ASSERT(sizeof(cnd_t) == __SIZEOF_PTHREAD_COND_T);
+static_assert(sizeof(thrd_t) == __SIZEOF_PTHREAD_T);
+static_assert(sizeof(tss_t) == __SIZEOF_PTHREAD_KEY_T);
+static_assert(sizeof(once_flag) == __SIZEOF_PTHREAD_ONCE_T);
+static_assert(sizeof(mtx_t) == __SIZEOF_PTHREAD_MUTEX_T);
+static_assert(sizeof(cnd_t) == __SIZEOF_PTHREAD_COND_T);
 
 
 #include <elf.h>
-STATIC_ASSERT(sizeof(Elf32_Half) == __SIZEOF_ELF32_HALF__);
-STATIC_ASSERT(sizeof(Elf64_Half) == __SIZEOF_ELF64_HALF__);
-STATIC_ASSERT(sizeof(Elf32_Word) == __SIZEOF_ELF32_WORD__);
-STATIC_ASSERT(sizeof(Elf64_Word) == __SIZEOF_ELF64_WORD__);
-STATIC_ASSERT(sizeof(Elf32_Xword) == __SIZEOF_ELF32_XWORD__);
-STATIC_ASSERT(sizeof(Elf64_Xword) == __SIZEOF_ELF64_XWORD__);
-STATIC_ASSERT(sizeof(Elf32_Addr) == __SIZEOF_ELF32_ADDR__);
-STATIC_ASSERT(sizeof(Elf64_Addr) == __SIZEOF_ELF64_ADDR__);
-STATIC_ASSERT(sizeof(Elf32_Off) == __SIZEOF_ELF32_OFF__);
-STATIC_ASSERT(sizeof(Elf64_Off) == __SIZEOF_ELF64_OFF__);
-STATIC_ASSERT(sizeof(Elf32_Section) == __SIZEOF_ELF32_SECTION__);
-STATIC_ASSERT(sizeof(Elf64_Section) == __SIZEOF_ELF64_SECTION__);
-STATIC_ASSERT(sizeof(Elf32_Versym) == __SIZEOF_ELF32_VERSYM__);
-STATIC_ASSERT(sizeof(Elf64_Versym) == __SIZEOF_ELF64_VERSYM__);
+static_assert(sizeof(Elf32_Half) == __SIZEOF_ELF32_HALF__);
+static_assert(sizeof(Elf64_Half) == __SIZEOF_ELF64_HALF__);
+static_assert(sizeof(Elf32_Word) == __SIZEOF_ELF32_WORD__);
+static_assert(sizeof(Elf64_Word) == __SIZEOF_ELF64_WORD__);
+static_assert(sizeof(Elf32_Xword) == __SIZEOF_ELF32_XWORD__);
+static_assert(sizeof(Elf64_Xword) == __SIZEOF_ELF64_XWORD__);
+static_assert(sizeof(Elf32_Addr) == __SIZEOF_ELF32_ADDR__);
+static_assert(sizeof(Elf64_Addr) == __SIZEOF_ELF64_ADDR__);
+static_assert(sizeof(Elf32_Off) == __SIZEOF_ELF32_OFF__);
+static_assert(sizeof(Elf64_Off) == __SIZEOF_ELF64_OFF__);
+static_assert(sizeof(Elf32_Section) == __SIZEOF_ELF32_SECTION__);
+static_assert(sizeof(Elf64_Section) == __SIZEOF_ELF64_SECTION__);
+static_assert(sizeof(Elf32_Versym) == __SIZEOF_ELF32_VERSYM__);
+static_assert(sizeof(Elf64_Versym) == __SIZEOF_ELF64_VERSYM__);
 
 
 /*[[[deemon
@@ -428,10 +429,10 @@ for (local f: files)
 #include <bits/cmsghdr-struct.h>
 
 /* struct cmsghdr */
-STATIC_ASSERT(offsetof(struct cmsghdr, cmsg_data) == __OFFSET_CMSGHDR_DATA);
-STATIC_ASSERT(offsetof(struct cmsghdr, cmsg_len) == __OFFSET_CMSGHDR_LEN);
-STATIC_ASSERT(offsetof(struct cmsghdr, cmsg_level) == __OFFSET_CMSGHDR_LEVEL);
-STATIC_ASSERT(offsetof(struct cmsghdr, cmsg_type) == __OFFSET_CMSGHDR_TYPE);
+static_assert(offsetof(struct cmsghdr, cmsg_data) == __OFFSET_CMSGHDR_DATA);
+static_assert(offsetof(struct cmsghdr, cmsg_len) == __OFFSET_CMSGHDR_LEN);
+static_assert(offsetof(struct cmsghdr, cmsg_level) == __OFFSET_CMSGHDR_LEVEL);
+static_assert(offsetof(struct cmsghdr, cmsg_type) == __OFFSET_CMSGHDR_TYPE);
 
 
 
@@ -440,28 +441,28 @@ STATIC_ASSERT(offsetof(struct cmsghdr, cmsg_type) == __OFFSET_CMSGHDR_TYPE);
 #include <bits/flock-struct.h>
 
 /* struct flock */
-STATIC_ASSERT(offsetof(struct flock, l_len) == __OFFSET_FLOCK_LEN);
-STATIC_ASSERT(offsetof(struct flock, l_pid) == __OFFSET_FLOCK_PID);
-STATIC_ASSERT(offsetof(struct flock, l_start) == __OFFSET_FLOCK_START);
-STATIC_ASSERT(offsetof(struct flock, l_type) == __OFFSET_FLOCK_TYPE);
-STATIC_ASSERT(offsetof(struct flock, l_whence) == __OFFSET_FLOCK_WHENCE);
-STATIC_ASSERT(sizeof(struct flock) == __SIZEOF_FLOCK);
+static_assert(offsetof(struct flock, l_len) == __OFFSET_FLOCK_LEN);
+static_assert(offsetof(struct flock, l_pid) == __OFFSET_FLOCK_PID);
+static_assert(offsetof(struct flock, l_start) == __OFFSET_FLOCK_START);
+static_assert(offsetof(struct flock, l_type) == __OFFSET_FLOCK_TYPE);
+static_assert(offsetof(struct flock, l_whence) == __OFFSET_FLOCK_WHENCE);
+static_assert(sizeof(struct flock) == __SIZEOF_FLOCK);
 
 /* struct __flock64 */
-STATIC_ASSERT(offsetof(struct __flock64, l_len) == __OFFSET_FLOCK64_LEN);
-STATIC_ASSERT(offsetof(struct __flock64, l_pid) == __OFFSET_FLOCK64_PID);
-STATIC_ASSERT(offsetof(struct __flock64, l_start) == __OFFSET_FLOCK64_START);
-STATIC_ASSERT(offsetof(struct __flock64, l_type) == __OFFSET_FLOCK64_TYPE);
-STATIC_ASSERT(offsetof(struct __flock64, l_whence) == __OFFSET_FLOCK64_WHENCE);
-STATIC_ASSERT(sizeof(struct __flock64) == __SIZEOF_FLOCK64);
+static_assert(offsetof(struct __flock64, l_len) == __OFFSET_FLOCK64_LEN);
+static_assert(offsetof(struct __flock64, l_pid) == __OFFSET_FLOCK64_PID);
+static_assert(offsetof(struct __flock64, l_start) == __OFFSET_FLOCK64_START);
+static_assert(offsetof(struct __flock64, l_type) == __OFFSET_FLOCK64_TYPE);
+static_assert(offsetof(struct __flock64, l_whence) == __OFFSET_FLOCK64_WHENCE);
+static_assert(sizeof(struct __flock64) == __SIZEOF_FLOCK64);
 
 /* struct __flock32 */
-STATIC_ASSERT(offsetof(struct __flock32, l_len) == __OFFSET_FLOCK32_LEN);
-STATIC_ASSERT(offsetof(struct __flock32, l_pid) == __OFFSET_FLOCK32_PID);
-STATIC_ASSERT(offsetof(struct __flock32, l_start) == __OFFSET_FLOCK32_START);
-STATIC_ASSERT(offsetof(struct __flock32, l_type) == __OFFSET_FLOCK32_TYPE);
-STATIC_ASSERT(offsetof(struct __flock32, l_whence) == __OFFSET_FLOCK32_WHENCE);
-STATIC_ASSERT(sizeof(struct __flock32) == __SIZEOF_FLOCK32);
+static_assert(offsetof(struct __flock32, l_len) == __OFFSET_FLOCK32_LEN);
+static_assert(offsetof(struct __flock32, l_pid) == __OFFSET_FLOCK32_PID);
+static_assert(offsetof(struct __flock32, l_start) == __OFFSET_FLOCK32_START);
+static_assert(offsetof(struct __flock32, l_type) == __OFFSET_FLOCK32_TYPE);
+static_assert(offsetof(struct __flock32, l_whence) == __OFFSET_FLOCK32_WHENCE);
+static_assert(sizeof(struct __flock32) == __SIZEOF_FLOCK32);
 
 
 
@@ -470,19 +471,19 @@ STATIC_ASSERT(sizeof(struct __flock32) == __SIZEOF_FLOCK32);
 #include <bits/itimerspec.h>
 
 /* struct itimerspec */
-STATIC_ASSERT(offsetof(struct itimerspec, it_value) == __OFFSET_ITIMERSPEC_VALUE);
-STATIC_ASSERT(offsetof(struct itimerspec, it_interval) == __OFFSET_ITIMERSPEC_INTERVAL);
-STATIC_ASSERT(sizeof(struct itimerspec) == __SIZEOF_ITIMERSPEC);
+static_assert(offsetof(struct itimerspec, it_value) == __OFFSET_ITIMERSPEC_VALUE);
+static_assert(offsetof(struct itimerspec, it_interval) == __OFFSET_ITIMERSPEC_INTERVAL);
+static_assert(sizeof(struct itimerspec) == __SIZEOF_ITIMERSPEC);
 
 /* struct __itimerspec64 */
-STATIC_ASSERT(offsetof(struct __itimerspec64, it_value) == __OFFSET_ITIMERSPEC64_VALUE);
-STATIC_ASSERT(offsetof(struct __itimerspec64, it_interval) == __OFFSET_ITIMERSPEC64_INTERVAL);
-STATIC_ASSERT(sizeof(struct __itimerspec64) == __SIZEOF_ITIMERSPEC64);
+static_assert(offsetof(struct __itimerspec64, it_value) == __OFFSET_ITIMERSPEC64_VALUE);
+static_assert(offsetof(struct __itimerspec64, it_interval) == __OFFSET_ITIMERSPEC64_INTERVAL);
+static_assert(sizeof(struct __itimerspec64) == __SIZEOF_ITIMERSPEC64);
 
 /* struct __itimerspec32 */
-STATIC_ASSERT(offsetof(struct __itimerspec32, it_value) == __OFFSET_ITIMERSPEC32_VALUE);
-STATIC_ASSERT(offsetof(struct __itimerspec32, it_interval) == __OFFSET_ITIMERSPEC32_INTERVAL);
-STATIC_ASSERT(sizeof(struct __itimerspec32) == __SIZEOF_ITIMERSPEC32);
+static_assert(offsetof(struct __itimerspec32, it_value) == __OFFSET_ITIMERSPEC32_VALUE);
+static_assert(offsetof(struct __itimerspec32, it_interval) == __OFFSET_ITIMERSPEC32_INTERVAL);
+static_assert(sizeof(struct __itimerspec32) == __SIZEOF_ITIMERSPEC32);
 
 
 
@@ -491,19 +492,19 @@ STATIC_ASSERT(sizeof(struct __itimerspec32) == __SIZEOF_ITIMERSPEC32);
 #include <bits/itimerval.h>
 
 /* struct itimerval */
-STATIC_ASSERT(offsetof(struct itimerval, it_value) == __OFFSET_ITIMERVAL_VALUE);
-STATIC_ASSERT(offsetof(struct itimerval, it_interval) == __OFFSET_ITIMERVAL_INTERVAL);
-STATIC_ASSERT(sizeof(struct itimerval) == __SIZEOF_ITIMERVAL);
+static_assert(offsetof(struct itimerval, it_value) == __OFFSET_ITIMERVAL_VALUE);
+static_assert(offsetof(struct itimerval, it_interval) == __OFFSET_ITIMERVAL_INTERVAL);
+static_assert(sizeof(struct itimerval) == __SIZEOF_ITIMERVAL);
 
 /* struct __itimerval64 */
-STATIC_ASSERT(offsetof(struct __itimerval64, it_value) == __OFFSET_ITIMERVAL64_VALUE);
-STATIC_ASSERT(offsetof(struct __itimerval64, it_interval) == __OFFSET_ITIMERVAL64_INTERVAL);
-STATIC_ASSERT(sizeof(struct __itimerval64) == __SIZEOF_ITIMERVAL64);
+static_assert(offsetof(struct __itimerval64, it_value) == __OFFSET_ITIMERVAL64_VALUE);
+static_assert(offsetof(struct __itimerval64, it_interval) == __OFFSET_ITIMERVAL64_INTERVAL);
+static_assert(sizeof(struct __itimerval64) == __SIZEOF_ITIMERVAL64);
 
 /* struct __itimerval32 */
-STATIC_ASSERT(offsetof(struct __itimerval32, it_value) == __OFFSET_ITIMERVAL32_VALUE);
-STATIC_ASSERT(offsetof(struct __itimerval32, it_interval) == __OFFSET_ITIMERVAL32_INTERVAL);
-STATIC_ASSERT(sizeof(struct __itimerval32) == __SIZEOF_ITIMERVAL32);
+static_assert(offsetof(struct __itimerval32, it_value) == __OFFSET_ITIMERVAL32_VALUE);
+static_assert(offsetof(struct __itimerval32, it_interval) == __OFFSET_ITIMERVAL32_INTERVAL);
+static_assert(sizeof(struct __itimerval32) == __SIZEOF_ITIMERVAL32);
 
 
 
@@ -512,10 +513,10 @@ STATIC_ASSERT(sizeof(struct __itimerval32) == __SIZEOF_ITIMERVAL32);
 #include <bits/mmsghdr-struct.h>
 
 /* struct mmsghdr */
-STATIC_ASSERT(offsetof(struct mmsghdr, msg_len) == __OFFSET_MMSGHDR_LEN);
-STATIC_ASSERT(offsetof(struct mmsghdr, msg_hdr) == __OFFSET_MMSGHDR_HDR);
-STATIC_ASSERT(sizeof(struct mmsghdr) == __SIZEOF_MMSGHDR);
-STATIC_ASSERT(alignof(struct mmsghdr) == __ALIGNOF_MMSGHDR);
+static_assert(offsetof(struct mmsghdr, msg_len) == __OFFSET_MMSGHDR_LEN);
+static_assert(offsetof(struct mmsghdr, msg_hdr) == __OFFSET_MMSGHDR_HDR);
+static_assert(sizeof(struct mmsghdr) == __SIZEOF_MMSGHDR);
+static_assert(alignof(struct mmsghdr) == __ALIGNOF_MMSGHDR);
 
 
 
@@ -524,15 +525,15 @@ STATIC_ASSERT(alignof(struct mmsghdr) == __ALIGNOF_MMSGHDR);
 #include <bits/msghdr-struct.h>
 
 /* struct msghdr */
-STATIC_ASSERT(offsetof(struct msghdr, msg_control) == __OFFSET_MSGHDR_CONTROL);
-STATIC_ASSERT(offsetof(struct msghdr, msg_controllen) == __OFFSET_MSGHDR_CONTROLLEN);
-STATIC_ASSERT(offsetof(struct msghdr, msg_flags) == __OFFSET_MSGHDR_FLAGS);
-STATIC_ASSERT(offsetof(struct msghdr, msg_iov) == __OFFSET_MSGHDR_IOV);
-STATIC_ASSERT(offsetof(struct msghdr, msg_iovlen) == __OFFSET_MSGHDR_IOVLEN);
-STATIC_ASSERT(offsetof(struct msghdr, msg_name) == __OFFSET_MSGHDR_NAME);
-STATIC_ASSERT(offsetof(struct msghdr, msg_namelen) == __OFFSET_MSGHDR_NAMELEN);
-STATIC_ASSERT(sizeof(struct msghdr) == __SIZEOF_MSGHDR);
-STATIC_ASSERT(alignof(struct msghdr) == __ALIGNOF_MSGHDR);
+static_assert(offsetof(struct msghdr, msg_control) == __OFFSET_MSGHDR_CONTROL);
+static_assert(offsetof(struct msghdr, msg_controllen) == __OFFSET_MSGHDR_CONTROLLEN);
+static_assert(offsetof(struct msghdr, msg_flags) == __OFFSET_MSGHDR_FLAGS);
+static_assert(offsetof(struct msghdr, msg_iov) == __OFFSET_MSGHDR_IOV);
+static_assert(offsetof(struct msghdr, msg_iovlen) == __OFFSET_MSGHDR_IOVLEN);
+static_assert(offsetof(struct msghdr, msg_name) == __OFFSET_MSGHDR_NAME);
+static_assert(offsetof(struct msghdr, msg_namelen) == __OFFSET_MSGHDR_NAMELEN);
+static_assert(sizeof(struct msghdr) == __SIZEOF_MSGHDR);
+static_assert(alignof(struct msghdr) == __ALIGNOF_MSGHDR);
 
 
 
@@ -541,61 +542,61 @@ STATIC_ASSERT(alignof(struct msghdr) == __ALIGNOF_MSGHDR);
 #include <bits/rusage-struct.h>
 
 /* struct rusage */
-STATIC_ASSERT(offsetof(struct rusage, ru_idrss) == __OFFSET_RUSAGE_IDRSS);
-STATIC_ASSERT(offsetof(struct rusage, ru_inblock) == __OFFSET_RUSAGE_INBLOCK);
-STATIC_ASSERT(offsetof(struct rusage, ru_isrss) == __OFFSET_RUSAGE_ISRSS);
-STATIC_ASSERT(offsetof(struct rusage, ru_ixrss) == __OFFSET_RUSAGE_IXRSS);
-STATIC_ASSERT(offsetof(struct rusage, ru_majflt) == __OFFSET_RUSAGE_MAJFLT);
-STATIC_ASSERT(offsetof(struct rusage, ru_maxrss) == __OFFSET_RUSAGE_MAXRSS);
-STATIC_ASSERT(offsetof(struct rusage, ru_minflt) == __OFFSET_RUSAGE_MINFLT);
-STATIC_ASSERT(offsetof(struct rusage, ru_msgrcv) == __OFFSET_RUSAGE_MSGRCV);
-STATIC_ASSERT(offsetof(struct rusage, ru_msgsnd) == __OFFSET_RUSAGE_MSGSND);
-STATIC_ASSERT(offsetof(struct rusage, ru_nivcsw) == __OFFSET_RUSAGE_NIVCSW);
-STATIC_ASSERT(offsetof(struct rusage, ru_nsignals) == __OFFSET_RUSAGE_NSIGNALS);
-STATIC_ASSERT(offsetof(struct rusage, ru_nswap) == __OFFSET_RUSAGE_NSWAP);
-STATIC_ASSERT(offsetof(struct rusage, ru_nvcsw) == __OFFSET_RUSAGE_NVCSW);
-STATIC_ASSERT(offsetof(struct rusage, ru_oublock) == __OFFSET_RUSAGE_OUBLOCK);
-STATIC_ASSERT(offsetof(struct rusage, ru_stime) == __OFFSET_RUSAGE_STIME);
-STATIC_ASSERT(offsetof(struct rusage, ru_utime) == __OFFSET_RUSAGE_UTIME);
-STATIC_ASSERT(sizeof(struct rusage) == __SIZEOF_RUSAGE);
+static_assert(offsetof(struct rusage, ru_idrss) == __OFFSET_RUSAGE_IDRSS);
+static_assert(offsetof(struct rusage, ru_inblock) == __OFFSET_RUSAGE_INBLOCK);
+static_assert(offsetof(struct rusage, ru_isrss) == __OFFSET_RUSAGE_ISRSS);
+static_assert(offsetof(struct rusage, ru_ixrss) == __OFFSET_RUSAGE_IXRSS);
+static_assert(offsetof(struct rusage, ru_majflt) == __OFFSET_RUSAGE_MAJFLT);
+static_assert(offsetof(struct rusage, ru_maxrss) == __OFFSET_RUSAGE_MAXRSS);
+static_assert(offsetof(struct rusage, ru_minflt) == __OFFSET_RUSAGE_MINFLT);
+static_assert(offsetof(struct rusage, ru_msgrcv) == __OFFSET_RUSAGE_MSGRCV);
+static_assert(offsetof(struct rusage, ru_msgsnd) == __OFFSET_RUSAGE_MSGSND);
+static_assert(offsetof(struct rusage, ru_nivcsw) == __OFFSET_RUSAGE_NIVCSW);
+static_assert(offsetof(struct rusage, ru_nsignals) == __OFFSET_RUSAGE_NSIGNALS);
+static_assert(offsetof(struct rusage, ru_nswap) == __OFFSET_RUSAGE_NSWAP);
+static_assert(offsetof(struct rusage, ru_nvcsw) == __OFFSET_RUSAGE_NVCSW);
+static_assert(offsetof(struct rusage, ru_oublock) == __OFFSET_RUSAGE_OUBLOCK);
+static_assert(offsetof(struct rusage, ru_stime) == __OFFSET_RUSAGE_STIME);
+static_assert(offsetof(struct rusage, ru_utime) == __OFFSET_RUSAGE_UTIME);
+static_assert(sizeof(struct rusage) == __SIZEOF_RUSAGE);
 
 /* struct __rusage64 */
-STATIC_ASSERT(offsetof(struct __rusage64, ru_idrss) == __OFFSET_RUSAGE64_IDRSS);
-STATIC_ASSERT(offsetof(struct __rusage64, ru_inblock) == __OFFSET_RUSAGE64_INBLOCK);
-STATIC_ASSERT(offsetof(struct __rusage64, ru_isrss) == __OFFSET_RUSAGE64_ISRSS);
-STATIC_ASSERT(offsetof(struct __rusage64, ru_ixrss) == __OFFSET_RUSAGE64_IXRSS);
-STATIC_ASSERT(offsetof(struct __rusage64, ru_majflt) == __OFFSET_RUSAGE64_MAJFLT);
-STATIC_ASSERT(offsetof(struct __rusage64, ru_maxrss) == __OFFSET_RUSAGE64_MAXRSS);
-STATIC_ASSERT(offsetof(struct __rusage64, ru_minflt) == __OFFSET_RUSAGE64_MINFLT);
-STATIC_ASSERT(offsetof(struct __rusage64, ru_msgrcv) == __OFFSET_RUSAGE64_MSGRCV);
-STATIC_ASSERT(offsetof(struct __rusage64, ru_msgsnd) == __OFFSET_RUSAGE64_MSGSND);
-STATIC_ASSERT(offsetof(struct __rusage64, ru_nivcsw) == __OFFSET_RUSAGE64_NIVCSW);
-STATIC_ASSERT(offsetof(struct __rusage64, ru_nsignals) == __OFFSET_RUSAGE64_NSIGNALS);
-STATIC_ASSERT(offsetof(struct __rusage64, ru_nswap) == __OFFSET_RUSAGE64_NSWAP);
-STATIC_ASSERT(offsetof(struct __rusage64, ru_nvcsw) == __OFFSET_RUSAGE64_NVCSW);
-STATIC_ASSERT(offsetof(struct __rusage64, ru_oublock) == __OFFSET_RUSAGE64_OUBLOCK);
-STATIC_ASSERT(offsetof(struct __rusage64, ru_stime) == __OFFSET_RUSAGE64_STIME);
-STATIC_ASSERT(offsetof(struct __rusage64, ru_utime) == __OFFSET_RUSAGE64_UTIME);
-STATIC_ASSERT(sizeof(struct __rusage64) == __SIZEOF_RUSAGE64);
+static_assert(offsetof(struct __rusage64, ru_idrss) == __OFFSET_RUSAGE64_IDRSS);
+static_assert(offsetof(struct __rusage64, ru_inblock) == __OFFSET_RUSAGE64_INBLOCK);
+static_assert(offsetof(struct __rusage64, ru_isrss) == __OFFSET_RUSAGE64_ISRSS);
+static_assert(offsetof(struct __rusage64, ru_ixrss) == __OFFSET_RUSAGE64_IXRSS);
+static_assert(offsetof(struct __rusage64, ru_majflt) == __OFFSET_RUSAGE64_MAJFLT);
+static_assert(offsetof(struct __rusage64, ru_maxrss) == __OFFSET_RUSAGE64_MAXRSS);
+static_assert(offsetof(struct __rusage64, ru_minflt) == __OFFSET_RUSAGE64_MINFLT);
+static_assert(offsetof(struct __rusage64, ru_msgrcv) == __OFFSET_RUSAGE64_MSGRCV);
+static_assert(offsetof(struct __rusage64, ru_msgsnd) == __OFFSET_RUSAGE64_MSGSND);
+static_assert(offsetof(struct __rusage64, ru_nivcsw) == __OFFSET_RUSAGE64_NIVCSW);
+static_assert(offsetof(struct __rusage64, ru_nsignals) == __OFFSET_RUSAGE64_NSIGNALS);
+static_assert(offsetof(struct __rusage64, ru_nswap) == __OFFSET_RUSAGE64_NSWAP);
+static_assert(offsetof(struct __rusage64, ru_nvcsw) == __OFFSET_RUSAGE64_NVCSW);
+static_assert(offsetof(struct __rusage64, ru_oublock) == __OFFSET_RUSAGE64_OUBLOCK);
+static_assert(offsetof(struct __rusage64, ru_stime) == __OFFSET_RUSAGE64_STIME);
+static_assert(offsetof(struct __rusage64, ru_utime) == __OFFSET_RUSAGE64_UTIME);
+static_assert(sizeof(struct __rusage64) == __SIZEOF_RUSAGE64);
 
 /* struct __rusage32 */
-STATIC_ASSERT(offsetof(struct __rusage32, ru_idrss) == __OFFSET_RUSAGE32_IDRSS);
-STATIC_ASSERT(offsetof(struct __rusage32, ru_inblock) == __OFFSET_RUSAGE32_INBLOCK);
-STATIC_ASSERT(offsetof(struct __rusage32, ru_isrss) == __OFFSET_RUSAGE32_ISRSS);
-STATIC_ASSERT(offsetof(struct __rusage32, ru_ixrss) == __OFFSET_RUSAGE32_IXRSS);
-STATIC_ASSERT(offsetof(struct __rusage32, ru_majflt) == __OFFSET_RUSAGE32_MAJFLT);
-STATIC_ASSERT(offsetof(struct __rusage32, ru_maxrss) == __OFFSET_RUSAGE32_MAXRSS);
-STATIC_ASSERT(offsetof(struct __rusage32, ru_minflt) == __OFFSET_RUSAGE32_MINFLT);
-STATIC_ASSERT(offsetof(struct __rusage32, ru_msgrcv) == __OFFSET_RUSAGE32_MSGRCV);
-STATIC_ASSERT(offsetof(struct __rusage32, ru_msgsnd) == __OFFSET_RUSAGE32_MSGSND);
-STATIC_ASSERT(offsetof(struct __rusage32, ru_nivcsw) == __OFFSET_RUSAGE32_NIVCSW);
-STATIC_ASSERT(offsetof(struct __rusage32, ru_nsignals) == __OFFSET_RUSAGE32_NSIGNALS);
-STATIC_ASSERT(offsetof(struct __rusage32, ru_nswap) == __OFFSET_RUSAGE32_NSWAP);
-STATIC_ASSERT(offsetof(struct __rusage32, ru_nvcsw) == __OFFSET_RUSAGE32_NVCSW);
-STATIC_ASSERT(offsetof(struct __rusage32, ru_oublock) == __OFFSET_RUSAGE32_OUBLOCK);
-STATIC_ASSERT(offsetof(struct __rusage32, ru_stime) == __OFFSET_RUSAGE32_STIME);
-STATIC_ASSERT(offsetof(struct __rusage32, ru_utime) == __OFFSET_RUSAGE32_UTIME);
-STATIC_ASSERT(sizeof(struct __rusage32) == __SIZEOF_RUSAGE32);
+static_assert(offsetof(struct __rusage32, ru_idrss) == __OFFSET_RUSAGE32_IDRSS);
+static_assert(offsetof(struct __rusage32, ru_inblock) == __OFFSET_RUSAGE32_INBLOCK);
+static_assert(offsetof(struct __rusage32, ru_isrss) == __OFFSET_RUSAGE32_ISRSS);
+static_assert(offsetof(struct __rusage32, ru_ixrss) == __OFFSET_RUSAGE32_IXRSS);
+static_assert(offsetof(struct __rusage32, ru_majflt) == __OFFSET_RUSAGE32_MAJFLT);
+static_assert(offsetof(struct __rusage32, ru_maxrss) == __OFFSET_RUSAGE32_MAXRSS);
+static_assert(offsetof(struct __rusage32, ru_minflt) == __OFFSET_RUSAGE32_MINFLT);
+static_assert(offsetof(struct __rusage32, ru_msgrcv) == __OFFSET_RUSAGE32_MSGRCV);
+static_assert(offsetof(struct __rusage32, ru_msgsnd) == __OFFSET_RUSAGE32_MSGSND);
+static_assert(offsetof(struct __rusage32, ru_nivcsw) == __OFFSET_RUSAGE32_NIVCSW);
+static_assert(offsetof(struct __rusage32, ru_nsignals) == __OFFSET_RUSAGE32_NSIGNALS);
+static_assert(offsetof(struct __rusage32, ru_nswap) == __OFFSET_RUSAGE32_NSWAP);
+static_assert(offsetof(struct __rusage32, ru_nvcsw) == __OFFSET_RUSAGE32_NVCSW);
+static_assert(offsetof(struct __rusage32, ru_oublock) == __OFFSET_RUSAGE32_OUBLOCK);
+static_assert(offsetof(struct __rusage32, ru_stime) == __OFFSET_RUSAGE32_STIME);
+static_assert(offsetof(struct __rusage32, ru_utime) == __OFFSET_RUSAGE32_UTIME);
+static_assert(sizeof(struct __rusage32) == __SIZEOF_RUSAGE32);
 
 
 
@@ -604,13 +605,13 @@ STATIC_ASSERT(sizeof(struct __rusage32) == __SIZEOF_RUSAGE32);
 #include <bits/sigaction-struct.h>
 
 /* struct sigaction */
-STATIC_ASSERT(offsetof(struct sigaction, sa_flags) == __OFFSET_SIGACTION_FLAGS);
-STATIC_ASSERT(offsetof(struct sigaction, sa_handler) == __OFFSET_SIGACTION_HANDLER);
-STATIC_ASSERT(offsetof(struct sigaction, sa_mask) == __OFFSET_SIGACTION_MASK);
-STATIC_ASSERT(offsetof(struct sigaction, sa_restorer) == __OFFSET_SIGACTION_RESTORER);
-STATIC_ASSERT(offsetof(struct sigaction, sa_sigaction) == __OFFSET_SIGACTION_SIGACTION);
-STATIC_ASSERT(sizeof(struct sigaction) == __SIZEOF_SIGACTION);
-STATIC_ASSERT(alignof(struct sigaction) == __ALIGNOF_SIGACTION);
+static_assert(offsetof(struct sigaction, sa_flags) == __OFFSET_SIGACTION_FLAGS);
+static_assert(offsetof(struct sigaction, sa_handler) == __OFFSET_SIGACTION_HANDLER);
+static_assert(offsetof(struct sigaction, sa_mask) == __OFFSET_SIGACTION_MASK);
+static_assert(offsetof(struct sigaction, sa_restorer) == __OFFSET_SIGACTION_RESTORER);
+static_assert(offsetof(struct sigaction, sa_sigaction) == __OFFSET_SIGACTION_SIGACTION);
+static_assert(sizeof(struct sigaction) == __SIZEOF_SIGACTION);
+static_assert(alignof(struct sigaction) == __ALIGNOF_SIGACTION);
 
 
 
@@ -619,29 +620,29 @@ STATIC_ASSERT(alignof(struct sigaction) == __ALIGNOF_SIGACTION);
 #include <bits/siginfo-struct.h>
 
 /* struct __siginfo_struct */
-STATIC_ASSERT(offsetof(struct __siginfo_struct, si_addr) == __OFFSET_SIGINFO_ADDR);
-STATIC_ASSERT(offsetof(struct __siginfo_struct, si_addr_lsb) == __OFFSET_SIGINFO_ADDR_LSB);
-STATIC_ASSERT(offsetof(struct __siginfo_struct, si_arch) == __OFFSET_SIGINFO_ARCH);
-STATIC_ASSERT(offsetof(struct __siginfo_struct, si_band) == __OFFSET_SIGINFO_BAND);
-STATIC_ASSERT(offsetof(struct __siginfo_struct, si_call_addr) == __OFFSET_SIGINFO_CALL_ADDR);
-STATIC_ASSERT(offsetof(struct __siginfo_struct, si_code) == __OFFSET_SIGINFO_CODE);
-STATIC_ASSERT(offsetof(struct __siginfo_struct, si_errno) == __OFFSET_SIGINFO_ERRNO);
-STATIC_ASSERT(offsetof(struct __siginfo_struct, si_fd) == __OFFSET_SIGINFO_FD);
-STATIC_ASSERT(offsetof(struct __siginfo_struct, si_int) == __OFFSET_SIGINFO_INT);
-STATIC_ASSERT(offsetof(struct __siginfo_struct, si_lower) == __OFFSET_SIGINFO_LOWER);
-STATIC_ASSERT(offsetof(struct __siginfo_struct, si_overrun) == __OFFSET_SIGINFO_OVERRUN);
-STATIC_ASSERT(offsetof(struct __siginfo_struct, si_pid) == __OFFSET_SIGINFO_PID);
-STATIC_ASSERT(offsetof(struct __siginfo_struct, si_ptr) == __OFFSET_SIGINFO_PTR);
-STATIC_ASSERT(offsetof(struct __siginfo_struct, si_signo) == __OFFSET_SIGINFO_SIGNO);
-STATIC_ASSERT(offsetof(struct __siginfo_struct, si_status) == __OFFSET_SIGINFO_STATUS);
-STATIC_ASSERT(offsetof(struct __siginfo_struct, si_stime) == __OFFSET_SIGINFO_STIME);
-STATIC_ASSERT(offsetof(struct __siginfo_struct, si_syscall) == __OFFSET_SIGINFO_SYSCALL);
-STATIC_ASSERT(offsetof(struct __siginfo_struct, si_timerid) == __OFFSET_SIGINFO_TIMERID);
-STATIC_ASSERT(offsetof(struct __siginfo_struct, si_uid) == __OFFSET_SIGINFO_UID);
-STATIC_ASSERT(offsetof(struct __siginfo_struct, si_upper) == __OFFSET_SIGINFO_UPPER);
-STATIC_ASSERT(offsetof(struct __siginfo_struct, si_utime) == __OFFSET_SIGINFO_UTIME);
-STATIC_ASSERT(offsetof(struct __siginfo_struct, si_value) == __OFFSET_SIGINFO_VALUE);
-STATIC_ASSERT(sizeof(struct __siginfo_struct) == __SIZEOF_SIGINFO);
+static_assert(offsetof(struct __siginfo_struct, si_addr) == __OFFSET_SIGINFO_ADDR);
+static_assert(offsetof(struct __siginfo_struct, si_addr_lsb) == __OFFSET_SIGINFO_ADDR_LSB);
+static_assert(offsetof(struct __siginfo_struct, si_arch) == __OFFSET_SIGINFO_ARCH);
+static_assert(offsetof(struct __siginfo_struct, si_band) == __OFFSET_SIGINFO_BAND);
+static_assert(offsetof(struct __siginfo_struct, si_call_addr) == __OFFSET_SIGINFO_CALL_ADDR);
+static_assert(offsetof(struct __siginfo_struct, si_code) == __OFFSET_SIGINFO_CODE);
+static_assert(offsetof(struct __siginfo_struct, si_errno) == __OFFSET_SIGINFO_ERRNO);
+static_assert(offsetof(struct __siginfo_struct, si_fd) == __OFFSET_SIGINFO_FD);
+static_assert(offsetof(struct __siginfo_struct, si_int) == __OFFSET_SIGINFO_INT);
+static_assert(offsetof(struct __siginfo_struct, si_lower) == __OFFSET_SIGINFO_LOWER);
+static_assert(offsetof(struct __siginfo_struct, si_overrun) == __OFFSET_SIGINFO_OVERRUN);
+static_assert(offsetof(struct __siginfo_struct, si_pid) == __OFFSET_SIGINFO_PID);
+static_assert(offsetof(struct __siginfo_struct, si_ptr) == __OFFSET_SIGINFO_PTR);
+static_assert(offsetof(struct __siginfo_struct, si_signo) == __OFFSET_SIGINFO_SIGNO);
+static_assert(offsetof(struct __siginfo_struct, si_status) == __OFFSET_SIGINFO_STATUS);
+static_assert(offsetof(struct __siginfo_struct, si_stime) == __OFFSET_SIGINFO_STIME);
+static_assert(offsetof(struct __siginfo_struct, si_syscall) == __OFFSET_SIGINFO_SYSCALL);
+static_assert(offsetof(struct __siginfo_struct, si_timerid) == __OFFSET_SIGINFO_TIMERID);
+static_assert(offsetof(struct __siginfo_struct, si_uid) == __OFFSET_SIGINFO_UID);
+static_assert(offsetof(struct __siginfo_struct, si_upper) == __OFFSET_SIGINFO_UPPER);
+static_assert(offsetof(struct __siginfo_struct, si_utime) == __OFFSET_SIGINFO_UTIME);
+static_assert(offsetof(struct __siginfo_struct, si_value) == __OFFSET_SIGINFO_VALUE);
+static_assert(sizeof(struct __siginfo_struct) == __SIZEOF_SIGINFO);
 
 
 
@@ -650,84 +651,84 @@ STATIC_ASSERT(sizeof(struct __siginfo_struct) == __SIZEOF_SIGINFO);
 #include <bits/stat-kos.h>
 
 /* struct __kos_stat */
-STATIC_ASSERT(offsetof(struct __kos_stat, st_atime) == __OFFSET_KOS_STAT_ATIME);
-STATIC_ASSERT(offsetof(struct __kos_stat, st_atime32) == __OFFSET_KOS_STAT_ATIME32);
-STATIC_ASSERT(offsetof(struct __kos_stat, st_atime64) == __OFFSET_KOS_STAT_ATIME64);
-STATIC_ASSERT(offsetof(struct __kos_stat, st_atimensec) == __OFFSET_KOS_STAT_ATIMENSEC);
-STATIC_ASSERT(offsetof(struct __kos_stat, st_atimensec32) == __OFFSET_KOS_STAT_ATIMENSEC32);
-STATIC_ASSERT(offsetof(struct __kos_stat, st_atimensec64) == __OFFSET_KOS_STAT_ATIMENSEC64);
-STATIC_ASSERT(offsetof(struct __kos_stat, st_atimespec) == __OFFSET_KOS_STAT_ATIMESPEC);
-STATIC_ASSERT(offsetof(struct __kos_stat, st_atimespec32) == __OFFSET_KOS_STAT_ATIMESPEC32);
-STATIC_ASSERT(offsetof(struct __kos_stat, st_atimespec64) == __OFFSET_KOS_STAT_ATIMESPEC64);
-STATIC_ASSERT(offsetof(struct __kos_stat, st_blksize) == __OFFSET_KOS_STAT_BLKSIZE);
-STATIC_ASSERT(offsetof(struct __kos_stat, st_blocks) == __OFFSET_KOS_STAT_BLOCKS);
-STATIC_ASSERT(offsetof(struct __kos_stat, st_ctime) == __OFFSET_KOS_STAT_CTIME);
-STATIC_ASSERT(offsetof(struct __kos_stat, st_ctime32) == __OFFSET_KOS_STAT_CTIME32);
-STATIC_ASSERT(offsetof(struct __kos_stat, st_ctime64) == __OFFSET_KOS_STAT_CTIME64);
-STATIC_ASSERT(offsetof(struct __kos_stat, st_ctimensec) == __OFFSET_KOS_STAT_CTIMENSEC);
-STATIC_ASSERT(offsetof(struct __kos_stat, st_ctimensec32) == __OFFSET_KOS_STAT_CTIMENSEC32);
-STATIC_ASSERT(offsetof(struct __kos_stat, st_ctimensec64) == __OFFSET_KOS_STAT_CTIMENSEC64);
-STATIC_ASSERT(offsetof(struct __kos_stat, st_ctimespec) == __OFFSET_KOS_STAT_CTIMESPEC);
-STATIC_ASSERT(offsetof(struct __kos_stat, st_ctimespec32) == __OFFSET_KOS_STAT_CTIMESPEC32);
-STATIC_ASSERT(offsetof(struct __kos_stat, st_ctimespec64) == __OFFSET_KOS_STAT_CTIMESPEC64);
-STATIC_ASSERT(offsetof(struct __kos_stat, st_dev) == __OFFSET_KOS_STAT_DEV);
-STATIC_ASSERT(offsetof(struct __kos_stat, st_gid) == __OFFSET_KOS_STAT_GID);
-STATIC_ASSERT(offsetof(struct __kos_stat, st_ino) == __OFFSET_KOS_STAT_INO);
-STATIC_ASSERT(offsetof(struct __kos_stat, st_mode) == __OFFSET_KOS_STAT_MODE);
-STATIC_ASSERT(offsetof(struct __kos_stat, st_mtime) == __OFFSET_KOS_STAT_MTIME);
-STATIC_ASSERT(offsetof(struct __kos_stat, st_mtime32) == __OFFSET_KOS_STAT_MTIME32);
-STATIC_ASSERT(offsetof(struct __kos_stat, st_mtime64) == __OFFSET_KOS_STAT_MTIME64);
-STATIC_ASSERT(offsetof(struct __kos_stat, st_mtimensec) == __OFFSET_KOS_STAT_MTIMENSEC);
-STATIC_ASSERT(offsetof(struct __kos_stat, st_mtimensec32) == __OFFSET_KOS_STAT_MTIMENSEC32);
-STATIC_ASSERT(offsetof(struct __kos_stat, st_mtimensec64) == __OFFSET_KOS_STAT_MTIMENSEC64);
-STATIC_ASSERT(offsetof(struct __kos_stat, st_mtimespec) == __OFFSET_KOS_STAT_MTIMESPEC);
-STATIC_ASSERT(offsetof(struct __kos_stat, st_mtimespec32) == __OFFSET_KOS_STAT_MTIMESPEC32);
-STATIC_ASSERT(offsetof(struct __kos_stat, st_mtimespec64) == __OFFSET_KOS_STAT_MTIMESPEC64);
-STATIC_ASSERT(offsetof(struct __kos_stat, st_nlink) == __OFFSET_KOS_STAT_NLINK);
-STATIC_ASSERT(offsetof(struct __kos_stat, st_rdev) == __OFFSET_KOS_STAT_RDEV);
-STATIC_ASSERT(offsetof(struct __kos_stat, st_size) == __OFFSET_KOS_STAT_SIZE);
-STATIC_ASSERT(offsetof(struct __kos_stat, st_uid) == __OFFSET_KOS_STAT_UID);
-STATIC_ASSERT(sizeof(struct __kos_stat) == __SIZEOF_KOS_STAT);
+static_assert(offsetof(struct __kos_stat, st_atime) == __OFFSET_KOS_STAT_ATIME);
+static_assert(offsetof(struct __kos_stat, st_atime32) == __OFFSET_KOS_STAT_ATIME32);
+static_assert(offsetof(struct __kos_stat, st_atime64) == __OFFSET_KOS_STAT_ATIME64);
+static_assert(offsetof(struct __kos_stat, st_atimensec) == __OFFSET_KOS_STAT_ATIMENSEC);
+static_assert(offsetof(struct __kos_stat, st_atimensec32) == __OFFSET_KOS_STAT_ATIMENSEC32);
+static_assert(offsetof(struct __kos_stat, st_atimensec64) == __OFFSET_KOS_STAT_ATIMENSEC64);
+static_assert(offsetof(struct __kos_stat, st_atimespec) == __OFFSET_KOS_STAT_ATIMESPEC);
+static_assert(offsetof(struct __kos_stat, st_atimespec32) == __OFFSET_KOS_STAT_ATIMESPEC32);
+static_assert(offsetof(struct __kos_stat, st_atimespec64) == __OFFSET_KOS_STAT_ATIMESPEC64);
+static_assert(offsetof(struct __kos_stat, st_blksize) == __OFFSET_KOS_STAT_BLKSIZE);
+static_assert(offsetof(struct __kos_stat, st_blocks) == __OFFSET_KOS_STAT_BLOCKS);
+static_assert(offsetof(struct __kos_stat, st_ctime) == __OFFSET_KOS_STAT_CTIME);
+static_assert(offsetof(struct __kos_stat, st_ctime32) == __OFFSET_KOS_STAT_CTIME32);
+static_assert(offsetof(struct __kos_stat, st_ctime64) == __OFFSET_KOS_STAT_CTIME64);
+static_assert(offsetof(struct __kos_stat, st_ctimensec) == __OFFSET_KOS_STAT_CTIMENSEC);
+static_assert(offsetof(struct __kos_stat, st_ctimensec32) == __OFFSET_KOS_STAT_CTIMENSEC32);
+static_assert(offsetof(struct __kos_stat, st_ctimensec64) == __OFFSET_KOS_STAT_CTIMENSEC64);
+static_assert(offsetof(struct __kos_stat, st_ctimespec) == __OFFSET_KOS_STAT_CTIMESPEC);
+static_assert(offsetof(struct __kos_stat, st_ctimespec32) == __OFFSET_KOS_STAT_CTIMESPEC32);
+static_assert(offsetof(struct __kos_stat, st_ctimespec64) == __OFFSET_KOS_STAT_CTIMESPEC64);
+static_assert(offsetof(struct __kos_stat, st_dev) == __OFFSET_KOS_STAT_DEV);
+static_assert(offsetof(struct __kos_stat, st_gid) == __OFFSET_KOS_STAT_GID);
+static_assert(offsetof(struct __kos_stat, st_ino) == __OFFSET_KOS_STAT_INO);
+static_assert(offsetof(struct __kos_stat, st_mode) == __OFFSET_KOS_STAT_MODE);
+static_assert(offsetof(struct __kos_stat, st_mtime) == __OFFSET_KOS_STAT_MTIME);
+static_assert(offsetof(struct __kos_stat, st_mtime32) == __OFFSET_KOS_STAT_MTIME32);
+static_assert(offsetof(struct __kos_stat, st_mtime64) == __OFFSET_KOS_STAT_MTIME64);
+static_assert(offsetof(struct __kos_stat, st_mtimensec) == __OFFSET_KOS_STAT_MTIMENSEC);
+static_assert(offsetof(struct __kos_stat, st_mtimensec32) == __OFFSET_KOS_STAT_MTIMENSEC32);
+static_assert(offsetof(struct __kos_stat, st_mtimensec64) == __OFFSET_KOS_STAT_MTIMENSEC64);
+static_assert(offsetof(struct __kos_stat, st_mtimespec) == __OFFSET_KOS_STAT_MTIMESPEC);
+static_assert(offsetof(struct __kos_stat, st_mtimespec32) == __OFFSET_KOS_STAT_MTIMESPEC32);
+static_assert(offsetof(struct __kos_stat, st_mtimespec64) == __OFFSET_KOS_STAT_MTIMESPEC64);
+static_assert(offsetof(struct __kos_stat, st_nlink) == __OFFSET_KOS_STAT_NLINK);
+static_assert(offsetof(struct __kos_stat, st_rdev) == __OFFSET_KOS_STAT_RDEV);
+static_assert(offsetof(struct __kos_stat, st_size) == __OFFSET_KOS_STAT_SIZE);
+static_assert(offsetof(struct __kos_stat, st_uid) == __OFFSET_KOS_STAT_UID);
+static_assert(sizeof(struct __kos_stat) == __SIZEOF_KOS_STAT);
 
 /* struct __kos_stat_alias64 */
-STATIC_ASSERT(offsetof(struct __kos_stat_alias64, st_atime) == __OFFSET_KOS_STAT_ATIME);
-STATIC_ASSERT(offsetof(struct __kos_stat_alias64, st_atime32) == __OFFSET_KOS_STAT_ATIME32);
-STATIC_ASSERT(offsetof(struct __kos_stat_alias64, st_atime64) == __OFFSET_KOS_STAT_ATIME64);
-STATIC_ASSERT(offsetof(struct __kos_stat_alias64, st_atimensec) == __OFFSET_KOS_STAT_ATIMENSEC);
-STATIC_ASSERT(offsetof(struct __kos_stat_alias64, st_atimensec32) == __OFFSET_KOS_STAT_ATIMENSEC32);
-STATIC_ASSERT(offsetof(struct __kos_stat_alias64, st_atimensec64) == __OFFSET_KOS_STAT_ATIMENSEC64);
-STATIC_ASSERT(offsetof(struct __kos_stat_alias64, st_atimespec) == __OFFSET_KOS_STAT_ATIMESPEC);
-STATIC_ASSERT(offsetof(struct __kos_stat_alias64, st_atimespec32) == __OFFSET_KOS_STAT_ATIMESPEC32);
-STATIC_ASSERT(offsetof(struct __kos_stat_alias64, st_atimespec64) == __OFFSET_KOS_STAT_ATIMESPEC64);
-STATIC_ASSERT(offsetof(struct __kos_stat_alias64, st_blksize) == __OFFSET_KOS_STAT_BLKSIZE);
-STATIC_ASSERT(offsetof(struct __kos_stat_alias64, st_blocks) == __OFFSET_KOS_STAT_BLOCKS);
-STATIC_ASSERT(offsetof(struct __kos_stat_alias64, st_ctime) == __OFFSET_KOS_STAT_CTIME);
-STATIC_ASSERT(offsetof(struct __kos_stat_alias64, st_ctime32) == __OFFSET_KOS_STAT_CTIME32);
-STATIC_ASSERT(offsetof(struct __kos_stat_alias64, st_ctime64) == __OFFSET_KOS_STAT_CTIME64);
-STATIC_ASSERT(offsetof(struct __kos_stat_alias64, st_ctimensec) == __OFFSET_KOS_STAT_CTIMENSEC);
-STATIC_ASSERT(offsetof(struct __kos_stat_alias64, st_ctimensec32) == __OFFSET_KOS_STAT_CTIMENSEC32);
-STATIC_ASSERT(offsetof(struct __kos_stat_alias64, st_ctimensec64) == __OFFSET_KOS_STAT_CTIMENSEC64);
-STATIC_ASSERT(offsetof(struct __kos_stat_alias64, st_ctimespec) == __OFFSET_KOS_STAT_CTIMESPEC);
-STATIC_ASSERT(offsetof(struct __kos_stat_alias64, st_ctimespec32) == __OFFSET_KOS_STAT_CTIMESPEC32);
-STATIC_ASSERT(offsetof(struct __kos_stat_alias64, st_ctimespec64) == __OFFSET_KOS_STAT_CTIMESPEC64);
-STATIC_ASSERT(offsetof(struct __kos_stat_alias64, st_dev) == __OFFSET_KOS_STAT_DEV);
-STATIC_ASSERT(offsetof(struct __kos_stat_alias64, st_gid) == __OFFSET_KOS_STAT_GID);
-STATIC_ASSERT(offsetof(struct __kos_stat_alias64, st_ino) == __OFFSET_KOS_STAT_INO);
-STATIC_ASSERT(offsetof(struct __kos_stat_alias64, st_mode) == __OFFSET_KOS_STAT_MODE);
-STATIC_ASSERT(offsetof(struct __kos_stat_alias64, st_mtime) == __OFFSET_KOS_STAT_MTIME);
-STATIC_ASSERT(offsetof(struct __kos_stat_alias64, st_mtime32) == __OFFSET_KOS_STAT_MTIME32);
-STATIC_ASSERT(offsetof(struct __kos_stat_alias64, st_mtime64) == __OFFSET_KOS_STAT_MTIME64);
-STATIC_ASSERT(offsetof(struct __kos_stat_alias64, st_mtimensec) == __OFFSET_KOS_STAT_MTIMENSEC);
-STATIC_ASSERT(offsetof(struct __kos_stat_alias64, st_mtimensec32) == __OFFSET_KOS_STAT_MTIMENSEC32);
-STATIC_ASSERT(offsetof(struct __kos_stat_alias64, st_mtimensec64) == __OFFSET_KOS_STAT_MTIMENSEC64);
-STATIC_ASSERT(offsetof(struct __kos_stat_alias64, st_mtimespec) == __OFFSET_KOS_STAT_MTIMESPEC);
-STATIC_ASSERT(offsetof(struct __kos_stat_alias64, st_mtimespec32) == __OFFSET_KOS_STAT_MTIMESPEC32);
-STATIC_ASSERT(offsetof(struct __kos_stat_alias64, st_mtimespec64) == __OFFSET_KOS_STAT_MTIMESPEC64);
-STATIC_ASSERT(offsetof(struct __kos_stat_alias64, st_nlink) == __OFFSET_KOS_STAT_NLINK);
-STATIC_ASSERT(offsetof(struct __kos_stat_alias64, st_rdev) == __OFFSET_KOS_STAT_RDEV);
-STATIC_ASSERT(offsetof(struct __kos_stat_alias64, st_size) == __OFFSET_KOS_STAT_SIZE);
-STATIC_ASSERT(offsetof(struct __kos_stat_alias64, st_uid) == __OFFSET_KOS_STAT_UID);
-STATIC_ASSERT(sizeof(struct __kos_stat_alias64) == __SIZEOF_KOS_STAT);
+static_assert(offsetof(struct __kos_stat_alias64, st_atime) == __OFFSET_KOS_STAT_ATIME);
+static_assert(offsetof(struct __kos_stat_alias64, st_atime32) == __OFFSET_KOS_STAT_ATIME32);
+static_assert(offsetof(struct __kos_stat_alias64, st_atime64) == __OFFSET_KOS_STAT_ATIME64);
+static_assert(offsetof(struct __kos_stat_alias64, st_atimensec) == __OFFSET_KOS_STAT_ATIMENSEC);
+static_assert(offsetof(struct __kos_stat_alias64, st_atimensec32) == __OFFSET_KOS_STAT_ATIMENSEC32);
+static_assert(offsetof(struct __kos_stat_alias64, st_atimensec64) == __OFFSET_KOS_STAT_ATIMENSEC64);
+static_assert(offsetof(struct __kos_stat_alias64, st_atimespec) == __OFFSET_KOS_STAT_ATIMESPEC);
+static_assert(offsetof(struct __kos_stat_alias64, st_atimespec32) == __OFFSET_KOS_STAT_ATIMESPEC32);
+static_assert(offsetof(struct __kos_stat_alias64, st_atimespec64) == __OFFSET_KOS_STAT_ATIMESPEC64);
+static_assert(offsetof(struct __kos_stat_alias64, st_blksize) == __OFFSET_KOS_STAT_BLKSIZE);
+static_assert(offsetof(struct __kos_stat_alias64, st_blocks) == __OFFSET_KOS_STAT_BLOCKS);
+static_assert(offsetof(struct __kos_stat_alias64, st_ctime) == __OFFSET_KOS_STAT_CTIME);
+static_assert(offsetof(struct __kos_stat_alias64, st_ctime32) == __OFFSET_KOS_STAT_CTIME32);
+static_assert(offsetof(struct __kos_stat_alias64, st_ctime64) == __OFFSET_KOS_STAT_CTIME64);
+static_assert(offsetof(struct __kos_stat_alias64, st_ctimensec) == __OFFSET_KOS_STAT_CTIMENSEC);
+static_assert(offsetof(struct __kos_stat_alias64, st_ctimensec32) == __OFFSET_KOS_STAT_CTIMENSEC32);
+static_assert(offsetof(struct __kos_stat_alias64, st_ctimensec64) == __OFFSET_KOS_STAT_CTIMENSEC64);
+static_assert(offsetof(struct __kos_stat_alias64, st_ctimespec) == __OFFSET_KOS_STAT_CTIMESPEC);
+static_assert(offsetof(struct __kos_stat_alias64, st_ctimespec32) == __OFFSET_KOS_STAT_CTIMESPEC32);
+static_assert(offsetof(struct __kos_stat_alias64, st_ctimespec64) == __OFFSET_KOS_STAT_CTIMESPEC64);
+static_assert(offsetof(struct __kos_stat_alias64, st_dev) == __OFFSET_KOS_STAT_DEV);
+static_assert(offsetof(struct __kos_stat_alias64, st_gid) == __OFFSET_KOS_STAT_GID);
+static_assert(offsetof(struct __kos_stat_alias64, st_ino) == __OFFSET_KOS_STAT_INO);
+static_assert(offsetof(struct __kos_stat_alias64, st_mode) == __OFFSET_KOS_STAT_MODE);
+static_assert(offsetof(struct __kos_stat_alias64, st_mtime) == __OFFSET_KOS_STAT_MTIME);
+static_assert(offsetof(struct __kos_stat_alias64, st_mtime32) == __OFFSET_KOS_STAT_MTIME32);
+static_assert(offsetof(struct __kos_stat_alias64, st_mtime64) == __OFFSET_KOS_STAT_MTIME64);
+static_assert(offsetof(struct __kos_stat_alias64, st_mtimensec) == __OFFSET_KOS_STAT_MTIMENSEC);
+static_assert(offsetof(struct __kos_stat_alias64, st_mtimensec32) == __OFFSET_KOS_STAT_MTIMENSEC32);
+static_assert(offsetof(struct __kos_stat_alias64, st_mtimensec64) == __OFFSET_KOS_STAT_MTIMENSEC64);
+static_assert(offsetof(struct __kos_stat_alias64, st_mtimespec) == __OFFSET_KOS_STAT_MTIMESPEC);
+static_assert(offsetof(struct __kos_stat_alias64, st_mtimespec32) == __OFFSET_KOS_STAT_MTIMESPEC32);
+static_assert(offsetof(struct __kos_stat_alias64, st_mtimespec64) == __OFFSET_KOS_STAT_MTIMESPEC64);
+static_assert(offsetof(struct __kos_stat_alias64, st_nlink) == __OFFSET_KOS_STAT_NLINK);
+static_assert(offsetof(struct __kos_stat_alias64, st_rdev) == __OFFSET_KOS_STAT_RDEV);
+static_assert(offsetof(struct __kos_stat_alias64, st_size) == __OFFSET_KOS_STAT_SIZE);
+static_assert(offsetof(struct __kos_stat_alias64, st_uid) == __OFFSET_KOS_STAT_UID);
+static_assert(sizeof(struct __kos_stat_alias64) == __SIZEOF_KOS_STAT);
 
 
 
@@ -736,84 +737,84 @@ STATIC_ASSERT(sizeof(struct __kos_stat_alias64) == __SIZEOF_KOS_STAT);
 #include <bits/statfs.h>
 
 /* struct statfs */
-STATIC_ASSERT(offsetof(struct statfs, f_bavail) == __OFFSET_STATFS_BAVAIL);
-STATIC_ASSERT(offsetof(struct statfs, f_bfree) == __OFFSET_STATFS_BFREE);
-STATIC_ASSERT(offsetof(struct statfs, f_blocks) == __OFFSET_STATFS_BLOCKS);
-STATIC_ASSERT(offsetof(struct statfs, f_bsize) == __OFFSET_STATFS_BSIZE);
-STATIC_ASSERT(offsetof(struct statfs, f_ffree) == __OFFSET_STATFS_FFREE);
-STATIC_ASSERT(offsetof(struct statfs, f_files) == __OFFSET_STATFS_FILES);
-STATIC_ASSERT(offsetof(struct statfs, f_flags) == __OFFSET_STATFS_FLAGS);
-STATIC_ASSERT(offsetof(struct statfs, f_frsize) == __OFFSET_STATFS_FRSIZE);
-STATIC_ASSERT(offsetof(struct statfs, f_fsid) == __OFFSET_STATFS_FSID);
-STATIC_ASSERT(offsetof(struct statfs, f_namelen) == __OFFSET_STATFS_NAMELEN);
-STATIC_ASSERT(offsetof(struct statfs, f_spare) == __OFFSET_STATFS_SPARE);
-STATIC_ASSERT(offsetof(struct statfs, f_type) == __OFFSET_STATFS_TYPE);
-STATIC_ASSERT(sizeof(struct statfs) == __SIZEOF_STATFS);
-STATIC_ASSERT(alignof(struct statfs) == __ALIGNOF_STATFS);
+static_assert(offsetof(struct statfs, f_bavail) == __OFFSET_STATFS_BAVAIL);
+static_assert(offsetof(struct statfs, f_bfree) == __OFFSET_STATFS_BFREE);
+static_assert(offsetof(struct statfs, f_blocks) == __OFFSET_STATFS_BLOCKS);
+static_assert(offsetof(struct statfs, f_bsize) == __OFFSET_STATFS_BSIZE);
+static_assert(offsetof(struct statfs, f_ffree) == __OFFSET_STATFS_FFREE);
+static_assert(offsetof(struct statfs, f_files) == __OFFSET_STATFS_FILES);
+static_assert(offsetof(struct statfs, f_flags) == __OFFSET_STATFS_FLAGS);
+static_assert(offsetof(struct statfs, f_frsize) == __OFFSET_STATFS_FRSIZE);
+static_assert(offsetof(struct statfs, f_fsid) == __OFFSET_STATFS_FSID);
+static_assert(offsetof(struct statfs, f_namelen) == __OFFSET_STATFS_NAMELEN);
+static_assert(offsetof(struct statfs, f_spare) == __OFFSET_STATFS_SPARE);
+static_assert(offsetof(struct statfs, f_type) == __OFFSET_STATFS_TYPE);
+static_assert(sizeof(struct statfs) == __SIZEOF_STATFS);
+static_assert(alignof(struct statfs) == __ALIGNOF_STATFS);
 
 /* struct statfs32 */
-STATIC_ASSERT(offsetof(struct statfs32, f_bavail) == __OFFSET_STATFS32_BAVAIL);
-STATIC_ASSERT(offsetof(struct statfs32, f_bfree) == __OFFSET_STATFS32_BFREE);
-STATIC_ASSERT(offsetof(struct statfs32, f_blocks) == __OFFSET_STATFS32_BLOCKS);
-STATIC_ASSERT(offsetof(struct statfs32, f_bsize) == __OFFSET_STATFS32_BSIZE);
-STATIC_ASSERT(offsetof(struct statfs32, f_ffree) == __OFFSET_STATFS32_FFREE);
-STATIC_ASSERT(offsetof(struct statfs32, f_files) == __OFFSET_STATFS32_FILES);
-STATIC_ASSERT(offsetof(struct statfs32, f_flags) == __OFFSET_STATFS32_FLAGS);
-STATIC_ASSERT(offsetof(struct statfs32, f_frsize) == __OFFSET_STATFS32_FRSIZE);
-STATIC_ASSERT(offsetof(struct statfs32, f_fsid) == __OFFSET_STATFS32_FSID);
-STATIC_ASSERT(offsetof(struct statfs32, f_namelen) == __OFFSET_STATFS32_NAMELEN);
-STATIC_ASSERT(offsetof(struct statfs32, f_spare) == __OFFSET_STATFS32_SPARE);
-STATIC_ASSERT(offsetof(struct statfs32, f_type) == __OFFSET_STATFS32_TYPE);
-STATIC_ASSERT(sizeof(struct statfs32) == __SIZEOF_STATFS32);
-STATIC_ASSERT(alignof(struct statfs32) == __ALIGNOF_STATFS32);
+static_assert(offsetof(struct statfs32, f_bavail) == __OFFSET_STATFS32_BAVAIL);
+static_assert(offsetof(struct statfs32, f_bfree) == __OFFSET_STATFS32_BFREE);
+static_assert(offsetof(struct statfs32, f_blocks) == __OFFSET_STATFS32_BLOCKS);
+static_assert(offsetof(struct statfs32, f_bsize) == __OFFSET_STATFS32_BSIZE);
+static_assert(offsetof(struct statfs32, f_ffree) == __OFFSET_STATFS32_FFREE);
+static_assert(offsetof(struct statfs32, f_files) == __OFFSET_STATFS32_FILES);
+static_assert(offsetof(struct statfs32, f_flags) == __OFFSET_STATFS32_FLAGS);
+static_assert(offsetof(struct statfs32, f_frsize) == __OFFSET_STATFS32_FRSIZE);
+static_assert(offsetof(struct statfs32, f_fsid) == __OFFSET_STATFS32_FSID);
+static_assert(offsetof(struct statfs32, f_namelen) == __OFFSET_STATFS32_NAMELEN);
+static_assert(offsetof(struct statfs32, f_spare) == __OFFSET_STATFS32_SPARE);
+static_assert(offsetof(struct statfs32, f_type) == __OFFSET_STATFS32_TYPE);
+static_assert(sizeof(struct statfs32) == __SIZEOF_STATFS32);
+static_assert(alignof(struct statfs32) == __ALIGNOF_STATFS32);
 
 /* struct statfs64 */
-STATIC_ASSERT(offsetof(struct statfs64, f_bavail) == __OFFSET_STATFS64_BAVAIL);
-STATIC_ASSERT(offsetof(struct statfs64, f_bfree) == __OFFSET_STATFS64_BFREE);
-STATIC_ASSERT(offsetof(struct statfs64, f_blocks) == __OFFSET_STATFS64_BLOCKS);
-STATIC_ASSERT(offsetof(struct statfs64, f_bsize) == __OFFSET_STATFS64_BSIZE);
-STATIC_ASSERT(offsetof(struct statfs64, f_ffree) == __OFFSET_STATFS64_FFREE);
-STATIC_ASSERT(offsetof(struct statfs64, f_files) == __OFFSET_STATFS64_FILES);
-STATIC_ASSERT(offsetof(struct statfs64, f_flags) == __OFFSET_STATFS64_FLAGS);
-STATIC_ASSERT(offsetof(struct statfs64, f_frsize) == __OFFSET_STATFS64_FRSIZE);
-STATIC_ASSERT(offsetof(struct statfs64, f_fsid) == __OFFSET_STATFS64_FSID);
-STATIC_ASSERT(offsetof(struct statfs64, f_namelen) == __OFFSET_STATFS64_NAMELEN);
-STATIC_ASSERT(offsetof(struct statfs64, f_spare) == __OFFSET_STATFS64_SPARE);
-STATIC_ASSERT(offsetof(struct statfs64, f_type) == __OFFSET_STATFS64_TYPE);
-STATIC_ASSERT(sizeof(struct statfs64) == __SIZEOF_STATFS64);
-STATIC_ASSERT(alignof(struct statfs64) == __ALIGNOF_STATFS64);
+static_assert(offsetof(struct statfs64, f_bavail) == __OFFSET_STATFS64_BAVAIL);
+static_assert(offsetof(struct statfs64, f_bfree) == __OFFSET_STATFS64_BFREE);
+static_assert(offsetof(struct statfs64, f_blocks) == __OFFSET_STATFS64_BLOCKS);
+static_assert(offsetof(struct statfs64, f_bsize) == __OFFSET_STATFS64_BSIZE);
+static_assert(offsetof(struct statfs64, f_ffree) == __OFFSET_STATFS64_FFREE);
+static_assert(offsetof(struct statfs64, f_files) == __OFFSET_STATFS64_FILES);
+static_assert(offsetof(struct statfs64, f_flags) == __OFFSET_STATFS64_FLAGS);
+static_assert(offsetof(struct statfs64, f_frsize) == __OFFSET_STATFS64_FRSIZE);
+static_assert(offsetof(struct statfs64, f_fsid) == __OFFSET_STATFS64_FSID);
+static_assert(offsetof(struct statfs64, f_namelen) == __OFFSET_STATFS64_NAMELEN);
+static_assert(offsetof(struct statfs64, f_spare) == __OFFSET_STATFS64_SPARE);
+static_assert(offsetof(struct statfs64, f_type) == __OFFSET_STATFS64_TYPE);
+static_assert(sizeof(struct statfs64) == __SIZEOF_STATFS64);
+static_assert(alignof(struct statfs64) == __ALIGNOF_STATFS64);
 
 /* struct __statfs32 */
-STATIC_ASSERT(offsetof(struct __statfs32, f_bavail) == __OFFSET_STATFS32_BAVAIL);
-STATIC_ASSERT(offsetof(struct __statfs32, f_bfree) == __OFFSET_STATFS32_BFREE);
-STATIC_ASSERT(offsetof(struct __statfs32, f_blocks) == __OFFSET_STATFS32_BLOCKS);
-STATIC_ASSERT(offsetof(struct __statfs32, f_bsize) == __OFFSET_STATFS32_BSIZE);
-STATIC_ASSERT(offsetof(struct __statfs32, f_ffree) == __OFFSET_STATFS32_FFREE);
-STATIC_ASSERT(offsetof(struct __statfs32, f_files) == __OFFSET_STATFS32_FILES);
-STATIC_ASSERT(offsetof(struct __statfs32, f_flags) == __OFFSET_STATFS32_FLAGS);
-STATIC_ASSERT(offsetof(struct __statfs32, f_frsize) == __OFFSET_STATFS32_FRSIZE);
-STATIC_ASSERT(offsetof(struct __statfs32, f_fsid) == __OFFSET_STATFS32_FSID);
-STATIC_ASSERT(offsetof(struct __statfs32, f_namelen) == __OFFSET_STATFS32_NAMELEN);
-STATIC_ASSERT(offsetof(struct __statfs32, f_spare) == __OFFSET_STATFS32_SPARE);
-STATIC_ASSERT(offsetof(struct __statfs32, f_type) == __OFFSET_STATFS32_TYPE);
-STATIC_ASSERT(sizeof(struct __statfs32) == __SIZEOF_STATFS32);
-STATIC_ASSERT(alignof(struct __statfs32) == __ALIGNOF_STATFS32);
+static_assert(offsetof(struct __statfs32, f_bavail) == __OFFSET_STATFS32_BAVAIL);
+static_assert(offsetof(struct __statfs32, f_bfree) == __OFFSET_STATFS32_BFREE);
+static_assert(offsetof(struct __statfs32, f_blocks) == __OFFSET_STATFS32_BLOCKS);
+static_assert(offsetof(struct __statfs32, f_bsize) == __OFFSET_STATFS32_BSIZE);
+static_assert(offsetof(struct __statfs32, f_ffree) == __OFFSET_STATFS32_FFREE);
+static_assert(offsetof(struct __statfs32, f_files) == __OFFSET_STATFS32_FILES);
+static_assert(offsetof(struct __statfs32, f_flags) == __OFFSET_STATFS32_FLAGS);
+static_assert(offsetof(struct __statfs32, f_frsize) == __OFFSET_STATFS32_FRSIZE);
+static_assert(offsetof(struct __statfs32, f_fsid) == __OFFSET_STATFS32_FSID);
+static_assert(offsetof(struct __statfs32, f_namelen) == __OFFSET_STATFS32_NAMELEN);
+static_assert(offsetof(struct __statfs32, f_spare) == __OFFSET_STATFS32_SPARE);
+static_assert(offsetof(struct __statfs32, f_type) == __OFFSET_STATFS32_TYPE);
+static_assert(sizeof(struct __statfs32) == __SIZEOF_STATFS32);
+static_assert(alignof(struct __statfs32) == __ALIGNOF_STATFS32);
 
 /* struct __statfs64 */
-STATIC_ASSERT(offsetof(struct __statfs64, f_bavail) == __OFFSET_STATFS64_BAVAIL);
-STATIC_ASSERT(offsetof(struct __statfs64, f_bfree) == __OFFSET_STATFS64_BFREE);
-STATIC_ASSERT(offsetof(struct __statfs64, f_blocks) == __OFFSET_STATFS64_BLOCKS);
-STATIC_ASSERT(offsetof(struct __statfs64, f_bsize) == __OFFSET_STATFS64_BSIZE);
-STATIC_ASSERT(offsetof(struct __statfs64, f_ffree) == __OFFSET_STATFS64_FFREE);
-STATIC_ASSERT(offsetof(struct __statfs64, f_files) == __OFFSET_STATFS64_FILES);
-STATIC_ASSERT(offsetof(struct __statfs64, f_flags) == __OFFSET_STATFS64_FLAGS);
-STATIC_ASSERT(offsetof(struct __statfs64, f_frsize) == __OFFSET_STATFS64_FRSIZE);
-STATIC_ASSERT(offsetof(struct __statfs64, f_fsid) == __OFFSET_STATFS64_FSID);
-STATIC_ASSERT(offsetof(struct __statfs64, f_namelen) == __OFFSET_STATFS64_NAMELEN);
-STATIC_ASSERT(offsetof(struct __statfs64, f_spare) == __OFFSET_STATFS64_SPARE);
-STATIC_ASSERT(offsetof(struct __statfs64, f_type) == __OFFSET_STATFS64_TYPE);
-STATIC_ASSERT(sizeof(struct __statfs64) == __SIZEOF_STATFS64);
-STATIC_ASSERT(alignof(struct __statfs64) == __ALIGNOF_STATFS64);
+static_assert(offsetof(struct __statfs64, f_bavail) == __OFFSET_STATFS64_BAVAIL);
+static_assert(offsetof(struct __statfs64, f_bfree) == __OFFSET_STATFS64_BFREE);
+static_assert(offsetof(struct __statfs64, f_blocks) == __OFFSET_STATFS64_BLOCKS);
+static_assert(offsetof(struct __statfs64, f_bsize) == __OFFSET_STATFS64_BSIZE);
+static_assert(offsetof(struct __statfs64, f_ffree) == __OFFSET_STATFS64_FFREE);
+static_assert(offsetof(struct __statfs64, f_files) == __OFFSET_STATFS64_FILES);
+static_assert(offsetof(struct __statfs64, f_flags) == __OFFSET_STATFS64_FLAGS);
+static_assert(offsetof(struct __statfs64, f_frsize) == __OFFSET_STATFS64_FRSIZE);
+static_assert(offsetof(struct __statfs64, f_fsid) == __OFFSET_STATFS64_FSID);
+static_assert(offsetof(struct __statfs64, f_namelen) == __OFFSET_STATFS64_NAMELEN);
+static_assert(offsetof(struct __statfs64, f_spare) == __OFFSET_STATFS64_SPARE);
+static_assert(offsetof(struct __statfs64, f_type) == __OFFSET_STATFS64_TYPE);
+static_assert(sizeof(struct __statfs64) == __SIZEOF_STATFS64);
+static_assert(alignof(struct __statfs64) == __ALIGNOF_STATFS64);
 
 
 
@@ -822,25 +823,25 @@ STATIC_ASSERT(alignof(struct __statfs64) == __ALIGNOF_STATFS64);
 #include <bits/timeb.h>
 
 /* struct timeb */
-STATIC_ASSERT(offsetof(struct timeb, dstflag) == __OFFSET_TIMEB_DSTFLAG);
-STATIC_ASSERT(offsetof(struct timeb, millitm) == __OFFSET_TIMEB_MILLITM);
-STATIC_ASSERT(offsetof(struct timeb, time) == __OFFSET_TIMEB_TIME);
-STATIC_ASSERT(offsetof(struct timeb, timezone) == __OFFSET_TIMEB_TIMEZONE);
-STATIC_ASSERT(sizeof(struct timeb) == __SIZEOF_TIMEB);
+static_assert(offsetof(struct timeb, dstflag) == __OFFSET_TIMEB_DSTFLAG);
+static_assert(offsetof(struct timeb, millitm) == __OFFSET_TIMEB_MILLITM);
+static_assert(offsetof(struct timeb, time) == __OFFSET_TIMEB_TIME);
+static_assert(offsetof(struct timeb, timezone) == __OFFSET_TIMEB_TIMEZONE);
+static_assert(sizeof(struct timeb) == __SIZEOF_TIMEB);
 
 /* struct __timeb64 */
-STATIC_ASSERT(offsetof(struct __timeb64, dstflag) == __OFFSET_TIMEB64_DSTFLAG);
-STATIC_ASSERT(offsetof(struct __timeb64, millitm) == __OFFSET_TIMEB64_MILLITM);
-STATIC_ASSERT(offsetof(struct __timeb64, time) == __OFFSET_TIMEB64_TIME);
-STATIC_ASSERT(offsetof(struct __timeb64, timezone) == __OFFSET_TIMEB64_TIMEZONE);
-STATIC_ASSERT(sizeof(struct __timeb64) == __SIZEOF_TIMEB64);
+static_assert(offsetof(struct __timeb64, dstflag) == __OFFSET_TIMEB64_DSTFLAG);
+static_assert(offsetof(struct __timeb64, millitm) == __OFFSET_TIMEB64_MILLITM);
+static_assert(offsetof(struct __timeb64, time) == __OFFSET_TIMEB64_TIME);
+static_assert(offsetof(struct __timeb64, timezone) == __OFFSET_TIMEB64_TIMEZONE);
+static_assert(sizeof(struct __timeb64) == __SIZEOF_TIMEB64);
 
 /* struct __timeb32 */
-STATIC_ASSERT(offsetof(struct __timeb32, dstflag) == __OFFSET_TIMEB32_DSTFLAG);
-STATIC_ASSERT(offsetof(struct __timeb32, millitm) == __OFFSET_TIMEB32_MILLITM);
-STATIC_ASSERT(offsetof(struct __timeb32, time) == __OFFSET_TIMEB32_TIME);
-STATIC_ASSERT(offsetof(struct __timeb32, timezone) == __OFFSET_TIMEB32_TIMEZONE);
-STATIC_ASSERT(sizeof(struct __timeb32) == __SIZEOF_TIMEB32);
+static_assert(offsetof(struct __timeb32, dstflag) == __OFFSET_TIMEB32_DSTFLAG);
+static_assert(offsetof(struct __timeb32, millitm) == __OFFSET_TIMEB32_MILLITM);
+static_assert(offsetof(struct __timeb32, time) == __OFFSET_TIMEB32_TIME);
+static_assert(offsetof(struct __timeb32, timezone) == __OFFSET_TIMEB32_TIMEZONE);
+static_assert(sizeof(struct __timeb32) == __SIZEOF_TIMEB32);
 
 
 
@@ -849,19 +850,19 @@ STATIC_ASSERT(sizeof(struct __timeb32) == __SIZEOF_TIMEB32);
 #include <bits/timespec.h>
 
 /* struct timespec */
-STATIC_ASSERT(offsetof(struct timespec, tv_sec) == __OFFSET_TIMESPEC_SEC);
-STATIC_ASSERT(offsetof(struct timespec, tv_nsec) == __OFFSET_TIMESPEC_NSEC);
-STATIC_ASSERT(sizeof(struct timespec) == __SIZEOF_TIMESPEC);
+static_assert(offsetof(struct timespec, tv_sec) == __OFFSET_TIMESPEC_SEC);
+static_assert(offsetof(struct timespec, tv_nsec) == __OFFSET_TIMESPEC_NSEC);
+static_assert(sizeof(struct timespec) == __SIZEOF_TIMESPEC);
 
 /* struct __timespec64 */
-STATIC_ASSERT(offsetof(struct __timespec64, tv_sec) == __OFFSET_TIMESPEC64_SEC);
-STATIC_ASSERT(offsetof(struct __timespec64, tv_nsec) == __OFFSET_TIMESPEC64_NSEC);
-STATIC_ASSERT(sizeof(struct __timespec64) == __SIZEOF_TIMESPEC64);
+static_assert(offsetof(struct __timespec64, tv_sec) == __OFFSET_TIMESPEC64_SEC);
+static_assert(offsetof(struct __timespec64, tv_nsec) == __OFFSET_TIMESPEC64_NSEC);
+static_assert(sizeof(struct __timespec64) == __SIZEOF_TIMESPEC64);
 
 /* struct __timespec32 */
-STATIC_ASSERT(offsetof(struct __timespec32, tv_sec) == __OFFSET_TIMESPEC32_SEC);
-STATIC_ASSERT(offsetof(struct __timespec32, tv_nsec) == __OFFSET_TIMESPEC32_NSEC);
-STATIC_ASSERT(sizeof(struct __timespec32) == __SIZEOF_TIMESPEC32);
+static_assert(offsetof(struct __timespec32, tv_sec) == __OFFSET_TIMESPEC32_SEC);
+static_assert(offsetof(struct __timespec32, tv_nsec) == __OFFSET_TIMESPEC32_NSEC);
+static_assert(sizeof(struct __timespec32) == __SIZEOF_TIMESPEC32);
 
 
 
@@ -870,19 +871,19 @@ STATIC_ASSERT(sizeof(struct __timespec32) == __SIZEOF_TIMESPEC32);
 #include <bits/timeval.h>
 
 /* struct timeval */
-STATIC_ASSERT(offsetof(struct timeval, tv_usec) == __OFFSET_TIMEVAL_USEC);
-STATIC_ASSERT(offsetof(struct timeval, tv_sec) == __OFFSET_TIMEVAL_SEC);
-STATIC_ASSERT(sizeof(struct timeval) == __SIZEOF_TIMEVAL);
+static_assert(offsetof(struct timeval, tv_usec) == __OFFSET_TIMEVAL_USEC);
+static_assert(offsetof(struct timeval, tv_sec) == __OFFSET_TIMEVAL_SEC);
+static_assert(sizeof(struct timeval) == __SIZEOF_TIMEVAL);
 
 /* struct __timeval64 */
-STATIC_ASSERT(offsetof(struct __timeval64, tv_usec) == __OFFSET_TIMEVAL64_USEC);
-STATIC_ASSERT(offsetof(struct __timeval64, tv_sec) == __OFFSET_TIMEVAL64_SEC);
-STATIC_ASSERT(sizeof(struct __timeval64) == __SIZEOF_TIMEVAL64);
+static_assert(offsetof(struct __timeval64, tv_usec) == __OFFSET_TIMEVAL64_USEC);
+static_assert(offsetof(struct __timeval64, tv_sec) == __OFFSET_TIMEVAL64_SEC);
+static_assert(sizeof(struct __timeval64) == __SIZEOF_TIMEVAL64);
 
 /* struct __timeval32 */
-STATIC_ASSERT(offsetof(struct __timeval32, tv_usec) == __OFFSET_TIMEVAL32_USEC);
-STATIC_ASSERT(offsetof(struct __timeval32, tv_sec) == __OFFSET_TIMEVAL32_SEC);
-STATIC_ASSERT(sizeof(struct __timeval32) == __SIZEOF_TIMEVAL32);
+static_assert(offsetof(struct __timeval32, tv_usec) == __OFFSET_TIMEVAL32_USEC);
+static_assert(offsetof(struct __timeval32, tv_sec) == __OFFSET_TIMEVAL32_SEC);
+static_assert(sizeof(struct __timeval32) == __SIZEOF_TIMEVAL32);
 
 
 
@@ -891,19 +892,19 @@ STATIC_ASSERT(sizeof(struct __timeval32) == __SIZEOF_TIMEVAL32);
 #include <bits/utimbuf.h>
 
 /* struct utimbuf */
-STATIC_ASSERT(offsetof(struct utimbuf, modtime) == __OFFSET_UTIMBUF_MODTIME);
-STATIC_ASSERT(offsetof(struct utimbuf, actime) == __OFFSET_UTIMBUF_ACTIME);
-STATIC_ASSERT(sizeof(struct utimbuf) == __SIZEOF_UTIMBUF);
+static_assert(offsetof(struct utimbuf, modtime) == __OFFSET_UTIMBUF_MODTIME);
+static_assert(offsetof(struct utimbuf, actime) == __OFFSET_UTIMBUF_ACTIME);
+static_assert(sizeof(struct utimbuf) == __SIZEOF_UTIMBUF);
 
 /* struct __utimbuf64 */
-STATIC_ASSERT(offsetof(struct __utimbuf64, modtime) == __OFFSET_UTIMBUF64_MODTIME);
-STATIC_ASSERT(offsetof(struct __utimbuf64, actime) == __OFFSET_UTIMBUF64_ACTIME);
-STATIC_ASSERT(sizeof(struct __utimbuf64) == __SIZEOF_UTIMBUF64);
+static_assert(offsetof(struct __utimbuf64, modtime) == __OFFSET_UTIMBUF64_MODTIME);
+static_assert(offsetof(struct __utimbuf64, actime) == __OFFSET_UTIMBUF64_ACTIME);
+static_assert(sizeof(struct __utimbuf64) == __SIZEOF_UTIMBUF64);
 
 /* struct __utimbuf32 */
-STATIC_ASSERT(offsetof(struct __utimbuf32, modtime) == __OFFSET_UTIMBUF32_MODTIME);
-STATIC_ASSERT(offsetof(struct __utimbuf32, actime) == __OFFSET_UTIMBUF32_ACTIME);
-STATIC_ASSERT(sizeof(struct __utimbuf32) == __SIZEOF_UTIMBUF32);
+static_assert(offsetof(struct __utimbuf32, modtime) == __OFFSET_UTIMBUF32_MODTIME);
+static_assert(offsetof(struct __utimbuf32, actime) == __OFFSET_UTIMBUF32_ACTIME);
+static_assert(sizeof(struct __utimbuf32) == __SIZEOF_UTIMBUF32);
 
 
 
@@ -912,92 +913,92 @@ STATIC_ASSERT(sizeof(struct __utimbuf32) == __SIZEOF_UTIMBUF32);
 #include <elf.h>
 
 /* struct elf32_ehdr */
-STATIC_ASSERT(offsetof(struct elf32_ehdr, e_ehsize) == __OFFSET_ELF32_EHDR_EHSIZE);
-STATIC_ASSERT(offsetof(struct elf32_ehdr, e_entry) == __OFFSET_ELF32_EHDR_ENTRY);
-STATIC_ASSERT(offsetof(struct elf32_ehdr, e_flags) == __OFFSET_ELF32_EHDR_FLAGS);
-STATIC_ASSERT(offsetof(struct elf32_ehdr, e_ident) == __OFFSET_ELF32_EHDR_IDENT);
-STATIC_ASSERT(offsetof(struct elf32_ehdr, e_machine) == __OFFSET_ELF32_EHDR_MACHINE);
-STATIC_ASSERT(offsetof(struct elf32_ehdr, e_phentsize) == __OFFSET_ELF32_EHDR_PHENTSIZE);
-STATIC_ASSERT(offsetof(struct elf32_ehdr, e_phnum) == __OFFSET_ELF32_EHDR_PHNUM);
-STATIC_ASSERT(offsetof(struct elf32_ehdr, e_phoff) == __OFFSET_ELF32_EHDR_PHOFF);
-STATIC_ASSERT(offsetof(struct elf32_ehdr, e_shentsize) == __OFFSET_ELF32_EHDR_SHENTSIZE);
-STATIC_ASSERT(offsetof(struct elf32_ehdr, e_shnum) == __OFFSET_ELF32_EHDR_SHNUM);
-STATIC_ASSERT(offsetof(struct elf32_ehdr, e_shoff) == __OFFSET_ELF32_EHDR_SHOFF);
-STATIC_ASSERT(offsetof(struct elf32_ehdr, e_shstrndx) == __OFFSET_ELF32_EHDR_SHSTRNDX);
-STATIC_ASSERT(offsetof(struct elf32_ehdr, e_type) == __OFFSET_ELF32_EHDR_TYPE);
-STATIC_ASSERT(offsetof(struct elf32_ehdr, e_version) == __OFFSET_ELF32_EHDR_VERSION);
-STATIC_ASSERT(sizeof(struct elf32_ehdr) == __SIZEOF_ELF32_EHDR);
+static_assert(offsetof(struct elf32_ehdr, e_ehsize) == __OFFSET_ELF32_EHDR_EHSIZE);
+static_assert(offsetof(struct elf32_ehdr, e_entry) == __OFFSET_ELF32_EHDR_ENTRY);
+static_assert(offsetof(struct elf32_ehdr, e_flags) == __OFFSET_ELF32_EHDR_FLAGS);
+static_assert(offsetof(struct elf32_ehdr, e_ident) == __OFFSET_ELF32_EHDR_IDENT);
+static_assert(offsetof(struct elf32_ehdr, e_machine) == __OFFSET_ELF32_EHDR_MACHINE);
+static_assert(offsetof(struct elf32_ehdr, e_phentsize) == __OFFSET_ELF32_EHDR_PHENTSIZE);
+static_assert(offsetof(struct elf32_ehdr, e_phnum) == __OFFSET_ELF32_EHDR_PHNUM);
+static_assert(offsetof(struct elf32_ehdr, e_phoff) == __OFFSET_ELF32_EHDR_PHOFF);
+static_assert(offsetof(struct elf32_ehdr, e_shentsize) == __OFFSET_ELF32_EHDR_SHENTSIZE);
+static_assert(offsetof(struct elf32_ehdr, e_shnum) == __OFFSET_ELF32_EHDR_SHNUM);
+static_assert(offsetof(struct elf32_ehdr, e_shoff) == __OFFSET_ELF32_EHDR_SHOFF);
+static_assert(offsetof(struct elf32_ehdr, e_shstrndx) == __OFFSET_ELF32_EHDR_SHSTRNDX);
+static_assert(offsetof(struct elf32_ehdr, e_type) == __OFFSET_ELF32_EHDR_TYPE);
+static_assert(offsetof(struct elf32_ehdr, e_version) == __OFFSET_ELF32_EHDR_VERSION);
+static_assert(sizeof(struct elf32_ehdr) == __SIZEOF_ELF32_EHDR);
 
 /* struct elf64_ehdr */
-STATIC_ASSERT(offsetof(struct elf64_ehdr, e_ehsize) == __OFFSET_ELF64_EHDR_EHSIZE);
-STATIC_ASSERT(offsetof(struct elf64_ehdr, e_entry) == __OFFSET_ELF64_EHDR_ENTRY);
-STATIC_ASSERT(offsetof(struct elf64_ehdr, e_flags) == __OFFSET_ELF64_EHDR_FLAGS);
-STATIC_ASSERT(offsetof(struct elf64_ehdr, e_ident) == __OFFSET_ELF64_EHDR_IDENT);
-STATIC_ASSERT(offsetof(struct elf64_ehdr, e_machine) == __OFFSET_ELF64_EHDR_MACHINE);
-STATIC_ASSERT(offsetof(struct elf64_ehdr, e_phentsize) == __OFFSET_ELF64_EHDR_PHENTSIZE);
-STATIC_ASSERT(offsetof(struct elf64_ehdr, e_phnum) == __OFFSET_ELF64_EHDR_PHNUM);
-STATIC_ASSERT(offsetof(struct elf64_ehdr, e_phoff) == __OFFSET_ELF64_EHDR_PHOFF);
-STATIC_ASSERT(offsetof(struct elf64_ehdr, e_shentsize) == __OFFSET_ELF64_EHDR_SHENTSIZE);
-STATIC_ASSERT(offsetof(struct elf64_ehdr, e_shnum) == __OFFSET_ELF64_EHDR_SHNUM);
-STATIC_ASSERT(offsetof(struct elf64_ehdr, e_shoff) == __OFFSET_ELF64_EHDR_SHOFF);
-STATIC_ASSERT(offsetof(struct elf64_ehdr, e_shstrndx) == __OFFSET_ELF64_EHDR_SHSTRNDX);
-STATIC_ASSERT(offsetof(struct elf64_ehdr, e_type) == __OFFSET_ELF64_EHDR_TYPE);
-STATIC_ASSERT(offsetof(struct elf64_ehdr, e_version) == __OFFSET_ELF64_EHDR_VERSION);
-STATIC_ASSERT(sizeof(struct elf64_ehdr) == __SIZEOF_ELF64_EHDR);
+static_assert(offsetof(struct elf64_ehdr, e_ehsize) == __OFFSET_ELF64_EHDR_EHSIZE);
+static_assert(offsetof(struct elf64_ehdr, e_entry) == __OFFSET_ELF64_EHDR_ENTRY);
+static_assert(offsetof(struct elf64_ehdr, e_flags) == __OFFSET_ELF64_EHDR_FLAGS);
+static_assert(offsetof(struct elf64_ehdr, e_ident) == __OFFSET_ELF64_EHDR_IDENT);
+static_assert(offsetof(struct elf64_ehdr, e_machine) == __OFFSET_ELF64_EHDR_MACHINE);
+static_assert(offsetof(struct elf64_ehdr, e_phentsize) == __OFFSET_ELF64_EHDR_PHENTSIZE);
+static_assert(offsetof(struct elf64_ehdr, e_phnum) == __OFFSET_ELF64_EHDR_PHNUM);
+static_assert(offsetof(struct elf64_ehdr, e_phoff) == __OFFSET_ELF64_EHDR_PHOFF);
+static_assert(offsetof(struct elf64_ehdr, e_shentsize) == __OFFSET_ELF64_EHDR_SHENTSIZE);
+static_assert(offsetof(struct elf64_ehdr, e_shnum) == __OFFSET_ELF64_EHDR_SHNUM);
+static_assert(offsetof(struct elf64_ehdr, e_shoff) == __OFFSET_ELF64_EHDR_SHOFF);
+static_assert(offsetof(struct elf64_ehdr, e_shstrndx) == __OFFSET_ELF64_EHDR_SHSTRNDX);
+static_assert(offsetof(struct elf64_ehdr, e_type) == __OFFSET_ELF64_EHDR_TYPE);
+static_assert(offsetof(struct elf64_ehdr, e_version) == __OFFSET_ELF64_EHDR_VERSION);
+static_assert(sizeof(struct elf64_ehdr) == __SIZEOF_ELF64_EHDR);
 
 /* struct elf32_shdr */
-STATIC_ASSERT(offsetof(struct elf32_shdr, sh_addr) == __OFFSET_ELF32_SHDR_ADDR);
-STATIC_ASSERT(offsetof(struct elf32_shdr, sh_addralign) == __OFFSET_ELF32_SHDR_ADDRALIGN);
-STATIC_ASSERT(offsetof(struct elf32_shdr, sh_entsize) == __OFFSET_ELF32_SHDR_ENTSIZE);
-STATIC_ASSERT(offsetof(struct elf32_shdr, sh_flags) == __OFFSET_ELF32_SHDR_FLAGS);
-STATIC_ASSERT(offsetof(struct elf32_shdr, sh_info) == __OFFSET_ELF32_SHDR_INFO);
-STATIC_ASSERT(offsetof(struct elf32_shdr, sh_link) == __OFFSET_ELF32_SHDR_LINK);
-STATIC_ASSERT(offsetof(struct elf32_shdr, sh_name) == __OFFSET_ELF32_SHDR_NAME);
-STATIC_ASSERT(offsetof(struct elf32_shdr, sh_offset) == __OFFSET_ELF32_SHDR_OFFSET);
-STATIC_ASSERT(offsetof(struct elf32_shdr, sh_size) == __OFFSET_ELF32_SHDR_SIZE);
-STATIC_ASSERT(offsetof(struct elf32_shdr, sh_type) == __OFFSET_ELF32_SHDR_TYPE);
-STATIC_ASSERT(sizeof(struct elf32_shdr) == __SIZEOF_ELF32_SHDR);
+static_assert(offsetof(struct elf32_shdr, sh_addr) == __OFFSET_ELF32_SHDR_ADDR);
+static_assert(offsetof(struct elf32_shdr, sh_addralign) == __OFFSET_ELF32_SHDR_ADDRALIGN);
+static_assert(offsetof(struct elf32_shdr, sh_entsize) == __OFFSET_ELF32_SHDR_ENTSIZE);
+static_assert(offsetof(struct elf32_shdr, sh_flags) == __OFFSET_ELF32_SHDR_FLAGS);
+static_assert(offsetof(struct elf32_shdr, sh_info) == __OFFSET_ELF32_SHDR_INFO);
+static_assert(offsetof(struct elf32_shdr, sh_link) == __OFFSET_ELF32_SHDR_LINK);
+static_assert(offsetof(struct elf32_shdr, sh_name) == __OFFSET_ELF32_SHDR_NAME);
+static_assert(offsetof(struct elf32_shdr, sh_offset) == __OFFSET_ELF32_SHDR_OFFSET);
+static_assert(offsetof(struct elf32_shdr, sh_size) == __OFFSET_ELF32_SHDR_SIZE);
+static_assert(offsetof(struct elf32_shdr, sh_type) == __OFFSET_ELF32_SHDR_TYPE);
+static_assert(sizeof(struct elf32_shdr) == __SIZEOF_ELF32_SHDR);
 
 /* struct elf64_shdr */
-STATIC_ASSERT(offsetof(struct elf64_shdr, sh_addr) == __OFFSET_ELF64_SHDR_ADDR);
-STATIC_ASSERT(offsetof(struct elf64_shdr, sh_addralign) == __OFFSET_ELF64_SHDR_ADDRALIGN);
-STATIC_ASSERT(offsetof(struct elf64_shdr, sh_entsize) == __OFFSET_ELF64_SHDR_ENTSIZE);
-STATIC_ASSERT(offsetof(struct elf64_shdr, sh_flags) == __OFFSET_ELF64_SHDR_FLAGS);
-STATIC_ASSERT(offsetof(struct elf64_shdr, sh_info) == __OFFSET_ELF64_SHDR_INFO);
-STATIC_ASSERT(offsetof(struct elf64_shdr, sh_link) == __OFFSET_ELF64_SHDR_LINK);
-STATIC_ASSERT(offsetof(struct elf64_shdr, sh_name) == __OFFSET_ELF64_SHDR_NAME);
-STATIC_ASSERT(offsetof(struct elf64_shdr, sh_offset) == __OFFSET_ELF64_SHDR_OFFSET);
-STATIC_ASSERT(offsetof(struct elf64_shdr, sh_size) == __OFFSET_ELF64_SHDR_SIZE);
-STATIC_ASSERT(offsetof(struct elf64_shdr, sh_type) == __OFFSET_ELF64_SHDR_TYPE);
-STATIC_ASSERT(sizeof(struct elf64_shdr) == __SIZEOF_ELF64_SHDR);
+static_assert(offsetof(struct elf64_shdr, sh_addr) == __OFFSET_ELF64_SHDR_ADDR);
+static_assert(offsetof(struct elf64_shdr, sh_addralign) == __OFFSET_ELF64_SHDR_ADDRALIGN);
+static_assert(offsetof(struct elf64_shdr, sh_entsize) == __OFFSET_ELF64_SHDR_ENTSIZE);
+static_assert(offsetof(struct elf64_shdr, sh_flags) == __OFFSET_ELF64_SHDR_FLAGS);
+static_assert(offsetof(struct elf64_shdr, sh_info) == __OFFSET_ELF64_SHDR_INFO);
+static_assert(offsetof(struct elf64_shdr, sh_link) == __OFFSET_ELF64_SHDR_LINK);
+static_assert(offsetof(struct elf64_shdr, sh_name) == __OFFSET_ELF64_SHDR_NAME);
+static_assert(offsetof(struct elf64_shdr, sh_offset) == __OFFSET_ELF64_SHDR_OFFSET);
+static_assert(offsetof(struct elf64_shdr, sh_size) == __OFFSET_ELF64_SHDR_SIZE);
+static_assert(offsetof(struct elf64_shdr, sh_type) == __OFFSET_ELF64_SHDR_TYPE);
+static_assert(sizeof(struct elf64_shdr) == __SIZEOF_ELF64_SHDR);
 
 /* struct elf32_sym */
-STATIC_ASSERT(offsetof(struct elf32_sym, st_info) == __OFFSET_ELF32_SYM_INFO);
-STATIC_ASSERT(offsetof(struct elf32_sym, st_name) == __OFFSET_ELF32_SYM_NAME);
-STATIC_ASSERT(offsetof(struct elf32_sym, st_other) == __OFFSET_ELF32_SYM_OTHER);
-STATIC_ASSERT(offsetof(struct elf32_sym, st_shndx) == __OFFSET_ELF32_SYM_SHNDX);
-STATIC_ASSERT(offsetof(struct elf32_sym, st_size) == __OFFSET_ELF32_SYM_SIZE);
-STATIC_ASSERT(offsetof(struct elf32_sym, st_value) == __OFFSET_ELF32_SYM_VALUE);
-STATIC_ASSERT(sizeof(struct elf32_sym) == __SIZEOF_ELF32_SYM);
+static_assert(offsetof(struct elf32_sym, st_info) == __OFFSET_ELF32_SYM_INFO);
+static_assert(offsetof(struct elf32_sym, st_name) == __OFFSET_ELF32_SYM_NAME);
+static_assert(offsetof(struct elf32_sym, st_other) == __OFFSET_ELF32_SYM_OTHER);
+static_assert(offsetof(struct elf32_sym, st_shndx) == __OFFSET_ELF32_SYM_SHNDX);
+static_assert(offsetof(struct elf32_sym, st_size) == __OFFSET_ELF32_SYM_SIZE);
+static_assert(offsetof(struct elf32_sym, st_value) == __OFFSET_ELF32_SYM_VALUE);
+static_assert(sizeof(struct elf32_sym) == __SIZEOF_ELF32_SYM);
 
 /* struct elf64_sym */
-STATIC_ASSERT(offsetof(struct elf64_sym, st_info) == __OFFSET_ELF64_SYM_INFO);
-STATIC_ASSERT(offsetof(struct elf64_sym, st_name) == __OFFSET_ELF64_SYM_NAME);
-STATIC_ASSERT(offsetof(struct elf64_sym, st_other) == __OFFSET_ELF64_SYM_OTHER);
-STATIC_ASSERT(offsetof(struct elf64_sym, st_shndx) == __OFFSET_ELF64_SYM_SHNDX);
-STATIC_ASSERT(offsetof(struct elf64_sym, st_size) == __OFFSET_ELF64_SYM_SIZE);
-STATIC_ASSERT(offsetof(struct elf64_sym, st_value) == __OFFSET_ELF64_SYM_VALUE);
-STATIC_ASSERT(sizeof(struct elf64_sym) == __SIZEOF_ELF64_SYM);
+static_assert(offsetof(struct elf64_sym, st_info) == __OFFSET_ELF64_SYM_INFO);
+static_assert(offsetof(struct elf64_sym, st_name) == __OFFSET_ELF64_SYM_NAME);
+static_assert(offsetof(struct elf64_sym, st_other) == __OFFSET_ELF64_SYM_OTHER);
+static_assert(offsetof(struct elf64_sym, st_shndx) == __OFFSET_ELF64_SYM_SHNDX);
+static_assert(offsetof(struct elf64_sym, st_size) == __OFFSET_ELF64_SYM_SIZE);
+static_assert(offsetof(struct elf64_sym, st_value) == __OFFSET_ELF64_SYM_VALUE);
+static_assert(sizeof(struct elf64_sym) == __SIZEOF_ELF64_SYM);
 
 /* struct elf32_syminfo */
-STATIC_ASSERT(offsetof(struct elf32_syminfo, si_flags) == __OFFSET_ELF32_SYMINFO_FLAGS);
-STATIC_ASSERT(offsetof(struct elf32_syminfo, si_boundto) == __OFFSET_ELF32_SYMINFO_BOUNDTO);
-STATIC_ASSERT(sizeof(struct elf32_syminfo) == __SIZEOF_ELF32_SYMINFO);
+static_assert(offsetof(struct elf32_syminfo, si_flags) == __OFFSET_ELF32_SYMINFO_FLAGS);
+static_assert(offsetof(struct elf32_syminfo, si_boundto) == __OFFSET_ELF32_SYMINFO_BOUNDTO);
+static_assert(sizeof(struct elf32_syminfo) == __SIZEOF_ELF32_SYMINFO);
 
 /* struct elf64_syminfo */
-STATIC_ASSERT(offsetof(struct elf64_syminfo, si_flags) == __OFFSET_ELF64_SYMINFO_FLAGS);
-STATIC_ASSERT(offsetof(struct elf64_syminfo, si_boundto) == __OFFSET_ELF64_SYMINFO_BOUNDTO);
-STATIC_ASSERT(sizeof(struct elf64_syminfo) == __SIZEOF_ELF64_SYMINFO);
+static_assert(offsetof(struct elf64_syminfo, si_flags) == __OFFSET_ELF64_SYMINFO_FLAGS);
+static_assert(offsetof(struct elf64_syminfo, si_boundto) == __OFFSET_ELF64_SYMINFO_BOUNDTO);
+static_assert(sizeof(struct elf64_syminfo) == __SIZEOF_ELF64_SYMINFO);
 
 /* struct elf32_rel */
 /* ... */
@@ -1012,210 +1013,210 @@ STATIC_ASSERT(sizeof(struct elf64_syminfo) == __SIZEOF_ELF64_SYMINFO);
 /* ... */
 
 /* struct elf32_phdr */
-STATIC_ASSERT(offsetof(struct elf32_phdr, p_align) == __OFFSET_ELF32_PHDR_ALIGN);
-STATIC_ASSERT(offsetof(struct elf32_phdr, p_filesz) == __OFFSET_ELF32_PHDR_FILESZ);
-STATIC_ASSERT(offsetof(struct elf32_phdr, p_flags) == __OFFSET_ELF32_PHDR_FLAGS);
-STATIC_ASSERT(offsetof(struct elf32_phdr, p_memsz) == __OFFSET_ELF32_PHDR_MEMSZ);
-STATIC_ASSERT(offsetof(struct elf32_phdr, p_offset) == __OFFSET_ELF32_PHDR_OFFSET);
-STATIC_ASSERT(offsetof(struct elf32_phdr, p_paddr) == __OFFSET_ELF32_PHDR_PADDR);
-STATIC_ASSERT(offsetof(struct elf32_phdr, p_type) == __OFFSET_ELF32_PHDR_TYPE);
-STATIC_ASSERT(offsetof(struct elf32_phdr, p_vaddr) == __OFFSET_ELF32_PHDR_VADDR);
-STATIC_ASSERT(sizeof(struct elf32_phdr) == __SIZEOF_ELF32_PHDR);
+static_assert(offsetof(struct elf32_phdr, p_align) == __OFFSET_ELF32_PHDR_ALIGN);
+static_assert(offsetof(struct elf32_phdr, p_filesz) == __OFFSET_ELF32_PHDR_FILESZ);
+static_assert(offsetof(struct elf32_phdr, p_flags) == __OFFSET_ELF32_PHDR_FLAGS);
+static_assert(offsetof(struct elf32_phdr, p_memsz) == __OFFSET_ELF32_PHDR_MEMSZ);
+static_assert(offsetof(struct elf32_phdr, p_offset) == __OFFSET_ELF32_PHDR_OFFSET);
+static_assert(offsetof(struct elf32_phdr, p_paddr) == __OFFSET_ELF32_PHDR_PADDR);
+static_assert(offsetof(struct elf32_phdr, p_type) == __OFFSET_ELF32_PHDR_TYPE);
+static_assert(offsetof(struct elf32_phdr, p_vaddr) == __OFFSET_ELF32_PHDR_VADDR);
+static_assert(sizeof(struct elf32_phdr) == __SIZEOF_ELF32_PHDR);
 
 /* struct elf64_phdr */
-STATIC_ASSERT(offsetof(struct elf64_phdr, p_align) == __OFFSET_ELF64_PHDR_ALIGN);
-STATIC_ASSERT(offsetof(struct elf64_phdr, p_filesz) == __OFFSET_ELF64_PHDR_FILESZ);
-STATIC_ASSERT(offsetof(struct elf64_phdr, p_flags) == __OFFSET_ELF64_PHDR_FLAGS);
-STATIC_ASSERT(offsetof(struct elf64_phdr, p_memsz) == __OFFSET_ELF64_PHDR_MEMSZ);
-STATIC_ASSERT(offsetof(struct elf64_phdr, p_offset) == __OFFSET_ELF64_PHDR_OFFSET);
-STATIC_ASSERT(offsetof(struct elf64_phdr, p_paddr) == __OFFSET_ELF64_PHDR_PADDR);
-STATIC_ASSERT(offsetof(struct elf64_phdr, p_type) == __OFFSET_ELF64_PHDR_TYPE);
-STATIC_ASSERT(offsetof(struct elf64_phdr, p_vaddr) == __OFFSET_ELF64_PHDR_VADDR);
-STATIC_ASSERT(sizeof(struct elf64_phdr) == __SIZEOF_ELF64_PHDR);
+static_assert(offsetof(struct elf64_phdr, p_align) == __OFFSET_ELF64_PHDR_ALIGN);
+static_assert(offsetof(struct elf64_phdr, p_filesz) == __OFFSET_ELF64_PHDR_FILESZ);
+static_assert(offsetof(struct elf64_phdr, p_flags) == __OFFSET_ELF64_PHDR_FLAGS);
+static_assert(offsetof(struct elf64_phdr, p_memsz) == __OFFSET_ELF64_PHDR_MEMSZ);
+static_assert(offsetof(struct elf64_phdr, p_offset) == __OFFSET_ELF64_PHDR_OFFSET);
+static_assert(offsetof(struct elf64_phdr, p_paddr) == __OFFSET_ELF64_PHDR_PADDR);
+static_assert(offsetof(struct elf64_phdr, p_type) == __OFFSET_ELF64_PHDR_TYPE);
+static_assert(offsetof(struct elf64_phdr, p_vaddr) == __OFFSET_ELF64_PHDR_VADDR);
+static_assert(sizeof(struct elf64_phdr) == __SIZEOF_ELF64_PHDR);
 
 /* struct elf32_dyn */
-STATIC_ASSERT(offsetof(struct elf32_dyn, d_un.d_ptr) == __OFFSET_ELF32_DYN_PTR);
-STATIC_ASSERT(offsetof(struct elf32_dyn, d_tag) == __OFFSET_ELF32_DYN_TAG);
-STATIC_ASSERT(offsetof(struct elf32_dyn, d_un.d_val) == __OFFSET_ELF32_DYN_VAL);
-STATIC_ASSERT(sizeof(struct elf32_dyn) == __SIZEOF_ELF32_DYN);
-STATIC_ASSERT(alignof(struct elf32_dyn) == __ALIGNOF_ELF32_DYN);
+static_assert(offsetof(struct elf32_dyn, d_un.d_ptr) == __OFFSET_ELF32_DYN_PTR);
+static_assert(offsetof(struct elf32_dyn, d_tag) == __OFFSET_ELF32_DYN_TAG);
+static_assert(offsetof(struct elf32_dyn, d_un.d_val) == __OFFSET_ELF32_DYN_VAL);
+static_assert(sizeof(struct elf32_dyn) == __SIZEOF_ELF32_DYN);
+static_assert(alignof(struct elf32_dyn) == __ALIGNOF_ELF32_DYN);
 
 /* struct elf64_dyn */
-STATIC_ASSERT(offsetof(struct elf64_dyn, d_un.d_ptr) == __OFFSET_ELF64_DYN_PTR);
-STATIC_ASSERT(offsetof(struct elf64_dyn, d_tag) == __OFFSET_ELF64_DYN_TAG);
-STATIC_ASSERT(offsetof(struct elf64_dyn, d_un.d_val) == __OFFSET_ELF64_DYN_VAL);
-STATIC_ASSERT(sizeof(struct elf64_dyn) == __SIZEOF_ELF64_DYN);
-STATIC_ASSERT(alignof(struct elf64_dyn) == __ALIGNOF_ELF64_DYN);
+static_assert(offsetof(struct elf64_dyn, d_un.d_ptr) == __OFFSET_ELF64_DYN_PTR);
+static_assert(offsetof(struct elf64_dyn, d_tag) == __OFFSET_ELF64_DYN_TAG);
+static_assert(offsetof(struct elf64_dyn, d_un.d_val) == __OFFSET_ELF64_DYN_VAL);
+static_assert(sizeof(struct elf64_dyn) == __SIZEOF_ELF64_DYN);
+static_assert(alignof(struct elf64_dyn) == __ALIGNOF_ELF64_DYN);
 
 /* struct elf32_chdr */
-STATIC_ASSERT(offsetof(struct elf32_chdr, ch_addralign) == __OFFSET_ELF32_CHDR_ADDRALIGN);
-STATIC_ASSERT(offsetof(struct elf32_chdr, ch_size) == __OFFSET_ELF32_CHDR_SIZE);
-STATIC_ASSERT(offsetof(struct elf32_chdr, ch_type) == __OFFSET_ELF32_CHDR_TYPE);
-STATIC_ASSERT(sizeof(struct elf32_chdr) == __SIZEOF_ELF32_CHDR);
+static_assert(offsetof(struct elf32_chdr, ch_addralign) == __OFFSET_ELF32_CHDR_ADDRALIGN);
+static_assert(offsetof(struct elf32_chdr, ch_size) == __OFFSET_ELF32_CHDR_SIZE);
+static_assert(offsetof(struct elf32_chdr, ch_type) == __OFFSET_ELF32_CHDR_TYPE);
+static_assert(sizeof(struct elf32_chdr) == __SIZEOF_ELF32_CHDR);
 
 /* struct elf64_chdr */
-STATIC_ASSERT(offsetof(struct elf64_chdr, ch_addralign) == __OFFSET_ELF64_CHDR_ADDRALIGN);
-STATIC_ASSERT(offsetof(struct elf64_chdr, ch_size) == __OFFSET_ELF64_CHDR_SIZE);
-STATIC_ASSERT(offsetof(struct elf64_chdr, ch_type) == __OFFSET_ELF64_CHDR_TYPE);
-STATIC_ASSERT(sizeof(struct elf64_chdr) == __SIZEOF_ELF64_CHDR);
+static_assert(offsetof(struct elf64_chdr, ch_addralign) == __OFFSET_ELF64_CHDR_ADDRALIGN);
+static_assert(offsetof(struct elf64_chdr, ch_size) == __OFFSET_ELF64_CHDR_SIZE);
+static_assert(offsetof(struct elf64_chdr, ch_type) == __OFFSET_ELF64_CHDR_TYPE);
+static_assert(sizeof(struct elf64_chdr) == __SIZEOF_ELF64_CHDR);
 
 /* struct elf32_verdef */
-STATIC_ASSERT(offsetof(struct elf32_verdef, vd_aux) == __OFFSET_ELF32_VERDEF_AUX);
-STATIC_ASSERT(offsetof(struct elf32_verdef, vd_cnt) == __OFFSET_ELF32_VERDEF_CNT);
-STATIC_ASSERT(offsetof(struct elf32_verdef, vd_flags) == __OFFSET_ELF32_VERDEF_FLAGS);
-STATIC_ASSERT(offsetof(struct elf32_verdef, vd_hash) == __OFFSET_ELF32_VERDEF_HASH);
-STATIC_ASSERT(offsetof(struct elf32_verdef, vd_ndx) == __OFFSET_ELF32_VERDEF_NDX);
-STATIC_ASSERT(offsetof(struct elf32_verdef, vd_next) == __OFFSET_ELF32_VERDEF_NEXT);
-STATIC_ASSERT(offsetof(struct elf32_verdef, vd_version) == __OFFSET_ELF32_VERDEF_VERSION);
-STATIC_ASSERT(sizeof(struct elf32_verdef) == __SIZEOF_ELF32_VERDEF);
-STATIC_ASSERT(alignof(struct elf32_verdef) == __ALIGNOF_ELF32_VERDEF);
+static_assert(offsetof(struct elf32_verdef, vd_aux) == __OFFSET_ELF32_VERDEF_AUX);
+static_assert(offsetof(struct elf32_verdef, vd_cnt) == __OFFSET_ELF32_VERDEF_CNT);
+static_assert(offsetof(struct elf32_verdef, vd_flags) == __OFFSET_ELF32_VERDEF_FLAGS);
+static_assert(offsetof(struct elf32_verdef, vd_hash) == __OFFSET_ELF32_VERDEF_HASH);
+static_assert(offsetof(struct elf32_verdef, vd_ndx) == __OFFSET_ELF32_VERDEF_NDX);
+static_assert(offsetof(struct elf32_verdef, vd_next) == __OFFSET_ELF32_VERDEF_NEXT);
+static_assert(offsetof(struct elf32_verdef, vd_version) == __OFFSET_ELF32_VERDEF_VERSION);
+static_assert(sizeof(struct elf32_verdef) == __SIZEOF_ELF32_VERDEF);
+static_assert(alignof(struct elf32_verdef) == __ALIGNOF_ELF32_VERDEF);
 
 /* struct elf64_verdef */
-STATIC_ASSERT(offsetof(struct elf64_verdef, vd_aux) == __OFFSET_ELF64_VERDEF_AUX);
-STATIC_ASSERT(offsetof(struct elf64_verdef, vd_cnt) == __OFFSET_ELF64_VERDEF_CNT);
-STATIC_ASSERT(offsetof(struct elf64_verdef, vd_flags) == __OFFSET_ELF64_VERDEF_FLAGS);
-STATIC_ASSERT(offsetof(struct elf64_verdef, vd_hash) == __OFFSET_ELF64_VERDEF_HASH);
-STATIC_ASSERT(offsetof(struct elf64_verdef, vd_ndx) == __OFFSET_ELF64_VERDEF_NDX);
-STATIC_ASSERT(offsetof(struct elf64_verdef, vd_next) == __OFFSET_ELF64_VERDEF_NEXT);
-STATIC_ASSERT(offsetof(struct elf64_verdef, vd_version) == __OFFSET_ELF64_VERDEF_VERSION);
-STATIC_ASSERT(sizeof(struct elf64_verdef) == __SIZEOF_ELF64_VERDEF);
-STATIC_ASSERT(alignof(struct elf64_verdef) == __ALIGNOF_ELF64_VERDEF);
+static_assert(offsetof(struct elf64_verdef, vd_aux) == __OFFSET_ELF64_VERDEF_AUX);
+static_assert(offsetof(struct elf64_verdef, vd_cnt) == __OFFSET_ELF64_VERDEF_CNT);
+static_assert(offsetof(struct elf64_verdef, vd_flags) == __OFFSET_ELF64_VERDEF_FLAGS);
+static_assert(offsetof(struct elf64_verdef, vd_hash) == __OFFSET_ELF64_VERDEF_HASH);
+static_assert(offsetof(struct elf64_verdef, vd_ndx) == __OFFSET_ELF64_VERDEF_NDX);
+static_assert(offsetof(struct elf64_verdef, vd_next) == __OFFSET_ELF64_VERDEF_NEXT);
+static_assert(offsetof(struct elf64_verdef, vd_version) == __OFFSET_ELF64_VERDEF_VERSION);
+static_assert(sizeof(struct elf64_verdef) == __SIZEOF_ELF64_VERDEF);
+static_assert(alignof(struct elf64_verdef) == __ALIGNOF_ELF64_VERDEF);
 
 /* struct elf32_verdaux */
-STATIC_ASSERT(offsetof(struct elf32_verdaux, vda_next) == __OFFSET_ELF32_VERDAUX_NEXT);
-STATIC_ASSERT(offsetof(struct elf32_verdaux, vda_name) == __OFFSET_ELF32_VERDAUX_NAME);
-STATIC_ASSERT(sizeof(struct elf32_verdaux) == __SIZEOF_ELF32_VERDAUX);
-STATIC_ASSERT(alignof(struct elf32_verdaux) == __ALIGNOF_ELF32_VERDAUX);
+static_assert(offsetof(struct elf32_verdaux, vda_next) == __OFFSET_ELF32_VERDAUX_NEXT);
+static_assert(offsetof(struct elf32_verdaux, vda_name) == __OFFSET_ELF32_VERDAUX_NAME);
+static_assert(sizeof(struct elf32_verdaux) == __SIZEOF_ELF32_VERDAUX);
+static_assert(alignof(struct elf32_verdaux) == __ALIGNOF_ELF32_VERDAUX);
 
 /* struct elf64_verdaux */
-STATIC_ASSERT(offsetof(struct elf64_verdaux, vda_next) == __OFFSET_ELF64_VERDAUX_NEXT);
-STATIC_ASSERT(offsetof(struct elf64_verdaux, vda_name) == __OFFSET_ELF64_VERDAUX_NAME);
-STATIC_ASSERT(sizeof(struct elf64_verdaux) == __SIZEOF_ELF64_VERDAUX);
-STATIC_ASSERT(alignof(struct elf64_verdaux) == __ALIGNOF_ELF64_VERDAUX);
+static_assert(offsetof(struct elf64_verdaux, vda_next) == __OFFSET_ELF64_VERDAUX_NEXT);
+static_assert(offsetof(struct elf64_verdaux, vda_name) == __OFFSET_ELF64_VERDAUX_NAME);
+static_assert(sizeof(struct elf64_verdaux) == __SIZEOF_ELF64_VERDAUX);
+static_assert(alignof(struct elf64_verdaux) == __ALIGNOF_ELF64_VERDAUX);
 
 /* struct elf32_verneed */
-STATIC_ASSERT(offsetof(struct elf32_verneed, vn_aux) == __OFFSET_ELF32_VERNEED_AUX);
-STATIC_ASSERT(offsetof(struct elf32_verneed, vn_cnt) == __OFFSET_ELF32_VERNEED_CNT);
-STATIC_ASSERT(offsetof(struct elf32_verneed, vn_file) == __OFFSET_ELF32_VERNEED_FILE);
-STATIC_ASSERT(offsetof(struct elf32_verneed, vn_next) == __OFFSET_ELF32_VERNEED_NEXT);
-STATIC_ASSERT(offsetof(struct elf32_verneed, vn_version) == __OFFSET_ELF32_VERNEED_VERSION);
-STATIC_ASSERT(sizeof(struct elf32_verneed) == __SIZEOF_ELF32_VERNEED);
-STATIC_ASSERT(alignof(struct elf32_verneed) == __ALIGNOF_ELF32_VERNEED);
+static_assert(offsetof(struct elf32_verneed, vn_aux) == __OFFSET_ELF32_VERNEED_AUX);
+static_assert(offsetof(struct elf32_verneed, vn_cnt) == __OFFSET_ELF32_VERNEED_CNT);
+static_assert(offsetof(struct elf32_verneed, vn_file) == __OFFSET_ELF32_VERNEED_FILE);
+static_assert(offsetof(struct elf32_verneed, vn_next) == __OFFSET_ELF32_VERNEED_NEXT);
+static_assert(offsetof(struct elf32_verneed, vn_version) == __OFFSET_ELF32_VERNEED_VERSION);
+static_assert(sizeof(struct elf32_verneed) == __SIZEOF_ELF32_VERNEED);
+static_assert(alignof(struct elf32_verneed) == __ALIGNOF_ELF32_VERNEED);
 
 /* struct elf64_verneed */
-STATIC_ASSERT(offsetof(struct elf64_verneed, vn_aux) == __OFFSET_ELF64_VERNEED_AUX);
-STATIC_ASSERT(offsetof(struct elf64_verneed, vn_cnt) == __OFFSET_ELF64_VERNEED_CNT);
-STATIC_ASSERT(offsetof(struct elf64_verneed, vn_file) == __OFFSET_ELF64_VERNEED_FILE);
-STATIC_ASSERT(offsetof(struct elf64_verneed, vn_next) == __OFFSET_ELF64_VERNEED_NEXT);
-STATIC_ASSERT(offsetof(struct elf64_verneed, vn_version) == __OFFSET_ELF64_VERNEED_VERSION);
-STATIC_ASSERT(sizeof(struct elf64_verneed) == __SIZEOF_ELF64_VERNEED);
-STATIC_ASSERT(alignof(struct elf64_verneed) == __ALIGNOF_ELF64_VERNEED);
+static_assert(offsetof(struct elf64_verneed, vn_aux) == __OFFSET_ELF64_VERNEED_AUX);
+static_assert(offsetof(struct elf64_verneed, vn_cnt) == __OFFSET_ELF64_VERNEED_CNT);
+static_assert(offsetof(struct elf64_verneed, vn_file) == __OFFSET_ELF64_VERNEED_FILE);
+static_assert(offsetof(struct elf64_verneed, vn_next) == __OFFSET_ELF64_VERNEED_NEXT);
+static_assert(offsetof(struct elf64_verneed, vn_version) == __OFFSET_ELF64_VERNEED_VERSION);
+static_assert(sizeof(struct elf64_verneed) == __SIZEOF_ELF64_VERNEED);
+static_assert(alignof(struct elf64_verneed) == __ALIGNOF_ELF64_VERNEED);
 
 /* struct elf32_vernaux */
-STATIC_ASSERT(offsetof(struct elf32_vernaux, vna_flags) == __OFFSET_ELF32_VERNAUX_FLAGS);
-STATIC_ASSERT(offsetof(struct elf32_vernaux, vna_hash) == __OFFSET_ELF32_VERNAUX_HASH);
-STATIC_ASSERT(offsetof(struct elf32_vernaux, vna_name) == __OFFSET_ELF32_VERNAUX_NAME);
-STATIC_ASSERT(offsetof(struct elf32_vernaux, vna_next) == __OFFSET_ELF32_VERNAUX_NEXT);
-STATIC_ASSERT(offsetof(struct elf32_vernaux, vna_other) == __OFFSET_ELF32_VERNAUX_OTHER);
-STATIC_ASSERT(sizeof(struct elf32_vernaux) == __SIZEOF_ELF32_VERNAUX);
-STATIC_ASSERT(alignof(struct elf32_vernaux) == __ALIGNOF_ELF32_VERNAUX);
+static_assert(offsetof(struct elf32_vernaux, vna_flags) == __OFFSET_ELF32_VERNAUX_FLAGS);
+static_assert(offsetof(struct elf32_vernaux, vna_hash) == __OFFSET_ELF32_VERNAUX_HASH);
+static_assert(offsetof(struct elf32_vernaux, vna_name) == __OFFSET_ELF32_VERNAUX_NAME);
+static_assert(offsetof(struct elf32_vernaux, vna_next) == __OFFSET_ELF32_VERNAUX_NEXT);
+static_assert(offsetof(struct elf32_vernaux, vna_other) == __OFFSET_ELF32_VERNAUX_OTHER);
+static_assert(sizeof(struct elf32_vernaux) == __SIZEOF_ELF32_VERNAUX);
+static_assert(alignof(struct elf32_vernaux) == __ALIGNOF_ELF32_VERNAUX);
 
 /* struct elf64_vernaux */
-STATIC_ASSERT(offsetof(struct elf64_vernaux, vna_flags) == __OFFSET_ELF64_VERNAUX_FLAGS);
-STATIC_ASSERT(offsetof(struct elf64_vernaux, vna_hash) == __OFFSET_ELF64_VERNAUX_HASH);
-STATIC_ASSERT(offsetof(struct elf64_vernaux, vna_name) == __OFFSET_ELF64_VERNAUX_NAME);
-STATIC_ASSERT(offsetof(struct elf64_vernaux, vna_next) == __OFFSET_ELF64_VERNAUX_NEXT);
-STATIC_ASSERT(offsetof(struct elf64_vernaux, vna_other) == __OFFSET_ELF64_VERNAUX_OTHER);
-STATIC_ASSERT(sizeof(struct elf64_vernaux) == __SIZEOF_ELF64_VERNAUX);
-STATIC_ASSERT(alignof(struct elf64_vernaux) == __ALIGNOF_ELF64_VERNAUX);
+static_assert(offsetof(struct elf64_vernaux, vna_flags) == __OFFSET_ELF64_VERNAUX_FLAGS);
+static_assert(offsetof(struct elf64_vernaux, vna_hash) == __OFFSET_ELF64_VERNAUX_HASH);
+static_assert(offsetof(struct elf64_vernaux, vna_name) == __OFFSET_ELF64_VERNAUX_NAME);
+static_assert(offsetof(struct elf64_vernaux, vna_next) == __OFFSET_ELF64_VERNAUX_NEXT);
+static_assert(offsetof(struct elf64_vernaux, vna_other) == __OFFSET_ELF64_VERNAUX_OTHER);
+static_assert(sizeof(struct elf64_vernaux) == __SIZEOF_ELF64_VERNAUX);
+static_assert(alignof(struct elf64_vernaux) == __ALIGNOF_ELF64_VERNAUX);
 
 /* struct elf32_auxv_t */
-STATIC_ASSERT(offsetof(struct elf32_auxv_t, a_un.a_val) == __OFFSET_ELF32_AUXV_VAL);
-STATIC_ASSERT(offsetof(struct elf32_auxv_t, a_type) == __OFFSET_ELF32_AUXV_TYPE);
-STATIC_ASSERT(sizeof(struct elf32_auxv_t) == __SIZEOF_ELF32_AUXV);
-STATIC_ASSERT(alignof(struct elf32_auxv_t) == __ALIGNOF_ELF32_AUXV);
+static_assert(offsetof(struct elf32_auxv_t, a_un.a_val) == __OFFSET_ELF32_AUXV_VAL);
+static_assert(offsetof(struct elf32_auxv_t, a_type) == __OFFSET_ELF32_AUXV_TYPE);
+static_assert(sizeof(struct elf32_auxv_t) == __SIZEOF_ELF32_AUXV);
+static_assert(alignof(struct elf32_auxv_t) == __ALIGNOF_ELF32_AUXV);
 
 /* struct elf64_auxv_t */
-STATIC_ASSERT(offsetof(struct elf64_auxv_t, a_un.a_val) == __OFFSET_ELF64_AUXV_VAL);
-STATIC_ASSERT(offsetof(struct elf64_auxv_t, a_type) == __OFFSET_ELF64_AUXV_TYPE);
-STATIC_ASSERT(sizeof(struct elf64_auxv_t) == __SIZEOF_ELF64_AUXV);
-STATIC_ASSERT(alignof(struct elf64_auxv_t) == __ALIGNOF_ELF64_AUXV);
+static_assert(offsetof(struct elf64_auxv_t, a_un.a_val) == __OFFSET_ELF64_AUXV_VAL);
+static_assert(offsetof(struct elf64_auxv_t, a_type) == __OFFSET_ELF64_AUXV_TYPE);
+static_assert(sizeof(struct elf64_auxv_t) == __SIZEOF_ELF64_AUXV);
+static_assert(alignof(struct elf64_auxv_t) == __ALIGNOF_ELF64_AUXV);
 
 /* struct elf32_nhdr */
-STATIC_ASSERT(offsetof(struct elf32_nhdr, n_descsz) == __OFFSET_ELF32_NHDR_DESCSZ);
-STATIC_ASSERT(offsetof(struct elf32_nhdr, n_namesz) == __OFFSET_ELF32_NHDR_NAMESZ);
-STATIC_ASSERT(offsetof(struct elf32_nhdr, n_type) == __OFFSET_ELF32_NHDR_TYPE);
-STATIC_ASSERT(sizeof(struct elf32_nhdr) == __SIZEOF_ELF32_NHDR);
-STATIC_ASSERT(alignof(struct elf32_nhdr) == __ALIGNOF_ELF32_NHDR);
+static_assert(offsetof(struct elf32_nhdr, n_descsz) == __OFFSET_ELF32_NHDR_DESCSZ);
+static_assert(offsetof(struct elf32_nhdr, n_namesz) == __OFFSET_ELF32_NHDR_NAMESZ);
+static_assert(offsetof(struct elf32_nhdr, n_type) == __OFFSET_ELF32_NHDR_TYPE);
+static_assert(sizeof(struct elf32_nhdr) == __SIZEOF_ELF32_NHDR);
+static_assert(alignof(struct elf32_nhdr) == __ALIGNOF_ELF32_NHDR);
 
 /* struct elf64_nhdr */
-STATIC_ASSERT(offsetof(struct elf64_nhdr, n_descsz) == __OFFSET_ELF64_NHDR_DESCSZ);
-STATIC_ASSERT(offsetof(struct elf64_nhdr, n_namesz) == __OFFSET_ELF64_NHDR_NAMESZ);
-STATIC_ASSERT(offsetof(struct elf64_nhdr, n_type) == __OFFSET_ELF64_NHDR_TYPE);
-STATIC_ASSERT(sizeof(struct elf64_nhdr) == __SIZEOF_ELF64_NHDR);
-STATIC_ASSERT(alignof(struct elf64_nhdr) == __ALIGNOF_ELF64_NHDR);
+static_assert(offsetof(struct elf64_nhdr, n_descsz) == __OFFSET_ELF64_NHDR_DESCSZ);
+static_assert(offsetof(struct elf64_nhdr, n_namesz) == __OFFSET_ELF64_NHDR_NAMESZ);
+static_assert(offsetof(struct elf64_nhdr, n_type) == __OFFSET_ELF64_NHDR_TYPE);
+static_assert(sizeof(struct elf64_nhdr) == __SIZEOF_ELF64_NHDR);
+static_assert(alignof(struct elf64_nhdr) == __ALIGNOF_ELF64_NHDR);
 
 /* struct elf32_move */
-STATIC_ASSERT(offsetof(struct elf32_move, m_info) == __OFFSET_ELF32_MOVE_INFO);
-STATIC_ASSERT(offsetof(struct elf32_move, m_poffset) == __OFFSET_ELF32_MOVE_POFFSET);
-STATIC_ASSERT(offsetof(struct elf32_move, m_repeat) == __OFFSET_ELF32_MOVE_REPEAT);
-STATIC_ASSERT(offsetof(struct elf32_move, m_stride) == __OFFSET_ELF32_MOVE_STRIDE);
-STATIC_ASSERT(offsetof(struct elf32_move, m_value) == __OFFSET_ELF32_MOVE_VALUE);
-STATIC_ASSERT(alignof(struct elf32_move) == __ALIGNOF_ELF32_MOVE);
+static_assert(offsetof(struct elf32_move, m_info) == __OFFSET_ELF32_MOVE_INFO);
+static_assert(offsetof(struct elf32_move, m_poffset) == __OFFSET_ELF32_MOVE_POFFSET);
+static_assert(offsetof(struct elf32_move, m_repeat) == __OFFSET_ELF32_MOVE_REPEAT);
+static_assert(offsetof(struct elf32_move, m_stride) == __OFFSET_ELF32_MOVE_STRIDE);
+static_assert(offsetof(struct elf32_move, m_value) == __OFFSET_ELF32_MOVE_VALUE);
+static_assert(alignof(struct elf32_move) == __ALIGNOF_ELF32_MOVE);
 
 /* struct elf64_move */
-STATIC_ASSERT(offsetof(struct elf64_move, m_info) == __OFFSET_ELF64_MOVE_INFO);
-STATIC_ASSERT(offsetof(struct elf64_move, m_poffset) == __OFFSET_ELF64_MOVE_POFFSET);
-STATIC_ASSERT(offsetof(struct elf64_move, m_repeat) == __OFFSET_ELF64_MOVE_REPEAT);
-STATIC_ASSERT(offsetof(struct elf64_move, m_stride) == __OFFSET_ELF64_MOVE_STRIDE);
-STATIC_ASSERT(offsetof(struct elf64_move, m_value) == __OFFSET_ELF64_MOVE_VALUE);
-STATIC_ASSERT(alignof(struct elf64_move) == __ALIGNOF_ELF64_MOVE);
+static_assert(offsetof(struct elf64_move, m_info) == __OFFSET_ELF64_MOVE_INFO);
+static_assert(offsetof(struct elf64_move, m_poffset) == __OFFSET_ELF64_MOVE_POFFSET);
+static_assert(offsetof(struct elf64_move, m_repeat) == __OFFSET_ELF64_MOVE_REPEAT);
+static_assert(offsetof(struct elf64_move, m_stride) == __OFFSET_ELF64_MOVE_STRIDE);
+static_assert(offsetof(struct elf64_move, m_value) == __OFFSET_ELF64_MOVE_VALUE);
+static_assert(alignof(struct elf64_move) == __ALIGNOF_ELF64_MOVE);
 
 /* union elf32_gptab */
-STATIC_ASSERT(offsetof(union elf32_gptab, gt_entry.gt_bytes) == __OFFSET_ELF32_GPTAB_ENTRY_BYTES);
-STATIC_ASSERT(offsetof(union elf32_gptab, gt_entry.gt_g_value) == __OFFSET_ELF32_GPTAB_ENTRY_G_VALUE);
-STATIC_ASSERT(offsetof(union elf32_gptab, gt_header.gt_current_g_value) == __OFFSET_ELF32_GPTAB_HEADER_CURRENT_G_VALUE);
-STATIC_ASSERT(sizeof(union elf32_gptab) == __SIZEOF_ELF32_GPTAB);
-STATIC_ASSERT(alignof(union elf32_gptab) == __ALIGNOF_ELF32_GPTAB);
+static_assert(offsetof(union elf32_gptab, gt_entry.gt_bytes) == __OFFSET_ELF32_GPTAB_ENTRY_BYTES);
+static_assert(offsetof(union elf32_gptab, gt_entry.gt_g_value) == __OFFSET_ELF32_GPTAB_ENTRY_G_VALUE);
+static_assert(offsetof(union elf32_gptab, gt_header.gt_current_g_value) == __OFFSET_ELF32_GPTAB_HEADER_CURRENT_G_VALUE);
+static_assert(sizeof(union elf32_gptab) == __SIZEOF_ELF32_GPTAB);
+static_assert(alignof(union elf32_gptab) == __ALIGNOF_ELF32_GPTAB);
 
 /* struct elf32_reginfo */
-STATIC_ASSERT(offsetof(struct elf32_reginfo, ri_cprmask) == __OFFSET_ELF32_REGINFO_CPRMASK);
-STATIC_ASSERT(offsetof(struct elf32_reginfo, ri_gprmask) == __OFFSET_ELF32_REGINFO_GPRMASK);
-STATIC_ASSERT(offsetof(struct elf32_reginfo, ri_gp_value) == __OFFSET_ELF32_REGINFO_GP_VALUE);
-STATIC_ASSERT(sizeof(struct elf32_reginfo) == __SIZEOF_ELF32_REGINFO);
-STATIC_ASSERT(alignof(struct elf32_reginfo) == __ALIGNOF_ELF32_REGINFO);
+static_assert(offsetof(struct elf32_reginfo, ri_cprmask) == __OFFSET_ELF32_REGINFO_CPRMASK);
+static_assert(offsetof(struct elf32_reginfo, ri_gprmask) == __OFFSET_ELF32_REGINFO_GPRMASK);
+static_assert(offsetof(struct elf32_reginfo, ri_gp_value) == __OFFSET_ELF32_REGINFO_GP_VALUE);
+static_assert(sizeof(struct elf32_reginfo) == __SIZEOF_ELF32_REGINFO);
+static_assert(alignof(struct elf32_reginfo) == __ALIGNOF_ELF32_REGINFO);
 
 /* struct elf_options */
-STATIC_ASSERT(offsetof(struct elf_options, info) == __OFFSET_ELF_OPTIONS_INFO);
-STATIC_ASSERT(offsetof(struct elf_options, kind) == __OFFSET_ELF_OPTIONS_KIND);
-STATIC_ASSERT(offsetof(struct elf_options, section) == __OFFSET_ELF_OPTIONS_SECTION);
-STATIC_ASSERT(offsetof(struct elf_options, size) == __OFFSET_ELF_OPTIONS_SIZE);
-STATIC_ASSERT(sizeof(struct elf_options) == __SIZEOF_ELF_OPTIONS);
-STATIC_ASSERT(alignof(struct elf_options) == __ALIGNOF_ELF_OPTIONS);
+static_assert(offsetof(struct elf_options, info) == __OFFSET_ELF_OPTIONS_INFO);
+static_assert(offsetof(struct elf_options, kind) == __OFFSET_ELF_OPTIONS_KIND);
+static_assert(offsetof(struct elf_options, section) == __OFFSET_ELF_OPTIONS_SECTION);
+static_assert(offsetof(struct elf_options, size) == __OFFSET_ELF_OPTIONS_SIZE);
+static_assert(sizeof(struct elf_options) == __SIZEOF_ELF_OPTIONS);
+static_assert(alignof(struct elf_options) == __ALIGNOF_ELF_OPTIONS);
 
 /* struct elf_options_hw */
-STATIC_ASSERT(offsetof(struct elf_options_hw, hwp_flags2) == __OFFSET_ELF_OPTIONS_HW_FLAGS2);
-STATIC_ASSERT(offsetof(struct elf_options_hw, hwp_flags1) == __OFFSET_ELF_OPTIONS_HW_FLAGS1);
-STATIC_ASSERT(sizeof(struct elf_options_hw) == __SIZEOF_ELF_OPTIONS_HW);
-STATIC_ASSERT(alignof(struct elf_options_hw) == __ALIGNOF_ELF_OPTIONS_HW);
+static_assert(offsetof(struct elf_options_hw, hwp_flags2) == __OFFSET_ELF_OPTIONS_HW_FLAGS2);
+static_assert(offsetof(struct elf_options_hw, hwp_flags1) == __OFFSET_ELF_OPTIONS_HW_FLAGS1);
+static_assert(sizeof(struct elf_options_hw) == __SIZEOF_ELF_OPTIONS_HW);
+static_assert(alignof(struct elf_options_hw) == __ALIGNOF_ELF_OPTIONS_HW);
 
 /* struct elf32_lib */
-STATIC_ASSERT(offsetof(struct elf32_lib, l_checksum) == __OFFSET_ELF32_LIB_CHECKSUM);
-STATIC_ASSERT(offsetof(struct elf32_lib, l_flags) == __OFFSET_ELF32_LIB_FLAGS);
-STATIC_ASSERT(offsetof(struct elf32_lib, l_name) == __OFFSET_ELF32_LIB_NAME);
-STATIC_ASSERT(offsetof(struct elf32_lib, l_time_stamp) == __OFFSET_ELF32_LIB_TIME_STAMP);
-STATIC_ASSERT(offsetof(struct elf32_lib, l_version) == __OFFSET_ELF32_LIB_VERSION);
-STATIC_ASSERT(sizeof(struct elf32_lib) == __SIZEOF_ELF32_LIB);
-STATIC_ASSERT(alignof(struct elf32_lib) == __ALIGNOF_ELF32_LIB);
+static_assert(offsetof(struct elf32_lib, l_checksum) == __OFFSET_ELF32_LIB_CHECKSUM);
+static_assert(offsetof(struct elf32_lib, l_flags) == __OFFSET_ELF32_LIB_FLAGS);
+static_assert(offsetof(struct elf32_lib, l_name) == __OFFSET_ELF32_LIB_NAME);
+static_assert(offsetof(struct elf32_lib, l_time_stamp) == __OFFSET_ELF32_LIB_TIME_STAMP);
+static_assert(offsetof(struct elf32_lib, l_version) == __OFFSET_ELF32_LIB_VERSION);
+static_assert(sizeof(struct elf32_lib) == __SIZEOF_ELF32_LIB);
+static_assert(alignof(struct elf32_lib) == __ALIGNOF_ELF32_LIB);
 
 /* struct elf64_lib */
-STATIC_ASSERT(offsetof(struct elf64_lib, l_checksum) == __OFFSET_ELF64_LIB_CHECKSUM);
-STATIC_ASSERT(offsetof(struct elf64_lib, l_flags) == __OFFSET_ELF64_LIB_FLAGS);
-STATIC_ASSERT(offsetof(struct elf64_lib, l_name) == __OFFSET_ELF64_LIB_NAME);
-STATIC_ASSERT(offsetof(struct elf64_lib, l_time_stamp) == __OFFSET_ELF64_LIB_TIME_STAMP);
-STATIC_ASSERT(offsetof(struct elf64_lib, l_version) == __OFFSET_ELF64_LIB_VERSION);
-STATIC_ASSERT(sizeof(struct elf64_lib) == __SIZEOF_ELF64_LIB);
-STATIC_ASSERT(alignof(struct elf64_lib) == __ALIGNOF_ELF64_LIB);
+static_assert(offsetof(struct elf64_lib, l_checksum) == __OFFSET_ELF64_LIB_CHECKSUM);
+static_assert(offsetof(struct elf64_lib, l_flags) == __OFFSET_ELF64_LIB_FLAGS);
+static_assert(offsetof(struct elf64_lib, l_name) == __OFFSET_ELF64_LIB_NAME);
+static_assert(offsetof(struct elf64_lib, l_time_stamp) == __OFFSET_ELF64_LIB_TIME_STAMP);
+static_assert(offsetof(struct elf64_lib, l_version) == __OFFSET_ELF64_LIB_VERSION);
+static_assert(sizeof(struct elf64_lib) == __SIZEOF_ELF64_LIB);
+static_assert(alignof(struct elf64_lib) == __ALIGNOF_ELF64_LIB);
 
 
 
@@ -1224,12 +1225,12 @@ STATIC_ASSERT(alignof(struct elf64_lib) == __ALIGNOF_ELF64_LIB);
 #include <kos/bits/debugtrap.h>
 
 /* struct debugtrap_reason */
-STATIC_ASSERT(offsetof(struct debugtrap_reason, dtr_intarg) == __OFFSET_DEBUGTRAP_REASON_INTARG);
-STATIC_ASSERT(offsetof(struct debugtrap_reason, dtr_ptrarg) == __OFFSET_DEBUGTRAP_REASON_PTRARG);
-STATIC_ASSERT(offsetof(struct debugtrap_reason, dtr_reason) == __OFFSET_DEBUGTRAP_REASON_REASON);
-STATIC_ASSERT(offsetof(struct debugtrap_reason, dtr_signo) == __OFFSET_DEBUGTRAP_REASON_SIGNO);
-STATIC_ASSERT(offsetof(struct debugtrap_reason, dtr_strarg) == __OFFSET_DEBUGTRAP_REASON_STRARG);
-STATIC_ASSERT(sizeof(struct debugtrap_reason) == __SIZEOF_DEBUGTRAP_REASON);
+static_assert(offsetof(struct debugtrap_reason, dtr_intarg) == __OFFSET_DEBUGTRAP_REASON_INTARG);
+static_assert(offsetof(struct debugtrap_reason, dtr_ptrarg) == __OFFSET_DEBUGTRAP_REASON_PTRARG);
+static_assert(offsetof(struct debugtrap_reason, dtr_reason) == __OFFSET_DEBUGTRAP_REASON_REASON);
+static_assert(offsetof(struct debugtrap_reason, dtr_signo) == __OFFSET_DEBUGTRAP_REASON_SIGNO);
+static_assert(offsetof(struct debugtrap_reason, dtr_strarg) == __OFFSET_DEBUGTRAP_REASON_STRARG);
+static_assert(sizeof(struct debugtrap_reason) == __SIZEOF_DEBUGTRAP_REASON);
 
 
 
@@ -1238,20 +1239,20 @@ STATIC_ASSERT(sizeof(struct debugtrap_reason) == __SIZEOF_DEBUGTRAP_REASON);
 #include <kos/bits/ukern-struct.h>
 
 /* struct userkern */
-STATIC_ASSERT(offsetof(struct userkern, uk_base) == OFFSET_USERKERN_BASE);
-STATIC_ASSERT(offsetof(struct userkern, uk_egid) == OFFSET_USERKERN_EGID);
-STATIC_ASSERT(offsetof(struct userkern, uk_euid) == OFFSET_USERKERN_EUID);
-STATIC_ASSERT(offsetof(struct userkern, uk_gid) == OFFSET_USERKERN_GID);
-STATIC_ASSERT(offsetof(struct userkern, uk_pgid) == OFFSET_USERKERN_PGID);
-STATIC_ASSERT(offsetof(struct userkern, uk_pid) == OFFSET_USERKERN_PID);
-STATIC_ASSERT(offsetof(struct userkern, uk_ppid) == OFFSET_USERKERN_PPID);
-STATIC_ASSERT(offsetof(struct userkern, uk_regs) == OFFSET_USERKERN_REGS);
-STATIC_ASSERT(offsetof(struct userkern, uk_sgid) == OFFSET_USERKERN_SGID);
-STATIC_ASSERT(offsetof(struct userkern, uk_sid) == OFFSET_USERKERN_SID);
-STATIC_ASSERT(offsetof(struct userkern, uk_suid) == OFFSET_USERKERN_SUID);
-STATIC_ASSERT(offsetof(struct userkern, uk_tid) == OFFSET_USERKERN_TID);
-STATIC_ASSERT(offsetof(struct userkern, uk_uid) == OFFSET_USERKERN_UID);
-STATIC_ASSERT(sizeof(struct userkern) == SIZEOF_USERKERN);
+static_assert(offsetof(struct userkern, uk_base) == OFFSET_USERKERN_BASE);
+static_assert(offsetof(struct userkern, uk_egid) == OFFSET_USERKERN_EGID);
+static_assert(offsetof(struct userkern, uk_euid) == OFFSET_USERKERN_EUID);
+static_assert(offsetof(struct userkern, uk_gid) == OFFSET_USERKERN_GID);
+static_assert(offsetof(struct userkern, uk_pgid) == OFFSET_USERKERN_PGID);
+static_assert(offsetof(struct userkern, uk_pid) == OFFSET_USERKERN_PID);
+static_assert(offsetof(struct userkern, uk_ppid) == OFFSET_USERKERN_PPID);
+static_assert(offsetof(struct userkern, uk_regs) == OFFSET_USERKERN_REGS);
+static_assert(offsetof(struct userkern, uk_sgid) == OFFSET_USERKERN_SGID);
+static_assert(offsetof(struct userkern, uk_sid) == OFFSET_USERKERN_SID);
+static_assert(offsetof(struct userkern, uk_suid) == OFFSET_USERKERN_SUID);
+static_assert(offsetof(struct userkern, uk_tid) == OFFSET_USERKERN_TID);
+static_assert(offsetof(struct userkern, uk_uid) == OFFSET_USERKERN_UID);
+static_assert(sizeof(struct userkern) == SIZEOF_USERKERN);
 
 
 
@@ -1260,45 +1261,45 @@ STATIC_ASSERT(sizeof(struct userkern) == SIZEOF_USERKERN);
 #include <kos/bits/spawn-action.h>
 
 /* struct spawn_action */
-STATIC_ASSERT(offsetof(struct spawn_action, sa_closerange.sa_hifd) == __OFFSET_SPAWN_ACTION_CLOSERANGE_HIFD);
-STATIC_ASSERT(offsetof(struct spawn_action, sa_closerange.sa_lofd) == __OFFSET_SPAWN_ACTION_CLOSERANGE_LOFD);
-STATIC_ASSERT(offsetof(struct spawn_action, sa_close.sa_fd) == __OFFSET_SPAWN_ACTION_CLOSE_FD);
-STATIC_ASSERT(offsetof(struct spawn_action, sa_dup2.sa_newfd) == __OFFSET_SPAWN_ACTION_DUP2_NEWFD);
-STATIC_ASSERT(offsetof(struct spawn_action, sa_dup2.sa_oldfd) == __OFFSET_SPAWN_ACTION_DUP2_OLDFD);
-STATIC_ASSERT(offsetof(struct spawn_action, sa_fsmode.sa_flag) == __OFFSET_SPAWN_ACTION_FSMODE_FLAG);
-STATIC_ASSERT(offsetof(struct spawn_action, sa_fsmode.sa_mask) == __OFFSET_SPAWN_ACTION_FSMODE_MASK);
-STATIC_ASSERT(offsetof(struct spawn_action, sa_openat.sa_dfd) == __OFFSET_SPAWN_ACTION_OPENAT_DFD);
-STATIC_ASSERT(offsetof(struct spawn_action, sa_openat.sa_fd) == __OFFSET_SPAWN_ACTION_OPENAT_FD);
-STATIC_ASSERT(offsetof(struct spawn_action, sa_openat.sa_filename) == __OFFSET_SPAWN_ACTION_OPENAT_FILENAME);
-STATIC_ASSERT(offsetof(struct spawn_action, sa_openat.sa_mode) == __OFFSET_SPAWN_ACTION_OPENAT_MODE);
-STATIC_ASSERT(offsetof(struct spawn_action, sa_openat.sa_oflags) == __OFFSET_SPAWN_ACTION_OPENAT_OFLAGS);
-STATIC_ASSERT(offsetof(struct spawn_action, sa_sched_setparam.sa_param) == __OFFSET_SPAWN_ACTION_SCHED_SETPARAM_PARAM);
-STATIC_ASSERT(offsetof(struct spawn_action, sa_sched_setscheduler.sa_param) == __OFFSET_SPAWN_ACTION_SCHED_SETSCHEDULER_PARAM);
-STATIC_ASSERT(offsetof(struct spawn_action, sa_sched_setscheduler.sa_policy) == __OFFSET_SPAWN_ACTION_SCHED_SETSCHEDULER_POLICY);
-STATIC_ASSERT(offsetof(struct spawn_action, sa_setfsgid.sa_fsgid) == __OFFSET_SPAWN_ACTION_SETFSGID_FSGID);
-STATIC_ASSERT(offsetof(struct spawn_action, sa_setfsuid.sa_fsuid) == __OFFSET_SPAWN_ACTION_SETFSUID_FSUID);
-STATIC_ASSERT(offsetof(struct spawn_action, sa_setgid.sa_gid) == __OFFSET_SPAWN_ACTION_SETGID_GID);
-STATIC_ASSERT(offsetof(struct spawn_action, sa_setgroups.sa_gcnt) == __OFFSET_SPAWN_ACTION_SETGROUPS_GCNT);
-STATIC_ASSERT(offsetof(struct spawn_action, sa_setgroups.sa_gvec) == __OFFSET_SPAWN_ACTION_SETGROUPS_GVEC);
-STATIC_ASSERT(offsetof(struct spawn_action, sa_setpgid.sa_pid) == __OFFSET_SPAWN_ACTION_SETPGID_PID);
-STATIC_ASSERT(offsetof(struct spawn_action, sa_setregid.sa_egid) == __OFFSET_SPAWN_ACTION_SETREGID_EGID);
-STATIC_ASSERT(offsetof(struct spawn_action, sa_setregid.sa_rgid) == __OFFSET_SPAWN_ACTION_SETREGID_RGID);
-STATIC_ASSERT(offsetof(struct spawn_action, sa_setresgid.sa_egid) == __OFFSET_SPAWN_ACTION_SETRESGID_EGID);
-STATIC_ASSERT(offsetof(struct spawn_action, sa_setresgid.sa_rgid) == __OFFSET_SPAWN_ACTION_SETRESGID_RGID);
-STATIC_ASSERT(offsetof(struct spawn_action, sa_setresgid.sa_sgid) == __OFFSET_SPAWN_ACTION_SETRESGID_SGID);
-STATIC_ASSERT(offsetof(struct spawn_action, sa_setresuid.sa_euid) == __OFFSET_SPAWN_ACTION_SETRESUID_EUID);
-STATIC_ASSERT(offsetof(struct spawn_action, sa_setresuid.sa_ruid) == __OFFSET_SPAWN_ACTION_SETRESUID_RUID);
-STATIC_ASSERT(offsetof(struct spawn_action, sa_setresuid.sa_suid) == __OFFSET_SPAWN_ACTION_SETRESUID_SUID);
-STATIC_ASSERT(offsetof(struct spawn_action, sa_setreuid.sa_euid) == __OFFSET_SPAWN_ACTION_SETREUID_EUID);
-STATIC_ASSERT(offsetof(struct spawn_action, sa_setreuid.sa_ruid) == __OFFSET_SPAWN_ACTION_SETREUID_RUID);
-STATIC_ASSERT(offsetof(struct spawn_action, sa_setuid.sa_uid) == __OFFSET_SPAWN_ACTION_SETUID_UID);
-STATIC_ASSERT(offsetof(struct spawn_action, sa_sigdfl.sa_sigset) == __OFFSET_SPAWN_ACTION_SIGDFL_SIGSET);
-STATIC_ASSERT(offsetof(struct spawn_action, sa_sigdfl.sa_sigsetsz) == __OFFSET_SPAWN_ACTION_SIGDFL_SIGSETSZ);
-STATIC_ASSERT(offsetof(struct spawn_action, sa_sigprocmask.sa_sigset) == __OFFSET_SPAWN_ACTION_SIGPROCMASK_SIGSET);
-STATIC_ASSERT(offsetof(struct spawn_action, sa_sigprocmask.sa_sigsetsz) == __OFFSET_SPAWN_ACTION_SIGPROCMASK_SIGSETSZ);
-STATIC_ASSERT(offsetof(struct spawn_action, sa_tcsetpgrp.sa_ttyfd) == __OFFSET_SPAWN_ACTION_TCSETPGRP_TTYFD);
-STATIC_ASSERT(offsetof(struct spawn_action, sa_type) == __OFFSET_SPAWN_ACTION_TYPE);
-STATIC_ASSERT(offsetof(struct spawn_action, sa_umask.sa_mask) == __OFFSET_SPAWN_ACTION_UMASK_MASK);
+static_assert(offsetof(struct spawn_action, sa_closerange.sa_hifd) == __OFFSET_SPAWN_ACTION_CLOSERANGE_HIFD);
+static_assert(offsetof(struct spawn_action, sa_closerange.sa_lofd) == __OFFSET_SPAWN_ACTION_CLOSERANGE_LOFD);
+static_assert(offsetof(struct spawn_action, sa_close.sa_fd) == __OFFSET_SPAWN_ACTION_CLOSE_FD);
+static_assert(offsetof(struct spawn_action, sa_dup2.sa_newfd) == __OFFSET_SPAWN_ACTION_DUP2_NEWFD);
+static_assert(offsetof(struct spawn_action, sa_dup2.sa_oldfd) == __OFFSET_SPAWN_ACTION_DUP2_OLDFD);
+static_assert(offsetof(struct spawn_action, sa_fsmode.sa_flag) == __OFFSET_SPAWN_ACTION_FSMODE_FLAG);
+static_assert(offsetof(struct spawn_action, sa_fsmode.sa_mask) == __OFFSET_SPAWN_ACTION_FSMODE_MASK);
+static_assert(offsetof(struct spawn_action, sa_openat.sa_dfd) == __OFFSET_SPAWN_ACTION_OPENAT_DFD);
+static_assert(offsetof(struct spawn_action, sa_openat.sa_fd) == __OFFSET_SPAWN_ACTION_OPENAT_FD);
+static_assert(offsetof(struct spawn_action, sa_openat.sa_filename) == __OFFSET_SPAWN_ACTION_OPENAT_FILENAME);
+static_assert(offsetof(struct spawn_action, sa_openat.sa_mode) == __OFFSET_SPAWN_ACTION_OPENAT_MODE);
+static_assert(offsetof(struct spawn_action, sa_openat.sa_oflags) == __OFFSET_SPAWN_ACTION_OPENAT_OFLAGS);
+static_assert(offsetof(struct spawn_action, sa_sched_setparam.sa_param) == __OFFSET_SPAWN_ACTION_SCHED_SETPARAM_PARAM);
+static_assert(offsetof(struct spawn_action, sa_sched_setscheduler.sa_param) == __OFFSET_SPAWN_ACTION_SCHED_SETSCHEDULER_PARAM);
+static_assert(offsetof(struct spawn_action, sa_sched_setscheduler.sa_policy) == __OFFSET_SPAWN_ACTION_SCHED_SETSCHEDULER_POLICY);
+static_assert(offsetof(struct spawn_action, sa_setfsgid.sa_fsgid) == __OFFSET_SPAWN_ACTION_SETFSGID_FSGID);
+static_assert(offsetof(struct spawn_action, sa_setfsuid.sa_fsuid) == __OFFSET_SPAWN_ACTION_SETFSUID_FSUID);
+static_assert(offsetof(struct spawn_action, sa_setgid.sa_gid) == __OFFSET_SPAWN_ACTION_SETGID_GID);
+static_assert(offsetof(struct spawn_action, sa_setgroups.sa_gcnt) == __OFFSET_SPAWN_ACTION_SETGROUPS_GCNT);
+static_assert(offsetof(struct spawn_action, sa_setgroups.sa_gvec) == __OFFSET_SPAWN_ACTION_SETGROUPS_GVEC);
+static_assert(offsetof(struct spawn_action, sa_setpgid.sa_pid) == __OFFSET_SPAWN_ACTION_SETPGID_PID);
+static_assert(offsetof(struct spawn_action, sa_setregid.sa_egid) == __OFFSET_SPAWN_ACTION_SETREGID_EGID);
+static_assert(offsetof(struct spawn_action, sa_setregid.sa_rgid) == __OFFSET_SPAWN_ACTION_SETREGID_RGID);
+static_assert(offsetof(struct spawn_action, sa_setresgid.sa_egid) == __OFFSET_SPAWN_ACTION_SETRESGID_EGID);
+static_assert(offsetof(struct spawn_action, sa_setresgid.sa_rgid) == __OFFSET_SPAWN_ACTION_SETRESGID_RGID);
+static_assert(offsetof(struct spawn_action, sa_setresgid.sa_sgid) == __OFFSET_SPAWN_ACTION_SETRESGID_SGID);
+static_assert(offsetof(struct spawn_action, sa_setresuid.sa_euid) == __OFFSET_SPAWN_ACTION_SETRESUID_EUID);
+static_assert(offsetof(struct spawn_action, sa_setresuid.sa_ruid) == __OFFSET_SPAWN_ACTION_SETRESUID_RUID);
+static_assert(offsetof(struct spawn_action, sa_setresuid.sa_suid) == __OFFSET_SPAWN_ACTION_SETRESUID_SUID);
+static_assert(offsetof(struct spawn_action, sa_setreuid.sa_euid) == __OFFSET_SPAWN_ACTION_SETREUID_EUID);
+static_assert(offsetof(struct spawn_action, sa_setreuid.sa_ruid) == __OFFSET_SPAWN_ACTION_SETREUID_RUID);
+static_assert(offsetof(struct spawn_action, sa_setuid.sa_uid) == __OFFSET_SPAWN_ACTION_SETUID_UID);
+static_assert(offsetof(struct spawn_action, sa_sigdfl.sa_sigset) == __OFFSET_SPAWN_ACTION_SIGDFL_SIGSET);
+static_assert(offsetof(struct spawn_action, sa_sigdfl.sa_sigsetsz) == __OFFSET_SPAWN_ACTION_SIGDFL_SIGSETSZ);
+static_assert(offsetof(struct spawn_action, sa_sigprocmask.sa_sigset) == __OFFSET_SPAWN_ACTION_SIGPROCMASK_SIGSET);
+static_assert(offsetof(struct spawn_action, sa_sigprocmask.sa_sigsetsz) == __OFFSET_SPAWN_ACTION_SIGPROCMASK_SIGSETSZ);
+static_assert(offsetof(struct spawn_action, sa_tcsetpgrp.sa_ttyfd) == __OFFSET_SPAWN_ACTION_TCSETPGRP_TTYFD);
+static_assert(offsetof(struct spawn_action, sa_type) == __OFFSET_SPAWN_ACTION_TYPE);
+static_assert(offsetof(struct spawn_action, sa_umask.sa_mask) == __OFFSET_SPAWN_ACTION_UMASK_MASK);
 
 /* struct spawn_action_list */
 /* ... */
@@ -1313,17 +1314,17 @@ STATIC_ASSERT(offsetof(struct spawn_action, sa_umask.sa_mask) == __OFFSET_SPAWN_
 #include <kos/exec/bits/library-listdef.h>
 
 /* struct library_listdef */
-STATIC_ASSERT(offsetof(struct library_listdef, lld_count) == __OFFSET_LIBRARY_LISTDEF_COUNT);
-STATIC_ASSERT(offsetof(struct library_listdef, lld_entry_offsetof_module) == __OFFSET_LIBRARY_LISTDEF_ENTRY_OFFSETOF_MODULE);
-STATIC_ASSERT(offsetof(struct library_listdef, lld_entry_offsetof_next) == __OFFSET_LIBRARY_LISTDEF_ENTRY_OFFSETOF_NEXT);
-STATIC_ASSERT(offsetof(struct library_listdef, lld_first) == __OFFSET_LIBRARY_LISTDEF_FIRST);
-STATIC_ASSERT(offsetof(struct library_listdef, lld_flags) == __OFFSET_LIBRARY_LISTDEF_FLAGS);
-STATIC_ASSERT(offsetof(struct library_listdef, lld_module_offsetof_filename) == __OFFSET_LIBRARY_LISTDEF_MODULE_OFFSETOF_FILENAME);
-STATIC_ASSERT(offsetof(struct library_listdef, lld_module_offsetof_loadaddr) == __OFFSET_LIBRARY_LISTDEF_MODULE_OFFSETOF_LOADADDR);
-STATIC_ASSERT(offsetof(struct library_listdef, lld_module_offsetof_loadstart) == __OFFSET_LIBRARY_LISTDEF_MODULE_OFFSETOF_LOADSTART);
-STATIC_ASSERT(offsetof(struct library_listdef, lld_size) == __OFFSET_LIBRARY_LISTDEF_SIZE);
-STATIC_ASSERT(offsetof(struct library_listdef, lld_sizeof_pointer) == __OFFSET_LIBRARY_LISTDEF_SIZEOF_POINTER);
-STATIC_ASSERT(sizeof(struct library_listdef) == __SIZEOF_LIBRARY_LISTDEF);
+static_assert(offsetof(struct library_listdef, lld_count) == __OFFSET_LIBRARY_LISTDEF_COUNT);
+static_assert(offsetof(struct library_listdef, lld_entry_offsetof_module) == __OFFSET_LIBRARY_LISTDEF_ENTRY_OFFSETOF_MODULE);
+static_assert(offsetof(struct library_listdef, lld_entry_offsetof_next) == __OFFSET_LIBRARY_LISTDEF_ENTRY_OFFSETOF_NEXT);
+static_assert(offsetof(struct library_listdef, lld_first) == __OFFSET_LIBRARY_LISTDEF_FIRST);
+static_assert(offsetof(struct library_listdef, lld_flags) == __OFFSET_LIBRARY_LISTDEF_FLAGS);
+static_assert(offsetof(struct library_listdef, lld_module_offsetof_filename) == __OFFSET_LIBRARY_LISTDEF_MODULE_OFFSETOF_FILENAME);
+static_assert(offsetof(struct library_listdef, lld_module_offsetof_loadaddr) == __OFFSET_LIBRARY_LISTDEF_MODULE_OFFSETOF_LOADADDR);
+static_assert(offsetof(struct library_listdef, lld_module_offsetof_loadstart) == __OFFSET_LIBRARY_LISTDEF_MODULE_OFFSETOF_LOADSTART);
+static_assert(offsetof(struct library_listdef, lld_size) == __OFFSET_LIBRARY_LISTDEF_SIZE);
+static_assert(offsetof(struct library_listdef, lld_sizeof_pointer) == __OFFSET_LIBRARY_LISTDEF_SIZEOF_POINTER);
+static_assert(sizeof(struct library_listdef) == __SIZEOF_LIBRARY_LISTDEF);
 
 
 
@@ -1332,10 +1333,10 @@ STATIC_ASSERT(sizeof(struct library_listdef) == __SIZEOF_LIBRARY_LISTDEF);
 #include <kos/exec/bits/peb.h>
 
 /* struct process_peb */
-STATIC_ASSERT(offsetof(struct process_peb, pp_argc) == OFFSET_PROCESS_PEB_ARGC);
-STATIC_ASSERT(offsetof(struct process_peb, pp_argv) == OFFSET_PROCESS_PEB_ARGV);
-STATIC_ASSERT(offsetof(struct process_peb, pp_envc) == OFFSET_PROCESS_PEB_ENVC);
-STATIC_ASSERT(offsetof(struct process_peb, pp_envp) == OFFSET_PROCESS_PEB_ENVP);
+static_assert(offsetof(struct process_peb, pp_argc) == OFFSET_PROCESS_PEB_ARGC);
+static_assert(offsetof(struct process_peb, pp_argv) == OFFSET_PROCESS_PEB_ARGV);
+static_assert(offsetof(struct process_peb, pp_envc) == OFFSET_PROCESS_PEB_ENVC);
+static_assert(offsetof(struct process_peb, pp_envp) == OFFSET_PROCESS_PEB_ENVP);
 
 
 
@@ -1359,21 +1360,21 @@ STATIC_ASSERT(offsetof(struct process_peb, pp_envp) == OFFSET_PROCESS_PEB_ENVP);
 #include <kos/hop/blockdevice.h>
 
 /* struct hop_blockdevice_stat */
-STATIC_ASSERT(offsetof(struct hop_blockdevice_stat, bs_device_flag) == __OFFSET_HOP_BLOCKDEVICE_STAT_DEVICE_FLAG);
-STATIC_ASSERT(offsetof(struct hop_blockdevice_stat, bs_devno) == __OFFSET_HOP_BLOCKDEVICE_STAT_DEVNO);
-STATIC_ASSERT(offsetof(struct hop_blockdevice_stat, bs_name) == __OFFSET_HOP_BLOCKDEVICE_STAT_NAME);
-STATIC_ASSERT(offsetof(struct hop_blockdevice_stat, bs_partcount) == __OFFSET_HOP_BLOCKDEVICE_STAT_PARTCOUNT);
-STATIC_ASSERT(offsetof(struct hop_blockdevice_stat, bs_sector_count) == __OFFSET_HOP_BLOCKDEVICE_STAT_SECTOR_COUNT);
-STATIC_ASSERT(offsetof(struct hop_blockdevice_stat, bs_sector_size) == __OFFSET_HOP_BLOCKDEVICE_STAT_SECTOR_SIZE);
-STATIC_ASSERT(offsetof(struct hop_blockdevice_stat, bs_struct_size) == __OFFSET_HOP_BLOCKDEVICE_STAT_STRUCT_SIZE);
-STATIC_ASSERT(offsetof(struct hop_blockdevice_stat, bs_total_bytes) == __OFFSET_HOP_BLOCKDEVICE_STAT_TOTAL_BYTES);
-STATIC_ASSERT(sizeof(struct hop_blockdevice_stat) == __SIZEOF_HOP_BLOCKDEVICE_STAT);
+static_assert(offsetof(struct hop_blockdevice_stat, bs_device_flag) == __OFFSET_HOP_BLOCKDEVICE_STAT_DEVICE_FLAG);
+static_assert(offsetof(struct hop_blockdevice_stat, bs_devno) == __OFFSET_HOP_BLOCKDEVICE_STAT_DEVNO);
+static_assert(offsetof(struct hop_blockdevice_stat, bs_name) == __OFFSET_HOP_BLOCKDEVICE_STAT_NAME);
+static_assert(offsetof(struct hop_blockdevice_stat, bs_partcount) == __OFFSET_HOP_BLOCKDEVICE_STAT_PARTCOUNT);
+static_assert(offsetof(struct hop_blockdevice_stat, bs_sector_count) == __OFFSET_HOP_BLOCKDEVICE_STAT_SECTOR_COUNT);
+static_assert(offsetof(struct hop_blockdevice_stat, bs_sector_size) == __OFFSET_HOP_BLOCKDEVICE_STAT_SECTOR_SIZE);
+static_assert(offsetof(struct hop_blockdevice_stat, bs_struct_size) == __OFFSET_HOP_BLOCKDEVICE_STAT_STRUCT_SIZE);
+static_assert(offsetof(struct hop_blockdevice_stat, bs_total_bytes) == __OFFSET_HOP_BLOCKDEVICE_STAT_TOTAL_BYTES);
+static_assert(sizeof(struct hop_blockdevice_stat) == __SIZEOF_HOP_BLOCKDEVICE_STAT);
 
 /* struct hop_blockdevice_openpart */
-STATIC_ASSERT(offsetof(struct hop_blockdevice_openpart, bop_openfd) == __OFFSET_HOP_BLOCKDEVICE_OPENPART_OPENFD);
-STATIC_ASSERT(offsetof(struct hop_blockdevice_openpart, bop_partno) == __OFFSET_HOP_BLOCKDEVICE_OPENPART_PARTNO);
-STATIC_ASSERT(offsetof(struct hop_blockdevice_openpart, bop_struct_size) == __OFFSET_HOP_BLOCKDEVICE_OPENPART_STRUCT_SIZE);
-STATIC_ASSERT(sizeof(struct hop_blockdevice_openpart) == __SIZEOF_HOP_BLOCKDEVICE_OPENPART);
+static_assert(offsetof(struct hop_blockdevice_openpart, bop_openfd) == __OFFSET_HOP_BLOCKDEVICE_OPENPART_OPENFD);
+static_assert(offsetof(struct hop_blockdevice_openpart, bop_partno) == __OFFSET_HOP_BLOCKDEVICE_OPENPART_PARTNO);
+static_assert(offsetof(struct hop_blockdevice_openpart, bop_struct_size) == __OFFSET_HOP_BLOCKDEVICE_OPENPART_STRUCT_SIZE);
+static_assert(sizeof(struct hop_blockdevice_openpart) == __SIZEOF_HOP_BLOCKDEVICE_OPENPART);
 
 
 
@@ -1382,167 +1383,167 @@ STATIC_ASSERT(sizeof(struct hop_blockdevice_openpart) == __SIZEOF_HOP_BLOCKDEVIC
 #include <kos/hop/datablock.h>
 
 /* struct hop_datablock_stat */
-STATIC_ASSERT(offsetof(struct hop_datablock_stat, ds_features) == __OFFSET_HOP_DATABLOCK_STAT_FEATURES);
-STATIC_ASSERT(offsetof(struct hop_datablock_stat, ds_pageshift) == __OFFSET_HOP_DATABLOCK_STAT_PAGESHIFT);
-STATIC_ASSERT(offsetof(struct hop_datablock_stat, ds_part_changed_pages) == __OFFSET_HOP_DATABLOCK_STAT_PART_CHANGED_PAGES);
-STATIC_ASSERT(offsetof(struct hop_datablock_stat, ds_part_f_changed) == __OFFSET_HOP_DATABLOCK_STAT_PART_F_CHANGED);
-STATIC_ASSERT(offsetof(struct hop_datablock_stat, ds_part_f_changed_pages) == __OFFSET_HOP_DATABLOCK_STAT_PART_F_CHANGED_PAGES);
-STATIC_ASSERT(offsetof(struct hop_datablock_stat, ds_part_f_locked) == __OFFSET_HOP_DATABLOCK_STAT_PART_F_LOCKED);
-STATIC_ASSERT(offsetof(struct hop_datablock_stat, ds_part_f_locked_pages) == __OFFSET_HOP_DATABLOCK_STAT_PART_F_LOCKED_PAGES);
-STATIC_ASSERT(offsetof(struct hop_datablock_stat, ds_part_init_pages) == __OFFSET_HOP_DATABLOCK_STAT_PART_INIT_PAGES);
-STATIC_ASSERT(offsetof(struct hop_datablock_stat, ds_part_mapped) == __OFFSET_HOP_DATABLOCK_STAT_PART_MAPPED);
-STATIC_ASSERT(offsetof(struct hop_datablock_stat, ds_part_mapped_pages) == __OFFSET_HOP_DATABLOCK_STAT_PART_MAPPED_PAGES);
-STATIC_ASSERT(offsetof(struct hop_datablock_stat, ds_part_ram_blocks) == __OFFSET_HOP_DATABLOCK_STAT_PART_RAM_BLOCKS);
-STATIC_ASSERT(offsetof(struct hop_datablock_stat, ds_part_st_incore) == __OFFSET_HOP_DATABLOCK_STAT_PART_ST_INCORE);
-STATIC_ASSERT(offsetof(struct hop_datablock_stat, ds_part_st_incore_pages) == __OFFSET_HOP_DATABLOCK_STAT_PART_ST_INCORE_PAGES);
-STATIC_ASSERT(offsetof(struct hop_datablock_stat, ds_part_st_inswap) == __OFFSET_HOP_DATABLOCK_STAT_PART_ST_INSWAP);
-STATIC_ASSERT(offsetof(struct hop_datablock_stat, ds_part_st_inswap_pages) == __OFFSET_HOP_DATABLOCK_STAT_PART_ST_INSWAP_PAGES);
-STATIC_ASSERT(offsetof(struct hop_datablock_stat, ds_part_st_locked) == __OFFSET_HOP_DATABLOCK_STAT_PART_ST_LOCKED);
-STATIC_ASSERT(offsetof(struct hop_datablock_stat, ds_part_st_locked_pages) == __OFFSET_HOP_DATABLOCK_STAT_PART_ST_LOCKED_PAGES);
-STATIC_ASSERT(offsetof(struct hop_datablock_stat, ds_part_swap_blocks) == __OFFSET_HOP_DATABLOCK_STAT_PART_SWAP_BLOCKS);
-STATIC_ASSERT(offsetof(struct hop_datablock_stat, ds_part_uninit_pages) == __OFFSET_HOP_DATABLOCK_STAT_PART_UNINIT_PAGES);
-STATIC_ASSERT(offsetof(struct hop_datablock_stat, ds_struct_size) == __OFFSET_HOP_DATABLOCK_STAT_STRUCT_SIZE);
-STATIC_ASSERT(sizeof(struct hop_datablock_stat) == __SIZEOF_HOP_DATABLOCK_STAT);
+static_assert(offsetof(struct hop_datablock_stat, ds_features) == __OFFSET_HOP_DATABLOCK_STAT_FEATURES);
+static_assert(offsetof(struct hop_datablock_stat, ds_pageshift) == __OFFSET_HOP_DATABLOCK_STAT_PAGESHIFT);
+static_assert(offsetof(struct hop_datablock_stat, ds_part_changed_pages) == __OFFSET_HOP_DATABLOCK_STAT_PART_CHANGED_PAGES);
+static_assert(offsetof(struct hop_datablock_stat, ds_part_f_changed) == __OFFSET_HOP_DATABLOCK_STAT_PART_F_CHANGED);
+static_assert(offsetof(struct hop_datablock_stat, ds_part_f_changed_pages) == __OFFSET_HOP_DATABLOCK_STAT_PART_F_CHANGED_PAGES);
+static_assert(offsetof(struct hop_datablock_stat, ds_part_f_locked) == __OFFSET_HOP_DATABLOCK_STAT_PART_F_LOCKED);
+static_assert(offsetof(struct hop_datablock_stat, ds_part_f_locked_pages) == __OFFSET_HOP_DATABLOCK_STAT_PART_F_LOCKED_PAGES);
+static_assert(offsetof(struct hop_datablock_stat, ds_part_init_pages) == __OFFSET_HOP_DATABLOCK_STAT_PART_INIT_PAGES);
+static_assert(offsetof(struct hop_datablock_stat, ds_part_mapped) == __OFFSET_HOP_DATABLOCK_STAT_PART_MAPPED);
+static_assert(offsetof(struct hop_datablock_stat, ds_part_mapped_pages) == __OFFSET_HOP_DATABLOCK_STAT_PART_MAPPED_PAGES);
+static_assert(offsetof(struct hop_datablock_stat, ds_part_ram_blocks) == __OFFSET_HOP_DATABLOCK_STAT_PART_RAM_BLOCKS);
+static_assert(offsetof(struct hop_datablock_stat, ds_part_st_incore) == __OFFSET_HOP_DATABLOCK_STAT_PART_ST_INCORE);
+static_assert(offsetof(struct hop_datablock_stat, ds_part_st_incore_pages) == __OFFSET_HOP_DATABLOCK_STAT_PART_ST_INCORE_PAGES);
+static_assert(offsetof(struct hop_datablock_stat, ds_part_st_inswap) == __OFFSET_HOP_DATABLOCK_STAT_PART_ST_INSWAP);
+static_assert(offsetof(struct hop_datablock_stat, ds_part_st_inswap_pages) == __OFFSET_HOP_DATABLOCK_STAT_PART_ST_INSWAP_PAGES);
+static_assert(offsetof(struct hop_datablock_stat, ds_part_st_locked) == __OFFSET_HOP_DATABLOCK_STAT_PART_ST_LOCKED);
+static_assert(offsetof(struct hop_datablock_stat, ds_part_st_locked_pages) == __OFFSET_HOP_DATABLOCK_STAT_PART_ST_LOCKED_PAGES);
+static_assert(offsetof(struct hop_datablock_stat, ds_part_swap_blocks) == __OFFSET_HOP_DATABLOCK_STAT_PART_SWAP_BLOCKS);
+static_assert(offsetof(struct hop_datablock_stat, ds_part_uninit_pages) == __OFFSET_HOP_DATABLOCK_STAT_PART_UNINIT_PAGES);
+static_assert(offsetof(struct hop_datablock_stat, ds_struct_size) == __OFFSET_HOP_DATABLOCK_STAT_STRUCT_SIZE);
+static_assert(sizeof(struct hop_datablock_stat) == __SIZEOF_HOP_DATABLOCK_STAT);
 
 /* struct hop_datablock_syncpages */
-STATIC_ASSERT(offsetof(struct hop_datablock_syncpages, dsp_count) == __OFFSET_HOP_DATABLOCK_SYNCPAGES_COUNT);
-STATIC_ASSERT(offsetof(struct hop_datablock_syncpages, dsp_maxpage) == __OFFSET_HOP_DATABLOCK_SYNCPAGES_MAXPAGE);
-STATIC_ASSERT(offsetof(struct hop_datablock_syncpages, dsp_minpage) == __OFFSET_HOP_DATABLOCK_SYNCPAGES_MINPAGE);
-STATIC_ASSERT(offsetof(struct hop_datablock_syncpages, dsp_struct_size) == __OFFSET_HOP_DATABLOCK_SYNCPAGES_STRUCT_SIZE);
-STATIC_ASSERT(sizeof(struct hop_datablock_syncpages) == __SIZEOF_HOP_DATABLOCK_SYNCPAGES);
+static_assert(offsetof(struct hop_datablock_syncpages, dsp_count) == __OFFSET_HOP_DATABLOCK_SYNCPAGES_COUNT);
+static_assert(offsetof(struct hop_datablock_syncpages, dsp_maxpage) == __OFFSET_HOP_DATABLOCK_SYNCPAGES_MAXPAGE);
+static_assert(offsetof(struct hop_datablock_syncpages, dsp_minpage) == __OFFSET_HOP_DATABLOCK_SYNCPAGES_MINPAGE);
+static_assert(offsetof(struct hop_datablock_syncpages, dsp_struct_size) == __OFFSET_HOP_DATABLOCK_SYNCPAGES_STRUCT_SIZE);
+static_assert(sizeof(struct hop_datablock_syncpages) == __SIZEOF_HOP_DATABLOCK_SYNCPAGES);
 
 /* struct hop_datablock_syncbytes */
-STATIC_ASSERT(offsetof(struct hop_datablock_syncbytes, dsb_count) == __OFFSET_HOP_DATABLOCK_SYNCBYTES_COUNT);
-STATIC_ASSERT(offsetof(struct hop_datablock_syncbytes, dsb_maxbyte) == __OFFSET_HOP_DATABLOCK_SYNCBYTES_MAXBYTE);
-STATIC_ASSERT(offsetof(struct hop_datablock_syncbytes, dsb_minbyte) == __OFFSET_HOP_DATABLOCK_SYNCBYTES_MINBYTE);
-STATIC_ASSERT(offsetof(struct hop_datablock_syncbytes, dsb_struct_size) == __OFFSET_HOP_DATABLOCK_SYNCBYTES_STRUCT_SIZE);
-STATIC_ASSERT(sizeof(struct hop_datablock_syncbytes) == __SIZEOF_HOP_DATABLOCK_SYNCBYTES);
+static_assert(offsetof(struct hop_datablock_syncbytes, dsb_count) == __OFFSET_HOP_DATABLOCK_SYNCBYTES_COUNT);
+static_assert(offsetof(struct hop_datablock_syncbytes, dsb_maxbyte) == __OFFSET_HOP_DATABLOCK_SYNCBYTES_MAXBYTE);
+static_assert(offsetof(struct hop_datablock_syncbytes, dsb_minbyte) == __OFFSET_HOP_DATABLOCK_SYNCBYTES_MINBYTE);
+static_assert(offsetof(struct hop_datablock_syncbytes, dsb_struct_size) == __OFFSET_HOP_DATABLOCK_SYNCBYTES_STRUCT_SIZE);
+static_assert(sizeof(struct hop_datablock_syncbytes) == __SIZEOF_HOP_DATABLOCK_SYNCBYTES);
 
 /* struct hop_datablock_openpart */
-STATIC_ASSERT(offsetof(struct hop_datablock_openpart, dop_openfd) == __OFFSET_HOP_DATABLOCK_OPENPART_OPENFD);
-STATIC_ASSERT(offsetof(struct hop_datablock_openpart, dop_pageno) == __OFFSET_HOP_DATABLOCK_OPENPART_PAGENO);
-STATIC_ASSERT(offsetof(struct hop_datablock_openpart, dop_pages_hint) == __OFFSET_HOP_DATABLOCK_OPENPART_PAGES_HINT);
-STATIC_ASSERT(offsetof(struct hop_datablock_openpart, dop_struct_size) == __OFFSET_HOP_DATABLOCK_OPENPART_STRUCT_SIZE);
-STATIC_ASSERT(sizeof(struct hop_datablock_openpart) == __SIZEOF_HOP_DATABLOCK_OPENPART);
+static_assert(offsetof(struct hop_datablock_openpart, dop_openfd) == __OFFSET_HOP_DATABLOCK_OPENPART_OPENFD);
+static_assert(offsetof(struct hop_datablock_openpart, dop_pageno) == __OFFSET_HOP_DATABLOCK_OPENPART_PAGENO);
+static_assert(offsetof(struct hop_datablock_openpart, dop_pages_hint) == __OFFSET_HOP_DATABLOCK_OPENPART_PAGES_HINT);
+static_assert(offsetof(struct hop_datablock_openpart, dop_struct_size) == __OFFSET_HOP_DATABLOCK_OPENPART_STRUCT_SIZE);
+static_assert(sizeof(struct hop_datablock_openpart) == __SIZEOF_HOP_DATABLOCK_OPENPART);
 
 /* struct hop_datablock_haschanged */
-STATIC_ASSERT(offsetof(struct hop_datablock_haschanged, dhc_maxbyte) == __OFFSET_HOP_DATABLOCK_HASCHANGED_MAXBYTE);
-STATIC_ASSERT(offsetof(struct hop_datablock_haschanged, dhc_minbyte) == __OFFSET_HOP_DATABLOCK_HASCHANGED_MINBYTE);
-STATIC_ASSERT(offsetof(struct hop_datablock_haschanged, dhc_struct_size) == __OFFSET_HOP_DATABLOCK_HASCHANGED_STRUCT_SIZE);
-STATIC_ASSERT(sizeof(struct hop_datablock_haschanged) == __SIZEOF_HOP_DATABLOCK_HASCHANGED);
+static_assert(offsetof(struct hop_datablock_haschanged, dhc_maxbyte) == __OFFSET_HOP_DATABLOCK_HASCHANGED_MAXBYTE);
+static_assert(offsetof(struct hop_datablock_haschanged, dhc_minbyte) == __OFFSET_HOP_DATABLOCK_HASCHANGED_MINBYTE);
+static_assert(offsetof(struct hop_datablock_haschanged, dhc_struct_size) == __OFFSET_HOP_DATABLOCK_HASCHANGED_STRUCT_SIZE);
+static_assert(sizeof(struct hop_datablock_haschanged) == __SIZEOF_HOP_DATABLOCK_HASCHANGED);
 
 /* struct hop_datablock_open_futex */
-STATIC_ASSERT(offsetof(struct hop_datablock_open_futex, dof_address) == __OFFSET_HOP_DATABLOCK_OPEN_FUTEX_ADDRESS);
-STATIC_ASSERT(offsetof(struct hop_datablock_open_futex, dof_openfd) == __OFFSET_HOP_DATABLOCK_OPEN_FUTEX_OPENFD);
-STATIC_ASSERT(offsetof(struct hop_datablock_open_futex, dof_struct_size) == __OFFSET_HOP_DATABLOCK_OPEN_FUTEX_STRUCT_SIZE);
-STATIC_ASSERT(sizeof(struct hop_datablock_open_futex) == __SIZEOF_HOP_DATABLOCK_OPEN_FUTEX);
+static_assert(offsetof(struct hop_datablock_open_futex, dof_address) == __OFFSET_HOP_DATABLOCK_OPEN_FUTEX_ADDRESS);
+static_assert(offsetof(struct hop_datablock_open_futex, dof_openfd) == __OFFSET_HOP_DATABLOCK_OPEN_FUTEX_OPENFD);
+static_assert(offsetof(struct hop_datablock_open_futex, dof_struct_size) == __OFFSET_HOP_DATABLOCK_OPEN_FUTEX_STRUCT_SIZE);
+static_assert(sizeof(struct hop_datablock_open_futex) == __SIZEOF_HOP_DATABLOCK_OPEN_FUTEX);
 
 /* struct hop_inode_chmod */
-STATIC_ASSERT(offsetof(struct hop_inode_chmod, icm_perm_flag) == __OFFSET_HOP_INODE_CHMOD_PERM_FLAG);
-STATIC_ASSERT(offsetof(struct hop_inode_chmod, icm_perm_mask) == __OFFSET_HOP_INODE_CHMOD_PERM_MASK);
-STATIC_ASSERT(offsetof(struct hop_inode_chmod, icm_perm_old) == __OFFSET_HOP_INODE_CHMOD_PERM_OLD);
-STATIC_ASSERT(offsetof(struct hop_inode_chmod, icm_struct_size) == __OFFSET_HOP_INODE_CHMOD_STRUCT_SIZE);
+static_assert(offsetof(struct hop_inode_chmod, icm_perm_flag) == __OFFSET_HOP_INODE_CHMOD_PERM_FLAG);
+static_assert(offsetof(struct hop_inode_chmod, icm_perm_mask) == __OFFSET_HOP_INODE_CHMOD_PERM_MASK);
+static_assert(offsetof(struct hop_inode_chmod, icm_perm_old) == __OFFSET_HOP_INODE_CHMOD_PERM_OLD);
+static_assert(offsetof(struct hop_inode_chmod, icm_struct_size) == __OFFSET_HOP_INODE_CHMOD_STRUCT_SIZE);
 
 /* struct hop_inode_chown */
-STATIC_ASSERT(offsetof(struct hop_inode_chown, ico_newgroup) == __OFFSET_HOP_INODE_CHOWN_NEWGROUP);
-STATIC_ASSERT(offsetof(struct hop_inode_chown, ico_newowner) == __OFFSET_HOP_INODE_CHOWN_NEWOWNER);
-STATIC_ASSERT(offsetof(struct hop_inode_chown, ico_oldgroup) == __OFFSET_HOP_INODE_CHOWN_OLDGROUP);
-STATIC_ASSERT(offsetof(struct hop_inode_chown, ico_oldowner) == __OFFSET_HOP_INODE_CHOWN_OLDOWNER);
-STATIC_ASSERT(offsetof(struct hop_inode_chown, ico_struct_size) == __OFFSET_HOP_INODE_CHOWN_STRUCT_SIZE);
+static_assert(offsetof(struct hop_inode_chown, ico_newgroup) == __OFFSET_HOP_INODE_CHOWN_NEWGROUP);
+static_assert(offsetof(struct hop_inode_chown, ico_newowner) == __OFFSET_HOP_INODE_CHOWN_NEWOWNER);
+static_assert(offsetof(struct hop_inode_chown, ico_oldgroup) == __OFFSET_HOP_INODE_CHOWN_OLDGROUP);
+static_assert(offsetof(struct hop_inode_chown, ico_oldowner) == __OFFSET_HOP_INODE_CHOWN_OLDOWNER);
+static_assert(offsetof(struct hop_inode_chown, ico_struct_size) == __OFFSET_HOP_INODE_CHOWN_STRUCT_SIZE);
 
 /* struct hop_directory_opennode */
-STATIC_ASSERT(offsetof(struct hop_directory_opennode, don_dent) == __OFFSET_HOP_DIRECTORY_OPENNODE_DENT);
-STATIC_ASSERT(offsetof(struct hop_directory_opennode, don_flags) == __OFFSET_HOP_DIRECTORY_OPENNODE_FLAGS);
-STATIC_ASSERT(offsetof(struct hop_directory_opennode, don_len) == __OFFSET_HOP_DIRECTORY_OPENNODE_LEN);
-STATIC_ASSERT(offsetof(struct hop_directory_opennode, don_name) == __OFFSET_HOP_DIRECTORY_OPENNODE_NAME);
-STATIC_ASSERT(offsetof(struct hop_directory_opennode, don_node) == __OFFSET_HOP_DIRECTORY_OPENNODE_NODE);
-STATIC_ASSERT(offsetof(struct hop_directory_opennode, don_struct_size) == __OFFSET_HOP_DIRECTORY_OPENNODE_STRUCT_SIZE);
-STATIC_ASSERT(sizeof(struct hop_directory_opennode) == __SIZEOF_HOP_DIRECTORY_OPENNODE);
+static_assert(offsetof(struct hop_directory_opennode, don_dent) == __OFFSET_HOP_DIRECTORY_OPENNODE_DENT);
+static_assert(offsetof(struct hop_directory_opennode, don_flags) == __OFFSET_HOP_DIRECTORY_OPENNODE_FLAGS);
+static_assert(offsetof(struct hop_directory_opennode, don_len) == __OFFSET_HOP_DIRECTORY_OPENNODE_LEN);
+static_assert(offsetof(struct hop_directory_opennode, don_name) == __OFFSET_HOP_DIRECTORY_OPENNODE_NAME);
+static_assert(offsetof(struct hop_directory_opennode, don_node) == __OFFSET_HOP_DIRECTORY_OPENNODE_NODE);
+static_assert(offsetof(struct hop_directory_opennode, don_struct_size) == __OFFSET_HOP_DIRECTORY_OPENNODE_STRUCT_SIZE);
+static_assert(sizeof(struct hop_directory_opennode) == __SIZEOF_HOP_DIRECTORY_OPENNODE);
 
 /* struct hop_directory_creatfile */
-STATIC_ASSERT(offsetof(struct hop_directory_creatfile, dcf_dent) == __OFFSET_HOP_DIRECTORY_CREATFILE_DENT);
-STATIC_ASSERT(offsetof(struct hop_directory_creatfile, dcf_group) == __OFFSET_HOP_DIRECTORY_CREATFILE_GROUP);
-STATIC_ASSERT(offsetof(struct hop_directory_creatfile, dcf_len) == __OFFSET_HOP_DIRECTORY_CREATFILE_LEN);
-STATIC_ASSERT(offsetof(struct hop_directory_creatfile, dcf_mode) == __OFFSET_HOP_DIRECTORY_CREATFILE_MODE);
-STATIC_ASSERT(offsetof(struct hop_directory_creatfile, dcf_name) == __OFFSET_HOP_DIRECTORY_CREATFILE_NAME);
-STATIC_ASSERT(offsetof(struct hop_directory_creatfile, dcf_node) == __OFFSET_HOP_DIRECTORY_CREATFILE_NODE);
-STATIC_ASSERT(offsetof(struct hop_directory_creatfile, dcf_oflags) == __OFFSET_HOP_DIRECTORY_CREATFILE_OFLAGS);
-STATIC_ASSERT(offsetof(struct hop_directory_creatfile, dcf_owner) == __OFFSET_HOP_DIRECTORY_CREATFILE_OWNER);
-STATIC_ASSERT(offsetof(struct hop_directory_creatfile, dcf_status) == __OFFSET_HOP_DIRECTORY_CREATFILE_STATUS);
-STATIC_ASSERT(offsetof(struct hop_directory_creatfile, dcf_struct_size) == __OFFSET_HOP_DIRECTORY_CREATFILE_STRUCT_SIZE);
-STATIC_ASSERT(sizeof(struct hop_directory_creatfile) == __SIZEOF_HOP_DIRECTORY_CREATFILE);
+static_assert(offsetof(struct hop_directory_creatfile, dcf_dent) == __OFFSET_HOP_DIRECTORY_CREATFILE_DENT);
+static_assert(offsetof(struct hop_directory_creatfile, dcf_group) == __OFFSET_HOP_DIRECTORY_CREATFILE_GROUP);
+static_assert(offsetof(struct hop_directory_creatfile, dcf_len) == __OFFSET_HOP_DIRECTORY_CREATFILE_LEN);
+static_assert(offsetof(struct hop_directory_creatfile, dcf_mode) == __OFFSET_HOP_DIRECTORY_CREATFILE_MODE);
+static_assert(offsetof(struct hop_directory_creatfile, dcf_name) == __OFFSET_HOP_DIRECTORY_CREATFILE_NAME);
+static_assert(offsetof(struct hop_directory_creatfile, dcf_node) == __OFFSET_HOP_DIRECTORY_CREATFILE_NODE);
+static_assert(offsetof(struct hop_directory_creatfile, dcf_oflags) == __OFFSET_HOP_DIRECTORY_CREATFILE_OFLAGS);
+static_assert(offsetof(struct hop_directory_creatfile, dcf_owner) == __OFFSET_HOP_DIRECTORY_CREATFILE_OWNER);
+static_assert(offsetof(struct hop_directory_creatfile, dcf_status) == __OFFSET_HOP_DIRECTORY_CREATFILE_STATUS);
+static_assert(offsetof(struct hop_directory_creatfile, dcf_struct_size) == __OFFSET_HOP_DIRECTORY_CREATFILE_STRUCT_SIZE);
+static_assert(sizeof(struct hop_directory_creatfile) == __SIZEOF_HOP_DIRECTORY_CREATFILE);
 
 /* struct hop_directory_remove */
-STATIC_ASSERT(offsetof(struct hop_directory_remove, drm_dent) == __OFFSET_HOP_DIRECTORY_REMOVE_DENT);
-STATIC_ASSERT(offsetof(struct hop_directory_remove, drm_flags) == __OFFSET_HOP_DIRECTORY_REMOVE_FLAGS);
-STATIC_ASSERT(offsetof(struct hop_directory_remove, drm_len) == __OFFSET_HOP_DIRECTORY_REMOVE_LEN);
-STATIC_ASSERT(offsetof(struct hop_directory_remove, drm_name) == __OFFSET_HOP_DIRECTORY_REMOVE_NAME);
-STATIC_ASSERT(offsetof(struct hop_directory_remove, drm_node) == __OFFSET_HOP_DIRECTORY_REMOVE_NODE);
-STATIC_ASSERT(offsetof(struct hop_directory_remove, drm_status) == __OFFSET_HOP_DIRECTORY_REMOVE_STATUS);
-STATIC_ASSERT(offsetof(struct hop_directory_remove, drm_struct_size) == __OFFSET_HOP_DIRECTORY_REMOVE_STRUCT_SIZE);
-STATIC_ASSERT(sizeof(struct hop_directory_remove) == __SIZEOF_HOP_DIRECTORY_REMOVE);
+static_assert(offsetof(struct hop_directory_remove, drm_dent) == __OFFSET_HOP_DIRECTORY_REMOVE_DENT);
+static_assert(offsetof(struct hop_directory_remove, drm_flags) == __OFFSET_HOP_DIRECTORY_REMOVE_FLAGS);
+static_assert(offsetof(struct hop_directory_remove, drm_len) == __OFFSET_HOP_DIRECTORY_REMOVE_LEN);
+static_assert(offsetof(struct hop_directory_remove, drm_name) == __OFFSET_HOP_DIRECTORY_REMOVE_NAME);
+static_assert(offsetof(struct hop_directory_remove, drm_node) == __OFFSET_HOP_DIRECTORY_REMOVE_NODE);
+static_assert(offsetof(struct hop_directory_remove, drm_status) == __OFFSET_HOP_DIRECTORY_REMOVE_STATUS);
+static_assert(offsetof(struct hop_directory_remove, drm_struct_size) == __OFFSET_HOP_DIRECTORY_REMOVE_STRUCT_SIZE);
+static_assert(sizeof(struct hop_directory_remove) == __SIZEOF_HOP_DIRECTORY_REMOVE);
 
 /* struct hop_directory_rename */
-STATIC_ASSERT(offsetof(struct hop_directory_rename, drn_dstdent) == __OFFSET_HOP_DIRECTORY_RENAME_DSTDENT);
-STATIC_ASSERT(offsetof(struct hop_directory_rename, drn_dstdir) == __OFFSET_HOP_DIRECTORY_RENAME_DSTDIR);
-STATIC_ASSERT(offsetof(struct hop_directory_rename, drn_dstlen) == __OFFSET_HOP_DIRECTORY_RENAME_DSTLEN);
-STATIC_ASSERT(offsetof(struct hop_directory_rename, drn_dstname) == __OFFSET_HOP_DIRECTORY_RENAME_DSTNAME);
-STATIC_ASSERT(offsetof(struct hop_directory_rename, drn_dstnode) == __OFFSET_HOP_DIRECTORY_RENAME_DSTNODE);
-STATIC_ASSERT(offsetof(struct hop_directory_rename, drn_flags) == __OFFSET_HOP_DIRECTORY_RENAME_FLAGS);
-STATIC_ASSERT(offsetof(struct hop_directory_rename, drn_srcdent) == __OFFSET_HOP_DIRECTORY_RENAME_SRCDENT);
-STATIC_ASSERT(offsetof(struct hop_directory_rename, drn_srclen) == __OFFSET_HOP_DIRECTORY_RENAME_SRCLEN);
-STATIC_ASSERT(offsetof(struct hop_directory_rename, drn_srcname) == __OFFSET_HOP_DIRECTORY_RENAME_SRCNAME);
-STATIC_ASSERT(offsetof(struct hop_directory_rename, drn_srcnode) == __OFFSET_HOP_DIRECTORY_RENAME_SRCNODE);
-STATIC_ASSERT(offsetof(struct hop_directory_rename, drn_struct_size) == __OFFSET_HOP_DIRECTORY_RENAME_STRUCT_SIZE);
-STATIC_ASSERT(sizeof(struct hop_directory_rename) == __SIZEOF_HOP_DIRECTORY_RENAME);
+static_assert(offsetof(struct hop_directory_rename, drn_dstdent) == __OFFSET_HOP_DIRECTORY_RENAME_DSTDENT);
+static_assert(offsetof(struct hop_directory_rename, drn_dstdir) == __OFFSET_HOP_DIRECTORY_RENAME_DSTDIR);
+static_assert(offsetof(struct hop_directory_rename, drn_dstlen) == __OFFSET_HOP_DIRECTORY_RENAME_DSTLEN);
+static_assert(offsetof(struct hop_directory_rename, drn_dstname) == __OFFSET_HOP_DIRECTORY_RENAME_DSTNAME);
+static_assert(offsetof(struct hop_directory_rename, drn_dstnode) == __OFFSET_HOP_DIRECTORY_RENAME_DSTNODE);
+static_assert(offsetof(struct hop_directory_rename, drn_flags) == __OFFSET_HOP_DIRECTORY_RENAME_FLAGS);
+static_assert(offsetof(struct hop_directory_rename, drn_srcdent) == __OFFSET_HOP_DIRECTORY_RENAME_SRCDENT);
+static_assert(offsetof(struct hop_directory_rename, drn_srclen) == __OFFSET_HOP_DIRECTORY_RENAME_SRCLEN);
+static_assert(offsetof(struct hop_directory_rename, drn_srcname) == __OFFSET_HOP_DIRECTORY_RENAME_SRCNAME);
+static_assert(offsetof(struct hop_directory_rename, drn_srcnode) == __OFFSET_HOP_DIRECTORY_RENAME_SRCNODE);
+static_assert(offsetof(struct hop_directory_rename, drn_struct_size) == __OFFSET_HOP_DIRECTORY_RENAME_STRUCT_SIZE);
+static_assert(sizeof(struct hop_directory_rename) == __SIZEOF_HOP_DIRECTORY_RENAME);
 
 /* struct hop_directory_link */
-STATIC_ASSERT(offsetof(struct hop_directory_link, dli_dent) == __OFFSET_HOP_DIRECTORY_LINK_DENT);
-STATIC_ASSERT(offsetof(struct hop_directory_link, dli_flags) == __OFFSET_HOP_DIRECTORY_LINK_FLAGS);
-STATIC_ASSERT(offsetof(struct hop_directory_link, dli_len) == __OFFSET_HOP_DIRECTORY_LINK_LEN);
-STATIC_ASSERT(offsetof(struct hop_directory_link, dli_linknode) == __OFFSET_HOP_DIRECTORY_LINK_LINKNODE);
-STATIC_ASSERT(offsetof(struct hop_directory_link, dli_name) == __OFFSET_HOP_DIRECTORY_LINK_NAME);
-STATIC_ASSERT(offsetof(struct hop_directory_link, dli_struct_size) == __OFFSET_HOP_DIRECTORY_LINK_STRUCT_SIZE);
-STATIC_ASSERT(sizeof(struct hop_directory_link) == __SIZEOF_HOP_DIRECTORY_LINK);
+static_assert(offsetof(struct hop_directory_link, dli_dent) == __OFFSET_HOP_DIRECTORY_LINK_DENT);
+static_assert(offsetof(struct hop_directory_link, dli_flags) == __OFFSET_HOP_DIRECTORY_LINK_FLAGS);
+static_assert(offsetof(struct hop_directory_link, dli_len) == __OFFSET_HOP_DIRECTORY_LINK_LEN);
+static_assert(offsetof(struct hop_directory_link, dli_linknode) == __OFFSET_HOP_DIRECTORY_LINK_LINKNODE);
+static_assert(offsetof(struct hop_directory_link, dli_name) == __OFFSET_HOP_DIRECTORY_LINK_NAME);
+static_assert(offsetof(struct hop_directory_link, dli_struct_size) == __OFFSET_HOP_DIRECTORY_LINK_STRUCT_SIZE);
+static_assert(sizeof(struct hop_directory_link) == __SIZEOF_HOP_DIRECTORY_LINK);
 
 /* struct hop_directory_symlink */
-STATIC_ASSERT(offsetof(struct hop_directory_symlink, dsl_dent) == __OFFSET_HOP_DIRECTORY_SYMLINK_DENT);
-STATIC_ASSERT(offsetof(struct hop_directory_symlink, dsl_flags) == __OFFSET_HOP_DIRECTORY_SYMLINK_FLAGS);
-STATIC_ASSERT(offsetof(struct hop_directory_symlink, dsl_group) == __OFFSET_HOP_DIRECTORY_SYMLINK_GROUP);
-STATIC_ASSERT(offsetof(struct hop_directory_symlink, dsl_len) == __OFFSET_HOP_DIRECTORY_SYMLINK_LEN);
-STATIC_ASSERT(offsetof(struct hop_directory_symlink, dsl_mode) == __OFFSET_HOP_DIRECTORY_SYMLINK_MODE);
-STATIC_ASSERT(offsetof(struct hop_directory_symlink, dsl_name) == __OFFSET_HOP_DIRECTORY_SYMLINK_NAME);
-STATIC_ASSERT(offsetof(struct hop_directory_symlink, dsl_node) == __OFFSET_HOP_DIRECTORY_SYMLINK_NODE);
-STATIC_ASSERT(offsetof(struct hop_directory_symlink, dsl_owner) == __OFFSET_HOP_DIRECTORY_SYMLINK_OWNER);
-STATIC_ASSERT(offsetof(struct hop_directory_symlink, dsl_struct_size) == __OFFSET_HOP_DIRECTORY_SYMLINK_STRUCT_SIZE);
-STATIC_ASSERT(offsetof(struct hop_directory_symlink, dsl_text) == __OFFSET_HOP_DIRECTORY_SYMLINK_TEXT);
-STATIC_ASSERT(offsetof(struct hop_directory_symlink, dsl_textlen) == __OFFSET_HOP_DIRECTORY_SYMLINK_TEXTLEN);
-STATIC_ASSERT(sizeof(struct hop_directory_symlink) == __SIZEOF_HOP_DIRECTORY_SYMLINK);
+static_assert(offsetof(struct hop_directory_symlink, dsl_dent) == __OFFSET_HOP_DIRECTORY_SYMLINK_DENT);
+static_assert(offsetof(struct hop_directory_symlink, dsl_flags) == __OFFSET_HOP_DIRECTORY_SYMLINK_FLAGS);
+static_assert(offsetof(struct hop_directory_symlink, dsl_group) == __OFFSET_HOP_DIRECTORY_SYMLINK_GROUP);
+static_assert(offsetof(struct hop_directory_symlink, dsl_len) == __OFFSET_HOP_DIRECTORY_SYMLINK_LEN);
+static_assert(offsetof(struct hop_directory_symlink, dsl_mode) == __OFFSET_HOP_DIRECTORY_SYMLINK_MODE);
+static_assert(offsetof(struct hop_directory_symlink, dsl_name) == __OFFSET_HOP_DIRECTORY_SYMLINK_NAME);
+static_assert(offsetof(struct hop_directory_symlink, dsl_node) == __OFFSET_HOP_DIRECTORY_SYMLINK_NODE);
+static_assert(offsetof(struct hop_directory_symlink, dsl_owner) == __OFFSET_HOP_DIRECTORY_SYMLINK_OWNER);
+static_assert(offsetof(struct hop_directory_symlink, dsl_struct_size) == __OFFSET_HOP_DIRECTORY_SYMLINK_STRUCT_SIZE);
+static_assert(offsetof(struct hop_directory_symlink, dsl_text) == __OFFSET_HOP_DIRECTORY_SYMLINK_TEXT);
+static_assert(offsetof(struct hop_directory_symlink, dsl_textlen) == __OFFSET_HOP_DIRECTORY_SYMLINK_TEXTLEN);
+static_assert(sizeof(struct hop_directory_symlink) == __SIZEOF_HOP_DIRECTORY_SYMLINK);
 
 /* struct hop_directory_mknod */
-STATIC_ASSERT(offsetof(struct hop_directory_mknod, dmn_dent) == __OFFSET_HOP_DIRECTORY_MKNOD_DENT);
-STATIC_ASSERT(offsetof(struct hop_directory_mknod, dmn_device) == __OFFSET_HOP_DIRECTORY_MKNOD_DEVICE);
-STATIC_ASSERT(offsetof(struct hop_directory_mknod, dmn_flags) == __OFFSET_HOP_DIRECTORY_MKNOD_FLAGS);
-STATIC_ASSERT(offsetof(struct hop_directory_mknod, dmn_group) == __OFFSET_HOP_DIRECTORY_MKNOD_GROUP);
-STATIC_ASSERT(offsetof(struct hop_directory_mknod, dmn_len) == __OFFSET_HOP_DIRECTORY_MKNOD_LEN);
-STATIC_ASSERT(offsetof(struct hop_directory_mknod, dmn_mode) == __OFFSET_HOP_DIRECTORY_MKNOD_MODE);
-STATIC_ASSERT(offsetof(struct hop_directory_mknod, dmn_name) == __OFFSET_HOP_DIRECTORY_MKNOD_NAME);
-STATIC_ASSERT(offsetof(struct hop_directory_mknod, dmn_node) == __OFFSET_HOP_DIRECTORY_MKNOD_NODE);
-STATIC_ASSERT(offsetof(struct hop_directory_mknod, dmn_owner) == __OFFSET_HOP_DIRECTORY_MKNOD_OWNER);
-STATIC_ASSERT(offsetof(struct hop_directory_mknod, dmn_struct_size) == __OFFSET_HOP_DIRECTORY_MKNOD_STRUCT_SIZE);
-STATIC_ASSERT(sizeof(struct hop_directory_mknod) == __SIZEOF_HOP_DIRECTORY_MKNOD);
+static_assert(offsetof(struct hop_directory_mknod, dmn_dent) == __OFFSET_HOP_DIRECTORY_MKNOD_DENT);
+static_assert(offsetof(struct hop_directory_mknod, dmn_device) == __OFFSET_HOP_DIRECTORY_MKNOD_DEVICE);
+static_assert(offsetof(struct hop_directory_mknod, dmn_flags) == __OFFSET_HOP_DIRECTORY_MKNOD_FLAGS);
+static_assert(offsetof(struct hop_directory_mknod, dmn_group) == __OFFSET_HOP_DIRECTORY_MKNOD_GROUP);
+static_assert(offsetof(struct hop_directory_mknod, dmn_len) == __OFFSET_HOP_DIRECTORY_MKNOD_LEN);
+static_assert(offsetof(struct hop_directory_mknod, dmn_mode) == __OFFSET_HOP_DIRECTORY_MKNOD_MODE);
+static_assert(offsetof(struct hop_directory_mknod, dmn_name) == __OFFSET_HOP_DIRECTORY_MKNOD_NAME);
+static_assert(offsetof(struct hop_directory_mknod, dmn_node) == __OFFSET_HOP_DIRECTORY_MKNOD_NODE);
+static_assert(offsetof(struct hop_directory_mknod, dmn_owner) == __OFFSET_HOP_DIRECTORY_MKNOD_OWNER);
+static_assert(offsetof(struct hop_directory_mknod, dmn_struct_size) == __OFFSET_HOP_DIRECTORY_MKNOD_STRUCT_SIZE);
+static_assert(sizeof(struct hop_directory_mknod) == __SIZEOF_HOP_DIRECTORY_MKNOD);
 
 /* struct hop_directory_mkdir */
-STATIC_ASSERT(offsetof(struct hop_directory_mkdir, dmd_dent) == __OFFSET_HOP_DIRECTORY_MKDIR_DENT);
-STATIC_ASSERT(offsetof(struct hop_directory_mkdir, dmd_flags) == __OFFSET_HOP_DIRECTORY_MKDIR_FLAGS);
-STATIC_ASSERT(offsetof(struct hop_directory_mkdir, dmd_group) == __OFFSET_HOP_DIRECTORY_MKDIR_GROUP);
-STATIC_ASSERT(offsetof(struct hop_directory_mkdir, dmd_len) == __OFFSET_HOP_DIRECTORY_MKDIR_LEN);
-STATIC_ASSERT(offsetof(struct hop_directory_mkdir, dmd_mode) == __OFFSET_HOP_DIRECTORY_MKDIR_MODE);
-STATIC_ASSERT(offsetof(struct hop_directory_mkdir, dmd_name) == __OFFSET_HOP_DIRECTORY_MKDIR_NAME);
-STATIC_ASSERT(offsetof(struct hop_directory_mkdir, dmd_node) == __OFFSET_HOP_DIRECTORY_MKDIR_NODE);
-STATIC_ASSERT(offsetof(struct hop_directory_mkdir, dmd_owner) == __OFFSET_HOP_DIRECTORY_MKDIR_OWNER);
-STATIC_ASSERT(offsetof(struct hop_directory_mkdir, dmd_struct_size) == __OFFSET_HOP_DIRECTORY_MKDIR_STRUCT_SIZE);
-STATIC_ASSERT(sizeof(struct hop_directory_mkdir) == __SIZEOF_HOP_DIRECTORY_MKDIR);
+static_assert(offsetof(struct hop_directory_mkdir, dmd_dent) == __OFFSET_HOP_DIRECTORY_MKDIR_DENT);
+static_assert(offsetof(struct hop_directory_mkdir, dmd_flags) == __OFFSET_HOP_DIRECTORY_MKDIR_FLAGS);
+static_assert(offsetof(struct hop_directory_mkdir, dmd_group) == __OFFSET_HOP_DIRECTORY_MKDIR_GROUP);
+static_assert(offsetof(struct hop_directory_mkdir, dmd_len) == __OFFSET_HOP_DIRECTORY_MKDIR_LEN);
+static_assert(offsetof(struct hop_directory_mkdir, dmd_mode) == __OFFSET_HOP_DIRECTORY_MKDIR_MODE);
+static_assert(offsetof(struct hop_directory_mkdir, dmd_name) == __OFFSET_HOP_DIRECTORY_MKDIR_NAME);
+static_assert(offsetof(struct hop_directory_mkdir, dmd_node) == __OFFSET_HOP_DIRECTORY_MKDIR_NODE);
+static_assert(offsetof(struct hop_directory_mkdir, dmd_owner) == __OFFSET_HOP_DIRECTORY_MKDIR_OWNER);
+static_assert(offsetof(struct hop_directory_mkdir, dmd_struct_size) == __OFFSET_HOP_DIRECTORY_MKDIR_STRUCT_SIZE);
+static_assert(sizeof(struct hop_directory_mkdir) == __SIZEOF_HOP_DIRECTORY_MKDIR);
 
 
 
@@ -1551,32 +1552,32 @@ STATIC_ASSERT(sizeof(struct hop_directory_mkdir) == __SIZEOF_HOP_DIRECTORY_MKDIR
 #include <kos/hop/driver.h>
 
 /* struct hop_driver_stat */
-STATIC_ASSERT(offsetof(struct hop_driver_stat, ds_argc) == __OFFSET_HOP_DRIVER_STAT_ARGC);
-STATIC_ASSERT(offsetof(struct hop_driver_stat, ds_depc) == __OFFSET_HOP_DRIVER_STAT_DEPC);
-STATIC_ASSERT(offsetof(struct hop_driver_stat, ds_flags) == __OFFSET_HOP_DRIVER_STAT_FLAGS);
-STATIC_ASSERT(offsetof(struct hop_driver_stat, ds_loadaddr) == __OFFSET_HOP_DRIVER_STAT_LOADADDR);
-STATIC_ASSERT(offsetof(struct hop_driver_stat, ds_loadend) == __OFFSET_HOP_DRIVER_STAT_LOADEND);
-STATIC_ASSERT(offsetof(struct hop_driver_stat, ds_loadstart) == __OFFSET_HOP_DRIVER_STAT_LOADSTART);
-STATIC_ASSERT(offsetof(struct hop_driver_stat, ds_shnum) == __OFFSET_HOP_DRIVER_STAT_SHNUM);
-STATIC_ASSERT(offsetof(struct hop_driver_stat, ds_shstrtabsz) == __OFFSET_HOP_DRIVER_STAT_SHSTRTABSZ);
-STATIC_ASSERT(offsetof(struct hop_driver_stat, ds_state) == __OFFSET_HOP_DRIVER_STAT_STATE);
-STATIC_ASSERT(offsetof(struct hop_driver_stat, ds_strtabsz) == __OFFSET_HOP_DRIVER_STAT_STRTABSZ);
-STATIC_ASSERT(offsetof(struct hop_driver_stat, ds_struct_size) == __OFFSET_HOP_DRIVER_STAT_STRUCT_SIZE);
-STATIC_ASSERT(offsetof(struct hop_driver_stat, ds_symcnt) == __OFFSET_HOP_DRIVER_STAT_SYMCNT);
-STATIC_ASSERT(sizeof(struct hop_driver_stat) == __SIZEOF_HOP_DRIVER_STAT);
+static_assert(offsetof(struct hop_driver_stat, ds_argc) == __OFFSET_HOP_DRIVER_STAT_ARGC);
+static_assert(offsetof(struct hop_driver_stat, ds_depc) == __OFFSET_HOP_DRIVER_STAT_DEPC);
+static_assert(offsetof(struct hop_driver_stat, ds_flags) == __OFFSET_HOP_DRIVER_STAT_FLAGS);
+static_assert(offsetof(struct hop_driver_stat, ds_loadaddr) == __OFFSET_HOP_DRIVER_STAT_LOADADDR);
+static_assert(offsetof(struct hop_driver_stat, ds_loadend) == __OFFSET_HOP_DRIVER_STAT_LOADEND);
+static_assert(offsetof(struct hop_driver_stat, ds_loadstart) == __OFFSET_HOP_DRIVER_STAT_LOADSTART);
+static_assert(offsetof(struct hop_driver_stat, ds_shnum) == __OFFSET_HOP_DRIVER_STAT_SHNUM);
+static_assert(offsetof(struct hop_driver_stat, ds_shstrtabsz) == __OFFSET_HOP_DRIVER_STAT_SHSTRTABSZ);
+static_assert(offsetof(struct hop_driver_stat, ds_state) == __OFFSET_HOP_DRIVER_STAT_STATE);
+static_assert(offsetof(struct hop_driver_stat, ds_strtabsz) == __OFFSET_HOP_DRIVER_STAT_STRTABSZ);
+static_assert(offsetof(struct hop_driver_stat, ds_struct_size) == __OFFSET_HOP_DRIVER_STAT_STRUCT_SIZE);
+static_assert(offsetof(struct hop_driver_stat, ds_symcnt) == __OFFSET_HOP_DRIVER_STAT_SYMCNT);
+static_assert(sizeof(struct hop_driver_stat) == __SIZEOF_HOP_DRIVER_STAT);
 
 /* struct hop_driver_string */
-STATIC_ASSERT(offsetof(struct hop_driver_string, ds_buf) == __OFFSET_HOP_DRIVER_STRING_BUF);
-STATIC_ASSERT(offsetof(struct hop_driver_string, ds_index) == __OFFSET_HOP_DRIVER_STRING_INDEX);
-STATIC_ASSERT(offsetof(struct hop_driver_string, ds_size) == __OFFSET_HOP_DRIVER_STRING_SIZE);
-STATIC_ASSERT(offsetof(struct hop_driver_string, ds_struct_size) == __OFFSET_HOP_DRIVER_STRING_STRUCT_SIZE);
-STATIC_ASSERT(sizeof(struct hop_driver_string) == __SIZEOF_HOP_DRIVER_STRING);
+static_assert(offsetof(struct hop_driver_string, ds_buf) == __OFFSET_HOP_DRIVER_STRING_BUF);
+static_assert(offsetof(struct hop_driver_string, ds_index) == __OFFSET_HOP_DRIVER_STRING_INDEX);
+static_assert(offsetof(struct hop_driver_string, ds_size) == __OFFSET_HOP_DRIVER_STRING_SIZE);
+static_assert(offsetof(struct hop_driver_string, ds_struct_size) == __OFFSET_HOP_DRIVER_STRING_STRUCT_SIZE);
+static_assert(sizeof(struct hop_driver_string) == __SIZEOF_HOP_DRIVER_STRING);
 
 /* struct hop_driver_open_dependency */
-STATIC_ASSERT(offsetof(struct hop_driver_open_dependency, dod_depno) == __OFFSET_HOP_DRIVER_OPEN_DEPENDENCY_DEPNO);
-STATIC_ASSERT(offsetof(struct hop_driver_open_dependency, dod_result) == __OFFSET_HOP_DRIVER_OPEN_DEPENDENCY_RESULT);
-STATIC_ASSERT(offsetof(struct hop_driver_open_dependency, dod_struct_size) == __OFFSET_HOP_DRIVER_OPEN_DEPENDENCY_STRUCT_SIZE);
-STATIC_ASSERT(sizeof(struct hop_driver_open_dependency) == __SIZEOF_HOP_DRIVER_OPEN_DEPENDENCY);
+static_assert(offsetof(struct hop_driver_open_dependency, dod_depno) == __OFFSET_HOP_DRIVER_OPEN_DEPENDENCY_DEPNO);
+static_assert(offsetof(struct hop_driver_open_dependency, dod_result) == __OFFSET_HOP_DRIVER_OPEN_DEPENDENCY_RESULT);
+static_assert(offsetof(struct hop_driver_open_dependency, dod_struct_size) == __OFFSET_HOP_DRIVER_OPEN_DEPENDENCY_STRUCT_SIZE);
+static_assert(sizeof(struct hop_driver_open_dependency) == __SIZEOF_HOP_DRIVER_OPEN_DEPENDENCY);
 
 
 
@@ -1585,11 +1586,11 @@ STATIC_ASSERT(sizeof(struct hop_driver_open_dependency) == __SIZEOF_HOP_DRIVER_O
 #include <kos/hop/file.h>
 
 /* struct hop_file_cmpxchg_offset */
-STATIC_ASSERT(offsetof(struct hop_file_cmpxchg_offset, cxo_expoffset) == __OFFSET_HOP_FILE_CMPXCHG_OFFSET_EXPOFFSET);
-STATIC_ASSERT(offsetof(struct hop_file_cmpxchg_offset, cxo_newoffset) == __OFFSET_HOP_FILE_CMPXCHG_OFFSET_NEWOFFSET);
-STATIC_ASSERT(offsetof(struct hop_file_cmpxchg_offset, cxo_oldoffset) == __OFFSET_HOP_FILE_CMPXCHG_OFFSET_OLDOFFSET);
-STATIC_ASSERT(offsetof(struct hop_file_cmpxchg_offset, cxo_struct_size) == __OFFSET_HOP_FILE_CMPXCHG_OFFSET_STRUCT_SIZE);
-STATIC_ASSERT(sizeof(struct hop_file_cmpxchg_offset) == __SIZEOF_HOP_FILE_CMPXCHG_OFFSET);
+static_assert(offsetof(struct hop_file_cmpxchg_offset, cxo_expoffset) == __OFFSET_HOP_FILE_CMPXCHG_OFFSET_EXPOFFSET);
+static_assert(offsetof(struct hop_file_cmpxchg_offset, cxo_newoffset) == __OFFSET_HOP_FILE_CMPXCHG_OFFSET_NEWOFFSET);
+static_assert(offsetof(struct hop_file_cmpxchg_offset, cxo_oldoffset) == __OFFSET_HOP_FILE_CMPXCHG_OFFSET_OLDOFFSET);
+static_assert(offsetof(struct hop_file_cmpxchg_offset, cxo_struct_size) == __OFFSET_HOP_FILE_CMPXCHG_OFFSET_STRUCT_SIZE);
+static_assert(sizeof(struct hop_file_cmpxchg_offset) == __SIZEOF_HOP_FILE_CMPXCHG_OFFSET);
 
 
 
@@ -1604,14 +1605,14 @@ STATIC_ASSERT(sizeof(struct hop_file_cmpxchg_offset) == __SIZEOF_HOP_FILE_CMPXCH
 #include <kos/hop/handle.h>
 
 /* struct hop_handle_stat */
-STATIC_ASSERT(offsetof(struct hop_handle_stat, hs_address) == __OFFSET_HOP_HANDLE_STAT_ADDRESS);
-STATIC_ASSERT(offsetof(struct hop_handle_stat, hs_kind) == __OFFSET_HOP_HANDLE_STAT_KIND);
-STATIC_ASSERT(offsetof(struct hop_handle_stat, hs_mode) == __OFFSET_HOP_HANDLE_STAT_MODE);
-STATIC_ASSERT(offsetof(struct hop_handle_stat, hs_refcnt) == __OFFSET_HOP_HANDLE_STAT_REFCNT);
-STATIC_ASSERT(offsetof(struct hop_handle_stat, hs_struct_size) == __OFFSET_HOP_HANDLE_STAT_STRUCT_SIZE);
-STATIC_ASSERT(offsetof(struct hop_handle_stat, hs_type) == __OFFSET_HOP_HANDLE_STAT_TYPE);
-STATIC_ASSERT(offsetof(struct hop_handle_stat, hs_typename) == __OFFSET_HOP_HANDLE_STAT_TYPENAME);
-STATIC_ASSERT(sizeof(struct hop_handle_stat) == __SIZEOF_HOP_HANDLE_STAT);
+static_assert(offsetof(struct hop_handle_stat, hs_address) == __OFFSET_HOP_HANDLE_STAT_ADDRESS);
+static_assert(offsetof(struct hop_handle_stat, hs_kind) == __OFFSET_HOP_HANDLE_STAT_KIND);
+static_assert(offsetof(struct hop_handle_stat, hs_mode) == __OFFSET_HOP_HANDLE_STAT_MODE);
+static_assert(offsetof(struct hop_handle_stat, hs_refcnt) == __OFFSET_HOP_HANDLE_STAT_REFCNT);
+static_assert(offsetof(struct hop_handle_stat, hs_struct_size) == __OFFSET_HOP_HANDLE_STAT_STRUCT_SIZE);
+static_assert(offsetof(struct hop_handle_stat, hs_type) == __OFFSET_HOP_HANDLE_STAT_TYPE);
+static_assert(offsetof(struct hop_handle_stat, hs_typename) == __OFFSET_HOP_HANDLE_STAT_TYPENAME);
+static_assert(sizeof(struct hop_handle_stat) == __SIZEOF_HOP_HANDLE_STAT);
 
 
 
@@ -1620,10 +1621,10 @@ STATIC_ASSERT(sizeof(struct hop_handle_stat) == __SIZEOF_HOP_HANDLE_STAT);
 #include <kos/hop/openfd.h>
 
 /* struct hop_openfd */
-STATIC_ASSERT(offsetof(struct hop_openfd, of_flags) == __OFFSET_HOP_OPENFD_FLAGS);
-STATIC_ASSERT(offsetof(struct hop_openfd, of_hint) == __OFFSET_HOP_OPENFD_HINT);
-STATIC_ASSERT(offsetof(struct hop_openfd, of_mode) == __OFFSET_HOP_OPENFD_MODE);
-STATIC_ASSERT(sizeof(struct hop_openfd) == __SIZEOF_HOP_OPENFD);
+static_assert(offsetof(struct hop_openfd, of_flags) == __OFFSET_HOP_OPENFD_FLAGS);
+static_assert(offsetof(struct hop_openfd, of_hint) == __OFFSET_HOP_OPENFD_HINT);
+static_assert(offsetof(struct hop_openfd, of_mode) == __OFFSET_HOP_OPENFD_MODE);
+static_assert(sizeof(struct hop_openfd) == __SIZEOF_HOP_OPENFD);
 
 
 
@@ -1644,47 +1645,47 @@ STATIC_ASSERT(sizeof(struct hop_openfd) == __SIZEOF_HOP_OPENFD);
 #include <kos/hop/pipe.h>
 
 /* struct hop_pipe_stat */
-STATIC_ASSERT(offsetof(struct hop_pipe_stat, ps_avail) == __OFFSET_HOP_PIPE_STAT_AVAIL);
-STATIC_ASSERT(offsetof(struct hop_pipe_stat, ps_bufcur) == __OFFSET_HOP_PIPE_STAT_BUFCUR);
-STATIC_ASSERT(offsetof(struct hop_pipe_stat, ps_buflim) == __OFFSET_HOP_PIPE_STAT_BUFLIM);
-STATIC_ASSERT(offsetof(struct hop_pipe_stat, ps_rdtotal) == __OFFSET_HOP_PIPE_STAT_RDTOTAL);
-STATIC_ASSERT(offsetof(struct hop_pipe_stat, ps_struct_size) == __OFFSET_HOP_PIPE_STAT_STRUCT_SIZE);
-STATIC_ASSERT(sizeof(struct hop_pipe_stat) == __SIZEOF_HOP_PIPE_STAT);
+static_assert(offsetof(struct hop_pipe_stat, ps_avail) == __OFFSET_HOP_PIPE_STAT_AVAIL);
+static_assert(offsetof(struct hop_pipe_stat, ps_bufcur) == __OFFSET_HOP_PIPE_STAT_BUFCUR);
+static_assert(offsetof(struct hop_pipe_stat, ps_buflim) == __OFFSET_HOP_PIPE_STAT_BUFLIM);
+static_assert(offsetof(struct hop_pipe_stat, ps_rdtotal) == __OFFSET_HOP_PIPE_STAT_RDTOTAL);
+static_assert(offsetof(struct hop_pipe_stat, ps_struct_size) == __OFFSET_HOP_PIPE_STAT_STRUCT_SIZE);
+static_assert(sizeof(struct hop_pipe_stat) == __SIZEOF_HOP_PIPE_STAT);
 
 /* struct hop_pipe_writesome */
-STATIC_ASSERT(offsetof(struct hop_pipe_writesome, pws_buf) == __OFFSET_HOP_PIPE_WRITESOME_BUF);
-STATIC_ASSERT(offsetof(struct hop_pipe_writesome, pws_buflen) == __OFFSET_HOP_PIPE_WRITESOME_BUFLEN);
-STATIC_ASSERT(offsetof(struct hop_pipe_writesome, pws_struct_size) == __OFFSET_HOP_PIPE_WRITESOME_STRUCT_SIZE);
-STATIC_ASSERT(offsetof(struct hop_pipe_writesome, pws_written) == __OFFSET_HOP_PIPE_WRITESOME_WRITTEN);
-STATIC_ASSERT(sizeof(struct hop_pipe_writesome) == __SIZEOF_HOP_PIPE_WRITESOME);
+static_assert(offsetof(struct hop_pipe_writesome, pws_buf) == __OFFSET_HOP_PIPE_WRITESOME_BUF);
+static_assert(offsetof(struct hop_pipe_writesome, pws_buflen) == __OFFSET_HOP_PIPE_WRITESOME_BUFLEN);
+static_assert(offsetof(struct hop_pipe_writesome, pws_struct_size) == __OFFSET_HOP_PIPE_WRITESOME_STRUCT_SIZE);
+static_assert(offsetof(struct hop_pipe_writesome, pws_written) == __OFFSET_HOP_PIPE_WRITESOME_WRITTEN);
+static_assert(sizeof(struct hop_pipe_writesome) == __SIZEOF_HOP_PIPE_WRITESOME);
 
 /* struct hop_pipe_vwritesome */
-STATIC_ASSERT(offsetof(struct hop_pipe_vwritesome, pvws_buf) == __OFFSET_HOP_PIPE_VWRITESOME_BUF);
-STATIC_ASSERT(offsetof(struct hop_pipe_vwritesome, pvws_bufcnt) == __OFFSET_HOP_PIPE_VWRITESOME_BUFCNT);
-STATIC_ASSERT(offsetof(struct hop_pipe_vwritesome, pvws_struct_size) == __OFFSET_HOP_PIPE_VWRITESOME_STRUCT_SIZE);
-STATIC_ASSERT(offsetof(struct hop_pipe_vwritesome, pvws_written) == __OFFSET_HOP_PIPE_VWRITESOME_WRITTEN);
-STATIC_ASSERT(sizeof(struct hop_pipe_vwritesome) == __SIZEOF_HOP_PIPE_VWRITESOME);
+static_assert(offsetof(struct hop_pipe_vwritesome, pvws_buf) == __OFFSET_HOP_PIPE_VWRITESOME_BUF);
+static_assert(offsetof(struct hop_pipe_vwritesome, pvws_bufcnt) == __OFFSET_HOP_PIPE_VWRITESOME_BUFCNT);
+static_assert(offsetof(struct hop_pipe_vwritesome, pvws_struct_size) == __OFFSET_HOP_PIPE_VWRITESOME_STRUCT_SIZE);
+static_assert(offsetof(struct hop_pipe_vwritesome, pvws_written) == __OFFSET_HOP_PIPE_VWRITESOME_WRITTEN);
+static_assert(sizeof(struct hop_pipe_vwritesome) == __SIZEOF_HOP_PIPE_VWRITESOME);
 
 /* struct hop_pipe_skipdata */
-STATIC_ASSERT(offsetof(struct hop_pipe_skipdata, psd_num_bytes) == __OFFSET_HOP_PIPE_SKIPDATA_NUM_BYTES);
-STATIC_ASSERT(offsetof(struct hop_pipe_skipdata, psd_rdpos) == __OFFSET_HOP_PIPE_SKIPDATA_RDPOS);
-STATIC_ASSERT(offsetof(struct hop_pipe_skipdata, psd_skipped) == __OFFSET_HOP_PIPE_SKIPDATA_SKIPPED);
-STATIC_ASSERT(offsetof(struct hop_pipe_skipdata, psd_struct_size) == __OFFSET_HOP_PIPE_SKIPDATA_STRUCT_SIZE);
-STATIC_ASSERT(sizeof(struct hop_pipe_skipdata) == __SIZEOF_HOP_PIPE_SKIPDATA);
+static_assert(offsetof(struct hop_pipe_skipdata, psd_num_bytes) == __OFFSET_HOP_PIPE_SKIPDATA_NUM_BYTES);
+static_assert(offsetof(struct hop_pipe_skipdata, psd_rdpos) == __OFFSET_HOP_PIPE_SKIPDATA_RDPOS);
+static_assert(offsetof(struct hop_pipe_skipdata, psd_skipped) == __OFFSET_HOP_PIPE_SKIPDATA_SKIPPED);
+static_assert(offsetof(struct hop_pipe_skipdata, psd_struct_size) == __OFFSET_HOP_PIPE_SKIPDATA_STRUCT_SIZE);
+static_assert(sizeof(struct hop_pipe_skipdata) == __SIZEOF_HOP_PIPE_SKIPDATA);
 
 /* struct hop_pipe_unread */
-STATIC_ASSERT(offsetof(struct hop_pipe_unread, pur_num_bytes) == __OFFSET_HOP_PIPE_UNREAD_NUM_BYTES);
-STATIC_ASSERT(offsetof(struct hop_pipe_unread, pur_rdpos) == __OFFSET_HOP_PIPE_UNREAD_RDPOS);
-STATIC_ASSERT(offsetof(struct hop_pipe_unread, pur_struct_size) == __OFFSET_HOP_PIPE_UNREAD_STRUCT_SIZE);
-STATIC_ASSERT(offsetof(struct hop_pipe_unread, pur_unread) == __OFFSET_HOP_PIPE_UNREAD_UNREAD);
-STATIC_ASSERT(sizeof(struct hop_pipe_unread) == __SIZEOF_HOP_PIPE_UNREAD);
+static_assert(offsetof(struct hop_pipe_unread, pur_num_bytes) == __OFFSET_HOP_PIPE_UNREAD_NUM_BYTES);
+static_assert(offsetof(struct hop_pipe_unread, pur_rdpos) == __OFFSET_HOP_PIPE_UNREAD_RDPOS);
+static_assert(offsetof(struct hop_pipe_unread, pur_struct_size) == __OFFSET_HOP_PIPE_UNREAD_STRUCT_SIZE);
+static_assert(offsetof(struct hop_pipe_unread, pur_unread) == __OFFSET_HOP_PIPE_UNREAD_UNREAD);
+static_assert(sizeof(struct hop_pipe_unread) == __SIZEOF_HOP_PIPE_UNREAD);
 
 /* struct hop_pipe_unwrite */
-STATIC_ASSERT(offsetof(struct hop_pipe_unwrite, puw_num_bytes) == __OFFSET_HOP_PIPE_UNWRITE_NUM_BYTES);
-STATIC_ASSERT(offsetof(struct hop_pipe_unwrite, puw_struct_size) == __OFFSET_HOP_PIPE_UNWRITE_STRUCT_SIZE);
-STATIC_ASSERT(offsetof(struct hop_pipe_unwrite, puw_unwritten) == __OFFSET_HOP_PIPE_UNWRITE_UNWRITTEN);
-STATIC_ASSERT(offsetof(struct hop_pipe_unwrite, puw_wrpos) == __OFFSET_HOP_PIPE_UNWRITE_WRPOS);
-STATIC_ASSERT(sizeof(struct hop_pipe_unwrite) == __SIZEOF_HOP_PIPE_UNWRITE);
+static_assert(offsetof(struct hop_pipe_unwrite, puw_num_bytes) == __OFFSET_HOP_PIPE_UNWRITE_NUM_BYTES);
+static_assert(offsetof(struct hop_pipe_unwrite, puw_struct_size) == __OFFSET_HOP_PIPE_UNWRITE_STRUCT_SIZE);
+static_assert(offsetof(struct hop_pipe_unwrite, puw_unwritten) == __OFFSET_HOP_PIPE_UNWRITE_UNWRITTEN);
+static_assert(offsetof(struct hop_pipe_unwrite, puw_wrpos) == __OFFSET_HOP_PIPE_UNWRITE_WRPOS);
+static_assert(sizeof(struct hop_pipe_unwrite) == __SIZEOF_HOP_PIPE_UNWRITE);
 
 
 
@@ -1693,26 +1694,26 @@ STATIC_ASSERT(sizeof(struct hop_pipe_unwrite) == __SIZEOF_HOP_PIPE_UNWRITE);
 #include <kos/hop/task.h>
 
 /* struct hop_task_join */
-STATIC_ASSERT(offsetof(struct hop_task_join, tj_reltimeout_nsec) == __OFFSET_HOP_TASK_JOIN_RELTIMEOUT_NSEC);
-STATIC_ASSERT(offsetof(struct hop_task_join, tj_reltimeout_sec) == __OFFSET_HOP_TASK_JOIN_RELTIMEOUT_SEC);
-STATIC_ASSERT(offsetof(struct hop_task_join, tj_status) == __OFFSET_HOP_TASK_JOIN_STATUS);
-STATIC_ASSERT(offsetof(struct hop_task_join, tj_struct_size) == __OFFSET_HOP_TASK_JOIN_STRUCT_SIZE);
-STATIC_ASSERT(sizeof(struct hop_task_join) == __SIZEOF_HOP_TASK_JOIN);
+static_assert(offsetof(struct hop_task_join, tj_reltimeout_nsec) == __OFFSET_HOP_TASK_JOIN_RELTIMEOUT_NSEC);
+static_assert(offsetof(struct hop_task_join, tj_reltimeout_sec) == __OFFSET_HOP_TASK_JOIN_RELTIMEOUT_SEC);
+static_assert(offsetof(struct hop_task_join, tj_status) == __OFFSET_HOP_TASK_JOIN_STATUS);
+static_assert(offsetof(struct hop_task_join, tj_struct_size) == __OFFSET_HOP_TASK_JOIN_STRUCT_SIZE);
+static_assert(sizeof(struct hop_task_join) == __SIZEOF_HOP_TASK_JOIN);
 
 /* struct hop_task_setprocessgroupleader */
-STATIC_ASSERT(offsetof(struct hop_task_setprocessgroupleader, tspgl_leader) == __OFFSET_HOP_TASK_SETPROCESSGROUPLEADER_LEADER);
-STATIC_ASSERT(offsetof(struct hop_task_setprocessgroupleader, tspgl_new_leader) == __OFFSET_HOP_TASK_SETPROCESSGROUPLEADER_NEW_LEADER);
-STATIC_ASSERT(offsetof(struct hop_task_setprocessgroupleader, tspgl_old_leader) == __OFFSET_HOP_TASK_SETPROCESSGROUPLEADER_OLD_LEADER);
-STATIC_ASSERT(offsetof(struct hop_task_setprocessgroupleader, tspgl_struct_size) == __OFFSET_HOP_TASK_SETPROCESSGROUPLEADER_STRUCT_SIZE);
-STATIC_ASSERT(sizeof(struct hop_task_setprocessgroupleader) == __SIZEOF_HOP_TASK_SETPROCESSGROUPLEADER);
+static_assert(offsetof(struct hop_task_setprocessgroupleader, tspgl_leader) == __OFFSET_HOP_TASK_SETPROCESSGROUPLEADER_LEADER);
+static_assert(offsetof(struct hop_task_setprocessgroupleader, tspgl_new_leader) == __OFFSET_HOP_TASK_SETPROCESSGROUPLEADER_NEW_LEADER);
+static_assert(offsetof(struct hop_task_setprocessgroupleader, tspgl_old_leader) == __OFFSET_HOP_TASK_SETPROCESSGROUPLEADER_OLD_LEADER);
+static_assert(offsetof(struct hop_task_setprocessgroupleader, tspgl_struct_size) == __OFFSET_HOP_TASK_SETPROCESSGROUPLEADER_STRUCT_SIZE);
+static_assert(sizeof(struct hop_task_setprocessgroupleader) == __SIZEOF_HOP_TASK_SETPROCESSGROUPLEADER);
 
 /* struct hop_task_setsessionleader */
-STATIC_ASSERT(offsetof(struct hop_task_setsessionleader, tssl_leader) == __OFFSET_HOP_TASK_SETSESSIONLEADER_LEADER);
-STATIC_ASSERT(offsetof(struct hop_task_setsessionleader, tssl_new_leader) == __OFFSET_HOP_TASK_SETSESSIONLEADER_NEW_LEADER);
-STATIC_ASSERT(offsetof(struct hop_task_setsessionleader, tssl_old_grp_leader) == __OFFSET_HOP_TASK_SETSESSIONLEADER_OLD_GRP_LEADER);
-STATIC_ASSERT(offsetof(struct hop_task_setsessionleader, tssl_old_leader) == __OFFSET_HOP_TASK_SETSESSIONLEADER_OLD_LEADER);
-STATIC_ASSERT(offsetof(struct hop_task_setsessionleader, tssl_struct_size) == __OFFSET_HOP_TASK_SETSESSIONLEADER_STRUCT_SIZE);
-STATIC_ASSERT(sizeof(struct hop_task_setsessionleader) == __SIZEOF_HOP_TASK_SETSESSIONLEADER);
+static_assert(offsetof(struct hop_task_setsessionleader, tssl_leader) == __OFFSET_HOP_TASK_SETSESSIONLEADER_LEADER);
+static_assert(offsetof(struct hop_task_setsessionleader, tssl_new_leader) == __OFFSET_HOP_TASK_SETSESSIONLEADER_NEW_LEADER);
+static_assert(offsetof(struct hop_task_setsessionleader, tssl_old_grp_leader) == __OFFSET_HOP_TASK_SETSESSIONLEADER_OLD_GRP_LEADER);
+static_assert(offsetof(struct hop_task_setsessionleader, tssl_old_leader) == __OFFSET_HOP_TASK_SETSESSIONLEADER_OLD_LEADER);
+static_assert(offsetof(struct hop_task_setsessionleader, tssl_struct_size) == __OFFSET_HOP_TASK_SETSESSIONLEADER_STRUCT_SIZE);
+static_assert(sizeof(struct hop_task_setsessionleader) == __SIZEOF_HOP_TASK_SETSESSIONLEADER);
 
 
 
@@ -1721,48 +1722,48 @@ STATIC_ASSERT(sizeof(struct hop_task_setsessionleader) == __SIZEOF_HOP_TASK_SETS
 #include <kos/ksysctl.h>
 
 /* struct ksysctl_driver_insmod */
-STATIC_ASSERT(offsetof(struct ksysctl_driver_insmod, im_blob.b_base) == __OFFSET_KSYSCTL_DRIVER_INSMOD_BLOB_BASE);
-STATIC_ASSERT(offsetof(struct ksysctl_driver_insmod, im_blob.b_size) == __OFFSET_KSYSCTL_DRIVER_INSMOD_BLOB_SIZE);
-STATIC_ASSERT(offsetof(struct ksysctl_driver_insmod, im_cmdline) == __OFFSET_KSYSCTL_DRIVER_INSMOD_CMDLINE);
-STATIC_ASSERT(offsetof(struct ksysctl_driver_insmod, im_driver) == __OFFSET_KSYSCTL_DRIVER_INSMOD_DRIVER);
-STATIC_ASSERT(offsetof(struct ksysctl_driver_insmod, im_file.f_dentry) == __OFFSET_KSYSCTL_DRIVER_INSMOD_FILE_DENTRY);
-STATIC_ASSERT(offsetof(struct ksysctl_driver_insmod, im_file.f_node) == __OFFSET_KSYSCTL_DRIVER_INSMOD_FILE_NODE);
-STATIC_ASSERT(offsetof(struct ksysctl_driver_insmod, im_file.f_path) == __OFFSET_KSYSCTL_DRIVER_INSMOD_FILE_PATH);
-STATIC_ASSERT(offsetof(struct ksysctl_driver_insmod, im_flags) == __OFFSET_KSYSCTL_DRIVER_INSMOD_FLAGS);
-STATIC_ASSERT(offsetof(struct ksysctl_driver_insmod, im_format) == __OFFSET_KSYSCTL_DRIVER_INSMOD_FORMAT);
-STATIC_ASSERT(offsetof(struct ksysctl_driver_insmod, im_name) == __OFFSET_KSYSCTL_DRIVER_INSMOD_NAME);
-STATIC_ASSERT(offsetof(struct ksysctl_driver_insmod, im_newdriver) == __OFFSET_KSYSCTL_DRIVER_INSMOD_NEWDRIVER);
-STATIC_ASSERT(offsetof(struct ksysctl_driver_insmod, im_struct_size) == __OFFSET_KSYSCTL_DRIVER_INSMOD_STRUCT_SIZE);
-STATIC_ASSERT(sizeof(struct ksysctl_driver_insmod) == __SIZEOF_KSYSCTL_DRIVER_INSMOD);
+static_assert(offsetof(struct ksysctl_driver_insmod, im_blob.b_base) == __OFFSET_KSYSCTL_DRIVER_INSMOD_BLOB_BASE);
+static_assert(offsetof(struct ksysctl_driver_insmod, im_blob.b_size) == __OFFSET_KSYSCTL_DRIVER_INSMOD_BLOB_SIZE);
+static_assert(offsetof(struct ksysctl_driver_insmod, im_cmdline) == __OFFSET_KSYSCTL_DRIVER_INSMOD_CMDLINE);
+static_assert(offsetof(struct ksysctl_driver_insmod, im_driver) == __OFFSET_KSYSCTL_DRIVER_INSMOD_DRIVER);
+static_assert(offsetof(struct ksysctl_driver_insmod, im_file.f_dentry) == __OFFSET_KSYSCTL_DRIVER_INSMOD_FILE_DENTRY);
+static_assert(offsetof(struct ksysctl_driver_insmod, im_file.f_node) == __OFFSET_KSYSCTL_DRIVER_INSMOD_FILE_NODE);
+static_assert(offsetof(struct ksysctl_driver_insmod, im_file.f_path) == __OFFSET_KSYSCTL_DRIVER_INSMOD_FILE_PATH);
+static_assert(offsetof(struct ksysctl_driver_insmod, im_flags) == __OFFSET_KSYSCTL_DRIVER_INSMOD_FLAGS);
+static_assert(offsetof(struct ksysctl_driver_insmod, im_format) == __OFFSET_KSYSCTL_DRIVER_INSMOD_FORMAT);
+static_assert(offsetof(struct ksysctl_driver_insmod, im_name) == __OFFSET_KSYSCTL_DRIVER_INSMOD_NAME);
+static_assert(offsetof(struct ksysctl_driver_insmod, im_newdriver) == __OFFSET_KSYSCTL_DRIVER_INSMOD_NEWDRIVER);
+static_assert(offsetof(struct ksysctl_driver_insmod, im_struct_size) == __OFFSET_KSYSCTL_DRIVER_INSMOD_STRUCT_SIZE);
+static_assert(sizeof(struct ksysctl_driver_insmod) == __SIZEOF_KSYSCTL_DRIVER_INSMOD);
 
 /* struct ksysctl_driver_delmod */
-STATIC_ASSERT(offsetof(struct ksysctl_driver_delmod, dm_file) == __OFFSET_KSYSCTL_DRIVER_DELMOD_FILE);
-STATIC_ASSERT(offsetof(struct ksysctl_driver_delmod, dm_flags) == __OFFSET_KSYSCTL_DRIVER_DELMOD_FLAGS);
-STATIC_ASSERT(offsetof(struct ksysctl_driver_delmod, dm_format) == __OFFSET_KSYSCTL_DRIVER_DELMOD_FORMAT);
-STATIC_ASSERT(offsetof(struct ksysctl_driver_delmod, dm_name) == __OFFSET_KSYSCTL_DRIVER_DELMOD_NAME);
-STATIC_ASSERT(offsetof(struct ksysctl_driver_delmod, dm_struct_size) == __OFFSET_KSYSCTL_DRIVER_DELMOD_STRUCT_SIZE);
-STATIC_ASSERT(sizeof(struct ksysctl_driver_delmod) == __SIZEOF_KSYSCTL_DRIVER_DELMOD);
+static_assert(offsetof(struct ksysctl_driver_delmod, dm_file) == __OFFSET_KSYSCTL_DRIVER_DELMOD_FILE);
+static_assert(offsetof(struct ksysctl_driver_delmod, dm_flags) == __OFFSET_KSYSCTL_DRIVER_DELMOD_FLAGS);
+static_assert(offsetof(struct ksysctl_driver_delmod, dm_format) == __OFFSET_KSYSCTL_DRIVER_DELMOD_FORMAT);
+static_assert(offsetof(struct ksysctl_driver_delmod, dm_name) == __OFFSET_KSYSCTL_DRIVER_DELMOD_NAME);
+static_assert(offsetof(struct ksysctl_driver_delmod, dm_struct_size) == __OFFSET_KSYSCTL_DRIVER_DELMOD_STRUCT_SIZE);
+static_assert(sizeof(struct ksysctl_driver_delmod) == __SIZEOF_KSYSCTL_DRIVER_DELMOD);
 
 /* struct ksysctl_driver_getmod */
-STATIC_ASSERT(offsetof(struct ksysctl_driver_getmod, gm_addr) == __OFFSET_KSYSCTL_DRIVER_GETMOD_ADDR);
-STATIC_ASSERT(offsetof(struct ksysctl_driver_getmod, gm_driver) == __OFFSET_KSYSCTL_DRIVER_GETMOD_DRIVER);
-STATIC_ASSERT(offsetof(struct ksysctl_driver_getmod, gm_file) == __OFFSET_KSYSCTL_DRIVER_GETMOD_FILE);
-STATIC_ASSERT(offsetof(struct ksysctl_driver_getmod, gm_format) == __OFFSET_KSYSCTL_DRIVER_GETMOD_FORMAT);
-STATIC_ASSERT(offsetof(struct ksysctl_driver_getmod, gm_name) == __OFFSET_KSYSCTL_DRIVER_GETMOD_NAME);
-STATIC_ASSERT(offsetof(struct ksysctl_driver_getmod, gm_struct_size) == __OFFSET_KSYSCTL_DRIVER_GETMOD_STRUCT_SIZE);
-STATIC_ASSERT(sizeof(struct ksysctl_driver_getmod) == __SIZEOF_KSYSCTL_DRIVER_GETMOD);
+static_assert(offsetof(struct ksysctl_driver_getmod, gm_addr) == __OFFSET_KSYSCTL_DRIVER_GETMOD_ADDR);
+static_assert(offsetof(struct ksysctl_driver_getmod, gm_driver) == __OFFSET_KSYSCTL_DRIVER_GETMOD_DRIVER);
+static_assert(offsetof(struct ksysctl_driver_getmod, gm_file) == __OFFSET_KSYSCTL_DRIVER_GETMOD_FILE);
+static_assert(offsetof(struct ksysctl_driver_getmod, gm_format) == __OFFSET_KSYSCTL_DRIVER_GETMOD_FORMAT);
+static_assert(offsetof(struct ksysctl_driver_getmod, gm_name) == __OFFSET_KSYSCTL_DRIVER_GETMOD_NAME);
+static_assert(offsetof(struct ksysctl_driver_getmod, gm_struct_size) == __OFFSET_KSYSCTL_DRIVER_GETMOD_STRUCT_SIZE);
+static_assert(sizeof(struct ksysctl_driver_getmod) == __SIZEOF_KSYSCTL_DRIVER_GETMOD);
 
 /* struct ksysctl_driver_get_library_path */
-STATIC_ASSERT(offsetof(struct ksysctl_driver_get_library_path, glp_buf) == __OFFSET_KSYSCTL_DRIVER_GET_LIBRARY_PATH_BUF);
-STATIC_ASSERT(offsetof(struct ksysctl_driver_get_library_path, glp_size) == __OFFSET_KSYSCTL_DRIVER_GET_LIBRARY_PATH_SIZE);
-STATIC_ASSERT(offsetof(struct ksysctl_driver_get_library_path, glp_struct_size) == __OFFSET_KSYSCTL_DRIVER_GET_LIBRARY_PATH_STRUCT_SIZE);
-STATIC_ASSERT(sizeof(struct ksysctl_driver_get_library_path) == __SIZEOF_KSYSCTL_DRIVER_GET_LIBRARY_PATH);
+static_assert(offsetof(struct ksysctl_driver_get_library_path, glp_buf) == __OFFSET_KSYSCTL_DRIVER_GET_LIBRARY_PATH_BUF);
+static_assert(offsetof(struct ksysctl_driver_get_library_path, glp_size) == __OFFSET_KSYSCTL_DRIVER_GET_LIBRARY_PATH_SIZE);
+static_assert(offsetof(struct ksysctl_driver_get_library_path, glp_struct_size) == __OFFSET_KSYSCTL_DRIVER_GET_LIBRARY_PATH_STRUCT_SIZE);
+static_assert(sizeof(struct ksysctl_driver_get_library_path) == __SIZEOF_KSYSCTL_DRIVER_GET_LIBRARY_PATH);
 
 /* struct ksysctl_driver_set_library_path */
-STATIC_ASSERT(offsetof(struct ksysctl_driver_set_library_path, slp_newpath) == __OFFSET_KSYSCTL_DRIVER_SET_LIBRARY_PATH_NEWPATH);
-STATIC_ASSERT(offsetof(struct ksysctl_driver_set_library_path, slp_oldpath) == __OFFSET_KSYSCTL_DRIVER_SET_LIBRARY_PATH_OLDPATH);
-STATIC_ASSERT(offsetof(struct ksysctl_driver_set_library_path, slp_struct_size) == __OFFSET_KSYSCTL_DRIVER_SET_LIBRARY_PATH_STRUCT_SIZE);
-STATIC_ASSERT(sizeof(struct ksysctl_driver_set_library_path) == __SIZEOF_KSYSCTL_DRIVER_SET_LIBRARY_PATH);
+static_assert(offsetof(struct ksysctl_driver_set_library_path, slp_newpath) == __OFFSET_KSYSCTL_DRIVER_SET_LIBRARY_PATH_NEWPATH);
+static_assert(offsetof(struct ksysctl_driver_set_library_path, slp_oldpath) == __OFFSET_KSYSCTL_DRIVER_SET_LIBRARY_PATH_OLDPATH);
+static_assert(offsetof(struct ksysctl_driver_set_library_path, slp_struct_size) == __OFFSET_KSYSCTL_DRIVER_SET_LIBRARY_PATH_STRUCT_SIZE);
+static_assert(sizeof(struct ksysctl_driver_set_library_path) == __SIZEOF_KSYSCTL_DRIVER_SET_LIBRARY_PATH);
 
 
 
@@ -1771,12 +1772,12 @@ STATIC_ASSERT(sizeof(struct ksysctl_driver_set_library_path) == __SIZEOF_KSYSCTL
 #include <linux/if_arp.h>
 
 /* struct arphdr */
-STATIC_ASSERT(offsetof(struct arphdr, ar_hln) == __OFFSET_ARPHDR_HLN);
-STATIC_ASSERT(offsetof(struct arphdr, ar_hrd) == __OFFSET_ARPHDR_HRD);
-STATIC_ASSERT(offsetof(struct arphdr, ar_op) == __OFFSET_ARPHDR_OP);
-STATIC_ASSERT(offsetof(struct arphdr, ar_pln) == __OFFSET_ARPHDR_PLN);
-STATIC_ASSERT(offsetof(struct arphdr, ar_pro) == __OFFSET_ARPHDR_PRO);
-STATIC_ASSERT(alignof(struct arphdr) == __ALIGNOF_ARPHDR);
+static_assert(offsetof(struct arphdr, ar_hln) == __OFFSET_ARPHDR_HLN);
+static_assert(offsetof(struct arphdr, ar_hrd) == __OFFSET_ARPHDR_HRD);
+static_assert(offsetof(struct arphdr, ar_op) == __OFFSET_ARPHDR_OP);
+static_assert(offsetof(struct arphdr, ar_pln) == __OFFSET_ARPHDR_PLN);
+static_assert(offsetof(struct arphdr, ar_pro) == __OFFSET_ARPHDR_PRO);
+static_assert(alignof(struct arphdr) == __ALIGNOF_ARPHDR);
 
 /* struct arpreq */
 /* ... */
@@ -1791,11 +1792,11 @@ STATIC_ASSERT(alignof(struct arphdr) == __ALIGNOF_ARPHDR);
 #include <linux/if_ether.h>
 
 /* struct ethhdr */
-STATIC_ASSERT(offsetof(struct ethhdr, h_dest) == __OFFSET_ETHHDR_DEST);
-STATIC_ASSERT(offsetof(struct ethhdr, h_proto) == __OFFSET_ETHHDR_PROTO);
-STATIC_ASSERT(offsetof(struct ethhdr, h_source) == __OFFSET_ETHHDR_SOURCE);
-STATIC_ASSERT(sizeof(struct ethhdr) == __SIZEOF_ETHHDR);
-STATIC_ASSERT(alignof(struct ethhdr) == __ALIGNOF_ETHHDR);
+static_assert(offsetof(struct ethhdr, h_dest) == __OFFSET_ETHHDR_DEST);
+static_assert(offsetof(struct ethhdr, h_proto) == __OFFSET_ETHHDR_PROTO);
+static_assert(offsetof(struct ethhdr, h_source) == __OFFSET_ETHHDR_SOURCE);
+static_assert(sizeof(struct ethhdr) == __SIZEOF_ETHHDR);
+static_assert(alignof(struct ethhdr) == __ALIGNOF_ETHHDR);
 
 
 
@@ -1807,17 +1808,17 @@ STATIC_ASSERT(alignof(struct ethhdr) == __ALIGNOF_ETHHDR);
 /* ... */
 
 /* struct iphdr */
-STATIC_ASSERT(offsetof(struct iphdr, ip_dst) == __OFFSET_IPHDR_DST);
-STATIC_ASSERT(offsetof(struct iphdr, ip_id) == __OFFSET_IPHDR_ID);
-STATIC_ASSERT(offsetof(struct iphdr, ip_len) == __OFFSET_IPHDR_LEN);
-STATIC_ASSERT(offsetof(struct iphdr, ip_off) == __OFFSET_IPHDR_OFF);
-STATIC_ASSERT(offsetof(struct iphdr, ip_p) == __OFFSET_IPHDR_P);
-STATIC_ASSERT(offsetof(struct iphdr, ip_src) == __OFFSET_IPHDR_SRC);
-STATIC_ASSERT(offsetof(struct iphdr, ip_sum) == __OFFSET_IPHDR_SUM);
-STATIC_ASSERT(offsetof(struct iphdr, ip_tos) == __OFFSET_IPHDR_TOS);
-STATIC_ASSERT(offsetof(struct iphdr, ip_ttl) == __OFFSET_IPHDR_TTL);
-STATIC_ASSERT(sizeof(struct iphdr) == __SIZEOF_IPHDR);
-STATIC_ASSERT(alignof(struct iphdr) == __ALIGNOF_IPHDR);
+static_assert(offsetof(struct iphdr, ip_dst) == __OFFSET_IPHDR_DST);
+static_assert(offsetof(struct iphdr, ip_id) == __OFFSET_IPHDR_ID);
+static_assert(offsetof(struct iphdr, ip_len) == __OFFSET_IPHDR_LEN);
+static_assert(offsetof(struct iphdr, ip_off) == __OFFSET_IPHDR_OFF);
+static_assert(offsetof(struct iphdr, ip_p) == __OFFSET_IPHDR_P);
+static_assert(offsetof(struct iphdr, ip_src) == __OFFSET_IPHDR_SRC);
+static_assert(offsetof(struct iphdr, ip_sum) == __OFFSET_IPHDR_SUM);
+static_assert(offsetof(struct iphdr, ip_tos) == __OFFSET_IPHDR_TOS);
+static_assert(offsetof(struct iphdr, ip_ttl) == __OFFSET_IPHDR_TTL);
+static_assert(sizeof(struct iphdr) == __SIZEOF_IPHDR);
+static_assert(alignof(struct iphdr) == __ALIGNOF_IPHDR);
 
 /* struct ip */
 /* ... */
@@ -1832,11 +1833,11 @@ STATIC_ASSERT(alignof(struct iphdr) == __ALIGNOF_IPHDR);
 #include <netinet/udp.h>
 
 /* struct udphdr */
-STATIC_ASSERT(offsetof(struct udphdr, uh_dport) == __OFFSET_UDPHDR_DPORT);
-STATIC_ASSERT(offsetof(struct udphdr, uh_sport) == __OFFSET_UDPHDR_SPORT);
-STATIC_ASSERT(offsetof(struct udphdr, uh_sum) == __OFFSET_UDPHDR_SUM);
-STATIC_ASSERT(offsetof(struct udphdr, uh_ulen) == __OFFSET_UDPHDR_ULEN);
-STATIC_ASSERT(sizeof(struct udphdr) == __SIZEOF_UDPHDR);
+static_assert(offsetof(struct udphdr, uh_dport) == __OFFSET_UDPHDR_DPORT);
+static_assert(offsetof(struct udphdr, uh_sport) == __OFFSET_UDPHDR_SPORT);
+static_assert(offsetof(struct udphdr, uh_sum) == __OFFSET_UDPHDR_SUM);
+static_assert(offsetof(struct udphdr, uh_ulen) == __OFFSET_UDPHDR_ULEN);
+static_assert(sizeof(struct udphdr) == __SIZEOF_UDPHDR);
 //[[[end]]]
 
 

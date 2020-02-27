@@ -128,10 +128,10 @@
 #   define __attribute_used__               __ATTR_USED
 #   define __attribute_noinline__           __ATTR_NOINLINE
 #   define __attribute_deprecated__         __ATTR_DEPRECATED_
-#   define __nonnull(params)                __NONNULL(params)
-#   define __attribute_warn_unused_result__ __WUNUSED
+#   define __nonnull(params)                __ATTR_NONNULL(params)
+#   define __attribute_warn_unused_result__ __ATTR_WUNUSED
 #if __USE_FORTIFY_LEVEL > 0
-#   define __wur                         __WUNUSED
+#   define __wur                         __ATTR_WUNUSED
 #else
 #   define __wur                         /* Nothing */
 #endif
@@ -216,5 +216,56 @@
 #   define __REDIRECT_NTH_LDBL(name,proto,alias) __REDIRECT_NTH(name,proto,alias)
 #endif
 #endif
+
+#ifdef __USE_BSD
+/* BSD's <sys/cdefs.h> defines these macros */
+#define __dead          __ATTR_NORETURN
+#define __pure          __ATTR_PURE
+#define __constfunc     __ATTR_CONST
+#define __noinline      __ATTR_NOINLINE
+#if __GCC_VERSION_NUM >= 30000 || __has_attribute(__always_inline__)
+#define __ATTR_FORCEINLINE __attribute__((__always_inline__))
+#else
+#define __ATTR_FORCEINLINE /* nothing */
+#endif
+#define __always_inline __ATTR_FORCEINLINE
+#define __returns_twice __ATTR_RETURNS_TWICE
+#define __noclone       __ATTR_NOCLONE
+#define __unused        __ATTR_UNUSED
+#define __diagused      __ATTR_UNUSED
+#define __debugused     __ATTR_UNUSED
+#define __used          __ATTR_USED
+#if __GCC_VERSION_NUM >= 30100 || __has_attribute(__no_instrument_function__)
+#define __noprofile __attribute__((__no_instrument_function__))
+#else
+#define __noprofile /* nothing */
+#endif
+#define __unreachable() __builtin_unreachable()
+#define __BEGIN_EXTERN_C __DECL_BEGIN
+#define __END_EXTERN_C   __DECL_END
+#ifdef __cplusplus
+#define __static_cast(x, y) static_cast<x>(y)
+#else /* __cplusplus */
+#define __static_cast(x, y) __CCAST(x)y
+#endif /* !__cplusplus */
+#define __dso_public    __ATTR_VISIBILITY("default")
+#define __dso_hidden    __ATTR_VISIBILITY("hidden")
+#define __dso_protected __ATTR_VISIBILITY("protected")
+#if __GCC_VERSION_NUM >= 40000 /* || __has_pragma(???) */
+#define __BEGIN_PUBLIC_DECLS _Pragma("GCC visibility push(default)") __DECL_BEGIN
+#define __END_PUBLIC_DECLS   __DECL_END _Pragma("GCC visibility pop")
+#define __BEGIN_HIDDEN_DECLS _Pragma("GCC visibility push(hidden)") __DECL_BEGIN
+#define __END_HIDDEN_DECLS   __DECL_END _Pragma("GCC visibility pop")
+#else
+#define __BEGIN_PUBLIC_DECLS __DECL_BEGIN
+#define __END_PUBLIC_DECLS   __DECL_END
+#define __BEGIN_HIDDEN_DECLS __DECL_BEGIN
+#define __END_HIDDEN_DECLS   __DECL_END
+#endif
+#define __packed __ATTR_PACKED
+#define __aligned(x) __ATTR_ALIGNED(x)
+#define __section(x) __ATTR_SECTION(x)
+#endif /* __USE_BSD */
+
 
 #endif /* !_SYS_CDEFS_H */

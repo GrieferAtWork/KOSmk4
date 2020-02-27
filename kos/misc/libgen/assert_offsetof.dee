@@ -68,9 +68,9 @@ function enumerateCommentSpecs(comment: string): {string...} {
 
 function generateAssertions(
 		structFile: string, structTypes: {string...} = none,
-		assertOffsetMacro: string = "STATIC_ASSERT(offsetof({typ}, {field}) == {value});\n",
-		assertSizeofMacro: string = "STATIC_ASSERT(sizeof({typ}) == {value});\n",
-		assertAlignofMacro: string = "STATIC_ASSERT(alignof({typ}) == {value});\n") {
+		assertOffsetMacro: string = "static_assert(offsetof({typ}, {field}) == {value});\n",
+		assertSizeofMacro: string = "static_assert(sizeof({typ}) == {value});\n",
+		assertAlignofMacro: string = "static_assert(alignof({typ}) == {value});\n") {
 	local knownMacros: {string: string | none} = Dict();
 	local knownStructs: {(string,string)...} = List();
 	local knownStructPrefixes: {string: string} = Dict();

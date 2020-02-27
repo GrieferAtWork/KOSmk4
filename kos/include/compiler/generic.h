@@ -148,17 +148,22 @@
 #pragma defineonoption __CODEGEAR_0X_SUPPORT__ -Ax
 #endif /* __BORLANDC__ >= 0x599 */
 
-#if (__has_feature(cxx_static_assert) ||                                                     \
-     (defined(__IBMCPP_STATIC_ASSERT) && __IBMCPP_STATIC_ASSERT + 0) ||                      \
-     (defined(__cplusplus) && ((defined(__BORLANDC__) && defined(__CODEGEAR_0X_SUPPORT__) && \
-                                __BORLANDC__ >= 0x610) ||                                    \
-                               (defined(__CODEGEARC__) && __CODEGEARC__ > 0x620))))
+#if (__has_feature(cxx_static_assert) ||                                                           \
+     (defined(__cpp_static_assert) && __cpp_static_assert + 0 != 0) ||                             \
+     (defined(__IBMCPP_STATIC_ASSERT) && __IBMCPP_STATIC_ASSERT + 0) ||                            \
+     (defined(__cplusplus) &&                                                                      \
+      ((defined(__BORLANDC__) && defined(__CODEGEAR_0X_SUPPORT__) && __BORLANDC__ + 0 >= 0x610) || \
+       (defined(__CODEGEARC__) && __CODEGEARC__ + 0 > 0x620))))
+#if defined(__cpp_static_assert) && __cpp_static_assert + 0 >= 201411
+#define __STATIC_ASSERT       static_assert
+#else /* __cpp_static_assert >= 201411 */
 #define __STATIC_ASSERT(expr) static_assert(expr, #expr)
-#define __STATIC_ASSERT_MSG(expr, msg) static_assert(expr, msg)
+#endif /* __cpp_static_assert < 201411 */
+#define __STATIC_ASSERT_MSG   static_assert
 #elif (defined(_Static_assert) || __has_feature(c_static_assert) || \
        (!defined(__cplusplus) && ((defined(__STDC_VERSION__) && __STDC_VERSION__ + 0 >= 201112L))))
-#define __STATIC_ASSERT(expr)          _Static_assert(expr, #expr)
-#define __STATIC_ASSERT_MSG(expr, msg) _Static_assert(expr, msg)
+#define __STATIC_ASSERT(expr) _Static_assert(expr, #expr)
+#define __STATIC_ASSERT_MSG   _Static_assert
 #elif defined(__TPP_COUNTER)
 #define __STATIC_ASSERT(expr)          typedef int __PP_CAT2(__static_assert_, __TPP_COUNTER(__static_assert))[(expr) ? 1 : -1]
 #define __STATIC_ASSERT_MSG(expr, msg) typedef int __PP_CAT2(__static_assert_, __TPP_COUNTER(__static_assert))[(expr) ? 1 : -1]
