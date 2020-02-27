@@ -33,12 +33,16 @@
 #include <sched/posix-signal.h>
 #include <sched/signal.h>
 
+#include <hybrid/atomic.h>
+#include <hybrid/unaligned.h>
+
 #include <kos/except/inval.h>
 #include <kos/except/net.h>
 #include <network/socket.h>
 
 #include <alloca.h>
 #include <assert.h>
+#include <errno.h>
 #include <stdalign.h>
 #include <string.h>
 
@@ -182,7 +186,7 @@ again:
 	nc = self->sk_ncon.get();
 	if unlikely(nc) {
 		/* A previous connect() is still in progress... */
-		if (mode & IO_NONBLOCK) {
+		if ((mode & IO_NONBLOCK) || (ATOMIC_READ(self->sk_msgflags) & MSG_DONTWAIT)) {
 			decref_unlikely(nc);
 			return SOCKET_CONNECT_NONBLOCK_ALREADY;
 		}
@@ -223,7 +227,7 @@ again:
 	 *       are not mandated by the general-purpose socket API, and
 	 *       this really isn't something that should be done by a
 	 *       proper application) */
-	if (mode & IO_NONBLOCK) {
+	if ((mode & IO_NONBLOCK) || (ATOMIC_READ(self->sk_msgflags) & MSG_DONTWAIT)) {
 		nc = (REF struct socket_connect_aio *)kmalloc(sizeof(struct socket_connect_aio),
 		                                              GFP_LOCKED | GFP_PREFLT);
 		nc->sca_refcnt = 1;
@@ -332,7 +336,7 @@ socket_asendto_peer(struct socket *__restrict self,
  *                      if it needs to be accessed after returning. (i.e. AIO needs to use its
  *                      own copy of this structure)
  * @param: msg_flags:   Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_EOR |
- *                              MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
+ *                              MSG_MORE | MSG_NOSIGNAL | MSG_OOB | MSG_DONTWAIT'
  * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED: [...]
  * @throws: E_NET_MESSAGE_TOO_LONG:                                                     [...]
  * @throws: E_NET_CONNECTION_RESET:                                                     [...]
@@ -344,6 +348,7 @@ socket_asend(struct socket *__restrict self,
              /*out*/ struct aio_handle *__restrict aio)
 		THROWS_INDIRECT(E_INVALID_ARGUMENT_BAD_STATE, E_NET_MESSAGE_TOO_LONG,
 		                E_NET_CONNECTION_RESET, E_NET_SHUTDOWN) {
+	msg_flags |= ATOMIC_READ(self->sk_msgflags) & SOCKET_MSGFLAGS_ADDEND_SENDMASK;
 	if (self->sk_ops->so_send) {
 		(*self->sk_ops->so_send)(self, buf, bufsize, msg_control, msg_flags, aio);
 	} else if (self->sk_ops->so_sendv) {
@@ -404,6 +409,7 @@ socket_asendv(struct socket *__restrict self,
               /*out*/ struct aio_handle *__restrict aio)
 		THROWS_INDIRECT(E_INVALID_ARGUMENT_BAD_STATE, E_NET_MESSAGE_TOO_LONG,
 		                E_NET_CONNECTION_RESET, E_NET_SHUTDOWN) {
+	msg_flags |= ATOMIC_READ(self->sk_msgflags) & SOCKET_MSGFLAGS_ADDEND_SENDMASK;
 	if (self->sk_ops->so_sendv) {
 		if (buf->ab_entc == 1 && self->sk_ops->so_send) {
 			(*self->sk_ops->so_send)(self, buf->ab_head.ab_base, bufsize, msg_control, msg_flags, aio);
@@ -419,6 +425,9 @@ socket_asendv(struct socket *__restrict self,
 
 
 /* Send helper functions for blocking and non-blocking operations.
+ * NOTE: Additionally, these functions accept `MSG_DONTWAIT' in
+ *       `msg_flags' as a bit-flag or'd with `mode & IO_NONBLOCK',
+ *       or'd with `self->sk_msgflags & MSG_DONTWAIT'
  * @return: * : The actual number of sent bytes (as returned by AIO) */
 PUBLIC NONNULL((1)) size_t KCALL
 socket_send(struct socket *__restrict self,
@@ -432,7 +441,8 @@ socket_send(struct socket *__restrict self,
 	aio_handle_generic_init(&aio);
 	TRY {
 		socket_asend(self, buf, bufsize, msg_control, msg_flags, &aio);
-		if (mode & IO_NONBLOCK) {
+		if ((mode & IO_NONBLOCK) || (msg_flags & MSG_DONTWAIT) ||
+		    (ATOMIC_READ(self->sk_msgflags) & MSG_DONTWAIT)) {
 			aio_handle_cancel(&aio); /* Force AIO completion one way or another... */
 			COMPILER_READ_BARRIER();
 			if (aio.hg_status == AIO_COMPLETION_CANCEL) {
@@ -450,7 +460,8 @@ socket_send(struct socket *__restrict self,
 			}
 		}
 	} EXCEPT {
-		if (was_thrown(E_NET_SHUTDOWN) && !(msg_flags & MSG_NOSIGNAL))
+		if (was_thrown(E_NET_SHUTDOWN) && !(msg_flags & MSG_NOSIGNAL) &&
+		    !(ATOMIC_READ(self->sk_msgflags) & MSG_NOSIGNAL))
 			task_raisesignalprocess(THIS_TASK, SIGPIPE);
 		RETHROW();
 	}
@@ -475,7 +486,8 @@ socket_sendv(struct socket *__restrict self,
 	aio_handle_generic_init(&aio);
 	TRY {
 		socket_asendv(self, buf, bufsize, msg_control, msg_flags, &aio);
-		if (mode & IO_NONBLOCK) {
+		if ((mode & IO_NONBLOCK) || (msg_flags & MSG_DONTWAIT) ||
+		    (ATOMIC_READ(self->sk_msgflags) & MSG_DONTWAIT)) {
 			aio_handle_cancel(&aio); /* Force AIO completion one way or another... */
 			COMPILER_READ_BARRIER();
 			if (aio.hg_status == AIO_COMPLETION_CANCEL) {
@@ -493,7 +505,8 @@ socket_sendv(struct socket *__restrict self,
 			}
 		}
 	} EXCEPT {
-		if (was_thrown(E_NET_SHUTDOWN) && !(msg_flags & MSG_NOSIGNAL))
+		if (was_thrown(E_NET_SHUTDOWN) && !(msg_flags & MSG_NOSIGNAL) &&
+		    !(ATOMIC_READ(self->sk_msgflags) & MSG_NOSIGNAL))
 			task_raisesignalprocess(THIS_TASK, SIGPIPE);
 		RETHROW();
 	}
@@ -710,6 +723,7 @@ socket_asendto(struct socket *__restrict self,
                /*out*/ struct aio_handle *__restrict aio)
 		THROWS_INDIRECT(E_INVALID_ARGUMENT_UNEXPECTED_COMMAND, E_NET_MESSAGE_TOO_LONG,
 		                E_NET_CONNECTION_RESET, E_NET_SHUTDOWN) {
+	msg_flags |= ATOMIC_READ(self->sk_msgflags) & SOCKET_MSGFLAGS_ADDEND_SENDMASK;
 	if (self->sk_ops->so_sendto) {
 		(*self->sk_ops->so_sendto)(self, buf, bufsize, addr, addr_len,
 		                           msg_control, msg_flags, aio);
@@ -735,6 +749,7 @@ socket_asendtov(struct socket *__restrict self,
                 /*out*/ struct aio_handle *__restrict aio)
 		THROWS_INDIRECT(E_INVALID_ARGUMENT_UNEXPECTED_COMMAND, E_NET_MESSAGE_TOO_LONG,
 		                E_NET_CONNECTION_RESET, E_NET_SHUTDOWN) {
+	msg_flags |= ATOMIC_READ(self->sk_msgflags) & SOCKET_MSGFLAGS_ADDEND_SENDMASK;
 	if (self->sk_ops->so_sendtov) {
 		if (buf->ab_entc == 1 && self->sk_ops->so_sendto) {
 			(*self->sk_ops->so_sendto)(self, buf->ab_head.ab_base, bufsize, addr,
@@ -755,6 +770,9 @@ socket_asendtov(struct socket *__restrict self,
 
 
 /* Send helper functions for blocking and non-blocking operations.
+ * NOTE: Additionally, these functions accept `MSG_DONTWAIT' in
+ *       `msg_flags' as a bit-flag or'd with `mode & IO_NONBLOCK',
+ *       or'd with `self->sk_msgflags & MSG_DONTWAIT'
  * @return: * : The actual number of sent bytes (as returned by AIO) */
 PUBLIC NONNULL((1)) size_t KCALL
 socket_sendto(struct socket *__restrict self,
@@ -769,7 +787,8 @@ socket_sendto(struct socket *__restrict self,
 	aio_handle_generic_init(&aio);
 	TRY {
 		socket_asendto(self, buf, bufsize, addr, addr_len, msg_control, msg_flags, &aio);
-		if (mode & IO_NONBLOCK) {
+		if ((mode & IO_NONBLOCK) || (msg_flags & MSG_DONTWAIT) ||
+		    (ATOMIC_READ(self->sk_msgflags) & MSG_DONTWAIT)) {
 			aio_handle_cancel(&aio); /* Force AIO completion one way or another... */
 			COMPILER_READ_BARRIER();
 			if (aio.hg_status == AIO_COMPLETION_CANCEL) {
@@ -787,7 +806,8 @@ socket_sendto(struct socket *__restrict self,
 			}
 		}
 	} EXCEPT {
-		if (was_thrown(E_NET_SHUTDOWN) && !(msg_flags & MSG_NOSIGNAL))
+		if (was_thrown(E_NET_SHUTDOWN) && !(msg_flags & MSG_NOSIGNAL) &&
+		    !(ATOMIC_READ(self->sk_msgflags) & MSG_NOSIGNAL))
 			task_raisesignalprocess(THIS_TASK, SIGPIPE);
 		RETHROW();
 	}
@@ -813,7 +833,8 @@ socket_sendtov(struct socket *__restrict self,
 	aio_handle_generic_init(&aio);
 	TRY {
 		socket_asendtov(self, buf, bufsize, addr, addr_len, msg_control, msg_flags, &aio);
-		if (mode & IO_NONBLOCK) {
+		if ((mode & IO_NONBLOCK) || (msg_flags & MSG_DONTWAIT) ||
+		    (ATOMIC_READ(self->sk_msgflags) & MSG_DONTWAIT)) {
 			aio_handle_cancel(&aio); /* Force AIO completion one way or another... */
 			COMPILER_READ_BARRIER();
 			if (aio.hg_status == AIO_COMPLETION_CANCEL) {
@@ -831,7 +852,8 @@ socket_sendtov(struct socket *__restrict self,
 			}
 		}
 	} EXCEPT {
-		if (was_thrown(E_NET_SHUTDOWN) && !(msg_flags & MSG_NOSIGNAL))
+		if (was_thrown(E_NET_SHUTDOWN) && !(msg_flags & MSG_NOSIGNAL) &&
+		    !(ATOMIC_READ(self->sk_msgflags) & MSG_NOSIGNAL))
 			task_raisesignalprocess(THIS_TASK, SIGPIPE);
 		RETHROW();
 	}
@@ -1092,7 +1114,7 @@ again_want_peer_malloc:
  *                        if it needs to be accessed after returning. (i.e. AIO needs to use its
  *                        own copy of this structure)
  * @param: msg_flags:     Set of `MSG_ERRQUEUE | MSG_OOB | MSG_PEEK | MSG_TRUNC |
- *                                MSG_WAITALL | MSG_CMSG_COMPAT'
+ *                                MSG_WAITALL | MSG_CMSG_COMPAT | MSG_DONTWAIT'
  * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED: [...]
  * @throws: E_NET_CONNECTION_REFUSED:                                                   [...] */
 PUBLIC NONNULL((1, 7)) void KCALL
@@ -1101,6 +1123,7 @@ socket_arecv(struct socket *__restrict self,
              struct ancillary_rmessage const *msg_control, syscall_ulong_t msg_flags,
              /*out*/ struct aio_handle *__restrict aio)
 		THROWS_INDIRECT(E_INVALID_ARGUMENT_BAD_STATE, E_NET_CONNECTION_REFUSED) {
+	msg_flags |= ATOMIC_READ(self->sk_msgflags) & SOCKET_MSGFLAGS_ADDEND_RECVMASK;
 	if (self->sk_ops->so_recv) {
 		(*self->sk_ops->so_recv)(self, buf, bufsize, presult_flags,
 		                         msg_control, msg_flags, aio);
@@ -1124,6 +1147,7 @@ socket_arecvv(struct socket *__restrict self,
               struct ancillary_rmessage const *msg_control, syscall_ulong_t msg_flags,
               /*out*/ struct aio_handle *__restrict aio)
 		THROWS_INDIRECT(E_INVALID_ARGUMENT_BAD_STATE, E_NET_CONNECTION_REFUSED) {
+	msg_flags |= ATOMIC_READ(self->sk_msgflags) & SOCKET_MSGFLAGS_ADDEND_RECVMASK;
 	if (self->sk_ops->so_recvv) {
 		(*self->sk_ops->so_recvv)(self, buf, bufsize, presult_flags,
 		                          msg_control, msg_flags, aio);
@@ -1134,6 +1158,9 @@ socket_arecvv(struct socket *__restrict self,
 }
 
 /* Recv helper functions for blocking and non-blocking operations.
+ * NOTE: Additionally, these functions accept `MSG_DONTWAIT' in
+ *       `msg_flags' as a bit-flag or'd with `mode & IO_NONBLOCK',
+ *       or'd with `self->sk_msgflags & MSG_DONTWAIT'
  * @return: * : The actual number of received bytes (as returned by AIO) */
 PUBLIC NONNULL((1)) size_t KCALL
 socket_recv(struct socket *__restrict self,
@@ -1145,7 +1172,8 @@ socket_recv(struct socket *__restrict self,
 	struct aio_handle_generic aio;
 	aio_handle_generic_init(&aio);
 	socket_arecv(self, buf, bufsize, presult_flags, msg_control, msg_flags, &aio);
-	if (mode & IO_NONBLOCK) {
+	if ((mode & IO_NONBLOCK) || (msg_flags & MSG_DONTWAIT) ||
+	    (ATOMIC_READ(self->sk_msgflags) & MSG_DONTWAIT)) {
 		aio_handle_cancel(&aio); /* Force AIO completion one way or another... */
 		COMPILER_READ_BARRIER();
 		if (aio.hg_status == AIO_COMPLETION_CANCEL) {
@@ -1186,7 +1214,8 @@ socket_recvv(struct socket *__restrict self, struct aio_buffer const *__restrict
 	struct aio_handle_generic aio;
 	aio_handle_generic_init(&aio);
 	socket_arecvv(self, buf, bufsize, presult_flags, msg_control, msg_flags, &aio);
-	if (mode & IO_NONBLOCK) {
+	if ((mode & IO_NONBLOCK) || (msg_flags & MSG_DONTWAIT) ||
+	    (ATOMIC_READ(self->sk_msgflags) & MSG_DONTWAIT)) {
 		aio_handle_cancel(&aio); /* Force AIO completion one way or another... */
 		COMPILER_READ_BARRIER();
 		if (aio.hg_status == AIO_COMPLETION_CANCEL) {
@@ -1231,7 +1260,7 @@ socket_recvv(struct socket *__restrict self, struct aio_buffer const *__restrict
  *                        if it needs to be accessed after returning. (i.e. AIO needs to use its
  *                        own copy of this structure)
  * @param: msg_flags:     Set of `MSG_ERRQUEUE | MSG_OOB | MSG_PEEK | MSG_TRUNC |
- *                                MSG_WAITALL | MSG_CMSG_COMPAT'
+ *                                MSG_WAITALL | MSG_CMSG_COMPAT | MSG_DONTWAIT'
  * @throws: E_NET_CONNECTION_REFUSED: [...] */
 PUBLIC NONNULL((1, 10)) void KCALL
 socket_arecvfrom(struct socket *__restrict self,
@@ -1243,6 +1272,7 @@ socket_arecvfrom(struct socket *__restrict self,
                  syscall_ulong_t msg_flags,
                  /*out*/ struct aio_handle *__restrict aio)
 		THROWS_INDIRECT(E_NET_CONNECTION_REFUSED) {
+	msg_flags |= ATOMIC_READ(self->sk_msgflags) & SOCKET_MSGFLAGS_ADDEND_RECVMASK;
 	if (self->sk_ops->so_recvfrom) {
 		(*self->sk_ops->so_recvfrom)(self, buf, bufsize, addr, addr_len,
 		                             preq_addr_len, presult_flags,
@@ -1280,6 +1310,7 @@ socket_arecvfromv(struct socket *__restrict self,
                   syscall_ulong_t msg_flags,
                   /*out*/ struct aio_handle *__restrict aio)
 		THROWS_INDIRECT(E_NET_CONNECTION_REFUSED) {
+	msg_flags |= ATOMIC_READ(self->sk_msgflags) & SOCKET_MSGFLAGS_ADDEND_RECVMASK;
 	if (self->sk_ops->so_recvfromv) {
 		(*self->sk_ops->so_recvfromv)(self, buf, bufsize, addr, addr_len,
 		                              preq_addr_len, presult_flags,
@@ -1295,6 +1326,9 @@ socket_arecvfromv(struct socket *__restrict self,
 }
 
 /* Recv helper functions for blocking and non-blocking operations.
+ * NOTE: Additionally, these functions accept `MSG_DONTWAIT' in
+ *       `msg_flags' as a bit-flag or'd with `mode & IO_NONBLOCK',
+ *       or'd with `self->sk_msgflags & MSG_DONTWAIT'
  * @return: * : The actual number of received bytes (as returned by AIO)
  * @throws: E_NET_TIMEOUT: The given `timeout' has expired, and `IO_NODATAZERO' wasn't set.
  *                         When `IO_NODATAZERO' was set, then `0' will be returned instead. */
@@ -1313,7 +1347,8 @@ socket_recvfrom(struct socket *__restrict self,
 	aio_handle_generic_init(&aio);
 	socket_arecvfrom(self, buf, bufsize, addr, addr_len, preq_addr_len,
 	                 presult_flags, msg_control, msg_flags, &aio);
-	if (mode & IO_NONBLOCK) {
+	if ((mode & IO_NONBLOCK) || (msg_flags & MSG_DONTWAIT) ||
+	    (ATOMIC_READ(self->sk_msgflags) & MSG_DONTWAIT)) {
 		aio_handle_cancel(&aio); /* Force AIO completion one way or another... */
 		COMPILER_READ_BARRIER();
 		if (aio.hg_status == AIO_COMPLETION_CANCEL) {
@@ -1359,7 +1394,8 @@ socket_recvfromv(struct socket *__restrict self,
 	aio_handle_generic_init(&aio);
 	socket_arecvfromv(self, buf, bufsize, addr, addr_len, preq_addr_len,
 	                  presult_flags, msg_control, msg_flags, &aio);
-	if (mode & IO_NONBLOCK) {
+	if ((mode & IO_NONBLOCK) || (msg_flags & MSG_DONTWAIT) ||
+	    (ATOMIC_READ(self->sk_msgflags) & MSG_DONTWAIT)) {
 		aio_handle_cancel(&aio); /* Force AIO completion one way or another... */
 		COMPILER_READ_BARRIER();
 		if (aio.hg_status == AIO_COMPLETION_CANCEL) {
@@ -1406,8 +1442,9 @@ socket_listen(struct socket *__restrict self,
 }
 
 /* Accept incoming client (aka. peer) connection requests.
- * NOTE: This function blocks unless `IO_NONBLOCK' is specified.
- *       In the later case, you may poll() for clients via `POLLIN'
+ * NOTE: This function blocks unless `IO_NONBLOCK' is specified,
+ *       or the `MSG_DONTWAIT' bit has been set in `self->sk_msgflags'.
+ *       In this case, you may poll() for clients via `POLLIN'
  * @return: * :   A reference to a socket that has been connected to a peer.
  * @return: NULL: `IO_NONBLOCK' was given, and no client socket is available right now.
  * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING: [...]
@@ -1424,6 +1461,8 @@ socket_accept(struct socket *__restrict self,
 		      socket_getfamily(self), socket_gettype(self),
 		      socket_getprotocol(self));
 	}
+	if (ATOMIC_READ(self->sk_msgflags) & MSG_DONTWAIT)
+		mode |= IO_NONBLOCK;
 	return (*self->sk_ops->so_accept)(self, addr, addr_len, preq_addr_len, mode);
 }
 
@@ -1447,6 +1486,45 @@ socket_shutdown(struct socket *__restrict self,
 	}
 }
 
+
+
+/* Helper macro to return an int-value from getsockopt() */
+#define GETSOCKOPT_RETURN_INT(value)                           \
+	do {                                                       \
+		result = sizeof(int);                                  \
+		if (optlen >= sizeof(int)) {                           \
+			COMPILER_WRITE_BARRIER();                          \
+			UNALIGNED_SET((USER CHECKED unsigned int *)optval, \
+			              (value));                            \
+			COMPILER_WRITE_BARRIER();                          \
+		}                                                      \
+		goto done;                                             \
+	} __WHILE0
+
+PRIVATE NONNULL((1)) socklen_t KCALL
+socket_getsockopt_default(struct socket *__restrict self,
+                          syscall_ulong_t level, syscall_ulong_t optname,
+                          USER CHECKED void *optval,
+                          socklen_t optlen, iomode_t mode) {
+	socklen_t result = 0;
+	/* Provide default values for a couple of socket options. */
+	if (level == SOL_SOCKET) {
+		switch (optname) {
+
+		case SO_ACCEPTCONN:
+		case SO_DEBUG:
+			/* Default all of these to 0 */
+			GETSOCKOPT_RETURN_INT(0);
+			break;
+
+		default:
+			break;
+		}
+	}
+done:
+	return result;
+}
+
 /* Get the value of the named socket option and store it in `optval'
  * @return: * : The required buffer size.
  * @throws: E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT: [...] */
@@ -1457,13 +1535,79 @@ socket_getsockopt(struct socket *__restrict self,
                   socklen_t optlen, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_SOCKET_OPT) {
 	socklen_t result;
-	/* TODO: Builtin socket options. */
+	/* Builtin socket options. */
+	if (level == SOL_SOCKET) {
+		switch (optname) {
+
+		case SO_ERROR: {
+			errno_t value = EOK;
+			REF struct socket_connect_aio *ah;
+again_read_ncon:
+			ah = self->sk_ncon.get();
+			if (ah) {
+				bool xch_ok;
+				if (!aio_handle_generic_hascompleted(&ah->sca_aio)) {
+					/* Don't consume before the operation has completed! */
+					decref_unlikely(ah);
+				} else {
+					/* If the operation failed, return the exit error errno. */
+					if (ah->sca_aio.hg_status == AIO_COMPLETION_FAILURE) {
+						value = error_as_errno(&ah->sca_aio.hg_error);
+					} else if (ah->sca_aio.hg_status == AIO_COMPLETION_CANCEL) {
+						value = ECANCELED;
+					}
+					/* Consume the completion status. */
+					xch_ok = self->sk_ncon.cmpxch_inherit_new(ah, NULL);
+					decref_unlikely(ah);
+					if (!xch_ok)
+						goto again_read_ncon;
+				}
+			}
+			GETSOCKOPT_RETURN_INT(value);
+		}	break;
+
+		case SO_TYPE:
+			GETSOCKOPT_RETURN_INT(socket_gettype(self));
+			break;
+
+		case SO_PROTOCOL:
+			GETSOCKOPT_RETURN_INT(socket_getprotocol(self));
+			break;
+
+		case SO_DOMAIN:
+			GETSOCKOPT_RETURN_INT(socket_getfamily(self));
+			break;
+
+		case SO_NOSIGPIPE:
+			GETSOCKOPT_RETURN_INT(ATOMIC_READ(self->sk_msgflags) & MSG_NOSIGNAL ? 1 : 0);
+			break;
+
+		case SO_DONTROUTE:
+			GETSOCKOPT_RETURN_INT(ATOMIC_READ(self->sk_msgflags) & MSG_DONTROUTE ? 1 : 0);
+			break;
+
+		case SO_OOBINLINE:
+			GETSOCKOPT_RETURN_INT(ATOMIC_READ(self->sk_msgflags) & MSG_OOB ? 1 : 0);
+			break;
+
+		case SO_DONTWAIT:
+			GETSOCKOPT_RETURN_INT(ATOMIC_READ(self->sk_msgflags) & MSG_DONTWAIT ? 1 : 0);
+			break;
+
+		default:
+			break;
+		}
+	}
 	if (self->sk_ops->so_getsockopt) {
 		TRY {
 			result = (*self->sk_ops->so_getsockopt)(self, level, optname,
 			                                        optval, optlen, mode);
 		} EXCEPT {
 			if (was_thrown(E_INVALID_ARGUMENT_SOCKET_OPT)) {
+				result = socket_getsockopt_default(self, level, optname,
+				                                   optval, optlen, mode);
+				if (result != 0)
+					goto done;
 				if (!PERTASK_GET(this_exception_pointers[0]))
 					PERTASK_SET(this_exception_pointers[0], (uintptr_t)E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT);
 				if (!PERTASK_GET(this_exception_pointers[1]))
@@ -1480,6 +1624,10 @@ socket_getsockopt(struct socket *__restrict self,
 			RETHROW();
 		}
 	} else {
+		result = socket_getsockopt_default(self, level, optname,
+		                                   optval, optlen, mode);
+		if (result != 0)
+			goto done;
 		THROW(E_INVALID_ARGUMENT_SOCKET_OPT,
 		      E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT,
 		      level, optname,
@@ -1487,6 +1635,7 @@ socket_getsockopt(struct socket *__restrict self,
 		      socket_gettype(self),
 		      socket_getprotocol(self));
 	}
+done:
 	return result;
 }
 
@@ -1499,7 +1648,54 @@ socket_setsockopt(struct socket *__restrict self,
                   USER CHECKED void const *optval,
                   socklen_t optlen, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_SOCKET_OPT, E_BUFFER_TOO_SMALL) {
-	/* TODO: Builtin socket options. */
+	/* Builtin socket options. */
+	if (level == SOL_SOCKET) {
+		switch (optname) {
+
+		case SO_NOSIGPIPE:
+			if (optlen != sizeof(int))
+				THROW(E_BUFFER_TOO_SMALL, sizeof(int), optlen);
+			if (UNALIGNED_GET((USER CHECKED unsigned int *)optval)) {
+				ATOMIC_FETCHOR(self->sk_msgflags, MSG_NOSIGNAL);
+			} else {
+				ATOMIC_FETCHAND(self->sk_msgflags, ~MSG_NOSIGNAL);
+			}
+			return;
+
+		case SO_DONTROUTE:
+			if (optlen != sizeof(int))
+				THROW(E_BUFFER_TOO_SMALL, sizeof(int), optlen);
+			if (UNALIGNED_GET((USER CHECKED unsigned int *)optval)) {
+				ATOMIC_FETCHOR(self->sk_msgflags, MSG_DONTROUTE);
+			} else {
+				ATOMIC_FETCHAND(self->sk_msgflags, ~MSG_DONTROUTE);
+			}
+			return;
+
+		case SO_OOBINLINE:
+			if (optlen != sizeof(int))
+				THROW(E_BUFFER_TOO_SMALL, sizeof(int), optlen);
+			if (UNALIGNED_GET((USER CHECKED unsigned int *)optval)) {
+				ATOMIC_FETCHOR(self->sk_msgflags, MSG_OOB);
+			} else {
+				ATOMIC_FETCHAND(self->sk_msgflags, ~MSG_OOB);
+			}
+			break;
+
+		case SO_DONTWAIT:
+			if (optlen != sizeof(int))
+				THROW(E_BUFFER_TOO_SMALL, sizeof(int), optlen);
+			if (UNALIGNED_GET((USER CHECKED unsigned int *)optval)) {
+				ATOMIC_FETCHOR(self->sk_msgflags, MSG_DONTWAIT);
+			} else {
+				ATOMIC_FETCHAND(self->sk_msgflags, ~MSG_DONTWAIT);
+			}
+			break;
+
+		default:
+			break;
+		}
+	}
 	if (self->sk_ops->so_setsockopt) {
 		TRY {
 			(*self->sk_ops->so_setsockopt)(self, level, optname,

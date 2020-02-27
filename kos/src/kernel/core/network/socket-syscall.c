@@ -166,7 +166,6 @@ DEFINE_SYSCALL3(fd_t, accept, fd_t, sockfd,
 		                       addr_len, sock.h_mode);
 	}
 	if (!result) {
-		assert(sock.h_mode & IO_NONBLOCK);
 		/* NOTE: We don't throw an exception for this case! */
 		return -EWOULDBLOCK;
 	}
@@ -213,7 +212,6 @@ DEFINE_SYSCALL4(fd_t, accept4, fd_t, sockfd,
 		                       addr_len, sock.h_mode);
 	}
 	if (!result) {
-		assert(sock.h_mode & IO_NONBLOCK);
 		/* NOTE: We don't throw an exception for this case! */
 		return -EWOULDBLOCK;
 	}
@@ -386,8 +384,6 @@ DEFINE_SYSCALL4(ssize_t, send, fd_t, sockfd,
 	}
 	{
 		FINALLY_DECREF_UNLIKELY((struct socket *)sock.h_data);
-		if (msg_flags & MSG_DONTWAIT)
-			sock.h_mode |= IO_NONBLOCK;
 		result = socket_send((struct socket *)sock.h_data,
 		                     buf, bufsize, NULL, msg_flags,
 		                     sock.h_mode);
@@ -419,8 +415,6 @@ DEFINE_SYSCALL6(ssize_t, sendto, fd_t, sockfd,
 	}
 	{
 		FINALLY_DECREF_UNLIKELY((struct socket *)sock.h_data);
-		if (msg_flags & MSG_DONTWAIT)
-			sock.h_mode |= IO_NONBLOCK;
 		if (addr_len) {
 			result = socket_sendto((struct socket *)sock.h_data,
 			                       buf, bufsize, addr, addr_len,
@@ -466,8 +460,6 @@ DEFINE_SYSCALL3(ssize_t, sendmsg, fd_t, sockfd,
 		struct aio_buffer_entry *iov_vec;
 		struct ancillary_message control, *pcontrol = NULL;
 		FINALLY_DECREF_UNLIKELY((struct socket *)sock.h_data);
-		if (msg_flags & MSG_DONTWAIT)
-			sock.h_mode |= IO_NONBLOCK;
 		if (msg.msg_controllen) {
 			/* Load message control buffers. */
 			pcontrol              = &control;
@@ -566,8 +558,6 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, sendmsg, fd_t, sockfd,
 		struct aio_buffer_entry *iov_vec;
 		struct ancillary_message control, *pcontrol = NULL;
 		FINALLY_DECREF_UNLIKELY((struct socket *)sock.h_data);
-		if (msg_flags & MSG_DONTWAIT)
-			sock.h_mode |= IO_NONBLOCK;
 		if (msg.msg_controllen) {
 			/* Load message control buffers. */
 			pcontrol                  = &control;
@@ -657,8 +647,6 @@ DEFINE_SYSCALL4(ssize_t, sendmmsg, fd_t, sockfd,
 		      HANDLE_TYPEKIND_GENERIC, subkind);
 	}
 	FINALLY_DECREF_UNLIKELY((struct socket *)sock.h_data);
-	if (msg_flags & MSG_DONTWAIT)
-		sock.h_mode |= IO_NONBLOCK;
 	for (i = 0; i < vlen; ++i) {
 		size_t result;
 		struct msghdr msg;
@@ -776,8 +764,6 @@ DEFINE_COMPAT_SYSCALL4(ssize_t, sendmmsg, fd_t, sockfd,
 		      HANDLE_TYPEKIND_GENERIC, subkind);
 	}
 	FINALLY_DECREF_UNLIKELY((struct socket *)sock.h_data);
-	if (msg_flags & MSG_DONTWAIT)
-		sock.h_mode |= IO_NONBLOCK;
 	msg_flags |= MSG_CMSG_COMPAT; /* Enable compatibility mode */
 	for (i = 0; i < vlen; ++i) {
 		size_t result;
@@ -904,8 +890,6 @@ DEFINE_SYSCALL4(ssize_t, recv, fd_t, sockfd,
 	}
 	{
 		FINALLY_DECREF_UNLIKELY((struct socket *)sock.h_data);
-		if (msg_flags & MSG_DONTWAIT)
-			sock.h_mode |= IO_NONBLOCK;
 		result = socket_recv((struct socket *)sock.h_data,
 		                     buf, bufsize, NULL, msg_flags,
 		                     sock.h_mode);
@@ -945,8 +929,6 @@ DEFINE_SYSCALL6(ssize_t, recvfrom, fd_t, sockfd,
 	}
 	{
 		FINALLY_DECREF_UNLIKELY((struct socket *)sock.h_data);
-		if (msg_flags & MSG_DONTWAIT)
-			sock.h_mode |= IO_NONBLOCK;
 		if (avail_addr_len) {
 			result = socket_recvfrom((struct socket *)sock.h_data,
 			                         buf, bufsize, addr, avail_addr_len, addr_len,
@@ -992,8 +974,6 @@ DEFINE_SYSCALL3(ssize_t, recvmsg, fd_t, sockfd,
 		struct aio_buffer_entry *iov_vec;
 		struct ancillary_rmessage control, *pcontrol = NULL;
 		FINALLY_DECREF_UNLIKELY((struct socket *)sock.h_data);
-		if (msg_flags & MSG_DONTWAIT)
-			sock.h_mode |= IO_NONBLOCK;
 		if (msg.msg_controllen) {
 			/* Load message control buffers. */
 			pcontrol               = &control;
@@ -1098,8 +1078,6 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, recvmsg, fd_t, sockfd,
 		struct aio_buffer_entry *iov_vec;
 		struct ancillary_rmessage control, *pcontrol = NULL;
 		FINALLY_DECREF_UNLIKELY((struct socket *)sock.h_data);
-		if (msg_flags & MSG_DONTWAIT)
-			sock.h_mode |= IO_NONBLOCK;
 		if (msg.msg_controllen) {
 			/* Load message control buffers. */
 			pcontrol                      = &control;
@@ -1197,8 +1175,6 @@ DEFINE_SYSCALL5(ssize_t, recvmmsg, fd_t, sockfd,
 		      HANDLE_TYPEKIND_GENERIC, subkind);
 	}
 	FINALLY_DECREF_UNLIKELY((struct socket *)sock.h_data);
-	if (msg_flags & MSG_DONTWAIT)
-		sock.h_mode |= IO_NONBLOCK;
 	if (timeout) {
 		validate_readable(timeout, sizeof(*timeout));
 		/* Copy the timeout into a kernel-space buffer.
@@ -1334,8 +1310,6 @@ compat_recvmmsg(fd_t sockfd,
 		      HANDLE_TYPEKIND_GENERIC, subkind);
 	}
 	FINALLY_DECREF_UNLIKELY((struct socket *)sock.h_data);
-	if (msg_flags & MSG_DONTWAIT)
-		sock.h_mode |= IO_NONBLOCK;
 	msg_flags |= MSG_CMSG_COMPAT;
 	for (i = 0; i < vlen; ++i) {
 		size_t result;

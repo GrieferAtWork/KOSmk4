@@ -485,6 +485,16 @@ FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL socket_connect_aio_destroy)(struct socket_connect_aio *__restrict self);
 DEFINE_REFCOUNT_FUNCTIONS(struct socket_connect_aio, sca_refcnt, socket_connect_aio_destroy)
 
+/* Mask of the message flags addend described by `sk_msgflags' for `send()' operation */
+#define SOCKET_MSGFLAGS_ADDEND_SENDMASK           \
+	(MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT | \
+	 MSG_EOR | MSG_MORE | MSG_NOSIGNAL)
+
+/* Mask of the message flags addend described by `sk_msgflags' for `recg()' operation */
+#define SOCKET_MSGFLAGS_ADDEND_RECVMASK                                  \
+	(MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK | MSG_DONTWAIT | MSG_ERRQUEUE | \
+	 MSG_OOB | MSG_PEEK | MSG_TRUNC | MSG_WAITALL)
+
 struct socket {
 	/* NOTE: Sockets must support weak referencing so-as to allow AIO
 	 *       handles for `connect()' to be references from within the
@@ -500,6 +510,7 @@ struct socket {
 	                                                       * This one's used for `socket_connect()' when called was a non-blocking operation.
 	                                                       * NOTE: Socket implementation should not touch this field!
 	                                                       * HINT: `POLLOUT' is indicated when this is `NULL', or when contained AIO has completed! */
+	WEAK uintptr_t                         sk_msgflags;   /* Additional message flags or'd to `send()' and `recv()' requests (but see `SOCKET_MSGFLAGS_ADDEND_(SEND|RECV)MASK' */
 	/* Socket-specific data goes here... */
 };
 
@@ -653,6 +664,9 @@ socket_asendv(struct socket *__restrict self,
 		                E_NET_CONNECTION_RESET, E_NET_SHUTDOWN);
 
 /* Send helper functions for blocking and non-blocking operations.
+ * NOTE: Additionally, these functions accept `MSG_DONTWAIT' in
+ *       `msg_flags' as a bit-flag or'd with `mode & IO_NONBLOCK',
+ *       or'd with `self->sk_sndflags & MSG_DONTWAIT'
  * @return: * : The actual number of sent bytes (as returned by AIO) */
 FUNDEF NONNULL((1)) size_t KCALL
 socket_send(struct socket *__restrict self,
@@ -703,6 +717,9 @@ socket_asendtov(struct socket *__restrict self,
 		                E_NET_CONNECTION_RESET, E_NET_SHUTDOWN);
 
 /* Send helper functions for blocking and non-blocking operations.
+ * NOTE: Additionally, these functions accept `MSG_DONTWAIT' in
+ *       `msg_flags' as a bit-flag or'd with `mode & IO_NONBLOCK',
+ *       or'd with `self->sk_sndflags & MSG_DONTWAIT'
  * @return: * : The actual number of sent bytes (as returned by AIO) */
 FUNDEF NONNULL((1)) size_t KCALL
 socket_sendto(struct socket *__restrict self,
@@ -752,6 +769,9 @@ socket_arecvv(struct socket *__restrict self,
 		THROWS_INDIRECT(E_INVALID_ARGUMENT_BAD_STATE, E_NET_CONNECTION_REFUSED);
 
 /* Recv helper functions for blocking and non-blocking operations.
+ * NOTE: Additionally, these functions accept `MSG_DONTWAIT' in
+ *       `msg_flags' as a bit-flag or'd with `mode & IO_NONBLOCK',
+ *       or'd with `self->sk_sndflags & MSG_DONTWAIT'
  * @return: * : The actual number of received bytes (as returned by AIO)
  * @throws: E_NET_TIMEOUT: The given `timeout' has expired, and `IO_NODATAZERO' wasn't set.
  *                         When `IO_NODATAZERO' was set, then `0' will be returned instead. */
@@ -806,6 +826,9 @@ socket_arecvfromv(struct socket *__restrict self,
 		THROWS_INDIRECT(E_NET_CONNECTION_REFUSED);
 
 /* Recv helper functions for blocking and non-blocking operations.
+ * NOTE: Additionally, these functions accept `MSG_DONTWAIT' in
+ *       `msg_flags' as a bit-flag or'd with `mode & IO_NONBLOCK',
+ *       or'd with `self->sk_sndflags & MSG_DONTWAIT'
  * @return: * : The actual number of received bytes (as returned by AIO)
  * @throws: E_NET_TIMEOUT: The given `timeout' has expired, and `IO_NODATAZERO' wasn't set.
  *                         When `IO_NODATAZERO' was set, then `0' will be returned instead. */
@@ -839,8 +862,9 @@ socket_listen(struct socket *__restrict self,
 		THROWS(E_NET_ADDRESS_IN_USE, E_INVALID_HANDLE_NET_OPERATION);
 
 /* Accept incoming client (aka. peer) connection requests.
- * NOTE: This function blocks unless `IO_NONBLOCK' is specified.
- *       In the later case, you may poll() for clients via `POLLIN'
+ * NOTE: This function blocks unless `IO_NONBLOCK' is specified,
+ *       or the `MSG_DONTWAIT' bit has been set in `self->sk_msgflags'.
+ *       In this case, you may poll() for clients via `POLLIN'
  * @return: * :   A reference to a socket that has been connected to a peer.
  * @return: NULL: `IO_NONBLOCK' was given, and no client socket is available right now.
  * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING: [...]
