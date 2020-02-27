@@ -295,6 +295,7 @@ struct vm_futex;
 struct vm_futexfd;
 struct driver_section;
 struct socket;
+struct uaio_controller;
 
 
 
@@ -922,6 +923,31 @@ INTDEF NONNULL((1)) void KCALL handle_socket_datasync(struct socket *__restrict 
 INTDEF NONNULL((1)) void KCALL handle_socket_stat(struct socket *__restrict self, USER CHECKED struct stat *result) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_socket_poll(struct socket *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_socket_hop(struct socket *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+
+/* Handle operators for `HANDLE_TYPE_UAIO' (`struct uaio_controller') */
+INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_uaio_tryincref)(struct uaio_controller *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_uaio_incref)(struct uaio_controller *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_uaio_decref)(struct uaio_controller *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_uaio_refcnt)(struct uaio_controller const *__restrict self);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_uaio_read(struct uaio_controller *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_uaio_write(struct uaio_controller *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_uaio_pread(struct uaio_controller *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_uaio_pwrite(struct uaio_controller *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_uaio_readv(struct uaio_controller *__restrict self, struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_uaio_writev(struct uaio_controller *__restrict self, struct aio_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_uaio_preadv(struct uaio_controller *__restrict self, struct aio_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_uaio_pwritev(struct uaio_controller *__restrict self, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_uaio_readdir(struct uaio_controller *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_uaio_seek(struct uaio_controller *__restrict self, off_t offset, unsigned int whence) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_uaio_ioctl(struct uaio_controller *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_uaio_truncate(struct uaio_controller *__restrict self, pos_t new_size) THROWS(...);
+INTDEF WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3)) REF struct vm_datablock *KCALL handle_uaio_mmap(struct uaio_controller *__restrict self, pos_t *__restrict pminoffset, pos_t *__restrict pnumbytes) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_uaio_allocate(struct uaio_controller *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_uaio_sync(struct uaio_controller *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_uaio_datasync(struct uaio_controller *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_uaio_stat(struct uaio_controller *__restrict self, USER CHECKED struct stat *result) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_uaio_poll(struct uaio_controller *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_uaio_hop(struct uaio_controller *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 
 #endif /* __CC__ */
 #endif /* CONFIG_BUILDING_KERNEL_CORE */

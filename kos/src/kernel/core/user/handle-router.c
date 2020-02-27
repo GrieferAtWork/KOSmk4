@@ -322,7 +322,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FUTEX]                  = */ "futex",
 		/* [HANDLE_TYPE_FUTEXFD]                = */ "futexfd",
 		/* [HANDLE_TYPE_DRIVER_SECTION]         = */ "driver_section",
-		/* [HANDLE_TYPE_SOCKET]                 = */ "socket"
+		/* [HANDLE_TYPE_SOCKET]                 = */ "socket",
+		/* [HANDLE_TYPE_UAIO]                   = */ "uaio"
 	},
 	/* .h_tryincref = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (__BOOL (FCALL *)(void *__restrict))&handle_undefined_tryincref,
@@ -350,7 +351,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FUTEX]                  = */ (__BOOL (FCALL *)(void *__restrict))&handle_futex_tryincref,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (__BOOL (FCALL *)(void *__restrict))&handle_futexfd_tryincref,
 		/* [HANDLE_TYPE_DRIVER_SECTION]         = */ (__BOOL (FCALL *)(void *__restrict))&handle_driver_section_tryincref,
-		/* [HANDLE_TYPE_SOCKET]                 = */ (__BOOL (FCALL *)(void *__restrict))&handle_socket_tryincref
+		/* [HANDLE_TYPE_SOCKET]                 = */ (__BOOL (FCALL *)(void *__restrict))&handle_socket_tryincref,
+		/* [HANDLE_TYPE_UAIO]                   = */ (__BOOL (FCALL *)(void *__restrict))&handle_uaio_tryincref
 	},
 	/* .h_incref = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (void (FCALL *)(void *__restrict))&handle_undefined_incref,
@@ -378,7 +380,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FUTEX]                  = */ (void (FCALL *)(void *__restrict))&handle_futex_incref,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (void (FCALL *)(void *__restrict))&handle_futexfd_incref,
 		/* [HANDLE_TYPE_DRIVER_SECTION]         = */ (void (FCALL *)(void *__restrict))&handle_driver_section_incref,
-		/* [HANDLE_TYPE_SOCKET]                 = */ (void (FCALL *)(void *__restrict))&handle_socket_incref
+		/* [HANDLE_TYPE_SOCKET]                 = */ (void (FCALL *)(void *__restrict))&handle_socket_incref,
+		/* [HANDLE_TYPE_UAIO]                   = */ (void (FCALL *)(void *__restrict))&handle_uaio_incref
 	},
 	/* .h_decref = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (void (FCALL *)(void *__restrict))&handle_undefined_decref,
@@ -406,7 +409,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FUTEX]                  = */ (void (FCALL *)(void *__restrict))&handle_futex_decref,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (void (FCALL *)(void *__restrict))&handle_futexfd_decref,
 		/* [HANDLE_TYPE_DRIVER_SECTION]         = */ (void (FCALL *)(void *__restrict))&handle_driver_section_decref,
-		/* [HANDLE_TYPE_SOCKET]                 = */ (void (FCALL *)(void *__restrict))&handle_socket_decref
+		/* [HANDLE_TYPE_SOCKET]                 = */ (void (FCALL *)(void *__restrict))&handle_socket_decref,
+		/* [HANDLE_TYPE_UAIO]                   = */ (void (FCALL *)(void *__restrict))&handle_uaio_decref
 	},
 	/* .h_refcnt = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_undefined_refcnt,
@@ -434,7 +438,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FUTEX]                  = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_futex_refcnt,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_futexfd_refcnt,
 		/* [HANDLE_TYPE_DRIVER_SECTION]         = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_driver_section_refcnt,
-		/* [HANDLE_TYPE_SOCKET]                 = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_socket_refcnt
+		/* [HANDLE_TYPE_SOCKET]                 = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_socket_refcnt,
+		/* [HANDLE_TYPE_UAIO]                   = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_uaio_refcnt
 	},
 	/* .h_read = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_undefined_read,
@@ -462,7 +467,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FUTEX]                  = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_futex_read,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_futexfd_read,
 		/* [HANDLE_TYPE_DRIVER_SECTION]         = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_driver_section_read,
-		/* [HANDLE_TYPE_SOCKET]                 = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_socket_read
+		/* [HANDLE_TYPE_SOCKET]                 = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_socket_read,
+		/* [HANDLE_TYPE_UAIO]                   = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_uaio_read
 	},
 	/* .h_write = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_undefined_write,
@@ -490,7 +496,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FUTEX]                  = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_futex_write,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_futexfd_write,
 		/* [HANDLE_TYPE_DRIVER_SECTION]         = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_driver_section_write,
-		/* [HANDLE_TYPE_SOCKET]                 = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_socket_write
+		/* [HANDLE_TYPE_SOCKET]                 = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_socket_write,
+		/* [HANDLE_TYPE_UAIO]                   = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_uaio_write
 	},
 	/* .h_pread = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_undefined_pread,
@@ -518,7 +525,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FUTEX]                  = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_futex_pread,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_futexfd_pread,
 		/* [HANDLE_TYPE_DRIVER_SECTION]         = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_driver_section_pread,
-		/* [HANDLE_TYPE_SOCKET]                 = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_socket_pread
+		/* [HANDLE_TYPE_SOCKET]                 = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_socket_pread,
+		/* [HANDLE_TYPE_UAIO]                   = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_uaio_pread
 	},
 	/* .h_pwrite = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_undefined_pwrite,
@@ -546,7 +554,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FUTEX]                  = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_futex_pwrite,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_futexfd_pwrite,
 		/* [HANDLE_TYPE_DRIVER_SECTION]         = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_driver_section_pwrite,
-		/* [HANDLE_TYPE_SOCKET]                 = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_socket_pwrite
+		/* [HANDLE_TYPE_SOCKET]                 = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_socket_pwrite,
+		/* [HANDLE_TYPE_UAIO]                   = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_uaio_pwrite
 	},
 	/* .h_readv = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, iomode_t))&handle_undefined_readv,
@@ -574,7 +583,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FUTEX]                  = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, iomode_t))&handle_futex_readv,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, iomode_t))&handle_futexfd_readv,
 		/* [HANDLE_TYPE_DRIVER_SECTION]         = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, iomode_t))&handle_driver_section_readv,
-		/* [HANDLE_TYPE_SOCKET]                 = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, iomode_t))&handle_socket_readv
+		/* [HANDLE_TYPE_SOCKET]                 = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, iomode_t))&handle_socket_readv,
+		/* [HANDLE_TYPE_UAIO]                   = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, iomode_t))&handle_uaio_readv
 	},
 	/* .h_writev = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, iomode_t))&handle_undefined_writev,
@@ -602,7 +612,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FUTEX]                  = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, iomode_t))&handle_futex_writev,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, iomode_t))&handle_futexfd_writev,
 		/* [HANDLE_TYPE_DRIVER_SECTION]         = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, iomode_t))&handle_driver_section_writev,
-		/* [HANDLE_TYPE_SOCKET]                 = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, iomode_t))&handle_socket_writev
+		/* [HANDLE_TYPE_SOCKET]                 = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, iomode_t))&handle_socket_writev,
+		/* [HANDLE_TYPE_UAIO]                   = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, iomode_t))&handle_uaio_writev
 	},
 	/* .h_preadv = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, pos_t, iomode_t))&handle_undefined_preadv,
@@ -630,7 +641,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FUTEX]                  = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, pos_t, iomode_t))&handle_futex_preadv,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, pos_t, iomode_t))&handle_futexfd_preadv,
 		/* [HANDLE_TYPE_DRIVER_SECTION]         = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, pos_t, iomode_t))&handle_driver_section_preadv,
-		/* [HANDLE_TYPE_SOCKET]                 = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, pos_t, iomode_t))&handle_socket_preadv
+		/* [HANDLE_TYPE_SOCKET]                 = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, pos_t, iomode_t))&handle_socket_preadv,
+		/* [HANDLE_TYPE_UAIO]                   = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, pos_t, iomode_t))&handle_uaio_preadv
 	},
 	/* .h_pwritev = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, pos_t, iomode_t))&handle_undefined_pwritev,
@@ -658,7 +670,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FUTEX]                  = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, pos_t, iomode_t))&handle_futex_pwritev,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, pos_t, iomode_t))&handle_futexfd_pwritev,
 		/* [HANDLE_TYPE_DRIVER_SECTION]         = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, pos_t, iomode_t))&handle_driver_section_pwritev,
-		/* [HANDLE_TYPE_SOCKET]                 = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, pos_t, iomode_t))&handle_socket_pwritev
+		/* [HANDLE_TYPE_SOCKET]                 = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, pos_t, iomode_t))&handle_socket_pwritev,
+		/* [HANDLE_TYPE_UAIO]                   = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, pos_t, iomode_t))&handle_uaio_pwritev
 	},
 	/* .h_readdir = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_undefined_readdir,
@@ -686,7 +699,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FUTEX]                  = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_futex_readdir,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_futexfd_readdir,
 		/* [HANDLE_TYPE_DRIVER_SECTION]         = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_driver_section_readdir,
-		/* [HANDLE_TYPE_SOCKET]                 = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_socket_readdir
+		/* [HANDLE_TYPE_SOCKET]                 = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_socket_readdir,
+		/* [HANDLE_TYPE_UAIO]                   = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_uaio_readdir
 	},
 	/* .h_seek = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_undefined_seek,
@@ -714,7 +728,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FUTEX]                  = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_futex_seek,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_futexfd_seek,
 		/* [HANDLE_TYPE_DRIVER_SECTION]         = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_driver_section_seek,
-		/* [HANDLE_TYPE_SOCKET]                 = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_socket_seek
+		/* [HANDLE_TYPE_SOCKET]                 = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_socket_seek,
+		/* [HANDLE_TYPE_UAIO]                   = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_uaio_seek
 	},
 	/* .h_ioctl = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_undefined_ioctl,
@@ -742,7 +757,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FUTEX]                  = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_futex_ioctl,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_futexfd_ioctl,
 		/* [HANDLE_TYPE_DRIVER_SECTION]         = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_driver_section_ioctl,
-		/* [HANDLE_TYPE_SOCKET]                 = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_socket_ioctl
+		/* [HANDLE_TYPE_SOCKET]                 = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_socket_ioctl,
+		/* [HANDLE_TYPE_UAIO]                   = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_uaio_ioctl
 	},
 	/* .h_truncate = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (void (KCALL *)(void *__restrict, pos_t))&handle_undefined_truncate,
@@ -770,7 +786,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FUTEX]                  = */ (void (KCALL *)(void *__restrict, pos_t))&handle_futex_truncate,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (void (KCALL *)(void *__restrict, pos_t))&handle_futexfd_truncate,
 		/* [HANDLE_TYPE_DRIVER_SECTION]         = */ (void (KCALL *)(void *__restrict, pos_t))&handle_driver_section_truncate,
-		/* [HANDLE_TYPE_SOCKET]                 = */ (void (KCALL *)(void *__restrict, pos_t))&handle_socket_truncate
+		/* [HANDLE_TYPE_SOCKET]                 = */ (void (KCALL *)(void *__restrict, pos_t))&handle_socket_truncate,
+		/* [HANDLE_TYPE_UAIO]                   = */ (void (KCALL *)(void *__restrict, pos_t))&handle_uaio_truncate
 	},
 	/* .h_mmap = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict))&handle_undefined_mmap,
@@ -798,7 +815,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FUTEX]                  = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict))&handle_futex_mmap,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict))&handle_futexfd_mmap,
 		/* [HANDLE_TYPE_DRIVER_SECTION]         = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict))&handle_driver_section_mmap,
-		/* [HANDLE_TYPE_SOCKET]                 = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict))&handle_socket_mmap
+		/* [HANDLE_TYPE_SOCKET]                 = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict))&handle_socket_mmap,
+		/* [HANDLE_TYPE_UAIO]                   = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict))&handle_uaio_mmap
 	},
 	/* .h_allocate = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_undefined_allocate,
@@ -826,7 +844,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FUTEX]                  = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_futex_allocate,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_futexfd_allocate,
 		/* [HANDLE_TYPE_DRIVER_SECTION]         = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_driver_section_allocate,
-		/* [HANDLE_TYPE_SOCKET]                 = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_socket_allocate
+		/* [HANDLE_TYPE_SOCKET]                 = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_socket_allocate,
+		/* [HANDLE_TYPE_UAIO]                   = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_uaio_allocate
 	},
 	/* .h_sync = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (void (KCALL *)(void *__restrict))&handle_undefined_sync,
@@ -854,7 +873,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FUTEX]                  = */ (void (KCALL *)(void *__restrict))&handle_futex_sync,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (void (KCALL *)(void *__restrict))&handle_futexfd_sync,
 		/* [HANDLE_TYPE_DRIVER_SECTION]         = */ (void (KCALL *)(void *__restrict))&handle_driver_section_sync,
-		/* [HANDLE_TYPE_SOCKET]                 = */ (void (KCALL *)(void *__restrict))&handle_socket_sync
+		/* [HANDLE_TYPE_SOCKET]                 = */ (void (KCALL *)(void *__restrict))&handle_socket_sync,
+		/* [HANDLE_TYPE_UAIO]                   = */ (void (KCALL *)(void *__restrict))&handle_uaio_sync
 	},
 	/* .h_datasync = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (void (KCALL *)(void *__restrict))&handle_undefined_datasync,
@@ -882,7 +902,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FUTEX]                  = */ (void (KCALL *)(void *__restrict))&handle_futex_datasync,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (void (KCALL *)(void *__restrict))&handle_futexfd_datasync,
 		/* [HANDLE_TYPE_DRIVER_SECTION]         = */ (void (KCALL *)(void *__restrict))&handle_driver_section_datasync,
-		/* [HANDLE_TYPE_SOCKET]                 = */ (void (KCALL *)(void *__restrict))&handle_socket_datasync
+		/* [HANDLE_TYPE_SOCKET]                 = */ (void (KCALL *)(void *__restrict))&handle_socket_datasync,
+		/* [HANDLE_TYPE_UAIO]                   = */ (void (KCALL *)(void *__restrict))&handle_uaio_datasync
 	},
 	/* .h_stat = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_undefined_stat,
@@ -910,7 +931,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FUTEX]                  = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_futex_stat,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_futexfd_stat,
 		/* [HANDLE_TYPE_DRIVER_SECTION]         = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_driver_section_stat,
-		/* [HANDLE_TYPE_SOCKET]                 = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_socket_stat
+		/* [HANDLE_TYPE_SOCKET]                 = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_socket_stat,
+		/* [HANDLE_TYPE_UAIO]                   = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_uaio_stat
 	},
 	/* .h_poll = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_undefined_poll,
@@ -938,7 +960,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FUTEX]                  = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_futex_poll,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_futexfd_poll,
 		/* [HANDLE_TYPE_DRIVER_SECTION]         = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_driver_section_poll,
-		/* [HANDLE_TYPE_SOCKET]                 = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_socket_poll
+		/* [HANDLE_TYPE_SOCKET]                 = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_socket_poll,
+		/* [HANDLE_TYPE_UAIO]                   = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_uaio_poll
 	},
 	/* .h_hop = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_undefined_hop,
@@ -966,7 +989,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FUTEX]                  = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_futex_hop,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_futexfd_hop,
 		/* [HANDLE_TYPE_DRIVER_SECTION]         = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_driver_section_hop,
-		/* [HANDLE_TYPE_SOCKET]                 = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_socket_hop
+		/* [HANDLE_TYPE_SOCKET]                 = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_socket_hop,
+		/* [HANDLE_TYPE_UAIO]                   = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_uaio_hop
 	},
 };
 
@@ -1596,6 +1620,31 @@ DEFINE_INTERN_WEAK_ALIAS(handle_socket_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_socket_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_socket_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_socket_hop, handle_undefined_hop);
+
+/* Weakly define operators for `HANDLE_TYPE_UAIO' (`struct uaio_controller') */
+DEFINE_INTERN_WEAK_ALIAS(handle_uaio_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_uaio_incref, handle_undefined_incref);
+DEFINE_INTERN_WEAK_ALIAS(handle_uaio_decref, handle_undefined_decref);
+DEFINE_INTERN_WEAK_ALIAS(handle_uaio_refcnt, handle_undefined_refcnt);
+DEFINE_INTERN_WEAK_ALIAS(handle_uaio_read, handle_undefined_read);
+DEFINE_INTERN_WEAK_ALIAS(handle_uaio_write, handle_undefined_write);
+DEFINE_INTERN_WEAK_ALIAS(handle_uaio_pread, handle_undefined_pread);
+DEFINE_INTERN_WEAK_ALIAS(handle_uaio_pwrite, handle_undefined_pwrite);
+DEFINE_INTERN_WEAK_ALIAS(handle_uaio_readv, handle_undefined_readv);
+DEFINE_INTERN_WEAK_ALIAS(handle_uaio_writev, handle_undefined_writev);
+DEFINE_INTERN_WEAK_ALIAS(handle_uaio_preadv, handle_undefined_preadv);
+DEFINE_INTERN_WEAK_ALIAS(handle_uaio_pwritev, handle_undefined_pwritev);
+DEFINE_INTERN_WEAK_ALIAS(handle_uaio_readdir, handle_undefined_readdir);
+DEFINE_INTERN_WEAK_ALIAS(handle_uaio_seek, handle_undefined_seek);
+DEFINE_INTERN_WEAK_ALIAS(handle_uaio_ioctl, handle_undefined_ioctl);
+DEFINE_INTERN_WEAK_ALIAS(handle_uaio_truncate, handle_undefined_truncate);
+DEFINE_INTERN_WEAK_ALIAS(handle_uaio_mmap, handle_undefined_mmap);
+DEFINE_INTERN_WEAK_ALIAS(handle_uaio_allocate, handle_undefined_allocate);
+DEFINE_INTERN_WEAK_ALIAS(handle_uaio_sync, handle_undefined_sync);
+DEFINE_INTERN_WEAK_ALIAS(handle_uaio_datasync, handle_undefined_datasync);
+DEFINE_INTERN_WEAK_ALIAS(handle_uaio_stat, handle_undefined_stat);
+DEFINE_INTERN_WEAK_ALIAS(handle_uaio_poll, handle_undefined_poll);
+DEFINE_INTERN_WEAK_ALIAS(handle_uaio_hop, handle_undefined_hop);
 //[[[end]]]
 
 
