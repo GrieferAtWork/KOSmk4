@@ -17,41 +17,27 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _LIBM_FABS_H
-#define _LIBM_FABS_H 1
+#ifndef _I386_KOS_LIBM_ASM_FABS_H
+#define _I386_KOS_LIBM_ASM_FABS_H 1
 
-#include <__crt.h>
+#include <__stdinc.h>
 
-#ifndef __NO_FPU
-#include <hybrid/typecore.h>
+#include <libm/asm/builtin.h>
 
-#include <bits/types.h>
-
+#if !defined(__NO_FPU) && defined(__COMPILER_HAVE_GCC_ASM)
 #include <libm/fdlibm.h>
-#include <libm/asm/fabs.h>
 
 #ifdef __CC__
 __DECL_BEGIN
 
 #ifdef __IEEE754_FLOAT_TYPE__
 #ifndef __ieee754_fabsf
-/*
- * ====================================================
- * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
- *
- * Developed at SunPro, a Sun Microsystems, Inc. business.
- * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice 
- * is preserved.
- * ====================================================
- */
-
+#define __ieee754_fabsf __ieee754_fabsf
 __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 (__LIBCCALL __ieee754_fabsf)(__IEEE754_FLOAT_TYPE__ __x) {
-	__uint32_t __ix;
-	__LIBM_GET_FLOAT_WORD(__ix, __x);
-	__LIBM_SET_FLOAT_WORD(__x, __ix & 0x7fffffff);
-	return __x;
+	__IEEE754_FLOAT_TYPE__ __res;
+	__asm__("fabs" : "=t" (__res) : "0" (__x));
+	return __res;
 }
 #endif /* !__ieee754_fabsf */
 #endif /* __IEEE754_FLOAT_TYPE__ */
@@ -59,23 +45,12 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 
 #ifdef __IEEE754_DOUBLE_TYPE__
 #ifndef __ieee754_fabs
-/*
- * ====================================================
- * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
- *
- * Developed at SunPro, a Sun Microsystems, Inc. business.
- * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice 
- * is preserved.
- * ====================================================
- */
-
+#define __ieee754_fabs __ieee754_fabs
 __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 (__LIBCCALL __ieee754_fabs)(__IEEE754_DOUBLE_TYPE__ __x) {
-	__uint32_t __high;
-	__LIBM_GET_HIGH_WORD(__high, __x);
-	__LIBM_SET_HIGH_WORD(__x, __high & 0x7fffffff);
-	return __x;
+	__IEEE754_DOUBLE_TYPE__ __res;
+	__asm__("fabs" : "=t" (__res) : "0" (__x));
+	return __res;
 }
 #endif /* !__ieee754_fabs */
 #endif /* __IEEE754_DOUBLE_TYPE__ */
@@ -83,34 +58,18 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 
 #ifdef __IEEE854_LONG_DOUBLE_TYPE__
 #ifndef __ieee854_fabsl
-/*
- * ====================================================
- * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
- *
- * Developed at SunPro, a Sun Microsystems, Inc. business.
- * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice
- * is preserved.
- * ====================================================
- */
-
+#define __ieee854_fabsl __ieee854_fabsl
 __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
 (__LIBCCALL __ieee854_fabsl)(__IEEE854_LONG_DOUBLE_TYPE__ __x) {
-#ifdef __mc68000__
-	__libm_ieee_long_double_shape_type *__sh_u = (__libm_ieee_long_double_shape_type *)&__x;
-	__sh_u->__l_parts.__l_sign_exponent &= 0x7fff;
-#else /* __mc68000__ */
-	__uint32_t __exp;
-	__LIBM_GET_LDOUBLE_EXP(__exp, __x);
-	__LIBM_SET_LDOUBLE_EXP(__x, __exp & 0x7fff);
-#endif /* !__mc68000__ */
-	return __x;
+	__IEEE854_LONG_DOUBLE_TYPE__ __res;
+	__asm__("fabs" : "=t" (__res) : "0" (__x));
+	return __res;
 }
 #endif /* !__ieee854_fabsl */
 #endif /* __IEEE854_LONG_DOUBLE_TYPE__ */
 
 __DECL_END
 #endif /* __CC__ */
-#endif /* !__NO_FPU */
+#endif /* !__NO_FPU && __COMPILER_HAVE_GCC_ASM */
 
-#endif /* !_LIBM_FABS_H */
+#endif /* !_I386_KOS_LIBM_ASM_FABS_H */
