@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5938ba3b */
+/* HASH CRC-32:0x3647c77c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4676,11 +4676,16 @@
 #define __CRT_ATTR_CONST___iswcsymf 1
 #define __CRT_ATTR_CONST___libc_current_sigrtmax 1
 #define __CRT_ATTR_CONST___libc_current_sigrtmin 1
+#define __CRT_ATTR_CONST___llrint 1
 #define __CRT_ATTR_CONST___llrintf 1
+#define __CRT_ATTR_CONST___llrintl 1
 #define __CRT_ATTR_CONST___llround 1
 #define __CRT_ATTR_CONST___llroundf 1
 #define __CRT_ATTR_CONST___llroundl 1
 #define __CRT_ATTR_CONST___locale_ctype_ptr 1
+#define __CRT_ATTR_CONST___lrint 1
+#define __CRT_ATTR_CONST___lrintf 1
+#define __CRT_ATTR_CONST___lrintl 1
 #define __CRT_ATTR_CONST___lround 1
 #define __CRT_ATTR_CONST___lroundf 1
 #define __CRT_ATTR_CONST___lroundl 1
@@ -4843,16 +4848,24 @@
 #define __CRT_ATTR_CONST_ldiv 1
 #define __CRT_ATTR_CONST_llabs 1
 #define __CRT_ATTR_CONST_lldiv 1
+#define __CRT_ATTR_CONST_llrint 1
 #define __CRT_ATTR_CONST_llrintf 1
+#define __CRT_ATTR_CONST_llrintl 1
 #define __CRT_ATTR_CONST_llround 1
 #define __CRT_ATTR_CONST_llroundf 1
 #define __CRT_ATTR_CONST_llroundl 1
+#define __CRT_ATTR_CONST_lrint 1
+#define __CRT_ATTR_CONST_lrintf 1
+#define __CRT_ATTR_CONST_lrintl 1
 #define __CRT_ATTR_CONST_lround 1
 #define __CRT_ATTR_CONST_lroundf 1
 #define __CRT_ATTR_CONST_lroundl 1
 #define __CRT_ATTR_CONST_nan 1
 #define __CRT_ATTR_CONST_nanf 1
 #define __CRT_ATTR_CONST_nanl 1
+#define __CRT_ATTR_CONST_nearbyint 1
+#define __CRT_ATTR_CONST_nearbyintf 1
+#define __CRT_ATTR_CONST_nearbyintl 1
 #define __CRT_ATTR_CONST_nextafter 1
 #define __CRT_ATTR_CONST_nextafterf 1
 #define __CRT_ATTR_CONST_nextafterl 1

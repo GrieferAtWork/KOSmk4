@@ -1386,7 +1386,7 @@ scalbln:(double x, long int n) -> double {
 
 @@Round X to integral value in floating-point format using current
 @@rounding direction, but do not raise inexact exception
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__nearbyint)][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__nearbyint)][crtbuiltin]
 nearbyint:(double x) -> double = rint;
 
 @@Round X to nearest integral value, rounding halfway cases away from zero
@@ -1436,11 +1436,11 @@ trunc:(double x) -> double {
 @@Compute remainder of X and Y and put in *QUO a value with sign
 @@of x/y and magnitude congruent `mod 2^n' to the magnitude of
 @@the integral quotient x/y, with n >= 3
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__remquo)][crtbuiltin]
+[std][ATTR_WUNUSED][nothrow][alias(__remquo)][crtbuiltin]
 remquo:(double x, double y, int *pquo) -> double; /* TODO */
 
 @@Round X to nearest integral value according to current rounding direction
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__lrint)]
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__lrint)]
 [dependency_include(<hybrid/typecore.h>)][crtbuiltin]
 [dependency_include(<libm/lrint.h>)][userimpl]
 [if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias(llrint)]
@@ -1499,7 +1499,7 @@ fma:(double x, double y, double z) -> double {
 
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGLONG
 @@Round X to nearest integral value according to current rounding direction
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__llrint)]
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__llrint)]
 [dependency_include(<hybrid/typecore.h>)][crtbuiltin]
 [dependency_include(<libm/lrint.h>)][userimpl]
 [alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__, lrint)]
@@ -1592,7 +1592,7 @@ scalblnf:(float x, long int n) -> float {
 #endif /* !... */
 }
 
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow]
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow]
 [alias(__nearbyintf)][doc_alias(nearbyint)][crtbuiltin]
 nearbyintf:(float x) -> float = rintf;
 
@@ -1636,10 +1636,10 @@ truncf:(float x) -> float {
 #endif /* !... */
 }
 
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__remquof)][crtbuiltin]
+[std][ATTR_WUNUSED][nothrow][alias(__remquof)][crtbuiltin]
 remquof:(float x, float y, int *pquo) -> float %{auto_block(math)}
 
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__lrintf)]
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__lrintf)]
 [dependency_include(<hybrid/typecore.h>)][crtbuiltin]
 [dependency_include(<libm/lrint.h>)][userimpl][doc_alias(lrint)]
 [if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias(llrintf)]
@@ -1760,7 +1760,7 @@ scalblnl:(__LONGDOUBLE x, long int n) -> __LONGDOUBLE {
 #endif /* !... */
 }
 
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow]
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow]
 [alias(__nearbyintl)][doc_alias(nearbyint)][crtbuiltin]
 nearbyintl:(__LONGDOUBLE x) -> __LONGDOUBLE = rintl;
 
@@ -1805,10 +1805,10 @@ truncl:(__LONGDOUBLE x) -> __LONGDOUBLE {
 #endif /* !... */
 }
 
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__remquol)][crtbuiltin]
+[std][ATTR_WUNUSED][nothrow][alias(__remquol)][crtbuiltin]
 remquol:(__LONGDOUBLE x, __LONGDOUBLE y, int *pquo) -> __LONGDOUBLE %{auto_block(math)}
 
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__lrintl)]
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__lrintl)]
 [dependency_include(<hybrid/typecore.h>)][crtbuiltin]
 [dependency_include(<libm/lrint.h>)][userimpl][doc_alias(lrint)]
 [if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias(llrintl)]
@@ -1854,7 +1854,7 @@ fminl:(__LONGDOUBLE x, __LONGDOUBLE y) -> __LONGDOUBLE %{copy(%auto, math)}
 fmal:(__LONGDOUBLE x, __LONGDOUBLE y, __LONGDOUBLE z) -> __LONGDOUBLE %{copy(%auto, math)}
 
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGLONG
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__llrintl)]
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__llrintl)]
 [dependency_include(<hybrid/typecore.h>)][crtbuiltin]
 [dependency_include(<libm/lrint.h>)][userimpl][doc_alias(llrint)]
 [alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__, lrintl)]

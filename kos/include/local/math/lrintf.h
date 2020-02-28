@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1242248a */
+/* HASH CRC-32:0x7d632764 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,7 +49,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__localdep_rintf,(float 
 
 __NAMESPACE_LOCAL_BEGIN
 /* Round X to nearest integral value according to current rounding direction */
-__LOCAL_LIBC(lrintf) __ATTR_WUNUSED long int
+__LOCAL_LIBC(lrintf) __ATTR_CONST __ATTR_WUNUSED long int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(lrintf))(float __x) {
 #line 1647 "kos/src/libc/magic/math.c"
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__

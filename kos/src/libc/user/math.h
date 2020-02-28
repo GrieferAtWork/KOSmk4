@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5b0aa665 */
+/* HASH CRC-32:0xc3baf41e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -265,13 +265,13 @@ INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_trunc)(double x);
  * the integral quotient x/y, with n >= 3 */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_remquo)(double x, double y, int *pquo);
 /* Round X to nearest integral value according to current rounding direction */
-INTDEF WUNUSED long int NOTHROW(LIBCCALL libc_lrint)(double x);
+INTDEF ATTR_CONST WUNUSED long int NOTHROW(LIBCCALL libc_lrint)(double x);
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 INTDEF ATTR_CONST WUNUSED long int NOTHROW(LIBCCALL libc_lround)(double x);
 /* Return positive difference between X and Y */
 INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_fdim)(double x, double y);
 /* Round X to nearest integral value according to current rounding direction */
-INTDEF WUNUSED __LONGLONG NOTHROW(LIBCCALL libc_llrint)(double x);
+INTDEF ATTR_CONST WUNUSED __LONGLONG NOTHROW(LIBCCALL libc_llrint)(double x);
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 INTDEF ATTR_CONST WUNUSED __LONGLONG NOTHROW(LIBCCALL libc_llround)(double x);
 INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_nexttowardf)(float x, __LONGDOUBLE y);
@@ -288,7 +288,7 @@ INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_truncf)(float x);
  * the integral quotient x/y, with n >= 3 */
 INTDEF WUNUSED float NOTHROW(LIBCCALL libc_remquof)(float x, float y, int *pquo);
 /* Round X to nearest integral value according to current rounding direction */
-INTDEF WUNUSED long int NOTHROW(LIBCCALL libc_lrintf)(float x);
+INTDEF ATTR_CONST WUNUSED long int NOTHROW(LIBCCALL libc_lrintf)(float x);
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 INTDEF ATTR_CONST WUNUSED long int NOTHROW(LIBCCALL libc_lroundf)(float x);
 /* Return positive difference between X and Y */
@@ -310,13 +310,13 @@ INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_truncl)(__LONGDOUBL
  * the integral quotient x/y, with n >= 3 */
 INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_remquol)(__LONGDOUBLE x, __LONGDOUBLE y, int *pquo);
 /* Round X to nearest integral value according to current rounding direction */
-INTDEF WUNUSED long int NOTHROW(LIBCCALL libc_lrintl)(__LONGDOUBLE x);
+INTDEF ATTR_CONST WUNUSED long int NOTHROW(LIBCCALL libc_lrintl)(__LONGDOUBLE x);
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 INTDEF ATTR_CONST WUNUSED long int NOTHROW(LIBCCALL libc_lroundl)(__LONGDOUBLE x);
 /* Return positive difference between X and Y */
 INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_fdiml)(__LONGDOUBLE x, __LONGDOUBLE y);
 /* Round X to nearest integral value according to current rounding direction */
-INTDEF WUNUSED __LONGLONG NOTHROW(LIBCCALL libc_llrintl)(__LONGDOUBLE x);
+INTDEF ATTR_CONST WUNUSED __LONGLONG NOTHROW(LIBCCALL libc_llrintl)(__LONGDOUBLE x);
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 INTDEF ATTR_CONST WUNUSED __LONGLONG NOTHROW(LIBCCALL libc_llroundl)(__LONGDOUBLE x);
 /* Cosine and sine of X */

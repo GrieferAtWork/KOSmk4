@@ -1738,9 +1738,9 @@ NOTHROW(LIBCCALL libc_remquo)(double x,
 }
 /*[[[end:remquo]]]*/
 
-/*[[[head:lrint,hash:CRC-32=0xbea5c52b]]]*/
+/*[[[head:lrint,hash:CRC-32=0x6f35dd90]]]*/
 /* Round X to nearest integral value according to current rounding direction */
-INTERN WUNUSED
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.lrint") long int
 NOTHROW(LIBCCALL libc_lrint)(double x)
 /*[[[body:lrint]]]*/
@@ -1760,12 +1760,12 @@ NOTHROW(LIBCCALL libc_lrint)(double x)
 
 
 
-/*[[[head:llrint,hash:CRC-32=0x266d3ef8]]]*/
+/*[[[head:llrint,hash:CRC-32=0x7e9ce7df]]]*/
 /* Round X to nearest integral value according to current rounding direction */
 #if __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
 DEFINE_INTERN_ALIAS(libc_llrint, libc_lrint);
 #else
-INTERN WUNUSED
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.llrint") __LONGLONG
 NOTHROW(LIBCCALL libc_llrint)(double x)
 /*[[[body:llrint]]]*/
@@ -1863,9 +1863,9 @@ NOTHROW(LIBCCALL libc_remquof)(float x,
 }
 /*[[[end:remquof]]]*/
 
-/*[[[head:lrintf,hash:CRC-32=0x37fe5ef4]]]*/
+/*[[[head:lrintf,hash:CRC-32=0x6b9ca4e8]]]*/
 /* Round X to nearest integral value according to current rounding direction */
-INTERN WUNUSED
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.lrintf") long int
 NOTHROW(LIBCCALL libc_lrintf)(float x)
 /*[[[body:lrintf]]]*/
@@ -1970,9 +1970,9 @@ NOTHROW(LIBCCALL libc_remquol)(__LONGDOUBLE x,
 }
 /*[[[end:remquol]]]*/
 
-/*[[[head:lrintl,hash:CRC-32=0x378519c0]]]*/
+/*[[[head:lrintl,hash:CRC-32=0x41db4132]]]*/
 /* Round X to nearest integral value according to current rounding direction */
-INTERN WUNUSED
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.lrintl") long int
 NOTHROW(LIBCCALL libc_lrintl)(__LONGDOUBLE x)
 /*[[[body:lrintl]]]*/
@@ -1992,12 +1992,12 @@ NOTHROW(LIBCCALL libc_lrintl)(__LONGDOUBLE x)
 
 
 
-/*[[[head:llrintl,hash:CRC-32=0xf87261b2]]]*/
+/*[[[head:llrintl,hash:CRC-32=0x9148b49d]]]*/
 /* Round X to nearest integral value according to current rounding direction */
 #if __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
 DEFINE_INTERN_ALIAS(libc_llrintl, libc_lrintl);
 #else
-INTERN WUNUSED
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.llrintl") __LONGLONG
 NOTHROW(LIBCCALL libc_llrintl)(__LONGDOUBLE x)
 /*[[[body:llrintl]]]*/
