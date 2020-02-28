@@ -208,6 +208,12 @@ PRIVATE struct atomic_rwlock change_vm_lock = ATOMIC_RWLOCK_INIT;
  * returning. */
 PUBLIC void KCALL task_setvm(struct vm *__restrict newvm)
 		THROWS(E_WOULDBLOCK) {
+	/* TODO: This function needs to become NOBLOCK+NOTHROW!
+	 *       There are certain places where kernel threads need
+	 *       to access memory from specific user-space VMs and
+	 *       need the ability to NOEXCEPT-switch back to their
+	 *       original VM if something goes wrong while accessing
+	 *       user-space. */
 	pflag_t was;
 	REF struct vm *oldvm;
 	struct task *me = THIS_TASK;

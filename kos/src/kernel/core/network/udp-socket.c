@@ -227,7 +227,16 @@ udp_sendtov(struct socket *__restrict self,
 
 	me  = (struct udp_socket *)self;
 	in  = udp_verify_sockaddr(addr, addr_len);
+	/* TODO: From what I understand, network cards should actually be
+	 *       selected based on `in->sin_addr.s_addr' (i.e. the target's
+	 *       IP address). As such, there needs to a routing table for
+	 *       mapping IP addresses to NIC devices, rather than having one
+	 *       default adapter for _everything_.
+	 *       However, a way to have one particular socket be bound to
+	 *       a specific device should still exist, so-as to allow for
+	 *       use of `(get|set)sockopt(SOL_SOCKET, SO_BINDTODEVICE)'! */
 	dev = udp_getnic(me);
+
 	/* Automatically bind to some local port if not done already! */
 	if unlikely(!(me->us_state & UDP_SOCKET_STATE_F_BOUND))
 		udp_autobind(me);

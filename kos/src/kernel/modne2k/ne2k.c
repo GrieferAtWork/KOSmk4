@@ -47,7 +47,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#if 1
+#if 0
 #define NE2K_DEBUG(...) printk(KERN_DEBUG __VA_ARGS__)
 #else
 #define NE2K_DEBUG(...) (void)0
