@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd5cd4625 */
+/* HASH CRC-32:0x55b20688 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,32 +19,48 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_llrintl_defined
-#if defined(__CRT_HAVE_llrint) || defined(__CRT_HAVE___llrint)
 #define __local_llrintl_defined 1
-/* Dependency: "llrint" */
-#ifndef ____localdep_llrint_defined
-#define ____localdep_llrint_defined 1
-#if __has_builtin(__builtin_llrint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_llrint)
-/* Round X to nearest integral value according to current rounding direction */
-__CEIREDIRECT(__ATTR_WUNUSED,__LONGLONG,__NOTHROW,__localdep_llrint,(double __x),llrint,{ return __builtin_llrint(__x); })
-#elif defined(__CRT_HAVE_llrint)
-/* Round X to nearest integral value according to current rounding direction */
-__CREDIRECT(__ATTR_WUNUSED,__LONGLONG,__NOTHROW,__localdep_llrint,(double __x),llrint,(__x))
-#elif defined(__CRT_HAVE___llrint)
-/* Round X to nearest integral value according to current rounding direction */
-__CREDIRECT(__ATTR_WUNUSED,__LONGLONG,__NOTHROW,__localdep_llrint,(double __x),__llrint,(__x))
-#else /* LIBC: llrint */
-#undef ____localdep_llrint_defined
-#endif /* llrint... */
-#endif /* !____localdep_llrint_defined */
+#include <hybrid/typecore.h>
+
+#include <libm/lrint.h>
+/* Dependency: "rintl" from "math" */
+#ifndef ____localdep_rintl_defined
+#define ____localdep_rintl_defined 1
+#if __has_builtin(__builtin_rintl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_rintl)
+/* Return the integer nearest X in the direction of the prevailing rounding mode */
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_rintl,(__LONGDOUBLE __x),rintl,{ return __builtin_rintl(__x); })
+#elif defined(__CRT_HAVE_rintl)
+/* Return the integer nearest X in the direction of the prevailing rounding mode */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_rintl,(__LONGDOUBLE __x),rintl,(__x))
+#elif defined(__CRT_HAVE___rintl)
+/* Return the integer nearest X in the direction of the prevailing rounding mode */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_rintl,(__LONGDOUBLE __x),__rintl,(__x))
+#else /* LIBC: rintl */
+#include <ieee754.h>
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_rint) || defined(__CRT_HAVE___rint)
+#include <local/math/rintl.h>
+/* Return the integer nearest X in the direction of the prevailing rounding mode */
+#define __localdep_rintl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rintl))
+#else /* CUSTOM: rintl */
+#undef ____localdep_rintl_defined
+#endif /* rintl... */
+#endif /* rintl... */
+#endif /* !____localdep_rintl_defined */
 
 __NAMESPACE_LOCAL_BEGIN
 /* Round X to nearest integral value according to current rounding direction */
 __LOCAL_LIBC(llrintl) __ATTR_WUNUSED __LONGLONG
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(llrintl))(__LONGDOUBLE __x) {
-#line 1794 "kos/src/libc/magic/math.c"
-	return (__LONGLONG)__localdep_llrint((double)__x);
+#line 1862 "kos/src/libc/magic/math.c"
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return __ieee854_llrintl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
+	return __ieee854_llrintf((__IEEE754_FLOAT_TYPE__)__x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+	return __ieee854_llrint((__IEEE754_DOUBLE_TYPE__)__x);
+#else /* ... */
+	return (__LONGLONG)__localdep_rintl(__x);
+#endif /* !... */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_llrint || __CRT_HAVE___llrint */
 #endif /* !__local_llrintl_defined */

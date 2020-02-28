@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x665aac70 */
+/* HASH CRC-32:0x610618ca */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -118,6 +118,8 @@ INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_fmal)(__LONGDOUBLE 
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
 #define libc___trunc libc_trunc
+/* Round X to nearest integral value according to current rounding direction */
+#define libc___lrint libc_lrint
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 #define libc___lround libc_lround
 /* Return positive difference between X and Y */
@@ -132,6 +134,8 @@ INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_fmal)(__LONGDOUBLE 
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
 #define libc___truncf libc_truncf
+/* Round X to nearest integral value according to current rounding direction */
+#define libc___lrintf libc_lrintf
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 #define libc___lroundf libc_lroundf
 /* Return positive difference between X and Y */
@@ -142,14 +146,20 @@ INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_fmal)(__LONGDOUBLE 
 #define libc___fminf libc_fminf
 /* Multiply-add function computed as a ternary operation */
 #define libc___fmaf libc_fmaf
+/* Round X to nearest integral value according to current rounding direction */
+#define libc___llrint libc_llrint
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 #define libc___llround libc_llround
+/* Round X to nearest integral value according to current rounding direction */
+#define libc___llrintf libc_llrintf
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 #define libc___llroundf libc_llroundf
 #define libc___roundl libc_roundl
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
 #define libc___truncl libc_truncl
+/* Round X to nearest integral value according to current rounding direction */
+#define libc___lrintl libc_lrintl
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 #define libc___lroundl libc_lroundl
 /* Return positive difference between X and Y */
@@ -160,6 +170,8 @@ INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_fmal)(__LONGDOUBLE 
 #define libc___fminl libc_fminl
 /* Multiply-add function computed as a ternary operation */
 #define libc___fmal libc_fmal
+/* Round X to nearest integral value according to current rounding direction */
+#define libc___llrintl libc_llrintl
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 #define libc___llroundl libc_llroundl
 #endif /* !__KERNEL__ */

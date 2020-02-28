@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1242248a */
+/* HASH CRC-32:0xfa77350 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,49 +18,49 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_lrintf_defined
-#define __local_lrintf_defined 1
+#ifndef __local_llrint_defined
+#define __local_llrint_defined 1
 #include <hybrid/typecore.h>
 
 #include <libm/lrint.h>
-/* Dependency: "rintf" from "math" */
-#ifndef ____localdep_rintf_defined
-#define ____localdep_rintf_defined 1
-#if __has_builtin(__builtin_rintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_rintf)
+/* Dependency: "rint" from "math" */
+#ifndef ____localdep_rint_defined
+#define ____localdep_rint_defined 1
+#if __has_builtin(__builtin_rint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_rint)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
-__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__localdep_rintf,(float __x),rintf,{ return __builtin_rintf(__x); })
-#elif defined(__CRT_HAVE_rintf)
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_rint,(double __x),rint,{ return __builtin_rint(__x); })
+#elif defined(__CRT_HAVE_rint)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__localdep_rintf,(float __x),rintf,(__x))
-#elif defined(__CRT_HAVE___rintf)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_rint,(double __x),rint,(__x))
+#elif defined(__CRT_HAVE___rint)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__localdep_rintf,(float __x),__rintf,(__x))
-#else /* LIBC: rintf */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_rint,(double __x),__rint,(__x))
+#else /* LIBC: rint */
 #include <ieee754.h>
-#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_rint) || defined(__CRT_HAVE___rint)
-#include <local/math/rintf.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <local/math/rint.h>
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
-#define __localdep_rintf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rintf))
-#else /* CUSTOM: rintf */
-#undef ____localdep_rintf_defined
-#endif /* rintf... */
-#endif /* rintf... */
-#endif /* !____localdep_rintf_defined */
+#define __localdep_rint (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rint))
+#else /* CUSTOM: rint */
+#undef ____localdep_rint_defined
+#endif /* rint... */
+#endif /* rint... */
+#endif /* !____localdep_rint_defined */
 
 __NAMESPACE_LOCAL_BEGIN
 /* Round X to nearest integral value according to current rounding direction */
-__LOCAL_LIBC(lrintf) __ATTR_WUNUSED long int
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(lrintf))(float __x) {
-#line 1647 "kos/src/libc/magic/math.c"
-#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
-	return __ieee754_lrintf((__IEEE754_FLOAT_TYPE__)__x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
-	return __ieee754_lrint((__IEEE754_DOUBLE_TYPE__)__x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
-	return __ieee754_lrintl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
+__LOCAL_LIBC(llrint) __ATTR_WUNUSED __LONGLONG
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(llrint))(double __x) {
+#line 1507 "kos/src/libc/magic/math.c"
+#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+	return __ieee754_llrint((__IEEE754_DOUBLE_TYPE__)__x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+	return __ieee754_llrintf((__IEEE754_FLOAT_TYPE__)__x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+	return __ieee754_llrintl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
 #else /* ... */
-	return (long int)__localdep_rintf(__x);
+	return (__LONGLONG)__localdep_rint(__x);
 #endif /* !... */
 }
 __NAMESPACE_LOCAL_END
-#endif /* !__local_lrintf_defined */
+#endif /* !__local_llrint_defined */

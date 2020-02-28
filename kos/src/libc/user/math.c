@@ -39,6 +39,7 @@
 #include <libm/isnan.h>
 #include <libm/issignaling.h>
 #include <libm/ldexp.h>
+#include <libm/lrint.h>
 #include <libm/lround.h>
 #include <libm/modf.h>
 #include <libm/nextafter.h>
@@ -1743,29 +1744,43 @@ INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.lrint") long int
 NOTHROW(LIBCCALL libc_lrint)(double x)
 /*[[[body:lrint]]]*/
-{
-	(void)x;
-	CRT_UNIMPLEMENTED("lrint"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+/*AUTO*/{
+#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+	return __ieee754_lrint((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+	return __ieee754_lrintf((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+	return __ieee754_lrintl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#else /* ... */
+	return (long int)libc_rint(x);
+#endif /* !... */
 }
 /*[[[end:lrint]]]*/
 
 
 
 
-/*[[[head:llrint,hash:CRC-32=0xf0268cce]]]*/
+/*[[[head:llrint,hash:CRC-32=0x266d3ef8]]]*/
 /* Round X to nearest integral value according to current rounding direction */
+#if __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
+DEFINE_INTERN_ALIAS(libc_llrint, libc_lrint);
+#else
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.llrint") __LONGLONG
 NOTHROW(LIBCCALL libc_llrint)(double x)
 /*[[[body:llrint]]]*/
-{
-	(void)x;
-	CRT_UNIMPLEMENTED("llrint"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+/*AUTO*/{
+#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+	return __ieee754_llrint((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+	return __ieee754_llrintf((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+	return __ieee754_llrintl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#else /* ... */
+	return (__LONGLONG)libc_rint(x);
+#endif /* !... */
 }
+#endif /* MAGIC:alias */
 /*[[[end:llrint]]]*/
 
 
@@ -1855,22 +1870,42 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.lrintf") long int
 NOTHROW(LIBCCALL libc_lrintf)(float x)
 /*[[[body:lrintf]]]*/
 /*AUTO*/{
-	return (long int)libc_lrint((double)x);
+#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+	return __ieee754_lrintf((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+	return __ieee754_lrint((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	return __ieee754_lrintl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#else /* ... */
+	return (long int)libc_rintf(x);
+#endif /* !... */
 }
 /*[[[end:lrintf]]]*/
 
 
 
 
-/*[[[head:llrintf,hash:CRC-32=0x47e863e4]]]*/
+/*[[[head:llrintf,hash:CRC-32=0x66fa9122]]]*/
 /* Round X to nearest integral value according to current rounding direction */
+#if __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
+DEFINE_INTERN_ALIAS(libc_llrintf, libc_lrintf);
+#else
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.llrintf") __LONGLONG
 NOTHROW(LIBCCALL libc_llrintf)(float x)
 /*[[[body:llrintf]]]*/
 /*AUTO*/{
-	return (__LONGLONG)libc_llrint((double)x);
+#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+	return __ieee754_llrintf((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+	return __ieee754_llrint((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	return __ieee754_llrintl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#else /* ... */
+	return (__LONGLONG)libc_rintf(x);
+#endif /* !... */
 }
+#endif /* MAGIC:alias */
 /*[[[end:llrintf]]]*/
 
 
@@ -1942,22 +1977,42 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.lrintl") long int
 NOTHROW(LIBCCALL libc_lrintl)(__LONGDOUBLE x)
 /*[[[body:lrintl]]]*/
 /*AUTO*/{
-	return (long int)libc_lrint((double)x);
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return __ieee854_lrintl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
+	return __ieee854_lrintf((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+	return __ieee854_lrint((__IEEE754_DOUBLE_TYPE__)x);
+#else /* ... */
+	return (long int)libc_rintl(x);
+#endif /* !... */
 }
 /*[[[end:lrintl]]]*/
 
 
 
 
-/*[[[head:llrintl,hash:CRC-32=0xb289c04d]]]*/
+/*[[[head:llrintl,hash:CRC-32=0xf87261b2]]]*/
 /* Round X to nearest integral value according to current rounding direction */
+#if __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
+DEFINE_INTERN_ALIAS(libc_llrintl, libc_lrintl);
+#else
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.llrintl") __LONGLONG
 NOTHROW(LIBCCALL libc_llrintl)(__LONGDOUBLE x)
 /*[[[body:llrintl]]]*/
 /*AUTO*/{
-	return (__LONGLONG)libc_llrint((double)x);
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return __ieee854_llrintl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
+	return __ieee854_llrintf((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+	return __ieee854_llrint((__IEEE754_DOUBLE_TYPE__)x);
+#else /* ... */
+	return (__LONGLONG)libc_rintl(x);
+#endif /* !... */
 }
+#endif /* MAGIC:alias */
 /*[[[end:llrintl]]]*/
 
 

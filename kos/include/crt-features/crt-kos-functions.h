@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x62932455 */
+/* HASH CRC-32:0xd34bd061 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1374,9 +1374,9 @@ __CRT_FUNCTION(listxattr,0,(),3,(char const *,path,char *,listbuf,size_t,listbuf
 __CRT_FUNCTION(llabs,2,(__SIZEOF_LONG_LONG__ == __SIZEOF_INT__,abs,__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__,labs),1,(__LONGLONG,x),__LONGLONG)
 __CRT_FUNCTION(lldiv,2,(__SIZEOF_LONG_LONG__ == __SIZEOF_INT__,div,__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__,ldiv),2,(__LONGLONG,numer,__LONGLONG,denom),lldiv_t)
 __CRT_FUNCTION(llistxattr,0,(),3,(char const *,path,char *,listbuf,size_t,listbufsize),ssize_t)
-__CRT_FUNCTION(llrint,0,(),1,(double,x),__LONGLONG)
-__CRT_FUNCTION(llrintf,0,(),1,(float,x),__LONGLONG)
-__CRT_FUNCTION(llrintl,0,(),1,(__LONGDOUBLE,x),__LONGLONG)
+__CRT_FUNCTION(llrint,1,(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__,lrint),1,(double,x),__LONGLONG)
+__CRT_FUNCTION(llrintf,1,(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__,lrintf),1,(float,x),__LONGLONG)
+__CRT_FUNCTION(llrintl,1,(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__,lrintl),1,(__LONGDOUBLE,x),__LONGLONG)
 __CRT_FUNCTION(llround,1,(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__,lround),1,(double,x),__LONGLONG)
 __CRT_FUNCTION(llroundf,1,(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__,lroundf),1,(float,x),__LONGLONG)
 __CRT_FUNCTION(llroundl,1,(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__,lroundl),1,(__LONGDOUBLE,x),__LONGLONG)

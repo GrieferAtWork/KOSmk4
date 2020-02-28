@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x166a2f41 */
+/* HASH CRC-32:0x1df5f4c2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -311,7 +311,6 @@
 #define __CRT_STUB_lcong48_r 1
 #define __CRT_STUB_lgamma 1
 #define __CRT_STUB_lgamma_r 1
-#define __CRT_STUB_llrint 1
 #define __CRT_STUB_localeconv 1
 #define __CRT_STUB_lockf64 1
 #define __CRT_STUB_log 1
@@ -325,7 +324,6 @@
 #define __CRT_STUB_logwtmp 1
 #define __CRT_STUB_lrand48 1
 #define __CRT_STUB_lrand48_r 1
-#define __CRT_STUB_lrint 1
 #define __CRT_STUB_makecontext 1
 #define __CRT_STUB_mbsnrtowcs 1
 #define __CRT_STUB_memfd_create 1
