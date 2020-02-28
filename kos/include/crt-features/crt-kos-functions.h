@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x61a71265 */
+/* HASH CRC-32:0x62932455 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1377,9 +1377,9 @@ __CRT_FUNCTION(llistxattr,0,(),3,(char const *,path,char *,listbuf,size_t,listbu
 __CRT_FUNCTION(llrint,0,(),1,(double,x),__LONGLONG)
 __CRT_FUNCTION(llrintf,0,(),1,(float,x),__LONGLONG)
 __CRT_FUNCTION(llrintl,0,(),1,(__LONGDOUBLE,x),__LONGLONG)
-__CRT_FUNCTION(llround,0,(),1,(double,x),__LONGLONG)
-__CRT_FUNCTION(llroundf,0,(),1,(float,x),__LONGLONG)
-__CRT_FUNCTION(llroundl,0,(),1,(__LONGDOUBLE,x),__LONGLONG)
+__CRT_FUNCTION(llround,1,(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__,lround),1,(double,x),__LONGLONG)
+__CRT_FUNCTION(llroundf,1,(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__,lroundf),1,(float,x),__LONGLONG)
+__CRT_FUNCTION(llroundl,1,(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__,lroundl),1,(__LONGDOUBLE,x),__LONGLONG)
 __CRT_FUNCTION(localeconv,0,(),0,(),struct lconv *)
 __CRT_FUNCTION(localtime,0,(),1,(time_t const *,timer),struct tm *)
 __CRT_FUNCTION(localtime64,1,(__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__,localtime),1,(time64_t const *,timer),__STRUCT_TM *)

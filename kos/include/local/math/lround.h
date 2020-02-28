@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x922ba334 */
+/* HASH CRC-32:0x51ed52b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,9 @@
  */
 #ifndef __local_lround_defined
 #define __local_lround_defined 1
+#include <hybrid/typecore.h>
+
+#include <libm/lround.h>
 /* Dependency: "round" from "math" */
 #ifndef ____localdep_round_defined
 #define ____localdep_round_defined 1
@@ -43,8 +46,16 @@ __NAMESPACE_LOCAL_BEGIN
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __LOCAL_LIBC(lround) __ATTR_CONST __ATTR_WUNUSED long int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(lround))(double __x) {
-#line 1449 "kos/src/libc/magic/math.c"
+#line 1452 "kos/src/libc/magic/math.c"
+#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+	return __ieee754_lround((__IEEE754_DOUBLE_TYPE__)__x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+	return __ieee754_lroundf((__IEEE754_FLOAT_TYPE__)__x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+	return __ieee854_lroundl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
+#else /* ... */
 	return (long int)__localdep_round(__x);
+#endif /* !... */
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_lround_defined */

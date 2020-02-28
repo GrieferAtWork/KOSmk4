@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8d30ea11 */
+/* HASH CRC-32:0xc2104a90 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3700,6 +3700,9 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lround,(double __x),(_
 #elif defined(__CRT_HAVE___lround)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lround,(double __x),__lround,(__x))
+#elif defined(__CRT_HAVE_llround) && (__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__)
+/* Round X to nearest integral value, rounding halfway cases away from zero */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lround,(double __x),llround,(__x))
 #else /* LIBC: lround */
 __NAMESPACE_STD_END
 #include <local/math/lround.h>
@@ -3796,6 +3799,9 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llround,(double __x)
 #elif defined(__CRT_HAVE___llround)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llround,(double __x),__llround,(__x))
+#elif defined(__CRT_HAVE_lround) && (__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__)
+/* Round X to nearest integral value, rounding halfway cases away from zero */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llround,(double __x),lround,(__x))
 #else /* LIBC: llround */
 __NAMESPACE_STD_END
 #include <local/math/llround.h>
@@ -4007,6 +4013,9 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lroundf,(float __x),(_
 #elif defined(__CRT_HAVE___lroundf)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lroundf,(float __x),__lroundf,(__x))
+#elif defined(__CRT_HAVE_llroundf) && (__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__)
+/* Round X to nearest integral value, rounding halfway cases away from zero */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lroundf,(float __x),llroundf,(__x))
 #else /* LIBC: lroundf */
 __NAMESPACE_STD_END
 #include <local/math/lroundf.h>
@@ -4109,6 +4118,9 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llroundf,(float __x)
 #elif defined(__CRT_HAVE___llroundf)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llroundf,(float __x),__llroundf,(__x))
+#elif defined(__CRT_HAVE_lroundf) && (__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__)
+/* Round X to nearest integral value, rounding halfway cases away from zero */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llroundf,(float __x),lroundf,(__x))
 #else /* LIBC: llroundf */
 __NAMESPACE_STD_END
 #include <local/math/llroundf.h>
@@ -4339,6 +4351,9 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lroundl,(__LONGDOUBLE 
 #elif defined(__CRT_HAVE___lroundl)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lroundl,(__LONGDOUBLE __x),__lroundl,(__x))
+#elif defined(__CRT_HAVE_llroundl) && (__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__)
+/* Round X to nearest integral value, rounding halfway cases away from zero */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lroundl,(__LONGDOUBLE __x),llroundl,(__x))
 #else /* LIBC: lroundl */
 __NAMESPACE_STD_END
 #include <local/math/lroundl.h>
@@ -4447,6 +4462,9 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llroundl,(__LONGDOUB
 #elif defined(__CRT_HAVE___llroundl)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llroundl,(__LONGDOUBLE __x),__llroundl,(__x))
+#elif defined(__CRT_HAVE_lroundl) && (__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__)
+/* Round X to nearest integral value, rounding halfway cases away from zero */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llroundl,(__LONGDOUBLE __x),lroundl,(__x))
 #else /* LIBC: llroundl */
 __NAMESPACE_STD_END
 #include <local/math/llroundl.h>
@@ -6081,6 +6099,9 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lround,(float __x),lr
 #elif defined(__CRT_HAVE___lroundf)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lround,(float __x),__lroundf,(__x))
+#elif defined(__CRT_HAVE_llroundf) && (__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__)
+/* Round X to nearest integral value, rounding halfway cases away from zero */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lround,(float __x),llroundf,(__x))
 #else /* LIBC: lroundf */
 } /* extern "C++" { */
 __NAMESPACE_STD_END
@@ -6190,6 +6211,9 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llround,(float __x)
 #elif defined(__CRT_HAVE___llroundf)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llround,(float __x),__llroundf,(__x))
+#elif defined(__CRT_HAVE_lroundf) && (__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__)
+/* Round X to nearest integral value, rounding halfway cases away from zero */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llround,(float __x),lroundf,(__x))
 #else /* LIBC: llroundf */
 } /* extern "C++" { */
 __NAMESPACE_STD_END
@@ -6490,6 +6514,9 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lround,(__LONGDOUBLE 
 #elif defined(__CRT_HAVE___lroundl)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lround,(__LONGDOUBLE __x),__lroundl,(__x))
+#elif defined(__CRT_HAVE_llroundl) && (__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__)
+/* Round X to nearest integral value, rounding halfway cases away from zero */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lround,(__LONGDOUBLE __x),llroundl,(__x))
 #else /* LIBC: lroundl */
 } /* extern "C++" { */
 __NAMESPACE_STD_END
@@ -6605,6 +6632,9 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llround,(__LONGDOUB
 #elif defined(__CRT_HAVE___llroundl)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llround,(__LONGDOUBLE __x),__llroundl,(__x))
+#elif defined(__CRT_HAVE_lroundl) && (__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__)
+/* Round X to nearest integral value, rounding halfway cases away from zero */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llround,(__LONGDOUBLE __x),lroundl,(__x))
 #else /* LIBC: llroundl */
 } /* extern "C++" { */
 __NAMESPACE_STD_END
@@ -11030,6 +11060,9 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,__lround,(double __x)
 #elif defined(__CRT_HAVE___lround)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,__lround,(double __x),(__x))
+#elif defined(__CRT_HAVE_llround) && (__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__)
+/* Round X to nearest integral value, rounding halfway cases away from zero */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,__lround,(double __x),llround,(__x))
 #else /* LIBC: lround */
 #include <local/math/lround.h>
 /* Round X to nearest integral value, rounding halfway cases away from zero */
@@ -11243,6 +11276,9 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,__lroundf,(float __x)
 #elif defined(__CRT_HAVE___lroundf)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,__lroundf,(float __x),(__x))
+#elif defined(__CRT_HAVE_llroundf) && (__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__)
+/* Round X to nearest integral value, rounding halfway cases away from zero */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,__lroundf,(float __x),llroundf,(__x))
 #else /* LIBC: lroundf */
 #include <local/math/lroundf.h>
 /* Round X to nearest integral value, rounding halfway cases away from zero */
@@ -11321,6 +11357,9 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,__llround,(double _
 #elif defined(__CRT_HAVE___llround)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,__llround,(double __x),(__x))
+#elif defined(__CRT_HAVE_lround) && (__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__)
+/* Round X to nearest integral value, rounding halfway cases away from zero */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,__llround,(double __x),lround,(__x))
 #else /* LIBC: llround */
 #include <local/math/llround.h>
 /* Round X to nearest integral value, rounding halfway cases away from zero */
@@ -11349,6 +11388,9 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,__llroundf,(float _
 #elif defined(__CRT_HAVE___llroundf)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,__llroundf,(float __x),(__x))
+#elif defined(__CRT_HAVE_lroundf) && (__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__)
+/* Round X to nearest integral value, rounding halfway cases away from zero */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,__llroundf,(float __x),lroundf,(__x))
 #else /* LIBC: llroundf */
 #include <local/math/llroundf.h>
 /* Round X to nearest integral value, rounding halfway cases away from zero */
@@ -11526,6 +11568,9 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,__lroundl,(__LONGDOUB
 #elif defined(__CRT_HAVE___lroundl)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,__lroundl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_llroundl) && (__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__)
+/* Round X to nearest integral value, rounding halfway cases away from zero */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,__lroundl,(__LONGDOUBLE __x),llroundl,(__x))
 #else /* LIBC: lroundl */
 #include <local/math/lroundl.h>
 /* Round X to nearest integral value, rounding halfway cases away from zero */
@@ -11617,6 +11662,9 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,__llroundl,(__LONGD
 #elif defined(__CRT_HAVE___llroundl)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,__llroundl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_lroundl) && (__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__)
+/* Round X to nearest integral value, rounding halfway cases away from zero */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,__llroundl,(__LONGDOUBLE __x),lroundl,(__x))
 #else /* LIBC: llroundl */
 #include <local/math/llroundl.h>
 /* Round X to nearest integral value, rounding halfway cases away from zero */

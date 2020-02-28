@@ -26,6 +26,7 @@
 #include <hybrid/typecore.h>
 
 #include <bits/types.h>
+#include <machine/ieeefp.h>
 
 #include <ieee754.h>
 
@@ -65,57 +66,56 @@ __DECL_BEGIN
 
 #ifdef __IEEE754_FLOAT_TYPE__
 
-//#define __LIBM_HIGH_ORDER_BIT_IS_SET_FOR_SNAN 1 /* TODO: ??? */
-//#define __LIBM_FLT_LARGEST_EXPONENT_IS_NORMAL 1 /* TODO: ??? */
+//#define __LIBM_HIGH_ORDER_BIT_IS_SET_FOR_SNAN 1 /* ??? */
 
-#ifdef __LIBM_FLT_LARGEST_EXPONENT_IS_NORMAL
-#define __LIBM_FLT_UWORD_IS_FINITE(x) 1
-#define __LIBM_FLT_UWORD_IS_NAN(x) 0
+#ifdef _FLT_LARGEST_EXPONENT_IS_NORMAL
+#define __LIBM_FLT_UWORD_IS_FINITE(x)   1
+#define __LIBM_FLT_UWORD_IS_NAN(x)      0
 #define __LIBM_FLT_UWORD_IS_INFINITE(x) 0
-#define __LIBM_FLT_UWORD_MAX 0x7fffffff
-#define __LIBM_FLT_UWORD_EXP_MAX 0x43010000
-#define __LIBM_FLT_UWORD_LOG_MAX 0x42b2d4fc
-#define __LIBM_FLT_UWORD_LOG_2MAX 0x42b437e0
-#define __LIBM_HUGE ((__IEEE754_FLOAT_TYPE__)0X1.FFFFFEP128)
-#else /* __LIBM_FLT_LARGEST_EXPONENT_IS_NORMAL */
-#define __LIBM_FLT_UWORD_IS_FINITE(x) ((x) < 0x7f800000L)
-#define __LIBM_FLT_UWORD_IS_NAN(x) ((x) > 0x7f800000L)
-#define __LIBM_FLT_UWORD_IS_INFINITE(x) ((x) == 0x7f800000L)
-#define __LIBM_FLT_UWORD_MAX 0x7f7fffffL
-#define __LIBM_FLT_UWORD_EXP_MAX 0x43000000
-#define __LIBM_FLT_UWORD_LOG_MAX 0x42b17217
-#define __LIBM_FLT_UWORD_LOG_2MAX 0x42b2d4fc
-#define __LIBM_HUGE ((__IEEE754_FLOAT_TYPE__)3.40282346638528860e+38)
-#endif /* !__LIBM_FLT_LARGEST_EXPONENT_IS_NORMAL */
+#define __LIBM_FLT_UWORD_MAX            0x7fffffff
+#define __LIBM_FLT_UWORD_EXP_MAX        0x43010000
+#define __LIBM_FLT_UWORD_LOG_MAX        0x42b2d4fc
+#define __LIBM_FLT_UWORD_LOG_2MAX       0x42b437e0
+#define __LIBM_HUGE                     ((__IEEE754_FLOAT_TYPE__)0x1.fffffep128)
+#else /* _FLT_LARGEST_EXPONENT_IS_NORMAL */
+#define __LIBM_FLT_UWORD_IS_FINITE(x)   ((x) < 0x7f800000l)
+#define __LIBM_FLT_UWORD_IS_NAN(x)      ((x) > 0x7f800000l)
+#define __LIBM_FLT_UWORD_IS_INFINITE(x) ((x) == 0x7f800000l)
+#define __LIBM_FLT_UWORD_MAX            0x7f7fffffl
+#define __LIBM_FLT_UWORD_EXP_MAX        0x43000000
+#define __LIBM_FLT_UWORD_LOG_MAX        0x42b17217
+#define __LIBM_FLT_UWORD_LOG_2MAX       0x42b2d4fc
+#define __LIBM_HUGE                     ((__IEEE754_FLOAT_TYPE__)3.40282346638528860e+38)
+#endif /* !_FLT_LARGEST_EXPONENT_IS_NORMAL */
 
 #define __LIBM_FLT_UWORD_HALF_MAX (__LIBM_FLT_UWORD_MAX - (1L << 23))
 #define __LIBM_FLT_LARGEST_EXP (__LIBM_FLT_UWORD_MAX >> 23)
 
 
-#if defined(_FLT_NO_DENORMALS) /* TODO: ??? */
-#define __LIBM_FLT_UWORD_IS_ZERO(x) ((x) < 0x00800000L)
+#ifdef _FLT_NO_DENORMALS
+#define __LIBM_FLT_UWORD_IS_ZERO(x)      ((x) < 0x00800000l)
 #define __LIBM_FLT_UWORD_IS_SUBNORMAL(x) 0
-#define __LIBM_FLT_UWORD_MIN 0x00800000
-#define __LIBM_FLT_UWORD_EXP_MIN 0x42fc0000
-#define __LIBM_FLT_UWORD_LOG_MIN 0x42aeac50
-#define __LIBM_FLT_SMALLEST_EXP 1
-#else
-#define __LIBM_FLT_UWORD_IS_ZERO(x) ((x) == 0)
-#define __LIBM_FLT_UWORD_IS_SUBNORMAL(x) ((x) < 0x00800000L)
-#define __LIBM_FLT_UWORD_MIN 0x00000001
-#define __LIBM_FLT_UWORD_EXP_MIN 0x43160000
-#define __LIBM_FLT_UWORD_LOG_MIN 0x42cff1b5
-#define __LIBM_FLT_SMALLEST_EXP -22
-#endif
+#define __LIBM_FLT_UWORD_MIN             0x00800000
+#define __LIBM_FLT_UWORD_EXP_MIN         0x42fc0000
+#define __LIBM_FLT_UWORD_LOG_MIN         0x42aeac50
+#define __LIBM_FLT_SMALLEST_EXP          1
+#else /* _FLT_NO_DENORMALS */
+#define __LIBM_FLT_UWORD_IS_ZERO(x)      ((x) == 0)
+#define __LIBM_FLT_UWORD_IS_SUBNORMAL(x) ((x) < 0x00800000l)
+#define __LIBM_FLT_UWORD_MIN             0x00000001
+#define __LIBM_FLT_UWORD_EXP_MIN         0x43160000
+#define __LIBM_FLT_UWORD_LOG_MIN         0x42cff1b5
+#define __LIBM_FLT_SMALLEST_EXP          (-22)
+#endif /* !_FLT_NO_DENORMALS */
 
 
-/* A union which permits us to convert between a float and a 32 bit int.  */
+/* A union which permits us to convert between a float and a 32 bit int. */
 typedef union {
 	__IEEE754_FLOAT_TYPE__ __f_value;
-	__uint32_t __f_word;
+	__uint32_t             __f_word;
 } __libm_ieee_float_shape_type;
 
-/* Get a 32 bit int from a float.  */
+/* Get a 32 bit int from a float. */
 #define __LIBM_GET_FLOAT_WORD(i, d)          \
 	do {                                     \
 		__libm_ieee_float_shape_type __gf_u; \
@@ -124,7 +124,7 @@ typedef union {
 	}                                        \
 	__WHILE0
 
-/* Set a float from a 32 bit int.  */
+/* Set a float from a 32 bit int. */
 #define __LIBM_SET_FLOAT_WORD(d, i)          \
 	do {                                     \
 		__libm_ieee_float_shape_type __sf_u; \
@@ -150,7 +150,7 @@ typedef union {
 	} __d_parts;
 } __libm_ieee_double_shape_type;
 
-/* Get two 32 bit ints from a double.  */
+/* Get two 32 bit ints from a double. */
 #define __LIBM_GET_DOUBLE_WORDS __LIBM_EXTRACT_WORDS
 #define __LIBM_EXTRACT_WORDS(ix0, ix1, d)            \
 	do {                                             \
@@ -161,7 +161,7 @@ typedef union {
 	}                                                \
 	__WHILE0
 
-/* Get the more significant 32 bit int from a double.  */
+/* Get the more significant 32 bit int from a double. */
 #define __LIBM_GET_HIGH_WORD(i, d)                   \
 	do {                                             \
 		__libm_ieee_double_shape_type __gh_u;        \
@@ -170,7 +170,7 @@ typedef union {
 	}                                                \
 	__WHILE0
 
-/* Get the less significant 32 bit int from a double.  */
+/* Get the less significant 32 bit int from a double. */
 #define __LIBM_GET_LOW_WORD(i, d)                    \
 	do {                                             \
 		__libm_ieee_double_shape_type __gl_u;        \
@@ -179,7 +179,7 @@ typedef union {
 	}                                                \
 	__WHILE0
 
-/* Set a double from two 32 bit ints.  */
+/* Set a double from two 32 bit ints. */
 #define __LIBM_INSERT_WORDS(d, ix0, ix1)             \
 	do {                                             \
 		__libm_ieee_double_shape_type __iw_u;        \
@@ -189,7 +189,7 @@ typedef union {
 	}                                                \
 	__WHILE0
 
-/* Set the more significant 32 bits of a double from an int.  */
+/* Set the more significant 32 bits of a double from an int. */
 #define __LIBM_SET_HIGH_WORD(d, v)                   \
 	do {                                             \
 		__libm_ieee_double_shape_type __sh_u;        \
@@ -199,7 +199,7 @@ typedef union {
 	}                                                \
 	__WHILE0
 
-/* Set the less significant 32 bits of a double from an int.  */
+/* Set the less significant 32 bits of a double from an int. */
 #define __LIBM_SET_LOW_WORD(d, v)                    \
 	do {                                             \
 		__libm_ieee_double_shape_type __sl_u;        \
@@ -228,21 +228,21 @@ typedef union {
 	__IEEE854_LONG_DOUBLE_TYPE__ __l_value;
 	struct {
 #if __FLOAT_WORD_ORDER__ == __ORDER_BIG_ENDIAN__
-		__int16_t __l_sign_exponent;
+		__int16_t  __l_sign_exponent;
 		__uint16_t __l_empty;
 		__uint32_t __l_msw;
 		__uint32_t __l_lsw;
 #elif __FLOAT_WORD_ORDER__ == __ORDER_LITTLE_ENDIAN__
 		__uint32_t __l_lsw;
 		__uint32_t __l_msw;
-		__int16_t __l_sign_exponent;
+		__int16_t  __l_sign_exponent;
 		__uint16_t __l_empty;
 #endif
 #define __LIBM_SET_LDOUBLE_EMPTY(u) (u).__l_parts.__l_empty = 0
 	} __l_parts;
 } __libm_ieee_long_double_shape_type;
 
-/* Get three 32 bit ints from a long double.  */
+/* Get three 32 bit ints from a long double. */
 #define __LIBM_GET_LDOUBLE_WORDS(exp, ix0, ix1, d)  \
 	do {                                            \
 		__libm_ieee_long_double_shape_type __ew_u;  \
@@ -252,7 +252,7 @@ typedef union {
 		(ix1) = __ew_u.__l_parts.__l_lsw;           \
 	} __WHILE0
 
-/* Set a long double from two 32 bit ints.  */
+/* Set a long double from two 32 bit ints. */
 #define __LIBM_SET_LDOUBLE_WORDS(d, exp, ix0, ix1)  \
 	do {                                            \
 		__libm_ieee_long_double_shape_type __iw_u;  \
@@ -263,7 +263,7 @@ typedef union {
 		(d) = __iw_u.__l_value;                     \
 	} __WHILE0
 
-/* Get the more significant 32 bits of a long double mantissa.  */
+/* Get the more significant 32 bits of a long double mantissa. */
 #define __LIBM_GET_LDOUBLE_MSW(v, d)               \
 	do {                                           \
 		__libm_ieee_long_double_shape_type __sh_u; \
@@ -271,7 +271,7 @@ typedef union {
 		(v) = __sh_u.__l_parts.__l_msw;            \
 	} __WHILE0
 
-/* Get the less significant 32 bits of a long double mantissa.  */
+/* Get the less significant 32 bits of a long double mantissa. */
 #define __LIBM_GET_LDOUBLE_LSW(v, d)               \
 	do {                                           \
 		__libm_ieee_long_double_shape_type __sh_u; \
@@ -279,7 +279,7 @@ typedef union {
 		(v) = __sh_u.__l_parts.__l_lsw;            \
 	} __WHILE0
 
-/* Set the more significant 32 bits of a long double mantissa from an int.  */
+/* Set the more significant 32 bits of a long double mantissa from an int. */
 #define __LIBM_SET_LDOUBLE_MSW(d, v)               \
 	do {                                           \
 		__libm_ieee_long_double_shape_type __sh_u; \
@@ -288,7 +288,7 @@ typedef union {
 		(d) = __sh_u.__l_value;                    \
 	} __WHILE0
 
-/* Set the less significant 32 bits of a long double mantissa from an int.  */
+/* Set the less significant 32 bits of a long double mantissa from an int. */
 #define __LIBM_SET_LDOUBLE_LSW(d, v)               \
 	do {                                           \
 		__libm_ieee_long_double_shape_type __sh_u; \
@@ -297,7 +297,7 @@ typedef union {
 		(d) = __sh_u.__l_value;                    \
 	} __WHILE0
 
-/* Get int from the exponent of a long double.  */
+/* Get int from the exponent of a long double. */
 #define __LIBM_GET_LDOUBLE_EXP(exp, d)              \
 	do {                                            \
 		__libm_ieee_long_double_shape_type __ge_u;  \
@@ -305,7 +305,7 @@ typedef union {
 		(exp) = __ge_u.__l_parts.__l_sign_exponent; \
 	} __WHILE0
 
-/* Set exponent of a long double from an int.  */
+/* Set exponent of a long double from an int. */
 #define __LIBM_SET_LDOUBLE_EXP(d, exp)              \
 	do {                                            \
 		__libm_ieee_long_double_shape_type __se_u;  \
@@ -318,7 +318,7 @@ typedef union {
 
 
 /* Macros to avoid undefined behavior that can arise if the amount
- * of a shift is exactly equal to the size of the shifted operand.  */
+ * of a shift is exactly equal to the size of the shifted operand. */
 #define __LIBM_SAFE_LEFT_SHIFT(op, amt) \
 	(((amt) < 8 * sizeof(op)) ? ((op) << (amt)) : 0)
 #define __LIBM_SAFE_RIGHT_SHIFT(op, amt) \

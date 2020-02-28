@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x92a76c4d */
+/* HASH CRC-32:0xb9068bbf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,31 +20,38 @@
  */
 #ifndef __local_lroundl_defined
 #define __local_lroundl_defined 1
-/* Dependency: "round" from "math" */
-#ifndef ____localdep_round_defined
-#define ____localdep_round_defined 1
-#if __has_builtin(__builtin_round) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_round)
-/* Round X to nearest integral value, rounding halfway cases away from zero */
-__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_round,(double __x),round,{ return __builtin_round(__x); })
-#elif defined(__CRT_HAVE_round)
-/* Round X to nearest integral value, rounding halfway cases away from zero */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_round,(double __x),round,(__x))
-#elif defined(__CRT_HAVE___round)
-/* Round X to nearest integral value, rounding halfway cases away from zero */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_round,(double __x),__round,(__x))
-#else /* LIBC: round */
-#include <local/math/round.h>
-/* Round X to nearest integral value, rounding halfway cases away from zero */
-#define __localdep_round (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(round))
-#endif /* round... */
-#endif /* !____localdep_round_defined */
+#include <hybrid/typecore.h>
+
+#include <libm/lround.h>
+/* Dependency: "roundl" from "math" */
+#ifndef ____localdep_roundl_defined
+#define ____localdep_roundl_defined 1
+#if __has_builtin(__builtin_roundl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_roundl)
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_roundl,(__LONGDOUBLE __x),roundl,{ return __builtin_roundl(__x); })
+#elif defined(__CRT_HAVE_roundl)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_roundl,(__LONGDOUBLE __x),roundl,(__x))
+#elif defined(__CRT_HAVE___roundl)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_roundl,(__LONGDOUBLE __x),__roundl,(__x))
+#else /* LIBC: roundl */
+#include <local/math/roundl.h>
+#define __localdep_roundl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(roundl))
+#endif /* roundl... */
+#endif /* !____localdep_roundl_defined */
 
 __NAMESPACE_LOCAL_BEGIN
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __LOCAL_LIBC(lroundl) __ATTR_CONST __ATTR_WUNUSED long int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(lroundl))(__LONGDOUBLE __x) {
-#line 1449 "kos/src/libc/magic/math.c"
-	return (long int)__localdep_round(__x);
+#line 1767 "kos/src/libc/magic/math.c"
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return __ieee854_lroundl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
+	return __ieee754_lroundf((__IEEE754_FLOAT_TYPE__)__x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+	return __ieee754_lround((__IEEE754_DOUBLE_TYPE__)__x);
+#else /* ... */
+	return (long int)__localdep_roundl(__x);
+#endif /* !... */
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_lroundl_defined */

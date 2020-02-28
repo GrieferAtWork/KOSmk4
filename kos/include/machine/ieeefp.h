@@ -1,4 +1,3 @@
-/* HASH CRC-32:0x701d421f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,16 +17,41 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_fmal_defined
-#define __local_fmal_defined 1
-__NAMESPACE_LOCAL_BEGIN
-/* Multiply-add function computed as a ternary operation */
-__LOCAL_LIBC(fmal) __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fmal))(__LONGDOUBLE __x,
-                                              __LONGDOUBLE __y,
-                                              __LONGDOUBLE __z) {
-#line 1484 "kos/src/libc/magic/math.c"
-	return (__x * __y) + __z;
-}
-__NAMESPACE_LOCAL_END
-#endif /* !__local_fmal_defined */
+#ifndef _MACHINE_IEEEFP_H
+#define _MACHINE_IEEEFP_H 1
+
+#include <__stdinc.h>
+
+#include <hybrid/__byteorder.h>
+#include <hybrid/host.h>
+#include <hybrid/typecore.h>
+
+#if 0
+#define _FLT_LARGEST_EXPONENT_IS_NORMAL 1
+#endif
+
+#if 0
+#define _FLT_NO_DENORMALS 1
+#endif
+
+#if __FLOAT_WORD_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#define __IEEE_LITTLE_ENDIAN 1
+#elif __FLOAT_WORD_ORDER__ == __ORDER_BIG_ENDIAN__
+#define __IEEE_BIG_ENDIAN 1
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#define __IEEE_BYTES_LITTLE_ENDIAN 1
+#endif /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
+#else
+#error "Unsupported endian"
+#endif
+
+#if __SIZEOF_DOUBLE__ == 4
+#define _DOUBLE_IS_32BITS 1
+#endif /* __SIZEOF_DOUBLE__ == 4 */
+
+
+/* #define _FLOAT_ARG float */
+/* #define __OBSOLETE_MATH_DEFAULT 0/1 */
+/* #define __OBSOLETE_MATH 0/1 */
+
+#endif /* !_MACHINE_IEEEFP_H */

@@ -51,7 +51,6 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 	__LIBM_SET_FLOAT_WORD(__x, __ix & 0x7fffffff);
 	return __x;
 }
-
 #endif /* __IEEE754_FLOAT_TYPE__ */
 
 

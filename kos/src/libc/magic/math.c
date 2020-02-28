@@ -1444,9 +1444,20 @@ remquo:(double x, double y, int *pquo) -> double; /* TODO */
 lrint:(double x) -> long int; /* TODO */
 
 @@Round X to nearest integral value, rounding halfway cases away from zero
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__lround)][crtbuiltin][userimpl]
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__lround)]
+[dependency_include(<hybrid/typecore.h>)][crtbuiltin]
+[dependency_include(<libm/lround.h>)][userimpl]
+[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias(llround)]
 lround:(double x) -> long int {
+#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+	return __ieee754_lround((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+	return __ieee754_lroundf((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+	return __ieee854_lroundl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#else /* ... */
 	return (long int)round(x);
+#endif /* !... */
 }
 
 @@Return positive difference between X and Y
@@ -1479,9 +1490,20 @@ fma:(double x, double y, double z) -> double {
 llrint:(double x) -> __LONGLONG; /* TODO */
 
 @@Round X to nearest integral value, rounding halfway cases away from zero
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__llround)][crtbuiltin][userimpl]
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__llround)]
+[dependency_include(<hybrid/typecore.h>)][crtbuiltin]
+[dependency_include(<libm/lround.h>)][userimpl]
+[alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__, lround)]
 llround:(double x) -> __LONGLONG {
+#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+	return __ieee754_llround((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+	return __ieee754_llroundf((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+	return __ieee854_llroundl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#else /* ... */
 	return (__LONGLONG)round(x);
+#endif /* !... */
 }
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGLONG */
 
@@ -1594,8 +1616,21 @@ remquof:(float x, float y, int *pquo) -> float %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__lrintf)][crtbuiltin]
 lrintf:(float x) -> long int %{auto_block(math)}
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__lroundf)][crtbuiltin][userimpl]
-lroundf:(float x) -> long int %{copy(%auto, double2float)}
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__lroundf)]
+[dependency_include(<hybrid/typecore.h>)][crtbuiltin]
+[dependency_include(<libm/lround.h>)][userimpl][doc_alias(lround)]
+[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias(llroundf)]
+lroundf:(float x) -> long int {
+#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+	return __ieee754_lroundf((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+	return __ieee754_lround((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	return __ieee854_lroundl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#else /* ... */
+	return (long int)roundf(x);
+#endif /* !... */
+}
 
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__fdimf)][crtbuiltin][userimpl]
 fdimf:(float x, float y) -> float %{copy(%auto, math)}
@@ -1613,8 +1648,21 @@ fmaf:(float x, float y, float z) -> float %{copy(%auto, double2float)}
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__llrintf)][crtbuiltin]
 llrintf:(float x) -> __LONGLONG %{auto_block(math)}
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__llroundf)][crtbuiltin][userimpl]
-llroundf:(float x) -> __LONGLONG %{copy(%auto, math)}
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__llroundf)]
+[dependency_include(<hybrid/typecore.h>)][crtbuiltin]
+[dependency_include(<libm/lround.h>)][userimpl][doc_alias(llround)]
+[alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__, lroundf)]
+llroundf:(float x) -> __LONGLONG {
+#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+	return __ieee754_llroundf((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+	return __ieee754_llround((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	return __ieee854_llroundl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#else /* ... */
+	return (__LONGLONG)roundf(x);
+#endif /* !... */
+}
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGLONG */
 
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
@@ -1711,8 +1759,22 @@ remquol:(__LONGDOUBLE x, __LONGDOUBLE y, int *pquo) -> __LONGDOUBLE %{auto_block
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__lrintl)][crtbuiltin]
 lrintl:(__LONGDOUBLE x) -> long int %{auto_block(math)}
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__lroundl)][crtbuiltin][userimpl]
-lroundl:(__LONGDOUBLE x) -> long int %{copy(%auto, math)}
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__lroundl)]
+[dependency_include(<hybrid/typecore.h>)][crtbuiltin]
+[dependency_include(<libm/lround.h>)][userimpl][doc_alias(lround)]
+[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias(llroundl)]
+lroundl:(__LONGDOUBLE x) -> long int {
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return __ieee854_lroundl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
+	return __ieee754_lroundf((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+	return __ieee754_lround((__IEEE754_DOUBLE_TYPE__)x);
+#else /* ... */
+	return (long int)roundl(x);
+#endif /* !... */
+}
+
 
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__fdiml)][userimpl][crtbuiltin]
 fdiml:(__LONGDOUBLE x, __LONGDOUBLE y) -> __LONGDOUBLE %{copy(%auto, math)}
@@ -1730,8 +1792,23 @@ fmal:(__LONGDOUBLE x, __LONGDOUBLE y, __LONGDOUBLE z) -> __LONGDOUBLE %{copy(%au
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__llrintl)][crtbuiltin]
 llrintl:(__LONGDOUBLE x) -> __LONGLONG %{auto_block(math)}
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__llroundl)][crtbuiltin][userimpl]
-llroundl:(__LONGDOUBLE x) -> __LONGLONG %{copy(%auto, math)}
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__llroundl)]
+[dependency_include(<hybrid/typecore.h>)][crtbuiltin]
+[dependency_include(<libm/lround.h>)][userimpl][doc_alias(llround)]
+[alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__, lroundl)]
+llroundl:(__LONGDOUBLE x) -> __LONGLONG {
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return __ieee854_llroundl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
+	return __ieee754_llroundf((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+	return __ieee754_llround((__IEEE754_DOUBLE_TYPE__)x);
+#else /* ... */
+	return (__LONGLONG)roundl(x);
+#endif /* !... */
+}
+
+
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGLONG */
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %(std, c, ccompat)#endif /* __USE_ISOC99 */

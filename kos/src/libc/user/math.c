@@ -39,6 +39,7 @@
 #include <libm/isnan.h>
 #include <libm/issignaling.h>
 #include <libm/ldexp.h>
+#include <libm/lround.h>
 #include <libm/modf.h>
 #include <libm/nextafter.h>
 #include <libm/nexttoward.h>
@@ -3071,19 +3072,39 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.lround") long int
 NOTHROW(LIBCCALL libc_lround)(double x)
 /*[[[body:lround]]]*/
 /*AUTO*/{
+#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+	return __ieee754_lround((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+	return __ieee754_lroundf((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+	return __ieee854_lroundl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#else /* ... */
 	return (long int)libc_round(x);
+#endif /* !... */
 }
 /*[[[end:lround]]]*/
 
-/*[[[head:llround,hash:CRC-32=0x51a79fcc]]]*/
+/*[[[head:llround,hash:CRC-32=0x70f7d6a3]]]*/
 /* Round X to nearest integral value, rounding halfway cases away from zero */
+#if __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
+DEFINE_INTERN_ALIAS(libc_llround, libc_lround);
+#else
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.llround") __LONGLONG
 NOTHROW(LIBCCALL libc_llround)(double x)
 /*[[[body:llround]]]*/
 /*AUTO*/{
+#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+	return __ieee754_llround((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+	return __ieee754_llroundf((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+	return __ieee854_llroundl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#else /* ... */
 	return (__LONGLONG)libc_round(x);
+#endif /* !... */
 }
+#endif /* MAGIC:alias */
 /*[[[end:llround]]]*/
 
 /*[[[head:lroundf,hash:CRC-32=0x8a154dc1]]]*/
@@ -3093,19 +3114,39 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.lroundf") long int
 NOTHROW(LIBCCALL libc_lroundf)(float x)
 /*[[[body:lroundf]]]*/
 /*AUTO*/{
-	return (long int)libc_round(x);
+#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+	return __ieee754_lroundf((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+	return __ieee754_lround((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	return __ieee854_lroundl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#else /* ... */
+	return (long int)libc_roundf(x);
+#endif /* !... */
 }
 /*[[[end:lroundf]]]*/
 
-/*[[[head:llroundf,hash:CRC-32=0x435c8414]]]*/
+/*[[[head:llroundf,hash:CRC-32=0x5eb0daeb]]]*/
 /* Round X to nearest integral value, rounding halfway cases away from zero */
+#if __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
+DEFINE_INTERN_ALIAS(libc_llroundf, libc_lroundf);
+#else
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.llroundf") __LONGLONG
 NOTHROW(LIBCCALL libc_llroundf)(float x)
 /*[[[body:llroundf]]]*/
 /*AUTO*/{
-	return (__LONGLONG)libc_round(x);
+#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+	return __ieee754_llroundf((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+	return __ieee754_llround((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	return __ieee854_llroundl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#else /* ... */
+	return (__LONGLONG)libc_roundf(x);
+#endif /* !... */
 }
+#endif /* MAGIC:alias */
 /*[[[end:llroundf]]]*/
 
 /*[[[head:lroundl,hash:CRC-32=0x78bfc21c]]]*/
@@ -3115,19 +3156,39 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.lroundl") long int
 NOTHROW(LIBCCALL libc_lroundl)(__LONGDOUBLE x)
 /*[[[body:lroundl]]]*/
 /*AUTO*/{
-	return (long int)libc_round(x);
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return __ieee854_lroundl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
+	return __ieee754_lroundf((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+	return __ieee754_lround((__IEEE754_DOUBLE_TYPE__)x);
+#else /* ... */
+	return (long int)libc_roundl(x);
+#endif /* !... */
 }
 /*[[[end:lroundl]]]*/
 
-/*[[[head:llroundl,hash:CRC-32=0xc0d1c438]]]*/
+/*[[[head:llroundl,hash:CRC-32=0x18d4d46]]]*/
 /* Round X to nearest integral value, rounding halfway cases away from zero */
+#if __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
+DEFINE_INTERN_ALIAS(libc_llroundl, libc_lroundl);
+#else
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.llroundl") __LONGLONG
 NOTHROW(LIBCCALL libc_llroundl)(__LONGDOUBLE x)
 /*[[[body:llroundl]]]*/
 /*AUTO*/{
-	return (__LONGLONG)libc_round(x);
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return __ieee854_llroundl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
+	return __ieee754_llroundf((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+	return __ieee754_llround((__IEEE754_DOUBLE_TYPE__)x);
+#else /* ... */
+	return (__LONGLONG)libc_roundl(x);
+#endif /* !... */
 }
+#endif /* MAGIC:alias */
 /*[[[end:llroundl]]]*/
 
 /*[[[end:implementation]]]*/

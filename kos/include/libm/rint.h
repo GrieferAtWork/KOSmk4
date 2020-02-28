@@ -85,7 +85,8 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 	return __x;
 }
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__(__LIBCCALL __ieee754_rintf)(__IEEE754_FLOAT_TYPE__ __x) {
+__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
+(__LIBCCALL __ieee754_rintf)(__IEEE754_FLOAT_TYPE__ __x) {
 	/* above code relies on a FPU doing the rounding,
 	 * and using round-to-even for FE_TONEAREST */
 	switch (__libc_fegetround()) {
