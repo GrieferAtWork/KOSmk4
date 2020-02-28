@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3930b047 */
+/* HASH CRC-32:0x4819d617 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(htonq) __ATTR_CONST __UINT64_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(htonq))(__UINT64_TYPE__ __hostlong) {
-#line 265 "kos/src/libc/magic/netinet.in.c"
+#line 266 "kos/src/libc/magic/netinet.in.c"
 	return (__UINT64_TYPE__)__hybrid_htobe64(__hostlong);
 }
 __NAMESPACE_LOCAL_END

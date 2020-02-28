@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xda6400ed */
+/* HASH CRC-32:0x5938ba3b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2139,6 +2139,16 @@
 #define __CRT_ATTR_NOTHROW_NCX_htons 1
 #define __CRT_ATTR_NOTHROW_NCX_if_freenameindex 1
 #define __CRT_ATTR_NOTHROW_NCX_index 1
+#define __CRT_ATTR_NOTHROW_NCX_inet_addr 1
+#define __CRT_ATTR_NOTHROW_NCX_inet_aton 1
+#define __CRT_ATTR_NOTHROW_NCX_inet_lnaof 1
+#define __CRT_ATTR_NOTHROW_NCX_inet_makeaddr 1
+#define __CRT_ATTR_NOTHROW_NCX_inet_neta 1
+#define __CRT_ATTR_NOTHROW_NCX_inet_netof 1
+#define __CRT_ATTR_NOTHROW_NCX_inet_network 1
+#define __CRT_ATTR_NOTHROW_NCX_inet_ntoa 1
+#define __CRT_ATTR_NOTHROW_NCX_inet_ntoa_r 1
+#define __CRT_ATTR_NOTHROW_NCX_inet_paton 1
 #define __CRT_ATTR_NOTHROW_NCX_initstate 1
 #define __CRT_ATTR_NOTHROW_NCX_initstate_r 1
 #define __CRT_ATTR_NOTHROW_NCX_insque 1
@@ -4045,18 +4055,10 @@
 #define __CRT_ATTR_NOTHROW_RPC_KOS_inet6_rth_reverse 1
 #define __CRT_ATTR_NOTHROW_RPC_KOS_inet6_rth_segments 1
 #define __CRT_ATTR_NOTHROW_RPC_KOS_inet6_rth_space 1
-#define __CRT_ATTR_NOTHROW_RPC_KOS_inet_addr 1
-#define __CRT_ATTR_NOTHROW_RPC_KOS_inet_aton 1
-#define __CRT_ATTR_NOTHROW_RPC_KOS_inet_lnaof 1
-#define __CRT_ATTR_NOTHROW_RPC_KOS_inet_makeaddr 1
 #define __CRT_ATTR_NOTHROW_RPC_KOS_inet_net_ntop 1
 #define __CRT_ATTR_NOTHROW_RPC_KOS_inet_net_pton 1
-#define __CRT_ATTR_NOTHROW_RPC_KOS_inet_neta 1
-#define __CRT_ATTR_NOTHROW_RPC_KOS_inet_netof 1
-#define __CRT_ATTR_NOTHROW_RPC_KOS_inet_network 1
 #define __CRT_ATTR_NOTHROW_RPC_KOS_inet_nsap_addr 1
 #define __CRT_ATTR_NOTHROW_RPC_KOS_inet_nsap_ntoa 1
-#define __CRT_ATTR_NOTHROW_RPC_KOS_inet_ntoa 1
 #define __CRT_ATTR_NOTHROW_RPC_KOS_inet_ntop 1
 #define __CRT_ATTR_NOTHROW_RPC_KOS_inet_pton 1
 #define __CRT_ATTR_NOTHROW_RPC_KOS_lckpwdf 1
@@ -4345,6 +4347,8 @@
 #define __CRT_ATTR_PURE_fuzzy_wmemcmp 1
 #define __CRT_ATTR_PURE_hasmntopt 1
 #define __CRT_ATTR_PURE_index 1
+#define __CRT_ATTR_PURE_inet_addr 1
+#define __CRT_ATTR_PURE_inet_network 1
 #define __CRT_ATTR_PURE_isalnum_l 1
 #define __CRT_ATTR_PURE_isalpha_l 1
 #define __CRT_ATTR_PURE_isblank_l 1
@@ -4798,6 +4802,9 @@
 #define __CRT_ATTR_CONST_htons 1
 #define __CRT_ATTR_CONST_imaxabs 1
 #define __CRT_ATTR_CONST_imaxdiv 1
+#define __CRT_ATTR_CONST_inet_lnaof 1
+#define __CRT_ATTR_CONST_inet_makeaddr 1
+#define __CRT_ATTR_CONST_inet_netof 1
 #define __CRT_ATTR_CONST_isalnum 1
 #define __CRT_ATTR_CONST_isalpha 1
 #define __CRT_ATTR_CONST_isblank 1

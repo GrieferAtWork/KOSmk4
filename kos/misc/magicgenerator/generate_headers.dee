@@ -3275,7 +3275,7 @@ again_enum_name:
 							} else if ("float" in argument_list || "float" in return_type) {
 								conv_name = "double2float";
 							} else {
-								err(i, "Failed to differenciate between ldouble and float math modes for {} (please specifiy explicitly)"
+								err(i, "Failed to differenciate between ldouble and float math modes for {} (please specify explicitly)"
 									.format({ funname }));
 							}
 						}

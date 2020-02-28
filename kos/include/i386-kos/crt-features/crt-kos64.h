@@ -1386,7 +1386,9 @@
 #define __CRT_HAVE_DOS$inet_nsap_addr 1
 #define __CRT_HAVE_DOS$inet_nsap_ntoa 1
 #define __CRT_HAVE_DOS$inet_ntoa 1
+#define __CRT_HAVE_DOS$inet_ntoa_r 1
 #define __CRT_HAVE_DOS$inet_ntop 1
+#define __CRT_HAVE_DOS$inet_paton 1
 #define __CRT_HAVE_DOS$inet_pton 1
 #define __CRT_HAVE_DOS$initgroups 1
 #define __CRT_HAVE_DOS$initstate 1
@@ -4931,7 +4933,9 @@
 #define __CRT_HAVE_inet_nsap_addr 1
 #define __CRT_HAVE_inet_nsap_ntoa 1
 #define __CRT_HAVE_inet_ntoa 1
+#define __CRT_HAVE_inet_ntoa_r 1
 #define __CRT_HAVE_inet_ntop 1
+#define __CRT_HAVE_inet_paton 1
 #define __CRT_HAVE_inet_pton 1
 #define __CRT_HAVE_initgroups 1
 #define __CRT_HAVE_initstate 1

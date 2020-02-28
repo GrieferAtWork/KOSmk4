@@ -68,16 +68,17 @@ __SYSDECL_BEGIN
 #define IN_CLASSA_NET              __UINT32_C(0xff000000)
 #define IN_CLASSA_NSHIFT           24
 #define IN_CLASSA_HOST             __UINT32_C(0x00ffffff) /* 0xffffffff & ~IN_CLASSA_NET */
-#define IN_CLASSA_MAX              128
+#define IN_CLASSA_MAX              __UINT8_C(128)
 #define IN_CLASSB(/*u32*/ a)       (((__CCAST(__uint32_t)(a)) & __UINT32_C(0xc0000000)) == __UINT32_C(0x80000000))
 #define IN_CLASSB_NET              __UINT32_C(0xffff0000)
 #define IN_CLASSB_NSHIFT           16
 #define IN_CLASSB_HOST             __UINT32_C(0x0000ffff) /* 0xffffffff & ~IN_CLASSB_NET */
-#define IN_CLASSB_MAX              65536
+#define IN_CLASSB_MAX              __UINT16_C(65536)
 #define IN_CLASSC(/*u32*/ a)       (((__CCAST(__uint32_t)(a)) & __UINT32_C(0xe0000000)) == __UINT32_C(0xc0000000))
 #define IN_CLASSC_NET              __UINT32_C(0xffffff00)
 #define IN_CLASSC_NSHIFT           8
 #define IN_CLASSC_HOST             __UINT32_C(0x000000ff) /* 0xffffffff & ~IN_CLASSC_NET */
+#define IN_CLASSC_MAX              __UINT32_C(16777216)
 #define IN_CLASSD(/*u32*/ a)       (((__CCAST(__uint32_t)(a)) & __UINT32_C(0xf0000000)) == __UINT32_C(0xe0000000))
 #define IN_MULTICAST(/*u32*/ a)    IN_CLASSD(a)
 #define IN_EXPERIMENTAL(/*u32*/ a) (((__CCAST(__uint32_t)(a)) & __UINT32_C(0xe0000000)) == __UINT32_C(0xe0000000))

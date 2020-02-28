@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x63f10862 */
+/* HASH CRC-32:0xa4513662 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2691,7 +2691,9 @@
 #define __CRT_SECTION_inet_nsap_addr                        __CRT_SECTINFO_net_inet                                 /* .text.crt.net.inet.inet_nsap_addr */
 #define __CRT_SECTION_inet_nsap_ntoa                        __CRT_SECTINFO_net_inet                                 /* .text.crt.net.inet.inet_nsap_ntoa */
 #define __CRT_SECTION_inet_ntoa                             __CRT_SECTINFO_net_inet                                 /* .text.crt.net.inet.inet_ntoa */
+#define __CRT_SECTION_inet_ntoa_r                           __CRT_SECTINFO_net_inet                                 /* .text.crt.net.inet.inet_ntoa_r */
 #define __CRT_SECTION_inet_ntop                             __CRT_SECTINFO_net_inet                                 /* .text.crt.net.inet.inet_ntop */
+#define __CRT_SECTION_inet_paton                            __CRT_SECTINFO_net_inet                                 /* .text.crt.net.inet.inet_paton */
 #define __CRT_SECTION_inet_pton                             __CRT_SECTINFO_net_inet                                 /* .text.crt.net.inet.inet_pton */
 
 /* .text.crt.net.inet.6.RFC_2292.* */

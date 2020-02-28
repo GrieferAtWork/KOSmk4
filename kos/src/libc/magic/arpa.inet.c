@@ -27,7 +27,7 @@
 #include <bits/types.h>
 #include <netinet/in.h>
 
-/* Documentation taken from Glibc /usr/include/arpa/inet.h */
+/* Documentation derived from Glibc /usr/include/arpa/inet.h */
 /* Copyright (C) 1997-2016 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
@@ -57,27 +57,348 @@ typedef __socklen_t socklen_t;
 
 }
 
-@@Convert Internet host address from numbers-and-dots
-@@notation in CP into binary data in network byte order
-[cp_kos] inet_addr:(char const *cp) -> in_addr_t;
+@@Return network number part of the Internet address IN
+[ATTR_WUNUSED][ATTR_CONST]
+[dependency_include(<netinet/in.h>)]
+[dependency_include(<hybrid/__byteswap.h>)]
+inet_netof:(struct in_addr inaddr) -> uint32_t {
+	uint32_t addr = __hybrid_betoh32(inaddr.@s_addr@);
+	if (@IN_CLASSA@(addr)) {
+		return (addr & @IN_CLASSA_NET@) >> @IN_CLASSA_NSHIFT@;
+	} else if (@IN_CLASSB@(addr)) {
+		return (addr & @IN_CLASSB_NET@) >> @IN_CLASSB_NSHIFT@;
+	} else {
+		return (addr & @IN_CLASSC_NET@) >> @IN_CLASSC_NSHIFT@;
+	}
+}
 
 @@Return the local host address part of the Internet address in IN
-[cp_kos] inet_lnaof:(struct in_addr inaddr) -> in_addr_t;
+[ATTR_WUNUSED][ATTR_CONST]
+[dependency_include(<netinet/in.h>)]
+[dependency_include(<hybrid/__byteswap.h>)]
+inet_lnaof:(struct in_addr inaddr) -> uint32_t {
+	uint32_t addr = __hybrid_betoh32(inaddr.@s_addr@);
+	if (@IN_CLASSA@(addr)) {
+		return addr & @IN_CLASSA_HOST@;
+	} else if (@IN_CLASSB@(addr)) {
+		return addr & @IN_CLASSB_HOST@;
+	} else {
+		return addr & @IN_CLASSC_HOST@;
+	}
+}
 
 @@Make Internet host address in network byte order by
 @@combining the network number NET with the local address HOST
-[cp_kos] inet_makeaddr:(in_addr_t net, in_addr_t host) -> struct in_addr;
+[ATTR_WUNUSED][ATTR_CONST]
+[dependency_include(<netinet/in.h>)]
+[dependency_include(<hybrid/__byteswap.h>)]
+inet_makeaddr:(uint32_t net, uint32_t host) -> struct in_addr {
+	struct @in_addr@ result;
+	uint32_t result_addr;
+	if (net < @IN_CLASSA_MAX@)
+		result_addr = (net << @IN_CLASSA_NSHIFT@) | (host & @IN_CLASSA_HOST@);
+	else if (net < @IN_CLASSB_MAX@)
+		result_addr = (net << @IN_CLASSB_NSHIFT@) | (host & @IN_CLASSB_HOST@);
+	else if (net < @IN_CLASSC_MAX@)
+		result_addr = (net << @IN_CLASSC_NSHIFT@) | (host & @IN_CLASSC_HOST@);
+	else {
+		result_addr = net | host;
+	}
+	result.@s_addr@ = __hybrid_htobe32(result_addr);
+	return result;
+}
 
-@@Return network number part of the Internet address IN
-[cp_kos] inet_netof:(struct in_addr inaddr) -> in_addr_t;
-
-@@Extract the network number in network byte order from
-@@the address in numbers-and-dots natation starting at CP
-[cp_kos] inet_network:(char const *cp) -> in_addr_t;
+@@Convert Internet host address from numbers-and-dots
+@@notation in CP into binary data in network byte order
+@@Accepted notations are:
+@@    a.b.c.d  (1.2.3.4)
+@@    a.b.cd   (1.2.52)
+@@    a.bcd    (1.564)
+@@    abcd     (4660)
+@@With each number allowed to be written in as one of:
+@@    123      (decimal)
+@@    0x123    (hex)
+@@    0123     (oct)
+[ATTR_PURE][dependency_include(<netinet/in.h>)]
+inet_addr:([nonnull] char const *__restrict cp) -> in_addr_t {
+	struct @in_addr@ addr;
+	if (!inet_paton((char const **)&cp, &addr, 0) || *cp)
+		return @INADDR_NONE@;
+	return addr.@s_addr@;
+}
 
 @@Convert Internet number in IN to ASCII representation. The return
 @@value is a pointer to an internal array containing the string
-[cp_kos] inet_ntoa:(struct in_addr inaddr) -> char *;
+[ATTR_WUNUSED]
+inet_ntoa:(struct in_addr inaddr) -> [nonnull] char * {
+	static char buf[16];
+	return inet_ntoa_r(inaddr, buf);
+}
+
+%#ifdef __USE_KOS
+%#define INET_NTOA_R_MAXLEN 16 /* Max # of characters written by `inet_ntoa_r' (e.g. `111.111.111.111\0') */
+@@Re-entrant version of `inet_ntoa()'
+[dependency_include(<netinet/in.h>)]
+[dependency_include(<hybrid/__byteswap.h>)]
+inet_ntoa_r:(struct in_addr inaddr, [nonnull] char buf[16]) -> [nonnull] char * {
+	uint32_t addr = __hybrid_betoh32(inaddr.@s_addr@);
+	sprintf(buf, "%u.%u.%u.%u",
+	        (unsigned int)(u8)((addr & __UINT32_C(0xff000000)) >> 24),
+	        (unsigned int)(u8)((addr & __UINT32_C(0x00ff0000)) >> 16),
+	        (unsigned int)(u8)((addr & __UINT32_C(0x0000ff00)) >> 8),
+	        (unsigned int)(u8)((addr & __UINT32_C(0x000000ff))));
+	return buf;
+}
+%#endif /* __USE_KOS */
+
+@@This function is the same as `inet_addr()', except that
+@@the return value is in host-endian, rather than net-endian
+[ATTR_PURE][dependency_include(<netinet/in.h>)]
+[dependency_include(<hybrid/__byteswap.h>)]
+inet_network:([nonnull] char const *__restrict cp) -> uint32_t {
+	struct @in_addr@ addr;
+	if (!inet_paton((char const **)&cp, &addr, 1) || *cp)
+		return @INADDR_NONE@;
+	return addr.@s_addr@;
+}
+
+%
+%/* The following functions are not part of XNS 5.2. */
+%#ifdef __USE_MISC
+
+@@Convert Internet host address from numbers-and-dots notation in
+@@CP into binary data and store the result in the structure INP
+@@Accepted notations are:
+@@    a.b.c.d  (1.2.3.4)
+@@    a.b.cd   (1.2.52)
+@@    a.bcd    (1.564)
+@@    abcd     (4660)
+@@With each number allowed to be written in as one of:
+@@    123      (decimal)
+@@    0x123    (hex)
+@@    0123     (oct)
+@@@return: 0: Bad input format
+@@@return: 1: Success
+inet_aton:([nonnull] char const *__restrict cp,
+           [nonnull] struct in_addr *__restrict inp) -> int {
+	return inet_paton((char const **)&cp, inp, 0) && !*cp;
+}
+
+%#ifdef __USE_KOS
+@@Same as `inet_aton()', but update `*pcp' to point after the address
+@@Accepted notations are:
+@@    a.b.c.d  (1.2.3.4)
+@@    a.b.cd   (1.2.52)
+@@    a.bcd    (1.564)
+@@    abcd     (4660)
+@@With each number allowed to be written in as one of:
+@@    123      (decimal)
+@@    0x123    (hex)
+@@    0123     (oct)
+@@@param: network_addr: When non-zero, `*pcp' is a network address
+@@@return: 0: Bad input format
+@@@return: 1: Success
+[ATTR_WUNUSED][dependency_include(<hybrid/__byteswap.h>)]
+inet_paton:([nonnull] char const **__restrict pcp,
+            [nonnull] struct in_addr *__restrict inp,
+            int network_addr) -> int {
+	uint32_t result;
+	uint32_t parts[4];
+	char const *cp = *pcp;
+	unsigned int i;
+	for (i = 0;;) {
+		char ch = *cp;
+		uint32_t part, new_part;
+		if (ch != '0') {
+			/* Decimal. */
+			if unlikely(!(ch >= '0' && ch <= '9'))
+				goto err; /* Bad format. */
+			part = ch - '0';
+			++cp;
+			for (;;) {
+				ch = *cp;
+				if (!(ch >= '0' && ch <= '9'))
+					break;
+				new_part = part * 10;
+				new_part += ch - '0';
+				if unlikely(new_part < part)
+					goto err; /* Overflow */
+				part = new_part;
+				++cp;
+			}
+		} else {
+			++cp;
+			ch = *cp;
+			if (ch == 'x' || ch == 'X') {
+				/* Hex-part */
+				part = 0;
+				++cp;
+				for (;;) {
+					uint8_t digit;
+					ch = *cp;
+					if (ch >= '0' && ch <= '9') {
+						digit = ch - '0';
+					} else if (ch >= 'a' && ch <= 'f') {
+						digit = 10 + ch - 'a';
+					} else if (ch >= 'A' && ch <= 'F') {
+						digit = 10 + ch - 'A';
+					} else {
+						break;
+					}
+					new_part = part * 16;
+					new_part += digit;
+					if unlikely(new_part < part)
+						goto err; /* Overflow */
+					part = new_part;
+					++cp;
+				}
+			} else if (ch >= '0' && ch <= '7') {
+				/* Oct-part */
+				part = ch - '0';
+				++cp;
+				for (;;) {
+					ch = *cp;
+					if (!(ch >= '0' && ch <= '7'))
+						break;
+					new_part = part * 8;
+					new_part += ch - '0';
+					if unlikely(new_part < part)
+						goto err; /* Overflow */
+					part = new_part;
+					++cp;
+				}
+			} else {
+				/* Zero-part */
+				part = 0;
+			}
+		}
+		parts[i] = part;
+		++i;
+		if (i >= 4) {
+			if unlikely(*cp == '.')
+				goto err; /* Bad format. */
+			break;
+		}
+		if (*cp != '.')
+			break;
+		if unlikely(part > 0xff)
+			goto err; /* Only the last part can be > 255 */
+		++cp;
+	}
+	switch (__builtin_expect(i, 4)) {
+	case 4:
+		if unlikely(parts[3] > 0xff)
+			goto err;
+		result = parts[0] << 24 |
+		         parts[1] << 16 |
+		         parts[2] << 8 |
+		         parts[3];
+		break;
+	case 3:
+		if (network_addr) {
+			if unlikely(parts[2] > 0xff)
+				goto err;
+			result = parts[0] << 16 |
+			         parts[1] << 8 |
+			         parts[2];
+		} else {
+			if unlikely(parts[2] > 0xffff)
+				goto err;
+			result = parts[0] << 24 |
+			         parts[1] << 16 |
+			         parts[2];
+		}
+		break;
+	case 2:
+		if (network_addr) {
+			if unlikely(parts[1] > 0xff)
+				goto err;
+			result = parts[0] << 8 |
+			         parts[1];
+		} else {
+			if unlikely(parts[1] > 0xffffff)
+				goto err;
+			result = parts[0] << 24 |
+			         parts[1];
+		}
+		break;
+	case 1:
+		if (network_addr) {
+			if unlikely(parts[0] > 0xff)
+				goto err;
+		}
+		result = parts[0];
+		break;
+	default: __builtin_unreachable();
+	}
+	inp->@s_addr@ = __hybrid_htobe32(result);
+	*pcp = cp;
+	return 1;
+err:
+	return 0;
+}
+%#endif /* __USE_KOS */
+
+@@Format a network number NET into presentation format and place
+@@result in buffer starting at BUF with length of LEN bytes
+[dependency_include(<parts/errno.h>)]
+inet_neta:(uint32_t net, [outp(len)] char *buf, size_t len) -> char * {
+	size_t reqlen;
+	if (net <= 0xff) {
+		if (!net) {
+			reqlen = 8;
+			if likely(len >= 8)
+				memcpy(buf, "0.0.0.0", 8 * sizeof(char));
+		} else {
+			reqlen = snprintf(buf, len, "%u", (unsigned int)net);
+		}
+	} else if (net <= 0xffff) {
+		reqlen = snprintf(buf, len, "%u.%u",
+		                  (unsigned int)((net & 0xff00) >> 8),
+		                  (unsigned int)(net & 0xff));
+	} else if (net <= 0xffffff) {
+		reqlen = snprintf(buf, len, "%u.%u.%u",
+		                  (unsigned int)((net & 0xff0000) >> 16),
+		                  (unsigned int)((net & 0xff00) >> 8),
+		                  (unsigned int)(net & 0xff));
+	} else {
+		reqlen = snprintf(buf, len, "%u.%u.%u.%u",
+		                  (unsigned int)((net & 0xff000000) >> 24),
+		                  (unsigned int)((net & 0xff0000) >> 16),
+		                  (unsigned int)((net & 0xff00) >> 8),
+		                  (unsigned int)(net & 0xff));
+	}
+	if unlikely(reqlen > len)
+		goto too_small;
+	return buf;
+too_small:
+#ifdef @__EMSGSIZE@
+	__libc_seterrno(@__EMSGSIZE@);
+#elif defined(@__ERANGE@)
+	__libc_seterrno(@__ERANGE@);
+#elif defined(@__EINVAL@)
+	__libc_seterrno(@__EINVAL@);
+#endif
+	return NULL;
+}
+
+@@Convert network number for interface type AF in buffer starting at CP
+@@to presentation format. The result will specify BITS bits of the number
+[cp_kos] inet_net_ntop:(int af, void const *cp, int bits, char *buf, size_t len) -> char *;
+
+@@Convert network number for interface type AF from presentation in buffer starting
+@@at CP to network format and store result int buffer starting at BUF of size LEN
+[cp_kos] inet_net_pton:(int af, char const *cp, void *buf, size_t len) -> int;
+
+@@Convert ASCII representation in hexadecimal form of the Internet address
+@@to binary form and place result in buffer of length LEN starting at BUF
+[cp_kos] inet_nsap_addr:(char const *cp, unsigned char *buf, int len) -> unsigned int;
+
+@@Convert internet address in binary form in LEN bytes
+@@starting at CP a presentation form and place result in BUF
+[cp_kos] inet_nsap_ntoa:(int len, unsigned char const *cp, char *buf) -> char *;
+
+%#endif /* __USE_MISC */
 
 @@Convert from presentation format of an Internet number in buffer
 @@starting at CP to the binary network format and store result for
@@ -86,41 +407,8 @@ typedef __socklen_t socklen_t;
 
 @@Convert a Internet address in binary network format for interface
 @@type AF in buffer starting at CP to presentation form and place
-@@result in buffer of length LEN astarting at BUF
+@@result in buffer of length LEN starting at BUF
 [cp_kos] inet_ntop:(int af, void const *__restrict cp, char *__restrict buf, socklen_t len) -> char const *;
-
-%
-%/* The following functions are not part of XNS 5.2. */
-%#ifdef __USE_MISC
-
-@@Convert Internet host address from numbers-and-dots notation in CP
-@@into binary data and store the result in the structure INP
-[cp_kos] inet_aton:(char const *cp, struct in_addr *inp) -> int;
-
-@@Format a network number NET into presentation format and place
-@@result in buffer starting at BUF with length of LEN bytes
-[cp_kos] inet_neta:(in_addr_t net, char *buf, size_t len) -> char *;
-
-@@Convert network number for interface type AF in buffer starting at
-@@CP to presentation format.  The result will specifiy BITS bits of
-@@the number
-[cp_kos] inet_net_ntop:(int af, void const *cp, int bits, char *buf, size_t len) -> char *;
-
-@@Convert network number for interface type AF from presentation in
-@@buffer starting at CP to network format and store result int
-@@buffer starting at BUF of size LEN
-[cp_kos] inet_net_pton:(int af, char const *cp, void *buf, size_t len) -> int;
-
-@@Convert ASCII representation in hexadecimal form of the Internet
-@@address to binary form and place result in buffer of length LEN
-@@starting at BUF
-[cp_kos] inet_nsap_addr:(char const *cp, unsigned char *buf, int len) -> unsigned int;
-
-@@Convert internet address in binary form in LEN bytes starting
-@@at CP a presentation form and place result in BUF
-[cp_kos] inet_nsap_ntoa:(int len, unsigned char const *cp, char *buf) -> char *;
-
-%#endif /* __USE_MISC */
 
 
 %{

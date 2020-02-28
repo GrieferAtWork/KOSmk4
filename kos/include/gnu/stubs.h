@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcadf3602 */
+/* HASH CRC-32:0x385d51f8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -286,17 +286,10 @@
 #define __stub_inet6_rth_reverse 1
 #define __stub_inet6_rth_segments 1
 #define __stub_inet6_rth_space 1
-#define __stub_inet_addr 1
-#define __stub_inet_aton 1
-#define __stub_inet_lnaof 1
 #define __stub_inet_net_ntop 1
 #define __stub_inet_net_pton 1
-#define __stub_inet_neta 1
-#define __stub_inet_netof 1
-#define __stub_inet_network 1
 #define __stub_inet_nsap_addr 1
 #define __stub_inet_nsap_ntoa 1
-#define __stub_inet_ntoa 1
 #define __stub_inet_ntop 1
 #define __stub_inet_pton 1
 #define __stub_initgroups 1
