@@ -317,7 +317,6 @@ struct usb_controller
 	                      PUSB_INTERRUPT_HANDLER handler, void *__restrict character_or_block_device,
 	                      size_t buflen, uintptr_t flags, unsigned int poll_interval_in_milliseconds);
 };
-DEFINE_REFCOUNT_TYPE_SUBCLASS(usb_controller, character_device)
 
 #define usb_controller_cinit(self)                  \
 	(atomic_rwlock_cinit(&(self)->uc_devslock),     \

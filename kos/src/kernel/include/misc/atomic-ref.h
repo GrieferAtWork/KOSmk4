@@ -111,7 +111,7 @@ template<class T> struct atomic_ref {
 		COMPILER_READ_BARRIER();
 		result = this->m_pointer;
 		COMPILER_READ_BARRIER();
-		refcnt_methods<T>::incref(result);
+		REFCNT_METHODS(T)::incref(result);
 #ifndef CONFIG_NO_SMP
 		__hybrid_atomic_fetchdec(this->m_inuse, __ATOMIC_SEQ_CST);
 #endif /* !CONFIG_NO_SMP */
@@ -129,7 +129,7 @@ template<class T> struct atomic_ref {
 		COMPILER_READ_BARRIER();
 		result = this->m_pointer;
 		COMPILER_READ_BARRIER();
-		refcnt_methods<T>::incref(result);
+		REFCNT_METHODS(T)::incref(result);
 #ifndef CONFIG_NO_SMP
 		__hybrid_atomic_fetchdec(this->m_inuse, __ATOMIC_SEQ_CST);
 #endif /* !CONFIG_NO_SMP */
@@ -141,7 +141,7 @@ template<class T> struct atomic_ref {
 	void KCALL set(T *__restrict new_pointer) __CXX_NOEXCEPT {
 		REF T *old_pointer;
 		old_pointer = this->exchange(new_pointer);
-		refcnt_methods<T>::decref(old_pointer);
+		REFCNT_METHODS(T)::decref(old_pointer);
 	}
 
 	/* Return a reference to the current pointed-to value */
@@ -149,13 +149,13 @@ template<class T> struct atomic_ref {
 	void KCALL set_inherit_new(REF T *__restrict new_pointer) __CXX_NOEXCEPT {
 		REF T *old_pointer;
 		old_pointer = this->exchange_inherit_new(new_pointer);
-		refcnt_methods<T>::decref(old_pointer);
+		REFCNT_METHODS(T)::decref(old_pointer);
 	}
 
 	/* Return a reference to the current pointed-to value */
 	__CXX_CLASSMEMBER ATTR_LEAF WUNUSED ATTR_RETNONNULL NONNULL((1)) NOBLOCK_IF(!PREEMPTION_ENABLED())
 	REF T *KCALL exchange(T *__restrict new_pointer) __CXX_NOEXCEPT {
-		refcnt_methods<T>::incref(new_pointer);
+		REFCNT_METHODS(T)::incref(new_pointer);
 		return exchange_inherit_new(new_pointer);
 	}
 
@@ -185,7 +185,7 @@ template<class T> struct atomic_ref {
 #ifdef CONFIG_NO_SMP
 		pflag_t was;
 #endif /* CONFIG_NO_SMP */
-		refcnt_methods<T>::incref(new_pointer);
+		REFCNT_METHODS(T)::incref(new_pointer);
 #ifdef CONFIG_NO_SMP
 		was = PREEMPTION_PUSHOFF();
 #endif /* CONFIG_NO_SMP */
@@ -197,7 +197,7 @@ template<class T> struct atomic_ref {
 #ifdef CONFIG_NO_SMP
 			PREEMPTION_POP(was);
 #endif /* CONFIG_NO_SMP */
-			refcnt_methods<T>::decref_nokill(new_pointer);
+			REFCNT_METHODS(T)::decref_nokill(new_pointer);
 			return false;
 		}
 #ifndef CONFIG_NO_SMP
@@ -206,7 +206,7 @@ template<class T> struct atomic_ref {
 #else /* !CONFIG_NO_SMP */
 		PREEMPTION_POP(was);
 #endif /* CONFIG_NO_SMP */
-		refcnt_methods<T>::decref(old_pointer);
+		REFCNT_METHODS(T)::decref(old_pointer);
 		return true;
 	}
 
@@ -233,7 +233,7 @@ template<class T> struct atomic_ref {
 #else /* !CONFIG_NO_SMP */
 		PREEMPTION_POP(was);
 #endif /* CONFIG_NO_SMP */
-		refcnt_methods<T>::decref(old_pointer);
+		REFCNT_METHODS(T)::decref(old_pointer);
 		return true;
 	}
 };
@@ -282,7 +282,7 @@ template<class T> struct xatomic_ref {
 		result = this->m_pointer;
 		COMPILER_READ_BARRIER();
 		if (result)
-			refcnt_methods<T>::incref(result);
+			REFCNT_METHODS(T)::incref(result);
 #ifndef CONFIG_NO_SMP
 		__hybrid_atomic_fetchdec(this->m_inuse, __ATOMIC_SEQ_CST);
 #endif /* !CONFIG_NO_SMP */
@@ -300,7 +300,7 @@ template<class T> struct xatomic_ref {
 		result = this->m_pointer;
 		COMPILER_READ_BARRIER();
 		if (result)
-			refcnt_methods<T>::incref(result);
+			REFCNT_METHODS(T)::incref(result);
 #ifndef CONFIG_NO_SMP
 		__hybrid_atomic_fetchdec(this->m_inuse, __ATOMIC_SEQ_CST);
 #endif /* !CONFIG_NO_SMP */
@@ -313,7 +313,7 @@ template<class T> struct xatomic_ref {
 		REF T *old_pointer;
 		old_pointer = this->exchange(new_pointer);
 		if (old_pointer)
-			refcnt_methods<T>::decref(old_pointer);
+			REFCNT_METHODS(T)::decref(old_pointer);
 	}
 
 	/* Return a reference to the current pointed-to value */
@@ -322,14 +322,14 @@ template<class T> struct xatomic_ref {
 		REF T *old_pointer;
 		old_pointer = this->exchange_inherit_new(new_pointer);
 		if (old_pointer)
-			refcnt_methods<T>::decref(old_pointer);
+			REFCNT_METHODS(T)::decref(old_pointer);
 	}
 
 	/* Return a reference to the current pointed-to value */
 	__CXX_CLASSMEMBER ATTR_LEAF WUNUSED NOBLOCK_IF(!PREEMPTION_ENABLED())
 	REF T *KCALL exchange(T *new_pointer) __CXX_NOEXCEPT {
 		if (new_pointer)
-			refcnt_methods<T>::incref(new_pointer);
+			REFCNT_METHODS(T)::incref(new_pointer);
 		return exchange_inherit_new(new_pointer);
 	}
 
@@ -360,7 +360,7 @@ template<class T> struct xatomic_ref {
 		pflag_t was;
 #endif /* CONFIG_NO_SMP */
 		if (new_pointer)
-			refcnt_methods<T>::incref(new_pointer);
+			REFCNT_METHODS(T)::incref(new_pointer);
 #ifdef CONFIG_NO_SMP
 		was = PREEMPTION_PUSHOFF();
 #endif /* CONFIG_NO_SMP */
@@ -373,7 +373,7 @@ template<class T> struct xatomic_ref {
 			PREEMPTION_POP(was);
 #endif /* CONFIG_NO_SMP */
 			if (new_pointer)
-				refcnt_methods<T>::decref_nokill(new_pointer);
+				REFCNT_METHODS(T)::decref_nokill(new_pointer);
 			return false;
 		}
 #ifndef CONFIG_NO_SMP
@@ -383,7 +383,7 @@ template<class T> struct xatomic_ref {
 		PREEMPTION_POP(was);
 #endif /* CONFIG_NO_SMP */
 		if (old_pointer)
-			refcnt_methods<T>::decref(old_pointer);
+			REFCNT_METHODS(T)::decref(old_pointer);
 		return true;
 	}
 
@@ -411,7 +411,7 @@ template<class T> struct xatomic_ref {
 		PREEMPTION_POP(was);
 #endif /* CONFIG_NO_SMP */
 		if (old_pointer)
-			refcnt_methods<T>::decref(old_pointer);
+			REFCNT_METHODS(T)::decref(old_pointer);
 		return true;
 	}
 };
@@ -483,7 +483,7 @@ template<class T> struct xatomic_weaklyref {
 		COMPILER_READ_BARRIER();
 		result = this->m_pointer;
 		COMPILER_READ_BARRIER();
-		if (result && !refcnt_methods<T>::tryincref(result))
+		if (result && !REFCNT_METHODS(T)::tryincref(result))
 			result = __NULLPTR;
 #ifndef CONFIG_NO_SMP
 		__hybrid_atomic_fetchdec(this->m_inuse, __ATOMIC_SEQ_CST);
@@ -518,7 +518,7 @@ template<class T> struct xatomic_weaklyref {
 		old_pointer = __hybrid_atomic_xch(this->m_pointer,
 		                                  new_pointer,
 		                                  __ATOMIC_SEQ_CST);
-		if (old_pointer && !refcnt_methods<T>::tryincref(old_pointer))
+		if (old_pointer && !REFCNT_METHODS(T)::tryincref(old_pointer))
 			old_pointer = __NULLPTR;
 #ifndef CONFIG_NO_SMP
 		while (__hybrid_atomic_load(this->m_inuse, __ATOMIC_ACQUIRE))

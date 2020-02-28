@@ -82,7 +82,6 @@ struct mouse_device
 #endif /* !CONFIG_NO_SMP */
 	WEAK uintptr_t          md_flags; /* Mouse device flags (Set of `MOUSE_DEVICE_FLAG_*') */
 };
-DEFINE_REFCOUNT_TYPE_SUBCLASS(mouse_device, character_device);
 
 
 #define character_device_isamouse(self)                    \

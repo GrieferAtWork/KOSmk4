@@ -230,7 +230,6 @@ struct uhci_controller: usb_controller {
 	                                               * interrupt where ISO interrupts where checked for completion. */
 	u8                         uc_portnum;        /* [const] # of available ports. */
 };
-DEFINE_REFCOUNT_TYPE_SUBCLASS(uhci_controller, usb_controller)
 
 #ifndef CONFIG_UHCI_USE_ASYNC_WORKERS
 struct uhci_powerctl {

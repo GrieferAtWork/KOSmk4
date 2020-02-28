@@ -310,10 +310,6 @@ __NAMESPACE_INT_END
 #define FINALLY_XDECREF_UNLIKELY(ptr) __NAMESPACE_INT_SYM _finally_xdecref_unlikely<REFCNT_METHODS_BASE_P(*(ptr))> __COMPILER_UNIQUE(__fxdecref_u)(ptr)
 
 
-#define DEFINE_REFCOUNT_TYPE_SUBCLASS(subclass, baseclass)                          \
-	extern "C++" {                                                                  \
-	template<> class refcnt_methods<subclass>: public refcnt_methods<baseclass> {}; \
-	}
 
 #ifdef __INTELLISENSE__
 template<class T> class sync_methods {
@@ -622,7 +618,6 @@ __NAMESPACE_INT_END
 
 
 #else /* __cplusplus */
-#define DEFINE_REFCOUNT_TYPE_SUBCLASS(subclass, baseclass)             /* nothing */
 #define __DEFINE_SYNC_PROXY(T, field)                                  /* nothing */
 #define __DEFINE_SYNC_RWLOCK(T, _tryread, _read, _read_nx, _endread, _reading, _canread,   \
                              _trywrite, _write, _write_nx, _endwrite, _writing, _canwrite, \

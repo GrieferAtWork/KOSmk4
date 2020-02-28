@@ -78,7 +78,6 @@ struct tty_device
 	                                size_t num_bytes, iomode_t mode) THROWS(...);
 };
 
-DEFINE_REFCOUNT_TYPE_SUBCLASS(tty_device, ttybase_device);
 
 
 #define ttybase_isatty(self) \

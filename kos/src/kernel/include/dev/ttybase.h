@@ -50,7 +50,6 @@ struct ttybase_device
 	XATOMIC_REF(struct taskpid)       t_fproc; /* [0..1] PID of the foreground process group leader.
 	                                            * This process is usually apart of the same session as `t_cproc' */
 };
-DEFINE_REFCOUNT_TYPE_SUBCLASS(ttybase_device, character_device);
 
 
 /* Kernel-level implementations for terminal system operators. */

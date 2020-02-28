@@ -64,7 +64,6 @@ struct pty_slave
 	WEAK struct winsize                  ps_wsize;  /* Terminal window size. */
 	XATOMIC_WEAKLYREF(struct pty_master) ps_master; /* [0..1] The terminal's master side (cleared when destroyed) */
 };
-DEFINE_REFCOUNT_TYPE_SUBCLASS(pty_slave, ttybase_device);
 
 struct pty_master
 #ifdef __cplusplus
@@ -76,7 +75,6 @@ struct pty_master
 #endif /* !__cplusplus */
 	XATOMIC_WEAKLYREF(struct pty_slave) pm_slave; /* [0..1] The terminal's slave side (cleared when destroyed) */
 };
-DEFINE_REFCOUNT_TYPE_SUBCLASS(pty_master, character_device);
 
 /* Check if a given TTY/character device is a `struct pty_slave'. */
 #define ttybase_isapty(self) \

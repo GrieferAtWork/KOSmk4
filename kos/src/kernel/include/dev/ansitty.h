@@ -43,7 +43,6 @@ struct ansitty_device
 	struct ansitty                       at_ansi; /* Ansi TTY support. */
 	XATOMIC_WEAKLYREF(struct tty_device) at_tty;  /* [0..1] Weak reference to a connected TTY (used for injecting keyboard input) */
 };
-DEFINE_REFCOUNT_TYPE_SUBCLASS(ansitty_device, character_device);
 
 #define character_device_isanansitty(self)                   \
 	((self)->cd_heapsize >= sizeof(struct ansitty_device) && \

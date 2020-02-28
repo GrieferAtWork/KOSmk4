@@ -108,7 +108,6 @@ struct keyboard_device
 	struct mutex               kd_leds_lock;    /* Lock for updating `kd_leds' */
 	uintptr_t                  kd_leds;         /* [lock(kd_leds)] Set of currently lit LEDs (when modified, `ko_setled' must be called). */
 };
-DEFINE_REFCOUNT_TYPE_SUBCLASS(keyboard_device, character_device);
 
 
 #define character_device_isakeyboard(self)                    \
