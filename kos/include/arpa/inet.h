@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe2ab5aeb */
+/* HASH CRC-32:0x32315511 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,29 +62,29 @@ typedef __socklen_t socklen_t;
 
 #ifdef __CRT_HAVE_inet_netof
 /* Return network number part of the Internet address IN */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,uint32_t,__NOTHROW_NCX,inet_netof,(struct in_addr __inaddr),(__inaddr))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__UINT32_TYPE__,__NOTHROW_NCX,inet_netof,(struct in_addr __inaddr),(__inaddr))
 #else /* LIBC: inet_netof */
 #include <local/arpa.inet/inet_netof.h>
 /* Return network number part of the Internet address IN */
-__NAMESPACE_LOCAL_USING_OR_IMPL(inet_netof, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED uint32_t __NOTHROW_NCX(__LIBCCALL inet_netof)(struct in_addr __inaddr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inet_netof))(__inaddr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(inet_netof, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL inet_netof)(struct in_addr __inaddr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inet_netof))(__inaddr); })
 #endif /* inet_netof... */
 #ifdef __CRT_HAVE_inet_lnaof
 /* Return the local host address part of the Internet address in IN */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,uint32_t,__NOTHROW_NCX,inet_lnaof,(struct in_addr __inaddr),(__inaddr))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__UINT32_TYPE__,__NOTHROW_NCX,inet_lnaof,(struct in_addr __inaddr),(__inaddr))
 #else /* LIBC: inet_lnaof */
 #include <local/arpa.inet/inet_lnaof.h>
 /* Return the local host address part of the Internet address in IN */
-__NAMESPACE_LOCAL_USING_OR_IMPL(inet_lnaof, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED uint32_t __NOTHROW_NCX(__LIBCCALL inet_lnaof)(struct in_addr __inaddr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inet_lnaof))(__inaddr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(inet_lnaof, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL inet_lnaof)(struct in_addr __inaddr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inet_lnaof))(__inaddr); })
 #endif /* inet_lnaof... */
 #ifdef __CRT_HAVE_inet_makeaddr
 /* Make Internet host address in network byte order by
  * combining the network number NET with the local address HOST */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,struct in_addr,__NOTHROW_NCX,inet_makeaddr,(uint32_t __net, uint32_t __host),(__net,__host))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,struct in_addr,__NOTHROW_NCX,inet_makeaddr,(__UINT32_TYPE__ __net, __UINT32_TYPE__ __host),(__net,__host))
 #else /* LIBC: inet_makeaddr */
 #include <local/arpa.inet/inet_makeaddr.h>
 /* Make Internet host address in network byte order by
  * combining the network number NET with the local address HOST */
-__NAMESPACE_LOCAL_USING_OR_IMPL(inet_makeaddr, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED struct in_addr __NOTHROW_NCX(__LIBCCALL inet_makeaddr)(uint32_t __net, uint32_t __host) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inet_makeaddr))(__net, __host); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(inet_makeaddr, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED struct in_addr __NOTHROW_NCX(__LIBCCALL inet_makeaddr)(__UINT32_TYPE__ __net, __UINT32_TYPE__ __host) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inet_makeaddr))(__net, __host); })
 #endif /* inet_makeaddr... */
 #ifdef __CRT_HAVE_inet_addr
 /* Convert Internet host address from numbers-and-dots
@@ -138,12 +138,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(inet_ntoa_r, __FORCELOCAL __ATTR_RETNONNULL __AT
 #ifdef __CRT_HAVE_inet_network
 /* This function is the same as `inet_addr()', except that
  * the return value is in host-endian, rather than net-endian */
-__CDECLARE(__ATTR_PURE __ATTR_NONNULL((1)),uint32_t,__NOTHROW_NCX,inet_network,(char const *__restrict __cp),(__cp))
+__CDECLARE(__ATTR_PURE __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,inet_network,(char const *__restrict __cp),(__cp))
 #else /* LIBC: inet_network */
 #include <local/arpa.inet/inet_network.h>
 /* This function is the same as `inet_addr()', except that
  * the return value is in host-endian, rather than net-endian */
-__NAMESPACE_LOCAL_USING_OR_IMPL(inet_network, __FORCELOCAL __ATTR_PURE __ATTR_NONNULL((1)) uint32_t __NOTHROW_NCX(__LIBCCALL inet_network)(char const *__restrict __cp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inet_network))(__cp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(inet_network, __FORCELOCAL __ATTR_PURE __ATTR_NONNULL((1)) __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL inet_network)(char const *__restrict __cp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inet_network))(__cp); })
 #endif /* inet_network... */
 
 /* The following functions are not part of XNS 5.2. */
@@ -217,22 +217,22 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(inet_paton, __FORCELOCAL __ATTR_WUNUSED __ATTR_N
 #ifdef __CRT_HAVE_inet_neta
 /* Format a network number NET into presentation format and place
  * result in buffer starting at BUF with length of LEN bytes */
-__CDECLARE(__ATTR_NONNULL((2)),char *,__NOTHROW_NCX,inet_neta,(uint32_t __net, char *__buf, size_t __len),(__net,__buf,__len))
+__CDECLARE(__ATTR_NONNULL((2)),char *,__NOTHROW_NCX,inet_neta,(__UINT32_TYPE__ __net, char *__buf, __SIZE_TYPE__ __len),(__net,__buf,__len))
 #else /* LIBC: inet_neta */
 #include <local/arpa.inet/inet_neta.h>
 /* Format a network number NET into presentation format and place
  * result in buffer starting at BUF with length of LEN bytes */
-__NAMESPACE_LOCAL_USING_OR_IMPL(inet_neta, __FORCELOCAL __ATTR_NONNULL((2)) char *__NOTHROW_NCX(__LIBCCALL inet_neta)(uint32_t __net, char *__buf, size_t __len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inet_neta))(__net, __buf, __len); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(inet_neta, __FORCELOCAL __ATTR_NONNULL((2)) char *__NOTHROW_NCX(__LIBCCALL inet_neta)(__UINT32_TYPE__ __net, char *__buf, __SIZE_TYPE__ __len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inet_neta))(__net, __buf, __len); })
 #endif /* inet_neta... */
 #ifdef __CRT_HAVE_inet_net_ntop
 /* Convert network number for interface type AF in buffer starting at CP
  * to presentation format. The result will specify BITS bits of the number */
-__CDECLARE(,char *,__NOTHROW_RPC_KOS,inet_net_ntop,(int __af, void const *__cp, int __bits, char *__buf, size_t __len),(__af,__cp,__bits,__buf,__len))
+__CDECLARE(,char *,__NOTHROW_RPC_KOS,inet_net_ntop,(int __af, void const *__cp, int __bits, char *__buf, __SIZE_TYPE__ __len),(__af,__cp,__bits,__buf,__len))
 #endif /* inet_net_ntop... */
 #ifdef __CRT_HAVE_inet_net_pton
 /* Convert network number for interface type AF from presentation in buffer starting
  * at CP to network format and store result int buffer starting at BUF of size LEN */
-__CDECLARE(,int,__NOTHROW_RPC_KOS,inet_net_pton,(int __af, char const *__cp, void *__buf, size_t __len),(__af,__cp,__buf,__len))
+__CDECLARE(,int,__NOTHROW_RPC_KOS,inet_net_pton,(int __af, char const *__cp, void *__buf, __SIZE_TYPE__ __len),(__af,__cp,__buf,__len))
 #endif /* inet_net_pton... */
 #ifdef __CRT_HAVE_inet_nsap_addr
 /* Convert ASCII representation in hexadecimal form of the Internet address

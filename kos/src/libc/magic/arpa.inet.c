@@ -61,7 +61,7 @@ typedef __socklen_t socklen_t;
 [ATTR_WUNUSED][ATTR_CONST]
 [dependency_include(<netinet/in.h>)]
 [dependency_include(<hybrid/__byteswap.h>)]
-inet_netof:(struct in_addr inaddr) -> uint32_t {
+inet_netof:(struct in_addr inaddr) -> $uint32_t {
 	uint32_t addr = __hybrid_betoh32(inaddr.@s_addr@);
 	if (@IN_CLASSA@(addr)) {
 		return (addr & @IN_CLASSA_NET@) >> @IN_CLASSA_NSHIFT@;
@@ -76,7 +76,7 @@ inet_netof:(struct in_addr inaddr) -> uint32_t {
 [ATTR_WUNUSED][ATTR_CONST]
 [dependency_include(<netinet/in.h>)]
 [dependency_include(<hybrid/__byteswap.h>)]
-inet_lnaof:(struct in_addr inaddr) -> uint32_t {
+inet_lnaof:(struct in_addr inaddr) -> $uint32_t {
 	uint32_t addr = __hybrid_betoh32(inaddr.@s_addr@);
 	if (@IN_CLASSA@(addr)) {
 		return addr & @IN_CLASSA_HOST@;
@@ -92,7 +92,7 @@ inet_lnaof:(struct in_addr inaddr) -> uint32_t {
 [ATTR_WUNUSED][ATTR_CONST]
 [dependency_include(<netinet/in.h>)]
 [dependency_include(<hybrid/__byteswap.h>)]
-inet_makeaddr:(uint32_t net, uint32_t host) -> struct in_addr {
+inet_makeaddr:($uint32_t net, $uint32_t host) -> struct in_addr {
 	struct @in_addr@ result;
 	uint32_t result_addr;
 	if (net < @IN_CLASSA_MAX@)
@@ -155,7 +155,7 @@ inet_ntoa_r:(struct in_addr inaddr, [nonnull] char buf[16]) -> [nonnull] char * 
 @@the return value is in host-endian, rather than net-endian
 [ATTR_PURE][dependency_include(<netinet/in.h>)]
 [dependency_include(<hybrid/__byteswap.h>)]
-inet_network:([nonnull] char const *__restrict cp) -> uint32_t {
+inet_network:([nonnull] char const *__restrict cp) -> $uint32_t {
 	struct @in_addr@ addr;
 	if (!inet_paton((char const **)&cp, &addr, 1) || *cp)
 		return @INADDR_NONE@;
@@ -342,7 +342,7 @@ err:
 @@Format a network number NET into presentation format and place
 @@result in buffer starting at BUF with length of LEN bytes
 [dependency_include(<parts/errno.h>)]
-inet_neta:(uint32_t net, [outp(len)] char *buf, size_t len) -> char * {
+inet_neta:($uint32_t net, [outp(len)] char *buf, $size_t len) -> char * {
 	size_t reqlen;
 	if (net <= 0xff) {
 		if (!net) {
@@ -384,11 +384,11 @@ too_small:
 
 @@Convert network number for interface type AF in buffer starting at CP
 @@to presentation format. The result will specify BITS bits of the number
-[cp_kos] inet_net_ntop:(int af, void const *cp, int bits, char *buf, size_t len) -> char *;
+[cp_kos] inet_net_ntop:(int af, void const *cp, int bits, char *buf, $size_t len) -> char *;
 
 @@Convert network number for interface type AF from presentation in buffer starting
 @@at CP to network format and store result int buffer starting at BUF of size LEN
-[cp_kos] inet_net_pton:(int af, char const *cp, void *buf, size_t len) -> int;
+[cp_kos] inet_net_pton:(int af, char const *cp, void *buf, $size_t len) -> int;
 
 @@Convert ASCII representation in hexadecimal form of the Internet address
 @@to binary form and place result in buffer of length LEN starting at BUF
