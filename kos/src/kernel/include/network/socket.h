@@ -352,6 +352,11 @@ struct socket_ops {
 	 *                                MSG_WAITALL | MSG_CMSG_COMPAT'
 	 * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED: [...]
 	 * @throws: E_NET_CONNECTION_REFUSED:                                                   [...] */
+	/* TODO: recv() should _not_ be an AIO operation. There is no situation where incoming data
+	 *       would not need to be temporarily buffered, so using AIO would _always_ require the
+	 *       use of an async job, at which point it would be just as efficient to make this interface
+	 *       blocking, unless `MSG_DONTWAIT' is passed, in which case the function won't block, and
+	 *       simply return to indicate if data could be read immediately. */
 	NONNULL((1, 7)) void
 	(KCALL *so_recv)(struct socket *__restrict self,
 	                 USER CHECKED void *buf, size_t bufsize, /*0..1*/ USER CHECKED u32 *presult_flags,

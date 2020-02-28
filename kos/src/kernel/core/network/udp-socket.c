@@ -242,8 +242,8 @@ udp_sendtov(struct socket *__restrict self,
 		udp_autobind(me);
 	if (msg_control != NULL)
 		THROW(E_NOT_IMPLEMENTED_TODO); /* TODO: IP Control message packets (can be used to set IP.TOS, etc.) */
-	if unlikely(bufsize > 0xffff)
-		THROW(E_NET_MESSAGE_TOO_LONG, bufsize, 0xffff);
+	if unlikely(bufsize > (0xffff - sizeof(struct udphdr)))
+		THROW(E_NET_MESSAGE_TOO_LONG, bufsize, 0xffff - sizeof(struct udphdr));
 	/* Construct the UDP packet to-be sent. */
 	packet = nic_device_newpacketv(dev, buf,
 	                               UDP_PACKET_HEADSIZE,
@@ -260,7 +260,7 @@ udp_sendtov(struct socket *__restrict self,
 		/* Fill in UDP header fields. */
 		udp->uh_sport = me->us_bindport;
 		udp->uh_dport = (be16)ATOMIC_READ(*(u16 *)&in->sin_port);
-		udp->uh_ulen  = htons((u16)bufsize);
+		udp->uh_ulen  = htons((u16)bufsize + sizeof(struct udphdr));
 		udp->uh_sum   = htons(0); /* TODO? */
 		/* Fill in IP header fields, as required by `ip_senddatagram()' */
 		ip->ip_hl         = 5;
