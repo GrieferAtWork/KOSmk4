@@ -191,7 +191,7 @@ struct socket_ops {
 	NOBLOCK NONNULL((1)) void
 	/*NOTHROW*/ (KCALL *so_fini)(struct socket *__restrict self);
 
-	/* [1..1] Poll for special condition
+	/* [0..1] Poll for special condition
 	 * The following conditions are defined:
 	 *    POLLIN:    `so_recv()' or `so_recvfrom()' if not listening,
 	 *               or `so_accept()' if listening can be called.
@@ -231,13 +231,14 @@ struct socket_ops {
 	 * @throws: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT:                                  [...]
 	 * @throws: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY: [...]
 	 * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND:                 [...]
-	 * @throws: E_NET_ADDRESS_NOT_AVAILABLE:                                                                [...] */
+	 * @throws: E_NET_ADDRESS_NOT_AVAILABLE:                                                                [...]
+	 * @throws: E_BUFFER_TOO_SMALL: The given `addr_len' is too small */
 	NONNULL((1)) void
 	(KCALL *so_bind)(struct socket *__restrict self,
 	                 USER CHECKED struct sockaddr const *addr,
 	                 socklen_t addr_len)
 			THROWS(E_NET_ADDRESS_IN_USE, E_INVALID_ARGUMENT_UNEXPECTED_COMMAND,
-			       E_INVALID_ARGUMENT_BAD_STATE);
+			       E_INVALID_ARGUMENT_BAD_STATE, E_BUFFER_TOO_SMALL);
 
 	/* [1..1]
 	 * Connect to the specified address.
@@ -249,7 +250,8 @@ struct socket_ops {
 	 * @throws: E_BADALLOC_INSUFFICIENT_PORT_NUMBERS:                                                          [...]
 	 * @throws: E_NET_CONNECTION_REFUSED:                                                                      [...]
 	 * @throws: E_NET_TIMEOUT:                                                                                 [...]
-	 * @throws: E_NET_UNREACHABLE:                                                                             [...] */
+	 * @throws: E_NET_UNREACHABLE:                                                                             [...]
+	 * @throws: E_BUFFER_TOO_SMALL: The given `addr_len' is too small */
 	NONNULL((1, 4)) void
 	(KCALL *so_connect)(struct socket *__restrict self,
 	                    USER CHECKED struct sockaddr const *addr, socklen_t addr_len,
@@ -258,7 +260,7 @@ struct socket_ops {
 			                E_INVALID_ARGUMENT_UNEXPECTED_COMMAND,
 			                E_BADALLOC_INSUFFICIENT_PORT_NUMBERS,
 			                E_NET_CONNECTION_REFUSED, E_NET_TIMEOUT,
-			                E_NET_UNREACHABLE);
+			                E_NET_UNREACHABLE, E_BUFFER_TOO_SMALL);
 
 	/* [0..1]
 	 * Send the contents of a given buffer over this socket.
@@ -311,7 +313,8 @@ struct socket_ops {
 	 * @throws: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SENDTO_WRONG_ADDRESS_FAMILY: [...]
 	 * @throws: E_NET_MESSAGE_TOO_LONG:                                                                       [...]
 	 * @throws: E_NET_CONNECTION_RESET:                                                                       [...]
-	 * @throws: E_NET_SHUTDOWN: [...] (NOTE: The caller of this function will deal with `SIGPIPE') */
+	 * @throws: E_NET_SHUTDOWN: [...] (NOTE: The caller of this function will deal with `SIGPIPE')
+	 * @throws: E_BUFFER_TOO_SMALL: The given `addr_len' is too small */
 	NONNULL((1, 8)) void
 	(KCALL *so_sendto)(struct socket *__restrict self,
 	                   USER CHECKED void const *buf, size_t bufsize,
@@ -319,7 +322,7 @@ struct socket_ops {
 	                   struct ancillary_message const *msg_control, syscall_ulong_t msg_flags,
 	                   /*out*/ struct aio_handle *__restrict aio)
 			THROWS_INDIRECT(E_INVALID_ARGUMENT_UNEXPECTED_COMMAND, E_NET_MESSAGE_TOO_LONG,
-			                E_NET_CONNECTION_RESET, E_NET_SHUTDOWN);
+			                E_NET_CONNECTION_RESET, E_NET_SHUTDOWN, E_BUFFER_TOO_SMALL);
 	/* [if(!so_send, [1..1]), else([0..1])] */
 	NONNULL((1, 2, 8)) void
 	(KCALL *so_sendtov)(struct socket *__restrict self,
@@ -328,7 +331,7 @@ struct socket_ops {
 	                    struct ancillary_message const *msg_control, syscall_ulong_t msg_flags,
 	                    /*out*/ struct aio_handle *__restrict aio)
 			THROWS_INDIRECT(E_INVALID_ARGUMENT_UNEXPECTED_COMMAND, E_NET_MESSAGE_TOO_LONG,
-			                E_NET_CONNECTION_RESET, E_NET_SHUTDOWN);
+			                E_NET_CONNECTION_RESET, E_NET_SHUTDOWN, E_BUFFER_TOO_SMALL);
 
 	/* [0..1]
 	 * Receive data over this socket, and store the contents within the given buffer.
@@ -514,6 +517,22 @@ struct socket {
 	/* Socket-specific data goes here... */
 };
 
+#define __socket_init_common(self, ops, type, protocol) \
+	((self)->sk_refcnt     = 1,                         \
+	 (self)->sk_weakrefcnt = 1,                         \
+	 (self)->sk_ops        = (ops),                     \
+	 (self)->sk_type       = (type),                    \
+	 (self)->sk_prot       = (protocol))
+#define socket_init(self, ops, type, protocol)        \
+	(__socket_init_common(self, ops, type, protocol), \
+	 xatomic_ref_init(&(self)->sk_ncon),              \
+	 (self)->sk_msgflags = 0)
+#define socket_cinit(self, ops, type, protocol)       \
+	(__socket_init_common(self, ops, type, protocol), \
+	 xatomic_ref_cinit(&(self)->sk_ncon, __NULLPTR),  \
+	 __hybrid_assert((self)->sk_msgflags == 0))
+
+
 /* Destroy a given socket object, and decrement its weak reference counter. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL socket_destroy)(struct socket *__restrict self);
@@ -523,6 +542,20 @@ DEFINE_REFCOUNT_FUNCTIONS(struct socket, sk_refcnt, socket_destroy)
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL socket_free)(struct socket *__restrict self);
 DEFINE_WEAKREFCOUNT_FUNCTIONS(struct socket, sk_weakrefcnt, socket_free)
+
+/* Create a new socket
+ * @param: family:   Socket family (one of `AF_*')
+ * @param: type:     Socket type (one of `SOCK_*' (_NOT_ including socket creation flags))
+ * @param: protocol: Socket protocol (dependent on family+type, or `0' for default)
+ * @throws: E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_FAMILY:   [...]
+ * @throws: E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_TYPE:     [...]
+ * @throws: E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_PROTOCOL: [...] */
+FUNDEF ATTR_RETNONNULL WUNUSED REF struct socket *KCALL
+socket_create(syscall_ulong_t family,
+              syscall_ulong_t type,
+              syscall_ulong_t protocol)
+		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
+
 
 /* Check if a given socket is connected.
  * WARNING: This function may clobber the currently set exception
@@ -561,7 +594,7 @@ socket_poll(struct socket *__restrict self, poll_mode_t what);
  *       address that is returned by this function is weakly undefined.
  *       e.g.: For AF_INET, sin_addr=0.0.0.0, sin_port=0 is returned.
  * @return: * : The required buffer size */
-FUNDEF NONNULL((1)) socklen_t KCALL
+extern NONNULL((1)) socklen_t KCALL
 socket_getsockname(struct socket *__restrict self,
                    USER CHECKED struct sockaddr *addr,
                    socklen_t addr_len);
@@ -570,7 +603,7 @@ socket_getsockname(struct socket *__restrict self,
  * This is usually the same address as was previously set by `socket_connect()'
  * @return: * : The required buffer size
  * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED: [...] */
-FUNDEF NONNULL((1)) socklen_t KCALL
+extern NONNULL((1)) socklen_t KCALL
 socket_getpeername(struct socket *__restrict self,
                    USER CHECKED struct sockaddr *addr,
                    socklen_t addr_len)
@@ -580,13 +613,14 @@ socket_getpeername(struct socket *__restrict self,
  * @throws: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT:                                  [...]
  * @throws: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY: [...]
  * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND:                 [...]
- * @throws: E_NET_ADDRESS_NOT_AVAILABLE:                                                                [...] */
-NONNULL((1)) void KCALL
+ * @throws: E_NET_ADDRESS_NOT_AVAILABLE:                                                                [...]
+ * @throws: E_BUFFER_TOO_SMALL: The given `addr_len' is too small */
+extern NONNULL((1)) void KCALL
 socket_bind(struct socket *__restrict self,
             USER CHECKED struct sockaddr const *addr,
             socklen_t addr_len)
 		THROWS(E_NET_ADDRESS_IN_USE, E_INVALID_ARGUMENT_UNEXPECTED_COMMAND,
-		       E_INVALID_ARGUMENT_BAD_STATE);
+		       E_INVALID_ARGUMENT_BAD_STATE, E_BUFFER_TOO_SMALL);
 
 /* Connect to the specified address.
  * @throws: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT:                                     [...]
@@ -595,8 +629,9 @@ socket_bind(struct socket *__restrict self,
  * @throws: E_BADALLOC_INSUFFICIENT_PORT_NUMBERS:                                                          [...]
  * @throws: E_NET_CONNECTION_REFUSED:                                                                      [...]
  * @throws: E_NET_TIMEOUT:                                                                                 [...]
- * @throws: E_NET_UNREACHABLE:                                                                             [...] */
-FUNDEF NONNULL((1, 4)) void KCALL
+ * @throws: E_NET_UNREACHABLE:                                                                             [...]
+ * @throws: E_BUFFER_TOO_SMALL: The given `addr_len' is too small */
+extern NONNULL((1, 4)) void KCALL
 socket_aconnect(struct socket *__restrict self,
                 USER CHECKED struct sockaddr const *addr, socklen_t addr_len,
                 /*out*/ struct aio_handle *__restrict aio)
@@ -604,7 +639,7 @@ socket_aconnect(struct socket *__restrict self,
 		                E_INVALID_ARGUMENT_UNEXPECTED_COMMAND,
 		                E_BADALLOC_INSUFFICIENT_PORT_NUMBERS,
 		                E_NET_CONNECTION_REFUSED, E_NET_TIMEOUT,
-		                E_NET_UNREACHABLE);
+		                E_NET_UNREACHABLE, E_BUFFER_TOO_SMALL);
 
 #else /* __INTELLISENSE__ */
 #define socket_getsockname(self, addr, addr_len)  (*(self)->sk_ops->so_getsockname)(self, addr, addr_len)
@@ -627,7 +662,7 @@ socket_connect(struct socket *__restrict self,
 		       E_INVALID_ARGUMENT_UNEXPECTED_COMMAND,
 		       E_BADALLOC_INSUFFICIENT_PORT_NUMBERS,
 		       E_NET_CONNECTION_REFUSED, E_NET_TIMEOUT,
-		       E_NET_UNREACHABLE);
+		       E_NET_UNREACHABLE, E_BUFFER_TOO_SMALL);
 #define SOCKET_CONNECT_COMPLETED        0    /* `connect()' has completed (always returned when `IO_NONBLOCK' isn't given) */
 #define SOCKET_CONNECT_NONBLOCK_STARTED 1    /* [EINPROGRESS] IO_NONBLOCK: A background connect() operation was started */
 #define SOCKET_CONNECT_NONBLOCK_ALREADY (-1) /* [EALREADY]    IO_NONBLOCK: A background connect() operation is still in progress */
@@ -698,7 +733,8 @@ socket_sendv(struct socket *__restrict self,
  * @throws: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SENDTO_WRONG_ADDRESS_FAMILY: [...]
  * @throws: E_NET_MESSAGE_TOO_LONG:                                                                       [...]
  * @throws: E_NET_CONNECTION_RESET:                                                                       [...]
- * @throws: E_NET_SHUTDOWN:                                                                               [...] */
+ * @throws: E_NET_SHUTDOWN:                                                                               [...]
+ * @throws: E_BUFFER_TOO_SMALL: The given `addr_len' is too small */
 FUNDEF NONNULL((1, 8)) void KCALL
 socket_asendto(struct socket *__restrict self,
                USER CHECKED void const *buf, size_t bufsize,
@@ -706,7 +742,7 @@ socket_asendto(struct socket *__restrict self,
                struct ancillary_message const *msg_control, syscall_ulong_t msg_flags,
                /*out*/ struct aio_handle *__restrict aio)
 		THROWS_INDIRECT(E_INVALID_ARGUMENT_UNEXPECTED_COMMAND, E_NET_MESSAGE_TOO_LONG,
-		                E_NET_CONNECTION_RESET, E_NET_SHUTDOWN);
+		                E_NET_CONNECTION_RESET, E_NET_SHUTDOWN, E_BUFFER_TOO_SMALL);
 FUNDEF NONNULL((1, 2, 8)) void KCALL
 socket_asendtov(struct socket *__restrict self,
                 struct aio_buffer const *__restrict buf, size_t bufsize,
@@ -714,7 +750,7 @@ socket_asendtov(struct socket *__restrict self,
                 struct ancillary_message const *msg_control, syscall_ulong_t msg_flags,
                 /*out*/ struct aio_handle *__restrict aio)
 		THROWS_INDIRECT(E_INVALID_ARGUMENT_UNEXPECTED_COMMAND, E_NET_MESSAGE_TOO_LONG,
-		                E_NET_CONNECTION_RESET, E_NET_SHUTDOWN);
+		                E_NET_CONNECTION_RESET, E_NET_SHUTDOWN, E_BUFFER_TOO_SMALL);
 
 /* Send helper functions for blocking and non-blocking operations.
  * NOTE: Additionally, these functions accept `MSG_DONTWAIT' in
@@ -728,7 +764,7 @@ socket_sendto(struct socket *__restrict self,
               struct ancillary_message const *msg_control, syscall_ulong_t msg_flags,
               iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_UNEXPECTED_COMMAND, E_NET_MESSAGE_TOO_LONG,
-		       E_NET_CONNECTION_RESET, E_NET_SHUTDOWN, E_WOULDBLOCK);
+		       E_NET_CONNECTION_RESET, E_NET_SHUTDOWN, E_WOULDBLOCK, E_BUFFER_TOO_SMALL);
 FUNDEF NONNULL((1, 2)) size_t KCALL
 socket_sendtov(struct socket *__restrict self,
                struct aio_buffer const *__restrict buf, size_t bufsize,
@@ -736,7 +772,7 @@ socket_sendtov(struct socket *__restrict self,
                struct ancillary_message const *msg_control, syscall_ulong_t msg_flags,
                iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_UNEXPECTED_COMMAND, E_NET_MESSAGE_TOO_LONG,
-		       E_NET_CONNECTION_RESET, E_NET_SHUTDOWN, E_WOULDBLOCK);
+		       E_NET_CONNECTION_RESET, E_NET_SHUTDOWN, E_WOULDBLOCK, E_BUFFER_TOO_SMALL);
 
 /* Receive data over this socket, and store the contents within the given buffer.
  * NOTE: `aio' is initialized with a handle supporting the RETSIZE

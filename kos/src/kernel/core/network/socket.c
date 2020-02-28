@@ -135,8 +135,9 @@ socket_isconnected(struct socket *__restrict self) {
  * Other conditions may be defined that are specific to individual socket types. */
 PUBLIC NONNULL((1)) poll_mode_t KCALL
 socket_poll(struct socket *__restrict self, poll_mode_t what) {
-	poll_mode_t result;
-	result = (*self->sk_ops->so_poll)(self, what);
+	poll_mode_t result = 0;
+	if likely(self->sk_ops->so_poll)
+		result = (*self->sk_ops->so_poll)(self, what);
 	if (what & POLLOUT) {
 		/* Check if there is a background connect() operation in progress... */
 		REF struct socket_connect_aio *nc;
@@ -178,7 +179,7 @@ socket_connect(struct socket *__restrict self,
 		       E_INVALID_ARGUMENT_UNEXPECTED_COMMAND,
 		       E_BADALLOC_INSUFFICIENT_PORT_NUMBERS,
 		       E_NET_CONNECTION_REFUSED, E_NET_TIMEOUT,
-		       E_NET_UNREACHABLE) {
+		       E_NET_UNREACHABLE, E_BUFFER_TOO_SMALL) {
 	/* First step: Check if there is a background connection attempt in progress. */
 	REF struct socket_connect_aio *nc;
 again:
@@ -714,7 +715,8 @@ socket_asendtov_connect_and_send(struct socket *__restrict self,
  * @throws: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SENDTO_WRONG_ADDRESS_FAMILY: [...]
  * @throws: E_NET_MESSAGE_TOO_LONG:                                                                       [...]
  * @throws: E_NET_CONNECTION_RESET:                                                                       [...]
- * @throws: E_NET_SHUTDOWN:                                                                               [...] */
+ * @throws: E_NET_SHUTDOWN:                                                                               [...]
+ * @throws: E_BUFFER_TOO_SMALL: The given `addr_len' is too small */
 PUBLIC NONNULL((1, 8)) void KCALL
 socket_asendto(struct socket *__restrict self,
                USER CHECKED void const *buf, size_t bufsize,
@@ -722,7 +724,7 @@ socket_asendto(struct socket *__restrict self,
                struct ancillary_message const *msg_control, syscall_ulong_t msg_flags,
                /*out*/ struct aio_handle *__restrict aio)
 		THROWS_INDIRECT(E_INVALID_ARGUMENT_UNEXPECTED_COMMAND, E_NET_MESSAGE_TOO_LONG,
-		                E_NET_CONNECTION_RESET, E_NET_SHUTDOWN) {
+		                E_NET_CONNECTION_RESET, E_NET_SHUTDOWN, E_BUFFER_TOO_SMALL) {
 	msg_flags |= ATOMIC_READ(self->sk_msgflags) & SOCKET_MSGFLAGS_ADDEND_SENDMASK;
 	if (self->sk_ops->so_sendto) {
 		(*self->sk_ops->so_sendto)(self, buf, bufsize, addr, addr_len,
@@ -748,7 +750,7 @@ socket_asendtov(struct socket *__restrict self,
                 struct ancillary_message const *msg_control, syscall_ulong_t msg_flags,
                 /*out*/ struct aio_handle *__restrict aio)
 		THROWS_INDIRECT(E_INVALID_ARGUMENT_UNEXPECTED_COMMAND, E_NET_MESSAGE_TOO_LONG,
-		                E_NET_CONNECTION_RESET, E_NET_SHUTDOWN) {
+		                E_NET_CONNECTION_RESET, E_NET_SHUTDOWN, E_BUFFER_TOO_SMALL) {
 	msg_flags |= ATOMIC_READ(self->sk_msgflags) & SOCKET_MSGFLAGS_ADDEND_SENDMASK;
 	if (self->sk_ops->so_sendtov) {
 		if (buf->ab_entc == 1 && self->sk_ops->so_sendto) {
@@ -781,7 +783,7 @@ socket_sendto(struct socket *__restrict self,
               struct ancillary_message const *msg_control, syscall_ulong_t msg_flags,
               iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_UNEXPECTED_COMMAND, E_NET_MESSAGE_TOO_LONG,
-		       E_NET_CONNECTION_RESET, E_NET_SHUTDOWN, E_WOULDBLOCK) {
+		       E_NET_CONNECTION_RESET, E_NET_SHUTDOWN, E_WOULDBLOCK, E_BUFFER_TOO_SMALL) {
 	size_t result;
 	struct aio_handle_generic aio;
 	aio_handle_generic_init(&aio);
@@ -827,7 +829,7 @@ socket_sendtov(struct socket *__restrict self,
                struct ancillary_message const *msg_control, syscall_ulong_t msg_flags,
                iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_UNEXPECTED_COMMAND, E_NET_MESSAGE_TOO_LONG,
-		       E_NET_CONNECTION_RESET, E_NET_SHUTDOWN, E_WOULDBLOCK) {
+		       E_NET_CONNECTION_RESET, E_NET_SHUTDOWN, E_WOULDBLOCK, E_BUFFER_TOO_SMALL) {
 	size_t result;
 	struct aio_handle_generic aio;
 	aio_handle_generic_init(&aio);

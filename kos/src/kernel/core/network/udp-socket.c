@@ -1,0 +1,336 @@
+/* Copyright (c) 2019-2020 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef GUARD_KERNEL_SRC_NETWORK_UDP_SOCKET_C
+#define GUARD_KERNEL_SRC_NETWORK_UDP_SOCKET_C 1
+#define _KOS_SOURCE 1
+
+#include <kernel/compiler.h>
+
+#include <dev/nic.h>
+
+#include <hybrid/atomic.h>
+#include <hybrid/minmax.h>
+
+#include <kos/except/inval.h>
+#include <netinet/in.h>
+#include <netinet/ip.h>
+#include <netinet/udp.h>
+#include <network/ip.h>
+#include <network/network.h>
+#include <network/udp-socket.h>
+#include <network/udp.h>
+
+#include <assert.h>
+#include <string.h>
+
+DECL_BEGIN
+
+PRIVATE USER CHECKED struct sockaddr_in const *KCALL
+udp_verify_sockaddr(USER CHECKED struct sockaddr const *addr,
+                    socklen_t addr_len) {
+	USER CHECKED struct sockaddr_in *in;
+	sa_family_t fam;
+	if unlikely(addr_len < sizeof(struct sockaddr_in))
+		THROW(E_BUFFER_TOO_SMALL, sizeof(struct sockaddr_in), addr_len);
+	in = (USER CHECKED struct sockaddr_in *)addr;
+	fam = ATOMIC_READ(in->sin_family);
+	if (fam != AF_INET) {
+		THROW(E_INVALID_ARGUMENT_UNEXPECTED_COMMAND,
+		      E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY,
+		      fam, AF_INET);
+	}
+	return in;
+}
+
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL udp_fini)(struct socket *__restrict self) {
+	struct udp_socket *me;
+	me = (struct udp_socket *)self;
+	xdecref(me->us_dev);
+}
+
+PRIVATE NONNULL((1)) socklen_t KCALL
+udp_getsockname(struct socket *__restrict self,
+                USER CHECKED struct sockaddr *addr,
+                socklen_t addr_len) {
+	struct udp_socket *me;
+	USER CHECKED struct sockaddr_in *in;
+	me = (struct udp_socket *)self;
+	in = (USER CHECKED struct sockaddr_in *)addr;
+	if likely(addr_len >= offsetafter(struct sockaddr_in, sin_family))
+		in->sin_family = AF_INET;
+	if likely(addr_len >= offsetafter(struct sockaddr_in, sin_port))
+		in->sin_port = me->us_bindport;
+	if likely(addr_len >= offsetafter(struct sockaddr_in, sin_addr.s_addr))
+		in->sin_addr.s_addr = me->us_bindip.s_addr;
+	return sizeof(struct sockaddr_in);
+}
+
+PRIVATE NONNULL((1)) socklen_t KCALL
+udp_getpeername(struct socket *__restrict self,
+                USER CHECKED struct sockaddr *addr,
+                socklen_t addr_len) {
+	struct udp_socket *me;
+	USER CHECKED struct sockaddr_in *in;
+	me = (struct udp_socket *)self;
+	in = (USER CHECKED struct sockaddr_in *)addr;
+	if (!(me->us_state & UDP_SOCKET_STATE_F_HASPEER)) {
+		THROW(E_INVALID_ARGUMENT_BAD_STATE,
+		      E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED);
+	}
+	if likely(addr_len >= offsetafter(struct sockaddr_in, sin_family))
+		in->sin_family = AF_INET;
+	if likely(addr_len >= offsetafter(struct sockaddr_in, sin_port))
+		in->sin_port = me->us_peerport;
+	if likely(addr_len >= offsetafter(struct sockaddr_in, sin_addr.s_addr))
+		in->sin_addr.s_addr = me->us_peerip.s_addr;
+	return sizeof(struct sockaddr_in);
+}
+
+
+PRIVATE NONNULL((1)) void KCALL
+udp_bind(struct socket *__restrict self,
+         USER CHECKED struct sockaddr const *addr,
+         socklen_t addr_len) {
+	struct udp_socket *me;
+	USER CHECKED struct sockaddr_in const *in;
+	me = (struct udp_socket *)self;
+	in = udp_verify_sockaddr(addr, addr_len);
+	/* Switch to binding-mode */
+	if (ATOMIC_FETCHOR(me->us_state, UDP_SOCKET_STATE_F_BINDING) & UDP_SOCKET_STATE_F_BINDING)
+		THROW(E_INVALID_ARGUMENT_BAD_STATE, E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND);
+	TRY {
+		/* Assign a port and  */
+		COMPILER_BARRIER();
+		me->us_bindip.s_addr = in->sin_addr.s_addr;
+		me->us_bindport      = in->sin_port;
+		COMPILER_BARRIER();
+		/* TODO: Actually register `me' as the recipient of UDP packets where:
+		 *       (PACKET.IP.DST_IP & me->us_bindip.s_addr) == me->us_bindip.s_addr &&
+		 *       PACKET.UDP.DST_PORT == me->us_bindport; */
+	} EXCEPT {
+		ATOMIC_FETCHAND(me->us_state, ~UDP_SOCKET_STATE_F_BINDING);
+		RETHROW();
+	}
+	/* Indicate that the socket has now been fully bound. */
+	ATOMIC_FETCHOR(me->us_state, UDP_SOCKET_STATE_F_BOUND);
+}
+
+
+PRIVATE NONNULL((1, 4)) void KCALL
+udp_connect(struct socket *__restrict self,
+            USER CHECKED struct sockaddr const *addr, socklen_t addr_len,
+            /*out*/ struct aio_handle *__restrict aio) {
+	struct udp_socket *me;
+	USER CHECKED struct sockaddr_in const *in;
+	me = (struct udp_socket *)self;
+	in = udp_verify_sockaddr(addr, addr_len);
+	/* Set the given address as peer address */
+	COMPILER_BARRIER();
+	me->us_peerip.s_addr = in->sin_addr.s_addr;
+	me->us_peerport      = in->sin_port;
+	COMPILER_BARRIER();
+	/* Mark the socket as having a peer */
+	ATOMIC_FETCHOR(me->us_state, UDP_SOCKET_STATE_F_HASPEER);
+	/* Indicate successful AIO completion. */
+	aio_handle_init(aio, &aio_noop_type);
+	aio_handle_complete(aio, AIO_COMPLETION_SUCCESS);
+}
+
+
+PRIVATE ATTR_RETNONNULL struct nic_device *KCALL
+udp_getnic(struct udp_socket *__restrict me) {
+	struct nic_device *result;
+again:
+	result = me->us_dev;
+	if (!result) {
+		result = nic_device_getdefault();
+		if unlikely(!result)
+			THROW(E_NO_SUCH_OBJECT);
+		if (!ATOMIC_CMPXCH(me->us_dev, NULL, result)) {
+			decref_unlikely(result);
+			COMPILER_READ_BARRIER();
+			goto again;
+		}
+	}
+	return result;
+}
+
+PRIVATE void KCALL
+udp_autobind_impl(struct udp_socket *__restrict me) {
+	static u16 nextport = 10000;
+	/* TODO: Do proper port binding! */
+	me->us_bindip.s_addr = htonl(0);
+	me->us_bindport      = htons(ATOMIC_FETCHINC(nextport));
+}
+
+/* Automatically bind the given UDP socket to some unused local port. */
+PRIVATE ATTR_NOINLINE void KCALL
+udp_autobind(struct udp_socket *__restrict me) {
+	uintptr_t state;
+again:
+	state = ATOMIC_FETCHOR(me->us_state, UDP_SOCKET_STATE_F_BINDING);
+	if (state & UDP_SOCKET_STATE_F_BOUND)
+		return; /* Already bound. */
+	if (state & UDP_SOCKET_STATE_F_BINDING) {
+		/* Some other thread is also binding right now... */
+		task_yield();
+		COMPILER_BARRIER();
+		goto again;
+	}
+	/* Do the yield ourself! */
+	TRY {
+		udp_autobind_impl(me);
+	} EXCEPT {
+		ATOMIC_FETCHAND(me->us_state, ~UDP_SOCKET_STATE_F_BINDING);
+		RETHROW();
+	}
+	ATOMIC_FETCHOR(me->us_state, UDP_SOCKET_STATE_F_BOUND);
+}
+
+
+PRIVATE NONNULL((1, 2, 8)) void KCALL
+udp_sendtov(struct socket *__restrict self,
+            struct aio_buffer const *__restrict buf, size_t bufsize,
+            /*?..1*/ USER CHECKED struct sockaddr const *addr, socklen_t addr_len,
+            struct ancillary_message const *msg_control, syscall_ulong_t msg_flags,
+            /*out*/ struct aio_handle *__restrict aio) {
+	struct udp_socket *me;
+	struct nic_device *dev;
+	USER CHECKED struct sockaddr_in const *in;
+	REF struct nic_packet *packet;
+	(void)msg_flags;
+	/* TODO: Support for `msg_flags & MSG_DONTROUTE' (don't use a gateway,
+	 *       but only send to directly reachable peers; this is what KOS
+	 *       currently does for every outbound packet; there is no concept
+	 *       of gateways as of yet...) */
+	/* TODO: Support for `msg_flags & MSG_MORE' (don't immediately transmit
+	 *       the datagram. Wait for more data for up to 200 milliseconds) */
+
+	me  = (struct udp_socket *)self;
+	in  = udp_verify_sockaddr(addr, addr_len);
+	dev = udp_getnic(me);
+	/* Automatically bind to some local port if not done already! */
+	if unlikely(!(me->us_state & UDP_SOCKET_STATE_F_BOUND))
+		udp_autobind(me);
+	if (msg_control != NULL)
+		THROW(E_NOT_IMPLEMENTED_TODO); /* TODO: IP Control message packets (can be used to set IP.TOS, etc.) */
+	if unlikely(bufsize > 0xffff)
+		THROW(E_NET_MESSAGE_TOO_LONG, bufsize, 0xffff);
+	/* Construct the UDP packet to-be sent. */
+	packet = nic_device_newpacketv(dev, buf,
+	                               UDP_PACKET_HEADSIZE,
+	                               UDP_PACKET_TAILSIZE);
+	(void)bufsize;
+	assert(packet->np_payloads == bufsize);
+	FINALLY_DECREF(packet);
+	{
+		/* Fill in UDP and IP headers. */
+		struct iphdr *ip;
+		struct udphdr *udp;
+		udp = nic_packet_tallochead(packet, struct udphdr);
+		ip  = nic_packet_tallochead(packet, struct iphdr);
+		/* Fill in UDP header fields. */
+		udp->uh_sport = me->us_bindport;
+		udp->uh_dport = (be16)ATOMIC_READ(*(u16 *)&in->sin_port);
+		udp->uh_ulen  = htons((u16)bufsize);
+		udp->uh_sum   = htons(0); /* TODO? */
+		/* Fill in IP header fields, as required by `ip_senddatagram()' */
+		ip->ip_hl         = 5;
+		ip->ip_tos        = 0; /* ??? */
+		ip->ip_off        = htons(0);
+		ip->ip_ttl        = 64;
+		ip->ip_p          = IPPROTO_UDP;
+		/* TODO: Wait for DHCP/zero-conf/etc. before using our IP */
+		ip->ip_src.s_addr = dev->nd_addr.na_ip;
+		ip->ip_dst.s_addr = (be32)ATOMIC_READ(*(u32 *)&in->sin_addr);
+	}
+	/* Actually send the packet over IP */
+	ip_senddatagram(dev, packet, aio);
+}
+
+
+PRIVATE NONNULL((1, 2, 10)) void KCALL
+udp_recvfromv(struct socket *__restrict self,
+              struct aio_buffer const *__restrict buf, size_t bufsize,
+              /*?..1*/ USER CHECKED struct sockaddr *addr, socklen_t addr_len,
+              /*?..1*/ USER CHECKED socklen_t *preq_addr_len,
+              /*0..1*/ USER CHECKED u32 *presult_flags,
+              struct ancillary_rmessage const *msg_control,
+              syscall_ulong_t msg_flags,
+              /*out*/ struct aio_handle *__restrict aio) {
+	struct udp_socket *me;
+	me = (struct udp_socket *)self;
+	/* TODO: Implement once we've got routing of incoming UDP packets. */
+	(void)me;
+	(void)buf;
+	(void)bufsize;
+	(void)addr;
+	(void)addr_len;
+	(void)preq_addr_len;
+	(void)presult_flags;
+	(void)msg_control;
+	(void)msg_flags;
+	(void)aio;
+	THROW(E_NOT_IMPLEMENTED_TODO);
+}
+
+
+/* Socket operators for UDP sockets. */
+PUBLIC struct socket_ops udp_socket_ops = {
+	/* .so_family      = */ AF_INET,
+	/* .so_fini        = */ &udp_fini,
+	/* .so_poll        = */ NULL,
+	/* .so_getsockname = */ &udp_getsockname,
+	/* .so_getpeername = */ &udp_getpeername,
+	/* .so_bind        = */ &udp_bind,
+	/* .so_connect     = */ &udp_connect,
+	/* .so_send        = */ NULL,
+	/* .so_sendv       = */ NULL,
+	/* .so_sendto      = */ NULL,
+	/* .so_sendtov     = */ &udp_sendtov,
+	/* .so_recv        = */ NULL,
+	/* .so_recvv       = */ NULL,
+	/* .so_recvfrom    = */ NULL,
+	/* .so_recvfromv   = */ &udp_recvfromv,
+	/* .so_listen      = */ NULL,
+	/* .so_accept      = */ NULL,
+	/* .so_shutdown    = */ NULL,
+	/* .so_getsockopt  = */ NULL, /* TODO: There are _many_ options that are specific to UDP */
+	/* .so_setsockopt  = */ NULL, /* TODO: There are _many_ options that are specific to UDP */
+	/* .so_ioctl       = */ NULL,
+	/* .so_free        = */ NULL,
+};
+
+
+/* Construct a new UDP socket. */
+PUBLIC ATTR_RETNONNULL WUNUSED REF struct socket *KCALL
+udp_socket_create(void) {
+	REF struct udp_socket *result;
+	result = (REF struct udp_socket *)kmalloc(sizeof(struct udp_socket), GFP_CALLOC);
+	socket_cinit(result, &udp_socket_ops, SOCK_DGRAM, IPPROTO_UDP);
+	return result;
+}
+
+
+DECL_END
+
+#endif /* !GUARD_KERNEL_SRC_NETWORK_UDP_SOCKET_C */

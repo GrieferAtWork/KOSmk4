@@ -123,7 +123,7 @@ ip_routedatagram(struct nic_device *__restrict dev,
  *   - ip_off    (as required for fragmentation; the RF and DF flags are not overwritten!)
  *   - ip_sum    (Only if not done by hardware, then will be filled with the correct value)
  * With this in mind, the caller must have already filled in:
- *   - ip_hl     (header length divided by 4)
+ *   - ip_hl     (header length divided by 4; set to `5' if no IP options are present)
  *   - ip_tos    (Type of IP service)
  *   - ip_off.RF (Should already be cleared)
  *   - ip_off.DF (Don't-fragment flag)
@@ -153,7 +153,7 @@ struct nic_packet_desc;
  *   - ip_off    (as required for fragmentation; the RF and DF flags are not overwritten!)
  *   - ip_sum    (Only if not done by hardware, then will be filled with the correct value)
  * With this in mind, the caller must have already filled in:
- *   - ip_hl     (header length divided by 4)
+ *   - ip_hl     (header length divided by 4; set to `5' if no IP options are present)
  *   - ip_tos    (Type of IP service)
  *   - ip_off.RF (Should already be cleared)
  *   - ip_off.DF (Don't-fragment flag)

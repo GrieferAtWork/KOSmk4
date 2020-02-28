@@ -1080,8 +1080,8 @@ NOTHROW(FCALL async_job_start)(async_job_t self,
 		COMPILER_WRITE_BARRIER();
 		aio_handle_init(aio,
 		                me->aj_ops->jc_retsize
-		                ? &async_job_aio_noretsize
-		                : &async_job_aio);
+		                ? &async_job_aio
+		                : &async_job_aio_noretsize);
 	}
 
 	me->aj_aio = aio;

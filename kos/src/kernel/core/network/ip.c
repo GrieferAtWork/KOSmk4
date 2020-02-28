@@ -29,6 +29,7 @@
 #include <kernel/except.h>
 #include <kernel/malloc.h>
 #include <kernel/printk.h>
+#include <kernel/vm.h>
 #include <sched/async.h>
 #include <sched/cpu.h>
 
@@ -644,6 +645,7 @@ struct ip_arp_and_datagram_job {
 	REF struct nic_device    *adj_dev;    /* [1..1][const] The associated network device. */
 	REF struct net_peeraddr  *adj_peer;   /* [1..1][const][valid_if(adj_arpc != 0)] The peer who's mac address we're in need of. */
 	REF struct nic_packet    *adj_gram;   /* [1..1][const][valid_if(adj_arpc != 0)] The IP datagram (with sufficient header space for an ethernet header) */
+	REF struct vm            *adj_gramvm; /* [1..1][const][valid_if(adj_arpc != 0)] The VM in the context of which `adj_gram' must be sent */
 	struct timespec           adj_arptmo; /* Timeout for ARP request responses. */
 	unsigned int              adj_arpc;   /* # of remaining ARP request attempts (set to 0 when the peer's mac became available). */
 	struct aio_handle_generic adj_done;   /* [valid_if(adj_arpc == 0)] AIO handle used to wait for transmit completion of `adj_gram' */
@@ -667,6 +669,7 @@ NOTHROW(ASYNC_CALLBACK_CC ip_arp_and_datagram_fini)(async_job_t self) {
 	if (me->adj_arpc == 0) {
 		aio_handle_generic_fini(&me->adj_done);
 	} else {
+		decref_likely(me->adj_gramvm);
 		decref_likely(me->adj_gram);
 		decref_unlikely(me->adj_peer);
 	}
@@ -715,12 +718,25 @@ ip_arp_and_datagram_work(async_job_t self) {
 
 		/* Send the packet. */
 		aio_handle_generic_init(&me->adj_done);
-		nic_device_send(me->adj_dev, me->adj_gram, &me->adj_done);
+		{
+			REF struct vm *oldvm;
+			oldvm = incref(THIS_VM);
+			FINALLY_DECREF_UNLIKELY(oldvm);
+			TRY {
+				task_setvm(me->adj_gramvm);
+				nic_device_send(me->adj_dev, me->adj_gram, &me->adj_done);
+			} EXCEPT {
+				task_setvm(oldvm); /* TODO: This may throw an exception! */
+				RETHROW();
+			}
+			task_setvm(oldvm); /* TODO: This may throw an exception! */
+		}
 
 		/* Drop reference and switch to wait-for-transmit-complete mode. */
 		COMPILER_BARRIER();
 		decref_unlikely(me->adj_peer);
 		decref_unlikely(me->adj_gram);
+		decref_unlikely(me->adj_gramvm);
 		COMPILER_WRITE_BARRIER();
 		me->adj_arpc = 0;
 		COMPILER_BARRIER();
@@ -765,11 +781,11 @@ PRIVATE struct async_job_callbacks const ip_arp_and_datagram = {
 	/* .jc_jobsize  = */ sizeof(struct ip_arp_and_datagram_job),
 	/* .jc_jobalign = */ alignof(struct ip_arp_and_datagram_job),
 	/* .jc_driver   = */ &drv_self,
-	/* .aj_fini     = */ &ip_arp_and_datagram_fini,
-	/* .aj_poll     = */ &ip_arp_and_datagram_poll,
-	/* .aj_work     = */ &ip_arp_and_datagram_work,
-	/* .aj_time     = */ &ip_arp_and_datagram_time,
-	/* .aj_cancel   = */ &ip_arp_and_datagram_cancel,
+	/* .jc_fini     = */ &ip_arp_and_datagram_fini,
+	/* .jc_poll     = */ &ip_arp_and_datagram_poll,
+	/* .jc_work     = */ &ip_arp_and_datagram_work,
+	/* .jc_time     = */ &ip_arp_and_datagram_time,
+	/* .jc_cancel   = */ &ip_arp_and_datagram_cancel,
 };
 
 
@@ -796,7 +812,7 @@ PRIVATE struct async_job_callbacks const ip_arp_and_datagram = {
  *   - ip_off    (as required for fragmentation; the RF and DF flags are not overwritten!)
  *   - ip_sum    (Only if not done by hardware, then will be filled with the correct value)
  * With this in mind, the caller must have already filled in:
- *   - ip_hl     (header length divided by 4)
+ *   - ip_hl     (header length divided by 4; set to `5' if no IP options are present)
  *   - ip_tos    (Type of IP service)
  *   - ip_off.RF (Should already be cleared)
  *   - ip_off.DF (Don't-fragment flag)
@@ -870,9 +886,10 @@ ip_senddatagram(struct nic_device *__restrict dev,
 			RETHROW();
 		}
 		job = (struct ip_arp_and_datagram_job *)aj;
-		job->adj_dev  = (REF struct nic_device *)incref(dev);
-		job->adj_peer = peer; /* Inherit reference */
-		job->adj_gram = incref(packet);
+		job->adj_dev    = (REF struct nic_device *)incref(dev);
+		job->adj_peer   = peer; /* Inherit reference */
+		job->adj_gram   = incref(packet);
+		job->adj_gramvm = incref(THIS_VM);
 		job->adj_arptmo = realtime();
 		nic_device_add_arp_response_timeout(dev, &job->adj_arptmo);
 		job->adj_arpc = 5; /* Must not be 0, but should be configurable */
@@ -887,6 +904,7 @@ struct ip_arp_and_datagrams_job {
 	REF struct nic_device         *adj_dev;    /* [1..1][const] The associated network device. */
 	REF struct net_peeraddr       *adj_peer;   /* [1..1][const][valid_if(adj_arpc != 0)] The peer who's mac address we're in need of. */
 	struct nic_packetlist          adj_gram;   /* [1..1][const][valid_if(adj_arpc != 0)] The IP datagram list (with sufficient header space for an ethernet header) */
+	REF struct vm                 *adj_gramvm; /* [1..1][const][valid_if(adj_arpc != 0)] The VM in the context of which `adj_gram' must be sent */
 	struct timespec                adj_arptmo; /* Timeout for ARP request responses. */
 	unsigned int                   adj_arpc;   /* # of remaining ARP request attempts (set to 0 when the peer's mac became available). */
 	struct aio_multihandle_generic adj_done;   /* [valid_if(adj_arpc == 0)] AIO handle used to wait for transmit completion of `adj_gram' */
@@ -903,6 +921,7 @@ NOTHROW(ASYNC_CALLBACK_CC ip_arp_and_datagrams_fini)(async_job_t self) {
 		aio_multihandle_generic_fini(&me->adj_done);
 	} else {
 		nic_packetlist_fini(&me->adj_gram);
+		decref_unlikely(me->adj_gramvm);
 		decref_unlikely(me->adj_peer);
 	}
 	decref_unlikely(me->adj_dev);
@@ -957,11 +976,21 @@ ip_arp_and_datagrams_work(async_job_t self) {
 		/* Send all of the packets. */
 		aio_multihandle_generic_init(&me->adj_done);
 		TRY {
-			for (i = 0; i < me->adj_gram.npl_cnt; ++i) {
-				struct aio_handle *hand;
-				hand = aio_multihandle_allochandle(&me->adj_done);
-				nic_device_send(me->adj_dev, me->adj_gram.npl_vec[i], hand);
+			REF struct vm *oldvm;
+			oldvm = incref(THIS_VM);
+			FINALLY_DECREF_UNLIKELY(oldvm);
+			TRY {
+				task_setvm(me->adj_gramvm);
+				for (i = 0; i < me->adj_gram.npl_cnt; ++i) {
+					struct aio_handle *hand;
+					hand = aio_multihandle_allochandle(&me->adj_done);
+					nic_device_send(me->adj_dev, me->adj_gram.npl_vec[i], hand);
+				}
+			} EXCEPT {
+				task_setvm(oldvm); /* TODO: This may throw an exception! */
+				RETHROW();
 			}
+			task_setvm(oldvm); /* TODO: This may throw an exception! */
 		} EXCEPT {
 			aio_multihandle_cancel(&me->adj_done);
 			RETHROW();
@@ -971,6 +1000,7 @@ ip_arp_and_datagrams_work(async_job_t self) {
 		COMPILER_BARRIER();
 		decref_unlikely(me->adj_peer);
 		nic_packetlist_fini(&me->adj_gram);
+		decref_unlikely(me->adj_gramvm);
 		COMPILER_WRITE_BARRIER();
 		me->adj_arpc = 0;
 		COMPILER_BARRIER();
@@ -1038,7 +1068,7 @@ PRIVATE struct async_job_callbacks const ip_arp_and_datagrams = {
  *   - ip_off    (as required for fragmentation; the RF and DF flags are not overwritten!)
  *   - ip_sum    (Only if not done by hardware, then will be filled with the correct value)
  * With this in mind, the caller must have already filled in:
- *   - ip_hl     (header length divided by 4)
+ *   - ip_hl     (header length divided by 4; set to `5' if no IP options are present)
  *   - ip_tos    (Type of IP service)
  *   - ip_off.RF (Should already be cleared)
  *   - ip_off.DF (Don't-fragment flag)
@@ -1148,9 +1178,10 @@ ip_senddatagram_ex(struct nic_device *__restrict dev,
 		decref_unlikely(peer);
 		RETHROW();
 	}
-	job->adj_dev  = (REF struct nic_device *)incref(dev);
-	job->adj_peer = peer; /* Inherit reference */
+	job->adj_dev    = (REF struct nic_device *)incref(dev);
+	job->adj_peer   = peer; /* Inherit reference */
 	job->adj_arptmo = realtime();
+	job->adj_gramvm = incref(THIS_VM);
 	nic_device_add_arp_response_timeout(dev, &job->adj_arptmo);
 	job->adj_arpc = 5; /* Must not be 0, but should be configurable */
 	decref(async_job_start(aj, aio));

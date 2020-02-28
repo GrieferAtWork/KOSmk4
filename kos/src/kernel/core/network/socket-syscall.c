@@ -57,11 +57,32 @@ DECL_BEGIN
 /* socket()                                                             */
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_SOCKET
-//TODO:DEFINE_SYSCALL3(fd_t, socket,
-//TODO:                syscall_ulong_t, domain,
-//TODO:                syscall_ulong_t, type,
-//TODO:                syscall_ulong_t, protocol) {
-//TODO:}
+DEFINE_SYSCALL3(fd_t, socket,
+                syscall_ulong_t, domain,
+                syscall_ulong_t, type,
+                syscall_ulong_t, protocol) {
+	REF struct socket *sock;
+	unsigned int result;
+	sock = socket_create(domain,
+	                     type & ~(SOCK_CLOEXEC |
+	                              SOCK_CLOFORK |
+	                              SOCK_NONBLOCK),
+	                     protocol);
+	{
+		struct handle hand;
+		hand.h_type = HANDLE_TYPE_SOCKET;
+		hand.h_mode = IO_RDWR;
+		hand.h_data = sock;
+		if (type & SOCK_CLOEXEC)
+			hand.h_mode |= IO_CLOEXEC;
+		if (type & SOCK_CLOFORK)
+			hand.h_mode |= IO_CLOFORK;
+		if (type & SOCK_NONBLOCK)
+			hand.h_mode |= IO_NONBLOCK;
+		result = handle_install(THIS_HANDLE_MANAGER, hand);
+	}
+	return (fd_t)result;
+}
 #endif /* __ARCH_WANT_SYSCALL_SOCKET */
 
 

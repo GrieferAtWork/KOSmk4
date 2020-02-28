@@ -32,6 +32,7 @@
 #include <kernel/types.h>
 
 #include <linux/if_ether.h>
+#include <netinet/in.h>
 #include <network/ethernet.h>
 #include <network/network.h>
 
@@ -146,6 +147,10 @@ NOTHROW(KCALL nic_device_cinit)(struct nic_device *__restrict self,
 	memcpy(&self->nd_ops, ops, sizeof(struct nic_device_ops));
 	self->cd_type.ct_write = &nic_device_write;
 	self->cd_type.ct_fini  = &nic_device_fini;
+	/* Default-configure the nic's IP address to broadcast, so
+	 * we can already send/receive IP packets before acquiring
+	 * a proper IP address from DHCP or some other source. */
+	self->nd_addr.na_ip = htonl(INADDR_BROADCAST);
 }
 
 /* Default finalizer for NIC devices.
@@ -285,6 +290,24 @@ nic_device_routepacket(struct nic_device *__restrict self,
 		RETHROW();
 	}
 	nic_rpacket_free(packet);
+}
+
+
+
+/* [0..1] The default NIC device. */
+PRIVATE XATOMIC_REF(struct nic_device) default_nic_device = XATOMIC_REF_INIT(NULL);
+
+/* Get/set the the default NIC device. */
+PUBLIC WUNUSED REF struct nic_device *
+NOTHROW(KCALL nic_device_getdefault)(void) {
+	return default_nic_device.get();
+}
+
+PUBLIC NONNULL((1)) void
+NOTHROW(KCALL nic_device_setdefault)(struct nic_device *__restrict dev) {
+	REF struct nic_device *old_device;
+	old_device = default_nic_device.exchange(dev);
+	xdecref(old_device);
 }
 
 

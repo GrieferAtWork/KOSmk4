@@ -206,8 +206,6 @@ done_procfs:
 	/* Make sure there aren't any memory leaks. */
 	assert(!KSysctl(KSYSCTL_SYSTEM_MEMORY_DUMP_LEAKS));
 
-	ksysctl_insmod("ne2k", NULL);
-
 	for (;;) {
 		pid_t cpid;
 		/* Do some cleanup on the console. */

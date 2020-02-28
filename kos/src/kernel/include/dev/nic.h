@@ -184,6 +184,7 @@ struct nic_device
 	struct network          nd_net;     /* A description of the attached network. */
 };
 
+
 /* Allocate a new NIC packet which may be used to send the given payload.
  * Reserve sufficient space for headers and footers of up to the specified
  * sizes to be included alongside the payload. */
@@ -292,6 +293,14 @@ FUNDEF NOBLOCK NONNULL((1, 2)) void KCALL
 nic_device_routepacket(struct nic_device *__restrict self,
                        /*inherit(always)*/ struct nic_rpacket *__restrict packet,
                        size_t real_packet_size);
+
+
+/* Get/set the the default NIC device. */
+FUNDEF WUNUSED REF struct nic_device *
+NOTHROW(KCALL nic_device_getdefault)(void);
+FUNDEF NONNULL((1)) void
+NOTHROW(KCALL nic_device_setdefault)(struct nic_device *__restrict dev);
+
 
 #endif /* __CC__ */
 

@@ -47,15 +47,12 @@
 #include <stdio.h>
 #include <string.h>
 
-#if 0
+#if 1
 #define NE2K_DEBUG(...) printk(KERN_DEBUG __VA_ARGS__)
 #else
 #define NE2K_DEBUG(...) (void)0
 #endif
 
-#include <network/ip.h> /* TODO: Remove me */
-#include <netinet/udp.h> /* TODO: Remove me */
-#include <netinet/in.h>
 
 DECL_BEGIN
 
@@ -1378,6 +1375,10 @@ Ne2k_ProbePciDevice(struct pci_device *__restrict dev) THROWS(...) {
 	}
 
 	character_device_register_auto(self);
+	
+	/* XXX: Collect a list of devices, then use some kind of config
+	 *      to determine which one should be used as the default! */
+	nic_device_setdefault(self);
 
 #if 1 /* XXX: Remove me (only here for testing) */
 	{
@@ -1389,52 +1390,6 @@ Ne2k_ProbePciDevice(struct pci_device *__restrict dev) THROWS(...) {
 			/* Turn the NIC on. */
 		} while (Ne2k_SetFlags(self, old_flags, old_flags | IFF_UP));
 	}
-#if 0 /* Try sending some packets ;) (disabled for GIT...) */
-	{
-		struct aio_handle_generic aio;
-		{
-			REF struct nic_packet *pck;
-			/* Construct a test packet */
-			static char const payload[64] = "Wazzzzaaaaaap!\n";
-			struct iphdr *ip;
-			struct udphdr *udp;
-			pck = nic_device_newpacketh(self,
-			                            IP_PACKET_HEADSIZE +
-			                            sizeof(struct udphdr) +
-			                            sizeof(payload),
-			                            IP_PACKET_TAILSIZE);
-			FINALLY_DECREF(pck);
-			memcpy(nic_packet_allochead(pck, sizeof(payload)), payload, sizeof(payload));
-			udp = nic_packet_tallochead(pck, struct udphdr);
-			ip  = nic_packet_tallochead(pck, struct iphdr);
-			udp->uh_sport = htons(12345);
-			udp->uh_dport = htons(8080);
-			udp->uh_ulen  = htons(sizeof(struct udphdr) + sizeof(payload));
-			udp->uh_sum   = htons(0); /* TODO */
-#define IP(a, b, c, d) ((u32)(a) << 24 | (u32)(b) << 16 | (u32)(c) << 8 | (u32)(d))
-			ip->ip_src.s_addr = htonl(IP(255, 255, 255, 255));
-			ip->ip_dst.s_addr = htonl(IP(10, 0, 2, 2));
-#undef IP
-			ip->ip_hl  = 5;  /* 5 * 4 = 20 bytes */
-			ip->ip_tos = 0;  /* ??? */
-			ip->ip_off = htons(0);
-			ip->ip_ttl = 64; /* ??? */
-			ip->ip_p   = IPPROTO_UDP;
-
-			/* send the test packet. */
-			aio_handle_generic_init(&aio);
-			ip_senddatagram(self, pck, &aio);
-		}
-		TRY {
-			aio_handle_generic_waitfor(&aio);
-			aio_handle_generic_checkerror(&aio);
-		} EXCEPT {
-			aio_handle_generic_fini(&aio);
-			RETHROW();
-		}
-		aio_handle_generic_fini(&aio);
-	}
-#endif
 #endif
 
 	return true;

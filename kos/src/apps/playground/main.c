@@ -27,6 +27,7 @@
 
 #include <hybrid/compiler.h>
 
+#include <arpa/inet.h>
 #include <asm/cpu-flags.h>
 #include <asm/intrin-fpu.h>
 #include <asm/intrin.h>
@@ -39,12 +40,14 @@
 #include <kos/types.h>
 #include <kos/ukern.h>
 #include <kos/unistd.h>
+#include <linux/if_ether.h>
+#include <netinet/if_ether.h>
 #include <netinet/in.h>
 #include <netinet/ip.h>
-#include <netinet/if_ether.h>
 #include <netinet/udp.h>
 #include <sys/io.h>
 #include <sys/mmio.h>
+#include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/syscall-proto.h>
 #include <sys/syscall.h>
@@ -67,7 +70,6 @@
 #include <syslog.h>
 #include <termios.h>
 #include <unistd.h>
-#include <linux/if_ether.h>
 
 DECL_BEGIN
 
@@ -315,56 +317,30 @@ int main_ustring(int argc, char *argv[], char *envp[]) {
 
 
 /************************************************************************/
-int main_nic(int argc, char *argv[], char *envp[]) {
+int main_sock(int argc, char *argv[], char *envp[]) {
+	fd_t sock;
+	struct sockaddr_in in;
+	char payload[] = "Wazzzzaaaaaap!\n";
+	char response[64];
+	ssize_t resplen;
 	(void)argc, (void)argv, (void)envp;
-	KSysctlInsmod("ne2k", NULL);
-	signal(SIGINT, SIG_IGN);
-	{
-		fd_t fd = Open("/dev/ne2k0", O_RDWR);
-		struct ATTR_PACKED ATTR_ALIGNED(2) {
-			struct ethhdr eth;
-			struct iphdr  ip;
-			struct udphdr udp;
-			char          dat[64];
-		} d;
-		memset(&d, 0, sizeof(d));
-		d.eth.h_source[0] = 0x12;
-		d.eth.h_source[1] = 0x34;
-		d.eth.h_source[2] = 0x56;
-		d.eth.h_source[3] = 0x78;
-		d.eth.h_source[4] = 0x9a;
-		d.eth.h_source[5] = 0xbc;
-		d.eth.h_dest[0]   = 0xff;
-		d.eth.h_dest[1]   = 0xff;
-		d.eth.h_dest[2]   = 0xff;
-		d.eth.h_dest[3]   = 0xff;
-		d.eth.h_dest[4]   = 0xff;
-		d.eth.h_dest[5]   = 0xff;
-		d.eth.h_proto = htons(ETH_P_IP);
-		d.ip.ip_v   = 4;
-		d.ip.ip_hl  = 5; /* 5 * 4 = 20 bytes */
-		d.ip.ip_tos = 0; /* ??? */
-		d.ip.ip_len = htons(sizeof(d.ip) + sizeof(d.udp) + sizeof(d.dat));
-		d.ip.ip_id  = htons(0); /* ??? */
-		d.ip.ip_off = htons(0); /* ??? */
-		d.ip.ip_ttl = 64;
-		d.ip.ip_p   = IPPROTO_UDP;
-		d.ip.ip_sum = htons(0x6281); /* TODO */
-#define IP(a, b, c, d) ((u32)(a) << 24 | (u32)(b) << 16 | (u32)(c) << 8 | (u32)(d))
-		d.ip.ip_src.s_addr = htonl(IP(10, 0, 2, 15));
-		d.ip.ip_dst.s_addr = htonl(IP(10, 0, 2, 2));
-#undef IP
-		d.udp.uh_sport = htons(12345);
-		d.udp.uh_dport = htons(8080);
-		d.udp.uh_ulen  = htons(sizeof(d.udp) + sizeof(d.dat));
-		d.udp.uh_sum   = htons(0xda33); /* TODO */
-		memset(d.dat, '\n', sizeof(d.dat));
-		strcpy(d.dat, "<<Hello World!>>\n");
-		Write(fd, &d, sizeof(d));
-		pause();
-		close(fd);
-	}
- 	return 0;
+	ksysctl_insmod("ne2k", NULL);
+	sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	if (sock < 0)
+		err(EXIT_FAILURE, "socket() failed: %s", strerror(errno));
+	in.sin_family      = AF_INET;
+	in.sin_addr.s_addr = inet_addr("10.0.2.2");
+	in.sin_port        = htons(8080);
+	if (connect(sock, (struct sockaddr *)&in, sizeof(in)))
+		err(EXIT_FAILURE, "connect() failed: %s", strerror(errno));
+	if (send(sock, payload, sizeof(payload), 0) < 0)
+		err(EXIT_FAILURE, "send() failed: %s", strerror(errno));
+	resplen = recv(sock, response, sizeof(response), 0);
+	if (resplen < 0)
+		err(EXIT_FAILURE, "recv() failed: %s", strerror(errno));
+	printf("Response: %$q\n", (size_t)resplen, response);
+	close(sock);
+	return 0;
 }
 /************************************************************************/
 
@@ -484,7 +460,7 @@ PRIVATE DEF defs[] = {
 	{ "logtime", &main_logtime },
 	{ "dl", &main_dl },
 	{ "ustring", &main_ustring },
-	{ "nic", &main_nic },
+	{ "sock", &main_sock },
 #ifdef HAVE_MAIN_SYSENTER
 	{ "sysenter", &main_sysenter },
 #endif /* HAVE_MAIN_SYSENTER */
