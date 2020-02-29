@@ -81,7 +81,7 @@ udp_routepacket(struct nic_device *__restrict dev,
 	printk(KERN_TRACE "[udp:%s] Packet from "
 	                  "[" NET_PRINTF_IPADDRPORT_FMT "] to "
 	                  "[" NET_PRINTF_IPADDRPORT_FMT "]:\n"
-	                  "%$[hex]\n",
+	                  "%$[hex:P]\n",
 	       dev->cd_name,
 	       NET_PRINTF_IPADDRPORT_ARG(ip_header->ip_src.s_addr,
 	                                 ntohs(packet->uh_sport)),

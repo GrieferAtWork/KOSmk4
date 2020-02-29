@@ -59,6 +59,60 @@ udp_verify_sockaddr(USER CHECKED struct sockaddr const *addr,
 	return in;
 }
 
+PRIVATE ATTR_RETNONNULL struct nic_device *KCALL
+udp_getnic(struct udp_socket *__restrict me) {
+	struct nic_device *result;
+again:
+	result = me->us_dev;
+	if (!result) {
+		result = nic_device_getdefault();
+		if unlikely(!result)
+			THROW(E_NO_SUCH_OBJECT);
+		if (!ATOMIC_CMPXCH(me->us_dev, NULL, result)) {
+			decref_unlikely(result);
+			COMPILER_READ_BARRIER();
+			goto again;
+		}
+	}
+	return result;
+}
+
+PRIVATE void KCALL
+udp_autobind_impl(struct udp_socket *__restrict me) {
+	static u16 nextport = 10000;
+	/* TODO: Do proper port binding! */
+	/* TODO: Linux uses a /proc file to specify the range of
+	 *       ports used for dynamic port allocation by IP:
+	 *       /proc/sys/net/ipv4/ip_local_port_range
+	 *       We should also support that file and select
+	 *       some port out of that range here. */
+	me->us_bindip.s_addr = htonl(0);
+	me->us_bindport      = htons(ATOMIC_FETCHINC(nextport));
+}
+
+/* Automatically bind the given UDP socket to some unused local port. */
+PRIVATE ATTR_NOINLINE void KCALL
+udp_autobind(struct udp_socket *__restrict me) {
+	uintptr_t state;
+again:
+	state = ATOMIC_FETCHOR(me->us_state, UDP_SOCKET_STATE_F_BINDING);
+	if (state & UDP_SOCKET_STATE_F_BOUND)
+		return; /* Already bound. */
+	if (state & UDP_SOCKET_STATE_F_BINDING) {
+		/* Some other thread is also binding right now... */
+		task_yield();
+		COMPILER_BARRIER();
+		goto again;
+	}
+	/* Do the yield ourself! */
+	TRY {
+		udp_autobind_impl(me);
+	} EXCEPT {
+		ATOMIC_FETCHAND(me->us_state, ~UDP_SOCKET_STATE_F_BINDING);
+		RETHROW();
+	}
+	ATOMIC_FETCHOR(me->us_state, UDP_SOCKET_STATE_F_BOUND);
+}
 
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL udp_fini)(struct socket *__restrict self) {
@@ -124,8 +178,12 @@ udp_bind(struct socket *__restrict self,
 		me->us_bindport      = in->sin_port;
 		COMPILER_BARRIER();
 		/* TODO: Actually register `me' as the recipient of UDP packets where:
-		 *       (PACKET.IP.DST_IP & me->us_bindip.s_addr) == me->us_bindip.s_addr &&
-		 *       PACKET.UDP.DST_PORT == me->us_bindport; */
+		 *       (PACKET.IP.DST_IP & (-1 << ffs(me->us_bindip.s_addr))) == me->us_bindip.s_addr &&
+		 *       PACKET.UDP.DST_PORT == me->us_bindport;
+		 *       Where `me->us_bindip.s_addr == 0' causes the ip-check to be skipped,
+		 *       as though the mask resulting from `(-1 << ffs(me->us_bindip.s_addr)'
+		 *       evaluated to `0' (reminder: ffs(x) is FindFirstSet, such that
+		 *       `(x & (1 << ffs(x))) != 0' so-long as `x != 0') */
 	} EXCEPT {
 		ATOMIC_FETCHAND(me->us_state, ~UDP_SOCKET_STATE_F_BINDING);
 		RETHROW();
@@ -150,60 +208,13 @@ udp_connect(struct socket *__restrict self,
 	COMPILER_BARRIER();
 	/* Mark the socket as having a peer */
 	ATOMIC_FETCHOR(me->us_state, UDP_SOCKET_STATE_F_HASPEER);
+	/* The man page for ip(7) says that connect() will also
+	 * cause the socket to become bound to some local port. */
+	if unlikely(!(me->us_state & UDP_SOCKET_STATE_F_BOUND))
+		udp_autobind(me);
 	/* Indicate successful AIO completion. */
 	aio_handle_init(aio, &aio_noop_type);
 	aio_handle_complete(aio, AIO_COMPLETION_SUCCESS);
-}
-
-
-PRIVATE ATTR_RETNONNULL struct nic_device *KCALL
-udp_getnic(struct udp_socket *__restrict me) {
-	struct nic_device *result;
-again:
-	result = me->us_dev;
-	if (!result) {
-		result = nic_device_getdefault();
-		if unlikely(!result)
-			THROW(E_NO_SUCH_OBJECT);
-		if (!ATOMIC_CMPXCH(me->us_dev, NULL, result)) {
-			decref_unlikely(result);
-			COMPILER_READ_BARRIER();
-			goto again;
-		}
-	}
-	return result;
-}
-
-PRIVATE void KCALL
-udp_autobind_impl(struct udp_socket *__restrict me) {
-	static u16 nextport = 10000;
-	/* TODO: Do proper port binding! */
-	me->us_bindip.s_addr = htonl(0);
-	me->us_bindport      = htons(ATOMIC_FETCHINC(nextport));
-}
-
-/* Automatically bind the given UDP socket to some unused local port. */
-PRIVATE ATTR_NOINLINE void KCALL
-udp_autobind(struct udp_socket *__restrict me) {
-	uintptr_t state;
-again:
-	state = ATOMIC_FETCHOR(me->us_state, UDP_SOCKET_STATE_F_BINDING);
-	if (state & UDP_SOCKET_STATE_F_BOUND)
-		return; /* Already bound. */
-	if (state & UDP_SOCKET_STATE_F_BINDING) {
-		/* Some other thread is also binding right now... */
-		task_yield();
-		COMPILER_BARRIER();
-		goto again;
-	}
-	/* Do the yield ourself! */
-	TRY {
-		udp_autobind_impl(me);
-	} EXCEPT {
-		ATOMIC_FETCHAND(me->us_state, ~UDP_SOCKET_STATE_F_BINDING);
-		RETHROW();
-	}
-	ATOMIC_FETCHOR(me->us_state, UDP_SOCKET_STATE_F_BOUND);
 }
 
 
@@ -289,6 +300,9 @@ udp_recvfromv(struct socket *__restrict self,
 	struct udp_socket *me;
 	me = (struct udp_socket *)self;
 	/* TODO: Implement once we've got routing of incoming UDP packets. */
+	/* Reminder: When the received packet is larger than the given buffer,
+	 *           then we must set `*presult_flags & MSG_TRUNC' before
+	 *           completion! */
 	(void)me;
 	(void)buf;
 	(void)bufsize;
