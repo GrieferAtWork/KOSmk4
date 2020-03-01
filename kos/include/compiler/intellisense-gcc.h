@@ -113,12 +113,22 @@ static_assert(sizeof(__UINT_FAST64_TYPE__) == __SIZEOF_FAST64_TYPE__, "WTF Intel
 #define __UINT_FAST64_TYPE__ unsigned long long int
 
 #endif
+#elif defined(__i386__)
+/* Intellisense incorrectly indicates that gcc for i386 defaults
+ * to having SSE math enabled. */
+#undef __SSE2_MATH__
+#undef __SSE2__
+#undef __SSE_MATH__
+#undef __SSE__
 #endif /* __x86_64__ */
 
 
 #if 0 /* How can Intellisense be this stupid? - I mean: this is linux 101! */
 static_assert(sizeof(wchar_t) == __SIZEOF_WCHAR_T__, "WTF Intellisense?");
 #else
+/* This isn't really correct, either. wchar_t on linux is 4 bytes, however we
+ * can't really change sizeof(xxx) using preprocessor directives, to the best
+ * we _can_ do is change intellisense to at least be consistent with itself... */
 #undef __SIZEOF_WCHAR_T__
 #define __SIZEOF_WCHAR_T__ 2
 #endif

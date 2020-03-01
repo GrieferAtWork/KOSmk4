@@ -27,6 +27,7 @@
 
 #include <bits/types.h>
 
+#include <libm/asm/atan2.h>
 #include <libm/atan.h>
 #include <libm/fabs.h>
 #include <libm/fdlibm.h>
@@ -35,6 +36,7 @@
 __DECL_BEGIN
 
 #ifdef __IEEE754_FLOAT_TYPE__
+#ifndef __ieee754_atan2f
 /*
  * ====================================================
  * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
@@ -142,11 +144,12 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 		return (__z - __LIBM_LOCAL_VALUE(pi_lof)) - __LIBM_LOCAL_VALUE(pif); /* atan(-,-) */
 	}
 }
-
+#endif /* !__ieee754_atan2f */
 #endif /* __IEEE754_FLOAT_TYPE__ */
 
 
 #ifdef __IEEE754_DOUBLE_TYPE__
+#ifndef __ieee754_atan2
 /*
  * ====================================================
  * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
@@ -255,11 +258,12 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 		return (__z - __LIBM_LOCAL_VALUE(pi_lo)) - __LIBM_LOCAL_VALUE(pi);     /* atan(-,-) */
 	}
 }
-
+#endif /* !__ieee754_atan2 */
 #endif /* __IEEE754_DOUBLE_TYPE__ */
 
 
 #ifdef __IEEE854_LONG_DOUBLE_TYPE__
+#ifndef __ieee854_atan2l
 /*
  * ====================================================
  * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
@@ -382,7 +386,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
 		return (__z - __LIBM_LOCAL_VALUE(pi_lol)) - __LIBM_LOCAL_VALUE(pil); /* atan(-,-) */
 	}
 }
-
+#endif /* !__ieee854_atan2l */
 #endif /* __IEEE854_LONG_DOUBLE_TYPE__ */
 
 __DECL_END

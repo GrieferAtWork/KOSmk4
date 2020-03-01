@@ -27,18 +27,22 @@
 
 #include <bits/types.h>
 
+#include <libm/asm/sqrt.h>
 #include <libm/fdlibm.h>
 
 #ifdef __IEEE854_LONG_DOUBLE_TYPE__
+#ifndef __ieee854_sqrtl
 #include <libm/isnan.h>
 #include <libm/frexp.h>
 #include <libm/ldexp.h>
+#endif /* !__ieee854_sqrtl */
 #endif /* __IEEE854_LONG_DOUBLE_TYPE__ */
 
 #ifdef __CC__
 __DECL_BEGIN
 
 #ifdef __IEEE754_FLOAT_TYPE__
+#ifndef __ieee754_sqrtf
 /*
  * ====================================================
  * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
@@ -62,20 +66,20 @@ __LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, tinyf, __IEEE754_FLOAT_C(1.0e-30))
 __LIBM_LOCAL_DECLARE_END
 
 __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
-(__LIBCCALL __ieee754_sqrtf)(__IEEE754_FLOAT_TYPE__ x) {
+(__LIBCCALL __ieee754_sqrtf)(__IEEE754_FLOAT_TYPE__ __x) {
 	__IEEE754_FLOAT_TYPE__ __z;
 	__uint32_t __r, __hx;
 	__int32_t __ix, __s, __q, __m, __t, _i;
-	__LIBM_GET_FLOAT_WORD(__ix, x);
+	__LIBM_GET_FLOAT_WORD(__ix, __x);
 	__hx = __ix & 0x7fffffff;
 	/* take care of Inf and NaN */
 	if (!__LIBM_FLT_UWORD_IS_FINITE(__hx))
-		return x * x + x; /* sqrt(NaN)=NaN, sqrt(+inf)=+inf sqrt(-inf)=sNaN */
+		return __x * __x + __x; /* sqrt(NaN)=NaN, sqrt(+inf)=+inf sqrt(-inf)=sNaN */
 	/* take care of zero and -ves */
 	if (__LIBM_FLT_UWORD_IS_ZERO(__hx))
-		return x; /* sqrt(+-0) = +-0 */
+		return __x; /* sqrt(+-0) = +-0 */
 	if (__ix < 0)
-		return (x - x) / (x - x); /* sqrt(-ve) = sNaN */
+		return (__x - __x) / (__x - __x); /* sqrt(-ve) = sNaN */
 	/* normalize x */
 	__m = (__ix >> 23);
 	if (__LIBM_FLT_UWORD_IS_SUBNORMAL(__hx)) { /* subnormal x */
@@ -122,11 +126,12 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 	__LIBM_SET_FLOAT_WORD(__z, __ix);
 	return __z;
 }
-
+#endif /* !__ieee754_sqrtf */
 #endif /* __IEEE754_FLOAT_TYPE__ */
 
 
 #ifdef __IEEE754_DOUBLE_TYPE__
+#ifndef __ieee754_sqrt
 /*
  * ====================================================
  * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
@@ -253,11 +258,12 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 	__LIBM_INSERT_WORDS(z, __ix0, __ix1);
 	return z;
 }
-
+#endif /* !__ieee754_sqrt */
 #endif /* __IEEE754_DOUBLE_TYPE__ */
 
 
 #ifdef __IEEE854_LONG_DOUBLE_TYPE__
+#ifndef __ieee854_sqrtl
 /* Emulation for sqrtl.
    Contributed by Paolo Bonzini
 
@@ -305,7 +311,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
 	} while (__delta != 0.0L);
 	return __y;
 }
-
+#endif /* !__ieee854_sqrtl */
 #endif /* __IEEE854_LONG_DOUBLE_TYPE__ */
 
 __DECL_END

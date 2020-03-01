@@ -27,6 +27,7 @@
 
 #include <bits/types.h>
 
+#include <libm/asm/atan.h>
 #include <libm/fabs.h>
 #include <libm/fdlibm.h>
 #ifdef __IEEE854_LONG_DOUBLE_TYPE__
@@ -37,6 +38,7 @@
 __DECL_BEGIN
 
 #ifdef __IEEE754_FLOAT_TYPE__
+#ifndef __ieee754_atanf
 /*
  * ====================================================
  * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
@@ -148,11 +150,12 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 		return (__hx < 0) ? -__z : __z;
 	}
 }
-
+#endif /* !__ieee754_atanf */
 #endif /* __IEEE754_FLOAT_TYPE__ */
 
 
 #ifdef __IEEE754_DOUBLE_TYPE__
+#ifndef __ieee754_atan
 /*
  * ====================================================
  * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
@@ -266,11 +269,12 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 		return (__hx < 0) ? -__z : __z;
 	}
 }
-
+#endif /* !__ieee754_atan */
 #endif /* __IEEE754_DOUBLE_TYPE__ */
 
 
 #ifdef __IEEE854_LONG_DOUBLE_TYPE__
+#ifndef __ieee854_atanl
 /* Copyright 2001 by Stephen L. Moshier <moshier@na-net.ornl.gov>
 
     This library is free software; you can redistribute it and/or
@@ -462,7 +466,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
 		return -__u;
 	return __u;
 }
-
+#endif /* !__ieee854_atanl */
 #endif /* __IEEE854_LONG_DOUBLE_TYPE__ */
 
 __DECL_END
