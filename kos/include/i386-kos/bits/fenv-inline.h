@@ -183,7 +183,7 @@ __NOTHROW(__inline_fesetround)(int __rounding_direction) {
 	if (__CPU_HAVE_SSE()) {
 		__UINT32_TYPE__ __mxscr;
 		__mxscr = __stmxcsr();
-		__mxscr &= MXCSR_RC;
+		__mxscr &= ~MXCSR_RC;
 		/* NOTE: 3 == (ctz(MXCSR_RC) - ctz(FCW_RC)) */
 		__mxscr |= __rounding_direction << 3;
 		__ldmxcsr(__mxscr);
