@@ -33,6 +33,8 @@
 #include <libm/cbrt.h>
 #include <libm/ceil.h>
 #include <libm/copysign.h>
+#include <libm/exp.h>
+#include <libm/expm1.h>
 #include <libm/fabs.h>
 #include <libm/fdlibm.h>
 #include <libm/finite.h>
@@ -586,11 +588,18 @@ INTERN __DECL_SIMD_exp WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.exp") double
 NOTHROW(LIBCCALL libc_exp)(double x)
 /*[[[body:exp]]]*/
-{
-	(void)x;
-	CRT_UNIMPLEMENTED("exp"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+/*AUTO*/{
+	double result;
+	result = __LIBM_MATHFUN(exp, x);
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
+	    (!__LIBM_MATHFUN(finite, result) || result == 0.0) &&
+	    __LIBM_MATHFUN(finite, x)) {
+		return __kernel_standard(x, x, result,
+		                         __LIBM_MATHFUN(signbit, x)
+		                         ? __LIBM_KMATHERR_EXP_UNDERFLOW
+		                         : __LIBM_KMATHERR_EXP_OVERFLOW);
+	}
+	return result;
 }
 /*[[[end:exp]]]*/
 
@@ -623,19 +632,15 @@ NOTHROW(LIBCCALL libc_ldexp)(double x,
 	double result;
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	result = (double)__ieee754_ldexp((__IEEE754_DOUBLE_TYPE__)x, exponent);
-	if unlikely(!__ieee754_finite((__IEEE754_DOUBLE_TYPE__)result) || result == 0.0)
 #elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 	result = (double)__ieee754_ldexpf((__IEEE754_FLOAT_TYPE__)x, exponent);
-	if unlikely(!__ieee754_finitef((__IEEE754_FLOAT_TYPE__)result) || result == 0.0)
 #else /* ... */
 	result = (double)__ieee854_ldexpl((__IEEE854_LONG_DOUBLE_TYPE__)x, exponent);
-	if unlikely(!__ieee854_finitel((__IEEE854_LONG_DOUBLE_TYPE__)result) || result == 0.0)
 #endif /* !... */
-	{
 #ifdef __ERANGE
+	if unlikely(!__LIBM_MATHFUN(finite, result) || result == 0.0)
 		__libc_seterrno(__ERANGE);
 #endif /* __ERANGE */
-	}
 	return result;
 }
 /*[[[end:ldexp]]]*/
@@ -693,7 +698,21 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.expf") float
 NOTHROW(LIBCCALL libc_expf)(float x)
 /*[[[body:expf]]]*/
 /*AUTO*/{
+#ifdef __LIBM_MATHFUNF
+	float result;
+	result = __LIBM_MATHFUNF(exp, x);
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
+	    (!__LIBM_MATHFUNF(finite, result) || result == 0.0f) &&
+	    __LIBM_MATHFUNF(finite, x)) {
+		return __kernel_standard_f(x, x, result,
+		                         __LIBM_MATHFUNF(signbit, x)
+		                         ? __LIBM_KMATHERR_EXP_UNDERFLOW
+		                         : __LIBM_KMATHERR_EXP_OVERFLOW);
+	}
+	return result;
+#else /* __LIBM_MATHFUNF */
 	return (float)libc_exp((double)x);
+#endif /* !__LIBM_MATHFUNF */
 }
 /*[[[end:expf]]]*/
 
@@ -731,19 +750,15 @@ NOTHROW(LIBCCALL libc_ldexpf)(float x,
 	float result;
 #ifdef __IEEE754_DOUBLE_TYPE_IS_FLOAT__
 	result = (float)__ieee754_ldexp((__IEEE754_DOUBLE_TYPE__)x, exponent);
-	if unlikely(!__ieee754_finite((__IEEE754_DOUBLE_TYPE__)result) || result == 0.0f)
 #elif defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__)
 	result = (float)__ieee754_ldexpf((__IEEE754_FLOAT_TYPE__)x, exponent);
-	if unlikely(!__ieee754_finitef((__IEEE754_FLOAT_TYPE__)result) || result == 0.0f)
 #else /* ... */
 	result = (float)__ieee854_ldexpl((__IEEE854_LONG_DOUBLE_TYPE__)x, exponent);
-	if unlikely(!__ieee854_finitel((__IEEE854_LONG_DOUBLE_TYPE__)result) || result == 0.0f)
 #endif /* !... */
-	{
 #ifdef __ERANGE
+	if unlikely(!__LIBM_MATHFUNF(finite, result) || result == 0.0f)
 		__libc_seterrno(__ERANGE);
 #endif /* __ERANGE */
-	}
 	return result;
 #else /* __LIBM_MATHFUN2F */
 	return (float)libc_ldexp((double)x, exponent);
@@ -802,7 +817,21 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.expl") __LONGDOUBLE
 NOTHROW(LIBCCALL libc_expl)(__LONGDOUBLE x)
 /*[[[body:expl]]]*/
 /*AUTO*/{
+#ifdef __LIBM_MATHFUNL
+	__LONGDOUBLE result;
+	result = __LIBM_MATHFUNL(exp, x);
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
+	    (!__LIBM_MATHFUNL(finite, result) || result == 0.0L) &&
+	    __LIBM_MATHFUNL(finite, x)) {
+		return __kernel_standard_l(x, x, result,
+		                         __LIBM_MATHFUNL(signbit, x)
+		                         ? __LIBM_KMATHERR_EXP_UNDERFLOW
+		                         : __LIBM_KMATHERR_EXP_OVERFLOW);
+	}
+	return result;
+#else /* __LIBM_MATHFUNL */
 	return (__LONGDOUBLE)libc_exp((double)x);
+#endif /* !__LIBM_MATHFUNL */
 }
 /*[[[end:expl]]]*/
 
@@ -840,19 +869,15 @@ NOTHROW(LIBCCALL libc_ldexpl)(__LONGDOUBLE x,
 	__LONGDOUBLE result;
 #ifdef __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__
 	result = (__LONGDOUBLE)__ieee754_ldexp((__IEEE754_DOUBLE_TYPE__)x, exponent);
-	if unlikely(!__ieee754_finite((__IEEE754_DOUBLE_TYPE__)result) || result == 0.0L)
 #elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
 	result = (__LONGDOUBLE)__ieee754_ldexpf((__IEEE754_FLOAT_TYPE__)x, exponent);
-	if unlikely(!__ieee754_finitef((__IEEE754_FLOAT_TYPE__)result) || result == 0.0L)
 #else /* ... */
 	result = (__LONGDOUBLE)__ieee854_ldexpl((__IEEE854_LONG_DOUBLE_TYPE__)x, exponent);
-	if unlikely(!__ieee854_finitel((__IEEE854_LONG_DOUBLE_TYPE__)result) || result == 0.0L)
 #endif /* !... */
-	{
 #ifdef __ERANGE
+	if unlikely(!__LIBM_MATHFUNL(finite, result) || result == 0.0L)
 		__libc_seterrno(__ERANGE);
 #endif /* __ERANGE */
-	}
 	return result;
 #else /* __LIBM_MATHFUN2L */
 	return (__LONGDOUBLE)libc_ldexp((double)x, exponent);
@@ -910,11 +935,17 @@ INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.expm1") double
 NOTHROW(LIBCCALL libc_expm1)(double x)
 /*[[[body:expm1]]]*/
-{
-	(void)x;
-	CRT_UNIMPLEMENTED("expm1"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+/*AUTO*/{
+	double result;
+	result = __LIBM_MATHFUN(expm1, x);
+	if ((!__LIBM_MATHFUN(finite, result) || result == -1.0) &&
+	    __LIBM_MATHFUN(finite , x) && __LIBM_LIB_VERSION != __LIBM_IEEE) {
+		return __kernel_standard(x, x, result,
+		                         __LIBM_MATHFUN(signbit, x)
+		                         ? __LIBM_KMATHERRL_EXPM1_UNDERFLOW
+		                         : __LIBM_KMATHERRL_EXPM1_OVERFLOW);
+	}
+	return result;
 }
 /*[[[end:expm1]]]*/
 
@@ -953,7 +984,20 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.expm1f") float
 NOTHROW(LIBCCALL libc_expm1f)(float x)
 /*[[[body:expm1f]]]*/
 /*AUTO*/{
+#ifdef __LIBM_MATHFUNF
+	float result;
+	result = __LIBM_MATHFUNF(expm1, x);
+	if ((!__LIBM_MATHFUNF(finite, result) || result == -1.0f) &&
+	    __LIBM_MATHFUNF(finite , x) && __LIBM_LIB_VERSION != __LIBM_IEEE) {
+		return __kernel_standard_f(x, x, result,
+		                         __LIBM_MATHFUNF(signbit, x)
+		                         ? __LIBM_KMATHERRL_EXPM1_UNDERFLOW
+		                         : __LIBM_KMATHERRL_EXPM1_OVERFLOW);
+	}
+	return result;
+#else /* __LIBM_MATHFUNF */
 	return (float)libc_expm1((double)x);
+#endif /* !__LIBM_MATHFUNF */
 }
 /*[[[end:expm1f]]]*/
 
@@ -986,7 +1030,20 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.expm1l") __LONGDOUBLE
 NOTHROW(LIBCCALL libc_expm1l)(__LONGDOUBLE x)
 /*[[[body:expm1l]]]*/
 /*AUTO*/{
+#ifdef __LIBM_MATHFUNL
+	__LONGDOUBLE result;
+	result = __LIBM_MATHFUNL(expm1, x);
+	if ((!__LIBM_MATHFUNL(finite, result) || result == -1.0L) &&
+	    __LIBM_MATHFUNL(finite , x) && __LIBM_LIB_VERSION != __LIBM_IEEE) {
+		return __kernel_standard_l(x, x, result,
+		                         __LIBM_MATHFUNL(signbit, x)
+		                         ? __LIBM_KMATHERRL_EXPM1_UNDERFLOW
+		                         : __LIBM_KMATHERRL_EXPM1_OVERFLOW);
+	}
+	return result;
+#else /* __LIBM_MATHFUNL */
 	return (__LONGDOUBLE)libc_expm1((double)x);
+#endif /* !__LIBM_MATHFUNL */
 }
 /*[[[end:expm1l]]]*/
 

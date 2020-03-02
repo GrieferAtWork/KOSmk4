@@ -231,7 +231,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
 	    ((x_class = __ieee854_fpclassifyl(x)) == __LIBM_FP_ZERO ||
 	     x_class == __LIBM_FP_NAN || x_class == __LIBM_FP_INFINITE))
 		return x + x;
-	u = (((-__IEEE854_LONG_DOUBLE_C(1.34661104733595206551E-1) * xm +
+	u = (((__IEEE854_LONG_DOUBLE_C(-1.34661104733595206551E-1) * xm +
 	       __IEEE854_LONG_DOUBLE_C(5.46646013663955245034E-1)) *
 	      xm -
 	      __IEEE854_LONG_DOUBLE_C(9.54382247715094465250E-1)) *

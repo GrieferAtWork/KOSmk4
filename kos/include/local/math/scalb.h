@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe94d4371 */
+/* HASH CRC-32:0xc8aca03f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(scalb) __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(scalb))(double __x,
                                                double __fn) {
-#line 1619 "kos/src/libc/magic/math.c"
+#line 1650 "kos/src/libc/magic/math.c"
 	/*
 	 * ====================================================
 	 * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.

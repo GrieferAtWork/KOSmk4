@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcbef42c6 */
+/* HASH CRC-32:0x9ae7bffb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,6 +44,13 @@
 /* Get current rounding direction */
 #define __libc_fegetround __libc_core_fegetround
 #endif /* !__fast_fegetround_defined */
+#ifdef __fast_fesetround_defined
+/* Establish the rounding direction represented by ROUND */
+#define __libc_fesetround (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(fesetround))
+#else /* __fast_fesetround_defined */
+/* Establish the rounding direction represented by ROUND */
+#define __libc_fesetround __libc_core_fesetround
+#endif /* !__fast_fesetround_defined */
 
 #endif /* __CC__ */
 

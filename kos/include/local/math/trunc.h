@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe5e297d9 */
+/* HASH CRC-32:0x5a4db24c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
  * format nearest but not larger in magnitude */
 __LOCAL_LIBC(trunc) __ATTR_CONST __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(trunc))(double __x) {
-#line 976 "kos/src/libc/magic/math.c"
+#line 1007 "kos/src/libc/magic/math.c"
 #ifdef __LIBM_MATHFUN
 	return __LIBM_MATHFUN(trunc, __x);
 #else /* __LIBM_MATHFUN */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdeb68a4c */
+/* HASH CRC-32:0xe829e108 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,24 +56,20 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(ldexpf) __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ldexpf))(float __x,
                                                 int __exponent) {
-#line 390 "kos/src/libc/magic/math.c"
+#line 404 "kos/src/libc/magic/math.c"
 #ifdef __LIBM_MATHFUN2F
 	float __result;
 #ifdef __IEEE754_DOUBLE_TYPE_IS_FLOAT__
 	__result = (float)__ieee754_ldexp((__IEEE754_DOUBLE_TYPE__)__x, __exponent);
-	if __unlikely(!__ieee754_finite((__IEEE754_DOUBLE_TYPE__)__result) || __result == 0.0f)
 #elif defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__)
 	__result = (float)__ieee754_ldexpf((__IEEE754_FLOAT_TYPE__)__x, __exponent);
-	if __unlikely(!__ieee754_finitef((__IEEE754_FLOAT_TYPE__)__result) || __result == 0.0f)
 #else /* ... */
 	__result = (float)__ieee854_ldexpl((__IEEE854_LONG_DOUBLE_TYPE__)__x, __exponent);
-	if __unlikely(!__ieee854_finitel((__IEEE854_LONG_DOUBLE_TYPE__)__result) || __result == 0.0f)
 #endif /* !... */
-	{
 #ifdef __ERANGE
+	if __unlikely(!__LIBM_MATHFUNF(finite, __result) || __result == 0.0f)
 		__libc_seterrno(__ERANGE);
 #endif /* __ERANGE */
-	}
 	return __result;
 #else /* __LIBM_MATHFUN2F */
 	return (float)__localdep_ldexp((double)__x, __exponent);

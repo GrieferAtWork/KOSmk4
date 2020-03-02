@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xea25d02d */
+/* HASH CRC-32:0x87589fe4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,7 +51,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Round X to nearest integral value according to current rounding direction */
 __LOCAL_LIBC(lrint) __ATTR_CONST __ATTR_WUNUSED long int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(lrint))(double __x) {
-#line 995 "kos/src/libc/magic/math.c"
+#line 1026 "kos/src/libc/magic/math.c"
 #ifdef __LIBM_MATHFUNI
 	return __LIBM_MATHFUNI(lrint, __x);
 #else /* __LIBM_MATHFUNI */

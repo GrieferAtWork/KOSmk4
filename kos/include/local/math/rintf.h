@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x33f8b33c */
+/* HASH CRC-32:0xf2f09db5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
 __LOCAL_LIBC(rintf) __ATTR_CONST __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(rintf))(float __x) {
-#line 859 "kos/src/libc/magic/math.c"
+#line 890 "kos/src/libc/magic/math.c"
 #ifdef __LIBM_MATHFUNF
 	return __LIBM_MATHFUNF(__rint, __x);
 #else /* __LIBM_MATHFUNF */

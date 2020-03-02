@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25c9629 */
+/* HASH CRC-32:0xb46ab8be */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,23 +32,19 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(ldexp) __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ldexp))(double __x,
                                                int __exponent) {
-#line 336 "kos/src/libc/magic/math.c"
+#line 354 "kos/src/libc/magic/math.c"
 	double __result;
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	__result = (double)__ieee754_ldexp((__IEEE754_DOUBLE_TYPE__)__x, __exponent);
-	if __unlikely(!__ieee754_finite((__IEEE754_DOUBLE_TYPE__)__result) || __result == 0.0)
 #elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 	__result = (double)__ieee754_ldexpf((__IEEE754_FLOAT_TYPE__)__x, __exponent);
-	if __unlikely(!__ieee754_finitef((__IEEE754_FLOAT_TYPE__)__result) || __result == 0.0)
 #else /* ... */
 	__result = (double)__ieee854_ldexpl((__IEEE854_LONG_DOUBLE_TYPE__)__x, __exponent);
-	if __unlikely(!__ieee854_finitel((__IEEE854_LONG_DOUBLE_TYPE__)__result) || __result == 0.0)
 #endif /* !... */
-	{
 #ifdef __ERANGE
+	if __unlikely(!__LIBM_MATHFUN(finite, __result) || __result == 0.0)
 		__libc_seterrno(__ERANGE);
 #endif /* __ERANGE */
-	}
 	return __result;
 }
 __NAMESPACE_LOCAL_END

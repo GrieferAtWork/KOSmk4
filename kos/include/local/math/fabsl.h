@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xac6a453e */
+/* HASH CRC-32:0x65f73b4e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Absolute value of X */
 __LOCAL_LIBC(fabsl) __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fabsl))(__LONGDOUBLE __x) {
-#line 702 "kos/src/libc/magic/math.c"
+#line 733 "kos/src/libc/magic/math.c"
 #ifdef __LIBM_MATHFUNL
 	#ifdef __LIBM_MATHFUNL
 	return __LIBM_MATHFUNL(fabs, __x);

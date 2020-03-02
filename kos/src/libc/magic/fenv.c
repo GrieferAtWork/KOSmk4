@@ -137,7 +137,7 @@ fegetround:() -> int {
 }
 
 @@Establish the rounding direction represented by ROUND
-[std][nothrow]
+[std][nothrow][libc]
 [fast][dependency_include(<bits/fenv-inline.h>)]
 fesetround:(int rounding_direction) -> int {
 	return @__inline_fesetround@(rounding_direction);

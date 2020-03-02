@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xafccbbad */
+/* HASH CRC-32:0xd559603a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,7 +51,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Return representation of qNaN for double type */
 __LOCAL_LIBC(nanf) __ATTR_CONST __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(nanf))(char const *__tagb) {
-#line 741 "kos/src/libc/magic/math.c"
+#line 772 "kos/src/libc/magic/math.c"
 #ifdef __LIBM_MATHFUNF
 	return __LIBM_MATHFUN1IF(nan, __tagb);
 #else /* __LIBM_MATHFUNF */

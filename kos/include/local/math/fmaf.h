@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7608249c */
+/* HASH CRC-32:0xd2942418 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __LOCAL_LIBC(fmaf) __ATTR_CONST __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fmaf))(float __x,
                                               float __y,
                                               float __z) {
-#line 1039 "kos/src/libc/magic/math.c"
+#line 1070 "kos/src/libc/magic/math.c"
 	/* TODO: ieee754-specific function */
 	return (__x * __y) + __z;
 }

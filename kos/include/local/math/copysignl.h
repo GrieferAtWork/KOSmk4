@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x20c1ad87 */
+/* HASH CRC-32:0xcd0b752 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(copysignl) __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(copysignl))(__LONGDOUBLE __num,
                                                    __LONGDOUBLE __sign) {
-#line 745 "kos/src/libc/magic/math.c"
+#line 776 "kos/src/libc/magic/math.c"
 #ifdef __LIBM_MATHFUN2L
 	#ifdef __LIBM_MATHFUN2L
 	return __LIBM_MATHFUN2L(copysign, __num, __sign);

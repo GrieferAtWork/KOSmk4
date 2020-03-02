@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x64d5ae05 */
+/* HASH CRC-32:0x1ef7d1c0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Return the binary exponent of X, which must be nonzero */
 __LOCAL_LIBC(ilogb) __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ilogb))(double __x) {
-#line 850 "kos/src/libc/magic/math.c"
+#line 881 "kos/src/libc/magic/math.c"
 	int __result;
 	__result = __LIBM_MATHFUNI(ilogb, __x);
 	if (__result == __LIBM_FP_ILOGB0 || __result == __LIBM_FP_ILOGBNAN || __result == __INT_MAX__)

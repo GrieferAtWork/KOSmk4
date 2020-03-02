@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x94ba3846 */
+/* HASH CRC-32:0xff69b66b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -105,7 +105,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Return nonzero if VALUE is finite and not NaN */
 __LOCAL_LIBC(finitel) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(finitel))(__LONGDOUBLE __x) {
-#line 1480 "kos/src/libc/magic/math.c"
+#line 1511 "kos/src/libc/magic/math.c"
 #ifdef __LIBM_MATHFUNL
 	#ifdef __LIBM_MATHFUNIL
 	return __LIBM_MATHFUNIL(finite, __x);

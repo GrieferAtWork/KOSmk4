@@ -294,9 +294,9 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
 	/* Check for negative numbers */
 	if (__x < __IEEE854_LONG_DOUBLE_C(0.0)) {
 #ifdef __IEEE754_DOUBLE_C
-		return (long double)__ieee754_sqrt(-__IEEE754_DOUBLE_C(1.0));
+		return (__IEEE854_LONG_DOUBLE_TYPE__)__ieee754_sqrt(__IEEE754_DOUBLE_C(-1.0));
 #else /* __IEEE754_DOUBLE_C */
-		return (long double)__ieee754_sqrtf(-__IEEE754_FLOAT_C(1.0));
+		return (__IEEE854_LONG_DOUBLE_TYPE__)__ieee754_sqrtf(__IEEE754_FLOAT_C(-1.0));
 #endif /* !__IEEE754_DOUBLE_C */
 	}
 	/* Check for zero and infinites */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdf6169 */
+/* HASH CRC-32:0x1ea8defd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Largest integer not greater than X */
 __LOCAL_LIBC(floorf) __ATTR_CONST __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(floorf))(float __x) {
-#line 692 "kos/src/libc/magic/math.c"
+#line 723 "kos/src/libc/magic/math.c"
 #ifdef __LIBM_MATHFUNF
 	#ifdef __LIBM_MATHFUNF
 	return __LIBM_MATHFUNF(floor, __x);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd810dc45 */
+/* HASH CRC-32:0x94ff5a52 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fdim) __ATTR_CONST __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fdim))(double __x,
                                               double __y) {
-#line 1018 "kos/src/libc/magic/math.c"
+#line 1049 "kos/src/libc/magic/math.c"
 	/* TODO: ieee754-specific function */
 	return __localdep_fabs(__y - __x);
 }

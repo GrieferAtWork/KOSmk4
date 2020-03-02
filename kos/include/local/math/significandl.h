@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb1c70461 */
+/* HASH CRC-32:0xaafa722e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,7 +51,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Return the fractional part of X after dividing out `ilogb(X)' */
 __LOCAL_LIBC(significandl) __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(significandl))(__LONGDOUBLE __x) {
-#line 1485 "kos/src/libc/magic/math.c"
+#line 1516 "kos/src/libc/magic/math.c"
 #ifdef __LIBM_MATHFUNL
 	return __LIBM_MATHFUNL(significand, __x);
 #else /* __LIBM_MATHFUNL */

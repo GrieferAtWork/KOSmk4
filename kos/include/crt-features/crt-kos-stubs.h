@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x221fd9eb */
+/* HASH CRC-32:0x622aa2f6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -141,10 +141,8 @@
 #define __CRT_STUB_erfc 1
 #define __CRT_STUB_ether_hostton 1
 #define __CRT_STUB_ether_ntohost 1
-#define __CRT_STUB_exp 1
 #define __CRT_STUB_exp10 1
 #define __CRT_STUB_exp2 1
-#define __CRT_STUB_expm1 1
 #define __CRT_STUB_fattach 1
 #define __CRT_STUB_fdetach 1
 #define __CRT_STUB_fgetgrent 1

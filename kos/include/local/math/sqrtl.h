@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x91afe2b7 */
+/* HASH CRC-32:0x6fbb1a47 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,7 +57,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Return the square root of X */
 __LOCAL_LIBC(sqrtl) __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(sqrtl))(__LONGDOUBLE __x) {
-#line 581 "kos/src/libc/magic/math.c"
+#line 612 "kos/src/libc/magic/math.c"
 #ifdef __LIBM_MATHFUNL
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_MATHFUNI2L(isless, __x, 0.0L))
 		return __kernel_standard_l(__x, __x, __LIBM_MATHFUN1IL(nan, ""), __LIBM_KMATHERR_SQRT); /* sqrt(negative) */

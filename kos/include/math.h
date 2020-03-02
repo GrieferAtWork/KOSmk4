@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x171ac565 */
+/* HASH CRC-32:0xc36aff9f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1690,7 +1690,16 @@ __CDECLARE(__DECL_SIMD_exp __ATTR_WUNUSED,double,__NOTHROW,exp,(double __x),(__x
 /* Exponential function of X */
 __CREDIRECT(__DECL_SIMD_exp __ATTR_WUNUSED,double,__NOTHROW,exp,(double __x),__exp,(__x))
 #else /* LIBC: exp */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_STD_END
+#include <local/math/exp.h>
+__NAMESPACE_STD_BEGIN
+/* Exponential function of X */
+__NAMESPACE_LOCAL_USING_OR_IMPL(exp, __FORCELOCAL __DECL_SIMD_exp __ATTR_WUNUSED double __NOTHROW(__LIBCCALL exp)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(exp))(__x); })
+#else /* CUSTOM: exp */
 #undef __std_exp_defined
+#endif /* exp... */
 #endif /* exp... */
 #endif /* !__std_exp_defined */
 #ifndef __std_frexp_defined
@@ -1806,7 +1815,9 @@ __CDECLARE(__DECL_SIMD_expf __ATTR_WUNUSED,float,__NOTHROW,expf,(float __x),(__x
 #elif defined(__CRT_HAVE___expf)
 /* Exponential function of X */
 __CREDIRECT(__DECL_SIMD_expf __ATTR_WUNUSED,float,__NOTHROW,expf,(float __x),__expf,(__x))
-#elif defined(__CRT_HAVE_exp) || defined(__CRT_HAVE___exp)
+#else /* LIBC: expf */
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_exp) || defined(__CRT_HAVE___exp)
 __NAMESPACE_STD_END
 #include <local/math/expf.h>
 __NAMESPACE_STD_BEGIN
@@ -1814,6 +1825,7 @@ __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(expf, __FORCELOCAL __DECL_SIMD_expf __ATTR_WUNUSED float __NOTHROW(__LIBCCALL expf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(expf))(__x); })
 #else /* CUSTOM: expf */
 #undef __std_expf_defined
+#endif /* expf... */
 #endif /* expf... */
 #endif /* !__std_expf_defined */
 #ifndef __std_frexpf_defined
@@ -1942,13 +1954,9 @@ __CDECLARE(__DECL_SIMD_expl __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,expl,(__LONGDO
 #elif defined(__CRT_HAVE___expl)
 /* Exponential function of X */
 __CREDIRECT(__DECL_SIMD_expl __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,expl,(__LONGDOUBLE __x),__expl,(__x))
-#elif defined(__CRT_HAVE_exp) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Exponential function of X */
-__CREDIRECT(__DECL_SIMD_expl __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,expl,(__LONGDOUBLE __x),exp,(__x))
-#elif defined(__CRT_HAVE___exp) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Exponential function of X */
-__CREDIRECT(__DECL_SIMD_expl __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,expl,(__LONGDOUBLE __x),__exp,(__x))
-#elif defined(__CRT_HAVE_exp) || defined(__CRT_HAVE___exp)
+#else /* LIBC: expl */
+#include <ieee754.h>
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_exp) || defined(__CRT_HAVE___exp)
 __NAMESPACE_STD_END
 #include <local/math/expl.h>
 __NAMESPACE_STD_BEGIN
@@ -1956,6 +1964,7 @@ __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(expl, __FORCELOCAL __DECL_SIMD_expl __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL expl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(expl))(__x); })
 #else /* CUSTOM: expl */
 #undef __std_expl_defined
+#endif /* expl... */
 #endif /* expl... */
 #endif /* !__std_expl_defined */
 #ifndef __std_frexpl_defined
@@ -2099,7 +2108,16 @@ __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,expm1,(double __x),(__x))
 /* Return exp(X) - 1 */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,expm1,(double __x),__expm1,(__x))
 #else /* LIBC: expm1 */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_STD_END
+#include <local/math/expm1.h>
+__NAMESPACE_STD_BEGIN
+/* Return exp(X) - 1 */
+__NAMESPACE_LOCAL_USING_OR_IMPL(expm1, __FORCELOCAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL expm1)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(expm1))(__x); })
+#else /* CUSTOM: expm1 */
 #undef __std_expm1_defined
+#endif /* expm1... */
 #endif /* expm1... */
 #endif /* !__std_expm1_defined */
 #ifndef __std_log1p_defined
@@ -2146,7 +2164,9 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,expm1f,(float __x),(__x))
 #elif defined(__CRT_HAVE___expm1f)
 /* Return exp(X) - 1 */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,expm1f,(float __x),__expm1f,(__x))
-#elif defined(__CRT_HAVE_expm1) || defined(__CRT_HAVE___expm1)
+#else /* LIBC: expm1f */
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_expm1) || defined(__CRT_HAVE___expm1)
 __NAMESPACE_STD_END
 #include <local/math/expm1f.h>
 __NAMESPACE_STD_BEGIN
@@ -2154,6 +2174,7 @@ __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(expm1f, __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL expm1f)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(expm1f))(__x); })
 #else /* CUSTOM: expm1f */
 #undef __std_expm1f_defined
+#endif /* expm1f... */
 #endif /* expm1f... */
 #endif /* !__std_expm1f_defined */
 #ifndef __std_log1pf_defined
@@ -2210,13 +2231,9 @@ __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,expm1l,(__LONGDOUBLE __x),(__x)
 #elif defined(__CRT_HAVE___expm1l)
 /* Return exp(X) - 1 */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,expm1l,(__LONGDOUBLE __x),__expm1l,(__x))
-#elif defined(__CRT_HAVE_expm1) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Return exp(X) - 1 */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,expm1l,(__LONGDOUBLE __x),expm1,(__x))
-#elif defined(__CRT_HAVE___expm1) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Return exp(X) - 1 */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,expm1l,(__LONGDOUBLE __x),__expm1,(__x))
-#elif defined(__CRT_HAVE_expm1) || defined(__CRT_HAVE___expm1)
+#else /* LIBC: expm1l */
+#include <ieee754.h>
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_expm1) || defined(__CRT_HAVE___expm1)
 __NAMESPACE_STD_END
 #include <local/math/expm1l.h>
 __NAMESPACE_STD_BEGIN
@@ -2224,6 +2241,7 @@ __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(expm1l, __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL expm1l)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(expm1l))(__x); })
 #else /* CUSTOM: expm1l */
 #undef __std_expm1l_defined
+#endif /* expm1l... */
 #endif /* expm1l... */
 #endif /* !__std_expm1l_defined */
 #ifndef __std_log1pl_defined
@@ -4838,7 +4856,9 @@ __CREDIRECT(__DECL_SIMD_expf __ATTR_WUNUSED,float,__NOTHROW,exp,(float __x),expf
 #elif defined(__CRT_HAVE___expf)
 /* Exponential function of X */
 __CREDIRECT(__DECL_SIMD_expf __ATTR_WUNUSED,float,__NOTHROW,exp,(float __x),__expf,(__x))
-#elif defined(__CRT_HAVE_exp) || defined(__CRT_HAVE___exp)
+#else /* LIBC: expf */
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_exp) || defined(__CRT_HAVE___exp)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/expf.h>
@@ -4846,6 +4866,7 @@ __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Exponential function of X */
 __FORCELOCAL __DECL_SIMD_expf __ATTR_WUNUSED float __NOTHROW(__LIBCCALL exp)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(expf))(__x); }
+#endif /* exp... */
 #endif /* exp... */
 #if __has_builtin(__builtin_frexpf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_frexpf)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
@@ -5307,13 +5328,9 @@ __CREDIRECT(__DECL_SIMD_expl __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,exp,(__LONGDO
 #elif defined(__CRT_HAVE___expl)
 /* Exponential function of X */
 __CREDIRECT(__DECL_SIMD_expl __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,exp,(__LONGDOUBLE __x),__expl,(__x))
-#elif defined(__CRT_HAVE_exp) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Exponential function of X */
-__CDECLARE(__DECL_SIMD_expl __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,exp,(__LONGDOUBLE __x),(__x))
-#elif defined(__CRT_HAVE___exp) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Exponential function of X */
-__CREDIRECT(__DECL_SIMD_expl __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,exp,(__LONGDOUBLE __x),__exp,(__x))
-#elif defined(__CRT_HAVE_exp) || defined(__CRT_HAVE___exp)
+#else /* LIBC: expl */
+#include <ieee754.h>
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_exp) || defined(__CRT_HAVE___exp)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/expl.h>
@@ -5321,6 +5338,7 @@ __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Exponential function of X */
 __FORCELOCAL __DECL_SIMD_expl __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL exp)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(expl))(__x); }
+#endif /* exp... */
 #endif /* exp... */
 #if __has_builtin(__builtin_frexpl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_frexpl)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
@@ -5615,7 +5633,9 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,expm1,(float __x),expm1f,(__x))
 #elif defined(__CRT_HAVE___expm1f)
 /* Return exp(X) - 1 */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,expm1,(float __x),__expm1f,(__x))
-#elif defined(__CRT_HAVE_expm1) || defined(__CRT_HAVE___expm1)
+#else /* LIBC: expm1f */
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_expm1) || defined(__CRT_HAVE___expm1)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/expm1f.h>
@@ -5623,6 +5643,7 @@ __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Return exp(X) - 1 */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL expm1)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(expm1f))(__x); }
+#endif /* expm1... */
 #endif /* expm1... */
 #if __has_builtin(__builtin_log1pf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log1pf)
 /* Return log(1 + X) */
@@ -5853,13 +5874,9 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,expm1,(__LONGDOUBLE __x),expm1
 #elif defined(__CRT_HAVE___expm1l)
 /* Return exp(X) - 1 */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,expm1,(__LONGDOUBLE __x),__expm1l,(__x))
-#elif defined(__CRT_HAVE_expm1) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Return exp(X) - 1 */
-__CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,expm1,(__LONGDOUBLE __x),(__x))
-#elif defined(__CRT_HAVE___expm1) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Return exp(X) - 1 */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,expm1,(__LONGDOUBLE __x),__expm1,(__x))
-#elif defined(__CRT_HAVE_expm1) || defined(__CRT_HAVE___expm1)
+#else /* LIBC: expm1l */
+#include <ieee754.h>
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_expm1) || defined(__CRT_HAVE___expm1)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/expm1l.h>
@@ -5867,6 +5884,7 @@ __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Return exp(X) - 1 */
 __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL expm1)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(expm1l))(__x); }
+#endif /* expm1... */
 #endif /* expm1... */
 #if __has_builtin(__builtin_log1pl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log1pl)
 /* Return log(1 + X) */
@@ -9229,12 +9247,22 @@ __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __atanhl)(__LONGDO
 #endif /* __atanhl... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
-#ifdef __CRT_HAVE___exp
+#if __has_builtin(__builtin_exp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exp)
 /* Exponential function of X */
-__CDECLARE(__DECL_SIMD_exp __ATTR_WUNUSED,double,__NOTHROW,__exp,(double __x),(__x))
+__CEIREDIRECT(__DECL_SIMD_exp __ATTR_WUNUSED,double,__NOTHROW,__exp,(double __x),exp,{ return __builtin_exp(__x); })
 #elif defined(__CRT_HAVE_exp)
 /* Exponential function of X */
 __CREDIRECT(__DECL_SIMD_exp __ATTR_WUNUSED,double,__NOTHROW,__exp,(double __x),exp,(__x))
+#elif defined(__CRT_HAVE___exp)
+/* Exponential function of X */
+__CDECLARE(__DECL_SIMD_exp __ATTR_WUNUSED,double,__NOTHROW,__exp,(double __x),(__x))
+#else /* LIBC: exp */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <local/math/exp.h>
+/* Exponential function of X */
+__FORCELOCAL __DECL_SIMD_exp __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __exp)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(exp))(__x); }
+#endif /* __exp... */
 #endif /* __exp... */
 #if __has_builtin(__builtin_frexp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_frexp)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
@@ -9310,10 +9338,13 @@ __CREDIRECT(__DECL_SIMD_expf __ATTR_WUNUSED,float,__NOTHROW,__expf,(float __x),e
 #elif defined(__CRT_HAVE___expf)
 /* Exponential function of X */
 __CDECLARE(__DECL_SIMD_expf __ATTR_WUNUSED,float,__NOTHROW,__expf,(float __x),(__x))
-#elif defined(__CRT_HAVE_exp) || defined(__CRT_HAVE___exp)
+#else /* LIBC: expf */
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_exp) || defined(__CRT_HAVE___exp)
 #include <local/math/expf.h>
 /* Exponential function of X */
 __FORCELOCAL __DECL_SIMD_expf __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __expf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(expf))(__x); }
+#endif /* __expf... */
 #endif /* __expf... */
 #if __has_builtin(__builtin_frexpf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_frexpf)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
@@ -9404,16 +9435,13 @@ __CREDIRECT(__DECL_SIMD_expl __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__expl,(__LON
 #elif defined(__CRT_HAVE___expl)
 /* Exponential function of X */
 __CDECLARE(__DECL_SIMD_expl __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__expl,(__LONGDOUBLE __x),(__x))
-#elif defined(__CRT_HAVE_exp) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Exponential function of X */
-__CREDIRECT(__DECL_SIMD_expl __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__expl,(__LONGDOUBLE __x),exp,(__x))
-#elif defined(__CRT_HAVE___exp) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Exponential function of X */
-__CREDIRECT(__DECL_SIMD_expl __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__expl,(__LONGDOUBLE __x),__exp,(__x))
-#elif defined(__CRT_HAVE_exp) || defined(__CRT_HAVE___exp)
+#else /* LIBC: expl */
+#include <ieee754.h>
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_exp) || defined(__CRT_HAVE___exp)
 #include <local/math/expl.h>
 /* Exponential function of X */
 __FORCELOCAL __DECL_SIMD_expl __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __expl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(expl))(__x); }
+#endif /* __expl... */
 #endif /* __expl... */
 #if __has_builtin(__builtin_frexpl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_frexpl)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
@@ -9608,12 +9636,22 @@ __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __pow10l)(__LONGDO
 #endif /* __USE_GNU */
 
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
-#ifdef __CRT_HAVE___expm1
+#if __has_builtin(__builtin_expm1) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_expm1)
 /* Return exp(X) - 1 */
-__CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__expm1,(double __x),(__x))
+__CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__expm1,(double __x),expm1,{ return __builtin_expm1(__x); })
 #elif defined(__CRT_HAVE_expm1)
 /* Return exp(X) - 1 */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__expm1,(double __x),expm1,(__x))
+#elif defined(__CRT_HAVE___expm1)
+/* Return exp(X) - 1 */
+__CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__expm1,(double __x),(__x))
+#else /* LIBC: expm1 */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <local/math/expm1.h>
+/* Return exp(X) - 1 */
+__FORCELOCAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __expm1)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(expm1))(__x); }
+#endif /* __expm1... */
 #endif /* __expm1... */
 #ifdef __CRT_HAVE___log1p
 /* Return log(1 + X) */
@@ -9641,10 +9679,13 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__expm1f,(float __x),expm1f,(__x))
 #elif defined(__CRT_HAVE___expm1f)
 /* Return exp(X) - 1 */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__expm1f,(float __x),(__x))
-#elif defined(__CRT_HAVE_expm1) || defined(__CRT_HAVE___expm1)
+#else /* LIBC: expm1f */
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_expm1) || defined(__CRT_HAVE___expm1)
 #include <local/math/expm1f.h>
 /* Return exp(X) - 1 */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __expm1f)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(expm1f))(__x); }
+#endif /* __expm1f... */
 #endif /* __expm1f... */
 #if __has_builtin(__builtin_log1pf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log1pf)
 /* Return log(1 + X) */
@@ -9684,16 +9725,13 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__expm1l,(__LONGDOUBLE __x),ex
 #elif defined(__CRT_HAVE___expm1l)
 /* Return exp(X) - 1 */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__expm1l,(__LONGDOUBLE __x),(__x))
-#elif defined(__CRT_HAVE_expm1) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Return exp(X) - 1 */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__expm1l,(__LONGDOUBLE __x),expm1,(__x))
-#elif defined(__CRT_HAVE___expm1) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Return exp(X) - 1 */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__expm1l,(__LONGDOUBLE __x),__expm1,(__x))
-#elif defined(__CRT_HAVE_expm1) || defined(__CRT_HAVE___expm1)
+#else /* LIBC: expm1l */
+#include <ieee754.h>
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_expm1) || defined(__CRT_HAVE___expm1)
 #include <local/math/expm1l.h>
 /* Return exp(X) - 1 */
 __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __expm1l)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(expm1l))(__x); }
+#endif /* __expm1l... */
 #endif /* __expm1l... */
 #if __has_builtin(__builtin_log1pl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log1pl)
 /* Return log(1 + X) */

@@ -307,7 +307,25 @@ atanhl:(__LONGDOUBLE x) -> __LONGDOUBLE %{auto_block(math)} /* TODO */
 @@Exponential function of X
 [attribute(@__DECL_SIMD_exp@)][decl_include(<bits/math-vector.h>)]
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__exp)][nothrow][crtbuiltin]
-exp:(double x) -> double; /* TODO */
+[dependency_include(<libm/signbit.h>)]
+[dependency_include(<libm/matherr.h>)][dependency_include(<libm/finite.h>)]
+[requires_include(<ieee754.h>)][dependency_include(<libm/exp.h>)]
+[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+          defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+          defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]
+exp:(double x) -> double {
+	double result;
+	result = __LIBM_MATHFUN(@exp@, x);
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
+	    (!__LIBM_MATHFUN(@finite@, result) || result == 0.0) &&
+	    __LIBM_MATHFUN(@finite@, x)) {
+		return __kernel_standard(x, x, result,
+		                         __LIBM_MATHFUN(@signbit@, x)
+		                         ? __LIBM_KMATHERR_EXP_UNDERFLOW
+		                         : __LIBM_KMATHERR_EXP_OVERFLOW);
+	}
+	return result;
+}
 
 @@Break VALUE into a normalized fraction and an integral power of 2
 [std][ATTR_WUNUSED][alias(__frexp)][crtbuiltin]
@@ -336,19 +354,15 @@ ldexp:(double x, int exponent) -> double {
 	double result;
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	result = (double)__ieee754_ldexp((__IEEE754_DOUBLE_TYPE__)x, exponent);
-	if unlikely(!__ieee754_finite((__IEEE754_DOUBLE_TYPE__)result) || result == 0.0)
 #elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 	result = (double)__ieee754_ldexpf((__IEEE754_FLOAT_TYPE__)x, exponent);
-	if unlikely(!__ieee754_finitef((__IEEE754_FLOAT_TYPE__)result) || result == 0.0)
 #else /* ... */
 	result = (double)__ieee854_ldexpl((__IEEE854_LONG_DOUBLE_TYPE__)x, exponent);
-	if unlikely(!__ieee854_finitel((__IEEE854_LONG_DOUBLE_TYPE__)result) || result == 0.0)
 #endif /* !... */
-	{
 #ifdef @__ERANGE@
+	if unlikely(!__LIBM_MATHFUN(@finite@, result) || result == 0.0)
 		__libc_seterrno(@__ERANGE@);
 #endif /* __ERANGE */
-	}
 	return result;
 }
 
@@ -380,7 +394,7 @@ modf:(double x, [nonnull] double *iptr) -> double {
 
 [attribute(@__DECL_SIMD_expf@)][decl_include(<bits/math-vector.h>)]
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__expf)][nothrow][crtbuiltin]
-expf:(float x) -> float %{auto_block(math)} /* TODO */
+expf:(float x) -> float %{auto_block(mathfun)}
 
 [std][ATTR_WUNUSED][alias(__frexpf)][crtbuiltin]
 frexpf:(float x, [nonnull] int *pexponent) -> float %{auto_block(mathfun)}
@@ -402,7 +416,7 @@ modff:(float x, [nonnull] float *iptr) -> float %{auto_block(mathfun)}
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
 [attribute(@__DECL_SIMD_expl@)][decl_include(<bits/math-vector.h>)]
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__expl)][nothrow][crtbuiltin]
-expl:(__LONGDOUBLE x) -> __LONGDOUBLE %{auto_block(math)} /* TODO */
+expl:(__LONGDOUBLE x) -> __LONGDOUBLE %{auto_block(mathfun)}
 
 [std][ATTR_WUNUSED][alias(__frexpl)][crtbuiltin]
 frexpl:(__LONGDOUBLE x, [nonnull] int *pexponent) -> __LONGDOUBLE %{auto_block(mathfun)}
@@ -426,7 +440,24 @@ modfl:(__LONGDOUBLE x, [nonnull] __LONGDOUBLE *iptr) -> __LONGDOUBLE %{auto_bloc
 %(std, c, ccompat)#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
 @@Return exp(X) - 1
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__expm1)][nothrow][crtbuiltin]
-expm1:(double x) -> double; /* TODO */
+[dependency_include(<libm/matherr.h>)][dependency_include(<libm/signbit.h>)]
+[dependency_include(<libm/finite.h>)]
+[requires_include(<ieee754.h>)][dependency_include(<libm/expm1.h>)]
+[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+          defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+          defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]
+expm1:(double x) -> double {
+	double result;
+	result = __LIBM_MATHFUN(@expm1@, x);
+	if ((!__LIBM_MATHFUN(@finite@, result) || result == -1.0) &&
+	    __LIBM_MATHFUN(@finite @, x) && __LIBM_LIB_VERSION != __LIBM_IEEE) {
+		return __kernel_standard(x, x, result,
+		                         __LIBM_MATHFUN(@signbit@, x)
+		                         ? __LIBM_KMATHERRL_EXPM1_UNDERFLOW
+		                         : __LIBM_KMATHERRL_EXPM1_OVERFLOW);
+	}
+	return result;
+}
 
 @@Return log(1 + X)
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__log1p)][nothrow][crtbuiltin]
@@ -438,7 +469,7 @@ logb:(double x) -> double; /* TODO */
 
 
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__expm1f)][nothrow][crtbuiltin]
-expm1f:(float x) -> float %{auto_block(math)} /* TODO */
+expm1f:(float x) -> float %{auto_block(mathfun)}
 
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__log1pf)][nothrow][crtbuiltin]
 log1pf:(float x) -> float %{auto_block(math)} /* TODO */
@@ -449,7 +480,7 @@ logbf:(float x) -> float %{auto_block(math)} /* TODO */
 
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__expm1l)][nothrow][crtbuiltin]
-expm1l:(__LONGDOUBLE x) -> __LONGDOUBLE %{auto_block(math)} /* TODO */
+expm1l:(__LONGDOUBLE x) -> __LONGDOUBLE %{auto_block(mathfun)}
 
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__log1pl)][nothrow][crtbuiltin]
 log1pl:(__LONGDOUBLE x) -> __LONGDOUBLE %{auto_block(math)} /* TODO */

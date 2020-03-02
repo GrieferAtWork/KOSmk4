@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3fe6dc48 */
+/* HASH CRC-32:0x193e6fef */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,19 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_expf_defined
-#if defined(__CRT_HAVE_exp) || defined(__CRT_HAVE___exp)
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_exp) || defined(__CRT_HAVE___exp)
 #define __local_expf_defined 1
 #include <bits/math-vector.h>
 #include <bits/math-vector.h>
-/* Dependency: "exp" */
+#include <libm/signbit.h>
+
+#include <libm/matherr.h>
+
+#include <libm/finite.h>
+
+#include <libm/exp.h>
+/* Dependency: "exp" from "math" */
 #ifndef ____localdep_exp_defined
 #define ____localdep_exp_defined 1
 #if __has_builtin(__builtin_exp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exp)
@@ -36,7 +44,14 @@ __CREDIRECT(__DECL_SIMD_exp __ATTR_WUNUSED,double,__NOTHROW,__localdep_exp,(doub
 /* Exponential function of X */
 __CREDIRECT(__DECL_SIMD_exp __ATTR_WUNUSED,double,__NOTHROW,__localdep_exp,(double __x),__exp,(__x))
 #else /* LIBC: exp */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <local/math/exp.h>
+/* Exponential function of X */
+#define __localdep_exp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(exp))
+#else /* CUSTOM: exp */
 #undef ____localdep_exp_defined
+#endif /* exp... */
 #endif /* exp... */
 #endif /* !____localdep_exp_defined */
 
@@ -44,9 +59,23 @@ __NAMESPACE_LOCAL_BEGIN
 /* Exponential function of X */
 __LOCAL_LIBC(expf) __DECL_SIMD_expf __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(expf))(float __x) {
-#line 384 "kos/src/libc/magic/math.c"
+#line 398 "kos/src/libc/magic/math.c"
+#ifdef __LIBM_MATHFUNF
+	float __result;
+	__result = __LIBM_MATHFUNF(exp, __x);
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
+	    (!__LIBM_MATHFUNF(finite, __result) || __result == 0.0f) &&
+	    __LIBM_MATHFUNF(finite, __x)) {
+		return __kernel_standard_f(__x, __x, __result,
+		                         __LIBM_MATHFUNF(signbit, __x)
+		                         ? __LIBM_KMATHERR_EXP_UNDERFLOW
+		                         : __LIBM_KMATHERR_EXP_OVERFLOW);
+	}
+	return __result;
+#else /* __LIBM_MATHFUNF */
 	return (float)__localdep_exp((double)__x);
+#endif /* !__LIBM_MATHFUNF */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_exp || __CRT_HAVE___exp */
+#endif /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __CRT_HAVE_exp || __CRT_HAVE___exp */
 #endif /* !__local_expf_defined */

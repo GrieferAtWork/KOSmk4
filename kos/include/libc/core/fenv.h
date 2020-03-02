@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe8218cfc */
+/* HASH CRC-32:0xd5e57a12 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,6 +46,14 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW,__libc_core_fegetround,(voi
 /* Get current rounding direction */
 #define __libc_core_fegetround (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fegetround))
 #endif /* fegetround... */
+#ifdef __CRT_HAVE_fesetround
+/* Establish the rounding direction represented by ROUND */
+__CREDIRECT(,int,__NOTHROW,__libc_core_fesetround,(int __rounding_direction),fesetround,(__rounding_direction))
+#else /* LIBC: fesetround */
+#include <local/fenv/fesetround.h>
+/* Establish the rounding direction represented by ROUND */
+#define __libc_core_fesetround (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fesetround))
+#endif /* fesetround... */
 
 __SYSDECL_END
 #endif /* __CC__ */

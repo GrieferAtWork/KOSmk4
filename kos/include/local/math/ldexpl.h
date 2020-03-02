@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x17b414c8 */
+/* HASH CRC-32:0xcacaeb8d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,24 +56,20 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(ldexpl) __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ldexpl))(__LONGDOUBLE __x,
                                                 int __exponent) {
-#line 412 "kos/src/libc/magic/math.c"
+#line 426 "kos/src/libc/magic/math.c"
 #ifdef __LIBM_MATHFUN2L
 	__LONGDOUBLE __result;
 #ifdef __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__
 	__result = (__LONGDOUBLE)__ieee754_ldexp((__IEEE754_DOUBLE_TYPE__)__x, __exponent);
-	if __unlikely(!__ieee754_finite((__IEEE754_DOUBLE_TYPE__)__result) || __result == 0.0L)
 #elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
 	__result = (__LONGDOUBLE)__ieee754_ldexpf((__IEEE754_FLOAT_TYPE__)__x, __exponent);
-	if __unlikely(!__ieee754_finitef((__IEEE754_FLOAT_TYPE__)__result) || __result == 0.0L)
 #else /* ... */
 	__result = (__LONGDOUBLE)__ieee854_ldexpl((__IEEE854_LONG_DOUBLE_TYPE__)__x, __exponent);
-	if __unlikely(!__ieee854_finitel((__IEEE854_LONG_DOUBLE_TYPE__)__result) || __result == 0.0L)
 #endif /* !... */
-	{
 #ifdef __ERANGE
+	if __unlikely(!__LIBM_MATHFUNL(finite, __result) || __result == 0.0L)
 		__libc_seterrno(__ERANGE);
 #endif /* __ERANGE */
-	}
 	return __result;
 #else /* __LIBM_MATHFUN2L */
 	return (__LONGDOUBLE)__localdep_ldexp((double)__x, __exponent);
