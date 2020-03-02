@@ -1720,6 +1720,9 @@ function removeLineFeedAndDuplicateSpaces(text: string): string {
 }
 
 
+@@List of all functions marked as `%[userimpl_if_requires(true)]'
+global userimpl_if_requires_functions: {Function...} = [];
+
 @@Yields an intermixed set of strings and functions to-be used to define
 function parse_functions(filename: string, text: string): {string | Function...} {
 	text = text.unifylines();
@@ -1780,6 +1783,7 @@ function parse_functions(filename: string, text: string): {string | Function...}
 	local dosnames = none;
 	local doc = "";
 	local pushed_macros: {{string...}...} = [];
+	local userimpl_if_requires: bool = false;
 	function err(i, message) {
 		print getFilenameForLog(filename),;
 		print "(",;
@@ -1938,6 +1942,26 @@ got_section_prefix:
 						std_only_guard = key_cxx_stdonly_guard(cpp_header_name);
 					local header_name = fs.fileof(filename).replace(".", "/") + ".h";
 					ccompat_cpp_headers[header_name] = (cpp_header_name, guard, std_only_guard);
+				} else if (directive.startswith("userimpl_if_requires")) {
+					directive = directive[#"userimpl_if_requires":].lstrip();
+					if (!directive.startswith("("))
+						err(directive_begin, "Expected `(' after `%[userimpl_if_requires' in " + repr directive);
+					local defend = directive.findmatch("(", ")", 1);
+					if (defend < 0)
+						err(directive_begin, "Missing `)' after `%[userimpl_if_requires" + repr directive + "'");
+					if (directive[defend + 1:].strip() != "")
+						err(directive_begin, "Trailing text after `%[userimpl_if_requires(...)': " + repr directive[defend:].strip());
+					local mode = directive[1:defend].strip();
+					if (mode == "true")
+						userimpl_if_requires = true;
+					else if (mode == "false")
+						userimpl_if_requires = false;
+					else {
+						err(directive_begin,
+							"Invalid argument for `%[userimpl_if_requires(...)]' "
+							"(expected `true' or `false', but got {!r})"
+							.format({ mode }));
+					}
 				} else if (directive.startswith("default_impl_section")) {
 					directive = directive[#"default_impl_section":].lstrip();
 					if (!directive.startswith("("))
@@ -3439,7 +3463,7 @@ got_chk_checkexpr:
 						fp << "}\n";
 						block = fp.string;
 					}	break;
-					
+
 					case "memcpyc": {
 						local pattern =
 						"{{\n"
@@ -3692,6 +3716,8 @@ got_chk_checkexpr:
 			fun.dependency_string = dependency_string;
 			fun.helper_function = helper_function;
 			fun.hide_in_header = hide_in_header;
+			if (userimpl_if_requires)
+				userimpl_if_requires_functions.append(fun);
 			if ((doc is string && !doc) && function_throws_anno) {
 				/* Auto-generate one documentation line for every
 				 * type of exception which may be thrown by the function */
@@ -5582,7 +5608,7 @@ do_return_crt:
 								/* Always re-direct in `extern "C++"' scopes! */
 								//if (extern_name == my_name) {
 								//	fp << "__CEIDECLARE(";
-								//} else 
+								//} else
 								fp << "__CEIREDIRECT(";
 								fp << decl_prefix[13:] << ",";
 								for (local is_word, word: split_words(return_type, env: this)) {
@@ -6957,6 +6983,21 @@ inherit_explicit_fields:
 		    func.dont_export_symbol !== true && !func.nocrt) {
 			print "Found alternate name for", repr(alias_func.name), ":", repr(func.name),"(user-space only)";
 			alias_func.nokern_alternate_names.append(func.name);
+		}
+	}
+}
+
+for (local f: userimpl_if_requires_functions) {
+	if (f.define_require_string !in ["", "1"]) {
+		f.export_in_kernel   = false;
+		f.dont_export_symbol = true;
+		f.douser             = true;
+		f.nouser             = false;
+		if (f.block is string || f.block is CopyFunctionBody) {
+			if (f.libc_impl is none)
+				f.libc_impl = f.block;
+			if (f.user_impl is none)
+				f.user_impl = f.block;
 		}
 	}
 }

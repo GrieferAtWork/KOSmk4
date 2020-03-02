@@ -26,6 +26,8 @@
 /*[[[deemon
 local functions = {
 	"fabs",
+	"nan",
+	"inf",
 };
 
 function mapBuiltinDefaultEx(prefix, name, suffix, typ) {
@@ -86,6 +88,78 @@ for (local n: functions)
 #define __ieee854_fabsl __builtin_fabsl
 #endif /* !__ieee854_fabsl && __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 #endif /* __LIBM_HAVE_BUILTIN_ASM_FABSL && __has_builtin(__builtin_fabsl) */
+
+#if defined(__LIBM_HAVE_BUILTIN_ASM_NAN) && __has_builtin(__builtin_nan)
+#if !defined(__ieee754_nan) && defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__)
+#define __ieee754_nan __builtin_nan
+#endif /* !__ieee754_nan && __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+#if !defined(__ieee754_nanf) && defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#define __ieee754_nanf __builtin_nan
+#endif /* !__ieee754_nanf && __IEEE754_FLOAT_TYPE_IS_DOUBLE__ */
+#if !defined(__ieee754_nanl) && defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#define __ieee754_nanl __builtin_nan
+#endif /* !__ieee754_nanl && __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#endif /* __LIBM_HAVE_BUILTIN_ASM_NAN && __has_builtin(__builtin_nan) */
+
+#if defined(__LIBM_HAVE_BUILTIN_ASM_NANF) && __has_builtin(__builtin_nanf)
+#if !defined(__ieee754_nan) && defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+#define __ieee754_nan __builtin_nanf
+#endif /* !__ieee754_nan && __IEEE754_DOUBLE_TYPE_IS_FLOAT__ */
+#if !defined(__ieee754_nanf) && defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__)
+#define __ieee754_nanf __builtin_nanf
+#endif /* !__ieee754_nanf && __IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+#if !defined(__ieee754_nanl) && defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+#define __ieee754_nanl __builtin_nanf
+#endif /* !__ieee754_nanl && __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+#endif /* __LIBM_HAVE_BUILTIN_ASM_NANF && __has_builtin(__builtin_nanf) */
+
+#if defined(__LIBM_HAVE_BUILTIN_ASM_NANL) && __has_builtin(__builtin_nanl)
+#if !defined(__ieee854_nan) && defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+#define __ieee854_nan __builtin_nanl
+#endif /* !__ieee854_nan && __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+#if !defined(__ieee854_nanf) && defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
+#define __ieee854_nanf __builtin_nanl
+#endif /* !__ieee854_nanf && __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ */
+#if !defined(__ieee854_nanl) && defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+#define __ieee854_nanl __builtin_nanl
+#endif /* !__ieee854_nanl && __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+#endif /* __LIBM_HAVE_BUILTIN_ASM_NANL && __has_builtin(__builtin_nanl) */
+
+#if defined(__LIBM_HAVE_BUILTIN_ASM_INF) && __has_builtin(__builtin_inf)
+#if !defined(__ieee754_inf) && defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__)
+#define __ieee754_inf __builtin_inf
+#endif /* !__ieee754_inf && __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+#if !defined(__ieee754_inff) && defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#define __ieee754_inff __builtin_inf
+#endif /* !__ieee754_inff && __IEEE754_FLOAT_TYPE_IS_DOUBLE__ */
+#if !defined(__ieee754_infl) && defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#define __ieee754_infl __builtin_inf
+#endif /* !__ieee754_infl && __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#endif /* __LIBM_HAVE_BUILTIN_ASM_INF && __has_builtin(__builtin_inf) */
+
+#if defined(__LIBM_HAVE_BUILTIN_ASM_INFF) && __has_builtin(__builtin_inff)
+#if !defined(__ieee754_inf) && defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+#define __ieee754_inf __builtin_inff
+#endif /* !__ieee754_inf && __IEEE754_DOUBLE_TYPE_IS_FLOAT__ */
+#if !defined(__ieee754_inff) && defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__)
+#define __ieee754_inff __builtin_inff
+#endif /* !__ieee754_inff && __IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+#if !defined(__ieee754_infl) && defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+#define __ieee754_infl __builtin_inff
+#endif /* !__ieee754_infl && __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+#endif /* __LIBM_HAVE_BUILTIN_ASM_INFF && __has_builtin(__builtin_inff) */
+
+#if defined(__LIBM_HAVE_BUILTIN_ASM_INFL) && __has_builtin(__builtin_infl)
+#if !defined(__ieee854_inf) && defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+#define __ieee854_inf __builtin_infl
+#endif /* !__ieee854_inf && __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+#if !defined(__ieee854_inff) && defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
+#define __ieee854_inff __builtin_infl
+#endif /* !__ieee854_inff && __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ */
+#if !defined(__ieee854_infl) && defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+#define __ieee854_infl __builtin_infl
+#endif /* !__ieee854_infl && __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+#endif /* __LIBM_HAVE_BUILTIN_ASM_INFL && __has_builtin(__builtin_infl) */
 //[[[end]]]
 
 #endif /* !_LIBM_ASM_FABS_H */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9407e041 */
+/* HASH CRC-32:0x852dfbbd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,10 +19,10 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_isinfl_defined
+#include <ieee754.h>
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_isinf) || defined(__CRT_HAVE___isinf)
 #define __local_isinfl_defined 1
 #include <libm/isinf.h>
-
-#include <bits/huge_vall.h>
 /* Dependency: "isinf" from "math" */
 #ifndef ____localdep_isinf_defined
 #define ____localdep_isinf_defined 1
@@ -36,9 +36,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isinf,(double _
 /* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isinf,(double __x),__isinf,(__x))
 #else /* LIBC: isinf */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <local/math/isinf.h>
 /* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
 #define __localdep_isinf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isinf))
+#else /* CUSTOM: isinf */
+#undef ____localdep_isinf_defined
+#endif /* isinf... */
 #endif /* isinf... */
 #endif /* !____localdep_isinf_defined */
 
@@ -46,18 +51,17 @@ __NAMESPACE_LOCAL_BEGIN
 /* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
 __LOCAL_LIBC(isinfl) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(isinfl))(__LONGDOUBLE __x) {
-#line 2149 "kos/src/libc/magic/math.c"
+#line 2189 "kos/src/libc/magic/math.c"
 #ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
 	return __ieee854_isinfl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
 	return __ieee754_isinf((__IEEE754_DOUBLE_TYPE__)__x);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
 	return __ieee754_isinff((__IEEE754_FLOAT_TYPE__)__x);
-#elif 1
-	return __localdep_isinf((double)__x);
 #else /* ... */
-	return __x == HUGE_VALL;
+	return __localdep_isinf((double)__x);
 #endif /* !... */
 }
 __NAMESPACE_LOCAL_END
+#endif /* __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __CRT_HAVE_isinf || __CRT_HAVE___isinf */
 #endif /* !__local_isinfl_defined */

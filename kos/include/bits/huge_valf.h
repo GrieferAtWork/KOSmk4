@@ -22,100 +22,17 @@
 
 #include <__stdinc.h>
 
-/* `HUGE_VALF' constant for IEEE 754 machines (where it is infinity).
-   Used by <stdlib.h> and <math.h> functions for overflow.
-   Copyright (C) 1992-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
-
-#ifdef __CC__
-__SYSDECL_BEGIN
-
 #if __has_builtin(__builtin_huge_valf)
-#define HUGE_VALF (__builtin_huge_valf())
-#else /* ... */
-#include <hybrid/typecore.h>
-#if __SIZEOF_FLOAT__ == 4
-#if defined(__GNUC__) && __GCC_VERSION_NUM >= 29600
-#define HUGE_VALF (__extension__ 0x1.0p255f)
-#elif defined(__GNUC__)
-#define HUGE_VALF (__extension__((union { __UINT32_TYPE__ __l; float __f; }) { 0x7f800000UL }).__f)
-#else /* ... */
-#include <hybrid/__byteorder.h>
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC_CONST_DATA union {
-	__BYTE_TYPE__ __c[4];
-	float         __f;
-} const __huge_valf = {
-#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-	{ 0x7f, 0x80, 0, 0 }
-#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-	{ 0, 0, 0x80, 0x7f }
-#else
-#error "Unsupported __BYTE_ORDER__"
-#endif
-};
-__NAMESPACE_LOCAL_END
-#define HUGE_VALF (__NAMESPACE_LOCAL_SYM __huge_valf.__f)
+#define HUGE_VALF __builtin_huge_valf()
+#else /* __has_builtin(__builtin_huge_valf) */
+#include <libm/inf.h>
+#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+#define HUGE_VALF __ieee754_inff()
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+#define HUGE_VALF __ieee754_inf()
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+#define HUGE_VALF __ieee854_infl()
 #endif /* !... */
-#elif __SIZEOF_FLOAT__ == 8
-#if defined(__GNUC__) && __GCC_VERSION_NUM >= 29600
-#define HUGE_VALF (__extension__ 0x1.0p2047)
-#elif defined(__GNUC__)
-#define HUGE_VALF (__extension__((union { __UINT64_TYPE__ __l; float __f; }) { 0x7ff0000000000000ULL }).__f)
-#else /* ... */
-#include <hybrid/__byteorder.h>
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC_CONST_DATA union {
-	__BYTE_TYPE__ __c[8];
-	float         __f;
-} const __huge_valf = {
-#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-	{ 0x7f, 0xf0, 0, 0, 0, 0, 0, 0 }
-#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-	{ 0, 0, 0, 0, 0, 0, 0xf0, 0x7f }
-#else
-#error "Unsupported __BYTE_ORDER__"
-#endif
-};
-__NAMESPACE_LOCAL_END
-#define HUGE_VALF (__NAMESPACE_LOCAL_SYM __huge_valf.__f)
-#endif /* !... */
-#elif __SIZEOF_FLOAT__ == 12
-#if defined(__GNUC__) && __GCC_VERSION_NUM >= 29600
-#define HUGE_VALF (__extension__ 0x1.0p32767L)
-#elif defined(__GNUC__)
-#define HUGE_VALF (__extension__((union { __BYTE_TYPE__ __c[12]; float __f; }) { { 0, 0, 0, 0, 0, 0, 0, 0x80, 0xff, 0x7f, 0, 0 } }).__f)
-#else /* ... */
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC_CONST_DATA union {
-	__BYTE_TYPE__ __c[12];
-	float         __f;
-} const __huge_valf = {
-	{ 0, 0, 0, 0, 0, 0, 0, 0x80, 0xff, 0x7f, 0, 0 }
-};
-__NAMESPACE_LOCAL_END
-#define HUGE_VALF (__NAMESPACE_LOCAL_SYM __huge_valf.__f)
-#endif /* !... */
-#else  /* __SIZEOF_FLOAT__... */
-#error "Unsupported __SIZEOF_FLOAT__"
-#endif /* !__SIZEOF_FLOAT__... */
-#endif /* !... */
-
-__SYSDECL_END
-#endif /* __CC__ */
+#endif /* !__has_builtin(__builtin_huge_valf) */
 
 #endif /* !_BITS_HUGE_VALF_H */

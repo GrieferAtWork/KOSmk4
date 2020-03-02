@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x941a05e0 */
+/* HASH CRC-32:0x188ae26c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,15 +19,23 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_nanf_defined
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
 #define __local_nanf_defined 1
-#include <bits/nan.h>
+#include <libm/nan.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Return representation of qNaN for double type */
 __LOCAL_LIBC(nanf) __ATTR_CONST __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(nanf))(char const *__tagb) {
-#line 1059 "kos/src/libc/magic/math.c"
-	(void)__tagb;
-	return (float)NAN;
+#line 1094 "kos/src/libc/magic/math.c"
+#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+	return (float)__ieee754_nanf(__tagb);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+	return (float)__ieee754_nan(__tagb);
+#else /* ... */
+	return (float)__ieee854_nanl(__tagb);
+#endif /* !... */
 }
 __NAMESPACE_LOCAL_END
+#endif /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 #endif /* !__local_nanf_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe6cea705 */
+/* HASH CRC-32:0x7f024f65 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,7 +52,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(frexpl) __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(frexpl))(__LONGDOUBLE __x,
                                                     int *__pexponent) {
-#line 496 "kos/src/libc/magic/math.c"
+#line 497 "kos/src/libc/magic/math.c"
 #ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
 	return (__LONGDOUBLE)__ieee854_frexpl((__IEEE854_LONG_DOUBLE_TYPE__)__x, __pexponent);
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)

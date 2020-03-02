@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x97f183e */
+/* HASH CRC-32:0x6238afa3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,10 +19,10 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_isnanf_defined
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_isnan) || defined(__CRT_HAVE___isnan) || defined(__CRT_HAVE__isnan)
 #define __local_isnanf_defined 1
 #include <libm/isnan.h>
-
-#include <bits/nan.h>
 /* Dependency: "isnan" from "math" */
 #ifndef ____localdep_isnan_defined
 #define ____localdep_isnan_defined 1
@@ -39,9 +39,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnan,(double _
 /* Return nonzero if VALUE is not a number */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnan,(double __x),_isnan,(__x))
 #else /* LIBC: isnan */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <local/math/isnan.h>
 /* Return nonzero if VALUE is not a number */
 #define __localdep_isnan (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isnan))
+#else /* CUSTOM: isnan */
+#undef ____localdep_isnan_defined
+#endif /* isnan... */
 #endif /* isnan... */
 #endif /* !____localdep_isnan_defined */
 
@@ -49,18 +54,17 @@ __NAMESPACE_LOCAL_BEGIN
 /* Return nonzero if VALUE is not a number */
 __LOCAL_LIBC(isnanf) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(isnanf))(float __x) {
-#line 2252 "kos/src/libc/magic/math.c"
+#line 2305 "kos/src/libc/magic/math.c"
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
 	return __ieee754_isnanf((__IEEE754_FLOAT_TYPE__)__x);
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 	return __ieee754_isnan((__IEEE754_DOUBLE_TYPE__)__x);
 #elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
 	return __ieee854_isnanl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
-#elif 1
-	return __localdep_isnan((double)__x);
 #else /* ... */
-	return __x == (float)NAN;
+	return __localdep_isnan((double)__x);
 #endif /* !... */
 }
 __NAMESPACE_LOCAL_END
+#endif /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __CRT_HAVE_isnan || __CRT_HAVE___isnan || __CRT_HAVE__isnan */
 #endif /* !__local_isnanf_defined */

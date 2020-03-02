@@ -1316,6 +1316,57 @@ NOTHROW(LIBCCALL libc_fmodl)(__LONGDOUBLE x,
 }
 /*[[[end:fmodl]]]*/
 
+/*[[[head:nan,hash:CRC-32=0x93790d90]]]*/
+/* Return representation of qNaN for double type */
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.nan") double
+NOTHROW(LIBCCALL libc_nan)(char const *tagb)
+/*[[[body:nan]]]*/
+/*AUTO*/{
+#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+	return (double)__ieee754_nan(tagb);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+	return (double)__ieee754_nanf(tagb);
+#else /* ... */
+	return (double)__ieee854_nanl(tagb);
+#endif /* !... */
+}
+/*[[[end:nan]]]*/
+
+/*[[[head:nanf,hash:CRC-32=0xdc22b2de]]]*/
+/* Return representation of qNaN for double type */
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.nanf") float
+NOTHROW(LIBCCALL libc_nanf)(char const *tagb)
+/*[[[body:nanf]]]*/
+/*AUTO*/{
+#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+	return (float)__ieee754_nanf(tagb);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+	return (float)__ieee754_nan(tagb);
+#else /* ... */
+	return (float)__ieee854_nanl(tagb);
+#endif /* !... */
+}
+/*[[[end:nanf]]]*/
+
+/*[[[head:nanl,hash:CRC-32=0x9114c517]]]*/
+/* Return representation of qNaN for double type */
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.nanl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_nanl)(char const *tagb)
+/*[[[body:nanl]]]*/
+/*AUTO*/{
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return (__LONGDOUBLE)__ieee854_nanl(tagb);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+	return (__LONGDOUBLE)__ieee754_nan(tagb);
+#else /* ... */
+	return (__LONGDOUBLE)__ieee754_nanf(tagb);
+#endif /* !... */
+}
+/*[[[end:nanl]]]*/
+
 /*[[[head:erf,hash:CRC-32=0x9569a0d]]]*/
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.erf") double
@@ -1717,7 +1768,6 @@ NOTHROW(LIBCCALL libc_scalbln)(double x,
 #endif /* MAGIC:alias */
 /*[[[end:scalbln]]]*/
 
-
 /*[[[head:remquo,hash:CRC-32=0xd01fffc4]]]*/
 /* Compute remainder of X and Y and put in *QUO a value with sign
  * of x/y and magnitude congruent `mod 2^n' to the magnitude of
@@ -1737,52 +1787,6 @@ NOTHROW(LIBCCALL libc_remquo)(double x,
 	return 0;
 }
 /*[[[end:remquo]]]*/
-
-/*[[[head:lrint,hash:CRC-32=0x6f35dd90]]]*/
-/* Round X to nearest integral value according to current rounding direction */
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.lrint") long int
-NOTHROW(LIBCCALL libc_lrint)(double x)
-/*[[[body:lrint]]]*/
-/*AUTO*/{
-#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
-	return __ieee754_lrint((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-	return __ieee754_lrintf((__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-	return __ieee754_lrintl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#else /* ... */
-	return (long int)libc_rint(x);
-#endif /* !... */
-}
-/*[[[end:lrint]]]*/
-
-
-
-
-/*[[[head:llrint,hash:CRC-32=0x7e9ce7df]]]*/
-/* Round X to nearest integral value according to current rounding direction */
-#if __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
-DEFINE_INTERN_ALIAS(libc_llrint, libc_lrint);
-#else
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.llrint") __LONGLONG
-NOTHROW(LIBCCALL libc_llrint)(double x)
-/*[[[body:llrint]]]*/
-/*AUTO*/{
-#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
-	return __ieee754_llrint((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-	return __ieee754_llrintf((__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-	return __ieee754_llrintl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#else /* ... */
-	return (__LONGLONG)libc_rint(x);
-#endif /* !... */
-}
-#endif /* MAGIC:alias */
-/*[[[end:llrint]]]*/
-
 
 /*[[[head:nexttowardf,hash:CRC-32=0x251a29b0]]]*/
 INTERN ATTR_CONST WUNUSED
@@ -1847,7 +1851,6 @@ NOTHROW(LIBCCALL libc_scalblnf)(float x,
 #endif /* MAGIC:alias */
 /*[[[end:scalblnf]]]*/
 
-
 /*[[[head:remquof,hash:CRC-32=0x4f335ffe]]]*/
 /* Compute remainder of X and Y and put in *QUO a value with sign
  * of x/y and magnitude congruent `mod 2^n' to the magnitude of
@@ -1862,53 +1865,6 @@ NOTHROW(LIBCCALL libc_remquof)(float x,
 	return (float)libc_remquo((double)x, (double)y, pquo);
 }
 /*[[[end:remquof]]]*/
-
-/*[[[head:lrintf,hash:CRC-32=0x6b9ca4e8]]]*/
-/* Round X to nearest integral value according to current rounding direction */
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.lrintf") long int
-NOTHROW(LIBCCALL libc_lrintf)(float x)
-/*[[[body:lrintf]]]*/
-/*AUTO*/{
-#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
-	return __ieee754_lrintf((__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
-	return __ieee754_lrint((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
-	return __ieee754_lrintl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#else /* ... */
-	return (long int)libc_rintf(x);
-#endif /* !... */
-}
-/*[[[end:lrintf]]]*/
-
-
-
-
-/*[[[head:llrintf,hash:CRC-32=0x66fa9122]]]*/
-/* Round X to nearest integral value according to current rounding direction */
-#if __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
-DEFINE_INTERN_ALIAS(libc_llrintf, libc_lrintf);
-#else
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.llrintf") __LONGLONG
-NOTHROW(LIBCCALL libc_llrintf)(float x)
-/*[[[body:llrintf]]]*/
-/*AUTO*/{
-#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
-	return __ieee754_llrintf((__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
-	return __ieee754_llrint((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
-	return __ieee754_llrintl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#else /* ... */
-	return (__LONGLONG)libc_rintf(x);
-#endif /* !... */
-}
-#endif /* MAGIC:alias */
-/*[[[end:llrintf]]]*/
-
-
 
 /*[[[head:scalbnl,hash:CRC-32=0x457ed1cf]]]*/
 /* Return X times (2 to the Nth power) */
@@ -1954,7 +1910,6 @@ NOTHROW(LIBCCALL libc_scalblnl)(__LONGDOUBLE x,
 #endif /* MAGIC:alias */
 /*[[[end:scalblnl]]]*/
 
-
 /*[[[head:remquol,hash:CRC-32=0xd91f3acc]]]*/
 /* Compute remainder of X and Y and put in *QUO a value with sign
  * of x/y and magnitude congruent `mod 2^n' to the magnitude of
@@ -1969,52 +1924,6 @@ NOTHROW(LIBCCALL libc_remquol)(__LONGDOUBLE x,
 	return (__LONGDOUBLE)libc_remquo((double)x, (double)y, pquo);
 }
 /*[[[end:remquol]]]*/
-
-/*[[[head:lrintl,hash:CRC-32=0x41db4132]]]*/
-/* Round X to nearest integral value according to current rounding direction */
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.lrintl") long int
-NOTHROW(LIBCCALL libc_lrintl)(__LONGDOUBLE x)
-/*[[[body:lrintl]]]*/
-/*AUTO*/{
-#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return __ieee854_lrintl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
-	return __ieee854_lrintf((__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
-	return __ieee854_lrint((__IEEE754_DOUBLE_TYPE__)x);
-#else /* ... */
-	return (long int)libc_rintl(x);
-#endif /* !... */
-}
-/*[[[end:lrintl]]]*/
-
-
-
-
-/*[[[head:llrintl,hash:CRC-32=0x9148b49d]]]*/
-/* Round X to nearest integral value according to current rounding direction */
-#if __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
-DEFINE_INTERN_ALIAS(libc_llrintl, libc_lrintl);
-#else
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.llrintl") __LONGLONG
-NOTHROW(LIBCCALL libc_llrintl)(__LONGDOUBLE x)
-/*[[[body:llrintl]]]*/
-/*AUTO*/{
-#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return __ieee854_llrintl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
-	return __ieee854_llrintf((__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
-	return __ieee854_llrint((__IEEE754_DOUBLE_TYPE__)x);
-#else /* ... */
-	return (__LONGLONG)libc_rintl(x);
-#endif /* !... */
-}
-#endif /* MAGIC:alias */
-/*[[[end:llrintl]]]*/
-
 
 /*[[[head:sincos,hash:CRC-32=0x7d55e0c]]]*/
 /* Cosine and sine of X */
@@ -2133,6 +2042,81 @@ NOTHROW(LIBCCALL libc_pow10l)(__LONGDOUBLE x)
 }
 /*[[[end:pow10l]]]*/
 
+/*[[[head:isinf,hash:CRC-32=0x7abffa1e]]]*/
+/* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.isinf") int
+NOTHROW(LIBCCALL libc_isinf)(double x)
+/*[[[body:isinf]]]*/
+/*AUTO*/{
+#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+	return __ieee754_isinf((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+	return __ieee754_isinff((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+	return __ieee854_isinfl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#else /* ... */
+	return x == HUGE_VAL;
+#endif /* !... */
+}
+/*[[[end:isinf]]]*/
+
+/*[[[head:isinff,hash:CRC-32=0x821963fa]]]*/
+/* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.isinff") int
+NOTHROW(LIBCCALL libc_isinff)(float x)
+/*[[[body:isinff]]]*/
+/*AUTO*/{
+#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+	return __ieee754_isinff((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+	return __ieee754_isinf((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	return __ieee854_isinfl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#else /* ... */
+	return libc_isinf((double)x);
+#endif /* !... */
+}
+/*[[[end:isinff]]]*/
+
+/*[[[head:isinfl,hash:CRC-32=0x7cb554fc]]]*/
+/* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.isinfl") int
+NOTHROW(LIBCCALL libc_isinfl)(__LONGDOUBLE x)
+/*[[[body:isinfl]]]*/
+/*AUTO*/{
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return __ieee854_isinfl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+	return __ieee754_isinf((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
+	return __ieee754_isinff((__IEEE754_FLOAT_TYPE__)x);
+#else /* ... */
+	return libc_isinf((double)x);
+#endif /* !... */
+}
+/*[[[end:isinfl]]]*/
+
+/*[[[head:finite,hash:CRC-32=0x833b8562]]]*/
+/* Return nonzero if VALUE is finite and not NaN */
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.finite") int
+NOTHROW(LIBCCALL libc_finite)(double x)
+/*[[[body:finite]]]*/
+/*AUTO*/{
+#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+	return __ieee754_finite((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+	return __ieee754_finitef((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+	return __ieee854_finitel((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#else /* ... */
+	return !libc_isinf(x) && !libc_isnan(x);
+#endif /* !... */
+}
+/*[[[end:finite]]]*/
 
 /*[[[head:significand,hash:CRC-32=0xd0cb1787]]]*/
 /* Return the fractional part of X after dividing out `ilogb(X)' */
@@ -2148,6 +2132,25 @@ NOTHROW(LIBCCALL libc_significand)(double x)
 }
 /*[[[end:significand]]]*/
 
+/*[[[head:finitef,hash:CRC-32=0xd3dc9c52]]]*/
+/* Return nonzero if VALUE is finite and not NaN */
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.finitef") int
+NOTHROW(LIBCCALL libc_finitef)(float x)
+/*[[[body:finitef]]]*/
+/*AUTO*/{
+#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+	return __ieee754_finitef((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+	return __ieee754_finite((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	return __ieee854_finitel((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#else /* ... */
+	return libc_finite((double)x);
+	//return !isinff(x) && !isnanf(x);
+#endif /* !... */
+}
+/*[[[end:finitef]]]*/
 
 /*[[[head:significandf,hash:CRC-32=0xc6ca2acb]]]*/
 /* Return the fractional part of X after dividing out `ilogb(X)' */
@@ -2160,6 +2163,25 @@ NOTHROW(LIBCCALL libc_significandf)(float x)
 }
 /*[[[end:significandf]]]*/
 
+/*[[[head:finitel,hash:CRC-32=0xd819d81]]]*/
+/* Return nonzero if VALUE is finite and not NaN */
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.finitel") int
+NOTHROW(LIBCCALL libc_finitel)(__LONGDOUBLE x)
+/*[[[body:finitel]]]*/
+/*AUTO*/{
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return __ieee854_finitel((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+	return __ieee754_finite((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
+	return __ieee754_finitef((__IEEE754_FLOAT_TYPE__)x);
+#else /* ... */
+	return libc_finite((double)x);
+	//return !isinfl(x) && !isnanl(x);
+#endif /* !... */
+}
+/*[[[end:finitel]]]*/
 
 /*[[[head:significandl,hash:CRC-32=0x208807f]]]*/
 /* Return the fractional part of X after dividing out `ilogb(X)' */
@@ -2171,6 +2193,61 @@ NOTHROW(LIBCCALL libc_significandl)(__LONGDOUBLE x)
 	return (__LONGDOUBLE)libc_significand((double)x);
 }
 /*[[[end:significandl]]]*/
+
+/*[[[head:isnan,hash:CRC-32=0x7f1c685a]]]*/
+/* Return nonzero if VALUE is not a number */
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.isnan") int
+NOTHROW(LIBCCALL libc_isnan)(double x)
+/*[[[body:isnan]]]*/
+/*AUTO*/{
+#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+	return __ieee754_isnan((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+	return __ieee754_isnanf((__IEEE754_FLOAT_TYPE__)x);
+#else /* ... */
+	return __ieee854_isnanl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#endif /* !... */
+}
+/*[[[end:isnan]]]*/
+
+/*[[[head:isnanf,hash:CRC-32=0x208a246b]]]*/
+/* Return nonzero if VALUE is not a number */
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.isnanf") int
+NOTHROW(LIBCCALL libc_isnanf)(float x)
+/*[[[body:isnanf]]]*/
+/*AUTO*/{
+#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+	return __ieee754_isnanf((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+	return __ieee754_isnan((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	return __ieee854_isnanl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#else /* ... */
+	return libc_isnan((double)x);
+#endif /* !... */
+}
+/*[[[end:isnanf]]]*/
+
+/*[[[head:isnanl,hash:CRC-32=0x56939fee]]]*/
+/* Return nonzero if VALUE is not a number */
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.isnanl") int
+NOTHROW(LIBCCALL libc_isnanl)(__LONGDOUBLE x)
+/*[[[body:isnanl]]]*/
+/*AUTO*/{
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return __ieee854_isnanl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
+	return __ieee754_isnanf((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+	return __ieee754_isnan((__IEEE754_DOUBLE_TYPE__)x);
+#else /* ... */
+	return libc_isnan((double)x);
+#endif /* !... */
+}
+/*[[[end:isnanl]]]*/
 
 /*[[[head:j0,hash:CRC-32=0x39953800]]]*/
 INTERN WUNUSED
@@ -2435,9 +2512,11 @@ NOTHROW(LIBCCALL libc_scalb)(double x,
 	COMPILER_IMPURE(); /* XXX: Math error handling */
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	return (double)__ieee754_scalb((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__)fn);
-#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 	return (double)__ieee754_scalbf((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__)fn);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+#else /* ... */
+	return (double)__ieee854_scalbl((__IEEE854_LONG_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__)fn);
+#endif /* !... */
 }
 /*[[[end:scalb]]]*/
 
@@ -2452,21 +2531,33 @@ NOTHROW(LIBCCALL libc_scalbf)(float x,
 	COMPILER_IMPURE(); /* XXX: Math error handling */
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
 	return (float)__ieee754_scalbf((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__)fn);
-#else /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 	return (float)__ieee754_scalb((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__)fn);
-#endif /* !__IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	return (float)__ieee854_scalbl((__IEEE854_LONG_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__)fn);
+#else /* ... */
+	return (float)libc_scalb((double)x, (double)fn);
+#endif /* !... */
 }
 /*[[[end:scalbf]]]*/
 
-/*[[[head:scalbl,hash:CRC-32=0xa70200b]]]*/
-/* Return X times (2 to the Nth power) */
+/*[[[head:scalbl,hash:CRC-32=0x86edbd2a]]]*/
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.scalbl") __LONGDOUBLE
 NOTHROW(LIBCCALL libc_scalbl)(__LONGDOUBLE x,
-                              __LONGDOUBLE n)
+                              __LONGDOUBLE fn)
 /*[[[body:scalbl]]]*/
 /*AUTO*/{
-	return (__LONGDOUBLE)libc_scalb((double)x, (double)n);
+	COMPILER_IMPURE(); /* XXX: Math error handling */
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return (__LONGDOUBLE)__ieee854_scalbl((__IEEE854_LONG_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__)fn);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+	return (__LONGDOUBLE)__ieee754_scalb((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__)fn);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
+	return (__LONGDOUBLE)__ieee754_scalbf((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__)fn);
+#else /* ... */
+	return (__LONGDOUBLE)libc_scalb((double)x, (double)fn);
+#endif /* !... */
 }
 /*[[[end:scalbl]]]*/
 
@@ -2486,7 +2577,6 @@ NOTHROW(LIBCCALL libc___fpclassify)(double x)
 }
 /*[[[end:__fpclassify]]]*/
 
-
 /*[[[head:__fpclassifyf,hash:CRC-32=0x35e1d3ac]]]*/
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.__fpclassifyf") int
@@ -2505,7 +2595,6 @@ NOTHROW(LIBCCALL libc___fpclassifyf)(float x)
 }
 /*[[[end:__fpclassifyf]]]*/
 
-
 /*[[[head:__fpclassifyl,hash:CRC-32=0xcdf268d1]]]*/
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.__fpclassifyl") int
@@ -2523,7 +2612,6 @@ NOTHROW(LIBCCALL libc___fpclassifyl)(__LONGDOUBLE x)
 #endif /* !... */
 }
 /*[[[end:__fpclassifyl]]]*/
-
 
 /*[[[head:__issignaling,hash:CRC-32=0x8c2b4808]]]*/
 INTERN ATTR_CONST WUNUSED
@@ -2577,751 +2665,13 @@ NOTHROW(LIBCCALL libc___issignalingl)(__LONGDOUBLE x)
 }
 /*[[[end:__issignalingl]]]*/
 
-/*[[[head:fabs,hash:CRC-32=0x650fe0bc]]]*/
-/* Absolute value of X */
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fabs") double
-NOTHROW(LIBCCALL libc_fabs)(double x)
-/*[[[body:fabs]]]*/
-/*AUTO*/{
-#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
-	return (double)__ieee754_fabs((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-	return (double)__ieee754_fabsf((__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-	return (double)__ieee854_fabsl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#else /* ... */
-	return x < 0.0 ? -x : x;
-#endif /* !... */
-}
-/*[[[end:fabs]]]*/
 
-/*[[[head:fabsf,hash:CRC-32=0x1b2fc3fc]]]*/
-/* Absolute value of X */
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fabsf") float
-NOTHROW(LIBCCALL libc_fabsf)(float x)
-/*[[[body:fabsf]]]*/
-/*AUTO*/{
-#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
-	return (float)__ieee754_fabsf((__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-	return (float)__ieee754_fabs((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
-	return (float)__ieee854_fabsl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#else /* ... */
-	return x < 0.0f ? -x : x;
-#endif /* !... */
-}
-/*[[[end:fabsf]]]*/
-
-/*[[[head:fabsl,hash:CRC-32=0x60424dbe]]]*/
-/* Return X with its signed changed to Y's */
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fabsl") __LONGDOUBLE
-NOTHROW(LIBCCALL libc_fabsl)(__LONGDOUBLE x)
-/*[[[body:fabsl]]]*/
-/*AUTO*/{
-#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return (__LONGDOUBLE)__ieee854_fabsl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#elif define(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
-	return (__LONGDOUBLE)__ieee754_fabs((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
-	return (__LONGDOUBLE)__ieee754_fabsf((__IEEE754_FLOAT_TYPE__)x);
-#else /* ... */
-	return x < 0.0L ? -x : x;
-#endif /* !... */
-}
-/*[[[end:fabsl]]]*/
-
-/*[[[head:copysign,hash:CRC-32=0x93ee85d9]]]*/
-/* Return X with its signed changed to Y's */
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.copysign") double
-NOTHROW(LIBCCALL libc_copysign)(double num,
-                                double sign)
-/*[[[body:copysign]]]*/
-/*AUTO*/{
-#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
-	return (double)__ieee754_copysign((__IEEE754_DOUBLE_TYPE__)num, (__IEEE754_DOUBLE_TYPE__)sign);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-	return (double)__ieee754_copysignf((__IEEE754_FLOAT_TYPE__)num, (__IEEE754_FLOAT_TYPE__)sign);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-	return (double)__ieee854_copysignl((__IEEE854_LONG_DOUBLE_TYPE__)num, (__IEEE854_LONG_DOUBLE_TYPE__)sign);
-#else /* ... */
-	if ((num < 0.0) != (sign < 0.0))
-		num = -num;
-	return num;
-#endif /* !... */
-}
-/*[[[end:copysign]]]*/
-
-/*[[[head:copysignf,hash:CRC-32=0x1f9d7422]]]*/
-/* Return X with its signed changed to Y's */
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.copysignf") float
-NOTHROW(LIBCCALL libc_copysignf)(float num,
-                                 float sign)
-/*[[[body:copysignf]]]*/
-/*AUTO*/{
-#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
-	return (float)__ieee754_copysignf((__IEEE754_FLOAT_TYPE__)num, (__IEEE754_FLOAT_TYPE__)sign);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
-	return (float)__ieee754_copysign((__IEEE754_DOUBLE_TYPE__)num, (__IEEE754_DOUBLE_TYPE__)sign);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
-	return (float)__ieee854_copysignl((__IEEE854_LONG_DOUBLE_TYPE__)num, (__IEEE854_LONG_DOUBLE_TYPE__)sign);
-#else /* ... */
-	if ((num < 0.0f) != (sign < 0.0f))
-		num = -num;
-	return num;
-#endif /* !... */
-}
-/*[[[end:copysignf]]]*/
-
-
-/*[[[head:fdim,hash:CRC-32=0x600c3283]]]*/
-/* Return positive difference between X and Y */
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fdim") double
-NOTHROW(LIBCCALL libc_fdim)(double x,
-                            double y)
-/*[[[body:fdim]]]*/
-/*AUTO*/{
-	return libc_fabs(y - x);
-}
-/*[[[end:fdim]]]*/
-
-/*[[[head:fdimf,hash:CRC-32=0xac66c679]]]*/
-/* Return positive difference between X and Y */
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fdimf") float
-NOTHROW(LIBCCALL libc_fdimf)(float x,
-                             float y)
-/*[[[body:fdimf]]]*/
-/*AUTO*/{
-	return libc_fabs(y - x);
-}
-/*[[[end:fdimf]]]*/
-
-/*[[[head:fdiml,hash:CRC-32=0x2fc01736]]]*/
-/* Return positive difference between X and Y */
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fdiml") __LONGDOUBLE
-NOTHROW(LIBCCALL libc_fdiml)(__LONGDOUBLE x,
-                             __LONGDOUBLE y)
-/*[[[body:fdiml]]]*/
-/*AUTO*/{
-	return libc_fabs(y - x);
-}
-/*[[[end:fdiml]]]*/
-
-/*[[[head:copysignl,hash:CRC-32=0x943c1a35]]]*/
-/* Return X with its signed changed to Y's */
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.copysignl") __LONGDOUBLE
-NOTHROW(LIBCCALL libc_copysignl)(__LONGDOUBLE num,
-                                 __LONGDOUBLE sign)
-/*[[[body:copysignl]]]*/
-/*AUTO*/{
-#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return (__LONGDOUBLE)__ieee854_copysignl((__IEEE854_LONG_DOUBLE_TYPE__)num, (__IEEE854_LONG_DOUBLE_TYPE__)sign);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
-	return (__LONGDOUBLE)__ieee754_copysign((__IEEE754_DOUBLE_TYPE__)num, (__IEEE754_DOUBLE_TYPE__)sign);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
-	return (__LONGDOUBLE)__ieee754_copysignf((__IEEE754_FLOAT_TYPE__)num, (__IEEE754_FLOAT_TYPE__)sign);
-#else /* ... */
-	if ((num < 0.0L) != (sign < 0.0L))
-		num = -num;
-	return num;
-#endif /* !... */
-}
-/*[[[end:copysignl]]]*/
-
-/*[[[head:isinf,hash:CRC-32=0x7abffa1e]]]*/
-/* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.isinf") int
-NOTHROW(LIBCCALL libc_isinf)(double x)
-/*[[[body:isinf]]]*/
-/*AUTO*/{
-#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
-	return __ieee754_isinf((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-	return __ieee754_isinff((__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-	return __ieee854_isinfl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#else /* ... */
-	return x == HUGE_VAL;
-#endif /* !... */
-}
-/*[[[end:isinf]]]*/
-
-/*[[[head:isinff,hash:CRC-32=0x821963fa]]]*/
-/* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.isinff") int
-NOTHROW(LIBCCALL libc_isinff)(float x)
-/*[[[body:isinff]]]*/
-/*AUTO*/{
-#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
-	return __ieee754_isinff((__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
-	return __ieee754_isinf((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
-	return __ieee854_isinfl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#elif 1
-	return libc_isinf((double)x);
-#else /* ... */
-	return x == HUGE_VALF;
-#endif /* !... */
-}
-/*[[[end:isinff]]]*/
-
-/*[[[head:isinfl,hash:CRC-32=0x7cb554fc]]]*/
-/* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.isinfl") int
-NOTHROW(LIBCCALL libc_isinfl)(__LONGDOUBLE x)
-/*[[[body:isinfl]]]*/
-/*AUTO*/{
-#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return __ieee854_isinfl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
-	return __ieee754_isinf((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
-	return __ieee754_isinff((__IEEE754_FLOAT_TYPE__)x);
-#elif 1
-	return libc_isinf((double)x);
-#else /* ... */
-	return x == HUGE_VALL;
-#endif /* !... */
-}
-/*[[[end:isinfl]]]*/
-
-/*[[[head:finite,hash:CRC-32=0x833b8562]]]*/
-/* Return nonzero if VALUE is finite and not NaN */
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.finite") int
-NOTHROW(LIBCCALL libc_finite)(double x)
-/*[[[body:finite]]]*/
-/*AUTO*/{
-#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
-	return __ieee754_finite((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-	return __ieee754_finitef((__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-	return __ieee854_finitel((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#else /* ... */
-	return !libc_isinf(x) && !libc_isnan(x);
-#endif /* !... */
-}
-/*[[[end:finite]]]*/
-
-/*[[[head:finitef,hash:CRC-32=0xd3dc9c52]]]*/
-/* Return nonzero if VALUE is finite and not NaN */
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.finitef") int
-NOTHROW(LIBCCALL libc_finitef)(float x)
-/*[[[body:finitef]]]*/
-/*AUTO*/{
-#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
-	return __ieee754_finitef((__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
-	return __ieee754_finite((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
-	return __ieee854_finitel((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#else /* ... */
-	return !libc_isinff(x) && !libc_isnanf(x);
-#endif /* !... */
-}
-/*[[[end:finitef]]]*/
-
-/*[[[head:finitel,hash:CRC-32=0xd819d81]]]*/
-/* Return nonzero if VALUE is finite and not NaN */
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.finitel") int
-NOTHROW(LIBCCALL libc_finitel)(__LONGDOUBLE x)
-/*[[[body:finitel]]]*/
-/*AUTO*/{
-#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return __ieee854_finitel((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
-	return __ieee754_finitef((__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
-	return __ieee754_finite((__IEEE754_DOUBLE_TYPE__)x);
-#elif 1
-	return libc_finite((double)x);
-#else /* ... */
-	return !libc_isinfl(x) && !libc_isnanl(x);
-#endif /* !... */
-}
-/*[[[end:finitel]]]*/
-
-/*[[[head:isnan,hash:CRC-32=0x7f1c685a]]]*/
-/* Return nonzero if VALUE is not a number */
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.isnan") int
-NOTHROW(LIBCCALL libc_isnan)(double x)
-/*[[[body:isnan]]]*/
-/*AUTO*/{
-#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
-	return __ieee754_isnan((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-	return __ieee754_isnanf((__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-	return __ieee854_isnanl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#else /* ... */
-	return x == (double)NAN;
-#endif /* !... */
-}
-/*[[[end:isnan]]]*/
-
-/*[[[head:isnanf,hash:CRC-32=0x208a246b]]]*/
-/* Return nonzero if VALUE is not a number */
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.isnanf") int
-NOTHROW(LIBCCALL libc_isnanf)(float x)
-/*[[[body:isnanf]]]*/
-/*AUTO*/{
-#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
-	return __ieee754_isnanf((__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
-	return __ieee754_isnan((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
-	return __ieee854_isnanl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#elif 1
-	return libc_isnan((double)x);
-#else /* ... */
-	return x == (float)NAN;
-#endif /* !... */
-}
-/*[[[end:isnanf]]]*/
-
-/*[[[head:isnanl,hash:CRC-32=0x56939fee]]]*/
-/* Return nonzero if VALUE is not a number */
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.isnanl") int
-NOTHROW(LIBCCALL libc_isnanl)(__LONGDOUBLE x)
-/*[[[body:isnanl]]]*/
-/*AUTO*/{
-#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return __ieee854_isnanl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
-	return __ieee754_isnanf((__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
-	return __ieee754_isnan((__IEEE754_DOUBLE_TYPE__)x);
-#elif 1
-	return libc_isnan((double)x);
-#else /* ... */
-	return x == (__LONGDOUBLE)NAN;
-#endif /* !... */
-}
-/*[[[end:isnanl]]]*/
-
-/*[[[head:__signbit,hash:CRC-32=0x2efd4f1c]]]*/
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.__signbit") int
-NOTHROW(LIBCCALL libc___signbit)(double x)
-/*[[[body:__signbit]]]*/
-/*AUTO*/{
-#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
-	return __ieee754_signbit((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-	return __ieee754_signbitf((__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-	return __ieee854_signbitl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#else /* ... */
-	return x < 0.0;
-#endif /* !... */
-}
-/*[[[end:__signbit]]]*/
-
-/*[[[head:__signbitf,hash:CRC-32=0x595889ca]]]*/
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.__signbitf") int
-NOTHROW(LIBCCALL libc___signbitf)(float x)
-/*[[[body:__signbitf]]]*/
-/*AUTO*/{
-#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
-	return __ieee754_signbitf((__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
-	return __ieee754_signbit((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
-	return __ieee854_signbitl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#else /* ... */
-	return x < 0.0f;
-#endif /* !... */
-}
-/*[[[end:__signbitf]]]*/
-
-/*[[[head:__signbitl,hash:CRC-32=0xbe5a5fcb]]]*/
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.__signbitl") int
-NOTHROW(LIBCCALL libc___signbitl)(__LONGDOUBLE x)
-/*[[[body:__signbitl]]]*/
-/*AUTO*/{
-#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return __ieee854_signbitl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
-	return __ieee754_signbit((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
-	return __ieee754_signbitf((__IEEE754_FLOAT_TYPE__)x);
-#else /* ... */
-	return x < 0.0L;
-#endif /* !... */
-}
-/*[[[end:__signbitl]]]*/
-
-/*[[[head:round,hash:CRC-32=0x6597c65a]]]*/
-/* Round X to nearest integral value, rounding halfway cases away from zero */
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.round") double
-NOTHROW(LIBCCALL libc_round)(double x)
-/*[[[body:round]]]*/
-/*AUTO*/{
-#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
-	return (double)__ieee754_round((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-	return (double)__ieee754_roundf((__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-	return (double)__ieee854_roundl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#else /* ... */
-	double result;
-	result = (double)(__INTMAX_TYPE__)x;
-	if (x < 0.0) {
-		/* result >= x */
-		if ((result - x) >= 0.5)
-			result -= 1.0;
-	} else {
-		/* result <= x */
-		if ((x - result) >= 0.5)
-			result += 1.0;
-	}
-	return result;
-#endif /* !... */
-}
-/*[[[end:round]]]*/
-
-/*[[[head:trunc,hash:CRC-32=0x21d4300a]]]*/
-/* Round X to the integral value in floating-point
- * format nearest but not larger in magnitude */
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.trunc") double
-NOTHROW(LIBCCALL libc_trunc)(double x)
-/*[[[body:trunc]]]*/
-/*AUTO*/{
-#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
-	return (double)__ieee754_trunc((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-	return (double)__ieee754_truncf((__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-	return (double)__ieee854_truncl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#else /* ... */
-	return (double)(__INTMAX_TYPE__)x;
-#endif /* !... */
-}
-/*[[[end:trunc]]]*/
-
-/*[[[head:roundf,hash:CRC-32=0xe9816caa]]]*/
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.roundf") float
-NOTHROW(LIBCCALL libc_roundf)(float x)
-/*[[[body:roundf]]]*/
-/*AUTO*/{
-#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
-	return (float)__ieee754_roundf((__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
-	return (float)__ieee754_round((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
-	return (float)__ieee854_roundl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#else /* ... */
-	float result;
-	result = (float)(__INTMAX_TYPE__)x;
-	if (x < 0.0f) {
-		/* result >= x */
-		if ((result - x) >= 0.5f)
-			result -= 1.0f;
-	} else {
-		/* result <= x */
-		if ((x - result) >= 0.5f)
-			result += 1.0f;
-	}
-	return result;
-#endif /* !... */
-}
-/*[[[end:roundf]]]*/
-
-/*[[[head:truncf,hash:CRC-32=0xcc614206]]]*/
-/* Round X to the integral value in floating-point
- * format nearest but not larger in magnitude */
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.truncf") float
-NOTHROW(LIBCCALL libc_truncf)(float x)
-/*[[[body:truncf]]]*/
-/*AUTO*/{
-#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
-	return (float)__ieee754_truncf((__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
-	return (float)__ieee754_trunc((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
-	return (float)__ieee854_truncl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#else /* ... */
-	return (float)(__INTMAX_TYPE__)x;
-#endif /* !... */
-}
-/*[[[end:truncf]]]*/
-
-/*[[[head:roundl,hash:CRC-32=0xa9b7eba7]]]*/
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.roundl") __LONGDOUBLE
-NOTHROW(LIBCCALL libc_roundl)(__LONGDOUBLE x)
-/*[[[body:roundl]]]*/
-/*AUTO*/{
-#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return (__LONGDOUBLE)__ieee854_roundl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
-	return (__LONGDOUBLE)__ieee754_round((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
-	return (__LONGDOUBLE)__ieee754_roundf((__IEEE754_FLOAT_TYPE__)x);
-#else /* ... */
-	__LONGDOUBLE result;
-	result = (__LONGDOUBLE)(__INTMAX_TYPE__)x;
-	if (x < 0.0L) {
-		/* result >= x */
-		if ((result - x) >= 0.5L)
-			result -= 1.0L;
-	} else {
-		/* result <= x */
-		if ((x - result) >= 0.5L)
-			result += 1.0L;
-	}
-	return result;
-#endif /* !... */
-}
-/*[[[end:roundl]]]*/
-
-/*[[[head:truncl,hash:CRC-32=0x8aa62a7c]]]*/
-/* Round X to the integral value in floating-point
- * format nearest but not larger in magnitude */
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.truncl") __LONGDOUBLE
-NOTHROW(LIBCCALL libc_truncl)(__LONGDOUBLE x)
-/*[[[body:truncl]]]*/
-/*AUTO*/{
-#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return (__LONGDOUBLE)__ieee854_truncl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
-	return (__LONGDOUBLE)__ieee754_trunc((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
-	return (__LONGDOUBLE)__ieee754_truncf((__IEEE754_FLOAT_TYPE__)x);
-#else /* ... */
-	return (__LONGDOUBLE)(__INTMAX_TYPE__)x;
-#endif /* !... */
-}
-/*[[[end:truncl]]]*/
-
-/*[[[head:lround,hash:CRC-32=0x23fc6eca]]]*/
-/* Round X to nearest integral value, rounding halfway cases away from zero */
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.lround") long int
-NOTHROW(LIBCCALL libc_lround)(double x)
-/*[[[body:lround]]]*/
-/*AUTO*/{
-#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
-	return __ieee754_lround((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-	return __ieee754_lroundf((__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-	return __ieee854_lroundl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#else /* ... */
-	return (long int)libc_round(x);
-#endif /* !... */
-}
-/*[[[end:lround]]]*/
-
-/*[[[head:llround,hash:CRC-32=0x70f7d6a3]]]*/
-/* Round X to nearest integral value, rounding halfway cases away from zero */
-#if __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
-DEFINE_INTERN_ALIAS(libc_llround, libc_lround);
-#else
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.llround") __LONGLONG
-NOTHROW(LIBCCALL libc_llround)(double x)
-/*[[[body:llround]]]*/
-/*AUTO*/{
-#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
-	return __ieee754_llround((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-	return __ieee754_llroundf((__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-	return __ieee854_llroundl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#else /* ... */
-	return (__LONGLONG)libc_round(x);
-#endif /* !... */
-}
-#endif /* MAGIC:alias */
-/*[[[end:llround]]]*/
-
-/*[[[head:lroundf,hash:CRC-32=0x8a154dc1]]]*/
-/* Round X to nearest integral value, rounding halfway cases away from zero */
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.lroundf") long int
-NOTHROW(LIBCCALL libc_lroundf)(float x)
-/*[[[body:lroundf]]]*/
-/*AUTO*/{
-#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
-	return __ieee754_lroundf((__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
-	return __ieee754_lround((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
-	return __ieee854_lroundl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#else /* ... */
-	return (long int)libc_roundf(x);
-#endif /* !... */
-}
-/*[[[end:lroundf]]]*/
-
-/*[[[head:llroundf,hash:CRC-32=0x5eb0daeb]]]*/
-/* Round X to nearest integral value, rounding halfway cases away from zero */
-#if __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
-DEFINE_INTERN_ALIAS(libc_llroundf, libc_lroundf);
-#else
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.llroundf") __LONGLONG
-NOTHROW(LIBCCALL libc_llroundf)(float x)
-/*[[[body:llroundf]]]*/
-/*AUTO*/{
-#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
-	return __ieee754_llroundf((__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
-	return __ieee754_llround((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
-	return __ieee854_llroundl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#else /* ... */
-	return (__LONGLONG)libc_roundf(x);
-#endif /* !... */
-}
-#endif /* MAGIC:alias */
-/*[[[end:llroundf]]]*/
-
-/*[[[head:lroundl,hash:CRC-32=0x78bfc21c]]]*/
-/* Round X to nearest integral value, rounding halfway cases away from zero */
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.lroundl") long int
-NOTHROW(LIBCCALL libc_lroundl)(__LONGDOUBLE x)
-/*[[[body:lroundl]]]*/
-/*AUTO*/{
-#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return __ieee854_lroundl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
-	return __ieee754_lroundf((__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
-	return __ieee754_lround((__IEEE754_DOUBLE_TYPE__)x);
-#else /* ... */
-	return (long int)libc_roundl(x);
-#endif /* !... */
-}
-/*[[[end:lroundl]]]*/
-
-/*[[[head:llroundl,hash:CRC-32=0x18d4d46]]]*/
-/* Round X to nearest integral value, rounding halfway cases away from zero */
-#if __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
-DEFINE_INTERN_ALIAS(libc_llroundl, libc_lroundl);
-#else
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.llroundl") __LONGLONG
-NOTHROW(LIBCCALL libc_llroundl)(__LONGDOUBLE x)
-/*[[[body:llroundl]]]*/
-/*AUTO*/{
-#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return __ieee854_llroundl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
-	return __ieee754_llroundf((__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
-	return __ieee754_llround((__IEEE754_DOUBLE_TYPE__)x);
-#else /* ... */
-	return (__LONGLONG)libc_roundl(x);
-#endif /* !... */
-}
-#endif /* MAGIC:alias */
-/*[[[end:llroundl]]]*/
 
 /*[[[end:implementation]]]*/
 
 
-#undef acos
-#undef asin
-#undef atan
-#undef atan2
-#undef cos
-#undef sin
-#undef tan
-#undef cosh
-#undef sinh
-#undef tanh
-#undef acosh
-#undef asinh
-#undef atanh
-#undef exp
-#undef frexp
-#undef ldexp
-#undef log
-#undef log10
-#undef modf
-#undef expm1
-#undef log1p
-#undef logb
-#undef exp2
-#undef log2
-#undef pow
-#undef sqrt
-#undef hypot
-#undef cbrt
-#undef fabs
-#undef fmod
-#undef copysign
-#undef erf
-#undef erfc
-#undef lgamma
-#undef gamma
-#undef erff
-#undef tgamma
-#undef rint
-#undef nearbyint
-#undef nextafter
-#undef remainder
-#undef drem
-#undef ilogb
-#undef nexttoward
-#undef scalbn
-#undef scalbln
-#undef round
-#undef trunc
-#undef remquo
-#undef lrint
-#undef lround
-#undef fdim
-#undef llrint
-#undef llround
-#undef sincos
-#undef exp10
-#undef pow10
-#undef isinf
-#undef finite
-#undef significand
-#undef isnan
-#undef j0
-#undef j1
-#undef jn
-#undef y0
-#undef y1
-#undef yn
-#undef lgamma_r
-#undef scalb
-#undef fpclassify
-#undef issignaling
 
-/*[[[start:exports,hash:CRC-32=0x1ebb925d]]]*/
+/*[[[start:exports,hash:CRC-32=0x29c97654]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(acos, libc_acos);
 DEFINE_PUBLIC_WEAK_ALIAS(__acos, libc_acos);
 DEFINE_PUBLIC_WEAK_ALIAS(asin, libc_asin);
@@ -3491,25 +2841,18 @@ DEFINE_PUBLIC_WEAK_ALIAS(cbrtf, libc_cbrtf);
 DEFINE_PUBLIC_WEAK_ALIAS(__cbrtf, libc_cbrtf);
 DEFINE_PUBLIC_WEAK_ALIAS(cbrtl, libc_cbrtl);
 DEFINE_PUBLIC_WEAK_ALIAS(__cbrtl, libc_cbrtl);
-DEFINE_PUBLIC_WEAK_ALIAS(fabs, libc_fabs);
-DEFINE_PUBLIC_WEAK_ALIAS(__fabs, libc_fabs);
 DEFINE_PUBLIC_WEAK_ALIAS(fmod, libc_fmod);
 DEFINE_PUBLIC_WEAK_ALIAS(__fmod, libc_fmod);
-DEFINE_PUBLIC_WEAK_ALIAS(fabsf, libc_fabsf);
-DEFINE_PUBLIC_WEAK_ALIAS(__fabsf, libc_fabsf);
 DEFINE_PUBLIC_WEAK_ALIAS(fmodf, libc_fmodf);
 DEFINE_PUBLIC_WEAK_ALIAS(__fmodf, libc_fmodf);
-DEFINE_PUBLIC_WEAK_ALIAS(fabsl, libc_fabsl);
-DEFINE_PUBLIC_WEAK_ALIAS(__fabsl, libc_fabsl);
 DEFINE_PUBLIC_WEAK_ALIAS(fmodl, libc_fmodl);
 DEFINE_PUBLIC_WEAK_ALIAS(__fmodl, libc_fmodl);
-DEFINE_PUBLIC_WEAK_ALIAS(copysign, libc_copysign);
-DEFINE_PUBLIC_WEAK_ALIAS(_copysign, libc_copysign);
-DEFINE_PUBLIC_WEAK_ALIAS(__copysign, libc_copysign);
-DEFINE_PUBLIC_WEAK_ALIAS(copysignf, libc_copysignf);
-DEFINE_PUBLIC_WEAK_ALIAS(__copysignf, libc_copysignf);
-DEFINE_PUBLIC_WEAK_ALIAS(copysignl, libc_copysignl);
-DEFINE_PUBLIC_WEAK_ALIAS(__copysignl, libc_copysignl);
+DEFINE_PUBLIC_WEAK_ALIAS(nan, libc_nan);
+DEFINE_PUBLIC_WEAK_ALIAS(__nan, libc_nan);
+DEFINE_PUBLIC_WEAK_ALIAS(nanf, libc_nanf);
+DEFINE_PUBLIC_WEAK_ALIAS(__nanf, libc_nanf);
+DEFINE_PUBLIC_WEAK_ALIAS(nanl, libc_nanl);
+DEFINE_PUBLIC_WEAK_ALIAS(__nanl, libc_nanl);
 DEFINE_PUBLIC_WEAK_ALIAS(erf, libc_erf);
 DEFINE_PUBLIC_WEAK_ALIAS(__erf, libc_erf);
 DEFINE_PUBLIC_WEAK_ALIAS(erfc, libc_erfc);
@@ -3585,64 +2928,22 @@ DEFINE_PUBLIC_WEAK_ALIAS(scalbn, libc_scalbn);
 DEFINE_PUBLIC_WEAK_ALIAS(__scalbn, libc_scalbn);
 DEFINE_PUBLIC_WEAK_ALIAS(scalbln, libc_scalbln);
 DEFINE_PUBLIC_WEAK_ALIAS(__scalbln, libc_scalbln);
-DEFINE_PUBLIC_WEAK_ALIAS(round, libc_round);
-DEFINE_PUBLIC_WEAK_ALIAS(__round, libc_round);
-DEFINE_PUBLIC_WEAK_ALIAS(trunc, libc_trunc);
-DEFINE_PUBLIC_WEAK_ALIAS(__trunc, libc_trunc);
 DEFINE_PUBLIC_WEAK_ALIAS(remquo, libc_remquo);
 DEFINE_PUBLIC_WEAK_ALIAS(__remquo, libc_remquo);
-DEFINE_PUBLIC_WEAK_ALIAS(lrint, libc_lrint);
-DEFINE_PUBLIC_WEAK_ALIAS(__lrint, libc_lrint);
-DEFINE_PUBLIC_WEAK_ALIAS(lround, libc_lround);
-DEFINE_PUBLIC_WEAK_ALIAS(__lround, libc_lround);
-DEFINE_PUBLIC_WEAK_ALIAS(fdim, libc_fdim);
-DEFINE_PUBLIC_WEAK_ALIAS(__fdim, libc_fdim);
-DEFINE_PUBLIC_WEAK_ALIAS(llrint, libc_llrint);
-DEFINE_PUBLIC_WEAK_ALIAS(__llrint, libc_llrint);
-DEFINE_PUBLIC_WEAK_ALIAS(llround, libc_llround);
-DEFINE_PUBLIC_WEAK_ALIAS(__llround, libc_llround);
 DEFINE_PUBLIC_WEAK_ALIAS(nexttowardf, libc_nexttowardf);
 DEFINE_PUBLIC_WEAK_ALIAS(__nexttowardf, libc_nexttowardf);
 DEFINE_PUBLIC_WEAK_ALIAS(scalbnf, libc_scalbnf);
 DEFINE_PUBLIC_WEAK_ALIAS(__scalbnf, libc_scalbnf);
 DEFINE_PUBLIC_WEAK_ALIAS(scalblnf, libc_scalblnf);
 DEFINE_PUBLIC_WEAK_ALIAS(__scalblnf, libc_scalblnf);
-DEFINE_PUBLIC_WEAK_ALIAS(roundf, libc_roundf);
-DEFINE_PUBLIC_WEAK_ALIAS(__roundf, libc_roundf);
-DEFINE_PUBLIC_WEAK_ALIAS(truncf, libc_truncf);
-DEFINE_PUBLIC_WEAK_ALIAS(__truncf, libc_truncf);
 DEFINE_PUBLIC_WEAK_ALIAS(remquof, libc_remquof);
 DEFINE_PUBLIC_WEAK_ALIAS(__remquof, libc_remquof);
-DEFINE_PUBLIC_WEAK_ALIAS(lrintf, libc_lrintf);
-DEFINE_PUBLIC_WEAK_ALIAS(__lrintf, libc_lrintf);
-DEFINE_PUBLIC_WEAK_ALIAS(lroundf, libc_lroundf);
-DEFINE_PUBLIC_WEAK_ALIAS(__lroundf, libc_lroundf);
-DEFINE_PUBLIC_WEAK_ALIAS(fdimf, libc_fdimf);
-DEFINE_PUBLIC_WEAK_ALIAS(__fdimf, libc_fdimf);
-DEFINE_PUBLIC_WEAK_ALIAS(llrintf, libc_llrintf);
-DEFINE_PUBLIC_WEAK_ALIAS(__llrintf, libc_llrintf);
-DEFINE_PUBLIC_WEAK_ALIAS(llroundf, libc_llroundf);
-DEFINE_PUBLIC_WEAK_ALIAS(__llroundf, libc_llroundf);
 DEFINE_PUBLIC_WEAK_ALIAS(scalbnl, libc_scalbnl);
 DEFINE_PUBLIC_WEAK_ALIAS(__scalbnl, libc_scalbnl);
 DEFINE_PUBLIC_WEAK_ALIAS(scalblnl, libc_scalblnl);
 DEFINE_PUBLIC_WEAK_ALIAS(__scalblnl, libc_scalblnl);
-DEFINE_PUBLIC_WEAK_ALIAS(roundl, libc_roundl);
-DEFINE_PUBLIC_WEAK_ALIAS(__roundl, libc_roundl);
-DEFINE_PUBLIC_WEAK_ALIAS(truncl, libc_truncl);
-DEFINE_PUBLIC_WEAK_ALIAS(__truncl, libc_truncl);
 DEFINE_PUBLIC_WEAK_ALIAS(remquol, libc_remquol);
 DEFINE_PUBLIC_WEAK_ALIAS(__remquol, libc_remquol);
-DEFINE_PUBLIC_WEAK_ALIAS(lrintl, libc_lrintl);
-DEFINE_PUBLIC_WEAK_ALIAS(__lrintl, libc_lrintl);
-DEFINE_PUBLIC_WEAK_ALIAS(lroundl, libc_lroundl);
-DEFINE_PUBLIC_WEAK_ALIAS(__lroundl, libc_lroundl);
-DEFINE_PUBLIC_WEAK_ALIAS(fdiml, libc_fdiml);
-DEFINE_PUBLIC_WEAK_ALIAS(__fdiml, libc_fdiml);
-DEFINE_PUBLIC_WEAK_ALIAS(llrintl, libc_llrintl);
-DEFINE_PUBLIC_WEAK_ALIAS(__llrintl, libc_llrintl);
-DEFINE_PUBLIC_WEAK_ALIAS(llroundl, libc_llroundl);
-DEFINE_PUBLIC_WEAK_ALIAS(__llroundl, libc_llroundl);
 DEFINE_PUBLIC_WEAK_ALIAS(sincos, libc_sincos);
 DEFINE_PUBLIC_WEAK_ALIAS(__sincos, libc_sincos);
 DEFINE_PUBLIC_WEAK_ALIAS(exp10, libc_exp10);
@@ -3740,18 +3041,12 @@ DEFINE_PUBLIC_WEAK_ALIAS(__scalbl, libc_scalbl);
 DEFINE_PUBLIC_WEAK_ALIAS(__fpclassify, libc___fpclassify);
 DEFINE_PUBLIC_WEAK_ALIAS(_dclass, libc___fpclassify);
 DEFINE_PUBLIC_WEAK_ALIAS(fpclassify, libc___fpclassify);
-DEFINE_PUBLIC_WEAK_ALIAS(__signbit, libc___signbit);
-DEFINE_PUBLIC_WEAK_ALIAS(_dsign, libc___signbit);
 DEFINE_PUBLIC_WEAK_ALIAS(__fpclassifyf, libc___fpclassifyf);
 DEFINE_PUBLIC_WEAK_ALIAS(_fdclass, libc___fpclassifyf);
 DEFINE_PUBLIC_WEAK_ALIAS(fpclassifyf, libc___fpclassifyf);
-DEFINE_PUBLIC_WEAK_ALIAS(__signbitf, libc___signbitf);
-DEFINE_PUBLIC_WEAK_ALIAS(_fdsign, libc___signbitf);
 DEFINE_PUBLIC_WEAK_ALIAS(__fpclassifyl, libc___fpclassifyl);
 DEFINE_PUBLIC_WEAK_ALIAS(_ldclass, libc___fpclassifyl);
 DEFINE_PUBLIC_WEAK_ALIAS(fpclassifyl, libc___fpclassifyl);
-DEFINE_PUBLIC_WEAK_ALIAS(__signbitl, libc___signbitl);
-DEFINE_PUBLIC_WEAK_ALIAS(_ldsign, libc___signbitl);
 DEFINE_PUBLIC_WEAK_ALIAS(__issignaling, libc___issignaling);
 DEFINE_PUBLIC_WEAK_ALIAS(issignaling, libc___issignaling);
 DEFINE_PUBLIC_WEAK_ALIAS(__issignalingf, libc___issignalingf);

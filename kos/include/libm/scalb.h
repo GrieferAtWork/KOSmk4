@@ -28,9 +28,11 @@
 
 #include <bits/types.h>
 
+#include <libc/fenv.h>
 #include <libm/fdlibm.h>
 #include <libm/finite.h>
 #include <libm/isnan.h>
+#include <libm/nan.h>
 #include <libm/rint.h>
 #include <libm/scalbn.h>
 
@@ -121,6 +123,53 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 }
 
 #endif /* __IEEE754_DOUBLE_TYPE__ */
+
+
+#ifdef __IEEE854_LONG_DOUBLE_TYPE__
+/* Copyright (C) 2011-2013 Free Software Foundation, Inc.
+   This file is part of the GNU C Library.
+   Contributed by Ulrich Drepper <drepper@gmail.com>, 2011.
+
+   The GNU C Library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
+
+   The GNU C Library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+
+   You should have received a copy of the GNU Lesser General Public
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
+
+__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
+(__LIBCCALL __ieee854_scalbl)(__IEEE854_LONG_DOUBLE_TYPE__ __x,
+                              __IEEE854_LONG_DOUBLE_TYPE__ __fn) {
+	__int64_t __ifn;
+	if (__ieee854_isnanl(__x))
+		return __x * __fn;
+	if (!__ieee854_finitel(__fn)) {
+		if (__ieee854_isnanl(__fn) || __fn > __IEEE854_LONG_DOUBLE_C(0.0))
+			return __x * __fn;
+		if (__x == __IEEE854_LONG_DOUBLE_C(0.0))
+			return __x;
+		return __x / -__fn;
+	}
+	__ifn = (__int64_t)__fn;
+	if ((__IEEE854_LONG_DOUBLE_TYPE__)__ifn != __fn) {
+		if (__ieee854_rintl(__fn) != __fn) {
+			__libc_feraiseexcept(FE_INVALID);
+			return __ieee854_nanl("");
+		}
+		if (__ifn > 65000l)
+			return __ieee854_scalblnl(__x, 65000l);
+		return __ieee854_scalblnl(__x, -65000l);
+	}
+	return __ieee854_scalblnl(__x, __ifn);
+}
+#endif /* __IEEE854_LONG_DOUBLE_TYPE__ */
 
 __DECL_END
 #endif /* __CC__ */

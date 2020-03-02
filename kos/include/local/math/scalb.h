@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa6621361 */
+/* HASH CRC-32:0xc5facc8b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,7 +20,7 @@
  */
 #ifndef __local_scalb_defined
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #define __local_scalb_defined 1
 #include <libm/scalb.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -28,14 +28,16 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(scalb) __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(scalb))(double __x,
                                                double __fn) {
-#line 2388 "kos/src/libc/magic/math.c"
+#line 2442 "kos/src/libc/magic/math.c"
 	__COMPILER_IMPURE(); /* XXX: Math error handling */
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	return (double)__ieee754_scalb((__IEEE754_DOUBLE_TYPE__)__x, (__IEEE754_DOUBLE_TYPE__)__fn);
-#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 	return (double)__ieee754_scalbf((__IEEE754_FLOAT_TYPE__)__x, (__IEEE754_FLOAT_TYPE__)__fn);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+#else /* ... */
+	return (double)__ieee854_scalbl((__IEEE854_LONG_DOUBLE_TYPE__)__x, (__IEEE854_LONG_DOUBLE_TYPE__)__fn);
+#endif /* !... */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ */
+#endif /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !__local_scalb_defined */

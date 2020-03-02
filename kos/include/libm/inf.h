@@ -1,4 +1,3 @@
-/* HASH CRC-32:0x9483dc64 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,29 +17,64 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_floor_defined
-#define __local_floor_defined 1
+#ifndef _LIBM_INF_H
+#define _LIBM_INF_H 1
+
+#include <__crt.h>
+
+#ifndef __NO_FPU
 #include <hybrid/typecore.h>
 
-#include <libm/floor.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Largest integer not greater than X */
-__LOCAL_LIBC(floor) __ATTR_CONST __ATTR_WUNUSED double
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(floor))(double __x) {
-#line 862 "kos/src/libc/magic/math.c"
-#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
-	return (double)__ieee754_floor((__IEEE754_DOUBLE_TYPE__)__x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-	return (double)__ieee754_floorf((__IEEE754_FLOAT_TYPE__)__x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-	return (double)__ieee854_floorl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
-#else /* ... */
-	double __result;
-	__result = (double)(__INTMAX_TYPE__)__x; /* Round towards 0 */
-	if (__result > __x)
-		__result -= 1.0;
-	return __result;
-#endif /* !... */
+#include <ieee754.h>
+
+#include <libm/asm/inf.h>
+#include <libm/fdlibm.h>
+
+#ifdef __CC__
+__DECL_BEGIN
+
+#ifdef __IEEE754_FLOAT_TYPE__
+#ifndef __ieee754_inff
+__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
+(__LIBCCALL __ieee754_inff)(void) {
+	__IEEE754_FLOAT_TYPE__ __res;
+	__LIBM_SET_FLOAT_WORD(__res, __UINT32_C(0x7f800000));
+	return __res;
 }
-__NAMESPACE_LOCAL_END
-#endif /* !__local_floor_defined */
+#endif /* !__ieee754_inff */
+#endif /* __IEEE754_FLOAT_TYPE__ */
+
+
+#ifdef __IEEE754_DOUBLE_TYPE__
+#ifndef __ieee754_inf
+__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
+(__LIBCCALL __ieee754_inf)(void) {
+	__IEEE754_DOUBLE_TYPE__ __res;
+	__LIBM_INSERT_WORDS(__res,
+	                    __UINT32_C(0x7ff00000),
+	                    __UINT32_C(0x00000000));
+	return __res;
+}
+#endif /* !__ieee754_inf */
+#endif /* __IEEE754_DOUBLE_TYPE__ */
+
+
+#ifdef __IEEE854_LONG_DOUBLE_TYPE__
+#ifndef __ieee854_infl
+__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
+(__LIBCCALL __ieee854_infl)(void) {
+	__IEEE854_LONG_DOUBLE_TYPE__ __res;
+	__LIBM_SET_LDOUBLE_WORDS(__res,
+	                         __UINT16_C(0x7fff),
+	                         __UINT32_C(0x80000000),
+	                         __UINT32_C(0));
+	return __res;
+}
+#endif /* !__ieee854_infl */
+#endif /* __IEEE854_LONG_DOUBLE_TYPE__ */
+
+__DECL_END
+#endif /* __CC__ */
+#endif /* !__NO_FPU */
+
+#endif /* !_LIBM_INF_H */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x445a07a6 */
+/* HASH CRC-32:0xf0dc863d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(pow) __DECL_SIMD_pow __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(pow))(double __x,
                                              double __y) {
-#line 632 "kos/src/libc/magic/math.c"
+#line 633 "kos/src/libc/magic/math.c"
 	__COMPILER_IMPURE(); /* XXX: Math error handling */
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	return (double)__ieee754_pow((__IEEE754_DOUBLE_TYPE__)__x, (__IEEE754_DOUBLE_TYPE__)__y);

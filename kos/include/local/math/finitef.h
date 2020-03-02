@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5004c4c1 */
+/* HASH CRC-32:0xbde43a4c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,51 +19,42 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_finitef_defined
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || ((defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_isinf) || defined(__CRT_HAVE___isinf)) && (defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_isnan) || defined(__CRT_HAVE___isnan) || defined(__CRT_HAVE__isnan))) || defined(__CRT_HAVE_finite) || defined(__CRT_HAVE___finite) || defined(__CRT_HAVE__finite)
 #define __local_finitef_defined 1
 #include <libm/finite.h>
-/* Dependency: "isinff" from "math" */
-#ifndef ____localdep_isinff_defined
-#define ____localdep_isinff_defined 1
-#if __has_builtin(__builtin_isinff) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isinff)
-/* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
-__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isinff,(float __x),isinff,{ return __builtin_isinff(__x); })
-#elif defined(__CRT_HAVE_isinff)
-/* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isinff,(float __x),isinff,(__x))
-#elif defined(__CRT_HAVE___isinff)
-/* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isinff,(float __x),__isinff,(__x))
-#else /* LIBC: isinff */
-#include <local/math/isinff.h>
-/* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
-#define __localdep_isinff (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isinff))
-#endif /* isinff... */
-#endif /* !____localdep_isinff_defined */
-
-/* Dependency: "isnanf" from "math" */
-#ifndef ____localdep_isnanf_defined
-#define ____localdep_isnanf_defined 1
-#if __has_builtin(__builtin_isnanf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isnanf)
-/* Return nonzero if VALUE is not a number */
-__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnanf,(float __x),isnanf,{ return __builtin_isnanf(__x); })
-#elif defined(__CRT_HAVE_isnanf)
-/* Return nonzero if VALUE is not a number */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnanf,(float __x),isnanf,(__x))
-#elif defined(__CRT_HAVE___isnanf)
-/* Return nonzero if VALUE is not a number */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnanf,(float __x),__isnanf,(__x))
-#else /* LIBC: isnanf */
-#include <local/math/isnanf.h>
-/* Return nonzero if VALUE is not a number */
-#define __localdep_isnanf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isnanf))
-#endif /* isnanf... */
-#endif /* !____localdep_isnanf_defined */
+/* Dependency: "finite" from "math" */
+#ifndef ____localdep_finite_defined
+#define ____localdep_finite_defined 1
+#if __has_builtin(__builtin_finite) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_finite)
+/* Return nonzero if VALUE is finite and not NaN */
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_finite,(double __x),finite,{ return __builtin_finite(__x); })
+#elif defined(__CRT_HAVE_finite)
+/* Return nonzero if VALUE is finite and not NaN */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_finite,(double __x),finite,(__x))
+#elif defined(__CRT_HAVE___finite)
+/* Return nonzero if VALUE is finite and not NaN */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_finite,(double __x),__finite,(__x))
+#elif defined(__CRT_HAVE__finite)
+/* Return nonzero if VALUE is finite and not NaN */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_finite,(double __x),_finite,(__x))
+#else /* LIBC: finite */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || ((defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_isinf) || defined(__CRT_HAVE___isinf)) && (defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_isnan) || defined(__CRT_HAVE___isnan) || defined(__CRT_HAVE__isnan)))
+#include <local/math/finite.h>
+/* Return nonzero if VALUE is finite and not NaN */
+#define __localdep_finite (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(finite))
+#else /* CUSTOM: finite */
+#undef ____localdep_finite_defined
+#endif /* finite... */
+#endif /* finite... */
+#endif /* !____localdep_finite_defined */
 
 __NAMESPACE_LOCAL_BEGIN
 /* Return nonzero if VALUE is finite and not NaN */
 __LOCAL_LIBC(finitef) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(finitef))(float __x) {
-#line 2187 "kos/src/libc/magic/math.c"
+#line 2233 "kos/src/libc/magic/math.c"
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
 	return __ieee754_finitef((__IEEE754_FLOAT_TYPE__)__x);
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
@@ -71,8 +62,10 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(finitef))(float __x) {
 #elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
 	return __ieee854_finitel((__IEEE854_LONG_DOUBLE_TYPE__)__x);
 #else /* ... */
-	return !__localdep_isinff(__x) && !__localdep_isnanf(__x);
+	return __localdep_finite((double)__x);
+	//return !isinff(x) && !isnanf(x);
 #endif /* !... */
 }
 __NAMESPACE_LOCAL_END
+#endif /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || ((__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __CRT_HAVE_isinf || __CRT_HAVE___isinf) && (__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __CRT_HAVE_isnan || __CRT_HAVE___isnan || __CRT_HAVE__isnan)) || __CRT_HAVE_finite || __CRT_HAVE___finite || __CRT_HAVE__finite */
 #endif /* !__local_finitef_defined */

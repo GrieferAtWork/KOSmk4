@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe1f8721e */
+/* HASH CRC-32:0x43821e3f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ __LOCAL_LIBC(sincosf) __DECL_SIMD_sincosf __ATTR_NONNULL((2, 3)) void
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(sincosf))(float __x,
                                                  float *__psinx,
                                                  float *__pcosx) {
-#line 2068 "kos/src/libc/magic/math.c"
+#line 2102 "kos/src/libc/magic/math.c"
 	double __sinx, __cosx;
 	__localdep_sincos((double)__x, &__sinx, &__cosx);
 	*__psinx = (float)__sinx;

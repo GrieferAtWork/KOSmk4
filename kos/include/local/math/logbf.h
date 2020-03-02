@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x161b76c */
+/* HASH CRC-32:0x9d3a8c8d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,7 +45,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Return the base 2 signed integral exponent of X */
 __LOCAL_LIBC(logbf) __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(logbf))(float __x) {
-#line 580 "kos/src/libc/magic/math.c"
+#line 581 "kos/src/libc/magic/math.c"
 	return (float)__localdep_logb((double)__x);
 }
 __NAMESPACE_LOCAL_END

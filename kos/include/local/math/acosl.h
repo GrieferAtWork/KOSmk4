@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x23073d52 */
+/* HASH CRC-32:0xc8b2abd1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Arc cosine of X */
 __LOCAL_LIBC(acosl) __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(acosl))(__LONGDOUBLE __x) {
-#line 221 "kos/src/libc/magic/math.c"
+#line 222 "kos/src/libc/magic/math.c"
 	return (__LONGDOUBLE)__localdep_acos((double)__x);
 }
 __NAMESPACE_LOCAL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2e5a874 */
+/* HASH CRC-32:0x21a87c4e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,10 +32,6 @@ DECL_BEGIN
 /* Return X with its signed changed to Y's */
 #define libc__copysign libc_copysign
 INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc__chgsign)(double x);
-/* Return nonzero if VALUE is finite and not NaN */
-#define libc__finite libc_finite
-/* Return nonzero if VALUE is not a number */
-#define libc__isnan libc_isnan
 #endif /* !__KERNEL__ */
 
 DECL_END

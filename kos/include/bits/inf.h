@@ -20,34 +20,19 @@
 #ifndef _BITS_INF_H
 #define _BITS_INF_H 1
 
-/* `INFINITY' constant for IEEE 754 machines.
-   Copyright (C) 2004-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
-
 #include <__stdinc.h>
 
-#ifdef __CC__
-/* IEEE positive infinity. */
 #if __has_builtin(__builtin_inff)
 #define INFINITY __builtin_inff()
-#else
-#include <bits/huge_valf.h>
-#define INFINITY HUGE_VALF
-#endif
-#endif /* __CC__ */
+#else /* __has_builtin(__builtin_inff) */
+#include <libm/inf.h>
+#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+#define INFINITY __ieee754_inff()
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+#define INFINITY __ieee754_inf()
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+#define INFINITY __ieee854_infl()
+#endif /* !... */
+#endif /* !__has_builtin(__builtin_inff) */
 
 #endif /* !_BITS_INF_H */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeb1c32d4 */
+/* HASH CRC-32:0xd6470705 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,7 +52,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(modfl) __ATTR_NONNULL((2)) __LONGDOUBLE
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(modfl))(__LONGDOUBLE __x,
                                                    __LONGDOUBLE *__iptr) {
-#line 541 "kos/src/libc/magic/math.c"
+#line 542 "kos/src/libc/magic/math.c"
 #ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
 	return (__LONGDOUBLE)__ieee854_modfl((__IEEE854_LONG_DOUBLE_TYPE__)__x, (__IEEE854_LONG_DOUBLE_TYPE__ *)__iptr);
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)

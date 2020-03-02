@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5e6cf1e0 */
+/* HASH CRC-32:0xa9a1c416 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Absolute value of X */
 __LOCAL_LIBC(fabsf) __ATTR_CONST __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fabsf))(float __x) {
-#line 918 "kos/src/libc/magic/math.c"
+#line 919 "kos/src/libc/magic/math.c"
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
 	return (float)__ieee754_fabsf((__IEEE754_FLOAT_TYPE__)__x);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
