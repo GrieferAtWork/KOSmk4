@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfc45ee0e */
+/* HASH CRC-32:0xb8d087c8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,20 +27,16 @@ __NAMESPACE_LOCAL_BEGIN
 /* Largest integer not greater than X */
 __LOCAL_LIBC(floorf) __ATTR_CONST __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(floorf))(float __x) {
-#line 934 "kos/src/libc/magic/math.c"
-#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
-	return (float)__ieee754_floorf((__IEEE754_FLOAT_TYPE__)__x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
-	return (float)__ieee754_floor((__IEEE754_DOUBLE_TYPE__)__x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
-	return (float)__ieee854_floorl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
-#else /* ... */
+#line 1074 "kos/src/libc/magic/math.c"
+#ifdef __LIBM_MATHFUNF
+	return __LIBM_MATHFUNF(floor, __x);
+#else /* __LIBM_MATHFUNF */
 	float __result;
 	__result = (float)(__INTMAX_TYPE__)__x; /* Round towards 0 */
 	if (__result > __x)
 		__result -= 1.0f;
 	return __result;
-#endif /* !... */
+#endif /* !__LIBM_MATHFUNF */
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_floorf_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1ecd4e2e */
+/* HASH CRC-32:0x549692bf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,10 @@
 #include <ieee754.h>
 #if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_ldexp) || defined(__CRT_HAVE___ldexp)
 #define __local_ldexpf_defined 1
+#include <parts/errno.h>
+
+#include <libm/finite.h>
+
 #include <libm/ldexp.h>
 /* Dependency: "ldexp" from "math" */
 #ifndef ____localdep_ldexp_defined
@@ -52,14 +56,31 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(ldexpf) __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ldexpf))(float __x,
                                                 int __exponent) {
-#line 444 "kos/src/libc/magic/math.c"
-	__COMPILER_IMPURE(); /* XXX: Math error handling */
+#line 464 "kos/src/libc/magic/math.c"
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
-	return (float)__ieee754_ldexpf((__IEEE754_FLOAT_TYPE__)__x, __exponent);
+	float __result;
+	__result = (float)__ieee754_ldexpf((__IEEE754_FLOAT_TYPE__)__x, __exponent);
+#ifdef __ERANGE
+	if __unlikely(!__ieee754_finitef((__IEEE754_FLOAT_TYPE__)__result) || __result == 0.0f)
+		__libc_seterrno(__ERANGE);
+#endif /* __ERANGE */
+	return __result;
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
-	return (float)__ieee754_ldexp((__IEEE754_DOUBLE_TYPE__)__x, __exponent);
+	float __result;
+	__result = (float)__ieee754_ldexp((__IEEE754_DOUBLE_TYPE__)__x, __exponent);
+#ifdef __ERANGE
+	if __unlikely(!__ieee754_finite((__IEEE754_DOUBLE_TYPE__)__result) || __result == 0.0f)
+		__libc_seterrno(__ERANGE);
+#endif /* __ERANGE */
+	return __result;
 #elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
-	return (float)__ieee854_ldexpl((__IEEE854_LONG_DOUBLE_TYPE__)__x, __exponent);
+	float __result;
+	__result = (float)__ieee854_ldexpl((__IEEE854_LONG_DOUBLE_TYPE__)__x, __exponent);
+#ifdef __ERANGE
+	if __unlikely(!__ieee854_finitel((__IEEE854_LONG_DOUBLE_TYPE__)__result) || __result == 0.0f)
+		__libc_seterrno(__ERANGE);
+#endif /* __ERANGE */
+	return __result;
 #else /* ... */
 	return (float)__localdep_ldexp((double)__x, __exponent);
 #endif /* !... */

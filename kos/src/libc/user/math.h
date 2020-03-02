@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b2ba312 */
+/* HASH CRC-32:0xc243dbe5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -227,7 +227,7 @@ INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_tgammal)(__LONGDOUBLE x);
 INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_rint)(double x);
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_nextafter)(double x, double y);
-/* Return the remainder of integer divison X/P with infinite precision */
+/* Return the remainder of integer division X/P with infinite precision */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_remainder)(double x, double p);
 /* Return the binary exponent of X, which must be nonzero */
 INTDEF WUNUSED int NOTHROW(LIBCCALL libc_ilogb)(double x);
@@ -235,12 +235,14 @@ INTDEF WUNUSED int NOTHROW(LIBCCALL libc_ilogb)(double x);
 INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_rintf)(float x);
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_nextafterf)(float x, float y);
+/* Return the remainder of integer division X/P with infinite precision */
 INTDEF WUNUSED float NOTHROW(LIBCCALL libc_remainderf)(float x, float p);
 /* Return the binary exponent of X, which must be nonzero */
 INTDEF WUNUSED int NOTHROW(LIBCCALL libc_ilogbf)(float x);
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
 INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_rintl)(__LONGDOUBLE x);
 INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_nextafterl)(__LONGDOUBLE x, __LONGDOUBLE y);
+/* Return the remainder of integer division X/P with infinite precision */
 INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_remainderl)(__LONGDOUBLE x, __LONGDOUBLE p);
 /* Return the binary exponent of X, which must be nonzero */
 INTDEF WUNUSED int NOTHROW(LIBCCALL libc_ilogbl)(__LONGDOUBLE x);

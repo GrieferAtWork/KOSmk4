@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4b7192dd */
+/* HASH CRC-32:0x4d907494 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,16 +51,12 @@ __NAMESPACE_LOCAL_BEGIN
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
 __LOCAL_LIBC(rintf) __ATTR_CONST __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(rintf))(float __x) {
-#line 1251 "kos/src/libc/magic/math.c"
-#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
-	return (float)__ieee754_rintf((__IEEE754_FLOAT_TYPE__)__x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
-	return (float)__ieee754_rint((__IEEE754_DOUBLE_TYPE__)__x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
-	return (float)__ieee854_rintl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
-#else /* ... */
+#line 1362 "kos/src/libc/magic/math.c"
+#ifdef __LIBM_MATHFUNF
+	return __LIBM_MATHFUNF(rint, __x);
+#else /* __LIBM_MATHFUNF */
 	return (float)__localdep_rint((double)__x);
-#endif /* !... */
+#endif /* !__LIBM_MATHFUNF */
 }
 __NAMESPACE_LOCAL_END
 #endif /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __CRT_HAVE_rint || __CRT_HAVE___rint */

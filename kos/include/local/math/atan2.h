@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaa321db4 */
+/* HASH CRC-32:0xba693cc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,14 +22,19 @@
 #include <ieee754.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #define __local_atan2_defined 1
+#include <bits/huge_val.h>
+
+#include <libm/matherr.h>
+
 #include <libm/atan2.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Arc tangent of Y/X */
 __LOCAL_LIBC(atan2) __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(atan2))(double __y,
                                                double __x) {
-#line 140 "kos/src/libc/magic/math.c"
-	__COMPILER_IMPURE(); /* XXX: Math error handling */
+#line 144 "kos/src/libc/magic/math.c"
+	if (__LIBM_LIB_VERSION == __LIBM_SVID && __x == 0.0 && __y == 0.0)
+		return __kernel_standard(__y, __x, HUGE_VAL, __LIBM_KMATHERR_ATAN2); /* atan2(+-0,+-0) */
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	return (double)__ieee754_atan2((__IEEE754_DOUBLE_TYPE__)__y, (__IEEE754_DOUBLE_TYPE__)__x);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)

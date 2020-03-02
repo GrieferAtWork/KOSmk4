@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9806a8ff */
+/* HASH CRC-32:0x5ceb7faf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,17 +51,14 @@ __NAMESPACE_LOCAL_BEGIN
 /* Return the square root of X */
 __LOCAL_LIBC(sqrtf) __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(sqrtf))(float __x) {
-#line 689 "kos/src/libc/magic/math.c"
-	__COMPILER_IMPURE(); /* XXX: Math error handling */
-#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
-	return (float)__ieee754_sqrtf((__IEEE754_FLOAT_TYPE__)__x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
-	return (float)__ieee754_sqrt((__IEEE754_DOUBLE_TYPE__)__x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
-	return (float)__ieee854_sqrtl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
-#else /* ... */
+#line 826 "kos/src/libc/magic/math.c"
+#ifdef __LIBM_MATHFUNF
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_MATHFUNI2F(isless, __x, 0.0f))
+		return __kernel_standard_f(__x, __x, __LIBM_MATHFUN1IF(nan, ""), __LIBM_KMATHERR_SQRT); /* sqrt(negative) */
+	return __LIBM_MATHFUNF(sqrt, __x);
+#else /* __LIBM_MATHFUNF */
 	return (float)__localdep_sqrt((double)__x);
-#endif /* !... */
+#endif /* !__LIBM_MATHFUNF */
 }
 __NAMESPACE_LOCAL_END
 #endif /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __CRT_HAVE_sqrt || __CRT_HAVE___sqrt */

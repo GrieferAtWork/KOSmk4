@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x929bf37 */
+/* HASH CRC-32:0x2713d4f0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,22 +20,44 @@
  */
 #ifndef __local_nanl_defined
 #include <ieee754.h>
-#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_nan) || defined(__CRT_HAVE___nan)
 #define __local_nanl_defined 1
 #include <libm/nan.h>
+/* Dependency: "nan" from "math" */
+#ifndef ____localdep_nan_defined
+#define ____localdep_nan_defined 1
+#if __has_builtin(__builtin_nan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nan)
+/* Return representation of qNaN for double type */
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_nan,(char const *__tagb),nan,{ return __builtin_nan(__tagb); })
+#elif defined(__CRT_HAVE_nan)
+/* Return representation of qNaN for double type */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_nan,(char const *__tagb),nan,(__tagb))
+#elif defined(__CRT_HAVE___nan)
+/* Return representation of qNaN for double type */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_nan,(char const *__tagb),__nan,(__tagb))
+#else /* LIBC: nan */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <local/math/nan.h>
+/* Return representation of qNaN for double type */
+#define __localdep_nan (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nan))
+#else /* CUSTOM: nan */
+#undef ____localdep_nan_defined
+#endif /* nan... */
+#endif /* nan... */
+#endif /* !____localdep_nan_defined */
+
 __NAMESPACE_LOCAL_BEGIN
 /* Return representation of qNaN for double type */
 __LOCAL_LIBC(nanl) __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(nanl))(char const *__tagb) {
-#line 1126 "kos/src/libc/magic/math.c"
-#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return (__LONGDOUBLE)__ieee854_nanl(__tagb);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
-	return (__LONGDOUBLE)__ieee754_nan(__tagb);
-#else /* ... */
-	return (__LONGDOUBLE)__ieee754_nanf(__tagb);
-#endif /* !... */
+#line 1241 "kos/src/libc/magic/math.c"
+#ifdef __LIBM_MATHFUN1IL
+	return __LIBM_MATHFUN1IL(nan, __tagb);
+#else /* __LIBM_MATHFUN1IL */
+	return (__LONGDOUBLE)__localdep_nan(__tagb);
+#endif /* !__LIBM_MATHFUN1IL */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ */
+#endif /* __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __CRT_HAVE_nan || __CRT_HAVE___nan */
 #endif /* !__local_nanl_defined */

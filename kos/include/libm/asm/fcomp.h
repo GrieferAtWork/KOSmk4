@@ -1,4 +1,3 @@
-/* HASH CRC-32:0xc2f0d860 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,22 +17,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local___signbitl_defined
-#define __local___signbitl_defined 1
-#include <libm/signbit.h>
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(__signbitl) __ATTR_CONST __ATTR_WUNUSED int
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__signbitl))(__LONGDOUBLE __x) {
-#line 3185 "kos/src/libc/magic/math.c"
-#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return __ieee854_signbitl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
-	return __ieee754_signbit((__IEEE754_DOUBLE_TYPE__)__x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
-	return __ieee754_signbitf((__IEEE754_FLOAT_TYPE__)__x);
-#else /* ... */
-	return __x < 0.0L;
-#endif /* !... */
-}
-__NAMESPACE_LOCAL_END
-#endif /* !__local___signbitl_defined */
+#ifndef _LIBM_ASM_FCOMP_H
+#define _LIBM_ASM_FCOMP_H 1
+
+#include <libm/asm/builtin.h>
+
+/* Placeholder... */
+
+#endif /* !_LIBM_ASM_FCOMP_H */

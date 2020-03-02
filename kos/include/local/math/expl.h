@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcea563c9 */
+/* HASH CRC-32:0x4a8eea53 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Exponential function of X */
 __LOCAL_LIBC(expl) __DECL_SIMD_expl __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(expl))(__LONGDOUBLE __x) {
-#line 489 "kos/src/libc/magic/math.c"
+#line 526 "kos/src/libc/magic/math.c"
 	return (__LONGDOUBLE)__localdep_exp((double)__x);
 }
 __NAMESPACE_LOCAL_END

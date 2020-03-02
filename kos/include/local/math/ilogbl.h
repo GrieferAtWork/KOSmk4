@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb76d1314 */
+/* HASH CRC-32:0x36f9bb10 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,9 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_ilogbl_defined
-#if defined(__CRT_HAVE_ilogb) || defined(__CRT_HAVE___ilogb)
+#include <ieee754.h>
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_ilogb) || defined(__CRT_HAVE___ilogb)
 #define __local_ilogbl_defined 1
-/* Dependency: "ilogb" */
+#include <libm/ilogb.h>
+
+#include <libm/matherr.h>
+/* Dependency: "ilogb" from "math" */
 #ifndef ____localdep_ilogb_defined
 #define ____localdep_ilogb_defined 1
 #if __has_builtin(__builtin_ilogb) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ilogb)
@@ -34,7 +38,14 @@ __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,__localdep_ilogb,(double __x),ilogb,(__
 /* Return the binary exponent of X, which must be nonzero */
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,__localdep_ilogb,(double __x),__ilogb,(__x))
 #else /* LIBC: ilogb */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#include <local/math/ilogb.h>
+/* Return the binary exponent of X, which must be nonzero */
+#define __localdep_ilogb (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ilogb))
+#else /* CUSTOM: ilogb */
 #undef ____localdep_ilogb_defined
+#endif /* ilogb... */
 #endif /* ilogb... */
 #endif /* !____localdep_ilogb_defined */
 
@@ -42,9 +53,17 @@ __NAMESPACE_LOCAL_BEGIN
 /* Return the binary exponent of X, which must be nonzero */
 __LOCAL_LIBC(ilogbl) __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ilogbl))(__LONGDOUBLE __x) {
-#line 1362 "kos/src/libc/magic/math.c"
-	return (int)__localdep_ilogb((double)__x);
+#line 1482 "kos/src/libc/magic/math.c"
+#ifdef __LIBM_MATHFUNIL
+	int __result;
+	__result = __LIBM_MATHFUNIL(ilogb, __x);
+	if (__result == __LIBM_FP_ILOGB0 || __result == __LIBM_FP_ILOGBNAN || __result == __INT_MAX__)
+		__kernel_standard_l(__x, __x, __x, __LIBM_KMATHERRF_ILOGB);
+	return __result;
+#else /* __LIBM_MATHFUNIL */
+	return __localdep_ilogb((double)__x);
+#endif /* !__LIBM_MATHFUNIL */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_ilogb || __CRT_HAVE___ilogb */
+#endif /* __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __CRT_HAVE_ilogb || __CRT_HAVE___ilogb */
 #endif /* !__local_ilogbl_defined */

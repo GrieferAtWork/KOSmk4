@@ -162,4 +162,96 @@ for (local n: functions)
 #endif /* __LIBM_HAVE_BUILTIN_ASM_INFL && __has_builtin(__builtin_infl) */
 //[[[end]]]
 
+
+/*[[[deemon
+for (local x: {
+	"isunordered",
+	"isgreater",
+	"isgreaterequal",
+	"isless",
+	"islessequal",
+	"islessgreater"
+}) {
+	print("#ifdef __LIBM_HAVE_BUILTIN_ASM_", x.upper());
+	print("#ifndef __ieee754_", x, "f");
+	print("#define __ieee754_", x, "f __builtin_", x, "");
+	print("#endif /" "* !__ieee754_", x, "f *" "/");
+	print("#ifndef __ieee754_", x, "");
+	print("#define __ieee754_", x, " __builtin_", x, "");
+	print("#endif /" "* !__ieee754_", x, " *" "/");
+	print("#ifndef __ieee854_", x, "l");
+	print("#define __ieee854_", x, "l __builtin_", x, "");
+	print("#endif /" "* !__ieee854_", x, "l *" "/");
+	print("#endif /" "* __LIBM_HAVE_BUILTIN_ASM_", x.upper(), " *" "/");
+}
+]]]*/
+#ifdef __LIBM_HAVE_BUILTIN_ASM_ISUNORDERED
+#ifndef __ieee754_isunorderedf
+#define __ieee754_isunorderedf __builtin_isunordered
+#endif /* !__ieee754_isunorderedf */
+#ifndef __ieee754_isunordered
+#define __ieee754_isunordered __builtin_isunordered
+#endif /* !__ieee754_isunordered */
+#ifndef __ieee854_isunorderedl
+#define __ieee854_isunorderedl __builtin_isunordered
+#endif /* !__ieee854_isunorderedl */
+#endif /* __LIBM_HAVE_BUILTIN_ASM_ISUNORDERED */
+#ifdef __LIBM_HAVE_BUILTIN_ASM_ISGREATER
+#ifndef __ieee754_isgreaterf
+#define __ieee754_isgreaterf __builtin_isgreater
+#endif /* !__ieee754_isgreaterf */
+#ifndef __ieee754_isgreater
+#define __ieee754_isgreater __builtin_isgreater
+#endif /* !__ieee754_isgreater */
+#ifndef __ieee854_isgreaterl
+#define __ieee854_isgreaterl __builtin_isgreater
+#endif /* !__ieee854_isgreaterl */
+#endif /* __LIBM_HAVE_BUILTIN_ASM_ISGREATER */
+#ifdef __LIBM_HAVE_BUILTIN_ASM_ISGREATEREQUAL
+#ifndef __ieee754_isgreaterequalf
+#define __ieee754_isgreaterequalf __builtin_isgreaterequal
+#endif /* !__ieee754_isgreaterequalf */
+#ifndef __ieee754_isgreaterequal
+#define __ieee754_isgreaterequal __builtin_isgreaterequal
+#endif /* !__ieee754_isgreaterequal */
+#ifndef __ieee854_isgreaterequall
+#define __ieee854_isgreaterequall __builtin_isgreaterequal
+#endif /* !__ieee854_isgreaterequall */
+#endif /* __LIBM_HAVE_BUILTIN_ASM_ISGREATEREQUAL */
+#ifdef __LIBM_HAVE_BUILTIN_ASM_ISLESS
+#ifndef __ieee754_islessf
+#define __ieee754_islessf __builtin_isless
+#endif /* !__ieee754_islessf */
+#ifndef __ieee754_isless
+#define __ieee754_isless __builtin_isless
+#endif /* !__ieee754_isless */
+#ifndef __ieee854_islessl
+#define __ieee854_islessl __builtin_isless
+#endif /* !__ieee854_islessl */
+#endif /* __LIBM_HAVE_BUILTIN_ASM_ISLESS */
+#ifdef __LIBM_HAVE_BUILTIN_ASM_ISLESSEQUAL
+#ifndef __ieee754_islessequalf
+#define __ieee754_islessequalf __builtin_islessequal
+#endif /* !__ieee754_islessequalf */
+#ifndef __ieee754_islessequal
+#define __ieee754_islessequal __builtin_islessequal
+#endif /* !__ieee754_islessequal */
+#ifndef __ieee854_islessequall
+#define __ieee854_islessequall __builtin_islessequal
+#endif /* !__ieee854_islessequall */
+#endif /* __LIBM_HAVE_BUILTIN_ASM_ISLESSEQUAL */
+#ifdef __LIBM_HAVE_BUILTIN_ASM_ISLESSGREATER
+#ifndef __ieee754_islessgreaterf
+#define __ieee754_islessgreaterf __builtin_islessgreater
+#endif /* !__ieee754_islessgreaterf */
+#ifndef __ieee754_islessgreater
+#define __ieee754_islessgreater __builtin_islessgreater
+#endif /* !__ieee754_islessgreater */
+#ifndef __ieee854_islessgreaterl
+#define __ieee854_islessgreaterl __builtin_islessgreater
+#endif /* !__ieee854_islessgreaterl */
+#endif /* __LIBM_HAVE_BUILTIN_ASM_ISLESSGREATER */
+//[[[end]]]
+
+
 #endif /* !_LIBM_ASM_FABS_H */

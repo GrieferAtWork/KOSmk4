@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x324d5c29 */
+/* HASH CRC-32:0x14609b9d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,10 @@
 #include <ieee754.h>
 #if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2)
 #define __local_atan2f_defined 1
+#include <bits/huge_valf.h>
+
+#include <libm/matherr.h>
+
 #include <libm/atan2.h>
 /* Dependency: "atan2" from "math" */
 #ifndef ____localdep_atan2_defined
@@ -52,8 +56,9 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(atan2f) __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(atan2f))(float __y,
                                                 float __x) {
-#line 196 "kos/src/libc/magic/math.c"
-	__COMPILER_IMPURE(); /* XXX: Math error handling */
+#line 202 "kos/src/libc/magic/math.c"
+	if (__LIBM_LIB_VERSION == __LIBM_SVID && __x == 0.0f && __y == 0.0f)
+		return __kernel_standard_f(__y, __x, HUGE_VALF, __LIBM_KMATHERR_ATAN2); /* atan2(+-0,+-0) */
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
 	return (float)__ieee754_atan2f((__IEEE754_FLOAT_TYPE__)__y, (__IEEE754_FLOAT_TYPE__)__x);
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)

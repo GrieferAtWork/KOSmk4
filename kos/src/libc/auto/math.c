@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x24698c4b */
+/* HASH CRC-32:0x4a3f03ca */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,20 +36,16 @@ DECL_BEGIN
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.ceil") double
 NOTHROW(LIBCCALL libc_ceil)(double x) {
-#line 827 "kos/src/libc/magic/math.c"
-#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
-	return (double)__ieee754_ceil((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-	return (double)__ieee754_ceilf((__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-	return (double)__ieee854_ceill((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#else /* ... */
+#line 988 "kos/src/libc/magic/math.c"
+#ifdef __LIBM_MATHFUN
+	return __LIBM_MATHFUN(ceil, x);
+#else /* __LIBM_MATHFUN */
 	double result;
 	result = (double)(__INTMAX_TYPE__)x; /* Round towards 0 */
 	if (result < x)
 		result += 1.0;
 	return result;
-#endif /* !... */
+#endif /* !__LIBM_MATHFUN */
 }
 
 #include <libm/fabs.h>
@@ -57,16 +53,12 @@ NOTHROW(LIBCCALL libc_ceil)(double x) {
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fabs") double
 NOTHROW(LIBCCALL libc_fabs)(double x) {
-#line 846 "kos/src/libc/magic/math.c"
-#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
-	return (double)__ieee754_fabs((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-	return (double)__ieee754_fabsf((__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-	return (double)__ieee854_fabsl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#else /* ... */
+#line 1003 "kos/src/libc/magic/math.c"
+#ifdef __LIBM_MATHFUN
+	return __LIBM_MATHFUN(fabs, x);
+#else /* __LIBM_MATHFUN */
 	return x < 0.0 ? -x : x;
-#endif /* !... */
+#endif /* !__LIBM_MATHFUN */
 }
 
 #include <hybrid/typecore.h>
@@ -76,20 +68,16 @@ NOTHROW(LIBCCALL libc_fabs)(double x) {
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.floor") double
 NOTHROW(LIBCCALL libc_floor)(double x) {
-#line 862 "kos/src/libc/magic/math.c"
-#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
-	return (double)__ieee754_floor((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-	return (double)__ieee754_floorf((__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-	return (double)__ieee854_floorl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#else /* ... */
+#line 1015 "kos/src/libc/magic/math.c"
+#ifdef __LIBM_MATHFUN
+	return __LIBM_MATHFUN(floor, x);
+#else /* __LIBM_MATHFUN */
 	double result;
 	result = (double)(__INTMAX_TYPE__)x; /* Round towards 0 */
 	if (result > x)
 		result -= 1.0;
 	return result;
-#endif /* !... */
+#endif /* !__LIBM_MATHFUN */
 }
 
 #include <hybrid/typecore.h>
@@ -99,20 +87,16 @@ NOTHROW(LIBCCALL libc_floor)(double x) {
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.ceilf") float
 NOTHROW(LIBCCALL libc_ceilf)(float x) {
-#line 901 "kos/src/libc/magic/math.c"
-#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
-	return (float)__ieee754_ceilf((__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
-	return (float)__ieee754_ceil((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
-	return (float)__ieee854_ceill((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#else /* ... */
+#line 1049 "kos/src/libc/magic/math.c"
+#ifdef __LIBM_MATHFUNF
+	return __LIBM_MATHFUNF(ceil, x);
+#else /* __LIBM_MATHFUNF */
 	float result;
 	result = (float)(__INTMAX_TYPE__)x; /* Round towards 0 */
 	if (result < x)
 		result += 1.0f;
 	return result;
-#endif /* !... */
+#endif /* !__LIBM_MATHFUNF */
 }
 
 #include <libm/fabs.h>
@@ -120,16 +104,12 @@ NOTHROW(LIBCCALL libc_ceilf)(float x) {
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fabsf") float
 NOTHROW(LIBCCALL libc_fabsf)(float x) {
-#line 919 "kos/src/libc/magic/math.c"
-#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
-	return (float)__ieee754_fabsf((__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-	return (float)__ieee754_fabs((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
-	return (float)__ieee854_fabsl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#else /* ... */
+#line 1063 "kos/src/libc/magic/math.c"
+#ifdef __LIBM_MATHFUNF
+	return __LIBM_MATHFUNF(fabs, x);
+#else /* __LIBM_MATHFUNF */
 	return x < 0.0f ? -x : x;
-#endif /* !... */
+#endif /* !__LIBM_MATHFUNF */
 }
 
 #include <hybrid/typecore.h>
@@ -139,20 +119,16 @@ NOTHROW(LIBCCALL libc_fabsf)(float x) {
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.floorf") float
 NOTHROW(LIBCCALL libc_floorf)(float x) {
-#line 934 "kos/src/libc/magic/math.c"
-#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
-	return (float)__ieee754_floorf((__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
-	return (float)__ieee754_floor((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
-	return (float)__ieee854_floorl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#else /* ... */
+#line 1074 "kos/src/libc/magic/math.c"
+#ifdef __LIBM_MATHFUNF
+	return __LIBM_MATHFUNF(floor, x);
+#else /* __LIBM_MATHFUNF */
 	float result;
 	result = (float)(__INTMAX_TYPE__)x; /* Round towards 0 */
 	if (result > x)
 		result -= 1.0f;
 	return result;
-#endif /* !... */
+#endif /* !__LIBM_MATHFUNF */
 }
 
 #include <hybrid/typecore.h>
@@ -162,20 +138,16 @@ NOTHROW(LIBCCALL libc_floorf)(float x) {
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.ceill") __LONGDOUBLE
 NOTHROW(LIBCCALL libc_ceill)(__LONGDOUBLE x) {
-#line 970 "kos/src/libc/magic/math.c"
-#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return (__LONGDOUBLE)__ieee854_ceill((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
-	return (__LONGDOUBLE)__ieee754_ceil((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
-	return (__LONGDOUBLE)__ieee754_ceilf((__IEEE754_FLOAT_TYPE__)x);
-#else /* ... */
+#line 1110 "kos/src/libc/magic/math.c"
+#ifdef __LIBM_MATHFUNL
+	return __LIBM_MATHFUNL(ceil, x);
+#else /* __LIBM_MATHFUNL */
 	__LONGDOUBLE result;
 	result = (__LONGDOUBLE)(__INTMAX_TYPE__)x; /* Round towards 0 */
 	if (result < x)
 		result += 1.0L;
 	return result;
-#endif /* !... */
+#endif /* !__LIBM_MATHFUNL */
 }
 
 #include <libm/fabs.h>
@@ -183,16 +155,12 @@ NOTHROW(LIBCCALL libc_ceill)(__LONGDOUBLE x) {
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fabsl") __LONGDOUBLE
 NOTHROW(LIBCCALL libc_fabsl)(__LONGDOUBLE x) {
-#line 988 "kos/src/libc/magic/math.c"
-#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return (__LONGDOUBLE)__ieee854_fabsl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#elif define(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
-	return (__LONGDOUBLE)__ieee754_fabs((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
-	return (__LONGDOUBLE)__ieee754_fabsf((__IEEE754_FLOAT_TYPE__)x);
-#else /* ... */
+#line 1124 "kos/src/libc/magic/math.c"
+#ifdef __LIBM_MATHFUNL
+	return __LIBM_MATHFUNL(fabs, x);
+#else /* __LIBM_MATHFUNL */
 	return x < 0.0L ? -x : x;
-#endif /* !... */
+#endif /* !__LIBM_MATHFUNL */
 }
 
 #include <hybrid/typecore.h>
@@ -202,20 +170,16 @@ NOTHROW(LIBCCALL libc_fabsl)(__LONGDOUBLE x) {
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.floorl") __LONGDOUBLE
 NOTHROW(LIBCCALL libc_floorl)(__LONGDOUBLE x) {
-#line 1003 "kos/src/libc/magic/math.c"
-#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return (__LONGDOUBLE)__ieee854_floorl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
-	return (__LONGDOUBLE)__ieee754_floor((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
-	return (__LONGDOUBLE)__ieee754_floorf((__IEEE754_FLOAT_TYPE__)x);
-#else /* ... */
+#line 1135 "kos/src/libc/magic/math.c"
+#ifdef __LIBM_MATHFUNL
+	return __LIBM_MATHFUNL(floor, x);
+#else /* __LIBM_MATHFUNL */
 	__LONGDOUBLE result;
 	result = (__LONGDOUBLE)(__INTMAX_TYPE__)x; /* Round towards 0 */
 	if (result > x)
 		result -= 1.0L;
 	return result;
-#endif /* !... */
+#endif /* !__LIBM_MATHFUNL */
 }
 
 #include <libm/copysign.h>
@@ -224,18 +188,14 @@ INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.copysign") double
 NOTHROW(LIBCCALL libc_copysign)(double num,
                                 double sign) {
-#line 1043 "kos/src/libc/magic/math.c"
-#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
-	return (double)__ieee754_copysign((__IEEE754_DOUBLE_TYPE__)num, (__IEEE754_DOUBLE_TYPE__)sign);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-	return (double)__ieee754_copysignf((__IEEE754_FLOAT_TYPE__)num, (__IEEE754_FLOAT_TYPE__)sign);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-	return (double)__ieee854_copysignl((__IEEE854_LONG_DOUBLE_TYPE__)num, (__IEEE854_LONG_DOUBLE_TYPE__)sign);
-#else /* ... */
+#line 1176 "kos/src/libc/magic/math.c"
+#ifdef __LIBM_MATHFUN2
+	return __LIBM_MATHFUN2(copysign, num, sign);
+#else /* __LIBM_MATHFUN2 */
 	if ((num < 0.0) != (sign < 0.0))
 		num = -num;
 	return num;
-#endif /* !... */
+#endif /* !__LIBM_MATHFUN2 */
 }
 
 #include <libm/copysign.h>
@@ -244,18 +204,14 @@ INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.copysignf") float
 NOTHROW(LIBCCALL libc_copysignf)(float num,
                                  float sign) {
-#line 1075 "kos/src/libc/magic/math.c"
-#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
-	return (float)__ieee754_copysignf((__IEEE754_FLOAT_TYPE__)num, (__IEEE754_FLOAT_TYPE__)sign);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
-	return (float)__ieee754_copysign((__IEEE754_DOUBLE_TYPE__)num, (__IEEE754_DOUBLE_TYPE__)sign);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
-	return (float)__ieee854_copysignl((__IEEE854_LONG_DOUBLE_TYPE__)num, (__IEEE854_LONG_DOUBLE_TYPE__)sign);
-#else /* ... */
+#line 1198 "kos/src/libc/magic/math.c"
+#ifdef __LIBM_MATHFUN2F
+	return __LIBM_MATHFUN2F(copysign, num, sign);
+#else /* __LIBM_MATHFUN2F */
 	if ((num < 0.0f) != (sign < 0.0f))
 		num = -num;
 	return num;
-#endif /* !... */
+#endif /* !__LIBM_MATHFUN2F */
 }
 
 #include <libm/copysign.h>
@@ -264,18 +220,14 @@ INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.copysignl") __LONGDOUBLE
 NOTHROW(LIBCCALL libc_copysignl)(__LONGDOUBLE num,
                                  __LONGDOUBLE sign) {
-#line 1107 "kos/src/libc/magic/math.c"
-#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return (__LONGDOUBLE)__ieee854_copysignl((__IEEE854_LONG_DOUBLE_TYPE__)num, (__IEEE854_LONG_DOUBLE_TYPE__)sign);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
-	return (__LONGDOUBLE)__ieee754_copysign((__IEEE754_DOUBLE_TYPE__)num, (__IEEE754_DOUBLE_TYPE__)sign);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
-	return (__LONGDOUBLE)__ieee754_copysignf((__IEEE754_FLOAT_TYPE__)num, (__IEEE754_FLOAT_TYPE__)sign);
-#else /* ... */
+#line 1225 "kos/src/libc/magic/math.c"
+#ifdef __LIBM_MATHFUN2L
+	return __LIBM_MATHFUN2L(copysign, num, sign);
+#else /* __LIBM_MATHFUN2L */
 	if ((num < 0.0L) != (sign < 0.0L))
 		num = -num;
 	return num;
-#endif /* !... */
+#endif /* !__LIBM_MATHFUN2L */
 }
 
 #include <hybrid/typecore.h>
@@ -285,7 +237,7 @@ NOTHROW(LIBCCALL libc_copysignl)(__LONGDOUBLE num,
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.round") double
 NOTHROW(LIBCCALL libc_round)(double x) {
-#line 1431 "kos/src/libc/magic/math.c"
+#line 1563 "kos/src/libc/magic/math.c"
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	return (double)__ieee754_round((__IEEE754_DOUBLE_TYPE__)x);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
@@ -316,7 +268,7 @@ NOTHROW(LIBCCALL libc_round)(double x) {
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.trunc") double
 NOTHROW(LIBCCALL libc_trunc)(double x) {
-#line 1459 "kos/src/libc/magic/math.c"
+#line 1591 "kos/src/libc/magic/math.c"
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	return (double)__ieee754_trunc((__IEEE754_DOUBLE_TYPE__)x);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
@@ -335,7 +287,7 @@ NOTHROW(LIBCCALL libc_trunc)(double x) {
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.lrint") long int
 NOTHROW(LIBCCALL libc_lrint)(double x) {
-#line 1482 "kos/src/libc/magic/math.c"
+#line 1614 "kos/src/libc/magic/math.c"
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	return __ieee754_lrint((__IEEE754_DOUBLE_TYPE__)x);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
@@ -354,7 +306,7 @@ NOTHROW(LIBCCALL libc_lrint)(double x) {
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.lround") long int
 NOTHROW(LIBCCALL libc_lround)(double x) {
-#line 1499 "kos/src/libc/magic/math.c"
+#line 1631 "kos/src/libc/magic/math.c"
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	return __ieee754_lround((__IEEE754_DOUBLE_TYPE__)x);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
@@ -371,7 +323,7 @@ INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fdim") double
 NOTHROW(LIBCCALL libc_fdim)(double x,
                             double y) {
-#line 1513 "kos/src/libc/magic/math.c"
+#line 1645 "kos/src/libc/magic/math.c"
 	return libc_fabs(y - x);
 }
 
@@ -380,7 +332,7 @@ INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fmax") double
 NOTHROW(LIBCCALL libc_fmax)(double x,
                             double y) {
-#line 1519 "kos/src/libc/magic/math.c"
+#line 1651 "kos/src/libc/magic/math.c"
 	return x < y ? y : x;
 }
 
@@ -389,7 +341,7 @@ INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fmin") double
 NOTHROW(LIBCCALL libc_fmin)(double x,
                             double y) {
-#line 1525 "kos/src/libc/magic/math.c"
+#line 1657 "kos/src/libc/magic/math.c"
 	return x < y ? x : y;
 }
 
@@ -399,7 +351,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fma") double
 NOTHROW(LIBCCALL libc_fma)(double x,
                            double y,
                            double z) {
-#line 1531 "kos/src/libc/magic/math.c"
+#line 1663 "kos/src/libc/magic/math.c"
 	return (x * y) + z;
 }
 
@@ -413,7 +365,7 @@ DEFINE_INTERN_ALIAS(libc_llrint, libc_lrint);
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.llrint") __LONGLONG
 NOTHROW(LIBCCALL libc_llrint)(double x) {
-#line 1541 "kos/src/libc/magic/math.c"
+#line 1673 "kos/src/libc/magic/math.c"
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	return __ieee754_llrint((__IEEE754_DOUBLE_TYPE__)x);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
@@ -436,7 +388,7 @@ DEFINE_INTERN_ALIAS(libc_llround, libc_lround);
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.llround") __LONGLONG
 NOTHROW(LIBCCALL libc_llround)(double x) {
-#line 1558 "kos/src/libc/magic/math.c"
+#line 1690 "kos/src/libc/magic/math.c"
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	return __ieee754_llround((__IEEE754_DOUBLE_TYPE__)x);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
@@ -455,7 +407,7 @@ NOTHROW(LIBCCALL libc_llround)(double x) {
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.roundf") float
 NOTHROW(LIBCCALL libc_roundf)(float x) {
-#line 1637 "kos/src/libc/magic/math.c"
+#line 1769 "kos/src/libc/magic/math.c"
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
 	return (float)__ieee754_roundf((__IEEE754_FLOAT_TYPE__)x);
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
@@ -484,7 +436,7 @@ NOTHROW(LIBCCALL libc_roundf)(float x) {
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.truncf") float
 NOTHROW(LIBCCALL libc_truncf)(float x) {
-#line 1662 "kos/src/libc/magic/math.c"
+#line 1794 "kos/src/libc/magic/math.c"
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
 	return (float)__ieee754_truncf((__IEEE754_FLOAT_TYPE__)x);
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
@@ -503,7 +455,7 @@ NOTHROW(LIBCCALL libc_truncf)(float x) {
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.lrintf") long int
 NOTHROW(LIBCCALL libc_lrintf)(float x) {
-#line 1681 "kos/src/libc/magic/math.c"
+#line 1813 "kos/src/libc/magic/math.c"
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
 	return __ieee754_lrintf((__IEEE754_FLOAT_TYPE__)x);
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
@@ -522,7 +474,7 @@ NOTHROW(LIBCCALL libc_lrintf)(float x) {
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.lroundf") long int
 NOTHROW(LIBCCALL libc_lroundf)(float x) {
-#line 1697 "kos/src/libc/magic/math.c"
+#line 1829 "kos/src/libc/magic/math.c"
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
 	return __ieee754_lroundf((__IEEE754_FLOAT_TYPE__)x);
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
@@ -539,7 +491,7 @@ INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fdimf") float
 NOTHROW(LIBCCALL libc_fdimf)(float x,
                              float y) {
-#line 1513 "kos/src/libc/magic/math.c"
+#line 1645 "kos/src/libc/magic/math.c"
 	return libc_fabs(y - x);
 }
 
@@ -548,7 +500,7 @@ INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fmaxf") float
 NOTHROW(LIBCCALL libc_fmaxf)(float x,
                              float y) {
-#line 1519 "kos/src/libc/magic/math.c"
+#line 1651 "kos/src/libc/magic/math.c"
 	return x < y ? y : x;
 }
 
@@ -557,7 +509,7 @@ INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fminf") float
 NOTHROW(LIBCCALL libc_fminf)(float x,
                              float y) {
-#line 1525 "kos/src/libc/magic/math.c"
+#line 1657 "kos/src/libc/magic/math.c"
 	return x < y ? x : y;
 }
 
@@ -567,7 +519,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fmaf") float
 NOTHROW(LIBCCALL libc_fmaf)(float x,
                             float y,
                             float z) {
-#line 1531 "kos/src/libc/magic/math.c"
+#line 1663 "kos/src/libc/magic/math.c"
 	return (x * y) + z;
 }
 
@@ -581,7 +533,7 @@ DEFINE_INTERN_ALIAS(libc_llrintf, libc_lrintf);
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.llrintf") __LONGLONG
 NOTHROW(LIBCCALL libc_llrintf)(float x) {
-#line 1726 "kos/src/libc/magic/math.c"
+#line 1858 "kos/src/libc/magic/math.c"
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
 	return __ieee754_llrintf((__IEEE754_FLOAT_TYPE__)x);
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
@@ -604,7 +556,7 @@ DEFINE_INTERN_ALIAS(libc_llroundf, libc_lroundf);
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.llroundf") __LONGLONG
 NOTHROW(LIBCCALL libc_llroundf)(float x) {
-#line 1742 "kos/src/libc/magic/math.c"
+#line 1874 "kos/src/libc/magic/math.c"
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
 	return __ieee754_llroundf((__IEEE754_FLOAT_TYPE__)x);
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
@@ -623,7 +575,7 @@ NOTHROW(LIBCCALL libc_llroundf)(float x) {
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.roundl") __LONGDOUBLE
 NOTHROW(LIBCCALL libc_roundl)(__LONGDOUBLE x) {
-#line 1805 "kos/src/libc/magic/math.c"
+#line 1937 "kos/src/libc/magic/math.c"
 #ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
 	return (__LONGDOUBLE)__ieee854_roundl((__IEEE854_LONG_DOUBLE_TYPE__)x);
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
@@ -652,7 +604,7 @@ NOTHROW(LIBCCALL libc_roundl)(__LONGDOUBLE x) {
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.truncl") __LONGDOUBLE
 NOTHROW(LIBCCALL libc_truncl)(__LONGDOUBLE x) {
-#line 1831 "kos/src/libc/magic/math.c"
+#line 1963 "kos/src/libc/magic/math.c"
 #ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
 	return (__LONGDOUBLE)__ieee854_truncl((__IEEE854_LONG_DOUBLE_TYPE__)x);
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
@@ -671,7 +623,7 @@ NOTHROW(LIBCCALL libc_truncl)(__LONGDOUBLE x) {
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.lrintl") long int
 NOTHROW(LIBCCALL libc_lrintl)(__LONGDOUBLE x) {
-#line 1850 "kos/src/libc/magic/math.c"
+#line 1982 "kos/src/libc/magic/math.c"
 #ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
 	return __ieee854_lrintl((__IEEE854_LONG_DOUBLE_TYPE__)x);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
@@ -690,7 +642,7 @@ NOTHROW(LIBCCALL libc_lrintl)(__LONGDOUBLE x) {
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.lroundl") long int
 NOTHROW(LIBCCALL libc_lroundl)(__LONGDOUBLE x) {
-#line 1866 "kos/src/libc/magic/math.c"
+#line 1998 "kos/src/libc/magic/math.c"
 #ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
 	return __ieee854_lroundl((__IEEE854_LONG_DOUBLE_TYPE__)x);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
@@ -707,7 +659,7 @@ INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fdiml") __LONGDOUBLE
 NOTHROW(LIBCCALL libc_fdiml)(__LONGDOUBLE x,
                              __LONGDOUBLE y) {
-#line 1513 "kos/src/libc/magic/math.c"
+#line 1645 "kos/src/libc/magic/math.c"
 	return libc_fabs(y - x);
 }
 
@@ -716,7 +668,7 @@ INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fmaxl") __LONGDOUBLE
 NOTHROW(LIBCCALL libc_fmaxl)(__LONGDOUBLE x,
                              __LONGDOUBLE y) {
-#line 1519 "kos/src/libc/magic/math.c"
+#line 1651 "kos/src/libc/magic/math.c"
 	return x < y ? y : x;
 }
 
@@ -725,7 +677,7 @@ INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fminl") __LONGDOUBLE
 NOTHROW(LIBCCALL libc_fminl)(__LONGDOUBLE x,
                              __LONGDOUBLE y) {
-#line 1525 "kos/src/libc/magic/math.c"
+#line 1657 "kos/src/libc/magic/math.c"
 	return x < y ? x : y;
 }
 
@@ -735,7 +687,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fmal") __LONGDOUBLE
 NOTHROW(LIBCCALL libc_fmal)(__LONGDOUBLE x,
                             __LONGDOUBLE y,
                             __LONGDOUBLE z) {
-#line 1531 "kos/src/libc/magic/math.c"
+#line 1663 "kos/src/libc/magic/math.c"
 	return (x * y) + z;
 }
 
@@ -749,7 +701,7 @@ DEFINE_INTERN_ALIAS(libc_llrintl, libc_lrintl);
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.llrintl") __LONGLONG
 NOTHROW(LIBCCALL libc_llrintl)(__LONGDOUBLE x) {
-#line 1896 "kos/src/libc/magic/math.c"
+#line 2028 "kos/src/libc/magic/math.c"
 #ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
 	return __ieee854_llrintl((__IEEE854_LONG_DOUBLE_TYPE__)x);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
@@ -772,7 +724,7 @@ DEFINE_INTERN_ALIAS(libc_llroundl, libc_lroundl);
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.llroundl") __LONGLONG
 NOTHROW(LIBCCALL libc_llroundl)(__LONGDOUBLE x) {
-#line 1912 "kos/src/libc/magic/math.c"
+#line 2044 "kos/src/libc/magic/math.c"
 #ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
 	return __ieee854_llroundl((__IEEE854_LONG_DOUBLE_TYPE__)x);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
@@ -789,7 +741,7 @@ NOTHROW(LIBCCALL libc_llroundl)(__LONGDOUBLE x) {
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.__signbit") int
 NOTHROW(LIBCCALL libc___signbit)(double x) {
-#line 2882 "kos/src/libc/magic/math.c"
+#line 3117 "kos/src/libc/magic/math.c"
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	return __ieee754_signbit((__IEEE754_DOUBLE_TYPE__)x);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
@@ -805,7 +757,7 @@ NOTHROW(LIBCCALL libc___signbit)(double x) {
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.__signbitf") int
 NOTHROW(LIBCCALL libc___signbitf)(float x) {
-#line 2916 "kos/src/libc/magic/math.c"
+#line 3151 "kos/src/libc/magic/math.c"
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
 	return __ieee754_signbitf((__IEEE754_FLOAT_TYPE__)x);
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
@@ -821,7 +773,7 @@ NOTHROW(LIBCCALL libc___signbitf)(float x) {
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.__signbitl") int
 NOTHROW(LIBCCALL libc___signbitl)(__LONGDOUBLE x) {
-#line 2950 "kos/src/libc/magic/math.c"
+#line 3185 "kos/src/libc/magic/math.c"
 #ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
 	return __ieee854_signbitl((__IEEE854_LONG_DOUBLE_TYPE__)x);
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)

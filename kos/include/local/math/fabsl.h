@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xffcea7ba */
+/* HASH CRC-32:0xf398931e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,16 +25,12 @@ __NAMESPACE_LOCAL_BEGIN
 /* Return X with its signed changed to Y's */
 __LOCAL_LIBC(fabsl) __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fabsl))(__LONGDOUBLE __x) {
-#line 988 "kos/src/libc/magic/math.c"
-#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return (__LONGDOUBLE)__ieee854_fabsl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
-#elif define(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
-	return (__LONGDOUBLE)__ieee754_fabs((__IEEE754_DOUBLE_TYPE__)__x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
-	return (__LONGDOUBLE)__ieee754_fabsf((__IEEE754_FLOAT_TYPE__)__x);
-#else /* ... */
+#line 1124 "kos/src/libc/magic/math.c"
+#ifdef __LIBM_MATHFUNL
+	return __LIBM_MATHFUNL(fabs, __x);
+#else /* __LIBM_MATHFUNL */
 	return __x < 0.0L ? -__x : __x;
-#endif /* !... */
+#endif /* !__LIBM_MATHFUNL */
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_fabsl_defined */

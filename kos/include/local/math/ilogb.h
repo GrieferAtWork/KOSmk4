@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc2f0d860 */
+/* HASH CRC-32:0x7aa201d9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,22 +18,24 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local___signbitl_defined
-#define __local___signbitl_defined 1
-#include <libm/signbit.h>
+#ifndef __local_ilogb_defined
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#define __local_ilogb_defined 1
+#include <libm/ilogb.h>
+
+#include <libm/matherr.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(__signbitl) __ATTR_CONST __ATTR_WUNUSED int
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__signbitl))(__LONGDOUBLE __x) {
-#line 3185 "kos/src/libc/magic/math.c"
-#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return __ieee854_signbitl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
-	return __ieee754_signbit((__IEEE754_DOUBLE_TYPE__)__x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
-	return __ieee754_signbitf((__IEEE754_FLOAT_TYPE__)__x);
-#else /* ... */
-	return __x < 0.0L;
-#endif /* !... */
+/* Return the binary exponent of X, which must be nonzero */
+__LOCAL_LIBC(ilogb) __ATTR_WUNUSED int
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ilogb))(double __x) {
+#line 1348 "kos/src/libc/magic/math.c"
+	int __result;
+	__result = __LIBM_MATHFUNI(ilogb, __x);
+	if (__result == __LIBM_FP_ILOGB0 || __result == __LIBM_FP_ILOGBNAN || __result == __INT_MAX__)
+		__kernel_standard(__x, __x, __x, __LIBM_KMATHERRF_ILOGB);
+	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* !__local___signbitl_defined */
+#endif /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ */
+#endif /* !__local_ilogb_defined */

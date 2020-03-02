@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd457c6f */
+/* HASH CRC-32:0x1d16413 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,16 +54,12 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(nextafterl) __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(nextafterl))(__LONGDOUBLE __x,
                                                     __LONGDOUBLE __y) {
-#line 1329 "kos/src/libc/magic/math.c"
-#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return (__LONGDOUBLE)__ieee854_nextafterl((__IEEE854_LONG_DOUBLE_TYPE__)__x, (__IEEE854_LONG_DOUBLE_TYPE__)__y);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
-	return (__LONGDOUBLE)__ieee754_nextafter((__IEEE754_DOUBLE_TYPE__)__x, (__IEEE754_DOUBLE_TYPE__)__y);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
-	return (__LONGDOUBLE)__ieee754_nextafterf((__IEEE754_FLOAT_TYPE__)__x, (__IEEE754_FLOAT_TYPE__)__y);
-#else /* ... */
+#line 1446 "kos/src/libc/magic/math.c"
+#ifdef __LIBM_MATHFUN2L
+	return __LIBM_MATHFUN2L(nextafter, __x, __y);
+#else /* __LIBM_MATHFUN2L */
 	return (__LONGDOUBLE)__localdep_nextafter((double)__x, (double)__y);
-#endif /* !... */
+#endif /* !__LIBM_MATHFUN2L */
 }
 __NAMESPACE_LOCAL_END
 #endif /* __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __CRT_HAVE_nextafter || __CRT_HAVE___nextafter || __CRT_HAVE__nextafter */

@@ -36,15 +36,21 @@
  *       however that's the version for which I've checked the GCC source
  *       to find those functions to which these conditions apply. */
 #if defined(__GNUC__) && __GCC_VERSION_NUM >= 90100
-#define __LIBM_HAVE_BUILTIN_ASM_FABS  1
-#define __LIBM_HAVE_BUILTIN_ASM_FABSF 1
-#define __LIBM_HAVE_BUILTIN_ASM_FABSL 1
-#define __LIBM_HAVE_BUILTIN_ASM_NAN   1
-#define __LIBM_HAVE_BUILTIN_ASM_NANF  1
-#define __LIBM_HAVE_BUILTIN_ASM_NANL  1
-#define __LIBM_HAVE_BUILTIN_ASM_INF   1
-#define __LIBM_HAVE_BUILTIN_ASM_INFF  1
-#define __LIBM_HAVE_BUILTIN_ASM_INFL  1
+#define __LIBM_HAVE_BUILTIN_ASM_FABS           1
+#define __LIBM_HAVE_BUILTIN_ASM_FABSF          1
+#define __LIBM_HAVE_BUILTIN_ASM_FABSL          1
+#define __LIBM_HAVE_BUILTIN_ASM_NAN            1
+#define __LIBM_HAVE_BUILTIN_ASM_NANF           1
+#define __LIBM_HAVE_BUILTIN_ASM_NANL           1
+#define __LIBM_HAVE_BUILTIN_ASM_INF            1
+#define __LIBM_HAVE_BUILTIN_ASM_INFF           1
+#define __LIBM_HAVE_BUILTIN_ASM_INFL           1
+#define __LIBM_HAVE_BUILTIN_ASM_ISUNORDERED    1
+#define __LIBM_HAVE_BUILTIN_ASM_ISGREATER      1
+#define __LIBM_HAVE_BUILTIN_ASM_ISGREATEREQUAL 1
+#define __LIBM_HAVE_BUILTIN_ASM_ISLESS         1
+#define __LIBM_HAVE_BUILTIN_ASM_ISLESSEQUAL    1
+#define __LIBM_HAVE_BUILTIN_ASM_ISLESSGREATER  1
 #endif /* __GNUC__ ... */
 
 #endif /* !_LIBM_ASM__BUILTIN_H */

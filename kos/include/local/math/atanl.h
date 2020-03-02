@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6490a332 */
+/* HASH CRC-32:0x2bceb7cb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,7 +51,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Arc tangent of X */
 __LOCAL_LIBC(atanl) __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(atanl))(__LONGDOUBLE __x) {
-#line 233 "kos/src/libc/magic/math.c"
+#line 240 "kos/src/libc/magic/math.c"
 #ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
 	return (__LONGDOUBLE)__ieee854_atanl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)

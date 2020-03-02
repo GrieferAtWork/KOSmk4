@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0dc863d */
+/* HASH CRC-32:0xecd41bae */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,21 +23,67 @@
 #if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #define __local_pow_defined 1
 #include <bits/math-vector.h>
+#include <libm/finite.h>
+
+#include <libm/isnan.h>
+
+#include <libm/matherr.h>
+
 #include <libm/pow.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Return X to the Y power */
 __LOCAL_LIBC(pow) __DECL_SIMD_pow __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(pow))(double __x,
                                              double __y) {
-#line 633 "kos/src/libc/magic/math.c"
-	__COMPILER_IMPURE(); /* XXX: Math error handling */
-#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
-	return (double)__ieee754_pow((__IEEE754_DOUBLE_TYPE__)__x, (__IEEE754_DOUBLE_TYPE__)__y);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-	return (double)__ieee754_powf((__IEEE754_FLOAT_TYPE__)__x, (__IEEE754_FLOAT_TYPE__)__y);
-#else /* ... */
-	return (double)__ieee854_powl((__IEEE854_LONG_DOUBLE_TYPE__)__x, (__IEEE854_LONG_DOUBLE_TYPE__)__y);
-#endif /* !... */
+#line 689 "kos/src/libc/magic/math.c"
+	double __result;
+	__result = __LIBM_MATHFUN2(pow, __x, __y);
+	/*
+	 * ====================================================
+	 * Copyright (C) 2004 by Sun Microsystems, Inc. All rights reserved.
+	 *
+	 * Permission to use, copy, modify, and distribute this
+	 * software is freely granted, provided that this notice 
+	 * is preserved.
+	 * ====================================================
+	 */
+	if (!__LIBM_MATHFUNI(finite, __result)) {
+		if (__LIBM_MATHFUNI(isnan, __y) && __x == 1.0) {
+			__result = 1.0;
+		} else if (__LIBM_LIB_VERSION != __LIBM_IEEE) {
+			if (__LIBM_MATHFUNI(isnan, __x)) {
+				if (__y == 0.0) /* pow(NaN,0.0) */
+					return __kernel_standard(__x, __y, __result, __LIBM_KMATHERR_POW_NAN);
+			} else if (__LIBM_MATHFUNI(finite, __x) && __LIBM_MATHFUNI(finite, __y)) {
+				if (__LIBM_MATHFUNI(isnan, __result)) { /* pow neg**non-int */
+					return __kernel_standard(__x, __y, __result, __LIBM_KMATHERR_POW_NONINT);
+				} else if (__x == 0.0 && __y < 0.0) {
+					if (__LIBM_MATHFUNI(signbit, __x) && __LIBM_MATHFUNI(signbit, __result)) { /* pow(-0.0,negative) */
+						return __kernel_standard(__x, __y, __result, __LIBM_KMATHERR_POW_MINUS);
+					} else { /* pow(+0.0,negative) */
+						return __kernel_standard(__x, __y, __result, __LIBM_KMATHERR_POW_ZEROMINUS);
+					}
+				} else {
+					/* pow overflow */
+					return __kernel_standard(__x, __y, __result, __LIBM_KMATHERR_POW_OVERFLOW);
+				}
+			}
+		}
+	} else if (__result == 0.0 &&
+	           __LIBM_MATHFUNI(finite, __x) &&
+	           __LIBM_MATHFUNI(finite, __y) &&
+	           __LIBM_LIB_VERSION != __LIBM_IEEE) {
+		if (__x == 0.0) {
+			if (__y == 0.0) {
+				/* pow(0.0, 0.0) */
+				return __kernel_standard(__x, __y, __result, __LIBM_KMATHERR_POW_ZERO);
+			}
+		} else {
+			/* pow underflow */
+			return __kernel_standard(__x, __y, __result, __LIBM_KMATHERR_POW_UNDERFLOW);
+		}
+	}
+	return __result;
 }
 __NAMESPACE_LOCAL_END
 #endif /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */

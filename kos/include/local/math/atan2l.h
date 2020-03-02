@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x83c3c62a */
+/* HASH CRC-32:0x1c695238 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,10 @@
 #include <ieee754.h>
 #if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2)
 #define __local_atan2l_defined 1
+#include <bits/huge_vall.h>
+
+#include <libm/matherr.h>
+
 #include <libm/atan2.h>
 /* Dependency: "atan2" from "math" */
 #ifndef ____localdep_atan2_defined
@@ -52,8 +56,9 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(atan2l) __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(atan2l))(__LONGDOUBLE __y,
                                                 __LONGDOUBLE __x) {
-#line 251 "kos/src/libc/magic/math.c"
-	__COMPILER_IMPURE(); /* XXX: Math error handling */
+#line 259 "kos/src/libc/magic/math.c"
+	if (__LIBM_LIB_VERSION == __LIBM_SVID && __x == 0.0L && __y == 0.0L)
+		return __kernel_standard_l(__y, __x, HUGE_VALL, __LIBM_KMATHERR_ATAN2); /* atan2(+-0,+-0) */
 #ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
 	return (__LONGDOUBLE)__ieee854_atan2l((__IEEE854_LONG_DOUBLE_TYPE__)__y, (__IEEE854_LONG_DOUBLE_TYPE__)__x);
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x808663b6 */
+/* HASH CRC-32:0xe9e17c80 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Hyperbolic tangent of X */
 __LOCAL_LIBC(tanhl) __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(tanhl))(__LONGDOUBLE __x) {
-#line 308 "kos/src/libc/magic/math.c"
+#line 317 "kos/src/libc/magic/math.c"
 	return (__LONGDOUBLE)__localdep_tanh((double)__x);
 }
 __NAMESPACE_LOCAL_END

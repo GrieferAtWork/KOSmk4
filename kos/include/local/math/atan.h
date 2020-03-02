@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3fd7cfe1 */
+/* HASH CRC-32:0xb74aa588 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Arc tangent of X */
 __LOCAL_LIBC(atan) __ATTR_CONST __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(atan))(double __x) {
-#line 124 "kos/src/libc/magic/math.c"
+#line 127 "kos/src/libc/magic/math.c"
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	return (double)__ieee754_atan((__IEEE754_DOUBLE_TYPE__)__x);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)

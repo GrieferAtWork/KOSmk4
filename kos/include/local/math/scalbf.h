@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x36da304e */
+/* HASH CRC-32:0x81a0eaf9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,17 +55,51 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(scalbf) __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(scalbf))(float __x,
                                                 float __fn) {
-#line 2461 "kos/src/libc/magic/math.c"
-	__COMPILER_IMPURE(); /* XXX: Math error handling */
-#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
-	return (float)__ieee754_scalbf((__IEEE754_FLOAT_TYPE__)__x, (__IEEE754_FLOAT_TYPE__)__fn);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
-	return (float)__ieee754_scalb((__IEEE754_DOUBLE_TYPE__)__x, (__IEEE754_DOUBLE_TYPE__)__fn);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
-	return (float)__ieee854_scalbl((__IEEE854_LONG_DOUBLE_TYPE__)__x, (__IEEE854_LONG_DOUBLE_TYPE__)__fn);
-#else /* ... */
+#line 2628 "kos/src/libc/magic/math.c"
+#ifdef __LIBM_MATHFUN2F
+	/*
+	 * ====================================================
+	 * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
+	 *
+	 * Developed at SunSoft, a Sun Microsystems, Inc. business.
+	 * Permission to use, copy, modify, and distribute this
+	 * software is freely granted, provided that this notice
+	 * is preserved.
+	 * ====================================================
+	 */
+	float __result;
+	__result = __LIBM_MATHFUN2F(scalb, __x, __fn);
+	if (__LIBM_LIB_VERSION == __LIBM_SVID) {
+		if (__LIBM_MATHFUNF(isinf, __result)) {
+			if (__LIBM_MATHFUNF(finite, __x)) {
+				return __kernel_standard_f(__x, __fn, __result, __LIBM_KMATHERR_SCALB_OVERFLOW); /* scalb overflow */
+			} else {
+#ifdef __ERANGE
+				__libc_seterrno(__ERANGE);
+#endif /* __ERANGE */
+			}
+		} else if (__result == 0.0f && __result != __x) {
+			return __kernel_standard_f(__x, __fn, __result, __LIBM_KMATHERR_SCALB_UNDERFLOW); /* scalb underflow */
+		}
+	} else {
+		if (!__LIBM_MATHFUNF(finite, __result) || __result == 0.0f) {
+			if (__LIBM_MATHFUNF(isnan, __result)) {
+				if (!__LIBM_MATHFUNF(isnan, __x) && !__LIBM_MATHFUNF(isnan, __fn))
+					__result = __kernel_standard_f(__x, __fn, __result, __LIBM_KMATHERR_SCALB_INVALID);
+			} else if (__LIBM_MATHFUNF(isinf, __result)) {
+				if (!__LIBM_MATHFUNF(isinf, __x) && !__LIBM_MATHFUNF(isinf, __fn))
+					__result = __kernel_standard_f(__x, __fn, __result, __LIBM_KMATHERR_SCALB_OVERFLOW);
+			} else {
+				/* result == 0.  */
+				if (__x != 0.0f && !__LIBM_MATHFUNF(isinf, __fn))
+					__result = __kernel_standard_f(__x, __fn, __result, __LIBM_KMATHERR_SCALB_UNDERFLOW);
+			}
+		}
+	}
+	return __result;
+#else /* __LIBM_MATHFUN2F */
 	return (float)__localdep_scalb((double)__x, (double)__fn);
-#endif /* !... */
+#endif /* !__LIBM_MATHFUN2F */
 }
 __NAMESPACE_LOCAL_END
 #endif /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __CRT_HAVE_scalb || __CRT_HAVE___scalb || __CRT_HAVE__scalb */

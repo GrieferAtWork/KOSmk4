@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1df5f4c2 */
+/* HASH CRC-32:0x51238a72 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -266,7 +266,6 @@
 #define __CRT_STUB_if_indextoname 1
 #define __CRT_STUB_if_nameindex 1
 #define __CRT_STUB_if_nametoindex 1
-#define __CRT_STUB_ilogb 1
 #define __CRT_STUB_inet6_opt_append 1
 #define __CRT_STUB_inet6_opt_find 1
 #define __CRT_STUB_inet6_opt_finish 1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9379455c */
+/* HASH CRC-32:0xcb804772 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,21 +22,24 @@
 #include <ieee754.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #define __local_remainder_defined 1
+#include <libm/matherr.h>
+
+#include <libm/isnan.h>
+
+#include <libm/isinf.h>
+
 #include <libm/remainder.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return the remainder of integer divison X/P with infinite precision */
+/* Return the remainder of integer division X/P with infinite precision */
 __LOCAL_LIBC(remainder) __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(remainder))(double __x,
                                                    double __p) {
-#line 1230 "kos/src/libc/magic/math.c"
-	__COMPILER_IMPURE(); /* XXX: Math error handling */
-#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
-	return (double)__ieee754_remainder((__IEEE754_DOUBLE_TYPE__)__x, (__IEEE754_DOUBLE_TYPE__)__p);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-	return (double)__ieee754_remainderf((__IEEE754_FLOAT_TYPE__)__x, (__IEEE754_FLOAT_TYPE__)__p);
-#else /* ... */
-	return (double)__ieee854_remainderl((__IEEE854_LONG_DOUBLE_TYPE__)__x, (__IEEE854_LONG_DOUBLE_TYPE__)__p);
-#endif /* !... */
+#line 1333 "kos/src/libc/magic/math.c"
+	if (((__p == 0.0 && !__LIBM_MATHFUN(isnan, __x)) ||
+	     (__LIBM_MATHFUN(isinf, __x) && !__LIBM_MATHFUN(isnan, __p))) &&
+	    __LIBM_LIB_VERSION != __LIBM_IEEE)
+		return __kernel_standard(__x, __p, __p, __LIBM_KMATHERR_REMAINDER); /* remainder domain */
+	return __LIBM_MATHFUN2(remainder, __x, __p);
 }
 __NAMESPACE_LOCAL_END
 #endif /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
