@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd7549982 */
+/* HASH CRC-32:0xdc967a10 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,29 +18,18 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_j1l_defined
-#if defined(__CRT_HAVE_j1) || defined(__CRT_HAVE___j1)
-#define __local_j1l_defined 1
-/* Dependency: "j1" */
-#ifndef ____localdep_j1_defined
-#define ____localdep_j1_defined 1
-#if __has_builtin(__builtin_j1) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_j1)
-__CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_j1,(double __x),j1,{ return __builtin_j1(__x); })
-#elif defined(__CRT_HAVE_j1)
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_j1,(double __x),j1,(__x))
-#elif defined(__CRT_HAVE___j1)
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_j1,(double __x),__j1,(__x))
-#else /* LIBC: j1 */
-#undef ____localdep_j1_defined
-#endif /* j1... */
-#endif /* !____localdep_j1_defined */
-
+#ifndef __local_significand_defined
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#define __local_significand_defined 1
+#include <libm/significand.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(j1l) __ATTR_WUNUSED __LONGDOUBLE
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(j1l))(__LONGDOUBLE __x) {
-#line 1560 "kos/src/libc/magic/math.c"
-	return (__LONGDOUBLE)__localdep_j1((double)__x);
+/* Return the fractional part of X after dividing out `ilogb(X)' */
+__LOCAL_LIBC(significand) __ATTR_CONST __ATTR_WUNUSED double
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(significand))(double __x) {
+#line 1465 "kos/src/libc/magic/math.c"
+	return __LIBM_MATHFUN(significand, __x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_j1 || __CRT_HAVE___j1 */
-#endif /* !__local_j1l_defined */
+#endif /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#endif /* !__local_significand_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x51238a72 */
+/* HASH CRC-32:0x221fd9eb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -526,7 +526,6 @@
 #define __CRT_STUB_shmctl 1
 #define __CRT_STUB_shmdt 1
 #define __CRT_STUB_shmget 1
-#define __CRT_STUB_significand 1
 #define __CRT_STUB_sigreturn 1
 #define __CRT_STUB_sin 1
 #define __CRT_STUB_sincos 1

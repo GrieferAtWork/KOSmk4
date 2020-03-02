@@ -58,6 +58,7 @@
 #include <libm/scalb.h>
 #include <libm/scalbn.h>
 #include <libm/signbit.h>
+#include <libm/significand.h>
 #include <libm/sqrt.h>
 #include <libm/trunc.h>
 
@@ -2231,17 +2232,14 @@ NOTHROW(LIBCCALL libc_finite)(double x)
 }
 /*[[[end:finite]]]*/
 
-/*[[[head:significand,hash:CRC-32=0xd0cb1787]]]*/
+/*[[[head:significand,hash:CRC-32=0xbccbc7aa]]]*/
 /* Return the fractional part of X after dividing out `ilogb(X)' */
-INTERN WUNUSED
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.significand") double
 NOTHROW(LIBCCALL libc_significand)(double x)
 /*[[[body:significand]]]*/
-{
-	(void)x;
-	CRT_UNIMPLEMENTED("significand"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+/*AUTO*/{
+	return __LIBM_MATHFUN(significand, x);
 }
 /*[[[end:significand]]]*/
 
@@ -2264,14 +2262,18 @@ NOTHROW(LIBCCALL libc_finitef)(float x)
 }
 /*[[[end:finitef]]]*/
 
-/*[[[head:significandf,hash:CRC-32=0xc6ca2acb]]]*/
+/*[[[head:significandf,hash:CRC-32=0xaacafae6]]]*/
 /* Return the fractional part of X after dividing out `ilogb(X)' */
-INTERN WUNUSED
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.significandf") float
 NOTHROW(LIBCCALL libc_significandf)(float x)
 /*[[[body:significandf]]]*/
 /*AUTO*/{
+#ifdef __LIBM_MATHFUNF
+	return __LIBM_MATHFUNF(significand, x);
+#else /* __LIBM_MATHFUNF */
 	return (float)libc_significand((double)x);
+#endif /* !__LIBM_MATHFUNF */
 }
 /*[[[end:significandf]]]*/
 
@@ -2294,14 +2296,18 @@ NOTHROW(LIBCCALL libc_finitel)(__LONGDOUBLE x)
 }
 /*[[[end:finitel]]]*/
 
-/*[[[head:significandl,hash:CRC-32=0x208807f]]]*/
+/*[[[head:significandl,hash:CRC-32=0x8bb89e65]]]*/
 /* Return the fractional part of X after dividing out `ilogb(X)' */
-INTERN WUNUSED
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.significandl") __LONGDOUBLE
 NOTHROW(LIBCCALL libc_significandl)(__LONGDOUBLE x)
 /*[[[body:significandl]]]*/
 /*AUTO*/{
+#ifdef __LIBM_MATHFUNL
+	return __LIBM_MATHFUNL(significand, x);
+#else /* __LIBM_MATHFUNL */
 	return (__LONGDOUBLE)libc_significand((double)x);
+#endif /* !__LIBM_MATHFUNL */
 }
 /*[[[end:significandl]]]*/
 

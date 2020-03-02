@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaceb38b0 */
+/* HASH CRC-32:0x3afb3d57 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -333,7 +333,7 @@ NOTHROW(LIBCCALL libc_fmal)(__LONGDOUBLE x,
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.__signbit") int
 NOTHROW(LIBCCALL libc___signbit)(double x) {
-#line 2054 "kos/src/libc/magic/math.c"
+#line 2060 "kos/src/libc/magic/math.c"
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	return __ieee754_signbit((__IEEE754_DOUBLE_TYPE__)x);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc905cf90 */
+/* HASH CRC-32:0x55c6e74b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4725,6 +4725,9 @@
 #define __CRT_ATTR_CONST___signbit 1
 #define __CRT_ATTR_CONST___signbitf 1
 #define __CRT_ATTR_CONST___signbitl 1
+#define __CRT_ATTR_CONST___significand 1
+#define __CRT_ATTR_CONST___significandf 1
+#define __CRT_ATTR_CONST___significandl 1
 #define __CRT_ATTR_CONST___trunc 1
 #define __CRT_ATTR_CONST___truncf 1
 #define __CRT_ATTR_CONST___truncl 1
@@ -4888,6 +4891,9 @@
 #define __CRT_ATTR_CONST_scalbn 1
 #define __CRT_ATTR_CONST_scalbnf 1
 #define __CRT_ATTR_CONST_scalbnl 1
+#define __CRT_ATTR_CONST_significand 1
+#define __CRT_ATTR_CONST_significandf 1
+#define __CRT_ATTR_CONST_significandl 1
 #define __CRT_ATTR_CONST_strerror_s 1
 #define __CRT_ATTR_CONST_strerrorname_s 1
 #define __CRT_ATTR_CONST_strsignal_s 1

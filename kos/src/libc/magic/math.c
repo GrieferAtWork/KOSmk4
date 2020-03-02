@@ -1456,16 +1456,22 @@ finite:(double x) -> int {
 [attribute(*)][alias(*)] drem:(*) = remainder;
 
 @@Return the fractional part of X after dividing out `ilogb(X)'
-[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__significand)][crtbuiltin]
-significand:(double x) -> double; /* TODO */
+[ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__significand)][crtbuiltin]
+[requires_include(<ieee754.h>)][dependency_include(<libm/significand.h>)]
+[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+          defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+          defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]
+significand:(double x) -> double {
+	return __LIBM_MATHFUN(@significand@, x);
+}
 
 [ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__finitef)][crtbuiltin]
 finitef:(float x) -> int  %{auto_block(mathfun)}
 
 [attribute(*)][alias(*)] dremf:(*) = remainderf;
 
-[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__significandf)][crtbuiltin]
-significandf:(float x) -> float %{auto_block(math)} /* TODO */
+[ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__significandf)][crtbuiltin]
+significandf:(float x) -> float %{auto_block(mathfun)}
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
 [ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__finitel)][crtbuiltin]
@@ -1474,8 +1480,8 @@ finitel:(__LONGDOUBLE x) -> int %{auto_block(mathfun)}
 
 [attribute(*)][alias(*)] dreml:(*) = remainderl;
 
-[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__significandl)][crtbuiltin]
-significandl:(__LONGDOUBLE x) -> __LONGDOUBLE %{auto_block(math)} /* TODO */
+[ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__significandl)][crtbuiltin]
+significandl:(__LONGDOUBLE x) -> __LONGDOUBLE %{auto_block(mathfun)}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_MISC */
 

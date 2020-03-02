@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x96374fcd */
+/* HASH CRC-32:0x171ac565 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -8036,13 +8036,20 @@ __FORCELOCAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL drem)(double __x, double
 #endif /* drem... */
 #if __has_builtin(__builtin_significand) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_significand)
 /* Return the fractional part of X after dividing out `ilogb(X)' */
-__CEIDECLARE(__ATTR_WUNUSED,double,__NOTHROW,significand,(double __x),{ return __builtin_significand(__x); })
+__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,significand,(double __x),{ return __builtin_significand(__x); })
 #elif defined(__CRT_HAVE_significand)
 /* Return the fractional part of X after dividing out `ilogb(X)' */
-__CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,significand,(double __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,significand,(double __x),(__x))
 #elif defined(__CRT_HAVE___significand)
 /* Return the fractional part of X after dividing out `ilogb(X)' */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,significand,(double __x),__significand,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,significand,(double __x),__significand,(__x))
+#else /* LIBC: significand */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <local/math/significand.h>
+/* Return the fractional part of X after dividing out `ilogb(X)' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(significand, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL significand)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(significand))(__x); })
+#endif /* significand... */
 #endif /* significand... */
 #if __has_builtin(__builtin_finitef) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_finitef)
 /* Return nonzero if VALUE is finite and not NaN */
@@ -8086,17 +8093,20 @@ __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL dremf)(float __x, float _
 #endif /* dremf... */
 #if __has_builtin(__builtin_significandf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_significandf)
 /* Return the fractional part of X after dividing out `ilogb(X)' */
-__CEIDECLARE(__ATTR_WUNUSED,float,__NOTHROW,significandf,(float __x),{ return __builtin_significandf(__x); })
+__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,significandf,(float __x),{ return __builtin_significandf(__x); })
 #elif defined(__CRT_HAVE_significandf)
 /* Return the fractional part of X after dividing out `ilogb(X)' */
-__CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,significandf,(float __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,significandf,(float __x),(__x))
 #elif defined(__CRT_HAVE___significandf)
 /* Return the fractional part of X after dividing out `ilogb(X)' */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,significandf,(float __x),__significandf,(__x))
-#elif defined(__CRT_HAVE_significand) || defined(__CRT_HAVE___significand)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,significandf,(float __x),__significandf,(__x))
+#else /* LIBC: significandf */
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_significand) || defined(__CRT_HAVE___significand)
 #include <local/math/significandf.h>
 /* Return the fractional part of X after dividing out `ilogb(X)' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(significandf, __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL significandf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(significandf))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(significandf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL significandf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(significandf))(__x); })
+#endif /* significandf... */
 #endif /* significandf... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if __has_builtin(__builtin_finitel) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_finitel)
@@ -8147,23 +8157,20 @@ __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL dreml)(__LONGDOUBL
 #endif /* dreml... */
 #if __has_builtin(__builtin_significandl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_significandl)
 /* Return the fractional part of X after dividing out `ilogb(X)' */
-__CEIDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,significandl,(__LONGDOUBLE __x),{ return __builtin_significandl(__x); })
+__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,significandl,(__LONGDOUBLE __x),{ return __builtin_significandl(__x); })
 #elif defined(__CRT_HAVE_significandl)
 /* Return the fractional part of X after dividing out `ilogb(X)' */
-__CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,significandl,(__LONGDOUBLE __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,significandl,(__LONGDOUBLE __x),(__x))
 #elif defined(__CRT_HAVE___significandl)
 /* Return the fractional part of X after dividing out `ilogb(X)' */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,significandl,(__LONGDOUBLE __x),__significandl,(__x))
-#elif defined(__CRT_HAVE_significand) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Return the fractional part of X after dividing out `ilogb(X)' */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,significandl,(__LONGDOUBLE __x),significand,(__x))
-#elif defined(__CRT_HAVE___significand) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Return the fractional part of X after dividing out `ilogb(X)' */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,significandl,(__LONGDOUBLE __x),__significand,(__x))
-#elif defined(__CRT_HAVE_significand) || defined(__CRT_HAVE___significand)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,significandl,(__LONGDOUBLE __x),__significandl,(__x))
+#else /* LIBC: significandl */
+#include <ieee754.h>
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_significand) || defined(__CRT_HAVE___significand)
 #include <local/math/significandl.h>
 /* Return the fractional part of X after dividing out `ilogb(X)' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(significandl, __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL significandl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(significandl))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(significandl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL significandl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(significandl))(__x); })
+#endif /* significandl... */
 #endif /* significandl... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __USE_MISC */
@@ -10343,12 +10350,22 @@ __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__drem,(double __x, double __p),(__x,
 __FORCELOCAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __drem)(double __x, double __p) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remainder))(__x, __p); }
 #endif /* __drem... */
 #endif /* __drem... */
-#ifdef __CRT_HAVE___significand
+#if __has_builtin(__builtin_significand) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_significand)
 /* Return the fractional part of X after dividing out `ilogb(X)' */
-__CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__significand,(double __x),(__x))
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__significand,(double __x),significand,{ return __builtin_significand(__x); })
 #elif defined(__CRT_HAVE_significand)
 /* Return the fractional part of X after dividing out `ilogb(X)' */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__significand,(double __x),significand,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__significand,(double __x),significand,(__x))
+#elif defined(__CRT_HAVE___significand)
+/* Return the fractional part of X after dividing out `ilogb(X)' */
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__significand,(double __x),(__x))
+#else /* LIBC: significand */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <local/math/significand.h>
+/* Return the fractional part of X after dividing out `ilogb(X)' */
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __significand)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(significand))(__x); }
+#endif /* __significand... */
 #endif /* __significand... */
 #if __has_builtin(__builtin_remainderf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remainderf)
 /* Return the remainder of integer division X/P with infinite precision */
@@ -10375,17 +10392,20 @@ __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __dremf)(float __x, float
 #endif /* __dremf... */
 #if __has_builtin(__builtin_significandf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_significandf)
 /* Return the fractional part of X after dividing out `ilogb(X)' */
-__CEIREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__significandf,(float __x),significandf,{ return __builtin_significandf(__x); })
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__significandf,(float __x),significandf,{ return __builtin_significandf(__x); })
 #elif defined(__CRT_HAVE_significandf)
 /* Return the fractional part of X after dividing out `ilogb(X)' */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__significandf,(float __x),significandf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__significandf,(float __x),significandf,(__x))
 #elif defined(__CRT_HAVE___significandf)
 /* Return the fractional part of X after dividing out `ilogb(X)' */
-__CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__significandf,(float __x),(__x))
-#elif defined(__CRT_HAVE_significand) || defined(__CRT_HAVE___significand)
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__significandf,(float __x),(__x))
+#else /* LIBC: significandf */
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_significand) || defined(__CRT_HAVE___significand)
 #include <local/math/significandf.h>
 /* Return the fractional part of X after dividing out `ilogb(X)' */
-__FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __significandf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(significandf))(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __significandf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(significandf))(__x); }
+#endif /* __significandf... */
 #endif /* __significandf... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if __has_builtin(__builtin_remainderl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remainderl)
@@ -10413,23 +10433,20 @@ __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __dreml)(__LONGDOU
 #endif /* __dreml... */
 #if __has_builtin(__builtin_significandl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_significandl)
 /* Return the fractional part of X after dividing out `ilogb(X)' */
-__CEIREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__significandl,(__LONGDOUBLE __x),significandl,{ return __builtin_significandl(__x); })
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__significandl,(__LONGDOUBLE __x),significandl,{ return __builtin_significandl(__x); })
 #elif defined(__CRT_HAVE_significandl)
 /* Return the fractional part of X after dividing out `ilogb(X)' */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__significandl,(__LONGDOUBLE __x),significandl,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__significandl,(__LONGDOUBLE __x),significandl,(__x))
 #elif defined(__CRT_HAVE___significandl)
 /* Return the fractional part of X after dividing out `ilogb(X)' */
-__CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__significandl,(__LONGDOUBLE __x),(__x))
-#elif defined(__CRT_HAVE_significand) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Return the fractional part of X after dividing out `ilogb(X)' */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__significandl,(__LONGDOUBLE __x),significand,(__x))
-#elif defined(__CRT_HAVE___significand) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Return the fractional part of X after dividing out `ilogb(X)' */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__significandl,(__LONGDOUBLE __x),__significand,(__x))
-#elif defined(__CRT_HAVE_significand) || defined(__CRT_HAVE___significand)
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__significandl,(__LONGDOUBLE __x),(__x))
+#else /* LIBC: significandl */
+#include <ieee754.h>
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_significand) || defined(__CRT_HAVE___significand)
 #include <local/math/significandl.h>
 /* Return the fractional part of X after dividing out `ilogb(X)' */
-__FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __significandl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(significandl))(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __significandl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(significandl))(__x); }
+#endif /* __significandl... */
 #endif /* __significandl... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __USE_MISC */
