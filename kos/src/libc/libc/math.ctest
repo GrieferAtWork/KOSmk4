@@ -25,7 +25,10 @@
 
 #include <system-test/ctest.h>
 
+#include <bits/fenv-inline.h>
 #include <assert.h>
+#include <fenv.h>
+#include <stdio.h>
 #include <math.h>
 
 DECL_BEGIN
@@ -38,7 +41,8 @@ DEFINE_TEST(math_rounding) {
 	volatile double e = -1.5;
 	volatile double f = -1.501;
 
-#define EQFLT(a, b) assertf(isfinite(a) && (a) == (b), "%f != %f", a, b)
+#define EQFLT(a, b) (assert(isfinite(a)), assertf((a) == (b), "%f != %f", (double)(a), (double)(b)))
+#define EQI(a, b)   assertf((a) == (b), "%d != %d", (int)(a), (int)(b))
 #define EQL(a, b)   assertf((a) == (b), "%ld != %ld", (long)(a), (long)(b))
 #define EQLL(a, b)  assertf((a) == (b), "%lld != %lld", (__LONGLONG)(a), (__LONGLONG)(b))
 	EQFLT(round(a), 1.0);
@@ -82,6 +86,64 @@ DEFINE_TEST(math_rounding) {
 	EQFLT(trunc(d), -1.0);
 	EQFLT(trunc(e), -1.0);
 	EQFLT(trunc(f), -1.0);
+
+	/* NOTE: `nearbyint()' is a libc export_alias for `rint()'
+	 * We don't directly use `rint()' for testing here, because GCC
+	 * has a builtin for rint() that overrides our code.
+	 * Furthermore (and I really don't know if this is a bug in GCC,
+	 * or me not understanding how rint() is supposed to work, so for
+	 * the time being, I'm not going to report this), GCC's rint()
+	 * function returns ?incorrect? results for negative input values
+	 * when using rounding models other than `FE_TONEAREST':
+	 * >> fesetround(FE_DOWNWARD);
+	 * >> volatile double x = -1.499;
+	 * >> printf("%f\n", __builtin_rint(x));                 // -1.0 (why???)
+	 * >> printf("inexact: %d\n", fetestexcept(FE_INEXACT)); // 0  (rint() sets this flag if its result was inexact...)
+	 * >> printf("%f\n", __builtin_nearbyint(x));            // -2.0
+	 */
+#undef rint
+#define rint nearbyint
+
+	fesetround(FE_TONEAREST);
+	EQI(fegetround(), FE_TONEAREST);
+	EQFLT(rint(a), round(a)); EQL(lrint(a), 1);  EQL(llrint(a), 1);
+	EQFLT(rint(b), round(b)); EQL(lrint(b), 2);  EQL(llrint(b), 2);
+	EQFLT(rint(c), round(c)); EQL(lrint(c), 2);  EQL(llrint(c), 2);
+	EQFLT(rint(d), round(d)); EQL(lrint(d), -1); EQL(llrint(d), -1);
+	EQFLT(rint(e), round(e)); EQL(lrint(e), -2); EQL(llrint(e), -2);
+	EQFLT(rint(f), round(f)); EQL(lrint(f), -2); EQL(llrint(f), -2);
+	EQI(fegetround(), FE_TONEAREST);
+
+	fesetround(FE_DOWNWARD);
+	EQI(fegetround(), FE_DOWNWARD);
+	EQFLT(rint(a), floor(a)); EQL(lrint(a), 1);  EQL(llrint(a), 1);
+	EQFLT(rint(b), floor(b)); EQL(lrint(b), 1);  EQL(llrint(b), 1);
+	EQFLT(rint(c), floor(c)); EQL(lrint(c), 1);  EQL(llrint(c), 1);
+	EQFLT(rint(d), floor(d)); EQL(lrint(d), -2); EQL(llrint(d), -2);
+	EQFLT(rint(e), floor(e)); EQL(lrint(e), -2); EQL(llrint(e), -2);
+	EQFLT(rint(f), floor(f)); EQL(lrint(f), -2); EQL(llrint(f), -2);
+	EQI(fegetround(), FE_DOWNWARD);
+
+	fesetround(FE_UPWARD);
+	EQI(fegetround(), FE_UPWARD);
+	EQFLT(rint(a), ceil(a)); EQL(lrint(a), 2);  EQL(llrint(a), 2);
+	EQFLT(rint(b), ceil(b)); EQL(lrint(b), 2);  EQL(llrint(b), 2);
+	EQFLT(rint(c), ceil(c)); EQL(lrint(c), 2);  EQL(llrint(c), 2);
+	EQFLT(rint(d), ceil(d)); EQL(lrint(d), -1); EQL(llrint(d), -1);
+	EQFLT(rint(e), ceil(e)); EQL(lrint(e), -1); EQL(llrint(e), -1);
+	EQFLT(rint(f), ceil(f)); EQL(lrint(f), -1); EQL(llrint(f), -1);
+	EQI(fegetround(), FE_UPWARD);
+
+	fesetround(FE_TOWARDZERO);
+	EQI(fegetround(), FE_TOWARDZERO);
+	EQFLT(rint(a), trunc(a)); EQL(lrint(a), 1);  EQL(llrint(a), 1);
+	EQFLT(rint(b), trunc(b)); EQL(lrint(b), 1);  EQL(llrint(b), 1);
+	EQFLT(rint(c), trunc(c)); EQL(lrint(c), 1);  EQL(llrint(c), 1);
+	EQFLT(rint(d), trunc(d)); EQL(lrint(d), -1); EQL(llrint(d), -1);
+	EQFLT(rint(e), trunc(e)); EQL(lrint(e), -1); EQL(llrint(e), -1);
+	EQFLT(rint(f), trunc(f)); EQL(lrint(f), -1); EQL(llrint(f), -1);
+	EQI(fegetround(), FE_TOWARDZERO);
+
 #undef EQLL
 #undef EQL
 #undef EQFLT

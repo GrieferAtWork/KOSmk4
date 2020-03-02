@@ -154,18 +154,21 @@
 #endif
 
 
+#ifdef __LIBC_BIND_CRTBUILTINS
+#if (__LIBC_BIND_CRTBUILTINS + 0) == 0
 #undef __LIBC_BIND_CRTBUILTINS
-#if !defined(__INTELLISENSE__) && \
-    !defined(__NO_has_builtin) && \
-    /* Don't bind CRT-builtin functions (such as `__builtin_malloc()') when building \
-     * libc itself, so-as to prevent GCC from generating relocations against the \
-     * real symbols (which would end up as relocations in the final binary), when we \
-     * actually want everything to be linked against symbols from the `libc_' namespace. */ \
-    !defined(__BUILDING_LIBC) && \
-    /* Don't bind CRT-builtin functions when linking against the i386 kernel's builtin CRT. \
-     * Because GCC assumes the default calling convention for builtin functions, we'd end up \
-     * with stack corruptions since the kernel uses STDCALL, but gcc invokes as CDECL. */ \
-    !(defined(__CRT_KOS_KERNEL) && (defined(__i386__) && !defined(__x86_64__)))
+#endif /* !__LIBC_BIND_CRTBUILTINS */
+#elif !defined(__INTELLISENSE__) && \
+      !defined(__NO_has_builtin) && \
+      /* Don't bind CRT-builtin functions (such as `__builtin_malloc()') when building \
+       * libc itself, so-as to prevent GCC from generating relocations against the \
+       * real symbols (which would end up as relocations in the final binary), when we \
+       * actually want everything to be linked against symbols from the `libc_' namespace. */ \
+      !defined(__BUILDING_LIBC) && \
+      /* Don't bind CRT-builtin functions when linking against the i386 kernel's builtin CRT. \
+       * Because GCC assumes the default calling convention for builtin functions, we'd end up \
+       * with stack corruptions since the kernel uses STDCALL, but gcc invokes as CDECL. */ \
+      !(defined(__CRT_KOS_KERNEL) && (defined(__i386__) && !defined(__x86_64__)))
 #define __LIBC_BIND_CRTBUILTINS 1
 #endif
 
