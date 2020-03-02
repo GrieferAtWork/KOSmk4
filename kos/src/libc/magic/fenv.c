@@ -130,13 +130,23 @@ fetestexcept:(int excepts) -> int {
 }
 
 @@Get current rounding direction
+@@@return: One of...
+@@            ... `FE_TONEAREST':  round()
+@@            ... `FE_DOWNWARD':   floor()
+@@            ... `FE_UPWARD':     ceil()
+@@            ... `FE_TOWARDZERO': trunc()
 [std][nothrow][ATTR_PURE][ATTR_WUNUSED][libc]
 [fast][dependency_include(<bits/fenv-inline.h>)]
 fegetround:() -> int {
 	return @__inline_fegetround@();
 }
 
-@@Establish the rounding direction represented by ROUND
+@@Establish the rounding direction represented by `rounding_direction'
+@@@param: rounding_direction: One of...
+@@            ... `FE_TONEAREST':  round()
+@@            ... `FE_DOWNWARD':   floor()
+@@            ... `FE_UPWARD':     ceil()
+@@            ... `FE_TOWARDZERO': trunc()
 [std][nothrow][libc]
 [fast][dependency_include(<bits/fenv-inline.h>)]
 fesetround:(int rounding_direction) -> int {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd5e57a12 */
+/* HASH CRC-32:0x884f701d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,19 +39,39 @@ __CREDIRECT(,int,,__libc_core_feraiseexcept,(int __excepts),feraiseexcept,(__exc
 #define __libc_core_feraiseexcept (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(feraiseexcept))
 #endif /* feraiseexcept... */
 #ifdef __CRT_HAVE_fegetround
-/* Get current rounding direction */
+/* Get current rounding direction
+ * @return: One of...
+ *             ... `FE_TONEAREST':  round()
+ *             ... `FE_DOWNWARD':   floor()
+ *             ... `FE_UPWARD':     ceil()
+ *             ... `FE_TOWARDZERO': trunc() */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW,__libc_core_fegetround,(void),fegetround,())
 #else /* LIBC: fegetround */
 #include <local/fenv/fegetround.h>
-/* Get current rounding direction */
+/* Get current rounding direction
+ * @return: One of...
+ *             ... `FE_TONEAREST':  round()
+ *             ... `FE_DOWNWARD':   floor()
+ *             ... `FE_UPWARD':     ceil()
+ *             ... `FE_TOWARDZERO': trunc() */
 #define __libc_core_fegetround (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fegetround))
 #endif /* fegetround... */
 #ifdef __CRT_HAVE_fesetround
-/* Establish the rounding direction represented by ROUND */
+/* Establish the rounding direction represented by `rounding_direction'
+ * @param: rounding_direction: One of...
+ *             ... `FE_TONEAREST':  round()
+ *             ... `FE_DOWNWARD':   floor()
+ *             ... `FE_UPWARD':     ceil()
+ *             ... `FE_TOWARDZERO': trunc() */
 __CREDIRECT(,int,__NOTHROW,__libc_core_fesetround,(int __rounding_direction),fesetround,(__rounding_direction))
 #else /* LIBC: fesetround */
 #include <local/fenv/fesetround.h>
-/* Establish the rounding direction represented by ROUND */
+/* Establish the rounding direction represented by `rounding_direction'
+ * @param: rounding_direction: One of...
+ *             ... `FE_TONEAREST':  round()
+ *             ... `FE_DOWNWARD':   floor()
+ *             ... `FE_UPWARD':     ceil()
+ *             ... `FE_TOWARDZERO': trunc() */
 #define __libc_core_fesetround (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fesetround))
 #endif /* fesetround... */
 

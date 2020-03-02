@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x346720a8 */
+/* HASH CRC-32:0x816a93c1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,9 +43,19 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_fesetexceptflag)(fexcept_t con
 /* Determine which of subset of the exceptions
  * specified by EXCEPTS are currently set */
 INTDEF ATTR_PURE WUNUSED int NOTHROW(LIBCCALL libc_fetestexcept)(int excepts);
-/* Get current rounding direction */
+/* Get current rounding direction
+ * @return: One of...
+ *             ... `FE_TONEAREST':  round()
+ *             ... `FE_DOWNWARD':   floor()
+ *             ... `FE_UPWARD':     ceil()
+ *             ... `FE_TOWARDZERO': trunc() */
 INTDEF ATTR_PURE WUNUSED int NOTHROW(LIBCCALL libc_fegetround)(void);
-/* Establish the rounding direction represented by ROUND */
+/* Establish the rounding direction represented by `rounding_direction'
+ * @param: rounding_direction: One of...
+ *             ... `FE_TONEAREST':  round()
+ *             ... `FE_DOWNWARD':   floor()
+ *             ... `FE_UPWARD':     ceil()
+ *             ... `FE_TOWARDZERO': trunc() */
 INTDEF int NOTHROW(LIBCCALL libc_fesetround)(int rounding_direction);
 /* Store the current floating-point environment in the object pointed to by ENVP */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_fegetenv)(fenv_t *envp);

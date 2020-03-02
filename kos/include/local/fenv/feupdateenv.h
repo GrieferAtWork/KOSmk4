@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1d30eefe */
+/* HASH CRC-32:0x1f6bdcfa */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
  * according to saved exceptions */
 __LOCAL_LIBC(feupdateenv) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(feupdateenv))(fenv_t const *___envp) {
-#line 173 "kos/src/libc/magic/fenv.c"
+#line 183 "kos/src/libc/magic/fenv.c"
 	__inline_feupdateenv(___envp);
 	return 0;
 }

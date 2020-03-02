@@ -54,8 +54,16 @@ __SYSDECL_BEGIN
  * the KOS kernel emulates this instruction, checks
  * for cpuid actually existing are omitted to keep
  * things a little bit simpler. */
+#if defined(__SSE__) || defined(__SSE_MATH__)
+#define __CPU_HAVE_SSE()       1
+#else /* __SSE__ || __SSE_MATH__ */
 #define __CPU_HAVE_SSE()       (__cpuid_edx(0x1) & CPUID_1D_SSE)
+#endif /* !__SSE__ && !__SSE_MATH__ */
+#if defined(__SSE2__) || defined(__SSE2_MATH__)
+#define __CPU_HAVE_SSE2()      1
+#else /* __SSE2__ || __SSE2_MATH__ */
 #define __CPU_HAVE_SSE2()      (__cpuid_edx(0x1) & CPUID_1D_SSE2)
+#endif /* !__SSE2__ && !__SSE2_MATH__ */
 #define __CPU_HAVE_SSSE3()     (__cpuid_ecx(0x1) & CPUID_1C_SSSE3)
 #define __CPU_HAVE_SSE4_1()    (__cpuid_ecx(0x1) & CPUID_1C_SSE4_1)
 #define __CPU_HAVE_SSE4_2()    (__cpuid_ecx(0x1) & CPUID_1C_SSE4_2)

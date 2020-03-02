@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x82040567 */
+/* HASH CRC-32:0x7abc7dde */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
  * exception flags and install a non-stop mode (if available) for all exceptions */
 __LOCAL_LIBC(feholdexcept) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(feholdexcept))(fenv_t *___envp) {
-#line 157 "kos/src/libc/magic/fenv.c"
+#line 167 "kos/src/libc/magic/fenv.c"
 	__inline_feholdexcept(___envp);
 	return 0;
 }

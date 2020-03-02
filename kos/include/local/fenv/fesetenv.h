@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x43d1969b */
+/* HASH CRC-32:0xb9c3618d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Establish the floating-point environment represented by the object pointed to by ENVP */
 __LOCAL_LIBC(fesetenv) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fesetenv))(fenv_t const *___envp) {
-#line 164 "kos/src/libc/magic/fenv.c"
+#line 174 "kos/src/libc/magic/fenv.c"
 	__inline_fesetenv(___envp);
 	return 0;
 }

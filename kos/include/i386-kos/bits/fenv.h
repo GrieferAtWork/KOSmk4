@@ -82,23 +82,23 @@ enum {
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
-	FE_TONEAREST  = 0x0000, /* == FCW_RC_NEAREST */
-	FE_DOWNWARD   = 0x0400, /* == FCW_RC_DOWN */
-	FE_UPWARD     = 0x0800, /* == FCW_RC_UP */
-	FE_TOWARDZERO = 0x0c00  /* == FCW_RC_TRUNC */
+	FE_TONEAREST  = 0x0000, /* round() (== FCW_RC_NEAREST) */
+	FE_DOWNWARD   = 0x0400, /* floor() (== FCW_RC_DOWN) */
+	FE_UPWARD     = 0x0800, /* ceil()  (== FCW_RC_UP) */
+	FE_TOWARDZERO = 0x0c00  /* trunc() (== FCW_RC_TRUNC) */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
-#define FE_TONEAREST  FE_TONEAREST  /* == FCW_RC_NEAREST */
-#define FE_DOWNWARD   FE_DOWNWARD   /* == FCW_RC_DOWN */
-#define FE_UPWARD     FE_UPWARD     /* == FCW_RC_UP */
-#define FE_TOWARDZERO FE_TOWARDZERO /* == FCW_RC_TRUNC */
+#define FE_TONEAREST  FE_TONEAREST  /* round() (== FCW_RC_NEAREST) */
+#define FE_DOWNWARD   FE_DOWNWARD   /* floor() (== FCW_RC_DOWN) */
+#define FE_UPWARD     FE_UPWARD     /* ceil()  (== FCW_RC_UP) */
+#define FE_TOWARDZERO FE_TOWARDZERO /* trunc() (== FCW_RC_TRUNC) */
 #else /* __COMPILER_PREFERR_ENUMS */
-#define FE_TONEAREST  0x0000 /* == FCW_RC_NEAREST */
-#define FE_DOWNWARD   0x0400 /* == FCW_RC_DOWN */
-#define FE_UPWARD     0x0800 /* == FCW_RC_UP */
-#define FE_TOWARDZERO 0x0c00 /* == FCW_RC_TRUNC */
+#define FE_TONEAREST  0x0000 /* round() (== FCW_RC_NEAREST) */
+#define FE_DOWNWARD   0x0400 /* floor() (== FCW_RC_DOWN) */
+#define FE_UPWARD     0x0800 /* ceil()  (== FCW_RC_UP) */
+#define FE_TOWARDZERO 0x0c00 /* trunc() (== FCW_RC_TRUNC) */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

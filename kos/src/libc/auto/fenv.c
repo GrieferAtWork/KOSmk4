@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x19ca922f */
+/* HASH CRC-32:0x6be14bf8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -93,19 +93,29 @@ NOTHROW(LIBCCALL libc_fetestexcept)(int excepts) {
 }
 
 #include <bits/fenv-inline.h>
-/* Get current rounding direction */
+/* Get current rounding direction
+ * @return: One of...
+ *             ... `FE_TONEAREST':  round()
+ *             ... `FE_DOWNWARD':   floor()
+ *             ... `FE_UPWARD':     ceil()
+ *             ... `FE_TOWARDZERO': trunc() */
 INTERN ATTR_PURE WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.fenv.fegetround") int
 NOTHROW(LIBCCALL libc_fegetround)(void) {
-#line 136 "kos/src/libc/magic/fenv.c"
+#line 141 "kos/src/libc/magic/fenv.c"
 	return __inline_fegetround();
 }
 
 #include <bits/fenv-inline.h>
-/* Establish the rounding direction represented by ROUND */
+/* Establish the rounding direction represented by `rounding_direction'
+ * @param: rounding_direction: One of...
+ *             ... `FE_TONEAREST':  round()
+ *             ... `FE_DOWNWARD':   floor()
+ *             ... `FE_UPWARD':     ceil()
+ *             ... `FE_TOWARDZERO': trunc() */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.math.fenv.fesetround") int
 NOTHROW(LIBCCALL libc_fesetround)(int rounding_direction) {
-#line 143 "kos/src/libc/magic/fenv.c"
+#line 153 "kos/src/libc/magic/fenv.c"
 	return __inline_fesetround(rounding_direction);
 }
 
@@ -114,7 +124,7 @@ NOTHROW(LIBCCALL libc_fesetround)(int rounding_direction) {
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.math.fenv.fegetenv") int
 NOTHROW_NCX(LIBCCALL libc_fegetenv)(fenv_t *envp) {
-#line 149 "kos/src/libc/magic/fenv.c"
+#line 159 "kos/src/libc/magic/fenv.c"
 	__inline_fegetenv(envp);
 	return 0;
 }
@@ -125,7 +135,7 @@ NOTHROW_NCX(LIBCCALL libc_fegetenv)(fenv_t *envp) {
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.math.fenv.feholdexcept") int
 NOTHROW_NCX(LIBCCALL libc_feholdexcept)(fenv_t *envp) {
-#line 157 "kos/src/libc/magic/fenv.c"
+#line 167 "kos/src/libc/magic/fenv.c"
 	__inline_feholdexcept(envp);
 	return 0;
 }
@@ -135,7 +145,7 @@ NOTHROW_NCX(LIBCCALL libc_feholdexcept)(fenv_t *envp) {
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.math.fenv.fesetenv") int
 NOTHROW_NCX(LIBCCALL libc_fesetenv)(fenv_t const *envp) {
-#line 164 "kos/src/libc/magic/fenv.c"
+#line 174 "kos/src/libc/magic/fenv.c"
 	__inline_fesetenv(envp);
 	return 0;
 }
@@ -147,7 +157,7 @@ NOTHROW_NCX(LIBCCALL libc_fesetenv)(fenv_t const *envp) {
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.math.fenv.feupdateenv") int
 NOTHROW_NCX(LIBCCALL libc_feupdateenv)(fenv_t const *envp) {
-#line 173 "kos/src/libc/magic/fenv.c"
+#line 183 "kos/src/libc/magic/fenv.c"
 	__inline_feupdateenv(envp);
 	return 0;
 }
@@ -158,7 +168,7 @@ NOTHROW_NCX(LIBCCALL libc_feupdateenv)(fenv_t const *envp) {
  * exceptions are successfully set, otherwise returns -1 */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.math.fenv.feenableexcept") int
 NOTHROW(LIBCCALL libc_feenableexcept)(int excepts) {
-#line 185 "kos/src/libc/magic/fenv.c"
+#line 195 "kos/src/libc/magic/fenv.c"
 	return __inline_feenableexcept(excepts);
 }
 
@@ -168,7 +178,7 @@ NOTHROW(LIBCCALL libc_feenableexcept)(int excepts) {
  * exceptions are successfully disabled, otherwise returns -1 */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.math.fenv.fedisableexcept") int
 NOTHROW(LIBCCALL libc_fedisableexcept)(int excepts) {
-#line 193 "kos/src/libc/magic/fenv.c"
+#line 203 "kos/src/libc/magic/fenv.c"
 	return __inline_fedisableexcept(excepts);
 }
 
@@ -177,7 +187,7 @@ NOTHROW(LIBCCALL libc_fedisableexcept)(int excepts) {
 INTERN ATTR_PURE WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.fenv.fegetexcept") int
 NOTHROW(LIBCCALL libc_fegetexcept)(void) {
-#line 200 "kos/src/libc/magic/fenv.c"
+#line 210 "kos/src/libc/magic/fenv.c"
 	return __inline_fegetexcept();
 }
 

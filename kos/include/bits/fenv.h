@@ -62,10 +62,10 @@ enum {
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
-	FE_TONEAREST  = 0x0000, /* == FCW_RC_NEAREST */
-	FE_DOWNWARD   = 0x0001, /* == FCW_RC_DOWN */
-	FE_UPWARD     = 0x0002, /* == FCW_RC_UP */
-	FE_TOWARDZERO = 0x0003  /* == FCW_RC_TRUNC */
+	FE_TONEAREST  = 0x0000, /* round() */
+	FE_DOWNWARD   = 0x0001, /* floor() */
+	FE_UPWARD     = 0x0002, /* ceil() */
+	FE_TOWARDZERO = 0x0003  /* trunc() */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/

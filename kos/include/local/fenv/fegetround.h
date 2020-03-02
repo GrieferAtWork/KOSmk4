@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2a9987c6 */
+/* HASH CRC-32:0xc599222a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,10 +22,15 @@
 #define __local_fegetround_defined 1
 #include <bits/fenv-inline.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Get current rounding direction */
+/* Get current rounding direction
+ * @return: One of...
+ *             ... `FE_TONEAREST':  round()
+ *             ... `FE_DOWNWARD':   floor()
+ *             ... `FE_UPWARD':     ceil()
+ *             ... `FE_TOWARDZERO': trunc() */
 __LOCAL_LIBC(fegetround) __ATTR_PURE __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fegetround))(void) {
-#line 136 "kos/src/libc/magic/fenv.c"
+#line 141 "kos/src/libc/magic/fenv.c"
 	return __inline_fegetround();
 }
 __NAMESPACE_LOCAL_END

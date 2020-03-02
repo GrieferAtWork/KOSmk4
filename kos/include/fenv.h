@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5e3d3aad */
+/* HASH CRC-32:0x31f26e82 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -186,29 +186,59 @@ __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(fetestexcept, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW(__LIBCCALL fetestexcept)(int __excepts) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fetestexcept))(__excepts); })
 #endif /* fetestexcept... */
 #ifdef __fast_fegetround_defined
-/* Get current rounding direction */
+/* Get current rounding direction
+ * @return: One of...
+ *             ... `FE_TONEAREST':  round()
+ *             ... `FE_DOWNWARD':   floor()
+ *             ... `FE_UPWARD':     ceil()
+ *             ... `FE_TOWARDZERO': trunc() */
 __NAMESPACE_FAST_USING_OR_IMPL(fegetround, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW(__LIBCCALL fegetround)(void) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(fegetround))(); })
 #elif defined(__CRT_HAVE_fegetround)
-/* Get current rounding direction */
+/* Get current rounding direction
+ * @return: One of...
+ *             ... `FE_TONEAREST':  round()
+ *             ... `FE_DOWNWARD':   floor()
+ *             ... `FE_UPWARD':     ceil()
+ *             ... `FE_TOWARDZERO': trunc() */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW,fegetround,(void),())
 #else /* LIBC: fegetround */
 __NAMESPACE_STD_END
 #include <local/fenv/fegetround.h>
 __NAMESPACE_STD_BEGIN
-/* Get current rounding direction */
+/* Get current rounding direction
+ * @return: One of...
+ *             ... `FE_TONEAREST':  round()
+ *             ... `FE_DOWNWARD':   floor()
+ *             ... `FE_UPWARD':     ceil()
+ *             ... `FE_TOWARDZERO': trunc() */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fegetround, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW(__LIBCCALL fegetround)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fegetround))(); })
 #endif /* fegetround... */
 #ifdef __fast_fesetround_defined
-/* Establish the rounding direction represented by ROUND */
+/* Establish the rounding direction represented by `rounding_direction'
+ * @param: rounding_direction: One of...
+ *             ... `FE_TONEAREST':  round()
+ *             ... `FE_DOWNWARD':   floor()
+ *             ... `FE_UPWARD':     ceil()
+ *             ... `FE_TOWARDZERO': trunc() */
 __NAMESPACE_FAST_USING_OR_IMPL(fesetround, __FORCELOCAL int __NOTHROW(__LIBCCALL fesetround)(int __rounding_direction) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(fesetround))(__rounding_direction); })
 #elif defined(__CRT_HAVE_fesetround)
-/* Establish the rounding direction represented by ROUND */
+/* Establish the rounding direction represented by `rounding_direction'
+ * @param: rounding_direction: One of...
+ *             ... `FE_TONEAREST':  round()
+ *             ... `FE_DOWNWARD':   floor()
+ *             ... `FE_UPWARD':     ceil()
+ *             ... `FE_TOWARDZERO': trunc() */
 __CDECLARE(,int,__NOTHROW,fesetround,(int __rounding_direction),(__rounding_direction))
 #else /* LIBC: fesetround */
 __NAMESPACE_STD_END
 #include <local/fenv/fesetround.h>
 __NAMESPACE_STD_BEGIN
-/* Establish the rounding direction represented by ROUND */
+/* Establish the rounding direction represented by `rounding_direction'
+ * @param: rounding_direction: One of...
+ *             ... `FE_TONEAREST':  round()
+ *             ... `FE_DOWNWARD':   floor()
+ *             ... `FE_UPWARD':     ceil()
+ *             ... `FE_TOWARDZERO': trunc() */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fesetround, __FORCELOCAL int __NOTHROW(__LIBCCALL fesetround)(int __rounding_direction) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fesetround))(__rounding_direction); })
 #endif /* fesetround... */
 #ifdef __fast_fegetenv_defined
