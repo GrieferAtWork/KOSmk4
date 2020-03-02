@@ -27,12 +27,14 @@
 
 #include <bits/types.h>
 
+#include <libm/asm/trunc.h>
 #include <libm/fdlibm.h>
 
 #ifdef __CC__
 __DECL_BEGIN
 
 #ifdef __IEEE754_FLOAT_TYPE__
+#ifndef __ieee754_truncf
 /* <<<No copyright notice found in the original file, but was part of fdlibm>>> */
 
 __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
@@ -56,11 +58,12 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 	}
 	return __x;
 }
-
+#endif /* !__ieee754_truncf */
 #endif /* __IEEE754_FLOAT_TYPE__ */
 
 
 #ifdef __IEEE754_DOUBLE_TYPE__
+#ifndef __ieee754_trunc
 /* <<<No copyright notice found in the original file, but was part of fdlibm>>> */
 
 __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
@@ -87,11 +90,12 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 	}
 	return __x;
 }
-
+#endif /* !__ieee754_trunc */
 #endif /* __IEEE754_DOUBLE_TYPE__ */
 
 
 #ifdef __IEEE854_LONG_DOUBLE_TYPE__
+#ifndef __ieee854_truncl
 /* <<<No copyright notice found in the original file, but was part of fdlibm>>> */
 
 __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
@@ -120,7 +124,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
 	}
 	return __x;
 }
-
+#endif /* !__ieee854_truncl */
 #endif /* __IEEE854_LONG_DOUBLE_TYPE__ */
 
 __DECL_END

@@ -27,12 +27,14 @@
 
 #include <bits/types.h>
 
+#include <libm/asm/ceil.h>
 #include <libm/fdlibm.h>
 
 #ifdef __CC__
 __DECL_BEGIN
 
 #ifdef __IEEE754_FLOAT_TYPE__
+#ifndef __ieee754_ceilf
 /* <<<No copyright notice found in the original file, but was part of fdlibm>>> */
 
 #ifndef __libm_hugef_defined
@@ -75,11 +77,12 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 	__LIBM_SET_FLOAT_WORD(__x, __i0);
 	return __x;
 }
-
+#endif /* !__ieee754_ceilf */
 #endif /* __IEEE754_FLOAT_TYPE__ */
 
 
 #ifdef __IEEE754_DOUBLE_TYPE__
+#ifndef __ieee754_ceil
 /*
  * ====================================================
  * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
@@ -151,11 +154,12 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 	__LIBM_INSERT_WORDS(__x, __i0, __i1);
 	return __x;
 }
-
+#endif /* !__ieee754_ceil */
 #endif /* __IEEE754_DOUBLE_TYPE__ */
 
 
 #ifdef __IEEE854_LONG_DOUBLE_TYPE__
+#ifndef __ieee854_ceill
 /* <<<No copyright notice found in the original file, but was part of fdlibm>>> */
 
 #ifndef __libm_hugeval4930l_defined
@@ -227,7 +231,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
 	__LIBM_SET_LDOUBLE_WORDS(__x, __se, __i0, __i1);
 	return __x;
 }
-
+#endif /* !__ieee854_ceill */
 #endif /* __IEEE854_LONG_DOUBLE_TYPE__ */
 
 __DECL_END

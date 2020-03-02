@@ -27,12 +27,14 @@
 
 #include <bits/types.h>
 
+#include <libm/asm/round.h>
 #include <libm/fdlibm.h>
 
 #ifdef __CC__
 __DECL_BEGIN
 
 #ifdef __IEEE754_FLOAT_TYPE__
+#ifndef __ieee754_roundf
 /* <<<No copyright notice found in the original file, but was part of fdlibm>>> */
 
 #ifndef __libm_hugef_defined
@@ -74,10 +76,12 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 	__LIBM_SET_FLOAT_WORD(__x, __i0);
 	return __x;
 }
+#endif /* !__ieee754_roundf */
 #endif /* __IEEE754_FLOAT_TYPE__ */
 
 
 #ifdef __IEEE754_DOUBLE_TYPE__
+#ifndef __ieee754_round
 /* <<<No copyright notice found in the original file, but was part of fdlibm>>> */
 
 #ifndef __libm_huge_defined
@@ -135,10 +139,12 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 	__LIBM_INSERT_WORDS(__x, __i0, __i1);
 	return __x;
 }
+#endif /* !__ieee754_round */
 #endif /* __IEEE754_DOUBLE_TYPE__ */
 
 
 #ifdef __IEEE854_LONG_DOUBLE_TYPE__
+#ifndef __ieee854_roundl
 /* <<<No copyright notice found in the original file, but was part of fdlibm>>> */
 
 #ifndef __libm_hugeval4930l_defined
@@ -206,6 +212,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
 	__LIBM_SET_LDOUBLE_WORDS(__x, se, __i0, __i1);
 	return __x;
 }
+#endif /* !__ieee854_roundl */
 #endif /* __IEEE854_LONG_DOUBLE_TYPE__ */
 
 __DECL_END
