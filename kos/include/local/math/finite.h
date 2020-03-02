@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x18fb7787 */
+/* HASH CRC-32:0x8ede9f50 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -78,16 +78,12 @@ __NAMESPACE_LOCAL_BEGIN
 /* Return nonzero if VALUE is finite and not NaN */
 __LOCAL_LIBC(finite) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(finite))(double __x) {
-#line 2341 "kos/src/libc/magic/math.c"
-#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
-	return __ieee754_finite((__IEEE754_DOUBLE_TYPE__)__x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-	return __ieee754_finitef((__IEEE754_FLOAT_TYPE__)__x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-	return __ieee854_finitel((__IEEE854_LONG_DOUBLE_TYPE__)__x);
-#else /* ... */
+#line 1449 "kos/src/libc/magic/math.c"
+#ifdef __LIBM_MATHFUNI
+	return __LIBM_MATHFUNI(finite, __x);
+#else /* __LIBM_MATHFUNI */
 	return !__localdep_isinf(__x) && !__localdep_isnan(__x);
-#endif /* !... */
+#endif /* !__LIBM_MATHFUNI */
 }
 __NAMESPACE_LOCAL_END
 #endif /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || ((__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __CRT_HAVE_isinf || __CRT_HAVE___isinf) && (__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __CRT_HAVE_isnan || __CRT_HAVE___isnan || __CRT_HAVE__isnan)) */

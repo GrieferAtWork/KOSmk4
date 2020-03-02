@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5b93d586 */
+/* HASH CRC-32:0x7a08edc7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,19 +49,21 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),double,__NOTHROW_NCX,__localdep_f
 
 __NAMESPACE_LOCAL_BEGIN
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-__LOCAL_LIBC(frexpl) __ATTR_WUNUSED __LONGDOUBLE
+__LOCAL_LIBC(frexpl) __ATTR_WUNUSED __ATTR_NONNULL((2)) __LONGDOUBLE
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(frexpl))(__LONGDOUBLE __x,
                                                     int *__pexponent) {
-#line 534 "kos/src/libc/magic/math.c"
-#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return (__LONGDOUBLE)__ieee854_frexpl((__IEEE854_LONG_DOUBLE_TYPE__)__x, __pexponent);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+#line 409 "kos/src/libc/magic/math.c"
+#ifdef __LIBM_MATHFUN2L
+	#ifdef __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__
 	return (__LONGDOUBLE)__ieee754_frexp((__IEEE754_DOUBLE_TYPE__)__x, __pexponent);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
 	return (__LONGDOUBLE)__ieee754_frexpf((__IEEE754_FLOAT_TYPE__)__x, __pexponent);
 #else /* ... */
-	return (__LONGDOUBLE)__localdep_frexp((double)__x, __pexponent);
+	return (__LONGDOUBLE)__ieee854_frexpl((__IEEE854_LONG_DOUBLE_TYPE__)__x, __pexponent);
 #endif /* !... */
+#else /* __LIBM_MATHFUN2L */
+	return (__LONGDOUBLE)__localdep_frexp((double)__x, __pexponent);
+#endif /* !__LIBM_MATHFUN2L */
 }
 __NAMESPACE_LOCAL_END
 #endif /* __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __CRT_HAVE_frexp || __CRT_HAVE___frexp */

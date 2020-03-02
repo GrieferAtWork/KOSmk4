@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf398931e */
+/* HASH CRC-32:0xac6a453e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,15 +21,38 @@
 #ifndef __local_fabsl_defined
 #define __local_fabsl_defined 1
 #include <libm/fabs.h>
+/* Dependency: "fabs" from "math" */
+#ifndef ____localdep_fabs_defined
+#define ____localdep_fabs_defined 1
+#if __has_builtin(__builtin_fabs) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fabs)
+/* Absolute value of X */
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_fabs,(double __x),fabs,{ return __builtin_fabs(__x); })
+#elif defined(__CRT_HAVE_fabs)
+/* Absolute value of X */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_fabs,(double __x),fabs,(__x))
+#elif defined(__CRT_HAVE___fabs)
+/* Absolute value of X */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_fabs,(double __x),__fabs,(__x))
+#else /* LIBC: fabs */
+#include <local/math/fabs.h>
+/* Absolute value of X */
+#define __localdep_fabs (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fabs))
+#endif /* fabs... */
+#endif /* !____localdep_fabs_defined */
+
 __NAMESPACE_LOCAL_BEGIN
-/* Return X with its signed changed to Y's */
+/* Absolute value of X */
 __LOCAL_LIBC(fabsl) __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fabsl))(__LONGDOUBLE __x) {
-#line 1124 "kos/src/libc/magic/math.c"
+#line 702 "kos/src/libc/magic/math.c"
 #ifdef __LIBM_MATHFUNL
+	#ifdef __LIBM_MATHFUNL
 	return __LIBM_MATHFUNL(fabs, __x);
-#else /* __LIBM_MATHFUNL */
+#else /* __LIBM_MATHFUN */
 	return __x < 0.0L ? -__x : __x;
+#endif /* !__LIBM_MATHFUN */
+#else /* __LIBM_MATHFUNL */
+	return (__LONGDOUBLE)__localdep_fabs((double)__x);
 #endif /* !__LIBM_MATHFUNL */
 }
 __NAMESPACE_LOCAL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2cc6a8c7 */
+/* HASH CRC-32:0x7e808ee4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,16 +64,16 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(remainderf) __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(remainderf))(float __x,
                                                     float __p) {
-#line 1392 "kos/src/libc/magic/math.c"
-#ifdef __LIBM_MATHFUNF
+#line 865 "kos/src/libc/magic/math.c"
+#ifdef __LIBM_MATHFUN2F
 	if (((__p == 0.0f && !__LIBM_MATHFUNF(isnan, __x)) ||
 	     (__LIBM_MATHFUNF(isinf, __x) && !__LIBM_MATHFUNF(isnan, __p))) &&
 	    __LIBM_LIB_VERSION != __LIBM_IEEE)
 		return __kernel_standard_f(__x, __p, __p, __LIBM_KMATHERR_REMAINDER); /* remainder domain */
 	return __LIBM_MATHFUN2F(remainder, __x, __p);
-#else /* __LIBM_MATHFUNF */
+#else /* __LIBM_MATHFUN2F */
 	return (float)__localdep_remainder((double)__x, (double)__p);
-#endif /* !__LIBM_MATHFUNF */
+#endif /* !__LIBM_MATHFUN2F */
 }
 __NAMESPACE_LOCAL_END
 #endif /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __CRT_HAVE_remainder || __CRT_HAVE___remainder || __CRT_HAVE_drem || __CRT_HAVE___drem */

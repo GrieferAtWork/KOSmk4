@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe06992d8 */
+/* HASH CRC-32:0xea7ac42f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,16 +53,16 @@ __NAMESPACE_LOCAL_BEGIN
 /* Return the binary exponent of X, which must be nonzero */
 __LOCAL_LIBC(ilogbf) __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ilogbf))(float __x) {
-#line 1411 "kos/src/libc/magic/math.c"
+#line 868 "kos/src/libc/magic/math.c"
 #ifdef __LIBM_MATHFUNF
 	int __result;
-	__result = __LIBM_MATHFUNF(ilogb, __x);
+	__result = __LIBM_MATHFUNIF(ilogb, __x);
 	if (__result == __LIBM_FP_ILOGB0 || __result == __LIBM_FP_ILOGBNAN || __result == __INT_MAX__)
 		__kernel_standard_f(__x, __x, __x, __LIBM_KMATHERRF_ILOGB);
 	return __result;
-#else /* ... */
+#else /* __LIBM_MATHFUNF */
 	return __localdep_ilogb((double)__x);
-#endif /* !... */
+#endif /* !__LIBM_MATHFUNF */
 }
 __NAMESPACE_LOCAL_END
 #endif /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __CRT_HAVE_ilogb || __CRT_HAVE___ilogb */

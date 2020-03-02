@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaed9f3da */
+/* HASH CRC-32:0xb09104b8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Cosine of X */
 __LOCAL_LIBC(cosf) __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(cosf))(float __x) {
-#line 218 "kos/src/libc/magic/math.c"
+#line 197 "kos/src/libc/magic/math.c"
 	return (float)__localdep_cos((double)__x);
 }
 __NAMESPACE_LOCAL_END

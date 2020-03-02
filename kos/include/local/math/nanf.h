@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x81266d1c */
+/* HASH CRC-32:0xafccbbad */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,12 +51,12 @@ __NAMESPACE_LOCAL_BEGIN
 /* Return representation of qNaN for double type */
 __LOCAL_LIBC(nanf) __ATTR_CONST __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(nanf))(char const *__tagb) {
-#line 1214 "kos/src/libc/magic/math.c"
-#ifdef __LIBM_MATHFUN1IF
+#line 741 "kos/src/libc/magic/math.c"
+#ifdef __LIBM_MATHFUNF
 	return __LIBM_MATHFUN1IF(nan, __tagb);
-#else /* __LIBM_MATHFUN1IF */
+#else /* __LIBM_MATHFUNF */
 	return (float)__localdep_nan(__tagb);
-#endif /* !__LIBM_MATHFUN1IF */
+#endif /* !__LIBM_MATHFUNF */
 }
 __NAMESPACE_LOCAL_END
 #endif /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __CRT_HAVE_nan || __CRT_HAVE___nan */

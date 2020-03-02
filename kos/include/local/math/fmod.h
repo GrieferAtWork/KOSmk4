@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x875b6c5d */
+/* HASH CRC-32:0x4d7db16 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fmod) __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fmod))(double __x,
                                               double __y) {
-#line 1038 "kos/src/libc/magic/math.c"
+#line 677 "kos/src/libc/magic/math.c"
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
 	    (__LIBM_MATHFUN(isinf, __x) || __y == 0.0) &&
 	    !__LIBM_MATHFUN2(isunordered, __x, __y))

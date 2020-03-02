@@ -194,6 +194,7 @@ function key_libd_is_export(x: string): string {
 	return x.startswith("DOS$");
 }
 
+
 @@Set of all CRT functions assembly names exported by the kernel
 global allKernelCrtFunctions: {string...} = HashSet();
 global all_crt_features: {string...} = HashSet();
@@ -577,6 +578,9 @@ class DirectivesEnvironment {
 	}
 }
 
+global functions: {string: Function};
+global function_body_conversions;
+
 function split_words(
 		text: string, env: {string: string} | Function = none,
 		for_copy: bool = false): {(bool, string)...} {
@@ -587,7 +591,7 @@ function split_words(
 	local conditions_stack: {int...} = [];
 	local did_encounter_else_if_has_function = false;
 	local saved_env: Cell with DirectivesEnvironment = Cell();
-	function execExpression(expr: string): Object {
+	function getEnv(): DirectivesEnvironment {
 		local used_env;
 		if (saved_env)
 			used_env = saved_env.value;
@@ -600,7 +604,10 @@ function split_words(
 			}
 			saved_env.value = used_env;
 		}
-		return exec(expr, globals: used_env);
+		return used_env;
+	}
+	function execExpression(expr: string): Object {
+		return exec(expr, globals: getEnv());
 	}
 	for (;;) {
 		if (i >= length)
@@ -619,7 +626,7 @@ function split_words(
 			continue;
 		} else if (text.isdecimal(i)) {
 			do ++i;
-			while (i < length && text.isalnum(i));
+			while (i < length && (text.isalnum(i) || text[i] in "."));
 			yield (false, text[tok_start:i]);
 			continue;
 		} else if (text[i] == "@") {
@@ -639,6 +646,72 @@ function split_words(
 					case "exec":
 						execExpression(directive);
 						break;
+					case "insert": {
+						if (!directive || !directive.issymstrt(0))
+							throw Error("Expected keyword after @@insert ...@@");
+						local op_end = 1;
+						while (op_end < #directive && directive.issymstrt(op_end))
+							++op_end;
+						local op = directive[:op_end].rstrip();
+						directive = directive[op_end:].lstrip();
+						if (!directive.startswith("(") || !directive.endswith(")"))
+							throw Error("Operand for insert directive must have parenthesis");
+						directive = directive[1:-1].strip();
+						switch (op) {
+						case "copy": {
+							if (directive.count(",") != 1)
+								throw Error("`insert copy' expects 2 arguments");
+							local funname, none, mode = directive.partition(",")...;
+							funname = funname.strip();
+							local myFunction = getEnv().values["env"]["self"];
+							mode = mode.strip();
+							if (mode == "math") {
+								if (myFunction.hasArgumentOrReturnType("__LONGDOUBLE")) {
+									mode = "double2ldouble";
+								} else if (myFunction.hasArgumentOrReturnType("float")) {
+									mode = "double2float";
+								} else {
+									throw Error("Failed to differenciate between ldouble and float "
+									            "math modes for {} (please specify explicitly)"
+										.format({ funname }));
+								}
+							}
+							local converter = function_body_conversions.get(mode);
+							if (converter is none)
+								throw Error("Unknown copy mode: {!r}"
+									.format({ mode }));
+							if (funname == "%auto") {
+								funname = converter["auto"](myFunction.name);
+								if (funname is none)
+									throw Error("Failed to automatically determine bound function for {!r} with {!r}"
+										.format({ myFunction.name, mode }));
+							}
+							converter = converter["convert_body"];
+							local fun: Function = functions.get(funname);
+							if (fun is none)
+								throw Error("Unknown function: {!r}"
+									.format({ funname }));
+							local block = fun.block;
+							if (block !is string)
+								throw Error("Cannot copy from unimplemented function {!r}"
+									.format({  }));
+							for (;;) {
+								block = block.strip();
+								if (block.startswith("{") && block.endswith("}") &&
+								    block.findmatch("{", "}", 1) == #block-1) {
+									block = block[1:-1];
+									continue;
+								}
+								break;
+							}
+							block = converter(myFunction, fun, block);
+							yield split_words(block, env, for_copy)...;
+						}	break;
+						default:
+							throw Error("Unknown insert operation: {!r}"
+								.format({ op }));
+						}
+					}	break;
 					case "noreplace_on_copy": {
 						/* Don't consider the token a work during copy */
 						yield (!for_copy, directive);
@@ -1591,7 +1664,7 @@ function_body_conversions["direct"] = {
 	"convert_doc" : [](oldFunction: Function, newFunction: Function, docstring: string): string { return docstring; },
 };
 
-local double2float_conversions: {string: string} = Dict {
+global double2float_conversions: {string: string} = Dict {
 	"double" : "float"
 };
 function_body_conversions["double2float"] = {
@@ -1611,6 +1684,9 @@ function_body_conversions["double2float"] = {
 				word = double2float_conversions.get(word, word);
 				if (word is WeakReplacement)
 					word = word.repl;
+			} else {
+				if ("." in word && word.replace(".", "").isdecimal())
+					word = word + "f";
 			}
 			fp << word;
 		}
@@ -1619,7 +1695,7 @@ function_body_conversions["double2float"] = {
 	"convert_doc" : [](oldFunction: Function, newFunction: Function, docstring: string): string { return docstring; },
 };
 
-local double2ldouble_conversions: {string: string} = Dict {
+global double2ldouble_conversions: {string: string} = Dict {
 	"double" : "__LONGDOUBLE"
 };
 function_body_conversions["double2ldouble"] = {
@@ -1639,6 +1715,9 @@ function_body_conversions["double2ldouble"] = {
 				word = double2ldouble_conversions.get(word, word);
 				if (word is WeakReplacement)
 					word = word.repl;
+			} else {
+				if ("." in word && word.replace(".", "").isdecimal())
+					word = word + "L";
 			}
 			fp << word;
 		}
@@ -2049,6 +2128,80 @@ got_section_prefix:
 							err(directive_begin, "Conflicting replacement definition for `" + repr a + "' (new: " + repr b + ", old: " + repr replacement_words[a] + ")'");
 					} else {
 						replacement_words[a] = b;
+					}
+				} else if (directive.startswith("define_double2float_replacement")) {
+					directive = directive[#"define_double2float_replacement":].lstrip();
+					if (!directive.startswith("("))
+						err(directive_begin, "Expected `(' after `%[define_double2float_replacement' in " + repr directive);
+					local defend = directive.findmatch("(", ")", 1);
+					if (defend < 0)
+						err(directive_begin, "Missing `)' after `%[define_double2float_replacement" + repr directive + "'");
+					if (directive[defend + 1:].strip() != "")
+						err(directive_begin, "Trailing text after `%[define_double2float_replacement(...)': " + repr directive[defend:].strip());
+					directive = directive[1:defend].strip();
+					if ("=" !in directive)
+						err(directive_begin, "Missing `=' in `%[define_double2float_replacement(" + repr directive + ")'");
+					local a, none, b = directive.partition("=")...;
+					a = a.strip();
+					b = b.strip();
+					if (a in double2float_conversions) {
+						if (double2float_conversions[a] != b)
+							err(directive_begin, "Conflicting replacement definition for `" + repr a + "' (new: " + repr b + ", old: " + repr double2float_conversions[a] + ")'");
+					} else {
+						double2float_conversions[a] = b;
+					}
+				} else if (directive.startswith("define_double2ldouble_replacement")) {
+					directive = directive[#"define_double2ldouble_replacement":].lstrip();
+					if (!directive.startswith("("))
+						err(directive_begin, "Expected `(' after `%[define_double2ldouble_replacement' in " + repr directive);
+					local defend = directive.findmatch("(", ")", 1);
+					if (defend < 0)
+						err(directive_begin, "Missing `)' after `%[define_double2ldouble_replacement" + repr directive + "'");
+					if (directive[defend + 1:].strip() != "")
+						err(directive_begin, "Trailing text after `%[define_double2ldouble_replacement(...)': " + repr directive[defend:].strip());
+					directive = directive[1:defend].strip();
+					if ("=" !in directive)
+						err(directive_begin, "Missing `=' in `%[define_double2ldouble_replacement(" + repr directive + ")'");
+					local a, none, b = directive.partition("=")...;
+					a = a.strip();
+					b = b.strip();
+					if (a in double2ldouble_conversions) {
+						if (double2ldouble_conversions[a] != b)
+							err(directive_begin, "Conflicting replacement definition for `" + repr a + "' (new: " + repr b + ", old: " + repr double2ldouble_conversions[a] + ")'");
+					} else {
+						double2ldouble_conversions[a] = b;
+					}
+				} else if (directive.startswith("define_double_replacement")) {
+					directive = directive[#"define_double_replacement":].lstrip();
+					if (!directive.startswith("("))
+						err(directive_begin, "Expected `(' after `%[define_double_replacement' in " + repr directive);
+					local defend = directive.findmatch("(", ")", 1);
+					if (defend < 0)
+						err(directive_begin, "Missing `)' after `%[define_double_replacement" + repr directive + "'");
+					if (directive[defend + 1:].strip() != "")
+						err(directive_begin, "Trailing text after `%[define_double_replacement(...)': " + repr directive[defend:].strip());
+					directive = directive[1:defend].strip();
+					if ("=" !in directive)
+						err(directive_begin, "Missing `=' in `%[define_double_replacement(" + repr directive + ")'");
+					local a, none, b = directive.partition("=")...;
+					a = a.strip();
+					b = b.strip();
+					if ("," !in b)
+						err(directive_begin, "Missing `,' in `%[define_double_replacement(" + repr directive + ")'");
+					local b, none, c = b.partition(",")...;
+					b = b.strip();
+					c = c.strip();
+					if (a in double2float_conversions) {
+						if (double2float_conversions[a] != b)
+							err(directive_begin, "Conflicting replacement definition for `" + repr a + "' (new: " + repr b + ", old: " + repr double2float_conversions[a] + ")'");
+					} else {
+						double2float_conversions[a] = b;
+					}
+					if (a in double2ldouble_conversions) {
+						if (double2ldouble_conversions[a] != c)
+							err(directive_begin, "Conflicting replacement definition for `" + repr a + "' (new: " + repr c + ", old: " + repr double2ldouble_conversions[a] + ")'");
+					} else {
+						double2ldouble_conversions[a] = c;
 					}
 				} else if (directive.startswith("define_str2wcs_replacement")) {
 					directive = directive[#"define_str2wcs_replacement":].lstrip();
@@ -3559,6 +3712,106 @@ got_chk_checkexpr:
 #endif
 						}
 					}	break;
+					case "mathfun": {
+						local my_type = "%auto";
+						local basefunc = "%auto";
+						if (arg) {
+							my_type, none, basefunc = get_mode_arg().partition(",")...;
+							my_type = my_type.strip();
+							basefunc = basefunc.strip();
+						}
+						if (my_type == "%auto") {
+							if ("__LONGDOUBLE" in argument_list || "__LONGDOUBLE" in return_type) {
+								my_type = "ldouble";
+							} else if ("float" in argument_list || "float" in return_type) {
+								my_type = "float";
+							} else {
+								err(i, "Failed to differenciate between ldouble and float math modes for {!r} (please specify explicitly as `%{{auto_block(mathfun([float|ldouble], %auto))}}')"
+									.format({ funname }));
+							}
+						}
+						if (my_type in ["long_double", "long double", "ldouble"])
+							my_type = "__LONGDOUBLE";
+						if (my_type !in ["float", "__LONGDOUBLE"])
+							err(i, "mathfun type must be `float' or `__LONGDOUBLE', but is {!r}"
+								.format({ my_type }));
+						if (basefunc == "%auto") {
+							if (funname.endswith("f") || funname.endswith("l"))
+								basefunc = funname[:-1];
+							else {
+								err(i, "Failed to determine name of base function for {!r} "
+								       "(please specifiy explicity as `%{{auto_block(mathfun(%auto, <basefunc>))}}"
+									.format({ funname }));
+							}
+						}
+						local block_pattern =
+						"{{\n"
+						"#ifdef {mathfun_macro}\n"
+						"	@@insert copy({basefunc}, {copymode})@@\n"
+						"#else /* {mathfun_macro} */\n"
+						"	return {cast_return_type}{basefunc}({baseargs});\n"
+						"#endif /* !{mathfun_macro} */\n"
+						"}}";
+						local argList = Tuple(split_argument_list(argument_list));
+						block = block_pattern.format({
+							"mathfun_macro" : {
+								"float"        : ("__LIBM_MATHFUNF", "__LIBM_MATHFUN2F"),
+								"__LONGDOUBLE" : ("__LIBM_MATHFUNL", "__LIBM_MATHFUN2L"),
+							}[my_type][#argList == 2 ? 1 : 0],
+							"cast_return_type" :
+								return_type in ["float", "__LONGDOUBLE"]
+									? "({})".format({ return_type })
+									: "",
+							"copymode" : {
+								"float"        : "double2float",
+								"__LONGDOUBLE" : "double2ldouble",
+							}[my_type],
+							"basefunc" : basefunc,
+							"baseargs" : ", ".join(
+								for (local typ, nam: argList)
+									typ == my_type ? "(double)" + nam : nam)
+						});
+						if (libc_impl is none)
+							libc_impl = block;
+						if (user_impl is none)
+							user_impl = block;
+						if (doc is string && !doc) /* Inherit the doc of the original function. */
+							doc = CopyFunctionBody(basefunc, identitiyConverter);
+						/* Inhert the `dependency_prefix' of `basefunc' */
+						if (dependency_prefix.strip())
+							err(i, "%{mathfun...} function has a non-empty dependency_prefix");
+						if (requires_prefix.strip())
+							err(i, "%{mathfun...} function has a non-empty requires_prefix");
+						dependency_prefix = CopyFunctionBody(basefunc, identitiyConverter);
+						requires_prefix = "#include <ieee754.h>\n";
+						if (!define_require_string) {
+							/* Auto-define requirements to require the underlying function */
+							final local matchMacros: {string: (string, string, string)} = {
+								"float" : (
+									"__IEEE754_FLOAT_TYPE_IS_FLOAT__",
+									"__IEEE754_DOUBLE_TYPE_IS_FLOAT__",
+									"__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__",
+								),
+								"__LONGDOUBLE" : (
+									"__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__",
+									"__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__",
+									"__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__",
+								)
+							};
+							local m = matchMacros[my_type];
+							define_require_string =
+								"defined({}) || "
+								"defined({}) || "
+								"defined({}) || "
+								"$has_function({})"
+							.format({ m[0], m[1], m[2], basefunc });
+#ifndef EXPORTS_USE_USER_HEADERS
+							if (dont_export_symbol is none)
+								dont_export_symbol = "auto";
+#endif /* !EXPORTS_USE_USER_HEADERS */
+						}
+					}	break;
+
 					case "math": {
 						/* sinf:(float x) -> float %{auto_block(math)} */
 						local my_type = "double";
@@ -3607,7 +3860,7 @@ got_chk_checkexpr:
 							libc_impl = block;
 						if (user_impl is none)
 							user_impl = block;
-						if (!doc) /* Inherit the doc of the original function. */
+						if (doc is string && !doc) /* Inherit the doc of the original function. */
 							doc = CopyFunctionBody(basefunc, identitiyConverter);
 						if (!define_require_string) {
 							/* Auto-define requirements to require the underlying function */
@@ -4102,7 +4355,7 @@ class Function {
 	@@Sequence of (condition, alias_name) for preferred aliases of the function
 	member preferred_aliases: {(string, string)...};
 
-	@@Arguments taken by the function
+	@@Arguments taken by the function (typ, name)
 	member args: {(string, string)...};
 
 	@@Mapping for custom argument lists used by specific aliases
@@ -4250,6 +4503,21 @@ class Function {
 	private member m_dependencies: {Function...};
 	private member m_dependencies_names: {string...};
 	private member m_localvars: {string...};
+
+	function hasArgumentType(findTyp: string): bool {
+		for (local typ, none: args) {
+			if (typ == findTyp)
+				return true;
+		}
+		return false;
+	}
+	function hasReturnType(findTyp: string): bool {
+		return return_type == findTyp;
+	}
+	function hasArgumentOrReturnType(findTyp: string): bool {
+		return hasArgumentType(findTyp) || hasReturnType(findTyp);
+	}
+
 
 	@@Returns the {(string, string)...} block of arguments for an alias `name'
 	private function args_for(name) {
@@ -6873,6 +7141,16 @@ function linkFunctionAliases(func: Function) {
 		} else {
 			del func.component_name;
 		}
+	}
+	if (func.dependency_prefix is CopyFunctionBody) {
+		local alias_func = functions.get(func.dependency_prefix.name);
+		if (alias_func is none) {
+			print "Function", repr func.name,
+				"is aliasing the dependency_prefix of unknown function",
+				repr func.dependency_prefix.name;
+			throw "Failed to find aliased function";
+		}
+		func.dependency_prefix = alias_func.dependency_prefix;
 	}
 	local funblock = func.block;
 	if (funblock is CopyFunctionBody) {

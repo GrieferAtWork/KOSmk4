@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x525b16d6 */
+/* HASH CRC-32:0x5ce3b37f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,7 +20,7 @@
  */
 #ifndef __local_powl_defined
 #include <ieee754.h>
-#if defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow)
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow)
 #define __local_powl_defined 1
 #include <bits/math-vector.h>
 #include <bits/math-vector.h>
@@ -60,7 +60,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(powl) __DECL_SIMD_powl __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(powl))(__LONGDOUBLE __x,
                                               __LONGDOUBLE __y) {
-#line 846 "kos/src/libc/magic/math.c"
+#line 578 "kos/src/libc/magic/math.c"
 #ifdef __LIBM_MATHFUN2L
 	__LONGDOUBLE __result;
 	__result = __LIBM_MATHFUN2L(pow, __x, __y);
@@ -78,7 +78,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(powl))(__LONGDOUBLE __x,
 			__result = 1.0L;
 		} else if (__LIBM_LIB_VERSION != __LIBM_IEEE) {
 			if (__LIBM_MATHFUNIL(isnan, __x)) {
-				if (__y == 0.0L) /* pow(NaN, 0.0) */
+				if (__y == 0.0L) /* pow(NaN,0.0) */
 					return __kernel_standard_l(__x, __y, __result, __LIBM_KMATHERR_POW_NAN);
 			} else if (__LIBM_MATHFUNIL(finite, __x) && __LIBM_MATHFUNIL(finite, __y)) {
 				if (__LIBM_MATHFUNIL(isnan, __result)) { /* pow neg**non-int */
@@ -115,5 +115,5 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(powl))(__LONGDOUBLE __x,
 #endif /* !__LIBM_MATHFUN2L */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __CRT_HAVE_pow || __CRT_HAVE___pow */
+#endif /* __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __CRT_HAVE_pow || __CRT_HAVE___pow */
 #endif /* !__local_powl_defined */

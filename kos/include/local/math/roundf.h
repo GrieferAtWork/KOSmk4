@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x641af4d0 */
+/* HASH CRC-32:0x17560dba */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,17 +23,34 @@
 #include <hybrid/typecore.h>
 
 #include <libm/round.h>
+/* Dependency: "round" from "math" */
+#ifndef ____localdep_round_defined
+#define ____localdep_round_defined 1
+#if __has_builtin(__builtin_round) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_round)
+/* Round X to nearest integral value, rounding halfway cases away from zero */
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_round,(double __x),round,{ return __builtin_round(__x); })
+#elif defined(__CRT_HAVE_round)
+/* Round X to nearest integral value, rounding halfway cases away from zero */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_round,(double __x),round,(__x))
+#elif defined(__CRT_HAVE___round)
+/* Round X to nearest integral value, rounding halfway cases away from zero */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_round,(double __x),__round,(__x))
+#else /* LIBC: round */
+#include <local/math/round.h>
+/* Round X to nearest integral value, rounding halfway cases away from zero */
+#define __localdep_round (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(round))
+#endif /* round... */
+#endif /* !____localdep_round_defined */
+
 __NAMESPACE_LOCAL_BEGIN
+/* Round X to nearest integral value, rounding halfway cases away from zero */
 __LOCAL_LIBC(roundf) __ATTR_CONST __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(roundf))(float __x) {
-#line 1769 "kos/src/libc/magic/math.c"
-#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
-	return (float)__ieee754_roundf((__IEEE754_FLOAT_TYPE__)__x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
-	return (float)__ieee754_round((__IEEE754_DOUBLE_TYPE__)__x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
-	return (float)__ieee854_roundl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
-#else /* ... */
+#line 1106 "kos/src/libc/magic/math.c"
+#ifdef __LIBM_MATHFUNF
+	#ifdef __LIBM_MATHFUNF
+	return (float)__LIBM_MATHFUNF(round, __x);
+#else /* __LIBM_MATHFUN */
 	float __result;
 	__result = (float)(__INTMAX_TYPE__)__x;
 	if (__x < 0.0f) {
@@ -46,7 +63,10 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(roundf))(float __x) {
 			__result += 1.0f;
 	}
 	return __result;
-#endif /* !... */
+#endif /* !__LIBM_MATHFUN */
+#else /* __LIBM_MATHFUNF */
+	return (float)__localdep_round((double)__x);
+#endif /* !__LIBM_MATHFUNF */
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_roundf_defined */

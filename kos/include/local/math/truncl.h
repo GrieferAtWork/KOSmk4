@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9fd7d9d4 */
+/* HASH CRC-32:0xb424ba1e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,22 +20,47 @@
  */
 #ifndef __local_truncl_defined
 #define __local_truncl_defined 1
+#include <hybrid/typecore.h>
+
 #include <libm/trunc.h>
+/* Dependency: "trunc" from "math" */
+#ifndef ____localdep_trunc_defined
+#define ____localdep_trunc_defined 1
+#if __has_builtin(__builtin_trunc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_trunc)
+/* Round X to the integral value in floating-point
+ * format nearest but not larger in magnitude */
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_trunc,(double __x),trunc,{ return __builtin_trunc(__x); })
+#elif defined(__CRT_HAVE_trunc)
+/* Round X to the integral value in floating-point
+ * format nearest but not larger in magnitude */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_trunc,(double __x),trunc,(__x))
+#elif defined(__CRT_HAVE___trunc)
+/* Round X to the integral value in floating-point
+ * format nearest but not larger in magnitude */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_trunc,(double __x),__trunc,(__x))
+#else /* LIBC: trunc */
+#include <local/math/trunc.h>
+/* Round X to the integral value in floating-point
+ * format nearest but not larger in magnitude */
+#define __localdep_trunc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(trunc))
+#endif /* trunc... */
+#endif /* !____localdep_trunc_defined */
+
 __NAMESPACE_LOCAL_BEGIN
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
 __LOCAL_LIBC(truncl) __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(truncl))(__LONGDOUBLE __x) {
-#line 1963 "kos/src/libc/magic/math.c"
-#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return (__LONGDOUBLE)__ieee854_truncl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
-	return (__LONGDOUBLE)__ieee754_trunc((__IEEE754_DOUBLE_TYPE__)__x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
-	return (__LONGDOUBLE)__ieee754_truncf((__IEEE754_FLOAT_TYPE__)__x);
-#else /* ... */
+#line 1165 "kos/src/libc/magic/math.c"
+#ifdef __LIBM_MATHFUNL
+	#ifdef __LIBM_MATHFUNL
+	return __LIBM_MATHFUNL(trunc, __x);
+#else /* __LIBM_MATHFUN */
 	return (__LONGDOUBLE)(__INTMAX_TYPE__)__x;
-#endif /* !... */
+#endif /* !__LIBM_MATHFUN */
+#else /* __LIBM_MATHFUNL */
+	return (__LONGDOUBLE)__localdep_trunc((double)__x);
+#endif /* !__LIBM_MATHFUNL */
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_truncl_defined */

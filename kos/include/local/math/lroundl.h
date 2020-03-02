@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf981b65f */
+/* HASH CRC-32:0xc4d0384f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,35 +23,61 @@
 #include <hybrid/typecore.h>
 
 #include <libm/lround.h>
-/* Dependency: "roundl" from "math" */
-#ifndef ____localdep_roundl_defined
-#define ____localdep_roundl_defined 1
-#if __has_builtin(__builtin_roundl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_roundl)
-__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_roundl,(__LONGDOUBLE __x),roundl,{ return __builtin_roundl(__x); })
-#elif defined(__CRT_HAVE_roundl)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_roundl,(__LONGDOUBLE __x),roundl,(__x))
-#elif defined(__CRT_HAVE___roundl)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_roundl,(__LONGDOUBLE __x),__roundl,(__x))
-#else /* LIBC: roundl */
-#include <local/math/roundl.h>
-#define __localdep_roundl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(roundl))
-#endif /* roundl... */
-#endif /* !____localdep_roundl_defined */
+/* Dependency: "round" from "math" */
+#ifndef ____localdep_round_defined
+#define ____localdep_round_defined 1
+#if __has_builtin(__builtin_round) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_round)
+/* Round X to nearest integral value, rounding halfway cases away from zero */
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_round,(double __x),round,{ return __builtin_round(__x); })
+#elif defined(__CRT_HAVE_round)
+/* Round X to nearest integral value, rounding halfway cases away from zero */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_round,(double __x),round,(__x))
+#elif defined(__CRT_HAVE___round)
+/* Round X to nearest integral value, rounding halfway cases away from zero */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_round,(double __x),__round,(__x))
+#else /* LIBC: round */
+#include <local/math/round.h>
+/* Round X to nearest integral value, rounding halfway cases away from zero */
+#define __localdep_round (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(round))
+#endif /* round... */
+#endif /* !____localdep_round_defined */
+
+/* Dependency: "lround" from "math" */
+#ifndef ____localdep_lround_defined
+#define ____localdep_lround_defined 1
+#if __has_builtin(__builtin_lround) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lround)
+/* Round X to nearest integral value, rounding halfway cases away from zero */
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,__localdep_lround,(double __x),lround,{ return __builtin_lround(__x); })
+#elif defined(__CRT_HAVE_lround)
+/* Round X to nearest integral value, rounding halfway cases away from zero */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,__localdep_lround,(double __x),lround,(__x))
+#elif defined(__CRT_HAVE___lround)
+/* Round X to nearest integral value, rounding halfway cases away from zero */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,__localdep_lround,(double __x),__lround,(__x))
+#elif defined(__CRT_HAVE_llround) && (__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__)
+/* Round X to nearest integral value, rounding halfway cases away from zero */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,__localdep_lround,(double __x),llround,(__x))
+#else /* LIBC: lround */
+#include <local/math/lround.h>
+/* Round X to nearest integral value, rounding halfway cases away from zero */
+#define __localdep_lround (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lround))
+#endif /* lround... */
+#endif /* !____localdep_lround_defined */
 
 __NAMESPACE_LOCAL_BEGIN
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __LOCAL_LIBC(lroundl) __ATTR_CONST __ATTR_WUNUSED long int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(lroundl))(__LONGDOUBLE __x) {
-#line 1998 "kos/src/libc/magic/math.c"
-#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return __ieee854_lroundl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
-	return __ieee754_lroundf((__IEEE754_FLOAT_TYPE__)__x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
-	return __ieee754_lround((__IEEE754_DOUBLE_TYPE__)__x);
-#else /* ... */
-	return (long int)__localdep_roundl(__x);
-#endif /* !... */
+#line 1176 "kos/src/libc/magic/math.c"
+#ifdef __LIBM_MATHFUNL
+	#ifdef __LIBM_MATHFUNIL
+	return __LIBM_MATHFUNIL(lround, __x);
+#else /* __LIBM_MATHFUNI */
+	return (long int)__localdep_round(__x);
+#endif /* !__LIBM_MATHFUNI */
+#else /* __LIBM_MATHFUNL */
+	return __localdep_lround((double)__x);
+#endif /* !__LIBM_MATHFUNL */
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_lroundl_defined */

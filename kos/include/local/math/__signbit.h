@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdeb7d190 */
+/* HASH CRC-32:0xe73cd8e8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__signbit) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__signbit))(double __x) {
-#line 3117 "kos/src/libc/magic/math.c"
+#line 2054 "kos/src/libc/magic/math.c"
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	return __ieee754_signbit((__IEEE754_DOUBLE_TYPE__)__x);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)

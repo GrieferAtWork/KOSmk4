@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaaefe32b */
+/* HASH CRC-32:0x8e834037 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Hyperbolic sine of X */
 __LOCAL_LIBC(sinhl) __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(sinhl))(__LONGDOUBLE __x) {
-#line 314 "kos/src/libc/magic/math.c"
+#line 261 "kos/src/libc/magic/math.c"
 	return (__LONGDOUBLE)__localdep_sinh((double)__x);
 }
 __NAMESPACE_LOCAL_END

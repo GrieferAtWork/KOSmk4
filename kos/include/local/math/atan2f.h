@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x14609b9d */
+/* HASH CRC-32:0x7cd7ffb4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #include <ieee754.h>
 #if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2)
 #define __local_atan2f_defined 1
-#include <bits/huge_valf.h>
+#include <bits/huge_val.h>
 
 #include <libm/matherr.h>
 
@@ -56,18 +56,14 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(atan2f) __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(atan2f))(float __y,
                                                 float __x) {
-#line 202 "kos/src/libc/magic/math.c"
+#line 194 "kos/src/libc/magic/math.c"
+#ifdef __LIBM_MATHFUN2F
 	if (__LIBM_LIB_VERSION == __LIBM_SVID && __x == 0.0f && __y == 0.0f)
-		return __kernel_standard_f(__y, __x, HUGE_VALF, __LIBM_KMATHERR_ATAN2); /* atan2(+-0,+-0) */
-#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
-	return (float)__ieee754_atan2f((__IEEE754_FLOAT_TYPE__)__y, (__IEEE754_FLOAT_TYPE__)__x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
-	return (float)__ieee754_atan2((__IEEE754_DOUBLE_TYPE__)__y, (__IEEE754_DOUBLE_TYPE__)__x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
-	return (float)__ieee854_atan2l((__IEEE854_LONG_DOUBLE_TYPE__)__y, (__IEEE854_LONG_DOUBLE_TYPE__)__x);
-#else /* ... */
+		return __kernel_standard_f(__y, __x, HUGE_VAL, __LIBM_KMATHERR_ATAN2); /* atan2(+-0,+-0) */
+	return __LIBM_MATHFUN2F(atan2, __y, __x);
+#else /* __LIBM_MATHFUN2F */
 	return (float)__localdep_atan2((double)__y, (double)__x);
-#endif /* !... */
+#endif /* !__LIBM_MATHFUN2F */
 }
 __NAMESPACE_LOCAL_END
 #endif /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __CRT_HAVE_atan2 || __CRT_HAVE___atan2 */

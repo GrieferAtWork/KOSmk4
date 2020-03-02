@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb79216c */
+/* HASH CRC-32:0x812051b9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,19 +49,21 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),double,__NOTHROW_NCX,__localdep_f
 
 __NAMESPACE_LOCAL_BEGIN
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-__LOCAL_LIBC(frexpf) __ATTR_WUNUSED float
+__LOCAL_LIBC(frexpf) __ATTR_WUNUSED __ATTR_NONNULL((2)) float
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(frexpf))(float __x,
                                                     int *__pexponent) {
-#line 445 "kos/src/libc/magic/math.c"
-#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
-	return (float)__ieee754_frexpf((__IEEE754_FLOAT_TYPE__)__x, __pexponent);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+#line 387 "kos/src/libc/magic/math.c"
+#ifdef __LIBM_MATHFUN2F
+	#ifdef __IEEE754_DOUBLE_TYPE_IS_FLOAT__
 	return (float)__ieee754_frexp((__IEEE754_DOUBLE_TYPE__)__x, __pexponent);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
-	return (float)__ieee854_frexpl((__IEEE854_LONG_DOUBLE_TYPE__)__x, __pexponent);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__)
+	return (float)__ieee754_frexpf((__IEEE754_FLOAT_TYPE__)__x, __pexponent);
 #else /* ... */
-	return (float)__localdep_frexp((double)__x, __pexponent);
+	return (float)__ieee854_frexpl((__IEEE854_LONG_DOUBLE_TYPE__)__x, __pexponent);
 #endif /* !... */
+#else /* __LIBM_MATHFUN2F */
+	return (float)__localdep_frexp((double)__x, __pexponent);
+#endif /* !__LIBM_MATHFUN2F */
 }
 __NAMESPACE_LOCAL_END
 #endif /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __CRT_HAVE_frexp || __CRT_HAVE___frexp */

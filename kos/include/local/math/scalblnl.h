@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa7f456ab */
+/* HASH CRC-32:0xade265c1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,16 +58,18 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(scalblnl) __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(scalblnl))(__LONGDOUBLE __x,
                                                   long int __n) {
-#line 1918 "kos/src/libc/magic/math.c"
-#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return (__LONGDOUBLE)__ieee854_scalblnl((__IEEE854_LONG_DOUBLE_TYPE__)__x, __n);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+#line 1155 "kos/src/libc/magic/math.c"
+#ifdef __LIBM_MATHFUN2L
+	#ifdef __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__
 	return (__LONGDOUBLE)__ieee754_scalbln((__IEEE754_DOUBLE_TYPE__)__x, __n);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
 	return (__LONGDOUBLE)__ieee754_scalblnf((__IEEE754_FLOAT_TYPE__)__x, __n);
 #else /* ... */
-	return (__LONGDOUBLE)__localdep_scalbln((double)__x, __n);
+	return (__LONGDOUBLE)__ieee854_scalblnl((__IEEE854_LONG_DOUBLE_TYPE__)__x, __n);
 #endif /* !... */
+#else /* __LIBM_MATHFUN2L */
+	return (__LONGDOUBLE)__localdep_scalbln((double)__x, __n);
+#endif /* !__LIBM_MATHFUN2L */
 }
 __NAMESPACE_LOCAL_END
 #endif /* __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __CRT_HAVE_scalbln || __CRT_HAVE___scalbln || (__CRT_HAVE_scalbn && __SIZEOF_INT__ == __SIZEOF_LONG__) || (__CRT_HAVE___scalbn && __SIZEOF_INT__ == __SIZEOF_LONG__) */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdff6b303 */
+/* HASH CRC-32:0x1de47bd6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,16 +44,18 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___issignaling,(
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__issignalingl) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__issignalingl))(__LONGDOUBLE __x) {
-#line 3241 "kos/src/libc/magic/math.c"
-#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return __ieee854_issignalingl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+#line 2104 "kos/src/libc/magic/math.c"
+#ifdef __LIBM_MATHFUNL
+	#ifdef __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__
 	return __ieee754_issignaling((__IEEE754_DOUBLE_TYPE__)__x);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
 	return __ieee754_issignalingf((__IEEE754_FLOAT_TYPE__)__x);
 #else /* ... */
-	return __localdep___issignaling((double)__x);
+	return __ieee854_issignalingl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
 #endif /* !... */
+#else /* __LIBM_MATHFUNL */
+	return __localdep___issignaling((double)__x);
+#endif /* !__LIBM_MATHFUNL */
 }
 __NAMESPACE_LOCAL_END
 #endif /* __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __CRT_HAVE___issignaling || __CRT_HAVE_issignaling */

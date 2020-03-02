@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e47748e */
+/* HASH CRC-32:0x25c9629 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(ldexp) __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ldexp))(double __x,
                                                int __exponent) {
-#line 389 "kos/src/libc/magic/math.c"
+#line 336 "kos/src/libc/magic/math.c"
 	double __result;
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	__result = (double)__ieee754_ldexp((__IEEE754_DOUBLE_TYPE__)__x, __exponent);

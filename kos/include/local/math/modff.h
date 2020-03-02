@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f6ac0f */
+/* HASH CRC-32:0xc18296be */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,19 +52,18 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(modff) __ATTR_NONNULL((2)) float
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(modff))(float __x,
                                                    float *__iptr) {
-#line 507 "kos/src/libc/magic/math.c"
-#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
-	return (float)__ieee754_modff((__IEEE754_FLOAT_TYPE__)__x, (__IEEE754_FLOAT_TYPE__ *)__iptr);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+#line 400 "kos/src/libc/magic/math.c"
+#ifdef __LIBM_MATHFUN2F
+	#ifdef __IEEE754_DOUBLE_TYPE_IS_FLOAT__
 	return (float)__ieee754_modf((__IEEE754_DOUBLE_TYPE__)__x, (__IEEE754_DOUBLE_TYPE__ *)__iptr);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
-	return (float)__ieee854_modfl((__IEEE854_LONG_DOUBLE_TYPE__)__x, (__IEEE854_LONG_DOUBLE_TYPE__ *)__iptr);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__)
+	return (float)__ieee754_modff((__IEEE754_FLOAT_TYPE__)__x, (__IEEE754_FLOAT_TYPE__ *)__iptr);
 #else /* ... */
-	double __i, __result;
-	__result = __localdep_modf((double)__x, &__i);
-	*__iptr = (float)__i;
-	return (float)__result;
+	return (float)__ieee854_modfl((__IEEE854_LONG_DOUBLE_TYPE__)__x, (__IEEE854_LONG_DOUBLE_TYPE__ *)__iptr);
 #endif /* !... */
+#else /* __LIBM_MATHFUN2F */
+	return (float)__localdep_modf((double)__x, __iptr);
+#endif /* !__LIBM_MATHFUN2F */
 }
 __NAMESPACE_LOCAL_END
 #endif /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __CRT_HAVE_modf || __CRT_HAVE___modf */

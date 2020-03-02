@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x90a9507 */
+/* HASH CRC-32:0x3c168560 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,19 +23,42 @@
 #include <hybrid/typecore.h>
 
 #include <libm/floor.h>
+/* Dependency: "floor" from "math" */
+#ifndef ____localdep_floor_defined
+#define ____localdep_floor_defined 1
+#if __has_builtin(__builtin_floor) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_floor)
+/* Largest integer not greater than X */
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_floor,(double __x),floor,{ return __builtin_floor(__x); })
+#elif defined(__CRT_HAVE_floor)
+/* Largest integer not greater than X */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_floor,(double __x),floor,(__x))
+#elif defined(__CRT_HAVE___floor)
+/* Largest integer not greater than X */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_floor,(double __x),__floor,(__x))
+#else /* LIBC: floor */
+#include <local/math/floor.h>
+/* Largest integer not greater than X */
+#define __localdep_floor (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(floor))
+#endif /* floor... */
+#endif /* !____localdep_floor_defined */
+
 __NAMESPACE_LOCAL_BEGIN
 /* Largest integer not greater than X */
 __LOCAL_LIBC(floorl) __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(floorl))(__LONGDOUBLE __x) {
-#line 1135 "kos/src/libc/magic/math.c"
+#line 705 "kos/src/libc/magic/math.c"
 #ifdef __LIBM_MATHFUNL
+	#ifdef __LIBM_MATHFUNL
 	return __LIBM_MATHFUNL(floor, __x);
-#else /* __LIBM_MATHFUNL */
+#else /* __LIBM_MATHFUN */
 	__LONGDOUBLE __result;
 	__result = (__LONGDOUBLE)(__INTMAX_TYPE__)__x; /* Round towards 0 */
 	if (__result > __x)
 		__result -= 1.0L;
 	return __result;
+#endif /* !__LIBM_MATHFUN */
+#else /* __LIBM_MATHFUNL */
+	return (__LONGDOUBLE)__localdep_floor((double)__x);
 #endif /* !__LIBM_MATHFUNL */
 }
 __NAMESPACE_LOCAL_END

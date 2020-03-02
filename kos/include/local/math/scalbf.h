@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x81a0eaf9 */
+/* HASH CRC-32:0xe4793fc0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,16 @@
 #include <ieee754.h>
 #if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_scalb) || defined(__CRT_HAVE___scalb) || defined(__CRT_HAVE__scalb)
 #define __local_scalbf_defined 1
+#include <libm/isnan.h>
+
+#include <libm/finite.h>
+
+#include <libm/isinf.h>
+
+#include <libm/matherr.h>
+
+#include <parts/errno.h>
+
 #include <libm/scalb.h>
 /* Dependency: "scalb" from "math" */
 #ifndef ____localdep_scalb_defined
@@ -55,7 +65,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(scalbf) __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(scalbf))(float __x,
                                                 float __fn) {
-#line 2628 "kos/src/libc/magic/math.c"
+#line 1659 "kos/src/libc/magic/math.c"
 #ifdef __LIBM_MATHFUN2F
 	/*
 	 * ====================================================

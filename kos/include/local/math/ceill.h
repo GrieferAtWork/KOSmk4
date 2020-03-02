@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x96d21f32 */
+/* HASH CRC-32:0xb7679ce9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,19 +23,42 @@
 #include <hybrid/typecore.h>
 
 #include <libm/ceil.h>
+/* Dependency: "ceil" from "math" */
+#ifndef ____localdep_ceil_defined
+#define ____localdep_ceil_defined 1
+#if __has_builtin(__builtin_ceil) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ceil)
+/* Smallest integral value not less than X */
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_ceil,(double __x),ceil,{ return __builtin_ceil(__x); })
+#elif defined(__CRT_HAVE_ceil)
+/* Smallest integral value not less than X */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_ceil,(double __x),ceil,(__x))
+#elif defined(__CRT_HAVE___ceil)
+/* Smallest integral value not less than X */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_ceil,(double __x),__ceil,(__x))
+#else /* LIBC: ceil */
+#include <local/math/ceil.h>
+/* Smallest integral value not less than X */
+#define __localdep_ceil (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ceil))
+#endif /* ceil... */
+#endif /* !____localdep_ceil_defined */
+
 __NAMESPACE_LOCAL_BEGIN
 /* Smallest integral value not less than X */
 __LOCAL_LIBC(ceill) __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ceill))(__LONGDOUBLE __x) {
-#line 1110 "kos/src/libc/magic/math.c"
+#line 699 "kos/src/libc/magic/math.c"
 #ifdef __LIBM_MATHFUNL
+	#ifdef __LIBM_MATHFUNL
 	return __LIBM_MATHFUNL(ceil, __x);
-#else /* __LIBM_MATHFUNL */
+#else /* __LIBM_MATHFUN */
 	__LONGDOUBLE __result;
 	__result = (__LONGDOUBLE)(__INTMAX_TYPE__)__x; /* Round towards 0 */
 	if (__result < __x)
 		__result += 1.0L;
 	return __result;
+#endif /* !__LIBM_MATHFUN */
+#else /* __LIBM_MATHFUNL */
+	return (__LONGDOUBLE)__localdep_ceil((double)__x);
 #endif /* !__LIBM_MATHFUNL */
 }
 __NAMESPACE_LOCAL_END

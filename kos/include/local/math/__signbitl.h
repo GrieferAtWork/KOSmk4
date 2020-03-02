@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc2f0d860 */
+/* HASH CRC-32:0x53ad361 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,19 +21,36 @@
 #ifndef __local___signbitl_defined
 #define __local___signbitl_defined 1
 #include <libm/signbit.h>
+/* Dependency: "__signbit" from "math" */
+#ifndef ____localdep___signbit_defined
+#define ____localdep___signbit_defined 1
+#ifdef __CRT_HAVE___signbit
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___signbit,(double __x),__signbit,(__x))
+#elif defined(__CRT_HAVE__dsign)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___signbit,(double __x),_dsign,(__x))
+#else /* LIBC: __signbit */
+#include <local/math/__signbit.h>
+#define __localdep___signbit (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__signbit))
+#endif /* __signbit... */
+#endif /* !____localdep___signbit_defined */
+
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__signbitl) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__signbitl))(__LONGDOUBLE __x) {
-#line 3185 "kos/src/libc/magic/math.c"
-#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return __ieee854_signbitl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+#line 2078 "kos/src/libc/magic/math.c"
+#ifdef __LIBM_MATHFUNL
+	#ifdef __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__
 	return __ieee754_signbit((__IEEE754_DOUBLE_TYPE__)__x);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
 	return __ieee754_signbitf((__IEEE754_FLOAT_TYPE__)__x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+	return __ieee854_signbitl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
 #else /* ... */
 	return __x < 0.0L;
 #endif /* !... */
+#else /* __LIBM_MATHFUNL */
+	return __localdep___signbit((double)__x);
+#endif /* !__LIBM_MATHFUNL */
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local___signbitl_defined */

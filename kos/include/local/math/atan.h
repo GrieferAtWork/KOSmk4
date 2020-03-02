@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb74aa588 */
+/* HASH CRC-32:0x56bf442d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,19 +22,28 @@
 #include <ieee754.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #define __local_atan_defined 1
+#include <libm/fcomp.h>
+
+#include <libm/fabs.h>
+
+#include <libm/matherr.h>
+
+#include <libm/inf.h>
+
 #include <libm/atan.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Arc tangent of X */
-__LOCAL_LIBC(atan) __ATTR_CONST __ATTR_WUNUSED double
+__LOCAL_LIBC(atan) __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(atan))(double __x) {
-#line 127 "kos/src/libc/magic/math.c"
-#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
-	return (double)__ieee754_atan((__IEEE754_DOUBLE_TYPE__)__x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-	return (double)__ieee754_atanf((__IEEE754_FLOAT_TYPE__)__x);
-#else /* ... */
-	return (double)__ieee854_atanl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
-#endif /* !... */
+#line 144 "kos/src/libc/magic/math.c"
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
+	    __LIBM_MATHFUNI2(isgreaterequal, __LIBM_MATHFUN(fabs, __x), 1.0)) {
+		return __kernel_standard(__x, __x, __LIBM_MATHFUN0(inf),
+		                         __LIBM_MATHFUN(fabs, __x) > 1.0
+		                         ? __LIBM_KMATHERR_ATANH_PLUSONE /* atanh(|x|>1) */
+		                         : __LIBM_KMATHERR_ATANH_ONE);   /* atanh(|x|==1) */
+	}
+	return __LIBM_MATHFUN(atan, __x);
 }
 __NAMESPACE_LOCAL_END
 #endif /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */

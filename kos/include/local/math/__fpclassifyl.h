@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe7b5bd9 */
+/* HASH CRC-32:0x26bb5007 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,16 +46,18 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___fpclassify,(d
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__fpclassifyl) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__fpclassifyl))(__LONGDOUBLE __x) {
-#line 3171 "kos/src/libc/magic/math.c"
-#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return __ieee854_fpclassifyl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+#line 2075 "kos/src/libc/magic/math.c"
+#ifdef __LIBM_MATHFUNL
+	#ifdef __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__
 	return __ieee754_fpclassify((__IEEE754_DOUBLE_TYPE__)__x);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
 	return __ieee754_fpclassifyf((__IEEE754_FLOAT_TYPE__)__x);
 #else /* ... */
-	return __localdep___fpclassify((double)__x);
+	return __ieee854_fpclassifyl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
 #endif /* !... */
+#else /* __LIBM_MATHFUNL */
+	return __localdep___fpclassify((double)__x);
+#endif /* !__LIBM_MATHFUNL */
 }
 __NAMESPACE_LOCAL_END
 #endif /* __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __CRT_HAVE___fpclassify || __CRT_HAVE__dclass || __CRT_HAVE_fpclassify */

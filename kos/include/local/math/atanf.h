@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfae3ff2 */
+/* HASH CRC-32:0x289739c7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,19 +22,27 @@
 #include <ieee754.h>
 #if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan)
 #define __local_atanf_defined 1
+#include <libm/fcomp.h>
+
+#include <libm/fabs.h>
+
+#include <libm/matherr.h>
+
+#include <libm/inf.h>
+
 #include <libm/atan.h>
 /* Dependency: "atan" from "math" */
 #ifndef ____localdep_atan_defined
 #define ____localdep_atan_defined 1
 #if __has_builtin(__builtin_atan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atan)
 /* Arc tangent of X */
-__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_atan,(double __x),atan,{ return __builtin_atan(__x); })
+__CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_atan,(double __x),atan,{ return __builtin_atan(__x); })
 #elif defined(__CRT_HAVE_atan)
 /* Arc tangent of X */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_atan,(double __x),atan,(__x))
+__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_atan,(double __x),atan,(__x))
 #elif defined(__CRT_HAVE___atan)
 /* Arc tangent of X */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_atan,(double __x),__atan,(__x))
+__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_atan,(double __x),__atan,(__x))
 #else /* LIBC: atan */
 #include <ieee754.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
@@ -51,16 +59,19 @@ __NAMESPACE_LOCAL_BEGIN
 /* Arc tangent of X */
 __LOCAL_LIBC(atanf) __ATTR_CONST __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(atanf))(float __x) {
-#line 183 "kos/src/libc/magic/math.c"
-#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
-	return (float)__ieee754_atanf((__IEEE754_FLOAT_TYPE__)__x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
-	return (float)__ieee754_atan((__IEEE754_DOUBLE_TYPE__)__x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
-	return (float)__ieee854_atanl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
-#else /* ... */
+#line 191 "kos/src/libc/magic/math.c"
+#ifdef __LIBM_MATHFUNF
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
+	    __LIBM_MATHFUNI2F(isgreaterequal, __LIBM_MATHFUNF(fabs, __x), 1.0f)) {
+		return __kernel_standard_f(__x, __x, __LIBM_MATHFUN0F(inf),
+		                         __LIBM_MATHFUNF(fabs, __x) > 1.0f
+		                         ? __LIBM_KMATHERR_ATANH_PLUSONE /* atanh(|x|>1) */
+		                         : __LIBM_KMATHERR_ATANH_ONE);   /* atanh(|x|==1) */
+	}
+	return __LIBM_MATHFUNF(atan, __x);
+#else /* __LIBM_MATHFUNF */
 	return (float)__localdep_atan((double)__x);
-#endif /* !... */
+#endif /* !__LIBM_MATHFUNF */
 }
 __NAMESPACE_LOCAL_END
 #endif /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __CRT_HAVE_atan || __CRT_HAVE___atan */

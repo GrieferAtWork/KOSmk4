@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd35a3e14 */
+/* HASH CRC-32:0xfad472cf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,14 +27,8 @@ __NAMESPACE_LOCAL_BEGIN
 /* Return nonzero if VALUE is not a number */
 __LOCAL_LIBC(isnan) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(isnan))(double __x) {
-#line 2420 "kos/src/libc/magic/math.c"
-#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
-	return __ieee754_isnan((__IEEE754_DOUBLE_TYPE__)__x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-	return __ieee754_isnanf((__IEEE754_FLOAT_TYPE__)__x);
-#else /* ... */
-	return __ieee854_isnanl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
-#endif /* !... */
+#line 1492 "kos/src/libc/magic/math.c"
+	return __LIBM_MATHFUNI(isnan, __x);
 }
 __NAMESPACE_LOCAL_END
 #endif /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */

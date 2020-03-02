@@ -99,20 +99,21 @@ NOTHROW(LIBCCALL libc_asin)(double x)
 }
 /*[[[end:asin]]]*/
 
-/*[[[head:atan,hash:CRC-32=0xe217f05b]]]*/
+/*[[[head:atan,hash:CRC-32=0x745b0aa4]]]*/
 /* Arc tangent of X */
-INTERN ATTR_CONST WUNUSED
+INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.atan") double
 NOTHROW(LIBCCALL libc_atan)(double x)
 /*[[[body:atan]]]*/
 /*AUTO*/{
-#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
-	return (double)__ieee754_atan((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-	return (double)__ieee754_atanf((__IEEE754_FLOAT_TYPE__)x);
-#else /* ... */
-	return (double)__ieee854_atanl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#endif /* !... */
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
+	    __LIBM_MATHFUNI2(isgreaterequal, __LIBM_MATHFUN(fabs, x), 1.0)) {
+		return __kernel_standard(x, x, __LIBM_MATHFUN0(inf),
+		                         __LIBM_MATHFUN(fabs, x) > 1.0
+		                         ? __LIBM_KMATHERR_ATANH_PLUSONE /* atanh(|x|>1) */
+		                         : __LIBM_KMATHERR_ATANH_ONE);   /* atanh(|x|==1) */
+	}
+	return __LIBM_MATHFUN(atan, x);
 }
 /*[[[end:atan]]]*/
 
@@ -126,13 +127,7 @@ NOTHROW(LIBCCALL libc_atan2)(double y,
 /*AUTO*/{
 	if (__LIBM_LIB_VERSION == __LIBM_SVID && x == 0.0 && y == 0.0)
 		return __kernel_standard(y, x, HUGE_VAL, __LIBM_KMATHERR_ATAN2); /* atan2(+-0,+-0) */
-#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
-	return (double)__ieee754_atan2((__IEEE754_DOUBLE_TYPE__)y, (__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-	return (double)__ieee754_atan2f((__IEEE754_FLOAT_TYPE__)y, (__IEEE754_FLOAT_TYPE__)x);
-#else /* ... */
-	return (double)__ieee854_atan2l((__IEEE854_LONG_DOUBLE_TYPE__)y, (__IEEE854_LONG_DOUBLE_TYPE__)x);
-#endif /* !... */
+	return __LIBM_MATHFUN2(atan2, y, x);
 }
 /*[[[end:atan2]]]*/
 
@@ -207,15 +202,18 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.atanf") float
 NOTHROW(LIBCCALL libc_atanf)(float x)
 /*[[[body:atanf]]]*/
 /*AUTO*/{
-#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
-	return (float)__ieee754_atanf((__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
-	return (float)__ieee754_atan((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
-	return (float)__ieee854_atanl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#else /* ... */
+#ifdef __LIBM_MATHFUNF
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
+	    __LIBM_MATHFUNI2F(isgreaterequal, __LIBM_MATHFUNF(fabs, x), 1.0f)) {
+		return __kernel_standard_f(x, x, __LIBM_MATHFUN0F(inf),
+		                         __LIBM_MATHFUNF(fabs, x) > 1.0f
+		                         ? __LIBM_KMATHERR_ATANH_PLUSONE /* atanh(|x|>1) */
+		                         : __LIBM_KMATHERR_ATANH_ONE);   /* atanh(|x|==1) */
+	}
+	return __LIBM_MATHFUNF(atan, x);
+#else /* __LIBM_MATHFUNF */
 	return (float)libc_atan((double)x);
-#endif /* !... */
+#endif /* !__LIBM_MATHFUNF */
 }
 /*[[[end:atanf]]]*/
 
@@ -227,17 +225,13 @@ NOTHROW(LIBCCALL libc_atan2f)(float y,
                               float x)
 /*[[[body:atan2f]]]*/
 /*AUTO*/{
+#ifdef __LIBM_MATHFUN2F
 	if (__LIBM_LIB_VERSION == __LIBM_SVID && x == 0.0f && y == 0.0f)
-		return __kernel_standard_f(y, x, HUGE_VALF, __LIBM_KMATHERR_ATAN2); /* atan2(+-0,+-0) */
-#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
-	return (float)__ieee754_atan2f((__IEEE754_FLOAT_TYPE__)y, (__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
-	return (float)__ieee754_atan2((__IEEE754_DOUBLE_TYPE__)y, (__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
-	return (float)__ieee854_atan2l((__IEEE854_LONG_DOUBLE_TYPE__)y, (__IEEE854_LONG_DOUBLE_TYPE__)x);
-#else /* ... */
+		return __kernel_standard_f(y, x, HUGE_VAL, __LIBM_KMATHERR_ATAN2); /* atan2(+-0,+-0) */
+	return __LIBM_MATHFUN2F(atan2, y, x);
+#else /* __LIBM_MATHFUN2F */
 	return (float)libc_atan2((double)y, (double)x);
-#endif /* !... */
+#endif /* !__LIBM_MATHFUN2F */
 }
 /*[[[end:atan2f]]]*/
 
@@ -303,15 +297,18 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.atanl") __LONGDOUBLE
 NOTHROW(LIBCCALL libc_atanl)(__LONGDOUBLE x)
 /*[[[body:atanl]]]*/
 /*AUTO*/{
-#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return (__LONGDOUBLE)__ieee854_atanl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
-	return (__LONGDOUBLE)__ieee754_atan((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
-	return (__LONGDOUBLE)__ieee754_atanf((__IEEE754_FLOAT_TYPE__)x);
-#else /* ... */
+#ifdef __LIBM_MATHFUNL
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
+	    __LIBM_MATHFUNI2L(isgreaterequal, __LIBM_MATHFUNL(fabs, x), 1.0L)) {
+		return __kernel_standard_l(x, x, __LIBM_MATHFUN0L(inf),
+		                         __LIBM_MATHFUNL(fabs, x) > 1.0L
+		                         ? __LIBM_KMATHERR_ATANH_PLUSONE /* atanh(|x|>1) */
+		                         : __LIBM_KMATHERR_ATANH_ONE);   /* atanh(|x|==1) */
+	}
+	return __LIBM_MATHFUNL(atan, x);
+#else /* __LIBM_MATHFUNL */
 	return (__LONGDOUBLE)libc_atan((double)x);
-#endif /* !... */
+#endif /* !__LIBM_MATHFUNL */
 }
 /*[[[end:atanl]]]*/
 
@@ -323,17 +320,13 @@ NOTHROW(LIBCCALL libc_atan2l)(__LONGDOUBLE y,
                               __LONGDOUBLE x)
 /*[[[body:atan2l]]]*/
 /*AUTO*/{
+#ifdef __LIBM_MATHFUN2L
 	if (__LIBM_LIB_VERSION == __LIBM_SVID && x == 0.0L && y == 0.0L)
-		return __kernel_standard_l(y, x, HUGE_VALL, __LIBM_KMATHERR_ATAN2); /* atan2(+-0,+-0) */
-#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return (__LONGDOUBLE)__ieee854_atan2l((__IEEE854_LONG_DOUBLE_TYPE__)y, (__IEEE854_LONG_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
-	return (__LONGDOUBLE)__ieee754_atan2((__IEEE754_DOUBLE_TYPE__)y, (__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
-	return (__LONGDOUBLE)__ieee754_atan2f((__IEEE754_FLOAT_TYPE__)y, (__IEEE754_FLOAT_TYPE__)x);
-#else /* ... */
+		return __kernel_standard_l(y, x, HUGE_VAL, __LIBM_KMATHERR_ATAN2); /* atan2(+-0,+-0) */
+	return __LIBM_MATHFUN2L(atan2, y, x);
+#else /* __LIBM_MATHFUN2L */
 	return (__LONGDOUBLE)libc_atan2((double)y, (double)x);
-#endif /* !... */
+#endif /* !__LIBM_MATHFUN2L */
 }
 /*[[[end:atan2l]]]*/
 
@@ -703,23 +696,25 @@ NOTHROW(LIBCCALL libc_expf)(float x)
 }
 /*[[[end:expf]]]*/
 
-/*[[[head:frexpf,hash:CRC-32=0x58c0578b]]]*/
+/*[[[head:frexpf,hash:CRC-32=0xff10f057]]]*/
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-INTERN WUNUSED
+INTERN WUNUSED NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.frexpf") float
 NOTHROW_NCX(LIBCCALL libc_frexpf)(float x,
                                   int *pexponent)
 /*[[[body:frexpf]]]*/
 /*AUTO*/{
-#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
-	return (float)__ieee754_frexpf((__IEEE754_FLOAT_TYPE__)x, pexponent);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+#ifdef __LIBM_MATHFUN2F
+	#ifdef __IEEE754_DOUBLE_TYPE_IS_FLOAT__
 	return (float)__ieee754_frexp((__IEEE754_DOUBLE_TYPE__)x, pexponent);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
-	return (float)__ieee854_frexpl((__IEEE854_LONG_DOUBLE_TYPE__)x, pexponent);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__)
+	return (float)__ieee754_frexpf((__IEEE754_FLOAT_TYPE__)x, pexponent);
 #else /* ... */
-	return (float)libc_frexp((double)x, pexponent);
+	return (float)__ieee854_frexpl((__IEEE854_LONG_DOUBLE_TYPE__)x, pexponent);
 #endif /* !... */
+#else /* __LIBM_MATHFUN2F */
+	return (float)libc_frexp((double)x, pexponent);
+#endif /* !__LIBM_MATHFUN2F */
 }
 /*[[[end:frexpf]]]*/
 
@@ -731,33 +726,27 @@ NOTHROW(LIBCCALL libc_ldexpf)(float x,
                               int exponent)
 /*[[[body:ldexpf]]]*/
 /*AUTO*/{
-#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+#ifdef __LIBM_MATHFUN2F
 	float result;
-	result = (float)__ieee754_ldexpf((__IEEE754_FLOAT_TYPE__)x, exponent);
-#ifdef __ERANGE
-	if unlikely(!__ieee754_finitef((__IEEE754_FLOAT_TYPE__)result) || result == 0.0f)
-		__libc_seterrno(__ERANGE);
-#endif /* __ERANGE */
-	return result;
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
-	float result;
+#ifdef __IEEE754_DOUBLE_TYPE_IS_FLOAT__
 	result = (float)__ieee754_ldexp((__IEEE754_DOUBLE_TYPE__)x, exponent);
-#ifdef __ERANGE
 	if unlikely(!__ieee754_finite((__IEEE754_DOUBLE_TYPE__)result) || result == 0.0f)
-		__libc_seterrno(__ERANGE);
-#endif /* __ERANGE */
-	return result;
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
-	float result;
-	result = (float)__ieee854_ldexpl((__IEEE854_LONG_DOUBLE_TYPE__)x, exponent);
-#ifdef __ERANGE
-	if unlikely(!__ieee854_finitel((__IEEE854_LONG_DOUBLE_TYPE__)result) || result == 0.0f)
-		__libc_seterrno(__ERANGE);
-#endif /* __ERANGE */
-	return result;
+#elif defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__)
+	result = (float)__ieee754_ldexpf((__IEEE754_FLOAT_TYPE__)x, exponent);
+	if unlikely(!__ieee754_finitef((__IEEE754_FLOAT_TYPE__)result) || result == 0.0f)
 #else /* ... */
-	return (float)libc_ldexp((double)x, exponent);
+	result = (float)__ieee854_ldexpl((__IEEE854_LONG_DOUBLE_TYPE__)x, exponent);
+	if unlikely(!__ieee854_finitel((__IEEE854_LONG_DOUBLE_TYPE__)result) || result == 0.0f)
 #endif /* !... */
+	{
+#ifdef __ERANGE
+		__libc_seterrno(__ERANGE);
+#endif /* __ERANGE */
+	}
+	return result;
+#else /* __LIBM_MATHFUN2F */
+	return (float)libc_ldexp((double)x, exponent);
+#endif /* !__LIBM_MATHFUN2F */
 }
 /*[[[end:ldexpf]]]*/
 
@@ -791,18 +780,17 @@ NOTHROW_NCX(LIBCCALL libc_modff)(float x,
                                  float *iptr)
 /*[[[body:modff]]]*/
 /*AUTO*/{
-#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
-	return (float)__ieee754_modff((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__ *)iptr);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+#ifdef __LIBM_MATHFUN2F
+	#ifdef __IEEE754_DOUBLE_TYPE_IS_FLOAT__
 	return (float)__ieee754_modf((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__ *)iptr);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
-	return (float)__ieee854_modfl((__IEEE854_LONG_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__ *)iptr);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__)
+	return (float)__ieee754_modff((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__ *)iptr);
 #else /* ... */
-	double i, result;
-	result = libc_modf((double)x, &i);
-	*iptr = (float)i;
-	return (float)result;
+	return (float)__ieee854_modfl((__IEEE854_LONG_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__ *)iptr);
 #endif /* !... */
+#else /* __LIBM_MATHFUN2F */
+	return (float)libc_modf((double)x, iptr);
+#endif /* !__LIBM_MATHFUN2F */
 }
 /*[[[end:modff]]]*/
 
@@ -817,23 +805,25 @@ NOTHROW(LIBCCALL libc_expl)(__LONGDOUBLE x)
 }
 /*[[[end:expl]]]*/
 
-/*[[[head:frexpl,hash:CRC-32=0x2966641a]]]*/
+/*[[[head:frexpl,hash:CRC-32=0x4d7623d5]]]*/
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-INTERN WUNUSED
+INTERN WUNUSED NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.frexpl") __LONGDOUBLE
 NOTHROW_NCX(LIBCCALL libc_frexpl)(__LONGDOUBLE x,
                                   int *pexponent)
 /*[[[body:frexpl]]]*/
 /*AUTO*/{
-#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return (__LONGDOUBLE)__ieee854_frexpl((__IEEE854_LONG_DOUBLE_TYPE__)x, pexponent);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+#ifdef __LIBM_MATHFUN2L
+	#ifdef __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__
 	return (__LONGDOUBLE)__ieee754_frexp((__IEEE754_DOUBLE_TYPE__)x, pexponent);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
 	return (__LONGDOUBLE)__ieee754_frexpf((__IEEE754_FLOAT_TYPE__)x, pexponent);
 #else /* ... */
-	return (__LONGDOUBLE)libc_frexp((double)x, pexponent);
+	return (__LONGDOUBLE)__ieee854_frexpl((__IEEE854_LONG_DOUBLE_TYPE__)x, pexponent);
 #endif /* !... */
+#else /* __LIBM_MATHFUN2L */
+	return (__LONGDOUBLE)libc_frexp((double)x, pexponent);
+#endif /* !__LIBM_MATHFUN2L */
 }
 /*[[[end:frexpl]]]*/
 
@@ -845,33 +835,27 @@ NOTHROW(LIBCCALL libc_ldexpl)(__LONGDOUBLE x,
                               int exponent)
 /*[[[body:ldexpl]]]*/
 /*AUTO*/{
-#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+#ifdef __LIBM_MATHFUN2L
 	__LONGDOUBLE result;
-	result = (__LONGDOUBLE)__ieee854_ldexpl((__IEEE854_LONG_DOUBLE_TYPE__)x, exponent);
-#ifdef __ERANGE
-	if unlikely(!__ieee854_finitel((__IEEE854_LONG_DOUBLE_TYPE__)result) || result == 0.0L)
-		__libc_seterrno(__ERANGE);
-#endif /* __ERANGE */
-	return result;
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
-	__LONGDOUBLE result;
+#ifdef __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__
 	result = (__LONGDOUBLE)__ieee754_ldexp((__IEEE754_DOUBLE_TYPE__)x, exponent);
-#ifdef __ERANGE
 	if unlikely(!__ieee754_finite((__IEEE754_DOUBLE_TYPE__)result) || result == 0.0L)
-		__libc_seterrno(__ERANGE);
-#endif /* __ERANGE */
-	return result;
 #elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
-	__LONGDOUBLE result;
 	result = (__LONGDOUBLE)__ieee754_ldexpf((__IEEE754_FLOAT_TYPE__)x, exponent);
-#ifdef __ERANGE
 	if unlikely(!__ieee754_finitef((__IEEE754_FLOAT_TYPE__)result) || result == 0.0L)
+#else /* ... */
+	result = (__LONGDOUBLE)__ieee854_ldexpl((__IEEE854_LONG_DOUBLE_TYPE__)x, exponent);
+	if unlikely(!__ieee854_finitel((__IEEE854_LONG_DOUBLE_TYPE__)result) || result == 0.0L)
+#endif /* !... */
+	{
+#ifdef __ERANGE
 		__libc_seterrno(__ERANGE);
 #endif /* __ERANGE */
+	}
 	return result;
-#else /* ... */
+#else /* __LIBM_MATHFUN2L */
 	return (__LONGDOUBLE)libc_ldexp((double)x, exponent);
-#endif /* !... */
+#endif /* !__LIBM_MATHFUN2L */
 }
 /*[[[end:ldexpl]]]*/
 
@@ -905,18 +889,17 @@ NOTHROW_NCX(LIBCCALL libc_modfl)(__LONGDOUBLE x,
                                  __LONGDOUBLE *iptr)
 /*[[[body:modfl]]]*/
 /*AUTO*/{
-#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return (__LONGDOUBLE)__ieee854_modfl((__IEEE854_LONG_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__ *)iptr);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+#ifdef __LIBM_MATHFUN2L
+	#ifdef __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__
 	return (__LONGDOUBLE)__ieee754_modf((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__ *)iptr);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
 	return (__LONGDOUBLE)__ieee754_modff((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__ *)iptr);
 #else /* ... */
-	double i, result;
-	result = libc_modf((double)x, &i);
-	*iptr = (float)i;
-	return (float)result;
+	return (__LONGDOUBLE)__ieee854_modfl((__IEEE854_LONG_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__ *)iptr);
 #endif /* !... */
+#else /* __LIBM_MATHFUN2L */
+	return (__LONGDOUBLE)libc_modf((double)x, iptr);
+#endif /* !__LIBM_MATHFUN2L */
 }
 /*[[[end:modfl]]]*/
 
@@ -1277,7 +1260,7 @@ NOTHROW(LIBCCALL libc_powl)(__LONGDOUBLE x,
 			result = 1.0L;
 		} else if (__LIBM_LIB_VERSION != __LIBM_IEEE) {
 			if (__LIBM_MATHFUNIL(isnan, x)) {
-				if (y == 0.0L) /* pow(NaN, 0.0) */
+				if (y == 0.0L) /* pow(NaN,0.0) */
 					return __kernel_standard_l(x, y, result, __LIBM_KMATHERR_POW_NAN);
 			} else if (__LIBM_MATHFUNIL(finite, x) && __LIBM_MATHFUNIL(finite, y)) {
 				if (__LIBM_MATHFUNIL(isnan, result)) { /* pow neg**non-int */
@@ -1327,7 +1310,7 @@ NOTHROW(LIBCCALL libc_sqrtl)(__LONGDOUBLE x)
 		return __kernel_standard_l(x, x, __LIBM_MATHFUN1IL(nan, ""), __LIBM_KMATHERR_SQRT); /* sqrt(negative) */
 	return __LIBM_MATHFUNL(sqrt, x);
 #else /* __LIBM_MATHFUNL */
-	return (__LONGDOUBLE)sqrt((double)x);
+	return (__LONGDOUBLE)libc_sqrt((double)x);
 #endif /* !__LIBM_MATHFUNL */
 }
 /*[[[end:sqrtl]]]*/
@@ -1449,7 +1432,8 @@ NOTHROW(LIBCCALL libc_fmodf)(float x,
 }
 /*[[[end:fmodf]]]*/
 
-/*[[[head:fmodl,hash:CRC-32=0x17742b39]]]*/
+/*[[[head:fmodl,hash:CRC-32=0xf7efc4d6]]]*/
+/* Floating-point modulo remainder of X/Y */
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fmodl") __LONGDOUBLE
 NOTHROW(LIBCCALL libc_fmodl)(__LONGDOUBLE x,
@@ -1486,11 +1470,11 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.nanf") float
 NOTHROW(LIBCCALL libc_nanf)(char const *tagb)
 /*[[[body:nanf]]]*/
 /*AUTO*/{
-#ifdef __LIBM_MATHFUN1IF
+#ifdef __LIBM_MATHFUNF
 	return __LIBM_MATHFUN1IF(nan, tagb);
-#else /* __LIBM_MATHFUN1IF */
+#else /* __LIBM_MATHFUNF */
 	return (float)libc_nan(tagb);
-#endif /* !__LIBM_MATHFUN1IF */
+#endif /* !__LIBM_MATHFUNF */
 }
 /*[[[end:nanf]]]*/
 
@@ -1501,11 +1485,11 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.nanl") __LONGDOUBLE
 NOTHROW(LIBCCALL libc_nanl)(char const *tagb)
 /*[[[body:nanl]]]*/
 /*AUTO*/{
-#ifdef __LIBM_MATHFUN1IL
+#ifdef __LIBM_MATHFUNL
 	return __LIBM_MATHFUN1IL(nan, tagb);
-#else /* __LIBM_MATHFUN1IL */
+#else /* __LIBM_MATHFUNL */
 	return (__LONGDOUBLE)libc_nan(tagb);
-#endif /* !__LIBM_MATHFUN1IL */
+#endif /* !__LIBM_MATHFUNL */
 }
 /*[[[end:nanl]]]*/
 
@@ -1708,7 +1692,7 @@ NOTHROW(LIBCCALL libc_rintf)(float x)
 #ifdef __LIBM_MATHFUNF
 	return __LIBM_MATHFUNF(rint, x);
 #else /* __LIBM_MATHFUNF */
-	return (float)libc_rint((double)x);
+	return (float)rint((double)x);
 #endif /* !__LIBM_MATHFUNF */
 }
 /*[[[end:rintf]]]*/
@@ -1724,7 +1708,7 @@ NOTHROW(LIBCCALL libc_nextafterf)(float x,
 #ifdef __LIBM_MATHFUN2F
 	return __LIBM_MATHFUN2F(nextafter, x, y);
 #else /* __LIBM_MATHFUN2F */
-	return (float)libc_nextafter((double)x, (double)y);
+	return (float)nextafter((double)x, (double)y);
 #endif /* !__LIBM_MATHFUN2F */
 }
 /*[[[end:nextafterf]]]*/
@@ -1737,15 +1721,15 @@ NOTHROW(LIBCCALL libc_remainderf)(float x,
                                   float p)
 /*[[[body:remainderf]]]*/
 /*AUTO*/{
-#ifdef __LIBM_MATHFUNF
+#ifdef __LIBM_MATHFUN2F
 	if (((p == 0.0f && !__LIBM_MATHFUNF(isnan, x)) ||
 	     (__LIBM_MATHFUNF(isinf, x) && !__LIBM_MATHFUNF(isnan, p))) &&
 	    __LIBM_LIB_VERSION != __LIBM_IEEE)
 		return __kernel_standard_f(x, p, p, __LIBM_KMATHERR_REMAINDER); /* remainder domain */
 	return __LIBM_MATHFUN2F(remainder, x, p);
-#else /* __LIBM_MATHFUNF */
+#else /* __LIBM_MATHFUN2F */
 	return (float)libc_remainder((double)x, (double)p);
-#endif /* !__LIBM_MATHFUNF */
+#endif /* !__LIBM_MATHFUN2F */
 }
 /*[[[end:remainderf]]]*/
 
@@ -1758,13 +1742,13 @@ NOTHROW(LIBCCALL libc_ilogbf)(float x)
 /*AUTO*/{
 #ifdef __LIBM_MATHFUNF
 	int result;
-	result = __LIBM_MATHFUNF(ilogb, x);
+	result = __LIBM_MATHFUNIF(ilogb, x);
 	if (result == __LIBM_FP_ILOGB0 || result == __LIBM_FP_ILOGBNAN || result == INT_MAX)
 		__kernel_standard_f(x, x, x, __LIBM_KMATHERRF_ILOGB);
 	return result;
-#else /* ... */
+#else /* __LIBM_MATHFUNF */
 	return libc_ilogb((double)x);
-#endif /* !... */
+#endif /* !__LIBM_MATHFUNF */
 }
 /*[[[end:ilogbf]]]*/
 
@@ -1778,12 +1762,13 @@ NOTHROW(LIBCCALL libc_rintl)(__LONGDOUBLE x)
 #ifdef __LIBM_MATHFUNL
 	return __LIBM_MATHFUNL(rint, x);
 #else /* __LIBM_MATHFUNL */
-	return (__LONGDOUBLE)libc_rint((double)x);
+	return (__LONGDOUBLE)rint((double)x);
 #endif /* !__LIBM_MATHFUNL */
 }
 /*[[[end:rintl]]]*/
 
-/*[[[head:nextafterl,hash:CRC-32=0x20f1f4ff]]]*/
+/*[[[head:nextafterl,hash:CRC-32=0xf6e943fd]]]*/
+/* Return X + epsilon if X < Y, X - epsilon if X > Y */
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.nextafterl") __LONGDOUBLE
 NOTHROW(LIBCCALL libc_nextafterl)(__LONGDOUBLE x,
@@ -1793,7 +1778,7 @@ NOTHROW(LIBCCALL libc_nextafterl)(__LONGDOUBLE x,
 #ifdef __LIBM_MATHFUN2L
 	return __LIBM_MATHFUN2L(nextafter, x, y);
 #else /* __LIBM_MATHFUN2L */
-	return (__LONGDOUBLE)libc_nextafter((double)x, (double)y);
+	return (__LONGDOUBLE)nextafter((double)x, (double)y);
 #endif /* !__LIBM_MATHFUN2L */
 }
 /*[[[end:nextafterl]]]*/
@@ -1806,15 +1791,15 @@ NOTHROW(LIBCCALL libc_remainderl)(__LONGDOUBLE x,
                                   __LONGDOUBLE p)
 /*[[[body:remainderl]]]*/
 /*AUTO*/{
-#ifdef __LIBM_MATHFUNL
+#ifdef __LIBM_MATHFUN2L
 	if (((p == 0.0L && !__LIBM_MATHFUNL(isnan, x)) ||
 	     (__LIBM_MATHFUNL(isinf, x) && !__LIBM_MATHFUNL(isnan, p))) &&
 	    __LIBM_LIB_VERSION != __LIBM_IEEE)
 		return __kernel_standard_l(x, p, p, __LIBM_KMATHERR_REMAINDER); /* remainder domain */
 	return __LIBM_MATHFUN2L(remainder, x, p);
-#else /* __LIBM_MATHFUNL */
-	return (__LONGDOUBLE)remainder((double)x, (double)p);
-#endif /* !__LIBM_MATHFUNL */
+#else /* __LIBM_MATHFUN2L */
+	return (__LONGDOUBLE)libc_remainder((double)x, (double)p);
+#endif /* !__LIBM_MATHFUN2L */
 }
 /*[[[end:remainderl]]]*/
 
@@ -1825,15 +1810,15 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.ilogbl") int
 NOTHROW(LIBCCALL libc_ilogbl)(__LONGDOUBLE x)
 /*[[[body:ilogbl]]]*/
 /*AUTO*/{
-#ifdef __LIBM_MATHFUNIL
+#ifdef __LIBM_MATHFUNL
 	int result;
 	result = __LIBM_MATHFUNIL(ilogb, x);
 	if (result == __LIBM_FP_ILOGB0 || result == __LIBM_FP_ILOGBNAN || result == INT_MAX)
 		__kernel_standard_l(x, x, x, __LIBM_KMATHERRF_ILOGB);
 	return result;
-#else /* __LIBM_MATHFUNIL */
+#else /* __LIBM_MATHFUNL */
 	return libc_ilogb((double)x);
-#endif /* !__LIBM_MATHFUNIL */
+#endif /* !__LIBM_MATHFUNL */
 }
 /*[[[end:ilogbl]]]*/
 
@@ -1943,15 +1928,17 @@ NOTHROW(LIBCCALL libc_scalbnf)(float x,
                                int n)
 /*[[[body:scalbnf]]]*/
 /*AUTO*/{
-#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
-	return (float)__ieee754_scalbnf((__IEEE754_FLOAT_TYPE__)x, n);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+#ifdef __LIBM_MATHFUN2F
+	#ifdef __IEEE754_DOUBLE_TYPE_IS_FLOAT__
 	return (float)__ieee754_scalbn((__IEEE754_DOUBLE_TYPE__)x, n);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
-	return (float)__ieee854_scalbnl((__IEEE854_LONG_DOUBLE_TYPE__)x, n);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__)
+	return (float)__ieee754_scalbnf((__IEEE754_FLOAT_TYPE__)x, n);
 #else /* ... */
-	return (float)libc_scalbn((double)x, n);
+	return (float)__ieee854_scalbnl((__IEEE854_LONG_DOUBLE_TYPE__)x, n);
 #endif /* !... */
+#else /* __LIBM_MATHFUN2F */
+	return (float)libc_scalbn((double)x, n);
+#endif /* !__LIBM_MATHFUN2F */
 }
 /*[[[end:scalbnf]]]*/
 
@@ -1966,15 +1953,17 @@ NOTHROW(LIBCCALL libc_scalblnf)(float x,
                                 long int n)
 /*[[[body:scalblnf]]]*/
 /*AUTO*/{
-#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
-	return (float)__ieee754_scalblnf((__IEEE754_FLOAT_TYPE__)x, n);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+#ifdef __LIBM_MATHFUN2F
+	#ifdef __IEEE754_DOUBLE_TYPE_IS_FLOAT__
 	return (float)__ieee754_scalbln((__IEEE754_DOUBLE_TYPE__)x, n);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
-	return (float)__ieee754_scalblnl((__IEEE854_LONG_DOUBLE_TYPE__)x, n);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__)
+	return (float)__ieee754_scalblnf((__IEEE754_FLOAT_TYPE__)x, n);
 #else /* ... */
-	return (float)libc_scalbln((double)x, n);
+	return (float)__ieee854_scalblnl((__IEEE854_LONG_DOUBLE_TYPE__)x, n);
 #endif /* !... */
+#else /* __LIBM_MATHFUN2F */
+	return (float)libc_scalbln((double)x, n);
+#endif /* !__LIBM_MATHFUN2F */
 }
 #endif /* MAGIC:alias */
 /*[[[end:scalblnf]]]*/
@@ -2002,15 +1991,17 @@ NOTHROW(LIBCCALL libc_scalbnl)(__LONGDOUBLE x,
                                int n)
 /*[[[body:scalbnl]]]*/
 /*AUTO*/{
-#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return (__LONGDOUBLE)__ieee854_scalbnl((__IEEE854_LONG_DOUBLE_TYPE__)x, n);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+#ifdef __LIBM_MATHFUN2L
+	#ifdef __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__
 	return (__LONGDOUBLE)__ieee754_scalbn((__IEEE754_DOUBLE_TYPE__)x, n);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
 	return (__LONGDOUBLE)__ieee754_scalbnf((__IEEE754_FLOAT_TYPE__)x, n);
 #else /* ... */
-	return (__LONGDOUBLE)libc_scalbn((double)x, n);
+	return (__LONGDOUBLE)__ieee854_scalbnl((__IEEE854_LONG_DOUBLE_TYPE__)x, n);
 #endif /* !... */
+#else /* __LIBM_MATHFUN2L */
+	return (__LONGDOUBLE)libc_scalbn((double)x, n);
+#endif /* !__LIBM_MATHFUN2L */
 }
 /*[[[end:scalbnl]]]*/
 
@@ -2025,15 +2016,17 @@ NOTHROW(LIBCCALL libc_scalblnl)(__LONGDOUBLE x,
                                 long int n)
 /*[[[body:scalblnl]]]*/
 /*AUTO*/{
-#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return (__LONGDOUBLE)__ieee854_scalblnl((__IEEE854_LONG_DOUBLE_TYPE__)x, n);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+#ifdef __LIBM_MATHFUN2L
+	#ifdef __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__
 	return (__LONGDOUBLE)__ieee754_scalbln((__IEEE754_DOUBLE_TYPE__)x, n);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
 	return (__LONGDOUBLE)__ieee754_scalblnf((__IEEE754_FLOAT_TYPE__)x, n);
 #else /* ... */
-	return (__LONGDOUBLE)libc_scalbln((double)x, n);
+	return (__LONGDOUBLE)__ieee854_scalblnl((__IEEE854_LONG_DOUBLE_TYPE__)x, n);
 #endif /* !... */
+#else /* __LIBM_MATHFUN2L */
+	return (__LONGDOUBLE)libc_scalbln((double)x, n);
+#endif /* !__LIBM_MATHFUN2L */
 }
 #endif /* MAGIC:alias */
 /*[[[end:scalblnl]]]*/
@@ -2177,15 +2170,11 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.isinf") int
 NOTHROW(LIBCCALL libc_isinf)(double x)
 /*[[[body:isinf]]]*/
 /*AUTO*/{
-#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
-	return __ieee754_isinf((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-	return __ieee754_isinff((__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-	return __ieee854_isinfl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#else /* ... */
+#ifdef __LIBM_MATHFUNI
+	return __LIBM_MATHFUNI(isinf, x);
+#else /* __LIBM_MATHFUNI */
 	return x == HUGE_VAL;
-#endif /* !... */
+#endif /* !__LIBM_MATHFUNI */
 }
 /*[[[end:isinf]]]*/
 
@@ -2196,15 +2185,15 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.isinff") int
 NOTHROW(LIBCCALL libc_isinff)(float x)
 /*[[[body:isinff]]]*/
 /*AUTO*/{
-#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
-	return __ieee754_isinff((__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
-	return __ieee754_isinf((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
-	return __ieee854_isinfl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#else /* ... */
+#ifdef __LIBM_MATHFUNF
+	#ifdef __LIBM_MATHFUNIF
+	return __LIBM_MATHFUNIF(isinf, x);
+#else /* __LIBM_MATHFUNI */
+	return x == HUGE_VAL;
+#endif /* !__LIBM_MATHFUNI */
+#else /* __LIBM_MATHFUNF */
 	return libc_isinf((double)x);
-#endif /* !... */
+#endif /* !__LIBM_MATHFUNF */
 }
 /*[[[end:isinff]]]*/
 
@@ -2215,15 +2204,15 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.isinfl") int
 NOTHROW(LIBCCALL libc_isinfl)(__LONGDOUBLE x)
 /*[[[body:isinfl]]]*/
 /*AUTO*/{
-#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return __ieee854_isinfl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
-	return __ieee754_isinf((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
-	return __ieee754_isinff((__IEEE754_FLOAT_TYPE__)x);
-#else /* ... */
+#ifdef __LIBM_MATHFUNL
+	#ifdef __LIBM_MATHFUNIL
+	return __LIBM_MATHFUNIL(isinf, x);
+#else /* __LIBM_MATHFUNI */
+	return x == HUGE_VAL;
+#endif /* !__LIBM_MATHFUNI */
+#else /* __LIBM_MATHFUNL */
 	return libc_isinf((double)x);
-#endif /* !... */
+#endif /* !__LIBM_MATHFUNL */
 }
 /*[[[end:isinfl]]]*/
 
@@ -2234,15 +2223,11 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.finite") int
 NOTHROW(LIBCCALL libc_finite)(double x)
 /*[[[body:finite]]]*/
 /*AUTO*/{
-#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
-	return __ieee754_finite((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-	return __ieee754_finitef((__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-	return __ieee854_finitel((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#else /* ... */
+#ifdef __LIBM_MATHFUNI
+	return __LIBM_MATHFUNI(finite, x);
+#else /* __LIBM_MATHFUNI */
 	return !libc_isinf(x) && !libc_isnan(x);
-#endif /* !... */
+#endif /* !__LIBM_MATHFUNI */
 }
 /*[[[end:finite]]]*/
 
@@ -2267,16 +2252,15 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.finitef") int
 NOTHROW(LIBCCALL libc_finitef)(float x)
 /*[[[body:finitef]]]*/
 /*AUTO*/{
-#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
-	return __ieee754_finitef((__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
-	return __ieee754_finite((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
-	return __ieee854_finitel((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#else /* ... */
+#ifdef __LIBM_MATHFUNF
+	#ifdef __LIBM_MATHFUNIF
+	return __LIBM_MATHFUNIF(finite, x);
+#else /* __LIBM_MATHFUNI */
+	return !libc_isinf(x) && !libc_isnan(x);
+#endif /* !__LIBM_MATHFUNI */
+#else /* __LIBM_MATHFUNF */
 	return libc_finite((double)x);
-	//return !isinff(x) && !isnanf(x);
-#endif /* !... */
+#endif /* !__LIBM_MATHFUNF */
 }
 /*[[[end:finitef]]]*/
 
@@ -2298,16 +2282,15 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.finitel") int
 NOTHROW(LIBCCALL libc_finitel)(__LONGDOUBLE x)
 /*[[[body:finitel]]]*/
 /*AUTO*/{
-#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return __ieee854_finitel((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
-	return __ieee754_finite((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
-	return __ieee754_finitef((__IEEE754_FLOAT_TYPE__)x);
-#else /* ... */
+#ifdef __LIBM_MATHFUNL
+	#ifdef __LIBM_MATHFUNIL
+	return __LIBM_MATHFUNIL(finite, x);
+#else /* __LIBM_MATHFUNI */
+	return !libc_isinf(x) && !libc_isnan(x);
+#endif /* !__LIBM_MATHFUNI */
+#else /* __LIBM_MATHFUNL */
 	return libc_finite((double)x);
-	//return !isinfl(x) && !isnanl(x);
-#endif /* !... */
+#endif /* !__LIBM_MATHFUNL */
 }
 /*[[[end:finitel]]]*/
 
@@ -2329,13 +2312,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.isnan") int
 NOTHROW(LIBCCALL libc_isnan)(double x)
 /*[[[body:isnan]]]*/
 /*AUTO*/{
-#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
-	return __ieee754_isnan((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-	return __ieee754_isnanf((__IEEE754_FLOAT_TYPE__)x);
-#else /* ... */
-	return __ieee854_isnanl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#endif /* !... */
+	return __LIBM_MATHFUNI(isnan, x);
 }
 /*[[[end:isnan]]]*/
 
@@ -2346,15 +2323,11 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.isnanf") int
 NOTHROW(LIBCCALL libc_isnanf)(float x)
 /*[[[body:isnanf]]]*/
 /*AUTO*/{
-#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
-	return __ieee754_isnanf((__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
-	return __ieee754_isnan((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
-	return __ieee854_isnanl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#else /* ... */
+#ifdef __LIBM_MATHFUNF
+	return __LIBM_MATHFUNIF(isnan, x);
+#else /* __LIBM_MATHFUNF */
 	return libc_isnan((double)x);
-#endif /* !... */
+#endif /* !__LIBM_MATHFUNF */
 }
 /*[[[end:isnanf]]]*/
 
@@ -2365,15 +2338,11 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.isnanl") int
 NOTHROW(LIBCCALL libc_isnanl)(__LONGDOUBLE x)
 /*[[[body:isnanl]]]*/
 /*AUTO*/{
-#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return __ieee854_isnanl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
-	return __ieee754_isnanf((__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
-	return __ieee754_isnan((__IEEE754_DOUBLE_TYPE__)x);
-#else /* ... */
+#ifdef __LIBM_MATHFUNL
+	return __LIBM_MATHFUNIL(isnan, x);
+#else /* __LIBM_MATHFUNL */
 	return libc_isnan((double)x);
-#endif /* !... */
+#endif /* !__LIBM_MATHFUNL */
 }
 /*[[[end:isnanl]]]*/
 
@@ -2735,7 +2704,8 @@ NOTHROW(LIBCCALL libc_scalbf)(float x,
 }
 /*[[[end:scalbf]]]*/
 
-/*[[[head:scalbl,hash:CRC-32=0x86edbd2a]]]*/
+/*[[[head:scalbl,hash:CRC-32=0xb6435633]]]*/
+/* Return X times (2 to the Nth power) */
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.scalbl") __LONGDOUBLE
 NOTHROW(LIBCCALL libc_scalbl)(__LONGDOUBLE x,
@@ -2811,15 +2781,17 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.__fpclassifyf") int
 NOTHROW(LIBCCALL libc___fpclassifyf)(float x)
 /*[[[body:__fpclassifyf]]]*/
 /*AUTO*/{
-#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
-	return __ieee754_fpclassifyf((__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+#ifdef __LIBM_MATHFUNF
+	#ifdef __IEEE754_DOUBLE_TYPE_IS_FLOAT__
 	return __ieee754_fpclassify((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
-	return __ieee854_fpclassifyl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__)
+	return __ieee754_fpclassifyf((__IEEE754_FLOAT_TYPE__)x);
 #else /* ... */
-	return libc___fpclassify((double)x);
+	return __ieee854_fpclassifyl((__IEEE854_LONG_DOUBLE_TYPE__)x);
 #endif /* !... */
+#else /* __LIBM_MATHFUNF */
+	return libc___fpclassify((double)x);
+#endif /* !__LIBM_MATHFUNF */
 }
 /*[[[end:__fpclassifyf]]]*/
 
@@ -2829,15 +2801,17 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.__fpclassifyl") int
 NOTHROW(LIBCCALL libc___fpclassifyl)(__LONGDOUBLE x)
 /*[[[body:__fpclassifyl]]]*/
 /*AUTO*/{
-#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return __ieee854_fpclassifyl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+#ifdef __LIBM_MATHFUNL
+	#ifdef __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__
 	return __ieee754_fpclassify((__IEEE754_DOUBLE_TYPE__)x);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
 	return __ieee754_fpclassifyf((__IEEE754_FLOAT_TYPE__)x);
 #else /* ... */
-	return libc___fpclassify((double)x);
+	return __ieee854_fpclassifyl((__IEEE854_LONG_DOUBLE_TYPE__)x);
 #endif /* !... */
+#else /* __LIBM_MATHFUNL */
+	return libc___fpclassify((double)x);
+#endif /* !__LIBM_MATHFUNL */
 }
 /*[[[end:__fpclassifyl]]]*/
 
@@ -2863,15 +2837,17 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.__issignalingf") int
 NOTHROW(LIBCCALL libc___issignalingf)(float x)
 /*[[[body:__issignalingf]]]*/
 /*AUTO*/{
-#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
-	return __ieee754_issignalingf((__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+#ifdef __LIBM_MATHFUNF
+	#ifdef __IEEE754_DOUBLE_TYPE_IS_FLOAT__
 	return __ieee754_issignaling((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
-	return __ieee854_issignalingl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__)
+	return __ieee754_issignalingf((__IEEE754_FLOAT_TYPE__)x);
 #else /* ... */
-	return libc___issignaling((double)x);
+	return __ieee854_issignalingl((__IEEE854_LONG_DOUBLE_TYPE__)x);
 #endif /* !... */
+#else /* __LIBM_MATHFUNF */
+	return libc___issignaling((double)x);
+#endif /* !__LIBM_MATHFUNF */
 }
 /*[[[end:__issignalingf]]]*/
 
@@ -2881,17 +2857,505 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.__issignalingl") int
 NOTHROW(LIBCCALL libc___issignalingl)(__LONGDOUBLE x)
 /*[[[body:__issignalingl]]]*/
 /*AUTO*/{
-#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return __ieee854_issignalingl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+#ifdef __LIBM_MATHFUNL
+	#ifdef __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__
 	return __ieee754_issignaling((__IEEE754_DOUBLE_TYPE__)x);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
 	return __ieee754_issignalingf((__IEEE754_FLOAT_TYPE__)x);
 #else /* ... */
-	return libc___issignaling((double)x);
+	return __ieee854_issignalingl((__IEEE854_LONG_DOUBLE_TYPE__)x);
 #endif /* !... */
+#else /* __LIBM_MATHFUNL */
+	return libc___issignaling((double)x);
+#endif /* !__LIBM_MATHFUNL */
 }
 /*[[[end:__issignalingl]]]*/
+
+/*[[[head:ceilf,hash:CRC-32=0xe8dddf03]]]*/
+/* Smallest integral value not less than X */
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.ceilf") float
+NOTHROW(LIBCCALL libc_ceilf)(float x)
+/*[[[body:ceilf]]]*/
+/*AUTO*/{
+#ifdef __LIBM_MATHFUNF
+	#ifdef __LIBM_MATHFUNF
+	return __LIBM_MATHFUNF(ceil, x);
+#else /* __LIBM_MATHFUN */
+	float result;
+	result = (float)(__INTMAX_TYPE__)x; /* Round towards 0 */
+	if (result < x)
+		result += 1.0f;
+	return result;
+#endif /* !__LIBM_MATHFUN */
+#else /* __LIBM_MATHFUNF */
+	return (float)libc_ceil((double)x);
+#endif /* !__LIBM_MATHFUNF */
+}
+/*[[[end:ceilf]]]*/
+
+/*[[[head:fabsf,hash:CRC-32=0x1b2fc3fc]]]*/
+/* Absolute value of X */
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fabsf") float
+NOTHROW(LIBCCALL libc_fabsf)(float x)
+/*[[[body:fabsf]]]*/
+/*AUTO*/{
+#ifdef __LIBM_MATHFUNF
+	#ifdef __LIBM_MATHFUNF
+	return __LIBM_MATHFUNF(fabs, x);
+#else /* __LIBM_MATHFUN */
+	return x < 0.0f ? -x : x;
+#endif /* !__LIBM_MATHFUN */
+#else /* __LIBM_MATHFUNF */
+	return (float)libc_fabs((double)x);
+#endif /* !__LIBM_MATHFUNF */
+}
+/*[[[end:fabsf]]]*/
+
+/*[[[head:floorf,hash:CRC-32=0x96354a29]]]*/
+/* Largest integer not greater than X */
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.floorf") float
+NOTHROW(LIBCCALL libc_floorf)(float x)
+/*[[[body:floorf]]]*/
+/*AUTO*/{
+#ifdef __LIBM_MATHFUNF
+	#ifdef __LIBM_MATHFUNF
+	return __LIBM_MATHFUNF(floor, x);
+#else /* __LIBM_MATHFUN */
+	float result;
+	result = (float)(__INTMAX_TYPE__)x; /* Round towards 0 */
+	if (result > x)
+		result -= 1.0f;
+	return result;
+#endif /* !__LIBM_MATHFUN */
+#else /* __LIBM_MATHFUNF */
+	return (float)libc_floor((double)x);
+#endif /* !__LIBM_MATHFUNF */
+}
+/*[[[end:floorf]]]*/
+
+/*[[[head:ceill,hash:CRC-32=0x894e4f72]]]*/
+/* Smallest integral value not less than X */
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.ceill") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_ceill)(__LONGDOUBLE x)
+/*[[[body:ceill]]]*/
+/*AUTO*/{
+#ifdef __LIBM_MATHFUNL
+	#ifdef __LIBM_MATHFUNL
+	return __LIBM_MATHFUNL(ceil, x);
+#else /* __LIBM_MATHFUN */
+	__LONGDOUBLE result;
+	result = (__LONGDOUBLE)(__INTMAX_TYPE__)x; /* Round towards 0 */
+	if (result < x)
+		result += 1.0L;
+	return result;
+#endif /* !__LIBM_MATHFUN */
+#else /* __LIBM_MATHFUNL */
+	return (__LONGDOUBLE)libc_ceil((double)x);
+#endif /* !__LIBM_MATHFUNL */
+}
+/*[[[end:ceill]]]*/
+
+/*[[[head:fabsl,hash:CRC-32=0x7f23b509]]]*/
+/* Absolute value of X */
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fabsl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_fabsl)(__LONGDOUBLE x)
+/*[[[body:fabsl]]]*/
+/*AUTO*/{
+#ifdef __LIBM_MATHFUNL
+	#ifdef __LIBM_MATHFUNL
+	return __LIBM_MATHFUNL(fabs, x);
+#else /* __LIBM_MATHFUN */
+	return x < 0.0L ? -x : x;
+#endif /* !__LIBM_MATHFUN */
+#else /* __LIBM_MATHFUNL */
+	return (__LONGDOUBLE)libc_fabs((double)x);
+#endif /* !__LIBM_MATHFUNL */
+}
+/*[[[end:fabsl]]]*/
+
+/*[[[head:floorl,hash:CRC-32=0xcc8d6ffb]]]*/
+/* Largest integer not greater than X */
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.floorl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_floorl)(__LONGDOUBLE x)
+/*[[[body:floorl]]]*/
+/*AUTO*/{
+#ifdef __LIBM_MATHFUNL
+	#ifdef __LIBM_MATHFUNL
+	return __LIBM_MATHFUNL(floor, x);
+#else /* __LIBM_MATHFUN */
+	__LONGDOUBLE result;
+	result = (__LONGDOUBLE)(__INTMAX_TYPE__)x; /* Round towards 0 */
+	if (result > x)
+		result -= 1.0L;
+	return result;
+#endif /* !__LIBM_MATHFUN */
+#else /* __LIBM_MATHFUNL */
+	return (__LONGDOUBLE)libc_floor((double)x);
+#endif /* !__LIBM_MATHFUNL */
+}
+/*[[[end:floorl]]]*/
+
+/*[[[head:copysignf,hash:CRC-32=0x1f9d7422]]]*/
+/* Return X with its signed changed to Y's */
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.copysignf") float
+NOTHROW(LIBCCALL libc_copysignf)(float num,
+                                 float sign)
+/*[[[body:copysignf]]]*/
+/*AUTO*/{
+#ifdef __LIBM_MATHFUN2F
+	#ifdef __LIBM_MATHFUN2F
+	return __LIBM_MATHFUN2F(copysign, num, sign);
+#else /* __LIBM_MATHFUN2 */
+	if ((num < 0.0f) != (sign < 0.0f))
+		num = -num;
+	return num;
+#endif /* !__LIBM_MATHFUN2 */
+#else /* __LIBM_MATHFUN2F */
+	return (float)libc_copysign((double)num, (double)sign);
+#endif /* !__LIBM_MATHFUN2F */
+}
+/*[[[end:copysignf]]]*/
+
+/*[[[head:copysignl,hash:CRC-32=0x943c1a35]]]*/
+/* Return X with its signed changed to Y's */
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.copysignl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_copysignl)(__LONGDOUBLE num,
+                                 __LONGDOUBLE sign)
+/*[[[body:copysignl]]]*/
+/*AUTO*/{
+#ifdef __LIBM_MATHFUN2L
+	#ifdef __LIBM_MATHFUN2L
+	return __LIBM_MATHFUN2L(copysign, num, sign);
+#else /* __LIBM_MATHFUN2 */
+	if ((num < 0.0L) != (sign < 0.0L))
+		num = -num;
+	return num;
+#endif /* !__LIBM_MATHFUN2 */
+#else /* __LIBM_MATHFUN2L */
+	return (__LONGDOUBLE)libc_copysign((double)num, (double)sign);
+#endif /* !__LIBM_MATHFUN2L */
+}
+/*[[[end:copysignl]]]*/
+
+/*[[[head:roundf,hash:CRC-32=0x8822b456]]]*/
+/* Round X to nearest integral value, rounding halfway cases away from zero */
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.roundf") float
+NOTHROW(LIBCCALL libc_roundf)(float x)
+/*[[[body:roundf]]]*/
+/*AUTO*/{
+#ifdef __LIBM_MATHFUNF
+	#ifdef __LIBM_MATHFUNF
+	return (float)__LIBM_MATHFUNF(round, x);
+#else /* __LIBM_MATHFUN */
+	float result;
+	result = (float)(__INTMAX_TYPE__)x;
+	if (x < 0.0f) {
+		/* result >= x */
+		if ((result - x) >= 0.5f)
+			result -= 1.0f;
+	} else {
+		/* result <= x */
+		if ((x - result) >= 0.5f)
+			result += 1.0f;
+	}
+	return result;
+#endif /* !__LIBM_MATHFUN */
+#else /* __LIBM_MATHFUNF */
+	return (float)libc_round((double)x);
+#endif /* !__LIBM_MATHFUNF */
+}
+/*[[[end:roundf]]]*/
+
+/*[[[head:truncf,hash:CRC-32=0xcc614206]]]*/
+/* Round X to the integral value in floating-point
+ * format nearest but not larger in magnitude */
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.truncf") float
+NOTHROW(LIBCCALL libc_truncf)(float x)
+/*[[[body:truncf]]]*/
+/*AUTO*/{
+#ifdef __LIBM_MATHFUNF
+	#ifdef __LIBM_MATHFUNF
+	return __LIBM_MATHFUNF(trunc, x);
+#else /* __LIBM_MATHFUN */
+	return (float)(__INTMAX_TYPE__)x;
+#endif /* !__LIBM_MATHFUN */
+#else /* __LIBM_MATHFUNF */
+	return (float)libc_trunc((double)x);
+#endif /* !__LIBM_MATHFUNF */
+}
+/*[[[end:truncf]]]*/
+
+/*[[[head:lrintf,hash:CRC-32=0x6b9ca4e8]]]*/
+/* Round X to nearest integral value according to current rounding direction */
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.lrintf") long int
+NOTHROW(LIBCCALL libc_lrintf)(float x)
+/*[[[body:lrintf]]]*/
+/*AUTO*/{
+#ifdef __LIBM_MATHFUNF
+	#ifdef __LIBM_MATHFUNIF
+	return __LIBM_MATHFUNIF(lrint, x);
+#else /* __LIBM_MATHFUNI */
+	return (long int)libc_rint(x);
+#endif /* !__LIBM_MATHFUNI */
+#else /* __LIBM_MATHFUNF */
+	return libc_lrint((double)x);
+#endif /* !__LIBM_MATHFUNF */
+}
+/*[[[end:lrintf]]]*/
+
+/*[[[head:lroundf,hash:CRC-32=0x8a154dc1]]]*/
+/* Round X to nearest integral value, rounding halfway cases away from zero */
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.lroundf") long int
+NOTHROW(LIBCCALL libc_lroundf)(float x)
+/*[[[body:lroundf]]]*/
+/*AUTO*/{
+#ifdef __LIBM_MATHFUNF
+	#ifdef __LIBM_MATHFUNIF
+	return __LIBM_MATHFUNIF(lround, x);
+#else /* __LIBM_MATHFUNI */
+	return (long int)libc_round(x);
+#endif /* !__LIBM_MATHFUNI */
+#else /* __LIBM_MATHFUNF */
+	return libc_lround((double)x);
+#endif /* !__LIBM_MATHFUNF */
+}
+/*[[[end:lroundf]]]*/
+
+/*[[[head:llrintf,hash:CRC-32=0x66fa9122]]]*/
+/* Round X to nearest integral value according to current rounding direction */
+#if __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
+DEFINE_INTERN_ALIAS(libc_llrintf, libc_lrintf);
+#else
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.llrintf") __LONGLONG
+NOTHROW(LIBCCALL libc_llrintf)(float x)
+/*[[[body:llrintf]]]*/
+/*AUTO*/{
+#ifdef __LIBM_MATHFUNF
+	#ifdef __LIBM_MATHFUNIF
+	return __LIBM_MATHFUNIF(llrint, x);
+#else /* __LIBM_MATHFUNI */
+	return (__LONGLONG)libc_rint(x);
+#endif /* !__LIBM_MATHFUNI */
+#else /* __LIBM_MATHFUNF */
+	return libc_llrint((double)x);
+#endif /* !__LIBM_MATHFUNF */
+}
+#endif /* MAGIC:alias */
+/*[[[end:llrintf]]]*/
+
+/*[[[head:llroundf,hash:CRC-32=0x5eb0daeb]]]*/
+/* Round X to nearest integral value, rounding halfway cases away from zero */
+#if __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
+DEFINE_INTERN_ALIAS(libc_llroundf, libc_lroundf);
+#else
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.llroundf") __LONGLONG
+NOTHROW(LIBCCALL libc_llroundf)(float x)
+/*[[[body:llroundf]]]*/
+/*AUTO*/{
+#ifdef __LIBM_MATHFUNF
+	#ifdef __LIBM_MATHFUNIF
+	return __LIBM_MATHFUNIF(llround, x);
+#else /* __LIBM_MATHFUNI */
+	return (__LONGLONG)libc_round(x);
+#endif /* !__LIBM_MATHFUNI */
+#else /* __LIBM_MATHFUNF */
+	return libc_llround((double)x);
+#endif /* !__LIBM_MATHFUNF */
+}
+#endif /* MAGIC:alias */
+/*[[[end:llroundf]]]*/
+
+/*[[[head:roundl,hash:CRC-32=0x878fc836]]]*/
+/* Round X to nearest integral value, rounding halfway cases away from zero */
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.roundl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_roundl)(__LONGDOUBLE x)
+/*[[[body:roundl]]]*/
+/*AUTO*/{
+#ifdef __LIBM_MATHFUNL
+	#ifdef __LIBM_MATHFUNL
+	return (__LONGDOUBLE)__LIBM_MATHFUNL(round, x);
+#else /* __LIBM_MATHFUN */
+	__LONGDOUBLE result;
+	result = (__LONGDOUBLE)(__INTMAX_TYPE__)x;
+	if (x < 0.0L) {
+		/* result >= x */
+		if ((result - x) >= 0.5L)
+			result -= 1.0L;
+	} else {
+		/* result <= x */
+		if ((x - result) >= 0.5L)
+			result += 1.0L;
+	}
+	return result;
+#endif /* !__LIBM_MATHFUN */
+#else /* __LIBM_MATHFUNL */
+	return (__LONGDOUBLE)libc_round((double)x);
+#endif /* !__LIBM_MATHFUNL */
+}
+/*[[[end:roundl]]]*/
+
+/*[[[head:truncl,hash:CRC-32=0x8aa62a7c]]]*/
+/* Round X to the integral value in floating-point
+ * format nearest but not larger in magnitude */
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.truncl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_truncl)(__LONGDOUBLE x)
+/*[[[body:truncl]]]*/
+/*AUTO*/{
+#ifdef __LIBM_MATHFUNL
+	#ifdef __LIBM_MATHFUNL
+	return __LIBM_MATHFUNL(trunc, x);
+#else /* __LIBM_MATHFUN */
+	return (__LONGDOUBLE)(__INTMAX_TYPE__)x;
+#endif /* !__LIBM_MATHFUN */
+#else /* __LIBM_MATHFUNL */
+	return (__LONGDOUBLE)libc_trunc((double)x);
+#endif /* !__LIBM_MATHFUNL */
+}
+/*[[[end:truncl]]]*/
+
+/*[[[head:lrintl,hash:CRC-32=0x41db4132]]]*/
+/* Round X to nearest integral value according to current rounding direction */
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.lrintl") long int
+NOTHROW(LIBCCALL libc_lrintl)(__LONGDOUBLE x)
+/*[[[body:lrintl]]]*/
+/*AUTO*/{
+#ifdef __LIBM_MATHFUNL
+	#ifdef __LIBM_MATHFUNIL
+	return __LIBM_MATHFUNIL(lrint, x);
+#else /* __LIBM_MATHFUNI */
+	return (long int)libc_rint(x);
+#endif /* !__LIBM_MATHFUNI */
+#else /* __LIBM_MATHFUNL */
+	return libc_lrint((double)x);
+#endif /* !__LIBM_MATHFUNL */
+}
+/*[[[end:lrintl]]]*/
+
+/*[[[head:lroundl,hash:CRC-32=0x78bfc21c]]]*/
+/* Round X to nearest integral value, rounding halfway cases away from zero */
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.lroundl") long int
+NOTHROW(LIBCCALL libc_lroundl)(__LONGDOUBLE x)
+/*[[[body:lroundl]]]*/
+/*AUTO*/{
+#ifdef __LIBM_MATHFUNL
+	#ifdef __LIBM_MATHFUNIL
+	return __LIBM_MATHFUNIL(lround, x);
+#else /* __LIBM_MATHFUNI */
+	return (long int)libc_round(x);
+#endif /* !__LIBM_MATHFUNI */
+#else /* __LIBM_MATHFUNL */
+	return libc_lround((double)x);
+#endif /* !__LIBM_MATHFUNL */
+}
+/*[[[end:lroundl]]]*/
+
+/*[[[head:llrintl,hash:CRC-32=0x9148b49d]]]*/
+/* Round X to nearest integral value according to current rounding direction */
+#if __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
+DEFINE_INTERN_ALIAS(libc_llrintl, libc_lrintl);
+#else
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.llrintl") __LONGLONG
+NOTHROW(LIBCCALL libc_llrintl)(__LONGDOUBLE x)
+/*[[[body:llrintl]]]*/
+/*AUTO*/{
+#ifdef __LIBM_MATHFUNL
+	#ifdef __LIBM_MATHFUNIL
+	return __LIBM_MATHFUNIL(llrint, x);
+#else /* __LIBM_MATHFUNI */
+	return (__LONGLONG)libc_rint(x);
+#endif /* !__LIBM_MATHFUNI */
+#else /* __LIBM_MATHFUNL */
+	return libc_llrint((double)x);
+#endif /* !__LIBM_MATHFUNL */
+}
+#endif /* MAGIC:alias */
+/*[[[end:llrintl]]]*/
+
+/*[[[head:llroundl,hash:CRC-32=0x18d4d46]]]*/
+/* Round X to nearest integral value, rounding halfway cases away from zero */
+#if __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
+DEFINE_INTERN_ALIAS(libc_llroundl, libc_lroundl);
+#else
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.llroundl") __LONGLONG
+NOTHROW(LIBCCALL libc_llroundl)(__LONGDOUBLE x)
+/*[[[body:llroundl]]]*/
+/*AUTO*/{
+#ifdef __LIBM_MATHFUNL
+	#ifdef __LIBM_MATHFUNIL
+	return __LIBM_MATHFUNIL(llround, x);
+#else /* __LIBM_MATHFUNI */
+	return (__LONGLONG)libc_round(x);
+#endif /* !__LIBM_MATHFUNI */
+#else /* __LIBM_MATHFUNL */
+	return libc_llround((double)x);
+#endif /* !__LIBM_MATHFUNL */
+}
+#endif /* MAGIC:alias */
+/*[[[end:llroundl]]]*/
+
+/*[[[head:__signbitf,hash:CRC-32=0x595889ca]]]*/
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.__signbitf") int
+NOTHROW(LIBCCALL libc___signbitf)(float x)
+/*[[[body:__signbitf]]]*/
+/*AUTO*/{
+#ifdef __LIBM_MATHFUNF
+	#ifdef __IEEE754_DOUBLE_TYPE_IS_FLOAT__
+	return __ieee754_signbit((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__)
+	return __ieee754_signbitf((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	return __ieee854_signbitl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#else /* ... */
+	return x < 0.0f;
+#endif /* !... */
+#else /* __LIBM_MATHFUNF */
+	return libc___signbit((double)x);
+#endif /* !__LIBM_MATHFUNF */
+}
+/*[[[end:__signbitf]]]*/
+
+/*[[[head:__signbitl,hash:CRC-32=0xbe5a5fcb]]]*/
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.__signbitl") int
+NOTHROW(LIBCCALL libc___signbitl)(__LONGDOUBLE x)
+/*[[[body:__signbitl]]]*/
+/*AUTO*/{
+#ifdef __LIBM_MATHFUNL
+	#ifdef __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return __ieee754_signbit((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
+	return __ieee754_signbitf((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+	return __ieee854_signbitl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#else /* ... */
+	return x < 0.0L;
+#endif /* !... */
+#else /* __LIBM_MATHFUNL */
+	return libc___signbit((double)x);
+#endif /* !__LIBM_MATHFUNL */
+}
+/*[[[end:__signbitl]]]*/
 
 
 
@@ -2899,7 +3363,7 @@ NOTHROW(LIBCCALL libc___issignalingl)(__LONGDOUBLE x)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x29c97654]]]*/
+/*[[[start:exports,hash:CRC-32=0xd15184ff]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(acos, libc_acos);
 DEFINE_PUBLIC_WEAK_ALIAS(__acos, libc_acos);
 DEFINE_PUBLIC_WEAK_ALIAS(asin, libc_asin);
@@ -3071,14 +3535,30 @@ DEFINE_PUBLIC_WEAK_ALIAS(cbrtl, libc_cbrtl);
 DEFINE_PUBLIC_WEAK_ALIAS(__cbrtl, libc_cbrtl);
 DEFINE_PUBLIC_WEAK_ALIAS(fmod, libc_fmod);
 DEFINE_PUBLIC_WEAK_ALIAS(__fmod, libc_fmod);
+DEFINE_PUBLIC_WEAK_ALIAS(ceilf, libc_ceilf);
+DEFINE_PUBLIC_WEAK_ALIAS(__ceilf, libc_ceilf);
+DEFINE_PUBLIC_WEAK_ALIAS(fabsf, libc_fabsf);
+DEFINE_PUBLIC_WEAK_ALIAS(__fabsf, libc_fabsf);
+DEFINE_PUBLIC_WEAK_ALIAS(floorf, libc_floorf);
+DEFINE_PUBLIC_WEAK_ALIAS(__floorf, libc_floorf);
 DEFINE_PUBLIC_WEAK_ALIAS(fmodf, libc_fmodf);
 DEFINE_PUBLIC_WEAK_ALIAS(__fmodf, libc_fmodf);
+DEFINE_PUBLIC_WEAK_ALIAS(ceill, libc_ceill);
+DEFINE_PUBLIC_WEAK_ALIAS(__ceill, libc_ceill);
+DEFINE_PUBLIC_WEAK_ALIAS(fabsl, libc_fabsl);
+DEFINE_PUBLIC_WEAK_ALIAS(__fabsl, libc_fabsl);
+DEFINE_PUBLIC_WEAK_ALIAS(floorl, libc_floorl);
+DEFINE_PUBLIC_WEAK_ALIAS(__floorl, libc_floorl);
 DEFINE_PUBLIC_WEAK_ALIAS(fmodl, libc_fmodl);
 DEFINE_PUBLIC_WEAK_ALIAS(__fmodl, libc_fmodl);
 DEFINE_PUBLIC_WEAK_ALIAS(nan, libc_nan);
 DEFINE_PUBLIC_WEAK_ALIAS(__nan, libc_nan);
+DEFINE_PUBLIC_WEAK_ALIAS(copysignf, libc_copysignf);
+DEFINE_PUBLIC_WEAK_ALIAS(__copysignf, libc_copysignf);
 DEFINE_PUBLIC_WEAK_ALIAS(nanf, libc_nanf);
 DEFINE_PUBLIC_WEAK_ALIAS(__nanf, libc_nanf);
+DEFINE_PUBLIC_WEAK_ALIAS(copysignl, libc_copysignl);
+DEFINE_PUBLIC_WEAK_ALIAS(__copysignl, libc_copysignl);
 DEFINE_PUBLIC_WEAK_ALIAS(nanl, libc_nanl);
 DEFINE_PUBLIC_WEAK_ALIAS(__nanl, libc_nanl);
 DEFINE_PUBLIC_WEAK_ALIAS(erf, libc_erf);
@@ -3164,14 +3644,38 @@ DEFINE_PUBLIC_WEAK_ALIAS(scalbnf, libc_scalbnf);
 DEFINE_PUBLIC_WEAK_ALIAS(__scalbnf, libc_scalbnf);
 DEFINE_PUBLIC_WEAK_ALIAS(scalblnf, libc_scalblnf);
 DEFINE_PUBLIC_WEAK_ALIAS(__scalblnf, libc_scalblnf);
+DEFINE_PUBLIC_WEAK_ALIAS(roundf, libc_roundf);
+DEFINE_PUBLIC_WEAK_ALIAS(__roundf, libc_roundf);
+DEFINE_PUBLIC_WEAK_ALIAS(truncf, libc_truncf);
+DEFINE_PUBLIC_WEAK_ALIAS(__truncf, libc_truncf);
 DEFINE_PUBLIC_WEAK_ALIAS(remquof, libc_remquof);
 DEFINE_PUBLIC_WEAK_ALIAS(__remquof, libc_remquof);
+DEFINE_PUBLIC_WEAK_ALIAS(lrintf, libc_lrintf);
+DEFINE_PUBLIC_WEAK_ALIAS(__lrintf, libc_lrintf);
+DEFINE_PUBLIC_WEAK_ALIAS(lroundf, libc_lroundf);
+DEFINE_PUBLIC_WEAK_ALIAS(__lroundf, libc_lroundf);
+DEFINE_PUBLIC_WEAK_ALIAS(llrintf, libc_llrintf);
+DEFINE_PUBLIC_WEAK_ALIAS(__llrintf, libc_llrintf);
+DEFINE_PUBLIC_WEAK_ALIAS(llroundf, libc_llroundf);
+DEFINE_PUBLIC_WEAK_ALIAS(__llroundf, libc_llroundf);
 DEFINE_PUBLIC_WEAK_ALIAS(scalbnl, libc_scalbnl);
 DEFINE_PUBLIC_WEAK_ALIAS(__scalbnl, libc_scalbnl);
 DEFINE_PUBLIC_WEAK_ALIAS(scalblnl, libc_scalblnl);
 DEFINE_PUBLIC_WEAK_ALIAS(__scalblnl, libc_scalblnl);
+DEFINE_PUBLIC_WEAK_ALIAS(roundl, libc_roundl);
+DEFINE_PUBLIC_WEAK_ALIAS(__roundl, libc_roundl);
+DEFINE_PUBLIC_WEAK_ALIAS(truncl, libc_truncl);
+DEFINE_PUBLIC_WEAK_ALIAS(__truncl, libc_truncl);
 DEFINE_PUBLIC_WEAK_ALIAS(remquol, libc_remquol);
 DEFINE_PUBLIC_WEAK_ALIAS(__remquol, libc_remquol);
+DEFINE_PUBLIC_WEAK_ALIAS(lrintl, libc_lrintl);
+DEFINE_PUBLIC_WEAK_ALIAS(__lrintl, libc_lrintl);
+DEFINE_PUBLIC_WEAK_ALIAS(lroundl, libc_lroundl);
+DEFINE_PUBLIC_WEAK_ALIAS(__lroundl, libc_lroundl);
+DEFINE_PUBLIC_WEAK_ALIAS(llrintl, libc_llrintl);
+DEFINE_PUBLIC_WEAK_ALIAS(__llrintl, libc_llrintl);
+DEFINE_PUBLIC_WEAK_ALIAS(llroundl, libc_llroundl);
+DEFINE_PUBLIC_WEAK_ALIAS(__llroundl, libc_llroundl);
 DEFINE_PUBLIC_WEAK_ALIAS(sincos, libc_sincos);
 DEFINE_PUBLIC_WEAK_ALIAS(__sincos, libc_sincos);
 DEFINE_PUBLIC_WEAK_ALIAS(exp10, libc_exp10);
@@ -3272,9 +3776,13 @@ DEFINE_PUBLIC_WEAK_ALIAS(fpclassify, libc___fpclassify);
 DEFINE_PUBLIC_WEAK_ALIAS(__fpclassifyf, libc___fpclassifyf);
 DEFINE_PUBLIC_WEAK_ALIAS(_fdclass, libc___fpclassifyf);
 DEFINE_PUBLIC_WEAK_ALIAS(fpclassifyf, libc___fpclassifyf);
+DEFINE_PUBLIC_WEAK_ALIAS(__signbitf, libc___signbitf);
+DEFINE_PUBLIC_WEAK_ALIAS(_fdsign, libc___signbitf);
 DEFINE_PUBLIC_WEAK_ALIAS(__fpclassifyl, libc___fpclassifyl);
 DEFINE_PUBLIC_WEAK_ALIAS(_ldclass, libc___fpclassifyl);
 DEFINE_PUBLIC_WEAK_ALIAS(fpclassifyl, libc___fpclassifyl);
+DEFINE_PUBLIC_WEAK_ALIAS(__signbitl, libc___signbitl);
+DEFINE_PUBLIC_WEAK_ALIAS(_ldsign, libc___signbitl);
 DEFINE_PUBLIC_WEAK_ALIAS(__issignaling, libc___issignaling);
 DEFINE_PUBLIC_WEAK_ALIAS(issignaling, libc___issignaling);
 DEFINE_PUBLIC_WEAK_ALIAS(__issignalingf, libc___issignalingf);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x64227337 */
+/* HASH CRC-32:0x96374fcd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -398,17 +398,35 @@ __NAMESPACE_STD_USING(floor)
 #define __fmod_defined 1
 __NAMESPACE_STD_USING(fmod)
 #endif /* !__fmod_defined && !__std_fmod_defined */
+#if !defined(__ceilf_defined) && defined(__std_ceilf_defined)
+#define __ceilf_defined 1
 __NAMESPACE_STD_USING(ceilf)
+#endif /* !__ceilf_defined && !__std_ceilf_defined */
+#if !defined(__fabsf_defined) && defined(__std_fabsf_defined)
+#define __fabsf_defined 1
 __NAMESPACE_STD_USING(fabsf)
+#endif /* !__fabsf_defined && !__std_fabsf_defined */
+#if !defined(__floorf_defined) && defined(__std_floorf_defined)
+#define __floorf_defined 1
 __NAMESPACE_STD_USING(floorf)
+#endif /* !__floorf_defined && !__std_floorf_defined */
 #if !defined(__fmodf_defined) && defined(__std_fmodf_defined)
 #define __fmodf_defined 1
 __NAMESPACE_STD_USING(fmodf)
 #endif /* !__fmodf_defined && !__std_fmodf_defined */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
+#if !defined(__ceill_defined) && defined(__std_ceill_defined)
+#define __ceill_defined 1
 __NAMESPACE_STD_USING(ceill)
+#endif /* !__ceill_defined && !__std_ceill_defined */
+#if !defined(__fabsl_defined) && defined(__std_fabsl_defined)
+#define __fabsl_defined 1
 __NAMESPACE_STD_USING(fabsl)
+#endif /* !__fabsl_defined && !__std_fabsl_defined */
+#if !defined(__floorl_defined) && defined(__std_floorl_defined)
+#define __floorl_defined 1
 __NAMESPACE_STD_USING(floorl)
+#endif /* !__floorl_defined && !__std_floorl_defined */
 #if !defined(__fmodl_defined) && defined(__std_fmodl_defined)
 #define __fmodl_defined 1
 __NAMESPACE_STD_USING(fmodl)
@@ -420,13 +438,19 @@ __NAMESPACE_STD_USING(copysign)
 #define __nan_defined 1
 __NAMESPACE_STD_USING(nan)
 #endif /* !__nan_defined && !__std_nan_defined */
+#if !defined(__copysignf_defined) && defined(__std_copysignf_defined)
+#define __copysignf_defined 1
 __NAMESPACE_STD_USING(copysignf)
+#endif /* !__copysignf_defined && !__std_copysignf_defined */
 #if !defined(__nanf_defined) && defined(__std_nanf_defined)
 #define __nanf_defined 1
 __NAMESPACE_STD_USING(nanf)
 #endif /* !__nanf_defined && !__std_nanf_defined */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
+#if !defined(__copysignl_defined) && defined(__std_copysignl_defined)
+#define __copysignl_defined 1
 __NAMESPACE_STD_USING(copysignl)
+#endif /* !__copysignl_defined && !__std_copysignl_defined */
 #if !defined(__nanl_defined) && defined(__std_nanl_defined)
 #define __nanl_defined 1
 __NAMESPACE_STD_USING(nanl)
@@ -590,21 +614,39 @@ __NAMESPACE_STD_USING(scalblnf)
 #define __nearbyintf_defined 1
 __NAMESPACE_STD_USING(nearbyintf)
 #endif /* !__nearbyintf_defined && !__std_nearbyintf_defined */
+#if !defined(__roundf_defined) && defined(__std_roundf_defined)
+#define __roundf_defined 1
 __NAMESPACE_STD_USING(roundf)
+#endif /* !__roundf_defined && !__std_roundf_defined */
+#if !defined(__truncf_defined) && defined(__std_truncf_defined)
+#define __truncf_defined 1
 __NAMESPACE_STD_USING(truncf)
+#endif /* !__truncf_defined && !__std_truncf_defined */
 #if !defined(__remquof_defined) && defined(__std_remquof_defined)
 #define __remquof_defined 1
 __NAMESPACE_STD_USING(remquof)
 #endif /* !__remquof_defined && !__std_remquof_defined */
+#if !defined(__lrintf_defined) && defined(__std_lrintf_defined)
+#define __lrintf_defined 1
 __NAMESPACE_STD_USING(lrintf)
+#endif /* !__lrintf_defined && !__std_lrintf_defined */
+#if !defined(__lroundf_defined) && defined(__std_lroundf_defined)
+#define __lroundf_defined 1
 __NAMESPACE_STD_USING(lroundf)
+#endif /* !__lroundf_defined && !__std_lroundf_defined */
 __NAMESPACE_STD_USING(fdimf)
 __NAMESPACE_STD_USING(fmaxf)
 __NAMESPACE_STD_USING(fminf)
 __NAMESPACE_STD_USING(fmaf)
 #ifdef __COMPILER_HAVE_LONGLONG
+#if !defined(__llrintf_defined) && defined(__std_llrintf_defined)
+#define __llrintf_defined 1
 __NAMESPACE_STD_USING(llrintf)
+#endif /* !__llrintf_defined && !__std_llrintf_defined */
+#if !defined(__llroundf_defined) && defined(__std_llroundf_defined)
+#define __llroundf_defined 1
 __NAMESPACE_STD_USING(llroundf)
+#endif /* !__llroundf_defined && !__std_llroundf_defined */
 #endif /* __COMPILER_HAVE_LONGLONG */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if !defined(__nexttowardl_defined) && defined(__std_nexttowardl_defined)
@@ -623,21 +665,39 @@ __NAMESPACE_STD_USING(scalblnl)
 #define __nearbyintl_defined 1
 __NAMESPACE_STD_USING(nearbyintl)
 #endif /* !__nearbyintl_defined && !__std_nearbyintl_defined */
+#if !defined(__roundl_defined) && defined(__std_roundl_defined)
+#define __roundl_defined 1
 __NAMESPACE_STD_USING(roundl)
+#endif /* !__roundl_defined && !__std_roundl_defined */
+#if !defined(__truncl_defined) && defined(__std_truncl_defined)
+#define __truncl_defined 1
 __NAMESPACE_STD_USING(truncl)
+#endif /* !__truncl_defined && !__std_truncl_defined */
 #if !defined(__remquol_defined) && defined(__std_remquol_defined)
 #define __remquol_defined 1
 __NAMESPACE_STD_USING(remquol)
 #endif /* !__remquol_defined && !__std_remquol_defined */
+#if !defined(__lrintl_defined) && defined(__std_lrintl_defined)
+#define __lrintl_defined 1
 __NAMESPACE_STD_USING(lrintl)
+#endif /* !__lrintl_defined && !__std_lrintl_defined */
+#if !defined(__lroundl_defined) && defined(__std_lroundl_defined)
+#define __lroundl_defined 1
 __NAMESPACE_STD_USING(lroundl)
+#endif /* !__lroundl_defined && !__std_lroundl_defined */
 __NAMESPACE_STD_USING(fdiml)
 __NAMESPACE_STD_USING(fmaxl)
 __NAMESPACE_STD_USING(fminl)
 __NAMESPACE_STD_USING(fmal)
 #ifdef __COMPILER_HAVE_LONGLONG
+#if !defined(__llrintl_defined) && defined(__std_llrintl_defined)
+#define __llrintl_defined 1
 __NAMESPACE_STD_USING(llrintl)
+#endif /* !__llrintl_defined && !__std_llrintl_defined */
+#if !defined(__llroundl_defined) && defined(__std_llroundl_defined)
+#define __llroundl_defined 1
 __NAMESPACE_STD_USING(llroundl)
+#endif /* !__llroundl_defined && !__std_llroundl_defined */
 #endif /* __COMPILER_HAVE_LONGLONG */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __USE_ISOC99 */
@@ -802,13 +862,13 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,asin,(double __x),__asin,(__x))
 #define __std_atan_defined 1
 #if __has_builtin(__builtin_atan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atan)
 /* Arc tangent of X */
-__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,atan,(double __x),{ return __builtin_atan(__x); })
+__CEIDECLARE(__ATTR_WUNUSED,double,__NOTHROW,atan,(double __x),{ return __builtin_atan(__x); })
 #elif defined(__CRT_HAVE_atan)
 /* Arc tangent of X */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,atan,(double __x),(__x))
+__CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,atan,(double __x),(__x))
 #elif defined(__CRT_HAVE___atan)
 /* Arc tangent of X */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,atan,(double __x),__atan,(__x))
+__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,atan,(double __x),__atan,(__x))
 #else /* LIBC: atan */
 #include <ieee754.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
@@ -816,7 +876,7 @@ __NAMESPACE_STD_END
 #include <local/math/atan.h>
 __NAMESPACE_STD_BEGIN
 /* Arc tangent of X */
-__NAMESPACE_LOCAL_USING_OR_IMPL(atan, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL atan)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atan))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(atan, __FORCELOCAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL atan)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atan))(__x); })
 #else /* CUSTOM: atan */
 #undef __std_atan_defined
 #endif /* atan... */
@@ -1760,13 +1820,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(expf, __FORCELOCAL __DECL_SIMD_expf __ATTR_WUNUS
 #define __std_frexpf_defined 1
 #if __has_builtin(__builtin_frexpf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_frexpf)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-__CEIDECLARE(__ATTR_WUNUSED,float,__NOTHROW_NCX,frexpf,(float __x, int *__pexponent),{ return __builtin_frexpf(__x, __pexponent); })
+__CEIDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),float,__NOTHROW_NCX,frexpf,(float __x, int *__pexponent),{ return __builtin_frexpf(__x, __pexponent); })
 #elif defined(__CRT_HAVE_frexpf)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-__CDECLARE(__ATTR_WUNUSED,float,__NOTHROW_NCX,frexpf,(float __x, int *__pexponent),(__x,__pexponent))
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),float,__NOTHROW_NCX,frexpf,(float __x, int *__pexponent),(__x,__pexponent))
 #elif defined(__CRT_HAVE___frexpf)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW_NCX,frexpf,(float __x, int *__pexponent),__frexpf,(__x,__pexponent))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),float,__NOTHROW_NCX,frexpf,(float __x, int *__pexponent),__frexpf,(__x,__pexponent))
 #else /* LIBC: frexpf */
 #include <ieee754.h>
 #if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_frexp) || defined(__CRT_HAVE___frexp)
@@ -1774,7 +1834,7 @@ __NAMESPACE_STD_END
 #include <local/math/frexpf.h>
 __NAMESPACE_STD_BEGIN
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-__NAMESPACE_LOCAL_USING_OR_IMPL(frexpf, __FORCELOCAL __ATTR_WUNUSED float __NOTHROW_NCX(__LIBCCALL frexpf)(float __x, int *__pexponent) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(frexpf))(__x, __pexponent); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(frexpf, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((2)) float __NOTHROW_NCX(__LIBCCALL frexpf)(float __x, int *__pexponent) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(frexpf))(__x, __pexponent); })
 #else /* CUSTOM: frexpf */
 #undef __std_frexpf_defined
 #endif /* frexpf... */
@@ -1902,13 +1962,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(expl, __FORCELOCAL __DECL_SIMD_expl __ATTR_WUNUS
 #define __std_frexpl_defined 1
 #if __has_builtin(__builtin_frexpl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_frexpl)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-__CEIDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,frexpl,(__LONGDOUBLE __x, int *__pexponent),{ return __builtin_frexpl(__x, __pexponent); })
+__CEIDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),__LONGDOUBLE,__NOTHROW_NCX,frexpl,(__LONGDOUBLE __x, int *__pexponent),{ return __builtin_frexpl(__x, __pexponent); })
 #elif defined(__CRT_HAVE_frexpl)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-__CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,frexpl,(__LONGDOUBLE __x, int *__pexponent),(__x,__pexponent))
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),__LONGDOUBLE,__NOTHROW_NCX,frexpl,(__LONGDOUBLE __x, int *__pexponent),(__x,__pexponent))
 #elif defined(__CRT_HAVE___frexpl)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,frexpl,(__LONGDOUBLE __x, int *__pexponent),__frexpl,(__x,__pexponent))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__LONGDOUBLE,__NOTHROW_NCX,frexpl,(__LONGDOUBLE __x, int *__pexponent),__frexpl,(__x,__pexponent))
 #else /* LIBC: frexpl */
 #include <ieee754.h>
 #if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_frexp) || defined(__CRT_HAVE___frexp)
@@ -1916,7 +1976,7 @@ __NAMESPACE_STD_END
 #include <local/math/frexpl.h>
 __NAMESPACE_STD_BEGIN
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-__NAMESPACE_LOCAL_USING_OR_IMPL(frexpl, __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL frexpl)(__LONGDOUBLE __x, int *__pexponent) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(frexpl))(__x, __pexponent); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(frexpl, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((2)) __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL frexpl)(__LONGDOUBLE __x, int *__pexponent) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(frexpl))(__x, __pexponent); })
 #else /* CUSTOM: frexpl */
 #undef __std_frexpl_defined
 #endif /* frexpl... */
@@ -2465,7 +2525,7 @@ __CDECLARE(__DECL_SIMD_powl __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,powl,(__LONGDO
 __CREDIRECT(__DECL_SIMD_powl __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,powl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__powl,(__x,__y))
 #else /* LIBC: powl */
 #include <ieee754.h>
-#if defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow)
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow)
 __NAMESPACE_STD_END
 #include <local/math/powl.h>
 __NAMESPACE_STD_BEGIN
@@ -2720,6 +2780,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fmod, __FORCELOCAL __ATTR_WUNUSED double __NOTHR
 #endif /* fmod... */
 #endif /* fmod... */
 #endif /* !__std_fmod_defined */
+#ifndef __std_ceilf_defined
+#define __std_ceilf_defined 1
 #if __has_builtin(__builtin_ceilf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ceilf)
 /* Smallest integral value not less than X */
 __CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,ceilf,(float __x),{ return __builtin_ceilf(__x); })
@@ -2736,6 +2798,9 @@ __NAMESPACE_STD_BEGIN
 /* Smallest integral value not less than X */
 __NAMESPACE_LOCAL_USING_OR_IMPL(ceilf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL ceilf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ceilf))(__x); })
 #endif /* ceilf... */
+#endif /* !__std_ceilf_defined */
+#ifndef __std_fabsf_defined
+#define __std_fabsf_defined 1
 #if __has_builtin(__builtin_fabsf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fabsf)
 /* Absolute value of X */
 __CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,fabsf,(float __x),{ return __builtin_fabsf(__x); })
@@ -2752,6 +2817,9 @@ __NAMESPACE_STD_BEGIN
 /* Absolute value of X */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fabsf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL fabsf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fabsf))(__x); })
 #endif /* fabsf... */
+#endif /* !__std_fabsf_defined */
+#ifndef __std_floorf_defined
+#define __std_floorf_defined 1
 #if __has_builtin(__builtin_floorf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_floorf)
 /* Largest integer not greater than X */
 __CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,floorf,(float __x),{ return __builtin_floorf(__x); })
@@ -2768,6 +2836,7 @@ __NAMESPACE_STD_BEGIN
 /* Largest integer not greater than X */
 __NAMESPACE_LOCAL_USING_OR_IMPL(floorf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL floorf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(floorf))(__x); })
 #endif /* floorf... */
+#endif /* !__std_floorf_defined */
 #ifndef __std_fmodf_defined
 #define __std_fmodf_defined 1
 #if __has_builtin(__builtin_fmodf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fmodf)
@@ -2793,6 +2862,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fmodf, __FORCELOCAL __ATTR_WUNUSED float __NOTHR
 #endif /* fmodf... */
 #endif /* !__std_fmodf_defined */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
+#ifndef __std_ceill_defined
+#define __std_ceill_defined 1
 #if __has_builtin(__builtin_ceill) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ceill)
 /* Smallest integral value not less than X */
 __CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,ceill,(__LONGDOUBLE __x),{ return __builtin_ceill(__x); })
@@ -2809,22 +2880,28 @@ __NAMESPACE_STD_BEGIN
 /* Smallest integral value not less than X */
 __NAMESPACE_LOCAL_USING_OR_IMPL(ceill, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL ceill)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ceill))(__x); })
 #endif /* ceill... */
+#endif /* !__std_ceill_defined */
+#ifndef __std_fabsl_defined
+#define __std_fabsl_defined 1
 #if __has_builtin(__builtin_fabsl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fabsl)
-/* Return X with its signed changed to Y's */
+/* Absolute value of X */
 __CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fabsl,(__LONGDOUBLE __x),{ return __builtin_fabsl(__x); })
 #elif defined(__CRT_HAVE_fabsl)
-/* Return X with its signed changed to Y's */
+/* Absolute value of X */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fabsl,(__LONGDOUBLE __x),(__x))
 #elif defined(__CRT_HAVE___fabsl)
-/* Return X with its signed changed to Y's */
+/* Absolute value of X */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fabsl,(__LONGDOUBLE __x),__fabsl,(__x))
 #else /* LIBC: fabsl */
 __NAMESPACE_STD_END
 #include <local/math/fabsl.h>
 __NAMESPACE_STD_BEGIN
-/* Return X with its signed changed to Y's */
+/* Absolute value of X */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fabsl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL fabsl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fabsl))(__x); })
 #endif /* fabsl... */
+#endif /* !__std_fabsl_defined */
+#ifndef __std_floorl_defined
+#define __std_floorl_defined 1
 #if __has_builtin(__builtin_floorl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_floorl)
 /* Largest integer not greater than X */
 __CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,floorl,(__LONGDOUBLE __x),{ return __builtin_floorl(__x); })
@@ -2841,13 +2918,17 @@ __NAMESPACE_STD_BEGIN
 /* Largest integer not greater than X */
 __NAMESPACE_LOCAL_USING_OR_IMPL(floorl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL floorl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(floorl))(__x); })
 #endif /* floorl... */
+#endif /* !__std_floorl_defined */
 #ifndef __std_fmodl_defined
 #define __std_fmodl_defined 1
 #if __has_builtin(__builtin_fmodl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fmodl)
+/* Floating-point modulo remainder of X/Y */
 __CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fmodl,(__LONGDOUBLE __x, __LONGDOUBLE __y),{ return __builtin_fmodl(__x, __y); })
 #elif defined(__CRT_HAVE_fmodl)
+/* Floating-point modulo remainder of X/Y */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fmodl,(__LONGDOUBLE __x, __LONGDOUBLE __y),(__x,__y))
 #elif defined(__CRT_HAVE___fmodl)
+/* Floating-point modulo remainder of X/Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fmodl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__fmodl,(__x,__y))
 #else /* LIBC: fmodl */
 #include <ieee754.h>
@@ -2855,6 +2936,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fmodl,(__LONGDOUB
 __NAMESPACE_STD_END
 #include <local/math/fmodl.h>
 __NAMESPACE_STD_BEGIN
+/* Floating-point modulo remainder of X/Y */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fmodl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL fmodl)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmodl))(__x, __y); })
 #else /* CUSTOM: fmodl */
 #undef __std_fmodl_defined
@@ -2907,6 +2989,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(nan, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED do
 #endif /* nan... */
 #endif /* nan... */
 #endif /* !__std_nan_defined */
+#ifndef __std_copysignf_defined
+#define __std_copysignf_defined 1
 #if __has_builtin(__builtin_copysignf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_copysignf)
 /* Return X with its signed changed to Y's */
 __CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,copysignf,(float __num, float __sign),{ return __builtin_copysignf(__num, __sign); })
@@ -2923,6 +3007,7 @@ __NAMESPACE_STD_BEGIN
 /* Return X with its signed changed to Y's */
 __NAMESPACE_LOCAL_USING_OR_IMPL(copysignf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL copysignf)(float __num, float __sign) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(copysignf))(__num, __sign); })
 #endif /* copysignf... */
+#endif /* !__std_copysignf_defined */
 #ifndef __std_nanf_defined
 #define __std_nanf_defined 1
 #if __has_builtin(__builtin_nanf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nanf)
@@ -2948,6 +3033,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(nanf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED f
 #endif /* nanf... */
 #endif /* !__std_nanf_defined */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
+#ifndef __std_copysignl_defined
+#define __std_copysignl_defined 1
 #if __has_builtin(__builtin_copysignl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_copysignl)
 /* Return X with its signed changed to Y's */
 __CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,copysignl,(__LONGDOUBLE __num, __LONGDOUBLE __sign),{ return __builtin_copysignl(__num, __sign); })
@@ -2964,6 +3051,7 @@ __NAMESPACE_STD_BEGIN
 /* Return X with its signed changed to Y's */
 __NAMESPACE_LOCAL_USING_OR_IMPL(copysignl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL copysignl)(__LONGDOUBLE __num, __LONGDOUBLE __sign) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(copysignl))(__num, __sign); })
 #endif /* copysignl... */
+#endif /* !__std_copysignl_defined */
 #ifndef __std_nanl_defined
 #define __std_nanl_defined 1
 #if __has_builtin(__builtin_nanl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nanl)
@@ -3466,12 +3554,16 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(rintl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED 
 #ifndef __std_nextafterl_defined
 #define __std_nextafterl_defined 1
 #if __has_builtin(__builtin_nextafterl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nextafterl)
+/* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nextafterl,(__LONGDOUBLE __x, __LONGDOUBLE __y),{ return __builtin_nextafterl(__x, __y); })
 #elif defined(__CRT_HAVE_nextafterl)
+/* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nextafterl,(__LONGDOUBLE __x, __LONGDOUBLE __y),(__x,__y))
 #elif defined(__CRT_HAVE___nextafterl)
+/* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nextafterl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__nextafterl,(__x,__y))
 #elif defined(__CRT_HAVE___nexttowardl)
+/* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nextafterl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__nexttowardl,(__x,__y))
 #else /* LIBC: nextafterl */
 #include <ieee754.h>
@@ -3479,6 +3571,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nextafterl,(__LON
 __NAMESPACE_STD_END
 #include <local/math/nextafterl.h>
 __NAMESPACE_STD_BEGIN
+/* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __NAMESPACE_LOCAL_USING_OR_IMPL(nextafterl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL nextafterl)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextafterl))(__x, __y); })
 #else /* CUSTOM: nextafterl */
 #undef __std_nextafterl_defined
@@ -3966,18 +4059,27 @@ __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL nearbyintf)(
 #endif /* nearbyintf... */
 #endif /* nearbyintf... */
 #endif /* !__std_nearbyintf_defined */
+#ifndef __std_roundf_defined
+#define __std_roundf_defined 1
 #if __has_builtin(__builtin_roundf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_roundf)
+/* Round X to nearest integral value, rounding halfway cases away from zero */
 __CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,roundf,(float __x),{ return __builtin_roundf(__x); })
 #elif defined(__CRT_HAVE_roundf)
+/* Round X to nearest integral value, rounding halfway cases away from zero */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,roundf,(float __x),(__x))
 #elif defined(__CRT_HAVE___roundf)
+/* Round X to nearest integral value, rounding halfway cases away from zero */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,roundf,(float __x),__roundf,(__x))
 #else /* LIBC: roundf */
 __NAMESPACE_STD_END
 #include <local/math/roundf.h>
 __NAMESPACE_STD_BEGIN
+/* Round X to nearest integral value, rounding halfway cases away from zero */
 __NAMESPACE_LOCAL_USING_OR_IMPL(roundf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL roundf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(roundf))(__x); })
 #endif /* roundf... */
+#endif /* !__std_roundf_defined */
+#ifndef __std_truncf_defined
+#define __std_truncf_defined 1
 #if __has_builtin(__builtin_truncf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_truncf)
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
@@ -3998,6 +4100,7 @@ __NAMESPACE_STD_BEGIN
  * format nearest but not larger in magnitude */
 __NAMESPACE_LOCAL_USING_OR_IMPL(truncf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL truncf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(truncf))(__x); })
 #endif /* truncf... */
+#endif /* !__std_truncf_defined */
 #ifndef __std_remquof_defined
 #define __std_remquof_defined 1
 #if __has_builtin(__builtin_remquof) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remquof)
@@ -4027,6 +4130,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(remquof, __FORCELOCAL __ATTR_WUNUSED float __NOT
 #undef __std_remquof_defined
 #endif /* remquof... */
 #endif /* !__std_remquof_defined */
+#ifndef __std_lrintf_defined
+#define __std_lrintf_defined 1
 #if __has_builtin(__builtin_lrintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lrintf)
 /* Round X to nearest integral value according to current rounding direction */
 __CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lrintf,(float __x),{ return __builtin_lrintf(__x); })
@@ -4046,6 +4151,9 @@ __NAMESPACE_STD_BEGIN
 /* Round X to nearest integral value according to current rounding direction */
 __NAMESPACE_LOCAL_USING_OR_IMPL(lrintf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long int __NOTHROW(__LIBCCALL lrintf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lrintf))(__x); })
 #endif /* lrintf... */
+#endif /* !__std_lrintf_defined */
+#ifndef __std_lroundf_defined
+#define __std_lroundf_defined 1
 #if __has_builtin(__builtin_lroundf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lroundf)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lroundf,(float __x),{ return __builtin_lroundf(__x); })
@@ -4065,6 +4173,7 @@ __NAMESPACE_STD_BEGIN
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __NAMESPACE_LOCAL_USING_OR_IMPL(lroundf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long int __NOTHROW(__LIBCCALL lroundf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lroundf))(__x); })
 #endif /* lroundf... */
+#endif /* !__std_lroundf_defined */
 #if __has_builtin(__builtin_fdimf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fdimf)
 /* Return positive difference between X and Y */
 __CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,fdimf,(float __x, float __y),{ return __builtin_fdimf(__x, __y); })
@@ -4130,6 +4239,8 @@ __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(fmaf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL fmaf)(float __x, float __y, float __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmaf))(__x, __y, __z); })
 #endif /* fmaf... */
 #ifdef __COMPILER_HAVE_LONGLONG
+#ifndef __std_llrintf_defined
+#define __std_llrintf_defined 1
 #if __has_builtin(__builtin_llrintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_llrintf)
 /* Round X to nearest integral value according to current rounding direction */
 __CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llrintf,(float __x),{ return __builtin_llrintf(__x); })
@@ -4149,6 +4260,9 @@ __NAMESPACE_STD_BEGIN
 /* Round X to nearest integral value according to current rounding direction */
 __NAMESPACE_LOCAL_USING_OR_IMPL(llrintf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGLONG __NOTHROW(__LIBCCALL llrintf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(llrintf))(__x); })
 #endif /* llrintf... */
+#endif /* !__std_llrintf_defined */
+#ifndef __std_llroundf_defined
+#define __std_llroundf_defined 1
 #if __has_builtin(__builtin_llroundf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_llroundf)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llroundf,(float __x),{ return __builtin_llroundf(__x); })
@@ -4168,17 +4282,22 @@ __NAMESPACE_STD_BEGIN
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __NAMESPACE_LOCAL_USING_OR_IMPL(llroundf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGLONG __NOTHROW(__LIBCCALL llroundf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(llroundf))(__x); })
 #endif /* llroundf... */
+#endif /* !__std_llroundf_defined */
 #endif /* __COMPILER_HAVE_LONGLONG */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #ifndef __std_nexttowardl_defined
 #define __std_nexttowardl_defined 1
 #if __has_builtin(__builtin_nexttowardl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nexttowardl)
+/* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nexttowardl,(__LONGDOUBLE __x, __LONGDOUBLE __y),{ return __builtin_nexttowardl(__x, __y); })
 #elif defined(__CRT_HAVE_nexttowardl)
+/* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nexttowardl,(__LONGDOUBLE __x, __LONGDOUBLE __y),(__x,__y))
 #elif defined(__CRT_HAVE_nextafterl)
+/* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nexttowardl,(__LONGDOUBLE __x, __LONGDOUBLE __y),nextafterl,(__x,__y))
 #elif defined(__CRT_HAVE___nexttowardl)
+/* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nexttowardl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__nexttowardl,(__x,__y))
 #else /* LIBC: nextafterl */
 #include <ieee754.h>
@@ -4186,6 +4305,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nexttowardl,(__LO
 __NAMESPACE_STD_END
 #include <local/math/nextafterl.h>
 __NAMESPACE_STD_BEGIN
+/* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL nexttowardl)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextafterl))(__x, __y); }
 #else /* CUSTOM: nextafterl */
 #undef __std_nexttowardl_defined
@@ -4284,18 +4404,27 @@ __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL nearb
 #endif /* nearbyintl... */
 #endif /* nearbyintl... */
 #endif /* !__std_nearbyintl_defined */
+#ifndef __std_roundl_defined
+#define __std_roundl_defined 1
 #if __has_builtin(__builtin_roundl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_roundl)
+/* Round X to nearest integral value, rounding halfway cases away from zero */
 __CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,roundl,(__LONGDOUBLE __x),{ return __builtin_roundl(__x); })
 #elif defined(__CRT_HAVE_roundl)
+/* Round X to nearest integral value, rounding halfway cases away from zero */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,roundl,(__LONGDOUBLE __x),(__x))
 #elif defined(__CRT_HAVE___roundl)
+/* Round X to nearest integral value, rounding halfway cases away from zero */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,roundl,(__LONGDOUBLE __x),__roundl,(__x))
 #else /* LIBC: roundl */
 __NAMESPACE_STD_END
 #include <local/math/roundl.h>
 __NAMESPACE_STD_BEGIN
+/* Round X to nearest integral value, rounding halfway cases away from zero */
 __NAMESPACE_LOCAL_USING_OR_IMPL(roundl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL roundl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(roundl))(__x); })
 #endif /* roundl... */
+#endif /* !__std_roundl_defined */
+#ifndef __std_truncl_defined
+#define __std_truncl_defined 1
 #if __has_builtin(__builtin_truncl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_truncl)
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
@@ -4316,6 +4445,7 @@ __NAMESPACE_STD_BEGIN
  * format nearest but not larger in magnitude */
 __NAMESPACE_LOCAL_USING_OR_IMPL(truncl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL truncl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(truncl))(__x); })
 #endif /* truncl... */
+#endif /* !__std_truncl_defined */
 #ifndef __std_remquol_defined
 #define __std_remquol_defined 1
 #if __has_builtin(__builtin_remquol) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remquol)
@@ -4355,6 +4485,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(remquol, __FORCELOCAL __ATTR_WUNUSED __LONGDOUBL
 #undef __std_remquol_defined
 #endif /* remquol... */
 #endif /* !__std_remquol_defined */
+#ifndef __std_lrintl_defined
+#define __std_lrintl_defined 1
 #if __has_builtin(__builtin_lrintl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lrintl)
 /* Round X to nearest integral value according to current rounding direction */
 __CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lrintl,(__LONGDOUBLE __x),{ return __builtin_lrintl(__x); })
@@ -4374,6 +4506,9 @@ __NAMESPACE_STD_BEGIN
 /* Round X to nearest integral value according to current rounding direction */
 __NAMESPACE_LOCAL_USING_OR_IMPL(lrintl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long int __NOTHROW(__LIBCCALL lrintl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lrintl))(__x); })
 #endif /* lrintl... */
+#endif /* !__std_lrintl_defined */
+#ifndef __std_lroundl_defined
+#define __std_lroundl_defined 1
 #if __has_builtin(__builtin_lroundl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lroundl)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lroundl,(__LONGDOUBLE __x),{ return __builtin_lroundl(__x); })
@@ -4393,6 +4528,7 @@ __NAMESPACE_STD_BEGIN
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __NAMESPACE_LOCAL_USING_OR_IMPL(lroundl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long int __NOTHROW(__LIBCCALL lroundl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lroundl))(__x); })
 #endif /* lroundl... */
+#endif /* !__std_lroundl_defined */
 #if __has_builtin(__builtin_fdiml) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fdiml)
 /* Return positive difference between X and Y */
 __CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fdiml,(__LONGDOUBLE __x, __LONGDOUBLE __y),{ return __builtin_fdiml(__x, __y); })
@@ -4458,6 +4594,8 @@ __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(fmal, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL fmal)(__LONGDOUBLE __x, __LONGDOUBLE __y, __LONGDOUBLE __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmal))(__x, __y, __z); })
 #endif /* fmal... */
 #ifdef __COMPILER_HAVE_LONGLONG
+#ifndef __std_llrintl_defined
+#define __std_llrintl_defined 1
 #if __has_builtin(__builtin_llrintl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_llrintl)
 /* Round X to nearest integral value according to current rounding direction */
 __CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llrintl,(__LONGDOUBLE __x),{ return __builtin_llrintl(__x); })
@@ -4477,6 +4615,9 @@ __NAMESPACE_STD_BEGIN
 /* Round X to nearest integral value according to current rounding direction */
 __NAMESPACE_LOCAL_USING_OR_IMPL(llrintl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGLONG __NOTHROW(__LIBCCALL llrintl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(llrintl))(__x); })
 #endif /* llrintl... */
+#endif /* !__std_llrintl_defined */
+#ifndef __std_llroundl_defined
+#define __std_llroundl_defined 1
 #if __has_builtin(__builtin_llroundl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_llroundl)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llroundl,(__LONGDOUBLE __x),{ return __builtin_llroundl(__x); })
@@ -4496,6 +4637,7 @@ __NAMESPACE_STD_BEGIN
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __NAMESPACE_LOCAL_USING_OR_IMPL(llroundl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGLONG __NOTHROW(__LIBCCALL llroundl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(llroundl))(__x); })
 #endif /* llroundl... */
+#endif /* !__std_llroundl_defined */
 #endif /* __COMPILER_HAVE_LONGLONG */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __USE_ISOC99 */
@@ -4707,13 +4849,13 @@ __FORCELOCAL __DECL_SIMD_expf __ATTR_WUNUSED float __NOTHROW(__LIBCCALL exp)(flo
 #endif /* exp... */
 #if __has_builtin(__builtin_frexpf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_frexpf)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-__CEIREDIRECT(__ATTR_WUNUSED,float,__NOTHROW_NCX,frexp,(float __x, int *__pexponent),frexpf,{ return __builtin_frexpf(__x, __pexponent); })
+__CEIREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),float,__NOTHROW_NCX,frexp,(float __x, int *__pexponent),frexpf,{ return __builtin_frexpf(__x, __pexponent); })
 #elif defined(__CRT_HAVE_frexpf)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW_NCX,frexp,(float __x, int *__pexponent),frexpf,(__x,__pexponent))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),float,__NOTHROW_NCX,frexp,(float __x, int *__pexponent),frexpf,(__x,__pexponent))
 #elif defined(__CRT_HAVE___frexpf)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW_NCX,frexp,(float __x, int *__pexponent),__frexpf,(__x,__pexponent))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),float,__NOTHROW_NCX,frexp,(float __x, int *__pexponent),__frexpf,(__x,__pexponent))
 #else /* LIBC: frexpf */
 #include <ieee754.h>
 #if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_frexp) || defined(__CRT_HAVE___frexp)
@@ -4723,7 +4865,7 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-__FORCELOCAL __ATTR_WUNUSED float __NOTHROW_NCX(__LIBCCALL frexp)(float __x, int *__pexponent) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(frexpf))(__x, __pexponent); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((2)) float __NOTHROW_NCX(__LIBCCALL frexp)(float __x, int *__pexponent) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(frexpf))(__x, __pexponent); }
 #endif /* frexp... */
 #endif /* frexp... */
 #if __has_builtin(__builtin_ldexpf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ldexpf)
@@ -5182,13 +5324,13 @@ __FORCELOCAL __DECL_SIMD_expl __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL e
 #endif /* exp... */
 #if __has_builtin(__builtin_frexpl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_frexpl)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-__CEIREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,frexp,(__LONGDOUBLE __x, int *__pexponent),frexpl,{ return __builtin_frexpl(__x, __pexponent); })
+__CEIREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__LONGDOUBLE,__NOTHROW_NCX,frexp,(__LONGDOUBLE __x, int *__pexponent),frexpl,{ return __builtin_frexpl(__x, __pexponent); })
 #elif defined(__CRT_HAVE_frexpl)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,frexp,(__LONGDOUBLE __x, int *__pexponent),frexpl,(__x,__pexponent))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__LONGDOUBLE,__NOTHROW_NCX,frexp,(__LONGDOUBLE __x, int *__pexponent),frexpl,(__x,__pexponent))
 #elif defined(__CRT_HAVE___frexpl)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,frexp,(__LONGDOUBLE __x, int *__pexponent),__frexpl,(__x,__pexponent))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__LONGDOUBLE,__NOTHROW_NCX,frexp,(__LONGDOUBLE __x, int *__pexponent),__frexpl,(__x,__pexponent))
 #else /* LIBC: frexpl */
 #include <ieee754.h>
 #if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_frexp) || defined(__CRT_HAVE___frexp)
@@ -5198,7 +5340,7 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-__FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL frexp)(__LONGDOUBLE __x, int *__pexponent) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(frexpl))(__x, __pexponent); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((2)) __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL frexp)(__LONGDOUBLE __x, int *__pexponent) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(frexpl))(__x, __pexponent); }
 #endif /* frexp... */
 #endif /* frexp... */
 #if __has_builtin(__builtin_ldexpl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ldexpl)
@@ -5302,7 +5444,7 @@ __CREDIRECT(__DECL_SIMD_powl __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,pow,(__LONGDO
 __CREDIRECT(__DECL_SIMD_powl __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,pow,(__LONGDOUBLE __x, __LONGDOUBLE __y),__powl,(__x,__y))
 #else /* LIBC: powl */
 #include <ieee754.h>
-#if defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow)
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/powl.h>
@@ -5352,13 +5494,13 @@ extern "C++" {
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL ceil)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ceill))(__x); }
 #endif /* ceil... */
 #if __has_builtin(__builtin_fabsl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fabsl)
-/* Return X with its signed changed to Y's */
+/* Absolute value of X */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fabs,(__LONGDOUBLE __x),fabsl,{ return __builtin_fabsl(__x); })
 #elif defined(__CRT_HAVE_fabsl)
-/* Return X with its signed changed to Y's */
+/* Absolute value of X */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fabs,(__LONGDOUBLE __x),fabsl,(__x))
 #elif defined(__CRT_HAVE___fabsl)
-/* Return X with its signed changed to Y's */
+/* Absolute value of X */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fabs,(__LONGDOUBLE __x),__fabsl,(__x))
 #else /* LIBC: fabsl */
 } /* extern "C++" { */
@@ -5366,7 +5508,7 @@ __NAMESPACE_STD_END
 #include <local/math/fabsl.h>
 __NAMESPACE_STD_BEGIN
 extern "C++" {
-/* Return X with its signed changed to Y's */
+/* Absolute value of X */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL fabs)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fabsl))(__x); }
 #endif /* fabs... */
 #if __has_builtin(__builtin_floorl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_floorl)
@@ -5388,10 +5530,13 @@ extern "C++" {
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL floor)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(floorl))(__x); }
 #endif /* floor... */
 #if __has_builtin(__builtin_fmodl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fmodl)
+/* Floating-point modulo remainder of X/Y */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fmod,(__LONGDOUBLE __x, __LONGDOUBLE __y),fmodl,{ return __builtin_fmodl(__x, __y); })
 #elif defined(__CRT_HAVE_fmodl)
+/* Floating-point modulo remainder of X/Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fmod,(__LONGDOUBLE __x, __LONGDOUBLE __y),fmodl,(__x,__y))
 #elif defined(__CRT_HAVE___fmodl)
+/* Floating-point modulo remainder of X/Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fmod,(__LONGDOUBLE __x, __LONGDOUBLE __y),__fmodl,(__x,__y))
 #else /* LIBC: fmodl */
 #include <ieee754.h>
@@ -5401,6 +5546,7 @@ __NAMESPACE_STD_END
 #include <local/math/fmodl.h>
 __NAMESPACE_STD_BEGIN
 extern "C++" {
+/* Floating-point modulo remainder of X/Y */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL fmod)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmodl))(__x, __y); }
 #endif /* fmod... */
 #endif /* fmod... */
@@ -5813,12 +5959,16 @@ __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL rint)
 #endif /* rint... */
 #endif /* rint... */
 #if __has_builtin(__builtin_nextafterl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nextafterl)
+/* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nextafter,(__LONGDOUBLE __x, __LONGDOUBLE __y),nextafterl,{ return __builtin_nextafterl(__x, __y); })
 #elif defined(__CRT_HAVE_nextafterl)
+/* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nextafter,(__LONGDOUBLE __x, __LONGDOUBLE __y),nextafterl,(__x,__y))
 #elif defined(__CRT_HAVE___nextafterl)
+/* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nextafter,(__LONGDOUBLE __x, __LONGDOUBLE __y),__nextafterl,(__x,__y))
 #elif defined(__CRT_HAVE___nexttowardl)
+/* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nextafter,(__LONGDOUBLE __x, __LONGDOUBLE __y),__nexttowardl,(__x,__y))
 #else /* LIBC: nextafterl */
 #include <ieee754.h>
@@ -5828,6 +5978,7 @@ __NAMESPACE_STD_END
 #include <local/math/nextafterl.h>
 __NAMESPACE_STD_BEGIN
 extern "C++" {
+/* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL nextafter)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextafterl))(__x, __y); }
 #endif /* nextafter... */
 #endif /* nextafter... */
@@ -6047,10 +6198,13 @@ __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL nearbyint)(f
 #endif /* nearbyint... */
 #endif /* nearbyint... */
 #if __has_builtin(__builtin_roundf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_roundf)
+/* Round X to nearest integral value, rounding halfway cases away from zero */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,round,(float __x),roundf,{ return __builtin_roundf(__x); })
 #elif defined(__CRT_HAVE_roundf)
+/* Round X to nearest integral value, rounding halfway cases away from zero */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,round,(float __x),roundf,(__x))
 #elif defined(__CRT_HAVE___roundf)
+/* Round X to nearest integral value, rounding halfway cases away from zero */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,round,(float __x),__roundf,(__x))
 #else /* LIBC: roundf */
 } /* extern "C++" { */
@@ -6058,6 +6212,7 @@ __NAMESPACE_STD_END
 #include <local/math/roundf.h>
 __NAMESPACE_STD_BEGIN
 extern "C++" {
+/* Round X to nearest integral value, rounding halfway cases away from zero */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL round)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(roundf))(__x); }
 #endif /* round... */
 #if __has_builtin(__builtin_truncf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_truncf)
@@ -6358,12 +6513,16 @@ extern "C++" {
 __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL tgamma)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tgammal))(__x); }
 #endif /* tgamma... */
 #if __has_builtin(__builtin_nextafterl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nextafterl)
+/* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nexttoward,(__LONGDOUBLE __x, __LONGDOUBLE __y),nextafterl,{ return __builtin_nextafterl(__x, __y); })
 #elif defined(__CRT_HAVE_nextafterl)
+/* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nexttoward,(__LONGDOUBLE __x, __LONGDOUBLE __y),nextafterl,(__x,__y))
 #elif defined(__CRT_HAVE___nextafterl)
+/* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nexttoward,(__LONGDOUBLE __x, __LONGDOUBLE __y),__nextafterl,(__x,__y))
 #elif defined(__CRT_HAVE___nexttowardl)
+/* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nexttoward,(__LONGDOUBLE __x, __LONGDOUBLE __y),__nexttowardl,(__x,__y))
 #else /* LIBC: nextafterl */
 #include <ieee754.h>
@@ -6373,6 +6532,7 @@ __NAMESPACE_STD_END
 #include <local/math/nextafterl.h>
 __NAMESPACE_STD_BEGIN
 extern "C++" {
+/* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL nexttoward)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextafterl))(__x, __y); }
 #endif /* nexttoward... */
 #endif /* nexttoward... */
@@ -6452,10 +6612,13 @@ __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL nearb
 #endif /* nearbyint... */
 #endif /* nearbyint... */
 #if __has_builtin(__builtin_roundl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_roundl)
+/* Round X to nearest integral value, rounding halfway cases away from zero */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,round,(__LONGDOUBLE __x),roundl,{ return __builtin_roundl(__x); })
 #elif defined(__CRT_HAVE_roundl)
+/* Round X to nearest integral value, rounding halfway cases away from zero */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,round,(__LONGDOUBLE __x),roundl,(__x))
 #elif defined(__CRT_HAVE___roundl)
+/* Round X to nearest integral value, rounding halfway cases away from zero */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,round,(__LONGDOUBLE __x),__roundl,(__x))
 #else /* LIBC: roundl */
 } /* extern "C++" { */
@@ -6463,6 +6626,7 @@ __NAMESPACE_STD_END
 #include <local/math/roundl.h>
 __NAMESPACE_STD_BEGIN
 extern "C++" {
+/* Round X to nearest integral value, rounding halfway cases away from zero */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL round)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(roundl))(__x); }
 #endif /* round... */
 #if __has_builtin(__builtin_truncl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_truncl)
@@ -7261,9 +7425,18 @@ __NAMESPACE_STD_USING(floor)
 #define __fmod_defined 1
 __NAMESPACE_STD_USING(fmod)
 #endif /* !__fmod_defined && !__std_fmod_defined */
+#if !defined(__ceilf_defined) && defined(__std_ceilf_defined)
+#define __ceilf_defined 1
 __NAMESPACE_STD_USING(ceilf)
+#endif /* !__ceilf_defined && !__std_ceilf_defined */
+#if !defined(__fabsf_defined) && defined(__std_fabsf_defined)
+#define __fabsf_defined 1
 __NAMESPACE_STD_USING(fabsf)
+#endif /* !__fabsf_defined && !__std_fabsf_defined */
+#if !defined(__floorf_defined) && defined(__std_floorf_defined)
+#define __floorf_defined 1
 __NAMESPACE_STD_USING(floorf)
+#endif /* !__floorf_defined && !__std_floorf_defined */
 #if !defined(__fmodf_defined) && defined(__std_fmodf_defined)
 #define __fmodf_defined 1
 __NAMESPACE_STD_USING(fmodf)
@@ -7271,9 +7444,18 @@ __NAMESPACE_STD_USING(fmodf)
 #endif /* !__CXX_SYSTEM_HEADER */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #ifndef __CXX_SYSTEM_HEADER
+#if !defined(__ceill_defined) && defined(__std_ceill_defined)
+#define __ceill_defined 1
 __NAMESPACE_STD_USING(ceill)
+#endif /* !__ceill_defined && !__std_ceill_defined */
+#if !defined(__fabsl_defined) && defined(__std_fabsl_defined)
+#define __fabsl_defined 1
 __NAMESPACE_STD_USING(fabsl)
+#endif /* !__fabsl_defined && !__std_fabsl_defined */
+#if !defined(__floorl_defined) && defined(__std_floorl_defined)
+#define __floorl_defined 1
 __NAMESPACE_STD_USING(floorl)
+#endif /* !__floorl_defined && !__std_floorl_defined */
 #if !defined(__fmodl_defined) && defined(__std_fmodl_defined)
 #define __fmodl_defined 1
 __NAMESPACE_STD_USING(fmodl)
@@ -7288,7 +7470,10 @@ __NAMESPACE_STD_USING(copysign)
 #define __nan_defined 1
 __NAMESPACE_STD_USING(nan)
 #endif /* !__nan_defined && !__std_nan_defined */
+#if !defined(__copysignf_defined) && defined(__std_copysignf_defined)
+#define __copysignf_defined 1
 __NAMESPACE_STD_USING(copysignf)
+#endif /* !__copysignf_defined && !__std_copysignf_defined */
 #if !defined(__nanf_defined) && defined(__std_nanf_defined)
 #define __nanf_defined 1
 __NAMESPACE_STD_USING(nanf)
@@ -7296,7 +7481,10 @@ __NAMESPACE_STD_USING(nanf)
 #endif /* !__CXX_SYSTEM_HEADER */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #ifndef __CXX_SYSTEM_HEADER
+#if !defined(__copysignl_defined) && defined(__std_copysignl_defined)
+#define __copysignl_defined 1
 __NAMESPACE_STD_USING(copysignl)
+#endif /* !__copysignl_defined && !__std_copysignl_defined */
 #if !defined(__nanl_defined) && defined(__std_nanl_defined)
 #define __nanl_defined 1
 __NAMESPACE_STD_USING(nanl)
@@ -7482,14 +7670,26 @@ __NAMESPACE_STD_USING(scalblnf)
 #define __nearbyintf_defined 1
 __NAMESPACE_STD_USING(nearbyintf)
 #endif /* !__nearbyintf_defined && !__std_nearbyintf_defined */
+#if !defined(__roundf_defined) && defined(__std_roundf_defined)
+#define __roundf_defined 1
 __NAMESPACE_STD_USING(roundf)
+#endif /* !__roundf_defined && !__std_roundf_defined */
+#if !defined(__truncf_defined) && defined(__std_truncf_defined)
+#define __truncf_defined 1
 __NAMESPACE_STD_USING(truncf)
+#endif /* !__truncf_defined && !__std_truncf_defined */
 #if !defined(__remquof_defined) && defined(__std_remquof_defined)
 #define __remquof_defined 1
 __NAMESPACE_STD_USING(remquof)
 #endif /* !__remquof_defined && !__std_remquof_defined */
+#if !defined(__lrintf_defined) && defined(__std_lrintf_defined)
+#define __lrintf_defined 1
 __NAMESPACE_STD_USING(lrintf)
+#endif /* !__lrintf_defined && !__std_lrintf_defined */
+#if !defined(__lroundf_defined) && defined(__std_lroundf_defined)
+#define __lroundf_defined 1
 __NAMESPACE_STD_USING(lroundf)
+#endif /* !__lroundf_defined && !__std_lroundf_defined */
 __NAMESPACE_STD_USING(fdimf)
 __NAMESPACE_STD_USING(fmaxf)
 __NAMESPACE_STD_USING(fminf)
@@ -7497,8 +7697,14 @@ __NAMESPACE_STD_USING(fmaf)
 #endif /* !__CXX_SYSTEM_HEADER */
 #ifdef __COMPILER_HAVE_LONGLONG
 #ifndef __CXX_SYSTEM_HEADER
+#if !defined(__llrintf_defined) && defined(__std_llrintf_defined)
+#define __llrintf_defined 1
 __NAMESPACE_STD_USING(llrintf)
+#endif /* !__llrintf_defined && !__std_llrintf_defined */
+#if !defined(__llroundf_defined) && defined(__std_llroundf_defined)
+#define __llroundf_defined 1
 __NAMESPACE_STD_USING(llroundf)
+#endif /* !__llroundf_defined && !__std_llroundf_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 #endif /* __COMPILER_HAVE_LONGLONG */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
@@ -7519,14 +7725,26 @@ __NAMESPACE_STD_USING(scalblnl)
 #define __nearbyintl_defined 1
 __NAMESPACE_STD_USING(nearbyintl)
 #endif /* !__nearbyintl_defined && !__std_nearbyintl_defined */
+#if !defined(__roundl_defined) && defined(__std_roundl_defined)
+#define __roundl_defined 1
 __NAMESPACE_STD_USING(roundl)
+#endif /* !__roundl_defined && !__std_roundl_defined */
+#if !defined(__truncl_defined) && defined(__std_truncl_defined)
+#define __truncl_defined 1
 __NAMESPACE_STD_USING(truncl)
+#endif /* !__truncl_defined && !__std_truncl_defined */
 #if !defined(__remquol_defined) && defined(__std_remquol_defined)
 #define __remquol_defined 1
 __NAMESPACE_STD_USING(remquol)
 #endif /* !__remquol_defined && !__std_remquol_defined */
+#if !defined(__lrintl_defined) && defined(__std_lrintl_defined)
+#define __lrintl_defined 1
 __NAMESPACE_STD_USING(lrintl)
+#endif /* !__lrintl_defined && !__std_lrintl_defined */
+#if !defined(__lroundl_defined) && defined(__std_lroundl_defined)
+#define __lroundl_defined 1
 __NAMESPACE_STD_USING(lroundl)
+#endif /* !__lroundl_defined && !__std_lroundl_defined */
 __NAMESPACE_STD_USING(fdiml)
 __NAMESPACE_STD_USING(fmaxl)
 __NAMESPACE_STD_USING(fminl)
@@ -7534,8 +7752,14 @@ __NAMESPACE_STD_USING(fmal)
 #endif /* !__CXX_SYSTEM_HEADER */
 #ifdef __COMPILER_HAVE_LONGLONG
 #ifndef __CXX_SYSTEM_HEADER
+#if !defined(__llrintl_defined) && defined(__std_llrintl_defined)
+#define __llrintl_defined 1
 __NAMESPACE_STD_USING(llrintl)
+#endif /* !__llrintl_defined && !__std_llrintl_defined */
+#if !defined(__llroundl_defined) && defined(__std_llroundl_defined)
+#define __llroundl_defined 1
 __NAMESPACE_STD_USING(llroundl)
+#endif /* !__llroundl_defined && !__std_llroundl_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 #endif /* __COMPILER_HAVE_LONGLONG */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
@@ -8005,7 +8229,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isnanl,(__LONGDOUBLE __x),
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isnanl,(__LONGDOUBLE __x),isnan,(__x))
 #else /* LIBC: isnanl */
 #include <ieee754.h>
-#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_isnan) || defined(__CRT_HAVE___isnan) || defined(__CRT_HAVE__isnan)
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_isnan) || defined(__CRT_HAVE___isnan) || defined(__CRT_HAVE__isnan)
 #include <local/math/isnanl.h>
 /* Return nonzero if VALUE is not a number */
 __NAMESPACE_LOCAL_USING_OR_IMPL(isnanl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isnanl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isnanl))(__x); })
@@ -8369,17 +8593,22 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(scalbf, __FORCELOCAL __ATTR_WUNUSED float __NOTH
 #endif /* scalbf... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if __has_builtin(__builtin_scalbl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scalbl)
+/* Return X times (2 to the Nth power) */
 __CEIDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbl,(__LONGDOUBLE __x, __LONGDOUBLE __fn),{ return __builtin_scalbl(__x, __fn); })
 #elif defined(__CRT_HAVE_scalbl)
+/* Return X times (2 to the Nth power) */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbl,(__LONGDOUBLE __x, __LONGDOUBLE __fn),(__x,__fn))
 #elif defined(__CRT_HAVE___scalbl)
+/* Return X times (2 to the Nth power) */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbl,(__LONGDOUBLE __x, __LONGDOUBLE __fn),__scalbl,(__x,__fn))
 #elif defined(__CRT_HAVE__scalb) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* Return X times (2 to the Nth power) */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbl,(__LONGDOUBLE __x, __LONGDOUBLE __fn),_scalb,(__x,__fn))
 #else /* LIBC: scalbl */
 #include <ieee754.h>
 #if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_scalb) || defined(__CRT_HAVE___scalb) || defined(__CRT_HAVE__scalb)
 #include <local/math/scalbl.h>
+/* Return X times (2 to the Nth power) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(scalbl, __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL scalbl)(__LONGDOUBLE __x, __LONGDOUBLE __fn) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scalbl))(__x, __fn); })
 #endif /* scalbl... */
 #endif /* scalbl... */
@@ -8405,19 +8634,19 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__asin,(double __x),asin,(__x))
 #endif /* __asin... */
 #if __has_builtin(__builtin_atan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atan)
 /* Arc tangent of X */
-__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__atan,(double __x),atan,{ return __builtin_atan(__x); })
+__CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__atan,(double __x),atan,{ return __builtin_atan(__x); })
 #elif defined(__CRT_HAVE_atan)
 /* Arc tangent of X */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__atan,(double __x),atan,(__x))
+__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__atan,(double __x),atan,(__x))
 #elif defined(__CRT_HAVE___atan)
 /* Arc tangent of X */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__atan,(double __x),(__x))
+__CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__atan,(double __x),(__x))
 #else /* LIBC: atan */
 #include <ieee754.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <local/math/atan.h>
 /* Arc tangent of X */
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __atan)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atan))(__x); }
+__FORCELOCAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __atan)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atan))(__x); }
 #endif /* __atan... */
 #endif /* __atan... */
 #if __has_builtin(__builtin_atan2) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atan2)
@@ -9081,19 +9310,19 @@ __FORCELOCAL __DECL_SIMD_expf __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __expf)(
 #endif /* __expf... */
 #if __has_builtin(__builtin_frexpf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_frexpf)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-__CEIREDIRECT(__ATTR_WUNUSED,float,__NOTHROW_NCX,__frexpf,(float __x, int *__pexponent),frexpf,{ return __builtin_frexpf(__x, __pexponent); })
+__CEIREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),float,__NOTHROW_NCX,__frexpf,(float __x, int *__pexponent),frexpf,{ return __builtin_frexpf(__x, __pexponent); })
 #elif defined(__CRT_HAVE_frexpf)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW_NCX,__frexpf,(float __x, int *__pexponent),frexpf,(__x,__pexponent))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),float,__NOTHROW_NCX,__frexpf,(float __x, int *__pexponent),frexpf,(__x,__pexponent))
 #elif defined(__CRT_HAVE___frexpf)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-__CDECLARE(__ATTR_WUNUSED,float,__NOTHROW_NCX,__frexpf,(float __x, int *__pexponent),(__x,__pexponent))
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),float,__NOTHROW_NCX,__frexpf,(float __x, int *__pexponent),(__x,__pexponent))
 #else /* LIBC: frexpf */
 #include <ieee754.h>
 #if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_frexp) || defined(__CRT_HAVE___frexp)
 #include <local/math/frexpf.h>
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-__FORCELOCAL __ATTR_WUNUSED float __NOTHROW_NCX(__LIBCCALL __frexpf)(float __x, int *__pexponent) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(frexpf))(__x, __pexponent); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((2)) float __NOTHROW_NCX(__LIBCCALL __frexpf)(float __x, int *__pexponent) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(frexpf))(__x, __pexponent); }
 #endif /* __frexpf... */
 #endif /* __frexpf... */
 #if __has_builtin(__builtin_ldexpf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ldexpf)
@@ -9181,19 +9410,19 @@ __FORCELOCAL __DECL_SIMD_expl __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL _
 #endif /* __expl... */
 #if __has_builtin(__builtin_frexpl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_frexpl)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-__CEIREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,__frexpl,(__LONGDOUBLE __x, int *__pexponent),frexpl,{ return __builtin_frexpl(__x, __pexponent); })
+__CEIREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__LONGDOUBLE,__NOTHROW_NCX,__frexpl,(__LONGDOUBLE __x, int *__pexponent),frexpl,{ return __builtin_frexpl(__x, __pexponent); })
 #elif defined(__CRT_HAVE_frexpl)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,__frexpl,(__LONGDOUBLE __x, int *__pexponent),frexpl,(__x,__pexponent))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__LONGDOUBLE,__NOTHROW_NCX,__frexpl,(__LONGDOUBLE __x, int *__pexponent),frexpl,(__x,__pexponent))
 #elif defined(__CRT_HAVE___frexpl)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-__CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,__frexpl,(__LONGDOUBLE __x, int *__pexponent),(__x,__pexponent))
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),__LONGDOUBLE,__NOTHROW_NCX,__frexpl,(__LONGDOUBLE __x, int *__pexponent),(__x,__pexponent))
 #else /* LIBC: frexpl */
 #include <ieee754.h>
 #if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_frexp) || defined(__CRT_HAVE___frexp)
 #include <local/math/frexpl.h>
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-__FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL __frexpl)(__LONGDOUBLE __x, int *__pexponent) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(frexpl))(__x, __pexponent); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((2)) __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL __frexpl)(__LONGDOUBLE __x, int *__pexponent) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(frexpl))(__x, __pexponent); }
 #endif /* __frexpl... */
 #endif /* __frexpl... */
 #if __has_builtin(__builtin_ldexpl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ldexpl)
@@ -9668,7 +9897,7 @@ __CREDIRECT(__DECL_SIMD_powl __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__powl,(__LON
 __CDECLARE(__DECL_SIMD_powl __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__powl,(__LONGDOUBLE __x, __LONGDOUBLE __y),(__x,__y))
 #else /* LIBC: powl */
 #include <ieee754.h>
-#if defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow)
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow)
 #include <local/math/powl.h>
 /* Return X to the Y power */
 __FORCELOCAL __DECL_SIMD_powl __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __powl)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(powl))(__x, __y); }
@@ -9999,17 +10228,17 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__ceill,(__LONGDOU
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __ceill)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ceill))(__x); }
 #endif /* __ceill... */
 #if __has_builtin(__builtin_fabsl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fabsl)
-/* Return X with its signed changed to Y's */
+/* Absolute value of X */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__fabsl,(__LONGDOUBLE __x),fabsl,{ return __builtin_fabsl(__x); })
 #elif defined(__CRT_HAVE_fabsl)
-/* Return X with its signed changed to Y's */
+/* Absolute value of X */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__fabsl,(__LONGDOUBLE __x),fabsl,(__x))
 #elif defined(__CRT_HAVE___fabsl)
-/* Return X with its signed changed to Y's */
+/* Absolute value of X */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__fabsl,(__LONGDOUBLE __x),(__x))
 #else /* LIBC: fabsl */
 #include <local/math/fabsl.h>
-/* Return X with its signed changed to Y's */
+/* Absolute value of X */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __fabsl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fabsl))(__x); }
 #endif /* __fabsl... */
 #if __has_builtin(__builtin_floorl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_floorl)
@@ -10027,15 +10256,19 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__floorl,(__LONGDO
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __floorl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(floorl))(__x); }
 #endif /* __floorl... */
 #if __has_builtin(__builtin_fmodl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fmodl)
+/* Floating-point modulo remainder of X/Y */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__fmodl,(__LONGDOUBLE __x, __LONGDOUBLE __y),fmodl,{ return __builtin_fmodl(__x, __y); })
 #elif defined(__CRT_HAVE_fmodl)
+/* Floating-point modulo remainder of X/Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__fmodl,(__LONGDOUBLE __x, __LONGDOUBLE __y),fmodl,(__x,__y))
 #elif defined(__CRT_HAVE___fmodl)
+/* Floating-point modulo remainder of X/Y */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__fmodl,(__LONGDOUBLE __x, __LONGDOUBLE __y),(__x,__y))
 #else /* LIBC: fmodl */
 #include <ieee754.h>
 #if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_fmod) || defined(__CRT_HAVE___fmod)
 #include <local/math/fmodl.h>
+/* Floating-point modulo remainder of X/Y */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __fmodl)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmodl))(__x, __y); }
 #endif /* __fmodl... */
 #endif /* __fmodl... */
@@ -10360,7 +10593,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isnanl,(__LONGDOUBLE __x
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isnanl,(__LONGDOUBLE __x),isnan,(__x))
 #else /* LIBC: isnanl */
 #include <ieee754.h>
-#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_isnan) || defined(__CRT_HAVE___isnan) || defined(__CRT_HAVE__isnan)
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_isnan) || defined(__CRT_HAVE___isnan) || defined(__CRT_HAVE__isnan)
 #include <local/math/isnanl.h>
 /* Return nonzero if VALUE is not a number */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __isnanl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isnanl))(__x); }
@@ -10989,17 +11222,22 @@ __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __rin
 #endif /* __rintl... */
 #endif /* __rintl... */
 #if __has_builtin(__builtin_nextafterl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nextafterl)
+/* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__nextafterl,(__LONGDOUBLE __x, __LONGDOUBLE __y),nextafterl,{ return __builtin_nextafterl(__x, __y); })
 #elif defined(__CRT_HAVE_nextafterl)
+/* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__nextafterl,(__LONGDOUBLE __x, __LONGDOUBLE __y),nextafterl,(__x,__y))
 #elif defined(__CRT_HAVE___nextafterl)
+/* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__nextafterl,(__LONGDOUBLE __x, __LONGDOUBLE __y),(__x,__y))
 #elif defined(__CRT_HAVE___nexttowardl)
+/* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__nextafterl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__nexttowardl,(__x,__y))
 #else /* LIBC: nextafterl */
 #include <ieee754.h>
 #if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter)
 #include <local/math/nextafterl.h>
+/* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __nextafterl)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextafterl))(__x, __y); }
 #endif /* __nextafterl... */
 #endif /* __nextafterl... */
@@ -11339,13 +11577,17 @@ __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __nearbyintf
 #endif /* __nearbyintf... */
 #endif /* __nearbyintf... */
 #if __has_builtin(__builtin_roundf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_roundf)
+/* Round X to nearest integral value, rounding halfway cases away from zero */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__roundf,(float __x),roundf,{ return __builtin_roundf(__x); })
 #elif defined(__CRT_HAVE_roundf)
+/* Round X to nearest integral value, rounding halfway cases away from zero */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__roundf,(float __x),roundf,(__x))
 #elif defined(__CRT_HAVE___roundf)
+/* Round X to nearest integral value, rounding halfway cases away from zero */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__roundf,(float __x),(__x))
 #else /* LIBC: roundf */
 #include <local/math/roundf.h>
+/* Round X to nearest integral value, rounding halfway cases away from zero */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __roundf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(roundf))(__x); }
 #endif /* __roundf... */
 #if __has_builtin(__builtin_truncf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_truncf)
@@ -11550,17 +11792,22 @@ __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGLONG __NOTHROW(__LIBCCALL __llrou
 #endif /* __COMPILER_HAVE_LONGLONG */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if __has_builtin(__builtin_nextafterl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nextafterl)
+/* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__nexttowardl,(__LONGDOUBLE __x, __LONGDOUBLE __y),nextafterl,{ return __builtin_nextafterl(__x, __y); })
 #elif defined(__CRT_HAVE_nextafterl)
+/* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__nexttowardl,(__LONGDOUBLE __x, __LONGDOUBLE __y),nextafterl,(__x,__y))
 #elif defined(__CRT_HAVE___nextafterl)
+/* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__nexttowardl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__nextafterl,(__x,__y))
 #elif defined(__CRT_HAVE___nexttowardl)
+/* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__nexttowardl,(__LONGDOUBLE __x, __LONGDOUBLE __y),(__x,__y))
 #else /* LIBC: nextafterl */
 #include <ieee754.h>
 #if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter)
 #include <local/math/nextafterl.h>
+/* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __nexttowardl)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextafterl))(__x, __y); }
 #endif /* __nexttowardl... */
 #endif /* __nexttowardl... */
@@ -11631,13 +11878,17 @@ __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __nea
 #endif /* __nearbyintl... */
 #endif /* __nearbyintl... */
 #if __has_builtin(__builtin_roundl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_roundl)
+/* Round X to nearest integral value, rounding halfway cases away from zero */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__roundl,(__LONGDOUBLE __x),roundl,{ return __builtin_roundl(__x); })
 #elif defined(__CRT_HAVE_roundl)
+/* Round X to nearest integral value, rounding halfway cases away from zero */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__roundl,(__LONGDOUBLE __x),roundl,(__x))
 #elif defined(__CRT_HAVE___roundl)
+/* Round X to nearest integral value, rounding halfway cases away from zero */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__roundl,(__LONGDOUBLE __x),(__x))
 #else /* LIBC: roundl */
 #include <local/math/roundl.h>
+/* Round X to nearest integral value, rounding halfway cases away from zero */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __roundl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(roundl))(__x); }
 #endif /* __roundl... */
 #if __has_builtin(__builtin_truncl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_truncl)
@@ -11864,17 +12115,22 @@ __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __scalbf)(float __x, floa
 #endif /* __scalbf... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if __has_builtin(__builtin_scalbl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scalbl)
+/* Return X times (2 to the Nth power) */
 __CEIREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__scalbl,(__LONGDOUBLE __x, __LONGDOUBLE __fn),scalbl,{ return __builtin_scalbl(__x, __fn); })
 #elif defined(__CRT_HAVE_scalbl)
+/* Return X times (2 to the Nth power) */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__scalbl,(__LONGDOUBLE __x, __LONGDOUBLE __fn),scalbl,(__x,__fn))
 #elif defined(__CRT_HAVE___scalbl)
+/* Return X times (2 to the Nth power) */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__scalbl,(__LONGDOUBLE __x, __LONGDOUBLE __fn),(__x,__fn))
 #elif defined(__CRT_HAVE__scalb) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* Return X times (2 to the Nth power) */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__scalbl,(__LONGDOUBLE __x, __LONGDOUBLE __fn),_scalb,(__x,__fn))
 #else /* LIBC: scalbl */
 #include <ieee754.h>
 #if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_scalb) || defined(__CRT_HAVE___scalb) || defined(__CRT_HAVE__scalb)
 #include <local/math/scalbl.h>
+/* Return X times (2 to the Nth power) */
 __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __scalbl)(__LONGDOUBLE __x, __LONGDOUBLE __fn) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scalbl))(__x, __fn); }
 #endif /* __scalbl... */
 #endif /* __scalbl... */

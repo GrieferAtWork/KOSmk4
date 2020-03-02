@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9f1f677a */
+/* HASH CRC-32:0x8d2ff6e2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,17 @@
 #include <ieee754.h>
 #if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_scalb) || defined(__CRT_HAVE___scalb) || defined(__CRT_HAVE__scalb)
 #define __local_scalbl_defined 1
+#include <libm/isnan.h>
+
+#include <libm/finite.h>
+
+#include <libm/isinf.h>
+
+#include <libm/matherr.h>
+
+#include <parts/errno.h>
+
+#include <libm/scalb.h>
 /* Dependency: "scalb" from "math" */
 #ifndef ____localdep_scalb_defined
 #define ____localdep_scalb_defined 1
@@ -50,10 +61,11 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_scalb,(double __x, double
 #endif /* !____localdep_scalb_defined */
 
 __NAMESPACE_LOCAL_BEGIN
+/* Return X times (2 to the Nth power) */
 __LOCAL_LIBC(scalbl) __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(scalbl))(__LONGDOUBLE __x,
                                                 __LONGDOUBLE __fn) {
-#line 2683 "kos/src/libc/magic/math.c"
+#line 1665 "kos/src/libc/magic/math.c"
 #ifdef __LIBM_MATHFUN2L
 	/*
 	 * ====================================================
