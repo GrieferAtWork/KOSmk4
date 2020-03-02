@@ -38,13 +38,29 @@ DEFINE_TEST(math_rounding) {
 	volatile double e = -1.5;
 	volatile double f = -1.501;
 
-#define EQFLT(a, b) assertf((a) == (b), "%f != %f", a, b)
+#define EQFLT(a, b) assertf(isfinite(a) && (a) == (b), "%f != %f", a, b)
+#define EQL(a, b)   assertf((a) == (b), "%ld != %ld", (long)(a), (long)(b))
+#define EQLL(a, b)  assertf((a) == (b), "%lld != %lld", (__LONGLONG)(a), (__LONGLONG)(b))
 	EQFLT(round(a), 1.0);
 	EQFLT(round(b), 2.0);
 	EQFLT(round(c), 2.0);
 	EQFLT(round(d), -1.0);
 	EQFLT(round(e), -2.0);
 	EQFLT(round(f), -2.0);
+
+	EQL(lround(a), 1);
+	EQL(lround(b), 2);
+	EQL(lround(c), 2);
+	EQL(lround(d), -1);
+	EQL(lround(e), -2);
+	EQL(lround(f), -2);
+
+	EQLL(llround(a), 1);
+	EQLL(llround(b), 2);
+	EQLL(llround(c), 2);
+	EQLL(llround(d), -1);
+	EQLL(llround(e), -2);
+	EQLL(llround(f), -2);
 
 	EQFLT(floor(a), 1.0);
 	EQFLT(floor(b), 1.0);
@@ -66,6 +82,8 @@ DEFINE_TEST(math_rounding) {
 	EQFLT(trunc(d), -1.0);
 	EQFLT(trunc(e), -1.0);
 	EQFLT(trunc(f), -1.0);
+#undef EQLL
+#undef EQL
 #undef EQFLT
 }
 

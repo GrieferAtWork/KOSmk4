@@ -30,12 +30,14 @@
 #include <bits/types.h>
 
 #include <libc/fenv.h>
+#include <libm/asm/lrint.h>
 #include <libm/fdlibm.h>
 
 #ifdef __CC__
 __DECL_BEGIN
 
 #ifdef __IEEE754_FLOAT_TYPE__
+#ifndef __ieee754_lrintf
 /* <<<No copyright notice found in the original file, but was part of fdlibm>>> */
 
 __LOCAL __ATTR_WUNUSED __ATTR_CONST long int
@@ -109,8 +111,10 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST long int
 	}
 	return __sx ? -__result : __result;
 }
+#endif /* !__ieee754_lrintf */
 
 #ifdef __COMPILER_HAVE_LONGLONG
+#ifndef __ieee754_llrintf
 __LOCAL __ATTR_WUNUSED __ATTR_CONST __LONGLONG
 (__LIBCCALL __ieee754_llrintf)(__IEEE754_FLOAT_TYPE__ __x) {
 	__int32_t __j0;
@@ -182,11 +186,13 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __LONGLONG
 	}
 	return __sx ? -__result : __result;
 }
+#endif /* !__ieee754_llrintf */
 #endif /* __COMPILER_HAVE_LONGLONG */
 #endif /* __IEEE754_FLOAT_TYPE__ */
 
 
 #ifdef __IEEE754_DOUBLE_TYPE__
+#ifndef __ieee754_lrint
 /* <<<No copyright notice found in the original file, but was part of fdlibm>>> */
 
 __LOCAL __ATTR_WUNUSED __ATTR_CONST long int
@@ -321,8 +327,10 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST long int
 	}
 	return __sx ? -__result : __result;
 }
+#endif /* !__ieee754_lrint */
 
 #ifdef __COMPILER_HAVE_LONGLONG
+#ifndef __ieee754_llrint
 __LOCAL __ATTR_WUNUSED __ATTR_CONST __LONGLONG
 (__LIBCCALL __ieee754_llrint)(__IEEE754_DOUBLE_TYPE__ __x) {
 	__int32_t __j0;
@@ -455,11 +463,13 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __LONGLONG
 	}
 	return __sx ? -__result : __result;
 }
+#endif /* !__ieee754_llrint */
 #endif /* __COMPILER_HAVE_LONGLONG */
 #endif /* __IEEE754_DOUBLE_TYPE__ */
 
 
 #ifdef __IEEE854_LONG_DOUBLE_TYPE__
+#ifndef __ieee854_lrintl
 /* <<<No copyright notice found in the original file, but was part of fdlibm>>> */
 
 __LOCAL __ATTR_WUNUSED __ATTR_CONST long int
@@ -613,8 +623,10 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST long int
 	}
 	return __sx ? -__result : __result;
 }
+#endif /* !__ieee854_lrintl */
 
 #ifdef __COMPILER_HAVE_LONGLONG
+#ifndef __ieee854_llrintl
 __LOCAL __ATTR_WUNUSED __ATTR_CONST __LONGLONG
 (__LIBCCALL __ieee854_llrintl)(__IEEE854_LONG_DOUBLE_TYPE__ __x) {
 	__int32_t __se, __j0;
@@ -766,6 +778,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __LONGLONG
 	}
 	return __sx ? -__result : __result;
 }
+#endif /* !__ieee854_llrintl */
 #endif /* __COMPILER_HAVE_LONGLONG */
 #endif /* __IEEE854_LONG_DOUBLE_TYPE__ */
 

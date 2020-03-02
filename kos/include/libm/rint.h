@@ -29,6 +29,7 @@
 #include <bits/types.h>
 
 #include <libc/fenv.h>
+#include <libm/asm/rint.h>
 #include <libm/ceil.h>
 #include <libm/fdlibm.h>
 #include <libm/floor.h>
@@ -38,6 +39,7 @@
 __DECL_BEGIN
 
 #ifdef __IEEE754_FLOAT_TYPE__
+#ifndef __ieee754_rintf
 /* <<<No copyright notice found in the original file, but was part of fdlibm>>> */
 
 #ifndef __libm_hugef_defined
@@ -105,11 +107,12 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 	}
 	return __ieee754_roundevenf(__x);
 }
-
+#endif /* !__ieee754_rintf */
 #endif /* __IEEE754_FLOAT_TYPE__ */
 
 
 #ifdef __IEEE754_DOUBLE_TYPE__
+#ifndef __ieee754_rint
 /*
  * ====================================================
  * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
@@ -201,11 +204,12 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 	}
 	return __ieee754_roundeven(__x);
 }
-
+#endif /* !__ieee754_rint */
 #endif /* __IEEE754_DOUBLE_TYPE__ */
 
 
 #ifdef __IEEE854_LONG_DOUBLE_TYPE__
+#ifndef __ieee854_rintl
 /* <<<No copyright notice found in the original file, but was part of fdlibm>>> */
 
 #ifndef __libm_hugeval4930l_defined
@@ -300,7 +304,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
 	}
 	return __ieee854_roundevenl(__x);
 }
-
+#endif /* !__ieee854_rintl */
 #endif /* __IEEE854_LONG_DOUBLE_TYPE__ */
 
 __DECL_END

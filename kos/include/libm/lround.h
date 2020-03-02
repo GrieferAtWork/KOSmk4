@@ -27,12 +27,14 @@
 
 #include <bits/types.h>
 
+#include <libm/asm/lround.h>
 #include <libm/fdlibm.h>
 
 #ifdef __CC__
 __DECL_BEGIN
 
 #ifdef __IEEE754_FLOAT_TYPE__
+#ifndef __ieee754_lroundf
 /* Round double value to long int.
    Copyright (C) 1997-2013 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -80,8 +82,10 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST long int
 		__result = -__result;
 	return __result;
 }
+#endif /* !__ieee754_lroundf */
 
 #ifdef __COMPILER_HAVE_LONGLONG
+#ifndef __ieee754_llroundf
 __LOCAL __ATTR_WUNUSED __ATTR_CONST __LONGLONG
 (__LIBCCALL __ieee754_llroundf)(__IEEE754_FLOAT_TYPE__ __x) {
 	__int32_t __j0;
@@ -111,11 +115,13 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __LONGLONG
 		__result = -__result;
 	return __result;
 }
+#endif /* !__ieee754_llroundf */
 #endif /* __COMPILER_HAVE_LONGLONG */
 #endif /* __IEEE754_FLOAT_TYPE__ */
 
 
 #ifdef __IEEE754_DOUBLE_TYPE__
+#ifndef __ieee754_lround
 /*
  * ====================================================
  * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
@@ -186,8 +192,10 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST long int
 		__result = -__result;
 	return __result;
 }
+#endif /* !__ieee754_lround */
 
 #ifdef __COMPILER_HAVE_LONGLONG
+#ifndef __ieee754_llround
 __LOCAL __ATTR_WUNUSED __ATTR_CONST __LONGLONG
 (__LIBCCALL __ieee754_llround)(__IEEE754_DOUBLE_TYPE__ __x) {
 	__int32_t __j0;
@@ -247,11 +255,13 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __LONGLONG
 		__result = -__result;
 	return __result;
 }
+#endif /* !__ieee754_llround */
 #endif /* __COMPILER_HAVE_LONGLONG */
 #endif /* __IEEE754_DOUBLE_TYPE__ */
 
 
 #ifdef __IEEE854_LONG_DOUBLE_TYPE__
+#ifndef __ieee854_lroundl
 /* Round double value to long int.
    Copyright (C) 1997-2013 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -316,8 +326,10 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST long int
 		__result = -__result;
 	return __result;
 }
+#endif /* !__ieee854_lroundl */
 
 #ifdef __COMPILER_HAVE_LONGLONG
+#ifndef __ieee854_llroundl
 __LOCAL __ATTR_WUNUSED __ATTR_CONST __LONGLONG
 (__LIBCCALL __ieee854_llroundl)(__IEEE854_LONG_DOUBLE_TYPE__ __x) {
 	__int32_t __j0;
@@ -363,6 +375,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __LONGLONG
 		__result = -__result;
 	return __result;
 }
+#endif /* !__ieee854_llroundl */
 #endif /* __COMPILER_HAVE_LONGLONG */
 #endif /* __IEEE854_LONG_DOUBLE_TYPE__ */
 

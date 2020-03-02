@@ -17,73 +17,59 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_LIBM_ASM_TRUNC_H
-#define _I386_KOS_LIBM_ASM_TRUNC_H 1
+#ifndef _I386_KOS_LIBM_ASM_RINT_H
+#define _I386_KOS_LIBM_ASM_RINT_H 1
 
 #include <__stdinc.h>
 
 #include <libm/asm/builtin.h>
 
 #if !defined(__NO_FPU) && defined(__COMPILER_HAVE_GCC_ASM)
-#include <asm/intrin-fpu.h>
-
 #include <libm/fdlibm.h>
 
 #ifdef __CC__
 __DECL_BEGIN
 
 #ifdef __IEEE754_FLOAT_TYPE__
-#ifndef __ieee754_truncf
-#define __ieee754_truncf __ieee754_truncf
+#ifndef __ieee754_rintf
+#define __ieee754_rintf __ieee754_rintf
 __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
-(__LIBCCALL __ieee754_truncf)(__IEEE754_FLOAT_TYPE__ __x) {
-	__UINT16_TYPE__ __cw;
+(__LIBCCALL __ieee754_rintf)(__IEEE754_FLOAT_TYPE__ __x) {
 	__IEEE754_FLOAT_TYPE__ __res;
-	__cw = __fnstcw();
-	__fldcw((__cw & ~__UINT16_C(0x0c00) /* FCW_RC */) | __UINT16_C(0x0c00) /* FCW_RC_TRUNC */);
 	__asm__ __volatile__("frndint" : "=t" (__res) : "0" (__x));
-	__fldcw(__cw);
 	return __res;
 }
-#endif /* !__ieee754_truncf */
+#endif /* !__ieee754_rintf */
 #endif /* __IEEE754_FLOAT_TYPE__ */
 
 
 #ifdef __IEEE754_DOUBLE_TYPE__
-#ifndef __ieee754_trunc
-#define __ieee754_trunc __ieee754_trunc
+#ifndef __ieee754_rint
+#define __ieee754_rint __ieee754_rint
 __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
-(__LIBCCALL __ieee754_trunc)(__IEEE754_DOUBLE_TYPE__ __x) {
-	__UINT16_TYPE__ __cw;
+(__LIBCCALL __ieee754_rint)(__IEEE754_DOUBLE_TYPE__ __x) {
 	__IEEE754_DOUBLE_TYPE__ __res;
-	__cw = __fnstcw();
-	__fldcw((__cw & ~__UINT16_C(0x0c00) /* FCW_RC */) | __UINT16_C(0x0c00) /* FCW_RC_TRUNC */);
 	__asm__ __volatile__("frndint" : "=t" (__res) : "0" (__x));
-	__fldcw(__cw);
 	return __res;
 }
-#endif /* !__ieee754_trunc */
+#endif /* !__ieee754_rint */
 #endif /* __IEEE754_DOUBLE_TYPE__ */
 
 
 #ifdef __IEEE854_LONG_DOUBLE_TYPE__
-#ifndef __ieee854_truncl
-#define __ieee854_truncl __ieee854_truncl
+#ifndef __ieee854_rintl
+#define __ieee854_rintl __ieee854_rintl
 __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
-(__LIBCCALL __ieee854_truncl)(__IEEE854_LONG_DOUBLE_TYPE__ __x) {
-	__UINT16_TYPE__ __cw;
+(__LIBCCALL __ieee854_rintl)(__IEEE854_LONG_DOUBLE_TYPE__ __x) {
 	__IEEE854_LONG_DOUBLE_TYPE__ __res;
-	__cw = __fnstcw();
-	__fldcw((__cw & ~__UINT16_C(0x0c00) /* FCW_RC */) | __UINT16_C(0x0c00) /* FCW_RC_TRUNC */);
 	__asm__ __volatile__("frndint" : "=t" (__res) : "0" (__x));
-	__fldcw(__cw);
 	return __res;
 }
-#endif /* !__ieee854_truncl */
+#endif /* !__ieee854_rintl */
 #endif /* __IEEE854_LONG_DOUBLE_TYPE__ */
 
 __DECL_END
 #endif /* __CC__ */
 #endif /* !__NO_FPU && __COMPILER_HAVE_GCC_ASM */
 
-#endif /* !_I386_KOS_LIBM_ASM_TRUNC_H */
+#endif /* !_I386_KOS_LIBM_ASM_RINT_H */

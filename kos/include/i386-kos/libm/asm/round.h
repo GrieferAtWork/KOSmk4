@@ -25,7 +25,6 @@
 #include <libm/asm/builtin.h>
 
 #if !defined(__NO_FPU) && defined(__COMPILER_HAVE_GCC_ASM)
-#include <asm/cpu-flags.h>
 #include <asm/intrin-fpu.h>
 
 #include <libm/fdlibm.h>
