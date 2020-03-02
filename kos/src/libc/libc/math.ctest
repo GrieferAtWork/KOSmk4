@@ -1,0 +1,75 @@
+/* Copyright (c) 2019-2020 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef GUARD_LIBC_LIBC_MATH_CTEST
+#define GUARD_LIBC_LIBC_MATH_CTEST 1
+#define _KOS_SOURCE 1
+
+#include <hybrid/compiler.h>
+
+#include <system-test/ctest.h>
+
+#include <assert.h>
+#include <math.h>
+
+DECL_BEGIN
+
+DEFINE_TEST(math_rounding) {
+	volatile double a = 1.499;
+	volatile double b = 1.5;
+	volatile double c = 1.501;
+	volatile double d = -1.499;
+	volatile double e = -1.5;
+	volatile double f = -1.501;
+
+#define EQFLT(a, b) assertf((a) == (b), "%f != %f", a, b)
+	EQFLT(round(a), 1.0);
+	EQFLT(round(b), 2.0);
+	EQFLT(round(c), 2.0);
+	EQFLT(round(d), -1.0);
+	EQFLT(round(e), -2.0);
+	EQFLT(round(f), -2.0);
+
+	EQFLT(floor(a), 1.0);
+	EQFLT(floor(b), 1.0);
+	EQFLT(floor(c), 1.0);
+	EQFLT(floor(d), -2.0);
+	EQFLT(floor(e), -2.0);
+	EQFLT(floor(f), -2.0);
+
+	EQFLT(ceil(a), 2.0);
+	EQFLT(ceil(b), 2.0);
+	EQFLT(ceil(c), 2.0);
+	EQFLT(ceil(d), -1.0);
+	EQFLT(ceil(e), -1.0);
+	EQFLT(ceil(f), -1.0);
+
+	EQFLT(trunc(a), 1.0);
+	EQFLT(trunc(b), 1.0);
+	EQFLT(trunc(c), 1.0);
+	EQFLT(trunc(d), -1.0);
+	EQFLT(trunc(e), -1.0);
+	EQFLT(trunc(f), -1.0);
+#undef EQFLT
+}
+
+
+DECL_END
+
+#endif /* !GUARD_LIBC_LIBC_MATH_CTEST */

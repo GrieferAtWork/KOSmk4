@@ -60,6 +60,7 @@
 #include <errno.h>
 #include <format-printer.h>
 #include <malloc.h>
+#include <math.h>
 #include <pty.h>
 #include <sched.h>
 #include <signal.h>
@@ -288,7 +289,7 @@ int main_dl(int argc, char *argv[], char *envp[]) {
 	printf("printf   @ %p\n", (void *)&printf);
 	printf("printf   @ %p (dlsym)\n", dlsym(RTLD_DEFAULT, "printf"));
 	printf("vprintf  @ %p (dlsym)\n", dlsym(RTLD_DEFAULT, "vprintf"));
- 	return 0;
+	return 0;
 }
 /************************************************************************/
 
@@ -309,7 +310,7 @@ int main_ustring(int argc, char *argv[], char *envp[]) {
 		printf("%I32s (%I32q)\n", s32, s32);
 		printf("%ls   (%lq)\n", sw, sw);
 	}
- 	return 0;
+	return 0;
 }
 /************************************************************************/
 
