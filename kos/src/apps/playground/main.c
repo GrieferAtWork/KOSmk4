@@ -318,6 +318,20 @@ int main_ustring(int argc, char *argv[], char *envp[]) {
 
 
 /************************************************************************/
+int main_float(int argc, char *argv[], char *envp[]) {
+	(void)argc, (void)argv, (void)envp;
+	printf("1/1 = %f\n", 1.0 / 1.0);
+	printf("1/2 = %f\n", 1.0 / 2.0);
+	printf("1/3 = %f\n", 1.0 / 3.0);
+	printf("1/4 = %f\n", 1.0 / 4.0);
+	return 0;
+}
+/************************************************************************/
+
+
+
+
+/************************************************************************/
 int main_sock(int argc, char *argv[], char *envp[]) {
 	fd_t sock;
 	struct sockaddr_in in;
@@ -461,6 +475,7 @@ PRIVATE DEF defs[] = {
 	{ "logtime", &main_logtime },
 	{ "dl", &main_dl },
 	{ "ustring", &main_ustring },
+	{ "float", &main_float },
 	{ "sock", &main_sock },
 #ifdef HAVE_MAIN_SYSENTER
 	{ "sysenter", &main_sysenter },

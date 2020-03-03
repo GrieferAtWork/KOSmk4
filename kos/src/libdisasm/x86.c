@@ -46,6 +46,8 @@ if (gcc_opt.remove("-O3"))
 #include <stdlib.h>
 #include <string.h>
 
+#include "_binstr.h"
+
 DECL_BEGIN
 
 
@@ -301,32 +303,38 @@ PRIVATE char const segment_prefix[][4] = {
 
 /* Instruction flags. */
 typedef u32 op_flag_t;
-#define F_OP16       0x00000001 /* The 0x66 prefix is being used. */
-#define F_AD16       0x00000002 /* The 0x67 prefix is being used. */
-#define F_LOCK       0x00000004 /* The `lock' (0xf0) prefix is being used. */
-#define F_REPNE      0x00000010 /* The `repne' (0xf2) prefix is being used. */
-#define F_REP        0x00000020 /* The `rep' (0xf3) prefix is being used. */
-#define F_HASVEX     0x00000040 /* A VEX prefix was given. */
-#define F_SEGMASK    0x0000f000 /* Mask for segment overrides. */
-#define F_SEGSHIFT           12 /* Shift for segment overrides. */
-#define F_VEX_VVVV_M 0x000f0000 /* Mask for VEX.VVVV */
-#define F_VEX_VVVV_S         16 /* Shift for VEX.VVVV */
-#define F_VEX_W      0x00100000 /* Value of VEX.W */
-#define F_VEX_L      0x00200000 /* Value of VEX.L */
-#define F_AD64       F_AD16     /* The 0x67 prefix is being used. */
-#define F_HASREX     0x00000080 /* A REX prefix is being used. */
-#define F_REXSHFT             8 /* Shift for the REX prefix byte. */
-#define F_REXMASK    0x00000f00 /* Mask of the REX prefix byte. */
-#define F_REX_W      0x00000800 /* The REX.W flag (Indicates 64-bit operands). */
-#define F_REX_R      0x00000400 /* The REX.R flag (1-bit extension to MODRM.reg). */
-#define F_REX_X      0x00000200 /* The REX.X flag (1-bit extension to SIB.index). */
-#define F_REX_B      0x00000100 /* The REX.B flag (1-bit extension to MODRM.rm). */
-#define F_SEGDS      0x00001000 /* DS override. */
-#define F_SEGES      0x00002000 /* ES override. */
-#define F_SEGCS      0x00003000 /* CS override. */
-#define F_SEGSS      0x00004000 /* SS override. */
-#define F_SEGFS      0x00005000 /* FS override. */
-#define F_SEGGS      0x00006000 /* GS override. */
+#define F_OP16        0x00000001 /* The 0x66 prefix is being used. */
+#define F_AD16        0x00000002 /* The 0x67 prefix is being used. */
+#define F_LOCK        0x00000004 /* The `lock' (0xf0) prefix is being used. */
+#define F_REPNE       0x00000010 /* The `repne' (0xf2) prefix is being used. */
+#define F_REP         0x00000020 /* The `rep' (0xf3) prefix is being used. */
+#define F_HASVEX      0x00000040 /* A VEX prefix was given. */
+#define F_SEGMASK     0x0000f000 /* Mask for segment overrides. */
+#define F_SEGSHIFT            12 /* Shift for segment overrides. */
+#define F_VEX_VVVVV_M 0x001f0000 /* Mask for EVEX.Vi + VEX.VVVV */
+#define F_VEX_VVVVV_S         16 /* Shift for EVEX.Vi + VEX.VVVV */
+#define F_VEX_W       0x00200000 /* Value of VEX.W */
+#define F_VEX_LL_M    0x00c00000 /* Value of VEX.LL */
+#define F_VEX_LL_S            22 /* Shift for VEX.LL */
+#define F_EVEX_z      0x01000000 /* Value of EVEX.z */
+#define F_EVEX_b      0x02000000 /* Value of EVEX.b */
+#define F_EVEX_R      0x04000000 /* The EVEX.R flag (a second 1-bit extension to MODRM.reg; use with `F_REX_R'). */
+#define F_EVEX_aaa_M  0x38000000 /* Value of EVEX.aaa */
+#define F_EVEX_aaa_S          27 /* Shift for EVEX.aaa */
+#define F_AD64        F_AD16     /* The 0x67 prefix is being used. */
+#define F_HASREX      0x00000080 /* A REX prefix is being used. */
+#define F_REXSHFT              8 /* Shift for the REX prefix byte. */
+#define F_REXMASK     0x00000f00 /* Mask of the REX prefix byte. */
+#define F_REX_W       0x00000800 /* The REX.W flag (Indicates 64-bit operands). */
+#define F_REX_R       0x00000400 /* The REX.R flag (1-bit extension to MODRM.reg). */
+#define F_REX_X       0x00000200 /* The REX.X flag (1-bit extension to SIB.index). */
+#define F_REX_B       0x00000100 /* The REX.B flag (1-bit extension to MODRM.rm). */
+#define F_SEGDS       0x00001000 /* DS override. */
+#define F_SEGES       0x00002000 /* ES override. */
+#define F_SEGCS       0x00003000 /* CS override. */
+#define F_SEGSS       0x00004000 /* SS override. */
+#define F_SEGFS       0x00005000 /* FS override. */
+#define F_SEGGS       0x00006000 /* GS override. */
 
 /* Explicit prefix byte flags. */
 #define F_66        F_OP16  /* The 0x66 prefix is being used. */
@@ -444,6 +452,8 @@ decode_modrm(struct disassembler *__restrict self,
 		info->mi_rm = MODRM_GETRM(rmbyte);
 		if (flags & F_REX_R)
 			info->mi_reg |= 0x8;
+		if (flags & F_EVEX_R)
+			info->mi_reg |= 0x10;
 		switch (rmbyte & MODRM_MOD_MASK) {
 
 		case 0x0 << MODRM_MOD_SHIFT:
@@ -511,6 +521,8 @@ parse_sib_byte:
 			/* Register operand. */
 			info->mi_type  = MODRM_REGISTER;
 			info->mi_index = 0xff;
+			if ((flags & (F_REX_X | F_HASVEX)) == (F_REX_X | F_HASVEX))
+				info->mi_rm |= 0x10;
 			break;
 
 		default: __builtin_unreachable();
@@ -534,17 +546,93 @@ next_byte:
 	result = *text++;
 	switch (result) {
 
-#define VEX3B_R        0x8000 /* FLAG:  3-byte VEX.R */
-#define VEX3B_X        0x4000 /* FLAG:  3-byte VEX.X */
-#define VEX3B_B        0x2000 /* FLAG:  3-byte VEX.B */
-#define VEX3B_M_MMMM_M 0x1f00 /* MASK:  3-byte VEX.M_MMMM */
-#define VEX3B_M_MMMM_S      8 /* SHIFT: 3-byte VEX.M_MMMM */
-#define VEX3B_W        0x0080 /* FLAG:  3-byte VEX.B */
-#define VEX3B_VVVV_M   0x0078 /* MASK:  3-byte VEX.VVVV */
-#define VEX3B_VVVV_S        3 /* SHIFT: 3-byte VEX.VVVV */
-#define VEX3B_L        0x0004 /* FLAG:  3-byte VEX.L */
-#define VEX3B_PP_M     0x0003 /* MASK:  3-byte VEX.PP */
-#define VEX3B_PP_S          0 /* SHIFT: 3-byte VEX.PP */
+#define EVEX_IDENT_M  0x0c0400 /* Mask of constant bits */
+#define EVEX_IDENT_V  0x000400 /* Value of constant bits */
+#define EVEX_R        0x800000 /* FLAG:  VEX.R */
+#define EVEX_X        0x400000 /* FLAG:  VEX.X */
+#define EVEX_B        0x200000 /* FLAG:  VEX.B */
+#define EVEX_Ri       0x100000 /* FLAG:  EVEX.R' */
+#define EVEX_MM_M     0x030000 /* MASK:  EVEX.M_MM (same as VEX.M_MMMM) */
+#define EVEX_MM_S           16 /* SHIFT: EVEX.M_MM */
+#define EVEX_W        0x008000 /* FLAG:  VEX.W */
+#define EVEX_VVVV_M   0x007800 /* MASK:  VEX.VVVV */
+#define EVEX_VVVV_S         11 /* SHIFT: VEX.VVVV */
+#define EVEX_PP_M     0x000300 /* MASK:  VEX.PP */
+#define EVEX_PP_S            8 /* SHIFT: VEX.PP */
+#define EVEX_z        0x000080 /* FLAG:  EVEX.z */
+#define EVEX_Li       0x000040 /* FLAG:  EVEX.L' */
+#define EVEX_L        0x000020 /* FLAG:  VEX.L */
+#define EVEX_b        0x000010 /* FLAG:  EVEX.b */
+#define EVEX_Vi       0x000008 /* FLAG:  EVEX.V' */
+#define EVEX_aaa_M    0x000007 /* MASK:  EVEX.aaa */
+#define EVEX_aaa_S           0 /* SHIFT: EVEX.aaa */
+
+	/* EVEX Prefix */
+	case 0x62: {
+		u32 evex;
+		/* EVEX only exists in 64-bit mode! */
+		if (!DA86_IS64(self))
+			break;
+		evex = *text++;
+		evex <<= 8;
+		evex |= *text++;
+		evex <<= 8;
+		evex |= *text++;
+		if ((evex & EVEX_IDENT_M) != EVEX_IDENT_V) {
+			text -= 3;
+			/*result = 0x62;*/
+			break;
+		}
+		*pflags |= F_HASVEX;
+		*pflags |= ((~evex & EVEX_VVVV_M) >> EVEX_VVVV_S) << F_VEX_VVVVV_S;
+		*pflags |= ((evex & EVEX_aaa_M) >> EVEX_aaa_S) << F_EVEX_aaa_S;
+		if (!(evex & EVEX_Vi))
+			*pflags |= 0x10 << F_VEX_VVVVV_S;
+		if (!(evex & EVEX_R))
+			*pflags |= F_REX_R;
+		if (!(evex & EVEX_Ri))
+			*pflags |= F_EVEX_R;
+		if (!(evex & EVEX_X))
+			*pflags |= F_REX_X;
+		if (!(evex & EVEX_B))
+			*pflags |= F_REX_B;
+		if (evex & EVEX_W)
+			*pflags |= F_VEX_W;
+		if (evex & EVEX_z)
+			*pflags |= F_EVEX_z;
+		if (evex & EVEX_b)
+			*pflags |= F_EVEX_b;
+		if (evex & EVEX_L)
+			*pflags |= 1 << F_VEX_LL_S;
+		if (evex & EVEX_Li)
+			*pflags |= 2 << F_VEX_LL_S;
+		switch (evex & EVEX_PP_M) {
+		case 0x01 << EVEX_PP_S: *pflags |= F_OP16; break;  /* same as 0x66 prefix */
+		case 0x02 << EVEX_PP_S: *pflags |= F_REP; break;   /* same as 0xf3 prefix */
+		case 0x03 << EVEX_PP_S: *pflags |= F_REPNE; break; /* same as 0xf2 prefix */
+		default: break;
+		}
+		switch (evex & EVEX_MM_M) {
+		case 0x1 << EVEX_MM_S: result = 0x0f00; break;
+		case 0x2 << EVEX_MM_S: result = 0x0f3800; break;
+		case 0x3 << EVEX_MM_S: result = 0x0f3a00; break;
+		default: goto err;
+		}
+		/* The actual instruction opcode byte */
+		result |= *text++;
+	}	break;
+
+#define VEX3B_R       0x8000 /* FLAG:  3-byte VEX.R */
+#define VEX3B_X       0x4000 /* FLAG:  3-byte VEX.X */
+#define VEX3B_B       0x2000 /* FLAG:  3-byte VEX.B */
+#define VEX3B_MMMMM_M 0x1f00 /* MASK:  3-byte VEX.MMMMM */
+#define VEX3B_MMMMM_S      8 /* SHIFT: 3-byte VEX.MMMMM */
+#define VEX3B_W       0x0080 /* FLAG:  3-byte VEX.W */
+#define VEX3B_VVVV_M  0x0078 /* MASK:  3-byte VEX.VVVV */
+#define VEX3B_VVVV_S       3 /* SHIFT: 3-byte VEX.VVVV */
+#define VEX3B_L       0x0004 /* FLAG:  3-byte VEX.L */
+#define VEX3B_PP_M    0x0003 /* MASK:  3-byte VEX.PP */
+#define VEX3B_PP_S         0 /* SHIFT: 3-byte VEX.PP */
 
 	/* VEX Prefix */
 	case 0xc4: { /* 3-byte form */
@@ -568,20 +656,20 @@ next_byte:
 		}
 		*pflags |= F_HASVEX;
 		if (vex & VEX3B_L)
-			*pflags |= F_VEX_L;
+			*pflags |= 1 << F_VEX_LL_S;
 		if (vex & VEX3B_W)
 			*pflags |= F_VEX_W;
-		*pflags |= ((~vex & VEX3B_VVVV_M) >> VEX3B_VVVV_S) << F_VEX_VVVV_S;
+		*pflags |= ((~vex & VEX3B_VVVV_M) >> VEX3B_VVVV_S) << F_VEX_VVVVV_S;
 		switch (vex & VEX3B_PP_M) {
 		case 0x01 << VEX3B_PP_S: *pflags |= F_OP16; break;  /* same as 0x66 prefix */
 		case 0x02 << VEX3B_PP_S: *pflags |= F_REP; break;   /* same as 0xf3 prefix */
 		case 0x03 << VEX3B_PP_S: *pflags |= F_REPNE; break; /* same as 0xf2 prefix */
 		default: break;
 		}
-		switch (vex & VEX3B_M_MMMM_M) {
-		case 0x1 << VEX3B_M_MMMM_S: result = 0x0f00; break;
-		case 0x2 << VEX3B_M_MMMM_S: result = 0x0f3800; break;
-		case 0x3 << VEX3B_M_MMMM_S: result = 0x0f3a00; break;
+		switch (vex & VEX3B_MMMMM_M) {
+		case 0x1 << VEX3B_MMMMM_S: result = 0x0f00; break;
+		case 0x2 << VEX3B_MMMMM_S: result = 0x0f3800; break;
+		case 0x3 << VEX3B_MMMMM_S: result = 0x0f3a00; break;
 		default: goto err;
 		}
 		/* The actual instruction opcode byte */
@@ -611,15 +699,17 @@ next_byte:
 		}
 		*pflags |= F_HASVEX;
 		if (result & VEX2B_L)
-			*pflags |= F_VEX_L;
-		*pflags |= ((~result & VEX2B_VVVV_M) >> VEX2B_VVVV_S) << F_VEX_VVVV_S;
+			*pflags |= 1 << F_VEX_LL_S;
+		*pflags |= ((~result & VEX2B_VVVV_M) >> VEX2B_VVVV_S) << F_VEX_VVVVV_S;
 		switch (result & VEX2B_PP_M) {
 		case 0x01 << VEX2B_PP_S: *pflags |= F_OP16; break;  /* same as 0x66 prefix */
 		case 0x02 << VEX2B_PP_S: *pflags |= F_REP; break;   /* same as 0xf3 prefix */
 		case 0x03 << VEX2B_PP_S: *pflags |= F_REPNE; break; /* same as 0xf2 prefix */
 		default: break;
 		}
-		goto next_byte;
+		/* The actual instruction opcode byte */
+		result = 0x0f00 | *text++;
+		break;
 
 		/* Prefix bytes */
 	case 0x66: *pflags |= F_66; goto next_byte;
@@ -754,6 +844,67 @@ da_print_treg(struct disassembler *__restrict self, u8 regno) {
 }
 
 PRIVATE void CC
+da_regno31_str(char name[2], u8 regno) {
+	regno &= 31;
+	if (regno >= 10) {
+		name[0] = '0' + (regno / 10);
+		name[1] = '0' + (regno % 10);
+	} else {
+		name[0] = '0' + regno;
+		name[1] = 0;
+	}
+}
+
+PRIVATE void CC
+da_print_mmreg(struct disassembler *__restrict self, u8 regno) {
+	char name[5];
+	name[0] = '%';
+	name[1] = 'm';
+	name[2] = 'm';
+	da_regno31_str(&name[3], regno);
+	disasm_print_format(self, DISASSEMBLER_FORMAT_REGISTER_PREFIX);
+	disasm_print(self, name, name[4] ? 5 : 4);
+	disasm_print_format(self, DISASSEMBLER_FORMAT_REGISTER_SUFFIX);
+}
+
+#define da_print_xmmreg(self, regno) da_print_Xmmreg(self, regno, 'x')
+#define da_print_ymmreg(self, regno) da_print_Xmmreg(self, regno, 'y')
+#define da_print_zmmreg(self, regno) da_print_Xmmreg(self, regno, 'z')
+PRIVATE void CC
+da_print_Xmmreg(struct disassembler *__restrict self, u8 regno, char x) {
+	char name[6];
+	name[0] = '%';
+	name[1] = x;
+	name[2] = 'm';
+	name[3] = 'm';
+	da_regno31_str(&name[4], regno);
+	disasm_print_format(self, DISASSEMBLER_FORMAT_REGISTER_PREFIX);
+	disasm_print(self, name, name[5] ? 6 : 5);
+	disasm_print_format(self, DISASSEMBLER_FORMAT_REGISTER_SUFFIX);
+}
+PRIVATE void CC
+da_print_Xmmmask(struct disassembler *__restrict self, op_flag_t flags) {
+	if ((flags & F_EVEX_aaa_M) != 0) {
+		char mask[3];
+		mask[0] = '%';
+		mask[1] = 'k';
+		mask[2] = '0' + (flags >> F_EVEX_aaa_S);
+		disasm_print(self, "{", 1);
+		disasm_print_format(self, DISASSEMBLER_FORMAT_REGISTER_PREFIX);
+		disasm_print(self, mask, 3);
+		disasm_print_format(self, DISASSEMBLER_FORMAT_REGISTER_SUFFIX);
+		disasm_print(self, "}", 1);
+	}
+	if (flags & F_EVEX_z) {
+		disasm_print(self, "{", 1);
+		disasm_print_format(self, DISASSEMBLER_FORMAT_MNEMONIC_PREFIX);
+		disasm_print(self, "z", 1);
+		disasm_print_format(self, DISASSEMBLER_FORMAT_MNEMONIC_SUFFIX);
+		disasm_print(self, "}", 1);
+	}
+}
+
+PRIVATE void CC
 da_print_bndreg(struct disassembler *__restrict self, u8 regno) {
 	char const *name = bnd_register_names[regno & 15];
 	disasm_print_format(self, DISASSEMBLER_FORMAT_REGISTER_PREFIX);
@@ -767,6 +918,76 @@ da_print_stireg(struct disassembler *__restrict self, u8 regno) {
 	disasm_print_format(self, DISASSEMBLER_FORMAT_REGISTER_PREFIX);
 	disasm_print(self, name, name[6] ? 7 : 6);
 	disasm_print_format(self, DISASSEMBLER_FORMAT_REGISTER_SUFFIX);
+}
+
+PRIVATE void CC
+da_print_modrm_rm_memory(struct disassembler *__restrict self,
+                         struct modrm const *__restrict rm,
+                         op_flag_t flags) {
+	bool has_register;
+	if ((flags & F_SEGMASK) != 0)
+		disasm_print(self, segment_prefix[((flags & F_SEGMASK) >> F_SEGSHIFT) - 1], 4);
+	has_register = rm->mi_rm != 0xff || rm->mi_index != 0xff;
+	if (rm->mi_offset || !has_register) {
+		s32 offset;
+		disasm_print_format(self, DISASSEMBLER_FORMAT_OFFSET_PREFIX);
+		offset = rm->mi_offset;
+		/* Only render small negative offsets as actually being negative.
+		 * Very large offsets are probably absolute pointers, unless a base
+		 * register is given. In that case, always render negative number
+		 * as actually being negative! */
+		if (offset < 0 && (rm->mi_rm != 0xff
+		                   ? offset != INT32_MIN /* Special case for INT32_MIN (always render as being positive) */
+		                   : offset > INT16_MIN)) {
+			if (offset >= INT8_MIN) {
+				disasm_printf(self, "-%" PRIu32, (u32)-offset);
+			} else {
+				disasm_printf(self, "-%#" PRIx32, (u32)-offset);
+			}
+		} else {
+			if ((u32)offset <= INT8_MAX) {
+				/* Render small, positive numbers as decimals, rather than hex. */
+				disasm_printf(self, "%" PRIu32, (u32)offset);
+			} else {
+				disasm_printf(self, "%#" PRIxPTR,
+				              (uintptr_t)(intptr_t)offset);
+			}
+		}
+		disasm_print_format(self, DISASSEMBLER_FORMAT_OFFSET_SUFFIX);
+	}
+	if (has_register) {
+		disasm_print(self, "(", 1);
+		if (rm->mi_rm != 0xff) {
+			if (DA86_IS64(self)) {
+				if (flags & F_67)
+					goto do_print_base32;
+				da_print_reg64(self, rm->mi_rm);
+			} else if (DA86_IS32(self) ^ ((flags & F_67) != 0)) {
+			do_print_base32:
+				da_print_reg32(self, rm->mi_rm);
+			} else {
+				da_print_reg16(self, rm->mi_rm);
+			}
+		}
+		if (rm->mi_index != 0xff) {
+			disasm_print(self, ",", 1);
+			if (DA86_IS64(self)) {
+				if (flags & F_67)
+					goto do_print_index32;
+				da_print_reg64(self, rm->mi_index);
+			} else if (DA86_IS32(self) ^ ((flags & F_67) != 0)) {
+do_print_index32:
+				da_print_reg32(self, rm->mi_index);
+			} else {
+				da_print_reg16(self, rm->mi_index);
+			}
+			disasm_print(self, ",", 1);
+			disasm_print_format(self, DISASSEMBLER_FORMAT_SCALE_PREFIX);
+			disasm_printf(self, "%u", 1 << rm->mi_shift);
+			disasm_print_format(self, DISASSEMBLER_FORMAT_SCALE_SUFFIX);
+		}
+		disasm_print(self, ")", 1);
+	}
 }
 
 PRIVATE void CC
@@ -784,70 +1005,32 @@ da_print_modrm_rm(struct disassembler *__restrict self,
 			da_print_reg8(self, rm->mi_rm, flags);
 		}
 	} else {
-		bool has_register;
-		if ((flags & F_SEGMASK) != 0)
-			disasm_print(self, segment_prefix[((flags & F_SEGMASK) >> F_SEGSHIFT) - 1], 4);
-		has_register = rm->mi_rm != 0xff || rm->mi_index != 0xff;
-		if (rm->mi_offset || !has_register) {
-			s32 offset;
-			disasm_print_format(self, DISASSEMBLER_FORMAT_OFFSET_PREFIX);
-			offset = rm->mi_offset;
-			/* Only render small negative offsets as actually being negative.
-			 * Very large offsets are probably absolute pointers, unless a base
-			 * register is given. In that case, always render negative number
-			 * as actually being negative! */
-			if (offset < 0 && (rm->mi_rm != 0xff
-			                   ? offset != INT32_MIN /* Special case for INT32_MIN (always render as being positive) */
-			                   : offset > INT16_MIN)) {
-				if (offset >= INT8_MIN) {
-					disasm_printf(self, "-%" PRIu32, (u32)-offset);
-				} else {
-					disasm_printf(self, "-%#" PRIx32, (u32)-offset);
-				}
-			} else {
-				if ((u32)offset <= INT8_MAX) {
-					/* Render small, positive numbers as decimals, rather than hex. */
-					disasm_printf(self, "%" PRIu32, (u32)offset);
-				} else {
-					disasm_printf(self, "%#" PRIxPTR,
-					              (uintptr_t)(intptr_t)offset);
-				}
-			}
-			disasm_print_format(self, DISASSEMBLER_FORMAT_OFFSET_SUFFIX);
-		}
-		if (has_register) {
-			disasm_print(self, "(", 1);
-			if (rm->mi_rm != 0xff) {
-				if (DA86_IS64(self)) {
-					if (flags & F_67)
-						goto do_print_base32;
-					da_print_reg64(self, rm->mi_rm);
-				} else if (DA86_IS32(self) ^ ((flags & F_67) != 0)) {
-do_print_base32:
-					da_print_reg32(self, rm->mi_rm);
-				} else {
-					da_print_reg16(self, rm->mi_rm);
-				}
-			}
-			if (rm->mi_index != 0xff) {
-				disasm_print(self, ",", 1);
-				if (DA86_IS64(self)) {
-					if (flags & F_67)
-						goto do_print_index32;
-					da_print_reg64(self, rm->mi_index);
-				} else if (DA86_IS32(self) ^ ((flags & F_67) != 0)) {
-do_print_index32:
-					da_print_reg32(self, rm->mi_index);
-				} else {
-					da_print_reg16(self, rm->mi_index);
-				}
-				disasm_print(self, ",", 1);
-				disasm_print_format(self, DISASSEMBLER_FORMAT_SCALE_PREFIX);
-				disasm_printf(self, "%u", 1 << rm->mi_shift);
-				disasm_print_format(self, DISASSEMBLER_FORMAT_SCALE_SUFFIX);
-			}
-			disasm_print(self, ")", 1);
-		}
+		da_print_modrm_rm_memory(self, rm, flags);
+	}
+}
+
+PRIVATE void CC
+da_print_modrm_rm64_mm(struct disassembler *__restrict self,
+                       struct modrm const *__restrict rm,
+                       op_flag_t flags) {
+	if (rm->mi_type == MODRM_REGISTER) {
+		da_print_mmreg(self, rm->mi_rm);
+	} else {
+		da_print_modrm_rm_memory(self, rm, flags);
+	}
+}
+
+#define da_print_modrm_rm128_xmm(self, rm, flag) da_print_modrm_rmNNN_Xmm(self, rm, flag, 'x')
+#define da_print_modrm_rm256_ymm(self, rm, flag) da_print_modrm_rmNNN_Xmm(self, rm, flag, 'y')
+#define da_print_modrm_rm512_zmm(self, rm, flag) da_print_modrm_rmNNN_Xmm(self, rm, flag, 'z')
+PRIVATE void CC
+da_print_modrm_rmNNN_Xmm(struct disassembler *__restrict self,
+                         struct modrm const *__restrict rm,
+                         op_flag_t flags, char x) {
+	if (rm->mi_type == MODRM_REGISTER) {
+		da_print_Xmmreg(self, rm->mi_rm, x);
+	} else {
+		da_print_modrm_rm_memory(self, rm, flags);
 	}
 }
 
@@ -865,7 +1048,7 @@ struct instruction {
 #define IF_REG6  0x000e
 #define IF_REG7  0x000f
 #define IF_MODRM 0x0010
-#define IF_BYTE2 0x3010 /* The first repr-byte is required as a follow-up on the instruction byte. */
+#define IF_BYTE2 0x3017 /* The first repr-byte is required as a follow-up on the instruction byte. */
 #define IF_66    0x0020
 #define IF_F2    0x0040
 #define IF_F3    0x0080
@@ -876,94 +1059,127 @@ struct instruction {
 #define IF_RMR   0x0800 /* Modrm is register */
 #define IF_VEXW0 0x1000 /* VEX + VEX.W == 0 */
 #define IF_VEXW1 0x2000 /* VEX + VEX.W == 1 */
-#define IF_VEX   0x3000 /* VEX */
+#define IF_VEX   0x3000 /* VEX (further specified by first character of repr) */
+#define IF_VEX_B0_LL_M 0x03 /* Required value for `VEX.LL' */
+#define IF_VEX_B0_LL_S    0 /* Required value for `VEX.LL' */
+#define IF_VEX_B0_W    0x04 /* Required value for `VEX.W' */
+#define IF_VEX_B0_WIG  0x08 /* Ignore `VEX.W' (`IF_VEX_B0_W' must not be set) */
 #define IF_X32   0x4000
 #define IF_X64   0x8000
 	u16  i_flags;    /* Instruction flags. */
 	u8   i_opcode;   /* Instruction opcode. */
 	char i_repr[13];
 };
+#define _OP_VEX_B02(wig, w, ll) BINSTR_0000##wig##w##ll
+#define _OP_VEX_B0(wig, w, ll)  _OP_VEX_B02(wig, w, ll)
+#define OP_VEX_B0(wig, w, ll)   _OP_VEX_B0(NORMBIN1(wig), NORMBIN1(w), NORMBIN2(ll))
+#define B_OP_VEX_B0(wig, w, ll)    \
+	(((wig) ? IF_VEX_B0_WIG : 0) | \
+	 ((w) ? IF_VEX_B0_W : 0) |     \
+	 ((ll) << IF_VEX_B0_LL_S))
 
 
-#define OPC_RM8     '1'
-#define OPC_RM16    '2'
-#define OPC_RM32    '3'
-#define OPC_RM64    '4'
-#define OPC_XRM16   '~'
-#define OPC_XRM32   '+'
-#define OPC_XRM64   '*'
-#define OPC_RMBND   '5'
+#define OPC_RM8         '1'
+#define OPC_RM16        '2'
+#define OPC_RM32        '3'
+#define OPC_RM64        '4'
+#define OPC_XRM16       '~'
+#define OPC_XRM32       '+'
+#define OPC_XRM64       '*'
+#define OPC_RMBND       '5'
 #define OPC_RMBND_RANGE '6'
-#define OPC_RMSTi   '7'
-#define OPC_S8      'a'
-#define OPC_U8      'A'
-#define OPC_S16     'b'
-#define OPC_U16     'B'
-#define OPC_S32     'c'
-#define OPC_U32     'C'
-#define OPC_U64     'd'
-#define OPC_MOFFS8  'E'
-#define OPC_MOFFS16 'F'
-#define OPC_MOFFS32 'G'
-#define OPC_MOFFS64 'H'
-#define OPC_R8      'r'
-#define OPC_R16     's'
-#define OPC_R32     't'
-#define OPC_R64     'u'
-#define OPC_VR8     'R'
-#define OPC_VR16    'S'
-#define OPC_VR32    'T'
-#define OPC_VR64    'U'
-#define OPC_RSEG    'v'
-#define OPC_RCR     'w'
-#define OPC_RDR     'x'
-#define OPC_RBND    'y'
-#define OPC_RTR     'z'
-#define OPC_DISP8   'm'
-#define OPC_DISP16  'n'
-#define OPC_DISP32  'o'
-#define OPC_LJMP    'P'
+#define OPC_RMSTi       '7'
+#define OPC_S8          'a'
+#define OPC_U8          'A'
+#define OPC_S16         'b'
+#define OPC_U16         'B'
+#define OPC_S32         'c'
+#define OPC_U32         'C'
+#define OPC_U64         'd'
+#define OPC_MOFFS8      'E'
+#define OPC_MOFFS16     'F'
+#define OPC_MOFFS32     'G'
+#define OPC_MOFFS64     'H'
+#define OPC_R8          'r'
+#define OPC_R16         's'
+#define OPC_R32         't'
+#define OPC_R64         'u'
+#define OPC_VR8         'R'
+#define OPC_VR16        'S'
+#define OPC_VR32        'T'
+#define OPC_VR64        'U'
+#define OPC_RSEG        'v'
+#define OPC_RCR         'w'
+#define OPC_RDR         'x'
+#define OPC_RBND        'y'
+#define OPC_RTR         'z'
+#define OPC_RMM         '.' /* %mm0, %mm1, etc. (based on rm.mi_reg) */
+#define OPC_RXMM        ',' /* %xmm0, %xmm1, etc. (based on rm.mi_reg) (followed by {%kN}{z}) */
+#define OPC_RYMM        '-' /* %ymm0, %ymm1, etc. (based on rm.mi_reg) (followed by {%kN}{z}) */
+#define OPC_RZMM        '/' /* %zmm0, %zmm1, etc. (based on rm.mi_reg) (followed by {%kN}{z}) */
+#define OPC_RM64_MM     ';' /* 64-bit memory location or %mm0, %mm1, etc. (based on rm.mi_rm) */
+#define OPC_RM128_XMM   '<' /* 128-bit memory location or %xmm0, %xmm1, etc. (based on rm.mi_rm) */
+#define OPC_RM256_YMM   '=' /* 256-bit memory location or %ymm0, %ymm1, etc. (based on rm.mi_rm) */
+#define OPC_RM512_ZMM   '>' /* 512-bit memory location or %zmm0, %zmm1, etc. (based on rm.mi_rm) */
+#define OPC_VRXMM       '@' /* %xmm0, %xmm1, etc. (based on F_VEX_VVVV_M) */
+#define OPC_VRYMM       '`' /* %ymm0, %ymm1, etc. (based on F_VEX_VVVV_M) */
+#define OPC_VRZMM       '|' /* %zmm0, %zmm1, etc. (based on F_VEX_VVVV_M) */
+#define OPC_DISP8       'm'
+#define OPC_DISP16      'n'
+#define OPC_DISP32      'o'
+#define OPC_LJMP        'P'
 
-#define OP_RM8     "1"
-#define OP_RM16    "2"
-#define OP_RM32    "3"
-#define OP_RM      "3"
-#define OP_RM64    "4"
-#define OP_XRM16   "~"
-#define OP_XRM32   "+"
-#define OP_XRM64   "*"
-#define OP_RMBND   "5"
+#define OP_RM8         "1"
+#define OP_RM16        "2"
+#define OP_RM32        "3"
+#define OP_RM          "3"
+#define OP_RM64        "4"
+#define OP_XRM16       "~"
+#define OP_XRM32       "+"
+#define OP_XRM64       "*"
+#define OP_RMBND       "5"
 #define OP_RMBND_RANGE "6"
-#define OP_RMSTi   "7"
-#define OP_S8      "a"
-#define OP_U8      "A"
-#define OP_S16     "b"
-#define OP_U16     "B"
-#define OP_S32     "c"
-#define OP_U32     "C"
-#define OP_U64     "d"
-#define OP_MOFFS8  "E"
-#define OP_MOFFS16 "F"
-#define OP_MOFFS32 "G"
-#define OP_MOFFS64 "H"
-#define OP_R8      "r"
-#define OP_R16     "s"
-#define OP_R32     "t"
-#define OP_R64     "u"
-#define OP_RSEG    "v"
-#define OP_RCR     "w"
-#define OP_RDR     "x"
-#define OP_RBND    "y"
-#define OP_RTR     "z"
-#define OP_VR8     "R"
-#define OP_VR16    "S"
-#define OP_VR32    "T"
-#define OP_VR64    "U"
-#define OP_DISP8   "m"
-#define OP_DISP16  "n"
-#define OP_DISP32  "o"
-#define OP_LJMP    "P"
-#define OP_ESC(s)  "{" s "}"
+#define OP_RMSTi       "7"
+#define OP_S8          "a"
+#define OP_U8          "A"
+#define OP_S16         "b"
+#define OP_U16         "B"
+#define OP_S32         "c"
+#define OP_U32         "C"
+#define OP_U64         "d"
+#define OP_MOFFS8      "E"
+#define OP_MOFFS16     "F"
+#define OP_MOFFS32     "G"
+#define OP_MOFFS64     "H"
+#define OP_R8          "r"
+#define OP_R16         "s"
+#define OP_R32         "t"
+#define OP_R64         "u"
+#define OP_RSEG        "v"
+#define OP_RCR         "w"
+#define OP_RDR         "x"
+#define OP_RBND        "y"
+#define OP_RTR         "z"
+#define OP_RMM         "." /* %mm0, %mm1, etc. (based on rm.mi_reg) */
+#define OP_RXMM        "," /* %xmm0, %xmm1, etc. (based on rm.mi_reg) */
+#define OP_RYMM        "-" /* %ymm0, %ymm1, etc. (based on rm.mi_reg) */
+#define OP_RZMM        "/" /* %zmm0, %zmm1, etc. (based on rm.mi_reg) */
+#define OP_RM64_MM     ";" /* 64-bit memory location or %mm0, %mm1, etc. (based on rm.mi_rm) */
+#define OP_RM128_XMM   "<" /* 128-bit memory location or %xmm0, %xmm1, etc. (based on rm.mi_rm) */
+#define OP_RM256_YMM   "=" /* 256-bit memory location or %ymm0, %ymm1, etc. (based on rm.mi_rm) */
+#define OP_RM512_ZMM   ">" /* 512-bit memory location or %zmm0, %zmm1, etc. (based on rm.mi_rm) */
+#define OP_VRXMM       "@" /* %xmm0, %xmm1, etc. (based on F_VEX_VVVV_M) */
+#define OP_VRYMM       "`" /* %ymm0, %ymm1, etc. (based on F_VEX_VVVV_M) */
+#define OP_VRZMM       "|" /* %zmm0, %zmm1, etc. (based on F_VEX_VVVV_M) */
+#define OP_VR8         "R"
+#define OP_VR16        "S"
+#define OP_VR32        "T"
+#define OP_VR64        "U"
+#define OP_DISP8       "m"
+#define OP_DISP16      "n"
+#define OP_DISP32      "o"
+#define OP_LJMP        "P"
+#define OP_ESC(s)      "{" s "}"
 
 #define OP_PAX_PCX_PDX ":a"
 #define OP_PAX_PCX     ":b"
@@ -2417,6 +2633,39 @@ PRIVATE struct instruction const ops_0f[] = {
 	I(0x4f, IF_MODRM,         "cmov" NAME_jcf "l\t" OP_RM32 OP_R32),
 	I(0x4f, IF_66|IF_MODRM,   "cmov" NAME_jcf "q\t" OP_RM64 OP_R64),
 
+	I(0x63, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(1, 0, 0), LO_VPACKSSWB128)),
+	I(0x63, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(1, 0, 1), LO_VPACKSSWB256)),
+	I(0x63, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(1, 0, 2), LO_VPACKSSWB512)),
+	I(0x63, IF_MODRM,              "packsswb\t" OP_RM64_MM OP_RMM),
+	I(0x63, IF_66|IF_MODRM,        "packsswb\t" OP_RM128_XMM OP_RXMM),
+
+	I(0x67, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(1, 0, 0), LO_VPACKUSWB128)),
+	I(0x67, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(1, 0, 1), LO_VPACKUSWB256)),
+	I(0x67, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(1, 0, 2), LO_VPACKUSWB512)),
+	I(0x67, IF_MODRM,              "packuswb\t" OP_RM64_MM OP_RMM),
+	I(0x67, IF_66|IF_MODRM,        "packuswb\t" OP_RM128_XMM OP_RXMM),
+
+	I(0x6b, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(1, 0, 0), LO_VPACKSSDW128)),
+	I(0x6b, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(1, 0, 1), LO_VPACKSSDW256)),
+	I(0x6b, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(0, 0, 2), LO_VPACKSSDW512)),
+	I(0x6b, IF_MODRM,              "packssdw\t" OP_RM64_MM OP_RMM),
+	I(0x6b, IF_66|IF_MODRM,        "packssdw\t" OP_RM128_XMM OP_RXMM),
+
+	I(0x6e, IF_VEXW0|IF_66|IF_MODRM,"vmovd\t" OP_RM32 OP_RXMM),
+	I(0x6e, IF_VEXW1|IF_66|IF_MODRM,"vmovq\t" OP_RM64 OP_RXMM),
+	I(0x6e, IF_MODRM,               "movd\t" OP_RM32 OP_RMM),
+	I(0x6e, IF_REXW|IF_MODRM,       "movq\t" OP_RM64 OP_RMM),
+	I(0x6e, IF_66|IF_MODRM,         "movd\t" OP_RM32 OP_RXMM),
+	I(0x6e, IF_REXW|IF_66|IF_MODRM, "movq\t" OP_RM64 OP_RXMM),
+	I(0x77, 0,                      "emms"),
+	I(0x7e, IF_VEXW0|IF_66|IF_MODRM,"vmovd\t" OP_RXMM OP_RM32),
+	I(0x7e, IF_VEXW1|IF_66|IF_MODRM,"vmovq\t" OP_RXMM OP_RM64),
+	I(0x7e, IF_MODRM,               "movd\t" OP_RMM OP_RM32),
+	I(0x7e, IF_REXW|IF_MODRM,       "movq\t" OP_RMM OP_RM64),
+	I(0x7e, IF_66|IF_MODRM,         "movd\t" OP_RXMM OP_RM32),
+	I(0x7e, IF_REXW|IF_66|IF_MODRM, "movq\t" OP_RXMM OP_RM64),
+
+
 //	I(0x78, IF_MODRM|IF_RMM,  "svdc\t" OP_RSEG OP_RM/*80*/), /* Unofficial */
 //	I(0x79, IF_MODRM|IF_RMM,  "rsdc\t" OP_RM/*80*/ OP_RSEG), /* Unofficial */
 
@@ -2626,6 +2875,9 @@ PRIVATE struct instruction const ops_0f[] = {
 	I(0xc1, IF_MODRM,        "xaddl\t" OP_R32 OP_RM32),
 	I(0xc1, IF_REXW|IF_MODRM,"xaddq\t" OP_R64 OP_RM64),
 
+	I(0xc3, IF_MODRM|IF_RMM,        "movntil\t" OP_R32 OP_RM32),
+	I(0xc3, IF_REXW|IF_MODRM|IF_RMM,"movntiq\t" OP_R64 OP_RM64),
+
 	I(0xc7, IF_X32|IF_MODRM|IF_RMM|IF_REG1,       "cmpxchg8b\t" OP_RM),
 	I(0xc7, IF_X64|IF_MODRM|IF_RMM|IF_REG1,       "cmpxchg16b\t" OP_RM),
 	I(0xc7, IF_MODRM|IF_RMM|IF_REG6,              "vmptrld\t" OP_RM64),
@@ -2671,13 +2923,62 @@ PRIVATE struct instruction const ops_0f[] = {
 	I(0xcf, 0,               "bswapl\t" OP_EDI),
 	I(0xcf, IF_REXW,         "bswapq\t" OP_RDI),
 
+	I(0xd4, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 1, 0) "vpaddq\t" OP_RM128_XMM OP_VRXMM OP_RXMM),
+	I(0xd4, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 1, 1) "vpaddq\t" OP_RM256_YMM OP_VRYMM OP_RYMM),
+	I(0xd4, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 1, 2) "vpaddq\t" OP_RM512_ZMM OP_VRZMM OP_RZMM),
+	I(0xd4, IF_MODRM,              "paddq\t" OP_RMM OP_RM64_MM),
+	I(0xd4, IF_66|IF_MODRM,        "paddq\t" OP_RXMM OP_RM128_XMM),
+
+	I(0xdc, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(1, 0, 0), LO_VPADDUSB128)),
+	I(0xdc, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(1, 0, 1), LO_VPADDUSB256)),
+	I(0xdc, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(1, 0, 2), LO_VPADDUSB512)),
+	I(0xdc, IF_MODRM,              "paddusb\t" OP_RMM OP_RM64_MM),
+	I(0xdc, IF_66|IF_MODRM,        "paddusb\t" OP_RXMM OP_RM128_XMM),
+
+	I(0xdd, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(1, 0, 0), LO_VPADDUSW128)),
+	I(0xdd, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(1, 0, 1), LO_VPADDUSW256)),
+	I(0xdd, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(1, 0, 2), LO_VPADDUSW512)),
+	I(0xdd, IF_MODRM,              "paddusw\t" OP_RMM OP_RM64_MM),
+	I(0xdd, IF_66|IF_MODRM,        "paddusw\t" OP_RXMM OP_RM128_XMM),
+
+	I(0xec, IF_MODRM,       "paddsb\t" OP_RMM OP_RM64_MM),
+	I(0xec, IF_66|IF_MODRM, "paddsb\t" OP_RXMM OP_RM128_XMM),
+	I(0xec, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(1, 0, 0) "vpaddsb\t" OP_RM128_XMM OP_VRXMM OP_RXMM),
+	I(0xec, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(1, 0, 1) "vpaddsb\t" OP_RM256_YMM OP_VRYMM OP_RYMM),
+	I(0xec, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(1, 0, 2) "vpaddsb\t" OP_RM512_ZMM OP_VRZMM OP_RZMM),
+
+	I(0xed, IF_MODRM,       "paddsw\t" OP_RMM OP_RM64_MM),
+	I(0xed, IF_66|IF_MODRM, "paddsw\t" OP_RXMM OP_RM128_XMM),
+	I(0xed, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(1, 0, 0) "vpaddsw\t" OP_RM128_XMM OP_VRXMM OP_RXMM),
+	I(0xed, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(1, 0, 1) "vpaddsw\t" OP_RM256_YMM OP_VRYMM OP_RYMM),
+	I(0xed, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(1, 0, 2) "vpaddsw\t" OP_RM512_ZMM OP_VRZMM OP_RZMM),
+
+	I(0xfc, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(1, 0, 0) "vpaddb\t" OP_RM128_XMM OP_VRXMM OP_RXMM),
+	I(0xfc, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(1, 0, 1) "vpaddb\t" OP_RM256_YMM OP_VRYMM OP_RYMM),
+	I(0xfc, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(1, 0, 2) "vpaddb\t" OP_RM512_ZMM OP_VRZMM OP_RZMM),
+	I(0xfc, IF_MODRM,              "paddb\t" OP_RMM OP_RM64_MM),
+	I(0xfc, IF_66|IF_MODRM,        "paddb\t" OP_RXMM OP_RM128_XMM),
+
+	I(0xfd, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(1, 0, 0) "vpaddw\t" OP_RM128_XMM OP_VRXMM OP_RXMM),
+	I(0xfd, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(1, 0, 1) "vpaddw\t" OP_RM256_YMM OP_VRYMM OP_RYMM),
+	I(0xfd, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(1, 0, 2) "vpaddw\t" OP_RM512_ZMM OP_VRZMM OP_RZMM),
+	I(0xfd, IF_MODRM,              "paddw\t" OP_RMM OP_RM64_MM),
+	I(0xfd, IF_66|IF_MODRM,        "paddw\t" OP_RXMM OP_RM128_XMM),
+
+	I(0xfe, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0) "vpaddd\t" OP_RM128_XMM OP_VRXMM OP_RXMM),
+	I(0xfe, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1) "vpaddd\t" OP_RM256_YMM OP_VRYMM OP_RYMM),
+	I(0xfe, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 2) "vpaddd\t" OP_RM512_ZMM OP_VRZMM OP_RZMM),
+	I(0xfe, IF_MODRM,              "paddd\t" OP_RMM OP_RM64_MM),
+	I(0xfe, IF_66|IF_MODRM,        "paddd\t" OP_RXMM OP_RM128_XMM),
+
+	/* TODO: pand, pandn, pcmpeqb, ... */
+
 	I(0xff, IF_MODRM,        "ud0\t" OP_RM32 OP_R32),
 
 	I(0, 0, "")
 /*[[[end:ops_0f]]]*/
 };
 /* clang-format on */
-
 
 /* clang-format off */
 PRIVATE struct instruction const ops_0f38[] = {
@@ -2864,24 +3165,24 @@ PRIVATE u16 const ops_offsets[256] = {
 };
 
 #define HAVE_OPS_0F_OFFSETS 1
-STATIC_ASSERT(COMPILER_LENOF(ops_0f) == 348);
+STATIC_ASSERT(COMPILER_LENOF(ops_0f) == 418);
 PRIVATE u16 const ops_0f_offsets[256] = {
-	0, 6, 36, 38, 347, 40, 42, 43, 45, 46, 47, 48, 347, 49, 347, 347,
-	347, 347, 347, 347, 347, 347, 347, 347, 50, 347, 54, 60, 65, 347, 347, 66,
-	68, 70, 72, 74, 76, 347, 77, 347, 347, 347, 347, 347, 347, 347, 347, 347,
-	78, 79, 80, 81, 82, 83, 84, 85, 347, 347, 347, 347, 347, 347, 347, 86,
+	0, 6, 36, 38, 417, 40, 42, 43, 45, 46, 47, 48, 417, 49, 417, 417,
+	417, 417, 417, 417, 417, 417, 417, 417, 50, 417, 54, 60, 65, 417, 417, 66,
+	68, 70, 72, 74, 76, 417, 77, 417, 417, 417, 417, 417, 417, 417, 417, 417,
+	78, 79, 80, 81, 82, 83, 84, 85, 417, 417, 417, 417, 417, 417, 417, 86,
 	87, 90, 93, 96, 99, 102, 105, 108, 111, 114, 117, 120, 123, 126, 129, 132,
-	347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347,
-	347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347,
-	347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347,
-	135, 137, 139, 141, 143, 145, 147, 149, 151, 153, 155, 157, 159, 161, 163, 165,
-	167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182,
-	183, 186, 189, 190, 193, 196, 347, 347, 199, 202, 205, 206, 209, 212, 215, 239,
-	242, 243, 246, 249, 252, 255, 258, 261, 263, 266, 267, 279, 282, 288, 294, 297,
-	299, 300, 347, 347, 347, 347, 347, 303, 314, 318, 322, 326, 330, 334, 338, 342,
-	347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347,
-	347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347,
-	347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 346
+	417, 417, 417, 417, 417, 417, 417, 417, 417, 417, 417, 417, 417, 417, 417, 417,
+	417, 417, 417, 135, 417, 417, 417, 140, 417, 417, 417, 145, 417, 417, 150, 417,
+	417, 417, 417, 417, 417, 417, 417, 156, 417, 417, 417, 417, 417, 417, 157, 417,
+	163, 165, 167, 169, 171, 173, 175, 177, 179, 181, 183, 185, 187, 189, 191, 193,
+	195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210,
+	211, 214, 217, 218, 221, 224, 417, 417, 227, 230, 233, 234, 237, 240, 243, 267,
+	270, 271, 274, 277, 280, 283, 286, 289, 291, 294, 295, 307, 310, 316, 322, 325,
+	327, 328, 417, 331, 417, 417, 417, 333, 344, 348, 352, 356, 360, 364, 368, 372,
+	417, 417, 417, 417, 376, 417, 417, 417, 417, 417, 417, 417, 381, 386, 417, 417,
+	417, 417, 417, 417, 417, 417, 417, 417, 417, 417, 417, 417, 391, 396, 417, 417,
+	417, 417, 417, 417, 417, 417, 417, 417, 417, 417, 417, 417, 401, 406, 411, 416
 };
 
 #define HAVE_OPS_0F38_OFFSETS 1
@@ -3175,11 +3476,22 @@ print_byte:
 				continue;
 			++self->d_pc;
 		} else {
-			if (chain->i_flags & (IF_VEXW0 | IF_VEXW1)) {
+			if (chain->i_flags & IF_VEX) {
 				if (!(flags & F_HASVEX))
 					continue;
-				if (((flags & F_VEX_W) != 0) != ((flags & IF_VEXW1) != 0))
-					continue;
+				if ((chain->i_flags & IF_VEX) == IF_VEX) {
+					byte_t f = (byte_t)chain->i_repr[0];
+					if (((flags & F_VEX_LL_M) >> F_VEX_LL_S) !=
+					    ((f & IF_VEX_B0_LL_M) >> IF_VEX_B0_LL_S))
+						continue; /* Different length value */
+					if (!(f & IF_VEX_B0_WIG)) {
+						if (!!(f & IF_VEX_B0_W) != !!(flags & F_VEX_W))
+							continue; /* Different width value */
+					}
+				} else {
+					if (!!(flags & F_VEX_W) != !!(flags & IF_VEXW1))
+						continue;
+				}
 			}
 			if (chain->i_flags & IF_MODRM) {
 				if (!args_start) {
@@ -3204,7 +3516,8 @@ print_byte:
 			char ch;
 			bool is_first = true;
 			start         = chain->i_repr;
-			if ((chain->i_flags & IF_BYTE2) == IF_BYTE2)
+			if ((chain->i_flags & IF_BYTE2) == IF_BYTE2 ||
+			    (chain->i_flags & IF_VEX) == IF_VEX)
 				++start;
 			if (*start == '?') {
 				/* Extended-length opcode representation. */
@@ -3253,6 +3566,7 @@ no_jcc_sel:
 					disasm_print(self, ", ", 2);
 				is_first = false;
 				switch (ch) {
+#define VEX_VVVVV() ((flags & F_VEX_VVVVV_M) >> F_VEX_VVVVV_S)
 
 				case OPC_RM8:
 					da_print_modrm_rm(self, &rm, flags, 1);
@@ -3520,19 +3834,19 @@ do_print_moffs:
 					break;
 
 				case OPC_VR8:
-					da_print_reg8(self, (flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S, flags);
+					da_print_reg8(self, VEX_VVVVV(), flags);
 					break;
 
 				case OPC_VR16:
-					da_print_reg16(self, (flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S);
+					da_print_reg16(self, VEX_VVVVV());
 					break;
 
 				case OPC_VR32:
-					da_print_reg32(self, (flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S);
+					da_print_reg32(self, VEX_VVVVV());
 					break;
 
 				case OPC_VR64:
-					da_print_reg64(self, (flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S);
+					da_print_reg64(self, VEX_VVVVV());
 					break;
 
 				case OPC_RSEG:
@@ -3553,6 +3867,53 @@ do_print_moffs:
 
 				case OPC_RTR:
 					da_print_treg(self, rm.mi_reg);
+					break;
+
+				case OPC_RMM:
+					da_print_mmreg(self, rm.mi_reg);
+					break;
+
+				case OPC_RXMM:
+					da_print_xmmreg(self, rm.mi_reg);
+					da_print_Xmmmask(self, flags);
+					break;
+
+				case OPC_RYMM:
+					da_print_ymmreg(self, rm.mi_reg);
+					da_print_Xmmmask(self, flags);
+					break;
+
+				case OPC_RZMM:
+					da_print_zmmreg(self, rm.mi_reg);
+					da_print_Xmmmask(self, flags);
+					break;
+
+				case OPC_RM64_MM:
+					da_print_modrm_rm64_mm(self, &rm, flags);
+					break;
+
+				case OPC_RM128_XMM:
+					da_print_modrm_rm128_xmm(self, &rm, flags);
+					break;
+
+				case OPC_RM256_YMM:
+					da_print_modrm_rm256_ymm(self, &rm, flags);
+					break;
+
+				case OPC_RM512_ZMM:
+					da_print_modrm_rm512_zmm(self, &rm, flags);
+					break;
+
+				case OPC_VRXMM:
+					da_print_xmmreg(self, VEX_VVVVV());
+					break;
+
+				case OPC_VRYMM:
+					da_print_ymmreg(self, VEX_VVVVV());
+					break;
+
+				case OPC_VRZMM:
+					da_print_zmmreg(self, VEX_VVVVV());
 					break;
 
 				case OPC_DISP8:

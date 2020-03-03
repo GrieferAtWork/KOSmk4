@@ -46,7 +46,7 @@
 #define DISASSEMBLER_FORMAT_SCALE_SUFFIX      0x000f /* Suffix for x86 modrm scale operands. */
 #define DISASSEMBLER_FORMAT_ISPREFIX(x) (!((x) & DISASSEMBLER_FORMAT_SUFFIX_FLAG))
 #define DISASSEMBLER_FORMAT_ISSUFFIX(x)   ((x) & DISASSEMBLER_FORMAT_SUFFIX_FLAG)
-#define DISASSEMBLER_FORMAT_SUFFIX_FLAG       0x0001 /*  */
+#define DISASSEMBLER_FORMAT_SUFFIX_FLAG       0x0001 /* Is this a suffix? */
 
 
 #ifdef __CC__

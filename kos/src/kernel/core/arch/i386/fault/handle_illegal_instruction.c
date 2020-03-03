@@ -197,6 +197,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 #define WR_VEXREGQ(v) x86_icpustate_set64(state, (u8)((op_flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S), v)
 #endif /* __x86_64__ */
 
+
 		/* Emulate syscall invocation methods not supported by the host */
 
 		case 0x0f34:
@@ -1340,7 +1341,6 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 //TODO:66 0F 1A /r BNDMOV bnd1, bnd2/m128         RM         V/NE         MPX         Move lower and upper bound from bnd2/m128 to bound register bnd1.
 //TODO:66 0F 1B /r BNDMOV bnd1/m64, bnd2         MR         NE/V         MPX         Move lower and upper bound from bnd2 to bnd1/m64.
 //TODO:66 0F 1B /r BNDMOV bnd1/m128, bnd2         MR         V/NE         MPX         Move lower and upper bound from bnd2 to bound register bnd1/m128.
-
 
 		default: {
 			uintptr_t next_pc;

@@ -555,6 +555,10 @@ next_byte:
 	result = *text++;
 	switch (result) {
 
+#ifdef __x86_64__
+		/* TODO: EVEX prefix support */
+#endif /* __x86_64__ */
+
 #define VEX3B_R        0x8000 /* FLAG:  3-byte VEX.R */
 #define VEX3B_X        0x4000 /* FLAG:  3-byte VEX.X */
 #define VEX3B_B        0x2000 /* FLAG:  3-byte VEX.B */
@@ -669,7 +673,9 @@ next_byte:
 		case 0x03 << VEX2B_PP_S: *pflags |= F_REPNE; break; /* same as 0xf2 prefix */
 		default: break;
 		}
-		goto next_byte;
+		/* The actual instruction opcode byte */
+		result = 0x0f00 | *text++;
+		break;
 
 		/* Prefix bytes */
 	case 0x66: *pflags |= F_OP16; goto next_byte;

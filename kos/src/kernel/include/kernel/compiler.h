@@ -163,7 +163,7 @@ FUNDEF void NOTHROW(KCALL BREAKPOINT)(void);
 #else
 #include <debugger/config.h>
 #ifndef CONFIG_NO_DEBUGGER
-#define BREAKPOINT()      ({ FUNDEF void KCALL dbg(void); dbg() })
+#define BREAKPOINT()      ({ FUNDEF void KCALL dbg(void); dbg(); })
 #else /* !CONFIG_NO_DEBUGGER */
 #define BREAKPOINT()      (void)0 /* ??? */
 #endif /* CONFIG_NO_DEBUGGER */
