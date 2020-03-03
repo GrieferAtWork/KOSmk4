@@ -20,7 +20,8 @@
 #ifndef GUARD_LIBVM86_EMULATOR_C
 #define GUARD_LIBVM86_EMULATOR_C 1
 
-#include "emulator.h"
+#include "api.h"
+/**/
 
 #include <hybrid/compiler.h>
 
@@ -28,13 +29,13 @@
 
 #include <kos/except.h>
 
-#include <libvm86/api.h>
-#include <libvm86/emulator.h>
-
 #include <assert.h>
 #include <stddef.h>
 
-#include "api.h"
+#include <libvm86/api.h>
+#include <libvm86/emulator.h>
+
+#include "emulator.h"
 #include "x86.h"
 
 #ifdef __KERNEL__
@@ -66,7 +67,8 @@ libvm86_intr(vm86_state_t *__restrict self, uint8_t intno) {
 		(*self->vr_intr)(self, intno);
 	} else {
 		/* Make `base' volatile, so the compiler can't be bothered by it possibly being
-		 * NULL (which is actually what we want it to be in this very special case!) */
+		 * NULL (which is actually what we want it to be in this very special case, as
+		 * the realmode IDT is located at address 0!) */
 		uint16_t *sp;
 		uint16_t *volatile base = (uint16_t *)0;
 		uint16_t cs, ip;

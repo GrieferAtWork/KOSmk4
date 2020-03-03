@@ -22,7 +22,7 @@
 
 #include <__stdcxx.h>
 
-#include <bits/c++/exception.h>
+#include <c++/bits/exception.h>
 
 
 __CXXDECL_BEGIN

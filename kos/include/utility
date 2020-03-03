@@ -26,21 +26,21 @@
 #include <initializer_list>
 
 #ifdef __USE_ISOCXX11
-#include <bits/c++/forward.h>
-#include <bits/c++/move.h>
-#include <bits/c++/traits/andor.h>
-#include <bits/c++/traits/conditional.h>
-#include <bits/c++/traits/declval.h>
-#include <bits/c++/traits/is_constructible.h>
+#include <c++/bits/forward.h>
+#include <c++/bits/move.h>
+#include <c++/bits/traits/andor.h>
+#include <c++/bits/traits/conditional.h>
+#include <c++/bits/traits/declval.h>
+#include <c++/bits/traits/is_constructible.h>
 #endif /* __USE_ISOCXX11 */
 #ifdef __USE_ISOCXX14
-#include <bits/c++/integer_sequence.h>
+#include <c++/bits/integer_sequence.h>
 #endif /* __USE_ISOCXX14 */
 #ifdef __USE_ISOCXX17
-#include <bits/c++/traits/add_cv.h>
+#include <c++/bits/traits/add_cv.h>
 #endif /* __USE_ISOCXX17 */
-#include <bits/c++/pair.h>
-#include <bits/c++/tuple.h>
+#include <c++/bits/pair.h>
+#include <c++/bits/tuple.h>
 
 __CXXDECL_BEGIN
 __NAMESPACE_STD_BEGIN

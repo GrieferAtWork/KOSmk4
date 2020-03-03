@@ -26,7 +26,7 @@
 
 #include <__crt.h>
 
-#define CC         LIBVM86_CC
+#define CC LIBVM86_CC
 
 #if !defined(NDEBUG) && 0
 #ifdef __KERNEL__

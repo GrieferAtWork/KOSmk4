@@ -289,6 +289,11 @@
 #define __USE_ISOCXX17 1
 #endif
 
+#if defined(_ISOCXX2A_SOURCE) || \
+   (defined(__cplusplus) && __cplusplus > 201703L)
+#define __USE_ISOCXX2A 1
+#endif
+
 #if defined(__cplusplus) && (!defined(__GNUC__) || __GCC_VERSION_NUM >= 40400)
 /* Enable proper C++ prototype declarations. */
 #define __CORRECT_ISO_CPP_STRING_H_PROTO    1
@@ -553,6 +558,7 @@
 #undef __USE_ISOCXX11
 #undef __USE_ISOCXX14
 #undef __USE_ISOCXX17
+#undef __USE_ISOCXX2A
 #undef __USE_POSIX_IMPLICITLY
 #undef __USE_POSIX
 #undef __USE_POSIX2
@@ -590,6 +596,7 @@
 #define __USE_ISOCXX11 1
 #define __USE_ISOCXX14 1
 #define __USE_ISOCXX17 1
+#define __USE_ISOCXX2A 1
 #define __USE_POSIX 1
 #define __USE_POSIX2 1
 #define __USE_POSIX199309 1

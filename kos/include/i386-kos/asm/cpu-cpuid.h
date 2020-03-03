@@ -58,7 +58,7 @@
 #define CPUID_1D_MCA             __UINT32_C(0x00004000) /* [bit(EDX:14)] Machine check architecture. */
 #define CPUID_1D_CMOV            __UINT32_C(0x00008000) /* [bit(EDX:15)] Conditional move and FCMOV instructions. */
 #define CPUID_1D_PAT             __UINT32_C(0x00010000) /* [bit(EDX:16)] Page Attribute Table. */
-#define CPUID_1D_PSE_36          __UINT32_C(0x00020000) /* [bit(EDX:17)] 36-bit page size extension. */
+#define CPUID_1D_PSE36           __UINT32_C(0x00020000) /* [bit(EDX:17)] 36-bit page size extension. */
 #define CPUID_1D_PSN             __UINT32_C(0x00040000) /* [bit(EDX:18)] Processor Serial Number. */
 #define CPUID_1D_CLFSH           __UINT32_C(0x00080000) /* [bit(EDX:19)] CLFLUSH instruction (SSE2). */
 /*      CPUID_1D_                __UINT32_C(0x00100000) /* [bit(EDX:20)] RESERVED. */
@@ -233,31 +233,31 @@
 /*      CPUID_80000001C_              __UINT32_C(0x20000000) /* [bit(29)] RESERVED. */
 /*      CPUID_80000001C_              __UINT32_C(0x40000000) /* [bit(30)] RESERVED. */
 /*      CPUID_80000001C_              __UINT32_C(0x80000000) /* [bit(31)] RESERVED. */
-#define CPUID_80000001D_FPU           __UINT32_C(0x00000001) /* [bit(0)] Onboard x87 FPU. */
-#define CPUID_80000001D_VME           __UINT32_C(0x00000002) /* [bit(1)] Virtual mode extensions (VIF). */
-#define CPUID_80000001D_DE            __UINT32_C(0x00000004) /* [bit(2)] Debugging extensions (CR4 bit 3). */
-#define CPUID_80000001D_PSE           __UINT32_C(0x00000008) /* [bit(3)] Page Size Extension (allow 4MiB pages). */
-#define CPUID_80000001D_TSC           __UINT32_C(0x00000010) /* [bit(4)] Time Stamp Counter. */
-#define CPUID_80000001D_MSR           __UINT32_C(0x00000020) /* [bit(5)] Model-specific registers. */
-#define CPUID_80000001D_PAE           __UINT32_C(0x00000040) /* [bit(6)] Physical Address Extension. */
-#define CPUID_80000001D_MCE           __UINT32_C(0x00000080) /* [bit(7)] Machine Check Exception. */
-#define CPUID_80000001D_CX8           __UINT32_C(0x00000100) /* [bit(8)] CMPXCHG8 (compare-and-swap) instruction. */
-#define CPUID_80000001D_APIC          __UINT32_C(0x00000200) /* [bit(9)] Onboard Advanced Programmable Interrupt Controller. */
+#define CPUID_80000001D_FPU           CPUID_1D_FPU           /* [bit(0)] Onboard x87 FPU. */
+#define CPUID_80000001D_VME           CPUID_1D_VME           /* [bit(1)] Virtual mode extensions (VIF). */
+#define CPUID_80000001D_DE            CPUID_1D_DE            /* [bit(2)] Debugging extensions (CR4 bit 3). */
+#define CPUID_80000001D_PSE           CPUID_1D_PSE           /* [bit(3)] Page Size Extension (allow 4MiB pages). */
+#define CPUID_80000001D_TSC           CPUID_1D_TSC           /* [bit(4)] Time Stamp Counter. */
+#define CPUID_80000001D_MSR           CPUID_1D_MSR           /* [bit(5)] Model-specific registers. */
+#define CPUID_80000001D_PAE           CPUID_1D_PAE           /* [bit(6)] Physical Address Extension. */
+#define CPUID_80000001D_MCE           CPUID_1D_MCE           /* [bit(7)] Machine Check Exception. */
+#define CPUID_80000001D_CX8           CPUID_1D_CX8           /* [bit(8)] CMPXCHG8 (compare-and-swap) instruction. */
+#define CPUID_80000001D_APIC          CPUID_1D_APIC          /* [bit(9)] Onboard Advanced Programmable Interrupt Controller. */
 /*      CPUID_80000001D_              __UINT32_C(0x00000400) /* [bit(10)] RESERVED. */
 #define CPUID_80000001D_SYSCALL       __UINT32_C(0x00000800) /* [bit(11)] SYSCALL and SYSRET instructions. */
-#define CPUID_80000001D_MTRR          __UINT32_C(0x00001000) /* [bit(12)] Memory Type Range Registers. */
-#define CPUID_80000001D_PGE           __UINT32_C(0x00002000) /* [bit(13)] Page Global Enable bit in CR4. */
-#define CPUID_80000001D_MCA           __UINT32_C(0x00004000) /* [bit(14)] Machine check architecture. */
-#define CPUID_80000001D_CMOV          __UINT32_C(0x00008000) /* [bit(15)] Conditional move and FCMOV instructions. */
-#define CPUID_80000001D_PAT           __UINT32_C(0x00010000) /* [bit(16)] Page Attribute Table. */
-#define CPUID_80000001D_PSE36         __UINT32_C(0x00020000) /* [bit(17)] 36-bit page size extension (for 4MiB pages). */
+#define CPUID_80000001D_MTRR          CPUID_1D_MTRR          /* [bit(12)] Memory Type Range Registers. */
+#define CPUID_80000001D_PGE           CPUID_1D_PGE           /* [bit(13)] Page Global Enable bit in CR4. */
+#define CPUID_80000001D_MCA           CPUID_1D_MCA           /* [bit(14)] Machine check architecture. */
+#define CPUID_80000001D_CMOV          CPUID_1D_CMOV          /* [bit(15)] Conditional move and FCMOV instructions. */
+#define CPUID_80000001D_PAT           CPUID_1D_PAT           /* [bit(16)] Page Attribute Table. */
+#define CPUID_80000001D_PSE36         CPUID_1D_PSE36         /* [bit(17)] 36-bit page size extension (for 4MiB pages). */
 /*      CPUID_80000001D_              __UINT32_C(0x00040000) /* [bit(18)] RESERVED. */
 #define CPUID_80000001D_MP            __UINT32_C(0x00080000) /* [bit(19)] Multiprocessor Capable. */
 #define CPUID_80000001D_NX            __UINT32_C(0x00100000) /* [bit(20)] NX bit. */
 /*      CPUID_80000001D_              __UINT32_C(0x00200000) /* [bit(21)] RESERVED. */
 #define CPUID_80000001D_MMXEXT        __UINT32_C(0x00400000) /* [bit(22)] Extended MMX. */
-#define CPUID_80000001D_MMX           __UINT32_C(0x00800000) /* [bit(23)] MMX instructions. */
-#define CPUID_80000001D_FXSR          __UINT32_C(0x01000000) /* [bit(24)] FXSAVE, FXRSTOR instructions, CR4 bit 9. */
+#define CPUID_80000001D_MMX           CPUID_1D_MMX           /* [bit(23)] MMX instructions. */
+#define CPUID_80000001D_FXSR          CPUID_1D_FXSR          /* [bit(24)] FXSAVE, FXRSTOR instructions, CR4 bit 9. */
 #define CPUID_80000001D_FXSR_OPT      __UINT32_C(0x02000000) /* [bit(25)] FXSAVE/FXRSTOR optimizations. */
 #define CPUID_80000001D_PDPE1GB       __UINT32_C(0x04000000) /* [bit(26)] Gibabyte pages. */
 #define CPUID_80000001D_RDTSCP        __UINT32_C(0x08000000) /* [bit(27)] RDTSCP instruction. */
@@ -265,6 +265,7 @@
 #define CPUID_80000001D_LM            __UINT32_C(0x20000000) /* [bit(29)] Long mode. */
 #define CPUID_80000001D_3DNOWEXT      __UINT32_C(0x40000000) /* [bit(30)] Extended 3DNow. */
 #define CPUID_80000001D_3DNOW         __UINT32_C(0x80000000) /* [bit(31)] 3DNow!. */
+
 
 
 #endif /* !_I386_KOS_ASM_CPU_CPUID_H */

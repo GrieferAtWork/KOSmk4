@@ -21,9 +21,8 @@
 #define GUARD_LIBVIDEO_GFX_RAM_BUFFER_C 1
 #define _KOS_SOURCE 1
 
-#include "ram-buffer.h"
-
 #include "api.h"
+/**/
 
 #include <hybrid/compiler.h>
 
@@ -33,13 +32,18 @@
 
 #include <assert.h>
 #include <malloc.h>
-#include <string.h>
-#include <minmax.h>
 #include <stddef.h>
+#include <string.h>
 
 #include "buffer.h"
 #include "empty-buffer.h"
 #include "gfx.h"
+#include "ram-buffer.h"
+
+/* libstdc++ #undef's min/max (ugh... I'll really have to replace
+ * that library with my own version of it at one point).
+ * But we want them as macros, so include this at the end... */
+#include <minmax.h>
 
 DECL_BEGIN
 

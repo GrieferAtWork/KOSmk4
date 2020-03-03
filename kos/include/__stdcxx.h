@@ -27,6 +27,7 @@
 #endif /* !__cplusplus */
 
 //#define __COMPILER_HAVE_CXX_TEMPLATE_CONSTEXPR 1
+#define __COMPILER_HAVE_CXX_TEMPLATE_CONSTEXPR 1 /* TODO */
 #define __COMPILER_HAVE_CXX_PARTIAL_TPL_SPEC 1
 #define __CXX_DEDUCE_TYPENAME typename
 

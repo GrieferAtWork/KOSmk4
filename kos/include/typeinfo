@@ -24,8 +24,8 @@
 #include <features.h>
 
 #include <bits/types.h>
-#include <bits/c++/bad_cast.h>
-#include <bits/c++/bad_typeid.h>
+#include <c++/bits/bad_cast.h>
+#include <c++/bits/bad_typeid.h>
 
 #include <libc/string.h>
 

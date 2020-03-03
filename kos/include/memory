@@ -22,9 +22,9 @@
 
 #include <__stdcxx.h>
 
-#include <bits/c++/addressof.h>
-#include <bits/c++/allocator.h>
-#include <bits/c++/unique_ptr.h>
+#include <c++/bits/addressof.h>
+#include <c++/bits/allocator.h>
+#include <c++/bits/unique_ptr.h>
 #include <bits/types.h>
 
 /* TODO: Incomplete */

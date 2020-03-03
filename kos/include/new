@@ -22,10 +22,10 @@
 
 #include <__stdcxx.h>
 #include <bits/types.h>
-#include <bits/c++/operator_new.h>
-#include <bits/c++/bad_alloc.h>
+#include <c++/bits/operator_new.h>
+#include <c++/bits/bad_alloc.h>
 #ifdef __USE_ISOCXX11
-#include <bits/c++/bad_array_new_length.h>
+#include <c++/bits/bad_array_new_length.h>
 #endif /* __USE_ISOCXX11 */
 
 __CXXDECL_BEGIN

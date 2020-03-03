@@ -21,55 +21,71 @@
 #define _CXX_TYPE_TRAITS 1
 
 #include <__stdcxx.h>
-#include <hybrid/typecore.h>
-#include <bits/c++/varargs-template.h>
-#include <bits/c++/traits/integral_constant.h>
-#include <bits/c++/traits/remove_reference.h>
-#include <bits/c++/traits/conditional.h>
-#include <bits/c++/traits/andor.h>
-#include <bits/c++/traits/remove_cv.h>
-#include <bits/c++/traits/is_void.h>
-#include <bits/c++/traits/add_cv.h>
-#include <bits/c++/traits/is_integral.h>
-#include <bits/c++/traits/is_floating_point.h>
-#include <bits/c++/traits/is_array.h>
-#include <bits/c++/traits/is_pointer.h>
-#include <bits/c++/traits/is_reference.h>
-#include <bits/c++/traits/is_function.h>
-#include <bits/c++/traits/is_member.h>
-#include <bits/c++/traits/is_enum.h>
-#include <bits/c++/traits/is_union.h>
-#include <bits/c++/traits/is_class.h>
-#include <bits/c++/traits/is_member_pointer.h>
-#include <bits/c++/traits/is_object.h>
-#include <bits/c++/traits/is_cv.h>
-#include <bits/c++/traits/is_arithmetic.h>
-#include <bits/c++/traits/is_sign.h>
-#include <bits/c++/traits/add_reference.h>
-#include <bits/c++/traits/extent.h>
-#include <bits/c++/traits/declval.h>
-#include <bits/c++/traits/remove_extent.h>
-#include <bits/c++/traits/remove_all_extents.h>
-#include <bits/c++/traits/is_destructible.h>
-#include <bits/c++/traits/is_scalar.h>
-#include <bits/c++/traits/is_null_pointer.h>
-#include <bits/c++/traits/is_constructible.h>
-#include <bits/c++/traits/is_same.h>
-#include <bits/c++/traits/is_base_of.h>
-#include <bits/c++/traits/is_assignable.h>
-#include <bits/c++/traits/is_convertible.h>
-#include <bits/c++/traits/make_sign.h>
-#include <bits/c++/traits/remove_pointer.h>
-#include <bits/c++/traits/add_pointer.h>
-#include <bits/c++/traits/aligned_storage.h>
-#include <bits/c++/traits/decay.h>
-#include <bits/c++/traits/enable_if.h>
-#include <bits/c++/traits/common_type.h>
-#include <bits/c++/traits/underlying_type.h>
-#include <bits/c++/traits/result_of.h>
+#include <features.h>
 
-#include <bits/c++/traits/__is_referenceable.h>
-#include <bits/c++/traits/__is_array_bounds.h>
+#include <hybrid/typecore.h>
+
+#include <c++/bits/traits/__is_array_bounds.h>
+#include <c++/bits/traits/__is_referenceable.h>
+#include <c++/bits/traits/add_cv.h>
+#include <c++/bits/traits/add_pointer.h>
+#include <c++/bits/traits/add_reference.h>
+#include <c++/bits/traits/aligned_storage.h>
+#include <c++/bits/traits/andor.h>
+#include <c++/bits/traits/common_type.h>
+#include <c++/bits/traits/conditional.h>
+#include <c++/bits/traits/decay.h>
+#include <c++/bits/traits/declval.h>
+#include <c++/bits/traits/enable_if.h>
+#include <c++/bits/traits/extent.h>
+#include <c++/bits/traits/integral_constant.h>
+#include <c++/bits/traits/is_arithmetic.h>
+#include <c++/bits/traits/is_array.h>
+#include <c++/bits/traits/is_assignable.h> /* is_assignable, is_copy_assignable, is_move_assignable,
+                                            * is_nothrow_assignable, is_nothrow_copy_assignable,
+                                            * is_nothrow_move_assignable, is_trivially_assignable,
+                                            * is_trivially_copy_assignable, is_trivially_move_assignable */
+#include <c++/bits/traits/is_base_of.h>
+#include <c++/bits/traits/is_class.h>
+#include <c++/bits/traits/is_constructible.h> /* is_constructible, is_default_constructible, is_copy_constructible,
+                                               * is_move_constructible, is_nothrow_default_constructible,
+                                               * is_nothrow_constructible, is_nothrow_copy_constructible,
+                                               * is_nothrow_move_constructible, is_trivially_constructible,
+                                               * is_trivially_default_constructible, is_trivially_copy_constructible,
+                                               * is_trivially_move_constructible, has_trivial_default_constructor,
+                                               * has_trivial_copy_constructor */
+#include <c++/bits/traits/is_convertible.h>   /* is_convertible, is_nothrow_convertible */
+#include <c++/bits/traits/is_cv.h>            /* is_const, is_volatile */
+#include <c++/bits/traits/is_destructible.h>  /* is_destructible, is_nothrow_destructible, is_trivially_destructible,
+                                              * has_virtual_destructor */
+#include <c++/bits/traits/is_enum.h>
+#include <c++/bits/traits/is_floating_point.h>
+#include <c++/bits/traits/is_function.h>
+#include <c++/bits/traits/is_integral.h>
+#include <c++/bits/traits/is_member.h> /* is_member_object_pointer, is_member_function_pointer */
+#include <c++/bits/traits/is_member_pointer.h>
+#include <c++/bits/traits/is_null_pointer.h>
+#include <c++/bits/traits/is_object.h>
+#include <c++/bits/traits/is_pointer.h>
+#include <c++/bits/traits/is_reference.h> /* is_lvalue_reference, is_rvalue_reference, is_reference */
+#include <c++/bits/traits/is_same.h>
+#include <c++/bits/traits/is_scalar.h>
+#include <c++/bits/traits/is_sign.h> /* is_signed, is_unsigned */
+#include <c++/bits/traits/is_union.h>
+#include <c++/bits/traits/is_void.h>
+#include <c++/bits/traits/make_sign.h>
+#include <c++/bits/traits/remove_all_extents.h>
+#include <c++/bits/traits/remove_cv.h>
+#include <c++/bits/traits/remove_extent.h>
+#include <c++/bits/traits/remove_pointer.h>
+#include <c++/bits/traits/remove_reference.h>
+#include <c++/bits/traits/result_of.h>
+#include <c++/bits/traits/underlying_type.h>
+#include <c++/bits/varargs-template.h>
+#include <c++/compiler/enum-class.h>
+#ifdef __USE_ISOCXX17
+#include <c++/bits/traits/is_invocable.h>
+#endif /* __USE_ISOCXX17 */
 
 __CXXDECL_BEGIN
 __NAMESPACE_STD_BEGIN
@@ -77,66 +93,66 @@ __NAMESPACE_STD_BEGIN
 #ifdef __USE_ISOCXX14
 #ifdef __COMPILER_HAVE_CXX_TEMPLATE_USING
 #define __cpp_lib_bool_constant 201505
-template<bool __v> using bool_constant = integral_constant<bool,__v>;
+template<bool __v> using bool_constant = integral_constant<bool, __v>;
 #endif /* __COMPILER_HAVE_CXX_TEMPLATE_USING */
 #endif /* __USE_ISOCXX14 */
 
 #ifdef __USE_ISOCXX17
 #define __cpp_lib_logical_traits 201510
 #ifdef __COMPILER_HAVE_CXX_VARIABLE_TEMPLATES
-template<class ...__Conditions> struct conjunction: public __NAMESPACE_INT_SYM __and_<__Conditions...> {};
-template<class ...__Conditions> struct disjunction: public __NAMESPACE_INT_SYM __or_<__Conditions...> {};
+template<class... __Conditions> struct conjunction: public __NAMESPACE_INT_SYM __and_<__Conditions...> {};
+template<class... __Conditions> struct disjunction: public __NAMESPACE_INT_SYM __or_<__Conditions...> {};
 #endif /* __COMPILER_HAVE_CXX_VARIABLE_TEMPLATES */
 template<class __Condition> struct negation: public __NAMESPACE_INT_SYM __not_<__Condition> {};
 #ifdef __COMPILER_HAVE_CXX_TEMPLATE_CONSTEXPR
-template<class ...__Conditions> inline constexpr bool conjunction_v = conjunction<__Conditions...>::value;
-template<class ...__Conditions> inline constexpr bool disjunction_v = disjunction<__Conditions...>::value;
-template<class __Condition> inline constexpr bool negation_v = negation<__Condition>::value;
+template<class... __Conditions> inline constexpr bool conjunction_v = conjunction<__Conditions...>::value;
+template<class... __Conditions> inline constexpr bool disjunction_v = disjunction<__Conditions...>::value;
+template<class __Condition> inline constexpr bool negation_v        = negation<__Condition>::value;
 #endif /* __COMPILER_HAVE_CXX_TEMPLATE_CONSTEXPR */
 #endif /* __USE_ISOCXX17 */
 
 #ifdef __USE_ISOCXX11
 #ifdef __COMPILER_HAVE_CXX_TEMPLATE_USING
 #define __cpp_lib_transformation_trait_aliases 201304
-template<class __T> using remove_const_t = typename remove_const<__T>::type;
-template<class __T> using remove_volatile_t = typename remove_volatile<__T>::type;
-template<class __T> using remove_cv_t = typename remove_cv<__T>::type;
-template<class __T> using add_const_t = typename add_const<__T>::type;
-template<class __T> using add_volatile_t = typename add_volatile<__T>::type;
-template<class __T> using add_cv_t = typename add_cv<__T>::type;
-template<class __T> using remove_extent_t = typename remove_extent<__T>::type;
+template<class __T> using remove_const_t       = typename remove_const<__T>::type;
+template<class __T> using remove_volatile_t    = typename remove_volatile<__T>::type;
+template<class __T> using remove_cv_t          = typename remove_cv<__T>::type;
+template<class __T> using add_const_t          = typename add_const<__T>::type;
+template<class __T> using add_volatile_t       = typename add_volatile<__T>::type;
+template<class __T> using add_cv_t             = typename add_cv<__T>::type;
+template<class __T> using remove_extent_t      = typename remove_extent<__T>::type;
 template<class __T> using remove_all_extents_t = typename remove_all_extents<__T>::type;
 #define __cpp_lib_transformation_trait_aliases 201304
-template<class __T> using remove_const_t = typename remove_const<__T>::type;
-template<class __T> using remove_volatile_t = typename remove_volatile<__T>::type;
-template<class __T> using remove_cv_t = typename remove_cv<__T>::type;
-template<class __T> using add_const_t = typename add_const<__T>::type;
-template<class __T> using add_volatile_t = typename add_volatile<__T>::type;
-template<class __T> using add_cv_t = typename add_cv<__T>::type;
-template<class __T> using remove_reference_t = typename remove_reference<__T>::type;
+template<class __T> using remove_const_t         = typename remove_const<__T>::type;
+template<class __T> using remove_volatile_t      = typename remove_volatile<__T>::type;
+template<class __T> using remove_cv_t            = typename remove_cv<__T>::type;
+template<class __T> using add_const_t            = typename add_const<__T>::type;
+template<class __T> using add_volatile_t         = typename add_volatile<__T>::type;
+template<class __T> using add_cv_t               = typename add_cv<__T>::type;
+template<class __T> using remove_reference_t     = typename remove_reference<__T>::type;
 template<class __T> using add_lvalue_reference_t = typename add_lvalue_reference<__T>::type;
 template<class __T> using add_rvalue_reference_t = typename add_rvalue_reference<__T>::type;
-template<class __T> using make_signed_t = typename make_signed<__T>::type;
-template<class __T> using make_unsigned_t = typename make_unsigned<__T>::type;
-template<class __T> using remove_extent_t = typename remove_extent<__T>::type;
-template<class __T> using remove_all_extents_t = typename remove_all_extents<__T>::type;
-template<class __T> using remove_pointer_t = typename remove_pointer<__T>::type;
-template<class __T> using add_pointer_t = typename add_pointer<__T>::type;
+template<class __T> using make_signed_t          = typename make_signed<__T>::type;
+template<class __T> using make_unsigned_t        = typename make_unsigned<__T>::type;
+template<class __T> using remove_extent_t        = typename remove_extent<__T>::type;
+template<class __T> using remove_all_extents_t   = typename remove_all_extents<__T>::type;
+template<class __T> using remove_pointer_t       = typename remove_pointer<__T>::type;
+template<class __T> using add_pointer_t          = typename add_pointer<__T>::type;
 template<__SIZE_TYPE__ __StorageSize, __SIZE_TYPE__ __Alignment = __PRIVATE_MAX_ALIGN_FOR_LENGTH(__StorageSize)>
-using aligned_storage_t = typename aligned_storage<__StorageSize,__Alignment>::type;
+using aligned_storage_t = typename aligned_storage<__StorageSize, __Alignment>::type;
 #ifdef __std_aligned_union_defined
 #ifdef __COMPILER_HAVE_CXX_VARIABLE_TEMPLATES
-template <__SIZE_TYPE__ __StorageSize, class ...__Types>
-using aligned_union_t = typename aligned_union<__StorageSize,__Types...>::type;
+template<__SIZE_TYPE__ __StorageSize, class... __Types>
+using aligned_union_t = typename aligned_union<__StorageSize, __Types...>::type;
 #endif /* __COMPILER_HAVE_CXX_VARIABLE_TEMPLATES */
 #endif /* __std_aligned_union_defined */
-template<class __T> using decay_t = typename decay<__T>::type;
-template<bool __Condition, class __T = void> using enable_if_t = typename enable_if<__Condition,__T>::type;
+template<class __T> using decay_t                              = typename decay<__T>::type;
+template<bool __Condition, class __T = void> using enable_if_t = typename enable_if<__Condition, __T>::type;
 template<bool __Condition, class __TrueType, class __FalseType>
-using conditional_t = typename conditional<__Condition,__TrueType,__FalseType>::type;
+using conditional_t = typename conditional<__Condition, __TrueType, __FalseType>::type;
 #ifdef __std_common_type_defined
 #ifdef __COMPILER_HAVE_CXX_VARIABLE_TEMPLATES
-template<class ...__T> using common_type_t = typename common_type<__T...>::type;
+template<class... __T> using common_type_t = typename common_type<__T...>::type;
 #endif /* __COMPILER_HAVE_CXX_VARIABLE_TEMPLATES */
 #endif /* __std_common_type_defined */
 #ifdef __std_underlying_type_defined
@@ -148,25 +164,25 @@ template<class __Signature> using result_of_t = typename result_of<__Signature>:
 #endif /* __COMPILER_HAVE_CXX_TEMPLATE_USING */
 #endif /* __USE_ISOCXX11 */
 
-template<class __T> struct is_fundamental: public __NAMESPACE_INT_SYM __or_<is_arithmetic<__T>,is_void<__T>,is_null_pointer<__T> >::type {};
-template<class __T> struct is_compound: public integral_constant<bool,!is_fundamental<__T>::value> {};
+template<class __T> struct is_fundamental: public __NAMESPACE_INT_SYM __or_<is_arithmetic<__T>, is_void<__T>, is_null_pointer<__T> >::type {};
+template<class __T> struct is_compound: public integral_constant<bool, !is_fundamental<__T>::value> {};
 
-template<class __T> struct is_trivial: public integral_constant<bool,__is_trivial(__T)> {};
-template<class __T> struct is_trivially_copyable: public integral_constant<bool,__is_trivially_copyable(__T)> {};
-template<class __T> struct is_standard_layout: public integral_constant<bool,__is_standard_layout(__T)> {};
-template<class __T> struct is_pod: public integral_constant<bool,__is_pod(__T)> {};
-template<class __T> struct is_literal_type: public integral_constant<bool,__is_literal_type(__T)> {};
-template<class __T> struct is_empty: public integral_constant<bool,__is_empty(__T)> {};
-template<class __T> struct is_polymorphic: public integral_constant<bool,__is_polymorphic(__T)> {};
+template<class __T> struct is_trivial: public integral_constant<bool, __is_trivial(__T)> {};
+template<class __T> struct is_trivially_copyable: public integral_constant<bool, __is_trivially_copyable(__T)> {};
+template<class __T> struct is_standard_layout: public integral_constant<bool, __is_standard_layout(__T)> {};
+template<class __T> struct is_pod: public integral_constant<bool, __is_pod(__T)> {};
+template<class __T> struct is_literal_type: public integral_constant<bool, __is_literal_type(__T)> {};
+template<class __T> struct is_empty: public integral_constant<bool, __is_empty(__T)> {};
+template<class __T> struct is_polymorphic: public integral_constant<bool, __is_polymorphic(__T)> {};
 #ifdef __USE_ISOCXX14
 #define __cpp_lib_is_final 201402L
-template<class __T> struct is_final: public integral_constant<bool,__is_final(__T)> {};
+template<class __T> struct is_final: public integral_constant<bool, __is_final(__T)> {};
 #endif /* __USE_ISOCXX14 */
-template<class __T> struct is_abstract: public integral_constant<bool,__is_abstract(__T)> {};
-template<class __T> struct alignment_of: public integral_constant<__SIZE_TYPE__,__COMPILER_ALIGNOF(__T)> {};
-template<class __T> struct rank: public integral_constant<__SIZE_TYPE__,0> {};
-template<class __T, __SIZE_TYPE__ __Size> struct rank<__T[__Size]>: public integral_constant<__SIZE_TYPE__,1+rank<__T>::value> {};
-template<class __T> struct rank<__T[]>: public integral_constant<__SIZE_TYPE__,1+rank<__T>::value> {};
+template<class __T> struct is_abstract: public integral_constant<bool, __is_abstract(__T)> {};
+template<class __T> struct alignment_of: public integral_constant<__SIZE_TYPE__, __COMPILER_ALIGNOF(__T)> {};
+template<class __T> struct rank: public integral_constant<__SIZE_TYPE__, 0> {};
+template<class __T, __SIZE_TYPE__ __Size> struct rank<__T[__Size]>: public integral_constant<__SIZE_TYPE__, 1 + rank<__T>::value> {};
+template<class __T> struct rank<__T[]>: public integral_constant<__SIZE_TYPE__, 1 + rank<__T>::value> {};
 
 #ifndef __std_reference_wrapper_defined
 #define __std_reference_wrapper_defined 1
@@ -176,9 +192,133 @@ template<class __T> class reference_wrapper;
 #if defined(__USE_ISOCXX14) || defined(__USE_GNU)
 #ifdef __COMPILER_HAVE_CXX_TEMPLATE_USING
 #define __cpp_lib_void_t 201411
-template<__CXX_VARARGS_TEMPLATE_ARGS_DEF(class,__Types,void)> using void_t = void;
+template<__CXX_VARARGS_TEMPLATE_ARGS_DEF(class, __Types, void)> using void_t = void;
 #endif /* __COMPILER_HAVE_CXX_TEMPLATE_USING */
-#endif
+#endif /* __USE_ISOCXX14 || __USE_GNU */
+
+#if __has_builtin(__builtin_is_constant_evaluated)
+#define __cpp_lib_is_constant_evaluated 201811L
+constexpr inline bool is_constant_evaluated() noexcept {
+	return __builtin_is_constant_evaluated();
+}
+#endif /* __has_builtin(__builtin_is_constant_evaluated) */
+
+
+#ifdef __USE_ISOCXX17
+#ifdef __COMPILER_HAVE_CXX_TEMPLATE_CONSTEXPR
+#define __cpp_lib_type_trait_variable_templates 201510L
+template<typename __T> inline constexpr bool is_void_v                                        = is_void<__T>::value;
+template<typename __T> inline constexpr bool is_null_pointer_v                                = is_null_pointer<__T>::value;
+template<typename __T> inline constexpr bool is_integral_v                                    = is_integral<__T>::value;
+template<typename __T> inline constexpr bool is_floating_point_v                              = is_floating_point<__T>::value;
+template<typename __T> inline constexpr bool is_array_v                                       = is_array<__T>::value;
+template<typename __T> inline constexpr bool is_pointer_v                                     = is_pointer<__T>::value;
+template<typename __T> inline constexpr bool is_lvalue_reference_v                            = is_lvalue_reference<__T>::value;
+template<typename __T> inline constexpr bool is_rvalue_reference_v                            = is_rvalue_reference<__T>::value;
+template<typename __T> inline constexpr bool is_member_object_pointer_v                       = is_member_object_pointer<__T>::value;
+template<typename __T> inline constexpr bool is_member_function_pointer_v                     = is_member_function_pointer<__T>::value;
+template<typename __T> inline constexpr bool is_enum_v                                        = is_enum<__T>::value;
+template<typename __T> inline constexpr bool is_union_v                                       = is_union<__T>::value;
+template<typename __T> inline constexpr bool is_class_v                                       = is_class<__T>::value;
+template<typename __T> inline constexpr bool is_function_v                                    = is_function<__T>::value;
+template<typename __T> inline constexpr bool is_reference_v                                   = is_reference<__T>::value;
+template<typename __T> inline constexpr bool is_arithmetic_v                                  = is_arithmetic<__T>::value;
+template<typename __T> inline constexpr bool is_fundamental_v                                 = is_fundamental<__T>::value;
+template<typename __T> inline constexpr bool is_object_v                                      = is_object<__T>::value;
+template<typename __T> inline constexpr bool is_scalar_v                                      = is_scalar<__T>::value;
+template<typename __T> inline constexpr bool is_compound_v                                    = is_compound<__T>::value;
+template<typename __T> inline constexpr bool is_member_pointer_v                              = is_member_pointer<__T>::value;
+template<typename __T> inline constexpr bool is_const_v                                       = is_const<__T>::value;
+template<typename __T> inline constexpr bool is_volatile_v                                    = is_volatile<__T>::value;
+template<typename __T> inline constexpr bool is_trivial_v                                     = is_trivial<__T>::value;
+template<typename __T> inline constexpr bool is_trivially_copyable_v                          = is_trivially_copyable<__T>::value;
+template<typename __T> inline constexpr bool is_standard_layout_v                             = is_standard_layout<__T>::value;
+template<typename __T> inline constexpr bool is_pod_v                                         = is_pod<__T>::value;
+template<typename __T> inline constexpr bool is_literal_type_v                                = is_literal_type<__T>::value;
+template<typename __T> inline constexpr bool is_empty_v                                       = is_empty<__T>::value;
+template<typename __T> inline constexpr bool is_polymorphic_v                                 = is_polymorphic<__T>::value;
+template<typename __T> inline constexpr bool is_abstract_v                                    = is_abstract<__T>::value;
+template<typename __T> inline constexpr bool is_final_v                                       = is_final<__T>::value;
+template<typename __T> inline constexpr bool is_signed_v                                      = is_signed<__T>::value;
+template<typename __T> inline constexpr bool is_unsigned_v                                    = is_unsigned<__T>::value;
+template<typename __T, typename... __Args> inline constexpr bool is_constructible_v           = is_constructible<__T, __Args...>::value;
+template<typename __T> inline constexpr bool is_default_constructible_v                       = is_default_constructible<__T>::value;
+template<typename __T> inline constexpr bool is_copy_constructible_v                          = is_copy_constructible<__T>::value;
+template<typename __T> inline constexpr bool is_move_constructible_v                          = is_move_constructible<__T>::value;
+template<typename __T, typename __U> inline constexpr bool is_assignable_v                    = is_assignable<__T, __U>::value;
+template<typename __T> inline constexpr bool is_copy_assignable_v                             = is_copy_assignable<__T>::value;
+template<typename __T> inline constexpr bool is_move_assignable_v                             = is_move_assignable<__T>::value;
+template<typename __T> inline constexpr bool is_destructible_v                                = is_destructible<__T>::value;
+template<typename __T, typename... __Args> inline constexpr bool is_trivially_constructible_v = is_trivially_constructible<__T, __Args...>::value;
+template<typename __T> inline constexpr bool is_trivially_default_constructible_v             = is_trivially_default_constructible<__T>::value;
+template<typename __T> inline constexpr bool is_trivially_copy_constructible_v                = is_trivially_copy_constructible<__T>::value;
+template<typename __T> inline constexpr bool is_trivially_move_constructible_v                = is_trivially_move_constructible<__T>::value;
+template<typename __T, typename __U> inline constexpr bool is_trivially_assignable_v          = is_trivially_assignable<__T, __U>::value;
+template<typename __T> inline constexpr bool is_trivially_copy_assignable_v                   = is_trivially_copy_assignable<__T>::value;
+template<typename __T> inline constexpr bool is_trivially_move_assignable_v                   = is_trivially_move_assignable<__T>::value;
+template<typename __T> inline constexpr bool is_trivially_destructible_v                      = is_trivially_destructible<__T>::value;
+template<typename __T, typename... __Args> inline constexpr bool is_nothrow_constructible_v   = is_nothrow_constructible<__T, __Args...>::value;
+template<typename __T> inline constexpr bool is_nothrow_default_constructible_v               = is_nothrow_default_constructible<__T>::value;
+template<typename __T> inline constexpr bool is_nothrow_copy_constructible_v                  = is_nothrow_copy_constructible<__T>::value;
+template<typename __T> inline constexpr bool is_nothrow_move_constructible_v                  = is_nothrow_move_constructible<__T>::value;
+template<typename __T, typename __U> inline constexpr bool is_nothrow_assignable_v            = is_nothrow_assignable<__T, __U>::value;
+template<typename __T> inline constexpr bool is_nothrow_copy_assignable_v                     = is_nothrow_copy_assignable<__T>::value;
+template<typename __T> inline constexpr bool is_nothrow_move_assignable_v                     = is_nothrow_move_assignable<__T>::value;
+template<typename __T> inline constexpr bool is_nothrow_destructible_v                        = is_nothrow_destructible<__T>::value;
+template<typename __T> inline constexpr bool has_virtual_destructor_v                         = has_virtual_destructor<__T>::value;
+template<typename __T> inline constexpr __SIZE_TYPE__ alignment_of_v                          = alignment_of<__T>::value;
+template<typename __T> inline constexpr __SIZE_TYPE__ rank_v                                  = rank<__T>::value;
+template<typename __T, unsigned __I = 0> inline constexpr __SIZE_TYPE__ extent_v              = extent<__T, __I>::value;
+template<typename __T, typename __U> inline constexpr bool is_same_v                          = is_same<__T, __U>::value;
+template<typename __Base, typename __Derived> inline constexpr bool is_base_of_v              = is_base_of<__Base, __Derived>::value;
+template<typename __From, typename __To> inline constexpr bool is_convertible_v               = is_convertible<__From, __To>::value;
+#endif /* __COMPILER_HAVE_CXX_TEMPLATE_CONSTEXPR */
+
+#ifdef __COMPILER_HAVE_HAS_UNIQUE_OBJECT_REPRESENTATIONS
+#define __cpp_lib_has_unique_object_representations 201606
+template<typename __T> struct has_unique_object_representations: integral_constant<bool, __has_unique_object_representations(remove_cv_t<remove_all_extents_t<__T> >)> {};
+template<typename __T> inline constexpr bool has_unique_object_representations_v = has_unique_object_representations<__T>::value;
+#endif /* __COMPILER_HAVE_HAS_UNIQUE_OBJECT_REPRESENTATIONS */
+
+#ifdef __COMPILER_HAVE_IS_AGGREGATE
+#define __cpp_lib_is_aggregate 201703
+template<typename __T> struct is_aggregate: integral_constant<bool, __is_aggregate(remove_cv_t<__T>)> {};
+template<typename __T> inline constexpr bool is_aggregate_v = is_aggregate<__T>::value;
+#endif /* __COMPILER_HAVE_IS_AGGREGATE */
+#endif /* __USE_ISOCXX17 */
+
+#ifdef __USE_ISOCXX2A
+__CXX_ENUM_CLASS_BEGIN(endian) {
+	little = __ORDER_LITTLE_ENDIAN__,
+	big    = __ORDER_BIG_ENDIAN__,
+	native = __BYTE_ORDER__
+} __CXX_ENUM_CLASS_END(endian);
+
+template<typename __T> struct remove_cvref { typedef typename remove_cv<typename remove_reference<_Tp>::type>::type type; };
+template<typename __T> struct type_identity { typedef __T type; };
+template<typename __T> struct unwrap_reference { typedef __T type; };
+template<typename __T> struct unwrap_reference<reference_wrapper<__T> > { typedef __T &type; };
+template<typename __T> struct unwrap_ref_decay { typedef typename unwrap_reference_t<typename decay<__T>::type>::type type; };
+#ifdef __COMPILER_HAVE_CXX_TEMPLATE_USING
+template<typename __T> using remove_cvref_t     = typename remove_cvref<__T>::type;
+template<typename __T> using type_identity_t    = typename type_identity<__T>::type;
+template<typename __T> using unwrap_reference_t = typename unwrap_reference<__T>::type;
+template<typename __T> using unwrap_ref_decay_t = typename unwrap_ref_decay<__T>::type;
+#endif /* __COMPILER_HAVE_CXX_TEMPLATE_USING */
+
+#define __cpp_lib_bounded_array_traits 201902L
+template<typename __T> struct is_bounded_array: public integral_constant<bool, (extent<__T>::value > 0)> {};
+template<typename __T> struct is_unbounded_array: public __NAMESPACE_INT_SYM __and_<is_array<_Tp>, __NAMESPACE_INT_SYM __not_<extent<_Tp> > > {};
+#ifdef __COMPILER_HAVE_CXX_TEMPLATE_CONSTEXPR
+template<typename __T> inline constexpr bool is_bounded_array_v   = is_bounded_array<__T>::value;
+template<typename __T> inline constexpr bool is_unbounded_array_v = is_unbounded_array<__T>::value;
+#endif /* __COMPILER_HAVE_CXX_TEMPLATE_CONSTEXPR */
+#endif /* __USE_ISOCXX2A */
+
+/* TODO: is_swappable<T>::value */
+/* TODO: is_nothrow_swappable<T>::value */
+/* TODO: is_swappable_with<T, U>::value */
+/* TODO: is_nothrow_swappable_with<T, U>::value */
 
 __NAMESPACE_STD_END
 __CXXDECL_END

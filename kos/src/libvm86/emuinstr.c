@@ -985,8 +985,8 @@ read_opcode:
 		GUARD_SEGFAULT({                                              \
 			segment = UNALIGNED_GET16((uint16_t *)(addr + 0));        \
 			offset  = op_flags & F_OP32                               \
-			             ? UNALIGNED_GET32((uint32_t *)(addr + 2))    \
-			             : UNALIGNED_GET16((uint16_t *)(addr + 2));   \
+			         ? UNALIGNED_GET32((uint32_t *)(addr + 2))        \
+			         : UNALIGNED_GET16((uint16_t *)(addr + 2));       \
 		});                                                           \
 		segment_register  = segment;                                  \
 		REG32(mod.mi_reg) = offset;                                   \
@@ -1002,7 +1002,7 @@ read_opcode:
 #ifndef __INTELLISENSE__
 		case 0xa1:
 			/* 0F A1     POP FS     ZO     Valid     Valid     Pop top of stack into FS; increment stack pointer by 16 bits.
-			 * 0F A1     POP FS     ZO     N.E.     Valid     Pop top of stack into FS; increment stack pointer by 32 bits. */
+			 * 0F A1     POP FS     ZO     N.E.      Valid     Pop top of stack into FS; increment stack pointer by 32 bits. */
 			if (op_flags & (F_LOCK))
 				goto err_ilop;
 			if (op_flags & F_OP32) {
@@ -1021,7 +1021,7 @@ read_opcode:
 
 		case 0xa9:
 			/* 0F A9     POP GS     ZO     Valid     Valid     Pop top of stack into GS; increment stack pointer by 16 bits.
-			 * 0F A9     POP GS     ZO     N.E.     Valid     Pop top of stack into GS; increment stack pointer by 32 bits.*/
+			 * 0F A9     POP GS     ZO     N.E.      Valid     Pop top of stack into GS; increment stack pointer by 32 bits.*/
 			if (op_flags & (F_LOCK))
 				goto err_ilop;
 			if (op_flags & F_OP32) {
@@ -1382,8 +1382,8 @@ read_opcode:
 			switch (mod.mi_reg) {
 
 			case 4:
-				/* 0F BA /4 ib 	BT r/m16, imm8 	MI 	Valid 	Valid 	Store selected bit in CF flag.
-				 * 0F BA /4 ib 	BT r/m32, imm8 	MI 	Valid 	Valid 	Store selected bit in CF flag. */
+				/* 0F BA /4 ib     BT r/m16, imm8     MI     Valid     Valid     Store selected bit in CF flag.
+				 * 0F BA /4 ib     BT r/m32, imm8     MI     Valid     Valid     Store selected bit in CF flag. */
 				if (op_flags & F_OP32) {
 					uint32_t value, mask = (uint32_t)1 << (imm_operand % 32);
 					error = libvm86_modrm_readl(self, &mod, &value, op_flags);
@@ -1404,8 +1404,8 @@ read_opcode:
 				break;
 
 			case 5:
-				/* 0F BA /5 ib 	BTS r/m16, imm8 	MI 	Valid 	Valid 	Store selected bit in CF flag and set.
-				 * 0F BA /5 ib 	BTS r/m32, imm8 	MI 	Valid 	Valid 	Store selected bit in CF flag and set. */
+				/* 0F BA /5 ib     BTS r/m16, imm8     MI     Valid     Valid     Store selected bit in CF flag and set.
+				 * 0F BA /5 ib     BTS r/m32, imm8     MI     Valid     Valid     Store selected bit in CF flag and set. */
 				if (op_flags & F_OP32) {
 					uint32_t *addr, value, mask = (uint32_t)1 << (imm_operand % 32);
 					addr = (uint32_t *)libvm86_modrm_getaddr(self, &mod, op_flags);
@@ -1438,8 +1438,8 @@ read_opcode:
 				break;
 
 			case 6:
-				/* 0F BA /6 ib 	BTR r/m16, imm8 	MI 	Valid 	Valid 	Store selected bit in CF flag and clear.
-				 * 0F BA /6 ib 	BTR r/m32, imm8 	MI 	Valid 	Valid 	Store selected bit in CF flag and clear. */
+				/* 0F BA /6 ib     BTR r/m16, imm8     MI     Valid     Valid     Store selected bit in CF flag and clear.
+				 * 0F BA /6 ib     BTR r/m32, imm8     MI     Valid     Valid     Store selected bit in CF flag and clear. */
 				if (op_flags & F_OP32) {
 					uint32_t *addr, value, mask = (uint32_t)1 << (imm_operand % 32);
 					addr = (uint32_t *)libvm86_modrm_getaddr(self, &mod, op_flags);
@@ -1472,8 +1472,8 @@ read_opcode:
 				break;
 
 			case 7:
-				/* 0F BA /7 ib 	BTC r/m16, imm8 	MI 	Valid 	Valid 	Store selected bit in CF flag and complement.
-				 * 0F BA /7 ib 	BTC r/m32, imm8 	MI 	Valid 	Valid 	Store selected bit in CF flag and complement. */
+				/* 0F BA /7 ib     BTC r/m16, imm8     MI     Valid     Valid     Store selected bit in CF flag and complement.
+				 * 0F BA /7 ib     BTC r/m32, imm8     MI     Valid     Valid     Store selected bit in CF flag and complement. */
 				if (op_flags & F_OP32) {
 					uint32_t *addr, value, mask = (uint32_t)1 << (imm_operand % 32);
 					addr = (uint32_t *)libvm86_modrm_getaddr(self, &mod, op_flags);
@@ -1538,8 +1538,8 @@ read_opcode:
 
 
 		case 0xab:
-			/* 0F AB /r 	BTS r/m16, r16 	MR 	Valid 	Valid 	Store selected bit in CF flag and set.
-			 * 0F AB /r 	BTS r/m32, r32 	MR 	Valid 	Valid 	Store selected bit in CF flag and set. */
+			/* 0F AB /r     BTS r/m16, r16     MR     Valid     Valid     Store selected bit in CF flag and set.
+			 * 0F AB /r     BTS r/m32, r32     MR     Valid     Valid     Store selected bit in CF flag and set. */
 			error = libvm86_modrm_decode(self, &mod, op_flags);
 			if unlikely(error != VM86_SUCCESS)
 				goto err;
@@ -1576,8 +1576,8 @@ read_opcode:
 
 
 		case 0xb3:
-			/* 0F B3 /r 	BTR r/m16, r16 	MR 	Valid 	Valid 	Store selected bit in CF flag and clear.
-			 * 0F B3 /r 	BTR r/m32, r32 	MR 	Valid 	Valid 	Store selected bit in CF flag and clear. */
+			/* 0F B3 /r     BTR r/m16, r16     MR     Valid     Valid     Store selected bit in CF flag and clear.
+			 * 0F B3 /r     BTR r/m32, r32     MR     Valid     Valid     Store selected bit in CF flag and clear. */
 			error = libvm86_modrm_decode(self, &mod, op_flags);
 			if unlikely(error != VM86_SUCCESS)
 				goto err;
@@ -1614,8 +1614,8 @@ read_opcode:
 
 
 		case 0xbb:
-			/* 0F BB /r 	BTC r/m16, r16 	MR 	Valid 	Valid 	Store selected bit in CF flag and complement.
-			 * 0F BB /r 	BTC r/m32, r32 	MR 	Valid 	Valid 	Store selected bit in CF flag and complement. */
+			/* 0F BB /r     BTC r/m16, r16     MR     Valid     Valid     Store selected bit in CF flag and complement.
+			 * 0F BB /r     BTC r/m32, r32     MR     Valid     Valid     Store selected bit in CF flag and complement. */
 			error = libvm86_modrm_decode(self, &mod, op_flags);
 			if unlikely(error != VM86_SUCCESS)
 				goto err;
@@ -1653,8 +1653,8 @@ read_opcode:
 
 		case 0xb6: {
 			uint8_t value;
-			/* 0F B6 /r 	MOVZX r16, r/m8 	RM 	Valid 	Valid 	Move byte to word with zero-extension.
-			 * 0F B6 /r 	MOVZX r32, r/m8 	RM 	Valid 	Valid 	Move byte to doubleword, zero-extension. */
+			/* 0F B6 /r     MOVZX r16, r/m8     RM     Valid     Valid     Move byte to word with zero-extension.
+			 * 0F B6 /r     MOVZX r32, r/m8     RM     Valid     Valid     Move byte to doubleword, zero-extension. */
 			error = libvm86_modrm_decode(self, &mod, op_flags);
 			if unlikely(error != VM86_SUCCESS)
 				goto err;
@@ -1670,7 +1670,7 @@ read_opcode:
 
 		case 0xb7: {
 			uint16_t value;
-			/* 0F B7 /r 	MOVZX r32, r/m16 	RM 	Valid 	Valid 	Move word to doubleword, zero-extension. */
+			/* 0F B7 /r     MOVZX r32, r/m16     RM     Valid     Valid     Move word to doubleword, zero-extension. */
 			error = libvm86_modrm_decode(self, &mod, op_flags);
 			if unlikely(error != VM86_SUCCESS)
 				goto err;
@@ -1683,8 +1683,8 @@ read_opcode:
 
 		case 0xbe: {
 			uint8_t value;
-			/* 0F BE /r 	MOVSX r16, r/m8 	RM 	Valid 	Valid 	Move byte to word with sign-extension.
-			 * 0F BE /r 	MOVSX r32, r/m8 	RM 	Valid 	Valid 	Move byte to doubleword with sign-extension. */
+			/* 0F BE /r     MOVSX r16, r/m8     RM     Valid     Valid     Move byte to word with sign-extension.
+			 * 0F BE /r     MOVSX r32, r/m8     RM     Valid     Valid     Move byte to doubleword with sign-extension. */
 			error = libvm86_modrm_decode(self, &mod, op_flags);
 			if unlikely(error != VM86_SUCCESS)
 				goto err;
@@ -1701,7 +1701,7 @@ read_opcode:
 
 		case 0xbf: {
 			uint16_t value;
-			/* 0F BF /r 	MOVSX r32, r/m16 	RM 	Valid 	Valid 	Move word to doubleword, with sign-extension. */
+			/* 0F BF /r     MOVSX r32, r/m16     RM     Valid     Valid     Move word to doubleword, with sign-extension. */
 			error = libvm86_modrm_decode(self, &mod, op_flags);
 			if unlikely(error != VM86_SUCCESS)
 				goto err;
@@ -1961,7 +1961,7 @@ do_rep_instruction:
 
 	case 0xe5:
 		/* E5 ib     IN AX, imm8     I     Valid     Valid     Input word from imm8 I/O port address into AX. */
-		/* E5 ib     IN EAX, imm8     I     Valid     Valid     Input dword from imm8 I/O port address into EAX. */
+		/* E5 ib     IN EAX, imm8    I     Valid     Valid     Input dword from imm8 I/O port address into EAX. */
 		if (op_flags & (F_LOCK))
 			goto err_ilop;
 		error = libvm86_read_pcbyte(self, &opcode);
@@ -2345,7 +2345,7 @@ do_rep_instruction:
 
 		case 0:
 			/* 8F /0     POP r/m16     M     Valid     Valid     Pop top of stack into m16; increment stack pointer.
-			 * 8F /0     POP r/m32     M     N.E.     Valid     Pop top of stack into m32; increment stack pointer. */
+			 * 8F /0     POP r/m32     M     N.E.      Valid     Pop top of stack into m32; increment stack pointer. */
 			if (op_flags & (F_LOCK))
 				goto err_ilop;
 			if (op_flags & F_OP32) {
@@ -2591,7 +2591,7 @@ do_rep_instruction:
 
 	case 0xe8:
 		/* E8 cw     CALL rel16     M     N.S.     Valid     Call near, relative, displacement relative to next instruction.
-		 * E8 cd     CALL rel32     M     Valid     Valid     Call near, relative, displacement relative to next instruction. */
+		 * E8 cd     CALL rel32     M     Valid    Valid     Call near, relative, displacement relative to next instruction. */
 		if (op_flags & (F_LOCK))
 			goto err_ilop;
 		if (op_flags & F_OP32) {
@@ -3531,7 +3531,7 @@ do_81h_op16:
 
 		case 6:
 			/* FF /6     PUSH r/m16     M     Valid     Valid     Push r/m16.
-			 * FF /6     PUSH r/m32     M     N.E.     Valid     Push r/m32. */
+			 * FF /6     PUSH r/m32     M     N.E.      Valid     Push r/m32. */
 			if (op_flags & (F_LOCK))
 				goto err_ilop;
 			if (op_flags & F_OP32) {
@@ -4099,8 +4099,8 @@ do_81h_op16:
 	case 0x91 ... 0x97:
 		/* 90+rw     XCHG AX, r16     O     Valid     Valid     Exchange r16 with AX.
 		 * 90+rw     XCHG r16, AX     O     Valid     Valid     Exchange AX with r16.
-		 * 90+rd     XCHG EAX, r32     O     Valid     Valid     Exchange r32 with EAX.
-		 * 90+rd     XCHG r32, EAX     O     Valid     Valid     Exchange EAX with r32. */
+		 * 90+rd     XCHG EAX, r32    O     Valid     Valid     Exchange r32 with EAX.
+		 * 90+rd     XCHG r32, EAX    O     Valid     Valid     Exchange EAX with r32. */
 		if (op_flags & F_OP32) {
 			uint32_t temp;
 			temp                            = REG32((uint8_t)(opcode - 0x90));

@@ -39,6 +39,12 @@
 #define __DECL_BEGIN extern "C" {
 #define __DECL_END   }
 
+#define __CXX11_EXPLICIT_OPERATOR explicit
+
+// #define __COMPILER_HAVE_HAS_UNIQUE_OBJECT_REPRESENTATIONS 1 /* `bool __has_unique_object_representations(typename T)' */
+// #define __COMPILER_HAVE_IS_AGGREGATE 1 /* `bool __is_aggregate(typename T)' */
+
+
 #if (__has_feature(cxx_constexpr) ||                                                                      \
      (defined(__cpp_constexpr) && __cpp_constexpr >= 200704) ||                                           \
      (defined(__IBMCPP__) && defined(__IBMCPP_CONSTEXPR) && (__IBMCPP_CONSTEXPR + 0)) ||                  \

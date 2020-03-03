@@ -586,4 +586,15 @@ template<class __VT> typename ____INTELLISENSE_enableif<____INTELLISENSE_issigne
 
 } /* namespace __intern */
 
+
+/* For some weird reason, intellisense defines these builtins as macros,
+ * on-top of already defining them as functions... (there may be more of
+ * these, but these are all that I've encountered thus far) */
+#ifdef __builtin_rint
+#undef __builtin_rint
+#undef __builtin_rintf
+#undef __builtin_rintl
+#endif /* __builtin_rint */
+
+
 #endif /* !____INTELLISENSE_STDINC_SYNTAX_GCC_H */

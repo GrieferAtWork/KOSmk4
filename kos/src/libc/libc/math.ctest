@@ -97,9 +97,8 @@ DEFINE_TEST(math_rounding) {
 	 * when using rounding models other than `FE_TONEAREST':
 	 * >> fesetround(FE_DOWNWARD);
 	 * >> volatile double x = -1.499;
-	 * >> printf("%f\n", __builtin_rint(x));                 // -1.0 (why???)
-	 * >> printf("inexact: %d\n", fetestexcept(FE_INEXACT)); // 0  (rint() sets this flag if its result was inexact...)
-	 * >> printf("%f\n", __builtin_nearbyint(x));            // -2.0
+	 * >> printf("%f\n", __builtin_rint(x));      // -1.0 (why???)
+	 * >> printf("%f\n", __builtin_nearbyint(x)); // -2.0
 	 */
 #undef rint
 #define rint nearbyint
