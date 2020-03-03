@@ -1177,7 +1177,7 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, recvmsg, fd_t, sockfd,
 DEFINE_SYSCALL5(ssize_t, recvmmsg, fd_t, sockfd,
                 USER UNCHECKED struct mmsghdr *, vmessages,
                 size_t, vlen, syscall_ulong_t, msg_flags,
-                USER UNCHECKED struct timespec const *, timeout) {
+                USER UNCHECKED struct timespec32 const *, timeout) {
 	size_t i;
 	REF struct handle sock;
 	struct timespec used_timeout;
@@ -1203,7 +1203,7 @@ DEFINE_SYSCALL5(ssize_t, recvmmsg, fd_t, sockfd,
 		COMPILER_READ_BARRIER();
 		memcpy(&used_timeout, timeout, sizeof(*timeout));
 		COMPILER_READ_BARRIER();
-		timeout = &used_timeout;
+		timeout = (struct timespec32 *)&used_timeout;
 	}
 	for (i = 0; i < vlen; ++i) {
 		size_t result;
@@ -1270,7 +1270,7 @@ DEFINE_SYSCALL5(ssize_t, recvmmsg, fd_t, sockfd,
 					                          pcontrol,
 					                          msg_flags,
 					                          sock.h_mode,
-					                          timeout);
+					                          (struct timespec *)timeout);
 				} else {
 					result = socket_recvv((struct socket *)sock.h_data,
 					                      &iov,
@@ -1279,7 +1279,7 @@ DEFINE_SYSCALL5(ssize_t, recvmmsg, fd_t, sockfd,
 					                      pcontrol,
 					                      msg_flags,
 					                      sock.h_mode,
-					                      timeout);
+					                      (struct timespec *)timeout);
 				}
 			} EXCEPT {
 				/* Special case: If the send fails for any operation other

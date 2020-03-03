@@ -311,6 +311,9 @@ function main(argv: {string...}) {
 				case "--compilers":
 					CONFIG_MAX_COMPILERS = int(value);
 					break;
+				case "--qemu":
+					CONFIG_EMULATOR_OPTIONS[emulator_options.QEMU_EXE] = value;
+					break;
 				case "--emulator":
 					CONFIG_EMULATOR_USED = value;
 					break;

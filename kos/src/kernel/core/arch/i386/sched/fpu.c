@@ -356,6 +356,7 @@ DEFINE_VERY_EARLY_KERNEL_COMMANDLINE_OPTION(x86_config_nofpu,
                                             KERNEL_COMMANDLINE_OPTION_TYPE_BOOL,
                                             "nofpu");
 
+#ifndef NDEBUG
 PRIVATE ATTR_FREETEXT void
 NOTHROW(KCALL test_fpu64)(void) {
 #define VAL1  __UINT64_C(0x0123456789abcdef)
@@ -368,6 +369,7 @@ NOTHROW(KCALL test_fpu64)(void) {
 	v = ATOMIC_READ(value);
 	assertf(v == VAL2, "v = %#I64x", v);
 }
+#endif /* !NDEBUG */
 
 /* Convert sfpustate's FTW to xfpustate's */
 INTERN ATTR_PURE NOBLOCK u8
@@ -516,7 +518,9 @@ setup_fpu_emulation:
 	/* Set the TS bit because while the FPU is now initialized, `thiscpu_x86_fputhread'
 	 * isn't actually set to anything, much less the calling thread. */
 	__wrcr0(cr0 | CR0_TS);
+#ifndef NDEBUG
 	test_fpu64();
+#endif /* !NDEBUG */
 }
 
 #ifdef __x86_64__
