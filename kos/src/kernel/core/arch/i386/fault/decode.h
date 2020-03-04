@@ -49,35 +49,46 @@ DECL_BEGIN
 
 /* Instruction flags. */
 typedef u32 op_flag_t;
-#define F_OP16       0x00000001 /* The 0x66 prefix is being used. */
-#define F_AD16       0x00000002 /* The 0x67 prefix is being used. */
-#define F_LOCK       0x00000004 /* The `lock' (0xf0) prefix is being used. */
-#define F_REPNE      0x00000010 /* The `repne' (0xf2) prefix is being used. */
-#define F_REP        0x00000020 /* The `rep' (0xf3) prefix is being used. */
-#define F_HASVEX     0x00000040 /* A VEX prefix was given. */
-#define F_SEGMASK    0x0000f000 /* Mask for segment overrides. */
+#define F_OP16        0x00000001 /* The 0x66 prefix is being used. */
+#define F_AD16        0x00000002 /* The 0x67 prefix is being used. */
+#define F_LOCK        0x00000004 /* The `lock' (0xf0) prefix is being used. */
+#define F_REPNE       0x00000010 /* The `repne' (0xf2) prefix is being used. */
+#define F_REP         0x00000020 /* The `rep' (0xf3) prefix is being used. */
+#define F_HASVEX      0x00000040 /* A VEX prefix was given. */
+#define F_SEGMASK     0x0000f000 /* Mask for segment overrides. */
 #ifdef __x86_64__
-#define F_VEX_VVVV_M 0x000f0000 /* Mask for VEX.VVVV */
-#else
-#define F_VEX_VVVV_M 0x00070000 /* Mask for VEX.VVVV */
-#endif
-#define F_VEX_VVVV_S         16 /* Shift for VEX.VVVV */
-#define F_VEX_W      0x00100000 /* Value of VEX.W */
-#define F_VEX_L      0x00200000 /* Value of VEX.L */
+#define F_VEX_VVVVV_M 0x001f0000 /* Mask for VEX.VVVVV */
+#else /* __x86_64__ */
+#define F_VEX_VVVVV_M 0x00070000 /* Mask for VEX.VVVVV */
+#endif /* !__x86_64__ */
+#define F_VEX_VVVVV_S         16 /* Shift for VEX.VVVVV */
+#define F_VEX_W       0x00200000 /* Value of VEX.W */
 #ifdef __x86_64__
-#define F_AD64       F_AD16     /* The 0x67 prefix is being used. */
-#define F_IS_X32     0x00000008 /* The hosted process is running in compatibility mode (32-bit). */
-#define F_HASREX     0x00000080 /* A REX prefix is being used. */
-#define F_REXSHFT             8 /* Shift for the REX prefix byte. */
-#define F_REXMASK    0x00000f00 /* Mask of the REX prefix byte. */
-#define F_REX_W      0x00000800 /* The REX.W flag (Indicates 64-bit operands). */
-#define F_REX_R      0x00000400 /* The REX.R flag (1-bit extension to MODRM.reg). */
-#define F_REX_X      0x00000200 /* The REX.X flag (1-bit extension to SIB.index). */
-#define F_REX_B      0x00000100 /* The REX.B flag (1-bit extension to MODRM.rm). */
-#define F_SEGDS      0x00000000 /* DS override (compatibility mode ONLY). */
-#define F_SEGES      0x00001000 /* ES override (compatibility mode ONLY). */
-#define F_SEGCS      0x00002000 /* CS override (compatibility mode ONLY). */
-#define F_SEGSS      0x00003000 /* SS override (compatibility mode ONLY). */
+#define F_VEX_LL_M    0x00400000 /* Value of VEX.LL */
+#else /* __x86_64__ */
+#define F_VEX_LL_M    0x00c00000 /* Value of VEX.LL */
+#endif /* !__x86_64__ */
+#define F_VEX_LL_S            22 /* Shift for VEX.LL */
+#ifdef __x86_64__
+#define F_AD64        F_AD16     /* The 0x67 prefix is being used. */
+#define F_IS_X32      0x00000008 /* The hosted process is running in compatibility mode (32-bit). */
+#define F_HASREX      0x00000080 /* A REX prefix is being used. */
+#define F_REXSHFT              8 /* Shift for the REX prefix byte. */
+#define F_REXMASK     0x00000f00 /* Mask of the REX prefix byte. */
+#define F_REX_W       0x00000800 /* The REX.W flag (Indicates 64-bit operands). */
+#define F_REX_R       0x00000400 /* The REX.R flag (1-bit extension to MODRM.reg). */
+#define F_REX_X       0x00000200 /* The REX.X flag (1-bit extension to SIB.index). */
+#define F_REX_B       0x00000100 /* The REX.B flag (1-bit extension to MODRM.rm). */
+#define F_SEGDS       0x00000000 /* DS override (compatibility mode ONLY). */
+#define F_SEGES       0x00001000 /* ES override (compatibility mode ONLY). */
+#define F_SEGCS       0x00002000 /* CS override (compatibility mode ONLY). */
+#define F_SEGSS       0x00003000 /* SS override (compatibility mode ONLY). */
+#define F_EVEX_z      0x01000000 /* Value of EVEX.z */
+#define F_EVEX_b      0x02000000 /* Value of EVEX.b */
+#define F_EVEX_R      0x04000000 /* The EVEX.R flag (a second 1-bit extension to MODRM.reg; use with `F_REX_R'). */
+#define F_EVEX_aaa_M  0x38000000 /* Value of EVEX.aaa */
+#define F_EVEX_aaa_S          27 /* Shift for EVEX.aaa */
+#define F_HASEVEX     0x40000000 /* An EVEX prefix was given. */
 #else /* __x86_64__ */
 #define F_SEGDS      0x00000000 /* DS override. */
 #define F_SEGES      0x00001000 /* ES override. */

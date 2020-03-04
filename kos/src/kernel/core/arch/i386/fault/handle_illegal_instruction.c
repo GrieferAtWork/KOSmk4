@@ -184,17 +184,17 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 #define WR_REGQ(v) modrm_setregq(state, &mod, op_flags, v)
 #endif /* __x86_64__ */
 
-#define RD_VEXREG()   x86_icpustate_get(state, (u8)((op_flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S))
-#define WR_VEXREG(v)  x86_icpustate_set(state, (u8)((op_flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S), v)
-#define RD_VEXREGB()  x86_icpustate_get8(state, (u8)((op_flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S))
-#define WR_VEXREGB(v) x86_icpustate_set8(state, (u8)((op_flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S), v)
-#define RD_VEXREGW()  x86_icpustate_get16(state, (u8)((op_flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S))
-#define WR_VEXREGW(v) x86_icpustate_set16(state, (u8)((op_flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S), v)
-#define RD_VEXREGL()  x86_icpustate_get32(state, (u8)((op_flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S))
-#define WR_VEXREGL(v) x86_icpustate_set32(state, (u8)((op_flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S), v)
+#define RD_VEXREG()   x86_icpustate_get(state, (u8)((op_flags & F_VEX_VVVVV_M) >> F_VEX_VVVVV_S))
+#define WR_VEXREG(v)  x86_icpustate_set(state, (u8)((op_flags & F_VEX_VVVVV_M) >> F_VEX_VVVVV_S), v)
+#define RD_VEXREGB()  x86_icpustate_get8(state, (u8)((op_flags & F_VEX_VVVVV_M) >> F_VEX_VVVVV_S))
+#define WR_VEXREGB(v) x86_icpustate_set8(state, (u8)((op_flags & F_VEX_VVVVV_M) >> F_VEX_VVVVV_S), v)
+#define RD_VEXREGW()  x86_icpustate_get16(state, (u8)((op_flags & F_VEX_VVVVV_M) >> F_VEX_VVVVV_S))
+#define WR_VEXREGW(v) x86_icpustate_set16(state, (u8)((op_flags & F_VEX_VVVVV_M) >> F_VEX_VVVVV_S), v)
+#define RD_VEXREGL()  x86_icpustate_get32(state, (u8)((op_flags & F_VEX_VVVVV_M) >> F_VEX_VVVVV_S))
+#define WR_VEXREGL(v) x86_icpustate_set32(state, (u8)((op_flags & F_VEX_VVVVV_M) >> F_VEX_VVVVV_S), v)
 #ifdef __x86_64__
-#define RD_VEXREGQ()  x86_icpustate_get64(state, (u8)((op_flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S))
-#define WR_VEXREGQ(v) x86_icpustate_set64(state, (u8)((op_flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S), v)
+#define RD_VEXREGQ()  x86_icpustate_get64(state, (u8)((op_flags & F_VEX_VVVVV_M) >> F_VEX_VVVVV_S))
+#define WR_VEXREGQ(v) x86_icpustate_set64(state, (u8)((op_flags & F_VEX_VVVVV_M) >> F_VEX_VVVVV_S), v)
 #endif /* __x86_64__ */
 
 
@@ -1137,7 +1137,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 			 * VEX.LZ.66.0F38.W1 F7 /r SHLX r64a, r/m64, r64b     Shift r/m64 logically left with count specified in r64b.
 			 * VEX.LZ.F2.0F38.W1 F7 /r SHRX r64a, r/m64, r64b     Shift r/m64 logically right with count specified in r64b. */
 			MOD_DECODE();
-			if (op_flags & (F_AD16 | F_VEX_L NIF_X86_64(| F_VEX_W)))
+			if (op_flags & (F_AD16 | F_VEX_LL_M NIF_X86_64(| F_VEX_W)))
 				goto e_bad_prefix;
 			if (op_flags & F_f3) {
 				/* SARX */
@@ -1239,7 +1239,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 
 		case 0x0f38f5:
 			MOD_DECODE();
-			if (op_flags & (F_AD16 | F_LOCK | F_VEX_L))
+			if (op_flags & (F_AD16 | F_LOCK | F_VEX_LL_M))
 				goto e_bad_prefix;
 			if (op_flags & F_f3) {
 				/* VEX.LZ.F3.0F38.W0 F5 /r PEXT r32a, r32b, r/m32         RVM         V/V         BMI2         Parallel extract of bits from r32b using mask in r/m32, result is written to r32a.
@@ -1291,7 +1291,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 		case 0x0f38f2: {
 			uintptr_t pflags;
 			MOD_DECODE();
-			if (op_flags & (F_AD16 | F_LOCK | F_REP | F_REPNE | F_VEX_L))
+			if (op_flags & (F_AD16 | F_LOCK | F_REP | F_REPNE | F_VEX_LL_M))
 				goto e_bad_prefix;
 			/* VEX.LZ.0F38.W0 F2 /r ANDN r32a, r32b, r/m32         RVM         V/V         BMI1         Bitwise AND of inverted r32b with r/m32, store result in r32a.
 			 * VEX.LZ.0F38.W1 F2 /r ANDN r64a, r64b, r/m64         RVM         V/NE         BMI1         Bitwise AND of inverted r64b with r/m64, store result in r64a. */

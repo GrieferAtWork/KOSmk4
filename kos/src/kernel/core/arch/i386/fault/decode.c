@@ -556,7 +556,83 @@ next_byte:
 	switch (result) {
 
 #ifdef __x86_64__
-		/* TODO: EVEX prefix support */
+#define EVEX_IDENT_M  0x0c0400 /* Mask of constant bits */
+#define EVEX_IDENT_V  0x000400 /* Value of constant bits */
+#define EVEX_R        0x800000 /* FLAG:  VEX.R */
+#define EVEX_X        0x400000 /* FLAG:  VEX.X */
+#define EVEX_B        0x200000 /* FLAG:  VEX.B */
+#define EVEX_Ri       0x100000 /* FLAG:  EVEX.R' */
+#define EVEX_MM_M     0x030000 /* MASK:  EVEX.M_MM (same as VEX.M_MMMM) */
+#define EVEX_MM_S           16 /* SHIFT: EVEX.M_MM */
+#define EVEX_W        0x008000 /* FLAG:  VEX.W */
+#define EVEX_VVVV_M   0x007800 /* MASK:  VEX.VVVV */
+#define EVEX_VVVV_S         11 /* SHIFT: VEX.VVVV */
+#define EVEX_PP_M     0x000300 /* MASK:  VEX.PP */
+#define EVEX_PP_S            8 /* SHIFT: VEX.PP */
+#define EVEX_z        0x000080 /* FLAG:  EVEX.z */
+#define EVEX_Li       0x000040 /* FLAG:  EVEX.L' */
+#define EVEX_L        0x000020 /* FLAG:  VEX.L */
+#define EVEX_b        0x000010 /* FLAG:  EVEX.b */
+#define EVEX_Vi       0x000008 /* FLAG:  EVEX.V' */
+#define EVEX_aaa_M    0x000007 /* MASK:  EVEX.aaa */
+#define EVEX_aaa_S           0 /* SHIFT: EVEX.aaa */
+
+	/* EVEX Prefix */
+	case 0x62: {
+		u32 evex;
+		/* EVEX only exists in 64-bit mode! */
+		if (*pflags & F_IS_X32)
+			break;
+		evex = *text++;
+		evex <<= 8;
+		evex |= *text++;
+		evex <<= 8;
+		evex |= *text++;
+		if ((evex & EVEX_IDENT_M) != EVEX_IDENT_V) {
+			text -= 3;
+			/*result = 0x62;*/
+			break;
+		}
+		*pflags |= F_HASVEX | F_HASEVEX;
+		*pflags |= ((~evex & EVEX_VVVV_M) >> EVEX_VVVV_S) << F_VEX_VVVVV_S;
+		*pflags |= ((evex & EVEX_aaa_M) >> EVEX_aaa_S) << F_EVEX_aaa_S;
+		if (!(evex & EVEX_Vi))
+			*pflags |= 0x10 << F_VEX_VVVVV_S;
+		if (!(evex & EVEX_R))
+			*pflags |= F_REX_R;
+		if (!(evex & EVEX_Ri))
+			*pflags |= F_EVEX_R;
+		if (!(evex & EVEX_X))
+			*pflags |= F_REX_X;
+		if (!(evex & EVEX_B))
+			*pflags |= F_REX_B;
+		if (evex & EVEX_W)
+			*pflags |= F_VEX_W;
+		if (evex & EVEX_z)
+			*pflags |= F_EVEX_z;
+		if (evex & EVEX_b)
+			*pflags |= F_EVEX_b;
+		if (evex & EVEX_L)
+			*pflags |= 1 << F_VEX_LL_S;
+		if (evex & EVEX_Li)
+			*pflags |= 2 << F_VEX_LL_S;
+		switch (evex & EVEX_PP_M) {
+		case 0x01 << EVEX_PP_S: *pflags |= F_OP16; break;  /* same as 0x66 prefix */
+		case 0x02 << EVEX_PP_S: *pflags |= F_REP; break;   /* same as 0xf3 prefix */
+		case 0x03 << EVEX_PP_S: *pflags |= F_REPNE; break; /* same as 0xf2 prefix */
+		default: break;
+		}
+		switch (evex & EVEX_MM_M) {
+		case 0x1 << EVEX_MM_S: result = 0x0f00; break;
+		case 0x2 << EVEX_MM_S: result = 0x0f3800; break;
+		case 0x3 << EVEX_MM_S: result = 0x0f3a00; break;
+		default:
+			THROW(E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX,
+			      0x62000000 | evex);
+		}
+		/* The actual instruction opcode byte */
+		result |= *text++;
+	}	break;
 #endif /* __x86_64__ */
 
 #define VEX3B_R        0x8000 /* FLAG:  3-byte VEX.R */
@@ -599,16 +675,16 @@ next_byte:
 		}
 		*pflags |= F_HASVEX;
 		if (vex & VEX3B_L)
-			*pflags |= F_VEX_L;
+			*pflags |= 1 << F_VEX_LL_S;
 		if (vex & VEX3B_W)
 			*pflags |= F_VEX_W;
 #ifdef __x86_64__
 		if (!(*pflags & F_IS_X32)) {
-			*pflags |= ((~vex & VEX3B_VVVV_M64) >> VEX3B_VVVV_S) << F_VEX_VVVV_S;
+			*pflags |= ((~vex & VEX3B_VVVV_M64) >> VEX3B_VVVV_S) << F_VEX_VVVVV_S;
 		} else
 #endif /* __x86_64__ */
 		{
-			*pflags |= ((~vex & VEX3B_VVVV_M) >> VEX3B_VVVV_S) << F_VEX_VVVV_S;
+			*pflags |= ((~vex & VEX3B_VVVV_M) >> VEX3B_VVVV_S) << F_VEX_VVVVV_S;
 		}
 		switch (vex & VEX3B_PP_M) {
 		case 0x01 << VEX3B_PP_S: *pflags |= F_OP16; break;  /* same as 0x66 prefix */
@@ -658,14 +734,14 @@ next_byte:
 		}
 		*pflags |= F_HASVEX;
 		if (result & VEX2B_L)
-			*pflags |= F_VEX_L;
+			*pflags |= 1 << F_VEX_LL_S;
 #ifdef __x86_64__
 		if (!(*pflags & F_IS_X32)) {
-			*pflags |= ((~result & VEX2B_VVVV_M64) >> VEX2B_VVVV_S) << F_VEX_VVVV_S;
+			*pflags |= ((~result & VEX2B_VVVV_M64) >> VEX2B_VVVV_S) << F_VEX_VVVVV_S;
 		} else
 #endif /* __x86_64__ */
 		{
-			*pflags |= ((~result & VEX2B_VVVV_M) >> VEX2B_VVVV_S) << F_VEX_VVVV_S;
+			*pflags |= ((~result & VEX2B_VVVV_M) >> VEX2B_VVVV_S) << F_VEX_VVVVV_S;
 		}
 		switch (result & VEX2B_PP_M) {
 		case 0x01 << VEX2B_PP_S: *pflags |= F_OP16; break;  /* same as 0x66 prefix */

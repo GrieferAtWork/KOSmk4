@@ -336,17 +336,17 @@ NOTHROW(FCALL x86_vio_main)(/*inherit(always)*/ vio_main_args_t *__restrict args
 #define WR_REGQ(v) modrm_setregq(state, &mod, op_flags, v)
 #endif /* __x86_64__ */
 
-#define RD_VEXREG()   x86_icpustate_get(state, (u8)((op_flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S))
-#define WR_VEXREG(v)  x86_icpustate_set(state, (u8)((op_flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S), v)
-#define RD_VEXREGB()  x86_icpustate_get8(state, (u8)((op_flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S))
-#define WR_VEXREGB(v) x86_icpustate_set8(state, (u8)((op_flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S), v)
-#define RD_VEXREGW()  x86_icpustate_get16(state, (u8)((op_flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S))
-#define WR_VEXREGW(v) x86_icpustate_set16(state, (u8)((op_flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S), v)
-#define RD_VEXREGL()  x86_icpustate_get32(state, (u8)((op_flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S))
-#define WR_VEXREGL(v) x86_icpustate_set32(state, (u8)((op_flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S), v)
+#define RD_VEXREG()   x86_icpustate_get(state, (u8)((op_flags & F_VEX_VVVVV_M) >> F_VEX_VVVVV_S))
+#define WR_VEXREG(v)  x86_icpustate_set(state, (u8)((op_flags & F_VEX_VVVVV_M) >> F_VEX_VVVVV_S), v)
+#define RD_VEXREGB()  x86_icpustate_get8(state, (u8)((op_flags & F_VEX_VVVVV_M) >> F_VEX_VVVVV_S))
+#define WR_VEXREGB(v) x86_icpustate_set8(state, (u8)((op_flags & F_VEX_VVVVV_M) >> F_VEX_VVVVV_S), v)
+#define RD_VEXREGW()  x86_icpustate_get16(state, (u8)((op_flags & F_VEX_VVVVV_M) >> F_VEX_VVVVV_S))
+#define WR_VEXREGW(v) x86_icpustate_set16(state, (u8)((op_flags & F_VEX_VVVVV_M) >> F_VEX_VVVVV_S), v)
+#define RD_VEXREGL()  x86_icpustate_get32(state, (u8)((op_flags & F_VEX_VVVVV_M) >> F_VEX_VVVVV_S))
+#define WR_VEXREGL(v) x86_icpustate_set32(state, (u8)((op_flags & F_VEX_VVVVV_M) >> F_VEX_VVVVV_S), v)
 #ifdef __x86_64__
-#define RD_VEXREGQ()  x86_icpustate_get64(state, (u8)((op_flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S))
-#define WR_VEXREGQ(v) x86_icpustate_set64(state, (u8)((op_flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S), v)
+#define RD_VEXREGQ()  x86_icpustate_get64(state, (u8)((op_flags & F_VEX_VVVVV_M) >> F_VEX_VVVVV_S))
+#define WR_VEXREGQ(v) x86_icpustate_set64(state, (u8)((op_flags & F_VEX_VVVVV_M) >> F_VEX_VVVVV_S), v)
 #endif /* __x86_64__ */
 
 
