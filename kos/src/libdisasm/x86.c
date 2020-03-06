@@ -4141,45 +4141,12 @@ PRIVATE struct instruction const ops_0f[] = {
 	I(0x4a, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 1) "/is4 vblendvps " OP_RM256_YMM__OP_VRYMM__OP_RYMM ", ymm4"), /* VEX.256.66.0f3a.W0 4a /r /is4 vblendvps ymm1, ymm2, ymm3/m256, ymm4 */
 	I(0x14, IF_66|IF_MODRM,                              "blendvps\txmm1, xmm2/m128, <xmm0>"),                        /*           66 0f 38 14 /r      blendvps xmm1, xmm2/m128, <xmm0> */
 
-	I(0x41, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 1, 0, 0) "vdppd\t" OP_U8 OP_RM128_XMM__OP_VRXMM__OP_RXMM), /* VEX.128.66.0f3a.WIG 41 /r ib vdppd xmm1, xmm2, xmm3/m128, imm8 */
-	I(0x41, IF_66|IF_MODRM,                              "dppd\t" OP_U8 OP_RM128_XMM OP_RXMM),             /*            66 0f 3a 41 /r ib dppd xmm1, xmm2/m128, imm8 */
-
-	I(0x40, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 1, 0, 0) "vdpps\t" OP_U8 OP_RM128_XMM__OP_VRXMM__OP_RXMM), /* VEX.128.66.0f3a.WIG 40 /r ib vdpps xmm1, xmm2, xmm3/m128, imm8 */
-	I(0x40, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 1, 0, 1) "vdpps\t" OP_U8 OP_RM256_YMM__OP_VRYMM__OP_RYMM), /* VEX.256.66.0f3a.WIG 40 /r ib vdpps ymm1, ymm2, ymm3/m256, imm8 */
-	I(0x40, IF_66|IF_MODRM,                              "dpps\t" OP_U8 OP_RM128_XMM OP_RXMM),             /*            66 0f 3a 40 /r ib dpps xmm1, xmm2/m128, imm8 */
-
 	I(0x17, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 1, 0, 0) "vextractps\treg/m32, xmm1, imm8"), /* EVEX.128.66.0f3a.WIG 17 /r ib vextractps reg/m32, xmm1, imm8 */
 	I(0x17, IF_66|IF_MODRM,                              "extractps\treg/m32, xmm1, imm8"),  /*             66 0f 3a 17 /r ib extractps reg/m32, xmm1, imm8 */
-
-	I(0x21, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(1, 1, 0, 0) "vinsertps\t" OP_U8 OP_RM128_XMM__OP_VRXMM__OP_RXMM), /*  VEX.128.66.0f3a.WIG 21 /r ib vinsertps xmm1, xmm2, xmm3/m32, imm8 */
-	I(0x21, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 0) "vinsertps\t" OP_U8 OP_RM128_XMM__OP_VRXMM__OP_RXMM), /* EVEX.128.66.0f3a.W0  21 /r ib vinsertps xmm1, xmm2, xmm3/m32, imm8 */
-	I(0x21, IF_66|IF_MODRM,                              "insertps\t" OP_U8 OP_RM128_XMM OP_RXMM),             /*             66 0f 3a 21 /r ib insertps xmm1, xmm2/m32, imm8 */
-
-	I(0x2a, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(1, 1, 0, 0) "vmovntdqa\txmm1, m128"), /*  VEX.128.66.0f38.WIG 2a /r vmovntdqa xmm1, m128 */
-	I(0x2a, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(1, 1, 0, 1) "vmovntdqa\tymm1, m256"), /*  VEX.256.66.0f38.WIG 2a /r vmovntdqa ymm1, m256 */
-	I(0x2a, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 0) "vmovntdqa\txmm1, m128"), /* EVEX.128.66.0f38.W0  2a /r vmovntdqa xmm1, m128 */
-	I(0x2a, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 1) "vmovntdqa\tymm1, m256"), /* EVEX.256.66.0f38.W0  2a /r vmovntdqa ymm1, m256 */
-	I(0x2a, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 2) "vmovntdqa\tzmm1, m512"), /* EVEX.512.66.0f38.W0  2a /r vmovntdqa zmm1, m512 */
-	I(0x2a, IF_66|IF_MODRM,                              "movntdqa\txmm1, m128"),  /*             66 0f 38 2a /r movntdqa xmm1, m128 */
-
-	I(0x42, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 1, 0, 0) "vmpsadbw\t" OP_U8 OP_RM128_XMM__OP_VRXMM__OP_RXMM), /* VEX.128.66.0f3a.WIG 42 /r ib vmpsadbw xmm1, xmm2, xmm3/m128, imm8 */
-	I(0x42, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 1, 0, 1) "vmpsadbw\t" OP_U8 OP_RM256_YMM__OP_VRYMM__OP_RYMM), /* VEX.256.66.0f3a.WIG 42 /r ib vmpsadbw ymm1, ymm2, ymm3/m256, imm8 */
-	I(0x42, IF_66|IF_MODRM,                              "mpsadbw\t" OP_U8 OP_RM128_XMM OP_RXMM),             /*            66 0f 3a 42 /r ib mpsadbw xmm1, xmm2/m128, imm8 */
-
-	I(0x2b, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(1, 1, 0, 0) "vpackusdw\t" OP_RM128_XMM__OP_VRXMM__OP_RXMM), /* VEX.128.66.0f38.WIG 2b /r vpackusdw xmm1, xmm2, xmm3/m128 */
-	I(0x2b, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(1, 1, 0, 1) "vpackusdw\t" OP_RM256_YMM__OP_VRYMM__OP_RYMM), /* VEX.256.66.0f38.WIG 2b /r vpackusdw ymm1, ymm2, ymm3/m256 */
-	I(0x2b, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 0) "vpackusdw\t" OP_RM128_XMM__OP_VRXMM__OP_RXMM), /* EVEX.128.66.0f38.W0 2b /r vpackusdw xmm1{k1}{z}, xmm2, xmm3/m128/m32bcst */
-	I(0x2b, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 1) "vpackusdw\t" OP_RM256_YMM__OP_VRYMM__OP_RYMM), /* EVEX.256.66.0f38.W0 2b /r vpackusdw ymm1{k1}{z}, ymm2, ymm3/m256/m32bcst */
-	I(0x2b, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 2) "vpackusdw\t" OP_RM512_ZMM__OP_VRZMM__OP_RZMM), /* EVEX.512.66.0f38.W0 2b /r vpackusdw zmm1{k1}{z}, zmm2, zmm3/m512/m32bcst */
-	I(0x2b, IF_66|IF_MODRM,                              "packusdw\t" OP_RM128_XMM OP_RXMM),             /*            66 0f 38 2b /r packusdw xmm1, xmm2/m128 */
 
 	I(0x4c, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 0) "/is4 vpblendvb " OP_RM128_XMM__OP_VRXMM__OP_RXMM ", xmm4"), /* VEX.128.66.0f3a.W0 4c /r /is4 vpblendvb xmm1, xmm2, xmm3/m128, xmm4 */
 	I(0x4c, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 1) "/is4 vpblendvb " OP_RM256_YMM__OP_VRYMM__OP_RYMM ", ymm4"), /* VEX.256.66.0f3a.W0 4c /r /is4 vpblendvb ymm1, ymm2, ymm3/m256, ymm4 */
 	I(0x10, IF_66|IF_MODRM,                              "pblendvb\txmm1, xmm2/m128, <xmm0>"),                        /*           66 0f 38 10 /r      pblendvb xmm1, xmm2/m128, <xmm0> */
-
-	I(0x0e, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 1, 0, 0) "vpblendw\t" OP_U8 OP_RM128_XMM__OP_VRXMM__OP_RXMM), /* VEX.128.66.0f3a.WIG 0e /r ib vpblendw xmm1, xmm2, xmm3/m128, imm8 */
-	I(0x0e, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 1, 0, 1) "vpblendw\t" OP_U8 OP_RM256_YMM__OP_VRYMM__OP_RYMM), /* VEX.256.66.0f3a.WIG 0e /r ib vpblendw ymm1, ymm2, ymm3/m256, imm8 */
-	I(0x0e, IF_66|IF_MODRM,                              "pblendw\t" OP_U8 OP_RM128_XMM OP_RXMM),             /*            66 0f 3a 0e /r ib pblendw xmm1, xmm2/m128, imm8 */
 
 	I(0x29, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(1, 1, 0, 0) "vpcmpeqq\t" OP_RM128_XMM__OP_VRXMM__OP_RXMM), /*  VEX.128.66.0f38.WIG 29 /r vpcmpeqq xmm1, xmm2, xmm3/m128 */
 	I(0x29, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(1, 1, 0, 1) "vpcmpeqq\t" OP_RM256_YMM__OP_VRYMM__OP_RYMM), /*  VEX.256.66.0f38.WIG 29 /r vpcmpeqq ymm1, ymm2, ymm3 /m256 */
@@ -5549,6 +5516,20 @@ PRIVATE struct instruction const ops_0f38[] = {
 	I(0x1f, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 1) "vpabsq\t" OP_RM256_YMM OP_RYMM), /* EVEX.256.66.0f38.W1  1f /r vpabsq ymm1{k1}{z}, ymm2/m256/m64bcst */
 	I(0x1f, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 2) "vpabsq\t" OP_RM512_ZMM OP_RZMM), /* EVEX.512.66.0f38.W1  1f /r vpabsq zmm1{k1}{z}, zmm2/m512/m64bcst */
 
+	I(0x2a, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(1, 1, 0, 0), LO_VMOVNTDQA_XMM)), /*  VEX.128.66.0f38.WIG 2a /r vmovntdqa xmm1, m128 */
+	I(0x2a, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(1, 1, 0, 1), LO_VMOVNTDQA_YMM)), /*  VEX.256.66.0f38.WIG 2a /r vmovntdqa ymm1, m256 */
+	I(0x2a, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(0, 0, 0, 0), LO_VMOVNTDQA_XMM)), /* EVEX.128.66.0f38.W0  2a /r vmovntdqa xmm1, m128 */
+	I(0x2a, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(0, 0, 0, 1), LO_VMOVNTDQA_YMM)), /* EVEX.256.66.0f38.W0  2a /r vmovntdqa ymm1, m256 */
+	I(0x2a, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(0, 0, 0, 2), LO_VMOVNTDQA_ZMM)), /* EVEX.512.66.0f38.W0  2a /r vmovntdqa zmm1, m512 */
+	I(0x2a, IF_66|IF_MODRM,        "movntdqa\t" OP_RM OP_RXMM),                            /*             66 0f 38 2a /r movntdqa xmm1, m128 */
+
+	I(0x2b, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(1, 1, 0, 0) "vpackusdw\t" OP_RM128_XMM__OP_VRXMM__OP_RXMM), /* VEX.128.66.0f38.WIG 2b /r vpackusdw xmm1, xmm2, xmm3/m128 */
+	I(0x2b, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(1, 1, 0, 1) "vpackusdw\t" OP_RM256_YMM__OP_VRYMM__OP_RYMM), /* VEX.256.66.0f38.WIG 2b /r vpackusdw ymm1, ymm2, ymm3/m256 */
+	I(0x2b, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 0) "vpackusdw\t" OP_RM128_XMM__OP_VRXMM__OP_RXMM), /* EVEX.128.66.0f38.W0 2b /r vpackusdw xmm1{k1}{z}, xmm2, xmm3/m128/m32bcst */
+	I(0x2b, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 1) "vpackusdw\t" OP_RM256_YMM__OP_VRYMM__OP_RYMM), /* EVEX.256.66.0f38.W0 2b /r vpackusdw ymm1{k1}{z}, ymm2, ymm3/m256/m32bcst */
+	I(0x2b, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 2) "vpackusdw\t" OP_RM512_ZMM__OP_VRZMM__OP_RZMM), /* EVEX.512.66.0f38.W0 2b /r vpackusdw zmm1{k1}{z}, zmm2, zmm3/m512/m32bcst */
+	I(0x2b, IF_66|IF_MODRM,                              "packusdw\t" OP_RM128_XMM OP_RXMM),             /*            66 0f 38 2b /r packusdw xmm1, xmm2/m128 */
+
 	I(0x38, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 1, 0, 0) "vpminsb\t" OP_RM128_XMM__OP_VRXMM__OP_RXMM), /* EVEX.128.66.0f38.WIG 38 /r vpminsb xmm1{k1}{z}, xmm2, xmm3/m128 */
 	I(0x38, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 1, 0, 1) "vpminsb\t" OP_RM256_YMM__OP_VRYMM__OP_RYMM), /* EVEX.256.66.0f38.WIG 38 /r vpminsb ymm1{k1}{z}, ymm2, ymm3/m256 */
 	I(0x38, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 1, 0, 2) "vpminsb\t" OP_RM512_ZMM__OP_VRZMM__OP_RZMM), /* EVEX.512.66.0f38.WIG 38 /r vpminsb zmm1{k1}{z}, zmm2, zmm3/m512 */
@@ -5664,6 +5645,25 @@ PRIVATE struct instruction const ops_0f3a[] = {
 	I(0x0c, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(1, 1, 0, 0) "vblendps\t" OP_U8 OP_RM128_XMM__OP_VRXMM__OP_RXMM), /* VEX.128.66.0f3a.WIG 0c /r ib vblendps xmm1, xmm2, xmm3/m128, imm8 */
 	I(0x0c, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(1, 1, 0, 1) "vblendps\t" OP_U8 OP_RM256_YMM__OP_VRYMM__OP_RYMM), /* VEX.256.66.0f3a.WIG 0c /r ib vblendps ymm1, ymm2, ymm3/m256, imm8 */
 	I(0x0c, IF_66|IF_MODRM,                              "blendps\t" OP_U8 OP_RM128_XMM OP_RXMM),             /*            66 0f 3a 0c /r ib blendps xmm1, xmm2/m128, imm8 */
+
+	I(0x0e, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 1, 0, 0) "vpblendw\t" OP_U8 OP_RM128_XMM__OP_VRXMM__OP_RXMM), /* VEX.128.66.0f3a.WIG 0e /r ib vpblendw xmm1, xmm2, xmm3/m128, imm8 */
+	I(0x0e, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 1, 0, 1) "vpblendw\t" OP_U8 OP_RM256_YMM__OP_VRYMM__OP_RYMM), /* VEX.256.66.0f3a.WIG 0e /r ib vpblendw ymm1, ymm2, ymm3/m256, imm8 */
+	I(0x0e, IF_66|IF_MODRM,                              "pblendw\t" OP_U8 OP_RM128_XMM OP_RXMM),             /*            66 0f 3a 0e /r ib pblendw xmm1, xmm2/m128, imm8 */
+
+	I(0x21, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(1, 1, 0, 0), LO_VINSERTPS_XMM)), /*  VEX.128.66.0f3a.WIG 21 /r ib vinsertps xmm1, xmm2, xmm3/m32, imm8 */
+	I(0x21, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(0, 0, 0, 0), LO_VINSERTPS_YMM)), /* EVEX.128.66.0f3a.W0  21 /r ib vinsertps xmm1, xmm2, xmm3/m32, imm8 */
+	I(0x21, IF_66|IF_MODRM,        "insertps\t" OP_U8 OP_RM128_XMM OP_RXMM),               /*             66 0f 3a 21 /r ib insertps xmm1, xmm2/m32, imm8 */
+
+	I(0x40, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 1, 0, 0) "vdpps\t" OP_U8 OP_RM128_XMM__OP_VRXMM__OP_RXMM), /* VEX.128.66.0f3a.WIG 40 /r ib vdpps xmm1, xmm2, xmm3/m128, imm8 */
+	I(0x40, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 1, 0, 1) "vdpps\t" OP_U8 OP_RM256_YMM__OP_VRYMM__OP_RYMM), /* VEX.256.66.0f3a.WIG 40 /r ib vdpps ymm1, ymm2, ymm3/m256, imm8 */
+	I(0x40, IF_66|IF_MODRM,                              "dpps\t" OP_U8 OP_RM128_XMM OP_RXMM),             /*            66 0f 3a 40 /r ib dpps xmm1, xmm2/m128, imm8 */
+
+	I(0x41, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 1, 0, 0) "vdppd\t" OP_U8 OP_RM128_XMM__OP_VRXMM__OP_RXMM), /* VEX.128.66.0f3a.WIG 41 /r ib vdppd xmm1, xmm2, xmm3/m128, imm8 */
+	I(0x41, IF_66|IF_MODRM,                              "dppd\t" OP_U8 OP_RM128_XMM OP_RXMM),             /*            66 0f 3a 41 /r ib dppd xmm1, xmm2/m128, imm8 */
+
+	I(0x42, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 1, 0, 0) "vmpsadbw\t" OP_U8 OP_RM128_XMM__OP_VRXMM__OP_RXMM), /* VEX.128.66.0f3a.WIG 42 /r ib vmpsadbw xmm1, xmm2, xmm3/m128, imm8 */
+	I(0x42, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 1, 0, 1) "vmpsadbw\t" OP_U8 OP_RM256_YMM__OP_VRYMM__OP_RYMM), /* VEX.256.66.0f3a.WIG 42 /r ib vmpsadbw ymm1, ymm2, ymm3/m256, imm8 */
+	I(0x42, IF_66|IF_MODRM,                              "mpsadbw\t" OP_U8 OP_RM128_XMM OP_RXMM),             /*            66 0f 3a 42 /r ib mpsadbw xmm1, xmm2/m128, imm8 */
 
 	I(0xcc, IF_MODRM, LONGREPR(LO_SHA1RNDS4)),
 
@@ -5787,45 +5787,45 @@ PRIVATE u16 const ops_offsets[256] = {
 };
 
 #define HAVE_OPS_0F_OFFSETS 1
-STATIC_ASSERT(COMPILER_LENOF(ops_0f) == 1034);
+STATIC_ASSERT(COMPILER_LENOF(ops_0f) == 1054);
 PRIVATE u16 const ops_0f_offsets[256] = {
-	0, 6, 36, 38, 1033, 40, 42, 43, 45, 46, 47, 48, 1033, 49, 1033, 1033,
-	51, 63, 75, 1033, 87, 99, 111, 1033, 117, 1033, 121, 127, 132, 1033, 1033, 133,
-	135, 137, 139, 141, 143, 1033, 144, 1033, 145, 157, 169, 1033, 170, 172, 1033, 1033,
-	174, 175, 176, 177, 178, 179, 180, 181, 1033, 1033, 1033, 1033, 1033, 1033, 1033, 182,
-	183, 186, 189, 192, 195, 198, 201, 204, 207, 210, 213, 216, 219, 222, 225, 228,
-	1033, 1033, 231, 236, 241, 253, 265, 277, 1033, 1033, 1033, 1033, 1033, 1033, 1033, 1033,
-	289, 294, 299, 306, 311, 316, 321, 328, 333, 338, 343, 350, 355, 361, 367, 373,
-	397, 412, 427, 451, 473, 478, 483, 490, 493, 495, 1033, 1033, 497, 503, 509, 515,
-	539, 541, 543, 545, 547, 549, 551, 553, 555, 557, 559, 561, 563, 565, 567, 569,
-	571, 572, 573, 574, 575, 576, 577, 578, 579, 580, 581, 582, 583, 584, 585, 586,
-	587, 590, 593, 594, 597, 600, 1033, 1033, 603, 606, 609, 610, 613, 616, 619, 651,
-	654, 655, 658, 661, 664, 667, 670, 673, 675, 678, 679, 691, 694, 700, 706, 709,
-	711, 712, 1033, 715, 1033, 1033, 717, 729, 745, 749, 753, 757, 761, 765, 769, 773,
-	777, 783, 788, 795, 802, 807, 812, 1033, 814, 819, 824, 829, 839, 844, 849, 854,
-	864, 869, 874, 884, 889, 894, 899, 905, 906, 911, 916, 921, 931, 936, 941, 946,
-	1033, 956, 961, 968, 975, 982, 987, 992, 993, 998, 1003, 1010, 1017, 1022, 1027, 1032
+	0, 6, 36, 38, 1053, 40, 42, 43, 45, 46, 47, 48, 1053, 49, 1053, 1053,
+	51, 63, 75, 1053, 87, 99, 111, 1053, 117, 1053, 121, 127, 132, 1053, 1053, 133,
+	135, 137, 139, 141, 143, 1053, 144, 1053, 145, 157, 169, 170, 176, 178, 1053, 1053,
+	180, 181, 182, 183, 184, 185, 186, 187, 1053, 1053, 1053, 1053, 1053, 1053, 1053, 188,
+	189, 192, 195, 198, 201, 204, 207, 210, 213, 216, 219, 222, 225, 228, 231, 234,
+	1053, 1053, 237, 242, 247, 259, 271, 283, 1053, 1053, 1053, 1053, 1053, 1053, 1053, 1053,
+	295, 300, 305, 312, 317, 322, 327, 334, 339, 344, 349, 356, 361, 367, 373, 379,
+	403, 418, 433, 457, 479, 484, 489, 496, 499, 501, 1053, 1053, 503, 509, 515, 521,
+	545, 547, 549, 551, 553, 555, 557, 559, 561, 563, 565, 567, 569, 571, 573, 575,
+	577, 578, 579, 580, 581, 582, 583, 584, 585, 586, 587, 588, 589, 590, 591, 592,
+	593, 596, 599, 600, 603, 606, 1053, 1053, 609, 612, 615, 616, 619, 622, 625, 657,
+	660, 661, 664, 667, 670, 673, 676, 679, 681, 684, 685, 697, 700, 706, 712, 715,
+	717, 718, 1053, 721, 1053, 1053, 723, 735, 751, 755, 759, 763, 767, 771, 775, 779,
+	783, 789, 794, 801, 808, 813, 818, 820, 828, 833, 838, 843, 853, 858, 863, 868,
+	878, 883, 888, 898, 903, 908, 913, 919, 926, 931, 936, 941, 951, 956, 961, 966,
+	1053, 976, 981, 988, 995, 1002, 1007, 1012, 1013, 1018, 1023, 1030, 1037, 1042, 1047, 1052
 };
 
 #define HAVE_OPS_0F38_OFFSETS 1
-STATIC_ASSERT(COMPILER_LENOF(ops_0f38) == 157);
+STATIC_ASSERT(COMPILER_LENOF(ops_0f38) == 169);
 PRIVATE u8 const ops_0f38_offsets[256] = {
-	0, 5, 9, 13, 17, 22, 26, 30, 34, 38, 42, 46, 156, 156, 156, 51,
-	156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 56, 61, 66, 73,
-	156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156,
-	156, 156, 156, 156, 156, 156, 156, 156, 76, 156, 80, 156, 84, 88, 97, 156,
-	156, 101, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156,
-	156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156,
-	156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156,
-	156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156,
-	103, 105, 107, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156,
-	156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156,
-	156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156,
-	156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156,
-	156, 156, 156, 156, 156, 156, 156, 156, 109, 110, 111, 112, 113, 114, 156, 156,
-	156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156,
-	156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156, 156,
-	115, 120, 126, 128, 156, 134, 140, 146, 154, 156, 156, 156, 156, 156, 156, 156
+	0, 5, 9, 13, 17, 22, 26, 30, 34, 38, 42, 46, 168, 168, 168, 51,
+	168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 56, 61, 66, 73,
+	168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 76, 82, 168, 168, 168, 168,
+	168, 168, 168, 168, 168, 168, 168, 168, 88, 168, 92, 168, 96, 100, 109, 168,
+	168, 113, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168,
+	168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168,
+	168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168,
+	168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168,
+	115, 117, 119, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168,
+	168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168,
+	168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168,
+	168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168,
+	168, 168, 168, 168, 168, 168, 168, 168, 121, 122, 123, 124, 125, 126, 168, 168,
+	168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168,
+	168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168,
+	127, 132, 138, 140, 168, 146, 152, 158, 166, 168, 168, 168, 168, 168, 168, 168
 };
 //[[[end]]]
 
