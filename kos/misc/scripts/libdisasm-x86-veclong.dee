@@ -1,0 +1,227 @@
+/* Copyright (c) 2019-2020 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+/* Helper script to split long instruction representations for libdisasm */
+import * from deemon;
+
+function containsAny(seq: {Object...}, elems: {Object...}): bool {
+	for (local e: elems) {
+		if (e in seq)
+			return true;
+	}
+	return false;
+}
+
+function getLongReprLength(iRepr: string): int {
+	local i = 0, len = #iRepr;
+	local result = 1; /* +1 for trailing NUL */
+	while (i < len) {
+		local c = iRepr[i];
+		if (c == "\"") {
+			++i;
+			while (i < len) {
+				c = iRepr[i];
+				if (c == "\"") {
+					++i;
+					break;
+				}
+				if (c == "\\")
+					++i;
+				++i;
+				++result;
+			}
+			continue;
+		}
+		if (c.isspace()) {
+			++i;
+			continue;
+		}
+		if (c.issymstrt()) {
+			++result; /* Something like `OP_*' */
+			do {
+				++i;
+			} while (i < len && iRepr.issymcont(i));
+			continue;
+		}
+		throw Error("Unexpected character {!r} in {!r}".format({ c, iRepr }));
+	}
+	return result;
+}
+
+local currentGroup = [];
+local longOpLines = [];
+
+for (local l: File.stdin) {
+	l = l.rstrip().decode("utf-8");
+	if (!l) {
+		local hasAnyLongRepr = false;
+		local usedNames = HashSet();
+		local mappedRepr = Dict();
+		for (local i = 0; i < #currentGroup; ++i) {
+			local l = currentGroup[i];
+			local rStart = l.index('"');
+			local rEnd = l.index(')', rStart);
+			local iRepr = l[rStart:rEnd].strip();
+			local longReprLength = getLongReprLength(iRepr);
+			if ("OP_VEX_B0" in l[:rStart])
+				++longReprLength;
+			if (longReprLength <= 13)
+				continue;
+			local iNameEnd = 1;
+			assert iRepr.issymstrt(iNameEnd);
+			while (iNameEnd < #iRepr && iRepr.issymcont(iNameEnd))
+				++iNameEnd;
+			local iName = iRepr[1:iNameEnd];
+			local longName = mappedRepr.get(iRepr);
+			if (longName is none) {
+				longName = "LO_{}".format({ iName.upper() });
+				if (containsAny(iRepr, {
+					"OP_RXMM OP_RM128_XMM_MASK",
+					"OP_RM128_XMM OP_RXMM_MASK",
+					"OP_RM128_XMM__OP_VRXMM__OP_RXMM_MASK",
+					"OP_RM128_XMM OP_VRXMM OP_RK_MASK",
+					"OP_RMK OP_RXMM",
+					"OP_MEM OP_RXMM_MASK",
+					"OP_MEM OP_VRXMM OP_RXMM",
+					"OP_RM8 OP_RXMM_MASK",
+					"OP_RM16 OP_RXMM_MASK",
+					"OP_RM32 OP_RXMM_MASK",
+					"OP_RM64 OP_RXMM_MASK",
+					"OP_U8 OP_RM128_XMM OP_RK_MASK",
+				})) {
+					longName = longName + "_XMM";
+				} else if (containsAny(iRepr, {
+					"OP_RYMM OP_RM256_YMM_MASK",
+					"OP_RM256_YMM OP_RYMM_MASK",
+					"OP_RM256_YMM__OP_VRYMM__OP_RYMM_MASK",
+					"OP_RYMM OP_RM128_XMM_MASK",
+					"OP_RM256_YMM OP_VRYMM OP_RK_MASK",
+					"OP_RMK OP_RYMM",
+					"OP_RM128_XMM OP_RYMM_MASK",
+					"OP_MEM OP_RYMM_MASK",
+					"OP_MEM OP_VRYMM OP_RYMM",
+					"OP_RM8 OP_RYMM_MASK",
+					"OP_RM16 OP_RYMM_MASK",
+					"OP_RM32 OP_RYMM_MASK",
+					"OP_RM64 OP_RYMM_MASK",
+					"OP_U8 OP_RM256_YMM OP_RK_MASK",
+					"OP_RM256_YMM OP_RXMM_MASK",
+				})) {
+					longName = longName + "_YMM";
+				} else if (containsAny(iRepr, {
+					"OP_RZMM OP_RM512_ZMM_MASK",
+					"OP_RM512_ZMM OP_RZMM_MASK",
+					"OP_RM512_ZMM__OP_VRZMM__OP_RZMM_MASK",
+					"OP_RZMM OP_RM128_XMM_MASK",
+					"OP_RZMM OP_RM256_YMM_MASK",
+					"OP_RM512_ZMM OP_VRZMM OP_RK_MASK",
+					"OP_RMK OP_RZMM",
+					"OP_RM128_XMM OP_RZMM_MASK",
+					"OP_MEM OP_RZMM_MASK",
+					"OP_MEM OP_VRZMM OP_RZMM",
+					"OP_RM8 OP_RZMM_MASK",
+					"OP_RM16 OP_RZMM_MASK",
+					"OP_RM32 OP_RZMM_MASK",
+					"OP_RM64 OP_RZMM_MASK",
+					"OP_U8 OP_RM512_ZMM OP_RK_MASK",
+					"OP_ER OP_RM512_ZMM OP_RYMM_MASK",
+					"OP_SAE OP_RM512_ZMM OP_RYMM_MASK",
+					"OP_SAE OP_RM256_YMM OP_RZMM_MASK",
+				})) {
+					longName = longName + "_ZMM";
+				} else if (containsAny(iRepr, {
+					"OP_RXMM OP_VRXMM OP_MEM",
+				})) {
+					longName = longName + "_XMM_REV";
+				} else if (containsAny(iRepr, {
+					"OP_RYMM OP_VRYMM OP_MEM",
+				})) {
+					longName = longName + "_YMM_REV";
+				} else if (containsAny(iRepr, {
+					"OP_RZMM OP_VRZMM OP_MEM",
+				})) {
+					longName = longName + "_ZMM_REV";
+				} else if (containsAny(iRepr, {
+					"OP_ER OP_RM32 OP_VRXMM OP_RXMM",
+					"OP_ER OP_RM128_XMM OP_R32",
+					"OP_SAE OP_RM128_XMM OP_R32",
+					"OP_RM32 OP_VRXMM OP_RXMM",
+				})) {
+					longName = longName + "_R32";
+				} else if (containsAny(iRepr, {
+					"OP_ER OP_RM64 OP_VRXMM OP_RXMM",
+					"OP_ER OP_RM128_XMM OP_R64",
+					"OP_SAE OP_RM128_XMM OP_R64",
+				})) {
+					longName = longName + "_R64";
+				}
+				if (longName in usedNames)
+					throw Error("Name {!r} reused by {!r}".format({ longName, l }));
+				usedNames.insert(longName);
+				mappedRepr[iRepr] = longName;
+				local lop = "LONGOP({}, {}".format({ longName, l[rStart:] });
+				local lopc = lop.rindex("),", 0, lop.index("/*")) + 1;
+				lop = lop[:lopc] + lop[lopc + 1:];
+				longOpLines.append(lop);
+				hasAnyLongRepr = true;
+			}
+			local prefix = l[:rStart];
+			local p = prefix.find("OP_VEX_B0");
+			local oldCommentOffset = l.index("/*");
+			if (p >= 0) {
+				l = "{}LONGREPR_B(B_{}, {}){}".format({
+					prefix[:p], prefix[p:].rstrip(),
+					longName, l[rEnd:]
+				});
+			} else {
+				l = "{}LONGREPR({}){}".format({ l[:rStart], longName, l[rEnd:] });
+			}
+			local ci = l.index("/*");
+			if (oldCommentOffset > ci)
+				l = l[:ci] + (" " * (oldCommentOffset - ci)) + l[ci:];
+			currentGroup[i] = l;
+		}
+		local longestIndent = (
+			for (local l: currentGroup)
+				l[:l.rindex("/*")].rstrip().length
+		) > ...;
+		for (local i = 0; i < #currentGroup; ++i) {
+			local l = currentGroup[i];
+			local c = l.rindex("/*");
+			l = "{} {}".format({ l[:c].rstrip().ljust(longestIndent), l[c:] });
+			currentGroup[i] = l;
+		}
+		if (hasAnyLongRepr)
+			longOpLines.append("");
+		for (local l: currentGroup)
+			print l;
+		print;
+		currentGroup = [];
+	} else {
+		currentGroup.append(l);
+	}
+}
+assert !currentGroup;
+
+for (local l: longOpLines)
+	print l;
+
+
+

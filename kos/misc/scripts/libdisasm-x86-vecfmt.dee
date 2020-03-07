@@ -1,0 +1,227 @@
+/* Copyright (c) 2019-2020 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+/* Helper script to auto-complete / auto-format x86 instructions
+ * for the libdisasm database */
+import * from deemon;
+
+
+
+local currentGroup = [];
+for (local l: File.stdin) {
+	l = l.rstrip().decode("utf-8");
+	if (!l) {
+		for (local i = 0; i < #currentGroup; ++i) {
+			local l = currentGroup[i];
+			local c = l.index("/*") + 2;
+			local r = l.index("/", c);
+			for (local t, f: {
+				("66", "IF_66"),
+				("f2", "IF_F2"),
+				("f3", "IF_F3"),
+			}) {
+				local cr = l[c:r].lower();
+				local h66 = ((" " + t + " ")) in cr || (("." + t)) in cr;
+				if (h66 != (f in l[:l.rindex("\"", 0, c)])) {
+					if (h66) {
+						local m = l.index("IF_MODRM");
+						l = l[:m] + f + "|" + l[m:];
+					} else {
+						local m = l.index(f + "|");
+						l = l[:m] + l[m+6:];
+					}
+				}
+			}
+			currentGroup[i] = l;
+		}
+		local hasAnyEvex = (
+			for (local l: currentGroup)
+				l[l.index("/*") + 2:].lstrip().lower().startswith("evex.")
+		) || ...;
+		for (local i = 0; i < #currentGroup; ++i) {
+			local l = currentGroup[i];
+			local c = l.index("/*") + 2;
+			local com = l[c:].lower().lstrip();
+			local isLig = ".lig" in com;
+			if ("IF_VEX" !in l[:c])
+				continue;
+			local p = l.index("OP_VEX_B0") + 9;
+			if (isLig) {
+				if (l[p:p+4] != "_LIG") {
+					l = l[:p] + "_LIG(" + l[l.index(",", p) + 1:];
+				}
+			} else {
+				if (l[p:p+4] == "_LIG") {
+					l = l[:p] + "_LIG(0, " + l[p:];
+				}
+			}
+			local p = l.index("(", p);
+			local e = l.index(")", p) + 1;
+			local wig = ".wig" in com;
+			local w = "0";
+			if (!wig) {
+				if (".w1" in com) {
+					w = "1";
+				} else {
+					com.index(".w0");
+				}
+			}
+			l = "{}({}, {}, {}{}){}".format({
+				l[:p],
+				/* noevex */ (hasAnyEvex && com.startswith("vex.")) ? "1" : "0",
+				/* wig */    wig ? "1" : "0",
+				/* w */      w,
+				isLig ? "" : (
+					".128" in com ? ", 0" :
+					".256" in com ? ", 1" :
+					".512" in com ? ", 2" :
+					".l0"  in com ? ", 0" :
+					".l1"  in com ? ", 1" :
+					".l2"  in com ? ", 2" : ({
+						throw Error("Missing length indicator in " + repr(com));
+					})
+				),
+				l[e:]
+			});
+			currentGroup[i] = l;
+		}
+		for (local i = 0; i < #currentGroup; ++i) {
+			local l = currentGroup[i];
+			local c = l.index("/*") + 2;
+			local r = l.index("/", c);
+			local rId = l[r + 1];
+			if (rId.isnumeric()) {
+				local p = l.find("IF_REG", 0, l.rindex("\"", 0, c));
+				if (p >= 0) {
+					p += 6;
+					l = l[:p] + rId + l[p + 1:];
+				} else {
+					p = l.index("IF_MODRM") + 8;
+					l = l[:p] + "|IF_REG" + rId + l[p:];
+				}
+			}
+			currentGroup[i] = l;
+		}
+		{
+			local noVexItems = [];
+			for (local i = 0; i < #currentGroup;) {
+				local l = currentGroup[i];
+				if ("OP_VEX_B0" in l) {
+					++i;
+				} else {
+					currentGroup.erase(i);
+					noVexItems.append(l);
+				}
+			}
+			currentGroup.extend(noVexItems);
+		}
+		local reprAlignment = (
+			for (local l: currentGroup)
+				l.index("\"", l.index(",", l.index(",") + 1) + 1)
+		) > ...;
+		for (local i = 0; i < #currentGroup; ++i) {
+			local l = currentGroup[i];
+			local reprBegin = l.index("\"", l.index(",", l.index(",") + 1) + 1);
+			assert reprBegin <= reprAlignment;
+			l = l[:reprBegin] + (" " * (reprAlignment - reprBegin)) + l[reprBegin:];
+			currentGroup[i] = l;
+		}
+		local reprStripAlignment = (
+			for (local l: currentGroup)
+				(#l[:reprAlignment] - #l[:reprAlignment].rstrip())
+		) < ...;
+		if (reprStripAlignment > 2) {
+			--reprStripAlignment;
+			for (local i = 0; i < #currentGroup; ++i) {
+				local l = currentGroup[i];
+				l = l[:reprAlignment - reprStripAlignment] + l[reprAlignment:];
+				currentGroup[i] = l;
+			}
+		}
+		for (local i = 0; i < #currentGroup; ++i) {
+			local l = currentGroup[i];
+			local j = l.index("\"") + 1;
+			if (l.issymstrt(j)) {
+				do ++j;
+				while (l.issymcont(j));
+				if (l[j] == " ") {
+					l = l[:j] + "\\t" + l[j + 1:];
+				}
+			}
+			currentGroup[i] = l;
+		}
+		local longestIndent = (
+			for (local l: currentGroup)
+				l[:l.rindex("/*")].rstrip().length
+		) > ...;
+		for (local i = 0; i < #currentGroup; ++i) {
+			local l = currentGroup[i];
+			local c = l.rindex("/*");
+			l = "{} {}".format({
+				l[:c].rstrip().ljust(longestIndent),
+#if 0
+				l[c:].upper()
+#else
+				l[c:].lower()
+					.replace("evex.", "EVEX.")
+					.replace("vex.", "VEX.")
+					.replace(".lig", ".LIG")
+					.replace(".wig", ".WIG")
+					.replace(".w0", ".W0")
+					.replace(".w1", ".W1")
+#endif
+			});
+			currentGroup[i] = l;
+		}
+		local commonRmOffset = (
+			for (local l: currentGroup)
+				l.index("/", l.index("/*") + 2)
+		) > ...;
+		for (local i = 0; i < #currentGroup; ++i) {
+			local l = currentGroup[i];
+			local c = l.index("/*") + 2;
+			local r = l.index("/", c);
+			assert r <= commonRmOffset;
+			l = l[:c] + (" " * (commonRmOffset - r)) + l[c:];
+
+			currentGroup[i] = l;
+		}
+		local commonCommentPrefix = (
+			for (local l: currentGroup)
+				(#l[l.index("/" "*")+2:] - #l[l.index("/" "*")+2:].lstrip())
+		) < ...;
+		if (commonCommentPrefix > 1) {
+			--commonCommentPrefix;
+			for (local i = 0; i < #currentGroup; ++i) {
+				local l = currentGroup[i];
+				local c = l.index("/*") + 2;
+				l = l[:c] + l[c + commonCommentPrefix:];
+				currentGroup[i] = l;
+			}
+		}
+		for (local l: currentGroup)
+			print l;
+		print;
+		currentGroup = [];
+	} else {
+		currentGroup.append(l);
+	}
+}
+
