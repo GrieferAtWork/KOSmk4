@@ -45,41 +45,63 @@
 
 DECL_BEGIN
 
+/* Automatically select jcc and setcc condition
+ * representation based on the preceding instruction. */
+#undef CONFIG_AUTOSELECT_JCC
+#if 1
+#define CONFIG_AUTOSELECT_JCC  1
+#endif
+
+/* Include implied operands of FPU instructions */
+#undef CONFIG_VERBOSE_FINST
+#if 1
+#define CONFIG_VERBOSE_FINST  1
+#endif
+
 
 #define I(op, flags, repr) { flags, op, repr }
 struct instruction {
-#define IF_REG0  0x0008
-#define IF_REG1  0x0009
-#define IF_REG2  0x000a
-#define IF_REG3  0x000b
-#define IF_REG4  0x000c
-#define IF_REG5  0x000d
-#define IF_REG6  0x000e
-#define IF_REG7  0x000f
-#define IF_MODRM 0x0010
+	/*  */
+#define IF_REG0  0x0008 /* Require that modrm.mi_reg == 0 */
+#define IF_REG1  0x0009 /* Require that modrm.mi_reg == 1 */
+#define IF_REG2  0x000a /* Require that modrm.mi_reg == 2 */
+#define IF_REG3  0x000b /* Require that modrm.mi_reg == 3 */
+#define IF_REG4  0x000c /* Require that modrm.mi_reg == 4 */
+#define IF_REG5  0x000d /* Require that modrm.mi_reg == 5 */
+#define IF_REG6  0x000e /* Require that modrm.mi_reg == 6 */
+#define IF_REG7  0x000f /* Require that modrm.mi_reg == 7 */
+#define IF_MODRM 0x0010 /* Decode a modr/m suffix */
 #define IF_BYTE2 0x3017 /* The first repr-byte is required as a follow-up on the instruction byte. */
-#define IF_66    0x0020
-#define IF_F2    0x0040
-#define IF_F3    0x0080
-#define IF_67    0x0100
-#define IF_REXW  0x0200
-#define IF_REXB  0xc000
+#define IF_66    0x0020 /* Mandatory prefix: operand-size override */
+#define IF_F2    0x0040 /* Mandatory prefix: repne */
+#define IF_F3    0x0080 /* Mandatory prefix: rep, repe */
+#define IF_67    0x0100 /* Address size override */
+#define IF_REXW  0x0200 /* Mask for the matching value of `REX.W' */
+#define IF_REXB  0xc000 /* Only match instructions with `REX.B' set */
 #define IF_RMM   0x0400 /* Modrm is memory */
 #define IF_RMR   0x0800 /* Modrm is register */
 #define IF_VEXW0 0x1000 /* VEX + VEX.W == 0 */
 #define IF_VEXW1 0x2000 /* VEX + VEX.W == 1 */
-#define IF_VEX   0x3000 /* VEX (further specified by first character of repr) */
+#define IF_VEX   0x3000 /* VEX (further specified by first character of repr, which is a set of `IF_VEX_B0_*') */
 #define IF_VEX_B0_LL_M   0x03 /* Required value for `VEX.LL' */
 #define IF_VEX_B0_LL_S      0 /* Required value for `VEX.LL' */
 #define IF_VEX_B0_LIG    0x03 /* Value of `IF_VEX_B0_LL_M' when vector length should be ignored. */
 #define IF_VEX_B0_W      0x04 /* Required value for `VEX.W' */
 #define IF_VEX_B0_WIG    0x08 /* Ignore `VEX.W' (`IF_VEX_B0_W' must not be set) */
 #define IF_VEX_B0_NOEVEX 0x10 /* Require that no EVEX prefix be given */
-#define IF_X32   0x4000
-#define IF_X64   0x8000
-	u16  i_flags;    /* Instruction flags. */
+#define IF_VEX_B0_RESVD  0xe0 /* Reserved bits */
+#define IF_X32   0x4000 /* Only match in 32-bit mode */
+#define IF_X64   0x8000 /* Only match in 64-bit mode */
+	u16  i_flags;    /* Instruction flags (set of `IF_*'). */
 	u8   i_opcode;   /* Instruction opcode. */
-	char i_repr[13];
+	char i_repr[13]; /* Instruction representation (name + ["\t" + operands])
+	                  * Note that some flag combinations also make use the first
+	                  * byte for additional representation. Also note that when
+	                  * the first character of the actual representation is a `?',
+	                  * then the following 2 bytes represent an unsigned offset
+	                  * into `longops_repr', to where the actual representation
+	                  * can be found. The representation is always terminated by
+	                  * a '\0' (NUL) character. */
 };
 #define _OP_VEX_B02(noevex, wig, w, ll) BINSTR_000##noevex##wig##w##ll
 #define _OP_VEX_B0(noevex, wig, w, ll)  _OP_VEX_B02(noevex, wig, w, ll)
@@ -98,6 +120,44 @@ struct instruction {
 	 ((wig) ? IF_VEX_B0_WIG : 0) |       \
 	 ((w) ? IF_VEX_B0_W : 0) |           \
 	 IF_VEX_B0_LL_M)
+
+
+/* Instruction operand type encodings
+ * Each operand (usually) consists of a single ASCII character that
+ * describes how and what is printed in order to represent the operand.
+ * The final representations of some operands may depend on specific
+ * prefix bytes or the value of the instruction's (optional) modr/m.
+ * Also note that in order to fully determine the length of an instruction,
+ * operands must also be decoded, as operands also contain information
+ * about immediate bytes (that are consumed as they are encountered)
+ * An instruction representation `i_repr' is encoded as:
+ *   #1: "X...":
+ *       The first byte of the representation is used for instruction matching when:
+ *       `(i_flags & IF_BYTE2) == IF_BYTE2 || (i_flags & IF_VEX) == IF_VEX'
+ *       If this is the case, then the first byte of `repr' is consumed and all
+ *       of the following encode/decode steps operate as `repr = i_repr + 1'
+ *   #2: OPC_LONGREPR + "<O1><O2>":
+ *       The actual representation is stored at `longops_repr + UNALIGNED_GET16((u16 *)(repr + 1))'
+ *       This is done to overcome the 12 (12+NUL=13) character limit for encoding
+ *       a mnemonic and its operands.
+ *       If the first character of `repr' was `OPC_LONGREPR', then all of the following
+ *       encode/decode steps operate using the string found in `longops_repr'
+ *   #3: This is where the ~actual~ representation can be found, which is one of:
+ *       - "<mnemonic>\0"
+ *       - "<mnemonic>\t<operands...>\0"
+ *       With `mnemonic' being the name of the instruction, and `operands'
+ *       being a tightly packed string made up of `OP_*', where each macro
+ *       expands to represent (usually) one operand (but note the few optional
+ *       operands such as `OP_SAE' and `OP_ER', as well as the few macros
+ *       that encode multiple operands).
+ *       Additionally, each operand from `operands' can be `OP_ESC("...")',
+ *       where `...' is an inlined string that will be printed in place of
+ *       the operand's representation. The prefix/suffix of this expression
+ *       is selected based on the first character of `...':
+ *         - `%': DISASSEMBLER_FORMAT_REGISTER_(PREFIX|SUFFIX)
+ *         - `$': DISASSEMBLER_FORMAT_IMMEDIATE_(PREFIX|SUFFIX)
+ *         - <anything else>: <printed without prefix/suffix>
+ */
 
 
 /* Valid operand namespace: ASCII 0x20-0x7e */
@@ -388,8 +448,14 @@ struct instruction {
 #define OP_XMM0 OP_ESC("%xmm0") /* %xmm0 */
 
 
-#undef CONFIG_AUTOSELECT_JCC
-#define CONFIG_AUTOSELECT_JCC  1
+#ifdef CONFIG_VERBOSE_FINST
+#define OP_VERBOSE_ST0 OP_ST0
+#define OP_VERBOSE_ST1 OP_ST1
+#else /* CONFIG_VERBOSE_FINST */
+#define OP_VERBOSE_ST0 /* nothing */
+#define OP_VERBOSE_ST1 /* nothing */
+#endif /* !CONFIG_VERBOSE_FINST */
+
 
 #ifdef CONFIG_AUTOSELECT_JCC
 #define NAME_jc0 "o"   /* "o" */
@@ -459,11 +525,11 @@ PRIVATE struct instruction const ops[] = {
 	I(0x00, IF_MODRM,        "addb\t" OP_R8   OP_RM8),
 	I(0x01, IF_66|IF_MODRM,  "addw\t" OP_R16  OP_RM16),
 	I(0x01, IF_MODRM,        "addl\t" OP_R32  OP_RM32),
-	I(0x01, IF_REXW|IF_MODRM,"addq\t" OP_R64  OP_RM64),
+	I(0x01, IF_MODRM|IF_REXW,"addq\t" OP_R64  OP_RM64),
 	I(0x02, IF_MODRM,        "addb\t" OP_RM8  OP_R32),
 	I(0x03, IF_66|IF_MODRM,  "addw\t" OP_RM16 OP_R32),
 	I(0x03, IF_MODRM,        "addl\t" OP_RM32 OP_R32),
-	I(0x03, IF_REXW|IF_MODRM,"addq\t" OP_RM64 OP_R64),
+	I(0x03, IF_MODRM|IF_REXW,"addq\t" OP_RM64 OP_R64),
 	I(0x04, 0,               "addb\t" OP_U8   OP_AL),
 	I(0x05, IF_66,           "addw\t" OP_U16  OP_AX),
 	I(0x05, 0,               "addl\t" OP_U32  OP_EAX),
@@ -477,11 +543,11 @@ PRIVATE struct instruction const ops[] = {
 	I(0x08, IF_MODRM,        "orb\t" OP_R8   OP_RM8),
 	I(0x09, IF_66|IF_MODRM,  "orw\t" OP_R16  OP_RM16),
 	I(0x09, IF_MODRM,        "orl\t" OP_R32  OP_RM32),
-	I(0x09, IF_REXW|IF_MODRM,"orq\t" OP_R64  OP_RM64),
+	I(0x09, IF_MODRM|IF_REXW,"orq\t" OP_R64  OP_RM64),
 	I(0x0a, IF_MODRM,        "orb\t" OP_RM8  OP_R32),
 	I(0x0b, IF_66|IF_MODRM,  "orw\t" OP_RM16 OP_R32),
 	I(0x0b, IF_MODRM,        "orl\t" OP_RM32 OP_R32),
-	I(0x0b, IF_REXW|IF_MODRM,"orq\t" OP_RM64 OP_R64),
+	I(0x0b, IF_MODRM|IF_REXW,"orq\t" OP_RM64 OP_R64),
 	I(0x0c, 0,               "orb\t" OP_U8   OP_AL),
 	I(0x0d, IF_66,           "orw\t" OP_U16  OP_AX),
 	I(0x0d, 0,               "orl\t" OP_U32  OP_EAX),
@@ -493,11 +559,11 @@ PRIVATE struct instruction const ops[] = {
 	I(0x10, IF_MODRM,        "adcb\t" OP_R8   OP_RM8),
 	I(0x11, IF_66|IF_MODRM,  "adcw\t" OP_R16  OP_RM16),
 	I(0x11, IF_MODRM,        "adcl\t" OP_R32  OP_RM32),
-	I(0x11, IF_REXW|IF_MODRM,"adcq\t" OP_R64  OP_RM64),
+	I(0x11, IF_MODRM|IF_REXW,"adcq\t" OP_R64  OP_RM64),
 	I(0x12, IF_MODRM,        "adcb\t" OP_RM8  OP_R32),
 	I(0x13, IF_66|IF_MODRM,  "adcw\t" OP_RM16 OP_R32),
 	I(0x13, IF_MODRM,        "adcl\t" OP_RM32 OP_R32),
-	I(0x13, IF_REXW|IF_MODRM,"adcq\t" OP_RM64 OP_R64),
+	I(0x13, IF_MODRM|IF_REXW,"adcq\t" OP_RM64 OP_R64),
 	I(0x14, 0,               "adcb\t" OP_U8   OP_AL),
 	I(0x15, IF_66,           "adcw\t" OP_U16  OP_AX),
 	I(0x15, 0,               "adcl\t" OP_U32  OP_EAX),
@@ -511,11 +577,11 @@ PRIVATE struct instruction const ops[] = {
 	I(0x18, IF_MODRM,        "sbbb\t" OP_R8   OP_RM8),
 	I(0x19, IF_66|IF_MODRM,  "sbbw\t" OP_R16  OP_RM16),
 	I(0x19, IF_MODRM,        "sbbl\t" OP_R32  OP_RM32),
-	I(0x19, IF_REXW|IF_MODRM,"sbbq\t" OP_R64  OP_RM64),
+	I(0x19, IF_MODRM|IF_REXW,"sbbq\t" OP_R64  OP_RM64),
 	I(0x1a, IF_MODRM,        "sbbb\t" OP_RM8  OP_R32),
 	I(0x1b, IF_66|IF_MODRM,  "sbbw\t" OP_RM16 OP_R32),
 	I(0x1b, IF_MODRM,        "sbbl\t" OP_RM32 OP_R32),
-	I(0x1b, IF_REXW|IF_MODRM,"sbbq\t" OP_RM64 OP_R64),
+	I(0x1b, IF_MODRM|IF_REXW,"sbbq\t" OP_RM64 OP_R64),
 	I(0x1c, 0,               "sbbb\t" OP_U8   OP_AL),
 	I(0x1d, IF_66,           "sbbw\t" OP_U16  OP_AX),
 	I(0x1d, 0,               "sbbl\t" OP_U32  OP_EAX),
@@ -529,11 +595,11 @@ PRIVATE struct instruction const ops[] = {
 	I(0x20, IF_MODRM,        "andb\t" OP_R8   OP_RM8),
 	I(0x21, IF_66|IF_MODRM,  "andw\t" OP_R16  OP_RM16),
 	I(0x21, IF_MODRM,        "andl\t" OP_R32  OP_RM32),
-	I(0x21, IF_REXW|IF_MODRM,"andq\t" OP_R64  OP_RM64),
+	I(0x21, IF_MODRM|IF_REXW,"andq\t" OP_R64  OP_RM64),
 	I(0x22, IF_MODRM,        "andb\t" OP_RM8  OP_R32),
 	I(0x23, IF_66|IF_MODRM,  "andw\t" OP_RM16 OP_R32),
 	I(0x23, IF_MODRM,        "andl\t" OP_RM32 OP_R32),
-	I(0x23, IF_REXW|IF_MODRM,"andq\t" OP_RM64 OP_R64),
+	I(0x23, IF_MODRM|IF_REXW,"andq\t" OP_RM64 OP_R64),
 	I(0x24, 0,               "andb\t" OP_U8   OP_AL),
 	I(0x25, IF_66,           "andw\t" OP_U16  OP_AX),
 	I(0x25, 0,               "andl\t" OP_U32  OP_EAX),
@@ -545,11 +611,11 @@ PRIVATE struct instruction const ops[] = {
 	I(0x28, IF_MODRM,        "subb\t" OP_R8   OP_RM8),
 	I(0x29, IF_66|IF_MODRM,  "subw\t" OP_R16  OP_RM16),
 	I(0x29, IF_MODRM,        "subl\t" OP_R32  OP_RM32),
-	I(0x29, IF_REXW|IF_MODRM,"subq\t" OP_R64  OP_RM64),
+	I(0x29, IF_MODRM|IF_REXW,"subq\t" OP_R64  OP_RM64),
 	I(0x2a, IF_MODRM,        "subb\t" OP_RM8  OP_R32),
 	I(0x2b, IF_66|IF_MODRM,  "subw\t" OP_RM16 OP_R32),
 	I(0x2b, IF_MODRM,        "subl\t" OP_RM32 OP_R32),
-	I(0x2b, IF_REXW|IF_MODRM,"subq\t" OP_RM64 OP_R64),
+	I(0x2b, IF_MODRM|IF_REXW,"subq\t" OP_RM64 OP_R64),
 	I(0x2c, 0,               "subb\t" OP_U8   OP_AL),
 	I(0x2d, IF_66,           "subw\t" OP_U16  OP_AX),
 	I(0x2d, 0,               "subl\t" OP_U32  OP_EAX),
@@ -561,11 +627,11 @@ PRIVATE struct instruction const ops[] = {
 	I(0x30, IF_MODRM,        "xorb\t" OP_R8   OP_RM8),
 	I(0x31, IF_66|IF_MODRM,  "xorw\t" OP_R16  OP_RM16),
 	I(0x31, IF_MODRM,        "xorl\t" OP_R32  OP_RM32),
-	I(0x31, IF_REXW|IF_MODRM,"xorq\t" OP_R64  OP_RM64),
+	I(0x31, IF_MODRM|IF_REXW,"xorq\t" OP_R64  OP_RM64),
 	I(0x32, IF_MODRM,        "xorb\t" OP_RM8  OP_R32),
 	I(0x33, IF_66|IF_MODRM,  "xorw\t" OP_RM16 OP_R32),
 	I(0x33, IF_MODRM,        "xorl\t" OP_RM32 OP_R32),
-	I(0x33, IF_REXW|IF_MODRM,"xorq\t" OP_RM64 OP_R64),
+	I(0x33, IF_MODRM|IF_REXW,"xorq\t" OP_RM64 OP_R64),
 	I(0x34, 0,               "xorb\t" OP_U8   OP_AL),
 	I(0x35, IF_66,           "xorw\t" OP_U16  OP_AX),
 	I(0x35, 0,               "xorl\t" OP_U32  OP_EAX),
@@ -577,11 +643,11 @@ PRIVATE struct instruction const ops[] = {
 	I(0x38, IF_MODRM,        "cmpb\t" OP_R8   OP_RM8),
 	I(0x39, IF_66|IF_MODRM,  "cmpw\t" OP_R16  OP_RM16),
 	I(0x39, IF_MODRM,        "cmpl\t" OP_R32  OP_RM32),
-	I(0x39, IF_REXW|IF_MODRM,"cmpq\t" OP_R64  OP_RM64),
+	I(0x39, IF_MODRM|IF_REXW,"cmpq\t" OP_R64  OP_RM64),
 	I(0x3a, IF_MODRM,        "cmpb\t" OP_RM8  OP_R32),
 	I(0x3b, IF_66|IF_MODRM,  "cmpw\t" OP_RM16 OP_R32),
 	I(0x3b, IF_MODRM,        "cmpl\t" OP_RM32 OP_R32),
-	I(0x3b, IF_REXW|IF_MODRM,"cmpq\t" OP_RM64 OP_R64),
+	I(0x3b, IF_MODRM|IF_REXW,"cmpq\t" OP_RM64 OP_R64),
 	I(0x3c, 0,               "cmpb\t" OP_U8   OP_AL),
 	I(0x3d, IF_66,           "cmpw\t" OP_U16  OP_AX),
 	I(0x3d, 0,               "cmpl\t" OP_U32  OP_EAX),
@@ -712,13 +778,13 @@ PRIVATE struct instruction const ops[] = {
 
 	I(0x69, IF_66|IF_MODRM,  "imulw\t" OP_U16 OP_RM16 OP_R16),
 	I(0x69, IF_MODRM,        "imull\t" OP_U32 OP_RM32 OP_R32),
-	I(0x69, IF_REXW|IF_MODRM,"imulq\t" OP_S32 OP_RM64 OP_R64),
+	I(0x69, IF_MODRM|IF_REXW,"imulq\t" OP_S32 OP_RM64 OP_R64),
 
 	I(0x6a, 0,               "pushl\t" OP_S8),
 
 	I(0x6b, IF_66|IF_MODRM,  "imulw\t" OP_U8 OP_RM16 OP_R16),
 	I(0x6b, IF_MODRM,        "imull\t" OP_U8 OP_RM32 OP_R32),
-	I(0x6b, IF_REXW|IF_MODRM,"imulq\t" OP_U8 OP_RM64 OP_R64),
+	I(0x6b, IF_MODRM|IF_REXW,"imulq\t" OP_U8 OP_RM64 OP_R64),
 
 	I(0x6c, 0,               "insb"),
 	I(0x6c, IF_F3,           "rep insb"),
@@ -762,35 +828,35 @@ PRIVATE struct instruction const ops[] = {
 
 	I(0x81, IF_66|IF_MODRM|IF_REG0, "addw\t" OP_U16 OP_RM16),
 	I(0x81, IF_MODRM|IF_REG0, "addl\t" OP_U32 OP_RM32),
-	I(0x81, IF_REXW|IF_MODRM|IF_REG0, "addq\t" OP_S32 OP_RM32),
+	I(0x81, IF_MODRM|IF_REXW|IF_REG0, "addq\t" OP_S32 OP_RM32),
 
 	I(0x81, IF_66|IF_MODRM|IF_REG1, "orw\t"  OP_U16 OP_RM16),
 	I(0x81, IF_MODRM|IF_REG1, "orl\t"  OP_U32 OP_RM32),
-	I(0x81, IF_REXW|IF_MODRM|IF_REG1, "orq\t"  OP_S32 OP_RM32),
+	I(0x81, IF_MODRM|IF_REXW|IF_REG1, "orq\t"  OP_S32 OP_RM32),
 
 	I(0x81, IF_66|IF_MODRM|IF_REG2, "adcw\t" OP_U16 OP_RM16),
 	I(0x81, IF_MODRM|IF_REG2, "adcl\t" OP_U32 OP_RM32),
-	I(0x81, IF_REXW|IF_MODRM|IF_REG2, "adcq\t" OP_S32 OP_RM32),
+	I(0x81, IF_MODRM|IF_REXW|IF_REG2, "adcq\t" OP_S32 OP_RM32),
 
 	I(0x81, IF_66|IF_MODRM|IF_REG3, "sbbw\t" OP_U16 OP_RM16),
 	I(0x81, IF_MODRM|IF_REG3, "sbbl\t" OP_U32 OP_RM32),
-	I(0x81, IF_REXW|IF_MODRM|IF_REG3, "sbbq\t" OP_S32 OP_RM32),
+	I(0x81, IF_MODRM|IF_REXW|IF_REG3, "sbbq\t" OP_S32 OP_RM32),
 
 	I(0x81, IF_66|IF_MODRM|IF_REG4, "andw\t" OP_U16 OP_RM16),
 	I(0x81, IF_MODRM|IF_REG4, "andl\t" OP_U32 OP_RM32),
-	I(0x81, IF_REXW|IF_MODRM|IF_REG4, "andq\t" OP_S32 OP_RM32),
+	I(0x81, IF_MODRM|IF_REXW|IF_REG4, "andq\t" OP_S32 OP_RM32),
 
 	I(0x81, IF_66|IF_MODRM|IF_REG5, "subw\t" OP_U16 OP_RM16),
 	I(0x81, IF_MODRM|IF_REG5, "subl\t" OP_U32 OP_RM32),
-	I(0x81, IF_REXW|IF_MODRM|IF_REG5, "subq\t" OP_S32 OP_RM32),
+	I(0x81, IF_MODRM|IF_REXW|IF_REG5, "subq\t" OP_S32 OP_RM32),
 
 	I(0x81, IF_66|IF_MODRM|IF_REG6, "xorw\t" OP_U16 OP_RM16),
 	I(0x81, IF_MODRM|IF_REG6, "xorl\t" OP_U32 OP_RM32),
-	I(0x81, IF_REXW|IF_MODRM|IF_REG6, "xorq\t" OP_S32 OP_RM32),
+	I(0x81, IF_MODRM|IF_REXW|IF_REG6, "xorq\t" OP_S32 OP_RM32),
 
 	I(0x81, IF_66|IF_MODRM|IF_REG7, "cmpw\t" OP_U16 OP_RM16),
 	I(0x81, IF_MODRM|IF_REG7, "cmpl\t" OP_U32 OP_RM32),
-	I(0x81, IF_REXW|IF_MODRM|IF_REG7, "cmpq\t" OP_S32 OP_RM32),
+	I(0x81, IF_MODRM|IF_REXW|IF_REG7, "cmpq\t" OP_S32 OP_RM32),
 
 	/* 0x82 is an alias for 0x80, but is only valid in 32-bit mode (not in 64-bit mode!) */
 	I(0x82, IF_X32|IF_MODRM|IF_REG0, "addb\t" OP_U8 OP_RM8),
@@ -804,74 +870,74 @@ PRIVATE struct instruction const ops[] = {
 
 	I(0x83, IF_66|IF_MODRM|IF_REG0, "addw\t" OP_S8 OP_RM16),
 	I(0x83, IF_MODRM|IF_REG0, "addl\t" OP_S8 OP_RM32),
-	I(0x83, IF_REXW|IF_MODRM|IF_REG0, "addq\t" OP_S8 OP_RM64),
+	I(0x83, IF_MODRM|IF_REXW|IF_REG0, "addq\t" OP_S8 OP_RM64),
 
 	I(0x83, IF_66|IF_MODRM|IF_REG1, "orw\t"  OP_S8 OP_RM16),
 	I(0x83, IF_MODRM|IF_REG1, "orl\t"  OP_S8 OP_RM32),
-	I(0x83, IF_REXW|IF_MODRM|IF_REG1, "orq\t"  OP_S8 OP_RM64),
+	I(0x83, IF_MODRM|IF_REXW|IF_REG1, "orq\t"  OP_S8 OP_RM64),
 
 	I(0x83, IF_66|IF_MODRM|IF_REG2, "adcw\t" OP_S8 OP_RM16),
 	I(0x83, IF_MODRM|IF_REG2, "adcl\t" OP_S8 OP_RM32),
-	I(0x83, IF_REXW|IF_MODRM|IF_REG2, "adcq\t" OP_S8 OP_RM64),
+	I(0x83, IF_MODRM|IF_REXW|IF_REG2, "adcq\t" OP_S8 OP_RM64),
 
 	I(0x83, IF_66|IF_MODRM|IF_REG3, "sbbw\t" OP_S8 OP_RM16),
 	I(0x83, IF_MODRM|IF_REG3, "sbbl\t" OP_S8 OP_RM32),
-	I(0x83, IF_REXW|IF_MODRM|IF_REG3, "sbbq\t" OP_S8 OP_RM64),
+	I(0x83, IF_MODRM|IF_REXW|IF_REG3, "sbbq\t" OP_S8 OP_RM64),
 
 	I(0x83, IF_66|IF_MODRM|IF_REG4, "andw\t" OP_S8 OP_RM16),
 	I(0x83, IF_MODRM|IF_REG4, "andl\t" OP_S8 OP_RM32),
-	I(0x83, IF_REXW|IF_MODRM|IF_REG4, "andq\t" OP_S8 OP_RM64),
+	I(0x83, IF_MODRM|IF_REXW|IF_REG4, "andq\t" OP_S8 OP_RM64),
 
 	I(0x83, IF_66|IF_MODRM|IF_REG5, "subw\t" OP_S8 OP_RM16),
 	I(0x83, IF_MODRM|IF_REG5, "subl\t" OP_S8 OP_RM32),
-	I(0x83, IF_REXW|IF_MODRM|IF_REG5, "subq\t" OP_S8 OP_RM64),
+	I(0x83, IF_MODRM|IF_REXW|IF_REG5, "subq\t" OP_S8 OP_RM64),
 
 	I(0x83, IF_66|IF_MODRM|IF_REG6, "xorw\t" OP_S8 OP_RM16),
 	I(0x83, IF_MODRM|IF_REG6, "xorl\t" OP_S8 OP_RM32),
-	I(0x83, IF_REXW|IF_MODRM|IF_REG6, "xorq\t" OP_S8 OP_RM64),
+	I(0x83, IF_MODRM|IF_REXW|IF_REG6, "xorq\t" OP_S8 OP_RM64),
 
 	I(0x83, IF_66|IF_MODRM|IF_REG7, "cmpw\t" OP_S8 OP_RM16),
 	I(0x83, IF_MODRM|IF_REG7, "cmpl\t" OP_S8 OP_RM32),
-	I(0x83, IF_REXW|IF_MODRM|IF_REG7, "cmpq\t" OP_S8 OP_RM64),
+	I(0x83, IF_MODRM|IF_REXW|IF_REG7, "cmpq\t" OP_S8 OP_RM64),
 
 	I(0x84, IF_MODRM,         "testb\t" OP_R8 OP_RM8),
 	I(0x85, IF_66|IF_MODRM,   "testw\t" OP_R16 OP_RM16),
 	I(0x85, IF_MODRM,         "testl\t" OP_R32 OP_RM32),
-	I(0x85, IF_REXW|IF_MODRM, "testq\t" OP_R64 OP_RM64),
+	I(0x85, IF_MODRM|IF_REXW, "testq\t" OP_R64 OP_RM64),
 
 	I(0x86, IF_MODRM,         "xchgb\t" OP_R8 OP_RM8),
 	I(0x87, IF_66|IF_MODRM,   "xchgw\t" OP_R16 OP_RM16),
 	I(0x87, IF_MODRM,         "xchgl\t" OP_R32 OP_RM32),
-	I(0x87, IF_REXW|IF_MODRM, "xchgq\t" OP_R64 OP_RM64),
+	I(0x87, IF_MODRM|IF_REXW, "xchgq\t" OP_R64 OP_RM64),
 
 	I(0x88, IF_MODRM,         "movb\t" OP_R8 OP_RM8),
 	I(0x89, IF_66|IF_MODRM,   "movw\t" OP_R16 OP_RM16),
 	I(0x89, IF_MODRM,         "movl\t" OP_R32 OP_RM32),
-	I(0x89, IF_REXW|IF_MODRM, "movq\t" OP_R64 OP_RM64),
+	I(0x89, IF_MODRM|IF_REXW, "movq\t" OP_R64 OP_RM64),
 
 	I(0x8a, IF_MODRM,         "movb\t" OP_RM8 OP_R8),
 	I(0x8b, IF_66|IF_MODRM,   "movw\t" OP_RM16 OP_R16),
 	I(0x8b, IF_MODRM,         "movl\t" OP_RM32 OP_R32),
-	I(0x8b, IF_REXW|IF_MODRM, "movq\t" OP_RM64 OP_R64),
+	I(0x8b, IF_MODRM|IF_REXW, "movq\t" OP_RM64 OP_R64),
 
 	I(0x8c, IF_66|IF_MODRM,   "movw\t" OP_RSEG OP_RM16),
 	I(0x8c, IF_MODRM,         "movl\t" OP_RSEG OP_RM32),
-	I(0x8c, IF_REXW|IF_MODRM, "movq\t" OP_RSEG OP_RM64),
+	I(0x8c, IF_MODRM|IF_REXW, "movq\t" OP_RSEG OP_RM64),
 
 	I(0x8d, IF_66|IF_MODRM,   "leaw\t" OP_RM16 OP_R16),
 	I(0x8d, IF_MODRM,         "leal\t" OP_RM32 OP_R32),
-	I(0x8d, IF_REXW|IF_MODRM, "leaq\t" OP_RM64 OP_R64),
+	I(0x8d, IF_MODRM|IF_REXW, "leaq\t" OP_RM64 OP_R64),
 
 	I(0x8e, IF_66|IF_MODRM,   "movw\t" OP_RM16 OP_RSEG),
 	I(0x8e, IF_MODRM,         "movl\t" OP_RM32 OP_RSEG),
-	I(0x8e, IF_REXW|IF_MODRM, "movq\t" OP_RM64 OP_RSEG),
+	I(0x8e, IF_MODRM|IF_REXW, "movq\t" OP_RM64 OP_RSEG),
 
 	I(0x8f, IF_66|IF_MODRM,         "popw\t" OP_RM16),
 	I(0x8f, IF_MODRM,               "popl\t" OP_RM32),
-	I(0x8f, IF_REXW|IF_MODRM,       "popq\t" OP_RM64),
+	I(0x8f, IF_MODRM|IF_REXW,       "popq\t" OP_RM64),
 	I(0x8f, IF_67|IF_66|IF_MODRM,   "popw\t" OP_RM16),
 	I(0x8f, IF_67|IF_MODRM,         "popl\t" OP_RM32),
-	I(0x8f, IF_67|IF_REXW|IF_MODRM, "popq\t" OP_RM64),
+	I(0x8f, IF_67|IF_MODRM|IF_REXW, "popq\t" OP_RM64),
 
 	I(0x90, 0,                "nop"),
 	I(0x90, IF_F3,            "pause"),
@@ -1092,35 +1158,35 @@ PRIVATE struct instruction const ops[] = {
 
 	I(0xc1, IF_66|IF_MODRM|IF_REG0, "rolw\t" OP_U8 OP_RM16),
 	I(0xc1, IF_MODRM|IF_REG0, "roll\t" OP_U8 OP_RM32),
-	I(0xc1, IF_REXW|IF_MODRM|IF_REG0, "rolq\t" OP_U8 OP_RM64),
+	I(0xc1, IF_MODRM|IF_REXW|IF_REG0, "rolq\t" OP_U8 OP_RM64),
 
 	I(0xc1, IF_66|IF_MODRM|IF_REG1, "rorw\t" OP_U8 OP_RM16),
 	I(0xc1, IF_MODRM|IF_REG1, "rorl\t" OP_U8 OP_RM32),
-	I(0xc1, IF_REXW|IF_MODRM|IF_REG1, "rorq\t" OP_U8 OP_RM64),
+	I(0xc1, IF_MODRM|IF_REXW|IF_REG1, "rorq\t" OP_U8 OP_RM64),
 
 	I(0xc1, IF_66|IF_MODRM|IF_REG2, "rclw\t" OP_U8 OP_RM16),
 	I(0xc1, IF_MODRM|IF_REG2, "rcll\t" OP_U8 OP_RM32),
-	I(0xc1, IF_REXW|IF_MODRM|IF_REG2, "rclq\t" OP_U8 OP_RM64),
+	I(0xc1, IF_MODRM|IF_REXW|IF_REG2, "rclq\t" OP_U8 OP_RM64),
 
 	I(0xc1, IF_66|IF_MODRM|IF_REG3, "rcrw\t" OP_U8 OP_RM16),
 	I(0xc1, IF_MODRM|IF_REG3, "rcrl\t" OP_U8 OP_RM32),
-	I(0xc1, IF_REXW|IF_MODRM|IF_REG3, "rcrq\t" OP_U8 OP_RM64),
+	I(0xc1, IF_MODRM|IF_REXW|IF_REG3, "rcrq\t" OP_U8 OP_RM64),
 
 	I(0xc1, IF_66|IF_MODRM|IF_REG4, "salw\t" OP_U8 OP_RM16),
 	I(0xc1, IF_MODRM|IF_REG4, "sall\t" OP_U8 OP_RM32),
-	I(0xc1, IF_REXW|IF_MODRM|IF_REG4, "salq\t" OP_U8 OP_RM64),
+	I(0xc1, IF_MODRM|IF_REXW|IF_REG4, "salq\t" OP_U8 OP_RM64),
 
 	I(0xc1, IF_66|IF_MODRM|IF_REG5, "shrw\t" OP_U8 OP_RM16),
 	I(0xc1, IF_MODRM|IF_REG5, "shrl\t" OP_U8 OP_RM32),
-	I(0xc1, IF_REXW|IF_MODRM|IF_REG5, "shrq\t" OP_U8 OP_RM64),
+	I(0xc1, IF_MODRM|IF_REXW|IF_REG5, "shrq\t" OP_U8 OP_RM64),
 
 	I(0xc1, IF_66|IF_MODRM|IF_REG6, "shlw\t" OP_U8 OP_RM16),
 	I(0xc1, IF_MODRM|IF_REG6, "shll\t" OP_U8 OP_RM32),
-	I(0xc1, IF_REXW|IF_MODRM|IF_REG6, "shlq\t" OP_U8 OP_RM64),
+	I(0xc1, IF_MODRM|IF_REXW|IF_REG6, "shlq\t" OP_U8 OP_RM64),
 
 	I(0xc1, IF_66|IF_MODRM|IF_REG7, "sarw\t" OP_U8 OP_RM16),
 	I(0xc1, IF_MODRM|IF_REG7, "sarl\t" OP_U8 OP_RM32),
-	I(0xc1, IF_REXW|IF_MODRM|IF_REG7, "sarq\t" OP_U8 OP_RM64),
+	I(0xc1, IF_MODRM|IF_REXW|IF_REG7, "sarq\t" OP_U8 OP_RM64),
 
 	I(0xc2, IF_66,            "retw\t" OP_U16),
 	I(0xc2, 0,                "ret\t" OP_U16),
@@ -1137,7 +1203,7 @@ PRIVATE struct instruction const ops[] = {
 
 	I(0xc7, IF_66|IF_MODRM|IF_REG0,  "movw\t" OP_U16 OP_RM16),
 	I(0xc7, IF_MODRM|IF_REG0,        "movl\t" OP_U32 OP_RM32),
-	I(0xc7, IF_REXW|IF_MODRM|IF_REG0,"movq\t" OP_S32 OP_RM64),
+	I(0xc7, IF_MODRM|IF_REXW|IF_REG0,"movq\t" OP_S32 OP_RM64),
 	I(0xc7, IF_BYTE2|IF_66,   "\xf8" "xbeginw\t" OP_DISP16),
 	I(0xc7, IF_BYTE2,         "\xf8" "xbegin\t" OP_DISP32),
 
@@ -1164,35 +1230,35 @@ PRIVATE struct instruction const ops[] = {
 
 	I(0xd1, IF_66|IF_MODRM|IF_REG0, "rolw\t" OP_IMM1 OP_RM16),
 	I(0xd1, IF_MODRM|IF_REG0, "roll\t" OP_IMM1 OP_RM32),
-	I(0xd1, IF_REXW|IF_MODRM|IF_REG0, "rolq\t" OP_IMM1 OP_RM64),
+	I(0xd1, IF_MODRM|IF_REXW|IF_REG0, "rolq\t" OP_IMM1 OP_RM64),
 
 	I(0xd1, IF_66|IF_MODRM|IF_REG1, "rorw\t" OP_IMM1 OP_RM16),
 	I(0xd1, IF_MODRM|IF_REG1, "rorl\t" OP_IMM1 OP_RM32),
-	I(0xd1, IF_REXW|IF_MODRM|IF_REG1, "rorq\t" OP_IMM1 OP_RM64),
+	I(0xd1, IF_MODRM|IF_REXW|IF_REG1, "rorq\t" OP_IMM1 OP_RM64),
 
 	I(0xd1, IF_66|IF_MODRM|IF_REG2, "rclw\t" OP_IMM1 OP_RM16),
 	I(0xd1, IF_MODRM|IF_REG2, "rcll\t" OP_IMM1 OP_RM32),
-	I(0xd1, IF_REXW|IF_MODRM|IF_REG2, "rclq\t" OP_IMM1 OP_RM64),
+	I(0xd1, IF_MODRM|IF_REXW|IF_REG2, "rclq\t" OP_IMM1 OP_RM64),
 
 	I(0xd1, IF_66|IF_MODRM|IF_REG3, "rcrw\t" OP_IMM1 OP_RM16),
 	I(0xd1, IF_MODRM|IF_REG3, "rcrl\t" OP_IMM1 OP_RM32),
-	I(0xd1, IF_REXW|IF_MODRM|IF_REG3, "rcrq\t" OP_IMM1 OP_RM64),
+	I(0xd1, IF_MODRM|IF_REXW|IF_REG3, "rcrq\t" OP_IMM1 OP_RM64),
 
 	I(0xd1, IF_66|IF_MODRM|IF_REG4, "shlw\t" OP_IMM1 OP_RM16),
 	I(0xd1, IF_MODRM|IF_REG4, "shll\t" OP_IMM1 OP_RM32),
-	I(0xd1, IF_REXW|IF_MODRM|IF_REG4, "shlq\t" OP_IMM1 OP_RM64),
+	I(0xd1, IF_MODRM|IF_REXW|IF_REG4, "shlq\t" OP_IMM1 OP_RM64),
 
 	I(0xd1, IF_66|IF_MODRM|IF_REG5, "shrw\t" OP_IMM1 OP_RM16),
 	I(0xd1, IF_MODRM|IF_REG5, "shrl\t" OP_IMM1 OP_RM32),
-	I(0xd1, IF_REXW|IF_MODRM|IF_REG5, "shrq\t" OP_IMM1 OP_RM64),
+	I(0xd1, IF_MODRM|IF_REXW|IF_REG5, "shrq\t" OP_IMM1 OP_RM64),
 
 	I(0xd1, IF_66|IF_MODRM|IF_REG6, "salw\t" OP_IMM1 OP_RM16),
 	I(0xd1, IF_MODRM|IF_REG6, "sall\t" OP_IMM1 OP_RM32),
-	I(0xd1, IF_REXW|IF_MODRM|IF_REG6, "salq\t" OP_IMM1 OP_RM64),
+	I(0xd1, IF_MODRM|IF_REXW|IF_REG6, "salq\t" OP_IMM1 OP_RM64),
 
 	I(0xd1, IF_66|IF_MODRM|IF_REG7, "sarw\t" OP_IMM1 OP_RM16),
 	I(0xd1, IF_MODRM|IF_REG7, "sarl\t" OP_IMM1 OP_RM32),
-	I(0xd1, IF_REXW|IF_MODRM|IF_REG7, "sarq\t" OP_IMM1 OP_RM64),
+	I(0xd1, IF_MODRM|IF_REXW|IF_REG7, "sarq\t" OP_IMM1 OP_RM64),
 
 	I(0xd2, IF_MODRM|IF_REG0, "rolb\t" OP_CL OP_RM8),
 	I(0xd2, IF_MODRM|IF_REG1, "rorb\t" OP_CL OP_RM8),
@@ -1205,35 +1271,35 @@ PRIVATE struct instruction const ops[] = {
 
 	I(0xd3, IF_66|IF_MODRM|IF_REG0, "rolw\t" OP_CL OP_RM16),
 	I(0xd3, IF_MODRM|IF_REG0, "roll\t" OP_CL OP_RM32),
-	I(0xd3, IF_REXW|IF_MODRM|IF_REG0, "rolq\t" OP_CL OP_RM64),
+	I(0xd3, IF_MODRM|IF_REXW|IF_REG0, "rolq\t" OP_CL OP_RM64),
 
 	I(0xd3, IF_66|IF_MODRM|IF_REG1, "rorw\t" OP_CL OP_RM16),
 	I(0xd3, IF_MODRM|IF_REG1, "rorl\t" OP_CL OP_RM32),
-	I(0xd3, IF_REXW|IF_MODRM|IF_REG1, "rorq\t" OP_CL OP_RM64),
+	I(0xd3, IF_MODRM|IF_REXW|IF_REG1, "rorq\t" OP_CL OP_RM64),
 
 	I(0xd3, IF_66|IF_MODRM|IF_REG2, "rclw\t" OP_CL OP_RM16),
 	I(0xd3, IF_MODRM|IF_REG2, "rcll\t" OP_CL OP_RM32),
-	I(0xd3, IF_REXW|IF_MODRM|IF_REG2, "rclq\t" OP_CL OP_RM64),
+	I(0xd3, IF_MODRM|IF_REXW|IF_REG2, "rclq\t" OP_CL OP_RM64),
 
 	I(0xd3, IF_66|IF_MODRM|IF_REG3, "rcrw\t" OP_CL OP_RM16),
 	I(0xd3, IF_MODRM|IF_REG3, "rcrl\t" OP_CL OP_RM32),
-	I(0xd3, IF_REXW|IF_MODRM|IF_REG3, "rcrq\t" OP_CL OP_RM64),
+	I(0xd3, IF_MODRM|IF_REXW|IF_REG3, "rcrq\t" OP_CL OP_RM64),
 
 	I(0xd3, IF_66|IF_MODRM|IF_REG4, "shlw\t" OP_CL OP_RM16),
 	I(0xd3, IF_MODRM|IF_REG4, "shll\t" OP_CL OP_RM32),
-	I(0xd3, IF_REXW|IF_MODRM|IF_REG4, "shlq\t" OP_CL OP_RM64),
+	I(0xd3, IF_MODRM|IF_REXW|IF_REG4, "shlq\t" OP_CL OP_RM64),
 
 	I(0xd3, IF_66|IF_MODRM|IF_REG5, "shrw\t" OP_CL OP_RM16),
 	I(0xd3, IF_MODRM|IF_REG5, "shrl\t" OP_CL OP_RM32),
-	I(0xd3, IF_REXW|IF_MODRM|IF_REG5, "shrq\t" OP_CL OP_RM64),
+	I(0xd3, IF_MODRM|IF_REXW|IF_REG5, "shrq\t" OP_CL OP_RM64),
 
 	I(0xd3, IF_66|IF_MODRM|IF_REG6, "salw\t" OP_CL OP_RM16),
 	I(0xd3, IF_MODRM|IF_REG6, "sall\t" OP_CL OP_RM32),
-	I(0xd3, IF_REXW|IF_MODRM|IF_REG6, "salq\t" OP_CL OP_RM64),
+	I(0xd3, IF_MODRM|IF_REXW|IF_REG6, "salq\t" OP_CL OP_RM64),
 
 	I(0xd3, IF_66|IF_MODRM|IF_REG7, "sarw\t" OP_CL OP_RM16),
 	I(0xd3, IF_MODRM|IF_REG7, "sarl\t" OP_CL OP_RM32),
-	I(0xd3, IF_REXW|IF_MODRM|IF_REG7, "sarq\t" OP_CL OP_RM64),
+	I(0xd3, IF_MODRM|IF_REXW|IF_REG7, "sarq\t" OP_CL OP_RM64),
 
 	I(0xd4, 0,                "aam\t" OP_U8),
 	I(0xd5, 0,                "aad\t" OP_U8),
@@ -1241,22 +1307,22 @@ PRIVATE struct instruction const ops[] = {
 	I(0xd7, 0,                "xlatb"),
 
 	I(0xd8, IF_MODRM|IF_RMR|IF_REG0, "fadd\t" OP_RMSTi OP_ST0),
-	I(0xd8, IF_MODRM|IF_RMM|IF_REG0, "faddl\t" OP_RMSTi /*OP_ST0*/),
+	I(0xd8, IF_MODRM|IF_RMM|IF_REG0, "faddl\t" OP_RMSTi OP_VERBOSE_ST0),
 	I(0xd8, IF_MODRM|IF_RMR|IF_REG1, "fmul\t" OP_RMSTi OP_ST0),
-	I(0xd8, IF_MODRM|IF_RMM|IF_REG1, "fmull\t" OP_RM32 /*OP_ST0*/),
+	I(0xd8, IF_MODRM|IF_RMM|IF_REG1, "fmull\t" OP_RM32 OP_VERBOSE_ST0),
 
-	I(0xd8, IF_MODRM|IF_RMR|IF_REG2, "fcom\t" OP_RMSTi /*OP_ST0*/),
-	I(0xd8, IF_MODRM|IF_RMM|IF_REG2, "fcoml\t" OP_RM32 /*OP_ST0*/),
-	I(0xd8, IF_MODRM|IF_RMR|IF_REG3, "fcomp\t" OP_RMSTi /*OP_ST0*/),
-	I(0xd8, IF_MODRM|IF_RMM|IF_REG3, "fcompl\t" OP_RM32 /*OP_ST0*/),
+	I(0xd8, IF_MODRM|IF_RMR|IF_REG2, "fcom\t" OP_RMSTi OP_VERBOSE_ST0),
+	I(0xd8, IF_MODRM|IF_RMM|IF_REG2, "fcoml\t" OP_RM32 OP_VERBOSE_ST0),
+	I(0xd8, IF_MODRM|IF_RMR|IF_REG3, "fcomp\t" OP_RMSTi OP_VERBOSE_ST0),
+	I(0xd8, IF_MODRM|IF_RMM|IF_REG3, "fcompl\t" OP_RM32 OP_VERBOSE_ST0),
 	I(0xd8, IF_MODRM|IF_RMR|IF_REG4, "fsub\t" OP_RMSTi OP_ST0),
-	I(0xd8, IF_MODRM|IF_RMM|IF_REG4, "fsubl\t" OP_RM32 /*OP_ST0*/),
+	I(0xd8, IF_MODRM|IF_RMM|IF_REG4, "fsubl\t" OP_RM32 OP_VERBOSE_ST0),
 	I(0xd8, IF_MODRM|IF_RMR|IF_REG5, "fsubr\t" OP_RMSTi OP_ST0),
-	I(0xd8, IF_MODRM|IF_RMM|IF_REG5, "fsubrl\t" OP_RM32 /*OP_ST0*/),
-	I(0xd8, IF_MODRM|IF_RMR|IF_REG6, "fdiv\t" OP_RMSTi /*OP_ST0*/),
-	I(0xd8, IF_MODRM|IF_RMM|IF_REG6, "fdivl\t" OP_RM32 /*OP_ST0*/),
-	I(0xd8, IF_MODRM|IF_RMR|IF_REG7, "fdivr\t" OP_RMSTi /*OP_ST0*/),
-	I(0xd8, IF_MODRM|IF_RMM|IF_REG7, "fdivrl\t" OP_RM32 /*OP_ST0*/),
+	I(0xd8, IF_MODRM|IF_RMM|IF_REG5, "fsubrl\t" OP_RM32 OP_VERBOSE_ST0),
+	I(0xd8, IF_MODRM|IF_RMR|IF_REG6, "fdiv\t" OP_RMSTi OP_VERBOSE_ST0),
+	I(0xd8, IF_MODRM|IF_RMM|IF_REG6, "fdivl\t" OP_RM32 OP_VERBOSE_ST0),
+	I(0xd8, IF_MODRM|IF_RMR|IF_REG7, "fdivr\t" OP_RMSTi OP_VERBOSE_ST0),
+	I(0xd8, IF_MODRM|IF_RMM|IF_REG7, "fdivrl\t" OP_RM32 OP_VERBOSE_ST0),
 
 	I(0xd9, IF_BYTE2,        "\xc0" "fld" OP_ST0),
 	I(0xd9, IF_BYTE2,        "\xc1" "fld" OP_ST1),
@@ -1312,20 +1378,20 @@ PRIVATE struct instruction const ops[] = {
 	I(0xd9, IF_MODRM|IF_RMM|IF_REG6, "fnstenv108\t" OP_MEM),
 	I(0xd9, IF_MODRM|IF_RMM|IF_REG7, "fnstcww\t" OP_RM16),
 
-	I(0xda, IF_BYTE2, "\xe9" "fucompp\t" /*OP_ST1 OP_ST0*/),
-	I(0xda, IF_MODRM|IF_RMM|IF_REG0, "fiaddl\t" OP_RM32 /*OP_ST0*/),
+	I(0xda, IF_BYTE2, LONGREPR_B(0xe9, LO_FUCOMPP)), /* fucompp %st(1), %st(0) */
+	I(0xda, IF_MODRM|IF_RMM|IF_REG0, "fiaddl\t" OP_RM32 OP_VERBOSE_ST0),
 	I(0xda, IF_MODRM|IF_RMR|IF_REG0, "fcmovb\t" OP_RMSTi OP_ST0),
 	I(0xda, IF_MODRM|IF_RMR|IF_REG1, "fcmove\t" OP_RMSTi OP_ST0),
 	I(0xda, IF_MODRM|IF_RMR|IF_REG2, "fcmovbe\t" OP_RMSTi OP_ST0),
 	I(0xda, IF_MODRM|IF_RMR|IF_REG3, "fcmovu\t" OP_RMSTi OP_ST0),
 
-	I(0xda, IF_MODRM|IF_RMM|IF_REG1, "fimull\t" OP_RM32 /*OP_ST0*/),
-	I(0xda, IF_MODRM|IF_RMM|IF_REG2, "ficoml\t" OP_RM32 /*OP_ST0*/),
-	I(0xda, IF_MODRM|IF_RMM|IF_REG3, "ficompl\t" OP_RM32 /*OP_ST0*/),
-	I(0xda, IF_MODRM|IF_RMM|IF_REG4, "fisubl\t" OP_RM32 /*OP_ST0*/),
-	I(0xda, IF_MODRM|IF_RMM|IF_REG5, "fisubrl\t" OP_RM32 /*OP_ST0*/),
-	I(0xda, IF_MODRM|IF_RMM|IF_REG6, "fidivl\t" OP_RM32 /*OP_ST0*/),
-	I(0xda, IF_MODRM|IF_RMM|IF_REG7, "fidivrl\t" OP_RM32 /*OP_ST0*/),
+	I(0xda, IF_MODRM|IF_RMM|IF_REG1, "fimull\t" OP_RM32 OP_VERBOSE_ST0),
+	I(0xda, IF_MODRM|IF_RMM|IF_REG2, "ficoml\t" OP_RM32 OP_VERBOSE_ST0),
+	I(0xda, IF_MODRM|IF_RMM|IF_REG3, "ficompl\t" OP_RM32 OP_VERBOSE_ST0),
+	I(0xda, IF_MODRM|IF_RMM|IF_REG4, "fisubl\t" OP_RM32 OP_VERBOSE_ST0),
+	I(0xda, IF_MODRM|IF_RMM|IF_REG5, "fisubrl\t" OP_RM32 OP_VERBOSE_ST0),
+	I(0xda, IF_MODRM|IF_RMM|IF_REG6, "fidivl\t" OP_RM32 OP_VERBOSE_ST0),
+	I(0xda, IF_MODRM|IF_RMM|IF_REG7, "fidivrl\t" OP_RM32 OP_VERBOSE_ST0),
 
 	I(0xdb, IF_BYTE2,  "\xe2" "fnclex"),
 	I(0xdb, IF_BYTE2,  "\xe3" "fninit"),
@@ -1353,19 +1419,19 @@ PRIVATE struct instruction const ops[] = {
 	I(0xdb, IF_MODRM|IF_RMM|IF_REG7, "fstp80" OP_MEM),
 
 	I(0xdc, IF_MODRM|IF_RMR|IF_REG0, "fadd\t" OP_ST0 OP_RMSTi),
-	I(0xdc, IF_MODRM|IF_RMM|IF_REG0, "faddq\t" OP_RM64 /*OP_ST0*/),
+	I(0xdc, IF_MODRM|IF_RMM|IF_REG0, "faddq\t" OP_RM64 OP_VERBOSE_ST0),
 	I(0xdc, IF_MODRM|IF_RMR|IF_REG1, "fmul\t" OP_ST0 OP_RMSTi),
-	I(0xdc, IF_MODRM|IF_RMM|IF_REG1, "fmulq\t" OP_RM64 /*OP_ST0*/),
-	I(0xdc, IF_MODRM|IF_RMM|IF_REG2, "fcomq\t" OP_RM64 /*OP_ST0*/),
-	I(0xdc, IF_MODRM|IF_RMM|IF_REG3, "fcompq\t" OP_RM64 /*OP_ST0*/),
+	I(0xdc, IF_MODRM|IF_RMM|IF_REG1, "fmulq\t" OP_RM64 OP_VERBOSE_ST0),
+	I(0xdc, IF_MODRM|IF_RMM|IF_REG2, "fcomq\t" OP_RM64 OP_VERBOSE_ST0),
+	I(0xdc, IF_MODRM|IF_RMM|IF_REG3, "fcompq\t" OP_RM64 OP_VERBOSE_ST0),
 	I(0xdc, IF_MODRM|IF_RMR|IF_REG4, "fsub\t" OP_ST0 OP_RMSTi),
-	I(0xdc, IF_MODRM|IF_RMM|IF_REG4, "fsubq\t" OP_RM64 /*OP_ST0*/),
+	I(0xdc, IF_MODRM|IF_RMM|IF_REG4, "fsubq\t" OP_RM64 OP_VERBOSE_ST0),
 	I(0xdc, IF_MODRM|IF_RMR|IF_REG5, "fsubr\t" OP_ST0 OP_RMSTi),
-	I(0xdc, IF_MODRM|IF_RMM|IF_REG5, "fsubrq\t" OP_RM64 /*OP_ST0*/),
-	I(0xdc, IF_MODRM|IF_RMR|IF_REG6, "fdiv\t" OP_RMSTi /*OP_ST0*/),
-	I(0xdc, IF_MODRM|IF_RMM|IF_REG6, "fdivq\t" OP_RM64 /*OP_ST0*/),
-	I(0xdc, IF_MODRM|IF_RMR|IF_REG7, "fdivr\t" OP_RMSTi /*OP_ST0*/),
-	I(0xdc, IF_MODRM|IF_RMM|IF_REG7, "fdivrq\t" OP_RM64 /*OP_ST0*/),
+	I(0xdc, IF_MODRM|IF_RMM|IF_REG5, "fsubrq\t" OP_RM64 OP_VERBOSE_ST0),
+	I(0xdc, IF_MODRM|IF_RMR|IF_REG6, "fdiv\t" OP_RMSTi OP_VERBOSE_ST0),
+	I(0xdc, IF_MODRM|IF_RMM|IF_REG6, "fdivq\t" OP_RM64 OP_VERBOSE_ST0),
+	I(0xdc, IF_MODRM|IF_RMR|IF_REG7, "fdivr\t" OP_RMSTi OP_VERBOSE_ST0),
+	I(0xdc, IF_MODRM|IF_RMM|IF_REG7, "fdivrq\t" OP_RM64 OP_VERBOSE_ST0),
 
 	I(0xdd, IF_BYTE2, "\xc0" "ffree\t" OP_ST0),
 	I(0xdd, IF_BYTE2, "\xc1" "ffree\t" OP_ST1),
@@ -1404,22 +1470,22 @@ PRIVATE struct instruction const ops[] = {
 	I(0xdd, IF_MODRM|IF_RMM|IF_REG6, "fnsave108\t" OP_MEM),
 	I(0xdd, IF_MODRM|IF_RMM|IF_REG7, "fnstcww\t" OP_RM16),
 
-	I(0xde, IF_BYTE2, "\xd9" "fcompp\t" /*OP_ST1*/ /*OP_ST0*/),
+	I(0xde, IF_BYTE2, "\xd9" "fcompp\t" OP_VERBOSE_ST1 OP_VERBOSE_ST0),
 
 	I(0xde, IF_MODRM|IF_RMR|IF_REG0, "faddp\t" OP_ST0 OP_RMSTi),
-	I(0xde, IF_MODRM|IF_RMM|IF_REG0, "fiaddw\t" OP_RM16 /*OP_ST0*/),
+	I(0xde, IF_MODRM|IF_RMM|IF_REG0, "fiaddw\t" OP_RM16 OP_VERBOSE_ST0),
 	I(0xde, IF_MODRM|IF_RMR|IF_REG1, "fmulp\t" OP_ST0 OP_RMSTi),
-	I(0xde, IF_MODRM|IF_RMM|IF_REG1, "fimulw\t" OP_RM16 /*OP_ST0*/),
-	I(0xde, IF_MODRM|IF_RMM|IF_REG2, "ficomw\t" OP_RM16 /*OP_ST0*/),
-	I(0xde, IF_MODRM|IF_RMM|IF_REG3, "ficompw\t" OP_RM16 /*OP_ST0*/),
+	I(0xde, IF_MODRM|IF_RMM|IF_REG1, "fimulw\t" OP_RM16 OP_VERBOSE_ST0),
+	I(0xde, IF_MODRM|IF_RMM|IF_REG2, "ficomw\t" OP_RM16 OP_VERBOSE_ST0),
+	I(0xde, IF_MODRM|IF_RMM|IF_REG3, "ficompw\t" OP_RM16 OP_VERBOSE_ST0),
 	I(0xde, IF_MODRM|IF_RMR|IF_REG4, "fsubp\t" OP_ST0 OP_RMSTi),
-	I(0xde, IF_MODRM|IF_RMM|IF_REG4, "fisubw\t" OP_RM16 /*OP_ST0*/),
+	I(0xde, IF_MODRM|IF_RMM|IF_REG4, "fisubw\t" OP_RM16 OP_VERBOSE_ST0),
 	I(0xde, IF_MODRM|IF_RMR|IF_REG5, "fsubrp\t" OP_ST0 OP_RMSTi),
-	I(0xde, IF_MODRM|IF_RMM|IF_REG5, "fisubrw\t" OP_RM16 /*OP_ST0*/),
+	I(0xde, IF_MODRM|IF_RMM|IF_REG5, "fisubrw\t" OP_RM16 OP_VERBOSE_ST0),
 	I(0xde, IF_MODRM|IF_RMR|IF_REG6, "fdivp\t" OP_ST0 OP_RMSTi),
-	I(0xde, IF_MODRM|IF_RMM|IF_REG6, "fidivw\t" OP_RM16 /*OP_ST0*/),
+	I(0xde, IF_MODRM|IF_RMM|IF_REG6, "fidivw\t" OP_RM16 OP_VERBOSE_ST0),
 	I(0xde, IF_MODRM|IF_RMR|IF_REG7, "fdivrp\t" OP_ST0 OP_RMSTi),
-	I(0xde, IF_MODRM|IF_RMM|IF_REG7, "fidivrw\t" OP_RM16 /*OP_ST0*/),
+	I(0xde, IF_MODRM|IF_RMM|IF_REG7, "fidivrw\t" OP_RM16 OP_VERBOSE_ST0),
 
 	I(0xdf, IF_BYTE2,  "\xe0" "fnstsw" OP_AX),
 	I(0xdf, IF_BYTE2,  "\xe8" "fucomip" OP_ST0 OP_ST0),
@@ -1466,9 +1532,9 @@ PRIVATE struct instruction const ops[] = {
 	 *       However, only Intel ignores it. - AMD still obeys the 66h
 	 *       prefix and truncates the operand to 16 bits */
 #if 1
-	I(0xe8, IF_66|IF_X32,     "callw\t" OP_DISP16),
+	I(0xe8, IF_X32|IF_66,     "callw\t" OP_DISP16),
 	I(0xe8, 0,                "call\t" OP_DISP32),
-	I(0xe9, IF_66|IF_X32,     "jmpw\t" OP_DISP16),
+	I(0xe9, IF_X32|IF_66,     "jmpw\t" OP_DISP16),
 	I(0xe9, 0,                "jmp\t" OP_DISP32),
 #else
 /*	I(0xe8, IF_66,            "callw\t" OP_DISP16), */
@@ -1508,35 +1574,35 @@ PRIVATE struct instruction const ops[] = {
 
 	I(0xf7, IF_66|IF_MODRM|IF_REG0, "testw\t" OP_U16 OP_RM16),
 	I(0xf7, IF_MODRM|IF_REG0, "testl\t" OP_U32 OP_RM32),
-	I(0xf7, IF_REXW|IF_MODRM|IF_REG0, "testq\t" OP_S32 OP_RM64),
+	I(0xf7, IF_MODRM|IF_REXW|IF_REG0, "testq\t" OP_S32 OP_RM64),
 
 	I(0xf7, IF_66|IF_MODRM|IF_REG1, "testw\t" OP_U16 OP_RM16), /* Undocumented alias */
 	I(0xf7, IF_MODRM|IF_REG1, "testl\t" OP_U32 OP_RM32), /* Undocumented alias */
-	I(0xf7, IF_REXW|IF_MODRM|IF_REG1, "testq\t" OP_S32 OP_RM64), /* Undocumented alias */
+	I(0xf7, IF_MODRM|IF_REXW|IF_REG1, "testq\t" OP_S32 OP_RM64), /* Undocumented alias */
 
 	I(0xf7, IF_66|IF_MODRM|IF_REG2, "notw\t" OP_RM16),
 	I(0xf7, IF_MODRM|IF_REG2, "notl\t" OP_RM32),
-	I(0xf7, IF_REXW|IF_MODRM|IF_REG2, "notq\t" OP_RM64),
+	I(0xf7, IF_MODRM|IF_REXW|IF_REG2, "notq\t" OP_RM64),
 
 	I(0xf7, IF_66|IF_MODRM|IF_REG3, "negw\t" OP_RM16),
 	I(0xf7, IF_MODRM|IF_REG3, "negl\t" OP_RM32),
-	I(0xf7, IF_REXW|IF_MODRM|IF_REG3, "negq\t" OP_RM64),
+	I(0xf7, IF_MODRM|IF_REXW|IF_REG3, "negq\t" OP_RM64),
 
 	I(0xf7, IF_66|IF_MODRM|IF_REG4, "mulw\t" OP_RM16),
 	I(0xf7, IF_MODRM|IF_REG4, "mull\t" OP_RM32),
-	I(0xf7, IF_REXW|IF_MODRM|IF_REG4, "mulq\t" OP_RM64),
+	I(0xf7, IF_MODRM|IF_REXW|IF_REG4, "mulq\t" OP_RM64),
 
 	I(0xf7, IF_66|IF_MODRM|IF_REG5, "imulw\t" OP_RM16),
 	I(0xf7, IF_MODRM|IF_REG5, "imull\t" OP_RM32),
-	I(0xf7, IF_REXW|IF_MODRM|IF_REG5, "imulq\t" OP_RM64),
+	I(0xf7, IF_MODRM|IF_REXW|IF_REG5, "imulq\t" OP_RM64),
 
 	I(0xf7, IF_66|IF_MODRM|IF_REG6, "divw\t" OP_RM16),
 	I(0xf7, IF_MODRM|IF_REG6, "divl\t" OP_RM32),
-	I(0xf7, IF_REXW|IF_MODRM|IF_REG6, "divq\t" OP_RM64),
+	I(0xf7, IF_MODRM|IF_REXW|IF_REG6, "divq\t" OP_RM64),
 
 	I(0xf7, IF_66|IF_MODRM|IF_REG7, "idivw\t" OP_RM16),
 	I(0xf7, IF_MODRM|IF_REG7, "idivl\t" OP_RM32),
-	I(0xf7, IF_REXW|IF_MODRM|IF_REG7, "idivq\t" OP_RM64),
+	I(0xf7, IF_MODRM|IF_REXW|IF_REG7, "idivq\t" OP_RM64),
 
 	I(0xf8, 0,                "clc"),
 	I(0xf9, 0,                "stc"),
@@ -1550,31 +1616,31 @@ PRIVATE struct instruction const ops[] = {
 
 	I(0xff, IF_66|IF_MODRM|IF_REG0, "incw\t" OP_RM16),
 	I(0xff, IF_MODRM|IF_REG0, "incl\t" OP_RM32),
-	I(0xff, IF_REXW|IF_MODRM|IF_REG0, "incq\t" OP_RM64),
+	I(0xff, IF_MODRM|IF_REXW|IF_REG0, "incq\t" OP_RM64),
 
 	I(0xff, IF_66|IF_MODRM|IF_REG1, "decw\t" OP_RM16),
 	I(0xff, IF_MODRM|IF_REG1, "decl\t" OP_RM32),
-	I(0xff, IF_REXW|IF_MODRM|IF_REG1, "decq\t" OP_RM64),
+	I(0xff, IF_MODRM|IF_REXW|IF_REG1, "decq\t" OP_RM64),
 
 	I(0xff, IF_66|IF_MODRM|IF_REG2, "callw\t" OP_XRM16),
 	I(0xff, IF_MODRM|IF_REG2, "calll\t" OP_XRM32),
-	I(0xff, IF_REXW|IF_MODRM|IF_REG2, "callq\t" OP_XRM64),
+	I(0xff, IF_MODRM|IF_REXW|IF_REG2, "callq\t" OP_XRM64),
 
 	I(0xff, IF_RMM|IF_66|IF_MODRM|IF_REG3, "lcallw\t" OP_XRM16),
 	I(0xff, IF_RMM|IF_MODRM|IF_REG3, "lcalll\t" OP_XRM32),
-	I(0xff, IF_RMM|IF_REXW|IF_MODRM|IF_REG3, "lcallq\t" OP_XRM64),
+	I(0xff, IF_RMM|IF_MODRM|IF_REXW|IF_REG3, "lcallq\t" OP_XRM64),
 
 	I(0xff, IF_66|IF_MODRM|IF_REG4, "jmpw\t" OP_XRM16),
 	I(0xff, IF_MODRM|IF_REG4, "jmpl\t" OP_XRM32),
-	I(0xff, IF_REXW|IF_MODRM|IF_REG4, "jmpq\t" OP_XRM64),
+	I(0xff, IF_MODRM|IF_REXW|IF_REG4, "jmpq\t" OP_XRM64),
 
 	I(0xff, IF_RMM|IF_66|IF_MODRM|IF_REG5, "ljmpw\t" OP_XRM16),
 	I(0xff, IF_RMM|IF_MODRM|IF_REG5, "ljmpl\t" OP_XRM32),
-	I(0xff, IF_RMM|IF_REXW|IF_MODRM|IF_REG5, "ljmpq\t" OP_XRM64),
+	I(0xff, IF_RMM|IF_MODRM|IF_REXW|IF_REG5, "ljmpq\t" OP_XRM64),
 
 	I(0xff, IF_66|IF_MODRM|IF_REG6, "pushw\t" OP_RM16),
 	I(0xff, IF_MODRM|IF_REG6, "pushl\t" OP_RM32),
-	I(0xff, IF_REXW|IF_MODRM|IF_REG6, "pushq\t" OP_RM64),
+	I(0xff, IF_MODRM|IF_REXW|IF_REG6, "pushq\t" OP_RM64),
 
 	I(0, 0, "")
 /*[[[end:ops]]]*/
@@ -1605,7 +1671,7 @@ PRIVATE struct instruction const ops_0f[] = {
 
 	I(0x01, IF_66|IF_MODRM|IF_REG4,          "smsww\t" OP_RM16),
 	I(0x01, IF_MODRM|IF_REG4,                "smswl\t" OP_RM32),
-	I(0x01, IF_REXW|IF_MODRM|IF_REG4,        "smswq\t" OP_RM64),
+	I(0x01, IF_MODRM|IF_REXW|IF_REG4,        "smswq\t" OP_RM64),
 
 	I(0x01, IF_MODRM|IF_REG6,                "lmsw\t" OP_RM16),
 
@@ -1801,17 +1867,17 @@ PRIVATE struct instruction const ops_0f[] = {
 	I(0x18, IF_MODRM|IF_REG2|IF_RMM, "prefetcht1\t" OP_MEM),
 	I(0x18, IF_MODRM|IF_REG3|IF_RMM, "prefetcht2\t" OP_MEM),
 
-	I(0x1a, IF_F2|IF_X32|IF_MODRM, "bndcu\t" OP_RM32 OP_RBND),
-	I(0x1a, IF_F2|IF_X64|IF_MODRM, "bndcu\t" OP_RM64 OP_RBND),
-	I(0x1a, IF_F3|IF_X32|IF_MODRM, "bndcl\t" OP_RM32 OP_RBND),
-	I(0x1a, IF_F3|IF_X64|IF_MODRM, "bndcl\t" OP_RM64 OP_RBND),
+	I(0x1a, IF_X32|IF_F2|IF_MODRM, "bndcu\t" OP_RM32 OP_RBND),
+	I(0x1a, IF_X64|IF_F2|IF_MODRM, "bndcu\t" OP_RM64 OP_RBND),
+	I(0x1a, IF_X32|IF_F3|IF_MODRM, "bndcl\t" OP_RM32 OP_RBND),
+	I(0x1a, IF_X64|IF_F3|IF_MODRM, "bndcl\t" OP_RM64 OP_RBND),
 	I(0x1a, IF_MODRM,              "bndldx\t" OP_RMBND_RANGE OP_RBND),
 	I(0x1a, IF_66|IF_MODRM,        "bndmov\t" OP_RMBND OP_RBND),
-	I(0x1b, IF_F2|IF_X32|IF_MODRM, "bndcn\t" OP_RM32 OP_RBND),
-	I(0x1b, IF_F2|IF_X64|IF_MODRM, "bndcn\t" OP_RM64 OP_RBND),
+	I(0x1b, IF_X32|IF_F2|IF_MODRM, "bndcn\t" OP_RM32 OP_RBND),
+	I(0x1b, IF_X64|IF_F2|IF_MODRM, "bndcn\t" OP_RM64 OP_RBND),
 	I(0x1b, IF_66|IF_MODRM,        "bndmov\t" OP_RBND OP_RMBND),
-	I(0x1b, IF_F3|IF_X32|IF_MODRM, "bndmk\t" OP_RM32 OP_RBND),
-	I(0x1b, IF_F3|IF_X64|IF_MODRM, "bndmk\t" OP_RM64 OP_RBND),
+	I(0x1b, IF_X32|IF_F3|IF_MODRM, "bndmk\t" OP_RM32 OP_RBND),
+	I(0x1b, IF_X64|IF_F3|IF_MODRM, "bndmk\t" OP_RM64 OP_RBND),
 
 	I(0x1c, IF_MODRM|IF_REG0|IF_RMM, "cldemote\t" OP_MEM),
 
@@ -2861,15 +2927,15 @@ PRIVATE struct instruction const ops_0f[] = {
 
 	I(0xa3, IF_66|IF_MODRM,   "btw\t" OP_R16 OP_RM16),
 	I(0xa3, IF_MODRM,         "btl\t" OP_R32 OP_RM32),
-	I(0xa3, IF_REXW|IF_MODRM, "btq\t" OP_R64 OP_RM64),
+	I(0xa3, IF_MODRM|IF_REXW, "btq\t" OP_R64 OP_RM64),
 
 	I(0xa4, IF_66|IF_MODRM,   "shldw\t" OP_RM16 OP_R16 OP_U8),
 	I(0xa4, IF_MODRM,         "shldl\t" OP_RM32 OP_R32 OP_U8),
-	I(0xa4, IF_REXW|IF_MODRM, "shldq\t" OP_RM64 OP_R64 OP_U8),
+	I(0xa4, IF_MODRM|IF_REXW, "shldq\t" OP_RM64 OP_R64 OP_U8),
 
 	I(0xa5, IF_66|IF_MODRM,   "shldw\t" OP_RM16 OP_R16 OP_CL),
 	I(0xa5, IF_MODRM,         "shldl\t" OP_RM32 OP_R32 OP_CL),
-	I(0xa5, IF_REXW|IF_MODRM, "shldq\t" OP_RM64 OP_R64 OP_CL),
+	I(0xa5, IF_MODRM|IF_REXW, "shldq\t" OP_RM64 OP_R64 OP_CL),
 
 	I(0xa8, IF_66,            "pushw\t" OP_GS),
 	I(0xa8, IF_X32,           "pushl\t" OP_GS),
@@ -2883,15 +2949,15 @@ PRIVATE struct instruction const ops_0f[] = {
 
 	I(0xab, IF_66|IF_MODRM,   "btsw\t" OP_R8 OP_RM8),
 	I(0xab, IF_MODRM,         "btsl\t" OP_R16 OP_RM16),
-	I(0xab, IF_REXW|IF_MODRM, "btsq\t" OP_R32 OP_RM32),
+	I(0xab, IF_MODRM|IF_REXW, "btsq\t" OP_R32 OP_RM32),
 
 	I(0xac, IF_66|IF_MODRM,   "shrdw\t" OP_RM16 OP_R16 OP_U8),
 	I(0xac, IF_MODRM,         "shrdl\t" OP_RM32 OP_R32 OP_U8),
-	I(0xac, IF_REXW|IF_MODRM, "shrdq\t" OP_RM64 OP_R64 OP_U8),
+	I(0xac, IF_MODRM|IF_REXW, "shrdq\t" OP_RM64 OP_R64 OP_U8),
 
 	I(0xad, IF_66|IF_MODRM,   "shrdw\t" OP_RM16 OP_R16 OP_CL),
 	I(0xad, IF_MODRM,         "shrdl\t" OP_RM32 OP_R32 OP_CL),
-	I(0xad, IF_REXW|IF_MODRM, "shrdq\t" OP_RM64 OP_R64 OP_CL),
+	I(0xad, IF_MODRM|IF_REXW, "shrdq\t" OP_RM64 OP_R64 OP_CL),
 
 	I(0xae, IF_VEX|IF_MODRM|IF_RMM|IF_REG2, OP_VEX_B0(0,1,0,0) "vldmxcsr\t" OP_MEM),
 	I(0xae, IF_VEX|IF_MODRM|IF_RMM|IF_REG3, OP_VEX_B0(0,1,0,0) "vstmxcsr\t" OP_MEM),
@@ -2913,18 +2979,18 @@ PRIVATE struct instruction const ops_0f[] = {
 	I(0xae, IF_MODRM|IF_RMM|IF_REG3,        "stmxcsr\t" OP_MEM),
 
 	I(0xae, IF_MODRM|IF_RMM|IF_REG4,        "xsave\t" OP_MEM),
-	I(0xae, IF_REXW|IF_MODRM|IF_RMM|IF_REG4,"xsave64\t" OP_MEM),
+	I(0xae, IF_MODRM|IF_REXW|IF_RMM|IF_REG4,"xsave64\t" OP_MEM),
 	I(0xae, IF_MODRM|IF_RMM|IF_REG5,        "xrstor\t" OP_MEM),
-	I(0xae, IF_REXW|IF_MODRM|IF_RMM|IF_REG5,"xrstor64\t" OP_MEM),
+	I(0xae, IF_MODRM|IF_REXW|IF_RMM|IF_REG5,"xrstor64\t" OP_MEM),
 	I(0xae, IF_MODRM|IF_RMM|IF_REG6,        "xsaveopt\t" OP_MEM),
-	I(0xae, IF_REXW|IF_MODRM|IF_RMM|IF_REG6,"xsaveopt64\t" OP_MEM),
+	I(0xae, IF_MODRM|IF_REXW|IF_RMM|IF_REG6,"xsaveopt64\t" OP_MEM),
 	I(0xae, IF_MODRM|IF_RMM|IF_REG7,        "clflush\t" OP_MEM),
 	I(0xae, IF_66|IF_MODRM|IF_RMM|IF_REG7,  "clflushopt\t" OP_RM32),
 
 	I(0xae, IF_MODRM|IF_RMM|IF_REG0,         "fxsave\t" OP_MEM),
-	I(0xae, IF_REXW|IF_MODRM|IF_RMM|IF_REG0, "fxsave64\t" OP_MEM),
+	I(0xae, IF_MODRM|IF_REXW|IF_RMM|IF_REG0, "fxsave64\t" OP_MEM),
 	I(0xae, IF_MODRM|IF_RMM|IF_REG1,         "fxrstor\t" OP_MEM),
-	I(0xae, IF_REXW|IF_MODRM|IF_RMM|IF_REG1, "fxrstor64\t" OP_MEM),
+	I(0xae, IF_MODRM|IF_REXW|IF_RMM|IF_REG1, "fxrstor64\t" OP_MEM),
 
 	I(0xae, IF_F3|IF_MODRM|IF_REG6|IF_RMR|IF_X32, "umonitorl\t" OP_RM32),
 	I(0xae, IF_F3|IF_MODRM|IF_REG6|IF_RMR|IF_X64, "umonitorq\t" OP_RM64),
@@ -2936,88 +3002,88 @@ PRIVATE struct instruction const ops_0f[] = {
 
 	I(0xaf, IF_66|IF_MODRM,  "imulb\t" OP_RM8 OP_R8),
 	I(0xaf, IF_MODRM,        "imulw\t" OP_RM16 OP_R16),
-	I(0xaf, IF_REXW|IF_MODRM,"imull\t" OP_RM32 OP_R32),
+	I(0xaf, IF_MODRM|IF_REXW,"imull\t" OP_RM32 OP_R32),
 
 	I(0xb0, IF_MODRM,        "cmpxchgb\t" OP_R8 OP_RM8),
 	I(0xb1, IF_66|IF_MODRM,  "cmpxchgw\t" OP_R16 OP_RM16),
 	I(0xb1, IF_MODRM,        "cmpxchgl\t" OP_R32 OP_RM32),
-	I(0xb1, IF_REXW|IF_MODRM,"cmpxchgq\t" OP_R64 OP_RM64),
+	I(0xb1, IF_MODRM|IF_REXW,"cmpxchgq\t" OP_R64 OP_RM64),
 
 	I(0xb2, IF_66|IF_MODRM|IF_RMM,  "lssw\t" OP_MEM/*32*/ OP_R16),
 	I(0xb2, IF_MODRM|IF_RMM,        "lssl\t" OP_MEM/*48*/ OP_R32),
-	I(0xb2, IF_REXW|IF_MODRM|IF_RMM,"lssq\t" OP_MEM/*80*/ OP_R64),
+	I(0xb2, IF_MODRM|IF_REXW|IF_RMM,"lssq\t" OP_MEM/*80*/ OP_R64),
 
 	I(0xb3, IF_66|IF_MODRM,  "btrw\t" OP_R16 OP_RM16),
 	I(0xb3, IF_MODRM,        "btrl\t" OP_R32 OP_RM32),
-	I(0xb3, IF_REXW|IF_MODRM,"btrq\t" OP_R64 OP_RM64),
+	I(0xb3, IF_MODRM|IF_REXW,"btrq\t" OP_R64 OP_RM64),
 
 	I(0xb4, IF_66|IF_MODRM|IF_RMM,  "lfsw\t" OP_MEM/*32*/ OP_R16),
 	I(0xb4, IF_MODRM|IF_RMM,        "lfsl\t" OP_MEM/*48*/ OP_R32),
-	I(0xb4, IF_REXW|IF_MODRM|IF_RMM,"lfsq\t" OP_MEM/*80*/ OP_R64),
+	I(0xb4, IF_MODRM|IF_REXW|IF_RMM,"lfsq\t" OP_MEM/*80*/ OP_R64),
 	I(0xb5, IF_66|IF_MODRM|IF_RMM,  "lgsw\t" OP_MEM/*32*/ OP_R16),
 	I(0xb5, IF_MODRM|IF_RMM,        "lgsl\t" OP_MEM/*48*/ OP_R32),
-	I(0xb5, IF_REXW|IF_MODRM|IF_RMM,"lgsq\t" OP_MEM/*80*/ OP_R64),
+	I(0xb5, IF_MODRM|IF_REXW|IF_RMM,"lgsq\t" OP_MEM/*80*/ OP_R64),
 
 	I(0xb6, IF_66|IF_MODRM,  "movzbw\t" OP_RM8 OP_R32),
 	I(0xb6, IF_MODRM,        "movzbl\t" OP_RM8 OP_R32),
-	I(0xb6, IF_REXW|IF_MODRM,"movzbq\t" OP_RM8 OP_R64),
+	I(0xb6, IF_MODRM|IF_REXW,"movzbq\t" OP_RM8 OP_R64),
 	I(0xb7, IF_MODRM,        "movzwl\t" OP_RM16 OP_R32),
-	I(0xb7, IF_REXW|IF_MODRM,"movzwq\t" OP_RM16 OP_R64),
+	I(0xb7, IF_MODRM|IF_REXW,"movzwq\t" OP_RM16 OP_R64),
 
 	I(0xb8, IF_F3|IF_66|IF_MODRM,  "popcntw\t" OP_RM16 OP_R16),
 	I(0xb8, IF_F3|IF_MODRM,        "popcntl\t" OP_RM32 OP_R32),
-	I(0xb8, IF_F3|IF_REXW|IF_MODRM,"popcntq\t" OP_RM64 OP_R64),
+	I(0xb8, IF_F3|IF_MODRM|IF_REXW,"popcntq\t" OP_RM64 OP_R64),
 
 	I(0xb9, IF_MODRM,        "ud1\t" OP_RM32 OP_R32),
 
 	I(0xba, IF_66|IF_MODRM|IF_REG4,"btw\t" OP_U8 OP_RM16),
 	I(0xba, IF_MODRM|IF_REG4,"btl\t" OP_U8 OP_RM32),
-	I(0xba, IF_REXW|IF_MODRM|IF_REG4,"btq\t" OP_U8 OP_RM64),
+	I(0xba, IF_MODRM|IF_REXW|IF_REG4,"btq\t" OP_U8 OP_RM64),
 
 	I(0xba, IF_66|IF_MODRM|IF_REG5,"btsw\t" OP_U8 OP_RM16),
 	I(0xba, IF_MODRM|IF_REG5,"btsl\t" OP_U8 OP_RM32),
-	I(0xba, IF_REXW|IF_MODRM|IF_REG5,"btsq\t" OP_U8 OP_RM64),
+	I(0xba, IF_MODRM|IF_REXW|IF_REG5,"btsq\t" OP_U8 OP_RM64),
 
 	I(0xba, IF_66|IF_MODRM|IF_REG6,"btrw\t" OP_U8 OP_RM16),
 	I(0xba, IF_MODRM|IF_REG6,"btrl\t" OP_U8 OP_RM32),
-	I(0xba, IF_REXW|IF_MODRM|IF_REG6,"btrq\t" OP_U8 OP_RM64),
+	I(0xba, IF_MODRM|IF_REXW|IF_REG6,"btrq\t" OP_U8 OP_RM64),
 
 	I(0xba, IF_66|IF_MODRM|IF_REG7,"btcw\t" OP_U8 OP_RM16),
 	I(0xba, IF_MODRM|IF_REG7,"btcl\t" OP_U8 OP_RM32),
-	I(0xba, IF_REXW|IF_MODRM|IF_REG7,"btcq\t" OP_U8 OP_RM64),
+	I(0xba, IF_MODRM|IF_REXW|IF_REG7,"btcq\t" OP_U8 OP_RM64),
 
 	I(0xbb, IF_66|IF_MODRM,  "btcw\t" OP_R16 OP_RM16),
 	I(0xbb, IF_MODRM,        "btcl\t" OP_R32 OP_RM32),
-	I(0xbb, IF_REXW|IF_MODRM,"btcq\t" OP_R64 OP_RM64),
+	I(0xbb, IF_MODRM|IF_REXW,"btcq\t" OP_R64 OP_RM64),
 
 	I(0xbc, IF_66|IF_MODRM,  "bsfw\t" OP_RM16 OP_R16),
 	I(0xbc, IF_MODRM,        "bsfl\t" OP_RM32 OP_R32),
-	I(0xbc, IF_REXW|IF_MODRM,"bsfq\t" OP_RM64 OP_R64),
+	I(0xbc, IF_MODRM|IF_REXW,"bsfq\t" OP_RM64 OP_R64),
 
 	I(0xbc, IF_F3|IF_66|IF_MODRM,  "tzcntw\t" OP_RM16 OP_R16),
 	I(0xbc, IF_F3|IF_MODRM,        "tzcntl\t" OP_RM32 OP_R32),
-	I(0xbc, IF_F3|IF_REXW|IF_MODRM,"tzcntq\t" OP_RM64 OP_R64),
+	I(0xbc, IF_F3|IF_MODRM|IF_REXW,"tzcntq\t" OP_RM64 OP_R64),
 
 	I(0xbd, IF_66|IF_MODRM,  "bsrw\t" OP_RM16 OP_R16),
 	I(0xbd, IF_MODRM,        "bsrl\t" OP_RM32 OP_R32),
-	I(0xbd, IF_REXW|IF_MODRM,"bsrq\t" OP_RM64 OP_R64),
+	I(0xbd, IF_MODRM|IF_REXW,"bsrq\t" OP_RM64 OP_R64),
 
 	I(0xbd, IF_F3|IF_66|IF_MODRM,  "lzcntw\t" OP_RM16 OP_R16),
 	I(0xbd, IF_F3|IF_MODRM,        "lzcntl\t" OP_RM32 OP_R32),
-	I(0xbd, IF_F3|IF_REXW|IF_MODRM,"lzcntq\t" OP_RM64 OP_R64),
+	I(0xbd, IF_F3|IF_MODRM|IF_REXW,"lzcntq\t" OP_RM64 OP_R64),
 
 	I(0xbe, IF_66|IF_MODRM,  "movsbw\t" OP_RM8 OP_R32),
 	I(0xbe, IF_MODRM,        "movsbl\t" OP_RM8 OP_R32),
-	I(0xbe, IF_REXW|IF_MODRM,"movsbq\t" OP_RM8 OP_R64),
+	I(0xbe, IF_MODRM|IF_REXW,"movsbq\t" OP_RM8 OP_R64),
 
 	I(0xbf, IF_MODRM,        "movswl\t" OP_RM16 OP_R32),
-	I(0xbf, IF_REXW|IF_MODRM,"movswq\t" OP_RM16 OP_R64),
+	I(0xbf, IF_MODRM|IF_REXW,"movswq\t" OP_RM16 OP_R64),
 
 	I(0xc0, IF_MODRM,        "xaddb\t" OP_R8 OP_RM8),
 
 	I(0xc1, IF_66|IF_MODRM,  "xaddw\t" OP_R16 OP_RM16),
 	I(0xc1, IF_MODRM,        "xaddl\t" OP_R32 OP_RM32),
-	I(0xc1, IF_REXW|IF_MODRM,"xaddq\t" OP_R64 OP_RM64),
+	I(0xc1, IF_MODRM|IF_REXW,"xaddq\t" OP_R64 OP_RM64),
 
 	I(0xc2, IF_VEX|IF_MODRM, OP_VEX_B0(1, 1, 0, 0) "vcmpps\t" OP_U8 OP_RM128_XMM__OP_VRXMM__OP_RXMM),  /*  VEX.128.0f.WIG c2 /r ib vcmpps xmm1, xmm2, xmm3/m128, imm8 */
 	I(0xc2, IF_VEX|IF_MODRM, OP_VEX_B0(1, 1, 0, 1) "vcmpps\t" OP_U8 OP_RM256_YMM__OP_VRYMM__OP_RYMM),  /*  VEX.256.0f.WIG c2 /r ib vcmpps ymm1, ymm2, ymm3/m256, imm8 */
@@ -3043,7 +3109,7 @@ PRIVATE struct instruction const ops_0f[] = {
 	I(0xc2, IF_F2|IF_MODRM, "cmpsd\t" OP_U8 OP_RM128_XMM OP_RXMM), /* f2 0f c2 /r ib cmpsd xmm1, xmm2/m64, imm8 */
 
 	I(0xc3, IF_MODRM|IF_RMM,        "movntil\t" OP_R32 OP_RM32),
-	I(0xc3, IF_REXW|IF_MODRM|IF_RMM,"movntiq\t" OP_R64 OP_RM64),
+	I(0xc3, IF_MODRM|IF_REXW|IF_RMM,"movntiq\t" OP_R64 OP_RM64),
 
 	I(0xc4, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(1, 0, 0, 0), LO_VPINSRW)), /*  VEX.128.66.0f.W0  c4 /r ib vpinsrw xmm1, xmm2, r32/m16, imm8 */
 	I(0xc4, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(0, 1, 0, 0), LO_VPINSRW)), /* EVEX.128.66.0f.WIG c4 /r ib vpinsrw xmm1, xmm2, r32/m16, imm8 */
@@ -3077,10 +3143,10 @@ PRIVATE struct instruction const ops_0f[] = {
 	I(0xc7, IF_X64|IF_MODRM|IF_RMM|IF_REG1,       "cmpxchg16b\t" OP_MEM),
 
 	I(0xc7, IF_MODRM|IF_RMM|IF_REG4,              "xsavec\t" OP_MEM),
-	I(0xc7, IF_REXW|IF_MODRM|IF_RMM|IF_REG4,      "xsavec64\t" OP_MEM),
+	I(0xc7, IF_MODRM|IF_REXW|IF_RMM|IF_REG4,      "xsavec64\t" OP_MEM),
 
 	I(0xc7, IF_MODRM|IF_RMM|IF_REG5,              "xsaves\t" OP_MEM),
-	I(0xc7, IF_REXW|IF_MODRM|IF_RMM|IF_REG5,      "xsaves64\t" OP_MEM),
+	I(0xc7, IF_MODRM|IF_REXW|IF_RMM|IF_REG5,      "xsaves64\t" OP_MEM),
 
 	I(0xc7, IF_MODRM|IF_RMM|IF_REG6,              "vmptrld\t" OP_RM64),
 	I(0xc7, IF_66|IF_MODRM|IF_RMM|IF_REG6,        "vmclear\t" OP_RM64),
@@ -3091,8 +3157,8 @@ PRIVATE struct instruction const ops_0f[] = {
 	I(0xc7, IF_MODRM|IF_RMM|IF_RMM|IF_REG7,       "vmptrst\t" OP_MEM),
 	I(0xc7, IF_X32|IF_MODRM|IF_RMR|IF_REG7,       "rdseedl\t" OP_RM32),
 	I(0xc7, IF_X64|IF_MODRM|IF_RMR|IF_REG7,       "rdseedq\t" OP_RM64),
-	I(0xc7, IF_F3|IF_X32|IF_MODRM|IF_RMR|IF_REG7, "rdpidl\t" OP_RM32),
-	I(0xc7, IF_F3|IF_X64|IF_MODRM|IF_RMR|IF_REG7, "rdpidq\t" OP_RM64),
+	I(0xc7, IF_X32|IF_F3|IF_MODRM|IF_RMR|IF_REG7, "rdpidl\t" OP_RM32),
+	I(0xc7, IF_X64|IF_F3|IF_MODRM|IF_RMR|IF_REG7, "rdpidq\t" OP_RM64),
 
 	I(0xc8, IF_REXB,         "bswapl\t" OP_R8D),
 	I(0xc8, IF_REXB|IF_REXW, "bswapq\t" OP_X64_R8),
@@ -4370,15 +4436,15 @@ PRIVATE struct instruction const ops_0f38[] = {
 
 	I(0xf0, IF_66|IF_MODRM/*|IF_RMM*/,   "movbew\t" OP_RM16 OP_R16), /* KOS Emulates the register variant */
 	I(0xf0, IF_MODRM/*|IF_RMM*/,         "movbel\t" OP_RM32 OP_R32),
-	I(0xf0, IF_REXW|IF_MODRM/*|IF_RMM*/, "movbeq\t" OP_RM64 OP_R64),
+	I(0xf0, IF_MODRM|IF_REXW/*|IF_RMM*/, "movbeq\t" OP_RM64 OP_R64),
 	I(0xf0, IF_F2|IF_MODRM,              "crc32b\t" OP_RM8 OP_R32),
-	I(0xf0, IF_F2|IF_REXW|IF_MODRM,      "crc32b\t" OP_RM8 OP_R64),
+	I(0xf0, IF_F2|IF_MODRM|IF_REXW,      "crc32b\t" OP_RM8 OP_R64),
 	I(0xf1, IF_66|IF_MODRM/*|IF_RMM*/,   "movbew\t" OP_R16 OP_RM16), /* KOS Emulates the register variant */
 	I(0xf1, IF_MODRM/*|IF_RMM*/,         "movbel\t" OP_R32 OP_RM32),
-	I(0xf1, IF_REXW|IF_MODRM/*|IF_RMM*/, "movbeq\t" OP_R64 OP_RM64),
+	I(0xf1, IF_MODRM|IF_REXW/*|IF_RMM*/, "movbeq\t" OP_R64 OP_RM64),
 	I(0xf1, IF_F2|IF_66|IF_MODRM,        "crc32w\t" OP_RM16 OP_R32),
 	I(0xf1, IF_F2|IF_MODRM,              "crc32l\t" OP_RM32 OP_R32),
-	I(0xf1, IF_F2|IF_REXW|IF_MODRM,      "crc32q\t" OP_RM64 OP_R64),
+	I(0xf1, IF_F2|IF_MODRM|IF_REXW,      "crc32q\t" OP_RM64 OP_R64),
 
 	I(0xf2, IF_VEXW0|IF_MODRM, "andnl\t" OP_RM32 OP_VR32 OP_R32),
 	I(0xf2, IF_VEXW1|IF_MODRM, "andnq\t" OP_RM64 OP_VR64 OP_R64),
@@ -4398,11 +4464,11 @@ PRIVATE struct instruction const ops_0f38[] = {
 	I(0xf5, IF_VEXW1|IF_F2|IF_MODRM, "pdepq\t" OP_RM64 OP_VR64 OP_R64),
 
 	I(0xf6, IF_66|IF_MODRM,         "adcxl\t" OP_RM32 OP_R32),
-	I(0xf6, IF_66|IF_REXW|IF_MODRM, "adcxq\t" OP_RM64 OP_R64),
+	I(0xf6, IF_66|IF_MODRM|IF_REXW, "adcxq\t" OP_RM64 OP_R64),
 	I(0xf6, IF_F3|IF_MODRM,         "adoxl\t" OP_RM32 OP_R32),
-	I(0xf6, IF_F3|IF_REXW|IF_MODRM, "adoxq\t" OP_RM64 OP_R64),
+	I(0xf6, IF_F3|IF_MODRM|IF_REXW, "adoxq\t" OP_RM64 OP_R64),
 	I(0xf6, IF_F2|IF_MODRM,         "mulxl\t" OP_RM32 OP_VR32 OP_R32),
-	I(0xf6, IF_F2|IF_REXW|IF_MODRM, "mulxq\t" OP_RM64 OP_VR64 OP_R64),
+	I(0xf6, IF_F2|IF_MODRM|IF_REXW, "mulxq\t" OP_RM64 OP_VR64 OP_R64),
 
 	I(0xf7, IF_VEXW0|IF_MODRM,       "bextrl\t" OP_VR32 OP_RM32 OP_R32),
 	I(0xf7, IF_VEXW1|IF_MODRM,       "bextrq\t" OP_VR64 OP_RM64 OP_R64),
@@ -4413,8 +4479,8 @@ PRIVATE struct instruction const ops_0f38[] = {
 	I(0xf7, IF_F2|IF_VEXW0|IF_MODRM, "shrxl\t" OP_VR32 OP_RM32 OP_R32),
 	I(0xf7, IF_F2|IF_VEXW1|IF_MODRM, "shrxq\t" OP_VR64 OP_RM64 OP_R64),
 
-	I(0xf8, IF_66|IF_X32|IF_MODRM|IF_RMM, "movdir64b\t" OP_RM64 OP_R32),
-	I(0xf8, IF_66|IF_X64|IF_MODRM|IF_RMM, "movdir64b\t" OP_RM64 OP_R64),
+	I(0xf8, IF_X32|IF_66|IF_MODRM|IF_RMM, "movdir64b\t" OP_RM64 OP_R32),
+	I(0xf8, IF_X64|IF_66|IF_MODRM|IF_RMM, "movdir64b\t" OP_RM64 OP_R64),
 
 	I(0, 0, "")
 /*[[[end:ops_0f38]]]*/

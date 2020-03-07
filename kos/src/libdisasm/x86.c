@@ -1281,11 +1281,12 @@ print_byte:
 			if ((chain->i_flags & IF_67) && (flags & F_67))
 				continue;
 		} else {
-			if (((chain->i_flags & IF_66) != 0) !=
-			    ((flags & F_66) != 0))
+			/* Do an exact match for the 0x66 prefix due to it being a
+			 * so-called mandatory prefix, that also modifies the name
+			 * of an instruction when ATnT representation is printed. */
+			if (((chain->i_flags & IF_66) != 0) != ((flags & F_66) != 0))
 				continue;
-			if (((chain->i_flags & IF_67) != 0) !=
-			    ((flags & F_67) != 0))
+			if ((chain->i_flags & IF_67) && !(flags & F_67))
 				continue;
 		}
 		if (((chain->i_flags & IF_F2) != 0) !=
