@@ -252,10 +252,10 @@ struct instruction {
 #define OP_ER           "I" /* {rn-sae}, {rd-sae}, {ru-sae} or {rz-sae} (based on `EVEX.LL') (operand is skipped if `EVEX.b' isn't set) */
 #define OPC_SAE         'J' /* {sae} (operand is skipped if `EVEX.b' isn't set) */
 #define OP_SAE          "J" /* {sae} (operand is skipped if `EVEX.b' isn't set) */
-#define OPC_IMM8_XMM    'J' /* %xmmN (based on *PC & 0xf0 before doing PC+=1) */
-#define OP_IMM8_XMM     "J" /* %xmmN (based on *PC & 0xf0 before doing PC+=1) */
-#define OPC_IMM8_YMM    'K' /* %ymmN (based on *PC & 0xf0 before doing PC+=1) */
-#define OP_IMM8_YMM     "K" /* %ymmN (based on *PC & 0xf0 before doing PC+=1) */
+#define OPC_IMM8_XMM    'K' /* %xmmN (based on *PC & 0xf0 before doing PC+=1) */
+#define OP_IMM8_XMM     "K" /* %xmmN (based on *PC & 0xf0 before doing PC+=1) */
+#define OPC_IMM8_YMM    'L' /* %ymmN (based on *PC & 0xf0 before doing PC+=1) */
+#define OP_IMM8_YMM     "L" /* %ymmN (based on *PC & 0xf0 before doing PC+=1) */
 /*      OPC_            'M'  * ... */
 /*      OP_             "M"  * ... */
 /*      OPC_            'N'  * ... */
