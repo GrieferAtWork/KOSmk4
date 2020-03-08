@@ -196,6 +196,10 @@ libjson_encode_INTO(struct json_writer *__restrict writer,
 		result = libjson_writer_putstring(writer, str, len);
 	}	break;
 
+	case JSON_TYPE_VOID:
+		result = libjson_writer_putnull(writer);
+		break;
+
 	default:
 		MESSAGE("Illegal type `%#.2I8x' in INTO", type);
 		result = -2;
@@ -211,14 +215,16 @@ INTDEF NONNULL((1, 2, 3)) int CC
 libjson_encode_OBJECT(struct json_writer *__restrict writer,
                       byte_t **__restrict preader,
                       void const *__restrict src,
-                      unsigned int gen_flags);
+                      unsigned int gen_flags,
+                      void const *const *ext);
 
 /* Process until _after_ the correct `JGEN_END' opcode is reached. */
 INTDEF NONNULL((1, 2, 3)) int CC
 libjson_encode_ARRAY(struct json_writer *__restrict writer,
                      byte_t **__restrict preader,
                      void const *__restrict src,
-                     unsigned int gen_flags);
+                     unsigned int gen_flags,
+                     void const *const *ext);
 
 
 /* Process the designator that must follow one of the following opcodes:
@@ -234,18 +240,19 @@ PRIVATE NONNULL((1, 2, 3)) int CC
 libjson_encode_designator(struct json_writer *__restrict writer,
                           byte_t **__restrict preader,
                           void const *__restrict src,
-                          unsigned int gen_flags) {
+                          unsigned int gen_flags,
+                          void const *const *ext) {
 	int result;
 	byte_t op, *reader = *preader;
 	op = *reader++;
 	switch (op) {
 
 	case JGEN_BEGINOBJECT:
-		result = libjson_encode_OBJECT(writer, (byte_t **)&reader, src, gen_flags);
+		result = libjson_encode_OBJECT(writer, (byte_t **)&reader, src, gen_flags, ext);
 		break;
 
 	case JGEN_BEGINARRAY:
-		result = libjson_encode_ARRAY(writer, (byte_t **)&reader, src, gen_flags);
+		result = libjson_encode_ARRAY(writer, (byte_t **)&reader, src, gen_flags, ext);
 		break;
 
 	case JGEN_INTO: {
@@ -256,6 +263,15 @@ libjson_encode_designator(struct json_writer *__restrict writer,
 		type    = *(uint8_t *)reader;
 		reader += 1;
 		result = libjson_encode_INTO(writer, &reader, src, (byte_t *)src + offset, type, gen_flags);
+	}	break;
+
+	case JGEN_EXTERN_OP: {
+		uint16_t offset, id;
+		offset = UNALIGNED_GET16((uint16_t *)reader);
+		reader += 2;
+		id = UNALIGNED_GET16((uint16_t *)reader);
+		reader += 2;
+		result = libjson_encode(writer, ext[id], (byte_t *)src + offset, ext);
 	}	break;
 
 	default:
@@ -273,7 +289,8 @@ INTERN NONNULL((1, 2, 3)) int CC
 libjson_encode_OBJECT(struct json_writer *__restrict writer,
                       byte_t **__restrict preader,
                       void const *__restrict src,
-                      unsigned int gen_flags) {
+                      unsigned int gen_flags,
+                      void const *const *ext) {
 	int result;
 	byte_t op, *reader = *preader;
 	DO(libjson_writer_beginobject(writer));
@@ -293,7 +310,8 @@ again_inner:
 			reader += namelen + 1;
 			/* parse the field designator. */
 			DO(libjson_encode_designator(writer, &reader, src,
-				                         inner_flags | (gen_flags & ~GENFLAG_OPTIONAL)));
+				                         inner_flags | (gen_flags & ~GENFLAG_OPTIONAL),
+			                             ext));
 		}	break;
 
 		case JGEN_OPTIONAL:
@@ -324,9 +342,11 @@ INTERN NONNULL((1, 2, 3)) int CC
 libjson_encode_ARRAY(struct json_writer *__restrict writer,
                      byte_t **__restrict preader,
                      void const *__restrict src,
-                     unsigned int gen_flags) {
+                     unsigned int gen_flags,
+                     void const *const *ext) {
 	int result;
 	byte_t op, *reader = *preader;
+	uint16_t next_index = 0;
 	DO(libjson_writer_beginarray(writer));
 	for (;;) {
 		unsigned int inner_flags = 0;
@@ -337,11 +357,24 @@ again_inner:
 		case JGEN_END:
 			goto done_array;
 
-		case JGEN_INDEX:
-			/* parse the array element designator. */
+		case JGEN_INDEX_OP: {
+			uint16_t index;
+			index = UNALIGNED_GET16((uint16_t *)reader);
+			reader += 2;
+			/* Make sure that indices only ever increment! */
+			if unlikely(index < next_index)
+				goto err_bad_usage;
+			while (next_index < index) {
+				/* Fill unused indices with `null' */
+				DO(libjson_writer_putnull(writer));
+				++next_index;
+			}
+			/* Create the array element designator. */
 			DO(libjson_encode_designator(writer, &reader, src,
-			                             inner_flags | (gen_flags & ~GENFLAG_OPTIONAL)));
-			break;
+			                             inner_flags | (gen_flags & ~GENFLAG_OPTIONAL),
+			                             ext));
+			++next_index; /* Account for the written index. */
+		}	break;
 
 		case JGEN_INDEX_REP_OP: {
 			uint16_t count;
@@ -360,7 +393,8 @@ again_inner:
 				DO(libjson_encode_designator(writer,
 				                             &reader,
 				                             (byte_t *)src + offset,
-				                             inner_flags | (gen_flags & ~GENFLAG_OPTIONAL)));
+				                             inner_flags | (gen_flags & ~GENFLAG_OPTIONAL),
+				                             ext));
 				offset += stride;
 			} while (--count != 0);
 		}	break;
@@ -390,6 +424,7 @@ done:
 
 
 /* Encode a given object `src' as Json, using the given `codec' as generator.
+ * @param: ext: External codec vector (s.a. `JGEN_EXTERN(...)')
  * @return:  0: Success.
  * @return: -1: Error: `writer->jw_result' has a negative value when the function was called.
  * @return: -1: Error: An invocation of the `writer->jw_printer' returned a negative value.
@@ -397,7 +432,8 @@ done:
 INTERN NONNULL((1, 2, 3)) int CC
 libjson_encode(struct json_writer *__restrict writer,
                void const *__restrict codec,
-               void const *__restrict src) {
+               void const *__restrict src,
+               void const *const *ext) {
 	int result;
 	byte_t op, *reader = (byte_t *)codec;
 	unsigned int gen_flags = GENFLAG_NORMAL;
@@ -410,7 +446,7 @@ again_parseop:
 		break;
 
 	case JGEN_BEGINOBJECT:
-		DO(libjson_encode_OBJECT(writer, (byte_t **)&reader, src, gen_flags));
+		DO(libjson_encode_OBJECT(writer, (byte_t **)&reader, src, gen_flags, ext));
 require_term:
 		op = *reader++;
 		if unlikely(op != JGEN_TERM) {
@@ -420,8 +456,18 @@ require_term:
 		break;
 
 	case JGEN_BEGINARRAY:
-		DO(libjson_encode_ARRAY(writer, (byte_t **)&reader, src, gen_flags));
+		DO(libjson_encode_ARRAY(writer, (byte_t **)&reader, src, gen_flags, ext));
 		goto require_term;
+
+	case JGEN_EXTERN_OP: {
+		uint16_t offset, id;
+		offset = UNALIGNED_GET16((uint16_t *)reader);
+		reader += 2;
+		id = UNALIGNED_GET16((uint16_t *)reader);
+		reader += 2;
+		result = libjson_encode(writer, ext[id], (byte_t *)src + offset, ext);
+		goto require_term;
+	}	break;
 
 	case JGEN_OPTIONAL:
 		if unlikely(gen_flags & GENFLAG_OPTIONAL) {
@@ -467,7 +513,7 @@ DECL_END
 #include "generator-decode-impl.c.inl"
 
 DECL_BEGIN
-#endif
+#endif /* !__INTELLISENSE__ */
 
 
 
@@ -485,19 +531,22 @@ INTDEF NONNULL((1, 2, 3)) int
 NOTHROW_NCX(CC libjson_decode_OBJECT)(struct json_parser *__restrict parser,
                                       byte_t **__restrict preader,
                                       void *__restrict dst,
-                                      unsigned int gen_flags);
+                                      unsigned int gen_flags,
+                                      void const *const *ext);
 
 /* Process until _after_ the correct `JGEN_END' opcode is reached. */
 INTDEF NONNULL((1, 2, 3)) int
 NOTHROW_NCX(CC libjson_decode_ARRAY)(struct json_parser *__restrict parser,
                                      byte_t **__restrict preader,
                                      void *__restrict dst,
-                                     unsigned int gen_flags);
+                                     unsigned int gen_flags,
+                                     void const *const *ext);
 
 
 
 
 /* Decode a given object `dst' from Json, using the given `codec' as generator.
+ * @param: ext: External codec vector (s.a. `JGEN_EXTERN(...)')
  * @return: JSON_ERROR_OK:     Success.
  * @return: JSON_ERROR_SYNTAX: Syntax error.
  * @return: JSON_ERROR_NOOBJ:  A required field doesn't exist or has wrong typing.
@@ -506,7 +555,8 @@ NOTHROW_NCX(CC libjson_decode_ARRAY)(struct json_parser *__restrict parser,
 INTERN NONNULL((1, 2, 3)) int
 NOTHROW_NCX(CC libjson_decode)(struct json_parser *__restrict parser,
                                void const *__restrict codec,
-                               void *__restrict dst) {
+                               void *__restrict dst,
+                               void const *const *ext) {
 	int result;
 	byte_t op, *reader = (byte_t *)codec;
 	unsigned int gen_flags = GENFLAG_NORMAL;
@@ -519,7 +569,7 @@ again_parseop:
 		break;
 
 	case JGEN_BEGINOBJECT:
-		result = libjson_decode_OBJECT(parser, (byte_t **)&reader, dst, gen_flags);
+		result = libjson_decode_OBJECT(parser, (byte_t **)&reader, dst, gen_flags, ext);
 require_term:
 		if (result == JSON_ERROR_OK) {
 			op = *reader++;
@@ -529,7 +579,7 @@ require_term:
 		break;
 
 	case JGEN_BEGINARRAY:
-		result = libjson_decode_ARRAY(parser, (byte_t **)&reader, dst, gen_flags);
+		result = libjson_decode_ARRAY(parser, (byte_t **)&reader, dst, gen_flags, ext);
 		goto require_term;
 
 	case JGEN_OPTIONAL:
@@ -547,6 +597,22 @@ require_term:
 		reader += 1;
 		result = libjson_decode_INTO(parser, &reader, dst, (byte_t *)dst + offset, type, gen_flags);
 		goto require_term;
+	}	break;
+
+	case JGEN_EXTERN_OP: {
+		/* Allowed but highly unlikely: The base codec reference one that is external */
+		uint16_t offset, id;
+		offset = UNALIGNED_GET16((uint16_t *)reader);
+		reader += 2;
+		id = UNALIGNED_GET16((uint16_t *)reader);
+		reader += 2;
+		/* Make sure that the base codec ends after a single primary object! */
+		if unlikely(*reader != JGEN_TERM)
+			goto err_bad_usage;
+		/* Switch to the external codec. */
+		reader = (byte_t *)ext[id];
+		dst    = (byte_t *)dst + offset;
+		goto again_parseop;
 	}	break;
 
 	default:

@@ -32,6 +32,7 @@
 DECL_BEGIN
 
 /* Encode a given object `src' as Json, using the given `codec' as generator.
+ * @param: ext: External codec vector (s.a. `JGEN_EXTERN(...)')
  * @return:  0: Success.
  * @return: -1: Error: `writer->jw_result' has a negative value when the function was called.
  * @return: -1: Error: An invocation of the `writer->jw_printer' returned a negative value.
@@ -39,9 +40,11 @@ DECL_BEGIN
 INTDEF NONNULL((1, 2, 3)) int CC
 libjson_encode(struct json_writer *__restrict writer,
                void const *__restrict codec,
-               void const *__restrict src);
+               void const *__restrict src,
+               void const *const *ext);
 
 /* Decode a given object `dst' from Json, using the given `codec' as generator.
+ * @param: ext: External codec vector (s.a. `JGEN_EXTERN(...)')
  * @return: JSON_ERROR_OK:     Success.
  * @return: JSON_ERROR_SYNTAX: Syntax error.
  * @return: JSON_ERROR_NOOBJ:  A required field doesn't exist or has wrong typing.
@@ -50,7 +53,8 @@ libjson_encode(struct json_writer *__restrict writer,
 INTDEF NONNULL((1, 2, 3)) int
 NOTHROW_NCX(CC libjson_decode)(struct json_parser *__restrict parser,
                                void const *__restrict codec,
-                               void *__restrict dst);
+                               void *__restrict dst,
+                               void const *const *ext);
 
 DECL_END
 

@@ -816,6 +816,7 @@ PRIVATE ATTR_FREERODATA byte_t const json_ram_definition_codec[] = {
 	JGEN_BEGINOBJECT,
 		JGEN_FIELD, 's', 't', 'a', 'r', 't', 0, JGEN_INTO, JSON_OFFSETOF(struct json_ram_definition, rd_start), JSON_TYPE_UINT64,
 		JGEN_FIELD, 's', 'i', 'z', 'e',      0, JGEN_INTO, JSON_OFFSETOF(struct json_ram_definition, rd_size), JSON_TYPE_UINT64,
+		JGEN_OPTIONAL,
 		JGEN_FIELD, 't', 'y', 'p', 'e',      0, JGEN_INTO, JSON_OFFSETOF(struct json_ram_definition, rd_type), JSON_TYPE_STRING_OR_NULL,
 	JGEN_END,
 	JGEN_TERM
@@ -833,7 +834,7 @@ kernel_handle_ram_cmdline(char *__restrict arg) {
 	for (;;) {
 		struct json_ram_definition ramdef;
 		u16 bank_type;
-		json_error = json_decode(&parser, json_ram_definition_codec, &ramdef);
+		json_error = json_decode(&parser, json_ram_definition_codec, &ramdef, NULL);
 		if (json_error != JSON_ERROR_OK)
 			goto parser_error;
 		if (!ramdef.rd_type)

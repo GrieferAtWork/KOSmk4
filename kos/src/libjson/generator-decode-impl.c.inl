@@ -296,6 +296,12 @@ NOTHROW_NCX(CC FUNC(libjson_decode_INTO))(IF_DECODE(struct json_parser *__restri
 		break;
 #endif /* !MODE_DECODE */
 
+	case JSON_TYPE_VOID:
+#ifdef MODE_DECODE
+		result = libjson_parser_getnull(parser);
+#endif /* MODE_DECODE */
+		break;
+
 	default:
 #ifdef MODE_DECODE
 		result = JSON_ERROR_SYSERR;
@@ -321,7 +327,8 @@ INTDEF
 NOTHROW_NCX(CC FUNC(libjson_decode_OBJECT))(IF_DECODE(struct json_parser *__restrict parser, )
                                             byte_t **__restrict preader,
                                             void *__restrict dst,
-                                            unsigned int gen_flags);
+                                            unsigned int gen_flags,
+                                            void const *const *ext);
 
 /* Process until _after_ the correct `JGEN_END' opcode is reached. */
 INTDEF
@@ -331,7 +338,8 @@ INTDEF
 NOTHROW_NCX(CC FUNC(libjson_decode_ARRAY))(IF_DECODE(struct json_parser *__restrict parser, )
                                            byte_t **__restrict preader,
                                            void *__restrict dst,
-                                           unsigned int gen_flags);
+                                           unsigned int gen_flags,
+                                           void const *const *ext);
 
 
 #ifndef LIBJSON_DECODE_OBJECT_ZERO_DEFINED
@@ -340,15 +348,18 @@ NOTHROW_NCX(CC FUNC(libjson_decode_ARRAY))(IF_DECODE(struct json_parser *__restr
 INTERN NONNULL((1, 2)) int
 NOTHROW_NCX(CC libjson_decode_designator_zero)(byte_t **__restrict preader,
                                                void *__restrict dst,
-                                               unsigned int gen_flags);
+                                               unsigned int gen_flags,
+                                               void const *const *ext);
 INTDEF NONNULL((1, 2)) int
 NOTHROW_NCX(CC libjson_decode_OBJECT_zero)(byte_t **__restrict preader,
                                            void *__restrict dst,
-                                           unsigned int gen_flags);
+                                           unsigned int gen_flags,
+                                           void const *const *ext);
 INTDEF NONNULL((1, 2)) int
 NOTHROW_NCX(CC libjson_decode_ARRAY_zero)(byte_t **__restrict preader,
                                           void *__restrict dst,
-                                          unsigned int gen_flags);
+                                          unsigned int gen_flags,
+                                          void const *const *ext);
 #endif /* MODE_DECODE */
 #endif /* !LIBJSON_DECODE_OBJECT_ZERO_DEFINED */
 
@@ -371,19 +382,49 @@ INTERN
 NOTHROW_NCX(CC FUNC(libjson_decode_designator))(IF_DECODE(struct json_parser *__restrict parser, )
                                                 byte_t **__restrict preader,
                                                 void *__restrict dst,
-                                                unsigned int gen_flags) {
+                                                unsigned int gen_flags,
+                                                void const *const *ext) {
 	int result;
 	byte_t op, *reader = *preader;
 	op = *reader++;
 	switch (op) {
 
 	case JGEN_BEGINOBJECT:
-		result = FUNC(libjson_decode_OBJECT)(IF_DECODE(parser, )&reader, dst, gen_flags);
+		result = FUNC(libjson_decode_OBJECT)(IF_DECODE(parser, )&reader, dst, gen_flags, ext);
 		break;
 
 	case JGEN_BEGINARRAY:
-		result = FUNC(libjson_decode_ARRAY)(IF_DECODE(parser, )&reader, dst, gen_flags);
+		result = FUNC(libjson_decode_ARRAY)(IF_DECODE(parser, )&reader, dst, gen_flags, ext);
 		break;
+
+	case JGEN_EXTERN_OP: {
+		uint16_t offset, id;
+		byte_t *codec;
+		offset = UNALIGNED_GET16((uint16_t *)reader);
+		reader += 2;
+		id = UNALIGNED_GET16((uint16_t *)reader);
+		reader += 2;
+		codec = (byte_t *)ext[id];
+		if unlikely(*codec == JGEN_TERM) {
+			/* Allowed, but highly unlikely: An empty codec */
+			result = JSON_ERROR_OK;
+		} else {
+#ifdef MODE_DECODE
+			result = libjson_decode_designator(parser, &codec,
+			                                   (byte_t *)dst + offset,
+			                                   gen_flags, ext);
+#else /* MODE_DECODE */
+			result = libjson_decode_designator_zero(&codec,
+			                                        (byte_t *)dst + offset,
+			                                        gen_flags, ext);
+#endif /* !MODE_DECODE */
+			if likely(result == JSON_ERROR_OK) {
+				op = *codec++;
+				if unlikely(op != JGEN_TERM)
+					goto err_bad_usage;
+			}
+		}
+	}	break;
 
 	case JGEN_INTO: {
 		uint16_t offset;
@@ -398,6 +439,7 @@ NOTHROW_NCX(CC FUNC(libjson_decode_designator))(IF_DECODE(struct json_parser *__
 	}	break;
 
 	default:
+err_bad_usage:
 		result = JSON_ERROR_SYSERR;
 		break;
 	}
@@ -414,7 +456,8 @@ INTERN
 NOTHROW_NCX(CC FUNC(libjson_decode_OBJECT))(IF_DECODE(struct json_parser *__restrict parser, )
                                             byte_t **__restrict preader,
                                             void *__restrict dst,
-                                            unsigned int gen_flags) {
+                                            unsigned int gen_flags,
+                                            void const *const *ext) {
 	int result;
 	byte_t op, *reader;
 #ifdef MODE_DECODE
@@ -422,7 +465,7 @@ NOTHROW_NCX(CC FUNC(libjson_decode_OBJECT))(IF_DECODE(struct json_parser *__rest
 	if (result != JSON_ERROR_OK) {
 		if (result == JSON_ERROR_NOOBJ && (gen_flags & GENFLAG_OPTIONAL)) {
 			/* ZERO-initialize all of the designated fields. */
-			result = libjson_decode_OBJECT_zero(preader, dst, gen_flags);
+			result = libjson_decode_OBJECT_zero(preader, dst, gen_flags, ext);
 		}
 		return result;
 	}
@@ -448,10 +491,10 @@ again_inner:
 			/* parse the field designator. */
 			if (result != JSON_ERROR_OK) {
 				if (result == JSON_ERROR_NOOBJ && (inner_flags & GENFLAG_OPTIONAL)) {
-					result = JSON_ERROR_OK;
 					/* ZERO-initialize all of the designated fields. */
 					result = libjson_decode_designator_zero(&reader, dst,
-					                                        inner_flags | (gen_flags & ~GENFLAG_OPTIONAL));
+					                                        inner_flags | (gen_flags & ~GENFLAG_OPTIONAL),
+					                                        ext);
 				} else {
 					goto done;
 				}
@@ -459,10 +502,11 @@ again_inner:
 #endif /* MODE_DECODE */
 			{
 				result = FUNC(libjson_decode_designator)(IF_DECODE(parser, )&reader, dst,
-				                                         inner_flags | (gen_flags & ~GENFLAG_OPTIONAL));
-				if unlikely(result != JSON_ERROR_OK)
-					goto done;
+				                                         inner_flags | (gen_flags & ~GENFLAG_OPTIONAL),
+				                                         ext);
 			}
+			if unlikely(result != JSON_ERROR_OK)
+				goto done;
 		}	break;
 
 		case JGEN_OPTIONAL:
@@ -499,7 +543,8 @@ INTERN
 NOTHROW_NCX(CC FUNC(libjson_decode_ARRAY))(IF_DECODE(struct json_parser *__restrict parser, )
                                            byte_t **__restrict preader,
                                            void *__restrict dst,
-                                           unsigned int gen_flags) {
+                                           unsigned int gen_flags,
+                                           void const *const *ext) {
 	int result;
 	byte_t op, *reader;
 	IF_DECODE(bool is_first = true;)
@@ -508,7 +553,7 @@ NOTHROW_NCX(CC FUNC(libjson_decode_ARRAY))(IF_DECODE(struct json_parser *__restr
 	if (result != JSON_ERROR_OK) {
 		if (result == JSON_ERROR_NOOBJ && (gen_flags & GENFLAG_OPTIONAL)) {
 			/* ZERO-initialize all of the designated fields. */
-			result = libjson_decode_ARRAY_zero(preader, dst, gen_flags);
+			result = libjson_decode_ARRAY_zero(preader, dst, gen_flags, ext);
 		}
 		return result;
 	}
@@ -523,9 +568,14 @@ again_inner:
 		case JGEN_END:
 			goto done_array;
 
-		case JGEN_INDEX:
+		case JGEN_INDEX_OP: {
+#ifndef MODE_DECODE
+			reader += 2; /* Consume the index operand. */
+#else /* !MODE_DECODE */
+			uint16_t index;
 			/* parse the array element designator. */
-#ifdef MODE_DECODE
+			index = UNALIGNED_GET16((uint16_t *)reader);
+			reader += 2; /* Consume the index operand. */
 			if (!is_first) {
 				result = libjson_parser_yield(parser);
 				if (result != ',') {
@@ -535,10 +585,29 @@ again_inner:
 				}
 			}
 			is_first = false;
+			/* XXX: In well-defined code, indices only ever increase, so
+			 *      we could speed this up by remembering the previous
+			 *      index and advancing by the difference... */
+			result = libjson_parser_findindex(parser, index);
+			if (result != JSON_ERROR_OK) {
+				if (result == JSON_ERROR_NOOBJ && (inner_flags & GENFLAG_OPTIONAL)) {
+					/* ZERO-initialize all of the designated indices. */
+					result = libjson_decode_designator_zero(&reader, dst,
+					                                        inner_flags | (gen_flags & ~GENFLAG_OPTIONAL),
+					                                        ext);
+				} else {
+					goto done;
+				}
+			} else
 #endif /* MODE_DECODE */
-			result = FUNC(libjson_decode_designator)(IF_DECODE(parser, )&reader, dst,
-			                                         inner_flags | (gen_flags & ~GENFLAG_OPTIONAL));
-			break;
+			{
+				result = FUNC(libjson_decode_designator)(IF_DECODE(parser, )&reader, dst,
+				                                         inner_flags | (gen_flags & ~GENFLAG_OPTIONAL),
+				                                         ext);
+			}
+			if unlikely(result != JSON_ERROR_OK)
+				goto done;
+		}	break;
 
 		case JGEN_INDEX_REP_OP: {
 			uint16_t count;
@@ -567,7 +636,8 @@ again_inner:
 				reader = orig_reader;
 				result = FUNC(libjson_decode_designator)(IF_DECODE(parser, )&reader,
 				                                         (byte_t *)dst + offset,
-				                                         inner_flags | (gen_flags & ~GENFLAG_OPTIONAL));
+				                                         inner_flags | (gen_flags & ~GENFLAG_OPTIONAL),
+				                                         ext);
 				if unlikely(result != JSON_ERROR_OK)
 					goto done;
 				offset += stride;

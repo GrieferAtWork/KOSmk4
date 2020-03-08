@@ -103,7 +103,12 @@ NOTHROW_NCX(CC json_ungetc)(struct json_parser *__restrict self) {
 /* Initialize a json parser with the given piece of in-memory json.
  * NOTE: This function automatically detects the encoding (one of `JSON_ENCODING_*')
  *       of the given input, as specified by the Json specs, meaning you don't have
- *       to concern yourself with the details on how to supply input to this function. */
+ *       to concern yourself with the details on how to supply input to this function.
+ * @param: start: Pointer to the start of json input data (usually points to a c-string)
+ * @param: end:   Pointer to the first byte past the end of json input data (usually equal
+ *                to `strend(start)', though note that the input string doesn't need to be
+ *                NUL-terminated. - Only bytes `x' with `x >= start && x < end' will ever
+ *                be accessed) */
 INTERN NONNULL((1, 2, 3)) void
 NOTHROW_NCX(CC libjson_parser_init)(struct json_parser *__restrict self,
                                     void const *start, void const *end) {
@@ -765,7 +770,7 @@ NOTHROW_NCX(CC libjson_parser_state)(struct json_parser *__restrict self) {
 /* Search for the given key within the current object.
  * The given key is searched in both forward, and backward direction, starting
  * at the current parser location. - If the key exists multiple times, it is
- * undefined which of these locations will be returned.
+ * undefined which of these locations will be referenced upon return.
  * @return: JSON_ERROR_OK:     The parser now points after the `:' following the matching key's name.
  * @return: JSON_ERROR_NOOBJ:  The given `key' wasn't found (The position of `self' remains unchanged)
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
@@ -834,8 +839,9 @@ again:
 	return JSON_ERROR_NOOBJ;
 }
 
-/* Goto the `index'th' array elements before returning `JSON_ERROR_OK'
- * the parser is rewound to the start of the current array before proceeding.
+/* Goto the `index'th' array element before returning `JSON_ERROR_OK'
+ * The parser is rewound to the start of the current array before skipping
+ * exactly `index' elements, thus causing that element to end up selected.
  * NOTE: If the intend is to enumerate array elements, it is more efficient
  *       to rewind to the start of the array with `json_parser_rewind()', then
  *       proceeding to use `json_parser_next()' to iterate elements.

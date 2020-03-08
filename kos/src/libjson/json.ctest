@@ -57,33 +57,51 @@ PRIVATE byte_t const my_struct_codec[] = {
 	JGEN_TERM
 };
 
-DEFINE_TEST(json_codecs) {
-	char json_input[] = "{"
-	                    "\"beta\":20,"
-	                    "\"alpha\":10,"
-	                    "\"name\":\"This is\\n my name\","
-	                    "\"values\":[1,2,4,8,16,32,64,128]"
-	                    "}";
+PRIVATE byte_t const my_struct_codec2[] = {
+	JGEN_BEGINOBJECT,
+		JGEN_FIELD, 'a', 'l', 'p', 'h', 'a', 0, JGEN_INTO, JSON_OFFSETOF(struct my_struct, ms_alpha), JSON_TYPE_INT,
+		JGEN_FIELD, 'b', 'e', 't', 'a',      0, JGEN_INTO, JSON_OFFSETOF(struct my_struct, ms_beta), JSON_TYPE_INT,
+		JGEN_FIELD, 'n', 'a', 'm', 'e',      0, JGEN_INTO, JSON_OFFSETOF(struct my_struct, ms_name), JSON_TYPE_STRING_OR_NULL,
+		JGEN_FIELD, 'v', 'a', 'l', 'u', 'e', 's', 0, JGEN_BEGINARRAY,
+			JGEN_INDEX(0), JGEN_INTO, JSON_OFFSETOF(struct my_struct, ms_values[0]), JSON_TYPE_INT,
+			JGEN_INDEX(1), JGEN_INTO, JSON_OFFSETOF(struct my_struct, ms_values[1]), JSON_TYPE_INT,
+			JGEN_INDEX(2), JGEN_INTO, JSON_OFFSETOF(struct my_struct, ms_values[2]), JSON_TYPE_INT,
+			JGEN_INDEX(3), JGEN_INTO, JSON_OFFSETOF(struct my_struct, ms_values[3]), JSON_TYPE_INT,
+			JGEN_INDEX(4), JGEN_INTO, JSON_OFFSETOF(struct my_struct, ms_values[4]), JSON_TYPE_INT,
+			JGEN_INDEX(5), JGEN_INTO, JSON_OFFSETOF(struct my_struct, ms_values[5]), JSON_TYPE_INT,
+			JGEN_INDEX(6), JGEN_INTO, JSON_OFFSETOF(struct my_struct, ms_values[6]), JSON_TYPE_INT,
+			JGEN_INDEX(7), JGEN_INTO, JSON_OFFSETOF(struct my_struct, ms_values[7]), JSON_TYPE_INT,
+		JGEN_END,
+	JGEN_END,
+	JGEN_TERM
+};
+
+PRIVATE PJSON_PARSER_INIT json_parser_init;
+PRIVATE PJSON_DECODE json_decode;
+PRIVATE PJSON_ENCODE json_encode;
+PRIVATE PJSON_PARSER_ENTEROBJECT json_parser_enterobject;
+PRIVATE PJSON_PARSER_ENTERARRAY json_parser_enterarray;
+PRIVATE PJSON_PARSER_FINDKEY json_parser_findkey;
+PRIVATE PJSON_PARSER_FINDINDEX json_parser_findindex;
+PRIVATE PJSON_PARSER_GETNUMBER json_parser_getnumber;
+
+PRIVATE void do_test_codec(byte_t const *codec) {
+	char json_input[] =
+	"{"
+	"\"beta\":20,"
+	"\"alpha\":10,"
+	"\"name\":\"This is\\n my name\","
+	"\"values\":[1,2,4,8,16,32,64,128]"
+	"}";
 	struct json_parser parser;
-	void *libjson;
 	int error;
-	PJSON_PARSER_INIT json_parser_init;
-	PJSON_DECODE json_decode;
-	PJSON_ENCODE json_encode;
 	struct my_struct foo;
-	libjson = dlopen(LIBJSON_LIBRARY_NAME, RTLD_LOCAL);
-	assertf(libjson, "dlerror(): %s", dlerror());
-	*(void **)&json_parser_init = dlsym(libjson, "json_parser_init");
-	assertf(json_parser_init, "dlerror(): %s", dlerror());
-	*(void **)&json_decode = dlsym(libjson, "json_decode");
-	assertf(json_decode, "dlerror(): %s", dlerror());
-	*(void **)&json_encode = dlsym(libjson, "json_encode");
-	assertf(json_encode, "dlerror(): %s", dlerror());
 
 	/* Decode json input by use of the codec defined above, and
 	 * store the results in an associated `struct my_struct' */
 	json_parser_init(&parser, json_input, COMPILER_STREND(json_input));
-	error = json_decode(&parser, my_struct_codec, &foo);
+	memset(&foo, 0xcc, sizeof(foo));
+	error = json_decode(&parser, codec, &foo, NULL);
 	ASSERT_EQUAL(error, JSON_ERROR_OK);
 	ASSERT_EQUAL(foo.ms_alpha, 10);
 	ASSERT_EQUAL(foo.ms_beta, 20);
@@ -120,7 +138,7 @@ DEFINE_TEST(json_codecs) {
 		char foo_generated[512], *ptr;
 		ptr = foo_generated;
 		json_writer_init(&writer, &format_sprintf_printer, &ptr, JSON_WRITER_FORMAT_PRETTY);
-		error = json_encode(&writer, my_struct_codec, &foo);
+		error = json_encode(&writer, codec, &foo, NULL);
 		ASSERT_EQUAL(error, JSON_ERROR_OK);
 		assertf(ptr == foo_generated + COMPILER_STRLEN(foo_pretty_expected) &&
 		        memcmp(foo_generated, foo_pretty_expected, sizeof(foo_pretty_expected) - sizeof(char)) == 0,
@@ -130,7 +148,7 @@ DEFINE_TEST(json_codecs) {
 		        (size_t)(ptr - foo_generated), foo_generated);
 		ptr = foo_generated;
 		json_writer_init(&writer, &format_sprintf_printer, &ptr, JSON_WRITER_FORMAT_COMPACT);
-		error = json_encode(&writer, my_struct_codec, &foo);
+		error = json_encode(&writer, codec, &foo, NULL);
 		ASSERT_EQUAL(error, JSON_ERROR_OK);
 		assertf(ptr == foo_generated + COMPILER_STRLEN(foo_compact_expected) &&
 		        memcmp(foo_generated, foo_compact_expected, sizeof(foo_compact_expected) - sizeof(char)) == 0,
@@ -139,6 +157,52 @@ DEFINE_TEST(json_codecs) {
 		        COMPILER_STRLEN(foo_compact_expected), foo_compact_expected,
 		        (size_t)(ptr - foo_generated), foo_generated);
 	}
+}
+
+DEFINE_TEST(json_codecs) {
+	void *libjson;
+	libjson = dlopen(LIBJSON_LIBRARY_NAME, RTLD_LOCAL);
+	assertf(libjson, "dlerror(): %s", dlerror());
+#define DLSYM(x) (*(void **)&x = dlsym(libjson, #x), assertf(x, "dlerror(): %s", dlerror()))
+	DLSYM(json_parser_init);
+	DLSYM(json_decode);
+	DLSYM(json_encode);
+	DLSYM(json_parser_enterobject);
+	DLSYM(json_parser_enterarray);
+	DLSYM(json_parser_findkey);
+	DLSYM(json_parser_findindex);
+	DLSYM(json_parser_getnumber);
+#undef DLSYM
+
+	do_test_codec(my_struct_codec);
+	do_test_codec(my_struct_codec2);
+
+	{
+		int error;
+		intptr_t value;
+		struct json_parser parser;
+		char const *input = "{\"bar\":\"baz\",\"foo\":[10,20,30]}";
+		json_parser_init(&parser, input, strend(input));
+
+		error = json_parser_enterobject(&parser);
+		assertf(error == JSON_ERROR_OK, "error = %d", error);
+
+		error = json_parser_findkey(&parser, "foo", 3);
+		assertf(error == JSON_ERROR_OK, "error = %d", error);
+
+		error = json_parser_enterarray(&parser);
+		assertf(error == JSON_ERROR_OK, "error = %d", error);
+
+		error = json_parser_findindex(&parser, 1);
+		assertf(error == JSON_ERROR_OK, "error = %d", error);
+
+		memset(&value, 0xcc, sizeof(value));
+		error = json_parser_getnumber(&parser, &value);
+		assertf(error == JSON_ERROR_OK, "error = %d", error);
+
+		assertf(value == 20, "value = %#Ix", value);
+	}
+
 	dlclose(libjson);
 }
 

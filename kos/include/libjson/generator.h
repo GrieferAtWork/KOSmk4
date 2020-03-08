@@ -93,55 +93,108 @@ struct json_parser;
  * NOTE: Any generator codec must start with one of the following opcodes:
  *   - JGEN_BEGINOBJECT
  *   - JGEN_BEGINARRAY
- *   - JGEN_OPTIONAL (Which itself must be followed by another one of these opcodes, though not `JGEN_OPTIONAL' again)
- *   - JGEN_INTO
- *   - JGEN_TERM
- */
-#define JGEN_TERM         0x00 /* Generator terminal indicator. */
-#define JGEN_END          0x01 /* End an object or array. */
-#define JGEN_BEGINOBJECT  0x02 /* Begin a new object.
-                                * Must be followed by one of:
-                                *    - JGEN_FIELD
-                                */
-#define JGEN_BEGINARRAY   0x03 /* Begin a new array.
-                                * Must be followed by one of:
-                                *    - JGEN_INDEX
-                                *    - JGEN_INDEX_REP_OP
-                                */
-#define JGEN_OPTIONAL     0x04 /* Optional modifier.
-                                * When the associated data doesn't exist,
-                                * it is zero-initialized during parsing.
-                                * Must be followed by one of:
-                                *    - JGEN_FIELD
-                                *    - JGEN_BEGINOBJECT
-                                *    - JGEN_BEGINARRAY
-                                *    - JGEN_INDEX(*)
-                                */
-#define JGEN_FIELD        0x10 /* [+char utf8_c_string[]] Address a named field.
-                                * Must be followed by:
-                                *    - JGEN_BEGINOBJECT
-                                *    - JGEN_BEGINARRAY
-                                *    - JGEN_INTO
-                                */
-#define JGEN_INDEX        0x11 /* Must be followed by:
-                                *    - JGEN_BEGINOBJECT
-                                *    - JGEN_BEGINARRAY
-                                *    - JGEN_INTO
-                                */
-#define JGEN_INDEX_REP_OP 0x12 /* [+uint16_t count][+uint16_t stride]
-                                * Repeat an index operation
-                                * Must be followed by:
-                                *    - JGEN_BEGINOBJECT
-                                *    - JGEN_BEGINARRAY
-                                *    - JGEN_INTO
-                                */
+ *   - JGEN_EXTERN(...)
+ *   - JGEN_OPTIONAL    (Followed by `JGEN_BEGINOBJECT', `JGEN_BEGINARRAY' or `JGEN_EXTERN(...)')
+ *   - JGEN_INTO        (Only allowed within the global scope: Parse the next
+ *                       element as one of bool, number, float, string or null)
+ *   - JGEN_TERM        (Mark the end of the codec) */
+
+
+/* Generator terminal indicator.
+ * Must always appear at the end of any json codec. */
+#define JGEN_TERM         0x00
+
+/* End an object or array.
+ * Must be followed by one of the same as the opcodes
+ * as those allowed at the start of a codec. */
+#define JGEN_END          0x01
+
+/* Begin a new object.
+ * Must be followed by one of:
+ *    - JGEN_FIELD    (Repeated any number of times)
+ *    - JGEN_OPTIONAL (Followed by `JGEN_FIELD')
+ * ... must be followed by:
+ *    - JGEN_END */
+#define JGEN_BEGINOBJECT  0x02
+
+/* Begin a new array.
+ * Must be followed by one of:
+ *    - JGEN_OPTIONAL     // Followed by `JGEN_INDEX' or `JGEN_INDEX_REP_OP')
+ *    - JGEN_INDEX        // Repeated any number of times, though with ever increasing
+ *                        // indices Note that unspecified indices are ignored during
+ *                        // decoding, and written as `null' during encoding)
+ *    - JGEN_INDEX_REP_OP // May only appear once, and must then be used to describe
+ *                        // the entire array from start to finish)
+ * ... must be followed by:
+ *    - JGEN_END */
+#define JGEN_BEGINARRAY   0x03
+
+/* [+uint16_t offset][+uint16_t id] Insert an external json codec at this location.
+ * This is the same as having all instructions of that external codec appear in-line,
+ * with `offset' added to the offset field of every `JGEN_INTO' instruction.
+ * The given `id' is an index into the `ext' array accepted by the encode/decode
+ * API functions. */
+#define JGEN_EXTERN_OP    0x04
+#define JGEN_EXTERN(offset, id) \
+	JGEN_EXTERN_OP, JGEN_ENCODE_UINT16(offset), JGEN_ENCODE_UINT16(id)
+
+/* Optional modifier prefix.
+ * When the associated data doesn't exist, or is initiated using
+ * the `null'-token, data is zero-initialized during decoding.
+ * Must be followed by one of (depending on where this modifier was used):
+ *    - JGEN_FIELD
+ *    - JGEN_BEGINOBJECT
+ *    - JGEN_BEGINARRAY
+ *    - JGEN_EXTERN(...)
+ *    - JGEN_INDEX(...)
+ *    - JGEN_INDEX_REP(...) */
+#define JGEN_OPTIONAL     0x08
+
+/* [+char utf8_c_string[]] Address a named field.
+ * Must be followed by:
+ *    - JGEN_BEGINOBJECT
+ *    - JGEN_BEGINARRAY
+ *    - JGEN_EXTERN(...)
+ *    - JGEN_INTO */
+#define JGEN_FIELD        0x10
+
+/* [+uint16_t index] Address a specific array index
+ * Must be followed by:
+ *    - JGEN_BEGINOBJECT // For [{ ... }, ...]
+ *    - JGEN_BEGINARRAY  // For [[ ... ], ...]
+ *    - JGEN_EXTERN(...) // External codec...
+ *    - JGEN_INTO        // For [ 10, ... ] */
+#define JGEN_INDEX_OP     0x11
+#define JGEN_INDEX(index) \
+	JGEN_INDEX_OP, JGEN_ENCODE_UINT16(index)
+
+/* [+uint16_t count][+uint16_t stride] Repeat an index operation
+ * Must be followed by:
+ *    - JGEN_BEGINOBJECT  // For [{ ... }, { ... }, ...]
+ *    - JGEN_BEGINARRAY   // For [[ ... ], [ ... ], ...]
+ *    - JGEN_EXTERN(...)  // External codec...
+ *    - JGEN_INTO         // For [ 10, 20, 30, ... ]
+ * This operator can be used to quickly define a complete array:
+ * >> JGEN_BEGINARRAY,
+ * >> 	JGEN_INDEX_REP(4, sizeof(int)), JGEN_INTO, JSON_OFFSETOF(struct my_struct, ms_values), JSON_TYPE_INT,
+ * >> JGEN_END,
+ * Same as:
+ * >> JGEN_BEGINARRAY,
+ * >> 	JGEN_INDEX(0), JGEN_INTO, JSON_OFFSETOF(struct my_struct, ms_values[0]), JSON_TYPE_INT,
+ * >> 	JGEN_INDEX(1), JGEN_INTO, JSON_OFFSETOF(struct my_struct, ms_values[1]), JSON_TYPE_INT,
+ * >> 	JGEN_INDEX(2), JGEN_INTO, JSON_OFFSETOF(struct my_struct, ms_values[2]), JSON_TYPE_INT,
+ * >> 	JGEN_INDEX(3), JGEN_INTO, JSON_OFFSETOF(struct my_struct, ms_values[3]), JSON_TYPE_INT,
+ * >> JGEN_END, */
+#define JGEN_INDEX_REP_OP 0x12
 #define JGEN_INDEX_REP(count, stride) \
 	JGEN_INDEX_REP_OP, JGEN_ENCODE_UINT16((count) - 1), JGEN_ENCODE_UINT16(stride)
-#define JGEN_INTO         0x13 /* [+uint16_t offset][+uint8_t type]
-                                * Must be followed by:
-                                *   #1: JSON_OFFSET(*)
-                                *   #2: JSON_TYPE_*
-                                */
+
+/* [+uint16_t offset][+uint8_t type]
+ * Descriptor for the C type and structure offset of data to be de-/encoded
+ * Must be followed by (in order):
+ *   #1: JSON_OFFSET(*)
+ *   #2: JSON_TYPE_* */
+#define JGEN_INTO         0x13
 
 
 /* Offset parameter generators for `JGEN_INTO' */
@@ -150,7 +203,7 @@ struct json_parser;
 
 /* Type parameter generators for `JGEN_INTO' */
 #define JSON_TYPE_BOOL                0xe0 /* bool */
-#define JSON_TYPE_BOOLBIT(bit)       (0xe0|((bit)&0x7)) /* Boolean bitflag (`*((u8 *)base + offset) ^= 1 << bit') */
+#define JSON_TYPE_BOOLBIT(bit)       (0xe0 | ((bit)&0x7)) /* Boolean bitflag (`*((u8 *)base + offset) ^= 1 << bit') */
 #define JSON_TYPE_BOOLFLAG(flag)                     \
 	((flag) == 0x01 ? 0xe0 : (flag) == 0x02 ? 0xe1 : \
 	 (flag) == 0x04 ? 0xe2 : (flag) == 0x08 ? 0xe3 : \
@@ -166,10 +219,13 @@ struct json_parser;
 #define JSON_TYPE_UINT64                0xef /* unsigned, 64-bit integer */
 #define JSON_TYPE_STRING                0xf0 /* utf8 *str -- Filled with a pointer returned by `libjson_parser_getstring()' */
 #define JSON_TYPE_STRING_OR_NULL        0xf1 /* Same as `JSON_TYPE_STRING', but also allow a `null' token, which results in `NULL' */
-#define JSON_TYPE_INLINE_STRING_OP      0xf2 /* [+uint16_t length] utf8[uint16_t] */
-#define JSON_TYPE_INLINE_STRING(length) JSON_TYPE_INLINE_STRING_OP, JGEN_ENCODE_UINT16(length)
-#define JSON_TYPE_STRING_WITH_LENGTH_OP 0xf9 /* [+uint16_t len_offset] utf8 *str; size_t len; */
-#define JSON_TYPE_STRING_WITH_LENGTH(len_offset) JSON_TYPE_STRING_WITH_LENGTH_OP, JGEN_ENCODE_UINT16(len_offset)
+#define JSON_TYPE_INLINE_STRING_OP      0xf2 /* [+uint16_t length] utf8[length] */
+#define JSON_TYPE_INLINE_STRING(length) \
+	JSON_TYPE_INLINE_STRING_OP, JGEN_ENCODE_UINT16(length)
+#define JSON_TYPE_STRING_WITH_LENGTH_OP 0xf9 /* [+uint16_t len_offset] utf8 *str; size_t len@len_offset; */
+#define JSON_TYPE_STRING_WITH_LENGTH(len_offset) \
+	JSON_TYPE_STRING_WITH_LENGTH_OP, JGEN_ENCODE_UINT16(len_offset)
+#define JSON_TYPE_VOID                  0xf3 /* void (nothing; parsed as `null'; the associated offset is ignored) */
 #ifndef __NO_FPU
 #define JSON_TYPE_FLOAT                 0xfd /* float */
 #define JSON_TYPE_DOUBLE                0xfe /* double */
@@ -192,22 +248,54 @@ struct json_parser;
 #define JSON_PRIVATE_STYPEFOR(sizeof) JSON_PRIVATE_STYPEFOR2(sizeof)
 #define JSON_PRIVATE_UTYPEFOR(sizeof) JSON_PRIVATE_UTYPEFOR2(sizeof)
 
-#define JSON_TYPE_SCHAR        JSON_PRIVATE_STYPEFOR(__SIZEOF_CHAR__)
-#define JSON_TYPE_UCHAR        JSON_PRIVATE_UTYPEFOR(__SIZEOF_CHAR__)
-#define JSON_TYPE_SHORT        JSON_PRIVATE_STYPEFOR(__SIZEOF_SHORT__)
-#define JSON_TYPE_USHORT       JSON_PRIVATE_UTYPEFOR(__SIZEOF_SHORT__)
-#define JSON_TYPE_INT          JSON_PRIVATE_STYPEFOR(__SIZEOF_INT__)
-#define JSON_TYPE_UINT         JSON_PRIVATE_UTYPEFOR(__SIZEOF_INT__)
-#define JSON_TYPE_LONG         JSON_PRIVATE_STYPEFOR(__SIZEOF_LONG__)
-#define JSON_TYPE_ULONG        JSON_PRIVATE_UTYPEFOR(__SIZEOF_LONG__)
-#define JSON_TYPE_LLONG        JSON_PRIVATE_STYPEFOR(__SIZEOF_LONG_LONG__)
-#define JSON_TYPE_ULLONG       JSON_PRIVATE_UTYPEFOR(__SIZEOF_LONG_LONG__)
-#define JSON_TYPE_SIZE_T       JSON_PRIVATE_UTYPEFOR(__SIZEOF_SIZE_T__)
-#define JSON_TYPE_SSIZE_T      JSON_PRIVATE_STYPEFOR(__SIZEOF_SIZE_T__)
-#define JSON_TYPE_INTPTR_T     JSON_PRIVATE_STYPEFOR(__SIZEOF_POINTER__)
-#define JSON_TYPE_UINTPTR_T    JSON_PRIVATE_UTYPEFOR(__SIZEOF_POINTER__)
-#define JSON_TYPE_INTMAX_T     JSON_PRIVATE_STYPEFOR(__SIZEOF_INTMAX_T__)
-#define JSON_TYPE_UINTMAX_T    JSON_PRIVATE_UTYPEFOR(__SIZEOF_INTMAX_T__)
+#define JSON_TYPE_SCHAR          JSON_PRIVATE_STYPEFOR(__SIZEOF_CHAR__)
+#define JSON_TYPE_UCHAR          JSON_PRIVATE_UTYPEFOR(__SIZEOF_CHAR__)
+#define JSON_TYPE_SHORT          JSON_PRIVATE_STYPEFOR(__SIZEOF_SHORT__)
+#define JSON_TYPE_USHORT         JSON_PRIVATE_UTYPEFOR(__SIZEOF_SHORT__)
+#define JSON_TYPE_INT            JSON_PRIVATE_STYPEFOR(__SIZEOF_INT__)
+#define JSON_TYPE_UINT           JSON_PRIVATE_UTYPEFOR(__SIZEOF_INT__)
+#define JSON_TYPE_LONG           JSON_PRIVATE_STYPEFOR(__SIZEOF_LONG__)
+#define JSON_TYPE_ULONG          JSON_PRIVATE_UTYPEFOR(__SIZEOF_LONG__)
+#ifdef __COMPILER_HAVE_LONGLONG
+#define JSON_TYPE_LLONG          JSON_PRIVATE_STYPEFOR(__SIZEOF_LONG_LONG__)
+#define JSON_TYPE_ULLONG         JSON_PRIVATE_UTYPEFOR(__SIZEOF_LONG_LONG__)
+#endif /* __COMPILER_HAVE_LONGLONG */
+#define JSON_TYPE_SIZE_T         JSON_PRIVATE_UTYPEFOR(__SIZEOF_SIZE_T__)
+#define JSON_TYPE_SSIZE_T        JSON_PRIVATE_STYPEFOR(__SIZEOF_SIZE_T__)
+#define JSON_TYPE_PTRDIFF_T      JSON_PRIVATE_STYPEFOR(__SIZEOF_PTRDIFF_T__)
+#define JSON_TYPE_INTPTR_T       JSON_PRIVATE_STYPEFOR(__SIZEOF_POINTER__)
+#define JSON_TYPE_UINTPTR_T      JSON_PRIVATE_UTYPEFOR(__SIZEOF_POINTER__)
+#define JSON_TYPE_INTMAX_T       JSON_PRIVATE_STYPEFOR(__SIZEOF_INTMAX_T__)
+#define JSON_TYPE_UINTMAX_T      JSON_PRIVATE_UTYPEFOR(__SIZEOF_INTMAX_T__)
+#define JSON_TYPE_CHAR16_T       JSON_TYPE_UINT16
+#define JSON_TYPE_CHAR32_T       JSON_TYPE_UINT32
+#ifdef __SIZEOF_WCHAR_T__
+#ifdef __WCHAR_UNSIGNED__
+#define JSON_TYPE_WCHAR_T        JSON_PRIVATE_UTYPEFOR(__SIZEOF_WCHAR_T__)
+#else /* __WCHAR_UNSIGNED__ */
+#define JSON_TYPE_WCHAR_T        JSON_PRIVATE_STYPEFOR(__SIZEOF_WCHAR_T__)
+#endif /* !__WCHAR_UNSIGNED__ */
+#endif /* __SIZEOF_WCHAR_T__ */
+#define JSON_TYPE_INT_FAST8_T    JSON_PRIVATE_STYPEFOR(__SIZEOF_INT_FAST8_T__)
+#define JSON_TYPE_UINT_FAST8_T   JSON_PRIVATE_UTYPEFOR(__SIZEOF_INT_FAST8_T__)
+#define JSON_TYPE_INT_FAST16_T   JSON_PRIVATE_STYPEFOR(__SIZEOF_INT_FAST16_T__)
+#define JSON_TYPE_UINT_FAST16_T  JSON_PRIVATE_UTYPEFOR(__SIZEOF_INT_FAST16_T__)
+#define JSON_TYPE_INT_FAST32_T   JSON_PRIVATE_STYPEFOR(__SIZEOF_INT_FAST32_T__)
+#define JSON_TYPE_UINT_FAST32_T  JSON_PRIVATE_UTYPEFOR(__SIZEOF_INT_FAST32_T__)
+#ifdef __SIZEOF_INT_FAST64_T__
+#define JSON_TYPE_INT_FAST64_T   JSON_PRIVATE_STYPEFOR(__SIZEOF_INT_FAST64_T__)
+#define JSON_TYPE_UINT_FAST64_T  JSON_PRIVATE_UTYPEFOR(__SIZEOF_INT_FAST64_T__)
+#endif /* __SIZEOF_INT_FAST64_T__ */
+#define JSON_TYPE_INT_LEAST8_T   JSON_PRIVATE_STYPEFOR(__SIZEOF_INT_LEAST8_T__)
+#define JSON_TYPE_UINT_LEAST8_T  JSON_PRIVATE_UTYPEFOR(__SIZEOF_INT_LEAST8_T__)
+#define JSON_TYPE_INT_LEAST16_T  JSON_PRIVATE_STYPEFOR(__SIZEOF_INT_LEAST16_T__)
+#define JSON_TYPE_UINT_LEAST16_T JSON_PRIVATE_UTYPEFOR(__SIZEOF_INT_LEAST16_T__)
+#define JSON_TYPE_INT_LEAST32_T  JSON_PRIVATE_STYPEFOR(__SIZEOF_INT_LEAST32_T__)
+#define JSON_TYPE_UINT_LEAST32_T JSON_PRIVATE_UTYPEFOR(__SIZEOF_INT_LEAST32_T__)
+#ifdef __SIZEOF_INT_LEAST64_T__
+#define JSON_TYPE_INT_LEAST64_T  JSON_PRIVATE_STYPEFOR(__SIZEOF_INT_LEAST64_T__)
+#define JSON_TYPE_UINT_LEAST64_T JSON_PRIVATE_UTYPEFOR(__SIZEOF_INT_LEAST64_T__)
+#endif /* __SIZEOF_INT_LEAST64_T__ */
 
 #ifdef __CHAR_UNSIGNED__
 #define JSON_TYPE_CHAR   JSON_TYPE_UCHAR
@@ -219,36 +307,42 @@ struct json_parser;
 
 
 /* Encode a given object `src' as Json, using the given `codec' as generator.
+ * @param: ext: External codec vector (s.a. `JGEN_EXTERN(...)')
  * @return:  0: Success
  * @return: -1: Error: `writer->jw_result' has a negative value when the function was called.
  * @return: -1: Error: An invocation of the `writer->jw_printer' returned a negative value.
  * @return: -2: Error: Invalid usage during this, or during an earlier call. */
 typedef __ATTR_NONNULL((1, 2, 3)) int
-(LIBJSON_CC *PJSON_ENCODE)(struct json_writer *__restrict writer,
-                           void const *__restrict codec,
-                           void const *__restrict src);
+(LIBJSON_CC *PJSON_ENCODE)(struct json_writer *__restrict __writer,
+                           void const *__restrict __codec,
+                           void const *__restrict __src,
+                           void const *const *__ext);
 #ifdef LIBJSON_WANT_PROTOTYPES
 LIBJSON_DECL __ATTR_NONNULL((1, 2, 3)) int LIBJSON_CC
-json_encode(struct json_writer *__restrict writer,
-            void const *__restrict codec,
-            void const *__restrict src);
+json_encode(struct json_writer *__restrict __writer,
+            void const *__restrict __codec,
+            void const *__restrict __src,
+            void const *const *__ext);
 #endif /* LIBJSON_WANT_PROTOTYPES */
 
 /* Decode a given object `dst' from Json, using the given `codec' as generator.
+ * @param: ext: External codec vector (s.a. `JGEN_EXTERN(...)')
  * @return: JSON_ERROR_OK:     Success.
  * @return: JSON_ERROR_SYNTAX: Syntax error.
  * @return: JSON_ERROR_NOOBJ:  A required field doesn't exist or has wrong typing.
  * @return: JSON_ERROR_SYSERR: Malformed codec.
  * @return: JSON_ERROR_RANGE:  The value of an integer field was too large. */
 typedef __ATTR_NONNULL((1, 2, 3)) int
-(LIBJSON_CC *PJSON_DECODE)(struct json_parser *__restrict parser,
-                           void const *__restrict codec,
-                           void *__restrict dst);
+(LIBJSON_CC *PJSON_DECODE)(struct json_parser *__restrict __parser,
+                           void const *__restrict __codec,
+                           void *__restrict __dst,
+                           void const *const *__ext);
 #ifdef LIBJSON_WANT_PROTOTYPES
 LIBJSON_DECL __ATTR_NONNULL((1, 2, 3)) int
-__NOTHROW_NCX(LIBJSON_CC json_decode)(struct json_parser *__restrict parser,
-                                      void const *__restrict codec,
-                                      void *__restrict dst);
+__NOTHROW_NCX(LIBJSON_CC json_decode)(struct json_parser *__restrict __parser,
+                                      void const *__restrict __codec,
+                                      void *__restrict __dst,
+                                      void const *const *__ext);
 #endif /* LIBJSON_WANT_PROTOTYPES */
 
 
