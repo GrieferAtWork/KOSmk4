@@ -156,6 +156,28 @@ FUNDEF ssize_t FCALL syscall_printtrace(struct rpc_syscall_info const *__restric
 #else /* !CONFIG_NO_SYSCALL_TRACING */
 #define syscall_tracing_getenabled()  false
 #endif /* CONFIG_NO_SYSCALL_TRACING */
+
+
+/* Emulate the execution of a system call.
+ * NOTE: `syscall_emulate_r()' is the same as `syscall_emulate()', however
+ *       will reset the kernel-space stack to `state', and immediately return
+ *       to userspace after the system call has returned (or unwind any exception
+ *       that was thrown by the system call, also dealing with the possibility
+ *       of RPC function handling, as well as system call restarting)
+ *       Note this variant will _NOT_ unwind the caller's stack, and should
+ *       therefor only be used when no cleanup has to be performed within the
+ *       calling thread! (if this doesn't apply, `syscall_emulate()' should
+ *       be used instead) */
+#ifndef __syscall_emulate_defined
+#define __syscall_emulate_defined 1
+FUNDEF WUNUSED struct icpustate *FCALL
+syscall_emulate(struct icpustate *__restrict state,
+                struct rpc_syscall_info const *__restrict sc_info);
+FUNDEF ATTR_NORETURN void FCALL
+syscall_emulate_r(struct icpustate *__restrict state,
+                  struct rpc_syscall_info const *__restrict sc_info);
+#endif /* !__syscall_emulate_defined */
+
 #endif /* !__CC__ */
 
 DECL_END

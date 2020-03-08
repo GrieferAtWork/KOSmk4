@@ -28,6 +28,11 @@
 
 #include <stdbool.h>
 
+/* TODO: Don't use the CONFIG_* namespace for arch-predefined
+ *       paging features. (CONFIG_* should only be used for
+ *       things that the user can select when building KOS)
+ *       Just use the ARCH_* namespace instead! */
+
 
 /* Since the entire kernel-space has its E1-vectors pre-allocated (so-as
  * to allow them to be share across all page-directories), page directory

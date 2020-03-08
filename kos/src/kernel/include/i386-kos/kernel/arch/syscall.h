@@ -124,18 +124,6 @@ FUNDEF ATTR_NORETURN void FCALL x86_syscall_emulate_cdecl_r(struct icpustate *__
 #define syscall_emulate32_callback_r x86_syscall_emulate_cdecl_r
 #endif /* !__x86_64__ */
 
-/* Emulate the execution of a system call.
- * NOTE: `syscall_emulate_r()' is the same as `syscall_emulate()', however
- *       will reset the kernel-space stack to `state', and immediately return
- *       to userspace after the system call has returned (or unwind any exception
- *       that was thrown by the system call, also dealing with the possibility
- *       of RPC function handling, as well as system call restarting) */
-FUNDEF WUNUSED struct icpustate *FCALL
-syscall_emulate(struct icpustate *__restrict state,
-                struct rpc_syscall_info const *__restrict sc_info);
-FUNDEF ATTR_NORETURN void FCALL
-syscall_emulate_r(struct icpustate *__restrict state,
-                  struct rpc_syscall_info const *__restrict sc_info);
 
 #ifdef __x86_64__
 FUNDEF WUNUSED struct icpustate *FCALL
