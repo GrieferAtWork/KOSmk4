@@ -105,6 +105,7 @@ for (local l: File.stdin) {
 					"OP_RM32 OP_RXMM_MASK",
 					"OP_RM64 OP_RXMM_MASK",
 					"OP_U8 OP_RM128_XMM OP_RK_MASK",
+					"OP_IMM8_XMM OP_RM128_XMM__OP_VRXMM__OP_RXMM",
 				})) {
 					longName = longName + "_XMM";
 				} else if (containsAny(iRepr, {
@@ -123,6 +124,7 @@ for (local l: File.stdin) {
 					"OP_RM64 OP_RYMM_MASK",
 					"OP_U8 OP_RM256_YMM OP_RK_MASK",
 					"OP_RM256_YMM OP_RXMM_MASK",
+					"OP_IMM8_YMM OP_RM256_YMM__OP_VRYMM__OP_RYMM",
 				})) {
 					longName = longName + "_YMM";
 				} else if (containsAny(iRepr, {
@@ -144,6 +146,7 @@ for (local l: File.stdin) {
 					"OP_ER OP_RM512_ZMM OP_RYMM_MASK",
 					"OP_SAE OP_RM512_ZMM OP_RYMM_MASK",
 					"OP_SAE OP_RM256_YMM OP_RZMM_MASK",
+					"OP_IMM8_ZMM OP_RM512_ZMM__OP_VRZMM__OP_RZMM",
 				})) {
 					longName = longName + "_ZMM";
 				} else if (containsAny(iRepr, {

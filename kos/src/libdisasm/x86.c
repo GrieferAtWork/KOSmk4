@@ -1830,6 +1830,20 @@ do_print_moffs:
 					da_print_Xmmmask(self, flags);
 					break;
 
+				case OPC_IMM8_XMM: {
+					u8 byte;
+					byte = *(u8 *)self->d_pc;
+					self->d_pc += 1;
+					da_print_xmmreg(self, (byte & 0xf0) >> 4);
+				}	break;
+
+				case OPC_IMM8_YMM: {
+					u8 byte;
+					byte = *(u8 *)self->d_pc;
+					self->d_pc += 1;
+					da_print_ymmreg(self, (byte & 0xf0) >> 4);
+				}	break;
+
 				case OPC_RM128_XMM__OPC_VRXMM__OPC_RXMM_MASK:
 					/* OPC_RM128_XMM OPC_VRXMM OPC_RXMM_MASK */
 					da_print_modrm_rm128_xmm(self, &rm, flags);

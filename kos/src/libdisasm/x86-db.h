@@ -252,10 +252,10 @@ struct instruction {
 #define OP_ER           "I" /* {rn-sae}, {rd-sae}, {ru-sae} or {rz-sae} (based on `EVEX.LL') (operand is skipped if `EVEX.b' isn't set) */
 #define OPC_SAE         'J' /* {sae} (operand is skipped if `EVEX.b' isn't set) */
 #define OP_SAE          "J" /* {sae} (operand is skipped if `EVEX.b' isn't set) */
-/*      OPC_            'K'  * ... */
-/*      OP_             "K"  * ... */
-/*      OPC_            'L'  * ... */
-/*      OP_             "L"  * ... */
+#define OPC_IMM8_XMM    'J' /* %xmmN (based on *PC & 0xf0 before doing PC+=1) */
+#define OP_IMM8_XMM     "J" /* %xmmN (based on *PC & 0xf0 before doing PC+=1) */
+#define OPC_IMM8_YMM    'K' /* %ymmN (based on *PC & 0xf0 before doing PC+=1) */
+#define OP_IMM8_YMM     "K" /* %ymmN (based on *PC & 0xf0 before doing PC+=1) */
 /*      OPC_            'M'  * ... */
 /*      OP_             "M"  * ... */
 /*      OPC_            'N'  * ... */
@@ -3640,6 +3640,8 @@ PRIVATE struct instruction const ops_0f38[] = {
 	I(0x10, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 1) "vpsrlvw\t" OP_RM256_YMM__OP_VRYMM__OP_RYMM_MASK), /* EVEX.256.66.0f38.W1 10 /r vpsrlvw ymm1{k1}{z}, ymm2, ymm3/m256 */
 	I(0x10, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 2) "vpsrlvw\t" OP_RM512_ZMM__OP_VRZMM__OP_RZMM_MASK), /* EVEX.512.66.0f38.W1 10 /r vpsrlvw zmm1{k1}{z}, zmm2, zmm3/m512 */
 
+	I(0x10, IF_66|IF_MODRM, LONGREPR(LO_PBLENDVB)), /* 66 0f 38 10 /r pblendvb xmm1, xmm2/m128, <xmm0> */
+
 	I(0x11, IF_F3|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(0, 0, 0, 0), LO_VPMOVUSDB_XMM)), /* EVEX.128.f3.0f38.W0 11 /r vpmovusdb xmm1/m32{k1}{z}, xmm2 */
 	I(0x11, IF_F3|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(0, 0, 0, 1), LO_VPMOVUSDB_YMM)), /* EVEX.256.f3.0f38.W0 11 /r vpmovusdb xmm1/m64{k1}{z}, ymm2 */
 	I(0x11, IF_F3|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(0, 0, 0, 2), LO_VPMOVUSDB_ZMM)), /* EVEX.512.f3.0f38.W0 11 /r vpmovusdb xmm1/m128{k1}{z}, zmm2 */
@@ -3675,6 +3677,8 @@ PRIVATE struct instruction const ops_0f38[] = {
 	I(0x14, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 2) "vprorvd\t" OP_RM512_ZMM__OP_VRZMM__OP_RZMM_MASK), /* EVEX.512.66.0f38.W0 14 /r vprorvd zmm1{k1}{z}, zmm2, zmm3/m512/m32bcst */
 	I(0x14, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 2) "vprorvq\t" OP_RM512_ZMM__OP_VRZMM__OP_RZMM_MASK), /* EVEX.512.66.0f38.W1 14 /r vprorvq zmm1{k1}{z}, zmm2, zmm3/m512/m64bcst */
 
+	I(0x14, IF_66|IF_MODRM, LONGREPR(LO_BLENDVPS)), /* 66 0f 38 14 /r blendvps xmm1, xmm2/m128, <xmm0> */
+
 	I(0x15, IF_F3|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(0, 0, 0, 0), LO_VPMOVUSQD_XMM)),        /* EVEX.128.f3.0f38.W0 15 /r vpmovusqd xmm1/m64{k1}{z}, xmm2 */
 	I(0x15, IF_F3|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(0, 0, 0, 1), LO_VPMOVUSQD_YMM)),        /* EVEX.256.f3.0f38.W0 15 /r vpmovusqd xmm1/m128{k1}{z}, ymm2 */
 	I(0x15, IF_F3|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(0, 0, 0, 2), LO_VPMOVUSQD_ZMM)),        /* EVEX.512.f3.0f38.W0 15 /r vpmovusqd ymm1/m256{k1}{z}, zmm2 */
@@ -3685,6 +3689,8 @@ PRIVATE struct instruction const ops_0f38[] = {
 	I(0x15, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 1) "vprolvq\t" OP_RM256_YMM__OP_VRYMM__OP_RYMM_MASK), /* EVEX.256.66.0f38.W1 15 /r vprolvq ymm1{k1}{z}, ymm2, ymm3/m256/m64bcst */
 	I(0x15, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 2) "vprolvd\t" OP_RM512_ZMM__OP_VRZMM__OP_RZMM_MASK), /* EVEX.512.66.0f38.W0 15 /r vprolvd zmm1{k1}{z}, zmm2, zmm3/m512/m32bcst */
 	I(0x15, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 2) "vprolvq\t" OP_RM512_ZMM__OP_VRZMM__OP_RZMM_MASK), /* EVEX.512.66.0f38.W1 15 /r vprolvq zmm1{k1}{z}, zmm2, zmm3/m512/m64bcst */
+
+	I(0x15, IF_66|IF_MODRM, LONGREPR(LO_BLENDVPD)), /* 66 0f 38 15 /r blendvpd xmm1, xmm2/m128, <xmm0> */
 
 	I(0x16, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 1) "vpermpd\t" OP_RM256_YMM__OP_VRYMM__OP_RYMM_MASK), /* EVEX.256.66.0f38.W1 16 /r vpermpd ymm1{k1}{z}, ymm2, ymm3/m256/m64bcst */
 	I(0x16, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 2) "vpermpd\t" OP_RM512_ZMM__OP_VRZMM__OP_RZMM_MASK), /* EVEX.512.66.0f38.W1 16 /r vpermpd zmm1{k1}{z}, zmm2, zmm3/m512/m64bcst */
@@ -4107,6 +4113,10 @@ PRIVATE struct instruction const ops_0f38[] = {
 	I(0x4f, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0_LIG(0, 0, 1), LO_VRSQRT14SD)), /* EVEX.LIG.66.0f38.W1 4f /r vrsqrt14sd xmm1{k1}{z}, xmm2, xmm3/m64 */
 	I(0x4f, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0_LIG(0, 0, 0), LO_VRSQRT14SS)), /* EVEX.LIG.66.0f38.W0 4f /r vrsqrt14ss xmm1{k1}{z}, xmm2, xmm3/m32 */
 
+	I(0x52, IF_F2|IF_VEX|IF_MODRM|IF_RMM, LONGREPR_B(B_OP_VEX_B0(0, 0, 0, 2), LO_VP4DPWSSD)), /* EVEX.512.f2.0f38.W0 52 /r vp4dpwssd zmm1{k1}{z}, zmm2+3, m128 */
+
+	I(0x53, IF_F2|IF_VEX|IF_MODRM|IF_RMM, LONGREPR_B(B_OP_VEX_B0(0, 0, 0, 2), LO_VP4DPWSSDS)), /* EVEX.512.f2.0f38.W0 53 /r vp4dpwssds zmm1{k1}{z}, zmm2+3, m128 */
+
 	I(0x58, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(0, 0, 0, 0), LO_VPBROADCASTD_XX)), /* EVEX.128.66.0f38.W0 58 /r vpbroadcastd xmm1{k1}{z}, xmm2/m32 */
 	I(0x58, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(0, 0, 0, 1), LO_VPBROADCASTD_XY)), /* EVEX.256.66.0f38.W0 58 /r vpbroadcastd ymm1{k1}{z}, xmm2/m32 */
 	I(0x58, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(0, 0, 0, 2), LO_VPBROADCASTD_XZ)), /* EVEX.512.66.0f38.W0 58 /r vpbroadcastd zmm1{k1}{z}, xmm2/m32 */
@@ -4311,8 +4321,12 @@ PRIVATE struct instruction const ops_0f38[] = {
 	I(0x9a, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(0, 0, 0, 1), LO_VFMSUB132PS_YMM)), /* EVEX.256.66.0f38.W0 9a /r vfmsub132ps ymm1{k1}{z}, ymm2, ymm3/m256/m32bcst */
 	I(0x9a, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(0, 0, 0, 2), LO_VFMSUB132PS_ZMM)), /* EVEX.512.66.0f38.W0 9a /r vfmsub132ps zmm1{k1}{z}, zmm2, zmm3/m512/m32bcst{er} */
 
+	I(0x9a, IF_F2|IF_VEX|IF_MODRM|IF_RMM, LONGREPR_B(B_OP_VEX_B0(0, 0, 0, 2), LO_V4FMADDPS_ZMM)),  /* EVEX.512.f2.0f38.W0 9a /r v4fmaddps zmm1{k1}{z}, zmm2+3, m128 */
+
 	I(0x9b, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0_LIG(0, 0, 1), LO_VFMSUB132SD_XMM)), /* EVEX.LIG.66.0f38.W1 9b /r vfmsub132sd xmm1{k1}{z}, xmm2, xmm3/m64{er} */
 	I(0x9b, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0_LIG(0, 0, 0), LO_VFMSUB132SS_XMM)), /* EVEX.LIG.66.0f38.W0 9b /r vfmsub132ss xmm1{k1}{z}, xmm2, xmm3/m32{er} */
+
+	I(0x9b, IF_F2|IF_VEX|IF_MODRM|IF_RMM, LONGREPR_B(B_OP_VEX_B0_LIG(0, 0, 0), LO_V4FMADDSS_XMM)),  /* EVEX.LIG.f2.0f38.W0 9b /r v4fmaddss xmm1{k1}{z}, xmm2+3, m128 */
 
 	I(0xa6, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(0, 0, 1, 0), LO_VFMADDSUB213PD_XMM)), /* EVEX.128.66.0f38.W1 a6 /r vfmaddsub213pd xmm1{k1}{z}, xmm2, xmm3/m128/m64bcst */
 	I(0xa6, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(0, 0, 1, 1), LO_VFMADDSUB213PD_YMM)), /* EVEX.256.66.0f38.W1 a6 /r vfmaddsub213pd ymm1{k1}{z}, ymm2, ymm3/m256/m64bcst */
@@ -4345,8 +4359,12 @@ PRIVATE struct instruction const ops_0f38[] = {
 	I(0xaa, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(0, 0, 0, 1), LO_VFMSUB213PS_YMM)), /* EVEX.256.66.0f38.W0 aa /r vfmsub213ps ymm1{k1}{z}, ymm2, ymm3/m256/m32bcst */
 	I(0xaa, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(0, 0, 0, 2), LO_VFMSUB213PS_ZMM)), /* EVEX.512.66.0f38.W0 aa /r vfmsub213ps zmm1{k1}{z}, zmm2, zmm3/m512/m32bcst{er} */
 
+	I(0xaa, IF_F2|IF_VEX|IF_MODRM|IF_RMM, LONGREPR_B(B_OP_VEX_B0(0, 0, 0, 2), LO_V4FNMADDPS_ZMM)), /* EVEX.512.f2.0f38.W0 aa /r v4fnmaddps zmm1{k1}{z}, zmm2+3, m128 */
+
 	I(0xab, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0_LIG(0, 0, 1), LO_VFMSUB213SD_XMM)), /* EVEX.LIG.66.0f38.W1 ab /r vfmsub213sd xmm1{k1}{z}, xmm2, xmm3/m64{er} */
 	I(0xab, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0_LIG(0, 0, 0), LO_VFMSUB213SS_XMM)), /* EVEX.LIG.66.0f38.W0 ab /r vfmsub213ss xmm1{k1}{z}, xmm2, xmm3/m32{er} */
+
+	I(0xab, IF_F2|IF_VEX|IF_MODRM|IF_RMM, LONGREPR_B(B_OP_VEX_B0_LIG(0, 0, 0), LO_V4FNMADDSS_XMM)), /* EVEX.LIG.f2.0f38.W0 ab /r v4fnmaddss xmm1{k1}{z}, xmm2+3, m128 */
 
 	I(0xb4, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(0, 0, 1, 0), LO_VPMADD52LUQ_XMM)), /* EVEX.128.66.0f38.W1 b4 /r vpmadd52luq xmm1{k1}{z}, xmm2, xmm3/m128/m64bcst */
 	I(0xb4, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(0, 0, 1, 1), LO_VPMADD52LUQ_YMM)), /* EVEX.256.66.0f38.W1 b4 /r vpmadd52luq ymm1{k1}{z}, ymm2, ymm3/m256/m64bcst */
@@ -4732,6 +4750,15 @@ PRIVATE struct instruction const ops_0f3a[] = {
 
 	I(0x46, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(0, 0, 0, 1), LO_VPERM2I128)), /* VEX.256.66.0f3a.W0 46 /r ib vperm2i128 ymm1, ymm2, ymm3/m256, imm8 */
 
+	I(0x4a, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(0, 0, 0, 0), LO_VBLENDVPS_XMM)), /* VEX.128.66.0f3a.W0 4a /r /is4 vblendvps xmm1, xmm2, xmm3/m128, xmm4 */
+	I(0x4a, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(0, 0, 0, 1), LO_VBLENDVPS_YMM)), /* VEX.256.66.0f3a.W0 4a /r /is4 vblendvps ymm1, ymm2, ymm3/m256, ymm4 */
+
+	I(0x4b, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(0, 0, 0, 0), LO_VBLENDVPD_XMM)), /* VEX.128.66.0f3a.W0 4b /r /is4 vblendvpd xmm1, xmm2, xmm3/m128, xmm4 */
+	I(0x4b, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(0, 0, 0, 1), LO_VBLENDVPD_YMM)), /* VEX.256.66.0f3a.W0 4b /r /is4 vblendvpd ymm1, ymm2, ymm3/m256, ymm4 */
+	
+	I(0x4c, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(0, 0, 0, 0), LO_VPBLENDVB_XMM)), /* VEX.128.66.0f3a.W0 4c /r /is4 vpblendvb xmm1, xmm2, xmm3/m128, xmm4 */
+	I(0x4c, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(0, 0, 0, 1), LO_VPBLENDVB_YMM)), /* VEX.256.66.0f3a.W0 4c /r /is4 vpblendvb ymm1, ymm2, ymm3/m256, ymm4 */
+
 	I(0x50, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 0) "vrangepd\t" OP_U8 OP_RM128_XMM__OP_VRXMM__OP_RXMM_MASK), /* EVEX.128.66.0f3a.W1 50 /r ib vrangepd xmm1{k1}{z}, xmm2, xmm3/m128/m64bcst, imm8 */
 	I(0x50, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 1) "vrangepd\t" OP_U8 OP_RM256_YMM__OP_VRYMM__OP_RYMM_MASK), /* EVEX.256.66.0f3a.W1 50 /r ib vrangepd ymm1{k1}{z}, ymm2, ymm3/m256/m64bcst, imm8 */
 	I(0x50, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(0, 0, 1, 2), LO_VRANGEPD)),                          /* EVEX.512.66.0f3a.W1 50 /r ib vrangepd zmm1{k1}{z}, zmm2, zmm3/m512/m64bcst{sae}, imm8 */
@@ -4806,21 +4833,9 @@ PRIVATE struct instruction const ops_0f3a[] = {
 /* clang-format on */
 
 #if 0
-	I(0x4b, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 0) "/is4 vblendvpd " OP_RM128_XMM__OP_VRXMM__OP_RXMM ", xmm4"), /* VEX.128.66.0f3a.W0 4b /r /is4 vblendvpd xmm1, xmm2, xmm3/m128, xmm4 */
-	I(0x4b, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 1) "/is4 vblendvpd " OP_RM256_YMM__OP_VRYMM__OP_RYMM ", ymm4"), /* VEX.256.66.0f3a.W0 4b /r /is4 vblendvpd ymm1, ymm2, ymm3/m256, ymm4 */
-	I(0x15, IF_66|IF_MODRM,                              "blendvpd\t" OP_XMM0 OP_RM128_XMM OP_RXMM),                  /*           66 0f 38 15 /r      blendvpd xmm1, xmm2/m128, <xmm0> */
-
-	I(0x4a, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 0) "/is4 vblendvps " OP_RM128_XMM__OP_VRXMM__OP_RXMM ", xmm4"), /* VEX.128.66.0f3a.W0 4a /r /is4 vblendvps xmm1, xmm2, xmm3/m128, xmm4 */
-	I(0x4a, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 1) "/is4 vblendvps " OP_RM256_YMM__OP_VRYMM__OP_RYMM ", ymm4"), /* VEX.256.66.0f3a.W0 4a /r /is4 vblendvps ymm1, ymm2, ymm3/m256, ymm4 */
-	I(0x14, IF_66|IF_MODRM,                              "blendvps\t" OP_XMM0 OP_RM128_XMM OP_RXMM),                  /*           66 0f 38 14 /r      blendvps xmm1, xmm2/m128, <xmm0> */
-
-	I(0x4c, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 0) "/is4 vpblendvb " OP_RM128_XMM__OP_VRXMM__OP_RXMM ", xmm4"), /* VEX.128.66.0f3a.W0 4c /r /is4 vpblendvb xmm1, xmm2, xmm3/m128, xmm4 */
-	I(0x4c, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 1) "/is4 vpblendvb " OP_RM256_YMM__OP_VRYMM__OP_RYMM ", ymm4"), /* VEX.256.66.0f3a.W0 4c /r /is4 vpblendvb ymm1, ymm2, ymm3/m256, ymm4 */
-	I(0x10, IF_66|IF_MODRM,                              "pblendvb\t" OP_XMM0 OP_RM128_XMM OP_RXMM),                  /*           66 0f 38 10 /r      pblendvb xmm1, xmm2/m128, <xmm0> */
-
-	I(0x92, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 0) "vgatherdpd\txmm, vm32x, xmm2"), /* VEX.128.66.0f38.W1 92 /r vgatherdpd xmm1, vm32x, xmm2 */
+	I(0x92, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 0) "vgatherdpd\txmm, vm32x, xmm"), /* VEX.128.66.0f38.W1 92 /r vgatherdpd xmm1, vm32x, xmm2 */
 	I(0x92, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 1) "vgatherdpd\tymm, vm32x, ymm"),  /* VEX.256.66.0f38.W1 92 /r vgatherdpd ymm1, vm32x, ymm2 */
-	I(0x93, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 0) "vgatherqpd\txmm, vm64x, xmm2"), /* VEX.128.66.0f38.W1 93 /r vgatherqpd xmm1, vm64x, xmm2 */
+	I(0x93, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 0) "vgatherqpd\txmm, vm64x, xmm"), /* VEX.128.66.0f38.W1 93 /r vgatherqpd xmm1, vm64x, xmm2 */
 	I(0x93, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 1) "vgatherqpd\tymm, vm64y, ymm"),  /* VEX.256.66.0f38.W1 93 /r vgatherqpd ymm1, vm64y, ymm2 */
 
 	I(0x92, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 0) "vgatherdps\txmm{k1}, vm32x"),  /* EVEX.128.66.0f38.W0 92 /vsib vgatherdps xmm1{k1}, vm32x */
@@ -4830,10 +4845,10 @@ PRIVATE struct instruction const ops_0f3a[] = {
 	I(0x92, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 1) "vgatherdpd\tymm1{k1}, vm32x"), /* EVEX.256.66.0f38.W1 92 /vsib vgatherdpd ymm1{k1}, vm32x */
 	I(0x92, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 2) "vgatherdpd\tzmm1{k1}, vm32y"), /* EVEX.512.66.0f38.W1 92 /vsib vgatherdpd zmm1{k1}, vm32y */
 
-	I(0x92, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 0) "vgatherdps\txmm, vm32x, xmm2"), /* VEX.128.66.0f38.W0 92 /r vgatherdps xmm1, vm32x, xmm2 */
+	I(0x92, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 0) "vgatherdps\txmm, vm32x, xmm"), /* VEX.128.66.0f38.W0 92 /r vgatherdps xmm1, vm32x, xmm2 */
 	I(0x92, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 1) "vgatherdps\tymm, vm32y, ymm"),  /* VEX.256.66.0f38.W0 92 /r vgatherdps ymm1, vm32y, ymm2 */
-	I(0x93, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 0) "vgatherqps\txmm, vm64x, xmm2"), /* VEX.128.66.0f38.W0 93 /r vgatherqps xmm1, vm64x, xmm2 */
-	I(0x93, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 1) "vgatherqps\txmm, vm64y, xmm2"), /* VEX.256.66.0f38.W0 93 /r vgatherqps xmm1, vm64y, xmm2 */
+	I(0x93, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 0) "vgatherqps\txmm, vm64x, xmm"), /* VEX.128.66.0f38.W0 93 /r vgatherqps xmm1, vm64x, xmm2 */
+	I(0x93, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 1) "vgatherqps\txmm, vm64y, xmm"), /* VEX.256.66.0f38.W0 93 /r vgatherqps xmm1, vm64y, xmm2 */
 
 	I(0x93, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 0) "vgatherqps\txmm{k1}, vm64x"),  /* EVEX.128.66.0f38.W0 93 /vsib vgatherqps xmm1{k1}, vm64x */
 	I(0x93, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 1) "vgatherqps\txmm{k1}, vm64y"),  /* EVEX.256.66.0f38.W0 93 /vsib vgatherqps xmm1{k1}, vm64y */
@@ -4842,10 +4857,10 @@ PRIVATE struct instruction const ops_0f3a[] = {
 	I(0x93, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 1) "vgatherqpd\tymm1{k1}, vm64y"), /* EVEX.256.66.0f38.W1 93 /vsib vgatherqpd ymm1{k1}, vm64y */
 	I(0x93, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 2) "vgatherqpd\tzmm1{k1}, vm64z"), /* EVEX.512.66.0f38.W1 93 /vsib vgatherqpd zmm1{k1}, vm64z */
 
-	I(0x90, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 0) "vpgatherdd\txmm, vm32x, xmm2"), /* VEX.128.66.0f38.W0 90 /r vpgatherdd xmm1, vm32x, xmm2 */
+	I(0x90, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 0) "vpgatherdd\txmm, vm32x, xmm"), /* VEX.128.66.0f38.W0 90 /r vpgatherdd xmm1, vm32x, xmm2 */
 	I(0x90, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 1) "vpgatherdd\tymm, vm32y, ymm"),  /* VEX.256.66.0f38.W0 90 /r vpgatherdd ymm1, vm32y, ymm2 */
-	I(0x91, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 0) "vpgatherqd\txmm, vm64x, xmm2"), /* VEX.128.66.0f38.W0 91 /r vpgatherqd xmm1, vm64x, xmm2 */
-	I(0x91, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 1) "vpgatherqd\txmm, vm64y, xmm2"), /* VEX.256.66.0f38.W0 91 /r vpgatherqd xmm1, vm64y, xmm2 */
+	I(0x91, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 0) "vpgatherqd\txmm, vm64x, xmm"), /* VEX.128.66.0f38.W0 91 /r vpgatherqd xmm1, vm64x, xmm2 */
+	I(0x91, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 1) "vpgatherqd\txmm, vm64y, xmm"), /* VEX.256.66.0f38.W0 91 /r vpgatherqd xmm1, vm64y, xmm2 */
 
 	I(0x90, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 0) "vpgatherdd\txmm{k1}, vm32x"),  /* EVEX.128.66.0f38.W0 90 /vsib vpgatherdd xmm1{k1}, vm32x */
 	I(0x90, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 1) "vpgatherdd\tymm1{k1}, vm32y"), /* EVEX.256.66.0f38.W0 90 /vsib vpgatherdd ymm1{k1}, vm32y */
@@ -4861,9 +4876,9 @@ PRIVATE struct instruction const ops_0f3a[] = {
 	I(0x91, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 1) "vpgatherqq\tymm1{k1}, vm64y"), /* EVEX.256.66.0f38.W1 91 /vsib vpgatherqq ymm1{k1}, vm64y */
 	I(0x91, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 2) "vpgatherqq\tzmm1{k1}, vm64z"), /* EVEX.512.66.0f38.W1 91 /vsib vpgatherqq zmm1{k1}, vm64z */
 
-	I(0x90, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 0) "vpgatherdq\txmm, vm32x, xmm2"), /* VEX.128.66.0f38.W1 90 /r vpgatherdq xmm1, vm32x, xmm2 */
+	I(0x90, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 0) "vpgatherdq\txmm, vm32x, xmm"), /* VEX.128.66.0f38.W1 90 /r vpgatherdq xmm1, vm32x, xmm2 */
 	I(0x90, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 1) "vpgatherdq\tymm, vm32x, ymm"),  /* VEX.256.66.0f38.W1 90 /r vpgatherdq ymm1, vm32x, ymm2 */
-	I(0x91, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 0) "vpgatherqq\txmm, vm64x, xmm2"), /* VEX.128.66.0f38.W1 91 /r vpgatherqq xmm1, vm64x, xmm2 */
+	I(0x91, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 0) "vpgatherqq\txmm, vm64x, xmm"), /* VEX.128.66.0f38.W1 91 /r vpgatherqq xmm1, vm64x, xmm2 */
 	I(0x91, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 1) "vpgatherqq\tymm, vm64y, ymm"),  /* VEX.256.66.0f38.W1 91 /r vpgatherqq ymm1, vm64y, ymm2 */
 
 	I(0xa0, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 0) "vpscatterdd\tvm32x{k1}, xmm"), /* EVEX.128.66.0f38.W0 a0 /vsib vpscatterdd vm32x{k1}, xmm1 */
@@ -4892,12 +4907,6 @@ PRIVATE struct instruction const ops_0f3a[] = {
 	I(0xa3, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 1) "vscatterqpd\tvm64y{k1}, ymm"), /* EVEX.256.66.0f38.W1 a3 /vsib vscatterqpd vm64y{k1}, ymm1 */
 	I(0xa3, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 2) "vscatterqpd\tvm64z{k1}, zmm"), /* EVEX.512.66.0f38.W1 a3 /vsib vscatterqpd vm64z{k1}, zmm1 */
 
-	I(0x9a, IF_F2|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 2) "v4fmaddps\tzmm1{k1}{z}, zmm+3, m"),  /* EVEX.512.f2.0f38.W0 9a /r v4fmaddps zmm1{k1}{z}, zmm2+3, m128 */
-	I(0xaa, IF_F2|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 2) "v4fnmaddps\tzmm1{k1}{z}, zmm+3, m"), /* EVEX.512.f2.0f38.W0 aa /r v4fnmaddps zmm1{k1}{z}, zmm2+3, m128 */
-
-	I(0x9b, IF_F2|IF_VEX|IF_MODRM, OP_VEX_B0_LIG(0, 0, 0) "v4fmaddss\txmm{k1}{z}, xmm2+3, m"),  /* EVEX.LIG.f2.0f38.W0 9b /r v4fmaddss xmm1{k1}{z}, xmm2+3, m128 */
-	I(0xab, IF_F2|IF_VEX|IF_MODRM, OP_VEX_B0_LIG(0, 0, 0) "v4fnmaddss\txmm{k1}{z}, xmm2+3, m"), /* EVEX.LIG.f2.0f38.W0 ab /r v4fnmaddss xmm1{k1}{z}, xmm2+3, m128 */
-
 	I(0xc6, IF_66|IF_VEX|IF_MODRM|IF_REG1, OP_VEX_B0(0, 0, 0, 2) "/vsib vgatherpf0dps vm32z{k1}"), /* EVEX.512.66.0f38.W0 c6 /1 /vsib vgatherpf0dps vm32z{k1} */
 	I(0xc7, IF_66|IF_VEX|IF_MODRM|IF_REG1, OP_VEX_B0(0, 0, 0, 2) "/vsib vgatherpf0qps vm64z{k1}"), /* EVEX.512.66.0f38.W0 c7 /1 /vsib vgatherpf0qps vm64z{k1} */
 	I(0xc6, IF_66|IF_VEX|IF_MODRM|IF_REG1, OP_VEX_B0(0, 0, 1, 2) "/vsib vgatherpf0dpd vm32y{k1}"), /* EVEX.512.66.0f38.W1 c6 /1 /vsib vgatherpf0dpd vm32y{k1} */
@@ -4907,10 +4916,6 @@ PRIVATE struct instruction const ops_0f3a[] = {
 	I(0xc7, IF_66|IF_VEX|IF_MODRM|IF_REG2, OP_VEX_B0(0, 0, 0, 2) "/vsib vgatherpf1qps vm64z{k1}"), /* EVEX.512.66.0f38.W0 c7 /2 /vsib vgatherpf1qps vm64z{k1} */
 	I(0xc6, IF_66|IF_VEX|IF_MODRM|IF_REG2, OP_VEX_B0(0, 0, 1, 2) "/vsib vgatherpf1dpd vm32y{k1}"), /* EVEX.512.66.0f38.W1 c6 /2 /vsib vgatherpf1dpd vm32y{k1} */
 	I(0xc7, IF_66|IF_VEX|IF_MODRM|IF_REG2, OP_VEX_B0(0, 0, 1, 2) "/vsib vgatherpf1qpd vm64z{k1}"), /* EVEX.512.66.0f38.W1 c7 /2 /vsib vgatherpf1qpd vm64z{k1} */
-
-	I(0x52, IF_F2|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 2) "vp4dpwssd\tzmm1{k1}{z}, zmm+3, m"), /* EVEX.512.f2.0f38.W0 52 /r vp4dpwssd zmm1{k1}{z}, zmm2+3, m128 */
-
-	I(0x53, IF_F2|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 2) "vp4dpwssds\tzmm1{k1}{z}, zmm+3, m"), /* EVEX.512.f2.0f38.W0 53 /r vp4dpwssds zmm1{k1}{z}, zmm2+3, m128 */
 #endif
 
 
@@ -5048,45 +5053,45 @@ PRIVATE u16 const ops_0f_offsets[256] = {
 };
 
 #define HAVE_OPS_0F38_OFFSETS 1
-STATIC_ASSERT(COMPILER_LENOF(ops_0f38) == 749);
+STATIC_ASSERT(COMPILER_LENOF(ops_0f38) == 758);
 PRIVATE u16 const ops_0f38_offsets[256] = {
 	0, 5, 9, 13, 17, 22, 26, 30, 34, 38, 42, 46, 51, 54, 59, 61,
-	63, 69, 75, 81, 87, 96, 105, 109, 112, 117, 122, 127, 129, 134, 139, 146,
-	149, 156, 163, 170, 177, 184, 193, 205, 217, 229, 241, 250, 256, 264, 268, 270,
-	272, 279, 286, 293, 300, 307, 316, 320, 326, 336, 351, 358, 367, 371, 380, 384,
-	393, 402, 404, 410, 412, 418, 424, 430, 748, 748, 748, 748, 436, 442, 443, 449,
-	748, 748, 748, 748, 748, 748, 748, 748, 451, 454, 462, 467, 748, 748, 748, 748,
-	748, 748, 748, 748, 469, 475, 481, 748, 748, 748, 748, 748, 748, 748, 748, 748,
-	748, 748, 748, 748, 748, 487, 493, 499, 505, 508, 511, 514, 517, 523, 529, 535,
-	541, 543, 545, 547, 748, 748, 748, 748, 550, 556, 562, 568, 574, 578, 584, 748,
-	748, 748, 748, 748, 748, 748, 588, 594, 600, 606, 608, 614, 748, 748, 748, 748,
-	748, 748, 748, 748, 748, 748, 616, 622, 628, 634, 636, 642, 748, 748, 748, 748,
-	748, 748, 748, 748, 644, 647, 650, 656, 662, 668, 670, 676, 748, 748, 748, 748,
-	748, 748, 748, 748, 678, 748, 748, 748, 684, 687, 688, 691, 693, 694, 748, 695,
-	748, 748, 748, 748, 748, 748, 748, 748, 748, 748, 748, 697, 699, 701, 703, 705,
-	748, 748, 748, 748, 748, 748, 748, 748, 748, 748, 748, 748, 748, 748, 748, 748,
-	707, 712, 718, 720, 748, 726, 732, 738, 746, 748, 748, 748, 748, 748, 748, 748
+	63, 70, 76, 82, 88, 98, 108, 112, 115, 120, 125, 130, 132, 137, 142, 149,
+	152, 159, 166, 173, 180, 187, 196, 208, 220, 232, 244, 253, 259, 267, 271, 273,
+	275, 282, 289, 296, 303, 310, 319, 323, 329, 339, 354, 361, 370, 374, 383, 387,
+	396, 405, 407, 413, 415, 421, 427, 433, 757, 757, 757, 757, 439, 445, 446, 452,
+	757, 757, 454, 455, 757, 757, 757, 757, 456, 459, 467, 472, 757, 757, 757, 757,
+	757, 757, 757, 757, 474, 480, 486, 757, 757, 757, 757, 757, 757, 757, 757, 757,
+	757, 757, 757, 757, 757, 492, 498, 504, 510, 513, 516, 519, 522, 528, 534, 540,
+	546, 548, 550, 552, 757, 757, 757, 757, 555, 561, 567, 573, 579, 583, 589, 757,
+	757, 757, 757, 757, 757, 757, 593, 599, 605, 611, 613, 620, 757, 757, 757, 757,
+	757, 757, 757, 757, 757, 757, 623, 629, 635, 641, 643, 650, 757, 757, 757, 757,
+	757, 757, 757, 757, 653, 656, 659, 665, 671, 677, 679, 685, 757, 757, 757, 757,
+	757, 757, 757, 757, 687, 757, 757, 757, 693, 696, 697, 700, 702, 703, 757, 704,
+	757, 757, 757, 757, 757, 757, 757, 757, 757, 757, 757, 706, 708, 710, 712, 714,
+	757, 757, 757, 757, 757, 757, 757, 757, 757, 757, 757, 757, 757, 757, 757, 757,
+	716, 721, 727, 729, 757, 735, 741, 747, 755, 757, 757, 757, 757, 757, 757, 757
 };
 
 #define HAVE_OPS_0F3A_OFFSETS 1
-STATIC_ASSERT(COMPILER_LENOF(ops_0f3a) == 224);
+STATIC_ASSERT(COMPILER_LENOF(ops_0f3a) == 230);
 PRIVATE u8 const ops_0f3a_offsets[256] = {
-	0, 2, 4, 6, 12, 15, 20, 223, 21, 27, 33, 36, 39, 42, 45, 48,
-	223, 223, 223, 223, 53, 56, 59, 63, 65, 70, 75, 77, 223, 79, 82, 88,
-	94, 97, 100, 104, 223, 108, 114, 120, 223, 223, 223, 223, 223, 223, 223, 223,
-	122, 124, 126, 128, 223, 223, 223, 223, 130, 135, 140, 142, 223, 223, 144, 150,
-	156, 159, 161, 167, 171, 223, 173, 223, 223, 223, 223, 223, 223, 223, 223, 223,
-	174, 180, 223, 223, 182, 188, 190, 196, 223, 223, 223, 223, 223, 223, 223, 223,
-	198, 200, 202, 204, 223, 223, 206, 212, 223, 223, 223, 223, 223, 223, 223, 223,
-	223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223,
-	223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223,
-	223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223,
-	223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223,
-	223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223,
-	223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 214, 223, 215, 217,
-	223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 219,
-	223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223,
-	221, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223
+	0, 2, 4, 6, 12, 15, 20, 229, 21, 27, 33, 36, 39, 42, 45, 48,
+	229, 229, 229, 229, 53, 56, 59, 63, 65, 70, 75, 77, 229, 79, 82, 88,
+	94, 97, 100, 104, 229, 108, 114, 120, 229, 229, 229, 229, 229, 229, 229, 229,
+	122, 124, 126, 128, 229, 229, 229, 229, 130, 135, 140, 142, 229, 229, 144, 150,
+	156, 159, 161, 167, 171, 229, 173, 229, 229, 229, 174, 176, 178, 229, 229, 229,
+	180, 186, 229, 229, 188, 194, 196, 202, 229, 229, 229, 229, 229, 229, 229, 229,
+	204, 206, 208, 210, 229, 229, 212, 218, 229, 229, 229, 229, 229, 229, 229, 229,
+	229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229,
+	229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229,
+	229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229,
+	229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229,
+	229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229,
+	229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 220, 229, 221, 223,
+	229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 225,
+	229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229,
+	227, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229
 };
 //[[[end]]]
 

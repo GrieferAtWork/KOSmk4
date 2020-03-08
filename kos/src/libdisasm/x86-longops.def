@@ -897,3 +897,26 @@ LONGOP(LO_VRNDSCALESD, "vrndscalesd\t" OP_U8 OP_SAE OP_RM128_XMM__OP_VRXMM__OP_R
 
 LONGOP(LO_VRNDSCALESS, "vrndscaless\t" OP_U8 OP_SAE OP_RM128_XMM__OP_VRXMM__OP_RXMM_MASK) /* EVEX.LIG.66.0f3a.W0 0a /r ib vrndscaless xmm1{k1}{z}, xmm2, xmm3/m32{sae}, imm8 */
 
+LONGOP(LO_VBLENDVPS_XMM, "vblendvps\t" OP_IMM8_XMM OP_RM128_XMM__OP_VRXMM__OP_RXMM) /* VEX.128.66.0f3a.W0 4a /r /is4 vblendvps xmm1, xmm2, xmm3/m128, xmm4 */
+LONGOP(LO_VBLENDVPS_YMM, "vblendvps\t" OP_IMM8_YMM OP_RM256_YMM__OP_VRYMM__OP_RYMM) /* VEX.256.66.0f3a.W0 4a /r /is4 vblendvps ymm1, ymm2, ymm3/m256, ymm4 */
+
+LONGOP(LO_VBLENDVPD_XMM, "vblendvpd\t" OP_IMM8_XMM OP_RM128_XMM__OP_VRXMM__OP_RXMM) /* VEX.128.66.0f3a.W0 4b /r /is4 vblendvpd xmm1, xmm2, xmm3/m128, xmm4 */
+LONGOP(LO_VBLENDVPD_YMM, "vblendvpd\t" OP_IMM8_YMM OP_RM256_YMM__OP_VRYMM__OP_RYMM) /* VEX.256.66.0f3a.W0 4b /r /is4 vblendvpd ymm1, ymm2, ymm3/m256, ymm4 */
+
+LONGOP(LO_VPBLENDVB_XMM, "vpblendvb\t" OP_IMM8_XMM OP_RM128_XMM__OP_VRXMM__OP_RXMM) /* VEX.128.66.0f3a.W0 4c /r /is4 vpblendvb xmm1, xmm2, xmm3/m128, xmm4 */
+LONGOP(LO_VPBLENDVB_YMM, "vpblendvb\t" OP_IMM8_YMM OP_RM256_YMM__OP_VRYMM__OP_RYMM) /* VEX.256.66.0f3a.W0 4c /r /is4 vpblendvb ymm1, ymm2, ymm3/m256, ymm4 */
+
+LONGOP(LO_PBLENDVB, "pblendvb\t" OP_XMM0 OP_RM128_XMM OP_RXMM) /* 66 0f 38 10 /r pblendvb xmm1, xmm2/m128, <xmm0> */
+LONGOP(LO_BLENDVPS, "blendvps\t" OP_XMM0 OP_RM128_XMM OP_RXMM) /* 66 0f 38 14 /r blendvps xmm1, xmm2/m128, <xmm0> */
+LONGOP(LO_BLENDVPD, "blendvpd\t" OP_XMM0 OP_RM128_XMM OP_RXMM) /* 66 0f 38 15 /r blendvpd xmm1, xmm2/m128, <xmm0> */
+
+LONGOP(LO_VP4DPWSSD, "vp4dpwssd\t" OP_MEM OP_VRZMM/*+3*/ OP_RZMM_MASK) /* EVEX.512.f2.0f38.W0 52 /r vp4dpwssd zmm1{k1}{z}, zmm2+3, m128 */
+
+LONGOP(LO_VP4DPWSSDS, "vp4dpwssds\t" OP_MEM OP_VRZMM/*+3*/ OP_RZMM_MASK) /* EVEX.512.f2.0f38.W0 53 /r vp4dpwssds zmm1{k1}{z}, zmm2+3, m128 */
+
+LONGOP(LO_V4FMADDPS_ZMM, "v4fmaddps\t" OP_MEM OP_VRZMM/*+3*/ OP_RZMM_MASK)  /* EVEX.512.f2.0f38.W0 9a /r v4fmaddps zmm1{k1}{z}, zmm2+3, m128 */
+LONGOP(LO_V4FNMADDPS_ZMM, "v4fnmaddps\t" OP_MEM OP_VRZMM/*+3*/ OP_RZMM_MASK) /* EVEX.512.f2.0f38.W0 aa /r v4fnmaddps zmm1{k1}{z}, zmm2+3, m128 */
+
+LONGOP(LO_V4FMADDSS_XMM, "v4fmaddss\t" OP_MEM OP_VRXMM/*+3*/ OP_RXMM_MASK)  /* EVEX.LIG.f2.0f38.W0 9b /r v4fmaddss xmm1{k1}{z}, xmm2+3, m128 */
+LONGOP(LO_V4FNMADDSS_XMM, "v4fnmaddss\t" OP_MEM OP_VRXMM/*+3*/ OP_RXMM_MASK) /* EVEX.LIG.f2.0f38.W0 ab /r v4fnmaddss xmm1{k1}{z}, xmm2+3, m128 */
+
