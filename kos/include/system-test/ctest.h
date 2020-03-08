@@ -31,13 +31,6 @@
 #error "Only include this file from within *.ctest files that are apart of /bin/system-test"
 #endif /* __INSIDE_LIBTEST */
 
-#define ASSERT_COMPARE(a, cmp, b) \
-	__hybrid_assertf((a) cmp (b), #a "(%Iu) " #cmp " " #b "(%Iu)", (__UINTPTR_TYPE__)(a), (__UINTPTR_TYPE__)(b))
-
-#define ASSERT_EQUAL(a, b)      ASSERT_COMPARE(a, ==, b)
-#define ASSERT_STREQUAL(a, b)   __hybrid_assertf(strcmp(a, b) == 0, #a "(%q) == " #b "(%q)", a, b)
-#define ASSERT_NOT_EQUAL(a, b)  ASSERT_COMPARE(a, !=, b)
-
 
 #ifdef __CC__
 __DECL_BEGIN

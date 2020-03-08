@@ -100,6 +100,59 @@ struct json_parser;
  *   - JGEN_TERM        (Mark the end of the codec) */
 
 
+/* JGEN bytecode syntax:
+ * Read as:
+ *    x        The contents of the rule `x'
+ *    [x]      `x' is optional
+ *    'x'      `x' is the name of an opcode that is expected
+ *    x y      First `x', then `y'
+ *    x | y    Either `x' or `y'
+ *    (x)      Same as `x' (used to clarify indent, and scope `|')
+ *    x...     `x' can be repeated any number of times (but at least once)
+ *    x ::= y  `x' is a rule defined as `y'
+ *    @codec   Name for the primary rule.
+ *
+ *
+ * @codec ::= [['JGEN_OPTIONAL'] DECL] 'JGEN_TERM';
+ *
+ * DECL ::= OBJECT_DECL | ARRAY_DECL | IMMEDIATE_DECL | EXTERN_DECL;
+ *
+ * OBJECT_DECL ::= (
+ *     'JGEN_BEGINOBJECT'
+ *     [(
+ *         ['JGEN_OPTIONAL'] 'JGEN_FIELD'
+ *         <Field name as inlined, NUL-terminated c-string>
+ *         DECL
+ *     )...]
+ *     'JGEN_END'
+ * );
+ *
+ * ARRAY_DECL ::= (
+ *     'JGEN_BEGINARRAY'
+ *     [(
+ *         (['JGEN_OPTIONAL'] 'JGEN_INDEX_REP(...)' DECL) |
+ *         ((
+ *             ['JGEN_OPTIONAL'] 'JGEN_INDEX(...)'
+ *             DECL
+ *         )...)
+ *     )]
+ *     'JGEN_END'
+ * );
+ *
+ * IMMEDIATE_DECL ::= (
+ *     'JGEN_INTO'
+ *     'JSON_OFFSET(...)'
+ *     'JSON_TYPE_*'
+ * );
+ *
+ * EXTERN_DECL ::= (
+ *     'JGEN_EXTERN(...)'
+ * );
+ *
+ */
+
+
+
 /* Generator terminal indicator.
  * Must always appear at the end of any json codec. */
 #define JGEN_TERM         0x00
@@ -192,7 +245,7 @@ struct json_parser;
 /* [+uint16_t offset][+uint8_t type]
  * Descriptor for the C type and structure offset of data to be de-/encoded
  * Must be followed by (in order):
- *   #1: JSON_OFFSET(*)
+ *   #1: JSON_OFFSET(...)
  *   #2: JSON_TYPE_* */
 #define JGEN_INTO         0x13
 

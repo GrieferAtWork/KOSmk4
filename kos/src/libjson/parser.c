@@ -27,6 +27,7 @@
 #include "api.h"
 
 #include <hybrid/byteorder.h>
+#include <hybrid/byteswap.h>
 #include <hybrid/unaligned.h>
 
 #include <assert.h>
@@ -99,6 +100,234 @@ NOTHROW_NCX(CC json_ungetc)(struct json_parser *__restrict self) {
 	return result;
 }
 
+#ifndef CONFIG_NO_JSON_C_COMMENT_SUPPORT
+/* Skip a comment after already having parsed `/' and `*', with
+ * the parser currently pointing at the first character of the
+ * comment body. */
+PRIVATE NONNULL((1)) int
+NOTHROW_NCX(CC json_skip_comment)(struct json_parser *__restrict self) {
+	char const *cbody_start;
+	cbody_start = self->jp_pos;
+	switch (__builtin_expect(self->jp_encoding, JSON_ENCODING_UTF8)) {
+
+	case JSON_ENCODING_UTF8:
+		for (;;) {
+			char const *pos;
+			pos = (char const *)memchr(self->jp_pos, '*',
+			                           (size_t)(self->jp_end - self->jp_pos));
+			if (!pos || pos >= self->jp_end - 1)
+				goto comment_syn;
+			if (pos[1] == '/') {
+				self->jp_pos = pos + 2;
+				break;
+			}
+			self->jp_pos = pos + 1;
+		}
+		break;
+
+	case JSON_ENCODING_UTF16LE:
+	case JSON_ENCODING_UTF16BE: {
+		uint16_t star = '*', slash = '/';
+#if __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__
+		if (self->jp_encoding == JSON_ENCODING_UTF16LE) {
+			star  = (uint16_t)HTOLE16('*');
+			slash = (uint16_t)HTOLE16('/');
+		}
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
+#if __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__
+		if (self->jp_encoding == JSON_ENCODING_UTF16BE) {
+			star  = (uint16_t)HTOBE16('*');
+			slash = (uint16_t)HTOBE16('/');
+		}
+#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
+		for (;;) {
+			uint16_t const *pos;
+			pos = memchrw(self->jp_pos, star, (size_t)(self->jp_end - self->jp_pos) / 2);
+			if (!pos || pos >= (uint16_t const *)(self->jp_end - 2))
+				goto comment_syn;
+			if (pos[1] == slash) {
+				self->jp_pos = (char const *)(pos + 2);
+				break;
+			}
+			self->jp_pos = (char const *)(pos + 1);
+		}
+	}	break;
+
+	case JSON_ENCODING_UTF32LE:
+	case JSON_ENCODING_UTF32BE: {
+		uint32_t star = '*', slash = '/';
+#if __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__
+		if (self->jp_encoding == JSON_ENCODING_UTF16LE) {
+			star  = (uint32_t)HTOLE32('*');
+			slash = (uint32_t)HTOLE32('/');
+		}
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
+#if __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__
+		if (self->jp_encoding == JSON_ENCODING_UTF16BE) {
+			star  = (uint32_t)HTOBE32('*');
+			slash = (uint32_t)HTOBE32('/');
+		}
+#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
+		for (;;) {
+			uint32_t const *pos;
+			pos = memchrl(self->jp_pos, star, (size_t)(self->jp_end - self->jp_pos) / 4);
+			if (!pos || pos >= (uint32_t const *)(self->jp_end - 4))
+				goto comment_syn;
+			if (pos[1] == slash) {
+				self->jp_pos = (char const *)(pos + 2);
+				break;
+			}
+			self->jp_pos = (char const *)(pos + 1);
+		}
+	}	break;
+
+	default: __builtin_unreachable();
+	}
+	return JSON_ERROR_OK;
+comment_syn:
+	self->jp_pos = cbody_start;
+	json_ungetc(self); /* '*' */
+	json_ungetc(self); /* '/' */
+	return JSON_ERROR_SYNTAX;
+}
+
+/* Skip a comment after already having parsed `*' and `/', with
+ * the parser currently pointing at the `*' character after the
+ * comment body. */
+PRIVATE NONNULL((1)) int
+NOTHROW_NCX(CC json_unskip_comment)(struct json_parser *__restrict self) {
+	char const *cbody_end = self->jp_pos;
+	switch (__builtin_expect(self->jp_encoding, JSON_ENCODING_UTF8)) {
+
+	case JSON_ENCODING_UTF8:
+		for (;;) {
+			char const *pos;
+			pos = (char const *)memrchr(self->jp_start, '*',
+			                            (size_t)(self->jp_pos - self->jp_start));
+			if (!pos || pos <= self->jp_start)
+				goto comment_syn;
+			if (pos[-1] == '/') {
+				self->jp_pos = pos - 1;
+				break;
+			}
+			self->jp_pos = pos;
+		}
+		break;
+
+	case JSON_ENCODING_UTF16LE:
+	case JSON_ENCODING_UTF16BE: {
+		uint16_t star = '*', slash = '/';
+#if __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__
+		if (self->jp_encoding == JSON_ENCODING_UTF16LE) {
+			star  = (uint16_t)HTOLE16('*');
+			slash = (uint16_t)HTOLE16('/');
+		}
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
+#if __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__
+		if (self->jp_encoding == JSON_ENCODING_UTF16BE) {
+			star  = (uint16_t)HTOBE16('*');
+			slash = (uint16_t)HTOBE16('/');
+		}
+#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
+		for (;;) {
+			uint16_t const *pos;
+			pos = memrchrw(self->jp_start, star,
+			               (size_t)(self->jp_pos - self->jp_start) / 2);
+			if (!pos || pos <= (uint16_t const *)self->jp_start)
+				goto comment_syn;
+			if (pos[-1] == slash) {
+				self->jp_pos = (char const *)(pos - 1);
+				break;
+			}
+			self->jp_pos = (char const *)pos;
+		}
+	}	break;
+
+	case JSON_ENCODING_UTF32LE:
+	case JSON_ENCODING_UTF32BE: {
+		uint32_t star = '*', slash = '/';
+#if __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__
+		if (self->jp_encoding == JSON_ENCODING_UTF16LE) {
+			star  = (uint32_t)HTOLE32('*');
+			slash = (uint32_t)HTOLE32('/');
+		}
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
+#if __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__
+		if (self->jp_encoding == JSON_ENCODING_UTF16BE) {
+			star  = (uint32_t)HTOBE32('*');
+			slash = (uint32_t)HTOBE32('/');
+		}
+#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
+		for (;;) {
+			uint32_t const *pos;
+			pos = memrchrl(self->jp_start, star,
+			               (size_t)(self->jp_pos - self->jp_start) / 4);
+			if (!pos || pos <= (uint32_t const *)self->jp_start)
+				goto comment_syn;
+			if (pos[-1] == slash) {
+				self->jp_pos = (char const *)(pos - 1);
+				break;
+			}
+			self->jp_pos = (char const *)pos;
+		}
+	}	break;
+
+	default: __builtin_unreachable();
+	}
+	return JSON_ERROR_OK;
+comment_syn:
+	self->jp_pos = cbody_end;
+	json_getc(self); /* '*' */
+	json_getc(self); /* '/' */
+	return JSON_ERROR_SYNTAX;
+}
+#endif /* !CONFIG_NO_JSON_C_COMMENT_SUPPORT */
+
+
+LOCAL NONNULL((1)) void
+NOTHROW_NCX(CC json_skip_whitespace)(struct json_parser *__restrict self) {
+	char const *prev;
+	char32_t ch;
+#ifndef CONFIG_NO_JSON_C_COMMENT_SUPPORT
+again:
+#endif /* !CONFIG_NO_JSON_C_COMMENT_SUPPORT */
+	do {
+		prev = self->jp_pos;
+		ch   = json_getc(self);
+	} while (unicode_isspace(ch));
+#ifndef CONFIG_NO_JSON_C_COMMENT_SUPPORT
+	if (ch == '/') {
+		ch = json_getc(self);
+		if (ch == '*') {
+			if (json_skip_comment(self) == JSON_ERROR_OK)
+				goto again;
+		}
+	}
+#endif /* !CONFIG_NO_JSON_C_COMMENT_SUPPORT */
+	self->jp_pos = prev;
+}
+
+LOCAL NONNULL((1)) void
+NOTHROW_NCX(CC json_skip_whitespace_at)(struct json_parser *__restrict self,
+                                        char32_t ch, char const *prev) {
+	while (unicode_isspace(ch)) {
+#ifndef CONFIG_NO_JSON_C_COMMENT_SUPPORT
+again:
+#endif /* !CONFIG_NO_JSON_C_COMMENT_SUPPORT */
+		prev = self->jp_pos;
+		ch   = json_getc(self);
+	}
+#ifndef CONFIG_NO_JSON_C_COMMENT_SUPPORT
+	if (ch == '/') {
+		ch = json_getc(self);
+		if (ch == '*') {
+			if (json_skip_comment(self) == JSON_ERROR_OK)
+				goto again;
+		}
+	}
+#endif /* !CONFIG_NO_JSON_C_COMMENT_SUPPORT */
+	self->jp_pos = prev;
+}
 
 /* Initialize a json parser with the given piece of in-memory json.
  * NOTE: This function automatically detects the encoding (one of `JSON_ENCODING_*')
@@ -139,15 +368,7 @@ NOTHROW_NCX(CC libjson_parser_init)(struct json_parser *__restrict self,
 		}
 	}
 	/* Skip leading whitespace. */
-	{
-		char const *prev;
-		char32_t ch;
-		do {
-			prev = self->jp_pos;
-			ch = json_getc(self);
-		} while (unicode_isspace(ch));
-		self->jp_pos = prev;
-	}
+	json_skip_whitespace(self);
 }
 
 INTERN NONNULL((1, 2)) void
@@ -222,10 +443,21 @@ again:
 		break;
 
 	case 1:
-		prev = (char *)memxendb(self->jp_pos, 1, (size_t)(self->jp_end - self->jp_pos));
-		json_truncate_pos_for_alignment(self, (char *)prev);
+		prev = (char const *)memxendb(self->jp_pos, 1, (size_t)(self->jp_end - self->jp_pos));
+		json_truncate_pos_for_alignment(self, prev);
 		result = JSON_PARSER_STRING;
 		break;
+
+#ifndef CONFIG_NO_JSON_C_COMMENT_SUPPORT
+	case '/':
+		ch = json_getc(self);
+		if (ch != '*')
+			goto syn2;
+		result = json_skip_comment(self);
+		if (result == JSON_ERROR_OK)
+			goto again;
+		goto done;
+#endif /* !CONFIG_NO_JSON_C_COMMENT_SUPPORT */
 
 		/* Single-character tokens. */
 	case '[': case ']':
@@ -255,33 +487,33 @@ again:
 
 	case 't':
 		if ((ch = json_getc(self)) != 'r')
-			goto syn;
+			goto syn2;
 		if ((ch = json_getc(self)) != 'u')
-			goto syn;
+			goto syn3;
 		if ((ch = json_getc(self)) != 'e')
-			goto syn;
+			goto syn4;
 		result = JSON_PARSER_TRUE;
 		break;
 
 	case 'f':
 		if (json_getc(self) != 'a')
-			goto syn;
+			goto syn2;
 		if (json_getc(self) != 'l')
-			goto syn;
+			goto syn3;
 		if (json_getc(self) != 's')
-			goto syn;
+			goto syn4;
 		if (json_getc(self) != 'e')
-			goto syn;
+			goto syn5;
 		result = JSON_PARSER_FALSE;
 		break;
 
 	case 'n':
 		if (json_getc(self) != 'u')
-			goto syn;
+			goto syn2;
 		if (json_getc(self) != 'l')
-			goto syn;
+			goto syn3;
 		if (json_getc(self) != 'l')
-			goto syn;
+			goto syn4;
 		result = JSON_PARSER_NULL;
 		break;
 
@@ -334,14 +566,20 @@ do_digit_inner:
 		return JSON_ERROR_SYNTAX;
 	}
 	/* Skip trailing whitespace. */
-	do {
-		prev = self->jp_pos;
-		ch = json_getc(self);
-	} while (unicode_isspace(ch));
-	self->jp_pos = prev;
-/*done:*/
+	json_skip_whitespace(self);
+#ifndef CONFIG_NO_JSON_C_COMMENT_SUPPORT
+done:
+#endif /* !CONFIG_NO_JSON_C_COMMENT_SUPPORT */
 	return result;
-syn:
+syn5:
+	json_ungetc(self);
+syn4:
+	json_ungetc(self);
+syn3:
+	json_ungetc(self);
+syn2:
+	json_ungetc(self);
+/*syn1:*/
 	json_ungetc(self);
 	return JSON_ERROR_SYNTAX;
 }
@@ -376,10 +614,10 @@ again:
 			uint8_t const *string_end;
 			string_end = memrxchrb(self->jp_start, 0, (size_t)(self->jp_pos - self->jp_start));
 			if unlikely(!string_end)
-				goto syn;
+				goto syn1;
 			string_end = memrchrb(self->jp_start, 0, (size_t)((char *)string_end - self->jp_start));
 			if unlikely(!string_end)
-				goto syn;
+				goto syn1;
 			json_truncate_pos_for_alignment(self, (char *)string_end);
 			result = JSON_PARSER_STRING;
 		}
@@ -389,10 +627,21 @@ again:
 		uint8_t const *string_end;
 		string_end = memrxchrb(self->jp_start, 1, (size_t)(self->jp_pos - self->jp_start));
 		if unlikely(!string_end)
-		    goto syn;
+		    goto syn1;
 		json_truncate_pos_for_alignment(self, (char *)string_end);
 		result = JSON_PARSER_STRING;
 	}	break;
+
+#ifndef CONFIG_NO_JSON_C_COMMENT_SUPPORT
+	case '/':
+		ch = json_ungetc(self);
+		if (ch != '*')
+			goto syn2;
+		result = json_unskip_comment(self);
+		if (result == JSON_ERROR_OK)
+			goto again;
+		goto done;
+#endif /* !CONFIG_NO_JSON_C_COMMENT_SUPPORT */
 
 	case '\"': /* String */
 		for (;;) {
@@ -419,11 +668,11 @@ again:
 
 	case 'l':
 		if (json_ungetc(self) != 'l')
-			goto syn;
+			goto syn2;
 		if (json_ungetc(self) != 'u')
-			goto syn;
+			goto syn3;
 		if (json_ungetc(self) != 'n')
-			goto syn;
+			goto syn4;
 		result = JSON_PARSER_NULL;
 		break;
 
@@ -431,20 +680,20 @@ again:
 		ch = json_ungetc(self);
 		if (ch == 'u') {
 			if (json_ungetc(self) != 'r')
-				goto syn;
+				goto syn3;
 			if (json_ungetc(self) != 't')
-				goto syn;
+				goto syn4;
 			result = JSON_PARSER_TRUE;
 		} else if (ch == 's') {
 			if (json_ungetc(self) != 'l')
-				goto syn;
+				goto syn3;
 			if (json_ungetc(self) != 'a')
-				goto syn;
+				goto syn4;
 			if (json_ungetc(self) != 'f')
-				goto syn;
+				goto syn5;
 			result = JSON_PARSER_FALSE;
 		} else {
-			goto syn;
+			goto syn2;
 		}
 		break;
 
@@ -498,10 +747,22 @@ again:
 			goto again; /* Whitespace */
 		}
 		/* Anything else isn't allowed and indicates a syntax error. */
-		goto syn;
+		goto syn1;
 	}
+#ifndef CONFIG_NO_JSON_C_COMMENT_SUPPORT
+done:
+#endif /* !CONFIG_NO_JSON_C_COMMENT_SUPPORT */
 	return result;
-syn:
+syn5:
+	json_getc(self);
+syn4:
+	json_getc(self);
+syn3:
+	json_getc(self);
+syn2:
+	json_getc(self);
+syn1:
+	json_getc(self);
 	return JSON_ERROR_SYNTAX;
 }
 
@@ -1036,13 +1297,7 @@ NOTHROW_NCX(CC libjson_parser_printstring)(struct json_parser *__restrict self,
 	}
 done:
 	/* Skip trailing whitespace. */
-	for (;;) {
-		start = self->jp_pos;
-		ch = json_getc(self);
-		if (!unicode_isspace(ch) || start >= self->jp_end)
-			break;
-	}
-	self->jp_pos = start;
+	json_skip_whitespace(self);
 	/* Flush all unwritten data. */
 	if (bufend != buf && likely(printer_result >= 0)) {
 		temp = (*printer)(arg, buf, (size_t)(bufend - buf));
@@ -1222,11 +1477,7 @@ again_parse_ch:
 		ch = json_getc(self);
 	} while (unicode_isdecimal(ch));
 	/* Skip trailing whitespace. */
-	while (unicode_isspace(ch) && start < self->jp_end) {
-		start = self->jp_pos;
-		ch = json_getc(self);
-	}
-	self->jp_pos = start;
+	json_skip_whitespace_at(self, ch, start);
 	/* Store the generated integer.
 	 * NOTE: The special case where `INTPTR_MIN == -INTPTR_MIN'
 	 *       is already handled above by the overflow check! */
@@ -1299,11 +1550,7 @@ again_parse_ch:
 		ch = json_getc(self);
 	} while (unicode_isdecimal(ch));
 	/* Skip trailing whitespace. */
-	while (unicode_isspace(ch) && start < self->jp_end) {
-		start = self->jp_pos;
-		ch = json_getc(self);
-	}
-	self->jp_pos = start;
+	json_skip_whitespace_at(self, ch, start);
 	/* Store the generated integer.
 	 * NOTE: The special case where `INT64_MIN == -INT64_MIN'
 	 *       is already handled above by the overflow check! */
@@ -1384,13 +1631,8 @@ NOTHROW_NCX(CC libjson_parser_getfloat)(struct json_parser *__restrict self,
 			result *= exp;
 		}
 	}
-
 	/* Skip trailing whitespace. */
-	while (unicode_isspace(ch) && start < self->jp_end) {
-		start = self->jp_pos;
-		ch = json_getc(self);
-	}
-	self->jp_pos = start;
+	json_skip_whitespace_at(self, ch, start);
 	/* Store the generated integer. */
 	if (negative)
 		result = -result;

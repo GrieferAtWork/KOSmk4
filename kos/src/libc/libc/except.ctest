@@ -22,8 +22,11 @@
 #define _KOS_SOURCE 1
 
 #include <hybrid/compiler.h>
-#include <system-test/ctest.h>
+
 #include <kos/except.h>
+#include <kos/types.h>
+#include <system-test/ctest.h>
+
 #include <assert.h>
 
 DECL_BEGIN
@@ -49,13 +52,18 @@ DEFINE_TEST(kernel_exceptions_function_correctly_with_cxx_handlers) {
 			reached_after = true;  /* NOT REACHABLE! (asserted below) */
 		} catch (...) {
 			reached_inner = true;
-			ASSERT_EQUAL(error_code(), ERROR_CODEOF(E_SEGFAULT_UNMAPPED));
+			assertf(error_code() == ERROR_CODEOF(E_SEGFAULT_UNMAPPED),
+			        "error_code() = %#Ix", (uintptr_t)error_code());
 			throw; /* Rethrow the exception */
 		}
 	} catch (...) {
 		reached_outer = true;
-		ASSERT_EQUAL(error_code(), ERROR_CODEOF(E_SEGFAULT_UNMAPPED));
-		ASSERT_EQUAL((void *)error_data()->e_pointers[0], (void *)p);
+		assertf(error_code() == ERROR_CODEOF(E_SEGFAULT_UNMAPPED),
+		        "error_code() = %#Ix", (uintptr_t)error_code());
+		assertf((void *)error_data()->e_pointers[0] == (void *)p,
+		        "error_data()->e_pointers[0] = %p\n",
+		        "p                           = %p\n",
+		        error_data()->e_pointers[0], p);
 #ifdef E_SEGFAULT_CONTEXT_FAULT
 		assert(error_data()->e_pointers[1] & E_SEGFAULT_CONTEXT_FAULT);
 #endif /* E_SEGFAULT_CONTEXT_FAULT */

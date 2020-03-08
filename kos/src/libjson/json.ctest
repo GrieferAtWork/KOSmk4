@@ -87,12 +87,12 @@ PRIVATE PJSON_PARSER_GETNUMBER json_parser_getnumber;
 
 PRIVATE void do_test_codec(byte_t const *codec) {
 	char json_input[] =
-	"{"
-	"\"beta\":20,"
-	"\"alpha\":10,"
-	"\"name\":\"This is\\n my name\","
-	"\"values\":[1,2,4,8,16,32,64,128]"
-	"}";
+	" /* leading comment */ {"
+	"\"beta\":20, /* The value of *beta* */"
+	"\"alpha\":10/* The value of *alpha**/,"
+	"\"name\":\"This is\\n my /*name*/\","
+	"\"values\"/*a*/:/*b*/[/*c*/1/*d*/,/*e*/2,4,8,16,32,64,128/*e*/]/*f*/"
+	"}/*g*/";
 	struct json_parser parser;
 	int error;
 	struct my_struct foo;
@@ -102,18 +102,19 @@ PRIVATE void do_test_codec(byte_t const *codec) {
 	json_parser_init(&parser, json_input, COMPILER_STREND(json_input));
 	memset(&foo, 0xcc, sizeof(foo));
 	error = json_decode(&parser, codec, &foo, NULL);
-	ASSERT_EQUAL(error, JSON_ERROR_OK);
-	ASSERT_EQUAL(foo.ms_alpha, 10);
-	ASSERT_EQUAL(foo.ms_beta, 20);
-	ASSERT_EQUAL(foo.ms_values[0], 1);
-	ASSERT_EQUAL(foo.ms_values[1], 2);
-	ASSERT_EQUAL(foo.ms_values[2], 4);
-	ASSERT_EQUAL(foo.ms_values[3], 8);
-	ASSERT_EQUAL(foo.ms_values[4], 16);
-	ASSERT_EQUAL(foo.ms_values[5], 32);
-	ASSERT_EQUAL(foo.ms_values[6], 64);
-	ASSERT_EQUAL(foo.ms_values[7], 128);
-	ASSERT_STREQUAL(foo.ms_name, "This is\n my name");
+	assertf(error == JSON_ERROR_OK, "error == %d", error);
+	assertf(foo.ms_alpha == 10, "foo.ms_alpha = %d", foo.ms_alpha);
+	assertf(foo.ms_beta == 20, "foo.ms_beta = %d", foo.ms_beta);
+	assertf(foo.ms_values[0] == 1, "foo.ms_values[0] = %d", foo.ms_values[0]);
+	assertf(foo.ms_values[1] == 2, "foo.ms_values[1] = %d", foo.ms_values[1]);
+	assertf(foo.ms_values[2] == 4, "foo.ms_values[2] = %d", foo.ms_values[2]);
+	assertf(foo.ms_values[3] == 8, "foo.ms_values[3] = %d", foo.ms_values[3]);
+	assertf(foo.ms_values[4] == 16, "foo.ms_values[4] = %d", foo.ms_values[4]);
+	assertf(foo.ms_values[5] == 32, "foo.ms_values[5] = %d", foo.ms_values[5]);
+	assertf(foo.ms_values[6] == 64, "foo.ms_values[6] = %d", foo.ms_values[6]);
+	assertf(foo.ms_values[7] == 128, "foo.ms_values[7] = %d", foo.ms_values[7]);
+	assertf(strcmp(foo.ms_name, "This is\n my /*name*/") == 0,
+	        "foo.ms_name = %q", foo.ms_name);
 
 	/* Also assert the opposite: converting a C-structure to json (using both compact and pretty formats) */
 	{
@@ -121,7 +122,7 @@ PRIVATE void do_test_codec(byte_t const *codec) {
 		PRIVATE char const foo_pretty_expected[] = "{\n"
 		                                           "\t\"alpha\": 10,\n"
 		                                           "\t\"beta\": 20,\n"
-		                                           "\t\"name\": \"This is\\n my name\",\n"
+		                                           "\t\"name\": \"This is\\n my /*name*/\",\n"
 		                                           "\t\"values\": [\n"
 		                                           "\t\t1,\n"
 		                                           "\t\t2,\n"
@@ -134,12 +135,12 @@ PRIVATE void do_test_codec(byte_t const *codec) {
 		                                           "\t]\n"
 		                                           "}";
 		PRIVATE char const foo_compact_expected[] =
-			"{\"alpha\":10,\"beta\":20,\"name\":\"This is\\n my name\",\"values\":[1,2,4,8,16,32,64,128]}";
+			"{\"alpha\":10,\"beta\":20,\"name\":\"This is\\n my /*name*/\",\"values\":[1,2,4,8,16,32,64,128]}";
 		char foo_generated[512], *ptr;
 		ptr = foo_generated;
 		json_writer_init(&writer, &format_sprintf_printer, &ptr, JSON_WRITER_FORMAT_PRETTY);
 		error = json_encode(&writer, codec, &foo, NULL);
-		ASSERT_EQUAL(error, JSON_ERROR_OK);
+		assertf(error == JSON_ERROR_OK, "error = %d", error);
 		assertf(ptr == foo_generated + COMPILER_STRLEN(foo_pretty_expected) &&
 		        memcmp(foo_generated, foo_pretty_expected, sizeof(foo_pretty_expected) - sizeof(char)) == 0,
 		        "Expected: %$q\n"
@@ -149,7 +150,7 @@ PRIVATE void do_test_codec(byte_t const *codec) {
 		ptr = foo_generated;
 		json_writer_init(&writer, &format_sprintf_printer, &ptr, JSON_WRITER_FORMAT_COMPACT);
 		error = json_encode(&writer, codec, &foo, NULL);
-		ASSERT_EQUAL(error, JSON_ERROR_OK);
+		assertf(error == JSON_ERROR_OK, "error = %d", error);
 		assertf(ptr == foo_generated + COMPILER_STRLEN(foo_compact_expected) &&
 		        memcmp(foo_generated, foo_compact_expected, sizeof(foo_compact_expected) - sizeof(char)) == 0,
 		        "Expected: %$q\n"
