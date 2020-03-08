@@ -4834,52 +4834,52 @@ PRIVATE struct instruction const ops_0f3a[] = {
 
 #if 0
 	I(0x92, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 0) "vgatherdpd\txmm, vm32x, xmm"), /* VEX.128.66.0f38.W1 92 /r vgatherdpd xmm1, vm32x, xmm2 */
-	I(0x92, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 1) "vgatherdpd\tymm, vm32x, ymm"),  /* VEX.256.66.0f38.W1 92 /r vgatherdpd ymm1, vm32x, ymm2 */
+	I(0x92, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 1) "vgatherdpd\tymm, vm32x, ymm"), /* VEX.256.66.0f38.W1 92 /r vgatherdpd ymm1, vm32x, ymm2 */
 	I(0x93, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 0) "vgatherqpd\txmm, vm64x, xmm"), /* VEX.128.66.0f38.W1 93 /r vgatherqpd xmm1, vm64x, xmm2 */
-	I(0x93, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 1) "vgatherqpd\tymm, vm64y, ymm"),  /* VEX.256.66.0f38.W1 93 /r vgatherqpd ymm1, vm64y, ymm2 */
+	I(0x93, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 1) "vgatherqpd\tymm, vm64y, ymm"), /* VEX.256.66.0f38.W1 93 /r vgatherqpd ymm1, vm64y, ymm2 */
 
-	I(0x92, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 0) "vgatherdps\txmm{k1}, vm32x"),  /* EVEX.128.66.0f38.W0 92 /vsib vgatherdps xmm1{k1}, vm32x */
-	I(0x92, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 1) "vgatherdps\tymm1{k1}, vm32y"), /* EVEX.256.66.0f38.W0 92 /vsib vgatherdps ymm1{k1}, vm32y */
-	I(0x92, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 2) "vgatherdps\tzmm1{k1}, vm32z"), /* EVEX.512.66.0f38.W0 92 /vsib vgatherdps zmm1{k1}, vm32z */
-	I(0x92, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 0) "vgatherdpd\txmm{k1}, vm32x"),  /* EVEX.128.66.0f38.W1 92 /vsib vgatherdpd xmm1{k1}, vm32x */
-	I(0x92, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 1) "vgatherdpd\tymm1{k1}, vm32x"), /* EVEX.256.66.0f38.W1 92 /vsib vgatherdpd ymm1{k1}, vm32x */
-	I(0x92, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 2) "vgatherdpd\tzmm1{k1}, vm32y"), /* EVEX.512.66.0f38.W1 92 /vsib vgatherdpd zmm1{k1}, vm32y */
+	I(0x92, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 0) "vgatherdps\txmm{k1}, vm32x"), /* EVEX.128.66.0f38.W0 92 /vsib vgatherdps xmm1{k1}, vm32x */
+	I(0x92, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 1) "vgatherdps\tymm{k1}, vm32y"), /* EVEX.256.66.0f38.W0 92 /vsib vgatherdps ymm1{k1}, vm32y */
+	I(0x92, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 2) "vgatherdps\tzmm{k1}, vm32z"), /* EVEX.512.66.0f38.W0 92 /vsib vgatherdps zmm1{k1}, vm32z */
+	I(0x92, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 0) "vgatherdpd\txmm{k1}, vm32x"), /* EVEX.128.66.0f38.W1 92 /vsib vgatherdpd xmm1{k1}, vm32x */
+	I(0x92, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 1) "vgatherdpd\tymm{k1}, vm32x"), /* EVEX.256.66.0f38.W1 92 /vsib vgatherdpd ymm1{k1}, vm32x */
+	I(0x92, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 2) "vgatherdpd\tzmm{k1}, vm32y"), /* EVEX.512.66.0f38.W1 92 /vsib vgatherdpd zmm1{k1}, vm32y */
 
 	I(0x92, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 0) "vgatherdps\txmm, vm32x, xmm"), /* VEX.128.66.0f38.W0 92 /r vgatherdps xmm1, vm32x, xmm2 */
-	I(0x92, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 1) "vgatherdps\tymm, vm32y, ymm"),  /* VEX.256.66.0f38.W0 92 /r vgatherdps ymm1, vm32y, ymm2 */
+	I(0x92, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 1) "vgatherdps\tymm, vm32y, ymm"), /* VEX.256.66.0f38.W0 92 /r vgatherdps ymm1, vm32y, ymm2 */
 	I(0x93, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 0) "vgatherqps\txmm, vm64x, xmm"), /* VEX.128.66.0f38.W0 93 /r vgatherqps xmm1, vm64x, xmm2 */
 	I(0x93, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 1) "vgatherqps\txmm, vm64y, xmm"), /* VEX.256.66.0f38.W0 93 /r vgatherqps xmm1, vm64y, xmm2 */
 
-	I(0x93, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 0) "vgatherqps\txmm{k1}, vm64x"),  /* EVEX.128.66.0f38.W0 93 /vsib vgatherqps xmm1{k1}, vm64x */
-	I(0x93, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 1) "vgatherqps\txmm{k1}, vm64y"),  /* EVEX.256.66.0f38.W0 93 /vsib vgatherqps xmm1{k1}, vm64y */
-	I(0x93, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 2) "vgatherqps\tymm1{k1}, vm64z"), /* EVEX.512.66.0f38.W0 93 /vsib vgatherqps ymm1{k1}, vm64z */
-	I(0x93, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 0) "vgatherqpd\txmm{k1}, vm64x"),  /* EVEX.128.66.0f38.W1 93 /vsib vgatherqpd xmm1{k1}, vm64x */
-	I(0x93, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 1) "vgatherqpd\tymm1{k1}, vm64y"), /* EVEX.256.66.0f38.W1 93 /vsib vgatherqpd ymm1{k1}, vm64y */
-	I(0x93, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 2) "vgatherqpd\tzmm1{k1}, vm64z"), /* EVEX.512.66.0f38.W1 93 /vsib vgatherqpd zmm1{k1}, vm64z */
+	I(0x93, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 0) "vgatherqps\txmm{k1}, vm64x"), /* EVEX.128.66.0f38.W0 93 /vsib vgatherqps xmm1{k1}, vm64x */
+	I(0x93, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 1) "vgatherqps\txmm{k1}, vm64y"), /* EVEX.256.66.0f38.W0 93 /vsib vgatherqps xmm1{k1}, vm64y */
+	I(0x93, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 2) "vgatherqps\tymm{k1}, vm64z"), /* EVEX.512.66.0f38.W0 93 /vsib vgatherqps ymm1{k1}, vm64z */
+	I(0x93, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 0) "vgatherqpd\txmm{k1}, vm64x"), /* EVEX.128.66.0f38.W1 93 /vsib vgatherqpd xmm1{k1}, vm64x */
+	I(0x93, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 1) "vgatherqpd\tymm{k1}, vm64y"), /* EVEX.256.66.0f38.W1 93 /vsib vgatherqpd ymm1{k1}, vm64y */
+	I(0x93, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 2) "vgatherqpd\tzmm{k1}, vm64z"), /* EVEX.512.66.0f38.W1 93 /vsib vgatherqpd zmm1{k1}, vm64z */
 
 	I(0x90, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 0) "vpgatherdd\txmm, vm32x, xmm"), /* VEX.128.66.0f38.W0 90 /r vpgatherdd xmm1, vm32x, xmm2 */
-	I(0x90, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 1) "vpgatherdd\tymm, vm32y, ymm"),  /* VEX.256.66.0f38.W0 90 /r vpgatherdd ymm1, vm32y, ymm2 */
+	I(0x90, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 1) "vpgatherdd\tymm, vm32y, ymm"), /* VEX.256.66.0f38.W0 90 /r vpgatherdd ymm1, vm32y, ymm2 */
 	I(0x91, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 0) "vpgatherqd\txmm, vm64x, xmm"), /* VEX.128.66.0f38.W0 91 /r vpgatherqd xmm1, vm64x, xmm2 */
 	I(0x91, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 1) "vpgatherqd\txmm, vm64y, xmm"), /* VEX.256.66.0f38.W0 91 /r vpgatherqd xmm1, vm64y, xmm2 */
 
-	I(0x90, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 0) "vpgatherdd\txmm{k1}, vm32x"),  /* EVEX.128.66.0f38.W0 90 /vsib vpgatherdd xmm1{k1}, vm32x */
-	I(0x90, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 1) "vpgatherdd\tymm1{k1}, vm32y"), /* EVEX.256.66.0f38.W0 90 /vsib vpgatherdd ymm1{k1}, vm32y */
-	I(0x90, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 2) "vpgatherdd\tzmm1{k1}, vm32z"), /* EVEX.512.66.0f38.W0 90 /vsib vpgatherdd zmm1{k1}, vm32z */
-	I(0x90, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 0) "vpgatherdq\txmm{k1}, vm32x"),  /* EVEX.128.66.0f38.W1 90 /vsib vpgatherdq xmm1{k1}, vm32x */
-	I(0x90, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 1) "vpgatherdq\tymm1{k1}, vm32x"), /* EVEX.256.66.0f38.W1 90 /vsib vpgatherdq ymm1{k1}, vm32x */
-	I(0x90, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 2) "vpgatherdq\tzmm1{k1}, vm32y"), /* EVEX.512.66.0f38.W1 90 /vsib vpgatherdq zmm1{k1}, vm32y */
+	I(0x90, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 0) "vpgatherdd\txmm{k1}, vm32x"), /* EVEX.128.66.0f38.W0 90 /vsib vpgatherdd xmm1{k1}, vm32x */
+	I(0x90, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 1) "vpgatherdd\tymm{k1}, vm32y"), /* EVEX.256.66.0f38.W0 90 /vsib vpgatherdd ymm1{k1}, vm32y */
+	I(0x90, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 2) "vpgatherdd\tzmm{k1}, vm32z"), /* EVEX.512.66.0f38.W0 90 /vsib vpgatherdd zmm1{k1}, vm32z */
+	I(0x90, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 0) "vpgatherdq\txmm{k1}, vm32x"), /* EVEX.128.66.0f38.W1 90 /vsib vpgatherdq xmm1{k1}, vm32x */
+	I(0x90, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 1) "vpgatherdq\tymm{k1}, vm32x"), /* EVEX.256.66.0f38.W1 90 /vsib vpgatherdq ymm1{k1}, vm32x */
+	I(0x90, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 2) "vpgatherdq\tzmm{k1}, vm32y"), /* EVEX.512.66.0f38.W1 90 /vsib vpgatherdq zmm1{k1}, vm32y */
 
-	I(0x91, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 0) "vpgatherqd\txmm{k1}, vm64x"),  /* EVEX.128.66.0f38.W0 91 /vsib vpgatherqd xmm1{k1}, vm64x */
-	I(0x91, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 1) "vpgatherqd\txmm{k1}, vm64y"),  /* EVEX.256.66.0f38.W0 91 /vsib vpgatherqd xmm1{k1}, vm64y */
-	I(0x91, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 2) "vpgatherqd\tymm1{k1}, vm64z"), /* EVEX.512.66.0f38.W0 91 /vsib vpgatherqd ymm1{k1}, vm64z */
-	I(0x91, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 0) "vpgatherqq\txmm{k1}, vm64x"),  /* EVEX.128.66.0f38.W1 91 /vsib vpgatherqq xmm1{k1}, vm64x */
-	I(0x91, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 1) "vpgatherqq\tymm1{k1}, vm64y"), /* EVEX.256.66.0f38.W1 91 /vsib vpgatherqq ymm1{k1}, vm64y */
-	I(0x91, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 2) "vpgatherqq\tzmm1{k1}, vm64z"), /* EVEX.512.66.0f38.W1 91 /vsib vpgatherqq zmm1{k1}, vm64z */
+	I(0x91, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 0) "vpgatherqd\txmm{k1}, vm64x"), /* EVEX.128.66.0f38.W0 91 /vsib vpgatherqd xmm1{k1}, vm64x */
+	I(0x91, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 1) "vpgatherqd\txmm{k1}, vm64y"), /* EVEX.256.66.0f38.W0 91 /vsib vpgatherqd xmm1{k1}, vm64y */
+	I(0x91, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 2) "vpgatherqd\tymm{k1}, vm64z"), /* EVEX.512.66.0f38.W0 91 /vsib vpgatherqd ymm1{k1}, vm64z */
+	I(0x91, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 0) "vpgatherqq\txmm{k1}, vm64x"), /* EVEX.128.66.0f38.W1 91 /vsib vpgatherqq xmm1{k1}, vm64x */
+	I(0x91, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 1) "vpgatherqq\tymm{k1}, vm64y"), /* EVEX.256.66.0f38.W1 91 /vsib vpgatherqq ymm1{k1}, vm64y */
+	I(0x91, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 2) "vpgatherqq\tzmm{k1}, vm64z"), /* EVEX.512.66.0f38.W1 91 /vsib vpgatherqq zmm1{k1}, vm64z */
 
 	I(0x90, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 0) "vpgatherdq\txmm, vm32x, xmm"), /* VEX.128.66.0f38.W1 90 /r vpgatherdq xmm1, vm32x, xmm2 */
-	I(0x90, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 1) "vpgatherdq\tymm, vm32x, ymm"),  /* VEX.256.66.0f38.W1 90 /r vpgatherdq ymm1, vm32x, ymm2 */
+	I(0x90, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 1) "vpgatherdq\tymm, vm32x, ymm"), /* VEX.256.66.0f38.W1 90 /r vpgatherdq ymm1, vm32x, ymm2 */
 	I(0x91, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 0) "vpgatherqq\txmm, vm64x, xmm"), /* VEX.128.66.0f38.W1 91 /r vpgatherqq xmm1, vm64x, xmm2 */
-	I(0x91, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 1) "vpgatherqq\tymm, vm64y, ymm"),  /* VEX.256.66.0f38.W1 91 /r vpgatherqq ymm1, vm64y, ymm2 */
+	I(0x91, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 1) "vpgatherqq\tymm, vm64y, ymm"), /* VEX.256.66.0f38.W1 91 /r vpgatherqq ymm1, vm64y, ymm2 */
 
 	I(0xa0, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 0) "vpscatterdd\tvm32x{k1}, xmm"), /* EVEX.128.66.0f38.W0 a0 /vsib vpscatterdd vm32x{k1}, xmm1 */
 	I(0xa0, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 0, 1) "vpscatterdd\tvm32y{k1}, ymm"), /* EVEX.256.66.0f38.W0 a0 /vsib vpscatterdd vm32y{k1}, ymm1 */
@@ -4907,15 +4907,15 @@ PRIVATE struct instruction const ops_0f3a[] = {
 	I(0xa3, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 1) "vscatterqpd\tvm64y{k1}, ymm"), /* EVEX.256.66.0f38.W1 a3 /vsib vscatterqpd vm64y{k1}, ymm1 */
 	I(0xa3, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 2) "vscatterqpd\tvm64z{k1}, zmm"), /* EVEX.512.66.0f38.W1 a3 /vsib vscatterqpd vm64z{k1}, zmm1 */
 
-	I(0xc6, IF_66|IF_VEX|IF_MODRM|IF_REG1, OP_VEX_B0(0, 0, 0, 2) "/vsib vgatherpf0dps vm32z{k1}"), /* EVEX.512.66.0f38.W0 c6 /1 /vsib vgatherpf0dps vm32z{k1} */
-	I(0xc7, IF_66|IF_VEX|IF_MODRM|IF_REG1, OP_VEX_B0(0, 0, 0, 2) "/vsib vgatherpf0qps vm64z{k1}"), /* EVEX.512.66.0f38.W0 c7 /1 /vsib vgatherpf0qps vm64z{k1} */
-	I(0xc6, IF_66|IF_VEX|IF_MODRM|IF_REG1, OP_VEX_B0(0, 0, 1, 2) "/vsib vgatherpf0dpd vm32y{k1}"), /* EVEX.512.66.0f38.W1 c6 /1 /vsib vgatherpf0dpd vm32y{k1} */
-	I(0xc7, IF_66|IF_VEX|IF_MODRM|IF_REG1, OP_VEX_B0(0, 0, 1, 2) "/vsib vgatherpf0qpd vm64z{k1}"), /* EVEX.512.66.0f38.W1 c7 /1 /vsib vgatherpf0qpd vm64z{k1} */
+	I(0xc6, IF_66|IF_VEX|IF_MODRM|IF_REG1, OP_VEX_B0(0, 0, 0, 2) "/vsib vgatherpf0dps\tvm32z{k1}"), /* EVEX.512.66.0f38.W0 c6 /1 /vsib vgatherpf0dps vm32z{k1} */
+	I(0xc7, IF_66|IF_VEX|IF_MODRM|IF_REG1, OP_VEX_B0(0, 0, 0, 2) "/vsib vgatherpf0qps\tvm64z{k1}"), /* EVEX.512.66.0f38.W0 c7 /1 /vsib vgatherpf0qps vm64z{k1} */
+	I(0xc6, IF_66|IF_VEX|IF_MODRM|IF_REG1, OP_VEX_B0(0, 0, 1, 2) "/vsib vgatherpf0dpd\tvm32y{k1}"), /* EVEX.512.66.0f38.W1 c6 /1 /vsib vgatherpf0dpd vm32y{k1} */
+	I(0xc7, IF_66|IF_VEX|IF_MODRM|IF_REG1, OP_VEX_B0(0, 0, 1, 2) "/vsib vgatherpf0qpd\tvm64z{k1}"), /* EVEX.512.66.0f38.W1 c7 /1 /vsib vgatherpf0qpd vm64z{k1} */
 
-	I(0xc6, IF_66|IF_VEX|IF_MODRM|IF_REG2, OP_VEX_B0(0, 0, 0, 2) "/vsib vgatherpf1dps vm32z{k1}"), /* EVEX.512.66.0f38.W0 c6 /2 /vsib vgatherpf1dps vm32z{k1} */
-	I(0xc7, IF_66|IF_VEX|IF_MODRM|IF_REG2, OP_VEX_B0(0, 0, 0, 2) "/vsib vgatherpf1qps vm64z{k1}"), /* EVEX.512.66.0f38.W0 c7 /2 /vsib vgatherpf1qps vm64z{k1} */
-	I(0xc6, IF_66|IF_VEX|IF_MODRM|IF_REG2, OP_VEX_B0(0, 0, 1, 2) "/vsib vgatherpf1dpd vm32y{k1}"), /* EVEX.512.66.0f38.W1 c6 /2 /vsib vgatherpf1dpd vm32y{k1} */
-	I(0xc7, IF_66|IF_VEX|IF_MODRM|IF_REG2, OP_VEX_B0(0, 0, 1, 2) "/vsib vgatherpf1qpd vm64z{k1}"), /* EVEX.512.66.0f38.W1 c7 /2 /vsib vgatherpf1qpd vm64z{k1} */
+	I(0xc6, IF_66|IF_VEX|IF_MODRM|IF_REG2, OP_VEX_B0(0, 0, 0, 2) "/vsib vgatherpf1dps\tvm32z{k1}"), /* EVEX.512.66.0f38.W0 c6 /2 /vsib vgatherpf1dps vm32z{k1} */
+	I(0xc7, IF_66|IF_VEX|IF_MODRM|IF_REG2, OP_VEX_B0(0, 0, 0, 2) "/vsib vgatherpf1qps\tvm64z{k1}"), /* EVEX.512.66.0f38.W0 c7 /2 /vsib vgatherpf1qps vm64z{k1} */
+	I(0xc6, IF_66|IF_VEX|IF_MODRM|IF_REG2, OP_VEX_B0(0, 0, 1, 2) "/vsib vgatherpf1dpd\tvm32y{k1}"), /* EVEX.512.66.0f38.W1 c6 /2 /vsib vgatherpf1dpd vm32y{k1} */
+	I(0xc7, IF_66|IF_VEX|IF_MODRM|IF_REG2, OP_VEX_B0(0, 0, 1, 2) "/vsib vgatherpf1qpd\tvm64z{k1}"), /* EVEX.512.66.0f38.W1 c7 /2 /vsib vgatherpf1qpd vm64z{k1} */
 #endif
 
 

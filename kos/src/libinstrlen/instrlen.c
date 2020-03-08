@@ -127,6 +127,11 @@ NOTHROW_NCX(CC skip_modrm)(byte_t **__restrict ppc) {
 
 INTERN ATTR_PURE WUNUSED void const *
 NOTHROW_NCX(CC libil_instruction_succ)(void const *pc) {
+	/* TODO: Instruction length also depends on the current operating mode!
+	 *       And while this function likely won't be needed to determine the
+	 *       length of a realmode instruction, x86_64 indiscriminately uses
+	 *       this function to work with both 32-bit and 64-bit code (which
+	 *       can actually lead to inconsistencies!) */
 	uint8_t const *my_itab;
 	uint8_t op, *reader      = (uint8_t *)pc;
 	uint8_t action, op_flags = 0;
@@ -161,7 +166,7 @@ next_byte:
 			/*op = 0xc4;*/
 			break;
 		}
-#endif
+#endif /* !__x86_64__ */
 		if ((vex & VEX3B_PP_M) == (0x01 << VEX3B_PP_S))
 			op_flags |= OPFLAG_66;
 		switch (vex & VEX3B_M_MMMM_M) {
@@ -191,7 +196,7 @@ next_byte:
 			op = 0xc5;
 			break;
 		}
-#endif
+#endif /* !__x86_64__ */
 		if ((op & VEX3B_PP_M) == (0x01 << VEX3B_PP_S))
 			op_flags |= OPFLAG_66;
 		goto next_byte;
@@ -207,12 +212,12 @@ next_byte:
 		if (op & 0x08)
 			op_flags |= OPFLAG_REXW;
 		goto next_byte;
-#else
+#else /* __x86_64__ */
 	case 0x26: goto next_byte;
 	case 0x2e: goto next_byte;
 	case 0x36: goto next_byte;
 	case 0x3e: goto next_byte;
-#endif
+#endif /* !__x86_64__ */
 	case 0x64: goto next_byte;
 	case 0x65: goto next_byte;
 	case 0x0f:
@@ -316,29 +321,35 @@ done:
 
 INTERN ATTR_PURE WUNUSED void const *
 NOTHROW_NCX(CC libil_instruction_pred)(void const *pc) {
-	void const *baseline, *result;
+	void const *baseline, *iter, *result;
 	unsigned int i;
 	baseline = libil_instruction_pred_impl(pc);
 	if unlikely(!baseline)
 		return NULL;
+	/* At this point we know that the intended prev-instruction (our return value) is
+	 * located somewhere between `baseline ... pc - 1', since `libil_instruction_pred_impl()'
+	 * returns a pointer to a memory location containing the longest possible preceding
+	 * instruction. */
+
 	/* Go backwards up to `LIBIL_PRED_VERIFY_DISTANCE' by guessing the length of the instructions.
 	 * Then, move forward until the given `pc' has once again been reached. */
+	iter = baseline;
 	for (i = 1; i < LIBIL_PRED_VERIFY_DISTANCE; ++i) {
 		void const *next;
-		next = libil_instruction_pred_impl(baseline);
+		next = libil_instruction_pred_impl(iter);
 		if (!next)
 			break;
-		baseline = next;
+		iter = next;
 	}
 	for (;;) {
 		void const *next;
-		result = baseline;
-		next = libil_instruction_succ(baseline);
-		if (!next)
-			next = (byte_t *)baseline + 1;
+		result = iter;
+		next = libil_instruction_succ(iter);
+		if unlikely(!next)
+			next = (byte_t *)iter + 1; /* Shouldn't happen... */
 		if (next >= pc)
-			break;
-		baseline = next;
+			break; /* Should be equal, unless `pc' didn't point to the start of an instruction... */
+		iter = next;
 	}
 	return result;
 }
@@ -379,7 +390,7 @@ NOTHROW(CC libil_instruction_trysucc)(void const *pc) {
 #ifdef __KERNEL__
 	struct exception_info old_info;
 	memcpy(&old_info, &THIS_EXCEPTION_INFO, sizeof(struct exception_info));
-#endif
+#endif /* __KERNEL__ */
 	TRY {
 		result = libil_instruction_succ(pc);
 	} EXCEPT {
@@ -387,9 +398,9 @@ NOTHROW(CC libil_instruction_trysucc)(void const *pc) {
 			RETHROW();
 #ifdef __KERNEL__
 		goto err_segfault;
-#else
+#else /* __KERNEL__ */
 		result = NULL;
-#endif
+#endif /* !__KERNEL__ */
 	}
 	if unlikely(!result)
 		result = (byte_t *)pc + 1;
@@ -398,7 +409,7 @@ NOTHROW(CC libil_instruction_trysucc)(void const *pc) {
 err_segfault:
 	memcpy(&THIS_EXCEPTION_INFO, &old_info, sizeof(struct exception_info));
 	return (byte_t *)pc + 1;
-#endif
+#endif /* __KERNEL__ */
 #endif /* !LIBINSTRLEN_FIXED_INSTRUCTION_LENGTH */
 }
 
@@ -411,7 +422,7 @@ NOTHROW(CC libil_instruction_trypred)(void const *pc) {
 #ifdef __KERNEL__
 	struct exception_info old_info;
 	memcpy(&old_info, &THIS_EXCEPTION_INFO, sizeof(struct exception_info));
-#endif
+#endif /* __KERNEL__ */
 	TRY {
 		result = libil_instruction_pred(pc);
 	} EXCEPT {
@@ -419,9 +430,9 @@ NOTHROW(CC libil_instruction_trypred)(void const *pc) {
 			RETHROW();
 #ifdef __KERNEL__
 		goto err_segfault;
-#else
+#else /* __KERNEL__ */
 		result = NULL;
-#endif
+#endif /* !__KERNEL__ */
 	}
 	if (!result)
 		result = (byte_t *)pc - 1;
@@ -430,7 +441,7 @@ NOTHROW(CC libil_instruction_trypred)(void const *pc) {
 err_segfault:
 	memcpy(&THIS_EXCEPTION_INFO, &old_info, sizeof(struct exception_info));
 	return (byte_t *)pc - 1;
-#endif
+#endif /* __KERNEL__ */
 #endif /* !LIBINSTRLEN_FIXED_INSTRUCTION_LENGTH */
 }
 
@@ -442,13 +453,13 @@ NOTHROW_NCX(CC libil_instruction_length)(void const *pc) {
 #ifdef LIBINSTRLEN_FIXED_INSTRUCTION_LENGTH
 	(void)pc;
 	return LIBINSTRLEN_FIXED_INSTRUCTION_LENGTH;
-#else
+#else /* LIBINSTRLEN_FIXED_INSTRUCTION_LENGTH */
 	void const *endpc;
 	endpc = libil_instruction_succ(pc);
 	if (!endpc)
 		return 0;
 	return (size_t)((byte_t *)endpc - (byte_t *)pc);
-#endif
+#endif /* !LIBINSTRLEN_FIXED_INSTRUCTION_LENGTH */
 }
 
 

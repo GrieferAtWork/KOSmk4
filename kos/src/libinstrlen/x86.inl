@@ -22,20 +22,20 @@
 /*[[[deemon
 #include "x86.def"
 
-function print_table(name,tab) {
+function print_table(name, tab) {
 	print "PRIVATE uint8_t const " + name + "[128] = {";
 	for (local i: [:128]) {
-		local a = tab.get((i * 2) + 0,"INSTR_UNDEF");
-		local b = tab.get((i * 2) + 1,"INSTR_UNDEF");
-		print "\tPAIR({}, {}),".format({ a, b });
+		local a = tab.get((i * 2) + 0, "INSTR_UNDEF");
+		local b = tab.get((i * 2) + 1, "INSTR_UNDEF");
+		print "\tPAIR({}, {}), ".format({ a, b });
 	}
 	print "};";
 }
 
-print_table("itab",itab);
-print_table("itab_0f",itab_0f);
-print_table("itab_0f38",itab_0f38);
-print_table("itab_0f3a",itab_0f3a);
+print_table("itab", itab);
+print_table("itab_0f", itab_0f);
+print_table("itab_0f38", itab_0f38);
+print_table("itab_0f3a", itab_0f3a);
 
 ]]]*/
 PRIVATE uint8_t const itab[128] = {

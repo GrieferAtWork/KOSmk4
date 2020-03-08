@@ -32,6 +32,9 @@
 #define I_3      "INSTR_3B"
 #define I_UNDEF  "INSTR_UNDEF"
 
+/* TODO: These tables should really be auto-generated based on libdisasm.
+ *       libdisasm has gotten may more love over time, and is much more
+ *       complete than this list right here! */
 local itab = {
 	0x00 : I_RM,
 	0x01 : I_RM,
