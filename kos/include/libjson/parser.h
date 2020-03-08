@@ -48,6 +48,7 @@ __DECL_BEGIN
 #define JSON_ERROR_SYNTAX (-1) /* Syntax error. */
 #define JSON_ERROR_NOOBJ  (-2) /* Entity does not exist */
 #define JSON_ERROR_SYSERR (-3) /* Other error (context-specific) */
+#define JSON_ERROR_RANGE  (-4) /* Integer under-/overflow */
 #define JSON_ERROR_NOTEQ  JSON_ERROR_SYSERR /* Strings are not equal */
 #define JSON_ERROR_EOF    JSON_ERROR_NOOBJ  /* End-of-file has been reached */
 
@@ -327,10 +328,14 @@ __NOTHROW_NCX(LIBJSON_CC json_parser_getstring)(struct json_parser *__restrict s
 
 /* Decode a Json number and store its value in `*presult'
  * @return: JSON_ERROR_OK:     Success. - The number is stored in `*presult'
- *                             In this case the parser points at the first token after an optional trailing `,'
+ *                             In this case the parser points at the first token after the number
  * @return: JSON_ERROR_NOOBJ:  The parser didn't point at a number token.
  *                             In this case the parser didn't change position.
- * @return: JSON_ERROR_SYNTAX: Syntax error. */
+ * @return: JSON_ERROR_SYNTAX: Syntax error.
+ * @return: JSON_ERROR_RANGE:  The encoded value does not fit into the given type.
+ *                             NOTE: Not returned by `json_parser_getfloat()'!
+ *                             In this case `*presult' is filled with the truncated
+ *                             integer value, and the parser points at the first token after the number */
 typedef __ATTR_NONNULL((1, 2)) int
 (LIBJSON_CC *PJSON_PARSER_GETNUMBER)(struct json_parser *__restrict self,
                                      __intptr_t *__restrict presult);

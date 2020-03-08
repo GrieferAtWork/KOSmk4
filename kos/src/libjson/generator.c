@@ -501,7 +501,8 @@ NOTHROW_NCX(CC libjson_decode_ARRAY)(struct json_parser *__restrict parser,
  * @return: JSON_ERROR_OK:     Success.
  * @return: JSON_ERROR_SYNTAX: Syntax error.
  * @return: JSON_ERROR_NOOBJ:  A required field doesn't exist or has wrong typing.
- * @return: JSON_ERROR_SYSERR: Malformed codec. */
+ * @return: JSON_ERROR_SYSERR: Malformed codec.
+ * @return: JSON_ERROR_RANGE:  The value of an integer field was too large. */
 INTERN NONNULL((1, 2, 3)) int
 NOTHROW_NCX(CC libjson_decode)(struct json_parser *__restrict parser,
                                void const *__restrict codec,

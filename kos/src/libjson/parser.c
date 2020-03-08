@@ -1148,18 +1148,23 @@ do_return_empty_string:
 
 /* Decode a Json number and store its value in `*presult'
  * @return: JSON_ERROR_OK:     Success. - The number is stored in `*presult'
- *                             In this case the parser points at the first token after an optional trailing `,'
+ *                             In this case the parser points at the first token after the number
  * @return: JSON_ERROR_NOOBJ:  The parser didn't point at a number token.
  *                             In this case the parser didn't change position.
- * @return: JSON_ERROR_SYNTAX: Syntax error. */
+ * @return: JSON_ERROR_SYNTAX: Syntax error.
+ * @return: JSON_ERROR_RANGE:  The encoded value does not fit into the given type.
+ *                             NOTE: Not returned by `json_parser_getfloat()'!
+ *                             In this case `*presult' is filled with the truncated
+ *                             integer value, and the parser points at the first token after the number */
 INTERN NONNULL((1, 2)) int
 NOTHROW_NCX(CC libjson_parser_getnumber)(struct json_parser *__restrict self,
                                          intptr_t *__restrict presult) {
 	char const *start = self->jp_pos;
 	char32_t ch = json_getc(self);
 	bool negative = false;
+	int error = JSON_ERROR_OK;
 	unsigned int radix = 10;
-	intptr_t result;
+	intptr_t result, new_result;
 	if (ch == '-') {
 		ch = json_getc(self);
 		negative = true;
@@ -1185,12 +1190,29 @@ NOTHROW_NCX(CC libjson_parser_getnumber)(struct json_parser *__restrict self,
 	result = 0;
 	do {
 		uint8_t digit;
+again_parse_ch:
 		digit = unicode_asdigit(ch);
 		if unlikely(digit > radix)
 			return JSON_ERROR_SYNTAX;
-		result *= radix;
-		result += digit;
-		start = self->jp_pos;
+		new_result = (result * radix) + digit;
+		if (new_result < result) {
+			result = new_result;
+			/* Check for special case: INTPTR_MIN, as well
+			 * as the fact that `INTPTR_MIN == -INTPTR_MIN' */
+			if (new_result == INTPTR_MIN && negative) {
+				start = self->jp_pos;
+				ch = json_getc(self);
+				/* If this was the last digit, then the
+				 * number doesn't actually overflow! */
+				if (!unicode_isdecimal(ch))
+					break;
+				error = JSON_ERROR_RANGE;
+				goto again_parse_ch;
+			}
+			error = JSON_ERROR_RANGE;
+		}
+		result = new_result;
+		start  = self->jp_pos;
 		ch = json_getc(self);
 	} while (unicode_isdecimal(ch));
 	/* Skip trailing whitespace. */
@@ -1199,11 +1221,13 @@ NOTHROW_NCX(CC libjson_parser_getnumber)(struct json_parser *__restrict self,
 		ch = json_getc(self);
 	}
 	self->jp_pos = start;
-	/* Store the generated integer. */
+	/* Store the generated integer.
+	 * NOTE: The special case where `INTPTR_MIN == -INTPTR_MIN'
+	 *       is already handled above by the overflow check! */
 	if (negative)
 		result = -result;
 	*presult = result;
-	return JSON_ERROR_OK;
+	return error;
 }
 
 #if __SIZEOF_POINTER__ >= 8
@@ -1215,8 +1239,9 @@ NOTHROW_NCX(CC libjson_parser_getint64)(struct json_parser *__restrict self,
 	char const *start = self->jp_pos;
 	char32_t ch = json_getc(self);
 	bool negative = false;
+	int error = JSON_ERROR_OK;
 	unsigned int radix = 10;
-	int64_t result;
+	int64_t result, new_result;
 	if (ch == '-') {
 		ch = json_getc(self);
 		negative = true;
@@ -1242,12 +1267,29 @@ NOTHROW_NCX(CC libjson_parser_getint64)(struct json_parser *__restrict self,
 	result = 0;
 	do {
 		uint8_t digit;
+again_parse_ch:
 		digit = unicode_asdigit(ch);
 		if unlikely(digit > radix)
 			return JSON_ERROR_SYNTAX;
-		result *= radix;
-		result += digit;
-		start = self->jp_pos;
+		new_result = (result * radix) + digit;
+		if (new_result < result) {
+			result = new_result;
+			/* Check for special case: INT64_MIN, as well
+			 * as the fact that `INT64_MIN == -INT64_MIN' */
+			if (new_result == INT64_MIN && negative) {
+				start = self->jp_pos;
+				ch = json_getc(self);
+				/* If this was the last digit, then the
+				 * number doesn't actually overflow! */
+				if (!unicode_isdecimal(ch))
+					break;
+				error = JSON_ERROR_RANGE;
+				goto again_parse_ch;
+			}
+			error = JSON_ERROR_RANGE;
+		}
+		result = new_result;
+		start  = self->jp_pos;
 		ch = json_getc(self);
 	} while (unicode_isdecimal(ch));
 	/* Skip trailing whitespace. */
@@ -1256,11 +1298,13 @@ NOTHROW_NCX(CC libjson_parser_getint64)(struct json_parser *__restrict self,
 		ch = json_getc(self);
 	}
 	self->jp_pos = start;
-	/* Store the generated integer. */
+	/* Store the generated integer.
+	 * NOTE: The special case where `INT64_MIN == -INT64_MIN'
+	 *       is already handled above by the overflow check! */
 	if (negative)
 		result = -result;
 	*presult = result;
-	return JSON_ERROR_OK;
+	return error;
 }
 #endif /* __SIZEOF_POINTER__ < 8 */
 DEFINE_INTERN_ALIAS(libjson_parser_getuint64, libjson_parser_getint64);

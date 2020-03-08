@@ -193,10 +193,14 @@ NOTHROW_NCX(CC libjson_parser_getstring)(struct json_parser *__restrict self,
 
 /* Decode a Json number and store its value in `*presult'
  * @return: JSON_ERROR_OK:     Success. - The number is stored in `*presult'
- *                             In this case the parser points at the first token after an optional trailing `,'
+ *                             In this case the parser points at the first token after the number
  * @return: JSON_ERROR_NOOBJ:  The parser didn't point at a number token.
  *                             In this case the parser didn't change position.
- * @return: JSON_ERROR_SYNTAX: Syntax error. */
+ * @return: JSON_ERROR_SYNTAX: Syntax error.
+ * @return: JSON_ERROR_RANGE:  The encoded value does not fit into the given type.
+ *                             NOTE: Not returned by `json_parser_getfloat()'!
+ *                             In this case `*presult' is filled with the truncated
+ *                             integer value, and the parser points at the first token after the number */
 INTDEF NONNULL((1, 2)) int
 NOTHROW_NCX(CC libjson_parser_getnumber)(struct json_parser *__restrict self,
                                          intptr_t *__restrict presult);

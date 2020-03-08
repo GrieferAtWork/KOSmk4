@@ -96,41 +96,55 @@ NOTHROW_NCX(CC FUNC(libjson_decode_INTO))(IF_DECODE(struct json_parser *__restri
 #if __SIZEOF_POINTER__ == 8
 	case JSON_TYPE_INT64:
 	case JSON_TYPE_UINT32:
-#endif
+#endif /* __SIZEOF_POINTER__ == 8 */
 	{
 		intptr_t number;
 		result = libjson_parser_getnumber(parser, &number);
 		if likely(result == JSON_ERROR_OK) {
 			switch (type) {
+
 			case JSON_TYPE_INT8:
 			case JSON_TYPE_UINT8:
 				*(int8_t *)dst = (int8_t)number;
 				break;
+
 			case JSON_TYPE_INT16:
 			case JSON_TYPE_UINT16:
 				UNALIGNED_SET16((uint16_t *)dst, (uint16_t)(int16_t)number);
 				break;
+
 			case JSON_TYPE_INT32:
+#if __SIZEOF_POINTER__ == 8
+			case JSON_TYPE_UINT32:
+#endif /* __SIZEOF_POINTER__ == 8 */
 				UNALIGNED_SET32((uint32_t *)dst, (uint32_t)(int32_t)number);
 				break;
+
 #if __SIZEOF_POINTER__ == 8
 			case JSON_TYPE_INT64:
-			case JSON_TYPE_UINT32:
-#endif
+				UNALIGNED_SET64((uint32_t *)dst, (int64_t)number);
+				break;
+#endif /* __SIZEOF_POINTER__ == 8 */
+
 			default: __builtin_unreachable();
 			}
 		}
 	}	break;
 
 #if __SIZEOF_POINTER__ != 8
-	case JSON_TYPE_INT64: {
+	case JSON_TYPE_INT64:
+	case JSON_TYPE_UINT32: {
 		int64_t value;
 		result = libjson_parser_getint64(parser, &value);
 		if likely(result == JSON_ERROR_OK) {
-			UNALIGNED_SET64((uint64_t *)dst, (uint64_t)value);
+			if (type == JSON_TYPE_INT64) {
+				UNALIGNED_SET64((uint64_t *)dst, (uint64_t)value);
+			} else {
+				UNALIGNED_SET32((uint32_t *)dst, (uint32_t)(uint64_t)value);
+			}
 		}
 	}	break;
-#endif
+#endif /* __SIZEOF_POINTER__ != 8 */
 
 	case JSON_TYPE_UINT64: {
 		uint64_t value;

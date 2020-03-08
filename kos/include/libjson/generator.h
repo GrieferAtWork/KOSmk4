@@ -151,7 +151,7 @@ struct json_parser;
 /* Type parameter generators for `JGEN_INTO' */
 #define JSON_TYPE_BOOL                0xe0 /* bool */
 #define JSON_TYPE_BOOLBIT(bit)       (0xe0|((bit)&0x7)) /* Boolean bitflag (`*((u8 *)base + offset) ^= 1 << bit') */
-#define JSON_TYPE_BOOLFLAG(flag) \
+#define JSON_TYPE_BOOLFLAG(flag)                     \
 	((flag) == 0x01 ? 0xe0 : (flag) == 0x02 ? 0xe1 : \
 	 (flag) == 0x04 ? 0xe2 : (flag) == 0x08 ? 0xe3 : \
 	 (flag) == 0x10 ? 0xe4 : (flag) == 0x20 ? 0xe5 : \
@@ -238,7 +238,8 @@ json_encode(struct json_writer *__restrict writer,
  * @return: JSON_ERROR_OK:     Success.
  * @return: JSON_ERROR_SYNTAX: Syntax error.
  * @return: JSON_ERROR_NOOBJ:  A required field doesn't exist or has wrong typing.
- * @return: JSON_ERROR_SYSERR: Malformed codec. */
+ * @return: JSON_ERROR_SYSERR: Malformed codec.
+ * @return: JSON_ERROR_RANGE:  The value of an integer field was too large. */
 typedef __ATTR_NONNULL((1, 2, 3)) int
 (LIBJSON_CC *PJSON_DECODE)(struct json_parser *__restrict parser,
                            void const *__restrict codec,
