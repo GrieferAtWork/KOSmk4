@@ -891,11 +891,14 @@ __builtin_ctzl:false
 __builtin_ctzll:false
 __builtin_cxa_end_cleanup:false
 __builtin_dcgettext:true
+__builtin_delete:true
 __builtin_dgettext:true
+__builtin_div:true
 __builtin_drem:true
 __builtin_dremf:true
 __builtin_dreml:true
 __builtin_dwarf_cfa:false
+__builtin_dwarf_fp_regnum:false
 __builtin_dwarf_sp_column:false
 __builtin_eh_copy_values:false
 __builtin_eh_filter:false
@@ -944,6 +947,7 @@ __builtin_fabsf32x:true
 __builtin_fabsf64:true
 __builtin_fabsf64x:true
 __builtin_fabsl:true
+__builtin_fceil:true
 __builtin_fdim:true
 __builtin_fdimf:true
 __builtin_fdiml:true
@@ -958,6 +962,7 @@ __builtin_fesetexceptflag:true
 __builtin_fesetround:true
 __builtin_fetestexcept:true
 __builtin_feupdateenv:true
+__builtin_ffloor:true
 __builtin_ffs:true
 __builtin_ffsimax:true
 __builtin_ffsl:true
@@ -1021,11 +1026,13 @@ __builtin_fputs:true
 __builtin_fputs_unlocked:true
 __builtin_frame_address:false
 __builtin_free:true
+__builtin_frem:true
 __builtin_frexp:true
 __builtin_frexpf:true
 __builtin_frexpl:true
 __builtin_frob_return_addr:false
 __builtin_fscanf:true
+__builtin_fsqrt:true
 __builtin_fwrite:true
 __builtin_fwrite_unlocked:true
 __builtin_gamma:true
@@ -1034,6 +1041,8 @@ __builtin_gammaf:true
 __builtin_gammaf_r:true
 __builtin_gammal:true
 __builtin_gammal_r:true
+__builtin_getexp:false
+__builtin_getman:false
 __builtin_gettext:true
 __builtin_goacc_parlevel_id:false
 __builtin_goacc_parlevel_size:false
@@ -1081,6 +1090,7 @@ __builtin_inff64x:false
 __builtin_infl:false
 __builtin_init_descriptor:false
 __builtin_init_dwarf_reg_size_table:false
+__builtin_init_dwarf_reg_sizes:false
 __builtin_init_heap_trampoline:false
 __builtin_init_trampoline:false
 __builtin_irint:false
@@ -1151,6 +1161,7 @@ __builtin_lceill:false
 __builtin_ldexp:true
 __builtin_ldexpf:true
 __builtin_ldexpl:true
+__builtin_ldiv:true
 __builtin_lfloor:false
 __builtin_lfloorf:false
 __builtin_lfloorl:false
@@ -1221,8 +1232,8 @@ __builtin_nanf32x:true
 __builtin_nanf64:true
 __builtin_nanf64x:true
 __builtin_nanl:true
-__builtin_nans:false
-__builtin_nansf:false
+__builtin_nans:true
+__builtin_nansf:true
 __builtin_nansf128:false
 __builtin_nansf128x:false
 __builtin_nansf16:false
@@ -1230,7 +1241,7 @@ __builtin_nansf32:false
 __builtin_nansf32x:false
 __builtin_nansf64:false
 __builtin_nansf64x:false
-__builtin_nansl:false
+__builtin_nansl:true
 __builtin_nearbyint:true
 __builtin_nearbyintf:true
 __builtin_nearbyintf128:true
@@ -1241,6 +1252,7 @@ __builtin_nearbyintf32x:true
 __builtin_nearbyintf64:true
 __builtin_nearbyintf64x:true
 __builtin_nearbyintl:true
+__builtin_new:true
 __builtin_next_arg:false
 __builtin_nextafter:true
 __builtin_nextafterf:true
@@ -1275,6 +1287,8 @@ __builtin_powl:true
 __builtin_prefetch:false
 __builtin_printf:true
 __builtin_printf_unlocked:true
+__builtin_profile_func_enter:false
+__builtin_profile_func_exit:false
 __builtin_putc:true
 __builtin_putc_unlocked:true
 __builtin_putchar:true
@@ -1447,6 +1461,9 @@ __builtin_va_arg_pack_len:false
 __builtin_va_copy:false
 __builtin_va_end:false
 __builtin_va_start:false
+__builtin_varargs_start:false
+__builtin_vec_delete:true
+__builtin_vec_new:true
 __builtin_vfprintf:true
 __builtin_vfscanf:true
 __builtin_vprintf:true

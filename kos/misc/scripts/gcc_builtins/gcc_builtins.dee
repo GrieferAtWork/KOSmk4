@@ -33,7 +33,7 @@ class GCCBuiltin {
 	public member name: string;
 	@@Preprocessor expression that must be fulfilled for this builtin to be provided
 	public member cond: string | none = none;
-	public member usesLibc: bool = true;
+	public member usesLibc: bool | none = true;
 	public property mapByName: (string, GCCBuiltin) = {
 		get(): (string, GCCBuiltin) {
 			return (name, this);
@@ -42,12 +42,35 @@ class GCCBuiltin {
 }
 
 
-function getGCCVersion(): string {
-	local a,b,c = File.open(
-		fs.joinpath(GCC, "gcc/BASE-VER"),
-		"r"
-	).read().decode("utf-8").strip().scanf("%d.%d.%d")...;
-	return (a,b,c);
+function getGCCVersion(): string | none {
+	local fp;
+	fp = try File.open(fs.joinpath(GCC, "gcc/BASE-VER"), "r") catch (...) none;
+	if (fp !is none) with (fp) {
+		local a, b, c = fp.read().decode("utf-8").strip().scanf("%d.%d.%d")...;
+		return (a, b, c);
+	}
+	fp = try File.open(fs.joinpath(GCC, "gcc/version.c"), "r") catch (...) none;
+	if (fp !is none) with (fp) {
+		for (local l: fp) {
+			if ("version_string" !in l)
+				continue;
+			local verstrStart = l.find("\"");
+			if (verstrStart < 0)
+				continue;
+			++verstrStart;
+			while (verstrStart < #l && !l.isnumeric(verstrStart))
+				++verstrStart;
+			l = l[verstrStart:];
+			l = l.decode("utf-8");
+			try {
+				local a, b, c = l.scanf("%d.%d.%d")...;
+				return (a, b, c);
+			} catch (...) {
+				local a, b = l.scanf("%d.%d")...;
+				return (a, b, 0);
+			}
+		}
+	}
 }
 
 function unescapeName(name: string): string {
@@ -120,8 +143,8 @@ function getGCCBuiltins(version: (int,int,int)): {string...} {
 	local data = r.read();
 	r.close();
 	local error = proc.join();
-	if (error != 0)
-		throw Error("Process " + repr(proc) + " failed with " + error);
+	//if (error != 0)
+	//	throw Error("Process " + proc + " failed with " + error);
 	local i = 0;
 	local len = #data;
 	while (i < len) {
@@ -151,8 +174,67 @@ function getGCCBuiltins(version: (int,int,int)): {string...} {
 			c = replaceAll(c,"  ", " ");
 			c = removeSurroundingParens(c);
 			yield GCCBuiltin(name: name, cond: "?" + c, usesLibc: usesLibc);
+		} else if (#parts in [10, 9, 8]) {
+			/* ENUM, NAME, CLASS, TYPE, LIBTYPE, BOTH_P, FALLBACK_P, NONANSI_P, ATTRS, IMPLICIT */
+			/* ENUM, NAME, CLASS, TYPE, LIBTYPE, BOTH_P, FALLBACK_P, NONANSI_P, ATTRS */
+			/* ENUM, NAME, CLASS, TYPE, LIBTYPE, BOTH_P, FALLBACK_P, NONANSI_P */
+			local name = parts[1].strip();
+			if (!name.startswith("\""))
+				continue;
+			local usesLibc = removeSurroundingParens(parts[6].strip());
+			local usesLibc = usesLibc !in ["false", "0"];
+			name = unescapeName(name);
+			yield GCCBuiltin(name: name, cond: "?true", usesLibc: usesLibc);
+		} else if (#parts == 1) {
+			/* DEF_BUILTIN(BUILT_IN_ALLOCA) */
+			local name = parts[0];
+			if (name.isanylower() || !name.startswith("BUILT_IN_"))
+				throw Error("Unexpected old-style builtin definition: " + repr(name));
+			name = "__builtin_" + name[#"BUILT_IN_":].lower();
+			final local knownNonLibcFunctions = {
+				"__builtin_alloca",
+				"__builtin_apply",
+				"__builtin_getexp",
+				"__builtin_getman",
+				"__builtin_saveregs",
+				"__builtin_classify_type",
+				"__builtin_next_arg",
+				"__builtin_args_info",
+				"__builtin_constant_p",
+				"__builtin_frame_address",
+				"__builtin_return_address",
+				"__builtin_aggregate_incoming_address",
+				"__builtin_apply_args",
+				"__builtin_apply",
+				"__builtin_return",
+				"__builtin_isgreater",
+				"__builtin_isgreaterequal",
+				"__builtin_isless",
+				"__builtin_islessequal",
+				"__builtin_islessgreater",
+				"__builtin_isunordered",
+				"__builtin_unwind_init",
+				"__builtin_dwarf_cfa",
+				"__builtin_dwarf_fp_regnum",
+				"__builtin_init_dwarf_reg_sizes",
+				"__builtin_frob_return_addr",
+				"__builtin_extract_return_addr",
+				"__builtin_eh_return",
+				"__builtin_varargs_start",
+				"__builtin_stdarg_start",
+				"__builtin_va_end",
+				"__builtin_va_copy",
+				"__builtin_expect",
+				"__builtin_trap",
+				/* Despite their names, these 2 have actually always been
+				 * ~true~ builtins that have never called into libc! */
+				"__builtin_longjmp",
+				"__builtin_setjmp",
+			};
+			yield GCCBuiltin(name: name, cond: "?true",
+				usesLibc: name !in knownNonLibcFunctions);
 		} else {
-			print "Unknown argument count",#parts,"in",repr parts;
+			throw Error("Unknown argument count " + #parts + " in " + repr parts);
 		}
 	}
 }
@@ -161,7 +243,7 @@ class GCCFeatureSet {
 	this = default;
 	public member version: (int,int,int);
 	public member builtins: {GCCBuiltin...};
-	
+
 	public property usableBuiltins: {GCCBuiltin...} = {
 		get(): {GCCBuiltin...} {
 			for (local b: builtins) {
@@ -179,6 +261,8 @@ class GCCFeatureSet {
 
 function getFeatureSet(): GCCFeatureSet {
 	local version = getGCCVersion();
+	if (version is none)
+		throw Error("Unable to determine version");
 	return GCCFeatureSet(
 		version: version,
 		builtins: getGCCBuiltins(version),
@@ -192,24 +276,30 @@ function getFeatureSetFilename(version: (int,int,int)) {
 function createFeatureSetFile(feat: GCCFeatureSet) {
 	if (!fs.stat.isdir("gcc_features"))
 		fs.mkdir("gcc_features");
-	with (local fp = File.open(getFeatureSetFilename(feat.version), "w")) {
-		for (local b: feat.builtins) {
-			print fp: b.name,;
-			print fp: ":",;
-			print fp: b.usesLibc,;
-			print fp: ",",;
-			if (b.cond !is none) {
-				print fp: " ",;
-				print fp: repr(b.cond),;
+	local filename = getFeatureSetFilename(feat.version);
+	try {
+		with (local fp = File.open(filename, "w")) {
+			for (local b: feat.builtins) {
+				print fp: b.name,;
+				print fp: ":",;
+				print fp: b.usesLibc,;
+				print fp: ",",;
+				if (b.cond !is none) {
+					print fp: " ",;
+					print fp: repr(b.cond),;
+				}
+				print fp:;
 			}
-			print fp:;
 		}
+	} catch (...) {
+		try fs.unlink(filename); catch (...);
+		throw;
 	}
 }
 
 function gitCheckout(commit: string) {
 	fs.chdir(GCC);
-	local proc = ipc.Process("git", { "checkout", commit });
+	local proc = ipc.Process("git", { "checkout", commit, "-f" });
 	proc.start();
 	local error = proc.join();
 	fs.chdir(ROOT);
@@ -219,7 +309,7 @@ function gitCheckout(commit: string) {
 
 function loadVersionFeatures(commit: (string, (int,int,int))) {
 	print "Loading features for:", repr commit;
-	local ver = try getGCCVersion() catch (...) none;
+	local ver = getGCCVersion();
 	if (ver is none || ver != commit[1])
 		gitCheckout(commit[0]);
 	local features = getFeatureSet();
@@ -249,9 +339,148 @@ local gccReleaseCommits: {(string, (int,int,int))...} = {
 	("8d705311c5c80046444afea85585cb94d307aecd", (4, 4, 0)),
 	("782f6c8b1609769f2f94a74e5409bc91993c1cda", (4, 3, 0)),
 	("bb23e61120082b6643da44eb85ee331060bf8e42", (4, 2, 0)),
-	/* TODO: The history of GCC builtins goes back even further!
-	 *       e.g. 3.3.0 apparently introduced `__builtin_huge_val()' and `__builtin_inf()' / `__builtin_nan()'
-	 */
+	("1af67e62c0a70161eebc3d792f1e65896c4a797f", (4, 1, 0)),
+	("30ff3273d55e9196702f4ee56f1a4f0fcdf1774a", (4, 0, 0)),
+	("2c8653eda811864b1a79d5ddf74c0c5c7f078427", (3, 5, 0)),
+//	("7969252bc0fb9cb928a1703d6d186995a73c96eb", (3, 4, 0)), /* Changed 3.4 -> 3.4.0 */
+	("805e22b2051e9c6a75377ea6599654d7415da483", (3, 4, 0)),
+	("74dd0d01c435c6d2c926aee0857b71b4c98a9693", (3, 3, 0)),
+	("f2a612f63be5c9acb3bbd0ff95a916fc3e530cf6", (3, 2, 0)),
+	("314c3585f2350529ae969c3f4edd9ef006c713a0", (3, 1, 0)),
+	/* builtins.def didn't exist in earlier versions...
+	 * Also: The absurdly small # of builtins at this point leads me
+	 *       to believe that this point truely is the inception of
+	 *       GCC's __builtin_* system. */
+//	("cf873f20399b64bfa0ea8c15d8d3104f7a72827f", (2, 97, 0)),
+//	("f7aefc28b8c9f42684b5af4f68ad990a8c169cbf", (2, 96, 0)),
+//	("4818dc3c9883db1c1f87f3dbf947e54a1f5ec0bb", (2, 93, 22)),
+//	("a28381de861be695bbfde7b0ab19153a42edc53e", (2, 93, 21)),
+//	("980f4a72142f223ef19aeff560b7a409082409aa", (2, 93, 20)),
+//	("36e429b84693fa0c8928a7394faf37f7673da500", (2, 93, 19)),
+//	("7830c9561d69236b3bf7cad1fdeda97a52de6aef", (2, 93, 18)),
+//	("1d6d3809626141a69650f7adbca2550f5484bd93", (2, 93, 17)),
+//	("8f87a7b677ef560c1c6c3f4ec9006bdd025c2604", (2, 93, 16)),
+//	("302cb580f3236d773b490b828cf1c94aa180d9d4", (2, 93, 15)),
+//	("3c69422eb09c2978e5135c701fb0b1a29a1e7804", (2, 93, 14)),
+//	("b84a11fa383196373e5daf3e855ad460ad641572", (2, 93, 13)),
+//	("6ccec7e95d408cd9647aa7e87138ab9d833685e6", (2, 93, 12)),
+//	("b512966aea6a49f01bc7cfcef0d4ec95b128c11d", (2, 93, 11)),
+//	("63c5743722a5ca79e21e9d4ea16b37cb243abe66", (2, 93, 10)),
+//	("d27df714eef0d5dbdabc34e17f7ae97e90d9790d", (2, 93, 9)),
+//	("b5fb43c78d443d70625aee1afd2fb67b64b1e682", (2, 93, 8)),
+//	("5b054d734b06d4f52f4db87e6c4356982d39c508", (2, 93, 7)),
+//	("d465b2706bdd6889b095bc8027615c5f00ede177", (2, 93, 6)),
+//	("5913e479e8a1a1747aaa7df1cccf857816c8bf0f", (2, 93, 5)),
+//	("781c9b375455ba97635d83a610f6b7128b30a4c1", (2, 93, 4)),
+//	("09f78b0deb47b4ad1723f321046e96776060790f", (2, 93, 3)),
+//	("a64cb2e59073a58faf41f2b34ecf0c85f435339d", (2, 93, 2)),
+//	("138ea0e27c0abbdf6874b21eca76f9ef989eda43", (2, 93, 1)),
+//	("ce7eb1b5c2c003c510f5ee7b3fb4294865eae712", (2, 93, 0)),
+//	("7c15c50026963a6c17746be2d5ead94195ccad19", (2, 92, 34)),
+//	("7dac70570eba20604beeff30ab53ddd3a438e93f", (2, 92, 33)),
+//	("dcfcb59189df105fb4101c326f3aa3ad03705fd0", (2, 92, 32)),
+//	("fdf76e70493f673e4ace996fb62a5027eded5524", (2, 92, 31)),
+//	("7b3e6cdf5951c974240a4530b91ee37cf4bdae7b", (2, 92, 30)),
+//	("6c6e82f6b2aa1bedcaa812aaec9eebde6881917d", (2, 92, 29)),
+//	("c977d8a71d0df255a7227c26c69f50346a3a8217", (2, 92, 29)),
+//	("c6ac7c4b0f5416458aeac281a6b6bc7397001266", (2, 92, 28)),
+//	("81b9a89930e750156c4cabf78e6f96ff880dc459", (2, 92, 27)),
+//	("bdfc68f0c80877922b3bb372328c394aff825f7f", (2, 92, 26)),
+//	("711c67ee6009cdd47091c65a2dd2854444717918", (2, 92, 25)),
+//	("08a979412f3bc33109ddfcd1cf26fc29e9df599c", (2, 92, 24)),
+//	("2f36f4fcdec4fd98a7dfbfbed854e9084537be99", (2, 92, 23)),
+//	("853e74026fd46739fa9840fabc3d2f247c8dc9d3", (2, 92, 22)),
+//	("a80b3a8e5f2f58595a5a14c14f4548b6c43b8d69", (2, 92, 21)),
+//	("e6a4f1a643eaff6f0f1e2fb89cb1c87f8e72d58f", (2, 92, 20)),
+//	("6adb8fda48ec6f2e4a4c1144d2147d2a36541573", (2, 92, 19)),
+//	("4a42c5f51834faa278ddfe15ab8e07f83783d3e7", (2, 92, 18)),
+//	("2381e9da9861521ca944afdcd36b6c31168c4b39", (2, 92, 17)),
+//	("dac4cb912d03b922397022b026cc2902a4d29d45", (2, 92, 16)),
+//	("c8bc878b6ef7e0d9640cacb55b60664049acb2e1", (2, 92, 15)),
+//	("bd22e851b97c6c4c0f8c827d4023a4fa0e4bd457", (2, 92, 14)),
+//	("fd301841965ec59bc0981e3c54fe0720fad22397", (2, 92, 13)),
+//	("be212d14f4e1c95f2a32727e3ec1a77001623111", (2, 92, 12)),
+//	("5bcf7098586f9eac84d734581a615bce22823e1f", (2, 92, 11)),
+//	("71d8a3613330c058b7d1456c8f3c8ab00b38a6f1", (2, 92, 10)),
+//	("0274a660f16a9cbb99aac58ef2314b271c0fda89", (2, 92, 9)),
+//	("a64977bc2831630b8f0afaa1a5caae1a92ddf4f3", (2, 92, 8)),
+//	("5fc5448a045b3b97a9266a3336051198530ddf4a", (2, 92, 7)),
+//	("d3a209203de6ad7a99e0ac67b73db06e17b4fb02", (2, 92, 6)),
+//	("01c0ef4d986e13e984353094c39c4006f84a3177", (2, 92, 5)),
+//	("b13f7168a0f35f0d6cc011a7dda0aea51c3d2780", (2, 92, 4)),
+//	("a0bb89e61cc53dd73142009b757f15ac3e0fcb54", (2, 92, 3)),
+//	("41f1e3aa6c749566dfaabfcf2c6c680250a12ef4", (2, 92, 2)),
+//	("e38a73f84d4a7b5f8f887067dd4cbefb085ab16f", (2, 92, 1)),
+//	("833aacb376c3033bf223deacd71bc64869da0332", (2, 92, 0)),
+//	("21305fd1f7ff53187f8932e34a60b14a3c68136d", (2, 91, 48)),
+//	("c4901273e758ce83a620e5f815ef113546ef3c73", (2, 91, 47)),
+//	("033e3a64f96049c10918a69e9329397188082c35", (2, 91, 46)),
+//	("9e042f31282adcb5f843b644184aac6ff8854d3f", (2, 91, 45)),
+//	("0e74463ec5d54a90d2f45693c436db6a49dadca5", (2, 91, 43)),
+//	("49fecab34a408ff9c4f1ca7952d1cba90c82865f", (2, 91, 42)),
+//	("8255a208821c441ebd7d38b71f8bf64e8519b47e", (2, 91, 41)),
+//	("6146b46b87e5a4a696c2c2ccc605d7047f0c143b", (2, 91, 40)),
+//	("839be5c4023f637ea75dcabf5555ed42eea42349", (2, 91, 39)),
+//	("7f36e3719d4b4f97b2af30094ebebbeff8d82d86", (2, 91, 38)),
+//	("27cffc8973f0ab3f10e10b87178e97faa8ea311c", (2, 91, 37)),
+//	("af01199a4be14a034b80aa39ede8b1822da4f6b7", (2, 91, 36)),
+//	("87efb83afb86ce73b51019f7c1fae4e223685b59", (2, 91, 35)),
+//	("ac0b7d1a3bddd70ae8e18862b7ad5e17cfd48854", (2, 91, 34)),
+//	("4d06589ab1104ce00f8da15e8b1fc66a8837f00e", (2, 91, 33)),
+//	("d9c33e22ae3dcc08fb37e0951b01bfecbc7640a7", (2, 91, 32)),
+//	("068068294fc4893a571ec35b9986c9738df9d8d9", (2, 91, 31)),
+//	("257f1835d6d2e7378cf5dea2b125f413488de956", (2, 91, 30)),
+//	("534f5a015d3320bb4040ddeaae91b884be1bb13d", (2, 91, 29)),
+//	("1b2319e6a3ce1b1640832c611f4b041e6ee279ca", (2, 91, 29)),
+//	("262ff34293da0fa7d801b8381a832c33965a068b", (2, 91, 28)),
+//	("c5aa1e92211d8e1c3768a94c7a1fcf7e72e8cf80", (2, 91, 27)),
+//	("f22a49524538a76802b3228eaaf3b3c8d06d9086", (2, 91, 26)),
+//	("7ca888dc941c1fbf02269cde40efe20171a3350f", (2, 91, 25)),
+//	("532c63cea8ee95297dd7d6810e8dca302735fd1b", (2, 91, 24)),
+//	("8beb3961cccf24d3fb7550da305302de8b8799ca", (2, 91, 23)),
+//	("9f02f04dcd933b56f270cdd1e9cd34950ae1f09e", (2, 91, 23)),
+//	("a9d2459ddc4395e2f09cca43ba8c9a2565a0c64c", (2, 91, 22)),
+//	("5ecb1a0ab0694c308e4fcf95f4cef84a1d162b34", (2, 91, 21)),
+//	("209d9728be084be31956cbc2f3329b4c4b5a6294", (2, 91, 20)),
+//	("ebf4f70303d86f9e5faa00ee8201a5264b27992d", (2, 91, 19)),
+//	("10fa3a4cdd9f544613c1ef796e0902982264311c", (2, 91, 18)),
+//	("997d68fef349f244932d14a82f06cbfe26e344f6", (2, 91, 17)),
+//	("9c3cfc5f1f672494b37abc77547b4b23bb9156f5", (2, 91, 16)),
+//	("7ca8cd5c38cec17f03aa8c5989522335a10d1732", (2, 91, 15)),
+//	("9a84f89b8f847d223aaf8f49ff25788a9ec17cce", (2, 91, 14)),
+//	("aaadb588e6a2369e187b2c1996f97c5225182e66", (2, 91, 13)),
+//	("d27f543b0b8ce711ea306f7c65a7122962a013ff", (2, 91, 12)),
+//	("de6ca2c9058aacd54fe587ee168446eb0b11f2ab", (2, 91, 11)),
+//	("3c85a72e47a5e080a408a5ae5020122f9b9bc0d6", (2, 91, 10)),
+//	("1d320110662c5093ceb52a8c04a353ada09da318", (2, 91, 9)),
+//	("3fb6d5cc82fe05ef81460938b75a9290085baf54", (2, 91, 8)),
+//	("cbf989463e6ce9617c76894e889892c980eafd06", (2, 91, 7)),
+//	("8e6baaa53fb486d628a29c0390750df6f20a839d", (2, 91, 6)),
+//	("9e51fe5e08854b504af35eba64f1e13950cd6f4a", (2, 91, 5)),
+//	("3304909d41694b52d205cd57f94abb7b668aafcf", (2, 91, 4)),
+//	("31e14e29eb6e8a4bbc1c93cf6777dcdd05f263b6", (2, 91, 3)),
+//	("f9ae41a2a96be03fb43ad204bf65e37acc4e32a9", (2, 91, 2)),
+//	("a3ea719893510de5a68c370406e1d42adad1cbc5", (2, 91, 2)),
+//	("ad87de1ece2f52d260b582709751ab9f315ab349", (2, 91, 1)),
+//	("0dbd1c7442aeabc3e63daf6f70f8fb136f0cf38e", (2, 91, 0)),
+//	("412fadac8bac755c477bfc3277b16e773eb61560", (2, 90, 15)),
+//	("9ea36bcb8668f71419bccc5db2534c29840a4aea", (2, 90, 14)),
+//	("45fe8dd7e0eb763a34f6c2f2cabdf3b924a926db", (2, 90, 13)),
+//	("b4aebc76dd73f0d2fab9332bf455cca62c2303c5", (2, 90, 12)),
+//	("96004f0cd9a259680dd7b64b9d512a290d8f7cd3", (2, 90, 11)),
+//	("34310bbd98cafb6fd11dfc4b27bafc2cf538b234", (2, 90, 10)),
+//	("f4aab597e79bf9976f980655a9c8ae1abdac0639", (2, 90, 9)),
+//	("72ee28edfef3024bdb48032731910ed0aafca942", (2, 90, 8)),
+//	("e864e0d428d6db62bd354dd35e9003f6c06f085d", (2, 90, 8)),
+//	("8d37f2b9a412b3a72cd4dd566f997c0016ba134e", (2, 90, 7)),
+//	("03b70ee34603f69afd540f2a3bba8d0186968d97", (2, 90, 6)),
+//	("86b40226c543894a5b86f821f8f9c0fee874f613", (2, 90, 5)),
+//	("44f831eeef82401042751c7009d1e3061d498569", (2, 90, 4)),
+//	("c04e22d147c56c471cf54e05316f8548ad33beed", (2, 90, 3)),
+//	("76a0ced53b6168b48cd07b2157bb9b4acac1fd12", (2, 90, 2)),
+//	("3586fe0bf1a746906616d3e5f0e2f334cbb43877", (2, 90, 1)),
+//	("c6f3deb9a6360d3029a7f8d9ad2e8c5de104ec3f", (2, 90, 0)),
+//	("071cd279a6ac9efccecd8171777a9fc99ac4796a", (2, 7, 90)),
 };
 
 for (local x: gccReleaseCommits) {
@@ -273,6 +502,9 @@ function getFeatureSetFromFile(version: (int,int,int)): GCCFeatureSet {
 			} else if (cond.startswith("true, ")) {
 				cond = cond[#"true, ":];
 				usesLibc = true;
+			} else if (cond.startswith("none, ")) {
+				cond = cond[#"none, ":];
+				usesLibc = none;
 			}
 			if (cond)
 				cond = cond.decode("c-escape");
@@ -404,7 +636,7 @@ function generateAllVersionsFeatureHistory(out: File): {GCCBuiltin...} {
 		local feat = getFeatureSetFromFile(ver);
 		for (local x: feat.builtins) {
 			local c = result.get(x.name);
-			if (c is none || (!c.usesLibc && x.usesLibc))
+			if (c is none || (!c.usesLibc && x.usesLibc === true))
 				result[x.name] = x;
 		}
 		local vernum = ver[0] * 10000 + ver[1] * 100 + ver[2];
