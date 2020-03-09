@@ -75,8 +75,8 @@ diff -Naur gcc-9.1.0-orig/fixincludes/mkfixinc.sh gcc-9.1.0/fixincludes/mkfixinc
      x86_64-*-mingw32* | \
 diff -Naur gcc-9.1.0-orig/gcc/config/i386/kos.h gcc-9.1.0/gcc/config/i386/kos.h
 --- gcc-9.1.0-orig/gcc/config/i386/kos.h	1970-01-01 01:00:00.000000000 +0100
-+++ gcc-9.1.0/gcc/config/i386/kos.h	2019-08-26 11:58:45.949565600 +0200
-@@ -0,0 +1,31 @@
++++ gcc-9.1.0/gcc/config/i386/kos.h	2020-03-09 19:52:41.956084300 +0100
+@@ -0,0 +1,36 @@
 +
 +#undef TARGET_KOS
 +#define TARGET_KOS 1
@@ -87,7 +87,7 @@ diff -Naur gcc-9.1.0-orig/gcc/config/i386/kos.h gcc-9.1.0/gcc/config/i386/kos.h
 + * in libc are actually defined by libdl (such as `environ'),
 + * so to prevent any confusion, we simply always link
 + * against our dynamic linker library. */
-+#define LIB_SPEC "-lc -ldl"
++#define LIB_SPEC "%{pthread: } -lc -ldl"
 +
 +#undef STARTFILE_SPEC
 +#define STARTFILE_SPEC "%{!shared: crt0.o%s} %{shared: crt0S.o%s}"
@@ -106,8 +106,23 @@ diff -Naur gcc-9.1.0-orig/gcc/config/i386/kos.h gcc-9.1.0/gcc/config/i386/kos.h
 +    builtin_assert ("system=posix");  \
 +  } while(0);
 +
++#undef CPP_SPEC
++#define CPP_SPEC "%{pthread:-D_REENTRANT}"
++
 +#undef LINK_SPEC
 +#define LINK_SPEC "%{shared:-shared} %{static:-static} %{!shared: %{!static: %{rdynamic:-export-dynamic} %{!dynamic-linker:-dynamic-linker /lib/libld.so}}}"
++
++
+diff -Naur gcc-9.1.0-orig/gcc/config/i386/kos.opt gcc-9.1.0/gcc/config/i386/kos.opt
+--- gcc-9.1.0-orig/gcc/config/i386/kos.opt	1970-01-01 01:00:00.000000000 +0100
++++ gcc-9.1.0/gcc/config/i386/kos.opt	2020-03-09 19:39:35.598897500 +0100
+@@ -0,0 +1,6 @@
++; Kos-specific options.
++
++pthread
++Driver
++
++; Retain blank line above
 diff -Naur gcc-9.1.0-orig/gcc/config/i386/kos64.h gcc-9.1.0/gcc/config/i386/kos64.h
 --- gcc-9.1.0-orig/gcc/config/i386/kos64.h	1970-01-01 01:00:00.000000000 +0100
 +++ gcc-9.1.0/gcc/config/i386/kos64.h	2019-07-13 16:13:54.497653500 +0200
@@ -117,6 +132,16 @@ diff -Naur gcc-9.1.0-orig/gcc/config/i386/kos64.h gcc-9.1.0/gcc/config/i386/kos6
 +
 +#undef TARGET_KOS64
 +#define TARGET_KOS64 1
+diff -Naur gcc-9.1.0-orig/gcc/config/i386/t-kos gcc-9.1.0/gcc/config/i386/t-kos
+--- gcc-9.1.0-orig/gcc/config/i386/t-kos	1970-01-01 01:00:00.000000000 +0100
++++ gcc-9.1.0/gcc/config/i386/t-kos	2019-07-13 16:15:50.765786100 +0200
+@@ -0,0 +1 @@
++MULTIARCH_DIRNAME = i386-kos
+diff -Naur gcc-9.1.0-orig/gcc/config/i386/t-kos64 gcc-9.1.0/gcc/config/i386/t-kos64
+--- gcc-9.1.0-orig/gcc/config/i386/t-kos64	1970-01-01 01:00:00.000000000 +0100
++++ gcc-9.1.0/gcc/config/i386/t-kos64	2019-07-26 17:00:01.724092600 +0200
+@@ -0,0 +1 @@
++MULTIARCH_DIRNAME = i386-kos
 diff -Naur gcc-9.1.0-orig/gcc/config/t-kos gcc-9.1.0/gcc/config/t-kos
 --- gcc-9.1.0-orig/gcc/config/t-kos	1970-01-01 01:00:00.000000000 +0100
 +++ gcc-9.1.0/gcc/config/t-kos	2019-07-13 16:15:50.765786100 +0200
@@ -129,7 +154,7 @@ diff -Naur gcc-9.1.0-orig/gcc/config/t-kos64 gcc-9.1.0/gcc/config/t-kos64
 +MULTIARCH_DIRNAME = i386-kos
 diff -Naur gcc-9.1.0-orig/gcc/config.gcc gcc-9.1.0/gcc/config.gcc
 --- gcc-9.1.0-orig/gcc/config.gcc	2019-04-15 10:05:03.000000000 +0200
-+++ gcc-9.1.0/gcc/config.gcc	2019-07-13 16:15:15.667294800 +0200
++++ gcc-9.1.0/gcc/config.gcc	2020-03-09 19:46:14.326824700 +0100
 @@ -675,6 +675,12 @@
  
  # Common parts for widely ported systems.
@@ -143,17 +168,19 @@ diff -Naur gcc-9.1.0-orig/gcc/config.gcc gcc-9.1.0/gcc/config.gcc
  *-*-darwin*)
    tmake_file="t-darwin ${cpu_type}/t-darwin"
    tm_file="${tm_file} darwin.h"
-@@ -978,6 +984,14 @@
+@@ -978,6 +984,16 @@
  esac
  
  case ${target} in
 +i[34567]86-*-kos*)
 +    tm_file="${tm_file} i386/unix.h i386/att.h dbxelf.h elfos.h glibc-stdint.h i386/i386elf.h i386/kos.h"
-+    tmake_file="${tmake_file} t-kos"
++    tmake_file="${tmake_file} i386/t-kos"
++    extra_options="${extra_options} i386/kos.opt"
 +    ;;
 +x86_64-*-kos*)
 +    tm_file="${tm_file} i386/unix.h i386/att.h dbxelf.h elfos.h glibc-stdint.h i386/i386elf.h i386/x86-64.h i386/kos64.h"
-+    tmake_file="${tmake_file} t-kos64"
++    tmake_file="${tmake_file} i386/t-kos64"
++    extra_options="${extra_options} i386/kos.opt"
 +    ;;
  aarch64*-*-elf | aarch64*-*-fuchsia* | aarch64*-*-rtems*)
  	tm_file="${tm_file} dbxelf.h elfos.h newlib-stdint.h"
