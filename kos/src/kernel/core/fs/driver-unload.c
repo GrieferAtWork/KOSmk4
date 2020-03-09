@@ -17,42 +17,30 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_EXEC_BITS_LIBRARY_H
-#define _KOS_EXEC_BITS_LIBRARY_H 1
+#ifndef GUARD_KERNEL_CORE_FS_DRIVER_UNLOAD_C
+#define GUARD_KERNEL_CORE_FS_DRIVER_UNLOAD_C 1
+#define _KOS_SOURCE 1
 
-#include <__stdinc.h>
+#include <kernel/compiler.h>
 
-#include <bits/types.h>
+#include <dev/block.h>
+#include <dev/char.h>
+#include <kernel/driver.h>
 
-__DECL_BEGIN
+DECL_BEGIN
 
-#ifdef __CC__
+/* Destroy all places where the given driver may still be loaded
+ * globally, including registered devices or object types, as well
+ * as task callbacks and interrupt hooks, etc... */
+INTERN NONNULL((1)) void KCALL
+driver_destroy_global_objects(struct driver *__restrict self) {
+	(void)self;
+	/* TODO: Delete global hooks of `self' */
+}
 
-#ifdef __KERNEL__
-struct driver;
-struct driver_section;
-typedef struct driver *library_handle_t;
-typedef struct driver_section *section_handle_t;
-#else /* __KERNEL__ */
-#ifdef _LIBDL_MODULE_H
-struct dlmodule;
-struct dlsection;
-typedef struct dlmodule *library_handle_t;
-typedef struct dlsection *section_handle_t;
-#else /* _LIBDL_MODULE_H */
-#ifdef __INTELLISENSE__
-struct __library_handle_struct;
-typedef struct __library_handle_struct *library_handle_t;
-#else /* __INTELLISENSE__ */
-typedef void *library_handle_t;
-#endif /* !__INTELLISENSE__ */
-typedef struct dl_section *section_handle_t;
-#endif /* !_LIBDL_MODULE_H */
-typedef __fd_t library_file_t;
-#endif /* !__KERNEL__ */
 
-#endif /* __CC__ */
 
-__DECL_END
 
-#endif /* !_KOS_EXEC_BITS_LIBRARY_H */
+DECL_END
+
+#endif /* !GUARD_KERNEL_CORE_FS_DRIVER_UNLOAD_C */

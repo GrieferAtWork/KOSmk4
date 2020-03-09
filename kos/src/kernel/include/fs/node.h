@@ -305,6 +305,13 @@ struct inode_type {
 				 * accommodate dynamically allocated directory entries.
 				 * When implemented, this operator is used during
 				 * path traversion instead of using `d_readdir' for that.
+				 * NOTE: The implementation of this function is free to make use
+				 *       of the following fields of the returned directory_entry,
+				 *       as it sees fit:
+				 *           - return->de_next
+				 *           - return->de_bypos
+				 *           - return->de_fsdata
+				 *           - return->de_pos
 				 * @return: NULL: No file with the given name exists.
 				 * @param: mode: Set of `FS_MODE_F*' (Most notably `FS_MODE_FDOSPATH')
 				 * @throw: E_SEGFAULT:    Failed to access the given `name'.
@@ -320,9 +327,9 @@ struct inode_type {
 						       E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...);
 				/* [0..1][locked(READ(self))]
 				 * Enumerate all entries of a dynamic directory `node':
-				 * >> (*callback)(arg, "foo", DT_REG, 42);
-				 * >> (*callback)(arg, "bar", DT_REG, 43);
-				 * >> (*callback)(arg, "baz", DT_REG, 44);
+				 * >> (*callback)(arg, "foo", 3, DT_REG, 42);
+				 * >> (*callback)(arg, "bar", 3, DT_REG, 43);
+				 * >> (*callback)(arg, "baz", 3, DT_REG, 44);
 				 * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_READDIR:
 				 *                        [...] (Same as not implementing)
 				 * @throw: E_IOERROR:     Failed to read data from disk. */

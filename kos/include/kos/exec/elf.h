@@ -27,22 +27,31 @@
 
 #include <elf.h>
 
+/* The expected machine word-size class */
 #ifndef ELF_ARCH_CLASS
 #error "Arch must #define `ELF_ARCH_CLASS' (as one of `ELFCLASS*')"
 #endif /* !ELF_ARCH_CLASS */
 
+/* The expected machine endian */
 #ifndef ELF_ARCH_DATA
 #error "Arch must #define `ELF_ARCH_DATA' (as one of `ELFDATA*')"
 #endif /* !ELF_ARCH_DATA */
 
+/* The expected machine ID */
 #ifndef ELF_ARCH_MACHINE
 #error "Arch must #define `ELF_ARCH_MACHINE' (as one of `EM_*')"
 #endif /* !ELF_ARCH_MACHINE */
 
+/* Define as:
+ *   1: ElfW(Rela) relocations may be used
+ *   0: Only ElfW(Rel) relocations are used */
 #ifndef ELF_ARCH_USESRELA
 #error "Arch must #define `ELF_ARCH_USESRELA' (as either `0' or `1')"
 #endif /* !ELF_ARCH_USESRELA */
 
+/* Define as:
+ *   1: Lazy relocations use indices, rather than offsets
+ *   0: Lazy relocations use offsets, rather than indices */
 #ifndef ELF_ARCH_LAZYINDX
 #error "Arch must #define `ELF_ARCH_LAZYINDX' (as either `0' or `1')"
 #endif /* !ELF_ARCH_LAZYINDX */

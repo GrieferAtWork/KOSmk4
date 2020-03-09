@@ -390,7 +390,9 @@ function generateAllVersionsFeatureHistory(out: File): {GCCBuiltin...} {
 	out << "#   define __GNUC_PATCH__ 0\n";
 	out << "#endif /* !__GNUC_PATCHLEVEL__ */\n";
 	out << "#endif /* !__GNUC_PATCH__ */\n";
-	out << "#define __GCC_VERSION_NUM    (__GNUC__*10000+__GNUC_MINOR__*100+__GNUC_PATCH__)\n";
+	out << "#ifndef __GCC_VERSION_NUM\n";
+	out << "#define __GCC_VERSION_NUM (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCH__)\n";
+	out << "#endif /* !__GCC_VERSION_NUM */\n";
 	local prevFeatureSet: GCCFeatureSet =
 		GCCFeatureSet(version: (0,0,0), builtins: {});
 	function myHasBuiltinKey(name: string): string {

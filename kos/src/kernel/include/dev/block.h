@@ -437,6 +437,12 @@ FUNDEF NONNULL((1)) size_t KCALL block_device_sync(struct basic_block_device *__
 
 /* TODO: `block_device_sync_a()' (same as `block_device_sync()', but is done asynchronously) */
 
+
+/* TODO: Get rid of `boot_partition'. Determining the root filesystem should
+ *       only make use of indicators taken from devices known at that point,
+ *       and fill in at some earlier point in time.
+ *       After that, the ~boot_partition~ should be determined via:
+ *           vfs_kernel->root->inode->super->device */
 /* [0..1] The block device / partition from which the kernel was booted.
  * Set to `(struct basic_block_device *)-1' if indeterminate during early boot. */
 DATDEF REF struct basic_block_device *boot_partition;

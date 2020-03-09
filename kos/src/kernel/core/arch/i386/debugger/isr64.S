@@ -95,17 +95,6 @@ INTERN_FUNCTION(x86_dbgidt_specific_00h) /* ISR_X86_f1 */
 	.cfi_endproc
 END(x86_dbgidt_specific_00h)
 
-
-/* TODO: Override all of the generic ISR handlers
- *        - `x86_dbgidt_generic_00h'
- *        - `x86_dbgidt_generic_01h'
- *        - `x86_dbgidt_generic_??h'
- *        - `x86_dbgidt_generic_6ch'
- *       and queue them being serviced until
- *       the debugger is eventually exited. */
-
-
-
 #endif /* CONFIG_HAVE_DEBUGGER */
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_DEBUGGER_ISR64_S */

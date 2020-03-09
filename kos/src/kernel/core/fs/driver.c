@@ -786,6 +786,11 @@ NOTHROW(KCALL driver_destroy)(struct driver *__restrict self) {
 	kfree((void *)self->d_argv);
 	kfree((void *)self->d_filename);
 	xdecref(self->d_file);
+	weakdecref_likely(self);
+}
+
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL driver_free)(struct driver *__restrict self) {
 	kfree(self);
 }
 
@@ -835,7 +840,8 @@ struct kernel_shstrtab {
 
 
 PUBLIC struct driver kernel_driver = {
-	/* .d_refcnt               = */ 2, /* kernel_driver, !DRIVER_FLAG_FINALIZED */
+	/* .d_refcnt               = */ 2, /* +1: kernel_driver, +1: !DRIVER_FLAG_FINALIZED */
+	/* .d_weakrefcnt           = */ 1, /* +1: kernel_driver */
 	/* .d_name                 = */ kernel_driver_name,
 	/* .d_filename             = */ kernel_driver_filename,
 	/* .d_file                 = */ NULL,
@@ -884,11 +890,6 @@ PUBLIC struct driver kernel_driver = {
 	/* .d_shstrtab_end         = */ kernel_shstrtab_data + sizeof(struct kernel_shstrtab),
 #endif /* !__INTELLISENSE__ */
 	/* .d_phnum                = */ 2,
-#ifdef PAGESIZE
-#define KERNEL_PHDR_ALIGN PAGESIZE
-#else /* PAGESIZE */
-#define KERNEL_PHDR_ALIGN __ALIGNOF_MAX_ALIGN_T__
-#endif /* !PAGESIZE */
 	{
 		/* [0] = */ ELFW(PHDR_INIT)(
 			/* .p_type   = */ PT_LOAD,
@@ -897,8 +898,8 @@ PUBLIC struct driver kernel_driver = {
 			/* .p_paddr  = */ (uintptr_t)__kernel_start - KERNEL_CORE_BASE,
 			/* .p_filesz = */ (uintptr_t)__kernel_size_nofree,
 			/* .p_memsz  = */ (uintptr_t)__kernel_size_nofree,
-			/* .p_flags  = */ PF_X|PF_W|PF_R,
-			/* .p_align  = */ KERNEL_PHDR_ALIGN
+			/* .p_flags  = */ PF_X | PF_W | PF_R,
+			/* .p_align  = */ PAGESIZE
 		),
 		/* [1] = */ ELFW(PHDR_INIT)(
 			/* .p_type   = */ PT_LOAD,
@@ -907,11 +908,10 @@ PUBLIC struct driver kernel_driver = {
 			/* .p_paddr  = */ (uintptr_t)__kernel_free_start - KERNEL_CORE_BASE,
 			/* .p_filesz = */ (uintptr_t)__kernel_free_size,
 			/* .p_memsz  = */ (uintptr_t)__kernel_free_size,
-			/* .p_flags  = */ PF_X|PF_W|PF_R,
-			/* .p_align  = */ KERNEL_PHDR_ALIGN
+			/* .p_flags  = */ PF_X | PF_W | PF_R,
+			/* .p_align  = */ PAGESIZE
 		)
 	}
-#undef KERNEL_PHDR_ALIGN
 };
 
 
@@ -943,12 +943,15 @@ NOTHROW(KCALL initialize_cmdline)(struct kernel_commandline_option const *start,
 				if (arg[namlen] != 0)
 					continue;
 				switch (start->co_type) {
+
 				case KERNEL_COMMANDLINE_OPTION_TYPE_PRESENT:
 					(*start->co_present)();
 					break;
+
 				case KERNEL_COMMANDLINE_OPTION_TYPE_BOOL:
 					*(bool *)start->co_option_addr = true;
 					break;
+
 				default: __builtin_unreachable();
 				}
 				goto next_option;
@@ -1458,6 +1461,7 @@ done_dyntag:
 		call_destructor_at(self, self->d_loadaddr + fini_func);
 }
 
+
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL driver_decref_dependencies)(struct driver *__restrict self) {
 	size_t i;
@@ -1533,6 +1537,13 @@ driver_disable_textrel(struct driver *__restrict self)
 }
 
 
+/* Destroy all places where the given driver may still be loaded
+ * globally, including registered devices or object types, as well
+ * as task callbacks and interrupt hooks, etc... */
+INTDEF NONNULL((1)) void KCALL
+driver_destroy_global_objects(struct driver *__restrict self);
+
+
 /* Finalize the given driver.
  *  #1: Execute destructor callbacks.
  *  #2: Decref (and ATOMIC_XCH(NULL)) each module from the dependency vector.
@@ -1578,7 +1589,6 @@ do_start_finalization:
 				/* Drop references from driver dependencies. */
 				if (flags & DRIVER_FLAG_DEPLOADED)
 					driver_decref_dependencies(self);
-
 			}
 			/* Acquire a sections lock so we can clear dangling sections. */
 			TRY {
@@ -1587,6 +1597,7 @@ do_start_finalization:
 				driver_enable_textrel(self);
 
 				/* Invoke dynamic driver-level callbacks for a driver being unloaded. */
+				driver_destroy_global_objects(self);
 				driver_finalized_callbacks(self);
 
 				/* Remove the driver from the current driver state */
@@ -2606,10 +2617,10 @@ done:
 
 
 
-#define THROW_FAULTY_ELF_ERROR(reason)        \
+#define THROW_FAULTY_ELF_ERROR(...)           \
 	THROW(E_NOT_EXECUTABLE_FAULTY,            \
 	      E_NOT_EXECUTABLE_FAULTY_FORMAT_ELF, \
-	      reason)
+	      __VA_ARGS__)
 
 
 #define HINT_ADDR(x, y) x
@@ -2800,11 +2811,11 @@ driver_do_load_dependencies(struct driver *__restrict self)
 			if (tag.d_tag != DT_NEEDED)
 				continue;
 			if unlikely(dep_i >= self->d_depcnt)
-				THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_NEEDED);
+				THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_NEEDED, dep_i);
 			filename = self->d_dynstr + tag.d_un.d_ptr;
 			if unlikely(filename < self->d_dynstr ||
 			            filename >= self->d_dynstr_end)
-				THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_NEEDED);
+				THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_NEEDED, dep_i);
 			if unlikely(!ATOMIC_READ(vfs_kernel.p_inode)) {
 				char const *name;
 				dependency = driver_with_name(filename);
@@ -2878,7 +2889,7 @@ driver_find_symbol_for_relocation(struct driver *__restrict self,
 	ElfW(Sym) const *search_sym, *weak_symbol, *sym;
 	struct driver *weak_symbol_driver, *dep;
 	if unlikely(symbol_id >= self->d_dynsym_cnt)
-		THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMBOL);
+		THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMBOL, symbol_id);
 	search_sym         = self->d_dynsym_tab + symbol_id;
 	weak_symbol        = NULL;
 	weak_symbol_driver = NULL;
@@ -2897,8 +2908,10 @@ driver_find_symbol_for_relocation(struct driver *__restrict self,
 	}
 	symbol_name = self->d_dynstr + search_sym->st_name;
 	if unlikely(symbol_name < self->d_dynstr ||
-	            symbol_name >= self->d_dynstr_end)
-		THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMNAME);
+	            symbol_name >= self->d_dynstr_end) {
+		THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMNAME,
+		                       search_sym->st_name);
+	}
 	/* Check for special symbol names. */
 	if (driver_special_symbol(self,
 	                          symbol_name,
@@ -2966,7 +2979,8 @@ found_symbol:
 	}
 	printk(KERN_ERR "[mod] Relocation against unknown symbol %q in driver %q\n",
 	       symbol_name, self->d_name);
-	THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NO_SYMBOL);
+	THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NO_SYMBOL,
+	                       search_sym->st_name);
 }
 
 
@@ -3184,7 +3198,8 @@ driver_invoke_initializer_s(uintptr_t func, struct driver *__restrict self) {
 	if unlikely(func < self->d_loadstart || func >= self->d_loadend) {
 		printk(KERN_ERR "[mod] Bad init function in driver %q (%p is out-of-bounds of %p...%p, loadaddr:%p)\n",
 		       self->d_name, func, self->d_loadstart, self->d_loadend - 1, self->d_loadaddr);
-		THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_INIT_FUNC);
+		THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_INIT_FUNC,
+		                       func - self->d_loadstart);
 	}
 	driver_invoke_initializer((void(*)(void))func);
 }
@@ -3316,10 +3331,10 @@ PUBLIC NONNULL((1)) bool
 
 
 
-PRIVATE NONNULL((2)) void KCALL
-unmap_range(uintptr_t loadaddr,
-            ElfW(Phdr) const *__restrict headers,
-            size_t count) {
+PRIVATE NONNULL((2)) void
+NOTHROW(KCALL unmap_range)(uintptr_t loadaddr,
+                           ElfW(Phdr) const *__restrict headers,
+                           size_t count) {
 	ElfW(Addr) addr;
 	ElfW(Word) size;
 	while (count--) {
@@ -3403,7 +3418,7 @@ driver_map_into_memory(struct driver *__restrict self,
 	max_addr = (uintptr_t)0;
 	/* Figure out the min/max byte offsets for program segments. */
 	for (i = 0; i < self->d_phnum; ++i) {
-		ElfW(Addr) addr;
+		ElfW(Addr) addr, endaddr;
 		ElfW(Word) size, align;
 		if (self->d_phdr[i].p_type != PT_LOAD)
 			continue;
@@ -3420,10 +3435,11 @@ driver_map_into_memory(struct driver *__restrict self,
 		size = CEIL_ALIGN(size, PAGESIZE);
 		if (min_addr > addr)
 			min_addr = addr;
-		if (OVERFLOW_UADD(addr, size - 1, &addr))
-			THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_PHDR_VADDR);
-		if (max_addr < addr)
-			max_addr = addr;
+		if (OVERFLOW_UADD(addr, size - 1, &endaddr))
+			THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_PHDR_VADDR,
+			                       addr, size);
+		if (max_addr < endaddr)
+			max_addr = endaddr;
 	}
 	if unlikely(min_addr >= max_addr)
 		THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NOSEGMENTS);
@@ -3434,7 +3450,7 @@ driver_map_into_memory(struct driver *__restrict self,
 	              PAGESIZE;
 	assert(total_bytes != 0);
 	if unlikely(min_alignment & (min_alignment - 1))
-		THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_PHDR_ALIGN);
+		THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_PHDR_ALIGN, min_alignment);
 	/* Find a suitable target location where we can map the library. */
 find_new_candidate:
 	vm_kernel_treelock_read();
@@ -3624,7 +3640,7 @@ done_tags_for_soname:
 					continue;
 				/* Found the section. */
 				dynstr_base = (char *)(base + phdrv[i].p_offset);
-				/* Make sure that .dynstr is in-bounds when viewed with */
+				/* Make sure that .dynstr is in-bounds of the driver image. */
 				if unlikely((void *)dynstr_base < (void *)base || soname_offset >= phdrv[i].p_filesz ||
 				            (void *)(dynstr_base + phdrv[i].p_filesz) >= (void *)(base + num_bytes))
 					THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SONAME);
@@ -3648,10 +3664,12 @@ done_tags_for_soname:
 	                                      phdrc * sizeof(ElfW(Phdr)),
 	                                      GFP_LOCKED | GFP_CALLOC | GFP_PREFLT);
 	TRY {
+		ElfW(Ehdr) *ehdr;
 		/* Copy program headers. */
 		memcpy(result->d_phdr, phdrv, phdrc, sizeof(ElfW(Phdr)));
-		result->d_refcnt = 2; /* 2: +1:<return-value>, +1:Not setting the `DRIVER_FLAG_FINALIZED' flag */
-		result->d_phnum  = phdrc;
+		result->d_weakrefcnt = 1;
+		result->d_refcnt     = 2; /* 2: +1:<return-value>, +1:Not setting the `DRIVER_FLAG_FINALIZED' flag */
+		result->d_phnum      = phdrc;
 		atomic_rwlock_cinit(&result->d_eh_frame_cache_lock);
 		atomic_rwlock_cinit(&result->d_sections_lock);
 		/* Fill in driver information. */
@@ -3668,18 +3686,25 @@ done_tags_for_soname:
 			result->d_argv = (char **)kmalloc(1 * sizeof(char *),
 			                                  GFP_CALLOC | GFP_LOCKED | GFP_PREFLT);
 		}
-		result->d_shoff    = ((ElfW(Ehdr) *)base)->e_shoff;
-		result->d_shstrndx = ((ElfW(Ehdr) *)base)->e_shstrndx;
-		result->d_shnum    = ((ElfW(Ehdr) *)base)->e_shnum;
+		ehdr = (ElfW(Ehdr) *)base;
+		result->d_shoff    = ehdr->e_shoff;
+		result->d_shstrndx = ehdr->e_shstrndx;
+		result->d_shnum    = ehdr->e_shnum;
 		COMPILER_READ_BARRIER();
-		if unlikely(ATOMIC_READ(((ElfW(Ehdr) *)base)->e_shentsize) != sizeof(ElfW(Shdr)))
-			THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHENT);
+		if unlikely(ATOMIC_READ(ehdr->e_shentsize) != sizeof(ElfW(Shdr))) {
+			THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHENT,
+			                       ehdr->e_shentsize);
+		}
 		/* Validate offsets for section headers */
-		if unlikely(result->d_shstrndx >= result->d_shnum)
-			THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHSTRNDX);
+		if unlikely(result->d_shstrndx >= result->d_shnum) {
+			THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHSTRNDX,
+			                       result->d_shstrndx, result->d_shnum);
+		}
 		if unlikely(result->d_shoff >= num_bytes ||
-		            result->d_shoff + (result->d_shnum * sizeof(ElfW(Shdr))) > num_bytes)
-			THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHOFF);
+		            result->d_shoff + (result->d_shnum * sizeof(ElfW(Shdr))) > num_bytes) {
+			THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHOFF,
+			                       result->d_shoff, result->d_shnum, num_bytes);
+		}
 		/* Load the sections header into memory. */
 		result->d_shdr = (ElfW(Shdr) *)kmalloc(result->d_shnum * sizeof(ElfW(Shdr)), GFP_PREFLT);
 		memcpy((ElfW(Shdr) *)result->d_shdr,
@@ -3690,15 +3715,20 @@ done_tags_for_soname:
 			size_t shstrtab_size;
 			char const *shstrtab_base, *shstrtab_end;
 			shstrtab = &result->d_shdr[result->d_shstrndx];
-			if unlikely(shstrtab->sh_type == SHT_NOBITS)
-				THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NOBITS_SHSTRTAB);
+			if unlikely(shstrtab->sh_type == SHT_NOBITS) {
+				THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NOBITS_SHSTRTAB,
+				                       result->d_shstrndx);
+			}
 			shstrtab_base = (char *)(base + shstrtab->sh_offset);
 			shstrtab_size = shstrtab->sh_size;
 			shstrtab_end  = shstrtab_base + shstrtab_size;
 			if unlikely((void *)shstrtab_end < (void *)shstrtab_base ||
 			            (void *)shstrtab_base < (void *)base ||
-			            (void *)shstrtab_end > (void *)(base + num_bytes))
-				THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHSTRTAB);
+			            (void *)shstrtab_end > (void *)(base + num_bytes)) {
+				THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHSTRTAB,
+				                       shstrtab->sh_offset,
+				                       shstrtab_size, num_bytes);
+			}
 			while (shstrtab_size && !shstrtab_base[shstrtab_size - 1])
 				--shstrtab_size;
 			/* Load the .shstrtab section into memory. */
@@ -3725,13 +3755,16 @@ done_tags_for_soname:
 				if (strcmp(name, ".eh_frame") == 0) {
 					/* Found the .eh_frame section! */
 					if unlikely(!(result->d_shdr[i].sh_flags & SHF_ALLOC))
-						THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NALLOC_EH_FRAME);
+						THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NALLOC_EH_FRAME, i);
 					result->d_eh_frame_start = (byte_t *)result->d_loadaddr + result->d_shdr[i].sh_addr;
 					result->d_eh_frame_end   = result->d_eh_frame_start + result->d_shdr[i].sh_size;
 					if unlikely(result->d_eh_frame_start > result->d_eh_frame_end ||
 					            result->d_eh_frame_start < (byte_t *)result->d_loadstart ||
-					            result->d_eh_frame_end > (byte_t *)result->d_loadend)
-						THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_EH_FRAME);
+					            result->d_eh_frame_end > (byte_t *)result->d_loadend) {
+						THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_EH_FRAME,
+						                       result->d_shdr[i].sh_addr,
+						                       result->d_shdr[i].sh_size);
+					}
 					/* TODO: Calculate best-fit semi/level values. */
 					result->d_eh_frame_cache_semi0 = ATREE_SEMI0(uintptr_t);
 					result->d_eh_frame_cache_leve0 = ATREE_LEVEL0(uintptr_t);
@@ -3782,7 +3815,7 @@ done_tags_for_soname:
 						result->d_dynstr = (char *)(result->d_loadaddr + tag.d_un.d_ptr);
 						if unlikely((void *)result->d_dynstr < (void *)result->d_loadstart ||
 						            (void *)result->d_dynstr > (void *)result->d_loadend)
-							THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_DYNSTR);
+							THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_DYNSTR, tag.d_un.d_ptr);
 						break;
 
 					case DT_STRSZ:
@@ -3793,29 +3826,29 @@ done_tags_for_soname:
 						result->d_hashtab = (ElfW(HashTable) *)(result->d_loadaddr + tag.d_un.d_ptr);
 						if unlikely((void *)result->d_hashtab < (void *)result->d_loadstart ||
 						            (void *)result->d_hashtab > (void *)result->d_loadend)
-							THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMHASH);
+							THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMHASH, tag.d_un.d_ptr);
 						break;
 
 					case DT_SYMTAB:
 						result->d_dynsym_tab = (ElfW(Sym) *)(result->d_loadaddr + tag.d_un.d_ptr);
 						if unlikely((void *)result->d_dynsym_tab < (void *)result->d_loadstart ||
 						            (void *)result->d_dynsym_tab > (void *)result->d_loadend)
-							THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_DYNSYM);
+							THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_DYNSYM, tag.d_un.d_ptr);
 						break;
 
 					case DT_SYMENT:
 						if unlikely(tag.d_un.d_val != sizeof(ElfW(Sym)))
-							THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMENT);
+							THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMENT, tag.d_un.d_ptr);
 						break;
 
 					case DT_RELAENT:
 						if unlikely(tag.d_un.d_val != sizeof(ElfW(Rela)))
-							THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_RELAENT);
+							THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_RELAENT, tag.d_un.d_ptr);
 						break;
 
 					case DT_RELENT:
 						if unlikely(tag.d_un.d_val != sizeof(ElfW(Rel)))
-							THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_RELENT);
+							THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_RELENT, tag.d_un.d_ptr);
 						break;
 
 					default: break;
@@ -3891,7 +3924,7 @@ do_dynstr_size:
 			}
 #if DRIVER_FLAG_NORMAL != 0
 			result->d_flags = DRIVER_FLAG_NORMAL;
-#endif
+#endif /* DRIVER_FLAG_NORMAL != 0 */
 done_dynsym:
 
 			/* Allocate the driver dependency vector.
@@ -4004,8 +4037,8 @@ done_dynsym:
  * @param: driver_path:        The parent directory path for `driver_inode'
  * @param: driver_dentry:      The directory entry of `driver_inode' within `driver_path'
  * @param: driver_cmdline:     The commandline to-be passed to the driver, or `NULL'
- * @param: pnew_driver_loaded: When non-NULL, write true to this pointer when the returned
- *                             driver was just newly loaded. - Otherwise, write false.
+ * @param: pnew_driver_loaded: When non-NULL, write `true' to this pointer when the returned
+ *                             driver was just newly loaded. - Otherwise, write `false'.
  * @return: * :                A reference to the freshly loaded driver. */
 PUBLIC WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct driver *KCALL
 driver_insmod_file(struct regular_node *__restrict driver_inode,

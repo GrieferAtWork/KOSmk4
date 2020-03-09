@@ -31,17 +31,9 @@
 #include <hybrid/sequence/list.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
-#include <elf.h>
+#include <kos/exec/elf.h> /* ElfW */
 
-#ifndef ELFW
-#if __SIZEOF_POINTER__ == 4
-#define ELFW(x) ELF32_##x
-#define ElfW(x) Elf32_##x
-#elif __SIZEOF_POINTER__ == 8
-#define ELFW(x) ELF64_##x
-#define ElfW(x) Elf64_##x
-#endif
-#endif /* !ELFW */
+#include <elf.h>
 
 DECL_BEGIN
 
@@ -165,20 +157,22 @@ DECL_BEGIN
 
 
 #ifndef CONFIG_BUILDING_KERNEL_CORE
+
 /* Special driver symbols */
 #ifndef __drv_self_defined
 #define __drv_self_defined 1
-DATDEF struct driver drv_self;          /* Self-pointer to the current driver's descriptor */
+DATDEF struct driver drv_self; /* Self-pointer to the current driver's descriptor */
 #endif /* !__drv_self_defined */
-DATDEF byte_t        drv_loadaddr[];    /* Absolute load-address of the driver (== drv_self.d_loadaddr) */
-DATDEF byte_t        drv_start[];       /* Absolute starting address of the driver program (== drv_self.d_loadstart) */
-DATDEF byte_t        drv_end[];         /* Absolute end address of the driver program (== drv_self.d_loadend) */
-DATDEF char          drv_name[];        /* Name of the driver (== drv_self.d_name) */
-DATDEF char         *drv_filename;      /* [0..1] Filename of the driver (== &drv_self.d_filename) */
-DATDEF struct inode *drv_file;          /* [0..1] Inode of the of the driver (== drv_self.d_file) */
-DATDEF char          drv_commandline[]; /* Driver commandline (== drv_self.d_cmdline) */
-DATDEF size_t        drv_argc;          /* Driver argument count (== &drv_self.d_argc) */
-DATDEF char         *drv_argv[];        /* [1..1][drv_argc] Driver argument vector (== drv_self.d_argv) */
+
+DATDEF byte_t               drv_loadaddr[];    /* Absolute load-address of the driver (== drv_self.d_loadaddr) */
+DATDEF byte_t               drv_start[];       /* Absolute starting address of the driver program (== drv_self.d_loadstart) */
+DATDEF byte_t               drv_end[];         /* Absolute end address of the driver program (== drv_self.d_loadend) */
+DATDEF char                 drv_name[];        /* Name of the driver (== drv_self.d_name) */
+DATDEF char                *drv_filename;      /* [0..1] Filename of the driver (== &drv_self.d_filename) */
+DATDEF struct regular_node *drv_file;          /* [0..1] Inode of the of the driver (== drv_self.d_file) */
+DATDEF char                 drv_commandline[]; /* Driver commandline as a \0\0-terminated, \0-seperated string (== drv_self.d_cmdline) */
+DATDEF size_t               drv_argc;          /* Driver argument count (== &drv_self.d_argc) */
+DATDEF char                *drv_argv[];        /* [1..1][drv_argc] Driver argument vector (== drv_self.d_argv) */
 
 
 /* NOTE: This function may be implemented by individual drivers!
@@ -193,8 +187,9 @@ DATDEF char         *drv_argv[];        /* [1..1][drv_argc] Driver argument vect
  * virtual memory, at which point this function's purpose is to try and
  * reclaim resources to allow the kernel to continue operation without
  * (normally) causing an E_BADALLOC exception to be thrown by the caller.
- * @return: * : Some kind of optional resource(s) was/were freed
- * @return: 0 : Nothing could be freed/released */
+ * @return: * : Some kind of optional resource(s) was/were freed,
+ *              and the caller should re-attempt their allocation.
+ * @return: 0 : Nothing could be freed/released (at the moment) */
 FUNDEF NOBLOCK size_t NOTHROW(KCALL drv_clearcache)(void);
 
 #ifndef DRIVER_INIT
@@ -273,6 +268,7 @@ struct driver_fde_cache_node;
 
 struct driver {
 	WEAK refcnt_t             d_refcnt;     /* Reference counter. */
+	WEAK refcnt_t             d_weakrefcnt; /* Weak reference counter. */
 	char const  *DRIVER_CONST d_name;       /* [1..1][const] Name of the driver (the module's `DT_SONAME' tag) */
 	char const  *DRIVER_CONST d_filename;   /* [0..1][lock(WRITE_ONCE)][owned]
 	                                         * Absolute (relative to `vfs_kernel') filename of the driver,
@@ -296,13 +292,11 @@ struct driver {
 	/* Module load location. */
 	uintptr_t    DRIVER_CONST d_loadaddr;   /* [const] Load address of the module. */
 	uintptr_t    DRIVER_CONST d_loadstart;  /* [const] Lowest address mapped by this module (already adjusted for `d_loadaddr'). */
-	uintptr_t    DRIVER_CONST d_loadend;    /* [const] Greatest address mapped by this module (already adjusted for `d_loadaddr'). */
+	uintptr_t    DRIVER_CONST d_loadend;    /* [const] Greatest address mapped by this module +1 (already adjusted for `d_loadaddr'). */
 
 	/* Special module section binding. */
-	byte_t const *DRIVER_CONST d_eh_frame_start; /* [0..1][<= d_eh_frame_end][const]
-	                                              * Starting pointer for the .eh_frame section */
-	byte_t const *DRIVER_CONST d_eh_frame_end;   /* [0..1][>= d_eh_frame_start][const]
-	                                              * Ending pointer for the .eh_frame section */
+	byte_t const    *DRIVER_CONST d_eh_frame_start; /* [0..1][<= d_eh_frame_end][const] Starting pointer for the .eh_frame section */
+	byte_t const    *DRIVER_CONST d_eh_frame_end;   /* [0..1][>= d_eh_frame_start][const] Ending pointer for the .eh_frame section */
 	struct driver_fde_cache_node *d_eh_frame_cache; /* [0..1][lock(d_eh_frame_cache)] ATREE-head for an eh-frame cache. */
 	struct atomic_rwlock          d_eh_frame_cache_lock;  /* Lock for `d_eh_frame_cache' */
 	uintptr_t        DRIVER_CONST d_eh_frame_cache_semi0; /* [const] SEMI0 for the eh_frame cache */
@@ -352,13 +346,15 @@ struct driver {
 	(__hybrid_atomic_load(self->d_flags, __ATOMIC_ACQUIRE) & \
 	 (DRIVER_FLAG_FINALIZING | DRIVER_FLAG_FINALIZED | DRIVER_FLAG_FINALIZED_C))
 
-/* A driver descriptor for the kernel core */
+/* The driver descriptor for the kernel core */
 DATDEF struct driver kernel_driver;
 
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL driver_section_destroy)(struct driver_section *__restrict self);
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL driver_destroy)(struct driver *__restrict self);
+FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL driver_free)(struct driver *__restrict self);
 DEFINE_REFCOUNT_FUNCTIONS(struct driver_section, ds_refcnt, driver_section_destroy)
 DEFINE_REFCOUNT_FUNCTIONS(struct driver, d_refcnt, driver_destroy)
+DEFINE_WEAKREFCOUNT_FUNCTIONS(struct driver, d_weakrefcnt, driver_free)
 
 struct regular_node;
 struct path;
@@ -368,6 +364,22 @@ struct driver_state {
 	/* Descriptor for a lock-less snapshot of the current loaded-driver state. */
 	WEAK refcnt_t                                           ds_refcnt;   /* Reference counter. */
 	size_t                                     DRIVER_CONST ds_count;    /* [const] Number of loaded drivers. */
+	/* TODO: This structure should hold weak references to loaded drivers!
+	 *       Additionally, drivers should remove themself from this list
+	 *       once their normal reference count hits zero. (i.e. this list
+	 *       should always contain _all_ loaded drivers. - As it stands
+	 *       right now, trying to unload a driver essentially only causes
+	 *       its destructor callbacks to be invoked, before the driver
+	 *       itself is then removed from this list, though this doesn't
+	 *       necessarily guaranty that the driver has actually been unloaded
+	 *       from memory; it may linger longer, giving the false impression
+	 *       of the driver having been unloaded)
+	 *       Additionally, removing drivers from this list before they're
+	 *       about to be unloaded can result in a driver being loaded a
+	 *       second time, before being fully unloaded first. */
+	/* TODO: The kernel core driver should be included in `driver_get_state()'!
+	 *       There's no reason in having it always be a special case to needlessly
+	 *       complicate code that tries to enumerate loaded drivers! */
 	COMPILER_FLEXIBLE_ARRAY(REF struct driver *DRIVER_CONST,ds_drivers); /* [1..1][const][ds_count] Vector of loaded drivers. */
 };
 
@@ -414,8 +426,8 @@ DATDEF ATOMIC_REF(struct driver_library_path_string) driver_library_path;
  * @param: driver_path:        The parent directory path for `driver_inode'
  * @param: driver_dentry:      The directory entry of `driver_inode' within `driver_path'
  * @param: driver_cmdline:     The commandline to-be passed to the driver, or `NULL'
- * @param: pnew_driver_loaded: When non-NULL, write true to this pointer when the returned
- *                             driver was just newly loaded. - Otherwise, write false.
+ * @param: pnew_driver_loaded: When non-NULL, write `true' to this pointer when the returned
+ *                             driver was just newly loaded. - Otherwise, write `false'.
  * @return: * :                A reference to the freshly loaded driver. */
 FUNDEF WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct driver *KCALL
 driver_insmod_file(struct regular_node *__restrict driver_inode,
