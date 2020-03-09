@@ -347,11 +347,11 @@ local gccReleaseCommits: {(string, (int,int,int))...} = {
 	("74dd0d01c435c6d2c926aee0857b71b4c98a9693", (3, 3, 0)),
 	("f2a612f63be5c9acb3bbd0ff95a916fc3e530cf6", (3, 2, 0)),
 	("314c3585f2350529ae969c3f4edd9ef006c713a0", (3, 1, 0)),
+	("cf873f20399b64bfa0ea8c15d8d3104f7a72827f", (2, 97, 0)),
 	/* builtins.def didn't exist in earlier versions...
 	 * Also: The absurdly small # of builtins at this point leads me
 	 *       to believe that this point truely is the inception of
 	 *       GCC's __builtin_* system. */
-//	("cf873f20399b64bfa0ea8c15d8d3104f7a72827f", (2, 97, 0)),
 //	("f7aefc28b8c9f42684b5af4f68ad990a8c169cbf", (2, 96, 0)),
 //	("4818dc3c9883db1c1f87f3dbf947e54a1f5ec0bb", (2, 93, 22)),
 //	("a28381de861be695bbfde7b0ab19153a42edc53e", (2, 93, 21)),
@@ -605,21 +605,21 @@ function generateAllVersionsFeatureHistory(out: File): {GCCBuiltin...} {
 	out << "#ifndef __has_builtin\n";
 	out << "#define __has_builtin(x) __GCC_PRIVATE_IS_DEFINED(__GCC_HAS_BUILTIN_##x)\n";
 	out << "#ifndef __GCC_PRIVATE_IS_DEFINED\n";
-	out << "#define __GCC_PRIVATE_ARG_PLACEHOLDER_  ,\n";
-	out << "#define __GCC_PRIVATE_TAKE_SECOND_ARG_IMPL(x,val,...) val\n";
+	out << "#define __GCC_PRIVATE_ARG_PLACEHOLDER_ ,\n";
+	out << "#define __GCC_PRIVATE_TAKE_SECOND_ARG_IMPL(x, val, ...) val\n";
 	out << "#define __GCC_PRIVATE_TAKE_SECOND_ARG(x) __GCC_PRIVATE_TAKE_SECOND_ARG_IMPL x\n";
-	out << "#define __GCC_PRIVATE_IS_DEFINED3(x) __GCC_PRIVATE_TAKE_SECOND_ARG((x 1,0))\n";
+	out << "#define __GCC_PRIVATE_IS_DEFINED3(x) __GCC_PRIVATE_TAKE_SECOND_ARG((x 1, 0))\n";
 	out << "#define __GCC_PRIVATE_IS_DEFINED2(x) __GCC_PRIVATE_IS_DEFINED3(__GCC_PRIVATE_ARG_PLACEHOLDER_##x)\n";
 	out << "#define __GCC_PRIVATE_IS_DEFINED(x) __GCC_PRIVATE_IS_DEFINED2(x)\n";
 	out << "#endif /* !__GCC_PRIVATE_IS_DEFINED */\n";
 	out << "#ifndef __GNUC_MINOR__\n";
-	out << "#   define __GNUC_MINOR__ 0\n";
+	out << "#define __GNUC_MINOR__ 0\n";
 	out << "#endif /* !__GNUC_MINOR__ */\n";
 	out << "#ifndef __GNUC_PATCH__\n";
 	out << "#ifdef __GNUC_PATCHLEVEL__\n";
-	out << "#   define __GNUC_PATCH__ __GNUC_PATCHLEVEL__\n";
+	out << "#define __GNUC_PATCH__ __GNUC_PATCHLEVEL__\n";
 	out << "#else /* __GNUC_PATCHLEVEL__ */\n";
-	out << "#   define __GNUC_PATCH__ 0\n";
+	out << "#define __GNUC_PATCH__ 0\n";
 	out << "#endif /* !__GNUC_PATCHLEVEL__ */\n";
 	out << "#endif /* !__GNUC_PATCH__ */\n";
 	out << "#ifndef __GCC_VERSION_NUM\n";

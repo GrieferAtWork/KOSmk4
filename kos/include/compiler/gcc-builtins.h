@@ -21,21 +21,21 @@
 #ifndef __has_builtin
 #define __has_builtin(x) __GCC_PRIVATE_IS_DEFINED(__GCC_HAS_BUILTIN_##x)
 #ifndef __GCC_PRIVATE_IS_DEFINED
-#define __GCC_PRIVATE_ARG_PLACEHOLDER_  ,
-#define __GCC_PRIVATE_TAKE_SECOND_ARG_IMPL(x,val,...) val
+#define __GCC_PRIVATE_ARG_PLACEHOLDER_ ,
+#define __GCC_PRIVATE_TAKE_SECOND_ARG_IMPL(x, val, ...) val
 #define __GCC_PRIVATE_TAKE_SECOND_ARG(x) __GCC_PRIVATE_TAKE_SECOND_ARG_IMPL x
-#define __GCC_PRIVATE_IS_DEFINED3(x) __GCC_PRIVATE_TAKE_SECOND_ARG((x 1,0))
+#define __GCC_PRIVATE_IS_DEFINED3(x) __GCC_PRIVATE_TAKE_SECOND_ARG((x 1, 0))
 #define __GCC_PRIVATE_IS_DEFINED2(x) __GCC_PRIVATE_IS_DEFINED3(__GCC_PRIVATE_ARG_PLACEHOLDER_##x)
 #define __GCC_PRIVATE_IS_DEFINED(x) __GCC_PRIVATE_IS_DEFINED2(x)
 #endif /* !__GCC_PRIVATE_IS_DEFINED */
 #ifndef __GNUC_MINOR__
-#   define __GNUC_MINOR__ 0
+#define __GNUC_MINOR__ 0
 #endif /* !__GNUC_MINOR__ */
 #ifndef __GNUC_PATCH__
 #ifdef __GNUC_PATCHLEVEL__
-#   define __GNUC_PATCH__ __GNUC_PATCHLEVEL__
+#define __GNUC_PATCH__ __GNUC_PATCHLEVEL__
 #else /* __GNUC_PATCHLEVEL__ */
-#   define __GNUC_PATCH__ 0
+#define __GNUC_PATCH__ 0
 #endif /* !__GNUC_PATCHLEVEL__ */
 #endif /* !__GNUC_PATCH__ */
 #ifndef __GCC_VERSION_NUM
