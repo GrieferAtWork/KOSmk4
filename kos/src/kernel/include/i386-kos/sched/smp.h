@@ -32,8 +32,8 @@ DECL_BEGIN
 
 
 /* X86 SMP control / initialization structures. */
-#define MPFPS_ALIGN                    16
-#define MP_FLOATING_POINTER_SIGNATURE  ENCODE_INT32('_','M','P','_')
+#define MPFPS_ALIGN                   16
+#define MP_FLOATING_POINTER_SIGNATURE ENCODE_INT32('_', 'M', 'P', '_')
 
 #define APICVER_82489DX    0x00
 #define APICVER_INTEGRATED 0x10
@@ -135,9 +135,6 @@ INTDEF u8 x86_smp_entry_page;
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 
 #endif /* __CC__ */
-
-
-
 
 DECL_END
 

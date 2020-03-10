@@ -36,7 +36,7 @@ DECL_BEGIN
  * Note that `heap_validate()' attempts to optimize itself not
  * to check data blocks that haven't been modified since the
  * previous check, making use of `pagedir_haschanged()', should
- * the host support that function (`CONFIG_HAVE_PAGEDIR_CHANGED') */
+ * the host support that function (`ARCH_PAGEDIR_HAVE_CHANGED') */
 #ifndef CONFIG_DEBUG_HEAP
 #if !defined(CONFIG_NO_DEBUG_HEAP) && !defined(NDEBUG)
 #define CONFIG_DEBUG_HEAP 1

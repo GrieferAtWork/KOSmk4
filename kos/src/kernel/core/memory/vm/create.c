@@ -116,15 +116,15 @@ vm_alloc(void) THROWS(E_BADALLOC) {
 #endif /* CONFIG_NO_USERKERN_SEGMENT */
 	result->v_kernreserve.vn_guard = 0;
 
-#ifdef CONFIG_PAGEDIR_INIT_IS_NOEXCEPT
+#ifdef ARCH_PAGEDIR_INIT_IS_NOEXCEPT
 	/* Initialize the page directory. */
 	pagedir_init2(&result->v_pagedir, result->v_pdir_phys);
-#endif /* CONFIG_PAGEDIR_INIT_IS_NOEXCEPT */
+#endif /* ARCH_PAGEDIR_INIT_IS_NOEXCEPT */
 	TRY {
-#ifndef CONFIG_PAGEDIR_INIT_IS_NOEXCEPT
+#ifndef ARCH_PAGEDIR_INIT_IS_NOEXCEPT
 		/* Initialize the page directory. */
 		pagedir_init2(&result->v_pagedir, result->v_pdir_phys);
-#endif /* !CONFIG_PAGEDIR_INIT_IS_NOEXCEPT */
+#endif /* !ARCH_PAGEDIR_INIT_IS_NOEXCEPT */
 		{
 			/* Run per-VM initializers. */
 			pervm_init_t *iter = __kernel_pervm_init_start;

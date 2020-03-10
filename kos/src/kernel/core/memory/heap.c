@@ -240,7 +240,7 @@ NOTHROW(KCALL find_modified_address)(byte_t *start, u32 pattern, size_t num_byte
 		if __untraced(!((uintptr_t)start & PAGEMASK)) {
 			for (;;) {
 #if 0
-#elif defined(CONFIG_HAVE_PAGEDIR_CHANGED)
+#elif defined(ARCH_PAGEDIR_HAVE_CHANGED)
 				/* If supported by the host, speed this up using page directory dirty bits. */
 				if (pagedir_haschanged(start)) {
 					pagedir_unsetchanged(start);

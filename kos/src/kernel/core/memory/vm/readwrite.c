@@ -129,7 +129,7 @@ NOTHROW(KCALL memeq_ku_nopf)(KERNEL void const *kernel_buffer,
 #define DEFINE_PAGEDIR_P_END                 __WHILE0
 #else
 
-#ifdef CONFIG_PAGEDIR_GETSET_USES_POINTER
+#ifdef ARCH_PAGEDIR_GETSET_USES_POINTER
 typedef PHYS pagedir_t *pdir_set_type_t;
 #else
 typedef PHYS vm_phys_t  pdir_set_type_t;

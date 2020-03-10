@@ -66,7 +66,7 @@ DECL_BEGIN
  *    -> Since only 2 indirections exist (`struct p32_pdir::p_e2' and `union p32_pdir_e2::p_e1'),
  *       both of which are always pre-allocated/or const-initialized for addresses >= 0xc0000000,
  *       there is no need to prepare kernel-space memory for paging before mapping memory. I.e.:
- *       when PAE integration is disabled, `paging32.h' can `#undef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE'
+ *       when PAE integration is disabled, `paging32.h' can `#undef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE'
  *
  */
 

@@ -172,13 +172,13 @@ NOTHROW(KCALL initialize_predefined_vm_trampoline)(struct task *__restrict self,
 	vm_node_insert(&FORTASK(self, this_trampoline_node));
 }
 
-#ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 /* Prepare 2 consecutive (and 2-page aligned) pages of virtual
  * memory for the purpose of doing the initial prepare required
  * for `THIS_TRAMPOLINE_PAGE' of `_boottask' and also `_bootidle' */
 INTDEF NOBLOCK FREE void *
 NOTHROW(FCALL kernel_initialize_boot_trampolines)(void);
-#endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 
 PUBLIC ATTR_PERTASK struct exception_info this_exception_info = {};
 
@@ -220,15 +220,15 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 	assert(_asyncwork.t_refcnt == 1);
 
 	/* Figure out where to put the initial trampolines for _boottask and _bootidle */
-#ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	boot_trampoline_pages = kernel_initialize_boot_trampolines();
-#else /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+#else /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	boot_trampoline_pages = vm_getfree(&vm_kernel,
 	                                   HINT_GETADDR(KERNEL_VMHINT_TRAMPOLINE),
 	                                   /* num_pages: */ 2 * PAGESIZE,
 	                                   /* alignment: */ 1 * PAGESIZE,
 	                                   HINT_GETMODE(KERNEL_VMHINT_TRAMPOLINE));
-#endif /* !CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+#endif /* !ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 
 	/* Construct the trampoline node for the predefined tasks. */
 	initialize_predefined_vm_trampoline(&_boottask, PAGEID_ENCODE((byte_t *)boot_trampoline_pages + 0 * PAGESIZE));
@@ -364,9 +364,9 @@ NOTHROW(KCALL task_destroy_raw_impl)(struct task *__restrict self) {
 	addr = vm_node_getstart(node);
 	pagedir_unmapone(addr);
 	pagedir_syncone(addr);
-#ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	pagedir_unprepare_mapone(addr);
-#endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 
 	/* Unlink + unmap the stack node. */
 	node = vm_paged_node_remove(&vm_kernel, FORTASK(self, this_kernel_stacknode_).vn_node.a_vmin);
@@ -379,9 +379,9 @@ NOTHROW(KCALL task_destroy_raw_impl)(struct task *__restrict self) {
 	size = vm_node_getsize(node);
 	pagedir_unmap(addr, size);
 	pagedir_sync(addr, size);
-#ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	pagedir_unprepare_map(addr, size);
-#endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 
 	/* Deallocate the kernel stack. */
 	vm_datapart_do_freeram(&FORTASK(self, this_kernel_stackpart_));
@@ -496,12 +496,12 @@ again_lock_vm:
 			}
 			FORTASK(result, this_kernel_stacknode_).vn_node.a_vmin = PAGEID_ENCODE((byte_t *)stack_addr);
 			FORTASK(result, this_kernel_stacknode_).vn_node.a_vmax = PAGEID_ENCODE((byte_t *)stack_addr + CEIL_ALIGN(KERNEL_STACKSIZE, PAGESIZE) - 1);
-#ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 			if unlikely(!pagedir_prepare_map(stack_addr, CEIL_ALIGN(KERNEL_STACKSIZE, PAGESIZE))) {
 				vm_kernel_treelock_endwrite();
 				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 			}
-#endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 			vm_node_insert(&FORTASK(result, this_kernel_stacknode_));
 
 			/* Map the trampoline node. */
@@ -518,10 +518,10 @@ again_lock_vm:
 			}
 			FORTASK(result, this_trampoline_node).vn_node.a_vmin = PAGEID_ENCODE(trampoline_addr);
 			FORTASK(result, this_trampoline_node).vn_node.a_vmax = PAGEID_ENCODE(trampoline_addr);
-#ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 			if unlikely(!pagedir_prepare_mapone(trampoline_addr))
 				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
-#endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 			/* Load the trampoline node into the kernel VM. */
 			vm_node_insert(&FORTASK(result, this_trampoline_node));
 

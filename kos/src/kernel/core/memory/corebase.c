@@ -299,7 +299,7 @@ again_tryhard_mapping_target:
 			result.cp_part = NULL;
 			goto done;
 		}
-#ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 		/* Map the page into our current page directory. */
 		if (!pagedir_prepare_mapone(mapping_target)) {
 			vm_kernel_treelock_endwrite();
@@ -311,7 +311,7 @@ again_tryhard_mapping_target:
 			result.cp_part = NULL;
 			goto done;
 		}
-#endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 		pagedir_mapone(mapping_target,
 		               page2addr(mapping_backend),
 		               PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);

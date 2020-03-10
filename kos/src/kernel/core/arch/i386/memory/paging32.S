@@ -119,7 +119,7 @@ END(pagedir_syncone)
  * >>                             PAGEDIR_PAGEALIGNED size_t num_bytes); */
 PUBLIC_FUNCTION(pagedir_sync)
 	.cfi_startproc
-	cmpl   $(CONFIG_PAGEDIR_LARGESYNC_THRESHOLD * 4096), %edx
+	cmpl   $(ARCH_PAGEDIR_LARGESYNC_THRESHOLD), %edx
 	jae8   x86_pagedir_syncall_maybe_global
 	movl   %ecx, %eax
 	movl   %edx, %ecx

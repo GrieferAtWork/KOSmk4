@@ -430,7 +430,7 @@ again_tryhard_mapping_target:
 			blockc = blocks == &corepair.cp_part->dp_ramdata.rd_block0
 			         ? 1
 			         : corepair.cp_part->dp_ramdata.rd_blockc;
-#ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 			/* Prepare to map all of the new blocks. */
 			for (i = 0; i < blockc; ++i) {
 				if unlikely(!pagedir_prepare_map((byte_t *)mapping_target + mapping_offset,
@@ -448,7 +448,7 @@ again_tryhard_mapping_target:
 			}
 			HEAP_ASSERT(mapping_offset == num_bytes);
 			mapping_offset = 0;
-#endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 			if (flags & GFP_PREFLT) {
 				/* Map all pre-allocated pages. */
 				for (i = 0; i < blockc; ++i) {
@@ -465,9 +465,9 @@ again_tryhard_mapping_target:
 								void *pageaddr;
 								pageaddr = (byte_t *)mapping_target + mapping_offset + j * PAGESIZE;
 								memset(pageaddr, 0, PAGESIZE);
-#ifdef CONFIG_HAVE_PAGEDIR_CHANGED
+#ifdef ARCH_PAGEDIR_HAVE_CHANGED
 								pagedir_unsetchanged(pageaddr);
-#endif /* CONFIG_HAVE_PAGEDIR_CHANGED */
+#endif /* ARCH_PAGEDIR_HAVE_CHANGED */
 							}
 						}
 					}
@@ -481,9 +481,9 @@ again_tryhard_mapping_target:
 							mempatl(pageaddr,
 							        DEBUGHEAP_FRESH_MEMORY,
 							        PAGESIZE);
-#ifdef CONFIG_HAVE_PAGEDIR_CHANGED
+#ifdef ARCH_PAGEDIR_HAVE_CHANGED
 							pagedir_unsetchanged(pageaddr);
-#endif /* CONFIG_HAVE_PAGEDIR_CHANGED */
+#endif /* ARCH_PAGEDIR_HAVE_CHANGED */
 						}
 					}
 #endif /* CONFIG_DEBUG_HEAP */

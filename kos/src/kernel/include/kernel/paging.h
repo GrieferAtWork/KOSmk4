@@ -47,7 +47,7 @@
 #endif
 
 
-/* Check if a given `addr' or [startaddr,endaddr)
+/* Check if a given `addr' or [startaddr, endaddr)
  * is consider apart of user- or kernel-space.
  * The *_PARTIAL functions check if the range has any overlapping
  * parts with the named address space, while the non-_PARTIAL functions
@@ -104,55 +104,55 @@ typedef uintptr_t pagedir_pushval_t;
 /* The physical and virtual address bindings of the kernel's page directory.
  * This is the initial page directory active when KOS boots, as well as the
  * the directory later used for thread running in kernel-space only. */
-#ifndef CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_KERNEL
+#ifndef ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_KERNEL
 DATDEF VIRT pagedir_t pagedir_kernel;
 DATDEF PHYS pagedir_t pagedir_kernel_phys;
-#endif /* !CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_KERNEL */
+#endif /* !ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_KERNEL */
 
 /* Initialize the given page directory.
  * The caller is required to allocate the page directory controller itself, which
  * must be aligned and sized according to `PAGEDIR_ALIGN' and `PAGEDIR_SIZE'. */
-#ifndef CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_INIT
-#ifdef CONFIG_PAGEDIR_INIT_NEED_PHYS_SELF
-#ifdef CONFIG_PAGEDIR_INIT_IS_NOEXCEPT
+#ifndef ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_INIT
+#ifdef ARCH_PAGEDIR_INIT_NEED_PHYS_SELF
+#ifdef ARCH_PAGEDIR_INIT_IS_NOEXCEPT
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL pagedir_init)(VIRT pagedir_t *__restrict self,
                             PHYS vm_phys_t phys_self);
-#else /* CONFIG_PAGEDIR_INIT_IS_NOEXCEPT */
+#else /* ARCH_PAGEDIR_INIT_IS_NOEXCEPT */
 FUNDEF NOBLOCK NONNULL((1)) void FCALL
 pagedir_init(VIRT pagedir_t *__restrict self,
              PHYS vm_phys_t phys_self) THROWS(E_BADALLOC);
-#endif /* !CONFIG_PAGEDIR_INIT_IS_NOEXCEPT */
+#endif /* !ARCH_PAGEDIR_INIT_IS_NOEXCEPT */
 #define pagedir_init1(self)            pagedir_init(self, pagedir_translate(self))
 #define pagedir_init2(self, phys_self) pagedir_init(self, phys_self)
-#else /* CONFIG_PAGEDIR_INIT_NEED_PHYS_SELF */
-#ifdef CONFIG_PAGEDIR_INIT_IS_NOEXCEPT
+#else /* ARCH_PAGEDIR_INIT_NEED_PHYS_SELF */
+#ifdef ARCH_PAGEDIR_INIT_IS_NOEXCEPT
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL pagedir_init)(VIRT pagedir_t *__restrict self);
-#else /* CONFIG_PAGEDIR_INIT_IS_NOEXCEPT */
+#else /* ARCH_PAGEDIR_INIT_IS_NOEXCEPT */
 FUNDEF NOBLOCK NONNULL((1)) void FCALL
 pagedir_init(VIRT pagedir_t *__restrict self) THROWS(E_BADALLOC);
-#endif /* !CONFIG_PAGEDIR_INIT_IS_NOEXCEPT */
+#endif /* !ARCH_PAGEDIR_INIT_IS_NOEXCEPT */
 #define pagedir_init1(self)            pagedir_init(self)
 #define pagedir_init2(self, phys_self) pagedir_init(self)
-#endif /* !CONFIG_PAGEDIR_INIT_NEED_PHYS_SELF */
-#endif /* !CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_INIT */
+#endif /* !ARCH_PAGEDIR_INIT_NEED_PHYS_SELF */
+#endif /* !ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_INIT */
 
 /* Finalize a given page directory. */
-#ifndef CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_FINI
-#ifdef CONFIG_PAGEDIR_FINI_NEED_PHYS_SELF
+#ifndef ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_FINI
+#ifdef ARCH_PAGEDIR_FINI_NEED_PHYS_SELF
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL pagedir_fini)(VIRT pagedir_t *__restrict self,
                             PHYS vm_phys_t phys_self);
 #define pagedir_fini1(self)            pagedir_fini(self, pagedir_translate(self))
 #define pagedir_fini2(self, phys_self) pagedir_fini(self, phys_self)
-#else /* CONFIG_PAGEDIR_FINI_NEED_PHYS_SELF */
+#else /* ARCH_PAGEDIR_FINI_NEED_PHYS_SELF */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL pagedir_fini)(VIRT pagedir_t *__restrict self);
 #define pagedir_fini1(self)            pagedir_fini(self)
 #define pagedir_fini2(self, phys_self) pagedir_fini(self)
-#endif /* !CONFIG_PAGEDIR_FINI_NEED_PHYS_SELF */
-#endif /* !CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_FINI */
+#endif /* !ARCH_PAGEDIR_FINI_NEED_PHYS_SELF */
+#endif /* !ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_FINI */
 #endif /* __CC__ */
 
 
@@ -176,13 +176,13 @@ NOTHROW(FCALL pagedir_fini)(VIRT pagedir_t *__restrict self);
 #ifdef __CC__
 
 #ifndef PAGEDIR_API_P_SELFARG
-#ifdef CONFIG_PAGEDIR_GETSET_USES_POINTER
+#ifdef ARCH_PAGEDIR_GETSET_USES_POINTER
 #define PAGEDIR_P_SELFTYPE      PHYS pagedir_t *
 #define PAGEDIR_P_SELFOFVM(vm) (vm)->v_pdir_phys_ptr
-#else /* CONFIG_PAGEDIR_GETSET_USES_POINTER */
+#else /* ARCH_PAGEDIR_GETSET_USES_POINTER */
 #define PAGEDIR_P_SELFTYPE      PHYS vm_phys_t
 #define PAGEDIR_P_SELFOFVM(vm) (vm)->v_pdir_phys
-#endif /* !CONFIG_PAGEDIR_GETSET_USES_POINTER */
+#endif /* !ARCH_PAGEDIR_GETSET_USES_POINTER */
 #endif /* !PAGEDIR_API_P_SELFARG */
 
 #if defined(__INTELLISENSE__)
@@ -198,7 +198,7 @@ __FORCELOCAL ATTR_CONST __pagedir_p_selftype KCALL __pagedir_p_selfofvm(struct v
 
 
 
-#ifndef CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_SYNCALL
+#ifndef ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_SYNCALL
 /* Synchronize the entirety of the current page directory.
  * Note that this function may only sync all user-space mappings. If the
  * intent is to also sync all of kernel-space, `pagedir_syncall()'
@@ -207,42 +207,42 @@ FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_syncall_user)(void);
 /* Same as `pagedir_syncall()', but also ensures that
  * all of kernel-space is synced. */
 FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_syncall)(void);
-#endif /* !CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_SYNCALL */
+#endif /* !ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_SYNCALL */
 
-#ifndef CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_SYNCONE
+#ifndef ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_SYNCONE
 /* Synchronize mappings within the given address range. */
 FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_syncone)(VIRT void *addr);
-#endif /* !CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_SYNCONE */
+#endif /* !ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_SYNCONE */
 
 /* Translate a virtual address into its physical counterpart. */
 FUNDEF NOBLOCK ATTR_PURE WUNUSED PHYS vm_phys_t NOTHROW(FCALL pagedir_translate)(VIRT void *addr);
 FUNDEF NOBLOCK ATTR_PURE WUNUSED PHYS vm_phys_t NOTHROW(KCALL pagedir_translate_p)(PAGEDIR_P_SELFTYPE self, VIRT void *addr);
 
 /* Low-level Get/Set the physical address of the currently active page directory. */
-#ifndef CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_GETSET
-#ifdef CONFIG_PAGEDIR_GETSET_USES_POINTER
+#ifndef ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_GETSET
+#ifdef ARCH_PAGEDIR_GETSET_USES_POINTER
 FUNDEF NOBLOCK ATTR_PURE WUNUSED PHYS pagedir_t *NOTHROW(KCALL pagedir_get)(void);
 FUNDEF NOBLOCK void NOTHROW(KCALL pagedir_set)(PHYS pagedir_t *__restrict value);
-#else /* CONFIG_PAGEDIR_GETSET_USES_POINTER */
+#else /* ARCH_PAGEDIR_GETSET_USES_POINTER */
 FUNDEF NOBLOCK ATTR_PURE WUNUSED PHYS vm_phys_t NOTHROW(KCALL pagedir_get)(void);
 FUNDEF NOBLOCK void NOTHROW(KCALL pagedir_set)(PHYS vm_phys_t value);
-#endif /* !CONFIG_PAGEDIR_GETSET_USES_POINTER */
-#endif /* !CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_GETSET */
+#endif /* !ARCH_PAGEDIR_GETSET_USES_POINTER */
+#endif /* !ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_GETSET */
 
 
 struct vm;
 /* Unmap the entirety of user-space.
  * NOTE: Unlike all other unmap() functions, this one guaranties that it
  *       can perform the task without needing to allocate more memory! */
-#ifndef CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_UNMAP_USERSPACE
+#ifndef ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_UNMAP_USERSPACE
 FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_unmap_userspace)(struct vm *__restrict sync_vm);
 FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_unmap_userspace_nosync)(void);
-#endif /* !CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_UNMAP_USERSPACE */
+#endif /* !ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_UNMAP_USERSPACE */
 
-#ifndef CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_UNMAP_USERSPACE_P
+#ifndef ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_UNMAP_USERSPACE_P
 FUNDEF NOBLOCK void NOTHROW(KCALL pagedir_unmap_userspace_p)(PAGEDIR_P_SELFTYPE self, struct vm *__restrict sync_vm);
 FUNDEF NOBLOCK void NOTHROW(KCALL pagedir_unmap_userspace_nosync_p)(PAGEDIR_P_SELFTYPE self);
-#endif /* !CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_UNMAP_USERSPACE_P */
+#endif /* !ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_UNMAP_USERSPACE_P */
 
 /* Temporarily switch to a different page directory `self'
  * @param: self: The page directory to switch to (of type `PAGEDIR_P_SELFTYPE') */
@@ -294,7 +294,7 @@ FUNDEF NOBLOCK void NOTHROW(KCALL pagedir_unmap_userspace_nosync_p)(PAGEDIR_P_SE
  * WARNING: unprepare() should always be called with the same range as prepare()
  * @return: true:  Successfully allocated structures required for creating mappings.
  * @return: false: Insufficient physical memory to change mappings. */
-#ifndef CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_PREPARE
+#ifndef ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_PREPARE
 FUNDEF NOBLOCK WUNUSED __BOOL
 NOTHROW(FCALL pagedir_prepare_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr);
 FUNDEF NOBLOCK void
@@ -360,7 +360,7 @@ FUNDEF NOBLOCK void
 NOTHROW(FCALL pagedir_unprepare_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                      PAGEDIR_PAGEALIGNED size_t num_bytes);
 #endif /* __OMIT_PAGING_CONSTANT_P_WRAPPERS */
-#endif /* !CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_PREPARE */
+#endif /* !ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_PREPARE */
 
 
 
@@ -376,7 +376,7 @@ NOTHROW(FCALL pagedir_unprepare_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
  *   - Use of this function requires a prior call to `pagedir_prepare_map()'!
  *   - Memory mappings defined in `vm_kernel' to be non-blocking have their
  *     mapping hint set to the address of the associated `struct vm_node' */
-#ifndef CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_MAPHINT
+#ifndef ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_MAPHINT
 FUNDEF NOBLOCK void
 NOTHROW(FCALL pagedir_maphintone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                   VIRT /*ALIGNED(PAGEDIR_MAPHINT_ALIGNMENT)*/ void *hint);
@@ -406,19 +406,19 @@ NOTHROW(FCALL pagedir_maphint)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                PAGEDIR_PAGEALIGNED size_t num_bytes,
                                VIRT /*ALIGNED(PAGEDIR_MAPHINT_ALIGNMENT)*/ void *hint);
 #endif /* __OMIT_PAGING_CONSTANT_P_WRAPPERS */
-#endif /* !CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_MAPHINT */
+#endif /* !ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_MAPHINT */
 
 /* Return the given of the given page, or NULL if no hint has been mapped. */
-#ifndef CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_GETHINT
+#ifndef ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_GETHINT
 FUNDEF NOBLOCK WUNUSED void *NOTHROW(FCALL pagedir_gethint)(VIRT void *addr);
-#endif /* !CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_GETHINT */
+#endif /* !ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_GETHINT */
 
 /* Create/delete a page-directory mapping.
  * @param: perm: A set of `PAGEDIR_MAP_F*' detailing how memory should be mapped.
  * `pagedir_sync()' must be called while specifying a virtual address range containing
  * `addr...+=num_bytes' in order to ensure that changes will become visible.
  * NOTE: This function can be called regardless of which page directory is active. */
-#ifndef CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_MAP
+#ifndef ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_MAP
 FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                                   PAGEDIR_PAGEALIGNED PHYS vm_phys_t phys,
                                                   u16 perm);
@@ -450,7 +450,7 @@ NOTHROW(FCALL pagedir_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                            PAGEDIR_PAGEALIGNED PHYS vm_phys_t phys,
                            u16 perm);
 #endif /* __OMIT_PAGING_CONSTANT_P_WRAPPERS */
-#endif /* !CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_MAP */
+#endif /* !ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_MAP */
 
 /* Special variants of `pagedir_mapone()' that should be used to
  * temporary override the mapping of a single, prepared page.
@@ -459,7 +459,7 @@ NOTHROW(FCALL pagedir_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
  * operation in the sense that the data is entirely thread-private, while modifications
  * do not require any kind of lock.
  * NOTE: If the page had been mapped, `pagedir_pop_mapone()' will automatically sync the page. */
-#ifndef CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_PUSH_MAPONE
+#ifndef ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_PUSH_MAPONE
 FUNDEF NOBLOCK WUNUSED pagedir_pushval_t
 NOTHROW(FCALL pagedir_push_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                    PAGEDIR_PAGEALIGNED PHYS vm_phys_t phys,
@@ -467,10 +467,10 @@ NOTHROW(FCALL pagedir_push_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 FUNDEF NOBLOCK void
 NOTHROW(FCALL pagedir_pop_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                   pagedir_pushval_t backup);
-#endif /* !CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_PUSH_MAPONE */
+#endif /* !ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_PUSH_MAPONE */
 
 /* Unmap pages from the given address range. (requires that the given area be prepared) */
-#ifndef CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_UNMAP
+#ifndef ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_UNMAP
 FUNDEF NOBLOCK void
 NOTHROW(FCALL pagedir_unmapone)(PAGEDIR_PAGEALIGNED VIRT void *addr);
 #ifndef __OMIT_PAGING_CONSTANT_P_WRAPPERS
@@ -496,12 +496,12 @@ FUNDEF NOBLOCK void
 NOTHROW(FCALL pagedir_unmap)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                              PAGEDIR_PAGEALIGNED size_t num_bytes);
 #endif /* __OMIT_PAGING_CONSTANT_P_WRAPPERS */
-#endif /* !CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_UNMAP */
+#endif /* !ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_UNMAP */
 
 
 /* Remove write-permissions from the given address range. (requires that the given area be prepared) */
-#ifdef CONFIG_HAVE_PAGEDIR_UNWRITE
-#ifndef CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_UNWRITE
+#ifdef ARCH_PAGEDIR_HAVE_UNWRITE
+#ifndef ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_UNWRITE
 FUNDEF NOBLOCK void
 NOTHROW(FCALL pagedir_unwriteone)(PAGEDIR_PAGEALIGNED VIRT void *addr);
 #ifndef __OMIT_PAGING_CONSTANT_P_WRAPPERS
@@ -527,11 +527,11 @@ FUNDEF NOBLOCK void
 NOTHROW(FCALL pagedir_unwrite)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                PAGEDIR_PAGEALIGNED size_t num_bytes);
 #endif /* __OMIT_PAGING_CONSTANT_P_WRAPPERS */
-#endif /* !CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_UNWRITE */
-#endif /* CONFIG_HAVE_PAGEDIR_UNWRITE */
+#endif /* !ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_UNWRITE */
+#endif /* ARCH_PAGEDIR_HAVE_UNWRITE */
 
 
-#ifndef CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_SYNC
+#ifndef ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_SYNC
 #ifndef __OMIT_PAGING_CONSTANT_P_WRAPPERS
 FUNDEF NOBLOCK void
 NOTHROW(FCALL __os_pagedir_sync)(PAGEDIR_PAGEALIGNED VIRT void *addr,
@@ -555,25 +555,25 @@ FUNDEF NOBLOCK void
 NOTHROW(FCALL pagedir_sync)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                             PAGEDIR_PAGEALIGNED size_t num_bytes);
 #endif
-#endif /* !CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_SYNC */
+#endif /* !ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_SYNC */
 
 /* Check if the given page is mapped.
  * NOTE: The given `addr' */
-#ifndef CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_ISMAPPED
+#ifndef ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_ISMAPPED
 FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL NOTHROW(FCALL pagedir_ismapped)(VIRT void *addr);
 FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL NOTHROW(FCALL pagedir_iswritable)(VIRT void *addr);
 FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL NOTHROW(FCALL pagedir_isuseraccessible)(VIRT void *addr);
 FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL NOTHROW(FCALL pagedir_isuserwritable)(VIRT void *addr);
-#endif /* !CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_ISMAPPED */
+#endif /* !ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_ISMAPPED */
 
-#ifdef CONFIG_HAVE_PAGEDIR_CHANGED
-#ifndef CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_HASCHANGED
+#ifdef ARCH_PAGEDIR_HAVE_CHANGED
+#ifndef ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_HASCHANGED
 /* TODO: Figure out a better design for these functions
  *       The current system is written under the assumption that 4MiB pages don't exist... */
 FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL NOTHROW(FCALL pagedir_haschanged)(VIRT void *addr);
 FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_unsetchanged)(VIRT void *addr);
-#endif /* !CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_HASCHANGED */
-#endif /* CONFIG_HAVE_PAGEDIR_CHANGED */
+#endif /* !ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_HASCHANGED */
+#endif /* ARCH_PAGEDIR_HAVE_CHANGED */
 
 
 /* Same as the functions above, but operate on the specified
@@ -584,17 +584,17 @@ FUNDEF NOBLOCK void NOTHROW(KCALL pagedir_unprepare_mapone_p)(PAGEDIR_P_SELFTYPE
 FUNDEF NOBLOCK void NOTHROW(KCALL pagedir_maphintone_p)(PAGEDIR_P_SELFTYPE self, PAGEDIR_PAGEALIGNED VIRT void *addr, VIRT /*ALIGNED(PAGEDIR_MAPHINT_ALIGNMENT)*/ void *hint);
 FUNDEF NOBLOCK void NOTHROW(KCALL pagedir_mapone_p)(PAGEDIR_P_SELFTYPE self, PAGEDIR_PAGEALIGNED VIRT void *addr, PAGEDIR_PAGEALIGNED PHYS vm_phys_t phys, u16 perm);
 FUNDEF NOBLOCK void NOTHROW(KCALL pagedir_unmapone_p)(PAGEDIR_P_SELFTYPE self, PAGEDIR_PAGEALIGNED VIRT void *addr);
-#ifdef CONFIG_HAVE_PAGEDIR_UNWRITE
+#ifdef ARCH_PAGEDIR_HAVE_UNWRITE
 FUNDEF NOBLOCK void NOTHROW(KCALL pagedir_unwriteone_p)(PAGEDIR_P_SELFTYPE self, PAGEDIR_PAGEALIGNED VIRT void *addr);
-#endif /* CONFIG_HAVE_PAGEDIR_UNWRITE */
+#endif /* ARCH_PAGEDIR_HAVE_UNWRITE */
 FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL NOTHROW(KCALL pagedir_ismapped_p)(PAGEDIR_P_SELFTYPE self, VIRT void *addr);
 FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL NOTHROW(KCALL pagedir_iswritable_p)(PAGEDIR_P_SELFTYPE self, VIRT void *addr);
 FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL NOTHROW(KCALL pagedir_isuseraccessible_p)(PAGEDIR_P_SELFTYPE self, VIRT void *addr);
 FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL NOTHROW(KCALL pagedir_isuserwritable_p)(PAGEDIR_P_SELFTYPE self, VIRT void *addr);
-#ifdef CONFIG_HAVE_PAGEDIR_CHANGED
+#ifdef ARCH_PAGEDIR_HAVE_CHANGED
 FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL NOTHROW(KCALL pagedir_haschanged_p)(PAGEDIR_P_SELFTYPE self, VIRT void *addr);
 FUNDEF NOBLOCK void NOTHROW(KCALL pagedir_unsetchanged_p)(PAGEDIR_P_SELFTYPE self, VIRT void *addr);
-#endif /* CONFIG_HAVE_PAGEDIR_CHANGED */
+#endif /* ARCH_PAGEDIR_HAVE_CHANGED */
 #ifndef __OMIT_PAGING_CONSTANT_P_WRAPPERS
 FUNDEF NOBLOCK WUNUSED __BOOL
 NOTHROW(KCALL __os_pagedir_prepare_map_p)(PAGEDIR_P_SELFTYPE self,
@@ -629,13 +629,13 @@ NOTHROW(KCALL __os_pagedir_unmap_p)(PAGEDIR_P_SELFTYPE self,
                                     PAGEDIR_PAGEALIGNED VIRT void *addr,
                                     PAGEDIR_PAGEALIGNED size_t num_bytes)
 		ASMNAME("pagedir_unmap_p");
-#ifdef CONFIG_HAVE_PAGEDIR_UNWRITE
+#ifdef ARCH_PAGEDIR_HAVE_UNWRITE
 FUNDEF NOBLOCK void
 NOTHROW(KCALL __os_pagedir_unwrite_p)(PAGEDIR_P_SELFTYPE self,
                                       PAGEDIR_PAGEALIGNED VIRT void *addr,
                                       PAGEDIR_PAGEALIGNED size_t num_bytes)
 		ASMNAME("pagedir_unwrite_p");
-#endif /* CONFIG_HAVE_PAGEDIR_UNWRITE */
+#endif /* ARCH_PAGEDIR_HAVE_UNWRITE */
 FORCELOCAL NOBLOCK WUNUSED __BOOL
 NOTHROW(KCALL pagedir_prepare_map_p)(PAGEDIR_P_SELFTYPE self,
                                      PAGEDIR_PAGEALIGNED VIRT void *addr,
@@ -719,7 +719,7 @@ NOTHROW(KCALL pagedir_unmap_p)(PAGEDIR_P_SELFTYPE self,
 	}
 	__os_pagedir_unmap_p(self, addr, num_bytes);
 }
-#ifdef CONFIG_HAVE_PAGEDIR_UNWRITE
+#ifdef ARCH_PAGEDIR_HAVE_UNWRITE
 FORCELOCAL NOBLOCK void
 NOTHROW(KCALL pagedir_unwrite_p)(PAGEDIR_P_SELFTYPE self,
                                  PAGEDIR_PAGEALIGNED VIRT void *addr,
@@ -734,7 +734,7 @@ NOTHROW(KCALL pagedir_unwrite_p)(PAGEDIR_P_SELFTYPE self,
 	}
 	__os_pagedir_unwrite_p(self, addr, num_bytes);
 }
-#endif /* CONFIG_HAVE_PAGEDIR_UNWRITE */
+#endif /* ARCH_PAGEDIR_HAVE_UNWRITE */
 #else /* !__OMIT_PAGING_CONSTANT_P_WRAPPERS */
 FUNDEF NOBLOCK WUNUSED __BOOL
 NOTHROW(KCALL pagedir_prepare_map_p)(PAGEDIR_P_SELFTYPE self,
@@ -763,12 +763,12 @@ FUNDEF NOBLOCK void
 NOTHROW(KCALL pagedir_unmap_p)(PAGEDIR_P_SELFTYPE self,
                                PAGEDIR_PAGEALIGNED VIRT void *addr,
                                PAGEDIR_PAGEALIGNED size_t num_bytes);
-#ifdef CONFIG_HAVE_PAGEDIR_UNWRITE
+#ifdef ARCH_PAGEDIR_HAVE_UNWRITE
 FUNDEF NOBLOCK void
 NOTHROW(KCALL pagedir_unwrite_p)(PAGEDIR_P_SELFTYPE self,
                                  PAGEDIR_PAGEALIGNED VIRT void *addr,
                                  PAGEDIR_PAGEALIGNED size_t num_bytes);
-#endif /* CONFIG_HAVE_PAGEDIR_UNWRITE */
+#endif /* ARCH_PAGEDIR_HAVE_UNWRITE */
 #endif /* __OMIT_PAGING_CONSTANT_P_WRAPPERS */
 
 #endif /* __CC__ */

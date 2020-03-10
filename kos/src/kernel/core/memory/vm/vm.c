@@ -2988,15 +2988,15 @@ NOTHROW(KCALL vm_node_destroy)(struct vm_node *__restrict self) {
 		assert(self->vn_vm != NULL);
 		/* If the memory mapping of `self' is still prepared, unprepare it now. */
 		if (self->vn_flags & VM_NODE_FLAG_PREPARED) {
-#ifndef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+#ifndef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 			if (self->vn_vm != &vm_kernel) /* Preparations are meaningless within kernel-space. */
-#endif /* !CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+#endif /* !ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 			{
-#ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 				if (self->vn_vm == THIS_VM || PAGEID_ISKERN(vm_node_getstartpageid(self)))
-#else /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+#else /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 				if (self->vn_vm == THIS_VM)
-#endif /* !CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+#endif /* !ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 				{
 					pagedir_unprepare_map_p(PAGEDIR_P_SELFOFVM(self->vn_vm),
 					                        vm_node_getstart(self),
@@ -3105,11 +3105,11 @@ NOTHROW(KCALL vm_node_update_write_access)(struct vm_node *__restrict self) {
 		}
 		/* By simply deleting the write-permission bit when it is set,
 		 * we can drastically reduce the number of required #PFs */
-#ifdef CONFIG_HAVE_PAGEDIR_UNWRITE
+#ifdef ARCH_PAGEDIR_HAVE_UNWRITE
 		pagedir_unwrite(addr, size);
-#else /* CONFIG_HAVE_PAGEDIR_UNWRITE */
+#else /* ARCH_PAGEDIR_HAVE_UNWRITE */
 		pagedir_unmap(addr, size);
-#endif /* !CONFIG_HAVE_PAGEDIR_UNWRITE */
+#endif /* !ARCH_PAGEDIR_HAVE_UNWRITE */
 		if (!(self->vn_flags & VM_NODE_FLAG_PREPARED))
 			pagedir_unprepare_map(addr, size);
 	} else {
@@ -3123,11 +3123,11 @@ NOTHROW(KCALL vm_node_update_write_access)(struct vm_node *__restrict self) {
 		}
 		/* By simply deleting the write-permission bit when it is set,
 		 * we can drastically reduce the number of required #PFs */
-#ifdef CONFIG_HAVE_PAGEDIR_UNWRITE
+#ifdef ARCH_PAGEDIR_HAVE_UNWRITE
 		pagedir_unwrite_p(pdir, addr, size);
-#else /* CONFIG_HAVE_PAGEDIR_UNWRITE */
+#else /* ARCH_PAGEDIR_HAVE_UNWRITE */
 		pagedir_unmap_p(pdir, addr, size);
-#endif /* !CONFIG_HAVE_PAGEDIR_UNWRITE */
+#endif /* !ARCH_PAGEDIR_HAVE_UNWRITE */
 		if (!(self->vn_flags & VM_NODE_FLAG_PREPARED))
 			pagedir_unprepare_map_p(pdir, addr, size);
 	}
@@ -3170,11 +3170,11 @@ NOTHROW(KCALL vm_node_update_write_access_locked_vm)(struct vm_node *__restrict 
 		}
 		/* By simply deleting the write-permission bit when it is set,
 		 * we can drastically reduce the number of required #PFs */
-#ifdef CONFIG_HAVE_PAGEDIR_UNWRITE
+#ifdef ARCH_PAGEDIR_HAVE_UNWRITE
 		pagedir_unwrite(addr, size);
-#else /* CONFIG_HAVE_PAGEDIR_UNWRITE */
+#else /* ARCH_PAGEDIR_HAVE_UNWRITE */
 		pagedir_unmap(addr, size);
-#endif /* !CONFIG_HAVE_PAGEDIR_UNWRITE */
+#endif /* !ARCH_PAGEDIR_HAVE_UNWRITE */
 		if (!(self->vn_flags & VM_NODE_FLAG_PREPARED))
 			pagedir_unprepare_map(addr, size);
 	} else {
@@ -3189,11 +3189,11 @@ NOTHROW(KCALL vm_node_update_write_access_locked_vm)(struct vm_node *__restrict 
 		}
 		/* By simply deleting the write-permission bit when it is set,
 		 * we can drastically reduce the number of required #PFs */
-#ifdef CONFIG_HAVE_PAGEDIR_UNWRITE
+#ifdef ARCH_PAGEDIR_HAVE_UNWRITE
 		pagedir_unwrite_p(pdir, addr, size);
-#else /* CONFIG_HAVE_PAGEDIR_UNWRITE */
+#else /* ARCH_PAGEDIR_HAVE_UNWRITE */
 		pagedir_unmap_p(pdir, addr, size);
-#endif /* !CONFIG_HAVE_PAGEDIR_UNWRITE */
+#endif /* !ARCH_PAGEDIR_HAVE_UNWRITE */
 		if (!(self->vn_flags & VM_NODE_FLAG_PREPARED))
 			pagedir_unprepare_map_p(pdir, addr, size);
 	}

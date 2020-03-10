@@ -1268,9 +1268,9 @@ dbg_pprintf(int x, int y, /*utf-8*/ char const *__restrict format, ...) {
 
 
 PRIVATE ATTR_DBGBSS pagedir_pushval_t vga_oldmapping[VGA_VRAM_SIZE / PAGESIZE];
-#ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 PRIVATE ATTR_DBGBSS bool vga_oldmapping_did_prepare = false;
-#endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 
 
 PRIVATE ATTR_DBGTEXT void NOTHROW(KCALL vga_map)(void) {
@@ -1279,7 +1279,7 @@ PRIVATE ATTR_DBGTEXT void NOTHROW(KCALL vga_map)(void) {
 		return;
 	vga_vram_offset         = VGA_VRAM_TEXT - VGA_VRAM_BASE;
 	vga_real_terminal_start = (u16 *)(KERNEL_CORE_BASE + VGA_VRAM_TEXT);
-#ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	if (pagedir_ismapped(vga_real_terminal_start) &&
 	    pagedir_translate(vga_real_terminal_start) == (vm_phys_t)VGA_VRAM_TEXT) {
 		vga_oldmapping_did_prepare = false;
@@ -1296,7 +1296,7 @@ PRIVATE ATTR_DBGTEXT void NOTHROW(KCALL vga_map)(void) {
 		printk(DBGSTR(KERN_CRIT "[dbg] Failed to find suitable location to map "
 		                        "VGA video memory. - This shouldn't happen\n"));
 	} else
-#endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	{
 		for (i = 0; i < COMPILER_LENOF(vga_oldmapping); ++i) {
 			pagedir_pushval_t oldword;
@@ -1313,11 +1313,11 @@ PRIVATE ATTR_DBGTEXT void NOTHROW(KCALL vga_unmap)(void) {
 	unsigned int i;
 	if (vga_real_terminal_start == NULL)
 		return;
-#ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	if (!vga_oldmapping_did_prepare)
 		return;
 	vga_oldmapping_did_prepare = false;
-#endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	for (i = 0; i < COMPILER_LENOF(vga_oldmapping); ++i) {
 		byte_t *addr = (byte_t *)vga_real_terminal_start + i * PAGESIZE;
 		pagedir_pop_mapone(addr, vga_oldmapping[i]);
@@ -1494,7 +1494,7 @@ NOTHROW(KCALL vga_vram)(u32 vram_offset) {
 	vram_offset = vram_offset & ~PAGEMASK;
 	if (vga_vram_offset != vram_offset) {
 		byte_t *addr;
-#ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 		if (!vga_oldmapping_did_prepare) {
 			byte_t *result;
 			result = (byte_t *)(KERNEL_CORE_BASE + VGA_VRAM_BASE + vram_offset);
@@ -1506,7 +1506,7 @@ NOTHROW(KCALL vga_vram)(u32 vram_offset) {
 			printk(DBGSTR(KERN_CRIT "[dbg] Video memory not prepared, and not "
 			                        "identity-mapped. This will probably go wrong...\n"));
 		}
-#endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 		addr = (byte_t *)((uintptr_t)vga_real_terminal_start & ~PAGEMASK);
 		pagedir_map(addr, PAGESIZE,
 		            (vm_phys_t)VGA_VRAM_BASE + vram_offset,

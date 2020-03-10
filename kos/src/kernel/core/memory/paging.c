@@ -85,7 +85,7 @@ NOTHROW(KCALL pagedir_unmapone_p)(PAGEDIR_P_SELFTYPE self,
 	PAGEDIR_P_ENDUSE(self);
 }
 
-#ifdef CONFIG_HAVE_PAGEDIR_UNWRITE
+#ifdef ARCH_PAGEDIR_HAVE_UNWRITE
 PUBLIC NOBLOCK ATTR_WEAK ATTR_SECTION(".text.kernel.pagedir_p.pagedir_unwriteone_p") void
 NOTHROW(KCALL pagedir_unwriteone_p)(PAGEDIR_P_SELFTYPE self,
                                     PAGEDIR_PAGEALIGNED VIRT void *addr) {
@@ -94,7 +94,7 @@ NOTHROW(KCALL pagedir_unwriteone_p)(PAGEDIR_P_SELFTYPE self,
 	}
 	PAGEDIR_P_ENDUSE(self);
 }
-#endif /* CONFIG_HAVE_PAGEDIR_UNWRITE */
+#endif /* ARCH_PAGEDIR_HAVE_UNWRITE */
 
 PUBLIC NOBLOCK ATTR_WEAK ATTR_SECTION(".text.kernel.pagedir_p.pagedir_prepare_map_p") WUNUSED bool
 NOTHROW(KCALL pagedir_prepare_map_p)(PAGEDIR_P_SELFTYPE self,
@@ -163,7 +163,7 @@ NOTHROW(KCALL pagedir_unmap_p)(PAGEDIR_P_SELFTYPE self,
 	PAGEDIR_P_ENDUSE(self);
 }
 
-#ifdef CONFIG_HAVE_PAGEDIR_UNWRITE
+#ifdef ARCH_PAGEDIR_HAVE_UNWRITE
 PUBLIC NOBLOCK ATTR_WEAK ATTR_SECTION(".text.kernel.pagedir_p.pagedir_unwrite_p") void
 NOTHROW(KCALL pagedir_unwrite_p)(PAGEDIR_P_SELFTYPE self,
                                  PAGEDIR_PAGEALIGNED VIRT void *addr,
@@ -173,7 +173,7 @@ NOTHROW(KCALL pagedir_unwrite_p)(PAGEDIR_P_SELFTYPE self,
 	}
 	PAGEDIR_P_ENDUSE(self);
 }
-#endif /* CONFIG_HAVE_PAGEDIR_UNWRITE */
+#endif /* ARCH_PAGEDIR_HAVE_UNWRITE */
 
 PUBLIC NOBLOCK ATTR_WEAK ATTR_SECTION(".text.kernel.pagedir_p.pagedir_ismapped_p") WUNUSED bool
 NOTHROW(KCALL pagedir_ismapped_p)(PAGEDIR_P_SELFTYPE self,
@@ -208,7 +208,7 @@ NOTHROW(KCALL pagedir_isuseraccessible_p)(PAGEDIR_P_SELFTYPE self,
 	return result;
 }
 
-#ifdef CONFIG_HAVE_PAGEDIR_CHANGED
+#ifdef ARCH_PAGEDIR_HAVE_CHANGED
 PUBLIC NOBLOCK ATTR_WEAK ATTR_SECTION(".text.kernel.pagedir_p.pagedir_haschanged_p") WUNUSED bool
 NOTHROW(KCALL pagedir_haschanged_p)(PAGEDIR_P_SELFTYPE self,
                                     VIRT void *addr) {
@@ -228,7 +228,7 @@ NOTHROW(KCALL pagedir_unsetchanged_p)(PAGEDIR_P_SELFTYPE self,
 	}
 	PAGEDIR_P_ENDUSE(self);
 }
-#endif /* CONFIG_HAVE_PAGEDIR_CHANGED */
+#endif /* ARCH_PAGEDIR_HAVE_CHANGED */
 
 PUBLIC NOBLOCK ATTR_WEAK ATTR_SECTION(".text.kernel.pagedir_p.pagedir_unmap_userspace_p") void
 NOTHROW(KCALL pagedir_unmap_userspace_p)(PAGEDIR_P_SELFTYPE self,

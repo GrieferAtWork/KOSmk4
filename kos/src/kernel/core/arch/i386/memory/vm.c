@@ -347,12 +347,12 @@ NOTHROW(KCALL simple_insert_and_activate)(struct vm_node *__restrict node,
 	part = node->vn_part;
 	assert(vm_node_getsize(node) == vm_datapart_numbytes(part));
 	addr = vm_node_getstart(node);
-#ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	if (!pagedir_prepare_map(addr, part->dp_ramdata.rd_block0.rb_size * PAGESIZE)) {
 		kernel_panic(FREESTR("Failed to prepare kernel mapping at %p...%p\n"),
 		             vm_node_getmin(node), vm_node_getmax(node));
 	}
-#endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	pagedir_map(addr, part->dp_ramdata.rd_block0.rb_size * PAGESIZE,
 	            page2addr(part->dp_ramdata.rd_block0.rb_start), prot);
 	assertf(part->dp_ramdata.rd_blockv == &part->dp_ramdata.rd_block0,
@@ -383,15 +383,15 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_kernel_vm)(void) {
 #endif /* X86_VM_KERNEL_PDIR_RESERVED_BASE_IS_RUNTIME_VALUE */
 
 	/* Unmap everything before the kernel. */
-#ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	if (pagedir_prepare_map((void *)KERNEL_CORE_BASE, (uintptr_t)__kernel_text_start - KERNEL_CORE_BASE))
-#endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	{
 		pagedir_unmap((void *)KERNEL_CORE_BASE,
 		              (uintptr_t)__kernel_text_start - KERNEL_CORE_BASE);
-#ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 		pagedir_unprepare_map((void *)KERNEL_CORE_BASE, (uintptr_t)__kernel_text_start - KERNEL_CORE_BASE);
-#endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	}
 	assert(kernel_vm_node_pagedata.vn_node.a_vmin != 0);
 
@@ -479,14 +479,14 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_kernel_vm)(void) {
 			pagedata_next_min = vm_node_getstart(iter);
 #endif /* !__x86_64__ */
 			num_bytes = (size_t)((byte_t *)pagedata_next_min - (byte_t *)pagedata_prev_end);
-#ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 			if (pagedir_prepare_map(pagedata_prev_end, num_bytes)) {
 				pagedir_unmap(pagedata_prev_end, num_bytes);
 				pagedir_unprepare_map(pagedata_prev_end, num_bytes);
 			}
-#else /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+#else /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 			pagedir_unmap(pagedata_prev_end, num_bytes);
-#endif /* !CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+#endif /* !ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 #ifdef __x86_64__
 			if (!iter)
 				break;
@@ -528,15 +528,15 @@ NOTHROW(KCALL x86_initialize_kernel_vm_readonly)(void) {
 #endif /* !X86_KERNEL_VMMAPPING_CORE_BSS */
 
 	/* Get rid of the page guarding the end of the boot-task stack. */
-#ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	if (pagedir_prepare_mapone(__kernel_boottask_stack_guard))
-#endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	{
 		pagedir_unmapone(__kernel_boottask_stack_guard);
 	}
-#ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	if (pagedir_prepare_mapone(__kernel_asyncwork_stack_guard))
-#endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	{
 		pagedir_unmapone(__kernel_asyncwork_stack_guard);
 	}
@@ -566,14 +566,14 @@ void KCALL x86_kernel_unload_free_and_jump_to_userspace(void) {
 	/* Unmap the entire .free section (in the kernel page directory)
 	 * NOTE: Make sure not to unmap the first couple of pages which
 	 *       are now used by the relocated BRK data. */
-#ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	if (pagedir_prepare_map(__kernel_free_start, (size_t)__kernel_free_size))
-#endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	{
 		pagedir_unmap(__kernel_free_start, (size_t)__kernel_free_size);
-#ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 		pagedir_unprepare_map(__kernel_free_start, (size_t)__kernel_free_size);
-#endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	}
 
 	/* Release all pages of the .free section, as well as those

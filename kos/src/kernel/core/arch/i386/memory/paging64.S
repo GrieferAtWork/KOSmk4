@@ -106,7 +106,7 @@ END(x86_pagedir_syncall_maybe_global)
 .section .text
 PUBLIC_FUNCTION(pagedir_sync)
 	.cfi_startproc
-	cmpq   $(CONFIG_PAGEDIR_LARGESYNC_THRESHOLD * 4096), %rsi
+	cmpq   $(ARCH_PAGEDIR_LARGESYNC_THRESHOLD), %rsi
 	jae8   x86_pagedir_syncall_maybe_global
 	shrq   $(12), %rsi
 	testq  %rsi, %rsi

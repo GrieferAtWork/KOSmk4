@@ -38,16 +38,16 @@
  * to allow them to be share across all page-directories), page directory
  * mappings within kernel space itself do not require and sort of
  * preparations being made. */
-#undef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-//#define CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE 1
+#undef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+//#define ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE 1
 
 /* x86 implements the `pagedir_(has|unset)changed' API. */
-#undef CONFIG_HAVE_PAGEDIR_CHANGED
-#define CONFIG_HAVE_PAGEDIR_CHANGED 1
+#undef ARCH_PAGEDIR_HAVE_CHANGED
+#define ARCH_PAGEDIR_HAVE_CHANGED 1
 
 /* x86 implements the `pagedir_unwrite' API (delete low-level write permissions). */
-#undef CONFIG_HAVE_PAGEDIR_UNWRITE
-#define CONFIG_HAVE_PAGEDIR_UNWRITE 1
+#undef ARCH_PAGEDIR_HAVE_UNWRITE
+#define ARCH_PAGEDIR_HAVE_UNWRITE 1
 
 #if defined(CONFIG_NO_PAGING_PAE) && defined(CONFIG_NO_PAGING_P32)
 #error "You can't disable PAE and P32 paging! - I need at least either to work properly!"
@@ -57,11 +57,11 @@
 
 DECL_BEGIN
 
-#undef CONFIG_PAGEDIR_INIT_NEED_PHYS_SELF
-#define CONFIG_PAGEDIR_INIT_NEED_PHYS_SELF 1
-#undef CONFIG_PAGEDIR_FINI_NEED_PHYS_SELF
-#undef CONFIG_PAGEDIR_INIT_IS_NOEXCEPT
-#define CONFIG_PAGEDIR_INIT_IS_NOEXCEPT 1
+#undef ARCH_PAGEDIR_INIT_NEED_PHYS_SELF
+#define ARCH_PAGEDIR_INIT_NEED_PHYS_SELF 1
+#undef ARCH_PAGEDIR_FINI_NEED_PHYS_SELF
+#undef ARCH_PAGEDIR_INIT_IS_NOEXCEPT
+#define ARCH_PAGEDIR_INIT_IS_NOEXCEPT 1
 
 #define X86_PAGEDIR_USES_PAE()  0
 #define X86_PAGEDIR_USES_P32()  1
@@ -87,10 +87,10 @@ DECL_END
 
 DECL_BEGIN
 
-#undef CONFIG_PAGEDIR_INIT_NEED_PHYS_SELF
-#undef CONFIG_PAGEDIR_FINI_NEED_PHYS_SELF
-#define CONFIG_PAGEDIR_FINI_NEED_PHYS_SELF 1
-#undef CONFIG_PAGEDIR_INIT_IS_NOEXCEPT
+#undef ARCH_PAGEDIR_INIT_NEED_PHYS_SELF
+#undef ARCH_PAGEDIR_FINI_NEED_PHYS_SELF
+#define ARCH_PAGEDIR_FINI_NEED_PHYS_SELF 1
+#undef ARCH_PAGEDIR_INIT_IS_NOEXCEPT
 
 #define X86_PAGEDIR_USES_PAE()  1
 #define X86_PAGEDIR_USES_P32()  0
@@ -124,11 +124,11 @@ DECL_END
 
 DECL_BEGIN
 
-#undef CONFIG_PAGEDIR_INIT_NEED_PHYS_SELF
-#define CONFIG_PAGEDIR_INIT_NEED_PHYS_SELF 1 /* Needed by P32 (`p32_pagedir_init') */
-#undef CONFIG_PAGEDIR_FINI_NEED_PHYS_SELF
-#define CONFIG_PAGEDIR_FINI_NEED_PHYS_SELF 1 /* Needed by PAE (`pae_pagedir_fini') */
-#undef CONFIG_PAGEDIR_INIT_IS_NOEXCEPT /* `pae_pagedir_init()' may throw `E_BADALLOC' (but `p32_pagedir_init()' is noexcept) */
+#undef ARCH_PAGEDIR_INIT_NEED_PHYS_SELF
+#define ARCH_PAGEDIR_INIT_NEED_PHYS_SELF 1 /* Needed by P32 (`p32_pagedir_init') */
+#undef ARCH_PAGEDIR_FINI_NEED_PHYS_SELF
+#define ARCH_PAGEDIR_FINI_NEED_PHYS_SELF 1 /* Needed by PAE (`pae_pagedir_fini') */
+#undef ARCH_PAGEDIR_INIT_IS_NOEXCEPT /* `pae_pagedir_init()' may throw `E_BADALLOC' (but `p32_pagedir_init()' is noexcept) */
 
 
 #define X86_PAGEDIR_USES_PAE()    (x86_bootcpu_cpuid.ci_1d & CPUID_1D_PAE)
@@ -203,12 +203,12 @@ typedef union {
 /* x86 uses a 32-/64-bit pointer for `cr3', meaning that physical memory
  * which may exist outside of the address space also addressable without
  * paging enabled cannot be used as a page directory pointer. */
-#undef CONFIG_PAGEDIR_GETSET_USES_POINTER
-#define CONFIG_PAGEDIR_GETSET_USES_POINTER 1
+#undef ARCH_PAGEDIR_GETSET_USES_POINTER
+#define ARCH_PAGEDIR_GETSET_USES_POINTER 1
 
 
-#undef CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_GETSET
-#define CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_GETSET 1
+#undef ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_GETSET
+#define ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_GETSET 1
 #ifdef __CC__
 /* Low-level Get/Set the physical address of the currently active page directory. */
 FORCELOCAL NOBLOCK ATTR_PURE WUNUSED PHYS pagedir_t *
@@ -231,25 +231,20 @@ NOTHROW(KCALL pagedir_set)(PHYS pagedir_t *__restrict value) {
 #endif /* __CC__ */
 
 
-/* When more than `CONFIG_PAGEDIR_LARGESYNC_THRESHOLD' need to be synced, rather
+/* When more than `ARCH_PAGEDIR_LARGESYNC_THRESHOLD' need to be synced, rather
  * than performing that number of single-page TLB invalidations, invalidate
  * everything instead. */
-#ifndef CONFIG_PAGEDIR_LARGESYNC_THRESHOLD
-#define CONFIG_PAGEDIR_LARGESYNC_THRESHOLD 256 /* TODO: REMOVE ME */
-#endif /* !CONFIG_PAGEDIR_LARGESYNC_THRESHOLD */
-
-/* TODO: Rename me to `CONFIG_PAGEDIR_LARGESYNC_THRESHOLD' */
-#ifndef CONFIG_NPAGEDIR_LARGESYNC_THRESHOLD
-#define CONFIG_NPAGEDIR_LARGESYNC_THRESHOLD 0x100000 /* 256 pages */
-#endif /* !CONFIG_NPAGEDIR_LARGESYNC_THRESHOLD */
+#ifndef ARCH_PAGEDIR_LARGESYNC_THRESHOLD
+#define ARCH_PAGEDIR_LARGESYNC_THRESHOLD 0x100000 /* 256 pages */
+#endif /* !ARCH_PAGEDIR_LARGESYNC_THRESHOLD */
 
 
-#undef CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_SYNCALL
-#undef CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_SYNCONE
-#undef CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_SYNC
-#define CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_SYNCALL 1
-#define CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_SYNCONE 1
-#define CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_SYNC 1
+#undef ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_SYNCALL
+#undef ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_SYNCONE
+#undef ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_SYNC
+#define ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_SYNCALL 1
+#define ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_SYNCONE 1
+#define ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_SYNC 1
 
 
 #ifndef __pagedir_pushval_t_defined
@@ -330,7 +325,7 @@ NOTHROW(FCALL pagedir_sync)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 			pagedir_syncall();
 			return;
 		}
-		if (num_bytes >= CONFIG_NPAGEDIR_LARGESYNC_THRESHOLD) {
+		if (num_bytes >= ARCH_PAGEDIR_LARGESYNC_THRESHOLD) {
 			x86_pagedir_syncall_maybe_global(addr, num_bytes);
 			return;
 		}
