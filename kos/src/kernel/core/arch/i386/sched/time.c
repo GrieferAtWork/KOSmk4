@@ -119,7 +119,7 @@ PRIVATE time_t const time_monthstart_yday[2][13] = {
 	time_monthstart_yday[!!(leap_year)][month]
 
 
-LOCAL NOBLOCK WUNUSED time_t
+LOCAL NOBLOCK NOPREEMPT WUNUSED time_t
 NOTHROW(KCALL cmos_unix_time)(void) {
 	u8 cmos_second, cmos_minute, cmos_hour, temp;
 	u8 cmos_day, cmos_month, cmos_year, cmos_cent;
@@ -212,7 +212,7 @@ got_time:
 
 
 
-PRIVATE NOBLOCK WUNUSED struct timespec
+PRIVATE NOBLOCK NOPREEMPT WUNUSED struct timespec
 NOTHROW(KCALL cmos_gettime)(struct realtime_clock_struct *__restrict UNUSED(self)) {
 	struct timespec result;
 	result.tv_sec  = cmos_unix_time();

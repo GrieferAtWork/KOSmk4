@@ -41,12 +41,13 @@ struct realtime_clock_struct {
 	struct timespec    rc_precision; /* [const] Clock precision. */
 	/* [1..1] Get the current realtime.
 	 * NOTE: This function is only ever called with preemption disabled! */
-	NOBLOCK WUNUSED struct timespec
+	NOPREEMPT NOBLOCK WUNUSED struct timespec
 	/*NOTHROW*/(KCALL *rc_gettime)(struct realtime_clock_struct *__restrict self);
 	/* [0..1] Set the current realtime.
 	 * NOTE: This function is only ever called with preemption disabled! */
-	void (KCALL *rc_settime)(struct realtime_clock_struct *__restrict self,
-	                         struct timespec const *__restrict abs_time);
+	NOPREEMPT void
+	(KCALL *rc_settime)(struct realtime_clock_struct *__restrict self,
+	                    struct timespec const *__restrict abs_time);
 	/* [0..1] Wait until the given time has been reached (using the realtime clock
 	 *        hardware to generate an interrupt), but return earlier if a sporadic
 	 *        interrupt happens before then.
