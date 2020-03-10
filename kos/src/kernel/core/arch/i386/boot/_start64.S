@@ -438,6 +438,8 @@ INTERN_FUNCTION(_start)
 	movl   $(__kernel_pervm_size), %ecx
 	rep;   movsb
 
+	/* Set the DIDINIT flag for the boot cpu's feature table. */
+	orl    $(CPU_FEATURE_FDIDINIT), V2P(x86_bootcpu_cpufeatures)
 
 	/* Check if CPUID is supported. */
 	pushfl
@@ -731,18 +733,18 @@ INTERN_FUNCTION(_start)
 	.align 8
 	PRIVATE_OBJECT(enterlong_gdt)
 #define DEFINE_SEGMENT_DESCRIPTOR(TYPE, args) \
-		.long  SEGMENT_##TYPE##_INIT_UL args; \
-		.long  SEGMENT_##TYPE##_INIT_UH args;
+		.int SEGMENT_##TYPE##_INIT_UL args;   \
+		.int SEGMENT_##TYPE##_INIT_UH args;
 		DEFINE_SEGMENT_DESCRIPTOR(DESCRIPTOR, (0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
-		DEFINE_SEGMENT_DESCRIPTOR(DESCRIPTOR, (0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_CODE_EXRD, 1, 0, 1, 0, /*L*/ 1, 0, 0))
-		DEFINE_SEGMENT_DESCRIPTOR(DESCRIPTOR, (0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_DATA_RDWR, 1, 0, 1, 0, /*L*/ 1, 0, 0))
+		DEFINE_SEGMENT_DESCRIPTOR(DESCRIPTOR, (0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_CODE_EXRD, 1, 0, 1, 0, /*L*/ 1, 0, 1))
+		DEFINE_SEGMENT_DESCRIPTOR(DESCRIPTOR, (0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_DATA_RDWR, 1, 0, 1, 0, /*L*/ 1, 0, 1))
 #undef DEFINE_SEGMENT_DESCRIPTOR
 	.Lenterlong_gdt_end = .
 	END(enterlong_gdt)
 	.align 2
 	PRIVATE_OBJECT(enterlong_gdt_pointer)
 		.word (.Lenterlong_gdt_end - enterlong_gdt) - 1
-		.long  SYM(enterlong_gdt)
+		.int  SYM(enterlong_gdt)
 	END(enterlong_gdt_pointer)
 	.popsection
 
@@ -750,15 +752,15 @@ INTERN_FUNCTION(_start)
 	lgdtl  SYM(enterlong_gdt_pointer)
 
 	/* Load 64-bit segment registers. */
-	movw   $(SEGMENT_KERNEL_DATA), %ax /* DATA */
+	movw   $(0x10), %ax /* DATA */
 	movw   %ax, %ds
-	movw   %ax, %es
-	movw   %ax, %fs
-	movw   %ax, %gs
-	movw   %ax, %ss
+/*	movw   %ax, %es */ /* Not needed */
+/*	movw   %ax, %fs */ /* Not needed */
+/*	movw   %ax, %gs */ /* Not needed */
+/*	movw   %ax, %ss */ /* Not needed */
 
 	/* And finally, jump into 64-bit mode! */
-	ljmpl  $(SEGMENT_KERNEL_CODE), $(SYM(_start64))
+	ljmpl  $(0x08), $(SYM(_start64))
 END(_start)
 
 

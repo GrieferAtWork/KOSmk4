@@ -25,9 +25,10 @@
 
 DECL_BEGIN
 
-#define CPU_FEATURE_FNONE  0x0000
-#define CPU_FEATURE_FCPUID 0x0001 /* The `cpuid' instruction is supported. */
-#define CPU_FEATURE_FI486  0x0001 /* The cpu is an i486. */
+#define CPU_FEATURE_FNONE    0x0000
+#define CPU_FEATURE_FCPUID   0x0001 /* The `cpuid' instruction is supported. */
+#define CPU_FEATURE_FI486    0x0001 /* The cpu is an i486. */
+#define CPU_FEATURE_FDIDINIT 0x8000 /* Features have been initialized. */
 
 
 

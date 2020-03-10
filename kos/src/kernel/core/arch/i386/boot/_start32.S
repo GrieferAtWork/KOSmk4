@@ -197,6 +197,8 @@ INTERN_FUNCTION(_start)
 	movl   $(__kernel_pervm_size), %ecx
 	rep;   movsb
 
+	/* Set the DIDINIT flag for the boot cpu's feature table. */
+	orl    $(CPU_FEATURE_FDIDINIT), V2P(x86_bootcpu_cpufeatures)
 
 	/* Check if CPUID is supported. */
 	pushfl

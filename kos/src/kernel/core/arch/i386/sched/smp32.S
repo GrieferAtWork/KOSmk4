@@ -290,139 +290,28 @@ INTERN_CONST(x86_smp_entry_size, . - x86_smp_entry)
 END(x86_smp_entry)
 .code32
 
-.section .pdata
-INTERN_FUNCTION(x86_smp_entry32)
-	/* 32-bit entry point */
-	movw   $(0x10), %sp /* x86_smp_gdt_pointer_base[2] */
-	movw   %sp, %ds
-	movw   %sp, %es
-	movw   %sp, %ss
 
-	/* Configure extended paging features.
-	 * This has to be done before we can load `pagedir_kernel', as features such
-	 * as PAE, or even just use of the GLOBAL bit would otherwise cause #PFs because
-	 * the CPU would claim that reserved bits were set, or who-know-what in the case
-	 * of the PAE page table really just being a completely different structure than
-	 * the P32 page table.
-	 * XXX: This assumes that all CPUs have the same feature-set as the boot cpu... */
-	movl   %cr4, %esp
-#ifndef CONFIG_NO_PAGING_PAE
-	/* Enable PAE support (if necessary for setting the page directory) */
-#ifndef CONFIG_NO_PAGING_P32
-	EXTERN(x86_bootcpu_cpuid)
-	testl  $(CPUID_1D_PAE), ((x86_bootcpu_cpuid - KERNEL_CORE_BASE) + OFFSET_CPUID_1D)
-	jz     1f
-#endif /* !CONFIG_NO_PAGING_P32 */
-	orl    $(CR4_PAE), %esp
-	/* Enable NX support (if necessary for setting the page directory) */
-	EXTERN(x86_bootcpu_cpuid)
-	testl  $(CPUID_80000001D_NX), ((x86_bootcpu_cpuid - KERNEL_CORE_BASE) + OFFSET_CPUID_80000001D)
-	jz     1f
-	movl   $(IA32_EFER), %ecx
-	rdmsr
-	orl    $(IA32_EFER_NXE), %eax
-	wrmsr
-	/* With PAE + NX, try to enable its effects while
-	 * in kernel-space (if supported by the CPU) */
-	testl  $(CPUID_7B_SMEP), (x86_bootcpu_cpuid + OFFSET_CPUID_7B)
-	jz     1f
-	orl    $(CR4_SMEP), %esp
-1:
-#endif /* !CONFIG_NO_PAGING_PAE */
-	/* Enable PGE support (if necessary for setting the page directory) */
-	testl  $(CPUID_1D_PGE), ((x86_bootcpu_cpuid - KERNEL_CORE_BASE) + OFFSET_CPUID_1D)
-	jz     1f
-	orl    $(CR4_PGE), %esp
-1:	movl   %esp, %cr4
-
-
-	/* Enable paging.
-	 * NOTE: This is why this part must appear in the .pdata section.
-	 *       Because we still are in physical memory, we must enable
-	 *       paging in a context where the page directory we're enabling
-	 *       has our current location mapped to ourself.
-	 *       Later then, we'll jump into true virtual memory, but for
-	 *       now, our actual PC is offset by `KERNEL_CORE_BASE' */
-	movl   $(pagedir_kernel_phys), %esp
-	movl   %esp, %cr3
-	movl   %cr0, %esp
-	orl    $(CR0_PG), %esp
-	movl   %esp, %cr0
-
-	/* Figure out who we actually are by looking at our LAPIC id. */
-	EXTERN(x86_lapicbase)
-	movl   x86_lapicbase, %esp
-	movl   APIC_ID(%esp), %esp
-	shrl   $(APIC_ID_FSHIFT), %esp
 
 #define R_CPU   %ebp
 #define R_TASK  %edi
 
-	/* Find the CPU how's APIC_ID matches `%sp' (and that'll be us then) */
-	EXTERN(cpu_count)
-	movl   cpu_count, %ecx
-	decl   %ecx
-	EXTERN(cpu_vector)
-1:	movl   cpu_vector(,%ecx,4), R_CPU
-	EXTERN(thiscpu_x86_lapicid)
-	movzbw thiscpu_x86_lapicid(R_CPU), %dx
-	cmpw   %dx, %sp
-	je     1f
-	loop   1b
-	jmp    .Lx86_smp_kill
-1:
-	/* Change CPU state to indicate that we're going to initialize! */
-	EXTERN(thiscpu_state)
-	movl   $(CPU_STATE_RUNNING), thiscpu_state(R_CPU)
-	EXTERN(cpu_online_count)
-	lock;  incl cpu_online_count
 
-	/* Found our CPU (now stored in R_CPU) */
-	EXTERN(thiscpu_current)
-	movl   thiscpu_current(R_CPU),  R_TASK /* TARGET task. */
-	EXTERN(this_sched_state)
-	movl   this_sched_state(R_TASK), %esp   /* stack */
+.section .pdata
 
-	/* Load the GDT of our new CPU */
-	EXTERN(thiscpu_x86_gdt)
-	leal   thiscpu_x86_gdt(R_CPU), %ecx
-	pushl  %ecx
-	pushw  $((SEGMENT_COUNT * SIZEOF_SEGMENT_DESCRIPTOR) - 1)
-	lgdt   (%esp)
-	addl   $(6), %esp
-
-	/* Load the Task register. */
-	/* SEGMENTS[SEGMENT_CPU_TSS].busy = 0;  // Required for `ltr' */
-	andb   $(0b11111101), thiscpu_x86_gdt + SEGMENT_CPU_TSS + 5(R_CPU)
-	movw   $(SEGMENT_CPU_TSS), %cx
-	ltrw   %cx
-
-	/* Load the local descriptor table. */
-	movw   $(SEGMENT_CPU_LDT), %cx
-	lldtw  %cx
-
-	/* Load basic segments. */
-	movw   $(SEGMENT_USER_DATA), %cx
-	movw   %cx, %ds
-	movw   %cx, %es
-	movw   $(SEGMENT_KERNEL_DATA), %cx
-	movw   %cx, %ss
-	/* NOTE: This also does the jump from physical into virtual memory! */
-	ljmp   $(SEGMENT_KERNEL_CODE), $(1f)
-1:
-
-	/* Load the interrupt descriptor table. */
-	EXTERN(x86_idt_ptr)
-	lidtl  x86_idt_ptr
-
-	/* ============== Configure cpuid features ============== */
-	/* R_CPU:  THIS_CPU
-	 * R_TASK: THIS_TASK */
-
+/* Initialize the cpuid feature table of the calling CPU
+ * IN:
+ *     R_CPU: THIS_CPU
+ * OUT:
+ *     %rip:  set to `.Ldone_init_cpuid'
+ * CLOBBER:
+ *     %eax
+ *     %ecx
+ *     %edx
+ *     %ebx
+ */
+PRIVATE_FUNCTION(x86_smp_init_cpuid)
+	movw   $(CPU_FEATURE_FDIDINIT), thiscpu_x86_cpufeatures(R_CPU)
 	/* Clear out our CPUID features table. */
-	EXTERN(thiscpu_x86_cpufeatures)
-	movw   $(CPU_FEATURE_FNONE), thiscpu_x86_cpufeatures(R_CPU)
-
 	pushl  %edi
 	leal   thiscpu_x86_cpuid(R_CPU), %edi
 	xorl   %eax, %eax
@@ -445,7 +334,7 @@ INTERN_FUNCTION(x86_smp_entry32)
 	xorl   0(%esp), %eax
 	popfl
 	andl   $(EFLAGS_ID), %eax
-	jz     .Ldone_cpuid
+	jz     .Ldone_init_cpuid
 
 	/* The `cpuid' instruction is available. */
 	orw    $(CPU_FEATURE_FCPUID), thiscpu_x86_cpufeatures(R_CPU)
@@ -530,7 +419,140 @@ INTERN_FUNCTION(x86_smp_entry32)
 	movl   %edx, thiscpu_x86_cpuid + OFFSET_CPUID_80000002D(R_CPU)
 3:  /* ci_80000000a < 0x80000004 */
 2:  /* ci_80000000a < 0x80000001 */
-.Ldone_cpuid:
+	jmp    .Ldone_init_cpuid
+END(x86_smp_init_cpuid)
+
+
+INTERN_FUNCTION(x86_smp_entry32)
+	/* 32-bit entry point */
+	movw   $(0x10), %sp /* x86_smp_gdt_pointer_base[2] */
+	movw   %sp, %ds
+	movw   %sp, %es
+	movw   %sp, %ss
+
+	/* Configure extended paging features.
+	 * This has to be done before we can load `pagedir_kernel', as features such
+	 * as PAE, or even just use of the GLOBAL bit would otherwise cause #PFs because
+	 * the CPU would claim that reserved bits were set, or who-know-what in the case
+	 * of the PAE page table really just being a completely different structure than
+	 * the P32 page table.
+	 * XXX: This assumes that all CPUs have the same feature-set as the boot cpu... */
+	movl   %cr4, %esp
+#ifndef CONFIG_NO_PAGING_PAE
+	/* Enable PAE support (if necessary for setting the page directory) */
+#ifndef CONFIG_NO_PAGING_P32
+	EXTERN(x86_bootcpu_cpuid)
+	testl  $(CPUID_1D_PAE), ((x86_bootcpu_cpuid - KERNEL_CORE_BASE) + OFFSET_CPUID_1D)
+	jz     1f
+#endif /* !CONFIG_NO_PAGING_P32 */
+	orl    $(CR4_PAE), %esp
+	/* Enable NX support (if necessary for setting the page directory) */
+	EXTERN(x86_bootcpu_cpuid)
+	testl  $(CPUID_80000001D_NX), ((x86_bootcpu_cpuid - KERNEL_CORE_BASE) + OFFSET_CPUID_80000001D)
+	jz     1f
+	movl   $(IA32_EFER), %ecx
+	rdmsr
+	orl    $(IA32_EFER_NXE), %eax
+	wrmsr
+	/* With PAE + NX, try to enable its effects while
+	 * in kernel-space (if supported by the CPU) */
+	testl  $(CPUID_7B_SMEP), (x86_bootcpu_cpuid + OFFSET_CPUID_7B)
+	jz     1f
+	orl    $(CR4_SMEP), %esp
+1:
+#endif /* !CONFIG_NO_PAGING_PAE */
+	/* Enable PGE support (if necessary for setting the page directory) */
+	testl  $(CPUID_1D_PGE), ((x86_bootcpu_cpuid - KERNEL_CORE_BASE) + OFFSET_CPUID_1D)
+	jz     1f
+	orl    $(CR4_PGE), %esp
+1:	movl   %esp, %cr4
+
+
+	/* Enable paging.
+	 * NOTE: This is why this part must appear in the .pdata section.
+	 *       Because we still are in physical memory, we must enable
+	 *       paging in a context where the page directory we're enabling
+	 *       has our current location mapped to ourself.
+	 *       Later then, we'll jump into true virtual memory, but for
+	 *       now, our actual PC is offset by `KERNEL_CORE_BASE' */
+	movl   $(pagedir_kernel_phys), %esp
+	movl   %esp, %cr3
+	movl   %cr0, %esp
+	orl    $(CR0_PG), %esp
+	movl   %esp, %cr0
+
+	/* Figure out who we actually are by looking at our LAPIC id. */
+	EXTERN(x86_lapicbase)
+	movl   x86_lapicbase, %esp
+	movl   APIC_ID(%esp), %esp
+	shrl   $(APIC_ID_FSHIFT), %esp
+
+	/* Find the CPU how's APIC_ID matches `%sp' (and that'll be us then) */
+	EXTERN(cpu_count)
+	movl   cpu_count, %ecx
+	decl   %ecx
+	EXTERN(cpu_vector)
+1:	movl   cpu_vector(,%ecx,4), R_CPU
+	EXTERN(thiscpu_x86_lapicid)
+	movzbw thiscpu_x86_lapicid(R_CPU), %dx
+	cmpw   %dx, %sp
+	je     1f
+	loop   1b
+	jmp    .Lx86_smp_kill
+1:
+	/* Change CPU state to indicate that we're going to initialize! */
+	EXTERN(thiscpu_state)
+	movl   $(CPU_STATE_RUNNING), thiscpu_state(R_CPU)
+	EXTERN(cpu_online_count)
+	lock;  incl cpu_online_count
+
+	/* Found our CPU (now stored in R_CPU) */
+	EXTERN(thiscpu_current)
+	movl   thiscpu_current(R_CPU),  R_TASK /* TARGET task. */
+	EXTERN(this_sched_state)
+	movl   this_sched_state(R_TASK), %esp   /* stack */
+
+	/* Load the GDT of our new CPU */
+	EXTERN(thiscpu_x86_gdt)
+	leal   thiscpu_x86_gdt(R_CPU), %ecx
+	pushl  %ecx
+	pushw  $((SEGMENT_COUNT * SIZEOF_SEGMENT_DESCRIPTOR) - 1)
+	lgdt   (%esp)
+	addl   $(6), %esp
+
+	/* Load the Task register. */
+	/* SEGMENTS[SEGMENT_CPU_TSS].busy = 0;  // Required for `ltr' */
+	andb   $(0b11111101), thiscpu_x86_gdt + SEGMENT_CPU_TSS + 5(R_CPU)
+	movw   $(SEGMENT_CPU_TSS), %cx
+	ltrw   %cx
+
+	/* Load the local descriptor table. */
+	movw   $(SEGMENT_CPU_LDT), %cx
+	lldtw  %cx
+
+	/* Load basic segments. */
+	movw   $(SEGMENT_USER_DATA), %cx
+	movw   %cx, %ds
+	movw   %cx, %es
+	movw   $(SEGMENT_KERNEL_DATA), %cx
+	movw   %cx, %ss
+	/* NOTE: This also does the jump from physical into virtual memory! */
+	ljmp   $(SEGMENT_KERNEL_CODE), $(1f)
+1:
+
+	/* Load the interrupt descriptor table. */
+	EXTERN(x86_idt_ptr)
+	lidtl  x86_idt_ptr
+
+	/* ============== Configure cpuid features ============== */
+	/* R_CPU:  THIS_CPU
+	 * R_TASK: THIS_TASK */
+
+	/* Check if we've already filled in our CPUID features table. */
+	EXTERN(thiscpu_x86_cpufeatures)
+	testw  $(CPU_FEATURE_FDIDINIT), thiscpu_x86_cpufeatures(R_CPU)
+	jz     x86_smp_init_cpuid
+.Ldone_init_cpuid:
 
 
 	/* If supported, initialize the `sysenter' instruction */
@@ -620,8 +642,8 @@ INTERN_FUNCTION(x86_smp_entry32)
 	EXTERN(x86_altcore_initapic)
 	call   x86_altcore_initapic
 
-	EXTERN(this_sched_state)
-	movl   this_sched_state(R_TASK), %esp
+//	EXTERN(this_sched_state)
+//	movl   this_sched_state(R_TASK), %esp
 
 	/* Load other scheduler-related register values. */
 	EXTERN(this_x86_kernel_psp0)

@@ -265,6 +265,8 @@ END(x86_execute_direct_ipi)
 
 
 
+#define SYM(x) ((x) - KERNEL_CORE_BASE)
+
 
 /* 16-bit (real-mode) bootstrap code executed by secondary cores.
  * All this code does is load a GDT and use it to jump
@@ -288,14 +290,14 @@ INTERN_LABEL(x86_smp_entry_gdt_offset):
 	orw    $(CR0_PE), %sp
 	movl   %esp, %cr0
 	/* Jump to protected mode. */
-	ljmpl  $(8), $(x86_smp_entry32 - KERNEL_CORE_BASE)
+	ljmpl  $(0x08), $(SYM(x86_smp_entry32))
 INTERN_OBJECT(x86_smp_gdt)
 	.word  (3 * SIZEOF_SEGMENT_DESCRIPTOR) - 1
 INTERN_LABEL(x86_smp_gdt_pointer_base):
-	.long  1f - x86_smp_entry
+	.int   1f - x86_smp_entry
 #define DEFINE_SEGMENT_DESCRIPTOR(TYPE, args) \
-	.long  SEGMENT_##TYPE##_INIT_UL args; \
-	.long  SEGMENT_##TYPE##_INIT_UH args;
+	.int   SEGMENT_##TYPE##_INIT_UL args;     \
+	.int   SEGMENT_##TYPE##_INIT_UH args;
 1:	DEFINE_SEGMENT_DESCRIPTOR(DESCRIPTOR, (0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
 	DEFINE_SEGMENT_DESCRIPTOR(DESCRIPTOR, (0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_CODE_EXRD, 1, 0, 1, 0, 0, 1, 1))
 	DEFINE_SEGMENT_DESCRIPTOR(DESCRIPTOR, (0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_DATA_RDWR, 1, 0, 1, 0, 0, 1, 1))
@@ -304,148 +306,211 @@ END(x86_smp_gdt)
 
 INTERN_CONST(x86_smp_entry_size, . - x86_smp_entry)
 END(x86_smp_entry)
-.code32
 
-.section .pdata
-INTERN_FUNCTION(x86_smp_entry32)
+
 	/* 32-bit entry point */
+.section .pdata
+
+
+.code32
+PRIVATE_OBJECT(x86_smp_entry32_ministack)
+	.skip 8 /* We only need 8 bytes of stack memory! */
+END(x86_smp_entry32_ministack)
+PRIVATE_OBJECT(x86_smp_entry32_ministack_lock)
+	.byte 0 /* Non-zero if locked */
+END(x86_smp_entry32_ministack_lock)
+
+INTERN_FUNCTION(x86_smp_entry32_spin)
+	pause
+INTERN_FUNCTION(x86_smp_entry32)
 	movw   $(0x10), %sp /* x86_smp_gdt_pointer_base[2] */
 	movw   %sp, %ds
-	movw   %sp, %es
+/*	movw   %sp, %es */ /* Not needed */
 	movw   %sp, %ss
 
-	/* TODO: Transition to long mode! */
-1:	cli
-	hlt
-	jmp     1b
+	/* Check if CPUID is supported.
+	 * NOTE: For this, we need 8 bytes of stack memory... */
+	movb   $(1), %al
+	lock;  xchgb %al, SYM(x86_smp_entry32_ministack_lock)
+	testb  %al, %al
+	jnz    x86_smp_entry32_spin
 
-.code64
+	movl   $(SYM(x86_smp_entry32_ministack) + 8), %esp
+	pushfl
+	pushfl
+	xorl   $(EFLAGS_ID), 0(%esp)
+	popfl
+	pushfl
+	popl   %eax
+	xorl   0(%esp), %eax
+	popfl
+	movb   $(0), SYM(x86_smp_entry32_ministack_lock) /* Unlock the temporary stack. */
+	andl   $(EFLAGS_ID), %eax
+	jz     x86_smp_boot_failure_no_cpuid
 
-	/* Configure extended paging features.
-	 * This has to be done before we can load `pagedir_kernel', as features such
-	 * as PAE, or even just use of the GLOBAL bit would otherwise cause #PFs because
-	 * the CPU would claim that reserved bits were set, or who-know-what in the case
-	 * of the PAE page table really just being a completely different structure than
-	 * the P32 page table.
-	 * XXX: This assumes that all CPUs have the same feature-set as the boot cpu... */
-	movq   %cr4, %rsp
-#ifndef CONFIG_NO_PAGING_PAE
-	/* Enable PAE support (if necessary for setting the page directory) */
-#ifndef CONFIG_NO_PAGING_P32
-	EXTERN(x86_bootcpu_cpuid)
-	testl  $(CPUID_1D_PAE), ((x86_bootcpu_cpuid - KERNEL_CORE_BASE) + OFFSET_CPUID_1D)
+
+	xorl   %eax, %eax
+	cpuid
+	cmpl   $(1), %eax
+	jb     x86_smp_boot_failure_no_cpuid_0x1
+
+	movl   $(0x80000000), %eax
+	cpuid
+	cmpl   $(0x80000001), %eax
+	jnae   x86_smp_boot_failure_no_cpuid_0x80000001
+
+	movl   $(0x80000001), %eax
+	cpuid
+
+	/* Test the LM bit. */
+	testl  $(CPUID_80000001D_LM), %edx
+	jz     x86_smp_boot_failure_no_longmode
+
+	/* Test the PAE bit. */
+//	testl  $(CPUID_80000001D_PAE), %edx
+//	jz     x86_smp_boot_failure_no_pae
+
+	/* Test the PSE bit. */
+//	testl  $(CPUID_80000001D_PSE), %edx
+//	jz     x86_smp_boot_failure_no_pse
+
+	movl   $(1), %eax
+	cpuid
+
+	/* Test the MSR bit. */
+	testl  $(CPUID_1D_MSR), %edx
+	jz     x86_smp_boot_failure_no_msr
+
+	/* Prepare to enable paging. */
+	movl   $(pagedir_kernel_phys), %esp
+	movl   %esp, %cr3
+
+	/* Configure the %CR4 register. */
+	movl   %cr4, %esp
+	/* Enable PageSizeExtension (required for 2Mib pages & long-mode),
+	 * as well as PhysicalAddressExtension (required for the 48-bit
+	 * physical address space needed in long-mode) */
+	orl    $(CR4_PSE | CR4_PAE), %esp
+	movl   $(1), %eax
+	cpuid
+	testl  $(CPUID_1D_PGE), %edx /* Enable PGE if supported by the host (optional feature) */
 	jz     1f
-#endif /* !CONFIG_NO_PAGING_P32 */
-	orq    $(CR4_PAE), %rsp
-	/* Enable NX support (if necessary for setting the page directory) */
-	EXTERN(x86_bootcpu_cpuid)
-	testl  $(CPUID_80000001D_NX), ((x86_bootcpu_cpuid - KERNEL_CORE_BASE) + OFFSET_CPUID_80000001D)
+	orl    $(CR4_PGE), %esp
+1:
+
+	/* Make sure that leaf #7 is actually supported */
+	xorl   %eax, %eax
+	cpuid
+	cmpl   $(7), %eax
+	jnae   2f
+	movl   $(7), %eax
+	cpuid
+	testl  $(CPUID_7B_SMEP), %ebx /* Enable SMAP if supported by the host (optional feature) */
 	jz     1f
+	orl    $(CR4_SMEP), %esp
+1:	testl  $(CPUID_7B_FSGSBASE), %ebx /* Enable FSGSBASE if supported by the host (emulated if unsupported) */
+	jz     1f
+	orl    $(CR4_FSGSBASE), %esp
+1:
+	/* Save the fully configured CR4 register. */
+2:	movl   %esp, %cr4
+
+
+	/* Set the LME bit in the EFER MSR register. */
 	movl   $(IA32_EFER), %ecx
 	rdmsr
-	orl    $(IA32_EFER_NXE), %eax
-	wrmsr
-1:
-#endif /* !CONFIG_NO_PAGING_PAE */
-	/* Enable PGE support (if necessary for setting the page directory) */
-	testl  $(CPUID_1D_PGE), ((x86_bootcpu_cpuid - KERNEL_CORE_BASE) + OFFSET_CPUID_1D)
+	orl    $(IA32_EFER_LME), %eax /* LongModeEnabled */
+	movl   %eax, %esp
+	movl   %edx, %ebp
+
+	/* Since we're already here, try to enable some other long-mode extensions,
+	 * such as the NXE bit, as well as SCE (SysCallExtensions) */
+	movl   $(0x80000001), %eax
+	cpuid
+	testl  $(CPUID_80000001D_NX), %edx
 	jz     1f
-	orq    $(CR4_PGE), %rsp
-1:	movq   %rsp, %cr4
+	orl    $(IA32_EFER_NXE), %esp
+1:	testl  $(CPUID_80000001D_SYSCALL), %edx
+	jz     1f
+	orl    $(IA32_EFER_SCE), %esp
+1:	/* Save the new configuration. */
+	movl   $(IA32_EFER), %ecx
+	movl   %esp, %eax
+	movl   %ebp, %edx
+	wrmsr
+
+	/* Now to actually enable paging! */
+	movl  %cr0, %eax
+	orl   $(CR0_PG | CR0_WP), %eax
+	movl  %eax, %cr0
+
+	/* Load a GDT that can be used for entering long mode. */
+	lgdtl  SYM(smp64_enterlong_gdt_pointer)
+
+	/* Load 64-bit segment registers. */
+	movw   $(0x10), %sp /* DATA */
+	movw   %sp, %ds
+/*	movw   %sp, %es * Not needed */
+/*	movw   %sp, %fs * Not needed */
+/*	movw   %sp, %gs * Not needed */
+	movw   %sp, %ss
+
+	/* And finally, jump into 64-bit mode! */
+	ljmpl  $(0x08), $(SYM(x86_smp_entry64))
+END(x86_smp_entry32)
+END(x86_smp_entry32_spin)
+
+DEFINE_PRIVATE_ALIAS(x86_smp_boot_failure_no_cpuid, x86_smp_boot_failure)
+DEFINE_PRIVATE_ALIAS(x86_smp_boot_failure_no_cpuid_0x1, x86_smp_boot_failure)
+DEFINE_PRIVATE_ALIAS(x86_smp_boot_failure_no_cpuid_0x80000001, x86_smp_boot_failure)
+DEFINE_PRIVATE_ALIAS(x86_smp_boot_failure_no_longmode, x86_smp_boot_failure)
+DEFINE_PRIVATE_ALIAS(x86_smp_boot_failure_no_msr, x86_smp_boot_failure)
+PRIVATE_FUNCTION(x86_smp_boot_failure)
+	cli
+	hlt
+	jmp    x86_smp_boot_failure
+END(x86_smp_boot_failure)
 
 
-	/* Enable paging.
-	 * NOTE: This is why this part must appear in the .pdata section.
-	 *       Because we still are in physical memory, we must enable
-	 *       paging in a context where the page directory we're enabling
-	 *       has our current location mapped to ourself.
-	 *       Later then, we'll jump into true virtual memory, but for
-	 *       now, our actual PC is offset by `KERNEL_CORE_BASE' */
-	movq   $(pagedir_kernel_phys), %rsp
-	movq   %rsp, %cr3
-	movq   %cr0, %rsp
-	orl    $(CR0_PG), %esp
-	movq   %rsp, %cr0
+.align 8
+PRIVATE_OBJECT(smp64_enterlong_gdt)
+#define DEFINE_SEGMENT_DESCRIPTOR(TYPE, args) \
+	.int   SEGMENT_##TYPE##_INIT_UL args;     \
+	.int   SEGMENT_##TYPE##_INIT_UH args;
+	DEFINE_SEGMENT_DESCRIPTOR(DESCRIPTOR, (0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+	DEFINE_SEGMENT_DESCRIPTOR(DESCRIPTOR, (0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_CODE_EXRD, 1, 0, 1, 0, /*L*/ 1, 0, 1))
+	DEFINE_SEGMENT_DESCRIPTOR(DESCRIPTOR, (0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_DATA_RDWR, 1, 0, 1, 0, /*L*/ 1, 0, 1))
+#undef DEFINE_SEGMENT_DESCRIPTOR
+.Lsmp64_enterlong_gdt_end = .
+END(smp64_enterlong_gdt)
+.align 2
+PRIVATE_OBJECT(smp64_enterlong_gdt_pointer)
+	.word  (.Lsmp64_enterlong_gdt_end - smp64_enterlong_gdt) - 1
+	.int   SYM(smp64_enterlong_gdt)
+END(smp64_enterlong_gdt_pointer)
 
-	/* Figure out who we actually are by looking at our LAPIC id. */
-	EXTERN(x86_lapicbase)
-	movq   x86_lapicbase, %rsp
-	movl   APIC_ID(%rsp), %esp
-	shrl   $(APIC_ID_FSHIFT), %esp
+
 
 #define R_CPU   %rbp
 #define R_TASK  %rbx
 
-	/* Find the CPU how's APIC_ID matches `%sp' (and that'll be us then) */
-	EXTERN(cpu_count)
-	movq   cpu_count, %rcx
-	decq   %rcx
-	EXTERN(cpu_vector)
-1:	movq   cpu_vector(,%rcx,8), R_CPU
-	EXTERN(thiscpu_x86_lapicid)
-	movzbw thiscpu_x86_lapicid(R_CPU), %dx
-	cmpw   %dx, %sp
-	je     1f
-	loop   1b
-	jmp    .Lx86_smp_kill
-1:
-	/* Change CPU state to indicate that we're going to initialize! */
-	EXTERN(thiscpu_state)
-	movq   $(CPU_STATE_RUNNING), thiscpu_state(R_CPU)
-	EXTERN(cpu_online_count)
-	lock;  incq cpu_online_count
 
-	/* Found our CPU (now stored in R_CPU) */
-	EXTERN(thiscpu_current)
-	movq   thiscpu_current(R_CPU),  R_TASK /* TARGET task. */
-	EXTERN(this_sched_state)
-	movq   this_sched_state(R_TASK), %rsp   /* stack */
+.code64
 
-	/* Load the GDT of our new CPU */
-	EXTERN(thiscpu_x86_gdt)
-	leaq   thiscpu_x86_gdt(R_CPU), %rcx
-	pushq  %rcx
-	pushw  $((SEGMENT_COUNT * SIZEOF_SEGMENT_DESCRIPTOR) - 1)
-	lgdt   (%rsp)
-	addq   $(10), %rsp
-
-	/* Load the Task register. */
-	/* SEGMENTS[SEGMENT_CPU_TSS].busy = 0;  // Required for `ltr' */
-	EXTERN(thiscpu_x86_gdt)
-	andb   $(0b11111101), thiscpu_x86_gdt + SEGMENT_CPU_TSS + 5(R_CPU)
-	movw   $(SEGMENT_CPU_TSS), %cx
-	ltrw   %cx
-
-	/* Load the local descriptor table. */
-	movw   $(SEGMENT_CPU_LDT), %cx
-	lldtw  %cx
-
-	/* Load basic segments. */
-	movw   $(SEGMENT_USER_DATA), %cx
-	movw   %cx, %ds
-	movw   %cx, %es
-	/* NOTE: This also does the jump from physical into virtual memory! */
-	movq   %rsp, %rax
-	pushq  $(SEGMENT_KERNEL_DATA0) /* %ss */
-	pushq  %rax                    /* %rsp */
-	pushfq                         /* %rflags */
-	pushq  $(SEGMENT_KERNEL_CODE)  /* %cs */
-	pushq  $(1f)                   /* %rip */
-	iretq  /* Jump to our per-cpu 64-bit code segment. */
-1:
-
-	/* Load the interrupt descriptor table. */
-	EXTERN(x86_idt_ptr)
-	lidtq  x86_idt_ptr
-
-	/* ============== Configure cpuid features ============== */
-	/* R_CPU:  THIS_CPU
-	 * R_TASK: THIS_TASK */
-
+/* Initialize the cpuid feature table of the calling CPU
+ * IN:
+ *     R_CPU: THIS_CPU
+ * OUT:
+ *     %rip:  set to `.Ldone_init_cpuid'
+ * CLOBBER:
+ *     %rax
+ *     %rcx
+ *     %rdx
+ *     %rdi
+ */
+PRIVATE_FUNCTION(x86_smp_init_cpuid)
+	movw   $(CPU_FEATURE_FDIDINIT), thiscpu_x86_cpufeatures(R_CPU)
 	/* Clear out our CPUID features table. */
-	EXTERN(thiscpu_x86_cpufeatures)
-	movw   $(CPU_FEATURE_FNONE), thiscpu_x86_cpufeatures(R_CPU)
-
 	leaq   thiscpu_x86_cpuid(R_CPU), %rdi
 	xorq   %rax, %rax
 #if (SIZEOF_CPUID_CPUINFO % 8) == 0
@@ -544,6 +609,94 @@ INTERN_FUNCTION(x86_smp_entry32)
 3:  /* ci_80000000a < 0x80000004 */
 2:  /* ci_80000000a < 0x80000001 */
 	movq   %rdi, %rbx
+	jmp    .Ldone_init_cpuid
+END(x86_smp_init_cpuid)
+
+
+
+	/* 64-bit entry point */
+INTERN_FUNCTION(x86_smp_entry64)
+
+	/* Figure out who we actually are by looking at our LAPIC id. */
+	EXTERN(x86_lapicbase)
+	movq   x86_lapicbase, %rsp
+	movl   APIC_ID(%rsp), %esp
+	shrl   $(APIC_ID_FSHIFT), %esp
+
+	/* Find the CPU how's APIC_ID matches `%sp' (and that'll be us then) */
+	EXTERN(cpu_count)
+	movq   cpu_count, %rcx
+	decq   %rcx
+	EXTERN(cpu_vector)
+1:	movq   cpu_vector(,%rcx,8), R_CPU
+	EXTERN(thiscpu_x86_lapicid)
+	movzbw thiscpu_x86_lapicid(R_CPU), %dx
+	cmpw   %dx, %sp
+	je     1f
+	loop   1b
+	jmp    .Lx86_smp_kill
+1:
+	/* Change CPU state to indicate that we're going to initialize! */
+	EXTERN(thiscpu_state)
+	movq   $(CPU_STATE_RUNNING), thiscpu_state(R_CPU)
+	EXTERN(cpu_online_count)
+	lock;  incq cpu_online_count
+
+	/* Found our CPU (now stored in R_CPU) */
+	EXTERN(thiscpu_current)
+	movq   thiscpu_current(R_CPU),  R_TASK /* TARGET task. */
+	EXTERN(this_sched_state)
+	movq   this_sched_state(R_TASK), %rsp   /* stack */
+
+	/* Load the GDT of our new CPU */
+	EXTERN(thiscpu_x86_gdt)
+	leaq   thiscpu_x86_gdt(R_CPU), %rcx
+	pushq  %rcx
+	pushw  $((SEGMENT_COUNT * SIZEOF_SEGMENT_DESCRIPTOR) - 1)
+	lgdtq  (%rsp)
+	addq   $(10), %rsp
+
+	/* Load basic segments. */
+	movw   $(SEGMENT_USER_DATA64_RPL), %cx
+	movw   %cx, %ds
+	movw   %cx, %es
+	movw   %cx, %fs
+	movw   %cx, %gs
+
+	/* Load the Task register. */
+	/* SEGMENTS[SEGMENT_CPU_TSS].busy = 0;  // Required for `ltr' */
+	EXTERN(thiscpu_x86_gdt)
+	andb   $(0b11111101), (thiscpu_x86_gdt + SEGMENT_CPU_TSS + 5)(R_CPU)
+	movw   $(SEGMENT_CPU_TSS), %cx
+	ltrw   %cx
+
+	/* Load the local descriptor table. */
+	movw   $(SEGMENT_CPU_LDT), %cx
+	lldtw  %cx
+
+	/* NOTE: This also does the jump from physical into virtual memory! */
+	movq   %rsp, %rax
+	pushq  $(SEGMENT_KERNEL_DATA0) /* %ss */
+	pushq  %rax                    /* %rsp */
+	pushfq                         /* %rflags */
+	pushq  $(SEGMENT_KERNEL_CODE)  /* %cs */
+	pushq  $(1f)                   /* %rip */
+	iretq  /* Jump to our per-cpu 64-bit code segment. */
+1:
+
+	/* Load the interrupt descriptor table. */
+	EXTERN(x86_idt_ptr)
+	lidtq  x86_idt_ptr
+
+	/* ============== Configure cpuid features ============== */
+	/* R_CPU:  THIS_CPU
+	 * R_TASK: THIS_TASK */
+
+	/* Check if we've already filled in our CPUID features table. */
+	EXTERN(thiscpu_x86_cpufeatures)
+	testw  $(CPU_FEATURE_FDIDINIT), thiscpu_x86_cpufeatures(R_CPU)
+	jz     x86_smp_init_cpuid
+.Ldone_init_cpuid:
 
 
 	/* If supported, initialize the `sysenter' instruction */
@@ -617,7 +770,6 @@ INTERN_FUNCTION(x86_smp_entry32)
 	wrmsr
 .Ldone_syscall:
 
-
 	/* Load the VM of the target task. */
 	movq   this_vm(R_TASK), %rcx
 	EXTERN(vm_kernel)
@@ -655,12 +807,12 @@ INTERN_FUNCTION(x86_smp_entry32)
 1:
 
 	/* Enable preemptive interrupts. */
-	movq   R_CPU, %rcx
+	movq   R_CPU, %rdi
 	EXTERN(x86_altcore_initapic)
 	call   x86_altcore_initapic
 
-	EXTERN(this_sched_state)
-	movq   this_sched_state(R_TASK), %rsp
+//	EXTERN(this_sched_state)
+//	movq   this_sched_state(R_TASK), %rsp
 
 	/* Load other scheduler-related register values. */
 	EXTERN(this_x86_kernel_psp0)
@@ -699,7 +851,7 @@ INTERN_FUNCTION(x86_smp_entry32)
 	ASM_POP_ICPUSTATE_BEFORE_IRET_CFI_R
 	intr_exit
 	.cfi_endproc
-END(x86_smp_entry32)
+END(x86_smp_entry64)
 
 
 
