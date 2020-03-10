@@ -450,9 +450,9 @@ INTERN_FUNCTION(x86_smp_entry32)
 	/* Load 64-bit segment registers. */
 	movw   $(0x10), %sp /* DATA */
 	movw   %sp, %ds
-/*	movw   %sp, %es * Not needed */
-/*	movw   %sp, %fs * Not needed */
-/*	movw   %sp, %gs * Not needed */
+/*	movw   %sp, %es */ /* Not needed */
+/*	movw   %sp, %fs */ /* Not needed */
+/*	movw   %sp, %gs */ /* Not needed */
 	movw   %sp, %ss
 
 	/* And finally, jump into 64-bit mode! */

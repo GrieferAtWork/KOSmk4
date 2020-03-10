@@ -198,8 +198,7 @@ got_time:
 	else {
 		if (year < (__DATE_YEAR__ % 100))
 			year += 100; /* 100 years into the future. */
-		year += (__DATE_YEAR__ / 100) * 100;
-		year = __DATE_YEAR__;
+		year += (__DATE_YEAR__ - (__DATE_YEAR__ % 100));
 	}
 	result = YEARS2DAYS((time_t)((s32)year - 1970));
 	result += MONTH_STARTING_DAY_OF_YEAR(ISLEAPYEAR(year), (u8)(cmos_month - 1) % 12);
