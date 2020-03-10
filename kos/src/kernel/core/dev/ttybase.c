@@ -521,8 +521,7 @@ do_TCSETA: {
 			newpid = task_getprocessgroupleaderpid_of(newthread);
 		}
 		printk(KERN_INFO "[tty:%q] Set foreground process group to [tid=%u]\n",
-		       me->cd_name, ATOMIC_READ(newpid->tp_thread.m_pointer),
-		       (unsigned int)taskpid_getrootpid(newpid));
+		       me->cd_name, (unsigned int)taskpid_getrootpid(newpid));
 		oldpid = me->t_fproc.exchange_inherit_new(newpid);
 		xdecref(oldpid);
 	}	break;
