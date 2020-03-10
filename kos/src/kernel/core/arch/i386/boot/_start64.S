@@ -387,6 +387,9 @@ INTERN_FUNCTION(_start)
 	movl   %eax, 0(%esp)
 	popfl
 
+	/* Make sure the EFLAGS.DF is cleared for the rep instructions below! */
+	cld
+
 #ifndef CONFIG_NO_SMP
 	/* memcpy(&_bootcpu, __kernel_percpu_start, (size_t)__kernel_percpu_size); */
 	movl   $(V2P(_bootcpu)), %edi
