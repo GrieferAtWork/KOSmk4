@@ -51,10 +51,10 @@
 #define __GNUC_PATCH__  0
 #endif /* __KOS__ */
 
-#if 1 /* WARNING: This breaks `operator ""s' and `operator new()' for intellisense */
+#ifndef __x86_64__ /* WARNING: This breaks `operator ""s' and `operator new()' for intellisense */
 #undef __SIZE_TYPE__
 #define __SIZE_TYPE__  unsigned long int
-#endif
+#endif /* !__x86_64__ */
 
 #ifdef __x86_64__
 #if 0 /* How can Intellisense be this stupid? - I mean: this is linux 101! */
