@@ -297,7 +297,6 @@ struct ksysctl_driver_set_library_path /*[PREFIX(slp_)]*/ {
 /* TODO: Wrapper for `block_device_lookup_name' */
 /* TODO: Wrapper for `character_device_lookup' */
 /* TODO: Wrapper for `character_device_lookup_name' */
-/* TODO: Wrapper for `boot_partition' */
 
 #define KSYSCTL_OPEN_KERNEL_VFS                0xfffe0001 /* [struct hop_openfd *result] Open a handle `HANDLE_TYPE_PATH' to `vfs_kernel'
                                                            * @return: == result->of_hint */

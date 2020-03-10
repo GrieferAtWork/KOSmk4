@@ -75,7 +75,7 @@ DATDEF struct desctab const x86_dbgidt_ptr;
  * Doing this is required to prevent other CPUs/threads from servicing
  * interrupts with IDT segments that aren't fully initialized.
  * As such, any modifications made to `x86_idt' after this function
- * is called will only code into effect once `x86_idt_modify_end()' is
+ * is called will only come into effect once `x86_idt_modify_end()' is
  * called. These functions are implemented as:
  *   x86_idt_modify_begin():
  *     - Acquire an internal mutex

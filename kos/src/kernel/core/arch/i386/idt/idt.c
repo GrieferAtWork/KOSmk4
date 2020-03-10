@@ -111,14 +111,11 @@ PUBLIC_CONST ATTR_COLDRODATA struct desctab const x86_dbgidt_ptr = {
 #endif /* !CONFIG_NO_DEBUGGER */
 
 /* Lock used to guard against multiple threads modifying the IDT */
-PRIVATE ATTR_COLDBSS struct shared_rwlock
-x86_idt_modify_lock = SHARED_RWLOCK_INIT;
+PRIVATE ATTR_COLDBSS struct shared_rwlock x86_idt_modify_lock = SHARED_RWLOCK_INIT;
 
 /* [0..1][lock(x86_idt_modify_lock)]
- * The temporary IDT copy that is in-use while
- * the original IDT is getting modified. */
-PRIVATE ATTR_COLDBSS struct idt_segment *
-x86_idt_modify_copy = NULL;
+ * The temporary IDT copy that is in-use while the original IDT is getting modified. */
+PRIVATE ATTR_COLDBSS struct idt_segment *x86_idt_modify_copy = NULL;
 
 
 #ifndef CONFIG_NO_SMP
@@ -156,7 +153,7 @@ NOTHROW(FCALL x86_idt_setcurrent)(struct desctab const *__restrict ptr) {
 		 *       so is kind-of excessive, simply because we don't want to run
 		 *       any risk of not being able to reach some specific CPU when
 		 *       that CPU is currently waking up, or has gone to sleep after
-		 *       having receiving a previous IDT override request, with the
+		 *       having received a previous IDT override request, with the
 		 *       current invocation of `x86_idt_setcurrent()' relating to the
 		 *       old (original) IDT base address being restored. */
 		count = cpu_broadcastipi_notthis(&x86_idt_setcurrent_ipi, args,
@@ -178,7 +175,7 @@ NOTHROW(FCALL x86_idt_setcurrent)(struct desctab const *__restrict ptr) {
  * Doing this is required to prevent other CPUs/threads from servicing
  * interrupts with IDT segments that aren't fully initialized.
  * As such, any modifications made to `x86_dbgidt' after this function
- * is called will only code into effect once `x86_idt_modify_end()' is
+ * is called will only come into effect once `x86_idt_modify_end()' is
  * called. These functions are implemented as:
  *   x86_idt_modify_begin():
  *     - Acquire an internal mutex
