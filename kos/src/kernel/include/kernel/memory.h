@@ -117,10 +117,10 @@ NOTHROW(KCALL minfo_usable_ram_pages)(void);
 INTDEF FREE void NOTHROW(KCALL minfo_addbank)(vm_phys_t start, vm_phys_t size, u16 type);
 
 /* Construct memory zones from memory info. */
-INTDEF FREE void NOTHROW(KCALL minfo_makezones)(void);
+INTDEF FREE void NOTHROW(KCALL kernel_initialize_minfo_makezones)(void);
 
-/* Relocate `minfo', as well as `mzones' data to a more appropriate location
- * after `minfo_makezones()' has been called, and the kernel VM has been
+/* Relocate `minfo', as well as `mzones' data to a more appropriate location after
+ * `kernel_initialize_minfo_makezones()' has been called, and the kernel VM has been
  * cleaned from unused memory mappings.
  * Before this function is called, all memory information still resides at a
  * location where its physical address is relative to its virtual, just like
@@ -130,7 +130,7 @@ INTDEF FREE void NOTHROW(KCALL minfo_makezones)(void);
  * Because of this, we try to relocate memory information into higher memory
  * as soon as this becomes possible, thus keeping it from randomly showing up
  * and causing problems for other code. */
-INTDEF FREE void NOTHROW(KCALL minfo_relocate_appropriate)(void);
+INTDEF FREE void NOTHROW(KCALL kernel_initialize_minfo_relocate)(void);
 
 /* Release all memory previously marked as `PMEMBANK_TYPE_PRESERVE' or
  * `PMEMBANK_TYPE_ALLOCATED', and page_free() all whole pages touched

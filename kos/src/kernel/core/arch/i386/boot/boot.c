@@ -46,9 +46,6 @@
 #include <fs/vfs.h>       /* TODO: Remove me; Only used for boot_partition-init */
 #include <kernel/panic.h> /* TODO: Remove me; Only used for boot_partition-init */
 
-/**/
-#include <assert.h>
-
 DECL_BEGIN
 
 PUBLIC ATTR_USED ATTR_SECTION(".bss")
@@ -173,9 +170,9 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       in effect (aka: before `x86_initialize_kernel_vm()' is called)
 	 *       Additionally, do this before memory zones have been finalized,
 	 *       so we can manually add SMP descriptor memory regions as available
-	 *       physical memory, while also preventing that they get overwritten
-	 *       by zone initialization, regardless of what the bootloader did
-	 *       about them in terms of telling us. */
+	 *       physical memory, while still preventing them from being overwritten
+	 *       by zone initialization, regardless of what the bootloader/BIOS did
+	 *       about them in terms of telling. */
 	x86_initialize_smp();
 
 	/* Same as SMP, ACPI needs access to the physical identity mapping. */
@@ -194,13 +191,16 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 #endif
 
 	/* Generate physical memory zones from collected memory information. */
-	minfo_makezones();
+	kernel_initialize_minfo_makezones();
 
-	/* Since we're about to use randomization, we somehow
-	 * need to generate just a tiny bit of entropy first.
-	 * So we're just going to read the CMOS RTC state and
-	 * use it to set the initial kernel seed. */
-	x86_initialize_rand_entropy();
+	/* Since we're about to evaluate the kernel commandline
+	 * for the first time (which parses the seed=... option),
+	 * we have to fill in the initial PRNG seed before then,
+	 * so that when not receiving that option, we'll end up
+	 * truly random initial seed.
+	 * So we're just going to read the CMOS RTC state and use
+	 * it to set the initial kernel seed. */
+	x86_initialize_rand_entropy(); /* TODO: Do this portably through use of `realtime()' */
 
 	/* Evaluate commandline options defined as `DEFINE_EARLY_KERNEL_COMMANDLINE_OPTION()' */
 	kernel_initialize_commandline_options_early();
@@ -231,20 +231,20 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* Relocate memory information into higher memory, moving it away from
 	 * being somewhere where it could cause problems, or be accidentally
 	 * corrupted. */
-	minfo_relocate_appropriate();
+	kernel_initialize_minfo_relocate();
+
+	/* Initialize the ioperm() sub-system. */
+	x86_initialize_iobm();
 
 	/* Flush the entire TLB buffer, now that we're finished setting up the page directory.
 	 * NOTE: Technically, this should be unnecessary, but it may still clean up some
 	 *       caches that had become clobbered by our incessant modifications above. */
 	pagedir_syncall();
 
-	/* Initialize the ioperm() sub-system. */
-	x86_initialize_iobm();
-
 	/* Initialize the APIC / PIC, as well as secondary CPUs when SMP is enabled. */
 	x86_initialize_apic();
 
-	/* TODO: ioapic support (ioapic is the modern equivalent of the pic) */
+	/* XXX: ioapic support (ioapic is the modern equivalent of the pic) */
 
 #ifndef CONFIG_NO_FPU
 	/* Initialize the FPU sub-system. */
@@ -305,45 +305,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* Load late commandline options. */
 	kernel_initialize_commandline_options_late();
-
-#if 0
-	{
-		byte_t *p = (byte_t *)kmalloc(42, GFP_NORMAL);
-		heap_validate_all();
-		mall_validate_padding();
-		printk("p = %p (%Iu)\n", p, kmalloc_usable_size(p));
-		printk("%$[hex]\n", kmalloc_usable_size(p), p);
-		printk("p[0] = %x\n", p[0]);
-		p[0] = 42;
-		printk("p[0] = %x\n", p[0]);
-		mall_validate_padding();
-		kfree(p);
-		printk("%$[hex]\n", 48, p);
-		heap_validate_all();
-	}
-#endif
-
-#if 0
-	struct task *test;
-	test = task_setup_kernel(task_alloc(&vm_kernel),
-	                         (thread_main_t)&test_thread,
-	                         2,
-	                         "foo",
-	                         "bar");
-	if (cpu_count > 1)
-		test->t_cpu = cpu_vector[1];
-
-	printk("Before task_connect()\n");
-	task_connect_ghost(&test_signal);
-	task_connect_ghost(&test_signal2);
-	printk("Before launch of secondary thread\n");
-	task_start(test);
-	decref(test);
-
-	printk("Before waiting on signal\n");
-	task_waitfor();
-	printk("After waiting on signal\n");
-#endif
 
 	/* TODO: libdebuginfo freezes with -gdwarf-2
 	 * TODO: Check if it still does this (it's been quite a while since I wrote that TODO) */

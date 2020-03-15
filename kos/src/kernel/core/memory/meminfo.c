@@ -425,7 +425,7 @@ again:
 
 
 /* Construct memory zones from memory info. */
-INTERN ATTR_FREETEXT void NOTHROW(KCALL minfo_makezones)(void) {
+INTERN ATTR_FREETEXT void NOTHROW(KCALL kernel_initialize_minfo_makezones)(void) {
 	/* This function is quite the nuisance, and doing it right is quite difficult.
 	 *  - We need to (dynamically) create some very large bitsets to hold information
 	 *    about what physical memory has been allocated.
@@ -437,8 +437,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL minfo_makezones)(void) {
 	 *    we only got 1 VM node/datapart (kernel_vm_(part|node)_pagedata) to describe this.
 	 *  - We can't just willy-nilly start using available ram, as it may contain important
 	 *    data structures left by the BIOS or BOOT loader! (so we must also look out for
-	 *    memory preservations)
-	 */
+	 *    memory preservations, aka. `PMEMBANK_TYPE_PRESERVE') */
 	size_t i, zone_count = 0, req_bytes = 0;
 	size_t req_pages;
 	byte_t *buffer;
@@ -642,18 +641,18 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL minfo_makezones)(void) {
 #define HINT_GETMODE(x) HINT_MODE x
 
 /* Relocate `minfo', as well as `mzones' data to a more appropriate location
- * after `minfo_makezones()' has been called, and the kernel VM has been
- * cleaned from unused memory mappings.
+ * after `kernel_initialize_minfo_makezones()' has been called, and the kernel
+ * VM has been cleaned from unused memory mappings.
  * Before this function is called, all memory information still resides at a
  * location where its physical address is relative to its virtual, just like
- * any other kernel data. However, that since can literally be anywhere in
+ * any other kernel data. However, since that can literally be anywhere in
  * virtual memory, it can easily (and accidentally) interfere with memory
  * layout expectancies of other early-boot systems.
  * Because of this, we try to relocate memory information into higher memory
  * as soon as this becomes possible, thus keeping it from randomly showing up
  * and causing problems for other code. */
 INTERN ATTR_FREETEXT void
-NOTHROW(KCALL minfo_relocate_appropriate)(void) {
+NOTHROW(KCALL kernel_initialize_minfo_relocate)(void) {
 	size_t num_bytes;
 	byte_t *dest, *old_addr;
 	ptrdiff_t relocation_offset;

@@ -81,14 +81,15 @@ NOTHROW(KCALL vm_copyfromphys_noidentity_partial)(void *__restrict dst,
 	return result;
 }
 
-/* Because the pyhs2virt identity mapping is initialized _after_ ACPI,
- * which needs to be done this way because pyhs2virt must be able to
- * allocate physical memory, which requires a prior call to `minfo_makezones()',
- * which requires that memory bank initialization has been finalized,
- * which it isn't yet (as indicative of `x86_initialize_acpi()' below
+/* Because the pyhs2virt identity mapping is initialized _after_
+ * ACPI, which needs to be done this way because pyhs2virt must
+ * be able to allocate physical memory, which requires a prior
+ * call to `kernel_initialize_minfo_makezones()', which requires
+ * that memory bank initialization has been finalized, which it
+ * isn't yet (as indicative of `x86_initialize_acpi()' below
  * calling `minfo_addbank()')
- * This function behaves the same as `vm_copyfromphys()', however will
- * not make use of the phys2virt identity segment. */
+ * This function behaves the same as `vm_copyfromphys()', however
+ * will not make use of the phys2virt identity segment. */
 PRIVATE ATTR_FREETEXT void
 NOTHROW(KCALL vm_copyfromphys_noidentity)(void *__restrict dst,
                                           PHYS vm_phys_t src,
