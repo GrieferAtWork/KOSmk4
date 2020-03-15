@@ -22,7 +22,8 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/cpuid.h>
+#include <kernel/arch/cpuid.h>
+#include <kernel/arch/paging32.h>
 #include <kernel/types.h>
 #include <sched/task.h>
 
@@ -42,10 +43,10 @@
 DECL_BEGIN
 
 /* Paging feature selectors. */
-#define HAVE_PAGE_GLOBAL_BIT       (x86_bootcpu_cpuid.ci_1d & CPUID_1D_PGE)
-#define HAVE_PAGE_ATTRIBUTE_TABLE  (x86_bootcpu_cpuid.ci_1d & CPUID_1D_PAT)
-#define HAVE_INSTR_INVLPG          (x86_bootcpu_cpufeatures & CPU_FEATURE_FI486) /* ... INVLPG is an instruction available since the i486 ... */
-#define HAVE_INSTR_INVPCID         (x86_bootcpu_cpuid.ci_7b & CPUID_7B_INVPCID)
+#define HAVE_PAGE_GLOBAL_BIT       X86_HAVE_PAGE_GLOBAL_BIT
+#define HAVE_PAGE_ATTRIBUTE_TABLE  X86_HAVE_PAGE_ATTRIBUTE_TABLE
+#define HAVE_INSTR_INVLPG          X86_HAVE_INSTR_INVLPG
+#define HAVE_INSTR_INVPCID         X86_HAVE_INSTR_INVPCID
 
 #if !defined(CONFIG_NO_PAGING_P32) && !defined(CONFIG_NO_PAGING_PAE)
 STATIC_ASSERT((u64)P32_PAGE_FGLOBAL == (u64)PAE_PAGE_FGLOBAL);
@@ -75,16 +76,16 @@ INTERN ATTR_PAGING_READMOSTLY u64 used_pxx_page_fglobal = PAE_PAGE_FGLOBAL; /* C
 
 
 #ifndef CONFIG_NO_PAGING_P32
-#define HAVE_4MIB_PAGES            (x86_bootcpu_cpuid.ci_1d & CPUID_1D_PSE)
+#define HAVE_4MIB_PAGES            X86_HAVE_4MIB_PAGES
 #endif /* !CONFIG_NO_PAGING_P32 */
 
 #ifndef CONFIG_NO_PAGING_PAE
-#define HAVE_2MIB_PAGES             1 /* Always supported */
+#define HAVE_2MIB_PAGES            1 /* Always supported */
 /* TODO: Take this into account:  When you set bit 34 of the 0x01A0 MSR on an Intel processor
  *                                you clear the bit 20 of EDX for CPUID/EAX=800000001h, disabling
  *                                your ability to enable the execute disable bit
  * From: https://forum.osdev.org/viewtopic.php?f=1&t=18945 */
-#define HAVE_EXECUTE_DISABLE       (x86_bootcpu_cpuid.ci_80000001d & CPUID_80000001D_NX)
+#define HAVE_EXECUTE_DISABLE       X86_HAVE_EXECUTE_DISABLE
 #endif /* !CONFIG_NO_PAGING_PAE */
 
 

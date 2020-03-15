@@ -28,11 +28,6 @@
 
 #include <stdbool.h>
 
-/* TODO: Don't use the CONFIG_* namespace for arch-predefined
- *       paging features. (CONFIG_* should only be used for
- *       things that the user can select when building KOS)
- *       Just use the ARCH_* namespace instead! */
-
 
 /* Since the entire kernel-space has its E1-vectors pre-allocated (so-as
  * to allow them to be share across all page-directories), page directory
@@ -54,8 +49,6 @@
 #elif defined(CONFIG_NO_PAGING_PAE)
 /* P32-paging only */
 #include "paging32-p32.h"
-
-DECL_BEGIN
 
 #undef ARCH_PAGEDIR_INIT_NEED_PHYS_SELF
 #define ARCH_PAGEDIR_INIT_NEED_PHYS_SELF 1
@@ -79,13 +72,9 @@ DECL_BEGIN
 #define PAGEDIR_ALIGN P32_PDIR_ALIGN
 #define PAGEDIR_SIZE  P32_PDIR_SIZE
 
-DECL_END
-
 #elif defined(CONFIG_NO_PAGING_P32)
 /* PAE-paging only */
 #include "paging32-pae.h"
-
-DECL_BEGIN
 
 #undef ARCH_PAGEDIR_INIT_NEED_PHYS_SELF
 #undef ARCH_PAGEDIR_FINI_NEED_PHYS_SELF
@@ -108,8 +97,6 @@ DECL_BEGIN
 #define PAGEDIR_ALIGN PAE_PDIR_ALIGN
 #define PAGEDIR_SIZE  PAE_PDIR_SIZE
 
-DECL_END
-
 #else /* CONFIG_... */
 
 /* Configure for hybrid paging. */
@@ -119,10 +106,8 @@ DECL_END
 #include "paging32-pae.h"
 /**/
 
-#include <kernel/cpuid.h>  /* x86_bootcpu_cpuid */
+#include <kernel/arch/cpuid.h>  /* x86_bootcpu_cpuid */
 #include <asm/cpu-cpuid.h> /* CPUID_1D_PAE */
-
-DECL_BEGIN
 
 #undef ARCH_PAGEDIR_INIT_NEED_PHYS_SELF
 #define ARCH_PAGEDIR_INIT_NEED_PHYS_SELF 1 /* Needed by P32 (`p32_pagedir_init') */
@@ -131,11 +116,11 @@ DECL_BEGIN
 #undef ARCH_PAGEDIR_INIT_IS_NOEXCEPT /* `pae_pagedir_init()' may throw `E_BADALLOC' (but `p32_pagedir_init()' is noexcept) */
 
 
-#define X86_PAGEDIR_USES_PAE()    (x86_bootcpu_cpuid.ci_1d & CPUID_1D_PAE)
-#define X86_PAGEDIR_USES_P32()  (!(x86_bootcpu_cpuid.ci_1d & CPUID_1D_PAE))
+#define X86_PAGEDIR_USES_PAE() X86_HAVE_PAE
+#define X86_PAGEDIR_USES_P32() (!X86_HAVE_PAE)
 
-#if P32_VM_KERNEL_PDIR_RESERVED_BASE == PAE_VM_KERNEL_PDIR_RESERVED_BASE && \
-    P32_VM_KERNEL_PDIR_RESERVED_SIZE == PAE_VM_KERNEL_PDIR_RESERVED_SIZE
+#if (P32_VM_KERNEL_PDIR_RESERVED_BASE == PAE_VM_KERNEL_PDIR_RESERVED_BASE && \
+     P32_VM_KERNEL_PDIR_RESERVED_SIZE == PAE_VM_KERNEL_PDIR_RESERVED_SIZE)
 #define X86_VM_KERNEL_PDIR_RESERVED_BASE_IS_COMPILETIME_VALUE 1
 
 /* Start of the address range reserved for page-directory self-modifications. */
@@ -177,8 +162,8 @@ DECL_BEGIN
 #define PAGEDIR_SIZE  PAE_PDIR_SIZE
 #endif /* P32_PDIR_SIZE <= PAE_PDIR_SIZE */
 
-DECL_END
 #endif /* !CONFIG_... */
+
 
 
 DECL_BEGIN
@@ -287,8 +272,8 @@ FORCELOCAL NOBLOCK void NOTHROW(FCALL pagedir_syncall_user)(void) {
 	        : "=&r" (temp));
 }
 
-/* Same as `pagedir_syncall()', but also ensures that
- * all of kernel-space is synced. */
+/* Same as `pagedir_syncall_user()', but also
+ * ensures that all of kernel-space is synced. */
 FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_syncall)(void);
 
 /* Hybrid of `pagedir_syncall()' and `pagedir_syncall_user()': When the given range

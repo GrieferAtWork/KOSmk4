@@ -29,6 +29,8 @@
 #include <kernel/panic.h>
 #include <kernel/printk.h>
 #include <kernel/vm.h>
+#include <kernel/vm/phys.h>
+#include <sched/async.h>
 #include <sched/cpu.h>
 #include <sched/tss.h>
 
@@ -370,6 +372,11 @@ NOTHROW(KCALL simple_insert_and_activate)(struct vm_node *__restrict node,
 
 DATDEF VIRT byte_t volatile *x86_lapicbase_ ASMNAME("x86_lapicbase");
 
+PRIVATE ATTR_FREETEXT NOBLOCK void
+NOTHROW(FCALL pagedir_unmap_and_sync_one)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
+	pagedir_unmapone(addr);
+	pagedir_syncone(addr);
+}
 
 INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_kernel_vm)(void) {
 #ifdef X86_VM_KERNEL_PDIR_RESERVED_BASE_IS_RUNTIME_VALUE
@@ -493,6 +500,12 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_kernel_vm)(void) {
 #endif /* !__x86_64__ */
 		}
 	}
+
+	/* Clear the trampoline mappings of the 3 initial threads */
+	pagedir_unmap_and_sync_one(PAGEID_DECODE_KERNEL(FORTASK(&_boottask, this_trampoline_page)));
+	pagedir_unmap_and_sync_one(PAGEID_DECODE_KERNEL(FORTASK(&_bootidle, this_trampoline_page)));
+	pagedir_unmap_and_sync_one(PAGEID_DECODE_KERNEL(FORTASK(&_asyncwork, this_trampoline_page)));
+
 	/* All right! that's our entire kernel VM all cleaned up! */
 }
 

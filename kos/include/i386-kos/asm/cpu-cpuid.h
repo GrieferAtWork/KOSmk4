@@ -49,7 +49,7 @@
 #define CPUID_1D_MSR             __UINT32_C(0x00000020) /* [bit(EDX:5)] Model-specific registers. */
 #define CPUID_1D_PAE             __UINT32_C(0x00000040) /* [bit(EDX:6)] Physical Address Extension. */
 #define CPUID_1D_MCE             __UINT32_C(0x00000080) /* [bit(EDX:7)] Machine Check Exception. */
-#define CPUID_1D_CX8             __UINT32_C(0x00000100) /* [bit(EDX:8)] CMPXCHG8 (compare-and-swap) instruction. */
+#define CPUID_1D_CX8             __UINT32_C(0x00000100) /* [bit(EDX:8)] CMPXCHG8B (compare-and-swap) instruction. */
 #define CPUID_1D_APIC            __UINT32_C(0x00000200) /* [bit(EDX:9)] Onboard Advanced Programmable Interrupt Controller. */
 /*      CPUID_1D_                __UINT32_C(0x00000400) /* [bit(EDX:10)] RESERVED. */
 #define CPUID_1D_SEP             __UINT32_C(0x00000800) /* [bit(EDX:11)] SYSENTER and SYSEXIT instructions. */
@@ -241,7 +241,7 @@
 #define CPUID_80000001D_MSR           CPUID_1D_MSR           /* [bit(5)] Model-specific registers. */
 #define CPUID_80000001D_PAE           CPUID_1D_PAE           /* [bit(6)] Physical Address Extension. */
 #define CPUID_80000001D_MCE           CPUID_1D_MCE           /* [bit(7)] Machine Check Exception. */
-#define CPUID_80000001D_CX8           CPUID_1D_CX8           /* [bit(8)] CMPXCHG8 (compare-and-swap) instruction. */
+#define CPUID_80000001D_CX8           CPUID_1D_CX8           /* [bit(8)] CMPXCHG8B (compare-and-swap) instruction. */
 #define CPUID_80000001D_APIC          CPUID_1D_APIC          /* [bit(9)] Onboard Advanced Programmable Interrupt Controller. */
 /*      CPUID_80000001D_              __UINT32_C(0x00000400) /* [bit(10)] RESERVED. */
 #define CPUID_80000001D_SYSCALL       __UINT32_C(0x00000800) /* [bit(11)] SYSCALL and SYSRET instructions. */

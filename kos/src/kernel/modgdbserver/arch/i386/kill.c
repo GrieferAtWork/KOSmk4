@@ -22,7 +22,7 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/cpuid.h>
+#include <kernel/arch/cpuid.h>
 #include <kernel/printk.h>
 #include <sched/task.h>
 

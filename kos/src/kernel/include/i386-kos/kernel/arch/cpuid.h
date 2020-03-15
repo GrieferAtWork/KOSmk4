@@ -21,13 +21,19 @@
 #define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_CPUID_H 1
 
 #include <kernel/compiler.h>
+
 #include <kernel/types.h>
+#include <sched/pertask.h>
+
+#include <asm/cpu-cpuid.h>
 
 DECL_BEGIN
 
 #define CPU_FEATURE_FNONE    0x0000
+#ifndef __x86_64__
 #define CPU_FEATURE_FCPUID   0x0001 /* The `cpuid' instruction is supported. */
 #define CPU_FEATURE_FI486    0x0001 /* The cpu is an i486. */
+#endif /* !__x86_64__ */
 #define CPU_FEATURE_FDIDINIT 0x8000 /* Features have been initialized. */
 
 
@@ -138,6 +144,56 @@ DATDEF u16 const x86_bootcpu_cpufeatures;
 DATDEF struct cpuinfo const x86_bootcpu_cpuid;
 
 #endif /* __CC__ */
+
+
+/* Feature test macros. */
+#ifndef __x86_64__
+#define X86_HAVE_I486                  (x86_bootcpu_cpufeatures & CPU_FEATURE_FI486)
+#define X86_HAVE_CPUID                 (x86_bootcpu_cpufeatures & CPU_FEATURE_FCPUID)
+#else /* !__x86_64__ */
+#define X86_HAVE_I486                  1 /* 64-bit mode _requires_ a 486+ */
+#define X86_HAVE_CPUID                 1 /* 64-bit mode _requires_ `cpuid' support */
+#define X86_ALWAYS_HAVE_CPUID          1 /* 64-bit mode _requires_ `cpuid' support */
+#endif /* __x86_64__ */
+#define X86_HAVE_FPU                   (x86_bootcpu_cpuid.ci_1d & CPUID_1D_FPU)
+#define X86_HAVE_FXSR                  (x86_bootcpu_cpuid.ci_1d & CPUID_1D_FXSR)
+#define X86_HAVE_SSE                   (x86_bootcpu_cpuid.ci_1d & CPUID_1D_SSE)
+#define X86_HAVE_PAGE_GLOBAL_BIT       (x86_bootcpu_cpuid.ci_1d & CPUID_1D_PGE)
+#define X86_HAVE_PAGE_ATTRIBUTE_TABLE  (x86_bootcpu_cpuid.ci_1d & CPUID_1D_PAT)
+#define X86_HAVE_INSTR_INVLPG          X86_HAVE_I486 /* ... INVLPG is an instruction available since the i486 ... */
+#define X86_HAVE_INSTR_INVPCID         (x86_bootcpu_cpuid.ci_7b & CPUID_7B_INVPCID)
+#define X86_HAVE_EXECUTE_DISABLE       (x86_bootcpu_cpuid.ci_80000001d & CPUID_80000001D_NX)
+#define X86_HAVE_SYSENTER              (x86_bootcpu_cpuid.ci_1d & CPUID_1D_SEP)
+#define X86_HAVE_CMPXCHG8B             (x86_bootcpu_cpuid.ci_1d & CPUID_1D_CX8)
+#ifdef __x86_64__
+#define X86_HAVE_FSGSBASE              (x86_bootcpu_cpuid.ci_7b & CPUID_7B_FSGSBASE)
+#define X86_HAVE_CMPXCHG16B            (x86_bootcpu_cpuid.ci_1c & CPUID_1C_CX16)
+#define X86_HAVE_SYSCALL               (x86_bootcpu_cpuid.ci_80000001d & CPUID_80000001D_SYSCALL)
+#define X86_HAVE_2MIB_PAGES            1 /* Always available! (and also assumed to be by code below!) */
+#define X86_HAVE_4MIB_PAGES            0 /* 32-bit only feature */
+#define X86_HAVE_1GIB_PAGES            (x86_bootcpu_cpuid.ci_80000001d & CPUID_80000001D_PSE)
+#define X86_HAVE_PAE                   0 /* 32-bit only feature */
+#else /* __x86_64__ */
+#define X86_HAVE_FSGSBASE              0 /* 64-bit only feature */
+#define X86_HAVE_CMPXCHG16B            0 /* 64-bit only feature */
+#define X86_HAVE_SYSCALL               0 /* 64-bit only feature */
+#define X86_HAVE_2MIB_PAGES            0 /* 64-bit only feature */
+#define X86_HAVE_4MIB_PAGES            (x86_bootcpu_cpuid.ci_1d & CPUID_1D_PSE)
+#define X86_HAVE_1GIB_PAGES            0 /* 64-bit only feature */
+#define X86_HAVE_PAE                   (x86_bootcpu_cpuid.ci_1d & CPUID_1D_PAE)
+#endif /* !__x86_64__ */
+
+
+/* Same as above, but for the current CPU (whereas
+ * the macros above are only for the boot CPU) */
+#define X86_THISCPU_HAVE_SYSENTER      (CURRENT_X86_CPUID.ci_1d & CPUID_1D_SEP)
+#ifdef __x86_64__
+#define X86_THISCPU_HAVE_SYSCALL       (CURRENT_X86_CPUID.ci_80000001d & CPUID_80000001D_SYSCALL)
+#else /* __x86_64__ */
+#define X86_THISCPU_HAVE_SYSCALL       0 /* 64-bit only feature */
+#endif /* !__x86_64__ */
+
+
 
 DECL_END
 

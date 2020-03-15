@@ -25,7 +25,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/boot.h>
-#include <kernel/cpuid.h>
+#include <kernel/arch/cpuid.h>
 #include <kernel/driver-param.h>
 #include <kernel/gdt.h>
 #include <kernel/memory.h>
@@ -113,9 +113,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* Initialize per-task/per-cpu structures */
 	kernel_initialize_scheduler();
 
-	/* Load support for the sysenter instruction as soon as possible. */
-	x86_initialize_sysenter();
-
 	/* Load default memory banks. */
 	x86_initialize_default_memory_banks();
 
@@ -168,6 +165,9 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 		       : FREESTR("KiB"));
 	}
 
+	/* Load support for the sysenter instruction. */
+	x86_initialize_sysenter();
+
 	/* Initialize SMP.
 	 * NOTE: This must be done while the physical identity mapping is still
 	 *       in effect (aka: before `x86_initialize_kernel_vm()' is called)
@@ -210,6 +210,13 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * used seed now so that the system logs remain consistent with the user's expectation. */
 	printk(FREESTR(KERN_INFO "[rand] Set pseudo RNG seed to %#.8I32x\n"), krand_seed);
 
+	/* Initialize the x86_64 physical memory identity memory mapping.
+	 * This can only be done _after_ we've loaded available RAM, since
+	 * this function may need to allocate some of that memory... */
+#ifdef CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC
+	x86_initialize_phys2virt64();
+#endif /* !ONFIG_PHYS2VIRT_IDENTITY_MAXALLOC */
+
 	/* Initialize the kernel VM, and instigate strict memory protection,
 	 * unmapping virtual memory that isn't being used by the kernel, while
 	 * also removing write permissions for .text and .rodata, as well as
@@ -234,7 +241,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* Initialize the ioperm() sub-system. */
 	x86_initialize_iobm();
 
-	/* Initialize the APIC / PIC */
+	/* Initialize the APIC / PIC, as well as secondary CPUs when SMP is enabled. */
 	x86_initialize_apic();
 
 	/* TODO: ioapic support (ioapic is the modern equivalent of the pic) */

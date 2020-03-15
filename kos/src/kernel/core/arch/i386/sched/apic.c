@@ -27,7 +27,7 @@
 #include <debugger/config.h>
 #include <fs/vfs.h>
 #include <kernel/apic.h>
-#include <kernel/cpuid.h>
+#include <kernel/arch/cpuid.h>
 #include <kernel/driver-param.h>
 #include <kernel/gdt.h>
 #include <kernel/handle.h>
@@ -155,7 +155,7 @@ PRIVATE /*ATTR_FREETEXT*/ void KCALL x86_altcore_entry(void) {
 	lapic_write(APIC_TIMER, APIC_TIMER_FDISABLED);
 
 	/* C-level entry point for secondary SMP cores. */
-	printk(/*FREESTR*/ (KERN_NOTICE "Begin CPU #%u initialization\n"), id);
+	printk(/*FREESTR*/ (KERN_INFO "[smp] Begin CPU #%u initialization\n"), id);
 
 	/* Tell the boot-cpu that we're now online. */
 	ATOMIC_FETCHAND(cpu_offline_mask[id / 8], ~(1 << (id % 8)));
@@ -169,7 +169,7 @@ PRIVATE /*ATTR_FREETEXT*/ void KCALL x86_altcore_entry(void) {
 	sync_endwrite(&x86_pit_lock);
 	num_ticks = lapic_read(APIC_TIMER_CURRENT);
 	num_ticks = (((u32)-1) - num_ticks) * 100;
-	printk(/*FREESTR*/ (KERN_INFO "CPU #%u uses a LAPIC timing of %u ticks per second\n"),
+	printk(/*FREESTR*/ (KERN_INFO "[smp] CPU #%u uses a LAPIC timing of %u ticks per second\n"),
 	       id, num_ticks);
 	num_ticks /= HZ;
 	if unlikely(!num_ticks)

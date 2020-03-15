@@ -170,7 +170,7 @@ NOTHROW(KCALL minfo_addbank)(vm_phys_t start, vm_phys_t size, u16 type) {
 		return;
 	if (OVERFLOW_UADD(start, size - 1, &max))
 		max = (vm_phys_t)-1;
-	printk(FREESTR(KERN_INFO "Adding memory bank at " FORMAT_VM_PHYS_T "..." FORMAT_VM_PHYS_T " (%s)\n"),
+	printk(FREESTR(KERN_INFO "[mem] Adding memory bank at " FORMAT_VM_PHYS_T "-" FORMAT_VM_PHYS_T " (%s)\n"),
 	       start, max, pmembank_type_names[type]);
 	i = 0;
 	while ((assert(i < minfo.mb_bankc),
@@ -240,7 +240,7 @@ NOTHROW(KCALL pmemzone_init_bits)(struct pmemzone *__restrict self,
                                   pageptr_t start, pagecnt_t num_pages,
                                   uintptr_t mask) {
 #if 0
-	printk(FREESTR(KERN_DEBUG "INIT: " FORMAT_VM_PHYS_T "..." FORMAT_VM_PHYS_T " as %Ix\n"),
+	printk(FREESTR(KERN_DEBUG "INIT: " FORMAT_VM_PHYS_T "-" FORMAT_VM_PHYS_T " as %Ix\n"),
 	       (vm_phys_t)(page2addr(start)),
 	       (vm_phys_t)(page2addr(start + num_pages) - 1),
 	       mask);
@@ -376,7 +376,7 @@ again:
 		for (i = 0; i < minfo.mb_bankc; ++i) {
 			if (minfo.mb_banks[i].mb_type == PMEMBANK_TYPE_UNDEF)
 				continue;
-			printk(FREESTR(KERN_EMERG "Bank #%Iu: %I64p-%I64p [%s] (%Iu (%#Ix) bytes / %Iu (%#Ix) pages)\n"),
+			printk(FREESTR(KERN_EMERG "[mem] Bank #%Iu: %I64p-%I64p [%s] (%Iu (%#Ix) bytes / %Iu (%#Ix) pages)\n"),
 			       (size_t)i,
 			       (u64)PMEMBANK_TYPE_MIN(minfo.mb_banks[i]),
 			       (u64)PMEMBANK_TYPE_MAX(minfo.mb_banks[i]),
@@ -468,7 +468,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL minfo_makezones)(void) {
 		++zone_count;
 		req_bytes += PMEMZONE_SIZEOF(bank_end_page - bank_start_page);
 	}
-	printk(FREESTR(KERN_DEBUG "Using %Iu memory zones\n"), zone_count);
+	printk(FREESTR(KERN_DEBUG "[mem] Using %Iu memory zones\n"), zone_count);
 
 	/* Also include the vector of memory zone pointers later found in `mzones.pm_zones' */
 	req_bytes += zone_count * sizeof(struct pmemzone *);
@@ -482,8 +482,8 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL minfo_makezones)(void) {
 	 * is not capable of allocating sub-page memory. */
 	req_pages = CEILDIV(req_bytes, PAGESIZE);
 	kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_start = minfo_allocate_part_pagedata(req_bytes);
-	printk(FREESTR(KERN_DEBUG "Allocate paging control structures at "
-	               FORMAT_VM_PHYS_T "..." FORMAT_VM_PHYS_T " (%Iu bytes in %Iu pages)\n"),
+	printk(FREESTR(KERN_DEBUG "[mem] Allocate paging control structures at "
+	               FORMAT_VM_PHYS_T "-" FORMAT_VM_PHYS_T " (%Iu bytes in %Iu pages)\n"),
 	       (vm_phys_t)(page2addr(kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_start)),
 	       (vm_phys_t)(page2addr(kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_start) + req_bytes - 1),
 	       req_bytes, req_pages);
@@ -549,10 +549,10 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL minfo_makezones)(void) {
 			endpage   = PMEMBANK_TYPE_ENDPAGE(minfo.mb_banks[zone_bank_start]);
 			if unlikely(startpage >= endpage) {
 				/* Special case: Memory zone too small to fit even a single whole page.
-				 * [output] MEMORY 0000000000BC3000...0000000000BC4FFF (kernel_free)
-				 * [output] MEMORY 0000000000BC5000...0000000000BC5033 (ram)
-				 * [output] MEMORY 0000000000BC5034...0000000000BC5052 (preserve)
-				 * [output] MEMORY 0000000000BC5053...0000000007FDFFFF (ram)
+				 * [output] MEMORY 0000000000BC3000-0000000000BC4FFF (kernel_free)
+				 * [output] MEMORY 0000000000BC5000-0000000000BC5033 (ram)
+				 * [output] MEMORY 0000000000BC5034-0000000000BC5052 (preserve)
+				 * [output] MEMORY 0000000000BC5053-0000000007FDFFFF (ram)
 				 * In this case, we can assume that at least some portion of the page is
 				 * considered to not be ~normal~ RAM. - So because of this, we do pretty
 				 * much assume that all pages (at least partially) touched by this mapping
@@ -583,7 +583,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL minfo_makezones)(void) {
 			                   startpage,
 			                   size,
 			                   init_mask);
-			if (init_mask)
+			if (init_mask & PMEMBITSET_FREEMASK)
 				zone->mz_cfree += size;
 			prev_init_end = startpage + size;
 		} while (zone_bank_start++ < i);
@@ -606,7 +606,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL minfo_makezones)(void) {
 		        "zone->mz_rmax  = %Iu",
 		        (size_t)zone->mz_cfree,
 		        (size_t)zone->mz_rmax);
-		printk(FREESTR(KERN_INFO "Define memory zone %Iu at " FORMAT_VM_PHYS_T "..." FORMAT_VM_PHYS_T " (%Iu/%Iu free pages)\n"),
+		printk(FREESTR(KERN_INFO "[mem] Define memory zone %Iu at " FORMAT_VM_PHYS_T "-" FORMAT_VM_PHYS_T " (%Iu/%Iu free pages)\n"),
 		       (size_t)(zone_count - 1),
 		       (vm_phys_t)(page2addr(zone->mz_start)),
 		       (vm_phys_t)(page2addr(bank_end_page) - 1),
@@ -663,10 +663,10 @@ NOTHROW(KCALL minfo_relocate_appropriate)(void) {
 	                            num_bytes, PAGESIZE,
 	                            HINT_GETMODE(KERNEL_VMHINT_PHYSINFO));
 	if unlikely(dest == VM_GETFREE_ERROR) {
-		printk(FREESTR(KERN_ERR "Failed to relocate memory information\n"));
+		kernel_panic(FREESTR("Failed to relocate memory information\n"));
 		return;
 	}
-	printk(FREESTR(KERN_DEBUG "Relocate RAM control structures to %p...%p\n"),
+	printk(FREESTR(KERN_DEBUG "[mem] Relocate RAM control structures to %p-%p\n"),
 	       dest, dest + num_bytes - 1);
 
 	/* Pop the node concerning the memory information, so we can modify it. */
@@ -686,8 +686,8 @@ NOTHROW(KCALL minfo_relocate_appropriate)(void) {
 	vm_node_insert(&kernel_vm_node_pagedata);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	if unlikely(!pagedir_prepare_map(dest, num_bytes)) {
-		printk(FREESTR(KERN_ERR "Failed to prepare VM for relocated memory "
-		                        "information at %p...%p\n"),
+		kernel_panic(FREESTR("Failed to prepare VM for relocated memory "
+		                     "information at %p-%p\n"),
 		       dest, dest + num_bytes - 1);
 		return;
 	}
@@ -772,7 +772,7 @@ use_floordiv_maxpage:
 			if (minpage <= maxpage) {
 				pagecnt_t temp;
 				temp = (pagecnt_t)(maxpage - minpage) + 1;
-				printk(FREESTR(KERN_DEBUG "Free preseved memory at " FORMAT_VM_PHYS_T "..." FORMAT_VM_PHYS_T "\n"),
+				printk(FREESTR(KERN_DEBUG "[mem] Free preseved memory at " FORMAT_VM_PHYS_T "-" FORMAT_VM_PHYS_T "\n"),
 				       (vm_phys_t)(page2addr(minpage)),
 				       (vm_phys_t)(page2addr(maxpage + 1) - 1));
 				page_free(minpage, temp);
@@ -787,7 +787,7 @@ use_floordiv_maxpage:
 			minfo.mb_banks[i].mb_type = PMEMBANK_TYPE_RAM;
 		}
 	}
-	printk(FREESTR(KERN_INFO "Released %Iu pages of preserved memory from %Iu banks\n"),
+	printk(FREESTR(KERN_INFO "[mem] Released %Iu pages of preserved memory from %Iu banks\n"),
 	       (size_t)num_released, num_banks);
 	/* Merge adjacent memory banks. */
 	for (i = 1; i < minfo.mb_bankc;) {

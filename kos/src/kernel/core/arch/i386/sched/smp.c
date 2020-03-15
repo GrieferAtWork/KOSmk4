@@ -144,8 +144,8 @@ NOTHROW(KCALL x86_initialize_smp)(void) {
 		x86_vm_part_lapic.dp_ramdata.rd_block0.rb_size  = 1;
 		x86_vm_part_lapic.dp_tree.a_vmin                = (datapage_t)0;
 		x86_vm_part_lapic.dp_tree.a_vmax                = (datapage_t)0;
-		FORCPU(&_bootcpu, _thiscpu_x86_lapicid)                  = 0xff; /* Read later using the LAPIC */
-		FORCPU(&_bootcpu, _thiscpu_x86_lapicversion)             = fps->mp_defcfg > 4 ? APICVER_INTEGRATED : APICVER_82489DX;
+		FORCPU(&_bootcpu, _thiscpu_x86_lapicid)         = 0xff; /* Read later using the LAPIC */
+		FORCPU(&_bootcpu, _thiscpu_x86_lapicversion)    = fps->mp_defcfg > 4 ? APICVER_INTEGRATED : APICVER_82489DX;
 		return;
 	}
 	/* Check pointer location. */

@@ -30,6 +30,7 @@
 #include <kernel/malloc.h>
 #include <kernel/memory.h>
 #include <kernel/paging.h>
+#include <kernel/phys2virt64.h>
 #include <kernel/printk.h>
 #include <kernel/vio.h>
 #include <kernel/vm.h>
@@ -352,7 +353,23 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 			struct vm_node *node;
 			struct vm_datapart *part;
 again_lookup_node:
+#ifdef CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC
+			/* Access to the phys2virt section is allowed while preemption is disabled.
+			 * However, when preemption is disabled, locking the kernel VM may fail,
+			 * so we need a special-case check for access to the phys2virt section when
+			 * we've previously failed to lock the kernel VM for reading. */
+			if unlikely(!sync_tryread(effective_vm)) {
+				if (effective_vm == &vm_kernel &&
+				    (uintptr_t)addr >= KERNEL_PHYS2VIRT_MIN &&
+				    (uintptr_t)addr <= KERNEL_PHYS2VIRT_MAX) {
+					x86_phys2virt64_require(addr);
+					goto done_before_pop_connections;
+				}
+				sync_read(effective_vm);
+			}
+#else /* CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC */
 			sync_read(effective_vm);
+#endif /* !CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC */
 again_lookup_node_already_locked:
 			assert(sync_reading(effective_vm));
 			assert(!sync_writing(effective_vm));
@@ -462,6 +479,14 @@ got_node_and_effective_vm_lock:
 			if unlikely(!node->vn_part) {
 				struct cpu *mycpu;
 				sync_endread(effective_vm);
+#ifdef CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC
+				/* Check for special case: `node' belongs to the physical identity area. */
+				if (node == &x86_phys2virt64_node) {
+					x86_phys2virt64_require(addr);
+					goto done_before_pop_connections;
+				}
+#endif /* CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC */
+
 				/* Check for special case: `node' may be the `thiscpu_x86_iobnode' of some CPU */
 do_handle_iob_node_access:
 				mycpu = THIS_CPU;
@@ -494,7 +519,7 @@ do_handle_iob_node_access:
 						allow_preemption = icpustate_getpreemption(state);
 						/* Make special checks if the access itself seems to
 						 * originate from a direct user-space access. */
-						if ((ecode & X86_PAGEFAULT_ECODE_USERSPACE) && isuser()) {
+						if (isuser()) {
 							/* User-space can never get write-access to the IOB vector. */
 							if (ecode & X86_PAGEFAULT_ECODE_WRITING)
 								goto pop_connections_and_throw_segfault;
@@ -534,6 +559,9 @@ do_handle_iob_node_access:
 					/* If we didn't actually re-enable preemption, then no cpu-transfer could have happened! */
 					if (!icpustate_getpreemption(state))
 						goto pop_connections_and_throw_segfault;
+					/* I/O access from kernel-space wouldn't result in an IOB check, so
+					 * if the access comes from kernel-space, then this is the calling
+					 * thread incorrectly accessing some other cpu's IOB. */
 					if (!isuser())
 						goto pop_connections_and_throw_segfault;
 					/* If the calling thread couldn't have changed CPUs, then this is an access to  */

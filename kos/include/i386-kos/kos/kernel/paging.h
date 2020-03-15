@@ -44,8 +44,8 @@
 #define COMPAT_KERNELSPACE_BASE __UINT32_C(0xc0000000) /* lower address space limit for kernel-space (as exposed to programs running in compatibility mode) */
 
 /* Check if a given physical address range is identity mapped. */
-#if 0 /* TODO: Add a configuration option for this.
-       * TODO: Must test the x86_64 kernel (once its working) with _and_ without the phyiscal identity mapping! */
+#if 1 /* TODO: Add a configuration option for this.
+       * TODO: Must test the x86_64 kernel (once its working) with _and_ without the physical identity mapping! */
 
 /* First first half of the kernel address space is used as identity mapping
  * for the first 64TiB (yes: that is Terrabyte) of physical memory. */
@@ -57,7 +57,7 @@
 /* Accessor macros for physical identity translation. */
 #define PHYS_IS_IDENTITY(base, num_bytes) (((__u64)(base) + (__u64)(num_bytes)) <= KERNEL_PHYS2VIRT_SIZE)
 #define PHYS_TO_IDENTITY(base)            ((void *)((__u64)(base) + KERNEL_PHYS2VIRT_BASE))
-#define PHYS_IS_IDENTITY_PAGE(pageno)     ((__u64)(pageno) <= KERNEL_PHYS2VIRT_PAGECOUNT)
+#define PHYS_IS_IDENTITY_PAGE(pageno)     ((__u64)(pageno) < __UINT64_C(0x400000000))
 #define PHYS_TO_IDENTITY_PAGE(pageno)     ((void *)(((__u64)(pageno) * 4096) + KERNEL_PHYS2VIRT_BASE))
 #endif
 

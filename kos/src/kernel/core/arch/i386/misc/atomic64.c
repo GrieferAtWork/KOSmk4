@@ -24,15 +24,16 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/types.h>
-
 #include <hybrid/host.h>
 
 #ifndef __x86_64__
-#include <asm/cpu-cpuid.h>
+#include <kernel/arch/cpuid.h>
 #include <kernel/boot.h>
-#include <kernel/cpuid.h>
+#include <kernel/types.h>
 #include <sched/atomic64.h>
+
+#include <asm/cpu-cpuid.h>
+
 #include <assert.h>
 
 DECL_BEGIN
@@ -70,7 +71,7 @@ NOTHROW(FCALL install_jmp)(void *redirection_addr,
 /* Initialize the atomic64 configuration */
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL x86_initialize_atomic64)(void) {
-	if (x86_bootcpu_cpuid.ci_1d & CPUID_1D_CX8) {
+	if (X86_HAVE_CMPXCHG8B) {
 		/* Machine has native 64-bit atomic support. */
 	} else {
 		/* Must use the 64-bit atomic emulation. */

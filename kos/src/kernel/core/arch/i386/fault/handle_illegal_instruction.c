@@ -24,7 +24,7 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/cpuid.h>
+#include <kernel/arch/cpuid.h>
 #include <kernel/debugtrap.h>
 #include <kernel/emulock.h>
 #include <kernel/except.h>
@@ -612,6 +612,10 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 			set_edx((u32)(result >> 32));
 		} break;
 
+#endif /* !__x86_64__ */
+
+
+#ifndef X86_ALWAYS_HAVE_CPUID
 		case 0x0fa2: {
 			struct cpuinfo const *info;
 			/* CPUID */
@@ -688,8 +692,9 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 				break;
 			}
 		}	break;
+#endif /* !X86_ALWAYS_HAVE_CPUID */
 
-#endif /* !__x86_64__ */
+
 
 		case 0x0fae:
 			MOD_DECODE();

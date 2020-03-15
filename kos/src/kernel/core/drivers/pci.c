@@ -230,7 +230,7 @@ NOTHROW(KCALL RegisterPCIDevice)(pci_addr_t addr) {
 			if (!class_name)
 				class_name = FREESTR("?");
 			printk(FREESTR(KERN_INFO
-			               "PCI Device at %I32p located "
+			               "[pci] Device at %I32p located "
 			               "(vendor/device %.4I16x:%.4I16x) "
 			               "(class: %s:%.2I8x.%.2I8x.%.2I8x.%.2I8x)\n"),
 			       addr,
@@ -247,7 +247,7 @@ NOTHROW(KCALL RegisterPCIDevice)(pci_addr_t addr) {
 	} EXCEPT {
 		if (!was_thrown(E_BADALLOC))
 			RETHROW();
-		printk(FREESTR(KERN_ERR "Failed to allocate descriptor for PCI device\n"));
+		printk(FREESTR(KERN_ERR "[pci] Failed to allocate descriptor for PCI device\n"));
 		kfree(result);
 		result = NULL;
 	}

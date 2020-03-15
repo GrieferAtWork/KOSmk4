@@ -23,7 +23,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/arch/paging32.h>
-#include <kernel/cpuid.h>
+#include <kernel/arch/cpuid.h>
 #include <kernel/paging.h>
 
 #include <hybrid/align.h>

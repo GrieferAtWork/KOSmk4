@@ -22,6 +22,7 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/phys2virt64.h>
 #include <kernel/types.h>
 
 #include <asm/pagesize.h>
@@ -66,6 +67,7 @@ INTDEF FREE void NOTHROW(KCALL x86_initialize_acpi)(void);
 INTDEF FREE void NOTHROW(KCALL x86_initialize_apic)(void);
 INTDEF FREE void NOTHROW(KCALL x86_initialize_iobm)(void);
 INTDEF FREE void NOTHROW(KCALL x86_initialize_kernel_vm)(void);
+INTDEF FREE void NOTHROW(KCALL x86_initialize_kernel_vm_unmap)(void);
 INTDEF FREE void NOTHROW(KCALL x86_initialize_kernel_vm_readonly)(void);
 INTDEF FREE void NOTHROW(KCALL x86_initialize_sysenter)(void);
 INTDEF FREE void NOTHROW(KCALL x86_initialize_rand_entropy)(void);
@@ -81,6 +83,9 @@ INTDEF FREE void NOTHROW(KCALL x86_initialize_atomic64)(void);
 #ifdef __x86_64__
 INTDEF FREE void NOTHROW(KCALL x86_initialize_fsgsbase)(void);
 #endif /* __x86_64__ */
+#ifdef CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC
+INTDEF FREE void NOTHROW(KCALL x86_initialize_phys2virt64)(void);
+#endif /* !ONFIG_PHYS2VIRT_IDENTITY_MAXALLOC */
 INTDEF FREE void NOTHROW(KCALL x86_initialize_commandline_himem)(void);
 INTDEF FREE void NOTHROW(KCALL x86_initialize_bootloader_drivers)(void);
 #endif /* CONFIG_BUILDING_KERNEL_CORE */

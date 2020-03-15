@@ -27,7 +27,7 @@
 #include <hybrid/host.h>
 #ifdef __x86_64__
 
-#include <kernel/cpuid.h>
+#include <kernel/arch/cpuid.h>
 #include <kernel/fsgsbase.h>
 #include <kernel/panic.h>
 #include <kernel/types.h>
@@ -172,7 +172,7 @@ NOTHROW(KCALL x86_initialize_fsgsbase)(void) {
 	uint32_t *iter;
 	/* Check if our CPU supports fsgsbase. If it does, the we don't have
 	 * to do anything, and we can NOP out calls to `x86_fsgsbase_patch()' */
-	if (x86_bootcpu_cpuid.ci_7b & CPUID_7B_FSGSBASE) {
+	if (X86_HAVE_FSGSBASE) {
 		*((byte_t *)x86_fsgsbase_patch + 0) = 0xc3;
 		return;
 	}

@@ -21,8 +21,9 @@
 #define GUARD_KERNEL_INCLUDE_KERNEL_BOOT_H 1
 
 #include <kernel/compiler.h>
-#include <kernel/types.h>
+
 #include <kernel/arch/boot.h>
+#include <kernel/types.h>
 
 DECL_BEGIN
 

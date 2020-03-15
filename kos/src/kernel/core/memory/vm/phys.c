@@ -771,7 +771,7 @@ NOTHROW(KCALL vm_memsetphyspages)(PAGEDIR_PAGEALIGNED PHYS vm_phys_t dst,
 		return;
 	assert(IS_ALIGNED(dst, PAGESIZE));
 #ifndef NO_PHYS_IDENTITY
-	while (PHYS_IS_IDENTITY(dst)) {
+	while (PHYS_IS_IDENTITY(dst, PAGESIZE)) {
 		memset(PHYS_TO_IDENTITY(dst), byte, PAGESIZE);
 		if (!--num_pages)
 			return;

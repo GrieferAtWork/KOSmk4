@@ -28,8 +28,8 @@
 #include <debugger/config.h>
 #include <debugger/function.h>
 #include <debugger/io.h>
+#include <kernel/arch/cpuid.h>
 #include <kernel/arch/paging64.h>
-#include <kernel/cpuid.h>
 #include <kernel/except.h>
 #include <kernel/memory.h>
 #include <kernel/paging.h>
@@ -59,14 +59,16 @@ DECL_BEGIN
 #define ppageof(paddr) (pageptr_t)((paddr) / PAGESIZE)
 
 /* Feature tests helpers */
-#define HAVE_PAGE_GLOBAL_BIT       (x86_bootcpu_cpuid.ci_1d & CPUID_1D_PGE)
-#define HAVE_PAGE_ATTRIBUTE_TABLE  (x86_bootcpu_cpuid.ci_1d & CPUID_1D_PAT)
-#define HAVE_INSTR_INVLPG          1 /* Always supported on x86_64 */
-#define HAVE_INSTR_INVPCID         (x86_bootcpu_cpuid.ci_7b & CPUID_7B_INVPCID)
-#define HAVE_1GIB_PAGES            (x86_bootcpu_cpuid.ci_80000001d & CPUID_80000001D_PSE)
-#define HAVE_2MIB_PAGES            1 /* Always available! (and also assumed to be by code below!) */
-#define HAVE_EXECUTE_DISABLE       (x86_bootcpu_cpuid.ci_80000001d & CPUID_80000001D_NX)
+#define HAVE_PAGE_GLOBAL_BIT       X86_HAVE_PAGE_GLOBAL_BIT
+#define HAVE_PAGE_ATTRIBUTE_TABLE  X86_HAVE_PAGE_ATTRIBUTE_TABLE
+#define HAVE_INSTR_INVLPG          X86_HAVE_INSTR_INVLPG
+#define HAVE_INSTR_INVPCID         X86_HAVE_INSTR_INVPCID
+#define HAVE_1GIB_PAGES            X86_HAVE_1GIB_PAGES
+#define HAVE_2MIB_PAGES            X86_HAVE_2MIB_PAGES
+#define HAVE_EXECUTE_DISABLE       X86_HAVE_EXECUTE_DISABLE
 
+/* This flag is set to 0 during the boot assembly bootstrap
+ * if it is found that the global page bit isn't supported. */
 INTERN u64 used_pxx_page_fglobal = P64_PAGE_FGLOBAL;
 #define USED_P64_PAGE_FGLOBAL used_pxx_page_fglobal
 

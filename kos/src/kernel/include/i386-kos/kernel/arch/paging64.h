@@ -515,8 +515,8 @@ FORCELOCAL NOBLOCK void NOTHROW(FCALL pagedir_syncall_user)(void) {
 	        : "=&r" (temp));
 }
 
-/* Same as `pagedir_syncall()', but also ensures that
- * all of kernel-space is synced. */
+/* Same as `pagedir_syncall_user()', but also
+ * ensures that all of kernel-space is synced. */
 FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_syncall)(void);
 
 /* Hybrid of `pagedir_syncall()' and `pagedir_syncall_user()': When the given range

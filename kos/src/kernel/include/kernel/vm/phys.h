@@ -268,6 +268,15 @@ NOTHROW(KCALL vm_ptram_map)(struct vm_ptram *__restrict self,
 	return result;
 }
 
+LOCAL NOBLOCK WUNUSED ATTR_RETNONNULL NONNULL((1)) byte_t *
+NOTHROW(KCALL vm_ptram_map_noidentity)(struct vm_ptram *__restrict self,
+                                       vm_phys_t addr, __BOOL writable DFL(true)) {
+	byte_t *result;
+	result = vm_ptram_mappage_noidentity(self, addr2page(addr), writable);
+	result += (uintptr_t)(addr & PAGEMASK);
+	return result;
+}
+
 
 
 #endif /* __CC__ */

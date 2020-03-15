@@ -23,7 +23,7 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/cpuid.h>
+#include <kernel/arch/cpuid.h>
 #include <kernel/driver-param.h>
 #include <kernel/except.h>
 #include <kernel/fpu.h>
@@ -321,7 +321,8 @@ x86_handle_device_not_available(struct icpustate *__restrict state) {
 
 
 
-#define CPUID_FEATURES_WRITABLE  (*(struct cpuinfo *)&CURRENT_X86_CPUID)
+#define CPUID_FEATURES_WRITABLE x86_bootcpu_cpuid_
+DATDEF struct cpuinfo x86_bootcpu_cpuid_ ASMNAME("x86_bootcpu_cpuid");
 
 
 DATDEF u32 x86_fxsave_mxcsr_mask_ ASMNAME("x86_fxsave_mxcsr_mask");
@@ -386,11 +387,6 @@ NOTHROW(FCALL x86_fxsave_decompress_ftw)(struct xfpustate const *__restrict self
 }
 
 
-#define HAVE_FPU  (CURRENT_X86_CPUID.ci_1d & CPUID_1D_FPU)
-#define HAVE_FXSR (CURRENT_X86_CPUID.ci_1d & CPUID_1D_FXSR)
-#define HAVE_SSE  (CURRENT_X86_CPUID.ci_1d & CPUID_1D_SSE)
-
-
 INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_fpu)(void) {
 	u32 cr0;
 	if (x86_config_nofpu) {
@@ -405,7 +401,7 @@ setup_fpu_emulation:
 	}
 	/* Check for the existence of an FPU. */
 	cr0 = __rdcr0() & ~(CR0_EM | CR0_TS);
-	if (!HAVE_FPU) {
+	if (!X86_HAVE_FPU) {
 		u16 testword = 0x55aa;
 		__wrcr0(cr0);
 		__fninit();
@@ -425,21 +421,21 @@ setup_fpu_emulation:
 		/* TODO: Only set `CR0_ET' if we're connected to a 387 (as opposed to a 287) */
 		cr0 |= CR0_ET;
 	}
-	if (PERCPU(thiscpu_x86_cpufeatures) & CPU_FEATURE_FI486)
+	if (X86_HAVE_I486)
 		cr0 |= CR0_NE; /* Native exceptions enable */
 	cr0 |= CR0_MP; /* Enable for native FPU */
 	__wrcr0(cr0);
 
 	/* Re-write `x86_fxsave()' and `x86_fxrstor()' based on processor capabilities. */
-	if (HAVE_FXSR) {
+	if (X86_HAVE_FXSR) {
 		u32 cr4;
 		cr4 = __rdcr4();
-		if (HAVE_SSE) {
+		if (X86_HAVE_SSE) {
 			printk(FREESTR(KERN_INFO "[fpu] Enable SSE & #XF exception support\n"));
 			cr4 |= (CR4_OSFXSR/* | CR4_OSXMMEXCPT*/);
 		}
 		__wrcr4(cr4);
-		if (!HAVE_SSE) {
+		if (!X86_HAVE_SSE) {
 			/* No SSE support */
 			x86_fxsave_mxcsr_mask_ = 0;
 		} else {
@@ -470,7 +466,7 @@ setup_fpu_emulation:
 		((byte_t *)&x86_fxrstor)[2] = 0x09;
 		((byte_t *)&x86_fxrstor)[3] = 0xc3; /* ret */
 	} else {
-		if (HAVE_SSE) {
+		if (X86_HAVE_SSE) {
 			/* x86_fxsave_mxcsr_mask_ = 0x0000ffbf; // Already the default */
 			inject_jmp((void *)&x86_fpustate_load, (void const *)&x86_fxrstor);
 			inject_jmp((void *)&x86_fpustate_save, (void const *)&x86_fxsave);

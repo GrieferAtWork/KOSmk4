@@ -25,7 +25,7 @@
 
 #include <kernel/apic.h>
 #include <kernel/breakpoint.h>
-#include <kernel/cpuid.h>
+#include <kernel/arch/cpuid.h>
 #include <kernel/gdt.h>
 #include <kernel/paging.h>
 #include <kernel/pic.h>

@@ -50,8 +50,62 @@ PUBLIC vm_phys_t acpi_root = 0;
 /* [valid_if(acpi_mode == ACPI_MODE_RSDT)] Length of the vector `((ACPISDTHeader *)acpi_root)->rsdp_sdts' */
 PUBLIC size_t acpi_sdt_count = 0;
 
+#ifdef NO_PHYS_IDENTITY
+#define vm_copyfromphys_noidentity vm_copyfromphys
+#else /* NO_PHYS_IDENTITY */
+PRIVATE ATTR_FREETEXT size_t
+NOTHROW(KCALL vm_copyfromphys_noidentity_partial)(void *__restrict dst,
+                                                  PHYS vm_phys_t src,
+                                                  size_t num_bytes) {
+	uintptr_t offset;
+	size_t result;
+	byte_t *vsrc = THIS_TRAMPOLINE_BASE;
+	pagedir_pushval_t pv;
+	/* NOTE: We must still preserve the trampoline here, since the trampoline
+	 *       for _boottask is allocated past the end of the kernel's .free
+	 *       section. This is important since the bootloader/bios may have
+	 *       placed various data structures at that location (on QEMU I
+	 *       noticed that the kernel's commandline is placed directly over-
+	 *       top of the _boottask's page directory identity mapping)
+	 *       As such, we must preserve this mapping, as things such that the
+	 *       kernel commandline are still used by later steps of the boot
+	 *       process. */
+	pv = pagedir_push_mapone(vsrc, src & ~(PAGESIZE - 1), PAGEDIR_MAP_FREAD);
+	pagedir_syncone(vsrc);
+	offset = (uintptr_t)(src & (PAGESIZE - 1));
+	result = PAGESIZE - offset;
+	if (result > num_bytes)
+		result = num_bytes;
+	memcpy(dst, vsrc + offset, result);
+	pagedir_pop_mapone(vsrc, pv);
+	return result;
+}
 
-PRIVATE ATTR_PURE ATTR_FREETEXT byte_t
+/* Because the pyhs2virt identity mapping is initialized _after_ ACPI,
+ * which needs to be done this way because pyhs2virt must be able to
+ * allocate physical memory, which requires a prior call to `minfo_makezones()',
+ * which requires that memory bank initialization has been finalized,
+ * which it isn't yet (as indicative of `x86_initialize_acpi()' below
+ * calling `minfo_addbank()')
+ * This function behaves the same as `vm_copyfromphys()', however will
+ * not make use of the phys2virt identity segment. */
+PRIVATE ATTR_FREETEXT void
+NOTHROW(KCALL vm_copyfromphys_noidentity)(void *__restrict dst,
+                                          PHYS vm_phys_t src,
+                                          size_t num_bytes) {
+	for (;;) {
+		size_t temp;
+		temp = vm_copyfromphys_noidentity_partial(dst, src, num_bytes);
+		if (temp >= num_bytes)
+			break;
+		dst = (byte_t *)dst + temp;
+		src += temp;
+		num_bytes -= temp;
+	}
+}
+#endif /* !NO_PHYS_IDENTITY */
+
+PRIVATE ATTR_FREETEXT ATTR_PURE byte_t
 NOTHROW(KCALL acpi_memsum)(void const *__restrict p, size_t n_bytes) {
 	byte_t result = 0;
 	byte_t *iter, *end;
@@ -67,7 +121,7 @@ NOTHROW(KCALL acpi_memsum_phys)(vm_phys_t p, size_t n_bytes) {
 	byte_t result = 0;
 	while (n_bytes) {
 		size_t cnt = MIN(n_bytes, COMPILER_LENOF(buf));
-		vm_copyfromphys(buf, p, cnt);
+		vm_copyfromphys_noidentity(buf, p, cnt);
 		result += acpi_memsum(buf, cnt);
 		n_bytes -= cnt;
 		p += cnt;
@@ -90,7 +144,7 @@ NOTHROW(KCALL RSDP_LocateInRange)(VIRT uintptr_t base, size_t bytes) {
 	if ((base + bytes) < base)
 		bytes = 0 - base;
 	end = (iter = (uintptr_t)base) + bytes;
-	printk(FREESTR(KERN_DEBUG "Searching for RSDPDescriptor in %p...%p\n"),
+	printk(FREESTR(KERN_DEBUG "[acpi] Searching for RSDPDescriptor in %p...%p\n"),
 	       iter - KERNEL_CORE_BASE, (end - 1) - KERNEL_CORE_BASE);
 	/* Clamp the search area to a 16-byte alignment. */
 	iter = CEIL_ALIGN(iter, RSDPDESCRIPTOR_ALIGN);
@@ -138,10 +192,10 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_acpi)(void) {
 	/* TODO: Commandline option to disable detection of this structure */
 	rsdp = RSDP_LocateDescriptor();
 	if unlikely(!rsdp) {
-		printk(FREESTR(KERN_DEBUG "RSDPDescriptor not found\n"));
+		printk(FREESTR(KERN_DEBUG "[acpi] RSDPDescriptor not found\n"));
 		return;
 	}
-	printk(FREESTR(KERN_DEBUG "RSDPDescriptor located at %p [oem: %.?q, rev: %I8u]\n"),
+	printk(FREESTR(KERN_DEBUG "[acpi] RSDPDescriptor located at %p [oem: %.?q, rev: %I8u]\n"),
 	       (uintptr_t)rsdp - KERNEL_CORE_BASE,
 	       COMPILER_LENOF(rsdp->rsdp_oemid),
 	       rsdp->rsdp_oemid,
@@ -152,16 +206,16 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_acpi)(void) {
 		/* Use XSDT (but validate it first) */
 		if (rsdp->rsdp_length < offsetof(RSDPDescriptor,rsdp_reserved) ||
 		    acpi_memsum(rsdp, rsdp->rsdp_length) != 0) {
-			printk(FREESTR(KERN_ERR "XSDT table extension is corrupted (using RSDT instead)\n"));
+			printk(FREESTR(KERN_ERR "[acpi] XSDT table extension is corrupted (using RSDT instead)\n"));
 		} else {
 			acpi_mode = ACPI_MODE_XSDT;
 			acpi_root = (vm_phys_t)rsdp->rsdp_xsdtaddr;
 		}
 	}
-	vm_copyfromphys(&header, acpi_root, sizeof(ACPISDTHeader));
+	vm_copyfromphys_noidentity(&header, acpi_root, sizeof(ACPISDTHeader));
 	/* Validate the header. */
 	if unlikely(acpi_memsum_phys(acpi_root, header.rsdp_length) != 0) {
-		printk(FREESTR(KERN_ERR "Corrupted %cSDT checksum [table: %I64p...%I64p]\n"),
+		printk(FREESTR(KERN_ERR "[acpi] Corrupted %cSDT checksum [table: %I64p...%I64p]\n"),
 		       acpi_mode == ACPI_MODE_RSDT ? 'R' : 'X',
 		       (u64)acpi_root,
 		       (u64)acpi_root + header.rsdp_length - 1);
@@ -171,7 +225,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_acpi)(void) {
 	/* Figure out how many tables there are. */
 	acpi_sdt_count = (header.rsdp_length - sizeof(ACPISDTHeader)) / ACPI_POINTER_SIZE;
 	if unlikely(!acpi_sdt_count) {
-		printk(FREESTR(KERN_ERR "%cSDT contains no SDTs [table: %I64p...%I64p]\n"),
+		printk(FREESTR(KERN_ERR "[acpi] %cSDT contains no SDTs [table: %I64p...%I64p]\n"),
 		       acpi_mode == ACPI_MODE_RSDT ? 'R' : 'X',
 		       (u64)acpi_root,
 		       (u64)acpi_root + header.rsdp_length - 1);
@@ -191,34 +245,31 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_acpi)(void) {
 	{
 		size_t i;
 		for (i = 0; i < acpi_sdt_count; ++i) {
-			vm_phys_t addr; vm_phys_t base;
+			vm_phys_t addr, base;
 			addr = acpi_root + sizeof(ACPISDTHeader) + i * ACPI_POINTER_SIZE;
 			/* Dereference the base pointer. */
-			base = ACPI_POINTER_SIZE == 4
-			       ? (vm_phys_t)vm_readphysl_unaligned(addr)
-			       : (vm_phys_t)vm_readphysq_unaligned(addr);
+			base = 0;
+			vm_copyfromphys_noidentity(&base, addr, ACPI_POINTER_SIZE);
 			/* Load the component header. */
-			vm_copyfromphys(&header, (vm_phys_t)base, sizeof(header));
+			vm_copyfromphys_noidentity(&header, base, sizeof(header));
 			/* Validate the table. */
-			if unlikely(acpi_memsum_phys((vm_phys_t)base, header.rsdp_length) != 0) {
-				printk(FREESTR(KERN_ERR "sdt[%Iu:%.?q] corrupted table [table: %I64p...%I64p, oem: %.?q, oemtab: %.?q]\n"),
+			if unlikely(acpi_memsum_phys(base, header.rsdp_length) != 0) {
+				printk(FREESTR(KERN_ERR "[acpi:sdt:%Iu:%.?q] corrupted table [table: %I64p...%I64p, oem: %.?q, oemtab: %.?q]\n"),
 				       i, COMPILER_LENOF(header.rsdp_signature), header.rsdp_signature,
 				       (u64)base, (u64)base + header.rsdp_length - 1,
 				       COMPILER_LENOF(header.rsdp_oemid), header.rsdp_oemid,
 				       COMPILER_LENOF(header.rsdp_oemtableid), header.rsdp_oemtableid);
 				memset(header.rsdp_signature, 0, sizeof(header.rsdp_signature));
-				vm_copytophys((vm_phys_t)base + offsetof(ACPISDTHeader, rsdp_signature),
+				vm_copytophys(base + offsetof(ACPISDTHeader, rsdp_signature),
 				              &header.rsdp_signature[0], sizeof(header.rsdp_signature));
 				continue;
 			}
-			printk(FREESTR(KERN_INFO "sdt[%Iu:%.?q] found table [table: %I64p...%I64p, oem: %.?q, oemtab: %.?q]\n"),
+			printk(FREESTR(KERN_INFO "[acpi:sdt:%Iu:%.?q] found table [table: %I64p...%I64p, oem: %.?q, oemtab: %.?q]\n"),
 			       i, COMPILER_LENOF(header.rsdp_signature), header.rsdp_signature,
 			       (u64)base, (u64)base + header.rsdp_length - 1,
 			       COMPILER_LENOF(header.rsdp_oemid), header.rsdp_oemid,
 			       COMPILER_LENOF(header.rsdp_oemtableid), header.rsdp_oemtableid);
-			minfo_addbank((vm_phys_t)base,
-			              (vm_phys_t)header.rsdp_length,
-			              PMEMBANK_TYPE_DEVICE);
+			minfo_addbank(base, (vm_phys_t)header.rsdp_length, PMEMBANK_TYPE_DEVICE);
 		}
 	}
 
@@ -226,7 +277,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_acpi)(void) {
 	{
 		FADT fadt;
 		if (acpi_lookup("FACP", &fadt, sizeof(fadt))) {
-			printk(FREESTR(KERN_DEBUG "fadt_Dsdt = %I32p\n"),fadt.fadt_Dsdt);
+			printk(FREESTR(KERN_DEBUG "[acpi] fadt_Dsdt = %I32p\n"),fadt.fadt_Dsdt);
 		}
 	}
 #endif

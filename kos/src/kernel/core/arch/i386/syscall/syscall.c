@@ -25,7 +25,7 @@
 
 #include <kernel/arch/isr.h>
 #include <kernel/coredump.h>
-#include <kernel/cpuid.h>
+#include <kernel/arch/cpuid.h>
 #include <kernel/debugtrap.h>
 #include <kernel/except.h>
 #include <kernel/idt.h>
@@ -83,14 +83,14 @@ INTERN ATTR_COLDBSS bool syscall_tracing_enabled = false;
 PRIVATE NOBLOCK NONNULL((1, 2)) struct icpustate *
 NOTHROW(FCALL syscall_tracing_ipi)(struct icpustate *__restrict state,
                                    void *args[CPU_IPI_ARGCOUNT]) {
-	if (CURRENT_X86_CPUID.ci_1d & CPUID_1D_SEP) {
+	if (X86_THISCPU_HAVE_SYSENTER) {
 		/* Also re-direct the `sysenter' instruction */
 		__wrmsr(IA32_SYSENTER_EIP,
 		        (u64)(uintptr_t)(args[0] ? (void *)&x86_syscall32_sysenter_traced
 		                                 : (void *)&x86_syscall32_sysenter));
 	}
 #ifdef __x86_64__
-	if (CURRENT_X86_CPUID.ci_80000001d & CPUID_80000001D_SYSCALL) {
+	if (X86_THISCPU_HAVE_SYSCALL) {
 		__wrmsr(IA32_LSTAR,
 		        args[0] ? (u64)&x86_syscall64_syscall_traced
 		                : (u64)&x86_syscall64_syscall);
@@ -200,13 +200,13 @@ PUBLIC bool KCALL syscall_tracing_setenabled(bool enable) {
 	}
 #endif /* !CONFIG_NO_SMP */
 
-	if (CURRENT_X86_CPUID.ci_1d & CPUID_1D_SEP) {
+	if (X86_THISCPU_HAVE_SYSENTER) {
 		__wrmsr(IA32_SYSENTER_EIP,
 		        enable ? (uintptr_t)&x86_syscall32_sysenter_traced
 		               : (uintptr_t)&x86_syscall32_sysenter);
 	}
 #ifdef __x86_64__
-	if (CURRENT_X86_CPUID.ci_80000001d & CPUID_80000001D_SYSCALL) {
+	if (X86_THISCPU_HAVE_SYSCALL) {
 		__wrmsr(IA32_LSTAR,
 		        enable ? (u64)&x86_syscall64_syscall_traced
 		               : (u64)&x86_syscall64_syscall);
@@ -230,7 +230,7 @@ NOTHROW(KCALL syscall_tracing_getenabled)(void) {
 
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL x86_initialize_sysenter)(void) {
-	if (CURRENT_X86_CPUID.ci_1d & CPUID_1D_SEP) {
+	if (X86_HAVE_SYSENTER) {
 		/* Configure support for the `sysenter' instruction. */
 		__wrmsr(IA32_SYSENTER_CS, SEGMENT_KERNEL_CODE);
 #ifdef __x86_64__
@@ -241,7 +241,7 @@ NOTHROW(KCALL x86_initialize_sysenter)(void) {
 		__wrmsr(IA32_SYSENTER_EIP, (u64)(uintptr_t)(void *)&x86_syscall32_sysenter);
 	}
 #ifdef __x86_64__
-	if (CURRENT_X86_CPUID.ci_80000001d & CPUID_80000001D_SYSCALL) {
+	if (X86_HAVE_SYSCALL) {
 		__wrmsr(IA32_STAR, (u64)SEGMENT_KERNEL_CODE << 32);
 		__wrmsr(IA32_LSTAR, (u64)&x86_syscall64_syscall);
 		__wrmsr(IA32_FMASK, EFLAGS_IF);

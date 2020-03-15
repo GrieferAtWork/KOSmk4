@@ -21,7 +21,9 @@
 #define GUARD_KERNEL_INCLUDE_KERNEL_PERSONALITY_H 1
 
 #include <kernel/compiler.h>
+
 #include <kernel/types.h>
+
 #include <kos/personality.h>
 
 DECL_BEGIN

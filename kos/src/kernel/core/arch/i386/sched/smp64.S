@@ -25,7 +25,7 @@
 
 #include <kernel/apic.h>
 #include <kernel/breakpoint.h>
-#include <kernel/cpuid.h>
+#include <kernel/arch/cpuid.h>
 #include <kernel/gdt.h>
 #include <kernel/paging.h>
 #include <kernel/pic.h>
@@ -523,9 +523,6 @@ PRIVATE_FUNCTION(x86_smp_init_cpuid)
 	movl   $(SIZEOF_CPUID_CPUINFO), %rcx
 	rep;   stosb
 #endif
-
-	/* The `cpuid' instruction is available. */
-	orw    $(CPU_FEATURE_FCPUID), thiscpu_x86_cpufeatures(R_CPU)
 
 	movq   %rbx, %rdi
 	movl   $(1), %eax

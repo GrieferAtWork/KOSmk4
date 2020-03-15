@@ -275,7 +275,7 @@ NOTHROW(KCALL x86_initialize_bootloader_drivers)(void) {
 				             (u64)driver_descriptor.mod_end - 1);
 			}
 		}
-	} break;
+	}	break;
 
 	case X86_BOOT_DRIVER_FORMAT_MB2: {
 		PHYS struct mb2_tag *tag_begin, *tag_iter, *tag_end;
@@ -308,7 +308,7 @@ NOTHROW(KCALL x86_initialize_bootloader_drivers)(void) {
 			}
 			tag_iter = (PHYS struct mb2_tag *)((byte_t *)tag_iter + CEIL_ALIGN(tag.size, MB2_TAG_ALIGN));
 		}
-	} break;
+	}	break;
 
 	default: break;
 	}
