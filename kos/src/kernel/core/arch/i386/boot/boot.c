@@ -254,14 +254,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* Make the kernel's .text and .rodata sections read-only. */
 	x86_initialize_kernel_vm_readonly();
 
-#ifndef CONFIG_NO_USERKERN_SEGMENT
-#ifdef __x86_64__
-	set_user_gsbase(x86_get_random_userkern_address());
-#else /* __x86_64__ */
-	set_user_fsbase(x86_get_random_userkern_address());
-#endif /* !__x86_64__ */
-#endif /* !CONFIG_NO_USERKERN_SEGMENT */
-
 	/* Initialize the PID sub-system for the boot task. */
 	kernel_initialize_bootpid();
 
