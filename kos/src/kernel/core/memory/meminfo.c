@@ -632,6 +632,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL kernel_initialize_minfo_makezones)(void)
 	memcpy(buffer, kernel_membanks_initial,
 	       minfo.mb_bankc + 1,
 	       sizeof(struct pmembank));
+	assert(minfo.mb_banks[minfo.mb_bankc].mb_start == 0);
 }
 
 
@@ -656,6 +657,7 @@ NOTHROW(KCALL kernel_initialize_minfo_relocate)(void) {
 	size_t num_bytes;
 	byte_t *dest, *old_addr;
 	ptrdiff_t relocation_offset;
+	assert(minfo.mb_banks[minfo.mb_bankc].mb_start == 0);
 	num_bytes = vm_node_getsize(&kernel_vm_node_pagedata);
 	dest = (byte_t *)vm_getfree(&vm_kernel,
 	                            HINT_GETADDR(KERNEL_VMHINT_PHYSINFO),
@@ -718,6 +720,7 @@ NOTHROW(KCALL kernel_initialize_minfo_relocate)(void) {
 	mzones.pm_zones[0]->mz_prev = NULL;
 	mzones.pm_last->mz_next     = NULL;
 #undef REL
+	assert(minfo.mb_banks[minfo.mb_bankc].mb_start == 0);
 }
 
 
@@ -733,6 +736,7 @@ NOTHROW(KCALL minfo_release_presevations)(void) {
 	size_t i, num_banks = 0;
 	pagecnt_t num_released    = 0;
 	pageptr_t freed_pages_end = 0;
+	assert(minfo.mb_banks[minfo.mb_bankc].mb_start == 0);
 	for (i = 0; i < minfo.mb_bankc; ++i) {
 		/* Search for PRESERVE and ALLOCATED memory banks. */
 		u16 type;
@@ -802,6 +806,8 @@ use_floordiv_maxpage:
 		            minfo.mb_bankc - i,
 		            sizeof(struct pmembank));
 	}
+	/* Ensure NUL-termination (required for `PMEMBANK_TYPE_MAX(minfo.mb_banks[minfo.mb_bankc - 1])') */
+	minfo.mb_banks[minfo.mb_bankc].mb_start = 0;
 }
 
 
