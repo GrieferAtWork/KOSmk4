@@ -224,16 +224,16 @@ LOCAL WUNUSED ATTR_PURE unsigned int NOTHROW(KCALL dbg_getcur_y)(void) { return 
 #define _DBG_PRIVATE_FMT_SETBGCOLOR(bg)   "\033[" _DBG_PRIVATE_COLORFMT_BG_##bg "m"
 
 /* Color escape codes for debug TTY output. */
-#define DF_SETCOLOR(fg, bg)   _DBG_PRIVATE_FMT_SETCOLOR(fg, bg)
-#define DF_SETFGCOLOR(fg)     _DBG_PRIVATE_FMT_SETFGCOLOR(fg)
-#define DF_SETBGCOLOR(bg)     _DBG_PRIVATE_FMT_SETBGCOLOR(bg)
-#define DF_DEFFGCOLOR         "\033[39m"    /* Reset foreground color */
-#define DF_DEFBGCOLOR         "\033[49m"    /* Reset background color */
-#define DF_DEFCOLOR           "\033[39;49m" /* Reset colors */
-#define DF_RESETATTR          "\033[m"      /* Reset all graphics attributes */
-#define DF_SETMAROON          DF_SETFGCOLOR(DBG_COLOR_MAROON)
-#define DF_SETWHITE           DF_SETFGCOLOR(DBG_COLOR_WHITE)
-#define DF_SETBLUE            DF_SETFGCOLOR(DBG_COLOR_BLUE)
+#define DF_SETCOLOR(fg, bg)    _DBG_PRIVATE_FMT_SETCOLOR(fg, bg)
+#define DF_SETFGCOLOR(fg)      _DBG_PRIVATE_FMT_SETFGCOLOR(fg)
+#define DF_SETBGCOLOR(bg)      _DBG_PRIVATE_FMT_SETBGCOLOR(bg)
+#define DF_DEFFGCOLOR          "\033[39m"    /* Reset foreground color */
+#define DF_DEFBGCOLOR          "\033[49m"    /* Reset background color */
+#define DF_DEFCOLOR            "\033[39;49m" /* Reset colors */
+#define DF_RESETATTR           "\033[m"      /* Reset all graphics attributes */
+#define DF_SETMAROON           DF_SETFGCOLOR(DBG_COLOR_MAROON)
+#define DF_SETWHITE            DF_SETFGCOLOR(DBG_COLOR_WHITE)
+#define DF_SETBLUE             DF_SETFGCOLOR(DBG_COLOR_BLUE)
 #define DF_COLOR(fg, bg, text) DF_SETCOLOR(fg, bg) text DF_RESETATTR
 #define DF_FGCOLOR(fg, text)   DF_SETFGCOLOR(fg) text DF_RESETATTR
 #define DF_BGCOLOR(bg, text)   DF_SETBGCOLOR(bg) text DF_RESETATTR

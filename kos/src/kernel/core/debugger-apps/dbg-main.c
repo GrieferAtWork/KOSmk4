@@ -344,6 +344,7 @@ dbg_main(uintptr_t show_welcome) {
 	for (;;) {
 		dbg_attr_t attr;
 		size_t argc;
+		uintptr_t errorcode;
 		struct debug_function const *cmd;
 		/* Force-enable render-to-screen. */
 		dbg_endupdate(true);
@@ -381,9 +382,14 @@ dbg_main(uintptr_t show_welcome) {
 		if (cmd->df_main == &debug_exit)
 			break;
 		TRY {
-			(*cmd->df_main)(argc, argv);
+			errorcode = (*cmd->df_main)(argc, argv);
 		} EXCEPT {
 			error_print_into(&dbg_printer, NULL);
+			errorcode = 1;
+		}
+		if (errorcode == DBG_FUNCTION_INVALID_ARGUMENTS) {
+			dbg_print(DBGSTR(DF_SETCOLOR(DBG_COLOR_MAROON, DBG_COLOR_LIGHT_GRAY)
+			                 "Invalid arguments" DF_RESETATTR "\n"));
 		}
 	}
 }
