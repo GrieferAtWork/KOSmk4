@@ -153,16 +153,25 @@ NOTHROW(KCALL RSDP_LocateInRange)(VIRT uintptr_t base, size_t bytes) {
 	for (; iter < end; iter += RSDPDESCRIPTOR_ALIGN) {
 		PRIVATE union {
 			char c[8];
+#ifdef __x86_64__
+			u64  u;
+#else /* __x86_64__ */
 			u32  u[2];
+#endif /* !__x86_64__ */
 		} const signature = {
 			{ 'R', 'S', 'D', ' ', 'P', 'T', 'R', ' ' }
 		};
 		RSDPDescriptor *result = (RSDPDescriptor *)iter;
 		/* Check for the signature. */
+#ifdef __x86_64__
+		if (((u64 *)result->rsdp_signature)[0] != signature.u)
+			continue;
+#else /* __x86_64__ */
 		if (((u32 *)result->rsdp_signature)[0] != signature.u[0])
 			continue;
 		if (((u32 *)result->rsdp_signature)[1] != signature.u[1])
 			continue;
+#endif /* !__x86_64__ */
 		/* When found, check the checksum. */
 		if (!acpi_memsum(result, offsetafter(RSDPDescriptor, rsdp_rsdtaddr)))
 			return result;
