@@ -147,7 +147,7 @@ NOTHROW(KCALL x86_initialize_commandline_himem)(void) {
 		cmdline_copy[x86_kernel_cmdline_length + 1] = '\0';
 		kernel_driver.d_cmdline = cmdline_copy;
 		kernel_driver.d_argv    = (char **)kmalloc((kernel_driver.d_argc + 1) * sizeof(char *), GFP_LOCKED);
-		printk(FREESTR(KERN_INFO "Loaded kernel commandline: ["));
+		printk(FREESTR(KERN_INFO "[boot] Loaded kernel commandline: ["));
 		for (i = 0, arg = cmdline_copy;
 		     i < kernel_driver.d_argc; ++i, arg = strend(arg) + 1) {
 			printk(FREESTR(KERN_INFO "%s%q"), i == 0 ? FREESTR("") : FREESTR(", "), arg);

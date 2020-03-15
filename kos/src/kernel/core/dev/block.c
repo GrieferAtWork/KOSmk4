@@ -957,7 +957,7 @@ DECL_BEGIN
 
 LOCAL NOBLOCK void
 NOTHROW(KCALL log_sync)(struct block_device *__restrict self, lba_t sector_id) {
-	printk(KERN_INFO "[sync][\"/dev/%#q\",devno=%u:%u] Syncing sector %#I64x (%#I64x-%#I64x)\n",
+	printk(KERN_INFO "[blk:\"/dev/%#q\",devno=%u:%u] Syncing sector %#I64x (%#I64x-%#I64x)\n",
 	       self->bd_name,
 	       (unsigned int)MAJOR(block_device_devno(self)),
 	       (unsigned int)MINOR(block_device_devno(self)),
@@ -1024,7 +1024,7 @@ _block_device_sync(struct block_device *__restrict self)
 				continue;
 			self->bd_cache[i].cs_flags &= ~BD_CACHED_SECTOR_FCHANGED;
 		}
-		printk(KERN_NOTICE "[sync][\"/dev/%#q\",devno=%u:%u] Block device was synced\n",
+		printk(KERN_NOTICE "[blk:\"/dev/%#q\",devno=%u:%u] Block device was synced\n",
 		       self->bd_name,
 		       (unsigned int)MAJOR(block_device_devno(self)),
 		       (unsigned int)MINOR(block_device_devno(self)));

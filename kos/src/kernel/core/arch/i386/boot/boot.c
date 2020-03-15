@@ -151,7 +151,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 			x86_initialize_memory_via_bios();
 			total_pages = minfo_usable_ram_pages();
 		}
-		printk(FREESTR(KERN_INFO "[boot] Located %Iu (%#Ix) bytes (%Iu %s) of usable RAM\n"),
+		printk(FREESTR(KERN_INFO "[mem] Located %Iu (%#Ix) bytes (%Iu %s) of usable RAM\n"),
 		       total_pages * PAGESIZE,
 		       total_pages * PAGESIZE,
 		       total_pages >= (0x100000 / PAGESIZE)

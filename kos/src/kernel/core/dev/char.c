@@ -300,7 +300,7 @@ character_device_add_to_devfs_impl(struct character_device *__restrict self) {
 	 * NOTE: If the file already exists, ignore that fact, as
 	 *      `devfs_insert()' will already set `self->cd_devfs_inode'
 	 *       to `NULL' for us */
-	printk(KERN_INFO "Register new character-device `/dev/%s'\n", self->cd_name);
+	printk(KERN_INFO "[chr] Register new character-device `/dev/%s'\n", self->cd_name);
 	if likely(!self->cd_devfs_inode) {
 		devfs_insert(self->cd_name,
 		             S_IFCHR,
@@ -331,7 +331,7 @@ PUBLIC NONNULL((1)) bool KCALL
 character_device_unregister(struct character_device *__restrict self)
 		THROWS(E_WOULDBLOCK) {
 	bool result = false;
-	printk(KERN_INFO "Removing character-device `/dev/%s'\n", self->cd_name);
+	printk(KERN_INFO "[chr] Removing character-device `/dev/%s'\n", self->cd_name);
 	if likely(self->cd_devlink.a_vaddr != DEV_UNSET) {
 		cdl_write();
 		COMPILER_READ_BARRIER();
