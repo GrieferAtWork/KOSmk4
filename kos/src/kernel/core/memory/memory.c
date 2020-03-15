@@ -1139,6 +1139,11 @@ DEFINE_DEBUG_FUNCTION(
 	if (argc != 1)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
 	(void)argv;
+#if __SIZEOF_POINTER__ >= 8
+	dbg_print(DBGSTR("# Start            End                   Usage (used/total)\n"));
+#else /* __SIZEOF_POINTER__ >= 8 */
+	dbg_print(DBGSTR("# Start    End           Usage (used/total)\n"));
+#endif /* __SIZEOF_POINTER__ < 8 */
 	for (i = 0; i < mzones.pm_zonec; ++i) {
 		struct pmemzone *zone;
 		size_t used_pages, total_pages;
