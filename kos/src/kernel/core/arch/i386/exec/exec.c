@@ -80,7 +80,7 @@ elfexec_init_entry(struct icpustate *__restrict user_state,
 		if (ehdr->e_ident[EI_ABIVERSION] != 0) {
 			THROW(E_NOT_EXECUTABLE_FAULTY,
 			      E_NOT_EXECUTABLE_FAULTY_FORMAT_ELF,
-			      E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADABI,
+			      E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADABIVERSION,
 			      ELFOSABI_SYSV,
 			      ehdr->e_ident[EI_ABIVERSION]);
 		}
@@ -181,7 +181,7 @@ elfexec_init_entry32(struct icpustate *__restrict user_state,
 		if (ehdr->e_ident[EI_ABIVERSION] != 0) {
 			THROW(E_NOT_EXECUTABLE_FAULTY,
 			      E_NOT_EXECUTABLE_FAULTY_FORMAT_ELF,
-			      E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADABI,
+			      E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADABIVERSION,
 			      ELFOSABI_SYSV,
 			      ehdr->e_ident[EI_ABIVERSION]);
 		}
@@ -197,7 +197,7 @@ elfexec_init_entry32(struct icpustate *__restrict user_state,
 		 * bytes allocated right here)...
 		 * FIXME: For ELF binaries marked as `ELFOSABI_SYSV', we really
 		 *        should push a copy of the PEB's `envp' and `argv' in
-		 *        compliance with the SysV requirements! */
+		 *        compliance with SysV requirements! */
 		ustack_size -= 4;
 		break;
 
