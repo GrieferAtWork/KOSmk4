@@ -28,6 +28,7 @@
 #include <debugger/config.h>
 #include <debugger/function.h>
 #include <debugger/io.h>
+#include <debugger/rt.h>
 #include <kernel/arch/cpuid.h>
 #include <kernel/arch/paging64.h>
 #include <kernel/except.h>
@@ -2497,10 +2498,10 @@ docall:
 }
 
 PRIVATE ATTR_DBGTEXT void KCALL
-p64_enum_e4(p64_enumfun_t func, void *arg) {
+p64_enum_e4(p64_enumfun_t func, void *arg, unsigned int vec4_max) {
 	unsigned int vec4;
 	union p64_pdir_e4 *e4 = P64_PDIR_E4_IDENTITY;
-	for (vec4 = 0; vec4 < 512; ++vec4) {
+	for (vec4 = 0; vec4 < vec4_max; ++vec4) {
 		union p64_pdir_e4 word;
 		word = e4[vec4];
 		if (P64_PDIR_E4_ISVEC3(word.p_word)) {
@@ -2520,7 +2521,7 @@ struct p64_enumdat {
 	bool   ed_skipident;
 };
 
-PRIVATE void KCALL
+PRIVATE ATTR_DBGTEXT void KCALL
 p64_printident(struct p64_enumdat *__restrict data) {
 	dbg_printf(DBGSTR(DF_WHITE("%p") "-" DF_WHITE("%p") ": " DF_WHITE("%Iu") " identity mappings\n"),
 	           (byte_t *)P64_VM_KERNEL_PDIR_IDENTITY_BASE,
@@ -2529,7 +2530,7 @@ p64_printident(struct p64_enumdat *__restrict data) {
 	data->ed_identcnt = 0;
 }
 
-PRIVATE void KCALL
+PRIVATE ATTR_DBGTEXT void KCALL
 p64_doenum(struct p64_enumdat *__restrict data,
            void *start, size_t num_bytes, u64 word, u64 mask) {
 	assert((word & P64_PAGE_FPRESENT) || (word & P64_PAGE_FISAHINT));
@@ -2541,7 +2542,10 @@ p64_doenum(struct p64_enumdat *__restrict data,
 		size_t indent;
 		dbg_printf(DBGSTR(": " DF_WHITE("%p") "+" DF_SETWHITE),
 		           word & P64_PAGE_FADDR_4KIB);
-		if ((num_bytes >= ((u64)1024 * 1024 * 1024)) &&
+		if ((num_bytes >= ((u64)1024 * 1024 * 1024 * 1024)) &&
+		    (num_bytes % ((u64)1024 * 1024 * 1024 * 1024)) == 0) {
+			indent = dbg_printf(DBGSTR("%Iu" DF_RESETATTR "TiB"), (size_t)(num_bytes / ((u64)1024 * 1024 * 1024 * 1024)));
+		} else if ((num_bytes >= ((u64)1024 * 1024 * 1024)) &&
 		    (num_bytes % ((u64)1024 * 1024 * 1024)) == 0) {
 			indent = dbg_printf(DBGSTR("%Iu" DF_RESETATTR "GiB"), (size_t)(num_bytes / ((u64)1024 * 1024 * 1024)));
 		} else if ((num_bytes >= ((u64)1024 * 1024)) &&
@@ -2597,7 +2601,7 @@ p64_doenum(struct p64_enumdat *__restrict data,
 	}
 }
 
-PRIVATE void KCALL
+PRIVATE ATTR_DBGTEXT void KCALL
 p64_enumfun(void *arg, void *start, size_t num_bytes, u64 word) {
 	struct p64_enumdat *data;
 	data = (struct p64_enumdat *)arg;
@@ -2634,20 +2638,8 @@ done_print:
 	data->ed_prevword    = word;
 }
 
-
-
-DEFINE_DEBUG_FUNCTION(
-		"lspd",
-		"lspd [MODE:kernel|user=user]\n"
-		"\tDo a raw walk over the loaded page directory and enumerate mappings.\n"
-		"\t" DF_WHITE("mode") " can be specified as either " DF_WHITE("kernel") " or " DF_WHITE("user") " to select if " DF_WHITE("vm_kernel") "\n"
-		"\tor " DF_WHITE("THIS_VM") " should be dumped\n",
-		argc, argv) {
+PRIVATE ATTR_DBGTEXT void KCALL p64_do_ldpd(unsigned int vec4_max) {
 	struct p64_enumdat data;
-	/* TODO: Parse `argv' (the `full') */
-	if (argc != 1)
-		return DBG_FUNCTION_INVALID_ARGUMENTS;
-	(void)argv;
 	data.ed_prevstart = 0;
 	data.ed_prevsize  = 0;
 	data.ed_prevword  = 0;
@@ -2656,9 +2648,38 @@ DEFINE_DEBUG_FUNCTION(
 	data.ed_mask = P64_PAGE_FVECTOR | P64_PAGE_FPRESENT | P64_PAGE_FWRITE | P64_PAGE_FUSER |
 	               P64_PAGE_FPWT | P64_PAGE_FPCD | P64_PAGE_FPAT | P64_PAGE_FNOEXEC |
 	               P64_PAGE_FPREPARED | P64_PAGE_FGLOBAL | P64_PAGE_FACCESSED | P64_PAGE_FDIRTY;
-	p64_enum_e4(&p64_enumfun, &data);
+	p64_enum_e4(&p64_enumfun, &data, vec4_max);
 	if (data.ed_prevsize)
 		p64_doenum(&data, data.ed_prevstart, data.ed_prevsize, data.ed_prevword, data.ed_mask);
+}
+
+DEFINE_DEBUG_FUNCTION(
+		"lspd",
+		"lspd [MODE:kernel|user=user]\n"
+		"\tDo a raw walk over the loaded page directory and enumerate mappings.\n"
+		"\t" DF_WHITE("mode") " can be specified as either " DF_WHITE("kernel") " or " DF_WHITE("user") " to select if " DF_WHITE("vm_kernel") "\n"
+		"\tor " DF_WHITE("THIS_VM") " should be dumped\n",
+		argc, argv) {
+	PAGEDIR_P_SELFTYPE pdir;
+	if (argc == 2) {
+		if (strcmp(argv[1], "kernel") == 0)
+			goto do_ls_kernel;
+		if (strcmp(argv[1], "user") != 0)
+			return DBG_FUNCTION_INVALID_ARGUMENTS;
+	} else {
+		if (argc != 1)
+			return DBG_FUNCTION_INVALID_ARGUMENTS;
+	}
+	pdir = dbg_getpagedir();
+	if (PAGEDIR_P_ISKERNEL(pdir)) {
+do_ls_kernel:
+		p64_do_ldpd(512);
+		return 0;
+	}
+	PAGEDIR_P_BEGINUSE(pdir) {
+		p64_do_ldpd(256);
+	}
+	PAGEDIR_P_ENDUSE(pdir);
 	return 0;
 }
 #endif /* CONFIG_HAVE_DEBUGGER */

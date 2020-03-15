@@ -177,21 +177,32 @@ NOTHROW(FCALL pagedir_fini)(VIRT pagedir_t *__restrict self);
 
 #ifndef PAGEDIR_API_P_SELFARG
 #ifdef ARCH_PAGEDIR_GETSET_USES_POINTER
-#define PAGEDIR_P_SELFTYPE      PHYS pagedir_t *
-#define PAGEDIR_P_SELFOFVM(vm) (vm)->v_pdir_phys_ptr
+#define PAGEDIR_P_SELFTYPE        PHYS pagedir_t *
+#define PAGEDIR_P_SELFOFVM(vm)    (vm)->v_pdir_phys_ptr
+#define PAGEDIR_P_ISKERNEL(x)     ((x) == &pagedir_kernel_phys)
+#define PAGEDIR_P_ISFROMVM(x, vm) ((x) == (vm)->v_pdir_phys_ptr)
 #else /* ARCH_PAGEDIR_GETSET_USES_POINTER */
-#define PAGEDIR_P_SELFTYPE      PHYS vm_phys_t
-#define PAGEDIR_P_SELFOFVM(vm) (vm)->v_pdir_phys
+#define PAGEDIR_P_SELFTYPE        PHYS vm_phys_t
+#define PAGEDIR_P_SELFOFVM(vm)    (vm)->v_pdir_phys
+#define PAGEDIR_P_ISKERNEL(x)     ((x) == vm_kernel.v_pdir_phys)
+#define PAGEDIR_P_ISFROMVM(x, vm) ((x) == (vm)->v_pdir_phys)
 #endif /* !ARCH_PAGEDIR_GETSET_USES_POINTER */
 #endif /* !PAGEDIR_API_P_SELFARG */
 
 #if defined(__INTELLISENSE__)
 typedef struct { PAGEDIR_P_SELFTYPE _m_self; } __pagedir_p_selftype;
-__FORCELOCAL ATTR_CONST __pagedir_p_selftype KCALL __pagedir_p_selfofvm(struct vm *__restrict v);
+__pagedir_p_selftype __pagedir_p_selfofvm(struct vm *__restrict v);
 #undef PAGEDIR_P_SELFTYPE
 #undef PAGEDIR_P_SELFOFVM
 #define PAGEDIR_P_SELFTYPE __pagedir_p_selftype
 #define PAGEDIR_P_SELFOFVM __pagedir_p_selfofvm
+#ifdef ARCH_PAGEDIR_GETSET_USES_POINTER
+#define PAGEDIR_P_ISKERNEL(x)     ((x)._m_self == &pagedir_kernel_phys)
+#define PAGEDIR_P_ISFROMVM(x, vm) ((x)._m_self == (vm)->v_pdir_phys_ptr)
+#else /* ARCH_PAGEDIR_GETSET_USES_POINTER */
+#define PAGEDIR_P_ISKERNEL(x)     ((x)._m_self == vm_kernel.v_pdir_phys)
+#define PAGEDIR_P_ISFROMVM(x, vm) ((x)._m_self == (vm)->v_pdir_phys)
+#endif /* !ARCH_PAGEDIR_GETSET_USES_POINTER */
 #endif /* __INTELLISENSE__ */
 
 

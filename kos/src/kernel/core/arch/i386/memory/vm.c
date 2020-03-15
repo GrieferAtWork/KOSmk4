@@ -501,7 +501,11 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_kernel_vm)(void) {
 		}
 	}
 
-	/* Clear the trampoline mappings of the 3 initial threads */
+	/* Clear the trampoline mappings of the 3 initial threads.
+	 * Before this point, they were (likely) still filled in with the original
+	 * physical memory identity mapping containing the kernel core image, or
+	 * may have also not been mapped at all (in which case this is a no-op)
+	 * s.a.: the comment inside of `vm_copyfromphys_noidentity_partial()' in `boot/acpi.c' */
 	pagedir_unmap_and_sync_one(PAGEID_DECODE_KERNEL(FORTASK(&_boottask, this_trampoline_page)));
 	pagedir_unmap_and_sync_one(PAGEID_DECODE_KERNEL(FORTASK(&_bootidle, this_trampoline_page)));
 	pagedir_unmap_and_sync_one(PAGEID_DECODE_KERNEL(FORTASK(&_asyncwork, this_trampoline_page)));
