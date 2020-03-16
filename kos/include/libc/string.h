@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f0d4c6e */
+/* HASH CRC-32:0xb0a6cabc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -89,7 +89,7 @@
 #define __libc_strcmp __libc_core_strcmp
 /* Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
 #define __libc_strnlen __libc_core_strnlen
-/* Descendingly search for `NEEDLE', starting at `HAYSTACK+N_BYTES'. - Return `NULL' if `NEEDLE' wasn't found. */
+/* Descendingly search for `NEEDLE', starting at `HAYSTACK + N_BYTES'. - Return `NULL' if `NEEDLE' wasn't found. */
 #define __libc_memrchr __libc_core_memrchr
 /* Return the first address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
  * If no such sub-string exists, return `NULL' instead.
@@ -275,45 +275,45 @@
 #define __libc_memchrl __libc_core_memchrl
 #endif /* !__fast_memchrl_defined */
 #ifdef __fast_memrchrw_defined
-/* Descendingly search for `NEEDLE', starting at `HAYSTACK+N_WORDS'. - Return `NULL' if `NEEDLE' wasn't found. */
+/* Descendingly search for `NEEDLE', starting at `HAYSTACK + N_WORDS * 2'. - Return `NULL' if `NEEDLE' wasn't found. */
 #define __libc_memrchrw (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memrchrw))
 #else /* __fast_memrchrw_defined */
-/* Descendingly search for `NEEDLE', starting at `HAYSTACK+N_WORDS'. - Return `NULL' if `NEEDLE' wasn't found. */
+/* Descendingly search for `NEEDLE', starting at `HAYSTACK + N_WORDS * 2'. - Return `NULL' if `NEEDLE' wasn't found. */
 #define __libc_memrchrw __libc_core_memrchrw
 #endif /* !__fast_memrchrw_defined */
 #ifdef __fast_memrchrl_defined
-/* Descendingly search for `NEEDLE', starting at `HAYSTACK+N_DWORDS'. - Return `NULL' if `NEEDLE' wasn't found. */
+/* Descendingly search for `NEEDLE', starting at `HAYSTACK + N_DWORDS * 4'. - Return `NULL' if `NEEDLE' wasn't found. */
 #define __libc_memrchrl (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memrchrl))
 #else /* __fast_memrchrl_defined */
-/* Descendingly search for `NEEDLE', starting at `HAYSTACK+N_DWORDS'. - Return `NULL' if `NEEDLE' wasn't found. */
+/* Descendingly search for `NEEDLE', starting at `HAYSTACK + N_DWORDS * 4'. - Return `NULL' if `NEEDLE' wasn't found. */
 #define __libc_memrchrl __libc_core_memrchrl
 #endif /* !__fast_memrchrl_defined */
 #ifdef __fast_memendw_defined
-/* Same as `memchrw', but return `HAYSTACK+N_WORDS', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memchrw', but return `HAYSTACK + N_WORDS * 2', rather than `NULL' if `NEEDLE' wasn't found. */
 #define __libc_memendw (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memendw))
 #else /* __fast_memendw_defined */
-/* Same as `memchrw', but return `HAYSTACK+N_WORDS', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memchrw', but return `HAYSTACK + N_WORDS * 2', rather than `NULL' if `NEEDLE' wasn't found. */
 #define __libc_memendw __libc_core_memendw
 #endif /* !__fast_memendw_defined */
 #ifdef __fast_memendl_defined
-/* Same as `memchrl', but return `HAYSTACK+N_DWORDS', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memchrl', but return `HAYSTACK + N_DWORDS * 4', rather than `NULL' if `NEEDLE' wasn't found. */
 #define __libc_memendl (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memendl))
 #else /* __fast_memendl_defined */
-/* Same as `memchrl', but return `HAYSTACK+N_DWORDS', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memchrl', but return `HAYSTACK + N_DWORDS * 4', rather than `NULL' if `NEEDLE' wasn't found. */
 #define __libc_memendl __libc_core_memendl
 #endif /* !__fast_memendl_defined */
 #ifdef __fast_memrendw_defined
-/* Same as `memrchrw', but return `HAYSTACK-1', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memrchrw', but return `HAYSTACK - 2', rather than `NULL' if `NEEDLE' wasn't found. */
 #define __libc_memrendw (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memrendw))
 #else /* __fast_memrendw_defined */
-/* Same as `memrchrw', but return `HAYSTACK-1', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memrchrw', but return `HAYSTACK - 2', rather than `NULL' if `NEEDLE' wasn't found. */
 #define __libc_memrendw __libc_core_memrendw
 #endif /* !__fast_memrendw_defined */
 #ifdef __fast_memrendl_defined
-/* Same as `memrchrl', but return `HAYSTACK-1', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memrchrl', but return `HAYSTACK - 4', rather than `NULL' if `NEEDLE' wasn't found. */
 #define __libc_memrendl (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memrendl))
 #else /* __fast_memrendl_defined */
-/* Same as `memrchrl', but return `HAYSTACK-1', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memrchrl', but return `HAYSTACK - 4', rather than `NULL' if `NEEDLE' wasn't found. */
 #define __libc_memrendl __libc_core_memrendl
 #endif /* !__fast_memrendl_defined */
 #ifdef __fast_memcpyq_defined
@@ -415,24 +415,28 @@
 #define __libc_memendq __libc_core_memendq
 #endif /* !__fast_memendq_defined */
 #ifdef __fast_memrendq_defined
-/* Same as `memrchrq', but return `HAYSTACK-1', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memrchrq', but return `HAYSTACK - 8', rather than `NULL' if `NEEDLE' wasn't found. */
 #define __libc_memrendq (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memrendq))
 #else /* __fast_memrendq_defined */
-/* Same as `memrchrq', but return `HAYSTACK-1', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memrchrq', but return `HAYSTACK - 8', rather than `NULL' if `NEEDLE' wasn't found. */
 #define __libc_memrendq __libc_core_memrendq
 #endif /* !__fast_memrendq_defined */
 #ifdef __fast_memlenq_defined
-/* Same as `memendq', but return the offset from `HAYSTACK', rather than the actual address. */
+/* Same as `memendq', but return the offset from `HAYSTACK', rather than the actual address.
+ * Returns `N_QWORDS' if the given `NEEDLE' wasn't found */
 #define __libc_memlenq (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memlenq))
 #else /* __fast_memlenq_defined */
-/* Same as `memendq', but return the offset from `HAYSTACK', rather than the actual address. */
+/* Same as `memendq', but return the offset from `HAYSTACK', rather than the actual address.
+ * Returns `N_QWORDS' if the given `NEEDLE' wasn't found */
 #define __libc_memlenq __libc_core_memlenq
 #endif /* !__fast_memlenq_defined */
 #ifdef __fast_memrlenq_defined
-/* Same as `memrendq', but return the offset from `HAYSTACK', rather than the actual address. */
+/* Same as `memrendq', but return the offset from `HAYSTACK', rather than the actual address.
+ * Returns `(size_t)-1 / 8' if the given `NEEDLE' wasn't found */
 #define __libc_memrlenq (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memrlenq))
 #else /* __fast_memrlenq_defined */
-/* Same as `memrendq', but return the offset from `HAYSTACK', rather than the actual address. */
+/* Same as `memrendq', but return the offset from `HAYSTACK', rather than the actual address.
+ * Returns `(size_t)-1 / 8' if the given `NEEDLE' wasn't found */
 #define __libc_memrlenq __libc_core_memrlenq
 #endif /* !__fast_memrlenq_defined */
 #ifdef __fast_rawmemlenq_defined
@@ -564,31 +568,35 @@
 #define __libc_mempmovedown __libc_core_mempmovedown
 #endif /* !__fast_mempmovedown_defined */
 #ifdef __fast_memend_defined
-/* Same as `memchr', but return `HAYSTACK+N_BYTES', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memchr', but return `HAYSTACK + N_BYTES', rather than `NULL' if `NEEDLE' wasn't found. */
 #define __libc_memend (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memend))
 #else /* __fast_memend_defined */
-/* Same as `memchr', but return `HAYSTACK+N_BYTES', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memchr', but return `HAYSTACK + N_BYTES', rather than `NULL' if `NEEDLE' wasn't found. */
 #define __libc_memend __libc_core_memend
 #endif /* !__fast_memend_defined */
 #ifdef __fast_memrend_defined
-/* Same as `memrchr', but return `HAYSTACK-1', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memrchr', but return `HAYSTACK - 1', rather than `NULL' if `NEEDLE' wasn't found. */
 #define __libc_memrend (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memrend))
 #else /* __fast_memrend_defined */
-/* Same as `memrchr', but return `HAYSTACK-1', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memrchr', but return `HAYSTACK - 1', rather than `NULL' if `NEEDLE' wasn't found. */
 #define __libc_memrend __libc_core_memrend
 #endif /* !__fast_memrend_defined */
 #ifdef __fast_memlen_defined
-/* Same as `memend', but return the offset from `HAYSTACK', rather than the actual address. */
+/* Same as `memend', but return the offset from `HAYSTACK', rather than the actual address.
+ * Returns `n_bytes' if the given `NEEDLE' wasn't found */
 #define __libc_memlen (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memlen))
 #else /* __fast_memlen_defined */
-/* Same as `memend', but return the offset from `HAYSTACK', rather than the actual address. */
+/* Same as `memend', but return the offset from `HAYSTACK', rather than the actual address.
+ * Returns `n_bytes' if the given `NEEDLE' wasn't found */
 #define __libc_memlen __libc_core_memlen
 #endif /* !__fast_memlen_defined */
 #ifdef __fast_memrlen_defined
-/* Same as `memrend', but return the offset from `HAYSTACK', rather than the actual address. */
+/* Same as `memrend', but return the offset from `HAYSTACK', rather than the actual address.
+ * Returns `(size_t)-1' if the given `NEEDLE' wasn't found */
 #define __libc_memrlen (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memrlen))
 #else /* __fast_memrlen_defined */
-/* Same as `memrend', but return the offset from `HAYSTACK', rather than the actual address. */
+/* Same as `memrend', but return the offset from `HAYSTACK', rather than the actual address.
+ * Returns `(size_t)-1' if the given `NEEDLE' wasn't found */
 #define __libc_memrlen __libc_core_memrlen
 #endif /* !__fast_memrlen_defined */
 /* Return the last address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'

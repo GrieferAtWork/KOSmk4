@@ -89,7 +89,7 @@ __NAMESPACE_STD_USING(__forward_size)
  *   [glc] rawmemchr[b|w|l|q]   - Same as `memchr[b|w|l|q]' with a search limit of `(size_t)-1/sizeof(T)'
  *   [kos] rawmemrchr[b|w|l|q]  - Same as `memrchr[b|w|l|q]' without a search limit, starting at `HAYSTACK-sizeof(T)'
  *   [kos] memend[b|w|l|q]      - Same as `memchr[b|w|l|q]', but return `HAYSTACK+N_(BYTES|WORDS|DWORDS)', rather than `NULL' if `NEEDLE' wasn't found.
- *   [kos] memrend[b|w|l|q]     - Same as `memrchr[b|w|l|q]', but return `HAYSTACK-1', rather than `NULL' if `NEEDLE' wasn't found.
+ *   [kos] memrend[b|w|l|q]     - Same as `memrchr[b|w|l|q]', but return `HAYSTACK - 1', rather than `NULL' if `NEEDLE' wasn't found.
  *   [kos] memlen[b|w|l|q]      - Same as `memend[b|w|l|q]', but return the offset from `HAYSTACK', rather than the actual address.
  *   [kos] memrlen[b|w|l|q]     - Same as `memrend[b|w|l|q]', but return the offset from `HAYSTACK', rather than the actual address.
  *   [kos] rawmemlen[b|w|l|q]   - Same as `rawmemchr[b|w|l|q]', but return the offset from `HAYSTACK', rather than the actual address.
@@ -590,7 +590,7 @@ strtok_r:(char *string,
 #ifdef __USE_GNU
 }
 
-@@Descendingly search for `NEEDLE', starting at `HAYSTACK+N_BYTES'. - Return `NULL' if `NEEDLE' wasn't found.
+@@Descendingly search for `NEEDLE', starting at `HAYSTACK + N_BYTES'. - Return `NULL' if `NEEDLE' wasn't found.
 [libc][kernel][ATTR_WUNUSED][ATTR_PURE]
 memrchr:([nonnull] void const *__restrict haystack, int needle, $size_t n_bytes) -> void *
 	[([nonnull] void *__restrict haystack, int needle, $size_t n_bytes) -> void *]
@@ -1335,14 +1335,14 @@ memchrl:([nonnull] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dwo
 	return NULL;
 }
 
-@@Descendingly search for `NEEDLE', starting at `HAYSTACK+N_BYTES'. - Return `NULL' if `NEEDLE' wasn't found.
+@@Descendingly search for `NEEDLE', starting at `HAYSTACK + N_BYTES'. - Return `NULL' if `NEEDLE' wasn't found.
 [nocrt][noexport][ATTR_WUNUSED][ATTR_PURE]
 memrchrb:([nonnull] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes) -> $uint8_t *
 	[([nonnull] /*aligned(1)*/ void *__restrict haystack, int byte, $size_t n_bytes) -> $uint8_t *]
 	[([nonnull] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes) -> $uint8_t const *]
 	= memrchr;
 
-@@Descendingly search for `NEEDLE', starting at `HAYSTACK+N_WORDS'. - Return `NULL' if `NEEDLE' wasn't found.
+@@Descendingly search for `NEEDLE', starting at `HAYSTACK + N_WORDS * 2'. - Return `NULL' if `NEEDLE' wasn't found.
 [fast][libc][kernel][ATTR_WUNUSED][ATTR_PURE]
 memrchrw:([nonnull] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words) -> $uint16_t *
 	[([nonnull] /*aligned(2)*/ void *__restrict haystack, $uint16_t word, $size_t n_words) -> $uint16_t *]
@@ -1356,7 +1356,7 @@ memrchrw:([nonnull] /*aligned(2)*/ void const *__restrict haystack, $uint16_t wo
 	return NULL;
 }
 
-@@Descendingly search for `NEEDLE', starting at `HAYSTACK+N_DWORDS'. - Return `NULL' if `NEEDLE' wasn't found.
+@@Descendingly search for `NEEDLE', starting at `HAYSTACK + N_DWORDS * 4'. - Return `NULL' if `NEEDLE' wasn't found.
 [fast][libc][kernel][ATTR_WUNUSED][ATTR_PURE]
 memrchrl:([nonnull] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords) -> $uint32_t *
 	[([nonnull] /*aligned(4)*/ void *__restrict haystack, $uint32_t dword, $size_t n_dwords) -> $uint32_t *]
@@ -1406,14 +1406,14 @@ rawmemchrl:([nonnull] /*aligned(4)*/ void const *__restrict haystack, $uint32_t 
 }
 
 
-@@Same as `memrchrb' without a search limit, starting at `HAYSTACK-1'
+@@Same as `memrchrb' without a search limit, starting at `HAYSTACK - 1'
 [nocrt][noexport][ATTR_WUNUSED][ATTR_PURE]
 rawmemrchrb:([nonnull] /*aligned(1)*/ void const *__restrict haystack, int byte) -> [nonnull] $uint8_t *
 	[([nonnull] /*aligned(1)*/ void *__restrict haystack, int byte) -> [nonnull] $uint8_t *]
 	[([nonnull] /*aligned(1)*/ void const *__restrict haystack, int byte) -> [nonnull] $uint8_t const *]
 	= rawmemrchr;
 
-@@Same as `memrchrw' without a search limit, starting at `(byte_t *)HAYSTACK-2'
+@@Same as `memrchrw' without a search limit, starting at `(byte_t *)HAYSTACK - 2'
 [kernel][ATTR_WUNUSED][ATTR_PURE]
 rawmemrchrw:([nonnull] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word) -> [nonnull] $uint16_t *
 	[([nonnull] /*aligned(2)*/ void *__restrict haystack, $uint16_t word) -> [nonnull] $uint16_t *]
@@ -1427,7 +1427,7 @@ rawmemrchrw:([nonnull] /*aligned(2)*/ void const *__restrict haystack, $uint16_t
 	return iter;
 }
 
-@@Same as `memrchrl' without a search limit, starting at `(byte_t *)HAYSTACK-4'
+@@Same as `memrchrl' without a search limit, starting at `(byte_t *)HAYSTACK - 4'
 [kernel][ATTR_WUNUSED][ATTR_PURE]
 rawmemrchrl:([nonnull] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword) -> [nonnull] $uint32_t *
 	[([nonnull] /*aligned(4)*/ void *__restrict haystack, $uint32_t dword) -> [nonnull] $uint32_t *]
@@ -1442,14 +1442,14 @@ rawmemrchrl:([nonnull] /*aligned(4)*/ void const *__restrict haystack, $uint32_t
 }
 
 
-@@Same as `memchrb', but return `HAYSTACK+N_BYTES', rather than `NULL' if `NEEDLE' wasn't found.
+@@Same as `memchrb', but return `HAYSTACK + N_BYTES', rather than `NULL' if `NEEDLE' wasn't found.
 [nocrt][noexport][ATTR_WUNUSED][ATTR_PURE]
 memendb:([nonnull] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes) -> [nonnull] $uint8_t *
 	[([nonnull] /*aligned(1)*/ void *__restrict haystack, int byte, $size_t n_bytes) -> [nonnull] $uint8_t *]
 	[([nonnull] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes) -> [nonnull] $uint8_t const *]
 	= memend;
 
-@@Same as `memchrw', but return `HAYSTACK+N_WORDS', rather than `NULL' if `NEEDLE' wasn't found.
+@@Same as `memchrw', but return `HAYSTACK + N_WORDS * 2', rather than `NULL' if `NEEDLE' wasn't found.
 [fast][libc][kernel][ATTR_WUNUSED][ATTR_PURE]
 memendw:([nonnull] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_bytes) -> [nonnull] $uint16_t *
 	[([nonnull] /*aligned(2)*/ void *__restrict haystack, $uint16_t word, $size_t n_bytes) -> [nonnull] $uint16_t *]
@@ -1463,7 +1463,7 @@ memendw:([nonnull] /*aligned(2)*/ void const *__restrict haystack, $uint16_t wor
 	return result;
 }
 
-@@Same as `memchrl', but return `HAYSTACK+N_DWORDS', rather than `NULL' if `NEEDLE' wasn't found.
+@@Same as `memchrl', but return `HAYSTACK + N_DWORDS * 4', rather than `NULL' if `NEEDLE' wasn't found.
 [fast][libc][kernel][ATTR_WUNUSED][ATTR_PURE]
 memendl:([nonnull] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_bytes) -> [nonnull] $uint32_t *
 	[([nonnull] /*aligned(4)*/ void *__restrict haystack, $uint32_t dword, $size_t n_bytes) -> [nonnull] $uint32_t *]
@@ -1477,37 +1477,45 @@ memendl:([nonnull] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dwo
 	return result;
 }
 
-@@Same as `memrchrb', but return `HAYSTACK-1', rather than `NULL' if `NEEDLE' wasn't found.
+@@Same as `memrchrb', but return `HAYSTACK - 1', rather than `NULL' if `NEEDLE' wasn't found.
 [nocrt][noexport][ATTR_WUNUSED][ATTR_PURE]
 memrendb:([nonnull] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes) -> [nonnull] $uint8_t *
 	[([nonnull] /*aligned(1)*/ void *__restrict haystack, int byte, $size_t n_bytes) -> [nonnull] $uint8_t *]
 	[([nonnull] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes) -> [nonnull] $uint8_t const *]
 	= memrend;
 
-@@Same as `memrchrw', but return `HAYSTACK-1', rather than `NULL' if `NEEDLE' wasn't found.
+@@Same as `memrchrw', but return `HAYSTACK - 2', rather than `NULL' if `NEEDLE' wasn't found.
 [fast][libc][kernel][ATTR_WUNUSED][ATTR_PURE]
 memrendw:([nonnull] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words) -> [nonnull] $uint16_t *
 	[([nonnull] /*aligned(2)*/ void *__restrict haystack, $uint16_t word, $size_t n_words) -> [nonnull] $uint16_t *]
 	[([nonnull] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words) -> [nonnull] $uint16_t const *]
 {
 	u16 *result = (u16 *)haystack + n_words;
-	while (n_words--) {
-		if unlikely(*--result == word)
+	for (;;) {
+		--result;
+		if unlikely(!n_words)
 			break;
+		if unlikely(*result == word)
+			break;
+		--n_words;
 	}
 	return result;
 }
 
-@@Same as `memrchrl', but return `HAYSTACK-1', rather than `NULL' if `NEEDLE' wasn't found.
+@@Same as `memrchrl', but return `HAYSTACK - 4', rather than `NULL' if `NEEDLE' wasn't found.
 [fast][libc][kernel][ATTR_WUNUSED][ATTR_PURE]
 memrendl:([nonnull] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords) -> [nonnull] $uint32_t *
 	[([nonnull] /*aligned(4)*/ void *__restrict haystack, $uint32_t dword, $size_t n_dwords) -> [nonnull] $uint32_t *]
 	[([nonnull] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords) -> [nonnull] $uint32_t const *]
 {
 	u32 *result = (u32 *)haystack + n_dwords;
-	while (n_dwords--) {
-		if unlikely(*--result == dword)
+	for (;;) {
+		--result;
+		if unlikely(!n_dwords)
 			break;
+		if unlikely(*result == dword)
+			break;
+		--n_dwords;
 	}
 	return result;
 }
@@ -1515,32 +1523,38 @@ memrendl:([nonnull] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dw
 
 
 @@Same as `memendb', but return the offset from `HAYSTACK', rather than the actual address.
+@@Returns `HAYSTACK + N_DWORDS' if the given `NEEDLE' wasn't found
 [nocrt][noexport][ATTR_WUNUSED][ATTR_PURE]
 memlenb:([nonnull] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes) -> $size_t = memlen;
 
 @@Same as `memendw', but return the offset from `HAYSTACK', rather than the actual address.
+@@Returns `HAYSTACK + N_DWORDS * 2' if the given `NEEDLE' wasn't found
 [kernel][ATTR_WUNUSED][ATTR_PURE]
 memlenw:([nonnull] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words) -> $size_t {
 	return (size_t)(memendw(haystack, word, n_words) - (u16 *)haystack);
 }
 
 @@Same as `memendl', but return the offset from `HAYSTACK', rather than the actual address.
+@@Returns `HAYSTACK + N_DWORDS * 4' if the given `NEEDLE' wasn't found
 [kernel][ATTR_WUNUSED][ATTR_PURE]
 memlenl:([nonnull] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords) -> $size_t {
 	return (size_t)(memendl(haystack, dword, n_dwords) - (u32 *)haystack);
 }
 
 @@Same as `memrendb', but return the offset from `HAYSTACK', rather than the actual address.
+@@Returns `(size_t)-1' if the given `NEEDLE' wasn't found
 [nocrt][noexport][ATTR_WUNUSED][ATTR_PURE]
 memrlenb:([nonnull] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes) -> $size_t = memrlen;
 
 @@Same as `memrendw', but return the offset from `HAYSTACK', rather than the actual address.
+@@Returns `(size_t)-1 / 2' if the given `NEEDLE' wasn't found
 [kernel][ATTR_WUNUSED][ATTR_PURE]
 memrlenw:([nonnull] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words) -> $size_t {
 	return (size_t)(memrendw(haystack, word, n_words) - (u16 *)haystack);
 }
 
 @@Same as `memrendl', but return the offset from `HAYSTACK', rather than the actual address.
+@@Returns `(size_t)-1 / 4' if the given `NEEDLE' wasn't found
 [kernel][ATTR_WUNUSED][ATTR_PURE]
 memrlenl:([nonnull] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords) -> $size_t {
 	return (size_t)(memrendl(haystack, dword, n_dwords) - (u32 *)haystack);
@@ -1804,7 +1818,7 @@ rawmemchrq:([nonnull] /*aligned(8)*/ void const *__restrict haystack, $uint64_t 
 	return iter;
 }
 
-@@Same as `memrchrq' without a search limit, starting at `(byte_t *)HAYSTACK-8'
+@@Same as `memrchrq' without a search limit, starting at `(byte_t *)HAYSTACK - 8'
 [kernel][ATTR_WUNUSED][ATTR_PURE]
 rawmemrchrq:([nonnull] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword) -> [nonnull] $uint64_t *
 	[([nonnull] /*aligned(8)*/ void *__restrict haystack, $uint64_t qword) -> [nonnull] $uint64_t *]
@@ -1832,27 +1846,33 @@ memendq:([nonnull] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qwo
 	return result;
 }
 
-@@Same as `memrchrq', but return `HAYSTACK-1', rather than `NULL' if `NEEDLE' wasn't found.
+@@Same as `memrchrq', but return `HAYSTACK - 8', rather than `NULL' if `NEEDLE' wasn't found.
 [fast][libc][kernel][ATTR_WUNUSED][ATTR_PURE]
 memrendq:([nonnull] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords) -> [nonnull] $uint64_t *
 	[([nonnull] /*aligned(8)*/ void *__restrict haystack, $uint64_t qword, $size_t n_qwords) -> [nonnull] $uint64_t *]
 	[([nonnull] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords) -> [nonnull] $uint64_t const *]
 {
 	u64 *result = (u64 *)haystack + n_qwords;
-	while (n_qwords--) {
-		if unlikely(*--result == qword)
+	for (;;) {
+		--result;
+		if unlikely(!n_qwords)
 			break;
+		if unlikely(*result == qword)
+			break;
+		--n_qwords;
 	}
 	return result;
 }
 
 @@Same as `memendq', but return the offset from `HAYSTACK', rather than the actual address.
+@@Returns `N_QWORDS' if the given `NEEDLE' wasn't found
 [fast][libc][kernel][ATTR_WUNUSED][ATTR_PURE]
 memlenq:([nonnull] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords) -> $size_t {
 	return (size_t)(memendq(haystack, qword, n_qwords) - (u64 *)haystack);
 }
 
 @@Same as `memrendq', but return the offset from `HAYSTACK', rather than the actual address.
+@@Returns `(size_t)-1 / 8' if the given `NEEDLE' wasn't found
 [fast][libc][kernel][ATTR_WUNUSED][ATTR_PURE]
 memrlenq:([nonnull] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords) -> $size_t {
 	return (size_t)(memrendq(haystack, qword, n_qwords) - (u64 *)haystack);
@@ -2649,7 +2669,7 @@ mempmovedown:([nonnull] void *dst, [nonnull] void const *src, $size_t n_bytes) -
 %#endif /* __cplusplus && __USE_STRING_OVERLOADS */
 
 
-@@Same as `memrchr' without a search limit, starting at `HAYSTACK-1'
+@@Same as `memrchr' without a search limit, starting at `HAYSTACK - 1'
 [kernel][ATTR_WUNUSED][ATTR_PURE]
 rawmemrchr:([nonnull] void const *__restrict haystack, int needle) -> [nonnull] void *
 	[([nonnull] void *__restrict haystack, int needle) -> [nonnull] void *]
@@ -2692,7 +2712,7 @@ rawmemrchr:([nonnull] void const *__restrict haystack, int needle) -> [nonnull] 
 //	return NULL;
 //}
 
-@@Same as `memchr', but return `HAYSTACK+N_BYTES', rather than `NULL' if `NEEDLE' wasn't found.
+@@Same as `memchr', but return `HAYSTACK + N_BYTES', rather than `NULL' if `NEEDLE' wasn't found.
 [fast][libc][kernel][ATTR_WUNUSED][ATTR_PURE]
 memend:([nonnull] void const *__restrict haystack, int needle, $size_t n_bytes) -> [nonnull] void *
 	[([nonnull] void *__restrict haystack, int needle, $size_t n_bytes) -> [nonnull] void *]
@@ -2706,27 +2726,33 @@ memend:([nonnull] void const *__restrict haystack, int needle, $size_t n_bytes) 
 	return result;
 }
 
-@@Same as `memrchr', but return `HAYSTACK-1', rather than `NULL' if `NEEDLE' wasn't found.
+@@Same as `memrchr', but return `HAYSTACK - 1', rather than `NULL' if `NEEDLE' wasn't found.
 [fast][libc][kernel][ATTR_WUNUSED][ATTR_PURE]
 memrend:([nonnull] void const *__restrict haystack, int needle, $size_t n_bytes) -> [nonnull] void *
 	[([nonnull] void *__restrict haystack, int needle, $size_t n_bytes) -> [nonnull] void *]
 	[([nonnull] void const *__restrict haystack, int needle, $size_t n_bytes) -> [nonnull] void const *]
 {
 	byte_t *result = (byte_t *)haystack + n_bytes;
-	while (n_bytes--) {
-		if unlikely(*--result == (byte_t)needle)
+	for (;;) {
+		--result;
+		if unlikely(!n_bytes)
 			break;
+		if unlikely(*result == (byte_t)needle)
+			break;
+		--n_bytes;
 	}
 	return result;
 }
 
 @@Same as `memend', but return the offset from `HAYSTACK', rather than the actual address.
+@@Returns `n_bytes' if the given `NEEDLE' wasn't found
 [fast][libc][kernel][ATTR_WUNUSED][ATTR_PURE]
 memlen:([nonnull] void const *__restrict haystack, int needle, $size_t n_bytes) -> $size_t {
 	return (size_t)((byte_t *)memend(haystack, needle, n_bytes) - (byte_t *)haystack);
 }
 
 @@Same as `memrend', but return the offset from `HAYSTACK', rather than the actual address.
+@@Returns `(size_t)-1' if the given `NEEDLE' wasn't found
 [fast][libc][kernel][ATTR_WUNUSED][ATTR_PURE]
 memrlen:([nonnull] void const *__restrict haystack, int needle, $size_t n_bytes) -> $size_t {
 	return (size_t)((byte_t *)memrend(haystack, needle, n_bytes) - (byte_t *)haystack);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaa5acb39 */
+/* HASH CRC-32:0xd4348da6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsncat_s))(__WCHAR_TYPE__ *__dst,
                                                        __SIZE_TYPE__ __dstsize,
                                                        __WCHAR_TYPE__ const *__src,
                                                        __SIZE_TYPE__ __maxlen) {
-#line 4952 "kos/src/libc/magic/string.c"
+#line 4978 "kos/src/libc/magic/string.c"
 
 
 	__WCHAR_TYPE__ *__iter;

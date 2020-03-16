@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1e93f151 */
+/* HASH CRC-32:0x46674b7e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __LOCAL_LIBC(memxlenl) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYP
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memxlenl))(/*aligned(4)*/ void const *__restrict __haystack,
                                                       __UINT32_TYPE__ __dword,
                                                       __SIZE_TYPE__ __n_dwords) {
-#line 2223 "kos/src/libc/magic/string.c"
+#line 2243 "kos/src/libc/magic/string.c"
 	return (__SIZE_TYPE__)(__localdep_memxendl(__haystack, __dword, __n_dwords) - (__UINT32_TYPE__ *)__haystack);
 }
 __NAMESPACE_LOCAL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd0823740 */
+/* HASH CRC-32:0x5753d105 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,25 +27,26 @@
 #ifndef ____localdep_memrendw_defined
 #define ____localdep_memrendw_defined 1
 #ifdef __fast_memrendw_defined
-/* Same as `memrchrw', but return `HAYSTACK-1', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memrchrw', but return `HAYSTACK - 2', rather than `NULL' if `NEEDLE' wasn't found. */
 #define __localdep_memrendw (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memrendw))
 #elif defined(__CRT_HAVE_memrendw)
-/* Same as `memrchrw', but return `HAYSTACK-1', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memrchrw', but return `HAYSTACK - 2', rather than `NULL' if `NEEDLE' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_memrendw,(/*aligned(2)*/ void const *__restrict __haystack, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words),memrendw,(__haystack,__word,__n_words))
 #else /* LIBC: memrendw */
 #include <local/string/memrendw.h>
-/* Same as `memrchrw', but return `HAYSTACK-1', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memrchrw', but return `HAYSTACK - 2', rather than `NULL' if `NEEDLE' wasn't found. */
 #define __localdep_memrendw (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrendw))
 #endif /* memrendw... */
 #endif /* !____localdep_memrendw_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `memrendw', but return the offset from `HAYSTACK', rather than the actual address. */
+/* Same as `memrendw', but return the offset from `HAYSTACK', rather than the actual address.
+ * Returns `(size_t)-1 / 2' if the given `NEEDLE' wasn't found */
 __LOCAL_LIBC(memrlenw) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memrlenw))(/*aligned(2)*/ void const *__restrict __haystack,
                                                       __UINT16_TYPE__ __word,
                                                       __SIZE_TYPE__ __n_words) {
-#line 1540 "kos/src/libc/magic/string.c"
+#line 1553 "kos/src/libc/magic/string.c"
 	return (__SIZE_TYPE__)(__localdep_memrendw(__haystack, __word, __n_words) - (__UINT16_TYPE__ *)__haystack);
 }
 __NAMESPACE_LOCAL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5b8762fb */
+/* HASH CRC-32:0x71a445d7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,11 +24,11 @@
 #ifndef ____localdep_rawmemrchr_defined
 #define ____localdep_rawmemrchr_defined 1
 #ifdef __CRT_HAVE_rawmemrchr
-/* Same as `memrchr' without a search limit, starting at `HAYSTACK-1' */
+/* Same as `memrchr' without a search limit, starting at `HAYSTACK - 1' */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_rawmemrchr,(void const *__restrict __haystack, int __needle),rawmemrchr,(__haystack,__needle))
 #else /* LIBC: rawmemrchr */
 #include <local/string/rawmemrchr.h>
-/* Same as `memrchr' without a search limit, starting at `HAYSTACK-1' */
+/* Same as `memrchr' without a search limit, starting at `HAYSTACK - 1' */
 #define __localdep_rawmemrchr (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rawmemrchr))
 #endif /* rawmemrchr... */
 #endif /* !____localdep_rawmemrchr_defined */
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(rawmemrlen) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(rawmemrlen))(void const *__restrict __haystack,
                                                         int __needle) {
-#line 2744 "kos/src/libc/magic/string.c"
+#line 2770 "kos/src/libc/magic/string.c"
 	return (__SIZE_TYPE__)((__BYTE_TYPE__ *)__localdep_rawmemrchr(__haystack, __needle) - (__BYTE_TYPE__ *)__haystack);
 }
 __NAMESPACE_LOCAL_END

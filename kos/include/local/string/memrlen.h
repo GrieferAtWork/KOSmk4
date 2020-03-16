@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd4a4e3ba */
+/* HASH CRC-32:0x2e2aaba1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,25 +27,26 @@
 #ifndef ____localdep_memrend_defined
 #define ____localdep_memrend_defined 1
 #ifdef __fast_memrend_defined
-/* Same as `memrchr', but return `HAYSTACK-1', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memrchr', but return `HAYSTACK - 1', rather than `NULL' if `NEEDLE' wasn't found. */
 #define __localdep_memrend (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memrend))
 #elif defined(__CRT_HAVE_memrend)
-/* Same as `memrchr', but return `HAYSTACK-1', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memrchr', but return `HAYSTACK - 1', rather than `NULL' if `NEEDLE' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memrend,(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes),memrend,(__haystack,__needle,__n_bytes))
 #else /* LIBC: memrend */
 #include <local/string/memrend.h>
-/* Same as `memrchr', but return `HAYSTACK-1', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memrchr', but return `HAYSTACK - 1', rather than `NULL' if `NEEDLE' wasn't found. */
 #define __localdep_memrend (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrend))
 #endif /* memrend... */
 #endif /* !____localdep_memrend_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `memrend', but return the offset from `HAYSTACK', rather than the actual address. */
+/* Same as `memrend', but return the offset from `HAYSTACK', rather than the actual address.
+ * Returns `(size_t)-1' if the given `NEEDLE' wasn't found */
 __LOCAL_LIBC(memrlen) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memrlen))(void const *__restrict __haystack,
                                                      int __needle,
                                                      __SIZE_TYPE__ __n_bytes) {
-#line 2732 "kos/src/libc/magic/string.c"
+#line 2758 "kos/src/libc/magic/string.c"
 	return (__SIZE_TYPE__)((__BYTE_TYPE__ *)__localdep_memrend(__haystack, __needle, __n_bytes) - (__BYTE_TYPE__ *)__haystack);
 }
 __NAMESPACE_LOCAL_END

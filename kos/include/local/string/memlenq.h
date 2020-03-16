@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8eb2ed4 */
+/* HASH CRC-32:0x6184820b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,12 +40,13 @@ __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__U
 #endif /* !____localdep_memendq_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `memendq', but return the offset from `HAYSTACK', rather than the actual address. */
+/* Same as `memendq', but return the offset from `HAYSTACK', rather than the actual address.
+ * Returns `N_QWORDS' if the given `NEEDLE' wasn't found */
 __LOCAL_LIBC(memlenq) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memlenq))(/*aligned(8)*/ void const *__restrict __haystack,
                                                      __UINT64_TYPE__ __qword,
                                                      __SIZE_TYPE__ __n_qwords) {
-#line 1852 "kos/src/libc/magic/string.c"
+#line 1871 "kos/src/libc/magic/string.c"
 	return (__SIZE_TYPE__)(__localdep_memendq(__haystack, __qword, __n_qwords) - (__UINT64_TYPE__ *)__haystack);
 }
 __NAMESPACE_LOCAL_END

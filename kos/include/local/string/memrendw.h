@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5aeacaaf */
+/* HASH CRC-32:0x7f71a3b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,16 +21,20 @@
 #ifndef __local_memrendw_defined
 #define __local_memrendw_defined 1
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `memrchrw', but return `HAYSTACK-1', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memrchrw', but return `HAYSTACK - 2', rather than `NULL' if `NEEDLE' wasn't found. */
 __LOCAL_LIBC(memrendw) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memrendw))(/*aligned(2)*/ void const *__restrict __haystack,
                                                       __UINT16_TYPE__ __word,
                                                       __SIZE_TYPE__ __n_words) {
 #line 1493 "kos/src/libc/magic/string.c"
 	__UINT16_TYPE__ *__result = (__UINT16_TYPE__ *)__haystack + __n_words;
-	while (__n_words--) {
-		if __unlikely(*--__result == __word)
+	for (;;) {
+		--__result;
+		if __unlikely(!__n_words)
 			break;
+		if __unlikely(*__result == __word)
+			break;
+		--__n_words;
 	}
 	return __result;
 }

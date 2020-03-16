@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x325191c6 */
+/* HASH CRC-32:0x6eda3d0f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_memrchr_defined
 #define __local_memrchr_defined 1
 __NAMESPACE_LOCAL_BEGIN
-/* Descendingly search for `NEEDLE', starting at `HAYSTACK+N_BYTES'. - Return `NULL' if `NEEDLE' wasn't found. */
+/* Descendingly search for `NEEDLE', starting at `HAYSTACK + N_BYTES'. - Return `NULL' if `NEEDLE' wasn't found. */
 __LOCAL_LIBC(memrchr) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memrchr))(void const *__restrict __haystack,
                                                      int __needle,
