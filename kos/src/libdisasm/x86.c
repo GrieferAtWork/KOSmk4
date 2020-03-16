@@ -27,6 +27,12 @@ if (gcc_opt.remove("-O3"))
 #define DISABLE_BRANCH_PROFILING 1
 #define _GNU_SOURCE 1
 #define _KOS_SOURCE 1
+#define CONFIG_LIBEMU86_WANT_16BIT 1
+#define CONFIG_LIBEMU86_WANT_32BIT 1
+#define CONFIG_LIBEMU86_WANT_64BIT 1
+#define CONFIG_LIBEMU86_WANT_SEGREGID 1
+#define LIBEMU86_WANT_PROTOTYPES 1
+#define __LIBEMU86_STATIC 1
 
 #include "x86.h"
 
@@ -46,38 +52,13 @@ if (gcc_opt.remove("-O3"))
 #include <stdlib.h>
 #include <string.h>
 
-#include "x86-db.h"
+#include <libemu86/emu86.h>
+
 #include "_binstr.h"
+#include "x86-db.h"
 
 DECL_BEGIN
 
-
-#define R_AX      0 /* Accumulator. */
-#define R_CX      1 /* Counter register. */
-#define R_DX      2 /* General purpose d-register. */
-#define R_BX      3 /* General purpose b-register. */
-#define R_SP      4 /* Stack pointer. */
-#define R_BP      5 /* Stack base pointer. */
-#define R_SI      6 /* Source pointer. */
-#define R_DI      7 /* Destination pointer. */
-
-#define R_EAX     0 /* Accumulator. */
-#define R_ECX     1 /* Counter register. */
-#define R_EDX     2 /* General purpose d-register. */
-#define R_EBX     3 /* General purpose b-register. */
-#define R_ESP     4 /* Stack pointer. */
-#define R_EBP     5 /* Stack base pointer. */
-#define R_ESI     6 /* Source pointer. */
-#define R_EDI     7 /* Destination pointer. */
-#define R_R8      8 /* R8 */
-#define R_R9      9 /* R9 */
-#define R_R10    10 /* R10 */
-#define R_R11    11 /* R11 */
-#define R_R12    12 /* R12 */
-#define R_R13    13 /* R13 */
-#define R_R14    14 /* R14 */
-#define R_R15    15 /* R15 */
-#define R_RIP    16 /* %rip (special value that may appear in `mi_rm') */
 
 PRIVATE char const gp_register_names8[16][5] = {
 	{ '%', 'a', 'l', 0, 0 },
@@ -173,7 +154,7 @@ PRIVATE char const gp_register_names64[17][4] = {
 	{ '%', 'r', '1', '3' },
 	{ '%', 'r', '1', '4' },
 	{ '%', 'r', '1', '5' },
-	{ '%', 'r', 'i', 'p' }  /* R_RIP */
+	{ '%', 'r', 'i', 'p' }  /* EMU86_R_RIP */
 };
 
 PRIVATE char const sreg_register_names[16][4] = {
@@ -291,10 +272,10 @@ PRIVATE char const sti_register_names[16][7] = {
 };
 
 PRIVATE char const segment_prefix[][4] = {
-	{ '%', 'd', 's', ':' },
 	{ '%', 'e', 's', ':' },
 	{ '%', 'c', 's', ':' },
 	{ '%', 's', 's', ':' },
+	{ '%', 'd', 's', ':' },
 	{ '%', 'f', 's', ':' },
 	{ '%', 'g', 's', ':' },
 };
@@ -302,485 +283,10 @@ PRIVATE char const segment_prefix[][4] = {
 
 
 
-/* Instruction flags. */
-typedef u32 op_flag_t;
-#define F_OP16        0x00000001 /* The 0x66 prefix is being used. */
-#define F_AD16        0x00000002 /* The 0x67 prefix is being used. */
-#define F_LOCK        0x00000004 /* The `lock' (0xf0) prefix is being used. */
-#define F_REPNE       0x00000010 /* The `repne' (0xf2) prefix is being used. */
-#define F_REP         0x00000020 /* The `rep' (0xf3) prefix is being used. */
-#define F_HASVEX      0x00000040 /* A VEX prefix was given. */
-#define F_SEGMASK     0x0000f000 /* Mask for segment overrides. */
-#define F_SEGSHIFT            12 /* Shift for segment overrides. */
-#define F_VEX_VVVVV_M 0x001f0000 /* Mask for EVEX.Vi + VEX.VVVV */
-#define F_VEX_VVVVV_S         16 /* Shift for EVEX.Vi + VEX.VVVV */
-#define F_VEX_W       0x00200000 /* Value of VEX.W */
-#define F_VEX_LL_M    0x00c00000 /* Value of VEX.LL */
-#define F_VEX_LL_S            22 /* Shift for VEX.LL */
-#define F_EVEX_z      0x01000000 /* Value of EVEX.z */
-#define F_EVEX_b      0x02000000 /* Value of EVEX.b */
-#define F_EVEX_R      0x04000000 /* The EVEX.R flag (a second 1-bit extension to MODRM.reg; use with `F_REX_R'). */
-#define F_EVEX_aaa_M  0x38000000 /* Value of EVEX.aaa */
-#define F_EVEX_aaa_S          27 /* Shift for EVEX.aaa */
-#define F_HASEVEX     0x40000000 /* An EVEX prefix was given. */
-#define F_AD64        F_AD16     /* The 0x67 prefix is being used. */
-#define F_HASREX      0x00000080 /* A REX prefix is being used. */
-#define F_REXSHFT              8 /* Shift for the REX prefix byte. */
-#define F_REXMASK     0x00000f00 /* Mask of the REX prefix byte. */
-#define F_REX_W       0x00000800 /* The REX.W flag (Indicates 64-bit operands). */
-#define F_REX_R       0x00000400 /* The REX.R flag (1-bit extension to MODRM.reg). */
-#define F_REX_X       0x00000200 /* The REX.X flag (1-bit extension to SIB.index). */
-#define F_REX_B       0x00000100 /* The REX.B flag (1-bit extension to MODRM.rm). */
-#define F_SEGDS       0x00001000 /* DS override. */
-#define F_SEGES       0x00002000 /* ES override. */
-#define F_SEGCS       0x00003000 /* CS override. */
-#define F_SEGSS       0x00004000 /* SS override. */
-#define F_SEGFS       0x00005000 /* FS override. */
-#define F_SEGGS       0x00006000 /* GS override. */
-
-/* Explicit prefix byte flags. */
-#define F_66        F_OP16  /* The 0x66 prefix is being used. */
-#define F_67        F_AD16  /* The 0x67 prefix is being used. */
-#define F_f0        F_LOCK  /* The 0xf0 prefix is being used. */
-#define F_f2        F_REPNE /* The 0xf2 prefix is being used. */
-#define F_f3        F_REP   /* The 0xf3 prefix is being used. */
-
-
-
-#define MODRM_MOD_MASK     0xc0 /* 0b11000000 */
-#define MODRM_REG_MASK     0x38 /* 0b00111000 */
-#define MODRM_RM_MASK      0x07 /* 0b00000111 */
-#define MODRM_MOD_SHIFT    6
-#define MODRM_REG_SHIFT    3
-#define MODRM_RM_SHIFT     0
-#define MODRM_GETMOD(x) (((x) & MODRM_MOD_MASK) >> MODRM_MOD_SHIFT)
-#define MODRM_GETREG(x) (((x) & MODRM_REG_MASK) >> MODRM_REG_SHIFT)
-#define MODRM_GETRM(x)  (((x) & MODRM_RM_MASK) >> MODRM_RM_SHIFT)
-
-struct modrm {
-	s32       mi_offset; /* Memory address. */
-#define MODRM_REGISTER 0
-#define MODRM_MEMORY   1
-	/* EXAMPLES:
-	 *  - mov $42, %mi_rm                                   # mi_type == MODRM_REGISTER
-	 *  - mov $42, mi_offset(%mi_rm)                        # mi_type == MODRM_MEMORY
-	 *  - mov %mi_reg, mi_offset(%mi_rm,%mi_index,mi_shift) # mi_type == MODRM_MEMORY
-	 */
-	u8        mi_type;   /* mod R/M type (One of `MODRM_*') */
-	u8        mi_reg;    /* Secondary register operand, or instruction sub-class. */
-	u8        mi_rm;     /* Base register (or 0xff when not set). */
-	u8        mi_index;  /* Index register (or 0xff when not set). */
-	u8        mi_shift;  /* Index shift (or 0). */
-};
-
 PRIVATE void CC
-decode_modrm(struct disassembler *__restrict self,
-             struct modrm *__restrict info,
-             op_flag_t flags) {
-	u8 rmbyte = *self->d_pc++;
-	u8 sibbyte;
-	info->mi_reg = MODRM_GETREG(rmbyte);
-	if (!DA86_IS64(self) && (DA86_IS16(self) ^ ((flags & F_67) != 0))) {
-		/* XXX: What about mandatory 67h prefix bytes? */
-		info->mi_shift = 0;
-		if ((rmbyte & MODRM_MOD_MASK) == (0x3 << MODRM_MOD_SHIFT)) {
-			/* Register operand. */
-			info->mi_rm    = MODRM_GETRM(rmbyte);
-			info->mi_type  = MODRM_REGISTER;
-			info->mi_index = 0xff;
-		} else {
-			info->mi_offset = 0;
-			info->mi_type = MODRM_MEMORY;
-			switch (MODRM_GETRM(rmbyte)) {
-
-			case 0: /* [BX + SI] */
-				info->mi_rm    = R_BX;
-				info->mi_index = R_SI;
-				break;
-
-			case 1: /* [BX + DI] */
-				info->mi_rm    = R_BX;
-				info->mi_index = R_DI;
-				break;
-
-			case 2: /* [BP + SI] */
-				info->mi_rm    = R_BP;
-				info->mi_index = R_SI;
-				break;
-
-			case 3: /* [BP + DI] */
-				info->mi_rm    = R_BP;
-				info->mi_index = R_DI;
-				break;
-
-			case 4: /* [SI] */
-				info->mi_rm    = R_SI;
-				info->mi_index = 0xff;
-				break;
-
-			case 5: /* [DI] */
-				info->mi_rm    = R_DI;
-				info->mi_index = 0xff;
-				break;
-
-			case 6: /* [BP] */
-				info->mi_index = 0xff;
-				info->mi_rm    = R_BP;
-				if ((rmbyte & MODRM_MOD_MASK) == (0x0 << MODRM_MOD_SHIFT)) { /* [disp16] */
-					info->mi_rm     = 0xff;
-					info->mi_offset = (s32)(s16)UNALIGNED_GET16((uint16_t *)self->d_pc);
-					self->d_pc += 2;
-				}
-				break;
-
-			case 7: /* [BX] */
-				info->mi_rm    = R_BX;
-				info->mi_index = 0xff;
-				break;
-
-			default: __builtin_unreachable();
-			}
-			if ((rmbyte & MODRM_MOD_MASK) == (0x1 << MODRM_MOD_SHIFT)) {
-				/* [... + disp8] */
-				info->mi_offset = (s32)*(int8_t *)self->d_pc;
-				self->d_pc += 1;
-			} else if ((rmbyte & MODRM_MOD_MASK) == (0x2 << MODRM_MOD_SHIFT)) {
-				/* [... + disp16] */
-				info->mi_offset = (s32)(s16)UNALIGNED_GET16((uint16_t *)self->d_pc);
-				self->d_pc += 2;
-			}
-		}
-	} else {
-		info->mi_rm = MODRM_GETRM(rmbyte);
-		if (flags & F_REX_R)
-			info->mi_reg |= 0x8;
-		if (flags & F_EVEX_R)
-			info->mi_reg |= 0x10;
-		switch (rmbyte & MODRM_MOD_MASK) {
-
-		case 0x0 << MODRM_MOD_SHIFT:
-			/* R/M */
-			info->mi_type = MODRM_MEMORY;
-			if (info->mi_rm == R_EBP) {
-				info->mi_rm     = 0xff;
-				info->mi_index  = 0xff;
-				info->mi_offset = (s32)UNALIGNED_GET32((u32 *)self->d_pc);
-				self->d_pc += 4;
-				if (DA86_IS64(self))
-					info->mi_rm = R_RIP; /* RIP-relative addressing */
-			} else if (info->mi_rm == R_ESP) {
-				sibbyte         = *self->d_pc++;
-				info->mi_offset = 0;
-parse_sib_byte:
-				info->mi_shift = MODRM_GETMOD(sibbyte);
-				info->mi_index = MODRM_GETREG(sibbyte);
-				info->mi_rm    = MODRM_GETRM(sibbyte);
-				if (flags & F_REX_X)
-					info->mi_index |= 0x8;
-				if (info->mi_index == R_ESP)
-					info->mi_index = 0xff;
-				if ((info->mi_rm == R_EBP) &&
-				    (rmbyte & MODRM_MOD_MASK) == (0x0 << MODRM_MOD_SHIFT)) {
-					info->mi_rm = 0xff; /* disp32 */
-					info->mi_offset = (s32)UNALIGNED_GET32((u32 *)self->d_pc);
-					self->d_pc += 4;
-				}
-			} else {
-				info->mi_index  = 0xff;
-				info->mi_offset = 0;
-			}
-			break;
-
-		case 0x1 << MODRM_MOD_SHIFT:
-			/* R/M + 1-byte offset */
-			info->mi_type  = MODRM_MEMORY;
-			info->mi_index = 0xff;
-			if (info->mi_rm == R_ESP) {
-				sibbyte         = *self->d_pc++;
-				info->mi_offset = (s32)*(s8 *)self->d_pc;
-				++self->d_pc;
-				goto parse_sib_byte;
-			}
-			info->mi_offset = (s32)*(s8 *)self->d_pc;
-			++self->d_pc;
-			break;
-
-		case 0x2 << MODRM_MOD_SHIFT:
-			/* R/M + 4-byte offset */
-			info->mi_type  = MODRM_MEMORY;
-			info->mi_index = 0xff;
-			if (info->mi_rm == R_ESP) {
-				sibbyte         = *self->d_pc++;
-				info->mi_offset = (s32)UNALIGNED_GET32((u32 *)self->d_pc);
-				self->d_pc += 4;
-				goto parse_sib_byte;
-			}
-			info->mi_offset = (s32)UNALIGNED_GET32((u32 *)self->d_pc);
-			self->d_pc += 4;
-			break;
-
-		case 0x3 << MODRM_MOD_SHIFT:
-			/* Register operand. */
-			info->mi_type  = MODRM_REGISTER;
-			info->mi_index = 0xff;
-			if ((flags & (F_REX_X | F_HASVEX)) == (F_REX_X | F_HASVEX))
-				info->mi_rm |= 0x10;
-			break;
-
-		default: __builtin_unreachable();
-		}
-		if (flags & F_REX_B)
-			info->mi_rm |= 0x8;
-	}
-}
-
-
-PRIVATE bool CC
-decode_opcode(struct disassembler *__restrict self,
-              u32 *__restrict popcode,
-              op_flag_t *__restrict pflags) {
-	u32 result;
-	byte_t *text;
-	text    = self->d_pc;
-	*pflags = 0;
-	result  = 0;
-next_byte:
-	result = *text++;
-	switch (result) {
-
-#define EVEX_IDENT_M  0x0c0400 /* Mask of constant bits */
-#define EVEX_IDENT_V  0x000400 /* Value of constant bits */
-#define EVEX_R        0x800000 /* FLAG:  VEX.R */
-#define EVEX_X        0x400000 /* FLAG:  VEX.X */
-#define EVEX_B        0x200000 /* FLAG:  VEX.B */
-#define EVEX_Ri       0x100000 /* FLAG:  EVEX.R' */
-#define EVEX_MM_M     0x030000 /* MASK:  EVEX.M_MM (same as VEX.M_MMMM) */
-#define EVEX_MM_S           16 /* SHIFT: EVEX.M_MM */
-#define EVEX_W        0x008000 /* FLAG:  VEX.W */
-#define EVEX_VVVV_M   0x007800 /* MASK:  VEX.VVVV */
-#define EVEX_VVVV_S         11 /* SHIFT: VEX.VVVV */
-#define EVEX_PP_M     0x000300 /* MASK:  VEX.PP */
-#define EVEX_PP_S            8 /* SHIFT: VEX.PP */
-#define EVEX_z        0x000080 /* FLAG:  EVEX.z */
-#define EVEX_Li       0x000040 /* FLAG:  EVEX.L' */
-#define EVEX_L        0x000020 /* FLAG:  VEX.L */
-#define EVEX_b        0x000010 /* FLAG:  EVEX.b */
-#define EVEX_Vi       0x000008 /* FLAG:  EVEX.V' */
-#define EVEX_aaa_M    0x000007 /* MASK:  EVEX.aaa */
-#define EVEX_aaa_S           0 /* SHIFT: EVEX.aaa */
-
-	/* EVEX Prefix */
-	case 0x62: {
-		u32 evex;
-		/* EVEX only exists in 64-bit mode! */
-		if (!DA86_IS64(self))
-			break;
-		evex = *text++;
-		evex <<= 8;
-		evex |= *text++;
-		evex <<= 8;
-		evex |= *text++;
-		if ((evex & EVEX_IDENT_M) != EVEX_IDENT_V) {
-			text -= 3;
-			/*result = 0x62;*/
-			break;
-		}
-		*pflags |= F_HASVEX | F_HASEVEX;
-		*pflags |= ((~evex & EVEX_VVVV_M) >> EVEX_VVVV_S) << F_VEX_VVVVV_S;
-		*pflags |= ((evex & EVEX_aaa_M) >> EVEX_aaa_S) << F_EVEX_aaa_S;
-		if (!(evex & EVEX_Vi))
-			*pflags |= 0x10 << F_VEX_VVVVV_S;
-		if (!(evex & EVEX_R))
-			*pflags |= F_REX_R;
-		if (!(evex & EVEX_Ri))
-			*pflags |= F_EVEX_R;
-		if (!(evex & EVEX_X))
-			*pflags |= F_REX_X;
-		if (!(evex & EVEX_B))
-			*pflags |= F_REX_B;
-		if (evex & EVEX_W)
-			*pflags |= F_VEX_W;
-		if (evex & EVEX_z)
-			*pflags |= F_EVEX_z;
-		if (evex & EVEX_b)
-			*pflags |= F_EVEX_b;
-		if (evex & EVEX_L)
-			*pflags |= 1 << F_VEX_LL_S;
-		if (evex & EVEX_Li)
-			*pflags |= 2 << F_VEX_LL_S;
-		switch (evex & EVEX_PP_M) {
-		case 0x01 << EVEX_PP_S: *pflags |= F_OP16; break;  /* same as 0x66 prefix */
-		case 0x02 << EVEX_PP_S: *pflags |= F_REP; break;   /* same as 0xf3 prefix */
-		case 0x03 << EVEX_PP_S: *pflags |= F_REPNE; break; /* same as 0xf2 prefix */
-		default: break;
-		}
-		switch (evex & EVEX_MM_M) {
-		case 0x1 << EVEX_MM_S: result = 0x0f00; break;
-		case 0x2 << EVEX_MM_S: result = 0x0f3800; break;
-		case 0x3 << EVEX_MM_S: result = 0x0f3a00; break;
-		default: goto err;
-		}
-		/* The actual instruction opcode byte */
-		result |= *text++;
-	}	break;
-
-#define VEX3B_R       0x8000 /* FLAG:  3-byte VEX.R */
-#define VEX3B_X       0x4000 /* FLAG:  3-byte VEX.X */
-#define VEX3B_B       0x2000 /* FLAG:  3-byte VEX.B */
-#define VEX3B_MMMMM_M 0x1f00 /* MASK:  3-byte VEX.MMMMM */
-#define VEX3B_MMMMM_S      8 /* SHIFT: 3-byte VEX.MMMMM */
-#define VEX3B_W       0x0080 /* FLAG:  3-byte VEX.W */
-#define VEX3B_VVVV_M  0x0078 /* MASK:  3-byte VEX.VVVV */
-#define VEX3B_VVVV_S       3 /* SHIFT: 3-byte VEX.VVVV */
-#define VEX3B_L       0x0004 /* FLAG:  3-byte VEX.L */
-#define VEX3B_PP_M    0x0003 /* MASK:  3-byte VEX.PP */
-#define VEX3B_PP_S         0 /* SHIFT: 3-byte VEX.PP */
-
-	/* VEX Prefix */
-	case 0xc4: { /* 3-byte form */
-		u16 vex;
-		vex = *text++;
-		vex <<= 8;
-		vex |= *text++;
-		if (DA86_IS64(self)) {
-			if (!(vex & VEX3B_R))
-				*pflags |= F_REX_R;
-			if (!(vex & VEX3B_X))
-				*pflags |= F_REX_X;
-			if (!(vex & VEX3B_B))
-				*pflags |= F_REX_B;
-		} else {
-			if (!(vex & (VEX3B_R | VEX3B_X))) {
-				text -= 2;
-				/*result = 0xc4;*/
-				break;
-			}
-		}
-		*pflags |= F_HASVEX;
-		if (vex & VEX3B_L)
-			*pflags |= 1 << F_VEX_LL_S;
-		if (vex & VEX3B_W)
-			*pflags |= F_VEX_W;
-		*pflags |= ((~vex & VEX3B_VVVV_M) >> VEX3B_VVVV_S) << F_VEX_VVVVV_S;
-		switch (vex & VEX3B_PP_M) {
-		case 0x01 << VEX3B_PP_S: *pflags |= F_OP16; break;  /* same as 0x66 prefix */
-		case 0x02 << VEX3B_PP_S: *pflags |= F_REP; break;   /* same as 0xf3 prefix */
-		case 0x03 << VEX3B_PP_S: *pflags |= F_REPNE; break; /* same as 0xf2 prefix */
-		default: break;
-		}
-		switch (vex & VEX3B_MMMMM_M) {
-		case 0x1 << VEX3B_MMMMM_S: result = 0x0f00; break;
-		case 0x2 << VEX3B_MMMMM_S: result = 0x0f3800; break;
-		case 0x3 << VEX3B_MMMMM_S: result = 0x0f3a00; break;
-		default: goto err;
-		}
-		/* The actual instruction opcode byte */
-		result |= *text++;
-	}	break;
-
-#define VEX2B_R      0x80 /* FLAG:  2-byte VEX.R */
-#define VEX2B_VVVV_M 0x78 /* MASK:  2-byte VEX.VVVV */
-#define VEX2B_1      0x40 /* FLAG:  Must be one (if 0, not a prefix + generate opcode `0xc5') */
-#define VEX2B_VVVV_S    3 /* SHIFT: 2-byte VEX.VVVV */
-#define VEX2B_L      0x04 /* FLAG:  2-byte VEX.L */
-#define VEX2B_PP_M   0x03 /* MASK:  2-byte VEX.PP */
-#define VEX2B_PP_S      0 /* SHIFT: 2-byte VEX.PP */
-
-	/* VEX Prefix */
-	case 0xc5: /* 2-byte form */
-		result = *text++;
-		if (DA86_IS64(self)) {
-			if (!(result & VEX2B_R))
-				*pflags |= F_REX_R;
-		} else {
-			if (!(result & (VEX2B_R | VEX2B_1))) {
-				--text;
-				result = 0xc5;
-				break;
-			}
-		}
-		*pflags |= F_HASVEX;
-		if (result & VEX2B_L)
-			*pflags |= 1 << F_VEX_LL_S;
-		*pflags |= ((~result & VEX2B_VVVV_M) >> VEX2B_VVVV_S) << F_VEX_VVVVV_S;
-		switch (result & VEX2B_PP_M) {
-		case 0x01 << VEX2B_PP_S: *pflags |= F_OP16; break;  /* same as 0x66 prefix */
-		case 0x02 << VEX2B_PP_S: *pflags |= F_REP; break;   /* same as 0xf3 prefix */
-		case 0x03 << VEX2B_PP_S: *pflags |= F_REPNE; break; /* same as 0xf2 prefix */
-		default: break;
-		}
-		/* The actual instruction opcode byte */
-		result = 0x0f00 | *text++;
-		break;
-
-		/* Prefix bytes */
-	case 0x66: *pflags |= F_66; goto next_byte;
-	case 0x67: *pflags |= F_67; goto next_byte;
-	case 0xf0: *pflags |= F_f0; goto next_byte;
-	case 0xf2: *pflags |= F_f2; goto next_byte;
-	case 0xf3: *pflags |= F_f3; goto next_byte;
-
-	case 0x40 ... 0x4f:
-		if (!DA86_IS64(self))
-			break;
-		*pflags |= F_HASREX | ((result & 0xf) << F_REXSHFT);
-		goto next_byte;
-
-	case 0x26:
-		if (DA86_IS64(self))
-			goto err;
-		*pflags = (*pflags & ~F_SEGMASK) | F_SEGES;
-		goto next_byte;
-
-	case 0x2e:
-		if (DA86_IS64(self))
-			goto err;
-		*pflags = (*pflags & ~F_SEGMASK) | F_SEGCS;
-		goto next_byte;
-
-	case 0x36:
-		if (DA86_IS64(self))
-			goto err;
-		*pflags = (*pflags & ~F_SEGMASK) | F_SEGSS;
-		goto next_byte;
-
-	case 0x3e:
-		if (DA86_IS64(self))
-			goto err;
-		*pflags = (*pflags & ~F_SEGMASK) | F_SEGDS;
-		goto next_byte;
-
-	case 0x64:
-		*pflags = (*pflags & ~F_SEGMASK) | F_SEGFS;
-		goto next_byte;
-
-	case 0x65:
-		*pflags = (*pflags & ~F_SEGMASK) | F_SEGGS;
-		goto next_byte;
-
-	case 0x0f:
-		result <<= 8;
-		result |= *text++;
-		if (result == 0x0f38 || result == 0x0f3a) {
-			result <<= 8;
-			result |= *text++;
-		}
-		break;
-
-	default: break;
-	}
-	self->d_pc = text;
-	*popcode   = result;
-	return true;
-err:
-	return false;
-}
-
-
-PRIVATE void CC
-da_print_reg8(struct disassembler *__restrict self, u8 regno, op_flag_t flags) {
+da_print_reg8(struct disassembler *__restrict self, u8 regno, emu86_opflags_t flags) {
 	char const *name = gp_register_names8[regno & 15];
-	if (flags & F_HASREX)
+	if (flags & EMU86_F_HASREX)
 		name = gp_register_names8_rex[regno & 15];
 	disasm_print_format(self, DISASSEMBLER_FORMAT_REGISTER_PREFIX);
 	disasm_print(self, name, name[4] ? 5 : name[3] ? 4 : 3);
@@ -798,7 +304,7 @@ da_print_reg16(struct disassembler *__restrict self, u8 regno) {
 PRIVATE void CC
 da_print_reg32(struct disassembler *__restrict self, u8 regno) {
 	char const *name;
-	name = gp_register_names32[regno <= R_RIP ? regno : (regno & 15)];
+	name = gp_register_names32[regno <= EMU86_R_RIP ? regno : (regno & 15)];
 	disasm_print_format(self, DISASSEMBLER_FORMAT_REGISTER_PREFIX);
 	disasm_print(self, name, name[4] ? 5 : 4);
 	disasm_print_format(self, DISASSEMBLER_FORMAT_REGISTER_SUFFIX);
@@ -807,7 +313,7 @@ da_print_reg32(struct disassembler *__restrict self, u8 regno) {
 PRIVATE void CC
 da_print_reg64(struct disassembler *__restrict self, u8 regno) {
 	char const *name;
-	name = gp_register_names64[regno <= R_RIP ? regno : (regno & 15)];
+	name = gp_register_names64[regno <= EMU86_R_RIP ? regno : (regno & 15)];
 	disasm_print_format(self, DISASSEMBLER_FORMAT_REGISTER_PREFIX);
 	disasm_print(self, name, name[3] ? 4 : 3);
 	disasm_print_format(self, DISASSEMBLER_FORMAT_REGISTER_SUFFIX);
@@ -896,13 +402,13 @@ da_print_Xmmreg(struct disassembler *__restrict self, u8 regno, char x) {
 	disasm_print_format(self, DISASSEMBLER_FORMAT_REGISTER_SUFFIX);
 }
 PRIVATE void CC
-da_print_Xmmmask(struct disassembler *__restrict self, op_flag_t flags) {
-	if ((flags & F_EVEX_aaa_M) != 0) {
+da_print_Xmmmask(struct disassembler *__restrict self, emu86_opflags_t flags) {
+	if ((flags & EMU86_F_EVEX_aaa_M) != 0) {
 		disasm_print(self, "{", 1);
-		da_print_kreg(self, (flags & F_EVEX_aaa_M) >> F_EVEX_aaa_S);
+		da_print_kreg(self, EMU86_F_EVEX_aaa(flags));
 		disasm_print(self, "}", 1);
 	}
-	if (flags & F_EVEX_z) {
+	if (flags & EMU86_F_EVEX_z) {
 		disasm_print(self, "{", 1);
 		disasm_print_format(self, DISASSEMBLER_FORMAT_MNEMONIC_PREFIX);
 		disasm_print(self, "z", 1);
@@ -929,11 +435,11 @@ da_print_stireg(struct disassembler *__restrict self, u8 regno) {
 
 PRIVATE void CC
 da_print_modrm_rm_memory(struct disassembler *__restrict self,
-                         struct modrm const *__restrict rm,
-                         op_flag_t flags) {
+                         struct emu86_modrm const *__restrict rm,
+                         emu86_opflags_t flags) {
 	bool has_register;
-	if ((flags & F_SEGMASK) != 0)
-		disasm_print(self, segment_prefix[((flags & F_SEGMASK) >> F_SEGSHIFT) - 1], 4);
+	if (EMU86_F_HASSEG(flags))
+		disasm_print(self, segment_prefix[EMU86_F_SEGREG(flags)], 4);
 	has_register = rm->mi_rm != 0xff || rm->mi_index != 0xff;
 	if (rm->mi_offset || !has_register) {
 		s32 offset;
@@ -966,10 +472,10 @@ da_print_modrm_rm_memory(struct disassembler *__restrict self,
 		disasm_print(self, "(", 1);
 		if (rm->mi_rm != 0xff) {
 			if (DA86_IS64(self)) {
-				if (flags & F_67)
+				if (flags & EMU86_F_67)
 					goto do_print_base32;
 				da_print_reg64(self, rm->mi_rm);
-			} else if (DA86_IS32(self) ^ ((flags & F_67) != 0)) {
+			} else if (DA86_IS32(self) ^ ((flags & EMU86_F_67) != 0)) {
 			do_print_base32:
 				da_print_reg32(self, rm->mi_rm);
 			} else {
@@ -979,10 +485,10 @@ da_print_modrm_rm_memory(struct disassembler *__restrict self,
 		if (rm->mi_index != 0xff) {
 			disasm_print(self, ",", 1);
 			if (DA86_IS64(self)) {
-				if (flags & F_67)
+				if (flags & EMU86_F_67)
 					goto do_print_index32;
 				da_print_reg64(self, rm->mi_index);
-			} else if (DA86_IS32(self) ^ ((flags & F_67) != 0)) {
+			} else if (DA86_IS32(self) ^ ((flags & EMU86_F_67) != 0)) {
 do_print_index32:
 				da_print_reg32(self, rm->mi_index);
 			} else {
@@ -999,9 +505,9 @@ do_print_index32:
 
 PRIVATE void CC
 da_print_modrm_rm(struct disassembler *__restrict self,
-                  struct modrm const *__restrict rm,
-                  op_flag_t flags, unsigned int size) {
-	if (rm->mi_type == MODRM_REGISTER) {
+                  struct emu86_modrm const *__restrict rm,
+                  emu86_opflags_t flags, unsigned int size) {
+	if (rm->mi_type == EMU86_MODRM_REGISTER) {
 		if (size == 8)
 			da_print_reg64(self, rm->mi_rm);
 		else if (size == 4)
@@ -1018,9 +524,9 @@ da_print_modrm_rm(struct disassembler *__restrict self,
 
 PRIVATE void CC
 da_print_modrm_rm64_mm(struct disassembler *__restrict self,
-                       struct modrm const *__restrict rm,
-                       op_flag_t flags) {
-	if (rm->mi_type == MODRM_REGISTER) {
+                       struct emu86_modrm const *__restrict rm,
+                       emu86_opflags_t flags) {
+	if (rm->mi_type == EMU86_MODRM_REGISTER) {
 		da_print_mmreg(self, rm->mi_rm);
 	} else {
 		da_print_modrm_rm_memory(self, rm, flags);
@@ -1032,9 +538,9 @@ da_print_modrm_rm64_mm(struct disassembler *__restrict self,
 #define da_print_modrm_rm512_zmm(self, rm, flag) da_print_modrm_rmNNN_Xmm(self, rm, flag, 'z')
 PRIVATE void CC
 da_print_modrm_rmNNN_Xmm(struct disassembler *__restrict self,
-                         struct modrm const *__restrict rm,
-                         op_flag_t flags, char x) {
-	if (rm->mi_type == MODRM_REGISTER) {
+                         struct emu86_modrm const *__restrict rm,
+                         emu86_opflags_t flags, char x) {
+	if (rm->mi_type == EMU86_MODRM_REGISTER) {
 		da_print_Xmmreg(self, rm->mi_rm, x);
 	} else {
 		da_print_modrm_rm_memory(self, rm, flags);
@@ -1210,20 +716,25 @@ libda_single_x86(struct disassembler *__restrict self) {
 	u32 whole_opcode;
 #endif /* CONFIG_AUTOSELECT_JCC */
 	u32 opcode;
-	op_flag_t flags;
+	emu86_opflags_t flags;
 	byte_t *text_start = self->d_pc;
 	byte_t *args_start = NULL;
 	struct instruction const *chain;
-	struct modrm rm;
+	struct emu86_modrm rm;
 	memset(&rm, 0, sizeof(rm));
-	if (!decode_opcode(self, &opcode, &flags)) {
-print_byte:
-		disasm_print_format(self, DISASSEMBLER_FORMAT_PSEUDOOP_PREFIX);
-		disasm_print(self, ".byte", 5);
-		disasm_print_format(self, DISASSEMBLER_FORMAT_PSEUDOOP_SUFFIX);
-		disasm_printf(self, " %#.2I8x", *self->d_pc++);
-		return;
+	switch (self->d_target) {
+	case DISASSEMBLER_TARGET_8086:
+		flags = EMU86_F_NORMAL | EMU86_F_16BIT;
+		break;
+	case DISASSEMBLER_TARGET_I386:
+		flags = EMU86_F_NORMAL | EMU86_F_32BIT;
+		break;
+	case DISASSEMBLER_TARGET_X86_64:
+		flags = EMU86_F_NORMAL | EMU86_F_64BIT;
+		break;
+	default: __builtin_unreachable();
 	}
+	self->d_pc = (byte_t *)emu86_opcode_decode(self->d_pc, &opcode, &flags);
 #ifdef CONFIG_AUTOSELECT_JCC
 	whole_opcode = opcode;
 #endif /* CONFIG_AUTOSELECT_JCC */
@@ -1268,7 +779,7 @@ print_byte:
 			continue;
 		}
 		if (((chain->i_flags & IF_REXW) != 0) !=
-		    ((flags & F_REX_W) != 0))
+		    ((flags & EMU86_F_REX_W) != 0))
 			continue;
 		if (DA86_IS16(self)) {
 			/* The 0x66 prefix acts inverted on 16-bit mode.
@@ -1276,27 +787,27 @@ print_byte:
 			 * whilst instruction _without_ the prefix are used any other
 			 * time (thus not breaking instructions that don't care about
 			 * the prefix at all). */
-			if ((chain->i_flags & IF_66) && (flags & F_66))
+			if ((chain->i_flags & IF_66) && (flags & EMU86_F_66))
 				continue;
-			if ((chain->i_flags & IF_67) && (flags & F_67))
+			if ((chain->i_flags & IF_67) && (flags & EMU86_F_67))
 				continue;
 		} else {
 			/* Do an exact match for the 0x66 prefix due to it being a
 			 * so-called mandatory prefix, that also modifies the name
 			 * of an instruction when ATnT representation is printed. */
-			if (((chain->i_flags & IF_66) != 0) != ((flags & F_66) != 0))
+			if (((chain->i_flags & IF_66) != 0) != ((flags & EMU86_F_66) != 0))
 				continue;
-			if ((chain->i_flags & IF_67) && !(flags & F_67))
+			if ((chain->i_flags & IF_67) && !(flags & EMU86_F_67))
 				continue;
 		}
 		if (((chain->i_flags & IF_F2) != 0) !=
-		    ((flags & F_f2) != 0))
+		    ((flags & EMU86_F_f2) != 0))
 			continue;
 		if (((chain->i_flags & IF_F3) != 0) !=
-		    ((flags & F_f3) != 0))
+		    ((flags & EMU86_F_f3) != 0))
 			continue;
 		if ((chain->i_flags & IF_REXB) == IF_REXB) {
-			if (!(flags & F_REX_B))
+			if (!(flags & EMU86_F_REX_B))
 				continue;
 		} else if (chain->i_flags & (IF_X32 | IF_X64)) {
 			if (chain->i_flags & IF_X32) {
@@ -1315,45 +826,44 @@ print_byte:
 			++self->d_pc;
 		} else {
 			if (chain->i_flags & IF_VEX) {
-				if (!(flags & F_HASVEX))
+				if (!(flags & EMU86_F_HASVEX))
 					continue;
 				if ((chain->i_flags & IF_VEX) == IF_VEX) {
 					byte_t f = (byte_t)chain->i_repr[0];
 					if ((f & IF_VEX_B0_LIG) != IF_VEX_B0_LIG) {
-						if (flags & F_EVEX_b) {
+						if (flags & EMU86_F_EVEX_b) {
 							/* When EVEX.b is set, then a 512-bit vector size is implied,
 							 * SAE is enabled, and VEX.LL is used as a rounding control
 							 * indicator, as displayed by `OP_ER' and `OP_SAE' */
 							if ((f & IF_VEX_B0_LL_M) != 2 << IF_VEX_B0_LL_S)
 								continue; /* Different length value */
 						} else {
-							if (((flags & F_VEX_LL_M) >> F_VEX_LL_S) !=
-							    ((f & IF_VEX_B0_LL_M) >> IF_VEX_B0_LL_S))
+							if (EMU86_F_VEX_LL(flags) != IF_VEX_B0_LL(f))
 								continue; /* Different length value */
 						}
 					}
-					if ((f & IF_VEX_B0_NOEVEX) && (flags & F_HASEVEX))
+					if ((f & IF_VEX_B0_NOEVEX) && (flags & EMU86_F_HASEVEX))
 						continue; /* Require that no EVEX prefix was used. */
 					if (!(f & IF_VEX_B0_WIG)) {
-						if (!!(f & IF_VEX_B0_W) != !!(flags & F_VEX_W))
+						if (!!(f & IF_VEX_B0_W) != !!(flags & EMU86_F_VEX_W))
 							continue; /* Different width value */
 					}
 				} else {
-					if (!!(flags & F_VEX_W) != !!(flags & IF_VEXW1))
+					if (!!(flags & EMU86_F_VEX_W) != !!(flags & IF_VEXW1))
 						continue;
 				}
 			}
 			if (chain->i_flags & IF_MODRM) {
 				if (!args_start) {
 					args_start = self->d_pc;
-					decode_modrm(self, &rm, flags);
+					self->d_pc = (byte_t *)emu86_modrm_decode(args_start, &rm, flags);
 				}
 				if (chain->i_flags & IF_REG0) {
 					if (rm.mi_reg != (chain->i_flags & 7))
 						continue;
 				}
 				if ((chain->i_flags & IF_RMM) &&
-				    (rm.mi_type == MODRM_REGISTER))
+				    (rm.mi_type == EMU86_MODRM_REGISTER))
 					continue;
 			} else if (args_start) {
 				self->d_pc = args_start;
@@ -1378,7 +888,7 @@ print_byte:
 			if (*p)
 				++p;
 			disasm_print_format(self, DISASSEMBLER_FORMAT_MNEMONIC_PREFIX);
-			if (flags & F_LOCK)
+			if (flags & EMU86_F_LOCK)
 				disasm_print(self, "lock ", 5);
 			{
 #ifdef CONFIG_AUTOSELECT_JCC
@@ -1417,7 +927,7 @@ no_jcc_sel:
 				is_first = false;
 do_nextop_nocomma:
 				switch (ch) {
-#define VEX_VVVVV() ((flags & F_VEX_VVVVV_M) >> F_VEX_VVVVV_S)
+#define VEX_VVVVV() EMU86_F_VEX_VVVVV(flags)
 
 				case OPC_RM8:
 					da_print_modrm_rm(self, &rm, flags, 1);
@@ -1451,7 +961,7 @@ do_nextop_nocomma:
 					break;
 
 				case OPC_RMBND:
-					if (rm.mi_type == MODRM_REGISTER) {
+					if (rm.mi_type == EMU86_MODRM_REGISTER) {
 						da_print_bndreg(self, rm.mi_rm);
 					} else {
 						da_print_modrm_rm(self, &rm, flags, DA86_IS64(self) ? 16 : 8);
@@ -1459,7 +969,7 @@ do_nextop_nocomma:
 					break;
 
 				case OPC_RMBND_RANGE:
-					if (rm.mi_type == MODRM_REGISTER ||
+					if (rm.mi_type == EMU86_MODRM_REGISTER ||
 					    rm.mi_index == 0xff ||
 					    rm.mi_rm == 0xff) {
 						disasm_print(self, "??" "? /*", 6);
@@ -1477,7 +987,7 @@ do_nextop_nocomma:
 					break;
 
 				case OPC_RMSTi:
-					if (rm.mi_type == MODRM_REGISTER) {
+					if (rm.mi_type == EMU86_MODRM_REGISTER) {
 						da_print_stireg(self, rm.mi_rm);
 					} else {
 						da_print_modrm_rm(self, &rm, flags, DA86_IS64(self) ? 16 : 8);
@@ -1599,7 +1109,7 @@ do_nextop_nocomma:
 						unsigned int i, n;
 						/* OP_PAX_PCX_PDX / OP_PAX_PCX */
 						n = name == 'b' ? 2 : 3;
-						if (!DA86_IS64(self) && (DA86_IS16(self) ^ ((flags & F_66) != 0))) {
+						if (!DA86_IS64(self) && (DA86_IS16(self) ^ ((flags & EMU86_F_66) != 0))) {
 							regname[2] = 'x';
 							for (i = 0; i < n; ++i) {
 								regname[1] = conv_table2[i];
@@ -1623,7 +1133,7 @@ do_nextop_nocomma:
 						}
 						goto done_escape_register;
 					} else if (name == 'c') { /* OP_PSI */
-						if (!DA86_IS64(self) && (DA86_IS16(self) ^ ((flags & F_66) != 0))) {
+						if (!DA86_IS64(self) && (DA86_IS16(self) ^ ((flags & EMU86_F_66) != 0))) {
 							regname[1] = 's';
 							regname[2] = 'i';
 							reglen = 3;
@@ -1663,8 +1173,8 @@ done_escape_register:
 					addr = (uintptr_t)UNALIGNED_GET64((u64 *)self->d_pc);
 					self->d_pc += 8;
 do_print_moffs:
-					if ((flags & F_SEGMASK) != 0)
-						disasm_print(self, segment_prefix[((flags & F_SEGMASK) >> F_SEGSHIFT) - 1], 4);
+					if (EMU86_F_HASSEG(flags))
+						disasm_print(self, segment_prefix[EMU86_F_SEGREG(flags)], 4);
 					libda_disasm_print_symbol(self, (void *)addr);
 				}	break;
 
@@ -1761,7 +1271,7 @@ do_print_moffs:
 					break;
 
 				case OPC_RMK:
-					if (rm.mi_type == MODRM_REGISTER) {
+					if (rm.mi_type == EMU86_MODRM_REGISTER) {
 						da_print_kreg(self, rm.mi_rm);
 					} else {
 						da_print_modrm_rm(self, &rm, flags, DA86_IS64(self) ? 16 : 8);
@@ -1877,7 +1387,7 @@ do_print_moffs:
 				case OPC_ER: {
 					PRIVATE char const rounding_modes[4] = { 'n', 'd', 'u', 'z' };
 					char rmrepr[6];
-					if (!(flags & F_EVEX_b)) {
+					if (!(flags & EMU86_F_EVEX_b)) {
 nextop_nocomma:
 						ch = *p++;
 						if (!ch)
@@ -1887,7 +1397,7 @@ nextop_nocomma:
 					disasm_print(self, "{", 1);
 					disasm_print_format(self, DISASSEMBLER_FORMAT_MNEMONIC_PREFIX);
 					rmrepr[0] = 'r';
-					rmrepr[1] = rounding_modes[(flags & F_VEX_LL_M) >> F_VEX_LL_S];
+					rmrepr[1] = rounding_modes[EMU86_F_VEX_LL(flags)];
 					rmrepr[2] = '-';
 					rmrepr[3] = 's';
 					rmrepr[4] = 'a';
@@ -1898,7 +1408,7 @@ nextop_nocomma:
 				}	break;
 
 				case OPC_SAE:
-					if (!(flags & F_EVEX_b))
+					if (!(flags & EMU86_F_EVEX_b))
 						goto nextop_nocomma;
 					disasm_print(self, "{", 1);
 					disasm_print_format(self, DISASSEMBLER_FORMAT_MNEMONIC_PREFIX);
@@ -1931,7 +1441,7 @@ nextop_nocomma:
 				case OPC_LJMP: {
 					u16 segment;
 					u32 offset;
-					if (flags & F_AD16) {
+					if (flags & EMU86_F_AD16) {
 						offset = UNALIGNED_GET16((u16 *)self->d_pc);
 						self->d_pc += 2;
 					} else {
@@ -1987,7 +1497,11 @@ done_operands:
 	}
 unknown_opcode:
 	self->d_pc = text_start;
-	goto print_byte;
+/*print_byte:*/
+	disasm_print_format(self, DISASSEMBLER_FORMAT_PSEUDOOP_PREFIX);
+	disasm_print(self, ".byte", 5);
+	disasm_print_format(self, DISASSEMBLER_FORMAT_PSEUDOOP_SUFFIX);
+	disasm_printf(self, " %#.2I8x", *self->d_pc++);
 }
 
 #ifdef __GNUC__

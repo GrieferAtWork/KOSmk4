@@ -27,7 +27,6 @@
 #include "dl.h"
 /**/
 
-/* TODO: Tune libdl's dlmalloc to allocate memory in smaller chunks! */
 /* TODO: Don't #define __builtin_unreachable() in <__crt.h> to __crt_unreachable()
  *       Instead look into `-fsanitize=unreachable' (which does something similar
  *       on a compiler-basis and don't make the library call mandatory for all

@@ -317,8 +317,6 @@ DlModule_OpenFilenameInPathList(char const *__restrict path,
 	orig_path = path;
 again:
 #endif /* CONFIG_DLOPEN_TRYHARD_NO_VERSION_SUFFIX */
-	/* TODO: Check if the one of the paths will be `/lib/libdl.so'.
-	 *       If so, immediately return a pointer to ourself! */
 	for (;;) {
 		char ch;
 		sep = path;

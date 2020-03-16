@@ -24,124 +24,86 @@
 
 #include <kernel/types.h>
 
+#include <libemu86/emu86.h>
+
 DECL_BEGIN
 
-#define R_EAX     0 /* Accumulator. */
-#define R_ECX     1 /* Counter register. */
-#define R_EDX     2 /* General purpose d-register. */
-#define R_EBX     3 /* General purpose b-register. */
-#define R_ESP     4 /* Stack pointer. */
-#define R_EBP     5 /* Stack base pointer. */
-#define R_ESI     6 /* Source pointer. */
-#define R_EDI     7 /* Destination pointer. */
+/* TODO: Get rid of these macros */
+#define R_EAX  EMU86_R_EAX /* Accumulator. */
+#define R_ECX  EMU86_R_ECX /* Counter register. */
+#define R_EDX  EMU86_R_EDX /* General purpose d-register. */
+#define R_EBX  EMU86_R_EBX /* General purpose b-register. */
+#define R_ESP  EMU86_R_ESP /* Stack pointer. */
+#define R_EBP  EMU86_R_EBP /* Stack base pointer. */
+#define R_ESI  EMU86_R_ESI /* Source pointer. */
+#define R_EDI  EMU86_R_EDI /* Destination pointer. */
 #ifdef __x86_64__
-#define R_R8      8 /* R8 */
-#define R_R9      9 /* R9 */
-#define R_R10    10 /* R10 */
-#define R_R11    11 /* R11 */
-#define R_R12    12 /* R12 */
-#define R_R13    13 /* R13 */
-#define R_R14    14 /* R14 */
-#define R_R15    15 /* R15 */
-#define R_FREX 0x10 /* FLAG: A REX prefix is being used (only affects `x86_reg8_offsets'). */
+#define R_R8   EMU86_R_R8  /* R8 */
+#define R_R9   EMU86_R_R9  /* R9 */
+#define R_R10  EMU86_R_R10 /* R10 */
+#define R_R11  EMU86_R_R11 /* R11 */
+#define R_R12  EMU86_R_R12 /* R12 */
+#define R_R13  EMU86_R_R13 /* R13 */
+#define R_R14  EMU86_R_R14 /* R14 */
+#define R_R15  EMU86_R_R15 /* R15 */
 #endif /* __x86_64__ */
 
 
 /* Instruction flags. */
-typedef u32 op_flag_t;
-#define F_OP16        0x00000001 /* The 0x66 prefix is being used. */
-#define F_AD16        0x00000002 /* The 0x67 prefix is being used. */
-#define F_LOCK        0x00000004 /* The `lock' (0xf0) prefix is being used. */
-#define F_REPNE       0x00000010 /* The `repne' (0xf2) prefix is being used. */
-#define F_REP         0x00000020 /* The `rep' (0xf3) prefix is being used. */
-#define F_HASVEX      0x00000040 /* A VEX prefix was given. */
-#define F_SEGMASK     0x0000f000 /* Mask for segment overrides. */
+typedef emu86_opflags_t op_flag_t;
+
+/* TODO: Get rid of these macros */
+#define F_OP16        EMU86_F_OP16        /* The 0x66 prefix is being used. */
+#define F_AD16        EMU86_F_AD16        /* The 0x67 prefix is being used. */
+#define F_LOCK        EMU86_F_LOCK        /* The `lock' (0xf0) prefix is being used. */
+#define F_REPNE       EMU86_F_REPNE       /* The `repne' (0xf2) prefix is being used. */
+#define F_REP         EMU86_F_REP         /* The `rep' (0xf3) prefix is being used. */
+#define F_HASVEX      EMU86_F_HASVEX      /* A VEX prefix was given. */
+#define F_SEGMASK     EMU86_F_SEGMASK     /* Mask for segment overrides. */
+#define F_VEX_VVVVV_M EMU86_F_VEX_VVVVV_M /* Mask for VEX.VVVVV */
+#define F_VEX_VVVVV_S EMU86_F_VEX_VVVVV_S /* Shift for VEX.VVVVV */
+#define F_VEX_W       EMU86_F_VEX_W       /* Value of VEX.W */
+#define F_VEX_LL_M    EMU86_F_VEX_LL_M    /* Value of VEX.LL */
+#define F_VEX_LL_S    EMU86_F_VEX_LL_S    /* Shift for VEX.LL */
 #ifdef __x86_64__
-#define F_VEX_VVVVV_M 0x001f0000 /* Mask for VEX.VVVVV */
+#define F_AD64        F_AD16              /* The 0x67 prefix is being used. */
+#define F_IS_X32      EMU86_F_32BIT       /* The hosted process is running in compatibility mode (32-bit). */
+#define F_HASREX      EMU86_F_HASREX      /* A REX prefix is being used. */
+#define F_REXSHFT     EMU86_F_REXSHFT     /* Shift for the REX prefix byte. */
+#define F_REXMASK     EMU86_F_REXMASK     /* Mask of the REX prefix byte. */
+#define F_REX_W       EMU86_F_REX_W       /* The REX.W flag (Indicates 64-bit operands). */
+#define F_REX_R       EMU86_F_REX_R       /* The REX.R flag (1-bit extension to MODRM.reg). */
+#define F_REX_X       EMU86_F_REX_X       /* The REX.X flag (1-bit extension to SIB.index). */
+#define F_REX_B       EMU86_F_REX_B       /* The REX.B flag (1-bit extension to MODRM.rm). */
+#define F_SEGDS       EMU86_F_SEGDS       /* DS override (compatibility mode ONLY). */
+#define F_SEGES       EMU86_F_SEGES       /* ES override (compatibility mode ONLY). */
+#define F_SEGCS       EMU86_F_SEGCS       /* CS override (compatibility mode ONLY). */
+#define F_SEGSS       EMU86_F_SEGSS       /* SS override (compatibility mode ONLY). */
+#define F_EVEX_z      EMU86_F_EVEX_z      /* Value of EVEX.z */
+#define F_EVEX_b      EMU86_F_EVEX_b      /* Value of EVEX.b */
+#define F_EVEX_R      EMU86_F_EVEX_R      /* The EVEX.R flag (a second 1-bit extension to MODRM.reg; use with `F_REX_R'). */
+#define F_EVEX_aaa_M  EMU86_F_EVEX_aaa_M  /* Value of EVEX.aaa */
+#define F_EVEX_aaa_S  EMU86_F_EVEX_aaa_S  /* Shift for EVEX.aaa */
+#define F_HASEVEX     EMU86_F_HASEVEX     /* An EVEX prefix was given. */
 #else /* __x86_64__ */
-#define F_VEX_VVVVV_M 0x00070000 /* Mask for VEX.VVVVV */
+#define F_SEGDS       EMU86_F_SEGDS /* DS override. */
+#define F_SEGES       EMU86_F_SEGES /* ES override. */
+#define F_SEGCS       EMU86_F_SEGCS /* CS override. */
+#define F_SEGSS       EMU86_F_SEGSS /* SS override. */
 #endif /* !__x86_64__ */
-#define F_VEX_VVVVV_S         16 /* Shift for VEX.VVVVV */
-#define F_VEX_W       0x00200000 /* Value of VEX.W */
-#ifdef __x86_64__
-#define F_VEX_LL_M    0x00400000 /* Value of VEX.LL */
-#else /* __x86_64__ */
-#define F_VEX_LL_M    0x00c00000 /* Value of VEX.LL */
-#endif /* !__x86_64__ */
-#define F_VEX_LL_S            22 /* Shift for VEX.LL */
-#ifdef __x86_64__
-#define F_AD64        F_AD16     /* The 0x67 prefix is being used. */
-#define F_IS_X32      0x00000008 /* The hosted process is running in compatibility mode (32-bit). */
-#define F_HASREX      0x00000080 /* A REX prefix is being used. */
-#define F_REXSHFT              8 /* Shift for the REX prefix byte. */
-#define F_REXMASK     0x00000f00 /* Mask of the REX prefix byte. */
-#define F_REX_W       0x00000800 /* The REX.W flag (Indicates 64-bit operands). */
-#define F_REX_R       0x00000400 /* The REX.R flag (1-bit extension to MODRM.reg). */
-#define F_REX_X       0x00000200 /* The REX.X flag (1-bit extension to SIB.index). */
-#define F_REX_B       0x00000100 /* The REX.B flag (1-bit extension to MODRM.rm). */
-#define F_SEGDS       0x00000000 /* DS override (compatibility mode ONLY). */
-#define F_SEGES       0x00001000 /* ES override (compatibility mode ONLY). */
-#define F_SEGCS       0x00002000 /* CS override (compatibility mode ONLY). */
-#define F_SEGSS       0x00003000 /* SS override (compatibility mode ONLY). */
-#define F_EVEX_z      0x01000000 /* Value of EVEX.z */
-#define F_EVEX_b      0x02000000 /* Value of EVEX.b */
-#define F_EVEX_R      0x04000000 /* The EVEX.R flag (a second 1-bit extension to MODRM.reg; use with `F_REX_R'). */
-#define F_EVEX_aaa_M  0x38000000 /* Value of EVEX.aaa */
-#define F_EVEX_aaa_S          27 /* Shift for EVEX.aaa */
-#define F_HASEVEX     0x40000000 /* An EVEX prefix was given. */
-#else /* __x86_64__ */
-#define F_SEGDS      0x00000000 /* DS override. */
-#define F_SEGES      0x00001000 /* ES override. */
-#define F_SEGCS      0x00002000 /* CS override. */
-#define F_SEGSS      0x00003000 /* SS override. */
-#endif /* !__x86_64__ */
-#define F_SEGFS      0x00004000 /* FS override. */
-#define F_SEGGS      0x00005000 /* GS override. */
+#define F_SEGFS       EMU86_F_SEGFS /* FS override. */
+#define F_SEGGS       EMU86_F_SEGGS /* GS override. */
 
 /* Explicit prefix byte flags. */
-#define F_66        F_OP16  /* The 0x66 prefix is being used. */
-#define F_67        F_AD16  /* The 0x67 prefix is being used. */
-#define F_f0        F_LOCK  /* The 0xf0 prefix is being used. */
-#define F_f2        F_REPNE /* The 0xf2 prefix is being used. */
-#define F_f3        F_REP   /* The 0xf3 prefix is being used. */
+/* TODO: Get rid of these macros */
+#define F_66 EMU86_F_66 /* The 0x66 prefix is being used. */
+#define F_67 EMU86_F_67 /* The 0x67 prefix is being used. */
+#define F_f0 EMU86_F_f0 /* The 0xf0 prefix is being used. */
+#define F_f2 EMU86_F_f2 /* The 0xf2 prefix is being used. */
+#define F_f3 EMU86_F_f3 /* The 0xf3 prefix is being used. */
 
-
-
-#define MODRM_MOD_MASK  0xc0 /* 0b11000000 */
-#define MODRM_REG_MASK  0x38 /* 0b00111000 */
-#define MODRM_RM_MASK   0x07 /* 0b00000111 */
-#define MODRM_MOD_SHIFT 6
-#define MODRM_REG_SHIFT 3
-#define MODRM_RM_SHIFT  0
-#define MODRM_GETMOD(x) (((x) & MODRM_MOD_MASK) >> MODRM_MOD_SHIFT)
-#define MODRM_GETREG(x) (((x) & MODRM_REG_MASK) >> MODRM_REG_SHIFT)
-#define MODRM_GETRM(x)  (((x) & MODRM_RM_MASK) >> MODRM_RM_SHIFT)
-
-struct modrm {
-	u32       mi_offset; /* Memory address. */
-#define MODRM_REGISTER 0
-#define MODRM_MEMORY   1
-	/* EXAMPLES:
-	 *  - mov $42, %mi_rm
-	 *  - mov $42, mi_offset(%mi_rm)
-	 *  - mov %mi_reg, mi_offset(%mi_rm,%mi_index,mi_shift)
-	 */
-	u8        mi_type;   /* mod R/M type (One of `MODRM_*') */
-	u8        mi_reg;    /* Secondary register operand, or instruction sub-class. */
-	u8        mi_rm;     /* Base register (or 0xff when not set). */
-	u8        mi_index;  /* Index register (or 0xff when not set). */
-	u8        mi_shift;  /* Index shift (or 0). */
-};
 
 struct icpustate;
-
-#ifdef __x86_64__
-INTDEF byte_t *(KCALL x86_decode_modrm)(byte_t *__restrict text, struct modrm *__restrict info, op_flag_t flags);
-#else /* __x86_64__ */
-INTDEF byte_t *(KCALL x86_decode_modrm)(byte_t *__restrict text, struct modrm *__restrict info);
-#define x86_decode_modrm(text, info, flags) x86_decode_modrm(text, info)
-#endif /* !__x86_64__ */
-
 
 /* @param: regno: One of `R_*' */
 #ifdef __x86_64__
@@ -172,18 +134,18 @@ INTDEF NONNULL((1)) void FCALL x86_icpustate_set32(struct icpustate *__restrict 
 
 INTDEF uintptr_t NOTHROW(KCALL x86_decode_segmentbase)(struct icpustate *__restrict state, op_flag_t flags);
 INTDEF uintptr_t NOTHROW(KCALL x86_decode_modrmgetmem)(struct icpustate *__restrict state,
-                                                       struct modrm *__restrict modrm, op_flag_t flags);
+                                                       struct emu86_modrm *__restrict modrm, op_flag_t flags);
 
 /* Access the register or memory location described by a MODRM instruction. */
-INTDEF u8  KCALL modrm_getrmb(struct icpustate *__restrict state, struct modrm *__restrict modrm, op_flag_t flags) THROWS(E_SEGFAULT);
-INTDEF u16 KCALL modrm_getrmw(struct icpustate *__restrict state, struct modrm *__restrict modrm, op_flag_t flags) THROWS(E_SEGFAULT);
-INTDEF u32 KCALL modrm_getrml(struct icpustate *__restrict state, struct modrm *__restrict modrm, op_flag_t flags) THROWS(E_SEGFAULT);
-INTDEF void KCALL modrm_setrmb(struct icpustate *__restrict state, struct modrm *__restrict modrm, op_flag_t flags, u8  value) THROWS(E_SEGFAULT);
-INTDEF void KCALL modrm_setrmw(struct icpustate *__restrict state, struct modrm *__restrict modrm, op_flag_t flags, u16 value) THROWS(E_SEGFAULT);
-INTDEF void KCALL modrm_setrml(struct icpustate *__restrict state, struct modrm *__restrict modrm, op_flag_t flags, u32 value) THROWS(E_SEGFAULT);
+INTDEF u8  KCALL modrm_getrmb(struct icpustate *__restrict state, struct emu86_modrm *__restrict modrm, op_flag_t flags) THROWS(E_SEGFAULT);
+INTDEF u16 KCALL modrm_getrmw(struct icpustate *__restrict state, struct emu86_modrm *__restrict modrm, op_flag_t flags) THROWS(E_SEGFAULT);
+INTDEF u32 KCALL modrm_getrml(struct icpustate *__restrict state, struct emu86_modrm *__restrict modrm, op_flag_t flags) THROWS(E_SEGFAULT);
+INTDEF void KCALL modrm_setrmb(struct icpustate *__restrict state, struct emu86_modrm *__restrict modrm, op_flag_t flags, u8  value) THROWS(E_SEGFAULT);
+INTDEF void KCALL modrm_setrmw(struct icpustate *__restrict state, struct emu86_modrm *__restrict modrm, op_flag_t flags, u16 value) THROWS(E_SEGFAULT);
+INTDEF void KCALL modrm_setrml(struct icpustate *__restrict state, struct emu86_modrm *__restrict modrm, op_flag_t flags, u32 value) THROWS(E_SEGFAULT);
 #ifdef __x86_64__
-INTDEF u64 KCALL modrm_getrmq(struct icpustate *__restrict state, struct modrm *__restrict modrm, op_flag_t flags) THROWS(E_SEGFAULT);
-INTDEF void KCALL modrm_setrmq(struct icpustate *__restrict state, struct modrm *__restrict modrm, op_flag_t flags, u64 value) THROWS(E_SEGFAULT);
+INTDEF u64 KCALL modrm_getrmq(struct icpustate *__restrict state, struct emu86_modrm *__restrict modrm, op_flag_t flags) THROWS(E_SEGFAULT);
+INTDEF void KCALL modrm_setrmq(struct icpustate *__restrict state, struct emu86_modrm *__restrict modrm, op_flag_t flags, u64 value) THROWS(E_SEGFAULT);
 #endif /* __x86_64__ */
 
 #define modrm_getregb(state, modrm, flags)        x86_icpustate_get8(state, (modrm)->mi_reg, flags)
@@ -216,19 +178,6 @@ INTDEF void KCALL modrm_setrmq(struct icpustate *__restrict state, struct modrm 
 #else /* __x86_64__ */
 #define modrm_getrmreg(state, modrm, flags)         x86_icpustate_get32(state, (modrm)->mi_rm)
 #define modrm_setrmreg(state, modrm, flags, value)  x86_icpustate_set32(state, (modrm)->mi_rm, value)
-#endif /* !__x86_64__ */
-
-
-/* Read (and return) an X86 opcode from `*ptext', updating that pointer
- * to refer to the the opcodes operands, or the next instruction, as well
- * as filling in `*pflags' to contain a set of `F_*' */
-#ifdef __x86_64__
-INTDEF u32 (KCALL x86_decode_instruction)(struct icpustate *__restrict state, byte_t **__restrict ptext, op_flag_t *__restrict pflags)
-		THROWS(E_SEGFAULT, E_ILLEGAL_INSTRUCTION);
-#else /* __x86_64__ */
-INTDEF u32 (KCALL x86_decode_instruction)(byte_t **__restrict ptext, op_flag_t *__restrict pflags)
-		THROWS(E_SEGFAULT);
-#define x86_decode_instruction(state, ptext, pflags) x86_decode_instruction(ptext, pflags)
 #endif /* !__x86_64__ */
 
 

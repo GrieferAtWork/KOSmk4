@@ -133,12 +133,12 @@ NOTHROW(FCALL x86_fsgsbase_patch)(void *__restrict pc) {
 	if (code[3] != 0xae)
 		return false; /* Wrong instruction */
 	byte = code[4]; /* mod r/m byte */
-	if ((byte & MODRM_MOD_MASK) != (0x3 << MODRM_MOD_SHIFT))
+	if ((byte & EMU86_MODRM_MOD_MASK) != (0x3 << EMU86_MODRM_MOD_SHIFT))
 		return false; /* Not a register operand. */
-	regno = MODRM_GETRM(byte);
+	regno = EMU86_MODRM_GETRM(byte);
 	if (rex & 0x1) /* REX.B */
 		regno |= 0x8;
-	method = MODRM_GETREG(byte);
+	method = EMU86_MODRM_GETREG(byte);
 	if unlikely(method >= 4)
 		return false; /* Invalid MODRM.REG method */
 	if (regno >= 4) {

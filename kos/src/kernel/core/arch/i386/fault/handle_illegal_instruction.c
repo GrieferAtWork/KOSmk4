@@ -95,17 +95,18 @@ typedef union {
 
 INTERN struct icpustate *FCALL
 x86_handle_illegal_instruction(struct icpustate *__restrict state) {
-	byte_t *orig_pc, *pc;
+	byte_t const *orig_pc, *pc;
 	u32 opcode;
 	op_flag_t op_flags;
-	struct modrm mod;
+	struct emu86_modrm mod;
 	pc = (byte_t *)state->ics_irregs.ir_pip;
 	COMPILER_READ_BARRIER();
 	/* Re-enable interrupts if they were enabled before. */
 	if (state->ics_irregs.ir_pflags & EFLAGS_IF)
 		__sti();
-	orig_pc = pc;
-	opcode  = x86_decode_instruction(state, &pc, &op_flags);
+	orig_pc  = pc;
+	op_flags = emu86_opflagsof_icpustate(state);
+	pc       = emu86_opcode_decode(pc, &opcode, &op_flags);
 	TRY {
 		if unlikely((pc - orig_pc) > 16) {
 			uintptr_t next_pc;
@@ -147,7 +148,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 #define del_pflags(mask)        msk_pflags(~(mask), 0)
 #define set_pflags_mask(value, mask) \
 	msk_pflags(~(mask), (value) & (mask))
-#define MOD_DECODE() (pc = x86_decode_modrm(pc, &mod, op_flags))
+#define MOD_DECODE() (pc = emu86_modrm_decode(pc, &mod, op_flags))
 
 #define RD_RMB()  modrm_getrmb(state, &mod, op_flags)
 #define WR_RMB(v) modrm_setrmb(state, &mod, op_flags, v)
@@ -184,17 +185,17 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 #define WR_REGQ(v) modrm_setregq(state, &mod, op_flags, v)
 #endif /* __x86_64__ */
 
-#define RD_VEXREG()   x86_icpustate_get(state, (u8)((op_flags & F_VEX_VVVVV_M) >> F_VEX_VVVVV_S))
-#define WR_VEXREG(v)  x86_icpustate_set(state, (u8)((op_flags & F_VEX_VVVVV_M) >> F_VEX_VVVVV_S), v)
-#define RD_VEXREGB()  x86_icpustate_get8(state, (u8)((op_flags & F_VEX_VVVVV_M) >> F_VEX_VVVVV_S))
-#define WR_VEXREGB(v) x86_icpustate_set8(state, (u8)((op_flags & F_VEX_VVVVV_M) >> F_VEX_VVVVV_S), v)
-#define RD_VEXREGW()  x86_icpustate_get16(state, (u8)((op_flags & F_VEX_VVVVV_M) >> F_VEX_VVVVV_S))
-#define WR_VEXREGW(v) x86_icpustate_set16(state, (u8)((op_flags & F_VEX_VVVVV_M) >> F_VEX_VVVVV_S), v)
-#define RD_VEXREGL()  x86_icpustate_get32(state, (u8)((op_flags & F_VEX_VVVVV_M) >> F_VEX_VVVVV_S))
-#define WR_VEXREGL(v) x86_icpustate_set32(state, (u8)((op_flags & F_VEX_VVVVV_M) >> F_VEX_VVVVV_S), v)
+#define RD_VEXREG()   x86_icpustate_get(state, (u8)EMU86_F_VEX_VVVVV(op_flags))
+#define WR_VEXREG(v)  x86_icpustate_set(state, (u8)EMU86_F_VEX_VVVVV(op_flags), v)
+#define RD_VEXREGB()  x86_icpustate_get8(state, (u8)EMU86_F_VEX_VVVVV(op_flags))
+#define WR_VEXREGB(v) x86_icpustate_set8(state, (u8)EMU86_F_VEX_VVVVV(op_flags), v)
+#define RD_VEXREGW()  x86_icpustate_get16(state, (u8)EMU86_F_VEX_VVVVV(op_flags))
+#define WR_VEXREGW(v) x86_icpustate_set16(state, (u8)EMU86_F_VEX_VVVVV(op_flags), v)
+#define RD_VEXREGL()  x86_icpustate_get32(state, (u8)EMU86_F_VEX_VVVVV(op_flags))
+#define WR_VEXREGL(v) x86_icpustate_set32(state, (u8)EMU86_F_VEX_VVVVV(op_flags), v)
 #ifdef __x86_64__
-#define RD_VEXREGQ()  x86_icpustate_get64(state, (u8)((op_flags & F_VEX_VVVVV_M) >> F_VEX_VVVVV_S))
-#define WR_VEXREGQ(v) x86_icpustate_set64(state, (u8)((op_flags & F_VEX_VVVVV_M) >> F_VEX_VVVVV_S), v)
+#define RD_VEXREGQ()  x86_icpustate_get64(state, (u8)EMU86_F_VEX_VVVVV(op_flags))
+#define WR_VEXREGQ(v) x86_icpustate_set64(state, (u8)EMU86_F_VEX_VVVVV(op_flags), v)
 #endif /* __x86_64__ */
 
 
@@ -241,7 +242,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 			/* 0F B0 /r      CMPXCHG r/m8,r8      Compare AL with r/m8. If equal, ZF is set and r8 is loaded into r/m8. Else, clear ZF and load r/m8 into AL */
 			value    = get_al();
 			newvalue = RD_REGB();
-			if (mod.mi_type == MODRM_REGISTER) {
+			if (mod.mi_type == EMU86_MODRM_REGISTER) {
 				temp = RD_RMREGB();
 				if (temp == value)
 					WR_RMREGB(newvalue);
@@ -272,7 +273,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 				u16 temp, value, newvalue;
 				value    = get_ax();
 				newvalue = RD_REGW();
-				if (mod.mi_type == MODRM_REGISTER) {
+				if (mod.mi_type == EMU86_MODRM_REGISTER) {
 					temp = RD_RMREGW();
 					if (temp == value)
 						WR_RMREGW((u16)newvalue);
@@ -295,7 +296,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 				u32 temp, value, newvalue;
 				value    = get_eax();
 				newvalue = RD_REGL();
-				if (mod.mi_type == MODRM_REGISTER) {
+				if (mod.mi_type == EMU86_MODRM_REGISTER) {
 					temp = RD_RMREGL();
 					if (temp == value)
 						WR_RMREGL((u32)newvalue);
@@ -328,7 +329,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 				uintptr_t addr;
 				if (op_flags & (F_OP16 | F_AD16 | F_REP | F_REPNE))
 					goto e_bad_prefix;
-				if unlikely(mod.mi_type != MODRM_MEMORY)
+				if unlikely(mod.mi_type != EMU86_MODRM_MEMORY)
 					goto e_bad_operand_addrmode;
 				/* 0F C7 /1 m64      CMPXCHG8B m64      Compare EDX:EAX with m64. If equal, set ZF and load ECX:EBX into m64. Else, clear ZF and load m64 into EDX:EAX */
 				old_value = get_eaxedx();
@@ -363,7 +364,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 			if (op_flags & (F_OP16 | F_AD16 | F_REP | F_REPNE))
 				goto e_bad_prefix;
 			temp = RD_REGB();
-			if (mod.mi_type == MODRM_REGISTER) {
+			if (mod.mi_type == EMU86_MODRM_REGISTER) {
 				value = RD_RMREGB();
 				WR_RMREGB(value + temp);
 			} else {
@@ -395,7 +396,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 			if (op_flags & F_OP16) {
 				u16 value, temp;
 				temp = RD_REGW();
-				if (mod.mi_type == MODRM_REGISTER) {
+				if (mod.mi_type == EMU86_MODRM_REGISTER) {
 					value = RD_RMREGW();
 					WR_RMREGW((u16)value + (u16)temp);
 				} else {
@@ -417,7 +418,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 			} else {
 				u32 value, temp;
 				temp = RD_REGL();
-				if (mod.mi_type == MODRM_REGISTER) {
+				if (mod.mi_type == EMU86_MODRM_REGISTER) {
 					value = RD_RMREGL();
 					WR_RMREGL((u32)value + (u32)temp);
 				} else {
@@ -712,7 +713,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 					uintptr_t addr;
 					if (op_flags & (F_LOCK))
 						goto e_bad_prefix;
-					if (mod.mi_type != MODRM_MEMORY)
+					if (mod.mi_type != EMU86_MODRM_MEMORY)
 						goto e_bad_operand_addrmode;
 					/* FXSAVE m512byte */
 					addr = x86_decode_modrmgetmem(state, &mod, op_flags);
@@ -721,7 +722,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 					x86_fxsave((USER CHECKED struct xfpustate *)(void *)addr);
 					break;
 				}
-				if (mod.mi_type != MODRM_REGISTER)
+				if (mod.mi_type != EMU86_MODRM_REGISTER)
 					goto e_bad_operand_addrmode;
 #ifndef __x86_64__
 				{
@@ -760,7 +761,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 					uintptr_t addr;
 					if (op_flags & (F_LOCK))
 						goto e_bad_prefix;
-					if (mod.mi_type != MODRM_MEMORY)
+					if (mod.mi_type != EMU86_MODRM_MEMORY)
 						goto e_bad_operand_addrmode;
 					/* FXRSTOR m512byte */
 					addr = x86_decode_modrmgetmem(state, &mod, op_flags);
@@ -769,7 +770,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 					x86_fxrstor((USER CHECKED struct xfpustate *)(void *)addr);
 					break;
 				}
-				if (mod.mi_type != MODRM_REGISTER)
+				if (mod.mi_type != EMU86_MODRM_REGISTER)
 					goto e_bad_operand_addrmode;
 #ifndef __x86_64__
 				{
@@ -814,7 +815,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 				/* wrfsbase */
 				if (!(op_flags & F_REP))
 					goto generic_illegal_instruction;
-				if (mod.mi_type != MODRM_REGISTER)
+				if (mod.mi_type != EMU86_MODRM_REGISTER)
 					goto e_bad_operand_addrmode;
 #ifndef __x86_64__
 				{
@@ -854,7 +855,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 				/* wrgsbase */
 				if (!(op_flags & F_REP))
 					goto generic_illegal_instruction;
-				if (mod.mi_type != MODRM_REGISTER)
+				if (mod.mi_type != EMU86_MODRM_REGISTER)
 					goto e_bad_operand_addrmode;
 				/* XXX: Check if `%gs == SEGMENT_USER_GSBASE_RPL' */
 #ifndef __x86_64__
@@ -923,7 +924,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 			if (op_flags & (F_LOCK | F_REP | F_REPNE))
 				goto e_bad_prefix;
 			if (mod.mi_reg == 0) {
-				if (mod.mi_type == MODRM_REGISTER) {
+				if (mod.mi_type == EMU86_MODRM_REGISTER) {
 					switch (mod.mi_rm) {
 					case 1: /* VMCALL */
 					case 2: /* VMLAUNCH */
@@ -941,7 +942,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 				goto e_bad_operand_addrmode; /* SGDT m16&32 */
 			}
 			if (mod.mi_reg == 1) {
-				if (mod.mi_type == MODRM_REGISTER) {
+				if (mod.mi_type == EMU86_MODRM_REGISTER) {
 					switch (mod.mi_rm) {
 
 					case 2: /* CLAC */
@@ -976,7 +977,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 				goto e_bad_operand_addrmode; /* SIDT m16&32 */
 			}
 			if (mod.mi_reg == 2) {
-				if (mod.mi_type == MODRM_REGISTER) {
+				if (mod.mi_type == EMU86_MODRM_REGISTER) {
 					switch (mod.mi_rm) {
 
 					case 0: /* XGETBV */
@@ -996,7 +997,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 				goto e_bad_operand_addrmode; /* LGDT m16&32 */
 			}
 			if (mod.mi_reg == 3) {
-				if (mod.mi_type == MODRM_REGISTER)
+				if (mod.mi_type == EMU86_MODRM_REGISTER)
 					goto e_bad_operand_addrmode; /* LIDT m16&32 */
 				if (isuser())
 					goto e_privileged_instruction;
@@ -1004,7 +1005,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 			}
 			if (mod.mi_reg == 7) {
 				/* INVLPG m */
-				if (mod.mi_type != MODRM_MEMORY) {
+				if (mod.mi_type != EMU86_MODRM_MEMORY) {
 					switch (mod.mi_rm) {
 
 					case 0:
@@ -1078,7 +1079,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 			MOD_DECODE();
 			if (op_flags & (F_AD16 | F_LOCK | F_REP | F_REPNE))
 				goto e_bad_prefix;
-			if (mod.mi_type != MODRM_MEMORY)
+			if (mod.mi_type != EMU86_MODRM_MEMORY)
 				goto e_bad_operand_addrmode;
 			IF_X86_64(if (op_flags & F_REX_W) {
 				WR_RMQ(RD_REGQ());
@@ -1091,7 +1092,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 			MOD_DECODE();
 			if (op_flags & (F_AD16 | F_LOCK | F_REP | F_REPNE))
 				goto e_bad_prefix;
-			if (mod.mi_type != MODRM_MEMORY)
+			if (mod.mi_type != EMU86_MODRM_MEMORY)
 				goto e_bad_operand_addrmode;
 			if (mod.mi_reg > 3)
 				goto generic_illegal_instruction;

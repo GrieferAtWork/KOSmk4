@@ -74,10 +74,10 @@ x86_handle_gpf(struct icpustate *__restrict state, uintptr_t ecode) {
 
 PRIVATE struct icpustate *FCALL
 x86_handle_gpf_impl(struct icpustate *__restrict state, uintptr_t ecode, bool is_ss) {
-	byte_t *orig_pc, *pc;
+	byte_t const *orig_pc, *pc;
 	u32 opcode;
 	op_flag_t op_flags;
-	struct modrm mod;
+	struct emu86_modrm mod;
 	u16 effective_segment_value;
 	unsigned int i;
 	pc = (byte_t *)state->ics_irregs.ir_pip;
@@ -155,14 +155,15 @@ set_noncanon_pc_exception:
 	}
 #endif /* __x86_64__ */
 
-	opcode = x86_decode_instruction(state, &pc, &op_flags);
+	op_flags = emu86_opflagsof_icpustate(state);
+	pc       = emu86_opcode_decode(pc, &opcode, &op_flags);
 
 	/* TODO: Some instructions (such as `XSAVEC') raise #GP if their operands are miss-aligned.
 	 *       KOS has a dedicated exception for this (`E_SEGFAULT_UNALIGNED') that should be
 	 *       thrown in such cases! */
 
 	TRY {
-#define MOD_DECODE() (pc = x86_decode_modrm(pc, &mod, op_flags))
+#define MOD_DECODE() (pc = emu86_modrm_decode(pc, &mod, op_flags))
 
 #define RD_RMB()  modrm_getrmb(state, &mod, op_flags)
 #define WR_RMB(v) modrm_setrmb(state, &mod, op_flags, v)
@@ -221,7 +222,7 @@ set_noncanon_pc_exception:
 		/* Check for #GPFs caused by non-canonical memory accesses. */
 		if (ecode == 0 && !is_ss) {
 			uintptr_t nc_addr;
-			byte_t *pc_after_opcode = pc;
+			byte_t const *pc_after_opcode = pc;
 			switch (opcode) {
 
 			case 0x88:    /* MOV r/m8,r8 */
@@ -271,7 +272,7 @@ set_noncanon_pc_exception:
 			case 0x0f6f:  /* movdqa xmm2/m128, xmm1 / movdqu xmm2/m128, xmm1
 			               * movq mm/m64, mm */
 				MOD_DECODE();
-				if (mod.mi_type != MODRM_MEMORY)
+				if (mod.mi_type != EMU86_MODRM_MEMORY)
 					break;
 				nc_addr = x86_decode_modrmgetmem(state, &mod, op_flags);
 				goto chk_noncanon_write;
@@ -514,7 +515,7 @@ set_noncanon_pc_exception:
 			case 0x0fc2:  /* cmppd $imm8, xmm2/m128, xmm1 */
 			case 0x0f3882:/* invpcid r32/r64, m128 */
 				MOD_DECODE();
-				if (mod.mi_type != MODRM_MEMORY)
+				if (mod.mi_type != EMU86_MODRM_MEMORY)
 					break;
 				nc_addr = x86_decode_modrmgetmem(state, &mod, op_flags);
 				goto chk_noncanon_read;
@@ -539,7 +540,7 @@ set_noncanon_pc_exception:
 			              * monitor / mwait / sgdt m48 / sidt m48
 			              * smsw r/m16 / smsw r32/m16 */
 				MOD_DECODE();
-				if (mod.mi_type != MODRM_MEMORY)
+				if (mod.mi_type != EMU86_MODRM_MEMORY)
 					break;
 				nc_addr = x86_decode_modrmgetmem(state, &mod, op_flags);
 				if (mod.mi_reg == 0)
@@ -554,7 +555,7 @@ set_noncanon_pc_exception:
 			              * ldmxcsr m32 / lfence / mfence / sfence
 			              * stmxcsr m32 */
 				MOD_DECODE();
-				if (mod.mi_type != MODRM_MEMORY)
+				if (mod.mi_type != EMU86_MODRM_MEMORY)
 					break;
 				nc_addr = x86_decode_modrmgetmem(state, &mod, op_flags);
 				if (mod.mi_reg == 1)
@@ -748,7 +749,7 @@ done_noncanon_check:
 
 		case 0xff:
 			MOD_DECODE();
-			if (mod.mi_reg == 3 && mod.mi_type == MODRM_MEMORY) {
+			if (mod.mi_reg == 3 && mod.mi_type == EMU86_MODRM_MEMORY) {
 				u16 segment;
 				uintptr_t offset;
 				byte_t *addr;
@@ -790,7 +791,7 @@ done_noncanon_check:
 			switch (mod.mi_reg) {
 
 			case 2:
-				if (mod.mi_type == MODRM_MEMORY) {
+				if (mod.mi_type == EMU86_MODRM_MEMORY) {
 					/* ldmxcsr m32 (attempted to set a reserved bit) */
 					PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
 					PERTASK_SET(this_exception_pointers[0], E_ILLEGAL_INSTRUCTION_X86_OPCODE(opcode, mod.mi_reg));
@@ -812,7 +813,7 @@ done_noncanon_check:
 
 #ifdef __x86_64__
 			case 3:
-				if (mod.mi_type == MODRM_REGISTER) {
+				if (mod.mi_type == EMU86_MODRM_REGISTER) {
 					/* F3       0F AE /3 WRGSBASE r32     Load the GS base address with the 32-bit value in the source register.
 					 * F3 REX.W 0F AE /3 WRGSBASE r64     Load the GS base address with the 64-bit value in the source register. */
 check_x86_64_noncanon_fsgsbase:
@@ -1039,7 +1040,7 @@ check_x86_64_noncanon_fsgsbase:
 			}
 			/* LGDT m16&32 */
 			/* LIDT m16&32 */
-			if (mod.mi_type != MODRM_MEMORY) {
+			if (mod.mi_type != EMU86_MODRM_MEMORY) {
 				PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND));
 				PERTASK_SET(this_exception_pointers[1],
 				            (uintptr_t)E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE);

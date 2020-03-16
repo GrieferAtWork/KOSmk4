@@ -26,6 +26,11 @@ opt.append("-Os");
 #ifndef GUARD_LIBVM86_EMUINSTR_C
 #define GUARD_LIBVM86_EMUINSTR_C 1
 #define DISABLE_BRANCH_PROFILING 1
+#define CONFIG_LIBEMU86_WANT_16BIT 1
+#define CONFIG_LIBEMU86_WANT_32BIT 0
+#define CONFIG_LIBEMU86_WANT_64BIT 0
+#define CONFIG_LIBEMU86_WANT_SEGREGID 1
+#define __LIBEMU86_STATIC 1
 
 #include "api.h"
 
@@ -44,6 +49,7 @@ opt.append("-Os");
 #include <stddef.h>
 #include <stdint.h>
 
+#include <libemu86/emu86.h>
 #include <libvm86/api.h>
 #include <libvm86/emulator.h>
 #include <libvm86/intrin86.h>
@@ -68,18 +74,18 @@ opt.append("-Os");
 
 DECL_BEGIN
 
-#define F_SEGES   0x0000 /* ES segment override. */
-#define F_SEGCS   0x0001 /* CS segment override. */
-#define F_SEGSS   0x0002 /* SS segment override. */
-#define F_SEGDS   0x0003 /* DS segment override. */
-#define F_SEGFS   0x0004 /* FS segment override. */
-#define F_SEGGS   0x0005 /* GS segment override. */
-#define F_SEGMASK 0x0007 /* Segment override mask */
-#define F_f0      0x0008 /* The 0xf0 prefix is being used. */
-#define F_66      0x0010 /* The 0x66 prefix is being used. */
-#define F_67      0x0020 /* The 0x67 prefix is being used. */
-#define F_f2      0x0040 /* The 0xf2 prefix is being used. */
-#define F_f3      0x0080 /* The 0xf3 prefix is being used. */
+#define F_SEGES   EMU86_F_SEGES   /* ES segment override. */
+#define F_SEGCS   EMU86_F_SEGCS   /* CS segment override. */
+#define F_SEGSS   EMU86_F_SEGSS   /* SS segment override. */
+#define F_SEGDS   EMU86_F_SEGDS   /* DS segment override. */
+#define F_SEGFS   EMU86_F_SEGFS   /* FS segment override. */
+#define F_SEGGS   EMU86_F_SEGGS   /* GS segment override. */
+#define F_SEGMASK EMU86_F_SEGMASK /* Segment override mask */
+#define F_f0      EMU86_F_f0      /* The 0xf0 prefix is being used. */
+#define F_66      EMU86_F_66      /* The 0x66 prefix is being used. */
+#define F_67      EMU86_F_67      /* The 0x67 prefix is being used. */
+#define F_f2      EMU86_F_f2      /* The 0xf2 prefix is being used. */
+#define F_f3      EMU86_F_f3      /* The 0xf3 prefix is being used. */
 
 #define F_OP32  F_66
 #define F_AD32  F_67
@@ -123,58 +129,30 @@ LOCAL NONNULL((1)) int (CC libvm86_popl_void)(vm86_state_t *__restrict self);
 #define libvm86_popl_void(self, op_flags)                      libvm86_popl_void(self)
 
 
-#if 1
 #define REG8(id)                                                      \
 	(*((id) >= 4 ? &(self)->vr_regs.vr_regdatab[(((id) - 4) * 4) + 1] \
 	             : &(self)->vr_regs.vr_regdatab[(id) * 4]))
 #define REG16(id) (self)->vr_regs.vr_regdataw[(id) * 2]
 #define REG32(id) (self)->vr_regs.vr_regdatal[id]
 #define SEG(id)   (self)->vr_regs.vr_segments[id]
-#else
-#define REG8(id)                                                                \
-	(*((id) >= 4 ? ((uint8_t *)(((uint32_t *)&(self)->vr_regs) + ((id)-4))) + 1 \
-	             : ((uint8_t *)(((uint32_t *)&(self)->vr_regs) + (id)))))
-#define REG16(id) \
-	(*(uint16_t *)(((uint32_t *)&(self)->vr_regs) + (id)))
-#define REG32(id) \
-	(((uint32_t *)&(self)->vr_regs)[id])
-#define SEG(id) \
-	(((uint16_t *)&(self)->vr_regs.vr_es)[id])
-#endif
 
-#define R_AX  0 /* Accumulator. */
-#define R_CX  1 /* Counter register. */
-#define R_DX  2 /* General purpose d-register. */
-#define R_BX  3 /* General purpose b-register. */
-#define R_SP  4 /* Stack pointer. */
-#define R_BP  5 /* Stack base pointer. */
-#define R_SI  6 /* Source pointer. */
-#define R_DI  7 /* Destination pointer. */
+#define R_AX EMU86_R_AX /* Accumulator. */
+#define R_CX EMU86_R_CX /* Counter register. */
+#define R_DX EMU86_R_DX /* General purpose d-register. */
+#define R_BX EMU86_R_BX /* General purpose b-register. */
+#define R_SP EMU86_R_SP /* Stack pointer. */
+#define R_BP EMU86_R_BP /* Stack base pointer. */
+#define R_SI EMU86_R_SI /* Source pointer. */
+#define R_DI EMU86_R_DI /* Destination pointer. */
 
-struct modrm {
-	uint32_t  mi_offset; /* Memory address. */
-#define MODRM_REGISTER 0
-#define MODRM_MEMORY   1
-	/* EXAMPLES:
-	 *  - mov $42, %mi_rm                                   # mi_type == MODRM_REGISTER
-	 *  - mov $42, mi_offset(%mi_rm)                        # mi_type == MODRM_MEMORY
-	 *  - mov %mi_reg, mi_offset(%mi_rm,%mi_index,mi_shift) # mi_type == MODRM_MEMORY
-	 */
-	uint8_t   mi_type;   /* mod R/M type (One of `MODRM_*') */
-	uint8_t   mi_reg;    /* Secondary register operand, or instruction sub-class. */
-	uint8_t   mi_rm;     /* Base register (or 0xff when not set). */
-	uint8_t   mi_index;  /* Index register (or 0xff when not set). */
-	uint8_t   mi_shift;  /* Index shift (or 0). */
-};
-
-INTDEF NONNULL((1, 2)) int (CC libvm86_modrm_decode)(vm86_state_t *__restrict self, struct modrm *__restrict info, uint16_t op_flags);
-LOCAL WUNUSED NONNULL((1, 2)) void *(CC libvm86_modrm_getaddr)(vm86_state_t *__restrict self, struct modrm const *__restrict info, uint16_t op_flags);
-LOCAL NONNULL((1, 2, 3)) int (CC libvm86_modrm_readb)(vm86_state_t *__restrict self, struct modrm const *__restrict info, uint8_t *__restrict presult, uint16_t op_flags);
-LOCAL NONNULL((1, 2, 3)) int (CC libvm86_modrm_readw)(vm86_state_t *__restrict self, struct modrm const *__restrict info, uint16_t *__restrict presult, uint16_t op_flags);
-LOCAL NONNULL((1, 2, 3)) int (CC libvm86_modrm_readl)(vm86_state_t *__restrict self, struct modrm const *__restrict info, uint32_t *__restrict presult, uint16_t op_flags);
-LOCAL NONNULL((1, 2)) int (CC libvm86_modrm_writeb)(vm86_state_t *__restrict self, struct modrm const *__restrict info, uint8_t value, uint16_t op_flags);
-LOCAL NONNULL((1, 2)) int (CC libvm86_modrm_writew)(vm86_state_t *__restrict self, struct modrm const *__restrict info, uint16_t value, uint16_t op_flags);
-LOCAL NONNULL((1, 2)) int (CC libvm86_modrm_writel)(vm86_state_t *__restrict self, struct modrm const *__restrict info, uint32_t value, uint16_t op_flags);
+INTDEF NONNULL((1, 2)) int (CC libvm86_modrm_decode)(vm86_state_t *__restrict self, struct emu86_modrm *__restrict info, emu86_opflags_t op_flags);
+LOCAL WUNUSED NONNULL((1, 2)) void *(CC libvm86_modrm_getaddr)(vm86_state_t *__restrict self, struct emu86_modrm const *__restrict info, emu86_opflags_t op_flags);
+LOCAL NONNULL((1, 2, 3)) int (CC libvm86_modrm_readb)(vm86_state_t *__restrict self, struct emu86_modrm const *__restrict info, uint8_t *__restrict presult, emu86_opflags_t op_flags);
+LOCAL NONNULL((1, 2, 3)) int (CC libvm86_modrm_readw)(vm86_state_t *__restrict self, struct emu86_modrm const *__restrict info, uint16_t *__restrict presult, emu86_opflags_t op_flags);
+LOCAL NONNULL((1, 2, 3)) int (CC libvm86_modrm_readl)(vm86_state_t *__restrict self, struct emu86_modrm const *__restrict info, uint32_t *__restrict presult, emu86_opflags_t op_flags);
+LOCAL NONNULL((1, 2)) int (CC libvm86_modrm_writeb)(vm86_state_t *__restrict self, struct emu86_modrm const *__restrict info, uint8_t value, emu86_opflags_t op_flags);
+LOCAL NONNULL((1, 2)) int (CC libvm86_modrm_writew)(vm86_state_t *__restrict self, struct emu86_modrm const *__restrict info, uint16_t value, emu86_opflags_t op_flags);
+LOCAL NONNULL((1, 2)) int (CC libvm86_modrm_writel)(vm86_state_t *__restrict self, struct emu86_modrm const *__restrict info, uint32_t value, emu86_opflags_t op_flags);
 
 
 
@@ -548,195 +526,40 @@ LOCAL NONNULL((1)) int
 	return VM86_SUCCESS;
 }
 
-#define MODRM_MOD_MASK  0xc0 /* 0b11000000 */
-#define MODRM_REG_MASK  0x38 /* 0b00111000 */
-#define MODRM_RM_MASK   0x07 /* 0b00000111 */
-#define MODRM_MOD_SHIFT 6
-#define MODRM_REG_SHIFT 3
-#define MODRM_RM_SHIFT  0
-#define MODRM_GETMOD(x) (((x)&MODRM_MOD_MASK) >> MODRM_MOD_SHIFT)
-#define MODRM_GETREG(x) (((x)&MODRM_REG_MASK) >> MODRM_REG_SHIFT)
-#define MODRM_GETRM(x)  (((x)&MODRM_RM_MASK) >> MODRM_RM_SHIFT)
 
 INTERN NONNULL((1, 2)) int CC
 libvm86_modrm_decode(vm86_state_t *__restrict self,
-                     struct modrm *__restrict info,
-                     uint16_t op_flags) {
-	uint8_t rmbyte;
-	int error;
-	error = libvm86_read_pcbyte(self, &rmbyte);
-	if unlikely(error != VM86_SUCCESS)
-		goto err;
-	info->mi_reg = MODRM_GETREG(rmbyte);
-	if (op_flags & F_AD32) {
-		uint8_t sibbyte;
-		info->mi_rm = MODRM_GETRM(rmbyte);
-		switch (rmbyte & MODRM_MOD_MASK) {
-
-		case 0x0 << MODRM_MOD_SHIFT:
-			/* R/M */
-			info->mi_type = MODRM_MEMORY;
-			if (info->mi_rm == R_BP) {
-				info->mi_rm     = 0xff;
-				info->mi_index  = 0xff;
-				error = libvm86_read_pcdword(self, &info->mi_offset);
-				if unlikely(error != VM86_SUCCESS)
-					goto err;
-			} else if (info->mi_rm == R_SP) {
-				error = libvm86_read_pcbyte(self, &sibbyte);
-				if unlikely(error != VM86_SUCCESS)
-					goto err;
-				info->mi_offset = 0;
-parse_sib_byte:
-				info->mi_shift = MODRM_GETMOD(sibbyte);
-				info->mi_index = MODRM_GETREG(sibbyte);
-				info->mi_rm    = MODRM_GETRM(sibbyte);
-				if (info->mi_index == R_SP)
-					info->mi_index = 0xff;
-				if ((info->mi_rm == R_BP) &&
-				    (rmbyte & MODRM_MOD_MASK) == (0x0 << MODRM_MOD_SHIFT))
-					info->mi_rm = 0xff;
-			} else {
-				info->mi_index  = 0xff;
-				info->mi_offset = 0;
-			}
-			break;
-
-		case 0x1 << MODRM_MOD_SHIFT: {
-			uint8_t temp;
-			/* R/M + 1-byte offset */
-			info->mi_type  = MODRM_MEMORY;
-			info->mi_index = 0xff;
-			if (info->mi_rm == R_SP) {
-				error = libvm86_read_pcbyte(self, &sibbyte);
-				if unlikely(error != VM86_SUCCESS)
-					goto err;
-				error = libvm86_read_pcbyte(self, &temp);
-				if unlikely(error != VM86_SUCCESS)
-					goto err;
-				info->mi_offset = (uint32_t)(int32_t)(int8_t)temp;
-				goto parse_sib_byte;
-			}
-			error = libvm86_read_pcbyte(self, &temp);
-			if unlikely(error != VM86_SUCCESS)
-				goto err;
-			info->mi_offset = (uint32_t)(int32_t)(int8_t)temp;
-		}	break;
-
-		case 0x2 << MODRM_MOD_SHIFT:
-			/* R/M + 4-byte offset */
-			info->mi_type  = MODRM_MEMORY;
-			info->mi_index = 0xff;
-			if (info->mi_rm == R_SP) {
-				error = libvm86_read_pcbyte(self, &sibbyte);
-				if unlikely(error != VM86_SUCCESS)
-					goto err;
-				error = libvm86_read_pcdword(self, &info->mi_offset);
-				if unlikely(error != VM86_SUCCESS)
-					goto err;
-				goto parse_sib_byte;
-			}
-			error = libvm86_read_pcdword(self, &info->mi_offset);
-			if unlikely(error != VM86_SUCCESS)
-				goto err;
-			break;
-
-		case 0x3 << MODRM_MOD_SHIFT:
-			/* Register operand. */
-			info->mi_type  = MODRM_REGISTER;
-			info->mi_index = 0xff;
-			break;
-
-		default: __builtin_unreachable();
-		}
-	} else {
-		info->mi_shift = 0;
-		if ((rmbyte & MODRM_MOD_MASK) == (0x3 << MODRM_MOD_SHIFT)) {
-			/* Register operand. */
-			info->mi_rm    = MODRM_GETRM(rmbyte);
-			info->mi_type  = MODRM_REGISTER;
-			info->mi_index = 0xff;
-		} else {
-			info->mi_offset = 0;
-			info->mi_type   = MODRM_MEMORY;
-			switch (MODRM_GETRM(rmbyte)) {
-			case 0: /* [BX + SI] */
-				info->mi_rm    = R_BX;
-				info->mi_index = R_SI;
-				break;
-			case 1: /* [BX + DI] */
-				info->mi_rm    = R_BX;
-				info->mi_index = R_DI;
-				break;
-			case 2: /* [BP + SI] */
-				info->mi_rm    = R_BP;
-				info->mi_index = R_SI;
-				break;
-			case 3: /* [BP + DI] */
-				info->mi_rm    = R_BP;
-				info->mi_index = R_DI;
-				break;
-			case 4: /* [SI] */
-				info->mi_rm    = R_SI;
-				info->mi_index = 0xff;
-				break;
-			case 5: /* [DI] */
-				info->mi_rm    = R_DI;
-				info->mi_index = 0xff;
-				break;
-			case 6: /* [BP] */
-				info->mi_index = 0xff;
-				info->mi_rm    = R_BP;
-				if ((rmbyte & MODRM_MOD_MASK) == (0x0 << MODRM_MOD_SHIFT)) { /* [disp16] */
-					uint16_t temp;
-					info->mi_rm = 0xff;
-					error = libvm86_read_pcword(self, &temp);
-					if likely(error == VM86_SUCCESS)
-						info->mi_offset = (uint32_t)(int32_t)(int16_t)temp;
-					return error;
-				}
-				break;
-			case 7: /* [BX] */
-				info->mi_rm    = R_BX;
-				info->mi_index = 0xff;
-				break;
-			default: __builtin_unreachable();
-			}
-			if ((rmbyte & MODRM_MOD_MASK) == (0x1 << MODRM_MOD_SHIFT)) {
-				uint8_t temp;
-				/* [... + disp8] */
-				error = libvm86_read_pcbyte(self, &temp);
-				if unlikely(error != VM86_SUCCESS)
-					goto err;
-				info->mi_offset = (uint32_t)(int32_t)(int8_t)temp;
-			} else if ((rmbyte & MODRM_MOD_MASK) == (0x2 << MODRM_MOD_SHIFT)) {
-				/* [... + disp16] */
-				uint16_t temp;
-				error = libvm86_read_pcword(self, &temp);
-				if unlikely(error != VM86_SUCCESS)
-					goto err;
-				info->mi_offset = (uint32_t)(int32_t)(int16_t)temp;
-			}
-		}
+                     struct emu86_modrm *__restrict info,
+                     emu86_opflags_t op_flags) {
+	byte_t *start_pc, *pc;
+	pc = (byte_t *)vm86_state_ip(self);
+	if (self->vr_trans)
+		pc = (byte_t *)self->vr_trans(self, pc);
+	start_pc = pc;
+	TRY {
+		pc = (byte_t *)emu86_modrm_decode(pc, info, op_flags);
+	} EXCEPT {
+		if (!WAS_SEGFAULT_THROWN())
+			RETHROW();
+		return VM86_SEGFAULT;
 	}
+	self->vr_regs.vr_ip += (uint16_t)(pc - start_pc);
 	return VM86_SUCCESS;
-err:
-	return error;
 }
 
 LOCAL WUNUSED NONNULL((1, 2)) void *CC
 libvm86_modrm_getaddr(vm86_state_t *__restrict self,
-                      struct modrm const *__restrict info,
-                      uint16_t op_flags) {
+                      struct emu86_modrm const *__restrict info,
+                      emu86_opflags_t op_flags) {
 	uintptr_t addr;
-	if (info->mi_type == MODRM_REGISTER)
+	if (info->mi_type == EMU86_MODRM_REGISTER)
 		return &REG32(info->mi_rm);
 	addr = info->mi_offset;
 	if (info->mi_rm != 0xff)
 		addr += REG16(info->mi_rm);
 	if (info->mi_index != 0xff)
 		addr += REG16(info->mi_index) << info->mi_shift;
-	addr = VM86_ADDR(SEG(op_flags & F_SEGMASK), addr & 0xffff);
+	addr = VM86_ADDR(SEG(EMU86_F_SEGREG(op_flags)), addr & 0xffff);
 	if (self->vr_trans)
 		addr = (uintptr_t)(*self->vr_trans)(self, (void *)addr);
 	return (void *)addr;
@@ -744,10 +567,10 @@ libvm86_modrm_getaddr(vm86_state_t *__restrict self,
 
 LOCAL NONNULL((1, 2, 3)) int CC
 libvm86_modrm_readb(vm86_state_t *__restrict self,
-                    struct modrm const *__restrict info,
+                    struct emu86_modrm const *__restrict info,
                     uint8_t *__restrict presult,
-                    uint16_t op_flags) {
-	if (info->mi_type == MODRM_REGISTER) {
+                    emu86_opflags_t op_flags) {
+	if (info->mi_type == EMU86_MODRM_REGISTER) {
 		*presult = REG8(info->mi_rm);
 	} else {
 		uint8_t *addr, value;
@@ -766,9 +589,9 @@ libvm86_modrm_readb(vm86_state_t *__restrict self,
 
 LOCAL NONNULL((1, 2, 3)) int CC
 libvm86_modrm_readw(vm86_state_t *__restrict self,
-                    struct modrm const *__restrict info,
+                    struct emu86_modrm const *__restrict info,
                     uint16_t *__restrict presult,
-                    uint16_t op_flags) {
+                    emu86_opflags_t op_flags) {
 	uint16_t *addr, value;
 	addr = (uint16_t *)libvm86_modrm_getaddr(self, info, op_flags);
 	TRY {
@@ -784,9 +607,9 @@ libvm86_modrm_readw(vm86_state_t *__restrict self,
 
 LOCAL NONNULL((1, 2, 3)) int CC
 libvm86_modrm_readl(vm86_state_t *__restrict self,
-                    struct modrm const *__restrict info,
+                    struct emu86_modrm const *__restrict info,
                     uint32_t *__restrict presult,
-                    uint16_t op_flags) {
+                    emu86_opflags_t op_flags) {
 	uint32_t *addr, value;
 	addr = (uint32_t *)libvm86_modrm_getaddr(self, info, op_flags);
 	TRY {
@@ -802,9 +625,9 @@ libvm86_modrm_readl(vm86_state_t *__restrict self,
 
 LOCAL NONNULL((1, 2)) int CC
 libvm86_modrm_writeb(vm86_state_t *__restrict self,
-                     struct modrm const *__restrict info,
-                     uint8_t value, uint16_t op_flags) {
-	if (info->mi_type == MODRM_REGISTER) {
+                     struct emu86_modrm const *__restrict info,
+                     uint8_t value, emu86_opflags_t op_flags) {
+	if (info->mi_type == EMU86_MODRM_REGISTER) {
 		REG8(info->mi_rm) = value;
 	} else {
 		uint8_t *addr;
@@ -822,9 +645,9 @@ libvm86_modrm_writeb(vm86_state_t *__restrict self,
 
 LOCAL NONNULL((1, 2)) int CC
 libvm86_modrm_writew(vm86_state_t *__restrict self,
-                     struct modrm const *__restrict info,
-                     uint16_t value, uint16_t op_flags) {
-	if (info->mi_type == MODRM_REGISTER) {
+                     struct emu86_modrm const *__restrict info,
+                     uint16_t value, emu86_opflags_t op_flags) {
+	if (info->mi_type == EMU86_MODRM_REGISTER) {
 		REG32(info->mi_rm) = value;
 	} else {
 		uint16_t *addr;
@@ -842,8 +665,8 @@ libvm86_modrm_writew(vm86_state_t *__restrict self,
 
 LOCAL NONNULL((1, 2)) int CC
 libvm86_modrm_writel(vm86_state_t *__restrict self,
-                     struct modrm const *__restrict info,
-                     uint32_t value, uint16_t op_flags) {
+                     struct emu86_modrm const *__restrict info,
+                     uint32_t value, emu86_opflags_t op_flags) {
 	uint32_t *addr;
 	addr = (uint32_t *)libvm86_modrm_getaddr(self, info, op_flags);
 	TRY {
@@ -861,15 +684,15 @@ libvm86_modrm_writel(vm86_state_t *__restrict self,
 
 PRIVATE ATTR_ALIGNED(4)
 char const cpuid_brand_string[48] = {
-	'K','O','S',' ','l','i','b','v','m','8','6',' ',
-	'e','m','u','l','a','t','o','r',' ','(',
+	'K', 'O', 'S', ' ', 'l', 'i', 'b', 'v', 'm', '8', '6',
+	' ', 'e', 'm', 'u', 'l', 'a', 't', 'o', 'r', ' ', '(',
 #ifdef __KERNEL__
-	'k','e','r','n',
+	'k', 'e', 'r', 'n',
 #else /* __KERNEL__ */
-	'u','s','e','r',
+	'u', 's', 'e', 'r',
 #endif /* !__KERNEL__ */
-	')',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',
-	' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' '
+	')', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
+	' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '
 };
 
 
@@ -889,9 +712,9 @@ char const cpuid_brand_string[48] = {
 INTERN NONNULL((1)) int CC libvm86_step(vm86_state_t *__restrict self) {
 	int error;
 	uint8_t opcode;
-	uint16_t op_flags = F_SEGDS;
+	emu86_opflags_t op_flags = F_SEGDS;
 	uint16_t ip_start = self->vr_regs.vr_ip;
-	struct modrm mod;
+	struct emu86_modrm mod;
 
 	if (self->vr_regs.vr_cs == 0xffff &&
 	    self->vr_regs.vr_ip == 0xffff)
@@ -979,7 +802,7 @@ read_opcode:
 		error = libvm86_modrm_decode(self, &mod, op_flags);           \
 		if unlikely(error != VM86_SUCCESS)                            \
 			goto err;                                                 \
-		if unlikely(mod.mi_type == MODRM_REGISTER)                    \
+		if unlikely(mod.mi_type == EMU86_MODRM_REGISTER)              \
 			goto err_ilop;                                            \
 		addr = (byte_t *)libvm86_modrm_getaddr(self, &mod, op_flags); \
 		GUARD_SEGFAULT({                                              \
@@ -2625,7 +2448,7 @@ do_rep_instruction:
 		error = libvm86_modrm_decode(self, &mod, op_flags);                                 \
 		if unlikely(error != VM86_SUCCESS)                                                  \
 			goto err;                                                                       \
-		if (mod.mi_type == MODRM_REGISTER) {                                                \
+		if (mod.mi_type == EMU86_MODRM_REGISTER) {                                          \
 			DO_REGB(REG8(mod.mi_rm), REG8(mod.mi_reg));                                     \
 		} else {                                                                            \
 			uint8_t *addr;                                                                  \
@@ -2638,7 +2461,7 @@ do_rep_instruction:
 		if unlikely(error != VM86_SUCCESS)                                                  \
 			goto err;                                                                       \
 		if (op_flags & F_OP32) {                                                            \
-			if (mod.mi_type == MODRM_REGISTER) {                                            \
+			if (mod.mi_type == EMU86_MODRM_REGISTER) {                                      \
 				DO_REGL(REG32(mod.mi_rm), REG32(mod.mi_reg));                               \
 			} else {                                                                        \
 				uint32_t *addr;                                                             \
@@ -2646,7 +2469,7 @@ do_rep_instruction:
 				DO_MEML(addr, REG32(mod.mi_reg));                                           \
 			}                                                                               \
 		} else {                                                                            \
-			if (mod.mi_type == MODRM_REGISTER) {                                            \
+			if (mod.mi_type == EMU86_MODRM_REGISTER) {                                      \
 				DO_REGW(REG16(mod.mi_rm), REG16(mod.mi_reg));                               \
 				REG32(mod.mi_rm) &= 0xffff;                                                 \
 			} else {                                                                        \
@@ -2711,7 +2534,7 @@ do_rep_instruction:
 		}                                                                                   \
 		break;                                                                              \
 do_80h_reg##id:                                                                             \
-		if (mod.mi_type == MODRM_REGISTER) {                                                \
+		if (mod.mi_type == EMU86_MODRM_REGISTER) {                                          \
 			DO_REGB(REG8(mod.mi_rm), opcode);                                               \
 		} else {                                                                            \
 			uint8_t *addr;                                                                  \
@@ -2720,7 +2543,7 @@ do_80h_reg##id:                                                                 
 		}                                                                                   \
 		break;                                                                              \
 do_81h_reg##id##_op16:                                                                      \
-		if (mod.mi_type == MODRM_REGISTER) {                                                \
+		if (mod.mi_type == EMU86_MODRM_REGISTER) {                                          \
 			DO_REGW(REG16(mod.mi_rm), operand16);                                           \
 			REG32(mod.mi_rm) &= 0xffff;                                                     \
 		} else {                                                                            \
@@ -2730,7 +2553,7 @@ do_81h_reg##id##_op16:                                                          
 		}                                                                                   \
 		break;                                                                              \
 do_81h_reg##id##_op32:                                                                      \
-		if (mod.mi_type == MODRM_REGISTER) {                                                \
+		if (mod.mi_type == EMU86_MODRM_REGISTER) {                                          \
 			DO_REGL(REG32(mod.mi_rm), operand32);                                           \
 		} else {                                                                            \
 			uint32_t *addr;                                                                 \
@@ -3211,7 +3034,7 @@ do_81h_op16:
 		error = libvm86_modrm_decode(self, &mod, op_flags);
 		if unlikely(error != VM86_SUCCESS)
 			goto err;
-		if unlikely(mod.mi_type == MODRM_REGISTER)
+		if unlikely(mod.mi_type == EMU86_MODRM_REGISTER)
 			goto err_ilop;
 		{
 			void *addr;
@@ -3303,7 +3126,7 @@ do_81h_op16:
 		case 0:
 			/* FE /0     INC r/m8     M     Valid     Valid     Increment r/m byte by 1. */
 			self->vr_regs.vr_flags &= ~(OF | SF | ZF | AF | PF);
-			if (mod.mi_type == MODRM_REGISTER) {
+			if (mod.mi_type == EMU86_MODRM_REGISTER) {
 				self->vr_regs.vr_flags |= f_addb(REG8(mod.mi_rm)++, (uint8_t)1) & (OF | SF | ZF | AF | PF);
 			} else {
 				uint8_t *addr, oldval;
@@ -3323,7 +3146,7 @@ do_81h_op16:
 		case 1:
 			/* FE /1     DEC r/m8     M     Valid     Valid     Decrement r/m8 by 1. */
 			self->vr_regs.vr_flags &= ~(OF | SF | ZF | AF | PF);
-			if (mod.mi_type == MODRM_REGISTER) {
+			if (mod.mi_type == EMU86_MODRM_REGISTER) {
 				self->vr_regs.vr_flags |= f_addb(REG8(mod.mi_rm)--, (uint8_t)-1) & (OF | SF | ZF | AF | PF);
 			} else {
 				uint8_t *addr, oldval;
@@ -3356,7 +3179,7 @@ do_81h_op16:
 			/* FF /0     INC r/m16     M     Valid     Valid     Increment r/m word by 1.
 			 * FF /0     INC r/m32     M     Valid     Valid     Increment r/m doubleword by 1. */
 			self->vr_regs.vr_flags &= ~(OF | SF | ZF | AF | PF);
-			if (mod.mi_type == MODRM_REGISTER) {
+			if (mod.mi_type == EMU86_MODRM_REGISTER) {
 				self->vr_regs.vr_flags |= op_flags & F_OP32
 				                          ? f_addl(REG32(mod.mi_rm)++, (uint32_t)1) & (OF | SF | ZF | AF | PF)
 				                          : f_addw(REG16(mod.mi_rm)++, (uint16_t)1) & (OF | SF | ZF | AF | PF);
@@ -3394,7 +3217,7 @@ do_81h_op16:
 			/* FF /1     DEC r/m16     M     Valid     Valid     Decrement r/m16 by 1.
 			 * FF /1     DEC r/m32     M     Valid     Valid     Decrement r/m32 by 1. */
 			self->vr_regs.vr_flags &= ~(OF | SF | ZF | AF | PF);
-			if (mod.mi_type == MODRM_REGISTER) {
+			if (mod.mi_type == EMU86_MODRM_REGISTER) {
 				self->vr_regs.vr_flags |= op_flags & F_OP32
 				                          ? f_addl(REG32(mod.mi_rm)--, (uint32_t)-1) & (OF | SF | ZF | AF | PF)
 				                          : f_addw(REG16(mod.mi_rm)--, (uint16_t)-1) & (OF | SF | ZF | AF | PF);
@@ -3461,7 +3284,7 @@ do_81h_op16:
 			 * FF /3     CALL m16:32     M     Valid     Valid     Call far, absolute indirect address given in m16:32. */
 			if (op_flags & (F_LOCK))
 				goto err_ilop;
-			if (mod.mi_type == MODRM_REGISTER)
+			if (mod.mi_type == EMU86_MODRM_REGISTER)
 				goto err_ilop;
 			addr = libvm86_modrm_getaddr(self, &mod, op_flags);
 			if (op_flags & F_OP32) {
@@ -3514,7 +3337,7 @@ do_81h_op16:
 			 * FF /5     JMP m16:32     M     Valid     Valid     Jump far, absolute indirect address given in m16:32. */
 			if (op_flags & (F_LOCK))
 				goto err_ilop;
-			if (mod.mi_type == MODRM_REGISTER)
+			if (mod.mi_type == EMU86_MODRM_REGISTER)
 				goto err_ilop;
 			addr = libvm86_modrm_getaddr(self, &mod, op_flags);
 			GUARD_SEGFAULT({
@@ -3649,7 +3472,7 @@ do_81h_op16:
 				goto err;
 			offset = temp;
 		}
-		addr = (uint8_t *)VM86_ADDR(SEG(op_flags & F_SEGMASK), offset & 0xffff);
+		addr = (uint8_t *)VM86_ADDR(SEG(EMU86_F_SEGREG(op_flags)), offset & 0xffff);
 		if (self->vr_trans)
 			addr = (uint8_t *)self->vr_trans(self, addr);
 		GUARD_SEGFAULT({
@@ -3675,7 +3498,7 @@ do_81h_op16:
 				goto err;
 			offset = temp;
 		}
-		addr = (void *)VM86_ADDR(SEG(op_flags & F_SEGMASK), offset & 0xffff);
+		addr = (void *)VM86_ADDR(SEG(EMU86_F_SEGREG(op_flags)), offset & 0xffff);
 		if (self->vr_trans)
 			addr = (uint8_t *)self->vr_trans(self, addr);
 		if (op_flags & F_OP32) {
@@ -3709,7 +3532,7 @@ do_81h_op16:
 				goto err;
 			offset = temp;
 		}
-		addr = (uint8_t *)VM86_ADDR(SEG(op_flags & F_SEGMASK), offset & 0xffff);
+		addr = (uint8_t *)VM86_ADDR(SEG(EMU86_F_SEGREG(op_flags)), offset & 0xffff);
 		if (self->vr_trans)
 			addr = (uint8_t *)self->vr_trans(self, addr);
 		GUARD_SEGFAULT({
@@ -3734,7 +3557,7 @@ do_81h_op16:
 				goto err;
 			offset = temp;
 		}
-		addr = (void *)VM86_ADDR(SEG(op_flags & F_SEGMASK), offset & 0xffff);
+		addr = (void *)VM86_ADDR(SEG(EMU86_F_SEGREG(op_flags)), offset & 0xffff);
 		if (self->vr_trans)
 			addr = (uint8_t *)self->vr_trans(self, addr);
 		GUARD_SEGFAULT({
@@ -3816,7 +3639,7 @@ do_81h_op16:
 		error = libvm86_modrm_decode(self, &mod, op_flags);
 		if unlikely(error != VM86_SUCCESS)
 			goto err;
-		if unlikely(mod.mi_type == MODRM_REGISTER)
+		if unlikely(mod.mi_type == EMU86_MODRM_REGISTER)
 			goto err_ilop;
 		value = mod.mi_offset;
 		if (op_flags & F_AD32) {
@@ -4120,7 +3943,7 @@ do_81h_op16:
 		error = libvm86_modrm_decode(self, &mod, op_flags);
 		if unlikely(error != VM86_SUCCESS)
 			goto err;
-		if (mod.mi_type == MODRM_REGISTER) {
+		if (mod.mi_type == EMU86_MODRM_REGISTER) {
 			uint8_t temp;
 			temp             = REG8(mod.mi_rm);
 			REG8(mod.mi_rm)  = REG8(mod.mi_reg);
@@ -4143,7 +3966,7 @@ do_81h_op16:
 		error = libvm86_modrm_decode(self, &mod, op_flags);
 		if unlikely(error != VM86_SUCCESS)
 			 goto err;
-		if (mod.mi_type == MODRM_REGISTER) {
+		if (mod.mi_type == EMU86_MODRM_REGISTER) {
 			if (op_flags & F_OP32) {
 				uint32_t temp;
 				temp              = REG32(mod.mi_rm);
@@ -4450,7 +4273,7 @@ do_81h_op16:
 
 #define DEFINE_ROTATE_SHIFT_OPCODES(id, DO_REGB, DO_REGW, DO_REGL, DO_MEMB, DO_MEMW, DO_MEML) \
 do_c0h_reg##id:                                                                               \
-	if (mod.mi_type == MODRM_REGISTER) {                                                      \
+	if (mod.mi_type == EMU86_MODRM_REGISTER) {                                                \
 		DO_REGB(REG8(mod.mi_rm), opcode);                                                     \
 	} else {                                                                                  \
 		uint8_t *addr;                                                                        \
@@ -4459,7 +4282,7 @@ do_c0h_reg##id:                                                                 
 	}                                                                                         \
 	break;                                                                                    \
 do_c1h_reg##id:                                                                               \
-	if (mod.mi_type == MODRM_REGISTER) {                                                      \
+	if (mod.mi_type == EMU86_MODRM_REGISTER) {                                                \
 		if (op_flags & F_OP32) {                                                              \
 			DO_REGL(REG32(mod.mi_rm), opcode);                                                \
 		} else {                                                                              \
@@ -4773,7 +4596,7 @@ do_c1h_switch_reg:
 
 		case 2:
 			/* F6 /2     NOT r/m8     M     Valid     Valid     Reverse each bit of r/m8. */
-			if (mod.mi_type == MODRM_REGISTER) {
+			if (mod.mi_type == EMU86_MODRM_REGISTER) {
 				REG8(mod.mi_rm) ^= 0xff;
 			} else {
 				uint8_t *addr;
@@ -4791,7 +4614,7 @@ do_c1h_switch_reg:
 		case 3: {
 			uint8_t oldval;
 			/* F6 /3     NEG r/m8     M     Valid     Valid     Two's complement negate r/m8. */
-			if (mod.mi_type == MODRM_REGISTER) {
+			if (mod.mi_type == EMU86_MODRM_REGISTER) {
 				oldval          = REG8(mod.mi_rm);
 				REG8(mod.mi_rm) = (uint8_t) - (int8_t)oldval;
 			} else {
@@ -4936,7 +4759,7 @@ do_c1h_switch_reg:
 		case 2:
 			/* F7 /2     NOT r/m16    M     Valid     Valid     Reverse each bit of r/m16.
 			 * F7 /2     NOT r/m32    M     Valid     Valid     Reverse each bit of r/m32. */
-			if (mod.mi_type == MODRM_REGISTER) {
+			if (mod.mi_type == EMU86_MODRM_REGISTER) {
 				REG32(mod.mi_rm) ^= UINT32_C(0xffffffff);
 				if (!(op_flags & F_OP32))
 					REG32(mod.mi_rm) &= 0xffff;
@@ -4966,7 +4789,7 @@ do_c1h_switch_reg:
 			 * F7 /3     NEG r/m32     M     Valid     Valid     Two's complement negate r/m32. */
 			if (op_flags & F_OP32) {
 				uint32_t oldval;
-				if (mod.mi_type == MODRM_REGISTER) {
+				if (mod.mi_type == EMU86_MODRM_REGISTER) {
 					oldval           = REG32(mod.mi_rm);
 					REG32(mod.mi_rm) = (uint32_t) - (int32_t)oldval;
 				} else {
@@ -4989,7 +4812,7 @@ do_c1h_switch_reg:
 					self->vr_regs.vr_flags |= CF;
 			} else {
 				uint16_t oldval;
-				if (mod.mi_type == MODRM_REGISTER) {
+				if (mod.mi_type == EMU86_MODRM_REGISTER) {
 					oldval           = REG16(mod.mi_rm);
 					REG32(mod.mi_rm) = (uint32_t)(uint16_t) - (int16_t)oldval;
 				} else {

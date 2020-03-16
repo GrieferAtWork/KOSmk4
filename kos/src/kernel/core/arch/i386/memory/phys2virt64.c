@@ -187,7 +187,7 @@ NOTHROW(KCALL metadata_clearall)(void) {
 }
 
 
-/* Ensure that the the given `addr', which must be located
+/* Ensure that the given `addr', which must be located
  * inside of [KERNEL_PHYS2VIRT_MIN, KERNEL_PHYS2VIRT_MAX]
  * is mapped against its designated physical address.
  * This function is called from within the #PF handler

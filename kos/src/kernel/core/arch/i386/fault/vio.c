@@ -277,9 +277,9 @@ NOTHROW(KCALL cleanup_and_unwind_interrupt)(/*inherit(always)*/ vio_main_args_t 
 INTERN struct icpustate *
 NOTHROW(FCALL x86_vio_main)(/*inherit(always)*/ vio_main_args_t *__restrict args, uintptr_t cr2) {
 	/* Exceptions always point to the instruction _after_ the faulting one! */
-	byte_t *orig_pc, *pc;
+	byte_t const *orig_pc, *pc;
 	pos_t vio_addr;
-	struct modrm mod;
+	struct emu86_modrm mod;
 	struct icpustate *state = args->ma_args.va_state;
 	uintptr_t value, temp;
 	u32 opcode;
@@ -291,10 +291,11 @@ NOTHROW(FCALL x86_vio_main)(/*inherit(always)*/ vio_main_args_t *__restrict args
 	vio_addr -= (pos_t)PAGEID_DECODE(args->ma_args.va_access_pageid);
 	vio_addr += (pos_t)args->ma_args.va_access_partoff;
 	TRY {
-		pc     = orig_pc;
-		opcode = x86_decode_instruction(state, &pc, &op_flags);
+		pc       = orig_pc;
+		op_flags = emu86_opflagsof_icpustate(state);
+		pc       = emu86_opcode_decode(pc, &opcode, &op_flags);
 		switch (opcode) {
-#define MOD_DECODE() pc = x86_decode_modrm(pc, &mod, op_flags)
+#define MOD_DECODE() (pc = emu86_modrm_decode(pc, &mod, op_flags))
 
 #define RD_RMB()  modrm_getrmb(state, &mod, op_flags)
 #define WR_RMB(v) modrm_setrmb(state, &mod, op_flags, v)
@@ -336,22 +337,22 @@ NOTHROW(FCALL x86_vio_main)(/*inherit(always)*/ vio_main_args_t *__restrict args
 #define WR_REGQ(v) modrm_setregq(state, &mod, op_flags, v)
 #endif /* __x86_64__ */
 
-#define RD_VEXREG()   x86_icpustate_get(state, (u8)((op_flags & F_VEX_VVVVV_M) >> F_VEX_VVVVV_S))
-#define WR_VEXREG(v)  x86_icpustate_set(state, (u8)((op_flags & F_VEX_VVVVV_M) >> F_VEX_VVVVV_S), v)
-#define RD_VEXREGB()  x86_icpustate_get8(state, (u8)((op_flags & F_VEX_VVVVV_M) >> F_VEX_VVVVV_S))
-#define WR_VEXREGB(v) x86_icpustate_set8(state, (u8)((op_flags & F_VEX_VVVVV_M) >> F_VEX_VVVVV_S), v)
-#define RD_VEXREGW()  x86_icpustate_get16(state, (u8)((op_flags & F_VEX_VVVVV_M) >> F_VEX_VVVVV_S))
-#define WR_VEXREGW(v) x86_icpustate_set16(state, (u8)((op_flags & F_VEX_VVVVV_M) >> F_VEX_VVVVV_S), v)
-#define RD_VEXREGL()  x86_icpustate_get32(state, (u8)((op_flags & F_VEX_VVVVV_M) >> F_VEX_VVVVV_S))
-#define WR_VEXREGL(v) x86_icpustate_set32(state, (u8)((op_flags & F_VEX_VVVVV_M) >> F_VEX_VVVVV_S), v)
+#define RD_VEXREG()   x86_icpustate_get(state, (u8)EMU86_F_VEX_VVVVV(op_flags))
+#define WR_VEXREG(v)  x86_icpustate_set(state, (u8)EMU86_F_VEX_VVVVV(op_flags), v)
+#define RD_VEXREGB()  x86_icpustate_get8(state, (u8)EMU86_F_VEX_VVVVV(op_flags))
+#define WR_VEXREGB(v) x86_icpustate_set8(state, (u8)EMU86_F_VEX_VVVVV(op_flags), v)
+#define RD_VEXREGW()  x86_icpustate_get16(state, (u8)EMU86_F_VEX_VVVVV(op_flags))
+#define WR_VEXREGW(v) x86_icpustate_set16(state, (u8)EMU86_F_VEX_VVVVV(op_flags), v)
+#define RD_VEXREGL()  x86_icpustate_get32(state, (u8)EMU86_F_VEX_VVVVV(op_flags))
+#define WR_VEXREGL(v) x86_icpustate_set32(state, (u8)EMU86_F_VEX_VVVVV(op_flags), v)
 #ifdef __x86_64__
-#define RD_VEXREGQ()  x86_icpustate_get64(state, (u8)((op_flags & F_VEX_VVVVV_M) >> F_VEX_VVVVV_S))
-#define WR_VEXREGQ(v) x86_icpustate_set64(state, (u8)((op_flags & F_VEX_VVVVV_M) >> F_VEX_VVVVV_S), v)
+#define RD_VEXREGQ()  x86_icpustate_get64(state, (u8)EMU86_F_VEX_VVVVV(op_flags))
+#define WR_VEXREGQ(v) x86_icpustate_set64(state, (u8)EMU86_F_VEX_VVVVV(op_flags), v)
 #endif /* __x86_64__ */
 
 
-#define RD_PFLAGS()         irregs_rdflags(&state->ics_irregs)
-#define WR_PFLAGS(v)        irregs_wrflags(&state->ics_irregs, v)
+#define RD_PFLAGS()  irregs_rdflags(&state->ics_irregs)
+#define WR_PFLAGS(v) irregs_wrflags(&state->ics_irregs, v)
 
 #ifdef __x86_64__
 #define RD_USP()  irregs_rdsp(&state->ics_irregs)
@@ -362,7 +363,7 @@ NOTHROW(FCALL x86_vio_main)(/*inherit(always)*/ vio_main_args_t *__restrict args
 #endif /* !__x86_64__ */
 
 #define IS_ATOMIC()        (op_flags & F_LOCK)
-#define IS_MODVIO()        (mod.mi_type == MODRM_MEMORY && x86_decode_modrmgetmem(state, &mod, op_flags) == cr2)
+#define IS_MODVIO()        (mod.mi_type == EMU86_MODRM_MEMORY && x86_decode_modrmgetmem(state, &mod, op_flags) == cr2)
 #define SET_PFLAGS(v, mask) WR_PFLAGS((RD_PFLAGS() & ~(mask)) | ((v) & (mask)))
 
 #ifdef __x86_64__

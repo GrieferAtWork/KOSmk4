@@ -85,6 +85,7 @@ struct instruction {
 #define IF_VEX   0x3000 /* VEX (further specified by first character of repr, which is a set of `IF_VEX_B0_*') */
 #define IF_VEX_B0_LL_M   0x03 /* Required value for `VEX.LL' */
 #define IF_VEX_B0_LL_S      0 /* Required value for `VEX.LL' */
+#define IF_VEX_B0_LL(x)  (((x) & IF_VEX_B0_LL_M) >> IF_VEX_B0_LL_S)
 #define IF_VEX_B0_LIG    0x03 /* Value of `IF_VEX_B0_LL_M' when vector length should be ignored. */
 #define IF_VEX_B0_W      0x04 /* Required value for `VEX.W' */
 #define IF_VEX_B0_WIG    0x08 /* Ignore `VEX.W' (`IF_VEX_B0_W' must not be set) */

@@ -117,11 +117,11 @@ x86_emulate_syscall64_lcall7(struct icpustate *__restrict state, u64 segment_off
 INTERN struct icpustate *FCALL
 x86_handle_segment_not_present(struct icpustate *__restrict state,
                                uintptr_t ecode) {
-	struct modrm mod;
+	struct emu86_modrm mod;
 	unsigned int i;
 	u32 opcode;
-	op_flag_t flags;
-	byte_t *pc, *orig_pc;
+	op_flag_t op_flags;
+	byte_t const *pc, *orig_pc;
 	orig_pc = (byte_t *)state->ics_irregs.ir_pip;
 	COMPILER_READ_BARRIER();
 	if (state->ics_irregs.ir_pflags & EFLAGS_IF)
@@ -131,45 +131,46 @@ x86_handle_segment_not_present(struct icpustate *__restrict state,
 	if (ecode & 1) {
 		opcode = 0;
 	} else {
-		opcode = x86_decode_instruction(state, &pc, &flags);
+		op_flags = emu86_opflagsof_icpustate(state);
+		pc       = emu86_opcode_decode(pc, &opcode, &op_flags);
 		TRY {
 			switch (opcode) {
 #define isuser()     icpustate_isuser(state)
-#define MOD_DECODE() (pc = x86_decode_modrm(pc, &mod, flags))
+#define MOD_DECODE() (pc = emu86_modrm_decode(pc, &mod, op_flags))
 
-#define RD_RMB()  modrm_getrmb(state, &mod, flags)
-#define WR_RMB(v) modrm_setrmb(state, &mod, flags, v)
-#define RD_RMW()  modrm_getrmw(state, &mod, flags)
-#define WR_RMW(v) modrm_setrmw(state, &mod, flags, v)
-#define RD_RML()  modrm_getrml(state, &mod, flags)
-#define WR_RML(v) modrm_setrml(state, &mod, flags, v)
+#define RD_RMB()  modrm_getrmb(state, &mod, op_flags)
+#define WR_RMB(v) modrm_setrmb(state, &mod, op_flags, v)
+#define RD_RMW()  modrm_getrmw(state, &mod, op_flags)
+#define WR_RMW(v) modrm_setrmw(state, &mod, op_flags, v)
+#define RD_RML()  modrm_getrml(state, &mod, op_flags)
+#define WR_RML(v) modrm_setrml(state, &mod, op_flags, v)
 #ifdef __x86_64__
-#define RD_RMQ()  modrm_getrmq(state, &mod, flags)
-#define WR_RMQ(v) modrm_setrmq(state, &mod, flags, v)
+#define RD_RMQ()  modrm_getrmq(state, &mod, op_flags)
+#define WR_RMQ(v) modrm_setrmq(state, &mod, op_flags, v)
 #endif /* __x86_64__ */
 
-#define RD_RMREGB()  modrm_getrmregb(state, &mod, flags)
-#define WR_RMREGB(v) modrm_setrmregb(state, &mod, flags, v)
-#define RD_RMREGW()  modrm_getrmregw(state, &mod, flags)
-#define WR_RMREGW(v) modrm_setrmregw(state, &mod, flags, v)
-#define RD_RMREGL()  modrm_getrmregl(state, &mod, flags)
-#define WR_RMREGL(v) modrm_setrmregl(state, &mod, flags, v)
+#define RD_RMREGB()  modrm_getrmregb(state, &mod, op_flags)
+#define WR_RMREGB(v) modrm_setrmregb(state, &mod, op_flags, v)
+#define RD_RMREGW()  modrm_getrmregw(state, &mod, op_flags)
+#define WR_RMREGW(v) modrm_setrmregw(state, &mod, op_flags, v)
+#define RD_RMREGL()  modrm_getrmregl(state, &mod, op_flags)
+#define WR_RMREGL(v) modrm_setrmregl(state, &mod, op_flags, v)
 #ifdef __x86_64__
-#define RD_RMREGQ()  modrm_getrmregq(state, &mod, flags)
-#define WR_RMREGQ(v) modrm_setrmregq(state, &mod, flags, v)
+#define RD_RMREGQ()  modrm_getrmregq(state, &mod, op_flags)
+#define WR_RMREGQ(v) modrm_setrmregq(state, &mod, op_flags, v)
 #endif /* __x86_64__ */
 
-#define RD_REG()   modrm_getreg(state, &mod, flags)
-#define WR_REG(v)  modrm_setreg(state, &mod, flags, v)
-#define RD_REGB()  modrm_getregb(state, &mod, flags)
-#define WR_REGB(v) modrm_setregb(state, &mod, flags, v)
-#define RD_REGW()  modrm_getregw(state, &mod, flags)
-#define WR_REGW(v) modrm_setregw(state, &mod, flags, v)
-#define RD_REGL()  modrm_getregl(state, &mod, flags)
-#define WR_REGL(v) modrm_setregl(state, &mod, flags, v)
+#define RD_REG()   modrm_getreg(state, &mod, op_flags)
+#define WR_REG(v)  modrm_setreg(state, &mod, op_flags, v)
+#define RD_REGB()  modrm_getregb(state, &mod, op_flags)
+#define WR_REGB(v) modrm_setregb(state, &mod, op_flags, v)
+#define RD_REGW()  modrm_getregw(state, &mod, op_flags)
+#define WR_REGW(v) modrm_setregw(state, &mod, op_flags, v)
+#define RD_REGL()  modrm_getregl(state, &mod, op_flags)
+#define WR_REGL(v) modrm_setregl(state, &mod, op_flags, v)
 #ifdef __x86_64__
-#define RD_REGQ()  modrm_getregq(state, &mod, flags)
-#define WR_REGQ(v) modrm_setregq(state, &mod, flags, v)
+#define RD_REGQ()  modrm_getregq(state, &mod, op_flags)
+#define WR_REGQ(v) modrm_setregq(state, &mod, op_flags, v)
 #endif /* !__x86_64__ */
 
 	
@@ -180,10 +181,10 @@ x86_handle_segment_not_present(struct icpustate *__restrict state,
 				 * CALL ptr16:32 D Invalid Valid Call far, absolute, address given in operand. */
 #ifdef __x86_64__
 				/* This instruction only exists in compatibility mode! */
-				if (!(flags & F_IS_X32))
+				if (!(op_flags & F_IS_X32))
 					goto unsupported_instruction;
 #endif /* __x86_64__ */
-				if (flags & F_OP16) {
+				if (op_flags & F_OP16) {
 					offset = UNALIGNED_GET16((u16 *)pc);
 					pc += 2;
 				} else {
@@ -216,20 +217,20 @@ x86_handle_segment_not_present(struct icpustate *__restrict state,
 
 			case 0xff:
 				MOD_DECODE();
-				if (mod.mi_reg == 3 && mod.mi_type == MODRM_MEMORY) {
+				if (mod.mi_reg == 3 && mod.mi_type == EMU86_MODRM_MEMORY) {
 					u16 segment;
 					uintptr_t offset;
 					byte_t *addr;
-					addr = (byte_t *)x86_decode_modrmgetmem(state, &mod, flags);
+					addr = (byte_t *)x86_decode_modrmgetmem(state, &mod, op_flags);
 					if (isuser())
 						validate_readable(addr, 1);
 #ifdef __x86_64__
-					if (flags & F_REX_W) {
+					if (op_flags & F_REX_W) {
 						segment = UNALIGNED_GET16((u16 *)(addr + 0));
 						offset  = UNALIGNED_GET64((u64 *)(addr + 2));
 					} else
 #endif /* __x86_64__ */
-					if (!(flags & F_OP16)) {
+					if (!(op_flags & F_OP16)) {
 						segment = UNALIGNED_GET16((u16 *)(addr + 0));
 						offset  = UNALIGNED_GET32((u32 *)(addr + 2));
 					} else {
@@ -241,7 +242,7 @@ x86_handle_segment_not_present(struct icpustate *__restrict state,
 					if (segment == 7 && (__sldt() & ~7) == SEGMENT_CPU_LDT) {
 						icpustate_setpc(state, (uintptr_t)pc);
 #ifdef __x86_64__
-						if (!(flags & F_IS_X32))
+						if (!(op_flags & F_IS_X32))
 							x86_emulate_syscall64_lcall7(state, offset);
 #endif /* __x86_64__ */
 						x86_emulate_syscall32_lcall7(state, (u32)offset);

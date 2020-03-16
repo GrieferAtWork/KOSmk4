@@ -176,11 +176,11 @@ PRIVATE ATTR_FREETEXT bool NOTHROW(KCALL detect_e820)(void) {
 /*	state.vr_regs.vr_ebx = 0; * continue-id. */
 	entry                = SMAP_BUFFER;
 	do {
-		state.vr_regs.vr_eax   = 0xe820;
-		state.vr_regs.vr_ecx   = sizeof(struct smap_entry);
-		state.vr_regs.vr_edx   = 0x534d4150;
-		state.vr_regs.vr_edi   = VM86_BUFFER_OFFSET;
-		state.vr_regs.vr_es    = VM86_BUFFER_SEG;
+		state.vr_regs.vr_eax = 0xe820;
+		state.vr_regs.vr_ecx = sizeof(struct smap_entry);
+		state.vr_regs.vr_edx = 0x534d4150;
+		state.vr_regs.vr_edi = VM86_BUFFER_OFFSET;
+		state.vr_regs.vr_es  = VM86_BUFFER_SEG;
 		if (!interrupt(&state, 0x15))
 			break; /* Execute realmode interrupt. */
 		if (state.vr_regs.vr_eflags & EFLAGS_CF)
