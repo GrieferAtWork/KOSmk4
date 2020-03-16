@@ -31,6 +31,7 @@
 
 #include <stddef.h>
 
+#include <libemu86/emu86.h>
 #include <libinstrlen/instrlen.h>
 
 #ifdef __KERNEL__
@@ -73,50 +74,31 @@ NOTHROW_NCX(CC libil_instruction_pred)(void const *pc) {
 #include "x86.inl"
 #undef PAIR
 
-#define MODRM_MOD_MASK     0xc0 /* 0b11000000 */
-#define MODRM_REG_MASK     0x38 /* 0b00111000 */
-#define MODRM_RM_MASK      0x07 /* 0b00000111 */
-#define MODRM_MOD_SHIFT    6
-#define MODRM_REG_SHIFT    3
-#define MODRM_RM_SHIFT     0
-#define MODRM_GETMOD(x) (((x) & MODRM_MOD_MASK) >> MODRM_MOD_SHIFT)
-#define MODRM_GETREG(x) (((x) & MODRM_REG_MASK) >> MODRM_REG_SHIFT)
-#define MODRM_GETRM(x)  (((x) & MODRM_RM_MASK) >> MODRM_RM_SHIFT)
-
-#define R_EAX     0 /* Accumulator. */
-#define R_ECX     1 /* Counter register. */
-#define R_EDX     2 /* General purpose d-register. */
-#define R_EBX     3 /* General purpose b-register. */
-#define R_ESP     4 /* Stack pointer. */
-#define R_EBP     5 /* Stack base pointer. */
-#define R_ESI     6 /* Source pointer. */
-#define R_EDI     7 /* Destination pointer. */
-
 LOCAL NONNULL((1)) byte_t
 NOTHROW_NCX(CC skip_modrm)(byte_t **__restrict ppc) {
 	byte_t op = *((*ppc)++);
-	switch (op & MODRM_MOD_MASK) {
+	switch (op & EMU86_MODRM_MOD_MASK) {
 
-	case 0x0 << MODRM_MOD_SHIFT:
+	case 0x0 << EMU86_MODRM_MOD_SHIFT:
 		/* R/M */
-		if (MODRM_GETRM(op) == R_EBP) {
+		if (EMU86_MODRM_GETRM(op) == EMU86_R_EBP) {
 			(*ppc) += 4;
-		} else if (MODRM_GETRM(op) == R_ESP) {
+		} else if (EMU86_MODRM_GETRM(op) == EMU86_R_ESP) {
 			(*ppc) += 1;
 		}
 		break;
 
-	case 0x1 << MODRM_MOD_SHIFT:
+	case 0x1 << EMU86_MODRM_MOD_SHIFT:
 		/* R/M + 1-byte offset */
 		(*ppc) += 1;
 		break;
 
-	case 0x2 << MODRM_MOD_SHIFT:
+	case 0x2 << EMU86_MODRM_MOD_SHIFT:
 		/* R/M + 4-byte offset */
 		(*ppc) += 4;
 		break;
 
-	case 0x3 << MODRM_MOD_SHIFT:
+	case 0x3 << EMU86_MODRM_MOD_SHIFT:
 		/* Register operand. */
 		break;
 
@@ -142,17 +124,33 @@ NOTHROW_NCX(CC libil_instruction_succ)(void const *pc) {
 next_byte:
 	op = *reader++;
 	switch (op) {
-#define VEX3B_R        0x8000 /* FLAG:  3-byte VEX.R */
-#define VEX3B_X        0x4000 /* FLAG:  3-byte VEX.X */
-#define VEX3B_B        0x2000 /* FLAG:  3-byte VEX.B */
-#define VEX3B_M_MMMM_M 0x1f00 /* MASK:  3-byte VEX.M_MMMM */
-#define VEX3B_M_MMMM_S      8 /* SHIFT: 3-byte VEX.M_MMMM */
-#define VEX3B_W        0x0080 /* FLAG:  3-byte VEX.B */
-#define VEX3B_VVVV_M   0x0078 /* MASK:  3-byte VEX.VVVV */
-#define VEX3B_VVVV_S        3 /* SHIFT: 3-byte VEX.VVVV */
-#define VEX3B_L        0x0004 /* FLAG:  3-byte VEX.L */
-#define VEX3B_PP_M     0x0003 /* MASK:  3-byte VEX.PP */
-#define VEX3B_PP_S          0 /* SHIFT: 3-byte VEX.PP */
+
+#ifdef __x86_64__
+	/* EVEX Prefix */
+	case 0x62: {
+		__uint32_t evex;
+		evex = *reader++;
+		evex <<= 8;
+		evex |= *reader++;
+		evex <<= 8;
+		evex |= *reader++;
+		if ((evex & EMU86_EVEX_IDENT_M) != EMU86_EVEX_IDENT_V) {
+			reader -= 3;
+			/*result = 0x62;*/
+			break;
+		}
+		if ((evex & EMU86_EVEX_PP_M) == (0x01 << EMU86_EVEX_PP_S))
+			op_flags |= OPFLAG_66; /* same as 0x66 prefix */
+		switch (evex & EMU86_EVEX_MM_M) {
+		case 0x1 << EMU86_EVEX_MM_S: my_itab = itab_0f; break;
+		case 0x2 << EMU86_EVEX_MM_S: my_itab = itab_0f38; break;
+		case 0x3 << EMU86_EVEX_MM_S: my_itab = itab_0f3a; break;
+		default: return NULL;
+		}
+		/* The actual instruction opcode byte */
+		op = *reader++;
+	}	break;
+#endif /* __x86_64__ */
 
 	/* VEX Prefix */
 	case 0xc4: { /* 3-byte form */
@@ -161,43 +159,35 @@ next_byte:
 		vex <<= 8;
 		vex |= *reader++;
 #ifndef __x86_64__
-		if (!(vex & (VEX3B_R | VEX3B_X))) {
+		if (!(vex & (EMU86_VEX3B_R | EMU86_VEX3B_X))) {
 			reader -= 2;
 			/*op = 0xc4;*/
 			break;
 		}
 #endif /* !__x86_64__ */
-		if ((vex & VEX3B_PP_M) == (0x01 << VEX3B_PP_S))
+		if ((vex & EMU86_VEX3B_PP_M) == (0x01 << EMU86_VEX3B_PP_S))
 			op_flags |= OPFLAG_66;
-		switch (vex & VEX3B_M_MMMM_M) {
-		case 0x1 << VEX3B_M_MMMM_S: my_itab = itab_0f; break;
-		case 0x2 << VEX3B_M_MMMM_S: my_itab = itab_0f38; break;
-		case 0x3 << VEX3B_M_MMMM_S: my_itab = itab_0f3a; break;
+		switch (vex & EMU86_VEX3B_MMMMM_M) {
+		case 0x1 << EMU86_VEX3B_MMMMM_S: my_itab = itab_0f; break;
+		case 0x2 << EMU86_VEX3B_MMMMM_S: my_itab = itab_0f38; break;
+		case 0x3 << EMU86_VEX3B_MMMMM_S: my_itab = itab_0f3a; break;
 		default: return NULL;
 		}
 		/* The actual instruction opcode byte */
 		op = *reader++;
 	}	break;
 
-#define VEX2B_R      0x80 /* FLAG:  2-byte VEX.R */
-#define VEX2B_VVVV_M 0x78 /* MASK:  2-byte VEX.VVVV */
-#define VEX2B_1      0x40 /* FLAG:  Must be one (if 0, not a prefix + generate opcode `0xc5') */
-#define VEX2B_VVVV_S    3 /* SHIFT: 2-byte VEX.VVVV */
-#define VEX2B_L      0x04 /* FLAG:  2-byte VEX.L */
-#define VEX2B_PP_M   0x03 /* MASK:  2-byte VEX.PP */
-#define VEX2B_PP_S      0 /* SHIFT: 2-byte VEX.PP */
-
 	/* VEX Prefix */
 	case 0xc5: /* 2-byte form */
 		op = *reader++;
 #ifndef __x86_64__
-		if (!(op & (VEX2B_R | VEX2B_1))) {
+		if (!(op & (EMU86_VEX2B_R | EMU86_VEX2B_1))) {
 			--reader;
 			op = 0xc5;
 			break;
 		}
 #endif /* !__x86_64__ */
-		if ((op & VEX3B_PP_M) == (0x01 << VEX3B_PP_S))
+		if ((op & EMU86_VEX3B_PP_M) == (0x01 << EMU86_VEX3B_PP_S))
 			op_flags |= OPFLAG_66;
 		goto next_byte;
 
@@ -270,7 +260,7 @@ next_byte:
 	case INSTR_RM0_1:
 	case INSTR_RM0_24:
 		op = skip_modrm(&reader);
-		if (MODRM_GETREG(op) == 0) {
+		if (EMU86_MODRM_GETREG(op) == 0) {
 			if (action == INSTR_RM0_1)
 				reader += 1;
 			else {

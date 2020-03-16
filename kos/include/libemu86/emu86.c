@@ -51,27 +51,6 @@ next_byte:
 	switch (result) {
 
 #if CONFIG_LIBEMU86_WANT_64BIT
-#define EMU86_EVEX_IDENT_M  0x0c0400 /* Mask of constant bits */
-#define EMU86_EVEX_IDENT_V  0x000400 /* Value of constant bits */
-#define EMU86_EVEX_R        0x800000 /* FLAG:  VEX.R */
-#define EMU86_EVEX_X        0x400000 /* FLAG:  VEX.X */
-#define EMU86_EVEX_B        0x200000 /* FLAG:  VEX.B */
-#define EMU86_EVEX_Ri       0x100000 /* FLAG:  EVEX.R' */
-#define EMU86_EVEX_MM_M     0x030000 /* MASK:  EVEX.M_MM (same as VEX.M_MMMM) */
-#define EMU86_EVEX_MM_S           16 /* SHIFT: EVEX.M_MM */
-#define EMU86_EVEX_W        0x008000 /* FLAG:  VEX.W */
-#define EMU86_EVEX_VVVV_M   0x007800 /* MASK:  VEX.VVVV */
-#define EMU86_EVEX_VVVV_S         11 /* SHIFT: VEX.VVVV */
-#define EMU86_EVEX_PP_M     0x000300 /* MASK:  VEX.PP */
-#define EMU86_EVEX_PP_S            8 /* SHIFT: VEX.PP */
-#define EMU86_EVEX_z        0x000080 /* FLAG:  EVEX.z */
-#define EMU86_EVEX_Li       0x000040 /* FLAG:  EVEX.L' */
-#define EMU86_EVEX_L        0x000020 /* FLAG:  VEX.L */
-#define EMU86_EVEX_b        0x000010 /* FLAG:  EVEX.b */
-#define EMU86_EVEX_Vi       0x000008 /* FLAG:  EVEX.V' */
-#define EMU86_EVEX_aaa_M    0x000007 /* MASK:  EVEX.aaa */
-#define EMU86_EVEX_aaa_S           0 /* SHIFT: EVEX.aaa */
-
 	/* EVEX Prefix */
 	case 0x62: {
 		__uint32_t evex;
@@ -134,18 +113,6 @@ next_byte:
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
 
 
-#define EMU86_VEX3B_R       0x8000 /* FLAG:  3-byte VEX.R */
-#define EMU86_VEX3B_X       0x4000 /* FLAG:  3-byte VEX.X */
-#define EMU86_VEX3B_B       0x2000 /* FLAG:  3-byte VEX.B */
-#define EMU86_VEX3B_MMMMM_M 0x1f00 /* MASK:  3-byte VEX.MMMMM */
-#define EMU86_VEX3B_MMMMM_S      8 /* SHIFT: 3-byte VEX.MMMMM */
-#define EMU86_VEX3B_W       0x0080 /* FLAG:  3-byte VEX.W */
-#define EMU86_VEX3B_VVVV_M  0x0078 /* MASK:  3-byte VEX.VVVV */
-#define EMU86_VEX3B_VVVV_S       3 /* SHIFT: 3-byte VEX.VVVV */
-#define EMU86_VEX3B_L       0x0004 /* FLAG:  3-byte VEX.L */
-#define EMU86_VEX3B_PP_M    0x0003 /* MASK:  3-byte VEX.PP */
-#define EMU86_VEX3B_PP_S         0 /* SHIFT: 3-byte VEX.PP */
-
 	/* VEX Prefix (3-byte form) */
 	case 0xc4: {
 		__uint16_t vex;
@@ -201,15 +168,6 @@ next_byte:
 		/* The actual instruction opcode byte */
 		result |= *pc++;
 	}	break;
-
-
-#define EMU86_VEX2B_R      0x80 /* FLAG:  2-byte VEX.R */
-#define EMU86_VEX2B_VVVV_M 0x78 /* MASK:  2-byte VEX.VVVV */
-#define EMU86_VEX2B_1      0x40 /* FLAG:  Must be one (if 0, not a prefix + generate opcode `0xc5') */
-#define EMU86_VEX2B_VVVV_S    3 /* SHIFT: 2-byte VEX.VVVV */
-#define EMU86_VEX2B_L      0x04 /* FLAG:  2-byte VEX.L */
-#define EMU86_VEX2B_PP_M   0x03 /* MASK:  2-byte VEX.PP */
-#define EMU86_VEX2B_PP_S      0 /* SHIFT: 2-byte VEX.PP */
 
 	/* VEX Prefix (2-byte form) */
 	case 0xc5:
