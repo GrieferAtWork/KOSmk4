@@ -26,6 +26,7 @@ if (gcc_opt.remove("-O3"))
 #define GUARD_KERNEL_SRC_DEBUGGER_APPS_DBG_MAIN_C 1
 #define DISABLE_BRANCH_PROFILING 1
 #define _KOS_SOURCE 1 /* fuzzy_strcasecmp() */
+#define _GNU_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -34,6 +35,7 @@ if (gcc_opt.remove("-O3"))
 #include <debugger/function.h>
 #include <debugger/io.h>
 #include <debugger/rt.h>
+#include <debugger/util.h>
 #include <kernel/except.h>
 
 #include <kos/kernel/cpu-state.h>
@@ -116,14 +118,14 @@ dbg_getfunc_start(char const *__restrict name) {
 }
 
 
-PUBLIC ATTR_DBGTEXT NONNULL((1)) size_t
-NOTHROW(KCALL dbg_autocomplete_command)(char *__restrict line,
-                                        size_t bufsize,
-                                        size_t num_written) {
-	char *word_start;
+PRIVATE ATTR_DBGTEXT NONNULL((1)) size_t
+NOTHROW(KCALL dbg_autocomplete)(char *__restrict line,
+                                size_t bufsize,
+                                size_t cursor) {
+	char *word_start, temp;
 	struct debug_function const *func;
 	size_t namelen, maxbuf;
-	word_start = line + num_written;
+	word_start = line + cursor;
 	while (word_start > line) {
 		char32_t ch;
 		char *temp = word_start;
@@ -132,18 +134,21 @@ NOTHROW(KCALL dbg_autocomplete_command)(char *__restrict line,
 			break;
 		word_start = temp;
 	}
-	line[num_written] = '\0';
-	func              = dbg_getfunc_start(word_start);
+	temp = line[cursor];
+	line[cursor] = '\0';
+	func = dbg_getfunc_start(word_start);
+	line[cursor] = temp;
 	if (!func)
-		return 0;
+		return cursor;
 	namelen = strlen(func->df_name);
-	if (namelen < num_written - (size_t)(word_start - line))
-		return 0;
+	if (namelen <= cursor - (size_t)(word_start - line))
+		return cursor;
 	maxbuf = (size_t)((line + bufsize) - word_start);
-	if (namelen > maxbuf)
-		namelen = maxbuf;
-	memcpy(word_start, func->df_name, namelen * sizeof(char));
-	return ((size_t)(word_start - line) + namelen) - num_written;
+	if (namelen >= maxbuf)
+		namelen = maxbuf - 1;
+	memmoveup(word_start + namelen, line + cursor, bufsize - cursor);
+	memcpy(word_start, func->df_name, namelen, sizeof(char));
+	return (size_t)(word_start - line) + namelen;
 }
 
 
@@ -192,6 +197,7 @@ DEFINE_DEBUG_FUNCTION(
 		i                 = 0;
 		for (iter = __kernel_debug_functions_start;
 		     iter < __kernel_debug_functions_end; ++iter) {
+			/* TODO: It would be nice if we printed commands in alphabetical order here... */
 			dbg_printf(DBGSTR(DF_WHITE("%?-s")), max_name_length, iter->df_name);
 			if ((i % commands_per_line) == (commands_per_line - 1))
 				dbg_putc('\n');
@@ -225,16 +231,118 @@ DEFINE_DEBUG_FUNCTION(
 }
 
 
-#define DBG_ARGC_MAX  32
+#define DBG_ARGC_MAX        16  /* Max # of different arguments. */
+#define DBG_MAXLINE         128 /* Default max length of an input line */
+#define DBG_MAXLINE_BACKLOG 512 /* Max # of bytes in the cmdline backlog */
 
-PRIVATE char cmdline[DBG_MAXLINE];
-PRIVATE char *argv[DBG_ARGC_MAX];
+PRIVATE ATTR_DBGBSS char cmdline[DBG_MAXLINE];
+PRIVATE ATTR_DBGBSS char *argv[DBG_ARGC_MAX];
+
+
+/* Debug commandline backlog (entries are separated by \0) */
+PRIVATE ATTR_DBGBSS char cmdline_backlog[DBG_MAXLINE_BACKLOG];
+PRIVATE ATTR_DBGBSS size_t cmdline_latest;    /* Start index of the latest/next entry */
+PRIVATE ATTR_DBGBSS size_t cmdline_current;   /* Start index of the currently viewed entry */
+
+/* true if the user first typed a cmdline, then used arrows to browse the
+ * backlog without executing their newly typed command (in this case, the
+ * command written before `cmdline_latest' was never actually executed) */
+PRIVATE ATTR_DBGBSS bool cmdline_didsavetemp;
+
+PRIVATE NOBLOCK ATTR_DBGTEXT void
+NOTHROW(KCALL cmdline_backlog_append)(char const *cmdln, size_t len) {
+	size_t avail;
+	if (len >= DBG_MAXLINE_BACKLOG)
+		return; /* Shouldn't happen! */
+again:
+	avail = DBG_MAXLINE_BACKLOG - cmdline_latest;
+	if (len >= avail) {
+		/* Delete the oldest backlog entry. */
+		size_t oldest_len = strlen(cmdline_backlog);
+		memmovedown(cmdline_backlog,
+		            cmdline_backlog + oldest_len,
+		            cmdline_latest - oldest_len,
+		            sizeof(char));
+		if (cmdline_current < oldest_len)
+			cmdline_current = 0;
+		else {
+			cmdline_current -= oldest_len;
+		}
+		cmdline_latest -= oldest_len;
+		cmdline_backlog[cmdline_latest] = '\0';
+		goto again;
+	}
+	memcpy(&cmdline_backlog[cmdline_latest],
+	       cmdln, len, sizeof(char));
+	cmdline_backlog[cmdline_latest + len] = '\0';
+	cmdline_latest += len + 1;
+}
+
+PRIVATE NOBLOCK ATTR_DBGTEXT void
+NOTHROW(KCALL cmdline_backlog_try_appendcurrent)(void) {
+	size_t cmdline_len = strlen(cmdline);
+	if (cmdline_current != cmdline_latest) {
+		char *cursel;
+		/* Delete a temporarily saved commandline. */
+		if (cmdline_didsavetemp) {
+			char *tempstart;
+			tempstart = (char *)memrend(cmdline_backlog, '\0', cmdline_latest - 1) + 1;
+			cmdline_latest = (size_t)(tempstart - cmdline_backlog);
+			cmdline_didsavetemp = false;
+		}
+		/* If the currently selected entry wasn't modified from its
+		 * original, then don't re-add it to the backlog once again! */
+		cursel = cmdline_backlog + cmdline_current;
+		if (cmdline_len == strlen(cursel) &&
+		    memcmp(cmdline, cursel, cmdline_len * sizeof(char)) == 0)
+			return;
+	}
+	if (cmdline_len != 0)
+		cmdline_backlog_append(cmdline, cmdline_len);
+	cmdline_current = cmdline_latest;
+}
+
+PRIVATE NOBLOCK ATTR_DBGTEXT bool
+NOTHROW(KCALL cmdline_backlog_prev)(void) {
+	char *prev_cmdline;
+	if (!cmdline_current)
+		return false; /* The oldest possible entry is already selected. */
+	if (cmdline_current == cmdline_latest && !cmdline_didsavetemp) {
+		/* Save the current (incomplete) commandline. */
+		cmdline_backlog_append(cmdline, strlen(cmdline));
+		cmdline_didsavetemp = true;
+	}
+	prev_cmdline = (char *)memrend(cmdline_backlog, '\0', cmdline_current - 1) + 1;
+	cmdline_current = (size_t)(prev_cmdline - cmdline_backlog);
+	memcpy(cmdline, prev_cmdline, strlen(prev_cmdline) + 1, sizeof(char));
+	return true;
+}
+
+PRIVATE NOBLOCK ATTR_DBGTEXT bool
+NOTHROW(KCALL cmdline_backlog_next)(void) {
+	char *next_cmdline, *cmdline_end;
+	if (cmdline_current == cmdline_latest)
+		return false;
+	next_cmdline = strend(cmdline_backlog + cmdline_current) + 1;
+	cmdline_current = (size_t)(next_cmdline - cmdline_backlog);
+	if (cmdline_current > cmdline_latest)
+		cmdline_current = cmdline_latest;
+	/* Load this commandline. */
+	cmdline_end = strend(next_cmdline);
+	memcpy(cmdline, next_cmdline, (size_t)(cmdline_end - next_cmdline) + 1, sizeof(char));
+	if ((cmdline_end + 1) >= cmdline_backlog + cmdline_latest && cmdline_didsavetemp) {
+		cmdline_latest = (size_t)(next_cmdline - cmdline_backlog);
+		cmdline_didsavetemp = false;
+	}
+	return true;
+}
+
 
 
 
 /* Split the given commandline and store the arguments in `argv' */
-PRIVATE size_t KCALL
-split_cmdline(char *__restrict cmdline,
+PRIVATE ATTR_DBGTEXT size_t KCALL
+split_cmdline(char *__restrict cmdln,
               char **__restrict argv,
               size_t argc_max) {
 	size_t argi, i;
@@ -243,22 +351,22 @@ split_cmdline(char *__restrict cmdline,
 		return 0;
 	}
 	/* Skip leading space. */
-	while (isspace(*cmdline))
-		++cmdline;
+	while (isspace(*cmdln))
+		++cmdln;
 	/* Check for empty commandline. */
-	if (!*cmdline)
+	if (!*cmdln)
 		return 0;
 	--argc_max;
 	i = 0, argi = 1;
-	cmdline_len = strlen(cmdline);
-	argv[0]     = cmdline;
+	cmdline_len = strlen(cmdln);
+	argv[0]     = cmdln;
 	for (;;) {
-		char ch = cmdline[i];
+		char ch = cmdln[i];
 		/* Escaped characters. */
 		if (ch == '\\') {
 			--cmdline_len;
-			memmovedown(&cmdline[i],
-			            &cmdline[i + 1],
+			memmovedown(&cmdln[i],
+			            &cmdln[i + 1],
 			            cmdline_len - i,
 			            sizeof(char));
 			++i;
@@ -270,16 +378,16 @@ split_cmdline(char *__restrict cmdline,
 		if (ch == '\'' || ch == '\"') {
 			char end_ch = ch;
 			--cmdline_len;
-			memmovedown(&cmdline[i],
-			            &cmdline[i + 1],
+			memmovedown(&cmdln[i],
+			            &cmdln[i + 1],
 			            cmdline_len - i,
 			            sizeof(char));
 			while (i < cmdline_len) {
-				ch = cmdline[i];
+				ch = cmdln[i];
 				if (ch == '\\') {
 					--cmdline_len;
-					memmovedown(&cmdline[i],
-					            &cmdline[i + 1],
+					memmovedown(&cmdln[i],
+					            &cmdln[i + 1],
 					            cmdline_len - i,
 					            sizeof(char));
 					++i;
@@ -289,8 +397,8 @@ split_cmdline(char *__restrict cmdline,
 				}
 				if (ch == end_ch) {
 					--cmdline_len;
-					memmovedown(&cmdline[i],
-					            &cmdline[i + 1],
+					memmovedown(&cmdln[i],
+					            &cmdln[i + 1],
 					            cmdline_len - i,
 					            sizeof(char));
 					break;
@@ -303,20 +411,20 @@ split_cmdline(char *__restrict cmdline,
 		}
 		/* Space -> Argument separator. */
 		if (isspace(ch)) {
-			cmdline[i] = '\0'; /* Terminate the previous argument. */
+			cmdln[i] = '\0'; /* Terminate the previous argument. */
 			++i;
 			/* Skip multiple consecutive spaces. */
-			while (i < cmdline_len && isspace(cmdline[i]))
+			while (i < cmdline_len && isspace(cmdln[i]))
 				++i;
 			if (i >= cmdline_len)
 				break;
 			/* Start a new argument. */
-			argv[argi] = &cmdline[i];
+			argv[argi] = &cmdln[i];
 			++argi;
 			if (argi >= argc_max) {
-				while (cmdline_len && isspace(cmdline[cmdline_len - 1]))
+				while (cmdline_len && isspace(cmdln[cmdline_len - 1]))
 					--cmdline_len;
-				cmdline[cmdline_len] = '\0';
+				cmdln[cmdline_len] = '\0';
 				break;
 			}
 			continue;
@@ -332,8 +440,14 @@ split_cmdline(char *__restrict cmdline,
 
 
 
-PUBLIC void KCALL
+PUBLIC ATTR_DBGTEXT void KCALL
 dbg_main(uintptr_t show_welcome) {
+	/* Reset the backlog */
+	cmdline_backlog[0]  = '\0';
+	cmdline_latest      = 0;
+	cmdline_current     = 0;
+	cmdline_didsavetemp = false;
+
 	/* The main entry function for the debugger.
 	 * Called once the debugger context of single-core + no preemptive interrupts has setup. */
 	if (show_welcome) {
@@ -347,20 +461,88 @@ dbg_main(uintptr_t show_welcome) {
 		uintptr_t errorcode;
 		struct debug_function const *cmd;
 		/* Force-enable render-to-screen. */
+again_readline:
 		dbg_endupdate(true);
 		/* Add a visual indicator for when the exit state doesn't match the currently
 		 * viewed state (thus informing the user that they need to type `apply' before
 		 * exit if they wish to return to the modified state) */
+		dbg_attr = dbg_default_attr;
 		if (dbg_changedview())
 			dbg_print(DBGSTR(DF_COLOR(DBG_COLOR_LIME, DBG_COLOR_DARK_GRAY, "!")));
 		dbg_print(DBGSTR("> "));
 		attr = dbg_attr;
-		dbg_setfgcolor(DBG_COLOR_WHITE);
+		dbg_setcolor(DBG_COLOR_WHITE, DBG_COLOR_DARK_GRAY);
 		dbg_setcur_visible(true);
-		dbg_readline(cmdline, DBG_MAXLINE, &dbg_autocomplete_command);
-		dbg_setcur_visible(false);
+		{
+			unsigned int code, field_width;
+			u32 cur = dbg_getcur();
+			size_t cursor_pos, screen_left;
+			cmdline[0] = '\0';
+			/* Switch back to the latest entry in the backlog */
+			cmdline_current = cmdline_latest;
+continue_readline_sol:
+			cursor_pos = screen_left = 0;
+continue_readline:
+			field_width = dbg_screen_width - DBG_GETCUR_X(cur);
+			code = dbg_editfield(DBG_GETCUR_X(cur), DBG_GETCUR_Y(cur),
+			                     field_width, cmdline, DBG_MAXLINE,
+			                     &cursor_pos, &screen_left);
+			switch (code) {
+
+			case DBG_EDITFIELD_RETURN_ENTER:
+				break;
+
+			case DBG_EDITFIELD_RETURN_TAB:
+				cursor_pos = dbg_autocomplete(cmdline, DBG_MAXLINE, cursor_pos);
+				goto continue_readline;
+
+			case DBG_EDITFIELD_RETURN_CTRL_C: {
+				unsigned int curx;
+				dbg_setcolor(DBG_COLOR_WHITE, DBG_COLOR_BLACK);
+				dbg_draweditfield(DBG_GETCUR_X(cur), DBG_GETCUR_Y(cur),
+				                  field_width, cmdline, DBG_MAXLINE,
+				                  &cursor_pos, &screen_left);
+				dbg_setcur(DBG_GETCUR_X(cur) + cursor_pos - screen_left,
+				           DBG_GETCUR_Y(cur));
+				curx = dbg_getcur_x();
+				dbg_attr = dbg_default_attr;
+				if (curx < dbg_screen_width - 2)
+					dbg_print(DBGSTR("^C\n"));
+				else if (curx == dbg_screen_width - 2)
+					dbg_print(DBGSTR("^C"));
+				else if (curx == dbg_screen_width - 1)
+					dbg_putc('^');
+				else {
+					dbg_putc('\n');
+				}
+			}	goto again_readline;
+
+			case DBG_EDITFIELD_RETURN_CTRL_D:
+				return; /* Exit (logout) */
+
+			case DBG_EDITFIELD_RETURN_UP:
+				if (!cmdline_backlog_prev())
+					goto continue_readline;
+				goto continue_readline_sol;
+
+			case DBG_EDITFIELD_RETURN_DOWN:
+				if (!cmdline_backlog_next())
+					goto continue_readline;
+				goto continue_readline_sol;
+
+			default:
+				goto continue_readline;
+			}
+			dbg_setcur_visible(false);
+			dbg_setcolor(DBG_COLOR_WHITE, DBG_COLOR_BLACK);
+			dbg_draweditfield(DBG_GETCUR_X(cur), DBG_GETCUR_Y(cur),
+			                  field_width, cmdline, DBG_MAXLINE,
+			                  &cursor_pos, &screen_left);
+			dbg_putc('\n');
+		}
 		dbg_attr = attr;
-		argc     = split_cmdline(cmdline, argv, DBG_ARGC_MAX);
+		cmdline_backlog_try_appendcurrent();
+		argc = split_cmdline(cmdline, argv, DBG_ARGC_MAX);
 		if (!argc)
 			continue;
 		cmd = dbg_getfunc(argv[0]);

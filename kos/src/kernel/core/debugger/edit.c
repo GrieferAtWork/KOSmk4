@@ -76,10 +76,15 @@ do_hide_cursor:
  * to the given `buf'.
  * Note that if `buf' is non-empty (buf[0] != '\0') upon entry,
  * editing will resume with the current contents of `buf'
+ * @param: pcursor_pos:  [0..1][in|out]: The index where the cursor starts out/ends up
+ * @param: pscreen_left: [0..1][in|out]: The index of the left-most visible character
  * @return: * : One of `DBG_EDITFIELD_RETURN_*' */
 PUBLIC ATTR_DBGTEXT unsigned int
 NOTHROW(FCALL dbg_editfield)(int x, int y, unsigned int field_width,
-                             char *buf, size_t buflen) {
+                             char *buf, size_t buflen,
+                             size_t *pcursor_pos,
+                             size_t *pscreen_left) {
+	unsigned int result;
 	char *screen_left, *pos, *endptr, *bufend;
 	if unlikely(field_width < 2)
 		field_width = 2;
@@ -92,7 +97,15 @@ NOTHROW(FCALL dbg_editfield)(int x, int y, unsigned int field_width,
 	bufend = buf + buflen;
 	screen_left = buf;
 	buf[buflen - 1] = '\0';
-	pos = endptr = strend(buf);
+	endptr = strend(buf);
+	pos = endptr;
+	if (pcursor_pos) {
+		pos = buf + *pcursor_pos;
+		if (pos > endptr)
+			pos = endptr;
+	}
+	if (pscreen_left)
+		screen_left = buf + *pscreen_left;
 	for (;;) {
 		char ch;
 		size_t onscreen;
@@ -103,6 +116,7 @@ NOTHROW(FCALL dbg_editfield)(int x, int y, unsigned int field_width,
 		if (onscreen > field_width - 1)
 			screen_left = pos - (field_width - 1);
 		dbg_drawedit(x, y, field_width, screen_left, pos, endptr);
+continue_norender:
 		if (!dbg_hasuni()) {
 			do {
 				key = dbg_getkey();
@@ -110,19 +124,30 @@ NOTHROW(FCALL dbg_editfield)(int x, int y, unsigned int field_width,
 			switch (key) {
 
 			case KEY_ESC:
-				return DBG_EDITFIELD_RETURN_ESC;
+				result = DBG_EDITFIELD_RETURN_ESC;
+				goto done;
+
 			case KEY_ENTER:
-				return DBG_EDITFIELD_RETURN_ENTER;
+				result = DBG_EDITFIELD_RETURN_ENTER;
+				goto done;
+
 			case KEY_TAB:
+				result = DBG_EDITFIELD_RETURN_TAB;
 				if (dbg_isholding_shift())
-					return DBG_EDITFIELD_RETURN_SHIFT_TAB;
-				return DBG_EDITFIELD_RETURN_TAB;
+					result = DBG_EDITFIELD_RETURN_SHIFT_TAB;
+				goto done;
+
 			case KEY_F1 ... KEY_F10:
-				return DBG_EDITFIELD_RETURN_F(1 + (key - KEY_F1));
+				result = DBG_EDITFIELD_RETURN_F(1 + (key - KEY_F1));
+				goto done;
+
 			case KEY_F11 ... KEY_F12:
-				return DBG_EDITFIELD_RETURN_F(11 + (key - KEY_F11));
+				result = DBG_EDITFIELD_RETURN_F(11 + (key - KEY_F11));
+				goto done;
+
 			case KEY_F13 ... KEY_F24:
-				return DBG_EDITFIELD_RETURN_F(13 + (key - KEY_F13));
+				result = DBG_EDITFIELD_RETURN_F(13 + (key - KEY_F13));
+				goto done;
 
 			case KEY_BACKSPACE: {
 				unsigned int n;
@@ -222,8 +247,12 @@ NOTHROW(FCALL dbg_editfield)(int x, int y, unsigned int field_width,
 				continue;
 
 			case KEY_UP:
+				result = DBG_EDITFIELD_RETURN_UP;
+				goto done;
+
 			case KEY_DOWN:
-				continue;
+				result = DBG_EDITFIELD_RETURN_DOWN;
+				goto done;
 
 			default:
 				break;
@@ -232,8 +261,18 @@ NOTHROW(FCALL dbg_editfield)(int x, int y, unsigned int field_width,
 			dbg_ungetkey(key);
 		}
 		ch = dbg_trygetc();
-		if (!ch)
-			continue;
+		switch (ch) {
+		case 0:
+			goto continue_norender;
+		case 3:
+			result = DBG_EDITFIELD_RETURN_CTRL_C;
+			goto done;
+		case 4:
+			result = DBG_EDITFIELD_RETURN_CTRL_D;
+			goto done;
+		default:
+			break;
+		}
 		if (endptr >= bufend) {
 			dbg_bell();
 			continue; /* Buffer is full */
@@ -243,8 +282,14 @@ NOTHROW(FCALL dbg_editfield)(int x, int y, unsigned int field_width,
 		          sizeof(char));
 		*pos++ = ch;
 		++endptr;
-		*endptr = 0;
+		*endptr = '\0';
 	}
+done:
+	if (pcursor_pos)
+		*pcursor_pos = (size_t)(pos - buf);
+	if (pscreen_left)
+		*pscreen_left = (size_t)(screen_left - buf);
+	return result;
 }
 
 
@@ -252,8 +297,10 @@ NOTHROW(FCALL dbg_editfield)(int x, int y, unsigned int field_width,
 /* Same as `dbg_editfield()', but only draw the edit field. */
 PUBLIC ATTR_DBGTEXT void
 NOTHROW(FCALL dbg_draweditfield)(int x, int y, unsigned int field_width,
-                                 char *buf, size_t buflen) {
-	char *endptr;
+                                 char *buf, size_t buflen,
+                                 size_t *pcursor_pos,
+                                 size_t *pscreen_left) {
+	char *screen_left, *pos, *endptr;
 	size_t onscreen;
 	if unlikely(field_width < 2)
 		field_width = 2;
@@ -263,12 +310,23 @@ NOTHROW(FCALL dbg_draweditfield)(int x, int y, unsigned int field_width,
 		buflen = sizeof(shouldnt_happen);
 		memset(shouldnt_happen, 0, sizeof(shouldnt_happen));
 	}
+	screen_left = buf;
 	buf[buflen - 1] = '\0';
 	endptr = strend(buf);
-	onscreen = (size_t)(endptr - buf);
+	pos = endptr;
+	if (pcursor_pos) {
+		pos = buf + *pcursor_pos;
+		if (pos > endptr)
+			pos = endptr;
+	}
+	if (pscreen_left)
+	screen_left = buf + *pscreen_left;
+	if (screen_left > pos)
+		screen_left = pos;
+	onscreen = (size_t)(pos - screen_left);
 	if (onscreen > field_width - 1)
-		buf = endptr - (field_width - 1);
-	dbg_drawedit(x, y, field_width, buf, endptr, endptr);
+		screen_left = pos - (field_width - 1);
+	dbg_drawedit(x, y, field_width, screen_left, pos, endptr);
 }
 
 

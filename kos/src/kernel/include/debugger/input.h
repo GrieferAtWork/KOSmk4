@@ -46,8 +46,8 @@ FUNDEF NOBLOCK bool NOTHROW(KCALL dbg_ungetkey)(u16 key);
  * NOTE: Modifier keys aren't returned by this function. */
 FUNDEF /*utf-8*/ char KCALL dbg_getc(void);
 FUNDEF /*utf-32*/ char32_t KCALL dbg_getuni(void);
-FUNDEF NOBLOCK /*utf-8*/ char KCALL dbg_trygetc(void);
-FUNDEF NOBLOCK /*utf-32*/ char32_t KCALL dbg_trygetuni(void);
+FUNDEF NOBLOCK /*utf-8*/ char KCALL dbg_trygetc(void); /* @return: 0: No characters available. */
+FUNDEF NOBLOCK /*utf-32*/ char32_t KCALL dbg_trygetuni(void); /* @return: 0: No characters available. */
 
 /* Unget a character to be re-returned by `dbg_(try)get(c|uni)'
  * When ungetting multiple characters, the character last unget'ed will be returned last. */
@@ -64,32 +64,6 @@ FUNDEF NOBLOCK WUNUSED ATTR_PURE bool NOTHROW(KCALL dbg_isholding_ctrl)(void);
 FUNDEF NOBLOCK WUNUSED ATTR_PURE bool NOTHROW(KCALL dbg_isholding_shift)(void);
 FUNDEF NOBLOCK WUNUSED ATTR_PURE bool NOTHROW(KCALL dbg_isholding_alt)(void);
 FUNDEF NOBLOCK WUNUSED ATTR_PURE bool NOTHROW(KCALL dbg_isholding_altgr)(void);
-
-
-/* Try to auto-complete whatever was written at `line+num_written',
- * returning the number of additional bytes written by the Autocomplete
- * @param: line:        The input line of text that should be completed.
- * @param: bufsize:    [> num_written] The available buffer size in bytes, starting at `line' (must not be exceeded)
- * @param: num_written: The amount of bytes already filled in by the user.
- * @return: * :         The number of bytes appended by auto-completion. */
-typedef NONNULL((1)) size_t (KCALL *dbg_autocomplete_t)(char *__restrict line,
-                                                        size_t bufsize, size_t num_written);
-
-/* Default auto completion function for the debug command line. */
-FUNDEF NONNULL((1)) size_t
-NOTHROW(KCALL dbg_autocomplete_command)(char *__restrict line,
-                                        size_t bufsize, size_t num_written);
-
-/* Read a single line of user-input from the debug terminal, and fill `buf'
- * NOTE: This function also performs tab-completion, as well as keep an input
- *       history backlog.
- * @param: autocomplete: The autocomplete function that should be used
- *                       for TAB (or `NULL' if this should be disabled)
- * @return: * : The number of bytes read and written to `buf' */
-FUNDEF size_t KCALL dbg_readline(/*utf-8*/ char *__restrict buf, size_t bufsize,
-                                 dbg_autocomplete_t autocomplete);
-#define DBG_MAXLINE 256 /* Default max length of a line (aka. intended size for `dbg_readline:buf') */
-
 
 #endif /* __CC__ */
 

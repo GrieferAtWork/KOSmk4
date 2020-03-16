@@ -74,20 +74,30 @@ FUNDEF void *NOTHROW(FCALL dbg_asmview)(void *addr);
  * to the given `buf'.
  * Note that if `buf' is non-empty (buf[0] != '\0') upon entry,
  * editing will resume with the current contents of `buf'
+ * @param: pcursor_pos:  [0..1][in|out]: The index where the cursor starts out/ends up
+ * @param: pscreen_left: [0..1][in|out]: The index of the left-most visible character
  * @return: * : One of `DBG_EDITFIELD_RETURN_*' */
 FUNDEF unsigned int
 NOTHROW(FCALL dbg_editfield)(int x, int y, unsigned int field_width,
-                             char *buf, size_t buflen);
+                             char *buf, size_t buflen,
+                             size_t *pcursor_pos DFL(__NULLPTR),
+                             size_t *pscreen_left DFL(__NULLPTR));
 #define DBG_EDITFIELD_RETURN_ENTER     0 /* Enter (confirm) */
 #define DBG_EDITFIELD_RETURN_TAB       1 /* Tab (go to next field?) */
 #define DBG_EDITFIELD_RETURN_SHIFT_TAB 2 /* Shift+Tab (go to next field?) */
-#define DBG_EDITFIELD_RETURN_ESC       3
-#define DBG_EDITFIELD_RETURN_F(n)     (16+((n)-1)) /* Fn key was pressed */
+#define DBG_EDITFIELD_RETURN_ESC       3 /* ESC was pressed */
+#define DBG_EDITFIELD_RETURN_UP        4 /* Up was pressed */
+#define DBG_EDITFIELD_RETURN_DOWN      5 /* Down was pressed */
+#define DBG_EDITFIELD_RETURN_CTRL_C    6 /* CTRL+C was pressed */
+#define DBG_EDITFIELD_RETURN_CTRL_D    7 /* CTRL+D was pressed */
+#define DBG_EDITFIELD_RETURN_F(n)      (16 + ((n)-1)) /* Fn key was pressed */
 
 /* Same as `dbg_editfield()', but only draw the edit field. */
 FUNDEF void
 NOTHROW(FCALL dbg_draweditfield)(int x, int y, unsigned int field_width,
-                                 char *buf, size_t buflen);
+                                 char *buf, size_t buflen,
+                                 size_t *pcursor_pos DFL(__NULLPTR),
+                                 size_t *pscreen_left DFL(__NULLPTR));
 
 
 /* Evaluate an address expression
