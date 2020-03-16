@@ -87,7 +87,7 @@ NOTHROW(KCALL x86_initialize_default_memory_banks)(void) {
 	for (i = 0; i < COMPILER_LENOF(default_memory_banks); ++i) {
 		vm_phys_t size;
 		u16 type;
-		size = PMEMBANK_TYPE_SIZE(default_memory_banks[i]);
+		size = PMEMBANK_SIZE(default_memory_banks[i]);
 		type = default_memory_banks[i].mb_type;
 		minfo.mb_total[PMEMBANK_TYPE_UNDEF] -= size;
 		minfo.mb_total[type] += size;

@@ -183,8 +183,8 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 		size_t i;
 		for (i = 0; i < minfo.mb_bankc; ++i) {
 			printk(KERN_DEBUG "[boot] MEMORY: %I64p...%I64p (%s)\n",
-			       (u64)PMEMBANK_TYPE_MIN(minfo.mb_banks[i]),
-			       (u64)PMEMBANK_TYPE_MAX(minfo.mb_banks[i]),
+			       (u64)PMEMBANK_MINADDR(minfo.mb_banks[i]),
+			       (u64)PMEMBANK_MAXADDR(minfo.mb_banks[i]),
 			       pmembank_type_names[minfo.mb_banks[i].mb_type]);
 		}
 	}

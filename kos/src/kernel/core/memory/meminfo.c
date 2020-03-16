@@ -113,22 +113,22 @@ NOTHROW(KCALL minfo_split_bank)(size_t bank_index, vm_phys_t start) {
 	        "bank_index     = %Iu\n"
 	        "minfo.mb_bankc = %Iu\n",
 	        bank_index, minfo.mb_bankc);
-	assertf(start > PMEMBANK_TYPE_START(kernel_membanks_initial[bank_index]),
-	        "bank_index                                               = %Iu\n"
-	        "start                                                    = " FORMAT_VM_PHYS_T "\n"
-	        "PMEMBANK_TYPE_START(kernel_membanks_initial[bank_index]) = " FORMAT_VM_PHYS_T "\n"
-	        "PMEMBANK_TYPE_MAX(kernel_membanks_initial[bank_index])   = " FORMAT_VM_PHYS_T "\n",
+	assertf(start > PMEMBANK_STARTADDR(kernel_membanks_initial[bank_index]),
+	        "bank_index                                              = %Iu\n"
+	        "start                                                   = " FORMAT_VM_PHYS_T "\n"
+	        "PMEMBANK_STARTADDR(kernel_membanks_initial[bank_index]) = " FORMAT_VM_PHYS_T "\n"
+	        "PMEMBANK_MAXADDR(kernel_membanks_initial[bank_index])   = " FORMAT_VM_PHYS_T "\n",
 	        bank_index, start,
-	        PMEMBANK_TYPE_START(kernel_membanks_initial[bank_index]),
-	        PMEMBANK_TYPE_MAX(kernel_membanks_initial[bank_index]));
-	assertf(start <= PMEMBANK_TYPE_MAX(kernel_membanks_initial[bank_index]),
-	        "bank_index                                               = %Iu\n"
-	        "start                                                    = " FORMAT_VM_PHYS_T "\n"
-	        "PMEMBANK_TYPE_START(kernel_membanks_initial[bank_index]) = " FORMAT_VM_PHYS_T "\n"
-	        "PMEMBANK_TYPE_MAX(kernel_membanks_initial[bank_index])   = " FORMAT_VM_PHYS_T "\n",
+	        PMEMBANK_STARTADDR(kernel_membanks_initial[bank_index]),
+	        PMEMBANK_MAXADDR(kernel_membanks_initial[bank_index]));
+	assertf(start <= PMEMBANK_MAXADDR(kernel_membanks_initial[bank_index]),
+	        "bank_index                                              = %Iu\n"
+	        "start                                                   = " FORMAT_VM_PHYS_T "\n"
+	        "PMEMBANK_STARTADDR(kernel_membanks_initial[bank_index]) = " FORMAT_VM_PHYS_T "\n"
+	        "PMEMBANK_MAXADDR(kernel_membanks_initial[bank_index])   = " FORMAT_VM_PHYS_T "\n",
 	        bank_index, start,
-	        PMEMBANK_TYPE_START(kernel_membanks_initial[bank_index]),
-	        PMEMBANK_TYPE_MAX(kernel_membanks_initial[bank_index]));
+	        PMEMBANK_STARTADDR(kernel_membanks_initial[bank_index]),
+	        PMEMBANK_MAXADDR(kernel_membanks_initial[bank_index]));
 	memmoveup(&kernel_membanks_initial[bank_index + 1],
 	          &kernel_membanks_initial[bank_index],
 	          minfo.mb_bankc - bank_index,
@@ -154,7 +154,7 @@ NOTHROW(KCALL minfo_usable_ram_pages)(void) {
 	size_t result = 0, i;
 	for (i = 0; i < minfo.mb_bankc; ++i) {
 		if (minfo.mb_banks[i].mb_type == PMEMBANK_TYPE_RAM)
-			result += PMEMBANK_TYPE_NUMPAGES(minfo.mb_banks[i]);
+			result += PMEMBANK_NUMPAGES(minfo.mb_banks[i]);
 	}
 	return result;
 }
@@ -174,27 +174,27 @@ NOTHROW(KCALL minfo_addbank)(vm_phys_t start, vm_phys_t size, u16 type) {
 	       start, max, pmembank_type_names[type]);
 	i = 0;
 	while ((assert(i < minfo.mb_bankc),
-	        start > PMEMBANK_TYPE_MAX(kernel_membanks_initial[i])))
+	        start > PMEMBANK_MAXADDR(kernel_membanks_initial[i])))
 		++i;
 continue_type_checks:
-	assert(start >= PMEMBANK_TYPE_MIN(kernel_membanks_initial[i]));
-	assert(start <= PMEMBANK_TYPE_MAX(kernel_membanks_initial[i]));
+	assert(start >= PMEMBANK_MINADDR(kernel_membanks_initial[i]));
+	assert(start <= PMEMBANK_MAXADDR(kernel_membanks_initial[i]));
 	while (type <= kernel_membanks_initial[i].mb_type) {
-		start = PMEMBANK_TYPE_END(kernel_membanks_initial[i]);
+		start = PMEMBANK_ENDADDR(kernel_membanks_initial[i]);
 		if (start - 1 >= max)
 			return;
 		++i;
 		assert(i < minfo.mb_bankc);
 	}
 	assert(type >= kernel_membanks_initial[i].mb_type);
-	if (start != PMEMBANK_TYPE_MIN(kernel_membanks_initial[i])) {
+	if (start != PMEMBANK_MINADDR(kernel_membanks_initial[i])) {
 		/* Must split the bank at this position. */
 		minfo_split_bank(i, start);
 		++i;
 	}
-	assert(start == PMEMBANK_TYPE_MIN(kernel_membanks_initial[i]));
-	if (max <= PMEMBANK_TYPE_MAX(kernel_membanks_initial[i])) {
-		if (max < PMEMBANK_TYPE_MAX(kernel_membanks_initial[i]))
+	assert(start == PMEMBANK_MINADDR(kernel_membanks_initial[i]));
+	if (max <= PMEMBANK_MAXADDR(kernel_membanks_initial[i])) {
+		if (max < PMEMBANK_MAXADDR(kernel_membanks_initial[i]))
 			minfo_split_bank(i, max + 1);
 		kernel_membanks_initial[i].mb_type = type;
 		if (i != 0 && kernel_membanks_initial[i - 1].mb_type == type) {
@@ -211,7 +211,7 @@ continue_type_checks:
 		}
 		assert(kernel_membanks_initial[i].mb_type == type);
 		++i;
-		start = PMEMBANK_TYPE_MIN(kernel_membanks_initial[i]);
+		start = PMEMBANK_MINADDR(kernel_membanks_initial[i]);
 		assert(start <= max);
 		goto continue_type_checks;
 	}
@@ -304,11 +304,11 @@ again:
 		pageptr_t bank_alloc_page;
 		if (kernel_membanks_initial[i].mb_type != PMEMBANK_TYPE_RAM)
 			continue; /* Not suitable for our purposes */
-		bytes_avail = PMEMBANK_TYPE_SIZE(kernel_membanks_initial[i]);
+		bytes_avail = PMEMBANK_SIZE(kernel_membanks_initial[i]);
 		if unlikely(bytes_avail < (vm_phys_t)num_bytes)
 			continue; /* Too small in general (even without alignment) */
-		bank_alloc_page = (pageptr_t)((PMEMBANK_TYPE_END(kernel_membanks_initial[i]) - num_bytes) / PAGESIZE);
-		if unlikely(bank_alloc_page < PMEMBANK_TYPE_STARTPAGE(kernel_membanks_initial[i]))
+		bank_alloc_page = (pageptr_t)((PMEMBANK_ENDADDR(kernel_membanks_initial[i]) - num_bytes) / PAGESIZE);
+		if unlikely(bank_alloc_page < PMEMBANK_STARTPAGE(kernel_membanks_initial[i]))
 			continue; /* Too small with alignment */
 #if defined(__i386__) || defined(__x86_64__)
 		/* Try not to allocate beneath the kernel, so-as not to use up low memory,
@@ -326,16 +326,16 @@ again:
 			vm_phys_t bank_alloc_addr;
 			bank_alloc_addr = (vm_phys_t)((uintptr_t)-1) - (num_bytes - 1);
 			bank_alloc_addr &= ~PAGEMASK;
-			if (bank_alloc_addr < PMEMBANK_TYPE_START(kernel_membanks_initial[i]))
+			if (bank_alloc_addr < PMEMBANK_STARTADDR(kernel_membanks_initial[i]))
 				break; /* Bank doesn't cover the last possible mapping location. */
 			waste = (pageptr_t)-2; /* A lot of waste this way... */
 		} else
 #endif /* __SIZEOF_VM_PHYS_T__ > __SIZEOF_POINTER__ */
 		{
 			/* See how much memory we're wasting with this allocation. */
-			assert(PMEMBANK_TYPE_END(kernel_membanks_initial[i]) >=
+			assert(PMEMBANK_ENDADDR(kernel_membanks_initial[i]) >=
 			       (page2addr(bank_alloc_page) + num_bytes));
-			waste = (pageptr_t)(PMEMBANK_TYPE_END(kernel_membanks_initial[i]) -
+			waste = (pageptr_t)(PMEMBANK_ENDADDR(kernel_membanks_initial[i]) -
 			                    (page2addr(bank_alloc_page) + num_bytes));
 #if 0
 			{
@@ -343,7 +343,7 @@ again:
 				 * (i.e. `NUMBER_OF_BYTES_UNSED_OF(PAGE_ALIGNED_BANK_END ... BYTE_ALIGNED_BANK_END)') */
 				vm_phys_t gain_min;
 				vm_phys_t gain_end;
-				gain_end = PMEMBANK_TYPE_END(kernel_membanks_initial[i]);
+				gain_end = PMEMBANK_ENDADDR(kernel_membanks_initial[i]);
 				if ((gain_end & PAGEMASK) != 0) {
 					vm_phys_t used_end;
 					size_t gain;
@@ -378,13 +378,13 @@ again:
 				continue;
 			printk(FREESTR(KERN_EMERG "[mem] Bank #%Iu: %I64p-%I64p [%s] (%Iu (%#Ix) bytes / %Iu (%#Ix) pages)\n"),
 			       (size_t)i,
-			       (u64)PMEMBANK_TYPE_MIN(minfo.mb_banks[i]),
-			       (u64)PMEMBANK_TYPE_MAX(minfo.mb_banks[i]),
+			       (u64)PMEMBANK_MINADDR(minfo.mb_banks[i]),
+			       (u64)PMEMBANK_MAXADDR(minfo.mb_banks[i]),
 			       pmembank_type_names[minfo.mb_banks[i].mb_type],
-			       (size_t)PMEMBANK_TYPE_SIZE(minfo.mb_banks[i]),
-			       (size_t)PMEMBANK_TYPE_SIZE(minfo.mb_banks[i]),
-			       (size_t)PMEMBANK_TYPE_NUMPAGES(minfo.mb_banks[i]),
-			       (size_t)PMEMBANK_TYPE_NUMPAGES(minfo.mb_banks[i]));
+			       (size_t)PMEMBANK_SIZE(minfo.mb_banks[i]),
+			       (size_t)PMEMBANK_SIZE(minfo.mb_banks[i]),
+			       (size_t)PMEMBANK_NUMPAGES(minfo.mb_banks[i]),
+			       (size_t)PMEMBANK_NUMPAGES(minfo.mb_banks[i]));
 		}
 		kernel_panic(FREESTR("Failed to locate sufficient memory to allocate "
 		                     "RAM control structures (requiring %Iu bytes)\n"),
@@ -394,10 +394,10 @@ again:
 	{
 		vm_phys_t candy_phys     = page2addr(candy);
 		vm_phys_t candy_phys_max = candy_phys + num_bytes - 1;
-		assert(candy_phys >= PMEMBANK_TYPE_MIN(kernel_membanks_initial[candy_bank]));
-		assert(candy_phys_max <= PMEMBANK_TYPE_MAX(kernel_membanks_initial[candy_bank]));
+		assert(candy_phys >= PMEMBANK_MINADDR(kernel_membanks_initial[candy_bank]));
+		assert(candy_phys_max <= PMEMBANK_MAXADDR(kernel_membanks_initial[candy_bank]));
 		assert(kernel_membanks_initial[candy_bank].mb_type == PMEMBANK_TYPE_RAM);
-		if (candy_phys_max < PMEMBANK_TYPE_MAX(kernel_membanks_initial[candy_bank])) {
+		if (candy_phys_max < PMEMBANK_MAXADDR(kernel_membanks_initial[candy_bank])) {
 			/* Split the bank above to keep information about unused memory. */
 			++minfo.mb_bankc; /* Inc before to account for trailing sentinel bank. */
 			memmoveup(&kernel_membanks_initial[candy_bank + 1],
@@ -406,9 +406,9 @@ again:
 			          sizeof(struct pmembank));
 			kernel_membanks_initial[candy_bank + 1].mb_start = candy_phys_max + 1;
 		}
-		assert(candy_phys_max == PMEMBANK_TYPE_MAX(kernel_membanks_initial[candy_bank]));
-		assert(candy_phys >= PMEMBANK_TYPE_MIN(kernel_membanks_initial[candy_bank]));
-		if (candy_phys == PMEMBANK_TYPE_MIN(kernel_membanks_initial[candy_bank])) {
+		assert(candy_phys_max == PMEMBANK_MAXADDR(kernel_membanks_initial[candy_bank]));
+		assert(candy_phys >= PMEMBANK_MINADDR(kernel_membanks_initial[candy_bank]));
+		if (candy_phys == PMEMBANK_MINADDR(kernel_membanks_initial[candy_bank])) {
 			kernel_membanks_initial[candy_bank].mb_type = PMEMBANK_TYPE_ALLOCATED;
 		} else {
 			++minfo.mb_bankc; /* Inc before to account for trailing sentinel bank. */
@@ -456,12 +456,12 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL kernel_initialize_minfo_makezones)(void)
 		        kernel_membanks_initial[i].mb_type);
 		if (!PMEMBANK_TYPE_SHOULD_ZONE(kernel_membanks_initial[i].mb_type))
 			continue;
-		bank_start_page = PMEMBANK_TYPE_STARTPAGE(kernel_membanks_initial[i]);
+		bank_start_page = PMEMBANK_STARTPAGE(kernel_membanks_initial[i]);
 		/* Scan ahead to merge adjacent, zoned memory banks. */
 		while (i + 1 < minfo.mb_bankc &&
 		       PMEMBANK_TYPE_SHOULD_ZONE(kernel_membanks_initial[i + 1].mb_type))
 			++i;
-		bank_end_page = PMEMBANK_TYPE_ENDPAGE(kernel_membanks_initial[i]);
+		bank_end_page = PMEMBANK_ENDPAGE(kernel_membanks_initial[i]);
 		if unlikely(!(bank_start_page <= bank_end_page - 1))
 			continue; /* Zonable area isn't large enough */
 		++zone_count;
@@ -512,13 +512,13 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL kernel_initialize_minfo_makezones)(void)
 		        kernel_membanks_initial[i].mb_type);
 		if (!PMEMBANK_TYPE_SHOULD_ZONE(kernel_membanks_initial[i].mb_type))
 			continue;
-		bank_start_page = PMEMBANK_TYPE_STARTPAGE(kernel_membanks_initial[i]);
+		bank_start_page = PMEMBANK_STARTPAGE(kernel_membanks_initial[i]);
 		/* Scan ahead to merge adjacent, zoned memory banks. */
 		zone_bank_start = i;
 		while (i + 1 < minfo.mb_bankc &&
 		       PMEMBANK_TYPE_SHOULD_ZONE(kernel_membanks_initial[i + 1].mb_type))
 			++i;
-		bank_end_page = PMEMBANK_TYPE_ENDPAGE(kernel_membanks_initial[i]);
+		bank_end_page = PMEMBANK_ENDPAGE(kernel_membanks_initial[i]);
 		if unlikely(!(bank_start_page <= bank_end_page - 1))
 			continue; /* Zonable area isn't large enough */
 		/* Allocate and remember the new zone. */
@@ -544,8 +544,8 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL kernel_initialize_minfo_makezones)(void)
 			uintptr_t init_mask;
 			pagecnt_t size;
 			pageptr_t startpage, endpage;
-			startpage = PMEMBANK_TYPE_STARTPAGE(minfo.mb_banks[zone_bank_start]);
-			endpage   = PMEMBANK_TYPE_ENDPAGE(minfo.mb_banks[zone_bank_start]);
+			startpage = PMEMBANK_STARTPAGE(minfo.mb_banks[zone_bank_start]);
+			endpage   = PMEMBANK_ENDPAGE(minfo.mb_banks[zone_bank_start]);
 			if unlikely(startpage >= endpage) {
 				/* Special case: Memory zone too small to fit even a single whole page.
 				 * [output] MEMORY 0000000000BC3000-0000000000BC4FFF (kernel_free)
@@ -557,8 +557,8 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL kernel_initialize_minfo_makezones)(void)
 				 * much assume that all pages (at least partially) touched by this mapping
 				 * are entirely undefined (which may not necessarily be so, but is the
 				 * safest thing which we can do). */
-				startpage = (pageptr_t)FLOORDIV(PMEMBANK_TYPE_MIN(minfo.mb_banks[zone_bank_start]), PAGESIZE);
-				endpage   = (pageptr_t)CEILDIV(PMEMBANK_TYPE_MAX(minfo.mb_banks[zone_bank_start]), PAGESIZE);
+				startpage = (pageptr_t)FLOORDIV(PMEMBANK_MINADDR(minfo.mb_banks[zone_bank_start]), PAGESIZE);
+				endpage   = (pageptr_t)CEILDIV(PMEMBANK_MAXADDR(minfo.mb_banks[zone_bank_start]), PAGESIZE);
 				if unlikely(startpage < bank_start_page)
 					startpage = bank_start_page;
 				if unlikely(endpage > bank_end_page)
@@ -806,7 +806,7 @@ use_floordiv_maxpage:
 		            minfo.mb_bankc - i,
 		            sizeof(struct pmembank));
 	}
-	/* Ensure NUL-termination (required for `PMEMBANK_TYPE_MAX(minfo.mb_banks[minfo.mb_bankc - 1])') */
+	/* Ensure NUL-termination (required for `PMEMBANK_MAXADDR(minfo.mb_banks[minfo.mb_bankc - 1])') */
 	minfo.mb_banks[minfo.mb_bankc].mb_start = 0;
 }
 
@@ -915,11 +915,11 @@ DEFINE_DEBUG_FUNCTION(
 		struct pmembank *bank;
 		bank = &minfo.mb_banks[i];
 		dbg_printf(DBGSTR(DF_WHITE(FORMAT_VM_PHYS_T) "-" DF_WHITE(FORMAT_VM_PHYS_T) " %s%-11s" DF_RESETATTR " %I64u\n"),
-		           PMEMBANK_TYPE_MIN(*bank),
-		           PMEMBANK_TYPE_MAX(*bank),
+		           PMEMBANK_MINADDR(*bank),
+		           PMEMBANK_MAXADDR(*bank),
 		           bank->mb_type < PMEMBANK_TYPE_COUNT ? pmembank_type_colors[bank->mb_type] : "",
 		           bank->mb_type < PMEMBANK_TYPE_COUNT ? pmembank_type_names[bank->mb_type] : "?",
-		           PMEMBANK_TYPE_SIZE(*bank));
+		           PMEMBANK_SIZE(*bank));
 	}
 	return 0;
 }

@@ -88,16 +88,16 @@ struct pmembank {
 };
 #define PMEMBANK_INIT(startptr, type) { { startptr }, type, { } }
 
-#define PMEMBANK_TYPE_START(x)     ((x).mb_start)
-#define PMEMBANK_TYPE_MIN(x)       ((x).mb_start)
-#define PMEMBANK_TYPE_MAX(x)       ((&(x))[1].mb_start - 1)
-#define PMEMBANK_TYPE_END(x)       ((&(x))[1].mb_start)
-#define PMEMBANK_TYPE_SIZE(x)      (PMEMBANK_TYPE_END(x) - PMEMBANK_TYPE_START(x))
-#define PMEMBANK_TYPE_STARTPAGE(x) ((pageptr_t)((PMEMBANK_TYPE_START(x) + PAGESIZE - 1) / PAGESIZE))
-#define PMEMBANK_TYPE_MINPAGE(x)   ((pageptr_t)((PMEMBANK_TYPE_START(x) + PAGESIZE - 1) / PAGESIZE))
-#define PMEMBANK_TYPE_MAXPAGE(x)   ((pageptr_t)((PMEMBANK_TYPE_END(x) / PAGESIZE) - 1))
-#define PMEMBANK_TYPE_ENDPAGE(x)   ((pageptr_t)(PMEMBANK_TYPE_END(x) / PAGESIZE))
-#define PMEMBANK_TYPE_NUMPAGES(x)  ((size_t)(PMEMBANK_TYPE_ENDPAGE(x) - PMEMBANK_TYPE_STARTPAGE(x)))
+#define PMEMBANK_STARTADDR(x) ((x).mb_start)
+#define PMEMBANK_MINADDR(x)   ((x).mb_start)
+#define PMEMBANK_MAXADDR(x)   ((&(x))[1].mb_start - 1)
+#define PMEMBANK_ENDADDR(x)   ((&(x))[1].mb_start)
+#define PMEMBANK_SIZE(x)      (PMEMBANK_ENDADDR(x) - PMEMBANK_STARTADDR(x))
+#define PMEMBANK_STARTPAGE(x) ((pageptr_t)((PMEMBANK_STARTADDR(x) + PAGESIZE - 1) / PAGESIZE))
+#define PMEMBANK_MINPAGE(x)   ((pageptr_t)((PMEMBANK_STARTADDR(x) + PAGESIZE - 1) / PAGESIZE))
+#define PMEMBANK_MAXPAGE(x)   ((pageptr_t)((PMEMBANK_ENDADDR(x) / PAGESIZE) - 1))
+#define PMEMBANK_ENDPAGE(x)   ((pageptr_t)(PMEMBANK_ENDADDR(x) / PAGESIZE))
+#define PMEMBANK_NUMPAGES(x)  ((size_t)(PMEMBANK_ENDPAGE(x) - PMEMBANK_STARTPAGE(x)))
 
 struct pmeminfo {
 	vm_phys_t        mb_total[PMEMBANK_TYPE_COUNT]; /* [const] The total number of bytes corresponding to certain banks. */
