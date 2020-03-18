@@ -40,7 +40,6 @@
 #include <kernel/printk.h>
 #include <kernel/swap.h>
 #include <kernel/types.h>
-#include <kernel/vio.h>
 #include <kernel/vm.h>
 #include <kernel/vm/phys.h>
 #include <sched/cpu.h>
@@ -68,6 +67,8 @@
 #include <stddef.h>
 #include <string.h>
 #include <unistd.h>
+
+#include <libvio/access.h>
 
 #include "../memory/vm/vm-partapi.h"
 

@@ -19,11 +19,12 @@
  */
 
 #ifdef __INTELLISENSE__
-#include "vio.c"
+#include "access.c"
 #define DEFINE_IO_READ 1
 //#define DEFINE_IO_WRITE 1
 #endif /* __INTELLISENSE__ */
 
+#ifdef __KERNEL__
 #include <kernel/vm/phys.h>
 
 DECL_BEGIN
@@ -34,22 +35,23 @@ DECL_BEGIN
 
 
 #ifdef DEFINE_IO_READ
-PUBLIC NONNULL((1)) void KCALL
-vio_copyfromvio_to_phys(struct vio_args *__restrict args,
-                        pos_t offset, vm_phys_t buf,
-                        size_t num_bytes)
+INTERN NONNULL((1)) void KCALL
+libvio_copyfromvio_to_phys(struct vio_args *__restrict args,
+                           vio_addr_t offset, vm_phys_t buf,
+                           size_t num_bytes)
 #elif defined(DEFINE_IO_WRITE)
-PUBLIC NONNULL((1)) void KCALL
-vio_copytovio_from_phys(struct vio_args *__restrict args,
-                        pos_t offset, vm_phys_t buf,
-                        size_t num_bytes)
+INTERN NONNULL((1)) void KCALL
+libvio_copytovio_from_phys(struct vio_args *__restrict args,
+                           vio_addr_t offset, vm_phys_t buf,
+                           size_t num_bytes)
 #endif
-		THROWS(...) {
+		__THROWS(...) {
 	bool is_first;
 	pagedir_pushval_t backup;
 	byte_t *tramp;
 	if unlikely(!num_bytes)
 		return;
+	/* TODO: Support for the phys2virt identity mapping! */
 	is_first = true;
 	tramp    = THIS_TRAMPOLINE_BASE;
 	for (;;) {
@@ -84,15 +86,15 @@ vio_copytovio_from_phys(struct vio_args *__restrict args,
 		TRY {
 			/* Copy memory. */
 #ifdef DEFINE_IO_READ
-			vio_copyfromvio(args,
-			                offset,
-			                tramp + ((ptrdiff_t)buf & PAGEMASK),
-			                page_bytes);
+			libvio_copyfromvio(args,
+			                   offset,
+			                   tramp + ((ptrdiff_t)buf & PAGEMASK),
+			                   page_bytes);
 #elif defined(DEFINE_IO_WRITE)
-			vio_copytovio(args,
-			              offset,
-			              tramp + ((ptrdiff_t)buf & PAGEMASK),
-			              page_bytes);
+			libvio_copytovio(args,
+			                 offset,
+			                 tramp + ((ptrdiff_t)buf & PAGEMASK),
+			                 page_bytes);
 #endif
 		} EXCEPT {
 			/* Try-catch is required, because VIO access may throw exceptions. */
@@ -114,4 +116,5 @@ vio_copytovio_from_phys(struct vio_args *__restrict args,
 
 
 DECL_END
+#endif /* __KERNEL__ */
 

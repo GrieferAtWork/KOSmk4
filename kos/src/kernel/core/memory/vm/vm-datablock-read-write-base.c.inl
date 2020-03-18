@@ -27,8 +27,10 @@
 #endif /* __INTELLISENSE__ */
 
 #include <kernel/aio.h>
-#include <kernel/vio.h>
+
 #include <hybrid/unaligned.h>
+
+#include <libvio/access.h>
 
 DECL_BEGIN
 
@@ -177,7 +179,7 @@ KCALL vm_datablock_write
 #ifdef DEFINE_IO_WRITE
 			                  num_bytes,
 #endif /* !DEFINE_IO_WRITE */
-			                  src_offset - vm_datapart_startbyte(part));
+			                  (size_t)(src_offset - vm_datapart_startbyte(part)));
 		} EXCEPT {
 			decref(part);
 			RETHROW();
@@ -342,12 +344,12 @@ KCALL vm_datablock_vio_write
 	pagedir_pop_mapone(tramp, backup);
 #else
 	struct vio_args args;
-	args.va_type            = self->db_vio;
-	args.va_block           = self;
-	args.va_part            = NULL;
-	args.va_access_partoff  = 0;
-	args.va_access_pageid = 0;
-	args.va_state           = NULL;
+	args.va_ops          = self->db_vio;
+	args.va_block        = self;
+	args.va_part         = NULL;
+	args.va_acmap_page   = 0;
+	args.va_acmap_offset = 0;
+	args.va_state        = NULL;
 #ifdef LIBVIO_CONFIG_HAVE_QWORD
 #define VIO_LARGEBLOCK_SIZE 8
 #define VIO_LARGEBLOCK_TYPE u64

@@ -27,6 +27,8 @@
 #include <kernel/aio.h>
 #include <kernel/iovec.h>
 
+#include <libvio/api.h>
+
 DECL_BEGIN
 
 #ifdef DMA_NX
@@ -266,12 +268,12 @@ wait_for_part_and_try_again:
 				goto again_reset;
 			}
 			state = ATOMIC_READ(part->dp_state);
-#ifdef CONFIG_VIO
+#ifdef LIBVIO_CONFIG_ENABLED
 			if (state == VM_DATAPART_STATE_VIOPRT) {
 				sync_endread(part);
 				goto err_unmapped;
 			}
-#endif /* CONFIG_VIO */
+#endif /* LIBVIO_CONFIG_ENABLED */
 			if (state != VM_DATAPART_STATE_INCORE &&
 			    state != VM_DATAPART_STATE_LOCKED) {
 loadcore_part_and_try_again:
@@ -422,19 +424,19 @@ unshare_copy_on_write_for_part:
 				assertf(!wasdestroyed(part),
 				        "Node %p at %p-%p points at destroyed data part at %p",
 				        node, vm_node_getmin(node), vm_node_getmax(node), part);
-#ifdef CONFIG_VIO
+#ifdef LIBVIO_CONFIG_ENABLED
 				if unlikely(ATOMIC_READ(part->dp_state) == VM_DATAPART_STATE_VIOPRT)
 					goto err_unmapped;
-#endif /* CONFIG_VIO */
+#endif /* LIBVIO_CONFIG_ENABLED */
 				if unlikely(!sync_tryread(part)) /* NOTE: It's OK if we get duplicate locks here! */
 					goto wait_for_part_and_try_again;
 				state = ATOMIC_READ(part->dp_state);
-#ifdef CONFIG_VIO
+#ifdef LIBVIO_CONFIG_ENABLED
 				if (state == VM_DATAPART_STATE_VIOPRT) {
 					sync_endread(part);
 					goto err_unmapped;
 				}
-#endif /* CONFIG_VIO */
+#endif /* LIBVIO_CONFIG_ENABLED */
 				if (state != VM_DATAPART_STATE_INCORE &&
 				    state != VM_DATAPART_STATE_LOCKED)
 					goto loadcore_part_and_try_again;

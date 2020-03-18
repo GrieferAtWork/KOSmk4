@@ -81,6 +81,9 @@ BEGIN
 		/* Required for: Keyboard key->character mappings */
 		"../../libkeymap/*.c",
 
+		/* Required for: VIO support */
+		"../../libvio/*.c",
+
 		/* Pull in the actual kernel sources */
 		"debugger/*.c",
 		"debugger-apps/*.c",

@@ -32,7 +32,6 @@
 #include <kernel/paging.h>
 #include <kernel/phys2virt64.h>
 #include <kernel/printk.h>
-#include <kernel/vio.h>
 #include <kernel/vm.h>
 #include <kernel/vm/phys.h>
 #include <sched/cpu.h>
@@ -42,6 +41,7 @@
 #include <sched/tss.h>
 #include <sched/userkern.h>
 
+#include <hybrid/align.h>
 #include <hybrid/atomic.h>
 
 #include <asm/cpu-flags.h>
@@ -56,6 +56,7 @@
 #include <string.h>
 
 #include <libinstrlen/instrlen.h>
+#include <libvio/access.h>
 
 #include "vio.h"
 
@@ -601,7 +602,7 @@ do_handle_iob_node_access:
 			TRY {
 				pageptr_t ppage;
 				/* Need at least a read-lock for part initialization */
-#ifdef CONFIG_VIO
+#ifdef LIBVIO_CONFIG_ENABLED
 				if (part->dp_state == VM_DATAPART_STATE_VIOPRT) {
 					vio_main_args_t args;
 					uintptr_half_t nodeprot;
@@ -610,30 +611,28 @@ do_handle_iob_node_access:
 					sync_endread(effective_vm);
 					/* VIO Emulation */
 					sync_read(part);
-					args.ma_args.va_block = incref(part->dp_block);
-					args.ma_args.va_access_partoff = ((pos_t)(vpage_offset +
-					                                          vm_datapart_mindpage(part))
-					                                  << VM_DATABLOCK_ADDRSHIFT(args.ma_args.va_block));
+					args.ma_args.va_block        = incref(part->dp_block);
+					args.ma_args.va_acmap_offset = ((pos_t)(vpage_offset + vm_datapart_mindpage(part))
+					                                << VM_DATABLOCK_ADDRSHIFT(args.ma_args.va_block));
 					sync_endread(part);
-					args.ma_args.va_type = args.ma_args.va_block->db_vio;
-					if unlikely(!args.ma_args.va_type) {
+					args.ma_args.va_ops = args.ma_args.va_block->db_vio;
+					if unlikely(!args.ma_args.va_ops) {
 						decref_unlikely(args.ma_args.va_block);
 						decref_unlikely(part);
 						goto pop_connections_and_throw_segfault;
 					}
-					args.ma_args.va_part          = part; /* Inherit reference */
-					args.ma_args.va_access_pageid = pageid;
-					args.ma_args.va_state         = state;
-					args.ma_oldcons               = &con; /* Inherit */
+					args.ma_args.va_part       = part; /* Inherit reference */
+					args.ma_args.va_acmap_page = (void *)FLOOR_ALIGN((uintptr_t)addr, PAGESIZE);
+					args.ma_oldcons            = &con; /* Inherit */
 					/* Check for special case: call into VIO memory */
-					if (args.ma_args.va_type->dtv_call && (uintptr_t)addr == pc) {
+					if (args.ma_args.va_ops->vo_call && (uintptr_t)addr == pc) {
 						/* Make sure that memory mapping has execute permissions! */
 						if unlikely(!(nodeprot & VM_PROT_EXEC)) {
 							goto vio_failure_throw_segfault;
 						}
 						/* Special case: call into VIO memory */
 						TRY {
-							pos_t vio_addr;
+							vio_addr_t vio_addr;
 							uintptr_t callsite_pc;
 							uintptr_t sp;
 #ifdef __x86_64__
@@ -684,13 +683,12 @@ do_handle_iob_node_access:
 							}
 #endif /* !__x86_64__ */
 							/* Figure out the exact VIO address that got called. */
-							vio_addr = (pos_t)addr;
-							vio_addr -= (pos_t)PAGEID_DECODE(args.ma_args.va_access_pageid);
-							vio_addr += (pos_t)args.ma_args.va_access_partoff;
+							vio_addr = args.ma_args.va_acmap_offset +
+							           ((uintptr_t)addr - (uintptr_t)args.ma_args.va_acmap_page);
 							/* Invoke the VIO call operator. */
-							state = (*args.ma_args.va_type->dtv_call)(&args.ma_args,
-							                                          state,
-							                                          vio_addr);
+							args.ma_args.va_state = state;
+							(*args.ma_args.va_ops->vo_call)(&args.ma_args, vio_addr);
+							state = args.ma_args.va_state;
 						} EXCEPT {
 							assert(args.ma_oldcons == &con);
 							assert(args.ma_args.va_part == part);
@@ -719,9 +717,10 @@ vio_failure_throw_segfault:
 						decref_unlikely(args.ma_args.va_part);
 						goto pop_connections_and_throw_segfault;
 					}
+					args.ma_args.va_state = state;
 					return x86_vio_main(&args, (uintptr_t)addr);
 				}
-#endif /* CONFIG_VIO */
+#endif /* LIBVIO_CONFIG_ENABLED */
 				sync_endread(effective_vm);
 
 				if (has_changed) {

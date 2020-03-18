@@ -19,7 +19,7 @@
  */
 
 #ifdef __INTELLISENSE__
-#include "vio.c"
+#include "access.c"
 
 #define DEFINE_VIO_NAME              xch
 #define DEFINE_VIO_OP(oldval, value) value
@@ -27,59 +27,67 @@
 
 DECL_BEGIN
 
-#define FUNC3(name, bwlq) vio_##name##bwlq
+#define FUNC3(name, bwlq) libvio_##name##bwlq
 #define FUNC2(name, bwlq) FUNC3(name, bwlq)
 #define FUNC(bwlq)        FUNC2(DEFINE_VIO_NAME, bwlq)
 
-#define COMPONENT3(name) dtv_##name
+#define COMPONENT3(name) vo_##name
 #define COMPONENT2(name) COMPONENT3(name)
 #define COMPONENT        COMPONENT2(DEFINE_VIO_NAME)
 
-PUBLIC NONNULL((1)) u8 KCALL
-FUNC(b)(struct vio_args *__restrict args, pos_t addr, u8 value, bool atomic) {
-	struct vm_datablock_type_vio const *type = args->va_type;
+INTERN NONNULL((1)) u8 CC
+FUNC(b)(struct vio_args *__restrict args, vio_addr_t addr, u8 value, bool atomic) {
+	struct vio_operators const *ops = args->va_ops;
 	u8 result, new_result;
-	if (type->COMPONENT.f_byte)
-		return (*type->COMPONENT.f_byte)(args, addr, value, atomic);
-	result = vio_readb(args, addr);
-	while ((new_result = vio_cmpxch_or_writeb(args, addr, result, DEFINE_VIO_OP(result, value), atomic)) != result)
+	if (ops->COMPONENT.f_byte)
+		return (*ops->COMPONENT.f_byte)(args, addr, value, atomic);
+	result = libvio_readb(args, addr);
+	while ((new_result = libvio_cmpxch_or_writeb(args, addr, result,
+	                                             DEFINE_VIO_OP(result, value),
+	                                             atomic)) != result)
 		result = new_result;
 	return new_result;
 }
 
-PUBLIC NONNULL((1)) u16 KCALL
-FUNC(w)(struct vio_args *__restrict args, pos_t addr, u16 value, bool atomic) {
-	struct vm_datablock_type_vio const *type = args->va_type;
+INTERN NONNULL((1)) u16 CC
+FUNC(w)(struct vio_args *__restrict args, vio_addr_t addr, u16 value, bool atomic) {
+	struct vio_operators const *ops = args->va_ops;
 	u16 result, new_result;
-	if (type->COMPONENT.f_word && ((uintptr_t)addr & 1) == 0)
-		return (*type->COMPONENT.f_word)(args, addr, value, atomic);
-	result = vio_readw(args, addr);
-	while ((new_result = vio_cmpxch_or_writew(args, addr, result, DEFINE_VIO_OP(result, value), atomic)) != result)
+	if (ops->COMPONENT.f_word && ((uintptr_t)addr & 1) == 0)
+		return (*ops->COMPONENT.f_word)(args, addr, value, atomic);
+	result = libvio_readw(args, addr);
+	while ((new_result = libvio_cmpxch_or_writew(args, addr, result,
+	                                             DEFINE_VIO_OP(result, value),
+	                                             atomic)) != result)
 		result = new_result;
 	return new_result;
 }
 
-PUBLIC NONNULL((1)) u32 KCALL
-FUNC(l)(struct vio_args *__restrict args, pos_t addr, u32 value, bool atomic) {
-	struct vm_datablock_type_vio const *type = args->va_type;
+INTERN NONNULL((1)) u32 CC
+FUNC(l)(struct vio_args *__restrict args, vio_addr_t addr, u32 value, bool atomic) {
+	struct vio_operators const *ops = args->va_ops;
 	u32 result, new_result;
-	if (type->COMPONENT.f_dword && ((uintptr_t)addr & 3) == 0)
-		return (*type->COMPONENT.f_dword)(args, addr, value, atomic);
-	result = vio_readl(args, addr);
-	while ((new_result = vio_cmpxch_or_writel(args, addr, result, DEFINE_VIO_OP(result, value), atomic)) != result)
+	if (ops->COMPONENT.f_dword && ((uintptr_t)addr & 3) == 0)
+		return (*ops->COMPONENT.f_dword)(args, addr, value, atomic);
+	result = libvio_readl(args, addr);
+	while ((new_result = libvio_cmpxch_or_writel(args, addr, result,
+	                                             DEFINE_VIO_OP(result, value),
+	                                             atomic)) != result)
 		result = new_result;
 	return new_result;
 }
 
 #ifdef LIBVIO_CONFIG_HAVE_QWORD
-PUBLIC NONNULL((1)) u64 KCALL
-FUNC(q)(struct vio_args *__restrict args, pos_t addr, u64 value, bool atomic) {
-	struct vm_datablock_type_vio const *type = args->va_type;
+INTERN NONNULL((1)) u64 CC
+FUNC(q)(struct vio_args *__restrict args, vio_addr_t addr, u64 value, bool atomic) {
+	struct vio_operators const *ops = args->va_ops;
 	u64 result, new_result;
-	if (type->COMPONENT.f_qword && ((uintptr_t)addr & 7) == 0)
-		return (*type->COMPONENT.f_qword)(args, addr, value, atomic);
-	result = vio_readq(args, addr);
-	while ((new_result = vio_cmpxch_or_writeq(args, addr, result, DEFINE_VIO_OP(result, value), atomic)) != result)
+	if (ops->COMPONENT.f_qword && ((uintptr_t)addr & 7) == 0)
+		return (*ops->COMPONENT.f_qword)(args, addr, value, atomic);
+	result = libvio_readq(args, addr);
+	while ((new_result = libvio_cmpxch_or_writeq(args, addr, result,
+	                                             DEFINE_VIO_OP(result, value),
+	                                             atomic)) != result)
 		result = new_result;
 	return new_result;
 }

@@ -22,12 +22,12 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/vio.h>
+#include <libvio/api.h>
 
-#ifndef CONFIG_VIO
+#ifndef LIBVIO_CONFIG_ENABLED
 #undef CONFIG_NO_USERKERN_SEGMENT
 #define CONFIG_NO_USERKERN_SEGMENT 1
-#endif /* !CONFIG_VIO */
+#endif /* !LIBVIO_CONFIG_ENABLED */
 
 #ifndef CONFIG_NO_USERKERN_SEGMENT
 #include <sched/arch/userkern.h>
@@ -44,12 +44,12 @@
 DECL_BEGIN
 
 /* VIO bindings for the kernel-reserve segment of user-space VMs */
-DATDEF struct vm_datablock_type_vio userkern_segment_vio;
+DATDEF struct vio_operators userkern_segment_vio;
 DATDEF struct vm_datablock userkern_segment_block;
 DATDEF struct vm_datapart userkern_segment_part;
 
 #ifdef __ARCH_HAVE_COMPAT
-DATDEF struct vm_datablock_type_vio userkern_segment_vio_compat;
+DATDEF struct vio_operators userkern_segment_vio_compat;
 DATDEF struct vm_datablock userkern_segment_block_compat;
 DATDEF struct vm_datapart userkern_segment_part_compat;
 #endif /* __ARCH_HAVE_COMPAT */

@@ -143,7 +143,7 @@ typedef __major_t major_t;
 #ifndef __off_t_defined
 #define __off_t_defined 1
 #ifdef __KERNEL__
-__HYBRID_ALTINT_TYPEDEF(__FS_TYPE(off), off_t, false); /* File/device offset */
+__HYBRID_ALTINT_TYPEDEF(__off64_t, off_t, false); /* File/device offset */
 #else /* __KERNEL__ */
 typedef __FS_TYPE(off) off_t; /* File/device offset */
 #endif /* !__KERNEL__ */
@@ -152,7 +152,7 @@ typedef __FS_TYPE(off) off_t; /* File/device offset */
 #ifndef __pos_t_defined
 #define __pos_t_defined 1
 #ifdef __KERNEL__
-__HYBRID_ALTINT_TYPEDEF(__FS_TYPE(pos), pos_t, false); /* File/device position */
+__HYBRID_ALTINT_TYPEDEF(__pos64_t, pos_t, false); /* File/device position */
 #else /* __KERNEL__ */
 typedef __FS_TYPE(pos) pos_t; /* File/device position */
 #endif /* !__KERNEL__ */
@@ -161,7 +161,7 @@ typedef __FS_TYPE(pos) pos_t; /* File/device position */
 #ifndef __ino_t_defined
 #define __ino_t_defined 1
 #ifdef __KERNEL__
-__HYBRID_ALTINT_TYPEDEF(__FS_TYPE(ino), ino_t, false); /* INode number */
+__HYBRID_ALTINT_TYPEDEF(__ino64_t, ino_t, false); /* INode number */
 #else /* __KERNEL__ */
 typedef __FS_TYPE(ino) ino_t; /* INode number */
 #endif /* !__KERNEL__ */

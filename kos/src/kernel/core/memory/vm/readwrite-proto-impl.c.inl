@@ -25,11 +25,12 @@
 #endif
 
 #include <kernel/printk.h>
-#include <kernel/vio.h>
 #include <kernel/vm/phys.h>
 #include <sched/pid.h>
 
 #include <hybrid/atomic.h>
+
+#include <libvio/access.h>
 
 #if (defined(COPY_USER2KERNEL) + defined(COPY_KERNEL2USER) + defined(VM_MEMSET_IMPL)) != 1
 #error "Must #define COPY_USER2KERNEL or COPY_KERNEL2USER or VM_MEMSET_IMPL before #include-ing this file"
@@ -108,9 +109,9 @@ again_lookup_node_already_locked:
 		node = vm_getnodeofpageid(self, pageid);
 		if unlikely(!node || !node->vn_part) {
 			sync_endread(self);
-#ifdef CONFIG_VIO
+#ifdef LIBVIO_CONFIG_ENABLED
 throw_segfault:
-#endif /* CONFIG_VIO */
+#endif /* LIBVIO_CONFIG_ENABLED */
 #ifdef IS_WRITING
 			THROW(E_SEGFAULT_UNMAPPED, addr,
 			      E_SEGFAULT_CONTEXT_FAULT | E_SEGFAULT_CONTEXT_WRITING);
@@ -132,7 +133,7 @@ throw_segfault:
 			transfer_bytes = num_bytes;
 
 		assert(vm_node_getpagecount(node) == vm_datapart_numvpages(part));
-#ifdef CONFIG_VIO
+#ifdef LIBVIO_CONFIG_ENABLED
 		/* Check for a VIO memory segment */
 		if (part->dp_state == VM_DATAPART_STATE_VIOPRT) {
 			uintptr_half_t nodeprot;
@@ -149,24 +150,23 @@ throw_segfault:
 				RETHROW();
 			}
 			args.va_block = incref(part->dp_block);
-			args.va_access_partoff = ((pos_t)(vpage_offset +
-			                                       vm_datapart_mindpage(part))
-			                          << VM_DATABLOCK_ADDRSHIFT(args.va_block));
+			args.va_acmap_offset = ((pos_t)(vpage_offset + vm_datapart_mindpage(part))
+			                        << VM_DATABLOCK_ADDRSHIFT(args.va_block));
 			/* Figure out the staring VIO address that is being accessed. */
 			vio_addr = ((pos_t)vm_datapart_mindpage(part) << VM_DATABLOCK_ADDRSHIFT(args.va_block)) +
 			            (pos_t)((byte_t *)addr - (byte_t *)vm_node_getmin(node));
 
 			sync_endread(part);
-			args.va_type = args.va_block->db_vio;
-			if unlikely(!args.va_type) {
+			args.va_ops = args.va_block->db_vio;
+			if unlikely(!args.va_ops) {
 vio_decref_and_throw_segfault:
 				decref_unlikely(args.va_block);
 				decref_unlikely(part);
 				goto throw_segfault;
 			}
-			args.va_part          = part; /* Inherit reference */
-			args.va_access_pageid = pageid;
-			args.va_state         = NULL;
+			args.va_part       = part; /* Inherit reference */
+			args.va_acmap_page = (void *)FLOOR_ALIGN((uintptr_t)addr, PAGESIZE);
+			args.va_state      = NULL;
 			/* Make sure that the segment was mapped with the proper protection */
 #ifdef IS_READING
 			if unlikely(!force_accessible && !(nodeprot & VM_PROT_READ))
@@ -187,7 +187,7 @@ vio_decref_and_throw_segfault:
 #endif /* !IS_READING */
 			goto done_part_transfer;
 		}
-#endif /* CONFIG_VIO */
+#endif /* LIBVIO_CONFIG_ENABLED */
 		sync_endread(self);
 		TRY {
 #ifdef IS_WRITING
@@ -550,9 +550,9 @@ do_transfer_ram:
 		{
 			decref_unlikely(part);
 		}
-#ifdef CONFIG_VIO
+#ifdef LIBVIO_CONFIG_ENABLED
 done_part_transfer:
-#endif /* CONFIG_VIO */
+#endif /* LIBVIO_CONFIG_ENABLED */
 		assert(transfer_bytes <= num_bytes);
 		if (transfer_bytes >= num_bytes)
 			return;

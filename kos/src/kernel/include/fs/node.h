@@ -31,6 +31,8 @@
 
 #include <kos/io.h>
 
+#include <libvio/api.h>
+
 #ifdef __cplusplus
 #include <kernel/except.h>
 
@@ -266,14 +268,14 @@ struct inode_type {
 		                           pos_t file_position)
 				THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...);
 
-#ifdef CONFIG_VIO
+#ifdef LIBVIO_CONFIG_ENABLED
 		/* [0..1][locked(READ(self) / WRITE(self))]
 		 * VIO file data access interface.
 		 * Since INodes are derived from data blocks, they can also implement the VIO
 		 * interface, with this pointer being usable as hook for implementing file I/O,
 		 * as well as memory mappings through virtual I/O callbacks. */
-		struct vm_datablock_type_vio *f_vio;
-#endif /* CONFIG_VIO */
+		struct vio_operators *f_vio;
+#endif /* LIBVIO_CONFIG_ENABLED */
 	} it_file;
 
 	union {

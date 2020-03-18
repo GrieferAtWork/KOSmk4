@@ -46,6 +46,8 @@
 #include <assert.h>
 #include <string.h>
 
+#include <libvio/api.h>
+
 #include "../corebase.h"
 #include "vm-nodeapi.h"
 
@@ -1933,13 +1935,13 @@ again:
 	decref_nokill(block); /* self->dp_block */
 	assert(block->db_pageshift <= PAGESHIFT);
 	self->dp_block = incref(&vm_datablock_anonymous_zero_vec[block->db_pageshift]);
-#ifdef CONFIG_VIO
+#ifdef LIBVIO_CONFIG_ENABLED
 	/* Unset VIO parts! */
 	assert((self->dp_state == VM_DATAPART_STATE_VIOPRT) ==
 	       (block->db_vio != NULL));
 	if (self->dp_state == VM_DATAPART_STATE_VIOPRT)
 		self->dp_state = VM_DATAPART_STATE_ABSENT;
-#endif /* CONFIG_VIO */
+#endif /* LIBVIO_CONFIG_ENABLED */
 	self->dp_flags &= ~(VM_DATAPART_FLAG_CHANGED | VM_DATAPART_FLAG_TRKCHNG);
 	if (self->dp_tree.a_min) {
 		if (self->dp_tree.a_max)
@@ -2205,10 +2207,10 @@ vm_datapart_sync(struct vm_datapart *__restrict self,
 	struct vm_datablock *block;
 	size_t result = 0;
 	struct pointer_set vms;
-#ifdef CONFIG_VIO
+#ifdef LIBVIO_CONFIG_ENABLED
 	if unlikely(ATOMIC_READ(self->dp_state) == VM_DATAPART_STATE_VIOPRT)
 		goto done_return_now;
-#endif /* CONFIG_VIO */
+#endif /* LIBVIO_CONFIG_ENABLED */
 	pointer_set_init(&vms);
 again_lock_datapart:
 	TRY {
@@ -2401,9 +2403,9 @@ done_unlock:
 		RETHROW();
 	}
 	vm_set_fini(&vms);
-#ifdef CONFIG_VIO
+#ifdef LIBVIO_CONFIG_ENABLED
 done_return_now:
-#endif /* CONFIG_VIO */
+#endif /* LIBVIO_CONFIG_ENABLED */
 	return result;
 }
 
@@ -2556,10 +2558,10 @@ vm_datablock_createpart(struct vm_datablock *__restrict self,
 #else /* VM_DATAPART_STATE_ABSENT != 0 */
 	assert(result->dp_state == VM_DATAPART_STATE_ABSENT);
 #endif /* VM_DATAPART_STATE_ABSENT == 0 */
-#ifdef CONFIG_VIO
+#ifdef LIBVIO_CONFIG_ENABLED
 	if (self->db_vio)
 		result->dp_state = VM_DATAPART_STATE_VIOPRT;
-#endif /* CONFIG_VIO */
+#endif /* LIBVIO_CONFIG_ENABLED */
 	result->dp_block = incref(self);
 	if (self->db_type->dt_initpart)
 		(*self->db_type->dt_initpart)(result);
@@ -2782,10 +2784,10 @@ set_inline_ppp:
 #else /* VM_DATAPART_FLAG_NORMAL != 0 */
 	assert(result->dp_state == VM_DATAPART_STATE_ABSENT);
 #endif /* VM_DATAPART_FLAG_NORMAL == 0 */
-#ifdef CONFIG_VIO
+#ifdef LIBVIO_CONFIG_ENABLED
 	if (self->db_vio)
 		result->dp_state = VM_DATAPART_STATE_VIOPRT;
-#endif /* CONFIG_VIO */
+#endif /* LIBVIO_CONFIG_ENABLED */
 	if (self->db_type->dt_initpart)
 		(*self->db_type->dt_initpart)(result);
 	/* Finally, insert the new part into the data tree. */
@@ -3502,10 +3504,10 @@ again:
 			unsigned int addrshift;
 			if ((part = iter->vn_part) == NULL)
 				goto no_changes_in_node;
-#ifdef CONFIG_VIO
+#ifdef LIBVIO_CONFIG_ENABLED
 			if unlikely(ATOMIC_READ(part->dp_state) == VM_DATAPART_STATE_VIOPRT)
 				goto no_changes_in_node;
-#endif /* CONFIG_VIO */
+#endif /* LIBVIO_CONFIG_ENABLED */
 			if (!(ATOMIC_READ(part->dp_flags) & VM_DATAPART_FLAG_CHANGED))
 				goto no_changes_in_node;
 			node_minpageid = vm_node_getminpageid(iter);

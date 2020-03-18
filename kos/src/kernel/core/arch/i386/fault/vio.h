@@ -22,10 +22,10 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/vio.h>
+#include <libvio/access.h>
 #include <kernel/vm.h>
 
-#ifdef CONFIG_VIO
+#ifdef LIBVIO_CONFIG_ENABLED
 DECL_BEGIN
 
 typedef struct {
@@ -40,6 +40,6 @@ INTDEF struct icpustate *
 NOTHROW(FCALL x86_vio_main)(/*inherit(always)*/ vio_main_args_t *__restrict args, uintptr_t cr2);
 
 DECL_END
-#endif /* CONFIG_VIO */
+#endif /* LIBVIO_CONFIG_ENABLED */
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_FAULT_VIO_H */

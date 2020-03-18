@@ -255,10 +255,10 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		struct vm_datapart *parts;
 		memset(&st, 0, sizeof(st));
 		st.ds_struct_size = sizeof(st);
-#ifdef CONFIG_VIO
+#ifdef LIBVIO_CONFIG_ENABLED
 		if (self->db_vio)
 			st.ds_features |= HOP_DATABLOCK_STAT_FEATURE_ISVIO;
-#endif /* CONFIG_VIO */
+#endif /* LIBVIO_CONFIG_ENABLED */
 		if (self->db_type->dt_initpart)
 			st.ds_features |= HOP_DATABLOCK_STAT_FEATURE_INIT;
 		if (self->db_type->dt_loadpart)

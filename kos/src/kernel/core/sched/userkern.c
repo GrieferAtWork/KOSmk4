@@ -29,7 +29,6 @@
 #include <kernel/paging.h>
 #include <kernel/printk.h>
 #include <kernel/syscall.h>
-#include <kernel/vio.h>
 #include <kernel/vm.h>
 #include <sched/cred.h>
 #include <sched/pertask.h>
@@ -41,6 +40,8 @@
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/ukern.h>
+
+#include <libvio/vio.h>
 
 #ifdef __ARCH_HAVE_COMPAT
 #include <hybrid/byteorder.h>
@@ -63,12 +64,12 @@ INTDEF NONNULL((1)) bool KCALL userkern_set_arch_specific_field_compat(struct vi
 
 #ifdef __INTELLISENSE__
 #if __SIZEOF_POINTER__ == 4 || defined(__ARCH_HAVE_COMPAT)
-PRIVATE NONNULL((1)) u32 KCALL userkern_segment_readl(struct vio_args *__restrict args, pos_t addr);
-PRIVATE NONNULL((1)) void KCALL userkern_segment_writel(struct vio_args *__restrict args, pos_t addr, u32 value);
+PRIVATE NONNULL((1)) u32 KCALL userkern_segment_readl(struct vio_args *__restrict args, vio_addr_t addr);
+PRIVATE NONNULL((1)) void KCALL userkern_segment_writel(struct vio_args *__restrict args, vio_addr_t addr, u32 value);
 #endif /* __SIZEOF_POINTER__ == 4 || __ARCH_HAVE_COMPAT */
 #if __SIZEOF_POINTER__ == 8 || defined(__ARCH_HAVE_COMPAT)
-PRIVATE NONNULL((1)) u64 KCALL userkern_segment_readq(struct vio_args *__restrict args, pos_t addr);
-PRIVATE NONNULL((1)) void KCALL userkern_segment_writeq(struct vio_args *__restrict args, pos_t addr, u64 value);
+PRIVATE NONNULL((1)) u64 KCALL userkern_segment_readq(struct vio_args *__restrict args, vio_addr_t addr);
+PRIVATE NONNULL((1)) void KCALL userkern_segment_writeq(struct vio_args *__restrict args, vio_addr_t addr, u64 value);
 #endif /* __SIZEOF_POINTER__ == 8 || __ARCH_HAVE_COMPAT */
 #else /* __INTELLISENSE__ */
 DECL_END
@@ -107,10 +108,9 @@ DECL_BEGIN
 #endif /* !__INTELLISENSE__ */
 
 
-PRIVATE struct icpustate *KCALL
+PRIVATE void KCALL
 userkern_segment_call(struct vio_args *__restrict args,
-                      struct icpustate *__restrict regs,
-                      pos_t addr) {
+                      vio_addr_t addr) {
 	uintptr_t reladdr;
 	uintptr_t base = get_userkern_base();
 	if (!ADDR_ISKERN(base))
@@ -124,15 +124,13 @@ userkern_segment_call(struct vio_args *__restrict args,
 	if (!USERKERN_SYSCALL_ISVALID(reladdr))
 		goto err_invalid_addr;
 	/* System call invocation. */
-	regs = syscall_emulate_callback(regs,
-	                                USERKERN_SYSCALL_DECODE(reladdr),
-	                                (reladdr & USERKERN_SYSCALL_EXCEPTBIT) != 0);
-	return regs;
+	args->va_state = syscall_emulate_callback(args->va_state,
+	                                          USERKERN_SYSCALL_DECODE(reladdr),
+	                                          (reladdr & USERKERN_SYSCALL_EXCEPTBIT) != 0);
+	return;
 err_invalid_addr:
-	addr -= (pos_t)args->va_access_partoff;
-	addr += (pos_t)PAGEID_DECODE(args->va_access_pageid);
 	THROW(E_SEGFAULT_UNMAPPED,
-	      (uintptr_t)addr,
+	      vio_args_faultaddr(args, addr),
 	      E_SEGFAULT_CONTEXT_FAULT |
 	      E_SEGFAULT_CONTEXT_USERCODE);
 }
@@ -159,18 +157,17 @@ err_invalid_addr:
 #endif /* !LIBVIO_CONFIG_HAVE_QWORD */
 
 /* VIO bindings for the kernel-reserve segment of user-space VMs */
-PUBLIC struct vm_datablock_type_vio userkern_segment_vio = {
-	/* .dtv_read   = */ INIT_OPERATION_PTR(read),
-	/* .dtv_write  = */ INIT_OPERATION_PTR(write),
-	/* .dtv_cmpxch = */ VM_DATABLOCK_TYPE_VIO_INIT_CMPXCH(NULL, NULL, NULL, NULL, NULL),
-	/* .dtv_xch    = */ VM_DATABLOCK_TYPE_VIO_INIT_XCH(NULL, NULL, NULL, NULL),
-	/* .dtv_add    = */ VM_DATABLOCK_TYPE_VIO_INIT_ADD(NULL, NULL, NULL, NULL),
-	/* .dtv_sub    = */ VM_DATABLOCK_TYPE_VIO_INIT_SUB(NULL, NULL, NULL, NULL),
-	/* .dtv_and    = */ VM_DATABLOCK_TYPE_VIO_INIT_AND(NULL, NULL, NULL, NULL),
-	/* .dtv_or     = */ VM_DATABLOCK_TYPE_VIO_INIT_OR(NULL, NULL, NULL, NULL),
-	/* .dtv_xor    = */ VM_DATABLOCK_TYPE_VIO_INIT_XOR(NULL, NULL, NULL, NULL),
-	/* .dtv_call   = */ &userkern_segment_call
-};
+PUBLIC struct vio_operators userkern_segment_vio =
+VIO_OPERATORS_INIT_EX(INIT_OPERATION_PTR(read),
+                      INIT_OPERATION_PTR(write),
+                      VIO_CALLBACK_INIT_CMPXCH(NULL, NULL, NULL, NULL, NULL),
+                      VIO_CALLBACK_INIT_XCH(NULL, NULL, NULL, NULL),
+                      VIO_CALLBACK_INIT_ADD(NULL, NULL, NULL, NULL),
+                      VIO_CALLBACK_INIT_SUB(NULL, NULL, NULL, NULL),
+                      VIO_CALLBACK_INIT_AND(NULL, NULL, NULL, NULL),
+                      VIO_CALLBACK_INIT_OR(NULL, NULL, NULL, NULL),
+                      VIO_CALLBACK_INIT_XOR(NULL, NULL, NULL, NULL),
+                      &userkern_segment_call);
 #undef INIT_OPERATION_PTR_NULL
 #undef INIT_OPERATION_PTR
 
@@ -262,10 +259,9 @@ PUBLIC struct vm_datablock userkern_segment_block = {
 
 
 
-PRIVATE struct icpustate *KCALL
+PRIVATE void KCALL
 userkern_segment_call_compat(struct vio_args *__restrict args,
-                             struct icpustate *__restrict regs,
-                             pos_t addr) {
+                             vio_addr_t addr) {
 	uintptr_t reladdr;
 	uintptr_t base = get_compat_userkern_base();
 	if (!COMPAT_ADDR_ISKERN(base))
@@ -279,31 +275,28 @@ userkern_segment_call_compat(struct vio_args *__restrict args,
 	if (!USERKERN_SYSCALL_ISVALID(reladdr))
 		goto err_invalid_addr;
 	/* System call invocation. */
-	regs = syscall_emulate_callback_compat(regs,
-	                                       USERKERN_SYSCALL_DECODE(reladdr),
-	                                       (reladdr & USERKERN_SYSCALL_EXCEPTBIT) != 0);
-	return regs;
+	args->va_state = syscall_emulate_callback_compat(args->va_state,
+	                                                 USERKERN_SYSCALL_DECODE(reladdr),
+	                                                 (reladdr & USERKERN_SYSCALL_EXCEPTBIT) != 0);
+	return;
 err_invalid_addr:
-	addr -= (pos_t)args->va_access_partoff;
-	addr += (pos_t)PAGEID_DECODE(args->va_access_pageid);
 	THROW(E_SEGFAULT_UNMAPPED,
-	      (uintptr_t)addr,
+	      vio_args_faultaddr(args, addr),
 	      E_SEGFAULT_CONTEXT_FAULT |
 	      E_SEGFAULT_CONTEXT_USERCODE);
 }
 
-PUBLIC struct vm_datablock_type_vio userkern_segment_vio_compat = {
-	/* .dtv_read   = */ INIT_OPERATION_PTR(read),
-	/* .dtv_write  = */ INIT_OPERATION_PTR(write),
-	/* .dtv_cmpxch = */ VM_DATABLOCK_TYPE_VIO_INIT_CMPXCH(NULL, NULL, NULL, NULL, NULL),
-	/* .dtv_xch    = */ VM_DATABLOCK_TYPE_VIO_INIT_XCH(NULL, NULL, NULL, NULL),
-	/* .dtv_add    = */ VM_DATABLOCK_TYPE_VIO_INIT_ADD(NULL, NULL, NULL, NULL),
-	/* .dtv_sub    = */ VM_DATABLOCK_TYPE_VIO_INIT_SUB(NULL, NULL, NULL, NULL),
-	/* .dtv_and    = */ VM_DATABLOCK_TYPE_VIO_INIT_AND(NULL, NULL, NULL, NULL),
-	/* .dtv_or     = */ VM_DATABLOCK_TYPE_VIO_INIT_OR(NULL, NULL, NULL, NULL),
-	/* .dtv_xor    = */ VM_DATABLOCK_TYPE_VIO_INIT_XOR(NULL, NULL, NULL, NULL),
-	/* .dtv_call   = */ &userkern_segment_call_compat
-};
+PUBLIC struct vio_operators userkern_segment_vio_compat =
+VIO_OPERATORS_INIT_EX(INIT_OPERATION_PTR(read),
+                      INIT_OPERATION_PTR(write),
+                      VIO_CALLBACK_INIT_CMPXCH(NULL, NULL, NULL, NULL, NULL),
+                      VIO_CALLBACK_INIT_XCH(NULL, NULL, NULL, NULL),
+                      VIO_CALLBACK_INIT_ADD(NULL, NULL, NULL, NULL),
+                      VIO_CALLBACK_INIT_SUB(NULL, NULL, NULL, NULL),
+                      VIO_CALLBACK_INIT_AND(NULL, NULL, NULL, NULL),
+                      VIO_CALLBACK_INIT_OR(NULL, NULL, NULL, NULL),
+                      VIO_CALLBACK_INIT_XOR(NULL, NULL, NULL, NULL),
+                      &userkern_segment_call_compat);
 #undef INIT_OPERATION_PTR_NULL
 #undef INIT_OPERATION_PTR
 

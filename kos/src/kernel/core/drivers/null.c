@@ -28,7 +28,6 @@
 #include <kernel/rand.h>
 #include <kernel/syslog.h>
 #include <kernel/types.h>
-#include <kernel/vio.h>
 #include <kernel/vm.h>
 #include <kernel/vm/phys.h>
 #include <sched/cred.h>
@@ -42,6 +41,8 @@
 
 #include <stddef.h>
 #include <string.h>
+
+#include <libvio/vio.h>
 
 DECL_BEGIN
 
@@ -294,43 +295,40 @@ kmsg_poll(struct character_device *__restrict UNUSED(self),
 
 
 
-#ifdef CONFIG_VIO
-PRIVATE u8 KCALL port_rdb(struct vio_args *__restrict UNUSED(args), pos_t addr) {
+#ifdef LIBVIO_CONFIG_ENABLED
+PRIVATE u8 KCALL
+port_rdb(struct vio_args *__restrict UNUSED(args), vio_addr_t addr) {
 	return inb((port_t)addr);
 }
 
-PRIVATE u16 KCALL port_rdw(struct vio_args *__restrict UNUSED(args), pos_t addr) {
+PRIVATE u16 KCALL
+port_rdw(struct vio_args *__restrict UNUSED(args), vio_addr_t addr) {
 	return inw((port_t)addr);
 }
 
-PRIVATE u32 KCALL port_rdl(struct vio_args *__restrict UNUSED(args), pos_t addr) {
+PRIVATE u32 KCALL
+port_rdl(struct vio_args *__restrict UNUSED(args), vio_addr_t addr) {
 	return inl((port_t)addr);
 }
 
-PRIVATE void KCALL port_wrb(struct vio_args *__restrict UNUSED(args), pos_t addr, u8 value) {
+PRIVATE void KCALL
+port_wrb(struct vio_args *__restrict UNUSED(args), vio_addr_t addr, u8 value) {
 	outb((port_t)addr, value);
 }
 
-PRIVATE void KCALL port_wrw(struct vio_args *__restrict UNUSED(args), pos_t addr, u16 value) {
+PRIVATE void KCALL
+port_wrw(struct vio_args *__restrict UNUSED(args), vio_addr_t addr, u16 value) {
 	outw((port_t)addr, value);
 }
 
-PRIVATE void KCALL port_wrl(struct vio_args *__restrict UNUSED(args), pos_t addr, u32 value) {
+PRIVATE void KCALL
+port_wrl(struct vio_args *__restrict UNUSED(args), vio_addr_t addr, u32 value) {
 	outl((port_t)addr, value);
 }
 
-PRIVATE struct vm_datablock_type_vio const port_vio = {
-	.dtv_read = {
-		.f_byte  = &port_rdb,
-		.f_word  = &port_rdw,
-		.f_dword = &port_rdl,
-	},
-	.dtv_write = {
-		.f_byte  = &port_wrb,
-		.f_word  = &port_wrw,
-		.f_dword = &port_wrl,
-	}
-};
+PRIVATE struct vio_operators const port_vio =
+VIO_OPERATORS_INIT(VIO_CALLBACK_INIT_READ(&port_rdb, &port_rdw, &port_rdl, NULL),
+                   VIO_CALLBACK_INIT_WRITE(&port_wrb, &port_wrw, &port_wrl, NULL));
 PRIVATE struct vm_datablock port_datablock = VM_DATABLOCK_INIT_VIO(&port_vio);
 
 #define PORT_MMAP_POINTER (&port_mmap)
@@ -343,28 +341,32 @@ port_mmap(struct character_device *__restrict UNUSED(self),
 }
 
 
-PRIVATE u8 KCALL random_rdb(struct vio_args *__restrict UNUSED(args), pos_t UNUSED(addr)) {
+PRIVATE u8 KCALL
+random_rdb(struct vio_args *__restrict UNUSED(args), pos_t UNUSED(addr)) {
 	return krand8_nondeterministic();
 }
 
-PRIVATE u16 KCALL random_rdw(struct vio_args *__restrict UNUSED(args), pos_t UNUSED(addr)) {
+PRIVATE u16 KCALL
+random_rdw(struct vio_args *__restrict UNUSED(args), pos_t UNUSED(addr)) {
 	return krand16_nondeterministic();
 }
 
-PRIVATE u32 KCALL random_rdl(struct vio_args *__restrict UNUSED(args), pos_t UNUSED(addr)) {
+PRIVATE u32 KCALL
+random_rdl(struct vio_args *__restrict UNUSED(args), pos_t UNUSED(addr)) {
 	return krand32_nondeterministic();
 }
 
 #ifdef LIBVIO_CONFIG_HAVE_QWORD
-PRIVATE u64 KCALL random_rdq(struct vio_args *__restrict UNUSED(args), pos_t UNUSED(addr)) {
+PRIVATE u64 KCALL
+random_rdq(struct vio_args *__restrict UNUSED(args), pos_t UNUSED(addr)) {
 	return ((u64)krand32_nondeterministic()) |
 	       ((u64)krand32_nondeterministic() << 32);
 }
 #endif /* LIBVIO_CONFIG_HAVE_QWORD */
 
-PRIVATE struct vm_datablock_type_vio const random_vio = {
-	.dtv_read  = VIO_CALLBACK_INIT(&random_rdb, &random_rdw, &random_rdl, &random_rdq),
-};
+PRIVATE struct vio_operators const random_vio =
+VIO_OPERATORS_INIT(VIO_CALLBACK_INIT_READ(&random_rdb, &random_rdw, &random_rdl, &random_rdq),
+                   VIO_CALLBACK_INIT_WRITE(NULL, NULL, NULL, NULL));
 PRIVATE struct vm_datablock random_datablock = VM_DATABLOCK_INIT_VIO(&random_vio);
 
 #define RANDOM_MMAP_POINTER (&random_mmap)
@@ -375,28 +377,31 @@ random_mmap(struct character_device *__restrict UNUSED(self),
 	return incref(&random_datablock);
 }
 
-PRIVATE u8 KCALL urandom_rdb(struct vio_args *__restrict UNUSED(args), pos_t UNUSED(addr)) {
+PRIVATE u8 KCALL
+urandom_rdb(struct vio_args *__restrict UNUSED(args), pos_t UNUSED(addr)) {
 	return (u8)krand32();
 }
 
-PRIVATE u16 KCALL urandom_rdw(struct vio_args *__restrict UNUSED(args), pos_t UNUSED(addr)) {
+PRIVATE u16 KCALL
+urandom_rdw(struct vio_args *__restrict UNUSED(args), pos_t UNUSED(addr)) {
 	return (u16)krand32();
 }
 
-PRIVATE u32 KCALL urandom_rdl(struct vio_args *__restrict UNUSED(args), pos_t UNUSED(addr)) {
+PRIVATE u32 KCALL
+urandom_rdl(struct vio_args *__restrict UNUSED(args), pos_t UNUSED(addr)) {
 	return krand32();
 }
 
 #ifdef LIBVIO_CONFIG_HAVE_QWORD
-PRIVATE u64 KCALL urandom_rdq(struct vio_args *__restrict UNUSED(args), pos_t UNUSED(addr)) {
+PRIVATE u64 KCALL
+urandom_rdq(struct vio_args *__restrict UNUSED(args), pos_t UNUSED(addr)) {
 	return krand64();
 }
 #endif /* LIBVIO_CONFIG_HAVE_QWORD */
 
-PRIVATE struct vm_datablock_type_vio const urandom_vio = {
-	.dtv_read  = VIO_CALLBACK_INIT(&urandom_rdb, &urandom_rdw, &urandom_rdl, &urandom_rdq),
-};
-
+PRIVATE struct vio_operators const urandom_vio =
+VIO_OPERATORS_INIT(VIO_CALLBACK_INIT_READ(&urandom_rdb, &urandom_rdw, &urandom_rdl, &urandom_rdq),
+                   VIO_CALLBACK_INIT_WRITE(NULL, NULL, NULL, NULL));
 PRIVATE struct vm_datablock urandom_datablock = VM_DATABLOCK_INIT_VIO(&urandom_vio);
 
 #define URANDOM_MMAP_POINTER (&urandom_mmap)
@@ -407,11 +412,11 @@ urandom_mmap(struct character_device *__restrict UNUSED(self),
 	return incref(&urandom_datablock);
 }
 
-#else /* CONFIG_VIO */
+#else /* LIBVIO_CONFIG_ENABLED */
 #define PORT_MMAP_POINTER    NULL
 #define RANDOM_MMAP_POINTER  NULL
 #define URANDOM_MMAP_POINTER NULL
-#endif /* !CONFIG_VIO */
+#endif /* !LIBVIO_CONFIG_ENABLED */
 
 
 

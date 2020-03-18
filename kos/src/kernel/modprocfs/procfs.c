@@ -28,6 +28,8 @@
 #include <fs/node.h>
 #include <kernel/driver.h>
 
+#include <libvio/api.h>
+
 DECL_BEGIN
 
 INTERN struct superblock_type ProcFS_Type = {
@@ -52,9 +54,9 @@ INTERN struct superblock ProcFS = {
 				/* .db_refcnt = */ 2, /* +1: devfs, +1: devfs_type.st_singleton */
 				/* .db_lock   = */ RWLOCK_INIT,
 				/* .db_type   = */ &inode_datablock_type,
-#ifdef CONFIG_VIO
+#ifdef LIBVIO_CONFIG_ENABLED
 				/* .db_vio    = */ NULL,
-#endif /* CONFIG_VIO */
+#endif /* LIBVIO_CONFIG_ENABLED */
 				/* .db_parts  = */ NULL,
 				VM_DATABLOCK_INIT_PAGEINFO(0)
 			},

@@ -23,6 +23,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/arch/paging.h> /* `pagedir_pushval_t' */
+#include <kernel/memory.h>      /* page2addr() */
 #include <kernel/paging.h>      /* `pagedir_push_mapone()' */
 #include <kernel/types.h>
 #include <sched/pertask.h> /* PERTASK_GET() */
@@ -30,6 +31,7 @@
 #include <hybrid/__assert.h>
 #include <hybrid/__unaligned.h>
 
+#include <asm/pageid.h>        /* __ARCH_PAGEID_TYPE */
 #include <kos/kernel/paging.h> /* `PHYS_IS_IDENTITY()' */
 
 /* Helper functions for accessing physical memory */
@@ -196,12 +198,16 @@ FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL vm_copypagetophys_nopf)(PAGEDIR_PAGE
  * NOTE: Because this page is unique for each thread, the user is not
  *       required to acquire a lock to the kernel VM when wishing to
  *       map something at this location! */
-DATDEF ATTR_PERTASK pageid_t this_trampoline_page;
+DATDEF ATTR_PERTASK __ARCH_PAGEID_TYPE this_trampoline_page;
 
 /* TODO: Go through all uses of `THIS_TRAMPOLINE_PAGE' and add
  *       optimizations for supporting `PHYS_IS_IDENTITY()' */
 #define THIS_TRAMPOLINE_PAGE PERTASK_GET(this_trampoline_page)
-#define THIS_TRAMPOLINE_BASE ((byte_t *)PAGEID_DECODE_KERNEL(THIS_TRAMPOLINE_PAGE))
+#ifdef __ARCH_PAGEID_DECODE_KERNEL
+#define THIS_TRAMPOLINE_BASE ((byte_t *)__ARCH_PAGEID_DECODE_KERNEL(THIS_TRAMPOLINE_PAGE))
+#else /* __ARCH_PAGEID_DECODE_KERNEL */
+#define THIS_TRAMPOLINE_BASE ((byte_t *)__ARCH_PAGEID_DECODE(THIS_TRAMPOLINE_PAGE))
+#endif /* !__ARCH_PAGEID_DECODE_KERNEL */
 
 /* A VM node used to describe a single, reserved page. */
 DATDEF ATTR_PERTASK struct vm_node this_trampoline_node;

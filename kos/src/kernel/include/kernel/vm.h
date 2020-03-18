@@ -42,20 +42,13 @@
 
 #include <stdbool.h>
 
+#include <libvio/access.h>
+
 #ifdef __ARCH_HAVE_COMPAT
 #include <hybrid/__pointer.h>
 #endif /* __ARCH_HAVE_COMPAT */
 
 DECL_BEGIN
-
-#ifndef CONFIG_NO_VIO
-#ifndef CONFIG_VIO
-#define CONFIG_VIO 1
-#elif (CONFIG_VIO+0) == 0
-#undef CONFIG_VIO
-#define CONFIG_NO_VIO 1
-#endif
-#endif /* !CONFIG_NO_VIO */
 
 #ifndef CONFIG_NO_SWAP
 #ifndef CONFIG_SWAP
@@ -265,9 +258,9 @@ struct vm_datapart {
 #ifndef CONFIG_NO_SWAP
 #define VM_DATAPART_STATE_INSWAP  0x0003 /* The part has been off-loaded into swap. */
 #endif /* !CONFIG_NO_SWAP */
-#ifdef CONFIG_VIO
+#ifdef LIBVIO_CONFIG_ENABLED
 #define VM_DATAPART_STATE_VIOPRT  0x0004 /* The part is implemented via I/O. */
-#endif /* CONFIG_VIO */
+#endif /* LIBVIO_CONFIG_ENABLED */
 #define VM_DATAPART_STATE_HASRAM(st) ((st) == VM_DATAPART_STATE_INCORE || (st) == VM_DATAPART_STATE_LOCKED)
 	/* State-specific data part meta-information. */
 	union {
@@ -964,9 +957,9 @@ struct vm_datablock_type {
 #define VM_DATABLOCK_ANONPARTS_INIT VM_DATABLOCK_ANONPARTS
 
 
-#ifdef CONFIG_VIO
-struct vm_datablock_type_vio;
-#endif /* CONFIG_VIO */
+#ifdef LIBVIO_CONFIG_ENABLED
+struct vio_operators;
+#endif /* LIBVIO_CONFIG_ENABLED */
 
 struct vm_datablock {
 	/* An infinite-length data block descriptor, used to refer
@@ -982,9 +975,9 @@ struct vm_datablock {
 	                                                * HINT: You can poll the signal of this lock if you wish to wait
 	                                                *       for changes in parts where changes must be tracked. */
 	struct vm_datablock_type const     *db_type;   /* [1..1][const] The type descriptor for this datablock. */
-#ifdef CONFIG_VIO
-	struct vm_datablock_type_vio const *db_vio;    /* [0..1][const] VIO callbacks (or NULL if the datablock doesn't use VIO). */
-#endif /* CONFIG_VIO */
+#ifdef LIBVIO_CONFIG_ENABLED
+	struct vio_operators const         *db_vio;    /* [0..1][const] VIO callbacks (or NULL if the datablock doesn't use VIO). */
+#endif /* LIBVIO_CONFIG_ENABLED */
 	REF LLIST(struct vm_datapart)       db_parts;  /* [0..1][lock(db_lock)] The first part of this datablock.
 	                                                * NOTE: When set to `VM_DATABLOCK_ANONPARTS', new parts are always
 	                                                *       allocated anonymously, and never added to the actual datablock.
@@ -1025,7 +1018,7 @@ struct vm_datablock {
 };
 
 
-#ifdef CONFIG_VIO
+#ifdef LIBVIO_CONFIG_ENABLED
 #define VM_DATABLOCK_INIT(type, parts, pageshift) \
 	{                                             \
 		/* .db_refcnt = */ 1,                     \
@@ -1046,7 +1039,7 @@ struct vm_datablock {
 	}
 #define VM_DATABLOCK_INIT_VIO(vio) \
 	VM_DATABLOCK_INIT_VIO_EX(&vm_datablock_anonymous_type, vio, NULL, 0)
-#else /* CONFIG_VIO */
+#else /* LIBVIO_CONFIG_ENABLED */
 #define VM_DATABLOCK_INIT(type, parts, pageshift) \
 	{                                             \
 		/* .db_refcnt = */ 1,                     \
@@ -1055,7 +1048,7 @@ struct vm_datablock {
 		/* .db_parts  = */ parts,                 \
 		VM_DATABLOCK_INIT_PAGEINFO(pageshift)     \
 	}
-#endif /* !CONFIG_VIO */
+#endif /* !LIBVIO_CONFIG_ENABLED */
 
 
 #define VM_DATABLOCK_PAGESHIFT(x) ((x)->db_pageshift)

@@ -30,6 +30,8 @@
 #include <hybrid/align.h>
 #include <hybrid/overflow.h>
 
+#include <libvio/access.h>
+
 #include "../memory/vm/vm-partapi.h"
 
 #ifdef __INTELLISENSE__
@@ -256,16 +258,16 @@ NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
 #endif /* !DEFINE_IO_READ */
 			return;
 		}
-#ifdef CONFIG_VIO
+#ifdef LIBVIO_CONFIG_ENABLED
 		if (self->db_vio) {
 			struct vio_args args;
-			args.va_type = self->i_type->it_file.f_vio;
-			assert(args.va_type);
-			args.va_block           = self;
-			args.va_part            = NULL;
-			args.va_access_pageid = 0;
-			args.va_access_partoff  = 0;
-			args.va_state           = NULL;
+			args.va_ops = self->i_type->it_file.f_vio;
+			assert(args.va_ops);
+			args.va_block        = self;
+			args.va_part         = NULL;
+			args.va_acmap_page   = 0;
+			args.va_acmap_offset = 0;
+			args.va_state        = NULL;
 			/* Invoke VIO callbacks as vio_read() operations. */
 #if defined(DEFINE_IO_PHYS) && !defined(DEFINE_IO_VECTOR)
 #ifdef DEFINE_IO_READ
@@ -311,7 +313,7 @@ NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
 #endif
 			return;
 		}
-#endif /* CONFIG_VIO */
+#endif /* LIBVIO_CONFIG_ENABLED */
 
 #ifdef DEFINE_IO_VECTOR
 		buf_offset = 0;

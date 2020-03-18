@@ -189,9 +189,9 @@ PUBLIC struct vm_datablock vm_datablock_debugheap = {
 	/* .db_refcnt = */ ((refcnt_t)-1)/2,
 	/* .db_lock   = */ RWLOCK_INIT,
 	/* .db_type   = */ &vm_datablock_debugheap_type,
-#ifdef CONFIG_VIO
+#ifdef LIBVIO_CONFIG_ENABLED
 	/* .db_vio    = */ NULL,
-#endif /* CONFIG_VIO */
+#endif /* LIBVIO_CONFIG_ENABLED */
 	/* .db_parts  = */ VM_DATABLOCK_ANONPARTS_INIT,
 	VM_DATABLOCK_INIT_PAGEINFO(0)
 };

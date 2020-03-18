@@ -31,14 +31,14 @@ opt.append("-Os");
 #include <kernel/compiler.h>
 
 #include <kernel/vm.h>
+#include <libvio/api.h>
 
-#ifdef CONFIG_VIO
+#ifdef LIBVIO_CONFIG_ENABLED
 
 #include <kernel/except.h>
 #include <kernel/gdt.h>
 #include <kernel/printk.h>
 #include <kernel/user.h>
-#include <kernel/vio.h>
 #include <kernel/vm86.h>
 #include <sched/except-handler.h>
 #include <sched/task.h>
@@ -61,6 +61,8 @@ opt.append("-Os");
 #include <string.h>
 
 #include <libinstrlen/instrlen.h>
+#include <libvio/access.h>
+#include <libvio/vio.h>
 
 #include "decode.h"
 #include "handle_illegal_instruction-bitops.h"
@@ -278,18 +280,17 @@ INTERN struct icpustate *
 NOTHROW(FCALL x86_vio_main)(/*inherit(always)*/ vio_main_args_t *__restrict args, uintptr_t cr2) {
 	/* Exceptions always point to the instruction _after_ the faulting one! */
 	byte_t const *orig_pc, *pc;
-	pos_t vio_addr;
+	vio_addr_t vio_addr;
 	struct emu86_modrm mod;
 	struct icpustate *state = args->ma_args.va_state;
 	uintptr_t value, temp;
 	u32 opcode;
 	op_flag_t op_flags;
 	bool isuser;
-	isuser  = icpustate_isuser(state);
-	orig_pc = (byte_t *)icpustate_getpc(state);
-	vio_addr = (pos_t)cr2;
-	vio_addr -= (pos_t)PAGEID_DECODE(args->ma_args.va_access_pageid);
-	vio_addr += (pos_t)args->ma_args.va_access_partoff;
+	isuser   = icpustate_isuser(state);
+	orig_pc  = (byte_t *)icpustate_getpc(state);
+	vio_addr = args->ma_args.va_acmap_offset +
+	           (cr2 - (uintptr_t)args->ma_args.va_acmap_page);
 	TRY {
 		pc       = orig_pc;
 		op_flags = emu86_opflagsof_icpustate(state);
@@ -4648,6 +4649,6 @@ do_pop_value_2_4_kernel_sp:
 
 DECL_END
 
-#endif /* CONFIG_VIO */
+#endif /* LIBVIO_CONFIG_ENABLED */
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_FAULT_VIO_C */

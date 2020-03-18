@@ -27,10 +27,11 @@
 #include <kernel/emulock.h>
 #include <kernel/except.h>
 #include <kernel/types.h>
-#include <kernel/vio.h>
 #include <kernel/vm.h>
 #include <sched/cpu.h>
 #include <sched/task.h>
+
+#include <hybrid/align.h>
 
 #include <asm/cacheline.h>
 #include <asm/intrin.h>
@@ -39,6 +40,8 @@
 
 #include <stdbool.h>
 #include <string.h>
+
+#include <libvio/access.h>
 
 #ifdef CONFIG_HAVE_EMULOCK
 
@@ -175,17 +178,17 @@ handle_vio_or_not_faulted:
 		/* Check if this is a VIO segment (or maybe not mapped at all) */
 		struct vm *effective_vm = THIS_VM;
 		struct vm_node *node;
-		pageid_t addr_page;
-#ifdef CONFIG_VIO
+		PAGEDIR_PAGEALIGNED void *addr_page;
+#ifdef LIBVIO_CONFIG_ENABLED
 		void *node_minaddr;
 		REF struct vm_datapart *part;
 		REF struct vm_datablock *block;
-#endif /* CONFIG_VIO */
+#endif /* LIBVIO_CONFIG_ENABLED */
 		if (ADDR_ISKERN(addr))
 			effective_vm = &vm_kernel;
-		addr_page = PAGEID_ENCODE(addr);
+		addr_page = (void *)FLOOR_ALIGN((uintptr_t)addr, PAGESIZE);
 		sync_read(effective_vm);
-		node = vm_getnodeofpageid(effective_vm, addr_page);
+		node = vm_getnodeofaddress(effective_vm, addr_page);
 		/* Check for an unmapped memory location. */
 		if (!node || !node->vn_block) {
 			uintptr_t context;
@@ -218,28 +221,27 @@ handle_vio_or_not_faulted:
 				      context);
 			}
 		}
-#ifdef CONFIG_VIO
+#ifdef LIBVIO_CONFIG_ENABLED
 		node_minaddr = vm_node_getmin(node);
 		block        = incref(node->vn_block);
 		part         = xincref(node->vn_part);
-#endif /* CONFIG_VIO */
+#endif /* LIBVIO_CONFIG_ENABLED */
 		sync_endread(effective_vm);
-#ifdef CONFIG_VIO
+#ifdef LIBVIO_CONFIG_ENABLED
 		{
 			FINALLY_DECREF_UNLIKELY(part);
 			FINALLY_DECREF_UNLIKELY(block);
 			if (block->db_vio) {
 				/* Handle VIO memory access. */
 				struct vio_args args;
-				pos_t vio_addr;
-				args.va_type            = block->db_vio;
+				vio_addr_t vio_addr;
+				args.va_ops             = block->db_vio;
 				args.va_block           = block;
 				args.va_part            = part;
-				args.va_access_partoff  = vm_datapart_minbyte(part);
-				args.va_access_pageid   = addr_page;
+				args.va_acmap_offset    = vm_datapart_minbyte(part);
+				args.va_acmap_page      = node_minaddr;
 				args.va_state           = *pstate;
-				vio_addr = args.va_access_partoff + ((uintptr_t)addr -
-				                                     (uintptr_t)node_minaddr);
+				vio_addr = args.va_acmap_offset + ((uintptr_t)addr - (uintptr_t)node_minaddr);
 				switch (num_bytes) {
 
 #ifdef CONFIG_EMULOCK_HAVE_CMPXCHG8
@@ -294,12 +296,11 @@ handle_vio_or_not_faulted:
 				return;
 			}
 		}
-#endif /* CONFIG_VIO */
+#endif /* LIBVIO_CONFIG_ENABLED */
 		/* We can get here if the given address hasn't been pre-faulted, yet. */
-		vm_paged_forcefault(effective_vm,
-		                    addr_page,
-		                    PAGEID_ENCODE((byte_t *)addr + num_bytes - 1),
-		                    true);
+		vm_forcefault(effective_vm, addr_page,
+		              CEIL_ALIGN((uintptr_t)addr + num_bytes, PAGESIZE) - (uintptr_t)addr_page,
+		              true);
 		goto again;
 	}
 }

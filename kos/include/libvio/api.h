@@ -25,9 +25,14 @@
 
 
 /* Configure optional features based on architecture */
+#define LIBVIO_CONFIG_ENABLED 1
 #undef LIBVIO_CONFIG_HAVE_QWORD
 #undef LIBVIO_CONFIG_HAVE_QWORD_CMPXCH
 #undef LIBVIO_CONFIG_HAVE_INT128_CMPXCH
+
+#if defined(__KERNEL__) && defined(CONFIG_NO_VIO)
+#undef LIBVIO_CONFIG_ENABLED
+#endif /* __KERNEL__ && CONFIG_NO_VIO */
 
 #if defined(__x86_64__)
 #define LIBVIO_CONFIG_HAVE_QWORD         1
@@ -50,9 +55,9 @@
 #define LIBVIO_CC /* nothing */
 #endif
 
-#if 0
+#if defined(__KERNEL__) && defined(LIBVIO_CONFIG_ENABLED)
 #define LIBVIO_WANT_PROTOTYPES 1
-#endif
+#endif /* __KERNEL__ && LIBVIO_CONFIG_ENABLED */
 
 #ifdef LIBVIO_WANT_PROTOTYPES
 #define LIBVIO_DECL __PUBDEF
