@@ -507,7 +507,7 @@ PRIVATE void CC
 da_print_modrm_rm(struct disassembler *__restrict self,
                   struct emu86_modrm const *__restrict rm,
                   emu86_opflags_t flags, unsigned int size) {
-	if (rm->mi_type == EMU86_MODRM_REGISTER) {
+	if (EMU86_MODRM_ISREG(rm->mi_type)) {
 		if (size == 8)
 			da_print_reg64(self, rm->mi_rm);
 		else if (size == 4)
@@ -526,7 +526,7 @@ PRIVATE void CC
 da_print_modrm_rm64_mm(struct disassembler *__restrict self,
                        struct emu86_modrm const *__restrict rm,
                        emu86_opflags_t flags) {
-	if (rm->mi_type == EMU86_MODRM_REGISTER) {
+	if (EMU86_MODRM_ISREG(rm->mi_type)) {
 		da_print_mmreg(self, rm->mi_rm);
 	} else {
 		da_print_modrm_rm_memory(self, rm, flags);
@@ -540,7 +540,7 @@ PRIVATE void CC
 da_print_modrm_rmNNN_Xmm(struct disassembler *__restrict self,
                          struct emu86_modrm const *__restrict rm,
                          emu86_opflags_t flags, char x) {
-	if (rm->mi_type == EMU86_MODRM_REGISTER) {
+	if (EMU86_MODRM_ISREG(rm->mi_type)) {
 		da_print_Xmmreg(self, rm->mi_rm, x);
 	} else {
 		da_print_modrm_rm_memory(self, rm, flags);
@@ -863,7 +863,7 @@ libda_single_x86(struct disassembler *__restrict self) {
 						continue;
 				}
 				if ((chain->i_flags & IF_RMM) &&
-				    (rm.mi_type == EMU86_MODRM_REGISTER))
+				    (EMU86_MODRM_ISREG(rm.mi_type)))
 					continue;
 			} else if (args_start) {
 				self->d_pc = args_start;
@@ -961,7 +961,7 @@ do_nextop_nocomma:
 					break;
 
 				case OPC_RMBND:
-					if (rm.mi_type == EMU86_MODRM_REGISTER) {
+					if (EMU86_MODRM_ISREG(rm.mi_type)) {
 						da_print_bndreg(self, rm.mi_rm);
 					} else {
 						da_print_modrm_rm(self, &rm, flags, DA86_IS64(self) ? 16 : 8);
@@ -969,7 +969,7 @@ do_nextop_nocomma:
 					break;
 
 				case OPC_RMBND_RANGE:
-					if (rm.mi_type == EMU86_MODRM_REGISTER ||
+					if (EMU86_MODRM_ISREG(rm.mi_type) ||
 					    rm.mi_index == 0xff ||
 					    rm.mi_rm == 0xff) {
 						disasm_print(self, "??" "? /*", 6);
@@ -987,7 +987,7 @@ do_nextop_nocomma:
 					break;
 
 				case OPC_RMSTi:
-					if (rm.mi_type == EMU86_MODRM_REGISTER) {
+					if (EMU86_MODRM_ISREG(rm.mi_type)) {
 						da_print_stireg(self, rm.mi_rm);
 					} else {
 						da_print_modrm_rm(self, &rm, flags, DA86_IS64(self) ? 16 : 8);
@@ -1271,7 +1271,7 @@ do_print_moffs:
 					break;
 
 				case OPC_RMK:
-					if (rm.mi_type == EMU86_MODRM_REGISTER) {
+					if (EMU86_MODRM_ISREG(rm.mi_type)) {
 						da_print_kreg(self, rm.mi_rm);
 					} else {
 						da_print_modrm_rm(self, &rm, flags, DA86_IS64(self) ? 16 : 8);

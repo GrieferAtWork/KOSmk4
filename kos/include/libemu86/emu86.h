@@ -331,6 +331,8 @@ __DECL_BEGIN
 /* Possible values for `struct emu86_modrm::mi_type' */
 #define EMU86_MODRM_REGISTER 0
 #define EMU86_MODRM_MEMORY   1
+#define EMU86_MODRM_ISREG(x) ((x) == 0)
+#define EMU86_MODRM_ISMEM(x) ((x) != 0)
 
 #ifdef __CC__
 

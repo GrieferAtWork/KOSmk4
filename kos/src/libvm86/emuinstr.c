@@ -105,8 +105,8 @@ DECL_END
 #define EMU86_ISUSER() 0
 #define EMU86_ISUSER_NOVM86() 0
 #define EMU86_ISVM86() 0
-#define EMU86_VALIDATE_READABLE(addr, num_bytes)  (void)0
-#define EMU86_VALIDATE_WRITEABLE(addr, num_bytes) (void)0
+#define EMU86_VALIDATE_READABLE(addr, num_bytes) (void)0
+#define EMU86_VALIDATE_WRITABLE(addr, num_bytes) (void)0
 #define EMU86_GETFLAGS()            self->vr_regs.vr_eflags
 #define EMU86_SETFLAGS(v)           (self->vr_regs.vr_eflags = (v))
 #define EMU86_MSKFLAGS(mask, value) (self->vr_regs.vr_eflags = (self->vr_regs.vr_eflags & (mask)) | (value))
@@ -121,7 +121,6 @@ DECL_END
 #define EMU86_ACCESS_MEMORY_IS_NOOP 1
 #define EMU86_ACCESS_MEMORY(addr, num_bytes) (void)0
 #define EMU86_ACCESS_MEMORY2(addr1, num_bytes1, addr2, num_bytes2) (void)0
-#undef EMU86_GETSEGBASE_IS_NOOP
 #undef EMU86_GETSEGBASE_IS_NOOP_DS
 #undef EMU86_GETSEGBASE_IS_NOOP_ES
 #undef EMU86_GETSEGBASE_IS_NOOP_CS

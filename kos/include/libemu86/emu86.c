@@ -306,7 +306,7 @@ __NOTHROW_NCX(LIBEMU86_CC emu86_modrm_decode)(__byte_t const *__restrict pc,
 			result->mi_index = 0xff;
 		} else {
 			result->mi_offset = 0;
-			result->mi_type = EMU86_MODRM_MEMORY;
+			result->mi_type   = EMU86_MODRM_MEMORY;
 			switch (EMU86_MODRM_GETRM(rmbyte)) {
 
 			case 0: /* [BX + SI] */

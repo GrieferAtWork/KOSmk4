@@ -552,7 +552,7 @@ libvm86_modrm_getaddr(vm86_state_t *__restrict self,
                       struct emu86_modrm const *__restrict info,
                       emu86_opflags_t op_flags) {
 	uintptr_t addr;
-	if (info->mi_type == EMU86_MODRM_REGISTER)
+	if (EMU86_MODRM_ISREG(info->mi_type))
 		return &REG32(info->mi_rm);
 	addr = info->mi_offset;
 	if (info->mi_rm != 0xff)
@@ -570,7 +570,7 @@ libvm86_modrm_readb(vm86_state_t *__restrict self,
                     struct emu86_modrm const *__restrict info,
                     uint8_t *__restrict presult,
                     emu86_opflags_t op_flags) {
-	if (info->mi_type == EMU86_MODRM_REGISTER) {
+	if (EMU86_MODRM_ISREG(info->mi_type)) {
 		*presult = REG8(info->mi_rm);
 	} else {
 		uint8_t *addr, value;
@@ -627,7 +627,7 @@ LOCAL NONNULL((1, 2)) int CC
 libvm86_modrm_writeb(vm86_state_t *__restrict self,
                      struct emu86_modrm const *__restrict info,
                      uint8_t value, emu86_opflags_t op_flags) {
-	if (info->mi_type == EMU86_MODRM_REGISTER) {
+	if (EMU86_MODRM_ISREG(info->mi_type)) {
 		REG8(info->mi_rm) = value;
 	} else {
 		uint8_t *addr;
@@ -647,7 +647,7 @@ LOCAL NONNULL((1, 2)) int CC
 libvm86_modrm_writew(vm86_state_t *__restrict self,
                      struct emu86_modrm const *__restrict info,
                      uint16_t value, emu86_opflags_t op_flags) {
-	if (info->mi_type == EMU86_MODRM_REGISTER) {
+	if (EMU86_MODRM_ISREG(info->mi_type)) {
 		REG32(info->mi_rm) = value;
 	} else {
 		uint16_t *addr;
@@ -802,7 +802,7 @@ read_opcode:
 		error = libvm86_modrm_decode(self, &mod, op_flags);           \
 		if unlikely(error != VM86_SUCCESS)                            \
 			goto err;                                                 \
-		if unlikely(mod.mi_type == EMU86_MODRM_REGISTER)              \
+		if unlikely(EMU86_MODRM_ISREG(mod.mi_type))                   \
 			goto err_ilop;                                            \
 		addr = (byte_t *)libvm86_modrm_getaddr(self, &mod, op_flags); \
 		GUARD_SEGFAULT({                                              \
@@ -2448,7 +2448,7 @@ do_rep_instruction:
 		error = libvm86_modrm_decode(self, &mod, op_flags);                                 \
 		if unlikely(error != VM86_SUCCESS)                                                  \
 			goto err;                                                                       \
-		if (mod.mi_type == EMU86_MODRM_REGISTER) {                                          \
+		if (EMU86_MODRM_ISREG(mod.mi_type)) {                                          \
 			DO_REGB(REG8(mod.mi_rm), REG8(mod.mi_reg));                                     \
 		} else {                                                                            \
 			uint8_t *addr;                                                                  \
@@ -2461,7 +2461,7 @@ do_rep_instruction:
 		if unlikely(error != VM86_SUCCESS)                                                  \
 			goto err;                                                                       \
 		if (op_flags & F_OP32) {                                                            \
-			if (mod.mi_type == EMU86_MODRM_REGISTER) {                                      \
+			if (EMU86_MODRM_ISREG(mod.mi_type)) {                                      \
 				DO_REGL(REG32(mod.mi_rm), REG32(mod.mi_reg));                               \
 			} else {                                                                        \
 				uint32_t *addr;                                                             \
@@ -2469,7 +2469,7 @@ do_rep_instruction:
 				DO_MEML(addr, REG32(mod.mi_reg));                                           \
 			}                                                                               \
 		} else {                                                                            \
-			if (mod.mi_type == EMU86_MODRM_REGISTER) {                                      \
+			if (EMU86_MODRM_ISREG(mod.mi_type)) {                                      \
 				DO_REGW(REG16(mod.mi_rm), REG16(mod.mi_reg));                               \
 				REG32(mod.mi_rm) &= 0xffff;                                                 \
 			} else {                                                                        \
@@ -2534,7 +2534,7 @@ do_rep_instruction:
 		}                                                                                   \
 		break;                                                                              \
 do_80h_reg##id:                                                                             \
-		if (mod.mi_type == EMU86_MODRM_REGISTER) {                                          \
+		if (EMU86_MODRM_ISREG(mod.mi_type)) {                                          \
 			DO_REGB(REG8(mod.mi_rm), opcode);                                               \
 		} else {                                                                            \
 			uint8_t *addr;                                                                  \
@@ -2543,7 +2543,7 @@ do_80h_reg##id:                                                                 
 		}                                                                                   \
 		break;                                                                              \
 do_81h_reg##id##_op16:                                                                      \
-		if (mod.mi_type == EMU86_MODRM_REGISTER) {                                          \
+		if (EMU86_MODRM_ISREG(mod.mi_type)) {                                          \
 			DO_REGW(REG16(mod.mi_rm), operand16);                                           \
 			REG32(mod.mi_rm) &= 0xffff;                                                     \
 		} else {                                                                            \
@@ -2553,7 +2553,7 @@ do_81h_reg##id##_op16:                                                          
 		}                                                                                   \
 		break;                                                                              \
 do_81h_reg##id##_op32:                                                                      \
-		if (mod.mi_type == EMU86_MODRM_REGISTER) {                                          \
+		if (EMU86_MODRM_ISREG(mod.mi_type)) {                                          \
 			DO_REGL(REG32(mod.mi_rm), operand32);                                           \
 		} else {                                                                            \
 			uint32_t *addr;                                                                 \
@@ -3034,7 +3034,7 @@ do_81h_op16:
 		error = libvm86_modrm_decode(self, &mod, op_flags);
 		if unlikely(error != VM86_SUCCESS)
 			goto err;
-		if unlikely(mod.mi_type == EMU86_MODRM_REGISTER)
+		if unlikely(EMU86_MODRM_ISREG(mod.mi_type))
 			goto err_ilop;
 		{
 			void *addr;
@@ -3126,7 +3126,7 @@ do_81h_op16:
 		case 0:
 			/* FE /0     INC r/m8     M     Valid     Valid     Increment r/m byte by 1. */
 			self->vr_regs.vr_flags &= ~(OF | SF | ZF | AF | PF);
-			if (mod.mi_type == EMU86_MODRM_REGISTER) {
+			if (EMU86_MODRM_ISREG(mod.mi_type)) {
 				self->vr_regs.vr_flags |= f_addb(REG8(mod.mi_rm)++, (uint8_t)1) & (OF | SF | ZF | AF | PF);
 			} else {
 				uint8_t *addr, oldval;
@@ -3146,7 +3146,7 @@ do_81h_op16:
 		case 1:
 			/* FE /1     DEC r/m8     M     Valid     Valid     Decrement r/m8 by 1. */
 			self->vr_regs.vr_flags &= ~(OF | SF | ZF | AF | PF);
-			if (mod.mi_type == EMU86_MODRM_REGISTER) {
+			if (EMU86_MODRM_ISREG(mod.mi_type)) {
 				self->vr_regs.vr_flags |= f_addb(REG8(mod.mi_rm)--, (uint8_t)-1) & (OF | SF | ZF | AF | PF);
 			} else {
 				uint8_t *addr, oldval;
@@ -3179,7 +3179,7 @@ do_81h_op16:
 			/* FF /0     INC r/m16     M     Valid     Valid     Increment r/m word by 1.
 			 * FF /0     INC r/m32     M     Valid     Valid     Increment r/m doubleword by 1. */
 			self->vr_regs.vr_flags &= ~(OF | SF | ZF | AF | PF);
-			if (mod.mi_type == EMU86_MODRM_REGISTER) {
+			if (EMU86_MODRM_ISREG(mod.mi_type)) {
 				self->vr_regs.vr_flags |= op_flags & F_OP32
 				                          ? f_addl(REG32(mod.mi_rm)++, (uint32_t)1) & (OF | SF | ZF | AF | PF)
 				                          : f_addw(REG16(mod.mi_rm)++, (uint16_t)1) & (OF | SF | ZF | AF | PF);
@@ -3217,7 +3217,7 @@ do_81h_op16:
 			/* FF /1     DEC r/m16     M     Valid     Valid     Decrement r/m16 by 1.
 			 * FF /1     DEC r/m32     M     Valid     Valid     Decrement r/m32 by 1. */
 			self->vr_regs.vr_flags &= ~(OF | SF | ZF | AF | PF);
-			if (mod.mi_type == EMU86_MODRM_REGISTER) {
+			if (EMU86_MODRM_ISREG(mod.mi_type)) {
 				self->vr_regs.vr_flags |= op_flags & F_OP32
 				                          ? f_addl(REG32(mod.mi_rm)--, (uint32_t)-1) & (OF | SF | ZF | AF | PF)
 				                          : f_addw(REG16(mod.mi_rm)--, (uint16_t)-1) & (OF | SF | ZF | AF | PF);
@@ -3284,7 +3284,7 @@ do_81h_op16:
 			 * FF /3     CALL m16:32     M     Valid     Valid     Call far, absolute indirect address given in m16:32. */
 			if (op_flags & (F_LOCK))
 				goto err_ilop;
-			if (mod.mi_type == EMU86_MODRM_REGISTER)
+			if (EMU86_MODRM_ISREG(mod.mi_type))
 				goto err_ilop;
 			addr = libvm86_modrm_getaddr(self, &mod, op_flags);
 			if (op_flags & F_OP32) {
@@ -3337,7 +3337,7 @@ do_81h_op16:
 			 * FF /5     JMP m16:32     M     Valid     Valid     Jump far, absolute indirect address given in m16:32. */
 			if (op_flags & (F_LOCK))
 				goto err_ilop;
-			if (mod.mi_type == EMU86_MODRM_REGISTER)
+			if (EMU86_MODRM_ISREG(mod.mi_type))
 				goto err_ilop;
 			addr = libvm86_modrm_getaddr(self, &mod, op_flags);
 			GUARD_SEGFAULT({
@@ -3639,7 +3639,7 @@ do_81h_op16:
 		error = libvm86_modrm_decode(self, &mod, op_flags);
 		if unlikely(error != VM86_SUCCESS)
 			goto err;
-		if unlikely(mod.mi_type == EMU86_MODRM_REGISTER)
+		if unlikely(EMU86_MODRM_ISREG(mod.mi_type))
 			goto err_ilop;
 		value = mod.mi_offset;
 		if (op_flags & F_AD32) {
@@ -3943,7 +3943,7 @@ do_81h_op16:
 		error = libvm86_modrm_decode(self, &mod, op_flags);
 		if unlikely(error != VM86_SUCCESS)
 			goto err;
-		if (mod.mi_type == EMU86_MODRM_REGISTER) {
+		if (EMU86_MODRM_ISREG(mod.mi_type)) {
 			uint8_t temp;
 			temp             = REG8(mod.mi_rm);
 			REG8(mod.mi_rm)  = REG8(mod.mi_reg);
@@ -3966,7 +3966,7 @@ do_81h_op16:
 		error = libvm86_modrm_decode(self, &mod, op_flags);
 		if unlikely(error != VM86_SUCCESS)
 			 goto err;
-		if (mod.mi_type == EMU86_MODRM_REGISTER) {
+		if (EMU86_MODRM_ISREG(mod.mi_type)) {
 			if (op_flags & F_OP32) {
 				uint32_t temp;
 				temp              = REG32(mod.mi_rm);
@@ -4273,7 +4273,7 @@ do_81h_op16:
 
 #define DEFINE_ROTATE_SHIFT_OPCODES(id, DO_REGB, DO_REGW, DO_REGL, DO_MEMB, DO_MEMW, DO_MEML) \
 do_c0h_reg##id:                                                                               \
-	if (mod.mi_type == EMU86_MODRM_REGISTER) {                                                \
+	if (EMU86_MODRM_ISREG(mod.mi_type)) {                                                \
 		DO_REGB(REG8(mod.mi_rm), opcode);                                                     \
 	} else {                                                                                  \
 		uint8_t *addr;                                                                        \
@@ -4282,7 +4282,7 @@ do_c0h_reg##id:                                                                 
 	}                                                                                         \
 	break;                                                                                    \
 do_c1h_reg##id:                                                                               \
-	if (mod.mi_type == EMU86_MODRM_REGISTER) {                                                \
+	if (EMU86_MODRM_ISREG(mod.mi_type)) {                                                \
 		if (op_flags & F_OP32) {                                                              \
 			DO_REGL(REG32(mod.mi_rm), opcode);                                                \
 		} else {                                                                              \
@@ -4596,7 +4596,7 @@ do_c1h_switch_reg:
 
 		case 2:
 			/* F6 /2     NOT r/m8     M     Valid     Valid     Reverse each bit of r/m8. */
-			if (mod.mi_type == EMU86_MODRM_REGISTER) {
+			if (EMU86_MODRM_ISREG(mod.mi_type)) {
 				REG8(mod.mi_rm) ^= 0xff;
 			} else {
 				uint8_t *addr;
@@ -4614,7 +4614,7 @@ do_c1h_switch_reg:
 		case 3: {
 			uint8_t oldval;
 			/* F6 /3     NEG r/m8     M     Valid     Valid     Two's complement negate r/m8. */
-			if (mod.mi_type == EMU86_MODRM_REGISTER) {
+			if (EMU86_MODRM_ISREG(mod.mi_type)) {
 				oldval          = REG8(mod.mi_rm);
 				REG8(mod.mi_rm) = (uint8_t) - (int8_t)oldval;
 			} else {
@@ -4759,7 +4759,7 @@ do_c1h_switch_reg:
 		case 2:
 			/* F7 /2     NOT r/m16    M     Valid     Valid     Reverse each bit of r/m16.
 			 * F7 /2     NOT r/m32    M     Valid     Valid     Reverse each bit of r/m32. */
-			if (mod.mi_type == EMU86_MODRM_REGISTER) {
+			if (EMU86_MODRM_ISREG(mod.mi_type)) {
 				REG32(mod.mi_rm) ^= UINT32_C(0xffffffff);
 				if (!(op_flags & F_OP32))
 					REG32(mod.mi_rm) &= 0xffff;
@@ -4789,7 +4789,7 @@ do_c1h_switch_reg:
 			 * F7 /3     NEG r/m32     M     Valid     Valid     Two's complement negate r/m32. */
 			if (op_flags & F_OP32) {
 				uint32_t oldval;
-				if (mod.mi_type == EMU86_MODRM_REGISTER) {
+				if (EMU86_MODRM_ISREG(mod.mi_type)) {
 					oldval           = REG32(mod.mi_rm);
 					REG32(mod.mi_rm) = (uint32_t) - (int32_t)oldval;
 				} else {
@@ -4812,7 +4812,7 @@ do_c1h_switch_reg:
 					self->vr_regs.vr_flags |= CF;
 			} else {
 				uint16_t oldval;
-				if (mod.mi_type == EMU86_MODRM_REGISTER) {
+				if (EMU86_MODRM_ISREG(mod.mi_type)) {
 					oldval           = REG16(mod.mi_rm);
 					REG32(mod.mi_rm) = (uint32_t)(uint16_t) - (int16_t)oldval;
 				} else {

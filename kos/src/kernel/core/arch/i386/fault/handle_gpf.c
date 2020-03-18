@@ -272,7 +272,7 @@ set_noncanon_pc_exception:
 			case 0x0f6f:  /* movdqa xmm2/m128, xmm1 / movdqu xmm2/m128, xmm1
 			               * movq mm/m64, mm */
 				MOD_DECODE();
-				if (mod.mi_type != EMU86_MODRM_MEMORY)
+				if (!EMU86_MODRM_ISMEM(mod.mi_type))
 					break;
 				nc_addr = x86_decode_modrmgetmem(state, &mod, op_flags);
 				goto chk_noncanon_write;
@@ -515,7 +515,7 @@ set_noncanon_pc_exception:
 			case 0x0fc2:  /* cmppd $imm8, xmm2/m128, xmm1 */
 			case 0x0f3882:/* invpcid r32/r64, m128 */
 				MOD_DECODE();
-				if (mod.mi_type != EMU86_MODRM_MEMORY)
+				if (!EMU86_MODRM_ISMEM(mod.mi_type))
 					break;
 				nc_addr = x86_decode_modrmgetmem(state, &mod, op_flags);
 				goto chk_noncanon_read;
@@ -540,7 +540,7 @@ set_noncanon_pc_exception:
 			              * monitor / mwait / sgdt m48 / sidt m48
 			              * smsw r/m16 / smsw r32/m16 */
 				MOD_DECODE();
-				if (mod.mi_type != EMU86_MODRM_MEMORY)
+				if (!EMU86_MODRM_ISMEM(mod.mi_type))
 					break;
 				nc_addr = x86_decode_modrmgetmem(state, &mod, op_flags);
 				if (mod.mi_reg == 0)
@@ -555,7 +555,7 @@ set_noncanon_pc_exception:
 			              * ldmxcsr m32 / lfence / mfence / sfence
 			              * stmxcsr m32 */
 				MOD_DECODE();
-				if (mod.mi_type != EMU86_MODRM_MEMORY)
+				if (!EMU86_MODRM_ISMEM(mod.mi_type))
 					break;
 				nc_addr = x86_decode_modrmgetmem(state, &mod, op_flags);
 				if (mod.mi_reg == 1)
@@ -813,7 +813,7 @@ done_noncanon_check:
 
 #ifdef __x86_64__
 			case 3:
-				if (mod.mi_type == EMU86_MODRM_REGISTER) {
+				if (EMU86_MODRM_ISREG(mod.mi_type)) {
 					/* F3       0F AE /3 WRGSBASE r32     Load the GS base address with the 32-bit value in the source register.
 					 * F3 REX.W 0F AE /3 WRGSBASE r64     Load the GS base address with the 64-bit value in the source register. */
 check_x86_64_noncanon_fsgsbase:
@@ -1040,7 +1040,7 @@ check_x86_64_noncanon_fsgsbase:
 			}
 			/* LGDT m16&32 */
 			/* LIDT m16&32 */
-			if (mod.mi_type != EMU86_MODRM_MEMORY) {
+			if (!EMU86_MODRM_ISMEM(mod.mi_type)) {
 				PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND));
 				PERTASK_SET(this_exception_pointers[1],
 				            (uintptr_t)E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE);

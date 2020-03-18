@@ -55,7 +55,8 @@
 #define LIBVIO_CC /* nothing */
 #endif
 
-#if defined(__KERNEL__) && defined(LIBVIO_CONFIG_ENABLED)
+#if (!defined(LIBVIO_WANT_PROTOTYPES) && \
+     defined(__KERNEL__) && defined(LIBVIO_CONFIG_ENABLED))
 #define LIBVIO_WANT_PROTOTYPES 1
 #endif /* __KERNEL__ && LIBVIO_CONFIG_ENABLED */
 

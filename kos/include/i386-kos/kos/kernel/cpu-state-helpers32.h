@@ -268,6 +268,7 @@ __NOTHROW_NCX(lcpustate32_to_kcpustate32)(struct lcpustate32 const *__restrict _
 #define kcpustate32_setesp(self, value)    ((self)->kcs_gpregs.gp_esp = (value))
 #define kcpustate32_geteflags(self)        ((__u32)(self)->kcs_eflags)
 #define kcpustate32_seteflags(self, value) ((self)->kcs_eflags = (value))
+#define kcpustate32_mskeflags(self, mask, flag) ((self)->kcs_eflags = ((self)->kcs_eflags & (mask)) | (flag))
 #define kcpustate32_to_kcpustate32(self, result)                        \
 	__libc_memcpy(__COMPILER_REQTYPE(struct kcpustate32 *, result),     \
 	              __COMPILER_REQTYPE(struct kcpustate32 const *, self), \
@@ -1017,6 +1018,19 @@ __NOTHROW_NCX(scpustate32_user_to_scpustate32_p)(struct scpustate32 const *__res
 #define ucpustate32_setesp(self, value)    ((self)->ucs_gpregs.gp_esp = (value))
 #define ucpustate32_geteflags(self)        ((__u32)(self)->ucs_eflags)
 #define ucpustate32_seteflags(self, value) ((self)->ucs_eflags = (value))
+#define ucpustate32_mskeflags(self, mask, flag) ((self)->ucs_eflags = ((self)->ucs_eflags & (mask)) | (flag))
+#define ucpustate32_getes(self)            ((self)->ucs_sgregs.sg_es16)
+#define ucpustate32_setes(self, value)     ((self)->ucs_sgregs.sg_es = (u16)(value))
+#define ucpustate32_getds(self)            ((self)->ucs_sgregs.sg_ds16)
+#define ucpustate32_setds(self, value)     ((self)->ucs_sgregs.sg_ds = (u16)(value))
+#define ucpustate32_getss(self)            ((self)->ucs_cs16)
+#define ucpustate32_setss(self, value)     ((self)->ucs_cs = (u16)(value))
+#define ucpustate32_getcs(self)            ((self)->ucs_ss16)
+#define ucpustate32_setcs(self, value)     ((self)->ucs_ss = (u16)(value))
+#define ucpustate32_getfs(self)            ((self)->ucs_sgregs.sg_fs16)
+#define ucpustate32_setfs(self, value)     ((self)->ucs_sgregs.sg_fs = (u16)(value))
+#define ucpustate32_getgs(self)            ((self)->ucs_sgregs.sg_gs16)
+#define ucpustate32_setgs(self, value)     ((self)->ucs_sgregs.sg_gs = (u16)(value))
 #define ucpustate32_to_ucpustate32(self, result)                        \
 	__libc_memcpy(__COMPILER_REQTYPE(struct ucpustate32 *, result),     \
 	              __COMPILER_REQTYPE(struct ucpustate32 const *, self), \
@@ -1169,6 +1183,7 @@ __NOTHROW_NCX(ucpustate32_to_scpustate32_p)(struct ucpustate32 const *__restrict
 #define fcpustate32_setesp(self, value)    ((self)->fcs_gpregs.gp_esp = (value))
 #define fcpustate32_geteflags(self)        ((__u32)(self)->fcs_eflags)
 #define fcpustate32_seteflags(self, value) ((self)->fcs_eflags = (value))
+#define fcpustate32_mskeflags(self, mask, flag) ((self)->fcs_eflags = ((self)->fcs_eflags & (mask)) | (flag))
 #define fcpustate32_to_fcpustate32(self, result)                        \
 	__libc_memcpy(__COMPILER_REQTYPE(struct fcpustate32 *, result),     \
 	              __COMPILER_REQTYPE(struct fcpustate32 const *, self), \
@@ -1499,6 +1514,7 @@ __NOTHROW_NCX(fcpustate32_to_scpustate32_p)(struct fcpustate32 const *__restrict
 #define kcpustate_setsp                     kcpustate32_setesp
 #define kcpustate_getpflags                 kcpustate32_geteflags
 #define kcpustate_setpflags                 kcpustate32_seteflags
+#define kcpustate_mskpflags                 kcpustate32_mskeflags
 #define kcpustate_to_kcpustate              kcpustate32_to_kcpustate32
 #define kcpustate_to_kcpustate32            kcpustate32_to_kcpustate32
 #define kcpustate32_to_kcpustate            kcpustate32_to_kcpustate32
@@ -1694,6 +1710,19 @@ __NOTHROW_NCX(fcpustate32_to_scpustate32_p)(struct fcpustate32 const *__restrict
 #define ucpustate_setsp                     ucpustate32_setesp
 #define ucpustate_getpflags                 ucpustate32_geteflags
 #define ucpustate_setpflags                 ucpustate32_seteflags
+#define ucpustate_mskpflags                 ucpustate32_mskeflags
+#define ucpustate_getes                     ucpustate32_getes
+#define ucpustate_setes                     ucpustate32_setes
+#define ucpustate_getds                     ucpustate32_getds
+#define ucpustate_setds                     ucpustate32_setds
+#define ucpustate_getss                     ucpustate32_getss
+#define ucpustate_setss                     ucpustate32_setss
+#define ucpustate_getcs                     ucpustate32_getcs
+#define ucpustate_setcs                     ucpustate32_setcs
+#define ucpustate_getfs                     ucpustate32_getfs
+#define ucpustate_setfs                     ucpustate32_setfs
+#define ucpustate_getgs                     ucpustate32_getgs
+#define ucpustate_setgs                     ucpustate32_setgs
 #if !defined(__x86_64__) && defined(__i386__)
 #define ucpustate_current                   ucpustate32_current
 #endif /* !__x86_64__ && __i386__ */
@@ -1724,6 +1753,7 @@ __NOTHROW_NCX(fcpustate32_to_scpustate32_p)(struct fcpustate32 const *__restrict
 #define fcpustate_setsp                     fcpustate32_setesp
 #define fcpustate_getpflags                 fcpustate32_geteflags
 #define fcpustate_setpflags                 fcpustate32_seteflags
+#define fcpustate_mskpflags                 fcpustate32_mskeflags
 #define fcpustate_to_fcpustate              fcpustate32_to_fcpustate32
 #define fcpustate_to_fcpustate32            fcpustate32_to_fcpustate32
 #define fcpustate32_to_fcpustate            fcpustate32_to_fcpustate32

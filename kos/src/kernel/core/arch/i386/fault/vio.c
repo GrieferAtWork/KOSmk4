@@ -28,6 +28,8 @@ opt.append("-Os");
 #define DISABLE_BRANCH_PROFILING 1
 #define _KOS_SOURCE 1
 
+/* TODO: Get rid of this file and use `libviocore' in `handle_pagefault()'! */
+
 #include <kernel/compiler.h>
 
 #include <kernel/vm.h>
@@ -364,7 +366,7 @@ NOTHROW(FCALL x86_vio_main)(/*inherit(always)*/ vio_main_args_t *__restrict args
 #endif /* !__x86_64__ */
 
 #define IS_ATOMIC()        (op_flags & F_LOCK)
-#define IS_MODVIO()        (mod.mi_type == EMU86_MODRM_MEMORY && x86_decode_modrmgetmem(state, &mod, op_flags) == cr2)
+#define IS_MODVIO()        (EMU86_MODRM_ISMEM(mod.mi_type) && x86_decode_modrmgetmem(state, &mod, op_flags) == cr2)
 #define SET_PFLAGS(v, mask) WR_PFLAGS((RD_PFLAGS() & ~(mask)) | ((v) & (mask)))
 
 #ifdef __x86_64__
@@ -646,7 +648,7 @@ NOTHROW(FCALL x86_vio_main)(/*inherit(always)*/ vio_main_args_t *__restrict args
 				}
 				break;
 
-			default: goto undefined_instruction;
+			default: goto return_unknown_instruction;
 			}
 			break;
 
@@ -680,7 +682,7 @@ NOTHROW(FCALL x86_vio_main)(/*inherit(always)*/ vio_main_args_t *__restrict args
 				}
 				break;
 
-			default: goto undefined_instruction;
+			default: goto return_unknown_instruction;
 			}
 			break;
 
@@ -794,7 +796,7 @@ NOTHROW(FCALL x86_vio_main)(/*inherit(always)*/ vio_main_args_t *__restrict args
 				case 5: VIO_SUB_WRITE(b); goto done; /* 80 /5 ib      SUB r/m8,imm8      Subtract imm8 from r/m8 */
 				case 6: VIO_XOR_WRITE(b); goto done; /* 80 /6 ib      XOR r/m8,imm8      r/m8 XOR imm8 */
 				case 7: VIO_CMP_WRITE(b); goto done; /* 80 /7 ib      CMP r/m8,imm8      Compare imm8 with r/m8 */
-				default: goto undefined_instruction;
+				default: goto return_unknown_instruction;
 				}
 			break;
 
@@ -804,7 +806,7 @@ NOTHROW(FCALL x86_vio_main)(/*inherit(always)*/ vio_main_args_t *__restrict args
 #ifdef __x86_64__
 			if (op_flags & F_REX_W) {
 				value = (u64)(s64)*(s32 *)pc;
-				pc += 2;
+				pc += 4;
 				if (IS_MODVIO())
 					switch (mod.mi_reg) {
 					case 0: VIO_ADD_WRITE(q); goto done; /* 81 /0 iq      ADD r/m64,Simm32      Add Simm32 to r/m64 */
@@ -815,7 +817,7 @@ NOTHROW(FCALL x86_vio_main)(/*inherit(always)*/ vio_main_args_t *__restrict args
 					case 5: VIO_SUB_WRITE(q); goto done; /* 81 /5 iq      SUB r/m64,Simm32      Subtract Simm32 from r/m64 */
 					case 6: VIO_XOR_WRITE(q); goto done; /* 81 /6 iq      XOR r/m64,Simm32      r/m64 XOR Simm32 */
 					case 7: VIO_CMP_WRITE(q); goto done; /* 81 /7 iq      CMP r/m64,Simm32      Compare Simm32 with r/m64 */
-					default: goto undefined_instruction;
+					default: goto return_unknown_instruction;
 					}
 			} else
 #endif /* __x86_64__ */
@@ -832,7 +834,7 @@ NOTHROW(FCALL x86_vio_main)(/*inherit(always)*/ vio_main_args_t *__restrict args
 					case 5: VIO_SUB_WRITE(w); goto done; /* 81 /5 iw      SUB r/m16,imm16      Subtract imm16 from r/m16 */
 					case 6: VIO_XOR_WRITE(w); goto done; /* 81 /6 iw      XOR r/m16,imm16      r/m16 XOR imm16 */
 					case 7: VIO_CMP_WRITE(w); goto done; /* 81 /7 iw      CMP r/m16,imm16      Compare imm16 with r/m16 */
-					default: goto undefined_instruction;
+					default: goto return_unknown_instruction;
 					}
 			} else {
 				value = *(u32 *)pc;
@@ -847,7 +849,7 @@ NOTHROW(FCALL x86_vio_main)(/*inherit(always)*/ vio_main_args_t *__restrict args
 					case 5: VIO_SUB_WRITE(l); goto done; /* 81 /5 id      SUB r/m32,imm32      Subtract imm32 from r/m32 */
 					case 6: VIO_XOR_WRITE(l); goto done; /* 81 /6 id      XOR r/m32,imm32      r/m32 XOR imm32 */
 					case 7: VIO_CMP_WRITE(l); goto done; /* 81 /7 id      CMP r/m32,imm32      Compare imm32 with r/m32 */
-					default: goto undefined_instruction;
+					default: goto return_unknown_instruction;
 					}
 			}
 			break;
@@ -869,7 +871,7 @@ NOTHROW(FCALL x86_vio_main)(/*inherit(always)*/ vio_main_args_t *__restrict args
 				case 5: goto do_subw_write; /* 83 /5 ib      SUB r/m16,Simm8      Subtract sign-extended imm8 from r/m16 */
 				case 6: goto do_xorw_write; /* 83 /6 ib      XOR r/m16,Simm8      r/m16 XOR imm8 (sign-extended) */
 				case 7: goto do_cmpw_write; /* 83 /7 ib      CMP r/m16,Simm8      Compare imm8 with r/m16 */
-				default: goto undefined_instruction;
+				default: goto return_unknown_instruction;
 				}
 			} else {
 				switch (mod.mi_reg) {
@@ -881,7 +883,7 @@ NOTHROW(FCALL x86_vio_main)(/*inherit(always)*/ vio_main_args_t *__restrict args
 				case 5: goto do_subl_write; /* 83 /5 ib      SUB r/m32,Simm8      Subtract sign-extended imm8 from r/m32 */
 				case 6: goto do_xorl_write; /* 83 /6 ib      XOR r/m32,Simm8      r/m32 XOR imm8 (sign-extended) */
 				case 7: goto do_cmpl_write; /* 83 /7 ib      CMP r/m32,Simm8      Compare imm8 with r/m32 */
-				default: goto undefined_instruction;
+				default: goto return_unknown_instruction;
 				}
 			}
 			break;
@@ -1279,7 +1281,7 @@ do_bts_temp_l:
 					goto do_btc_temp_w;
 				goto do_btc_temp_l;
 
-			default: goto undefined_instruction;
+			default: goto return_unknown_instruction;
 			}
 			break;
 
@@ -1312,7 +1314,7 @@ do_bts_temp_l:
 				}
 				break;
 
-			default: goto undefined_instruction;
+			default: goto return_unknown_instruction;
 			}
 			break;
 
@@ -1495,7 +1497,7 @@ user_push_value_vio_stack_2_4_8:
 				}
 				break;
 
-			default: goto undefined_instruction;
+			default: goto return_unknown_instruction;
 			}
 			break;
 
@@ -1701,7 +1703,7 @@ user_push_value_vio_stack_2_4_8:
 				}
 				break;
 
-			default: goto undefined_instruction;
+			default: goto return_unknown_instruction;
 			}
 			break;
 
@@ -1893,7 +1895,7 @@ user_push_value_vio_stack_2_4_8:
 					goto done;
 				break;
 
-			default: goto undefined_instruction;
+			default: goto return_unknown_instruction;
 			}
 			break;
 
@@ -2086,7 +2088,7 @@ user_push_value_vio_stack_2_4_8:
 				}
 				break;
 
-			default: goto undefined_instruction;
+			default: goto return_unknown_instruction;
 			}
 			break;
 
@@ -2175,7 +2177,7 @@ again_0xf6:
 				       (u16)((u8)(temp % (s8)value)) << 8));
 			}	goto done;
 
-			default: goto undefined_instruction;
+			default: goto return_unknown_instruction;
 			}
 		}	break;
 
@@ -2423,7 +2425,7 @@ again_0xf7:
 				}
 				goto done;
 
-			default: goto undefined_instruction;
+			default: goto return_unknown_instruction;
 			}
 			break;
 
@@ -2778,7 +2780,7 @@ again_0xc0:
 				        : "cc");
 				break;
 
-			default: goto undefined_instruction;
+			default: goto return_unknown_instruction;
 			}
 			if (vio_cmpxch_or_writeb(&args->ma_args, vio_addr, value, newvalue, IS_ATOMIC()) != value)
 				goto again_0xc0;
@@ -2919,7 +2921,7 @@ again_0xc1_op64:
 					        : "cc");
 					break;
 
-				default: goto undefined_instruction;
+				default: goto return_unknown_instruction;
 				}
 				if (vio_cmpxch_or_writeq(&args->ma_args, vio_addr, value, newvalue, IS_ATOMIC()) != value)
 					goto again_0xc1_op64;
@@ -3026,7 +3028,7 @@ again_0xc1_op16:
 					        : "cc");
 					break;
 
-				default: goto undefined_instruction;
+				default: goto return_unknown_instruction;
 				}
 				if (vio_cmpxch_or_writew(&args->ma_args, vio_addr, value, newvalue, IS_ATOMIC()) != value)
 					goto again_0xc1_op16;
@@ -3133,7 +3135,7 @@ again_0xc1:
 					        : "cc");
 					break;
 
-				default: goto undefined_instruction;
+				default: goto return_unknown_instruction;
 				}
 				if (vio_cmpxch_or_writel(&args->ma_args,
 					                     vio_addr,
@@ -3247,7 +3249,7 @@ again_0xd0:
 				        : "cc");
 				break;
 
-			default: goto undefined_instruction;
+			default: goto return_unknown_instruction;
 			}
 			if (vio_cmpxch_or_writeb(&args->ma_args, vio_addr, value, newvalue, IS_ATOMIC()) != value)
 				goto again_0xd0;
@@ -3353,7 +3355,7 @@ again_0xd1_op64:
 					        : "cc");
 					break;
 
-				default: goto undefined_instruction;
+				default: goto return_unknown_instruction;
 				}
 				if (vio_cmpxch_or_writeq(&args->ma_args, vio_addr,
 				                         value, newvalue, IS_ATOMIC()) != value)
@@ -3454,7 +3456,7 @@ again_0xd1_op16:
 					        : "cc");
 					break;
 
-				default: goto undefined_instruction;
+				default: goto return_unknown_instruction;
 				}
 				if (vio_cmpxch_or_writew(&args->ma_args, vio_addr,
 				                         value, newvalue, IS_ATOMIC()) != value)
@@ -3555,7 +3557,7 @@ again_0xd1:
 					        : "cc");
 					break;
 
-				default: goto undefined_instruction;
+				default: goto return_unknown_instruction;
 				}
 				if (vio_cmpxch_or_writel(&args->ma_args, vio_addr,
 				                         value, newvalue, IS_ATOMIC()) != value)
@@ -4559,7 +4561,7 @@ again_0x0fac:
 
 		default: break;
 		}
-undefined_instruction:
+return_unknown_instruction:
 		/* XXX: Emulate every x86 instruction as a one-on-one direct emulation here.
 		 *      If we did this, it would become possible to run VIO memory as code.
 		 *   -> This could be especially useful since it would allow us to implement

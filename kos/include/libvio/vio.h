@@ -27,6 +27,9 @@
 #ifdef LIBVIO_CONFIG_HAVE_INT128_CMPXCH
 #include <hybrid/int128.h>
 #endif /* LIBVIO_CONFIG_HAVE_INT128_CMPXCH */
+#if defined(__KERNEL__) && !defined(__pos_t_defined)
+#include <hybrid/__altint.h>
+#endif /* __KERNEL__ && !__pos_t_defined */
 
 #ifdef __CC__
 __DECL_BEGIN
@@ -74,9 +77,12 @@ struct vio_args {
 /* Return the effective fault address for a given VIO address. */
 #ifdef __INTELLISENSE__
 void *vio_args_faultaddr(struct vio_args const *self, vio_addr_t vio_addr);
+vio_addr_t vio_args_vioaddr(struct vio_args const *self, void *virtaddr);
 #else /* __INTELLISENSE__ */
 #define vio_args_faultaddr(self, vio_addr) \
 	(void *)((__byte_t *)(self)->va_acmap_page + (__size_t)((vio_addr) - (self)->va_acmap_offset))
+#define vio_args_vioaddr(self, virtaddr) \
+	((self)->va_acmap_offset + (size_t)((__byte_t *)(virtaddr) - (__byte_t *)(self)->va_acmap_page))
 #endif /* !__INTELLISENSE__ */
 
 

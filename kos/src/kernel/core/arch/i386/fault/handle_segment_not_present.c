@@ -217,7 +217,7 @@ x86_handle_segment_not_present(struct icpustate *__restrict state,
 
 			case 0xff:
 				MOD_DECODE();
-				if (mod.mi_reg == 3 && mod.mi_type == EMU86_MODRM_MEMORY) {
+				if (mod.mi_reg == 3 && EMU86_MODRM_ISMEM(mod.mi_type)) {
 					u16 segment;
 					uintptr_t offset;
 					byte_t *addr;

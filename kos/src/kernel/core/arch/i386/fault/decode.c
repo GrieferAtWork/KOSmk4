@@ -269,7 +269,7 @@ NOTHROW(FCALL get_segment_base)(u16 segid) {
 			      X86_REGISTER_MISC_LDT,                /* regno */
 			      ldt);                                 /* regval */
 		}
-		seg       = &((struct segment *)gdt.dt_base)[SEGMENT_INDEX(ldt)];
+		seg          = &((struct segment *)gdt.dt_base)[SEGMENT_INDEX(ldt)];
 		gdt.dt_base  = segment_rdbaseX(seg);
 		gdt.dt_limit = (uint16_t)segment_rdlimit(seg);
 	}
@@ -318,7 +318,7 @@ NOTHROW(KCALL x86_decode_modrmgetmem)(struct icpustate *__restrict state,
                                       struct emu86_modrm *__restrict modrm,
                                       op_flag_t flags) {
 	uintptr_t result;
-	if (modrm->mi_type == EMU86_MODRM_REGISTER)
+	if (EMU86_MODRM_ISREG(modrm->mi_type))
 		return x86_icpustate_get(state, modrm->mi_rm);
 	result = modrm->mi_offset;
 	if (modrm->mi_rm != 0xff)
@@ -340,7 +340,7 @@ modrm_getrmb(struct icpustate *__restrict state,
              struct emu86_modrm *__restrict modrm, op_flag_t flags)
 		THROWS(E_SEGFAULT) {
 	uintptr_t addr;
-	if (modrm->mi_type == EMU86_MODRM_REGISTER)
+	if (EMU86_MODRM_ISREG(modrm->mi_type))
 		return x86_icpustate_get8(state, modrm->mi_rm, flags);
 	addr = x86_decode_modrmgetmem(state, modrm, flags);
 	if (irregs_isuser(IRREGS(state)))
@@ -353,7 +353,7 @@ modrm_setrmb(struct icpustate *__restrict state,
              struct emu86_modrm *__restrict modrm,
              op_flag_t flags, u8 value)
 		THROWS(E_SEGFAULT) {
-	if (modrm->mi_type == EMU86_MODRM_REGISTER) {
+	if (EMU86_MODRM_ISREG(modrm->mi_type)) {
 		x86_icpustate_set8(state, modrm->mi_rm, flags, value);
 	} else {
 		uintptr_t addr;
@@ -369,7 +369,7 @@ modrm_getrmw(struct icpustate *__restrict state,
              struct emu86_modrm *__restrict modrm, op_flag_t flags)
 		THROWS(E_SEGFAULT) {
 	uintptr_t addr;
-	if (modrm->mi_type == EMU86_MODRM_REGISTER)
+	if (EMU86_MODRM_ISREG(modrm->mi_type))
 		return x86_icpustate_get16(state, modrm->mi_rm);
 	addr = x86_decode_modrmgetmem(state, modrm, flags);
 	if (irregs_isuser(IRREGS(state)))
@@ -382,7 +382,7 @@ modrm_setrmw(struct icpustate *__restrict state,
              struct emu86_modrm *__restrict modrm,
              op_flag_t flags, u16 value)
 		THROWS(E_SEGFAULT) {
-	if (modrm->mi_type == EMU86_MODRM_REGISTER) {
+	if (EMU86_MODRM_ISREG(modrm->mi_type)) {
 		x86_icpustate_set16(state, modrm->mi_rm, value);
 	} else {
 		uintptr_t addr;
@@ -398,7 +398,7 @@ modrm_getrml(struct icpustate *__restrict state,
              struct emu86_modrm *__restrict modrm, op_flag_t flags)
 		THROWS(E_SEGFAULT) {
 	uintptr_t addr;
-	if (modrm->mi_type == EMU86_MODRM_REGISTER)
+	if (EMU86_MODRM_ISREG(modrm->mi_type))
 		return x86_icpustate_get32(state, modrm->mi_rm);
 	addr = x86_decode_modrmgetmem(state, modrm, flags);
 	if (irregs_isuser(IRREGS(state)))
@@ -411,7 +411,7 @@ modrm_setrml(struct icpustate *__restrict state,
              struct emu86_modrm *__restrict modrm,
              op_flag_t flags, u32 value)
 		THROWS(E_SEGFAULT) {
-	if (modrm->mi_type == EMU86_MODRM_REGISTER) {
+	if (EMU86_MODRM_ISREG(modrm->mi_type)) {
 		x86_icpustate_set32(state, modrm->mi_rm, value);
 	} else {
 		uintptr_t addr;
@@ -428,7 +428,7 @@ modrm_getrmq(struct icpustate *__restrict state,
              struct emu86_modrm *__restrict modrm, op_flag_t flags)
 		THROWS(E_SEGFAULT) {
 	uintptr_t addr;
-	if (modrm->mi_type == EMU86_MODRM_REGISTER)
+	if (EMU86_MODRM_ISREG(modrm->mi_type))
 		return x86_icpustate_get64(state, modrm->mi_rm);
 	addr = x86_decode_modrmgetmem(state, modrm, flags);
 	if (irregs_isuser(IRREGS(state)))
@@ -441,7 +441,7 @@ modrm_setrmq(struct icpustate *__restrict state,
              struct emu86_modrm *__restrict modrm,
              op_flag_t flags, u64 value)
 		THROWS(E_SEGFAULT) {
-	if (modrm->mi_type == EMU86_MODRM_REGISTER) {
+	if (EMU86_MODRM_ISREG(modrm->mi_type)) {
 		x86_icpustate_set64(state, modrm->mi_rm, value);
 	} else {
 		uintptr_t addr;

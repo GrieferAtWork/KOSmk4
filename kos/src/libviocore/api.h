@@ -17,32 +17,16 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _LIBVIOCORE_API_H
-#define _LIBVIOCORE_API_H 1
+#ifndef GUARD_LIBVIOCORE_API_H
+#define GUARD_LIBVIOCORE_API_H 1
+#define LIBVIO_WANT_PROTOTYPES 1
+#define LIBINSTRLEN_WANT_PROTOTYPES 1
 
 #include <__stdinc.h>
-#include <hybrid/host.h>
-#include <libvio/api.h>
+#include <hybrid/compiler.h>
 
-#if defined(__i386__) && !defined(__x86_64__)
-#define LIBVIOCORE_CC __ATTR_FASTCALL
-#else
-#define LIBVIOCORE_CC /* nothing */
-#endif
+#include <libviocore/api.h>
 
-#if (!defined(LIBVIOCORE_WANT_PROTOTYPES) &&    \
-     defined(__KOS__) && defined(__KERNEL__) && \
-     defined(LIBVIO_CONFIG_ENABLED))
-#define LIBVIOCORE_WANT_PROTOTYPES 1
-#endif
+#define CC LIBVIOCORE_CC
 
-#ifdef __LIBVIOCORE_STATIC
-#define LIBVIOCORE_DECL __INTDEF
-#else /* __LIBVIOCORE_STATIC */
-#define LIBVIOCORE_DECL __IMPDEF
-#endif /* !__LIBVIOCORE_STATIC */
-
-/* Library name for use with `dlopen()' */
-#define LIBVIOCORE_LIBRARY_NAME "libviocore.so"
-
-#endif /* !_LIBVIOCORE_API_H */
+#endif /* !GUARD_LIBVIOCORE_API_H */

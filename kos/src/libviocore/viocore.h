@@ -17,32 +17,25 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _LIBVIOCORE_API_H
-#define _LIBVIOCORE_API_H 1
+#ifndef GUARD_LIBVIOCORE_VIOCORE_H
+#define GUARD_LIBVIOCORE_VIOCORE_H 1
 
-#include <__stdinc.h>
-#include <hybrid/host.h>
-#include <libvio/api.h>
+#include "api.h"
+#include <libviocore/viocore.h>
 
-#if defined(__i386__) && !defined(__x86_64__)
-#define LIBVIOCORE_CC __ATTR_FASTCALL
-#else
-#define LIBVIOCORE_CC /* nothing */
-#endif
+#ifdef LIBVIO_CONFIG_ENABLED
+DECL_BEGIN
 
-#if (!defined(LIBVIOCORE_WANT_PROTOTYPES) &&    \
-     defined(__KOS__) && defined(__KERNEL__) && \
-     defined(LIBVIO_CONFIG_ENABLED))
-#define LIBVIOCORE_WANT_PROTOTYPES 1
-#endif
+/* Emulate the instruction pointed-to by `self->vea_args.va_state' and dispatch
+ * any memory access made to `self->vea_ptr' by dispatching it using the VIO
+ * callback table.
+ * Upon success, `self->vea_args.va_state' will point to the updated CPU state,
+ * which may be placed at a different address than it was upon entry.
+ * This function is intended to be called from a page fault handler. */
+INTDEF void CC libviocore_emulate(struct vio_emulate_args *__restrict self);
 
-#ifdef __LIBVIOCORE_STATIC
-#define LIBVIOCORE_DECL __INTDEF
-#else /* __LIBVIOCORE_STATIC */
-#define LIBVIOCORE_DECL __IMPDEF
-#endif /* !__LIBVIOCORE_STATIC */
 
-/* Library name for use with `dlopen()' */
-#define LIBVIOCORE_LIBRARY_NAME "libviocore.so"
+DECL_END
+#endif /* LIBVIO_CONFIG_ENABLED */
 
-#endif /* !_LIBVIOCORE_API_H */
+#endif /* !GUARD_LIBVIOCORE_VIOCORE_H */

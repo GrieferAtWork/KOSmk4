@@ -83,6 +83,8 @@ BEGIN
 
 		/* Required for: VIO support */
 		"../../libvio/*.c",
+//		"../../libviocore/*.c", /* Empty folder... */
+		"../../libviocore/arch/" + XARCH + "/*.c",
 
 		/* Pull in the actual kernel sources */
 		"debugger/*.c",
