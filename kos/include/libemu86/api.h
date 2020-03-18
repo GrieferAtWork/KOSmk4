@@ -45,6 +45,9 @@
 #define LIBEMU86_WANT_PROTOTYPES 1
 #endif
 
+/* Library name for use with `dlopen()' */
+#define LIBEMU86_LIBRARY_NAME "libemu86.so"
+
 
 #ifdef __LIBEMU86_STATIC
 #define LIBEMU86_DECL __PRIVATE

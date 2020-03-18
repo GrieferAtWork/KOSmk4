@@ -355,12 +355,12 @@ PRIVATE u32 KCALL random_rdl(struct vio_args *__restrict UNUSED(args), pos_t UNU
 	return krand32_nondeterministic();
 }
 
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 PRIVATE u64 KCALL random_rdq(struct vio_args *__restrict UNUSED(args), pos_t UNUSED(addr)) {
 	return ((u64)krand32_nondeterministic()) |
 	       ((u64)krand32_nondeterministic() << 32);
 }
-#endif /* CONFIG_VIO_HAS_QWORD */
+#endif /* LIBVIO_CONFIG_HAVE_QWORD */
 
 PRIVATE struct vm_datablock_type_vio const random_vio = {
 	.dtv_read  = VIO_CALLBACK_INIT(&random_rdb, &random_rdw, &random_rdl, &random_rdq),
@@ -387,11 +387,11 @@ PRIVATE u32 KCALL urandom_rdl(struct vio_args *__restrict UNUSED(args), pos_t UN
 	return krand32();
 }
 
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 PRIVATE u64 KCALL urandom_rdq(struct vio_args *__restrict UNUSED(args), pos_t UNUSED(addr)) {
 	return krand64();
 }
-#endif /* CONFIG_VIO_HAS_QWORD */
+#endif /* LIBVIO_CONFIG_HAVE_QWORD */
 
 PRIVATE struct vm_datablock_type_vio const urandom_vio = {
 	.dtv_read  = VIO_CALLBACK_INIT(&urandom_rdb, &urandom_rdw, &urandom_rdl, &urandom_rdq),

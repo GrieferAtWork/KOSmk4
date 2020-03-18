@@ -17,26 +17,33 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_VIO_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_VIO_H 1
+#ifndef _LIBVIOCORE_API_H
+#define _LIBVIOCORE_API_H 1
 
-#include <kernel/compiler.h>
-#include <kernel/vm.h>
+#include <__stdinc.h>
 #include <hybrid/host.h>
 
-#ifdef CONFIG_VIO
-DECL_BEGIN
+#if defined(__i386__) && !defined(__x86_64__)
+#define LIBVIOCORE_CC __ATTR_FASTCALL
+#else
+#define LIBVIOCORE_CC /* nothing */
+#endif
 
-#undef LIBVIO_CONFIG_HAVE_QWORD
-#undef LIBVIO_CONFIG_HAVE_QWORD_CMPXCH
-#undef LIBVIO_CONFIG_HAVE_INT128_CMPXCH
-#define LIBVIO_CONFIG_HAVE_QWORD_CMPXCH 1 /* Because of the `cmpxchg8b' instruction */
-#ifdef __x86_64__
-#define LIBVIO_CONFIG_HAVE_QWORD 1
-#define LIBVIO_CONFIG_HAVE_INT128_CMPXCH 1 /* Because of the `cmpxchg16b' instruction */
-#endif /* __x86_64__ */
+#if !defined(LIBVIOCORE_WANT_PROTOTYPES) && \
+     defined(__KOS__) && defined(__KERNEL__)
+#define LIBVIOCORE_WANT_PROTOTYPES 1
+#endif
 
-DECL_END
-#endif /* CONFIG_VIO */
+#if defined(__KOS__) && defined(__KERNEL__) && \
+    defined(CONFIG_BUILDING_KERNEL_CORE)
+#define LIBVIOCORE_DECL __PUBDEF
+#elif defined(__LIBVIOCORE_STATIC)
+#define LIBVIOCORE_DECL __INTDEF
+#else
+#define LIBVIOCORE_DECL __IMPDEF
+#endif
 
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_VIO_H */
+/* Library name for use with `dlopen()' */
+#define LIBVIOCORE_LIBRARY_NAME "libviocore.so"
+
+#endif /* !_LIBVIOCORE_API_H */

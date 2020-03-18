@@ -27,11 +27,11 @@
 #ifdef CONFIG_VIO
 DECL_BEGIN
 
-#undef CONFIG_VIO_HAS_QWORD
-#undef CONFIG_VIO_HAS_QWORD_CMPXCH
+#undef LIBVIO_CONFIG_HAVE_QWORD
+#undef LIBVIO_CONFIG_HAVE_QWORD_CMPXCH
 #if __SIZEOF_POINTER__ >= 8
-#define CONFIG_VIO_HAS_QWORD_CMPXCH 1 /* Because of the `cmpxchg8b' instruction */
-#define CONFIG_VIO_HAS_QWORD        1
+#define LIBVIO_CONFIG_HAVE_QWORD_CMPXCH 1 /* Because of the `cmpxchg8b' instruction */
+#define LIBVIO_CONFIG_HAVE_QWORD        1
 #endif
 
 DECL_END

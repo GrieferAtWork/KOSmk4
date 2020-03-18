@@ -140,23 +140,23 @@ err_invalid_addr:
 
 
 #if __SIZEOF_POINTER__ >= 8
-#ifndef CONFIG_VIO_HAS_QWORD
+#ifndef LIBVIO_CONFIG_HAVE_QWORD
 #error "Invalid configuration"
-#endif /* !CONFIG_VIO_HAS_QWORD */
+#endif /* !LIBVIO_CONFIG_HAVE_QWORD */
 #define INIT_OPERATION_PTR(name) \
 	{ NULL, NULL, NULL, &userkern_segment_##name##q }
-#elif defined(CONFIG_VIO_HAS_QWORD)
+#elif defined(LIBVIO_CONFIG_HAVE_QWORD)
 #define INIT_OPERATION_PTR(name) \
 	{ NULL, NULL, &userkern_segment_##name##l, NULL }
 #else
 #define INIT_OPERATION_PTR(name) \
 	{ NULL, NULL, &userkern_segment_##name##l }
 #endif
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 #define INIT_OPERATION_PTR_NULL { NULL, NULL, NULL, NULL }
-#else /* CONFIG_VIO_HAS_QWORD */
+#else /* LIBVIO_CONFIG_HAVE_QWORD */
 #define INIT_OPERATION_PTR_NULL { NULL, NULL, NULL }
-#endif /* !CONFIG_VIO_HAS_QWORD */
+#endif /* !LIBVIO_CONFIG_HAVE_QWORD */
 
 /* VIO bindings for the kernel-reserve segment of user-space VMs */
 PUBLIC struct vm_datablock_type_vio userkern_segment_vio = {
@@ -228,23 +228,23 @@ PUBLIC struct vm_datablock userkern_segment_block = {
 
 #ifdef __ARCH_HAVE_COMPAT
 #if __ARCH_COMPAT_SIZEOF_POINTER >= 8
-#ifndef CONFIG_VIO_HAS_QWORD
+#ifndef LIBVIO_CONFIG_HAVE_QWORD
 #error "Invalid configuration"
-#endif /* !CONFIG_VIO_HAS_QWORD */
+#endif /* !LIBVIO_CONFIG_HAVE_QWORD */
 #define INIT_OPERATION_PTR(name) \
 	{ NULL, NULL, NULL, &userkern_segment_##name##q }
-#elif defined(CONFIG_VIO_HAS_QWORD)
+#elif defined(LIBVIO_CONFIG_HAVE_QWORD)
 #define INIT_OPERATION_PTR(name) \
 	{ NULL, NULL, &userkern_segment_##name##l, NULL }
 #else
 #define INIT_OPERATION_PTR(name) \
 	{ NULL, NULL, &userkern_segment_##name##l }
 #endif
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 #define INIT_OPERATION_PTR_NULL { NULL, NULL, NULL, NULL }
-#else /* CONFIG_VIO_HAS_QWORD */
+#else /* LIBVIO_CONFIG_HAVE_QWORD */
 #define INIT_OPERATION_PTR_NULL { NULL, NULL, NULL }
-#endif /* !CONFIG_VIO_HAS_QWORD */
+#endif /* !LIBVIO_CONFIG_HAVE_QWORD */
 
 #ifdef KERNELSPACE_HIGHMEM
 #define COMPAT_ADDR_ISKERN(addr) (__CCAST(__UINTPTR_TYPE__)(addr) >= COMPAT_KERNELSPACE_BASE)

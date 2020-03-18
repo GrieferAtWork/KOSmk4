@@ -51,7 +51,7 @@ vio_illegal_write(struct vio_args const *__restrict args, pos_t addr) {
 	      E_SEGFAULT_CONTEXT_VIO | E_SEGFAULT_CONTEXT_WRITING);
 }
 
-#ifdef CONFIG_VIO_HAS_INT128_CMPXCH
+#ifdef LIBVIO_CONFIG_HAVE_INT128_CMPXCH
 PRIVATE ATTR_NORETURN void KCALL
 vio_nonatomic_operation128(struct vio_args const *__restrict args,
                            pos_t addr, uint128_t oldval, uint128_t newval) {
@@ -68,9 +68,9 @@ vio_nonatomic_operation128(struct vio_args const *__restrict args,
 		  uint128_vec64_significand(newval, 0),
 		  uint128_vec64_significand(newval, 1));
 }
-#endif /* CONFIG_VIO_HAS_INT128_CMPXCH */
+#endif /* LIBVIO_CONFIG_HAVE_INT128_CMPXCH */
 
-#if defined(CONFIG_VIO_HAS_QWORD) || defined(CONFIG_VIO_HAS_QWORD_CMPXCH)
+#if defined(LIBVIO_CONFIG_HAVE_QWORD) || defined(LIBVIO_CONFIG_HAVE_QWORD_CMPXCH)
 PRIVATE ATTR_NORETURN void KCALL
 vio_nonatomic_operation64(struct vio_args const *__restrict args,
                           pos_t addr, u64 oldval, u64 newval) {
@@ -91,7 +91,7 @@ vio_nonatomic_operation64(struct vio_args const *__restrict args,
 	      (u32)newval, (u32)(newval >> 32));
 #endif /* !__x86_64__ */
 }
-#endif /* CONFIG_VIO_HAS_QWORD || CONFIG_VIO_HAS_QWORD_CMPXCH */
+#endif /* LIBVIO_CONFIG_HAVE_QWORD || LIBVIO_CONFIG_HAVE_QWORD_CMPXCH */
 
 PRIVATE ATTR_NORETURN void KCALL
 vio_nonatomic_operation32(struct vio_args const *__restrict args,
@@ -277,7 +277,7 @@ typedef union ATTR_PACKED {
 #define L(off)   ((x).l_##off)
 #define Q(off)   ((x).q_##off)
 
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 #define IQ(...) __VA_ARGS__
 #else
 #define IQ(...) /* nothing */
@@ -306,19 +306,19 @@ typedef union ATTR_PACKED {
 #define AQ     (addr & ~7) /* qword-aligned */
 
 /* The max address mask that could ever be relevant. */
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 #define MMASK    7
 #define CASEB    case 1: case 3: case 5: case 7:
 #define CASEW    case 2: case 6:
 #define CASEL    case 4:
 #define CASEQ    case 0:
-#else /* CONFIG_VIO_HAS_QWORD */
+#else /* LIBVIO_CONFIG_HAVE_QWORD */
 #define MMASK  3
 #define CASEB    case 1: case 3:
 #define CASEW    case 2:
 #define CASEL    case 0:
 #define CASEQ    /* nothing */
-#endif /* !CONFIG_VIO_HAS_QWORD */
+#endif /* !LIBVIO_CONFIG_HAVE_QWORD */
 
 
 
@@ -380,7 +380,7 @@ PUBLIC NONNULL((1)) u16 KCALL vio_readw(struct vio_args *__restrict args, pos_t 
 		if (type->dtv_or.f_dword) { dword x = { (*type->dtv_or.f_dword)(args, AL, 0, true) }; return W3; }
 		if (type->dtv_xor.f_dword) { dword x = { (*type->dtv_xor.f_dword)(args, AL, 0, true) }; return W3; }
 	}
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 	if (((uintptr_t)addr & 7) != 7) {
 		if (type->dtv_read.f_qword) { qword x = { (*type->dtv_read.f_qword)(args, AQ) }; return W7; }
 		if (type->dtv_cmpxch.f_qword) { qword x = { (*type->dtv_cmpxch.f_qword)(args, AQ, 0, 0, true) }; return W7; }
@@ -390,7 +390,7 @@ PUBLIC NONNULL((1)) u16 KCALL vio_readw(struct vio_args *__restrict args, pos_t 
 		if (type->dtv_or.f_qword) { qword x = { (*type->dtv_or.f_qword)(args, AQ, 0, true) }; return W7; }
 		if (type->dtv_xor.f_qword) { qword x = { (*type->dtv_xor.f_qword)(args, AQ, 0, true) }; return W7; }
 	}
-#endif /* CONFIG_VIO_HAS_QWORD */
+#endif /* LIBVIO_CONFIG_HAVE_QWORD */
 #define READ_2X_READB(func, ...)                                      \
 	if (type->func.f_byte) {                                          \
 		word x;                                                       \
@@ -440,7 +440,7 @@ PUBLIC NONNULL((1)) u16 KCALL vio_readw(struct vio_args *__restrict args, pos_t 
 		READ_2X_READL(dtv_xor, 0, true)
 	}
 #undef READ_2X_READL
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 	if (((uintptr_t)addr & 7) == 7) {
 #define READ_2X_READQ(func, ...)                                           \
 		if (type->func.f_qword) {                                          \
@@ -458,7 +458,7 @@ PUBLIC NONNULL((1)) u16 KCALL vio_readw(struct vio_args *__restrict args, pos_t 
 		READ_2X_READQ(dtv_xor, 0, true)
 	}
 #undef READ_2X_READQ
-#endif /* CONFIG_VIO_HAS_QWORD */
+#endif /* LIBVIO_CONFIG_HAVE_QWORD */
 	vio_illegal_read(args, addr);
 }
 
@@ -473,7 +473,7 @@ PUBLIC NONNULL((1)) u32 KCALL vio_readl(struct vio_args *__restrict args, pos_t 
 		if (type->dtv_or.f_dword) return (*type->dtv_or.f_dword)(args, addr, 0, true);
 		if (type->dtv_xor.f_dword) return (*type->dtv_xor.f_dword)(args, addr, 0, true);
 	}
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 	if (((uintptr_t)addr & 7) <= 3) {
 		if (type->dtv_read.f_qword) { qword x = { (*type->dtv_read.f_qword)(args, AQ) }; return L7; }
 		if (type->dtv_cmpxch.f_qword) { qword x = { (*type->dtv_cmpxch.f_qword)(args, AQ, 0, 0, true) }; return L7; }
@@ -483,7 +483,7 @@ PUBLIC NONNULL((1)) u32 KCALL vio_readl(struct vio_args *__restrict args, pos_t 
 		if (type->dtv_or.f_qword) { qword x = { (*type->dtv_or.f_qword)(args, AQ, 0, true) }; return L7; }
 		if (type->dtv_xor.f_qword) { qword x = { (*type->dtv_xor.f_qword)(args, AQ, 0, true) }; return L7; }
 	}
-#endif /* CONFIG_VIO_HAS_QWORD */
+#endif /* LIBVIO_CONFIG_HAVE_QWORD */
 #define READ_2X_READW(func, ...)                                    \
 	if (type->func.f_word) {                                        \
 		dword x;                                                    \
@@ -516,7 +516,7 @@ PUBLIC NONNULL((1)) u32 KCALL vio_readl(struct vio_args *__restrict args, pos_t 
 	READ_2X_READL(dtv_or, 0, true)
 	READ_2X_READL(dtv_xor, 0, true)
 #undef READ_2X_READL
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 #define READ_2X_READQ(func, ...)                                     \
 	if (type->func.f_qword) {                                        \
 		xword x;                                                     \
@@ -532,7 +532,7 @@ PUBLIC NONNULL((1)) u32 KCALL vio_readl(struct vio_args *__restrict args, pos_t 
 	READ_2X_READQ(dtv_or, 0, true)
 	READ_2X_READQ(dtv_xor, 0, true)
 #undef READ_2X_READQ
-#endif /* CONFIG_VIO_HAS_QWORD */
+#endif /* LIBVIO_CONFIG_HAVE_QWORD */
 #define READ_3X_READW(func, ...)                                      \
 	if (type->func.f_word) {                                          \
 		qword x;                                                      \
@@ -586,7 +586,7 @@ PUBLIC NONNULL((1)) u16 KCALL vio_readw_aligned(struct vio_args *__restrict args
 	if (type->dtv_and.f_dword) { dword x = { (*type->dtv_and.f_dword)(args, AL, (u32)~0, true) }; return W2; }
 	if (type->dtv_or.f_dword) { dword x = { (*type->dtv_or.f_dword)(args, AL, 0, true) }; return W2; }
 	if (type->dtv_xor.f_dword) { dword x = { (*type->dtv_xor.f_dword)(args, AL, 0, true) }; return W2; }
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 	if (type->dtv_read.f_qword) { qword x = { (*type->dtv_read.f_qword)(args, AQ) }; return W6; }
 	if (type->dtv_cmpxch.f_qword) { qword x = { (*type->dtv_cmpxch.f_qword)(args, AQ, 0, 0, true) }; return W6; }
 	if (type->dtv_add.f_qword) { qword x = { (*type->dtv_add.f_qword)(args, AQ, 0, true) }; return W6; }
@@ -594,7 +594,7 @@ PUBLIC NONNULL((1)) u16 KCALL vio_readw_aligned(struct vio_args *__restrict args
 	if (type->dtv_and.f_qword) { qword x = { (*type->dtv_and.f_qword)(args, AQ, (u64)~0, true) }; return W6; }
 	if (type->dtv_or.f_qword) { qword x = { (*type->dtv_or.f_qword)(args, AQ, 0, true) }; return W6; }
 	if (type->dtv_xor.f_qword) { qword x = { (*type->dtv_xor.f_qword)(args, AQ, 0, true) }; return W6; }
-#endif /* CONFIG_VIO_HAS_QWORD */
+#endif /* LIBVIO_CONFIG_HAVE_QWORD */
 #define READ_2X_READB(func, ...)                                      \
 	if (type->func.f_byte) {                                          \
 		word x;                                                       \
@@ -623,7 +623,7 @@ PUBLIC NONNULL((1)) u32 KCALL vio_readl_aligned(struct vio_args *__restrict args
 	if (type->dtv_and.f_dword) return (*type->dtv_and.f_dword)(args, addr, (u16)~0, true);
 	if (type->dtv_or.f_dword) return (*type->dtv_or.f_dword)(args, addr, 0, true);
 	if (type->dtv_xor.f_dword) return (*type->dtv_xor.f_dword)(args, addr, 0, true);
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 	if (type->dtv_read.f_qword) { qword x = { (*type->dtv_read.f_qword)(args, AQ) }; return L4; }
 	if (type->dtv_cmpxch.f_qword) { qword x = { (*type->dtv_cmpxch.f_qword)(args, AQ, 0, 0, true) }; return L4; }
 	if (type->dtv_add.f_qword) { qword x = { (*type->dtv_add.f_qword)(args, AQ, 0, true) }; return L4; }
@@ -631,7 +631,7 @@ PUBLIC NONNULL((1)) u32 KCALL vio_readl_aligned(struct vio_args *__restrict args
 	if (type->dtv_and.f_qword) { qword x = { (*type->dtv_and.f_qword)(args, AQ, (u64)~0, true) }; return L4; }
 	if (type->dtv_or.f_qword) { qword x = { (*type->dtv_or.f_qword)(args, AQ, 0, true) }; return L4; }
 	if (type->dtv_xor.f_qword) { qword x = { (*type->dtv_xor.f_qword)(args, AQ, 0, true) }; return L4; }
-#endif /* CONFIG_VIO_HAS_QWORD */
+#endif /* LIBVIO_CONFIG_HAVE_QWORD */
 #define READ_2X_READW(func, ...)                                      \
 	if (type->func.f_word) {                                          \
 		dword x;                                                      \
@@ -668,7 +668,7 @@ PUBLIC NONNULL((1)) u32 KCALL vio_readl_aligned(struct vio_args *__restrict args
 }
 
 
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 PUBLIC NONNULL((1)) u64 KCALL vio_readq(struct vio_args *__restrict args, pos_t addr) {
 	struct vm_datablock_type_vio const *type = args->va_type;
 	if (((uintptr_t)addr & 7) == 0) {
@@ -853,7 +853,7 @@ PUBLIC NONNULL((1)) u64 KCALL vio_readq_aligned(struct vio_args *__restrict args
 #undef READ_8X_READB
 	vio_illegal_read(args, addr);
 }
-#endif /* CONFIG_VIO_HAS_QWORD */
+#endif /* LIBVIO_CONFIG_HAVE_QWORD */
 
 #define IF_WW(name, ...) { __auto_type func = type->dtv_write.name; if (func) { __VA_ARGS__ } }
 #define IF_WX(name, ...) { __auto_type func = type->dtv_xch.name; if (func) { __VA_ARGS__ } }
@@ -889,7 +889,7 @@ PUBLIC NONNULL((1)) void KCALL vio_writeb(struct vio_args *__restrict args, pos_
 		(*func)(args, addr, x.l, false);
 		return;
 	})
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 	IF_WW(f_qword, {
 		qword x = { vio_readq_aligned(args, AQ) };
 		B7 = value;
@@ -902,7 +902,7 @@ PUBLIC NONNULL((1)) void KCALL vio_writeb(struct vio_args *__restrict args, pos_
 		(*func)(args, addr, x.q, false);
 		return;
 	})
-#endif /* CONFIG_VIO_HAS_QWORD */
+#endif /* LIBVIO_CONFIG_HAVE_QWORD */
 	vio_illegal_write(args, addr);
 }
 
@@ -941,7 +941,7 @@ vio_writew(struct vio_args *__restrict args, pos_t addr, u16 value) {
 			return;
 		})
 	}
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 	if (((uintptr_t)addr & 7) != 7) {
 		IF_WW(f_qword, {
 			qword x = { vio_readq_aligned(args, addr & ~7) };
@@ -956,7 +956,7 @@ vio_writew(struct vio_args *__restrict args, pos_t addr, u16 value) {
 			return;
 		})
 	}
-#endif /* CONFIG_VIO_HAS_QWORD */
+#endif /* LIBVIO_CONFIG_HAVE_QWORD */
 	IF_WW(f_word, {
 		dword x = { vio_readl_aligned(args, addr & ~3) };
 		W3 = value;
@@ -1006,7 +1006,7 @@ vio_writew_aligned(struct vio_args *__restrict args, pos_t addr, u16 value) {
 			return;
 		})
 	}
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 	if (((uintptr_t)addr & 7) != 7) {
 		IF_WW(f_qword, {
 			qword x = { vio_readq_aligned(args, addr & ~7) };
@@ -1021,7 +1021,7 @@ vio_writew_aligned(struct vio_args *__restrict args, pos_t addr, u16 value) {
 			return;
 		})
 	}
-#endif /* CONFIG_VIO_HAS_QWORD */
+#endif /* LIBVIO_CONFIG_HAVE_QWORD */
 	vio_illegal_write(args, addr);
 }
 
@@ -1085,7 +1085,7 @@ vio_writel(struct vio_args *__restrict args,
 			return;
 		})
 	}
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 	IF_WW(f_qword, {
 		qword x;
 		x.q = vio_readq(args, addr & ~7);
@@ -1100,9 +1100,9 @@ vio_writel(struct vio_args *__restrict args,
 		(*func)(args, addr, value, false);
 		return;
 	})
-#endif /* CONFIG_VIO_HAS_QWORD */
+#endif /* LIBVIO_CONFIG_HAVE_QWORD */
 	if (((uintptr_t)addr & 3) != 0) {
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 		IF_WW(f_dword, {
 			qword x;
 			x.q = vio_readq_aligned(args, addr & ~7);
@@ -1140,7 +1140,7 @@ vio_writel(struct vio_args *__restrict args,
 		})
 #endif
 	}
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 	IF_WW(f_qword, {
 		qword x = { vio_readq_aligned(args, addr & ~7) };
 		L3 = value;
@@ -1153,7 +1153,7 @@ vio_writel(struct vio_args *__restrict args,
 		(*func)(args, addr & ~7, x.q, false);
 		return;
 	})
-#endif /* CONFIG_VIO_HAS_QWORD */
+#endif /* LIBVIO_CONFIG_HAVE_QWORD */
 	vio_illegal_write(args, addr);
 }
 
@@ -1192,7 +1192,7 @@ vio_writel_aligned(struct vio_args *__restrict args,
 		(*func)(args, addr + 3, x.b[3], false);
 		return;
 	})
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 	IF_WW(f_qword, {
 		qword x;
 		x.q = vio_readq(args, addr & ~4);
@@ -1207,11 +1207,11 @@ vio_writel_aligned(struct vio_args *__restrict args,
 		(*func)(args, addr, x.q, false);
 		return;
 	})
-#endif /* CONFIG_VIO_HAS_QWORD */
+#endif /* LIBVIO_CONFIG_HAVE_QWORD */
 	vio_illegal_write(args, addr);
 }
 
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 PUBLIC NONNULL((1)) void KCALL
 vio_writeq(struct vio_args *__restrict args,
            pos_t addr, u64 value) {
@@ -1407,7 +1407,7 @@ vio_writeq_aligned(struct vio_args *__restrict args,
 	})
 	vio_illegal_write(args, addr);
 }
-#endif /* CONFIG_VIO_HAS_QWORD */
+#endif /* LIBVIO_CONFIG_HAVE_QWORD */
 
 
 PUBLIC NONNULL((1)) u8 KCALL
@@ -1442,10 +1442,10 @@ vio_cmpxchb(struct vio_args *__restrict args,
 		}
 		return oldval2.b[(uintptr_t)addr & 3];
 	}
-#if defined(CONFIG_VIO_HAS_QWORD) || defined(CONFIG_VIO_HAS_QWORD_CMPXCH)
+#if defined(LIBVIO_CONFIG_HAVE_QWORD) || defined(LIBVIO_CONFIG_HAVE_QWORD_CMPXCH)
 	if (type->dtv_cmpxch.f_qword) {
 		qword oldval, oldval2, newval;
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 		oldval.q = vio_readq(args, addr & ~7);
 #else
 		oldval.l[0] = vio_readl(args, (addr & ~7));
@@ -1461,7 +1461,7 @@ vio_cmpxchb(struct vio_args *__restrict args,
 		}
 		return oldval2.b[(uintptr_t)addr & 7];
 	}
-#endif /* CONFIG_VIO_HAS_QWORD || CONFIG_VIO_HAS_QWORD_CMPXCH */
+#endif /* LIBVIO_CONFIG_HAVE_QWORD || LIBVIO_CONFIG_HAVE_QWORD_CMPXCH */
 	/* Non-atomic compare-exchange */
 	if (atomic)
 		vio_nonatomic_operation8(args, addr, oldvalue, newvalue);
@@ -1493,15 +1493,15 @@ vio_cmpxchw(struct vio_args *__restrict args,
 		}
 		return (*(u16 *)((u8 *)&oldval2 + ((uintptr_t)addr & 3)));
 	}
-#if defined(CONFIG_VIO_HAS_QWORD) || defined(CONFIG_VIO_HAS_QWORD_CMPXCH)
+#if defined(LIBVIO_CONFIG_HAVE_QWORD) || defined(LIBVIO_CONFIG_HAVE_QWORD_CMPXCH)
 	if (type->dtv_cmpxch.f_qword && ((uintptr_t)addr & 7) <= 6) {
 		qword oldval, oldval2, newval;
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 		oldval.q = vio_readq(args, addr & ~7);
-#else /* CONFIG_VIO_HAS_QWORD */
+#else /* LIBVIO_CONFIG_HAVE_QWORD */
 		oldval.l[0] = vio_readl(args, (addr & ~7));
 		oldval.l[1] = vio_readl(args, (addr & ~7) + 4);
-#endif /* !CONFIG_VIO_HAS_QWORD */
+#endif /* !LIBVIO_CONFIG_HAVE_QWORD */
 		(*(u16 *)((u8 *)&oldval + ((uintptr_t)addr & 7))) = oldvalue;
 		newval                                            = oldval;
 		(*(u16 *)((u8 *)&newval + ((uintptr_t)addr & 7))) = newvalue;
@@ -1512,7 +1512,7 @@ vio_cmpxchw(struct vio_args *__restrict args,
 		}
 		return (*(u16 *)((u8 *)&oldval2 + ((uintptr_t)addr & 7)));
 	}
-#endif /* CONFIG_VIO_HAS_QWORD || CONFIG_VIO_HAS_QWORD_CMPXCH */
+#endif /* LIBVIO_CONFIG_HAVE_QWORD || LIBVIO_CONFIG_HAVE_QWORD_CMPXCH */
 	/* Non-atomic compare-exchange */
 	if (atomic)
 		vio_nonatomic_operation16(args, addr, oldvalue, newvalue);
@@ -1531,15 +1531,15 @@ vio_cmpxchl(struct vio_args *__restrict args,
 	struct vm_datablock_type_vio const *type = args->va_type;
 	if (type->dtv_cmpxch.f_dword && ((uintptr_t)addr & 3) == 0)
 		return (*type->dtv_cmpxch.f_dword)(args, addr, oldvalue, newvalue, atomic);
-#if defined(CONFIG_VIO_HAS_QWORD) || defined(CONFIG_VIO_HAS_QWORD_CMPXCH)
+#if defined(LIBVIO_CONFIG_HAVE_QWORD) || defined(LIBVIO_CONFIG_HAVE_QWORD_CMPXCH)
 	if (type->dtv_cmpxch.f_qword && ((uintptr_t)addr & 7) <= 4) {
 		qword oldval, oldval2, newval;
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 		oldval.q = vio_readq(args, addr & ~7);
-#else /* CONFIG_VIO_HAS_QWORD */
+#else /* LIBVIO_CONFIG_HAVE_QWORD */
 		oldval.l[0] = vio_readl(args, (addr & ~7));
 		oldval.l[1] = vio_readl(args, (addr & ~7) + 4);
-#endif /* !CONFIG_VIO_HAS_QWORD */
+#endif /* !LIBVIO_CONFIG_HAVE_QWORD */
 		(*(u32 *)((u8 *)&oldval + ((uintptr_t)addr & 7))) = oldvalue;
 		newval                                            = oldval;
 		(*(u32 *)((u8 *)&newval + ((uintptr_t)addr & 7))) = newvalue;
@@ -1550,7 +1550,7 @@ vio_cmpxchl(struct vio_args *__restrict args,
 		}
 		return (*(u32 *)((u8 *)&oldval2 + ((uintptr_t)addr & 7)));
 	}
-#endif /* CONFIG_VIO_HAS_QWORD || CONFIG_VIO_HAS_QWORD_CMPXCH */
+#endif /* LIBVIO_CONFIG_HAVE_QWORD || LIBVIO_CONFIG_HAVE_QWORD_CMPXCH */
 	/* Non-atomic compare-exchange */
 	if (atomic)
 		vio_nonatomic_operation32(args, addr, oldvalue, newvalue);
@@ -1562,7 +1562,7 @@ vio_cmpxchl(struct vio_args *__restrict args,
 	}
 }
 
-#if defined(CONFIG_VIO_HAS_QWORD) || defined(CONFIG_VIO_HAS_QWORD_CMPXCH)
+#if defined(LIBVIO_CONFIG_HAVE_QWORD) || defined(LIBVIO_CONFIG_HAVE_QWORD_CMPXCH)
 PUBLIC NONNULL((1)) u64 KCALL
 vio_cmpxchq(struct vio_args *__restrict args,
             pos_t addr, u64 oldvalue, u64 newvalue, bool atomic) {
@@ -1573,12 +1573,12 @@ vio_cmpxchq(struct vio_args *__restrict args,
 	if (atomic)
 		vio_nonatomic_operation64(args, addr, oldvalue, newvalue);
 	{
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 		u64 result = vio_readq(args, addr);
 		if (result == oldvalue)
 			vio_writeq(args, addr, newvalue);
 		return result;
-#else /* CONFIG_VIO_HAS_QWORD */
+#else /* LIBVIO_CONFIG_HAVE_QWORD */
 		qword result;
 		result.l[0] = vio_readl(args, addr);
 		result.l[1] = vio_readl(args, addr + 4);
@@ -1588,12 +1588,12 @@ vio_cmpxchq(struct vio_args *__restrict args,
 			vio_writel(args, addr + 4, result.l[1]);
 		}
 		return oldvalue;
-#endif /* !CONFIG_VIO_HAS_QWORD */
+#endif /* !LIBVIO_CONFIG_HAVE_QWORD */
 	}
 }
-#endif /* CONFIG_VIO_HAS_QWORD || CONFIG_VIO_HAS_QWORD_CMPXCH */
+#endif /* LIBVIO_CONFIG_HAVE_QWORD || LIBVIO_CONFIG_HAVE_QWORD_CMPXCH */
 
-#ifdef CONFIG_VIO_HAS_INT128_CMPXCH
+#ifdef LIBVIO_CONFIG_HAVE_INT128_CMPXCH
 PUBLIC NONNULL((1)) uint128_t KCALL
 vio_cmpxch128(struct vio_args *__restrict args,
               pos_t addr, uint128_t oldvalue,
@@ -1610,14 +1610,14 @@ vio_cmpxch128(struct vio_args *__restrict args,
 			u64       v64[2];
 			u32       v32[4];
 		} result;
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 		result.v64[0] = vio_readq(args, addr + 0);
 		result.v64[1] = vio_readq(args, addr + 8);
 		if (memcmp(&result, &oldvalue, 16) == 0) {
 			vio_writeq(args, addr + 0, uint128_vec64(newvalue)[0]);
 			vio_writeq(args, addr + 8, uint128_vec64(newvalue)[1]);
 		}
-#else /* CONFIG_VIO_HAS_QWORD */
+#else /* LIBVIO_CONFIG_HAVE_QWORD */
 		result.v32[0] = vio_readl(args, addr + 0);
 		result.v32[1] = vio_readl(args, addr + 4);
 		result.v32[2] = vio_readl(args, addr + 8);
@@ -1628,11 +1628,11 @@ vio_cmpxch128(struct vio_args *__restrict args,
 			vio_writel(args, addr + 8,  uint128_vec32(newvalue)[2]);
 			vio_writel(args, addr + 12, uint128_vec32(newvalue)[3]);
 		}
-#endif /* !CONFIG_VIO_HAS_QWORD */
+#endif /* !LIBVIO_CONFIG_HAVE_QWORD */
 		return result.v128;
 	}
 }
-#endif /* CONFIG_VIO_HAS_INT128_CMPXCH */
+#endif /* LIBVIO_CONFIG_HAVE_INT128_CMPXCH */
 
 PUBLIC NONNULL((1)) u8 KCALL
 vio_cmpxch_or_writeb(struct vio_args *__restrict args,
@@ -1667,15 +1667,15 @@ vio_cmpxch_or_writeb(struct vio_args *__restrict args,
 		}
 		return oldval2.b[(uintptr_t)addr & 3];
 	}
-#if defined(CONFIG_VIO_HAS_QWORD) || defined(CONFIG_VIO_HAS_QWORD_CMPXCH)
+#if defined(LIBVIO_CONFIG_HAVE_QWORD) || defined(LIBVIO_CONFIG_HAVE_QWORD_CMPXCH)
 	if (type->dtv_cmpxch.f_qword) {
 		qword oldval, oldval2, newval;
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 		oldval.q = vio_readq(args, addr & ~7);
-#else /* CONFIG_VIO_HAS_QWORD */
+#else /* LIBVIO_CONFIG_HAVE_QWORD */
 		oldval.l[0] = vio_readl(args, (addr & ~7));
 		oldval.l[1] = vio_readl(args, (addr & ~7) + 4);
-#endif /* !CONFIG_VIO_HAS_QWORD */
+#endif /* !LIBVIO_CONFIG_HAVE_QWORD */
 		oldval.b[(uintptr_t)addr & 7] = oldvalue;
 		newval                        = oldval;
 		newval.b[(uintptr_t)addr & 7] = newvalue;
@@ -1686,7 +1686,7 @@ vio_cmpxch_or_writeb(struct vio_args *__restrict args,
 		}
 		return oldval2.b[(uintptr_t)addr & 7];
 	}
-#endif /* CONFIG_VIO_HAS_QWORD || CONFIG_VIO_HAS_QWORD_CMPXCH */
+#endif /* LIBVIO_CONFIG_HAVE_QWORD || LIBVIO_CONFIG_HAVE_QWORD_CMPXCH */
 	/* Non-atomic compare-exchange */
 	if (atomic)
 		vio_nonatomic_operation8(args, addr, oldvalue, newvalue);
@@ -1715,15 +1715,15 @@ vio_cmpxch_or_writew(struct vio_args *__restrict args,
 		}
 		return (*(u16 *)((u8 *)&oldval2 + ((uintptr_t)addr & 3)));
 	}
-#if defined(CONFIG_VIO_HAS_QWORD) || defined(CONFIG_VIO_HAS_QWORD_CMPXCH)
+#if defined(LIBVIO_CONFIG_HAVE_QWORD) || defined(LIBVIO_CONFIG_HAVE_QWORD_CMPXCH)
 	if (type->dtv_cmpxch.f_qword && ((uintptr_t)addr & 7) <= 6) {
 		qword oldval, oldval2, newval;
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 		oldval.q = vio_readq(args, addr & ~7);
-#else /* CONFIG_VIO_HAS_QWORD */
+#else /* LIBVIO_CONFIG_HAVE_QWORD */
 		oldval.l[0] = vio_readl(args, (addr & ~7));
 		oldval.l[1] = vio_readl(args, (addr & ~7) + 4);
-#endif /* !CONFIG_VIO_HAS_QWORD */
+#endif /* !LIBVIO_CONFIG_HAVE_QWORD */
 		(*(u16 *)((u8 *)&oldval + ((uintptr_t)addr & 7))) = oldvalue;
 		newval                                            = oldval;
 		(*(u16 *)((u8 *)&newval + ((uintptr_t)addr & 7))) = newvalue;
@@ -1734,7 +1734,7 @@ vio_cmpxch_or_writew(struct vio_args *__restrict args,
 		}
 		return (*(u16 *)((u8 *)&oldval2 + ((uintptr_t)addr & 7)));
 	}
-#endif /* CONFIG_VIO_HAS_QWORD || CONFIG_VIO_HAS_QWORD_CMPXCH */
+#endif /* LIBVIO_CONFIG_HAVE_QWORD || LIBVIO_CONFIG_HAVE_QWORD_CMPXCH */
 	/* Non-atomic compare-exchange */
 	if (atomic)
 		vio_nonatomic_operation16(args, addr, oldvalue, newvalue);
@@ -1750,15 +1750,15 @@ vio_cmpxch_or_writel(struct vio_args *__restrict args,
 	struct vm_datablock_type_vio const *type = args->va_type;
 	if (type->dtv_cmpxch.f_dword && ((uintptr_t)addr & 3) == 0)
 		return (*type->dtv_cmpxch.f_dword)(args, addr, oldvalue, newvalue, atomic);
-#if defined(CONFIG_VIO_HAS_QWORD) || defined(CONFIG_VIO_HAS_QWORD_CMPXCH)
+#if defined(LIBVIO_CONFIG_HAVE_QWORD) || defined(LIBVIO_CONFIG_HAVE_QWORD_CMPXCH)
 	if (type->dtv_cmpxch.f_qword && ((uintptr_t)addr & 7) <= 4) {
 		qword oldval, oldval2, newval;
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 		oldval.q = vio_readq(args, addr & ~7);
-#else /* CONFIG_VIO_HAS_QWORD */
+#else /* LIBVIO_CONFIG_HAVE_QWORD */
 		oldval.l[0] = vio_readl(args, (addr & ~7));
 		oldval.l[1] = vio_readl(args, (addr & ~7) + 4);
-#endif /* !CONFIG_VIO_HAS_QWORD */
+#endif /* !LIBVIO_CONFIG_HAVE_QWORD */
 		(*(u32 *)((u8 *)&oldval + ((uintptr_t)addr & 7))) = oldvalue;
 		newval                                            = oldval;
 		(*(u32 *)((u8 *)&newval + ((uintptr_t)addr & 7))) = newvalue;
@@ -1769,7 +1769,7 @@ vio_cmpxch_or_writel(struct vio_args *__restrict args,
 		}
 		return (*(u32 *)((u8 *)&oldval2 + ((uintptr_t)addr & 7)));
 	}
-#endif /* CONFIG_VIO_HAS_QWORD || CONFIG_VIO_HAS_QWORD_CMPXCH */
+#endif /* LIBVIO_CONFIG_HAVE_QWORD || LIBVIO_CONFIG_HAVE_QWORD_CMPXCH */
 	/* Non-atomic compare-exchange */
 	if (atomic)
 		vio_nonatomic_operation32(args, addr, oldvalue, newvalue);
@@ -1777,7 +1777,7 @@ vio_cmpxch_or_writel(struct vio_args *__restrict args,
 	return oldvalue;
 }
 
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 PUBLIC NONNULL((1)) u64 KCALL
 vio_cmpxch_or_writeq(struct vio_args *__restrict args,
                      pos_t addr, u64 oldvalue,
@@ -1791,7 +1791,7 @@ vio_cmpxch_or_writeq(struct vio_args *__restrict args,
 	vio_writeq(args, addr, newvalue);
 	return oldvalue;
 }
-#endif /* CONFIG_VIO_HAS_QWORD */
+#endif /* LIBVIO_CONFIG_HAVE_QWORD */
 
 
 
@@ -1818,7 +1818,7 @@ vio_copyfromvio(struct vio_args *__restrict args,
 		num_bytes -= 2;
 		offset += 2;
 	}
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 	if ((offset & 4) && num_bytes >= 4) {
 		u32 temp = vio_readl_aligned(args, offset);
 		UNALIGNED_SET32((u32 *)buf, temp);
@@ -1840,7 +1840,7 @@ vio_copyfromvio(struct vio_args *__restrict args,
 		num_bytes -= 4;
 		offset += 4;
 	}
-#else /* CONFIG_VIO_HAS_QWORD */
+#else /* LIBVIO_CONFIG_HAVE_QWORD */
 	while (num_bytes >= 4) {
 		u32 temp = vio_readl_aligned(args, offset);
 		UNALIGNED_SET32((u32 *)buf, temp);
@@ -1848,7 +1848,7 @@ vio_copyfromvio(struct vio_args *__restrict args,
 		num_bytes -= 4;
 		offset += 4;
 	}
-#endif /* !CONFIG_VIO_HAS_QWORD */
+#endif /* !LIBVIO_CONFIG_HAVE_QWORD */
 	assert(num_bytes <= 3);
 	if (num_bytes >= 2) {
 		u16 temp = vio_readw_aligned(args, offset);
@@ -1885,7 +1885,7 @@ vio_copytovio(struct vio_args *__restrict args,
 		num_bytes -= 2;
 		offset += 2;
 	}
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 	if ((offset & 4) && num_bytes >= 4) {
 		u32 temp = UNALIGNED_GET32((u32 *)buf);
 		vio_writel_aligned(args, offset, temp);
@@ -1907,7 +1907,7 @@ vio_copytovio(struct vio_args *__restrict args,
 		num_bytes -= 4;
 		offset += 4;
 	}
-#else /* CONFIG_VIO_HAS_QWORD */
+#else /* LIBVIO_CONFIG_HAVE_QWORD */
 	while (num_bytes >= 4) {
 		u32 temp = UNALIGNED_GET32((u32 *)buf);
 		vio_writel_aligned(args, offset, temp);
@@ -1915,7 +1915,7 @@ vio_copytovio(struct vio_args *__restrict args,
 		num_bytes -= 4;
 		offset += 4;
 	}
-#endif /* !CONFIG_VIO_HAS_QWORD */
+#endif /* !LIBVIO_CONFIG_HAVE_QWORD */
 	assert(num_bytes <= 3);
 	if (num_bytes >= 2) {
 		u16 temp = UNALIGNED_GET16((u16 *)buf);
@@ -1949,7 +1949,7 @@ vio_memset(struct vio_args *__restrict args,
 		num_bytes -= 2;
 		offset += 2;
 	}
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 	if ((offset & 4) && num_bytes >= 4) {
 		u32 temp = (u32)byte | (u32)byte << 8 |
 		           (u32)byte << 16 | (u32)byte << 24;
@@ -1975,7 +1975,7 @@ vio_memset(struct vio_args *__restrict args,
 		num_bytes -= 4;
 		offset += 4;
 	}
-#else /* CONFIG_VIO_HAS_QWORD */
+#else /* LIBVIO_CONFIG_HAVE_QWORD */
 	if (num_bytes >= 4) {
 		u32 temp = (u32)byte | (u32)byte << 8 |
 		           (u32)byte << 16 | (u32)byte << 24;
@@ -1985,7 +1985,7 @@ vio_memset(struct vio_args *__restrict args,
 			offset += 4;
 		}
 	}
-#endif /* !CONFIG_VIO_HAS_QWORD */
+#endif /* !LIBVIO_CONFIG_HAVE_QWORD */
 	assert(num_bytes <= 3);
 	if (num_bytes >= 2) {
 		u16 temp = (u16)byte | (u16)byte << 8;

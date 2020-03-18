@@ -38,7 +38,7 @@
 #include <kernel/except.h>
 
 #include <string.h>
-#endif
+#endif /* __KERNEL__ */
 
 DECL_BEGIN
 

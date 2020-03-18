@@ -36,7 +36,6 @@
 #define CONFIG_LIBEMU86_WANT_16BIT 1
 #define CONFIG_LIBEMU86_WANT_64BIT 1
 #endif /* !__x86_64__ */
-#define CONFIG_LIBEMU86_NEED_ARCHMODE 1
 
 #include <libemu86/api.h>
 

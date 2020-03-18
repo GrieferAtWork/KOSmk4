@@ -17,26 +17,30 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_VIO_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_VIO_H 1
+#ifdef __INTELLISENSE__
+#include "../emulate.c.inl"
+#endif /* __INTELLISENSE__ */
 
-#include <kernel/compiler.h>
-#include <kernel/vm.h>
-#include <hybrid/host.h>
+EMU86_INTELLISENSE_BEGIN(lea) {
 
-#ifdef CONFIG_VIO
-DECL_BEGIN
+#ifndef EMU86_EMULATE_ONLY_MEMORY
+case 0x8d: {
+	/*         8D /r     LEA r16,m     RM     Valid     Valid     Store effective address for m in register r16.
+	 *         8D /r     LEA r32,m     RM     Valid     Valid     Store effective address for m in register r32.
+	 * REX.W + 8D /r     LEA r64,m     RM     Valid     N.E.      Store effective address for m in register r64. */
+	uintptr_t addr;
+	MODRM_DECODE_MEMONLY();
+	addr = (uintptr_t)MODRM_MEMADDR();
+	IF_64BIT(if (IS_64BIT()) {
+		MODRM_SETREGQ((u64)addr);
+	} else) if (!IS_16BIT()) {
+		MODRM_SETREGL((u32)addr);
+	} else {
+		MODRM_SETREGW((u16)addr);
+	}
+	goto done;
+}
+#endif /* !EMU86_EMULATE_ONLY_MEMORY */
 
-#undef LIBVIO_CONFIG_HAVE_QWORD
-#undef LIBVIO_CONFIG_HAVE_QWORD_CMPXCH
-#undef LIBVIO_CONFIG_HAVE_INT128_CMPXCH
-#define LIBVIO_CONFIG_HAVE_QWORD_CMPXCH 1 /* Because of the `cmpxchg8b' instruction */
-#ifdef __x86_64__
-#define LIBVIO_CONFIG_HAVE_QWORD 1
-#define LIBVIO_CONFIG_HAVE_INT128_CMPXCH 1 /* Because of the `cmpxchg16b' instruction */
-#endif /* __x86_64__ */
-
-DECL_END
-#endif /* CONFIG_VIO */
-
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_VIO_H */
+}
+EMU86_INTELLISENSE_END

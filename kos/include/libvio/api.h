@@ -17,26 +17,52 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_VIO_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_VIO_H 1
+#ifndef _LIBVIO_API_H
+#define _LIBVIO_API_H 1
 
-#include <kernel/compiler.h>
-#include <kernel/vm.h>
+#include <__stdinc.h>
 #include <hybrid/host.h>
 
-#ifdef CONFIG_VIO
-DECL_BEGIN
 
+/* Configure optional features based on architecture */
 #undef LIBVIO_CONFIG_HAVE_QWORD
 #undef LIBVIO_CONFIG_HAVE_QWORD_CMPXCH
 #undef LIBVIO_CONFIG_HAVE_INT128_CMPXCH
-#define LIBVIO_CONFIG_HAVE_QWORD_CMPXCH 1 /* Because of the `cmpxchg8b' instruction */
-#ifdef __x86_64__
-#define LIBVIO_CONFIG_HAVE_QWORD 1
+
+#if defined(__x86_64__)
+#define LIBVIO_CONFIG_HAVE_QWORD         1
+#define LIBVIO_CONFIG_HAVE_QWORD_CMPXCH  1
 #define LIBVIO_CONFIG_HAVE_INT128_CMPXCH 1 /* Because of the `cmpxchg16b' instruction */
-#endif /* __x86_64__ */
+#elif defined(__i386__)
+#define LIBVIO_CONFIG_HAVE_QWORD_CMPXCH  1 /* Because of the `cmpxchg8b' instruction */
+#else /* Arch... */
+#include <hybrid/typecore.h>
+#if __SIZEOF_POINTER__ >= 8
+#define LIBVIO_CONFIG_HAVE_QWORD 1
+#define LIBVIO_CONFIG_HAVE_QWORD_CMPXCH 1
+#endif /* __SIZEOF_POINTER__ >= 8 */
+#endif /* !Arch... */
 
-DECL_END
-#endif /* CONFIG_VIO */
 
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_VIO_H */
+#if defined(__i386__) && !defined(__x86_64__)
+#define LIBVIO_CC __ATTR_STDCALL
+#else
+#define LIBVIO_CC /* nothing */
+#endif
+
+#if 0
+#define LIBVIO_WANT_PROTOTYPES 1
+#endif
+
+#ifdef LIBVIO_WANT_PROTOTYPES
+#define LIBVIO_DECL __PUBDEF
+#elif defined(__LIBVIO_STATIC)
+#define LIBVIO_DECL __INTDEF
+#else
+#define LIBVIO_DECL __IMPDEF
+#endif
+
+/* Library name for use with `dlopen()' */
+#define LIBVIO_LIBRARY_NAME "libvio.so"
+
+#endif /* !_LIBVIO_API_H */

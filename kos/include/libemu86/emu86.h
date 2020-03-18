@@ -80,6 +80,25 @@ __DECL_BEGIN
 #define EMU86_R_ESI     6 /* Source pointer. */
 #define EMU86_R_EDI     7 /* Destination pointer. */
 #if CONFIG_LIBEMU86_WANT_64BIT
+#define EMU86_R_R8D     8 /* %r8d */
+#define EMU86_R_R9D     9 /* %r9d */
+#define EMU86_R_R10D   10 /* %r10d */
+#define EMU86_R_R11D   11 /* %r11d */
+#define EMU86_R_R12D   12 /* %r12d */
+#define EMU86_R_R13D   13 /* %r13d */
+#define EMU86_R_R14D   14 /* %r14d */
+#define EMU86_R_R15D   15 /* %r15d */
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+
+#if CONFIG_LIBEMU86_WANT_64BIT
+#define EMU86_R_RAX     0 /* Accumulator. */
+#define EMU86_R_RCX     1 /* Counter register. */
+#define EMU86_R_RDX     2 /* General purpose d-register. */
+#define EMU86_R_RBX     3 /* General purpose b-register. */
+#define EMU86_R_RSP     4 /* Stack pointer. */
+#define EMU86_R_RBP     5 /* Stack base pointer. */
+#define EMU86_R_RSI     6 /* Source pointer. */
+#define EMU86_R_RDI     7 /* Destination pointer. */
 #define EMU86_R_R8      8 /* %r8 */
 #define EMU86_R_R9      9 /* %r9 */
 #define EMU86_R_R10    10 /* %r10 */
@@ -90,6 +109,14 @@ __DECL_BEGIN
 #define EMU86_R_R15    15 /* %r15 */
 #define EMU86_R_RIP    16 /* %rip (special value that may appear in `mi_rm') */
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
+
+#define EMU86_R_ES 0 /* %es */
+#define EMU86_R_CS 1 /* %cs */
+#define EMU86_R_SS 2 /* %ss */
+#define EMU86_R_DS 3 /* %ds */
+#define EMU86_R_FS 4 /* %fs */
+#define EMU86_R_GS 5 /* %gs */
+
 
 
 /* Layout of an EVEX prefix (64-bit only) */
@@ -405,7 +432,9 @@ __DECL_END
 
 
 #ifdef __LIBEMU86_STATIC
+#ifndef __INTELLISENSE__
 #include "emu86.c"
+#endif /* !__INTELLISENSE__ */
 #endif /* __LIBEMU86_STATIC */
 
 #endif /* !_LIBEMU86_EMU86_H */

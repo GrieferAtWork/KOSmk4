@@ -348,13 +348,13 @@ KCALL vm_datablock_vio_write
 	args.va_access_partoff  = 0;
 	args.va_access_pageid = 0;
 	args.va_state           = NULL;
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 #define VIO_LARGEBLOCK_SIZE 8
 #define VIO_LARGEBLOCK_TYPE u64
-#else /* CONFIG_VIO_HAS_QWORD */
+#else /* LIBVIO_CONFIG_HAVE_QWORD */
 #define VIO_LARGEBLOCK_SIZE 4
 #define VIO_LARGEBLOCK_TYPE u32
-#endif /* !CONFIG_VIO_HAS_QWORD */
+#endif /* !LIBVIO_CONFIG_HAVE_QWORD */
 
 #ifdef DEFINE_IO_READ
 #define DO_VIO(T, w, n) UNALIGNED_SET##n((T *)buf, vio_read##w(&args, src_offset))
@@ -365,20 +365,20 @@ KCALL vm_datablock_vio_write
 	     src_offset += VIO_LARGEBLOCK_SIZE,
 	     num_bytes -= VIO_LARGEBLOCK_SIZE,
 	     buf = (byte_t *)buf + VIO_LARGEBLOCK_SIZE) {
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 		DO_VIO(u64, q, 64);
-#else /* CONFIG_VIO_HAS_QWORD */
+#else /* LIBVIO_CONFIG_HAVE_QWORD */
 		DO_VIO(u32, l, 32);
-#endif /* !CONFIG_VIO_HAS_QWORD */
+#endif /* !LIBVIO_CONFIG_HAVE_QWORD */
 	}
 	/* Access unaligned memory. */
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 	if (num_bytes & 4) {
 		DO_VIO(u32, l, 32);
 		buf = (byte_t *)buf + 4;
 		src_offset += 4;
 	}
-#endif /* CONFIG_VIO_HAS_QWORD */
+#endif /* LIBVIO_CONFIG_HAVE_QWORD */
 	if (num_bytes & 2) {
 		DO_VIO(u16, w, 16);
 		buf = (byte_t *)buf + 2;

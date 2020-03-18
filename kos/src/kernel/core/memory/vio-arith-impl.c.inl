@@ -71,7 +71,7 @@ FUNC(l)(struct vio_args *__restrict args, pos_t addr, u32 value, bool atomic) {
 	return new_result;
 }
 
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 PUBLIC NONNULL((1)) u64 KCALL
 FUNC(q)(struct vio_args *__restrict args, pos_t addr, u64 value, bool atomic) {
 	struct vm_datablock_type_vio const *type = args->va_type;
@@ -83,7 +83,7 @@ FUNC(q)(struct vio_args *__restrict args, pos_t addr, u64 value, bool atomic) {
 		result = new_result;
 	return new_result;
 }
-#endif /* CONFIG_VIO_HAS_QWORD */
+#endif /* LIBVIO_CONFIG_HAVE_QWORD */
 
 #undef DEFINE_VIO_OP
 #undef FUNC3

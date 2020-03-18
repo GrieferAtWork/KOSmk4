@@ -17,26 +17,22 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_VIO_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_VIO_H 1
+#ifndef _LIBVIO_ACCESS_H
+#define _LIBVIO_ACCESS_H 1
 
-#include <kernel/compiler.h>
-#include <kernel/vm.h>
-#include <hybrid/host.h>
+#include "api.h"
 
-#ifdef CONFIG_VIO
-DECL_BEGIN
+#include "vio.h"
 
-#undef LIBVIO_CONFIG_HAVE_QWORD
-#undef LIBVIO_CONFIG_HAVE_QWORD_CMPXCH
-#undef LIBVIO_CONFIG_HAVE_INT128_CMPXCH
-#define LIBVIO_CONFIG_HAVE_QWORD_CMPXCH 1 /* Because of the `cmpxchg8b' instruction */
-#ifdef __x86_64__
-#define LIBVIO_CONFIG_HAVE_QWORD 1
-#define LIBVIO_CONFIG_HAVE_INT128_CMPXCH 1 /* Because of the `cmpxchg16b' instruction */
-#endif /* __x86_64__ */
+#ifdef __CC__
+__DECL_BEGIN
 
-DECL_END
-#endif /* CONFIG_VIO */
+/* VIO internal functions for dispatching operations. */
 
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_VIO_H */
+
+
+
+__DECL_END
+#endif /* __CC__ */
+
+#endif /* !_LIBVIO_ACCESS_H */

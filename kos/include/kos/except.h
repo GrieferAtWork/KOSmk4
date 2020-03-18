@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x858350ef */
+/* HASH CRC-32:0xd883892d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -957,8 +957,10 @@ __LIBC __ATTR_NORETURN __ATTR_COLD void (__ERROR_THROWN_CC error_thrown)(error_c
  *       be implemented without making some additional tweaks to gcc under KOS, though
  *       that wouldn't even be the first time I had to tweak binutils/gcc for this
  *       project... */
-#define TRY         try
-#define EXCEPT      catch(...)
+#define __TRY       try
+#define __EXCEPT    catch(...)
+#define TRY         __TRY
+#define EXCEPT      __EXCEPT
 #endif /* __cplusplus */
 
 #endif /* __KOS__ */

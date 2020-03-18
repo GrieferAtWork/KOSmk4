@@ -29,9 +29,9 @@
 #ifdef CONFIG_VIO
 #include <kernel/arch/vio.h>
 
-#ifdef CONFIG_VIO_HAS_INT128_CMPXCH
+#ifdef LIBVIO_CONFIG_HAVE_INT128_CMPXCH
 #include <int128.h>
-#endif /* CONFIG_VIO_HAS_INT128_CMPXCH */
+#endif /* LIBVIO_CONFIG_HAVE_INT128_CMPXCH */
 
 DECL_BEGIN
 
@@ -80,24 +80,24 @@ struct vm_datablock_type_vio {
 		NONNULL((1)) u8  (KCALL *f_byte)(struct vio_args *__restrict args, pos_t addr);
 		NONNULL((1)) u16 (KCALL *f_word)(struct vio_args *__restrict args, pos_t addr);
 		NONNULL((1)) u32 (KCALL *f_dword)(struct vio_args *__restrict args, pos_t addr);
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 		NONNULL((1)) u64 (KCALL *f_qword)(struct vio_args *__restrict args, pos_t addr);
-#endif /* CONFIG_VIO_HAS_QWORD */
+#endif /* LIBVIO_CONFIG_HAVE_QWORD */
 	} dtv_read;
 
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 #define VIO_CALLBACK_INIT(b, w, l, q) { b, w, l, q }
-#else /* CONFIG_VIO_HAS_QWORD */
+#else /* LIBVIO_CONFIG_HAVE_QWORD */
 #define VIO_CALLBACK_INIT(b, w, l, q) { b, w, l }
-#endif /* !CONFIG_VIO_HAS_QWORD */
+#endif /* !LIBVIO_CONFIG_HAVE_QWORD */
 
 	struct {
 		NONNULL((1)) void (KCALL *f_byte)(struct vio_args *__restrict args, pos_t addr, u8 value);
 		NONNULL((1)) void (KCALL *f_word)(struct vio_args *__restrict args, pos_t addr, u16 value);
 		NONNULL((1)) void (KCALL *f_dword)(struct vio_args *__restrict args, pos_t addr, u32 value);
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 		NONNULL((1)) void (KCALL *f_qword)(struct vio_args *__restrict args, pos_t addr, u64 value);
-#endif /* CONFIG_VIO_HAS_QWORD */
+#endif /* LIBVIO_CONFIG_HAVE_QWORD */
 	} dtv_write;
 
 	struct {
@@ -105,12 +105,12 @@ struct vm_datablock_type_vio {
 		NONNULL((1)) u8  (KCALL *f_byte)(struct vio_args *__restrict args, pos_t addr, u8 oldvalue, u8 newvalue, bool atomic);
 		NONNULL((1)) u16 (KCALL *f_word)(struct vio_args *__restrict args, pos_t addr, u16 oldvalue, u16 newvalue, bool atomic);
 		NONNULL((1)) u32 (KCALL *f_dword)(struct vio_args *__restrict args, pos_t addr, u32 oldvalue, u32 newvalue, bool atomic);
-#if defined(CONFIG_VIO_HAS_QWORD) || defined(CONFIG_VIO_HAS_QWORD_CMPXCH)
+#if defined(LIBVIO_CONFIG_HAVE_QWORD) || defined(LIBVIO_CONFIG_HAVE_QWORD_CMPXCH)
 		NONNULL((1)) u64 (KCALL *f_qword)(struct vio_args *__restrict args, pos_t addr, u64 oldvalue, u64 newvalue, bool atomic);
-#endif /* CONFIG_VIO_HAS_QWORD || CONFIG_VIO_HAS_QWORD_CMPXCH */
-#ifdef CONFIG_VIO_HAS_INT128_CMPXCH
+#endif /* LIBVIO_CONFIG_HAVE_QWORD || LIBVIO_CONFIG_HAVE_QWORD_CMPXCH */
+#ifdef LIBVIO_CONFIG_HAVE_INT128_CMPXCH
 		NONNULL((1)) uint128_t (KCALL *f_int128)(struct vio_args *__restrict args, pos_t addr, uint128_t oldvalue, uint128_t newvalue, bool atomic);
-#endif /* CONFIG_VIO_HAS_INT128_CMPXCH */
+#endif /* LIBVIO_CONFIG_HAVE_INT128_CMPXCH */
 	} dtv_cmpxch;
 
 	struct {
@@ -118,9 +118,9 @@ struct vm_datablock_type_vio {
 		NONNULL((1)) u8  (KCALL *f_byte)(struct vio_args *__restrict args, pos_t addr, u8 newvalue, bool atomic);
 		NONNULL((1)) u16 (KCALL *f_word)(struct vio_args *__restrict args, pos_t addr, u16 newvalue, bool atomic);
 		NONNULL((1)) u32 (KCALL *f_dword)(struct vio_args *__restrict args, pos_t addr, u32 newvalue, bool atomic);
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 		NONNULL((1)) u64 (KCALL *f_qword)(struct vio_args *__restrict args, pos_t addr, u64 newvalue, bool atomic);
-#endif /* CONFIG_VIO_HAS_QWORD */
+#endif /* LIBVIO_CONFIG_HAVE_QWORD */
 	} dtv_xch;
 
 	struct {
@@ -128,9 +128,9 @@ struct vm_datablock_type_vio {
 		NONNULL((1)) u8  (KCALL *f_byte)(struct vio_args *__restrict args, pos_t addr, u8 value, bool atomic);
 		NONNULL((1)) u16 (KCALL *f_word)(struct vio_args *__restrict args, pos_t addr, u16 value, bool atomic);
 		NONNULL((1)) u32 (KCALL *f_dword)(struct vio_args *__restrict args, pos_t addr, u32 value, bool atomic);
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 		NONNULL((1)) u64 (KCALL *f_qword)(struct vio_args *__restrict args, pos_t addr, u64 value, bool atomic);
-#endif /* CONFIG_VIO_HAS_QWORD */
+#endif /* LIBVIO_CONFIG_HAVE_QWORD */
 	} dtv_add;
 
 	struct {
@@ -138,9 +138,9 @@ struct vm_datablock_type_vio {
 		NONNULL((1)) u8  (KCALL *f_byte)(struct vio_args *__restrict args, pos_t addr, u8 value, bool atomic);
 		NONNULL((1)) u16 (KCALL *f_word)(struct vio_args *__restrict args, pos_t addr, u16 value, bool atomic);
 		NONNULL((1)) u32 (KCALL *f_dword)(struct vio_args *__restrict args, pos_t addr, u32 value, bool atomic);
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 		NONNULL((1)) u64 (KCALL *f_qword)(struct vio_args *__restrict args, pos_t addr, u64 value, bool atomic);
-#endif /* CONFIG_VIO_HAS_QWORD */
+#endif /* LIBVIO_CONFIG_HAVE_QWORD */
 	} dtv_sub;
 
 	struct {
@@ -148,9 +148,9 @@ struct vm_datablock_type_vio {
 		NONNULL((1)) u8  (KCALL *f_byte)(struct vio_args *__restrict args, pos_t addr, u8 mask, bool atomic);
 		NONNULL((1)) u16 (KCALL *f_word)(struct vio_args *__restrict args, pos_t addr, u16 mask, bool atomic);
 		NONNULL((1)) u32 (KCALL *f_dword)(struct vio_args *__restrict args, pos_t addr, u32 mask, bool atomic);
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 		NONNULL((1)) u64 (KCALL *f_qword)(struct vio_args *__restrict args, pos_t addr, u64 mask, bool atomic);
-#endif /* CONFIG_VIO_HAS_QWORD */
+#endif /* LIBVIO_CONFIG_HAVE_QWORD */
 	} dtv_and;
 
 	struct {
@@ -158,9 +158,9 @@ struct vm_datablock_type_vio {
 		NONNULL((1)) u8  (KCALL *f_byte)(struct vio_args *__restrict args, pos_t addr, u8 mask, bool atomic);
 		NONNULL((1)) u16 (KCALL *f_word)(struct vio_args *__restrict args, pos_t addr, u16 mask, bool atomic);
 		NONNULL((1)) u32 (KCALL *f_dword)(struct vio_args *__restrict args, pos_t addr, u32 mask, bool atomic);
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 		NONNULL((1)) u64 (KCALL *f_qword)(struct vio_args *__restrict args, pos_t addr, u64 mask, bool atomic);
-#endif /* CONFIG_VIO_HAS_QWORD */
+#endif /* LIBVIO_CONFIG_HAVE_QWORD */
 	} dtv_or;
 
 	struct {
@@ -168,9 +168,9 @@ struct vm_datablock_type_vio {
 		NONNULL((1)) u8  (KCALL *f_byte)(struct vio_args *__restrict args, pos_t addr, u8 mask, bool atomic);
 		NONNULL((1)) u16 (KCALL *f_word)(struct vio_args *__restrict args, pos_t addr, u16 mask, bool atomic);
 		NONNULL((1)) u32 (KCALL *f_dword)(struct vio_args *__restrict args, pos_t addr, u32 mask, bool atomic);
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 		NONNULL((1)) u64 (KCALL *f_qword)(struct vio_args *__restrict args, pos_t addr, u64 mask, bool atomic);
-#endif /* CONFIG_VIO_HAS_QWORD */
+#endif /* LIBVIO_CONFIG_HAVE_QWORD */
 	} dtv_xor;
 
 	/* Invoked as the result of the user attempting to call into VIO memory.
@@ -202,7 +202,7 @@ struct vm_datablock_type_vio {
 };
 
 /* Initializers for VIO callbacks */
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 #define VM_DATABLOCK_TYPE_VIO_INIT_READ(b, w, l, q)  { b, w, l, q }
 #define VM_DATABLOCK_TYPE_VIO_INIT_WRITE(b, w, l, q) { b, w, l, q }
 #define VM_DATABLOCK_TYPE_VIO_INIT_XCH(b, w, l, q)   { b, w, l, q }
@@ -211,7 +211,7 @@ struct vm_datablock_type_vio {
 #define VM_DATABLOCK_TYPE_VIO_INIT_AND(b, w, l, q)   { b, w, l, q }
 #define VM_DATABLOCK_TYPE_VIO_INIT_OR(b, w, l, q)    { b, w, l, q }
 #define VM_DATABLOCK_TYPE_VIO_INIT_XOR(b, w, l, q)   { b, w, l, q }
-#else /* CONFIG_VIO_HAS_QWORD */
+#else /* LIBVIO_CONFIG_HAVE_QWORD */
 #define VM_DATABLOCK_TYPE_VIO_INIT_READ(b, w, l, q)  { b, w, l }
 #define VM_DATABLOCK_TYPE_VIO_INIT_WRITE(b, w, l, q) { b, w, l }
 #define VM_DATABLOCK_TYPE_VIO_INIT_XCH(b, w, l, q)   { b, w, l }
@@ -220,22 +220,22 @@ struct vm_datablock_type_vio {
 #define VM_DATABLOCK_TYPE_VIO_INIT_AND(b, w, l, q)   { b, w, l }
 #define VM_DATABLOCK_TYPE_VIO_INIT_OR(b, w, l, q)    { b, w, l }
 #define VM_DATABLOCK_TYPE_VIO_INIT_XOR(b, w, l, q)   { b, w, l }
-#endif /* !CONFIG_VIO_HAS_QWORD */
+#endif /* !LIBVIO_CONFIG_HAVE_QWORD */
 
 
-#if defined(CONFIG_VIO_HAS_QWORD) || defined(CONFIG_VIO_HAS_QWORD_CMPXCH)
-#ifdef CONFIG_VIO_HAS_INT128_CMPXCH
+#if defined(LIBVIO_CONFIG_HAVE_QWORD) || defined(LIBVIO_CONFIG_HAVE_QWORD_CMPXCH)
+#ifdef LIBVIO_CONFIG_HAVE_INT128_CMPXCH
 #define VM_DATABLOCK_TYPE_VIO_INIT_CMPXCH(b, w, l, q, i128) { b, w, l, q, i128 }
-#else /* CONFIG_VIO_HAS_INT128_CMPXCH */
+#else /* LIBVIO_CONFIG_HAVE_INT128_CMPXCH */
 #define VM_DATABLOCK_TYPE_VIO_INIT_CMPXCH(b, w, l, q, i128) { b, w, l, q }
-#endif /* !CONFIG_VIO_HAS_INT128_CMPXCH */
-#else /* CONFIG_VIO_HAS_QWORD || CONFIG_VIO_HAS_QWORD_CMPXCH */
-#ifdef CONFIG_VIO_HAS_INT128_CMPXCH
+#endif /* !LIBVIO_CONFIG_HAVE_INT128_CMPXCH */
+#else /* LIBVIO_CONFIG_HAVE_QWORD || LIBVIO_CONFIG_HAVE_QWORD_CMPXCH */
+#ifdef LIBVIO_CONFIG_HAVE_INT128_CMPXCH
 #define VM_DATABLOCK_TYPE_VIO_INIT_CMPXCH(b, w, l, q, i128) { b, w, l, i128 }
-#else /* CONFIG_VIO_HAS_INT128_CMPXCH */
+#else /* LIBVIO_CONFIG_HAVE_INT128_CMPXCH */
 #define VM_DATABLOCK_TYPE_VIO_INIT_CMPXCH(b, w, l, q, i128) { b, w, l }
-#endif /* !CONFIG_VIO_HAS_INT128_CMPXCH */
-#endif /* !CONFIG_VIO_HAS_QWORD && !CONFIG_VIO_HAS_QWORD_CMPXCH */
+#endif /* !LIBVIO_CONFIG_HAVE_INT128_CMPXCH */
+#endif /* !LIBVIO_CONFIG_HAVE_QWORD && !LIBVIO_CONFIG_HAVE_QWORD_CMPXCH */
 
 
 
@@ -281,13 +281,13 @@ FUNDEF NONNULL((1)) void KCALL vio_copyfromvio_to_phys(struct vio_args *__restri
 FUNDEF NONNULL((1)) void KCALL vio_copytovio_from_phys(struct vio_args *__restrict args, pos_t offset, vm_phys_t buf, size_t num_bytes) THROWS(...);
 
 
-#if defined(CONFIG_VIO_HAS_QWORD) || defined(CONFIG_VIO_HAS_QWORD_CMPXCH)
+#if defined(LIBVIO_CONFIG_HAVE_QWORD) || defined(LIBVIO_CONFIG_HAVE_QWORD_CMPXCH)
 FUNDEF NONNULL((1)) u64 KCALL vio_cmpxchq(struct vio_args *__restrict args, pos_t addr, u64 oldvalue, u64 newvalue, bool atomic);
-#endif /* CONFIG_VIO_HAS_QWORD || CONFIG_VIO_HAS_QWORD_CMPXCH */
-#ifdef CONFIG_VIO_HAS_INT128_CMPXCH
+#endif /* LIBVIO_CONFIG_HAVE_QWORD || LIBVIO_CONFIG_HAVE_QWORD_CMPXCH */
+#ifdef LIBVIO_CONFIG_HAVE_INT128_CMPXCH
 FUNDEF NONNULL((1)) uint128_t KCALL vio_cmpxch128(struct vio_args *__restrict args, pos_t addr, uint128_t oldvalue, uint128_t newvalue, bool atomic);
-#endif /* CONFIG_VIO_HAS_INT128_CMPXCH */
-#ifdef CONFIG_VIO_HAS_QWORD
+#endif /* LIBVIO_CONFIG_HAVE_INT128_CMPXCH */
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 FUNDEF NONNULL((1)) u64 KCALL vio_cmpxch_or_writeq(struct vio_args *__restrict args, pos_t addr, u64 oldvalue, u64 newvalue, bool atomic);
 FUNDEF NONNULL((1)) u64 KCALL vio_readq(struct vio_args *__restrict args, pos_t addr);
 FUNDEF NONNULL((1)) void KCALL vio_writeq(struct vio_args *__restrict args, pos_t addr, u64 value);
@@ -297,7 +297,7 @@ FUNDEF NONNULL((1)) u64 KCALL vio_subq(struct vio_args *__restrict args, pos_t a
 FUNDEF NONNULL((1)) u64 KCALL vio_andq(struct vio_args *__restrict args, pos_t addr, u64 mask, bool atomic);
 FUNDEF NONNULL((1)) u64 KCALL vio_orq(struct vio_args *__restrict args, pos_t addr, u64 mask, bool atomic);
 FUNDEF NONNULL((1)) u64 KCALL vio_xorq(struct vio_args *__restrict args, pos_t addr, u64 mask, bool atomic);
-#endif /* CONFIG_VIO_HAS_QWORD */
+#endif /* LIBVIO_CONFIG_HAVE_QWORD */
 
 /* Same as the function above, but these require the address to be aligned by the data type. */
 FUNDEF NONNULL((1)) u8  KCALL vio_readb_aligned(struct vio_args *__restrict args, pos_t addr) ASMNAME("vio_readb");
@@ -306,10 +306,10 @@ FUNDEF NONNULL((1)) u32 KCALL vio_readl_aligned(struct vio_args *__restrict args
 FUNDEF NONNULL((1)) void KCALL vio_writeb_aligned(struct vio_args *__restrict args, pos_t addr, u8  value) ASMNAME("vio_writeb");
 FUNDEF NONNULL((1)) void KCALL vio_writew_aligned(struct vio_args *__restrict args, pos_t addr, u16 value);
 FUNDEF NONNULL((1)) void KCALL vio_writel_aligned(struct vio_args *__restrict args, pos_t addr, u32 value);
-#ifdef CONFIG_VIO_HAS_QWORD
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
 FUNDEF NONNULL((1)) u64 KCALL vio_readq_aligned(struct vio_args *__restrict args, pos_t addr);
 FUNDEF NONNULL((1)) void KCALL vio_writeq_aligned(struct vio_args *__restrict args, pos_t addr, u64 value);
-#endif /* CONFIG_VIO_HAS_QWORD */
+#endif /* LIBVIO_CONFIG_HAVE_QWORD */
 
 
 DECL_END
