@@ -1710,6 +1710,114 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #endif /* !EMU86_EMULATE_IMPL_HEADER */
 #endif /* !__INTELLISENSE__ */
 
+			/* TODO: inb, inw, inl, outb, outw, outl */
+			/* TODO: pushf, popf */
+			/* TODO: [rep] ins */
+			/* TODO: [rep] outs */
+			/* TODO: [rep] lods */
+			/* TODO: [rep] movs */
+			/* TODO: [rep] stos */
+			/* TODO: [repe|repne] scas */
+			/* TODO: [repe|repne] cmps */
+			/* TODO: ret */
+			/* TODO: lret */
+			/* TODO: enter */
+			/* TODO: cpuid */
+			/* TODO: daa */
+			/* TODO: das */
+			/* TODO: aaa */
+			/* TODO: aas */
+			/* TODO: pusha */
+			/* TODO: popa */
+			/* TODO: arpl */
+			/* TODO: jcc */
+			/* TODO: cbw */
+			/* TODO: cwd */
+			/* TODO: cdq */
+			/* TODO: sahf */
+			/* TODO: lahf */
+			/* TODO: int, int3, into, int1 */
+			/* TODO: aam */
+			/* TODO: aad */
+			/* TODO: salc */
+			/* TODO: xlatb */
+			/* TODO: loop, loopz, loopnz */
+			/* TODO: jcxz, jecxz, jrcxz */
+			/* TODO: hlt */
+			/* TODO: cmc */
+			/* TODO: clc */
+			/* TODO: stc */
+			/* TODO: cli */
+			/* TODO: sti */
+			/* TODO: cld */
+			/* TODO: std */
+			/* TODO: sldt */
+			/* TODO: str */
+			/* TODO: lldt */
+			/* TODO: ltr */
+			/* TODO: verr */
+			/* TODO: verw */
+			/* TODO: sgdt */
+			/* TODO: lgdt */
+			/* TODO: smsw */
+			/* TODO: lmsw */
+			/* TODO: invlpg */
+			/* TODO: swapgs */
+			/* TODO: rdtscp */
+			/* TODO: lar */
+			/* TODO: lsl */
+			/* TODO: syscall */
+			/* TODO: clts */
+			/* TODO: sysret */
+			/* TODO: invd */
+			/* TODO: wbinvd */
+			/* TODO: cflsh */
+			/* TODO: prefetchw */
+			/* TODO: prefetchnta */
+			/* TODO: prefetcht0 */
+			/* TODO: prefetcht1 */
+			/* TODO: prefetcht2 */
+			/* TODO: cldemote */
+			/* TODO: mov (%crN) */
+			/* TODO: wrmsr */
+			/* TODO: rdtsc */
+			/* TODO: rdmsr */
+			/* TODO: rdpmc */
+			/* TODO: sysenter */
+			/* TODO: sysexit */
+			/* TODO: rdfsbase */
+			/* TODO: rdgsbase */
+			/* TODO: wrfsbase */
+			/* TODO: wrgsbase */
+			/* TODO: lfence */
+			/* TODO: mfence */
+			/* TODO: sfence */
+			/* TODO: les */
+			/* TODO: lds */
+			/* TODO: lss */
+			/* TODO: lfs */
+			/* TODO: lgs */
+			/* TODO: bswap */
+			/* TODO: crc32 */
+			/* TODO: movbe */
+			/* TODO: popcnt */
+			/* TODO: andn */
+			/* TODO: blsr */
+			/* TODO: blsmsk */
+			/* TODO: blsi */
+			/* TODO: bzhi */
+			/* TODO: pext */
+			/* TODO: pdep */
+			/* TODO: adcx */
+			/* TODO: adox */
+			/* TODO: mulx */
+			/* TODO: bextr */
+			/* TODO: shlx */
+			/* TODO: sarx */
+			/* TODO: shrx */
+			/* TODO: movdir64b */
+			/* TODO: rorx */
+
 
 			default:
 				goto return_unknown_instruction;
