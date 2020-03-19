@@ -1607,6 +1607,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #include "emu/bittest.c.inl"
 #include "emu/bound.c.inl"
 #include "emu/calljmp.c.inl"
+#include "emu/cmovcc.c.inl"
 #include "emu/incdec.c.inl"
 #include "emu/iret.c.inl"
 #include "emu/lea.c.inl"
