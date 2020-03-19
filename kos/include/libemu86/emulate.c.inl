@@ -1665,6 +1665,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #include "emu/misc.c.inl"
 #include "emu/mov.c.inl"
 #include "emu/pushpop.c.inl"
+#include "emu/xadd.c.inl"
 #include "emu/xchg.c.inl"
 #endif /* !__INTELLISENSE__ */
 

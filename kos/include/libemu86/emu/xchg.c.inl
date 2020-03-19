@@ -34,6 +34,8 @@ EMU86_INTELLISENSE_BEGIN(xchg) {
 	reg_operand = MODRM_GETREG##BWLQ();                            \
 	NIF_ONLY_MEMORY(                                               \
 	if (EMU86_MODRM_ISREG(modrm.mi_type)) {                        \
+		if unlikely(op_flags & EMU86_F_LOCK)                       \
+			goto return_unknown_instruction;                       \
 		oldval = MODRM_GETRMREG##BWLQ();                           \
 		MODRM_SETRMREG##BWLQ(reg_operand);                         \
 	} else) {                                                      \
