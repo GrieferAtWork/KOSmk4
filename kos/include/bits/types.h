@@ -27,7 +27,7 @@
 
 #include <bits/typesizes.h>
 
-__SYSDECL_BEGIN
+__DECL_BEGIN
 
 #ifndef __SIZEOF_FD_T__
 #define __SIZEOF_FD_T__             __SIZEOF_INT__
@@ -587,6 +587,6 @@ typedef __CRT_PRIVATE_SLNG(__SIZEOF_FSWORD_T__) __fsword_t;
 #define __SIZEOF_TYPEDEF_CLOCK_T__ __SIZEOF_CLOCK_T__
 #endif /* !__CRT_DOS_PRIMARY */
 
-__SYSDECL_END
+__DECL_END
 
 #endif /* !_BITS_TYPES_H */

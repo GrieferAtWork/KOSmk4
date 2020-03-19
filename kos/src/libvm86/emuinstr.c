@@ -216,6 +216,10 @@ DECL_END
 #define EMU86_SETPSI(v, ...)    self->vr_regs.vr_si = (u16)(v)
 #define EMU86_SETPDI(v, ...)    self->vr_regs.vr_di = (u16)(v)
 
+#define EMU86_EMULATE_THROW_BOUNDERR(bound_idx, bound_min, bound_max) \
+	return libvm86_intr(self, 0x5) /* #BR */
+
+
 /* Make sure that `THROW()' isn't used by the emulated code. */
 #undef THROW
 #define THROW  dont_use_THROW

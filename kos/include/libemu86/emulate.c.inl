@@ -161,6 +161,10 @@ __DECL_BEGIN
 /* #define EMU86_EMULATE_EXCEPT_DECODE TRY */
 /* #define EMU86_EMULATE_EXCEPT_SWITCH EXCEPT { ... } */
 
+/* Define to implement support for the `bound' instruction on 16-/32-bit */
+/* #define EMU86_EMULATE_THROW_BOUNDERR(bound_idx, bound_min, bound_max) \
+	THROW(E_INDEX_ERROR_OUT_OF_BOUNDS, bound_idx, bound_min, bound_max) */
+
 /* Return the initial set of opcode flags. */
 #ifndef EMU86_EMULATE_GETOPFLAGS
 #ifdef CONFIG_LIBEMU86_NEED_ARCHMODE
@@ -451,7 +455,7 @@ __DECL_BEGIN
 	 __EMU86_GETSEGBASE_IS_NOOP_FS | __EMU86_GETSEGBASE_IS_NOOP_GS)
 #define EMU86_GETSEGBASE_IS_NOOP_ANY 1
 #define EMU86_GETSEGBASE_IS_NOOP(regno) \
-	(__EMU86_GETSEGBASE_IS_NOOP & (1 << (regno)))
+	((__EMU86_GETSEGBASE_IS_NOOP >> (regno)) & 1)
 #endif /* !All-noop */
 #else /* Any-noop */
 #define EMU86_GETSEGBASE_IS_NOOP(regno) 0
@@ -1462,6 +1466,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 		/* Pull in emulated instructions. */
 #ifndef __INTELLISENSE__
 #include "emu/arith.c.inl"
+#include "emu/bound.c.inl"
 #include "emu/iret.c.inl"
 #include "emu/lea.c.inl"
 #include "emu/leave.c.inl"

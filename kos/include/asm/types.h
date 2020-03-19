@@ -28,7 +28,7 @@
 
 #ifndef ____s8_defined
 #define ____s8_defined 1
-__SYSDECL_BEGIN
+__DECL_BEGIN
 typedef __INT8_TYPE__ __s8;
 typedef __UINT8_TYPE__ __u8;
 typedef __INT16_TYPE__ __s16;
@@ -41,7 +41,7 @@ typedef __INT64_TYPE__ __s64;
 #ifdef __UINT64_TYPE__
 typedef __UINT64_TYPE__ __u64;
 #endif /* __UINT64_TYPE__ */
-__SYSDECL_END
+__DECL_END
 #endif /* !____s8_defined */
 
 #endif /* __CC__ */
