@@ -1701,6 +1701,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #include "emu/leave.c.inl"
 #include "emu/misc.c.inl"
 #include "emu/mov.c.inl"
+#include "emu/nop.c.inl"
 #include "emu/pushpop.c.inl"
 #include "emu/shift.c.inl"
 #include "emu/shift2.c.inl"
