@@ -22,6 +22,8 @@
 #define _KOS_SOURCE 1
 #define DISABLE_BRANCH_PROFILING 1
 
+/* TODO: Use libemu86 to emulate instructions that aren't supported natively! */
+
 #include <kernel/compiler.h>
 
 #include <kernel/arch/cpuid.h>

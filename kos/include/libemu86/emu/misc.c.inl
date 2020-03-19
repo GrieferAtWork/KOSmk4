@@ -323,28 +323,5 @@ case 0xff:
 #undef DO_DEC_modrm
 #undef DO_INC_modrm
 
-
-case 0x0fae:
-	MODRM_DECODE();
-	switch (modrm.mi_reg) {
-
-	case 7:
-		/* 0F AE /7      CLFLUSH m8      Flushes cache line containing m8 */
-#ifndef EMU86_EMULATE_ONLY_MEMORY
-		if (!EMU86_MODRM_ISMEM(modrm.mi_type))
-			goto return_unknown_instruction;
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
-#ifdef EMU86_EMULATE_CLFLUSH
-		EMU86_EMULATE_CLFLUSH(MODRM_MEMADDR());
-#endif /* EMU86_EMULATE_CLFLUSH */
-		break;
-
-	default:
-		break;
-	}
-	goto return_unknown_instruction;
-
-
-
 }
 EMU86_INTELLISENSE_END

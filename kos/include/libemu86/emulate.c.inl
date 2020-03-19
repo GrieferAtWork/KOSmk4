@@ -1675,6 +1675,17 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 
 		/* Pull in emulated instructions. */
 #ifndef __INTELLISENSE__
+#ifdef EMU86_EMULATE_IMPL_HEADER
+/* Allow the user to specify a custom header that gets included for
+ * the purpose of defining actually emulated instructions, thus
+ * allowing the user to restrict the set of instructions being
+ * emulated.
+ * This is used by the KOS kernel #UD handler in order to emulate
+ * certain instructions which may not be supported by the real host,
+ * without pulling in a large number of instructions that are always
+ * expected to have native support. */
+#include EMU86_EMULATE_IMPL_HEADER
+#else /* EMU86_EMULATE_IMPL_HEADER */
 #include "emu/arith.c.inl"
 #include "emu/arith2.c.inl"
 #include "emu/bitscan.c.inl"
@@ -1683,6 +1694,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #include "emu/calljmp.c.inl"
 #include "emu/cmovcc.c.inl"
 #include "emu/cmpxchg.c.inl"
+#include "emu/flush.c.inl"
 #include "emu/incdec.c.inl"
 #include "emu/iret.c.inl"
 #include "emu/lea.c.inl"
@@ -1693,6 +1705,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #include "emu/shift.c.inl"
 #include "emu/xadd.c.inl"
 #include "emu/xchg.c.inl"
+#endif /* !EMU86_EMULATE_IMPL_HEADER */
 #endif /* !__INTELLISENSE__ */
 
 
