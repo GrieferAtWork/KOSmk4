@@ -1606,9 +1606,11 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #include "emu/bitscan.c.inl"
 #include "emu/bittest.c.inl"
 #include "emu/bound.c.inl"
+#include "emu/incdec.c.inl"
 #include "emu/iret.c.inl"
 #include "emu/lea.c.inl"
 #include "emu/leave.c.inl"
+#include "emu/misc.c.inl"
 #include "emu/mov.c.inl"
 #include "emu/pushpop.c.inl"
 #endif /* !__INTELLISENSE__ */

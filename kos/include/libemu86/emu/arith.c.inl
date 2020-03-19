@@ -156,7 +156,7 @@ set_test##Nbits##_before_sub:                                                   
 		if (OVERFLOW_USUB(oldval, rhs, &newval))                                       \
 			eflags_addend |= EFLAGS_OF | EFLAGS_CF;                                    \
 set_test##Nbits##_after_sub:                                                           \
-		if (((oldval & 0xf) + (rhs & 0xf)) >= 0x10)                                    \
+		if (((oldval & 0xf) + ((0 - (rhs)) & 0xf)) >= 0x10)                            \
 			eflags_addend |= EFLAGS_AF;                                                \
 		if ((s##Nbits)newval < 0)                                                      \
 			eflags_addend |= EFLAGS_SF;                                                \
