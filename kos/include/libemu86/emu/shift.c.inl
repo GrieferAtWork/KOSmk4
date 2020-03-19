@@ -30,10 +30,11 @@ EMU86_INTELLISENSE_BEGIN(shift) {
 	do {                                                                                       \
 		u32 eflags_addend = 0;                                                                 \
 		u8 oldval, newval;                                                                     \
-		oldval = MODRM_GETRMB();                                                               \
 		num_bits &= (Nbits - 1);                                                               \
 		if (!num_bits)                                                                         \
-			break; /* no-op */                                                                 \
+			goto done; /* no-op */                                                             \
+do_shift##Nbits:                                                                               \
+		oldval = MODRM_GETRMB();                                                               \
 		switch (modrm.mi_reg) {                                                                \
 			                                                                                   \
 		case 0: /* rol r/mN,<num_bits> */                                                      \
@@ -127,7 +128,7 @@ EMU86_INTELLISENSE_BEGIN(shift) {
 				}                                                                              \
 			}                                                                                  \
 			eflags_addend |= emu86_geteflags_test##bwlq(newval);                               \
-			EMU86_MSKFLAGS(eflags_mask, eflags_addend);                                        \
+			EMU86_MSKFLAGS(~eflags_mask, eflags_addend);                                       \
 		}                                                                                      \
 	} __WHILE0
 
@@ -143,7 +144,7 @@ case 0xd2: {
 	/* D2 /7      SAR r/m8,CL      Signed divide* r/m8 by 2, CL times */
 	MODRM_DECODE();
 	num_bits = EMU86_GETCL();
-do_shift8:
+do_shift8bit:
 	DEFINE_SHIFT_OPERATIONS_MODRM_reg(b, B, 8, 1, UINT8_C(0x80));
 	goto done;
 }
@@ -176,16 +177,13 @@ case 0xd3: {
 	/* D3 /7      SAR r/m64,CL      Signed divide* r/m64 by 2, CL times */
 	MODRM_DECODE();
 	num_bits  = EMU86_GETCL();
-do_shift163264:
+do_shift163264bit:
 	/* TODO */
 	IF_64BIT(if (IS_64BIT()) {
-do_shift64:
 		DEFINE_SHIFT_OPERATIONS_MODRM_reg(q, Q, 64, 8, UINT64_C(0x8000000000000000));
 	} else) if (!IS_16BIT()) {
-do_shift32:
 		DEFINE_SHIFT_OPERATIONS_MODRM_reg(l, L, 32, 4, UINT32_C(0x80000000));
 	} else {
-do_shift16:
 		DEFINE_SHIFT_OPERATIONS_MODRM_reg(w, W, 16, 2, UINT16_C(0x8000));
 	}
 	goto done;
@@ -203,7 +201,7 @@ case 0xc0: {
 	MODRM_DECODE();
 	num_bits  = *(u8 *)pc;
 	pc += 1;
-	goto do_shift8;
+	goto do_shift8bit;
 }
 
 case 0xc1: {
@@ -234,7 +232,7 @@ case 0xc1: {
 	MODRM_DECODE();
 	num_bits = *(u8 *)pc;
 	pc += 1;
-	goto do_shift163264;
+	goto do_shift163264bit;
 }
 
 
@@ -249,7 +247,7 @@ case 0xd0: {
 	/* D0 /7      SAR r/m8,1      Signed divide* r/m8 by 2, 1 times */
 	MODRM_DECODE();
 	num_bits = 1;
-	goto do_shift8;
+	goto do_shift8bit;
 }
 
 case 0xd1: {
@@ -279,7 +277,7 @@ case 0xd1: {
 	/* D1 /7      SAR r/m64,1      Signed divide* r/m64 by 2, 1 times */
 	MODRM_DECODE();
 	num_bits = 1;
-	goto do_shift163264;
+	goto do_shift163264bit;
 }
 
 

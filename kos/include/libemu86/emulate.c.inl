@@ -1703,6 +1703,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #include "emu/mov.c.inl"
 #include "emu/pushpop.c.inl"
 #include "emu/shift.c.inl"
+#include "emu/shift2.c.inl"
 #include "emu/xadd.c.inl"
 #include "emu/xchg.c.inl"
 #endif /* !EMU86_EMULATE_IMPL_HEADER */
