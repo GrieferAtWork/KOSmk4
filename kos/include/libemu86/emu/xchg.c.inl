@@ -83,7 +83,13 @@ case 0x87: {
 	EMU86_SET##AX(reg_operand);                 \
 	EMU86_SETREG##BWLQ(regno, oldval);
 
-case 0x90 ... 0x97: {
+case 0x90:
+	/* nop */
+	if (op_flags & EMU86_F_REP)
+		EMU86_EMULATE_LOOPHINT(); /* pause */
+	goto done;
+
+case 0x91 ... 0x97: {
 	/*         90+rw     XCHG AX, r16      Exchange r16 with AX.
 	 *         90+rw     XCHG r16, AX      Exchange AX with r16.
 	 *         90+rd     XCHG EAX, r32     Exchange r32 with EAX.
