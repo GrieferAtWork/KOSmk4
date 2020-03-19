@@ -350,6 +350,14 @@ __DECL_BEGIN
 #endif /* !EMU86_EMULATE_WRITEQASW */
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
 
+/* Define to `0' to have `xchg' require a lock prefix in order to be considered atomic.
+ * Real hardware always has xchg behave as atomic, regardless of the presence of an
+ * optional lock-prefix, however this also makes it impossible to implement non-atomic
+ * xchg in VIO. (though VIO is default configured to still match the hardware standard,
+ * meaning that this is only a convenience option that isn't actually ever altered) */
+#ifndef EMU86_EMULATE_ATOMIC_XCHG_REQUIRES_LOCK
+#define EMU86_EMULATE_ATOMIC_XCHG_REQUIRES_LOCK 1
+#endif /* !EMU86_EMULATE_ATOMIC_XCHG_REQUIRES_LOCK */
 
 /* Define to non-zero if user access checks should be performed. */
 #ifndef EMU86_EMULATE_CHECKUSER
@@ -1657,6 +1665,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #include "emu/misc.c.inl"
 #include "emu/mov.c.inl"
 #include "emu/pushpop.c.inl"
+#include "emu/xchg.c.inl"
 #endif /* !__INTELLISENSE__ */
 
 
