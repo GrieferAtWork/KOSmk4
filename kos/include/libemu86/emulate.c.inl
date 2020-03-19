@@ -1092,6 +1092,29 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_modrm_mem
 }
 #endif /* !EMU86_MODRM_MEMADDR */
 
+#ifndef EMU86_MODRM_MEMADDR_NOSEGBASE
+#ifdef EMU86_GETSEGBASE_IS_NOOP_ALL
+#define EMU86_MODRM_MEMADDR_NOSEGBASE(modrm, op_flags) \
+	EMU86_MODRM_MEMADDR(modrm, op_flags)
+#else /* EMU86_GETSEGBASE_IS_NOOP_ALL */
+#define EMU86_MODRM_MEMADDR_NOSEGBASE(modrm, op_flags) \
+	(EMU86_EMULATE_HELPER_NAME(emu86_modrm_memaddr_nosegbase)(EMU86_EMULATE_HELPER_PARAM_ modrm, op_flags))
+__PRIVATE __ATTR_UNUSED __ATTR_WUNUSED ATTR_PURE EMU86_EMULATE_HELPER_ATTR byte_t *
+EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_modrm_memaddr_nosegbase))(EMU86_EMULATE_HELPER_ARGS_
+                                                                                                 struct emu86_modrm const *__restrict modrm,
+                                                                                                 emu86_opflags_t op_flags) {
+	uintptr_t result;
+	(void)op_flags;
+	result = modrm->mi_offset;
+	if (modrm->mi_rm != 0xff)
+		result += EMU86_GETREGP(modrm->mi_rm, op_flags);
+	if (modrm->mi_index != 0xff)
+		result += EMU86_GETREGP(modrm->mi_index, op_flags) << modrm->mi_shift;
+	return (byte_t *)result;
+}
+#endif /* !EMU86_GETSEGBASE_IS_NOOP_ALL */
+#endif /* !EMU86_MODRM_MEMADDR_NOSEGBASE */
+
 
 
 
@@ -1562,7 +1585,8 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #define NIF_ONLY_MEMORY(...) __VA_ARGS__
 #endif /* !EMU86_EMULATE_ONLY_MEMORY */
 
-#define MODRM_MEMADDR()  EMU86_MODRM_MEMADDR(&modrm, op_flags)
+#define MODRM_MEMADDR()           EMU86_MODRM_MEMADDR(&modrm, op_flags)
+#define MODRM_MEMADDR_NOSEGBASE() EMU86_MODRM_MEMADDR_NOSEGBASE(&modrm, op_flags)
 #define MODRM_GETRMB()   EMU86_GETMODRM_RMB(&modrm, op_flags)
 #define MODRM_GETRMW()   EMU86_GETMODRM_RMW(&modrm, op_flags)
 #define MODRM_GETRML()   EMU86_GETMODRM_RML(&modrm, op_flags)

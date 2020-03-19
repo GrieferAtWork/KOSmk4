@@ -30,7 +30,7 @@ case 0x8d: {
 	 * REX.W + 8D /r     LEA r64,m     RM     Valid     N.E.      Store effective address for m in register r64. */
 	uintptr_t addr;
 	MODRM_DECODE_MEMONLY();
-	addr = (uintptr_t)MODRM_MEMADDR();
+	addr = (uintptr_t)MODRM_MEMADDR_NOSEGBASE();
 	IF_64BIT(if (IS_64BIT()) {
 		MODRM_SETREGQ((u64)addr);
 	} else) if (!IS_16BIT()) {
