@@ -31,7 +31,6 @@ EMU86_INTELLISENSE_BEGIN(xchg) {
 
 #define DEFINE_XCHG_modrm(BWLQ, Nbits, Nbytes)                     \
 	u##Nbits reg_operand, oldval;                                  \
-	MODRM_DECODE();                                                \
 	reg_operand = MODRM_GETREG##BWLQ();                            \
 	NIF_ONLY_MEMORY(                                               \
 	if (EMU86_MODRM_ISREG(modrm.mi_type)) {                        \
@@ -49,6 +48,7 @@ EMU86_INTELLISENSE_BEGIN(xchg) {
 case 0x86: {
 	/* 86 /r      XCHG r/m8, r8      Exchange r8 (byte register) with byte from r/m8 */
 	/* 86 /r      XCHG r8, r/m8      Exchange byte from r/m8 with r8 (byte register) */
+	MODRM_DECODE();
 	DEFINE_XCHG_modrm(B, 8, 1)
 	goto done;
 }
