@@ -30,18 +30,20 @@ EMU86_INTELLISENSE_BEGIN(shift) {
 	do {                                                                                       \
 		u32 eflags_addend = 0;                                                                 \
 		u8 oldval, newval;                                                                     \
-		oldval        = MODRM_GETRMB();                                                        \
+		oldval = MODRM_GETRMB();                                                               \
 		num_bits &= (Nbits - 1);                                                               \
+		if (!num_bits)                                                                         \
+			break; /* no-op */                                                                 \
 		switch (modrm.mi_reg) {                                                                \
 			                                                                                   \
 		case 0: /* rol r/mN,<num_bits> */                                                      \
-			if (num_bits && ((oldval << (num_bits - 1)) & msb_bit_set) != 0)                   \
+			if ((oldval << (num_bits - 1)) & msb_bit_set)                                      \
 				eflags_addend |= EFLAGS_CF;                                                    \
 			newval = __hybrid_rol##Nbits(oldval, num_bits);                                    \
 			break;                                                                             \
 			                                                                                   \
 		case 1: /* ror r/mN,<num_bits> */                                                      \
-			if (num_bits && (oldval & ((u##Nbits)1 << (num_bits - 1))) != 0)                   \
+			if (oldval & ((u##Nbits)1 << (num_bits - 1)))                                      \
 				eflags_addend |= EFLAGS_CF;                                                    \
 			newval = __hybrid_ror##Nbits(oldval, num_bits);                                    \
 			break;                                                                             \
@@ -58,19 +60,19 @@ EMU86_INTELLISENSE_BEGIN(shift) {
 			                                                                                   \
 		case 4: /* sal r/mN,<num_bits> */                                                      \
 		case 6: /* shl r/mN,<num_bits> */                                                      \
-			if (num_bits && ((oldval << (num_bits - 1)) & msb_bit_set) != 0)                   \
+			if ((oldval << (num_bits - 1)) & msb_bit_set)                                      \
 				eflags_addend |= EFLAGS_CF;                                                    \
 			newval = oldval << num_bits;                                                       \
 			break;                                                                             \
 			                                                                                   \
 		case 5: /* shr r/mN,<num_bits> */                                                      \
-			if (num_bits && (oldval & ((u##Nbits)1 << (num_bits - 1))) != 0)                   \
+			if (oldval & ((u##Nbits)1 << (num_bits - 1)))                                      \
 				eflags_addend |= EFLAGS_CF;                                                    \
 			newval = (u##Nbits)oldval >> num_bits;                                             \
 			break;                                                                             \
 			                                                                                   \
 		case 7: /* sar r/mN,<num_bits> */                                                      \
-			if (num_bits && (oldval & ((u##Nbits)1 << (num_bits - 1))) != 0)                   \
+			if (oldval & ((u##Nbits)1 << (num_bits - 1)))                                      \
 				eflags_addend |= EFLAGS_CF;                                                    \
 			/* XXX: Signed right-shift isn't portable in the C standard... */                  \
 			newval = (s##Nbits)oldval >> num_bits;                                             \
