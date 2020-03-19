@@ -924,6 +924,7 @@ libviocore_atomic_cmpxch_or_writeq(struct vio_emulate_args *__restrict self,
 	COMPILER_BARRIER();
 	return result;
 }
+
 #define EMU86_EMULATE_ATOMIC_CMPXCH128(addr, oldval, newval, force_atomic) \
 	libviocore_atomic_cmpxch128(self, addr, oldval, newval, force_atomic)
 LOCAL NONNULL((1)) uint128_t CC

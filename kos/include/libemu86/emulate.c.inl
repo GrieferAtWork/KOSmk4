@@ -273,7 +273,7 @@ __DECL_BEGIN
 #define EMU86_EMULATE_ATOMIC_FETCHORQ(addr, addend, force_atomic) __hybrid_atomic_fetchor(*(u64 *)EMU86_EMULATE_TRANSLATEADDR(addr), addend, __ATOMIC_SEQ_CST)
 #define EMU86_EMULATE_ATOMIC_FETCHXORQ(addr, addend, force_atomic) __hybrid_atomic_fetchxor(*(u64 *)EMU86_EMULATE_TRANSLATEADDR(addr), addend, __ATOMIC_SEQ_CST)
 #define EMU86_EMULATE_ATOMIC_CMPXCH_OR_WRITEQ(addr, oldval, newval, force_atomic) __hybrid_atomic_cmpxch(*(u64 *)EMU86_EMULATE_TRANSLATEADDR(addr), oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
-#define EMU86_EMULATE_ATOMIC_CMPXCH128(addr, oldval, newval, force_atomic) __hybrid_atomic_cmpxch(*(uint128_t *)EMU86_EMULATE_TRANSLATEADDR(addr), oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
+/*  #define EMU86_EMULATE_ATOMIC_CMPXCH128(addr, oldval, newval, force_atomic)  */
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
 #endif /* !EMU86_EMULATE_READB */
 
@@ -1608,6 +1608,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #include "emu/bound.c.inl"
 #include "emu/calljmp.c.inl"
 #include "emu/cmovcc.c.inl"
+#include "emu/cmpxchg.c.inl"
 #include "emu/incdec.c.inl"
 #include "emu/iret.c.inl"
 #include "emu/lea.c.inl"

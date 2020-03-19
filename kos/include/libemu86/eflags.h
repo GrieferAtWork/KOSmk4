@@ -22,6 +22,7 @@
 
 #include "api.h"
 
+#include <hybrid/__overflow.h>
 #include <bits/types.h>
 #include <i386-kos/asm/cpu-flags.h>
 
@@ -38,7 +39,8 @@ __DECL_BEGIN
 #define emu86_geteflags_ZFw(value) ((__uint16_t)(value) == 0 ? EFLAGS_ZF : 0)
 #define emu86_geteflags_ZFl(value) ((__uint32_t)(value) == 0 ? EFLAGS_ZF : 0)
 
-__LOCAL __uint32_t LIBEMU86_CC emu86_geteflags_PFb(__uint8_t value) {
+__LOCAL __ATTR_CONST __uint32_t
+__NOTHROW(LIBEMU86_CC emu86_geteflags_PFb)(__uint8_t value) {
 	/* == POPCOUNT(value) & 1 */
 	value ^= value >> 4;
 	value ^= value >> 2;
@@ -46,7 +48,8 @@ __LOCAL __uint32_t LIBEMU86_CC emu86_geteflags_PFb(__uint8_t value) {
 	return (value & 1) ? EFLAGS_PF : 0;
 }
 
-__LOCAL __uint32_t LIBEMU86_CC emu86_geteflags_PFw(__uint16_t value) {
+__LOCAL __ATTR_CONST __uint32_t
+__NOTHROW(LIBEMU86_CC emu86_geteflags_PFw)(__uint16_t value) {
 	/* == POPCOUNT(value) & 1 */
 	value ^= value >> 8;
 	value ^= value >> 4;
@@ -55,7 +58,8 @@ __LOCAL __uint32_t LIBEMU86_CC emu86_geteflags_PFw(__uint16_t value) {
 	return (value & 1) ? EFLAGS_PF : 0;
 }
 
-__LOCAL __uint32_t LIBEMU86_CC emu86_geteflags_PFl(__uint32_t value) {
+__LOCAL __ATTR_CONST __uint32_t
+__NOTHROW(LIBEMU86_CC emu86_geteflags_PFl)(__uint32_t value) {
 	/* == POPCOUNT(value) & 1 */
 	value ^= value >> 16;
 	value ^= value >> 8;
@@ -68,7 +72,8 @@ __LOCAL __uint32_t LIBEMU86_CC emu86_geteflags_PFl(__uint32_t value) {
 #if CONFIG_LIBEMU86_WANT_64BIT
 #define emu86_geteflags_SFq(value) ((__int64_t)(value) < 0 ? EFLAGS_SF : 0)
 #define emu86_geteflags_ZFq(value) ((__uint64_t)(value) == 0 ? EFLAGS_ZF : 0)
-__LOCAL __uint32_t LIBEMU86_CC emu86_geteflags_PFq(__uint64_t value) {
+__LOCAL __ATTR_CONST __uint32_t
+__NOTHROW(LIBEMU86_CC emu86_geteflags_PFq)(__uint64_t value) {
 	/* == POPCOUNT(value) & 1 */
 	value ^= value >> 32;
 	value ^= value >> 16;
@@ -87,6 +92,33 @@ __LOCAL __uint32_t LIBEMU86_CC emu86_geteflags_PFq(__uint64_t value) {
 #if CONFIG_LIBEMU86_WANT_64BIT
 #define emu86_geteflags_testq(value) (emu86_geteflags_SFq(value) | emu86_geteflags_ZFq(value) | emu86_geteflags_PFq(value))
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
+
+
+/* Return a set of `EFLAGS_(CF|OF|SF|ZF|AF|PF)' */
+#define EMU86_GETEFLAGS_CMP_MASK         \
+	(EFLAGS_CF | EFLAGS_OF | EFLAGS_SF | \
+	 EFLAGS_ZF | EFLAGS_AF | EFLAGS_PF)
+#define EMU86_DEFINE_CMP(bwlq, Nbits)                                         \
+	__LOCAL __ATTR_CONST __uint32_t                                           \
+	__NOTHROW(LIBEMU86_CC emu86_geteflags_cmp##bwlq)(__uint##Nbits##_t lhs,   \
+	                                                 __uint##Nbits##_t rhs) { \
+		__uint##Nbits##_t newval;                                             \
+		__uint32_t result = 0;                                                \
+		if (__hybrid_overflow_usub(lhs, rhs, &newval))                        \
+			result |= EFLAGS_OF | EFLAGS_CF;                                  \
+		if (((lhs & 0xf) + ((0 - rhs) & 0xf)) >= 0x10)                        \
+			result |= EFLAGS_AF;                                              \
+		result |= emu86_geteflags_test##bwlq(newval);                         \
+		return result;                                                        \
+	}
+EMU86_DEFINE_CMP(b, 8)
+EMU86_DEFINE_CMP(w, 16)
+EMU86_DEFINE_CMP(l, 32)
+#if CONFIG_LIBEMU86_WANT_64BIT
+EMU86_DEFINE_CMP(q, 64)
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#undef EMU86_DEFINE_CMP
+
 
 __DECL_END
 #endif /* __CC__ */
