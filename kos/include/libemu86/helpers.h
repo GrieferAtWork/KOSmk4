@@ -63,17 +63,64 @@ __DECL_BEGIN
 		return result;                                                                        \
 	}
 
+#define EMU86_DEFINE_RCL(bwlq, Nbits, msb_bit_set)                                          \
+	__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __uint##Nbits##_t                            \
+	__NOTHROW(LIBEMU86_CC emu86_rcl##bwlq)(__uint##Nbits##_t i, __uint8_t num_bits,         \
+	                                       /*in|out:CF*/ __uint32_t * __restrict peflags) { \
+		bool cf = (*peflags & EFLAGS_CF) != 0;                                              \
+		for (; num_bits; --num_bits) {                                                      \
+			bool new_cf;                                                                    \
+			new_cf = (i & msb_bit_set) != 0;                                                \
+			i <<= 1;                                                                        \
+			if (cf)                                                                         \
+				i |= 1;                                                                     \
+			cf = new_cf;                                                                    \
+		}                                                                                   \
+		*peflags &= ~EFLAGS_CF;                                                             \
+		if (cf)                                                                             \
+			*peflags |= EFLAGS_CF;                                                          \
+		return i;                                                                           \
+	}
+#define EMU86_DEFINE_RCR(bwlq, Nbits, msb_bit_set)                                          \
+	__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __uint##Nbits##_t                            \
+	__NOTHROW(LIBEMU86_CC emu86_rcr##bwlq)(__uint##Nbits##_t i, __uint8_t num_bits,         \
+	                                       /*in|out:CF*/ __uint32_t * __restrict peflags) { \
+		bool cf = (*peflags & EFLAGS_CF) != 0;                                              \
+		for (; num_bits; --num_bits) {                                                      \
+			bool new_cf;                                                                    \
+			new_cf = (i & 1) != 0;                                                          \
+			i >>= 1;                                                                        \
+			if (cf)                                                                         \
+				i |= msb_bit_set;                                                           \
+			cf = new_cf;                                                                    \
+		}                                                                                   \
+		*peflags &= ~EFLAGS_CF;                                                             \
+		if (cf)                                                                             \
+			*peflags |= EFLAGS_CF;                                                          \
+		return i;                                                                           \
+	}
+
 EMU86_DEFINE_TZCNT(b, 8)
 EMU86_DEFINE_TZCNT(w, 16)
 EMU86_DEFINE_TZCNT(l, 32)
 EMU86_DEFINE_LZCNT(b, 8)
 EMU86_DEFINE_LZCNT(w, 16)
 EMU86_DEFINE_LZCNT(l, 32)
+EMU86_DEFINE_RCL(b, 8, __UINT8_C(0x80))
+EMU86_DEFINE_RCL(w, 16, __UINT16_C(0x8000))
+EMU86_DEFINE_RCL(l, 32, __UINT32_C(0x80000000))
+EMU86_DEFINE_RCR(b, 8, __UINT8_C(0x80))
+EMU86_DEFINE_RCR(w, 16, __UINT16_C(0x8000))
+EMU86_DEFINE_RCR(l, 32, __UINT32_C(0x80000000))
 #if CONFIG_LIBEMU86_WANT_64BIT
 EMU86_DEFINE_TZCNT(q, 64)
 EMU86_DEFINE_LZCNT(q, 64)
+EMU86_DEFINE_RCL(q, 64, __UINT64_C(0x8000000000000000))
+EMU86_DEFINE_RCR(q, 64, __UINT64_C(0x8000000000000000))
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
 
+#undef EMU86_DEFINE_RCR
+#undef EMU86_DEFINE_RCL
 #undef EMU86_DEFINE_LZCNT
 #undef EMU86_DEFINE_TZCNT
 

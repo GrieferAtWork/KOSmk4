@@ -2662,8 +2662,8 @@ again_0xf7:
 			u8 value, temp, newvalue;
 		case 0xd2:
 			MOD_DECODE();
-			/* D2 /4      SAL r/m8,CL      Multiply r/m8 by 2, CL times */
-			/* D2 /4      SHL r/m8,CL      Multiply r/m8 by 2, CL times */
+			/* D2 /4|6    SAL r/m8,CL      Multiply r/m8 by 2, CL times */
+			/* D2 /4|6    SHL r/m8,CL      Multiply r/m8 by 2, CL times */
 			/* D2 /5      SHR r/m8,CL      Unsigned divide r/m8 by 2, CL times */
 			/* D2 /7      SAR r/m8,CL      Signed divide* r/m8 by 2, CL times */
 			/* D2 /0      ROL r/m8,CL      Rotate 8 bits r/m8 left CL times */
@@ -2744,8 +2744,9 @@ again_0xc0:
 				break;
 
 			case 4:
-				/* C0 /4 ib      SAL r/m8,imm8      Multiply r/m8 by 2, imm8 times */
-				/* C0 /4 ib      SHL r/m8,imm8      Multiply r/m8 by 2, imm8 times */
+			case 6:
+				/* C0 /4|6 ib      SAL r/m8,imm8      Multiply r/m8 by 2, imm8 times */
+				/* C0 /4|6 ib      SHL r/m8,imm8      Multiply r/m8 by 2, imm8 times */
 				__asm__("shlb %%cl, %b1\n\t"
 				        INSTR_PUSHFP
 				        TAIL_POPP_OP0
@@ -2793,10 +2794,10 @@ again_0xc0:
 			u8 temp;
 		case 0xd3:
 			MOD_DECODE();
-			/* D3 /4      SAL r/m16,CL      Multiply r/m16 by 2, CL times */
-			/* D3 /4      SAL r/m32,CL      Multiply r/m32 by 2, CL times */
-			/* D3 /4      SHL r/m16,CL      Multiply r/m16 by 2, CL times */
-			/* D3 /4      SHL r/m32,CL      Multiply r/m32 by 2, CL times */
+			/* D3 /4|6    SAL r/m16,CL      Multiply r/m16 by 2, CL times */
+			/* D3 /4|6    SAL r/m32,CL      Multiply r/m32 by 2, CL times */
+			/* D3 /4|6    SHL r/m16,CL      Multiply r/m16 by 2, CL times */
+			/* D3 /4|6    SHL r/m32,CL      Multiply r/m32 by 2, CL times */
 			/* D3 /5      SHR r/m16,CL      Unsigned divide r/m16 by 2, CL times */
 			/* D3 /5      SHR r/m32,CL      Unsigned divide r/m32 by 2, CL times */
 			/* D3 /7      SAR r/m16,CL      Signed divide* r/m16 by 2, CL times */
@@ -2885,8 +2886,9 @@ again_0xc1_op64:
 					break;
 
 				case 4:
-					/* C1 /4 ib      SAL r/m16,imm8      Multiply r/m16 by 2, imm8 times */
-					/* C1 /4 ib      SHL r/m16,imm8      Multiply r/m16 by 2, imm8 times */
+				case 6:
+					/* C1 /4|6 ib      SAL r/m16,imm8      Multiply r/m16 by 2, imm8 times */
+					/* C1 /4|6 ib      SHL r/m16,imm8      Multiply r/m16 by 2, imm8 times */
 					__asm__("shlq %%cl, %q1\n\t"
 					        INSTR_PUSHFP
 					        TAIL_POPP_OP0
@@ -3099,8 +3101,9 @@ again_0xc1:
 					break;
 
 				case 4:
-					/* C1 /4 ib      SAL r/m32,imm8      Multiply r/m32 by 2, imm8 times */
-					/* C1 /4 ib      SHL r/m32,imm8      Multiply r/m32 by 2, imm8 times */
+				case 6:
+					/* C1 /4|6 ib      SAL r/m32,imm8      Multiply r/m32 by 2, imm8 times */
+					/* C1 /4|6 ib      SHL r/m32,imm8      Multiply r/m32 by 2, imm8 times */
 					__asm__("shll %%cl, %k1\n\t"
 					        INSTR_PUSHFP
 					        TAIL_POPP_OP0
@@ -3216,8 +3219,9 @@ again_0xd0:
 				break;
 
 			case 4:
-				/* D0 /4      SAL r/m8      Multiply r/m8 by 2, 1 time */
-				/* D0 /4      SHL r/m8      Multiply r/m8 by 2, 1 time */
+			case 6:
+				/* D0 /4|6      SAL r/m8      Multiply r/m8 by 2, 1 time */
+				/* D0 /4|6      SHL r/m8      Multiply r/m8 by 2, 1 time */
 				__asm__("shlb %b1\n\t"
 				        INSTR_PUSHFP
 				        TAIL_POPP_OP0
@@ -3322,8 +3326,9 @@ again_0xd1_op64:
 					break;
 
 				case 4:
-					/* D1 /4      SAL r/m16      Multiply r/m16 by 2, 1 time */
-					/* D1 /4      SHL r/m16      Multiply r/m16 by 2, 1 time */
+				case 6:
+					/* D1 /4|6      SAL r/m16      Multiply r/m16 by 2, 1 time */
+					/* D1 /4|6      SHL r/m16      Multiply r/m16 by 2, 1 time */
 					__asm__("shlq %q1\n\t"
 					        INSTR_PUSHFP
 					        TAIL_POPP_OP0
@@ -3423,8 +3428,9 @@ again_0xd1_op16:
 					break;
 
 				case 4:
-					/* D1 /4      SAL r/m16      Multiply r/m16 by 2, 1 time */
-					/* D1 /4      SHL r/m16      Multiply r/m16 by 2, 1 time */
+				case 6:
+					/* D1 /4|6      SAL r/m16      Multiply r/m16 by 2, 1 time */
+					/* D1 /4|6      SHL r/m16      Multiply r/m16 by 2, 1 time */
 					__asm__("shlw %w1\n\t"
 					        INSTR_PUSHFP
 					        TAIL_POPP_OP0
@@ -3524,8 +3530,9 @@ again_0xd1:
 					break;
 
 				case 4:
-					/* D1 /4      SAL r/m32      Multiply r/m32 by 2, 1 time */
-					/* D1 /4      SHL r/m32      Multiply r/m32 by 2, 1 time */
+				case 6:
+					/* D1 /4|6      SAL r/m32      Multiply r/m32 by 2, 1 time */
+					/* D1 /4|6      SHL r/m32      Multiply r/m32 by 2, 1 time */
 					__asm__("shll %k1\n\t"
 					        INSTR_PUSHFP
 					        TAIL_POPP_OP0
