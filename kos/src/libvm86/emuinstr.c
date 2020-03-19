@@ -215,6 +215,8 @@ DECL_END
 
 #define EMU86_EMULATE_THROW_BOUNDERR(bound_idx, bound_min, bound_max) \
 	return libvm86_intr(self, 0x5) /* #BR */
+#define EMU86_EMULATE_THROW_DIVIDE_BY_ZERO() \
+	return libvm86_intr(self, 0x0) /* #DE */
 
 
 /* Make sure that `THROW()' isn't used by the emulated code. */

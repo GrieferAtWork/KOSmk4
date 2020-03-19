@@ -1515,6 +1515,7 @@ NOTHROW(CC CS_setregl)(struct vio_emulate_args *__restrict self, u8 regno, u32 v
 #define EMU86_SETPDI(value, op_flags) (_CPUSTATE_GPREGS.gp_pdi = (uintptr_t)(value) & _EMU86_REGP_MASK(op_flags))
 #define EMU86_EMULATE_THROW_BOUNDERR(bound_idx, bound_min, bound_max) \
 	THROW(E_INDEX_ERROR_OUT_OF_BOUNDS, bound_idx, bound_min, bound_max)
+#define EMU86_EMULATE_THROW_DIVIDE_BY_ZERO_ALLOW_RETHROW 1
 
 DECL_END
 

@@ -43,6 +43,7 @@
 #include <kos/types.h>
 
 #include <stdbool.h>
+#include <stdint.h>
 
 #include "eflags.h"
 #include "emu86.h"
@@ -167,6 +168,45 @@ __DECL_BEGIN
 /* Define to implement support for the `bound' instruction on 16-/32-bit */
 /* #define EMU86_EMULATE_THROW_BOUNDERR(bound_idx, bound_min, bound_max) \
 	THROW(E_INDEX_ERROR_OUT_OF_BOUNDS, bound_idx, bound_min, bound_max) */
+
+/* Allow E_DIVIDE_BY_ZERO to be rethrown natively, rather than having
+ * to be handled by use of `EMU86_EMULATE_THROW_DIVIDE_BY_ZERO[B|W|L|Q]()'
+ * In case the aformentioned macros only ever throw the same exception,
+ * this can get rid of unnecessary bloat. */
+#ifndef EMU86_EMULATE_THROW_DIVIDE_BY_ZERO_ALLOW_RETHROW
+#define EMU86_EMULATE_THROW_DIVIDE_BY_ZERO_ALLOW_RETHROW 0
+#endif /* !EMU86_EMULATE_THROW_DIVIDE_BY_ZERO_ALLOW_RETHROW */
+
+#ifndef EMU86_EMULATE_THROW_DIVIDE_BY_ZEROB
+#ifndef EMU86_EMULATE_THROW_DIVIDE_BY_ZERO
+#define EMU86_EMULATE_THROW_DIVIDE_BY_ZERO() THROW(E_DIVIDE_BY_ZERO)
+#endif /* !EMU86_EMULATE_THROW_DIVIDE_BY_ZERO */
+#ifndef EMU86_EMULATE_THROW_SIGNED_DIVIDE_BY_ZERO
+#define EMU86_EMULATE_THROW_SIGNED_DIVIDE_BY_ZERO() EMU86_EMULATE_THROW_DIVIDE_BY_ZERO()
+#endif /* !EMU86_EMULATE_THROW_SIGNED_DIVIDE_BY_ZERO */
+#define EMU86_EMULATE_THROW_DIVIDE_BY_ZEROB(/*u16*/ lhs) EMU86_EMULATE_THROW_DIVIDE_BY_ZERO()
+#define EMU86_EMULATE_THROW_DIVIDE_BY_ZEROW(/*u32*/ lhs) EMU86_EMULATE_THROW_DIVIDE_BY_ZERO()
+#define EMU86_EMULATE_THROW_DIVIDE_BY_ZEROL(/*u64*/ lhs) EMU86_EMULATE_THROW_DIVIDE_BY_ZERO()
+#define EMU86_EMULATE_THROW_SIGNED_DIVIDE_BY_ZEROB(/*s16*/ lhs) EMU86_EMULATE_THROW_SIGNED_DIVIDE_BY_ZERO()
+#define EMU86_EMULATE_THROW_SIGNED_DIVIDE_BY_ZEROW(/*s32*/ lhs) EMU86_EMULATE_THROW_SIGNED_DIVIDE_BY_ZERO()
+#define EMU86_EMULATE_THROW_SIGNED_DIVIDE_BY_ZEROL(/*s64*/ lhs) EMU86_EMULATE_THROW_SIGNED_DIVIDE_BY_ZERO()
+#if CONFIG_LIBEMU86_WANT_64BIT && defined(__UINT128_TYPE__)
+#define EMU86_EMULATE_THROW_DIVIDE_BY_ZEROQ(/*uint128_t*/ lhs) EMU86_EMULATE_THROW_DIVIDE_BY_ZERO()
+#define EMU86_EMULATE_THROW_SIGNED_DIVIDE_BY_ZEROQ(/*int128_t*/ lhs) EMU86_EMULATE_THROW_SIGNED_DIVIDE_BY_ZERO()
+#endif /* CONFIG_LIBEMU86_WANT_64BIT && __UINT128_TYPE__ */
+#endif /* !EMU86_EMULATE_THROW_DIVIDE_BY_ZERO */
+#ifndef EMU86_EMULATE_THROW_DIVIDE_OVERFLOWB
+#define EMU86_EMULATE_THROW_DIVIDE_OVERFLOWB(/*u16*/ lhs, /*u8*/ rhs, /*u16*/ exact_result) EMU86_EMULATE_THROW_DIVIDE_BY_ZEROB(lhs)
+#define EMU86_EMULATE_THROW_DIVIDE_OVERFLOWW(/*u32*/ lhs, /*u16*/ rhs, /*u32*/ exact_result) EMU86_EMULATE_THROW_DIVIDE_BY_ZEROW(lhs)
+#define EMU86_EMULATE_THROW_DIVIDE_OVERFLOWL(/*u64*/ lhs, /*u32*/ rhs, /*u64*/ exact_result) EMU86_EMULATE_THROW_DIVIDE_BY_ZEROL(lhs)
+#define EMU86_EMULATE_THROW_SIGNED_DIVIDE_OVERFLOWB(/*s16*/ lhs, /*s8*/ rhs, /*s16*/ exact_result) EMU86_EMULATE_THROW_SIGNED_DIVIDE_BY_ZEROB(lhs)
+#define EMU86_EMULATE_THROW_SIGNED_DIVIDE_OVERFLOWW(/*s32*/ lhs, /*s16*/ rhs, /*s32*/ exact_result) EMU86_EMULATE_THROW_SIGNED_DIVIDE_BY_ZEROW(lhs)
+#define EMU86_EMULATE_THROW_SIGNED_DIVIDE_OVERFLOWL(/*s64*/ lhs, /*s32*/ rhs, /*s64*/ exact_result) EMU86_EMULATE_THROW_SIGNED_DIVIDE_BY_ZEROL(lhs)
+#if CONFIG_LIBEMU86_WANT_64BIT && defined(__UINT128_TYPE__)
+#define EMU86_EMULATE_THROW_DIVIDE_OVERFLOWQ(/*uint128_t*/ lhs, /*u64*/ rhs, /*uint128_t*/ exact_result) EMU86_EMULATE_THROW_DIVIDE_BY_ZEROQ(lhs)
+#define EMU86_EMULATE_THROW_SIGNED_DIVIDE_OVERFLOWQ(/*int128_t*/ lhs, /*s64*/ rhs, /*int128_t*/ exact_result) EMU86_EMULATE_THROW_SIGNED_DIVIDE_BY_ZEROQ(lhs)
+#endif /* CONFIG_LIBEMU86_WANT_64BIT && __UINT128_TYPE__ */
+#endif /* !EMU86_EMULATE_THROW_DIVIDE_OVERFLOWB */
 
 /* Return the initial set of opcode flags. */
 #ifndef EMU86_EMULATE_GETOPFLAGS
@@ -1603,6 +1643,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 		/* Pull in emulated instructions. */
 #ifndef __INTELLISENSE__
 #include "emu/arith.c.inl"
+#include "emu/arith2.c.inl"
 #include "emu/bitscan.c.inl"
 #include "emu/bittest.c.inl"
 #include "emu/bound.c.inl"
