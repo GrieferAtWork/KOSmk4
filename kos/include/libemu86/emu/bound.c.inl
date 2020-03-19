@@ -41,6 +41,7 @@ case 0x62: {
 			s16 words[2];
 			u32 dword;
 		} temp;
+		EMU86_READ_USER_MEMORY(addr, 4);
 		temp.dword = EMU86_EMULATE_READL(addr);
 		bound_min  = temp.words[0];
 		bound_max  = temp.words[1];
@@ -50,6 +51,7 @@ case 0x62: {
 			s32 dwords[2];
 			u64 qword;
 		} temp;
+		EMU86_READ_USER_MEMORY(addr, 8);
 #if CONFIG_LIBEMU86_WANT_64BIT
 		temp.qword = EMU86_EMULATE_READQ(addr);
 #else /* CONFIG_LIBEMU86_WANT_64BIT */

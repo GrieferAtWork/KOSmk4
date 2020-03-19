@@ -42,6 +42,8 @@
 #include <kos/kernel/types.h>
 #include <kos/types.h>
 
+#include <stdbool.h>
+
 #include "eflags.h"
 #include "emu86.h"
 #include "helpers.h"
@@ -258,6 +260,9 @@ __DECL_BEGIN
 #define EMU86_EMULATE_ATOMIC_CMPXCHW(addr, oldval, newval, force_atomic) __hybrid_atomic_cmpxch(*(u16 *)EMU86_EMULATE_TRANSLATEADDR(addr), oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
 #define EMU86_EMULATE_ATOMIC_CMPXCHL(addr, oldval, newval, force_atomic) __hybrid_atomic_cmpxch(*(u32 *)EMU86_EMULATE_TRANSLATEADDR(addr), oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
 #define EMU86_EMULATE_ATOMIC_CMPXCHQ(addr, oldval, newval, force_atomic) __hybrid_atomic_cmpxch(*(u64 *)EMU86_EMULATE_TRANSLATEADDR(addr), oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
+#define EMU86_EMULATE_ATOMIC_CMPXCH_OR_WRITEB(addr, oldval, newval, force_atomic) __hybrid_atomic_cmpxch(*(u8 *)EMU86_EMULATE_TRANSLATEADDR(addr), oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
+#define EMU86_EMULATE_ATOMIC_CMPXCH_OR_WRITEW(addr, oldval, newval, force_atomic) __hybrid_atomic_cmpxch(*(u16 *)EMU86_EMULATE_TRANSLATEADDR(addr), oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
+#define EMU86_EMULATE_ATOMIC_CMPXCH_OR_WRITEL(addr, oldval, newval, force_atomic) __hybrid_atomic_cmpxch(*(u32 *)EMU86_EMULATE_TRANSLATEADDR(addr), oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
 #if CONFIG_LIBEMU86_WANT_64BIT
 #define EMU86_EMULATE_READQ(addr)     (*(u64 const *)EMU86_EMULATE_TRANSLATEADDR(addr))
 #define EMU86_EMULATE_WRITEQ(addr, v) (*(u64 *)EMU86_EMULATE_TRANSLATEADDR(addr) = (v))
@@ -267,6 +272,7 @@ __DECL_BEGIN
 #define EMU86_EMULATE_ATOMIC_FETCHANDQ(addr, addend, force_atomic) __hybrid_atomic_fetchand(*(u64 *)EMU86_EMULATE_TRANSLATEADDR(addr), addend, __ATOMIC_SEQ_CST)
 #define EMU86_EMULATE_ATOMIC_FETCHORQ(addr, addend, force_atomic) __hybrid_atomic_fetchor(*(u64 *)EMU86_EMULATE_TRANSLATEADDR(addr), addend, __ATOMIC_SEQ_CST)
 #define EMU86_EMULATE_ATOMIC_FETCHXORQ(addr, addend, force_atomic) __hybrid_atomic_fetchxor(*(u64 *)EMU86_EMULATE_TRANSLATEADDR(addr), addend, __ATOMIC_SEQ_CST)
+#define EMU86_EMULATE_ATOMIC_CMPXCH_OR_WRITEQ(addr, oldval, newval, force_atomic) __hybrid_atomic_cmpxch(*(u64 *)EMU86_EMULATE_TRANSLATEADDR(addr), oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
 #define EMU86_EMULATE_ATOMIC_CMPXCH128(addr, oldval, newval, force_atomic) __hybrid_atomic_cmpxch(*(uint128_t *)EMU86_EMULATE_TRANSLATEADDR(addr), oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
 #endif /* !EMU86_EMULATE_READB */
@@ -386,13 +392,6 @@ __DECL_BEGIN
 #define EMU86_GETSP_RAW()  EMU86_GETSP()
 #define EMU86_SETSP_RAW(v) EMU86_SETSP(v)
 #endif /* !EMU86_GETSP_RAW */
-
-/* Additional per-instruction handling before memory is accessed. */
-#ifndef EMU86_ACCESS_MEMORY
-#define EMU86_ACCESS_MEMORY_IS_NOOP 1
-#define EMU86_ACCESS_MEMORY(addr, num_bytes) (void)0
-#define EMU86_ACCESS_MEMORY2(addr1, num_bytes1, addr2, num_bytes2) (void)0
-#endif /* !EMU86_ACCESS_MEMORY */
 
 /* Return the base address address for a given segment */
 #ifndef EMU86_GETSEGBASE
@@ -1233,6 +1232,149 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_
 
 
 
+/* Get/Set the R/M operand from a given modrm (when the modrm is known to be memory) */
+#ifndef EMU86_EMULATE_ONLY_MEMORY
+#ifndef EMU86_GETMODRM_RMMEMB
+#define EMU86_GETMODRM_RMMEMB(modrm, op_flags) \
+	(EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rmmemb)(EMU86_EMULATE_HELPER_PARAM_ modrm, op_flags))
+__PRIVATE __ATTR_UNUSED __ATTR_WUNUSED __ATTR_PURE EMU86_EMULATE_HELPER_ATTR u8
+EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rmmemb))(EMU86_EMULATE_HELPER_ARGS_
+                                                                                         struct emu86_modrm const *__restrict modrm,
+                                                                                         emu86_opflags_t op_flags) {
+	byte_t *addr;
+	addr = EMU86_MODRM_MEMADDR(modrm, op_flags);
+#if EMU86_EMULATE_CHECKUSER
+	if (EMU86_ISUSER())
+		EMU86_VALIDATE_READABLE(addr, 1);
+#endif /* EMU86_EMULATE_CHECKUSER */
+	return EMU86_EMULATE_READB(addr);
+}
+#endif /* !EMU86_GETMODRM_RMMEMB */
+
+#ifndef EMU86_SETMODRM_RMMEMB
+#define EMU86_SETMODRM_RMMEMB(modrm, value, op_flags) \
+	(EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_rmmemb)(EMU86_EMULATE_HELPER_PARAM_ modrm, value, op_flags))
+__PRIVATE __ATTR_UNUSED EMU86_EMULATE_HELPER_ATTR void
+EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_rmmemb))(EMU86_EMULATE_HELPER_ARGS_
+                                                                                         struct emu86_modrm const *__restrict modrm,
+                                                                                         u8 value, emu86_opflags_t op_flags) {
+	byte_t *addr;
+	addr = EMU86_MODRM_MEMADDR(modrm, op_flags);
+#if EMU86_EMULATE_CHECKUSER
+	if (EMU86_ISUSER())
+		EMU86_VALIDATE_WRITABLE(addr, 1);
+#endif /* EMU86_EMULATE_CHECKUSER */
+	EMU86_EMULATE_WRITEB(addr, value);
+}
+#endif /* !EMU86_SETMODRM_RMMEMB */
+
+#ifndef EMU86_GETMODRM_RMMEMW
+#define EMU86_GETMODRM_RMMEMW(modrm, op_flags) \
+	(EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rmmemw)(EMU86_EMULATE_HELPER_PARAM_ modrm, op_flags))
+__PRIVATE __ATTR_UNUSED __ATTR_WUNUSED __ATTR_PURE EMU86_EMULATE_HELPER_ATTR u16
+EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rmmemw))(EMU86_EMULATE_HELPER_ARGS_
+                                                                                         struct emu86_modrm const *__restrict modrm,
+                                                                                         emu86_opflags_t op_flags) {
+	byte_t *addr;
+	addr = EMU86_MODRM_MEMADDR(modrm, op_flags);
+#if EMU86_EMULATE_CHECKUSER
+	if (EMU86_ISUSER())
+		EMU86_VALIDATE_READABLE(addr, 2);
+#endif /* EMU86_EMULATE_CHECKUSER */
+	return EMU86_EMULATE_READW(addr);
+}
+#endif /* !EMU86_GETMODRM_RMMEMW */
+
+#ifndef EMU86_SETMODRM_RMMEMW
+#define EMU86_SETMODRM_RMMEMW(modrm, value, op_flags) \
+	(EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_rmmemw)(EMU86_EMULATE_HELPER_PARAM_ modrm, value, op_flags))
+__PRIVATE __ATTR_UNUSED EMU86_EMULATE_HELPER_ATTR void
+EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_rmmemw))(EMU86_EMULATE_HELPER_ARGS_
+                                                                                         struct emu86_modrm const *__restrict modrm,
+                                                                                         u16 value, emu86_opflags_t op_flags) {
+	byte_t *addr;
+	addr = EMU86_MODRM_MEMADDR(modrm, op_flags);
+#if EMU86_EMULATE_CHECKUSER
+	if (EMU86_ISUSER())
+		EMU86_VALIDATE_WRITABLE(addr, 2);
+#endif /* EMU86_EMULATE_CHECKUSER */
+	EMU86_EMULATE_WRITEW(addr, value);
+}
+#endif /* !EMU86_SETMODRM_RMMEMW */
+
+#ifndef EMU86_GETMODRM_RMMEML
+#define EMU86_GETMODRM_RMMEML(modrm, op_flags) \
+	(EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rml)(EMU86_EMULATE_HELPER_PARAM_ modrm, op_flags))
+__PRIVATE __ATTR_UNUSED __ATTR_WUNUSED __ATTR_PURE EMU86_EMULATE_HELPER_ATTR u32
+EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rmmeml))(EMU86_EMULATE_HELPER_ARGS_
+                                                                                         struct emu86_modrm const *__restrict modrm,
+                                                                                         emu86_opflags_t op_flags) {
+	byte_t *addr;
+	addr = EMU86_MODRM_MEMADDR(modrm, op_flags);
+#if EMU86_EMULATE_CHECKUSER
+	if (EMU86_ISUSER())
+		EMU86_VALIDATE_READABLE(addr, 4);
+#endif /* EMU86_EMULATE_CHECKUSER */
+	return EMU86_EMULATE_READL(addr);
+}
+#endif /* !EMU86_GETMODRM_RMMEML */
+
+#ifndef EMU86_SETMODRM_RMMEML
+#define EMU86_SETMODRM_RMMEML(modrm, value, op_flags) \
+	(EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_rmmeml)(EMU86_EMULATE_HELPER_PARAM_ modrm, value, op_flags))
+__PRIVATE __ATTR_UNUSED EMU86_EMULATE_HELPER_ATTR void
+EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_rmmeml))(EMU86_EMULATE_HELPER_ARGS_
+                                                                                         struct emu86_modrm const *__restrict modrm,
+                                                                                         u32 value, emu86_opflags_t op_flags) {
+	byte_t *addr;
+	addr = EMU86_MODRM_MEMADDR(modrm, op_flags);
+#if EMU86_EMULATE_CHECKUSER
+	if (EMU86_ISUSER())
+		EMU86_VALIDATE_WRITABLE(addr, 4);
+#endif /* EMU86_EMULATE_CHECKUSER */
+	EMU86_EMULATE_WRITEL(addr, value);
+}
+#endif /* !EMU86_SETMODRM_RMMEML */
+
+#if CONFIG_LIBEMU86_WANT_64BIT
+#ifndef EMU86_GETMODRM_RMMEMQ
+#define EMU86_GETMODRM_RMMEMQ(modrm, op_flags) \
+	(EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rmmemq)(EMU86_EMULATE_HELPER_PARAM_ modrm, op_flags))
+__PRIVATE __ATTR_UNUSED __ATTR_WUNUSED __ATTR_PURE EMU86_EMULATE_HELPER_ATTR u64
+EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rmmemq))(EMU86_EMULATE_HELPER_ARGS_
+                                                                                         struct emu86_modrm const *__restrict modrm,
+                                                                                         emu86_opflags_t op_flags) {
+	byte_t *addr;
+	addr = EMU86_MODRM_MEMADDR(modrm, op_flags);
+#if EMU86_EMULATE_CHECKUSER
+	if (EMU86_ISUSER())
+		EMU86_VALIDATE_READABLE(addr, 8);
+#endif /* EMU86_EMULATE_CHECKUSER */
+	return EMU86_EMULATE_READQ(addr);
+}
+#endif /* !EMU86_GETMODRM_RMMEMQ */
+
+#ifndef EMU86_SETMODRM_RMMEMQ
+#define EMU86_SETMODRM_RMMEMQ(modrm, value, op_flags) \
+	(EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_rmmemq)(EMU86_EMULATE_HELPER_PARAM_ modrm, value, op_flags))
+__PRIVATE __ATTR_UNUSED EMU86_EMULATE_HELPER_ATTR void
+EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_rmmemq))(EMU86_EMULATE_HELPER_ARGS_
+                                                                                         struct emu86_modrm const *__restrict modrm,
+                                                                                         u64 value, emu86_opflags_t op_flags) {
+	byte_t *addr;
+	addr = EMU86_MODRM_MEMADDR(modrm, op_flags);
+#if EMU86_EMULATE_CHECKUSER
+	if (EMU86_ISUSER())
+		EMU86_VALIDATE_WRITABLE(addr, 8);
+#endif /* EMU86_EMULATE_CHECKUSER */
+	EMU86_EMULATE_WRITEQ(addr, value);
+}
+#endif /* !EMU86_SETMODRM_RMMEMQ */
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* !EMU86_EMULATE_ONLY_MEMORY */
+
+
+
 #ifdef __INTELLISENSE__
 #ifndef EMU86_EMULATE_TRANSLATEADDR_IS_NOOP
 #define _EMU86_INTELLISENSE_BEGIN_REAL_START_PC , *real_start_pc
@@ -1342,37 +1484,23 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 	(pc = emu86_modrm_decode(pc, &modrm, op_flags))
 #endif /* !EMU86_EMULATE_ONLY_MEMORY */
 
-#ifndef MODRM_EMU86_ACCESS_MEMORY
-#ifdef EMU86_EMULATE_ONLY_MEMORY
-#define MODRM_EMU86_ACCESS_MEMORY(num_bytes) \
-	EMU86_ACCESS_MEMORY(MODRM_MEMADDR(), num_bytes)
-#else /* EMU86_ACCESS_MEMORY */
-#define MODRM_EMU86_ACCESS_MEMORY(num_bytes)                 \
-	do {                                                     \
-		if (EMU86_MODRM_ISMEM(modrm.mi_type))                \
-			EMU86_ACCESS_MEMORY(MODRM_MEMADDR(), num_bytes); \
-	} __WHILE0
-#endif /* !EMU86_ACCESS_MEMORY */
-#endif /* !MODRM_EMU86_ACCESS_MEMORY */
-
-
+	/* Invoke all necessary callbacks for read/write access to memory
+	 * who's address has been derived  */
 #ifndef EMU86_READ_USER_MEMORY
 #if EMU86_EMULATE_CHECKUSER
 #define EMU86_READ_USER_MEMORY(addr, num_bytes)       \
 	do {                                              \
-		EMU86_ACCESS_MEMORY(addr, num_bytes);         \
 		if (EMU86_ISUSER())                           \
 			EMU86_VALIDATE_READABLE(addr, num_bytes); \
 	} __WHILE0
-#define EMU86_WRITE_USER_MEMORY(addr, num_bytes)       \
-	do {                                               \
-		EMU86_ACCESS_MEMORY(addr, num_bytes);          \
-		if (EMU86_ISUSER())                            \
+#define EMU86_WRITE_USER_MEMORY(addr, num_bytes)      \
+	do {                                              \
+		if (EMU86_ISUSER())                           \
 			EMU86_VALIDATE_WRITABLE(addr, num_bytes); \
 	} __WHILE0
 #else /* EMU86_EMULATE_CHECKUSER */
-#define EMU86_READ_USER_MEMORY(addr, num_bytes)  EMU86_ACCESS_MEMORY(addr, num_bytes)
-#define EMU86_WRITE_USER_MEMORY(addr, num_bytes) EMU86_ACCESS_MEMORY(addr, num_bytes)
+#define EMU86_READ_USER_MEMORY(addr, num_bytes)  (void)0
+#define EMU86_WRITE_USER_MEMORY(addr, num_bytes) (void)0
 #endif /* !EMU86_EMULATE_CHECKUSER */
 #endif /* !EMU86_READ_USER_MEMORY */
 
@@ -1396,6 +1524,30 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #define MODRM_GETRMQ()   EMU86_GETMODRM_RMQ(&modrm, op_flags)
 #define MODRM_SETRMQ(v)  EMU86_SETMODRM_RMQ(&modrm, v, op_flags)
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
+
+#ifdef EMU86_EMULATE_ONLY_MEMORY
+#define MODRM_GETRMMEMB()   EMU86_GETMODRM_RMB(&modrm, op_flags)
+#define MODRM_GETRMMEMW()   EMU86_GETMODRM_RMW(&modrm, op_flags)
+#define MODRM_GETRMMEML()   EMU86_GETMODRM_RML(&modrm, op_flags)
+#define MODRM_SETRMMEMB(v)  EMU86_SETMODRM_RMB(&modrm, v, op_flags)
+#define MODRM_SETRMMEMW(v)  EMU86_SETMODRM_RMW(&modrm, v, op_flags)
+#define MODRM_SETRMMEML(v)  EMU86_SETMODRM_RML(&modrm, v, op_flags)
+#if CONFIG_LIBEMU86_WANT_64BIT
+#define MODRM_GETRMMEMQ()   EMU86_GETMODRM_RMQ(&modrm, op_flags)
+#define MODRM_SETRMMEMQ(v)  EMU86_SETMODRM_RMQ(&modrm, v, op_flags)
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#else /* EMU86_EMULATE_ONLY_MEMORY */
+#define MODRM_GETRMMEMB()   EMU86_GETMODRM_RMMEMB(&modrm, op_flags)
+#define MODRM_GETRMMEMW()   EMU86_GETMODRM_RMMEMW(&modrm, op_flags)
+#define MODRM_GETRMMEML()   EMU86_GETMODRM_RMMEML(&modrm, op_flags)
+#define MODRM_SETRMMEMB(v)  EMU86_SETMODRM_RMMEMB(&modrm, v, op_flags)
+#define MODRM_SETRMMEMW(v)  EMU86_SETMODRM_RMMEMW(&modrm, v, op_flags)
+#define MODRM_SETRMMEML(v)  EMU86_SETMODRM_RMMEML(&modrm, v, op_flags)
+#if CONFIG_LIBEMU86_WANT_64BIT
+#define MODRM_GETRMMEMQ()   EMU86_GETMODRM_RMMEMQ(&modrm, op_flags)
+#define MODRM_SETRMMEMQ(v)  EMU86_SETMODRM_RMMEMQ(&modrm, v, op_flags)
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* !EMU86_EMULATE_ONLY_MEMORY */
 
 #define MODRM_GETRMREGB()   EMU86_GETREGB(modrm.mi_rm, op_flags)
 #define MODRM_GETRMREGW()   EMU86_GETREGW(modrm.mi_rm)
@@ -1447,27 +1599,12 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 	SEGMENT_ADDR2(EMU86_F_SEGREG(op_flags), offset)
 #endif /* !EMU86_GETSEGBASE_IS_NOOP */
 
-#if EMU86_EMULATE_CHECKUSER
-#define MAYBE_VALIDATE_READABLE(addr, num_bytes) \
-	do {                                         \
-		if (EMU86_ISUSER())                      \
-			EMU86_VALIDATE_READABLE(addr, 1);    \
-	} __WHILE0
-#define MAYBE_VALIDATE_WRITABLE(addr, num_bytes) \
-	do {                                         \
-		if (EMU86_ISUSER())                      \
-			EMU86_VALIDATE_WRITABLE(addr, 1);    \
-	} __WHILE0
-#else /* EMU86_EMULATE_CHECKUSER */
-#define MAYBE_VALIDATE_READABLE(addr, num_bytes) (void)0
-#define MAYBE_VALIDATE_WRITABLE(addr, num_bytes) (void)0
-#endif /* !EMU86_EMULATE_CHECKUSER */
-
 
 		/* Pull in emulated instructions. */
 #ifndef __INTELLISENSE__
 #include "emu/arith.c.inl"
 #include "emu/bitscan.c.inl"
+#include "emu/bittest.c.inl"
 #include "emu/bound.c.inl"
 #include "emu/iret.c.inl"
 #include "emu/lea.c.inl"

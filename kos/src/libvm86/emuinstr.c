@@ -118,9 +118,6 @@ DECL_END
 #define EMU86_SETSP(v)         self->vr_regs.vr_ip = (u16)((uintptr_t)(v) - (self->vr_regs.vr_cs << 4))
 #define EMU86_GETSP_RAW()      self->vr_regs.vr_sp
 #define EMU86_SETSP_RAW(v)     self->vr_regs.vr_sp = (u16)(v)
-#define EMU86_ACCESS_MEMORY_IS_NOOP 1
-#define EMU86_ACCESS_MEMORY(addr, num_bytes) (void)0
-#define EMU86_ACCESS_MEMORY2(addr1, num_bytes1, addr2, num_bytes2) (void)0
 #undef EMU86_GETSEGBASE_IS_NOOP_DS
 #undef EMU86_GETSEGBASE_IS_NOOP_ES
 #undef EMU86_GETSEGBASE_IS_NOOP_CS

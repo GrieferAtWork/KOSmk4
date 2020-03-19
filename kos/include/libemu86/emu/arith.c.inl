@@ -34,7 +34,7 @@ EMU86_INTELLISENSE_BEGIN(arith) {
 #define DO_ARITHn(NAME, operator, BWLQ, Nbytes, oldval, rhs)                                         \
 	if (EMU86_MODRM_ISMEM(modrm.mi_type)) {                                                          \
 		byte_t *_addr = MODRM_MEMADDR();                                                             \
-		MAYBE_VALIDATE_WRITABLE(_addr, Nbytes);                                                      \
+		EMU86_WRITE_USER_MEMORY(_addr, Nbytes);                                                      \
 		oldval = EMU86_EMULATE_ATOMIC_FETCH##NAME##BWLQ(_addr, rhs, (op_flags & EMU86_F_LOCK) != 0); \
 	} else {                                                                                         \
 		oldval = MODRM_GETRMREG##BWLQ();                                                             \
@@ -93,7 +93,7 @@ do_adc##Nbits:                                                                  
 			MODRM_SETRMREG##BWLQ(newval);                                              \
 		} else) {                                                                      \
 			byte_t *addr = MODRM_MEMADDR();                                            \
-			MAYBE_VALIDATE_WRITABLE(addr, Nbytes);                                     \
+			EMU86_WRITE_USER_MEMORY(addr, Nbytes);                                     \
 			for (;;) {                                                                 \
 				oldval = EMU86_EMULATE_READ##BWLQ(addr);                               \
 				eflags_addend = 0;                                                     \
@@ -126,7 +126,7 @@ do_sbb##Nbits:                                                                  
 			MODRM_SETRMREG##BWLQ(newval);                                              \
 		} else) {                                                                      \
 			byte_t *addr = MODRM_MEMADDR();                                            \
-			MAYBE_VALIDATE_WRITABLE(addr, Nbytes);                                     \
+			EMU86_WRITE_USER_MEMORY(addr, Nbytes);                                     \
 			for (;;) {                                                                 \
 				oldval = EMU86_EMULATE_READ##BWLQ(addr);                               \
 				eflags_addend = 0;                                                     \

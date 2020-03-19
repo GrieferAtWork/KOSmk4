@@ -836,7 +836,94 @@ libviocore_atomic_cmpxchq(struct vio_emulate_args *__restrict self,
 	return result;
 }
 
+#define EMU86_EMULATE_ATOMIC_CMPXCH_OR_WRITEB(addr, oldval, newval, force_atomic) \
+	libviocore_atomic_cmpxch_or_writeb(self, (void *)(uintptr_t)(addr), oldval, newval, force_atomic)
+LOCAL NONNULL((1)) u8 CC
+libviocore_atomic_cmpxch_or_writeb(struct vio_emulate_args *__restrict self,
+                                   __USER __CHECKED void *addr,
+                                   u8 oldval, u8 newval, bool force_atomic) {
+	u8 result;
+	COMPILER_BARRIER();
+	if likely(addr == self->vea_ptr)
+		result = vio_cmpxch_or_writeb(&self->vea_args, self->vea_addr, oldval, newval, force_atomic);
+	else if (force_atomic)
+		result = ATOMIC_CMPXCH(*(u8 *)addr, oldval, newval);
+	else {
+		result = *(u8 *)addr;
+		COMPILER_READ_BARRIER();
+		if (result == oldval)
+			*(u8 *)addr = newval;
+	}
+	COMPILER_BARRIER();
+	return result;
+}
+
+#define EMU86_EMULATE_ATOMIC_CMPXCH_OR_WRITEW(addr, oldval, newval, force_atomic) \
+	libviocore_atomic_cmpxch_or_writew(self, (void *)(uintptr_t)(addr), oldval, newval, force_atomic)
+LOCAL NONNULL((1)) u16 CC
+libviocore_atomic_cmpxch_or_writew(struct vio_emulate_args *__restrict self,
+                                   __USER __CHECKED void *addr,
+                                   u16 oldval, u16 newval, bool force_atomic) {
+	u16 result;
+	COMPILER_BARRIER();
+	if likely(addr == self->vea_ptr)
+		result = vio_cmpxch_or_writew(&self->vea_args, self->vea_addr, oldval, newval, force_atomic);
+	else if (force_atomic)
+		result = ATOMIC_CMPXCH(*(u16 *)addr, oldval, newval);
+	else {
+		result = *(u16 *)addr;
+		COMPILER_READ_BARRIER();
+		if (result == oldval)
+			*(u16 *)addr = newval;
+	}
+	COMPILER_BARRIER();
+	return result;
+}
+
+#define EMU86_EMULATE_ATOMIC_CMPXCH_OR_WRITEL(addr, oldval, newval, force_atomic) \
+	libviocore_atomic_cmpxch_or_writel(self, (void *)(uintptr_t)(addr), oldval, newval, force_atomic)
+LOCAL NONNULL((1)) u32 CC
+libviocore_atomic_cmpxch_or_writel(struct vio_emulate_args *__restrict self,
+                                   __USER __CHECKED void *addr,
+                                   u32 oldval, u32 newval, bool force_atomic) {
+	u32 result;
+	COMPILER_BARRIER();
+	if likely(addr == self->vea_ptr)
+		result = vio_cmpxch_or_writel(&self->vea_args, self->vea_addr, oldval, newval, force_atomic);
+	else if (force_atomic)
+		result = ATOMIC_CMPXCH(*(u32 *)addr, oldval, newval);
+	else {
+		result = *(u32 *)addr;
+		COMPILER_READ_BARRIER();
+		if (result == oldval)
+			*(u32 *)addr = newval;
+	}
+	COMPILER_BARRIER();
+	return result;
+}
+
 #ifdef __x86_64__
+#define EMU86_EMULATE_ATOMIC_CMPXCH_OR_WRITEQ(addr, oldval, newval, force_atomic) \
+	libviocore_atomic_cmpxch_or_writeq(self, (void *)(uintptr_t)(addr), oldval, newval, force_atomic)
+LOCAL NONNULL((1)) u64 CC
+libviocore_atomic_cmpxch_or_writeq(struct vio_emulate_args *__restrict self,
+                                   __USER __CHECKED void *addr,
+                                   u64 oldval, u64 newval, bool force_atomic) {
+	u64 result;
+	COMPILER_BARRIER();
+	if likely(addr == self->vea_ptr)
+		result = vio_cmpxch_or_writeq(&self->vea_args, self->vea_addr, oldval, newval, force_atomic);
+	else if (force_atomic)
+		result = ATOMIC_CMPXCH(*(u64 *)addr, oldval, newval);
+	else {
+		result = *(u64 *)addr;
+		COMPILER_READ_BARRIER();
+		if (result == oldval)
+			*(u64 *)addr = newval;
+	}
+	COMPILER_BARRIER();
+	return result;
+}
 #define EMU86_EMULATE_ATOMIC_CMPXCH128(addr, oldval, newval, force_atomic) \
 	libviocore_atomic_cmpxch128(self, addr, oldval, newval, force_atomic)
 LOCAL NONNULL((1)) uint128_t CC
@@ -944,22 +1031,6 @@ DECL_END
 #endif /* !__x86_64__ */
 #define EMU86_GETSP_RAW()  EMU86_GETSP()
 #define EMU86_SETSP_RAW(v) EMU86_SETSP(v)
-#define EMU86_ACCESS_MEMORY(addr, num_bytes)                                  \
-	do {                                                                      \
-		if  unlikely((self)->vea_ptr != (byte_t *)(uintptr_t)(addr)) {        \
-			if ((byte_t *)(uintptr_t)(addr) < (self)->vea_ptr)                \
-				goto return_unknown_instruction;                              \
-			if ((self)->vea_ptr >= (byte_t *)(uintptr_t)(addr) + (num_bytes)) \
-				goto return_unknown_instruction;                              \
-		}                                                                     \
-	} __WHILE0
-#define EMU86_ACCESS_MEMORY2(addr1, num_bytes1, addr2, num_bytes2)            \
-	do {                                                                      \
-		if ((self)->vea_ptr != (byte_t *)(uintptr_t)(addr1) &&                \
-		    ((byte_t *)(uintptr_t)(addr1) < (self)->vea_ptr ||                \
-		     (self)->vea_ptr >= (byte_t *)(uintptr_t)(addr1) + (num_bytes1))) \
-			EMU86_ACCESS_MEMORY(addr2, num_bytes2);                           \
-	} __WHILE0
 
 #undef EMU86_GETSEGBASE_IS_NOOP
 #undef EMU86_GETSEGBASE_IS_NOOP_DS

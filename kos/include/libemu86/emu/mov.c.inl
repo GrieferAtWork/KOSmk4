@@ -27,7 +27,6 @@ case 0x88: {
 	/* 88 /r      MOV r/m8,r8      Move r8 to r/m8 */
 	u8 value;
 	MODRM_DECODE();
-	MODRM_EMU86_ACCESS_MEMORY(1);
 	value = MODRM_GETREGB();
 	MODRM_SETRMB(value);
 	goto done;
@@ -41,17 +40,14 @@ case 0x89: {
 	MODRM_DECODE();
 	IF_64BIT(if (IS_64BIT()) {
 		u64 value;
-		MODRM_EMU86_ACCESS_MEMORY(8);
 		value = MODRM_GETREGQ();
 		MODRM_SETRMQ(value);
 	} else) if (!IS_16BIT()) {
 		u32 value;
-		MODRM_EMU86_ACCESS_MEMORY(4);
 		value = MODRM_GETREGL();
 		MODRM_SETRML(value);
 	} else {
 		u16 value;
-		MODRM_EMU86_ACCESS_MEMORY(2);
 		value = MODRM_GETREGW();
 		MODRM_SETRMW(value);
 	}
@@ -63,7 +59,6 @@ case 0x8a: {
 	/* 8A /r      MOV r8,r/m8      Move r/m8 to r8 */
 	u8 value;
 	MODRM_DECODE();
-	MODRM_EMU86_ACCESS_MEMORY(1);
 	value = MODRM_GETRMB();
 	MODRM_SETREGB(value);
 	goto done;
@@ -77,17 +72,14 @@ case 0x8b: {
 	MODRM_DECODE();
 	IF_64BIT(if (IS_64BIT()) {
 		u64 value;
-		MODRM_EMU86_ACCESS_MEMORY(8);
 		value = MODRM_GETRMQ();
 		MODRM_SETREGQ(value);
 	} else) if (!IS_16BIT()) {
 		u32 value;
-		MODRM_EMU86_ACCESS_MEMORY(4);
 		value = MODRM_GETRML();
 		MODRM_SETREGL(value);
 	} else {
 		u16 value;
-		MODRM_EMU86_ACCESS_MEMORY(2);
 		value = MODRM_GETRMW();
 		MODRM_SETREGW(value);
 	}
@@ -105,13 +97,10 @@ case 0x8c: {
 		goto return_unknown_instruction;
 	segment = EMU86_GETSEG(modrm.mi_reg);
 	IF_64BIT(if (IS_64BIT()) {
-		MODRM_EMU86_ACCESS_MEMORY(8);
 		MODRM_SETREGQ(segment);
 	} else) if (!IS_16BIT()) {
-		MODRM_EMU86_ACCESS_MEMORY(4);
 		MODRM_SETREGL(segment);
 	} else {
-		MODRM_EMU86_ACCESS_MEMORY(2);
 		MODRM_SETREGW(segment);
 	}
 	goto done;
@@ -125,7 +114,6 @@ case 0x8e: {
 	MODRM_DECODE();
 	if unlikely(modrm.mi_reg >= 6)
 		goto return_unknown_instruction;
-	MODRM_EMU86_ACCESS_MEMORY(2);
 	segment = MODRM_GETREGW();
 #if EMU86_EMULATE_CHECKUSER && (CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_64BIT)
 	if ((modrm.mi_reg == EMU86_R_CS ? !SEGMENT_IS_VALID_USERCODE(segment)
@@ -257,7 +245,6 @@ case 0xc6:
 	case 0: {
 		/* C6 /0      MOV r/m8,imm8      Move imm8 to r/m8 */
 		u8 value;
-		MODRM_EMU86_ACCESS_MEMORY(1);
 		value = *(u8 *)pc;
 		pc += 1;
 		MODRM_SETRMB(value);
@@ -286,13 +273,10 @@ case 0xc7:
 			pc += 4;
 		}
 		IF_64BIT(if (IS_64BIT()) {
-			MODRM_EMU86_ACCESS_MEMORY(8);
 			MODRM_SETRMQ((u64)(s64)value);
 		} else) if (!IS_16BIT()) {
-			MODRM_EMU86_ACCESS_MEMORY(4);
 			MODRM_SETRML((u32)value);
 		} else {
-			MODRM_EMU86_ACCESS_MEMORY(2);
 			MODRM_SETRMW((u16)value);
 		}
 		goto done;
@@ -310,7 +294,6 @@ case 0x0fb6: {
 	 *         0F B6 /r     MOVZX r32, r/m8     Move byte to doubleword, zero-extension.
 	 * REX.W + 0F B6 /r     MOVZX r64, r/m8*    Move byte to quadword, zero-extension. */
 	MODRM_DECODE();
-	MODRM_EMU86_ACCESS_MEMORY(1);
 	value = MODRM_GETRMB();
 	IF_64BIT(if (IS_64BIT()) {
 		MODRM_SETREGQ((u64)value);
@@ -328,7 +311,6 @@ case 0x0fb7: {
 	/*         0F B7 /r     MOVZX r32, r/m16    Move word to doubleword, zero-extension.
 	 * REX.W + 0F B7 /r     MOVZX r64, r/m16    Move word to quadword, zero-extension. */
 	MODRM_DECODE();
-	MODRM_EMU86_ACCESS_MEMORY(2);
 	value = MODRM_GETRMW();
 	IF_64BIT(if (IS_64BIT()) {
 		MODRM_SETREGQ((u64)value);
@@ -345,7 +327,6 @@ case 0x0fbe: {
 	 *         0F B6 /r     MOVSX r32, r/m8     Move byte to doubleword, sign-extension.
 	 * REX.W + 0F B6 /r     MOVSX r64, r/m8*    Move byte to quadword, sign-extension. */
 	MODRM_DECODE();
-	MODRM_EMU86_ACCESS_MEMORY(1);
 	value = (s8)MODRM_GETRMB();
 	IF_64BIT(if (IS_64BIT()) {
 		MODRM_SETREGQ((u64)(s64)value);
@@ -363,7 +344,6 @@ case 0x0fbf: {
 	/*         0F B7 /r     MOVSX r32, r/m16    Move word to doubleword, sign-extension.
 	 * REX.W + 0F B7 /r     MOVSX r64, r/m16    Move word to quadword, sign-extension. */
 	MODRM_DECODE();
-	MODRM_EMU86_ACCESS_MEMORY(2);
 	value = (s16)MODRM_GETRMW();
 	IF_64BIT(if (IS_64BIT()) {
 		MODRM_SETREGQ((u64)(s64)value);
@@ -381,14 +361,11 @@ case 0x63: {
 	MODRM_DECODE();
 	IF_64BIT(if (IS_64BIT()) {
 		s32 value;
-		MODRM_EMU86_ACCESS_MEMORY(4);
 		value = (s32)MODRM_GETRML();
 		MODRM_SETREGQ((u64)(s64)value);
 	} else) if (!IS_16BIT()) {
-		MODRM_EMU86_ACCESS_MEMORY(4);
 		MODRM_SETREGL(MODRM_GETRML());
 	} else {
-		MODRM_EMU86_ACCESS_MEMORY(2);
 		MODRM_SETREGW(MODRM_GETRMW());
 	}
 	goto done;
