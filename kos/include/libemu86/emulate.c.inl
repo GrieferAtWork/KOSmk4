@@ -1694,6 +1694,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #include "emu/calljmp.c.inl"
 #include "emu/cmovcc.c.inl"
 #include "emu/cmpxchg.c.inl"
+#include "emu/cmpxchgb.c.inl"
 #include "emu/flush.c.inl"
 #include "emu/incdec.c.inl"
 #include "emu/iret.c.inl"
@@ -1817,6 +1818,9 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 			/* TODO: shrx */
 			/* TODO: movdir64b */
 			/* TODO: rorx */
+			/* TODO: rdrand */
+			/* TODO: rdseed */
+			/* TODO: rdpid */
 
 
 			default:
