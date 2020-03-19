@@ -1320,7 +1320,7 @@ FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_read_unsafe(struct vm_datablock *
 FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_write_unsafe(struct vm_datablock *__restrict self, void const *__restrict src, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 
 
-#ifndef CONFIG_NO_VIO
+#ifdef LIBVIO_CONFIG_ENABLED
 /* Perform datablock access through VIO callbacks. */
 FUNDEF NONNULL((1)) void KCALL vm_datablock_vio_read(struct vm_datablock *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t src_offset) THROWS(E_SEGFAULT, ...);
 FUNDEF NONNULL((1)) void KCALL vm_datablock_vio_write(struct vm_datablock *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t dst_offset) THROWS(E_SEGFAULT, ...);
@@ -1330,7 +1330,7 @@ FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_vio_readv(struct vm_datablock *__
 FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_vio_writev(struct vm_datablock *__restrict self, struct aio_buffer const *__restrict buf, pos_t dst_offset) THROWS(E_SEGFAULT, ...);
 FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_vio_readv_phys(struct vm_datablock *__restrict self, struct aio_pbuffer const *__restrict buf, pos_t src_offset) THROWS(...);
 FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_vio_writev_phys(struct vm_datablock *__restrict self, struct aio_pbuffer const *__restrict buf, pos_t dst_offset) THROWS(...);
-#endif /* !CONFIG_NO_VIO */
+#endif /* LIBVIO_CONFIG_ENABLED */
 
 
 

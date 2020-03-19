@@ -70,7 +70,7 @@ DECL_BEGIN
 #endif /* !DEFINE_IO_READ */
 
 
-#ifndef CONFIG_NO_VIO
+#ifdef LIBVIO_CONFIG_ENABLED
 /* Perform datablock access through VIO callbacks. */
 #ifdef DEFINE_IO_READ
 #if defined(DEFINE_IO_PHYS) && defined(DEFINE_IO_VECTOR)
@@ -93,7 +93,7 @@ DECL_BEGIN
 #define DO_VIO_ACCESS  vm_datablock_vio_write
 #endif
 #endif /* !DEFINE_IO_READ */
-#endif /* !CONFIG_NO_VIO */
+#endif /* LIBVIO_CONFIG_ENABLED */
 
 
 
@@ -151,7 +151,7 @@ KCALL vm_datablock_write
 	struct aio_buffer view,view2;
 #endif /* !DEFINE_IO_PHYS */
 #endif /* DEFINE_IO_VECTOR */
-#ifndef CONFIG_NO_VIO
+#ifdef LIBVIO_CONFIG_ENABLED
 	if (self->db_vio) {
 		/* Perform I/O through VIO functionality. */
 		DO_VIO_ACCESS(self,
@@ -162,7 +162,7 @@ KCALL vm_datablock_write
 		              src_offset);
 		return;
 	}
-#endif /* !CONFIG_NO_VIO */
+#endif /* LIBVIO_CONFIG_ENABLED */
 	for (;;) {
 		size_t temp;
 		REF struct vm_datapart *part;
@@ -215,7 +215,7 @@ KCALL vm_datablock_write
 
 
 
-#ifndef CONFIG_NO_VIO
+#ifdef LIBVIO_CONFIG_ENABLED
 #if !defined(DEFINE_IO_UNSAFE)
 
 /* Perform datablock access through VIO callbacks. */
@@ -400,9 +400,7 @@ KCALL vm_datablock_vio_write
 }
 
 #endif /* !DEFINE_IO_UNSAFE */
-#endif /* !CONFIG_NO_VIO */
-
-
+#endif /* LIBVIO_CONFIG_ENABLED */
 
 DECL_END
 
