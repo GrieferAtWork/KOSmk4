@@ -21,6 +21,8 @@
 #include "../emulate.c.inl"
 #endif /* __INTELLISENSE__ */
 
+#include "pushpop-util.h"
+
 EMU86_INTELLISENSE_BEGIN(misc) {
 
 
@@ -302,6 +304,15 @@ case 0xff:
 		goto done_dont_set_pc;
 	}
 
+
+	case 6:
+		/* FF /6     PUSH r/m16     Push r/m16.
+		 * FF /6     PUSH r/m32     Push r/m32.
+		 * FF /6     PUSH r/m64     Push r/m64. */
+		EMU86_PUSH163264(MODRM_GETRMW(),
+		                 MODRM_GETRML(),
+		                 MODRM_GETRMQ());
+		break;
 
 
 	default:
