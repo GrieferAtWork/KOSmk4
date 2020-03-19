@@ -233,11 +233,11 @@ __DECL_BEGIN
  * NOTE: These functions aren't used when it comes to reading from PC-relative memory. */
 #ifndef EMU86_EMULATE_READB
 #define EMU86_EMULATE_READB(addr)     (*(u8 const *)EMU86_EMULATE_TRANSLATEADDR(addr))
-#define EMU86_EMULATE_READW(addr)     (*(u16 const *)EMU86_EMULATE_TRANSLATEADDR(addr))
-#define EMU86_EMULATE_READL(addr)     (*(u32 const *)EMU86_EMULATE_TRANSLATEADDR(addr))
+#define EMU86_EMULATE_READW(addr)     UNALIGNED_GET16((u16 *)EMU86_EMULATE_TRANSLATEADDR(addr))
+#define EMU86_EMULATE_READL(addr)     UNALIGNED_GET32((u32 *)EMU86_EMULATE_TRANSLATEADDR(addr))
 #define EMU86_EMULATE_WRITEB(addr, v) (*(u8 *)EMU86_EMULATE_TRANSLATEADDR(addr) = (v))
-#define EMU86_EMULATE_WRITEW(addr, v) (*(u16 *)EMU86_EMULATE_TRANSLATEADDR(addr) = (v))
-#define EMU86_EMULATE_WRITEL(addr, v) (*(u32 *)EMU86_EMULATE_TRANSLATEADDR(addr) = (v))
+#define EMU86_EMULATE_WRITEW(addr, v) UNALIGNED_SET16((u16 *)EMU86_EMULATE_TRANSLATEADDR(addr), v)
+#define EMU86_EMULATE_WRITEL(addr, v) UNALIGNED_SET32((u32 *)EMU86_EMULATE_TRANSLATEADDR(addr), v)
 #define EMU86_EMULATE_ATOMIC_XCHB(addr, addend, force_atomic) __hybrid_atomic_xch(*(u8 *)EMU86_EMULATE_TRANSLATEADDR(addr), addend, __ATOMIC_SEQ_CST)
 #define EMU86_EMULATE_ATOMIC_XCHW(addr, addend, force_atomic) __hybrid_atomic_xch(*(u16 *)EMU86_EMULATE_TRANSLATEADDR(addr), addend, __ATOMIC_SEQ_CST)
 #define EMU86_EMULATE_ATOMIC_XCHL(addr, addend, force_atomic) __hybrid_atomic_xch(*(u32 *)EMU86_EMULATE_TRANSLATEADDR(addr), addend, __ATOMIC_SEQ_CST)
@@ -264,8 +264,8 @@ __DECL_BEGIN
 #define EMU86_EMULATE_ATOMIC_CMPXCH_OR_WRITEW(addr, oldval, newval, force_atomic) __hybrid_atomic_cmpxch(*(u16 *)EMU86_EMULATE_TRANSLATEADDR(addr), oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
 #define EMU86_EMULATE_ATOMIC_CMPXCH_OR_WRITEL(addr, oldval, newval, force_atomic) __hybrid_atomic_cmpxch(*(u32 *)EMU86_EMULATE_TRANSLATEADDR(addr), oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
 #if CONFIG_LIBEMU86_WANT_64BIT
-#define EMU86_EMULATE_READQ(addr)     (*(u64 const *)EMU86_EMULATE_TRANSLATEADDR(addr))
-#define EMU86_EMULATE_WRITEQ(addr, v) (*(u64 *)EMU86_EMULATE_TRANSLATEADDR(addr) = (v))
+#define EMU86_EMULATE_READQ(addr)     UNALIGNED_GET64((u64 const *)EMU86_EMULATE_TRANSLATEADDR(addr))
+#define EMU86_EMULATE_WRITEQ(addr, v) UNALIGNED_SET64((u64 *)EMU86_EMULATE_TRANSLATEADDR(addr), v)
 #define EMU86_EMULATE_ATOMIC_XCHQ(addr, addend, force_atomic) __hybrid_atomic_xch(*(u64 *)EMU86_EMULATE_TRANSLATEADDR(addr), addend, __ATOMIC_SEQ_CST)
 #define EMU86_EMULATE_ATOMIC_FETCHADDQ(addr, addend, force_atomic) __hybrid_atomic_fetchadd(*(u64 *)EMU86_EMULATE_TRANSLATEADDR(addr), addend, __ATOMIC_SEQ_CST)
 #define EMU86_EMULATE_ATOMIC_FETCHSUBQ(addr, addend, force_atomic) __hybrid_atomic_fetchsub(*(u64 *)EMU86_EMULATE_TRANSLATEADDR(addr), addend, __ATOMIC_SEQ_CST)
@@ -1420,11 +1420,11 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 	start_pc      = (byte_t const *)EMU86_EMULATE_TRANSLATEADDR(real_start_pc);
 #endif /* !EMU86_EMULATE_TRANSLATEADDR_IS_NOOP */
 #ifdef EMU86_EMULATE_TRANSLATEADDR_IS_NOOP
-#define REAL_START_PC() start_pc
-#define REAL_PC()       pc
+#define REAL_START_PC() (uintptr_t)start_pc
+#define REAL_PC()       (uintptr_t)pc
 #else /* EMU86_EMULATE_TRANSLATEADDR_IS_NOOP */
-#define REAL_START_PC() real_start_pc
-#define REAL_PC()       (real_start_pc + (size_t)(pc - start_pc))
+#define REAL_START_PC() (uintptr_t)real_start_pc
+#define REAL_PC()       (uintptr_t)(real_start_pc + (size_t)(pc - start_pc))
 #endif /* !EMU86_EMULATE_TRANSLATEADDR_IS_NOOP */
 
 #ifdef EMU86_EMULATE_TRY
@@ -1606,6 +1606,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #include "emu/bitscan.c.inl"
 #include "emu/bittest.c.inl"
 #include "emu/bound.c.inl"
+#include "emu/calljmp.c.inl"
 #include "emu/incdec.c.inl"
 #include "emu/iret.c.inl"
 #include "emu/lea.c.inl"

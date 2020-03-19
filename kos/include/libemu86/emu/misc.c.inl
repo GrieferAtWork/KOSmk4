@@ -122,6 +122,188 @@ case 0xff:
 		goto done;
 	}
 
+
+	case 2: {
+		byte_t *sp = (byte_t *)EMU86_GETSP();
+		/* FF /2      CALL r/m16      Call near, absolute indirect, address given in r/m16 */
+		/* FF /2      CALL r/m32      Call near, absolute indirect, address given in r/m32 */
+		/* FF /2      CALL r/m64      Call near, absolute indirect, address given in r/m64 */
+#if CONFIG_LIBEMU86_WANT_64BIT
+		IF_16BIT_OR_32BIT(if (EMU86_F_IS64(op_flags))) {
+			/* 64-bit mode */
+			u64 dest_pc = MODRM_GETRMQ();
+			sp -= 8;
+			EMU86_EMULATE_PUSH(sp, 8);
+			EMU86_WRITE_USER_MEMORY(sp, 8);
+			EMU86_EMULATE_WRITEQ(sp, (u64)REAL_PC());
+			EMU86_EMULATE_SETPC(dest_pc);
+		}
+		IF_16BIT_OR_32BIT(else)
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#if CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT
+		{
+			/* 16/32-bit mode */
+			if (!IS_16BIT()) {
+				u32 dest_pc = MODRM_GETRML();
+				sp -= 4;
+				EMU86_EMULATE_PUSH(sp, 4);
+				EMU86_WRITE_USER_MEMORY(sp, 4);
+				EMU86_EMULATE_WRITEL(sp, (u32)REAL_PC());
+				EMU86_EMULATE_SETPC(dest_pc);
+			} else {
+				u16 dest_pc = MODRM_GETRMW();
+				sp -= 2;
+				EMU86_EMULATE_PUSH(sp, 2);
+				EMU86_WRITE_USER_MEMORY(sp, 2);
+				EMU86_EMULATE_WRITEW(sp, (u16)REAL_PC());
+				EMU86_EMULATE_SETPC(dest_pc);
+			}
+		}
+#endif /* CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT */
+		EMU86_SETSP(sp);
+		goto done_dont_set_pc;
+	}
+
+
+	case 3: {
+		/*       FF /3    CALL m16:16    Call far, absolute indirect, address given in m16:16.
+		 *       FF /3    CALL m16:32    Call far, absolute indirect, address given in m16:32.
+		 * REX.W FF /3    CALL m16:64    Call far, absolute indirect, address given in m16:64. */
+		byte_t *sp;
+#if CONFIG_LIBEMU86_WANT_64BIT
+		u64 offset;
+#else /* CONFIG_LIBEMU86_WANT_64BIT */
+		u32 offset;
+#endif /* !CONFIG_LIBEMU86_WANT_64BIT */
+		u16 segment;
+		byte_t *addr;
+#ifndef EMU86_EMULATE_ONLY_MEMORY
+		if (!EMU86_MODRM_ISMEM(modrm.mi_type))
+			goto return_unknown_instruction;
+#endif /* !EMU86_EMULATE_ONLY_MEMORY */
+		addr = MODRM_MEMADDR();
+		IF_64BIT(if (IS_64BIT()) {
+			EMU86_READ_USER_MEMORY(addr, 10);
+			offset = EMU86_EMULATE_READQ(addr);
+			pc += 8;
+		} else) if (!IS_16BIT()) {
+			EMU86_READ_USER_MEMORY(addr, 6);
+			offset = EMU86_EMULATE_READL(addr);
+			pc += 4;
+		} else {
+			EMU86_READ_USER_MEMORY(addr, 4);
+			offset = EMU86_EMULATE_READW(addr);
+			pc += 2;
+		}
+		segment = EMU86_EMULATE_READW(addr);
+		/* Verify the segment index. */
+#if EMU86_EMULATE_CHECKUSER
+		if (!SEGMENT_IS_VALID_USERCODE(segment) && EMU86_ISUSER_NOVM86()) {
+			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+			      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
+			      X86_REGISTER_SEGMENT_CS, segment);
+		}
+#endif /* EMU86_EMULATE_CHECKUSER */
+		sp = (byte_t *)EMU86_GETSP();
+		IF_64BIT(if (IS_64BIT()) {
+			sp -= 16;
+			EMU86_EMULATE_PUSH(sp, 16);
+			EMU86_WRITE_USER_MEMORY(sp, 16);
+			EMU86_EMULATE_WRITEQ(sp + 8, (u64)EMU86_GETCS());
+			EMU86_EMULATE_WRITEQ(sp + 0, (u64)REAL_PC());
+		} else) if (!IS_16BIT()) {
+			sp -= 8;
+			EMU86_EMULATE_PUSH(sp, 8);
+			EMU86_WRITE_USER_MEMORY(sp, 8);
+			EMU86_EMULATE_WRITEL(sp + 4, (u32)EMU86_GETCS());
+			EMU86_EMULATE_WRITEL(sp + 0, (u32)REAL_PC());
+		} else {
+			sp -= 4;
+			EMU86_EMULATE_PUSH(sp, 4);
+			EMU86_WRITE_USER_MEMORY(sp, 4);
+			EMU86_EMULATE_WRITEW(sp + 2, (u16)EMU86_GETCS());
+			EMU86_EMULATE_WRITEW(sp + 0, (u16)REAL_PC());
+		}
+		EMU86_SETSP(sp);
+		EMU86_SETCS(segment);
+		EMU86_EMULATE_SETIP(offset);
+		goto done_dont_set_pc;
+	}
+
+
+	case 4: {
+		/* FF /2      JMP r/m16      Jump near, absolute indirect, address given in r/m16 */
+		/* FF /2      JMP r/m32      Jump near, absolute indirect, address given in r/m32 */
+		/* FF /2      JMP r/m64      Jump near, absolute indirect, address given in r/m64 */
+#if CONFIG_LIBEMU86_WANT_64BIT
+		IF_16BIT_OR_32BIT(if (EMU86_F_IS64(op_flags))) {
+			/* 64-bit mode */
+			u64 dest_pc = MODRM_GETRMQ();
+			EMU86_EMULATE_SETPC(dest_pc);
+		}
+		IF_16BIT_OR_32BIT(else)
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#if CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT
+		{
+			/* 16/32-bit mode */
+			if (!IS_16BIT()) {
+				u32 dest_pc = MODRM_GETRML();
+				EMU86_EMULATE_SETPC(dest_pc);
+			} else {
+				u16 dest_pc = MODRM_GETRMW();
+				EMU86_EMULATE_SETPC(dest_pc);
+			}
+		}
+#endif /* CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT */
+		goto done_dont_set_pc;
+	}
+
+
+	case 5: {
+		/*       FF /5    JMP m16:16    Jump far, absolute indirect, address given in m16:16.
+		 *       FF /5    JMP m16:32    Jump far, absolute indirect, address given in m16:32.
+		 * REX.W FF /5    JMP m16:64    Jump far, absolute indirect, address given in m16:64. */
+#if CONFIG_LIBEMU86_WANT_64BIT
+		u64 offset;
+#else /* CONFIG_LIBEMU86_WANT_64BIT */
+		u32 offset;
+#endif /* !CONFIG_LIBEMU86_WANT_64BIT */
+		u16 segment;
+		byte_t *addr;
+#ifndef EMU86_EMULATE_ONLY_MEMORY
+		if (!EMU86_MODRM_ISMEM(modrm.mi_type))
+			goto return_unknown_instruction;
+#endif /* !EMU86_EMULATE_ONLY_MEMORY */
+		addr = MODRM_MEMADDR();
+		IF_64BIT(if (IS_64BIT()) {
+			EMU86_READ_USER_MEMORY(addr, 10);
+			offset = EMU86_EMULATE_READQ(addr);
+			pc += 8;
+		} else) if (!IS_16BIT()) {
+			EMU86_READ_USER_MEMORY(addr, 6);
+			offset = EMU86_EMULATE_READL(addr);
+			pc += 4;
+		} else {
+			EMU86_READ_USER_MEMORY(addr, 4);
+			offset = EMU86_EMULATE_READW(addr);
+			pc += 2;
+		}
+		segment = EMU86_EMULATE_READW(addr);
+		/* Verify the segment index. */
+#if EMU86_EMULATE_CHECKUSER
+		if (!SEGMENT_IS_VALID_USERCODE(segment) && EMU86_ISUSER_NOVM86()) {
+			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+			      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
+			      X86_REGISTER_SEGMENT_CS, segment);
+		}
+#endif /* EMU86_EMULATE_CHECKUSER */
+		EMU86_SETCS(segment);
+		EMU86_EMULATE_SETIP(offset);
+		goto done_dont_set_pc;
+	}
+
+
+
 	default:
 		break;
 	}
