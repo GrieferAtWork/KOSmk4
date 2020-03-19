@@ -44,6 +44,7 @@
 
 #include "eflags.h"
 #include "emu86.h"
+#include "helpers.h"
 
 #if defined(__x86_64__) || defined(__i386__)
 #include <kos/kernel/cpu-state-helpers.h>
@@ -1466,6 +1467,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 		/* Pull in emulated instructions. */
 #ifndef __INTELLISENSE__
 #include "emu/arith.c.inl"
+#include "emu/bitscan.c.inl"
 #include "emu/bound.c.inl"
 #include "emu/iret.c.inl"
 #include "emu/lea.c.inl"

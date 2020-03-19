@@ -53,8 +53,8 @@ case 0x62: {
 #if CONFIG_LIBEMU86_WANT_64BIT
 		temp.qword = EMU86_EMULATE_READQ(addr);
 #else /* CONFIG_LIBEMU86_WANT_64BIT */
-		temp.dword[0] = EMU86_EMULATE_READL(addr);
-		temp.dword[1] = EMU86_EMULATE_READL(addr + 4);
+		temp.dwords[0] = EMU86_EMULATE_READL(addr);
+		temp.dwords[1] = EMU86_EMULATE_READL(addr + 4);
 #endif /* !CONFIG_LIBEMU86_WANT_64BIT */
 		bound_min = temp.dwords[0];
 		bound_max = temp.dwords[1];
