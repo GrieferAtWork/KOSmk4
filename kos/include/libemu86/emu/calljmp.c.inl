@@ -61,13 +61,13 @@ case 0x9a: {
 		EMU86_EMULATE_PUSH(sp, 8);
 		EMU86_WRITE_USER_MEMORY(sp, 8);
 		EMU86_EMULATE_WRITEL(sp + 4, (u32)EMU86_GETCS());
-		EMU86_EMULATE_WRITEL(sp + 0, (u32)REAL_PC());
+		EMU86_EMULATE_WRITEL(sp + 0, (u32)REAL_IP());
 	} else {
 		sp -= 4;
 		EMU86_EMULATE_PUSH(sp, 4);
 		EMU86_WRITE_USER_MEMORY(sp, 4);
 		EMU86_EMULATE_WRITEW(sp + 2, (u16)EMU86_GETCS());
-		EMU86_EMULATE_WRITEW(sp + 0, (u16)REAL_PC());
+		EMU86_EMULATE_WRITEW(sp + 0, (u16)REAL_IP());
 	}
 	EMU86_SETSP(sp);
 	EMU86_SETCS(segment);
@@ -82,9 +82,8 @@ case 0xe8: {
 	/* E8 cw    CALL rel16   Call near, relative, displacement relative to next instruction.
 	 * E8 cd    CALL rel32   Call near, relative, displacement relative to next instruction.
 	 *                       32-bit displacement sign extended to 64-bits in 64-bit mode. */
+	EMU86_UREG_TYPE dest_ip;
 	s32 offset;
-	byte_t const *dest_pc;
-	byte_t *sp = (byte_t *)EMU86_GETSP();
 	IF_16BIT_OR_32BIT(
 	if (IS_16BIT() && !EMU86_F_IS64(op_flags)) {
 		offset = (s32)(s16)UNALIGNED_GET16((u16 *)pc);
@@ -93,13 +92,12 @@ case 0xe8: {
 		offset = (s32)UNALIGNED_GET32((u32 *)pc);
 		pc += 4;
 	}
-	dest_pc = pc + offset;
+	dest_ip = REAL_IP() + offset;
 	/* Push the previous PC */
-	EMU86_PUSH163264((u16)REAL_PC(),
-	                 (u32)REAL_PC(),
-	                 (u64)REAL_PC());
-	EMU86_EMULATE_SETPC(dest_pc);
-	EMU86_SETSP(sp);
+	EMU86_PUSH163264((dest_ip &= 0xffff, (u16)REAL_IP()),
+	                 (u32)REAL_IP(),
+	                 (u64)REAL_IP());
+	EMU86_EMULATE_SETIP(dest_ip);
 	goto done_dont_set_pc;
 }
 
@@ -110,31 +108,31 @@ case 0xe9: {
 	/* E9 cw    JMP rel16   Jump near, relative, displacement relative to next instruction.
 	 * E9 cd    JMP rel32   Jump near, relative, displacement relative to next instruction.
 	 *                      32-bit displacement sign extended to 64-bits in 64-bit mode. */
-	byte_t const *dest_pc;
+	EMU86_UREG_TYPE dest_ip;
 	IF_16BIT_OR_32BIT(
 	if (IS_16BIT() && !EMU86_F_IS64(op_flags)) {
 		s16 offset;
 		offset = (s16)UNALIGNED_GET16((u16 *)pc);
 		pc += 2;
-		dest_pc = (byte_t *)((uintptr_t)(pc + offset) & 0xffff);
+		dest_ip = REAL_IP() + offset;
 	} else) {
 		s32 offset;
 		offset = (s32)UNALIGNED_GET32((u32 *)pc);
 		pc += 4;
-		dest_pc = pc + offset;
+		dest_ip = REAL_IP() + offset;
 	}
-	EMU86_EMULATE_SETPC(dest_pc);
+	EMU86_EMULATE_SETIP(dest_ip);
 	goto done_dont_set_pc;
 }
 
 case 0xeb: {
 	/* EB cw    JMP rel8    Jump near, relative, displacement relative to next instruction. */
+	EMU86_UREG_TYPE dest_ip;
 	s8 offset;
-	byte_t const *dest_pc;
 	offset = *(s8 *)pc;
 	pc += 1;
-	dest_pc = pc + offset;
-	EMU86_EMULATE_SETPC(dest_pc);
+	dest_ip = REAL_IP() + offset;
+	EMU86_EMULATE_SETIP(dest_ip);
 	goto done_dont_set_pc;
 }
 

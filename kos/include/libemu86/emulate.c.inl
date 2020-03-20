@@ -1582,11 +1582,11 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 	start_pc      = (byte_t const *)EMU86_EMULATE_TRANSLATEADDR(real_start_pc);
 #endif /* !EMU86_EMULATE_TRANSLATEADDR_IS_NOOP */
 #ifdef EMU86_EMULATE_TRANSLATEADDR_IS_NOOP
-#define REAL_START_PC() (uintptr_t)start_pc
-#define REAL_PC()       (uintptr_t)pc
+#define REAL_START_IP() (uintptr_t)start_pc
+#define REAL_IP()       (uintptr_t)pc
 #else /* EMU86_EMULATE_TRANSLATEADDR_IS_NOOP */
-#define REAL_START_PC() (uintptr_t)real_start_pc
-#define REAL_PC()       (uintptr_t)(real_start_pc + (size_t)(pc - start_pc))
+#define REAL_START_IP() (uintptr_t)real_start_pc
+#define REAL_IP()       (uintptr_t)(real_start_pc + (size_t)(pc - start_pc))
 #endif /* !EMU86_EMULATE_TRANSLATEADDR_IS_NOOP */
 
 #ifdef EMU86_EMULATE_TRY
@@ -1665,6 +1665,14 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #define EMU86_WRITE_USER_MEMORY(addr, num_bytes) (void)0
 #endif /* !EMU86_EMULATE_CHECKUSER */
 #endif /* !EMU86_READ_USER_MEMORY */
+
+#if CONFIG_LIBEMU86_WANT_64BIT
+#define EMU86_UREG_TYPE u64
+#define EMU86_SREG_TYPE s64
+#else /* CONFIG_LIBEMU86_WANT_64BIT */
+#define EMU86_UREG_TYPE u32
+#define EMU86_SREG_TYPE s32
+#endif /* !CONFIG_LIBEMU86_WANT_64BIT */
 
 
 #ifdef EMU86_EMULATE_ONLY_MEMORY
@@ -1955,16 +1963,16 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #endif /* EMU86_EMULATE_EXCEPT */
 done:
 	/* Set the new instruction pointer. */
-	EMU86_EMULATE_SETPC(REAL_PC());
+	EMU86_EMULATE_SETPC(REAL_IP());
 done_dont_set_pc:
 	EMU86_EMULATE_RETURN;
 return_unknown_instruction:
-	EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION(REAL_START_PC(),
+	EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION(REAL_START_IP(),
 	                                         opcode,
 	                                         op_flags);
 #ifndef __INTELLISENSE__
-#undef REAL_START_PC
-#undef REAL_PC
+#undef REAL_START_IP
+#undef REAL_IP
 #undef MODRM
 #endif /* !__INTELLISENSE__ */
 }

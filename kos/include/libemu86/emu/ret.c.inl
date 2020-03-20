@@ -37,10 +37,10 @@ case 0xc3: {
 
 case 0xc2: {
 	u16 offset;
+	byte_t *sp;
 	/* C2 iw     RET imm16     Near return to calling procedure and pop imm16 bytes from stack. */
 	offset = UNALIGNED_GET16((u16 *)pc);
 	pc += 2;
-	byte_t *sp;
 	sp = (byte_t *)EMU86_GETSP();
 	EMU86_POP163264_IMPL(EMU86_SETIP,
 	                     EMU86_SETEIP,

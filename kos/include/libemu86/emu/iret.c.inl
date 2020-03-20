@@ -50,21 +50,13 @@ EMU86_INTELLISENSE_BEGIN(iret) {
 #endif /* !EMU86_SETGS_VM86 */
 #endif /* CONFIG_LIBEMU86_WANT_32BIT && CONFIG_LIBEMU86_WANT_16BIT */
 
-#if CONFIG_LIBEMU86_WANT_64BIT
-#define REG_UTYPE u64
-#define REG_STYPE s64
-#else /* CONFIG_LIBEMU86_WANT_64BIT */
-#define REG_UTYPE u32
-#define REG_STYPE s32
-#endif /* !CONFIG_LIBEMU86_WANT_64BIT */
-
 
 case 0xcf: {
 	/* CF     IRET     ZO     Valid     Valid     Interrupt return (16-bit operand size).
 	 * CF     IRETD    ZO     Valid     Valid     Interrupt return (32-bit operand size).
 	 * CF     IRETQ    ZO     Valid     Valid     Interrupt return (64-bit operand size). */
 	byte_t *sp = (byte_t *)EMU86_GETSP();
-	REG_UTYPE new_ip;
+	EMU86_UREG_TYPE new_ip;
 	u16 new_cs;
 	u32 new_eflags;
 	IF_64BIT(if (IS_64BIT()) {
@@ -143,7 +135,7 @@ case 0xcf: {
 	if (EMU86_F_IS64(op_flags) || ((new_cs & 3) && !EMU86_ISUSER()))
 #endif /* CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT */
 	{
-		REG_UTYPE new_sp;
+		EMU86_UREG_TYPE new_sp;
 		u16 new_ss;
 		IF_64BIT(if (IS_64BIT()) {
 			EMU86_EMULATE_POP(sp, 16);
@@ -214,9 +206,6 @@ case 0xcf: {
 #endif /* CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT */
 #undef USERIRET_EFLAGS_MASK
 }
-
-#undef REG_UTYPE
-#undef REG_STYPE
 
 }
 EMU86_INTELLISENSE_END
