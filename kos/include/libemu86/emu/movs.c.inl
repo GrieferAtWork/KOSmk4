@@ -49,10 +49,11 @@ case 0xa4: {
 	/* A4     MOVSB     For legacy mode, Move byte from address DS:(E)SI to ES:(E)DI.
 	 *                  For 64-bit mode move byte from address (R|E)SI to (R|E)DI. */
 	byte_t *psi_addr, *pdi_addr;
-	EMU86_PSIPDIn_LOAD_POINTERS(psi, pdi, psi_addr, pdi_addr);
+	EMU86_PSIPDIn_LOAD_POINTERS(psi, pdi, psi_addr, pdi_addr,
+	                            op_flags & EMU86_F_REP);
 	DEFINE_MOVSn_TRANSFER(B, 8, 1);
 do_movs_save_pointer:
-	EMU86_PSIPDIn_SAVE_POINTERS(psi, pdi);
+	EMU86_PSIPDIn_SAVE_POINTERS(psi, pdi, op_flags & EMU86_F_REP);
 	/* Check for repeat */
 	if (op_flags & EMU86_F_REP)
 		goto done_dont_set_pc;
@@ -67,7 +68,8 @@ case 0xa5: {
 	 *                          For 64-bit mode move dword from address (R|E)SI to (R|E)DI.
 	 * REX.W + A5     MOVSQ     Move qword from address (R|E)SI to (R|E)DI. */
 	byte_t *psi_addr, *pdi_addr;
-	EMU86_PSIPDIn_LOAD_POINTERS(psi, pdi, psi_addr, pdi_addr);
+	EMU86_PSIPDIn_LOAD_POINTERS(psi, pdi, psi_addr, pdi_addr,
+	                            op_flags & EMU86_F_REP);
 	IF_64BIT(if (IS_64BIT()) {
 		DEFINE_MOVSn_TRANSFER(Q, 64, 8);
 	} else) if (!IS_16BIT()) {

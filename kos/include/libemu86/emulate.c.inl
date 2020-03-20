@@ -1901,6 +1901,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #include "emu/call.c.inl"
 #include "emu/cbw.c.inl"
 #include "emu/cmovcc.c.inl"
+#include "emu/cmps.c.inl"
 #include "emu/cmpxchg.c.inl"
 #include "emu/cmpxchgb.c.inl"
 #include "emu/flush.c.inl"
@@ -1940,7 +1941,6 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #endif /* !EMU86_EMULATE_IMPL_HEADER */
 #endif /* !__INTELLISENSE__ */
 
-			/* TODO: [repe|repne] cmps */
 			/* TODO: enter */
 			/* TODO: cpuid */
 			/* TODO: int, int3, into, int1 */

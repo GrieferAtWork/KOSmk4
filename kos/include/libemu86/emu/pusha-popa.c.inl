@@ -21,7 +21,7 @@
 #include "../emulate.c.inl"
 #endif /* __INTELLISENSE__ */
 
-EMU86_INTELLISENSE_BEGIN(pushapopa) {
+EMU86_INTELLISENSE_BEGIN(pusha_popa) {
 
 #if CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT
 

@@ -41,13 +41,13 @@ case 0xae: {
 	                 EFLAGS_AF | EFLAGS_PF | EFLAGS_CF),
 	               new_eflags);
 	/* Check for repeat */
-	if (op_flags & EMU86_F_REPNE) {
-		/* repne scasb   (while not equal) */
-		if (!(new_eflags & EFLAGS_ZF))
-			goto done_dont_set_pc;
-	} else if (op_flags & EMU86_F_REP) {
+	if (op_flags & EMU86_F_REP) {
 		/* repe scasb   (while equal)*/
 		if (new_eflags & EFLAGS_ZF)
+			goto done_dont_set_pc;
+	} else if (op_flags & EMU86_F_REPNE) {
+		/* repne scasb   (while not equal) */
+		if (!(new_eflags & EFLAGS_ZF))
 			goto done_dont_set_pc;
 	}
 	goto done;
@@ -90,13 +90,13 @@ case 0xaf: {
 	                 EFLAGS_AF | EFLAGS_PF | EFLAGS_CF),
 	               new_eflags);
 	/* Check for repeat */
-	if (op_flags & EMU86_F_REPNE) {
-		/* repne scas(w|l|q)   (while not equal) */
-		if (!(new_eflags & EFLAGS_ZF))
-			goto done_dont_set_pc;
-	} else if (op_flags & EMU86_F_REP) {
+	if (op_flags & EMU86_F_REP) {
 		/* repe scas(w|l|q)   (while equal)*/
 		if (new_eflags & EFLAGS_ZF)
+			goto done_dont_set_pc;
+	} else if (op_flags & EMU86_F_REPNE) {
+		/* repne scas(w|l|q)   (while not equal) */
+		if (!(new_eflags & EFLAGS_ZF))
 			goto done_dont_set_pc;
 	}
 	goto done;

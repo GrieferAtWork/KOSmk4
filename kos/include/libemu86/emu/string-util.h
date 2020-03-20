@@ -166,58 +166,58 @@
 	}
 
 
-#define EMU86_PSIPDIn_LOAD_POINTERS(psi, pdi, psi_addr, pdi_addr) \
-	EMU86_ADDRSIZE_SWITCH64({                                     \
-		if ((op_flags & EMU86_F_REP) && EMU86_GETRCX() == 0)      \
-			goto done;                                            \
-		psi      = EMU86_GETRSI();                                \
-		pdi      = EMU86_GETRDI();                                \
-		psi_addr = (byte_t *)psi;                                 \
-		pdi_addr = (byte_t *)pdi;                                 \
-	}, {                                                          \
-		if ((op_flags & EMU86_F_REP) && EMU86_GETECX() == 0)      \
-			goto done;                                            \
-		psi      = EMU86_GETESI();                                \
-		pdi      = EMU86_GETEDI();                                \
-		psi_addr = EMU86_SEGADDR(EMU86_GETDSBASE(), (u32)psi);    \
-		pdi_addr = EMU86_SEGADDR(EMU86_GETESBASE(), (u32)pdi);    \
-	}, {                                                          \
-		if ((op_flags & EMU86_F_REP) && EMU86_GETCX() == 0)       \
-			goto done;                                            \
-		psi      = EMU86_GETSI();                                 \
-		pdi      = EMU86_GETDI();                                 \
-		psi_addr = EMU86_SEGADDR(EMU86_GETDSBASE(), (u16)psi);    \
-		pdi_addr = EMU86_SEGADDR(EMU86_GETESBASE(), (u16)pdi);    \
+#define EMU86_PSIPDIn_LOAD_POINTERS(psi, pdi, psi_addr, pdi_addr, isrep) \
+	EMU86_ADDRSIZE_SWITCH64({                                            \
+		if ((isrep) && EMU86_GETRCX() == 0)                              \
+			goto done;                                                   \
+		psi      = EMU86_GETRSI();                                       \
+		pdi      = EMU86_GETRDI();                                       \
+		psi_addr = (byte_t *)psi;                                        \
+		pdi_addr = (byte_t *)pdi;                                        \
+	}, {                                                                 \
+		if ((isrep) && EMU86_GETECX() == 0)                              \
+			goto done;                                                   \
+		psi      = EMU86_GETESI();                                       \
+		pdi      = EMU86_GETEDI();                                       \
+		psi_addr = EMU86_SEGADDR(EMU86_GETDSBASE(), (u32)psi);           \
+		pdi_addr = EMU86_SEGADDR(EMU86_GETESBASE(), (u32)pdi);           \
+	}, {                                                                 \
+		if ((isrep) && EMU86_GETCX() == 0)                               \
+			goto done;                                                   \
+		psi      = EMU86_GETSI();                                        \
+		pdi      = EMU86_GETDI();                                        \
+		psi_addr = EMU86_SEGADDR(EMU86_GETDSBASE(), (u16)psi);           \
+		pdi_addr = EMU86_SEGADDR(EMU86_GETESBASE(), (u16)pdi);           \
 	})
 
-#define EMU86_PSIPDIn_SAVE_POINTERS(psi, pdi) \
-	EMU86_ADDRSIZE_SWITCH64({                 \
-		EMU86_SETRSI(psi);                    \
-		EMU86_SETRDI(pdi);                    \
-		if (op_flags & EMU86_F_REP) {         \
-			u64 rcx = EMU86_GETRCX() - 1;     \
-			EMU86_SETRCX(rcx);                \
-			if (!rcx)                         \
-				goto done;                    \
-		}                                     \
-	}, {                                      \
-		EMU86_SETESI(psi);                    \
-		EMU86_SETEDI(pdi);                    \
-		if (op_flags & EMU86_F_REP) {         \
-			u32 ecx = EMU86_GETECX() - 1;     \
-			EMU86_SETECX(ecx);                \
-			if (!ecx)                         \
-				goto done;                    \
-		}                                     \
-	}, {                                      \
-		EMU86_SETSI(psi);                     \
-		EMU86_SETDI(pdi);                     \
-		if (op_flags & EMU86_F_REP) {         \
-			u16 cx = EMU86_GETCX() - 1;       \
-			EMU86_SETCX(cx);                  \
-			if (!cx)                          \
-				goto done;                    \
-		}                                     \
+#define EMU86_PSIPDIn_SAVE_POINTERS(psi, pdi, isrep) \
+	EMU86_ADDRSIZE_SWITCH64({                        \
+		EMU86_SETRSI(psi);                           \
+		EMU86_SETRDI(pdi);                           \
+		if (isrep) {                                 \
+			u64 rcx = EMU86_GETRCX() - 1;            \
+			EMU86_SETRCX(rcx);                       \
+			if (!rcx)                                \
+				goto done;                           \
+		}                                            \
+	}, {                                             \
+		EMU86_SETESI(psi);                           \
+		EMU86_SETEDI(pdi);                           \
+		if (isrep) {                                 \
+			u32 ecx = EMU86_GETECX() - 1;            \
+			EMU86_SETECX(ecx);                       \
+			if (!ecx)                                \
+				goto done;                           \
+		}                                            \
+	}, {                                             \
+		EMU86_SETSI(psi);                            \
+		EMU86_SETDI(pdi);                            \
+		if (isrep) {                                 \
+			u16 cx = EMU86_GETCX() - 1;              \
+			EMU86_SETCX(cx);                         \
+			if (!cx)                                 \
+				goto done;                           \
+		}                                            \
 	})
 
 

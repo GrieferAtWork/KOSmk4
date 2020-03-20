@@ -21,7 +21,7 @@
 #include "../emulate.c.inl"
 #endif /* __INTELLISENSE__ */
 
-EMU86_INTELLISENSE_BEGIN(sahflahf) {
+EMU86_INTELLISENSE_BEGIN(sahf_lahf) {
 
 #ifndef EMU86_EMULATE_ONLY_MEMORY
 

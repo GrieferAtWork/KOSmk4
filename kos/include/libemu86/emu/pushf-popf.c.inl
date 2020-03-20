@@ -23,7 +23,7 @@
 
 #include "push-pop-util.h"
 
-EMU86_INTELLISENSE_BEGIN(pushfpopf) {
+EMU86_INTELLISENSE_BEGIN(pushf_popf) {
 
 case 0x9c: {
 	/* 9C     PUSHF      Push lower 16 bits of EFLAGS.
