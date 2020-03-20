@@ -1926,6 +1926,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #include "emu/ret.c.inl"
 #include "emu/sahflahf.c.inl"
 #include "emu/salc.c.inl"
+#include "emu/scas.c.inl"
 #include "emu/shift.c.inl"
 #include "emu/shift2.c.inl"
 #include "emu/stcf.c.inl"
@@ -1939,7 +1940,6 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #endif /* !__INTELLISENSE__ */
 
 			/* TODO: [rep] movs */
-			/* TODO: [repe|repne] scas */
 			/* TODO: [repe|repne] cmps */
 			/* TODO: enter */
 			/* TODO: cpuid */
