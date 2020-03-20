@@ -28,7 +28,7 @@ EMU86_INTELLISENSE_BEGIN(iret) {
 #define EMU86_SETCS_VM86 EMU86_SETCS
 #endif /* !EMU86_SETCS_VM86 */
 #ifndef EMU86_SETEIP_VM86
-#define EMU86_SETEIP_VM86 EMU86_EMULATE_SETIP
+#define EMU86_SETEIP_VM86 EMU86_SETIPREG
 #endif /* !EMU86_SETEIP_VM86 */
 #ifndef EMU86_SETESP_VM86
 #define EMU86_SETESP_VM86 EMU86_SETESP
@@ -55,10 +55,11 @@ case 0xcf: {
 	/* CF     IRET     ZO     Valid     Valid     Interrupt return (16-bit operand size).
 	 * CF     IRETD    ZO     Valid     Valid     Interrupt return (32-bit operand size).
 	 * CF     IRETQ    ZO     Valid     Valid     Interrupt return (64-bit operand size). */
-	byte_t *sp = (byte_t *)EMU86_GETSP();
+	byte_t *sp;
 	EMU86_UREG_TYPE new_ip;
 	u16 new_cs;
 	u32 new_eflags;
+	sp = EMU86_GETSTACKPTR();
 	IF_64BIT(if (IS_64BIT()) {
 		EMU86_EMULATE_POP(sp, 40);
 		EMU86_READ_USER_MEMORY(sp, 40);
@@ -94,7 +95,7 @@ case 0xcf: {
 			EMU86_SETFLAGS(new_eflags);
 			EMU86_SETCS_VM86(new_cs);
 			EMU86_SETEIP_VM86((u32)new_ip);
-			EMU86_SETSP(sp);
+			EMU86_SETSTACKPTR(sp);
 			goto done_dont_set_pc;
 		}
 	}
@@ -175,7 +176,7 @@ case 0xcf: {
 #endif /* EMU86_EMULATE_CHECKUSER && CONFIG_LIBEMU86_WANT_64BIT */
 		EMU86_SETFLAGS(new_eflags);
 		EMU86_SETCS(new_cs);
-		EMU86_EMULATE_SETIP((u32)new_ip);
+		EMU86_SETIPREG((u32)new_ip);
 #if CONFIG_LIBEMU86_WANT_64BIT
 		EMU86_SETRSP(new_sp);
 #else /* CONFIG_LIBEMU86_WANT_64BIT */
@@ -201,7 +202,7 @@ case 0xcf: {
 #endif /* EMU86_EMULATE_CHECKUSER */
 	EMU86_SETFLAGS(new_eflags);
 	EMU86_SETCS(new_cs);
-	EMU86_EMULATE_SETIP((u32)new_ip);
+	EMU86_SETIPREG((u32)new_ip);
 	goto done_dont_set_pc;
 #endif /* CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT */
 #undef USERIRET_EFLAGS_MASK

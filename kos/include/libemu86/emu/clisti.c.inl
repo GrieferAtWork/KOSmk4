@@ -51,7 +51,7 @@ case 0xfb: {
 		EMU86_EMULATE_VM86_SETIF(1);
 #ifdef EMU86_EMULATE_RETURN_AFTER_STI_VM86
 		/* Set the return program counter. */
-		EMU86_EMULATE_SETPC(REAL_IP());
+		EMU86_SETPCPTR(REAL_IP());
 		/* Execute the custom return statement. */
 		EMU86_EMULATE_RETURN_AFTER_STI_VM86;
 		__builtin_unreachable();
@@ -75,7 +75,7 @@ case 0xfb: {
 		EMU86_SETFLAGS(old_flags | EFLAGS_IF);
 	}
 	/* Set the return program counter. */
-	EMU86_EMULATE_SETPC(REAL_IP());
+	EMU86_SETPCPTR(REAL_IP());
 	/* Execute the custom return statement. */
 	EMU86_EMULATE_RETURN_AFTER_STI;
 	__builtin_unreachable();

@@ -133,7 +133,7 @@ case 0xff:
 		EMU86_PUSH163264((dest_ip = MODRM_GETRMW(), (u16)REAL_IP()),
 		                 (dest_ip = MODRM_GETRML(), (u32)REAL_IP()),
 		                 (dest_ip = MODRM_GETRMQ(), (u64)REAL_IP()));
-		EMU86_EMULATE_SETIP(dest_ip);
+		EMU86_SETIPREG(dest_ip);
 		goto done_dont_set_pc;
 	}
 
@@ -173,7 +173,7 @@ case 0xff:
 			      X86_REGISTER_SEGMENT_CS, segment);
 		}
 #endif /* EMU86_EMULATE_CHECKUSER */
-		sp = (byte_t *)EMU86_GETSP();
+		sp = EMU86_GETSTACKPTR();
 		IF_64BIT(if (IS_64BIT()) {
 			sp -= 16;
 			EMU86_EMULATE_PUSH(sp, 16);
@@ -193,9 +193,9 @@ case 0xff:
 			EMU86_EMULATE_WRITEW(sp + 2, (u16)EMU86_GETCS());
 			EMU86_EMULATE_WRITEW(sp + 0, (u16)REAL_IP());
 		}
-		EMU86_SETSP(sp);
+		EMU86_SETSTACKPTR(sp);
 		EMU86_SETCS(segment);
-		EMU86_EMULATE_SETIP(offset);
+		EMU86_SETIPREG(offset);
 		goto done_dont_set_pc;
 	}
 
@@ -212,7 +212,7 @@ case 0xff:
 		}) IF_16BIT_OR_32BIT(else {
 			dest_ip = MODRM_GETRML();
 		})
-		EMU86_EMULATE_SETIP(dest_ip);
+		EMU86_SETIPREG(dest_ip);
 		goto done_dont_set_pc;
 	}
 
@@ -256,7 +256,7 @@ case 0xff:
 		}
 #endif /* EMU86_EMULATE_CHECKUSER */
 		EMU86_SETCS(segment);
-		EMU86_EMULATE_SETIP(offset);
+		EMU86_SETIPREG(offset);
 		goto done_dont_set_pc;
 	}
 

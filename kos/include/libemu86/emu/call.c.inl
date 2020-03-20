@@ -44,7 +44,7 @@ case 0xe8: {
 	EMU86_PUSH163264((dest_ip &= 0xffff, (u16)REAL_IP()),
 	                 (u32)REAL_IP(),
 	                 (u64)REAL_IP());
-	EMU86_EMULATE_SETIP(dest_ip);
+	EMU86_SETIPREG(dest_ip);
 	goto done_dont_set_pc;
 }
 

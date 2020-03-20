@@ -41,7 +41,7 @@ case 0xc9:
 		orig_bp = EMU86_EMULATE_READW(bp - 2);
 #endif /* EMU86_GETSEGBASE_IS_NOOP_SS */
 		EMU86_SETBP(orig_bp);
-		EMU86_SETSP_RAW(bp);
+		EMU86_SETSPREG(bp);
 	}
 #if CONFIG_LIBEMU86_WANT_64BIT
 	else
@@ -60,7 +60,7 @@ case 0xc9:
 		orig_bp = EMU86_EMULATE_READQ(bp - 8);
 #endif /* EMU86_GETSEGBASE_IS_NOOP_SS */
 		EMU86_SETRBP(orig_bp);
-		EMU86_SETSP_RAW(bp);
+		EMU86_SETSPREG(bp);
 	}
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
 #if CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT
@@ -76,7 +76,7 @@ case 0xc9:
 		orig_bp = EMU86_EMULATE_READL(bp - 4);
 #endif /* EMU86_GETSEGBASE_IS_NOOP_SS */
 		EMU86_SETEBP(orig_bp);
-		EMU86_SETSP_RAW(bp);
+		EMU86_SETSPREG(bp);
 	}
 #endif /* CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT */
 	goto done;

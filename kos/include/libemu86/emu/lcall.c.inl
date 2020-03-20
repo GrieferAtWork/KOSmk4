@@ -53,7 +53,7 @@ case 0x9a: {
 		      X86_REGISTER_SEGMENT_CS, segment);
 	}
 #endif /* EMU86_EMULATE_CHECKUSER */
-	sp = (byte_t *)EMU86_GETSP();
+	sp = EMU86_GETSTACKPTR();
 	if (!IS_16BIT()) {
 		sp -= 8;
 		EMU86_EMULATE_PUSH(sp, 8);
@@ -67,9 +67,9 @@ case 0x9a: {
 		EMU86_EMULATE_WRITEW(sp + 2, (u16)EMU86_GETCS());
 		EMU86_EMULATE_WRITEW(sp + 0, (u16)REAL_IP());
 	}
-	EMU86_SETSP(sp);
+	EMU86_SETSTACKPTR(sp);
 	EMU86_SETCS(segment);
-	EMU86_EMULATE_SETIP(offset);
+	EMU86_SETIPREG(offset);
 	goto done_dont_set_pc;
 }
 #endif /* CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT */

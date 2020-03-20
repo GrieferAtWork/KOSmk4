@@ -33,7 +33,7 @@ case 0x60: {
 		if (EMU86_F_IS64(op_flags))
 			goto return_unknown_instruction;
 	});
-	sp = (byte_t *)EMU86_GETSP();
+	sp = EMU86_GETSTACKPTR();
 	if (!IS_16BIT()) {
 		sp -= 32;
 		EMU86_EMULATE_PUSH(sp, 32);
@@ -53,13 +53,13 @@ case 0x60: {
 		EMU86_EMULATE_WRITEW(sp + 0x0, EMU86_GETDI());
 		EMU86_EMULATE_WRITEW(sp + 0x2, EMU86_GETSI());
 		EMU86_EMULATE_WRITEW(sp + 0x4, EMU86_GETBP());
-		EMU86_EMULATE_WRITEW(sp + 0x6, EMU86_GETSPREG());
+		EMU86_EMULATE_WRITEW(sp + 0x6, EMU86_GETSP());
 		EMU86_EMULATE_WRITEW(sp + 0x8, EMU86_GETBX());
 		EMU86_EMULATE_WRITEW(sp + 0xa, EMU86_GETDX());
 		EMU86_EMULATE_WRITEW(sp + 0xc, EMU86_GETCX());
 		EMU86_EMULATE_WRITEW(sp + 0xe, EMU86_GETAX());
 	}
-	EMU86_SETSP(sp);
+	EMU86_SETSTACKPTR(sp);
 	goto done;
 }
 
@@ -72,7 +72,7 @@ case 0x61: {
 		if (EMU86_F_IS64(op_flags))
 			goto return_unknown_instruction;
 	});
-	sp = (byte_t *)EMU86_GETSP();
+	sp = EMU86_GETSTACKPTR();
 	if (!IS_16BIT()) {
 		u32 eax, ecx, edx, ebx, ebp, esi, edi;
 		EMU86_EMULATE_POP(sp, 32);
@@ -116,7 +116,7 @@ case 0x61: {
 		EMU86_SETAX(ax);
 		sp += 16;
 	}
-	EMU86_SETSP(sp);
+	EMU86_SETSTACKPTR(sp);
 	goto done;
 }
 

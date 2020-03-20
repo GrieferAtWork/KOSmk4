@@ -52,7 +52,7 @@ case 0x9d: {
 	 * 9D     POPFQ     Pop top of stack and zero-extend into RFLAGS. */
 	u32 eflags_mask, new_eflags;
 	byte_t *sp;
-	sp = (byte_t *)EMU86_GETSP();
+	sp = EMU86_GETSTACKPTR();
 #define EFLAGS_MASK_COMMON                                 \
 	(EFLAGS_RF | EFLAGS_NT | EFLAGS_IOPLMASK | EFLAGS_OF | \
 	 EFLAGS_DF | EFLAGS_TF | EFLAGS_SF | EFLAGS_ZF |       \

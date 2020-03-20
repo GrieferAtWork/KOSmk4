@@ -44,7 +44,7 @@ case 0xe9: {
 		pc += 4;
 		dest_ip = REAL_IP() + offset;
 	}
-	EMU86_EMULATE_SETIP(dest_ip);
+	EMU86_SETIPREG(dest_ip);
 	goto done_dont_set_pc;
 }
 
@@ -55,7 +55,7 @@ case 0xeb: {
 	offset = *(s8 *)pc;
 	pc += 1;
 	dest_ip = REAL_IP() + offset;
-	EMU86_EMULATE_SETIP(dest_ip);
+	EMU86_SETIPREG(dest_ip);
 	goto done_dont_set_pc;
 }
 

@@ -41,12 +41,12 @@ case 0xc2: {
 	/* C2 iw     RET imm16     Near return to calling procedure and pop imm16 bytes from stack. */
 	offset = UNALIGNED_GET16((u16 *)pc);
 	pc += 2;
-	sp = (byte_t *)EMU86_GETSP();
+	sp = EMU86_GETSTACKPTR();
 	EMU86_POP163264_IMPL(EMU86_SETIP,
 	                     EMU86_SETEIP,
 	                     EMU86_SETRIP);
 	sp += offset;
-	EMU86_SETSP(sp);
+	EMU86_SETSTACKPTR(sp);
 	goto done_dont_set_pc;
 }
 

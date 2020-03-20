@@ -36,7 +36,7 @@
 				goto return_unknown_instruction; \
 		});                                      \
 		_value = (value);                        \
-		sp     = (byte_t *)EMU86_GETSP();        \
+		sp     = EMU86_GETSTACKPTR();            \
 		if (IS_16BIT()) {                        \
 			sp -= 2;                             \
 			EMU86_EMULATE_PUSH(sp, 2);           \
@@ -48,7 +48,7 @@
 			EMU86_WRITE_USER_MEMORY(sp, 4);      \
 			EMU86_EMULATE_WRITEL(sp, _value);    \
 		}                                        \
-		EMU86_SETSP(sp);                         \
+		EMU86_SETSTACKPTR(sp);                   \
 	} __WHILE0
 
 
@@ -63,7 +63,7 @@
 			if (EMU86_F_IS64(op_flags))          \
 				goto return_unknown_instruction; \
 		});                                      \
-		sp = (byte_t *)EMU86_GETSP();            \
+		sp = EMU86_GETSTACKPTR();                \
 		if (IS_16BIT()) {                        \
 			EMU86_EMULATE_POP(sp, 2);            \
 			EMU86_READ_USER_MEMORY(sp, 2);       \
@@ -76,7 +76,7 @@
 			sp += 4;                             \
 		}                                        \
 		setter(_value);                          \
-		EMU86_SETSP(sp);                         \
+		EMU86_SETSTACKPTR(sp);                   \
 	} __WHILE0
 
 
@@ -86,7 +86,7 @@
 #define EMU86_PUSH163264(value16, value32, value64)                    \
 	do {                                                               \
 		byte_t *sp;                                                    \
-		sp = (byte_t *)EMU86_GETSP();                                  \
+		sp = EMU86_GETSTACKPTR();                                      \
 		if (IS_16BIT()) {                                              \
 			sp -= 2;                                                   \
 			EMU86_EMULATE_PUSH(sp, 2);                                 \
@@ -105,18 +105,18 @@
 			EMU86_WRITE_USER_MEMORY(sp, 4);                            \
 			EMU86_EMULATE_WRITEL(sp, value32);                         \
 		})                                                             \
-		EMU86_SETSP(sp);                                               \
+		EMU86_SETSTACKPTR(sp);                                         \
 	} __WHILE0
 
 /* 66 XX pop16
  *    XX pop32  (in 32-bit mode)
  *    XX pop64  (in 64-bit mode) */
-#define EMU86_POP163264(setter16, setter32, setter64)                  \
-	do {                                                               \
-		byte_t *sp;                                                    \
-		sp = (byte_t *)EMU86_GETSP();                                  \
-		EMU86_POP163264_IMPL(setter16, setter32, setter64)             \
-		EMU86_SETSP(sp);                                               \
+#define EMU86_POP163264(setter16, setter32, setter64)      \
+	do {                                                   \
+		byte_t *sp;                                        \
+		sp = EMU86_GETSTACKPTR();                          \
+		EMU86_POP163264_IMPL(setter16, setter32, setter64) \
+		EMU86_SETSTACKPTR(sp);                             \
 	} __WHILE0
 #define EMU86_POP163264_IMPL(setter16, setter32, setter64)             \
 		if (IS_16BIT()) {                                              \

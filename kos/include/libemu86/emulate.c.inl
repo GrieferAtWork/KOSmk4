@@ -451,51 +451,35 @@ __DECL_BEGIN
 #endif /* !EMU86_MSKFLAGS */
 
 /* Get/set the program counter (IP/EIP/RIP) register (including CS.BASE)
- * Note that `EMU86_EMULATE_GETPC() == EMU86_SEGADDR(EMU86_GETCSBASE(), EMU86_EMULATE_GETIP())'  */
-#ifndef EMU86_EMULATE_GETPC
-#define EMU86_EMULATE_GETPC()  icpustate_getpc(_state)
-#define EMU86_EMULATE_SETPC(v) icpustate_setpc(_state, (__uintptr_t)(v))
-#endif /* !EMU86_EMULATE_GETPC */
+ * Note that `EMU86_GETPCPTR() == EMU86_SEGADDR(EMU86_GETCSBASE(), EMU86_GETIPREG())'  */
+#ifndef EMU86_GETPCPTR
+#define EMU86_GETPCPTR()  (byte_t *)icpustate_getpc(_state)
+#define EMU86_SETPCPTR(v) icpustate_setpc(_state, (__uintptr_t)(v))
+#endif /* !EMU86_GETPCPTR */
 
-/* Same as `EMU86_EMULATE_SETPC()', but don't account for
+/* Same as `EMU86_SETPCPTR()', but don't account for
  * segment offsets, but simply set the raw %(e|r)ip register. */
-#ifndef EMU86_EMULATE_GETIP
-#define EMU86_EMULATE_GETIP()  EMU86_EMULATE_GETPC()
-#define EMU86_EMULATE_SETIP(v) EMU86_EMULATE_SETPC(v)
-#endif /* !EMU86_EMULATE_GETIP */
-
-/* Get/set the %(|e|r)ip register */
-#ifndef EMU86_GETIP
-#define EMU86_GETIP()  ((u16)EMU86_EMULATE_GETIP())
-#define EMU86_SETIP(v) EMU86_EMULATE_SETIP((u16)(v))
-#endif /* !EMU86_GETIP */
-#ifndef EMU86_GETEIP
-#define EMU86_GETEIP()  ((u32)EMU86_EMULATE_GETIP())
-#define EMU86_SETEIP(v) EMU86_EMULATE_SETIP((u32)(v))
-#endif /* !EMU86_GETEIP */
-#if CONFIG_LIBEMU86_WANT_64BIT
-#ifndef EMU86_GETRIP
-#define EMU86_GETRIP()  ((u64)EMU86_EMULATE_GETIP())
-#define EMU86_SETRIP(v) EMU86_EMULATE_SETIP((u64)(v))
-#endif /* !EMU86_GETRIP */
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#ifndef EMU86_GETIPREG
+#define EMU86_GETIPREG()  (EMU86_UREG_TYPE)(uintptr_t)EMU86_GETPCPTR()
+#define EMU86_SETIPREG(v) EMU86_SETPCPTR(v)
+#endif /* !EMU86_GETIPREG */
 
 /* Get/Set the SP/ESP/RSP register (including SS.BASE)
- * Note that `EMU86_GETSP() == EMU86_SEGADDR(EMU86_GETSSBASE(), EMU86_GETSP_RAW())' */
-#ifndef EMU86_GETSP
-#define EMU86_GETSP()  icpustate_getsp(_state)
+ * Note that `EMU86_GETSTACKPTR() == EMU86_SEGADDR(EMU86_GETSSBASE(), EMU86_GETSPREG())' */
+#ifndef EMU86_GETSTACKPTR
+#define EMU86_GETSTACKPTR() (byte_t *)icpustate_getsp(_state)
 #ifdef __x86_64__
-#define EMU86_SETSP(v) icpustate64_setrsp(_state, (__uintptr_t)(v))
+#define EMU86_SETSTACKPTR(v) icpustate64_setrsp(_state, (__uintptr_t)(v))
 #else /* __x86_64__ */
-#define EMU86_SETSP(v) (_state = icpustate_setsp_p(_state, (__uintptr_t)(v)))
+#define EMU86_SETSTACKPTR(v) (_state = icpustate_setsp_p(_state, (__uintptr_t)(v)))
 #endif /* !__x86_64__ */
-#endif /* !EMU86_GETSP */
+#endif /* !EMU86_GETSTACKPTR */
 
-/* Same as `EMU86_EMULATE_GETIP()' is for `EMU86_EMULATE_GETPC()', but for `EMU86_GETSP()' */
-#ifndef EMU86_GETSP_RAW
-#define EMU86_GETSP_RAW()  EMU86_GETSP()
-#define EMU86_SETSP_RAW(v) EMU86_SETSP(v)
-#endif /* !EMU86_GETSP_RAW */
+/* Same as `EMU86_GETIPREG()' is for `EMU86_GETPCPTR()', but for `EMU86_GETSTACKPTR()' */
+#ifndef EMU86_GETSPREG
+#define EMU86_GETSPREG()  (EMU86_UREG_TYPE)(uintptr_t)EMU86_GETSTACKPTR()
+#define EMU86_SETSPREG(v) EMU86_SETSTACKPTR(v)
+#endif /* !EMU86_GETSPREG */
 
 /* Return the base address address for a given segment */
 #ifndef EMU86_GETSEGBASE
@@ -610,7 +594,7 @@ __DECL_BEGIN
 #else /* icpustate_setss */
 #define EMU86_SETSS(v) icpustate_trysetss(_state, v) /* Override me to handle failure! */
 #endif /* !icpustate_setss */
-#endif /* !EMU86_GETSP */
+#endif /* !EMU86_GETSTACKPTR */
 
 /* Get/Set the %ds register */
 #ifndef EMU86_GETDS
@@ -631,8 +615,8 @@ __DECL_BEGIN
 #endif /* !EMU86_GETGS */
 
 /* Notify that the instruction is about to push/pop the indicated number of bytes.
- * @param: new_sp: The new SP value (offset from `EMU86_GETSP()')
- * @param: old_sp: The old SP value (as returned by `EMU86_GETSP()') */
+ * @param: new_sp: The new SP value (offset from `EMU86_GETSTACKPTR()')
+ * @param: old_sp: The old SP value (as returned by `EMU86_GETSTACKPTR()') */
 #ifndef EMU86_EMULATE_PUSH
 #define EMU86_EMULATE_PUSH(new_sp, num_bytes) (void)0
 #endif /* !EMU86_EMULATE_PUSH */
@@ -812,7 +796,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getregb))
 #if CONFIG_LIBEMU86_WANT_64BIT
 	if (op_flags & EMU86_F_HASREX) {
 		if (regno == EMU86_R_SPL)
-			return (u8)EMU86_GETSP();
+			return (u8)EMU86_GETSTACKPTR();
 		return *(u8 const *)((byte_t const *)_state + EMU86_EMULATE_HELPER_NAME(emu86_reg_offsets)[regno]);
 	}
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
@@ -840,7 +824,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setregb))
 #if CONFIG_LIBEMU86_WANT_64BIT
 	if (op_flags & EMU86_F_HASREX) {
 		if (regno == EMU86_R_SPL) {
-			EMU86_SETSP((EMU86_GETSP() & ~0xff) | value);
+			EMU86_SETSTACKPTR((EMU86_GETSTACKPTR() & ~0xff) | value);
 		} else {
 			*(u8 *)((byte_t *)_state + EMU86_EMULATE_HELPER_NAME(emu86_reg_offsets)[regno]) = value;
 		}
@@ -860,7 +844,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getregw))
                                                                                  u8 regno) {
 	regno &= __EMU86_GPREG_MASK;
 	if (regno == EMU86_R_SP)
-		return EMU86_GETSP();
+		return EMU86_GETSTACKPTR();
 	return (u16)*(uintptr_t const *)((byte_t *)_state + EMU86_EMULATE_HELPER_NAME(emu86_reg_offsets)[regno]);
 }
 #endif /* !EMU86_GETREGW */
@@ -873,7 +857,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setregw))
                                                                                  u8 regno, u16 value) {
 	regno &= __EMU86_GPREG_MASK;
 	if (regno == EMU86_R_SP) {
-		EMU86_SETSP((uintptr_t)value);
+		EMU86_SETSTACKPTR((uintptr_t)value);
 	} else {
 		*(uintptr_t *)((byte_t *)_state + EMU86_EMULATE_HELPER_NAME(emu86_reg_offsets)[regno]) = (uintptr_t)value;
 	}
@@ -888,7 +872,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getregl))
                                                                                  u8 regno) {
 	regno &= __EMU86_GPREG_MASK;
 	if (regno == EMU86_R_SP)
-		return EMU86_GETSP();
+		return EMU86_GETSTACKPTR();
 	return (u32)*(uintptr_t const *)((byte_t const *)_state + EMU86_EMULATE_HELPER_NAME(emu86_reg_offsets)[regno]);
 }
 #endif /* !EMU86_GETREGL */
@@ -901,7 +885,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setregl))
                                                                                  u8 regno, u32 value) {
 	regno &= __EMU86_GPREG_MASK;
 	if (regno == EMU86_R_SP) {
-		EMU86_SETSP((uintptr_t)value);
+		EMU86_SETSTACKPTR((uintptr_t)value);
 	} else {
 		*(uintptr_t *)((byte_t *)_state + EMU86_EMULATE_HELPER_NAME(emu86_reg_offsets)[regno]) = (uintptr_t)value;
 	}
@@ -917,7 +901,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getregq))
                                                                                  u8 regno) {
 	regno &= __EMU86_GPREG_MASK;
 	if (regno == EMU86_R_SP)
-		return (u64)EMU86_GETSP();
+		return (u64)EMU86_GETSTACKPTR();
 	return (u64)*(uintptr_t const *)((byte_t const *)_state + EMU86_EMULATE_HELPER_NAME(emu86_reg_offsets)[regno]);
 }
 #endif /* !EMU86_GETREGQ */
@@ -930,7 +914,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setregq))
                                                                                  u8 regno, u64 value) {
 	regno &= __EMU86_GPREG_MASK;
 	if (regno == EMU86_R_SP) {
-		EMU86_SETSP((uintptr_t)value);
+		EMU86_SETSTACKPTR((uintptr_t)value);
 	} else {
 		*(uintptr_t *)((byte_t *)_state + EMU86_EMULATE_HELPER_NAME(emu86_reg_offsets)[regno]) = (uintptr_t)value;
 	}
@@ -1030,6 +1014,22 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setregp))
 #endif /* !EMU86_SETREGP */
 
 
+/* Get/set the %(|e|r)ip register */
+#ifndef EMU86_GETIP
+#define EMU86_GETIP()  ((u16)EMU86_GETIPREG())
+#define EMU86_SETIP(v) EMU86_SETIPREG((u16)(v))
+#endif /* !EMU86_GETIP */
+#ifndef EMU86_GETEIP
+#define EMU86_GETEIP()  ((u32)EMU86_GETIPREG())
+#define EMU86_SETEIP(v) EMU86_SETIPREG((u32)(v))
+#endif /* !EMU86_GETEIP */
+#if CONFIG_LIBEMU86_WANT_64BIT
+#ifndef EMU86_GETRIP
+#define EMU86_GETRIP()  ((u64)EMU86_GETIPREG())
+#define EMU86_SETRIP(v) EMU86_SETIPREG((u64)(v))
+#endif /* !EMU86_GETRIP */
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+
 /* Get/set specific registers */
 #ifndef EMU86_GETAL
 #define EMU86_GETAL() EMU86_GETREGB(EMU86_R_AL, 0)
@@ -1060,7 +1060,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setregp))
 #define EMU86_GETCX() EMU86_GETREGW(EMU86_R_CX)
 #define EMU86_GETDX() EMU86_GETREGW(EMU86_R_DX)
 #define EMU86_GETBX() EMU86_GETREGW(EMU86_R_BX)
-#define EMU86_GETSPREG() EMU86_GETREGW(EMU86_R_SP)
+#define EMU86_GETSP() EMU86_GETREGW(EMU86_R_SP)
 #define EMU86_GETBP() EMU86_GETREGW(EMU86_R_BP)
 #define EMU86_GETSI() EMU86_GETREGW(EMU86_R_SI)
 #define EMU86_GETDI() EMU86_GETREGW(EMU86_R_DI)
@@ -1070,7 +1070,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setregp))
 #define EMU86_SETCX(value) EMU86_SETREGW(EMU86_R_CX, value)
 #define EMU86_SETDX(value) EMU86_SETREGW(EMU86_R_DX, value)
 #define EMU86_SETBX(value) EMU86_SETREGW(EMU86_R_BX, value)
-#define EMU86_SETSPREG(value) EMU86_SETREGW(EMU86_R_SP, value)
+#define EMU86_SETSP(value) EMU86_SETREGW(EMU86_R_SP, value)
 #define EMU86_SETBP(value) EMU86_SETREGW(EMU86_R_BP, value)
 #define EMU86_SETSI(value) EMU86_SETREGW(EMU86_R_SI, value)
 #define EMU86_SETDI(value) EMU86_SETREGW(EMU86_R_DI, value)
@@ -1576,9 +1576,9 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 	EMU86_EMULATE_SETUP;
 	op_flags = EMU86_EMULATE_GETOPFLAGS();
 #ifdef EMU86_EMULATE_TRANSLATEADDR_IS_NOOP
-	start_pc = (byte_t const *)EMU86_EMULATE_GETPC();
+	start_pc = (byte_t const *)EMU86_GETPCPTR();
 #else /* EMU86_EMULATE_TRANSLATEADDR_IS_NOOP */
-	real_start_pc = (byte_t const *)EMU86_EMULATE_GETPC();
+	real_start_pc = (byte_t const *)EMU86_GETPCPTR();
 	start_pc      = (byte_t const *)EMU86_EMULATE_TRANSLATEADDR(real_start_pc);
 #endif /* !EMU86_EMULATE_TRANSLATEADDR_IS_NOOP */
 #ifdef EMU86_EMULATE_TRANSLATEADDR_IS_NOOP
@@ -1843,6 +1843,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #include "emu/lea.c.inl"
 #include "emu/leave.c.inl"
 #include "emu/ljmp.c.inl"
+#include "emu/lret.c.inl"
 #include "emu/misc.c.inl"
 #include "emu/mov.c.inl"
 #include "emu/nop.c.inl"
@@ -1862,7 +1863,6 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 			/* TODO: [rep] stos */
 			/* TODO: [repe|repne] scas */
 			/* TODO: [repe|repne] cmps */
-			/* TODO: lret */
 			/* TODO: enter */
 			/* TODO: cpuid */
 			/* TODO: arpl */
@@ -1966,7 +1966,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #endif /* EMU86_EMULATE_EXCEPT */
 done:
 	/* Set the new instruction pointer. */
-	EMU86_EMULATE_SETPC(REAL_IP());
+	EMU86_SETPCPTR(REAL_IP());
 done_dont_set_pc:
 	EMU86_EMULATE_RETURN;
 return_unknown_instruction:

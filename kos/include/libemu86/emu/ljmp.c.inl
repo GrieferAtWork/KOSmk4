@@ -50,7 +50,7 @@ case 0xea: {
 	}
 #endif /* EMU86_EMULATE_CHECKUSER */
 	EMU86_SETCS(segment);
-	EMU86_EMULATE_SETIP(offset);
+	EMU86_SETIPREG(offset);
 	goto done_dont_set_pc;
 }
 
