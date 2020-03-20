@@ -21,8 +21,9 @@
 #define _LIBVIOCORE_VIOCORE_H 1
 
 #include "api.h"
-#include <libvio/vio.h>
 
+#include <libvio/vio.h>
+#include <libviocore/bits/viocore.h>
 
 /* TODO: libviocore
  * -> Move all of the VIO logic into a dedicated library that can also be loaded from user-space.
@@ -88,12 +89,6 @@
 
 #ifdef __CC__
 __DECL_BEGIN
-
-struct vio_emulate_args {
-	struct vio_args vea_args; /* [OVERRIDE(.va_state, [1..1])] Underlying VIO arguments. */
-	vio_addr_t      vea_addr; /* == vio_args_vioaddr(&.vea_args, .vea_ptr) */
-	void           *vea_ptr;  /* Virtual address at which the VIO fault happened. */
-};
 
 /* Emulate the instruction pointed-to by `self->vea_args.va_state' and dispatch
  * any memory access made to `self->vea_ptr' by dispatching it using the VIO

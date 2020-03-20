@@ -142,8 +142,16 @@ DECL_END
 #define EMU86_SETDS(v)          self->vr_regs.vr_ds = (u16)(v)
 #define EMU86_GETES()           self->vr_regs.vr_es
 #define EMU86_SETES(v)          self->vr_regs.vr_es = (u16)(v)
-#define EMU86_EMULATE_PUSH(new_sp, num_bytes) (void)0 /* TODO: Check for stack segment overflow! */
-#define EMU86_EMULATE_POP(old_sp, num_bytes) (void)0 /* TODO: Check for stack segment underflow! */
+#define EMU86_EMULATE_PUSH(new_sp, num_bytes)             \
+	do {                                                  \
+		if unlikely(!vm86_state_canpush(self, num_bytes)) \
+			return VM86_DOUBLE_FAULT;                     \
+	} __WHILE0
+#define EMU86_EMULATE_POP(old_sp, num_bytes)             \
+	do {                                                 \
+		if unlikely(!vm86_state_canpop(self, num_bytes)) \
+			return VM86_DOUBLE_FAULT;                    \
+	} __WHILE0
 #define EMU86_GETSEG(regno)        self->vr_regs.vr_segments[regno]
 #define EMU86_SETSEG(regno, value) self->vr_regs.vr_segments[regno] = (value)
 #define EMU86_GETREGB(regno, ...)        REG8(regno)

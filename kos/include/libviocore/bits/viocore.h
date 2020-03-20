@@ -17,38 +17,24 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_CORE_ARCH_I386_FAULT_VIO_H
-#define GUARD_KERNEL_CORE_ARCH_I386_FAULT_VIO_H 1
+#ifndef _LIBVIOCORE_BITS_VIOCORE_H
+#define _LIBVIOCORE_BITS_VIOCORE_H 1
 
-#include <kernel/compiler.h>
+#include <libviocore/api.h>
+/**/
 
-/* TODO: Get rid of this file and use `libviocore' in `handle_pagefault()'! */
+#include <libvio/vio.h>
 
-#undef USE_VIOCORE
-#if 1 /* Use libviocore to VIO emulation, rather
-       * than the deprecated `x86_vio_main' */
-#define USE_VIOCORE 1
-#endif
+#ifdef __CC__
+__DECL_BEGIN
 
-#ifndef USE_VIOCORE
-#include <libvio/access.h>
-#include <kernel/vm.h>
-#ifdef LIBVIO_CONFIG_ENABLED
-DECL_BEGIN
+struct vio_emulate_args {
+	struct vio_args vea_args; /* [OVERRIDE(.va_state, [1..1])] Underlying VIO arguments. */
+	vio_addr_t      vea_addr; /* == vio_args_vioaddr(&.vea_args, .vea_ptr) */
+	void           *vea_ptr;  /* Virtual address at which the VIO fault happened. */
+};
 
-typedef struct {
-	struct vio_args          ma_args;    /* [OVERRIDE(.va_block,REF)]
-	                                      * [OVERRIDE(.va_part,REF)] Basic VIO arguments. */
-	struct task_connections *ma_oldcons; /* [1..1] Old task connections (must be restored) */
-} vio_main_args_t;
+__DECL_END
+#endif /* __CC__ */
 
-
-/* Main function for VIO instruction emulation. */
-INTDEF struct icpustate *
-NOTHROW(FCALL x86_vio_main)(/*inherit(always)*/ vio_main_args_t *__restrict args, uintptr_t cr2);
-
-DECL_END
-#endif /* LIBVIO_CONFIG_ENABLED */
-#endif /* !USE_VIOCORE */
-
-#endif /* !GUARD_KERNEL_CORE_ARCH_I386_FAULT_VIO_H */
+#endif /* !_LIBVIOCORE_BITS_VIOCORE_H */

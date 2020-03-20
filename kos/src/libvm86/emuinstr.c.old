@@ -432,7 +432,7 @@ LOCAL NONNULL((1)) int
 (CC libvm86_pushw)(vm86_state_t *__restrict self,
                    uint16_t value) {
 	uint16_t *addr;
-	if unlikely(!vm86_state_hasstack(self, 2))
+	if unlikely(!vm86_state_canpush(self, 2))
 		return VM86_DOUBLE_FAULT;
 	addr = (uint16_t *)(uintptr_t)(vm86_state_sp(self) - 2);
 	if (self->vr_trans)
@@ -452,7 +452,7 @@ LOCAL NONNULL((1)) int
 (CC libvm86_pushl)(vm86_state_t *__restrict self,
                    uint32_t value) {
 	uint32_t *addr;
-	if unlikely(!vm86_state_hasstack(self, 4))
+	if unlikely(!vm86_state_canpush(self, 4))
 		return VM86_DOUBLE_FAULT;
 	addr = (uint32_t *)(uintptr_t)(vm86_state_sp(self) - 4);
 	if (self->vr_trans)
@@ -472,7 +472,7 @@ LOCAL NONNULL((1, 2)) int
 (CC libvm86_popw)(vm86_state_t *__restrict self,
                   uint16_t *__restrict presult) {
 	uint16_t *addr, value;
-	if unlikely(self->vr_regs.vr_sp < 2)
+	if unlikely(vm86_state_canpop(self, 2))
 		return VM86_DOUBLE_FAULT;
 	addr = (uint16_t *)vm86_state_sp(self);
 	if (self->vr_trans)
@@ -493,7 +493,7 @@ LOCAL NONNULL((1, 2)) int
 (CC libvm86_popl)(vm86_state_t *__restrict self,
                   uint32_t *__restrict presult) {
 	uint32_t *addr, value;
-	if unlikely(self->vr_regs.vr_sp < 4)
+	if unlikely(vm86_state_canpop(self, 4))
 		return VM86_DOUBLE_FAULT;
 	addr = (uint32_t *)vm86_state_sp(self);
 	if (self->vr_trans)
@@ -512,7 +512,7 @@ LOCAL NONNULL((1, 2)) int
 
 LOCAL NONNULL((1)) int
 (CC libvm86_popw_void)(vm86_state_t *__restrict self) {
-	if unlikely(self->vr_regs.vr_sp < 2)
+	if unlikely(vm86_state_canpop(self, 2))
 		return VM86_DOUBLE_FAULT;
 	self->vr_regs.vr_esp += 2;
 	return VM86_SUCCESS;
@@ -520,7 +520,7 @@ LOCAL NONNULL((1)) int
 
 LOCAL NONNULL((1)) int
 (CC libvm86_popl_void)(vm86_state_t *__restrict self) {
-	if unlikely(self->vr_regs.vr_sp < 4)
+	if unlikely(vm86_state_canpop(self, 4))
 		return VM86_DOUBLE_FAULT;
 	self->vr_regs.vr_esp += 4;
 	return VM86_SUCCESS;

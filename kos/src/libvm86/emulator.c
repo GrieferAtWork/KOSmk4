@@ -82,7 +82,7 @@ libvm86_intr(vm86_state_t *__restrict self, uint8_t intno) {
 				RETHROW();
 			return VM86_SEGFAULT;
 		}
-		if (!vm86_state_hasstack(self, 6))
+		if (!vm86_state_canpush(self, 6))
 			return VM86_DOUBLE_FAULT;
 		sp = (uint16_t *)vm86_state_sp(self);
 		if (self->vr_trans)

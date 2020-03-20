@@ -60,7 +60,51 @@
 
 #include "vio.h"
 
+#ifdef USE_VIOCORE
+#include <libviocore/viocore.h>
+#ifndef __x86_64__
+#include <asm/cfi.h>
+#endif /* !__x86_64__ */
+#else /* USE_VIOCORE */
+#endif /* !USE_VIOCORE */
+
 DECL_BEGIN
+
+#ifdef USE_VIOCORE
+#ifndef __x86_64__
+
+/* Register bootstrap loader.
+ * Restore:
+ *   %ss  = *(u32 *)(%eax + 0);
+ *   %esp = *(u32 *)(%eax + 4);
+ *   %eip = *(u32 *)(%eax + 8);
+ *   %eax = *(u32 *)(%eax + 12);
+ */
+INTDEF byte_t x86_vio_kernel_esp_bootstrap_loader[];
+__asm__(".pushsection .text.cold\n\t"
+        ".global x86_vio_kernel_esp_bootstrap_loader\n\t"
+        ".hidden x86_vio_kernel_esp_bootstrap_loader\n\t"
+        "x86_vio_kernel_esp_bootstrap_loader:\n\t"
+        "	.cfi_startproc simple\n\t"
+        "	.cfi_def_cfa %esp, 0\n\t"
+        "	.cfi_reg_offset %ss, 0, %eax\n\t"
+        "	.cfi_reg_offset %esp, 4, %eax\n\t"
+        "	.cfi_reg_offset %eip, 8, %eax\n\t"
+        "	.cfi_reg_offset %eax, 12, %eax\n\t"
+        "	movw  0(%eax), %ss\n\t"
+        "	.cfi_same_value %ss\n\t"
+        "	movl  4(%eax), %esp\n\t"
+        "	pushl 8(%eax)\n\t"
+        "	movl  12(%eax), %eax\n\t"
+        "	.cfi_same_value %eax\n\t"
+        "	.cfi_reg_value  %esp, 4, %esp\n\t"
+        "	.cfi_reg_offset %eip, 0, %esp\n\t"
+        "	ret\n\t"
+        "	.cfi_endproc\n\t"
+        ".size x86_vio_kernel_esp_bootstrap_loader, . - x86_vio_kernel_esp_bootstrap_loader\n\t"
+        ".popsection");
+#endif /* !__x86_64__ */
+#endif /* USE_VIOCORE */
 
 #ifndef CONFIG_NO_SMP
 #define IF_SMP(...) __VA_ARGS__
@@ -604,28 +648,35 @@ do_handle_iob_node_access:
 				/* Need at least a read-lock for part initialization */
 #ifdef LIBVIO_CONFIG_ENABLED
 				if (part->dp_state == VM_DATAPART_STATE_VIOPRT) {
+#ifdef USE_VIOCORE
+					struct vio_emulate_args args;
+#else /* USE_VIOCORE */
 					vio_main_args_t args;
+#define vea_args ma_args
+#endif /* !USE_VIOCORE */
 					uintptr_half_t nodeprot;
 					nodeprot = node->vn_prot;
 					COMPILER_READ_BARRIER();
 					sync_endread(effective_vm);
 					/* VIO Emulation */
 					sync_read(part);
-					args.ma_args.va_block        = incref(part->dp_block);
-					args.ma_args.va_acmap_offset = ((pos_t)(vpage_offset + vm_datapart_mindpage(part))
-					                                << VM_DATABLOCK_ADDRSHIFT(args.ma_args.va_block));
+					args.vea_args.va_block        = incref(part->dp_block);
+					args.vea_args.va_acmap_offset = ((pos_t)(vpage_offset + vm_datapart_mindpage(part))
+					                                 << VM_DATABLOCK_ADDRSHIFT(args.vea_args.va_block));
 					sync_endread(part);
-					args.ma_args.va_ops = args.ma_args.va_block->db_vio;
-					if unlikely(!args.ma_args.va_ops) {
-						decref_unlikely(args.ma_args.va_block);
+					args.vea_args.va_ops = args.vea_args.va_block->db_vio;
+					if unlikely(!args.vea_args.va_ops) {
+						decref_unlikely(args.vea_args.va_block);
 						decref_unlikely(part);
 						goto pop_connections_and_throw_segfault;
 					}
-					args.ma_args.va_part       = part; /* Inherit reference */
-					args.ma_args.va_acmap_page = (void *)FLOOR_ALIGN((uintptr_t)addr, PAGESIZE);
-					args.ma_oldcons            = &con; /* Inherit */
+					args.vea_args.va_part       = part; /* Inherit reference */
+					args.vea_args.va_acmap_page = (void *)FLOOR_ALIGN((uintptr_t)addr, PAGESIZE);
+#ifndef LIBVIO_CONFIG_ENABLED
+					args.ma_oldcons = &con; /* Inherit */
+#endif /* !LIBVIO_CONFIG_ENABLED */
 					/* Check for special case: call into VIO memory */
-					if (args.ma_args.va_ops->vo_call && (uintptr_t)addr == pc) {
+					if (args.vea_args.va_ops->vo_call && (uintptr_t)addr == pc) {
 						/* Make sure that memory mapping has execute permissions! */
 						if unlikely(!(nodeprot & VM_PROT_EXEC)) {
 							goto vio_failure_throw_segfault;
@@ -683,25 +734,29 @@ do_handle_iob_node_access:
 							}
 #endif /* !__x86_64__ */
 							/* Figure out the exact VIO address that got called. */
-							vio_addr = args.ma_args.va_acmap_offset +
-							           ((uintptr_t)addr - (uintptr_t)args.ma_args.va_acmap_page);
+							vio_addr = args.vea_args.va_acmap_offset +
+							           ((uintptr_t)addr - (uintptr_t)args.vea_args.va_acmap_page);
 							/* Invoke the VIO call operator. */
-							args.ma_args.va_state = state;
-							(*args.ma_args.va_ops->vo_call)(&args.ma_args, vio_addr);
-							state = args.ma_args.va_state;
+							args.vea_args.va_state = state;
+							(*args.vea_args.va_ops->vo_call)(&args.vea_args, vio_addr);
+							state = args.vea_args.va_state;
 						} EXCEPT {
+#ifndef LIBVIO_CONFIG_ENABLED
 							assert(args.ma_oldcons == &con);
-							assert(args.ma_args.va_part == part);
-							decref_unlikely(args.ma_args.va_block);
-							/*decref_unlikely(args.ma_args.va_part);*/
+#endif /* !LIBVIO_CONFIG_ENABLED */
+							assert(args.vea_args.va_part == part);
+							decref_unlikely(args.vea_args.va_block);
+							/*decref_unlikely(args.vea_args.va_part);*/
 							/*task_popconnections(args.ma_oldcons);*/
 							RETHROW(); /* Except blocks below will already cleanup `part' and `&con' */
 						}
+#ifndef LIBVIO_CONFIG_ENABLED
 						assert(args.ma_oldcons == &con);
-						assert(args.ma_args.va_part == part);
-						decref_unlikely(args.ma_args.va_block);
-						decref_unlikely(args.ma_args.va_part);
-						task_popconnections(args.ma_oldcons);
+#endif /* !LIBVIO_CONFIG_ENABLED */
+						assert(args.vea_args.va_part == part);
+						decref_unlikely(args.vea_args.va_block);
+						decref_unlikely(args.vea_args.va_part);
+						task_popconnections(&con);
 						return state;
 					}
 do_normal_vio:
@@ -711,14 +766,60 @@ do_normal_vio:
 						         : !(nodeprot & VM_PROT_READ)  /* Read from non-readable VIO segment */
 						         ) {
 vio_failure_throw_segfault:
+#ifndef LIBVIO_CONFIG_ENABLED
 						assert(args.ma_oldcons == &con);
-						assert(args.ma_args.va_part == part);
-						decref_unlikely(args.ma_args.va_block);
-						decref_unlikely(args.ma_args.va_part);
+#endif /* !LIBVIO_CONFIG_ENABLED */
+						assert(args.vea_args.va_part == part);
+						decref_unlikely(args.vea_args.va_block);
+						decref_unlikely(args.vea_args.va_part);
 						goto pop_connections_and_throw_segfault;
 					}
-					args.ma_args.va_state = state;
+					args.vea_args.va_state = state;
+#ifdef LIBVIO_CONFIG_ENABLED
+					/* Emulate the current instruction. */
+					args.vea_ptr  = addr;
+					args.vea_addr = vio_args_vioaddr(&args.vea_args,
+					                                 (args.vea_ptr));
+					TRY {
+						viocore_emulate(&args);
+					} EXCEPT {
+						decref_unlikely(args.vea_args.va_block);
+						decref_unlikely(args.vea_args.va_part);
+						task_popconnections(&con);
+						RETHROW();
+					}
+					decref_unlikely(args.vea_args.va_block);
+					decref_unlikely(args.vea_args.va_part);
+					task_popconnections(&con);
+#ifndef __x86_64__
+					/* Check if the kernel %esp or %ss was modified */
+					if unlikely(args.vea_kernel_override & (VIO_EMULATE_ARGS_386_KERNEL_ESP_VALID |
+					                                        VIO_EMULATE_ARGS_386_KERNEL_SS_VALID)) {
+						u32 real_esp = args.vea_kernel_esp_override;
+						u16 real_ss  = args.vea_kernel_ss_override;
+						u32 *regload_area;
+						assert(!isuser());
+						if (!(args.vea_kernel_override & VIO_EMULATE_ARGS_386_KERNEL_SS_VALID))
+							real_ss = icpustate32_getkernelss(args.vea_args.va_state);
+						if (!(args.vea_kernel_override & VIO_EMULATE_ARGS_386_KERNEL_ESP_VALID))
+							real_esp = icpustate32_getkernelesp(args.vea_args.va_state);
+						regload_area = (u32 *)vm_node_getstart(THIS_KERNEL_STACK);
+						/* Fill in the register save area to match what's going to
+						 * get loaded by `x86_vio_kernel_esp_bootstrap_loader()' */
+						regload_area[0] = real_ss;
+						regload_area[1] = real_esp;
+						regload_area[2] = args.vea_args.va_state->ics_irregs_k.ir_eip;
+						regload_area[3] = args.vea_args.va_state->ics_gpregs.gp_eax;
+						/* Have `%eax' point to the register save area */
+						args.vea_args.va_state->ics_gpregs.gp_eax = (u32)regload_area;
+						/* Have the icpustate return to the bootstrap function */
+						args.vea_args.va_state->ics_irregs_k.ir_eip = (u32)x86_vio_kernel_esp_bootstrap_loader;
+					}
+#endif /* !__x86_64__ */
+					return args.vea_args.va_state;
+#else /* LIBVIO_CONFIG_ENABLED */
 					return x86_vio_main(&args, (uintptr_t)addr);
+#endif /* !LIBVIO_CONFIG_ENABLED */
 				}
 #endif /* LIBVIO_CONFIG_ENABLED */
 				sync_endread(effective_vm);

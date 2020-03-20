@@ -142,7 +142,8 @@ struct vm86_state_struct {
 
 /* realmode/vm86 is _always_ constrained to 0xffff register offsets.
  * s.a. `https://wiki.osdev.org/Real_Mode#Addressing_Modes' */
-#define vm86_state_hasstack(self, num_bytes) ((self)->vr_regs.vr_sp < (__uint16_t)((__uint16_t)0-(num_bytes)))
+#define vm86_state_canpush(self, num_bytes) ((self)->vr_regs.vr_sp < (__uint16_t)((__uint16_t)0-(num_bytes)))
+#define vm86_state_canpop(self, num_bytes)  ((self)->vr_regs.vr_sp >= (__uint16_t)(num_bytes))
 #define vm86_state_sp(self)  VM86_ADDR((self)->vr_regs.vr_ss, (self)->vr_regs.vr_sp)
 #define vm86_state_si(self)  VM86_ADDR((self)->vr_regs.vr_ds, (self)->vr_regs.vr_si)
 #define vm86_state_di(self)  VM86_ADDR((self)->vr_regs.vr_es, (self)->vr_regs.vr_di)

@@ -70,6 +70,8 @@ opt.append("-Os");
 #include "handle_illegal_instruction-bitops.h"
 #include "vio.h"
 
+
+#ifndef USE_VIOCORE
 DECL_BEGIN
 
 #pragma GCC diagnostic ignored "-Waddress-of-packed-member"
@@ -4657,6 +4659,7 @@ do_pop_value_2_4_kernel_sp:
 }
 
 DECL_END
+#endif /* !USE_VIOCORE */
 
 #endif /* LIBVIO_CONFIG_ENABLED */
 

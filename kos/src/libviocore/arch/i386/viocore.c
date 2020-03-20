@@ -1028,14 +1028,36 @@ DECL_END
 #define EMU86_GETRIP()              (u64)EMU86_GETIPREG()
 #define EMU86_SETRIP(v)             EMU86_SETIPREG((u64)(v))
 #endif /* __x86_64__ */
-#define EMU86_GETSPREG()            CS(getsp)(self->vea_args.va_state)
+
 #if defined(__x86_64__) || !defined(__KERNEL__)
-#define EMU86_SETSPREG(v)           CS(setsp)(self->vea_args.va_state, (__uintptr_t)(v))
+#define EMU86_GETSS()     CS(getss)(self->vea_args.va_state)
+#define EMU86_SETSS(v)    CS(setss)(self->vea_args.va_state, v)
+#define EMU86_GETSPREG()  CS(getsp)(self->vea_args.va_state)
+#define EMU86_SETSPREG(v) CS(setsp)(self->vea_args.va_state, (__uintptr_t)(v))
 #else /* __x86_64__ */
-#define EMU86_SETSPREG(v)           (self->vea_args.va_state = icpustate_setsp_p(self->vea_args.va_state, (__uintptr_t)(v)))
+#define EMU86_EMULATE_SETUP            \
+	do {                               \
+		self->vea_kernel_override = 0; \
+	} __WHILE0
+#define EMU86_GETSS()                                                   \
+	((self->vea_kernel_override & VIO_EMULATE_ARGS_386_KERNEL_SS_VALID) \
+	 ? self->vea_kernel_esp_override                                    \
+	 : icpustate32_getss(self->vea_args.va_state))
+#define EMU86_GETSPREG()                                                 \
+	((self->vea_kernel_override & VIO_EMULATE_ARGS_386_KERNEL_ESP_VALID) \
+	 ? self->vea_kernel_esp_override                                     \
+	 : icpustate32_getesp(self->vea_args.va_state))
+#define EMU86_SETSS(v)                                                            \
+	(icpustate32_trysetss(self->vea_args.va_state, v)                             \
+	 ? (void)(self->vea_kernel_override &= ~VIO_EMULATE_ARGS_386_KERNEL_SS_VALID) \
+	 : (void)(self->vea_kernel_ss_override = (v),                                 \
+	          self->vea_kernel_override |= VIO_EMULATE_ARGS_386_KERNEL_SS_VALID))
+#define EMU86_SETSPREG(v)                                                          \
+	(icpustate32_trysetesp(self->vea_args.va_state, v)                             \
+	 ? (void)(self->vea_kernel_override &= ~VIO_EMULATE_ARGS_386_KERNEL_ESP_VALID) \
+	 : (void)(self->vea_kernel_esp_override = (v),                                 \
+	          self->vea_kernel_override |= VIO_EMULATE_ARGS_386_KERNEL_ESP_VALID))
 #endif /* !__x86_64__ */
-#define EMU86_GETSTACKPTR()         (byte_t *)EMU86_GETSPREG()
-#define EMU86_SETSTACKPTR(v)        EMU86_SETSPREG(v)
 
 #undef EMU86_GETSEGBASE_IS_NOOP
 #undef EMU86_GETSEGBASE_IS_NOOP_DS
@@ -1067,6 +1089,8 @@ DECL_END
 #define EMU86_GETFSBASE() __rdfsbase()
 #define EMU86_GETGSBASE() (EMU86_ISUSER() ? (void *)__rdmsr(IA32_KERNEL_GS_BASE) : __rdgsbase())
 #else /* __x86_64__ */
+#include <sched/task.h>
+
 /* 32-bit mode supports non-zero bases for any segment! */
 DECL_BEGIN
 #define EMU86_GETSEGBASE(segment_regno) \
@@ -1078,21 +1102,69 @@ DECL_BEGIN
 #define EMU86_GETFSBASE() EMU86_GETSEGBASE(EMU86_R_FS)
 #define EMU86_GETGSBASE() EMU86_GETSEGBASE(EMU86_R_GS)
 PRIVATE WUNUSED NONNULL((1)) u32
-NOTHROW(CC i386_segment_base)(struct icpustate *__restrict state,
+NOTHROW(CC i386_segment_base)(struct icpustate32 *__restrict state,
                               u8 segment_regno) {
 	u32 result;
 	u16 segment_index;
 	pflag_t was;
 	struct segment *seg;
 	struct desctab dt;
+#ifndef __OPTIMIZE_SIZE__
+	bool isuser;
+	isuser = icpustate32_isuser(state);
+#endif /* !__OPTIMIZE_SIZE__ */
 	/* Determine the segment's index. */
 	switch (segment_regno) {
-	case EMU86_R_ES: segment_index = icpustate_getes(state); break;
-	case EMU86_R_CS: segment_index = icpustate_getcs(state); break;
-	case EMU86_R_SS: segment_index = icpustate_getcs(state); break;
-	case EMU86_R_DS: segment_index = icpustate_getds(state); break;
-	case EMU86_R_FS: segment_index = icpustate_getfs(state); break;
-	case EMU86_R_GS: segment_index = __rdgs(); break;
+
+	case EMU86_R_ES:
+#ifndef __OPTIMIZE_SIZE__
+		if (!isuser)
+			return 0; /* Always 0 for kernel-space */
+#endif /* !__OPTIMIZE_SIZE__ */
+		segment_index = icpustate_getes(state);
+		break;
+
+	case EMU86_R_CS:
+#ifndef __OPTIMIZE_SIZE__
+		if (!isuser)
+			return 0; /* Always 0 for kernel-space */
+#endif /* !__OPTIMIZE_SIZE__ */
+		segment_index = icpustate_getcs(state);
+		break;
+
+	case EMU86_R_SS:
+#ifndef __OPTIMIZE_SIZE__
+		if (!isuser)
+			return 0; /* Always 0 for kernel-space */
+#endif /* !__OPTIMIZE_SIZE__ */
+		segment_index = icpustate_getcs(state);
+		break;
+
+	case EMU86_R_DS:
+#ifndef __OPTIMIZE_SIZE__
+		if (!isuser)
+			return 0; /* Always 0 for kernel-space */
+#endif /* !__OPTIMIZE_SIZE__ */
+		segment_index = icpustate_getds(state);
+		break;
+
+	case EMU86_R_FS:
+#ifndef __OPTIMIZE_SIZE__
+		/* %fs is the TLS segment for kernel-space */
+		if (!isuser)
+			return (u32)THIS_TASK;
+#endif /* !__OPTIMIZE_SIZE__ */
+		segment_index = icpustate_getfs(state);
+		break;
+
+	case EMU86_R_GS:
+		/* %gs is undefined for kernel-space (or rather: will
+		 * still contain whatever value user-space assigned to
+		 * it, so don't do any special optimizations for this
+		 * case...) */
+		segment_index = __rdgs();
+		break;
+
 	default: __builtin_unreachable();
 	}
 	was = PREEMPTION_PUSHOFF();
@@ -1151,12 +1223,17 @@ DECL_END
 #define EMU86_GETGSBASE() __rdgsbase()
 #endif /* !__KERNEL__ */
 #define EMU86_SEGADDR(segbase, segoffset) (byte_t *)(uintptr_t)((segbase) + (segoffset))
+#ifdef EMU86_GETSEGBASE_IS_NOOP_SS
+#define EMU86_GETSTACKPTR()  (byte_t *)EMU86_GETSPREG()
+#define EMU86_SETSTACKPTR(v) EMU86_SETSPREG(v)
+#else /* EMU86_GETSEGBASE_IS_NOOP_SS */
+#define EMU86_GETSTACKPTR()  EMU86_SEGADDR(EMU86_GETSSBASE(), EMU86_GETSPREG())
+#define EMU86_SETSTACKPTR(v) EMU86_SETSPREG((uintptr_t)(v) - EMU86_GETSSBASE())
+#endif /* !EMU86_GETSEGBASE_IS_NOOP_SS */
 #define EMU86_GETES()  CS(getes)(self->vea_args.va_state)
 #define EMU86_SETES(v) CS(setes)(self->vea_args.va_state, v)
 #define EMU86_GETCS()  CS(getcs)(self->vea_args.va_state)
 #define EMU86_SETCS(v) CS(setcs)(self->vea_args.va_state, v)
-#define EMU86_GETSS()  CS(getss)(self->vea_args.va_state)
-#define EMU86_SETSS(v) CS(setss)(self->vea_args.va_state, v)
 #define EMU86_GETDS()  CS(getds)(self->vea_args.va_state)
 #define EMU86_SETDS(v) CS(setds)(self->vea_args.va_state, v)
 #define EMU86_GETFS()  CS(getfs)(self->vea_args.va_state)
