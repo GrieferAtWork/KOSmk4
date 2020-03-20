@@ -60,13 +60,14 @@ typedef __pos64_t vio_addr_t;
 
 
 /* Argument structure passed to VIO callbacks. */
-struct vio_args {
+struct vio_args { /* TODO: Rename to `vioargs' */
 	struct vio_operators const *va_ops;          /* [1..1][== va_block->db_type->dt_vio] */
 	void                       *va_acmap_page;   /* Page-aligned virtual base address of the accessed mapping (== mmap:return). */
 	vio_addr_t                  va_acmap_offset; /* [== vm_datapart_startbyte(va_part)]
 	                                              * VIO file offset at `va_acmap_page' (== mmap:offset). */
-	vio_cpustate_t             *va_state;        /* [0..1][in|out] The CPU state at the time of the access being made (or `NULL' when accessed through other means). */
 #ifdef __KERNEL__
+	vio_cpustate_t             *va_state;        /* [0..1][in|out] The CPU state at the time of the access
+	                                              * being made (or `NULL' when accessed through other means). */
 	struct vm_datablock        *va_block;        /* [1..1] The data block that is being accessed. */
 	struct vm_datapart         *va_part;         /* [0..1] The part that is being accessed. */
 #else /* __KERNEL__ */
@@ -76,14 +77,29 @@ struct vio_args {
 
 /* Return the effective fault address for a given VIO address. */
 #ifdef __INTELLISENSE__
-void *vio_args_faultaddr(struct vio_args const *self, vio_addr_t vio_addr);
-vio_addr_t vio_args_vioaddr(struct vio_args const *self, void *virtaddr);
+void *vio_args_faultaddr(struct vio_args const *__restrict self, vio_addr_t vio_addr);
+vio_addr_t vio_args_vioaddr(struct vio_args const *__restrict self, void *virtaddr);
 #else /* __INTELLISENSE__ */
 #define vio_args_faultaddr(self, vio_addr) \
 	(void *)((__byte_t *)(self)->va_acmap_page + (__size_t)((vio_addr) - (self)->va_acmap_offset))
 #define vio_args_vioaddr(self, virtaddr) \
 	((self)->va_acmap_offset + (size_t)((__byte_t *)(virtaddr) - (__byte_t *)(self)->va_acmap_page))
 #endif /* !__INTELLISENSE__ */
+
+#ifndef __KERNEL__
+/* Return a pointer to the modifiable CPU state of the thread that
+ * is requesting the memory access. If the thread is currently inside
+ * of kernel-space (such that its CPU state cannot be accessed),
+ * return `NULL' instead. */
+typedef __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) vio_cpustate_t *
+/*__NOTHROW_NCX*/ (LIBVIO_CC *PVIO_ARGS_GETSTATE)(struct vio_args *__restrict self);
+#ifdef LIBVIO_WANT_PROTOTYPES
+LIBVIO_DECL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) vio_cpustate_t *
+__NOTHROW_NCX(LIBVIO_CC vio_args_getstate)(struct vio_args *__restrict self);
+#endif /* LIBVIO_WANT_PROTOTYPES */
+#else /* __KERNEL__ */
+#define vio_args_getstate(self) ((self)->va_state)
+#endif /* !__KERNEL__ */
 
 
 #ifdef LIBVIO_CONFIG_HAVE_QWORD

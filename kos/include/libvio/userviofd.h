@@ -88,16 +88,14 @@ __DECL_BEGIN
 #endif /* !__ARCH_HAVE_COMPAT */
 #define UVIO_OPCODE_GETUCMD   0xfe /* req  (user command request (don't actually respond to this!)) */
 #define UVIO_OPCODE_PUTUCMD   0xff /* resp (user command trigger (causes a `UVIO_OPCODE_GETNOOP' to become readable))
-                                     * NOTE: The `ur_respid' field should be one of `UVIO_OPCODE_UCMD_*'
-                                     *       The `uq_ldata[0]' field contains the TID of the sending thread.
-                                     *       The `uq_ldata[1]' field contains the PID of the sending process. */
+                                    * NOTE: The `ur_respid' field should be one of `UVIO_OPCODE_UCMD_*' */
 
 /* Values for `ur_respid' of `UVIO_OPCODE_PUTNOOP' responses */
 #define UVIO_OPCODE_UCMD_STOP 0x01 /* Destroy the associated UVIO object.
                                     * Used internally by `libvio.so' to terminate the service thread,
                                     * as well as `close(2)' the associated UVIO handle. NOTE: To prevent
                                     * some other thread from destroying a shared UVIO object, libvio.so
-                                    * checks `uq_ldata[1]' to match `getpid(2)', and ignores stop requests
+                                    * checks `uq_pid' to match `getpid(2)', and ignores stop requests
                                     * from processes other than its own. */
 /* Range of user commands that are free for use by custom protocols.
  * aka.: These will never be used by the `libvio.so' implementation. */
@@ -117,6 +115,9 @@ __DECL_BEGIN
 /* This fixed-length structure is read() from uvio objects. */
 struct uvio_request {
 	__uint64_t uq_addr;     /* Absolute UVIO address that is being accessed. */
+	__uint64_t uq_mapaddr;  /* Page-aligned virtual base address of the associated mapping (s.a. `va_acmap_page') */
+	__uint64_t uq_mapoffs;  /* Page-aligned starting offset of . */
+	__uint32_t uq_pid;      /* PID of the sending process. */
 	__uint8_t  uq_opcode;   /* The request opcode (one of `UVIO_OPCODE_*') */
 	__uint8_t  uq_reqflags; /* Request flags (set of `UVIO_REQUEST_FLAG_*') */
 	__uint16_t uq_reqid;    /* Request ID (must be echoed back in `struct uvio_response') */
@@ -136,6 +137,7 @@ struct uvio_request {
 	__uint8_t  ur_opcode;    /* The response opcode (one of `UVIO_OPCODE_*') */   \
 	__uint8_t  ur_respflags; /* Response flags (set of `UVIO_RESPONSE_FLAG_*') */ \
 	__uint16_t ur_respid;    /* Request ID (same as `struct uvio_request::uq_reqid') */
+
 struct uvio_response {
 	UVIO_RESPONSE_HEADER
 };
@@ -157,19 +159,21 @@ struct uvio_response_readl {
 
 struct uvio_response_readq {
 	UVIO_RESPONSE_HEADER
-	__uint64_t ur_result; /* Return value */
+	union {
+		__uint32_t ur_lresult[2]; /* Return value */
+		__uint64_t ur_result;     /* Return value */
+	};
 };
 
 struct uvio_response_read128 {
 	UVIO_RESPONSE_HEADER
-#ifdef __UINT128_TYPE__
 	union {
+#ifdef __UINT128_TYPE__
 		__UINT128_TYPE__ ur_result;     /* Return value */
+#endif /* __UINT128_TYPE__ */
 		__uint64_t       ur_qresult[2]; /* Return value */
+		__uint32_t       ur_lresult[4]; /* Return value */
 	};
-#else /* __UINT128_TYPE__ */
-	__uint64_t ur_qresult[2]; /* Return value */
-#endif /* !__UINT128_TYPE__ */
 };
 
 struct uvio_response_except {
