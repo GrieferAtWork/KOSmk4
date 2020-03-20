@@ -199,8 +199,17 @@ __DECL_BEGIN
  * NOTE: This expression mustn't return normally! (but should
  *       normally contain a `THROW()' or `return' statement) */
 /* #define EMU86_EMULATE_RETURN_AFTER_STI ... */
+
 /* Same as `EMU86_EMULATE_RETURN_AFTER_STI', but used for vm86 instead. */
 /* #define EMU86_EMULATE_RETURN_AFTER_STI_VM86 ... */
+
+/* An optional, special return expression to be evaluated following
+ * an `hlt' instruction (with #IF=0 or #IF=1 respectively)
+ * When not defined, `hlt' will simply return normally.
+ * See also: `EMU86_EMULATE_RETURN_AFTER_HLT_VM86' when vm86 is supported. */
+/* #define EMU86_EMULATE_RETURN_AFTER_HLT_IF0 ... */
+/* #define EMU86_EMULATE_RETURN_AFTER_HLT_IF1 ... */
+
 
 #ifndef EMU86_EMULATE_THROW_DIVIDE_BY_ZEROB
 #ifndef EMU86_EMULATE_THROW_DIVIDE_ERROR
@@ -279,6 +288,9 @@ __DECL_BEGIN
 #ifndef EMU86_EMULATE_VM86_SETIF
 #define EMU86_EMULATE_VM86_SETIF(v) (void)0
 #endif /* !EMU86_EMULATE_VM86_SETIF */
+#ifndef EMU86_EMULATE_RETURN_AFTER_HLT_VM86
+#define EMU86_EMULATE_RETURN_AFTER_HLT_VM86 goto done
+#endif /* !EMU86_EMULATE_RETURN_AFTER_HLT_VM86 */
 #endif /* EMU86_EMULATE_VM86 */
 
 
@@ -1798,6 +1810,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #include "emu/cmpxchg.c.inl"
 #include "emu/cmpxchgb.c.inl"
 #include "emu/flush.c.inl"
+#include "emu/hlt.c.inl"
 #include "emu/incdec.c.inl"
 #include "emu/io.c.inl"
 #include "emu/iret.c.inl"
@@ -1837,7 +1850,6 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 			/* TODO: xlatb */
 			/* TODO: loop, loopz, loopnz */
 			/* TODO: jcxz, jecxz, jrcxz */
-			/* TODO: hlt */
 			/* TODO: cmc */
 			/* TODO: clc */
 			/* TODO: stc */

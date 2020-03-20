@@ -223,6 +223,10 @@ DECL_END
 	return libvm86_intr(self, 0x0) /* #DE */
 #define EMU86_EMULATE_RETURN_AFTER_STI \
 	return VM86_INTR_ENABLED
+#define EMU86_EMULATE_RETURN_AFTER_HLT_IF0 \
+	return VM86_FROZEN
+#define EMU86_EMULATE_RETURN_AFTER_HLT_IF1 \
+	return VM86_HALTED
 
 
 /* Make sure that `THROW()' isn't used by the emulated code. */
