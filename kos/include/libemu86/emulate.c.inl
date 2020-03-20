@@ -1857,6 +1857,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #include "emu/salc.c.inl"
 #include "emu/shift.c.inl"
 #include "emu/shift2.c.inl"
+#include "emu/stcf.c.inl"
 #include "emu/xadd.c.inl"
 #include "emu/xchg.c.inl"
 #endif /* !EMU86_EMULATE_IMPL_HEADER */
@@ -1874,9 +1875,6 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 			/* TODO: xlatb */
 			/* TODO: loop, loopz, loopnz */
 			/* TODO: jcxz, jecxz, jrcxz */
-			/* TODO: cmc */
-			/* TODO: clc */
-			/* TODO: stc */
 			/* TODO: cld */
 			/* TODO: std */
 			/* TODO: sldt */
