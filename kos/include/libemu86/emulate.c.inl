@@ -1787,6 +1787,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #include "emu/mov.c.inl"
 #include "emu/nop.c.inl"
 #include "emu/pushapopa.c.inl"
+#include "emu/pushfpopf.c.inl"
 #include "emu/pushpop.c.inl"
 #include "emu/shift.c.inl"
 #include "emu/shift2.c.inl"
@@ -1795,7 +1796,6 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #endif /* !EMU86_EMULATE_IMPL_HEADER */
 #endif /* !__INTELLISENSE__ */
 
-			/* TODO: pushf, popf */
 			/* TODO: [rep] lods */
 			/* TODO: [rep] movs */
 			/* TODO: [rep] stos */
