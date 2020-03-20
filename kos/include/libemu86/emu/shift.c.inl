@@ -90,7 +90,7 @@ do_shift##Nbits:                                                                
 			byte_t *addr;                                                                      \
 			addr = MODRM_MEMADDR();                                                            \
 			EMU86_WRITE_USER_MEMORY(addr, Nbytes);                                             \
-			if (!EMU86_EMULATE_ATOMIC_CMPXCH_OR_WRITE##BWLQ(addr, oldval, newval,              \
+			if (!EMU86_MEM_ATOMIC_CMPXCH_OR_WRITE##BWLQ(addr, oldval, newval,              \
 			                                                (op_flags & EMU86_F_LOCK) != 0)) { \
 				EMU86_EMULATE_LOOPHINT();                                                      \
 				goto do_shift##Nbits;                                                          \

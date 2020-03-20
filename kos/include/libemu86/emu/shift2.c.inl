@@ -26,40 +26,40 @@ EMU86_INTELLISENSE_BEGIN(shift2) {
 	/* The number of bits by which to shift */
 	u8 num_bits;
 
-#define DEFINE_SHLD_MODRM_rm_reg(bwlq, BWLQ, Nbits, Nbytes, msb_bit_set)                    \
-	u##Nbits oldval, bitsrc, newval;                                                        \
-	num_bits &= (Nbits - 1);                                                                \
-	if (!num_bits)                                                                          \
-		goto done;                                                                          \
-	bitsrc = MODRM_GETREG##BWLQ();                                                          \
-	if (EMU86_MODRM_ISREG(modrm.mi_type)) {                                                 \
-		if unlikely(op_flags & EMU86_F_LOCK)                                                \
-			goto return_unknown_instruction;                                                \
-		oldval = MODRM_GETRMREG##BWLQ();                                                    \
-		newval = (oldval << num_bits) |                                                     \
-		         (bitsrc >> (Nbits - num_bits));                                            \
-		MODRM_SETRMREG##BWLQ(newval);                                                       \
-	} else {                                                                                \
-		byte_t *addr;                                                                       \
-		addr = MODRM_MEMADDR();                                                             \
-		EMU86_WRITE_USER_MEMORY(addr, Nbytes);                                              \
-		for (;;) {                                                                          \
-			oldval = EMU86_EMULATE_READ##BWLQ(addr);                                        \
-			newval = (oldval << num_bits) |                                                 \
-			         (bitsrc >> (Nbits - num_bits));                                        \
-			if (EMU86_EMULATE_ATOMIC_CMPXCH_OR_WRITE##BWLQ(addr, oldval, newval,            \
-			                                               (op_flags & EMU86_F_LOCK) != 0)) \
-				break;                                                                      \
-			EMU86_EMULATE_LOOPHINT();                                                       \
-		}                                                                                   \
-	}                                                                                       \
-	if ((oldval << (num_bits - 1)) & msb_bit_set)                                           \
-		eflags_addend |= EFLAGS_CF;                                                         \
-	if (num_bits == 1) {                                                                    \
-		eflags_mask |= EFLAGS_OF;                                                           \
-		if ((oldval & msb_bit_set) != (newval & msb_bit_set))                               \
-			eflags_addend |= EFLAGS_OF;                                                     \
-	}                                                                                       \
+#define DEFINE_SHLD_MODRM_rm_reg(bwlq, BWLQ, Nbits, Nbytes, msb_bit_set)                \
+	u##Nbits oldval, bitsrc, newval;                                                    \
+	num_bits &= (Nbits - 1);                                                            \
+	if (!num_bits)                                                                      \
+		goto done;                                                                      \
+	bitsrc = MODRM_GETREG##BWLQ();                                                      \
+	if (EMU86_MODRM_ISREG(modrm.mi_type)) {                                             \
+		if unlikely(op_flags & EMU86_F_LOCK)                                            \
+			goto return_unknown_instruction;                                            \
+		oldval = MODRM_GETRMREG##BWLQ();                                                \
+		newval = (oldval << num_bits) |                                                 \
+		         (bitsrc >> (Nbits - num_bits));                                        \
+		MODRM_SETRMREG##BWLQ(newval);                                                   \
+	} else {                                                                            \
+		byte_t *addr;                                                                   \
+		addr = MODRM_MEMADDR();                                                         \
+		EMU86_WRITE_USER_MEMORY(addr, Nbytes);                                          \
+		for (;;) {                                                                      \
+			oldval = EMU86_MEMREAD##BWLQ(addr);                                         \
+			newval = (oldval << num_bits) |                                             \
+			         (bitsrc >> (Nbits - num_bits));                                    \
+			if (EMU86_MEM_ATOMIC_CMPXCH_OR_WRITE##BWLQ(addr, oldval, newval,            \
+			                                           (op_flags & EMU86_F_LOCK) != 0)) \
+				break;                                                                  \
+			EMU86_EMULATE_LOOPHINT();                                                   \
+		}                                                                               \
+	}                                                                                   \
+	if ((oldval << (num_bits - 1)) & msb_bit_set)                                       \
+		eflags_addend |= EFLAGS_CF;                                                     \
+	if (num_bits == 1) {                                                                \
+		eflags_mask |= EFLAGS_OF;                                                       \
+		if ((oldval & msb_bit_set) != (newval & msb_bit_set))                           \
+			eflags_addend |= EFLAGS_OF;                                                 \
+	}                                                                                   \
 	eflags_addend |= emu86_geteflags_test##bwlq(newval);
 
 
@@ -98,40 +98,40 @@ case 0x0fa4: {
 
 
 
-#define DEFINE_SHRD_MODRM_rm_reg(bwlq, BWLQ, Nbits, Nbytes, msb_bit_set)                    \
-	u##Nbits oldval, bitsrc, newval;                                                        \
-	num_bits &= (Nbits - 1);                                                                \
-	if (!num_bits)                                                                          \
-		goto done;                                                                          \
-	bitsrc = MODRM_GETREG##BWLQ();                                                          \
-	if (EMU86_MODRM_ISREG(modrm.mi_type)) {                                                 \
-		if unlikely(op_flags & EMU86_F_LOCK)                                                \
-			goto return_unknown_instruction;                                                \
-		oldval = MODRM_GETRMREG##BWLQ();                                                    \
-		newval = (oldval >> num_bits) |                                                     \
-		         (bitsrc << (Nbits - num_bits));                                            \
-		MODRM_SETRMREG##BWLQ(newval);                                                       \
-	} else {                                                                                \
-		byte_t *addr;                                                                       \
-		addr = MODRM_MEMADDR();                                                             \
-		EMU86_WRITE_USER_MEMORY(addr, Nbytes);                                              \
-		for (;;) {                                                                          \
-			oldval = EMU86_EMULATE_READ##BWLQ(addr);                                        \
-			newval = (oldval >> num_bits) |                                                 \
-			         (bitsrc << (Nbits - num_bits));                                        \
-			if (EMU86_EMULATE_ATOMIC_CMPXCH_OR_WRITE##BWLQ(addr, oldval, newval,            \
-			                                               (op_flags & EMU86_F_LOCK) != 0)) \
-				break;                                                                      \
-			EMU86_EMULATE_LOOPHINT();                                                       \
-		}                                                                                   \
-	}                                                                                       \
-	if ((oldval >> (num_bits - 1)) & 1)                                                     \
-		eflags_addend |= EFLAGS_CF;                                                         \
-	if (num_bits == 1) {                                                                    \
-		eflags_mask |= EFLAGS_OF;                                                           \
-		if ((oldval & msb_bit_set) != (newval & msb_bit_set))                               \
-			eflags_addend |= EFLAGS_OF;                                                     \
-	}                                                                                       \
+#define DEFINE_SHRD_MODRM_rm_reg(bwlq, BWLQ, Nbits, Nbytes, msb_bit_set)                \
+	u##Nbits oldval, bitsrc, newval;                                                    \
+	num_bits &= (Nbits - 1);                                                            \
+	if (!num_bits)                                                                      \
+		goto done;                                                                      \
+	bitsrc = MODRM_GETREG##BWLQ();                                                      \
+	if (EMU86_MODRM_ISREG(modrm.mi_type)) {                                             \
+		if unlikely(op_flags & EMU86_F_LOCK)                                            \
+			goto return_unknown_instruction;                                            \
+		oldval = MODRM_GETRMREG##BWLQ();                                                \
+		newval = (oldval >> num_bits) |                                                 \
+		         (bitsrc << (Nbits - num_bits));                                        \
+		MODRM_SETRMREG##BWLQ(newval);                                                   \
+	} else {                                                                            \
+		byte_t *addr;                                                                   \
+		addr = MODRM_MEMADDR();                                                         \
+		EMU86_WRITE_USER_MEMORY(addr, Nbytes);                                          \
+		for (;;) {                                                                      \
+			oldval = EMU86_MEMREAD##BWLQ(addr);                                         \
+			newval = (oldval >> num_bits) |                                             \
+			         (bitsrc << (Nbits - num_bits));                                    \
+			if (EMU86_MEM_ATOMIC_CMPXCH_OR_WRITE##BWLQ(addr, oldval, newval,            \
+			                                           (op_flags & EMU86_F_LOCK) != 0)) \
+				break;                                                                  \
+			EMU86_EMULATE_LOOPHINT();                                                   \
+		}                                                                               \
+	}                                                                                   \
+	if ((oldval >> (num_bits - 1)) & 1)                                                 \
+		eflags_addend |= EFLAGS_CF;                                                     \
+	if (num_bits == 1) {                                                                \
+		eflags_mask |= EFLAGS_OF;                                                       \
+		if ((oldval & msb_bit_set) != (newval & msb_bit_set))                           \
+			eflags_addend |= EFLAGS_OF;                                                 \
+	}                                                                                   \
 	eflags_addend |= emu86_geteflags_test##bwlq(newval);
 
 

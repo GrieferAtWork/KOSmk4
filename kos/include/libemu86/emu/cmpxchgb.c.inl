@@ -38,7 +38,7 @@ case 0x0fc7:
 #endif /* !EMU86_EMULATE_ONLY_MEMORY */
 #if CONFIG_LIBEMU86_WANT_64BIT
 		if (IS_64BIT()) {
-#ifdef EMU86_EMULATE_ATOMIC_CMPXCH128
+#ifdef EMU86_MEM_ATOMIC_CMPXCH128
 			union {
 				uint128_t word128;
 				u64 qwords[2];
@@ -50,7 +50,7 @@ case 0x0fc7:
 			newval.qwords[1]      = EMU86_GETRCX();
 			addr                  = MODRM_MEMADDR();
 			EMU86_WRITE_USER_MEMORY(addr, 16);
-			real_oldval.word128 = EMU86_EMULATE_ATOMIC_CMPXCH128(addr, want_oldval.word128, newval.word128,
+			real_oldval.word128 = EMU86_MEM_ATOMIC_CMPXCH128(addr, want_oldval.word128, newval.word128,
 			                                                     (op_flags & EMU86_F_LOCK) != 0);
 			if (real_oldval.qwords[0] == want_oldval.qwords[0] &&
 			    real_oldval.qwords[1] == want_oldval.qwords[1]) {
@@ -60,13 +60,13 @@ case 0x0fc7:
 				EMU86_SETRAX(real_oldval.qwords[0]);
 				EMU86_SETRDX(real_oldval.qwords[1]);
 			}
-#else /* EMU86_EMULATE_ATOMIC_CMPXCH128 */
+#else /* EMU86_MEM_ATOMIC_CMPXCH128 */
 			goto return_unknown_instruction;
-#endif /* !EMU86_EMULATE_ATOMIC_CMPXCH128 */
+#endif /* !EMU86_MEM_ATOMIC_CMPXCH128 */
 		} else
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
 		{
-#ifdef EMU86_EMULATE_ATOMIC_CMPXCHQ
+#ifdef EMU86_MEM_ATOMIC_CMPXCHQ
 			union {
 				u64 qword;
 				u32 dwords[2];
@@ -78,7 +78,7 @@ case 0x0fc7:
 			newval.dwords[1]      = EMU86_GETECX();
 			addr                  = MODRM_MEMADDR();
 			EMU86_WRITE_USER_MEMORY(addr, 8);
-			real_oldval.qword = EMU86_EMULATE_ATOMIC_CMPXCHQ(addr, want_oldval.qword, newval.qword,
+			real_oldval.qword = EMU86_MEM_ATOMIC_CMPXCHQ(addr, want_oldval.qword, newval.qword,
 			                                                 (op_flags & EMU86_F_LOCK) != 0);
 #if __SIZEOF_POINTER__ >= 8
 			if (real_oldval.qword == want_oldval.qword)
@@ -93,9 +93,9 @@ case 0x0fc7:
 				EMU86_SETEAX(real_oldval.dwords[0]);
 				EMU86_SETEDX(real_oldval.dwords[1]);
 			}
-#else /* EMU86_EMULATE_ATOMIC_CMPXCHQ */
+#else /* EMU86_MEM_ATOMIC_CMPXCHQ */
 			goto return_unknown_instruction;
-#endif /* !EMU86_EMULATE_ATOMIC_CMPXCHQ */
+#endif /* !EMU86_MEM_ATOMIC_CMPXCHQ */
 		}
 		goto done;
 	}

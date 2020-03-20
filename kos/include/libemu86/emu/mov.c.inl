@@ -144,7 +144,7 @@ case 0xa0: {
 	}
 	addr = SEGMENT_ADDR(offset);
 	EMU86_READ_USER_MEMORY(addr, 1);
-	value = EMU86_EMULATE_READB(addr);
+	value = EMU86_MEMREADB(addr);
 	EMU86_SETAL(value);
 	goto done;
 }
@@ -166,17 +166,17 @@ case 0xa1: {
 	IF_64BIT(if (IS_64BIT()) {
 		u64 value;
 		EMU86_READ_USER_MEMORY(addr, 8);
-		value = EMU86_EMULATE_READQ(addr);
+		value = EMU86_MEMREADQ(addr);
 		EMU86_SETRAX(value);
 	} else) if (!IS_16BIT()) {
 		u32 value;
 		EMU86_READ_USER_MEMORY(addr, 4);
-		value = EMU86_EMULATE_READL(addr);
+		value = EMU86_MEMREADL(addr);
 		EMU86_SETEAX(value);
 	} else {
 		u16 value;
 		EMU86_READ_USER_MEMORY(addr, 2);
-		value = EMU86_EMULATE_READW(addr);
+		value = EMU86_MEMREADW(addr);
 		EMU86_SETAX(value);
 	}
 	goto done;
@@ -198,7 +198,7 @@ case 0xa2: {
 	addr = SEGMENT_ADDR(offset);
 	EMU86_WRITE_USER_MEMORY(addr, 1);
 	value = EMU86_GETAL();
-	EMU86_EMULATE_WRITEB(addr, value);
+	EMU86_MEMWRITEB(addr, value);
 	goto done;
 }
 
@@ -221,17 +221,17 @@ case 0xa3: {
 		u64 value;
 		EMU86_WRITE_USER_MEMORY(addr, 8);
 		value = EMU86_GETRAX();
-		EMU86_EMULATE_WRITEQ(addr, value);
+		EMU86_MEMWRITEQ(addr, value);
 	} else) if (!IS_16BIT()) {
 		u32 value;
 		EMU86_WRITE_USER_MEMORY(addr, 4);
 		value = EMU86_GETEAX();
-		EMU86_EMULATE_WRITEL(addr, value);
+		EMU86_MEMWRITEL(addr, value);
 	} else {
 		u16 value;
 		EMU86_WRITE_USER_MEMORY(addr, 2);
 		value = EMU86_GETAX();
-		EMU86_EMULATE_WRITEW(addr, value);
+		EMU86_MEMWRITEW(addr, value);
 	}
 	goto done;
 }
@@ -355,19 +355,58 @@ case 0x0fbf: {
 
 
 case 0x63: {
-	/*         63 /r*       MOVSXD r16, r/m16   Move word to word with sign-extension.
-	 *         63 /r*       MOVSXD r32, r/m32   Move doubleword to doubleword with sign-extension.
-	 * REX.W + 63 /r        MOVSXD r64, r/m32   Move doubleword to quadword with sign-extension. */
 	MODRM_DECODE();
-	IF_64BIT(if (IS_64BIT()) {
-		s32 value;
-		value = (s32)MODRM_GETRML();
-		MODRM_SETREGQ((u64)(s64)value);
-	} else) if (!IS_16BIT()) {
-		MODRM_SETREGL(MODRM_GETRML());
-	} else {
-		MODRM_SETREGW(MODRM_GETRMW());
+	IF_16BIT_OR_32BIT(if (EMU86_F_IS64(op_flags))) {
+		/*         63 /r*       MOVSXD r16, r/m16   Move word to word with sign-extension.
+		 *         63 /r*       MOVSXD r32, r/m32   Move doubleword to doubleword with sign-extension.
+		 * REX.W + 63 /r        MOVSXD r64, r/m32   Move doubleword to quadword with sign-extension. */
+		IF_64BIT(if (IS_64BIT()) {
+			s32 value;
+			value = (s32)MODRM_GETRML();
+			MODRM_SETREGQ((u64)(s64)value);
+		} else) if (!IS_16BIT()) {
+			MODRM_SETREGL(MODRM_GETRML());
+		} else {
+			MODRM_SETREGW(MODRM_GETRMW());
+		}
 	}
+#if CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT
+	else {
+		/* 63 /r     ARPL r/m16, r16     Adjust RPL of r/m16 to not less than RPL of r16. */
+		u16 dst, src;
+		u32 eflags_addend;
+		src = MODRM_GETREGW();
+		eflags_addend = 0;
+		NIF_ONLY_MEMORY(
+		if (EMU86_MODRM_ISREG(modrm.mi_type)) {
+			dst = MODRM_GETRMREGW();
+			if ((dst & 3) < (src & 3)) {
+				u16 newval;
+				newval = (dst & ~3) | (src & 3);
+				MODRM_SETRMREGW(newval);
+				eflags_addend = EFLAGS_ZF;
+			}
+		} else) {
+			byte_t *addr;
+			addr = MODRM_MEMADDR();
+			EMU86_WRITE_USER_MEMORY(addr, 2);
+			for (;;) {
+				u16 newval;
+				dst = EMU86_MEMREADW(addr);
+				if ((dst & 3) >= (src & 3))
+					break;
+				newval = (dst & ~3) | (src & 3);
+				if (EMU86_MEM_ATOMIC_CMPXCH_OR_WRITEW(addr, dst, newval,
+				                                      (op_flags & EMU86_F_LOCK) != 0)) {
+					eflags_addend = EFLAGS_ZF;
+					break;
+				}
+				EMU86_EMULATE_LOOPHINT();
+			}
+		}
+		EMU86_MSKFLAGS(~EFLAGS_ZF, eflags_addend);
+	}
+#endif /* CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT */
 	goto done;
 }
 

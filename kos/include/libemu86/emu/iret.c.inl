@@ -63,23 +63,23 @@ case 0xcf: {
 	IF_64BIT(if (IS_64BIT()) {
 		EMU86_EMULATE_POP(sp, 40);
 		EMU86_READ_USER_MEMORY(sp, 40);
-		new_ip     = EMU86_EMULATE_READQ(sp + 0);
-		new_cs     = EMU86_EMULATE_READQASW(sp + 8);
-		new_eflags = EMU86_EMULATE_READQASL(sp + 16);
+		new_ip     = EMU86_MEMREADQ(sp + 0);
+		new_cs     = EMU86_MEMREADQASW(sp + 8);
+		new_eflags = EMU86_MEMREADQASL(sp + 16);
 		sp += 24;
 	} else) if (!IS_16BIT()) {
 		EMU86_EMULATE_POP(sp, 12);
 		EMU86_READ_USER_MEMORY(sp, 12);
-		new_ip     = EMU86_EMULATE_READL(sp + 0);
-		new_cs     = EMU86_EMULATE_READLASW(sp + 4);
-		new_eflags = EMU86_EMULATE_READL(sp + 8);
+		new_ip     = EMU86_MEMREADL(sp + 0);
+		new_cs     = EMU86_MEMREADLASW(sp + 4);
+		new_eflags = EMU86_MEMREADL(sp + 8);
 		sp += 12;
 	} else {
 		EMU86_EMULATE_POP(sp, 6);
 		EMU86_READ_USER_MEMORY(sp, 6);
-		new_ip     = EMU86_EMULATE_READW(sp + 0);
-		new_cs     = EMU86_EMULATE_READW(sp + 2);
-		new_eflags = EMU86_EMULATE_READW(sp + 4);
+		new_ip     = EMU86_MEMREADW(sp + 0);
+		new_cs     = EMU86_MEMREADW(sp + 2);
+		new_eflags = EMU86_MEMREADW(sp + 4);
 		sp += 6;
 	}
 #if CONFIG_LIBEMU86_WANT_32BIT && CONFIG_LIBEMU86_WANT_16BIT
@@ -105,12 +105,12 @@ case 0xcf: {
 		u16 new_ss, new_es, new_ds, new_fs, new_gs;
 		EMU86_EMULATE_POP(sp, 24);
 		EMU86_READ_USER_MEMORY(sp, 24);
-		new_esp = EMU86_EMULATE_READL(sp + 0);
-		new_ss  = EMU86_EMULATE_READLASW(sp + 4);
-		new_es  = EMU86_EMULATE_READLASW(sp + 8);
-		new_ds  = EMU86_EMULATE_READLASW(sp + 12);
-		new_fs  = EMU86_EMULATE_READLASW(sp + 16);
-		new_gs  = EMU86_EMULATE_READLASW(sp + 20);
+		new_esp = EMU86_MEMREADL(sp + 0);
+		new_ss  = EMU86_MEMREADLASW(sp + 4);
+		new_es  = EMU86_MEMREADLASW(sp + 8);
+		new_ds  = EMU86_MEMREADLASW(sp + 12);
+		new_fs  = EMU86_MEMREADLASW(sp + 16);
+		new_gs  = EMU86_MEMREADLASW(sp + 20);
 		COMPILER_READ_BARRIER();
 		EMU86_SETFLAGS(new_eflags);
 		EMU86_SETCS_VM86(new_cs);
@@ -141,18 +141,18 @@ case 0xcf: {
 		IF_64BIT(if (IS_64BIT()) {
 			EMU86_EMULATE_POP(sp, 16);
 			EMU86_READ_USER_MEMORY(sp, 16);
-			new_sp = EMU86_EMULATE_READQ(sp + 0);
-			new_ss = EMU86_EMULATE_READQASW(sp + 8);
+			new_sp = EMU86_MEMREADQ(sp + 0);
+			new_ss = EMU86_MEMREADQASW(sp + 8);
 		} else) if (!IS_16BIT()) {
 			EMU86_EMULATE_POP(sp, 8);
 			EMU86_READ_USER_MEMORY(sp, 8);
-			new_sp = EMU86_EMULATE_READL(sp + 0);
-			new_ss = EMU86_EMULATE_READLASW(sp + 4);
+			new_sp = EMU86_MEMREADL(sp + 0);
+			new_ss = EMU86_MEMREADLASW(sp + 4);
 		} else {
 			EMU86_EMULATE_POP(sp, 4);
 			EMU86_READ_USER_MEMORY(sp, 4);
-			new_sp = EMU86_EMULATE_READW(sp + 0);
-			new_ss = EMU86_EMULATE_READW(sp + 2);
+			new_sp = EMU86_MEMREADW(sp + 0);
+			new_ss = EMU86_MEMREADW(sp + 2);
 		}
 #if EMU86_EMULATE_CHECKUSER && CONFIG_LIBEMU86_WANT_64BIT
 		/* Verify segment registers.

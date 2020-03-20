@@ -37,7 +37,7 @@ EMU86_INTELLISENSE_BEGIN(xadd) {
 		byte_t *addr;                                                                 \
 		addr = MODRM_MEMADDR();                                                       \
 		EMU86_WRITE_USER_MEMORY(addr, Nbytes);                                        \
-		oldval = EMU86_EMULATE_ATOMIC_FETCHADD##BWLQ(addr, rhs,                       \
+		oldval = EMU86_MEM_ATOMIC_FETCHADD##BWLQ(addr, rhs,                       \
 		                                             (op_flags & EMU86_F_LOCK) != 0); \
 	}                                                                                 \
 	if (OVERFLOW_UADD(oldval, rhs, &newval))                                          \

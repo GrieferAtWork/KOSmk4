@@ -42,7 +42,7 @@ EMU86_INTELLISENSE_BEGIN(xchg) {
 		byte_t *addr;                                              \
 		addr = MODRM_MEMADDR();                                    \
 		EMU86_WRITE_USER_MEMORY(addr, Nbytes);                     \
-		oldval = EMU86_EMULATE_ATOMIC_XCH##BWLQ(addr, reg_operand, \
+		oldval = EMU86_MEM_ATOMIC_XCH##BWLQ(addr, reg_operand, \
 		                                        XCHG_IS_ATOMIC()); \
 	}                                                              \
 	MODRM_SETREG##BWLQ(oldval);

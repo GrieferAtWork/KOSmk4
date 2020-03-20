@@ -42,7 +42,7 @@ case 0xfe:
 	} else) {                                                                         \
 		byte_t *addr = MODRM_MEMADDR();                                               \
 		EMU86_WRITE_USER_MEMORY(addr, Nbytes);                                        \
-		oldval = EMU86_EMULATE_ATOMIC_FETCHADD##BWLQ(addr, 1,                         \
+		oldval = EMU86_MEM_ATOMIC_FETCHADD##BWLQ(addr, 1,                         \
 		                                             (op_flags & EMU86_F_LOCK) != 0); \
 	}                                                                                 \
 	if (OVERFLOW_UADD(oldval, 1, &newval))                                            \
@@ -64,7 +64,7 @@ case 0xfe:
 	} else) {                                                                         \
 		byte_t *addr = MODRM_MEMADDR();                                               \
 		EMU86_WRITE_USER_MEMORY(addr, Nbytes);                                        \
-		oldval = EMU86_EMULATE_ATOMIC_FETCHSUB##BWLQ(addr, 1,                         \
+		oldval = EMU86_MEM_ATOMIC_FETCHSUB##BWLQ(addr, 1,                         \
 		                                             (op_flags & EMU86_F_LOCK) != 0); \
 	}                                                                                 \
 	if (OVERFLOW_USUB(oldval, 1, &newval))                                            \
@@ -153,18 +153,18 @@ case 0xff:
 		addr = MODRM_MEMADDR();
 		IF_64BIT(if (IS_64BIT()) {
 			EMU86_READ_USER_MEMORY(addr, 10);
-			offset = EMU86_EMULATE_READQ(addr);
+			offset = EMU86_MEMREADQ(addr);
 			pc += 8;
 		} else) if (!IS_16BIT()) {
 			EMU86_READ_USER_MEMORY(addr, 6);
-			offset = EMU86_EMULATE_READL(addr);
+			offset = EMU86_MEMREADL(addr);
 			pc += 4;
 		} else {
 			EMU86_READ_USER_MEMORY(addr, 4);
-			offset = EMU86_EMULATE_READW(addr);
+			offset = EMU86_MEMREADW(addr);
 			pc += 2;
 		}
-		segment = EMU86_EMULATE_READW(addr);
+		segment = EMU86_MEMREADW(addr);
 		/* Verify the segment index. */
 #if EMU86_EMULATE_CHECKUSER
 		if (!SEGMENT_IS_VALID_USERCODE(segment) && EMU86_ISUSER_NOVM86()) {
@@ -178,20 +178,20 @@ case 0xff:
 			sp -= 16;
 			EMU86_EMULATE_PUSH(sp, 16);
 			EMU86_WRITE_USER_MEMORY(sp, 16);
-			EMU86_EMULATE_WRITEQ(sp + 8, (u64)EMU86_GETCS());
-			EMU86_EMULATE_WRITEQ(sp + 0, (u64)REAL_IP());
+			EMU86_MEMWRITEQ(sp + 8, (u64)EMU86_GETCS());
+			EMU86_MEMWRITEQ(sp + 0, (u64)REAL_IP());
 		} else) if (!IS_16BIT()) {
 			sp -= 8;
 			EMU86_EMULATE_PUSH(sp, 8);
 			EMU86_WRITE_USER_MEMORY(sp, 8);
-			EMU86_EMULATE_WRITEL(sp + 4, (u32)EMU86_GETCS());
-			EMU86_EMULATE_WRITEL(sp + 0, (u32)REAL_IP());
+			EMU86_MEMWRITEL(sp + 4, (u32)EMU86_GETCS());
+			EMU86_MEMWRITEL(sp + 0, (u32)REAL_IP());
 		} else {
 			sp -= 4;
 			EMU86_EMULATE_PUSH(sp, 4);
 			EMU86_WRITE_USER_MEMORY(sp, 4);
-			EMU86_EMULATE_WRITEW(sp + 2, (u16)EMU86_GETCS());
-			EMU86_EMULATE_WRITEW(sp + 0, (u16)REAL_IP());
+			EMU86_MEMWRITEW(sp + 2, (u16)EMU86_GETCS());
+			EMU86_MEMWRITEW(sp + 0, (u16)REAL_IP());
 		}
 		EMU86_SETSTACKPTR(sp);
 		EMU86_SETCS(segment);
@@ -235,18 +235,18 @@ case 0xff:
 		addr = MODRM_MEMADDR();
 		IF_64BIT(if (IS_64BIT()) {
 			EMU86_READ_USER_MEMORY(addr, 10);
-			offset = EMU86_EMULATE_READQ(addr);
+			offset = EMU86_MEMREADQ(addr);
 			pc += 8;
 		} else) if (!IS_16BIT()) {
 			EMU86_READ_USER_MEMORY(addr, 6);
-			offset = EMU86_EMULATE_READL(addr);
+			offset = EMU86_MEMREADL(addr);
 			pc += 4;
 		} else {
 			EMU86_READ_USER_MEMORY(addr, 4);
-			offset = EMU86_EMULATE_READW(addr);
+			offset = EMU86_MEMREADW(addr);
 			pc += 2;
 		}
-		segment = EMU86_EMULATE_READW(addr);
+		segment = EMU86_MEMREADW(addr);
 		/* Verify the segment index. */
 #if EMU86_EMULATE_CHECKUSER
 		if (!SEGMENT_IS_VALID_USERCODE(segment) && EMU86_ISUSER_NOVM86()) {

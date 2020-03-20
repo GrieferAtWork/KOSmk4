@@ -40,7 +40,7 @@ EMU86_INTELLISENSE_BEGIN(cmpxchg) {
 	} else) {                                                                            \
 		byte_t *addr = MODRM_MEMADDR();                                                  \
 		EMU86_WRITE_USER_MEMORY(addr, Nbytes);                                           \
-		real_oldval = EMU86_EMULATE_ATOMIC_CMPXCH##BWLQ(addr, want_oldval, newval,       \
+		real_oldval = EMU86_MEM_ATOMIC_CMPXCH##BWLQ(addr, want_oldval, newval,       \
 		                                                (op_flags & EMU86_F_LOCK) != 0); \
 	}                                                                                    \
 	EMU86_MSKFLAGS(~EMU86_GETEFLAGS_CMP_MASK,                                            \

@@ -21,51 +21,26 @@
 #include "../emulate.c.inl"
 #endif /* __INTELLISENSE__ */
 
-EMU86_INTELLISENSE_BEGIN(bound) {
+EMU86_INTELLISENSE_BEGIN(stdf) {
 
-#if CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT
-case 0x62: {
-	s32 bound_idx, bound_min, bound_max;
-	byte_t *addr;
-	/* 62 /r      BOUND r16, m16&16      Check if r16 (array index) is within bounds specified by m16&16 */
-	/* 62 /r      BOUND r32, m32&32      Check if r32 (array index) is within bounds specified by m32&32 */
-	IF_64BIT({
-		if (EMU86_F_IS64(op_flags))
-			goto return_unknown_instruction;
-	});
-	MODRM_DECODE_MEMONLY();
-	addr = MODRM_MEMADDR();
-	if (IS_16BIT()) {
-		union {
-			s16 words[2];
-			u32 dword;
-		} temp;
-		EMU86_READ_USER_MEMORY(addr, 4);
-		temp.dword = EMU86_MEMREADL(addr);
-		bound_min  = temp.words[0];
-		bound_max  = temp.words[1];
-		bound_idx  = (s32)(s16)MODRM_GETREGW();
-	} else {
-		union {
-			s32 dwords[2];
-			u64 qword;
-		} temp;
-		EMU86_READ_USER_MEMORY(addr, 8);
-#if CONFIG_LIBEMU86_WANT_64BIT
-		temp.qword = EMU86_MEMREADQ(addr);
-#else /* CONFIG_LIBEMU86_WANT_64BIT */
-		temp.dwords[0] = EMU86_MEMREADL(addr);
-		temp.dwords[1] = EMU86_MEMREADL(addr + 4);
-#endif /* !CONFIG_LIBEMU86_WANT_64BIT */
-		bound_min = temp.dwords[0];
-		bound_max = temp.dwords[1];
-		bound_idx = (s32)MODRM_GETREGL();
-	}
-	if (!(bound_idx >= bound_min && bound_idx <= bound_max))
-		EMU86_EMULATE_THROW_BOUNDERR(bound_idx, bound_min, bound_max);
+#ifndef EMU86_EMULATE_ONLY_MEMORY
+
+	/* Instructions that modify the EFLAGS.DF (direction) bit. */
+
+case 0xfc: {
+	/* FC     CLD     Clear DF flag. */
+	EMU86_MSKFLAGS(~EFLAGS_DF, 0);
 	goto done;
 }
-#endif /* CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT */
+
+
+case 0xfd: {
+	/* FD     STD     Set DF flag. */
+	EMU86_MSKFLAGS(~EFLAGS_DF, EFLAGS_DF);
+	goto done;
+}
+
+#endif /* !EMU86_EMULATE_ONLY_MEMORY */
 
 }
 EMU86_INTELLISENSE_END

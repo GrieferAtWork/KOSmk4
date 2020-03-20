@@ -41,12 +41,12 @@
 			sp -= 2;                             \
 			EMU86_EMULATE_PUSH(sp, 2);           \
 			EMU86_WRITE_USER_MEMORY(sp, 2);      \
-			EMU86_EMULATE_WRITEW(sp, _value);    \
+			EMU86_MEMWRITEW(sp, _value);    \
 		} else {                                 \
 			sp -= 4;                             \
 			EMU86_EMULATE_PUSH(sp, 4);           \
 			EMU86_WRITE_USER_MEMORY(sp, 4);      \
-			EMU86_EMULATE_WRITEL(sp, _value);    \
+			EMU86_MEMWRITEL(sp, _value);    \
 		}                                        \
 		EMU86_SETSTACKPTR(sp);                   \
 	} __WHILE0
@@ -67,12 +67,12 @@
 		if (IS_16BIT()) {                        \
 			EMU86_EMULATE_POP(sp, 2);            \
 			EMU86_READ_USER_MEMORY(sp, 2);       \
-			_value = (T)EMU86_EMULATE_READW(sp); \
+			_value = (T)EMU86_MEMREADW(sp);      \
 			sp += 2;                             \
 		} else {                                 \
 			EMU86_EMULATE_POP(sp, 4);            \
 			EMU86_READ_USER_MEMORY(sp, 4);       \
-			_value = (T)EMU86_EMULATE_READL(sp); \
+			_value = (T)EMU86_MEMREADL(sp);      \
 			sp += 4;                             \
 		}                                        \
 		setter(_value);                          \
@@ -91,19 +91,19 @@
 			sp -= 2;                                                   \
 			EMU86_EMULATE_PUSH(sp, 2);                                 \
 			EMU86_WRITE_USER_MEMORY(sp, 2);                            \
-			EMU86_EMULATE_WRITEW(sp, value16);                         \
+			EMU86_MEMWRITEW(sp, value16);                         \
 		}                                                              \
 		IF_64BIT(else IF_16BIT_OR_32BIT(if (EMU86_F_IS64(op_flags))) { \
 			sp -= 8;                                                   \
 			EMU86_EMULATE_PUSH(sp, 8);                                 \
 			EMU86_WRITE_USER_MEMORY(sp, 8);                            \
-			EMU86_EMULATE_WRITEQ(sp, value64);                         \
+			EMU86_MEMWRITEQ(sp, value64);                         \
 		})                                                             \
 		IF_16BIT_OR_32BIT(else {                                       \
 			sp -= 4;                                                   \
 			EMU86_EMULATE_PUSH(sp, 4);                                 \
 			EMU86_WRITE_USER_MEMORY(sp, 4);                            \
-			EMU86_EMULATE_WRITEL(sp, value32);                         \
+			EMU86_MEMWRITEL(sp, value32);                         \
 		})                                                             \
 		EMU86_SETSTACKPTR(sp);                                         \
 	} __WHILE0
@@ -123,7 +123,7 @@
 			u16 _value;                                                \
 			EMU86_EMULATE_POP(sp, 2);                                  \
 			EMU86_READ_USER_MEMORY(sp, 2);                             \
-			_value = EMU86_EMULATE_READW(sp);                          \
+			_value = EMU86_MEMREADW(sp);                               \
 			setter16(_value);                                          \
 			sp += 2;                                                   \
 		}                                                              \
@@ -131,7 +131,7 @@
 			u64 _value;                                                \
 			EMU86_EMULATE_POP(sp, 8);                                  \
 			EMU86_READ_USER_MEMORY(sp, 8);                             \
-			_value = EMU86_EMULATE_READQ(sp);                          \
+			_value = EMU86_MEMREADQ(sp);                               \
 			setter64(_value);                                          \
 			sp += 8;                                                   \
 		})                                                             \
@@ -139,7 +139,7 @@
 			u32 _value;                                                \
 			EMU86_EMULATE_POP(sp, 4);                                  \
 			EMU86_READ_USER_MEMORY(sp, 4);                             \
-			_value = EMU86_EMULATE_READL(sp);                          \
+			_value = EMU86_MEMREADL(sp);                               \
 			setter32(_value);                                          \
 			sp += 4;                                                   \
 		})

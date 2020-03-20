@@ -35,7 +35,7 @@ EMU86_INTELLISENSE_BEGIN(arith) {
 	if (EMU86_MODRM_ISMEM(modrm.mi_type)) {                                                          \
 		byte_t *_addr = MODRM_MEMADDR();                                                             \
 		EMU86_WRITE_USER_MEMORY(_addr, Nbytes);                                                      \
-		oldval = EMU86_EMULATE_ATOMIC_FETCH##NAME##BWLQ(_addr, rhs, (op_flags & EMU86_F_LOCK) != 0); \
+		oldval = EMU86_MEM_ATOMIC_FETCH##NAME##BWLQ(_addr, rhs, (op_flags & EMU86_F_LOCK) != 0); \
 	} else {                                                                                         \
 		oldval = MODRM_GETRMREG##BWLQ();                                                             \
 		MODRM_SETRMREG##BWLQ(oldval operator rhs);                                                   \
@@ -50,143 +50,143 @@ EMU86_INTELLISENSE_BEGIN(arith) {
 	 *    32-bit  l      L      4        32
 	 *    64-bit  q      Q      8        64
 	 */
-#define DO_ARITH_SWITCH_rmdst_mi_reg(bwlq, BWLQ, Nbytes, Nbits, rhs)                   \
-	switch (modrm.mi_reg) {                                                            \
-		u##Nbits oldval, newval;                                                       \
-		u32 eflags_addend;                                                             \
-	case 0:                                                                            \
-do_add##Nbits:                                                                         \
-		DO_ARITHn(ADD, +, BWLQ, Nbytes, oldval, rhs);                                  \
-		eflags_addend = 0;                                                             \
-		if (OVERFLOW_UADD(oldval, rhs, &newval))                                       \
-			eflags_addend |= EFLAGS_OF | EFLAGS_CF;                                    \
-set_test##Nbits##_after_add:                                                           \
-		if (((oldval & 0xf) + (rhs & 0xf)) >= 0x10)                                    \
-			eflags_addend |= EFLAGS_AF;                                                \
-		if ((s##Nbits)newval < 0)                                                      \
-			eflags_addend |= EFLAGS_SF;                                                \
-		EMU86_MSKFLAGS(~(EFLAGS_OF | EFLAGS_CF | EFLAGS_SF |                           \
-		                 EFLAGS_ZF | EFLAGS_PF | EFLAGS_AF),                           \
-		               eflags_addend | emu86_geteflags_test##bwlq(newval));            \
-		break;                                                                         \
-		                                                                               \
-	case 1:                                                                            \
-do_or##Nbits:                                                                          \
-		DO_ARITHn(OR, |, BWLQ, Nbytes, oldval, rhs);                                   \
-		oldval |= rhs;                                                                 \
-		goto set_test##Nbits;                                                          \
-		                                                                               \
-	case 2:                                                                            \
-do_adc##Nbits:                                                                         \
-		if (!(EMU86_GETFLAGS() & EFLAGS_CF))                                           \
-			goto do_add##Nbits;                                                        \
-		NIF_ONLY_MEMORY(                                                               \
-		if (EMU86_MODRM_ISREG(modrm.mi_type)) {                                        \
-			if unlikely(op_flags & EMU86_F_LOCK)                                       \
-				goto return_unknown_instruction;                                       \
-			oldval = MODRM_GETRMREG##BWLQ();                                           \
-			eflags_addend = 0;                                                         \
-			if (OVERFLOW_UADD(oldval, rhs, &newval))                                   \
-				eflags_addend |= EFLAGS_OF | EFLAGS_CF;                                \
-			if (OVERFLOW_UADD(newval, 1, &newval))                                     \
-				eflags_addend |= EFLAGS_OF | EFLAGS_CF;                                \
-			MODRM_SETRMREG##BWLQ(newval);                                              \
-		} else) {                                                                      \
-			byte_t *addr = MODRM_MEMADDR();                                            \
-			EMU86_WRITE_USER_MEMORY(addr, Nbytes);                                     \
-			for (;;) {                                                                 \
-				oldval = EMU86_EMULATE_READ##BWLQ(addr);                               \
-				eflags_addend = 0;                                                     \
-				if (OVERFLOW_UADD(oldval, rhs, &newval))                               \
-					eflags_addend |= EFLAGS_OF | EFLAGS_CF;                            \
-				if (OVERFLOW_UADD(newval, 1, &newval))                                 \
-					eflags_addend |= EFLAGS_OF | EFLAGS_CF;                            \
-				if (EMU86_EMULATE_ATOMIC_CMPXCH##BWLQ(addr, oldval, newval,            \
-				                                      (op_flags & EMU86_F_LOCK) != 0)) \
-					break;                                                             \
-				EMU86_EMULATE_LOOPHINT();                                              \
-			}                                                                          \
-		}                                                                              \
-		goto set_test##Nbits##_after_add;                                              \
-		                                                                               \
-	case 3:                                                                            \
-do_sbb##Nbits:                                                                         \
-		if (!(EMU86_GETFLAGS() & EFLAGS_CF))                                           \
-			goto do_sub##Nbits;                                                        \
-		NIF_ONLY_MEMORY(                                                               \
-		if (EMU86_MODRM_ISREG(modrm.mi_type)) {                                        \
-			if unlikely(op_flags & EMU86_F_LOCK)                                       \
-				goto return_unknown_instruction;                                       \
-			oldval = MODRM_GETRMREG##BWLQ();                                           \
-			eflags_addend = 0;                                                         \
-			if (OVERFLOW_USUB(oldval, rhs, &newval))                                   \
-				eflags_addend |= EFLAGS_OF | EFLAGS_CF;                                \
-			if (OVERFLOW_USUB(newval, 1, &newval))                                     \
-				eflags_addend |= EFLAGS_OF | EFLAGS_CF;                                \
-			MODRM_SETRMREG##BWLQ(newval);                                              \
-		} else) {                                                                      \
-			byte_t *addr = MODRM_MEMADDR();                                            \
-			EMU86_WRITE_USER_MEMORY(addr, Nbytes);                                     \
-			for (;;) {                                                                 \
-				oldval = EMU86_EMULATE_READ##BWLQ(addr);                               \
-				eflags_addend = 0;                                                     \
-				if (OVERFLOW_USUB(oldval, rhs, &newval))                               \
-					eflags_addend |= EFLAGS_OF | EFLAGS_CF;                            \
-				if (OVERFLOW_USUB(newval, 1, &newval))                                 \
-					eflags_addend |= EFLAGS_OF | EFLAGS_CF;                            \
-				if (EMU86_EMULATE_ATOMIC_CMPXCH##BWLQ(addr, oldval, newval,            \
-				                                      (op_flags & EMU86_F_LOCK) != 0)) \
-					break;                                                             \
-				EMU86_EMULATE_LOOPHINT();                                              \
-			}                                                                          \
-		}                                                                              \
-		goto set_test##Nbits##_after_sub;                                              \
-		                                                                               \
-	case 4:                                                                            \
-do_and##Nbits:                                                                         \
-		DO_ARITHn(AND, &, BWLQ, Nbytes, oldval, rhs);                                  \
-		oldval &= rhs;                                                                 \
-		goto set_test##Nbits;                                                          \
-		                                                                               \
-	case 5:                                                                            \
-do_sub##Nbits:                                                                         \
-		DO_ARITHn(SUB, -, BWLQ, Nbytes, oldval, rhs);                                  \
-set_test##Nbits##_before_sub:                                                          \
-		eflags_addend = 0;                                                             \
-		if (OVERFLOW_USUB(oldval, rhs, &newval))                                       \
-			eflags_addend |= EFLAGS_OF | EFLAGS_CF;                                    \
-set_test##Nbits##_after_sub:                                                           \
-		if (((oldval & 0xf) + ((0 - (rhs)) & 0xf)) >= 0x10)                            \
-			eflags_addend |= EFLAGS_AF;                                                \
-		if ((s##Nbits)newval < 0)                                                      \
-			eflags_addend |= EFLAGS_SF;                                                \
-		EMU86_MSKFLAGS(~(EFLAGS_OF | EFLAGS_CF | EFLAGS_SF |                           \
-		                 EFLAGS_ZF | EFLAGS_PF | EFLAGS_AF),                           \
-		               eflags_addend | emu86_geteflags_test##bwlq(newval));            \
-		break;                                                                         \
-		                                                                               \
-	case 6:                                                                            \
-do_xor##Nbits:                                                                         \
-		DO_ARITHn(XOR, ^, BWLQ, Nbytes, oldval, rhs);                                  \
-		oldval ^= rhs;                                                                 \
-set_test##Nbits:                                                                       \
-		EMU86_MSKFLAGS(~(EFLAGS_OF | EFLAGS_CF | EFLAGS_SF | EFLAGS_ZF | EFLAGS_PF),   \
-		               emu86_geteflags_test##bwlq(oldval));                            \
-		break;                                                                         \
-		                                                                               \
-	case 7:                                                                            \
-do_cmp##Nbits:                                                                         \
-		if unlikely(op_flags & EMU86_F_LOCK)                                           \
-			goto return_unknown_instruction;                                           \
-		/* Always support REGISTER-R/M here! (needed for register write-back) */       \
-		IF_ONLY_MEMORY(                                                                \
-		oldval = unlikely(EMU86_MODRM_ISREG(modrm.mi_type))                            \
-		       ? MODRM_GETRMREG##BWLQ()                                                \
-		       : MODRM_GETRM##BWLQ();)                                                 \
-		NIF_ONLY_MEMORY(oldval = MODRM_GETRM##BWLQ();)                                 \
-		goto set_test##Nbits##_before_sub;                                             \
-		                                                                               \
-	default: goto return_unknown_instruction;                                          \
+#define DO_ARITH_SWITCH_rmdst_mi_reg(bwlq, BWLQ, Nbytes, Nbits, rhs)                 \
+	switch (modrm.mi_reg) {                                                          \
+		u##Nbits oldval, newval;                                                     \
+		u32 eflags_addend;                                                           \
+	case 0:                                                                          \
+do_add##Nbits:                                                                       \
+		DO_ARITHn(ADD, +, BWLQ, Nbytes, oldval, rhs);                                \
+		eflags_addend = 0;                                                           \
+		if (OVERFLOW_UADD(oldval, rhs, &newval))                                     \
+			eflags_addend |= EFLAGS_OF | EFLAGS_CF;                                  \
+set_test##Nbits##_after_add:                                                         \
+		if (((oldval & 0xf) + (rhs & 0xf)) >= 0x10)                                  \
+			eflags_addend |= EFLAGS_AF;                                              \
+		if ((s##Nbits)newval < 0)                                                    \
+			eflags_addend |= EFLAGS_SF;                                              \
+		EMU86_MSKFLAGS(~(EFLAGS_OF | EFLAGS_CF | EFLAGS_SF |                         \
+		                 EFLAGS_ZF | EFLAGS_PF | EFLAGS_AF),                         \
+		               eflags_addend | emu86_geteflags_test##bwlq(newval));          \
+		break;                                                                       \
+		                                                                             \
+	case 1:                                                                          \
+do_or##Nbits:                                                                        \
+		DO_ARITHn(OR, |, BWLQ, Nbytes, oldval, rhs);                                 \
+		oldval |= rhs;                                                               \
+		goto set_test##Nbits;                                                        \
+		                                                                             \
+	case 2:                                                                          \
+do_adc##Nbits:                                                                       \
+		if (!(EMU86_GETFLAGS() & EFLAGS_CF))                                         \
+			goto do_add##Nbits;                                                      \
+		NIF_ONLY_MEMORY(                                                             \
+		if (EMU86_MODRM_ISREG(modrm.mi_type)) {                                      \
+			if unlikely(op_flags & EMU86_F_LOCK)                                     \
+				goto return_unknown_instruction;                                     \
+			oldval = MODRM_GETRMREG##BWLQ();                                         \
+			eflags_addend = 0;                                                       \
+			if (OVERFLOW_UADD(oldval, rhs, &newval))                                 \
+				eflags_addend |= EFLAGS_OF | EFLAGS_CF;                              \
+			if (OVERFLOW_UADD(newval, 1, &newval))                                   \
+				eflags_addend |= EFLAGS_OF | EFLAGS_CF;                              \
+			MODRM_SETRMREG##BWLQ(newval);                                            \
+		} else) {                                                                    \
+			byte_t *addr = MODRM_MEMADDR();                                          \
+			EMU86_WRITE_USER_MEMORY(addr, Nbytes);                                   \
+			for (;;) {                                                               \
+				oldval = EMU86_MEMREAD##BWLQ(addr);                                  \
+				eflags_addend = 0;                                                   \
+				if (OVERFLOW_UADD(oldval, rhs, &newval))                             \
+					eflags_addend |= EFLAGS_OF | EFLAGS_CF;                          \
+				if (OVERFLOW_UADD(newval, 1, &newval))                               \
+					eflags_addend |= EFLAGS_OF | EFLAGS_CF;                          \
+				if (EMU86_MEM_ATOMIC_CMPXCH##BWLQ(addr, oldval, newval,              \
+				                                  (op_flags & EMU86_F_LOCK) != 0))   \
+					break;                                                           \
+				EMU86_EMULATE_LOOPHINT();                                            \
+			}                                                                        \
+		}                                                                            \
+		goto set_test##Nbits##_after_add;                                            \
+		                                                                             \
+	case 3:                                                                          \
+do_sbb##Nbits:                                                                       \
+		if (!(EMU86_GETFLAGS() & EFLAGS_CF))                                         \
+			goto do_sub##Nbits;                                                      \
+		NIF_ONLY_MEMORY(                                                             \
+		if (EMU86_MODRM_ISREG(modrm.mi_type)) {                                      \
+			if unlikely(op_flags & EMU86_F_LOCK)                                     \
+				goto return_unknown_instruction;                                     \
+			oldval = MODRM_GETRMREG##BWLQ();                                         \
+			eflags_addend = 0;                                                       \
+			if (OVERFLOW_USUB(oldval, rhs, &newval))                                 \
+				eflags_addend |= EFLAGS_OF | EFLAGS_CF;                              \
+			if (OVERFLOW_USUB(newval, 1, &newval))                                   \
+				eflags_addend |= EFLAGS_OF | EFLAGS_CF;                              \
+			MODRM_SETRMREG##BWLQ(newval);                                            \
+		} else) {                                                                    \
+			byte_t *addr = MODRM_MEMADDR();                                          \
+			EMU86_WRITE_USER_MEMORY(addr, Nbytes);                                   \
+			for (;;) {                                                               \
+				oldval = EMU86_MEMREAD##BWLQ(addr);                                  \
+				eflags_addend = 0;                                                   \
+				if (OVERFLOW_USUB(oldval, rhs, &newval))                             \
+					eflags_addend |= EFLAGS_OF | EFLAGS_CF;                          \
+				if (OVERFLOW_USUB(newval, 1, &newval))                               \
+					eflags_addend |= EFLAGS_OF | EFLAGS_CF;                          \
+				if (EMU86_MEM_ATOMIC_CMPXCH##BWLQ(addr, oldval, newval,              \
+				                                  (op_flags & EMU86_F_LOCK) != 0))   \
+					break;                                                           \
+				EMU86_EMULATE_LOOPHINT();                                            \
+			}                                                                        \
+		}                                                                            \
+		goto set_test##Nbits##_after_sub;                                            \
+		                                                                             \
+	case 4:                                                                          \
+do_and##Nbits:                                                                       \
+		DO_ARITHn(AND, &, BWLQ, Nbytes, oldval, rhs);                                \
+		oldval &= rhs;                                                               \
+		goto set_test##Nbits;                                                        \
+		                                                                             \
+	case 5:                                                                          \
+do_sub##Nbits:                                                                       \
+		DO_ARITHn(SUB, -, BWLQ, Nbytes, oldval, rhs);                                \
+set_test##Nbits##_before_sub:                                                        \
+		eflags_addend = 0;                                                           \
+		if (OVERFLOW_USUB(oldval, rhs, &newval))                                     \
+			eflags_addend |= EFLAGS_OF | EFLAGS_CF;                                  \
+set_test##Nbits##_after_sub:                                                         \
+		if (((oldval & 0xf) + ((0 - (rhs)) & 0xf)) >= 0x10)                          \
+			eflags_addend |= EFLAGS_AF;                                              \
+		if ((s##Nbits)newval < 0)                                                    \
+			eflags_addend |= EFLAGS_SF;                                              \
+		EMU86_MSKFLAGS(~(EFLAGS_OF | EFLAGS_CF | EFLAGS_SF |                         \
+		                 EFLAGS_ZF | EFLAGS_PF | EFLAGS_AF),                         \
+		               eflags_addend | emu86_geteflags_test##bwlq(newval));          \
+		break;                                                                       \
+		                                                                             \
+	case 6:                                                                          \
+do_xor##Nbits:                                                                       \
+		DO_ARITHn(XOR, ^, BWLQ, Nbytes, oldval, rhs);                                \
+		oldval ^= rhs;                                                               \
+set_test##Nbits:                                                                     \
+		EMU86_MSKFLAGS(~(EFLAGS_OF | EFLAGS_CF | EFLAGS_SF | EFLAGS_ZF | EFLAGS_PF), \
+		               emu86_geteflags_test##bwlq(oldval));                          \
+		break;                                                                       \
+		                                                                             \
+	case 7:                                                                          \
+do_cmp##Nbits:                                                                       \
+		if unlikely(op_flags & EMU86_F_LOCK)                                         \
+			goto return_unknown_instruction;                                         \
+		/* Always support REGISTER-R/M here! (needed for register write-back) */     \
+		IF_ONLY_MEMORY(                                                              \
+		oldval = unlikely(EMU86_MODRM_ISREG(modrm.mi_type))                          \
+		       ? MODRM_GETRMREG##BWLQ()                                              \
+		       : MODRM_GETRM##BWLQ();)                                               \
+		NIF_ONLY_MEMORY(oldval = MODRM_GETRM##BWLQ();)                               \
+		goto set_test##Nbits##_before_sub;                                           \
+		                                                                             \
+	default: goto return_unknown_instruction;                                        \
 	}
 
 

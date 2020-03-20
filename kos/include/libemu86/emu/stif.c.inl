@@ -21,10 +21,13 @@
 #include "../emulate.c.inl"
 #endif /* __INTELLISENSE__ */
 
-EMU86_INTELLISENSE_BEGIN(clisti) {
-
+EMU86_INTELLISENSE_BEGIN(stif) {
 
 #ifndef EMU86_EMULATE_ONLY_MEMORY
+
+	/* Instructions that modify the EFLAGS.IF (interrupt) bit. */
+
+
 case 0xfa: {
 	/* FA     CLI     Clear interrupt flag; interrupts disabled when interrupt flag cleared. */
 #if EMU86_EMULATE_VM86

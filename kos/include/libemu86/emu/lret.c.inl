@@ -36,20 +36,20 @@ case 0xcb: {
 	IF_64BIT(if (IS_64BIT()) {
 		EMU86_EMULATE_POP(sp, 16);
 		EMU86_READ_USER_MEMORY(sp, 16);
-		ip = EMU86_EMULATE_READQ(sp + 0);
-		cs = EMU86_EMULATE_READQASW(sp + 8);
+		ip = EMU86_MEMREADQ(sp + 0);
+		cs = EMU86_MEMREADQASW(sp + 8);
 		sp += 16;
 	} else) if (!IS_16BIT()) {
 		EMU86_EMULATE_POP(sp, 8);
 		EMU86_READ_USER_MEMORY(sp, 8);
-		ip = EMU86_EMULATE_READL(sp + 0);
-		cs = EMU86_EMULATE_READLASW(sp + 4);
+		ip = EMU86_MEMREADL(sp + 0);
+		cs = EMU86_MEMREADLASW(sp + 4);
 		sp += 8;
 	} else {
 		EMU86_EMULATE_POP(sp, 4);
 		EMU86_READ_USER_MEMORY(sp, 4);
-		cs = EMU86_EMULATE_READW(sp + 0);
-		ip = EMU86_EMULATE_READW(sp + 2);
+		cs = EMU86_MEMREADW(sp + 0);
+		ip = EMU86_MEMREADW(sp + 2);
 		sp += 4;
 	}
 #if EMU86_EMULATE_CHECKUSER
@@ -79,20 +79,20 @@ case 0xca: {
 	IF_64BIT(if (IS_64BIT()) {
 		EMU86_EMULATE_POP(sp, 16);
 		EMU86_READ_USER_MEMORY(sp, 16);
-		ip = EMU86_EMULATE_READQ(sp + 0);
-		cs = EMU86_EMULATE_READQASW(sp + 8);
+		ip = EMU86_MEMREADQ(sp + 0);
+		cs = EMU86_MEMREADQASW(sp + 8);
 		sp += 16;
 	} else) if (!IS_16BIT()) {
 		EMU86_EMULATE_POP(sp, 8);
 		EMU86_READ_USER_MEMORY(sp, 8);
-		ip = EMU86_EMULATE_READL(sp + 0);
-		cs = EMU86_EMULATE_READLASW(sp + 4);
+		ip = EMU86_MEMREADL(sp + 0);
+		cs = EMU86_MEMREADLASW(sp + 4);
 		sp += 8;
 	} else {
 		EMU86_EMULATE_POP(sp, 4);
 		EMU86_READ_USER_MEMORY(sp, 4);
-		cs = EMU86_EMULATE_READW(sp + 0);
-		ip = EMU86_EMULATE_READW(sp + 2);
+		cs = EMU86_MEMREADW(sp + 0);
+		ip = EMU86_MEMREADW(sp + 2);
 		sp += 4;
 	}
 #if EMU86_EMULATE_CHECKUSER
