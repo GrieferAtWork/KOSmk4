@@ -1772,6 +1772,27 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 
 
 
+/* EMU86_ADDRSIZE_SWITCH(do64, do32, do16)
+ * >> if (<running-as-64-bit-code>) {
+ * >>     if (<67-prefix-byte-given>) {
+ * >>         do32
+ * >>     } else {
+ * >>         do64
+ * >>     }
+ * >> } else if (<running-as-32-bit-code>) {
+ * >>     if (<67-prefix-byte-given>) {
+ * >>         do16
+ * >>     } else {
+ * >>         do32
+ * >>     }
+ * >> } else {
+ * >>     if (<67-prefix-byte-given>) {
+ * >>         do32
+ * >>     } else {
+ * >>         do16
+ * >>     }
+ * >> }
+ */
 #if CONFIG_LIBEMU86_WANT_64BIT && (CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT)
 #define EMU86_ADDRSIZE_SWITCH(do64, do32, do16)                                                  \
 	if (EMU86_F_IS64(op_flags) && !(op_flags & EMU86_F_67)) {                                    \
@@ -1801,6 +1822,55 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 	} else {                                                  \
 		/* 32-bit address size */                             \
 		do32;                                                 \
+	}
+#else
+#error "Invalid configuration"
+#endif
+
+
+/* EMU86_ADDRSIZE_SWITCH64(do64, do32, do16)
+ * >> if (<running-as-64-bit-code>) {
+ * >>     do64
+ * >> } else if (<running-as-32-bit-code>) {
+ * >>     if (<67-prefix-byte-given>) {
+ * >>         do16
+ * >>     } else {
+ * >>         do32
+ * >>     }
+ * >> } else {
+ * >>     if (<67-prefix-byte-given>) {
+ * >>         do32
+ * >>     } else {
+ * >>         do16
+ * >>     }
+ * >> }
+ */
+#if CONFIG_LIBEMU86_WANT_64BIT && (CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT)
+#define EMU86_ADDRSIZE_SWITCH64(do64, do32, do16)                        \
+	if (EMU86_F_IS64(op_flags)) {                                      \
+		/* 64-bit address size */                                      \
+		do64;                                                          \
+	} else if (!!EMU86_F_IS16(op_flags) ^ !!(op_flags & EMU86_F_67)) { \
+		/* 32-bit address size */                                      \
+		do32;                                                          \
+	} else {                                                           \
+		/* 16-bit address size */                                      \
+		do16;                                                          \
+	}
+#elif !CONFIG_LIBEMU86_WANT_64BIT
+#define EMU86_ADDRSIZE_SWITCH64(do64, do32, do16)               \
+	if (!!EMU86_F_IS16(op_flags) ^ !!(op_flags & EMU86_F_67)) { \
+		/* 32-bit address size */                               \
+		do32;                                                   \
+	} else {                                                    \
+		/* 16-bit address size */                               \
+		do16;                                                   \
+	}
+#elif CONFIG_LIBEMU86_WANT_64BIT && !(CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT)
+#define EMU86_ADDRSIZE_SWITCH64(do64, do32, do16) \
+	{                                             \
+		/* 64-bit address size */                 \
+		do64;                                     \
 	}
 #else
 #error "Invalid configuration"
@@ -1844,6 +1914,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #include "emu/lea.c.inl"
 #include "emu/leave.c.inl"
 #include "emu/ljmp.c.inl"
+#include "emu/lods.c.inl"
 #include "emu/loop.c.inl"
 #include "emu/lret.c.inl"
 #include "emu/misc.c.inl"
@@ -1866,7 +1937,6 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #endif /* !EMU86_EMULATE_IMPL_HEADER */
 #endif /* !__INTELLISENSE__ */
 
-			/* TODO: [rep] lods */
 			/* TODO: [rep] movs */
 			/* TODO: [rep] stos */
 			/* TODO: [repe|repne] scas */
