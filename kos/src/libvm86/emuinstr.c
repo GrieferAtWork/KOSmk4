@@ -62,7 +62,8 @@ DECL_BEGIN
  * @return: * :                One of `VM86_*' */
 INTDEF NONNULL((1)) int CC libvm86_step(vm86_state_t *__restrict self);
 
-PRIVATE byte_t *CC libvm86_translate(vm86_state_t *__restrict self, void const *addr) {
+PRIVATE byte_t *CC
+libvm86_translate(vm86_state_t *__restrict self, void const *addr) {
 	if (self->vr_trans)
 		addr = (*self->vr_trans)(self, (void *)addr);
 	return (byte_t *)addr;
@@ -74,7 +75,6 @@ DECL_END
 #define EMU86_EMULATE_ATTR         NONNULL((1))
 #define EMU86_EMULATE_RETURN       return VM86_SUCCESS
 #define EMU86_EMULATE_RETURN_TYPE  int
-#define EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION(faultaddr, opcode, op_flags) return libvm86_intr(self, 0x6) /* Invalid Opcode */
 #define EMU86_EMULATE_NOTHROW      /* nothing */
 #define EMU86_EMULATE_CC           CC
 #define EMU86_EMULATE_NAME         libvm86_step
@@ -229,6 +229,8 @@ DECL_END
 #define EMU86_SETPSI(v, ...)    self->vr_regs.vr_si = (u16)(v)
 #define EMU86_SETPDI(v, ...)    self->vr_regs.vr_di = (u16)(v)
 
+#define EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION(faultaddr, opcode, op_flags) \
+	return libvm86_intr(self, 0x6) /* Invalid Opcode */
 #define EMU86_EMULATE_THROW_BOUNDERR(bound_idx, bound_min, bound_max) \
 	return libvm86_intr(self, 0x5) /* #BR */
 #define EMU86_EMULATE_THROW_DIVIDE_ERROR() \

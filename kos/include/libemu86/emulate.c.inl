@@ -1952,16 +1952,21 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 			/* TODO: verw */
 			/* TODO: sgdt */
 			/* TODO: lgdt */
-			/* TODO: smsw */
-			/* TODO: lmsw */
 			/* TODO: invlpg */
-			/* TODO: swapgs */
-			/* TODO: rdtscp */
 			/* TODO: lar */
 			/* TODO: lsl */
-			/* TODO: syscall */
+
+			/* TODO: les */
+			/* TODO: lds */
+			/* TODO: lss */
+			/* TODO: lfs */
+			/* TODO: lgs */
+
+			/* TODO: smsw */
+			/* TODO: lmsw */
 			/* TODO: clts */
-			/* TODO: sysret */
+			/* TODO: mov (%crN) */
+
 			/* TODO: invd */
 			/* TODO: wbinvd */
 			/* TODO: cflsh */
@@ -1971,25 +1976,27 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 			/* TODO: prefetcht1 */
 			/* TODO: prefetcht2 */
 			/* TODO: cldemote */
-			/* TODO: mov (%crN) */
+
+			/* TODO: lfence */
+			/* TODO: mfence */
+			/* TODO: sfence */
+
+			/* TODO: syscall */
+			/* TODO: sysret */
+			/* TODO: sysenter */
+			/* TODO: sysexit */
+
+			/* TODO: swapgs */
+			/* TODO: rdtscp */
 			/* TODO: wrmsr */
 			/* TODO: rdtsc */
 			/* TODO: rdmsr */
 			/* TODO: rdpmc */
-			/* TODO: sysenter */
-			/* TODO: sysexit */
 			/* TODO: rdfsbase */
 			/* TODO: rdgsbase */
 			/* TODO: wrfsbase */
 			/* TODO: wrgsbase */
-			/* TODO: lfence */
-			/* TODO: mfence */
-			/* TODO: sfence */
-			/* TODO: les */
-			/* TODO: lds */
-			/* TODO: lss */
-			/* TODO: lfs */
-			/* TODO: lgs */
+
 			/* TODO: bswap */
 			/* TODO: crc32 */
 			/* TODO: movbe */

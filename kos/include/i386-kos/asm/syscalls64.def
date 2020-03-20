@@ -515,6 +515,7 @@ mq_timedreceive = mq_timedreceivex64;
 -0x000000000000001c:raiseat
 -0x000000000000001d:coredump
 -0x000000000000001e:process_spawnveat
+-0x000000000000001f:userviofd
 -0x000000000000004e:kreaddir
 -0x000000000000004f:kreaddirf
 -0x0000000000000050:fchdirat

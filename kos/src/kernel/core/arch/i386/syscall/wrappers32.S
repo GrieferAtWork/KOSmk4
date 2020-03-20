@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x801dc08 */
+/* HASH CRC-32:0x44959f26 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -16114,6 +16114,56 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_utime64)
 	iret
 	.cfi_endproc
 END(__x86_asm32_int80_utime64)
+
+/* Construct a user-fault-fd object supporting mmap(2), with actual
+ * memory accesses being dispatched by adding them as pending requests
+ * to an internal queue that should be read(2) from by a worker thread,
+ * which should then service those requests before responding by write(2)ing
+ * the results of the operation back to the same fd.
+ * HINT: The format of the structures that are read(2) and
+ *       write(2)en can be found in `<libvio/userviofd.h>'
+ * NOTE: Don't use this system call directly. Use `vio_create(3)'
+ *       from `<libvio/vio.h>' instead.
+ * @param: initial_size: The initial mmap(2)able size of the returned handle.
+ *                       This size may be altered at a later point in time
+ *                       through use of `ftruncate(return)'
+ * @param: flags:        Set of `0 | O_NONBLOCK | O_CLOEXEC | O_CLOFORK' */
+/* fd_t userviofd(size_t initial_size, syscall_ulong_t flags) */
+.section .text.x86.asm32_syscall_int80.userviofd
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_userviofd)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffffe5
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %edx
+	pushl_cfi_r %ecx  /* Arg #1 */
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_userviofd)
+	call   sys_userviofd
+	popl_cfi_r %ebx
+	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_userviofd)
 
 /* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 /* errno_t process_spawnveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags, struct spawn_actionsx32 const *actions) */
@@ -33532,6 +33582,56 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_utime64)
 	X86_IRET_BUT_PREFER_SYSEXIT
 	.cfi_endproc
 END(__x86_asm32_sysenter_utime64)
+
+/* Construct a user-fault-fd object supporting mmap(2), with actual
+ * memory accesses being dispatched by adding them as pending requests
+ * to an internal queue that should be read(2) from by a worker thread,
+ * which should then service those requests before responding by write(2)ing
+ * the results of the operation back to the same fd.
+ * HINT: The format of the structures that are read(2) and
+ *       write(2)en can be found in `<libvio/userviofd.h>'
+ * NOTE: Don't use this system call directly. Use `vio_create(3)'
+ *       from `<libvio/vio.h>' instead.
+ * @param: initial_size: The initial mmap(2)able size of the returned handle.
+ *                       This size may be altered at a later point in time
+ *                       through use of `ftruncate(return)'
+ * @param: flags:        Set of `0 | O_NONBLOCK | O_CLOEXEC | O_CLOFORK' */
+/* fd_t userviofd(size_t initial_size, syscall_ulong_t flags) */
+.section .text.x86.asm32_syscall_sysenter.userviofd
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_userviofd)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0xffffffe5
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %edx
+	pushl_cfi_r %ecx  /* Arg #1 */
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_userviofd)
+	call   sys_userviofd
+	popl_cfi_r %ebx
+	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_userviofd)
 
 /* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 /* errno_t process_spawnveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags, struct spawn_actionsx32 const *actions) */

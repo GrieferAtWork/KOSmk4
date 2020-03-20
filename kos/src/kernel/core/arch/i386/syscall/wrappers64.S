@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf11b0eed */
+/* HASH CRC-32:0xa630164b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -10414,6 +10414,49 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kreaddir)
 	intr_exit_sysret
 	.cfi_endproc
 END(__x86_asm64_syscall_kreaddir)
+
+/* Construct a user-fault-fd object supporting mmap(2), with actual
+ * memory accesses being dispatched by adding them as pending requests
+ * to an internal queue that should be read(2) from by a worker thread,
+ * which should then service those requests before responding by write(2)ing
+ * the results of the operation back to the same fd.
+ * HINT: The format of the structures that are read(2) and
+ *       write(2)en can be found in `<libvio/userviofd.h>'
+ * NOTE: Don't use this system call directly. Use `vio_create(3)'
+ *       from `<libvio/vio.h>' instead.
+ * @param: initial_size: The initial mmap(2)able size of the returned handle.
+ *                       This size may be altered at a later point in time
+ *                       through use of `ftruncate(return)'
+ * @param: flags:        Set of `0 | O_NONBLOCK | O_CLOEXEC | O_CLOFORK' */
+/* fd_t userviofd(size_t initial_size, syscall_ulong_t flags) */
+.section .text.x86.asm64_syscall.userviofd
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_userviofd)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0xffffffffffffffe1
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys_userviofd)
+	call   sys_userviofd
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm64_syscall_userviofd)
 
 /* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 /* errno_t process_spawnveat(fd_t dirfd, char const *pathname, __HYBRID_PTR64(char const) const *argv, __HYBRID_PTR64(char const) const *envp, atflag_t flags, struct spawn_actionsx64 const *actions) */
@@ -25612,6 +25655,51 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_utime64)
 	.cfi_endproc
 END(__x86_asm32_int80_utime64)
 
+/* Construct a user-fault-fd object supporting mmap(2), with actual
+ * memory accesses being dispatched by adding them as pending requests
+ * to an internal queue that should be read(2) from by a worker thread,
+ * which should then service those requests before responding by write(2)ing
+ * the results of the operation back to the same fd.
+ * HINT: The format of the structures that are read(2) and
+ *       write(2)en can be found in `<libvio/userviofd.h>'
+ * NOTE: Don't use this system call directly. Use `vio_create(3)'
+ *       from `<libvio/vio.h>' instead.
+ * @param: initial_size: The initial mmap(2)able size of the returned handle.
+ *                       This size may be altered at a later point in time
+ *                       through use of `ftruncate(return)'
+ * @param: flags:        Set of `0 | O_NONBLOCK | O_CLOEXEC | O_CLOFORK' */
+/* fd_t userviofd(size_t initial_size, syscall_ulong_t flags) */
+.section .text.x86.asm32_syscall_int80.userviofd
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_userviofd)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffffe5
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	EXTERN(sys32_userviofd)
+	call   sys32_userviofd
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_userviofd)
+
 /* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 /* errno_t process_spawnveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags, struct spawn_actionsx32 const *actions) */
 .section .text.x86.asm32_syscall_int80.process_spawnveat
@@ -30027,6 +30115,22 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_ftime64, __x86_asm32_int80_ftime64
 
 /* errno_t utime64(char const *filename, struct utimbufx32_64 const *times) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_utime64, __x86_asm32_int80_utime64)
+
+/* Construct a user-fault-fd object supporting mmap(2), with actual
+ * memory accesses being dispatched by adding them as pending requests
+ * to an internal queue that should be read(2) from by a worker thread,
+ * which should then service those requests before responding by write(2)ing
+ * the results of the operation back to the same fd.
+ * HINT: The format of the structures that are read(2) and
+ *       write(2)en can be found in `<libvio/userviofd.h>'
+ * NOTE: Don't use this system call directly. Use `vio_create(3)'
+ *       from `<libvio/vio.h>' instead.
+ * @param: initial_size: The initial mmap(2)able size of the returned handle.
+ *                       This size may be altered at a later point in time
+ *                       through use of `ftruncate(return)'
+ * @param: flags:        Set of `0 | O_NONBLOCK | O_CLOEXEC | O_CLOFORK' */
+/* fd_t userviofd(size_t initial_size, syscall_ulong_t flags) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_userviofd, __x86_asm32_int80_userviofd)
 
 /* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 /* errno_t process_spawnveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags, struct spawn_actionsx32 const *actions) */
@@ -35407,6 +35511,30 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_utime64)
 	jmp    sys32_utime64
 	.cfi_endproc
 END(__x86_asm32_sysrun32_utime64)
+
+/* Construct a user-fault-fd object supporting mmap(2), with actual
+ * memory accesses being dispatched by adding them as pending requests
+ * to an internal queue that should be read(2) from by a worker thread,
+ * which should then service those requests before responding by write(2)ing
+ * the results of the operation back to the same fd.
+ * HINT: The format of the structures that are read(2) and
+ *       write(2)en can be found in `<libvio/userviofd.h>'
+ * NOTE: Don't use this system call directly. Use `vio_create(3)'
+ *       from `<libvio/vio.h>' instead.
+ * @param: initial_size: The initial mmap(2)able size of the returned handle.
+ *                       This size may be altered at a later point in time
+ *                       through use of `ftruncate(return)'
+ * @param: flags:        Set of `0 | O_NONBLOCK | O_CLOEXEC | O_CLOFORK' */
+/* fd_t userviofd(size_t initial_size, syscall_ulong_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.userviofd
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_userviofd)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_userviofd)
+	jmp    sys32_userviofd
+	.cfi_endproc
+END(__x86_asm32_sysrun32_userviofd)
 
 /* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 /* errno_t process_spawnveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags, struct spawn_actionsx32 const *actions) */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f2c3eb4 */
+/* HASH CRC-32:0x48c214be */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -461,6 +461,20 @@
 #define __NR64_fchdirat               __UINT64_C(0xffffffffffffffb0) /* errno_t fchdirat(fd_t dirfd, char const *path, atflag_t flags) */
 #define __NR64_kreaddirf              __UINT64_C(0xffffffffffffffb1) /* ssize_t kreaddirf(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode, iomode_t iomode) */
 #define __NR64_kreaddir               __UINT64_C(0xffffffffffffffb2) /* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
+/* Construct a user-fault-fd object supporting mmap(2), with actual
+ * memory accesses being dispatched by adding them as pending requests
+ * to an internal queue that should be read(2) from by a worker thread,
+ * which should then service those requests before responding by write(2)ing
+ * the results of the operation back to the same fd.
+ * HINT: The format of the structures that are read(2) and
+ *       write(2)en can be found in `<libvio/userviofd.h>'
+ * NOTE: Don't use this system call directly. Use `vio_create(3)'
+ *       from `<libvio/vio.h>' instead.
+ * @param: initial_size: The initial mmap(2)able size of the returned handle.
+ *                       This size may be altered at a later point in time
+ *                       through use of `ftruncate(return)'
+ * @param: flags:        Set of `0 | O_NONBLOCK | O_CLOEXEC | O_CLOFORK' */
+#define __NR64_userviofd              __UINT64_C(0xffffffffffffffe1) /* fd_t userviofd(size_t initial_size, syscall_ulong_t flags) */
 /* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 #define __NR64_process_spawnveat      __UINT64_C(0xffffffffffffffe2) /* errno_t process_spawnveat(fd_t dirfd, char const *pathname, __HYBRID_PTR64(char const) const *argv, __HYBRID_PTR64(char const) const *envp, atflag_t flags, struct spawn_actionsx64 const *actions) */
 /* Trigger a coredump of the calling process.
@@ -1142,6 +1156,7 @@
 #define __NR64RM_fchdirat               0
 #define __NR64RM_kreaddirf              0
 #define __NR64RM_kreaddir               0
+#define __NR64RM_userviofd              0
 #define __NR64RM_process_spawnveat      0
 #define __NR64RM_coredump               2
 #define __NR64RM_raiseat                2
@@ -1677,6 +1692,7 @@
 #define __NR64RC_fchdirat               3
 #define __NR64RC_kreaddirf              5
 #define __NR64RC_kreaddir               4
+#define __NR64RC_userviofd              2
 #define __NR64RC_process_spawnveat      6
 #define __NR64RC_coredump               6
 #define __NR64RC_raiseat                2

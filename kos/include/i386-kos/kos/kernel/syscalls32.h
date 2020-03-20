@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc514ffa */
+/* HASH CRC-32:0x33931f70 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -447,6 +447,7 @@
 #define __ARCH_WANT_SYSCALL_UNSHARE                 1
 #define __ARCH_WANT_SYSCALL_USELIB                  1
 #define __ARCH_WANT_SYSCALL_USERFAULTFD             1
+#define __ARCH_WANT_SYSCALL_USERVIOFD               1
 #define __ARCH_WANT_SYSCALL_USTAT                   1
 #define __ARCH_WANT_SYSCALL_UTIME                   1
 #define __ARCH_WANT_SYSCALL_UTIME64                 1

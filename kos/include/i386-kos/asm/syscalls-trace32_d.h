@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e3c7688 */
+/* HASH CRC-32:0x5221847d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1027,6 +1027,8 @@
 #define __NR32AN0_ftime64                 tp
 #define __NR32AN0_utime64                 filename
 #define __NR32AN1_utime64                 times
+#define __NR32AN0_userviofd               initial_size
+#define __NR32AN1_userviofd               flags
 #define __NR32AN0_process_spawnveat       dirfd
 #define __NR32AN1_process_spawnveat       pathname
 #define __NR32AN2_process_spawnveat       argv
@@ -3425,6 +3427,10 @@
 #define __NR32ATRA0_utime64(filename, times) ,(validate_readable_opt(filename,1),filename)
 #define __NR32ATRF1_utime64                 "%p"
 #define __NR32ATRA1_utime64(filename, times) ,times
+#define __NR32ATRF0_userviofd               "%" PRIuSIZ
+#define __NR32ATRA0_userviofd(initial_size, flags) ,initial_size
+#define __NR32ATRF1_userviofd               "%#" PRIxSIZ
+#define __NR32ATRA1_userviofd(initial_size, flags) ,(uintptr_t)(flags)
 #define __NR32ATRF0_process_spawnveat       "%d"
 #define __NR32ATRA0_process_spawnveat(dirfd, pathname, argv, envp, flags, actions) ,(int)(dirfd)
 #define __NR32ATRF1_process_spawnveat       "%q"

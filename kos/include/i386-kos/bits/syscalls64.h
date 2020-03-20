@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeffc5af6 */
+/* HASH CRC-32:0xa31d4c52 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -464,6 +464,20 @@
 #define SYS_fchdirat               __NR_fchdirat               /* errno_t fchdirat(fd_t dirfd, char const *path, atflag_t flags) */
 #define SYS_kreaddirf              __NR_kreaddirf              /* ssize_t kreaddirf(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode, iomode_t iomode) */
 #define SYS_kreaddir               __NR_kreaddir               /* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
+/* Construct a user-fault-fd object supporting mmap(2), with actual
+ * memory accesses being dispatched by adding them as pending requests
+ * to an internal queue that should be read(2) from by a worker thread,
+ * which should then service those requests before responding by write(2)ing
+ * the results of the operation back to the same fd.
+ * HINT: The format of the structures that are read(2) and
+ *       write(2)en can be found in `<libvio/userviofd.h>'
+ * NOTE: Don't use this system call directly. Use `vio_create(3)'
+ *       from `<libvio/vio.h>' instead.
+ * @param: initial_size: The initial mmap(2)able size of the returned handle.
+ *                       This size may be altered at a later point in time
+ *                       through use of `ftruncate(return)'
+ * @param: flags:        Set of `0 | O_NONBLOCK | O_CLOEXEC | O_CLOFORK' */
+#define SYS_userviofd              __NR_userviofd              /* fd_t userviofd(size_t initial_size, syscall_ulong_t flags) */
 /* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 #define SYS_process_spawnveat      __NR_process_spawnveat      /* errno_t process_spawnveat(fd_t dirfd, char const *pathname, __HYBRID_PTR64(char const) const *argv, __HYBRID_PTR64(char const) const *envp, atflag_t flags, struct spawn_actionsx64 const *actions) */
 /* Trigger a coredump of the calling process.

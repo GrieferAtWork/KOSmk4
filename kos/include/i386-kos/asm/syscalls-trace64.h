@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6cc6c84a */
+/* HASH CRC-32:0xfee5dce8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -816,6 +816,8 @@
 #define __NRAN1_kreaddir               buf
 #define __NRAN2_kreaddir               bufsize
 #define __NRAN3_kreaddir               mode
+#define __NRAN0_userviofd              initial_size
+#define __NRAN1_userviofd              flags
 #define __NRAN0_process_spawnveat      dirfd
 #define __NRAN1_process_spawnveat      pathname
 #define __NRAN2_process_spawnveat      argv
@@ -2760,6 +2762,10 @@
                                                    ,((mode) & READDIR_PEEK) && ((mode) & (READDIR_CONTINUE)) ? "|" : "",(mode) & READDIR_PEEK ? "READDIR_PEEK" : "" \
                                                    ,((mode) & READDIR_SKIPREL) && ((mode) & (READDIR_CONTINUE|READDIR_PEEK)) ? "|" : "",(mode) & READDIR_SKIPREL ? "READDIR_SKIPREL" : "" \
                                                    ,((mode) & READDIR_WANTEOF) && ((mode) & (READDIR_CONTINUE|READDIR_PEEK|READDIR_SKIPREL)) ? "|" : "",(mode) & READDIR_WANTEOF ? "READDIR_WANTEOF" : ""
+#define __NRATRF0_userviofd              "%" PRIuSIZ
+#define __NRATRA0_userviofd(initial_size, flags) ,initial_size
+#define __NRATRF1_userviofd              "%#" PRIxSIZ
+#define __NRATRA1_userviofd(initial_size, flags) ,(uintptr_t)(flags)
 #define __NRATRF0_process_spawnveat      "%d"
 #define __NRATRA0_process_spawnveat(dirfd, pathname, argv, envp, flags, actions) ,(int)(dirfd)
 #define __NRATRF1_process_spawnveat      "%q"

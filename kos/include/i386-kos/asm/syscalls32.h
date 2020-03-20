@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2c4e7708 */
+/* HASH CRC-32:0xfdaaee14 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -554,6 +554,20 @@
 #define __NR_ioctlf                  __UINT32_C(0xffffffca) /* syscall_slong_t ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
 #define __NR_ftime64                 __UINT32_C(0xffffffdd) /* errno_t ftime64(struct timebx32_64 *tp) */
 #define __NR_utime64                 __UINT32_C(0xffffffe2) /* errno_t utime64(char const *filename, struct utimbufx32_64 const *times) */
+/* Construct a user-fault-fd object supporting mmap(2), with actual
+ * memory accesses being dispatched by adding them as pending requests
+ * to an internal queue that should be read(2) from by a worker thread,
+ * which should then service those requests before responding by write(2)ing
+ * the results of the operation back to the same fd.
+ * HINT: The format of the structures that are read(2) and
+ *       write(2)en can be found in `<libvio/userviofd.h>'
+ * NOTE: Don't use this system call directly. Use `vio_create(3)'
+ *       from `<libvio/vio.h>' instead.
+ * @param: initial_size: The initial mmap(2)able size of the returned handle.
+ *                       This size may be altered at a later point in time
+ *                       through use of `ftruncate(return)'
+ * @param: flags:        Set of `0 | O_NONBLOCK | O_CLOEXEC | O_CLOFORK' */
+#define __NR_userviofd               __UINT32_C(0xffffffe5) /* fd_t userviofd(size_t initial_size, syscall_ulong_t flags) */
 /* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 #define __NR_process_spawnveat       __UINT32_C(0xffffffe6) /* errno_t process_spawnveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags, struct spawn_actionsx32 const *actions) */
 #define __NR_stime64                 __UINT32_C(0xffffffe7) /* errno_t stime64(time64_t const *t) */
@@ -1316,6 +1330,7 @@
 #define __NRRM_ioctlf                  0
 #define __NRRM_ftime64                 0
 #define __NRRM_utime64                 0
+#define __NRRM_userviofd               0
 #define __NRRM_process_spawnveat       0
 #define __NRRM_stime64                 0
 #define __NRRM_coredump                2
@@ -1958,6 +1973,7 @@
 #define __NRRC_ioctlf                  4
 #define __NRRC_ftime64                 1
 #define __NRRC_utime64                 2
+#define __NRRC_userviofd               2
 #define __NRRC_process_spawnveat       6
 #define __NRRC_stime64                 1
 #define __NRRC_coredump                6

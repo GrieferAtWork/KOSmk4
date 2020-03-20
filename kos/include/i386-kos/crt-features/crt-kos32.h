@@ -4124,6 +4124,7 @@
 #define __CRT_HAVE_sys_Xunshare 1
 #define __CRT_HAVE_sys_Xuselib 1
 #define __CRT_HAVE_sys_Xuserfaultfd 1
+#define __CRT_HAVE_sys_Xuserviofd 1
 #define __CRT_HAVE_sys_Xustat 1
 #define __CRT_HAVE_sys_Xutime 1
 #define __CRT_HAVE_sys_Xutime64 1
@@ -4574,6 +4575,7 @@
 #define __CRT_HAVE_sys_unshare 1
 #define __CRT_HAVE_sys_uselib 1
 #define __CRT_HAVE_sys_userfaultfd 1
+#define __CRT_HAVE_sys_userviofd 1
 #define __CRT_HAVE_sys_ustat 1
 #define __CRT_HAVE_sys_utime 1
 #define __CRT_HAVE_sys_utime64 1

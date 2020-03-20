@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa550b316 */
+/* HASH CRC-32:0xdaf4c3bd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -557,6 +557,20 @@
 #define SYS_ioctlf                  __NR_ioctlf                  /* syscall_slong_t ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
 #define SYS_ftime64                 __NR_ftime64                 /* errno_t ftime64(struct timebx32_64 *tp) */
 #define SYS_utime64                 __NR_utime64                 /* errno_t utime64(char const *filename, struct utimbufx32_64 const *times) */
+/* Construct a user-fault-fd object supporting mmap(2), with actual
+ * memory accesses being dispatched by adding them as pending requests
+ * to an internal queue that should be read(2) from by a worker thread,
+ * which should then service those requests before responding by write(2)ing
+ * the results of the operation back to the same fd.
+ * HINT: The format of the structures that are read(2) and
+ *       write(2)en can be found in `<libvio/userviofd.h>'
+ * NOTE: Don't use this system call directly. Use `vio_create(3)'
+ *       from `<libvio/vio.h>' instead.
+ * @param: initial_size: The initial mmap(2)able size of the returned handle.
+ *                       This size may be altered at a later point in time
+ *                       through use of `ftruncate(return)'
+ * @param: flags:        Set of `0 | O_NONBLOCK | O_CLOEXEC | O_CLOFORK' */
+#define SYS_userviofd               __NR_userviofd               /* fd_t userviofd(size_t initial_size, syscall_ulong_t flags) */
 /* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 #define SYS_process_spawnveat       __NR_process_spawnveat       /* errno_t process_spawnveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags, struct spawn_actionsx32 const *actions) */
 #define SYS_stime64                 __NR_stime64                 /* errno_t stime64(time64_t const *t) */

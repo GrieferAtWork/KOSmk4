@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x97350133 */
+/* HASH CRC-32:0x8685343b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1027,6 +1027,8 @@
 #define __NRAN0_ftime64                 tp
 #define __NRAN0_utime64                 filename
 #define __NRAN1_utime64                 times
+#define __NRAN0_userviofd               initial_size
+#define __NRAN1_userviofd               flags
 #define __NRAN0_process_spawnveat       dirfd
 #define __NRAN1_process_spawnveat       pathname
 #define __NRAN2_process_spawnveat       argv
@@ -3425,6 +3427,10 @@
 #define __NRATRA0_utime64(filename, times) ,(validate_readable_opt(filename,1),filename)
 #define __NRATRF1_utime64                 "%p"
 #define __NRATRA1_utime64(filename, times) ,times
+#define __NRATRF0_userviofd               "%" PRIuSIZ
+#define __NRATRA0_userviofd(initial_size, flags) ,initial_size
+#define __NRATRF1_userviofd               "%#" PRIxSIZ
+#define __NRATRA1_userviofd(initial_size, flags) ,(uintptr_t)(flags)
 #define __NRATRF0_process_spawnveat       "%d"
 #define __NRATRA0_process_spawnveat(dirfd, pathname, argv, envp, flags, actions) ,(int)(dirfd)
 #define __NRATRF1_process_spawnveat       "%q"

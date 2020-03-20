@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd8f709b6 */
+/* HASH CRC-32:0x44f07533 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -7495,6 +7495,48 @@ INTERN_FUNCTION(libc_sys_Xutime64)
 	jmp    libc_x86_exec_Xsyscall2
 END(libc_sys_Xutime64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xutime64, libc_sys_Xutime64)
+
+/* Construct a user-fault-fd object supporting mmap(2), with actual
+ * memory accesses being dispatched by adding them as pending requests
+ * to an internal queue that should be read(2) from by a worker thread,
+ * which should then service those requests before responding by write(2)ing
+ * the results of the operation back to the same fd.
+ * HINT: The format of the structures that are read(2) and
+ *       write(2)en can be found in `<libvio/userviofd.h>'
+ * NOTE: Don't use this system call directly. Use `vio_create(3)'
+ *       from `<libvio/vio.h>' instead.
+ * @param: initial_size: The initial mmap(2)able size of the returned handle.
+ *                       This size may be altered at a later point in time
+ *                       through use of `ftruncate(return)'
+ * @param: flags:        Set of `0 | O_NONBLOCK | O_CLOEXEC | O_CLOFORK' */
+/* fd_t userviofd(size_t initial_size, syscall_ulong_t flags) */
+.section .text.crt.syscall.userviofd
+INTERN_FUNCTION(libc_sys_userviofd)
+	movl   $(0xffffffe5), %eax
+	jmp    libc_x86_exec_syscall2
+END(libc_sys_userviofd)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_userviofd, libc_sys_userviofd)
+
+/* Construct a user-fault-fd object supporting mmap(2), with actual
+ * memory accesses being dispatched by adding them as pending requests
+ * to an internal queue that should be read(2) from by a worker thread,
+ * which should then service those requests before responding by write(2)ing
+ * the results of the operation back to the same fd.
+ * HINT: The format of the structures that are read(2) and
+ *       write(2)en can be found in `<libvio/userviofd.h>'
+ * NOTE: Don't use this system call directly. Use `vio_create(3)'
+ *       from `<libvio/vio.h>' instead.
+ * @param: initial_size: The initial mmap(2)able size of the returned handle.
+ *                       This size may be altered at a later point in time
+ *                       through use of `ftruncate(return)'
+ * @param: flags:        Set of `0 | O_NONBLOCK | O_CLOEXEC | O_CLOFORK' */
+/* fd_t userviofd(size_t initial_size, syscall_ulong_t flags) */
+.section .text.crt.syscall.Xuserviofd
+INTERN_FUNCTION(libc_sys_Xuserviofd)
+	movl   $(0xffffffe5), %eax
+	jmp    libc_x86_exec_Xsyscall2
+END(libc_sys_Xuserviofd)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xuserviofd, libc_sys_Xuserviofd)
 
 /* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 /* errno_t process_spawnveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags, struct spawn_actionsx32 const *actions) */

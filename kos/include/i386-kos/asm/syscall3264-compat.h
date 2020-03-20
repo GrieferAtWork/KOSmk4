@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x27988459 */
+/* HASH CRC-32:0x5f716077 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -271,6 +271,7 @@
 #define __NR3264COMPAT_unshare                1(unshare)
 #define __NR3264COMPAT_uselib                 1(uselib)
 #define __NR3264COMPAT_userfaultfd            1(userfaultfd)
+#define __NR3264COMPAT_userviofd              1(userviofd)
 #define __NR3264COMPAT_utime                  1(utime64)
 #define __NR3264COMPAT_vfork                  1(vfork)
 #define __NR3264COMPAT_vhangup                1(vhangup)

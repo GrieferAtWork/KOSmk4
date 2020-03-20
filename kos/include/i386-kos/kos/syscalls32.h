@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xff4d7cc */
+/* HASH CRC-32:0xc9fe99cc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1790,6 +1790,22 @@ __CDECLARE_SC(,__errno_t,uselib,(char const *__library),(__library))
 #if __CRT_HAVE_SC(userfaultfd)
 __CDECLARE_SC(,__errno_t,userfaultfd,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(userfaultfd) */
+#if __CRT_HAVE_SC(userviofd)
+/* Construct a user-fault-fd object supporting mmap(2), with actual
+ * memory accesses being dispatched by adding them as pending requests
+ * to an internal queue that should be read(2) from by a worker thread,
+ * which should then service those requests before responding by write(2)ing
+ * the results of the operation back to the same fd.
+ * HINT: The format of the structures that are read(2) and
+ *       write(2)en can be found in `<libvio/userviofd.h>'
+ * NOTE: Don't use this system call directly. Use `vio_create(3)'
+ *       from `<libvio/vio.h>' instead.
+ * @param: initial_size: The initial mmap(2)able size of the returned handle.
+ *                       This size may be altered at a later point in time
+ *                       through use of `ftruncate(return)'
+ * @param: flags:        Set of `0 | O_NONBLOCK | O_CLOEXEC | O_CLOFORK' */
+__CDECLARE_SC(,__fd_t,userviofd,(__size_t __initial_size, __syscall_ulong_t __flags),(__initial_size,__flags))
+#endif /* __CRT_HAVE_SC(userviofd) */
 #if __CRT_HAVE_SC(ustat)
 __CDECLARE_SC(,__errno_t,ustat,(__dev_t __dev, struct ustat *__ubuf),(__dev,__ubuf))
 #endif /* __CRT_HAVE_SC(ustat) */
@@ -3491,6 +3507,22 @@ __CDECLARE_XSC(,__errno_t,uselib,(char const *__library),(__library))
 #if __CRT_HAVE_XSC(userfaultfd)
 __CDECLARE_XSC(,__errno_t,userfaultfd,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(userfaultfd) */
+#if __CRT_HAVE_XSC(userviofd)
+/* Construct a user-fault-fd object supporting mmap(2), with actual
+ * memory accesses being dispatched by adding them as pending requests
+ * to an internal queue that should be read(2) from by a worker thread,
+ * which should then service those requests before responding by write(2)ing
+ * the results of the operation back to the same fd.
+ * HINT: The format of the structures that are read(2) and
+ *       write(2)en can be found in `<libvio/userviofd.h>'
+ * NOTE: Don't use this system call directly. Use `vio_create(3)'
+ *       from `<libvio/vio.h>' instead.
+ * @param: initial_size: The initial mmap(2)able size of the returned handle.
+ *                       This size may be altered at a later point in time
+ *                       through use of `ftruncate(return)'
+ * @param: flags:        Set of `0 | O_NONBLOCK | O_CLOEXEC | O_CLOFORK' */
+__CDECLARE_XSC(,__fd_t,userviofd,(__size_t __initial_size, __syscall_ulong_t __flags),(__initial_size,__flags))
+#endif /* __CRT_HAVE_XSC(userviofd) */
 #if __CRT_HAVE_XSC(ustat)
 __CDECLARE_XSC(,__errno_t,ustat,(__dev_t __dev, struct ustat *__ubuf),(__dev,__ubuf))
 #endif /* __CRT_HAVE_XSC(ustat) */

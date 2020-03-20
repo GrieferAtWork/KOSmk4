@@ -1918,6 +1918,22 @@ coredumpx64:(struct ucpustate64 const *curr_state, struct ucpustate64 const *ori
 %[endgroup]
 
 
+@@Construct a user-fault-fd object supporting mmap(2), with actual
+@@memory accesses being dispatched by adding them as pending requests
+@@to an internal queue that should be read(2) from by a worker thread,
+@@which should then service those requests before responding by write(2)ing
+@@the results of the operation back to the same fd.
+@@HINT: The format of the structures that are read(2) and
+@@      write(2)en can be found in `<libvio/userviofd.h>'
+@@NOTE: Don't use this system call directly. Use `vio_create(3)'
+@@      from `<libvio/vio.h>' instead.
+@@@param: initial_size: The initial mmap(2)able size of the returned handle.
+@@                      This size may be altered at a later point in time
+@@                      through use of `ftruncate(return)'
+@@@param: flags:        Set of `0 | O_NONBLOCK | O_CLOEXEC | O_CLOFORK'
+userviofd:(size_t initial_size, syscall_ulong_t flags) -> fd_t;
+
+
 
 
 /* Generic system call numbers */

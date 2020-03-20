@@ -299,43 +299,37 @@ struct vio_operators {
 #ifndef __KERNEL__
 
 /* vio_create(3):
- * >> fd_t vio_create(struct vio_operators *ops, void *cookie, oflag_t flags);
- * @param: flags:  Set of `0 | O_CLOEXEC | O_CLOFORK'
- * @param: cookie: A cookie pointer that is available as `args->va_cookie'
- * Desc:
- *     Create an mmap(2)able VIO object where memory accesses
- *     made to the object are serviced by dispatching them via
- *     the given `ops' table.
- *     The returned file descriptor mustn't be deleted by `close(2)',
- *     but rather through use of `vio_destroy(3)'.
- *     Note that callbacks in `ops' may be invoked in the context
- *     of a different thread than the one that performed the memory
- *     access. Also note that the returned `fd_t' can be shared with
- *     other processes, but still function as expected. (when shared
- *     with a different process, that process should once again make
- *     use of `close(2)' for cleanup, rather than `vio_destroy(3)')
- * Impl:
- *     Call `userviofd()' and store the returned handle in a list
- *     of active VIO objects. If the list becomes non-empty, start
- *     a background thread that poll(2)s from all registered `userviofd()'
- *     objects, and services the requests by dispatching them through
- *     the ops-table originally passed to `vio_create()' */
+ * >> fd_t vio_create(struct vio_operators *ops, void *cookie,
+ * >>                 size_t initial_size, oflag_t flags);
+ * Create an mmap(2)able VIO object where memory accesses
+ * made to the object are serviced by dispatching them via
+ * the given `ops' table.
+ * The returned file descriptor mustn't be deleted by `close(2)',
+ * but rather through use of `vio_destroy(3)'.
+ * Note that callbacks in `ops' may be invoked in the context
+ * of a different thread than the one that performed the memory
+ * access. Also note that the returned `fd_t' can be shared with
+ * other processes, but still function as expected. (when shared
+ * with a different process, that process should once again make
+ * use of `close(2)' for cleanup, rather than `vio_destroy(3)')
+ * @param: flags:        Set of `0 | O_CLOEXEC | O_CLOFORK'
+ * @param: cookie:       A cookie pointer that is available as `args->va_cookie'
+ * @param: initial_size: The initial mmap(2)able size of the returned handle.
+ *                       This size may be altered at a later point in time
+ *                       through use of `ftruncate(return)' */
 typedef __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t
-/*__NOTHROW_NCX*/ (LIBVIO_CC *PVIO_CREATE)(struct vio_operators const *ops, void *cookie, __oflag_t flags);
+/*__NOTHROW_NCX*/ (LIBVIO_CC *PVIO_CREATE)(struct vio_operators const *ops, void *cookie,
+                                           __size_t initial_size, __oflag_t flags);
 #ifdef LIBVIO_WANT_PROTOTYPES
 LIBVIO_DECL __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t
-__NOTHROW_NCX(LIBVIO_CC vio_create)(struct vio_operators const *ops, void *cookie, __oflag_t flags);
+__NOTHROW_NCX(LIBVIO_CC vio_create)(struct vio_operators const *ops, void *cookie,
+                                    __size_t initial_size, __oflag_t flags);
 #endif /* LIBVIO_WANT_PROTOTYPES */
 
 
 /* vio_destroy(3):
  * >> int vio_destroy(fd_t fd);
- * Desc:
- *     Destroy a VIO file descriptor previously created by `vio_create(3)'
- * Impl:
- *     Remove `fd' from the set of active userfd handles. If all
- *     handles get closed, stop the background thread used to
- *     service VIO requests. */
+ * Destroy a VIO file descriptor previously created by `vio_create(3)' */
 typedef int /*__NOTHROW_NCX*/ (LIBVIO_CC *PVIO_DESTROY)(__fd_t fd);
 #ifdef LIBVIO_WANT_PROTOTYPES
 LIBVIO_DECL int __NOTHROW_NCX(LIBVIO_CC vio_destroy)(__fd_t fd);

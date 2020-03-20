@@ -621,6 +621,7 @@ mq_timedreceive64 = mq_timedreceivex32_64;
 -0x00000018:coredump
 -0x00000019:stime64
 -0x0000001a:process_spawnveat
+-0x0000001b:userviofd
 -0x0000001e:utime64
 -0x00000023:ftime64
 -0x00000036:ioctlf
