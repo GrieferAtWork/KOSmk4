@@ -1931,6 +1931,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #include "emu/stcf.c.inl"
 #include "emu/stdf.c.inl"
 #include "emu/stif.c.inl"
+#include "emu/stos.c.inl"
 #include "emu/xadd.c.inl"
 #include "emu/xchg.c.inl"
 #include "emu/xlatb.c.inl"
@@ -1938,7 +1939,6 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #endif /* !__INTELLISENSE__ */
 
 			/* TODO: [rep] movs */
-			/* TODO: [rep] stos */
 			/* TODO: [repe|repne] scas */
 			/* TODO: [repe|repne] cmps */
 			/* TODO: enter */
