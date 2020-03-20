@@ -103,8 +103,8 @@ case 0xcf: {
 		/* return to vm86 (from 32-bit mode) */
 		u32 new_esp;
 		u16 new_ss, new_es, new_ds, new_fs, new_gs;
-		EMU86_EMULATE_POP(sp, 24);
-		EMU86_READ_USER_MEMORY(sp, 24);
+		EMU86_EMULATE_POP(sp - 12, 24 + 12);
+		EMU86_READ_USER_MEMORY(sp - 12, 24 + 12);
 		new_esp = EMU86_MEMREADL(sp + 0);
 		new_ss  = EMU86_MEMREADLASW(sp + 4);
 		new_es  = EMU86_MEMREADLASW(sp + 8);
@@ -139,18 +139,20 @@ case 0xcf: {
 		EMU86_UREG_TYPE new_sp;
 		u16 new_ss;
 		IF_64BIT(if (IS_64BIT()) {
-			EMU86_EMULATE_POP(sp, 16);
-			EMU86_READ_USER_MEMORY(sp, 16);
+			/* EMU86_EMULATE_POP() and EMU86_READ_USER_MEMORY()
+			 * were already invoked with the proper values above! */
+			/*EMU86_EMULATE_POP(sp - 24, 16 + 24);*/
+			/*EMU86_READ_USER_MEMORY(sp - 24, 16 + 24);*/
 			new_sp = EMU86_MEMREADQ(sp + 0);
 			new_ss = EMU86_MEMREADQASW(sp + 8);
 		} else) if (!IS_16BIT()) {
-			EMU86_EMULATE_POP(sp, 8);
-			EMU86_READ_USER_MEMORY(sp, 8);
+			EMU86_EMULATE_POP(sp - 12, 8 + 12);
+			EMU86_READ_USER_MEMORY(sp - 12, 8 + 12);
 			new_sp = EMU86_MEMREADL(sp + 0);
 			new_ss = EMU86_MEMREADLASW(sp + 4);
 		} else {
-			EMU86_EMULATE_POP(sp, 4);
-			EMU86_READ_USER_MEMORY(sp, 4);
+			EMU86_EMULATE_POP(sp - 6, 4 + 6);
+			EMU86_READ_USER_MEMORY(sp - 6, 4 + 6);
 			new_sp = EMU86_MEMREADW(sp + 0);
 			new_ss = EMU86_MEMREADW(sp + 2);
 		}
