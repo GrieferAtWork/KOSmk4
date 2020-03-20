@@ -988,9 +988,10 @@ DECL_END
 #define EMU86_EMULATE_VM86 0
 #else /* __x86_64__ */
 #define EMU86_EMULATE_VM86 1
-#endif /* !__x86_64__ */
 #define EMU86_EMULATE_VM86_GETIF()  0       /* TODO: Get vm86 #IF bit */
 #define EMU86_EMULATE_VM86_SETIF(v) (void)0 /* TODO: Set vm86 #IF bit */
+/* TODO: vm86 I/O functions (used by ins and outs) */
+#endif /* !__x86_64__ */
 #ifdef __KERNEL__
 #define EMU86_EMULATE_CHECKUSER 1
 #define EMU86_ISUSER()        icpustate_isuser(self->vea_args.va_state)
@@ -1012,7 +1013,6 @@ DECL_END
 #define EMU86_VALIDATE_READABLE(addr, num_bytes) (void)0
 #define EMU86_VALIDATE_WRITABLE(addr, num_bytes) (void)0
 #endif /* !__KERNEL__ */
-
 #define EMU86_GETFLAGS()            CS(getpflags)(self->vea_args.va_state)
 #define EMU86_SETFLAGS(v)           CS(setpflags)(self->vea_args.va_state, v)
 #define EMU86_MSKFLAGS(mask, value) CS(mskpflags)(self->vea_args.va_state, mask, value)
@@ -1020,6 +1020,14 @@ DECL_END
 #define EMU86_EMULATE_SETPC(v)      CS(setpc)(self->vea_args.va_state, (__uintptr_t)(v))
 #define EMU86_EMULATE_GETIP()       EMU86_EMULATE_GETPC()
 #define EMU86_EMULATE_SETIP(v)      EMU86_EMULATE_SETPC(v)
+#define EMU86_GETIP()               (u16)EMU86_EMULATE_GETPC()
+#define EMU86_SETIP(v)              EMU86_EMULATE_SETPC((u16)(v))
+#define EMU86_GETEIP()              (u32)EMU86_EMULATE_GETPC()
+#define EMU86_SETEIP(v)             EMU86_EMULATE_SETPC((u32)(v))
+#ifdef __x86_64__
+#define EMU86_GETRIP()              (u64)EMU86_EMULATE_GETPC()
+#define EMU86_SETRIP(v)             EMU86_EMULATE_SETPC((u64)(v))
+#endif /* __x86_64__ */
 #define EMU86_GETSP()               CS(getsp)(self->vea_args.va_state)
 #if defined(__x86_64__) || !defined(__KERNEL__)
 #define EMU86_SETSP(v) (CS(setsp)(self->vea_args.va_state, (__uintptr_t)(v)))

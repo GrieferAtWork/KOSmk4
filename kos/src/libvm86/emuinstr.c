@@ -112,6 +112,10 @@ DECL_END
 #define EMU86_EMULATE_SETPC(v) self->vr_regs.vr_ip = (u16)((uintptr_t)(v) - (self->vr_regs.vr_cs << 4))
 #define EMU86_EMULATE_GETIP()  self->vr_regs.vr_ip
 #define EMU86_EMULATE_SETIP(v) self->vr_regs.vr_ip = (u16)(v)
+#define EMU86_GETIP()          self->vr_regs.vr_ip
+#define EMU86_SETIP(v)         self->vr_regs.vr_ip = (u16)(v)
+#define EMU86_GETEIP()         (u32)self->vr_regs.vr_ip
+#define EMU86_SETEIP(v)        self->vr_regs.vr_ip = (u16)(u32)(v)
 #define EMU86_GETSP()          vm86_state_sp(self)
 #define EMU86_SETSP(v)         self->vr_regs.vr_ip = (u16)((uintptr_t)(v) - (self->vr_regs.vr_cs << 4))
 #define EMU86_GETSP_RAW()      self->vr_regs.vr_sp

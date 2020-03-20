@@ -464,6 +464,22 @@ __DECL_BEGIN
 #define EMU86_EMULATE_SETIP(v) EMU86_EMULATE_SETPC(v)
 #endif /* !EMU86_EMULATE_GETIP */
 
+/* Get/set the %(|e|r)ip register */
+#ifndef EMU86_GETIP
+#define EMU86_GETIP()  ((u16)EMU86_EMULATE_GETIP())
+#define EMU86_SETIP(v) EMU86_EMULATE_SETIP((u16)(v))
+#endif /* !EMU86_GETIP */
+#ifndef EMU86_GETEIP
+#define EMU86_GETEIP()  ((u32)EMU86_EMULATE_GETIP())
+#define EMU86_SETEIP(v) EMU86_EMULATE_SETIP((u32)(v))
+#endif /* !EMU86_GETEIP */
+#if CONFIG_LIBEMU86_WANT_64BIT
+#ifndef EMU86_GETRIP
+#define EMU86_GETRIP()  ((u64)EMU86_EMULATE_GETIP())
+#define EMU86_SETRIP(v) EMU86_EMULATE_SETIP((u64)(v))
+#endif /* !EMU86_GETRIP */
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+
 /* Get/Set the SP/ESP/RSP register (including SS.BASE)
  * Note that `EMU86_GETSP() == EMU86_SEGADDR(EMU86_GETSSBASE(), EMU86_GETSP_RAW())' */
 #ifndef EMU86_GETSP
@@ -1822,6 +1838,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #include "emu/pushapopa.c.inl"
 #include "emu/pushfpopf.c.inl"
 #include "emu/pushpop.c.inl"
+#include "emu/ret.c.inl"
 #include "emu/shift.c.inl"
 #include "emu/shift2.c.inl"
 #include "emu/xadd.c.inl"
@@ -1834,7 +1851,6 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 			/* TODO: [rep] stos */
 			/* TODO: [repe|repne] scas */
 			/* TODO: [repe|repne] cmps */
-			/* TODO: ret */
 			/* TODO: lret */
 			/* TODO: enter */
 			/* TODO: cpuid */

@@ -21,18 +21,35 @@
 #include "../emulate.c.inl"
 #endif /* __INTELLISENSE__ */
 
-EMU86_INTELLISENSE_BEGIN(nop) {
+#include "pushpop-util.h"
 
 
-#ifndef EMU86_EMULATE_ONLY_MEMORY
-case 0x0f1f:
-	/* NP 0F 1F /0     NOP r/m16     Multi-byte no-operation instruction.
-	 * NP 0F 1F /0     NOP r/m32     Multi-byte no-operation instruction. */
-	MODRM_DECODE();
-	if (modrm.mi_reg != 0)
-		goto return_unknown_instruction;
-	goto done;
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
+EMU86_INTELLISENSE_BEGIN(ret) {
+
+
+case 0xc3: {
+	/* C3     RET     Near return to calling procedure. */
+	EMU86_POP163264(EMU86_SETIP,
+	                EMU86_SETEIP,
+	                EMU86_SETRIP);
+	goto done_dont_set_pc;
+}
+
+case 0xc2: {
+	u16 offset;
+	/* C2 iw     RET imm16     Near return to calling procedure and pop imm16 bytes from stack. */
+	offset = UNALIGNED_GET16((u16 *)pc);
+	pc += 2;
+	byte_t *sp;
+	sp = (byte_t *)EMU86_GETSP();
+	EMU86_POP163264_IMPL(EMU86_SETIP,
+	                     EMU86_SETEIP,
+	                     EMU86_SETRIP);
+	sp += offset;
+	EMU86_SETSP(sp);
+	goto done_dont_set_pc;
+}
+
 
 
 }

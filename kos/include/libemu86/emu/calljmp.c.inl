@@ -21,6 +21,8 @@
 #include "../emulate.c.inl"
 #endif /* __INTELLISENSE__ */
 
+#include "pushpop-util.h"
+
 EMU86_INTELLISENSE_BEGIN(calljmp) {
 
 
@@ -93,34 +95,9 @@ case 0xe8: {
 	}
 	dest_pc = pc + offset;
 	/* Push the previous PC */
-#if CONFIG_LIBEMU86_WANT_64BIT
-	IF_16BIT_OR_32BIT(if (EMU86_F_IS64(op_flags))) {
-		/* 64-bit mode */
-		sp -= 8;
-		EMU86_EMULATE_PUSH(sp, 8);
-		EMU86_WRITE_USER_MEMORY(sp, 8);
-		EMU86_EMULATE_WRITEQ(sp, (u64)REAL_PC());
-	}
-	IF_16BIT_OR_32BIT(else)
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
-#if CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT
-	{
-		/* 16/32-bit mode */
-		if (!IS_16BIT()) {
-			sp -= 4;
-			EMU86_EMULATE_PUSH(sp, 4);
-			EMU86_WRITE_USER_MEMORY(sp, 4);
-			EMU86_EMULATE_WRITEL(sp, (u32)REAL_PC());
-		} else {
-			sp -= 2;
-			EMU86_EMULATE_PUSH(sp, 2);
-			EMU86_WRITE_USER_MEMORY(sp, 2);
-			EMU86_EMULATE_WRITEW(sp, (u16)REAL_PC());
-			/* Truncate to 16 bits. */
-			dest_pc = (byte_t *)((uintptr_t)dest_pc & 0xffff);
-		}
-	}
-#endif /* CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT */
+	EMU86_PUSH163264((u16)REAL_PC(),
+	                 (u32)REAL_PC(),
+	                 (u64)REAL_PC());
 	EMU86_EMULATE_SETPC(dest_pc);
 	EMU86_SETSP(sp);
 	goto done_dont_set_pc;
