@@ -62,8 +62,8 @@
 			if ((isrep) && EMU86_GETECX() == 0)                   \
 				goto done;                                        \
 			ptrreg = EMU86_GETE##SI();                            \
-			addr = (byte_t *)EMU86_SEGADDR(EMU86_GET##DS##BASE(), \
-			                               (uintptr_t)ptrreg);    \
+			addr = EMU86_SEGADDR(EMU86_GET##DS##BASE(),           \
+			                     (uintptr_t)ptrreg);              \
 			EMU86_READ_USER_MEMORY(addr, Nbytes);                 \
 			value = EMU86_MEMREAD##BWLQ(addr);                    \
 			useval32;                                             \
@@ -85,8 +85,8 @@
 			if ((isrep) && EMU86_GETCX() == 0)                    \
 				goto done;                                        \
 			ptrreg = EMU86_GET##SI();                             \
-			addr = (byte_t *)EMU86_SEGADDR(EMU86_GET##DS##BASE(), \
-			                               (uintptr_t)ptrreg);    \
+			addr = EMU86_SEGADDR(EMU86_GET##DS##BASE(),           \
+			                     (uintptr_t)ptrreg);              \
 			EMU86_READ_USER_MEMORY(addr, Nbytes);                 \
 			value = EMU86_MEMREAD##BWLQ(addr);                    \
 			useval16;                                             \
@@ -140,8 +140,8 @@
 			if ((isrep) && EMU86_GETECX() == 0)                          \
 				goto done;                                               \
 			ptrreg = EMU86_GETE##DI();                                   \
-			addr = (byte_t *)EMU86_SEGADDR(EMU86_GET##ES##BASE(),        \
-			                               (uintptr_t)ptrreg);           \
+			addr = EMU86_SEGADDR(EMU86_GET##ES##BASE(),                  \
+			                     (uintptr_t)ptrreg);                     \
 			EMU86_WRITE_USER_MEMORY(addr, Nbytes);                       \
 			EMU86_MEMWRITE##BWLQ(addr, value);                           \
 			if (EMU86_GETFLAGS() & EFLAGS_DF) {                          \
@@ -162,8 +162,8 @@
 			if ((isrep) && EMU86_GETCX() == 0)                           \
 				goto done;                                               \
 			ptrreg = EMU86_GET##DI();                                    \
-			addr = (byte_t *)EMU86_SEGADDR(EMU86_GET##ES##BASE(),        \
-			                               (uintptr_t)ptrreg);           \
+			addr = EMU86_SEGADDR(EMU86_GET##ES##BASE(),                  \
+			                     (uintptr_t)ptrreg);                     \
 			EMU86_WRITE_USER_MEMORY(addr, Nbytes);                       \
 			EMU86_MEMWRITE##BWLQ(addr, value);                           \
 			if (EMU86_GETFLAGS() & EFLAGS_DF) {                          \

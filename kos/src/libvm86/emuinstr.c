@@ -129,7 +129,7 @@ DECL_END
 #define EMU86_GETSSBASE()       self->vr_regs.vr_ds
 #define EMU86_GETFSBASE()       self->vr_regs.vr_fs
 #define EMU86_GETGSBASE()       self->vr_regs.vr_gs
-#define EMU86_SEGADDR(segbase, segoffset) VM86_ADDR(segbase, segoffset)
+#define EMU86_SEGADDR(setid, segoffset) (byte_t *)(uintptr_t)VM86_ADDR(setid, segoffset)
 #define EMU86_GETCS()           self->vr_regs.vr_cs
 #define EMU86_SETCS(v)          self->vr_regs.vr_cs = (u16)(v)
 #define EMU86_GETSS()           self->vr_regs.vr_ss

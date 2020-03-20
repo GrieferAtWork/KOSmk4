@@ -1150,7 +1150,7 @@ DECL_END
 #define EMU86_GETFSBASE() __rdfsbase()
 #define EMU86_GETGSBASE() __rdgsbase()
 #endif /* !__KERNEL__ */
-#define EMU86_SEGADDR(segbase, segoffset) ((segbase) + (segoffset))
+#define EMU86_SEGADDR(segbase, segoffset) (byte_t *)(uintptr_t)((segbase) + (segoffset))
 #define EMU86_GETES()  CS(getes)(self->vea_args.va_state)
 #define EMU86_SETES(v) CS(setes)(self->vea_args.va_state, v)
 #define EMU86_GETCS()  CS(getcs)(self->vea_args.va_state)

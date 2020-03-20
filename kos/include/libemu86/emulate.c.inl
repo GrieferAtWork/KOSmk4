@@ -571,7 +571,7 @@ __DECL_BEGIN
 
 /* Form a memory address from a segment, and an offset to that segment */
 #ifndef EMU86_SEGADDR
-#define EMU86_SEGADDR(segbase, segoffset) ((segbase) + (segoffset))
+#define EMU86_SEGADDR(segbase, segoffset) (byte_t *)(uintptr_t)((segbase) + (segoffset))
 #endif /* !EMU86_SEGADDR */
 
 /* Get/Set the %es register */
@@ -1760,12 +1760,12 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #define SEGMENT_ADDR2(segment_regno, offset) \
 	(EMU86_GETSEGBASE_IS_NOOP(segment_regno) \
 	 ? (byte_t *)(uintptr_t)(offset)         \
-	 : (byte_t *)EMU86_SEGADDR((uintptr_t)EMU86_GETSEGBASE(segment_regno), (uintptr_t)(offset)))
+	 : EMU86_SEGADDR((uintptr_t)EMU86_GETSEGBASE(segment_regno), (uintptr_t)(offset)))
 #define SEGMENT_ADDR(offset) \
 	SEGMENT_ADDR2(EMU86_F_SEGREG(op_flags), offset)
 #else /* EMU86_GETSEGBASE_IS_NOOP */
 #define SEGMENT_ADDR2(segment_regno, offset) \
-	(byte_t *)EMU86_SEGADDR((uintptr_t)EMU86_GETSEGBASE(segment_regno), (uintptr_t)(offset))
+	EMU86_SEGADDR((uintptr_t)EMU86_GETSEGBASE(segment_regno), (uintptr_t)(offset))
 #define SEGMENT_ADDR(offset) \
 	SEGMENT_ADDR2(EMU86_F_SEGREG(op_flags), offset)
 #endif /* !EMU86_GETSEGBASE_IS_NOOP */
@@ -1861,6 +1861,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #include "emu/stif.c.inl"
 #include "emu/xadd.c.inl"
 #include "emu/xchg.c.inl"
+#include "emu/xlatb.c.inl"
 #endif /* !EMU86_EMULATE_IMPL_HEADER */
 #endif /* !__INTELLISENSE__ */
 
@@ -1872,7 +1873,6 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 			/* TODO: enter */
 			/* TODO: cpuid */
 			/* TODO: int, int3, into, int1 */
-			/* TODO: xlatb */
 			/* TODO: loop, loopz, loopnz */
 			/* TODO: jcxz, jecxz, jrcxz */
 			/* TODO: sldt */

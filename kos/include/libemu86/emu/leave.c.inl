@@ -33,7 +33,7 @@ case 0xc9:
 		u16 bp, orig_bp;
 		bp = EMU86_GETBP();
 #ifndef EMU86_GETSEGBASE_IS_NOOP_SS
-		bp_addr = (byte_t *)EMU86_SEGADDR(EMU86_GETSEGBASE(EMU86_R_SS), bp) - 2;
+		bp_addr = EMU86_SEGADDR(EMU86_GETSEGBASE(EMU86_R_SS), bp) - 2;
 		EMU86_READ_USER_MEMORY(bp_addr, 2);
 		orig_bp = EMU86_MEMREADW(bp_addr);
 #else /* !EMU86_GETSEGBASE_IS_NOOP_SS */
@@ -52,7 +52,7 @@ case 0xc9:
 		u64 bp, orig_bp;
 		bp = EMU86_GETRBP();
 #ifndef EMU86_GETSEGBASE_IS_NOOP_SS
-		bp_addr = (byte_t *)EMU86_SEGADDR(EMU86_GETSEGBASE(EMU86_R_SS), bp) - 8;
+		bp_addr = EMU86_SEGADDR(EMU86_GETSEGBASE(EMU86_R_SS), bp) - 8;
 		EMU86_READ_USER_MEMORY(bp_addr, 8);
 		orig_bp = EMU86_MEMREADQ(bp_addr);
 #else /* !EMU86_GETSEGBASE_IS_NOOP_SS */
@@ -68,7 +68,7 @@ case 0xc9:
 		u32 bp, orig_bp;
 		bp = EMU86_GETEBP();
 #ifndef EMU86_GETSEGBASE_IS_NOOP_SS
-		bp_addr = (byte_t *)EMU86_SEGADDR(EMU86_GETSEGBASE(EMU86_R_SS), bp) - 4;
+		bp_addr = EMU86_SEGADDR(EMU86_GETSEGBASE(EMU86_R_SS), bp) - 4;
 		EMU86_READ_USER_MEMORY(bp_addr, 4);
 		orig_bp = EMU86_MEMREADL(bp_addr);
 #else /* !EMU86_GETSEGBASE_IS_NOOP_SS */
