@@ -1838,6 +1838,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #include "emu/incdec.c.inl"
 #include "emu/io.c.inl"
 #include "emu/iret.c.inl"
+#include "emu/jcc.c.inl"
 #include "emu/jmp.c.inl"
 #include "emu/lcall.c.inl"
 #include "emu/lea.c.inl"

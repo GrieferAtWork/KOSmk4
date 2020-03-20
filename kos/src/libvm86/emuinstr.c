@@ -108,18 +108,14 @@ DECL_END
 #define EMU86_GETFLAGS()            self->vr_regs.vr_eflags
 #define EMU86_SETFLAGS(v)           (self->vr_regs.vr_eflags = (v))
 #define EMU86_MSKFLAGS(mask, value) (self->vr_regs.vr_eflags = (self->vr_regs.vr_eflags & (mask)) | (value))
-#define EMU86_EMULATE_GETPC()  vm86_state_ip(self)
-#define EMU86_EMULATE_SETPC(v) self->vr_regs.vr_ip = (u16)((uintptr_t)(v) - (self->vr_regs.vr_cs << 4))
-#define EMU86_EMULATE_GETIP()  self->vr_regs.vr_ip
-#define EMU86_EMULATE_SETIP(v) self->vr_regs.vr_ip = (u16)(v)
-#define EMU86_GETIP()          self->vr_regs.vr_ip
-#define EMU86_SETIP(v)         self->vr_regs.vr_ip = (u16)(v)
-#define EMU86_GETEIP()         (u32)self->vr_regs.vr_ip
-#define EMU86_SETEIP(v)        self->vr_regs.vr_ip = (u16)(u32)(v)
-#define EMU86_GETSP()          vm86_state_sp(self)
-#define EMU86_SETSP(v)         self->vr_regs.vr_ip = (u16)((uintptr_t)(v) - (self->vr_regs.vr_cs << 4))
-#define EMU86_GETSP_RAW()      self->vr_regs.vr_sp
-#define EMU86_SETSP_RAW(v)     self->vr_regs.vr_sp = (u16)(v)
+#define EMU86_GETPCPTR()            ((byte_t *)(uintptr_t)vm86_state_ip(self))
+#define EMU86_SETPCPTR(v)           self->vr_regs.vr_ip = (u16)((uintptr_t)(v) - (self->vr_regs.vr_cs << 4))
+#define EMU86_GETIPREG()            self->vr_regs.vr_ip
+#define EMU86_SETIPREG(v)           self->vr_regs.vr_ip = (u16)(v)
+#define EMU86_GETSTACKPTR()         ((byte_t *)(uintptr_t)vm86_state_sp(self))
+#define EMU86_SETSTACKPTR(v)        self->vr_regs.vr_sp = (u16)((uintptr_t)(v) - (self->vr_regs.vr_cs << 4))
+#define EMU86_GETSPREG()            self->vr_regs.vr_sp
+#define EMU86_SETSPREG(v)           self->vr_regs.vr_sp = (u16)(v)
 #undef EMU86_GETSEGBASE_IS_NOOP_DS
 #undef EMU86_GETSEGBASE_IS_NOOP_ES
 #undef EMU86_GETSEGBASE_IS_NOOP_CS
@@ -148,7 +144,7 @@ DECL_END
 #define EMU86_SETES(v)          self->vr_regs.vr_es = (u16)(v)
 #define EMU86_EMULATE_PUSH(new_sp, num_bytes) (void)0 /* TODO: Check for stack segment overflow! */
 #define EMU86_EMULATE_POP(old_sp, num_bytes) (void)0 /* TODO: Check for stack segment underflow! */
-#define EMU86_GETSEG(regno)     self->vr_regs.vr_segments[regno]
+#define EMU86_GETSEG(regno)        self->vr_regs.vr_segments[regno]
 #define EMU86_SETSEG(regno, value) self->vr_regs.vr_segments[regno] = (value)
 #define EMU86_GETREGB(regno, ...)        REG8(regno)
 #define EMU86_SETREGB(regno, value, ...) REG8(regno) = (u8)(value)
@@ -156,6 +152,10 @@ DECL_END
 #define EMU86_SETREGW(regno, value)      REG16(regno) = (u16)(value)
 #define EMU86_GETREGL(regno)             REG32(regno)
 #define EMU86_SETREGL(regno, value)      REG32(regno) = (u32)(value)
+#define EMU86_GETIP()           self->vr_regs.vr_ip
+#define EMU86_SETIP(v)          self->vr_regs.vr_ip = (u16)(v)
+#define EMU86_GETEIP()          (u32)self->vr_regs.vr_ip
+#define EMU86_SETEIP(v)         self->vr_regs.vr_ip = (u16)(u32)(v)
 #define EMU86_GETAL()           self->vr_regs.vr_al
 #define EMU86_GETCL()           self->vr_regs.vr_cl
 #define EMU86_GETDL()           self->vr_regs.vr_dl
@@ -176,7 +176,7 @@ DECL_END
 #define EMU86_GETCX()           self->vr_regs.vr_cx
 #define EMU86_GETDX()           self->vr_regs.vr_dx
 #define EMU86_GETBX()           self->vr_regs.vr_bx
-#define EMU86_GETSPREG()        self->vr_regs.vr_sp
+#define EMU86_GETSP()           self->vr_regs.vr_sp
 #define EMU86_GETBP()           self->vr_regs.vr_bp
 #define EMU86_GETSI()           self->vr_regs.vr_si
 #define EMU86_GETDI()           self->vr_regs.vr_di
@@ -184,7 +184,7 @@ DECL_END
 #define EMU86_SETCX(v)          self->vr_regs.vr_cx = (u16)(v)
 #define EMU86_SETDX(v)          self->vr_regs.vr_dx = (u16)(v)
 #define EMU86_SETBX(v)          self->vr_regs.vr_bx = (u16)(v)
-#define EMU86_SETSPREG(v)       self->vr_regs.vr_sp = (u16)(v)
+#define EMU86_SETSP(v)          self->vr_regs.vr_sp = (u16)(v)
 #define EMU86_SETBP(v)          self->vr_regs.vr_bp = (u16)(v)
 #define EMU86_SETSI(v)          self->vr_regs.vr_si = (u16)(v)
 #define EMU86_SETDI(v)          self->vr_regs.vr_di = (u16)(v)
