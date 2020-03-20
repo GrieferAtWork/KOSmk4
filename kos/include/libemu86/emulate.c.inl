@@ -1919,6 +1919,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #include "emu/lret.c.inl"
 #include "emu/misc.c.inl"
 #include "emu/mov.c.inl"
+#include "emu/movs.c.inl"
 #include "emu/nop.c.inl"
 #include "emu/pushapopa.c.inl"
 #include "emu/pushfpopf.c.inl"
@@ -1939,7 +1940,6 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #endif /* !EMU86_EMULATE_IMPL_HEADER */
 #endif /* !__INTELLISENSE__ */
 
-			/* TODO: [rep] movs */
 			/* TODO: [repe|repne] cmps */
 			/* TODO: enter */
 			/* TODO: cpuid */

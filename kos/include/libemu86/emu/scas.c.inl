@@ -33,8 +33,6 @@ case 0xae: {
 	EMU86_READ_STRING_EX_IMPL(EMU86_ADDRSIZE_SWITCH,
 	                          ES, DI, B, 8, 1, rhs,
 	                          op_flags & (EMU86_F_REP | EMU86_F_REPNE),
-	                          /**/,
-	                          /**/,
 	                          /**/);
 	lhs        = EMU86_GETAL();
 	new_eflags = emu86_geteflags_cmpb(lhs, rhs);
@@ -67,8 +65,6 @@ case 0xaf: {
 		EMU86_READ_STRING_EX_IMPL(EMU86_ADDRSIZE_SWITCH,
 		                          ES, DI, Q, 64, 8, rhs,
 		                          op_flags & (EMU86_F_REP | EMU86_F_REPNE),
-		                          /**/,
-		                          /**/,
 		                          /**/);
 		lhs        = EMU86_GETRAX();
 		new_eflags = emu86_geteflags_cmpq(lhs, rhs);
@@ -77,8 +73,6 @@ case 0xaf: {
 		EMU86_READ_STRING_EX_IMPL(EMU86_ADDRSIZE_SWITCH,
 		                          ES, DI, L, 32, 4, rhs,
 		                          op_flags & (EMU86_F_REP | EMU86_F_REPNE),
-		                          /**/,
-		                          /**/,
 		                          /**/);
 		lhs        = EMU86_GETEAX();
 		new_eflags = emu86_geteflags_cmpl(lhs, rhs);
@@ -87,8 +81,6 @@ case 0xaf: {
 		EMU86_READ_STRING_EX_IMPL(EMU86_ADDRSIZE_SWITCH,
 		                          ES, DI, W, 16, 2, rhs,
 		                          op_flags & (EMU86_F_REP | EMU86_F_REPNE),
-		                          /**/,
-		                          /**/,
 		                          /**/);
 		lhs        = EMU86_GETAX();
 		new_eflags = emu86_geteflags_cmpw(lhs, rhs);

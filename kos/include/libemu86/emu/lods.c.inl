@@ -33,8 +33,6 @@ case 0xac: {
 	EMU86_READ_STRING_EX_IMPL(EMU86_ADDRSIZE_SWITCH64,
 	                          DS, SI, B, 8, 1, value,
 	                          op_flags & EMU86_F_REP,
-	                          /**/,
-	                          /**/,
 	                          /**/);
 	EMU86_SETAL(value);
 	if (op_flags & EMU86_F_REP)
@@ -53,8 +51,6 @@ case 0xad: {
 		EMU86_READ_STRING_EX_IMPL(EMU86_ADDRSIZE_SWITCH64,
 		                          DS, SI, Q, 64, 8, value,
 		                          op_flags & EMU86_F_REP,
-		                          /**/,
-		                          /**/,
 		                          /**/);
 		EMU86_SETRAX(value);
 	} else) if (!IS_16BIT()) {
@@ -62,8 +58,6 @@ case 0xad: {
 		EMU86_READ_STRING_EX_IMPL(EMU86_ADDRSIZE_SWITCH64,
 		                          DS, SI, L, 32, 4, value,
 		                          op_flags & EMU86_F_REP,
-		                          /**/,
-		                          /**/,
 		                          /**/);
 		EMU86_SETEAX(value);
 	} else {
@@ -71,8 +65,6 @@ case 0xad: {
 		EMU86_READ_STRING_EX_IMPL(EMU86_ADDRSIZE_SWITCH64,
 		                          DS, SI, W, 16, 2, value,
 		                          op_flags & EMU86_F_REP,
-		                          /**/,
-		                          /**/,
 		                          /**/);
 		EMU86_SETAX(value);
 	}
