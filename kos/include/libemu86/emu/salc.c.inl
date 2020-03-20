@@ -21,30 +21,20 @@
 #include "../emulate.c.inl"
 #endif /* __INTELLISENSE__ */
 
-EMU86_INTELLISENSE_BEGIN(sahflahf) {
+EMU86_INTELLISENSE_BEGIN(salc) {
 
 #ifndef EMU86_EMULATE_ONLY_MEMORY
 
-#define AHF_MASK (EFLAGS_CF | EFLAGS_PF | EFLAGS_AF | EFLAGS_ZF | EFLAGS_SF)
-
-case 0x9e: {
-	/* 9E     SAHF     Loads SF, ZF, AF, PF, and CF from AH into EFLAGS register. */
-	u8 ah = EMU86_GETAH();
-	EMU86_MSKFLAGS(~AHF_MASK, ah & AHF_MASK);
+	/* NOTE: This instruction is not officially documented by intel!
+	 *       Until this day (20.03.2020) intel still documents this
+	 *       opcode as being unused, however the behavior emulated
+	 *       here matches what is described here:
+	 *       http://www.rcollins.org/secrets/opcodes/SALC.html */
+case 0xd6: {
+	/* D6     SALC     Set AL on Carry */
+	EMU86_SETAL(EMU86_GETFLAGS() & EFLAGS_CF ? 0xff : 0x00);
 	goto done;
 }
-
-
-case 0x9f: {
-	/* 9F     LAHF     Load: AH := EFLAGS(SF:ZF:0:AF:0:PF:1:CF). */
-	u8 ah;
-	ah = (u8)(EMU86_GETFLAGS() & AHF_MASK) |
-	     0x02; /* bit#1 is documented as always-set-to-1 */
-	EMU86_SETAH(ah);
-	goto done;
-}
-
-#undef AHF_MASK
 
 #endif /* !EMU86_EMULATE_ONLY_MEMORY */
 

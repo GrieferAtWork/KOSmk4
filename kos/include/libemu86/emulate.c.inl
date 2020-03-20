@@ -1854,6 +1854,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #include "emu/pushpop.c.inl"
 #include "emu/ret.c.inl"
 #include "emu/sahflahf.c.inl"
+#include "emu/salc.c.inl"
 #include "emu/shift.c.inl"
 #include "emu/shift2.c.inl"
 #include "emu/xadd.c.inl"
@@ -1870,7 +1871,6 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 			/* TODO: cpuid */
 			/* TODO: arpl */
 			/* TODO: int, int3, into, int1 */
-			/* TODO: salc */
 			/* TODO: xlatb */
 			/* TODO: loop, loopz, loopnz */
 			/* TODO: jcxz, jecxz, jrcxz */
