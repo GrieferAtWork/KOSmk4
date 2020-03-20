@@ -24,7 +24,6 @@
 EMU86_INTELLISENSE_BEGIN(bound) {
 
 #if CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT
-#ifdef EMU86_EMULATE_THROW_BOUNDERR
 case 0x62: {
 	s32 bound_idx, bound_min, bound_max;
 	byte_t *addr;
@@ -66,7 +65,6 @@ case 0x62: {
 		EMU86_EMULATE_THROW_BOUNDERR(bound_idx, bound_min, bound_max);
 	goto done;
 }
-#endif /* EMU86_EMULATE_THROW_BOUNDERR */
 #endif /* CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT */
 
 }

@@ -172,16 +172,35 @@ __DECL_BEGIN
 /* #define EMU86_EMULATE_EXCEPT_SWITCH EXCEPT { ... } */
 
 /* Define to implement support for the `bound' instruction on 16-/32-bit */
-/* #define EMU86_EMULATE_THROW_BOUNDERR(bound_idx, bound_min, bound_max) \
-	THROW(E_INDEX_ERROR_OUT_OF_BOUNDS, bound_idx, bound_min, bound_max) */
+#ifndef EMU86_EMULATE_THROW_BOUNDERR
+#define EMU86_EMULATE_THROW_BOUNDERR(bound_idx, bound_min, bound_max) \
+	THROW(E_INDEX_ERROR_OUT_OF_BOUNDS, bound_idx, bound_min, bound_max)
+#endif /* !EMU86_EMULATE_THROW_BOUNDERR */
 
 /* Allow E_DIVIDE_BY_ZERO to be rethrown natively, rather than having
  * to be handled by use of `EMU86_EMULATE_THROW_DIVIDE_ERROR[B|W|L|Q]()'
- * In case the aformentioned macros only ever throw the same exception,
+ * In case the aforementioned macros only ever throw the same exception,
  * this can get rid of unnecessary bloat. */
 #ifndef EMU86_EMULATE_THROW_DIVIDE_BY_ZERO_ALLOW_RETHROW
 #define EMU86_EMULATE_THROW_DIVIDE_BY_ZERO_ALLOW_RETHROW 0
 #endif /* !EMU86_EMULATE_THROW_DIVIDE_BY_ZERO_ALLOW_RETHROW */
+
+/* Throw an exception indicative of a privileged instruction
+ * Only used when `EMU86_EMULATE_CHECKUSER' is enabled. */
+#ifndef EMU86_EMULATE_THROW_PRIVILEGED_INSTRUCTION
+#define EMU86_EMULATE_THROW_PRIVILEGED_INSTRUCTION(opcode) \
+	THROW(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE, opcode)
+#endif /* !EMU86_EMULATE_THROW_PRIVILEGED_INSTRUCTION */
+
+/* An optional, special return expression to be evaluated following
+ * an `sti' instruction that turned on EFLAGS.IF (may be used to
+ * implement special handling in order to delay interrupt checks
+ * until after the next instruction)
+ * NOTE: This expression mustn't return normally! (but should
+ *       normally contain a `THROW()' or `return' statement) */
+/* #define EMU86_EMULATE_RETURN_AFTER_STI ... */
+/* Same as `EMU86_EMULATE_RETURN_AFTER_STI', but used for vm86 instead. */
+/* #define EMU86_EMULATE_RETURN_AFTER_STI_VM86 ... */
 
 #ifndef EMU86_EMULATE_THROW_DIVIDE_BY_ZEROB
 #ifndef EMU86_EMULATE_THROW_DIVIDE_ERROR
@@ -1774,6 +1793,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #include "emu/bittest.c.inl"
 #include "emu/bound.c.inl"
 #include "emu/calljmp.c.inl"
+#include "emu/clisti.c.inl"
 #include "emu/cmovcc.c.inl"
 #include "emu/cmpxchg.c.inl"
 #include "emu/cmpxchgb.c.inl"
@@ -1821,8 +1841,6 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 			/* TODO: cmc */
 			/* TODO: clc */
 			/* TODO: stc */
-			/* TODO: cli */
-			/* TODO: sti */
 			/* TODO: cld */
 			/* TODO: std */
 			/* TODO: sldt */
