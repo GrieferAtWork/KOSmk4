@@ -1829,6 +1829,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #include "emu/bittest.c.inl"
 #include "emu/bound.c.inl"
 #include "emu/call.c.inl"
+#include "emu/cbw.c.inl"
 #include "emu/clisti.c.inl"
 #include "emu/cmovcc.c.inl"
 #include "emu/cmpxchg.c.inl"
@@ -1867,10 +1868,6 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 			/* TODO: enter */
 			/* TODO: cpuid */
 			/* TODO: arpl */
-			/* TODO: jcc */
-			/* TODO: cbw */
-			/* TODO: cwd */
-			/* TODO: cdq */
 			/* TODO: sahf */
 			/* TODO: lahf */
 			/* TODO: int, int3, into, int1 */
