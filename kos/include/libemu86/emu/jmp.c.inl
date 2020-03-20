@@ -21,7 +21,7 @@
 #include "../emulate.c.inl"
 #endif /* __INTELLISENSE__ */
 
-#include "pushpop-util.h"
+#include "push-pop-util.h"
 
 EMU86_INTELLISENSE_BEGIN(jmp) {
 
