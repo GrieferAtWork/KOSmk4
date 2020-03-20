@@ -1306,7 +1306,7 @@ PRIVATE struct instruction const ops[] = {
 
 	I(0xd4, 0,                "aam\t" OP_U8),
 	I(0xd5, 0,                "aad\t" OP_U8),
-	I(0xd6, 0,                "salc"),
+	I(0xd6, 0,                "salc"), /* http://www.rcollins.org/secrets/opcodes/SALC.html */
 	I(0xd7, 0,                "xlatb"),
 
 	I(0xd8, IF_MODRM|IF_RMR|IF_REG0, "fadd\t" OP_RMSTi OP_ST0),

@@ -21,41 +21,26 @@
 #include "../emulate.c.inl"
 #endif /* __INTELLISENSE__ */
 
-EMU86_INTELLISENSE_BEGIN(cbw) {
+EMU86_INTELLISENSE_BEGIN(sahflahf) {
 
 #ifndef EMU86_EMULATE_ONLY_MEMORY
 
-case 0x98: {
-	/*         98     CBW      AX := sign-extend of AL.
-	 *         98     CWDE     EAX := sign-extend of AX.
-	 * REX.W + 98     CDQE     RAX := sign-extend of EAX. */
-	IF_64BIT(if (IS_64BIT()) {
-		EMU86_SETRAX((u64)(s64)(s32)EMU86_GETEAX());
-	} else) if (!IS_16BIT()) {
-		EMU86_SETEAX((u32)(s32)(s16)EMU86_GETAX());
-	} else {
-		EMU86_SETAX((u16)(s16)(s8)EMU86_GETAL());
-	}
+#define AHF_MASK (EFLAGS_CF | EFLAGS_PF | EFLAGS_AF | EFLAGS_ZF | EFLAGS_SF)
+
+case 0x9e: {
+	/* 9E     SAHF     Loads SF, ZF, AF, PF, and CF from AH into EFLAGS register. */
+	u8 ah = EMU86_GETAH();
+	EMU86_MSKFLAGS(~AHF_MASK, ah & AHF_MASK);
 	goto done;
 }
 
-case 0x99: {
-	/*         99     CWD     DX:AX := sign-extend of AX.
-	 *         99     CDQ     EDX:EAX := sign-extend of EAX.
-	 * REX.W + 99     CQO     RDX:RAX:= sign-extend of RAX. */
-	IF_64BIT(if (IS_64BIT()) {
-		s64 rax;
-		rax = (s64)EMU86_GETRAX();
-		EMU86_SETRDX(rax < 0 ? UINT64_MAX : 0);
-	} else) if (!IS_16BIT()) {
-		s32 eax;
-		eax = (s32)EMU86_GETEAX();
-		EMU86_SETEDX(eax < 0 ? UINT32_MAX : 0);
-	} else {
-		s16 ax;
-		ax = (s16)EMU86_GETAX();
-		EMU86_SETDX(ax < 0 ? UINT16_MAX : 0);
-	}
+
+case 0x9f: {
+	/* 9F     LAHF     Load: AH := EFLAGS(SF:ZF:0:AF:0:PF:1:CF). */
+	u8 ah;
+	ah = (u8)(EMU86_GETFLAGS() & AHF_MASK) |
+	     0x02; /* bit#1 is documented as always-set-to-1 */
+	EMU86_SETAH(ah);
 	goto done;
 }
 
