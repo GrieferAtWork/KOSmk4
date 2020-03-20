@@ -984,10 +984,6 @@ DECL_END
 	}
 #define EMU86_EMULATE_GETOPFLAGS() _CS(emu86_opflagsof)(self->vea_args.va_state)
 #define EMU86_EMULATE_ONLY_MEMORY 1 /* _ONLY_ emulate memory-based instructions! */
-#ifdef __KERNEL__
-#include <sched/cred.h>
-#define EMU86_ALLOWED_EFLAGS_MODIFY_MASK() cred_allow_eflags_modify_mask()
-#endif /* !__KERNEL__ */
 #ifdef __x86_64__
 #define EMU86_EMULATE_VM86 0
 #else /* __x86_64__ */
@@ -1161,6 +1157,23 @@ DECL_END
 #define EMU86_SETGS(v) CS(setgs)(self->vea_args.va_state, v)
 #define EMU86_EMULATE_PUSH(new_sp, num_bytes) (void)0
 #define EMU86_EMULATE_POP(old_sp, num_bytes) (void)0
+#if !defined(__x86_64__) && defined(__KERNEL__)
+/* Simplifications for accessing VM86 registers. */
+#define EMU86_GETCS_VM86()    self->vea_args.va_state->ics_irregs_v.ir_cs16
+#define EMU86_SETCS_VM86(v)  (self->vea_args.va_state->ics_irregs_v.ir_cs = (u16)(v))
+#define EMU86_GETESP_VM86()   self->vea_args.va_state->ics_irregs_v.ir_esp
+#define EMU86_SETESP_VM86(v) (self->vea_args.va_state->ics_irregs_v.ir_esp = (u32)(v))
+#define EMU86_GETSS_VM86()    self->vea_args.va_state->ics_irregs_v.ir_ss16
+#define EMU86_SETSS_VM86(v)  (self->vea_args.va_state->ics_irregs_v.ir_ss = (u16)(v))
+#define EMU86_GETES_VM86()    self->vea_args.va_state->ics_irregs_v.ir_es16
+#define EMU86_SETES_VM86(v)  (self->vea_args.va_state->ics_irregs_v.ir_es = (u16)(v))
+#define EMU86_GETDS_VM86()    self->vea_args.va_state->ics_irregs_v.ir_ds16
+#define EMU86_SETDS_VM86(v)  (self->vea_args.va_state->ics_irregs_v.ir_ds = (u16)(v))
+#define EMU86_GETFS_VM86()    self->vea_args.va_state->ics_irregs_v.ir_fs16
+#define EMU86_SETFS_VM86(v)  (self->vea_args.va_state->ics_irregs_v.ir_fs = (u16)(v))
+#define EMU86_GETGS_VM86()    self->vea_args.va_state->ics_irregs_v.ir_gs16
+#define EMU86_SETGS_VM86(v)  (self->vea_args.va_state->ics_irregs_v.ir_gs = (u16)(v))
+#endif /* !__x86_64__ && __KERNEL__ */
 
 
 DECL_BEGIN

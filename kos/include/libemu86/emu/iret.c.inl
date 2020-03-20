@@ -23,172 +23,200 @@
 
 EMU86_INTELLISENSE_BEGIN(iret) {
 
+#if CONFIG_LIBEMU86_WANT_32BIT && CONFIG_LIBEMU86_WANT_16BIT
+#ifndef EMU86_SETCS_VM86
+#define EMU86_SETCS_VM86 EMU86_SETCS
+#endif /* !EMU86_SETCS_VM86 */
+#ifndef EMU86_SETEIP_VM86
+#define EMU86_SETEIP_VM86 EMU86_EMULATE_SETIP
+#endif /* !EMU86_SETEIP_VM86 */
+#ifndef EMU86_SETESP_VM86
+#define EMU86_SETESP_VM86 EMU86_SETESP
+#endif /* !EMU86_SETESP_VM86 */
+#ifndef EMU86_SETSS_VM86
+#define EMU86_SETSS_VM86 EMU86_SETSS
+#endif /* !EMU86_SETSS_VM86 */
+#ifndef EMU86_SETES_VM86
+#define EMU86_SETES_VM86 EMU86_SETES
+#endif /* !EMU86_SETES_VM86 */
+#ifndef EMU86_SETDS_VM86
+#define EMU86_SETDS_VM86 EMU86_SETDS
+#endif /* !EMU86_SETDS_VM86 */
+#ifndef EMU86_SETFS_VM86
+#define EMU86_SETFS_VM86 EMU86_SETFS
+#endif /* !EMU86_SETFS_VM86 */
+#ifndef EMU86_SETGS_VM86
+#define EMU86_SETGS_VM86 EMU86_SETGS
+#endif /* !EMU86_SETGS_VM86 */
+#endif /* CONFIG_LIBEMU86_WANT_32BIT && CONFIG_LIBEMU86_WANT_16BIT */
+
+#if CONFIG_LIBEMU86_WANT_64BIT
+#define REG_UTYPE u64
+#define REG_STYPE s64
+#else /* CONFIG_LIBEMU86_WANT_64BIT */
+#define REG_UTYPE u32
+#define REG_STYPE s32
+#endif /* !CONFIG_LIBEMU86_WANT_64BIT */
+
+
 case 0xcf: {
 	/* CF     IRET     ZO     Valid     Valid     Interrupt return (16-bit operand size).
 	 * CF     IRETD    ZO     Valid     Valid     Interrupt return (32-bit operand size).
 	 * CF     IRETQ    ZO     Valid     Valid     Interrupt return (64-bit operand size). */
 	byte_t *sp = (byte_t *)EMU86_GETSP();
-#if CONFIG_LIBEMU86_WANT_64BIT
-	if (IS_64BIT()) {
-		u64 rip, rflags, rsp;
-		u16 cs, ss;
+	REG_UTYPE new_ip;
+	u16 new_cs;
+	u32 new_eflags;
+	IF_64BIT(if (IS_64BIT()) {
 		EMU86_EMULATE_POP(sp, 40);
 		EMU86_READ_USER_MEMORY(sp, 40);
-		rip    = EMU86_EMULATE_READQ(sp), sp += 8;
-		cs     = EMU86_EMULATE_READQASW(sp), sp += 8;
-		rflags = EMU86_EMULATE_READQ(sp), sp += 8;
-		rsp    = EMU86_EMULATE_READQ(sp), sp += 8;
-		ss     = EMU86_EMULATE_READQASW(sp), sp += 8;
-#if EMU86_EMULATE_CHECKUSER
-		if (!SEGMENT_IS_VALID_USERCODE(cs) && EMU86_ISUSER()) {
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-			      X86_REGISTER_SEGMENT_CS, cs);
-		}
-		if (!SEGMENT_IS_VALID_USERDATA(ss) && EMU86_ISUSER()) {
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-			      X86_REGISTER_SEGMENT_SS, ss);
-		}
-#ifndef EMU86_ALLOWED_EFLAGS_MODIFY_MASK_IS_FULL
-		{
-			u64 old_eflags, mask;
-			old_eflags = EMU86_GETFLAGS();
-			mask       = EMU86_ALLOWED_EFLAGS_MODIFY_MASK();
-			if ((old_eflags & ~mask) != (rflags & ~mask) && EMU86_ISUSER()) {
-				THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-				      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-				      X86_REGISTER_MISC_EFLAGS,
-				      (uintptr_t)rflags);
-			}
-		}
-#endif /* !EMU86_ALLOWED_EFLAGS_MODIFY_MASK_IS_FULL */
-#endif /* EMU86_EMULATE_CHECKUSER */
-		sp = (byte_t *)rsp;
-		EMU86_SETSS(ss);
-		EMU86_SETFLAGS(rflags);
-		EMU86_SETCS(cs);
-		EMU86_EMULATE_SETPC(rip);
-	} else
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
-	{
-		u32 eip, eflags;
-		u16 cs;
-		unsigned int wordsize;
-#if EMU86_EMULATE_VM86
-		bool new_vm86_if = false;
-#endif /* EMU86_EMULATE_VM86 */
-		wordsize = IS_16BIT() ? 2 : 4;
-		EMU86_EMULATE_POP(sp, 3 * wordsize);
-		EMU86_READ_USER_MEMORY(sp, 3 * wordsize);
-		if (wordsize == 2) {
-			eip    = EMU86_EMULATE_READW(sp), sp += 2;
-			cs     = EMU86_EMULATE_READW(sp), sp += 2;
-			eflags = EMU86_EMULATE_READW(sp), sp += 2;
-		} else {
-			eip    = EMU86_EMULATE_READL(sp), sp += 4;
-			cs     = EMU86_EMULATE_READLASW(sp), sp += 4;
-			eflags = EMU86_EMULATE_READL(sp), sp += 4;
-		}
-#if EMU86_EMULATE_CHECKUSER && (CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_64BIT)
-		if (!SEGMENT_IS_VALID_USERCODE(cs) && !EMU86_ISVM86() &&
-#if EMU86_EMULATE_VM86
-		    !(eflags & EFLAGS_VM) &&
-#endif /* EMU86_EMULATE_VM86 */
-		    EMU86_ISUSER_NOVM86()) {
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-			      X86_REGISTER_SEGMENT_CS, cs);
-		}
-#endif /* EMU86_EMULATE_CHECKUSER && (CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_64BIT) */
-#if EMU86_EMULATE_VM86
-		if (EMU86_ISVM86()) {
-			new_vm86_if = (eflags & EFLAGS_IF) != 0;
-			if (eflags & EFLAGS_VM) {
-				/* Cannot re-enter vm86 when already inside of vm86! */
-				THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-				      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-				      X86_REGISTER_MISC_EFLAGS, eflags);
-			}
-			eflags = (eflags & ~(EFLAGS_IF | EFLAGS_IOPLMASK)) |
-			         (EMU86_GETFLAGS() & (EFLAGS_IF | EFLAGS_IOPLMASK)) |
-			         EFLAGS_VM;
-		}
-#if EMU86_EMULATE_CHECKUSER && !defined(EMU86_ALLOWED_EFLAGS_MODIFY_MASK_IS_FULL)
-		else
-#endif /* EMU86_EMULATE_CHECKUSER && !EMU86_ALLOWED_EFLAGS_MODIFY_MASK_IS_FULL */
-#endif /* EMU86_EMULATE_VM86 */
-#if EMU86_EMULATE_CHECKUSER && !defined(EMU86_ALLOWED_EFLAGS_MODIFY_MASK_IS_FULL)
-		{
-			u32 old_eflags, mask;
-			old_eflags = EMU86_GETFLAGS();
-			mask       = EMU86_ALLOWED_EFLAGS_MODIFY_MASK();
-			if ((old_eflags & ~mask) != (eflags & ~mask) && EMU86_ISUSER()) {
-				THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-				      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-				      X86_REGISTER_MISC_EFLAGS,
-				      eflags);
-			}
-		}
-#endif /* EMU86_EMULATE_CHECKUSER && !EMU86_ALLOWED_EFLAGS_MODIFY_MASK_IS_FULL */
-#if CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_64BIT
-		if (((cs & 3) != (EMU86_GETCS() & 3))
-#if EMU86_EMULATE_VM86
-		    || (eflags & EFLAGS_VM)
-#endif /* EMU86_EMULATE_VM86 */
-		    ) {
-			u32 esp;
-			u16 ss;
-			EMU86_EMULATE_POP(sp - (3 * wordsize), 5 * wordsize);
-			EMU86_READ_USER_MEMORY(sp, 2 * wordsize);
-			if (wordsize == 2) {
-				esp = EMU86_EMULATE_READW(sp), sp += 2;
-				ss  = EMU86_EMULATE_READW(sp), sp += 2;
-			} else {
-				esp = EMU86_EMULATE_READL(sp), sp += 4;
-				ss  = EMU86_EMULATE_READLASW(sp), sp += 4;
-			}
-#if EMU86_EMULATE_CHECKUSER
-			if (!SEGMENT_IS_VALID_USERDATA(ss) && !(eflags & EFLAGS_VM)) {
-				THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-				      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-				      X86_REGISTER_SEGMENT_SS, ss);
-			}
-#endif /* EMU86_EMULATE_CHECKUSER */
-#if EMU86_EMULATE_VM86
-			if (eflags & EFLAGS_VM) {
-				u16 es, ds, fs, gs;
-				EMU86_EMULATE_POP(sp - (5 * wordsize), 9 * wordsize);
-				EMU86_READ_USER_MEMORY(sp, 4 * wordsize);
-				if (wordsize == 2) {
-				} else {
-				}
-				es = EMU86_EMULATE_READLASW(sp), sp += 4;
-				ds = EMU86_EMULATE_READLASW(sp), sp += 4;
-				fs = EMU86_EMULATE_READLASW(sp), sp += 4;
-				gs = EMU86_EMULATE_READLASW(sp), sp += 4;
-				EMU86_SETES(es);
-				EMU86_SETDS(ds);
-				EMU86_SETFS(fs);
-				EMU86_SETGS(gs);
-			}
-#endif /* EMU86_EMULATE_VM86 */
-			sp = (byte_t *)esp;
-			EMU86_SETSS(ss);
-		}
-#endif /* CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_64BIT */
-		EMU86_SETFLAGS(eflags);
-		EMU86_SETCS(cs);
-		EMU86_EMULATE_SETPC(eip);
-#if EMU86_EMULATE_VM86
-		if (EMU86_ISVM86())
-			EMU86_EMULATE_VM86_SETIF(new_vm86_if);
-#endif /* EMU86_EMULATE_VM86 */
+		new_ip     = EMU86_EMULATE_READQ(sp + 0);
+		new_cs     = EMU86_EMULATE_READQASW(sp + 8);
+		new_eflags = EMU86_EMULATE_READQASL(sp + 16);
+		sp += 24;
+	} else) if (!IS_16BIT()) {
+		EMU86_EMULATE_POP(sp, 12);
+		EMU86_READ_USER_MEMORY(sp, 12);
+		new_ip     = EMU86_EMULATE_READL(sp + 0);
+		new_cs     = EMU86_EMULATE_READLASW(sp + 4);
+		new_eflags = EMU86_EMULATE_READL(sp + 8);
+		sp += 12;
+	} else {
+		EMU86_EMULATE_POP(sp, 6);
+		EMU86_READ_USER_MEMORY(sp, 6);
+		new_ip     = EMU86_EMULATE_READW(sp + 0);
+		new_cs     = EMU86_EMULATE_READW(sp + 2);
+		new_eflags = EMU86_EMULATE_READW(sp + 4);
+		sp += 6;
 	}
-	EMU86_SETSP_RAW((uintptr_t)sp);
+#if CONFIG_LIBEMU86_WANT_32BIT && CONFIG_LIBEMU86_WANT_16BIT
+	if (!EMU86_F_IS64(op_flags)) {
+		u32 old_eflags = EMU86_GETFLAGS();
+		if (old_eflags & EFLAGS_VM) {
+			/* return from vm86 (to vm86) */
+#define VM86_KEEPMASK (EFLAGS_VM | EFLAGS_IOPLMASK | EFLAGS_VIP | EFLAGS_VIF)
+			new_eflags &= ~(VM86_KEEPMASK);
+			new_eflags |= old_eflags & VM86_KEEPMASK;
+#undef VM86_KEEPMASK
+			COMPILER_READ_BARRIER();
+			EMU86_SETFLAGS(new_eflags);
+			EMU86_SETCS_VM86(new_cs);
+			EMU86_SETEIP_VM86((u32)new_ip);
+			EMU86_SETSP(sp);
+			goto done_dont_set_pc;
+		}
+	}
+	if (EMU86_F_IS32(op_flags) && (new_eflags & EFLAGS_VM) && !EMU86_ISUSER()) {
+		/* return to vm86 (from 32-bit mode) */
+		u32 new_esp;
+		u16 new_ss, new_es, new_ds, new_fs, new_gs;
+		EMU86_EMULATE_POP(sp, 24);
+		EMU86_READ_USER_MEMORY(sp, 24);
+		new_esp = EMU86_EMULATE_READL(sp + 0);
+		new_ss  = EMU86_EMULATE_READLASW(sp + 4);
+		new_es  = EMU86_EMULATE_READLASW(sp + 8);
+		new_ds  = EMU86_EMULATE_READLASW(sp + 12);
+		new_fs  = EMU86_EMULATE_READLASW(sp + 16);
+		new_gs  = EMU86_EMULATE_READLASW(sp + 20);
+		COMPILER_READ_BARRIER();
+		EMU86_SETFLAGS(new_eflags);
+		EMU86_SETCS_VM86(new_cs);
+		EMU86_SETEIP_VM86((u32)new_ip);
+		EMU86_SETESP_VM86(new_esp);
+		EMU86_SETSS_VM86(new_ss);
+		EMU86_SETES_VM86(new_es);
+		EMU86_SETDS_VM86(new_ds);
+		EMU86_SETFS_VM86(new_fs);
+		EMU86_SETGS_VM86(new_gs);
+		goto done_dont_set_pc;
+	}
+#endif /* CONFIG_LIBEMU86_WANT_32BIT && CONFIG_LIBEMU86_WANT_16BIT */
+
+	/* Restrict user-space IRET EFLAGS to only update this mask */
+#define USERIRET_EFLAGS_MASK                                     \
+	(EFLAGS_CF | EFLAGS_PF | EFLAGS_AF | EFLAGS_ZF | EFLAGS_SF | \
+	 EFLAGS_TF | EFLAGS_DF | EFLAGS_OF | EFLAGS_NT)
+
+	/* Return to outer privilege level, or return from 64-bit mode.
+	 * In this case, always pop (|E|R)SP and SS as well! */
+#if CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT
+	if (EMU86_F_IS64(op_flags) || ((new_cs & 3) && !EMU86_ISUSER()))
+#endif /* CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT */
+	{
+		REG_UTYPE new_sp;
+		u16 new_ss;
+		IF_64BIT(if (IS_64BIT()) {
+			EMU86_EMULATE_POP(sp, 16);
+			EMU86_READ_USER_MEMORY(sp, 16);
+			new_sp = EMU86_EMULATE_READQ(sp + 0);
+			new_ss = EMU86_EMULATE_READQASW(sp + 8);
+		} else) if (!IS_16BIT()) {
+			EMU86_EMULATE_POP(sp, 8);
+			EMU86_READ_USER_MEMORY(sp, 8);
+			new_sp = EMU86_EMULATE_READL(sp + 0);
+			new_ss = EMU86_EMULATE_READLASW(sp + 4);
+		} else {
+			EMU86_EMULATE_POP(sp, 4);
+			EMU86_READ_USER_MEMORY(sp, 4);
+			new_sp = EMU86_EMULATE_READW(sp + 0);
+			new_ss = EMU86_EMULATE_READW(sp + 2);
+		}
+#if EMU86_EMULATE_CHECKUSER && CONFIG_LIBEMU86_WANT_64BIT
+		/* Verify segment registers.
+		 * NOTE: We can only get here with `EMU86_ISUSER() == true'
+		 *       when the calling code is running in 64-bit mode,
+		 *       so these checks aren't necessary otherwise! */
+		if (EMU86_ISUSER()) {
+			if (!SEGMENT_IS_VALID_USERCODE(new_cs)) {
+				THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+				      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
+				      X86_REGISTER_SEGMENT_CS, new_cs);
+			}
+			if (!SEGMENT_IS_VALID_USERDATA(new_ss)) {
+				THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+				      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
+				      X86_REGISTER_SEGMENT_SS, new_ss);
+			}
+			new_eflags &= USERIRET_EFLAGS_MASK;
+			new_eflags |= EMU86_GETFLAGS() & ~USERIRET_EFLAGS_MASK;
+		}
+#endif /* EMU86_EMULATE_CHECKUSER && CONFIG_LIBEMU86_WANT_64BIT */
+		EMU86_SETFLAGS(new_eflags);
+		EMU86_SETCS(new_cs);
+		EMU86_EMULATE_SETIP((u32)new_ip);
+#if CONFIG_LIBEMU86_WANT_64BIT
+		EMU86_SETRSP(new_sp);
+#else /* CONFIG_LIBEMU86_WANT_64BIT */
+		EMU86_SETESP(new_sp);
+#endif /* !CONFIG_LIBEMU86_WANT_64BIT */
+		EMU86_SETSS(new_ss);
+		goto done_dont_set_pc;
+	}
+#if CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT
+	/* Return to same privilege level. */
+#if EMU86_EMULATE_CHECKUSER
+	/* Verify segment registers. */
+	if (EMU86_ISUSER()) {
+		if (!SEGMENT_IS_VALID_USERCODE(new_cs)) {
+			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+			      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
+			      X86_REGISTER_SEGMENT_CS, new_cs);
+		}
+		/* Restrict EFLAGS to only update this mask */
+		new_eflags &= USERIRET_EFLAGS_MASK;
+		new_eflags |= EMU86_GETFLAGS() & ~USERIRET_EFLAGS_MASK;
+	}
+#endif /* EMU86_EMULATE_CHECKUSER */
+	EMU86_SETFLAGS(new_eflags);
+	EMU86_SETCS(new_cs);
+	EMU86_EMULATE_SETIP((u32)new_ip);
 	goto done_dont_set_pc;
+#endif /* CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT */
+#undef USERIRET_EFLAGS_MASK
 }
 
+#undef REG_UTYPE
+#undef REG_STYPE
 
 }
 EMU86_INTELLISENSE_END

@@ -239,17 +239,6 @@ __DECL_BEGIN
 #endif /* !__INTELLISENSE__ */
 #endif /* !EMU86_EMULATE_TRANSLATEADDR */
 
-/* Return the mask of eflags bits which may be modified by `iret' and `popf'
- * Checked for only when `EMU86_EMULATE_CHECKUSER' is enabled. */
-#ifndef EMU86_ALLOWED_EFLAGS_MODIFY_MASK
-#if defined(__KERNEL__) && (defined(__x86_64__) || defined(__i386__))
-#define EMU86_ALLOWED_EFLAGS_MODIFY_MASK() cred_allow_eflags_modify_mask()
-#else /* __KERNEL__ && (__x86_64__ || __i386__) */
-#define EMU86_ALLOWED_EFLAGS_MODIFY_MASK() 0xffffffff
-#define EMU86_ALLOWED_EFLAGS_MODIFY_MASK_IS_FULL 1
-#endif /* !__KERNEL__ || (!__x86_64__ && !__i386__) */
-#endif /* !EMU86_ALLOWED_EFLAGS_MODIFY_MASK */
-
 
 /* Enable emulation of VM86 helpers */
 #ifndef EMU86_EMULATE_VM86
@@ -347,6 +336,13 @@ __DECL_BEGIN
 #define EMU86_EMULATE_READQASW(addr) (u16)EMU86_EMULATE_READQ(addr)
 #endif
 #endif /* !EMU86_EMULATE_READQASW */
+#ifndef EMU86_EMULATE_READQASL
+#if 1
+#define EMU86_EMULATE_READQASL(addr) EMU86_EMULATE_READL(addr)
+#else
+#define EMU86_EMULATE_READQASL(addr) (u32)EMU86_EMULATE_READQ(addr)
+#endif
+#endif /* !EMU86_EMULATE_READQASL */
 #ifndef EMU86_EMULATE_WRITEQASW
 #if 1
 #define EMU86_EMULATE_WRITEQASW(addr, value) EMU86_EMULATE_WRITEW(addr, value)
@@ -354,6 +350,13 @@ __DECL_BEGIN
 #define EMU86_EMULATE_WRITEQASW(addr, value) EMU86_EMULATE_WRITEQ(addr, value)
 #endif
 #endif /* !EMU86_EMULATE_WRITEQASW */
+#ifndef EMU86_EMULATE_WRITEQASL
+#if 1
+#define EMU86_EMULATE_WRITEQASL(addr, value) EMU86_EMULATE_WRITEL(addr, value)
+#else
+#define EMU86_EMULATE_WRITEQASL(addr, value) EMU86_EMULATE_WRITEQ(addr, value)
+#endif
+#endif /* !EMU86_EMULATE_WRITEQASL */
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
 
 /* Define to `0' to have `xchg' require a lock prefix in order to be considered atomic.
@@ -387,7 +390,7 @@ __DECL_BEGIN
 #endif /* !EMU86_ISUSER_NOVM86 */
 #ifndef EMU86_ISVM86
 #ifdef EMU86_EMULATE_VM86
-#define EMU86_ISVM86() icpustate_isvm86(_state)
+#define EMU86_ISVM86() (EMU86_GETFLAGS() & EFLAGS_VM)
 #else /* EMU86_EMULATE_VM86 */
 #define EMU86_ISVM86() 0
 #endif /* !EMU86_EMULATE_VM86 */

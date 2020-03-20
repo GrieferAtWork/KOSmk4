@@ -115,32 +115,34 @@
 	do {                                                               \
 		byte_t *sp;                                                    \
 		sp = (byte_t *)EMU86_GETSP();                                  \
+		EMU86_POP163264_IMPL(setter16, setter32, setter64)             \
+		EMU86_SETSP(sp);                                               \
+	} __WHILE0
+#define EMU86_POP163264_IMPL(setter16, setter32, setter64)             \
 		if (IS_16BIT()) {                                              \
-			u16 value;                                                 \
+			u16 _value;                                                \
 			EMU86_EMULATE_POP(sp, 2);                                  \
 			EMU86_READ_USER_MEMORY(sp, 2);                             \
-			value = EMU86_EMULATE_READW(sp);                           \
-			setter16(value);                                           \
+			_value = EMU86_EMULATE_READW(sp);                          \
+			setter16(_value);                                          \
 			sp += 2;                                                   \
 		}                                                              \
 		IF_64BIT(else IF_16BIT_OR_32BIT(if (EMU86_F_IS64(op_flags))) { \
-			u64 value;                                                 \
+			u64 _value;                                                \
 			EMU86_EMULATE_POP(sp, 8);                                  \
 			EMU86_READ_USER_MEMORY(sp, 8);                             \
-			value = EMU86_EMULATE_READQ(sp);                           \
-			setter64(value);                                           \
+			_value = EMU86_EMULATE_READQ(sp);                          \
+			setter64(_value);                                          \
 			sp += 8;                                                   \
 		})                                                             \
 		IF_16BIT_OR_32BIT(else {                                       \
-			u32 value;                                                 \
+			u32 _value;                                                \
 			EMU86_EMULATE_POP(sp, 4);                                  \
 			EMU86_READ_USER_MEMORY(sp, 4);                             \
-			value = EMU86_EMULATE_READL(sp);                           \
-			setter32(value);                                           \
+			_value = EMU86_EMULATE_READL(sp);                          \
+			setter32(_value);                                          \
 			sp += 4;                                                   \
-		})                                                             \
-		EMU86_SETSP(sp);                                               \
-	} __WHILE0
+		})
 
 
 
