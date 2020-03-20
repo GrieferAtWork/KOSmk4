@@ -86,7 +86,7 @@
 #define EMU86_PUSH163264(value16, value32, value64)                    \
 	do {                                                               \
 		byte_t *sp;                                                    \
-		sp     = (byte_t *)EMU86_GETSP();                              \
+		sp = (byte_t *)EMU86_GETSP();                                  \
 		if (IS_16BIT()) {                                              \
 			sp -= 2;                                                   \
 			EMU86_EMULATE_PUSH(sp, 2);                                 \
@@ -114,7 +114,7 @@
 #define EMU86_POP163264(setter16, setter32, setter64)                  \
 	do {                                                               \
 		byte_t *sp;                                                    \
-		sp     = (byte_t *)EMU86_GETSP();                              \
+		sp = (byte_t *)EMU86_GETSP();                                  \
 		if (IS_16BIT()) {                                              \
 			u16 value;                                                 \
 			EMU86_EMULATE_POP(sp, 2);                                  \
@@ -141,5 +141,7 @@
 		})                                                             \
 		EMU86_SETSP(sp);                                               \
 	} __WHILE0
+
+
 
 #endif /* !_LIBEMU86_EMU_PUSHPOP_UTIL_H */

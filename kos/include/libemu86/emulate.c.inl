@@ -604,6 +604,14 @@ __DECL_BEGIN
 #define EMU86_EMULATE_OUTB(portno, value) outb(portno, value)
 #define EMU86_EMULATE_OUTW(portno, value) outw(portno, value)
 #define EMU86_EMULATE_OUTL(portno, value) outl(portno, value)
+#ifdef __KERNEL__
+/* Define these to allow for some minor optimizations, when it is known
+ * that in/out emulation can never throw an exception (Note that this
+ * isn't the case for user-space, where use of these instructions can
+ * result in an `E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE' exception) */
+#define EMU86_EMULATE_IN_IS_NOEXCEPT 1
+#define EMU86_EMULATE_OUT_IS_NOEXCEPT 1
+#endif /* __KERNEL__ */
 #endif /* !EMU86_EMULATE_INB */
 
 
@@ -1748,6 +1756,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #else /* EMU86_EMULATE_IMPL_HEADER */
 #include "emu/arith.c.inl"
 #include "emu/arith2.c.inl"
+#include "emu/bcd.c.inl"
 #include "emu/bitscan.c.inl"
 #include "emu/bittest.c.inl"
 #include "emu/bound.c.inl"
@@ -1782,10 +1791,6 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 			/* TODO: lret */
 			/* TODO: enter */
 			/* TODO: cpuid */
-			/* TODO: daa */
-			/* TODO: das */
-			/* TODO: aaa */
-			/* TODO: aas */
 			/* TODO: pusha */
 			/* TODO: popa */
 			/* TODO: arpl */
@@ -1796,8 +1801,6 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 			/* TODO: sahf */
 			/* TODO: lahf */
 			/* TODO: int, int3, into, int1 */
-			/* TODO: aam */
-			/* TODO: aad */
 			/* TODO: salc */
 			/* TODO: xlatb */
 			/* TODO: loop, loopz, loopnz */

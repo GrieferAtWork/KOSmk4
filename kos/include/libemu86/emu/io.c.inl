@@ -166,17 +166,17 @@ case 0x6e: {
 	/* 6E     OUTSB     Output byte from memory location specified in DS:(E)SI or RSI to I/O port specified in DX. */
 	u16 portno = EMU86_GETDX();
 	VERIFY_USER_PORT_ACCESS(portno, 1);
-#ifdef __KERNEL__
+#ifdef EMU86_EMULATE_OUT_IS_NOEXCEPT
 	{
 		u8 value;
 		EMU86_READ_STRING(DS, SI, B, 8, 1,
 		                  _value, value = _value);
 		EMU86_EMULATE_OUTB(portno, value);
 	}
-#else /* __KERNEL__ */
+#else /* EMU86_EMULATE_OUT_IS_NOEXCEPT */
 	EMU86_READ_STRING(DS, SI, B, 8, 1, value,
 	                  EMU86_EMULATE_OUTB(portno, value));
-#endif /* !__KERNEL__ */
+#endif /* !EMU86_EMULATE_OUT_IS_NOEXCEPT */
 	/* Repeat the instruction */
 	if (op_flags & EMU86_F_REP)
 		goto done_dont_set_pc;
@@ -189,30 +189,30 @@ case 0x6f: {
 	u16 portno = EMU86_GETDX();
 	if (!IS_16BIT()) {
 		VERIFY_USER_PORT_ACCESS(portno, 4);
-#ifdef __KERNEL__
+#ifdef EMU86_EMULATE_OUT_IS_NOEXCEPT
 		{
 			u32 value;
 			EMU86_READ_STRING(DS, SI, L, 32, 4,
 			                  _value, value = _value);
 			EMU86_EMULATE_OUTL(portno, value);
 		}
-#else /* __KERNEL__ */
+#else /* EMU86_EMULATE_OUT_IS_NOEXCEPT */
 		EMU86_READ_STRING(DS, SI, W, 32, 4, value,
 		                  EMU86_EMULATE_OUTL(portno, value));
-#endif /* !__KERNEL__ */
+#endif /* !EMU86_EMULATE_OUT_IS_NOEXCEPT */
 	} else {
 		VERIFY_USER_PORT_ACCESS(portno, 2);
-#ifdef __KERNEL__
+#ifdef EMU86_EMULATE_OUT_IS_NOEXCEPT
 		{
 			u16 value;
 			EMU86_READ_STRING(DS, SI, W, 16, 2,
 			                  _value, value = _value);
 			EMU86_EMULATE_OUTW(portno, value);
 		}
-#else /* __KERNEL__ */
+#else /* EMU86_EMULATE_OUT_IS_NOEXCEPT */
 		EMU86_READ_STRING(DS, SI, W, 16, 2, value,
 		                  EMU86_EMULATE_OUTW(portno, value));
-#endif /* !__KERNEL__ */
+#endif /* !EMU86_EMULATE_OUT_IS_NOEXCEPT */
 	}
 	/* Repeat the instruction */
 	if (op_flags & EMU86_F_REP)
