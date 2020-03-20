@@ -1844,6 +1844,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #include "emu/lea.c.inl"
 #include "emu/leave.c.inl"
 #include "emu/ljmp.c.inl"
+#include "emu/loop.c.inl"
 #include "emu/lret.c.inl"
 #include "emu/misc.c.inl"
 #include "emu/mov.c.inl"
@@ -1873,8 +1874,6 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 			/* TODO: enter */
 			/* TODO: cpuid */
 			/* TODO: int, int3, into, int1 */
-			/* TODO: loop, loopz, loopnz */
-			/* TODO: jcxz, jecxz, jrcxz */
 			/* TODO: sldt */
 			/* TODO: str */
 			/* TODO: lldt */

@@ -44,6 +44,8 @@ case 0xe9: {
 		pc += 4;
 		dest_ip = REAL_IP() + offset;
 	}
+	if (IS_16BIT())
+		dest_ip &= 0xffff;
 	EMU86_SETIPREG(dest_ip);
 	goto done_dont_set_pc;
 }
@@ -55,12 +57,13 @@ case 0xeb: {
 	offset = *(s8 *)pc;
 	pc += 1;
 	dest_ip = REAL_IP() + offset;
+	if (IS_16BIT())
+		dest_ip &= 0xffff;
 	EMU86_SETIPREG(dest_ip);
 	goto done_dont_set_pc;
 }
 
 #endif /* !EMU86_EMULATE_ONLY_MEMORY */
-
 
 }
 EMU86_INTELLISENSE_END

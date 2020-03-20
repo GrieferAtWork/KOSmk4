@@ -42,8 +42,8 @@ EMU86_INTELLISENSE_BEGIN(jcc) {
 			EMU86_UREG_TYPE dest_ip;                       \
 			dest_ip = REAL_IP() + offset;                  \
 			IF_16BIT_OR_32BIT(                             \
-			if (IS_16BIT())                                \
-			dest_ip &= 0xffff;)                            \
+			if (IS_16BIT() && !EMU86_F_IS64(op_flags))     \
+				dest_ip &= 0xffff;)                        \
 			EMU86_SETIPREG(dest_ip);                       \
 		}                                                  \
 		goto done_dont_set_pc;                             \
@@ -59,8 +59,8 @@ EMU86_INTELLISENSE_BEGIN(jcc) {
 			EMU86_UREG_TYPE dest_ip;                       \
 			dest_ip = REAL_IP() + offset;                  \
 			IF_16BIT_OR_32BIT(                             \
-			if (IS_16BIT())                                \
-			dest_ip &= 0xffff;)                            \
+			if (IS_16BIT() && !EMU86_F_IS64(op_flags))     \
+				dest_ip &= 0xffff;)                        \
 			EMU86_SETIPREG(dest_ip);                       \
 		}                                                  \
 		goto done_dont_set_pc;                             \

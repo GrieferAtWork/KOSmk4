@@ -21,38 +21,69 @@
 #include "../emulate.c.inl"
 #endif /* __INTELLISENSE__ */
 
-EMU86_INTELLISENSE_BEGIN(xlatb) {
+#include "pushpop-util.h"
 
-case 0xd7: {
-	/*         D7     XLAT m8     Set AL to memory byte DS:[(E)BX + unsigned AL].
-	 *         D7     XLATB       Set AL to memory byte DS:[(E)BX + unsigned AL].
-	 * REX.W + D7     XLATB       Set AL to memory byte [RBX + unsigned AL]. */
-	byte_t *baseaddr;
-	u8 al = EMU86_GETAL();
-#ifdef EMU86_GETSEGBASE_IS_NOOP_DS
-	EMU86_ADDRSIZE_SWITCH({
-		baseaddr = (byte_t *)(uintptr_t)EMU86_GETRBX();
-	}, {
-		baseaddr = (byte_t *)(uintptr_t)EMU86_GETEBX();
-	}, {
-		baseaddr = (byte_t *)(uintptr_t)EMU86_GETBX();
-	});
-	baseaddr += al;
-#else /* EMU86_GETSEGBASE_IS_NOOP_DS */
-	EMU86_ADDRSIZE_SWITCH({
-		baseaddr = (byte_t *)EMU86_GETRBX() + al;
-	}, {
-		baseaddr = EMU86_SEGADDR(EMU86_GETDSBASE(), EMU86_GETEBX() + al);
-	}, {
-		baseaddr = EMU86_SEGADDR(EMU86_GETDSBASE(), EMU86_GETBX() + al);
-	});
-#endif /* !EMU86_GETSEGBASE_IS_NOOP_DS */
-	EMU86_READ_USER_MEMORY(baseaddr, 1);
-	/* Read memory from the specified address */
-	al = EMU86_MEMREADB(baseaddr);
-	EMU86_SETAL(al);
-	goto done;
+EMU86_INTELLISENSE_BEGIN(loop) {
+
+
+#ifndef EMU86_EMULATE_ONLY_MEMORY
+
+case 0xe0: {
+	/* E0 cb     LOOPNE rel8     Decrement count; jump short if count!=0 and ZF=0. */
+	if ((EMU86_GETFLAGS() & EFLAGS_ZF) != 0) {
+		pc += 1;
+		goto done; /* Don't jump */
+	}
+	goto do_loop;
 }
+
+
+case 0xe1: {
+	/* E1 cb     LOOPE rel8      Decrement count; jump short if count!=0 and ZF=1. */
+	if ((EMU86_GETFLAGS() & EFLAGS_ZF) == 0) {
+		pc += 1;
+		goto done; /* Don't jump */
+	}
+	goto do_loop;
+}
+
+
+case 0xe2: {
+	/* E2 cb     LOOP rel8       Decrement count; jump short if count!=0. */
+	s8 offset;
+do_loop:
+	offset = *(s8 *)pc;
+	pc += 1;
+	EMU86_ADDRSIZE_SWITCH({
+		u64 rax;
+		rax = EMU86_GETRAX() - 1;
+		EMU86_SETRAX(rax);
+		if (!rax)
+			goto done;
+	}, {
+		u32 eax;
+		eax = EMU86_GETEAX() - 1;
+		EMU86_SETEAX(eax);
+		if (!eax)
+			goto done;
+	}, {
+		u16 ax;
+		ax = EMU86_GETAX() - 1;
+		EMU86_SETAX(ax);
+		if (!ax)
+			goto done;
+	});
+	{
+		EMU86_UREG_TYPE dest_ip;
+		dest_ip = REAL_IP() + offset;
+		if (IS_16BIT())
+			dest_ip &= 0xffff;
+		EMU86_SETIPREG(dest_ip);
+	}
+	goto done_dont_set_pc;
+}
+
+#endif /* !EMU86_EMULATE_ONLY_MEMORY */
 
 }
 EMU86_INTELLISENSE_END
