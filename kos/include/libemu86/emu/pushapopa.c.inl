@@ -1,0 +1,126 @@
+/* Copyright (c) 2019-2020 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifdef __INTELLISENSE__
+#include "../emulate.c.inl"
+#endif /* __INTELLISENSE__ */
+
+EMU86_INTELLISENSE_BEGIN(pushapopa) {
+
+#if CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT
+
+case 0x60: {
+	/* 60     PUSHA      Push AX, CX, DX, BX, original SP, BP, SI, and DI.
+	 * 60     PUSHAD     Push EAX, ECX, EDX, EBX, original ESP, EBP, ESI, and EDI. */
+	byte_t *sp;
+	IF_64BIT({
+		if (EMU86_F_IS64(op_flags))
+			goto return_unknown_instruction;
+	});
+	sp = (byte_t *)EMU86_GETSP();
+	if (!IS_16BIT()) {
+		sp -= 32;
+		EMU86_EMULATE_PUSH(sp, 32);
+		EMU86_WRITE_USER_MEMORY(sp, 32);
+		EMU86_EMULATE_WRITEL(sp + 0x00, EMU86_GETEDI());
+		EMU86_EMULATE_WRITEL(sp + 0x04, EMU86_GETESI());
+		EMU86_EMULATE_WRITEL(sp + 0x08, EMU86_GETEBP());
+		EMU86_EMULATE_WRITEL(sp + 0x0c, EMU86_GETESP());
+		EMU86_EMULATE_WRITEL(sp + 0x10, EMU86_GETEBX());
+		EMU86_EMULATE_WRITEL(sp + 0x14, EMU86_GETEDX());
+		EMU86_EMULATE_WRITEL(sp + 0x18, EMU86_GETECX());
+		EMU86_EMULATE_WRITEL(sp + 0x1c, EMU86_GETEAX());
+	} else {
+		sp -= 16;
+		EMU86_EMULATE_PUSH(sp, 16);
+		EMU86_WRITE_USER_MEMORY(sp, 16);
+		EMU86_EMULATE_WRITEW(sp + 0x0, EMU86_GETDI());
+		EMU86_EMULATE_WRITEW(sp + 0x2, EMU86_GETSI());
+		EMU86_EMULATE_WRITEW(sp + 0x4, EMU86_GETBP());
+		EMU86_EMULATE_WRITEW(sp + 0x6, EMU86_GETSPREG());
+		EMU86_EMULATE_WRITEW(sp + 0x8, EMU86_GETBX());
+		EMU86_EMULATE_WRITEW(sp + 0xa, EMU86_GETDX());
+		EMU86_EMULATE_WRITEW(sp + 0xc, EMU86_GETCX());
+		EMU86_EMULATE_WRITEW(sp + 0xe, EMU86_GETAX());
+	}
+	EMU86_SETSP(sp);
+	goto done;
+}
+
+
+case 0x61: {
+	/* 61     POPA      Pop DI, SI, BP, BX, DX, CX, and AX.
+	 * 61     POPAD     Pop EDI, ESI, EBP, EBX, EDX, ECX, and EAX. */
+	byte_t *sp;
+	IF_64BIT({
+		if (EMU86_F_IS64(op_flags))
+			goto return_unknown_instruction;
+	});
+	sp = (byte_t *)EMU86_GETSP();
+	if (!IS_16BIT()) {
+		u32 eax, ecx, edx, ebx, ebp, esi, edi;
+		EMU86_EMULATE_POP(sp, 32);
+		EMU86_READ_USER_MEMORY(sp, 32);
+		edi = EMU86_EMULATE_READL(sp + 0x00);
+		esi = EMU86_EMULATE_READL(sp + 0x04);
+		ebp = EMU86_EMULATE_READL(sp + 0x08);
+/*		esp = EMU86_EMULATE_READL(sp + 0x0c); */
+		ebx = EMU86_EMULATE_READL(sp + 0x10);
+		edx = EMU86_EMULATE_READL(sp + 0x14);
+		ecx = EMU86_EMULATE_READL(sp + 0x18);
+		eax = EMU86_EMULATE_READL(sp + 0x1c);
+		COMPILER_READ_BARRIER();
+		EMU86_SETEDI(edi);
+		EMU86_SETESI(esi);
+		EMU86_SETEBP(ebp);
+		EMU86_SETEBX(ebx);
+		EMU86_SETEDX(edx);
+		EMU86_SETECX(ecx);
+		EMU86_SETEAX(eax);
+		sp += 32;
+	} else {
+		u16 ax, cx, dx, bx, bp, si, di;
+		EMU86_EMULATE_POP(sp, 16);
+		EMU86_READ_USER_MEMORY(sp, 16);
+		di = EMU86_EMULATE_READL(sp + 0x0);
+		si = EMU86_EMULATE_READL(sp + 0x2);
+		bp = EMU86_EMULATE_READL(sp + 0x4);
+/*		sp = EMU86_EMULATE_READL(sp + 0x6); */
+		bx = EMU86_EMULATE_READL(sp + 0x8);
+		dx = EMU86_EMULATE_READL(sp + 0xa);
+		cx = EMU86_EMULATE_READL(sp + 0xc);
+		ax = EMU86_EMULATE_READL(sp + 0xe);
+		COMPILER_READ_BARRIER();
+		EMU86_SETDI(di);
+		EMU86_SETSI(si);
+		EMU86_SETBP(bp);
+		EMU86_SETBX(bx);
+		EMU86_SETDX(dx);
+		EMU86_SETCX(cx);
+		EMU86_SETAX(ax);
+		sp += 16;
+	}
+	EMU86_SETSP(sp);
+	goto done;
+}
+
+#endif /* CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT */
+
+}
+EMU86_INTELLISENSE_END

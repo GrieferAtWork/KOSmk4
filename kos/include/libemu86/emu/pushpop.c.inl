@@ -23,7 +23,7 @@
 
 #include "pushpop-util.h"
 
-EMU86_INTELLISENSE_BEGIN(pushpop_segments) {
+EMU86_INTELLISENSE_BEGIN(pushpop) {
 
 #if CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT
 
