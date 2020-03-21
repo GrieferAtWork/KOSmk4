@@ -964,7 +964,7 @@ DECL_END
 
 #define EMU86_EMULATE_DECL INTERN
 #define EMU86_EMULATE_ATTR NONNULL((1))
-#define EMU86_EMULATE_RETURN      return
+#define EMU86_EMULATE_RETURN()    return
 #define EMU86_EMULATE_RETURN_TYPE void
 #define EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION(faultaddr, opcode, op_flags) \
 	libviocore_throw_unknown_instruction(self, opcode)

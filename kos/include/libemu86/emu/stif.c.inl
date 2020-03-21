@@ -56,7 +56,7 @@ case 0xfb: {
 		/* Set the return program counter. */
 		EMU86_SETPCPTR(REAL_IP());
 		/* Execute the custom return statement. */
-		EMU86_EMULATE_RETURN_AFTER_STI_VM86;
+		EMU86_EMULATE_RETURN_AFTER_STI_VM86();
 		__builtin_unreachable();
 #else /* EMU86_EMULATE_RETURN_AFTER_STI_VM86 */
 		goto done;
@@ -80,7 +80,7 @@ case 0xfb: {
 	/* Set the return program counter. */
 	EMU86_SETPCPTR(REAL_IP());
 	/* Execute the custom return statement. */
-	EMU86_EMULATE_RETURN_AFTER_STI;
+	EMU86_EMULATE_RETURN_AFTER_STI();
 	__builtin_unreachable();
 #else /* EMU86_EMULATE_RETURN_AFTER_STI */
 	EMU86_MSKFLAGS(~EFLAGS_IF, EFLAGS_IF);

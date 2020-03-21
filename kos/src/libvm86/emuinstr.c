@@ -117,7 +117,7 @@ DECL_END
 
 #define EMU86_EMULATE_DECL         INTERN
 #define EMU86_EMULATE_ATTR         NONNULL((1))
-#define EMU86_EMULATE_RETURN       return VM86_SUCCESS
+#define EMU86_EMULATE_RETURN()     return VM86_SUCCESS
 #define EMU86_EMULATE_RETURN_TYPE  int
 #define EMU86_EMULATE_NOTHROW      /* nothing */
 #define EMU86_EMULATE_CC           CC
@@ -283,12 +283,21 @@ DECL_END
 	return libvm86_intr(self, 0x5) /* #BR */
 #define EMU86_EMULATE_THROW_DIVIDE_ERROR() \
 	return libvm86_intr(self, 0x0) /* #DE */
-#define EMU86_EMULATE_RETURN_AFTER_STI \
+#define EMU86_EMULATE_RETURN_AFTER_STI() \
 	return VM86_INTR_ENABLED
-#define EMU86_EMULATE_RETURN_AFTER_HLT_IF0 \
+#define EMU86_EMULATE_RETURN_AFTER_HLT_IF0() \
 	return VM86_FROZEN
-#define EMU86_EMULATE_RETURN_AFTER_HLT_IF1 \
+#define EMU86_EMULATE_RETURN_AFTER_HLT_IF1() \
 	return VM86_HALTED
+#define EMU86_EMULATE_RETURN_AFTER_INT(intno) \
+	return libvm86_intr(self, intno)
+#define EMU86_EMULATE_RETURN_AFTER_INT1() \
+	return libvm86_intr(self, 0x01) /* #DB */
+#define EMU86_EMULATE_RETURN_AFTER_INT3() \
+	return libvm86_intr(self, 0x03) /* #BP */
+#define EMU86_EMULATE_RETURN_AFTER_INTO() \
+	return libvm86_intr(self, 0x04) /* #OF */
+
 
 #if defined(__KERNEL__) && 1
 #include <kernel/printk.h>

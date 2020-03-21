@@ -77,18 +77,9 @@ __DECL_BEGIN
 
 /* How and what `emu86_emulate()' should return */
 #ifndef EMU86_EMULATE_RETURN
-#define EMU86_EMULATE_RETURN      return _state
+#define EMU86_EMULATE_RETURN()    return _state
 #define EMU86_EMULATE_RETURN_TYPE struct icpustate *
 #endif /* !EMU86_EMULATE_RETURN */
-
-/* Return in the event of an unrecognized instruction.
- * @param: faultaddr: The starting address of the faulting instruction
- * @param: opcode:    The unknown instruction's opcode
- * @param: op_flags:  Instruction flags (set of `EMU86_F_*') */
-#ifndef EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION
-#define EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION(faultaddr, opcode, op_flags) \
-	EMU86_EMULATE_RETURN
-#endif /* !EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION */
 
 /* The NOTHROW annotation of `emu86_emulate()' */
 #ifndef EMU86_EMULATE_NOTHROW
@@ -199,17 +190,51 @@ __DECL_BEGIN
  * until after the next instruction)
  * NOTE: This expression mustn't return normally! (but should
  *       normally contain a `THROW()' or `return' statement) */
-/* #define EMU86_EMULATE_RETURN_AFTER_STI ... */
+/* #define EMU86_EMULATE_RETURN_AFTER_STI() ... */
 
-/* Same as `EMU86_EMULATE_RETURN_AFTER_STI', but used for vm86 instead. */
-/* #define EMU86_EMULATE_RETURN_AFTER_STI_VM86 ... */
+/* Same as `EMU86_EMULATE_RETURN_AFTER_STI()', but used for vm86 instead. */
+/* #define EMU86_EMULATE_RETURN_AFTER_STI_VM86() ... */
 
 /* An optional, special return expression to be evaluated following
  * an `hlt' instruction (with #IF=0 or #IF=1 respectively)
  * When not defined, `hlt' will simply return normally.
  * See also: `EMU86_EMULATE_RETURN_AFTER_HLT_VM86' when vm86 is supported. */
-/* #define EMU86_EMULATE_RETURN_AFTER_HLT_IF0 ... */
-/* #define EMU86_EMULATE_RETURN_AFTER_HLT_IF1 ... */
+/* #define EMU86_EMULATE_RETURN_AFTER_HLT_IF0() ... */
+/* #define EMU86_EMULATE_RETURN_AFTER_HLT_IF1() ... */
+
+/* Define this (and don't enable `EMU86_EMULATE_ONLY_MEMORY')
+ * to enable emulation of `int', `int3', `into' and `int1' */
+/* #define EMU86_EMULATE_RETURN_AFTER_INT(intno) ... */
+
+/* Return handlers for specific instructions */
+#ifdef EMU86_EMULATE_RETURN_AFTER_INT
+#ifndef EMU86_EMULATE_RETURN_AFTER_INT1
+#define EMU86_EMULATE_RETURN_AFTER_INT1() \
+	EMU86_EMULATE_RETURN_AFTER_INT(0x01) /* #DB */
+#endif /* !EMU86_EMULATE_RETURN_AFTER_INT1 */
+#ifndef EMU86_EMULATE_RETURN_AFTER_INT3
+#define EMU86_EMULATE_RETURN_AFTER_INT3() \
+	EMU86_EMULATE_RETURN_AFTER_INT(0x03) /* #BP */
+#endif /* !EMU86_EMULATE_RETURN_AFTER_INT3 */
+#ifndef EMU86_EMULATE_RETURN_AFTER_INTO
+#define EMU86_EMULATE_RETURN_AFTER_INTO() \
+	EMU86_EMULATE_RETURN_AFTER_INT(0x04) /* #OF */
+#endif /* !EMU86_EMULATE_RETURN_AFTER_INTO */
+#ifndef EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION
+#define EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION(faultaddr, opcode, op_flags) \
+	EMU86_EMULATE_RETURN_AFTER_INT(0x06) /* #UD */
+#endif /* !EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION */
+#endif /* EMU86_EMULATE_RETURN_AFTER_INT */
+
+
+/* Return in the event of an unrecognized instruction.
+ * @param: faultaddr: The starting address of the faulting instruction
+ * @param: opcode:    The unknown instruction's opcode
+ * @param: op_flags:  Instruction flags (set of `EMU86_F_*') */
+#ifndef EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION
+#define EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION(faultaddr, opcode, op_flags) \
+	EMU86_EMULATE_RETURN()
+#endif /* !EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION */
 
 
 #ifndef EMU86_EMULATE_THROW_DIVIDE_BY_ZEROB
@@ -1945,7 +1970,6 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #endif /* !EMU86_EMULATE_IMPL_HEADER */
 #endif /* !__INTELLISENSE__ */
 
-			/* TODO: int, int3, into, int1 */
 			/* TODO: sldt */
 			/* TODO: str */
 			/* TODO: lldt */
@@ -2023,7 +2047,7 @@ done:
 	/* Set the new instruction pointer. */
 	EMU86_SETPCPTR(REAL_IP());
 done_dont_set_pc:
-	EMU86_EMULATE_RETURN;
+	EMU86_EMULATE_RETURN();
 return_unknown_instruction:
 	EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION(REAL_START_IP(),
 	                                         opcode,
