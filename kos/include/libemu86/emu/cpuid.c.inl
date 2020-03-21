@@ -68,9 +68,11 @@ case 0x0fa2: {
 				               CPUID_80000001C_TBM |
 				               0,
 				EDX_FEATURES = CPUID_80000001D_CMOV |
-				               CPUID_80000001D_TSC |     /* TODO: Optional */
-				               CPUID_80000001D_MSR |     /* TODO: Optional */
-				               CPUID_80000001D_SYSCALL | /* TODO: Optional */
+			                   CPUID_80000001D_TSC | /* TODO: Optional */
+			                   CPUID_80000001D_MSR | /* TODO: Optional */
+#ifdef EMU86_EMULATE_RETURN_AFTER_SYSCALL
+				               CPUID_80000001D_SYSCALL |
+#endif /* EMU86_EMULATE_RETURN_AFTER_SYSCALL */
 #ifdef EMU86_MEM_ATOMIC_CMPXCHQ
 				               CPUID_80000001D_CX8 |
 #endif /* EMU86_MEM_ATOMIC_CMPXCHQ */
@@ -127,7 +129,9 @@ cpuid_setinfo0_noeax:
 				               CPUID_1D_CLFSH |
 				               CPUID_1D_TSC |   /* TODO: Optional */
 				               CPUID_1D_MSR |   /* TODO: Optional */
-				               CPUID_1D_SEP |   /* TODO: Optional */
+#ifdef EMU86_EMULATE_RETURN_AFTER_SYSENTER
+				               CPUID_1D_SEP |
+#endif /* EMU86_EMULATE_RETURN_AFTER_SYSENTER */
 #ifdef EMU86_MEM_ATOMIC_CMPXCHQ
 				               CPUID_1D_CX8 |
 #endif /* EMU86_MEM_ATOMIC_CMPXCHQ */

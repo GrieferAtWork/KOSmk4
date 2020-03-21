@@ -215,6 +215,15 @@ __DECL_BEGIN
  * to enable emulation of `int', `int3', `into' and `int1' */
 /* #define EMU86_EMULATE_RETURN_AFTER_INT(intno) ... */
 
+
+/* Return handlers for `syscall' and `sysenter'
+ * These hooks should be defined within the #UD handler in
+ * kernel-space to emulate the expected behavior is the
+ * instruction had actually been supported. */
+/* #define EMU86_EMULATE_RETURN_AFTER_SYSCALL() ... */
+/* #define EMU86_EMULATE_RETURN_AFTER_SYSENTER() ... */
+
+
 /* Return handlers for specific instructions */
 #ifdef EMU86_EMULATE_RETURN_AFTER_INT
 #ifndef EMU86_EMULATE_RETURN_AFTER_INT1
@@ -1974,6 +1983,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #include "emu/stdf.c.inl"
 #include "emu/stif.c.inl"
 #include "emu/stos.c.inl"
+#include "emu/syscall-sysenter.c.inl"
 #include "emu/xadd.c.inl"
 #include "emu/xchg.c.inl"
 #include "emu/xlatb.c.inl"
@@ -2000,11 +2010,6 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 			/* TODO: lfence */
 			/* TODO: mfence */
 			/* TODO: sfence */
-
-			/* TODO: syscall */
-			/* TODO: sysret */
-			/* TODO: sysenter */
-			/* TODO: sysexit */
 
 			/* TODO: swapgs */
 			/* TODO: rdtscp */
