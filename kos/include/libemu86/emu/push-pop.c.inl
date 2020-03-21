@@ -155,7 +155,7 @@ case 0x58 ... 0x5f: {
 	/* 50+rw     POP r16     Pop r16.
 	 * 50+rd     POP r32     Pop r32.
 	 * 50+rd     POP r64     Pop r64. */
-	u8 regno = (u8)(opcode - 0x50);
+	u8 regno = (u8)(opcode - 0x58);
 #define SETREGW(v) EMU86_SETREGW(regno, v)
 #define SETREGL(v) EMU86_SETREGL(regno, v)
 #define SETREGQ(v) EMU86_SETREGQ(regno, v)
