@@ -266,11 +266,11 @@ case 0xc7:
 		/* C7 /0      MOV r/m16,imm16      Move imm16 to r/m16 */
 		/* C7 /0      MOV r/m32,imm32      Move imm32 to r/m32 */
 		if (!IS_16BIT()) {
-			value = (s32)(u32)UNALIGNED_GET16((u16 *)pc);
-			pc += 2;
-		} else {
 			value = (s32)UNALIGNED_GET32((u32 *)pc);
 			pc += 4;
+		} else {
+			value = (s32)(u32)UNALIGNED_GET16((u16 *)pc);
+			pc += 2;
 		}
 		IF_64BIT(if (IS_64BIT()) {
 			MODRM_SETRMQ((u64)(s64)value);
