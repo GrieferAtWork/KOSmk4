@@ -96,10 +96,16 @@ case 0x91 ... 0x97: {
 	 * REX.W + 90+rd     XCHG RAX, r64     Exchange r64 with RAX.
 	 *         90+rd     XCHG r32, EAX     Exchange EAX with r32.
 	 * REX.W + 90+rd     XCHG r64, RAX     Exchange RAX with r64. */
-	u8 regno = (u8)(opcode - 0x90);
-	IF_64BIT(if (IS_64BIT()) {
+	u8 regno;
+	regno = opcode - 0x90;
+#if CONFIG_LIBEMU86_WANT_64BIT
+	if (op_flags & EMU86_F_REX_B)
+		regno |= 0x8;
+	if (IS_64BIT()) {
 		DEFINE_XCHG_reg(Q, 64, regno, RAX)
-	} else) if (!IS_16BIT()) {
+	} else
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+	if (!IS_16BIT()) {
 		DEFINE_XCHG_reg(L, 32, regno, EAX)
 	} else {
 		DEFINE_XCHG_reg(W, 16, regno, AX)

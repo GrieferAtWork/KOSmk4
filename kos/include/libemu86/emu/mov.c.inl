@@ -415,10 +415,15 @@ case 0x63: {
 #ifndef EMU86_EMULATE_ONLY_MEMORY
 case 0xb0 ... 0xb7: {
 	u8 value;
+	u8 regno = opcode - 0xb0;
+#if CONFIG_LIBEMU86_WANT_64BIT
+	if (op_flags & EMU86_F_REX_B)
+		regno |= 0x8;
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
 	/* B0+ rb ib    MOV r8, imm8      OI     Valid     Valid     Move imm8 to r8. */
 	value = *pc;
 	++pc;
-	EMU86_SETREGB(opcode - 0xb0, value, op_flags);
+	EMU86_SETREGB(regno, value, op_flags);
 	goto done;
 }
 
@@ -427,21 +432,26 @@ case 0xb8 ... 0xbf: {
 	/*         B8+ rw iw    MOV r16, imm16   OI   Valid    Valid    Move imm16 to r16.
 	 *         B8+ rd id    MOV r32, imm32   OI   Valid    Valid    Move imm32 to r32.
 	 * REX.W + B8+ rd io    MOV r64, imm64   OI   Valid    N.E.     Move imm64 to r64. */
+	u8 regno = opcode - 0xb8;
+#if CONFIG_LIBEMU86_WANT_64BIT
+	if (op_flags & EMU86_F_REX_B)
+		regno |= 0x8;
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
 	IF_64BIT(if (IS_64BIT()) {
 		u64 value;
 		value = UNALIGNED_GET64((u64 *)pc);
 		pc += 8;
-		EMU86_SETREGQ(opcode - 0xb8, value);
+		EMU86_SETREGQ(regno, value);
 	} else) if (!IS_16BIT()) {
 		u32 value;
 		value = UNALIGNED_GET32((u32 *)pc);
 		pc += 4;
-		EMU86_SETREGL(opcode - 0xb8, value);
+		EMU86_SETREGL(regno, value);
 	} else {
 		u16 value;
 		value = UNALIGNED_GET16((u16 *)pc);
 		pc += 2;
-		EMU86_SETREGW(opcode - 0xb8, value);
+		EMU86_SETREGW(regno, value);
 	}
 	goto done;
 }

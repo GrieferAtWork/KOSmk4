@@ -144,7 +144,12 @@ case 0x50 ... 0x57: {
 	/* 50+rw     PUSH r16     Push r16.
 	 * 50+rd     PUSH r32     Push r32.
 	 * 50+rd     PUSH r64     Push r64. */
-	u8 regno = (u8)(opcode - 0x50);
+	u8 regno;
+	regno = opcode - 0x50;
+#if CONFIG_LIBEMU86_WANT_64BIT
+	if (op_flags & EMU86_F_REX_B)
+		regno |= 0x8;
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
 	EMU86_PUSH163264(EMU86_GETREGW(regno),
 	                 EMU86_GETREGL(regno),
 	                 EMU86_GETREGQ(regno));
@@ -155,7 +160,12 @@ case 0x58 ... 0x5f: {
 	/* 50+rw     POP r16     Pop r16.
 	 * 50+rd     POP r32     Pop r32.
 	 * 50+rd     POP r64     Pop r64. */
-	u8 regno = (u8)(opcode - 0x58);
+	u8 regno;
+	regno = opcode - 0x58;
+#if CONFIG_LIBEMU86_WANT_64BIT
+	if (op_flags & EMU86_F_REX_B)
+		regno |= 0x8;
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
 #define SETREGW(v) EMU86_SETREGW(regno, v)
 #define SETREGL(v) EMU86_SETREGL(regno, v)
 #define SETREGQ(v) EMU86_SETREGQ(regno, v)
