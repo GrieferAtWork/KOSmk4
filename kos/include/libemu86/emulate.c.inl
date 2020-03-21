@@ -61,6 +61,7 @@
 #endif /* !LIBEMU86_DONT_USE_HYBRID_BSWAP */
 
 #if defined(__x86_64__) || defined(__i386__)
+#include <asm/intrin.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 #ifdef __KERNEL__
@@ -119,6 +120,15 @@ __DECL_BEGIN
 #ifndef EMU86_EMULATE_ARGS
 #define EMU86_EMULATE_ARGS          struct icpustate *__restrict _state
 #endif /* !EMU86_EMULATE_ARGS */
+
+/* Define to non-zero if user access checks should be performed. */
+#ifndef EMU86_EMULATE_CHECKUSER
+#if defined(__KERNEL__) || defined(__INTELLISENSE__)
+#define EMU86_EMULATE_CHECKUSER 1
+#else /* __KERNEL__ */
+#define EMU86_EMULATE_CHECKUSER 0
+#endif /* !__KERNEL__ */
+#endif /* !EMU86_EMULATE_CHECKUSER */
 
 /* Hint at a spin-loop that may not necessarily break on its own.
  * This is placed in `do { READ(); } while (!ATOMIC_CMPXCH());'
@@ -192,6 +202,33 @@ __DECL_BEGIN
 #define EMU86_EMULATE_THROW_PRIVILEGED_INSTRUCTION(opcode) \
 	THROW(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE, opcode)
 #endif /* !EMU86_EMULATE_THROW_PRIVILEGED_INSTRUCTION */
+/* Same as `EMU86_EMULATE_THROW_PRIVILEGED_INSTRUCTION()', but used
+ * when the instruction was specific to a certain modrm.mi_reg value
+ * that is given as `rm_reg'. */
+#ifndef EMU86_EMULATE_THROW_PRIVILEGED_INSTRUCTION_RMREG
+#define EMU86_EMULATE_THROW_PRIVILEGED_INSTRUCTION_RMREG(opcode, rm_reg) \
+	EMU86_EMULATE_THROW_PRIVILEGED_INSTRUCTION(opcode)
+#endif /* !EMU86_EMULATE_THROW_PRIVILEGED_INSTRUCTION_RMREG */
+
+/* Expected a memory operand modr/m */
+#ifndef EMU86_EMULATE_THROW_MODRM_EXPECTED_MEMORY
+#define EMU86_EMULATE_THROW_MODRM_EXPECTED_MEMORY(opcode) \
+	goto return_unknown_instruction
+#endif /* !EMU86_EMULATE_THROW_MODRM_EXPECTED_MEMORY */
+#ifndef EMU86_EMULATE_THROW_MODRM_EXPECTED_MEMORY_RMREG
+#define EMU86_EMULATE_THROW_MODRM_EXPECTED_MEMORY_RMREG(opcode, rm_reg) \
+	EMU86_EMULATE_THROW_MODRM_EXPECTED_MEMORY(opcode)
+#endif /* !EMU86_EMULATE_THROW_MODRM_EXPECTED_MEMORY_RMREG */
+
+/* Expected a register operand for modr/m */
+#ifndef EMU86_EMULATE_THROW_MODRM_EXPECTED_REGISTER
+#define EMU86_EMULATE_THROW_MODRM_EXPECTED_REGISTER(opcode) \
+	goto return_unknown_instruction
+#endif /* !EMU86_EMULATE_THROW_MODRM_EXPECTED_REGISTER */
+#ifndef EMU86_EMULATE_THROW_MODRM_EXPECTED_REGISTER_RMREG
+#define EMU86_EMULATE_THROW_MODRM_EXPECTED_REGISTER_RMREG(opcode, rm_reg) \
+	EMU86_EMULATE_THROW_MODRM_EXPECTED_REGISTER(opcode)
+#endif /* !EMU86_EMULATE_THROW_MODRM_EXPECTED_REGISTER_RMREG */
 
 /* An optional, special return expression to be evaluated following
  * an `sti' instruction that turned on EFLAGS.IF (may be used to
@@ -338,6 +375,85 @@ __DECL_BEGIN
 #endif /* EMU86_EMULATE_VM86 */
 
 
+/* Optional emulation of various protected-mode x86 registers
+ * These accessor functions are used in `emu/pmode.c.inl'
+ * NOTE: The associated instructions are guarded against user-access. */
+#if defined(__x86_64__) || defined(__i386__)
+#if !defined(EMU86_EMULATE_SLDT) && defined(EMU86_WANT_EMULATE_SLDT)
+#define EMU86_EMULATE_SLDT() __sldt()
+#endif /* !EMU86_EMULATE_SLDT && EMU86_WANT_EMULATE_SLDT */
+#if !defined(EMU86_EMULATE_LLDT) && defined(EMU86_WANT_EMULATE_LLDT)
+#define EMU86_EMULATE_LLDT(segment_index) __lldt(segment_index)
+#endif /* !EMU86_EMULATE_LLDT && EMU86_WANT_EMULATE_LLDT */
+#if !defined(EMU86_EMULATE_STR) && defined(EMU86_WANT_EMULATE_STR)
+#define EMU86_EMULATE_STR() __str()
+#endif /* !EMU86_EMULATE_STR && EMU86_WANT_EMULATE_STR */
+#if !defined(EMU86_EMULATE_LTR) && defined(EMU86_WANT_EMULATE_LTR)
+#define EMU86_EMULATE_LTR(segment_index) __ltr(segment_index)
+#endif /* !EMU86_EMULATE_LTR && EMU86_WANT_EMULATE_LTR */
+#if !defined(EMU86_EMULATE_VERR) && defined(EMU86_WANT_EMULATE_VERR)
+#define EMU86_EMULATE_VERR(segment_index) __verr(segment_index)
+#endif /* !EMU86_EMULATE_VERR && EMU86_WANT_EMULATE_VERR */
+#if !defined(EMU86_EMULATE_VERW) && defined(EMU86_WANT_EMULATE_VERW)
+#define EMU86_EMULATE_VERW(segment_index) __verw(segment_index)
+#endif /* !EMU86_EMULATE_VERW && EMU86_WANT_EMULATE_VERW */
+#if !defined(EMU86_EMULATE_SGDT) && defined(EMU86_WANT_EMULATE_SGDT)
+#define EMU86_EMULATE_SGDT(limit, base)        \
+	do {                                       \
+		struct desctab dt;                     \
+		__sgdt(&dt);                           \
+		(limit) = (u16)dt.dt_limit;            \
+		(base)  = (EMU86_UREG_TYPE)dt.dt_base; \
+	} __WHILE0
+#endif /* !EMU86_EMULATE_SGDT && EMU86_WANT_EMULATE_SGDT */
+#if !defined(EMU86_EMULATE_LGDT) && defined(EMU86_WANT_EMULATE_LGDT)
+#define EMU86_EMULATE_LGDT(limit, base) \
+	__lgdt(limit, (void *)(uintptr_t)(base))
+#endif /* !EMU86_EMULATE_LGDT && EMU86_WANT_EMULATE_LGDT */
+#if !defined(EMU86_EMULATE_SIDT) && defined(EMU86_WANT_EMULATE_SIDT)
+#define EMU86_EMULATE_SIDT(limit, base)        \
+	do {                                       \
+		struct desctab dt;                     \
+		__sidt(&dt);                           \
+		(limit) = (u16)dt.dt_limit;            \
+		(base)  = (EMU86_UREG_TYPE)dt.dt_base; \
+	} __WHILE0
+#endif /* !EMU86_EMULATE_SIDT && EMU86_WANT_EMULATE_SIDT */
+#if !defined(EMU86_EMULATE_LIDT) && defined(EMU86_WANT_EMULATE_LIDT)
+#define EMU86_EMULATE_LIDT(limit, base) \
+	__lidt(limit, (void *)(uintptr_t)(base))
+#endif /* !EMU86_EMULATE_LIDT && EMU86_WANT_EMULATE_LIDT */
+#if !defined(EMU86_EMULATE_SMSW) && defined(EMU86_WANT_EMULATE_SMSW)
+#define EMU86_EMULATE_SMSW() __smsw()
+#endif /* !EMU86_EMULATE_SMSW && EMU86_WANT_EMULATE_SMSW */
+#if !defined(EMU86_EMULATE_LMSW) && defined(EMU86_WANT_EMULATE_LMSW)
+#define EMU86_EMULATE_LMSW(value) __lmsw(value)
+#endif /* !EMU86_EMULATE_LMSW && EMU86_WANT_EMULATE_LMSW */
+#if !defined(EMU86_EMULATE_INVLPG) && defined(EMU86_WANT_EMULATE_INVLPG)
+#define EMU86_EMULATE_INVLPG(addr) __invlpg(addr)
+#endif /* !EMU86_EMULATE_INVLPG && EMU86_WANT_EMULATE_INVLPG */
+#endif /* __x86_64__ || __i386__ */
+
+
+/* Get the value of `CR4.UMIP', which when enabled causes the following
+ * instructions to trigger a #GP when executed from user-space:
+ *   - sldt
+ *   - str
+ *   - sgdt
+ *   - sidt
+ *   - smsw
+ */
+#if EMU86_EMULATE_CHECKUSER && !defined(EMU86_GETCR4_UMIP)
+#if defined(__KERNEL__) && (defined(__x86_64__) || defined(__i386__))
+#define EMU86_GETCR4_UMIP() (__rdcr4() & CR4_UMIP)
+#endif /* __KERNEL__ && (__x86_64__ || __i386__) */
+#ifndef EMU86_GETCR4_UMIP
+#define EMU86_GETCR4_UMIP_IS_ZERO 1
+#define EMU86_GETCR4_UMIP() 0
+#endif /* !EMU86_GETCR4_UMIP */
+#endif /* EMU86_EMULATE_CHECKUSER && !EMU86_GETCR4_UMIP */
+
+
 
 /* Read/write memory
  * NOTE: These functions aren't used when it comes to reading from PC-relative memory. */
@@ -442,15 +558,6 @@ __DECL_BEGIN
 #ifndef EMU86_EMULATE_ATOMIC_XCHG_REQUIRES_LOCK
 #define EMU86_EMULATE_ATOMIC_XCHG_REQUIRES_LOCK 1
 #endif /* !EMU86_EMULATE_ATOMIC_XCHG_REQUIRES_LOCK */
-
-/* Define to non-zero if user access checks should be performed. */
-#ifndef EMU86_EMULATE_CHECKUSER
-#if defined(__KERNEL__) || defined(__INTELLISENSE__)
-#define EMU86_EMULATE_CHECKUSER 1
-#else /* __KERNEL__ */
-#define EMU86_EMULATE_CHECKUSER 0
-#endif /* !__KERNEL__ */
-#endif /* !EMU86_EMULATE_CHECKUSER */
 
 /* Return non-zero if user access checks should be performed for the caller. */
 #ifndef EMU86_ISUSER
@@ -694,6 +801,19 @@ __DECL_BEGIN
 
 
 
+#if CONFIG_LIBEMU86_WANT_64BIT
+#define EMU86_UREG_TYPE u64
+#define EMU86_SREG_TYPE s64
+#else /* CONFIG_LIBEMU86_WANT_64BIT */
+#define EMU86_UREG_TYPE u32
+#define EMU86_SREG_TYPE s32
+#endif /* !CONFIG_LIBEMU86_WANT_64BIT */
+
+
+
+
+
+
 /* Get a segment register by index
  * @param: regno: One of `EMU86_R_ES', `EMU86_R_CS', ... */
 #ifndef EMU86_GETSEG
@@ -840,7 +960,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getregb))
 #if CONFIG_LIBEMU86_WANT_64BIT
 	if (op_flags & EMU86_F_HASREX) {
 		if (regno == EMU86_R_SPL)
-			return (u8)EMU86_GETSTACKPTR();
+			return (u8)EMU86_GETSPREG();
 		return *(u8 const *)((byte_t const *)_state + EMU86_EMULATE_HELPER_NAME(emu86_reg_offsets)[regno]);
 	}
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
@@ -868,7 +988,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setregb))
 #if CONFIG_LIBEMU86_WANT_64BIT
 	if (op_flags & EMU86_F_HASREX) {
 		if (regno == EMU86_R_SPL) {
-			EMU86_SETSTACKPTR((EMU86_GETSTACKPTR() & ~0xff) | value);
+			EMU86_SETSPREG((EMU86_GETSPREG() & ~0xff) | value);
 		} else {
 			*(u8 *)((byte_t *)_state + EMU86_EMULATE_HELPER_NAME(emu86_reg_offsets)[regno]) = value;
 		}
@@ -888,7 +1008,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getregw))
                                                                                  u8 regno) {
 	regno &= __EMU86_GPREG_MASK;
 	if (regno == EMU86_R_SP)
-		return EMU86_GETSTACKPTR();
+		return EMU86_GETSPREG();
 	return (u16)*(uintptr_t const *)((byte_t *)_state + EMU86_EMULATE_HELPER_NAME(emu86_reg_offsets)[regno]);
 }
 #endif /* !EMU86_GETREGW */
@@ -901,7 +1021,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setregw))
                                                                                  u8 regno, u16 value) {
 	regno &= __EMU86_GPREG_MASK;
 	if (regno == EMU86_R_SP) {
-		EMU86_SETSTACKPTR((uintptr_t)value);
+		EMU86_SETSPREG(value);
 	} else {
 		*(uintptr_t *)((byte_t *)_state + EMU86_EMULATE_HELPER_NAME(emu86_reg_offsets)[regno]) = (uintptr_t)value;
 	}
@@ -916,7 +1036,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getregl))
                                                                                  u8 regno) {
 	regno &= __EMU86_GPREG_MASK;
 	if (regno == EMU86_R_SP)
-		return EMU86_GETSTACKPTR();
+		return (u32)EMU86_GETSPREG();
 	return (u32)*(uintptr_t const *)((byte_t const *)_state + EMU86_EMULATE_HELPER_NAME(emu86_reg_offsets)[regno]);
 }
 #endif /* !EMU86_GETREGL */
@@ -929,7 +1049,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setregl))
                                                                                  u8 regno, u32 value) {
 	regno &= __EMU86_GPREG_MASK;
 	if (regno == EMU86_R_SP) {
-		EMU86_SETSTACKPTR((uintptr_t)value);
+		EMU86_SETSPREG(value);
 	} else {
 		*(uintptr_t *)((byte_t *)_state + EMU86_EMULATE_HELPER_NAME(emu86_reg_offsets)[regno]) = (uintptr_t)value;
 	}
@@ -945,7 +1065,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getregq))
                                                                                  u8 regno) {
 	regno &= __EMU86_GPREG_MASK;
 	if (regno == EMU86_R_SP)
-		return (u64)EMU86_GETSTACKPTR();
+		return (u64)EMU86_GETSPREG();
 	return (u64)*(uintptr_t const *)((byte_t const *)_state + EMU86_EMULATE_HELPER_NAME(emu86_reg_offsets)[regno]);
 }
 #endif /* !EMU86_GETREGQ */
@@ -958,7 +1078,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setregq))
                                                                                  u8 regno, u64 value) {
 	regno &= __EMU86_GPREG_MASK;
 	if (regno == EMU86_R_SP) {
-		EMU86_SETSTACKPTR((uintptr_t)value);
+		EMU86_SETSPREG(value);
 	} else {
 		*(uintptr_t *)((byte_t *)_state + EMU86_EMULATE_HELPER_NAME(emu86_reg_offsets)[regno]) = (uintptr_t)value;
 	}
@@ -1710,15 +1830,6 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #endif /* !EMU86_EMULATE_CHECKUSER */
 #endif /* !EMU86_READ_USER_MEMORY */
 
-#if CONFIG_LIBEMU86_WANT_64BIT
-#define EMU86_UREG_TYPE u64
-#define EMU86_SREG_TYPE s64
-#else /* CONFIG_LIBEMU86_WANT_64BIT */
-#define EMU86_UREG_TYPE u32
-#define EMU86_SREG_TYPE s32
-#endif /* !CONFIG_LIBEMU86_WANT_64BIT */
-
-
 #ifdef EMU86_EMULATE_ONLY_MEMORY
 #define IF_ONLY_MEMORY(...)  __VA_ARGS__
 #define NIF_ONLY_MEMORY(...) /* nothing */
@@ -1970,6 +2081,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #include "emu/mov.c.inl"
 #include "emu/movs.c.inl"
 #include "emu/nop.c.inl"
+#include "emu/pmode.c.inl"
 #include "emu/push-pop.c.inl"
 #include "emu/pusha-popa.c.inl"
 #include "emu/pushf-popf.c.inl"
@@ -1990,33 +2102,13 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #endif /* !EMU86_EMULATE_IMPL_HEADER */
 #endif /* !__INTELLISENSE__ */
 
-			/* TODO: sldt */
-			/* TODO: str */
-			/* TODO: lldt */
-			/* TODO: ltr */
-			/* TODO: verr */
-			/* TODO: verw */
-			/* TODO: sgdt */
-			/* TODO: lgdt */
-			/* TODO: invlpg */
 			/* TODO: lar */
 			/* TODO: lsl */
-
-			/* TODO: smsw */
-			/* TODO: lmsw */
-			/* TODO: clts */
-			/* TODO: mov (%crN) */
 
 			/* TODO: lfence */
 			/* TODO: mfence */
 			/* TODO: sfence */
 
-			/* TODO: swapgs */
-			/* TODO: rdtscp */
-			/* TODO: wrmsr */
-			/* TODO: rdtsc */
-			/* TODO: rdmsr */
-			/* TODO: rdpmc */
 			/* TODO: rdfsbase */
 			/* TODO: rdgsbase */
 			/* TODO: wrfsbase */
@@ -2041,9 +2133,6 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 			/* TODO: shrx */
 			/* TODO: movdir64b */
 			/* TODO: rorx */
-			/* TODO: rdrand */
-			/* TODO: rdseed */
-			/* TODO: rdpid */
 
 
 			default:

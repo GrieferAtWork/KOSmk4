@@ -1629,6 +1629,25 @@ NOTHROW(CC CS_setregl)(struct vio_emulate_args *__restrict self, u8 regno, u32 v
 	THROW(E_INDEX_ERROR_OUT_OF_BOUNDS, bound_idx, bound_min, bound_max)
 #define EMU86_EMULATE_THROW_DIVIDE_BY_ZERO_ALLOW_RETHROW 1
 
+/* Enable support for protected-mode instructions
+ * This is required because all of these instructions can take
+ * a memory location as operand, thus allowing them to trigger
+ * a #PF that may require VIO emulation... */
+#define EMU86_WANT_EMULATE_SLDT 1
+#define EMU86_WANT_EMULATE_LLDT 1
+#define EMU86_WANT_EMULATE_STR  1
+#define EMU86_WANT_EMULATE_LTR  1
+#define EMU86_WANT_EMULATE_SGDT 1
+#define EMU86_WANT_EMULATE_LGDT 1
+#define EMU86_WANT_EMULATE_SIDT 1
+#define EMU86_WANT_EMULATE_LIDT 1
+#define EMU86_WANT_EMULATE_VERR 1
+#define EMU86_WANT_EMULATE_VERW 1
+#define EMU86_WANT_EMULATE_SMSW 1
+#define EMU86_WANT_EMULATE_LMSW 1
+/* #define EMU86_WANT_EMULATE_INVLPG 1 */ /* This one shouldn't be able to cause a segfault! */
+
+
 DECL_END
 
 /* Use relative include to force rebuild on change, and prevent -Wsystem-headers */

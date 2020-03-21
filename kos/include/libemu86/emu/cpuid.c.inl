@@ -68,8 +68,6 @@ case 0x0fa2: {
 				               CPUID_80000001C_TBM |
 				               0,
 				EDX_FEATURES = CPUID_80000001D_CMOV |
-			                   CPUID_80000001D_TSC | /* TODO: Optional */
-			                   CPUID_80000001D_MSR | /* TODO: Optional */
 #ifdef EMU86_EMULATE_RETURN_AFTER_SYSCALL
 				               CPUID_80000001D_SYSCALL |
 #endif /* EMU86_EMULATE_RETURN_AFTER_SYSCALL */
@@ -120,15 +118,12 @@ cpuid_setinfo0_noeax:
 			enum {
 				ECX_FEATURES = CPUID_1C_MOVBE |
 				               CPUID_1C_POPCNT |
-				               CPUID_1C_RDRND | /* TODO: Optional */
 #if CONFIG_LIBEMU86_WANT_64BIT && defined(EMU86_MEM_ATOMIC_CMPXCH128)
 				               CPUID_1C_CX16 |
 #endif /* CONFIG_LIBEMU86_WANT_64BIT && EMU86_MEM_ATOMIC_CMPXCH128 */
 				               0,
 				EDX_FEATURES = CPUID_1D_CMOV |
 				               CPUID_1D_CLFSH |
-				               CPUID_1D_TSC |   /* TODO: Optional */
-				               CPUID_1D_MSR |   /* TODO: Optional */
 #ifdef EMU86_EMULATE_RETURN_AFTER_SYSENTER
 				               CPUID_1D_SEP |
 #endif /* EMU86_EMULATE_RETURN_AFTER_SYSENTER */
@@ -155,7 +150,6 @@ cpuid_setinfo0_noeax:
 				EBX_FEATURES = CPUID_7B_CLFLUSHOPT |
 				               CPUID_7B_CLWB |
 				               CPUID_7B_FSGSBASE | /* TODO: Optional */
-				               CPUID_7B_RDSEED |   /* TODO: Optional */
 				               0,
 				ECX_FEATURES = CPUID_7C_PREFETCHWT1 |
 				               0,
