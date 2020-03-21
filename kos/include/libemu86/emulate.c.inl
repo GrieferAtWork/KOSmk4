@@ -1921,6 +1921,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #include "emu/lods.c.inl"
 #include "emu/loop.c.inl"
 #include "emu/lret.c.inl"
+#include "emu/lxs.c.inl"
 #include "emu/misc.c.inl"
 #include "emu/mov.c.inl"
 #include "emu/movs.c.inl"
@@ -1956,12 +1957,6 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 			/* TODO: invlpg */
 			/* TODO: lar */
 			/* TODO: lsl */
-
-			/* TODO: les */
-			/* TODO: lds */
-			/* TODO: lss */
-			/* TODO: lfs */
-			/* TODO: lgs */
 
 			/* TODO: smsw */
 			/* TODO: lmsw */
