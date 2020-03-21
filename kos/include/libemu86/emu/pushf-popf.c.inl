@@ -67,6 +67,7 @@ case 0x9d: {
 	                     eflags_mask = EFLAGS_MASK_COMMON | EFLAGS_ID | EFLAGS_AC;
 	                     new_eflags  = ~(EFLAGS_RF) & (u32) /*value;*/);
 #undef EFLAGS_MASK_COMMON
+	EMU86_SETSTACKPTR(sp);
 #if EMU86_EMULATE_VM86
 	if (EMU86_ISVM86()) {
 		EMU86_EMULATE_VM86_SETIF((new_eflags & EFLAGS_IF) != 0);
