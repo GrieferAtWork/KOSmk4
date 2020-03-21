@@ -26,110 +26,110 @@ EMU86_INTELLISENSE_BEGIN(shift) {
 	u8 num_bits;
 
 
-#define DEFINE_SHIFT_OPERATIONS_MODRM_reg(bwlq, BWLQ, Nbits, Nbytes, msb_bit_set)              \
-	do {                                                                                       \
-		u32 eflags_addend = 0;                                                                 \
-		u8 oldval, newval;                                                                     \
-		num_bits &= (Nbits - 1);                                                               \
-		if (!num_bits)                                                                         \
-			goto done; /* no-op */                                                             \
-do_shift##Nbits:                                                                               \
-		oldval = MODRM_GETRMB();                                                               \
-		switch (modrm.mi_reg) {                                                                \
-			                                                                                   \
-		case 0: /* rol r/mN,<num_bits> */                                                      \
-			if ((oldval << (num_bits - 1)) & msb_bit_set)                                      \
-				eflags_addend |= EFLAGS_CF;                                                    \
-			newval = __hybrid_rol##Nbits(oldval, num_bits);                                    \
-			break;                                                                             \
-			                                                                                   \
-		case 1: /* ror r/mN,<num_bits> */                                                      \
-			if (oldval & ((u##Nbits)1 << (num_bits - 1)))                                      \
-				eflags_addend |= EFLAGS_CF;                                                    \
-			newval = __hybrid_ror##Nbits(oldval, num_bits);                                    \
-			break;                                                                             \
-			                                                                                   \
-		case 2: /* rcl r/mN,<num_bits> */                                                      \
-			eflags_addend = EMU86_GETFLAGS() & EFLAGS_CF;                                      \
-			newval = emu86_rcl##bwlq(oldval, num_bits, &eflags_addend);                        \
-			break;                                                                             \
-			                                                                                   \
-		case 3: /* rcr r/mN,<num_bits> */                                                      \
-			eflags_addend = EMU86_GETFLAGS() & EFLAGS_CF;                                      \
-			newval = emu86_rcr##bwlq(oldval, num_bits, &eflags_addend);                        \
-			break;                                                                             \
-			                                                                                   \
-		case 4: /* sal r/mN,<num_bits> */                                                      \
-		case 6: /* shl r/mN,<num_bits> */                                                      \
-			if ((oldval << (num_bits - 1)) & msb_bit_set)                                      \
-				eflags_addend |= EFLAGS_CF;                                                    \
-			newval = oldval << num_bits;                                                       \
-			break;                                                                             \
-			                                                                                   \
-		case 5: /* shr r/mN,<num_bits> */                                                      \
-			if (oldval & ((u##Nbits)1 << (num_bits - 1)))                                      \
-				eflags_addend |= EFLAGS_CF;                                                    \
-			newval = (u##Nbits)oldval >> num_bits;                                             \
-			break;                                                                             \
-			                                                                                   \
-		case 7: /* sar r/mN,<num_bits> */                                                      \
-			if (oldval & ((u##Nbits)1 << (num_bits - 1)))                                      \
-				eflags_addend |= EFLAGS_CF;                                                    \
-			/* XXX: Signed right-shift isn't portable in the C standard... */                  \
-			newval = (s##Nbits)oldval >> num_bits;                                             \
-			break;                                                                             \
-			                                                                                   \
-		default:                                                                               \
-			goto return_unknown_instruction;                                                   \
-		}                                                                                      \
-		/* Write-back the new result. */                                                       \
-		NIF_ONLY_MEMORY(                                                                       \
-		if (EMU86_MODRM_ISREG(modrm.mi_type)) {                                                \
-			MODRM_SETRMREG##BWLQ(newval);                                                      \
-		} else) {                                                                              \
-			byte_t *addr;                                                                      \
-			addr = MODRM_MEMADDR();                                                            \
-			EMU86_WRITE_USER_MEMORY(addr, Nbytes);                                             \
+#define DEFINE_SHIFT_OPERATIONS_MODRM_reg(bwlq, BWLQ, Nbits, Nbytes, msb_bit_set)          \
+	do {                                                                                   \
+		u32 eflags_addend = 0;                                                             \
+		u##Nbits oldval, newval;                                                           \
+		num_bits &= (Nbits - 1);                                                           \
+		if (!num_bits)                                                                     \
+			goto done; /* no-op */                                                         \
+do_shift##Nbits:                                                                           \
+		oldval = MODRM_GETRM##BWLQ();                                                      \
+		switch (modrm.mi_reg) {                                                            \
+			                                                                               \
+		case 0: /* rol r/mN,<num_bits> */                                                  \
+			if ((oldval << (num_bits - 1)) & msb_bit_set)                                  \
+				eflags_addend |= EFLAGS_CF;                                                \
+			newval = __hybrid_rol##Nbits(oldval, num_bits);                                \
+			break;                                                                         \
+			                                                                               \
+		case 1: /* ror r/mN,<num_bits> */                                                  \
+			if (oldval & ((u##Nbits)1 << (num_bits - 1)))                                  \
+				eflags_addend |= EFLAGS_CF;                                                \
+			newval = __hybrid_ror##Nbits(oldval, num_bits);                                \
+			break;                                                                         \
+			                                                                               \
+		case 2: /* rcl r/mN,<num_bits> */                                                  \
+			eflags_addend = EMU86_GETFLAGS() & EFLAGS_CF;                                  \
+			newval = emu86_rcl##bwlq(oldval, num_bits, &eflags_addend);                    \
+			break;                                                                         \
+			                                                                               \
+		case 3: /* rcr r/mN,<num_bits> */                                                  \
+			eflags_addend = EMU86_GETFLAGS() & EFLAGS_CF;                                  \
+			newval = emu86_rcr##bwlq(oldval, num_bits, &eflags_addend);                    \
+			break;                                                                         \
+			                                                                               \
+		case 4: /* sal r/mN,<num_bits> */                                                  \
+		case 6: /* shl r/mN,<num_bits> */                                                  \
+			if ((oldval << (num_bits - 1)) & msb_bit_set)                                  \
+				eflags_addend |= EFLAGS_CF;                                                \
+			newval = oldval << num_bits;                                                   \
+			break;                                                                         \
+			                                                                               \
+		case 5: /* shr r/mN,<num_bits> */                                                  \
+			if (oldval & ((u##Nbits)1 << (num_bits - 1)))                                  \
+				eflags_addend |= EFLAGS_CF;                                                \
+			newval = (u##Nbits)oldval >> num_bits;                                         \
+			break;                                                                         \
+			                                                                               \
+		case 7: /* sar r/mN,<num_bits> */                                                  \
+			if (oldval & ((u##Nbits)1 << (num_bits - 1)))                                  \
+				eflags_addend |= EFLAGS_CF;                                                \
+			/* XXX: Signed right-shift isn't portable in the C standard... */              \
+			newval = (s##Nbits)oldval >> num_bits;                                         \
+			break;                                                                         \
+			                                                                               \
+		default:                                                                           \
+			goto return_unknown_instruction;                                               \
+		}                                                                                  \
+		/* Write-back the new result. */                                                   \
+		NIF_ONLY_MEMORY(                                                                   \
+		if (EMU86_MODRM_ISREG(modrm.mi_type)) {                                            \
+			MODRM_SETRMREG##BWLQ(newval);                                                  \
+		} else) {                                                                          \
+			byte_t *addr;                                                                  \
+			addr = MODRM_MEMADDR();                                                        \
+			EMU86_WRITE_USER_MEMORY(addr, Nbytes);                                         \
 			if (!EMU86_MEM_ATOMIC_CMPXCH_OR_WRITE##BWLQ(addr, oldval, newval,              \
-			                                                (op_flags & EMU86_F_LOCK) != 0)) { \
-				EMU86_EMULATE_LOOPHINT();                                                      \
-				goto do_shift##Nbits;                                                          \
-			}                                                                                  \
-		}                                                                                      \
-		/* Update %eflags. */                                                                  \
-		{                                                                                      \
-			u32 eflags_mask = EFLAGS_CF | EFLAGS_SF | EFLAGS_ZF | EFLAGS_PF;                   \
-			if (num_bits == 1) {                                                               \
-				eflags_mask |= EFLAGS_OF;                                                      \
-				/* Calculate the new value of EFLAGS.OF */                                     \
-				switch (modrm.mi_reg) {                                                        \
-				case 0: /* rol */                                                              \
-				case 2: /* rcl */                                                              \
-					if (!!(newval & msb_bit_set) ^ !!(eflags_addend & EFLAGS_CF))              \
-						eflags_addend |= EFLAGS_OF;                                            \
-					break;                                                                     \
-				case 1: /* ror */                                                              \
-					if (!!(newval & msb_bit_set) ^ !!(newval & (msb_bit_set >> 1)))            \
-						eflags_addend |= EFLAGS_OF;                                            \
-					break;                                                                     \
-				case 3: /* rcr */                                                              \
-				case 4: /* sal */                                                              \
-				case 6: /* shl */                                                              \
-					if (!!(oldval & msb_bit_set) ^ !!(eflags_addend & EFLAGS_CF))              \
-						eflags_addend |= EFLAGS_OF;                                            \
-					break;                                                                     \
-				case 7: /* sar */                                                              \
-					/* EFLAGS.OF = 0 */                                                        \
-					break;                                                                     \
-				default:                                                                       \
-					if (oldval & msb_bit_set)                                                  \
-						eflags_addend |= EFLAGS_OF;                                            \
-					break;                                                                     \
-				}                                                                              \
-			}                                                                                  \
-			eflags_addend |= emu86_geteflags_test##bwlq(newval);                               \
-			EMU86_MSKFLAGS(~eflags_mask, eflags_addend);                                       \
-		}                                                                                      \
+			                                            (op_flags & EMU86_F_LOCK) != 0)) { \
+				EMU86_EMULATE_LOOPHINT();                                                  \
+				goto do_shift##Nbits;                                                      \
+			}                                                                              \
+		}                                                                                  \
+		/* Update %eflags. */                                                              \
+		{                                                                                  \
+			u32 eflags_mask = EFLAGS_CF | EFLAGS_SF | EFLAGS_ZF | EFLAGS_PF;               \
+			if (num_bits == 1) {                                                           \
+				eflags_mask |= EFLAGS_OF;                                                  \
+				/* Calculate the new value of EFLAGS.OF */                                 \
+				switch (modrm.mi_reg) {                                                    \
+				case 0: /* rol */                                                          \
+				case 2: /* rcl */                                                          \
+					if (!!(newval & msb_bit_set) ^ !!(eflags_addend & EFLAGS_CF))          \
+						eflags_addend |= EFLAGS_OF;                                        \
+					break;                                                                 \
+				case 1: /* ror */                                                          \
+					if (!!(newval & msb_bit_set) ^ !!(newval & (msb_bit_set >> 1)))        \
+						eflags_addend |= EFLAGS_OF;                                        \
+					break;                                                                 \
+				case 3: /* rcr */                                                          \
+				case 4: /* sal */                                                          \
+				case 6: /* shl */                                                          \
+					if (!!(oldval & msb_bit_set) ^ !!(eflags_addend & EFLAGS_CF))          \
+						eflags_addend |= EFLAGS_OF;                                        \
+					break;                                                                 \
+				case 7: /* sar */                                                          \
+					/* EFLAGS.OF = 0 */                                                    \
+					break;                                                                 \
+				default:                                                                   \
+					if (oldval & msb_bit_set)                                              \
+						eflags_addend |= EFLAGS_OF;                                        \
+					break;                                                                 \
+				}                                                                          \
+			}                                                                              \
+			eflags_addend |= emu86_geteflags_test##bwlq(newval);                           \
+			EMU86_MSKFLAGS(~eflags_mask, eflags_addend);                                   \
+		}                                                                                  \
 	} __WHILE0
 
 
@@ -178,7 +178,6 @@ case 0xd3: {
 	MODRM_DECODE();
 	num_bits  = EMU86_GETCL();
 do_shift163264bit:
-	/* TODO */
 	IF_64BIT(if (IS_64BIT()) {
 		DEFINE_SHIFT_OPERATIONS_MODRM_reg(q, Q, 64, 8, UINT64_C(0x8000000000000000));
 	} else) if (!IS_16BIT()) {
