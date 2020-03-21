@@ -51,6 +51,15 @@
 #include "emu86.h"
 #include "helpers.h"
 
+/* When `LIBEMU86_DONT_USE_HYBRID_BSWAP' is defined, don't use the BSWAP()
+ * functions from `<hybrid/byteswap.h>'. This should be configured when
+ * libemu86 is being used to emulate instructions not supported by the
+ * host, in which case it couldn't very well use the instructions it's
+ * trying to emulate. */
+#ifndef LIBEMU86_DONT_USE_HYBRID_BSWAP
+#include <hybrid/byteswap.h>
+#endif /* !LIBEMU86_DONT_USE_HYBRID_BSWAP */
+
 #if defined(__x86_64__) || defined(__i386__)
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
@@ -1924,6 +1933,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #include "emu/bitscan.c.inl"
 #include "emu/bittest.c.inl"
 #include "emu/bound.c.inl"
+#include "emu/bswap.c.inl"
 #include "emu/call.c.inl"
 #include "emu/cbw.c.inl"
 #include "emu/cmovcc.c.inl"
@@ -2007,7 +2017,6 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 			/* TODO: wrfsbase */
 			/* TODO: wrgsbase */
 
-			/* TODO: bswap */
 			/* TODO: crc32 */
 			/* TODO: movbe */
 			/* TODO: popcnt */
