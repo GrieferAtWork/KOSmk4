@@ -272,7 +272,7 @@ case 0xff:
 		EMU86_PUSH163264(MODRM_GETRMW(),
 		                 MODRM_GETRML(),
 		                 MODRM_GETRMQ());
-		break;
+		goto done;
 
 
 	default:
