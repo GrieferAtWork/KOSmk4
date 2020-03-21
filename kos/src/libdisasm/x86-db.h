@@ -433,10 +433,10 @@ struct instruction {
 #define OP_CL      OP_SHORT ")" /* %cl */
 #define OP_DL      OP_SHORT "*" /* %dl */
 #define OP_BL      OP_SHORT "+" /* %bl */
-#define OP_AH      OP_SHORT "," /* %ah */
-#define OP_CH      OP_SHORT "-" /* %ch */
-#define OP_DH      OP_SHORT "." /* %dh */
-#define OP_BH      OP_SHORT "/" /* %bh */
+#define OP_AH_SPL  OP_SHORT "," /* %ah (or %spl when a rex prefix was used) */
+#define OP_CH_BPL  OP_SHORT "-" /* %ch (or %bpl when a rex prefix was used) */
+#define OP_DH_DIL  OP_SHORT "." /* %dh (or %dil when a rex prefix was used) */
+#define OP_BH_SIL  OP_SHORT "/" /* %bh (or %sil when a rex prefix was used) */
 
 #define OP_DS   OP_ESC("%ds") /* %ds */
 #define OP_ES   OP_ESC("%es") /* %es */
@@ -1093,13 +1093,13 @@ PRIVATE struct instruction const ops[] = {
 	I(0xb3, IF_REXB,          "movb\t" OP_U8 OP_R11D),
 	I(0xb3, 0,                "movb\t" OP_U8 OP_BL),
 	I(0xb4, IF_REXB,          "movb\t" OP_U8 OP_R12D),
-	I(0xb4, 0,                "movb\t" OP_U8 OP_AH),
+	I(0xb4, 0,                "movb\t" OP_U8 OP_AH_SPL),
 	I(0xb5, IF_REXB,          "movb\t" OP_U8 OP_R13D),
-	I(0xb5, 0,                "movb\t" OP_U8 OP_CH),
+	I(0xb5, 0,                "movb\t" OP_U8 OP_CH_BPL),
 	I(0xb6, IF_REXB,          "movb\t" OP_U8 OP_R14D),
-	I(0xb6, 0,                "movb\t" OP_U8 OP_DH),
+	I(0xb6, 0,                "movb\t" OP_U8 OP_DH_DIL),
 	I(0xb7, IF_REXB,          "movb\t" OP_U8 OP_R15D),
-	I(0xb7, 0,                "movb\t" OP_U8 OP_BH),
+	I(0xb7, 0,                "movb\t" OP_U8 OP_BH_SIL),
 
 	I(0xb8, IF_REXB|IF_66,    "movw\t"   OP_U16 OP_R8W),
 	I(0xb8, IF_REXB,          "movl\t"   OP_U32 OP_R8D),

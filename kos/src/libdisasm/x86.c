@@ -1090,10 +1090,19 @@ do_nextop_nocomma:
 						regname[3] = conv_table3[index >> 1];
 						reglen     = 4;
 					} else if (name >= OP_GP16_MIN && name <= OP_GP16_MAX) {
-						/* %al, %cl, %dl, %bl, %ah, %ch, %dh, %bh */
-						regname[1] = conv_table2[(name - OP_GP16_MIN) & 3];
-						regname[2] = (name >= (OP_GP16_MIN + 4)) ? 'h' : 'l';
-						reglen = 3;
+						/* %al, %cl, %dl, %bl, %(ah|spl), %(ch|bpl), %(dh|dil), %(bh|sil) */
+						if (name >= (OP_GP16_MIN + 4) && (flags & EMU86_F_HASREX)) {
+							unsigned int index;
+							index      = (unsigned int)(name - OP_GP16_MIN);
+							regname[1] = conv_table2[index];
+							regname[2] = conv_table3[index >> 1];
+							regname[3] = 'l';
+							reglen     = 4;
+						} else {
+							regname[1] = conv_table2[(name - OP_GP16_MIN) & 3];
+							regname[2] = (name >= (OP_GP16_MIN + 4)) ? 'h' : 'l';
+							reglen     = 3;
+						}
 					} else if (name >= OP_X64_RN_MIN && name <= OP_X64_RN_MAX) {
 						/* %r8 - %r15 */
 						regname[1] = 'r';
