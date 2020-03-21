@@ -267,6 +267,8 @@ case 0xff:
 		/* FF /6     PUSH r/m16     Push r/m16.
 		 * FF /6     PUSH r/m32     Push r/m32.
 		 * FF /6     PUSH r/m64     Push r/m64. */
+		if unlikely(op_flags & EMU86_F_LOCK)
+			goto return_unknown_instruction;
 		EMU86_PUSH163264(MODRM_GETRMW(),
 		                 MODRM_GETRML(),
 		                 MODRM_GETRMQ());
