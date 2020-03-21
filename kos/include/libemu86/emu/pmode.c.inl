@@ -31,15 +31,18 @@
 #define EMU86_WANT_EMULATE_SMSW 1
 #define EMU86_WANT_EMULATE_LMSW 1
 #define EMU86_WANT_EMULATE_INVLPG 1
+#define EMU86_WANT_EMULATE_LAR 1
+#define EMU86_WANT_EMULATE_LSL 1
 #include "../emulate.c.inl"
 #endif /* __INTELLISENSE__ */
 
 EMU86_INTELLISENSE_BEGIN(pmode) {
 
 
-#if (defined(EMU86_EMULATE_SLDT) || defined(EMU86_EMULATE_STR) || \
-     defined(EMU86_EMULATE_LLDT) || defined(EMU86_EMULATE_LTR) || \
-     defined(EMU86_EMULATE_VERR) || defined(EMU86_EMULATE_VERW))
+#if (defined(EMU86_EMULATE_SLDT) || defined(EMU86_EMULATE_STR) ||   \
+     defined(EMU86_EMULATE_LLDT) || defined(EMU86_EMULATE_LTR) ||   \
+     ((CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_64BIT) && \
+      (defined(EMU86_EMULATE_VERR) || defined(EMU86_EMULATE_VERW))))
 
 case 0x0f00: {
 	MODRM_DECODE();
@@ -101,11 +104,16 @@ case 0x0f00: {
 	}
 #endif /* EMU86_EMULATE_LTR */
 
+#if CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_64BIT
 #ifdef EMU86_EMULATE_VERR
 	case 4: {
 		/* 0F 00 /4     VERR r/m16     Set ZF=1 if segment specified with r/m16 can be read. */
 		bool ok;
 		u16 segment_index;
+#if CONFIG_LIBEMU86_WANT_16BIT
+		if (EMU86_F_IS16(op_flags)) /* This also includes vm86! */
+			goto return_unknown_instruction;
+#endif /* CONFIG_LIBEMU86_WANT_16BIT */
 		segment_index = MODRM_GETRMW();
 		ok = EMU86_EMULATE_VERR(segment_index);
 		EMU86_MSKFLAGS(~EFLAGS_ZF, ok ? EFLAGS_ZF : 0);
@@ -118,12 +126,17 @@ case 0x0f00: {
 		/* 0F 00 /5     VERW r/m16     Set ZF=1 if segment specified with r/m16 can be written. */
 		bool ok;
 		u16 segment_index;
+#if CONFIG_LIBEMU86_WANT_16BIT
+		if (EMU86_F_IS16(op_flags)) /* This also includes vm86! */
+			goto return_unknown_instruction;
+#endif /* CONFIG_LIBEMU86_WANT_16BIT */
 		segment_index = MODRM_GETRMW();
 		ok = EMU86_EMULATE_VERW(segment_index);
 		EMU86_MSKFLAGS(~EFLAGS_ZF, ok ? EFLAGS_ZF : 0);
 		goto done;
 	}
 #endif /* EMU86_EMULATE_VERW */
+#endif /* CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_64BIT */
 
 	default:
 		break;
@@ -310,6 +323,60 @@ case 0x0f01: {
 	goto return_unknown_instruction;
 }
 #endif /* EMU86_EMULATE_... */
+
+
+#if CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_64BIT
+#ifdef EMU86_EMULATE_LAR
+case 0x0f02: {
+	/* 0F 02 /r     LAR r16, r16/m16     r16 := access rights referenced by r16/m16 */
+	bool ok;
+	u16 segment_index;
+	u16 segment_rights;
+#if CONFIG_LIBEMU86_WANT_16BIT
+	if (EMU86_F_IS16(op_flags)) /* This also includes vm86! */
+		goto return_unknown_instruction;
+#endif /* CONFIG_LIBEMU86_WANT_16BIT */
+	MODRM_DECODE();
+	segment_index = MODRM_GETRMW();
+	ok = EMU86_EMULATE_LAR(segment_index,
+	                       segment_rights);
+	EMU86_MSKFLAGS(~EFLAGS_ZF, ok ? EFLAGS_ZF : 0);
+	if (ok)
+		MODRM_SETRMREGW(segment_rights);
+	goto done;
+}
+#endif /* EMU86_EMULATE_LAR */
+
+
+#ifdef EMU86_EMULATE_LSL
+case 0x0f03: {
+	/*         0F 03 /r     LSL r16, r16/m16     Load: r16 := segment limit, selector r16/m16.
+	 *         0F 03 /r     LSL r32, r32/m16     Load: r32 := segment limit, selector r32/m16.
+	 * REX.W + 0F 03 /r     LSL r64, r32/m16     Load: r64 := segment limit, selector r32/m16 */
+	bool ok;
+	u16 segment_index;
+	EMU86_UREG_TYPE limit;
+#if CONFIG_LIBEMU86_WANT_16BIT
+	if (EMU86_F_IS16(op_flags)) /* This also includes vm86! */
+		goto return_unknown_instruction;
+#endif /* CONFIG_LIBEMU86_WANT_16BIT */
+	MODRM_DECODE();
+	segment_index = MODRM_GETRMW();
+	ok = EMU86_EMULATE_LSL(segment_index, limit);
+	EMU86_MSKFLAGS(~EFLAGS_ZF, ok ? EFLAGS_ZF : 0);
+	if (ok) {
+		IF_64BIT(if (IS_64BIT()) {
+			MODRM_SETREGQ(limit);
+		} else) if (!IS_16BIT()) {
+			MODRM_SETREGL(limit);
+		} else {
+			MODRM_SETREGW(limit);
+		}
+	}
+	goto done;
+}
+#endif /* EMU86_EMULATE_LSL */
+#endif /* CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_64BIT */
 
 
 }

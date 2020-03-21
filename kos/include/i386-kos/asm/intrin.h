@@ -210,6 +210,15 @@ __FORCELOCAL void (__stosq)(void *__restrict __dst, __UINT64_TYPE__ __dword, __S
 __FORCELOCAL void (__boundw)(__INT16_TYPE__ const __limits[2], __INT16_TYPE__ __index) { __asm__ __volatile__("boundw %0, %w1" : : "m" (__COMPILER_ASM_BUFFER(__UINT16_TYPE__, 2, __limits)), "r" (__index)); }
 __FORCELOCAL void (__boundl)(__INT32_TYPE__ const __limits[2], __INT32_TYPE__ __index) { __asm__ __volatile__("boundl %0, %k1" : : "m" (__COMPILER_ASM_BUFFER(__UINT32_TYPE__, 2, __limits)), "r" (__index)); }
 #endif /* !__x86_64__ */
+__FORCELOCAL __ATTR_WUNUSED __BOOL (__lar)(__UINT16_TYPE__ __segment_index, __UINT16_TYPE__ *__presult) { __BOOL __ok; __asm__ __volatile__("lar %w2, %w1" : "=@ccz" (__ok), "=r" (*__presult) : "g" (__segment_index)); return __ok; }
+__FORCELOCAL __ATTR_WUNUSED __BOOL (__lslw)(__UINT16_TYPE__ __segment_index, __UINT16_TYPE__ *__presult) { __BOOL __ok; __asm__ __volatile__("lslw %w2, %w1" : "=@ccz"(__ok), "=r" (*__presult) : "g" (__segment_index)); return __ok; }
+__FORCELOCAL __ATTR_WUNUSED __BOOL (__lsll)(__UINT16_TYPE__ __segment_index, __UINT32_TYPE__ *__presult) { __BOOL __ok; __asm__ __volatile__("lsll %k2, %k1" : "=@ccz"(__ok), "=r" (*__presult) : "g" (__segment_index)); return __ok; }
+#ifdef __x86_64__
+__FORCELOCAL __ATTR_WUNUSED __BOOL (__lslq)(__UINT16_TYPE__ __segment_index, __UINT64_TYPE__ *__presult) { __BOOL __ok; __asm__ __volatile__("lslq %q2, %q1" : "=@ccz"(__ok), "=r" (*__presult) : "g" (__segment_index)); return __ok; }
+__FORCELOCAL __ATTR_WUNUSED __BOOL (__lsl)(__UINT16_TYPE__ __segment_index, __UINTPTR_TYPE__ *__presult) { return __lslq(__segment_index, __presult); }
+#else /* __x86_64__ */
+__FORCELOCAL __ATTR_WUNUSED __BOOL (__lsl)(__UINT16_TYPE__ __segment_index, __UINTPTR_TYPE__ *__presult) { return __lsll(__segment_index, __presult); }
+#endif /* !__x86_64__ */
 
 /* Read/Write control registers. */
 __FORCELOCAL __ATTR_WUNUSED __REGISTER_TYPE__ (__rdcr0)(void) { __register __REGISTER_TYPE__ __result; __asm__ __volatile__("mov %%cr0, %0" : "=r" (__result)); return __result; }

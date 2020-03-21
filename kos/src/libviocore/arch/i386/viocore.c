@@ -1646,6 +1646,8 @@ NOTHROW(CC CS_setregl)(struct vio_emulate_args *__restrict self, u8 regno, u32 v
 #define EMU86_WANT_EMULATE_SMSW 1
 #define EMU86_WANT_EMULATE_LMSW 1
 /* #define EMU86_WANT_EMULATE_INVLPG 1 */ /* This one shouldn't be able to cause a segfault! */
+#define EMU86_WANT_EMULATE_LAR 1
+#define EMU86_WANT_EMULATE_LSL 1
 
 
 DECL_END

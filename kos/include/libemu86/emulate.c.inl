@@ -73,6 +73,15 @@
 #include <int128.h>
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
 
+#if CONFIG_LIBEMU86_WANT_64BIT
+#define EMU86_UREG_TYPE u64
+#define EMU86_SREG_TYPE s64
+#else /* CONFIG_LIBEMU86_WANT_64BIT */
+#define EMU86_UREG_TYPE u32
+#define EMU86_SREG_TYPE s32
+#endif /* !CONFIG_LIBEMU86_WANT_64BIT */
+
+
 __DECL_BEGIN
 
 /* Declaration visibility of `emu86_emulate()' */
@@ -375,6 +384,7 @@ __DECL_BEGIN
 #endif /* EMU86_EMULATE_VM86 */
 
 
+
 /* Optional emulation of various protected-mode x86 registers
  * These accessor functions are used in `emu/pmode.c.inl'
  * NOTE: The associated instructions are guarded against user-access. */
@@ -391,12 +401,14 @@ __DECL_BEGIN
 #if !defined(EMU86_EMULATE_LTR) && defined(EMU86_WANT_EMULATE_LTR)
 #define EMU86_EMULATE_LTR(segment_index) __ltr(segment_index)
 #endif /* !EMU86_EMULATE_LTR && EMU86_WANT_EMULATE_LTR */
+#if CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_64BIT
 #if !defined(EMU86_EMULATE_VERR) && defined(EMU86_WANT_EMULATE_VERR)
 #define EMU86_EMULATE_VERR(segment_index) __verr(segment_index)
 #endif /* !EMU86_EMULATE_VERR && EMU86_WANT_EMULATE_VERR */
 #if !defined(EMU86_EMULATE_VERW) && defined(EMU86_WANT_EMULATE_VERW)
 #define EMU86_EMULATE_VERW(segment_index) __verw(segment_index)
 #endif /* !EMU86_EMULATE_VERW && EMU86_WANT_EMULATE_VERW */
+#endif /* CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_64BIT */
 #if !defined(EMU86_EMULATE_SGDT) && defined(EMU86_WANT_EMULATE_SGDT)
 #define EMU86_EMULATE_SGDT(limit, base)        \
 	do {                                       \
@@ -432,6 +444,24 @@ __DECL_BEGIN
 #if !defined(EMU86_EMULATE_INVLPG) && defined(EMU86_WANT_EMULATE_INVLPG)
 #define EMU86_EMULATE_INVLPG(addr) __invlpg(addr)
 #endif /* !EMU86_EMULATE_INVLPG && EMU86_WANT_EMULATE_INVLPG */
+#if CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_64BIT
+#if !defined(EMU86_EMULATE_LAR) && defined(EMU86_WANT_EMULATE_LAR)
+#define EMU86_EMULATE_LAR(segment_index, result) __lar(segment_index, /*(u16 *)*/&(result))
+#endif /* !EMU86_EMULATE_LAR && EMU86_WANT_EMULATE_LAR */
+#if !defined(EMU86_EMULATE_LSL) && defined(EMU86_WANT_EMULATE_LSL)
+#define EMU86_EMULATE_LSL(segment_index, result) \
+	(EMU86_EMULATE_HELPER_NAME(emu86_emulate_lsl)(segment_index, /*(EMU86_UREG_TYPE *)*/ &(result)))
+EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED bool
+EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_emulate_lsl))(u16 segment_index,
+                                                                                     EMU86_UREG_TYPE *__restrict presult) {
+	bool ok;
+	uintptr_t result;
+	ok = __lsl(segment_index, &result);
+	*presult = (EMU86_UREG_TYPE)result;
+	return ok;
+}
+#endif /* !EMU86_EMULATE_LSL && EMU86_WANT_EMULATE_LSL */
+#endif /* CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_64BIT */
 #endif /* __x86_64__ || __i386__ */
 
 
@@ -801,15 +831,6 @@ __DECL_BEGIN
 
 
 
-#if CONFIG_LIBEMU86_WANT_64BIT
-#define EMU86_UREG_TYPE u64
-#define EMU86_SREG_TYPE s64
-#else /* CONFIG_LIBEMU86_WANT_64BIT */
-#define EMU86_UREG_TYPE u32
-#define EMU86_SREG_TYPE s32
-#endif /* !CONFIG_LIBEMU86_WANT_64BIT */
-
-
 
 
 
@@ -819,7 +840,7 @@ __DECL_BEGIN
 #ifndef EMU86_GETSEG
 #define EMU86_GETSEG(regno) \
 	(EMU86_EMULATE_HELPER_NAME(emu86_getseg)(EMU86_EMULATE_HELPER_PARAM_ regno))
-EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED __ATTR_WUNUSED __ATTR_PURE EMU86_EMULATE_HELPER_ATTR u16
+EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED __ATTR_PURE EMU86_EMULATE_HELPER_ATTR u16
 EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getseg))(EMU86_EMULATE_HELPER_ARGS_
                                                                                 u8 regno) {
 	u16 result;
@@ -944,14 +965,14 @@ PRIVATE u8 const EMU86_EMULATE_HELPER_NAME(emu86_reg_offsets)[8] = {
 #if CONFIG_LIBEMU86_WANT_64BIT
 #define EMU86_GETREGB(regno, op_flags) \
 	(EMU86_EMULATE_HELPER_NAME(emu86_getregb)(EMU86_EMULATE_HELPER_PARAM_ regno, op_flags))
-EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED __ATTR_WUNUSED __ATTR_PURE EMU86_EMULATE_HELPER_ATTR u8
+EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED __ATTR_PURE EMU86_EMULATE_HELPER_ATTR u8
 EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getregb))(EMU86_EMULATE_HELPER_ARGS_
                                                                                  u8 regno,
                                                                                  emu86_opflags_t op_flags)
 #else /* CONFIG_LIBEMU86_WANT_64BIT */
 #define EMU86_GETREGB(regno, ...) \
 	(EMU86_EMULATE_HELPER_NAME(emu86_getregb)(EMU86_EMULATE_HELPER_PARAM_ regno))
-EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED __ATTR_WUNUSED __ATTR_PURE EMU86_EMULATE_HELPER_ATTR u8
+EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED __ATTR_PURE EMU86_EMULATE_HELPER_ATTR u8
 EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getregb))(EMU86_EMULATE_HELPER_ARGS_
                                                                                  u8 regno)
 #endif /* !CONFIG_LIBEMU86_WANT_64BIT */
@@ -1003,7 +1024,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setregb))
 #ifndef EMU86_GETREGW
 #define EMU86_GETREGW(regno) \
 	(EMU86_EMULATE_HELPER_NAME(emu86_getregw)(EMU86_EMULATE_HELPER_PARAM_ regno))
-EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED __ATTR_WUNUSED __ATTR_PURE EMU86_EMULATE_HELPER_ATTR u16
+EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED __ATTR_PURE EMU86_EMULATE_HELPER_ATTR u16
 EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getregw))(EMU86_EMULATE_HELPER_ARGS_
                                                                                  u8 regno) {
 	regno &= __EMU86_GPREG_MASK;
@@ -1031,7 +1052,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setregw))
 #ifndef EMU86_GETREGL
 #define EMU86_GETREGL(regno) \
 	(EMU86_EMULATE_HELPER_NAME(emu86_getregl)(EMU86_EMULATE_HELPER_PARAM_ regno))
-EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED __ATTR_WUNUSED __ATTR_PURE EMU86_EMULATE_HELPER_ATTR u32
+EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED __ATTR_PURE EMU86_EMULATE_HELPER_ATTR u32
 EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getregl))(EMU86_EMULATE_HELPER_ARGS_
                                                                                  u8 regno) {
 	regno &= __EMU86_GPREG_MASK;
@@ -1060,7 +1081,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setregl))
 #ifndef EMU86_GETREGQ
 #define EMU86_GETREGQ(regno) \
 	(EMU86_EMULATE_HELPER_NAME(emu86_getregq)(EMU86_EMULATE_HELPER_PARAM_ regno))
-EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED __ATTR_WUNUSED __ATTR_PURE EMU86_EMULATE_HELPER_ATTR u64
+EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED __ATTR_PURE EMU86_EMULATE_HELPER_ATTR u64
 EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getregq))(EMU86_EMULATE_HELPER_ARGS_
                                                                                  u8 regno) {
 	regno &= __EMU86_GPREG_MASK;
@@ -1103,7 +1124,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setregq))
 #else /* !CONFIG_LIBEMU86_NEED_ARCHMODE */
 #define EMU86_GETREGP(regno, op_flags) \
 	(EMU86_EMULATE_HELPER_NAME(emu86_getregp)(EMU86_EMULATE_HELPER_PARAM_ regno, op_flags))
-EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED __ATTR_WUNUSED __ATTR_PURE EMU86_EMULATE_HELPER_ATTR uintptr_t
+EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED __ATTR_PURE EMU86_EMULATE_HELPER_ATTR uintptr_t
 EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getregp))(EMU86_EMULATE_HELPER_ARGS_
                                                                                  u8 regno,
                                                                                  emu86_opflags_t op_flags) {
@@ -1144,7 +1165,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getregp))
 #else /* !CONFIG_LIBEMU86_NEED_ARCHMODE */
 #define EMU86_SETREGP(regno, value, op_flags) \
 	(EMU86_EMULATE_HELPER_NAME(emu86_setregp)(EMU86_EMULATE_HELPER_PARAM_ regno, value, op_flags))
-EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED __ATTR_WUNUSED __ATTR_PURE EMU86_EMULATE_HELPER_ATTR uintptr_t
+EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED __ATTR_PURE EMU86_EMULATE_HELPER_ATTR uintptr_t
 EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setregp))(EMU86_EMULATE_HELPER_ARGS_
                                                                                  u8 regno, uintptr_t value,
                                                                                  emu86_opflags_t op_flags) {
@@ -1321,7 +1342,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setregp))
 #ifndef EMU86_MODRM_MEMADDR
 #define EMU86_MODRM_MEMADDR(modrm, op_flags) \
 	(EMU86_EMULATE_HELPER_NAME(emu86_modrm_memaddr)(EMU86_EMULATE_HELPER_PARAM_ modrm, op_flags))
-EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED __ATTR_WUNUSED ATTR_PURE EMU86_EMULATE_HELPER_ATTR byte_t *
+EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED ATTR_PURE EMU86_EMULATE_HELPER_ATTR byte_t *
 EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_modrm_memaddr))(EMU86_EMULATE_HELPER_ARGS_
                                                                                        struct emu86_modrm const *__restrict modrm,
                                                                                        emu86_opflags_t op_flags) {
@@ -1353,7 +1374,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_modrm_mem
 #else /* EMU86_GETSEGBASE_IS_NOOP_ALL */
 #define EMU86_MODRM_MEMADDR_NOSEGBASE(modrm, op_flags) \
 	(EMU86_EMULATE_HELPER_NAME(emu86_modrm_memaddr_nosegbase)(EMU86_EMULATE_HELPER_PARAM_ modrm, op_flags))
-EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED __ATTR_WUNUSED ATTR_PURE EMU86_EMULATE_HELPER_ATTR byte_t *
+EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED ATTR_PURE EMU86_EMULATE_HELPER_ATTR byte_t *
 EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_modrm_memaddr_nosegbase))(EMU86_EMULATE_HELPER_ARGS_
                                                                                                  struct emu86_modrm const *__restrict modrm,
                                                                                                  emu86_opflags_t op_flags) {
@@ -1377,7 +1398,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_modrm_mem
 #ifndef EMU86_GETMODRM_RMB
 #define EMU86_GETMODRM_RMB(modrm, op_flags) \
 	(EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rmb)(EMU86_EMULATE_HELPER_PARAM_ modrm, op_flags))
-EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED __ATTR_WUNUSED __ATTR_PURE EMU86_EMULATE_HELPER_ATTR u8
+EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED __ATTR_PURE EMU86_EMULATE_HELPER_ATTR u8
 EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rmb))(EMU86_EMULATE_HELPER_ARGS_
                                                                                       struct emu86_modrm const *__restrict modrm,
                                                                                       emu86_opflags_t op_flags) {
@@ -1422,7 +1443,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_
 #ifndef EMU86_GETMODRM_RMW
 #define EMU86_GETMODRM_RMW(modrm, op_flags) \
 	(EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rmw)(EMU86_EMULATE_HELPER_PARAM_ modrm, op_flags))
-EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED __ATTR_WUNUSED __ATTR_PURE EMU86_EMULATE_HELPER_ATTR u16
+EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED __ATTR_PURE EMU86_EMULATE_HELPER_ATTR u16
 EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rmw))(EMU86_EMULATE_HELPER_ARGS_
                                                                                       struct emu86_modrm const *__restrict modrm,
                                                                                       emu86_opflags_t op_flags) {
@@ -1467,7 +1488,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_
 #ifndef EMU86_GETMODRM_RML
 #define EMU86_GETMODRM_RML(modrm, op_flags) \
 	(EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rml)(EMU86_EMULATE_HELPER_PARAM_ modrm, op_flags))
-EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED __ATTR_WUNUSED __ATTR_PURE EMU86_EMULATE_HELPER_ATTR u32
+EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED __ATTR_PURE EMU86_EMULATE_HELPER_ATTR u32
 EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rml))(EMU86_EMULATE_HELPER_ARGS_
                                                                                       struct emu86_modrm const *__restrict modrm,
                                                                                       emu86_opflags_t op_flags) {
@@ -1513,7 +1534,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_
 #ifndef EMU86_GETMODRM_RMQ
 #define EMU86_GETMODRM_RMQ(modrm, op_flags) \
 	(EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rmq)(EMU86_EMULATE_HELPER_PARAM_ modrm, op_flags))
-EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED __ATTR_WUNUSED __ATTR_PURE EMU86_EMULATE_HELPER_ATTR u64
+EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED __ATTR_PURE EMU86_EMULATE_HELPER_ATTR u64
 EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rmq))(EMU86_EMULATE_HELPER_ARGS_
                                                                                       struct emu86_modrm const *__restrict modrm,
                                                                                       emu86_opflags_t op_flags) {
@@ -1563,7 +1584,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_
 #ifndef EMU86_GETMODRM_RMMEMB
 #define EMU86_GETMODRM_RMMEMB(modrm, op_flags) \
 	(EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rmmemb)(EMU86_EMULATE_HELPER_PARAM_ modrm, op_flags))
-EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED __ATTR_WUNUSED __ATTR_PURE EMU86_EMULATE_HELPER_ATTR u8
+EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED __ATTR_PURE EMU86_EMULATE_HELPER_ATTR u8
 EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rmmemb))(EMU86_EMULATE_HELPER_ARGS_
                                                                                          struct emu86_modrm const *__restrict modrm,
                                                                                          emu86_opflags_t op_flags) {
@@ -1597,7 +1618,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_
 #ifndef EMU86_GETMODRM_RMMEMW
 #define EMU86_GETMODRM_RMMEMW(modrm, op_flags) \
 	(EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rmmemw)(EMU86_EMULATE_HELPER_PARAM_ modrm, op_flags))
-EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED __ATTR_WUNUSED __ATTR_PURE EMU86_EMULATE_HELPER_ATTR u16
+EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED __ATTR_PURE EMU86_EMULATE_HELPER_ATTR u16
 EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rmmemw))(EMU86_EMULATE_HELPER_ARGS_
                                                                                          struct emu86_modrm const *__restrict modrm,
                                                                                          emu86_opflags_t op_flags) {
@@ -1631,7 +1652,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_
 #ifndef EMU86_GETMODRM_RMMEML
 #define EMU86_GETMODRM_RMMEML(modrm, op_flags) \
 	(EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rml)(EMU86_EMULATE_HELPER_PARAM_ modrm, op_flags))
-EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED __ATTR_WUNUSED __ATTR_PURE EMU86_EMULATE_HELPER_ATTR u32
+EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED __ATTR_PURE EMU86_EMULATE_HELPER_ATTR u32
 EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rmmeml))(EMU86_EMULATE_HELPER_ARGS_
                                                                                          struct emu86_modrm const *__restrict modrm,
                                                                                          emu86_opflags_t op_flags) {
@@ -1666,7 +1687,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_
 #ifndef EMU86_GETMODRM_RMMEMQ
 #define EMU86_GETMODRM_RMMEMQ(modrm, op_flags) \
 	(EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rmmemq)(EMU86_EMULATE_HELPER_PARAM_ modrm, op_flags))
-EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED __ATTR_WUNUSED __ATTR_PURE EMU86_EMULATE_HELPER_ATTR u64
+EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED __ATTR_PURE EMU86_EMULATE_HELPER_ATTR u64
 EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rmmemq))(EMU86_EMULATE_HELPER_ARGS_
                                                                                          struct emu86_modrm const *__restrict modrm,
                                                                                          emu86_opflags_t op_flags) {
@@ -2101,9 +2122,6 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #include "emu/xlatb.c.inl"
 #endif /* !EMU86_EMULATE_IMPL_HEADER */
 #endif /* !__INTELLISENSE__ */
-
-			/* TODO: lar */
-			/* TODO: lsl */
 
 			/* TODO: lfence */
 			/* TODO: mfence */

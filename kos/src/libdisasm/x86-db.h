@@ -1699,10 +1699,10 @@ PRIVATE struct instruction const ops_0f[] = {
 	I(0x01, IF_BYTE2,                 "\xd6" "xtest"),
 	I(0x01, IF_BYTE2,                 "\xd7" "enclu"),
 
-	I(0x02, IF_66|IF_MODRM,   "larw\t" OP_RM16 OP_R16),
-	I(0x02, IF_MODRM,         "larl\t" OP_RM32 OP_R32),
+	I(0x02, IF_MODRM,         "lar\t" OP_RM16 OP_R16),
 	I(0x03, IF_66|IF_MODRM,   "lslw\t" OP_RM16 OP_R16),
-	I(0x03, IF_MODRM,         "lsll\t" OP_RM32 OP_R32),
+	I(0x03, IF_MODRM,         "lsll\t" OP_RM32 OP_R16),
+	I(0x03, IF_MODRM|IF_REXW, "lslq\t" OP_RM64 OP_R16),
 
 	I(0x05, IF_X32,           "loadall"), /* Unofficial */
 	I(0x05, IF_X64,           "syscall"),
@@ -5037,7 +5037,7 @@ PRIVATE u16 const ops_offsets[256] = {
 #define HAVE_OPS_0F_OFFSETS 1
 STATIC_ASSERT(COMPILER_LENOF(ops_0f) == 1509);
 PRIVATE u16 const ops_0f_offsets[256] = {
-	0, 6, 36, 38, 1508, 40, 42, 43, 45, 46, 47, 48, 1508, 49, 1508, 1508,
+	0, 6, 36, 37, 1508, 40, 42, 43, 45, 46, 47, 48, 1508, 49, 1508, 1508,
 	51, 75, 97, 118, 124, 136, 148, 163, 169, 1508, 173, 179, 184, 1508, 1508, 185,
 	187, 189, 191, 193, 195, 1508, 196, 1508, 197, 209, 221, 231, 243, 253, 263, 269,
 	275, 276, 277, 278, 279, 280, 281, 282, 1508, 1508, 1508, 1508, 1508, 1508, 1508, 283,
