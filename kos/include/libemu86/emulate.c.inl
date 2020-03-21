@@ -34,9 +34,10 @@
 #include <hybrid/host.h>
 #include <hybrid/overflow.h>
 #include <hybrid/unaligned.h>
+#include <hybrid/wordbits.h>
 
+#include <i386-kos/asm/cpu-cpuid.h>
 #include <i386-kos/asm/cpu-flags.h>
-#include <i386-kos/asm/registers-compat.h>
 #include <i386-kos/asm/registers.h>
 #include <kos/except.h>
 #include <kos/except/inval.h>
@@ -1904,6 +1905,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #include "emu/cmps.c.inl"
 #include "emu/cmpxchg.c.inl"
 #include "emu/cmpxchgb.c.inl"
+#include "emu/cpuid.c.inl"
 #include "emu/flush.c.inl"
 #include "emu/hlt.c.inl"
 #include "emu/incdec.c.inl"
@@ -1942,7 +1944,6 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #endif /* !__INTELLISENSE__ */
 
 			/* TODO: enter */
-			/* TODO: cpuid */
 			/* TODO: int, int3, into, int1 */
 			/* TODO: sldt */
 			/* TODO: str */
@@ -1970,6 +1971,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 			/* TODO: invd */
 			/* TODO: wbinvd */
 			/* TODO: cflsh */
+			/* TODO: clwb */
 			/* TODO: prefetchw */
 			/* TODO: prefetchnta */
 			/* TODO: prefetcht0 */
