@@ -28,17 +28,21 @@
 #ifndef __KERNEL__
 
 #include <hybrid/atomic.h>
+#include <hybrid/byteorder.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <kos/anno.h>
 #include <kos/except.h>
+#include <kos/kernel/types.h>
 #include <kos/syscalls.h>
+#include <kos/types.h>
 #include <sys/poll.h>
 
 #include <errno.h>
 #include <fcntl.h>
 #include <malloc.h>
 #include <pthread.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <unistd.h>
 
@@ -53,6 +57,20 @@ struct uvio_service_startup_args {
 	struct vio_operators const *ssa_ops;    /* [1..1] UVIO callbacks */
 	void                       *ssa_cookie; /* [?..?] UVIO callback cookie */
 };
+
+union qword {
+	u64 q;
+	u32 l[2];
+};
+
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#define LSW 0 /* LeastSignificantWord */
+#define MSW 1 /* MosttSignificantWord */
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#define LSW 1 /* LeastSignificantWord */
+#define MSW 0 /* MosttSignificantWord */
+#endif
+
 
 /* TODO: vio_args_getstate()  (implement through use of custom hop() operations that
  *                             can be used to get/set the CPU state of a waiting
@@ -143,36 +161,190 @@ PRIVATE void *uvio_service_thread(void *cookie) {
 				resp_size = sizeof(resp.r);
 				break;
 
-#define UVIO_OPCODE_XCHB      0x18 /* req(value:uq_bdata[0])   resp(oldval:uvio_response_readb) */
-#define UVIO_OPCODE_XCHW      0x19 /* req(value:uq_wdata[0])   resp(oldval:uvio_response_readw) */
-#define UVIO_OPCODE_XCHL      0x1a /* req(value:uq_ldata[0])   resp(oldval:uvio_response_readl) */
-#define UVIO_OPCODE_XCHQ      0x1b /* req(value:uq_qdata[0])   resp(oldval:uvio_response_readq) */
-#define UVIO_OPCODE_ADDB      0x1c /* req(value:uq_bdata[0])   resp(oldval:uvio_response_readb) */
-#define UVIO_OPCODE_ADDW      0x1d /* req(value:uq_wdata[0])   resp(oldval:uvio_response_readw) */
-#define UVIO_OPCODE_ADDL      0x1e /* req(value:uq_ldata[0])   resp(oldval:uvio_response_readl) */
-#define UVIO_OPCODE_ADDQ      0x1f /* req(value:uq_qdata[0])   resp(oldval:uvio_response_readq) */
-#define UVIO_OPCODE_SUBB      0x20 /* req(value:uq_bdata[0])   resp(oldval:uvio_response_readb) */
-#define UVIO_OPCODE_SUBW      0x21 /* req(value:uq_wdata[0])   resp(oldval:uvio_response_readw) */
-#define UVIO_OPCODE_SUBL      0x22 /* req(value:uq_ldata[0])   resp(oldval:uvio_response_readl) */
-#define UVIO_OPCODE_SUBQ      0x23 /* req(value:uq_qdata[0])   resp(oldval:uvio_response_readq) */
-#define UVIO_OPCODE_ANDB      0x24 /* req(value:uq_bdata[0])   resp(oldval:uvio_response_readb) */
-#define UVIO_OPCODE_ANDW      0x25 /* req(value:uq_wdata[0])   resp(oldval:uvio_response_readw) */
-#define UVIO_OPCODE_ANDL      0x26 /* req(value:uq_ldata[0])   resp(oldval:uvio_response_readl) */
-#define UVIO_OPCODE_ANDQ      0x27 /* req(value:uq_qdata[0])   resp(oldval:uvio_response_readq) */
-#define UVIO_OPCODE_ORB       0x28 /* req(value:uq_bdata[0])   resp(oldval:uvio_response_readb) */
-#define UVIO_OPCODE_ORW       0x29 /* req(value:uq_wdata[0])   resp(oldval:uvio_response_readw) */
-#define UVIO_OPCODE_ORL       0x2a /* req(value:uq_ldata[0])   resp(oldval:uvio_response_readl) */
-#define UVIO_OPCODE_ORQ       0x2b /* req(value:uq_qdata[0])   resp(oldval:uvio_response_readq) */
-#define UVIO_OPCODE_XORB      0x2c /* req(value:uq_bdata[0])   resp(oldval:uvio_response_readb) */
-#define UVIO_OPCODE_XORW      0x2d /* req(value:uq_wdata[0])   resp(oldval:uvio_response_readw) */
-#define UVIO_OPCODE_XORL      0x2e /* req(value:uq_ldata[0])   resp(oldval:uvio_response_readl) */
-#define UVIO_OPCODE_XORQ      0x2f /* req(value:uq_qdata[0])   resp(oldval:uvio_response_readq) */
-#define UVIO_OPCODE_CMPXCHB   0x30 /* req(oldval:uq_bdata[0], newval:uq_bdata[16])    resp(real_oldval:uvio_response_readb) */
-#define UVIO_OPCODE_CMPXCHW   0x31 /* req(oldval:uq_wdata[0], newval:uq_wdata[8])     resp(real_oldval:uvio_response_readw) */
-#define UVIO_OPCODE_CMPXCHL   0x32 /* req(oldval:uq_ldata[0], newval:uq_ldata[4])     resp(real_oldval:uvio_response_readl) */
-#define UVIO_OPCODE_CMPXCHQ   0x33 /* req(oldval:uq_qdata[0], newval:uq_qdata[2])     resp(real_oldval:uvio_response_readq) */
+			case UVIO_OPCODE_XCHB:
+				resp.rb.ur_result = libvio_xchb(&args, req.uq_addr,
+				                                req.uq_bdata[0],
+				                                FORCE_ATOMIC());
+				resp_size = sizeof(resp.rb);
+				break;
 
-			case UVIO_OPCODE_CMPXCH128:
+			case UVIO_OPCODE_XCHW:
+				resp.rw.ur_result = libvio_xchw(&args, req.uq_addr,
+				                                req.uq_wdata[0],
+				                                FORCE_ATOMIC());
+				resp_size = sizeof(resp.rw);
+				break;
+
+			case UVIO_OPCODE_XCHL:
+				resp.rl.ur_result = libvio_xchl(&args, req.uq_addr,
+				                                req.uq_ldata[0],
+				                                FORCE_ATOMIC());
+				resp_size = sizeof(resp.rl);
+				break;
+
+			case UVIO_OPCODE_XCHQ: {
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
+				resp.rq.ur_result = libvio_xchq(&args, req.uq_addr,
+				                                req.uq_qdata[0],
+				                                FORCE_ATOMIC());
+#elif defined(LIBVIO_CONFIG_HAVE_QWORD_CMPXCH)
+				union qword q;
+				for (;;) {
+					q.l[0] = libvio_readl(&args, req.uq_addr + 0);
+					q.l[1] = libvio_readl(&args, req.uq_addr + 4);
+					if (libvio_cmpxchq(&args, req.uq_addr, q.q,
+					                   req.uq_qdata[0],
+					                   FORCE_ATOMIC()))
+						break;
+					pthread_yield();
+				}
+				resp.rq.ur_lresult[0] = q.l[0];
+				resp.rq.ur_lresult[1] = q.l[1];
+#else /* ... */
+				if (FORCE_ATOMIC()) {
+					THROW(E_SEGFAULT_NOTATOMIC,
+					      vio_args_faultaddr(&args, req.uq_addr),
+					      E_SEGFAULT_CONTEXT_WRITING,
+					      8,
+					      libvio_readl(&args, req.uq_addr + 4 * LSW),
+					      libvio_readl(&args, req.uq_addr + 4 * MSW),
+					      req.uq_ldata[2 + LSW],
+					      req.uq_ldata[2 + MSW]);
+				}
+				resp.rq.ur_lresult[0] = libvio_xchl(&args, req.uq_addr + 0, req.uq_ldata[0], false);
+				resp.rq.ur_lresult[1] = libvio_xchl(&args, req.uq_addr + 4, req.uq_ldata[1], false);
+#endif /* !... */
+				resp_size = sizeof(resp.rq);
+			}	break;
+
+#define DEFINE_UVIO_OPERATION_BWL(add, ADD)                     \
+	case UVIO_OPCODE_##ADD##B:                                  \
+		resp.rb.ur_result = libvio_##add##b(&args, req.uq_addr, \
+		                                    req.uq_bdata[0],    \
+		                                    FORCE_ATOMIC());    \
+		resp_size = sizeof(resp.rb);                            \
+		break;                                                  \
+	                                                            \
+	case UVIO_OPCODE_##ADD##W:                                  \
+		resp.rw.ur_result = libvio_##add##w(&args, req.uq_addr, \
+		                                    req.uq_wdata[0],    \
+		                                    FORCE_ATOMIC());    \
+		resp_size = sizeof(resp.rw);                            \
+		break;                                                  \
+	                                                            \
+	case UVIO_OPCODE_##ADD##L:                                  \
+		resp.rl.ur_result = libvio_##add##l(&args, req.uq_addr, \
+		                                    req.uq_ldata[0],    \
+		                                    FORCE_ATOMIC());    \
+		resp_size = sizeof(resp.rl);                            \
+		break;
+
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
+#define DEFINE_UVIO_OPERATION_Q(add, ADD, op)                   \
+	case UVIO_OPCODE_##ADD##Q:                                  \
+		resp.rq.ur_result = libvio_##add##q(&args, req.uq_addr, \
+		                                    req.uq_qdata[0],    \
+		                                    FORCE_ATOMIC());    \
+		resp_size = sizeof(resp.rq);                            \
+		break;
+#elif defined(LIBVIO_CONFIG_HAVE_QWORD_CMPXCH)
+#define DEFINE_UVIO_OPERATION_Q(add, ADD, op)              \
+	case UVIO_OPCODE_##ADD##Q: {                           \
+		union qword q;                                     \
+		for (;;) {                                         \
+			q.l[0] = libvio_readl(&args, req.uq_addr + 0); \
+			q.l[1] = libvio_readl(&args, req.uq_addr + 4); \
+			if (libvio_cmpxchq(&args, req.uq_addr, q.q,    \
+			                   q.q op req.uq_qdata[0],     \
+			                   FORCE_ATOMIC()))            \
+				break;                                     \
+			pthread_yield();                               \
+		}                                                  \
+		resp.rq.ur_lresult[0] = q.l[0];                    \
+		resp.rq.ur_lresult[1] = q.l[1];                    \
+		resp_size = sizeof(resp.rq);                       \
+	} break;
+#else /* LIBVIO_CONFIG_HAVE_QWORD */
+#define DEFINE_UVIO_OPERATION_Q(add, ADD, op)               \
+	case UVIO_OPCODE_##ADD##Q: {                            \
+		union qword oldval, newval;                         \
+		oldval.l[0] = libvio_readl(&args, req.uq_addr + 0); \
+		oldval.l[1] = libvio_readl(&args, req.uq_addr + 4); \
+		newval.q    = oldval.q op req.uq_qdata[0];          \
+		if (FORCE_ATOMIC()) {                               \
+			THROW(E_SEGFAULT_NOTATOMIC,                     \
+			      vio_args_faultaddr(&args, req.uq_addr),   \
+			      E_SEGFAULT_CONTEXT_WRITING,               \
+			      8,                                        \
+			      oldval.l[0 + LSW],                        \
+			      oldval.l[0 + MSW],                        \
+			      newval.l[2 + LSW],                        \
+			      newval.l[2 + MSW]);                       \
+		}                                                   \
+		libvio_writel(&args, req.uq_addr + 0, newval.l[0]); \
+		libvio_writel(&args, req.uq_addr + 4, newval.l[1]); \
+		resp_size = sizeof(resp.rq);                        \
+	} break;
+#endif /* !LIBVIO_CONFIG_HAVE_QWORD */
+#define DEFINE_UVIO_OPERATION(add, ADD, op) \
+	DEFINE_UVIO_OPERATION_BWL(add, ADD)     \
+	DEFINE_UVIO_OPERATION_Q(add, ADD, +)
+			DEFINE_UVIO_OPERATION(add, ADD, +)
+			DEFINE_UVIO_OPERATION(sub, SUB, -)
+			DEFINE_UVIO_OPERATION(and, AND, &)
+			DEFINE_UVIO_OPERATION(or, OR, |)
+			DEFINE_UVIO_OPERATION(xor, XOR, ^)
+#undef DEFINE_UVIO_OPERATION_BWL
+#undef DEFINE_UVIO_OPERATION_Q
+#undef DEFINE_UVIO_OPERATION
+
+			case UVIO_OPCODE_CMPXCHB: {
+				resp.rb.ur_result = libvio_cmpxchb(&args, req.uq_addr,
+				                                   req.uq_bdata[0],
+				                                   req.uq_bdata[16],
+				                                   FORCE_ATOMIC());
+				resp_size = sizeof(resp.rb);
+			}	break;
+
+			case UVIO_OPCODE_CMPXCHW: {
+				resp.rw.ur_result = libvio_cmpxchw(&args, req.uq_addr,
+				                                   req.uq_wdata[0],
+				                                   req.uq_wdata[8],
+				                                   FORCE_ATOMIC());
+				resp_size = sizeof(resp.rw);
+			}	break;
+
+			case UVIO_OPCODE_CMPXCHL: {
+				resp.rl.ur_result = libvio_cmpxchl(&args, req.uq_addr,
+				                                   req.uq_ldata[0],
+				                                   req.uq_ldata[4],
+				                                   FORCE_ATOMIC());
+				resp_size = sizeof(resp.rl);
+			}	break;
+
+			case UVIO_OPCODE_CMPXCHQ: {
+#if defined(LIBVIO_CONFIG_HAVE_QWORD) || defined(LIBVIO_CONFIG_HAVE_QWORD_CMPXCH)
+				resp.rq.ur_result = libvio_cmpxchq(&args, req.uq_addr,
+				                                   req.uq_qdata[0],
+				                                   req.uq_qdata[2],
+				                                   FORCE_ATOMIC());
+				resp_size = sizeof(resp.rq);
+#else /* LIBVIO_CONFIG_HAVE_QWORD || LIBVIO_CONFIG_HAVE_QWORD_CMPXCH */
+#endif /* !LIBVIO_CONFIG_HAVE_QWORD && !LIBVIO_CONFIG_HAVE_QWORD_CMPXCH */
+				if (FORCE_ATOMIC()) {
+					THROW(E_SEGFAULT_NOTATOMIC,
+					      vio_args_faultaddr(&args, req.uq_addr),
+					      E_SEGFAULT_CONTEXT_WRITING,
+					      8,
+					      (uintptr_t)req.uq_ldata[0 + LSW],
+					      (uintptr_t)req.uq_ldata[0 + MSW],
+					      (uintptr_t)req.uq_ldata[2 + LSW],
+					      (uintptr_t)req.uq_ldata[2 + MSW]);
+				}
+			}	break;
+
+
+			case UVIO_OPCODE_CMPXCH128: {
 #ifdef LIBVIO_CONFIG_HAVE_INT128_CMPXCH
 				resp.r128.ur_result = libvio_cmpxch128(&args, req.uq_addr,
 				                                       req.uq_data128[0],
@@ -184,10 +356,10 @@ PRIVATE void *uvio_service_thread(void *cookie) {
 					      vio_args_faultaddr(&args, req.uq_addr),
 					      E_SEGFAULT_CONTEXT_WRITING,
 					      16,
-					      (uintptr_t)req.uq_qdata[0],
-					      (uintptr_t)req.uq_qdata[1],
-					      (uintptr_t)req.uq_qdata[2],
-					      (uintptr_t)req.uq_qdata[3]);
+					      (uintptr_t)req.uq_qdata[0 + LSW],
+					      (uintptr_t)req.uq_qdata[0 + MSW],
+					      (uintptr_t)req.uq_qdata[2 + LSW],
+					      (uintptr_t)req.uq_qdata[2 + MSW]);
 				}
 #ifdef LIBVIO_CONFIG_HAVE_QWORD
 				resp.r128.ur_qresult[0] = libvio_readq(&args, req.uq_addr + 0);
@@ -214,7 +386,7 @@ PRIVATE void *uvio_service_thread(void *cookie) {
 #endif /* !LIBVIO_CONFIG_HAVE_QWORD */
 #endif /* !LIBVIO_CONFIG_HAVE_INT128_CMPXCH */
 				resp_size = sizeof(resp.r128);
-				break;
+			}	break;
 
 			case UVIO_OPCODE_GETUCMD:
 				/* User command */
