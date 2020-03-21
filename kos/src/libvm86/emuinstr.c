@@ -113,7 +113,7 @@ DECL_END
 #define EMU86_GETIPREG()            self->vr_regs.vr_ip
 #define EMU86_SETIPREG(v)           self->vr_regs.vr_ip = (u16)(v)
 #define EMU86_GETSTACKPTR()         ((byte_t *)(uintptr_t)vm86_state_sp(self))
-#define EMU86_SETSTACKPTR(v)        self->vr_regs.vr_sp = (u16)((uintptr_t)(v) - (self->vr_regs.vr_cs << 4))
+#define EMU86_SETSTACKPTR(v)        self->vr_regs.vr_sp = (u16)((uintptr_t)(v) - (self->vr_regs.vr_ss << 4))
 #define EMU86_GETSPREG()            self->vr_regs.vr_sp
 #define EMU86_SETSPREG(v)           self->vr_regs.vr_sp = (u16)(v)
 #undef EMU86_GETSEGBASE_IS_NOOP_DS
