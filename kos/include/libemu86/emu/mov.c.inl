@@ -135,7 +135,7 @@ case 0xa0: {
 	byte_t *addr;
 	u32 offset;
 	u8 value;
-	if (op_flags & EMU86_F_AD16) {
+	if (!!EMU86_F_IS16(op_flags) ^ !!(op_flags & EMU86_F_AD16)) {
 		offset = UNALIGNED_GET16((u16 *)pc);
 		pc += 2;
 	} else {
@@ -155,7 +155,7 @@ case 0xa1: {
 	/* A1      MOV RAX,moffs32*     Move quadword at (seg:offset) to RAX */
 	byte_t *addr;
 	u32 offset;
-	if (op_flags & EMU86_F_AD16) {
+	if (!!EMU86_F_IS16(op_flags) ^ !!(op_flags & EMU86_F_AD16)) {
 		offset = UNALIGNED_GET16((u16 *)pc);
 		pc += 2;
 	} else {
@@ -188,7 +188,7 @@ case 0xa2: {
 	byte_t *addr;
 	u32 offset;
 	u8 value;
-	if (op_flags & EMU86_F_AD16) {
+	if (!!EMU86_F_IS16(op_flags) ^ !!(op_flags & EMU86_F_AD16)) {
 		offset = UNALIGNED_GET16((u16 *)pc);
 		pc += 2;
 	} else {
@@ -209,7 +209,7 @@ case 0xa3: {
 	/* A3      MOV moffs64*,RAX     Move RAX to quadword at (seg:offset) */
 	byte_t *addr;
 	u32 offset;
-	if (op_flags & EMU86_F_AD16) {
+	if (!!EMU86_F_IS16(op_flags) ^ !!(op_flags & EMU86_F_AD16)) {
 		offset = UNALIGNED_GET16((u16 *)pc);
 		pc += 2;
 	} else {

@@ -33,7 +33,7 @@ case 0xea: {
 	 * EA cp    JMP ptr16:32    Jump far, absolute, address given in operand */
 	u32 offset;
 	u16 segment;
-	if (op_flags & EMU86_F_AD16) {
+	if (!!EMU86_F_IS16(op_flags) ^ !!(op_flags & EMU86_F_AD16)) {
 		offset = UNALIGNED_GET16((u16 *)pc);
 		pc += 2;
 	} else {
