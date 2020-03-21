@@ -167,25 +167,25 @@ DECL_END
 #undef EMU86_GETSEGBASE_IS_NOOP_FS
 #undef EMU86_GETSEGBASE_IS_NOOP_GS
 #define EMU86_GETSEGBASE(segid) self->vr_regs.vr_segments[segid]
-#define EMU86_GETDSBASE()       self->vr_regs.vr_es
-#define EMU86_GETESBASE()       self->vr_regs.vr_cs
-#define EMU86_GETCSBASE()       self->vr_regs.vr_ss
-#define EMU86_GETSSBASE()       self->vr_regs.vr_ds
+#define EMU86_GETESBASE()       self->vr_regs.vr_es
+#define EMU86_GETCSBASE()       self->vr_regs.vr_cs
+#define EMU86_GETSSBASE()       self->vr_regs.vr_ss
+#define EMU86_GETDSBASE()       self->vr_regs.vr_ds
 #define EMU86_GETFSBASE()       self->vr_regs.vr_fs
 #define EMU86_GETGSBASE()       self->vr_regs.vr_gs
 #define EMU86_SEGADDR(setid, segoffset) (byte_t *)(uintptr_t)VM86_ADDR(setid, segoffset)
+#define EMU86_GETES()           self->vr_regs.vr_es
+#define EMU86_SETES(v)          self->vr_regs.vr_es = (u16)(v)
 #define EMU86_GETCS()           self->vr_regs.vr_cs
 #define EMU86_SETCS(v)          self->vr_regs.vr_cs = (u16)(v)
 #define EMU86_GETSS()           self->vr_regs.vr_ss
 #define EMU86_SETSS(v)          self->vr_regs.vr_ss = (u16)(v)
+#define EMU86_GETDS()           self->vr_regs.vr_ds
+#define EMU86_SETDS(v)          self->vr_regs.vr_ds = (u16)(v)
 #define EMU86_GETFS()           self->vr_regs.vr_fs
 #define EMU86_SETFS(v)          self->vr_regs.vr_fs = (u16)(v)
 #define EMU86_GETGS()           self->vr_regs.vr_gs
 #define EMU86_SETGS(v)          self->vr_regs.vr_gs = (u16)(v)
-#define EMU86_GETDS()           self->vr_regs.vr_ds
-#define EMU86_SETDS(v)          self->vr_regs.vr_ds = (u16)(v)
-#define EMU86_GETES()           self->vr_regs.vr_es
-#define EMU86_SETES(v)          self->vr_regs.vr_es = (u16)(v)
 #define EMU86_EMULATE_PUSH(new_sp, num_bytes)             \
 	do {                                                  \
 		if unlikely(!vm86_state_canpush(self, num_bytes)) \
