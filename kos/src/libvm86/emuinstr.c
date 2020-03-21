@@ -23,9 +23,9 @@ opt.append("-Os");
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#if 1                     /* TODO: Remove me */
-#include "emuinstr.c.old" /* TODO: Remove me */
-#else                     /* TODO: Remove me */
+#if 1                         /* TODO: Remove me */
+#include "emuinstr-old.c.inl" /* TODO: Remove me */
+#else                         /* TODO: Remove me */
 #ifndef GUARD_LIBVM86_EMUINSTR_C
 #define GUARD_LIBVM86_EMUINSTR_C 1
 #define DISABLE_BRANCH_PROFILING 1

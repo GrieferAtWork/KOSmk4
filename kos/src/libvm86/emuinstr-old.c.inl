@@ -719,7 +719,7 @@ INTERN NONNULL((1)) int CC libvm86_step(vm86_state_t *__restrict self) {
 	if (self->vr_regs.vr_cs == 0xffff &&
 	    self->vr_regs.vr_ip == 0xffff)
 		return VM86_STOPPED;
-#if defined(__KERNEL__) && 0
+#if defined(__KERNEL__) && 1
 	{
 		struct disassembler da;
 		size_t len;
