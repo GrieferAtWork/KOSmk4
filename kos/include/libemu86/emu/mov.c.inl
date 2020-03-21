@@ -97,11 +97,11 @@ case 0x8c: {
 		goto return_unknown_instruction;
 	segment = EMU86_GETSEG(modrm.mi_reg);
 	IF_64BIT(if (IS_64BIT()) {
-		MODRM_SETREGQ(segment);
+		MODRM_SETRMQ(segment);
 	} else) if (!IS_16BIT()) {
-		MODRM_SETREGL(segment);
+		MODRM_SETRML(segment);
 	} else {
-		MODRM_SETREGW(segment);
+		MODRM_SETRMW(segment);
 	}
 	goto done;
 }
@@ -114,7 +114,7 @@ case 0x8e: {
 	MODRM_DECODE();
 	if unlikely(modrm.mi_reg >= 6)
 		goto return_unknown_instruction;
-	segment = MODRM_GETREGW();
+	segment = MODRM_GETRMW();
 #if EMU86_EMULATE_CHECKUSER && (CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_64BIT)
 	if ((modrm.mi_reg == EMU86_R_CS ? !SEGMENT_IS_VALID_USERCODE(segment)
 	                                : !SEGMENT_IS_VALID_USERDATA(segment)) &&

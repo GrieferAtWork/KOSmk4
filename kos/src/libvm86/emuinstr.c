@@ -242,6 +242,63 @@ DECL_END
 #define EMU86_EMULATE_RETURN_AFTER_HLT_IF1 \
 	return VM86_HALTED
 
+#if defined(__KERNEL__) && 1
+#include <kernel/printk.h>
+#include <kernel/syslog.h>
+#include <libdisasm/disassembler.h>
+
+#if 1 /* Cause a crash on segfault */
+#undef EMU86_EMULATE_TRY
+#undef EMU86_EMULATE_EXCEPT
+#endif
+
+
+DECL_BEGIN
+#define EMU86_EMULATE_SETUP libvm86_loginstr(self)
+PRIVATE NONNULL((1)) void CC
+libvm86_loginstr(vm86_state_t *__restrict self) {
+	struct disassembler da;
+	size_t len;
+	uint8_t *pc = (uint8_t *)vm86_state_ip(self);
+	ptrdiff_t baseoff = 0;
+	if (self->vr_trans) {
+		uint8_t *newpc;
+		newpc   = (uint8_t *)self->vr_trans(self, pc);
+		baseoff = (ptrdiff_t)(pc - newpc);
+		pc      = newpc;
+	}
+	disasm_init(&da, &syslog_printer, SYSLOG_LEVEL_RAW,
+	            pc, DISASSEMBLER_TARGET_8086,
+	            DISASSEMBLER_FNORMAL, baseoff);
+	len = (size_t)disasm_print_line_nolf(&da);
+	if (len < 60)
+		printk(KERN_RAW "%*s", 60 - len, "");
+	printk(KERN_RAW "\t# eax=%I32p, ecx=%I32p, edx=%I32p, ebx=%I32p, "
+	                "esp=%I16p:%I16p, ebp:%I32p, esi:%I16p:%I16p, edi:%I16p:%I16p, "
+	                "eip=%I16p:%I16p, efl=%I16p [",
+	       self->vr_regs.vr_eax, self->vr_regs.vr_ecx,
+	       self->vr_regs.vr_edx, self->vr_regs.vr_ebx,
+	       self->vr_regs.vr_ss, self->vr_regs.vr_sp,
+	       self->vr_regs.vr_ebp,
+	       self->vr_regs.vr_ds, self->vr_regs.vr_si,
+	       self->vr_regs.vr_es, self->vr_regs.vr_di,
+	       self->vr_regs.vr_cs, self->vr_regs.vr_ip,
+	       self->vr_regs.vr_flags);
+	if (self->vr_regs.vr_flags & CF)
+		printk(KERN_RAW "CF");
+	if (self->vr_regs.vr_flags & PF)
+		printk(KERN_RAW "%sPF", self->vr_regs.vr_flags & CF ? "," : "");
+	if (self->vr_regs.vr_flags & ZF)
+		printk(KERN_RAW "%sZF", self->vr_regs.vr_flags & (CF | PF) ? "," : "");
+	if (self->vr_regs.vr_flags & SF)
+		printk(KERN_RAW "%sSF", self->vr_regs.vr_flags & (CF | PF | ZF) ? "," : "");
+	if (self->vr_regs.vr_flags & OF)
+		printk(KERN_RAW "%sOF", self->vr_regs.vr_flags & (CF | PF | ZF | SF) ? "," : "");
+	printk(KERN_RAW "]\n");
+}
+DECL_END
+#endif /* __KERNEL__ */
+
 
 /* Make sure that `THROW()' isn't used by the emulated code. */
 #undef THROW
