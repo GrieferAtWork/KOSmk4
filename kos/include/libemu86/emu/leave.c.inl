@@ -23,7 +23,8 @@
 
 EMU86_INTELLISENSE_BEGIN(leave) {
 
-case 0xc9:
+
+case 0xc9: {
 	/* C9     LEAVE     ZO     Valid    Valid     Set SP to BP, then pop BP.
 	 * C9     LEAVE     ZO     N.E.     Valid     Set ESP to EBP, then pop EBP. */
 #ifndef EMU86_GETSEGBASE_IS_NOOP_SS
@@ -80,5 +81,8 @@ case 0xc9:
 	}
 #endif /* CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT */
 	goto done;
+}
+
+
 }
 EMU86_INTELLISENSE_END

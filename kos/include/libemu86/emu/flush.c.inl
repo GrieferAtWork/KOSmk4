@@ -23,6 +23,17 @@
 
 EMU86_INTELLISENSE_BEGIN(flush) {
 
+	/* TODO: invd */
+	/* TODO: wbinvd */
+	/* TODO: cflsh */
+	/* TODO: clwb */
+	/* TODO: prefetchw */
+	/* TODO: prefetchnta */
+	/* TODO: prefetcht0 */
+	/* TODO: prefetcht1 */
+	/* TODO: prefetcht2 */
+	/* TODO: cldemote */
+
 case 0x0fae:
 	MODRM_DECODE();
 	switch (modrm.mi_reg) {

@@ -1906,7 +1906,8 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #include "emu/cmpxchg.c.inl"
 #include "emu/cmpxchgb.c.inl"
 #include "emu/cpuid.c.inl"
-#include "emu/flush.c.inl"
+#include "emu/enter.c.inl"
+#include "emu/flush.c.inl" /* TODO: Missing instructions in here */
 #include "emu/hlt.c.inl"
 #include "emu/incdec.c.inl"
 #include "emu/io.c.inl"
@@ -1943,7 +1944,6 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #endif /* !EMU86_EMULATE_IMPL_HEADER */
 #endif /* !__INTELLISENSE__ */
 
-			/* TODO: enter */
 			/* TODO: int, int3, into, int1 */
 			/* TODO: sldt */
 			/* TODO: str */
@@ -1967,17 +1967,6 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 			/* TODO: lmsw */
 			/* TODO: clts */
 			/* TODO: mov (%crN) */
-
-			/* TODO: invd */
-			/* TODO: wbinvd */
-			/* TODO: cflsh */
-			/* TODO: clwb */
-			/* TODO: prefetchw */
-			/* TODO: prefetchnta */
-			/* TODO: prefetcht0 */
-			/* TODO: prefetcht1 */
-			/* TODO: prefetcht2 */
-			/* TODO: cldemote */
 
 			/* TODO: lfence */
 			/* TODO: mfence */
