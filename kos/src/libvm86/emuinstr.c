@@ -232,14 +232,14 @@ DECL_END
 #define EMU86_GETBP()           self->vr_regs.vr_bp
 #define EMU86_GETSI()           self->vr_regs.vr_si
 #define EMU86_GETDI()           self->vr_regs.vr_di
-#define EMU86_SETAX(v)          self->vr_regs.vr_ax = (u16)(v)
-#define EMU86_SETCX(v)          self->vr_regs.vr_cx = (u16)(v)
-#define EMU86_SETDX(v)          self->vr_regs.vr_dx = (u16)(v)
-#define EMU86_SETBX(v)          self->vr_regs.vr_bx = (u16)(v)
-#define EMU86_SETSP(v)          self->vr_regs.vr_sp = (u16)(v)
-#define EMU86_SETBP(v)          self->vr_regs.vr_bp = (u16)(v)
-#define EMU86_SETSI(v)          self->vr_regs.vr_si = (u16)(v)
-#define EMU86_SETDI(v)          self->vr_regs.vr_di = (u16)(v)
+#define EMU86_SETAX(v)          self->vr_regs.vr_eax = (u32)(u16)(v)
+#define EMU86_SETCX(v)          self->vr_regs.vr_ecx = (u32)(u16)(v)
+#define EMU86_SETDX(v)          self->vr_regs.vr_edx = (u32)(u16)(v)
+#define EMU86_SETBX(v)          self->vr_regs.vr_ebx = (u32)(u16)(v)
+#define EMU86_SETSP(v)          self->vr_regs.vr_esp = (u32)(u16)(v)
+#define EMU86_SETBP(v)          self->vr_regs.vr_ebp = (u32)(u16)(v)
+#define EMU86_SETSI(v)          self->vr_regs.vr_esi = (u32)(u16)(v)
+#define EMU86_SETDI(v)          self->vr_regs.vr_edi = (u32)(u16)(v)
 #define EMU86_GETEAX()          self->vr_regs.vr_eax
 #define EMU86_GETECX()          self->vr_regs.vr_ecx
 #define EMU86_GETEDX()          self->vr_regs.vr_edx
@@ -264,14 +264,14 @@ DECL_END
 #define EMU86_GETPBP(...)       self->vr_regs.vr_bp
 #define EMU86_GETPSI(...)       self->vr_regs.vr_si
 #define EMU86_GETPDI(...)       self->vr_regs.vr_di
-#define EMU86_SETPAX(v, ...)    self->vr_regs.vr_ax = (u16)(v)
-#define EMU86_SETPCX(v, ...)    self->vr_regs.vr_cx = (u16)(v)
-#define EMU86_SETPDX(v, ...)    self->vr_regs.vr_dx = (u16)(v)
-#define EMU86_SETPBX(v, ...)    self->vr_regs.vr_bx = (u16)(v)
-#define EMU86_SETPSP(v, ...)    self->vr_regs.vr_sp = (u16)(v)
-#define EMU86_SETPBP(v, ...)    self->vr_regs.vr_bp = (u16)(v)
-#define EMU86_SETPSI(v, ...)    self->vr_regs.vr_si = (u16)(v)
-#define EMU86_SETPDI(v, ...)    self->vr_regs.vr_di = (u16)(v)
+#define EMU86_SETPAX(v, ...)    self->vr_regs.vr_eax = (u32)(u16)(v)
+#define EMU86_SETPCX(v, ...)    self->vr_regs.vr_ecx = (u32)(u16)(v)
+#define EMU86_SETPDX(v, ...)    self->vr_regs.vr_edx = (u32)(u16)(v)
+#define EMU86_SETPBX(v, ...)    self->vr_regs.vr_ebx = (u32)(u16)(v)
+#define EMU86_SETPSP(v, ...)    self->vr_regs.vr_esp = (u32)(u16)(v)
+#define EMU86_SETPBP(v, ...)    self->vr_regs.vr_ebp = (u32)(u16)(v)
+#define EMU86_SETPSI(v, ...)    self->vr_regs.vr_esi = (u32)(u16)(v)
+#define EMU86_SETPDI(v, ...)    self->vr_regs.vr_edi = (u32)(u16)(v)
 
 #define EMU86_EMULATE_SETUP              \
 	if (self->vr_regs.vr_cs == 0xffff && \
