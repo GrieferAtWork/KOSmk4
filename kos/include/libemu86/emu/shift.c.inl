@@ -80,7 +80,9 @@ do_shift##Nbits:                                                                
 			break;                                                                         \
 			                                                                               \
 		default:                                                                           \
-			goto return_unknown_instruction;                                               \
+			/* In 64-bit mode, REX.B can cause modrm.mi_reg to be > 7 */                 \
+			IFELSE_64BIT(goto return_unknown_instruction_rmreg,                          \
+			             __builtin_unreachable());                                       \
 		}                                                                                  \
 		/* Write-back the new result. */                                                   \
 		NIF_ONLY_MEMORY(                                                                   \
@@ -131,6 +133,9 @@ do_shift##Nbits:                                                                
 			EMU86_MSKFLAGS(~eflags_mask, eflags_addend);                                   \
 		}                                                                                  \
 	} __WHILE0
+#if CONFIG_LIBEMU86_WANT_64BIT
+#define NEED_return_unknown_instruction_rmreg
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
 
 
 case 0xd2: {

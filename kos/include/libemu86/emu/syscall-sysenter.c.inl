@@ -29,11 +29,12 @@ EMU86_INTELLISENSE_BEGIN(syscall_sysenter) {
 #ifdef EMU86_EMULATE_RETURN_AFTER_SYSCALL
 case 0x0f05: {
 	/* 0F 05     SYSCALL     Fast call to privilege level 0 system procedures. */
-	if unlikely(op_flags & EMU86_F_LOCK)
-		goto return_unknown_instruction;
+#define NEED_return_unexpected_lock
+	EMU86_REQUIRE_NO_LOCK();
 #if CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT
 	if unlikely(!EMU86_F_IS64(op_flags))
-		goto return_unknown_instruction;
+		goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
 #endif /* CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT */
 	EMU86_SETPCPTR(REAL_IP());
 	EMU86_EMULATE_RETURN_AFTER_SYSCALL();
@@ -45,13 +46,14 @@ case 0x0f05: {
 #ifdef EMU86_EMULATE_RETURN_AFTER_SYSENTER
 case 0x0f34: {
 	/* 0F 34     SYSENTER     Fast call to privilege level 0 system procedures. */
-	if unlikely(op_flags & EMU86_F_LOCK)
-		goto return_unknown_instruction;
+#define NEED_return_unexpected_lock
+	EMU86_REQUIRE_NO_LOCK();
 #if CONFIG_LIBEMU86_WANT_16BIT
 	/* Intel documents that sysenter cannot be used from
 	 * real-mode (i.e. 16-bit mode, or in this case: vm86) */
 	if unlikely(EMU86_F_IS16(op_flags))
-		goto return_unknown_instruction;
+		goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
 #endif /* CONFIG_LIBEMU86_WANT_16BIT */
 	/* Canonically, sysenter override the return IP, so no need to write it back here! */
 	/*EMU86_SETPCPTR(REAL_IP());*/

@@ -26,20 +26,22 @@ EMU86_INTELLISENSE_BEGIN(shift2) {
 	/* The number of bits by which to shift */
 	u8 num_bits;
 
+#ifndef EMU86_EMULATE_ONLY_MEMORY
+#define NEED_return_unexpected_lock
+#endif /* !EMU86_EMULATE_ONLY_MEMORY */
 #define DEFINE_SHLD_MODRM_rm_reg(bwlq, BWLQ, Nbits, Nbytes, msb_bit_set)                \
 	u##Nbits oldval, bitsrc, newval;                                                    \
 	num_bits &= (Nbits - 1);                                                            \
 	if (!num_bits)                                                                      \
 		goto done;                                                                      \
 	bitsrc = MODRM_GETREG##BWLQ();                                                      \
-	if (EMU86_MODRM_ISREG(modrm.mi_type)) {                                             \
-		if unlikely(op_flags & EMU86_F_LOCK)                                            \
-			goto return_unknown_instruction;                                            \
+	NIF_ONLY_MEMORY(if (EMU86_MODRM_ISREG(modrm.mi_type)) {                             \
+		EMU86_REQUIRE_NO_LOCK();                                                        \
 		oldval = MODRM_GETRMREG##BWLQ();                                                \
 		newval = (oldval << num_bits) |                                                 \
 		         (bitsrc >> (Nbits - num_bits));                                        \
 		MODRM_SETRMREG##BWLQ(newval);                                                   \
-	} else {                                                                            \
+	} else) {                                                                           \
 		byte_t *addr;                                                                   \
 		addr = MODRM_MEMADDR();                                                         \
 		EMU86_WRITE_USER_MEMORY(addr, Nbytes);                                          \
@@ -98,20 +100,22 @@ case 0x0fa4: {
 
 
 
+#ifndef EMU86_EMULATE_ONLY_MEMORY
+#define NEED_return_unexpected_lock
+#endif /* !EMU86_EMULATE_ONLY_MEMORY */
 #define DEFINE_SHRD_MODRM_rm_reg(bwlq, BWLQ, Nbits, Nbytes, msb_bit_set)                \
 	u##Nbits oldval, bitsrc, newval;                                                    \
 	num_bits &= (Nbits - 1);                                                            \
 	if (!num_bits)                                                                      \
 		goto done;                                                                      \
 	bitsrc = MODRM_GETREG##BWLQ();                                                      \
-	if (EMU86_MODRM_ISREG(modrm.mi_type)) {                                             \
-		if unlikely(op_flags & EMU86_F_LOCK)                                            \
-			goto return_unknown_instruction;                                            \
+	NIF_ONLY_MEMORY(if (EMU86_MODRM_ISREG(modrm.mi_type)) {                             \
+		EMU86_REQUIRE_NO_LOCK();                                                        \
 		oldval = MODRM_GETRMREG##BWLQ();                                                \
 		newval = (oldval >> num_bits) |                                                 \
 		         (bitsrc << (Nbits - num_bits));                                        \
 		MODRM_SETRMREG##BWLQ(newval);                                                   \
-	} else {                                                                            \
+	} else) {                                                                           \
 		byte_t *addr;                                                                   \
 		addr = MODRM_MEMADDR();                                                         \
 		EMU86_WRITE_USER_MEMORY(addr, Nbytes);                                          \

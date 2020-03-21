@@ -273,16 +273,12 @@ DECL_END
 #define EMU86_SETPSI(v, ...)    self->vr_regs.vr_esi = (u32)(u16)(v)
 #define EMU86_SETPDI(v, ...)    self->vr_regs.vr_edi = (u32)(u16)(v)
 
-#define EMU86_EMULATE_SETUP              \
+#define EMU86_EMULATE_SETUP()            \
 	if (self->vr_regs.vr_cs == 0xffff && \
 	    self->vr_regs.vr_ip == 0xffff)   \
 		return VM86_STOPPED;
-#define EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION(faultaddr, opcode, op_flags) \
-	return libvm86_intr(self, 0x6) /* Invalid Opcode */
-#define EMU86_EMULATE_THROW_BOUNDERR(bound_idx, bound_min, bound_max) \
-	return libvm86_intr(self, 0x5) /* #BR */
-#define EMU86_EMULATE_THROW_DIVIDE_ERROR() \
-	return libvm86_intr(self, 0x0) /* #DE */
+
+/* Define custom handlers for specific instructions. */
 #define EMU86_EMULATE_RETURN_AFTER_STI() \
 	return VM86_INTR_ENABLED
 #define EMU86_EMULATE_RETURN_AFTER_HLT_IF0() \
@@ -297,6 +293,33 @@ DECL_END
 	return libvm86_intr(self, 0x03) /* #BP */
 #define EMU86_EMULATE_RETURN_AFTER_INTO() \
 	return libvm86_intr(self, 0x04) /* #OF */
+#define EMU86_EMULATE_THROW_BOUNDERR(bound_idx, bound_min, bound_max) \
+	return libvm86_intr(self, 0x5) /* #BR */
+
+
+/* Define how we want to handle exceptions */
+#define EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION() \
+	return libvm86_intr(self, 0x6) /* Invalid Opcode */
+/* Have all of the verbose bad-instruction return-paths alias the main one. */
+#undef EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION_RMREG
+#undef EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION
+#undef EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION_RMREG
+#undef EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM
+#undef EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM_RMREG
+#undef EMU86_EMULATE_RETURN_EXPECTED_REGISTER_MODRM
+#undef EMU86_EMULATE_RETURN_EXPECTED_REGISTER_MODRM_RMREG
+#undef EMU86_EMULATE_RETURN_UNEXPECTED_LOCK
+#undef EMU86_EMULATE_RETURN_UNEXPECTED_LOCK_RMREG
+#undef EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION
+#undef EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION_RMREG
+#define EMU86_EMULATE_THROW_DIVIDE_BY_ZERO_ALLOW_RETHROW 0
+#define EMU86_EMULATE_THROW_DIVIDE_ERROR() \
+	return libvm86_intr(self, 0x0) /* #DE */
+#define EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(how, regno, regval, offset) \
+	return libvm86_intr(self, (how) == E_ILLEGAL_INSTRUCTION_REGISTER_RDINV ||       \
+	                          (how) == E_ILLEGAL_INSTRUCTION_REGISTER_WRINV          \
+	                          ? 0x06 /* #UD */                                       \
+	                          : 0x0d /* #GP */)
 
 
 #if defined(__KERNEL__) && 1
@@ -312,7 +335,7 @@ DECL_END
 
 DECL_BEGIN
 #undef EMU86_EMULATE_SETUP
-#define EMU86_EMULATE_SETUP              \
+#define EMU86_EMULATE_SETUP()            \
 	if (self->vr_regs.vr_cs == 0xffff && \
 	    self->vr_regs.vr_ip == 0xffff)   \
 		return VM86_STOPPED;             \

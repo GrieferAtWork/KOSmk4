@@ -29,8 +29,10 @@ case 0x0f1f:
 	/* NP 0F 1F /0     NOP r/m16     Multi-byte no-operation instruction.
 	 * NP 0F 1F /0     NOP r/m32     Multi-byte no-operation instruction. */
 	MODRM_DECODE();
-	if (modrm.mi_reg != 0)
-		goto return_unknown_instruction;
+	if (modrm.mi_reg != 0) {
+#define NEED_return_unknown_instruction_rmreg
+		goto return_unknown_instruction_rmreg;
+	}
 	goto done;
 #endif /* !EMU86_EMULATE_ONLY_MEMORY */
 

@@ -29,10 +29,11 @@ case 0x60: {
 	/* 60     PUSHA      Push AX, CX, DX, BX, original SP, BP, SI, and DI.
 	 * 60     PUSHAD     Push EAX, ECX, EDX, EBX, original ESP, EBP, ESI, and EDI. */
 	byte_t *sp;
-	IF_64BIT({
-		if (EMU86_F_IS64(op_flags))
-			goto return_unknown_instruction;
-	});
+#if CONFIG_LIBEMU86_WANT_64BIT
+#define NEED_return_unavailable_instruction
+	if (EMU86_F_IS64(op_flags))
+		goto return_unavailable_instruction;
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
 	sp = EMU86_GETSTACKPTR();
 	if (!IS_16BIT()) {
 		sp -= 32;
@@ -68,10 +69,11 @@ case 0x61: {
 	/* 61     POPA      Pop DI, SI, BP, BX, DX, CX, and AX.
 	 * 61     POPAD     Pop EDI, ESI, EBP, EBX, EDX, ECX, and EAX. */
 	byte_t *sp;
-	IF_64BIT({
-		if (EMU86_F_IS64(op_flags))
-			goto return_unknown_instruction;
-	});
+#if CONFIG_LIBEMU86_WANT_64BIT
+#define NEED_return_unavailable_instruction
+	if (EMU86_F_IS64(op_flags))
+		goto return_unavailable_instruction;
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
 	sp = EMU86_GETSTACKPTR();
 	if (!IS_16BIT()) {
 		u32 eax, ecx, edx, ebx, ebp, esi, edi;

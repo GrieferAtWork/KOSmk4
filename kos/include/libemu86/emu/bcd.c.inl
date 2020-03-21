@@ -30,10 +30,11 @@ case 0x27: {
 	/* 27     DAA     Decimal adjust AL after addition. */
 	uintptr_t old_flags, new_flags;
 	u8 old_al, new_al;
-	IF_64BIT({
-		if (EMU86_F_IS64(op_flags))
-			goto return_unknown_instruction;
-	});
+#if CONFIG_LIBEMU86_WANT_64BIT
+#define NEED_return_unavailable_instruction
+	if (EMU86_F_IS64(op_flags))
+		goto return_unavailable_instruction;
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
 	old_al    = EMU86_GETAL();
 	old_flags = EMU86_GETFLAGS();
 	new_al    = old_al;
@@ -61,10 +62,11 @@ case 0x2f: {
 	/* 2F     DAS     Decimal adjust AL after subtraction. */
 	uintptr_t old_flags, new_flags;
 	u8 old_al, new_al;
-	IF_64BIT({
-		if (EMU86_F_IS64(op_flags))
-			goto return_unknown_instruction;
-	});
+#if CONFIG_LIBEMU86_WANT_64BIT
+#define NEED_return_unavailable_instruction
+	if (EMU86_F_IS64(op_flags))
+		goto return_unavailable_instruction;
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
 	old_al    = EMU86_GETAL();
 	old_flags = EMU86_GETFLAGS();
 	new_al    = old_al;
@@ -92,10 +94,11 @@ case 0x37: {
 	/* 37     AAA     ASCII adjust AL after addition. */
 	uintptr_t flags;
 	u16 ax;
-	IF_64BIT({
-		if (EMU86_F_IS64(op_flags))
-			goto return_unknown_instruction;
-	});
+#if CONFIG_LIBEMU86_WANT_64BIT
+#define NEED_return_unavailable_instruction
+	if (EMU86_F_IS64(op_flags))
+		goto return_unavailable_instruction;
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
 	ax    = EMU86_GETAX();
 	flags = EMU86_GETFLAGS();
 	if ((ax & 0xf) > 9 || (flags & EFLAGS_AF)) {
@@ -116,10 +119,11 @@ case 0x3f: {
 	 * s.a. https://www.youtube.com/watch?v=c2ia8T4E2Mc */
 	uintptr_t flags;
 	u16 ax;
-	IF_64BIT({
-		if (EMU86_F_IS64(op_flags))
-			goto return_unknown_instruction;
-	});
+#if CONFIG_LIBEMU86_WANT_64BIT
+#define NEED_return_unavailable_instruction
+	if (EMU86_F_IS64(op_flags))
+		goto return_unavailable_instruction;
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
 	ax    = EMU86_GETAX();
 	flags = EMU86_GETFLAGS();
 	if ((ax & 0xf) > 9 || (flags & EFLAGS_AF)) {
@@ -149,10 +153,11 @@ case 0xd4: {
 	 * D4 ib     AAM imm8     Adjust AX after multiply to number base imm8. */
 	u8 base;
 	u8 ah, al;
-	IF_64BIT({
-		if (EMU86_F_IS64(op_flags))
-			goto return_unknown_instruction;
-	});
+#if CONFIG_LIBEMU86_WANT_64BIT
+#define NEED_return_unavailable_instruction
+	if (EMU86_F_IS64(op_flags))
+		goto return_unavailable_instruction;
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
 	base = *(u8 *)pc;
 	pc += 1;
 	al = EMU86_GETAL();
@@ -177,10 +182,11 @@ case 0xd5: {
 	 * D5 ib     AAD imm8     Adjust AX before division to number base imm8. */
 	u8 base;
 	u8 ah, al;
-	IF_64BIT({
-		if (EMU86_F_IS64(op_flags))
-			goto return_unknown_instruction;
-	});
+#if CONFIG_LIBEMU86_WANT_64BIT
+#define NEED_return_unavailable_instruction
+	if (EMU86_F_IS64(op_flags))
+		goto return_unavailable_instruction;
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
 	base = *(u8 *)pc;
 	pc += 1;
 	al = EMU86_GETAL();

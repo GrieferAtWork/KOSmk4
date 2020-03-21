@@ -29,10 +29,12 @@ case 0x62: {
 	byte_t *addr;
 	/* 62 /r     BOUND r16, m16&16     Check if r16 (array index) is within bounds specified by m16&16
 	 * 62 /r     BOUND r32, m32&32     Check if r32 (array index) is within bounds specified by m32&32 */
-	IF_64BIT({
-		if (EMU86_F_IS64(op_flags))
-			goto return_unknown_instruction;
-	});
+#if CONFIG_LIBEMU86_WANT_64BIT
+#define NEED_return_unavailable_instruction
+	if (EMU86_F_IS64(op_flags))
+		goto return_unavailable_instruction;
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#define NEED_return_expected_memory_modrm
 	MODRM_DECODE_MEMONLY();
 	addr = MODRM_MEMADDR();
 	if (IS_16BIT()) {

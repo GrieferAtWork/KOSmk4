@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x198ccdb8 */
+/* HASH CRC-32:0xe9cd95c6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -195,7 +195,7 @@ CLASS(E_OVERFLOW,MESSAGE("Overflow"),ERRNO(EOVERFLOW),())
 END
 CLASS(E_ILLEGAL_INSTRUCTION,MESSAGE("Illegal instruction"),ERRNO(EPERM),())
 	SUBCLASS(E_ILLEGAL_INSTRUCTION_BAD_OPCODE,MESSAGE("Unknown instruction"),NO_ERRNO,(MEMBER(uintptr_t,opcode)))
-	SUBCLASS(E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX,MESSAGE("Unsupported instruction prefix"),NO_ERRNO,(MEMBER(uintptr_t,prefix_sequence)))
+	SUBCLASS(E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX,MESSAGE("Unsupported instruction prefix"),NO_ERRNO,(MEMBER(uintptr_t,opcode) MEMBER(uintptr_t,op_flags)))
 	SUBCLASS(E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE,MESSAGE("Unsupported instruction"),NO_ERRNO,(MEMBER(uintptr_t,opcode)))
 	SUBCLASS(E_ILLEGAL_INSTRUCTION_X86_TOO_LONG,MESSAGE("Instruction too long"),NO_ERRNO,(MEMBER(uintptr_t,opcode)))
 	SUBCLASS(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE,MESSAGE("Privileged instruction"),NO_ERRNO,(MEMBER(uintptr_t,opcode)))

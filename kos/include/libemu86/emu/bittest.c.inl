@@ -45,15 +45,16 @@ set_cf_from_nonzero:
 	EMU86_MSKFLAGS(~EFLAGS_CF, nonzero ? EFLAGS_CF : 0);
 	goto done;
 
-
+#ifndef EMU86_EMULATE_ONLY_MEMORY
+#define NEED_return_unexpected_lock
+#endif /* !EMU86_EMULATE_ONLY_MEMORY */
 #define DEFINE_BIT_TEST_AND_op(pred_oldval_mask)                                       \
 	IF_64BIT(if (IS_64BIT()) {                                                         \
 		u64 oldval, mask;                                                              \
 		mask = (u64)1 << (bitno % 64);                                                 \
 		NIF_ONLY_MEMORY(                                                               \
 		if (EMU86_MODRM_ISREG(modrm.mi_type)) {                                        \
-			if unlikely(op_flags & EMU86_F_LOCK)                                       \
-				goto return_unknown_instruction;                                       \
+			EMU86_REQUIRE_NO_LOCK();                                                   \
 			oldval = MODRM_GETRMREGQ();                                                \
 			MODRM_SETRMREGQ(pred_oldval_mask(oldval, mask));                           \
 		} else) {                                                                      \
@@ -74,8 +75,7 @@ set_cf_from_nonzero:
 		mask = (u32)1 << (bitno % 32);                                                 \
 		NIF_ONLY_MEMORY(                                                               \
 		if (EMU86_MODRM_ISREG(modrm.mi_type)) {                                        \
-			if unlikely(op_flags & EMU86_F_LOCK)                                       \
-				goto return_unknown_instruction;                                       \
+			EMU86_REQUIRE_NO_LOCK();                                                   \
 			oldval = MODRM_GETRMREGL();                                                \
 			MODRM_SETRMREGL(pred_oldval_mask(oldval, mask));                           \
 		} else) {                                                                      \
@@ -96,8 +96,7 @@ set_cf_from_nonzero:
 		mask = (u16)1 << (bitno % 16);                                                 \
 		NIF_ONLY_MEMORY(                                                               \
 		if (EMU86_MODRM_ISREG(modrm.mi_type)) {                                        \
-			if unlikely(op_flags & EMU86_F_LOCK)                                       \
-				goto return_unknown_instruction;                                       \
+			EMU86_REQUIRE_NO_LOCK();                                                   \
 			oldval = MODRM_GETRMREGW();                                                \
 			MODRM_SETRMREGW(pred_oldval_mask(oldval, mask));                           \
 		} else) {                                                                      \
@@ -187,7 +186,9 @@ case 0x0fba:
 		 * REX.W + 0F BA /7 ib     BTC r/m64, imm8      Store selected bit in CF flag and complement. */
 		goto do_btc_modrm;
 
-	default: goto return_unknown_instruction;
+	default:
+#define NEED_return_unknown_instruction_rmreg
+		goto return_unknown_instruction_rmreg;
 	}
 	break;
 

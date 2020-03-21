@@ -32,7 +32,7 @@ case 0xea: {
 	/* EA cd    JMP ptr16:16    Jump far, absolute, address given in operand
 	 * EA cp    JMP ptr16:32    Jump far, absolute, address given in operand */
 	u32 offset;
-	u16 segment;
+	u16 cs;
 	if (!!EMU86_F_IS16(op_flags) ^ !!(op_flags & EMU86_F_AD16)) {
 		offset = UNALIGNED_GET16((u16 *)pc);
 		pc += 2;
@@ -40,16 +40,21 @@ case 0xea: {
 		offset = UNALIGNED_GET32((u32 *)pc);
 		pc += 4;
 	}
-	segment = UNALIGNED_GET16((u16 *)pc);
+	cs = UNALIGNED_GET16((u16 *)pc);
 	/* Verify the segment index. */
 #if EMU86_EMULATE_CHECKUSER
-	if (!SEGMENT_IS_VALID_USERCODE(segment) && EMU86_ISUSER_NOVM86()) {
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-		      X86_REGISTER_SEGMENT_CS, segment);
+	if (!SEGMENT_IS_VALID_USERCODE(cs) && EMU86_ISUSER_NOVM86()) {
+#ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
+		EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV,
+		                                                 X86_REGISTER_SEGMENT_CS,
+		                                                 cs, 0);
+#else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
+#define NEED_return_privileged_instruction
+		goto return_privileged_instruction;
+#endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 	}
 #endif /* EMU86_EMULATE_CHECKUSER */
-	EMU86_SETCS(segment);
+	EMU86_SETCS(cs);
 	EMU86_SETIPREG(offset);
 	goto done_dont_set_pc;
 }

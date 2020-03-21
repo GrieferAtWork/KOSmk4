@@ -27,56 +27,56 @@
 /* 66 XX push16
  *    XX push32  (in 32-bit mode)
  *    XX illegal (in 64-bit mode) */
-#define EMU86_PUSH1632(T, value)                 \
-	do {                                         \
-		byte_t *sp;                              \
-		T _value;                                \
-		IF_64BIT({                               \
-			if (EMU86_F_IS64(op_flags))          \
-				goto return_unknown_instruction; \
-		});                                      \
-		_value = (value);                        \
-		sp     = EMU86_GETSTACKPTR();            \
-		if (IS_16BIT()) {                        \
-			sp -= 2;                             \
-			EMU86_EMULATE_PUSH(sp, 2);           \
-			EMU86_WRITE_USER_MEMORY(sp, 2);      \
-			EMU86_MEMWRITEW(sp, _value);    \
-		} else {                                 \
-			sp -= 4;                             \
-			EMU86_EMULATE_PUSH(sp, 4);           \
-			EMU86_WRITE_USER_MEMORY(sp, 4);      \
-			EMU86_MEMWRITEL(sp, _value);    \
-		}                                        \
-		EMU86_SETSTACKPTR(sp);                   \
+#define EMU86_PUSH1632(T, value)                     \
+	do {                                             \
+		byte_t *sp;                                  \
+		T _value;                                    \
+		IF_64BIT({                                   \
+			if (EMU86_F_IS64(op_flags))              \
+				goto return_unavailable_instruction; \
+		});                                          \
+		_value = (value);                            \
+		sp     = EMU86_GETSTACKPTR();                \
+		if (IS_16BIT()) {                            \
+			sp -= 2;                                 \
+			EMU86_EMULATE_PUSH(sp, 2);               \
+			EMU86_WRITE_USER_MEMORY(sp, 2);          \
+			EMU86_MEMWRITEW(sp, _value);             \
+		} else {                                     \
+			sp -= 4;                                 \
+			EMU86_EMULATE_PUSH(sp, 4);               \
+			EMU86_WRITE_USER_MEMORY(sp, 4);          \
+			EMU86_MEMWRITEL(sp, _value);             \
+		}                                            \
+		EMU86_SETSTACKPTR(sp);                       \
 	} __WHILE0
 
 
 /* 66 XX pop16
  *    XX pop32   (in 32-bit mode)
  *    XX illegal (in 64-bit mode) */
-#define EMU86_POP1632(T, setter)                 \
-	do {                                         \
-		byte_t *sp;                              \
-		T _value;                                \
-		IF_64BIT({                               \
-			if (EMU86_F_IS64(op_flags))          \
-				goto return_unknown_instruction; \
-		});                                      \
-		sp = EMU86_GETSTACKPTR();                \
-		if (IS_16BIT()) {                        \
-			EMU86_EMULATE_POP(sp, 2);            \
-			EMU86_READ_USER_MEMORY(sp, 2);       \
-			_value = (T)EMU86_MEMREADW(sp);      \
-			sp += 2;                             \
-		} else {                                 \
-			EMU86_EMULATE_POP(sp, 4);            \
-			EMU86_READ_USER_MEMORY(sp, 4);       \
-			_value = (T)EMU86_MEMREADL(sp);      \
-			sp += 4;                             \
-		}                                        \
-		setter(_value);                          \
-		EMU86_SETSTACKPTR(sp);                   \
+#define EMU86_POP1632(T, setter)                     \
+	do {                                             \
+		byte_t *sp;                                  \
+		T _value;                                    \
+		IF_64BIT({                                   \
+			if (EMU86_F_IS64(op_flags))              \
+				goto return_unavailable_instruction; \
+		});                                          \
+		sp = EMU86_GETSTACKPTR();                    \
+		if (IS_16BIT()) {                            \
+			EMU86_EMULATE_POP(sp, 2);                \
+			EMU86_READ_USER_MEMORY(sp, 2);           \
+			_value = (T)EMU86_MEMREADW(sp);          \
+			sp += 2;                                 \
+		} else {                                     \
+			EMU86_EMULATE_POP(sp, 4);                \
+			EMU86_READ_USER_MEMORY(sp, 4);           \
+			_value = (T)EMU86_MEMREADL(sp);          \
+			sp += 4;                                 \
+		}                                            \
+		setter(_value);                              \
+		EMU86_SETSTACKPTR(sp);                       \
 	} __WHILE0
 
 

@@ -163,14 +163,24 @@ case 0xcf: {
 		 *       so these checks aren't necessary otherwise! */
 		if (EMU86_ISUSER()) {
 			if (!SEGMENT_IS_VALID_USERCODE(new_cs)) {
-				THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-				      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-				      X86_REGISTER_SEGMENT_CS, new_cs);
+#ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
+				EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV,
+				                                                 X86_REGISTER_SEGMENT_CS,
+				                                                 new_cs, 0);
+#else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
+#define NEED_return_privileged_instruction
+				goto return_privileged_instruction;
+#endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 			}
 			if (!SEGMENT_IS_VALID_USERDATA(new_ss)) {
-				THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-				      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-				      X86_REGISTER_SEGMENT_SS, new_ss);
+#ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
+				EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV,
+				                                                 X86_REGISTER_SEGMENT_SS,
+				                                                 new_ss, 0);
+#else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
+#define NEED_return_privileged_instruction
+				goto return_privileged_instruction;
+#endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 			}
 			new_eflags &= USERIRET_EFLAGS_MASK;
 			new_eflags |= EMU86_GETFLAGS() & ~USERIRET_EFLAGS_MASK;
@@ -193,9 +203,14 @@ case 0xcf: {
 	/* Verify segment registers. */
 	if (EMU86_ISUSER()) {
 		if (!SEGMENT_IS_VALID_USERCODE(new_cs)) {
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-			      X86_REGISTER_SEGMENT_CS, new_cs);
+#ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
+			EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV,
+			                                                 X86_REGISTER_SEGMENT_CS,
+			                                                 new_cs, 0);
+#else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
+#define NEED_return_privileged_instruction
+			goto return_privileged_instruction;
+#endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 		}
 		/* Restrict EFLAGS to only update this mask */
 		new_eflags &= USERIRET_EFLAGS_MASK;

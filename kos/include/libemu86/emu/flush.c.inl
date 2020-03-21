@@ -41,18 +41,20 @@ case 0x0fae:
 	case 7:
 		/* 0F AE /7      CLFLUSH m8      Flushes cache line containing m8 */
 #ifndef EMU86_EMULATE_ONLY_MEMORY
+#define NEED_return_expected_memory_modrm_rmreg
 		if (!EMU86_MODRM_ISMEM(modrm.mi_type))
-			goto return_unknown_instruction;
+			goto return_expected_memory_modrm_rmreg;
 #endif /* !EMU86_EMULATE_ONLY_MEMORY */
 #ifdef EMU86_EMULATE_CLFLUSH
 		EMU86_EMULATE_CLFLUSH(MODRM_MEMADDR());
 #endif /* EMU86_EMULATE_CLFLUSH */
-		break;
+		goto done;
 
 	default:
-		break;
+#define NEED_return_unknown_instruction_rmreg
+		goto return_unknown_instruction_rmreg;
 	}
-	goto return_unknown_instruction;
+	break;
 
 }
 EMU86_INTELLISENSE_END

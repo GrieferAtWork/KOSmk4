@@ -29,22 +29,24 @@ EMU86_INTELLISENSE_BEGIN(xchg) {
 #define XCHG_IS_ATOMIC() ((op_flags & EMU86_F_LOCK) != 0)
 #endif /* !EMU86_EMULATE_ATOMIC_XCHG_REQUIRES_LOCK */
 
-#define DEFINE_XCHG_modrm(BWLQ, Nbits, Nbytes)                     \
-	u##Nbits reg_operand, oldval;                                  \
-	reg_operand = MODRM_GETREG##BWLQ();                            \
-	NIF_ONLY_MEMORY(                                               \
-	if (EMU86_MODRM_ISREG(modrm.mi_type)) {                        \
-		if unlikely(op_flags & EMU86_F_LOCK)                       \
-			goto return_unknown_instruction;                       \
-		oldval = MODRM_GETRMREG##BWLQ();                           \
-		MODRM_SETRMREG##BWLQ(reg_operand);                         \
-	} else) {                                                      \
-		byte_t *addr;                                              \
-		addr = MODRM_MEMADDR();                                    \
-		EMU86_WRITE_USER_MEMORY(addr, Nbytes);                     \
+#ifndef EMU86_EMULATE_ONLY_MEMORY
+#define NEED_return_unexpected_lock
+#endif /* !EMU86_EMULATE_ONLY_MEMORY */
+#define DEFINE_XCHG_modrm(BWLQ, Nbits, Nbytes)                 \
+	u##Nbits reg_operand, oldval;                              \
+	reg_operand = MODRM_GETREG##BWLQ();                        \
+	NIF_ONLY_MEMORY(                                           \
+	if (EMU86_MODRM_ISREG(modrm.mi_type)) {                    \
+		EMU86_REQUIRE_NO_LOCK();                               \
+		oldval = MODRM_GETRMREG##BWLQ();                       \
+		MODRM_SETRMREG##BWLQ(reg_operand);                     \
+	} else) {                                                  \
+		byte_t *addr;                                          \
+		addr = MODRM_MEMADDR();                                \
+		EMU86_WRITE_USER_MEMORY(addr, Nbytes);                 \
 		oldval = EMU86_MEM_ATOMIC_XCH##BWLQ(addr, reg_operand, \
-		                                        XCHG_IS_ATOMIC()); \
-	}                                                              \
+		                                    XCHG_IS_ATOMIC()); \
+	}                                                          \
 	MODRM_SETREG##BWLQ(oldval);
 
 case 0x86: {

@@ -112,34 +112,6 @@ NOTHROW(CC libviocore_complete_except)(struct vio_emulate_args *__restrict self,
 	data->e_faultaddr = (void *)CS(getpc)(self->vea_args.va_state);
 }
 
-PRIVATE ATTR_NORETURN void CC
-libviocore_throw_unknown_instruction(struct vio_emulate_args *__restrict self,
-                                     u32 opcode) {
-	struct exception_data *data;
-	void const *pc, *next_pc;
-	unsigned int i;
-	pc      = (void const *)CS(getpc)(self->vea_args.va_state);
-	next_pc = instruction_succ(pc);
-	if (next_pc)
-		CS(setpc)(self->vea_args.va_state, (uintptr_t)next_pc);
-#ifdef __KERNEL__
-	printk(KERN_WARNING "[vio] Unrecognized instruction %p:%#I32x (accessing %p:%#I64x)\n",
-	       pc, opcode, self->vea_ptr, (u64)self->vea_addr);
-#else /* __KERNEL__ */
-	syslog(LOG_WARN, "[vio] Unrecognized instruction %p:%#I32x (accessing %p:%#I64x)\n",
-	       pc, opcode, self->vea_ptr, (u64)self->vea_addr);
-#endif /* !__KERNEL__ */
-	/* Throw an exception detailing an unsupported opcode. */
-	data                = error_data();
-	data->e_code        = ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE);
-	data->e_faultaddr   = (void *)pc;
-	data->e_pointers[0] = opcode;
-	for (i = 1; i < EXCEPTION_DATA_POINTERS; ++i)
-		data->e_pointers[i] = 0;
-	error_throw_current();
-}
-
-
 #define EMU86_MEMREADB(addr) \
 	libviocore_readb(self, (void const *)(uintptr_t)(addr))
 PRIVATE NONNULL((1)) u8 CC
@@ -960,14 +932,10 @@ libviocore_atomic_cmpxch128(struct vio_emulate_args *__restrict self,
 
 
 
-DECL_END
-
 #define EMU86_EMULATE_DECL INTERN
 #define EMU86_EMULATE_ATTR NONNULL((1))
 #define EMU86_EMULATE_RETURN()    return
 #define EMU86_EMULATE_RETURN_TYPE void
-#define EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION(faultaddr, opcode, op_flags) \
-	libviocore_throw_unknown_instruction(self, opcode)
 #define EMU86_EMULATE_NOTHROW /* nothing */
 #define EMU86_EMULATE_CC CC
 #define EMU86_EMULATE_NAME libviocore_emulate
@@ -1035,7 +1003,7 @@ DECL_END
 #define EMU86_GETSPREG()  CS(getsp)(self->vea_args.va_state)
 #define EMU86_SETSPREG(v) CS(setsp)(self->vea_args.va_state, (__uintptr_t)(v))
 #else /* __x86_64__ */
-#define EMU86_EMULATE_SETUP            \
+#define EMU86_EMULATE_SETUP()          \
 	do {                               \
 		self->vea_kernel_override = 0; \
 	} __WHILE0
@@ -1089,10 +1057,11 @@ DECL_END
 #define EMU86_GETFSBASE() __rdfsbase()
 #define EMU86_GETGSBASE() (EMU86_ISUSER() ? (void *)__rdmsr(IA32_KERNEL_GS_BASE) : __rdgsbase())
 #else /* __x86_64__ */
+DECL_END
 #include <sched/task.h>
+DECL_BEGIN
 
 /* 32-bit mode supports non-zero bases for any segment! */
-DECL_BEGIN
 #define EMU86_GETSEGBASE(segment_regno) \
 	i386_segment_base(self->vea_args.va_state, segment_regno)
 #define EMU86_GETDSBASE() EMU86_GETSEGBASE(EMU86_R_DS)
@@ -1199,7 +1168,6 @@ NOTHROW(CC i386_segment_base)(struct icpustate32 *__restrict state,
 	PREEMPTION_POP(was);
 	return result;
 }
-DECL_END
 #endif /* !__x86_64__ */
 #else /* __KERNEL__ */
 /* If the base of any of these segments wasn't 0, then this library
@@ -1260,8 +1228,6 @@ DECL_END
 #define EMU86_SETGS_VM86(v)  (self->vea_args.va_state->ics_irregs_v.ir_gs = (u16)(v))
 #endif /* !__x86_64__ && __KERNEL__ */
 
-
-DECL_BEGIN
 
 #ifdef __x86_64__
 #define X86_GPREGCOUNT 16
@@ -1625,9 +1591,6 @@ NOTHROW(CC CS_setregl)(struct vio_emulate_args *__restrict self, u8 regno, u32 v
 #define EMU86_SETPBP(value, op_flags) (_CPUSTATE_GPREGS.gp_pbp = (uintptr_t)(value) & _EMU86_REGP_MASK(op_flags))
 #define EMU86_SETPSI(value, op_flags) (_CPUSTATE_GPREGS.gp_psi = (uintptr_t)(value) & _EMU86_REGP_MASK(op_flags))
 #define EMU86_SETPDI(value, op_flags) (_CPUSTATE_GPREGS.gp_pdi = (uintptr_t)(value) & _EMU86_REGP_MASK(op_flags))
-#define EMU86_EMULATE_THROW_BOUNDERR(bound_idx, bound_min, bound_max) \
-	THROW(E_INDEX_ERROR_OUT_OF_BOUNDS, bound_idx, bound_min, bound_max)
-#define EMU86_EMULATE_THROW_DIVIDE_BY_ZERO_ALLOW_RETHROW 1
 
 /* Enable support for protected-mode instructions
  * This is required because all of these instructions can take
@@ -1648,6 +1611,93 @@ NOTHROW(CC CS_setregl)(struct vio_emulate_args *__restrict self, u8 regno, u32 v
 /* #define EMU86_WANT_EMULATE_INVLPG 1 */ /* This one shouldn't be able to cause a segfault! */
 #define EMU86_WANT_EMULATE_LAR 1
 #define EMU86_WANT_EMULATE_LSL 1
+
+
+PRIVATE ATTR_NORETURN void CC
+libviocore_throw_unknown_instruction(struct vio_emulate_args *__restrict self,
+                                     error_code_t code, uintptr_t opcode,
+                                     uintptr_t ptr1, uintptr_t ptr2,
+                                     uintptr_t ptr3, uintptr_t ptr4) {
+	struct exception_data *data;
+	void const *pc, *next_pc;
+	unsigned int i;
+	pc      = (void const *)CS(getpc)(self->vea_args.va_state);
+	next_pc = instruction_succ(pc);
+	if (next_pc)
+		CS(setpc)(self->vea_args.va_state, (uintptr_t)next_pc);
+#ifdef __KERNEL__
+	printk(KERN_WARNING "[vio] Illegal instruction %p:%#Ix [cr2=%p:%#I64x,code=%Ix:%Ix]\n",
+	       pc, opcode, self->vea_ptr, (u64)self->vea_addr,
+	       ERROR_CLASS(code), ERROR_SUBCLASS(code));
+#else /* __KERNEL__ */
+	syslog(LOG_WARN, "[vio] Illegal instruction %p:%#Ix [cr2=%p:%#I64x,code=%Ix:%Ix]\n",
+	       pc, opcode, self->vea_ptr, (u64)self->vea_addr,
+	       ERROR_CLASS(code), ERROR_SUBCLASS(code));
+#endif /* !__KERNEL__ */
+	/* Throw an exception detailing an unsupported opcode. */
+	data                = error_data();
+	data->e_code        = code;
+	data->e_faultaddr   = (void *)pc;
+	data->e_pointers[0] = opcode;
+	data->e_pointers[1] = ptr1;
+	data->e_pointers[2] = ptr2;
+	data->e_pointers[3] = ptr3;
+	data->e_pointers[4] = ptr4;
+	for (i = 5; i < EXCEPTION_DATA_POINTERS; ++i)
+		data->e_pointers[i] = 0;
+	error_throw_current();
+}
+
+PRIVATE ATTR_NORETURN void CC
+libviocore_throw_exception(struct vio_emulate_args *__restrict self,
+                           error_code_t code, uintptr_t ptr0,
+                           uintptr_t ptr1, uintptr_t ptr2) {
+	struct exception_data *data;
+	void const *pc, *next_pc;
+	unsigned int i;
+	pc      = (void const *)CS(getpc)(self->vea_args.va_state);
+	next_pc = instruction_succ(pc);
+	if (next_pc)
+		CS(setpc)(self->vea_args.va_state, (uintptr_t)next_pc);
+	data                = error_data();
+	data->e_code        = code;
+	data->e_faultaddr   = (void *)pc;
+	data->e_pointers[0] = ptr0;
+	data->e_pointers[1] = ptr1;
+	data->e_pointers[2] = ptr2;
+	for (i = 3; i < EXCEPTION_DATA_POINTERS; ++i)
+		data->e_pointers[i] = 0;
+	error_throw_current();
+}
+
+
+
+#define _EMU86_GETOPCODE()        opcode
+#define _EMU86_GETOPCODE_RMREG()  E_ILLEGAL_INSTRUCTION_X86_OPCODE(opcode, modrm.mi_reg)
+/* Define how we want to handle exceptions */
+#define EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION()           libviocore_throw_unknown_instruction(self, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPCODE), _EMU86_GETOPCODE(), 0, 0, 0, 0)
+#define EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION_RMREG()     libviocore_throw_unknown_instruction(self, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPCODE), _EMU86_GETOPCODE_RMREG(), 0, 0, 0, 0)
+#define EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION()        libviocore_throw_unknown_instruction(self, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE), _EMU86_GETOPCODE(), 0, 0, 0, 0)
+#define EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION_RMREG()  libviocore_throw_unknown_instruction(self, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE), _EMU86_GETOPCODE_RMREG(), 0, 0, 0, 0)
+#define EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM()         libviocore_throw_unknown_instruction(self, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE(), E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE, EMU86_MODRM_MEMORY, modrm.mi_type, 0)
+#define EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM_RMREG()   libviocore_throw_unknown_instruction(self, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE_RMREG(), E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE, EMU86_MODRM_MEMORY, modrm.mi_type, 0)
+#define EMU86_EMULATE_RETURN_EXPECTED_REGISTER_MODRM()       libviocore_throw_unknown_instruction(self, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE(), E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE, EMU86_MODRM_REGISTER, modrm.mi_type, 0)
+#define EMU86_EMULATE_RETURN_EXPECTED_REGISTER_MODRM_RMREG() libviocore_throw_unknown_instruction(self, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE_RMREG(), E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE, EMU86_MODRM_REGISTER, modrm.mi_type, 0)
+#define EMU86_EMULATE_RETURN_UNEXPECTED_LOCK()               libviocore_throw_unknown_instruction(self, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE(), op_flags, 0, 0, 0)
+#define EMU86_EMULATE_RETURN_UNEXPECTED_LOCK_RMREG()         libviocore_throw_unknown_instruction(self, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE_RMREG(), op_flags, 0, 0, 0)
+#define EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION()       libviocore_throw_unknown_instruction(self, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE), _EMU86_GETOPCODE(), 0, 0, 0, 0)
+#define EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION_RMREG() libviocore_throw_unknown_instruction(self, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE), _EMU86_GETOPCODE_RMREG(), 0, 0, 0, 0)
+#define EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(how, regno, regval, offset)         \
+	libviocore_throw_unknown_instruction(self, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER), \
+	                                     opcode, how, regno, regval, offset)
+#define EMU86_EMULATE_THROW_BOUNDERR(bound_idx, bound_min, bound_max)           \
+	libviocore_throw_exception(self, ERROR_CODEOF(E_INDEX_ERROR_OUT_OF_BOUNDS), \
+	                           (uintptr_t)(bound_idx),                          \
+	                           (uintptr_t)(bound_min),                          \
+	                           (uintptr_t)(bound_max))
+#define EMU86_EMULATE_THROW_DIVIDE_BY_ZERO_ALLOW_RETHROW 0
+#define EMU86_EMULATE_THROW_DIVIDE_ERROR() \
+	libviocore_throw_exception(self, ERROR_CODEOF(E_DIVIDE_BY_ZERO), 0, 0, 0)
 
 
 DECL_END

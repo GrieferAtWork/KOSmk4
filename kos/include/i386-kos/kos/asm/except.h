@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa7795cce */
+/* HASH CRC-32:0x750c0402 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -179,8 +179,11 @@
  * 	member opcode: uintptr_t; */
 #define E_ILLEGAL_INSTRUCTION_BAD_OPCODE (E_ILLEGAL_INSTRUCTION,0x0001)
 /* An unsupported prefix byte was encountered
- * 	@@The unsupported prefix byte-sequence (in big-endian)
- * 	member prefix_sequence: uintptr_t; */
+ * 	@@The opcode that caused the exception
+ * 	@@NOTE: This field should be decoded using `E_ILLEGAL_INSTRUCTION_X86_OPCODE_*'
+ * 	member opcode: uintptr_t;
+ * 	@@Opcode flags (set of `EMU86_F_*')
+ * 	member op_flags: uintptr_t; */
 #define E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX (E_ILLEGAL_INSTRUCTION,0x0002)
 /* The instruction's opcode is not supported by the host (not thrown if the instruction was emulated)
  * 	@@The opcode that caused the exception

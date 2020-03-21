@@ -55,9 +55,14 @@ case 0xcb: {
 #if EMU86_EMULATE_CHECKUSER
 	/* Verify the given `cs' segment. */
 	if (!SEGMENT_IS_VALID_USERCODE(cs) && EMU86_ISUSER_NOVM86()) {
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-		      X86_REGISTER_SEGMENT_CS, cs);
+#ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
+		EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV,
+		                                                 X86_REGISTER_SEGMENT_CS,
+		                                                 cs, 0);
+#else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
+#define NEED_return_privileged_instruction
+		goto return_privileged_instruction;
+#endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 	}
 #endif /* EMU86_EMULATE_CHECKUSER */
 	EMU86_SETSTACKPTR(sp);
@@ -98,9 +103,14 @@ case 0xca: {
 #if EMU86_EMULATE_CHECKUSER
 	/* Verify the given `cs' segment. */
 	if (!SEGMENT_IS_VALID_USERCODE(cs) && EMU86_ISUSER_NOVM86()) {
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-		      X86_REGISTER_SEGMENT_CS, cs);
+#ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
+		EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV,
+		                                                 X86_REGISTER_SEGMENT_CS,
+		                                                 cs, 0);
+#else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
+#define NEED_return_privileged_instruction
+		goto return_privileged_instruction;
+#endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 	}
 #endif /* EMU86_EMULATE_CHECKUSER */
 	sp += offset;

@@ -29,10 +29,11 @@ EMU86_INTELLISENSE_BEGIN(incdec) {
 case 0x40 ... 0x47: {
 	/* 40+ rw    INC r16      Increment word register by 1.
 	 * 40+ rd    INC r32      Increment doubleword register by 1. */
-	IF_64BIT({
-		if (EMU86_F_IS64(op_flags))
-			goto return_unknown_instruction;
-	});
+#if CONFIG_LIBEMU86_WANT_64BIT
+#define NEED_return_unavailable_instruction
+	if (EMU86_F_IS64(op_flags))
+		goto return_unavailable_instruction;
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
 	if (!IS_16BIT()) {
 		u32 oldval, newval;
 		u32 eflags_addend = 0;
@@ -63,10 +64,11 @@ case 0x40 ... 0x47: {
 case 0x48 ... 0x4f: {
 	/* 48+ rw    DEC r16      Decrement word register by 1.
 	 * 48+ rd    DEC r32      Decrement doubleword register by 1. */
-	IF_64BIT({
-		if (EMU86_F_IS64(op_flags))
-			goto return_unknown_instruction;
-	});
+#if CONFIG_LIBEMU86_WANT_64BIT
+#define NEED_return_unavailable_instruction
+	if (EMU86_F_IS64(op_flags))
+		goto return_unavailable_instruction;
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
 	if (!IS_16BIT()) {
 		u32 oldval, newval;
 		u32 eflags_addend = 0;

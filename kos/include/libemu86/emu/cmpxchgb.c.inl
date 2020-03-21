@@ -33,8 +33,9 @@ case 0x0fc7:
 		 * REX.W + 0F C7 /1 CMPXCHG16B m128    Compare RDX:RAX with m128. If equal, set ZF and load RCX:RBX
 		 *                                     into m128. Else, clear ZF and load m128 into RDX:RAX. */
 #ifndef EMU86_EMULATE_ONLY_MEMORY
-		if (!EMU86_MODRM_ISREG(modrm.mi_type))
-			goto return_unknown_instruction;
+#define NEED_return_expected_memory_modrm
+		if (!EMU86_MODRM_ISMEM(modrm.mi_type))
+			goto return_expected_memory_modrm;
 #endif /* !EMU86_EMULATE_ONLY_MEMORY */
 #if CONFIG_LIBEMU86_WANT_64BIT
 		if (IS_64BIT()) {
@@ -61,7 +62,8 @@ case 0x0fc7:
 				EMU86_SETRDX(real_oldval.qwords[1]);
 			}
 #else /* EMU86_MEM_ATOMIC_CMPXCH128 */
-			goto return_unknown_instruction;
+#define NEED_return_unsupported_instruction_rmreg
+			goto return_unsupported_instruction_rmreg;
 #endif /* !EMU86_MEM_ATOMIC_CMPXCH128 */
 		} else
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
@@ -94,13 +96,16 @@ case 0x0fc7:
 				EMU86_SETEDX(real_oldval.dwords[1]);
 			}
 #else /* EMU86_MEM_ATOMIC_CMPXCHQ */
-			goto return_unknown_instruction;
+#define NEED_return_unsupported_instruction_rmreg
+			goto return_unsupported_instruction_rmreg;
 #endif /* !EMU86_MEM_ATOMIC_CMPXCHQ */
 		}
 		goto done;
 	}
 
-	default: goto return_unknown_instruction;
+	default:
+#define NEED_return_unknown_instruction_rmreg
+		goto return_unknown_instruction_rmreg;
 	}
 	break;
 

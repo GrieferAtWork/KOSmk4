@@ -23,11 +23,13 @@
 
 EMU86_INTELLISENSE_BEGIN(arith2) {
 
+#ifndef EMU86_EMULATE_ONLY_MEMORY
+#define NEED_return_unexpected_lock_rmreg
+#endif /* !EMU86_EMULATE_ONLY_MEMORY */
 #define DEFINE_NOT_MODRM_rm(BWLQ, Nbits, Nbytes, mask)                   \
 	NIF_ONLY_MEMORY(if (EMU86_MODRM_ISREG(modrm.mi_type)) {              \
 		u##Nbits reg;                                                    \
-		if unlikely(op_flags & EMU86_F_LOCK)                             \
-			goto return_unknown_instruction;                             \
+		EMU86_REQUIRE_NO_LOCK_RMREG();                                   \
 		reg = MODRM_GETRMREG##BWLQ();                                    \
 		MODRM_SETRMREG##BWLQ(~reg);                                      \
 	} else) {                                                            \
@@ -43,8 +45,7 @@ EMU86_INTELLISENSE_BEGIN(arith2) {
 	u32 eflags_addend = 0;                                                     \
 	u##Nbits oldval, newval;                                                   \
 	NIF_ONLY_MEMORY(if (EMU86_MODRM_ISREG(modrm.mi_type)) {                    \
-		if unlikely(op_flags & EMU86_F_LOCK)                                   \
-			goto return_unknown_instruction;                                   \
+		EMU86_REQUIRE_NO_LOCK_RMREG();                                         \
 		oldval = MODRM_GETRMREG##BWLQ();                                       \
 		newval = (u##Nbits)0 - oldval;                                         \
 		MODRM_SETRMREG##BWLQ(newval);                                          \
@@ -181,9 +182,11 @@ case 0xf6:
 		goto done;
 	}
 
-	default: break;
+	default:
+#define NEED_return_unknown_instruction_rmreg
+		goto return_unknown_instruction_rmreg;
 	}
-	goto return_unknown_instruction;
+	break;
 
 
 
@@ -270,7 +273,9 @@ case 0xf7:
 			EMU86_SETRDX(result.qwords[1]);
 			is_upper_half_needed = result.qwords[1] != 0;
 #else /* __UINT128_TYPE__ */
-			goto return_unknown_instruction;
+			/* XXX: Emulate this? */
+#define NEED_return_unsupported_instruction_rmreg
+			goto return_unsupported_instruction_rmreg;
 #endif /* !__UINT128_TYPE__ */
 		} else
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
@@ -328,7 +333,8 @@ case 0xf7:
 			                         ? (result.qwords[0] & UINT64_C(0x8000000000000000)) != 0
 			                         : true;
 #else /* __UINT128_TYPE__ */
-			goto return_unknown_instruction;
+#define NEED_return_unsupported_instruction_rmreg
+			goto return_unsupported_instruction_rmreg;
 #endif /* !__UINT128_TYPE__ */
 		} else
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
@@ -395,7 +401,8 @@ case 0xf7:
 			EMU86_SETRAX(divres.qwords[0]);
 			EMU86_SETRDX(modres);
 #else /* __UINT128_TYPE__ */
-			goto return_unknown_instruction;
+#define NEED_return_unsupported_instruction_rmreg
+			goto return_unsupported_instruction_rmreg;
 #endif /* !__UINT128_TYPE__ */
 		} else
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
@@ -476,7 +483,8 @@ case 0xf7:
 			EMU86_SETRAX(divres.qwords[0]);
 			EMU86_SETRDX((u64)modres);
 #else /* __UINT128_TYPE__ */
-			goto return_unknown_instruction;
+#define NEED_return_unsupported_instruction_rmreg
+			goto return_unsupported_instruction_rmreg;
 #endif /* !__UINT128_TYPE__ */
 		} else
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
@@ -526,9 +534,10 @@ case 0xf7:
 		goto done;
 
 	default:
-		break;
+#define NEED_return_unknown_instruction_rmreg
+		goto return_unknown_instruction_rmreg;
 	}
-	goto return_unknown_instruction;
+	break;
 
 #undef DEFINE_NEG_MODRM_rm
 #undef DEFINE_NOT_MODRM_rm

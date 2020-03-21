@@ -178,10 +178,11 @@ __DECL_BEGIN
 #define EMU86_EMULATE_VARIABLES /* nothing */
 #endif /* !EMU86_EMULATE_VARIABLES */
 
-/* Additional code to be executed before starting emulation */
-#ifndef EMU86_EMULATE_SETUP
-#define EMU86_EMULATE_SETUP do { } __WHILE0
-#endif /* !EMU86_EMULATE_SETUP */
+/* Additional code to insert at the start of emu86_emulate() */
+/* #define EMU86_EMULATE_SETUP() ... */
+
+/* Additional code to insert at the end of emu86_emulate() */
+/* #define EMU86_EMULATE_FOOTER() ... */
 
 /* May be used to add a TRY ... EXCEPT block around emulation */
 /* #define EMU86_EMULATE_TRY           TRY */
@@ -190,85 +191,6 @@ __DECL_BEGIN
 /* #define EMU86_EMULATE_TRY_SWITCH    EXCEPT { ... } */
 /* #define EMU86_EMULATE_EXCEPT_DECODE TRY */
 /* #define EMU86_EMULATE_EXCEPT_SWITCH EXCEPT { ... } */
-
-/* Define to implement support for the `bound' instruction on 16-/32-bit */
-#ifndef EMU86_EMULATE_THROW_BOUNDERR
-#define EMU86_EMULATE_THROW_BOUNDERR(bound_idx, bound_min, bound_max) \
-	THROW(E_INDEX_ERROR_OUT_OF_BOUNDS, bound_idx, bound_min, bound_max)
-#endif /* !EMU86_EMULATE_THROW_BOUNDERR */
-
-/* Allow E_DIVIDE_BY_ZERO to be rethrown natively, rather than having
- * to be handled by use of `EMU86_EMULATE_THROW_DIVIDE_ERROR[B|W|L|Q]()'
- * In case the aforementioned macros only ever throw the same exception,
- * this can get rid of unnecessary bloat. */
-#ifndef EMU86_EMULATE_THROW_DIVIDE_BY_ZERO_ALLOW_RETHROW
-#define EMU86_EMULATE_THROW_DIVIDE_BY_ZERO_ALLOW_RETHROW 0
-#endif /* !EMU86_EMULATE_THROW_DIVIDE_BY_ZERO_ALLOW_RETHROW */
-
-/* Throw an exception indicative of a privileged instruction
- * Only used when `EMU86_EMULATE_CHECKUSER' is enabled. */
-#ifndef EMU86_EMULATE_THROW_PRIVILEGED_INSTRUCTION
-#define EMU86_EMULATE_THROW_PRIVILEGED_INSTRUCTION(opcode) \
-	THROW(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE, opcode)
-#endif /* !EMU86_EMULATE_THROW_PRIVILEGED_INSTRUCTION */
-/* Same as `EMU86_EMULATE_THROW_PRIVILEGED_INSTRUCTION()', but used
- * when the instruction was specific to a certain modrm.mi_reg value
- * that is given as `rm_reg'. */
-#ifndef EMU86_EMULATE_THROW_PRIVILEGED_INSTRUCTION_RMREG
-#define EMU86_EMULATE_THROW_PRIVILEGED_INSTRUCTION_RMREG(opcode, rm_reg) \
-	EMU86_EMULATE_THROW_PRIVILEGED_INSTRUCTION(opcode)
-#endif /* !EMU86_EMULATE_THROW_PRIVILEGED_INSTRUCTION_RMREG */
-
-/* Expected a memory operand modr/m */
-#ifndef EMU86_EMULATE_THROW_MODRM_EXPECTED_MEMORY
-#define EMU86_EMULATE_THROW_MODRM_EXPECTED_MEMORY(opcode) \
-	goto return_unknown_instruction
-#endif /* !EMU86_EMULATE_THROW_MODRM_EXPECTED_MEMORY */
-#ifndef EMU86_EMULATE_THROW_MODRM_EXPECTED_MEMORY_RMREG
-#define EMU86_EMULATE_THROW_MODRM_EXPECTED_MEMORY_RMREG(opcode, rm_reg) \
-	EMU86_EMULATE_THROW_MODRM_EXPECTED_MEMORY(opcode)
-#endif /* !EMU86_EMULATE_THROW_MODRM_EXPECTED_MEMORY_RMREG */
-
-/* Expected a register operand for modr/m */
-#ifndef EMU86_EMULATE_THROW_MODRM_EXPECTED_REGISTER
-#define EMU86_EMULATE_THROW_MODRM_EXPECTED_REGISTER(opcode) \
-	goto return_unknown_instruction
-#endif /* !EMU86_EMULATE_THROW_MODRM_EXPECTED_REGISTER */
-#ifndef EMU86_EMULATE_THROW_MODRM_EXPECTED_REGISTER_RMREG
-#define EMU86_EMULATE_THROW_MODRM_EXPECTED_REGISTER_RMREG(opcode, rm_reg) \
-	EMU86_EMULATE_THROW_MODRM_EXPECTED_REGISTER(opcode)
-#endif /* !EMU86_EMULATE_THROW_MODRM_EXPECTED_REGISTER_RMREG */
-
-/* An optional, special return expression to be evaluated following
- * an `sti' instruction that turned on EFLAGS.IF (may be used to
- * implement special handling in order to delay interrupt checks
- * until after the next instruction)
- * NOTE: This expression mustn't return normally! (but should
- *       normally contain a `THROW()' or `return' statement) */
-/* #define EMU86_EMULATE_RETURN_AFTER_STI() ... */
-
-/* Same as `EMU86_EMULATE_RETURN_AFTER_STI()', but used for vm86 instead. */
-/* #define EMU86_EMULATE_RETURN_AFTER_STI_VM86() ... */
-
-/* An optional, special return expression to be evaluated following
- * an `hlt' instruction (with #IF=0 or #IF=1 respectively)
- * When not defined, `hlt' will simply return normally.
- * See also: `EMU86_EMULATE_RETURN_AFTER_HLT_VM86' when vm86 is supported. */
-/* #define EMU86_EMULATE_RETURN_AFTER_HLT_IF0() ... */
-/* #define EMU86_EMULATE_RETURN_AFTER_HLT_IF1() ... */
-
-/* Define this (and don't enable `EMU86_EMULATE_ONLY_MEMORY')
- * to enable emulation of `int', `int3', `into' and `int1' */
-/* #define EMU86_EMULATE_RETURN_AFTER_INT(intno) ... */
-
-
-/* Return handlers for `syscall' and `sysenter'
- * These hooks should be defined within the #UD handler in
- * kernel-space to emulate the expected behavior is the
- * instruction had actually been supported. */
-/* #define EMU86_EMULATE_RETURN_AFTER_SYSCALL() ... */
-/* #define EMU86_EMULATE_RETURN_AFTER_SYSENTER() ... */
-
 
 /* Return handlers for specific instructions */
 #ifdef EMU86_EMULATE_RETURN_AFTER_INT
@@ -284,22 +206,165 @@ __DECL_BEGIN
 #define EMU86_EMULATE_RETURN_AFTER_INTO() \
 	EMU86_EMULATE_RETURN_AFTER_INT(0x04) /* #OF */
 #endif /* !EMU86_EMULATE_RETURN_AFTER_INTO */
+#ifndef EMU86_EMULATE_THROW_BOUNDERR
+#define EMU86_EMULATE_THROW_BOUNDERR(bound_idx, bound_min, bound_max) \
+	EMU86_EMULATE_RETURN_AFTER_INT(0x05) /* #BR */
+#endif /* !EMU86_EMULATE_THROW_BOUNDERR */
 #ifndef EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION
-#define EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION(faultaddr, opcode, op_flags) \
+#define EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION() \
 	EMU86_EMULATE_RETURN_AFTER_INT(0x06) /* #UD */
 #endif /* !EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION */
+#ifndef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
+#define EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(how, regno, regval, offset) \
+	EMU86_EMULATE_RETURN_AFTER_INT((how) == E_ILLEGAL_INSTRUCTION_REGISTER_RDINV ||  \
+	                               (how) == E_ILLEGAL_INSTRUCTION_REGISTER_WRINV     \
+	                               ? 0x06 /* #UD */                                  \
+	                               : 0x0d /* #GP */)
+#endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 #endif /* EMU86_EMULATE_RETURN_AFTER_INT */
 
 
 /* Return in the event of an unrecognized instruction.
- * @param: faultaddr: The starting address of the faulting instruction
- * @param: opcode:    The unknown instruction's opcode
- * @param: op_flags:  Instruction flags (set of `EMU86_F_*') */
+ * HINT: Additionally, you may use the following expressions:
+ *     - REAL_START_IP()  Evaluates to the starting IP of the faulting
+ *                        instruction (i.e. the fault address)
+ *     - op_flags         Set of `EMU86_F_*'
+ *     - opcode           The absolute opcode of the faulting instruction
+ *     - modrm            The decoded modr/m suffix (only for *_RMREG handlers) */
 #ifndef EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION
-#define EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION(faultaddr, opcode, op_flags) \
-	EMU86_EMULATE_RETURN()
+#define _EMU86_GETOPCODE()        opcode
+#ifdef E_ILLEGAL_INSTRUCTION_X86_OPCODE
+#define _EMU86_GETOPCODE_RMREG()  E_ILLEGAL_INSTRUCTION_X86_OPCODE(opcode, modrm.mi_reg)
+#else /* E_ILLEGAL_INSTRUCTION_X86_OPCODE */
+#define _EMU86_GETOPCODE_RMREG()  opcode
+#endif /* !E_ILLEGAL_INSTRUCTION_X86_OPCODE */
+#define EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION()           THROW(E_ILLEGAL_INSTRUCTION_BAD_OPCODE, _EMU86_GETOPCODE())
+#define EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION_RMREG()     THROW(E_ILLEGAL_INSTRUCTION_BAD_OPCODE, _EMU86_GETOPCODE_RMREG())
+#define EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION()        THROW(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE, _EMU86_GETOPCODE())
+#define EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION_RMREG()  THROW(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE, _EMU86_GETOPCODE_RMREG())
+#define EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM()         THROW(E_ILLEGAL_INSTRUCTION_BAD_OPERAND, _EMU86_GETOPCODE(), E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE)
+#define EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM_RMREG()   THROW(E_ILLEGAL_INSTRUCTION_BAD_OPERAND, _EMU86_GETOPCODE_RMREG(), E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE)
+#define EMU86_EMULATE_RETURN_EXPECTED_REGISTER_MODRM()       THROW(E_ILLEGAL_INSTRUCTION_BAD_OPERAND, _EMU86_GETOPCODE(), E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE)
+#define EMU86_EMULATE_RETURN_EXPECTED_REGISTER_MODRM_RMREG() THROW(E_ILLEGAL_INSTRUCTION_BAD_OPERAND, _EMU86_GETOPCODE_RMREG(), E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE)
+#ifdef E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX
+#define EMU86_EMULATE_RETURN_UNEXPECTED_LOCK()        THROW(E_ILLEGAL_INSTRUCTION_BAD_OPERAND, _EMU86_GETOPCODE(), op_flags)
+#define EMU86_EMULATE_RETURN_UNEXPECTED_LOCK_RMREG()  THROW(E_ILLEGAL_INSTRUCTION_BAD_OPERAND, _EMU86_GETOPCODE_RMREG(), op_flags)
+#endif /* E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX */
+#define EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION()       THROW(E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE, _EMU86_GETOPCODE())
+#define EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION_RMREG() THROW(E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE, _EMU86_GETOPCODE_RMREG())
+#define EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(how, regno, regval, offset) \
+	THROW(E_ILLEGAL_INSTRUCTION_REGISTER, _EMU86_GETOPCODE(), how, regno, regval, offset)
+#define EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER_RMREG(how, regno, regval, offset) \
+	THROW(E_ILLEGAL_INSTRUCTION_REGISTER, _EMU86_GETOPCODE_RMREG(), how, regno, regval, offset)
 #endif /* !EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION */
 
+/* #define EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION()       ... */
+/* #define EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION_RMREG() ... */
+
+/* Throw an exception indicative of a privileged instruction
+ * Only used when `EMU86_EMULATE_CHECKUSER' is enabled. */
+/* #define EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION()       ... */
+/* #define EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION_RMREG() ... */
+
+/* Expected a memory operand modr/m */
+/* #define EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM()       ... */
+/* #define EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM_RMREG() ... */
+
+/* Expected a register operand for modr/m */
+/* #define EMU86_EMULATE_RETURN_EXPECTED_REGISTER_MODRM()       ... */
+/* #define EMU86_EMULATE_RETURN_EXPECTED_REGISTER_MODRM_RMREG() ... */
+
+/* Unexpected LOCK prefix */
+/* #define EMU86_EMULATE_RETURN_UNEXPECTED_LOCK()       ... */
+/* #define EMU86_EMULATE_RETURN_UNEXPECTED_LOCK_RMREG() ... */
+
+/* Instruction isn't supported due to some missing hardware feature.
+ * Used by the implementations of `cmpxchg8b' and `cmpxchg16b' when
+ * no way of performing the operation was configured. */
+/* #define EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION()       ... */
+/* #define EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION_RMREG() ... */
+
+/* Instruction isn't available due in the current execution mode.
+ * NOTE: Only invoked for instructions that would be recognized in
+ *       other currently configure-enabled execution mode. - i.e.
+ *       when libemu86 is configured to only support 16-bit mode,
+ *       then 32-/64-bit only instruction will _NOT_ cause this
+ *       macro to be expanded.
+ * This macro is mainly used in 64-bit mode by instructions such
+ * as `bound' (since those aren't available in that execution mode) */
+/* #define EMU86_EMULATE_THROW_UNAVAILABLE_INSTRUCTION()       ... */
+/* #define EMU86_EMULATE_THROW_UNAVAILABLE_INSTRUCTION_RMREG() ... */
+
+
+
+
+/* An optional, special return expression to be evaluated following
+ * an `sti' instruction that turned on EFLAGS.IF (may be used to
+ * implement special handling in order to delay interrupt checks
+ * until after the next instruction)
+ * NOTE: This expression mustn't return normally! (but should
+ *       normally contain a `THROW()' or `return' statement) */
+/* #define EMU86_EMULATE_RETURN_AFTER_STI() ... */
+
+/* Same as `EMU86_EMULATE_RETURN_AFTER_STI()', but used for vm86 instead. */
+/* #define EMU86_EMULATE_RETURN_AFTER_STI_VM86() ... */
+
+
+
+/* An optional, special return expression to be evaluated following
+ * an `hlt' instruction (with #IF=0 or #IF=1 respectively)
+ * When not defined, `hlt' will simply return normally.
+ * See also: `EMU86_EMULATE_RETURN_AFTER_HLT_VM86' when vm86 is supported. */
+/* #define EMU86_EMULATE_RETURN_AFTER_HLT_IF0() ... */
+/* #define EMU86_EMULATE_RETURN_AFTER_HLT_IF1() ... */
+
+
+
+/* Define this (and don't enable `EMU86_EMULATE_ONLY_MEMORY')
+ * to enable emulation of `int', `int3', `into' and `int1' */
+/* #define EMU86_EMULATE_RETURN_AFTER_INT(intno) ... */
+
+
+
+/* Return handlers for `syscall' and `sysenter'
+ * These hooks should be defined within the #UD handler in
+ * kernel-space to emulate the expected behavior is the
+ * instruction had actually been supported. */
+/* #define EMU86_EMULATE_RETURN_AFTER_SYSCALL() ... */
+/* #define EMU86_EMULATE_RETURN_AFTER_SYSENTER() ... */
+
+
+/* Do what should be done in order to handle
+ * the `bound' instruction failing on 16-/32-bit */
+#ifndef EMU86_EMULATE_THROW_BOUNDERR
+#define EMU86_EMULATE_THROW_BOUNDERR(bound_idx, bound_min, bound_max) \
+	THROW(E_INDEX_ERROR_OUT_OF_BOUNDS, bound_idx, bound_min, bound_max)
+#endif /* !EMU86_EMULATE_THROW_BOUNDERR */
+
+/* Throw an exception related to attempting to access an illegal/protected register.
+ * NOTE: When not defined, such cases are handled as follows:
+ *   how == E_ILLEGAL_INSTRUCTION_REGISTER_RDINV:   return_unsupported_instruction
+ *   how == E_ILLEGAL_INSTRUCTION_REGISTER_WRINV:   return_unsupported_instruction
+ *   how == E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD:   return_unsupported_instruction
+ *   how == E_ILLEGAL_INSTRUCTION_REGISTER_WRNPSEG: return_unsupported_instruction
+ *   how == E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV:   return_privileged_instruction  (only with `EMU86_EMULATE_CHECKUSER')
+ *   how == E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV:   return_privileged_instruction  (only with `EMU86_EMULATE_CHECKUSER')
+ * @param: how:    How was the register accessed (One of `E_ILLEGAL_INSTRUCTION_REGISTER_*')
+ * @param: regno:  The accessed register index (one of `X86_REGISTER_*')
+ * @param: regval: The value that was attempted to be assigned (only for write operations)
+ * @param: offset: An offset applied to the register (in case of an illegal lcall/ljmp; 0 otherwise) */
+/* #define EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(how, regno, regval, offset)       ... */
+/* #define EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER_RMREG(how, regno, regval, offset) ... */
+
+
+
+/* Allow E_DIVIDE_BY_ZERO to be rethrown natively, rather than having
+ * to be handled by use of `EMU86_EMULATE_THROW_DIVIDE_ERROR[B|W|L|Q]()'
+ * In case the aforementioned macros only ever throw the same exception,
+ * this can get rid of unnecessary bloat. */
+#ifndef EMU86_EMULATE_THROW_DIVIDE_BY_ZERO_ALLOW_RETHROW
+#define EMU86_EMULATE_THROW_DIVIDE_BY_ZERO_ALLOW_RETHROW 0
+#endif /* !EMU86_EMULATE_THROW_DIVIDE_BY_ZERO_ALLOW_RETHROW */
 
 #ifndef EMU86_EMULATE_THROW_DIVIDE_BY_ZEROB
 #ifndef EMU86_EMULATE_THROW_DIVIDE_ERROR
@@ -1728,6 +1793,25 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_
 #else /* !EMU86_EMULATE_TRANSLATEADDR_IS_NOOP */
 #define _EMU86_INTELLISENSE_BEGIN_REAL_START_PC /* nothing */
 #endif /* EMU86_EMULATE_TRANSLATEADDR_IS_NOOP */
+
+
+#if 0
+#define _EMU86_INTELLISENSE_DEFINE_LABEL(name) name:
+#else
+#define _EMU86_INTELLISENSE_ARG_PLACEHOLDER_ ,
+#define _EMU86_INTELLISENSE_TAKE_SECOND_ARG_IMPL(x, val, ...) val
+#define _EMU86_INTELLISENSE_TAKE_SECOND_ARG(x) _EMU86_INTELLISENSE_TAKE_SECOND_ARG_IMPL x
+#define _EMU86_INTELLISENSE_IS_DEFINED3(...) _EMU86_INTELLISENSE_TAKE_SECOND_ARG((__VA_ARGS__ 1,0))
+#define _EMU86_INTELLISENSE_IS_DEFINED2(x) _EMU86_INTELLISENSE_IS_DEFINED3(_EMU86_INTELLISENSE_ARG_PLACEHOLDER_##x)
+#define _EMU86_INTELLISENSE_IS_DEFINED(x) _EMU86_INTELLISENSE_IS_DEFINED2(x)
+#define _EMU86_INTELLISENSE_DEFINE_LABEL3_0(name) /* nothing */
+#define _EMU86_INTELLISENSE_DEFINE_LABEL3_1(name) name:
+#define _EMU86_INTELLISENSE_DEFINE_LABEL3(name, x) _EMU86_INTELLISENSE_DEFINE_LABEL3_##x(name)
+#define _EMU86_INTELLISENSE_DEFINE_LABEL2(name, x) _EMU86_INTELLISENSE_DEFINE_LABEL3(name, x)
+#define _EMU86_INTELLISENSE_DEFINE_LABEL(name) \
+	_EMU86_INTELLISENSE_DEFINE_LABEL2(name, _EMU86_INTELLISENSE_IS_DEFINED(NEED_##name))
+#endif
+
 #define EMU86_INTELLISENSE_BEGIN(name)                                                                \
 	__DECL_BEGIN                                                                                      \
 	EMU86_EMULATE_DECL EMU86_EMULATE_RETURN_TYPE                                                      \
@@ -1737,12 +1821,26 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_
 		emu86_opflags_t op_flags;                                                                     \
 		struct emu86_modrm modrm;                                                                     \
 		switch (opcode)
-#define EMU86_INTELLISENSE_END \
-done:                          \
-done_dont_set_pc:              \
-return_unknown_instruction:    \
-		;                      \
-	}                          \
+#define EMU86_INTELLISENSE_END                                         \
+done:                                                                  \
+done_dont_set_pc:                                                      \
+return_unknown_instruction:                                            \
+_EMU86_INTELLISENSE_DEFINE_LABEL(return_privileged_instruction_rmreg)  \
+_EMU86_INTELLISENSE_DEFINE_LABEL(return_privileged_instruction)        \
+_EMU86_INTELLISENSE_DEFINE_LABEL(return_expected_memory_modrm_rmreg)   \
+_EMU86_INTELLISENSE_DEFINE_LABEL(return_expected_memory_modrm)         \
+_EMU86_INTELLISENSE_DEFINE_LABEL(return_expected_register_modrm_rmreg) \
+_EMU86_INTELLISENSE_DEFINE_LABEL(return_expected_register_modrm)       \
+_EMU86_INTELLISENSE_DEFINE_LABEL(return_unexpected_lock_prefix_rmreg)  \
+_EMU86_INTELLISENSE_DEFINE_LABEL(return_unexpected_lock_rmreg)         \
+_EMU86_INTELLISENSE_DEFINE_LABEL(return_unexpected_lock)               \
+_EMU86_INTELLISENSE_DEFINE_LABEL(return_unsupported_instruction_rmreg) \
+_EMU86_INTELLISENSE_DEFINE_LABEL(return_unsupported_instruction)       \
+_EMU86_INTELLISENSE_DEFINE_LABEL(return_unavailable_instruction_rmreg) \
+_EMU86_INTELLISENSE_DEFINE_LABEL(return_unavailable_instruction)       \
+_EMU86_INTELLISENSE_DEFINE_LABEL(return_unknown_instruction_rmreg)     \
+		(void)0;                                                       \
+	}                                                                  \
 	__DECL_END
 #else /* __INTELLISENSE__ */
 #define EMU86_INTELLISENSE_BEGIN(name) /* nothing */
@@ -1756,9 +1854,12 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 	byte_t const *real_start_pc;
 #endif /* !EMU86_EMULATE_TRANSLATEADDR_IS_NOOP */
 	byte_t const *start_pc, *pc;
+	struct emu86_modrm modrm;
 	emu86_opflags_t op_flags;
 	u32 opcode;
-	EMU86_EMULATE_SETUP;
+#ifdef EMU86_EMULATE_SETUP
+	EMU86_EMULATE_SETUP();
+#endif /* EMU86_EMULATE_SETUP */
 	op_flags = EMU86_EMULATE_GETOPFLAGS();
 #ifdef EMU86_EMULATE_TRANSLATEADDR_IS_NOOP
 	start_pc = (byte_t const *)EMU86_GETPCPTR();
@@ -1794,7 +1895,6 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 		EMU86_EMULATE_TRY_SWITCH
 #endif /* EMU86_EMULATE_TRY_SWITCH */
 		{
-			struct emu86_modrm modrm;
 			switch (opcode) {
 
 #if CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT
@@ -1805,12 +1905,15 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 
 
 #if CONFIG_LIBEMU86_WANT_64BIT
-#define IS_64BIT()    (op_flags & EMU86_F_REX_W)
-#define IF_64BIT(...) __VA_ARGS__
+#define IS_64BIT()           (op_flags & EMU86_F_REX_W)
+#define IF_64BIT(...)        __VA_ARGS__
+#define IFELSE_64BIT(tt, ff) tt
 #else /* CONFIG_LIBEMU86_WANT_64BIT */
-#define IS_64BIT()    0
-#define IF_64BIT(...) /* nothing */
+#define IS_64BIT()           0
+#define IF_64BIT(...)        /* nothing */
+#define IFELSE_64BIT(tt, ff) ff
 #endif /* !CONFIG_LIBEMU86_WANT_64BIT */
+
 #if CONFIG_LIBEMU86_WANT_16BIT
 #define IS_16BIT() (EMU86_F_IS16(op_flags) ? (op_flags & EMU86_F_OP16) == 0 : (op_flags & EMU86_F_OP16) != 0)
 #else /* CONFIG_LIBEMU86_WANT_16BIT */
@@ -1821,11 +1924,11 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 	do {                                               \
 		pc = emu86_modrm_decode(pc, &modrm, op_flags); \
 		if (!EMU86_MODRM_ISMEM(modrm.mi_type))         \
-			goto return_unknown_instruction;           \
+			goto return_expected_memory_modrm;         \
 	} __WHILE0
 #ifdef EMU86_EMULATE_ONLY_MEMORY
-#define MODRM_DECODE() \
-	MODRM_DECODE_MEMONLY()
+#define NEED_return_expected_memory_modrm
+#define MODRM_DECODE() MODRM_DECODE_MEMONLY()
 #else /* EMU86_EMULATE_ONLY_MEMORY */
 #define MODRM_DECODE() \
 	(pc = emu86_modrm_decode(pc, &modrm, op_flags))
@@ -2053,6 +2156,20 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #endif
 
 
+	/* TODO: Go through all instructions and add LOCK checks! */
+#define EMU86_REQUIRE_NO_LOCK()                 \
+	do {                                        \
+		if unlikely(op_flags & EMU86_F_LOCK)    \
+			goto return_unexpected_lock;        \
+	} __WHILE0
+#define EMU86_REQUIRE_NO_LOCK_RMREG()          \
+	do {                                       \
+		if unlikely(op_flags & EMU86_F_LOCK)   \
+			goto return_unexpected_lock_rmreg; \
+	} __WHILE0
+
+
+
 
 
 		/* Pull in emulated instructions. */
@@ -2123,6 +2240,8 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #endif /* !EMU86_EMULATE_IMPL_HEADER */
 #endif /* !__INTELLISENSE__ */
 
+			/* TODO: mov (crN) */
+
 			/* TODO: lfence */
 			/* TODO: mfence */
 			/* TODO: sfence */
@@ -2169,10 +2288,144 @@ done:
 	EMU86_SETPCPTR(REAL_IP());
 done_dont_set_pc:
 	EMU86_EMULATE_RETURN();
-return_unknown_instruction:
-	EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION(REAL_START_IP(),
-	                                         opcode,
-	                                         op_flags);
+
+
+#if EMU86_EMULATE_CHECKUSER
+	/* Privileged instruction
+	 * Only used when `EMU86_EMULATE_CHECKUSER' is enabled. */
+	__IF0 {
+#ifdef NEED_return_privileged_instruction_rmreg
+#undef NEED_return_privileged_instruction_rmreg
+return_privileged_instruction_rmreg:;
+#ifdef EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION_RMREG
+		EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION_RMREG();
+#endif /* EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION_RMREG */
+#endif /* NEED_return_privileged_instruction_rmreg */
+#ifdef NEED_return_privileged_instruction
+#undef NEED_return_privileged_instruction
+return_privileged_instruction:;
+#ifdef EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION
+		EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION();
+#endif /* EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION */
+#endif /* NEED_return_privileged_instruction */
+	}
+#endif /* EMU86_EMULATE_CHECKUSER */
+
+
+	/* Instruction isn't defined for a non-memory modr/m operand */
+	__IF0 {
+#ifdef NEED_return_expected_memory_modrm_rmreg
+#undef NEED_return_expected_memory_modrm_rmreg
+return_expected_memory_modrm_rmreg:;
+#ifdef EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM_RMREG
+		EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM_RMREG();
+#endif /* EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM_RMREG */
+#endif /* NEED_return_expected_memory_modrm_rmreg */
+#ifdef NEED_return_expected_memory_modrm
+#undef NEED_return_expected_memory_modrm
+return_expected_memory_modrm:;
+#ifdef EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM
+		EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM();
+#endif /* EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM */
+#endif /* NEED_return_expected_memory_modrm */
+	}
+
+
+	/* Instruction isn't defined for a non-register modr/m operand */
+	__IF0 {
+#ifdef NEED_return_expected_register_modrm_rmreg
+#undef NEED_return_expected_register_modrm_rmreg
+return_expected_register_modrm_rmreg:;
+#ifdef EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM_RMREG
+		EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM_RMREG();
+#endif /* EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM_RMREG */
+#endif /* NEED_return_expected_register_modrm_rmreg */
+#ifdef NEED_return_expected_register_modrm
+#undef NEED_return_expected_register_modrm
+return_expected_register_modrm:;
+#ifdef EMU86_EMULATE_RETURN_EXPECTED_REGISTER_MODRM
+		EMU86_EMULATE_RETURN_EXPECTED_REGISTER_MODRM();
+#endif /* EMU86_EMULATE_RETURN_EXPECTED_REGISTER_MODRM */
+#endif /* NEED_return_expected_register_modrm */
+	}
+
+
+	/* Unexpected LOCK prefix */
+	__IF0 {
+#ifdef NEED_return_unexpected_lock_rmreg
+#undef NEED_return_unexpected_lock_rmreg
+return_unexpected_lock_rmreg:;
+#ifdef EMU86_EMULATE_RETURN_UNEXPECTED_LOCK_RMREG
+		EMU86_EMULATE_RETURN_UNEXPECTED_LOCK_RMREG();
+#endif /* EMU86_EMULATE_RETURN_UNEXPECTED_LOCK_RMREG */
+#endif /* NEED_return_unexpected_lock_rmreg */
+#ifdef NEED_return_unexpected_lock
+#undef NEED_return_unexpected_lock
+return_unexpected_lock:;
+#ifdef EMU86_EMULATE_RETURN_UNEXPECTED_LOCK
+		EMU86_EMULATE_RETURN_UNEXPECTED_LOCK();
+#endif /* EMU86_EMULATE_RETURN_UNEXPECTED_LOCK */
+#endif /* NEED_return_unexpected_lock */
+	}
+
+
+	/* Instruction isn't supported due to some missing hardware feature. */
+	__IF0 {
+#ifdef NEED_return_unsupported_instruction_rmreg
+#undef NEED_return_unsupported_instruction_rmreg
+return_unsupported_instruction_rmreg:;
+#ifdef EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION_RMREG
+		EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION_RMREG();
+#endif /* EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION_RMREG */
+#endif /* NEED_return_unsupported_instruction_rmreg */
+#ifdef NEED_return_unsupported_instruction
+#undef NEED_return_unsupported_instruction
+return_unsupported_instruction:;
+#ifdef EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION
+		EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION();
+#endif /* EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION */
+#endif /* NEED_return_unsupported_instruction */
+	}
+
+
+	/* Instruction isn't available due in the current execution mode. */
+	__IF0 {
+#ifdef NEED_return_unavailable_instruction_rmreg
+#undef NEED_return_unavailable_instruction_rmreg
+return_unavailable_instruction_rmreg:;
+#ifdef EMU86_EMULATE_THROW_UNAVAILABLE_INSTRUCTION_RMREG
+		EMU86_EMULATE_THROW_UNAVAILABLE_INSTRUCTION_RMREG();
+#endif /* EMU86_EMULATE_THROW_UNAVAILABLE_INSTRUCTION_RMREG */
+#endif /* NEED_return_unavailable_instruction_rmreg */
+#ifdef NEED_return_unavailable_instruction
+#undef NEED_return_unavailable_instruction
+return_unavailable_instruction:;
+#ifdef EMU86_EMULATE_THROW_UNAVAILABLE_INSTRUCTION
+		EMU86_EMULATE_THROW_UNAVAILABLE_INSTRUCTION();
+#endif /* EMU86_EMULATE_THROW_UNAVAILABLE_INSTRUCTION */
+#endif /* NEED_return_unavailable_instruction */
+	}
+
+
+	/* Unknown instruction */
+	__IF0 {
+#ifdef NEED_return_unknown_instruction_rmreg
+#undef NEED_return_unknown_instruction_rmreg
+return_unknown_instruction_rmreg:;
+#ifdef EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION_RMREG
+		EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION_RMREG();
+#endif /* EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION_RMREG */
+#endif /* NEED_return_unknown_instruction_rmreg */
+	}
+return_unknown_instruction: /* TODO: Go through all uses of this label and use the labels above instead! */
+	/* Default case: Handle as an unknown instruction */
+	EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION();
+
+
+#ifdef EMU86_EMULATE_FOOTER
+	EMU86_EMULATE_FOOTER();
+#endif /* EMU86_EMULATE_FOOTER */
+
 #ifndef __INTELLISENSE__
 #undef REAL_START_IP
 #undef REAL_IP

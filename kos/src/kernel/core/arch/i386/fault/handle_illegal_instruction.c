@@ -1402,6 +1402,7 @@ e_unsupported_instruction:
 		goto set_generic_illegal_instruction;
 e_bad_prefix:
 		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX));
+		PERTASK_SET(this_exception_pointers[1], (uintptr_t)op_flags);
 		i = 1;
 		goto set_generic_illegal_instruction;
 e_instruction_too_long:

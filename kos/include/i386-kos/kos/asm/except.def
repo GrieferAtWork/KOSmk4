@@ -218,8 +218,11 @@ class E_ILLEGAL_INSTRUCTION_BAD_OPCODE: E_ILLEGAL_INSTRUCTION = 0x0001 {
 [message("Unsupported instruction prefix")]
 @@An unsupported prefix byte was encountered
 class E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX: E_ILLEGAL_INSTRUCTION = 0x0002 {
-	@@The unsupported prefix byte-sequence (in big-endian)
-	member prefix_sequence: uintptr_t;
+	@@The opcode that caused the exception
+	@@NOTE: This field should be decoded using `E_ILLEGAL_INSTRUCTION_X86_OPCODE_*'
+	member opcode: uintptr_t;
+	@@Opcode flags (set of `EMU86_F_*')
+	member op_flags: uintptr_t;
 }
 
 [message("Unsupported instruction")]

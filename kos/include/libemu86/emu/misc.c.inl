@@ -30,13 +30,15 @@ case 0xfe:
 	MODRM_DECODE();
 	switch (modrm.mi_reg) {
 
+#ifndef EMU86_EMULATE_ONLY_MEMORY
+#define NEED_return_unexpected_lock_rmreg
+#endif /* !EMU86_EMULATE_ONLY_MEMORY */
 #define DO_INC_modrm(bwlq, BWLQ, Nbits, Nbytes)                                   \
 	u##Nbits oldval, newval;                                                      \
 	u32 eflags_addend = 0;                                                        \
 	NIF_ONLY_MEMORY(                                                              \
 	if (EMU86_MODRM_ISREG(modrm.mi_type)) {                                       \
-		if unlikely(op_flags &EMU86_F_LOCK)                                       \
-			goto return_unknown_instruction;                                      \
+		EMU86_REQUIRE_NO_LOCK_RMREG();                                            \
 		oldval = MODRM_GETRMREG##BWLQ();                                          \
 		MODRM_SETRMREG##BWLQ((u##Nbits)(oldval + 1));                             \
 	} else) {                                                                     \
@@ -57,8 +59,7 @@ case 0xfe:
 	u32 eflags_addend = 0;                                                        \
 	NIF_ONLY_MEMORY(                                                              \
 	if (EMU86_MODRM_ISREG(modrm.mi_type)) {                                       \
-		if unlikely(op_flags &EMU86_F_LOCK)                                       \
-			goto return_unknown_instruction;                                      \
+		EMU86_REQUIRE_NO_LOCK_RMREG();                                            \
 		oldval = MODRM_GETRMREG##BWLQ();                                          \
 		MODRM_SETRMREG##BWLQ(oldval - 1);                                         \
 	} else) {                                                                     \
@@ -89,9 +90,10 @@ case 0xfe:
 	}
 
 	default:
-		break;
+#define NEED_return_unknown_instruction_rmreg
+		goto return_unknown_instruction_rmreg;
 	}
-	goto return_unknown_instruction;
+	break;
 
 
 case 0xff:
@@ -146,11 +148,12 @@ case 0xff:
 		 * REX.W FF /3    CALL m16:64    Call far, absolute indirect, address given in m16:64. */
 		byte_t *sp;
 		EMU86_UREG_TYPE offset;
-		u16 segment;
+		u16 cs;
 		byte_t *addr;
 #ifndef EMU86_EMULATE_ONLY_MEMORY
+#define NEED_return_expected_memory_modrm_rmreg
 		if (!EMU86_MODRM_ISMEM(modrm.mi_type))
-			goto return_unknown_instruction;
+			goto return_expected_memory_modrm_rmreg;
 #endif /* !EMU86_EMULATE_ONLY_MEMORY */
 		addr = MODRM_MEMADDR();
 		IF_64BIT(if (IS_64BIT()) {
@@ -166,13 +169,18 @@ case 0xff:
 			offset = EMU86_MEMREADW(addr);
 			pc += 2;
 		}
-		segment = EMU86_MEMREADW(addr);
+		cs = EMU86_MEMREADW(addr);
 		/* Verify the segment index. */
 #if EMU86_EMULATE_CHECKUSER
-		if (!SEGMENT_IS_VALID_USERCODE(segment) && EMU86_ISUSER_NOVM86()) {
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-			      X86_REGISTER_SEGMENT_CS, segment);
+		if (!SEGMENT_IS_VALID_USERCODE(cs) && EMU86_ISUSER_NOVM86()) {
+#ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
+			EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV,
+			                                                 X86_REGISTER_SEGMENT_CS,
+			                                                 cs, 0);
+#else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
+#define NEED_return_privileged_instruction
+			goto return_privileged_instruction;
+#endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 		}
 #endif /* EMU86_EMULATE_CHECKUSER */
 		sp = EMU86_GETSTACKPTR();
@@ -196,7 +204,7 @@ case 0xff:
 			EMU86_MEMWRITEW(sp + 0, (u16)REAL_IP());
 		}
 		EMU86_SETSTACKPTR(sp);
-		EMU86_SETCS(segment);
+		EMU86_SETCS(cs);
 		EMU86_SETIPREG(offset);
 		goto done_dont_set_pc;
 	}
@@ -228,11 +236,12 @@ case 0xff:
 #else /* CONFIG_LIBEMU86_WANT_64BIT */
 		u32 offset;
 #endif /* !CONFIG_LIBEMU86_WANT_64BIT */
-		u16 segment;
+		u16 cs;
 		byte_t *addr;
 #ifndef EMU86_EMULATE_ONLY_MEMORY
+#define NEED_return_expected_memory_modrm_rmreg
 		if (!EMU86_MODRM_ISMEM(modrm.mi_type))
-			goto return_unknown_instruction;
+			goto return_expected_memory_modrm_rmreg;
 #endif /* !EMU86_EMULATE_ONLY_MEMORY */
 		addr = MODRM_MEMADDR();
 		IF_64BIT(if (IS_64BIT()) {
@@ -248,16 +257,21 @@ case 0xff:
 			offset = EMU86_MEMREADW(addr);
 			pc += 2;
 		}
-		segment = EMU86_MEMREADW(addr);
+		cs = EMU86_MEMREADW(addr);
 		/* Verify the segment index. */
 #if EMU86_EMULATE_CHECKUSER
-		if (!SEGMENT_IS_VALID_USERCODE(segment) && EMU86_ISUSER_NOVM86()) {
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-			      X86_REGISTER_SEGMENT_CS, segment);
+		if (!SEGMENT_IS_VALID_USERCODE(cs) && EMU86_ISUSER_NOVM86()) {
+#ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
+			EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV,
+			                                                 X86_REGISTER_SEGMENT_CS,
+			                                                 cs, 0);
+#else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
+#define NEED_return_privileged_instruction
+			goto return_privileged_instruction;
+#endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 		}
 #endif /* EMU86_EMULATE_CHECKUSER */
-		EMU86_SETCS(segment);
+		EMU86_SETCS(cs);
 		EMU86_SETIPREG(offset);
 		goto done_dont_set_pc;
 	}
@@ -267,8 +281,8 @@ case 0xff:
 		/* FF /6     PUSH r/m16     Push r/m16.
 		 * FF /6     PUSH r/m32     Push r/m32.
 		 * FF /6     PUSH r/m64     Push r/m64. */
-		if unlikely(op_flags & EMU86_F_LOCK)
-			goto return_unknown_instruction;
+#define NEED_return_unexpected_lock_rmreg
+		EMU86_REQUIRE_NO_LOCK_RMREG();
 		EMU86_PUSH163264(MODRM_GETRMW(),
 		                 MODRM_GETRML(),
 		                 MODRM_GETRMQ());
@@ -276,9 +290,10 @@ case 0xff:
 
 
 	default:
-		break;
+#define NEED_return_unknown_instruction_rmreg
+		goto return_unknown_instruction_rmreg;
 	}
-	goto return_unknown_instruction;
+	break;
 
 #undef DO_DEC_modrm
 #undef DO_INC_modrm

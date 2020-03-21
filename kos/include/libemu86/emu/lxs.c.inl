@@ -33,10 +33,11 @@ EMU86_INTELLISENSE_BEGIN(lxs) {
 case 0xc4: {
 	/* C4 /r     LES r16,m16:16     Load ES:r16 with far pointer from memory.
 	 * C4 /r     LES r32,m16:32     Load ES:r32 with far pointer from memory. */
-	IF_64BIT({
-		if (EMU86_F_IS64(op_flags))
-			goto return_unknown_instruction;
-	});
+#if CONFIG_LIBEMU86_WANT_64BIT
+#define NEED_return_unavailable_instruction
+	if (EMU86_F_IS64(op_flags))
+		goto return_unavailable_instruction;
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
 	segment_regno = EMU86_R_ES;
 	goto do_lxs;
 }
@@ -44,10 +45,11 @@ case 0xc4: {
 case 0xc5: {
 	/* C5 /r     LDS r16,m16:16     Load DS:r16 with far pointer from memory.
 	 * C5 /r     LDS r32,m16:32     Load DS:r32 with far pointer from memory. */
-	IF_64BIT({
-		if (EMU86_F_IS64(op_flags))
-			goto return_unknown_instruction;
-	});
+#if CONFIG_LIBEMU86_WANT_64BIT
+#define NEED_return_unavailable_instruction
+	if (EMU86_F_IS64(op_flags))
+		goto return_unavailable_instruction;
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
 	segment_regno = EMU86_R_DS;
 	goto do_lxs;
 }
@@ -81,6 +83,7 @@ case 0x0fb5: {
 	EMU86_UREG_TYPE offset;
 	segment_regno = EMU86_R_GS;
 do_lxs:
+#define NEED_return_expected_memory_modrm
 	MODRM_DECODE_MEMONLY();
 	addr = MODRM_MEMADDR();
 	IF_64BIT(if (IS_64BIT()) {
@@ -99,9 +102,14 @@ do_lxs:
 #if EMU86_EMULATE_CHECKUSER
 	/* Validate the given segment index. */
 	if (!SEGMENT_IS_VALID_USERDATA(segment) && EMU86_ISUSER_NOVM86()) {
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-		      segment_regno, segment);
+#ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
+		EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV,
+		                                                 X86_REGISTER_SEGMENT_ES + segment_regno,
+		                                                 segment, 0);
+#else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
+#define NEED_return_privileged_instruction
+		goto return_privileged_instruction;
+#endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 	}
 #endif /* EMU86_EMULATE_CHECKUSER */
 	EMU86_SETSEG(segment_regno, segment);

@@ -27,6 +27,10 @@ EMU86_INTELLISENSE_BEGIN(push_pop) {
 
 #if CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT
 
+#if CONFIG_LIBEMU86_WANT_64BIT
+#define NEED_return_unavailable_instruction
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+
 /************************************************************************/
 /* PUSH ES                                                              */
 /************************************************************************/
@@ -182,8 +186,10 @@ case 0x58 ... 0x5f: {
 
 case 0x8f: {
 	MODRM_DECODE();
-	if (modrm.mi_reg != 0)
-		goto return_unknown_instruction;
+	if unlikely(modrm.mi_reg != 0) {
+#define NEED_return_unknown_instruction_rmreg
+		goto return_unknown_instruction_rmreg;
+	}
 	/* 8F /0     POP r/m16     Pop top of stack into m16; increment stack pointer.
 	 * 8F /0     POP r/m32     Pop top of stack into m32; increment stack pointer.
 	 * 8F /0     POP r/m64     Pop top of stack into m64; increment stack pointer.

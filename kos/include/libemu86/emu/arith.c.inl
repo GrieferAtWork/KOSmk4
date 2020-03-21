@@ -29,7 +29,6 @@ EMU86_INTELLISENSE_BEGIN(arith) {
 	u64 op64;
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
 
-
 	/* NOTE: Always support register-based MODR/M to support reverse encoded operands */
 #define DO_ARITHn(NAME, operator, BWLQ, Nbytes, oldval, rhs)                         \
 	if (EMU86_MODRM_ISMEM(modrm.mi_type)) {                                          \
@@ -83,8 +82,7 @@ do_adc##Nbits:                                                                  
 			goto do_add##Nbits;                                                      \
 		NIF_ONLY_MEMORY(                                                             \
 		if (EMU86_MODRM_ISREG(modrm.mi_type)) {                                      \
-			if unlikely(op_flags & EMU86_F_LOCK)                                     \
-				goto return_unknown_instruction;                                     \
+			EMU86_REQUIRE_NO_LOCK_RMREG();                                           \
 			oldval = MODRM_GETRMREG##BWLQ();                                         \
 			eflags_addend = 0;                                                       \
 			if (OVERFLOW_SADD((s##Nbits)oldval, (s##Nbits)rhs, (s##Nbits *)&newval)) \
@@ -125,8 +123,7 @@ do_sbb##Nbits:                                                                  
 			goto do_sub##Nbits;                                                      \
 		NIF_ONLY_MEMORY(                                                             \
 		if (EMU86_MODRM_ISREG(modrm.mi_type)) {                                      \
-			if unlikely(op_flags & EMU86_F_LOCK)                                     \
-				goto return_unknown_instruction;                                     \
+			EMU86_REQUIRE_NO_LOCK_RMREG();                                           \
 			oldval = MODRM_GETRMREG##BWLQ();                                         \
 			eflags_addend = 0;                                                       \
 			if (OVERFLOW_SSUB((s##Nbits)oldval, (s##Nbits)rhs,                       \
@@ -196,8 +193,7 @@ set_test##Nbits:                                                                
 		                                                                             \
 	case 7:                                                                          \
 do_cmp##Nbits:                                                                       \
-		if unlikely(op_flags & EMU86_F_LOCK)                                         \
-			goto return_unknown_instruction;                                         \
+		EMU86_REQUIRE_NO_LOCK_RMREG();                                               \
 		/* Always support REGISTER-R/M here! (needed for register write-back) */     \
 		IF_ONLY_MEMORY(                                                              \
 		oldval = unlikely(EMU86_MODRM_ISREG(modrm.mi_type))                          \
@@ -206,8 +202,15 @@ do_cmp##Nbits:                                                                  
 		NIF_ONLY_MEMORY(oldval = MODRM_GETRM##BWLQ();)                               \
 		goto set_test##Nbits##_before_sub;                                           \
 		                                                                             \
-	default: goto return_unknown_instruction;                                        \
+	default:                                                                         \
+		/* In 64-bit mode, REX.B can cause modrm.mi_reg to be > 7 */                 \
+		IFELSE_64BIT(goto return_unknown_instruction_rmreg,                          \
+		             __builtin_unreachable());                                       \
 	}
+#if CONFIG_LIBEMU86_WANT_64BIT
+#define NEED_return_unknown_instruction_rmreg
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#define NEED_return_unexpected_lock_rmreg
 
 
 /* ======================================================================== */

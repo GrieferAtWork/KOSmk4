@@ -93,8 +93,16 @@ case 0x8c: {
 	 * REX.W + 8C /r     MOV r16/r32/m16, Sreg**    MR  Valid Valid Move zero extended 16-bit segment register to r16/r32/r64/m16.
 	 * REX.W + 8C /r     MOV r64/m16, Sreg**        MR  Valid Valid Move zero extended 16-bit segment register to r64/m16. */
 	MODRM_DECODE();
-	if (modrm.mi_reg >= 6)
-		goto return_unknown_instruction;
+	if (modrm.mi_reg >= 6) {
+#ifndef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
+#define NEED_return_unsupported_instruction
+		goto return_unsupported_instruction;
+#else /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
+		EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_RDINV,
+		                                                 X86_REGISTER_SEGMENT_ES + modrm.mi_reg,
+		                                                 0, 0);
+#endif /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
+	}
 	segment = EMU86_GETSEG(modrm.mi_reg);
 	IF_64BIT(if (IS_64BIT()) {
 		MODRM_SETRMQ(segment);
@@ -112,17 +120,29 @@ case 0x8e: {
 	/*         8E /r      MOV Sreg,r/m16** RM Valid Valid Move r/m16 to segment register.
 	 * REX.W + 8E /r      MOV Sreg,r/m64** RM Valid Valid Move lower 16 bits of r/m64 to segment register. */
 	MODRM_DECODE();
-	if unlikely(modrm.mi_reg >= 6)
-		goto return_unknown_instruction;
 	segment = MODRM_GETRMW();
+	if unlikely(modrm.mi_reg >= 6) {
+#ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
+		EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRINV,
+		                                                 X86_REGISTER_SEGMENT_ES + modrm.mi_reg,
+		                                                 segment, 0);
+#else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
+#define NEED_return_unsupported_instruction
+		goto return_unsupported_instruction;
+#endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
+	}
 #if EMU86_EMULATE_CHECKUSER && (CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_64BIT)
 	if ((modrm.mi_reg == EMU86_R_CS ? !SEGMENT_IS_VALID_USERCODE(segment)
 	                                : !SEGMENT_IS_VALID_USERDATA(segment)) &&
 	    EMU86_ISUSER_NOVM86()) {
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-		      X86_REGISTER_SEGMENT_ES + modrm.mi_reg,
-		      segment);
+#ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
+		EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV,
+		                                                 X86_REGISTER_SEGMENT_ES + modrm.mi_reg,
+		                                                 segment, 0);
+#else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
+#define NEED_return_privileged_instruction
+		goto return_privileged_instruction;
+#endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 	}
 #endif /* EMU86_EMULATE_CHECKUSER && (CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_64BIT) */
 	EMU86_SETSEG(modrm.mi_reg, segment);
@@ -248,12 +268,14 @@ case 0xc6:
 		value = *(u8 *)pc;
 		pc += 1;
 		MODRM_SETRMB(value);
-	}	break;
+		goto done;
+	}
 
 	default:
-		goto return_unknown_instruction;
+#define NEED_return_unknown_instruction_rmreg
+		goto return_unknown_instruction_rmreg;
 	}
-	goto done;
+	break;
 
 
 
@@ -280,10 +302,11 @@ case 0xc7:
 			MODRM_SETRMW((u16)value);
 		}
 		goto done;
-	}	break;
+	}
 
 	default:
-		goto return_unknown_instruction;
+#define NEED_return_unknown_instruction_rmreg
+		goto return_unknown_instruction_rmreg;
 	}
 	break;
 

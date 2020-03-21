@@ -32,10 +32,11 @@ case 0x9a: {
 	byte_t *sp;
 	u32 offset;
 	u16 segment;
-	IF_64BIT({
-		if (EMU86_F_IS64(op_flags))
-			goto return_unknown_instruction;
-	});
+#if CONFIG_LIBEMU86_WANT_64BIT
+#define NEED_return_unavailable_instruction
+	if (EMU86_F_IS64(op_flags))
+		goto return_unavailable_instruction;
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
 	if (!IS_16BIT()) {
 		offset = UNALIGNED_GET32((u32 *)pc);
 		pc += 4;
@@ -48,9 +49,14 @@ case 0x9a: {
 	/* Verify the segment index. */
 #if EMU86_EMULATE_CHECKUSER
 	if (!SEGMENT_IS_VALID_USERCODE(segment) && EMU86_ISUSER_NOVM86()) {
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-		      X86_REGISTER_SEGMENT_CS, segment);
+#ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
+		EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV,
+		                                                 X86_REGISTER_SEGMENT_CS,
+		                                                 segment, 0);
+#else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
+#define NEED_return_privileged_instruction
+		goto return_privileged_instruction;
+#endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 	}
 #endif /* EMU86_EMULATE_CHECKUSER */
 	sp = EMU86_GETSTACKPTR();

@@ -29,6 +29,7 @@ case 0x8d: {
 	 *         8D /r     LEA r32,m     RM     Valid     Valid     Store effective address for m in register r32.
 	 * REX.W + 8D /r     LEA r64,m     RM     Valid     N.E.      Store effective address for m in register r64. */
 	uintptr_t addr;
+#define NEED_return_expected_memory_modrm
 	MODRM_DECODE_MEMONLY();
 	addr = (uintptr_t)MODRM_MEMADDR_NOSEGBASE();
 	IF_64BIT(if (IS_64BIT()) {
