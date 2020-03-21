@@ -61,7 +61,7 @@ do_add##Nbits:                                                                  
 		if (OVERFLOW_UADD(oldval, rhs, &newval))                                     \
 			eflags_addend |= EFLAGS_OF | EFLAGS_CF;                                  \
 set_test##Nbits##_after_add:                                                         \
-		if (((oldval & 0xf) + (rhs & 0xf)) >= 0x10)                                  \
+		if (emu86_getflags_AF_add(oldval, rhs))                                      \
 			eflags_addend |= EFLAGS_AF;                                              \
 		if ((s##Nbits)newval < 0)                                                    \
 			eflags_addend |= EFLAGS_SF;                                              \
@@ -156,7 +156,7 @@ set_test##Nbits##_before_sub:                                                   
 		if (OVERFLOW_USUB(oldval, rhs, &newval))                                     \
 			eflags_addend |= EFLAGS_OF | EFLAGS_CF;                                  \
 set_test##Nbits##_after_sub:                                                         \
-		if (((oldval & 0xf) + ((0 - (rhs)) & 0xf)) >= 0x10)                          \
+		if (emu86_getflags_AF_sub(oldval, rhs))                                      \
 			eflags_addend |= EFLAGS_AF;                                              \
 		if ((s##Nbits)newval < 0)                                                    \
 			eflags_addend |= EFLAGS_SF;                                              \

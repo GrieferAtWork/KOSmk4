@@ -758,6 +758,8 @@ INTERN NONNULL((1)) int CC libvm86_step(vm86_state_t *__restrict self) {
 			printk(KERN_RAW "%sSF", self->vr_regs.vr_flags & (CF | PF | ZF) ? "," : "");
 		if (self->vr_regs.vr_flags & OF)
 			printk(KERN_RAW "%sOF", self->vr_regs.vr_flags & (CF | PF | ZF | SF) ? "," : "");
+		if (self->vr_regs.vr_flags & AF)
+			printk(KERN_RAW "%sAF", self->vr_regs.vr_flags & (CF | PF | ZF | SF | OF) ? "," : "");
 		printk(KERN_RAW "]\n");
 	}
 #endif /* __KERNEL__ */

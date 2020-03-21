@@ -69,6 +69,11 @@ __NOTHROW(LIBEMU86_CC emu86_geteflags_PFb)(__uint8_t value) {
 #define emu86_geteflags_testq(value) (emu86_geteflags_SFq(value) | emu86_geteflags_ZFq(value) | emu86_geteflags_PFq(value))
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
 
+#define emu86_getflags_AF_add(lhs, rhs) \
+	((__uint8_t)((__uint8_t)(lhs & 0xf) + (__uint8_t)(rhs & 0xf)) >= (__uint8_t)0x10)
+#define emu86_getflags_AF_sub(lhs, rhs) \
+	((__uint8_t)(lhs & 0xf) < (__uint8_t)(rhs & 0xf))
+
 
 /* Return a set of `EFLAGS_(CF|OF|SF|ZF|AF|PF)' */
 #define EMU86_GETEFLAGS_CMP_MASK         \
@@ -82,7 +87,7 @@ __NOTHROW(LIBEMU86_CC emu86_geteflags_PFb)(__uint8_t value) {
 		__uint32_t result = 0;                                                \
 		if (__hybrid_overflow_usub(lhs, rhs, &newval))                        \
 			result |= EFLAGS_OF | EFLAGS_CF;                                  \
-		if (((lhs & 0xf) + ((0 - rhs) & 0xf)) >= 0x10)                        \
+		if (emu86_getflags_AF_sub(lhs, rhs))                                  \
 			result |= EFLAGS_AF;                                              \
 		result |= emu86_geteflags_test##bwlq(newval);                         \
 		return result;                                                        \

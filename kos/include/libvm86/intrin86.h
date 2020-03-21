@@ -20,6 +20,8 @@
 #ifndef _LIBVM86_INTRIN86_H
 #define _LIBVM86_INTRIN86_H 1
 
+/* TODO: Get rid of this header once libemu86 fully replaces the old emulator! */
+
 #include <hybrid/bit.h>
 #include <hybrid/host.h>
 

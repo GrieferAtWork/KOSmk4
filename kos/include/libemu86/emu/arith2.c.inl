@@ -50,7 +50,7 @@ EMU86_INTELLISENSE_BEGIN(arith2) {
 		MODRM_SETRMREG##BWLQ(newval);                                          \
 	} else) {                                                                  \
 		byte_t *addr;                                                          \
-		/* Use XOR to implement NOT */                                         \
+		/* Use XOR to implement NEG */                                         \
 		addr = MODRM_MEMADDR();                                                \
 		EMU86_WRITE_USER_MEMORY(addr, Nbytes);                                 \
 		for (;;) {                                                             \
@@ -66,7 +66,7 @@ EMU86_INTELLISENSE_BEGIN(arith2) {
 		eflags_addend |= EFLAGS_CF;                                            \
 	if (oldval == maxbit_set) /* 0x80, 0x8000, etc... */                       \
 		eflags_addend |= EFLAGS_OF;                                            \
-	if ((oldval & 0xf) != 0)                                                   \
+	if (emu86_getflags_AF_sub(0, oldval))                                      \
 		eflags_addend |= EFLAGS_AF;                                            \
 	EMU86_MSKFLAGS(~(EFLAGS_CF | EFLAGS_OF | EFLAGS_SF |                       \
 	                 EFLAGS_ZF | EFLAGS_AF | EFLAGS_PF),                       \

@@ -23,31 +23,31 @@
 
 EMU86_INTELLISENSE_BEGIN(xadd) {
 
-#define DEFINE_XADD_MODRM_reg_rm(bwlq, BWLQ, Nbits, Nbytes)                           \
-	u##Nbits rhs, oldval, newval;                                                     \
-	u32 eflags_addend = 0;                                                            \
-	rhs = MODRM_GETREG##BWLQ();                                                       \
-	NIF_ONLY_MEMORY(                                                                  \
-	if (EMU86_MODRM_ISREG(modrm.mi_type)) {                                           \
-		if unlikely(op_flags & EMU86_F_LOCK)                                          \
-			goto return_unknown_instruction;                                          \
-		oldval = MODRM_GETRMREG##BWLQ();                                              \
-		MODRM_SETRMREG##BWLQ(oldval + rhs);                                           \
-	} else) {                                                                         \
-		byte_t *addr;                                                                 \
-		addr = MODRM_MEMADDR();                                                       \
-		EMU86_WRITE_USER_MEMORY(addr, Nbytes);                                        \
+#define DEFINE_XADD_MODRM_reg_rm(bwlq, BWLQ, Nbits, Nbytes)                       \
+	u##Nbits rhs, oldval, newval;                                                 \
+	u32 eflags_addend = 0;                                                        \
+	rhs = MODRM_GETREG##BWLQ();                                                   \
+	NIF_ONLY_MEMORY(                                                              \
+	if (EMU86_MODRM_ISREG(modrm.mi_type)) {                                       \
+		if unlikely(op_flags & EMU86_F_LOCK)                                      \
+			goto return_unknown_instruction;                                      \
+		oldval = MODRM_GETRMREG##BWLQ();                                          \
+		MODRM_SETRMREG##BWLQ(oldval + rhs);                                       \
+	} else) {                                                                     \
+		byte_t *addr;                                                             \
+		addr = MODRM_MEMADDR();                                                   \
+		EMU86_WRITE_USER_MEMORY(addr, Nbytes);                                    \
 		oldval = EMU86_MEM_ATOMIC_FETCHADD##BWLQ(addr, rhs,                       \
-		                                             (op_flags & EMU86_F_LOCK) != 0); \
-	}                                                                                 \
-	if (OVERFLOW_UADD(oldval, rhs, &newval))                                          \
-		eflags_addend |= EFLAGS_OF | EFLAGS_CF;                                       \
-	if (((oldval & 0xf) + (rhs & 0xf)) >= 0x10)                                       \
-		eflags_addend |= EFLAGS_AF;                                                   \
-	if ((s8)newval < 0)                                                               \
-		eflags_addend |= EFLAGS_SF;                                                   \
-	EMU86_MSKFLAGS(~(EFLAGS_OF | EFLAGS_CF | EFLAGS_SF |                              \
-	                 EFLAGS_ZF | EFLAGS_PF | EFLAGS_AF),                              \
+		                                         (op_flags & EMU86_F_LOCK) != 0); \
+	}                                                                             \
+	if (OVERFLOW_UADD(oldval, rhs, &newval))                                      \
+		eflags_addend |= EFLAGS_OF | EFLAGS_CF;                                   \
+	if (emu86_getflags_AF_add(oldval, rhs))                                       \
+		eflags_addend |= EFLAGS_AF;                                               \
+	if ((s8)newval < 0)                                                           \
+		eflags_addend |= EFLAGS_SF;                                               \
+	EMU86_MSKFLAGS(~(EFLAGS_OF | EFLAGS_CF | EFLAGS_SF |                          \
+	                 EFLAGS_ZF | EFLAGS_PF | EFLAGS_AF),                          \
 	               eflags_addend | emu86_geteflags_test##bwlq(newval));
 
 

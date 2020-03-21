@@ -39,7 +39,7 @@ case 0x40 ... 0x47: {
 		oldval = EMU86_GETREGL(opcode - 0x40);
 		if (OVERFLOW_UADD(oldval, 1, &newval))
 			eflags_addend |= EFLAGS_OF;
-		if ((oldval & 0xf) == 0xf)
+		if (emu86_getflags_AF_add(oldval, 1))
 			eflags_addend |= EFLAGS_AF;
 		EMU86_SETREGL(opcode - 0x40, newval);
 		EMU86_MSKFLAGS(~(EFLAGS_OF | EFLAGS_SF | EFLAGS_ZF | EFLAGS_PF | EFLAGS_AF),
@@ -50,7 +50,7 @@ case 0x40 ... 0x47: {
 		oldval = EMU86_GETREGW(opcode - 0x40);
 		if (OVERFLOW_UADD(oldval, 1, &newval))
 			eflags_addend |= EFLAGS_OF;
-		if ((oldval & 0xf) == 0xf)
+		if (emu86_getflags_AF_add(oldval, 1))
 			eflags_addend |= EFLAGS_AF;
 		EMU86_SETREGW(opcode - 0x40, newval);
 		EMU86_MSKFLAGS(~(EFLAGS_OF | EFLAGS_SF | EFLAGS_ZF | EFLAGS_PF | EFLAGS_AF),
@@ -69,19 +69,23 @@ case 0x48 ... 0x4f: {
 	});
 	if (!IS_16BIT()) {
 		u32 oldval, newval;
-		u32 eflags_addend = EFLAGS_AF;
+		u32 eflags_addend = 0;
 		oldval = EMU86_GETREGL(opcode - 0x48);
 		if (OVERFLOW_USUB(oldval, 1, &newval))
 			eflags_addend |= EFLAGS_OF;
+		if (emu86_getflags_AF_sub(oldval, 1))
+			eflags_addend |= EFLAGS_AF;
 		EMU86_SETREGL(opcode - 0x48, newval);
 		EMU86_MSKFLAGS(~(EFLAGS_OF | EFLAGS_SF | EFLAGS_ZF | EFLAGS_PF | EFLAGS_AF),
 		               eflags_addend | emu86_geteflags_testl(newval));
 	} else {
 		u16 oldval, newval;
-		u32 eflags_addend = EFLAGS_AF;
+		u32 eflags_addend = 0;
 		oldval = EMU86_GETREGW(opcode - 0x48);
 		if (OVERFLOW_USUB(oldval, 1, &newval))
 			eflags_addend |= EFLAGS_OF;
+		if (emu86_getflags_AF_sub(oldval, 1))
+			eflags_addend |= EFLAGS_AF;
 		EMU86_SETREGW(opcode - 0x48, newval);
 		EMU86_MSKFLAGS(~(EFLAGS_OF | EFLAGS_SF | EFLAGS_ZF | EFLAGS_PF | EFLAGS_AF),
 		               eflags_addend | emu86_geteflags_testw(newval));
