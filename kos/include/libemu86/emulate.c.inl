@@ -632,12 +632,12 @@ __DECL_BEGIN
 /* Access I/O ports. */
 #ifndef EMU86_EMULATE_INB
 #include <sys/io.h>
-#define EMU86_EMULATE_INB(portno)         inb(portno)
-#define EMU86_EMULATE_INW(portno)         inw(portno)
-#define EMU86_EMULATE_INL(portno)         inl(portno)
-#define EMU86_EMULATE_OUTB(portno, value) outb(portno, value)
-#define EMU86_EMULATE_OUTW(portno, value) outw(portno, value)
-#define EMU86_EMULATE_OUTL(portno, value) outl(portno, value)
+#define EMU86_EMULATE_INB(portno, result) do { (result) = inb(portno); } __WHILE0
+#define EMU86_EMULATE_INW(portno, result) do { (result) = inw(portno); } __WHILE0
+#define EMU86_EMULATE_INL(portno, result) do { (result) = inl(portno); } __WHILE0
+#define EMU86_EMULATE_OUTB(portno, value) do { outb(portno, value); } __WHILE0
+#define EMU86_EMULATE_OUTW(portno, value) do { outw(portno, value); } __WHILE0
+#define EMU86_EMULATE_OUTL(portno, value) do { outl(portno, value); } __WHILE0
 #ifdef __KERNEL__
 /* Define these to allow for some minor optimizations, when it is known
  * that in/out emulation can never throw an exception (Note that this

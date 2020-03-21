@@ -25,20 +25,20 @@
 
 EMU86_INTELLISENSE_BEGIN(movs) {
 
-#define DEFINE_MOVSn_TRANSFER(BWLQ, Nbits, Nbytes)             \
-	EMU86_READ_USER_MEMORY(psi_addr, Nbytes);                  \
-	EMU86_WRITE_USER_MEMORY(pdi_addr, Nbytes);                 \
-	{                                                          \
-		u##Nbits transfer_value;                               \
-		transfer_value = EMU86_MEMREAD##BWLQ(psi_addr);        \
-		EMU86_MEMWRITE##BWLQ(pdi_addr, transfer_value);        \
-	}                                                          \
-	if (EMU86_GETFLAGS() & EFLAGS_DF) {                        \
-		psi -= Nbytes;                                         \
-		pdi -= Nbytes;                                         \
-	} else {                                                   \
-		psi += Nbytes;                                         \
-		pdi += Nbytes;                                         \
+#define DEFINE_MOVSn_TRANSFER(BWLQ, Nbits, Nbytes)      \
+	EMU86_READ_USER_MEMORY(psi_addr, Nbytes);           \
+	EMU86_WRITE_USER_MEMORY(pdi_addr, Nbytes);          \
+	{                                                   \
+		u##Nbits transfer_value;                        \
+		transfer_value = EMU86_MEMREAD##BWLQ(psi_addr); \
+		EMU86_MEMWRITE##BWLQ(pdi_addr, transfer_value); \
+	}                                                   \
+	if (EMU86_GETFLAGS() & EFLAGS_DF) {                 \
+		psi -= Nbytes;                                  \
+		pdi -= Nbytes;                                  \
+	} else {                                            \
+		psi += Nbytes;                                  \
+		pdi += Nbytes;                                  \
 	}
 
 

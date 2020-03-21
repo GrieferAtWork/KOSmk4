@@ -43,7 +43,7 @@ case 0xe4: {
 	portno = *(u8 *)pc;
 	pc += 1;
 	VERIFY_USER_PORT_ACCESS(portno, 1);
-	value = EMU86_EMULATE_INB(portno);
+	EMU86_EMULATE_INB(portno, value);
 	EMU86_SETAL(value);
 	goto done;
 }
@@ -57,12 +57,12 @@ case 0xe5: {
 	if (!IS_16BIT()) {
 		u32 value;
 		VERIFY_USER_PORT_ACCESS(portno, 4);
-		value = EMU86_EMULATE_INL(portno);
+		EMU86_EMULATE_INL(portno, value);
 		EMU86_SETEAX(value);
 	} else {
 		u16 value;
 		VERIFY_USER_PORT_ACCESS(portno, 2);
-		value = EMU86_EMULATE_INW(portno);
+		EMU86_EMULATE_INW(portno, value);
 		EMU86_SETAX(value);
 	}
 	goto done;
@@ -73,7 +73,7 @@ case 0xec: {
 	u8 value;
 	u16 portno = EMU86_GETDX();
 	VERIFY_USER_PORT_ACCESS(portno, 1);
-	value = EMU86_EMULATE_INB(portno);
+	EMU86_EMULATE_INB(portno, value);
 	EMU86_SETAL(value);
 	goto done;
 }
@@ -85,12 +85,12 @@ case 0xed: {
 	if (!IS_16BIT()) {
 		u32 value;
 		VERIFY_USER_PORT_ACCESS(portno, 4);
-		value = EMU86_EMULATE_INL(portno);
+		EMU86_EMULATE_INL(portno, value);
 		EMU86_SETEAX(value);
 	} else {
 		u16 value;
 		VERIFY_USER_PORT_ACCESS(portno, 2);
-		value = EMU86_EMULATE_INW(portno);
+		EMU86_EMULATE_INW(portno, value);
 		EMU86_SETAX(value);
 	}
 	goto done;
@@ -226,7 +226,7 @@ case 0x6c: {
 	u16 portno = EMU86_GETDX();
 	u8 value;
 	VERIFY_USER_PORT_ACCESS(portno, 1);
-	value = EMU86_EMULATE_INB(portno);
+	EMU86_EMULATE_INB(portno, value);
 	EMU86_WRITE_STRING(ES, DI, B, 8, 1, value);
 	/* Repeat the instruction */
 	if (op_flags & EMU86_F_REP)
@@ -242,12 +242,12 @@ case 0x6d: {
 	if (!IS_16BIT()) {
 		u32 value;
 		VERIFY_USER_PORT_ACCESS(portno, 4);
-		value = EMU86_EMULATE_INL(portno);
+		EMU86_EMULATE_INL(portno, value);
 		EMU86_WRITE_STRING(ES, DI, L, 32, 4, value);
 	} else {
 		u16 value;
 		VERIFY_USER_PORT_ACCESS(portno, 2);
-		value = EMU86_EMULATE_INW(portno);
+		EMU86_EMULATE_INW(portno, value);
 		EMU86_WRITE_STRING(ES, DI, W, 16, 2, value);
 	}
 	/* Repeat the instruction */

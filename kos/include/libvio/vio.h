@@ -65,9 +65,9 @@ struct vio_args { /* TODO: Rename to `vioargs' */
 	void                       *va_acmap_page;   /* Page-aligned virtual base address of the accessed mapping (== mmap:return). */
 	vio_addr_t                  va_acmap_offset; /* [== vm_datapart_startbyte(va_part)]
 	                                              * VIO file offset at `va_acmap_page' (== mmap:offset). */
-#ifdef __KERNEL__
 	vio_cpustate_t             *va_state;        /* [0..1][in|out] The CPU state at the time of the access
 	                                              * being made (or `NULL' when accessed through other means). */
+#ifdef __KERNEL__
 	struct vm_datablock        *va_block;        /* [1..1] The data block that is being accessed. */
 	struct vm_datapart         *va_part;         /* [0..1] The part that is being accessed. */
 #else /* __KERNEL__ */

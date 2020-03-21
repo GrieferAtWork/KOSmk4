@@ -71,6 +71,50 @@ libvm86_translate(vm86_state_t *__restrict self, void const *addr) {
 
 DECL_END
 
+#define EMU86_EMULATE_INB(portno, result)             \
+	do {                                              \
+		int error;                                    \
+		error = libvm86_inb(self, portno, &(result)); \
+		if (error != VM86_SUCCESS)                    \
+			return error;                             \
+	} __WHILE0
+#define EMU86_EMULATE_INW(portno, result)             \
+	do {                                              \
+		int error;                                    \
+		error = libvm86_inw(self, portno, &(result)); \
+		if (error != VM86_SUCCESS)                    \
+			return error;                             \
+	} __WHILE0
+#define EMU86_EMULATE_INL(portno, result)             \
+	do {                                              \
+		int error;                                    \
+		error = libvm86_inl(self, portno, &(result)); \
+		if (error != VM86_SUCCESS)                    \
+			return error;                             \
+	} __WHILE0
+#define EMU86_EMULATE_OUTB(portno, value)          \
+	do {                                           \
+		int error;                                 \
+		error = libvm86_outb(self, portno, value); \
+		if (error != VM86_SUCCESS)                 \
+			return error;                          \
+	} __WHILE0
+#define EMU86_EMULATE_OUTW(portno, value)          \
+	do {                                           \
+		int error;                                 \
+		error = libvm86_outw(self, portno, value); \
+		if (error != VM86_SUCCESS)                 \
+			return error;                          \
+	} __WHILE0
+#define EMU86_EMULATE_OUTL(portno, value)          \
+	do {                                           \
+		int error;                                 \
+		error = libvm86_outl(self, portno, value); \
+		if (error != VM86_SUCCESS)                 \
+			return error;                          \
+	} __WHILE0
+
+
 #define EMU86_EMULATE_DECL         INTERN
 #define EMU86_EMULATE_ATTR         NONNULL((1))
 #define EMU86_EMULATE_RETURN       return VM86_SUCCESS
