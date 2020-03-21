@@ -58,13 +58,13 @@ EMU86_INTELLISENSE_BEGIN(arith) {
 do_add##Nbits:                                                                       \
 		DO_ARITHn(ADD, +, BWLQ, Nbytes, oldval, rhs);                                \
 		eflags_addend = 0;                                                           \
+		if (OVERFLOW_SADD((s##Nbits)oldval, (s##Nbits)rhs, (s##Nbits *)&newval))     \
+			eflags_addend |= EFLAGS_OF;                                              \
 		if (OVERFLOW_UADD(oldval, rhs, &newval))                                     \
-			eflags_addend |= EFLAGS_OF | EFLAGS_CF;                                  \
+			eflags_addend |= EFLAGS_CF;                                              \
 set_test##Nbits##_after_add:                                                         \
 		if (emu86_getflags_AF_add(oldval, rhs))                                      \
 			eflags_addend |= EFLAGS_AF;                                              \
-		if ((s##Nbits)newval < 0)                                                    \
-			eflags_addend |= EFLAGS_SF;                                              \
 		EMU86_MSKFLAGS(~(EFLAGS_OF | EFLAGS_CF | EFLAGS_SF |                         \
 		                 EFLAGS_ZF | EFLAGS_PF | EFLAGS_AF),                         \
 		               eflags_addend | emu86_geteflags_test##bwlq(newval));          \
@@ -86,10 +86,14 @@ do_adc##Nbits:                                                                  
 				goto return_unknown_instruction;                                     \
 			oldval = MODRM_GETRMREG##BWLQ();                                         \
 			eflags_addend = 0;                                                       \
+			if (OVERFLOW_SADD((s##Nbits)oldval, (s##Nbits)rhs, (s##Nbits *)&newval)) \
+				eflags_addend |= EFLAGS_OF;                                          \
 			if (OVERFLOW_UADD(oldval, rhs, &newval))                                 \
-				eflags_addend |= EFLAGS_OF | EFLAGS_CF;                              \
+				eflags_addend |= EFLAGS_CF;                                          \
+			if (newval == (u##Nbits)INT##Nbits##_MAX)                                \
+				eflags_addend |= EFLAGS_CF;                                          \
 			if (OVERFLOW_UADD(newval, 1, &newval))                                   \
-				eflags_addend |= EFLAGS_OF | EFLAGS_CF;                              \
+				eflags_addend |= EFLAGS_CF;                                          \
 			MODRM_SETRMREG##BWLQ(newval);                                            \
 		} else) {                                                                    \
 			byte_t *addr = MODRM_MEMADDR();                                          \
@@ -97,10 +101,15 @@ do_adc##Nbits:                                                                  
 			for (;;) {                                                               \
 				oldval = EMU86_MEMREAD##BWLQ(addr);                                  \
 				eflags_addend = 0;                                                   \
+				if (OVERFLOW_SADD((s##Nbits)oldval, (s##Nbits)rhs,                   \
+				                  (s##Nbits *)&newval))                              \
+					eflags_addend |= EFLAGS_OF;                                      \
 				if (OVERFLOW_UADD(oldval, rhs, &newval))                             \
-					eflags_addend |= EFLAGS_OF | EFLAGS_CF;                          \
+					eflags_addend |= EFLAGS_CF;                                      \
+				if (newval == (u##Nbits)INT##Nbits##_MAX)                            \
+					eflags_addend |= EFLAGS_OF;                                      \
 				if (OVERFLOW_UADD(newval, 1, &newval))                               \
-					eflags_addend |= EFLAGS_OF | EFLAGS_CF;                          \
+					eflags_addend |= EFLAGS_CF;                                      \
 				if (EMU86_MEM_ATOMIC_CMPXCH##BWLQ(addr, oldval, newval,              \
 				                                  (op_flags & EMU86_F_LOCK) != 0))   \
 					break;                                                           \
@@ -119,10 +128,15 @@ do_sbb##Nbits:                                                                  
 				goto return_unknown_instruction;                                     \
 			oldval = MODRM_GETRMREG##BWLQ();                                         \
 			eflags_addend = 0;                                                       \
+			if (OVERFLOW_SSUB((s##Nbits)oldval, (s##Nbits)rhs,                       \
+			                  (s##Nbits *)&newval))                                  \
+				eflags_addend |= EFLAGS_OF;                                          \
 			if (OVERFLOW_USUB(oldval, rhs, &newval))                                 \
-				eflags_addend |= EFLAGS_OF | EFLAGS_CF;                              \
+				eflags_addend |= EFLAGS_CF;                                          \
+			if (newval == (u##Nbits)INT##Nbits##_MIN)                                \
+				eflags_addend |= EFLAGS_OF;                                          \
 			if (OVERFLOW_USUB(newval, 1, &newval))                                   \
-				eflags_addend |= EFLAGS_OF | EFLAGS_CF;                              \
+				eflags_addend |= EFLAGS_CF;                                          \
 			MODRM_SETRMREG##BWLQ(newval);                                            \
 		} else) {                                                                    \
 			byte_t *addr = MODRM_MEMADDR();                                          \
@@ -130,10 +144,15 @@ do_sbb##Nbits:                                                                  
 			for (;;) {                                                               \
 				oldval = EMU86_MEMREAD##BWLQ(addr);                                  \
 				eflags_addend = 0;                                                   \
+				if (OVERFLOW_SSUB((s##Nbits)oldval, (s##Nbits)rhs,                   \
+				                  (s##Nbits *)&newval))                              \
+					eflags_addend |= EFLAGS_OF;                                      \
 				if (OVERFLOW_USUB(oldval, rhs, &newval))                             \
-					eflags_addend |= EFLAGS_OF | EFLAGS_CF;                          \
+					eflags_addend |= EFLAGS_CF;                                      \
+				if (newval == (u##Nbits)INT##Nbits##_MIN)                            \
+					eflags_addend |= EFLAGS_OF;                                      \
 				if (OVERFLOW_USUB(newval, 1, &newval))                               \
-					eflags_addend |= EFLAGS_OF | EFLAGS_CF;                          \
+					eflags_addend |= EFLAGS_CF;                                      \
 				if (EMU86_MEM_ATOMIC_CMPXCH##BWLQ(addr, oldval, newval,              \
 				                                  (op_flags & EMU86_F_LOCK) != 0))   \
 					break;                                                           \
@@ -153,13 +172,13 @@ do_sub##Nbits:                                                                  
 		DO_ARITHn(SUB, -, BWLQ, Nbytes, oldval, rhs);                                \
 set_test##Nbits##_before_sub:                                                        \
 		eflags_addend = 0;                                                           \
+		if (OVERFLOW_SSUB((s##Nbits)oldval, (s##Nbits)rhs, (s##Nbits *)&newval))     \
+			eflags_addend |= EFLAGS_OF;                                              \
 		if (OVERFLOW_USUB(oldval, rhs, &newval))                                     \
-			eflags_addend |= EFLAGS_OF | EFLAGS_CF;                                  \
+			eflags_addend |= EFLAGS_CF;                                              \
 set_test##Nbits##_after_sub:                                                         \
 		if (emu86_getflags_AF_sub(oldval, rhs))                                      \
 			eflags_addend |= EFLAGS_AF;                                              \
-		if ((s##Nbits)newval < 0)                                                    \
-			eflags_addend |= EFLAGS_SF;                                              \
 		EMU86_MSKFLAGS(~(EFLAGS_OF | EFLAGS_CF | EFLAGS_SF |                         \
 		                 EFLAGS_ZF | EFLAGS_PF | EFLAGS_AF),                         \
 		               eflags_addend | emu86_geteflags_test##bwlq(newval));          \

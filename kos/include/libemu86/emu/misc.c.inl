@@ -45,7 +45,7 @@ case 0xfe:
 		oldval = EMU86_MEM_ATOMIC_FETCHADD##BWLQ(addr, 1,                         \
 		                                         (op_flags & EMU86_F_LOCK) != 0); \
 	}                                                                             \
-	if (OVERFLOW_UADD(oldval, 1, &newval))                                        \
+	if (OVERFLOW_SADD((s##Nbits)oldval, (s##Nbits)1, (s##Nbits *)&newval))        \
 		eflags_addend |= EFLAGS_OF;                                               \
 	if (emu86_getflags_AF_add(oldval, 1))                                         \
 		eflags_addend |= EFLAGS_AF;                                               \
@@ -67,7 +67,7 @@ case 0xfe:
 		oldval = EMU86_MEM_ATOMIC_FETCHSUB##BWLQ(addr, 1,                         \
 		                                         (op_flags & EMU86_F_LOCK) != 0); \
 	}                                                                             \
-	if (OVERFLOW_USUB(oldval, 1, &newval))                                        \
+	if (OVERFLOW_SSUB((s##Nbits)oldval, (s##Nbits)1, (s##Nbits *)&newval))        \
 		eflags_addend |= EFLAGS_OF;                                               \
 	if (emu86_getflags_AF_sub(oldval, 1))                                         \
 		eflags_addend |= EFLAGS_AF;                                               \

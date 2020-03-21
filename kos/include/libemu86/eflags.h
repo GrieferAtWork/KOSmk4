@@ -85,8 +85,12 @@ __NOTHROW(LIBEMU86_CC emu86_geteflags_PFb)(__uint8_t value) {
 	                                                 __uint##Nbits##_t rhs) { \
 		__uint##Nbits##_t newval;                                             \
 		__uint32_t result = 0;                                                \
+		if (__hybrid_overflow_ssub((__int##Nbits##_t)lhs,                     \
+		                           (__int##Nbits##_t)rhs,                     \
+		                           (__int##Nbits##_t *)&newval))              \
+			result |= EFLAGS_OF;                                              \
 		if (__hybrid_overflow_usub(lhs, rhs, &newval))                        \
-			result |= EFLAGS_OF | EFLAGS_CF;                                  \
+			result |= EFLAGS_CF;                                              \
 		if (emu86_getflags_AF_sub(lhs, rhs))                                  \
 			result |= EFLAGS_AF;                                              \
 		result |= emu86_geteflags_test##bwlq(newval);                         \

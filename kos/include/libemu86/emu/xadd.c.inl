@@ -40,12 +40,12 @@ EMU86_INTELLISENSE_BEGIN(xadd) {
 		oldval = EMU86_MEM_ATOMIC_FETCHADD##BWLQ(addr, rhs,                       \
 		                                         (op_flags & EMU86_F_LOCK) != 0); \
 	}                                                                             \
+	if (OVERFLOW_SADD((s##Nbits)oldval, (s##Nbits)rhs, (s##Nbits *)&newval))      \
+		eflags_addend |= EFLAGS_OF;                                               \
 	if (OVERFLOW_UADD(oldval, rhs, &newval))                                      \
-		eflags_addend |= EFLAGS_OF | EFLAGS_CF;                                   \
+		eflags_addend |= EFLAGS_CF;                                               \
 	if (emu86_getflags_AF_add(oldval, rhs))                                       \
 		eflags_addend |= EFLAGS_AF;                                               \
-	if ((s8)newval < 0)                                                           \
-		eflags_addend |= EFLAGS_SF;                                               \
 	EMU86_MSKFLAGS(~(EFLAGS_OF | EFLAGS_CF | EFLAGS_SF |                          \
 	                 EFLAGS_ZF | EFLAGS_PF | EFLAGS_AF),                          \
 	               eflags_addend | emu86_geteflags_test##bwlq(newval));

@@ -738,14 +738,14 @@ INTERN NONNULL((1)) int CC libvm86_step(vm86_state_t *__restrict self) {
 		if (len < 60)
 			printk(KERN_RAW "%*s", 60 - len, "");
 		printk(KERN_RAW "\t# eax=%I32p, ecx=%I32p, edx=%I32p, ebx=%I32p, "
-		                "esp=%I16p:%I16p, ebp:%I32p, esi:%I16p:%I16p, edi:%I16p:%I16p, "
+		                "esp=%I16p:%I16p, ebp:%I32p, esi:%I16p:%I32p, edi:%I16p:%I32p, "
 		                "eip=%I16p:%I16p, efl=%I16p [",
 		       self->vr_regs.vr_eax, self->vr_regs.vr_ecx,
 		       self->vr_regs.vr_edx, self->vr_regs.vr_ebx,
 		       self->vr_regs.vr_ss, self->vr_regs.vr_sp,
 		       self->vr_regs.vr_ebp,
-		       self->vr_regs.vr_ds, self->vr_regs.vr_si,
-		       self->vr_regs.vr_es, self->vr_regs.vr_di,
+		       self->vr_regs.vr_ds, self->vr_regs.vr_esi,
+		       self->vr_regs.vr_es, self->vr_regs.vr_edi,
 		       self->vr_regs.vr_cs, self->vr_regs.vr_ip,
 		       self->vr_regs.vr_flags);
 		if (self->vr_regs.vr_flags & CF)
