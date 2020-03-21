@@ -157,7 +157,7 @@ DECL_END
 #define EMU86_GETREGB(regno, ...)        REG8(regno)
 #define EMU86_SETREGB(regno, value, ...) REG8(regno) = (u8)(value)
 #define EMU86_GETREGW(regno)             REG16(regno)
-#define EMU86_SETREGW(regno, value)      REG16(regno) = (u16)(value)
+#define EMU86_SETREGW(regno, value)      REG32(regno) = (u32)(u16)(value) /* 16-bit register writes clear the upper 16 bits */
 #define EMU86_GETREGL(regno)             REG32(regno)
 #define EMU86_SETREGL(regno, value)      REG32(regno) = (u32)(value)
 #define EMU86_GETIP()           self->vr_regs.vr_ip
@@ -229,6 +229,10 @@ DECL_END
 #define EMU86_SETPSI(v, ...)    self->vr_regs.vr_si = (u16)(v)
 #define EMU86_SETPDI(v, ...)    self->vr_regs.vr_di = (u16)(v)
 
+#define EMU86_EMULATE_SETUP              \
+	if (self->vr_regs.vr_cs == 0xffff && \
+	    self->vr_regs.vr_ip == 0xffff)   \
+		return VM86_STOPPED;
 #define EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION(faultaddr, opcode, op_flags) \
 	return libvm86_intr(self, 0x6) /* Invalid Opcode */
 #define EMU86_EMULATE_THROW_BOUNDERR(bound_idx, bound_min, bound_max) \
@@ -254,7 +258,13 @@ DECL_END
 
 
 DECL_BEGIN
-#define EMU86_EMULATE_SETUP libvm86_loginstr(self)
+#undef EMU86_EMULATE_SETUP
+#define EMU86_EMULATE_SETUP              \
+	if (self->vr_regs.vr_cs == 0xffff && \
+	    self->vr_regs.vr_ip == 0xffff)   \
+		return VM86_STOPPED;             \
+	libvm86_loginstr(self)
+
 PRIVATE NONNULL((1)) void CC
 libvm86_loginstr(vm86_state_t *__restrict self) {
 	struct disassembler da;
