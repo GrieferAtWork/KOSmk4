@@ -205,6 +205,7 @@ case 0xcf: {
 	EMU86_SETFLAGS(new_eflags);
 	EMU86_SETCS(new_cs);
 	EMU86_SETIPREG((u32)new_ip);
+	EMU86_SETSTACKPTR(sp);
 	goto done_dont_set_pc;
 #endif /* CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT */
 #undef USERIRET_EFLAGS_MASK
