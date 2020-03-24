@@ -21,44 +21,35 @@
 #include "../emulate.c.inl"
 #endif /* __INTELLISENSE__ */
 
-EMU86_INTELLISENSE_BEGIN(andn) {
+EMU86_INTELLISENSE_BEGIN(rorx) {
 
-
-case 0x0f38f2: {
-	/* VEX.LZ.0F38.W0 F2 /r     ANDN r32a, r32b, r/m32     Bitwise AND of inverted r32b with r/m32, store result in r32a.
-	 * VEX.LZ.0F38.W1 F2 /r     ANDN r64a, r64b, r/m64     Bitwise AND of inverted r64b with r/m64, store result in r64a. */
-	EMU86_UREG_TYPE result;
-	u32 eflags_addend = 0;
+case 0x0f3af0: {
+	/* VEX.LZ.F2.0F3A.W0 F0 /r ib     RORX r32, r/m32, imm8     Rotate 32-bit r/m32 right imm8 times without affecting arithmetic flags.
+	 * VEX.LZ.F2.0F3A.W1 F0 /r ib     RORX r64, r/m64, imm8     Rotate 64-bit r/m64 right imm8 times without affecting arithmetic flags. */
+	u8 num_bits;
 	if ((op_flags & (EMU86_F_HASVEX | EMU86_F_VEX_LL_M | EMU86_F_LOCK)) != EMU86_F_HASVEX)
 		goto return_unknown_instruction;
 	MODRM_DECODE();
+	num_bits = *(u8 *)pc;
+	pc += 1;
 #if CONFIG_LIBEMU86_WANT_64BIT
 	if (op_flags & EMU86_F_VEX_W) {
-		u64 lhs, rhs;
-		lhs = VEX_GETREGQ();
-		rhs = MODRM_GETRMQ();
-		result = ~lhs & rhs;
-		if ((s64)(u64)result < 0)
-			eflags_addend |= EFLAGS_SF;
-		MODRM_SETREGQ(result);
+		u64 value;
+		value = MODRM_GETRMQ();
+		num_bits %= 64;
+		value = __hybrid_ror64(value, num_bits);
+		MODRM_SETREGQ(value);
 	} else
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
 	{
-		u32 lhs, rhs;
-		lhs = VEX_GETREGL();
-		rhs = MODRM_GETRML();
-		result = ~lhs & rhs;
-		if ((s32)(u32)result < 0)
-			eflags_addend |= EFLAGS_SF;
-		MODRM_SETREGL(result);
+		u32 value;
+		value = MODRM_GETRML();
+		num_bits %= 32;
+		value = __hybrid_ror32(value, num_bits);
+		MODRM_SETREGL(value);
 	}
-	if (result == 0)
-		eflags_addend |= EFLAGS_ZF;
-	EMU86_MSKFLAGS(~(EFLAGS_SF | EFLAGS_ZF),
-	               eflags_addend);
+	goto done;
 }
-
-
 
 }
 EMU86_INTELLISENSE_END

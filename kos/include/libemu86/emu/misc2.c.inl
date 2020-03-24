@@ -30,7 +30,7 @@ case 0x0fae: {
 	MODRM_DECODE();
 	if (op_flags & EMU86_F_f3) {
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
-#if CONFIG_LIBEMU86_WANT_64BIT || EMU86_EMULATE_CONFIG_FSGSBASE_32BIT
+#if CONFIG_LIBEMU86_WANT_64BIT || EMU86_EMULATE_CONFIG_FSGSBASE_32BIT || EMU86_EMULATE_CONFIG_CHECKERROR
 		/* Need a register operand */
 		if (!EMU86_MODRM_ISREG(modrm.mi_type))
 			goto return_expected_register_modrm_rmreg;
@@ -102,7 +102,7 @@ case 0x0fae: {
 		default:
 			break;
 		}
-#endif /* CONFIG_LIBEMU86_WANT_64BIT || EMU86_EMULATE_CONFIG_FSGSBASE_32BIT */
+#endif /* CONFIG_LIBEMU86_WANT_64BIT || EMU86_EMULATE_CONFIG_FSGSBASE_32BIT || EMU86_EMULATE_CONFIG_CHECKERROR */
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 	} else {
 		switch (modrm.mi_reg) {
@@ -159,6 +159,7 @@ case 0x0fae: {
 #endif /* EMU86_EMULATE_CLFLUSH */
 				}
 #endif /* EMU86_EMULATE_CLFLUSHOPT || EMU86_EMULATE_CLFLUSH */
+				goto done;
 			} else {
 				static int fence_word = 0;
 do_mfence:
@@ -167,8 +168,9 @@ do_mfence:
 #define NEED_return_unknown_instruction_rmreg
 				/* NP 0F AE F8     SFENCE     Serializes store operations. */
 				__hybrid_atomic_xch(fence_word, 1, __ATOMIC_SEQ_CST);
+				goto done;
 			}
-			goto done;
+			break;
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 
 		default:

@@ -107,7 +107,9 @@ __DECL_BEGIN
 /* Enable permission/usage/register checks for instructions that could 
  * only ever result in `EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION()'
  * Without this, such instructions may instead be handled as though they
- * were unknown. */
+ * were unknown.
+ * WARNING: Some instructions may still not be checked unless the option
+ *          `EMU86_EMULATE_CONFIG_ONLY_MEMORY' is defined to `0' */
 #ifndef EMU86_EMULATE_CONFIG_CHECKERROR
 #define EMU86_EMULATE_CONFIG_CHECKERROR 0
 #endif /* !EMU86_EMULATE_CONFIG_CHECKERROR */
@@ -2255,6 +2257,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #include "emu/pusha-popa.c.inl"
 #include "emu/pushf-popf.c.inl"
 #include "emu/ret.c.inl"
+#include "emu/rorx.c.inl"
 #include "emu/sahf-lahf.c.inl"
 #include "emu/salc.c.inl"
 #include "emu/scas.c.inl"
@@ -2298,7 +2301,6 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 			/* TODO: sarx */
 			/* TODO: shrx */
 			/* TODO: movdir64b */
-			/* TODO: rorx */
 
 			default:
 				goto return_unknown_instruction;
