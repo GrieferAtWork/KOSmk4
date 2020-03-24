@@ -2230,7 +2230,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #include "emu/cmpxchgb.c.inl"
 #include "emu/cpuid.c.inl"
 #include "emu/enter.c.inl"
-#include "emu/flush.c.inl" /* TODO: Missing instructions in here */
+#include "emu/flush.c.inl"
 #include "emu/hlt.c.inl"
 #include "emu/incdec.c.inl"
 #include "emu/io.c.inl"
@@ -2248,6 +2248,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #include "emu/misc.c.inl"
 #include "emu/misc2.c.inl"
 #include "emu/mov.c.inl"
+#include "emu/movbe.c.inl"
 #include "emu/movs.c.inl"
 #include "emu/nop.c.inl"
 #include "emu/pmode.c.inl"
@@ -2285,7 +2286,6 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 			/* XXX: rdpid      (if only for verbose exception messages?) */
 
 			/* TODO: crc32 */
-			/* TODO: movbe */
 			/* TODO: andn */
 			/* TODO: blsr */
 			/* TODO: blsmsk */

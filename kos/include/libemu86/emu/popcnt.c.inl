@@ -1,0 +1,80 @@
+/* Copyright (c) 2019-2020 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifdef __INTELLISENSE__
+#include "../emulate.c.inl"
+#endif /* __INTELLISENSE__ */
+
+EMU86_INTELLISENSE_BEGIN(popcnt) {
+
+case 0x0fb8: {
+	/* F3       0F B8 /r     POPCNT r16, r/m16     POPCNT on r/m16
+	 * F3       0F B8 /r     POPCNT r32, r/m32     POPCNT on r/m32
+	 * F3 REX.W 0F B8 /r     POPCNT r64, r/m64     POPCNT on r/m64 */
+	unsigned int result;
+	if unlikely(!(op_flags & EMU86_F_f3))
+		goto return_unknown_instruction;
+#define NEED_return_unknown_instruction
+	MODRM_DECODE();
+	EMU86_REQUIRE_NO_LOCK();
+#define NEED_return_unexpected_lock
+#ifdef LIBEMU86_DONT_USE_HYBRID_BIT
+	{
+		EMU86_UREG_TYPE word;
+		IF_64BIT(if (IS_64BIT()) {
+			word = MODRM_GETRMQ();
+		} else) if (!IS_16BIT()) {
+			word = MODRM_GETRML();
+		} else {
+			word = MODRM_GETRMW();
+		}
+		result = 0;
+		for (; word; word >>= 1) {
+			if (word & 1)
+				++result;
+		}
+	}
+#else /* LIBEMU86_DONT_USE_HYBRID_BIT */
+	IF_64BIT(if (IS_64BIT()) {
+		u64 word;
+		word   = MODRM_GETRMQ();
+		result = __hybrid_popcount64(word);
+	} else) if (!IS_16BIT()) {
+		u32 word;
+		word   = MODRM_GETRML();
+		result = __hybrid_popcount32(word);
+	} else {
+		u16 word;
+		word   = MODRM_GETRMW();
+		result = __hybrid_popcount16(word);
+	}
+#endif /* !LIBEMU86_DONT_USE_HYBRID_BIT */
+#if CONFIG_LIBEMU86_WANT_64BIT
+	MODRM_SETREGQ(result);
+#else /* CONFIG_LIBEMU86_WANT_64BIT */
+	MODRM_SETREGL(result);
+#endif /* !CONFIG_LIBEMU86_WANT_64BIT */
+	EMU86_MSKFLAGS(~(EFLAGS_OF | EFLAGS_SF | EFLAGS_ZF |
+	                 EFLAGS_AF | EFLAGS_CF | EFLAGS_PF),
+	               result == 0 ? EFLAGS_ZF : 0);
+	goto done;
+}
+
+}
+EMU86_INTELLISENSE_END
