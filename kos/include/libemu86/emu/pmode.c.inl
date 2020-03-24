@@ -52,7 +52,7 @@ case 0x0f00: {
 	case 0: {
 		/* REX.W + 0F 00 /0     SLDT r/m16     Stores segment selector from LDTR in r64/m16. */
 		u16 ldtr;
-#if EMU86_EMULATE_CHECKUSER
+#if EMU86_EMULATE_CONFIG_CHECKUSER
 		if (EMU86_ISUSER() && EMU86_GETCR4_UMIP()) {
 #ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
 			EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV,
@@ -62,7 +62,7 @@ case 0x0f00: {
 			goto return_privileged_instruction_rmreg;
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 		}
-#endif /* EMU86_EMULATE_CHECKUSER */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
 		ldtr = EMU86_EMULATE_SLDT();
 		MODRM_SETRMW(ldtr);
 		goto done;
@@ -73,7 +73,7 @@ case 0x0f00: {
 	case 1: {
 		/* 0F 00 /1     STR r/m16     Stores segment selector from TR in r/m16. */
 		u16 tr;
-#if EMU86_EMULATE_CHECKUSER
+#if EMU86_EMULATE_CONFIG_CHECKUSER
 		if (EMU86_ISUSER() && EMU86_GETCR4_UMIP()) {
 #ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
 			EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV,
@@ -83,7 +83,7 @@ case 0x0f00: {
 			goto return_privileged_instruction_rmreg;
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 		}
-#endif /* EMU86_EMULATE_CHECKUSER */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
 		tr = EMU86_EMULATE_STR();
 		MODRM_SETRMW(tr);
 		goto done;
@@ -95,7 +95,7 @@ case 0x0f00: {
 		/* 0F 00 /2     LLDT r/m16     Load segment selector r/m16 into LDTR. */
 		u16 ldtr;
 		ldtr = MODRM_GETRMW();
-#if EMU86_EMULATE_CHECKUSER
+#if EMU86_EMULATE_CONFIG_CHECKUSER
 		if (EMU86_ISUSER()) {
 #ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
 			EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV,
@@ -105,7 +105,7 @@ case 0x0f00: {
 			goto return_privileged_instruction_rmreg;
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 		}
-#endif /* EMU86_EMULATE_CHECKUSER */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
 		EMU86_EMULATE_LLDT(ldtr);
 		goto done;
 	}
@@ -116,7 +116,7 @@ case 0x0f00: {
 		/* 0F 00 /3     LTR r/m16     Load r/m16 into task register. */
 		u16 tr;
 		tr = MODRM_GETRMW();
-#if EMU86_EMULATE_CHECKUSER
+#if EMU86_EMULATE_CONFIG_CHECKUSER
 		if (EMU86_ISUSER()) {
 #ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
 			EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV,
@@ -126,7 +126,7 @@ case 0x0f00: {
 			goto return_privileged_instruction_rmreg;
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 		}
-#endif /* EMU86_EMULATE_CHECKUSER */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
 		EMU86_EMULATE_LTR(tr);
 		goto done;
 	}
@@ -194,12 +194,12 @@ case 0x0f01: {
 		 * 0F 01 /0     SGDT m16&64     Store GDTR to m. */
 		u16 limit;
 		EMU86_UREG_TYPE base;
-#ifndef EMU86_EMULATE_ONLY_MEMORY
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 #define NEED_return_expected_memory_modrm_rmreg
 		if (!EMU86_MODRM_ISMEM(modrm.mi_type))
 			goto return_expected_memory_modrm_rmreg;
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
-#if EMU86_EMULATE_CHECKUSER
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
+#if EMU86_EMULATE_CONFIG_CHECKUSER
 		if (EMU86_ISUSER() && EMU86_GETCR4_UMIP()) {
 #ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
 			EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV,
@@ -212,7 +212,7 @@ case 0x0f01: {
 			goto return_privileged_instruction_rmreg;
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 		}
-#endif /* EMU86_EMULATE_CHECKUSER */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
 		EMU86_EMULATE_SGDT(limit, base);
 		IF_64BIT(if (EMU86_F_IS64(op_flags)) {
 			EMU86_WRITE_USER_MEMORY(rmaddr, 10);
@@ -233,12 +233,12 @@ case 0x0f01: {
 		 * 0F 01 /1     SIDT m16&64     Store IDTR to m. */
 		u16 limit;
 		EMU86_UREG_TYPE base;
-#ifndef EMU86_EMULATE_ONLY_MEMORY
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 #define NEED_return_expected_memory_modrm_rmreg
 		if (!EMU86_MODRM_ISMEM(modrm.mi_type))
 			goto return_expected_memory_modrm_rmreg;
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
-#if EMU86_EMULATE_CHECKUSER
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
+#if EMU86_EMULATE_CONFIG_CHECKUSER
 		if (EMU86_ISUSER() && EMU86_GETCR4_UMIP()) {
 #ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
 			EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV,
@@ -251,7 +251,7 @@ case 0x0f01: {
 			goto return_privileged_instruction_rmreg;
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 		}
-#endif /* EMU86_EMULATE_CHECKUSER */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
 		EMU86_EMULATE_SIDT(limit, base);
 		IF_64BIT(if (EMU86_F_IS64(op_flags)) {
 			EMU86_WRITE_USER_MEMORY(rmaddr, 10);
@@ -273,11 +273,11 @@ case 0x0f01: {
 		 * 0F 01 /2     LGDT m16&64     Load m into GDTR. */
 		u16 limit;
 		EMU86_UREG_TYPE base;
-#ifndef EMU86_EMULATE_ONLY_MEMORY
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 #define NEED_return_expected_memory_modrm_rmreg
 		if (!EMU86_MODRM_ISMEM(modrm.mi_type))
 			goto return_expected_memory_modrm_rmreg;
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 		IF_64BIT(if (EMU86_F_IS64(op_flags)) {
 			EMU86_READ_USER_MEMORY(rmaddr, 10);
 			limit = EMU86_MEMREADW(rmaddr + 0);
@@ -287,7 +287,7 @@ case 0x0f01: {
 			limit = EMU86_MEMREADW(rmaddr + 0);
 			base  = EMU86_MEMREADL(rmaddr + 2);
 		}
-#if EMU86_EMULATE_CHECKUSER
+#if EMU86_EMULATE_CONFIG_CHECKUSER
 		if (EMU86_ISUSER()) {
 #ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
 			EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV,
@@ -300,7 +300,7 @@ case 0x0f01: {
 			goto return_privileged_instruction_rmreg;
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 		}
-#endif /* EMU86_EMULATE_CHECKUSER */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
 		EMU86_EMULATE_LGDT(limit, base);
 		goto done;
 	}
@@ -313,11 +313,11 @@ case 0x0f01: {
 		 * 0F 01 /3     LIDT m16&64     Load m into IDTR. */
 		u16 limit;
 		EMU86_UREG_TYPE base;
-#ifndef EMU86_EMULATE_ONLY_MEMORY
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 #define NEED_return_expected_memory_modrm_rmreg
 		if (!EMU86_MODRM_ISMEM(modrm.mi_type))
 			goto return_expected_memory_modrm_rmreg;
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 		IF_64BIT(if (EMU86_F_IS64(op_flags)) {
 			EMU86_READ_USER_MEMORY(rmaddr, 10);
 			limit = EMU86_MEMREADW(rmaddr + 0);
@@ -327,7 +327,7 @@ case 0x0f01: {
 			limit = EMU86_MEMREADW(rmaddr + 0);
 			base  = EMU86_MEMREADL(rmaddr + 2);
 		}
-#if EMU86_EMULATE_CHECKUSER
+#if EMU86_EMULATE_CONFIG_CHECKUSER
 		if (EMU86_ISUSER()) {
 #ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
 			EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV,
@@ -340,7 +340,7 @@ case 0x0f01: {
 			goto return_privileged_instruction_rmreg;
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 		}
-#endif /* EMU86_EMULATE_CHECKUSER */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
 		EMU86_EMULATE_LIDT(limit, base);
 		goto done;
 	}
@@ -350,7 +350,7 @@ case 0x0f01: {
 	case 4: {
 		/* 0F 01 /4     SMSW r/m16     Store machine status word to r/m16. */
 		u16 msw;
-#if EMU86_EMULATE_CHECKUSER
+#if EMU86_EMULATE_CONFIG_CHECKUSER
 		if (EMU86_ISUSER() && EMU86_GETCR4_UMIP()) {
 #ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
 			EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV,
@@ -360,7 +360,7 @@ case 0x0f01: {
 			goto return_privileged_instruction_rmreg;
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 		}
-#endif /* EMU86_EMULATE_CHECKUSER */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
 		msw = EMU86_EMULATE_SMSW();
 		MODRM_SETRMW(msw);
 		goto done;
@@ -372,7 +372,7 @@ case 0x0f01: {
 		/* 0F 01 /6     LMSW r/m16     Loads r/m16 in machine status word of CR0. */
 		u16 msw;
 		msw = MODRM_GETRMW();
-#if EMU86_EMULATE_CHECKUSER
+#if EMU86_EMULATE_CONFIG_CHECKUSER
 		if (EMU86_ISUSER()) {
 #ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
 			EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV,
@@ -382,7 +382,7 @@ case 0x0f01: {
 			goto return_privileged_instruction_rmreg;
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 		}
-#endif /* EMU86_EMULATE_CHECKUSER */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
 		EMU86_EMULATE_LMSW(msw);
 		goto done;
 	}
@@ -392,16 +392,16 @@ case 0x0f01: {
 	case 7: {
 		/* 0F 01 /7     INVLPG m      Invalidate TLB entries for page containing m. */
 		byte_t *addr;
-#ifndef EMU86_EMULATE_ONLY_MEMORY
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 #define NEED_return_expected_memory_modrm_rmreg
 		if (!EMU86_MODRM_ISMEM(modrm.mi_type))
 			goto return_expected_memory_modrm_rmreg;
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
-#if EMU86_EMULATE_CHECKUSER
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
+#if EMU86_EMULATE_CONFIG_CHECKUSER
 #define NEED_return_privileged_instruction_rmreg
 		if (EMU86_ISUSER())
 			goto return_privileged_instruction_rmreg;
-#endif /* EMU86_EMULATE_CHECKUSER */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
 		addr = MODRM_MEMADDR();
 		EMU86_EMULATE_INVLPG(addr);
 		goto done;

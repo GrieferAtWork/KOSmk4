@@ -84,6 +84,33 @@
 
 __DECL_BEGIN
 
+/* Define to 1 to only emulate instructions that access memory. (used to implement VIO) */
+#ifndef EMU86_EMULATE_CONFIG_ONLY_MEMORY
+#define EMU86_EMULATE_CONFIG_ONLY_MEMORY 0
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
+
+/* Define to non-zero if user access checks should be performed. */
+#ifndef EMU86_EMULATE_CONFIG_CHECKUSER
+#if defined(__KERNEL__) || defined(__INTELLISENSE__)
+#define EMU86_EMULATE_CONFIG_CHECKUSER 1
+#else /* __KERNEL__ */
+#define EMU86_EMULATE_CONFIG_CHECKUSER 0
+#endif /* !__KERNEL__ */
+#endif /* !EMU86_EMULATE_CONFIG_CHECKUSER */
+
+/* Enable support for rdfsbase/rdgsbase/wrfsbase/wrgsbase
+ * in 32-bit and 16-bit modes (with the instructions using
+ * the 32-bit registers in both execution modi)
+ * s.a. `EMU86_SETFSBASE()' and `EMU86_SETGSBASE()' */
+#ifndef EMU86_EMULATE_CONFIG_FSGSBASE_32BIT
+#ifdef __KOS__
+#define EMU86_EMULATE_CONFIG_FSGSBASE_32BIT 1
+#else /* __KOS__ */
+#define EMU86_EMULATE_CONFIG_FSGSBASE_32BIT 0
+#endif /* !__KOS__ */
+#endif /* !EMU86_EMULATE_CONFIG_FSGSBASE_32BIT */
+
+
 /* Declaration visibility of `emu86_emulate()' */
 #ifndef EMU86_EMULATE_DECL
 #define EMU86_EMULATE_DECL __PRIVATE
@@ -129,15 +156,6 @@ __DECL_BEGIN
 #ifndef EMU86_EMULATE_ARGS
 #define EMU86_EMULATE_ARGS          struct icpustate *__restrict _state
 #endif /* !EMU86_EMULATE_ARGS */
-
-/* Define to non-zero if user access checks should be performed. */
-#ifndef EMU86_EMULATE_CHECKUSER
-#if defined(__KERNEL__) || defined(__INTELLISENSE__)
-#define EMU86_EMULATE_CHECKUSER 1
-#else /* __KERNEL__ */
-#define EMU86_EMULATE_CHECKUSER 0
-#endif /* !__KERNEL__ */
-#endif /* !EMU86_EMULATE_CHECKUSER */
 
 /* Hint at a spin-loop that may not necessarily break on its own.
  * This is placed in `do { READ(); } while (!ATOMIC_CMPXCH());'
@@ -262,7 +280,7 @@ __DECL_BEGIN
 /* #define EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION_RMREG() ... */
 
 /* Throw an exception indicative of a privileged instruction
- * Only used when `EMU86_EMULATE_CHECKUSER' is enabled. */
+ * Only used when `EMU86_EMULATE_CONFIG_CHECKUSER' is enabled. */
 /* #define EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION()       ... */
 /* #define EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION_RMREG() ... */
 
@@ -298,6 +316,7 @@ __DECL_BEGIN
 
 
 
+
 /* An optional, special return expression to be evaluated following
  * an `sti' instruction that turned on EFLAGS.IF (may be used to
  * implement special handling in order to delay interrupt checks
@@ -314,13 +333,13 @@ __DECL_BEGIN
 /* An optional, special return expression to be evaluated following
  * an `hlt' instruction (with #IF=0 or #IF=1 respectively)
  * When not defined, `hlt' will simply return normally.
- * See also: `EMU86_EMULATE_RETURN_AFTER_HLT_VM86' when vm86 is supported. */
+ * See also: `EMU86_EMULATE_RETURN_AFTER_HLT_VM86()' when vm86 is supported. */
 /* #define EMU86_EMULATE_RETURN_AFTER_HLT_IF0() ... */
 /* #define EMU86_EMULATE_RETURN_AFTER_HLT_IF1() ... */
 
 
 
-/* Define this (and don't enable `EMU86_EMULATE_ONLY_MEMORY')
+/* Define this (and don't enable `EMU86_EMULATE_CONFIG_ONLY_MEMORY')
  * to enable emulation of `int', `int3', `into' and `int1' */
 /* #define EMU86_EMULATE_RETURN_AFTER_INT(intno) ... */
 
@@ -347,8 +366,8 @@ __DECL_BEGIN
  *   how == E_ILLEGAL_INSTRUCTION_REGISTER_WRINV:   return_unsupported_instruction
  *   how == E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD:   return_unsupported_instruction
  *   how == E_ILLEGAL_INSTRUCTION_REGISTER_WRNPSEG: return_unsupported_instruction
- *   how == E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV:   return_privileged_instruction  (only with `EMU86_EMULATE_CHECKUSER')
- *   how == E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV:   return_privileged_instruction  (only with `EMU86_EMULATE_CHECKUSER')
+ *   how == E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV:   return_privileged_instruction  (only with `EMU86_EMULATE_CONFIG_CHECKUSER')
+ *   how == E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV:   return_privileged_instruction  (only with `EMU86_EMULATE_CONFIG_CHECKUSER')
  * @param: how:    How was the register accessed (One of `E_ILLEGAL_INSTRUCTION_REGISTER_*')
  * @param: regno:  The accessed register index (one of `X86_REGISTER_*')
  * @param: regval: The value that was attempted to be assigned (only for write operations)
@@ -406,9 +425,6 @@ __DECL_BEGIN
 #endif /* !CONFIG_LIBEMU86_NEED_ARCHMODE */
 #endif /* !EMU86_EMULATE_GETOPFLAGS */
 
-/* Define to only emulate instructions that access memory. (used to implement VIO) */
-/* #define EMU86_EMULATE_ONLY_MEMORY 1 */
-
 /* Translate a memory address to its real counterpart.
  * This macro is invoked prior to any kind of memory access made
  * by hosted code, and can be used to implement software paging,
@@ -444,7 +460,7 @@ __DECL_BEGIN
 #define EMU86_EMULATE_VM86_SETIF(v) (void)0
 #endif /* !EMU86_EMULATE_VM86_SETIF */
 #ifndef EMU86_EMULATE_RETURN_AFTER_HLT_VM86
-#define EMU86_EMULATE_RETURN_AFTER_HLT_VM86 goto done
+#define EMU86_EMULATE_RETURN_AFTER_HLT_VM86() goto done
 #endif /* !EMU86_EMULATE_RETURN_AFTER_HLT_VM86 */
 #endif /* EMU86_EMULATE_VM86 */
 
@@ -526,6 +542,14 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_emulate_l
 	return ok;
 }
 #endif /* !EMU86_EMULATE_LSL && EMU86_WANT_EMULATE_LSL */
+#if defined(__KOS__) || defined(__x86_64__)
+#ifndef EMU86_SETFSBASE
+#define EMU86_SETFSBASE(v) __wrfsbase((void *)(uintptr_t)(v))
+#endif /* !EMU86_SETFSBASE */
+#ifndef EMU86_SETGSBASE
+#define EMU86_SETGSBASE(v) __wrgsbase((void *)(uintptr_t)(v))
+#endif /* !EMU86_SETGSBASE */
+#endif /* __KOS__ || __x86_64__ */
 #endif /* CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_64BIT */
 #endif /* __x86_64__ || __i386__ */
 
@@ -538,7 +562,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_emulate_l
  *   - sidt
  *   - smsw
  */
-#if EMU86_EMULATE_CHECKUSER && !defined(EMU86_GETCR4_UMIP)
+#if EMU86_EMULATE_CONFIG_CHECKUSER && !defined(EMU86_GETCR4_UMIP)
 #if defined(__KERNEL__) && (defined(__x86_64__) || defined(__i386__))
 #define EMU86_GETCR4_UMIP() (__rdcr4() & CR4_UMIP)
 #endif /* __KERNEL__ && (__x86_64__ || __i386__) */
@@ -546,7 +570,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_emulate_l
 #define EMU86_GETCR4_UMIP_IS_ZERO 1
 #define EMU86_GETCR4_UMIP() 0
 #endif /* !EMU86_GETCR4_UMIP */
-#endif /* EMU86_EMULATE_CHECKUSER && !EMU86_GETCR4_UMIP */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER && !EMU86_GETCR4_UMIP */
 
 
 
@@ -870,7 +894,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_emulate_l
 #define EMU86_EMULATE_POP(old_sp, num_bytes) (void)0
 #endif /* !EMU86_EMULATE_POP */
 
-/* Verify user access to a specified I/O port range. (requires `EMU86_EMULATE_CHECKUSER') */
+/* Verify user access to a specified I/O port range. (requires `EMU86_EMULATE_CONFIG_CHECKUSER') */
 #ifndef EMU86_VALIDATE_IO
 #define EMU86_VALIDATE_IO(portno, num_ports) (void)0
 #endif /* !EMU86_VALIDATE_IO */
@@ -1468,15 +1492,15 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_
                                                                                       struct emu86_modrm const *__restrict modrm,
                                                                                       emu86_opflags_t op_flags) {
 	byte_t *addr;
-#ifndef EMU86_EMULATE_ONLY_MEMORY
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 	if (EMU86_MODRM_ISREG(modrm->mi_type))
 		return EMU86_GETREGB(modrm->mi_rm, op_flags);
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 	addr = EMU86_MODRM_MEMADDR(modrm, op_flags);
-#if EMU86_EMULATE_CHECKUSER
+#if EMU86_EMULATE_CONFIG_CHECKUSER
 	if (EMU86_ISUSER())
 		EMU86_VALIDATE_READABLE(addr, 1);
-#endif /* EMU86_EMULATE_CHECKUSER */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
 	return EMU86_MEMREADB(addr);
 }
 #endif /* !EMU86_GETMODRM_RMB */
@@ -1488,18 +1512,18 @@ EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED EMU86_EMULATE_HELPER_ATTR void
 EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_rmb))(EMU86_EMULATE_HELPER_ARGS_
                                                                                       struct emu86_modrm const *__restrict modrm,
                                                                                       u8 value, emu86_opflags_t op_flags) {
-#ifndef EMU86_EMULATE_ONLY_MEMORY
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 	if (EMU86_MODRM_ISREG(modrm->mi_type)) {
 		EMU86_SETREGB(modrm->mi_rm, value, op_flags);
 	} else
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 	{
 		byte_t *addr;
 		addr = EMU86_MODRM_MEMADDR(modrm, op_flags);
-#if EMU86_EMULATE_CHECKUSER
+#if EMU86_EMULATE_CONFIG_CHECKUSER
 		if (EMU86_ISUSER())
 			EMU86_VALIDATE_WRITABLE(addr, 1);
-#endif /* EMU86_EMULATE_CHECKUSER */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
 		EMU86_MEMWRITEB(addr, value);
 	}
 }
@@ -1513,15 +1537,15 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_
                                                                                       struct emu86_modrm const *__restrict modrm,
                                                                                       emu86_opflags_t op_flags) {
 	byte_t *addr;
-#ifndef EMU86_EMULATE_ONLY_MEMORY
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 	if (EMU86_MODRM_ISREG(modrm->mi_type))
 		return EMU86_GETREGW(modrm->mi_rm);
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 	addr = EMU86_MODRM_MEMADDR(modrm, op_flags);
-#if EMU86_EMULATE_CHECKUSER
+#if EMU86_EMULATE_CONFIG_CHECKUSER
 	if (EMU86_ISUSER())
 		EMU86_VALIDATE_READABLE(addr, 2);
-#endif /* EMU86_EMULATE_CHECKUSER */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
 	return EMU86_MEMREADW(addr);
 }
 #endif /* !EMU86_GETMODRM_RMW */
@@ -1533,18 +1557,18 @@ EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED EMU86_EMULATE_HELPER_ATTR void
 EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_rmw))(EMU86_EMULATE_HELPER_ARGS_
                                                                                       struct emu86_modrm const *__restrict modrm,
                                                                                       u16 value, emu86_opflags_t op_flags) {
-#ifndef EMU86_EMULATE_ONLY_MEMORY
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 	if (EMU86_MODRM_ISREG(modrm->mi_type)) {
 		EMU86_SETREGW(modrm->mi_rm, value);
 	} else
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 	{
 		byte_t *addr;
 		addr = EMU86_MODRM_MEMADDR(modrm, op_flags);
-#if EMU86_EMULATE_CHECKUSER
+#if EMU86_EMULATE_CONFIG_CHECKUSER
 		if (EMU86_ISUSER())
 			EMU86_VALIDATE_WRITABLE(addr, 2);
-#endif /* EMU86_EMULATE_CHECKUSER */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
 		EMU86_MEMWRITEW(addr, value);
 	}
 }
@@ -1558,15 +1582,15 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_
                                                                                       struct emu86_modrm const *__restrict modrm,
                                                                                       emu86_opflags_t op_flags) {
 	byte_t *addr;
-#ifndef EMU86_EMULATE_ONLY_MEMORY
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 	if (EMU86_MODRM_ISREG(modrm->mi_type))
 		return EMU86_GETREGL(modrm->mi_rm);
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 	addr = EMU86_MODRM_MEMADDR(modrm, op_flags);
-#if EMU86_EMULATE_CHECKUSER
+#if EMU86_EMULATE_CONFIG_CHECKUSER
 	if (EMU86_ISUSER())
 		EMU86_VALIDATE_READABLE(addr, 4);
-#endif /* EMU86_EMULATE_CHECKUSER */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
 	return EMU86_MEMREADL(addr);
 }
 #endif /* !EMU86_GETMODRM_RML */
@@ -1578,18 +1602,18 @@ EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED EMU86_EMULATE_HELPER_ATTR void
 EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_rml))(EMU86_EMULATE_HELPER_ARGS_
                                                                                       struct emu86_modrm const *__restrict modrm,
                                                                                       u32 value, emu86_opflags_t op_flags) {
-#ifndef EMU86_EMULATE_ONLY_MEMORY
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 	if (EMU86_MODRM_ISREG(modrm->mi_type)) {
 		EMU86_SETREGL(modrm->mi_rm, value);
 	} else
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 	{
 		byte_t *addr;
 		addr = EMU86_MODRM_MEMADDR(modrm, op_flags);
-#if EMU86_EMULATE_CHECKUSER
+#if EMU86_EMULATE_CONFIG_CHECKUSER
 		if (EMU86_ISUSER())
 			EMU86_VALIDATE_WRITABLE(addr, 4);
-#endif /* EMU86_EMULATE_CHECKUSER */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
 		EMU86_MEMWRITEL(addr, value);
 	}
 }
@@ -1604,15 +1628,15 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_
                                                                                       struct emu86_modrm const *__restrict modrm,
                                                                                       emu86_opflags_t op_flags) {
 	byte_t *addr;
-#ifndef EMU86_EMULATE_ONLY_MEMORY
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 	if (EMU86_MODRM_ISREG(modrm->mi_type))
 		return EMU86_GETREGQ(modrm->mi_rm);
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 	addr = EMU86_MODRM_MEMADDR(modrm, op_flags);
-#if EMU86_EMULATE_CHECKUSER
+#if EMU86_EMULATE_CONFIG_CHECKUSER
 	if (EMU86_ISUSER())
 		EMU86_VALIDATE_READABLE(addr, 8);
-#endif /* EMU86_EMULATE_CHECKUSER */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
 	return EMU86_MEMREADQ(addr);
 }
 #endif /* !EMU86_GETMODRM_RMQ */
@@ -1624,18 +1648,18 @@ EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED EMU86_EMULATE_HELPER_ATTR void
 EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_rmq))(EMU86_EMULATE_HELPER_ARGS_
                                                                                       struct emu86_modrm const *__restrict modrm,
                                                                                       u64 value, emu86_opflags_t op_flags) {
-#ifndef EMU86_EMULATE_ONLY_MEMORY
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 	if (EMU86_MODRM_ISREG(modrm->mi_type)) {
 		EMU86_SETREGQ(modrm->mi_rm, value);
 	} else
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 	{
 		byte_t *addr;
 		addr = EMU86_MODRM_MEMADDR(modrm, op_flags);
-#if EMU86_EMULATE_CHECKUSER
+#if EMU86_EMULATE_CONFIG_CHECKUSER
 		if (EMU86_ISUSER())
 			EMU86_VALIDATE_WRITABLE(addr, 8);
-#endif /* EMU86_EMULATE_CHECKUSER */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
 		EMU86_MEMWRITEQ(addr, value);
 	}
 }
@@ -1645,7 +1669,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_
 
 
 /* Get/Set the R/M operand from a given modrm (when the modrm is known to be memory) */
-#ifndef EMU86_EMULATE_ONLY_MEMORY
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 #ifndef EMU86_GETMODRM_RMMEMB
 #define EMU86_GETMODRM_RMMEMB(modrm, op_flags) \
 	(EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rmmemb)(EMU86_EMULATE_HELPER_PARAM_ modrm, op_flags))
@@ -1655,10 +1679,10 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_
                                                                                          emu86_opflags_t op_flags) {
 	byte_t *addr;
 	addr = EMU86_MODRM_MEMADDR(modrm, op_flags);
-#if EMU86_EMULATE_CHECKUSER
+#if EMU86_EMULATE_CONFIG_CHECKUSER
 	if (EMU86_ISUSER())
 		EMU86_VALIDATE_READABLE(addr, 1);
-#endif /* EMU86_EMULATE_CHECKUSER */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
 	return EMU86_MEMREADB(addr);
 }
 #endif /* !EMU86_GETMODRM_RMMEMB */
@@ -1672,10 +1696,10 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_
                                                                                          u8 value, emu86_opflags_t op_flags) {
 	byte_t *addr;
 	addr = EMU86_MODRM_MEMADDR(modrm, op_flags);
-#if EMU86_EMULATE_CHECKUSER
+#if EMU86_EMULATE_CONFIG_CHECKUSER
 	if (EMU86_ISUSER())
 		EMU86_VALIDATE_WRITABLE(addr, 1);
-#endif /* EMU86_EMULATE_CHECKUSER */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
 	EMU86_MEMWRITEB(addr, value);
 }
 #endif /* !EMU86_SETMODRM_RMMEMB */
@@ -1689,10 +1713,10 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_
                                                                                          emu86_opflags_t op_flags) {
 	byte_t *addr;
 	addr = EMU86_MODRM_MEMADDR(modrm, op_flags);
-#if EMU86_EMULATE_CHECKUSER
+#if EMU86_EMULATE_CONFIG_CHECKUSER
 	if (EMU86_ISUSER())
 		EMU86_VALIDATE_READABLE(addr, 2);
-#endif /* EMU86_EMULATE_CHECKUSER */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
 	return EMU86_MEMREADW(addr);
 }
 #endif /* !EMU86_GETMODRM_RMMEMW */
@@ -1706,10 +1730,10 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_
                                                                                          u16 value, emu86_opflags_t op_flags) {
 	byte_t *addr;
 	addr = EMU86_MODRM_MEMADDR(modrm, op_flags);
-#if EMU86_EMULATE_CHECKUSER
+#if EMU86_EMULATE_CONFIG_CHECKUSER
 	if (EMU86_ISUSER())
 		EMU86_VALIDATE_WRITABLE(addr, 2);
-#endif /* EMU86_EMULATE_CHECKUSER */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
 	EMU86_MEMWRITEW(addr, value);
 }
 #endif /* !EMU86_SETMODRM_RMMEMW */
@@ -1723,10 +1747,10 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_
                                                                                          emu86_opflags_t op_flags) {
 	byte_t *addr;
 	addr = EMU86_MODRM_MEMADDR(modrm, op_flags);
-#if EMU86_EMULATE_CHECKUSER
+#if EMU86_EMULATE_CONFIG_CHECKUSER
 	if (EMU86_ISUSER())
 		EMU86_VALIDATE_READABLE(addr, 4);
-#endif /* EMU86_EMULATE_CHECKUSER */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
 	return EMU86_MEMREADL(addr);
 }
 #endif /* !EMU86_GETMODRM_RMMEML */
@@ -1740,10 +1764,10 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_
                                                                                          u32 value, emu86_opflags_t op_flags) {
 	byte_t *addr;
 	addr = EMU86_MODRM_MEMADDR(modrm, op_flags);
-#if EMU86_EMULATE_CHECKUSER
+#if EMU86_EMULATE_CONFIG_CHECKUSER
 	if (EMU86_ISUSER())
 		EMU86_VALIDATE_WRITABLE(addr, 4);
-#endif /* EMU86_EMULATE_CHECKUSER */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
 	EMU86_MEMWRITEL(addr, value);
 }
 #endif /* !EMU86_SETMODRM_RMMEML */
@@ -1758,10 +1782,10 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_
                                                                                          emu86_opflags_t op_flags) {
 	byte_t *addr;
 	addr = EMU86_MODRM_MEMADDR(modrm, op_flags);
-#if EMU86_EMULATE_CHECKUSER
+#if EMU86_EMULATE_CONFIG_CHECKUSER
 	if (EMU86_ISUSER())
 		EMU86_VALIDATE_READABLE(addr, 8);
-#endif /* EMU86_EMULATE_CHECKUSER */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
 	return EMU86_MEMREADQ(addr);
 }
 #endif /* !EMU86_GETMODRM_RMMEMQ */
@@ -1775,15 +1799,15 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_
                                                                                          u64 value, emu86_opflags_t op_flags) {
 	byte_t *addr;
 	addr = EMU86_MODRM_MEMADDR(modrm, op_flags);
-#if EMU86_EMULATE_CHECKUSER
+#if EMU86_EMULATE_CONFIG_CHECKUSER
 	if (EMU86_ISUSER())
 		EMU86_VALIDATE_WRITABLE(addr, 8);
-#endif /* EMU86_EMULATE_CHECKUSER */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
 	EMU86_MEMWRITEQ(addr, value);
 }
 #endif /* !EMU86_SETMODRM_RMMEMQ */
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 
 
 
@@ -1926,18 +1950,18 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 		if (!EMU86_MODRM_ISMEM(modrm.mi_type))         \
 			goto return_expected_memory_modrm;         \
 	} __WHILE0
-#ifdef EMU86_EMULATE_ONLY_MEMORY
+#if EMU86_EMULATE_CONFIG_ONLY_MEMORY
 #define NEED_return_expected_memory_modrm
 #define MODRM_DECODE() MODRM_DECODE_MEMONLY()
-#else /* EMU86_EMULATE_ONLY_MEMORY */
+#else /* EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 #define MODRM_DECODE() \
 	(pc = emu86_modrm_decode(pc, &modrm, op_flags))
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 
 	/* Invoke all necessary callbacks for read/write access to memory
 	 * who's address has been derived  */
 #ifndef EMU86_READ_USER_MEMORY
-#if EMU86_EMULATE_CHECKUSER
+#if EMU86_EMULATE_CONFIG_CHECKUSER
 #define EMU86_READ_USER_MEMORY(addr, num_bytes)       \
 	do {                                              \
 		if (EMU86_ISUSER())                           \
@@ -1948,19 +1972,19 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 		if (EMU86_ISUSER())                           \
 			EMU86_VALIDATE_WRITABLE(addr, num_bytes); \
 	} __WHILE0
-#else /* EMU86_EMULATE_CHECKUSER */
+#else /* EMU86_EMULATE_CONFIG_CHECKUSER */
 #define EMU86_READ_USER_MEMORY(addr, num_bytes)  (void)0
 #define EMU86_WRITE_USER_MEMORY(addr, num_bytes) (void)0
-#endif /* !EMU86_EMULATE_CHECKUSER */
+#endif /* !EMU86_EMULATE_CONFIG_CHECKUSER */
 #endif /* !EMU86_READ_USER_MEMORY */
 
-#ifdef EMU86_EMULATE_ONLY_MEMORY
+#if EMU86_EMULATE_CONFIG_ONLY_MEMORY
 #define IF_ONLY_MEMORY(...)  __VA_ARGS__
 #define NIF_ONLY_MEMORY(...) /* nothing */
-#else /* EMU86_EMULATE_ONLY_MEMORY */
+#else /* EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 #define IF_ONLY_MEMORY(...)  /* nothing */
 #define NIF_ONLY_MEMORY(...) __VA_ARGS__
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 
 #define MODRM_MEMADDR()           EMU86_MODRM_MEMADDR(&modrm, op_flags)
 #define MODRM_MEMADDR_NOSEGBASE() EMU86_MODRM_MEMADDR_NOSEGBASE(&modrm, op_flags)
@@ -1975,7 +1999,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #define MODRM_SETRMQ(v)  EMU86_SETMODRM_RMQ(&modrm, v, op_flags)
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
 
-#ifdef EMU86_EMULATE_ONLY_MEMORY
+#if EMU86_EMULATE_CONFIG_ONLY_MEMORY
 #define MODRM_GETRMMEMB()   EMU86_GETMODRM_RMB(&modrm, op_flags)
 #define MODRM_GETRMMEMW()   EMU86_GETMODRM_RMW(&modrm, op_flags)
 #define MODRM_GETRMMEML()   EMU86_GETMODRM_RML(&modrm, op_flags)
@@ -1986,7 +2010,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #define MODRM_GETRMMEMQ()   EMU86_GETMODRM_RMQ(&modrm, op_flags)
 #define MODRM_SETRMMEMQ(v)  EMU86_SETMODRM_RMQ(&modrm, v, op_flags)
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
-#else /* EMU86_EMULATE_ONLY_MEMORY */
+#else /* EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 #define MODRM_GETRMMEMB()   EMU86_GETMODRM_RMMEMB(&modrm, op_flags)
 #define MODRM_GETRMMEMW()   EMU86_GETMODRM_RMMEMW(&modrm, op_flags)
 #define MODRM_GETRMMEML()   EMU86_GETMODRM_RMMEML(&modrm, op_flags)
@@ -1997,7 +2021,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #define MODRM_GETRMMEMQ()   EMU86_GETMODRM_RMMEMQ(&modrm, op_flags)
 #define MODRM_SETRMMEMQ(v)  EMU86_SETMODRM_RMMEMQ(&modrm, v, op_flags)
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 
 #define MODRM_GETRMREGB()   EMU86_GETREGB(modrm.mi_rm, op_flags)
 #define MODRM_GETRMREGW()   EMU86_GETREGW(modrm.mi_rm)
@@ -2216,6 +2240,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #include "emu/lret.c.inl"
 #include "emu/lxs.c.inl"
 #include "emu/misc.c.inl"
+#include "emu/misc2.c.inl"
 #include "emu/mov.c.inl"
 #include "emu/movs.c.inl"
 #include "emu/nop.c.inl"
@@ -2240,16 +2265,17 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #endif /* !EMU86_EMULATE_IMPL_HEADER */
 #endif /* !__INTELLISENSE__ */
 
-			/* TODO: mov (crN) */
-
-			/* TODO: lfence */
-			/* TODO: mfence */
-			/* TODO: sfence */
-
-			/* TODO: rdfsbase */
-			/* TODO: rdgsbase */
-			/* TODO: wrfsbase */
-			/* TODO: wrgsbase */
+			/* XXX: mov (crN)  (if only for verbose exception messages?) */
+			/* XXX: clts       (if only for verbose exception messages?) */
+			/* XXX: swapgs     (if only for verbose exception messages?) */
+			/* XXX: rdtscp     (if only for verbose exception messages?) */
+			/* XXX: wrmsr      (if only for verbose exception messages?) */
+			/* XXX: rdtsc      (if only for verbose exception messages?) */
+			/* XXX: rdmsr      (if only for verbose exception messages?) */
+			/* XXX: rdpmc      (if only for verbose exception messages?) */
+			/* XXX: rdrand     (if only for verbose exception messages?) */
+			/* XXX: rdseed     (if only for verbose exception messages?) */
+			/* XXX: rdpid      (if only for verbose exception messages?) */
 
 			/* TODO: crc32 */
 			/* TODO: movbe */
@@ -2271,7 +2297,6 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 			/* TODO: movdir64b */
 			/* TODO: rorx */
 
-
 			default:
 				goto return_unknown_instruction;
 			}
@@ -2290,9 +2315,9 @@ done_dont_set_pc:
 	EMU86_EMULATE_RETURN();
 
 
-#if EMU86_EMULATE_CHECKUSER
+#if EMU86_EMULATE_CONFIG_CHECKUSER
 	/* Privileged instruction
-	 * Only used when `EMU86_EMULATE_CHECKUSER' is enabled. */
+	 * Only used when `EMU86_EMULATE_CONFIG_CHECKUSER' is enabled. */
 	__IF0 {
 #ifdef NEED_return_privileged_instruction_rmreg
 #undef NEED_return_privileged_instruction_rmreg
@@ -2309,7 +2334,7 @@ return_privileged_instruction:;
 #endif /* EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION */
 #endif /* NEED_return_privileged_instruction */
 	}
-#endif /* EMU86_EMULATE_CHECKUSER */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
 
 
 	/* Instruction isn't defined for a non-memory modr/m operand */

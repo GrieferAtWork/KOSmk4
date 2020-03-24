@@ -23,38 +23,113 @@
 
 EMU86_INTELLISENSE_BEGIN(flush) {
 
-	/* TODO: invd */
-	/* TODO: wbinvd */
-	/* TODO: cflsh */
-	/* TODO: clwb */
-	/* TODO: prefetchw */
-	/* TODO: prefetchnta */
-	/* TODO: prefetcht0 */
-	/* TODO: prefetcht1 */
-	/* TODO: prefetcht2 */
-	/* TODO: cldemote */
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
+case 0x0f08: {
+	/* 0F 08     INVD     Flush internal caches; initiate flushing of external caches. */
+#ifdef EMU86_EMULATE_INVD
+	EMU86_EMULATE_INVD();
+#endif /* EMU86_EMULATE_INVD */
+	goto done;
+}
 
-case 0x0fae:
+
+case 0x0f09: {
+	/* 0F 09     WBINVD     Write back and flush Internal caches; initiate writing-back and flushing of external caches. */
+#ifdef EMU86_EMULATE_WBINVD
+	EMU86_EMULATE_WBINVD();
+#endif /* EMU86_EMULATE_WBINVD */
+	goto done;
+}
+
+
+case 0x0f0d: {
 	MODRM_DECODE();
 	switch (modrm.mi_reg) {
 
-	case 7:
-		/* 0F AE /7      CLFLUSH m8      Flushes cache line containing m8 */
-#ifndef EMU86_EMULATE_ONLY_MEMORY
-#define NEED_return_expected_memory_modrm_rmreg
+	case 1: {
+		/* 0F 0D /1     PREFETCHW m8     Move data from m8 closer to the processor in anticipation of a write. */
 		if (!EMU86_MODRM_ISMEM(modrm.mi_type))
 			goto return_expected_memory_modrm_rmreg;
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
-#ifdef EMU86_EMULATE_CLFLUSH
-		EMU86_EMULATE_CLFLUSH(MODRM_MEMADDR());
-#endif /* EMU86_EMULATE_CLFLUSH */
+#define NEED_return_expected_memory_modrm_rmreg
+#ifdef EMU86_EMULATE_WPREFETCHW
+		EMU86_EMULATE_WPREFETCHW(MODRM_MEMADDR());
+#endif /* EMU86_EMULATE_WPREFETCHW */
+		goto done;
+	}
+
+	default:
+		goto return_unknown_instruction_rmreg;
+#define NEED_return_unknown_instruction_rmreg
+	}
+	break;
+}
+
+
+case 0x0f18: {
+	/* 0F 18 /0     PREFETCHNTA m8     Move data from m8 closer to the processor using NTA hint.
+	 * 0F 18 /1     PREFETCHT0 m8      Move data from m8 closer to the processor using T0 hint.
+	 * 0F 18 /2     PREFETCHT1 m8      Move data from m8 closer to the processor using T1 hint.
+	 * 0F 18 /3     PREFETCHT2 m8      Move data from m8 closer to the processor using T2 hint. */
+	MODRM_DECODE();
+	if (!EMU86_MODRM_ISMEM(modrm.mi_type))
+		goto return_expected_memory_modrm_rmreg;
+#define NEED_return_expected_memory_modrm_rmreg
+	switch (modrm.mi_reg) {
+
+	case 0:
+#ifdef EMU86_EMULATE_PREFETCHNTA
+		EMU86_EMULATE_PREFETCHNTA(MODRM_MEMADDR());
+#endif /* EMU86_EMULATE_PREFETCHNTA */
+		goto done;
+
+	case 1:
+#ifdef EMU86_EMULATE_PREFETCH0
+		EMU86_EMULATE_PREFETCH0(MODRM_MEMADDR());
+#endif /* EMU86_EMULATE_PREFETCH0 */
+		goto done;
+
+	case 2:
+#ifdef EMU86_EMULATE_PREFETCH1
+		EMU86_EMULATE_PREFETCH1(MODRM_MEMADDR());
+#endif /* EMU86_EMULATE_PREFETCH1 */
+		goto done;
+
+	case 3:
+#ifdef EMU86_EMULATE_PREFETCH2
+		EMU86_EMULATE_PREFETCH2(MODRM_MEMADDR());
+#endif /* EMU86_EMULATE_PREFETCH2 */
 		goto done;
 
 	default:
-#define NEED_return_unknown_instruction_rmreg
 		goto return_unknown_instruction_rmreg;
+#define NEED_return_unknown_instruction_rmreg
 	}
 	break;
+}
+
+
+case 0x0f1c: {
+	MODRM_DECODE();
+	if (!EMU86_MODRM_ISMEM(modrm.mi_type))
+		goto return_expected_memory_modrm_rmreg;
+#define NEED_return_expected_memory_modrm_rmreg
+	switch (modrm.mi_reg) {
+
+	case 0:
+		/* NP 0F 1C /0     CLDEMOTE m8     Hint to hardware to move the cache line containing m8 to a more
+		 *                                 distant level of the cache without writing back to memory. */
+#ifdef EMU86_EMULATE_CLDEMOTE
+		EMU86_EMULATE_CLDEMOTE(MODRM_MEMADDR());
+#endif /* EMU86_EMULATE_CLDEMOTE */
+		goto done;
+
+	default:
+		goto return_unknown_instruction_rmreg;
+#define NEED_return_unknown_instruction_rmreg
+	}
+	break;
+}
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 
 }
 EMU86_INTELLISENSE_END

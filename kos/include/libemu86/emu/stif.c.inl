@@ -23,7 +23,7 @@
 
 EMU86_INTELLISENSE_BEGIN(stif) {
 
-#ifndef EMU86_EMULATE_ONLY_MEMORY
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 
 	/* Instructions that modify the EFLAGS.IF (interrupt) bit. */
 
@@ -37,10 +37,11 @@ case 0xfa: {
 	}
 #endif /* EMU86_EMULATE_VM86 */
 
-#if EMU86_EMULATE_CHECKUSER
-	if (EMU86_ISUSER())
-		EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION(0xfa);
-#endif /* EMU86_EMULATE_CHECKUSER */
+#if EMU86_EMULATE_CONFIG_CHECKUSER
+	if unlikely(EMU86_ISUSER())
+		goto return_privileged_instruction;
+#define NEED_return_privileged_instruction
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
 
 	EMU86_MSKFLAGS(~EFLAGS_IF, 0);
 	goto done;
@@ -64,10 +65,11 @@ case 0xfb: {
 	}
 #endif /* EMU86_EMULATE_VM86 */
 
-#if EMU86_EMULATE_CHECKUSER
-	if (EMU86_ISUSER())
-		EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION(0xfb);
-#endif /* EMU86_EMULATE_CHECKUSER */
+#if EMU86_EMULATE_CONFIG_CHECKUSER
+	if unlikely(EMU86_ISUSER())
+		goto return_privileged_instruction;
+#define NEED_return_privileged_instruction
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
 #ifdef EMU86_EMULATE_RETURN_AFTER_STI
 	{
 		uintptr_t old_flags;
@@ -89,7 +91,7 @@ case 0xfb: {
 }
 
 
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 
 }
 EMU86_INTELLISENSE_END

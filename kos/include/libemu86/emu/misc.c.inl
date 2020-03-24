@@ -30,9 +30,9 @@ case 0xfe:
 	MODRM_DECODE();
 	switch (modrm.mi_reg) {
 
-#ifndef EMU86_EMULATE_ONLY_MEMORY
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 #define NEED_return_unexpected_lock_rmreg
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 #define DO_INC_modrm(bwlq, BWLQ, Nbits, Nbytes)                                   \
 	u##Nbits oldval, newval;                                                      \
 	u32 eflags_addend = 0;                                                        \
@@ -150,11 +150,11 @@ case 0xff:
 		EMU86_UREG_TYPE offset;
 		u16 cs;
 		byte_t *addr;
-#ifndef EMU86_EMULATE_ONLY_MEMORY
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 #define NEED_return_expected_memory_modrm_rmreg
 		if (!EMU86_MODRM_ISMEM(modrm.mi_type))
 			goto return_expected_memory_modrm_rmreg;
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 		addr = MODRM_MEMADDR();
 		IF_64BIT(if (IS_64BIT()) {
 			EMU86_READ_USER_MEMORY(addr, 10);
@@ -171,7 +171,7 @@ case 0xff:
 		}
 		cs = EMU86_MEMREADW(addr);
 		/* Verify the segment index. */
-#if EMU86_EMULATE_CHECKUSER
+#if EMU86_EMULATE_CONFIG_CHECKUSER
 		if (!SEGMENT_IS_VALID_USERCODE(cs) && EMU86_ISUSER_NOVM86()) {
 #ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
 			EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV,
@@ -182,7 +182,7 @@ case 0xff:
 			goto return_privileged_instruction;
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 		}
-#endif /* EMU86_EMULATE_CHECKUSER */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
 		sp = EMU86_GETSTACKPTR();
 		IF_64BIT(if (IS_64BIT()) {
 			sp -= 16;
@@ -238,11 +238,11 @@ case 0xff:
 #endif /* !CONFIG_LIBEMU86_WANT_64BIT */
 		u16 cs;
 		byte_t *addr;
-#ifndef EMU86_EMULATE_ONLY_MEMORY
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 #define NEED_return_expected_memory_modrm_rmreg
 		if (!EMU86_MODRM_ISMEM(modrm.mi_type))
 			goto return_expected_memory_modrm_rmreg;
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 		addr = MODRM_MEMADDR();
 		IF_64BIT(if (IS_64BIT()) {
 			EMU86_READ_USER_MEMORY(addr, 10);
@@ -259,7 +259,7 @@ case 0xff:
 		}
 		cs = EMU86_MEMREADW(addr);
 		/* Verify the segment index. */
-#if EMU86_EMULATE_CHECKUSER
+#if EMU86_EMULATE_CONFIG_CHECKUSER
 		if (!SEGMENT_IS_VALID_USERCODE(cs) && EMU86_ISUSER_NOVM86()) {
 #ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
 			EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV,
@@ -270,7 +270,7 @@ case 0xff:
 			goto return_privileged_instruction;
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 		}
-#endif /* EMU86_EMULATE_CHECKUSER */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
 		EMU86_SETCS(cs);
 		EMU86_SETIPREG(offset);
 		goto done_dont_set_pc;

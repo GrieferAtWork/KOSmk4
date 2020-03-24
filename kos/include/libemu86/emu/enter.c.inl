@@ -65,7 +65,7 @@ case 0xc8: {
 			u8 i;
 			byte_t *pbp_addr;
 			pbp_addr = EMU86_SEGADDR(EMU86_GETSSBASE(), pbp);
-#if EMU86_EMULATE_CHECKUSER
+#if EMU86_EMULATE_CONFIG_CHECKUSER
 			/* Validate the memory region from which data will be copied.
 			 * NOTE: The destination area was already validated above! */
 			if (EMU86_ISUSER()) {
@@ -79,7 +79,7 @@ case 0xc8: {
 				});
 				EMU86_VALIDATE_READABLE(pbp_addr - access_total, access_total);
 			}
-#endif /* EMU86_EMULATE_CHECKUSER */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
 			for (i = 1; i < nesting_level; ++i) {
 				if (IS_16BIT()) {
 					u16 temp;

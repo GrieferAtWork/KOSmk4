@@ -325,9 +325,9 @@ case 0x83:
 	}
 	goto done;
 
-#ifdef EMU86_EMULATE_ONLY_MEMORY
+#if EMU86_EMULATE_CONFIG_ONLY_MEMORY
 #define DEFINE_REGISTER_IMMEDIATE_INSTRUCTIONS(_opcode, name, NAME) /* nothing */
-#else /* EMU86_EMULATE_ONLY_MEMORY */
+#else /* EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 #define DEFINE_REGISTER_IMMEDIATE_INSTRUCTIONS(_opcode, name, NAME)     \
 	case _opcode + 4:                                                   \
 		/* _opcode + 04 ib      FOO AL, imm8        Foo imm8 to AL */   \
@@ -356,7 +356,7 @@ case 0x83:
 			pc += 2;                                                    \
 			goto do_##name##16;                                         \
 		}
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 
 #define DEFINE_REGISTER_MEMORY_INSTRUCTIONS(_opcode, name, NAME)        \
 	case _opcode + 0:                                                   \

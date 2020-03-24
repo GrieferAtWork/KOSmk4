@@ -99,7 +99,7 @@ do_lxs:
 		segment = EMU86_MEMREADW(addr);
 		offset  = EMU86_MEMREADW(addr + 2);
 	}
-#if EMU86_EMULATE_CHECKUSER
+#if EMU86_EMULATE_CONFIG_CHECKUSER
 	/* Validate the given segment index. */
 	if (!SEGMENT_IS_VALID_USERDATA(segment) && EMU86_ISUSER_NOVM86()) {
 #ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
@@ -111,7 +111,7 @@ do_lxs:
 		goto return_privileged_instruction;
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 	}
-#endif /* EMU86_EMULATE_CHECKUSER */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
 	EMU86_SETSEG(segment_regno, segment);
 #if CONFIG_LIBEMU86_WANT_64BIT
 	MODRM_SETREGQ(offset);

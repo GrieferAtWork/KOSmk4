@@ -951,7 +951,7 @@ libviocore_atomic_cmpxch128(struct vio_emulate_args *__restrict self,
 		RETHROW();                                \
 	}
 #define EMU86_EMULATE_GETOPFLAGS() _CS(emu86_opflagsof)(self->vea_args.va_state)
-#define EMU86_EMULATE_ONLY_MEMORY 1 /* _ONLY_ emulate memory-based instructions! */
+#define EMU86_EMULATE_CONFIG_ONLY_MEMORY 1 /* _ONLY_ emulate memory-based instructions! */
 #ifdef __x86_64__
 #define EMU86_EMULATE_VM86 0
 #else /* __x86_64__ */
@@ -961,7 +961,7 @@ libviocore_atomic_cmpxch128(struct vio_emulate_args *__restrict self,
 /* TODO: vm86 I/O functions (used by ins and outs) */
 #endif /* !__x86_64__ */
 #ifdef __KERNEL__
-#define EMU86_EMULATE_CHECKUSER 1
+#define EMU86_EMULATE_CONFIG_CHECKUSER 1
 #define EMU86_ISUSER()        icpustate_isuser(self->vea_args.va_state)
 #if EMU86_EMULATE_VM86
 #define EMU86_ISUSER_NOVM86() icpustate_isuser_novm86(self->vea_args.va_state)
@@ -974,7 +974,7 @@ libviocore_atomic_cmpxch128(struct vio_emulate_args *__restrict self,
 #define EMU86_VALIDATE_READABLE(addr, num_bytes) validate_readable((void const *)(uintptr_t)(addr), num_bytes)
 #define EMU86_VALIDATE_WRITABLE(addr, num_bytes) validate_writable((void *)(uintptr_t)(addr), num_bytes)
 #else /* __KERNEL__ */
-#define EMU86_EMULATE_CHECKUSER 0
+#define EMU86_EMULATE_CONFIG_CHECKUSER 0
 #define EMU86_ISUSER() 0
 #define EMU86_ISUSER_NOVM86() 0
 #define EMU86_ISVM86() 0
@@ -1058,12 +1058,13 @@ libviocore_atomic_cmpxch128(struct vio_emulate_args *__restrict self,
 #define EMU86_GETGSBASE() (EMU86_ISUSER() ? (void *)__rdmsr(IA32_KERNEL_GS_BASE) : __rdgsbase())
 #else /* __x86_64__ */
 DECL_END
+#include <kernel/gdt.h>
 #include <sched/task.h>
 DECL_BEGIN
 
 /* 32-bit mode supports non-zero bases for any segment! */
 #define EMU86_GETSEGBASE(segment_regno) \
-	i386_segment_base(self->vea_args.va_state, segment_regno)
+	i386_getsegment_base(self->vea_args.va_state, segment_regno)
 #define EMU86_GETDSBASE() EMU86_GETSEGBASE(EMU86_R_DS)
 #define EMU86_GETESBASE() EMU86_GETSEGBASE(EMU86_R_ES)
 #define EMU86_GETCSBASE() EMU86_GETSEGBASE(EMU86_R_CS)
@@ -1071,71 +1072,64 @@ DECL_BEGIN
 #define EMU86_GETFSBASE() EMU86_GETSEGBASE(EMU86_R_FS)
 #define EMU86_GETGSBASE() EMU86_GETSEGBASE(EMU86_R_GS)
 PRIVATE WUNUSED NONNULL((1)) u32
-NOTHROW(CC i386_segment_base)(struct icpustate32 *__restrict state,
-                              u8 segment_regno) {
+NOTHROW(CC i386_getsegment_base)(struct icpustate32 *__restrict state,
+                                 u8 segment_regno) {
 	u32 result;
 	u16 segment_index;
 	pflag_t was;
 	struct segment *seg;
 	struct desctab dt;
-#ifndef __OPTIMIZE_SIZE__
-	bool isuser;
-	isuser = icpustate32_isuser(state);
-#endif /* !__OPTIMIZE_SIZE__ */
 	/* Determine the segment's index. */
 	switch (segment_regno) {
 
 	case EMU86_R_ES:
-#ifndef __OPTIMIZE_SIZE__
-		if (!isuser)
-			return 0; /* Always 0 for kernel-space */
-#endif /* !__OPTIMIZE_SIZE__ */
 		segment_index = icpustate_getes(state);
 		break;
 
 	case EMU86_R_CS:
-#ifndef __OPTIMIZE_SIZE__
-		if (!isuser)
-			return 0; /* Always 0 for kernel-space */
-#endif /* !__OPTIMIZE_SIZE__ */
 		segment_index = icpustate_getcs(state);
 		break;
 
 	case EMU86_R_SS:
-#ifndef __OPTIMIZE_SIZE__
-		if (!isuser)
-			return 0; /* Always 0 for kernel-space */
-#endif /* !__OPTIMIZE_SIZE__ */
 		segment_index = icpustate_getcs(state);
 		break;
 
 	case EMU86_R_DS:
-#ifndef __OPTIMIZE_SIZE__
-		if (!isuser)
-			return 0; /* Always 0 for kernel-space */
-#endif /* !__OPTIMIZE_SIZE__ */
 		segment_index = icpustate_getds(state);
 		break;
 
 	case EMU86_R_FS:
-#ifndef __OPTIMIZE_SIZE__
-		/* %fs is the TLS segment for kernel-space */
-		if (!isuser)
-			return (u32)THIS_TASK;
-#endif /* !__OPTIMIZE_SIZE__ */
 		segment_index = icpustate_getfs(state);
 		break;
 
 	case EMU86_R_GS:
-		/* %gs is undefined for kernel-space (or rather: will
-		 * still contain whatever value user-space assigned to
-		 * it, so don't do any special optimizations for this
-		 * case...) */
 		segment_index = __rdgs();
 		break;
 
 	default: __builtin_unreachable();
 	}
+	/* Handle known segment indices without disabling preemption. */
+	switch (segment_index & ~3) {
+
+	case SEGMENT_KERNEL_CODE:
+	case SEGMENT_KERNEL_DATA:
+	case SEGMENT_USER_CODE32:
+	case SEGMENT_USER_DATA32:
+		return 0;
+
+	case SEGMENT_KERNEL_FSBASE:
+		return (u32)THIS_TASK;
+
+	case SEGMENT_USER_FSBASE:
+		return get_user_fsbase();
+
+	case SEGMENT_USER_GSBASE:
+		return get_user_gsbase();
+
+	default:
+		break;
+	}
+
 	was = PREEMPTION_PUSHOFF();
 	__sgdt(&dt);
 	if (segment_index & 4) {
@@ -1168,6 +1162,68 @@ NOTHROW(CC i386_segment_base)(struct icpustate32 *__restrict state,
 	PREEMPTION_POP(was);
 	return result;
 }
+
+#define EMU86_SETFSBASE(v) i386_setsegment_base(self->vea_args.va_state, EMU86_R_FS, (u32)(v))
+#define EMU86_SETGSBASE(v) i386_setsegment_base(self->vea_args.va_state, EMU86_R_GS, (u32)(v))
+PRIVATE WUNUSED NONNULL((1)) void
+NOTHROW(CC i386_setsegment_base)(struct icpustate32 *__restrict state,
+                                 u8 segment_regno, u32 value) {
+	u16 segment_index;
+	/* Determine the segment's index. */
+	switch (segment_regno) {
+
+	case EMU86_R_ES:
+		segment_index = icpustate_getes(state);
+		break;
+
+	case EMU86_R_CS:
+		segment_index = icpustate_getcs(state);
+		break;
+
+	case EMU86_R_SS:
+		segment_index = icpustate_getcs(state);
+		break;
+
+	case EMU86_R_DS:
+		segment_index = icpustate_getds(state);
+		break;
+
+	case EMU86_R_FS:
+		segment_index = icpustate_getfs(state);
+		break;
+
+	case EMU86_R_GS:
+		segment_index = __rdgs();
+		break;
+
+	default: __builtin_unreachable();
+	}
+	/* Only the user fs/gs base register can be modified. */
+	switch (segment_index & ~3) {
+
+	case SEGMENT_USER_FSBASE:
+		set_user_fsbase_noreload(value);
+		break;
+
+	case SEGMENT_USER_GSBASE:
+		set_user_gsbase_noreload(value);
+		break;
+
+	default:
+		/* Not allowed. */
+		THROW(E_ILLEGAL_INSTRUCTION_REGISTER,
+		      0, /* opcode (filled in by the caller through `libviocore_complete_except()') */
+		      E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV,
+		      X86_REGISTER_SEGMENT_ES + segment_regno,
+		      value, segment_index);
+		break;
+	}
+	/* Reload manually if user-space %gs was modified.
+	 * All other register get automatically reloaded upon return to user-space. */
+	if (segment_regno == EMU86_R_GS)
+		__wrgs(segment_index);
+}
+
 #endif /* !__x86_64__ */
 #else /* __KERNEL__ */
 /* If the base of any of these segments wasn't 0, then this library
@@ -1189,6 +1245,8 @@ NOTHROW(CC i386_segment_base)(struct icpustate32 *__restrict state,
 #define EMU86_GETSSBASE() 0
 #define EMU86_GETFSBASE() __rdfsbase()
 #define EMU86_GETGSBASE() __rdgsbase()
+#define EMU86_SETFSBASE(v) __wrfsbase((void *)(uintptr_t)(v))
+#define EMU86_SETGSBASE(v) __wrgsbase((void *)(uintptr_t)(v))
 #endif /* !__KERNEL__ */
 #define EMU86_SEGADDR(segbase, segoffset) (byte_t *)(uintptr_t)((segbase) + (segoffset))
 #ifdef EMU86_GETSEGBASE_IS_NOOP_SS

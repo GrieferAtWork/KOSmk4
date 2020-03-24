@@ -23,7 +23,7 @@
 
 EMU86_INTELLISENSE_BEGIN(cbw) {
 
-#ifndef EMU86_EMULATE_ONLY_MEMORY
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 
 case 0x98: {
 	/*         98     CBW      AX := sign-extend of AL.
@@ -59,7 +59,7 @@ case 0x99: {
 	goto done;
 }
 
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 
 }
 EMU86_INTELLISENSE_END

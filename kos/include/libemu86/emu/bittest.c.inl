@@ -45,9 +45,9 @@ set_cf_from_nonzero:
 	EMU86_MSKFLAGS(~EFLAGS_CF, nonzero ? EFLAGS_CF : 0);
 	goto done;
 
-#ifndef EMU86_EMULATE_ONLY_MEMORY
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 #define NEED_return_unexpected_lock
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 #define DEFINE_BIT_TEST_AND_op(pred_oldval_mask)                                       \
 	IF_64BIT(if (IS_64BIT()) {                                                         \
 		u64 oldval, mask;                                                              \

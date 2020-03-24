@@ -23,7 +23,7 @@
 
 EMU86_INTELLISENSE_BEGIN(stcf) {
 
-#ifndef EMU86_EMULATE_ONLY_MEMORY
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 
 	/* Instructions that modify the EFLAGS.CF (carry) bit. */
 
@@ -51,7 +51,7 @@ case 0xf9: {
 	goto done;
 }
 
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 
 }
 EMU86_INTELLISENSE_END

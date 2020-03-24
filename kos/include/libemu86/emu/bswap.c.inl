@@ -23,7 +23,7 @@
 
 EMU86_INTELLISENSE_BEGIN(bswap) {
 
-#ifndef EMU86_EMULATE_ONLY_MEMORY
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 
 case 0x0fc8 ... 0x0fcf: {
 	/*         0F C8+rd     BSWAP r32     Reverses the byte order of a 32-bit register.
@@ -79,7 +79,7 @@ case 0x0fc8 ... 0x0fcf: {
 	goto done;
 }
 
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 
 }
 EMU86_INTELLISENSE_END

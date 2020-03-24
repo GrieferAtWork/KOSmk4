@@ -26,7 +26,7 @@
 EMU86_INTELLISENSE_BEGIN(loop) {
 
 
-#ifndef EMU86_EMULATE_ONLY_MEMORY
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 
 case 0xe0: {
 	/* E0 cb     LOOPNE rel8     Decrement count; jump short if count!=0 and ZF=0. */
@@ -83,7 +83,7 @@ do_loop:
 	goto done_dont_set_pc;
 }
 
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 
 }
 EMU86_INTELLISENSE_END

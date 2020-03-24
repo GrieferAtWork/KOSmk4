@@ -24,18 +24,18 @@
 
 EMU86_INTELLISENSE_BEGIN(io) {
 
-#if EMU86_EMULATE_CHECKUSER
+#if EMU86_EMULATE_CONFIG_CHECKUSER
 #define VERIFY_USER_PORT_ACCESS(portno, num_ports) \
 	do {                                           \
 		if (EMU86_ISUSER())                        \
 			EMU86_VALIDATE_IO(portno, num_ports);  \
 	} __WHILE0
-#else /* EMU86_EMULATE_CHECKUSER */
+#else /* EMU86_EMULATE_CONFIG_CHECKUSER */
 #define VERIFY_USER_PORT_ACCESS(portno, num_ports) (void)0
-#endif /* !EMU86_EMULATE_CHECKUSER */
+#endif /* !EMU86_EMULATE_CONFIG_CHECKUSER */
 
 
-#ifndef EMU86_EMULATE_ONLY_MEMORY
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 case 0xe4: {
 	/* E4 ib     IN AL,imm8      Input byte from imm8 I/O port address into AL. */
 	u8 value;
@@ -157,7 +157,7 @@ case 0xef: {
 	}
 	goto done;
 }
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 
 
 

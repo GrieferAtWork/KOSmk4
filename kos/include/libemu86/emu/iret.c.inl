@@ -156,7 +156,7 @@ case 0xcf: {
 			new_sp = EMU86_MEMREADW(sp + 0);
 			new_ss = EMU86_MEMREADW(sp + 2);
 		}
-#if EMU86_EMULATE_CHECKUSER && CONFIG_LIBEMU86_WANT_64BIT
+#if EMU86_EMULATE_CONFIG_CHECKUSER && CONFIG_LIBEMU86_WANT_64BIT
 		/* Verify segment registers.
 		 * NOTE: We can only get here with `EMU86_ISUSER() == true'
 		 *       when the calling code is running in 64-bit mode,
@@ -185,7 +185,7 @@ case 0xcf: {
 			new_eflags &= USERIRET_EFLAGS_MASK;
 			new_eflags |= EMU86_GETFLAGS() & ~USERIRET_EFLAGS_MASK;
 		}
-#endif /* EMU86_EMULATE_CHECKUSER && CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER && CONFIG_LIBEMU86_WANT_64BIT */
 		EMU86_SETFLAGS(new_eflags);
 		EMU86_SETCS(new_cs);
 		EMU86_SETIPREG((u32)new_ip);
@@ -199,7 +199,7 @@ case 0xcf: {
 	}
 #if CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT
 	/* Return to same privilege level. */
-#if EMU86_EMULATE_CHECKUSER
+#if EMU86_EMULATE_CONFIG_CHECKUSER
 	/* Verify segment registers. */
 	if (EMU86_ISUSER()) {
 		if (!SEGMENT_IS_VALID_USERCODE(new_cs)) {
@@ -216,7 +216,7 @@ case 0xcf: {
 		new_eflags &= USERIRET_EFLAGS_MASK;
 		new_eflags |= EMU86_GETFLAGS() & ~USERIRET_EFLAGS_MASK;
 	}
-#endif /* EMU86_EMULATE_CHECKUSER */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
 	EMU86_SETFLAGS(new_eflags);
 	EMU86_SETCS(new_cs);
 	EMU86_SETIPREG((u32)new_ip);

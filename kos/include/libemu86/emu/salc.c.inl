@@ -23,7 +23,7 @@
 
 EMU86_INTELLISENSE_BEGIN(salc) {
 
-#ifndef EMU86_EMULATE_ONLY_MEMORY
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 
 	/* NOTE: This instruction is not officially documented by intel!
 	 *       Until this day (20.03.2020) intel still documents this
@@ -36,7 +36,7 @@ case 0xd6: {
 	goto done;
 }
 
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 
 }
 EMU86_INTELLISENSE_END

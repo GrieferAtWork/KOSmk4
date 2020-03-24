@@ -61,31 +61,31 @@ DATDEF ATTR_PERTASK uintptr_t const this_x86_kernel_psp0;
 
 /* Get/Set the user-space FS/GS base for the current thread. */
 #ifdef __x86_64__
-FORCELOCAL WUNUSED uintptr_t KCALL get_user_fsbase(void) {
+LOCAL WUNUSED uintptr_t KCALL get_user_fsbase(void) {
 	return (uintptr_t)__rdfsbase();
 }
 
-FORCELOCAL void KCALL set_user_fsbase(uintptr_t value) {
+LOCAL void KCALL set_user_fsbase(uintptr_t value) {
 	__wrfsbase((void *)value);
 }
 
-FORCELOCAL WUNUSED uintptr_t KCALL get_user_gsbase(void) {
+LOCAL WUNUSED uintptr_t KCALL get_user_gsbase(void) {
 	/* We must read the KERNEL_GS_BASE MSR here, as it
 	 * currently contains the effective user-space GS-base */
 	return (uintptr_t)__rdmsr(IA32_KERNEL_GS_BASE);
 }
 
-FORCELOCAL void KCALL set_user_gsbase(uintptr_t value) {
+LOCAL void KCALL set_user_gsbase(uintptr_t value) {
 	/* We must write the KERNEL_GS_BASE MSR here, as it
 	 * currently contains the effective user-space GS-base */
 	__wrmsr(IA32_KERNEL_GS_BASE, (__UINT64_TYPE__)value);
 }
 
-FORCELOCAL void KCALL update_user_fsbase(void) {
+LOCAL void KCALL update_user_fsbase(void) {
 	/* Nothing */
 }
 
-FORCELOCAL void KCALL update_user_gsbase(void) {
+LOCAL void KCALL update_user_gsbase(void) {
 	/* Nothing */
 }
 
@@ -97,13 +97,17 @@ FORCELOCAL void KCALL update_user_gsbase(void) {
 DATDEF ATTR_PERTASK uintptr_t this_x86_user_fsbase;
 DATDEF ATTR_PERTASK uintptr_t this_x86_user_gsbase;
 
-FORCELOCAL WUNUSED uintptr_t KCALL get_user_fsbase(void) {
+LOCAL WUNUSED uintptr_t KCALL get_user_fsbase(void) {
 	return PERTASK_GET(this_x86_user_fsbase);
 }
 
-FORCELOCAL void KCALL set_user_fsbase(uintptr_t value) {
+LOCAL void KCALL set_user_fsbase_noreload(uintptr_t value) {
 	PERTASK_SET(this_x86_user_fsbase, value);
 	segment_wrbaseX(&PERCPU(thiscpu_x86_gdt[SEGMENT_INDEX(SEGMENT_USER_FSBASE)]), value);
+}
+
+LOCAL void KCALL set_user_fsbase(uintptr_t value) {
+	set_user_fsbase_noreload(value);
 #ifndef SEGMENT_KERNEL_FSBASE
 	{
 		__register uintptr_t temp;
@@ -117,7 +121,7 @@ FORCELOCAL void KCALL set_user_fsbase(uintptr_t value) {
 #endif /* !SEGMENT_KERNEL_FSBASE */
 }
 
-FORCELOCAL void KCALL update_user_fsbase(void) {
+LOCAL void KCALL update_user_fsbase(void) {
 	segment_wrbaseX(&PERCPU(thiscpu_x86_gdt[SEGMENT_INDEX(SEGMENT_USER_FSBASE)]),
 	                PERTASK_GET(this_x86_user_fsbase));
 #ifndef SEGMENT_KERNEL_FSBASE
@@ -133,13 +137,17 @@ FORCELOCAL void KCALL update_user_fsbase(void) {
 #endif /* !SEGMENT_KERNEL_FSBASE */
 }
 
-FORCELOCAL WUNUSED uintptr_t KCALL get_user_gsbase(void) {
+LOCAL WUNUSED uintptr_t KCALL get_user_gsbase(void) {
 	return PERTASK_GET(this_x86_user_gsbase);
 }
 
-FORCELOCAL void KCALL set_user_gsbase(uintptr_t value) {
+LOCAL void KCALL set_user_gsbase_noreload(uintptr_t value) {
 	PERTASK_SET(this_x86_user_gsbase, value);
 	segment_wrbaseX(&PERCPU(thiscpu_x86_gdt[SEGMENT_INDEX(SEGMENT_USER_GSBASE)]), value);
+}
+
+LOCAL void KCALL set_user_gsbase(uintptr_t value) {
+	set_user_gsbase_noreload(value);
 #ifndef SEGMENT_KERNEL_GSBASE
 	{
 		/* Reload the GS register, which likely wouldn't be done without this. */
@@ -153,7 +161,7 @@ FORCELOCAL void KCALL set_user_gsbase(uintptr_t value) {
 #endif /* !SEGMENT_KERNEL_GSBASE */
 }
 
-FORCELOCAL void KCALL update_user_gsbase(void) {
+LOCAL void KCALL update_user_gsbase(void) {
 	segment_wrbaseX(&PERCPU(thiscpu_x86_gdt[SEGMENT_INDEX(SEGMENT_USER_GSBASE)]),
 	                PERTASK_GET(this_x86_user_gsbase));
 #ifndef SEGMENT_KERNEL_GSBASE

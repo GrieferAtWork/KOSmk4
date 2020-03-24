@@ -32,11 +32,11 @@ case 0x0fc7:
 		 *                                     into m64. Else, clear ZF and load m64 into EDX:EAX.
 		 * REX.W + 0F C7 /1 CMPXCHG16B m128    Compare RDX:RAX with m128. If equal, set ZF and load RCX:RBX
 		 *                                     into m128. Else, clear ZF and load m128 into RDX:RAX. */
-#ifndef EMU86_EMULATE_ONLY_MEMORY
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 #define NEED_return_expected_memory_modrm
 		if (!EMU86_MODRM_ISMEM(modrm.mi_type))
 			goto return_expected_memory_modrm;
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 #if CONFIG_LIBEMU86_WANT_64BIT
 		if (IS_64BIT()) {
 #ifdef EMU86_MEM_ATOMIC_CMPXCH128

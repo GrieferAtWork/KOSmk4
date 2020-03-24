@@ -52,7 +52,7 @@ case 0xcb: {
 		ip = EMU86_MEMREADW(sp + 2);
 		sp += 4;
 	}
-#if EMU86_EMULATE_CHECKUSER
+#if EMU86_EMULATE_CONFIG_CHECKUSER
 	/* Verify the given `cs' segment. */
 	if (!SEGMENT_IS_VALID_USERCODE(cs) && EMU86_ISUSER_NOVM86()) {
 #ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
@@ -64,7 +64,7 @@ case 0xcb: {
 		goto return_privileged_instruction;
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 	}
-#endif /* EMU86_EMULATE_CHECKUSER */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
 	EMU86_SETSTACKPTR(sp);
 	EMU86_SETCS(cs);
 	EMU86_SETIPREG(ip);
@@ -100,7 +100,7 @@ case 0xca: {
 		ip = EMU86_MEMREADW(sp + 2);
 		sp += 4;
 	}
-#if EMU86_EMULATE_CHECKUSER
+#if EMU86_EMULATE_CONFIG_CHECKUSER
 	/* Verify the given `cs' segment. */
 	if (!SEGMENT_IS_VALID_USERCODE(cs) && EMU86_ISUSER_NOVM86()) {
 #ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
@@ -112,7 +112,7 @@ case 0xca: {
 		goto return_privileged_instruction;
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 	}
-#endif /* EMU86_EMULATE_CHECKUSER */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
 	sp += offset;
 	EMU86_SETSTACKPTR(sp);
 	EMU86_SETCS(cs);

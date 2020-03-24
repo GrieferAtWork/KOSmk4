@@ -24,7 +24,7 @@
 EMU86_INTELLISENSE_BEGIN(nop) {
 
 
-#ifndef EMU86_EMULATE_ONLY_MEMORY
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 case 0x0f1f:
 	/* NP 0F 1F /0     NOP r/m16     Multi-byte no-operation instruction.
 	 * NP 0F 1F /0     NOP r/m32     Multi-byte no-operation instruction. */
@@ -34,7 +34,7 @@ case 0x0f1f:
 		goto return_unknown_instruction_rmreg;
 	}
 	goto done;
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 
 
 }

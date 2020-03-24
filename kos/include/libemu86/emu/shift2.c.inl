@@ -26,9 +26,9 @@ EMU86_INTELLISENSE_BEGIN(shift2) {
 	/* The number of bits by which to shift */
 	u8 num_bits;
 
-#ifndef EMU86_EMULATE_ONLY_MEMORY
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 #define NEED_return_unexpected_lock
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 #define DEFINE_SHLD_MODRM_rm_reg(bwlq, BWLQ, Nbits, Nbytes, msb_bit_set)                \
 	u##Nbits oldval, bitsrc, newval;                                                    \
 	num_bits &= (Nbits - 1);                                                            \
@@ -100,9 +100,9 @@ case 0x0fa4: {
 
 
 
-#ifndef EMU86_EMULATE_ONLY_MEMORY
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 #define NEED_return_unexpected_lock
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 #define DEFINE_SHRD_MODRM_rm_reg(bwlq, BWLQ, Nbits, Nbytes, msb_bit_set)                \
 	u##Nbits oldval, bitsrc, newval;                                                    \
 	num_bits &= (Nbits - 1);                                                            \

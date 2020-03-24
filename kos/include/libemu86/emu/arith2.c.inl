@@ -23,9 +23,9 @@
 
 EMU86_INTELLISENSE_BEGIN(arith2) {
 
-#ifndef EMU86_EMULATE_ONLY_MEMORY
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 #define NEED_return_unexpected_lock_rmreg
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 #define DEFINE_NOT_MODRM_rm(BWLQ, Nbits, Nbytes, mask)                   \
 	NIF_ONLY_MEMORY(if (EMU86_MODRM_ISREG(modrm.mi_type)) {              \
 		u##Nbits reg;                                                    \
@@ -689,7 +689,7 @@ case 0x69: {
 }
 
 
-#ifndef EMU86_EMULATE_ONLY_MEMORY
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 case 0xa8: {
 	/*         A8 ib     TEST AL, imm8       AND imm8 with AL; set SF, ZF, PF according to result. */
 	u8 lhs, imm;
@@ -729,7 +729,7 @@ case 0xa9: {
 	}
 	goto done;
 }
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 
 
 }

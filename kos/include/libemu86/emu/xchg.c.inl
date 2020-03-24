@@ -29,9 +29,9 @@ EMU86_INTELLISENSE_BEGIN(xchg) {
 #define XCHG_IS_ATOMIC() ((op_flags & EMU86_F_LOCK) != 0)
 #endif /* !EMU86_EMULATE_ATOMIC_XCHG_REQUIRES_LOCK */
 
-#ifndef EMU86_EMULATE_ONLY_MEMORY
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 #define NEED_return_unexpected_lock
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 #define DEFINE_XCHG_modrm(BWLQ, Nbits, Nbytes)                 \
 	u##Nbits reg_operand, oldval;                              \
 	reg_operand = MODRM_GETREG##BWLQ();                        \
@@ -76,7 +76,7 @@ case 0x87: {
 }
 
 
-#ifndef EMU86_EMULATE_ONLY_MEMORY
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 
 #define DEFINE_XCHG_reg(BWLQ, Nbits, regno, AX) \
 	u##Nbits reg_operand, oldval;               \
@@ -115,7 +115,7 @@ case 0x91 ... 0x97: {
 	goto done;
 }
 #undef DEFINE_XCHG_reg
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 
 
 #undef DEFINE_XCHG_modrm

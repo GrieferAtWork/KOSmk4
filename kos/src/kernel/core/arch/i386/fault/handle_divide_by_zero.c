@@ -42,6 +42,7 @@ x86_handle_divide_by_zero(struct icpustate *__restrict state) {
 	PERTASK_SET(this_exception_code,
 	            ERROR_CODEOF(E_DIVIDE_BY_ZERO));
 	/* TODO: This function can also get called due to divide overflow! */
+	/* TODO: This function can also get called due to `aam $0' */
 	for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i)
 		PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
 #if EXCEPT_BACKTRACE_SIZE != 0

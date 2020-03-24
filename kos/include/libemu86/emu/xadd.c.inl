@@ -23,9 +23,9 @@
 
 EMU86_INTELLISENSE_BEGIN(xadd) {
 
-#ifndef EMU86_EMULATE_ONLY_MEMORY
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 #define NEED_return_unexpected_lock
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 #define DEFINE_XADD_MODRM_reg_rm(bwlq, BWLQ, Nbits, Nbytes)                       \
 	u##Nbits rhs, oldval, newval;                                                 \
 	u32 eflags_addend = 0;                                                        \

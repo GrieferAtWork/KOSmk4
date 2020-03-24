@@ -1704,15 +1704,15 @@ PRIVATE struct instruction const ops_0f[] = {
 	I(0x03, IF_MODRM,         "lsll\t" OP_RM32 OP_R16),
 	I(0x03, IF_MODRM|IF_REXW, "lslq\t" OP_RM64 OP_R16),
 
-	I(0x05, IF_X32,           "loadall"), /* Unofficial */
+	I(0x05, IF_X32,           "loadall"), /* http://www.geoffchappell.com/notes/windows/archive/linkcpu.htm */
 	I(0x05, IF_X64,           "syscall"),
 	I(0x06, 0,                "clts"),
-	I(0x07, IF_X32,           "loadall\t" OP_PSI), /* Unofficial */
+	I(0x07, IF_X32,           "loadall\t" OP_PSI), /* http://www.geoffchappell.com/notes/windows/archive/linkcpu.htm */
 	I(0x07, IF_X64,           "sysret"),
 	I(0x08, 0,                "invd"),
 	I(0x09, 0,                "wbinvd"),
 
-	I(0x0a, 0,                "cflsh"),
+	I(0x0a, 0,                "cflsh"), /* http://www.geoffchappell.com/notes/windows/archive/linkcpu.htm */
 
 	I(0x0b, 0,                "ud2"),
 
@@ -2674,8 +2674,8 @@ PRIVATE struct instruction const ops_0f[] = {
 	I(0x77, IF_VEX, OP_VEX_B0(0, 1, 0, 1) "vzeroall"),
 	I(0x77, 0,                      "emms"),
 
-//	I(0x78, IF_MODRM|IF_RMM,  "svdc\t" OP_RSEG OP_MEM/*80*/), /* Unofficial */
-//	I(0x79, IF_MODRM|IF_RMM,  "rsdc\t" OP_MEM/*80*/ OP_RSEG), /* Unofficial */
+//	I(0x78, IF_MODRM|IF_RMM,  "svdc\t" OP_RSEG OP_MEM/*80*/), /* http://www.geoffchappell.com/notes/windows/archive/linkcpu.htm */
+//	I(0x79, IF_MODRM|IF_RMM,  "rsdc\t" OP_MEM/*80*/ OP_RSEG), /* http://www.geoffchappell.com/notes/windows/archive/linkcpu.htm */
 
 	I(0x78, IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(0, 0, 1, 0), LO_VCVTTPD2UDQ_XMM)), /* EVEX.128.0f.W1 78 /r vcvttpd2udq xmm1{k1}{z}, xmm2/m128/m64bcst */
 	I(0x78, IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(0, 0, 1, 1), LO_VCVTTPD2UDQ_YMM)), /* EVEX.256.0f.W1 78 /r vcvttpd2udq xmm1{k1}{z}, ymm2/m256/m64bcst */
@@ -2962,46 +2962,45 @@ PRIVATE struct instruction const ops_0f[] = {
 	I(0xad, IF_MODRM,         "shrdl\t" OP_RM32 OP_R32 OP_CL),
 	I(0xad, IF_MODRM|IF_REXW, "shrdq\t" OP_RM64 OP_R64 OP_CL),
 
+	I(0xae, IF_F3|IF_MODRM|IF_RMR|IF_REG0,         "rdfsbasel\t" OP_RM32),
+	I(0xae, IF_F3|IF_MODRM|IF_RMR|IF_REXW|IF_REG0, "rdfsbaseq\t" OP_RM64),
+	I(0xae, IF_MODRM|IF_RMM|IF_REG0,               "fxsave\t" OP_MEM),
+	I(0xae, IF_MODRM|IF_REXW|IF_RMM|IF_REG0,       "fxsave64\t" OP_MEM),
+
+	I(0xae, IF_F3|IF_MODRM|IF_RMR|IF_REG1,         "rdgsbasel\t" OP_RM32),
+	I(0xae, IF_F3|IF_MODRM|IF_RMR|IF_REXW|IF_REG1, "rdgsbaseq\t" OP_RM64),
+	I(0xae, IF_MODRM|IF_RMM|IF_REG1,               "fxrstor\t" OP_MEM),
+	I(0xae, IF_MODRM|IF_REXW|IF_RMM|IF_REG1,       "fxrstor64\t" OP_MEM),
+
 	I(0xae, IF_VEX|IF_MODRM|IF_RMM|IF_REG2, OP_VEX_B0(0,1,0,0) "vldmxcsr\t" OP_MEM),
+	I(0xae, IF_F3|IF_MODRM|IF_RMR|IF_REG2,         "wrfsbasel\t" OP_RM32),
+	I(0xae, IF_F3|IF_MODRM|IF_RMR|IF_REXW|IF_REG2, "wrfsbaseq\t" OP_RM64),
+	I(0xae, IF_MODRM|IF_RMM|IF_REG2,               "ldmxcsr\t" OP_MEM),
+
 	I(0xae, IF_VEX|IF_MODRM|IF_RMM|IF_REG3, OP_VEX_B0(0,1,0,0) "vstmxcsr\t" OP_MEM),
-	I(0xae, IF_F3|IF_MODRM|IF_REG0,         "rdfsbasel\t" OP_RM32),
-	I(0xae, IF_REXW|IF_F3|IF_MODRM|IF_REG0, "rdfsbaseq\t" OP_RM64),
+	I(0xae, IF_F3|IF_MODRM|IF_RMR|IF_REG3,         "wrgsbasel\t" OP_RM32),
+	I(0xae, IF_F3|IF_MODRM|IF_RMR|IF_REXW|IF_REG3, "wrgsbaseq\t" OP_RM64),
+	I(0xae, IF_MODRM|IF_RMM|IF_REG3,               "stmxcsr\t" OP_MEM),
 
-	I(0xae, IF_F3|IF_MODRM|IF_REG1,         "rdgsbasel\t" OP_RM32),
-	I(0xae, IF_REXW|IF_F3|IF_MODRM|IF_REG1, "rdgsbaseq\t" OP_RM64),
+	I(0xae, IF_MODRM|IF_RMM|IF_REG4,         "xsave\t" OP_MEM),
+	I(0xae, IF_MODRM|IF_REXW|IF_RMM|IF_REG4, "xsave64\t" OP_MEM),
 
-	I(0xae, IF_F3|IF_MODRM|IF_REG2,         "wrfsbasel\t" OP_RM32),
-	I(0xae, IF_REXW|IF_F3|IF_MODRM|IF_REG2, "wrfsbaseq\t" OP_RM64),
-
-	I(0xae, IF_F3|IF_MODRM|IF_REG3,         "wrgsbasel\t" OP_RM32),
-	I(0xae, IF_REXW|IF_F3|IF_MODRM|IF_REG3, "wrgsbaseq\t" OP_RM64),
-
-	I(0xae, IF_MODRM|IF_RMM|IF_REG0,        "fxsave\t" OP_MEM),
-	I(0xae, IF_MODRM|IF_RMM|IF_REG1,        "fxrstor\t" OP_MEM),
-	I(0xae, IF_MODRM|IF_RMM|IF_REG2,        "ldmxcsr\t" OP_MEM),
-	I(0xae, IF_MODRM|IF_RMM|IF_REG3,        "stmxcsr\t" OP_MEM),
-
-	I(0xae, IF_MODRM|IF_RMM|IF_REG4,        "xsave\t" OP_MEM),
-	I(0xae, IF_MODRM|IF_REXW|IF_RMM|IF_REG4,"xsave64\t" OP_MEM),
-	I(0xae, IF_MODRM|IF_RMM|IF_REG5,        "xrstor\t" OP_MEM),
-	I(0xae, IF_MODRM|IF_REXW|IF_RMM|IF_REG5,"xrstor64\t" OP_MEM),
-	I(0xae, IF_MODRM|IF_RMM|IF_REG6,        "xsaveopt\t" OP_MEM),
-	I(0xae, IF_MODRM|IF_REXW|IF_RMM|IF_REG6,"xsaveopt64\t" OP_MEM),
-	I(0xae, IF_MODRM|IF_RMM|IF_REG7,        "clflush\t" OP_MEM),
-	I(0xae, IF_66|IF_MODRM|IF_RMM|IF_REG7,  "clflushopt\t" OP_RM32),
-
-	I(0xae, IF_MODRM|IF_RMM|IF_REG0,         "fxsave\t" OP_MEM),
-	I(0xae, IF_MODRM|IF_REXW|IF_RMM|IF_REG0, "fxsave64\t" OP_MEM),
-	I(0xae, IF_MODRM|IF_RMM|IF_REG1,         "fxrstor\t" OP_MEM),
-	I(0xae, IF_MODRM|IF_REXW|IF_RMM|IF_REG1, "fxrstor64\t" OP_MEM),
+	I(0xae, IF_MODRM|IF_RMM|IF_REG5,         "xrstor\t" OP_MEM),
+	I(0xae, IF_MODRM|IF_REXW|IF_RMM|IF_REG5, "xrstor64\t" OP_MEM),
 
 	I(0xae, IF_F3|IF_MODRM|IF_REG6|IF_RMR|IF_X32, "umonitorl\t" OP_RM32),
 	I(0xae, IF_F3|IF_MODRM|IF_REG6|IF_RMR|IF_X64, "umonitorq\t" OP_RM64),
 	I(0xae, IF_F2|IF_MODRM|IF_REG6,               "umwait\t" OP_EAX OP_EDX OP_RM32),
+	I(0xae, IF_66|IF_MODRM|IF_RMM|IF_REG6,        "clwb\t" OP_MEM),
+	I(0xae, IF_MODRM|IF_RMM|IF_REG6,              "xsaveopt\t" OP_MEM),
+	I(0xae, IF_MODRM|IF_REXW|IF_RMM|IF_REG6,      "xsaveopt64\t" OP_MEM),
 
-	I(0xae, IF_BYTE2,                "\xe8" "lfence"),
-	I(0xae, IF_BYTE2,                "\xf0" "mfence"),
-	I(0xae, IF_BYTE2,                "\xf8" "sfence"),
+	I(0xae, IF_66|IF_MODRM|IF_RMM|IF_REG7, "clflushopt\t" OP_RM32),
+	I(0xae, IF_MODRM|IF_RMM|IF_REG7,       "clflush\t" OP_MEM),
+
+	I(0xae, IF_BYTE2,                "\xe8" "lfence"), /* 0xe8: [mod=3,reg=5,rm=0] (aka. `foo [rm]:%ax, [reg]:%bp') */
+	I(0xae, IF_BYTE2,                "\xf0" "mfence"), /* 0xf0: [mod=3,reg=6,rm=0] (aka. `foo [rm]:%ax, [reg]:%si') */
+	I(0xae, IF_BYTE2,                "\xf8" "sfence"), /* 0xf8: [mod=3,reg=7,rm=0] (aka. `foo [rm]:%ax, [reg]:%di') */
 
 	I(0xaf, IF_66|IF_MODRM,  "imulb\t" OP_RM8 OP_R8),
 	I(0xaf, IF_MODRM,        "imulw\t" OP_RM16 OP_R16),
@@ -5035,24 +5034,24 @@ PRIVATE u16 const ops_offsets[256] = {
 };
 
 #define HAVE_OPS_0F_OFFSETS 1
-STATIC_ASSERT(COMPILER_LENOF(ops_0f) == 1509);
+STATIC_ASSERT(COMPILER_LENOF(ops_0f) == 1508);
 PRIVATE u16 const ops_0f_offsets[256] = {
-	0, 6, 36, 37, 1508, 40, 42, 43, 45, 46, 47, 48, 1508, 49, 1508, 1508,
-	51, 75, 97, 118, 124, 136, 148, 163, 169, 1508, 173, 179, 184, 1508, 1508, 185,
-	187, 189, 191, 193, 195, 1508, 196, 1508, 197, 209, 221, 231, 243, 253, 263, 269,
-	275, 276, 277, 278, 279, 280, 281, 282, 1508, 1508, 1508, 1508, 1508, 1508, 1508, 283,
+	0, 6, 36, 37, 1507, 40, 42, 43, 45, 46, 47, 48, 1507, 49, 1507, 1507,
+	51, 75, 97, 118, 124, 136, 148, 163, 169, 1507, 173, 179, 184, 1507, 1507, 185,
+	187, 189, 191, 193, 195, 1507, 196, 1507, 197, 209, 221, 231, 243, 253, 263, 269,
+	275, 276, 277, 278, 279, 280, 281, 282, 1507, 1507, 1507, 1507, 1507, 1507, 1507, 283,
 	284, 287, 294, 301, 304, 311, 318, 325, 332, 335, 338, 345, 351, 354, 357, 360,
 	363, 375, 393, 398, 403, 415, 427, 439, 451, 469, 487, 505, 526, 544, 562, 580,
 	598, 603, 608, 615, 620, 625, 630, 637, 642, 647, 652, 659, 664, 670, 676, 682,
 	706, 721, 736, 772, 794, 799, 804, 811, 814, 832, 852, 870, 880, 886, 892, 898,
 	922, 924, 926, 928, 930, 932, 934, 936, 938, 940, 942, 944, 946, 948, 950, 952,
 	954, 959, 964, 969, 974, 975, 976, 977, 978, 983, 988, 989, 990, 991, 992, 993,
-	994, 997, 1000, 1001, 1004, 1007, 1508, 1508, 1010, 1013, 1016, 1017, 1020, 1023, 1026, 1058,
-	1061, 1062, 1065, 1068, 1071, 1074, 1077, 1080, 1082, 1085, 1086, 1098, 1101, 1107, 1113, 1116,
-	1118, 1119, 1122, 1140, 1142, 1146, 1154, 1166, 1182, 1186, 1190, 1194, 1198, 1202, 1206, 1210,
-	1214, 1220, 1225, 1232, 1239, 1246, 1251, 1253, 1261, 1266, 1271, 1276, 1286, 1291, 1296, 1301,
-	1311, 1316, 1321, 1331, 1336, 1341, 1346, 1367, 1374, 1379, 1384, 1389, 1399, 1404, 1409, 1414,
-	1424, 1427, 1432, 1439, 1446, 1453, 1458, 1463, 1466, 1471, 1476, 1483, 1490, 1495, 1500, 1507
+	994, 997, 1000, 1001, 1004, 1007, 1507, 1507, 1010, 1013, 1016, 1017, 1020, 1023, 1026, 1057,
+	1060, 1061, 1064, 1067, 1070, 1073, 1076, 1079, 1081, 1084, 1085, 1097, 1100, 1106, 1112, 1115,
+	1117, 1118, 1121, 1139, 1141, 1145, 1153, 1165, 1181, 1185, 1189, 1193, 1197, 1201, 1205, 1209,
+	1213, 1219, 1224, 1231, 1238, 1245, 1250, 1252, 1260, 1265, 1270, 1275, 1285, 1290, 1295, 1300,
+	1310, 1315, 1320, 1330, 1335, 1340, 1345, 1366, 1373, 1378, 1383, 1388, 1398, 1403, 1408, 1413,
+	1423, 1426, 1431, 1438, 1445, 1452, 1457, 1462, 1465, 1470, 1475, 1482, 1489, 1494, 1499, 1506
 };
 
 #define HAVE_OPS_0F38_OFFSETS 1

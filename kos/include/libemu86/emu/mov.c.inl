@@ -131,7 +131,7 @@ case 0x8e: {
 		goto return_unsupported_instruction;
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 	}
-#if EMU86_EMULATE_CHECKUSER && (CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_64BIT)
+#if EMU86_EMULATE_CONFIG_CHECKUSER && (CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_64BIT)
 	if ((modrm.mi_reg == EMU86_R_CS ? !SEGMENT_IS_VALID_USERCODE(segment)
 	                                : !SEGMENT_IS_VALID_USERDATA(segment)) &&
 	    EMU86_ISUSER_NOVM86()) {
@@ -144,7 +144,7 @@ case 0x8e: {
 		goto return_privileged_instruction;
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 	}
-#endif /* EMU86_EMULATE_CHECKUSER && (CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_64BIT) */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER && (CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_64BIT) */
 	EMU86_SETSEG(modrm.mi_reg, segment);
 	goto done;
 }
@@ -435,7 +435,7 @@ case 0x63: {
 
 
 
-#ifndef EMU86_EMULATE_ONLY_MEMORY
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 case 0xb0 ... 0xb7: {
 	u8 value;
 	u8 regno = opcode - 0xb0;
@@ -478,7 +478,7 @@ case 0xb8 ... 0xbf: {
 	}
 	goto done;
 }
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 
 
 

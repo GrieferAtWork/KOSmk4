@@ -23,9 +23,9 @@
 
 EMU86_INTELLISENSE_BEGIN(cmpxchg) {
 
-#ifndef EMU86_EMULATE_ONLY_MEMORY
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 #define NEED_return_unexpected_lock
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 
 /* Perform a CMPXCHG operation on MODRM.RM */
 #define DEFINE_CMPXCHG_modrm_rm(bwlq, BWLQ, Nbits, Nbytes, get_want_oldval)          \

@@ -25,7 +25,7 @@
 
 EMU86_INTELLISENSE_BEGIN(jmp) {
 
-#ifndef EMU86_EMULATE_ONLY_MEMORY
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 
 case 0xe9: {
 	/* E9 cw    JMP rel16   Jump near, relative, displacement relative to next instruction.
@@ -63,7 +63,7 @@ case 0xeb: {
 	goto done_dont_set_pc;
 }
 
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 
 }
 EMU86_INTELLISENSE_END

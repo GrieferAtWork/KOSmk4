@@ -23,7 +23,7 @@
 
 EMU86_INTELLISENSE_BEGIN(stdf) {
 
-#ifndef EMU86_EMULATE_ONLY_MEMORY
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 
 	/* Instructions that modify the EFLAGS.DF (direction) bit. */
 
@@ -40,7 +40,7 @@ case 0xfd: {
 	goto done;
 }
 
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 
 }
 EMU86_INTELLISENSE_END

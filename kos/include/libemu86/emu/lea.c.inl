@@ -23,7 +23,7 @@
 
 EMU86_INTELLISENSE_BEGIN(lea) {
 
-#ifndef EMU86_EMULATE_ONLY_MEMORY
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 case 0x8d: {
 	/*         8D /r     LEA r16,m     RM     Valid     Valid     Store effective address for m in register r16.
 	 *         8D /r     LEA r32,m     RM     Valid     Valid     Store effective address for m in register r32.
@@ -41,7 +41,7 @@ case 0x8d: {
 	}
 	goto done;
 }
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 
 }
 EMU86_INTELLISENSE_END

@@ -23,7 +23,7 @@
 
 EMU86_INTELLISENSE_BEGIN(jcc) {
 
-#ifndef EMU86_EMULATE_ONLY_MEMORY
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 
 #define DEFINE_Jcc(id, cond)                               \
 	case 0x0f80 + id: {                                    \
@@ -225,7 +225,7 @@ case 0xe3: {
 	goto done_dont_set_pc;
 }
 
-#endif /* !EMU86_EMULATE_ONLY_MEMORY */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 
 }
 EMU86_INTELLISENSE_END
