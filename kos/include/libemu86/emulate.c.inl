@@ -2263,6 +2263,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #include "emu/scas.c.inl"
 #include "emu/shift.c.inl"
 #include "emu/shift2.c.inl"
+#include "emu/shiftx.c.inl"
 #include "emu/stcf.c.inl"
 #include "emu/stdf.c.inl"
 #include "emu/stif.c.inl"
@@ -2297,9 +2298,6 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 			/* TODO: adox */
 			/* TODO: mulx */
 			/* TODO: bextr */
-			/* TODO: shlx */
-			/* TODO: sarx */
-			/* TODO: shrx */
 			/* TODO: movdir64b */
 
 			default:

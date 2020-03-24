@@ -75,14 +75,13 @@ do_shift##Nbits:                                                                
 		case 7: /* sar r/mN,<num_bits> */                                                  \
 			if (oldval & ((u##Nbits)1 << (num_bits - 1)))                                  \
 				eflags_addend |= EFLAGS_CF;                                                \
-			/* XXX: Signed right-shift isn't portable in the C standard... */              \
-			newval = (s##Nbits)oldval >> num_bits;                                         \
+			newval = emu86_sar##bwlq(oldval, num_bits);                                    \
 			break;                                                                         \
 			                                                                               \
 		default:                                                                           \
-			/* In 64-bit mode, REX.B can cause modrm.mi_reg to be > 7 */                 \
-			IFELSE_64BIT(goto return_unknown_instruction_rmreg,                          \
-			             __builtin_unreachable());                                       \
+			/* In 64-bit mode, REX.B can cause modrm.mi_reg to be > 7 */                   \
+			IFELSE_64BIT(goto return_unknown_instruction_rmreg,                            \
+			             __builtin_unreachable());                                         \
 		}                                                                                  \
 		/* Write-back the new result. */                                                   \
 		NIF_ONLY_MEMORY(                                                                   \
