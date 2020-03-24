@@ -23,51 +23,59 @@
 
 EMU86_INTELLISENSE_BEGIN(bound) {
 
-#if CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT
+#if (CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT || \
+     (EMU86_EMULATE_CONFIG_CHECKERROR && CONFIG_LIBEMU86_WANT_64BIT))
 case 0x62: {
-	s32 bound_idx, bound_min, bound_max;
-	byte_t *addr;
 	/* 62 /r     BOUND r16, m16&16     Check if r16 (array index) is within bounds specified by m16&16
 	 * 62 /r     BOUND r32, m32&32     Check if r32 (array index) is within bounds specified by m32&32 */
-#if CONFIG_LIBEMU86_WANT_64BIT
-#define NEED_return_unavailable_instruction
-	if (EMU86_F_IS64(op_flags))
-		goto return_unavailable_instruction;
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
-#define NEED_return_expected_memory_modrm
 	MODRM_DECODE_MEMONLY();
-	addr = MODRM_MEMADDR();
-	if (IS_16BIT()) {
-		union {
-			s16 words[2];
-			u32 dword;
-		} temp;
-		EMU86_READ_USER_MEMORY(addr, 4);
-		temp.dword = EMU86_MEMREADL(addr);
-		bound_min  = temp.words[0];
-		bound_max  = temp.words[1];
-		bound_idx  = (s32)(s16)MODRM_GETREGW();
-	} else {
-		union {
-			s32 dwords[2];
-			u64 qword;
-		} temp;
-		EMU86_READ_USER_MEMORY(addr, 8);
+#define NEED_return_expected_memory_modrm
+#if CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT
 #if CONFIG_LIBEMU86_WANT_64BIT
-		temp.qword = EMU86_MEMREADQ(addr);
+#define NEED_return_unsupported_instruction
+	if (EMU86_F_IS64(op_flags))
+		goto return_unsupported_instruction;
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+	{
+		s32 bound_idx, bound_min, bound_max;
+		byte_t *addr;
+		addr = MODRM_MEMADDR();
+		if (IS_16BIT()) {
+			union {
+				s16 words[2];
+				u32 dword;
+			} temp;
+			EMU86_READ_USER_MEMORY(addr, 4);
+			temp.dword = EMU86_MEMREADL(addr);
+			bound_min  = temp.words[0];
+			bound_max  = temp.words[1];
+			bound_idx  = (s32)(s16)MODRM_GETREGW();
+		} else {
+			union {
+				s32 dwords[2];
+				u64 qword;
+			} temp;
+			EMU86_READ_USER_MEMORY(addr, 8);
+#if CONFIG_LIBEMU86_WANT_64BIT
+			temp.qword = EMU86_MEMREADQ(addr);
 #else /* CONFIG_LIBEMU86_WANT_64BIT */
-		temp.dwords[0] = EMU86_MEMREADL(addr);
-		temp.dwords[1] = EMU86_MEMREADL(addr + 4);
+			temp.dwords[0] = EMU86_MEMREADL(addr);
+			temp.dwords[1] = EMU86_MEMREADL(addr + 4);
 #endif /* !CONFIG_LIBEMU86_WANT_64BIT */
-		bound_min = temp.dwords[0];
-		bound_max = temp.dwords[1];
-		bound_idx = (s32)MODRM_GETREGL();
+			bound_min = temp.dwords[0];
+			bound_max = temp.dwords[1];
+			bound_idx = (s32)MODRM_GETREGL();
+		}
+		if (!(bound_idx >= bound_min && bound_idx <= bound_max))
+			EMU86_EMULATE_THROW_BOUNDERR(bound_idx, bound_min, bound_max);
+		goto done;
 	}
-	if (!(bound_idx >= bound_min && bound_idx <= bound_max))
-		EMU86_EMULATE_THROW_BOUNDERR(bound_idx, bound_min, bound_max);
-	goto done;
+#else /* CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT */
+#define NEED_return_unsupported_instruction
+	goto return_unsupported_instruction;
+#endif /* !CONFIG_LIBEMU86_WANT_32BIT && !CONFIG_LIBEMU86_WANT_16BIT */
 }
-#endif /* CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT */
+#endif /* CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT || (EMU86_EMULATE_CONFIG_CHECKERROR && CONFIG_LIBEMU86_WANT_64BIT) */
 
 }
 EMU86_INTELLISENSE_END

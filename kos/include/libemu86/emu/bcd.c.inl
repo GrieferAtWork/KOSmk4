@@ -31,9 +31,9 @@ case 0x27: {
 	uintptr_t old_flags, new_flags;
 	u8 old_al, new_al;
 #if CONFIG_LIBEMU86_WANT_64BIT
-#define NEED_return_unavailable_instruction
+#define NEED_return_unsupported_instruction
 	if (EMU86_F_IS64(op_flags))
-		goto return_unavailable_instruction;
+		goto return_unsupported_instruction;
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
 	old_al    = EMU86_GETAL();
 	old_flags = EMU86_GETFLAGS();
@@ -63,9 +63,9 @@ case 0x2f: {
 	uintptr_t old_flags, new_flags;
 	u8 old_al, new_al;
 #if CONFIG_LIBEMU86_WANT_64BIT
-#define NEED_return_unavailable_instruction
+#define NEED_return_unsupported_instruction
 	if (EMU86_F_IS64(op_flags))
-		goto return_unavailable_instruction;
+		goto return_unsupported_instruction;
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
 	old_al    = EMU86_GETAL();
 	old_flags = EMU86_GETFLAGS();
@@ -95,9 +95,9 @@ case 0x37: {
 	uintptr_t flags;
 	u16 ax;
 #if CONFIG_LIBEMU86_WANT_64BIT
-#define NEED_return_unavailable_instruction
+#define NEED_return_unsupported_instruction
 	if (EMU86_F_IS64(op_flags))
-		goto return_unavailable_instruction;
+		goto return_unsupported_instruction;
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
 	ax    = EMU86_GETAX();
 	flags = EMU86_GETFLAGS();
@@ -120,9 +120,9 @@ case 0x3f: {
 	uintptr_t flags;
 	u16 ax;
 #if CONFIG_LIBEMU86_WANT_64BIT
-#define NEED_return_unavailable_instruction
+#define NEED_return_unsupported_instruction
 	if (EMU86_F_IS64(op_flags))
-		goto return_unavailable_instruction;
+		goto return_unsupported_instruction;
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
 	ax    = EMU86_GETAX();
 	flags = EMU86_GETFLAGS();
@@ -154,9 +154,9 @@ case 0xd4: {
 	u8 base;
 	u8 ah, al;
 #if CONFIG_LIBEMU86_WANT_64BIT
-#define NEED_return_unavailable_instruction
+#define NEED_return_unsupported_instruction
 	if (EMU86_F_IS64(op_flags))
-		goto return_unavailable_instruction;
+		goto return_unsupported_instruction;
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
 	base = *(u8 *)pc;
 	pc += 1;
@@ -183,9 +183,9 @@ case 0xd5: {
 	u8 base;
 	u8 ah, al;
 #if CONFIG_LIBEMU86_WANT_64BIT
-#define NEED_return_unavailable_instruction
+#define NEED_return_unsupported_instruction
 	if (EMU86_F_IS64(op_flags))
-		goto return_unavailable_instruction;
+		goto return_unsupported_instruction;
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
 	base = *(u8 *)pc;
 	pc += 1;

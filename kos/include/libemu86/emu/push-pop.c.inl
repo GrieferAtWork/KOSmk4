@@ -28,7 +28,7 @@ EMU86_INTELLISENSE_BEGIN(push_pop) {
 #if CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT
 
 #if CONFIG_LIBEMU86_WANT_64BIT
-#define NEED_return_unavailable_instruction
+#define NEED_return_unsupported_instruction
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
 
 /************************************************************************/

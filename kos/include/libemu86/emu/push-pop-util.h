@@ -33,7 +33,7 @@
 		T _value;                                    \
 		IF_64BIT({                                   \
 			if (EMU86_F_IS64(op_flags))              \
-				goto return_unavailable_instruction; \
+				goto return_unsupported_instruction; \
 		});                                          \
 		_value = (value);                            \
 		sp     = EMU86_GETSTACKPTR();                \
@@ -61,7 +61,7 @@
 		T _value;                                    \
 		IF_64BIT({                                   \
 			if (EMU86_F_IS64(op_flags))              \
-				goto return_unavailable_instruction; \
+				goto return_unsupported_instruction; \
 		});                                          \
 		sp = EMU86_GETSTACKPTR();                    \
 		if (IS_16BIT()) {                            \

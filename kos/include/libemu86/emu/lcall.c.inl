@@ -33,9 +33,9 @@ case 0x9a: {
 	u32 offset;
 	u16 segment;
 #if CONFIG_LIBEMU86_WANT_64BIT
-#define NEED_return_unavailable_instruction
+#define NEED_return_unsupported_instruction
 	if (EMU86_F_IS64(op_flags))
-		goto return_unavailable_instruction;
+		goto return_unsupported_instruction;
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
 	if (!IS_16BIT()) {
 		offset = UNALIGNED_GET32((u32 *)pc);

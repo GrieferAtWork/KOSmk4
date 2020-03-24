@@ -104,6 +104,14 @@ __DECL_BEGIN
 #endif /* !__KERNEL__ */
 #endif /* !EMU86_EMULATE_CONFIG_CHECKUSER */
 
+/* Enable permission/usage/register checks for instructions that could 
+ * only ever result in `EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION()'
+ * Without this, such instructions may instead be handled as though they
+ * were unknown. */
+#ifndef EMU86_EMULATE_CONFIG_CHECKERROR
+#define EMU86_EMULATE_CONFIG_CHECKERROR 0
+#endif /* !EMU86_EMULATE_CONFIG_CHECKERROR */
+
 /* Enable support for rdfsbase/rdgsbase/wrfsbase/wrgsbase
  * in 32-bit and 16-bit modes (with the instructions using
  * the 32-bit registers in both execution modi)
@@ -307,17 +315,6 @@ __DECL_BEGIN
  * no way of performing the operation was configured. */
 /* #define EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION()       ... */
 /* #define EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION_RMREG() ... */
-
-/* Instruction isn't available due in the current execution mode.
- * NOTE: Only invoked for instructions that would be recognized in
- *       other currently configure-enabled execution mode. - i.e.
- *       when libemu86 is configured to only support 16-bit mode,
- *       then 32-/64-bit only instruction will _NOT_ cause this
- *       macro to be expanded.
- * This macro is mainly used in 64-bit mode by instructions such
- * as `bound' (since those aren't available in that execution mode) */
-/* #define EMU86_EMULATE_THROW_UNAVAILABLE_INSTRUCTION()       ... */
-/* #define EMU86_EMULATE_THROW_UNAVAILABLE_INSTRUCTION_RMREG() ... */
 
 
 
@@ -1867,7 +1864,7 @@ _EMU86_INTELLISENSE_DEFINE_LABEL(return_unexpected_lock)               \
 _EMU86_INTELLISENSE_DEFINE_LABEL(return_unsupported_instruction_rmreg) \
 _EMU86_INTELLISENSE_DEFINE_LABEL(return_unsupported_instruction)       \
 _EMU86_INTELLISENSE_DEFINE_LABEL(return_unavailable_instruction_rmreg) \
-_EMU86_INTELLISENSE_DEFINE_LABEL(return_unavailable_instruction)       \
+_EMU86_INTELLISENSE_DEFINE_LABEL(return_unsupported_instruction)       \
 _EMU86_INTELLISENSE_DEFINE_LABEL(return_unknown_instruction_rmreg)     \
 		(void)0;                                                       \
 	}                                                                  \
@@ -2400,7 +2397,9 @@ return_unexpected_lock:;
 	}
 
 
-	/* Instruction isn't supported due to some missing hardware feature. */
+	/* Instruction isn't supported due to some missing hardware feature,
+	 * due to the current execution mode, or due to how libemu86 was
+	 * configured. */
 	__IF0 {
 #ifdef NEED_return_unsupported_instruction_rmreg
 #undef NEED_return_unsupported_instruction_rmreg
@@ -2416,25 +2415,6 @@ return_unsupported_instruction:;
 		EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION();
 #endif /* EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION */
 #endif /* NEED_return_unsupported_instruction */
-	}
-
-
-	/* Instruction isn't available due in the current execution mode. */
-	__IF0 {
-#ifdef NEED_return_unavailable_instruction_rmreg
-#undef NEED_return_unavailable_instruction_rmreg
-return_unavailable_instruction_rmreg:;
-#ifdef EMU86_EMULATE_THROW_UNAVAILABLE_INSTRUCTION_RMREG
-		EMU86_EMULATE_THROW_UNAVAILABLE_INSTRUCTION_RMREG();
-#endif /* EMU86_EMULATE_THROW_UNAVAILABLE_INSTRUCTION_RMREG */
-#endif /* NEED_return_unavailable_instruction_rmreg */
-#ifdef NEED_return_unavailable_instruction
-#undef NEED_return_unavailable_instruction
-return_unavailable_instruction:;
-#ifdef EMU86_EMULATE_THROW_UNAVAILABLE_INSTRUCTION
-		EMU86_EMULATE_THROW_UNAVAILABLE_INSTRUCTION();
-#endif /* EMU86_EMULATE_THROW_UNAVAILABLE_INSTRUCTION */
-#endif /* NEED_return_unavailable_instruction */
 	}
 
 
