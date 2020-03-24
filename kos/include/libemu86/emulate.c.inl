@@ -2295,7 +2295,6 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 			/* TODO: adcx */
 			/* TODO: adox */
 			/* TODO: mulx */
-			/* TODO: bextr */
 			/* TODO: movdir64b */
 
 			default:
