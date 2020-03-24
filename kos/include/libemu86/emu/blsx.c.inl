@@ -100,7 +100,42 @@ case 0x0f38f3: {
 		goto done;
 	}
 
-		/* TODO: blsi */
+
+	case 3: {
+		/* VEX.LZ.0F38.W0 F3 /3     BLSI r32, r/m32     Extract lowest set bit from r/m32 and set that bit in r32.
+		 * VEX.LZ.0F38.W1 F3 /3     BLSI r64, r/m64     Extract lowest set bit from r/m64, and set that bit in r64. */
+		u32 eflags_addend = 0;
+#if CONFIG_LIBEMU86_WANT_64BIT
+		if (op_flags & EMU86_F_VEX_W) {
+			u64 src, result;
+			src = MODRM_GETRMQ();
+			result = src & ~(src - 1);
+			if ((s64)result < 0)
+				eflags_addend |= EFLAGS_SF;
+			if (result == 0)
+				eflags_addend |= EFLAGS_ZF;
+			if (src != 0)
+				eflags_addend |= EFLAGS_CF;
+			VEX_SETREGQ(result);
+		} else
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+		{
+			u32 src, result;
+			src = MODRM_GETRML();
+			result = src & ~(src - 1);
+			if ((s32)result < 0)
+				eflags_addend |= EFLAGS_SF;
+			if (result == 0)
+				eflags_addend |= EFLAGS_ZF;
+			if (src != 0)
+				eflags_addend |= EFLAGS_CF;
+			VEX_SETREGL(result);
+		}
+		EMU86_MSKFLAGS(~(EFLAGS_SF | EFLAGS_ZF | EFLAGS_CF | EFLAGS_OF),
+		               eflags_addend);
+		goto done;
+	}
+
 
 	default:
 		goto return_unknown_instruction_rmreg;
