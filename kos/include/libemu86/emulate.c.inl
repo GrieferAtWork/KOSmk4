@@ -51,6 +51,12 @@
 #include "emu86.h"
 #include "helpers.h"
 
+/* When `LIBEMU86_DONT_USE_HYBRID_BIT' is defined, don't use the bit
+ * functions from `<hybrid/__bit.h>'. */
+#ifndef LIBEMU86_DONT_USE_HYBRID_BIT
+#include <hybrid/__bit.h>
+#endif /* !LIBEMU86_DONT_USE_HYBRID_BIT */
+
 /* When `LIBEMU86_DONT_USE_HYBRID_BSWAP' is defined, don't use the BSWAP()
  * functions from `<hybrid/byteswap.h>'. This should be configured when
  * libemu86 is being used to emulate instructions not supported by the
@@ -2245,6 +2251,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #include "emu/movs.c.inl"
 #include "emu/nop.c.inl"
 #include "emu/pmode.c.inl"
+#include "emu/popcnt.c.inl"
 #include "emu/push-pop.c.inl"
 #include "emu/pusha-popa.c.inl"
 #include "emu/pushf-popf.c.inl"
@@ -2279,7 +2286,6 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 
 			/* TODO: crc32 */
 			/* TODO: movbe */
-			/* TODO: popcnt */
 			/* TODO: andn */
 			/* TODO: blsr */
 			/* TODO: blsmsk */
