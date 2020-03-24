@@ -768,10 +768,10 @@ PRIVATE struct instruction const ops[] = {
 
 	I(0x63, IF_MODRM,        "arpl\t" OP_R16 OP_RM16),
 
-	/* 0x64 -- PREFIX */
-	/* 0x65 -- PREFIX */
-	/* 0x66 -- PREFIX */
-	/* 0x67 -- PREFIX */
+	/* 0x64 -- PREFIX (%fs:...) */
+	/* 0x65 -- PREFIX (%gs:...) */
+	/* 0x66 -- PREFIX (operand-size prefix) */
+	/* 0x67 -- PREFIX (address-size prefix) */
 
 	I(0x68, IF_66,           "pushw\t" OP_U16),
 	I(0x68, 0,               "pushl\t" OP_U32),
