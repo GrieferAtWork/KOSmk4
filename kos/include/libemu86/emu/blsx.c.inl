@@ -21,45 +21,62 @@
 #include "../emulate.c.inl"
 #endif /* __INTELLISENSE__ */
 
-EMU86_INTELLISENSE_BEGIN(andn) {
+EMU86_INTELLISENSE_BEGIN(blsx) {
 
 
-case 0x0f38f2: {
-	/* VEX.LZ.0F38.W0 F2 /r     ANDN r32a, r32b, r/m32     Bitwise AND of inverted r32b with r/m32, store result in r32a.
-	 * VEX.LZ.0F38.W1 F2 /r     ANDN r64a, r64b, r/m64     Bitwise AND of inverted r64b with r/m64, store result in r64a. */
-	EMU86_UREG_TYPE result;
-	u32 eflags_addend = 0;
+case 0x0f38f3: {
+	MODRM_DECODE();
 	if ((op_flags & (EMU86_F_HASVEX | EMU86_F_VEX_LL_M |
 	                 EMU86_F_LOCK | EMU86_F_66 |
 	                 EMU86_F_f2 | EMU86_F_f3)) != EMU86_F_HASVEX)
-		goto return_unknown_instruction;
-	MODRM_DECODE();
-#if CONFIG_LIBEMU86_WANT_64BIT
-	if (op_flags & EMU86_F_VEX_W) {
-		u64 lhs, rhs;
-		lhs = VEX_GETREGQ();
-		rhs = MODRM_GETRMQ();
-		result = ~lhs & rhs;
-		if ((s64)(u64)result < 0)
-			eflags_addend |= EFLAGS_SF;
-		MODRM_SETREGQ(result);
-	} else
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
-	{
-		u32 lhs, rhs;
-		lhs = VEX_GETREGL();
-		rhs = MODRM_GETRML();
-		result = ~lhs & rhs;
-		if ((s32)(u32)result < 0)
-			eflags_addend |= EFLAGS_SF;
-		MODRM_SETREGL(result);
-	}
-	if (result == 0)
-		eflags_addend |= EFLAGS_ZF;
-	EMU86_MSKFLAGS(~(EFLAGS_SF | EFLAGS_ZF),
-	               eflags_addend);
-}
+		goto return_unknown_instruction_rmreg;
+#define NEED_return_unknown_instruction_rmreg
+	switch (modrm.mi_reg) {
 
+	case 1: {
+		/* VEX.LZ.0F38.W0 F3 /1     BLSR r32, r/m32     Reset lowest set bit of r/m32, keep all other bits of r/m32 and write result to r32.
+		 * VEX.LZ.0F38.W1 F3 /1     BLSR r64, r/m64     Reset lowest set bit of r/m64, keep all other bits of r/m64 and write result to r64. */
+		u32 eflags_addend = 0;
+#if CONFIG_LIBEMU86_WANT_64BIT
+		if (op_flags & EMU86_F_VEX_W) {
+			u64 src, result;
+			src = MODRM_GETRMQ();
+			result = src & (src - 1);
+			if ((s64)result < 0)
+				eflags_addend |= EFLAGS_SF;
+			if (result == 0)
+				eflags_addend |= EFLAGS_ZF;
+			if (src == 0)
+				eflags_addend |= EFLAGS_CF;
+			VEX_SETREGQ(result);
+		} else
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+		{
+			u32 src, result;
+			src = MODRM_GETRML();
+			result = src & (src - 1);
+			if ((s32)result < 0)
+				eflags_addend |= EFLAGS_SF;
+			if (result == 0)
+				eflags_addend |= EFLAGS_ZF;
+			if (src == 0)
+				eflags_addend |= EFLAGS_CF;
+			VEX_SETREGL(result);
+		}
+		EMU86_MSKFLAGS(~(EFLAGS_SF | EFLAGS_ZF | EFLAGS_CF),
+		               eflags_addend);
+		goto done;
+	}
+
+		/* TODO: blsmsk */
+		/* TODO: blsi */
+
+	default:
+		goto return_unknown_instruction_rmreg;
+#define NEED_return_unknown_instruction_rmreg
+	}
+	break;
+}
 
 
 }
