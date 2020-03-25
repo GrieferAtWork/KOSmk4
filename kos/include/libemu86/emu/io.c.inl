@@ -36,6 +36,7 @@ EMU86_INTELLISENSE_BEGIN(io) {
 
 
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
+#if EMU86_EMULATE_CONFIG_WANT_IO
 case EMU86_OPCODE_ENCODE(0xe4): {
 	/* E4 ib     IN AL,imm8      Input byte from imm8 I/O port address into AL. */
 	u8 value;
@@ -47,7 +48,14 @@ case EMU86_OPCODE_ENCODE(0xe4): {
 	EMU86_SETAL(value);
 	goto done;
 }
+#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+case EMU86_OPCODE_ENCODE(0xe4):
+	goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* ... */
 
+
+#if EMU86_EMULATE_CONFIG_WANT_IO
 case EMU86_OPCODE_ENCODE(0xe5): {
 	/* E5 ib     IN AX,imm8      Input word from imm8 I/O port address into AX.
 	 * E5 ib     IN EAX,imm8     Input dword from imm8 I/O port address into EAX. */
@@ -67,7 +75,14 @@ case EMU86_OPCODE_ENCODE(0xe5): {
 	}
 	goto done;
 }
+#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+case EMU86_OPCODE_ENCODE(0xe5):
+	goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* ... */
 
+
+#if EMU86_EMULATE_CONFIG_WANT_IO
 case EMU86_OPCODE_ENCODE(0xec): {
 	/* EC        IN AL,DX        Input byte from I/O port in DX into AL. */
 	u8 value;
@@ -77,7 +92,14 @@ case EMU86_OPCODE_ENCODE(0xec): {
 	EMU86_SETAL(value);
 	goto done;
 }
+#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+case EMU86_OPCODE_ENCODE(0xec):
+	goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* ... */
 
+
+#if EMU86_EMULATE_CONFIG_WANT_IO
 case EMU86_OPCODE_ENCODE(0xed): {
 	/* ED        IN AX,DX        Input word from I/O port in DX into AX.
 	 * ED        IN EAX,DX       Input doubleword from I/O port in DX into EAX. */
@@ -95,8 +117,14 @@ case EMU86_OPCODE_ENCODE(0xed): {
 	}
 	goto done;
 }
+#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+case EMU86_OPCODE_ENCODE(0xed):
+	goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* ... */
 
 
+#if EMU86_EMULATE_CONFIG_WANT_IO
 case EMU86_OPCODE_ENCODE(0xe6): {
 	/* E6 ib     OUT imm8, AL      Output byte in AL to I/O port address imm8. */
 	u8 value;
@@ -108,7 +136,14 @@ case EMU86_OPCODE_ENCODE(0xe6): {
 	EMU86_EMULATE_OUTB(portno, value);
 	goto done;
 }
+#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+case EMU86_OPCODE_ENCODE(0xe6):
+	goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* ... */
 
+
+#if EMU86_EMULATE_CONFIG_WANT_IO
 case EMU86_OPCODE_ENCODE(0xe7): {
 	/* E7 ib     OUT imm8, AX      Output word in AX to I/O port address imm8.
 	 * E7 ib     OUT imm8, EAX     Output doubleword in EAX to I/O port address imm8. */
@@ -128,7 +163,14 @@ case EMU86_OPCODE_ENCODE(0xe7): {
 	}
 	goto done;
 }
+#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+case EMU86_OPCODE_ENCODE(0xe7):
+	goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* ... */
 
+
+#if EMU86_EMULATE_CONFIG_WANT_IO
 case EMU86_OPCODE_ENCODE(0xee): {
 	/* EE        OUT DX, AL        Output byte in AL to I/O port address in DX. */
 	u8 value;
@@ -139,7 +181,14 @@ case EMU86_OPCODE_ENCODE(0xee): {
 	EMU86_EMULATE_OUTB(portno, value);
 	goto done;
 }
+#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+case EMU86_OPCODE_ENCODE(0xee):
+	goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* ... */
 
+
+#if EMU86_EMULATE_CONFIG_WANT_IO
 case EMU86_OPCODE_ENCODE(0xef): {
 	/* EF        OUT DX, AX        Output word in AX to I/O port address in DX.
 	 * EF        OUT DX, EAX       Output doubleword in EAX to I/O port address in DX. */
@@ -157,13 +206,21 @@ case EMU86_OPCODE_ENCODE(0xef): {
 	}
 	goto done;
 }
+#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+case EMU86_OPCODE_ENCODE(0xef):
+	goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* ... */
+
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 
 
 
 
+#if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_IO
 case EMU86_OPCODE_ENCODE(0x6e): {
 	/* 6E     OUTSB     Output byte from memory location specified in DS:(E)SI or RSI to I/O port specified in DX. */
+#if EMU86_EMULATE_CONFIG_WANT_IO
 	u16 portno = EMU86_GETDX();
 	VERIFY_USER_PORT_ACCESS(portno, 1);
 #ifdef EMU86_EMULATE_OUT_IS_NOEXCEPT
@@ -181,11 +238,16 @@ case EMU86_OPCODE_ENCODE(0x6e): {
 	if (op_flags & EMU86_F_REP)
 		goto done_dont_set_pc;
 	goto done;
+#else /* EMU86_EMULATE_CONFIG_WANT_IO */
+	goto notsup_lodsb;
+#define NEED_notsup_lodsb
+#endif /* !EMU86_EMULATE_CONFIG_WANT_IO */
 }
 
 case EMU86_OPCODE_ENCODE(0x6f): {
 	/* 6F     OUTSW     Output word from memory location specified in DS:(E)SI or RSI to I/O port specified in DX.
 	 * 6F     OUTSD     Output doubleword from memory location specified in DS:(E)SI or RSI to I/O port specified in DX. */
+#if EMU86_EMULATE_CONFIG_WANT_IO
 	u16 portno = EMU86_GETDX();
 	if (!IS_16BIT()) {
 		VERIFY_USER_PORT_ACCESS(portno, 4);
@@ -218,11 +280,16 @@ case EMU86_OPCODE_ENCODE(0x6f): {
 	if (op_flags & EMU86_F_REP)
 		goto done_dont_set_pc;
 	goto done;
+#else /* EMU86_EMULATE_CONFIG_WANT_IO */
+	goto notsup_lodswlq;
+#define NEED_notsup_lodswlq
+#endif /* !EMU86_EMULATE_CONFIG_WANT_IO */
 }
 
 
 case EMU86_OPCODE_ENCODE(0x6c): {
 	/* 6C     INSB      Input byte from I/O port specified in DX into memory location specified with ES:(E)DI or RDI. */
+#if EMU86_EMULATE_CONFIG_WANT_IO
 	u16 portno = EMU86_GETDX();
 	u8 value;
 	VERIFY_USER_PORT_ACCESS(portno, 1);
@@ -232,12 +299,17 @@ case EMU86_OPCODE_ENCODE(0x6c): {
 	if (op_flags & EMU86_F_REP)
 		goto done_dont_set_pc;
 	goto done;
+#else /* EMU86_EMULATE_CONFIG_WANT_IO */
+	goto notsup_stosb;
+#define NEED_notsup_stosb
+#endif /* !EMU86_EMULATE_CONFIG_WANT_IO */
 }
 
 
 case EMU86_OPCODE_ENCODE(0x6d): {
 	/* 6D     INSW      Input word from I/O port specified in DX into memory location specified in ES:(E)DI or RDI.
 	 * 6D     INSD      Input doubleword from I/O port specified in DX into memory location specified in ES:(E)DI or RDI. */
+#if EMU86_EMULATE_CONFIG_WANT_IO
 	u16 portno = EMU86_GETDX();
 	if (!IS_16BIT()) {
 		u32 value;
@@ -254,9 +326,12 @@ case EMU86_OPCODE_ENCODE(0x6d): {
 	if (op_flags & EMU86_F_REP)
 		goto done_dont_set_pc;
 	goto done;
+#else /* EMU86_EMULATE_CONFIG_WANT_IO */
+	goto notsup_stoswlq;
+#define NEED_notsup_stoswlq
+#endif /* !EMU86_EMULATE_CONFIG_WANT_IO */
 }
-
-
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_IO */
 
 
 }

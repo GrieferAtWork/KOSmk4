@@ -24,13 +24,14 @@
 EMU86_INTELLISENSE_BEGIN(cpuid) {
 
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
+#if EMU86_EMULATE_CONFIG_WANT_CPUID
 case EMU86_OPCODE_ENCODE(0x0fa2): {
 	/* 0F A2     CPUID     Returns processor identification and feature information to the
 	 *                     EAX, EBX, ECX, and EDX registers, as determined by input entered
 	 *                     in EAX (in some cases, ECX as well). */
 #ifdef EMU86_EMULATE_HANDLE_CPUID
 	/* Allow for custom expressions for handling _all_ CPUID leaves. */
-	EMU86_EMULATE_HANDLE_CPUID;
+	EMU86_EMULATE_HANDLE_CPUID();
 #else /* EMU86_EMULATE_HANDLE_CPUID */
 	u32 eax;
 
@@ -165,6 +166,11 @@ cpuid_setinfo0_noeax:
 #endif /* !EMU86_EMULATE_HANDLE_CPUID */
 	goto done;
 }
+#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+case EMU86_OPCODE_ENCODE(0x0fa2):
+	goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 
 }

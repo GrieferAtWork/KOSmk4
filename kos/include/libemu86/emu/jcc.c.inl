@@ -25,7 +25,36 @@ EMU86_INTELLISENSE_BEGIN(jcc) {
 
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 
-#define DEFINE_Jcc(id, cond)                               \
+#if EMU86_EMULATE_CONFIG_WANT_JCC8
+#define DEFINE_Jcc8(id, cond)                              \
+	case EMU86_OPCODE_ENCODE(0x70 + id): {                 \
+		s8 offset;                                         \
+		u32 eflags = EMU86_GETFLAGS();                     \
+		offset     = *(s8 *)pc;                            \
+		pc += 1;                                           \
+		if (!(cond))                                       \
+			goto done;                                     \
+		{                                                  \
+			EMU86_UREG_TYPE dest_ip;                       \
+			dest_ip = REAL_IP() + offset;                  \
+			IF_16BIT_OR_32BIT(                             \
+			if (IS_16BIT() && !EMU86_F_IS64(op_flags))     \
+				dest_ip &= 0xffff;)                        \
+			EMU86_SETIPREG(dest_ip);                       \
+		}                                                  \
+		goto done_dont_set_pc;                             \
+	}
+#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+#define NEED_return_unsupported_instruction
+#define DEFINE_Jcc8(id, cond)            \
+	case EMU86_OPCODE_ENCODE(0x70 + id): \
+		goto return_unsupported_instruction;
+#else /* ... */
+#define DEFINE_Jcc8(id, cond) /* nothing */
+#endif /* !... */
+
+#if EMU86_EMULATE_CONFIG_WANT_JCC32
+#define DEFINE_Jcc32(id, cond)                             \
 	case EMU86_OPCODE_ENCODE(0x0f80 + id): {               \
 		s32 offset;                                        \
 		u32 eflags = EMU86_GETFLAGS();                     \
@@ -47,24 +76,20 @@ EMU86_INTELLISENSE_BEGIN(jcc) {
 			EMU86_SETIPREG(dest_ip);                       \
 		}                                                  \
 		goto done_dont_set_pc;                             \
-	}                                                      \
-	case EMU86_OPCODE_ENCODE(0x70 + id): {                 \
-		s8 offset;                                         \
-		u32 eflags = EMU86_GETFLAGS();                     \
-		offset     = *(s8 *)pc;                            \
-		pc += 1;                                           \
-		if (!(cond))                                       \
-			goto done;                                     \
-		{                                                  \
-			EMU86_UREG_TYPE dest_ip;                       \
-			dest_ip = REAL_IP() + offset;                  \
-			IF_16BIT_OR_32BIT(                             \
-			if (IS_16BIT() && !EMU86_F_IS64(op_flags))     \
-				dest_ip &= 0xffff;)                        \
-			EMU86_SETIPREG(dest_ip);                       \
-		}                                                  \
-		goto done_dont_set_pc;                             \
 	}
+#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+#define NEED_return_unsupported_instruction
+#define DEFINE_Jcc32(id, cond)               \
+	case EMU86_OPCODE_ENCODE(0x0f80 + id): \
+		goto return_unsupported_instruction;
+#else /* ... */
+#define DEFINE_Jcc32(id, cond) /* nothing */
+#endif /* !... */
+
+#define DEFINE_Jcc(id, cond) \
+	DEFINE_Jcc8(id, cond)    \
+	DEFINE_Jcc32(id, cond)
+
 
 	/* 0F 80 cd     JO rel32       Jump near if overflow (OF=1).
 	 * 0F 80 cw     JO rel16       Jump near if overflow (OF=1). Not supported in 64-bit mode.
@@ -193,10 +218,13 @@ EMU86_INTELLISENSE_BEGIN(jcc) {
 	DEFINE_Jcc(0xf, !(eflags & EFLAGS_ZF) &&
 	                (!!(eflags & EFLAGS_SF) ==
 	                             !!(eflags & EFLAGS_OF)))
+
+#undef DEFINE_Jcc8
+#undef DEFINE_Jcc32
 #undef DEFINE_Jcc
 
 
-
+#if EMU86_EMULATE_CONFIG_WANT_JCXZ
 case EMU86_OPCODE_ENCODE(0xe3): {
 	/* E3 cb     JCXZ rel8      Jump short if CX register is 0. Not supported in 64-bit mode.
 	 * E3 cb     JECXZ rel8     Jump short if ECX register is 0.
@@ -224,6 +252,11 @@ case EMU86_OPCODE_ENCODE(0xe3): {
 	}
 	goto done_dont_set_pc;
 }
+#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+case EMU86_OPCODE_ENCODE(0xe3):
+	goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* ... */
 
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 

@@ -23,9 +23,8 @@
 
 EMU86_INTELLISENSE_BEGIN(incdec) {
 
-#if CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
-
+#if EMU86_EMULATE_CONFIG_WANT_INCREG && (CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT)
 case EMU86_OPCODE_ENCODE(0x40) ... EMU86_OPCODE_ENCODE(0x47): {
 	/* 40+ rw    INC r16      Increment word register by 1.
 	 * 40+ rd    INC r32      Increment doubleword register by 1. */
@@ -65,8 +64,14 @@ case EMU86_OPCODE_ENCODE(0x40) ... EMU86_OPCODE_ENCODE(0x47): {
 	}
 	goto done;
 }
+#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+case EMU86_OPCODE_ENCODE(0x40) ... EMU86_OPCODE_ENCODE(0x47):
+	goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif
 
 
+#if EMU86_EMULATE_CONFIG_WANT_DECREG && (CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT)
 case EMU86_OPCODE_ENCODE(0x48) ... EMU86_OPCODE_ENCODE(0x4f): {
 	/* 48+ rw    DEC r16      Decrement word register by 1.
 	 * 48+ rd    DEC r32      Decrement doubleword register by 1. */
@@ -106,11 +111,13 @@ case EMU86_OPCODE_ENCODE(0x48) ... EMU86_OPCODE_ENCODE(0x4f): {
 	}
 	goto done;
 }
-
-
+#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+case EMU86_OPCODE_ENCODE(0x48) ... EMU86_OPCODE_ENCODE(0x4f):
+	goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif
 
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
-#endif /* CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT */
 
 }
 EMU86_INTELLISENSE_END

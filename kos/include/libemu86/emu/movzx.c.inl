@@ -21,38 +21,41 @@
 #include "../emulate.c.inl"
 #endif /* __INTELLISENSE__ */
 
-#include "push-pop-util.h"
+EMU86_INTELLISENSE_BEGIN(movzx) {
 
-EMU86_INTELLISENSE_BEGIN(call) {
 
-#if EMU86_EMULATE_CONFIG_WANT_CALL
-case EMU86_OPCODE_ENCODE(0xe8): {
-	/* E8 cw    CALL rel16   Call near, relative, displacement relative to next instruction.
-	 * E8 cd    CALL rel32   Call near, relative, displacement relative to next instruction.
-	 *                       32-bit displacement sign extended to 64-bits in 64-bit mode. */
-	EMU86_UREG_TYPE dest_ip;
-	s32 offset;
-	IF_16BIT_OR_32BIT(
-	if (IS_16BIT() && !EMU86_F_IS64(op_flags)) {
-		offset = (s32)(s16)UNALIGNED_GET16((u16 *)pc);
-		pc += 2;
-	} else) {
-		offset = (s32)UNALIGNED_GET32((u32 *)pc);
-		pc += 4;
+case EMU86_OPCODE_ENCODE(0x0fb6): {
+	u8 value;
+	/*         0F B6 /r     MOVZX r16, r/m8     Move byte to word with zero-extension.
+	 *         0F B6 /r     MOVZX r32, r/m8     Move byte to doubleword, zero-extension.
+	 * REX.W + 0F B6 /r     MOVZX r64, r/m8*    Move byte to quadword, zero-extension. */
+	MODRM_DECODE();
+	value = MODRM_GETRMB();
+	IF_64BIT(if (IS_64BIT()) {
+		MODRM_SETREGQ((u64)value);
+	} else) if (!IS_16BIT()) {
+		MODRM_SETREGL((u32)value);
+	} else {
+		MODRM_SETREGW((u16)value);
 	}
-	dest_ip = REAL_IP() + offset;
-	/* Push the previous PC */
-	EMU86_PUSH163264((dest_ip &= 0xffff, (u16)REAL_IP()),
-	                 (u32)REAL_IP(),
-	                 (u64)REAL_IP());
-	EMU86_SETIPREG(dest_ip);
-	goto done_dont_set_pc;
+	goto done;
 }
-#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
-case EMU86_OPCODE_ENCODE(0xe8):
-	goto return_unsupported_instruction;
-#define NEED_return_unsupported_instruction
-#endif /* ... */
+
+
+case EMU86_OPCODE_ENCODE(0x0fb7): {
+	u16 value;
+	/*         0F B7 /r     MOVZX r32, r/m16    Move word to doubleword, zero-extension.
+	 * REX.W + 0F B7 /r     MOVZX r64, r/m16    Move word to quadword, zero-extension. */
+	MODRM_DECODE();
+	value = MODRM_GETRMW();
+	IF_64BIT(if (IS_64BIT()) {
+		MODRM_SETREGQ((u64)value);
+	} else) {
+		MODRM_SETREGL((u32)value);
+	}
+	goto done;
+}
+
 
 }
 EMU86_INTELLISENSE_END

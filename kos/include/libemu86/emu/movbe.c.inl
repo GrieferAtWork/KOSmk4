@@ -24,6 +24,7 @@
 EMU86_INTELLISENSE_BEGIN(movbe) {
 
 
+#if EMU86_EMULATE_CONFIG_WANT_MOVBE
 case EMU86_OPCODE_ENCODE(0x0f38f0): {
 	/*         0F 38 F0 /r     MOVBE r16, m16     Reverse byte order in m16 and move to r16.
 	 *         0F 38 F0 /r     MOVBE r32, m32     Reverse byte order in m32 and move to r32.
@@ -32,7 +33,7 @@ case EMU86_OPCODE_ENCODE(0x0f38f0): {
 	MODRM_DECODE_MEMONLY();
 #define NEED_return_expected_memory_modrm
 	addr = MODRM_MEMADDR();
-#ifdef LIBEMU86_DONT_USE_HYBRID_BSWAP
+#ifdef EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BSWAP
 	IF_64BIT(if (IS_64BIT()) {
 		union {
 			u8  bytes[8];
@@ -72,7 +73,7 @@ case EMU86_OPCODE_ENCODE(0x0f38f0): {
 		newword.bytes[1] = oldword.bytes[0];
 		MODRM_SETREGW(newword.word);
 	}
-#else /* LIBEMU86_DONT_USE_HYBRID_BSWAP */
+#else /* EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BSWAP */
 	IF_64BIT(if (IS_64BIT()) {
 		u64 oldword, newword;
 		EMU86_READ_USER_MEMORY(addr, 8);
@@ -92,11 +93,17 @@ case EMU86_OPCODE_ENCODE(0x0f38f0): {
 		newword = BSWAP16(oldword);
 		MODRM_SETREGW(newword);
 	}
-#endif /* !LIBEMU86_DONT_USE_HYBRID_BSWAP */
+#endif /* !EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BSWAP */
 	goto done;
 }
+#elif EMU86_EMULATE_CONFIG_CHECKERROR
+case EMU86_OPCODE_ENCODE(0x0f38f0):
+	goto notsup_modrm_getwlq;
+#define NEED_notsup_modrm_getwlq
+#endif /* ... */
 
 
+#if EMU86_EMULATE_CONFIG_WANT_MOVBE
 case EMU86_OPCODE_ENCODE(0x0f38f1): {
 	/*         0F 38 F1 /r     MOVBE m16, r16     Reverse byte order in r16 and move to m16.
 	 *         0F 38 F1 /r     MOVBE m32, r32     Reverse byte order in r32 and move to m32.
@@ -105,7 +112,7 @@ case EMU86_OPCODE_ENCODE(0x0f38f1): {
 	MODRM_DECODE_MEMONLY();
 #define NEED_return_expected_memory_modrm
 	addr = MODRM_MEMADDR();
-#ifdef LIBEMU86_DONT_USE_HYBRID_BSWAP
+#ifdef EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BSWAP
 	IF_64BIT(if (IS_64BIT()) {
 		union {
 			u8  bytes[8];
@@ -145,7 +152,7 @@ case EMU86_OPCODE_ENCODE(0x0f38f1): {
 		newword.bytes[1] = oldword.bytes[0];
 		EMU86_MEMWRITEW(addr, newword.word);
 	}
-#else /* LIBEMU86_DONT_USE_HYBRID_BSWAP */
+#else /* EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BSWAP */
 	IF_64BIT(if (IS_64BIT()) {
 		u64 oldword, newword;
 		EMU86_WRITE_USER_MEMORY(addr, 8);
@@ -165,10 +172,14 @@ case EMU86_OPCODE_ENCODE(0x0f38f1): {
 		newword = BSWAP16(oldword);
 		EMU86_MEMWRITEW(addr, newword);
 	}
-#endif /* !LIBEMU86_DONT_USE_HYBRID_BSWAP */
+#endif /* !EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BSWAP */
 	goto done;
 }
-
+#elif EMU86_EMULATE_CONFIG_CHECKERROR
+case EMU86_OPCODE_ENCODE(0x0f38f1):
+	goto notsup_modrm_setwlq;
+#define NEED_notsup_modrm_setwlq
+#endif /* ... */
 
 
 }

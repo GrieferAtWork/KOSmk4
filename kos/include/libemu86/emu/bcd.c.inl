@@ -24,8 +24,9 @@
 EMU86_INTELLISENSE_BEGIN(bcd) {
 
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
-#if CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT
+#if EMU86_EMULATE_CONFIG_CHECKERROR || CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT
 
+#if EMU86_EMULATE_CONFIG_WANT_DAA
 case EMU86_OPCODE_ENCODE(0x27): {
 	/* 27     DAA     Decimal adjust AL after addition. */
 	uintptr_t old_flags, new_flags;
@@ -57,7 +58,14 @@ case EMU86_OPCODE_ENCODE(0x27): {
 	EMU86_SETFLAGS(new_flags);
 	goto done;
 }
+#elif !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+case EMU86_OPCODE_ENCODE(0x27):
+#define NEED_return_unsupported_instruction
+	goto return_unsupported_instruction;
+#endif /* ... */
 
+
+#if EMU86_EMULATE_CONFIG_WANT_DAS
 case EMU86_OPCODE_ENCODE(0x2f): {
 	/* 2F     DAS     Decimal adjust AL after subtraction. */
 	uintptr_t old_flags, new_flags;
@@ -88,8 +96,14 @@ case EMU86_OPCODE_ENCODE(0x2f): {
 	EMU86_SETFLAGS(new_flags);
 	goto done;
 }
+#elif !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+case EMU86_OPCODE_ENCODE(0x2f):
+#define NEED_return_unsupported_instruction
+	goto return_unsupported_instruction;
+#endif /* ... */
 
 
+#if EMU86_EMULATE_CONFIG_WANT_AAA
 case EMU86_OPCODE_ENCODE(0x37): {
 	/* 37     AAA     ASCII adjust AL after addition. */
 	uintptr_t flags;
@@ -112,8 +126,14 @@ case EMU86_OPCODE_ENCODE(0x37): {
 	EMU86_SETFLAGS(flags);
 	goto done;
 }
+#elif !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+case EMU86_OPCODE_ENCODE(0x37):
+#define NEED_return_unsupported_instruction
+	goto return_unsupported_instruction;
+#endif /* ... */
 
 
+#if EMU86_EMULATE_CONFIG_WANT_AAS
 case EMU86_OPCODE_ENCODE(0x3f): {
 	/* 3F     AAS     ASCII adjust AL after subtraction.
 	 * s.a. https://www.youtube.com/watch?v=c2ia8T4E2Mc */
@@ -137,9 +157,15 @@ case EMU86_OPCODE_ENCODE(0x3f): {
 	EMU86_SETFLAGS(flags);
 	goto done;
 }
+#elif !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+case EMU86_OPCODE_ENCODE(0x3f):
+#define NEED_return_unsupported_instruction
+	goto return_unsupported_instruction;
+#endif /* ... */
 
 
 
+#if EMU86_EMULATE_CONFIG_WANT_AAM
 #ifndef NIF_EMU86_EMULATE_THROW_DIVIDE_BY_ZERO_ALLOW_RETHROW
 #if EMU86_EMULATE_THROW_DIVIDE_BY_ZERO_ALLOW_RETHROW
 #define NIF_EMU86_EMULATE_THROW_DIVIDE_BY_ZERO_ALLOW_RETHROW(...) /* nothing */
@@ -175,8 +201,14 @@ case EMU86_OPCODE_ENCODE(0xd4): {
 	               emu86_geteflags_testb(al));
 	goto done;
 }
+#elif !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+case EMU86_OPCODE_ENCODE(0xd4):
+#define NEED_return_unsupported_instruction
+	goto return_unsupported_instruction;
+#endif /* ... */
 
 
+#if EMU86_EMULATE_CONFIG_WANT_AAD
 case EMU86_OPCODE_ENCODE(0xd5): {
 	/* D5 0A     AAD          ASCII adjust AX before division.
 	 * D5 ib     AAD imm8     Adjust AX before division to number base imm8. */
@@ -198,8 +230,13 @@ case EMU86_OPCODE_ENCODE(0xd5): {
 	               emu86_geteflags_testb(al));
 	goto done;
 }
+#elif !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+case EMU86_OPCODE_ENCODE(0xd5):
+#define NEED_return_unsupported_instruction
+	goto return_unsupported_instruction;
+#endif /* ... */
 
-#endif /* CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT */
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT */
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 
 }

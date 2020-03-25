@@ -24,16 +24,20 @@
 EMU86_INTELLISENSE_BEGIN(andn) {
 
 
+#if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_ANDN
 case EMU86_OPCODE_ENCODE(0x0f38f2): {
 	/* VEX.LZ.0F38.W0 F2 /r     ANDN r32a, r32b, r/m32     Bitwise AND of inverted r32b with r/m32, store result in r32a.
 	 * VEX.LZ.0F38.W1 F2 /r     ANDN r64a, r64b, r/m64     Bitwise AND of inverted r64b with r/m64, store result in r64a. */
+#if EMU86_EMULATE_CONFIG_WANT_ANDN
 	EMU86_UREG_TYPE result;
 	u32 eflags_addend = 0;
+#endif /* EMU86_EMULATE_CONFIG_WANT_ANDN */
 	if ((op_flags & (EMU86_F_HASVEX | EMU86_F_VEX_LL_M |
 	                 EMU86_F_LOCK | EMU86_F_66 |
 	                 EMU86_F_f2 | EMU86_F_f3)) != EMU86_F_HASVEX)
 		goto return_unknown_instruction;
 	MODRM_DECODE();
+#if EMU86_EMULATE_CONFIG_WANT_ANDN
 #if CONFIG_LIBEMU86_WANT_64BIT
 	if (op_flags & EMU86_F_VEX_W) {
 		u64 lhs, rhs;
@@ -58,7 +62,14 @@ case EMU86_OPCODE_ENCODE(0x0f38f2): {
 		eflags_addend |= EFLAGS_ZF;
 	EMU86_MSKFLAGS(~(EFLAGS_SF | EFLAGS_ZF),
 	               eflags_addend);
+	goto done;
+#else /* EMU86_EMULATE_CONFIG_WANT_ANDN */
+	MODRM_NOSUP_GETRMZ_VEX_W();
+	goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* !EMU86_EMULATE_CONFIG_WANT_ANDN */
 }
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_ANDN */
 
 
 

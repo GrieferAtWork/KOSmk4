@@ -56,6 +56,7 @@
 
 #include "decode.h"
 
+#ifndef CONFIG_USE_HANDLE_BAD_USAGE
 DECL_BEGIN
 
 PRIVATE struct icpustate *FCALL
@@ -1276,5 +1277,6 @@ unwind_state:
 }
 
 DECL_END
+#endif /* !CONFIG_USE_HANDLE_BAD_USAGE */
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_FAULT_HANDLE_GPF_C */

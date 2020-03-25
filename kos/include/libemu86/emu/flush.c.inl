@@ -24,6 +24,7 @@
 EMU86_INTELLISENSE_BEGIN(flush) {
 
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
+#if EMU86_EMULATE_CONFIG_WANT_INVD
 case EMU86_OPCODE_ENCODE(0x0f08): {
 	/* 0F 08     INVD     Flush internal caches; initiate flushing of external caches. */
 #ifdef EMU86_EMULATE_INVD
@@ -31,8 +32,14 @@ case EMU86_OPCODE_ENCODE(0x0f08): {
 #endif /* EMU86_EMULATE_INVD */
 	goto done;
 }
+#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+case EMU86_OPCODE_ENCODE(0x0f08):
+	goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* ... */
 
 
+#if EMU86_EMULATE_CONFIG_WANT_WBINVD
 case EMU86_OPCODE_ENCODE(0x0f09): {
 	/* 0F 09     WBINVD     Write back and flush Internal caches; initiate writing-back and flushing of external caches. */
 #ifdef EMU86_EMULATE_WBINVD
@@ -40,12 +47,20 @@ case EMU86_OPCODE_ENCODE(0x0f09): {
 #endif /* EMU86_EMULATE_WBINVD */
 	goto done;
 }
+#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+case EMU86_OPCODE_ENCODE(0x0f09):
+	goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* ... */
 
 
+#if ((EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC) || \
+     EMU86_EMULATE_CONFIG_WANT_PREFETCHW)
 case EMU86_OPCODE_ENCODE(0x0f0d): {
 	MODRM_DECODE();
 	switch (modrm.mi_reg) {
 
+#if EMU86_EMULATE_CONFIG_WANT_PREFETCHW
 	case 1: {
 		/* 0F 0D /1     PREFETCHW m8     Move data from m8 closer to the processor in anticipation of a write. */
 		if (!EMU86_MODRM_ISMEM(modrm.mi_type))
@@ -56,6 +71,11 @@ case EMU86_OPCODE_ENCODE(0x0f0d): {
 #endif /* EMU86_EMULATE_WPREFETCHW */
 		goto done;
 	}
+#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+	case 1:
+		goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
+#endif /* ... */
 
 	default:
 		goto return_unknown_instruction_rmreg;
@@ -63,8 +83,12 @@ case EMU86_OPCODE_ENCODE(0x0f0d): {
 	}
 	break;
 }
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_PREFETCHW */
 
 
+#if ((EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC) || \
+     EMU86_EMULATE_CONFIG_WANT_PREFETCHNTA || EMU86_EMULATE_CONFIG_WANT_PREFETCH0 ||        \
+     EMU86_EMULATE_CONFIG_WANT_PREFETCH1 || EMU86_EMULATE_CONFIG_WANT_PREFETCH2)
 case EMU86_OPCODE_ENCODE(0x0f18): {
 	/* 0F 18 /0     PREFETCHNTA m8     Move data from m8 closer to the processor using NTA hint.
 	 * 0F 18 /1     PREFETCHT0 m8      Move data from m8 closer to the processor using T0 hint.
@@ -76,29 +100,56 @@ case EMU86_OPCODE_ENCODE(0x0f18): {
 #define NEED_return_expected_memory_modrm_rmreg
 	switch (modrm.mi_reg) {
 
+#if EMU86_EMULATE_CONFIG_WANT_PREFETCHNTA
 	case 0:
 #ifdef EMU86_EMULATE_PREFETCHNTA
 		EMU86_EMULATE_PREFETCHNTA(MODRM_MEMADDR());
 #endif /* EMU86_EMULATE_PREFETCHNTA */
 		goto done;
+#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+	case 0:
+		goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
+#endif /* ... */
 
+
+#if EMU86_EMULATE_CONFIG_WANT_PREFETCH0
 	case 1:
 #ifdef EMU86_EMULATE_PREFETCH0
 		EMU86_EMULATE_PREFETCH0(MODRM_MEMADDR());
 #endif /* EMU86_EMULATE_PREFETCH0 */
 		goto done;
+#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+	case 1:
+		goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
+#endif /* ... */
 
+
+#if EMU86_EMULATE_CONFIG_WANT_PREFETCH1
 	case 2:
 #ifdef EMU86_EMULATE_PREFETCH1
 		EMU86_EMULATE_PREFETCH1(MODRM_MEMADDR());
 #endif /* EMU86_EMULATE_PREFETCH1 */
 		goto done;
+#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+	case 2:
+		goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
+#endif /* ... */
 
+
+#if EMU86_EMULATE_CONFIG_WANT_PREFETCH2
 	case 3:
 #ifdef EMU86_EMULATE_PREFETCH2
 		EMU86_EMULATE_PREFETCH2(MODRM_MEMADDR());
 #endif /* EMU86_EMULATE_PREFETCH2 */
 		goto done;
+#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+	case 3:
+		goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
+#endif /* ... */
 
 	default:
 		goto return_unknown_instruction_rmreg;
@@ -106,8 +157,10 @@ case EMU86_OPCODE_ENCODE(0x0f18): {
 	}
 	break;
 }
+#endif /* ((EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC) || ... */
 
 
+#if (EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC) || EMU86_EMULATE_CONFIG_WANT_CLDEMOTE
 case EMU86_OPCODE_ENCODE(0x0f1c): {
 	MODRM_DECODE();
 	if (!EMU86_MODRM_ISMEM(modrm.mi_type))
@@ -115,6 +168,7 @@ case EMU86_OPCODE_ENCODE(0x0f1c): {
 #define NEED_return_expected_memory_modrm_rmreg
 	switch (modrm.mi_reg) {
 
+#if EMU86_EMULATE_CONFIG_WANT_CLDEMOTE
 	case 0:
 		/* NP 0F 1C /0     CLDEMOTE m8     Hint to hardware to move the cache line containing m8 to a more
 		 *                                 distant level of the cache without writing back to memory. */
@@ -122,6 +176,11 @@ case EMU86_OPCODE_ENCODE(0x0f1c): {
 		EMU86_EMULATE_CLDEMOTE(MODRM_MEMADDR());
 #endif /* EMU86_EMULATE_CLDEMOTE */
 		goto done;
+#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+	case 0:
+		goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
+#endif /* ... */
 
 	default:
 		goto return_unknown_instruction_rmreg;
@@ -129,6 +188,7 @@ case EMU86_OPCODE_ENCODE(0x0f1c): {
 	}
 	break;
 }
+#endif /* (EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC) || EMU86_EMULATE_CONFIG_WANT_CLDEMOTE */
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 
 }

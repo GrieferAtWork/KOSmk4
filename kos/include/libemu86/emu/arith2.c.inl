@@ -23,6 +23,9 @@
 
 EMU86_INTELLISENSE_BEGIN(arith2) {
 
+#if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_ARITH2
+
+#if EMU86_EMULATE_CONFIG_WANT_ARITH2
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 #define NEED_return_unexpected_lock_rmreg
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
@@ -72,9 +75,11 @@ EMU86_INTELLISENSE_BEGIN(arith2) {
 	EMU86_MSKFLAGS(~(EFLAGS_CF | EFLAGS_OF | EFLAGS_SF |                       \
 	                 EFLAGS_ZF | EFLAGS_AF | EFLAGS_PF),                       \
 	               eflags_addend | emu86_geteflags_test##bwlq(newval));
+#endif /* EMU86_EMULATE_CONFIG_WANT_ARITH2 */
 
 
 case EMU86_OPCODE_ENCODE(0xf6):
+#if EMU86_EMULATE_CONFIG_WANT_ARITH2
 	MODRM_DECODE();
 	switch (modrm.mi_reg) {
 
@@ -184,13 +189,34 @@ case EMU86_OPCODE_ENCODE(0xf6):
 	}
 
 	default:
+#if CONFIG_LIBEMU86_WANT_64BIT
+#define NEED_return_unknown_instruction_rmreg
+		goto return_unknown_instruction_rmreg;
+#else /* CONFIG_LIBEMU86_WANT_64BIT */
+		__builtin_unreachable();
+#endif /* !CONFIG_LIBEMU86_WANT_64BIT */
+	}
+#else /* EMU86_EMULATE_CONFIG_WANT_ARITH2 */
+	MODRM_DECODE();
+#if CONFIG_LIBEMU86_WANT_64BIT
+	if (modrm.mi_reg >= 8) {
 #define NEED_return_unknown_instruction_rmreg
 		goto return_unknown_instruction_rmreg;
 	}
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+	if (modrm.mi_reg == 0) {
+		MODRM_NOSUP_GETRMB();
+	} else {
+		MODRM_NOSUP_GETSETRMB();
+	}
+	goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
+#endif /* !EMU86_EMULATE_CONFIG_WANT_ARITH2 */
 	break;
 
 
 case EMU86_OPCODE_ENCODE(0xf7):
+#if EMU86_EMULATE_CONFIG_WANT_ARITH2
 	MODRM_DECODE();
 	switch (modrm.mi_reg) {
 
@@ -534,9 +560,29 @@ case EMU86_OPCODE_ENCODE(0xf7):
 		goto done;
 
 	default:
+#if CONFIG_LIBEMU86_WANT_64BIT
+#define NEED_return_unknown_instruction_rmreg
+		goto return_unknown_instruction_rmreg;
+#else /* CONFIG_LIBEMU86_WANT_64BIT */
+		__builtin_unreachable();
+#endif /* !CONFIG_LIBEMU86_WANT_64BIT */
+	}
+#else /* EMU86_EMULATE_CONFIG_WANT_ARITH2 */
+	MODRM_DECODE();
+#if CONFIG_LIBEMU86_WANT_64BIT
+	if (modrm.mi_reg >= 8) {
 #define NEED_return_unknown_instruction_rmreg
 		goto return_unknown_instruction_rmreg;
 	}
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+	if (modrm.mi_reg == 0) {
+		MODRM_NOSUP_GETRMWLQ();
+	} else {
+		MODRM_NOSUP_GETSETRMWLQ();
+	}
+	goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
+#endif /* !EMU86_EMULATE_CONFIG_WANT_ARITH2 */
 	break;
 
 #undef DEFINE_NEG_MODRM_rm
@@ -545,6 +591,7 @@ case EMU86_OPCODE_ENCODE(0xf7):
 
 case EMU86_OPCODE_ENCODE(0x84): {
 	/* 84 /r      TEST r/m8,r8      AND r8 with r/m8; set SF, ZF, PF according to result */
+#if EMU86_EMULATE_CONFIG_WANT_ARITH2
 	u8 lhs, rhs;
 	MODRM_DECODE();
 	lhs = MODRM_GETRMB();
@@ -552,13 +599,19 @@ case EMU86_OPCODE_ENCODE(0x84): {
 	EMU86_MSKFLAGS(~(EFLAGS_SF | EFLAGS_ZF | EFLAGS_PF),
 	               emu86_geteflags_testb(lhs & rhs));
 	goto done;
+#else /* EMU86_EMULATE_CONFIG_WANT_ARITH2 */
+#define NEED_notsup_modrm_getb
+	goto notsup_modrm_getb;
+#endif /* !EMU86_EMULATE_CONFIG_WANT_ARITH2 */
 }
 
 
 
 case EMU86_OPCODE_ENCODE(0x85): {
-	/* 85 /r      TEST r/m16,r16      AND r16 with r/m16; set SF, ZF, PF according to result */
-	/* 85 /r      TEST r/m32,r32      AND r32 with r/m32; set SF, ZF, PF according to result */
+#if EMU86_EMULATE_CONFIG_WANT_ARITH2
+	/* 85 /r      TEST r/m16,r16      AND r16 with r/m16; set SF, ZF, PF according to result
+	 * 85 /r      TEST r/m32,r32      AND r32 with r/m32; set SF, ZF, PF according to result
+	 * 85 /r      TEST r/m64,r64      AND r64 with r/m64; set SF, ZF, PF according to result */
 	MODRM_DECODE();
 	IF_64BIT(if (IS_64BIT()) {
 		u64 lhs, rhs;
@@ -583,10 +636,15 @@ case EMU86_OPCODE_ENCODE(0x85): {
 		               emu86_geteflags_testw(lhs & rhs));
 	}
 	goto done;
+#else /* EMU86_EMULATE_CONFIG_WANT_ARITH2 */
+#define NEED_notsup_modrm_getwlq
+	goto notsup_modrm_getwlq;
+#endif /* !EMU86_EMULATE_CONFIG_WANT_ARITH2 */
 }
 
 
 case EMU86_OPCODE_ENCODE(0x0faf): {
+#if EMU86_EMULATE_CONFIG_WANT_ARITH2
 	/*         0F AF /r     IMUL r16, r/m16     word register <- word register * r/m16.
 	 *         0F AF /r     IMUL r32, r/m32     doubleword register <- doubleword register * r/m32.
 	 * REX.W + 0F AF /r     IMUL r64, r/m64     Quadword register <- Quadword register * r/m64. */
@@ -616,6 +674,10 @@ case EMU86_OPCODE_ENCODE(0x0faf): {
 	               ? (EFLAGS_CF | EFLAGS_OF)
 	               : 0);
 	goto done;
+#else /* EMU86_EMULATE_CONFIG_WANT_ARITH2 */
+#define NEED_notsup_modrm_getwlq
+	goto notsup_modrm_getwlq;
+#endif /* !EMU86_EMULATE_CONFIG_WANT_ARITH2 */
 }
 
 
@@ -623,6 +685,7 @@ case EMU86_OPCODE_ENCODE(0x6b): {
 	/*         6B /r ib     IMUL r16, r/m16, imm8     word register <- r/m16 * sign-extended immediate byte.
 	 *         6B /r ib     IMUL r32, r/m32, imm8     doubleword register <- r/m32 * sign-extended immediate byte.
 	 * REX.W + 6B /r ib     IMUL r64, r/m64, imm8     Quadword register <- r/m64 * sign-extended immediate byte. */
+#if EMU86_EMULATE_CONFIG_WANT_ARITH2
 	s8 imm;
 	bool overflow;
 	MODRM_DECODE();
@@ -649,6 +712,10 @@ case EMU86_OPCODE_ENCODE(0x6b): {
 	               ? (EFLAGS_CF | EFLAGS_OF)
 	               : 0);
 	goto done;
+#else /* EMU86_EMULATE_CONFIG_WANT_ARITH2 */
+#define NEED_notsup_modrm_getwlq
+	goto notsup_modrm_getwlq;
+#endif /* !EMU86_EMULATE_CONFIG_WANT_ARITH2 */
 }
 
 
@@ -656,6 +723,7 @@ case EMU86_OPCODE_ENCODE(0x69): {
 	/*         69 /r iw     IMUL r16, r/m16, imm16     word register <- r/m16 * immediate word.
 	 *         69 /r id     IMUL r32, r/m32, imm32     doubleword register <- r/m32 * immediate doubleword.
 	 * REX.W + 69 /r id     IMUL r64, r/m64, imm32     Quadword register <- r/m64 * immediate doubleword. */
+#if EMU86_EMULATE_CONFIG_WANT_ARITH2
 	bool overflow;
 	MODRM_DECODE();
 	IF_64BIT(if (IS_64BIT()) {
@@ -686,10 +754,15 @@ case EMU86_OPCODE_ENCODE(0x69): {
 	               ? (EFLAGS_CF | EFLAGS_OF)
 	               : 0);
 	goto done;
+#else /* EMU86_EMULATE_CONFIG_WANT_ARITH2 */
+#define NEED_notsup_modrm_getwlq
+	goto notsup_modrm_getwlq;
+#endif /* !EMU86_EMULATE_CONFIG_WANT_ARITH2 */
 }
 
 
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
+#if EMU86_EMULATE_CONFIG_WANT_ARITH2
 case EMU86_OPCODE_ENCODE(0xa8): {
 	/*         A8 ib     TEST AL, imm8       AND imm8 with AL; set SF, ZF, PF according to result. */
 	u8 lhs, imm;
@@ -700,7 +773,14 @@ case EMU86_OPCODE_ENCODE(0xa8): {
 	               emu86_geteflags_testb(lhs & imm));
 	goto done;
 }
+#elif !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+case EMU86_OPCODE_ENCODE(0xa8): {
+	goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+}
+#endif /* ... */
 
+#if EMU86_EMULATE_CONFIG_WANT_ARITH2
 case EMU86_OPCODE_ENCODE(0xa9): {
 	/*         A9 iw     TEST AX, imm16      AND imm16 with AX; set SF, ZF, PF according to result.
 	 *         A9 id     TEST EAX, imm32     AND imm32 with EAX; set SF, ZF, PF according to result.
@@ -729,8 +809,15 @@ case EMU86_OPCODE_ENCODE(0xa9): {
 	}
 	goto done;
 }
+#elif !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+case EMU86_OPCODE_ENCODE(0xa9): {
+	goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+}
+#endif /* ... */
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_ARITH2 */
 
 }
 EMU86_INTELLISENSE_END

@@ -25,6 +25,7 @@ EMU86_INTELLISENSE_BEGIN(bswap) {
 
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 
+#if EMU86_EMULATE_CONFIG_WANT_BSWAP
 case EMU86_OPCODE_ENCODE(0x0fc8) ... EMU86_OPCODE_ENCODE(0x0fcf): {
 	/*         0F C8+rd     BSWAP r32     Reverses the byte order of a 32-bit register.
 	 * REX.W + 0F C8+rd     BSWAP r64     Reverses the byte order of a 64-bit register. */
@@ -34,7 +35,7 @@ case EMU86_OPCODE_ENCODE(0x0fc8) ... EMU86_OPCODE_ENCODE(0x0fcf): {
 	if (op_flags & EMU86_F_REX_B)
 		regno |= 0x8;
 	if (IS_64BIT()) {
-#ifdef LIBEMU86_DONT_USE_HYBRID_BSWAP
+#ifdef EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BSWAP
 		union {
 			u8  bytes[8];
 			u64 qword;
@@ -49,16 +50,16 @@ case EMU86_OPCODE_ENCODE(0x0fc8) ... EMU86_OPCODE_ENCODE(0x0fcf): {
 		newval.bytes[6] = oldval.bytes[1];
 		newval.bytes[7] = oldval.bytes[0];
 		EMU86_SETREGQ(regno, newval.qword);
-#else /* LIBEMU86_DONT_USE_HYBRID_BSWAP */
+#else /* EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BSWAP */
 		u64 temp;
 		temp = EMU86_GETREGQ(regno);
 		temp = BSWAP64(temp);
 		EMU86_SETREGQ(regno, temp);
-#endif /* !LIBEMU86_DONT_USE_HYBRID_BSWAP */
+#endif /* !EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BSWAP */
 	} else
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
 	{
-#ifdef LIBEMU86_DONT_USE_HYBRID_BSWAP
+#ifdef EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BSWAP
 		union {
 			u8  bytes[4];
 			u32 dword;
@@ -69,15 +70,20 @@ case EMU86_OPCODE_ENCODE(0x0fc8) ... EMU86_OPCODE_ENCODE(0x0fcf): {
 		newval.bytes[2] = oldval.bytes[1];
 		newval.bytes[3] = oldval.bytes[0];
 		EMU86_SETREGL(regno, newval.dword);
-#else /* LIBEMU86_DONT_USE_HYBRID_BSWAP */
+#else /* EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BSWAP */
 		u32 temp;
 		temp = EMU86_GETREGL(regno);
 		temp = BSWAP32(temp);
 		EMU86_SETREGL(regno, temp);
-#endif /* !LIBEMU86_DONT_USE_HYBRID_BSWAP */
+#endif /* !EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BSWAP */
 	}
 	goto done;
 }
+#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+case EMU86_OPCODE_ENCODE(0x0fc8) ... EMU86_OPCODE_ENCODE(0x0fcf):
+	goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* ... */
 
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 

@@ -21,38 +21,21 @@
 #include "../emulate.c.inl"
 #endif /* __INTELLISENSE__ */
 
-#include "push-pop-util.h"
+EMU86_INTELLISENSE_BEGIN(sysexit) {
 
-EMU86_INTELLISENSE_BEGIN(call) {
-
-#if EMU86_EMULATE_CONFIG_WANT_CALL
-case EMU86_OPCODE_ENCODE(0xe8): {
-	/* E8 cw    CALL rel16   Call near, relative, displacement relative to next instruction.
-	 * E8 cd    CALL rel32   Call near, relative, displacement relative to next instruction.
-	 *                       32-bit displacement sign extended to 64-bits in 64-bit mode. */
-	EMU86_UREG_TYPE dest_ip;
-	s32 offset;
-	IF_16BIT_OR_32BIT(
-	if (IS_16BIT() && !EMU86_F_IS64(op_flags)) {
-		offset = (s32)(s16)UNALIGNED_GET16((u16 *)pc);
-		pc += 2;
-	} else) {
-		offset = (s32)UNALIGNED_GET32((u32 *)pc);
-		pc += 4;
-	}
-	dest_ip = REAL_IP() + offset;
-	/* Push the previous PC */
-	EMU86_PUSH163264((dest_ip &= 0xffff, (u16)REAL_IP()),
-	                 (u32)REAL_IP(),
-	                 (u64)REAL_IP());
-	EMU86_SETIPREG(dest_ip);
-	goto done_dont_set_pc;
-}
-#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
-case EMU86_OPCODE_ENCODE(0xe8):
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
+#if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_SYSEXIT
+case EMU86_OPCODE_ENCODE(0x0f35): {
+	/*         0F 35     SYSEXIT     Fast return to privilege level 3 user code.
+	 * REX.W + 0F 35     SYSEXIT     Fast return to 64-bit mode privilege level 3 user code. */
+#define NEED_return_unexpected_lock
+	EMU86_REQUIRE_NO_LOCK();
+	/* XXX: Emulate? */
 	goto return_unsupported_instruction;
 #define NEED_return_unsupported_instruction
-#endif /* ... */
+}
+#endif /* EMU86_EMULATE_CONFIG_WANT_SYSEXIT || EMU86_EMULATE_CONFIG_WANT_SYSEXIT */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 
 }
 EMU86_INTELLISENSE_END

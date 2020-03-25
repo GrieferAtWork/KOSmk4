@@ -20,6 +20,11 @@
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_FAULT_DECODE_H
 #define GUARD_KERNEL_CORE_ARCH_I386_FAULT_DECODE_H 1
 
+#undef CONFIG_USE_HANDLE_BAD_USAGE
+#if 0 /* TODO: Enable me */
+#define CONFIG_USE_HANDLE_BAD_USAGE 1
+#endif
+
 #include <kernel/compiler.h>
 
 #include <kernel/types.h>

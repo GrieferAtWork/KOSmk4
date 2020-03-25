@@ -25,18 +25,23 @@
 
 EMU86_INTELLISENSE_BEGIN(lcall) {
 
-#if CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT
+#if ((EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC) || \
+     (EMU86_EMULATE_CONFIG_WANT_LCALL && (CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT)))
 case EMU86_OPCODE_ENCODE(0x9a): {
 	/* 9A cd    CALL ptr16:16    Call far, absolute, address given in operand.
 	 * 9A cp    CALL ptr16:32    Call far, absolute, address given in operand. */
+#if CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT
 	byte_t *sp;
+#if EMU86_EMULATE_CONFIG_WANT_LCALL || EMU86_EMULATE_CONFIG_CHECKUSER
 	u32 offset;
 	u16 segment;
+#endif /* EMU86_EMULATE_CONFIG_WANT_LCALL || EMU86_EMULATE_CONFIG_CHECKUSER */
 #if CONFIG_LIBEMU86_WANT_64BIT
 #define NEED_return_unsupported_instruction
 	if (EMU86_F_IS64(op_flags))
 		goto return_unsupported_instruction;
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#if EMU86_EMULATE_CONFIG_WANT_LCALL || EMU86_EMULATE_CONFIG_CHECKUSER
 	if (!IS_16BIT()) {
 		offset = UNALIGNED_GET32((u32 *)pc);
 		pc += 4;
@@ -46,13 +51,14 @@ case EMU86_OPCODE_ENCODE(0x9a): {
 	}
 	segment = UNALIGNED_GET16((u16 *)pc);
 	pc += 2;
+#endif /* EMU86_EMULATE_CONFIG_WANT_LCALL || EMU86_EMULATE_CONFIG_CHECKUSER */
 	/* Verify the segment index. */
 #if EMU86_EMULATE_CONFIG_CHECKUSER
 	if (!SEGMENT_IS_VALID_USERCODE(segment) && EMU86_ISUSER_NOVM86()) {
 #ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
 		EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV,
 		                                                 X86_REGISTER_SEGMENT_CS,
-		                                                 segment, 0);
+		                                                 segment, offset);
 #else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 #define NEED_return_privileged_instruction
 		goto return_privileged_instruction;
@@ -63,22 +69,39 @@ case EMU86_OPCODE_ENCODE(0x9a): {
 	if (!IS_16BIT()) {
 		sp -= 8;
 		EMU86_EMULATE_PUSH(sp, 8);
+#if EMU86_EMULATE_CONFIG_WANT_LCALL
 		EMU86_WRITE_USER_MEMORY(sp, 8);
 		EMU86_MEMWRITEL(sp + 4, (u32)EMU86_GETCS());
 		EMU86_MEMWRITEL(sp + 0, (u32)REAL_IP());
+#else /* EMU86_EMULATE_CONFIG_WANT_LCALL */
+		EMU86_UNSUPPORTED_MEMACCESS(sp, 8, false, true);
+#endif /* !EMU86_EMULATE_CONFIG_WANT_LCALL */
 	} else {
 		sp -= 4;
 		EMU86_EMULATE_PUSH(sp, 4);
+#if EMU86_EMULATE_CONFIG_WANT_LCALL
 		EMU86_WRITE_USER_MEMORY(sp, 4);
 		EMU86_MEMWRITEW(sp + 2, (u16)EMU86_GETCS());
 		EMU86_MEMWRITEW(sp + 0, (u16)REAL_IP());
+#else /* EMU86_EMULATE_CONFIG_WANT_LCALL */
+		EMU86_UNSUPPORTED_MEMACCESS(sp, 4, false, true);
+#endif /* !EMU86_EMULATE_CONFIG_WANT_LCALL */
 	}
+#if EMU86_EMULATE_CONFIG_WANT_LCALL
 	EMU86_SETSTACKPTR(sp);
 	EMU86_SETCS(segment);
 	EMU86_SETIPREG(offset);
+#else /* EMU86_EMULATE_CONFIG_WANT_LCALL */
+#define NEED_return_unsupported_instruction
+	goto return_unsupported_instruction;
+#endif /* !EMU86_EMULATE_CONFIG_WANT_LCALL */
+#else /* CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT */
+#define NEED_return_unsupported_instruction
+	goto return_unsupported_instruction;
+#endif /* !CONFIG_LIBEMU86_WANT_16BIT && !CONFIG_LIBEMU86_WANT_32BIT */
 	goto done_dont_set_pc;
 }
-#endif /* CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT */
+#endif /* ... */
 
 }
 EMU86_INTELLISENSE_END

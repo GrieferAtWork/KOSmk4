@@ -27,19 +27,24 @@
 EMU86_INTELLISENSE_BEGIN(lret) {
 
 
+#if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_LRET
 case EMU86_OPCODE_ENCODE(0xcb): {
 	/* CB     RET     Far return to calling procedure. */
+#if EMU86_EMULATE_CONFIG_WANT_LRET || EMU86_EMULATE_CONFIG_CHECKUSER
 	u16 cs;
 	byte_t *sp;
 	EMU86_UREG_TYPE ip;
 	sp = EMU86_GETSTACKPTR();
-	IF_64BIT(if (IS_64BIT()) {
+#if CONFIG_LIBEMU86_WANT_64BIT
+	if (IS_64BIT()) {
 		EMU86_EMULATE_POP(sp, 16);
 		EMU86_READ_USER_MEMORY(sp, 16);
 		ip = EMU86_MEMREADQ(sp + 0);
 		cs = EMU86_MEMREADQASW(sp + 8);
 		sp += 16;
-	} else) if (!IS_16BIT()) {
+	} else
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+	if (!IS_16BIT()) {
 		EMU86_EMULATE_POP(sp, 8);
 		EMU86_READ_USER_MEMORY(sp, 8);
 		ip = EMU86_MEMREADL(sp + 0);
@@ -48,8 +53,8 @@ case EMU86_OPCODE_ENCODE(0xcb): {
 	} else {
 		EMU86_EMULATE_POP(sp, 4);
 		EMU86_READ_USER_MEMORY(sp, 4);
-		cs = EMU86_MEMREADW(sp + 0);
-		ip = EMU86_MEMREADW(sp + 2);
+		ip = EMU86_MEMREADW(sp + 0);
+		cs = EMU86_MEMREADW(sp + 2);
 		sp += 4;
 	}
 #if EMU86_EMULATE_CONFIG_CHECKUSER
@@ -58,36 +63,52 @@ case EMU86_OPCODE_ENCODE(0xcb): {
 #ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
 		EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV,
 		                                                 X86_REGISTER_SEGMENT_CS,
-		                                                 cs, 0);
+		                                                 cs, ip);
 #else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 #define NEED_return_privileged_instruction
 		goto return_privileged_instruction;
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 	}
 #endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
+#endif /* EMU86_EMULATE_CONFIG_WANT_LRET || EMU86_EMULATE_CONFIG_CHECKUSER */
+#if EMU86_EMULATE_CONFIG_WANT_LRET
 	EMU86_SETSTACKPTR(sp);
 	EMU86_SETCS(cs);
 	EMU86_SETIPREG(ip);
 	goto done_dont_set_pc;
+#else /* EMU86_EMULATE_CONFIG_WANT_LRET */
+	goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction;
+#endif /* !EMU86_EMULATE_CONFIG_WANT_LRET */
 }
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_LRET */
 
 
+#if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_LRET
 case EMU86_OPCODE_ENCODE(0xca): {
 	/* CA iw     RET imm16     Far return to calling procedure and pop imm16 bytes from stack. */
+#if EMU86_EMULATE_CONFIG_WANT_LRET || EMU86_EMULATE_CONFIG_CHECKUSER
 	u16 cs;
 	byte_t *sp;
+#if EMU86_EMULATE_CONFIG_WANT_LRET
 	u16 offset;
+#endif /* EMU86_EMULATE_CONFIG_WANT_LRET */
 	EMU86_UREG_TYPE ip;
+#if EMU86_EMULATE_CONFIG_WANT_LRET
 	offset = UNALIGNED_GET16((u16 *)pc);
 	pc += 2;
+#endif /* EMU86_EMULATE_CONFIG_WANT_LRET */
 	sp = EMU86_GETSTACKPTR();
-	IF_64BIT(if (IS_64BIT()) {
+#if CONFIG_LIBEMU86_WANT_64BIT
+	if (IS_64BIT()) {
 		EMU86_EMULATE_POP(sp, 16);
 		EMU86_READ_USER_MEMORY(sp, 16);
 		ip = EMU86_MEMREADQ(sp + 0);
 		cs = EMU86_MEMREADQASW(sp + 8);
 		sp += 16;
-	} else) if (!IS_16BIT()) {
+	} else
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+	if (!IS_16BIT()) {
 		EMU86_EMULATE_POP(sp, 8);
 		EMU86_READ_USER_MEMORY(sp, 8);
 		ip = EMU86_MEMREADL(sp + 0);
@@ -96,8 +117,8 @@ case EMU86_OPCODE_ENCODE(0xca): {
 	} else {
 		EMU86_EMULATE_POP(sp, 4);
 		EMU86_READ_USER_MEMORY(sp, 4);
-		cs = EMU86_MEMREADW(sp + 0);
-		ip = EMU86_MEMREADW(sp + 2);
+		ip = EMU86_MEMREADW(sp + 0);
+		cs = EMU86_MEMREADW(sp + 2);
 		sp += 4;
 	}
 #if EMU86_EMULATE_CONFIG_CHECKUSER
@@ -106,19 +127,26 @@ case EMU86_OPCODE_ENCODE(0xca): {
 #ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
 		EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV,
 		                                                 X86_REGISTER_SEGMENT_CS,
-		                                                 cs, 0);
+		                                                 cs, ip);
 #else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 #define NEED_return_privileged_instruction
 		goto return_privileged_instruction;
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 	}
 #endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
+#endif /* EMU86_EMULATE_CONFIG_WANT_LRET || EMU86_EMULATE_CONFIG_CHECKUSER */
+#if EMU86_EMULATE_CONFIG_WANT_LRET
 	sp += offset;
 	EMU86_SETSTACKPTR(sp);
 	EMU86_SETCS(cs);
 	EMU86_SETIPREG(ip);
 	goto done_dont_set_pc;
+#else /* EMU86_EMULATE_CONFIG_WANT_LRET */
+	goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction;
+#endif /* !EMU86_EMULATE_CONFIG_WANT_LRET */
 }
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_LRET */
 
 
 }

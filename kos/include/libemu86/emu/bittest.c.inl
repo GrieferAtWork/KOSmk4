@@ -22,12 +22,16 @@
 #endif /* __INTELLISENSE__ */
 
 EMU86_INTELLISENSE_BEGIN(bittest) {
+#if EMU86_EMULATE_CONFIG_WANT_BITTEST
 	bool nonzero;
 	unsigned int bitno;
+#endif /* EMU86_EMULATE_CONFIG_WANT_BITTEST */
 
 case EMU86_OPCODE_ENCODE(0x0fa3):
-	/* 0F A3      BT r/m16, r16      Store selected bit in CF flag */
-	/* 0F A3      BT r/m32, r32      Store selected bit in CF flag */
+#if EMU86_EMULATE_CONFIG_WANT_BITTEST
+	/* 0F A3      BT r/m16, r16      Store selected bit in CF flag
+	 * 0F A3      BT r/m32, r32      Store selected bit in CF flag
+	 * 0F A3      BT r/m64, r64      Store selected bit in CF flag */
 	MODRM_DECODE();
 	bitno = MODRM_GETREGW();
 do_bt_modrm:
@@ -44,7 +48,13 @@ do_bt_modrm:
 set_cf_from_nonzero:
 	EMU86_MSKFLAGS(~EFLAGS_CF, nonzero ? EFLAGS_CF : 0);
 	goto done;
+#else /* EMU86_EMULATE_CONFIG_WANT_BITTEST */
+	goto notsup_modrm_getwlq;
+#define NEED_notsup_modrm_getwlq
+#endif /* !EMU86_EMULATE_CONFIG_WANT_BITTEST */
 
+
+#if EMU86_EMULATE_CONFIG_WANT_BITTEST
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 #define NEED_return_unexpected_lock
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
@@ -113,11 +123,13 @@ set_cf_from_nonzero:
 		}                                                                              \
 		nonzero = (oldval & mask) != 0;                                                \
 	}
+#endif /* EMU86_EMULATE_CONFIG_WANT_BITTEST */
 
 case EMU86_OPCODE_ENCODE(0x0fbb):
 	/*         0F BB /r     BTC r/m16, r16      Store selected bit in CF flag and complement.
 	 *         0F BB /r     BTC r/m32, r32      Store selected bit in CF flag and complement.
 	 * REX.W + 0F BB /r     BTC r/m64, r64      Store selected bit in CF flag and complement. */
+#if EMU86_EMULATE_CONFIG_WANT_BITTEST
 	MODRM_DECODE();
 	bitno = MODRM_GETREGW();
 do_btc_modrm:
@@ -125,12 +137,17 @@ do_btc_modrm:
 	DEFINE_BIT_TEST_AND_op(PRED_COMPLEMENT);
 #undef PRED_COMPLEMENT
 	goto set_cf_from_nonzero;
+#else /* EMU86_EMULATE_CONFIG_WANT_BITTEST */
+	goto notsup_modrm_getsetwlq;
+#define NEED_notsup_modrm_getsetwlq
+#endif /* !EMU86_EMULATE_CONFIG_WANT_BITTEST */
 
 
 case EMU86_OPCODE_ENCODE(0x0fb3):
 	/*         0F B3 /r     BTR r/m16, r16      Store selected bit in CF flag and clear.
 	 *         0F B3 /r     BTR r/m32, r32      Store selected bit in CF flag and clear.
 	 * REX.W + 0F B3 /r     BTR r/m64, r64      Store selected bit in CF flag and clear. */
+#if EMU86_EMULATE_CONFIG_WANT_BITTEST
 	MODRM_DECODE();
 	bitno = MODRM_GETREGW();
 do_btr_modrm:
@@ -138,12 +155,17 @@ do_btr_modrm:
 	DEFINE_BIT_TEST_AND_op(PRED_RESET);
 #undef PRED_RESET
 	goto set_cf_from_nonzero;
+#else /* EMU86_EMULATE_CONFIG_WANT_BITTEST */
+	goto notsup_modrm_getsetwlq;
+#define NEED_notsup_modrm_getsetwlq
+#endif /* !EMU86_EMULATE_CONFIG_WANT_BITTEST */
 
 
 case EMU86_OPCODE_ENCODE(0x0fab):
 	/*         0F AB /r     BTS r/m16, r16      Store selected bit in CF flag and set.
 	 *         0F AB /r     BTS r/m32, r32      Store selected bit in CF flag and set.
 	 * REX.W + 0F AB /r     BTS r/m64, r64      Store selected bit in CF flag and set. */
+#if EMU86_EMULATE_CONFIG_WANT_BITTEST
 	MODRM_DECODE();
 	bitno = MODRM_GETREGW();
 do_bts_modrm:
@@ -151,11 +173,16 @@ do_bts_modrm:
 	DEFINE_BIT_TEST_AND_op(PRED_SET);
 #undef PRED_SET
 	goto set_cf_from_nonzero;
+#else /* EMU86_EMULATE_CONFIG_WANT_BITTEST */
+	goto notsup_modrm_getsetwlq;
+#define NEED_notsup_modrm_getsetwlq
+#endif /* !EMU86_EMULATE_CONFIG_WANT_BITTEST */
 
 #undef DEFINE_BIT_TEST_AND_op
 
 
 case EMU86_OPCODE_ENCODE(0x0fba):
+#if EMU86_EMULATE_CONFIG_WANT_BITTEST
 	MODRM_DECODE();
 	/* Take the bit number from *PC */
 	bitno = *(u8 *)pc;
@@ -191,6 +218,22 @@ case EMU86_OPCODE_ENCODE(0x0fba):
 		goto return_unknown_instruction_rmreg;
 	}
 	break;
+#else /* EMU86_EMULATE_CONFIG_WANT_BITTEST */
+	MODRM_DECODE();
+#if CONFIG_LIBEMU86_WANT_64BIT
+	if (modrm.mi_reg >= 8) {
+#define NEED_return_unknown_instruction_rmreg
+		goto return_unknown_instruction_rmreg;
+	}
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+	if (modrm.mi_reg == 0) {
+		MODRM_NOSUP_GETRMWLQ();
+	} else {
+		MODRM_NOSUP_GETSETRMWLQ();
+	}
+	goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
+#endif /* !EMU86_EMULATE_CONFIG_WANT_BITTEST */
 
 
 

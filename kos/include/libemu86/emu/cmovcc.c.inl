@@ -24,34 +24,56 @@
 EMU86_INTELLISENSE_BEGIN(cmovcc) {
 
 	/* Define CMOVcc and SETcc instructions */
-#define DEFINE_CMOVcc_SETcc(id, cond_expr)      \
-	case EMU86_OPCODE_ENCODE(0x0f40 + id): {    \
-		u32 eflags;                             \
-		MODRM_DECODE();                         \
-		eflags = EMU86_GETFLAGS();              \
-		if (cond_expr) {                        \
-			IF_64BIT(if (IS_64BIT()) {          \
-				u64 value = MODRM_GETRMQ();     \
-				MODRM_SETREGQ(value);           \
-			} else) if (!IS_16BIT()) {          \
-				u32 value = MODRM_GETRML();     \
-				MODRM_SETREGL(value);           \
-			} else {                            \
-				u16 value = MODRM_GETRMW();     \
-				MODRM_SETREGW(value);           \
-			}                                   \
-		}                                       \
-		goto done;                              \
-	}                                           \
-	                                            \
-	case EMU86_OPCODE_ENCODE(0x0f90 + id): {    \
-		u32 eflags;                             \
-		MODRM_DECODE();                         \
-		eflags = EMU86_GETFLAGS();              \
-		MODRM_SETRMB((cond_expr) ? 1 : 0);      \
-		goto done;                              \
+#if EMU86_EMULATE_CONFIG_WANT_SETCC
+#define DEFINE_SETcc(id, cond_expr)          \
+	case EMU86_OPCODE_ENCODE(0x0f90 + id): { \
+		u32 eflags;                          \
+		MODRM_DECODE();                      \
+		eflags = EMU86_GETFLAGS();           \
+		MODRM_SETRMB((cond_expr) ? 1 : 0);   \
+		goto done;                           \
 	}
+#elif EMU86_EMULATE_CONFIG_CHECKERROR
+#define DEFINE_SETcc(id, cond_expr)        \
+	case EMU86_OPCODE_ENCODE(0x0f90 + id): \
+		goto notsup_modrm_getwlq;
+#define NEED_notsup_modrm_getwlq
+#else
+#define DEFINE_SETcc(id, cond_expr) /* nothing */
+#endif
 
+#if EMU86_EMULATE_CONFIG_WANT_CMOVCC
+#define DEFINE_CMOVcc(id, cond_expr)         \
+	case EMU86_OPCODE_ENCODE(0x0f40 + id): { \
+		u32 eflags;                          \
+		MODRM_DECODE();                      \
+		eflags = EMU86_GETFLAGS();           \
+		if (cond_expr) {                     \
+			IF_64BIT(if (IS_64BIT()) {       \
+				u64 value = MODRM_GETRMQ();  \
+				MODRM_SETREGQ(value);        \
+			} else) if (!IS_16BIT()) {       \
+				u32 value = MODRM_GETRML();  \
+				MODRM_SETREGL(value);        \
+			} else {                         \
+				u16 value = MODRM_GETRMW();  \
+				MODRM_SETREGW(value);        \
+			}                                \
+		}                                    \
+		goto done;                           \
+	}
+#elif EMU86_EMULATE_CONFIG_CHECKERROR
+#define DEFINE_CMOVcc(id, cond_expr)       \
+	case EMU86_OPCODE_ENCODE(0x0f40 + id): \
+		goto notsup_modrm_getwlq;
+#define NEED_notsup_modrm_getwlq
+#else
+#define DEFINE_CMOVcc(id, cond_expr) /* nothing */
+#endif
+
+#define DEFINE_CMOVcc_SETcc(id, cond_expr) \
+	DEFINE_CMOVcc(id, cond_expr)           \
+	DEFINE_SETcc(id, cond_expr)
 
 	/* 0F 40      CMOVO r16, r/m16        Move if overflow (OF=1) */
 	/* 0F 40      CMOVO r32, r/m32        Move if overflow (OF=1) */
@@ -151,6 +173,8 @@ EMU86_INTELLISENSE_BEGIN(cmovcc) {
 	                         (!!(eflags & EFLAGS_SF) ==
 	                          !!(eflags & EFLAGS_OF)))
 
+#undef DEFINE_SETcc
+#undef DEFINE_CMOVcc
 #undef DEFINE_CMOVcc_SETcc
 
 }

@@ -169,7 +169,7 @@ void (__int)(__UINT8_TYPE__ __intno);
 #endif
 __FORCELOCAL void (__invd)(void) { __asm__ __volatile__("invd"); }
 __FORCELOCAL void (__wbinvd)(void) { __asm__ __volatile__("wbinvd"); }
-__FORCELOCAL void (__invlpg)(void *__p) { __asm__ __volatile__("invlpg" : : "m" (*(int *)__p)); }
+__FORCELOCAL void (__invlpg)(void *__p) { __asm__ __volatile__("invlpg %0" : : "m" (*(int *)__p)); }
 __FORCELOCAL void (__lfence)(void) { __COMPILER_READ_BARRIER(); __asm__ __volatile__("lfence"); __COMPILER_READ_BARRIER(); }
 __FORCELOCAL void (__sfence)(void) { __COMPILER_WRITE_BARRIER(); __asm__ __volatile__("sfence"); __COMPILER_WRITE_BARRIER(); }
 __FORCELOCAL void (__mfence)(void) { __COMPILER_BARRIER(); __asm__ __volatile__("mfence"); __COMPILER_BARRIER(); }

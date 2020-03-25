@@ -78,6 +78,7 @@ opt.append("-Os");
 #ifdef __KERNEL__
 #include <kernel/except.h>
 #include <kernel/printk.h>
+#include <sched/except-handler.h>
 #include <sched/task.h>
 #endif /* __KERNEL__ */
 
@@ -100,9 +101,9 @@ INTDEF void CC libviocore_emulate(struct vio_emulate_args *__restrict self);
 #endif /* !__KERNEL__ */
 
 /* Fill in missing exception pointer. */
-PRIVATE __NOBLOCK void
+PRIVATE ATTR_NORETURN __NOBLOCK void
 NOTHROW(CC libviocore_complete_except)(struct vio_emulate_args *__restrict self,
-                                       u32 opcode) {
+                                       uintptr_t opcode) {
 	struct exception_data *data;
 	data = error_data();
 	if (data->e_class == E_ILLEGAL_INSTRUCTION) {
@@ -127,6 +128,18 @@ NOTHROW(CC libviocore_complete_except)(struct vio_emulate_args *__restrict self,
 	}
 	/* Fill in the fault address. */
 	data->e_faultaddr = (void *)CS(getpc)(self->vea_args.va_state);
+#ifdef __KERNEL__
+#if EXCEPT_BACKTRACE_SIZE != 0
+	{
+		unsigned int i;
+		for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
+			PERTASK_SET(this_exception_trace[i], (void *)0);
+	}
+#endif /* EXCEPT_BACKTRACE_SIZE != 0 */
+	x86_userexcept_unwind_interrupt(self->vea_args.va_state);
+#else /* __KERNEL__ */
+	RETHROW();
+#endif /* !__KERNEL__ */
 }
 
 #define EMU86_MEMREADB(addr) \
@@ -965,7 +978,6 @@ libviocore_atomic_cmpxch128(struct vio_emulate_args *__restrict self,
 #define EMU86_EMULATE_EXCEPT_SWITCH                       \
 	EXCEPT {                                              \
 		libviocore_complete_except(self, EMU86_OPCODE()); \
-		RETHROW();                                        \
 	}
 #define EMU86_EMULATE_GETOPFLAGS() _CS(emu86_opflagsof)(self->vea_args.va_state)
 #define EMU86_EMULATE_CONFIG_ONLY_MEMORY 1 /* _ONLY_ emulate memory-based instructions! */
@@ -1180,6 +1192,10 @@ NOTHROW(CC i386_getsegment_base)(struct icpustate32 *__restrict state,
 	return result;
 }
 
+#if 1 /* Unused */
+#define EMU86_SETFSBASE(v) unused_feature;
+#define EMU86_SETGSBASE(v) unused_feature;
+#else /* Unused */
 #define EMU86_SETFSBASE(v) i386_setsegment_base(self->vea_args.va_state, EMU86_R_FS, (u32)(v))
 #define EMU86_SETGSBASE(v) i386_setsegment_base(self->vea_args.va_state, EMU86_R_GS, (u32)(v))
 PRIVATE WUNUSED NONNULL((1)) void
@@ -1240,6 +1256,7 @@ NOTHROW(CC i386_setsegment_base)(struct icpustate32 *__restrict state,
 	if (segment_regno == EMU86_R_GS)
 		__wrgs(segment_index);
 }
+#endif
 
 #endif /* !__x86_64__ */
 #else /* __KERNEL__ */
@@ -1671,21 +1688,21 @@ NOTHROW(CC CS_setregl)(struct vio_emulate_args *__restrict self, u8 regno, u32 v
  * This is required because all of these instructions can take
  * a memory location as operand, thus allowing them to trigger
  * a #PF that may require VIO emulation... */
-#define EMU86_WANT_EMULATE_SLDT 1
-#define EMU86_WANT_EMULATE_LLDT 1
-#define EMU86_WANT_EMULATE_STR  1
-#define EMU86_WANT_EMULATE_LTR  1
-#define EMU86_WANT_EMULATE_SGDT 1
-#define EMU86_WANT_EMULATE_LGDT 1
-#define EMU86_WANT_EMULATE_SIDT 1
-#define EMU86_WANT_EMULATE_LIDT 1
-#define EMU86_WANT_EMULATE_VERR 1
-#define EMU86_WANT_EMULATE_VERW 1
-#define EMU86_WANT_EMULATE_SMSW 1
-#define EMU86_WANT_EMULATE_LMSW 1
-/* #define EMU86_WANT_EMULATE_INVLPG 1 */ /* This one shouldn't be able to cause a segfault! */
-#define EMU86_WANT_EMULATE_LAR 1
-#define EMU86_WANT_EMULATE_LSL 1
+#define EMU86_EMULATE_CONFIG_WANT_SLDT 1
+#define EMU86_EMULATE_CONFIG_WANT_LLDT 1
+#define EMU86_EMULATE_CONFIG_WANT_STR  1
+#define EMU86_EMULATE_CONFIG_WANT_LTR  1
+#define EMU86_EMULATE_CONFIG_WANT_SGDT 1
+#define EMU86_EMULATE_CONFIG_WANT_LGDT 1
+#define EMU86_EMULATE_CONFIG_WANT_SIDT 1
+#define EMU86_EMULATE_CONFIG_WANT_LIDT 1
+#define EMU86_EMULATE_CONFIG_WANT_VERR 1
+#define EMU86_EMULATE_CONFIG_WANT_VERW 1
+#define EMU86_EMULATE_CONFIG_WANT_SMSW 1
+#define EMU86_EMULATE_CONFIG_WANT_LMSW 1
+#define EMU86_EMULATE_CONFIG_WANT_INVLPG 0 /* This one shouldn't be able to cause a segfault! */
+#define EMU86_EMULATE_CONFIG_WANT_LAR 1
+#define EMU86_EMULATE_CONFIG_WANT_LSL 1
 
 
 PRIVATE ATTR_NORETURN void CC
@@ -1720,7 +1737,15 @@ libviocore_throw_unknown_instruction(struct vio_emulate_args *__restrict self,
 	data->e_pointers[4] = ptr4;
 	for (i = 5; i < EXCEPTION_DATA_POINTERS; ++i)
 		data->e_pointers[i] = 0;
+#ifdef __KERNEL__
+#if EXCEPT_BACKTRACE_SIZE != 0
+	for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
+		PERTASK_SET(this_exception_trace[i], (void *)0);
+#endif /* EXCEPT_BACKTRACE_SIZE != 0 */
+	x86_userexcept_unwind_interrupt(self->vea_args.va_state);
+#else /* __KERNEL__ */
 	error_throw_current();
+#endif /* !__KERNEL__ */
 }
 
 PRIVATE ATTR_NORETURN void CC
@@ -1742,7 +1767,15 @@ libviocore_throw_exception(struct vio_emulate_args *__restrict self,
 	data->e_pointers[2] = ptr2;
 	for (i = 3; i < EXCEPTION_DATA_POINTERS; ++i)
 		data->e_pointers[i] = 0;
+#ifdef __KERNEL__
+#if EXCEPT_BACKTRACE_SIZE != 0
+	for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
+		PERTASK_SET(this_exception_trace[i], (void *)0);
+#endif /* EXCEPT_BACKTRACE_SIZE != 0 */
+	x86_userexcept_unwind_interrupt(self->vea_args.va_state);
+#else /* __KERNEL__ */
 	error_throw_current();
+#endif /* !__KERNEL__ */
 }
 
 

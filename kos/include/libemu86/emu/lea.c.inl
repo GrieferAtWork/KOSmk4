@@ -24,6 +24,7 @@
 EMU86_INTELLISENSE_BEGIN(lea) {
 
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
+#if EMU86_EMULATE_CONFIG_WANT_LEA
 case EMU86_OPCODE_ENCODE(0x8d): {
 	/*         8D /r     LEA r16,m     RM     Valid     Valid     Store effective address for m in register r16.
 	 *         8D /r     LEA r32,m     RM     Valid     Valid     Store effective address for m in register r32.
@@ -41,6 +42,11 @@ case EMU86_OPCODE_ENCODE(0x8d): {
 	}
 	goto done;
 }
+#else /* EMU86_EMULATE_CONFIG_WANT_LEA */
+case EMU86_OPCODE_ENCODE(0x8d):
+	goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* !EMU86_EMULATE_CONFIG_WANT_LEA */
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 
 }

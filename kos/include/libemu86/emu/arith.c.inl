@@ -22,13 +22,19 @@
 #endif /* __INTELLISENSE__ */
 
 EMU86_INTELLISENSE_BEGIN(arith) {
+
+#if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_ARITH
+
+#if EMU86_EMULATE_CONFIG_WANT_ARITH
 	u8 op8;
 	u16 op16;
 	u32 op32;
 #if CONFIG_LIBEMU86_WANT_64BIT
 	u64 op64;
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* EMU86_EMULATE_CONFIG_WANT_ARITH */
 
+#if EMU86_EMULATE_CONFIG_WANT_ARITH
 	/* NOTE: Always support register-based MODR/M to support reverse encoded operands */
 #define DO_ARITHn(NAME, operator, BWLQ, Nbytes, oldval, rhs)                         \
 	if (EMU86_MODRM_ISMEM(modrm.mi_type)) {                                          \
@@ -40,6 +46,7 @@ EMU86_INTELLISENSE_BEGIN(arith) {
 		oldval = MODRM_GETRMREG##BWLQ();                                             \
 		MODRM_SETRMREG##BWLQ(oldval operator rhs);                                   \
 	}
+#endif /* EMU86_EMULATE_CONFIG_WANT_ARITH */
 
 	/* Perform an arithmetic `modrm.mi_reg' with the given `rhs' as the right-hand-side
 	 * operand, and `modrm.RM' as the left-hand-side. The operation size is described
@@ -50,6 +57,7 @@ EMU86_INTELLISENSE_BEGIN(arith) {
 	 *    32-bit  l      L      4        32
 	 *    64-bit  q      Q      8        64
 	 */
+#if EMU86_EMULATE_CONFIG_WANT_ARITH
 #define DO_ARITH_SWITCH_rmdst_mi_reg(bwlq, BWLQ, Nbytes, Nbits, rhs)                 \
 	switch (modrm.mi_reg) {                                                          \
 		u##Nbits oldval, newval;                                                     \
@@ -207,6 +215,7 @@ do_cmp##Nbits:                                                                  
 		IFELSE_64BIT(goto return_unknown_instruction_rmreg,                          \
 		             __builtin_unreachable());                                       \
 	}
+#endif /* EMU86_EMULATE_CONFIG_WANT_ARITH */
 #if CONFIG_LIBEMU86_WANT_64BIT
 #define NEED_return_unknown_instruction_rmreg
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
@@ -218,6 +227,7 @@ do_cmp##Nbits:                                                                  
 /* ======================================================================== */
 case EMU86_OPCODE_ENCODE(0x80): {
 	MODRM_DECODE();
+#if EMU86_EMULATE_CONFIG_WANT_ARITH
 	op8 = *(u8 *)pc;
 	pc += 1;
 /*do_op8:*/
@@ -231,11 +241,30 @@ case EMU86_OPCODE_ENCODE(0x80): {
 	/* 80 /7 ib      CMP r/m8,imm8      Compare imm8 with r/m8 */
 	DO_ARITH_SWITCH_rmdst_mi_reg(b, B, 1, 8, op8)
 	goto done;
+#else /* EMU86_EMULATE_CONFIG_WANT_ARITH */
+#if CONFIG_LIBEMU86_WANT_64BIT
+	if (modrm.mi_reg >= 8)
+		goto return_unknown_instruction_rmreg;
+#define NEED_return_unknown_instruction_rmreg
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+	if (modrm.mi_reg == 7) {
+		EMU86_REQUIRE_NO_LOCK_RMREG();
+		MODRM_NOSUP_GETRMB();
+	} else {
+		MODRM_NOSUP_GETSETRMB();
+	}
+	goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
+#endif /* !EMU86_EMULATE_CONFIG_WANT_ARITH */
 }
 
 
 case EMU86_OPCODE_ENCODE(0x81):
+#if !EMU86_EMULATE_CONFIG_WANT_ARITH
+case EMU86_OPCODE_ENCODE(0x83):
+#endif /* !EMU86_EMULATE_CONFIG_WANT_ARITH */
 	MODRM_DECODE();
+#if EMU86_EMULATE_CONFIG_WANT_ARITH
 #if CONFIG_LIBEMU86_WANT_64BIT
 	if (IS_64BIT()) {
 		op64 = (u64)(s64)(s32)UNALIGNED_GET32((u32 *)pc);
@@ -280,8 +309,24 @@ do_op16:
 		DO_ARITH_SWITCH_rmdst_mi_reg(w, W, 2, 16, op16)
 	}
 	goto done;
+#else /* EMU86_EMULATE_CONFIG_WANT_ARITH */
+#if CONFIG_LIBEMU86_WANT_64BIT
+	if (modrm.mi_reg >= 8)
+		goto return_unknown_instruction_rmreg;
+#define NEED_return_unknown_instruction_rmreg
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+	if (modrm.mi_reg == 7) {
+		EMU86_REQUIRE_NO_LOCK_RMREG();
+		MODRM_NOSUP_GETRMWLQ();
+	} else {
+		MODRM_NOSUP_GETSETRMWLQ();
+	}
+	goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
+#endif /* !EMU86_EMULATE_CONFIG_WANT_ARITH */
 
 
+#if EMU86_EMULATE_CONFIG_WANT_ARITH
 case EMU86_OPCODE_ENCODE(0x83):
 	MODRM_DECODE();
 #if CONFIG_LIBEMU86_WANT_64BIT
@@ -325,10 +370,11 @@ case EMU86_OPCODE_ENCODE(0x83):
 		goto do_op16;
 	}
 	goto done;
+#endif /* EMU86_EMULATE_CONFIG_WANT_ARITH */
 
 #if EMU86_EMULATE_CONFIG_ONLY_MEMORY
 #define DEFINE_REGISTER_IMMEDIATE_INSTRUCTIONS(_opcode, name, NAME) /* nothing */
-#else /* EMU86_EMULATE_CONFIG_ONLY_MEMORY */
+#elif EMU86_EMULATE_CONFIG_WANT_ARITH
 #define DEFINE_REGISTER_IMMEDIATE_INSTRUCTIONS(_opcode, name, NAME)     \
 	case EMU86_OPCODE_ENCODE(_opcode + 4):                              \
 		/* _opcode + 04 ib      FOO AL, imm8        Foo imm8 to AL */   \
@@ -357,8 +403,22 @@ case EMU86_OPCODE_ENCODE(0x83):
 			pc += 2;                                                    \
 			goto do_##name##16;                                         \
 		}
-#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
+#elif !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+#define DEFINE_REGISTER_IMMEDIATE_INSTRUCTIONS(_opcode, name, NAME)     \
+	case EMU86_OPCODE_ENCODE(_opcode + 4):                              \
+		/* _opcode + 04 ib      FOO AL, imm8        Foo imm8 to AL */   \
+		goto return_unsupported_instruction;                            \
+	case EMU86_OPCODE_ENCODE(_opcode + 5):                              \
+		/*         _opcode + 05 iw   FOO AL, imm16   Foo imm16 to AL */ \
+		/*         _opcode + 05 id   FOO AL, imm32   Foo imm32 to AL */ \
+		/* REX.W + _opcode + 05 id   FOO AL, Simm32  Foo Simm32 to AL */\
+		goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#else /* ... */
+#define DEFINE_REGISTER_IMMEDIATE_INSTRUCTIONS(_opcode, name, NAME) /* nothing */
+#endif /* !... */
 
+#if EMU86_EMULATE_CONFIG_WANT_ARITH
 #define DEFINE_REGISTER_MEMORY_INSTRUCTIONS(_opcode, name, NAME)        \
 	case EMU86_OPCODE_ENCODE(_opcode + 0):                              \
 		/* _opcode + 00 /r      FOO r/m8, r8        Foo r8 to r/m8 */   \
@@ -413,6 +473,30 @@ case EMU86_OPCODE_ENCODE(0x83):
 		}                                                               \
 	                                                                    \
 	DEFINE_REGISTER_IMMEDIATE_INSTRUCTIONS(_opcode, name, NAME)
+#else /* EMU86_EMULATE_CONFIG_WANT_ARITH */
+#define NEED_notsup_modrm_getsetb_rmreg
+#define NEED_notsup_modrm_getsetwlq_rmreg
+#define NEED_notsup_modrm_getb_rmreg
+#define NEED_notsup_modrm_getwlq_rmreg
+#define DEFINE_REGISTER_MEMORY_INSTRUCTIONS(_opcode, name, NAME)        \
+	case EMU86_OPCODE_ENCODE(_opcode + 0):                              \
+		/* _opcode + 00 /r      FOO r/m8, r8        Foo r8 to r/m8 */   \
+		goto notsup_modrm_getsetb_rmreg;                                \
+	case EMU86_OPCODE_ENCODE(_opcode + 1):                              \
+		/* _opcode + 01 /r      FOO r/m16, r16      Foo r16 to r/m16 */ \
+		/* _opcode + 01 /r      FOO r/m32, r32      Foo r32 to r/m32 */ \
+		/* _opcode + 01 /r      FOO r/m64, r64      Foo r64 to r/m64 */ \
+		goto notsup_modrm_getsetwlq_rmreg;                              \
+	case EMU86_OPCODE_ENCODE(_opcode + 2):                              \
+		/* _opcode + 02 /r      FOO r8, r/m8        Foo r/m8 to r8 */   \
+		goto notsup_modrm_getb_rmreg;                                   \
+	case EMU86_OPCODE_ENCODE(_opcode + 3):                              \
+		/* _opcode + 03 /r      FOO r16, r/m16      Foo r/m16 to r16 */ \
+		/* _opcode + 03 /r      FOO r32, r/m32      Foo r/m32 to r32 */ \
+		/* _opcode + 03 /r      FOO r64, r/m64      Foo r/m64 to r64 */ \
+		goto notsup_modrm_getwlq_rmreg;                                 \
+	DEFINE_REGISTER_IMMEDIATE_INSTRUCTIONS(_opcode, name, NAME)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_ARITH */
 
 	/*         00 /r     ADD r/m8, r8       Add r8 to r/m8.
 	 *         01 /r     ADD r/m16, r16     Add r16 to r/m16.
@@ -508,9 +592,49 @@ case EMU86_OPCODE_ENCODE(0x83):
 	 *         3D iw     CMP AX, imm16      Compare imm16 with AX.
 	 *         3D id     CMP EAX, imm32     Compare imm32 with EAX.
 	 * REX.W + 3D id     CMP RAX, imm32     Compare imm32 sign-extended to 64-bits with RAX. */
+#if EMU86_EMULATE_CONFIG_WANT_ARITH
 	DEFINE_REGISTER_MEMORY_INSTRUCTIONS(0x38, cmp, CMP)
+#else /* EMU86_EMULATE_CONFIG_WANT_ARITH */
+	case EMU86_OPCODE_ENCODE(0x38):
+		/* _opcode + 00 /r      FOO r/m8, r8        Foo r8 to r/m8 */
+		goto notsup_modrm_getb_rmreg;
+#define NEED_notsup_modrm_getb_rmreg
+
+	case EMU86_OPCODE_ENCODE(0x39):
+		/* _opcode + 01 /r      FOO r/m16, r16      Foo r16 to r/m16 */
+		/* _opcode + 01 /r      FOO r/m32, r32      Foo r32 to r/m32 */
+		/* _opcode + 01 /r      FOO r/m64, r64      Foo r64 to r/m64 */
+		goto notsup_modrm_getwlq_rmreg;
+#define NEED_notsup_modrm_getwlq_rmreg
+
+	case EMU86_OPCODE_ENCODE(0x3a):
+		/* _opcode + 02 /r      FOO r8, r/m8        Foo r/m8 to r8 */
+		goto notsup_modrm_getb_rmreg;
+#define NEED_notsup_modrm_getb_rmreg
+
+	case EMU86_OPCODE_ENCODE(0x3b):
+		/* _opcode + 03 /r      FOO r16, r/m16      Foo r/m16 to r16 */
+		/* _opcode + 03 /r      FOO r32, r/m32      Foo r/m32 to r32 */
+		/* _opcode + 03 /r      FOO r64, r/m64      Foo r/m64 to r64 */
+		goto notsup_modrm_getwlq_rmreg;
+#define NEED_notsup_modrm_getwlq_rmreg
+
+#if !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+	case EMU86_OPCODE_ENCODE(0x3c):
+		/* _opcode + 04 ib      FOO AL, imm8        Foo imm8 to AL */
+		goto return_unsupported_instruction;
+
+	case EMU86_OPCODE_ENCODE(0x3d):
+		/*         _opcode + 05 iw   FOO AL, imm16   Foo imm16 to AL */
+		/*         _opcode + 05 id   FOO AL, imm32   Foo imm32 to AL */
+		/* REX.W + _opcode + 05 id   FOO AL, Simm32  Foo Simm32 to AL */
+		goto return_unsupported_instruction;
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC */
+
+#endif /* !EMU86_EMULATE_CONFIG_WANT_ARITH */
 
 #undef DEFINE_REGISTER_MEMORY_INSTRUCTIONS
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_ARITH */
 
 }
 EMU86_INTELLISENSE_END

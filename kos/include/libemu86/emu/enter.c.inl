@@ -23,11 +23,15 @@
 
 EMU86_INTELLISENSE_BEGIN(enter) {
 
+#if (EMU86_EMULATE_CONFIG_WANT_ENTER || (EMU86_EMULATE_CONFIG_CHECKERROR && !defined(EMU86_UNSUPPORTED_MEMACCESS_IS_NOOP)))
 case EMU86_OPCODE_ENCODE(0xc8): {
 	/* C8 iw 00     ENTER imm16, 0        Create a stack frame for a procedure.
 	 * C8 iw 01     ENTER imm16, 1        Create a stack frame with a nested pointer for a procedure.
 	 * C8 iw ib     ENTER imm16, imm8     Create a stack frame with nested pointers for a procedure. */
-	EMU86_UREG_TYPE pbp, frameTemp;
+	EMU86_UREG_TYPE pbp;
+#if EMU86_EMULATE_CONFIG_WANT_ENTER
+	EMU86_UREG_TYPE frameTemp;
+#endif /* EMU86_EMULATE_CONFIG_WANT_ENTER */
 	u16 alloc_size;
 	u8 nesting_level;
 	byte_t *sp;
@@ -41,30 +45,53 @@ case EMU86_OPCODE_ENCODE(0xc8): {
 	if (IS_16BIT()) {
 		size_t push_total = 2 * (nesting_level + 1);
 		EMU86_EMULATE_PUSH(sp - (push_total + alloc_size), push_total + alloc_size);
+#if EMU86_EMULATE_CONFIG_WANT_ENTER
 		EMU86_WRITE_USER_MEMORY(sp - push_total, push_total);
-		sp -= 2;
 		frameTemp = EMU86_GETSP() - 2;
 		EMU86_MEMWRITEW(sp, pbp);
+#else /* EMU86_EMULATE_CONFIG_WANT_ENTER */
+		EMU86_UNSUPPORTED_MEMACCESS(sp - push_total, push_total, false, true);
+#endif /* !EMU86_EMULATE_CONFIG_WANT_ENTER */
 	} else IF_64BIT(IF_16BIT_OR_32BIT(if (EMU86_F_IS64(op_flags))) {
 		size_t push_total = 8 * (nesting_level + 1);
 		EMU86_EMULATE_PUSH(sp - (push_total + alloc_size), push_total + alloc_size);
+#if EMU86_EMULATE_CONFIG_WANT_ENTER
 		EMU86_WRITE_USER_MEMORY(sp - push_total, push_total);
 		sp -= 8;
 		frameTemp = EMU86_GETRSP() - 8;
 		EMU86_MEMWRITEQ(sp, pbp);
+#else /* EMU86_EMULATE_CONFIG_WANT_ENTER */
+		EMU86_UNSUPPORTED_MEMACCESS(sp - push_total, push_total, false, true);
+#endif /* !EMU86_EMULATE_CONFIG_WANT_ENTER */
 	} IF_16BIT_OR_32BIT(else)) IF_16BIT_OR_32BIT({
 		size_t push_total = 4 * (nesting_level + 1);
 		EMU86_EMULATE_PUSH(sp - (push_total + alloc_size), push_total + alloc_size);
+#if EMU86_EMULATE_CONFIG_WANT_ENTER
 		EMU86_WRITE_USER_MEMORY(sp - push_total, push_total);
 		sp -= 4;
 		frameTemp = EMU86_GETESP() - 4;
 		EMU86_MEMWRITEL(sp, pbp);
+#else /* EMU86_EMULATE_CONFIG_WANT_ENTER */
+		EMU86_UNSUPPORTED_MEMACCESS(sp - push_total, push_total, false, true);
+#endif /* !EMU86_EMULATE_CONFIG_WANT_ENTER */
 	})
 	if (nesting_level != 0) {
 		if (nesting_level > 1) {
-			u8 i;
 			byte_t *pbp_addr;
 			pbp_addr = EMU86_SEGADDR(EMU86_GETSSBASE(), pbp);
+#if !EMU86_EMULATE_CONFIG_WANT_ENTER
+			{
+				size_t access_total;
+				if (IS_16BIT()) {
+					access_total = (nesting_level - 1) * 2;
+				} else IF_64BIT(IF_16BIT_OR_32BIT(if (EMU86_F_IS64(op_flags))) {
+					access_total = (nesting_level - 1) * 8;
+				} IF_16BIT_OR_32BIT(else)) IF_16BIT_OR_32BIT({
+					access_total = (nesting_level - 1) * 4;
+				});
+				EMU86_UNSUPPORTED_MEMACCESS(pbp_addr - access_total, access_total, true, false);
+			}
+#else /* !EMU86_EMULATE_CONFIG_WANT_ENTER */
 #if EMU86_EMULATE_CONFIG_CHECKUSER
 			/* Validate the memory region from which data will be copied.
 			 * NOTE: The destination area was already validated above! */
@@ -80,28 +107,33 @@ case EMU86_OPCODE_ENCODE(0xc8): {
 				EMU86_VALIDATE_READABLE(pbp_addr - access_total, access_total);
 			}
 #endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
-			for (i = 1; i < nesting_level; ++i) {
-				if (IS_16BIT()) {
-					u16 temp;
-					pbp_addr -= 2;
-					sp -= 2;
-					temp = EMU86_MEMREADW(pbp_addr);
-					EMU86_MEMWRITEW(sp, temp);
-				} else IF_64BIT(IF_16BIT_OR_32BIT(if (EMU86_F_IS64(op_flags))) {
-					u64 temp;
-					pbp_addr -= 8;
-					sp -= 8;
-					temp = EMU86_MEMREADQ(pbp_addr);
-					EMU86_MEMWRITEQ(sp, temp);
-				} IF_16BIT_OR_32BIT(else)) IF_16BIT_OR_32BIT({
-					u32 temp;
-					pbp_addr -= 4;
-					sp -= 4;
-					temp = EMU86_MEMREADL(pbp_addr);
-					EMU86_MEMWRITEL(sp, temp);
-				})
+			{
+				u8 i;
+				for (i = 1; i < nesting_level; ++i) {
+					if (IS_16BIT()) {
+						u16 temp;
+						pbp_addr -= 2;
+						sp -= 2;
+						temp = EMU86_MEMREADW(pbp_addr);
+						EMU86_MEMWRITEW(sp, temp);
+					} else IF_64BIT(IF_16BIT_OR_32BIT(if (EMU86_F_IS64(op_flags))) {
+						u64 temp;
+						pbp_addr -= 8;
+						sp -= 8;
+						temp = EMU86_MEMREADQ(pbp_addr);
+						EMU86_MEMWRITEQ(sp, temp);
+					} IF_16BIT_OR_32BIT(else)) IF_16BIT_OR_32BIT({
+						u32 temp;
+						pbp_addr -= 4;
+						sp -= 4;
+						temp = EMU86_MEMREADL(pbp_addr);
+						EMU86_MEMWRITEL(sp, temp);
+					})
+				}
 			}
+#endif /* EMU86_EMULATE_CONFIG_WANT_ENTER */
 		}
+#if EMU86_EMULATE_CONFIG_WANT_ENTER
 		if (IS_16BIT()) {
 			sp -= 2;
 			EMU86_MEMWRITEW(sp, frameTemp);
@@ -112,7 +144,9 @@ case EMU86_OPCODE_ENCODE(0xc8): {
 			sp -= 4;
 			EMU86_MEMWRITEL(sp, frameTemp);
 		})
+#endif /* EMU86_EMULATE_CONFIG_WANT_ENTER */
 	}
+#if EMU86_EMULATE_CONFIG_WANT_ENTER
 	if (IS_16BIT()) {
 		/* The upper 16 bits of RBP/EBP don't get modified by this! */
 #if CONFIG_LIBEMU86_WANT_64BIT
@@ -132,8 +166,12 @@ case EMU86_OPCODE_ENCODE(0xc8): {
 	sp -= alloc_size;
 	EMU86_SETSTACKPTR(sp);
 	goto done;
+#else /* EMU86_EMULATE_CONFIG_WANT_ENTER */
+	goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* !EMU86_EMULATE_CONFIG_WANT_ENTER */
 }
-
+#endif /* EMU86_EMULATE_CONFIG_WANT_ENTER || (EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_UNSUPPORTED_MEMACCESS_IS_NOOP) */
 
 
 }

@@ -26,6 +26,7 @@ EMU86_INTELLISENSE_BEGIN(hlt) {
 
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 
+#if EMU86_EMULATE_CONFIG_WANT_HLT
 case EMU86_OPCODE_ENCODE(0xf4): {
 	/* F4     HLT     Halt */
 #if EMU86_EMULATE_VM86
@@ -58,9 +59,13 @@ case EMU86_OPCODE_ENCODE(0xf4): {
 #endif /* EMU86_EMULATE_RETURN_AFTER_HLT_IF0 */
 	}
 #endif /* EMU86_EMULATE_RETURN_AFTER_HLT_IF(0|1) */
-
 	goto done;
 }
+#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+case EMU86_OPCODE_ENCODE(0xf4):
+	goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* ... */
 
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 

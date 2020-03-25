@@ -25,6 +25,7 @@ EMU86_INTELLISENSE_BEGIN(cbw) {
 
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 
+#if EMU86_EMULATE_CONFIG_WANT_CBW
 case EMU86_OPCODE_ENCODE(0x98): {
 	/*         98     CBW      AX := sign-extend of AL.
 	 *         98     CWDE     EAX := sign-extend of AX.
@@ -38,7 +39,14 @@ case EMU86_OPCODE_ENCODE(0x98): {
 	}
 	goto done;
 }
+#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+case EMU86_OPCODE_ENCODE(0x98):
+	goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* ... */
 
+
+#if EMU86_EMULATE_CONFIG_WANT_CWD
 case EMU86_OPCODE_ENCODE(0x99): {
 	/*         99     CWD     DX:AX := sign-extend of AX.
 	 *         99     CDQ     EDX:EAX := sign-extend of EAX.
@@ -58,6 +66,11 @@ case EMU86_OPCODE_ENCODE(0x99): {
 	}
 	goto done;
 }
+#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+case EMU86_OPCODE_ENCODE(0x99):
+	goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* ... */
 
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 

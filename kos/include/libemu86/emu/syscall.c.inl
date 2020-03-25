@@ -21,38 +21,33 @@
 #include "../emulate.c.inl"
 #endif /* __INTELLISENSE__ */
 
-#include "push-pop-util.h"
+EMU86_INTELLISENSE_BEGIN(syscall) {
 
-EMU86_INTELLISENSE_BEGIN(call) {
-
-#if EMU86_EMULATE_CONFIG_WANT_CALL
-case EMU86_OPCODE_ENCODE(0xe8): {
-	/* E8 cw    CALL rel16   Call near, relative, displacement relative to next instruction.
-	 * E8 cd    CALL rel32   Call near, relative, displacement relative to next instruction.
-	 *                       32-bit displacement sign extended to 64-bits in 64-bit mode. */
-	EMU86_UREG_TYPE dest_ip;
-	s32 offset;
-	IF_16BIT_OR_32BIT(
-	if (IS_16BIT() && !EMU86_F_IS64(op_flags)) {
-		offset = (s32)(s16)UNALIGNED_GET16((u16 *)pc);
-		pc += 2;
-	} else) {
-		offset = (s32)UNALIGNED_GET32((u32 *)pc);
-		pc += 4;
-	}
-	dest_ip = REAL_IP() + offset;
-	/* Push the previous PC */
-	EMU86_PUSH163264((dest_ip &= 0xffff, (u16)REAL_IP()),
-	                 (u32)REAL_IP(),
-	                 (u64)REAL_IP());
-	EMU86_SETIPREG(dest_ip);
-	goto done_dont_set_pc;
-}
-#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
-case EMU86_OPCODE_ENCODE(0xe8):
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
+#if (EMU86_EMULATE_CONFIG_CHECKERROR ||    \
+     (EMU86_EMULATE_CONFIG_WANT_SYSCALL && \
+      CONFIG_LIBEMU86_WANT_64BIT &&        \
+      defined(EMU86_EMULATE_RETURN_AFTER_SYSCALL)))
+case EMU86_OPCODE_ENCODE(0x0f05): {
+	/* 0F 05     SYSCALL     Fast call to privilege level 0 system procedures. */
+#define NEED_return_unexpected_lock
+	EMU86_REQUIRE_NO_LOCK();
+#if EMU86_EMULATE_CONFIG_WANT_SYSCALL && defined(EMU86_EMULATE_RETURN_AFTER_SYSCALL)
+#if CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT
+	if unlikely(!EMU86_F_IS64(op_flags))
+		goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT */
+	EMU86_SETPCPTR(REAL_IP());
+	EMU86_EMULATE_RETURN_AFTER_SYSCALL();
+	__builtin_unreachable();
+#else /* EMU86_EMULATE_CONFIG_WANT_SYSCALL && EMU86_EMULATE_RETURN_AFTER_SYSCALL */
 	goto return_unsupported_instruction;
 #define NEED_return_unsupported_instruction
-#endif /* ... */
+#endif /* !EMU86_EMULATE_CONFIG_WANT_SYSCALL || !EMU86_EMULATE_RETURN_AFTER_SYSCALL */
+}
+#endif /* EMU86_EMULATE_CONFIG_WANT_SYSCALL || (EMU86_EMULATE_CONFIG_WANT_SYSCALL && CONFIG_LIBEMU86_WANT_64BIT && EMU86_EMULATE_RETURN_AFTER_SYSCALL) */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 
 }
 EMU86_INTELLISENSE_END

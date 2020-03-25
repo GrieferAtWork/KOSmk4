@@ -24,6 +24,8 @@
 EMU86_INTELLISENSE_BEGIN(blsx) {
 
 
+#if (EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_BLSR || \
+     EMU86_EMULATE_CONFIG_WANT_BLSMSK || EMU86_EMULATE_CONFIG_WANT_BLSI)
 case EMU86_OPCODE_ENCODE(0x0f38f3): {
 	MODRM_DECODE();
 	if ((op_flags & (EMU86_F_HASVEX | EMU86_F_VEX_LL_M |
@@ -33,6 +35,29 @@ case EMU86_OPCODE_ENCODE(0x0f38f3): {
 #define NEED_return_unknown_instruction_rmreg
 	switch (modrm.mi_reg) {
 
+#if EMU86_EMULATE_CONFIG_CHECKERROR
+#if !EMU86_EMULATE_CONFIG_WANT_BLSR
+#define NEED_UNSUPPORTED_BLSX_HANDLER
+	case 1:
+#endif /* !EMU86_EMULATE_CONFIG_WANT_BLSR */
+#if !EMU86_EMULATE_CONFIG_WANT_BLSMSK
+#define NEED_UNSUPPORTED_BLSX_HANDLER
+	case 2:
+#endif /* !EMU86_EMULATE_CONFIG_WANT_BLSMSK */
+#if !EMU86_EMULATE_CONFIG_WANT_BLSI
+#define NEED_UNSUPPORTED_BLSX_HANDLER
+	case 3:
+#endif /* !EMU86_EMULATE_CONFIG_WANT_BLSI */
+#ifdef NEED_UNSUPPORTED_BLSX_HANDLER
+#undef NEED_UNSUPPORTED_BLSX_HANDLER
+		MODRM_NOSUP_GETRMZ_VEX_W();
+		goto return_unknown_instruction_rmreg;
+#define NEED_return_unknown_instruction_rmreg
+#endif /* NEED_UNSUPPORTED_BLSX_HANDLER */
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR */
+
+
+#if EMU86_EMULATE_CONFIG_WANT_BLSR
 	case 1: {
 		/* VEX.LZ.0F38.W0 F3 /1     BLSR r32, r/m32     Reset lowest set bit of r/m32, keep all other bits of r/m32 and write result to r32.
 		 * VEX.LZ.0F38.W1 F3 /1     BLSR r64, r/m64     Reset lowest set bit of r/m64, keep all other bits of r/m64 and write result to r64. */
@@ -67,8 +92,10 @@ case EMU86_OPCODE_ENCODE(0x0f38f3): {
 		               eflags_addend);
 		goto done;
 	}
+#endif /* EMU86_EMULATE_CONFIG_WANT_BLSR */
 
 
+#if EMU86_EMULATE_CONFIG_WANT_BLSMSK
 	case 2: {
 		/* VEX.LZ.0F38.W0 F3 /2     BLSMSK r32, r/m32     Set all lower bits in r32 to "1" starting from bit 0 to lowest set bit in r/m32.
 		 * VEX.LZ.0F38.W1 F3 /2     BLSMSK r64, r/m64     Set all lower bits in r64 to "1" starting from bit 0 to lowest set bit in r/m64. */
@@ -99,8 +126,10 @@ case EMU86_OPCODE_ENCODE(0x0f38f3): {
 		               eflags_addend);
 		goto done;
 	}
+#endif /* EMU86_EMULATE_CONFIG_WANT_BLSMSK */
 
 
+#if EMU86_EMULATE_CONFIG_WANT_BLSI
 	case 3: {
 		/* VEX.LZ.0F38.W0 F3 /3     BLSI r32, r/m32     Extract lowest set bit from r/m32 and set that bit in r32.
 		 * VEX.LZ.0F38.W1 F3 /3     BLSI r64, r/m64     Extract lowest set bit from r/m64, and set that bit in r64. */
@@ -135,6 +164,7 @@ case EMU86_OPCODE_ENCODE(0x0f38f3): {
 		               eflags_addend);
 		goto done;
 	}
+#endif /* EMU86_EMULATE_CONFIG_WANT_BLSI */
 
 
 	default:
@@ -143,6 +173,7 @@ case EMU86_OPCODE_ENCODE(0x0f38f3): {
 	}
 	break;
 }
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_BLSR || EMU86_EMULATE_CONFIG_WANT_BLSMSK || EMU86_EMULATE_CONFIG_WANT_BLSI */
 
 
 }

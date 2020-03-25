@@ -28,6 +28,7 @@ EMU86_INTELLISENSE_BEGIN(loop) {
 
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 
+#if EMU86_EMULATE_CONFIG_WANT_LOOPNE
 case EMU86_OPCODE_ENCODE(0xe0): {
 	/* E0 cb     LOOPNE rel8     Decrement count; jump short if count!=0 and ZF=0. */
 	if ((EMU86_GETFLAGS() & EFLAGS_ZF) != 0) {
@@ -36,8 +37,14 @@ case EMU86_OPCODE_ENCODE(0xe0): {
 	}
 	goto do_loop;
 }
+#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+case EMU86_OPCODE_ENCODE(0xe0):
+	goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* ... */
 
 
+#if EMU86_EMULATE_CONFIG_WANT_LOOPE
 case EMU86_OPCODE_ENCODE(0xe1): {
 	/* E1 cb     LOOPE rel8      Decrement count; jump short if count!=0 and ZF=1. */
 	if ((EMU86_GETFLAGS() & EFLAGS_ZF) == 0) {
@@ -46,8 +53,14 @@ case EMU86_OPCODE_ENCODE(0xe1): {
 	}
 	goto do_loop;
 }
+#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+case EMU86_OPCODE_ENCODE(0xe1):
+	goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* ... */
 
 
+#if EMU86_EMULATE_CONFIG_WANT_LOOP
 case EMU86_OPCODE_ENCODE(0xe2): {
 	/* E2 cb     LOOP rel8       Decrement count; jump short if count!=0. */
 	s8 offset;
@@ -82,6 +95,11 @@ do_loop:
 	}
 	goto done_dont_set_pc;
 }
+#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+case EMU86_OPCODE_ENCODE(0xe2):
+	goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* ... */
 
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 

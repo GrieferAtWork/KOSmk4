@@ -116,6 +116,27 @@
 		EMU86_SETSTACKPTR(sp);                                         \
 	} __WHILE0
 
+#define EMU86_PUSH163264_NOSUP()                                       \
+	do {                                                               \
+		byte_t *sp;                                                    \
+		sp = EMU86_GETSTACKPTR();                                      \
+		if (IS_16BIT()) {                                              \
+			sp -= 2;                                                   \
+			EMU86_EMULATE_PUSH(sp, 2);                                 \
+			EMU86_UNSUPPORTED_MEMACCESS(sp, 2, false, true);           \
+		}                                                              \
+		IF_64BIT(else IF_16BIT_OR_32BIT(if (EMU86_F_IS64(op_flags))) { \
+			sp -= 8;                                                   \
+			EMU86_EMULATE_PUSH(sp, 8);                                 \
+			EMU86_UNSUPPORTED_MEMACCESS(sp, 8, false, true);           \
+		})                                                             \
+		IF_16BIT_OR_32BIT(else {                                       \
+			sp -= 4;                                                   \
+			EMU86_EMULATE_PUSH(sp, 4);                                 \
+			EMU86_UNSUPPORTED_MEMACCESS(sp, 4, false, true);           \
+		})                                                             \
+	} __WHILE0
+
 /* 66 XX pop16
  *    XX pop32  (in 32-bit mode)
  *    XX pop64  (in 64-bit mode) */

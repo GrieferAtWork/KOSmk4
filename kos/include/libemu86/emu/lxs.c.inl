@@ -29,7 +29,9 @@ EMU86_INTELLISENSE_BEGIN(lxs) {
 	u8 segment_regno;
 
 
-#if CONFIG_LIBEMU86_WANT_16BIT | CONFIG_LIBEMU86_WANT_32BIT
+#if (EMU86_EMULATE_CONFIG_CHECKERROR || \
+     (EMU86_EMULATE_CONFIG_WANT_LXS &&  \
+      (CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT)))
 case EMU86_OPCODE_ENCODE(0xc4): {
 	/* C4 /r     LES r16,m16:16     Load ES:r16 with far pointer from memory.
 	 * C4 /r     LES r32,m16:32     Load ES:r32 with far pointer from memory. */
@@ -53,9 +55,10 @@ case EMU86_OPCODE_ENCODE(0xc5): {
 	segment_regno = EMU86_R_DS;
 	goto do_lxs;
 }
-#endif /* CONFIG_LIBEMU86_WANT_16BIT | CONFIG_LIBEMU86_WANT_32BIT */
+#endif /* ... */
 
 
+#if (EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_LXS)
 case EMU86_OPCODE_ENCODE(0x0fb2): {
 	/*       0F B2 /r     LSS r16,m16:16     Load SS:r16 with far pointer from memory.
 	 *       0F B2 /r     LSS r32,m16:32     Load SS:r32 with far pointer from memory.
@@ -78,13 +81,16 @@ case EMU86_OPCODE_ENCODE(0x0fb5): {
 	/*       0F B5 /r     LGS r16,m16:16     Load GS:r16 with far pointer from memory.
 	 *       0F B5 /r     LGS r32,m16:32     Load GS:r32 with far pointer from memory.
 	 * REX + 0F B5 /r     LGS r64,m16:64     Load GS:r64 with far pointer from memory. */
+#if EMU86_EMULATE_CONFIG_CHECKUSER || EMU86_EMULATE_CONFIG_WANT_LXS
 	byte_t *addr;
 	u16 segment;
 	EMU86_UREG_TYPE offset;
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER || EMU86_EMULATE_CONFIG_WANT_LXS */
 	segment_regno = EMU86_R_GS;
 do_lxs:
 #define NEED_return_expected_memory_modrm
 	MODRM_DECODE_MEMONLY();
+#if EMU86_EMULATE_CONFIG_CHECKUSER || EMU86_EMULATE_CONFIG_WANT_LXS
 	addr = MODRM_MEMADDR();
 	IF_64BIT(if (IS_64BIT()) {
 		EMU86_READ_USER_MEMORY(addr, 10);
@@ -105,13 +111,15 @@ do_lxs:
 #ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
 		EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV,
 		                                                 X86_REGISTER_SEGMENT_ES + segment_regno,
-		                                                 segment, 0);
+		                                                 segment, offset);
 #else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 #define NEED_return_privileged_instruction
 		goto return_privileged_instruction;
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 	}
 #endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER || EMU86_EMULATE_CONFIG_WANT_LXS */
+#if EMU86_EMULATE_CONFIG_WANT_LXS
 	EMU86_SETSEG(segment_regno, segment);
 #if CONFIG_LIBEMU86_WANT_64BIT
 	MODRM_SETREGQ(offset);
@@ -119,7 +127,12 @@ do_lxs:
 	MODRM_SETREGL(offset);
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
 	goto done;
+#else /* EMU86_EMULATE_CONFIG_WANT_LXS */
+	goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* !EMU86_EMULATE_CONFIG_WANT_LXS */
 }
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_LXS */
 
 
 }

@@ -39,7 +39,7 @@ case EMU86_OPCODE_ENCODE(0x0fc7):
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 #if CONFIG_LIBEMU86_WANT_64BIT
 		if (IS_64BIT()) {
-#ifdef EMU86_MEM_ATOMIC_CMPXCH128
+#if EMU86_EMULATE_CONFIG_WANT_CMPXCHG16B && defined(EMU86_MEM_ATOMIC_CMPXCH128)
 			union {
 				uint128_t word128;
 				u64 qwords[2];
@@ -61,14 +61,15 @@ case EMU86_OPCODE_ENCODE(0x0fc7):
 				EMU86_SETRAX(real_oldval.qwords[0]);
 				EMU86_SETRDX(real_oldval.qwords[1]);
 			}
-#else /* EMU86_MEM_ATOMIC_CMPXCH128 */
+#else /* EMU86_EMULATE_CONFIG_WANT_CMPXCHG16B && EMU86_MEM_ATOMIC_CMPXCH128 */
+			EMU86_UNSUPPORTED_MEMACCESS(MODRM_MEMADDR(), 16, true, true);
 #define NEED_return_unsupported_instruction_rmreg
 			goto return_unsupported_instruction_rmreg;
-#endif /* !EMU86_MEM_ATOMIC_CMPXCH128 */
+#endif /* !EMU86_EMULATE_CONFIG_WANT_CMPXCHG16B || !EMU86_MEM_ATOMIC_CMPXCH128 */
 		} else
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
 		{
-#ifdef EMU86_MEM_ATOMIC_CMPXCHQ
+#if EMU86_EMULATE_CONFIG_WANT_CMPXCHG8B && defined(EMU86_MEM_ATOMIC_CMPXCHQ)
 			union {
 				u64 qword;
 				u32 dwords[2];
@@ -95,10 +96,11 @@ case EMU86_OPCODE_ENCODE(0x0fc7):
 				EMU86_SETEAX(real_oldval.dwords[0]);
 				EMU86_SETEDX(real_oldval.dwords[1]);
 			}
-#else /* EMU86_MEM_ATOMIC_CMPXCHQ */
+#else /* EMU86_EMULATE_CONFIG_WANT_CMPXCHG8B && EMU86_MEM_ATOMIC_CMPXCHQ */
+			EMU86_UNSUPPORTED_MEMACCESS(MODRM_MEMADDR(), 8, true, true);
 #define NEED_return_unsupported_instruction_rmreg
 			goto return_unsupported_instruction_rmreg;
-#endif /* !EMU86_MEM_ATOMIC_CMPXCHQ */
+#endif /* !EMU86_EMULATE_CONFIG_WANT_CMPXCHG8B || !EMU86_MEM_ATOMIC_CMPXCHQ */
 		}
 		goto done;
 	}

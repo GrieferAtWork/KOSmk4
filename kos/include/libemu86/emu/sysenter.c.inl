@@ -21,40 +21,17 @@
 #include "../emulate.c.inl"
 #endif /* __INTELLISENSE__ */
 
-EMU86_INTELLISENSE_BEGIN(syscall_sysenter) {
+EMU86_INTELLISENSE_BEGIN(sysenter) {
 
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
-
-#if EMU86_EMULATE_CONFIG_CHECKERROR || CONFIG_LIBEMU86_WANT_64BIT
-#if EMU86_EMULATE_CONFIG_CHECKERROR || defined(EMU86_EMULATE_RETURN_AFTER_SYSCALL)
-case EMU86_OPCODE_ENCODE(0x0f05): {
-	/* 0F 05     SYSCALL     Fast call to privilege level 0 system procedures. */
-#define NEED_return_unexpected_lock
-	EMU86_REQUIRE_NO_LOCK();
-#ifdef EMU86_EMULATE_RETURN_AFTER_SYSCALL
-#if CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT
-	if unlikely(!EMU86_F_IS64(op_flags))
-		goto return_unsupported_instruction;
-#define NEED_return_unsupported_instruction
-#endif /* CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT */
-	EMU86_SETPCPTR(REAL_IP());
-	EMU86_EMULATE_RETURN_AFTER_SYSCALL();
-	__builtin_unreachable();
-#else /* EMU86_EMULATE_RETURN_AFTER_SYSCALL */
-	goto return_unsupported_instruction;
-#define NEED_return_unsupported_instruction
-#endif /* !EMU86_EMULATE_RETURN_AFTER_SYSCALL */
-}
-#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_RETURN_AFTER_SYSCALL */
-#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || CONFIG_LIBEMU86_WANT_64BIT */
-
-
-#if EMU86_EMULATE_CONFIG_CHECKERROR || defined(EMU86_EMULATE_RETURN_AFTER_SYSENTER)
+#if (EMU86_EMULATE_CONFIG_CHECKERROR ||               \
+     (defined(EMU86_EMULATE_RETURN_AFTER_SYSENTER) && \
+      EMU86_EMULATE_CONFIG_WANT_SYSENTER))
 case EMU86_OPCODE_ENCODE(0x0f34): {
 	/* 0F 34     SYSENTER     Fast call to privilege level 0 system procedures. */
 #define NEED_return_unexpected_lock
 	EMU86_REQUIRE_NO_LOCK();
-#ifdef EMU86_EMULATE_RETURN_AFTER_SYSENTER
+#if EMU86_EMULATE_CONFIG_WANT_SYSENTER && defined(EMU86_EMULATE_RETURN_AFTER_SYSENTER)
 #if CONFIG_LIBEMU86_WANT_16BIT
 	/* Intel documents that sysenter cannot be used from
 	 * real-mode (i.e. 16-bit mode, or in this case: vm86) */
@@ -66,36 +43,12 @@ case EMU86_OPCODE_ENCODE(0x0f34): {
 	/*EMU86_SETPCPTR(REAL_IP());*/
 	EMU86_EMULATE_RETURN_AFTER_SYSENTER();
 	__builtin_unreachable();
-#else /* EMU86_EMULATE_RETURN_AFTER_SYSENTER */
+#else /* EMU86_EMULATE_CONFIG_WANT_SYSENTER && EMU86_EMULATE_RETURN_AFTER_SYSENTER */
 	goto return_unsupported_instruction;
 #define NEED_return_unsupported_instruction
-#endif /* !EMU86_EMULATE_RETURN_AFTER_SYSENTER */
+#endif /* !EMU86_EMULATE_CONFIG_WANT_SYSENTER || !EMU86_EMULATE_RETURN_AFTER_SYSENTER */
 }
 #endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_RETURN_AFTER_SYSENTER */
-
-
-#if EMU86_EMULATE_CONFIG_CHECKERROR
-case EMU86_OPCODE_ENCODE(0x0f07): {
-	/*         0F 07     SYSRET     Return to compatibility mode from fast system call
-	 * REX.W + 0F 07     SYSRET     Return to 64-bit mode from fast system call */
-#define NEED_return_unexpected_lock
-	EMU86_REQUIRE_NO_LOCK();
-	goto return_unsupported_instruction;
-#define NEED_return_unsupported_instruction
-}
-
-
-case EMU86_OPCODE_ENCODE(0x0f35): {
-	/*         0F 35     SYSEXIT     Fast return to privilege level 3 user code.
-	 * REX.W + 0F 35     SYSEXIT     Fast return to 64-bit mode privilege level 3 user code. */
-#define NEED_return_unexpected_lock
-	EMU86_REQUIRE_NO_LOCK();
-	goto return_unsupported_instruction;
-#define NEED_return_unsupported_instruction
-}
-#endif /* EMU86_EMULATE_CONFIG_CHECKERROR */
-
-
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 
 }

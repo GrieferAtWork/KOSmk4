@@ -24,35 +24,36 @@
 EMU86_INTELLISENSE_BEGIN(movdir64b) {
 
 
-#if EMU86_EMULATE_CONFIG_CHECKERROR
+#if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_MOVDIR64B
 case EMU86_OPCODE_ENCODE(0x0f38f8): {
 	/* 66 0F 38 F8 /r     MOVDIR64B r16/r32/r64, m512     Move 64-bytes as direct-store with guaranteed 64-byte
 	 *                                                    write atomicity from the source memory operand address
 	 *                                                    to destination memory address specified as offset to
 	 *                                                    ES segment in the register operand. */
 	byte_t *dstaddr;
+	byte_t *srcaddr;
 	MODRM_DECODE_MEMONLY();
 #define NEED_return_expected_memory_modrm
 	dstaddr = EMU86_SEGADDR(EMU86_GETESBASE(),
 	                        EMU86_GETREGP(modrm.mi_reg, op_flags));
-#if EMU86_EMULATE_CONFIG_CHECKUSER
-	if (EMU86_ISUSER()) {
-		byte_t *srcaddr = MODRM_MEMADDR();
-		EMU86_VALIDATE_READABLE(srcaddr, 8);
-		EMU86_VALIDATE_WRITABLE(dstaddr, 8);
-	}
-#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
+	srcaddr = MODRM_MEMADDR();
 	if (!IS_ALIGNED((uintptr_t)dstaddr, 16))
 		EMU86_EMULATE_THROW_SEGFAULT_UNALIGNED(dstaddr, E_SEGFAULT_CONTEXT_WRITING, 16);
+	EMU86_UNSUPPORTED_MEMACCESS(srcaddr, 64, true, false);
+	EMU86_UNSUPPORTED_MEMACCESS(dstaddr, 64, false, true);
+
 	/* We sadly don't have any way of emulating this instruction...
 	 * The problem is that it would require us to somehow provide a 512-bit atomic
 	 * write (or better yet: 512-bit atomic cmpxchg) method which we simply don't
 	 * have. So the best we can do is check for error conditions, before indicating
 	 * that the instruction simply isn't supported... */
+	(void)dstaddr;
+	(void)srcaddr;
+
 #define NEED_return_unsupported_instruction
 	goto return_unsupported_instruction;
 }
-#endif /* EMU86_EMULATE_CONFIG_CHECKERROR */
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_MOVDIR64B */
 
 
 }

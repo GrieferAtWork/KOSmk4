@@ -25,6 +25,7 @@
 
 EMU86_INTELLISENSE_BEGIN(cmps) {
 
+#if EMU86_EMULATE_CONFIG_WANT_CMPS
 #define DEFINE_CMPSn_COMPARE(bwlq, BWLQ, Nbits, Nbytes)      \
 	EMU86_READ_USER_MEMORY(psi_addr, Nbytes);                \
 	EMU86_READ_USER_MEMORY(pdi_addr, Nbytes);                \
@@ -46,18 +47,29 @@ EMU86_INTELLISENSE_BEGIN(cmps) {
 		psi += Nbytes;                                       \
 		pdi += Nbytes;                                       \
 	}
+#endif /* EMU86_EMULATE_CONFIG_WANT_CMPS */
 
 
 	/* Temporary storage for the %(|e|r)si and %(|e|r)di registers. */
+#if EMU86_EMULATE_CONFIG_WANT_CMPS
 	EMU86_UREG_TYPE psi, pdi;
+#endif /* EMU86_EMULATE_CONFIG_WANT_CMPS */
 
-case EMU86_OPCODE_ENCODE(0xa6): {
+case EMU86_OPCODE_ENCODE(0xa6):
+#if !EMU86_EMULATE_CONFIG_WANT_CMPS
+case EMU86_OPCODE_ENCODE(0xa7):
+#endif /* !EMU86_EMULATE_CONFIG_WANT_CMPS */
+{
 	/* A6     CMPSB     For legacy mode, compare byte at address DS:(E)SI with byte at address ES:(E)DI;
 	 *                  For 64-bit mode compare byte at address (R|E)SI with byte at address (R|E)DI.
 	 *                  The status flags are set accordingly. */
 	byte_t *psi_addr, *pdi_addr;
+#if !EMU86_EMULATE_CONFIG_WANT_CMPS
+	EMU86_UREG_TYPE psi, pdi;
+#endif /* EMU86_EMULATE_CONFIG_WANT_CMPS */
 	EMU86_PSIPDIn_LOAD_POINTERS(psi, pdi, psi_addr, pdi_addr,
 	                            op_flags & (EMU86_F_REP | EMU86_F_REPNE));
+#if EMU86_EMULATE_CONFIG_WANT_CMPS
 	DEFINE_CMPSn_COMPARE(b, B, 8, 1);
 do_cmps_save_pointer:
 	EMU86_PSIPDIn_SAVE_POINTERS(psi, pdi, op_flags & (EMU86_F_REP | EMU86_F_REPNE));
@@ -72,9 +84,19 @@ do_cmps_save_pointer:
 			goto done_dont_set_pc; /* not equal */
 	}
 	goto done;
+#else /* EMU86_EMULATE_CONFIG_WANT_CMPS */
+#define CMPS_N_BYTES() \
+	(tiny_opcode == EMU86_OPCODE_ENCODE(0xa6) ? 1 : IF_64BIT(IS_64BIT() ? 8 : ) !IS_16BIT() ? 4 : 2)
+	EMU86_UNSUPPORTED_MEMACCESS(psi_addr, CMPS_N_BYTES(), true, false);
+	EMU86_UNSUPPORTED_MEMACCESS(pdi_addr, CMPS_N_BYTES(), true, false);
+	goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#undef CMPS_N_BYTES
+#endif /* !EMU86_EMULATE_CONFIG_WANT_CMPS */
 }
 
 
+#if EMU86_EMULATE_CONFIG_WANT_CMPS
 case EMU86_OPCODE_ENCODE(0xa7): {
 	/*         A7     CMPSW     For legacy mode, compare word at address DS:(E)SI with word at address ES:(E)DI;
 	 *                          For 64-bit mode compare word at address (R|E)SI with word at address (R|E)DI.
@@ -96,6 +118,7 @@ case EMU86_OPCODE_ENCODE(0xa7): {
 	}
 	goto do_cmps_save_pointer;
 }
+#endif /* EMU86_EMULATE_CONFIG_WANT_CMPS */
 
 #undef DEFINE_CMPSn_COMPARE
 

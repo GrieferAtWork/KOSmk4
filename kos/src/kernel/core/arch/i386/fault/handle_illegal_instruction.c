@@ -78,6 +78,7 @@
 
 #pragma GCC diagnostic ignored "-Waddress-of-packed-member"
 
+#ifndef CONFIG_USE_HANDLE_BAD_USAGE
 DECL_BEGIN
 
 #ifdef __x86_64__
@@ -1562,5 +1563,6 @@ set_generic_illegal_instruction:
 }
 
 DECL_END
+#endif /* !CONFIG_USE_HANDLE_BAD_USAGE */
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_HANDLE_ILLEGAL_INSTRUCTION_C */

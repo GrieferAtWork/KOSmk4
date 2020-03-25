@@ -51,33 +51,45 @@ EMU86_INTELLISENSE_BEGIN(iret) {
 #endif /* CONFIG_LIBEMU86_WANT_32BIT && CONFIG_LIBEMU86_WANT_16BIT */
 
 
+#if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_IRET
 case EMU86_OPCODE_ENCODE(0xcf): {
 	/* CF     IRET     ZO     Valid     Valid     Interrupt return (16-bit operand size).
 	 * CF     IRETD    ZO     Valid     Valid     Interrupt return (32-bit operand size).
 	 * CF     IRETQ    ZO     Valid     Valid     Interrupt return (64-bit operand size). */
 	byte_t *sp;
+#if EMU86_EMULATE_CONFIG_WANT_IRET
 	EMU86_UREG_TYPE new_ip;
+#endif /* EMU86_EMULATE_CONFIG_WANT_IRET */
 	u16 new_cs;
 	u32 new_eflags;
 	sp = EMU86_GETSTACKPTR();
-	IF_64BIT(if (IS_64BIT()) {
+#if CONFIG_LIBEMU86_WANT_64BIT
+	if (IS_64BIT()) {
 		EMU86_EMULATE_POP(sp, 40);
 		EMU86_READ_USER_MEMORY(sp, 40);
+#if EMU86_EMULATE_CONFIG_WANT_IRET
 		new_ip     = EMU86_MEMREADQ(sp + 0);
+#endif /* EMU86_EMULATE_CONFIG_WANT_IRET */
 		new_cs     = EMU86_MEMREADQASW(sp + 8);
 		new_eflags = EMU86_MEMREADQASL(sp + 16);
 		sp += 24;
-	} else) if (!IS_16BIT()) {
+	} else
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+	if (!IS_16BIT()) {
 		EMU86_EMULATE_POP(sp, 12);
 		EMU86_READ_USER_MEMORY(sp, 12);
+#if EMU86_EMULATE_CONFIG_WANT_IRET
 		new_ip     = EMU86_MEMREADL(sp + 0);
+#endif /* EMU86_EMULATE_CONFIG_WANT_IRET */
 		new_cs     = EMU86_MEMREADLASW(sp + 4);
 		new_eflags = EMU86_MEMREADL(sp + 8);
 		sp += 12;
 	} else {
 		EMU86_EMULATE_POP(sp, 6);
 		EMU86_READ_USER_MEMORY(sp, 6);
+#if EMU86_EMULATE_CONFIG_WANT_IRET
 		new_ip     = EMU86_MEMREADW(sp + 0);
+#endif /* EMU86_EMULATE_CONFIG_WANT_IRET */
 		new_cs     = EMU86_MEMREADW(sp + 2);
 		new_eflags = EMU86_MEMREADW(sp + 4);
 		sp += 6;
@@ -87,6 +99,7 @@ case EMU86_OPCODE_ENCODE(0xcf): {
 		u32 old_eflags = EMU86_GETFLAGS();
 		if (old_eflags & EFLAGS_VM) {
 			/* return from vm86 (to vm86) */
+#if EMU86_EMULATE_CONFIG_WANT_IRET
 #define VM86_KEEPMASK (EFLAGS_VM | EFLAGS_IOPLMASK | EFLAGS_VIP | EFLAGS_VIF)
 			new_eflags &= ~(VM86_KEEPMASK);
 			new_eflags |= old_eflags & VM86_KEEPMASK;
@@ -97,10 +110,15 @@ case EMU86_OPCODE_ENCODE(0xcf): {
 			EMU86_SETEIP_VM86((u32)new_ip);
 			EMU86_SETSTACKPTR(sp);
 			goto done_dont_set_pc;
+#else /* EMU86_EMULATE_CONFIG_WANT_IRET */
+			goto return_unsupported_instruction;
+#define WANT_return_unsupported_instruction
+#endif /* !EMU86_EMULATE_CONFIG_WANT_IRET */
 		}
 	}
 	if (EMU86_F_IS32(op_flags) && (new_eflags & EFLAGS_VM) && !EMU86_ISUSER()) {
 		/* return to vm86 (from 32-bit mode) */
+#if EMU86_EMULATE_CONFIG_WANT_IRET
 		u32 new_esp;
 		u16 new_ss, new_es, new_ds, new_fs, new_gs;
 		EMU86_EMULATE_POP(sp - 12, 24 + 12);
@@ -122,6 +140,10 @@ case EMU86_OPCODE_ENCODE(0xcf): {
 		EMU86_SETFS_VM86(new_fs);
 		EMU86_SETGS_VM86(new_gs);
 		goto done_dont_set_pc;
+#else /* EMU86_EMULATE_CONFIG_WANT_IRET */
+		goto return_unsupported_instruction;
+#define WANT_return_unsupported_instruction
+#endif /* !EMU86_EMULATE_CONFIG_WANT_IRET */
 	}
 #endif /* CONFIG_LIBEMU86_WANT_32BIT && CONFIG_LIBEMU86_WANT_16BIT */
 
@@ -136,24 +158,35 @@ case EMU86_OPCODE_ENCODE(0xcf): {
 	if (EMU86_F_IS64(op_flags) || ((new_cs & 3) && !EMU86_ISUSER()))
 #endif /* CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT */
 	{
+#if EMU86_EMULATE_CONFIG_WANT_IRET
 		EMU86_UREG_TYPE new_sp;
+#endif /* EMU86_EMULATE_CONFIG_WANT_IRET */
 		u16 new_ss;
-		IF_64BIT(if (IS_64BIT()) {
+#if CONFIG_LIBEMU86_WANT_64BIT
+		if (IS_64BIT()) {
 			/* EMU86_EMULATE_POP() and EMU86_READ_USER_MEMORY()
 			 * were already invoked with the proper values above! */
 			/*EMU86_EMULATE_POP(sp - 24, 16 + 24);*/
 			/*EMU86_READ_USER_MEMORY(sp - 24, 16 + 24);*/
+#if EMU86_EMULATE_CONFIG_WANT_IRET
 			new_sp = EMU86_MEMREADQ(sp + 0);
+#endif /* EMU86_EMULATE_CONFIG_WANT_IRET */
 			new_ss = EMU86_MEMREADQASW(sp + 8);
-		} else) if (!IS_16BIT()) {
+		} else
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+		if (!IS_16BIT()) {
 			EMU86_EMULATE_POP(sp - 12, 8 + 12);
 			EMU86_READ_USER_MEMORY(sp - 12, 8 + 12);
+#if EMU86_EMULATE_CONFIG_WANT_IRET
 			new_sp = EMU86_MEMREADL(sp + 0);
+#endif /* EMU86_EMULATE_CONFIG_WANT_IRET */
 			new_ss = EMU86_MEMREADLASW(sp + 4);
 		} else {
 			EMU86_EMULATE_POP(sp - 6, 4 + 6);
 			EMU86_READ_USER_MEMORY(sp - 6, 4 + 6);
+#if EMU86_EMULATE_CONFIG_WANT_IRET
 			new_sp = EMU86_MEMREADW(sp + 0);
+#endif /* EMU86_EMULATE_CONFIG_WANT_IRET */
 			new_ss = EMU86_MEMREADW(sp + 2);
 		}
 #if EMU86_EMULATE_CONFIG_CHECKUSER && CONFIG_LIBEMU86_WANT_64BIT
@@ -182,10 +215,13 @@ case EMU86_OPCODE_ENCODE(0xcf): {
 				goto return_privileged_instruction;
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 			}
+#if EMU86_EMULATE_CONFIG_WANT_IRET
 			new_eflags &= USERIRET_EFLAGS_MASK;
 			new_eflags |= EMU86_GETFLAGS() & ~USERIRET_EFLAGS_MASK;
+#endif /* EMU86_EMULATE_CONFIG_WANT_IRET */
 		}
 #endif /* EMU86_EMULATE_CONFIG_CHECKUSER && CONFIG_LIBEMU86_WANT_64BIT */
+#if EMU86_EMULATE_CONFIG_WANT_IRET
 		EMU86_SETFLAGS(new_eflags);
 		EMU86_SETCS(new_cs);
 		EMU86_SETIPREG((u32)new_ip);
@@ -196,6 +232,10 @@ case EMU86_OPCODE_ENCODE(0xcf): {
 #endif /* !CONFIG_LIBEMU86_WANT_64BIT */
 		EMU86_SETSS(new_ss);
 		goto done_dont_set_pc;
+#else /* EMU86_EMULATE_CONFIG_WANT_IRET */
+		goto return_unsupported_instruction;
+#define WANT_return_unsupported_instruction
+#endif /* !EMU86_EMULATE_CONFIG_WANT_IRET */
 	}
 #if CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT
 	/* Return to same privilege level. */
@@ -213,18 +253,26 @@ case EMU86_OPCODE_ENCODE(0xcf): {
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 		}
 		/* Restrict EFLAGS to only update this mask */
+#if EMU86_EMULATE_CONFIG_WANT_IRET
 		new_eflags &= USERIRET_EFLAGS_MASK;
 		new_eflags |= EMU86_GETFLAGS() & ~USERIRET_EFLAGS_MASK;
+#endif /* EMU86_EMULATE_CONFIG_WANT_IRET */
 	}
 #endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
+#if EMU86_EMULATE_CONFIG_WANT_IRET
 	EMU86_SETFLAGS(new_eflags);
 	EMU86_SETCS(new_cs);
 	EMU86_SETIPREG((u32)new_ip);
 	EMU86_SETSTACKPTR(sp);
 	goto done_dont_set_pc;
+#else /* EMU86_EMULATE_CONFIG_WANT_IRET */
+	goto return_unsupported_instruction;
+#define WANT_return_unsupported_instruction
+#endif /* !EMU86_EMULATE_CONFIG_WANT_IRET */
 #endif /* CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT */
 #undef USERIRET_EFLAGS_MASK
 }
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_IRET */
 
 }
 EMU86_INTELLISENSE_END
