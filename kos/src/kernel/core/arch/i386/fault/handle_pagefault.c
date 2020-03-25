@@ -58,19 +58,13 @@
 #include <libinstrlen/instrlen.h>
 #include <libvio/access.h>
 
-#include "vio.h"
-
-#ifdef USE_VIOCORE
 #include <libviocore/viocore.h>
 #ifndef __x86_64__
 #include <asm/cfi.h>
 #endif /* !__x86_64__ */
-#else /* USE_VIOCORE */
-#endif /* !USE_VIOCORE */
 
 DECL_BEGIN
 
-#ifdef USE_VIOCORE
 #ifndef __x86_64__
 
 /* Register bootstrap loader.
@@ -104,7 +98,6 @@ __asm__(".pushsection .text.cold\n\t"
         ".size x86_vio_kernel_esp_bootstrap_loader, . - x86_vio_kernel_esp_bootstrap_loader\n\t"
         ".popsection");
 #endif /* !__x86_64__ */
-#endif /* USE_VIOCORE */
 
 #ifndef CONFIG_NO_SMP
 #define IF_SMP(...) __VA_ARGS__
@@ -648,12 +641,7 @@ do_handle_iob_node_access:
 				/* Need at least a read-lock for part initialization */
 #ifdef LIBVIO_CONFIG_ENABLED
 				if (part->dp_state == VM_DATAPART_STATE_VIOPRT) {
-#ifdef USE_VIOCORE
 					struct vio_emulate_args args;
-#else /* USE_VIOCORE */
-					vio_main_args_t args;
-#define vea_args ma_args
-#endif /* !USE_VIOCORE */
 					uintptr_half_t nodeprot;
 					nodeprot = node->vn_prot;
 					COMPILER_READ_BARRIER();
