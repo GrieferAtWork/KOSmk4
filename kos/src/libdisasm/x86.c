@@ -713,9 +713,9 @@ libda_select_jcc(struct disassembler *__restrict self,
 INTERN NONNULL((1)) void CC
 libda_single_x86(struct disassembler *__restrict self) {
 #ifdef CONFIG_AUTOSELECT_JCC
-	u32 whole_opcode;
+	emu86_opcode_t whole_opcode;
 #endif /* CONFIG_AUTOSELECT_JCC */
-	u32 opcode;
+	emu86_opcode_t opcode;
 	emu86_opflags_t flags;
 	byte_t *text_start = self->d_pc;
 	byte_t *args_start = NULL;
@@ -739,34 +739,40 @@ libda_single_x86(struct disassembler *__restrict self) {
 	whole_opcode = opcode;
 #endif /* CONFIG_AUTOSELECT_JCC */
 	/* Print the instruction. */
-	if (opcode <= 0xff) {
+	if (opcode < EMU86_OPCODE_BASE0f) {
+#if EMU86_OPCODE_BASE0 != 0
+		opcode -= EMU86_OPCODE_BASE0;
+#endif /* EMU86_OPCODE_BASE0 != 0 */
 		chain = ops;
 #ifdef HAVE_OPS_OFFSETS
 		chain += ops_offsets[opcode];
 #endif /* HAVE_OPS_OFFSETS */
-	} else if ((opcode & 0xff00) == 0x0f00) {
-		/* Multi-byte opcodes. */
-		if ((opcode & 0xffff00) == 0x0f3800) {
-			chain = ops_0f38;
-			opcode &= 0xff;
-#ifdef HAVE_OPS_0F38_OFFSETS
-			chain += ops_0f38_offsets[opcode];
-#endif /* HAVE_OPS_0F38_OFFSETS */
-		} else if ((opcode & 0xffff00) == 0x0f3a00) {
-			chain = ops_0f3a;
-			opcode &= 0xff;
-#ifdef HAVE_OPS_0F3A_OFFSETS
-			chain += ops_0f3a_offsets[opcode];
-#endif /* HAVE_OPS_0F3A_OFFSETS */
-		} else {
-			chain = ops_0f;
-			opcode &= 0xff;
+	} else if (opcode < EMU86_OPCODE_BASE0f38) {
+		opcode -= EMU86_OPCODE_BASE0f;
+#if EMU86_OPCODE_BASE0f + 0x100 != EMU86_OPCODE_BASE0f38
+		opcode &= 0xff;
+#endif /* EMU86_OPCODE_BASE0f + 0x100 != EMU86_OPCODE_BASE0f38 */
+		chain = ops_0f;
 #ifdef HAVE_OPS_0F_OFFSETS
-			chain += ops_0f_offsets[opcode];
+		chain += ops_0f_offsets[opcode];
 #endif /* HAVE_OPS_0F_OFFSETS */
-		}
+	} else if (opcode < EMU86_OPCODE_BASE0f3a) {
+		opcode -= EMU86_OPCODE_BASE0f38;
+#if EMU86_OPCODE_BASE0f38 + 0x100 != EMU86_OPCODE_BASE0f3a
+		opcode &= 0xff;
+#endif /* EMU86_OPCODE_BASE0f38 + 0x100 != EMU86_OPCODE_BASE0f3a */
+		chain = ops_0f38;
+#ifdef HAVE_OPS_0F38_OFFSETS
+		chain += ops_0f38_offsets[opcode];
+#endif /* HAVE_OPS_0F38_OFFSETS */
 	} else {
-		goto unknown_opcode;
+		opcode -= EMU86_OPCODE_BASE0f3a;
+		if unlikely(opcode >= 0x100)
+			goto unknown_opcode;
+		chain = ops_0f3a;
+#ifdef HAVE_OPS_0F3A_OFFSETS
+		chain += ops_0f3a_offsets[opcode];
+#endif /* HAVE_OPS_0F3A_OFFSETS */
 	}
 	for (;; ++chain) {
 		if (chain->i_opcode != opcode) {

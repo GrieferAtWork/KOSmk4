@@ -46,15 +46,15 @@ DECL_BEGIN
 INTERN struct icpustate *FCALL
 x86_handle_bound_range(struct icpustate *__restrict state) {
 	byte_t const *pc;
-	u32 opcode;
-	op_flag_t flags;
+	emu86_opcode_t opcode;
+	emu86_opflags_t flags;
 	uintptr_t bound_index, bound_min, bound_max;
 	pc = (byte_t *)icpustate_getpc(state);
 	PERTASK_SET(this_exception_faultaddr, (void *)pc);
 	flags     = emu86_opflagsof_icpustate(state);
 	pc        = emu86_opcode_decode(pc, &opcode, &flags);
 	bound_min = bound_index = bound_max = 0;
-	if (opcode == 0x62) {
+	if (opcode == EMU86_OPCODE_ENCODE(0x62)) {
 		struct emu86_modrm mod;
 		/* 62 /r      BOUND r16, m16&16      Check if r16 (array index) is within bounds specified by m16&16
 		 * 62 /r      BOUND r32, m32&32      Check if r32 (array index) is within bounds specified by m32&32 */

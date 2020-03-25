@@ -120,7 +120,8 @@ x86_handle_segment_not_present(struct icpustate *__restrict state,
 	struct emu86_modrm mod;
 	unsigned int i;
 	u32 opcode;
-	op_flag_t op_flags;
+	emu86_opcode_t tiny_opcode;
+	emu86_opflags_t op_flags;
 	byte_t const *pc, *orig_pc;
 	orig_pc = (byte_t *)state->ics_irregs.ir_pip;
 	COMPILER_READ_BARRIER();
@@ -132,7 +133,8 @@ x86_handle_segment_not_present(struct icpustate *__restrict state,
 		opcode = 0;
 	} else {
 		op_flags = emu86_opflagsof_icpustate(state);
-		pc       = emu86_opcode_decode(pc, &opcode, &op_flags);
+		pc       = emu86_opcode_decode(pc, &tiny_opcode, &op_flags);
+		opcode   = EMU86_OPCODE_DECODE(tiny_opcode);
 		TRY {
 			switch (opcode) {
 #define isuser()     icpustate_isuser(state)

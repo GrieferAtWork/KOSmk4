@@ -76,6 +76,7 @@ PRIVATE struct icpustate *FCALL
 x86_handle_gpf_impl(struct icpustate *__restrict state, uintptr_t ecode, bool is_ss) {
 	byte_t const *orig_pc, *pc;
 	u32 opcode;
+	emu86_opcode_t tiny_opcode;
 	op_flag_t op_flags;
 	struct emu86_modrm mod;
 	u16 effective_segment_value;
@@ -156,7 +157,8 @@ set_noncanon_pc_exception:
 #endif /* __x86_64__ */
 
 	op_flags = emu86_opflagsof_icpustate(state);
-	pc       = emu86_opcode_decode(pc, &opcode, &op_flags);
+	pc       = emu86_opcode_decode(pc, &tiny_opcode, &op_flags);
+	opcode   = EMU86_OPCODE_DECODE(tiny_opcode);
 
 	/* TODO: Some instructions (such as `XSAVEC') raise #GP if their operands are miss-aligned.
 	 *       KOS has a dedicated exception for this (`E_SEGFAULT_UNALIGNED') that should be

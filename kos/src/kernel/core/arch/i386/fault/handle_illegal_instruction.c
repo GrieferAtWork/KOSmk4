@@ -99,6 +99,7 @@ INTERN struct icpustate *FCALL
 x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 	byte_t const *orig_pc, *pc;
 	u32 opcode;
+	emu86_opcode_t tiny_opcode;
 	op_flag_t op_flags;
 	struct emu86_modrm mod;
 	pc = (byte_t *)state->ics_irregs.ir_pip;
@@ -108,7 +109,8 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 		__sti();
 	orig_pc  = pc;
 	op_flags = emu86_opflagsof_icpustate(state);
-	pc       = emu86_opcode_decode(pc, &opcode, &op_flags);
+	pc       = emu86_opcode_decode(pc, &tiny_opcode, &op_flags);
+	opcode   = EMU86_OPCODE_DECODE(tiny_opcode);
 	TRY {
 		if unlikely((pc - orig_pc) > 16) {
 			uintptr_t next_pc;
