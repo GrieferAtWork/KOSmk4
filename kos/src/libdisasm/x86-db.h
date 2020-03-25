@@ -1680,9 +1680,6 @@ PRIVATE struct instruction const ops_0f[] = {
 
 	I(0x01, IF_MODRM|IF_RMM|IF_REG7,         "invlpg\t" OP_MEM),
 
-	I(0x01, IF_BYTE2,                 "\xf8" "swapgs"),
-	I(0x01, IF_BYTE2,                 "\xf9" "rdtscp"),
-
 	I(0x01, IF_BYTE2,                 "\xc1" "vmcall"),
 	I(0x01, IF_BYTE2,                 "\xc2" "vmlaunch"),
 	I(0x01, IF_BYTE2,                 "\xc3" "vmresume"),
@@ -1699,7 +1696,11 @@ PRIVATE struct instruction const ops_0f[] = {
 	I(0x01, IF_BYTE2,                 "\xd6" "xtest"),
 	I(0x01, IF_BYTE2,                 "\xd7" "enclu"),
 
+	I(0x01, IF_BYTE2,                 "\xf8" "swapgs"),
+	I(0x01, IF_BYTE2,                 "\xf9" "rdtscp"),
+
 	I(0x02, IF_MODRM,         "lar\t" OP_RM16 OP_R16),
+
 	I(0x03, IF_66|IF_MODRM,   "lslw\t" OP_RM16 OP_R16),
 	I(0x03, IF_MODRM,         "lsll\t" OP_RM32 OP_R16),
 	I(0x03, IF_MODRM|IF_REXW, "lslq\t" OP_RM64 OP_R16),
@@ -4476,12 +4477,12 @@ PRIVATE struct instruction const ops_0f38[] = {
 	I(0xf3, IF_VEXW0|IF_MODRM|IF_REG3,"blsil\t" OP_RM32 OP_VR32),
 	I(0xf3, IF_VEXW1|IF_MODRM|IF_REG3,"blsiq\t" OP_RM64 OP_VR64),
 
-	I(0xf5, IF_VEXW0|IF_MODRM,       "bzhil\t" OP_VR32 OP_RM32 OP_R32),
-	I(0xf5, IF_VEXW1|IF_MODRM,       "bzhiq\t" OP_VR64 OP_RM64 OP_R64),
-	I(0xf5, IF_VEXW0|IF_F3|IF_MODRM, "pextl\t" OP_RM32 OP_VR32 OP_R32),
-	I(0xf5, IF_VEXW1|IF_F3|IF_MODRM, "pextq\t" OP_RM64 OP_VR64 OP_R64),
-	I(0xf5, IF_VEXW0|IF_F2|IF_MODRM, "pdepl\t" OP_RM32 OP_VR32 OP_R32),
-	I(0xf5, IF_VEXW1|IF_F2|IF_MODRM, "pdepq\t" OP_RM64 OP_VR64 OP_R64),
+	I(0xf5, IF_VEXW0|IF_F3|IF_MODRM, "pextl\t" OP_RM32 OP_VR32 OP_R32), /* VEX.LZ.F3.0F38.W0 F5 /r     PEXT r32a, r32b, r/m32     Parallel extract of bits from r32b using mask in r/m32, result is written to r32a. */
+	I(0xf5, IF_VEXW1|IF_F3|IF_MODRM, "pextq\t" OP_RM64 OP_VR64 OP_R64), /* VEX.LZ.F3.0F38.W1 F5 /r     PEXT r64a, r64b, r/m64     Parallel extract of bits from r64b using mask in r/m64, result is written to r64a. */
+	I(0xf5, IF_VEXW0|IF_F2|IF_MODRM, "pdepl\t" OP_RM32 OP_VR32 OP_R32), /* VEX.LZ.F2.0F38.W0 F5 /r     PDEP r32a, r32b, r/m32     Parallel deposit of bits from r32b using mask in r/m32, result is written to r32a. */
+	I(0xf5, IF_VEXW1|IF_F2|IF_MODRM, "pdepq\t" OP_RM64 OP_VR64 OP_R64), /* VEX.LZ.F2.0F38.W1 F5 /r     PDEP r64a, r64b, r/m64     Parallel deposit of bits from r64b using mask in r/m64, result is written to r64a. */
+	I(0xf5, IF_VEXW0|IF_MODRM,       "bzhil\t" OP_VR32 OP_RM32 OP_R32), /* VEX.LZ.0F38.W0 F5 /r     BZHI r32a, r/m32, r32b     Zero bits in r/m32 starting with the position in r32b, write result to r32a. */
+	I(0xf5, IF_VEXW1|IF_MODRM,       "bzhiq\t" OP_VR64 OP_RM64 OP_R64), /* VEX.LZ.0F38.W1 F5 /r     BZHI r64a, r/m64, r64b     Zero bits in r/m64 starting with the position in r64b, write result to r64a. */
 
 	I(0xf6, IF_66|IF_MODRM,         "adcxl\t" OP_RM32 OP_R32),
 	I(0xf6, IF_66|IF_MODRM|IF_REXW, "adcxq\t" OP_RM64 OP_R64),

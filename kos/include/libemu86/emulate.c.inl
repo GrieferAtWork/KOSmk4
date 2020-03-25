@@ -2252,6 +2252,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #include "emu/movbe.c.inl"
 #include "emu/movs.c.inl"
 #include "emu/nop.c.inl"
+#include "emu/pext.c.inl"
 #include "emu/pmode.c.inl"
 #include "emu/popcnt.c.inl"
 #include "emu/push-pop.c.inl"
@@ -2289,9 +2290,6 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 			/* XXX: rdpid      (if only for verbose exception messages?) */
 
 			/* TODO: crc32 */
-			/* TODO: bzhi */
-			/* TODO: pext */
-			/* TODO: pdep */
 			/* TODO: adcx */
 			/* TODO: adox */
 			/* TODO: mulx */
