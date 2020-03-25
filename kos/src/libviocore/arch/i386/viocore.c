@@ -60,6 +60,7 @@ opt.append("-Os");
 #include <kos/kernel/cpu-state-compat.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
+#include <kos/kernel/paging.h>
 #include <kos/kernel/segment.h>
 #include <kos/kernel/types.h>
 #include <kos/types.h>
@@ -107,6 +108,22 @@ NOTHROW(CC libviocore_complete_except)(struct vio_emulate_args *__restrict self,
 	if (data->e_class == E_ILLEGAL_INSTRUCTION) {
 		if (!data->e_pointers[0])
 			data->e_pointers[0] = opcode;
+	} else if (data->e_class == E_SEGFAULT) {
+		/* Fix-up the context code for the segmentation fault. */
+		/* We're the VIO handler, so the fault happened during VIO */
+		data->e_pointers[1] |= E_SEGFAULT_CONTEXT_VIO;
+#ifdef __KERNEL__
+		if (icpustate_isuser(self->vea_args.va_state))
+#endif /* __KERNEL__ */
+		{
+			/* The fault happened due to a user-space access */
+			data->e_pointers[1] |= E_SEGFAULT_CONTEXT_USERCODE;
+		}
+#ifdef __x86_64__
+		/* The fault uses a non-canonical address (shouldn't actually happen...) */
+		if (ADDR_IS_NONCANON(data->e_pointers[0]))
+			data->e_pointers[1] |= E_SEGFAULT_CONTEXT_NONCANON;
+#endif /* __x86_64__ */
 	}
 	/* Fill in the fault address. */
 	data->e_faultaddr = (void *)CS(getpc)(self->vea_args.va_state);

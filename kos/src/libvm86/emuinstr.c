@@ -294,7 +294,9 @@ DECL_END
 #define EMU86_EMULATE_RETURN_AFTER_INTO() \
 	return libvm86_intr(self, 0x04) /* #OF */
 #define EMU86_EMULATE_THROW_BOUNDERR(bound_idx, bound_min, bound_max) \
-	return libvm86_intr(self, 0x5) /* #BR */
+	return libvm86_intr(self, 0x05) /* #BR */
+#define EMU86_EMULATE_THROW_SEGFAULT_UNALIGNED(addr, context, req_alignment) \
+	return libvm86_intr(self, 0x0d) /* #GP */
 
 
 /* Define how we want to handle exceptions */

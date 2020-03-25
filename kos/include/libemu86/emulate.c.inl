@@ -31,6 +31,7 @@
 
 #include <hybrid/__atomic.h>
 #include <hybrid/__rotate.h>
+#include <hybrid/align.h>
 #include <hybrid/host.h>
 #include <hybrid/overflow.h>
 #include <hybrid/unaligned.h>
@@ -255,6 +256,10 @@ __DECL_BEGIN
 	                               ? 0x06 /* #UD */                                  \
 	                               : 0x0d /* #GP */)
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
+#ifndef EMU86_EMULATE_THROW_SEGFAULT_UNALIGNED
+#define EMU86_EMULATE_THROW_SEGFAULT_UNALIGNED(addr, context, req_alignment) \
+	EMU86_EMULATE_RETURN_AFTER_INT(0x0d) /* #GP */
+#endif /* !EMU86_EMULATE_THROW_SEGFAULT_UNALIGNED */
 #endif /* EMU86_EMULATE_RETURN_AFTER_INT */
 
 
@@ -364,6 +369,12 @@ __DECL_BEGIN
 #define EMU86_EMULATE_THROW_BOUNDERR(bound_idx, bound_min, bound_max) \
 	THROW(E_INDEX_ERROR_OUT_OF_BOUNDS, bound_idx, bound_min, bound_max)
 #endif /* !EMU86_EMULATE_THROW_BOUNDERR */
+
+/* Handle a misalignmented memory operand. */
+#ifndef EMU86_EMULATE_THROW_SEGFAULT_UNALIGNED
+#define EMU86_EMULATE_THROW_SEGFAULT_UNALIGNED(addr, context, req_alignment) \
+	THROW(E_SEGFAULT_UNALIGNED, addr, context, req_alignment)
+#endif /* !EMU86_EMULATE_THROW_SEGFAULT_UNALIGNED */
 
 /* Throw an exception related to attempting to access an illegal/protected register.
  * NOTE: When not defined, such cases are handled as follows:
@@ -2251,6 +2262,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #include "emu/misc2.c.inl"
 #include "emu/mov.c.inl"
 #include "emu/movbe.c.inl"
+#include "emu/movdir64b.c.inl"
 #include "emu/movs.c.inl"
 #include "emu/nop.c.inl"
 #include "emu/pext.c.inl"
@@ -2291,7 +2303,18 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 			/* XXX: rdpid      (if only for verbose exception messages?) */
 
 			/* TODO: crc32 */
-			/* TODO: movdir64b */
+
+			//TODO: https://en.wikipedia.org/wiki/Bit_Manipulation_Instruction_Sets
+			//      BEXTR
+			//      BLCFILL
+			//      BLCI
+			//      BLCIC
+			//      BLCMSK
+			//      BLCS
+			//      BLSFILL
+			//      BLSIC
+			//      T1MSKC
+			//      TZMSK
 
 			default:
 				goto return_unknown_instruction;
