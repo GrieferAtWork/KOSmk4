@@ -2214,6 +2214,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
  * expected to have native support. */
 #include EMU86_EMULATE_IMPL_HEADER
 #else /* EMU86_EMULATE_IMPL_HEADER */
+#include "emu/adcx.c.inl"
 #include "emu/andn.c.inl"
 #include "emu/arith.c.inl"
 #include "emu/arith2.c.inl"
@@ -2290,9 +2291,6 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 			/* XXX: rdpid      (if only for verbose exception messages?) */
 
 			/* TODO: crc32 */
-			/* TODO: adcx */
-			/* TODO: adox */
-			/* TODO: mulx */
 			/* TODO: movdir64b */
 
 			default:

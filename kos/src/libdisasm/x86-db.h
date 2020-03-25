@@ -4477,19 +4477,19 @@ PRIVATE struct instruction const ops_0f38[] = {
 	I(0xf3, IF_VEXW0|IF_MODRM|IF_REG3,"blsil\t" OP_RM32 OP_VR32),
 	I(0xf3, IF_VEXW1|IF_MODRM|IF_REG3,"blsiq\t" OP_RM64 OP_VR64),
 
-	I(0xf5, IF_VEXW0|IF_F3|IF_MODRM, "pextl\t" OP_RM32 OP_VR32 OP_R32), /* VEX.LZ.F3.0F38.W0 F5 /r     PEXT r32a, r32b, r/m32     Parallel extract of bits from r32b using mask in r/m32, result is written to r32a. */
-	I(0xf5, IF_VEXW1|IF_F3|IF_MODRM, "pextq\t" OP_RM64 OP_VR64 OP_R64), /* VEX.LZ.F3.0F38.W1 F5 /r     PEXT r64a, r64b, r/m64     Parallel extract of bits from r64b using mask in r/m64, result is written to r64a. */
-	I(0xf5, IF_VEXW0|IF_F2|IF_MODRM, "pdepl\t" OP_RM32 OP_VR32 OP_R32), /* VEX.LZ.F2.0F38.W0 F5 /r     PDEP r32a, r32b, r/m32     Parallel deposit of bits from r32b using mask in r/m32, result is written to r32a. */
-	I(0xf5, IF_VEXW1|IF_F2|IF_MODRM, "pdepq\t" OP_RM64 OP_VR64 OP_R64), /* VEX.LZ.F2.0F38.W1 F5 /r     PDEP r64a, r64b, r/m64     Parallel deposit of bits from r64b using mask in r/m64, result is written to r64a. */
+	I(0xf5, IF_F3|IF_VEXW0|IF_MODRM, "pextl\t" OP_RM32 OP_VR32 OP_R32), /* VEX.LZ.F3.0F38.W0 F5 /r     PEXT r32a, r32b, r/m32     Parallel extract of bits from r32b using mask in r/m32, result is written to r32a. */
+	I(0xf5, IF_F3|IF_VEXW1|IF_MODRM, "pextq\t" OP_RM64 OP_VR64 OP_R64), /* VEX.LZ.F3.0F38.W1 F5 /r     PEXT r64a, r64b, r/m64     Parallel extract of bits from r64b using mask in r/m64, result is written to r64a. */
+	I(0xf5, IF_F2|IF_VEXW0|IF_MODRM, "pdepl\t" OP_RM32 OP_VR32 OP_R32), /* VEX.LZ.F2.0F38.W0 F5 /r     PDEP r32a, r32b, r/m32     Parallel deposit of bits from r32b using mask in r/m32, result is written to r32a. */
+	I(0xf5, IF_F2|IF_VEXW1|IF_MODRM, "pdepq\t" OP_RM64 OP_VR64 OP_R64), /* VEX.LZ.F2.0F38.W1 F5 /r     PDEP r64a, r64b, r/m64     Parallel deposit of bits from r64b using mask in r/m64, result is written to r64a. */
 	I(0xf5, IF_VEXW0|IF_MODRM,       "bzhil\t" OP_VR32 OP_RM32 OP_R32), /* VEX.LZ.0F38.W0 F5 /r     BZHI r32a, r/m32, r32b     Zero bits in r/m32 starting with the position in r32b, write result to r32a. */
 	I(0xf5, IF_VEXW1|IF_MODRM,       "bzhiq\t" OP_VR64 OP_RM64 OP_R64), /* VEX.LZ.0F38.W1 F5 /r     BZHI r64a, r/m64, r64b     Zero bits in r/m64 starting with the position in r64b, write result to r64a. */
 
-	I(0xf6, IF_66|IF_MODRM,         "adcxl\t" OP_RM32 OP_R32),
-	I(0xf6, IF_66|IF_MODRM|IF_REXW, "adcxq\t" OP_RM64 OP_R64),
-	I(0xf6, IF_F3|IF_MODRM,         "adoxl\t" OP_RM32 OP_R32),
-	I(0xf6, IF_F3|IF_MODRM|IF_REXW, "adoxq\t" OP_RM64 OP_R64),
-	I(0xf6, IF_F2|IF_MODRM,         "mulxl\t" OP_RM32 OP_VR32 OP_R32),
-	I(0xf6, IF_F2|IF_MODRM|IF_REXW, "mulxq\t" OP_RM64 OP_VR64 OP_R64),
+	I(0xf6, IF_F2|IF_VEXW0|IF_MODRM,"mulxl\t" OP_RM32 OP_VR32 OP_R32), /* VEX.LZ.F2.0F38.W0 F6 /r     MULX r32a, r32b, r/m32     Unsigned multiply of r/m32 with EDX without affecting arithmetic flags. */
+	I(0xf6, IF_F2|IF_VEXW1|IF_MODRM,"mulxq\t" OP_RM64 OP_VR64 OP_R64), /* VEX.LZ.F2.0F38.W1 F6 /r     MULX r64a, r64b, r/m64     Unsigned multiply of r/m64 with RDX without affecting arithmetic flags. */
+	I(0xf6, IF_F3|IF_MODRM,         "adoxl\t" OP_RM32 OP_R32),         /* F3       0F 38 F6 /r     ADOX r32, r/m32     Unsigned addition of r32 with OF, r/m32 to r32, writes OF. */
+	I(0xf6, IF_F3|IF_MODRM|IF_REXW, "adoxq\t" OP_RM64 OP_R64),         /* F3 REX.w 0F 38 F6 /r     ADOX r64, r/m64     Unsigned addition of r64 with OF, r/m64 to r64, writes OF. */
+	I(0xf6, IF_66|IF_MODRM,         "adcxl\t" OP_RM32 OP_R32),         /* 66       0F 38 F6 /r     ADCX r32, r/m32     Unsigned addition of r32 with CF, r/m32 to r32, writes CF. */
+	I(0xf6, IF_66|IF_MODRM|IF_REXW, "adcxq\t" OP_RM64 OP_R64),         /* 66 REX.w 0F 38 F6 /r     ADCX r64, r/m64     Unsigned addition of r64 with CF, r/m64 to r64, writes CF. */
 
 	I(0xf7, IF_VEXW0|IF_MODRM,       "bextrl\t" OP_VR32 OP_RM32 OP_R32),
 	I(0xf7, IF_VEXW1|IF_MODRM,       "bextrq\t" OP_VR64 OP_RM64 OP_R64),
