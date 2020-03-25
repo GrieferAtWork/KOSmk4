@@ -25,7 +25,7 @@ EMU86_INTELLISENSE_BEGIN(movdir64b) {
 
 
 #if EMU86_EMULATE_CONFIG_CHECKERROR
-case 0x0f38f8: {
+case EMU86_OPCODE_ENCODE(0x0f38f8): {
 	/* 66 0F 38 F8 /r     MOVDIR64B r16/r32/r64, m512     Move 64-bytes as direct-store with guaranteed 64-byte
 	 *                                                    write atomicity from the source memory operand address
 	 *                                                    to destination memory address specified as offset to

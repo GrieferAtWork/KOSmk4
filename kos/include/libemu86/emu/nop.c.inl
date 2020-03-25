@@ -25,7 +25,7 @@ EMU86_INTELLISENSE_BEGIN(nop) {
 
 
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
-case 0x0f1f:
+case EMU86_OPCODE_ENCODE(0x0f1f):
 	/* NP 0F 1F /0     NOP r/m16     Multi-byte no-operation instruction.
 	 * NP 0F 1F /0     NOP r/m32     Multi-byte no-operation instruction. */
 	MODRM_DECODE();

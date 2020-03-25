@@ -51,7 +51,7 @@ EMU86_INTELLISENSE_BEGIN(iret) {
 #endif /* CONFIG_LIBEMU86_WANT_32BIT && CONFIG_LIBEMU86_WANT_16BIT */
 
 
-case 0xcf: {
+case EMU86_OPCODE_ENCODE(0xcf): {
 	/* CF     IRET     ZO     Valid     Valid     Interrupt return (16-bit operand size).
 	 * CF     IRETD    ZO     Valid     Valid     Interrupt return (32-bit operand size).
 	 * CF     IRETQ    ZO     Valid     Valid     Interrupt return (64-bit operand size). */

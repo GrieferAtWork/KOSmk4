@@ -27,7 +27,7 @@
 EMU86_INTELLISENSE_BEGIN(ret) {
 
 
-case 0xc3: {
+case EMU86_OPCODE_ENCODE(0xc3): {
 	/* C3     RET     Near return to calling procedure. */
 	EMU86_POP163264(EMU86_SETIP,
 	                EMU86_SETEIP,
@@ -35,7 +35,7 @@ case 0xc3: {
 	goto done_dont_set_pc;
 }
 
-case 0xc2: {
+case EMU86_OPCODE_ENCODE(0xc2): {
 	u16 offset;
 	byte_t *sp;
 	/* C2 iw     RET imm16     Near return to calling procedure and pop imm16 bytes from stack. */

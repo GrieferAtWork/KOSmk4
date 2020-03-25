@@ -51,7 +51,7 @@ EMU86_INTELLISENSE_BEGIN(cmps) {
 	/* Temporary storage for the %(|e|r)si and %(|e|r)di registers. */
 	EMU86_UREG_TYPE psi, pdi;
 
-case 0xa6: {
+case EMU86_OPCODE_ENCODE(0xa6): {
 	/* A6     CMPSB     For legacy mode, compare byte at address DS:(E)SI with byte at address ES:(E)DI;
 	 *                  For 64-bit mode compare byte at address (R|E)SI with byte at address (R|E)DI.
 	 *                  The status flags are set accordingly. */
@@ -75,7 +75,7 @@ do_cmps_save_pointer:
 }
 
 
-case 0xa7: {
+case EMU86_OPCODE_ENCODE(0xa7): {
 	/*         A7     CMPSW     For legacy mode, compare word at address DS:(E)SI with word at address ES:(E)DI;
 	 *                          For 64-bit mode compare word at address (R|E)SI with word at address (R|E)DI.
 	 *                          The status flags are set accordingly.

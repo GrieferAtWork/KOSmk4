@@ -27,8 +27,7 @@ EMU86_INTELLISENSE_BEGIN(stif) {
 
 	/* Instructions that modify the EFLAGS.IF (interrupt) bit. */
 
-
-case 0xfa: {
+case EMU86_OPCODE_ENCODE(0xfa): {
 	/* FA     CLI     Clear interrupt flag; interrupts disabled when interrupt flag cleared. */
 #if EMU86_EMULATE_VM86
 	if (EMU86_ISVM86()) {
@@ -47,7 +46,7 @@ case 0xfa: {
 	goto done;
 }
 
-case 0xfb: {
+case EMU86_OPCODE_ENCODE(0xfb): {
 	/* FB     STI     Set interrupt flag; external, maskable interrupts
 	 *                enabled at the end of the next instruction. */
 #if EMU86_EMULATE_VM86

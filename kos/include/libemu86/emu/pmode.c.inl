@@ -45,7 +45,7 @@ EMU86_INTELLISENSE_BEGIN(pmode) {
      ((CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_64BIT) && \
       (defined(EMU86_EMULATE_VERR) || defined(EMU86_EMULATE_VERW))))
 
-case 0x0f00: {
+case EMU86_OPCODE_ENCODE(0x0f00): {
 	MODRM_DECODE();
 	switch (modrm.mi_reg) {
 
@@ -229,7 +229,7 @@ case 0x0f00: {
      defined(EMU86_EMULATE_LGDT) || defined(EMU86_EMULATE_LIDT) || \
      defined(EMU86_EMULATE_SMSW) || defined(EMU86_EMULATE_LMSW) || \
      defined(EMU86_EMULATE_INVLPG) || EMU86_EMULATE_CONFIG_CHECKERROR)
-case 0x0f01: {
+case EMU86_OPCODE_ENCODE(0x0f01): {
 	byte_t *rmaddr;
 	MODRM_DECODE();
 	rmaddr = MODRM_MEMADDR();
@@ -525,7 +525,7 @@ case 0x0f01: {
 #if (CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_64BIT || \
      (EMU86_EMULATE_CONFIG_CHECKERROR && CONFIG_LIBEMU86_WANT_16BIT))
 #if EMU86_EMULATE_CONFIG_CHECKERROR || defined(EMU86_EMULATE_LAR)
-case 0x0f02: {
+case EMU86_OPCODE_ENCODE(0x0f02): {
 	/* 0F 02 /r     LAR r16, r16/m16     r16 := access rights referenced by r16/m16 */
 #if CONFIG_LIBEMU86_WANT_16BIT
 #define NEED_return_unsupported_instruction
@@ -555,7 +555,7 @@ case 0x0f02: {
 
 
 #if EMU86_EMULATE_CONFIG_CHECKERROR || defined(EMU86_EMULATE_LSL)
-case 0x0f03: {
+case EMU86_OPCODE_ENCODE(0x0f03): {
 	/*         0F 03 /r     LSL r16, r16/m16     Load: r16 := segment limit, selector r16/m16.
 	 *         0F 03 /r     LSL r32, r32/m16     Load: r32 := segment limit, selector r32/m16.
 	 * REX.W + 0F 03 /r     LSL r64, r32/m16     Load: r64 := segment limit, selector r32/m16 */

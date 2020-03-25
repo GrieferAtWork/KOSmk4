@@ -25,7 +25,8 @@
 
 EMU86_INTELLISENSE_BEGIN(push_pop) {
 
-#if CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT
+#if (CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT || \
+     (EMU86_EMULATE_CONFIG_CHECKERROR && CONFIG_LIBEMU86_WANT_64BIT))
 
 #if CONFIG_LIBEMU86_WANT_64BIT
 #define NEED_return_unsupported_instruction
@@ -34,73 +35,87 @@ EMU86_INTELLISENSE_BEGIN(push_pop) {
 /************************************************************************/
 /* PUSH ES                                                              */
 /************************************************************************/
-case 0x06: {
+case EMU86_OPCODE_ENCODE(0x06): {
 	EMU86_PUSH1632(u16, EMU86_GETES());
+#if CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT
 	goto done;
+#endif /* CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT */
 }
 
 
 /************************************************************************/
 /* POP ES                                                               */
 /************************************************************************/
-case 0x07: {
+case EMU86_OPCODE_ENCODE(0x07): {
 	EMU86_POP1632(u16, EMU86_SETES);
+#if CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT
 	goto done;
+#endif /* CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT */
 }
 
 
 /************************************************************************/
 /* PUSH CS                                                              */
 /************************************************************************/
-case 0x0e: {
+case EMU86_OPCODE_ENCODE(0x0e): {
 	EMU86_PUSH1632(u16, EMU86_GETCS());
+#if CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT
 	goto done;
+#endif /* CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT */
 }
 
 
 /************************************************************************/
 /* PUSH SS                                                              */
 /************************************************************************/
-case 0x16: {
+case EMU86_OPCODE_ENCODE(0x16): {
 	EMU86_PUSH1632(u16, EMU86_GETSS());
+#if CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT
 	goto done;
+#endif /* CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT */
 }
 
 
 /************************************************************************/
 /* POP SS                                                               */
 /************************************************************************/
-case 0x17: {
+case EMU86_OPCODE_ENCODE(0x17): {
 	EMU86_POP1632(u16, EMU86_SETSS);
+#if CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT
 	goto done;
+#endif /* CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT */
 }
 
 
 /************************************************************************/
 /* PUSH DS                                                              */
 /************************************************************************/
-case 0x1e: {
+case EMU86_OPCODE_ENCODE(0x1e): {
 	EMU86_PUSH1632(u16, EMU86_GETDS());
+#if CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT
 	goto done;
+#endif /* CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT */
 }
 
 
 /************************************************************************/
 /* POP DS                                                               */
 /************************************************************************/
-case 0x1f: {
+case EMU86_OPCODE_ENCODE(0x1f): {
 	EMU86_POP1632(u16, EMU86_SETDS);
+#if CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT
 	goto done;
+#endif /* CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT */
 }
 
-#endif /* CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT */
+#endif /* CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT || EMU86_EMULATE_CONFIG_CHECKERROR */
 
 
 
 /************************************************************************/
 /* PUSH FS                                                              */
 /************************************************************************/
-case 0x0fa0: {
+case EMU86_OPCODE_ENCODE(0x0fa0): {
 	EMU86_PUSH163264(EMU86_GETFS(),
 	                 EMU86_GETFS(),
 	                 EMU86_GETFS());
@@ -111,7 +126,7 @@ case 0x0fa0: {
 /************************************************************************/
 /* POP FS                                                              */
 /************************************************************************/
-case 0x0fa1: {
+case EMU86_OPCODE_ENCODE(0x0fa1): {
 	EMU86_POP163264(EMU86_SETFS,
 	                EMU86_SETFS,
 	                EMU86_SETFS);
@@ -123,7 +138,7 @@ case 0x0fa1: {
 /************************************************************************/
 /* PUSH GS                                                              */
 /************************************************************************/
-case 0x0fa8: {
+case EMU86_OPCODE_ENCODE(0x0fa8): {
 	EMU86_PUSH163264(EMU86_GETGS(),
 	                 EMU86_GETGS(),
 	                 EMU86_GETGS());
@@ -134,7 +149,7 @@ case 0x0fa8: {
 /************************************************************************/
 /* POP GS                                                              */
 /************************************************************************/
-case 0x0fa9: {
+case EMU86_OPCODE_ENCODE(0x0fa9): {
 	EMU86_POP163264(EMU86_SETGS,
 	                EMU86_SETGS,
 	                EMU86_SETGS);
@@ -144,12 +159,12 @@ case 0x0fa9: {
 
 
 
-case 0x50 ... 0x57: {
+case EMU86_OPCODE_ENCODE(0x50) ... EMU86_OPCODE_ENCODE(0x57): {
 	/* 50+rw     PUSH r16     Push r16.
 	 * 50+rd     PUSH r32     Push r32.
 	 * 50+rd     PUSH r64     Push r64. */
 	u8 regno;
-	regno = opcode - 0x50;
+	regno = tiny_opcode - EMU86_OPCODE_ENCODE(0x50);
 #if CONFIG_LIBEMU86_WANT_64BIT
 	if (op_flags & EMU86_F_REX_B)
 		regno |= 0x8;
@@ -160,12 +175,12 @@ case 0x50 ... 0x57: {
 	goto done;
 }
 	
-case 0x58 ... 0x5f: {
+case EMU86_OPCODE_ENCODE(0x58) ... EMU86_OPCODE_ENCODE(0x5f): {
 	/* 50+rw     POP r16     Pop r16.
 	 * 50+rd     POP r32     Pop r32.
 	 * 50+rd     POP r64     Pop r64. */
 	u8 regno;
-	regno = opcode - 0x58;
+	regno = tiny_opcode - EMU86_OPCODE_ENCODE(0x58);
 #if CONFIG_LIBEMU86_WANT_64BIT
 	if (op_flags & EMU86_F_REX_B)
 		regno |= 0x8;
@@ -184,7 +199,7 @@ case 0x58 ... 0x5f: {
 
 
 
-case 0x8f: {
+case EMU86_OPCODE_ENCODE(0x8f): {
 	MODRM_DECODE();
 	if unlikely(modrm.mi_reg != 0) {
 #define NEED_return_unknown_instruction_rmreg
@@ -210,11 +225,11 @@ case 0x8f: {
 #define IMM_UTYPE u32
 #endif /* !CONFIG_LIBEMU86_WANT_64BIT */
 	IMM_UTYPE imm;
-case 0x6a:
+case EMU86_OPCODE_ENCODE(0x6a):
 	imm = (IMM_UTYPE)(IMM_STYPE)*(s8 *)pc;
 	pc += 1;
 	goto do_push_imm;
-case 0x68:
+case EMU86_OPCODE_ENCODE(0x68):
 	/* 6A ib     PUSH imm8      Push imm8.
 	 * 68 iw     PUSH imm16     Push imm16.
 	 * 68 id     PUSH imm32     Push imm32. */

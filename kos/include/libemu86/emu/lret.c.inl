@@ -27,7 +27,7 @@
 EMU86_INTELLISENSE_BEGIN(lret) {
 
 
-case 0xcb: {
+case EMU86_OPCODE_ENCODE(0xcb): {
 	/* CB     RET     Far return to calling procedure. */
 	u16 cs;
 	byte_t *sp;
@@ -72,7 +72,7 @@ case 0xcb: {
 }
 
 
-case 0xca: {
+case EMU86_OPCODE_ENCODE(0xca): {
 	/* CA iw     RET imm16     Far return to calling procedure and pop imm16 bytes from stack. */
 	u16 cs;
 	byte_t *sp;

@@ -26,7 +26,7 @@ EMU86_INTELLISENSE_BEGIN(jcc) {
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 
 #define DEFINE_Jcc(id, cond)                               \
-	case 0x0f80 + id: {                                    \
+	case EMU86_OPCODE_ENCODE(0x0f80 + id): {               \
 		s32 offset;                                        \
 		u32 eflags = EMU86_GETFLAGS();                     \
 		IF_16BIT_OR_32BIT(if (IS_16BIT()) {                \
@@ -48,7 +48,7 @@ EMU86_INTELLISENSE_BEGIN(jcc) {
 		}                                                  \
 		goto done_dont_set_pc;                             \
 	}                                                      \
-	case 0x70 + id: {                                      \
+	case EMU86_OPCODE_ENCODE(0x70 + id): {                 \
 		s8 offset;                                         \
 		u32 eflags = EMU86_GETFLAGS();                     \
 		offset     = *(s8 *)pc;                            \
@@ -197,7 +197,7 @@ EMU86_INTELLISENSE_BEGIN(jcc) {
 
 
 
-case 0xe3: {
+case EMU86_OPCODE_ENCODE(0xe3): {
 	/* E3 cb     JCXZ rel8      Jump short if CX register is 0. Not supported in 64-bit mode.
 	 * E3 cb     JECXZ rel8     Jump short if ECX register is 0.
 	 * E3 cb     JRCXZ rel8     Jump short if RCX register is 0. */

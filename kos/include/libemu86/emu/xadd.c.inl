@@ -53,7 +53,7 @@ EMU86_INTELLISENSE_BEGIN(xadd) {
 	               eflags_addend | emu86_geteflags_test##bwlq(newval));
 
 
-case 0x0fc0: {
+case EMU86_OPCODE_ENCODE(0x0fc0): {
 	/* 0F C0 /r      XADD r/m8, r8      Exchange r8 and r/m8; load sum into r/m8 */
 	MODRM_DECODE();
 	DEFINE_XADD_MODRM_reg_rm(b, B, 8, 1)
@@ -61,7 +61,7 @@ case 0x0fc0: {
 }
 
 
-case 0x0fc1: {
+case EMU86_OPCODE_ENCODE(0x0fc1): {
 	/* 0F C1 /r      XADD r/m16, r16      Exchange r16 and r/m16; load sum into r/m16
 	 * 0F C1 /r      XADD r/m32, r32      Exchange r32 and r/m32; load sum into r/m32
 	 * 0F C1 /r      XADD r/m64, r64      Exchange r64 and r/m64; load sum into r/m64 */

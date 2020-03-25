@@ -24,7 +24,7 @@
 EMU86_INTELLISENSE_BEGIN(movbe) {
 
 
-case 0x0f38f0: {
+case EMU86_OPCODE_ENCODE(0x0f38f0): {
 	/*         0F 38 F0 /r     MOVBE r16, m16     Reverse byte order in m16 and move to r16.
 	 *         0F 38 F0 /r     MOVBE r32, m32     Reverse byte order in m32 and move to r32.
 	 * REX.W + 0F 38 F0 /r     MOVBE r64, m64     Reverse byte order in m64 and move to r64. */
@@ -97,7 +97,7 @@ case 0x0f38f0: {
 }
 
 
-case 0x0f38f1: {
+case EMU86_OPCODE_ENCODE(0x0f38f1): {
 	/*         0F 38 F1 /r     MOVBE m16, r16     Reverse byte order in r16 and move to m16.
 	 *         0F 38 F1 /r     MOVBE m32, r32     Reverse byte order in r32 and move to m32.
 	 * REX.W + 0F 38 F1 /r     MOVBE m64, r64     Reverse byte order in r64 and move to m64. */

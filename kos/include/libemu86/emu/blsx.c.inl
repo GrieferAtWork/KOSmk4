@@ -24,7 +24,7 @@
 EMU86_INTELLISENSE_BEGIN(blsx) {
 
 
-case 0x0f38f3: {
+case EMU86_OPCODE_ENCODE(0x0f38f3): {
 	MODRM_DECODE();
 	if ((op_flags & (EMU86_F_HASVEX | EMU86_F_VEX_LL_M |
 	                 EMU86_F_LOCK | EMU86_F_66 |

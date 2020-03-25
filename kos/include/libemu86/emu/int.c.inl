@@ -25,47 +25,67 @@ EMU86_INTELLISENSE_BEGIN(int) {
 
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 
-#ifdef EMU86_EMULATE_RETURN_AFTER_INT1
-case 0xf1: {
+#if EMU86_EMULATE_CONFIG_CHECKERROR || defined(EMU86_EMULATE_RETURN_AFTER_INT1)
+case EMU86_OPCODE_ENCODE(0xf1): {
 	/* F1     INT1     Generate debug trap. */
+#ifdef EMU86_EMULATE_RETURN_AFTER_INT1
 	EMU86_SETPCPTR(REAL_IP());
 	EMU86_EMULATE_RETURN_AFTER_INT1();
 	__builtin_unreachable();
+#else /* EMU86_EMULATE_RETURN_AFTER_INT1 */
+	goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* !EMU86_EMULATE_RETURN_AFTER_INT1 */
 }
-#endif /* EMU86_EMULATE_RETURN_AFTER_INT1 */
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_RETURN_AFTER_INT1 */
 
-#ifdef EMU86_EMULATE_RETURN_AFTER_INT3
-case 0xcc: {
+#if EMU86_EMULATE_CONFIG_CHECKERROR || defined(EMU86_EMULATE_RETURN_AFTER_INT3)
+case EMU86_OPCODE_ENCODE(0xcc): {
 	/* CC     INT3     Generate breakpoint trap. */
+#ifdef EMU86_EMULATE_RETURN_AFTER_INT3
 	EMU86_SETPCPTR(REAL_IP());
 	EMU86_EMULATE_RETURN_AFTER_INT3();
 	__builtin_unreachable();
+#else /* EMU86_EMULATE_RETURN_AFTER_INT3 */
+	goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* !EMU86_EMULATE_RETURN_AFTER_INT3 */
 }
-#endif /* EMU86_EMULATE_RETURN_AFTER_INT3 */
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_RETURN_AFTER_INT3 */
 
-#ifdef EMU86_EMULATE_RETURN_AFTER_INT
-case 0xcd: {
+#if EMU86_EMULATE_CONFIG_CHECKERROR || defined(EMU86_EMULATE_RETURN_AFTER_INT)
+case EMU86_OPCODE_ENCODE(0xcd): {
 	/* CD ib     INT imm8     Generate software interrupt with vector specified by immediate byte. */
+#ifdef EMU86_EMULATE_RETURN_AFTER_INT
 	u8 intno;
 	intno = *(u8 *)pc;
 	pc += 1;
 	EMU86_SETPCPTR(REAL_IP());
 	EMU86_EMULATE_RETURN_AFTER_INT(intno);
 	__builtin_unreachable();
+#else /* EMU86_EMULATE_RETURN_AFTER_INT */
+	goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* !EMU86_EMULATE_RETURN_AFTER_INT */
 }
-#endif /* EMU86_EMULATE_RETURN_AFTER_INT */
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_RETURN_AFTER_INT */
 
-#ifdef EMU86_EMULATE_RETURN_AFTER_INTO
-case 0xce: {
+#if EMU86_EMULATE_CONFIG_CHECKERROR || defined(EMU86_EMULATE_RETURN_AFTER_INTO)
+case EMU86_OPCODE_ENCODE(0xce): {
 	/* CE     INTO     Generate overflow trap if overflow flag is 1. */
+#ifdef EMU86_EMULATE_RETURN_AFTER_INTO
 	if (EMU86_GETFLAGS() & EFLAGS_OF) {
 		EMU86_SETPCPTR(REAL_IP());
 		EMU86_EMULATE_RETURN_AFTER_INTO();
 		__builtin_unreachable();
 	}
 	goto done;
+#else /* EMU86_EMULATE_RETURN_AFTER_INTO */
+	goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* !EMU86_EMULATE_RETURN_AFTER_INTO */
 }
-#endif /* EMU86_EMULATE_RETURN_AFTER_INTO */
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_RETURN_AFTER_INTO */
 
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 

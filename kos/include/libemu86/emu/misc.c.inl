@@ -26,7 +26,7 @@
 EMU86_INTELLISENSE_BEGIN(misc) {
 
 
-case 0xfe:
+case EMU86_OPCODE_ENCODE(0xfe):
 	MODRM_DECODE();
 	switch (modrm.mi_reg) {
 
@@ -96,7 +96,7 @@ case 0xfe:
 	break;
 
 
-case 0xff:
+case EMU86_OPCODE_ENCODE(0xff):
 	MODRM_DECODE();
 	switch (modrm.mi_reg) {
 

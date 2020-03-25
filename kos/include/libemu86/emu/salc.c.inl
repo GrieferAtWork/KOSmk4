@@ -30,7 +30,7 @@ EMU86_INTELLISENSE_BEGIN(salc) {
 	 *       opcode as being unused, however the behavior emulated
 	 *       here matches what is described here:
 	 *       http://www.rcollins.org/secrets/opcodes/SALC.html */
-case 0xd6: {
+case EMU86_OPCODE_ENCODE(0xd6): {
 	/* D6     SALC     Set AL on Carry */
 	EMU86_SETAL(EMU86_GETFLAGS() & EFLAGS_CF ? 0xff : 0x00);
 	goto done;

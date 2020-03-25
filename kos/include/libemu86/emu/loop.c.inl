@@ -28,7 +28,7 @@ EMU86_INTELLISENSE_BEGIN(loop) {
 
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 
-case 0xe0: {
+case EMU86_OPCODE_ENCODE(0xe0): {
 	/* E0 cb     LOOPNE rel8     Decrement count; jump short if count!=0 and ZF=0. */
 	if ((EMU86_GETFLAGS() & EFLAGS_ZF) != 0) {
 		pc += 1;
@@ -38,7 +38,7 @@ case 0xe0: {
 }
 
 
-case 0xe1: {
+case EMU86_OPCODE_ENCODE(0xe1): {
 	/* E1 cb     LOOPE rel8      Decrement count; jump short if count!=0 and ZF=1. */
 	if ((EMU86_GETFLAGS() & EFLAGS_ZF) == 0) {
 		pc += 1;
@@ -48,7 +48,7 @@ case 0xe1: {
 }
 
 
-case 0xe2: {
+case EMU86_OPCODE_ENCODE(0xe2): {
 	/* E2 cb     LOOP rel8       Decrement count; jump short if count!=0. */
 	s8 offset;
 do_loop:

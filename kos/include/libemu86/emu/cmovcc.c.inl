@@ -25,7 +25,7 @@ EMU86_INTELLISENSE_BEGIN(cmovcc) {
 
 	/* Define CMOVcc and SETcc instructions */
 #define DEFINE_CMOVcc_SETcc(id, cond_expr)      \
-	case 0x0f40 + id: {                         \
+	case EMU86_OPCODE_ENCODE(0x0f40 + id): {    \
 		u32 eflags;                             \
 		MODRM_DECODE();                         \
 		eflags = EMU86_GETFLAGS();              \
@@ -44,7 +44,7 @@ EMU86_INTELLISENSE_BEGIN(cmovcc) {
 		goto done;                              \
 	}                                           \
 	                                            \
-	case 0x0f90 + id: {                         \
+	case EMU86_OPCODE_ENCODE(0x0f90 + id): {    \
 		u32 eflags;                             \
 		MODRM_DECODE();                         \
 		eflags = EMU86_GETFLAGS();              \

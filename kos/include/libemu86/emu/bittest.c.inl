@@ -25,7 +25,7 @@ EMU86_INTELLISENSE_BEGIN(bittest) {
 	bool nonzero;
 	unsigned int bitno;
 
-case 0x0fa3:
+case EMU86_OPCODE_ENCODE(0x0fa3):
 	/* 0F A3      BT r/m16, r16      Store selected bit in CF flag */
 	/* 0F A3      BT r/m32, r32      Store selected bit in CF flag */
 	MODRM_DECODE();
@@ -114,7 +114,7 @@ set_cf_from_nonzero:
 		nonzero = (oldval & mask) != 0;                                                \
 	}
 
-case 0x0fbb:
+case EMU86_OPCODE_ENCODE(0x0fbb):
 	/*         0F BB /r     BTC r/m16, r16      Store selected bit in CF flag and complement.
 	 *         0F BB /r     BTC r/m32, r32      Store selected bit in CF flag and complement.
 	 * REX.W + 0F BB /r     BTC r/m64, r64      Store selected bit in CF flag and complement. */
@@ -127,7 +127,7 @@ do_btc_modrm:
 	goto set_cf_from_nonzero;
 
 
-case 0x0fb3:
+case EMU86_OPCODE_ENCODE(0x0fb3):
 	/*         0F B3 /r     BTR r/m16, r16      Store selected bit in CF flag and clear.
 	 *         0F B3 /r     BTR r/m32, r32      Store selected bit in CF flag and clear.
 	 * REX.W + 0F B3 /r     BTR r/m64, r64      Store selected bit in CF flag and clear. */
@@ -140,7 +140,7 @@ do_btr_modrm:
 	goto set_cf_from_nonzero;
 
 
-case 0x0fab:
+case EMU86_OPCODE_ENCODE(0x0fab):
 	/*         0F AB /r     BTS r/m16, r16      Store selected bit in CF flag and set.
 	 *         0F AB /r     BTS r/m32, r32      Store selected bit in CF flag and set.
 	 * REX.W + 0F AB /r     BTS r/m64, r64      Store selected bit in CF flag and set. */
@@ -155,7 +155,7 @@ do_bts_modrm:
 #undef DEFINE_BIT_TEST_AND_op
 
 
-case 0x0fba:
+case EMU86_OPCODE_ENCODE(0x0fba):
 	MODRM_DECODE();
 	/* Take the bit number from *PC */
 	bitno = *(u8 *)pc;

@@ -26,7 +26,7 @@
 EMU86_INTELLISENSE_BEGIN(lods) {
 
 
-case 0xac: {
+case EMU86_OPCODE_ENCODE(0xac): {
 	/* AC     LODSB     For legacy mode, Load byte at address DS:(E)SI into AL.
 	 *                  For 64-bit mode load byte at address (R)SI into AL. */
 	u8 value;
@@ -40,7 +40,7 @@ case 0xac: {
 	goto done;
 }
 
-case 0xad: {
+case EMU86_OPCODE_ENCODE(0xad): {
 	/*         AD     LODSW     For legacy mode, Load word at address DS:(E)SI into AX.
 	 *                          For 64-bit mode load word at address (R)SI into AX.
 	 *         AD     LODSD     For legacy mode, Load dword at address DS:(E)SI into EAX.

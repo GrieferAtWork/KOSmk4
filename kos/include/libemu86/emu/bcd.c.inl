@@ -26,7 +26,7 @@ EMU86_INTELLISENSE_BEGIN(bcd) {
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 #if CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT
 
-case 0x27: {
+case EMU86_OPCODE_ENCODE(0x27): {
 	/* 27     DAA     Decimal adjust AL after addition. */
 	uintptr_t old_flags, new_flags;
 	u8 old_al, new_al;
@@ -58,7 +58,7 @@ case 0x27: {
 	goto done;
 }
 
-case 0x2f: {
+case EMU86_OPCODE_ENCODE(0x2f): {
 	/* 2F     DAS     Decimal adjust AL after subtraction. */
 	uintptr_t old_flags, new_flags;
 	u8 old_al, new_al;
@@ -90,7 +90,7 @@ case 0x2f: {
 }
 
 
-case 0x37: {
+case EMU86_OPCODE_ENCODE(0x37): {
 	/* 37     AAA     ASCII adjust AL after addition. */
 	uintptr_t flags;
 	u16 ax;
@@ -114,7 +114,7 @@ case 0x37: {
 }
 
 
-case 0x3f: {
+case EMU86_OPCODE_ENCODE(0x3f): {
 	/* 3F     AAS     ASCII adjust AL after subtraction.
 	 * s.a. https://www.youtube.com/watch?v=c2ia8T4E2Mc */
 	uintptr_t flags;
@@ -148,7 +148,7 @@ case 0x3f: {
 #endif /* !EMU86_EMULATE_THROW_DIVIDE_BY_ZERO_ALLOW_RETHROW */
 #endif /* !NIF_EMU86_EMULATE_THROW_DIVIDE_BY_ZERO_ALLOW_RETHROW */
 
-case 0xd4: {
+case EMU86_OPCODE_ENCODE(0xd4): {
 	/* D4 0A     AAM          ASCII adjust AX after multiply.
 	 * D4 ib     AAM imm8     Adjust AX after multiply to number base imm8. */
 	u8 base;
@@ -177,7 +177,7 @@ case 0xd4: {
 }
 
 
-case 0xd5: {
+case EMU86_OPCODE_ENCODE(0xd5): {
 	/* D5 0A     AAD          ASCII adjust AX before division.
 	 * D5 ib     AAD imm8     Adjust AX before division to number base imm8. */
 	u8 base;

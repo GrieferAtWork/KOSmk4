@@ -25,11 +25,11 @@ EMU86_INTELLISENSE_BEGIN(bswap) {
 
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 
-case 0x0fc8 ... 0x0fcf: {
+case EMU86_OPCODE_ENCODE(0x0fc8) ... EMU86_OPCODE_ENCODE(0x0fcf): {
 	/*         0F C8+rd     BSWAP r32     Reverses the byte order of a 32-bit register.
 	 * REX.W + 0F C8+rd     BSWAP r64     Reverses the byte order of a 64-bit register. */
 	u8 regno;
-	regno = opcode - 0x0fc8;
+	regno = tiny_opcode - EMU86_OPCODE_ENCODE(0x0fc8);
 #if CONFIG_LIBEMU86_WANT_64BIT
 	if (op_flags & EMU86_F_REX_B)
 		regno |= 0x8;

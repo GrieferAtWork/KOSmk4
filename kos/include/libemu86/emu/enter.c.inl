@@ -23,7 +23,7 @@
 
 EMU86_INTELLISENSE_BEGIN(enter) {
 
-case 0xc8: {
+case EMU86_OPCODE_ENCODE(0xc8): {
 	/* C8 iw 00     ENTER imm16, 0        Create a stack frame for a procedure.
 	 * C8 iw 01     ENTER imm16, 1        Create a stack frame with a nested pointer for a procedure.
 	 * C8 iw ib     ENTER imm16, imm8     Create a stack frame with nested pointers for a procedure. */

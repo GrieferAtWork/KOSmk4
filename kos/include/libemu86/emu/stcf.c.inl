@@ -27,8 +27,7 @@ EMU86_INTELLISENSE_BEGIN(stcf) {
 
 	/* Instructions that modify the EFLAGS.CF (carry) bit. */
 
-
-case 0xf5: {
+case EMU86_OPCODE_ENCODE(0xf5): {
 	/* F5     CMC     Complement CF flag. */
 	u32 flags;
 	flags = EMU86_GETFLAGS();
@@ -38,14 +37,14 @@ case 0xf5: {
 }
 
 
-case 0xf8: {
+case EMU86_OPCODE_ENCODE(0xf8): {
 	/* F8     CLC     Clear CF flag. */
 	EMU86_MSKFLAGS(~EFLAGS_CF, 0);
 	goto done;
 }
 
 
-case 0xf9: {
+case EMU86_OPCODE_ENCODE(0xf9): {
 	/* F9     STC     Set CF flag. */
 	EMU86_MSKFLAGS(~EFLAGS_CF, EFLAGS_CF);
 	goto done;

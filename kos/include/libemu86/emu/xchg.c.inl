@@ -49,7 +49,7 @@ EMU86_INTELLISENSE_BEGIN(xchg) {
 	}                                                          \
 	MODRM_SETREG##BWLQ(oldval);
 
-case 0x86: {
+case EMU86_OPCODE_ENCODE(0x86): {
 	/* 86 /r      XCHG r/m8, r8      Exchange r8 (byte register) with byte from r/m8 */
 	/* 86 /r      XCHG r8, r/m8      Exchange byte from r/m8 with r8 (byte register) */
 	MODRM_DECODE();
@@ -57,7 +57,7 @@ case 0x86: {
 	goto done;
 }
 
-case 0x87: {
+case EMU86_OPCODE_ENCODE(0x87): {
 	/* 87 /r      XCHG r/m16, r16      Exchange r16 with word from r/m16
 	 * 87 /r      XCHG r16, r/m16      Exchange word from r/m16 with r16
 	 * 87 /r      XCHG r/m32, r32      Exchange r32 with doubleword from r/m32
@@ -85,13 +85,13 @@ case 0x87: {
 	EMU86_SET##AX(reg_operand);                 \
 	EMU86_SETREG##BWLQ(regno, oldval);
 
-case 0x90:
+case EMU86_OPCODE_ENCODE(0x90):
 	/* nop */
 	if (op_flags & EMU86_F_REP)
 		EMU86_EMULATE_LOOPHINT(); /* pause */
 	goto done;
 
-case 0x91 ... 0x97: {
+case EMU86_OPCODE_ENCODE(0x91) ... EMU86_OPCODE_ENCODE(0x97): {
 	/*         90+rw     XCHG AX, r16      Exchange r16 with AX.
 	 *         90+rw     XCHG r16, AX      Exchange AX with r16.
 	 *         90+rd     XCHG EAX, r32     Exchange r32 with EAX.
@@ -99,7 +99,7 @@ case 0x91 ... 0x97: {
 	 *         90+rd     XCHG r32, EAX     Exchange EAX with r32.
 	 * REX.W + 90+rd     XCHG r64, RAX     Exchange RAX with r64. */
 	u8 regno;
-	regno = opcode - 0x90;
+	regno = tiny_opcode - EMU86_OPCODE_ENCODE(0x90);
 #if CONFIG_LIBEMU86_WANT_64BIT
 	if (op_flags & EMU86_F_REX_B)
 		regno |= 0x8;

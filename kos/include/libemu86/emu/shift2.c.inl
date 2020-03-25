@@ -65,7 +65,7 @@ EMU86_INTELLISENSE_BEGIN(shift2) {
 	eflags_addend |= emu86_geteflags_test##bwlq(newval);
 
 
-case 0x0fa5: {
+case EMU86_OPCODE_ENCODE(0x0fa5): {
 	/* 0F A5      SHLD r/m16, r16, CL      Shift r/m16 to left CL places while shifting bits from r16 in from the right
 	 * 0F A5      SHLD r/m32, r32, CL      Shift r/m32 to left CL places while shifting bits from r32 in from the right
 	 * 0F A5      SHLD r/m64, r64, CL      Shift r/m64 to left CL places while shifting bits from r64 in from the right */
@@ -86,7 +86,7 @@ do_shld:
 	goto done;
 }
 
-case 0x0fa4: {
+case EMU86_OPCODE_ENCODE(0x0fa4): {
 	/* 0F A4      SHLD r/m16, r16, imm8      Shift r/m16 to left imm8 places while shifting bits from r16 in from the right
 	 * 0F A4      SHLD r/m32, r32, imm8      Shift r/m32 to left imm8 places while shifting bits from r32 in from the right
 	 * 0F A4      SHLD r/m64, r64, imm8      Shift r/m64 to left imm8 places while shifting bits from r64 in from the right */
@@ -139,7 +139,7 @@ case 0x0fa4: {
 	eflags_addend |= emu86_geteflags_test##bwlq(newval);
 
 
-case 0x0fad: {
+case EMU86_OPCODE_ENCODE(0x0fad): {
 	/* 0F AD      SHRD r/m16, r16, CL      Shift r/m16 to right CL places while shifting bits from r16 in from the left
 	 * 0F AD      SHRD r/m32, r32, CL      Shift r/m32 to right CL places while shifting bits from r32 in from the left
 	 * 0F AD      SHRD r/m64, r64, CL      Shift r/m64 to right CL places while shifting bits from r64 in from the left */
@@ -160,7 +160,7 @@ do_shrd:
 	goto done;
 }
 
-case 0x0fac: {
+case EMU86_OPCODE_ENCODE(0x0fac): {
 	/* 0F AC      SHRD r/m16, r16, imm8      Shift r/m16 to right imm8 places while shifting bits from r16 in from the left
 	 * 0F AC      SHRD r/m32, r32, imm8      Shift r/m32 to right imm8 places while shifting bits from r32 in from the left
 	 * 0F AC      SHRD r/m64, r64, imm8      Shift r/m64 to right imm8 places while shifting bits from r64 in from the left */

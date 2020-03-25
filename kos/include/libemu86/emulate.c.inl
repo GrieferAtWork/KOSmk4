@@ -21,6 +21,7 @@
 #ifndef __LIBEMU86_STATIC
 #define LIBEMU86_WANT_PROTOTYPES 1
 #define __LIBEMU86_STATIC 1
+#define EMU86_EMULATE_CONFIG_CHECKERROR 1
 #define CONFIG_LIBEMU86_WANT_16BIT 1
 #define CONFIG_LIBEMU86_WANT_32BIT 1
 #ifdef __x86_64__
@@ -114,6 +115,7 @@ __DECL_BEGIN
 #ifndef EMU86_EMULATE_CONFIG_CHECKERROR
 #define EMU86_EMULATE_CONFIG_CHECKERROR 0
 #endif /* !EMU86_EMULATE_CONFIG_CHECKERROR */
+
 
 /* Enable support for rdfsbase/rdgsbase/wrfsbase/wrgsbase
  * in 32-bit and 16-bit modes (with the instructions using
@@ -268,14 +270,14 @@ __DECL_BEGIN
  *     - REAL_START_IP()  Evaluates to the starting IP of the faulting
  *                        instruction (i.e. the fault address)
  *     - op_flags         Set of `EMU86_F_*'
- *     - opcode           The absolute opcode of the faulting instruction
+ *     - EMU86_OPCODE()   The absolute opcode of the faulting instruction
  *     - modrm            The decoded modr/m suffix (only for *_RMREG handlers) */
 #ifndef EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION
-#define _EMU86_GETOPCODE()        opcode
+#define _EMU86_GETOPCODE()        EMU86_OPCODE()
 #ifdef E_ILLEGAL_INSTRUCTION_X86_OPCODE
-#define _EMU86_GETOPCODE_RMREG()  E_ILLEGAL_INSTRUCTION_X86_OPCODE(opcode, modrm.mi_reg)
+#define _EMU86_GETOPCODE_RMREG()  E_ILLEGAL_INSTRUCTION_X86_OPCODE(EMU86_OPCODE(), modrm.mi_reg)
 #else /* E_ILLEGAL_INSTRUCTION_X86_OPCODE */
-#define _EMU86_GETOPCODE_RMREG()  opcode
+#define _EMU86_GETOPCODE_RMREG()  EMU86_OPCODE()
 #endif /* !E_ILLEGAL_INSTRUCTION_X86_OPCODE */
 #define EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION()           THROW(E_ILLEGAL_INSTRUCTION_BAD_OPCODE, _EMU86_GETOPCODE())
 #define EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION_RMREG()     THROW(E_ILLEGAL_INSTRUCTION_BAD_OPCODE, _EMU86_GETOPCODE_RMREG())
@@ -370,7 +372,7 @@ __DECL_BEGIN
 	THROW(E_INDEX_ERROR_OUT_OF_BOUNDS, bound_idx, bound_min, bound_max)
 #endif /* !EMU86_EMULATE_THROW_BOUNDERR */
 
-/* Handle a misalignmented memory operand. */
+/* Handle a misaligned memory operand. */
 #ifndef EMU86_EMULATE_THROW_SEGFAULT_UNALIGNED
 #define EMU86_EMULATE_THROW_SEGFAULT_UNALIGNED(addr, context, req_alignment) \
 	THROW(E_SEGFAULT_UNALIGNED, addr, context, req_alignment)
@@ -1857,10 +1859,10 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_
 	EMU86_EMULATE_DECL EMU86_EMULATE_RETURN_TYPE                                                      \
 	EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(_i##name))(EMU86_EMULATE_ARGS) { \
 		byte_t const *start_pc, *pc _EMU86_INTELLISENSE_BEGIN_REAL_START_PC;                          \
-		u32 opcode;                                                                                   \
+		emu86_opcode_t tiny_opcode;                                                                   \
 		emu86_opflags_t op_flags;                                                                     \
 		struct emu86_modrm modrm;                                                                     \
-		switch (opcode)
+		switch (tiny_opcode)
 #define EMU86_INTELLISENSE_END                                         \
 done:                                                                  \
 done_dont_set_pc:                                                      \
@@ -1896,7 +1898,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 	byte_t const *start_pc, *pc;
 	struct emu86_modrm modrm;
 	emu86_opflags_t op_flags;
-	u32 opcode;
+	emu86_opcode_t tiny_opcode;
 #ifdef EMU86_EMULATE_SETUP
 	EMU86_EMULATE_SETUP();
 #endif /* EMU86_EMULATE_SETUP */
@@ -1924,7 +1926,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 		EMU86_EMULATE_TRY_DECODE
 #endif /* EMU86_EMULATE_TRY_DECODE */
 		{
-			pc = emu86_opcode_decode(start_pc, &opcode, &op_flags);
+			pc = emu86_opcode_decode(start_pc, &tiny_opcode, &op_flags);
 		}
 #ifdef EMU86_EMULATE_EXCEPT_DECODE
 		EMU86_EMULATE_EXCEPT_DECODE;
@@ -1935,7 +1937,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 		EMU86_EMULATE_TRY_SWITCH
 #endif /* EMU86_EMULATE_TRY_SWITCH */
 		{
-			switch (opcode) {
+			switch (tiny_opcode) {
 
 #if CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT
 #define IF_16BIT_OR_32BIT(...) __VA_ARGS__
@@ -2001,6 +2003,8 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #define IF_ONLY_MEMORY(...)  /* nothing */
 #define NIF_ONLY_MEMORY(...) __VA_ARGS__
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
+
+#define EMU86_OPCODE() EMU86_OPCODE_DECODE(tiny_opcode)
 
 #define MODRM_MEMADDR()           EMU86_MODRM_MEMADDR(&modrm, op_flags)
 #define MODRM_MEMADDR_NOSEGBASE() EMU86_MODRM_MEMADDR_NOSEGBASE(&modrm, op_flags)
@@ -2456,7 +2460,6 @@ return_unknown_instruction: /* TODO: Go through all uses of this label and use t
 #ifndef __INTELLISENSE__
 #undef REAL_START_IP
 #undef REAL_IP
-#undef MODRM
 #endif /* !__INTELLISENSE__ */
 }
 

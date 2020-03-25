@@ -24,7 +24,7 @@
 EMU86_INTELLISENSE_BEGIN(bitscan) {
 
 
-case 0x0fbc:
+case EMU86_OPCODE_ENCODE(0x0fbc):
 	MODRM_DECODE();
 	if (op_flags & EMU86_F_REP) {
 		/* F3       0F BC /r TZCNT r16, r/m16   Count the number of trailing zero bits in r/m16, return result in r16.
@@ -81,7 +81,7 @@ case 0x0fbc:
 	goto done;
 
 
-case 0x0fbd:
+case EMU86_OPCODE_ENCODE(0x0fbd):
 	MODRM_DECODE();
 	if (op_flags & EMU86_F_REP) {
 		/* F3       0F BD /r  LZCNT r16, r/m16

@@ -27,7 +27,7 @@ EMU86_INTELLISENSE_BEGIN(jmp) {
 
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 
-case 0xe9: {
+case EMU86_OPCODE_ENCODE(0xe9): {
 	/* E9 cw    JMP rel16   Jump near, relative, displacement relative to next instruction.
 	 * E9 cd    JMP rel32   Jump near, relative, displacement relative to next instruction.
 	 *                      32-bit displacement sign extended to 64-bits in 64-bit mode. */
@@ -50,7 +50,7 @@ case 0xe9: {
 	goto done_dont_set_pc;
 }
 
-case 0xeb: {
+case EMU86_OPCODE_ENCODE(0xeb): {
 	/* EB cw    JMP rel8    Jump near, relative, displacement relative to next instruction. */
 	EMU86_UREG_TYPE dest_ip;
 	s8 offset;

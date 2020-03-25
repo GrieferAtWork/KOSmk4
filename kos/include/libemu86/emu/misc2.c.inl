@@ -26,7 +26,7 @@
 
 EMU86_INTELLISENSE_BEGIN(misc2) {
 
-case 0x0fae: {
+case EMU86_OPCODE_ENCODE(0x0fae): {
 	MODRM_DECODE();
 	if (op_flags & EMU86_F_f3) {
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY

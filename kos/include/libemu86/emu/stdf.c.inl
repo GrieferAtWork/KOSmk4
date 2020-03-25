@@ -27,14 +27,14 @@ EMU86_INTELLISENSE_BEGIN(stdf) {
 
 	/* Instructions that modify the EFLAGS.DF (direction) bit. */
 
-case 0xfc: {
+case EMU86_OPCODE_ENCODE(0xfc): {
 	/* FC     CLD     Clear DF flag. */
 	EMU86_MSKFLAGS(~EFLAGS_DF, 0);
 	goto done;
 }
 
 
-case 0xfd: {
+case EMU86_OPCODE_ENCODE(0xfd): {
 	/* FD     STD     Set DF flag. */
 	EMU86_MSKFLAGS(~EFLAGS_DF, EFLAGS_DF);
 	goto done;

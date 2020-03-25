@@ -23,7 +23,7 @@
 
 EMU86_INTELLISENSE_BEGIN(rorx) {
 
-case 0x0f3af0: {
+case EMU86_OPCODE_ENCODE(0x0f3af0): {
 	/* VEX.LZ.F2.0F3A.W0 F0 /r ib     RORX r32, r/m32, imm8     Rotate 32-bit r/m32 right imm8 times without affecting arithmetic flags.
 	 * VEX.LZ.F2.0F3A.W1 F0 /r ib     RORX r64, r/m64, imm8     Rotate 64-bit r/m64 right imm8 times without affecting arithmetic flags. */
 	u8 num_bits;

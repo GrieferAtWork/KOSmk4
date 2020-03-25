@@ -30,7 +30,7 @@ EMU86_INTELLISENSE_BEGIN(lxs) {
 
 
 #if CONFIG_LIBEMU86_WANT_16BIT | CONFIG_LIBEMU86_WANT_32BIT
-case 0xc4: {
+case EMU86_OPCODE_ENCODE(0xc4): {
 	/* C4 /r     LES r16,m16:16     Load ES:r16 with far pointer from memory.
 	 * C4 /r     LES r32,m16:32     Load ES:r32 with far pointer from memory. */
 #if CONFIG_LIBEMU86_WANT_64BIT
@@ -42,7 +42,7 @@ case 0xc4: {
 	goto do_lxs;
 }
 
-case 0xc5: {
+case EMU86_OPCODE_ENCODE(0xc5): {
 	/* C5 /r     LDS r16,m16:16     Load DS:r16 with far pointer from memory.
 	 * C5 /r     LDS r32,m16:32     Load DS:r32 with far pointer from memory. */
 #if CONFIG_LIBEMU86_WANT_64BIT
@@ -56,7 +56,7 @@ case 0xc5: {
 #endif /* CONFIG_LIBEMU86_WANT_16BIT | CONFIG_LIBEMU86_WANT_32BIT */
 
 
-case 0x0fb2: {
+case EMU86_OPCODE_ENCODE(0x0fb2): {
 	/*       0F B2 /r     LSS r16,m16:16     Load SS:r16 with far pointer from memory.
 	 *       0F B2 /r     LSS r32,m16:32     Load SS:r32 with far pointer from memory.
 	 * REX + 0F B2 /r     LSS r64,m16:64     Load SS:r64 with far pointer from memory. */
@@ -65,7 +65,7 @@ case 0x0fb2: {
 }
 
 
-case 0x0fb4: {
+case EMU86_OPCODE_ENCODE(0x0fb4): {
 	/*       0F B4 /r     LFS r16,m16:16     Load FS:r16 with far pointer from memory.
 	 *       0F B4 /r     LFS r32,m16:32     Load FS:r32 with far pointer from memory.
 	 * REX + 0F B4 /r     LFS r64,m16:64     Load FS:r64 with far pointer from memory. */
@@ -74,7 +74,7 @@ case 0x0fb4: {
 }
 
 
-case 0x0fb5: {
+case EMU86_OPCODE_ENCODE(0x0fb5): {
 	/*       0F B5 /r     LGS r16,m16:16     Load GS:r16 with far pointer from memory.
 	 *       0F B5 /r     LGS r32,m16:32     Load GS:r32 with far pointer from memory.
 	 * REX + 0F B5 /r     LGS r64,m16:64     Load GS:r64 with far pointer from memory. */

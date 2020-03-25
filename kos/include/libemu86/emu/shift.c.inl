@@ -137,7 +137,7 @@ do_shift##Nbits:                                                                
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
 
 
-case 0xd2: {
+case EMU86_OPCODE_ENCODE(0xd2): {
 	/* D2 /0      ROL r/m8,CL      Rotate 8 bits r/m8 left CL times */
 	/* D2 /1      ROR r/m8,CL      Rotate 8 bits r/m8 right CL times */
 	/* D2 /2      RCL r/m8,CL      Rotate 9 bits (CF, r/m8) left CL times */
@@ -154,7 +154,7 @@ do_shift8bit:
 }
 
 
-case 0xd3: {
+case EMU86_OPCODE_ENCODE(0xd3): {
 	/* D3 /0      ROL r/m16,CL      Rotate 16 bits r/m16 left CL times */
 	/* D3 /0      ROL r/m32,CL      Rotate 32 bits r/m32 left CL times */
 	/* D3 /0      ROL r/m64,CL      Rotate 64 bits r/m64 left CL times */
@@ -192,7 +192,7 @@ do_shift163264bit:
 	goto done;
 }
 
-case 0xc0: {
+case EMU86_OPCODE_ENCODE(0xc0): {
 	/* C0 /0   ib     ROL r/m8,imm8      Rotate 8 bits r/m8 left imm8 times */
 	/* C0 /1   ib     ROR r/m8,imm8      Rotate 8 bits r/m16 right imm8 times */
 	/* C0 /2   ib     RCL r/m8,imm8      Rotate 9 bits (CF, r/m8) left imm8 times */
@@ -207,7 +207,7 @@ case 0xc0: {
 	goto do_shift8bit;
 }
 
-case 0xc1: {
+case EMU86_OPCODE_ENCODE(0xc1): {
 	/* D1 /0   ib     ROL r/m16,imm8      Rotate 16 bits r/m16 left imm8 times */
 	/* D1 /0   ib     ROL r/m32,imm8      Rotate 32 bits r/m32 left imm8 times */
 	/* D1 /0   ib     ROL r/m64,imm8      Rotate 64 bits r/m64 left imm8 times */
@@ -239,7 +239,7 @@ case 0xc1: {
 }
 
 
-case 0xd0: {
+case EMU86_OPCODE_ENCODE(0xd0): {
 	/* D0 /0      ROL r/m8,1      Rotate 8 bits r/m8 left once */
 	/* D0 /1      ROR r/m8,1      Rotate 8 bits r/m8 right once */
 	/* D0 /2      RCL r/m8,1      Rotate 9 bits (CF, r/m8) left once */
@@ -253,7 +253,7 @@ case 0xd0: {
 	goto do_shift8bit;
 }
 
-case 0xd1: {
+case EMU86_OPCODE_ENCODE(0xd1): {
 	/* D1 /0      ROL r/m16,1      Rotate 16 bits r/m16 left once */
 	/* D1 /0      ROL r/m32,1      Rotate 32 bits r/m32 left once */
 	/* D1 /0      ROL r/m64,1      Rotate 64 bits r/m64 left once */

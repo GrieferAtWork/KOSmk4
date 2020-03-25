@@ -23,7 +23,8 @@
 
 EMU86_INTELLISENSE_BEGIN(mov) {
 
-case 0x88: {
+
+case EMU86_OPCODE_ENCODE(0x88): {
 	/* 88 /r      MOV r/m8,r8      Move r8 to r/m8 */
 	u8 value;
 	MODRM_DECODE();
@@ -33,7 +34,7 @@ case 0x88: {
 }
 
 
-case 0x89: {
+case EMU86_OPCODE_ENCODE(0x89): {
 	/* 89 /r      MOV r/m16,r16      Move r16 to r/m16 */
 	/* 89 /r      MOV r/m32,r32      Move r32 to r/m32 */
 	/* 89 /r      MOV r/m64,r64      Move r64 to r/m64 */
@@ -55,7 +56,7 @@ case 0x89: {
 }
 
 
-case 0x8a: {
+case EMU86_OPCODE_ENCODE(0x8a): {
 	/* 8A /r      MOV r8,r/m8      Move r/m8 to r8 */
 	u8 value;
 	MODRM_DECODE();
@@ -65,7 +66,7 @@ case 0x8a: {
 }
 
 
-case 0x8b: {
+case EMU86_OPCODE_ENCODE(0x8b): {
 	/* 8b /r      MOV r16,r/m16      Move r/m16 to r16 */
 	/* 8b /r      MOV r32,r/m32      Move r/m32 to r32 */
 	/* 8b /r      MOV r64,r/m64      Move r/m64 to r64 */
@@ -87,7 +88,7 @@ case 0x8b: {
 }
 
 
-case 0x8c: {
+case EMU86_OPCODE_ENCODE(0x8c): {
 	u16 segment;
 	/*         8C /r     MOV r/m16,Sreg**           MR  Valid Valid Move segment register to r/m16.
 	 * REX.W + 8C /r     MOV r16/r32/m16, Sreg**    MR  Valid Valid Move zero extended 16-bit segment register to r16/r32/r64/m16.
@@ -115,7 +116,7 @@ case 0x8c: {
 }
 
 
-case 0x8e: {
+case EMU86_OPCODE_ENCODE(0x8e): {
 	u16 segment;
 	/*         8E /r      MOV Sreg,r/m16** RM Valid Valid Move r/m16 to segment register.
 	 * REX.W + 8E /r      MOV Sreg,r/m64** RM Valid Valid Move lower 16 bits of r/m64 to segment register. */
@@ -150,7 +151,7 @@ case 0x8e: {
 }
 
 
-case 0xa0: {
+case EMU86_OPCODE_ENCODE(0xa0): {
 	/* A0      MOV AL,moffs8*      Move byte at (seg:offset) to AL */
 	byte_t *addr;
 	u32 offset;
@@ -169,7 +170,7 @@ case 0xa0: {
 	goto done;
 }
 
-case 0xa1: {
+case EMU86_OPCODE_ENCODE(0xa1): {
 	/* A1      MOV AX,moffs16*      Move word at (seg:offset) to AX */
 	/* A1      MOV EAX,moffs32*     Move doubleword at (seg:offset) to EAX */
 	/* A1      MOV RAX,moffs32*     Move quadword at (seg:offset) to RAX */
@@ -203,7 +204,7 @@ case 0xa1: {
 }
 
 
-case 0xa2: {
+case EMU86_OPCODE_ENCODE(0xa2): {
 	/* A2      MOV moffs8*,AL      Move AL to (seg:offset) */
 	byte_t *addr;
 	u32 offset;
@@ -223,7 +224,7 @@ case 0xa2: {
 }
 
 
-case 0xa3: {
+case EMU86_OPCODE_ENCODE(0xa3): {
 	/* A3      MOV moffs16*,AX      Move AX to word at (seg:offset) */
 	/* A3      MOV moffs32*,EAX     Move EAX to doubleword at (seg:offset) */
 	/* A3      MOV moffs64*,RAX     Move RAX to quadword at (seg:offset) */
@@ -258,7 +259,7 @@ case 0xa3: {
 
 
 
-case 0xc6:
+case EMU86_OPCODE_ENCODE(0xc6):
 	MODRM_DECODE();
 	switch (modrm.mi_reg) {
 
@@ -279,7 +280,7 @@ case 0xc6:
 
 
 
-case 0xc7:
+case EMU86_OPCODE_ENCODE(0xc7):
 	MODRM_DECODE();
 	switch (modrm.mi_reg) {
 
@@ -311,7 +312,7 @@ case 0xc7:
 	break;
 
 
-case 0x0fb6: {
+case EMU86_OPCODE_ENCODE(0x0fb6): {
 	u8 value;
 	/*         0F B6 /r     MOVZX r16, r/m8     Move byte to word with zero-extension.
 	 *         0F B6 /r     MOVZX r32, r/m8     Move byte to doubleword, zero-extension.
@@ -329,7 +330,7 @@ case 0x0fb6: {
 }
 
 
-case 0x0fb7: {
+case EMU86_OPCODE_ENCODE(0x0fb7): {
 	u16 value;
 	/*         0F B7 /r     MOVZX r32, r/m16    Move word to doubleword, zero-extension.
 	 * REX.W + 0F B7 /r     MOVZX r64, r/m16    Move word to quadword, zero-extension. */
@@ -344,7 +345,7 @@ case 0x0fb7: {
 }
 
 
-case 0x0fbe: {
+case EMU86_OPCODE_ENCODE(0x0fbe): {
 	s8 value;
 	/*         0F B6 /r     MOVSX r16, r/m8     Move byte to word with sign-extension.
 	 *         0F B6 /r     MOVSX r32, r/m8     Move byte to doubleword, sign-extension.
@@ -362,7 +363,7 @@ case 0x0fbe: {
 }
 
 
-case 0x0fbf: {
+case EMU86_OPCODE_ENCODE(0x0fbf): {
 	s16 value;
 	/*         0F B7 /r     MOVSX r32, r/m16    Move word to doubleword, sign-extension.
 	 * REX.W + 0F B7 /r     MOVSX r64, r/m16    Move word to quadword, sign-extension. */
@@ -377,7 +378,7 @@ case 0x0fbf: {
 }
 
 
-case 0x63: {
+case EMU86_OPCODE_ENCODE(0x63): {
 	MODRM_DECODE();
 	IF_16BIT_OR_32BIT(if (EMU86_F_IS64(op_flags))) {
 		/*         63 /r*       MOVSXD r16, r/m16   Move word to word with sign-extension.
@@ -436,9 +437,9 @@ case 0x63: {
 
 
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
-case 0xb0 ... 0xb7: {
+case EMU86_OPCODE_ENCODE(0xb0) ... EMU86_OPCODE_ENCODE(0xb7): {
 	u8 value;
-	u8 regno = opcode - 0xb0;
+	u8 regno = tiny_opcode - EMU86_OPCODE_ENCODE(0xb0);
 #if CONFIG_LIBEMU86_WANT_64BIT
 	if (op_flags & EMU86_F_REX_B)
 		regno |= 0x8;
@@ -451,11 +452,11 @@ case 0xb0 ... 0xb7: {
 }
 
 
-case 0xb8 ... 0xbf: {
+case EMU86_OPCODE_ENCODE(0xb8) ... EMU86_OPCODE_ENCODE(0xbf): {
 	/*         B8+ rw iw    MOV r16, imm16   OI   Valid    Valid    Move imm16 to r16.
 	 *         B8+ rd id    MOV r32, imm32   OI   Valid    Valid    Move imm32 to r32.
 	 * REX.W + B8+ rd io    MOV r64, imm64   OI   Valid    N.E.     Move imm64 to r64. */
-	u8 regno = opcode - 0xb8;
+	u8 regno = tiny_opcode - EMU86_OPCODE_ENCODE(0xb8);
 #if CONFIG_LIBEMU86_WANT_64BIT
 	if (op_flags & EMU86_F_REX_B)
 		regno |= 0x8;

@@ -73,7 +73,8 @@ EMU86_INTELLISENSE_BEGIN(arith2) {
 	                 EFLAGS_ZF | EFLAGS_AF | EFLAGS_PF),                       \
 	               eflags_addend | emu86_geteflags_test##bwlq(newval));
 
-case 0xf6:
+
+case EMU86_OPCODE_ENCODE(0xf6):
 	MODRM_DECODE();
 	switch (modrm.mi_reg) {
 
@@ -189,8 +190,7 @@ case 0xf6:
 	break;
 
 
-
-case 0xf7:
+case EMU86_OPCODE_ENCODE(0xf7):
 	MODRM_DECODE();
 	switch (modrm.mi_reg) {
 
@@ -543,7 +543,7 @@ case 0xf7:
 #undef DEFINE_NOT_MODRM_rm
 
 
-case 0x84: {
+case EMU86_OPCODE_ENCODE(0x84): {
 	/* 84 /r      TEST r/m8,r8      AND r8 with r/m8; set SF, ZF, PF according to result */
 	u8 lhs, rhs;
 	MODRM_DECODE();
@@ -556,7 +556,7 @@ case 0x84: {
 
 
 
-case 0x85: {
+case EMU86_OPCODE_ENCODE(0x85): {
 	/* 85 /r      TEST r/m16,r16      AND r16 with r/m16; set SF, ZF, PF according to result */
 	/* 85 /r      TEST r/m32,r32      AND r32 with r/m32; set SF, ZF, PF according to result */
 	MODRM_DECODE();
@@ -586,7 +586,7 @@ case 0x85: {
 }
 
 
-case 0x0faf: {
+case EMU86_OPCODE_ENCODE(0x0faf): {
 	/*         0F AF /r     IMUL r16, r/m16     word register <- word register * r/m16.
 	 *         0F AF /r     IMUL r32, r/m32     doubleword register <- doubleword register * r/m32.
 	 * REX.W + 0F AF /r     IMUL r64, r/m64     Quadword register <- Quadword register * r/m64. */
@@ -619,7 +619,7 @@ case 0x0faf: {
 }
 
 
-case 0x6b: {
+case EMU86_OPCODE_ENCODE(0x6b): {
 	/*         6B /r ib     IMUL r16, r/m16, imm8     word register <- r/m16 * sign-extended immediate byte.
 	 *         6B /r ib     IMUL r32, r/m32, imm8     doubleword register <- r/m32 * sign-extended immediate byte.
 	 * REX.W + 6B /r ib     IMUL r64, r/m64, imm8     Quadword register <- r/m64 * sign-extended immediate byte. */
@@ -652,7 +652,7 @@ case 0x6b: {
 }
 
 
-case 0x69: {
+case EMU86_OPCODE_ENCODE(0x69): {
 	/*         69 /r iw     IMUL r16, r/m16, imm16     word register <- r/m16 * immediate word.
 	 *         69 /r id     IMUL r32, r/m32, imm32     doubleword register <- r/m32 * immediate doubleword.
 	 * REX.W + 69 /r id     IMUL r64, r/m64, imm32     Quadword register <- r/m64 * immediate doubleword. */
@@ -690,7 +690,7 @@ case 0x69: {
 
 
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
-case 0xa8: {
+case EMU86_OPCODE_ENCODE(0xa8): {
 	/*         A8 ib     TEST AL, imm8       AND imm8 with AL; set SF, ZF, PF according to result. */
 	u8 lhs, imm;
 	imm = *(u8 *)pc;
@@ -701,7 +701,7 @@ case 0xa8: {
 	goto done;
 }
 
-case 0xa9: {
+case EMU86_OPCODE_ENCODE(0xa9): {
 	/*         A9 iw     TEST AX, imm16      AND imm16 with AX; set SF, ZF, PF according to result.
 	 *         A9 id     TEST EAX, imm32     AND imm32 with EAX; set SF, ZF, PF according to result.
 	 * REX.W + A9 id     TEST RAX, imm32     AND imm32 sign-extended to 64-bits with RAX; set SF, ZF, PF according to result. */

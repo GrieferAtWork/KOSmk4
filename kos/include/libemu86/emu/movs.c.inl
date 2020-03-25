@@ -45,7 +45,7 @@ EMU86_INTELLISENSE_BEGIN(movs) {
 	/* Temporary storage for the %(|e|r)si and %(|e|r)di registers. */
 	EMU86_UREG_TYPE psi, pdi;
 
-case 0xa4: {
+case EMU86_OPCODE_ENCODE(0xa4): {
 	/* A4     MOVSB     For legacy mode, Move byte from address DS:(E)SI to ES:(E)DI.
 	 *                  For 64-bit mode move byte from address (R|E)SI to (R|E)DI. */
 	byte_t *psi_addr, *pdi_addr;
@@ -61,7 +61,7 @@ do_movs_save_pointer:
 }
 
 
-case 0xa5: {
+case EMU86_OPCODE_ENCODE(0xa5): {
 	/*         A5     MOVSW     For legacy mode, move word from address DS:(E)SI to ES:(E)DI.
 	 *                          For 64-bit mode move word at address (R|E)SI to (R|E)DI.
 	 *         A5     MOVSD     For legacy mode, move dword from address DS:(E)SI to ES:(E)DI.

@@ -24,7 +24,7 @@
 EMU86_INTELLISENSE_BEGIN(lea) {
 
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
-case 0x8d: {
+case EMU86_OPCODE_ENCODE(0x8d): {
 	/*         8D /r     LEA r16,m     RM     Valid     Valid     Store effective address for m in register r16.
 	 *         8D /r     LEA r32,m     RM     Valid     Valid     Store effective address for m in register r32.
 	 * REX.W + 8D /r     LEA r64,m     RM     Valid     N.E.      Store effective address for m in register r64. */

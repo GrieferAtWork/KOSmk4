@@ -26,7 +26,7 @@
 EMU86_INTELLISENSE_BEGIN(lcall) {
 
 #if CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT
-case 0x9a: {
+case EMU86_OPCODE_ENCODE(0x9a): {
 	/* 9A cd    CALL ptr16:16    Call far, absolute, address given in operand.
 	 * 9A cp    CALL ptr16:32    Call far, absolute, address given in operand. */
 	byte_t *sp;

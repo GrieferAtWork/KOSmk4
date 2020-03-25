@@ -23,7 +23,7 @@
 
 EMU86_INTELLISENSE_BEGIN(cmpxchgb) {
 
-case 0x0fc7:
+case EMU86_OPCODE_ENCODE(0x0fc7):
 	MODRM_DECODE();
 	switch (modrm.mi_reg) {
 

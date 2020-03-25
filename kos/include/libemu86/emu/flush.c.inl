@@ -24,7 +24,7 @@
 EMU86_INTELLISENSE_BEGIN(flush) {
 
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
-case 0x0f08: {
+case EMU86_OPCODE_ENCODE(0x0f08): {
 	/* 0F 08     INVD     Flush internal caches; initiate flushing of external caches. */
 #ifdef EMU86_EMULATE_INVD
 	EMU86_EMULATE_INVD();
@@ -33,7 +33,7 @@ case 0x0f08: {
 }
 
 
-case 0x0f09: {
+case EMU86_OPCODE_ENCODE(0x0f09): {
 	/* 0F 09     WBINVD     Write back and flush Internal caches; initiate writing-back and flushing of external caches. */
 #ifdef EMU86_EMULATE_WBINVD
 	EMU86_EMULATE_WBINVD();
@@ -42,7 +42,7 @@ case 0x0f09: {
 }
 
 
-case 0x0f0d: {
+case EMU86_OPCODE_ENCODE(0x0f0d): {
 	MODRM_DECODE();
 	switch (modrm.mi_reg) {
 
@@ -65,7 +65,7 @@ case 0x0f0d: {
 }
 
 
-case 0x0f18: {
+case EMU86_OPCODE_ENCODE(0x0f18): {
 	/* 0F 18 /0     PREFETCHNTA m8     Move data from m8 closer to the processor using NTA hint.
 	 * 0F 18 /1     PREFETCHT0 m8      Move data from m8 closer to the processor using T0 hint.
 	 * 0F 18 /2     PREFETCHT1 m8      Move data from m8 closer to the processor using T1 hint.
@@ -108,7 +108,7 @@ case 0x0f18: {
 }
 
 
-case 0x0f1c: {
+case EMU86_OPCODE_ENCODE(0x0f1c): {
 	MODRM_DECODE();
 	if (!EMU86_MODRM_ISMEM(modrm.mi_type))
 		goto return_expected_memory_modrm_rmreg;

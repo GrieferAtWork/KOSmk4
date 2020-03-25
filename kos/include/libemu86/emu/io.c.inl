@@ -36,7 +36,7 @@ EMU86_INTELLISENSE_BEGIN(io) {
 
 
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
-case 0xe4: {
+case EMU86_OPCODE_ENCODE(0xe4): {
 	/* E4 ib     IN AL,imm8      Input byte from imm8 I/O port address into AL. */
 	u8 value;
 	u8 portno;
@@ -48,7 +48,7 @@ case 0xe4: {
 	goto done;
 }
 
-case 0xe5: {
+case EMU86_OPCODE_ENCODE(0xe5): {
 	/* E5 ib     IN AX,imm8      Input word from imm8 I/O port address into AX.
 	 * E5 ib     IN EAX,imm8     Input dword from imm8 I/O port address into EAX. */
 	u8 portno;
@@ -68,7 +68,7 @@ case 0xe5: {
 	goto done;
 }
 
-case 0xec: {
+case EMU86_OPCODE_ENCODE(0xec): {
 	/* EC        IN AL,DX        Input byte from I/O port in DX into AL. */
 	u8 value;
 	u16 portno = EMU86_GETDX();
@@ -78,7 +78,7 @@ case 0xec: {
 	goto done;
 }
 
-case 0xed: {
+case EMU86_OPCODE_ENCODE(0xed): {
 	/* ED        IN AX,DX        Input word from I/O port in DX into AX.
 	 * ED        IN EAX,DX       Input doubleword from I/O port in DX into EAX. */
 	u16 portno = EMU86_GETDX();
@@ -97,7 +97,7 @@ case 0xed: {
 }
 
 
-case 0xe6: {
+case EMU86_OPCODE_ENCODE(0xe6): {
 	/* E6 ib     OUT imm8, AL      Output byte in AL to I/O port address imm8. */
 	u8 value;
 	u8 portno;
@@ -109,7 +109,7 @@ case 0xe6: {
 	goto done;
 }
 
-case 0xe7: {
+case EMU86_OPCODE_ENCODE(0xe7): {
 	/* E7 ib     OUT imm8, AX      Output word in AX to I/O port address imm8.
 	 * E7 ib     OUT imm8, EAX     Output doubleword in EAX to I/O port address imm8. */
 	u8 portno;
@@ -129,7 +129,7 @@ case 0xe7: {
 	goto done;
 }
 
-case 0xee: {
+case EMU86_OPCODE_ENCODE(0xee): {
 	/* EE        OUT DX, AL        Output byte in AL to I/O port address in DX. */
 	u8 value;
 	u16 portno;
@@ -140,7 +140,7 @@ case 0xee: {
 	goto done;
 }
 
-case 0xef: {
+case EMU86_OPCODE_ENCODE(0xef): {
 	/* EF        OUT DX, AX        Output word in AX to I/O port address in DX.
 	 * EF        OUT DX, EAX       Output doubleword in EAX to I/O port address in DX. */
 	u16 portno = EMU86_GETDX();
@@ -162,7 +162,7 @@ case 0xef: {
 
 
 
-case 0x6e: {
+case EMU86_OPCODE_ENCODE(0x6e): {
 	/* 6E     OUTSB     Output byte from memory location specified in DS:(E)SI or RSI to I/O port specified in DX. */
 	u16 portno = EMU86_GETDX();
 	VERIFY_USER_PORT_ACCESS(portno, 1);
@@ -183,7 +183,7 @@ case 0x6e: {
 	goto done;
 }
 
-case 0x6f: {
+case EMU86_OPCODE_ENCODE(0x6f): {
 	/* 6F     OUTSW     Output word from memory location specified in DS:(E)SI or RSI to I/O port specified in DX.
 	 * 6F     OUTSD     Output doubleword from memory location specified in DS:(E)SI or RSI to I/O port specified in DX. */
 	u16 portno = EMU86_GETDX();
@@ -221,7 +221,7 @@ case 0x6f: {
 }
 
 
-case 0x6c: {
+case EMU86_OPCODE_ENCODE(0x6c): {
 	/* 6C     INSB      Input byte from I/O port specified in DX into memory location specified with ES:(E)DI or RDI. */
 	u16 portno = EMU86_GETDX();
 	u8 value;
@@ -235,7 +235,7 @@ case 0x6c: {
 }
 
 
-case 0x6d: {
+case EMU86_OPCODE_ENCODE(0x6d): {
 	/* 6D     INSW      Input word from I/O port specified in DX into memory location specified in ES:(E)DI or RDI.
 	 * 6D     INSD      Input doubleword from I/O port specified in DX into memory location specified in ES:(E)DI or RDI. */
 	u16 portno = EMU86_GETDX();

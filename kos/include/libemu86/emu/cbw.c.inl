@@ -25,7 +25,7 @@ EMU86_INTELLISENSE_BEGIN(cbw) {
 
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 
-case 0x98: {
+case EMU86_OPCODE_ENCODE(0x98): {
 	/*         98     CBW      AX := sign-extend of AL.
 	 *         98     CWDE     EAX := sign-extend of AX.
 	 * REX.W + 98     CDQE     RAX := sign-extend of EAX. */
@@ -39,7 +39,7 @@ case 0x98: {
 	goto done;
 }
 
-case 0x99: {
+case EMU86_OPCODE_ENCODE(0x99): {
 	/*         99     CWD     DX:AX := sign-extend of AX.
 	 *         99     CDQ     EDX:EAX := sign-extend of EAX.
 	 * REX.W + 99     CQO     RDX:RAX:= sign-extend of RAX. */

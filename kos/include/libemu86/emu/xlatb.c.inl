@@ -23,7 +23,7 @@
 
 EMU86_INTELLISENSE_BEGIN(xlatb) {
 
-case 0xd7: {
+case EMU86_OPCODE_ENCODE(0xd7): {
 	/*         D7     XLAT m8     Set AL to memory byte DS:[(E)BX + unsigned AL].
 	 *         D7     XLATB       Set AL to memory byte DS:[(E)BX + unsigned AL].
 	 * REX.W + D7     XLATB       Set AL to memory byte [RBX + unsigned AL]. */

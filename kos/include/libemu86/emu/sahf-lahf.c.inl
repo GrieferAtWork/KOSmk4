@@ -27,7 +27,7 @@ EMU86_INTELLISENSE_BEGIN(sahf_lahf) {
 
 #define AHF_MASK (EFLAGS_CF | EFLAGS_PF | EFLAGS_AF | EFLAGS_ZF | EFLAGS_SF)
 
-case 0x9e: {
+case EMU86_OPCODE_ENCODE(0x9e): {
 	/* 9E     SAHF     Loads SF, ZF, AF, PF, and CF from AH into EFLAGS register. */
 	u8 ah = EMU86_GETAH();
 	EMU86_MSKFLAGS(~AHF_MASK, ah & AHF_MASK);
@@ -35,7 +35,7 @@ case 0x9e: {
 }
 
 
-case 0x9f: {
+case EMU86_OPCODE_ENCODE(0x9f): {
 	/* 9F     LAHF     Load: AH := EFLAGS(SF:ZF:0:AF:0:PF:1:CF). */
 	u8 ah;
 	ah = (u8)(EMU86_GETFLAGS() & AHF_MASK) |

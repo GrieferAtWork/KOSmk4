@@ -216,7 +216,7 @@ do_cmp##Nbits:                                                                  
 /* ======================================================================== */
 /*    BINARY ARITHMATIC                                                     */
 /* ======================================================================== */
-case 0x80: {
+case EMU86_OPCODE_ENCODE(0x80): {
 	MODRM_DECODE();
 	op8 = *(u8 *)pc;
 	pc += 1;
@@ -234,7 +234,7 @@ case 0x80: {
 }
 
 
-case 0x81:
+case EMU86_OPCODE_ENCODE(0x81):
 	MODRM_DECODE();
 #if CONFIG_LIBEMU86_WANT_64BIT
 	if (IS_64BIT()) {
@@ -281,7 +281,8 @@ do_op16:
 	}
 	goto done;
 
-case 0x83:
+
+case EMU86_OPCODE_ENCODE(0x83):
 	MODRM_DECODE();
 #if CONFIG_LIBEMU86_WANT_64BIT
 	if (IS_64BIT()) {
@@ -329,7 +330,7 @@ case 0x83:
 #define DEFINE_REGISTER_IMMEDIATE_INSTRUCTIONS(_opcode, name, NAME) /* nothing */
 #else /* EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 #define DEFINE_REGISTER_IMMEDIATE_INSTRUCTIONS(_opcode, name, NAME)     \
-	case _opcode + 4:                                                   \
+	case EMU86_OPCODE_ENCODE(_opcode + 4):                              \
 		/* _opcode + 04 ib      FOO AL, imm8        Foo imm8 to AL */   \
 		op8 = *(u8 *)pc;                                                \
 		pc += 1;                                                        \
@@ -337,7 +338,7 @@ case 0x83:
 		modrm.mi_rm   = EMU86_R_AL;                                     \
 		goto do_##name##8;                                              \
 	                                                                    \
-	case _opcode + 5:                                                   \
+	case EMU86_OPCODE_ENCODE(_opcode + 5):                              \
 		/*         _opcode + 05 iw   FOO AL, imm16   Foo imm16 to AL */ \
 		/*         _opcode + 05 id   FOO AL, imm32   Foo imm32 to AL */ \
 		/* REX.W + _opcode + 05 id   FOO AL, Simm32  Foo Simm32 to AL */\
@@ -359,13 +360,13 @@ case 0x83:
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 
 #define DEFINE_REGISTER_MEMORY_INSTRUCTIONS(_opcode, name, NAME)        \
-	case _opcode + 0:                                                   \
+	case EMU86_OPCODE_ENCODE(_opcode + 0):                              \
 		/* _opcode + 00 /r      FOO r/m8, r8        Foo r8 to r/m8 */   \
 		MODRM_DECODE();                                                 \
 		op8 = MODRM_GETREGB();                                          \
 		goto do_##name##8;                                              \
 	                                                                    \
-	case _opcode + 1:                                                   \
+	case EMU86_OPCODE_ENCODE(_opcode + 1):                              \
 		/* _opcode + 01 /r      FOO r/m16, r16      Foo r16 to r/m16 */ \
 		/* _opcode + 01 /r      FOO r/m32, r32      Foo r32 to r/m32 */ \
 		/* _opcode + 01 /r      FOO r/m64, r64      Foo r64 to r/m64 */ \
@@ -381,7 +382,7 @@ case 0x83:
 			goto do_##name##16;                                         \
 		}                                                               \
 	                                                                    \
-	case _opcode + 2:                                                   \
+	case EMU86_OPCODE_ENCODE(_opcode + 2):                              \
 		/* _opcode + 02 /r      FOO r8, r/m8        Foo r/m8 to r8 */   \
 		MODRM_DECODE();                                                 \
 		op8 = MODRM_GETRMB();                                           \
@@ -389,7 +390,7 @@ case 0x83:
 		modrm.mi_rm   = modrm.mi_reg;                                   \
 		goto do_##name##8;                                              \
 	                                                                    \
-	case _opcode + 3:                                                   \
+	case EMU86_OPCODE_ENCODE(_opcode + 3):                              \
 		/* _opcode + 03 /r      FOO r16, r/m16      Foo r/m16 to r16 */ \
 		/* _opcode + 03 /r      FOO r32, r/m32      Foo r/m32 to r32 */ \
 		/* _opcode + 03 /r      FOO r64, r/m64      Foo r/m64 to r64 */ \

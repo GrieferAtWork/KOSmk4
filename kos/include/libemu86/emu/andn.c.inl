@@ -24,7 +24,7 @@
 EMU86_INTELLISENSE_BEGIN(andn) {
 
 
-case 0x0f38f2: {
+case EMU86_OPCODE_ENCODE(0x0f38f2): {
 	/* VEX.LZ.0F38.W0 F2 /r     ANDN r32a, r32b, r/m32     Bitwise AND of inverted r32b with r/m32, store result in r32a.
 	 * VEX.LZ.0F38.W1 F2 /r     ANDN r64a, r64b, r/m64     Bitwise AND of inverted r64b with r/m64, store result in r64a. */
 	EMU86_UREG_TYPE result;

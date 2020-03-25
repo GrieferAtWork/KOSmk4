@@ -334,7 +334,36 @@ __DECL_BEGIN
 #define EMU86_MODRM_ISREG(x) ((x) == 0)
 #define EMU86_MODRM_ISMEM(x) ((x) != 0)
 
+
+#define EMU86_OPCODE_BASE0    0x0000
+#define EMU86_OPCODE_BASE0f   0x0100
+#define EMU86_OPCODE_BASE0f38 0x0200
+#define EMU86_OPCODE_BASE0f3a 0x0300
+
+/* Encode/Decode an x86 opcode `real_opcode' */
+#define EMU86_OPCODE_ENCODE(real_opcode)                                             \
+	((real_opcode) <= 0xff                                                           \
+	 ? __CCAST(emu86_opcode_t)(EMU86_OPCODE_BASE0 + (real_opcode))                   \
+	 : ((real_opcode) >= 0x0f00 && (real_opcode) <= 0x0fff)                          \
+	   ? __CCAST(emu86_opcode_t)(EMU86_OPCODE_BASE0f + ((real_opcode)-0x0f00))       \
+	   : ((real_opcode) >= 0x0f3800 && (real_opcode) <= 0x0f38ff)                    \
+	     ? __CCAST(emu86_opcode_t)(EMU86_OPCODE_BASE0f38 + ((real_opcode)-0x0f3800)) \
+	     : __CCAST(emu86_opcode_t)(EMU86_OPCODE_BASE0f3a + ((real_opcode)-0x0f3a00)))
+#define EMU86_OPCODE_DECODE(tiny_opcode)                                       \
+	((tiny_opcode) < EMU86_OPCODE_BASE0f                                       \
+	 ? __CCAST(__uint32_t)(0x00 + (tiny_opcode)-EMU86_OPCODE_BASE0)            \
+	 : (tiny_opcode) < EMU86_OPCODE_BASE0f38                                   \
+	   ? __CCAST(__uint32_t)(0x0f00 + (tiny_opcode)-EMU86_OPCODE_BASE0f)       \
+	   : (tiny_opcode) < EMU86_OPCODE_BASE0f3a                                 \
+	     ? __CCAST(__uint32_t)(0x0f3800 + (tiny_opcode)-EMU86_OPCODE_BASE0f38) \
+	     : __CCAST(__uint32_t)(0x0f3a00 + (tiny_opcode)-EMU86_OPCODE_BASE0f3a))
+
+
+
 #ifdef __CC__
+
+/* X86 opcode. (tiny form; use `EMU86_OPCODE_DECODE()' to decode) */
+typedef __uint16_t emu86_opcode_t;
 
 /* Instruction flags (set of `EMU86_F_*'). */
 typedef __uint32_t emu86_opflags_t;
@@ -349,12 +378,12 @@ typedef __uint32_t emu86_opflags_t;
  *                        setting `EMU86_F_BITMASK' */
 typedef __ATTR_UNUSED __ATTR_WUNUSED __ATTR_RETNONNULL __ATTR_NONNULL((1, 2, 3)) __byte_t const *
 /*__NOTHROW_NCX*/ (LIBEMU86_CC *PEMU86_OPCODE_DECODE)(__byte_t const *__restrict pc,
-                                                      __uint32_t *__restrict popcode,
+                                                      emu86_opcode_t *__restrict popcode,
                                                       emu86_opflags_t *__restrict pflags);
 #ifdef LIBEMU86_WANT_PROTOTYPES
 LIBEMU86_DECL __ATTR_UNUSED __ATTR_WUNUSED __ATTR_RETNONNULL __ATTR_NONNULL((1, 2, 3)) __byte_t const *
 __NOTHROW_NCX(LIBEMU86_CC emu86_opcode_decode)(__byte_t const *__restrict pc,
-                                               __uint32_t *__restrict popcode,
+                                               emu86_opcode_t *__restrict popcode,
                                                emu86_opflags_t *__restrict pflags);
 #endif /* LIBEMU86_WANT_PROTOTYPES */
 

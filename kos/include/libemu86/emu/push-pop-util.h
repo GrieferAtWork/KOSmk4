@@ -27,6 +27,7 @@
 /* 66 XX push16
  *    XX push32  (in 32-bit mode)
  *    XX illegal (in 64-bit mode) */
+#if CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT
 #define EMU86_PUSH1632(T, value)                     \
 	do {                                             \
 		byte_t *sp;                                  \
@@ -50,11 +51,15 @@
 		}                                            \
 		EMU86_SETSTACKPTR(sp);                       \
 	} __WHILE0
+#elif EMU86_EMULATE_CONFIG_CHECKERROR && CONFIG_LIBEMU86_WANT_64BIT
+#define EMU86_PUSH1632(T, value) goto return_unsupported_instruction
+#endif
 
 
 /* 66 XX pop16
  *    XX pop32   (in 32-bit mode)
  *    XX illegal (in 64-bit mode) */
+#if CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT
 #define EMU86_POP1632(T, setter)                     \
 	do {                                             \
 		byte_t *sp;                                  \
@@ -78,6 +83,9 @@
 		setter(_value);                              \
 		EMU86_SETSTACKPTR(sp);                       \
 	} __WHILE0
+#elif EMU86_EMULATE_CONFIG_CHECKERROR && CONFIG_LIBEMU86_WANT_64BIT
+#define EMU86_POP1632(T, setter) goto return_unsupported_instruction
+#endif
 
 
 /* 66 XX push16
@@ -91,19 +99,19 @@
 			sp -= 2;                                                   \
 			EMU86_EMULATE_PUSH(sp, 2);                                 \
 			EMU86_WRITE_USER_MEMORY(sp, 2);                            \
-			EMU86_MEMWRITEW(sp, value16);                         \
+			EMU86_MEMWRITEW(sp, value16);                              \
 		}                                                              \
 		IF_64BIT(else IF_16BIT_OR_32BIT(if (EMU86_F_IS64(op_flags))) { \
 			sp -= 8;                                                   \
 			EMU86_EMULATE_PUSH(sp, 8);                                 \
 			EMU86_WRITE_USER_MEMORY(sp, 8);                            \
-			EMU86_MEMWRITEQ(sp, value64);                         \
+			EMU86_MEMWRITEQ(sp, value64);                              \
 		})                                                             \
 		IF_16BIT_OR_32BIT(else {                                       \
 			sp -= 4;                                                   \
 			EMU86_EMULATE_PUSH(sp, 4);                                 \
 			EMU86_WRITE_USER_MEMORY(sp, 4);                            \
-			EMU86_MEMWRITEL(sp, value32);                         \
+			EMU86_MEMWRITEL(sp, value32);                              \
 		})                                                             \
 		EMU86_SETSTACKPTR(sp);                                         \
 	} __WHILE0

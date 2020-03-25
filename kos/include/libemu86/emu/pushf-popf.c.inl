@@ -25,7 +25,7 @@
 
 EMU86_INTELLISENSE_BEGIN(pushf_popf) {
 
-case 0x9c: {
+case EMU86_OPCODE_ENCODE(0x9c): {
 	/* 9C     PUSHF      Push lower 16 bits of EFLAGS.
 	 * 9C     PUSHFD     Push EFLAGS.
 	 * 9C     PUSHFQ     Push RFLAGS. */
@@ -46,7 +46,7 @@ case 0x9c: {
 }
 
 
-case 0x9d: {
+case EMU86_OPCODE_ENCODE(0x9d): {
 	/* 9D     POPF      Pop top of stack into lower 16 bits of EFLAGS.
 	 * 9D     POPFD     Pop top of stack into EFLAGS.
 	 * 9D     POPFQ     Pop top of stack and zero-extend into RFLAGS. */

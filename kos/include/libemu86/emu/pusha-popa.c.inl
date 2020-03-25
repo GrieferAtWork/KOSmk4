@@ -23,106 +23,121 @@
 
 EMU86_INTELLISENSE_BEGIN(pusha_popa) {
 
-#if CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT
+#if (CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT || \
+     (EMU86_EMULATE_CONFIG_CHECKERROR && CONFIG_LIBEMU86_WANT_64BIT))
 
-case 0x60: {
+case EMU86_OPCODE_ENCODE(0x60): {
 	/* 60     PUSHA      Push AX, CX, DX, BX, original SP, BP, SI, and DI.
 	 * 60     PUSHAD     Push EAX, ECX, EDX, EBX, original ESP, EBP, ESI, and EDI. */
-	byte_t *sp;
 #if CONFIG_LIBEMU86_WANT_64BIT
 #define NEED_return_unsupported_instruction
 	if (EMU86_F_IS64(op_flags))
 		goto return_unsupported_instruction;
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
-	sp = EMU86_GETSTACKPTR();
-	if (!IS_16BIT()) {
-		sp -= 32;
-		EMU86_EMULATE_PUSH(sp, 32);
-		EMU86_WRITE_USER_MEMORY(sp, 32);
-		EMU86_MEMWRITEL(sp + 0x00, EMU86_GETEDI());
-		EMU86_MEMWRITEL(sp + 0x04, EMU86_GETESI());
-		EMU86_MEMWRITEL(sp + 0x08, EMU86_GETEBP());
-		EMU86_MEMWRITEL(sp + 0x0c, EMU86_GETESP());
-		EMU86_MEMWRITEL(sp + 0x10, EMU86_GETEBX());
-		EMU86_MEMWRITEL(sp + 0x14, EMU86_GETEDX());
-		EMU86_MEMWRITEL(sp + 0x18, EMU86_GETECX());
-		EMU86_MEMWRITEL(sp + 0x1c, EMU86_GETEAX());
-	} else {
-		sp -= 16;
-		EMU86_EMULATE_PUSH(sp, 16);
-		EMU86_WRITE_USER_MEMORY(sp, 16);
-		EMU86_MEMWRITEW(sp + 0x0, EMU86_GETDI());
-		EMU86_MEMWRITEW(sp + 0x2, EMU86_GETSI());
-		EMU86_MEMWRITEW(sp + 0x4, EMU86_GETBP());
-		EMU86_MEMWRITEW(sp + 0x6, EMU86_GETSP());
-		EMU86_MEMWRITEW(sp + 0x8, EMU86_GETBX());
-		EMU86_MEMWRITEW(sp + 0xa, EMU86_GETDX());
-		EMU86_MEMWRITEW(sp + 0xc, EMU86_GETCX());
-		EMU86_MEMWRITEW(sp + 0xe, EMU86_GETAX());
+#if CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT
+	{
+		byte_t *sp;
+		sp = EMU86_GETSTACKPTR();
+		if (!IS_16BIT()) {
+			sp -= 32;
+			EMU86_EMULATE_PUSH(sp, 32);
+			EMU86_WRITE_USER_MEMORY(sp, 32);
+			EMU86_MEMWRITEL(sp + 0x00, EMU86_GETEDI());
+			EMU86_MEMWRITEL(sp + 0x04, EMU86_GETESI());
+			EMU86_MEMWRITEL(sp + 0x08, EMU86_GETEBP());
+			EMU86_MEMWRITEL(sp + 0x0c, EMU86_GETESP());
+			EMU86_MEMWRITEL(sp + 0x10, EMU86_GETEBX());
+			EMU86_MEMWRITEL(sp + 0x14, EMU86_GETEDX());
+			EMU86_MEMWRITEL(sp + 0x18, EMU86_GETECX());
+			EMU86_MEMWRITEL(sp + 0x1c, EMU86_GETEAX());
+		} else {
+			sp -= 16;
+			EMU86_EMULATE_PUSH(sp, 16);
+			EMU86_WRITE_USER_MEMORY(sp, 16);
+			EMU86_MEMWRITEW(sp + 0x0, EMU86_GETDI());
+			EMU86_MEMWRITEW(sp + 0x2, EMU86_GETSI());
+			EMU86_MEMWRITEW(sp + 0x4, EMU86_GETBP());
+			EMU86_MEMWRITEW(sp + 0x6, EMU86_GETSP());
+			EMU86_MEMWRITEW(sp + 0x8, EMU86_GETBX());
+			EMU86_MEMWRITEW(sp + 0xa, EMU86_GETDX());
+			EMU86_MEMWRITEW(sp + 0xc, EMU86_GETCX());
+			EMU86_MEMWRITEW(sp + 0xe, EMU86_GETAX());
+		}
+		EMU86_SETSTACKPTR(sp);
+		goto done;
 	}
-	EMU86_SETSTACKPTR(sp);
-	goto done;
+#else /* CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT */
+#define NEED_return_unsupported_instruction
+	goto return_unsupported_instruction;
+#endif /* !CONFIG_LIBEMU86_WANT_32BIT && !CONFIG_LIBEMU86_WANT_16BIT */
 }
 
 
-case 0x61: {
+case EMU86_OPCODE_ENCODE(0x61): {
 	/* 61     POPA      Pop DI, SI, BP, BX, DX, CX, and AX.
 	 * 61     POPAD     Pop EDI, ESI, EBP, EBX, EDX, ECX, and EAX. */
-	byte_t *sp;
 #if CONFIG_LIBEMU86_WANT_64BIT
 #define NEED_return_unsupported_instruction
 	if (EMU86_F_IS64(op_flags))
 		goto return_unsupported_instruction;
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
-	sp = EMU86_GETSTACKPTR();
-	if (!IS_16BIT()) {
-		u32 eax, ecx, edx, ebx, ebp, esi, edi;
-		EMU86_EMULATE_POP(sp, 32);
-		EMU86_READ_USER_MEMORY(sp, 32);
-		edi = EMU86_MEMREADL(sp + 0x00);
-		esi = EMU86_MEMREADL(sp + 0x04);
-		ebp = EMU86_MEMREADL(sp + 0x08);
-/*		esp = EMU86_MEMREADL(sp + 0x0c); */
-		ebx = EMU86_MEMREADL(sp + 0x10);
-		edx = EMU86_MEMREADL(sp + 0x14);
-		ecx = EMU86_MEMREADL(sp + 0x18);
-		eax = EMU86_MEMREADL(sp + 0x1c);
-		COMPILER_READ_BARRIER();
-		EMU86_SETEDI(edi);
-		EMU86_SETESI(esi);
-		EMU86_SETEBP(ebp);
-		EMU86_SETEBX(ebx);
-		EMU86_SETEDX(edx);
-		EMU86_SETECX(ecx);
-		EMU86_SETEAX(eax);
-		sp += 32;
-	} else {
-		u16 ax, cx, dx, bx, bp, si, di;
-		EMU86_EMULATE_POP(sp, 16);
-		EMU86_READ_USER_MEMORY(sp, 16);
-		di = EMU86_MEMREADL(sp + 0x0);
-		si = EMU86_MEMREADL(sp + 0x2);
-		bp = EMU86_MEMREADL(sp + 0x4);
-/*		sp = EMU86_MEMREADL(sp + 0x6); */
-		bx = EMU86_MEMREADL(sp + 0x8);
-		dx = EMU86_MEMREADL(sp + 0xa);
-		cx = EMU86_MEMREADL(sp + 0xc);
-		ax = EMU86_MEMREADL(sp + 0xe);
-		COMPILER_READ_BARRIER();
-		EMU86_SETDI(di);
-		EMU86_SETSI(si);
-		EMU86_SETBP(bp);
-		EMU86_SETBX(bx);
-		EMU86_SETDX(dx);
-		EMU86_SETCX(cx);
-		EMU86_SETAX(ax);
-		sp += 16;
+#if CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT
+	{
+		byte_t *sp;
+		sp = EMU86_GETSTACKPTR();
+		if (!IS_16BIT()) {
+			u32 eax, ecx, edx, ebx, ebp, esi, edi;
+			EMU86_EMULATE_POP(sp, 32);
+			EMU86_READ_USER_MEMORY(sp, 32);
+			edi = EMU86_MEMREADL(sp + 0x00);
+			esi = EMU86_MEMREADL(sp + 0x04);
+			ebp = EMU86_MEMREADL(sp + 0x08);
+/*			esp = EMU86_MEMREADL(sp + 0x0c); */
+			ebx = EMU86_MEMREADL(sp + 0x10);
+			edx = EMU86_MEMREADL(sp + 0x14);
+			ecx = EMU86_MEMREADL(sp + 0x18);
+			eax = EMU86_MEMREADL(sp + 0x1c);
+			COMPILER_READ_BARRIER();
+			EMU86_SETEDI(edi);
+			EMU86_SETESI(esi);
+			EMU86_SETEBP(ebp);
+			EMU86_SETEBX(ebx);
+			EMU86_SETEDX(edx);
+			EMU86_SETECX(ecx);
+			EMU86_SETEAX(eax);
+			sp += 32;
+		} else {
+			u16 ax, cx, dx, bx, bp, si, di;
+			EMU86_EMULATE_POP(sp, 16);
+			EMU86_READ_USER_MEMORY(sp, 16);
+			di = EMU86_MEMREADL(sp + 0x0);
+			si = EMU86_MEMREADL(sp + 0x2);
+			bp = EMU86_MEMREADL(sp + 0x4);
+/*			sp = EMU86_MEMREADL(sp + 0x6); */
+			bx = EMU86_MEMREADL(sp + 0x8);
+			dx = EMU86_MEMREADL(sp + 0xa);
+			cx = EMU86_MEMREADL(sp + 0xc);
+			ax = EMU86_MEMREADL(sp + 0xe);
+			COMPILER_READ_BARRIER();
+			EMU86_SETDI(di);
+			EMU86_SETSI(si);
+			EMU86_SETBP(bp);
+			EMU86_SETBX(bx);
+			EMU86_SETDX(dx);
+			EMU86_SETCX(cx);
+			EMU86_SETAX(ax);
+			sp += 16;
+		}
+		EMU86_SETSTACKPTR(sp);
+		goto done;
 	}
-	EMU86_SETSTACKPTR(sp);
-	goto done;
+#else /* CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT */
+#define NEED_return_unsupported_instruction
+	goto return_unsupported_instruction;
+#endif /* !CONFIG_LIBEMU86_WANT_32BIT && !CONFIG_LIBEMU86_WANT_16BIT */
 }
 
-#endif /* CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT */
+#endif /* CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT || (EMU86_EMULATE_CONFIG_CHECKERROR && CONFIG_LIBEMU86_WANT_64BIT) */
 
 }
 EMU86_INTELLISENSE_END

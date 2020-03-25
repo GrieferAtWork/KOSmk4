@@ -23,7 +23,7 @@
 
 EMU86_INTELLISENSE_BEGIN(popcnt) {
 
-case 0x0fb8: {
+case EMU86_OPCODE_ENCODE(0x0fb8): {
 	/* F3       0F B8 /r     POPCNT r16, r/m16     POPCNT on r/m16
 	 * F3       0F B8 /r     POPCNT r32, r/m32     POPCNT on r/m32
 	 * F3 REX.W 0F B8 /r     POPCNT r64, r/m64     POPCNT on r/m64 */

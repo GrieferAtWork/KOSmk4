@@ -24,7 +24,7 @@
 EMU86_INTELLISENSE_BEGIN(adcx) {
 
 
-case 0x0f38f6: {
+case EMU86_OPCODE_ENCODE(0x0f38f6): {
 	MODRM_DECODE();
 	if (op_flags & EMU86_F_f2) {
 		/* VEX.LZ.F2.0F38.W0 F6 /r     MULX r32a, r32b, r/m32     Unsigned multiply of r/m32 with EDX without affecting arithmetic flags.

@@ -50,7 +50,7 @@ EMU86_INTELLISENSE_BEGIN(cmpxchg) {
 	                                         real_oldval));
 
 
-case 0x0fb0: {
+case EMU86_OPCODE_ENCODE(0x0fb0): {
 	/* 0F B0 /r      CMPXCHG r/m8,r8      Compare AL with r/m8. If equal, ZF is set and r8 is
 	 *                                    loaded into r/m8. Else, clear ZF and load r/m8 into AL */
 	DEFINE_CMPXCHG_modrm_rm(b, B, 8, 1, EMU86_GETAL())
@@ -58,7 +58,7 @@ case 0x0fb0: {
 }
 
 
-case 0x0fb1:
+case EMU86_OPCODE_ENCODE(0x0fb1): {
 	/* 0F B1 /r      CMPXCHG r/m16,r16    Compare AX with r/m16. If equal, ZF is set and r16 is
 	 *                                    loaded into r/m16. Else, clear ZF and load r/m16 into AX.
 	 * 0F B1 /r      CMPXCHG r/m32,r32    Compare EAX with r/m32. If equal, ZF is set and r32 is
@@ -74,6 +74,7 @@ case 0x0fb1:
 		DEFINE_CMPXCHG_modrm_rm(w, W, 16, 2, EMU86_GETAX())
 	}
 	goto done;
+}
 
 #undef DEFINE_CMPXCHG_modrm_rm
 

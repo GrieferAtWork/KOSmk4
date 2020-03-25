@@ -26,7 +26,7 @@
 EMU86_INTELLISENSE_BEGIN(scas) {
 
 
-case 0xae: {
+case EMU86_OPCODE_ENCODE(0xae): {
 	/* AE     SCASB     Compare AL with byte at ES:(E)DI or RDI then set status flags. */
 	u8 lhs, rhs;
 	u32 new_eflags;
@@ -55,7 +55,7 @@ case 0xae: {
 
 
 
-case 0xaf: {
+case EMU86_OPCODE_ENCODE(0xaf): {
 	/*         AF     SCASW     Compare AX with word at ES:(E)DI or RDI then set status flags.
 	 *         AF     SCASD     Compare EAX with doubleword at ES:(E)DI or RDI then set status flags.
 	 * REX.W + AF     SCASQ     Compare RAX with quadword at RDI or EDI then set status flags. */

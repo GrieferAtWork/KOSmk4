@@ -43,12 +43,12 @@ __DECL_BEGIN
  * @param: pflags:  [in(EMU86_F_BITMASK)|out] Opcode flags. */
 LIBEMU86_IMPL __ATTR_UNUSED __ATTR_WUNUSED __ATTR_RETNONNULL __ATTR_NONNULL((1, 2, 3)) __byte_t const *
 __NOTHROW_NCX(LIBEMU86_CC emu86_opcode_decode)(__byte_t const *__restrict pc,
-                                               __uint32_t *__restrict popcode,
+                                               emu86_opcode_t *__restrict popcode,
                                                emu86_opflags_t *__restrict pflags) {
-	__uint32_t result;
+	emu86_opcode_t opcode;
 next_byte:
-	result = *pc++;
-	switch (result) {
+	opcode = *pc++;
+	switch (opcode) {
 
 #if CONFIG_LIBEMU86_WANT_64BIT
 	/* EVEX Prefix */
@@ -99,16 +99,16 @@ next_byte:
 		default: break;
 		}
 		switch (evex & EMU86_EVEX_MM_M) {
-		case 0x1 << EMU86_EVEX_MM_S: result = 0x0f00; break;
-		case 0x2 << EMU86_EVEX_MM_S: result = 0x0f3800; break;
-		case 0x3 << EMU86_EVEX_MM_S: result = 0x0f3a00; break;
+		case 0x1 << EMU86_EVEX_MM_S: opcode = EMU86_OPCODE_BASE0f; break;
+		case 0x2 << EMU86_EVEX_MM_S: opcode = EMU86_OPCODE_BASE0f38; break;
+		case 0x3 << EMU86_EVEX_MM_S: opcode = EMU86_OPCODE_BASE0f3a; break;
 		default:
 			pc -= 3;
 			/*result = 0x62;*/
 			goto done;
 		}
 		/* The actual instruction opcode byte */
-		result |= *pc++;
+		opcode |= *pc++;
 	}	break;
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
 
@@ -157,27 +157,27 @@ next_byte:
 		default: break;
 		}
 		switch (vex & EMU86_VEX3B_MMMMM_M) {
-		case 0x1 << EMU86_VEX3B_MMMMM_S: result = 0x0f00; break;
-		case 0x2 << EMU86_VEX3B_MMMMM_S: result = 0x0f3800; break;
-		case 0x3 << EMU86_VEX3B_MMMMM_S: result = 0x0f3a00; break;
+		case 0x1 << EMU86_VEX3B_MMMMM_S: opcode = EMU86_OPCODE_BASE0f; break;
+		case 0x2 << EMU86_VEX3B_MMMMM_S: opcode = EMU86_OPCODE_BASE0f38; break;
+		case 0x3 << EMU86_VEX3B_MMMMM_S: opcode = EMU86_OPCODE_BASE0f3a; break;
 		default:
 			pc -= 2;
 			/*result = 0xc4;*/
 			goto done;
 		}
 		/* The actual instruction opcode byte */
-		result |= *pc++;
+		opcode |= *pc++;
 	}	break;
 
 	/* VEX Prefix (2-byte form) */
 	case 0xc5:
-		result = *pc++;
+		opcode = *pc++;
 #if CONFIG_LIBEMU86_WANT_64BIT
 #if CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT
 		if (EMU86_F_IS64(*pflags))
 #endif /* CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT */
 		{
-			if (!(result & EMU86_VEX2B_R))
+			if (!(opcode & EMU86_VEX2B_R))
 				*pflags |= EMU86_F_REX_R;
 		}
 #if CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT
@@ -186,25 +186,25 @@ next_byte:
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
 #if CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT
 		{
-			if (!(result & (EMU86_VEX2B_R | EMU86_VEX2B_1))) {
+			if (!(opcode & (EMU86_VEX2B_R | EMU86_VEX2B_1))) {
 				--pc;
-				result = 0xc5;
+				opcode = 0xc5;
 				break;
 			}
 		}
 #endif /* CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT */
 		*pflags |= EMU86_F_HASVEX;
-		if (result & EMU86_VEX2B_L)
+		if (opcode & EMU86_VEX2B_L)
 			*pflags |= 1 << EMU86_F_VEX_LL_S;
-		*pflags |= ((~result & EMU86_VEX2B_VVVV_M) >> EMU86_VEX2B_VVVV_S) << EMU86_F_VEX_VVVVV_S;
-		switch (result & EMU86_VEX2B_PP_M) {
+		*pflags |= ((~opcode & EMU86_VEX2B_VVVV_M) >> EMU86_VEX2B_VVVV_S) << EMU86_F_VEX_VVVVV_S;
+		switch (opcode & EMU86_VEX2B_PP_M) {
 		case 0x01 << EMU86_VEX2B_PP_S: *pflags |= EMU86_F_OP16; break;  /* same as 0x66 prefix */
 		case 0x02 << EMU86_VEX2B_PP_S: *pflags |= EMU86_F_REP; break;   /* same as 0xf3 prefix */
 		case 0x03 << EMU86_VEX2B_PP_S: *pflags |= EMU86_F_REPNE; break; /* same as 0xf2 prefix */
 		default: break;
 		}
 		/* The actual instruction opcode byte */
-		result = 0x0f00 | *pc++;
+		opcode = EMU86_OPCODE_BASE0f | *pc++;
 		break;
 
 		/* Prefix bytes */
@@ -220,7 +220,7 @@ next_byte:
 		if (!EMU86_F_IS64(*pflags))
 			break;
 #endif /* CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT */
-		*pflags |= EMU86_F_HASREX | ((result & 0xf) << EMU86_F_REXSHFT);
+		*pflags |= EMU86_F_HASREX | ((opcode & 0xf) << EMU86_F_REXSHFT);
 		goto next_byte;
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
 
@@ -267,18 +267,18 @@ next_byte:
 		goto next_byte;
 
 	case 0x0f:
-		result <<= 8;
-		result |= *pc++;
-		if (result == 0x0f38 || result == 0x0f3a) {
-			result <<= 8;
-			result |= *pc++;
+		opcode = EMU86_OPCODE_BASE0f | *pc++;
+		if (opcode == (EMU86_OPCODE_BASE0f | 0x38)) {
+			opcode = EMU86_OPCODE_BASE0f38 | *pc++;
+		} else if (opcode == (EMU86_OPCODE_BASE0f | 0x3a)) {
+			opcode = EMU86_OPCODE_BASE0f3a | *pc++;
 		}
 		break;
 
 	default: break;
 	}
 done:
-	*popcode = result;
+	*popcode = opcode;
 	return pc;
 }
 
