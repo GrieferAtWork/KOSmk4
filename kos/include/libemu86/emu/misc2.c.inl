@@ -43,12 +43,12 @@ case EMU86_OPCODE_ENCODE(0x0fae): {
        EMU86_EMULATE_CONFIG_WANT_WRFSBASE || EMU86_EMULATE_CONFIG_WANT_WRGSBASE) && \
       (CONFIG_LIBEMU86_WANT_64BIT || EMU86_EMULATE_CONFIG_FSGSBASE_32BIT)))
 		/* Need a register operand */
-		if (!EMU86_MODRM_ISREG(modrm.mi_type))
+		if unlikely(!EMU86_MODRM_ISREG(modrm.mi_type))
 			goto return_expected_register_modrm_rmreg;
 #define NEED_return_expected_register_modrm_rmreg
 		/* Need 64-bit mode, or the 32-bit support extension */
 #if !EMU86_EMULATE_CONFIG_FSGSBASE_32BIT
-		if (!EMU86_F_IS64(op_flags))
+		if unlikely(!EMU86_F_IS64(op_flags))
 			goto return_unsupported_instruction_rmreg;
 #define NEED_return_unsupported_instruction_rmreg
 #endif /* !EMU86_EMULATE_CONFIG_FSGSBASE_32BIT */
@@ -101,14 +101,24 @@ case EMU86_OPCODE_ENCODE(0x0fae): {
 			EMU86_UREG_TYPE value;
 			IF_64BIT(if (IS_64BIT()) {
 				value = MODRM_GETRMREGQ();
+				EMU86_VALIDATE_CANONICAL(value);
 			} else) {
 				value = MODRM_GETRMREGL();
 			}
 			EMU86_SETFSBASE(value);
 			goto done;
 		}
-#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+#elif (EMU86_EMULATE_CONFIG_CHECKERROR && \
+       (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC || \
+        (CONFIG_LIBEMU86_WANT_64BIT && !defined(EMU86_VALIDATE_CANONICAL_IS_NOOP))))
 		case 2:
+#ifndef EMU86_VALIDATE_CANONICAL_IS_NOOP
+			IF_64BIT(if (IS_64BIT()) {
+				EMU86_UREG_TYPE value;
+				value = MODRM_GETRMREGQ();
+				EMU86_VALIDATE_CANONICAL(value);
+			})
+#endif /* !EMU86_VALIDATE_CANONICAL_IS_NOOP */
 			goto return_unsupported_instruction_rmreg;
 #define NEED_return_unsupported_instruction_rmreg
 #endif /* ... */
@@ -120,14 +130,24 @@ case EMU86_OPCODE_ENCODE(0x0fae): {
 			EMU86_UREG_TYPE value;
 			IF_64BIT(if (IS_64BIT()) {
 				value = MODRM_GETRMREGQ();
+				EMU86_VALIDATE_CANONICAL(value);
 			} else) {
 				value = MODRM_GETRMREGL();
 			}
 			EMU86_SETGSBASE(value);
 			goto done;
 		}
-#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+#elif (EMU86_EMULATE_CONFIG_CHECKERROR && \
+       (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC || \
+        (CONFIG_LIBEMU86_WANT_64BIT && !defined(EMU86_VALIDATE_CANONICAL_IS_NOOP))))
 		case 3:
+#ifndef EMU86_VALIDATE_CANONICAL_IS_NOOP
+			IF_64BIT(if (IS_64BIT()) {
+				EMU86_UREG_TYPE value;
+				value = MODRM_GETRMREGQ();
+				EMU86_VALIDATE_CANONICAL(value);
+			})
+#endif /* !EMU86_VALIDATE_CANONICAL_IS_NOOP */
 			goto return_unsupported_instruction_rmreg;
 #define NEED_return_unsupported_instruction_rmreg
 #endif /* ... */
@@ -139,20 +159,21 @@ case EMU86_OPCODE_ENCODE(0x0fae): {
 	} else {
 		switch (modrm.mi_reg) {
 
-//XXX:	I(0xae, IF_MODRM|IF_RMM|IF_REG0,               "fxsave\t" OP_MEM),
-//XXX:	I(0xae, IF_MODRM|IF_REXW|IF_RMM|IF_REG0,       "fxsave64\t" OP_MEM),
-//XXX:	I(0xae, IF_MODRM|IF_RMM|IF_REG1,               "fxrstor\t" OP_MEM),
-//XXX:	I(0xae, IF_MODRM|IF_REXW|IF_RMM|IF_REG1,       "fxrstor64\t" OP_MEM),
-//XXX:	I(0xae, IF_VEX|IF_MODRM|IF_RMM|IF_REG2, OP_VEX_B0(0,1,0,0) "vldmxcsr\t" OP_MEM),
-//XXX:	I(0xae, IF_MODRM|IF_RMM|IF_REG2,               "ldmxcsr\t" OP_MEM),
-//XXX:	I(0xae, IF_VEX|IF_MODRM|IF_RMM|IF_REG3, OP_VEX_B0(0,1,0,0) "vstmxcsr\t" OP_MEM),
-//XXX:	I(0xae, IF_MODRM|IF_RMM|IF_REG3,               "stmxcsr\t" OP_MEM),
-//XXX:	I(0xae, IF_MODRM|IF_RMM|IF_REG4,               "xsave\t" OP_MEM),
-//XXX:	I(0xae, IF_MODRM|IF_REXW|IF_RMM|IF_REG4,       "xsave64\t" OP_MEM),
-//XXX:	I(0xae, IF_MODRM|IF_RMM|IF_REG5,               "xrstor\t" OP_MEM),
-//XXX:	I(0xae, IF_MODRM|IF_REXW|IF_RMM|IF_REG5,       "xrstor64\t" OP_MEM),
-//XXX:	I(0xae, IF_MODRM|IF_RMM|IF_REG6,               "xsaveopt\t" OP_MEM),
-//XXX:	I(0xae, IF_MODRM|IF_REXW|IF_RMM|IF_REG6,       "xsaveopt64\t" OP_MEM),
+//TODO:	I(0xae, IF_MODRM|IF_RMM|IF_REG0,               "fxsave\t" OP_MEM),
+//TODO:	I(0xae, IF_MODRM|IF_REXW|IF_RMM|IF_REG0,       "fxsave64\t" OP_MEM),
+//TODO:	I(0xae, IF_MODRM|IF_RMM|IF_REG1,               "fxrstor\t" OP_MEM),
+//TODO:	I(0xae, IF_MODRM|IF_REXW|IF_RMM|IF_REG1,       "fxrstor64\t" OP_MEM),
+//TODO:	I(0xae, IF_VEX|IF_MODRM|IF_RMM|IF_REG2, OP_VEX_B0(0,1,0,0) "vldmxcsr\t" OP_MEM),
+//TODO:	I(0xae, IF_MODRM|IF_RMM|IF_REG2,               "ldmxcsr\t" OP_MEM),
+//TODO:	I(0xae, IF_VEX|IF_MODRM|IF_RMM|IF_REG3, OP_VEX_B0(0,1,0,0) "vstmxcsr\t" OP_MEM),
+//TODO:	I(0xae, IF_MODRM|IF_RMM|IF_REG3,               "stmxcsr\t" OP_MEM),
+//TODO:	I(0xae, IF_MODRM|IF_RMM|IF_REG4,               "xsave\t" OP_MEM),
+//TODO:	I(0xae, IF_MODRM|IF_REXW|IF_RMM|IF_REG4,       "xsave64\t" OP_MEM),
+//TODO:	I(0xae, IF_MODRM|IF_RMM|IF_REG5,               "xrstor\t" OP_MEM),
+//TODO:	I(0xae, IF_MODRM|IF_REXW|IF_RMM|IF_REG5,       "xrstor64\t" OP_MEM),
+//TODO:	I(0xae, IF_MODRM|IF_RMM|IF_REG6,               "xsaveopt\t" OP_MEM),
+//TODO:	I(0xae, IF_MODRM|IF_REXW|IF_RMM|IF_REG6,       "xsaveopt64\t" OP_MEM),
+
 
 #if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_LFENCE
 		case 5: {

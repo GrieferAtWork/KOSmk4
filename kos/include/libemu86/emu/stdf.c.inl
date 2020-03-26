@@ -27,18 +27,30 @@ EMU86_INTELLISENSE_BEGIN(stdf) {
 
 	/* Instructions that modify the EFLAGS.DF (direction) bit. */
 
+#if EMU86_EMULATE_CONFIG_WANT_CLD
 case EMU86_OPCODE_ENCODE(0xfc): {
 	/* FC     CLD     Clear DF flag. */
 	EMU86_MSKFLAGS(~EFLAGS_DF, 0);
 	goto done;
 }
+#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+case EMU86_OPCODE_ENCODE(0xfc):
+	goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* ... */
 
 
+#if EMU86_EMULATE_CONFIG_WANT_STD
 case EMU86_OPCODE_ENCODE(0xfd): {
 	/* FD     STD     Set DF flag. */
 	EMU86_MSKFLAGS(~EFLAGS_DF, EFLAGS_DF);
 	goto done;
 }
+#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+case EMU86_OPCODE_ENCODE(0xfd):
+	goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* ... */
 
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 

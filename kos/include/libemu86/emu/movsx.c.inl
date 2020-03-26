@@ -24,6 +24,7 @@
 EMU86_INTELLISENSE_BEGIN(movsx) {
 
 
+#if EMU86_EMULATE_CONFIG_WANT_MOVSX
 case EMU86_OPCODE_ENCODE(0x0fbe): {
 	s8 value;
 	/*         0F B6 /r     MOVSX r16, r/m8     Move byte to word with sign-extension.
@@ -40,8 +41,14 @@ case EMU86_OPCODE_ENCODE(0x0fbe): {
 	}
 	goto done;
 }
+#elif EMU86_EMULATE_CONFIG_CHECKERROR
+case EMU86_OPCODE_ENCODE(0x0fbe):
+	goto notsup_modrm_getb;
+#define NEED_notsup_modrm_getb
+#endif /* ... */
 
 
+#if EMU86_EMULATE_CONFIG_WANT_MOVSX
 case EMU86_OPCODE_ENCODE(0x0fbf): {
 	s16 value;
 	/*         0F B7 /r     MOVSX r32, r/m16    Move word to doubleword, sign-extension.
@@ -55,6 +62,11 @@ case EMU86_OPCODE_ENCODE(0x0fbf): {
 	}
 	goto done;
 }
+#elif EMU86_EMULATE_CONFIG_CHECKERROR
+case EMU86_OPCODE_ENCODE(0x0fbf):
+	goto notsup_modrm_getw;
+#define NEED_notsup_modrm_getw
+#endif /* ... */
 
 
 }

@@ -39,6 +39,7 @@ case EMU86_OPCODE_ENCODE(0xac): {
 	EMU86_SETAL(value);
 	if (op_flags & EMU86_F_REP)
 		goto done_dont_set_pc;
+#define NEED_done_dont_set_pc
 	goto done;
 #else /* EMU86_EMULATE_CONFIG_WANT_LODS */
 	goto notsup_lodsb;
@@ -77,6 +78,7 @@ case EMU86_OPCODE_ENCODE(0xad): {
 	}
 	if (op_flags & EMU86_F_REP)
 		goto done_dont_set_pc;
+#define NEED_done_dont_set_pc
 	goto done;
 #else /* EMU86_EMULATE_CONFIG_WANT_LODS */
 	goto notsup_lodswlq;

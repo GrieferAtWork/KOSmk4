@@ -21,54 +21,42 @@
 #include "../emulate.c.inl"
 #endif /* __INTELLISENSE__ */
 
-EMU86_INTELLISENSE_BEGIN(stcf) {
+#include "push-pop-util.h"
 
-#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
+EMU86_INTELLISENSE_BEGIN(push_imm) {
 
-	/* Instructions that modify the EFLAGS.CF (carry) bit. */
 
-#if EMU86_EMULATE_CONFIG_WANT_CMC
-case EMU86_OPCODE_ENCODE(0xf5): {
-	/* F5     CMC     Complement CF flag. */
-	u32 flags;
-	flags = EMU86_GETFLAGS();
-	flags ^= EFLAGS_CF;
-	EMU86_SETFLAGS(flags);
+#if EMU86_EMULATE_CONFIG_WANT_PUSH_IMM
+{
+	EMU86_UREG_TYPE imm;
+case EMU86_OPCODE_ENCODE(0x6a):
+	imm = (EMU86_UREG_TYPE)(EMU86_SREG_TYPE)*(s8 *)pc;
+	pc += 1;
+	goto do_push_imm;
+case EMU86_OPCODE_ENCODE(0x68):
+	/* 6A ib     PUSH imm8      Push imm8.
+	 * 68 iw     PUSH imm16     Push imm16.
+	 * 68 id     PUSH imm32     Push imm32. */
+	if (IS_16BIT()) {
+		imm = (EMU86_UREG_TYPE)(EMU86_SREG_TYPE)(s16)UNALIGNED_GET16((u16 *)pc);
+		pc += 2;
+	} else {
+		imm = (EMU86_UREG_TYPE)(EMU86_SREG_TYPE)(s32)UNALIGNED_GET32((u32 *)pc);
+		pc += 4;
+	}
+do_push_imm:
+	EMU86_PUSH163264((u16)imm,
+	                 (u32)imm,
+	                 (u64)imm);
 	goto done;
 }
-#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
-case EMU86_OPCODE_ENCODE(0xf5):
-	goto return_unsupported_instruction;
-#define NEED_return_unsupported_instruction
+#elif EMU86_EMULATE_CONFIG_CHECKERROR
+case EMU86_OPCODE_ENCODE(0x6a):
+case EMU86_OPCODE_ENCODE(0x68):
+	goto notsup_pushwlq;
+#define NEED_notsup_pushwlq
 #endif /* ... */
 
-
-#if EMU86_EMULATE_CONFIG_WANT_CLC
-case EMU86_OPCODE_ENCODE(0xf8): {
-	/* F8     CLC     Clear CF flag. */
-	EMU86_MSKFLAGS(~EFLAGS_CF, 0);
-	goto done;
-}
-#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
-case EMU86_OPCODE_ENCODE(0xf8):
-	goto return_unsupported_instruction;
-#define NEED_return_unsupported_instruction
-#endif /* ... */
-
-
-#if EMU86_EMULATE_CONFIG_WANT_STC
-case EMU86_OPCODE_ENCODE(0xf9): {
-	/* F9     STC     Set CF flag. */
-	EMU86_MSKFLAGS(~EFLAGS_CF, EFLAGS_CF);
-	goto done;
-}
-#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
-case EMU86_OPCODE_ENCODE(0xf9):
-	goto return_unsupported_instruction;
-#define NEED_return_unsupported_instruction
-#endif /* ... */
-
-#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 
 }
 EMU86_INTELLISENSE_END

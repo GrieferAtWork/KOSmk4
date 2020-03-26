@@ -26,6 +26,7 @@
 EMU86_INTELLISENSE_BEGIN(stos) {
 
 
+#if EMU86_EMULATE_CONFIG_WANT_STOS
 case EMU86_OPCODE_ENCODE(0xaa): {
 	/* AA     STOSB     For legacy mode, store AL at address ES:(E)DI;
 	 *                  For 64-bit mode store AL at address RDI or EDI. */
@@ -36,10 +37,17 @@ case EMU86_OPCODE_ENCODE(0xaa): {
 	                           op_flags & EMU86_F_REP);
 	if (op_flags & EMU86_F_REP)
 		goto done_dont_set_pc;
+#define NEED_done_dont_set_pc
 	goto done;
 }
+#elif EMU86_EMULATE_CONFIG_CHECKERROR
+case EMU86_OPCODE_ENCODE(0xaa):
+	goto notsup_stosb;
+#define NEED_notsup_stosb
+#endif /* ... */
 
 
+#if EMU86_EMULATE_CONFIG_WANT_STOS
 case EMU86_OPCODE_ENCODE(0xab): {
 	/*         AB     STOSW     For legacy mode, store AX at address ES:(E)DI;
 	 *                          For 64-bit mode store AX at address RDI or EDI.
@@ -67,8 +75,14 @@ case EMU86_OPCODE_ENCODE(0xab): {
 	}
 	if (op_flags & EMU86_F_REP)
 		goto done_dont_set_pc;
+#define NEED_done_dont_set_pc
 	goto done;
 }
+#elif EMU86_EMULATE_CONFIG_CHECKERROR
+case EMU86_OPCODE_ENCODE(0xab):
+	goto notsup_stoswlq;
+#define NEED_notsup_stoswlq
+#endif /* ... */
 
 
 }

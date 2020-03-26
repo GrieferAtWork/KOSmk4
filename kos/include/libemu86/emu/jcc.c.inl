@@ -25,7 +25,8 @@ EMU86_INTELLISENSE_BEGIN(jcc) {
 
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 
-#if EMU86_EMULATE_CONFIG_WANT_JCC8
+#if EMU86_EMULATE_CONFIG_WANT_JCC_DISP8
+#define NEED_done_dont_set_pc
 #define DEFINE_Jcc8(id, cond)                              \
 	case EMU86_OPCODE_ENCODE(0x70 + id): {                 \
 		s8 offset;                                         \
@@ -53,7 +54,8 @@ EMU86_INTELLISENSE_BEGIN(jcc) {
 #define DEFINE_Jcc8(id, cond) /* nothing */
 #endif /* !... */
 
-#if EMU86_EMULATE_CONFIG_WANT_JCC32
+#if EMU86_EMULATE_CONFIG_WANT_JCC_DISP32
+#define NEED_done_dont_set_pc
 #define DEFINE_Jcc32(id, cond)                             \
 	case EMU86_OPCODE_ENCODE(0x0f80 + id): {               \
 		s32 offset;                                        \
@@ -251,6 +253,7 @@ case EMU86_OPCODE_ENCODE(0xe3): {
 		EMU86_SETIPREG(dest_ip);
 	}
 	goto done_dont_set_pc;
+#define NEED_done_dont_set_pc
 }
 #elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
 case EMU86_OPCODE_ENCODE(0xe3):

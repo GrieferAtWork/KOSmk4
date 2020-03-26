@@ -24,7 +24,7 @@
 EMU86_INTELLISENSE_BEGIN(mov) {
 
 
-#if EMU86_EMULATE_CONFIG_WANT_MOVRM
+#if EMU86_EMULATE_CONFIG_WANT_MOV_RM
 case EMU86_OPCODE_ENCODE(0x88): {
 	/* 88 /r      MOV r/m8,r8      Move r8 to r/m8 */
 	u8 value;
@@ -40,7 +40,7 @@ case EMU86_OPCODE_ENCODE(0x88):
 #endif /* ... */
 
 
-#if EMU86_EMULATE_CONFIG_WANT_MOVRM
+#if EMU86_EMULATE_CONFIG_WANT_MOV_RM
 case EMU86_OPCODE_ENCODE(0x89): {
 	/* 89 /r      MOV r/m16,r16      Move r16 to r/m16 */
 	/* 89 /r      MOV r/m32,r32      Move r32 to r/m32 */
@@ -68,7 +68,7 @@ case EMU86_OPCODE_ENCODE(0x89):
 #endif /* ... */
 
 
-#if EMU86_EMULATE_CONFIG_WANT_MOVRM
+#if EMU86_EMULATE_CONFIG_WANT_MOV_RM
 case EMU86_OPCODE_ENCODE(0x8a): {
 	/* 8A /r      MOV r8,r/m8      Move r/m8 to r8 */
 	u8 value;
@@ -84,7 +84,7 @@ case EMU86_OPCODE_ENCODE(0x8a):
 #endif /* ... */
 
 
-#if EMU86_EMULATE_CONFIG_WANT_MOVRM
+#if EMU86_EMULATE_CONFIG_WANT_MOV_RM
 case EMU86_OPCODE_ENCODE(0x8b): {
 	/* 8b /r      MOV r16,r/m16      Move r/m16 to r16 */
 	/* 8b /r      MOV r32,r/m32      Move r/m32 to r32 */

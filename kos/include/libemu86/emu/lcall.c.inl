@@ -100,6 +100,7 @@ case EMU86_OPCODE_ENCODE(0x9a): {
 	goto return_unsupported_instruction;
 #endif /* !CONFIG_LIBEMU86_WANT_16BIT && !CONFIG_LIBEMU86_WANT_32BIT */
 	goto done_dont_set_pc;
+#define NEED_done_dont_set_pc
 }
 #endif /* ... */
 

@@ -44,8 +44,11 @@
 #include <kernel/debugtrap.h>
 #include <kernel/except.h>
 #include <kernel/gdt.h>
+#include <kernel/printk.h>
+#include <kernel/syscall.h>
 #include <kernel/user.h>
 #include <sched/except-handler.h>
+#include <sched/pid.h>
 #include <sched/rpc.h>
 #include <sched/task.h>
 
@@ -67,6 +70,7 @@ DECL_BEGIN
 #define BAD_USAGE_REASON_UD  0x0600
 #define BAD_USAGE_REASON_SS  0x0c00
 #define BAD_USAGE_REASON_GFP 0x0d00
+#define BAD_USAGE_INTNO(usage)  (((usage) & 0xff00) >> 8)
 #define BAD_USAGE_REASON(usage) ((usage) & 0xff00)
 #define BAD_USAGE_ECODE(usage)  ((usage) & 0x00ff)
 
@@ -86,10 +90,10 @@ x86_handle_bad_usage(struct icpustate *__restrict state, u16 usage);
 /* Configure for which instructions emulation should be attempted.
  * Any instruction enabled here will be emulated if not supported natively! */
 
-#define EMU86_EMULATE_CONFIG_WANT_ADCX          1 /* Emulate non-standard instruction */
-#define EMU86_EMULATE_CONFIG_WANT_ADOX          1 /* Emulate non-standard instruction */
-#define EMU86_EMULATE_CONFIG_WANT_MULX          1 /* Emulate non-standard instruction */
-#define EMU86_EMULATE_CONFIG_WANT_ANDN          1 /* Emulate non-standard instruction */
+#define EMU86_EMULATE_CONFIG_WANT_ADCX          1 /* Emulate non-standard instructions */
+#define EMU86_EMULATE_CONFIG_WANT_ADOX          1 /* Emulate non-standard instructions */
+#define EMU86_EMULATE_CONFIG_WANT_MULX          1 /* Emulate non-standard instructions */
+#define EMU86_EMULATE_CONFIG_WANT_ANDN          1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_ARITH         0
 #define EMU86_EMULATE_CONFIG_WANT_ARITH2        0
 #define EMU86_EMULATE_CONFIG_WANT_DAA           0
@@ -98,26 +102,26 @@ x86_handle_bad_usage(struct icpustate *__restrict state, u16 usage);
 #define EMU86_EMULATE_CONFIG_WANT_AAS           0
 #define EMU86_EMULATE_CONFIG_WANT_AAM           0
 #define EMU86_EMULATE_CONFIG_WANT_AAD           0
-#define EMU86_EMULATE_CONFIG_WANT_TZCNT         1 /* Emulate non-standard instruction */
+#define EMU86_EMULATE_CONFIG_WANT_TZCNT         1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_BSF           0
-#define EMU86_EMULATE_CONFIG_WANT_LZCNT         1 /* Emulate non-standard instruction */
+#define EMU86_EMULATE_CONFIG_WANT_LZCNT         1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_BSR           0
 #define EMU86_EMULATE_CONFIG_WANT_BITTEST       0
-#define EMU86_EMULATE_CONFIG_WANT_BLSR          1 /* Emulate non-standard instruction */
-#define EMU86_EMULATE_CONFIG_WANT_BLSMSK        1 /* Emulate non-standard instruction */
-#define EMU86_EMULATE_CONFIG_WANT_BLSI          1 /* Emulate non-standard instruction */
+#define EMU86_EMULATE_CONFIG_WANT_BLSR          1 /* Emulate non-standard instructions */
+#define EMU86_EMULATE_CONFIG_WANT_BLSMSK        1 /* Emulate non-standard instructions */
+#define EMU86_EMULATE_CONFIG_WANT_BLSI          1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_BOUND         0
-#define EMU86_EMULATE_CONFIG_WANT_BSWAP         0
+#define EMU86_EMULATE_CONFIG_WANT_BSWAP         (!CONFIG_LIBEMU86_WANT_64BIT) /* Only available on 486+ (emulate in 32-bit mode) */
 #define EMU86_EMULATE_CONFIG_WANT_CALL          0
 #define EMU86_EMULATE_CONFIG_WANT_CBW           0
 #define EMU86_EMULATE_CONFIG_WANT_CWD           0
-#define EMU86_EMULATE_CONFIG_WANT_SETCC         (!CONFIG_LIBEMU86_WANT_64BIT) /* Only emulate in 32-bit kernels */
-#define EMU86_EMULATE_CONFIG_WANT_CMOVCC        (!CONFIG_LIBEMU86_WANT_64BIT) /* Only emulate in 32-bit kernels */
+#define EMU86_EMULATE_CONFIG_WANT_SETCC         (!CONFIG_LIBEMU86_WANT_64BIT) /* Only available on 486+ (emulate in 32-bit mode) */
+#define EMU86_EMULATE_CONFIG_WANT_CMOVCC        (!CONFIG_LIBEMU86_WANT_64BIT) /* Only available on 486+ (emulate in 32-bit mode) */
 #define EMU86_EMULATE_CONFIG_WANT_CMPS          0
 #define EMU86_EMULATE_CONFIG_WANT_CMPXCHG       0 /* TODO: Try to emulate this! */
 #define EMU86_EMULATE_CONFIG_WANT_CMPXCHG8B     0 /* TODO: Try to emulate this! */
 #define EMU86_EMULATE_CONFIG_WANT_CMPXCHG16B    0 /* TODO: Try to emulate this! */
-#define EMU86_EMULATE_CONFIG_WANT_CPUID         (!CONFIG_LIBEMU86_WANT_64BIT) /* Only emulate in 32-bit kernels */
+#define EMU86_EMULATE_CONFIG_WANT_CPUID         (!CONFIG_LIBEMU86_WANT_64BIT) /* Only available on 486+ (emulate in 32-bit mode) */
 #define EMU86_EMULATE_CONFIG_WANT_ENTER         0
 #define EMU86_EMULATE_CONFIG_WANT_INVD          1 /* TODO: Check if this instruction always exists on x86_64 */
 #define EMU86_EMULATE_CONFIG_WANT_WBINVD        1 /* TODO: Check if this instruction always exists on x86_64 */
@@ -128,19 +132,19 @@ x86_handle_bad_usage(struct icpustate *__restrict state, u16 usage);
 #define EMU86_EMULATE_CONFIG_WANT_PREFETCH2     1 /* TODO: Check if this instruction always exists on x86_64 */
 #define EMU86_EMULATE_CONFIG_WANT_CLDEMOTE      1 /* TODO: Check if this instruction always exists on x86_64 */
 #define EMU86_EMULATE_CONFIG_WANT_HLT           0
-#define EMU86_EMULATE_CONFIG_WANT_INCREG        0
-#define EMU86_EMULATE_CONFIG_WANT_DECREG        0
+#define EMU86_EMULATE_CONFIG_WANT_INC_REG       0
+#define EMU86_EMULATE_CONFIG_WANT_DEC_REG       0
 #define EMU86_EMULATE_CONFIG_WANT_INT1          0
 #define EMU86_EMULATE_CONFIG_WANT_INT3          0
 #define EMU86_EMULATE_CONFIG_WANT_INT           0
 #define EMU86_EMULATE_CONFIG_WANT_INTO          0
 #define EMU86_EMULATE_CONFIG_WANT_IO            0
 #define EMU86_EMULATE_CONFIG_WANT_IRET          0 /* TODO: Emulation for vm86 */
-#define EMU86_EMULATE_CONFIG_WANT_JCC8          0
-#define EMU86_EMULATE_CONFIG_WANT_JCC32         0
+#define EMU86_EMULATE_CONFIG_WANT_JCC_DISP8     0
+#define EMU86_EMULATE_CONFIG_WANT_JCC_DISP32    0
 #define EMU86_EMULATE_CONFIG_WANT_JCXZ          0
-#define EMU86_EMULATE_CONFIG_WANT_JMP8          0
-#define EMU86_EMULATE_CONFIG_WANT_JMP32         0
+#define EMU86_EMULATE_CONFIG_WANT_JMP_DISP8     0
+#define EMU86_EMULATE_CONFIG_WANT_JMP_DISP32    0
 #define EMU86_EMULATE_CONFIG_WANT_LCALL         0
 #define EMU86_EMULATE_CONFIG_WANT_LEA           0
 #define EMU86_EMULATE_CONFIG_WANT_LEAVE         0
@@ -151,33 +155,37 @@ x86_handle_bad_usage(struct icpustate *__restrict state, u16 usage);
 #define EMU86_EMULATE_CONFIG_WANT_LOOP          0
 #define EMU86_EMULATE_CONFIG_WANT_LRET          0
 #define EMU86_EMULATE_CONFIG_WANT_LXS           0
-#define EMU86_EMULATE_CONFIG_WANT_INCRM         0
-#define EMU86_EMULATE_CONFIG_WANT_DECRM         0
-#define EMU86_EMULATE_CONFIG_WANT_CALLRM        0
-#define EMU86_EMULATE_CONFIG_WANT_LCALLRM       0
-#define EMU86_EMULATE_CONFIG_WANT_JMPRM         0
-#define EMU86_EMULATE_CONFIG_WANT_LJMPRM        0
-#define EMU86_EMULATE_CONFIG_WANT_PUSHRM        0
-#define EMU86_EMULATE_CONFIG_WANT_RDFSBASE      1 /* Emulate non-standard instruction */
-#define EMU86_EMULATE_CONFIG_WANT_RDGSBASE      1 /* Emulate non-standard instruction */
-#define EMU86_EMULATE_CONFIG_WANT_WRFSBASE      1 /* Emulate non-standard instruction */
-#define EMU86_EMULATE_CONFIG_WANT_WRGSBASE      1 /* Emulate non-standard instruction */
+#define EMU86_EMULATE_CONFIG_WANT_INC_RM        0
+#define EMU86_EMULATE_CONFIG_WANT_DEC_RM        0
+#define EMU86_EMULATE_CONFIG_WANT_CALL_RM       0
+#define EMU86_EMULATE_CONFIG_WANT_LCALL_RM      0
+#define EMU86_EMULATE_CONFIG_WANT_JMP_RM        0
+#define EMU86_EMULATE_CONFIG_WANT_LJMP_RM       0
+#define EMU86_EMULATE_CONFIG_WANT_PUSH_RM       0
+#define EMU86_EMULATE_CONFIG_WANT_RDFSBASE      1 /* Emulate non-standard instructions */
+#define EMU86_EMULATE_CONFIG_WANT_RDGSBASE      1 /* Emulate non-standard instructions */
+#define EMU86_EMULATE_CONFIG_WANT_WRFSBASE      1 /* Emulate non-standard instructions */
+#define EMU86_EMULATE_CONFIG_WANT_WRGSBASE      1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_CLWB          1 /* TODO: Check if this instruction always exists on x86_64 */
 #define EMU86_EMULATE_CONFIG_WANT_CLFLUSH       1 /* TODO: Check if this instruction always exists on x86_64 */
 #define EMU86_EMULATE_CONFIG_WANT_CLFLUSHOPT    1 /* TODO: Check if this instruction always exists on x86_64 */
-#define EMU86_EMULATE_CONFIG_WANT_LFENCE        1 /* Emulate non-standard instruction */
-#define EMU86_EMULATE_CONFIG_WANT_SFENCE        1 /* Emulate non-standard instruction */
-#define EMU86_EMULATE_CONFIG_WANT_MFENCE        1 /* Emulate non-standard instruction */
-#define EMU86_EMULATE_CONFIG_WANT_MOVRM         0
-#define EMU86_EMULATE_CONFIG_WANT_MOVBE         1 /* Emulate non-standard instruction */
-#define EMU86_EMULATE_CONFIG_WANT_MOVIMM        0
-#define EMU86_EMULATE_CONFIG_WANT_MOVMOFFS      0
+#define EMU86_EMULATE_CONFIG_WANT_LFENCE        1 /* Emulate non-standard instructions */
+#define EMU86_EMULATE_CONFIG_WANT_SFENCE        1 /* Emulate non-standard instructions */
+#define EMU86_EMULATE_CONFIG_WANT_MFENCE        1 /* Emulate non-standard instructions */
+#define EMU86_EMULATE_CONFIG_WANT_MOV_RM        0
+#define EMU86_EMULATE_CONFIG_WANT_MOVBE         1 /* Emulate non-standard instructions */
+#define EMU86_EMULATE_CONFIG_WANT_MOV_IMM       0
+#define EMU86_EMULATE_CONFIG_WANT_MOV_MOFFS     0
 #define EMU86_EMULATE_CONFIG_WANT_MOVS          0
-#define EMU86_EMULATE_CONFIG_WANT_MOVSREG       0
-#define EMU86_EMULATE_CONFIG_WANT_SYSCALL       CONFIG_LIBEMU86_WANT_64BIT
-#define EMU86_EMULATE_CONFIG_WANT_SYSRET        0
-#define EMU86_EMULATE_CONFIG_WANT_SYSENTER      1
-#define EMU86_EMULATE_CONFIG_WANT_SYSEXIT       0
+#define EMU86_EMULATE_CONFIG_WANT_MOV_SREG      0
+#define EMU86_EMULATE_CONFIG_WANT_MOVSX         0
+#define EMU86_EMULATE_CONFIG_WANT_MOVSXD        0
+#define EMU86_EMULATE_CONFIG_WANT_MOVZX         0
+#define EMU86_EMULATE_CONFIG_WANT_ARPL          0
+#define EMU86_EMULATE_CONFIG_WANT_NOP_RM         1 /* TODO: Check if this instruction always exists on x86_64 */
+#define EMU86_EMULATE_CONFIG_WANT_PEXT          1 /* Emulate non-standard instructions */
+#define EMU86_EMULATE_CONFIG_WANT_PDEP          1 /* Emulate non-standard instructions */
+#define EMU86_EMULATE_CONFIG_WANT_BZHI          1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_SLDT          0
 #define EMU86_EMULATE_CONFIG_WANT_LLDT          0
 #define EMU86_EMULATE_CONFIG_WANT_STR           0
@@ -190,9 +198,57 @@ x86_handle_bad_usage(struct icpustate *__restrict state, u16 usage);
 #define EMU86_EMULATE_CONFIG_WANT_VERW          0
 #define EMU86_EMULATE_CONFIG_WANT_SMSW          0
 #define EMU86_EMULATE_CONFIG_WANT_LMSW          0
-#define EMU86_EMULATE_CONFIG_WANT_INVLPG        1
+#define EMU86_EMULATE_CONFIG_WANT_INVLPG        (!CONFIG_LIBEMU86_WANT_64BIT) /* Only available on 486+ (emulate in 32-bit mode) */
 #define EMU86_EMULATE_CONFIG_WANT_LAR           0
 #define EMU86_EMULATE_CONFIG_WANT_LSL           0
+#define EMU86_EMULATE_CONFIG_WANT_POPCNT        1 /* Emulate non-standard instructions */
+#define EMU86_EMULATE_CONFIG_WANT_PUSHA         0
+#define EMU86_EMULATE_CONFIG_WANT_POPA          0
+#define EMU86_EMULATE_CONFIG_WANT_PUSHF         0 /* TODO: Emulation for vm86 */
+#define EMU86_EMULATE_CONFIG_WANT_POPF          0 /* TODO: Emulation for vm86 */
+#define EMU86_EMULATE_CONFIG_WANT_PUSH_IMM      0
+#define EMU86_EMULATE_CONFIG_WANT_PUSH_REG      0
+#define EMU86_EMULATE_CONFIG_WANT_POP_REG       0
+#define EMU86_EMULATE_CONFIG_WANT_POP_RM        0
+#define EMU86_EMULATE_CONFIG_WANT_PUSH_ES       0
+#define EMU86_EMULATE_CONFIG_WANT_POP_ES        0
+#define EMU86_EMULATE_CONFIG_WANT_PUSH_CS       0
+#define EMU86_EMULATE_CONFIG_WANT_PUSH_SS       0
+#define EMU86_EMULATE_CONFIG_WANT_POP_SS        0
+#define EMU86_EMULATE_CONFIG_WANT_PUSH_DS       0
+#define EMU86_EMULATE_CONFIG_WANT_POP_DS        0
+#define EMU86_EMULATE_CONFIG_WANT_PUSH_FS       0
+#define EMU86_EMULATE_CONFIG_WANT_POP_FS        0
+#define EMU86_EMULATE_CONFIG_WANT_PUSH_GS       0
+#define EMU86_EMULATE_CONFIG_WANT_POP_GS        0
+#define EMU86_EMULATE_CONFIG_WANT_RET           0
+#define EMU86_EMULATE_CONFIG_WANT_RORX          1 /* Emulate non-standard instructions */
+#define EMU86_EMULATE_CONFIG_WANT_SAHF          0
+#define EMU86_EMULATE_CONFIG_WANT_LAHF          0
+#define EMU86_EMULATE_CONFIG_WANT_SALC          0
+#define EMU86_EMULATE_CONFIG_WANT_SCAS          0
+#define EMU86_EMULATE_CONFIG_WANT_SHIFT         0
+#define EMU86_EMULATE_CONFIG_WANT_SHIFT2        1 /* Emulate non-standard instructions */
+#define EMU86_EMULATE_CONFIG_WANT_BEXTR         1 /* Emulate non-standard instructions */
+#define EMU86_EMULATE_CONFIG_WANT_SHIFTX        1 /* Emulate non-standard instructions */
+#define EMU86_EMULATE_CONFIG_WANT_CMC           0
+#define EMU86_EMULATE_CONFIG_WANT_CLC           0
+#define EMU86_EMULATE_CONFIG_WANT_STC           0
+#define EMU86_EMULATE_CONFIG_WANT_CLD           0
+#define EMU86_EMULATE_CONFIG_WANT_STD           0
+#define EMU86_EMULATE_CONFIG_WANT_CLI           0 /* TODO: Emulation for vm86 */
+#define EMU86_EMULATE_CONFIG_WANT_STI           0 /* TODO: Emulation for vm86 */
+#define EMU86_EMULATE_CONFIG_WANT_STOS          0
+#define EMU86_EMULATE_CONFIG_WANT_SYSCALL       CONFIG_LIBEMU86_WANT_64BIT
+#define EMU86_EMULATE_CONFIG_WANT_SYSRET        0
+#define EMU86_EMULATE_CONFIG_WANT_SYSENTER      1
+#define EMU86_EMULATE_CONFIG_WANT_SYSEXIT       0
+#define EMU86_EMULATE_CONFIG_WANT_XADD          0
+#define EMU86_EMULATE_CONFIG_WANT_XCHG_RM       0
+#define EMU86_EMULATE_CONFIG_WANT_NOP           0
+#define EMU86_EMULATE_CONFIG_WANT_PAUSE         0
+#define EMU86_EMULATE_CONFIG_WANT_XCHG_REG      0
+#define EMU86_EMULATE_CONFIG_WANT_XLATB         0
 
 
 
@@ -227,20 +283,25 @@ loophint(struct icpustate *__restrict state) {
 #undef EMU86_EMULATE_RETURN_AFTER_INTO /* Not needed because we don't emulate the instruction */
 #undef EMU86_EMULATE_THROW_BOUNDERR    /* Not needed because we don't emulate the instruction */
 
+#define EMU86_EMULATE_TRY \
+	TRY
+#define EMU86_EMULATE_EXCEPT     \
+	EXCEPT {                     \
+		complete_except(_state); \
+	}
+
 #define EMU86_EMULATE_TRY_SWITCH \
 	TRY
-#define EMU86_EMULATE_EXCEPT_SWITCH              \
-	EXCEPT {                                     \
-		complete_except(_state, EMU86_OPCODE()); \
+#define EMU86_EMULATE_EXCEPT_SWITCH                               \
+	EXCEPT {                                                      \
+		complete_except_switch(_state, EMU86_OPCODE(), op_flags); \
 	}
+
 /* Fill in missing exception pointer. */
 PRIVATE ATTR_NORETURN NOBLOCK void
-NOTHROW(FCALL complete_except)(struct icpustate *__restrict self, uintptr_t opcode) {
+NOTHROW(FCALL complete_except)(struct icpustate *__restrict self) {
 	error_class_t cls = PERTASK_GET(this_exception_class);
-	if (cls == E_ILLEGAL_INSTRUCTION) {
-		if (!PERTASK_GET(this_exception_pointers[0]))
-			PERTASK_SET(this_exception_pointers[0], opcode);
-	} else if (cls == E_SEGFAULT) {
+	if (cls == E_SEGFAULT) {
 		uintptr_t flags;
 		flags = PERTASK_GET(this_exception_pointers[1]);
 #ifdef __KERNEL__
@@ -258,7 +319,14 @@ NOTHROW(FCALL complete_except)(struct icpustate *__restrict self, uintptr_t opco
 		PERTASK_SET(this_exception_pointers[1], flags);
 	}
 	/* Fill in the fault address. */
-	PERTASK_SET(this_exception_faultaddr, (void *)icpustate_getpc(self));
+	{
+		void const *pc, *next_pc;
+		pc      = (void const *)icpustate_getpc(self);
+		next_pc = instruction_succ(pc);
+		if (next_pc)
+			icpustate_setpc(self, (uintptr_t)next_pc);
+		PERTASK_SET(this_exception_faultaddr, (void *)pc);
+	}
 #if EXCEPT_BACKTRACE_SIZE != 0
 	{
 		unsigned int i;
@@ -269,11 +337,26 @@ NOTHROW(FCALL complete_except)(struct icpustate *__restrict self, uintptr_t opco
 	x86_userexcept_unwind_interrupt(self);
 }
 
+/* Fill in missing exception pointer. */
+PRIVATE ATTR_NORETURN NOBLOCK void
+NOTHROW(FCALL complete_except_switch)(struct icpustate *__restrict self,
+                                      uintptr_t opcode, uintptr_t op_flags) {
+	error_class_t cls = PERTASK_GET(this_exception_class);
+	if (cls == E_ILLEGAL_INSTRUCTION) {
+		if (!PERTASK_GET(this_exception_pointers[0]))
+			PERTASK_SET(this_exception_pointers[0], opcode);
+		if (!PERTASK_GET(this_exception_pointers[1]))
+			PERTASK_SET(this_exception_pointers[1], op_flags);
+	}
+	complete_except(self);
+}
+
 PRIVATE ATTR_NORETURN NONNULL((1)) void FCALL
-throw_exception(struct icpustate *__restrict state,
-                error_code_t code, uintptr_t opcode,
-                uintptr_t ptr1, uintptr_t ptr2,
-                uintptr_t ptr3, uintptr_t ptr4) {
+throw_illegal_instruction_exception(struct icpustate *__restrict state,
+                                    error_code_t code, uintptr_t opcode,
+                                    uintptr_t op_flags, uintptr_t ptr2,
+                                    uintptr_t ptr3, uintptr_t ptr4,
+                                    uintptr_t ptr5) {
 	unsigned int i;
 	void const *pc, *next_pc;
 	pc      = (void const *)icpustate_getpc(state);
@@ -283,45 +366,156 @@ throw_exception(struct icpustate *__restrict state,
 	PERTASK_SET(this_exception_code, code);
 	PERTASK_SET(this_exception_faultaddr, (void *)pc);
 	PERTASK_SET(this_exception_pointers[0], opcode);
-	PERTASK_SET(this_exception_pointers[1], ptr1);
+	PERTASK_SET(this_exception_pointers[1], op_flags);
 	PERTASK_SET(this_exception_pointers[2], ptr2);
 	PERTASK_SET(this_exception_pointers[3], ptr3);
 	PERTASK_SET(this_exception_pointers[4], ptr4);
-	for (i = 5; i < EXCEPTION_DATA_POINTERS; ++i)
+	PERTASK_SET(this_exception_pointers[5], ptr5);
+	for (i = 6; i < EXCEPTION_DATA_POINTERS; ++i)
 		PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_enabled() && (kernel_debugtrap_on & KERNEL_DEBUGTRAP_ON_ILLEGAL_INSTRUCTION))
 		kernel_debugtrap(state, SIGILL);
+#if EXCEPT_BACKTRACE_SIZE != 0
+	for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
+		PERTASK_SET(this_exception_trace[i], (void *)0);
+#endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 	x86_userexcept_unwind_interrupt(state);
+}
+
+PRIVATE ATTR_NORETURN NONNULL((1)) void FCALL
+throw_exception(struct icpustate *__restrict state,
+                error_code_t code, uintptr_t ptr0, uintptr_t ptr1) {
+	unsigned int i;
+	void const *pc, *next_pc;
+	pc      = (void const *)icpustate_getpc(state);
+	next_pc = instruction_succ(pc);
+	if (next_pc)
+		icpustate_setpc(state, (uintptr_t)next_pc);
+	PERTASK_SET(this_exception_code, code);
+	PERTASK_SET(this_exception_faultaddr, (void *)pc);
+	PERTASK_SET(this_exception_pointers[0], ptr0);
+	PERTASK_SET(this_exception_pointers[1], ptr1);
+	for (i = 2; i < EXCEPTION_DATA_POINTERS; ++i)
+		PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
+#if EXCEPT_BACKTRACE_SIZE != 0
+	for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
+		PERTASK_SET(this_exception_trace[i], (void *)0);
+#endif /* EXCEPT_BACKTRACE_SIZE != 0 */
+	x86_userexcept_unwind_interrupt(state);
+}
+
+PRIVATE ATTR_NORETURN NONNULL((1)) void FCALL
+throw_generic_unknown_instruction(struct icpustate *__restrict state,
+                                  u16 usage, uintptr_t opcode,
+                                  emu86_opflags_t op_flags) {
+
+	/* Produce some default exception. */
+	if (BAD_USAGE_REASON(usage) == BAD_USAGE_REASON_UD) {
+		/* #UD simply results in a generic BAD_OPCODE exception! */
+		throw_illegal_instruction_exception(state,
+		                                    ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPCODE),
+		                                    opcode, op_flags, 0, 0, 0, 0);
+	} else {
+		u16 segval;
+		if (BAD_USAGE_REASON(usage) == BAD_USAGE_REASON_SS) {
+			segval = icpustate_getss(state);
+		} else {
+			switch (op_flags & EMU86_F_SEGMASK) {
+			case EMU86_F_SEGFS: segval = icpustate_getfs(state); break;
+			case EMU86_F_SEGGS: segval = icpustate_getgs(state); break;
+#ifndef __x86_64__
+			case EMU86_F_SEGES: segval = icpustate_getes(state); break;
+			case EMU86_F_SEGCS: segval = icpustate_getcs(state); break;
+			case EMU86_F_SEGSS: segval = icpustate_getss(state); break;
+#endif /* !__x86_64__ */
+			default: segval = icpustate_getds(state); break;
+			}
+		}
+		if (!segval && BAD_USAGE_ECODE(usage) == 0) {
+			/* Throw a NULL-segment exception. */
+			throw_illegal_instruction_exception(state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER),
+			                                    opcode, op_flags, E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD,
+			                                    X86_REGISTER_SEGMENT_ES + EMU86_F_SEGREG(op_flags),
+			                                    0, 0);
+		}
+#ifdef __x86_64__
+		/* On x86_64, a #GPF is thrown when attempting to access a non-canonical address.
+		 * However, the kernel expects that the only exception that might be thrown when
+		 * accessing some unchecked pointer is an E_SEGFAULT (or E_WOULDBLOCK when pre-
+		 * emption is currently disabled).
+		 * Emu86 already tried to inspect the source instruction to determine the faulting
+		 * memory address. However there are literally thousands of different X86
+		 * instructions that take a memory operand, and we can only know about so many
+		 * before we run into one that may not even have existed at the time this
+		 * decoder was written.
+		 * So despite the fact that we haven't managed to figure out the faulting memory
+		 * address, simply assume that a 0-error-code is indicative of a instruction that
+		 * tried to access a non-canonical address.
+		 * In this case, we set the first non-canonical address as faulting address.
+		 * Also: we don't know if it was a write that caused the problem, so we just
+		 *       always act like it was an unspecific access to an unmapped page. */
+		if (BAD_USAGE_REASON(usage) == BAD_USAGE_REASON_GFP && BAD_USAGE_ECODE(usage) == 0) {
+			printk(KERN_WARNING "[gpf] Assuming Segmentation fault at ? [pc=%p,opcode=%#Ix,opflags=%#I32x] [tid=%u]\n",
+			       (void *)icpustate_getpc(state), opcode, op_flags, (unsigned int)task_getroottid_s());
+			throw_exception(state,
+			                ERROR_CODEOF(E_SEGFAULT_UNMAPPED),
+			                X86_64_ADDRBUS_NONCANON_MIN,
+			                icpustate_isuser(state) ? E_SEGFAULT_CONTEXT_NONCANON | E_SEGFAULT_CONTEXT_USERCODE
+			                                        : E_SEGFAULT_CONTEXT_NONCANON);
+		}
+#endif /* __x86_64__ */
+		/* If the error originated from user-space, default to assuming it's
+		 * because of some privileged instruction not explicitly handled (maybe
+		 * because we don't know about it, or maybe because of some other reason). */
+		if (icpustate_isuser(state)) {
+			/* #GPF is also thrown when EFLAGS.AC is set, and the caller originates from user-space.
+			 * When EFLAGS.AC is set, we default to throwing an `E_SEGFAULT_UNALIGNED' exception! */
+			if (icpustate_getpflags(state) & EFLAGS_AC) {
+				throw_exception(state,
+				                ERROR_CODEOF(E_SEGFAULT_UNALIGNED), 0,
+				                icpustate_isuser(state) ? E_SEGFAULT_CONTEXT_NONCANON | E_SEGFAULT_CONTEXT_USERCODE
+				                                        : E_SEGFAULT_CONTEXT_NONCANON);
+			}
+			throw_illegal_instruction_exception(state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE),
+			                                    opcode, op_flags, 0, 0, 0, 0);
+		}
+		/* In kernel space, this one's a wee bit more complicated... */
+		throw_illegal_instruction_exception(state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_X86_INTERRUPT),
+		                                    opcode, op_flags, BAD_USAGE_INTNO(usage),
+		                                    BAD_USAGE_ECODE(usage), segval, 0);
+	}
 }
 
 #define _EMU86_GETOPCODE()        EMU86_OPCODE()
 #define _EMU86_GETOPCODE_RMREG()  E_ILLEGAL_INSTRUCTION_X86_OPCODE(EMU86_OPCODE(), modrm.mi_reg)
-#define EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION()           throw_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPCODE), _EMU86_GETOPCODE(), 0, 0, 0, 0)
-#define EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION_RMREG()     throw_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPCODE), _EMU86_GETOPCODE_RMREG(), 0, 0, 0, 0)
-#define EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION()        throw_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE), _EMU86_GETOPCODE(), 0, 0, 0, 0)
-#define EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION_RMREG()  throw_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE), _EMU86_GETOPCODE_RMREG(), 0, 0, 0, 0)
-#define EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM()         throw_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE(), E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE, 0, 0, 0)
-#define EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM_RMREG()   throw_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE_RMREG(), E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE, 0, 0, 0)
-#define EMU86_EMULATE_RETURN_EXPECTED_REGISTER_MODRM()       throw_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE(), E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE, 0, 0, 0)
-#define EMU86_EMULATE_RETURN_EXPECTED_REGISTER_MODRM_RMREG() throw_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE_RMREG(), E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE, 0, 0, 0)
-#define EMU86_EMULATE_RETURN_UNEXPECTED_LOCK()               throw_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE(), op_flags, 0, 0, 0)
-#define EMU86_EMULATE_RETURN_UNEXPECTED_LOCK_RMREG()         throw_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE_RMREG(), op_flags, 0, 0, 0)
-#define EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION()       throw_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE), _EMU86_GETOPCODE(), 0, 0, 0, 0)
-#define EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION_RMREG() throw_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE), _EMU86_GETOPCODE_RMREG(), 0, 0, 0, 0)
-#define EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(how, regno, regval, offset) \
-	throw_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER),            \
-	                _EMU86_GETOPCODE(), how, regno, regval, offset)
-#define EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER_RMREG(how, regno, regval, offset) \
-	throw_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER),                  \
-	                _EMU86_GETOPCODE_RMREG(), how, regno, regval, offset)
+#define EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION()           throw_generic_unknown_instruction(_state, usage, _EMU86_GETOPCODE(), op_flags)
+#define EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION_RMREG()     throw_generic_unknown_instruction(_state, usage, _EMU86_GETOPCODE_RMREG(), op_flags)
+#define EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION()        throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE), _EMU86_GETOPCODE(), op_flags, 0, 0, 0, 0)
+#define EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION_RMREG()  throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE), _EMU86_GETOPCODE_RMREG(), op_flags, 0, 0, 0, 0)
+#define EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM()         throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE(), op_flags, E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE, 0, 0, 0)
+#define EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM_RMREG()   throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE_RMREG(), op_flags, E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE, 0, 0, 0)
+#define EMU86_EMULATE_RETURN_EXPECTED_REGISTER_MODRM()       throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE(), op_flags, E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE, 0, 0, 0)
+#define EMU86_EMULATE_RETURN_EXPECTED_REGISTER_MODRM_RMREG() throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE_RMREG(), op_flags, E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE, 0, 0, 0)
+#define EMU86_EMULATE_RETURN_UNEXPECTED_LOCK()               throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE(), op_flags, 0, 0, 0, 0)
+#define EMU86_EMULATE_RETURN_UNEXPECTED_LOCK_RMREG()         throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE_RMREG(), op_flags, 0, 0, 0, 0)
+#define EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION()       throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE), _EMU86_GETOPCODE(), op_flags, 0, 0, 0, 0)
+#define EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION_RMREG() throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE), _EMU86_GETOPCODE_RMREG(), op_flags, 0, 0, 0, 0)
+#define EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(how, regno, regval, offset)          \
+	throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER), \
+	                                    _EMU86_GETOPCODE(), op_flags, how, regno, regval, offset)
+#define EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER_RMREG(how, regno, regval, offset)    \
+	throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER), \
+	                                    _EMU86_GETOPCODE_RMREG(), op_flags, how, regno, regval, offset)
+
 #define EMU86_EMULATE_GETOPFLAGS() emu86_opflagsof_icpustate(_state)
 #define EMU86_EMULATE_TRANSLATEADDR_IS_NOOP 1
 #define EMU86_EMULATE_TRANSLATEADDR(addr) (addr)
-#define EMU86_GETCR4_UMIP_IS_ZERO 1
-#define EMU86_GETCR4_UMIP() 0 /* TODO: Support me! */
+#define EMU86_GETCR4_UMIP_IS_ZERO 1 /* TODO: Support me! */
+#define EMU86_GETCR4_UMIP() 0       /* TODO: Support me! */
 
 
+/* Tell libemu86 how to emulate certain instructions. */
 #define EMU86_EMULATE_SLDT()                     DONT_USE
 #define EMU86_EMULATE_LLDT(segment_index)        DONT_USE
 #define EMU86_EMULATE_STR()                      DONT_USE
@@ -336,6 +530,38 @@ throw_exception(struct icpustate *__restrict state,
 #define EMU86_EMULATE_INVLPG(addr)               pagedir_syncall()
 #define EMU86_EMULATE_LAR(segment_index, result) DONT_USE
 #define EMU86_EMULATE_LSL(segment_index, result) DONT_USE
+
+#ifdef __x86_64__
+#define NEED_return_unsupported_instruction
+#define EMU86_EMULATE_RETURN_AFTER_SYSCALL()                              \
+	do {                                                                  \
+		if unlikely(icpustate_getcs(_state) != SEGMENT_USER_CODE64_RPL) { \
+			/* Only allowed from 64-bit user-space. */                    \
+			EMU86_SETPCPTR(REAL_START_IP());                              \
+			goto return_unsupported_instruction;                          \
+		}                                                                 \
+		/* syscall emulation */                                           \
+		x86_syscall_emulate64_int80h_r(_state);                           \
+	} __WHILE0
+#define NEED_return_unsupported_instruction
+#define EMU86_EMULATE_RETURN_AFTER_SYSENTER()      \
+	do {                                           \
+		/* Only allowed from 32-bit user-space. */ \
+		if unlikely(!EMU86_F_IS32(op_flags))       \
+			goto return_unsupported_instruction;   \
+		__hybrid_assert(EMU86_ISUSER());           \
+		/* sysenter emulation */                   \
+		x86_syscall_emulate32_sysenter_r(_state);  \
+		__builtin_unreachable();                   \
+	} __WHILE0
+#else /* __x86_64__ */
+#define EMU86_EMULATE_RETURN_AFTER_SYSENTER()      \
+	do {                                           \
+		__hybrid_assert(EMU86_ISUSER());           \
+		x86_syscall_emulate32_sysenter_r(_state);  \
+		__builtin_unreachable();                   \
+	} __WHILE0
+#endif /* !__x86_64__ */
 
 
 #ifdef __x86_64__
@@ -400,31 +626,107 @@ setgsbase(struct icpustate *__restrict state, uintptr_t value) {
 #define EMU86_EMULATE_VM86_SETIF(v)           (void)0
 #define EMU86_EMULATE_RETURN_AFTER_HLT_VM86() /* TODO */
 #define EMU86_ISUSER_NOVM86() icpustate_isuser_novm86(_state)
-#define EMU86_ISVM86() (EMU86_GETFLAGS() & EFLAGS_VM)
+#define EMU86_ISVM86()        icpustate_isvm86(_state)
 #endif /* !__x86_64__ */
 #define EMU86_VALIDATE_READABLE(addr, num_bytes) validate_readable((void const *)(uintptr_t)(addr), num_bytes)
 #define EMU86_VALIDATE_WRITABLE(addr, num_bytes) validate_writable((void *)(uintptr_t)(addr), num_bytes)
 
 
 #ifdef __x86_64__
+
+#define EMU86_EMULATE_VALIDATE_BEFORE_OPCODE_DECODE(pc) \
+	assert_canonical_pc(_state, (void const *)(pc))
 PRIVATE void KCALL
-assert_canonical_address(void *addr, size_t num_bytes,
+assert_canonical_pc(struct icpustate *__restrict state,
+                    void const *pc) {
+	/* Make sure that the program counter is canonical! */
+	if unlikely(ADDR_IS_NONCANON(pc)) {
+		/* Special case: Non-canonical program counter
+		 * Just like with #PF for `%cr2 == %rip', handle this case by trying to
+		 * restore the original RIP-value from `0(%rsp)', assuming that the RIP
+		 * register ended up getting corrupted due to a bad `call', rather than
+		 * a bad `jmp' */
+		uintptr_t callsite_pc;
+		uintptr_t sp = icpustate_getsp(state);
+		bool is_compat;
+		unsigned int i;
+		callsite_pc = (uintptr_t)pc;
+		if (sp >= KERNELSPACE_BASE && icpustate_isuser(state))
+			goto set_noncanon_pc_exception;
+		is_compat = icpustate_is32bit(state);
+		if (is_compat) {
+			callsite_pc = (uintptr_t)*(u32 *)sp;
+		} else {
+			callsite_pc = *(uintptr_t *)sp;
+		}
+		/* Verify the call-site program counter. */
+		if (icpustate_isuser(state) ? (callsite_pc >= USERSPACE_END)
+		                            : (callsite_pc < KERNELSPACE_BASE)) {
+			callsite_pc = (uintptr_t)pc;
+			goto set_noncanon_pc_exception;
+		}
+		icpustate_setpc(state, callsite_pc);
+		icpustate_setsp(state, is_compat ? sp + 4 : sp + 8);
+		{
+			void const *call_instr;
+			call_instr = instruction_pred((void *)callsite_pc);
+			if likely(call_instr)
+				callsite_pc = (uintptr_t)call_instr;
+		}
+set_noncanon_pc_exception:
+		PERTASK_SET(this_exception_faultaddr, (void *)callsite_pc);
+		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_NOTEXECUTABLE));
+		PERTASK_SET(this_exception_pointers[0], (uintptr_t)pc);
+		PERTASK_SET(this_exception_pointers[1],
+		            (uintptr_t)(E_SEGFAULT_CONTEXT_USERCODE |
+		                        E_SEGFAULT_CONTEXT_NONCANON));
+		if (!icpustate_isuser(state))
+			PERTASK_SET(this_exception_pointers[1], (uintptr_t)E_SEGFAULT_CONTEXT_NONCANON);
+		for (i = 2; i < EXCEPTION_DATA_POINTERS; ++i)
+			PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
+		icpustate_setpc(state, callsite_pc);
+#if EXCEPT_BACKTRACE_SIZE != 0
+		for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
+			PERTASK_SET(this_exception_trace[i], (void *)0);
+#endif /* EXCEPT_BACKTRACE_SIZE != 0 */
+		printk(KERN_DEBUG "[segfault] PC-Fault at %p [pc=%p] [#GPF] [tid=%u]\n",
+		       pc, callsite_pc, (unsigned int)task_getroottid_s());
+		x86_userexcept_unwind_interrupt(state);
+	}
+}
+
+#undef EMU86_UNSUPPORTED_MEMACCESS_IS_NOOP
+#define EMU86_UNSUPPORTED_MEMACCESS(addr, num_bytes, reading, writing) \
+	assert_canonical_address(_state, addr, num_bytes, reading, writing)
+PRIVATE void KCALL
+assert_canonical_address(struct icpustate *__restrict state,
+                         void *addr, size_t num_bytes,
                          bool reading, bool writing) {
 	(void)reading;
-	if (ADDR_IS_NONCANON((byte_t *)addr) ||
-	    ADDR_IS_NONCANON((byte_t *)addr + num_bytes - 1)) {
+	if unlikely(ADDR_IS_NONCANON((byte_t *)addr) ||
+	            ADDR_IS_NONCANON((byte_t *)addr + num_bytes - 1)) {
+		printk(KERN_DEBUG "[segfault] Fault at %p [pc=%p] [#GPF] [tid=%u]\n",
+		       addr, icpustate_getpc(state), (unsigned int)task_getroottid_s());
 		THROW(E_SEGFAULT_UNMAPPED,
 		      addr,
 		      writing ? E_SEGFAULT_CONTEXT_NONCANON | E_SEGFAULT_CONTEXT_WRITING
 		              : E_SEGFAULT_CONTEXT_NONCANON);
 	}
 }
-#define EMU86_UNSUPPORTED_MEMACCESS(addr, num_bytes, reading, writing) \
-	assert_canonical_address(addr, num_bytes, reading, writing)
+
+#define EMU86_EMULATE_THROW_SEGFAULT_UNMAPPED_NONCANON(addr) \
+	THROW(E_SEGFAULT_UNMAPPED, addr, E_SEGFAULT_CONTEXT_NONCANON)
+#undef EMU86_VALIDATE_CANONICAL_IS_NOOP
+#define EMU86_VALIDATE_CANONICAL(addr)                            \
+	do {                                                          \
+		if unlikely(ADDR_IS_NONCANON(addr))                       \
+			EMU86_EMULATE_THROW_SEGFAULT_UNMAPPED_NONCANON(addr); \
+	} __WHILE0
 #else /* __x86_64__ */
 #define EMU86_UNSUPPORTED_MEMACCESS_IS_NOOP 1
 #define EMU86_UNSUPPORTED_MEMACCESS(addr, num_bytes, reading, writing) (void)0
 #endif /* !__x86_64__ */
+
 #define EMU86_GETFLAGS()            icpustate_getpflags(_state)
 #define EMU86_SETFLAGS(v)           icpustate_setpflags(_state, v)
 #define EMU86_MSKFLAGS(mask, value) icpustate_mskpflags(_state, mask, value)

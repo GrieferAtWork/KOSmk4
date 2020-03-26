@@ -69,6 +69,7 @@ do_movs_save_pointer:
 	/* Check for repeat */
 	if (op_flags & EMU86_F_REP)
 		goto done_dont_set_pc;
+#define NEED_done_dont_set_pc
 	goto done;
 #else /* EMU86_EMULATE_CONFIG_WANT_MOVS */
 #define MOVS_N_BYTES() \

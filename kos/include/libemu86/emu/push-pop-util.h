@@ -51,8 +51,28 @@
 		}                                            \
 		EMU86_SETSTACKPTR(sp);                       \
 	} __WHILE0
-#elif EMU86_EMULATE_CONFIG_CHECKERROR && CONFIG_LIBEMU86_WANT_64BIT
+#define EMU86_PUSH1632_NOSUP()                               \
+	do {                                                     \
+		byte_t *sp;                                          \
+		IF_64BIT({                                           \
+			if (EMU86_F_IS64(op_flags))                      \
+				goto return_unsupported_instruction;         \
+		});                                                  \
+		sp = EMU86_GETSTACKPTR();                            \
+		if (IS_16BIT()) {                                    \
+			sp -= 2;                                         \
+			EMU86_EMULATE_PUSH(sp, 2);                       \
+			EMU86_UNSUPPORTED_MEMACCESS(sp, 2, false, true); \
+		} else {                                             \
+			sp -= 4;                                         \
+			EMU86_EMULATE_PUSH(sp, 4);                       \
+			EMU86_UNSUPPORTED_MEMACCESS(sp, 4, false, true); \
+		}                                                    \
+		goto return_unsupported_instruction;                 \
+	} __WHILE0
+#elif EMU86_EMULATE_CONFIG_CHECKERROR
 #define EMU86_PUSH1632(T, value) goto return_unsupported_instruction
+#define EMU86_PUSH1632_NOSUP()   goto return_unsupported_instruction
 #endif
 
 
@@ -83,8 +103,27 @@
 		setter(_value);                              \
 		EMU86_SETSTACKPTR(sp);                       \
 	} __WHILE0
-#elif EMU86_EMULATE_CONFIG_CHECKERROR && CONFIG_LIBEMU86_WANT_64BIT
+#define EMU86_POP1632_NOSUP()                                \
+	do {                                                     \
+		byte_t *sp;                                          \
+		IF_64BIT({                                           \
+			if (EMU86_F_IS64(op_flags))                      \
+				goto return_unsupported_instruction;         \
+		});                                                  \
+		sp = EMU86_GETSTACKPTR();                            \
+		if (IS_16BIT()) {                                    \
+			EMU86_EMULATE_POP(sp, 2);                        \
+			EMU86_UNSUPPORTED_MEMACCESS(sp, 2, true, false); \
+		} else {                                             \
+			EMU86_EMULATE_POP(sp, 4);                        \
+			EMU86_READ_USER_MEMORY(sp, 4);                   \
+			EMU86_UNSUPPORTED_MEMACCESS(sp, 4, true, false); \
+		}                                                    \
+		goto return_unsupported_instruction;                 \
+	} __WHILE0
+#elif EMU86_EMULATE_CONFIG_CHECKERROR
 #define EMU86_POP1632(T, setter) goto return_unsupported_instruction
+#define EMU86_POP1632_NOSUP()    goto return_unsupported_instruction
 #endif
 
 
@@ -171,6 +210,27 @@
 			_value = EMU86_MEMREADL(sp);                               \
 			setter32(_value);                                          \
 			sp += 4;                                                   \
+		})
+
+
+#define EMU86_POP163264_NOSUP()      \
+	do {                             \
+		byte_t *sp;                  \
+		sp = EMU86_GETSTACKPTR();    \
+		EMU86_POP163264_NOSUP_IMPL() \
+	} __WHILE0
+#define EMU86_POP163264_NOSUP_IMPL()                                   \
+		if (IS_16BIT()) {                                              \
+			EMU86_EMULATE_POP(sp, 2);                                  \
+			EMU86_UNSUPPORTED_MEMACCESS(sp, 2, true, false);           \
+		}                                                              \
+		IF_64BIT(else IF_16BIT_OR_32BIT(if (EMU86_F_IS64(op_flags))) { \
+			EMU86_EMULATE_POP(sp, 8);                                  \
+			EMU86_UNSUPPORTED_MEMACCESS(sp, 8, true, false);           \
+		})                                                             \
+		IF_16BIT_OR_32BIT(else {                                       \
+			EMU86_EMULATE_POP(sp, 4);                                  \
+			EMU86_UNSUPPORTED_MEMACCESS(sp, 4, true, false);           \
 		})
 
 

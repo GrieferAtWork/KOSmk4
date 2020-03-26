@@ -22,9 +22,11 @@
 #endif /* __INTELLISENSE__ */
 
 EMU86_INTELLISENSE_BEGIN(shift) {
+
+
+#if EMU86_EMULATE_CONFIG_WANT_SHIFT
 	/* The number of bits by which to shift */
 	u8 num_bits;
-
 
 #define DEFINE_SHIFT_OPERATIONS_MODRM_reg(bwlq, BWLQ, Nbits, Nbytes, msb_bit_set)          \
 	do {                                                                                   \
@@ -283,8 +285,24 @@ case EMU86_OPCODE_ENCODE(0xd1): {
 	goto do_shift163264bit;
 }
 
-
 #undef DEFINE_SHIFT_OPERATIONS_MODRM_reg
+#else /* EMU86_EMULATE_CONFIG_WANT_SHIFT */
+
+#if EMU86_EMULATE_CONFIG_CHECKERROR
+case EMU86_OPCODE_ENCODE(0xd2):
+case EMU86_OPCODE_ENCODE(0xc0):
+case EMU86_OPCODE_ENCODE(0xd0):
+	goto notsup_modrm_getsetb;
+#define NEED_notsup_modrm_getsetb
+
+case EMU86_OPCODE_ENCODE(0xd3):
+case EMU86_OPCODE_ENCODE(0xc1):
+case EMU86_OPCODE_ENCODE(0xd1):
+	goto notsup_modrm_getsetwlq;
+#define NEED_notsup_modrm_getsetwlq
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR */
+
+#endif /* !EMU86_EMULATE_CONFIG_WANT_SHIFT */
 
 }
 EMU86_INTELLISENSE_END

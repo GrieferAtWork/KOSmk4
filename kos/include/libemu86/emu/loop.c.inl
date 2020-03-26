@@ -94,6 +94,7 @@ do_loop:
 		EMU86_SETIPREG(dest_ip);
 	}
 	goto done_dont_set_pc;
+#define NEED_done_dont_set_pc
 }
 #elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
 case EMU86_OPCODE_ENCODE(0xe2):

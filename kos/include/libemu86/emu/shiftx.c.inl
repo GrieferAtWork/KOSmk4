@@ -24,12 +24,14 @@
 EMU86_INTELLISENSE_BEGIN(shiftx) {
 
 
+#if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_BEXTR || EMU86_EMULATE_CONFIG_WANT_SHIFTX
 case EMU86_OPCODE_ENCODE(0x0f38f7): {
 	MODRM_DECODE();
 	if ((op_flags & (EMU86_F_HASVEX | EMU86_F_VEX_LL_M |
 	                 EMU86_F_LOCK)) != EMU86_F_HASVEX)
 		goto return_unknown_instruction;
 	if ((op_flags & (EMU86_F_66 | EMU86_F_f2 | EMU86_F_f3)) == 0) {
+#if EMU86_EMULATE_CONFIG_WANT_BEXTR
 		/* VEX.LZ.0F38.W0 F7 /r     BEXTR r32a, r/m32, r32b     Contiguous bitwise extract from r/m32 using r32b as control; store result in r32a.
 		 * VEX.LZ.0F38.W1 F7 /r     BEXTR r64a, r/m64, r64b     Contiguous bitwise extract from r/m64 using r64b as control; store result in r64a. */
 		u32 eflags_addend = 0;
@@ -76,7 +78,16 @@ bextr_write_dst_0:
 		}
 		EMU86_MSKFLAGS(~(EFLAGS_ZF | EFLAGS_CF | EFLAGS_OF),
 		               eflags_addend);
+		goto done;
+#elif EMU86_EMULATE_CONFIG_CHECKERROR
+		goto notsup_modrm_getz_rex_w_modrm_parsed;
+#define NEED_notsup_modrm_getz_rex_w_modrm_parsed
+#else /* ... */
+		goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* !... */
 	} else {
+#if EMU86_EMULATE_CONFIG_WANT_SHIFTX
 		/* VEX.LZ.66.0F38.W0 F7 /r     SHLX r32a, r/m32, r32b     Shift r/m32 logically left with count specified in r32b.
 		 * VEX.LZ.F2.0F38.W0 F7 /r     SHRX r32a, r/m32, r32b     Shift r/m32 logically right with count specified in r32b.
 		 * VEX.LZ.F3.0F38.W0 F7 /r     SARX r32a, r/m32, r32b     Shift r/m32 arithmetically right with count specified in r32b.
@@ -113,9 +124,18 @@ bextr_write_dst_0:
 			}
 			MODRM_SETREGL(value);
 		}
+		goto done;
+#elif EMU86_EMULATE_CONFIG_CHECKERROR
+		goto notsup_modrm_getz_rex_w_modrm_parsed;
+#define NEED_notsup_modrm_getz_rex_w_modrm_parsed
+#else /* ... */
+		goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif
 	}
-	goto done;
+	break;
 }
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_BEXTR || EMU86_EMULATE_CONFIG_WANT_SHIFTX */
 
 
 }

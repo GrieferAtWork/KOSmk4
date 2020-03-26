@@ -24,24 +24,41 @@
 EMU86_INTELLISENSE_BEGIN(movsxd) {
 
 
+#if (EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_MOVSXD || EMU86_EMULATE_CONFIG_WANT_ARPL)
 case EMU86_OPCODE_ENCODE(0x63): {
 	MODRM_DECODE();
-	IF_16BIT_OR_32BIT(if (EMU86_F_IS64(op_flags))) {
+#if EMU86_EMULATE_CONFIG_WANT_MOVSXD && CONFIG_LIBEMU86_WANT_64BIT
+#if EMU86_EMULATE_CONFIG_WANT_ARPL && (CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT)
+	if (EMU86_F_IS64(op_flags))
+#endif /* EMU86_EMULATE_CONFIG_WANT_ARPL && (CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT) */
+	{
+#if EMU86_EMULATE_CONFIG_WANT_MOVSXD
 		/*         63 /r*       MOVSXD r16, r/m16   Move word to word with sign-extension.
 		 *         63 /r*       MOVSXD r32, r/m32   Move doubleword to doubleword with sign-extension.
 		 * REX.W + 63 /r        MOVSXD r64, r/m32   Move doubleword to quadword with sign-extension. */
-		IF_64BIT(if (IS_64BIT()) {
+		if (IS_64BIT()) {
 			s32 value;
 			value = (s32)MODRM_GETRML();
 			MODRM_SETREGQ((u64)(s64)value);
-		} else) if (!IS_16BIT()) {
+		} else if (!IS_16BIT()) {
 			MODRM_SETREGL(MODRM_GETRML());
 		} else {
 			MODRM_SETREGW(MODRM_GETRMW());
 		}
+		goto done;
+#else /* EMU86_EMULATE_CONFIG_WANT_MOVSXD */
+		MODRM_NOSUP_GETRMZ(IS_64BIT() || !IS_16BIT() ? 4 : 2);
+		goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* !EMU86_EMULATE_CONFIG_WANT_MOVSXD */
 	}
-#if CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT
-	else {
+#endif /* EMU86_EMULATE_CONFIG_WANT_MOVSXD && CONFIG_LIBEMU86_WANT_64BIT */
+#if EMU86_EMULATE_CONFIG_WANT_ARPL && (CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT)
+#if EMU86_EMULATE_CONFIG_WANT_MOVSXD && CONFIG_LIBEMU86_WANT_64BIT
+	else
+#endif /* EMU86_EMULATE_CONFIG_WANT_MOVSXD && CONFIG_LIBEMU86_WANT_64BIT */
+	{
+#if EMU86_EMULATE_CONFIG_WANT_ARPL
 		/* 63 /r     ARPL r/m16, r16     Adjust RPL of r/m16 to not less than RPL of r16. */
 		u16 dst, src;
 		u32 eflags_addend;
@@ -75,10 +92,16 @@ case EMU86_OPCODE_ENCODE(0x63): {
 			}
 		}
 		EMU86_MSKFLAGS(~EFLAGS_ZF, eflags_addend);
+		goto done;
+#else /* EMU86_EMULATE_CONFIG_WANT_ARPL */
+		goto notsup_modrm_getsetw;
+#define NEED_notsup_modrm_getsetw
+#endif /* !EMU86_EMULATE_CONFIG_WANT_ARPL */
 	}
-#endif /* CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT */
-	goto done;
+#endif /* EMU86_EMULATE_CONFIG_WANT_ARPL && (CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT) */
+	break;
 }
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || ... */
 
 
 }

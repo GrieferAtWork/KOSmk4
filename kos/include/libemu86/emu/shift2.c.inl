@@ -23,6 +23,8 @@
 
 /* SSE's 3-operand shift instructions. */
 EMU86_INTELLISENSE_BEGIN(shift2) {
+
+#if EMU86_EMULATE_CONFIG_WANT_SHIFT2
 	/* The number of bits by which to shift */
 	u8 num_bits;
 
@@ -170,8 +172,20 @@ case EMU86_OPCODE_ENCODE(0x0fac): {
 	goto do_shrd;
 }
 
-
 #undef DEFINE_SHRD_MODRM_rm_reg
+#else /* EMU86_EMULATE_CONFIG_WANT_SHIFT2 */
+
+#if EMU86_EMULATE_CONFIG_CHECKERROR
+case EMU86_OPCODE_ENCODE(0x0fa5):
+case EMU86_OPCODE_ENCODE(0x0fa4):
+case EMU86_OPCODE_ENCODE(0x0fad):
+case EMU86_OPCODE_ENCODE(0x0fac):
+	goto notsup_modrm_getsetwlq;
+#define NEED_notsup_modrm_getsetwlq
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR */
+
+#endif /* !EMU86_EMULATE_CONFIG_WANT_SHIFT2 */
+
 
 }
 EMU86_INTELLISENSE_END

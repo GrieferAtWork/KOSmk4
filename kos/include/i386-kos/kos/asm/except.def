@@ -213,6 +213,8 @@ class E_ILLEGAL_INSTRUCTION_BAD_OPCODE: E_ILLEGAL_INSTRUCTION = 0x0001 {
 	@@The opcode that caused the exception
 	@@NOTE: This field should be decoded using `E_ILLEGAL_INSTRUCTION_X86_OPCODE_*'
 	member opcode: uintptr_t;
+	@@Opcode flags (set of `EMU86_F_*')
+	member op_flags: uintptr_t;
 }
 
 [message("Unsupported instruction prefix")]
@@ -231,6 +233,8 @@ class E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE: E_ILLEGAL_INSTRUCTION = 0x0003 {
 	@@The opcode that caused the exception
 	@@NOTE: This field should be decoded using `E_ILLEGAL_INSTRUCTION_X86_OPCODE_*'
 	member opcode: uintptr_t;
+	@@Opcode flags (set of `EMU86_F_*')
+	member op_flags: uintptr_t;
 }
 
 [message("Instruction too long")]
@@ -239,6 +243,8 @@ class E_ILLEGAL_INSTRUCTION_X86_TOO_LONG: E_ILLEGAL_INSTRUCTION = 0x0004 {
 	@@The opcode that caused the exception
 	@@NOTE: This field should be decoded using `E_ILLEGAL_INSTRUCTION_X86_OPCODE_*'
 	member opcode: uintptr_t;
+	@@Opcode flags (set of `EMU86_F_*')
+	member op_flags: uintptr_t;
 }
 
 [message("Privileged instruction")]
@@ -247,6 +253,8 @@ class E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE: E_ILLEGAL_INSTRUCTION = 0x0005 {
 	@@The opcode that caused the exception
 	@@NOTE: This field should be decoded using `E_ILLEGAL_INSTRUCTION_X86_OPCODE_*'
 	member opcode: uintptr_t;
+	@@Opcode flags (set of `EMU86_F_*')
+	member op_flags: uintptr_t;
 }
 
 @@A kernel-space instruction has caused an unhandled #GP or #SS
@@ -254,6 +262,8 @@ class E_ILLEGAL_INSTRUCTION_X86_INTERRUPT: E_ILLEGAL_INSTRUCTION = 0x000f {
 	@@The opcode that caused the exception
 	@@NOTE: This field should be decoded using `E_ILLEGAL_INSTRUCTION_X86_OPCODE_*'
 	member opcode: uintptr_t;
+	@@Opcode flags (set of `EMU86_F_*')
+	member op_flags: uintptr_t;
 	@@The system interrupt that occurred
 	member intno: uintptr_t;
 	@@The error code associated with that interrupt
@@ -268,6 +278,8 @@ class E_ILLEGAL_INSTRUCTION_BAD_OPERAND: E_ILLEGAL_INSTRUCTION = 0x0010 {
 	@@The opcode that caused the exception
 	@@NOTE: This field should be decoded using `E_ILLEGAL_INSTRUCTION_X86_OPCODE_*'
 	member opcode: uintptr_t;
+	@@Opcode flags (set of `EMU86_F_*')
+	member op_flags: uintptr_t;
 	@@For what reason was the operand invalid (One of `E_ILLEGAL_INSTRUCTION_BAD_OPERAND_*')
 	[tostr(select("E_ILLEGAL_INSTRUCTION_BAD_OPERAND_*"))]
 	member what: uintptr_t;
@@ -283,6 +295,8 @@ class E_ILLEGAL_INSTRUCTION_REGISTER: E_ILLEGAL_INSTRUCTION = 0x0011 {
 	@@The opcode that caused the exception
 	@@NOTE: This field should be decoded using `E_ILLEGAL_INSTRUCTION_X86_OPCODE_*'
 	member opcode: uintptr_t;
+	@@Opcode flags (set of `EMU86_F_*')
+	member op_flags: uintptr_t;
 	@@How was the register accessed (One of `E_ILLEGAL_INSTRUCTION_REGISTER_*')
 	[tostr(select("E_ILLEGAL_INSTRUCTION_REGISTER_*"))]
 	member how: uintptr_t;

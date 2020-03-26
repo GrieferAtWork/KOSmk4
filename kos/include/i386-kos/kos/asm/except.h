@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x750c0402 */
+/* HASH CRC-32:0x1ec13291 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -176,7 +176,9 @@
 /* The instruction opcode was not recognized
  * 	@@The opcode that caused the exception
  * 	@@NOTE: This field should be decoded using `E_ILLEGAL_INSTRUCTION_X86_OPCODE_*'
- * 	member opcode: uintptr_t; */
+ * 	member opcode: uintptr_t;
+ * 	@@Opcode flags (set of `EMU86_F_*')
+ * 	member op_flags: uintptr_t; */
 #define E_ILLEGAL_INSTRUCTION_BAD_OPCODE (E_ILLEGAL_INSTRUCTION,0x0001)
 /* An unsupported prefix byte was encountered
  * 	@@The opcode that caused the exception
@@ -188,22 +190,30 @@
 /* The instruction's opcode is not supported by the host (not thrown if the instruction was emulated)
  * 	@@The opcode that caused the exception
  * 	@@NOTE: This field should be decoded using `E_ILLEGAL_INSTRUCTION_X86_OPCODE_*'
- * 	member opcode: uintptr_t; */
+ * 	member opcode: uintptr_t;
+ * 	@@Opcode flags (set of `EMU86_F_*')
+ * 	member op_flags: uintptr_t; */
 #define E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE (E_ILLEGAL_INSTRUCTION,0x0003)
 /* Including all prefixes, the instruction is too long
  * 	@@The opcode that caused the exception
  * 	@@NOTE: This field should be decoded using `E_ILLEGAL_INSTRUCTION_X86_OPCODE_*'
- * 	member opcode: uintptr_t; */
+ * 	member opcode: uintptr_t;
+ * 	@@Opcode flags (set of `EMU86_F_*')
+ * 	member op_flags: uintptr_t; */
 #define E_ILLEGAL_INSTRUCTION_X86_TOO_LONG (E_ILLEGAL_INSTRUCTION,0x0004)
 /* The calling code does not have the necessary privilege to invoke the instruction `opcode'
  * 	@@The opcode that caused the exception
  * 	@@NOTE: This field should be decoded using `E_ILLEGAL_INSTRUCTION_X86_OPCODE_*'
- * 	member opcode: uintptr_t; */
+ * 	member opcode: uintptr_t;
+ * 	@@Opcode flags (set of `EMU86_F_*')
+ * 	member op_flags: uintptr_t; */
 #define E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE (E_ILLEGAL_INSTRUCTION,0x0005)
 /* A kernel-space instruction has caused an unhandled #GP or #SS
  * 	@@The opcode that caused the exception
  * 	@@NOTE: This field should be decoded using `E_ILLEGAL_INSTRUCTION_X86_OPCODE_*'
  * 	member opcode: uintptr_t;
+ * 	@@Opcode flags (set of `EMU86_F_*')
+ * 	member op_flags: uintptr_t;
  * 	@@The system interrupt that occurred
  * 	member intno: uintptr_t;
  * 	@@The error code associated with that interrupt
@@ -215,6 +225,8 @@
  * 	@@The opcode that caused the exception
  * 	@@NOTE: This field should be decoded using `E_ILLEGAL_INSTRUCTION_X86_OPCODE_*'
  * 	member opcode: uintptr_t;
+ * 	@@Opcode flags (set of `EMU86_F_*')
+ * 	member op_flags: uintptr_t;
  * 	@@For what reason was the operand invalid (One of `E_ILLEGAL_INSTRUCTION_BAD_OPERAND_*')
  * 	member what: uintptr_t; */
 #define E_ILLEGAL_INSTRUCTION_BAD_OPERAND (E_ILLEGAL_INSTRUCTION,0x0010)
@@ -224,6 +236,8 @@
  * 	@@The opcode that caused the exception
  * 	@@NOTE: This field should be decoded using `E_ILLEGAL_INSTRUCTION_X86_OPCODE_*'
  * 	member opcode: uintptr_t;
+ * 	@@Opcode flags (set of `EMU86_F_*')
+ * 	member op_flags: uintptr_t;
  * 	@@How was the register accessed (One of `E_ILLEGAL_INSTRUCTION_REGISTER_*')
  * 	member how: uintptr_t;
  * 	@@The accessed register index
@@ -233,7 +247,8 @@
  * 	@@The associated register value (or 0 for read operations)
  * 	member regval: uintptr_t;
  * 	@@An offset applied to the register (set in case of an illegal lcall/ljmp; 0 otherwise)
- * 	member offset: uintptr_t; */
+ * 	member offset: uintptr_t;
+ */
 #define E_ILLEGAL_INSTRUCTION_REGISTER (E_ILLEGAL_INSTRUCTION,0x0011)
 /* Read from invalid register */
 #define E_ILLEGAL_INSTRUCTION_REGISTER_RDINV 0x0001

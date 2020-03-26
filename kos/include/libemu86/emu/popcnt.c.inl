@@ -23,6 +23,7 @@
 
 EMU86_INTELLISENSE_BEGIN(popcnt) {
 
+#if EMU86_EMULATE_CONFIG_WANT_POPCNT
 case EMU86_OPCODE_ENCODE(0x0fb8): {
 	/* F3       0F B8 /r     POPCNT r16, r/m16     POPCNT on r/m16
 	 * F3       0F B8 /r     POPCNT r32, r/m32     POPCNT on r/m32
@@ -75,6 +76,13 @@ case EMU86_OPCODE_ENCODE(0x0fb8): {
 	               result == 0 ? EFLAGS_ZF : 0);
 	goto done;
 }
+#elif EMU86_EMULATE_CONFIG_CHECKERROR
+case EMU86_OPCODE_ENCODE(0x0fb8):
+	if unlikely(!(op_flags & EMU86_F_f3))
+		goto return_unknown_instruction;
+	goto notsup_modrm_getwlq_nolock;
+#define NEED_notsup_modrm_getwlq_nolock
+#endif /* ... */
 
 }
 EMU86_INTELLISENSE_END

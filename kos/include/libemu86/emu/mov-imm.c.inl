@@ -24,7 +24,7 @@
 EMU86_INTELLISENSE_BEGIN(mov_imm) {
 
 
-#if EMU86_EMULATE_CONFIG_WANT_MOVIMM
+#if EMU86_EMULATE_CONFIG_WANT_MOV_IMM
 case EMU86_OPCODE_ENCODE(0xc6):
 	MODRM_DECODE();
 	switch (modrm.mi_reg) {
@@ -51,7 +51,7 @@ case EMU86_OPCODE_ENCODE(0xc6):
 
 
 
-#if EMU86_EMULATE_CONFIG_WANT_MOVIMM
+#if EMU86_EMULATE_CONFIG_WANT_MOV_IMM
 case EMU86_OPCODE_ENCODE(0xc7):
 	MODRM_DECODE();
 	switch (modrm.mi_reg) {
@@ -91,7 +91,7 @@ case EMU86_OPCODE_ENCODE(0xc7):
 
 
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
-#if EMU86_EMULATE_CONFIG_WANT_MOVIMM
+#if EMU86_EMULATE_CONFIG_WANT_MOV_IMM
 case EMU86_OPCODE_ENCODE(0xb0) ... EMU86_OPCODE_ENCODE(0xb7): {
 	u8 value;
 	u8 regno = tiny_opcode - EMU86_OPCODE_ENCODE(0xb0);
@@ -112,7 +112,7 @@ case EMU86_OPCODE_ENCODE(0xb0) ... EMU86_OPCODE_ENCODE(0xb7):
 #endif /* ... */
 
 
-#if EMU86_EMULATE_CONFIG_WANT_MOVIMM
+#if EMU86_EMULATE_CONFIG_WANT_MOV_IMM
 case EMU86_OPCODE_ENCODE(0xb8) ... EMU86_OPCODE_ENCODE(0xbf): {
 	/*         B8+ rw iw    MOV r16, imm16   OI   Valid    Valid    Move imm16 to r16.
 	 *         B8+ rd id    MOV r32, imm32   OI   Valid    Valid    Move imm32 to r32.

@@ -64,9 +64,8 @@ case EMU86_OPCODE_ENCODE(0x0f38f2): {
 	               eflags_addend);
 	goto done;
 #else /* EMU86_EMULATE_CONFIG_WANT_ANDN */
-	MODRM_NOSUP_GETRMZ_VEX_W();
-	goto return_unsupported_instruction;
-#define NEED_return_unsupported_instruction
+	goto notsup_modrm_getz_rex_w_modrm_parsed;
+#define NEED_notsup_modrm_getz_rex_w_modrm_parsed
 #endif /* !EMU86_EMULATE_CONFIG_WANT_ANDN */
 }
 #endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_ANDN */

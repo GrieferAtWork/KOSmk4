@@ -27,14 +27,15 @@ EMU86_INTELLISENSE_BEGIN(stif) {
 
 	/* Instructions that modify the EFLAGS.IF (interrupt) bit. */
 
+#if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_CLI
 case EMU86_OPCODE_ENCODE(0xfa): {
 	/* FA     CLI     Clear interrupt flag; interrupts disabled when interrupt flag cleared. */
-#if EMU86_EMULATE_VM86
+#if EMU86_EMULATE_CONFIG_WANT_CLI && EMU86_EMULATE_VM86
 	if (EMU86_ISVM86()) {
 		EMU86_EMULATE_VM86_SETIF(0);
 		goto done;
 	}
-#endif /* EMU86_EMULATE_VM86 */
+#endif /* EMU86_EMULATE_CONFIG_WANT_CLI && EMU86_EMULATE_VM86 */
 
 #if EMU86_EMULATE_CONFIG_CHECKUSER
 	if unlikely(EMU86_ISUSER())
@@ -42,14 +43,22 @@ case EMU86_OPCODE_ENCODE(0xfa): {
 #define NEED_return_privileged_instruction
 #endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
 
+#if EMU86_EMULATE_CONFIG_WANT_CLI
 	EMU86_MSKFLAGS(~EFLAGS_IF, 0);
 	goto done;
+#else /* EMU86_EMULATE_CONFIG_WANT_CLI */
+	goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* !EMU86_EMULATE_CONFIG_WANT_CLI */
 }
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_CLI */
 
+
+#if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_STI
 case EMU86_OPCODE_ENCODE(0xfb): {
 	/* FB     STI     Set interrupt flag; external, maskable interrupts
 	 *                enabled at the end of the next instruction. */
-#if EMU86_EMULATE_VM86
+#if EMU86_EMULATE_CONFIG_WANT_STI && EMU86_EMULATE_VM86
 	if (EMU86_ISVM86()) {
 		EMU86_EMULATE_VM86_SETIF(1);
 #ifdef EMU86_EMULATE_RETURN_AFTER_STI_VM86
@@ -62,13 +71,15 @@ case EMU86_OPCODE_ENCODE(0xfb): {
 		goto done;
 #endif /* !EMU86_EMULATE_RETURN_AFTER_STI_VM86 */
 	}
-#endif /* EMU86_EMULATE_VM86 */
+#endif /* EMU86_EMULATE_CONFIG_WANT_STI && EMU86_EMULATE_VM86 */
 
 #if EMU86_EMULATE_CONFIG_CHECKUSER
 	if unlikely(EMU86_ISUSER())
 		goto return_privileged_instruction;
 #define NEED_return_privileged_instruction
 #endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
+
+#if EMU86_EMULATE_CONFIG_WANT_STI
 #ifdef EMU86_EMULATE_RETURN_AFTER_STI
 	{
 		uintptr_t old_flags;
@@ -87,7 +98,12 @@ case EMU86_OPCODE_ENCODE(0xfb): {
 	EMU86_MSKFLAGS(~EFLAGS_IF, EFLAGS_IF);
 	goto done;
 #endif /* !EMU86_EMULATE_RETURN_AFTER_STI */
+#else /* EMU86_EMULATE_CONFIG_WANT_STI */
+	goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* !EMU86_EMULATE_CONFIG_WANT_STI */
 }
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_STI */
 
 
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */

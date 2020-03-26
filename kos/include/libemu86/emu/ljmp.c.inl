@@ -70,6 +70,7 @@ case EMU86_OPCODE_ENCODE(0xea): {
 		EMU86_SETCS(cs);
 		EMU86_SETIPREG(offset);
 		goto done_dont_set_pc;
+#define NEED_done_dont_set_pc
 #else /* EMU86_EMULATE_CONFIG_WANT_LJMP */
 #define NEED_return_unsupported_instruction
 		goto return_unsupported_instruction;

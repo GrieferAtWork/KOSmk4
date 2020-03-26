@@ -25,6 +25,8 @@
 
 EMU86_INTELLISENSE_BEGIN(pushf_popf) {
 
+
+#if EMU86_EMULATE_CONFIG_WANT_PUSHF
 case EMU86_OPCODE_ENCODE(0x9c): {
 	/* 9C     PUSHF      Push lower 16 bits of EFLAGS.
 	 * 9C     PUSHFD     Push EFLAGS.
@@ -44,8 +46,14 @@ case EMU86_OPCODE_ENCODE(0x9c): {
 	                 (u64)value);
 	goto done;
 }
+#elif EMU86_EMULATE_CONFIG_CHECKERROR
+case EMU86_OPCODE_ENCODE(0x9c):
+	goto notsup_pushwlq;
+#define NEED_notsup_pushwlq
+#endif /* ... */
 
 
+#if EMU86_EMULATE_CONFIG_WANT_POPF
 case EMU86_OPCODE_ENCODE(0x9d): {
 	/* 9D     POPF      Pop top of stack into lower 16 bits of EFLAGS.
 	 * 9D     POPFD     Pop top of stack into EFLAGS.
@@ -84,6 +92,11 @@ case EMU86_OPCODE_ENCODE(0x9d): {
 	EMU86_MSKFLAGS(~eflags_mask, new_eflags);
 	goto done;
 }
+#elif EMU86_EMULATE_CONFIG_CHECKERROR
+case EMU86_OPCODE_ENCODE(0x9d):
+	goto notsup_popwlq;
+#define NEED_notsup_popwlq
+#endif /* ... */
 
 
 

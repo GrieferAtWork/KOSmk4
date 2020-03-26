@@ -26,8 +26,10 @@
 EMU86_INTELLISENSE_BEGIN(scas) {
 
 
+#if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_SCAS
 case EMU86_OPCODE_ENCODE(0xae): {
 	/* AE     SCASB     Compare AL with byte at ES:(E)DI or RDI then set status flags. */
+#if EMU86_EMULATE_CONFIG_WANT_SCAS
 	u8 lhs, rhs;
 	u32 new_eflags;
 	EMU86_READ_STRING_EX_IMPL(EMU86_ADDRSIZE_SWITCH,
@@ -45,20 +47,29 @@ case EMU86_OPCODE_ENCODE(0xae): {
 		/* repe scasb   (while equal)*/
 		if (new_eflags & EFLAGS_ZF)
 			goto done_dont_set_pc;
+#define NEED_done_dont_set_pc
 	} else if (op_flags & EMU86_F_REPNE) {
 		/* repne scasb   (while not equal) */
 		if (!(new_eflags & EFLAGS_ZF))
 			goto done_dont_set_pc;
+#define NEED_done_dont_set_pc
 	}
 	goto done;
+#else /* EMU86_EMULATE_CONFIG_WANT_SCAS */
+	goto notsup_lodsb;
+#define NEED_notsup_lodsb
+#endif /* !EMU86_EMULATE_CONFIG_WANT_SCAS */
 }
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_SCAS */
 
 
 
+#if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_SCAS
 case EMU86_OPCODE_ENCODE(0xaf): {
 	/*         AF     SCASW     Compare AX with word at ES:(E)DI or RDI then set status flags.
 	 *         AF     SCASD     Compare EAX with doubleword at ES:(E)DI or RDI then set status flags.
 	 * REX.W + AF     SCASQ     Compare RAX with quadword at RDI or EDI then set status flags. */
+#if EMU86_EMULATE_CONFIG_WANT_SCAS
 	u32 new_eflags;
 	IF_64BIT(if (IS_64BIT()) {
 		u64 lhs, rhs;
@@ -94,13 +105,20 @@ case EMU86_OPCODE_ENCODE(0xaf): {
 		/* repe scas(w|l|q)   (while equal)*/
 		if (new_eflags & EFLAGS_ZF)
 			goto done_dont_set_pc;
+#define NEED_done_dont_set_pc
 	} else if (op_flags & EMU86_F_REPNE) {
 		/* repne scas(w|l|q)   (while not equal) */
 		if (!(new_eflags & EFLAGS_ZF))
 			goto done_dont_set_pc;
+#define NEED_done_dont_set_pc
 	}
 	goto done;
+#else /* EMU86_EMULATE_CONFIG_WANT_SCAS */
+	goto notsup_lodswlq;
+#define NEED_notsup_lodswlq
+#endif /* !EMU86_EMULATE_CONFIG_WANT_SCAS */
 }
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_SCAS */
 
 
 

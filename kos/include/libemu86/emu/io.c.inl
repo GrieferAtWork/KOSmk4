@@ -48,10 +48,10 @@ case EMU86_OPCODE_ENCODE(0xe4): {
 	EMU86_SETAL(value);
 	goto done;
 }
-#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+#elif EMU86_EMULATE_CONFIG_CHECKERROR
 case EMU86_OPCODE_ENCODE(0xe4):
-	goto return_unsupported_instruction;
-#define NEED_return_unsupported_instruction
+	goto notsup_userprivileged;
+#define NEED_notsup_userprivileged
 #endif /* ... */
 
 
@@ -75,10 +75,10 @@ case EMU86_OPCODE_ENCODE(0xe5): {
 	}
 	goto done;
 }
-#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+#elif EMU86_EMULATE_CONFIG_CHECKERROR
 case EMU86_OPCODE_ENCODE(0xe5):
-	goto return_unsupported_instruction;
-#define NEED_return_unsupported_instruction
+	goto notsup_userprivileged;
+#define NEED_notsup_userprivileged
 #endif /* ... */
 
 
@@ -92,10 +92,10 @@ case EMU86_OPCODE_ENCODE(0xec): {
 	EMU86_SETAL(value);
 	goto done;
 }
-#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+#elif EMU86_EMULATE_CONFIG_CHECKERROR
 case EMU86_OPCODE_ENCODE(0xec):
-	goto return_unsupported_instruction;
-#define NEED_return_unsupported_instruction
+	goto notsup_userprivileged;
+#define NEED_notsup_userprivileged
 #endif /* ... */
 
 
@@ -117,10 +117,10 @@ case EMU86_OPCODE_ENCODE(0xed): {
 	}
 	goto done;
 }
-#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+#elif EMU86_EMULATE_CONFIG_CHECKERROR
 case EMU86_OPCODE_ENCODE(0xed):
-	goto return_unsupported_instruction;
-#define NEED_return_unsupported_instruction
+	goto notsup_userprivileged;
+#define NEED_notsup_userprivileged
 #endif /* ... */
 
 
@@ -136,10 +136,10 @@ case EMU86_OPCODE_ENCODE(0xe6): {
 	EMU86_EMULATE_OUTB(portno, value);
 	goto done;
 }
-#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+#elif EMU86_EMULATE_CONFIG_CHECKERROR
 case EMU86_OPCODE_ENCODE(0xe6):
-	goto return_unsupported_instruction;
-#define NEED_return_unsupported_instruction
+	goto notsup_userprivileged;
+#define NEED_notsup_userprivileged
 #endif /* ... */
 
 
@@ -163,10 +163,10 @@ case EMU86_OPCODE_ENCODE(0xe7): {
 	}
 	goto done;
 }
-#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+#elif EMU86_EMULATE_CONFIG_CHECKERROR
 case EMU86_OPCODE_ENCODE(0xe7):
-	goto return_unsupported_instruction;
-#define NEED_return_unsupported_instruction
+	goto notsup_userprivileged;
+#define NEED_notsup_userprivileged
 #endif /* ... */
 
 
@@ -181,10 +181,10 @@ case EMU86_OPCODE_ENCODE(0xee): {
 	EMU86_EMULATE_OUTB(portno, value);
 	goto done;
 }
-#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+#elif EMU86_EMULATE_CONFIG_CHECKERROR
 case EMU86_OPCODE_ENCODE(0xee):
-	goto return_unsupported_instruction;
-#define NEED_return_unsupported_instruction
+	goto notsup_userprivileged;
+#define NEED_notsup_userprivileged
 #endif /* ... */
 
 
@@ -206,10 +206,10 @@ case EMU86_OPCODE_ENCODE(0xef): {
 	}
 	goto done;
 }
-#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+#elif EMU86_EMULATE_CONFIG_CHECKERROR
 case EMU86_OPCODE_ENCODE(0xef):
-	goto return_unsupported_instruction;
-#define NEED_return_unsupported_instruction
+	goto notsup_userprivileged;
+#define NEED_notsup_userprivileged
 #endif /* ... */
 
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
@@ -237,12 +237,14 @@ case EMU86_OPCODE_ENCODE(0x6e): {
 	/* Repeat the instruction */
 	if (op_flags & EMU86_F_REP)
 		goto done_dont_set_pc;
+#define NEED_done_dont_set_pc
 	goto done;
 #else /* EMU86_EMULATE_CONFIG_WANT_IO */
-	goto notsup_lodsb;
-#define NEED_notsup_lodsb
+	goto notsup_lodsb_userprivileged;
+#define NEED_notsup_lodsb_userprivileged
 #endif /* !EMU86_EMULATE_CONFIG_WANT_IO */
 }
+
 
 case EMU86_OPCODE_ENCODE(0x6f): {
 	/* 6F     OUTSW     Output word from memory location specified in DS:(E)SI or RSI to I/O port specified in DX.
@@ -279,10 +281,11 @@ case EMU86_OPCODE_ENCODE(0x6f): {
 	/* Repeat the instruction */
 	if (op_flags & EMU86_F_REP)
 		goto done_dont_set_pc;
+#define NEED_done_dont_set_pc
 	goto done;
 #else /* EMU86_EMULATE_CONFIG_WANT_IO */
-	goto notsup_lodswlq;
-#define NEED_notsup_lodswlq
+	goto notsup_lodswlq_userprivileged;
+#define NEED_notsup_lodswlq_userprivileged
 #endif /* !EMU86_EMULATE_CONFIG_WANT_IO */
 }
 
@@ -298,10 +301,11 @@ case EMU86_OPCODE_ENCODE(0x6c): {
 	/* Repeat the instruction */
 	if (op_flags & EMU86_F_REP)
 		goto done_dont_set_pc;
+#define NEED_done_dont_set_pc
 	goto done;
 #else /* EMU86_EMULATE_CONFIG_WANT_IO */
-	goto notsup_stosb;
-#define NEED_notsup_stosb
+	goto notsup_stosb_userprivileged;
+#define NEED_notsup_stosb_userprivileged
 #endif /* !EMU86_EMULATE_CONFIG_WANT_IO */
 }
 
@@ -325,10 +329,11 @@ case EMU86_OPCODE_ENCODE(0x6d): {
 	/* Repeat the instruction */
 	if (op_flags & EMU86_F_REP)
 		goto done_dont_set_pc;
+#define NEED_done_dont_set_pc
 	goto done;
 #else /* EMU86_EMULATE_CONFIG_WANT_IO */
-	goto notsup_stoswlq;
-#define NEED_notsup_stoswlq
+	goto notsup_stoswlq_userprivileged;
+#define NEED_notsup_stoswlq_userprivileged
 #endif /* !EMU86_EMULATE_CONFIG_WANT_IO */
 }
 #endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_IO */

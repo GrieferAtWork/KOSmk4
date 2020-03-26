@@ -27,14 +27,21 @@ EMU86_INTELLISENSE_BEGIN(sahf_lahf) {
 
 #define AHF_MASK (EFLAGS_CF | EFLAGS_PF | EFLAGS_AF | EFLAGS_ZF | EFLAGS_SF)
 
+#if EMU86_EMULATE_CONFIG_WANT_SAHF
 case EMU86_OPCODE_ENCODE(0x9e): {
 	/* 9E     SAHF     Loads SF, ZF, AF, PF, and CF from AH into EFLAGS register. */
 	u8 ah = EMU86_GETAH();
 	EMU86_MSKFLAGS(~AHF_MASK, ah & AHF_MASK);
 	goto done;
 }
+#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+case EMU86_OPCODE_ENCODE(0x9e):
+	goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* ... */
 
 
+#if EMU86_EMULATE_CONFIG_WANT_SAHF
 case EMU86_OPCODE_ENCODE(0x9f): {
 	/* 9F     LAHF     Load: AH := EFLAGS(SF:ZF:0:AF:0:PF:1:CF). */
 	u8 ah;
@@ -43,6 +50,11 @@ case EMU86_OPCODE_ENCODE(0x9f): {
 	EMU86_SETAH(ah);
 	goto done;
 }
+#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+case EMU86_OPCODE_ENCODE(0x9f):
+	goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* ... */
 
 #undef AHF_MASK
 

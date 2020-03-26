@@ -78,10 +78,12 @@ do_cmps_save_pointer:
 		/* repe cmpsb   (repeat while equal) */
 		if (EMU86_GETFLAGS() & EFLAGS_ZF)
 			goto done_dont_set_pc; /* equal */
+#define NEED_done_dont_set_pc
 	} else if (op_flags & EMU86_F_REPNE) {
 		/* repe cmpsb   (repeat while not equal) */
 		if (!(EMU86_GETFLAGS() & EFLAGS_ZF))
 			goto done_dont_set_pc; /* not equal */
+#define NEED_done_dont_set_pc
 	}
 	goto done;
 #else /* EMU86_EMULATE_CONFIG_WANT_CMPS */

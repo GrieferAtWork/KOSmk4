@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe9cd95c6 */
+/* HASH CRC-32:0x51732b4e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -194,14 +194,14 @@ END
 CLASS(E_OVERFLOW,MESSAGE("Overflow"),ERRNO(EOVERFLOW),())
 END
 CLASS(E_ILLEGAL_INSTRUCTION,MESSAGE("Illegal instruction"),ERRNO(EPERM),())
-	SUBCLASS(E_ILLEGAL_INSTRUCTION_BAD_OPCODE,MESSAGE("Unknown instruction"),NO_ERRNO,(MEMBER(uintptr_t,opcode)))
+	SUBCLASS(E_ILLEGAL_INSTRUCTION_BAD_OPCODE,MESSAGE("Unknown instruction"),NO_ERRNO,(MEMBER(uintptr_t,opcode) MEMBER(uintptr_t,op_flags)))
 	SUBCLASS(E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX,MESSAGE("Unsupported instruction prefix"),NO_ERRNO,(MEMBER(uintptr_t,opcode) MEMBER(uintptr_t,op_flags)))
-	SUBCLASS(E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE,MESSAGE("Unsupported instruction"),NO_ERRNO,(MEMBER(uintptr_t,opcode)))
-	SUBCLASS(E_ILLEGAL_INSTRUCTION_X86_TOO_LONG,MESSAGE("Instruction too long"),NO_ERRNO,(MEMBER(uintptr_t,opcode)))
-	SUBCLASS(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE,MESSAGE("Privileged instruction"),NO_ERRNO,(MEMBER(uintptr_t,opcode)))
-	SUBCLASS(E_ILLEGAL_INSTRUCTION_X86_INTERRUPT,NO_MESSAGE,NO_ERRNO,(MEMBER(uintptr_t,opcode) MEMBER(uintptr_t,intno) MEMBER(uintptr_t,ecode) MEMBER(uintptr_t,segval)))
-	SUBCLASS(E_ILLEGAL_INSTRUCTION_BAD_OPERAND,MESSAGE("Invalid instruction operand"),NO_ERRNO,(MEMBER(uintptr_t,opcode) MEMBER(uintptr_t,what)))
-	SUBCLASS(E_ILLEGAL_INSTRUCTION_REGISTER,MESSAGE("Invalid register access"),NO_ERRNO,(MEMBER(uintptr_t,opcode) MEMBER(uintptr_t,how) MEMBER(uintptr_t,regno) MEMBER(uintptr_t,regval) MEMBER(uintptr_t,offset)))
+	SUBCLASS(E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE,MESSAGE("Unsupported instruction"),NO_ERRNO,(MEMBER(uintptr_t,opcode) MEMBER(uintptr_t,op_flags)))
+	SUBCLASS(E_ILLEGAL_INSTRUCTION_X86_TOO_LONG,MESSAGE("Instruction too long"),NO_ERRNO,(MEMBER(uintptr_t,opcode) MEMBER(uintptr_t,op_flags)))
+	SUBCLASS(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE,MESSAGE("Privileged instruction"),NO_ERRNO,(MEMBER(uintptr_t,opcode) MEMBER(uintptr_t,op_flags)))
+	SUBCLASS(E_ILLEGAL_INSTRUCTION_X86_INTERRUPT,NO_MESSAGE,NO_ERRNO,(MEMBER(uintptr_t,opcode) MEMBER(uintptr_t,op_flags) MEMBER(uintptr_t,intno) MEMBER(uintptr_t,ecode) MEMBER(uintptr_t,segval)))
+	SUBCLASS(E_ILLEGAL_INSTRUCTION_BAD_OPERAND,MESSAGE("Invalid instruction operand"),NO_ERRNO,(MEMBER(uintptr_t,opcode) MEMBER(uintptr_t,op_flags) MEMBER(uintptr_t,what)))
+	SUBCLASS(E_ILLEGAL_INSTRUCTION_REGISTER,MESSAGE("Invalid register access"),NO_ERRNO,(MEMBER(uintptr_t,opcode) MEMBER(uintptr_t,op_flags) MEMBER(uintptr_t,how) MEMBER(uintptr_t,regno) MEMBER(uintptr_t,regval) MEMBER(uintptr_t,offset)))
 END
 CLASS(E_STACK_OVERFLOW,MESSAGE("Stack overflow"),ERRNO(EFAULT),())
 END

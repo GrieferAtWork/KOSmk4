@@ -24,12 +24,17 @@
 EMU86_INTELLISENSE_BEGIN(pext) {
 
 
+#if (EMU86_EMULATE_CONFIG_CHECKERROR || \
+     (EMU86_EMULATE_CONFIG_WANT_PEXT || \
+      EMU86_EMULATE_CONFIG_WANT_PDEP || \
+      EMU86_EMULATE_CONFIG_WANT_BZHI))
 case EMU86_OPCODE_ENCODE(0x0f38f5): {
 	MODRM_DECODE();
 	if ((op_flags & (EMU86_F_HASVEX | EMU86_F_VEX_LL_M |
 	                 EMU86_F_LOCK | EMU86_F_66)) != EMU86_F_HASVEX)
 		goto return_unknown_instruction;
 	if (op_flags & EMU86_F_f3) {
+#if EMU86_EMULATE_CONFIG_WANT_PEXT
 		/* VEX.LZ.F3.0F38.W0 F5 /r     PEXT r32a, r32b, r/m32     Parallel extract of bits from r32b using mask in r/m32, result is written to r32a.
 		 * VEX.LZ.F3.0F38.W1 F5 /r     PEXT r64a, r64b, r/m64     Parallel extract of bits from r64b using mask in r/m64, result is written to r64a. */
 #if CONFIG_LIBEMU86_WANT_64BIT
@@ -63,7 +68,12 @@ case EMU86_OPCODE_ENCODE(0x0f38f5): {
 			MODRM_SETREGL(result);
 		}
 		goto done;
+#elif EMU86_EMULATE_CONFIG_CHECKERROR
+		goto notsup_modrm_getz_rex_w_modrm_parsed;
+#define NEED_notsup_modrm_getz_rex_w_modrm_parsed
+#endif /* ... */
 	} else if (op_flags & EMU86_F_f2) {
+#if EMU86_EMULATE_CONFIG_WANT_PDEP
 		/* VEX.LZ.F2.0F38.W0 F5 /r     PDEP r32a, r32b, r/m32     Parallel deposit of bits from r32b using mask in r/m32, result is written to r32a.
 		 * VEX.LZ.F2.0F38.W1 F5 /r     PDEP r64a, r64b, r/m64     Parallel deposit of bits from r64b using mask in r/m64, result is written to r64a. */
 #if CONFIG_LIBEMU86_WANT_64BIT
@@ -97,9 +107,14 @@ case EMU86_OPCODE_ENCODE(0x0f38f5): {
 			MODRM_SETREGL(result);
 		}
 		goto done;
+#elif EMU86_EMULATE_CONFIG_CHECKERROR
+		goto notsup_modrm_getz_rex_w_modrm_parsed;
+#define NEED_notsup_modrm_getz_rex_w_modrm_parsed
+#endif /* ... */
 	} else {
 		/* VEX.LZ.0F38.W0 F5 /r     BZHI r32a, r/m32, r32b     Zero bits in r/m32 starting with the position in r32b, write result to r32a.
 		 * VEX.LZ.0F38.W1 F5 /r     BZHI r64a, r/m64, r64b     Zero bits in r/m64 starting with the position in r64b, write result to r64a. */
+#if EMU86_EMULATE_CONFIG_WANT_PDEP
 		u8 num_bits;
 		u32 eflags_addend = 0;
 		num_bits = VEX_GETREGB();
@@ -136,8 +151,19 @@ case EMU86_OPCODE_ENCODE(0x0f38f5): {
 		EMU86_MSKFLAGS(~(EFLAGS_ZF | EFLAGS_CF | EFLAGS_SF | EFLAGS_OF),
 		               eflags_addend);
 		goto done;
+#elif EMU86_EMULATE_CONFIG_CHECKERROR
+		goto notsup_modrm_getz_rex_w_modrm_parsed;
+#define NEED_notsup_modrm_getz_rex_w_modrm_parsed
+#endif /* ... */
 	}
+#if (!EMU86_EMULATE_CONFIG_CHECKERROR && \
+     (!EMU86_EMULATE_CONFIG_WANT_PEXT || \
+      !EMU86_EMULATE_CONFIG_WANT_PDEP || \
+      !EMU86_EMULATE_CONFIG_WANT_BZHI))
+	goto return_unknown_instruction;
+#endif /* ... */
 }
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || ... */
 
 
 }

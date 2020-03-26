@@ -23,6 +23,8 @@
 
 EMU86_INTELLISENSE_BEGIN(xlatb) {
 
+
+#if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_XLATB
 case EMU86_OPCODE_ENCODE(0xd7): {
 	/*         D7     XLAT m8     Set AL to memory byte DS:[(E)BX + unsigned AL].
 	 *         D7     XLATB       Set AL to memory byte DS:[(E)BX + unsigned AL].
@@ -47,12 +49,23 @@ case EMU86_OPCODE_ENCODE(0xd7): {
 		baseaddr = EMU86_SEGADDR(EMU86_GETDSBASE(), EMU86_GETBX() + al);
 	});
 #endif /* !EMU86_GETSEGBASE_IS_NOOP_DS */
-	EMU86_READ_USER_MEMORY(baseaddr, 1);
+#if EMU86_EMULATE_CONFIG_WANT_XLATB
 	/* Read memory from the specified address */
-	al = EMU86_MEMREADB(baseaddr);
-	EMU86_SETAL(al);
+	{
+		u8 value;
+		EMU86_READ_USER_MEMORY(baseaddr, 1);
+		value = EMU86_MEMREADB(baseaddr);
+		EMU86_SETAL(value);
+	}
 	goto done;
+#else /* EMU86_EMULATE_CONFIG_WANT_XLATB */
+	EMU86_UNSUPPORTED_MEMACCESS(baseaddr, 1, true, false);
+	goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* !EMU86_EMULATE_CONFIG_WANT_XLATB */
 }
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_XLATB */
+
 
 }
 EMU86_INTELLISENSE_END

@@ -23,7 +23,7 @@
 
 #include "push-pop-util.h"
 
-#if EMU86_EMULATE_CONFIG_WANT_INCRM
+#if EMU86_EMULATE_CONFIG_WANT_INC_RM
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 #define NEED_return_unexpected_lock_rmreg
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
@@ -47,9 +47,9 @@
 		eflags_addend |= EFLAGS_AF;                                               \
 	EMU86_MSKFLAGS(~(EFLAGS_OF | EFLAGS_SF | EFLAGS_ZF | EFLAGS_PF | EFLAGS_AF),  \
 	               eflags_addend | emu86_geteflags_test##bwlq(newval));
-#endif /* EMU86_EMULATE_CONFIG_WANT_INCRM */
+#endif /* EMU86_EMULATE_CONFIG_WANT_INC_RM */
 
-#if EMU86_EMULATE_CONFIG_WANT_DECRM
+#if EMU86_EMULATE_CONFIG_WANT_DEC_RM
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 #define NEED_return_unexpected_lock_rmreg
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
@@ -73,19 +73,19 @@
 		eflags_addend |= EFLAGS_AF;                                               \
 	EMU86_MSKFLAGS(~(EFLAGS_OF | EFLAGS_SF | EFLAGS_ZF | EFLAGS_PF | EFLAGS_AF),  \
 	               eflags_addend | emu86_geteflags_test##bwlq(newval));
-#endif /* EMU86_EMULATE_CONFIG_WANT_DECRM */
+#endif /* EMU86_EMULATE_CONFIG_WANT_DEC_RM */
 
 
 
 EMU86_INTELLISENSE_BEGIN(misc) {
 
 
-#if (EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_INCRM || EMU86_EMULATE_CONFIG_WANT_DECRM)
+#if (EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_INC_RM || EMU86_EMULATE_CONFIG_WANT_DEC_RM)
 case EMU86_OPCODE_ENCODE(0xfe):
 	MODRM_DECODE();
 	switch (modrm.mi_reg) {
 
-#if EMU86_EMULATE_CONFIG_WANT_DECRM
+#if EMU86_EMULATE_CONFIG_WANT_DEC_RM
 	case 0: {
 		/* FE /0      INC r/m8      Increment r/m byte by 1 */
 		DO_INC_modrm(b, B, 8, 1)
@@ -98,7 +98,7 @@ case EMU86_OPCODE_ENCODE(0xfe):
 #endif /* ... */
 
 
-#if EMU86_EMULATE_CONFIG_WANT_DECRM
+#if EMU86_EMULATE_CONFIG_WANT_DEC_RM
 	case 1: {
 		/* FE /1      DEC r/m8      Decrement r/m8 by 1 */
 		DO_DEC_modrm(b, B, 8, 1)
@@ -119,15 +119,15 @@ case EMU86_OPCODE_ENCODE(0xfe):
 
 
 
-#if (EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_INCRM ||   \
-     EMU86_EMULATE_CONFIG_WANT_DECRM || EMU86_EMULATE_CONFIG_WANT_CALLRM ||  \
-     EMU86_EMULATE_CONFIG_WANT_LCALLRM || EMU86_EMULATE_CONFIG_WANT_JMPRM || \
-     EMU86_EMULATE_CONFIG_WANT_LJMPRM || EMU86_EMULATE_CONFIG_WANT_PUSHRM)
+#if (EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_INC_RM ||   \
+     EMU86_EMULATE_CONFIG_WANT_DEC_RM || EMU86_EMULATE_CONFIG_WANT_CALL_RM ||  \
+     EMU86_EMULATE_CONFIG_WANT_LCALL_RM || EMU86_EMULATE_CONFIG_WANT_JMP_RM || \
+     EMU86_EMULATE_CONFIG_WANT_LJMP_RM || EMU86_EMULATE_CONFIG_WANT_PUSH_RM)
 case EMU86_OPCODE_ENCODE(0xff):
 	MODRM_DECODE();
 	switch (modrm.mi_reg) {
 
-#if EMU86_EMULATE_CONFIG_WANT_INCRM
+#if EMU86_EMULATE_CONFIG_WANT_INC_RM
 	case 0: {
 		/* FF /0      INC r/m16      Increment r/m byte by 1
 		 * FF /0      INC r/m32      Increment r/m byte by 1
@@ -147,7 +147,7 @@ case EMU86_OPCODE_ENCODE(0xff):
 		goto notsup_modrm_getsetwlq_rmreg_modrm_parsed;
 #endif /* ... */
 
-#if EMU86_EMULATE_CONFIG_WANT_DECRM
+#if EMU86_EMULATE_CONFIG_WANT_DEC_RM
 	case 1: {
 		/* FF /1      DEC r/m16      Decrement r/m byte by 1
 		 * FF /1      DEC r/m32      Decrement r/m byte by 1
@@ -168,7 +168,7 @@ case EMU86_OPCODE_ENCODE(0xff):
 #endif /* ... */
 
 
-#if EMU86_EMULATE_CONFIG_WANT_CALLRM
+#if EMU86_EMULATE_CONFIG_WANT_CALL_RM
 	case 2: {
 		/* FF /2      CALL r/m16      Call near, absolute indirect, address given in r/m16 */
 		/* FF /2      CALL r/m32      Call near, absolute indirect, address given in r/m32 */
@@ -179,6 +179,7 @@ case EMU86_OPCODE_ENCODE(0xff):
 		                 (dest_ip = MODRM_GETRMQ(), (u64)REAL_IP()));
 		EMU86_SETIPREG(dest_ip);
 		goto done_dont_set_pc;
+#define NEED_done_dont_set_pc
 	}
 #elif EMU86_EMULATE_CONFIG_CHECKERROR
 	case 2:
@@ -187,23 +188,23 @@ case EMU86_OPCODE_ENCODE(0xff):
 #endif /* ... */
 
 
-#if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_LCALLRM
+#if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_LCALL_RM
 	case 3: {
 		/*       FF /3    CALL m16:16    Call far, absolute indirect, address given in m16:16.
 		 *       FF /3    CALL m16:32    Call far, absolute indirect, address given in m16:32.
 		 * REX.W FF /3    CALL m16:64    Call far, absolute indirect, address given in m16:64. */
 		byte_t *sp;
-#if EMU86_EMULATE_CONFIG_CHECKUSER || EMU86_EMULATE_CONFIG_WANT_LCALLRM
+#if EMU86_EMULATE_CONFIG_CHECKUSER || EMU86_EMULATE_CONFIG_WANT_LCALL_RM
 		EMU86_UREG_TYPE offset;
 		u16 cs;
 		byte_t *addr;
-#endif /* EMU86_EMULATE_CONFIG_CHECKUSER || EMU86_EMULATE_CONFIG_WANT_LCALLRM */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER || EMU86_EMULATE_CONFIG_WANT_LCALL_RM */
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 #define NEED_return_expected_memory_modrm_rmreg
 		if (!EMU86_MODRM_ISMEM(modrm.mi_type))
 			goto return_expected_memory_modrm_rmreg;
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
-#if EMU86_EMULATE_CONFIG_CHECKUSER || EMU86_EMULATE_CONFIG_WANT_LCALLRM
+#if EMU86_EMULATE_CONFIG_CHECKUSER || EMU86_EMULATE_CONFIG_WANT_LCALL_RM
 		addr = MODRM_MEMADDR();
 		IF_64BIT(if (IS_64BIT()) {
 			EMU86_READ_USER_MEMORY(addr, 10);
@@ -232,53 +233,54 @@ case EMU86_OPCODE_ENCODE(0xff):
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 		}
 #endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
-#endif /* EMU86_EMULATE_CONFIG_CHECKUSER || EMU86_EMULATE_CONFIG_WANT_LCALLRM */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER || EMU86_EMULATE_CONFIG_WANT_LCALL_RM */
 		sp = EMU86_GETSTACKPTR();
 		IF_64BIT(if (IS_64BIT()) {
 			sp -= 16;
 			EMU86_EMULATE_PUSH(sp, 16);
-#if EMU86_EMULATE_CONFIG_WANT_LCALLRM
+#if EMU86_EMULATE_CONFIG_WANT_LCALL_RM
 			EMU86_WRITE_USER_MEMORY(sp, 16);
 			EMU86_MEMWRITEQ(sp + 8, (u64)EMU86_GETCS());
 			EMU86_MEMWRITEQ(sp + 0, (u64)REAL_IP());
-#else /* EMU86_EMULATE_CONFIG_WANT_LCALLRM */
+#else /* EMU86_EMULATE_CONFIG_WANT_LCALL_RM */
 			EMU86_UNSUPPORTED_MEMACCESS(sp, 16, false, true);
-#endif /* !EMU86_EMULATE_CONFIG_WANT_LCALLRM */
+#endif /* !EMU86_EMULATE_CONFIG_WANT_LCALL_RM */
 		} else) if (!IS_16BIT()) {
 			sp -= 8;
 			EMU86_EMULATE_PUSH(sp, 8);
-#if EMU86_EMULATE_CONFIG_WANT_LCALLRM
+#if EMU86_EMULATE_CONFIG_WANT_LCALL_RM
 			EMU86_WRITE_USER_MEMORY(sp, 8);
 			EMU86_MEMWRITEL(sp + 4, (u32)EMU86_GETCS());
 			EMU86_MEMWRITEL(sp + 0, (u32)REAL_IP());
-#else /* EMU86_EMULATE_CONFIG_WANT_LCALLRM */
+#else /* EMU86_EMULATE_CONFIG_WANT_LCALL_RM */
 			EMU86_UNSUPPORTED_MEMACCESS(sp, 8, false, true);
-#endif /* !EMU86_EMULATE_CONFIG_WANT_LCALLRM */
+#endif /* !EMU86_EMULATE_CONFIG_WANT_LCALL_RM */
 		} else {
 			sp -= 4;
 			EMU86_EMULATE_PUSH(sp, 4);
-#if EMU86_EMULATE_CONFIG_WANT_LCALLRM
+#if EMU86_EMULATE_CONFIG_WANT_LCALL_RM
 			EMU86_WRITE_USER_MEMORY(sp, 4);
 			EMU86_MEMWRITEW(sp + 2, (u16)EMU86_GETCS());
 			EMU86_MEMWRITEW(sp + 0, (u16)REAL_IP());
-#else /* EMU86_EMULATE_CONFIG_WANT_LCALLRM */
+#else /* EMU86_EMULATE_CONFIG_WANT_LCALL_RM */
 			EMU86_UNSUPPORTED_MEMACCESS(sp, 4, false, true);
-#endif /* !EMU86_EMULATE_CONFIG_WANT_LCALLRM */
+#endif /* !EMU86_EMULATE_CONFIG_WANT_LCALL_RM */
 		}
-#if EMU86_EMULATE_CONFIG_WANT_LCALLRM
+#if EMU86_EMULATE_CONFIG_WANT_LCALL_RM
 		EMU86_SETSTACKPTR(sp);
 		EMU86_SETCS(cs);
 		EMU86_SETIPREG(offset);
 		goto done_dont_set_pc;
-#else /* EMU86_EMULATE_CONFIG_WANT_LCALLRM */
+#define NEED_done_dont_set_pc
+#else /* EMU86_EMULATE_CONFIG_WANT_LCALL_RM */
 		goto return_unsupported_instruction_rmreg;
 #define NEED_return_unsupported_instruction_rmreg
-#endif /* !EMU86_EMULATE_CONFIG_WANT_LCALLRM */
+#endif /* !EMU86_EMULATE_CONFIG_WANT_LCALL_RM */
 	}
-#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_LCALLRM */
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_LCALL_RM */
 
 
-#if EMU86_EMULATE_CONFIG_WANT_JMPRM
+#if EMU86_EMULATE_CONFIG_WANT_JMP_RM
 	case 4: {
 		/* FF /2      JMP r/m16      Jump near, absolute indirect, address given in r/m16 */
 		/* FF /2      JMP r/m32      Jump near, absolute indirect, address given in r/m32 */
@@ -293,6 +295,7 @@ case EMU86_OPCODE_ENCODE(0xff):
 		})
 		EMU86_SETIPREG(dest_ip);
 		goto done_dont_set_pc;
+#define NEED_done_dont_set_pc
 	}
 #elif EMU86_EMULATE_CONFIG_CHECKERROR
 	case 4:
@@ -301,12 +304,12 @@ case EMU86_OPCODE_ENCODE(0xff):
 #endif /* ... */
 
 
-#if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_LJMPRM
+#if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_LJMP_RM
 	case 5: {
 		/*       FF /5    JMP m16:16    Jump far, absolute indirect, address given in m16:16.
 		 *       FF /5    JMP m16:32    Jump far, absolute indirect, address given in m16:32.
 		 * REX.W FF /5    JMP m16:64    Jump far, absolute indirect, address given in m16:64. */
-#if EMU86_EMULATE_CONFIG_CHECKUSER || EMU86_EMULATE_CONFIG_WANT_LJMPRM
+#if EMU86_EMULATE_CONFIG_CHECKUSER || EMU86_EMULATE_CONFIG_WANT_LJMP_RM
 #if CONFIG_LIBEMU86_WANT_64BIT
 		u64 offset;
 #else /* CONFIG_LIBEMU86_WANT_64BIT */
@@ -347,20 +350,21 @@ case EMU86_OPCODE_ENCODE(0xff):
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 		}
 #endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
-#endif /* EMU86_EMULATE_CONFIG_CHECKUSER || EMU86_EMULATE_CONFIG_WANT_LJMPRM */
-#if EMU86_EMULATE_CONFIG_WANT_LJMPRM
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER || EMU86_EMULATE_CONFIG_WANT_LJMP_RM */
+#if EMU86_EMULATE_CONFIG_WANT_LJMP_RM
 		EMU86_SETCS(cs);
 		EMU86_SETIPREG(offset);
 		goto done_dont_set_pc;
-#else /* EMU86_EMULATE_CONFIG_WANT_LJMPRM */
+#define NEED_done_dont_set_pc
+#else /* EMU86_EMULATE_CONFIG_WANT_LJMP_RM */
 		goto return_unsupported_instruction_rmreg;
 #define NEED_return_unsupported_instruction_rmreg
-#endif /* !EMU86_EMULATE_CONFIG_WANT_LJMPRM */
+#endif /* !EMU86_EMULATE_CONFIG_WANT_LJMP_RM */
 	}
-#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_LJMPRM */
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_LJMP_RM */
 
 
-#if EMU86_EMULATE_CONFIG_WANT_PUSHRM
+#if EMU86_EMULATE_CONFIG_WANT_PUSH_RM
 	case 6:
 		/* FF /6     PUSH r/m16     Push r/m16.
 		 * FF /6     PUSH r/m32     Push r/m32.
@@ -371,11 +375,11 @@ case EMU86_OPCODE_ENCODE(0xff):
 		                 MODRM_GETRML(),
 		                 MODRM_GETRMQ());
 		goto done;
-#else /* EMU86_EMULATE_CONFIG_WANT_PUSHRM */
+#else /* EMU86_EMULATE_CONFIG_WANT_PUSH_RM */
 	case 6:
 #define NEED_notsup_modrm_getwlq_rmreg_modrm_parsed_pushwlq
 		goto notsup_modrm_getwlq_rmreg_modrm_parsed_pushwlq;
-#endif /* !EMU86_EMULATE_CONFIG_WANT_PUSHRM */
+#endif /* !EMU86_EMULATE_CONFIG_WANT_PUSH_RM */
 
 
 	default:

@@ -25,16 +25,23 @@ EMU86_INTELLISENSE_BEGIN(salc) {
 
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 
-	/* NOTE: This instruction is not officially documented by intel!
-	 *       Until this day (20.03.2020) intel still documents this
+	/* NOTE: This instruction is not officially documented by Intel!
+	 *       Until this day (20.03.2020) Intel still documents this
 	 *       opcode as being unused, however the behavior emulated
 	 *       here matches what is described here:
 	 *       http://www.rcollins.org/secrets/opcodes/SALC.html */
+
+#if EMU86_EMULATE_CONFIG_WANT_SALC
 case EMU86_OPCODE_ENCODE(0xd6): {
 	/* D6     SALC     Set AL on Carry */
 	EMU86_SETAL(EMU86_GETFLAGS() & EFLAGS_CF ? 0xff : 0x00);
 	goto done;
 }
+#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+case EMU86_OPCODE_ENCODE(0xd6):
+	goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* ... */
 
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 

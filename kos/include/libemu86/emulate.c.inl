@@ -35,6 +35,7 @@
 #include <hybrid/align.h>
 #include <hybrid/host.h>
 #include <hybrid/overflow.h>
+#include <hybrid/typecore.h>
 #include <hybrid/unaligned.h>
 #include <hybrid/wordbits.h>
 
@@ -258,12 +259,12 @@ __DECL_BEGIN
 #ifndef EMU86_EMULATE_CONFIG_WANT_HLT
 #define EMU86_EMULATE_CONFIG_WANT_HLT (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
 #endif /* !EMU86_EMULATE_CONFIG_WANT_HLT */
-#ifndef EMU86_EMULATE_CONFIG_WANT_INCREG
-#define EMU86_EMULATE_CONFIG_WANT_INCREG (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
-#endif /* !EMU86_EMULATE_CONFIG_WANT_INCREG */
-#ifndef EMU86_EMULATE_CONFIG_WANT_DECREG
-#define EMU86_EMULATE_CONFIG_WANT_DECREG (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
-#endif /* !EMU86_EMULATE_CONFIG_WANT_DECREG */
+#ifndef EMU86_EMULATE_CONFIG_WANT_INC_REG
+#define EMU86_EMULATE_CONFIG_WANT_INC_REG (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_INC_REG */
+#ifndef EMU86_EMULATE_CONFIG_WANT_DEC_REG
+#define EMU86_EMULATE_CONFIG_WANT_DEC_REG (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_DEC_REG */
 #ifndef EMU86_EMULATE_CONFIG_WANT_INT1
 #define EMU86_EMULATE_CONFIG_WANT_INT1 (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
 #endif /* !EMU86_EMULATE_CONFIG_WANT_INT1 */
@@ -282,21 +283,21 @@ __DECL_BEGIN
 #ifndef EMU86_EMULATE_CONFIG_WANT_IRET
 #define EMU86_EMULATE_CONFIG_WANT_IRET (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
 #endif /* !EMU86_EMULATE_CONFIG_WANT_IRET */
-#ifndef EMU86_EMULATE_CONFIG_WANT_JCC8
-#define EMU86_EMULATE_CONFIG_WANT_JCC8 (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
-#endif /* !EMU86_EMULATE_CONFIG_WANT_JCC8 */
-#ifndef EMU86_EMULATE_CONFIG_WANT_JCC32
-#define EMU86_EMULATE_CONFIG_WANT_JCC32 (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
-#endif /* !EMU86_EMULATE_CONFIG_WANT_JCC32 */
+#ifndef EMU86_EMULATE_CONFIG_WANT_JCC_DISP8
+#define EMU86_EMULATE_CONFIG_WANT_JCC_DISP8 (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_JCC_DISP8 */
+#ifndef EMU86_EMULATE_CONFIG_WANT_JCC_DISP32
+#define EMU86_EMULATE_CONFIG_WANT_JCC_DISP32 (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_JCC_DISP32 */
 #ifndef EMU86_EMULATE_CONFIG_WANT_JCXZ
 #define EMU86_EMULATE_CONFIG_WANT_JCXZ (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
 #endif /* !EMU86_EMULATE_CONFIG_WANT_JCXZ */
-#ifndef EMU86_EMULATE_CONFIG_WANT_JMP8
-#define EMU86_EMULATE_CONFIG_WANT_JMP8 (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
-#endif /* !EMU86_EMULATE_CONFIG_WANT_JMP8 */
-#ifndef EMU86_EMULATE_CONFIG_WANT_JMP32
-#define EMU86_EMULATE_CONFIG_WANT_JMP32 (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
-#endif /* !EMU86_EMULATE_CONFIG_WANT_JMP32 */
+#ifndef EMU86_EMULATE_CONFIG_WANT_JMP_DISP8
+#define EMU86_EMULATE_CONFIG_WANT_JMP_DISP8 (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_JMP_DISP8 */
+#ifndef EMU86_EMULATE_CONFIG_WANT_JMP_DISP32
+#define EMU86_EMULATE_CONFIG_WANT_JMP_DISP32 (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_JMP_DISP32 */
 #ifndef EMU86_EMULATE_CONFIG_WANT_LCALL
 #define EMU86_EMULATE_CONFIG_WANT_LCALL (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
 #endif /* !EMU86_EMULATE_CONFIG_WANT_LCALL */
@@ -327,27 +328,27 @@ __DECL_BEGIN
 #ifndef EMU86_EMULATE_CONFIG_WANT_LXS
 #define EMU86_EMULATE_CONFIG_WANT_LXS (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
 #endif /* !EMU86_EMULATE_CONFIG_WANT_LXS */
-#ifndef EMU86_EMULATE_CONFIG_WANT_INCRM
-#define EMU86_EMULATE_CONFIG_WANT_INCRM EMU86_EMULATE_CONFIG_WANT_INCREG
-#endif /* !EMU86_EMULATE_CONFIG_WANT_INCRM */
-#ifndef EMU86_EMULATE_CONFIG_WANT_DECRM
-#define EMU86_EMULATE_CONFIG_WANT_DECRM EMU86_EMULATE_CONFIG_WANT_DECREG
-#endif /* !EMU86_EMULATE_CONFIG_WANT_DECRM */
-#ifndef EMU86_EMULATE_CONFIG_WANT_CALLRM
-#define EMU86_EMULATE_CONFIG_WANT_CALLRM (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
-#endif /* !EMU86_EMULATE_CONFIG_WANT_CALLRM */
-#ifndef EMU86_EMULATE_CONFIG_WANT_LCALLRM
-#define EMU86_EMULATE_CONFIG_WANT_LCALLRM (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
-#endif /* !EMU86_EMULATE_CONFIG_WANT_LCALLRM */
-#ifndef EMU86_EMULATE_CONFIG_WANT_JMPRM
-#define EMU86_EMULATE_CONFIG_WANT_JMPRM (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
-#endif /* !EMU86_EMULATE_CONFIG_WANT_JMPRM */
-#ifndef EMU86_EMULATE_CONFIG_WANT_LJMPRM
-#define EMU86_EMULATE_CONFIG_WANT_LJMPRM (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
-#endif /* !EMU86_EMULATE_CONFIG_WANT_LJMPRM */
-#ifndef EMU86_EMULATE_CONFIG_WANT_PUSHRM
-#define EMU86_EMULATE_CONFIG_WANT_PUSHRM (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
-#endif /* !EMU86_EMULATE_CONFIG_WANT_PUSHRM */
+#ifndef EMU86_EMULATE_CONFIG_WANT_INC_RM
+#define EMU86_EMULATE_CONFIG_WANT_INC_RM EMU86_EMULATE_CONFIG_WANT_INC_REG
+#endif /* !EMU86_EMULATE_CONFIG_WANT_INC_RM */
+#ifndef EMU86_EMULATE_CONFIG_WANT_DEC_RM
+#define EMU86_EMULATE_CONFIG_WANT_DEC_RM EMU86_EMULATE_CONFIG_WANT_DEC_REG
+#endif /* !EMU86_EMULATE_CONFIG_WANT_DEC_RM */
+#ifndef EMU86_EMULATE_CONFIG_WANT_CALL_RM
+#define EMU86_EMULATE_CONFIG_WANT_CALL_RM (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_CALL_RM */
+#ifndef EMU86_EMULATE_CONFIG_WANT_LCALL_RM
+#define EMU86_EMULATE_CONFIG_WANT_LCALL_RM (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_LCALL_RM */
+#ifndef EMU86_EMULATE_CONFIG_WANT_JMP_RM
+#define EMU86_EMULATE_CONFIG_WANT_JMP_RM (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_JMP_RM */
+#ifndef EMU86_EMULATE_CONFIG_WANT_LJMP_RM
+#define EMU86_EMULATE_CONFIG_WANT_LJMP_RM (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_LJMP_RM */
+#ifndef EMU86_EMULATE_CONFIG_WANT_PUSH_RM
+#define EMU86_EMULATE_CONFIG_WANT_PUSH_RM (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_PUSH_RM */
 #ifndef EMU86_EMULATE_CONFIG_WANT_RDFSBASE
 #define EMU86_EMULATE_CONFIG_WANT_RDFSBASE (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
 #endif /* !EMU86_EMULATE_CONFIG_WANT_RDFSBASE */
@@ -378,40 +379,51 @@ __DECL_BEGIN
 #ifndef EMU86_EMULATE_CONFIG_WANT_MFENCE
 #define EMU86_EMULATE_CONFIG_WANT_MFENCE (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
 #endif /* !EMU86_EMULATE_CONFIG_WANT_MFENCE */
-#ifndef EMU86_EMULATE_CONFIG_WANT_MOVRM
-#define EMU86_EMULATE_CONFIG_WANT_MOVRM (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
-#endif /* !EMU86_EMULATE_CONFIG_WANT_MOVRM */
+#ifndef EMU86_EMULATE_CONFIG_WANT_MOV_RM
+#define EMU86_EMULATE_CONFIG_WANT_MOV_RM (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_MOV_RM */
 #ifndef EMU86_EMULATE_CONFIG_WANT_MOVBE
 #define EMU86_EMULATE_CONFIG_WANT_MOVBE (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
 #endif /* !EMU86_EMULATE_CONFIG_WANT_MOVBE */
 #ifndef EMU86_EMULATE_CONFIG_WANT_MOVDIR64B
 #define EMU86_EMULATE_CONFIG_WANT_MOVDIR64B (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
 #endif /* !EMU86_EMULATE_CONFIG_WANT_MOVDIR64B */
-#ifndef EMU86_EMULATE_CONFIG_WANT_MOVIMM
-#define EMU86_EMULATE_CONFIG_WANT_MOVIMM (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
-#endif /* !EMU86_EMULATE_CONFIG_WANT_MOVIMM */
-#ifndef EMU86_EMULATE_CONFIG_WANT_MOVMOFFS
-#define EMU86_EMULATE_CONFIG_WANT_MOVMOFFS (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
-#endif /* !EMU86_EMULATE_CONFIG_WANT_MOVMOFFS */
+#ifndef EMU86_EMULATE_CONFIG_WANT_MOV_IMM
+#define EMU86_EMULATE_CONFIG_WANT_MOV_IMM (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_MOV_IMM */
+#ifndef EMU86_EMULATE_CONFIG_WANT_MOV_MOFFS
+#define EMU86_EMULATE_CONFIG_WANT_MOV_MOFFS (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_MOV_MOFFS */
 #ifndef EMU86_EMULATE_CONFIG_WANT_MOVS
 #define EMU86_EMULATE_CONFIG_WANT_MOVS (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
 #endif /* !EMU86_EMULATE_CONFIG_WANT_MOVS */
-#ifndef EMU86_EMULATE_CONFIG_WANT_MOVSREG
-#define EMU86_EMULATE_CONFIG_WANT_MOVSREG (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
-#endif /* !EMU86_EMULATE_CONFIG_WANT_MOVSREG */
-
-#ifndef EMU86_EMULATE_CONFIG_WANT_SYSCALL
-#define EMU86_EMULATE_CONFIG_WANT_SYSCALL (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
-#endif /* !EMU86_EMULATE_CONFIG_WANT_SYSCALL */
-#ifndef EMU86_EMULATE_CONFIG_WANT_SYSRET
-#define EMU86_EMULATE_CONFIG_WANT_SYSRET (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
-#endif /* !EMU86_EMULATE_CONFIG_WANT_SYSRET */
-#ifndef EMU86_EMULATE_CONFIG_WANT_SYSENTER
-#define EMU86_EMULATE_CONFIG_WANT_SYSENTER (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
-#endif /* !EMU86_EMULATE_CONFIG_WANT_SYSENTER */
-#ifndef EMU86_EMULATE_CONFIG_WANT_SYSEXIT
-#define EMU86_EMULATE_CONFIG_WANT_SYSEXIT (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
-#endif /* !EMU86_EMULATE_CONFIG_WANT_SYSEXIT */
+#ifndef EMU86_EMULATE_CONFIG_WANT_MOV_SREG
+#define EMU86_EMULATE_CONFIG_WANT_MOV_SREG (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_MOV_SREG */
+#ifndef EMU86_EMULATE_CONFIG_WANT_MOVSX
+#define EMU86_EMULATE_CONFIG_WANT_MOVSX (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_MOVSX */
+#ifndef EMU86_EMULATE_CONFIG_WANT_MOVSXD
+#define EMU86_EMULATE_CONFIG_WANT_MOVSXD (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_MOVSXD */
+#ifndef EMU86_EMULATE_CONFIG_WANT_MOVZX
+#define EMU86_EMULATE_CONFIG_WANT_MOVZX (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_MOVZX */
+#ifndef EMU86_EMULATE_CONFIG_WANT_ARPL
+#define EMU86_EMULATE_CONFIG_WANT_ARPL (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_ARPL */
+#ifndef EMU86_EMULATE_CONFIG_WANT_NOP_RM
+#define EMU86_EMULATE_CONFIG_WANT_NOP_RM (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_NOP_RM */
+#ifndef EMU86_EMULATE_CONFIG_WANT_PEXT
+#define EMU86_EMULATE_CONFIG_WANT_PEXT (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_PEXT */
+#ifndef EMU86_EMULATE_CONFIG_WANT_PDEP
+#define EMU86_EMULATE_CONFIG_WANT_PDEP (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_PDEP */
+#ifndef EMU86_EMULATE_CONFIG_WANT_BZHI
+#define EMU86_EMULATE_CONFIG_WANT_BZHI (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_BZHI */
 #ifndef EMU86_EMULATE_CONFIG_WANT_SLDT
 #define EMU86_EMULATE_CONFIG_WANT_SLDT 0
 #endif /* !EMU86_EMULATE_CONFIG_WANT_SLDT */
@@ -457,6 +469,150 @@ __DECL_BEGIN
 #ifndef EMU86_EMULATE_CONFIG_WANT_LSL
 #define EMU86_EMULATE_CONFIG_WANT_LSL 0
 #endif /* !EMU86_EMULATE_CONFIG_WANT_LSL */
+#ifndef EMU86_EMULATE_CONFIG_WANT_POPCNT
+#define EMU86_EMULATE_CONFIG_WANT_POPCNT (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_POPCNT */
+#ifndef EMU86_EMULATE_CONFIG_WANT_PUSHA
+#define EMU86_EMULATE_CONFIG_WANT_PUSHA (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_PUSHA */
+#ifndef EMU86_EMULATE_CONFIG_WANT_POPA
+#define EMU86_EMULATE_CONFIG_WANT_POPA (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_POPA */
+#ifndef EMU86_EMULATE_CONFIG_WANT_PUSHF
+#define EMU86_EMULATE_CONFIG_WANT_PUSHF (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_PUSHF */
+#ifndef EMU86_EMULATE_CONFIG_WANT_POPF
+#define EMU86_EMULATE_CONFIG_WANT_POPF (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_POPF */
+#ifndef EMU86_EMULATE_CONFIG_WANT_PUSH_IMM
+#define EMU86_EMULATE_CONFIG_WANT_PUSH_IMM (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_PUSH_IMM */
+#ifndef EMU86_EMULATE_CONFIG_WANT_PUSH_REG
+#define EMU86_EMULATE_CONFIG_WANT_PUSH_REG (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_PUSH_REG */
+#ifndef EMU86_EMULATE_CONFIG_WANT_POP_REG
+#define EMU86_EMULATE_CONFIG_WANT_POP_REG (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_POP_REG */
+#ifndef EMU86_EMULATE_CONFIG_WANT_POP_RM
+#define EMU86_EMULATE_CONFIG_WANT_POP_RM (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_POP_RM */
+#ifndef EMU86_EMULATE_CONFIG_WANT_PUSH_ES
+#define EMU86_EMULATE_CONFIG_WANT_PUSH_ES (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_PUSH_ES */
+#ifndef EMU86_EMULATE_CONFIG_WANT_POP_ES
+#define EMU86_EMULATE_CONFIG_WANT_POP_ES (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_POP_ES */
+#ifndef EMU86_EMULATE_CONFIG_WANT_PUSH_CS
+#define EMU86_EMULATE_CONFIG_WANT_PUSH_CS (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_PUSH_CS */
+#ifndef EMU86_EMULATE_CONFIG_WANT_PUSH_SS
+#define EMU86_EMULATE_CONFIG_WANT_PUSH_SS (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_PUSH_SS */
+#ifndef EMU86_EMULATE_CONFIG_WANT_POP_SS
+#define EMU86_EMULATE_CONFIG_WANT_POP_SS (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_POP_SS */
+#ifndef EMU86_EMULATE_CONFIG_WANT_PUSH_DS
+#define EMU86_EMULATE_CONFIG_WANT_PUSH_DS (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_PUSH_DS */
+#ifndef EMU86_EMULATE_CONFIG_WANT_POP_DS
+#define EMU86_EMULATE_CONFIG_WANT_POP_DS (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_POP_DS */
+#ifndef EMU86_EMULATE_CONFIG_WANT_PUSH_FS
+#define EMU86_EMULATE_CONFIG_WANT_PUSH_FS (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_PUSH_FS */
+#ifndef EMU86_EMULATE_CONFIG_WANT_POP_FS
+#define EMU86_EMULATE_CONFIG_WANT_POP_FS (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_POP_FS */
+#ifndef EMU86_EMULATE_CONFIG_WANT_PUSH_GS
+#define EMU86_EMULATE_CONFIG_WANT_PUSH_GS (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_PUSH_GS */
+#ifndef EMU86_EMULATE_CONFIG_WANT_POP_GS
+#define EMU86_EMULATE_CONFIG_WANT_POP_GS (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_POP_GS */
+#ifndef EMU86_EMULATE_CONFIG_WANT_RET
+#define EMU86_EMULATE_CONFIG_WANT_RET (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_RET */
+#ifndef EMU86_EMULATE_CONFIG_WANT_RORX
+#define EMU86_EMULATE_CONFIG_WANT_RORX (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_RORX */
+#ifndef EMU86_EMULATE_CONFIG_WANT_SAHF
+#define EMU86_EMULATE_CONFIG_WANT_SAHF (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_SAHF */
+#ifndef EMU86_EMULATE_CONFIG_WANT_LAHF
+#define EMU86_EMULATE_CONFIG_WANT_LAHF (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_LAHF */
+#ifndef EMU86_EMULATE_CONFIG_WANT_SALC
+#define EMU86_EMULATE_CONFIG_WANT_SALC (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_SALC */
+#ifndef EMU86_EMULATE_CONFIG_WANT_SCAS
+#define EMU86_EMULATE_CONFIG_WANT_SCAS (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_SCAS */
+#ifndef EMU86_EMULATE_CONFIG_WANT_SHIFT
+#define EMU86_EMULATE_CONFIG_WANT_SHIFT (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_SHIFT */
+#ifndef EMU86_EMULATE_CONFIG_WANT_SHIFT2
+#define EMU86_EMULATE_CONFIG_WANT_SHIFT2 (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_SHIFT2 */
+#ifndef EMU86_EMULATE_CONFIG_WANT_BEXTR
+#define EMU86_EMULATE_CONFIG_WANT_BEXTR (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_BEXTR */
+#ifndef EMU86_EMULATE_CONFIG_WANT_SHIFTX
+#define EMU86_EMULATE_CONFIG_WANT_SHIFTX (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_SHIFTX */
+#ifndef EMU86_EMULATE_CONFIG_WANT_CMC
+#define EMU86_EMULATE_CONFIG_WANT_CMC (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_CMC */
+#ifndef EMU86_EMULATE_CONFIG_WANT_CLC
+#define EMU86_EMULATE_CONFIG_WANT_CLC (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_CLC */
+#ifndef EMU86_EMULATE_CONFIG_WANT_STC
+#define EMU86_EMULATE_CONFIG_WANT_STC (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_STC */
+#ifndef EMU86_EMULATE_CONFIG_WANT_CLD
+#define EMU86_EMULATE_CONFIG_WANT_CLD (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_CLD */
+#ifndef EMU86_EMULATE_CONFIG_WANT_STD
+#define EMU86_EMULATE_CONFIG_WANT_STD (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_STD */
+#ifndef EMU86_EMULATE_CONFIG_WANT_CLI
+#define EMU86_EMULATE_CONFIG_WANT_CLI (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_CLI */
+#ifndef EMU86_EMULATE_CONFIG_WANT_STI
+#define EMU86_EMULATE_CONFIG_WANT_STI (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_STI */
+#ifndef EMU86_EMULATE_CONFIG_WANT_STOS
+#define EMU86_EMULATE_CONFIG_WANT_STOS (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_STOS */
+#ifndef EMU86_EMULATE_CONFIG_WANT_SYSCALL
+#define EMU86_EMULATE_CONFIG_WANT_SYSCALL (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_SYSCALL */
+#ifndef EMU86_EMULATE_CONFIG_WANT_SYSRET
+#define EMU86_EMULATE_CONFIG_WANT_SYSRET (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_SYSRET */
+#ifndef EMU86_EMULATE_CONFIG_WANT_SYSENTER
+#define EMU86_EMULATE_CONFIG_WANT_SYSENTER (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_SYSENTER */
+#ifndef EMU86_EMULATE_CONFIG_WANT_SYSEXIT
+#define EMU86_EMULATE_CONFIG_WANT_SYSEXIT (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_SYSEXIT */
+#ifndef EMU86_EMULATE_CONFIG_WANT_XADD
+#define EMU86_EMULATE_CONFIG_WANT_XADD (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_XADD */
+#ifndef EMU86_EMULATE_CONFIG_WANT_XCHG_RM
+#define EMU86_EMULATE_CONFIG_WANT_XCHG_RM (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_XCHG_RM */
+#ifndef EMU86_EMULATE_CONFIG_WANT_NOP
+#define EMU86_EMULATE_CONFIG_WANT_NOP (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_NOP */
+#ifndef EMU86_EMULATE_CONFIG_WANT_PAUSE
+#define EMU86_EMULATE_CONFIG_WANT_PAUSE (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_PAUSE */
+#ifndef EMU86_EMULATE_CONFIG_WANT_XCHG_REG
+#define EMU86_EMULATE_CONFIG_WANT_XCHG_REG (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_XCHG_REG */
+#ifndef EMU86_EMULATE_CONFIG_WANT_XLATB
+#define EMU86_EMULATE_CONFIG_WANT_XLATB (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_XLATB */
 
 
 /* Enable support for rdfsbase/rdgsbase/wrfsbase/wrgsbase
@@ -631,24 +787,28 @@ __DECL_BEGIN
 #else /* E_ILLEGAL_INSTRUCTION_X86_OPCODE */
 #define _EMU86_GETOPCODE_RMREG()  EMU86_OPCODE()
 #endif /* !E_ILLEGAL_INSTRUCTION_X86_OPCODE */
-#define EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION()           THROW(E_ILLEGAL_INSTRUCTION_BAD_OPCODE, _EMU86_GETOPCODE())
-#define EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION_RMREG()     THROW(E_ILLEGAL_INSTRUCTION_BAD_OPCODE, _EMU86_GETOPCODE_RMREG())
-#define EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION()        THROW(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE, _EMU86_GETOPCODE())
-#define EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION_RMREG()  THROW(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE, _EMU86_GETOPCODE_RMREG())
-#define EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM()         THROW(E_ILLEGAL_INSTRUCTION_BAD_OPERAND, _EMU86_GETOPCODE(), E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE)
-#define EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM_RMREG()   THROW(E_ILLEGAL_INSTRUCTION_BAD_OPERAND, _EMU86_GETOPCODE_RMREG(), E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE)
-#define EMU86_EMULATE_RETURN_EXPECTED_REGISTER_MODRM()       THROW(E_ILLEGAL_INSTRUCTION_BAD_OPERAND, _EMU86_GETOPCODE(), E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE)
-#define EMU86_EMULATE_RETURN_EXPECTED_REGISTER_MODRM_RMREG() THROW(E_ILLEGAL_INSTRUCTION_BAD_OPERAND, _EMU86_GETOPCODE_RMREG(), E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE)
+#define EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION()           THROW(E_ILLEGAL_INSTRUCTION_BAD_OPCODE, _EMU86_GETOPCODE(), op_flags)
+#define EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION_RMREG()     THROW(E_ILLEGAL_INSTRUCTION_BAD_OPCODE, _EMU86_GETOPCODE_RMREG(), op_flags)
+#define EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION()        THROW(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE, _EMU86_GETOPCODE(), op_flags)
+#define EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION_RMREG()  THROW(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE, _EMU86_GETOPCODE_RMREG(), op_flags)
+#define EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM()         THROW(E_ILLEGAL_INSTRUCTION_BAD_OPERAND, _EMU86_GETOPCODE(), op_flags, E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE)
+#define EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM_RMREG()   THROW(E_ILLEGAL_INSTRUCTION_BAD_OPERAND, _EMU86_GETOPCODE_RMREG(), op_flags, E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE)
+#define EMU86_EMULATE_RETURN_EXPECTED_REGISTER_MODRM()       THROW(E_ILLEGAL_INSTRUCTION_BAD_OPERAND, _EMU86_GETOPCODE(), op_flags, E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE)
+#define EMU86_EMULATE_RETURN_EXPECTED_REGISTER_MODRM_RMREG() THROW(E_ILLEGAL_INSTRUCTION_BAD_OPERAND, _EMU86_GETOPCODE_RMREG(), op_flags, E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE)
 #ifdef E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX
 #define EMU86_EMULATE_RETURN_UNEXPECTED_LOCK()        THROW(E_ILLEGAL_INSTRUCTION_BAD_OPERAND, _EMU86_GETOPCODE(), op_flags)
 #define EMU86_EMULATE_RETURN_UNEXPECTED_LOCK_RMREG()  THROW(E_ILLEGAL_INSTRUCTION_BAD_OPERAND, _EMU86_GETOPCODE_RMREG(), op_flags)
 #endif /* E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX */
-#define EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION()       THROW(E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE, _EMU86_GETOPCODE())
-#define EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION_RMREG() THROW(E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE, _EMU86_GETOPCODE_RMREG())
+#define EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION()       THROW(E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE, _EMU86_GETOPCODE(), op_flags)
+#define EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION_RMREG() THROW(E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE, _EMU86_GETOPCODE_RMREG(), op_flags)
 #define EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(how, regno, regval, offset) \
-	THROW(E_ILLEGAL_INSTRUCTION_REGISTER, _EMU86_GETOPCODE(), how, regno, regval, offset)
+	THROW(E_ILLEGAL_INSTRUCTION_REGISTER, _EMU86_GETOPCODE(), op_flags, how, regno, regval, offset)
 #define EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER_RMREG(how, regno, regval, offset) \
-	THROW(E_ILLEGAL_INSTRUCTION_REGISTER, _EMU86_GETOPCODE_RMREG(), how, regno, regval, offset)
+	THROW(E_ILLEGAL_INSTRUCTION_REGISTER, _EMU86_GETOPCODE_RMREG(), op_flags, how, regno, regval, offset)
+#if CONFIG_LIBEMU86_WANT_64BIT
+#define EMU86_EMULATE_THROW_SEGFAULT_UNMAPPED_NONCANON(addr) \
+	THROW(E_SEGFAULT_UNMAPPED, addr, E_SEGFAULT_CONTEXT_NONCANON)
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
 #endif /* !EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION */
 
 /* #define EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION()       ... */
@@ -744,6 +904,18 @@ __DECL_BEGIN
  * @param: offset: An offset applied to the register (in case of an illegal lcall/ljmp; 0 otherwise) */
 /* #define EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(how, regno, regval, offset)       ... */
 /* #define EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER_RMREG(how, regno, regval, offset) ... */
+
+
+/* Throw an exception as the result of `addr' being non-canonical in 64-bit mode.
+ * Note that for normal memory accesses, an address is not checked for being canonical.
+ * However, certain instructions (such as wr(fs|gs)base) have an explicit except-branch
+ * that gets called whenever a non-canonical address is passed. This exception handler
+ * will then be used these (few) cases.
+ * s.a. `EMU86_VALIDATE_CANONICAL()' */
+//#if CONFIG_LIBEMU86_WANT_64BIT
+/* #define EMU86_EMULATE_THROW_SEGFAULT_UNMAPPED_NONCANON(addr) \
+	THROW(E_SEGFAULT_UNMAPPED, addr, E_SEGFAULT_CONTEXT_NONCANON) */
+//#endif /* CONFIG_LIBEMU86_WANT_64BIT */
 
 
 
@@ -944,6 +1116,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_emulate_l
 
 
 
+
 /* Read/write memory
  * NOTE: These functions aren't used when it comes to reading from PC-relative memory. */
 #ifndef EMU86_MEMREADB
@@ -1069,6 +1242,38 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_emulate_l
 #define EMU86_VALIDATE_WRITABLE(addr, num_bytes) (void)0
 #endif /* !__KERNEL__ */
 #endif /* !EMU86_VALIDATE_READABLE */
+
+
+/* Validate that a given `addr' is canonical.
+ * NOTE: It is assumed that any 32-bit address is always canonical! */
+#if CONFIG_LIBEMU86_WANT_64BIT
+#ifndef EMU86_VALIDATE_CANONICAL
+#if __SIZEOF_POINTER__ < 8
+#define EMU86_VALIDATE_CANONICAL_IS_NOOP 1
+#define EMU86_VALIDATE_CANONICAL(addr) (void)0
+#elif defined(EMU86_EMULATE_THROW_SEGFAULT_UNMAPPED_NONCANON)
+#ifndef EMU86_VALIDATE_IS_CANONICAL
+#ifdef __x86_64__
+#include <kos/kernel/paging.h>
+#define EMU86_VALIDATE_IS_CANONICAL(addr) ADDR_IS_CANON(addr)
+#else /* __x86_64__ */
+#define EMU86_VALIDATE_IS_CANONICAL(addr)                     \
+	((u64)(uintptr_t)(addr) < UINT64_C(0x0000800000000000) || \
+	 (u64)(uintptr_t)(addr) > UINT64_C(0xffff7fffffffffff))
+#endif /* !__x86_64__ */
+#endif /* !EMU86_VALIDATE_IS_CANONICAL */
+#define EMU86_VALIDATE_CANONICAL(addr)                            \
+	do {                                                          \
+		if unlikely(!EMU86_VALIDATE_IS_CANONICAL(addr))           \
+			EMU86_EMULATE_THROW_SEGFAULT_UNMAPPED_NONCANON(addr); \
+	} __WHILE0
+#else /* EMU86_EMULATE_THROW_SEGFAULT_UNMAPPED_NONCANON */
+#define EMU86_VALIDATE_CANONICAL_IS_NOOP 1
+#define EMU86_VALIDATE_CANONICAL(addr) (void)0
+#endif /* !EMU86_EMULATE_THROW_SEGFAULT_UNMAPPED_NONCANON */
+#endif /* !EMU86_VALIDATE_CANONICAL */
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+
 
 /* Handle the case where an unsupported instruction performs a memory access.
  * @param: addr:      [type(void *)] Base address (not translated). 
@@ -2223,8 +2428,8 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_
 		switch (tiny_opcode)
 #define EMU86_INTELLISENSE_END                                         \
 done:                                                                  \
-done_dont_set_pc:                                                      \
 return_unknown_instruction:                                            \
+_EMU86_INTELLISENSE_DEFINE_LABEL(done_dont_set_pc)                     \
 _EMU86_INTELLISENSE_DEFINE_LABEL(return_privileged_instruction_rmreg)  \
 _EMU86_INTELLISENSE_DEFINE_LABEL(return_privileged_instruction)        \
 _EMU86_INTELLISENSE_DEFINE_LABEL(return_expected_memory_modrm_rmreg)   \
@@ -2747,42 +2952,44 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #include "emu/lxs.c.inl"
 #include "emu/misc.c.inl"
 #include "emu/misc2.c.inl"
-#include "emu/mov-imm.c.inl"    /* TODO: EMU86_EMULATE_CONFIG_WANT_xxx */
-#include "emu/mov-moffs.c.inl"  /* TODO: EMU86_EMULATE_CONFIG_WANT_xxx */
-#include "emu/mov-sreg.c.inl"   /* TODO: EMU86_EMULATE_CONFIG_WANT_xxx */
+#include "emu/mov-imm.c.inl"
+#include "emu/mov-moffs.c.inl"
+#include "emu/mov-sreg.c.inl"
 #include "emu/mov.c.inl"
 #include "emu/movbe.c.inl"
 #include "emu/movdir64b.c.inl"
-#include "emu/movs.c.inl"       /* TODO: EMU86_EMULATE_CONFIG_WANT_xxx */
-#include "emu/movsx.c.inl"      /* TODO: EMU86_EMULATE_CONFIG_WANT_xxx */
-#include "emu/movsxd.c.inl"     /* TODO: EMU86_EMULATE_CONFIG_WANT_xxx */
-#include "emu/movzx.c.inl"      /* TODO: EMU86_EMULATE_CONFIG_WANT_xxx */
-#include "emu/nop.c.inl"        /* TODO: EMU86_EMULATE_CONFIG_WANT_xxx */
-#include "emu/pext.c.inl"       /* TODO: EMU86_EMULATE_CONFIG_WANT_xxx */
+#include "emu/movs.c.inl"
+#include "emu/movsx.c.inl"
+#include "emu/movsxd.c.inl"
+#include "emu/movzx.c.inl"
+#include "emu/nop.c.inl"
+#include "emu/pext.c.inl"
 #include "emu/pmode.c.inl"
-#include "emu/popcnt.c.inl"     /* TODO: EMU86_EMULATE_CONFIG_WANT_xxx */
-#include "emu/push-pop.c.inl"   /* TODO: EMU86_EMULATE_CONFIG_WANT_xxx */
-#include "emu/pusha-popa.c.inl" /* TODO: EMU86_EMULATE_CONFIG_WANT_xxx */
-#include "emu/pushf-popf.c.inl" /* TODO: EMU86_EMULATE_CONFIG_WANT_xxx */
-#include "emu/ret.c.inl"        /* TODO: EMU86_EMULATE_CONFIG_WANT_xxx */
-#include "emu/rorx.c.inl"       /* TODO: EMU86_EMULATE_CONFIG_WANT_xxx */
-#include "emu/sahf-lahf.c.inl"  /* TODO: EMU86_EMULATE_CONFIG_WANT_xxx */
-#include "emu/salc.c.inl"       /* TODO: EMU86_EMULATE_CONFIG_WANT_xxx */
-#include "emu/scas.c.inl"       /* TODO: EMU86_EMULATE_CONFIG_WANT_xxx */
-#include "emu/shift.c.inl"      /* TODO: EMU86_EMULATE_CONFIG_WANT_xxx */
-#include "emu/shift2.c.inl"     /* TODO: EMU86_EMULATE_CONFIG_WANT_xxx */
-#include "emu/shiftx.c.inl"     /* TODO: EMU86_EMULATE_CONFIG_WANT_xxx */
-#include "emu/stcf.c.inl"       /* TODO: EMU86_EMULATE_CONFIG_WANT_xxx */
-#include "emu/stdf.c.inl"       /* TODO: EMU86_EMULATE_CONFIG_WANT_xxx */
-#include "emu/stif.c.inl"       /* TODO: EMU86_EMULATE_CONFIG_WANT_xxx */
-#include "emu/stos.c.inl"       /* TODO: EMU86_EMULATE_CONFIG_WANT_xxx */
-#include "emu/syscall.c.inl"    /* TODO: EMU86_EMULATE_CONFIG_WANT_xxx */
-#include "emu/sysenter.c.inl"   /* TODO: EMU86_EMULATE_CONFIG_WANT_xxx */
-#include "emu/sysexit.c.inl"    /* TODO: EMU86_EMULATE_CONFIG_WANT_xxx */
-#include "emu/sysret.c.inl"     /* TODO: EMU86_EMULATE_CONFIG_WANT_xxx */
-#include "emu/xadd.c.inl"       /* TODO: EMU86_EMULATE_CONFIG_WANT_xxx */
-#include "emu/xchg.c.inl"       /* TODO: EMU86_EMULATE_CONFIG_WANT_xxx */
-#include "emu/xlatb.c.inl"      /* TODO: EMU86_EMULATE_CONFIG_WANT_xxx */
+#include "emu/popcnt.c.inl"
+#include "emu/push-imm.c.inl"
+#include "emu/push-pop-sreg.c.inl"
+#include "emu/push-pop.c.inl"
+#include "emu/pusha-popa.c.inl"
+#include "emu/pushf-popf.c.inl"
+#include "emu/ret.c.inl"
+#include "emu/rorx.c.inl"
+#include "emu/sahf-lahf.c.inl"
+#include "emu/salc.c.inl"
+#include "emu/scas.c.inl"
+#include "emu/shift.c.inl"
+#include "emu/shift2.c.inl"
+#include "emu/shiftx.c.inl"
+#include "emu/stcf.c.inl"
+#include "emu/stdf.c.inl"
+#include "emu/stif.c.inl"
+#include "emu/stos.c.inl"
+#include "emu/syscall.c.inl"
+#include "emu/sysenter.c.inl"
+#include "emu/sysexit.c.inl"
+#include "emu/sysret.c.inl"
+#include "emu/xadd.c.inl"
+#include "emu/xchg.c.inl"
+#include "emu/xlatb.c.inl"
 #endif /* !EMU86_EMULATE_IMPL_HEADER */
 #endif /* !__INTELLISENSE__ */
 
@@ -2797,8 +3004,110 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 			/* XXX: rdrand     (if only for verbose exception messages?) */
 			/* XXX: rdseed     (if only for verbose exception messages?) */
 			/* XXX: rdpid      (if only for verbose exception messages?) */
+			/* XXX: xgetbv     (if only for verbose exception messages?) */
+			/* XXX: xsetbv     (if only for verbose exception messages?) */
+			/* XXX: vmfunc     (if only for verbose exception messages?) */
+			/* XXX: vmfunc     (if only for verbose exception messages?) */
+			/* XXX: xtest      (if only for verbose exception messages?) */
+			/* XXX: enclu      (if only for verbose exception messages?) */
+			/* XXX: monitor    (if only for verbose exception messages?) */
+			/* XXX: mwait      (if only for verbose exception messages?) */
+			/* XXX: encls      (if only for verbose exception messages?) */
+			/* XXX: vmcall     (if only for verbose exception messages?) */
+			/* XXX: vmlaunch   (if only for verbose exception messages?) */
+			/* XXX: vmresume   (if only for verbose exception messages?) */
+			/* XXX: vmxoff     (if only for verbose exception messages?) */
+			/* XXX: invpcid    (if only for verbose exception messages?) */
 
 			/* TODO: crc32 */
+			/* TODO: clac */
+			/* TODO: stac */
+			/* TODO: movnti */
+
+			/* TODO: Go through all instructions and add LOCK-missing assertions.
+			 *       The following is a list of all instructions that allow for a lock prefix */
+			/* 0F BB     BTC r/m16, r16     Store selected bit in CF flag and complement */
+			/* 0F BB     BTC r/m32, r32     Store selected bit in CF flag and complement */
+			/* 0F B3     BTR r/m16, r16     Store selected bit in CF flag and clear */
+			/* 0F B3     BTR r/m32, r32     Store selected bit in CF flag and clear */
+			/* 0F AB     BTS r/m16, r16     Store selected bit in CF flag and set */
+			/* 0F AB     BTS r/m32, r32     Store selected bit in CF flag and set */
+			/* FE /0     INC r/m8     Increment r/m byte by 1 */
+			/* FE /1     DEC r/m8     Decrement r/m8 by 1 */
+			/* FF /0     INC r/m16     Increment r/m word by 1 */
+			/* FF /0     INC r/m32     Increment r/m doubleword by 1 */
+			/* FF /1     DEC r/m16     Decrement r/m16 by 1 */
+			/* FF /1     DEC r/m32     Decrement r/m32 by 1 */
+			/* 0F B0 /r     CMPXCHG r/m8,r8     Compare AL with r/m8. If equal, ZF is set and r8 is loaded into r/m8. Else, clear ZF and load r/m8 into AL */
+			/* 0F B1 /r     CMPXCHG r/m16,r16    Compare AX with r/m16. If equal, ZF is set and r16 is loaded into r/m16. Else, clear ZF and load r/m16 into AX */
+			/* 0F B1 /r     CMPXCHG r/m32,r32    Compare EAX with r/m32. If equal, ZF is set and r32 is loaded into r/m32. Else, clear ZF and load r/m32 into EAX */
+			/* 0F C7 /1 m64     CMPXCHG8B m64     Compare EDX:EAX with m64. If equal, set ZF and load ECX:EBX into m64. Else, clear ZF and load m64 into EDX:EAX */
+			/* F6 /2     NOT r/m8     Reverse each bit of r/m8 */
+			/* F6 /3     NEG r/m8     Two's complement negate r/m8 */
+			/* F7 /2     NOT r/m16     Reverse each bit of r/m16 */
+			/* F7 /2     NOT r/m32     Reverse each bit of r/m32 */
+			/* F7 /3     NEG r/m16     Two's complement negate r/m16 */
+			/* F7 /3     NEG r/m32     Two's complement negate r/m32 */
+			/* 0F C0 /r     XADD r/m8, r8     Exchange r8 and r/m8; load sum into r/m8 */
+			/* 0F C1 /r     XADD r/m16, r16     Exchange r16 and r/m16; load sum into r/m16 */
+			/* 0F C1 /r     XADD r/m32, r32     Exchange r32 and r/m32; load sum into r/m32 */
+			/* C0 /0 ib     ROL r/m8,imm8     Rotate 8 bits r/m8 left imm8 times */
+			/* C0 /1 ib     ROR r/m8,imm8     Rotate 8 bits r/m16 right imm8 times */
+			/* C0 /2 ib     RCL r/m8,imm8     Rotate 9 bits (CF, r/m8) left imm8 times */
+			/* C0 /3 ib     RCR r/m8,imm8     Rotate 9 bits (CF, r/m8) right imm8 times */
+			/* C0 /4 ib     SAL r/m8,imm8     Multiply r/m8 by 2, imm8 times */
+			/* C0 /4 ib     SHL r/m8,imm8     Multiply r/m8 by 2, imm8 times */
+			/* C0 /5 ib     SHR r/m8,imm8     Unsigned divide r/m8 by 2, imm8 times */
+			/* C0 /7 ib     SAR r/m8,imm8     Signed divide* r/m8 by 2, imm8 times */
+			/* C1 /0 ib     ROL r/m16,imm8     Rotate 16 bits r/m16 left imm8 times. */
+			/* C1 /0 ib     ROL r/m32,imm8     Rotate 32 bits r/m32 left imm8 times */
+			/* C1 /1 ib     ROR r/m16,imm8     Rotate 16 bits r/m16 right imm8 times */
+			/* C1 /1 ib     ROR r/m32,imm8     Rotate 32 bits r/m32 right imm8 times */
+			/* C1 /2 ib     RCL r/m16,imm8     Rotate 17 bits (CF, r/m16) left imm8 times */
+			/* C1 /2 ib     RCL r/m32,imm8     Rotate 33 bits (CF, r/m32) left imm8 times */
+			/* C1 /3 ib     RCR r/m16,imm8     Rotate 17 bits (CF, r/m16) right imm8 times */
+			/* C1 /3 ib     RCR r/m32,imm8     Rotate 33 bits (CF, r/m32) right imm8 times */
+			/* C1 /4 ib     SAL r/m16,imm8     Multiply r/m16 by 2, imm8 times */
+			/* C1 /4 ib     SAL r/m32,imm8     Multiply r/m32 by 2, imm8 times */
+			/* C1 /4 ib     SHL r/m16,imm8     Multiply r/m16 by 2, imm8 times */
+			/* C1 /4 ib     SHL r/m32,imm8     Multiply r/m32 by 2, imm8 times */
+			/* C1 /5 ib     SHR r/m16,imm8     Unsigned divide r/m16 by 2, imm8 times */
+			/* C1 /5 ib     SHR r/m32,imm8     Unsigned divide r/m32 by 2, imm8 times */
+			/* C1 /7 ib     SAR r/m16,imm8     Signed divide* r/m16 by 2, imm8 times */
+			/* C1 /7 ib     SAR r/m32,imm8     Signed divide* r/m32 by 2, imm8 times */
+			/* D0 /0     ROL r/m8, 1     Rotate 8 bits r/m8 left once */
+			/* D0 /1     ROR r/m8, 1     Rotate 8 bits r/m8 right once */
+			/* D0 /2     RCL r/m8, 1     Rotate 9 bits (CF, r/m8) left once */
+			/* D0 /3     RCR r/m8, 1     Rotate 9 bits (CF, r/m8) right once */
+			/* D0 /4     SAL r/m8     Multiply r/m8 by 2, 1 time */
+			/* D0 /4     SHL r/m8     Multiply r/m8 by 2, 1 time */
+			/* D0 /5     SHR r/m8     Unsigned divide r/m8 by 2, 1 time */
+			/* D0 /7     SAR r/m8     Signed divide* r/m8 by 2, 1 times */
+			/* D1 /0     ROL r/m16, 1     Rotate 16 bits r/m16 left once */
+			/* D1 /0     ROL r/m32, 1     Rotate 32 bits r/m32 left once */
+			/* D1 /1     ROR r/m16, 1     Rotate 16 bits r/m16 right once */
+			/* D1 /1     ROR r/m32, 1     Rotate 32 bits r/m32 right once */
+			/* D1 /2     RCL r/m16, 1     Rotate 17 bits (CF, r/m16) left once */
+			/* D1 /2     RCL r/m32, 1     Rotate 33 bits (CF, r/m32) left once */
+			/* D1 /3     RCR r/m16, 1     Rotate 17 bits (CF, r/m16) right once */
+			/* D1 /3     RCR r/m32, 1     Rotate 33 bits (CF, r/m32) right once */
+			/* D1 /4     SAL r/m16     Multiply r/m16 by 2, 1 time */
+			/* D1 /4     SAL r/m32     Multiply r/m32 by 2, 1 time */
+			/* D1 /4     SHL r/m16     Multiply r/m16 by 2, 1 time */
+			/* D1 /4     SHL r/m32     Multiply r/m32 by 2, 1 time */
+			/* D1 /5     SHR r/m16     Unsigned divide r/m16 by 2, 1 time */
+			/* D1 /5     SHR r/m32     Unsigned divide r/m32 by 2, 1 time */
+			/* D1 /7     SAR r/m16     Signed divide* r/m16 by 2, 1 time */
+			/* D1 /7     SAR r/m32     Signed divide* r/m32 by 2, 1 time */
+			/* 0F A4     SHLD r/m16, r16, imm8     Shift r/m16 to left imm8 places while shifting bits from r16 in from the right */
+			/* 0F A4     SHLD r/m32, r32, imm8     Shift r/m32 to left imm8 places while shifting bits from r32 in from the right */
+			/* 0F A5     SHLD r/m16, r16, CL     Shift r/m16 to left CL places while shifting bits from r16 in from the right */
+			/* 0F A5     SHLD r/m32, r32, CL     Shift r/m32 to left CL places while shifting bits from r32 in from the right */
+			/* 0F AC     SHRD r/m16, r16, imm8     Shift r/m16 to right imm8 places while shifting bits from r16 in from the left */
+			/* 0F AC     SHRD r/m32, r32, imm8     Shift r/m32 to right imm8 places while shifting bits from r32 in from the left */
+			/* 0F AD     SHRD r/m16, r16, CL     Shift r/m16 to right CL places while shifting bits from r16 in from the left */
+			/* 0F AD     SHRD r/m32, r32, CL     Shift r/m32 to right CL places while shifting bits from r32 in from the left */
+
 
 			//TODO: https://en.wikipedia.org/wiki/Bit_Manipulation_Instruction_Sets
 			//      BEXTR
@@ -2817,6 +3126,103 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 
 
 /* Helpers for handling unsupported instructions. */
+#ifdef NEED_notsup_stosb_userprivileged
+#undef NEED_notsup_stosb_userprivileged
+notsup_stosb_userprivileged:
+#ifndef EMU86_UNSUPPORTED_MEMACCESS_IS_NOOP
+		{
+			void *baseaddr;
+			EMU86_ADDRSIZE_SWITCH({
+				baseaddr = (void *)(uintptr_t)EMU86_GETRDI();
+			}, {
+				baseaddr = EMU86_SEGADDR(EMU86_GETESBASE(), EMU86_GETEDI());
+			}, {
+				baseaddr = EMU86_SEGADDR(EMU86_GETDSBASE(), EMU86_GETDI());
+			});
+			EMU86_UNSUPPORTED_MEMACCESS(baseaddr, 1, false, true);
+		}
+#endif /* !EMU86_UNSUPPORTED_MEMACCESS_IS_NOOP */
+		goto notsup_userprivileged;
+#define NEED_notsup_userprivileged
+#endif /* NEED_notsup_stosb_userprivileged */
+
+
+#ifdef NEED_notsup_stoswlq_userprivileged
+#undef NEED_notsup_stoswlq_userprivileged
+notsup_stoswlq_userprivileged:
+#ifndef EMU86_UNSUPPORTED_MEMACCESS_IS_NOOP
+		{
+			void *baseaddr;
+			size_t num_bytes = IF_64BIT(IS_64BIT() ? 8 :) !IS_16BIT() ? 4 : 2;
+			EMU86_ADDRSIZE_SWITCH({
+				baseaddr = (void *)(uintptr_t)EMU86_GETRDI();
+			}, {
+				baseaddr = EMU86_SEGADDR(EMU86_GETESBASE(), EMU86_GETEDI());
+			}, {
+				baseaddr = EMU86_SEGADDR(EMU86_GETDSBASE(), EMU86_GETDI());
+			});
+			EMU86_UNSUPPORTED_MEMACCESS(baseaddr, num_bytes, false, true);
+		}
+#endif /* !EMU86_UNSUPPORTED_MEMACCESS_IS_NOOP */
+		goto notsup_userprivileged;
+#define NEED_notsup_userprivileged
+#endif /* NEED_notsup_stoswlq_userprivileged */
+
+
+#ifdef NEED_notsup_lodsb_userprivileged
+#undef NEED_notsup_lodsb_userprivileged
+notsup_lodsb_userprivileged:
+#ifndef EMU86_UNSUPPORTED_MEMACCESS_IS_NOOP
+		{
+			void *baseaddr;
+			EMU86_ADDRSIZE_SWITCH({
+				baseaddr = (void *)(uintptr_t)EMU86_GETRDI();
+			}, {
+				baseaddr = EMU86_SEGADDR(EMU86_GETESBASE(), EMU86_GETEDI());
+			}, {
+				baseaddr = EMU86_SEGADDR(EMU86_GETDSBASE(), EMU86_GETDI());
+			});
+			EMU86_UNSUPPORTED_MEMACCESS(baseaddr, 1, true, false);
+		}
+#endif /* !EMU86_UNSUPPORTED_MEMACCESS_IS_NOOP */
+		goto notsup_userprivileged;
+#define NEED_notsup_userprivileged
+#endif /* NEED_notsup_lodsb_userprivileged */
+
+
+#ifdef NEED_notsup_lodswlq_userprivileged
+#undef NEED_notsup_lodswlq_userprivileged
+notsup_lodswlq_userprivileged:
+#ifndef EMU86_UNSUPPORTED_MEMACCESS_IS_NOOP
+		{
+			void *baseaddr;
+			size_t num_bytes = IF_64BIT(IS_64BIT() ? 8 :) !IS_16BIT() ? 4 : 2;
+			EMU86_ADDRSIZE_SWITCH({
+				baseaddr = (void *)(uintptr_t)EMU86_GETRDI();
+			}, {
+				baseaddr = EMU86_SEGADDR(EMU86_GETESBASE(), EMU86_GETEDI());
+			}, {
+				baseaddr = EMU86_SEGADDR(EMU86_GETDSBASE(), EMU86_GETDI());
+			});
+			EMU86_UNSUPPORTED_MEMACCESS(baseaddr, num_bytes, true, false);
+		}
+#endif /* !EMU86_UNSUPPORTED_MEMACCESS_IS_NOOP */
+		goto notsup_userprivileged;
+#define NEED_notsup_userprivileged
+#endif /* NEED_notsup_lodswlq_userprivileged */
+
+
+#ifdef NEED_notsup_userprivileged
+#undef NEED_notsup_userprivileged
+notsup_userprivileged:
+		if (EMU86_ISUSER())
+			goto return_privileged_instruction;
+#define NEED_return_privileged_instruction
+		goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* NEED_notsup_userprivileged */
+
+
 #ifdef NEED_notsup_stosb
 #undef NEED_notsup_stosb
 notsup_stosb:
@@ -2836,6 +3242,7 @@ notsup_stosb:
 		goto return_unsupported_instruction;
 #define NEED_return_unsupported_instruction
 #endif /* NEED_notsup_stosb */
+
 
 #ifdef NEED_notsup_stoswlq
 #undef NEED_notsup_stoswlq
@@ -2922,6 +3329,15 @@ notsup_modrm_setwlq_rmreg:
 #endif /* NEED_notsup_modrm_setwlq_rmreg */
 
 
+#ifdef NEED_notsup_modrm_setwlq_rmreg_modrm_parsed_popwlq
+#undef NEED_notsup_modrm_setwlq_rmreg_modrm_parsed_popwlq
+notsup_modrm_setwlq_rmreg_modrm_parsed_popwlq:
+		EMU86_POP163264_NOSUP();
+		goto notsup_modrm_setwlq_rmreg_modrm_parsed;
+#define NEED_notsup_modrm_setwlq_rmreg_modrm_parsed
+#endif /* NEED_notsup_modrm_setwlq_rmreg_modrm_parsed_popwlq */
+
+
 #ifdef NEED_notsup_modrm_setwlq_rmreg_modrm_parsed
 #undef NEED_notsup_modrm_setwlq_rmreg_modrm_parsed
 notsup_modrm_setwlq_rmreg_modrm_parsed:
@@ -2972,6 +3388,24 @@ notsup_modrm_setb:
 #endif /* NEED_notsup_modrm_setb */
 
 
+#ifdef NEED_notsup_modrm_getz_rex_w
+#undef NEED_notsup_modrm_getz_rex_w
+notsup_modrm_getz_rex_w:
+		MODRM_DECODE();
+		goto notsup_modrm_getz_rex_w_modrm_parsed;
+#define NEED_notsup_modrm_getz_rex_w_modrm_parsed
+#endif /* NEED_notsup_modrm_getz_rex_w */
+
+
+#ifdef NEED_notsup_modrm_getz_rex_w_modrm_parsed
+#undef NEED_notsup_modrm_getz_rex_w_modrm_parsed
+notsup_modrm_getz_rex_w_modrm_parsed:
+		MODRM_NOSUP_GETRMZ_VEX_W();
+		goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* NEED_notsup_modrm_getz_rex_w_modrm_parsed */
+
+
 #ifdef NEED_notsup_modrm_getwlq_rmreg
 #undef NEED_notsup_modrm_getwlq_rmreg
 notsup_modrm_getwlq_rmreg:
@@ -2994,13 +3428,14 @@ notsup_modrm_getwlq_rmreg:
 
 
 #ifdef NEED_notsup_modrm_getwlq_rmreg_modrm_parsed_pushwlq
-#include "emu/push-pop-util.h"
 #undef NEED_notsup_modrm_getwlq_rmreg_modrm_parsed_pushwlq
+#include "emu/push-pop-util.h"
 notsup_modrm_getwlq_rmreg_modrm_parsed_pushwlq:
 		EMU86_PUSH163264_NOSUP();
 		goto notsup_modrm_getwlq_rmreg_modrm_parsed;
 #define NEED_notsup_modrm_getwlq_rmreg_modrm_parsed
 #endif /* NEED_notsup_modrm_getwlq_rmreg_modrm_parsed_pushwlq */
+
 
 #ifdef NEED_notsup_modrm_getwlq_rmreg_modrm_parsed
 #undef NEED_notsup_modrm_getwlq_rmreg_modrm_parsed
@@ -3009,6 +3444,16 @@ notsup_modrm_getwlq_rmreg_modrm_parsed:
 		goto return_unsupported_instruction_rmreg;
 #define NEED_return_unsupported_instruction_rmreg
 #endif /* NEED_notsup_modrm_getwlq_rmreg_modrm_parsed */
+
+
+#ifdef NEED_notsup_modrm_getwlq_nolock
+#undef NEED_notsup_modrm_getwlq_nolock
+notsup_modrm_getwlq_nolock:
+		EMU86_REQUIRE_NO_LOCK();
+#define NEED_return_unexpected_lock
+		goto notsup_modrm_getwlq;
+#define NEED_notsup_modrm_getwlq
+#endif /* NEED_notsup_modrm_getwlq_nolock */
 
 
 #ifdef NEED_notsup_modrm_getwlq
@@ -3050,6 +3495,16 @@ notsup_modrm_getb:
 		goto return_unsupported_instruction;
 #define NEED_return_unsupported_instruction
 #endif /* NEED_notsup_modrm_getb */
+
+
+#ifdef NEED_notsup_modrm_getw
+#undef NEED_notsup_modrm_getw
+notsup_modrm_getw:
+		MODRM_DECODE();
+		MODRM_NOSUP_GETRMW();
+		goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* NEED_notsup_modrm_getw */
 
 
 #ifdef NEED_notsup_modrm_getsetb_rmreg
@@ -3120,6 +3575,15 @@ notsup_modrm_getsetwlq_rmreg_modrm_parsed:
 #endif /* NEED_notsup_modrm_getsetwlq_rmreg_modrm_parsed */
 
 
+#ifdef NEED_notsup_modrm_getsetw
+#undef NEED_notsup_modrm_getsetw
+notsup_modrm_getsetw:
+		MODRM_DECODE();
+		MODRM_NOSUP_GETSETRMW();
+		goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* NEED_notsup_modrm_getsetw */
+
 #ifdef NEED_notsup_modrm_getsetwlq
 #undef NEED_notsup_modrm_getsetwlq
 notsup_modrm_getsetwlq:
@@ -3128,6 +3592,53 @@ notsup_modrm_getsetwlq:
 		goto return_unsupported_instruction;
 #define NEED_return_unsupported_instruction
 #endif /* NEED_notsup_modrm_getsetwlq */
+
+
+#ifdef NEED_notsup_pushwlq
+#undef NEED_notsup_pushwlq
+#include "emu/push-pop-util.h"
+notsup_pushwlq:
+		EMU86_PUSH163264_NOSUP();
+		goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* NEED_notsup_pushwlq */
+
+
+#ifdef NEED_notsup_popwlq
+#undef NEED_notsup_popwlq
+#include "emu/push-pop-util.h"
+notsup_popwlq:
+		EMU86_POP163264_NOSUP();
+		goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* NEED_notsup_popwlq */
+
+
+#ifdef NEED_notsup_pushwl
+#undef NEED_notsup_pushwl
+#include "emu/push-pop-util.h"
+#ifndef EMU86_PUSH1632_NOSUP
+#error "Unsupported: notsup_pushwl"
+#endif /* EMU86_PUSH1632_NOSUP */
+notsup_pushwl:
+		EMU86_PUSH1632_NOSUP();
+		goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* NEED_notsup_pushwl */
+
+
+#ifdef NEED_notsup_popwl
+#undef NEED_notsup_popwl
+#include "emu/push-pop-util.h"
+#ifndef EMU86_POP1632_NOSUP
+#error "Unsupported: notsup_popwl"
+#endif /* EMU86_POP1632_NOSUP */
+notsup_popwl:
+		EMU86_POP1632_NOSUP();
+		goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* NEED_notsup_popwl */
+
 
 			}
 		}
@@ -3141,7 +3652,10 @@ notsup_modrm_getsetwlq:
 done:
 	/* Set the new instruction pointer. */
 	EMU86_SETPCPTR(REAL_IP());
+#ifdef NEED_done_dont_set_pc
+#undef NEED_done_dont_set_pc
 done_dont_set_pc:
+#endif /* NEED_done_dont_set_pc */
 	EMU86_EMULATE_RETURN();
 
 
@@ -3154,7 +3668,10 @@ done_dont_set_pc:
 return_privileged_instruction_rmreg:;
 #ifdef EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION_RMREG
 		EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION_RMREG();
-#endif /* EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION_RMREG */
+#else /* EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION_RMREG */
+#define NEED_return_unknown_instruction_rmreg
+		goto return_unknown_instruction_rmreg;
+#endif /* !EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION_RMREG */
 #endif /* NEED_return_privileged_instruction_rmreg */
 #ifdef NEED_return_privileged_instruction
 #undef NEED_return_privileged_instruction
@@ -3174,7 +3691,10 @@ return_privileged_instruction:;
 return_expected_memory_modrm_rmreg:;
 #ifdef EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM_RMREG
 		EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM_RMREG();
-#endif /* EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM_RMREG */
+#else /* EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM_RMREG */
+#define NEED_return_unknown_instruction_rmreg
+		goto return_unknown_instruction_rmreg;
+#endif /* !EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM_RMREG */
 #endif /* NEED_return_expected_memory_modrm_rmreg */
 #ifdef NEED_return_expected_memory_modrm
 #undef NEED_return_expected_memory_modrm
@@ -3193,7 +3713,10 @@ return_expected_memory_modrm:;
 return_expected_register_modrm_rmreg:;
 #ifdef EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM_RMREG
 		EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM_RMREG();
-#endif /* EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM_RMREG */
+#else /* EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM_RMREG */
+#define NEED_return_unknown_instruction_rmreg
+		goto return_unknown_instruction_rmreg;
+#endif /* !EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM_RMREG */
 #endif /* NEED_return_expected_register_modrm_rmreg */
 #ifdef NEED_return_expected_register_modrm
 #undef NEED_return_expected_register_modrm
@@ -3212,7 +3735,10 @@ return_expected_register_modrm:;
 return_unexpected_lock_rmreg:;
 #ifdef EMU86_EMULATE_RETURN_UNEXPECTED_LOCK_RMREG
 		EMU86_EMULATE_RETURN_UNEXPECTED_LOCK_RMREG();
-#endif /* EMU86_EMULATE_RETURN_UNEXPECTED_LOCK_RMREG */
+#else /* EMU86_EMULATE_RETURN_UNEXPECTED_LOCK_RMREG */
+#define NEED_return_unknown_instruction_rmreg
+		goto return_unknown_instruction_rmreg;
+#endif /* !EMU86_EMULATE_RETURN_UNEXPECTED_LOCK_RMREG */
 #endif /* NEED_return_unexpected_lock_rmreg */
 #ifdef NEED_return_unexpected_lock
 #undef NEED_return_unexpected_lock
@@ -3233,7 +3759,10 @@ return_unexpected_lock:;
 return_unsupported_instruction_rmreg:;
 #ifdef EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION_RMREG
 		EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION_RMREG();
-#endif /* EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION_RMREG */
+#else /* EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION_RMREG */
+#define NEED_return_unknown_instruction_rmreg
+		goto return_unknown_instruction_rmreg;
+#endif /* !EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION_RMREG */
 #endif /* NEED_return_unsupported_instruction_rmreg */
 #ifdef NEED_return_unsupported_instruction
 #undef NEED_return_unsupported_instruction

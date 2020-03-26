@@ -28,6 +28,9 @@ EMU86_INTELLISENSE_BEGIN(lret) {
 
 
 #if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_LRET
+#if !EMU86_EMULATE_CONFIG_WANT_LRET
+case EMU86_OPCODE_ENCODE(0xca):
+#endif /* EMU86_EMULATE_CONFIG_WANT_LRET */
 case EMU86_OPCODE_ENCODE(0xcb): {
 	/* CB     RET     Far return to calling procedure. */
 #if EMU86_EMULATE_CONFIG_WANT_LRET || EMU86_EMULATE_CONFIG_CHECKUSER
@@ -76,6 +79,7 @@ case EMU86_OPCODE_ENCODE(0xcb): {
 	EMU86_SETCS(cs);
 	EMU86_SETIPREG(ip);
 	goto done_dont_set_pc;
+#define NEED_done_dont_set_pc
 #else /* EMU86_EMULATE_CONFIG_WANT_LRET */
 	goto return_unsupported_instruction;
 #define NEED_return_unsupported_instruction;
@@ -84,20 +88,15 @@ case EMU86_OPCODE_ENCODE(0xcb): {
 #endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_LRET */
 
 
-#if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_LRET
+#if EMU86_EMULATE_CONFIG_WANT_LRET
 case EMU86_OPCODE_ENCODE(0xca): {
 	/* CA iw     RET imm16     Far return to calling procedure and pop imm16 bytes from stack. */
-#if EMU86_EMULATE_CONFIG_WANT_LRET || EMU86_EMULATE_CONFIG_CHECKUSER
 	u16 cs;
 	byte_t *sp;
-#if EMU86_EMULATE_CONFIG_WANT_LRET
 	u16 offset;
-#endif /* EMU86_EMULATE_CONFIG_WANT_LRET */
 	EMU86_UREG_TYPE ip;
-#if EMU86_EMULATE_CONFIG_WANT_LRET
 	offset = UNALIGNED_GET16((u16 *)pc);
 	pc += 2;
-#endif /* EMU86_EMULATE_CONFIG_WANT_LRET */
 	sp = EMU86_GETSTACKPTR();
 #if CONFIG_LIBEMU86_WANT_64BIT
 	if (IS_64BIT()) {
@@ -134,19 +133,14 @@ case EMU86_OPCODE_ENCODE(0xca): {
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 	}
 #endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
-#endif /* EMU86_EMULATE_CONFIG_WANT_LRET || EMU86_EMULATE_CONFIG_CHECKUSER */
-#if EMU86_EMULATE_CONFIG_WANT_LRET
 	sp += offset;
 	EMU86_SETSTACKPTR(sp);
 	EMU86_SETCS(cs);
 	EMU86_SETIPREG(ip);
 	goto done_dont_set_pc;
-#else /* EMU86_EMULATE_CONFIG_WANT_LRET */
-	goto return_unsupported_instruction;
-#define NEED_return_unsupported_instruction;
-#endif /* !EMU86_EMULATE_CONFIG_WANT_LRET */
+#define NEED_done_dont_set_pc
 }
-#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_LRET */
+#endif /* EMU86_EMULATE_CONFIG_WANT_LRET */
 
 
 }

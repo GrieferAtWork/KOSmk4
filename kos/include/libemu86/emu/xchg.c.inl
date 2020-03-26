@@ -23,6 +23,7 @@
 
 EMU86_INTELLISENSE_BEGIN(xchg) {
 
+#if EMU86_EMULATE_CONFIG_WANT_XCHG_RM
 #if EMU86_EMULATE_CONFIG_ATOMIC_XCHG_REQUIRES_LOCK
 #define XCHG_IS_ATOMIC() ((op_flags & EMU86_F_LOCK) != 0)
 #else /* EMU86_EMULATE_CONFIG_ATOMIC_XCHG_REQUIRES_LOCK */
@@ -74,10 +75,50 @@ case EMU86_OPCODE_ENCODE(0x87): {
 	}
 	goto done;
 }
+#elif EMU86_EMULATE_CONFIG_CHECKERROR
+case EMU86_OPCODE_ENCODE(0x86):
+	goto notsup_modrm_getsetb;
+#define NEED_notsup_modrm_getsetb
+case EMU86_OPCODE_ENCODE(0x87):
+	goto notsup_modrm_getsetwlq;
+#define NEED_notsup_modrm_getsetwlq
+#endif /* ... */
+
+
+/* Allow the user to override the behavior of `pause' */
+#ifndef EMU86_EMULATE_PAUSE
+#define EMU86_EMULATE_PAUSE() EMU86_EMULATE_LOOPHINT()
+#endif /* !EMU86_EMULATE_PAUSE */
 
 
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
+#if EMU86_EMULATE_CONFIG_WANT_NOP || EMU86_EMULATE_CONFIG_WANT_PAUSE
+#define HAVE_OPCODE_90
+case EMU86_OPCODE_ENCODE(0x90):
+	/* nop */
+#if EMU86_EMULATE_CONFIG_WANT_PAUSE
+	if (op_flags & EMU86_F_REP) {
+		EMU86_EMULATE_PAUSE(); /* pause */
+		goto done;
+	}
+#endif /* EMU86_EMULATE_CONFIG_WANT_PAUSE */
+#if EMU86_EMULATE_CONFIG_WANT_NOP || EMU86_EMULATE_CONFIG_WANT_XCHG_REG
+	goto done;
+#else /* EMU86_EMULATE_CONFIG_WANT_NOP || EMU86_EMULATE_CONFIG_WANT_XCHG_REG */
+	goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* !EMU86_EMULATE_CONFIG_WANT_NOP || EMU86_EMULATE_CONFIG_WANT_XCHG_REG */
+#elif (EMU86_EMULATE_CONFIG_CHECKERROR &&                \
+       !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC && \
+       !EMU86_EMULATE_CONFIG_WANT_XCHG_REG)
+#define HAVE_OPCODE_90
+case EMU86_OPCODE_ENCODE(0x90):
+	goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* ... */
 
+
+#if EMU86_EMULATE_CONFIG_WANT_XCHG_REG
 #define DEFINE_XCHG_reg(BWLQ, Nbits, regno, AX) \
 	u##Nbits reg_operand, oldval;               \
 	reg_operand = EMU86_GETREG##BWLQ(regno);    \
@@ -85,13 +126,12 @@ case EMU86_OPCODE_ENCODE(0x87): {
 	EMU86_SET##AX(reg_operand);                 \
 	EMU86_SETREG##BWLQ(regno, oldval);
 
-case EMU86_OPCODE_ENCODE(0x90):
-	/* nop */
-	if (op_flags & EMU86_F_REP)
-		EMU86_EMULATE_LOOPHINT(); /* pause */
-	goto done;
-
-case EMU86_OPCODE_ENCODE(0x91) ... EMU86_OPCODE_ENCODE(0x97): {
+#ifdef HAVE_OPCODE_90
+case EMU86_OPCODE_ENCODE(0x91) ... EMU86_OPCODE_ENCODE(0x97):
+#else /* HAVE_OPCODE_90 */
+case EMU86_OPCODE_ENCODE(0x90) ... EMU86_OPCODE_ENCODE(0x97):
+#endif /* !HAVE_OPCODE_90 */
+{
 	/*         90+rw     XCHG AX, r16      Exchange r16 with AX.
 	 *         90+rw     XCHG r16, AX      Exchange AX with r16.
 	 *         90+rd     XCHG EAX, r32     Exchange r32 with EAX.
@@ -115,6 +155,16 @@ case EMU86_OPCODE_ENCODE(0x91) ... EMU86_OPCODE_ENCODE(0x97): {
 	goto done;
 }
 #undef DEFINE_XCHG_reg
+#elif (EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC)
+#ifdef HAVE_OPCODE_90
+case EMU86_OPCODE_ENCODE(0x91) ... EMU86_OPCODE_ENCODE(0x97):
+#else /* HAVE_OPCODE_90 */
+case EMU86_OPCODE_ENCODE(0x90) ... EMU86_OPCODE_ENCODE(0x97):
+#endif /* !HAVE_OPCODE_90 */
+	goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* ... */
+
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 
 

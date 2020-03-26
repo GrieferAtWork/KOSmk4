@@ -24,6 +24,7 @@
 EMU86_INTELLISENSE_BEGIN(movzx) {
 
 
+#if EMU86_EMULATE_CONFIG_WANT_MOVZX
 case EMU86_OPCODE_ENCODE(0x0fb6): {
 	u8 value;
 	/*         0F B6 /r     MOVZX r16, r/m8     Move byte to word with zero-extension.
@@ -40,8 +41,14 @@ case EMU86_OPCODE_ENCODE(0x0fb6): {
 	}
 	goto done;
 }
+#elif EMU86_EMULATE_CONFIG_CHECKERROR
+case EMU86_OPCODE_ENCODE(0x0fb6):
+	goto notsup_modrm_getb;
+#define NEED_notsup_modrm_getb
+#endif /* ... */
 
 
+#if EMU86_EMULATE_CONFIG_WANT_MOVZX
 case EMU86_OPCODE_ENCODE(0x0fb7): {
 	u16 value;
 	/*         0F B7 /r     MOVZX r32, r/m16    Move word to doubleword, zero-extension.
@@ -55,6 +62,11 @@ case EMU86_OPCODE_ENCODE(0x0fb7): {
 	}
 	goto done;
 }
+#elif EMU86_EMULATE_CONFIG_CHECKERROR
+case EMU86_OPCODE_ENCODE(0x0fb7):
+	goto notsup_modrm_getw;
+#define NEED_notsup_modrm_getw
+#endif /* ... */
 
 
 }

@@ -27,13 +27,16 @@
 EMU86_INTELLISENSE_BEGIN(ret) {
 
 
+#if EMU86_EMULATE_CONFIG_WANT_RET
 case EMU86_OPCODE_ENCODE(0xc3): {
 	/* C3     RET     Near return to calling procedure. */
 	EMU86_POP163264(EMU86_SETIP,
 	                EMU86_SETEIP,
 	                EMU86_SETRIP);
 	goto done_dont_set_pc;
+#define NEED_done_dont_set_pc
 }
+
 
 case EMU86_OPCODE_ENCODE(0xc2): {
 	u16 offset;
@@ -48,8 +51,14 @@ case EMU86_OPCODE_ENCODE(0xc2): {
 	sp += offset;
 	EMU86_SETSTACKPTR(sp);
 	goto done_dont_set_pc;
+#define NEED_done_dont_set_pc
 }
-
+#elif EMU86_EMULATE_CONFIG_CHECKERROR
+case EMU86_OPCODE_ENCODE(0xc3):
+case EMU86_OPCODE_ENCODE(0xc2):
+	goto notsup_popwlq;
+#define NEED_notsup_popwlq
+#endif /* ... */
 
 
 }

@@ -78,9 +78,8 @@ case EMU86_OPCODE_ENCODE(0x0f38f6): {
 		}
 		goto done;
 #else /* EMU86_EMULATE_CONFIG_WANT_MULX */
-		MODRM_NOSUP_GETRMZ_VEX_W();
-		goto return_unsupported_instruction;
-#define NEED_return_unsupported_instruction
+		goto notsup_modrm_getz_rex_w_modrm_parsed;
+#define NEED_notsup_modrm_getz_rex_w_modrm_parsed
 #endif /* !EMU86_EMULATE_CONFIG_WANT_MULX */
 	} else {
 #if EMU86_EMULATE_CONFIG_WANT_ADCX || EMU86_EMULATE_CONFIG_WANT_ADOX
@@ -122,9 +121,8 @@ case EMU86_OPCODE_ENCODE(0x0f38f6): {
 				MODRM_SETREGL(result);
 			}
 #else /* EMU86_EMULATE_CONFIG_WANT_ADCX */
-			MODRM_NOSUP_GETRMZ_VEX_W();
-			goto return_unsupported_instruction;
-#define NEED_return_unsupported_instruction
+			goto notsup_modrm_getz_rex_w_modrm_parsed;
+#define NEED_notsup_modrm_getz_rex_w_modrm_parsed
 #endif /* !EMU86_EMULATE_CONFIG_WANT_ADCX */
 		} else if (op_flags & EMU86_F_f3) {
 			/* F3       0F 38 F6 /r     ADOX r32, r/m32     Unsigned addition of r32 with OF, r/m32 to r32, writes OF.
@@ -160,9 +158,8 @@ case EMU86_OPCODE_ENCODE(0x0f38f6): {
 				MODRM_SETREGL(result);
 			}
 #else /* EMU86_EMULATE_CONFIG_WANT_ADOX */
-			MODRM_NOSUP_GETRMZ_VEX_W();
-			goto return_unsupported_instruction;
-#define NEED_return_unsupported_instruction
+			goto notsup_modrm_getz_rex_w_modrm_parsed;
+#define NEED_notsup_modrm_getz_rex_w_modrm_parsed
 #endif /* !EMU86_EMULATE_CONFIG_WANT_ADOX */
 		} else {
 			goto return_unknown_instruction;

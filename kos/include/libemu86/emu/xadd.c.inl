@@ -23,6 +23,7 @@
 
 EMU86_INTELLISENSE_BEGIN(xadd) {
 
+#if EMU86_EMULATE_CONFIG_WANT_XADD
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 #define NEED_return_unexpected_lock
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
@@ -75,8 +76,16 @@ case EMU86_OPCODE_ENCODE(0x0fc1): {
 	}
 	goto done;
 }
-
 #undef DEFINE_XADD_MODRM_reg_rm
+#elif EMU86_EMULATE_CONFIG_CHECKERROR
+case EMU86_OPCODE_ENCODE(0x0fc0):
+	goto notsup_modrm_getsetb;
+#define NEED_notsup_modrm_getsetb
+case EMU86_OPCODE_ENCODE(0x0fc1):
+	goto notsup_modrm_getsetwlq;
+#define NEED_notsup_modrm_getsetwlq
+#endif /* ... */
+
 
 }
 EMU86_INTELLISENSE_END

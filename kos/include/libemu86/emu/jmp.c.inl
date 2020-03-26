@@ -27,7 +27,7 @@ EMU86_INTELLISENSE_BEGIN(jmp) {
 
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 
-#if EMU86_EMULATE_CONFIG_WANT_JMP32
+#if EMU86_EMULATE_CONFIG_WANT_JMP_DISP32
 case EMU86_OPCODE_ENCODE(0xe9): {
 	/* E9 cw    JMP rel16   Jump near, relative, displacement relative to next instruction.
 	 * E9 cd    JMP rel32   Jump near, relative, displacement relative to next instruction.
@@ -49,6 +49,7 @@ case EMU86_OPCODE_ENCODE(0xe9): {
 		dest_ip &= 0xffff;
 	EMU86_SETIPREG(dest_ip);
 	goto done_dont_set_pc;
+#define NEED_done_dont_set_pc
 }
 #elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
 case EMU86_OPCODE_ENCODE(0xe9):
@@ -57,7 +58,7 @@ case EMU86_OPCODE_ENCODE(0xe9):
 #endif /* ... */
 
 
-#if EMU86_EMULATE_CONFIG_WANT_JMP8
+#if EMU86_EMULATE_CONFIG_WANT_JMP_DISP8
 case EMU86_OPCODE_ENCODE(0xeb): {
 	/* EB cw    JMP rel8    Jump near, relative, displacement relative to next instruction. */
 	EMU86_UREG_TYPE dest_ip;
@@ -69,6 +70,7 @@ case EMU86_OPCODE_ENCODE(0xeb): {
 		dest_ip &= 0xffff;
 	EMU86_SETIPREG(dest_ip);
 	goto done_dont_set_pc;
+#define NEED_done_dont_set_pc
 }
 #elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
 case EMU86_OPCODE_ENCODE(0xeb):

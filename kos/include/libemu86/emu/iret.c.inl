@@ -110,6 +110,7 @@ case EMU86_OPCODE_ENCODE(0xcf): {
 			EMU86_SETEIP_VM86((u32)new_ip);
 			EMU86_SETSTACKPTR(sp);
 			goto done_dont_set_pc;
+#define NEED_done_dont_set_pc
 #else /* EMU86_EMULATE_CONFIG_WANT_IRET */
 			goto return_unsupported_instruction;
 #define WANT_return_unsupported_instruction
@@ -140,6 +141,7 @@ case EMU86_OPCODE_ENCODE(0xcf): {
 		EMU86_SETFS_VM86(new_fs);
 		EMU86_SETGS_VM86(new_gs);
 		goto done_dont_set_pc;
+#define NEED_done_dont_set_pc
 #else /* EMU86_EMULATE_CONFIG_WANT_IRET */
 		goto return_unsupported_instruction;
 #define WANT_return_unsupported_instruction
@@ -232,6 +234,7 @@ case EMU86_OPCODE_ENCODE(0xcf): {
 #endif /* !CONFIG_LIBEMU86_WANT_64BIT */
 		EMU86_SETSS(new_ss);
 		goto done_dont_set_pc;
+#define NEED_done_dont_set_pc
 #else /* EMU86_EMULATE_CONFIG_WANT_IRET */
 		goto return_unsupported_instruction;
 #define WANT_return_unsupported_instruction
@@ -265,6 +268,7 @@ case EMU86_OPCODE_ENCODE(0xcf): {
 	EMU86_SETIPREG((u32)new_ip);
 	EMU86_SETSTACKPTR(sp);
 	goto done_dont_set_pc;
+#define NEED_done_dont_set_pc
 #else /* EMU86_EMULATE_CONFIG_WANT_IRET */
 	goto return_unsupported_instruction;
 #define WANT_return_unsupported_instruction
