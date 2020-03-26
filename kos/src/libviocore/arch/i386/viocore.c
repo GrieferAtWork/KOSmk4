@@ -78,6 +78,7 @@ opt.append("-Os");
 #ifdef __KERNEL__
 #include <kernel/except.h>
 #include <kernel/printk.h>
+#include <kernel/user.h>
 #include <sched/except-handler.h>
 #include <sched/task.h>
 #endif /* __KERNEL__ */
@@ -85,8 +86,8 @@ opt.append("-Os");
 DECL_BEGIN
 
 /* Emulate the instruction pointed-to by `self->vea_args.va_state' and dispatch
- * any memory access made to `self->vea_ptr' by dispatching it using the VIO
- * callback table.
+ * any memory access made to `self->vea_ptrlo ... self->vea_ptrhi' by dispatching
+ * it using the VIO callback table.
  * Upon success, `self->vea_args.va_state' will point to the updated CPU state,
  * which may be placed at a different address than it was upon entry.
  * This function is intended to be called from a page fault handler. */
@@ -101,9 +102,9 @@ INTDEF void CC libviocore_emulate(struct vio_emulate_args *__restrict self);
 #endif /* !__KERNEL__ */
 
 /* Fill in missing exception pointer. */
-PRIVATE ATTR_NORETURN __NOBLOCK void
-NOTHROW(CC libviocore_complete_except)(struct vio_emulate_args *__restrict self,
-                                       uintptr_t opcode) {
+PRIVATE ATTR_NORETURN __NOBLOCK void CC
+libviocore_complete_except(struct vio_emulate_args *__restrict self,
+                           uintptr_t opcode) {
 	struct exception_data *data;
 	data = error_data();
 	if (data->e_class == E_ILLEGAL_INSTRUCTION) {
@@ -111,8 +112,10 @@ NOTHROW(CC libviocore_complete_except)(struct vio_emulate_args *__restrict self,
 			data->e_pointers[0] = opcode;
 	} else if (data->e_class == E_SEGFAULT) {
 		/* Fix-up the context code for the segmentation fault. */
-		/* We're the VIO handler, so the fault happened during VIO */
-		data->e_pointers[1] |= E_SEGFAULT_CONTEXT_VIO;
+		/* We're the VIO handler, so check if the fault happened during VIO */
+		if ((byte_t *)data->e_pointers[0] >= (byte_t *)self->vea_ptrlo &&
+		    (byte_t *)data->e_pointers[0] <= (byte_t *)self->vea_ptrhi)
+			data->e_pointers[1] |= E_SEGFAULT_CONTEXT_VIO;
 #ifdef __KERNEL__
 		if (icpustate_isuser(self->vea_args.va_state))
 #endif /* __KERNEL__ */
@@ -126,21 +129,50 @@ NOTHROW(CC libviocore_complete_except)(struct vio_emulate_args *__restrict self,
 			data->e_pointers[1] |= E_SEGFAULT_CONTEXT_NONCANON;
 #endif /* __x86_64__ */
 	}
-	/* Fill in the fault address. */
-	data->e_faultaddr = (void *)CS(getpc)(self->vea_args.va_state);
-#ifdef __KERNEL__
-#if EXCEPT_BACKTRACE_SIZE != 0
+	/* Fix-up the PC register and fill in the fault address */
 	{
-		unsigned int i;
-		for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
-			PERTASK_SET(this_exception_trace[i], (void *)0);
+		void const *pc, *next_pc;
+		pc      = (void const *)CS(getpc)(self->vea_args.va_state);
+		next_pc = instruction_succ(pc);
+		data->e_faultaddr = (void *)pc;
+		if (next_pc)
+			CS(setpc)(self->vea_args.va_state, (uintptr_t)next_pc);
 	}
-#endif /* EXCEPT_BACKTRACE_SIZE != 0 */
-	x86_userexcept_unwind_interrupt(self->vea_args.va_state);
-#else /* __KERNEL__ */
 	RETHROW();
-#endif /* !__KERNEL__ */
 }
+
+#ifdef __KERNEL__
+#define VALRD(addr, num_bytes)                         \
+	do {                                               \
+		if (icpustate_isuser(self->vea_args.va_state)) \
+			validate_readable(addr, num_bytes);        \
+	} __WHILE0
+#define VALWR(addr, num_bytes)                         \
+	do {                                               \
+		if (icpustate_isuser(self->vea_args.va_state)) \
+			validate_writable(addr, num_bytes);        \
+	} __WHILE0
+#define VALRDWR(addr, num_bytes)                       \
+	do {                                               \
+		if (icpustate_isuser(self->vea_args.va_state)) \
+			validate_readwrite(addr, num_bytes);       \
+	} __WHILE0
+#else /* __KERNEL__ */
+#define VALRD(addr, num_bytes)   (void)0
+#define VALWR(addr, num_bytes)   (void)0
+#define VALRDWR(addr, num_bytes) (void)0
+#endif /* !__KERNEL__ */
+
+
+
+#if 1
+#define CHK_VIO_ADDR(self, addr) ((addr) >= self->vea_ptrlo && (addr) <= self->vea_ptrhi)
+#define GET_VIO_ADDR(self, addr) (self->vea_addr + (size_t)((byte_t *)(addr) - (byte_t *)self->vea_ptrlo))
+#else
+#define CHK_VIO_ADDR(self, addr) ((addr) == self->vea_ptrlo)
+#define GET_VIO_ADDR(self, addr) (self->vea_addr)
+#endif
+
 
 #define EMU86_MEMREADB(addr) \
 	libviocore_readb(self, (void const *)(uintptr_t)(addr))
@@ -148,9 +180,10 @@ PRIVATE NONNULL((1)) u8 CC
 libviocore_readb(struct vio_emulate_args *__restrict self,
                  __USER __CHECKED void const *addr) {
 	u8 result;
-	if likely(addr == self->vea_ptr)
-		result = vio_readb(&self->vea_args, self->vea_addr);
+	if likely(CHK_VIO_ADDR(self, addr))
+		result = vio_readb(&self->vea_args, GET_VIO_ADDR(self, addr));
 	else {
+		VALRD(addr, 1);
 		result = *(u8 const *)addr;
 	}
 	COMPILER_READ_BARRIER();
@@ -163,9 +196,10 @@ PRIVATE NONNULL((1)) u16 CC
 libviocore_readw(struct vio_emulate_args *__restrict self,
                  __USER __CHECKED void const *addr) {
 	u16 result;
-	if likely(addr == self->vea_ptr)
-		result = vio_readw(&self->vea_args, self->vea_addr);
+	if likely(CHK_VIO_ADDR(self, addr))
+		result = vio_readw(&self->vea_args, GET_VIO_ADDR(self, addr));
 	else {
+		VALRD(addr, 2);
 		result = *(u16 const *)addr;
 	}
 	COMPILER_READ_BARRIER();
@@ -178,9 +212,10 @@ PRIVATE NONNULL((1)) u32 CC
 libviocore_readl(struct vio_emulate_args *__restrict self,
                  __USER __CHECKED void const *addr) {
 	u32 result;
-	if likely(addr == self->vea_ptr)
-		result = vio_readl(&self->vea_args, self->vea_addr);
+	if likely(CHK_VIO_ADDR(self, addr))
+		result = vio_readl(&self->vea_args, GET_VIO_ADDR(self, addr));
 	else {
+		VALRD(addr, 4);
 		result = *(u32 const *)addr;
 	}
 	COMPILER_READ_BARRIER();
@@ -194,9 +229,10 @@ PRIVATE NONNULL((1)) u64 CC
 libviocore_readq(struct vio_emulate_args *__restrict self,
                  __USER __CHECKED void const *addr) {
 	u64 result;
-	if likely(addr == self->vea_ptr)
-		result = vio_readq(&self->vea_args, self->vea_addr);
+	if likely(CHK_VIO_ADDR(self, addr))
+		result = vio_readq(&self->vea_args, GET_VIO_ADDR(self, addr));
 	else {
+		VALRD(addr, 8);
 		result = *(u64 const *)addr;
 	}
 	COMPILER_READ_BARRIER();
@@ -209,9 +245,10 @@ libviocore_readq(struct vio_emulate_args *__restrict self,
 PRIVATE NONNULL((1)) void CC
 libviocore_writeb(struct vio_emulate_args *__restrict self,
                   __USER __CHECKED void *addr, u8 value) {
-	if likely(addr == self->vea_ptr)
-		vio_writeb(&self->vea_args, self->vea_addr, value);
+	if likely(CHK_VIO_ADDR(self, addr))
+		vio_writeb(&self->vea_args, GET_VIO_ADDR(self, addr), value);
 	else {
+		VALWR(addr, 1);
 		*(u8 *)addr = value;
 	}
 	COMPILER_WRITE_BARRIER();
@@ -222,9 +259,10 @@ libviocore_writeb(struct vio_emulate_args *__restrict self,
 PRIVATE NONNULL((1)) void CC
 libviocore_writew(struct vio_emulate_args *__restrict self,
                   __USER __CHECKED void *addr, u16 value) {
-	if likely(addr == self->vea_ptr)
-		vio_writew(&self->vea_args, self->vea_addr, value);
+	if likely(CHK_VIO_ADDR(self, addr))
+		vio_writew(&self->vea_args, GET_VIO_ADDR(self, addr), value);
 	else {
+		VALWR(addr, 2);
 		*(u16 *)addr = value;
 	}
 	COMPILER_WRITE_BARRIER();
@@ -235,9 +273,10 @@ libviocore_writew(struct vio_emulate_args *__restrict self,
 PRIVATE NONNULL((1)) void CC
 libviocore_writel(struct vio_emulate_args *__restrict self,
                   __USER __CHECKED void *addr, u32 value) {
-	if likely(addr == self->vea_ptr)
-		vio_writel(&self->vea_args, self->vea_addr, value);
+	if likely(CHK_VIO_ADDR(self, addr))
+		vio_writel(&self->vea_args, GET_VIO_ADDR(self, addr), value);
 	else {
+		VALWR(addr, 4);
 		*(u32 *)addr = value;
 	}
 	COMPILER_WRITE_BARRIER();
@@ -249,9 +288,10 @@ libviocore_writel(struct vio_emulate_args *__restrict self,
 PRIVATE NONNULL((1)) void CC
 libviocore_writeq(struct vio_emulate_args *__restrict self,
                   __USER __CHECKED void *addr, u64 value) {
-	if likely(addr == self->vea_ptr)
-		vio_writeq(&self->vea_args, self->vea_addr, value);
+	if likely(CHK_VIO_ADDR(self, addr))
+		vio_writeq(&self->vea_args, GET_VIO_ADDR(self, addr), value);
 	else {
+		VALWR(addr, 8);
 		*(u64 *)addr = value;
 	}
 	COMPILER_WRITE_BARRIER();
@@ -266,13 +306,16 @@ libviocore_atomic_xchb(struct vio_emulate_args *__restrict self,
                        bool force_atomic) {
 	u8 result;
 	COMPILER_BARRIER();
-	if likely(addr == self->vea_ptr)
-		result = vio_xchb(&self->vea_args, self->vea_addr, value, force_atomic);
-	else if (force_atomic)
-		result = ATOMIC_XCH(*(u8 *)addr, value);
+	if likely(CHK_VIO_ADDR(self, addr))
+		result = vio_xchb(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
 	else {
-		result = *(u8 *)addr;
-		*(u8 *)addr = value;
+		VALRDWR(addr, 1);
+		if (force_atomic)
+			result = ATOMIC_XCH(*(u8 *)addr, value);
+		else {
+			result      = *(u8 *)addr;
+			*(u8 *)addr = value;
+		}
 	}
 	COMPILER_BARRIER();
 	return result;
@@ -286,13 +329,16 @@ libviocore_atomic_xchw(struct vio_emulate_args *__restrict self,
                        bool force_atomic) {
 	u16 result;
 	COMPILER_BARRIER();
-	if likely(addr == self->vea_ptr)
-		result = vio_xchw(&self->vea_args, self->vea_addr, value, force_atomic);
-	else if (force_atomic)
-		result = ATOMIC_XCH(*(u16 *)addr, value);
+	if likely(CHK_VIO_ADDR(self, addr))
+		result = vio_xchw(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
 	else {
-		result = *(u16 *)addr;
-		*(u16 *)addr = value;
+		VALRDWR(addr, 2);
+		if (force_atomic)
+			result = ATOMIC_XCH(*(u16 *)addr, value);
+		else {
+			result       = *(u16 *)addr;
+			*(u16 *)addr = value;
+		}
 	}
 	COMPILER_BARRIER();
 	return result;
@@ -306,13 +352,16 @@ libviocore_atomic_xchl(struct vio_emulate_args *__restrict self,
                        bool force_atomic) {
 	u32 result;
 	COMPILER_BARRIER();
-	if likely(addr == self->vea_ptr)
-		result = vio_xchl(&self->vea_args, self->vea_addr, value, force_atomic);
-	else if (force_atomic)
-		result = ATOMIC_XCH(*(u32 *)addr, value);
+	if likely(CHK_VIO_ADDR(self, addr))
+		result = vio_xchl(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
 	else {
-		result = *(u32 *)addr;
-		*(u32 *)addr = value;
+		VALRDWR(addr, 4);
+		if (force_atomic)
+			result = ATOMIC_XCH(*(u32 *)addr, value);
+		else {
+			result       = *(u32 *)addr;
+			*(u32 *)addr = value;
+		}
 	}
 	COMPILER_BARRIER();
 	return result;
@@ -327,13 +376,16 @@ libviocore_atomic_xchq(struct vio_emulate_args *__restrict self,
                        bool force_atomic) {
 	u64 result;
 	COMPILER_BARRIER();
-	if likely(addr == self->vea_ptr)
-		result = vio_xchq(&self->vea_args, self->vea_addr, value, force_atomic);
-	else if (force_atomic)
-		result = ATOMIC_XCH(*(u64 *)addr, value);
+	if likely(CHK_VIO_ADDR(self, addr))
+		result = vio_xchq(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
 	else {
-		result = *(u64 *)addr;
-		*(u64 *)addr = value;
+		VALRDWR(addr, 8);
+		if (force_atomic)
+			result = ATOMIC_XCH(*(u64 *)addr, value);
+		else {
+			result       = *(u64 *)addr;
+			*(u64 *)addr = value;
+		}
 	}
 	COMPILER_BARRIER();
 	return result;
@@ -348,13 +400,16 @@ libviocore_atomic_fetchaddb(struct vio_emulate_args *__restrict self,
                             bool force_atomic) {
 	u8 result;
 	COMPILER_BARRIER();
-	if likely(addr == self->vea_ptr)
-		result = vio_addb(&self->vea_args, self->vea_addr, value, force_atomic);
-	else if (force_atomic)
-		result = ATOMIC_FETCHADD(*(u8 *)addr, value);
+	if likely(CHK_VIO_ADDR(self, addr))
+		result = vio_addb(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
 	else {
-		result = *(u8 *)addr;
-		*(u8 *)addr = result + value;
+		VALRDWR(addr, 1);
+		if (force_atomic)
+			result = ATOMIC_FETCHADD(*(u8 *)addr, value);
+		else {
+			result      = *(u8 *)addr;
+			*(u8 *)addr = result + value;
+		}
 	}
 	COMPILER_BARRIER();
 	return result;
@@ -368,13 +423,16 @@ libviocore_atomic_fetchaddw(struct vio_emulate_args *__restrict self,
                             bool force_atomic) {
 	u16 result;
 	COMPILER_BARRIER();
-	if likely(addr == self->vea_ptr)
-		result = vio_addw(&self->vea_args, self->vea_addr, value, force_atomic);
-	else if (force_atomic)
-		result = ATOMIC_FETCHADD(*(u16 *)addr, value);
+	if likely(CHK_VIO_ADDR(self, addr))
+		result = vio_addw(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
 	else {
-		result = *(u16 *)addr;
-		*(u16 *)addr = result + value;
+		VALRDWR(addr, 2);
+		if (force_atomic)
+			result = ATOMIC_FETCHADD(*(u16 *)addr, value);
+		else {
+			result       = *(u16 *)addr;
+			*(u16 *)addr = result + value;
+		}
 	}
 	COMPILER_BARRIER();
 	return result;
@@ -388,13 +446,16 @@ libviocore_atomic_fetchaddl(struct vio_emulate_args *__restrict self,
                             bool force_atomic) {
 	u32 result;
 	COMPILER_BARRIER();
-	if likely(addr == self->vea_ptr)
-		result = vio_addl(&self->vea_args, self->vea_addr, value, force_atomic);
-	else if (force_atomic)
-		result = ATOMIC_FETCHADD(*(u32 *)addr, value);
+	if likely(CHK_VIO_ADDR(self, addr))
+		result = vio_addl(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
 	else {
-		result = *(u32 *)addr;
-		*(u32 *)addr = result + value;
+		VALRDWR(addr, 4);
+		if (force_atomic)
+			result = ATOMIC_FETCHADD(*(u32 *)addr, value);
+		else {
+			result       = *(u32 *)addr;
+			*(u32 *)addr = result + value;
+		}
 	}
 	COMPILER_BARRIER();
 	return result;
@@ -409,13 +470,16 @@ libviocore_atomic_fetchaddq(struct vio_emulate_args *__restrict self,
                             bool force_atomic) {
 	u64 result;
 	COMPILER_BARRIER();
-	if likely(addr == self->vea_ptr)
-		result = vio_addq(&self->vea_args, self->vea_addr, value, force_atomic);
-	else if (force_atomic)
-		result = ATOMIC_FETCHADD(*(u64 *)addr, value);
+	if likely(CHK_VIO_ADDR(self, addr))
+		result = vio_addq(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
 	else {
-		result = *(u64 *)addr;
-		*(u64 *)addr = result + value;
+		VALRDWR(addr, 8);
+		if (force_atomic)
+			result = ATOMIC_FETCHADD(*(u64 *)addr, value);
+		else {
+			result       = *(u64 *)addr;
+			*(u64 *)addr = result + value;
+		}
 	}
 	COMPILER_BARRIER();
 	return result;
@@ -430,13 +494,16 @@ libviocore_atomic_fetchsubb(struct vio_emulate_args *__restrict self,
                             bool force_atomic) {
 	u8 result;
 	COMPILER_BARRIER();
-	if likely(addr == self->vea_ptr)
-		result = vio_subb(&self->vea_args, self->vea_addr, value, force_atomic);
-	else if (force_atomic)
-		result = ATOMIC_FETCHSUB(*(u8 *)addr, value);
+	if likely(CHK_VIO_ADDR(self, addr))
+		result = vio_subb(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
 	else {
-		result = *(u8 *)addr;
-		*(u8 *)addr = result - value;
+		VALRDWR(addr, 1);
+		if (force_atomic)
+			result = ATOMIC_FETCHSUB(*(u8 *)addr, value);
+		else {
+			result      = *(u8 *)addr;
+			*(u8 *)addr = result - value;
+		}
 	}
 	COMPILER_BARRIER();
 	return result;
@@ -450,13 +517,16 @@ libviocore_atomic_fetchsubw(struct vio_emulate_args *__restrict self,
                             bool force_atomic) {
 	u16 result;
 	COMPILER_BARRIER();
-	if likely(addr == self->vea_ptr)
-		result = vio_subw(&self->vea_args, self->vea_addr, value, force_atomic);
-	else if (force_atomic)
-		result = ATOMIC_FETCHSUB(*(u16 *)addr, value);
+	if likely(CHK_VIO_ADDR(self, addr))
+		result = vio_subw(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
 	else {
-		result = *(u16 *)addr;
-		*(u16 *)addr = result - value;
+		VALRDWR(addr, 2);
+		if (force_atomic)
+			result = ATOMIC_FETCHSUB(*(u16 *)addr, value);
+		else {
+			result       = *(u16 *)addr;
+			*(u16 *)addr = result - value;
+		}
 	}
 	COMPILER_BARRIER();
 	return result;
@@ -470,13 +540,16 @@ libviocore_atomic_fetchsubl(struct vio_emulate_args *__restrict self,
                             bool force_atomic) {
 	u32 result;
 	COMPILER_BARRIER();
-	if likely(addr == self->vea_ptr)
-		result = vio_subl(&self->vea_args, self->vea_addr, value, force_atomic);
-	else if (force_atomic)
-		result = ATOMIC_FETCHSUB(*(u32 *)addr, value);
+	if likely(CHK_VIO_ADDR(self, addr))
+		result = vio_subl(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
 	else {
-		result = *(u32 *)addr;
-		*(u32 *)addr = result - value;
+		VALRDWR(addr, 4);
+		if (force_atomic)
+			result = ATOMIC_FETCHSUB(*(u32 *)addr, value);
+		else {
+			result       = *(u32 *)addr;
+			*(u32 *)addr = result - value;
+		}
 	}
 	COMPILER_BARRIER();
 	return result;
@@ -491,13 +564,16 @@ libviocore_atomic_fetchsubq(struct vio_emulate_args *__restrict self,
                             bool force_atomic) {
 	u64 result;
 	COMPILER_BARRIER();
-	if likely(addr == self->vea_ptr)
-		result = vio_subq(&self->vea_args, self->vea_addr, value, force_atomic);
-	else if (force_atomic)
-		result = ATOMIC_FETCHSUB(*(u64 *)addr, value);
+	if likely(CHK_VIO_ADDR(self, addr))
+		result = vio_subq(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
 	else {
-		result = *(u64 *)addr;
-		*(u64 *)addr = result - value;
+		VALRDWR(addr, 8);
+		if (force_atomic)
+			result = ATOMIC_FETCHSUB(*(u64 *)addr, value);
+		else {
+			result       = *(u64 *)addr;
+			*(u64 *)addr = result - value;
+		}
 	}
 	COMPILER_BARRIER();
 	return result;
@@ -512,13 +588,16 @@ libviocore_atomic_fetchandb(struct vio_emulate_args *__restrict self,
                             bool force_atomic) {
 	u8 result;
 	COMPILER_BARRIER();
-	if likely(addr == self->vea_ptr)
-		result = vio_andb(&self->vea_args, self->vea_addr, value, force_atomic);
-	else if (force_atomic)
-		result = ATOMIC_FETCHAND(*(u8 *)addr, value);
+	if likely(CHK_VIO_ADDR(self, addr))
+		result = vio_andb(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
 	else {
-		result = *(u8 *)addr;
-		*(u8 *)addr = result & value;
+		VALRDWR(addr, 1);
+		if (force_atomic)
+			result = ATOMIC_FETCHAND(*(u8 *)addr, value);
+		else {
+			result      = *(u8 *)addr;
+			*(u8 *)addr = result & value;
+		}
 	}
 	COMPILER_BARRIER();
 	return result;
@@ -532,13 +611,16 @@ libviocore_atomic_fetchandw(struct vio_emulate_args *__restrict self,
                             bool force_atomic) {
 	u16 result;
 	COMPILER_BARRIER();
-	if likely(addr == self->vea_ptr)
-		result = vio_andw(&self->vea_args, self->vea_addr, value, force_atomic);
-	else if (force_atomic)
-		result = ATOMIC_FETCHAND(*(u16 *)addr, value);
+	if likely(CHK_VIO_ADDR(self, addr))
+		result = vio_andw(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
 	else {
-		result = *(u16 *)addr;
-		*(u16 *)addr = result & value;
+		VALRDWR(addr, 2);
+		if (force_atomic)
+			result = ATOMIC_FETCHAND(*(u16 *)addr, value);
+		else {
+			result       = *(u16 *)addr;
+			*(u16 *)addr = result & value;
+		}
 	}
 	COMPILER_BARRIER();
 	return result;
@@ -552,13 +634,16 @@ libviocore_atomic_fetchandl(struct vio_emulate_args *__restrict self,
                             bool force_atomic) {
 	u32 result;
 	COMPILER_BARRIER();
-	if likely(addr == self->vea_ptr)
-		result = vio_andl(&self->vea_args, self->vea_addr, value, force_atomic);
-	else if (force_atomic)
-		result = ATOMIC_FETCHAND(*(u32 *)addr, value);
+	if likely(CHK_VIO_ADDR(self, addr))
+		result = vio_andl(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
 	else {
-		result = *(u32 *)addr;
-		*(u32 *)addr = result & value;
+		VALRDWR(addr, 4);
+		if (force_atomic)
+			result = ATOMIC_FETCHAND(*(u32 *)addr, value);
+		else {
+			result       = *(u32 *)addr;
+			*(u32 *)addr = result & value;
+		}
 	}
 	COMPILER_BARRIER();
 	return result;
@@ -573,13 +658,16 @@ libviocore_atomic_fetchandq(struct vio_emulate_args *__restrict self,
                             bool force_atomic) {
 	u64 result;
 	COMPILER_BARRIER();
-	if likely(addr == self->vea_ptr)
-		result = vio_andq(&self->vea_args, self->vea_addr, value, force_atomic);
-	else if (force_atomic)
-		result = ATOMIC_FETCHAND(*(u64 *)addr, value);
+	if likely(CHK_VIO_ADDR(self, addr))
+		result = vio_andq(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
 	else {
-		result = *(u64 *)addr;
-		*(u64 *)addr = result & value;
+		VALRDWR(addr, 8);
+		if (force_atomic)
+			result = ATOMIC_FETCHAND(*(u64 *)addr, value);
+		else {
+			result       = *(u64 *)addr;
+			*(u64 *)addr = result & value;
+		}
 	}
 	COMPILER_BARRIER();
 	return result;
@@ -594,13 +682,16 @@ libviocore_atomic_fetchorb(struct vio_emulate_args *__restrict self,
                             bool force_atomic) {
 	u8 result;
 	COMPILER_BARRIER();
-	if likely(addr == self->vea_ptr)
-		result = vio_orb(&self->vea_args, self->vea_addr, value, force_atomic);
-	else if (force_atomic)
-		result = ATOMIC_FETCHOR(*(u8 *)addr, value);
+	if likely(CHK_VIO_ADDR(self, addr))
+		result = vio_orb(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
 	else {
-		result = *(u8 *)addr;
-		*(u8 *)addr = result | value;
+		VALRDWR(addr, 1);
+		if (force_atomic)
+			result = ATOMIC_FETCHOR(*(u8 *)addr, value);
+		else {
+			result      = *(u8 *)addr;
+			*(u8 *)addr = result | value;
+		}
 	}
 	COMPILER_BARRIER();
 	return result;
@@ -614,13 +705,16 @@ libviocore_atomic_fetchorw(struct vio_emulate_args *__restrict self,
                             bool force_atomic) {
 	u16 result;
 	COMPILER_BARRIER();
-	if likely(addr == self->vea_ptr)
-		result = vio_orw(&self->vea_args, self->vea_addr, value, force_atomic);
-	else if (force_atomic)
-		result = ATOMIC_FETCHOR(*(u16 *)addr, value);
+	if likely(CHK_VIO_ADDR(self, addr))
+		result = vio_orw(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
 	else {
-		result = *(u16 *)addr;
-		*(u16 *)addr = result | value;
+		VALRDWR(addr, 2);
+		if (force_atomic)
+			result = ATOMIC_FETCHOR(*(u16 *)addr, value);
+		else {
+			result       = *(u16 *)addr;
+			*(u16 *)addr = result | value;
+		}
 	}
 	COMPILER_BARRIER();
 	return result;
@@ -634,13 +728,16 @@ libviocore_atomic_fetchorl(struct vio_emulate_args *__restrict self,
                             bool force_atomic) {
 	u32 result;
 	COMPILER_BARRIER();
-	if likely(addr == self->vea_ptr)
-		result = vio_orl(&self->vea_args, self->vea_addr, value, force_atomic);
-	else if (force_atomic)
-		result = ATOMIC_FETCHOR(*(u32 *)addr, value);
+	if likely(CHK_VIO_ADDR(self, addr))
+		result = vio_orl(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
 	else {
-		result = *(u32 *)addr;
-		*(u32 *)addr = result | value;
+		VALRDWR(addr, 4);
+		if (force_atomic)
+			result = ATOMIC_FETCHOR(*(u32 *)addr, value);
+		else {
+			result       = *(u32 *)addr;
+			*(u32 *)addr = result | value;
+		}
 	}
 	COMPILER_BARRIER();
 	return result;
@@ -655,13 +752,16 @@ libviocore_atomic_fetchorq(struct vio_emulate_args *__restrict self,
                             bool force_atomic) {
 	u64 result;
 	COMPILER_BARRIER();
-	if likely(addr == self->vea_ptr)
-		result = vio_orq(&self->vea_args, self->vea_addr, value, force_atomic);
-	else if (force_atomic)
-		result = ATOMIC_FETCHOR(*(u64 *)addr, value);
+	if likely(CHK_VIO_ADDR(self, addr))
+		result = vio_orq(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
 	else {
-		result = *(u64 *)addr;
-		*(u64 *)addr = result | value;
+		VALRDWR(addr, 8);
+		if (force_atomic)
+			result = ATOMIC_FETCHOR(*(u64 *)addr, value);
+		else {
+			result       = *(u64 *)addr;
+			*(u64 *)addr = result | value;
+		}
 	}
 	COMPILER_BARRIER();
 	return result;
@@ -676,13 +776,16 @@ libviocore_atomic_fetchxorb(struct vio_emulate_args *__restrict self,
                             bool force_atomic) {
 	u8 result;
 	COMPILER_BARRIER();
-	if likely(addr == self->vea_ptr)
-		result = vio_xorb(&self->vea_args, self->vea_addr, value, force_atomic);
-	else if (force_atomic)
-		result = ATOMIC_FETCHXOR(*(u8 *)addr, value);
+	if likely(CHK_VIO_ADDR(self, addr))
+		result = vio_xorb(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
 	else {
-		result = *(u8 *)addr;
-		*(u8 *)addr = result ^ value;
+		VALRDWR(addr, 1);
+		if (force_atomic)
+			result = ATOMIC_FETCHXOR(*(u8 *)addr, value);
+		else {
+			result      = *(u8 *)addr;
+			*(u8 *)addr = result ^ value;
+		}
 	}
 	COMPILER_BARRIER();
 	return result;
@@ -696,13 +799,16 @@ libviocore_atomic_fetchxorw(struct vio_emulate_args *__restrict self,
                             bool force_atomic) {
 	u16 result;
 	COMPILER_BARRIER();
-	if likely(addr == self->vea_ptr)
-		result = vio_xorw(&self->vea_args, self->vea_addr, value, force_atomic);
-	else if (force_atomic)
-		result = ATOMIC_FETCHXOR(*(u16 *)addr, value);
+	if likely(CHK_VIO_ADDR(self, addr))
+		result = vio_xorw(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
 	else {
-		result = *(u16 *)addr;
-		*(u16 *)addr = result ^ value;
+		VALRDWR(addr, 2);
+		if (force_atomic)
+			result = ATOMIC_FETCHXOR(*(u16 *)addr, value);
+		else {
+			result       = *(u16 *)addr;
+			*(u16 *)addr = result ^ value;
+		}
 	}
 	COMPILER_BARRIER();
 	return result;
@@ -716,13 +822,16 @@ libviocore_atomic_fetchxorl(struct vio_emulate_args *__restrict self,
                             bool force_atomic) {
 	u32 result;
 	COMPILER_BARRIER();
-	if likely(addr == self->vea_ptr)
-		result = vio_xorl(&self->vea_args, self->vea_addr, value, force_atomic);
-	else if (force_atomic)
-		result = ATOMIC_FETCHXOR(*(u32 *)addr, value);
+	if likely(CHK_VIO_ADDR(self, addr))
+		result = vio_xorl(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
 	else {
-		result = *(u32 *)addr;
-		*(u32 *)addr = result ^ value;
+		VALRDWR(addr, 4);
+		if (force_atomic)
+			result = ATOMIC_FETCHXOR(*(u32 *)addr, value);
+		else {
+			result       = *(u32 *)addr;
+			*(u32 *)addr = result ^ value;
+		}
 	}
 	COMPILER_BARRIER();
 	return result;
@@ -737,13 +846,16 @@ libviocore_atomic_fetchxorq(struct vio_emulate_args *__restrict self,
                             bool force_atomic) {
 	u64 result;
 	COMPILER_BARRIER();
-	if likely(addr == self->vea_ptr)
-		result = vio_xorq(&self->vea_args, self->vea_addr, value, force_atomic);
-	else if (force_atomic)
-		result = ATOMIC_FETCHXOR(*(u64 *)addr, value);
+	if likely(CHK_VIO_ADDR(self, addr))
+		result = vio_xorq(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
 	else {
-		result = *(u64 *)addr;
-		*(u64 *)addr = result ^ value;
+		VALRDWR(addr, 8);
+		if (force_atomic)
+			result = ATOMIC_FETCHXOR(*(u64 *)addr, value);
+		else {
+			result       = *(u64 *)addr;
+			*(u64 *)addr = result ^ value;
+		}
 	}
 	COMPILER_BARRIER();
 	return result;
@@ -758,15 +870,18 @@ libviocore_atomic_cmpxchb(struct vio_emulate_args *__restrict self,
                           u8 oldval, u8 newval, bool force_atomic) {
 	u8 result;
 	COMPILER_BARRIER();
-	if likely(addr == self->vea_ptr)
-		result = vio_cmpxchb(&self->vea_args, self->vea_addr, oldval, newval, force_atomic);
-	else if (force_atomic)
-		result = ATOMIC_CMPXCH(*(u8 *)addr, oldval, newval);
+	if likely(CHK_VIO_ADDR(self, addr))
+		result = vio_cmpxchb(&self->vea_args, GET_VIO_ADDR(self, addr), oldval, newval, force_atomic);
 	else {
-		result = *(u8 *)addr;
-		COMPILER_READ_BARRIER();
-		if (result == oldval)
-			*(u8 *)addr = newval;
+		VALRDWR(addr, 1);
+		if (force_atomic)
+			result = ATOMIC_CMPXCH(*(u8 *)addr, oldval, newval);
+		else {
+			result = *(u8 *)addr;
+			COMPILER_READ_BARRIER();
+			if (result == oldval)
+				*(u8 *)addr = newval;
+		}
 	}
 	COMPILER_BARRIER();
 	return result;
@@ -780,15 +895,18 @@ libviocore_atomic_cmpxchw(struct vio_emulate_args *__restrict self,
                           u16 oldval, u16 newval, bool force_atomic) {
 	u16 result;
 	COMPILER_BARRIER();
-	if likely(addr == self->vea_ptr)
-		result = vio_cmpxchw(&self->vea_args, self->vea_addr, oldval, newval, force_atomic);
-	else if (force_atomic)
-		result = ATOMIC_CMPXCH(*(u16 *)addr, oldval, newval);
+	if likely(CHK_VIO_ADDR(self, addr))
+		result = vio_cmpxchw(&self->vea_args, GET_VIO_ADDR(self, addr), oldval, newval, force_atomic);
 	else {
-		result = *(u16 *)addr;
-		COMPILER_READ_BARRIER();
-		if (result == oldval)
-			*(u16 *)addr = newval;
+		VALRDWR(addr, 2);
+		if (force_atomic)
+			result = ATOMIC_CMPXCH(*(u16 *)addr, oldval, newval);
+		else {
+			result = *(u16 *)addr;
+			COMPILER_READ_BARRIER();
+			if (result == oldval)
+				*(u16 *)addr = newval;
+		}
 	}
 	COMPILER_BARRIER();
 	return result;
@@ -802,15 +920,18 @@ libviocore_atomic_cmpxchl(struct vio_emulate_args *__restrict self,
                           u32 oldval, u32 newval, bool force_atomic) {
 	u32 result;
 	COMPILER_BARRIER();
-	if likely(addr == self->vea_ptr)
-		result = vio_cmpxchl(&self->vea_args, self->vea_addr, oldval, newval, force_atomic);
-	else if (force_atomic)
-		result = ATOMIC_CMPXCH(*(u32 *)addr, oldval, newval);
+	if likely(CHK_VIO_ADDR(self, addr))
+		result = vio_cmpxchl(&self->vea_args, GET_VIO_ADDR(self, addr), oldval, newval, force_atomic);
 	else {
-		result = *(u32 *)addr;
-		COMPILER_READ_BARRIER();
-		if (result == oldval)
-			*(u32 *)addr = newval;
+		VALRDWR(addr, 4);
+		if (force_atomic)
+			result = ATOMIC_CMPXCH(*(u32 *)addr, oldval, newval);
+		else {
+			result = *(u32 *)addr;
+			COMPILER_READ_BARRIER();
+			if (result == oldval)
+				*(u32 *)addr = newval;
+		}
 	}
 	COMPILER_BARRIER();
 	return result;
@@ -824,15 +945,18 @@ libviocore_atomic_cmpxchq(struct vio_emulate_args *__restrict self,
                           u64 oldval, u64 newval, bool force_atomic) {
 	u64 result;
 	COMPILER_BARRIER();
-	if likely(addr == self->vea_ptr)
-		result = vio_cmpxchq(&self->vea_args, self->vea_addr, oldval, newval, force_atomic);
-	else if (force_atomic)
-		result = ATOMIC_CMPXCH(*(u64 *)addr, oldval, newval);
+	if likely(CHK_VIO_ADDR(self, addr))
+		result = vio_cmpxchq(&self->vea_args, GET_VIO_ADDR(self, addr), oldval, newval, force_atomic);
 	else {
-		result = *(u64 *)addr;
-		COMPILER_READ_BARRIER();
-		if (result == oldval)
-			*(u64 *)addr = newval;
+		VALRDWR(addr, 8);
+		if (force_atomic)
+			result = ATOMIC_CMPXCH(*(u64 *)addr, oldval, newval);
+		else {
+			result = *(u64 *)addr;
+			COMPILER_READ_BARRIER();
+			if (result == oldval)
+				*(u64 *)addr = newval;
+		}
 	}
 	COMPILER_BARRIER();
 	return result;
@@ -846,15 +970,18 @@ libviocore_atomic_cmpxch_or_writeb(struct vio_emulate_args *__restrict self,
                                    u8 oldval, u8 newval, bool force_atomic) {
 	u8 result;
 	COMPILER_BARRIER();
-	if likely(addr == self->vea_ptr)
-		result = vio_cmpxch_or_writeb(&self->vea_args, self->vea_addr, oldval, newval, force_atomic);
-	else if (force_atomic)
-		result = ATOMIC_CMPXCH(*(u8 *)addr, oldval, newval);
+	if likely(CHK_VIO_ADDR(self, addr))
+		result = vio_cmpxch_or_writeb(&self->vea_args, GET_VIO_ADDR(self, addr), oldval, newval, force_atomic);
 	else {
-		result = *(u8 *)addr;
-		COMPILER_READ_BARRIER();
-		if (result == oldval)
-			*(u8 *)addr = newval;
+		VALRDWR(addr, 1);
+		if (force_atomic)
+			result = ATOMIC_CMPXCH(*(u8 *)addr, oldval, newval);
+		else {
+			result = *(u8 *)addr;
+			COMPILER_READ_BARRIER();
+			if (result == oldval)
+				*(u8 *)addr = newval;
+		}
 	}
 	COMPILER_BARRIER();
 	return result;
@@ -868,15 +995,18 @@ libviocore_atomic_cmpxch_or_writew(struct vio_emulate_args *__restrict self,
                                    u16 oldval, u16 newval, bool force_atomic) {
 	u16 result;
 	COMPILER_BARRIER();
-	if likely(addr == self->vea_ptr)
-		result = vio_cmpxch_or_writew(&self->vea_args, self->vea_addr, oldval, newval, force_atomic);
-	else if (force_atomic)
-		result = ATOMIC_CMPXCH(*(u16 *)addr, oldval, newval);
+	if likely(CHK_VIO_ADDR(self, addr))
+		result = vio_cmpxch_or_writew(&self->vea_args, GET_VIO_ADDR(self, addr), oldval, newval, force_atomic);
 	else {
-		result = *(u16 *)addr;
-		COMPILER_READ_BARRIER();
-		if (result == oldval)
-			*(u16 *)addr = newval;
+		VALRDWR(addr, 2);
+		if (force_atomic)
+			result = ATOMIC_CMPXCH(*(u16 *)addr, oldval, newval);
+		else {
+			result = *(u16 *)addr;
+			COMPILER_READ_BARRIER();
+			if (result == oldval)
+				*(u16 *)addr = newval;
+		}
 	}
 	COMPILER_BARRIER();
 	return result;
@@ -890,15 +1020,18 @@ libviocore_atomic_cmpxch_or_writel(struct vio_emulate_args *__restrict self,
                                    u32 oldval, u32 newval, bool force_atomic) {
 	u32 result;
 	COMPILER_BARRIER();
-	if likely(addr == self->vea_ptr)
-		result = vio_cmpxch_or_writel(&self->vea_args, self->vea_addr, oldval, newval, force_atomic);
-	else if (force_atomic)
-		result = ATOMIC_CMPXCH(*(u32 *)addr, oldval, newval);
+	if likely(CHK_VIO_ADDR(self, addr))
+		result = vio_cmpxch_or_writel(&self->vea_args, GET_VIO_ADDR(self, addr), oldval, newval, force_atomic);
 	else {
-		result = *(u32 *)addr;
-		COMPILER_READ_BARRIER();
-		if (result == oldval)
-			*(u32 *)addr = newval;
+		VALRDWR(addr, 4);
+		if (force_atomic)
+			result = ATOMIC_CMPXCH(*(u32 *)addr, oldval, newval);
+		else {
+			result = *(u32 *)addr;
+			COMPILER_READ_BARRIER();
+			if (result == oldval)
+				*(u32 *)addr = newval;
+		}
 	}
 	COMPILER_BARRIER();
 	return result;
@@ -913,15 +1046,18 @@ libviocore_atomic_cmpxch_or_writeq(struct vio_emulate_args *__restrict self,
                                    u64 oldval, u64 newval, bool force_atomic) {
 	u64 result;
 	COMPILER_BARRIER();
-	if likely(addr == self->vea_ptr)
-		result = vio_cmpxch_or_writeq(&self->vea_args, self->vea_addr, oldval, newval, force_atomic);
-	else if (force_atomic)
-		result = ATOMIC_CMPXCH(*(u64 *)addr, oldval, newval);
+	if likely(CHK_VIO_ADDR(self, addr))
+		result = vio_cmpxch_or_writeq(&self->vea_args, GET_VIO_ADDR(self, addr), oldval, newval, force_atomic);
 	else {
-		result = *(u64 *)addr;
-		COMPILER_READ_BARRIER();
-		if (result == oldval)
-			*(u64 *)addr = newval;
+		VALRDWR(addr, 8);
+		if (force_atomic)
+			result = ATOMIC_CMPXCH(*(u64 *)addr, oldval, newval);
+		else {
+			result = *(u64 *)addr;
+			COMPILER_READ_BARRIER();
+			if (result == oldval)
+				*(u64 *)addr = newval;
+		}
 	}
 	COMPILER_BARRIER();
 	return result;
@@ -935,23 +1071,26 @@ libviocore_atomic_cmpxch128(struct vio_emulate_args *__restrict self,
                             uint128_t oldval, uint128_t newval, bool force_atomic) {
 	uint128_t result;
 	COMPILER_BARRIER();
-	if likely(addr == self->vea_ptr) {
-		result = vio_cmpxch128(&self->vea_args, self->vea_addr, oldval, newval, force_atomic);
-	} else if (force_atomic) {
-		__asm__ __volatile__("cmpxchg16b %0"
-		                     : "+m" (*(uint128_t *)addr)
-		                     , "=a" (uint128_vec64(result)[0])
-		                     , "=d" (uint128_vec64(result)[1])
-		                     : "a" (uint128_vec64(oldval)[0])
-		                     , "d" (uint128_vec64(oldval)[1])
-		                     , "b" (uint128_vec64(newval)[0])
-		                     , "c" (uint128_vec64(newval)[1])
-		                     : "cc");
+	if likely(CHK_VIO_ADDR(self, addr)) {
+		result = vio_cmpxch128(&self->vea_args, GET_VIO_ADDR(self, addr), oldval, newval, force_atomic);
 	} else {
-		result = *(uint128_t *)addr;
-		COMPILER_READ_BARRIER();
-		if (uint128_eq128(result, oldval))
-			*(uint128_t *)addr = newval;
+		VALRDWR(addr, 16);
+		if (force_atomic) {
+			__asm__ __volatile__("cmpxchg16b %0"
+			                     : "+m" (*(uint128_t *)addr)
+			                     , "=a" (uint128_vec64(result)[0])
+			                     , "=d" (uint128_vec64(result)[1])
+			                     : "a" (uint128_vec64(oldval)[0])
+			                     , "d" (uint128_vec64(oldval)[1])
+			                     , "b" (uint128_vec64(newval)[0])
+			                     , "c" (uint128_vec64(newval)[1])
+			                     : "cc");
+		} else {
+			result = *(uint128_t *)addr;
+			COMPILER_READ_BARRIER();
+			if (uint128_eq128(result, oldval))
+				*(uint128_t *)addr = newval;
+		}
 	}
 	COMPILER_BARRIER();
 	return result;
@@ -999,17 +1138,18 @@ libviocore_atomic_cmpxch128(struct vio_emulate_args *__restrict self,
 #define EMU86_ISUSER_NOVM86() icpustate_isuser(self->vea_args.va_state)
 #define EMU86_ISVM86()        0
 #endif /* !EMU86_EMULATE_VM86 */
-#include <kernel/user.h>
-#define EMU86_VALIDATE_READABLE(addr, num_bytes) validate_readable((void const *)(uintptr_t)(addr), num_bytes)
-#define EMU86_VALIDATE_WRITABLE(addr, num_bytes) validate_writable((void *)(uintptr_t)(addr), num_bytes)
 #else /* __KERNEL__ */
 #define EMU86_EMULATE_CONFIG_CHECKUSER 0
 #define EMU86_ISUSER() 0
 #define EMU86_ISUSER_NOVM86() 0
 #define EMU86_ISVM86() 0
-#define EMU86_VALIDATE_READABLE(addr, num_bytes) (void)0
-#define EMU86_VALIDATE_WRITABLE(addr, num_bytes) (void)0
 #endif /* !__KERNEL__ */
+#define EMU86_VALIDATE_READABLE(addr, num_bytes)  (void)0 /* read/write validation is performed on a per-access basis */
+#define EMU86_VALIDATE_WRITABLE(addr, num_bytes)  (void)0 /* read/write validation is performed on a per-access basis */
+#define EMU86_VALIDATE_READWRITE(addr, num_bytes) (void)0 /* read/write validation is performed on a per-access basis */
+#define EMU86_VALIDATE_READABLE_IS_NOOP 1
+#define EMU86_VALIDATE_WRITABLE_IS_NOOP 1
+#define EMU86_VALIDATE_READWRITE_IS_NOOP 1
 #define EMU86_GETFLAGS()            CS(getpflags)(self->vea_args.va_state)
 #define EMU86_SETFLAGS(v)           CS(setpflags)(self->vea_args.va_state, v)
 #define EMU86_MSKFLAGS(mask, value) CS(mskpflags)(self->vea_args.va_state, mask, value)
@@ -1100,9 +1240,9 @@ DECL_BEGIN
 #define EMU86_GETSSBASE() EMU86_GETSEGBASE(EMU86_R_SS)
 #define EMU86_GETFSBASE() EMU86_GETSEGBASE(EMU86_R_FS)
 #define EMU86_GETGSBASE() EMU86_GETSEGBASE(EMU86_R_GS)
-PRIVATE WUNUSED NONNULL((1)) u32
-NOTHROW(CC i386_getsegment_base)(struct icpustate32 *__restrict state,
-                                 u8 segment_regno) {
+PRIVATE WUNUSED NONNULL((1)) u32 CC
+i386_getsegment_base(struct icpustate32 *__restrict state,
+                     u8 segment_regno) {
 	u32 result;
 	u16 segment_index;
 	pflag_t was;
@@ -1198,9 +1338,9 @@ NOTHROW(CC i386_getsegment_base)(struct icpustate32 *__restrict state,
 #else /* Unused */
 #define EMU86_SETFSBASE(v) i386_setsegment_base(self->vea_args.va_state, EMU86_R_FS, (u32)(v))
 #define EMU86_SETGSBASE(v) i386_setsegment_base(self->vea_args.va_state, EMU86_R_GS, (u32)(v))
-PRIVATE WUNUSED NONNULL((1)) void
-NOTHROW(CC i386_setsegment_base)(struct icpustate32 *__restrict state,
-                                 u8 segment_regno, u32 value) {
+PRIVATE WUNUSED NONNULL((1)) void CC
+i386_setsegment_base(struct icpustate32 *__restrict state,
+                     u8 segment_regno, u32 value) {
 	u16 segment_index;
 	/* Determine the segment's index. */
 	switch (segment_regno) {
@@ -1719,12 +1859,12 @@ libviocore_throw_unknown_instruction(struct vio_emulate_args *__restrict self,
 	if (next_pc)
 		CS(setpc)(self->vea_args.va_state, (uintptr_t)next_pc);
 #ifdef __KERNEL__
-	printk(KERN_WARNING "[vio] Illegal instruction %p:%#Ix [cr2=%p:%#I64x,code=%Ix:%Ix]\n",
-	       pc, opcode, self->vea_ptr, (u64)self->vea_addr,
+	printk(KERN_WARNING "[vio] Illegal instruction %p-%p:%#Ix [cr2=%p:%#I64x,code=%Ix:%Ix]\n",
+	       pc, opcode, self->vea_ptrlo, self->vea_ptrhi, (u64)self->vea_addr,
 	       ERROR_CLASS(code), ERROR_SUBCLASS(code));
 #else /* __KERNEL__ */
-	syslog(LOG_WARN, "[vio] Illegal instruction %p:%#Ix [cr2=%p:%#I64x,code=%Ix:%Ix]\n",
-	       pc, opcode, self->vea_ptr, (u64)self->vea_addr,
+	syslog(LOG_WARN, "[vio] Illegal instruction %p-%p:%#Ix [cr2=%p:%#I64x,code=%Ix:%Ix]\n",
+	       pc, opcode, self->vea_ptrlo, self->vea_ptrhi, (u64)self->vea_addr,
 	       ERROR_CLASS(code), ERROR_SUBCLASS(code));
 #endif /* !__KERNEL__ */
 	/* Throw an exception detailing an unsupported opcode. */
@@ -1739,15 +1879,7 @@ libviocore_throw_unknown_instruction(struct vio_emulate_args *__restrict self,
 	data->e_pointers[5] = ptr5;
 	for (i = 6; i < EXCEPTION_DATA_POINTERS; ++i)
 		data->e_pointers[i] = 0;
-#ifdef __KERNEL__
-#if EXCEPT_BACKTRACE_SIZE != 0
-	for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
-		PERTASK_SET(this_exception_trace[i], (void *)0);
-#endif /* EXCEPT_BACKTRACE_SIZE != 0 */
-	x86_userexcept_unwind_interrupt(self->vea_args.va_state);
-#else /* __KERNEL__ */
 	error_throw_current();
-#endif /* !__KERNEL__ */
 }
 
 PRIVATE ATTR_NORETURN void CC
@@ -1769,15 +1901,7 @@ libviocore_throw_exception(struct vio_emulate_args *__restrict self,
 	data->e_pointers[2] = ptr2;
 	for (i = 3; i < EXCEPTION_DATA_POINTERS; ++i)
 		data->e_pointers[i] = 0;
-#ifdef __KERNEL__
-#if EXCEPT_BACKTRACE_SIZE != 0
-	for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
-		PERTASK_SET(this_exception_trace[i], (void *)0);
-#endif /* EXCEPT_BACKTRACE_SIZE != 0 */
-	x86_userexcept_unwind_interrupt(self->vea_args.va_state);
-#else /* __KERNEL__ */
 	error_throw_current();
-#endif /* !__KERNEL__ */
 }
 
 

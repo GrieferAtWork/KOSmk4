@@ -165,24 +165,27 @@ function buildToolchainsAndGroups() {
 	}
 }
 
-function build(reconfigure: Callable = none) {
-	TARGET_NAME = "{}-kos-{}".format({ TARGET_ARCH, getConfig() });
-	{
-		/* Make sure that the correct bin-config is selected. */
-		local selConfig;
-		local selConfigFile = "bin/{}-kos".format({ TARGET_ARCH });
-		selConfig = cygwinReadLink(selConfigFile);
-		if (selConfig !is string || selConfig != TARGET_NAME) {
-			if (selConfig !is none)
-				fs.unlink(selConfigFile);
-			print "Changing libpath to", repr(TARGET_NAME);
-			local p = ipc.Process("bash", [ "-c",
-				"ln -s {!r} {!r}".format({ TARGET_NAME, selConfigFile })
-			]);
-			p.start();
-			joinProcess(p);
-		}
+function setBinTargetLink(target_arch: string, target_name: string) {
+	/* Make sure that the correct bin-config is selected. */
+	local selConfigFile = "bin/{}-kos".format({ target_arch });
+	local selConfig = cygwinReadLink(selConfigFile);
+	if (selConfig !is string || selConfig != target_name) {
+		if (selConfig !is none)
+			fs.unlink(selConfigFile);
+		print("Changing libpath: `ln -s ", repr(target_name), " ", repr(selConfigFile), "`");
+		local p = ipc.Process("bash", [ "-c",
+			"ln -s {!r} {!r}".format({ target_name, selConfigFile })
+		]);
+		p.start();
+		joinProcess(p);
 	}
+}
+
+function build(reconfigure: Callable = none, binTargetName: string = none) {
+	TARGET_NAME = "{}-kos-{}".format({ TARGET_ARCH, getConfig() });
+	if (binTargetName is none)
+		binTargetName = TARGET_NAME;
+	setBinTargetLink(TARGET_ARCH, binTargetName);
 
 	/* To speed up compilation, provide some known-good values
 	 * for standard library paths valid for the KOS toolchain */
@@ -191,8 +194,8 @@ function build(reconfigure: Callable = none) {
 	/* Apply target configurations. */
 	config.CROSS_PREFIX = TARGET.CROSS_PREFIX;
 	config.BUILD_PATH = "build/" + TARGET_NAME;
-	TARGET_BINPATH = "/bin/" + TARGET_NAME;
-	KERNEL_BINARY = TARGET_BINPATH + "/os/kernel.bin";
+	TARGET_BINPATH = "/bin/" + binTargetName;
+	KERNEL_BINARY  = TARGET_BINPATH + "/os/kernel.bin";
 
 	/* Configure MTOOLS build steps */
 	toolchain.options[TOOLCHAIN_MTOOLS_EXE]  = HOST_EXE("binutils/build-mtools/mtools");

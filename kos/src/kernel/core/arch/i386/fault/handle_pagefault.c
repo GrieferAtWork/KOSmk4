@@ -307,8 +307,19 @@ nope:
 #endif /* CONFIG_NO_SMP */
 
 
+
 INTERN struct icpustate *FCALL
 x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
+#if (X86_PAGEFAULT_ECODE_USERSPACE == E_SEGFAULT_CONTEXT_USERCODE && \
+     X86_PAGEFAULT_ECODE_WRITING == E_SEGFAULT_CONTEXT_WRITING)
+#define GET_PF_CONTEXT_UW_BITS() (uintptr_t)(ecode & (X86_PAGEFAULT_ECODE_USERSPACE | X86_PAGEFAULT_ECODE_WRITING))
+#else
+#define GET_PF_CONTEXT_UW_BITS()                                                            \
+	((uintptr_t)(ecode & X86_PAGEFAULT_ECODE_USERSPACE ? E_SEGFAULT_CONTEXT_USERCODE : 0) | \
+	 (uintptr_t)(ecode & X86_PAGEFAULT_ECODE_WRITING ? E_SEGFAULT_CONTEXT_WRITING : 0))
+#endif
+
+
 #if 1
 #define isuser() (ecode & X86_PAGEFAULT_ECODE_USERSPACE)
 #else
@@ -399,7 +410,8 @@ again_lookup_node:
 			if unlikely(!sync_tryread(effective_vm)) {
 				if (effective_vm == &vm_kernel &&
 				    (uintptr_t)addr >= KERNEL_PHYS2VIRT_MIN &&
-				    (uintptr_t)addr <= KERNEL_PHYS2VIRT_MAX) {
+				    (uintptr_t)addr <= KERNEL_PHYS2VIRT_MAX &&
+				    !isuser()) {
 					x86_phys2virt64_require(addr);
 					goto done_before_pop_connections;
 				}
@@ -660,15 +672,11 @@ do_handle_iob_node_access:
 					}
 					args.vea_args.va_part       = part; /* Inherit reference */
 					args.vea_args.va_acmap_page = (void *)FLOOR_ALIGN((uintptr_t)addr, PAGESIZE);
-#ifndef LIBVIO_CONFIG_ENABLED
-					args.ma_oldcons = &con; /* Inherit */
-#endif /* !LIBVIO_CONFIG_ENABLED */
 					/* Check for special case: call into VIO memory */
 					if (args.vea_args.va_ops->vo_call && (uintptr_t)addr == pc) {
 						/* Make sure that memory mapping has execute permissions! */
-						if unlikely(!(nodeprot & VM_PROT_EXEC)) {
+						if unlikely(!(nodeprot & VM_PROT_EXEC))
 							goto vio_failure_throw_segfault;
-						}
 						/* Special case: call into VIO memory */
 						TRY {
 							vio_addr_t vio_addr;
@@ -729,18 +737,22 @@ do_handle_iob_node_access:
 							(*args.vea_args.va_ops->vo_call)(&args.vea_args, vio_addr);
 							state = args.vea_args.va_state;
 						} EXCEPT {
-#ifndef LIBVIO_CONFIG_ENABLED
-							assert(args.ma_oldcons == &con);
-#endif /* !LIBVIO_CONFIG_ENABLED */
-							assert(args.vea_args.va_part == part);
+							/* Ensure that a the VIO flag is set if necessary */
+							if (was_thrown(E_SEGFAULT)) {
+								void *faultaddr = (void *)PERTASK_GET(this_exception_pointers[0]);
+								if (faultaddr == addr) {
+									uintptr_t flags;
+									flags = PERTASK_GET(this_exception_pointers[1]);
+									flags |= E_SEGFAULT_CONTEXT_VIO;
+									PERTASK_SET(this_exception_pointers[1], flags);
+								}
+							}
 							decref_unlikely(args.vea_args.va_block);
-							/*decref_unlikely(args.vea_args.va_part);*/
-							/*task_popconnections(args.ma_oldcons);*/
+							assert(args.vea_args.va_part == part);
+							/*decref_unlikely(args.vea_args.va_part);*/ /* Handled by outer EXCEPT */
+							/*task_popconnections(args.ma_oldcons);*/ /* Handled by outer EXCEPT */
 							RETHROW(); /* Except blocks below will already cleanup `part' and `&con' */
 						}
-#ifndef LIBVIO_CONFIG_ENABLED
-						assert(args.ma_oldcons == &con);
-#endif /* !LIBVIO_CONFIG_ENABLED */
 						assert(args.vea_args.va_part == part);
 						decref_unlikely(args.vea_args.va_block);
 						decref_unlikely(args.vea_args.va_part);
@@ -754,29 +766,30 @@ do_normal_vio:
 						         : !(nodeprot & VM_PROT_READ)  /* Read from non-readable VIO segment */
 						         ) {
 vio_failure_throw_segfault:
-#ifndef LIBVIO_CONFIG_ENABLED
-						assert(args.ma_oldcons == &con);
-#endif /* !LIBVIO_CONFIG_ENABLED */
-						assert(args.vea_args.va_part == part);
 						decref_unlikely(args.vea_args.va_block);
+						assert(args.vea_args.va_part == part);
 						decref_unlikely(args.vea_args.va_part);
 						goto pop_connections_and_throw_segfault;
 					}
 					args.vea_args.va_state = state;
-#ifdef LIBVIO_CONFIG_ENABLED
-					/* Emulate the current instruction. */
-					args.vea_ptr  = addr;
-					args.vea_addr = vio_args_vioaddr(&args.vea_args,
-					                                 (args.vea_ptr));
+					/* Determine the address range for which memory access should be virtualized
+					 * by looking at the lower/upper bound of the accessed VM node. - Any memory
+					 * access within this range will be dispatched via VIO. */
+					args.vea_ptrlo = vm_node_getmin(node);
+					args.vea_ptrhi = vm_node_getmax(node);
+					args.vea_addr  = vio_args_vioaddr(&args.vea_args, args.vea_ptrlo);
 					TRY {
+						/* Emulate the current instruction. */
 						viocore_emulate(&args);
 					} EXCEPT {
 						decref_unlikely(args.vea_args.va_block);
-						decref_unlikely(args.vea_args.va_part);
-						task_popconnections(&con);
+						assert(args.vea_args.va_part == part);
+						/*decref_unlikely(args.vea_args.va_part);*/ /* Handled by outer EXCEPT */
+						/*task_popconnections(&con);*/ /* Handled by outer EXCEPT */
 						RETHROW();
 					}
 					decref_unlikely(args.vea_args.va_block);
+					assert(args.vea_args.va_part == part);
 					decref_unlikely(args.vea_args.va_part);
 					task_popconnections(&con);
 #ifndef __x86_64__
@@ -805,9 +818,6 @@ vio_failure_throw_segfault:
 					}
 #endif /* !__x86_64__ */
 					return args.vea_args.va_state;
-#else /* LIBVIO_CONFIG_ENABLED */
-					return x86_vio_main(&args, (uintptr_t)addr);
-#endif /* !LIBVIO_CONFIG_ENABLED */
 				}
 #endif /* LIBVIO_CONFIG_ENABLED */
 				sync_endread(effective_vm);
@@ -1331,19 +1341,14 @@ throw_segfault:
 			/* Discard read-from-callsite_pc exception... */
 		}
 		PERTASK_SET(this_exception_faultaddr, (void *)callsite_pc);
-		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_NOTEXECUTABLE));
+		PERTASK_SET(this_exception_code, (ecode & X86_PAGEFAULT_ECODE_PRESENT)
+		                                 ? ERROR_CODEOF(E_SEGFAULT_NOTEXECUTABLE)
+		                                 : ERROR_CODEOF(E_SEGFAULT_UNMAPPED));
 		PERTASK_SET(this_exception_pointers[0], (uintptr_t)addr);
-#if (X86_PAGEFAULT_ECODE_USERSPACE == E_SEGFAULT_CONTEXT_USERCODE && \
-     X86_PAGEFAULT_ECODE_WRITING == E_SEGFAULT_CONTEXT_WRITING)
 		PERTASK_SET(this_exception_pointers[1],
-		            (uintptr_t)(E_SEGFAULT_CONTEXT_FAULT) |
-		            (uintptr_t)(ecode & (X86_PAGEFAULT_ECODE_USERSPACE | X86_PAGEFAULT_ECODE_WRITING)));
-#else
-		PERTASK_SET(this_exception_pointers[1],
-		            (uintptr_t)(E_SEGFAULT_CONTEXT_FAULT) |
-		            (uintptr_t)(ecode & X86_PAGEFAULT_ECODE_USERSPACE ? E_SEGFAULT_CONTEXT_USERCODE : 0) |
-		            (uintptr_t)(ecode & X86_PAGEFAULT_ECODE_WRITING ? E_SEGFAULT_CONTEXT_WRITING : 0));
-#endif
+		            (uintptr_t)(E_SEGFAULT_CONTEXT_FAULT |
+		                        E_SEGFAULT_CONTEXT_EXEC |
+		                        GET_PF_CONTEXT_UW_BITS()));
 		{
 			unsigned int i;
 			for (i = 2; i < EXCEPTION_DATA_POINTERS; ++i)
@@ -1355,27 +1360,24 @@ throw_segfault:
 		goto do_unwind_state;
 	}
 not_a_badcall:
-	if ((ecode & (X86_PAGEFAULT_ECODE_PRESENT | X86_PAGEFAULT_ECODE_WRITING)) == (X86_PAGEFAULT_ECODE_PRESENT | X86_PAGEFAULT_ECODE_WRITING)) {
+	if ((ecode & (X86_PAGEFAULT_ECODE_PRESENT | X86_PAGEFAULT_ECODE_WRITING)) ==
+	    /*    */ (X86_PAGEFAULT_ECODE_PRESENT | X86_PAGEFAULT_ECODE_WRITING)) {
 		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_READONLY));
 	} else if ((ecode & X86_PAGEFAULT_ECODE_PRESENT) && ((ecode & X86_PAGEFAULT_ECODE_INSTRFETCH) ||
-	                                             (pc == (uintptr_t)addr))) {
+	                                                     (pc == (uintptr_t)addr))) {
 		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_NOTEXECUTABLE));
 	} else {
 		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_UNMAPPED));
 	}
 set_exception_pointers:
 	PERTASK_SET(this_exception_pointers[0], (uintptr_t)addr);
-#if (X86_PAGEFAULT_ECODE_USERSPACE == E_SEGFAULT_CONTEXT_USERCODE && \
-     X86_PAGEFAULT_ECODE_WRITING == E_SEGFAULT_CONTEXT_WRITING)
 	PERTASK_SET(this_exception_pointers[1],
-	            (uintptr_t)(E_SEGFAULT_CONTEXT_FAULT) |
-	            (uintptr_t)(ecode & (X86_PAGEFAULT_ECODE_USERSPACE | X86_PAGEFAULT_ECODE_WRITING)));
-#else
-	PERTASK_SET(this_exception_pointers[1],
-	            (uintptr_t)(E_SEGFAULT_CONTEXT_FAULT) |
-	            (uintptr_t)(ecode & X86_PAGEFAULT_ECODE_USERSPACE ? E_SEGFAULT_CONTEXT_USERCODE : 0) |
-	            (uintptr_t)(ecode & X86_PAGEFAULT_ECODE_WRITING ? E_SEGFAULT_CONTEXT_WRITING : 0));
-#endif
+	            (uintptr_t)(E_SEGFAULT_CONTEXT_FAULT |
+	                        ((ecode & X86_PAGEFAULT_ECODE_INSTRFETCH) ||
+	                         (pc == (uintptr_t)addr)
+	                         ? E_SEGFAULT_CONTEXT_EXEC
+	                         : 0) |
+	                        GET_PF_CONTEXT_UW_BITS()));
 	{
 		unsigned int i;
 		for (i = 2; i < EXCEPTION_DATA_POINTERS; ++i)
@@ -1398,6 +1400,7 @@ do_unwind_state:
 		state = kernel_debugtrap_r(state, SIGSEGV);
 	x86_userexcept_unwind_interrupt(state);
 #undef isuser
+#undef GET_PF_CONTEXT_UW_BITS
 }
 
 DECL_END

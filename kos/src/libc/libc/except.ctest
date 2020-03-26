@@ -76,6 +76,9 @@ DEFINE_TEST(kernel_exceptions_function_correctly_with_cxx_handlers) {
 #ifdef E_SEGFAULT_CONTEXT_NONCANON
 		assert(!(error_data()->e_pointers[1] & E_SEGFAULT_CONTEXT_NONCANON));
 #endif /* E_SEGFAULT_CONTEXT_NONCANON */
+#ifdef E_SEGFAULT_CONTEXT_EXEC
+		assert(!(error_data()->e_pointers[1] & E_SEGFAULT_CONTEXT_EXEC));
+#endif /* E_SEGFAULT_CONTEXT_EXEC */
 #ifdef E_SEGFAULT_CONTEXT_UNMAP
 		assert(!(error_data()->e_pointers[1] & E_SEGFAULT_CONTEXT_UNMAP));
 #endif /* E_SEGFAULT_CONTEXT_UNMAP */

@@ -168,8 +168,10 @@ const E_SEGFAULT_CONTEXT_WRITING  = 0x0002;
 const E_SEGFAULT_CONTEXT_USERCODE = 0x0004;
 @@Non-canonical address
 const E_SEGFAULT_CONTEXT_NONCANON = 0x0008;
+@@The instruction pointer's location caused the fault
+const E_SEGFAULT_CONTEXT_EXEC     = 0x0010;
 @@Attempted to unmap an undefined memory address
-const E_SEGFAULT_CONTEXT_UNMAP    = 0x0010;
+const E_SEGFAULT_CONTEXT_UNMAP    = 0x4000;
 @@FLAG: The access was perform by VIO
 const E_SEGFAULT_CONTEXT_VIO      = 0x8000;
 

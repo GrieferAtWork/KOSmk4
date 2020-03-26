@@ -204,7 +204,7 @@ PRIVATE void *uvio_service_thread(void *cookie) {
 				if (FORCE_ATOMIC()) {
 					THROW(E_SEGFAULT_NOTATOMIC,
 					      vio_args_faultaddr(&args, req.uq_addr),
-					      E_SEGFAULT_CONTEXT_WRITING,
+					      0,
 					      8,
 					      libvio_readl(&args, req.uq_addr + 4 * LSW),
 					      libvio_readl(&args, req.uq_addr + 4 * MSW),
@@ -274,7 +274,7 @@ PRIVATE void *uvio_service_thread(void *cookie) {
 		if (FORCE_ATOMIC()) {                               \
 			THROW(E_SEGFAULT_NOTATOMIC,                     \
 			      vio_args_faultaddr(&args, req.uq_addr),   \
-			      E_SEGFAULT_CONTEXT_WRITING,               \
+			      0,                                        \
 			      8,                                        \
 			      oldval.l[0 + LSW],                        \
 			      oldval.l[0 + MSW],                        \
@@ -334,7 +334,7 @@ PRIVATE void *uvio_service_thread(void *cookie) {
 				if (FORCE_ATOMIC()) {
 					THROW(E_SEGFAULT_NOTATOMIC,
 					      vio_args_faultaddr(&args, req.uq_addr),
-					      E_SEGFAULT_CONTEXT_WRITING,
+					      0,
 					      8,
 					      (uintptr_t)req.uq_ldata[0 + LSW],
 					      (uintptr_t)req.uq_ldata[0 + MSW],
@@ -354,7 +354,7 @@ PRIVATE void *uvio_service_thread(void *cookie) {
 				if (FORCE_ATOMIC()) {
 					THROW(E_SEGFAULT_NOTATOMIC,
 					      vio_args_faultaddr(&args, req.uq_addr),
-					      E_SEGFAULT_CONTEXT_WRITING,
+					      0,
 					      16,
 					      (uintptr_t)req.uq_qdata[0 + LSW],
 					      (uintptr_t)req.uq_qdata[0 + MSW],

@@ -54,6 +54,8 @@ struct testdecl {
 
 __INTDEF void __NOTHROW_NCX(__VLIBCCALL ctest_subtestf)(char const *__restrict __format, ...);
 __INTDEF void __NOTHROW_NCX(__LIBCCALL ctest_vsubtestf)(char const *__restrict __format, __builtin_va_list __args);
+__INTDEF void __NOTHROW_NCX(__VLIBCCALL ctest_substatf)(char const *__restrict __format, ...);
+__INTDEF void __NOTHROW_NCX(__LIBCCALL ctest_vsubstatf)(char const *__restrict __format, __builtin_va_list __args);
 
 
 __DECL_END

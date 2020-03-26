@@ -32,11 +32,11 @@
 DECL_BEGIN
 
 #ifdef KERNELSPACE_HIGHMEM
-#define VALID_USER_PTR(p)           ((uintptr_t)(p) < KERNELSPACE_BASE)
-#define VALID_USER_RANGE(start,end) ((uintptr_t)(end) <= KERNELSPACE_BASE)
+#define VALID_USER_PTR(p)            ((uintptr_t)(p) < KERNELSPACE_BASE)
+#define VALID_USER_RANGE(start, end) ((uintptr_t)(end) <= KERNELSPACE_BASE)
 #else /* KERNELSPACE_HIGHMEM */
-#define VALID_USER_PTR(p)           ((uintptr_t)(p) >= KERNELSPACE_END)
-#define VALID_USER_RANGE(start,end) ((uintptr_t)(start) >= KERNELSPACE_END)
+#define VALID_USER_PTR(p)            ((uintptr_t)(p) >= KERNELSPACE_END)
+#define VALID_USER_RANGE(start, end) ((uintptr_t)(start) >= KERNELSPACE_END)
 #endif /* !KERNELSPACE_HIGHMEM */
 
 /* Validate user-pointers for being allowed to be used for the specified operations.
@@ -49,8 +49,9 @@ PUBLIC void KCALL
 validate_user(UNCHECKED USER void const *base, size_t num_bytes) THROWS(E_SEGFAULT) {
 	uintptr_t endaddr;
 	if unlikely(OVERFLOW_UADD((uintptr_t)base, num_bytes, &endaddr) ||
-	            !VALID_USER_RANGE(base, endaddr))
+	            !VALID_USER_RANGE(base, endaddr)) {
 		THROW(E_SEGFAULT_UNMAPPED, base, E_SEGFAULT_CONTEXT_USERCODE);
+	}
 }
 
 PUBLIC void KCALL
@@ -59,19 +60,23 @@ validate_userm(UNCHECKED USER void const *base, size_t num_items, size_t item_si
 	uintptr_t endaddr;
 	if unlikely(OVERFLOW_UMUL(num_items, item_size_in_bytes, &total_size) ||
 	            OVERFLOW_UADD((uintptr_t)base, total_size, &endaddr) ||
-	            !VALID_USER_RANGE(base, endaddr))
+	            !VALID_USER_RANGE(base, endaddr)) {
 		THROW(E_SEGFAULT_UNMAPPED, base, E_SEGFAULT_CONTEXT_USERCODE);
+	}
 }
 
 DEFINE_PUBLIC_ALIAS(validate_readable, validate_user);
+DEFINE_PUBLIC_ALIAS(validate_readwrite, validate_user);
 DEFINE_PUBLIC_ALIAS(validate_readablem, validate_userm);
+DEFINE_PUBLIC_ALIAS(validate_readwritem, validate_userm);
 
 PUBLIC void KCALL
 validate_writable(UNCHECKED USER void *base, size_t num_bytes) THROWS(E_SEGFAULT) {
 	uintptr_t endaddr;
 	if unlikely(OVERFLOW_UADD((uintptr_t)base, num_bytes, &endaddr) ||
-	            !VALID_USER_RANGE(base, endaddr))
+	            !VALID_USER_RANGE(base, endaddr)) {
 		THROW(E_SEGFAULT_UNMAPPED, base, E_SEGFAULT_CONTEXT_USERCODE | E_SEGFAULT_CONTEXT_WRITING);
+	}
 }
 
 PUBLIC void KCALL
@@ -80,8 +85,9 @@ validate_writablem(UNCHECKED USER void *base, size_t num_items, size_t item_size
 	uintptr_t endaddr;
 	if unlikely(OVERFLOW_UMUL(num_items, item_size_in_bytes, &total_size) ||
 	            OVERFLOW_UADD((uintptr_t)base, total_size, &endaddr) ||
-	            !VALID_USER_RANGE(base, endaddr))
+	            !VALID_USER_RANGE(base, endaddr)) {
 		THROW(E_SEGFAULT_UNMAPPED, base, E_SEGFAULT_CONTEXT_USERCODE | E_SEGFAULT_CONTEXT_WRITING);
+	}
 }
 
 PUBLIC void KCALL
@@ -96,6 +102,8 @@ DEFINE_PUBLIC_ALIAS(validate_readablem_opt, validate_readablem);
 DEFINE_PUBLIC_ALIAS(validate_writable_opt, validate_writable);
 DEFINE_PUBLIC_ALIAS(validate_writablem_opt, validate_writablem);
 DEFINE_PUBLIC_ALIAS(validate_executable_opt, validate_executable);
+DEFINE_PUBLIC_ALIAS(validate_readwrite_opt, validate_readwrite);
+DEFINE_PUBLIC_ALIAS(validate_readwritem_opt, validate_readwritem);
 #else /* KERNELSPACE_HIGHMEM */
 
 PUBLIC void KCALL
@@ -120,6 +128,18 @@ PUBLIC void KCALL
 validate_writablem_opt(UNCHECKED USER void *base, size_t num_items, size_t item_size_in_bytes) THROWS(E_SEGFAULT) {
 	if (base)
 		validate_writablem(base, num_items, item_size_in_bytes);
+}
+
+PUBLIC void KCALL
+validate_readwrite_opt(UNCHECKED USER void *base, size_t num_bytes) THROWS(E_SEGFAULT) {
+	if (base)
+		validate_readwrite(base, num_bytes);
+}
+
+PUBLIC void KCALL
+validate_readwritem_opt(UNCHECKED USER void *base, size_t num_items, size_t item_size_in_bytes) THROWS(E_SEGFAULT) {
+	if (base)
+		validate_readwritem(base, num_items, item_size_in_bytes);
 }
 
 PUBLIC void KCALL

@@ -257,10 +257,18 @@ userkern_segment_writeq(struct vio_args *__restrict args,
 	return;
 #endif /* !DEFINE_IO_READ */
 err_invalid_addr:
+#ifdef DEFINE_IO_READ
 	THROW(E_SEGFAULT_UNMAPPED,
 	      vio_args_faultaddr(args, addr),
 	      E_SEGFAULT_CONTEXT_FAULT |
 	      E_SEGFAULT_CONTEXT_USERCODE);
+#else /* DEFINE_IO_READ */
+	THROW(E_SEGFAULT_UNMAPPED,
+	      vio_args_faultaddr(args, addr),
+	      E_SEGFAULT_CONTEXT_FAULT |
+	      E_SEGFAULT_CONTEXT_WRITING |
+	      E_SEGFAULT_CONTEXT_USERCODE);
+#endif /* !DEFINE_IO_READ */
 }
 
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1ec13291 */
+/* HASH CRC-32:0x8f8dafcf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -145,8 +145,10 @@
 #define E_SEGFAULT_CONTEXT_USERCODE 0x0004
 /* Non-canonical address */
 #define E_SEGFAULT_CONTEXT_NONCANON 0x0008
+/* The instruction pointer's location caused the fault */
+#define E_SEGFAULT_CONTEXT_EXEC 0x0010
 /* Attempted to unmap an undefined memory address */
-#define E_SEGFAULT_CONTEXT_UNMAP 0x0010
+#define E_SEGFAULT_CONTEXT_UNMAP 0x4000
 /* FLAG: The access was perform by VIO */
 #define E_SEGFAULT_CONTEXT_VIO 0x8000
 

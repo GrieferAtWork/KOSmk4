@@ -67,7 +67,7 @@ libvio_nonatomic_operation128(struct vio_args const *__restrict args,
 		      E_SEGFAULT_CONTEXT_VIO, 16);
 	}
 	THROW(E_SEGFAULT_NOTATOMIC, ptr,
-	      E_SEGFAULT_CONTEXT_VIO | E_SEGFAULT_CONTEXT_WRITING, 16,
+	      E_SEGFAULT_CONTEXT_VIO, 16,
 	      uint128_vec64_significand(oldval, 0),
 	      uint128_vec64_significand(oldval, 1),
 	      uint128_vec64_significand(newval, 0),
@@ -86,11 +86,11 @@ libvio_nonatomic_operation64(struct vio_args const *__restrict args,
 	}
 #ifdef __x86_64__
 	THROW(E_SEGFAULT_NOTATOMIC, ptr,
-	      E_SEGFAULT_CONTEXT_VIO | E_SEGFAULT_CONTEXT_WRITING, 8,
+	      E_SEGFAULT_CONTEXT_VIO, 8,
 	      oldval, 0, newval);
 #else /* __x86_64__ */
 	THROW(E_SEGFAULT_NOTATOMIC, ptr,
-	      E_SEGFAULT_CONTEXT_VIO | E_SEGFAULT_CONTEXT_WRITING, 8,
+	      E_SEGFAULT_CONTEXT_VIO, 8,
 	      (u32)oldval, (u32)(oldval >> 32),
 	      (u32)newval, (u32)(newval >> 32));
 #endif /* !__x86_64__ */
@@ -106,7 +106,7 @@ libvio_nonatomic_operation32(struct vio_args const *__restrict args,
 		      E_SEGFAULT_CONTEXT_VIO, 4);
 	}
 	THROW(E_SEGFAULT_NOTATOMIC, ptr,
-	      E_SEGFAULT_CONTEXT_VIO | E_SEGFAULT_CONTEXT_WRITING, 4,
+	      E_SEGFAULT_CONTEXT_VIO, 4,
 	      oldval, 0, newval);
 }
 
@@ -119,7 +119,7 @@ libvio_nonatomic_operation16(struct vio_args const *__restrict args,
 		      E_SEGFAULT_CONTEXT_VIO, 2);
 	}
 	THROW(E_SEGFAULT_NOTATOMIC, ptr,
-	      E_SEGFAULT_CONTEXT_VIO | E_SEGFAULT_CONTEXT_WRITING, 2,
+	      E_SEGFAULT_CONTEXT_VIO, 2,
 	      oldval, 0, newval);
 }
 
@@ -128,7 +128,7 @@ libvio_nonatomic_operation8(struct vio_args const *__restrict args,
                             vio_addr_t addr, u8 oldval, u8 newval) {
 	void *ptr = vio_args_faultaddr(args, addr);
 	THROW(E_SEGFAULT_NOTATOMIC, ptr,
-	      E_SEGFAULT_CONTEXT_VIO | E_SEGFAULT_CONTEXT_WRITING, 1,
+	      E_SEGFAULT_CONTEXT_VIO, 1,
 	      oldval, 0, newval);
 }
 

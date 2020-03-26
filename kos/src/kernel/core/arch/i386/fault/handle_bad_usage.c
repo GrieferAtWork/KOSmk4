@@ -1,3 +1,9 @@
+/*[[[magic
+// Optimize this file for size
+local opt = options.setdefault("GCC.options",[]);
+opt.removeif([](e) -> e.startswith("-O"));
+opt.append("-Os");
+]]]*/
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,18 +51,23 @@
 #include <kernel/except.h>
 #include <kernel/gdt.h>
 #include <kernel/printk.h>
+#include <kernel/restart-interrupt.h>
 #include <kernel/syscall.h>
 #include <kernel/user.h>
 #include <sched/except-handler.h>
 #include <sched/pid.h>
 #include <sched/rpc.h>
 #include <sched/task.h>
+#include <sched/userkern.h>
+
+#include <hybrid/overflow.h>
 
 #include <asm/registers.h>
 #include <kos/kernel/cpu-state-compat.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 
+#include <assert.h>
 #include <limits.h>
 #include <signal.h>
 #include <stdbool.h>
@@ -64,6 +75,12 @@
 
 #include <libemu86/emu86.h>
 #include <libinstrlen/instrlen.h>
+
+#ifndef CONFIG_NO_USERKERN_SEGMENT
+#include <libvio/access.h>
+#include <libviocore/viocore.h>
+#endif /* !CONFIG_NO_USERKERN_SEGMENT */
+
 
 DECL_BEGIN
 
@@ -283,6 +300,19 @@ loophint(struct icpustate *__restrict state) {
 #undef EMU86_EMULATE_RETURN_AFTER_INTO /* Not needed because we don't emulate the instruction */
 #undef EMU86_EMULATE_THROW_BOUNDERR    /* Not needed because we don't emulate the instruction */
 
+
+PRIVATE ATTR_NORETURN NOBLOCK void
+NOTHROW(FCALL unwind)(struct icpustate *__restrict self) {
+#if EXCEPT_BACKTRACE_SIZE != 0
+	{
+		unsigned int i;
+		for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
+			PERTASK_SET(this_exception_trace[i], (void *)0);
+	}
+#endif /* EXCEPT_BACKTRACE_SIZE != 0 */
+	x86_userexcept_unwind_interrupt(self);
+}
+
 #define EMU86_EMULATE_TRY \
 	TRY
 #define EMU86_EMULATE_EXCEPT     \
@@ -327,14 +357,7 @@ NOTHROW(FCALL complete_except)(struct icpustate *__restrict self) {
 			icpustate_setpc(self, (uintptr_t)next_pc);
 		PERTASK_SET(this_exception_faultaddr, (void *)pc);
 	}
-#if EXCEPT_BACKTRACE_SIZE != 0
-	{
-		unsigned int i;
-		for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
-			PERTASK_SET(this_exception_trace[i], (void *)0);
-	}
-#endif /* EXCEPT_BACKTRACE_SIZE != 0 */
-	x86_userexcept_unwind_interrupt(self);
+	unwind(self);
 }
 
 /* Fill in missing exception pointer. */
@@ -376,11 +399,7 @@ throw_illegal_instruction_exception(struct icpustate *__restrict state,
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_enabled() && (kernel_debugtrap_on & KERNEL_DEBUGTRAP_ON_ILLEGAL_INSTRUCTION))
 		kernel_debugtrap(state, SIGILL);
-#if EXCEPT_BACKTRACE_SIZE != 0
-	for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
-		PERTASK_SET(this_exception_trace[i], (void *)0);
-#endif /* EXCEPT_BACKTRACE_SIZE != 0 */
-	x86_userexcept_unwind_interrupt(state);
+	unwind(state);
 }
 
 PRIVATE ATTR_NORETURN NONNULL((1)) void FCALL
@@ -398,11 +417,7 @@ throw_exception(struct icpustate *__restrict state,
 	PERTASK_SET(this_exception_pointers[1], ptr1);
 	for (i = 2; i < EXCEPTION_DATA_POINTERS; ++i)
 		PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
-#if EXCEPT_BACKTRACE_SIZE != 0
-	for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
-		PERTASK_SET(this_exception_trace[i], (void *)0);
-#endif /* EXCEPT_BACKTRACE_SIZE != 0 */
-	x86_userexcept_unwind_interrupt(state);
+	unwind(state);
 }
 
 PRIVATE ATTR_NORETURN NONNULL((1)) void FCALL
@@ -461,8 +476,9 @@ throw_generic_unknown_instruction(struct icpustate *__restrict state,
 			throw_exception(state,
 			                ERROR_CODEOF(E_SEGFAULT_UNMAPPED),
 			                X86_64_ADDRBUS_NONCANON_MIN,
-			                icpustate_isuser(state) ? E_SEGFAULT_CONTEXT_NONCANON | E_SEGFAULT_CONTEXT_USERCODE
-			                                        : E_SEGFAULT_CONTEXT_NONCANON);
+			                icpustate_isuser(state)
+			                ? E_SEGFAULT_CONTEXT_NONCANON | E_SEGFAULT_CONTEXT_USERCODE
+			                : E_SEGFAULT_CONTEXT_NONCANON);
 		}
 #endif /* __x86_64__ */
 		/* If the error originated from user-space, default to assuming it's
@@ -474,8 +490,9 @@ throw_generic_unknown_instruction(struct icpustate *__restrict state,
 			if (icpustate_getpflags(state) & EFLAGS_AC) {
 				throw_exception(state,
 				                ERROR_CODEOF(E_SEGFAULT_UNALIGNED), 0,
-				                icpustate_isuser(state) ? E_SEGFAULT_CONTEXT_NONCANON | E_SEGFAULT_CONTEXT_USERCODE
-				                                        : E_SEGFAULT_CONTEXT_NONCANON);
+				                icpustate_isuser(state)
+				                ? E_SEGFAULT_CONTEXT_NONCANON | E_SEGFAULT_CONTEXT_USERCODE
+				                : E_SEGFAULT_CONTEXT_NONCANON);
 			}
 			throw_illegal_instruction_exception(state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE),
 			                                    opcode, op_flags, 0, 0, 0, 0);
@@ -484,6 +501,22 @@ throw_generic_unknown_instruction(struct icpustate *__restrict state,
 		throw_illegal_instruction_exception(state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_X86_INTERRUPT),
 		                                    opcode, op_flags, BAD_USAGE_INTNO(usage),
 		                                    BAD_USAGE_ECODE(usage), segval, 0);
+	}
+}
+
+PRIVATE ATTR_NORETURN NONNULL((1)) void FCALL
+throw_unsupported_instruction(struct icpustate *__restrict state,
+                              u16 usage, uintptr_t opcode, uintptr_t op_flags) {
+	if (BAD_USAGE_REASON(usage) == BAD_USAGE_REASON_UD) {
+		/* An unsupported instruction caused a #UD
+		 * -> Throw an UNSUPPORTED_OPCODE exception */
+		throw_illegal_instruction_exception(state,
+		                                    ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE),
+		                                    opcode, op_flags, 0, 0, 0, 0);
+	} else {
+		/* An unsupported instruction caused a #GPF or #SS
+		 * -> Handle the exception the same way we do for unknown instructions! */
+		throw_generic_unknown_instruction(state, usage, opcode, op_flags);
 	}
 }
 
@@ -499,8 +532,8 @@ throw_generic_unknown_instruction(struct icpustate *__restrict state,
 #define EMU86_EMULATE_RETURN_EXPECTED_REGISTER_MODRM_RMREG() throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE_RMREG(), op_flags, E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE, 0, 0, 0)
 #define EMU86_EMULATE_RETURN_UNEXPECTED_LOCK()               throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE(), op_flags, 0, 0, 0, 0)
 #define EMU86_EMULATE_RETURN_UNEXPECTED_LOCK_RMREG()         throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE_RMREG(), op_flags, 0, 0, 0, 0)
-#define EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION()       throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE), _EMU86_GETOPCODE(), op_flags, 0, 0, 0, 0)
-#define EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION_RMREG() throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE), _EMU86_GETOPCODE_RMREG(), op_flags, 0, 0, 0, 0)
+#define EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION()       throw_unsupported_instruction(_state, usage, _EMU86_GETOPCODE(), op_flags)
+#define EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION_RMREG() throw_unsupported_instruction(_state, usage, _EMU86_GETOPCODE_RMREG(), op_flags)
 #define EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(how, regno, regval, offset)          \
 	throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER), \
 	                                    _EMU86_GETOPCODE(), op_flags, how, regno, regval, offset)
@@ -628,8 +661,102 @@ setgsbase(struct icpustate *__restrict state, uintptr_t value) {
 #define EMU86_ISUSER_NOVM86() icpustate_isuser_novm86(_state)
 #define EMU86_ISVM86()        icpustate_isvm86(_state)
 #endif /* !__x86_64__ */
-#define EMU86_VALIDATE_READABLE(addr, num_bytes) validate_readable((void const *)(uintptr_t)(addr), num_bytes)
-#define EMU86_VALIDATE_WRITABLE(addr, num_bytes) validate_writable((void *)(uintptr_t)(addr), num_bytes)
+
+
+
+/* Special handling for user-space address range validation:
+ * Because our version of libemu86 is the one responsible for emulating
+ * instruction that may not necessarily be known to the host CPU, there
+ * also exists the case where user-space is trying to perform a memory
+ * access to its UKERN segment, using an instruction that is not natively
+ * known to the host CPU.
+ * In this case, when trying to emulate the instruction, we would normally
+ * notice that user-space is trying to access a kernel-space address.
+ * However, the UKERN segment exists as an overlay on-top of kernel-space,
+ * and as such any memory access originating from user-space, and targeting
+ * a kernel-space address (while also overlapping with the UKERN segment),
+ * must be dispatched through VIO. */
+#ifndef CONFIG_NO_USERKERN_SEGMENT
+PRIVATE struct icpustate *FCALL
+dispatch_userkern_vio_r(struct icpustate *__restrict state) {
+	struct vio_emulate_args args;
+	struct vm *myvm = THIS_VM;
+	/* The VIO emulation will span the entirety of the KERNRESERVE node. */
+	args.vea_ptrlo = vm_node_getmin(&myvm->v_kernreserve);
+	args.vea_ptrhi = vm_node_getmax(&myvm->v_kernreserve);
+	/* Load VM component pointers. */
+	args.vea_args.va_block = myvm->v_kernreserve.vn_block;
+	args.vea_args.va_part  = myvm->v_kernreserve.vn_part;
+	assert(args.vea_args.va_block);
+	assert(args.vea_args.va_part);
+	assert(args.vea_args.va_part->dp_block == args.vea_args.va_block);
+	assert(args.vea_args.va_part->dp_state == VM_DATAPART_STATE_VIOPRT);
+	assert(args.vea_args.va_block->db_vio);
+	/* Load the VIO dispatch table */
+	args.vea_args.va_ops = args.vea_args.va_block->db_vio;
+	/* Setup meta-data for where VIO is mapped
+	 * Since we know that the USERKERN VIO mapping consists of
+	 * only a single data part, this part is quite simple. */
+	args.vea_args.va_acmap_page   = args.vea_ptrlo;
+	args.vea_args.va_acmap_offset = 0;
+	args.vea_args.va_state        = state;
+	args.vea_addr                 = 0;
+	/* Emulate the instruction. */
+	viocore_emulate(&args);
+	/* Return the updated CPU state. */
+	return args.vea_args.va_state;
+}
+
+
+#define EMU86_VALIDATE_READABLE(addr, num_bytes)                         \
+	do {                                                                 \
+		if ((uintptr_t)(addr) >= KERNELSPACE_BASE)                       \
+			assert_user_address_range(_state, (void *)(uintptr_t)(addr), \
+			                          num_bytes, true, false);           \
+	} __WHILE0
+#define EMU86_VALIDATE_WRITABLE(addr, num_bytes)                         \
+	do {                                                                 \
+		if ((uintptr_t)(addr) >= KERNELSPACE_BASE)                       \
+			assert_user_address_range(_state, (void *)(uintptr_t)(addr), \
+			                          num_bytes, false, true);           \
+	} __WHILE0
+#define EMU86_VALIDATE_READWRITE(addr, num_bytes)                        \
+	do {                                                                 \
+		if ((uintptr_t)(addr) >= KERNELSPACE_BASE)                       \
+			assert_user_address_range(_state, (void *)(uintptr_t)(addr), \
+			                          num_bytes, true, true);            \
+	} __WHILE0
+PRIVATE void KCALL
+assert_user_address_range(struct icpustate *__restrict state,
+                          void const *addr, size_t num_bytes,
+                          bool reading, bool writing) {
+	uintptr_t endaddr;
+	if unlikely(OVERFLOW_UADD((uintptr_t)addr, num_bytes, &endaddr) ||
+	            endaddr > KERNELSPACE_BASE) {
+		struct vm *myvm = THIS_VM;
+		pageid_t pageid = PAGEID_ENCODE((uintptr_t)addr);
+		/* Dispatch the current instruction through VIO */
+		if (pageid >= vm_node_getminpageid(&myvm->v_kernreserve) &&
+		    pageid <= vm_node_getmaxpageid(&myvm->v_kernreserve)) {
+			/* Rewind the kernel stack such that `%(r|e)sp = state' before calling this function!
+			 * There is no need to keep the instruction emulation payload of `handle_bad_usage()'
+			 * on-stack when re-starting emulation for the purpose of dispatching userkern VIO. */
+			kernel_restart_interrupt(state, &dispatch_userkern_vio_r);
+		}
+		/* ERROR: User-space is trying to access kernel-space! */
+		THROW(E_SEGFAULT_UNMAPPED, addr,
+		      (writing && !reading)
+		      ? E_SEGFAULT_CONTEXT_USERCODE | E_SEGFAULT_CONTEXT_WRITING
+		      : E_SEGFAULT_CONTEXT_USERCODE);
+	}
+}
+#else /* !CONFIG_NO_USERKERN_SEGMENT */
+#define EMU86_VALIDATE_READABLE(addr, num_bytes)  validate_readable(addr, num_bytes)
+#define EMU86_VALIDATE_WRITABLE(addr, num_bytes)  validate_writable(addr, num_bytes)
+#define EMU86_VALIDATE_READWRITE(addr, num_bytes) validate_readwrite(addr, num_bytes)
+#endif /* CONFIG_NO_USERKERN_SEGMENT */
+
+
 
 
 #ifdef __x86_64__
@@ -675,23 +802,23 @@ assert_canonical_pc(struct icpustate *__restrict state,
 		}
 set_noncanon_pc_exception:
 		PERTASK_SET(this_exception_faultaddr, (void *)callsite_pc);
-		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_NOTEXECUTABLE));
+		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_UNMAPPED));
 		PERTASK_SET(this_exception_pointers[0], (uintptr_t)pc);
 		PERTASK_SET(this_exception_pointers[1],
 		            (uintptr_t)(E_SEGFAULT_CONTEXT_USERCODE |
-		                        E_SEGFAULT_CONTEXT_NONCANON));
-		if (!icpustate_isuser(state))
-			PERTASK_SET(this_exception_pointers[1], (uintptr_t)E_SEGFAULT_CONTEXT_NONCANON);
+		                        E_SEGFAULT_CONTEXT_NONCANON |
+		                        E_SEGFAULT_CONTEXT_EXEC));
+		if (!icpustate_isuser(state)) {
+			PERTASK_SET(this_exception_pointers[1],
+			            (uintptr_t)(E_SEGFAULT_CONTEXT_NONCANON |
+			                        E_SEGFAULT_CONTEXT_EXEC));
+		}
 		for (i = 2; i < EXCEPTION_DATA_POINTERS; ++i)
 			PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
 		icpustate_setpc(state, callsite_pc);
-#if EXCEPT_BACKTRACE_SIZE != 0
-		for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
-			PERTASK_SET(this_exception_trace[i], (void *)0);
-#endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 		printk(KERN_DEBUG "[segfault] PC-Fault at %p [pc=%p] [#GPF] [tid=%u]\n",
 		       pc, callsite_pc, (unsigned int)task_getroottid_s());
-		x86_userexcept_unwind_interrupt(state);
+		unwind(state);
 	}
 }
 
@@ -702,15 +829,21 @@ PRIVATE void KCALL
 assert_canonical_address(struct icpustate *__restrict state,
                          void *addr, size_t num_bytes,
                          bool reading, bool writing) {
-	(void)reading;
+	assert(reading || writing);
 	if unlikely(ADDR_IS_NONCANON((byte_t *)addr) ||
 	            ADDR_IS_NONCANON((byte_t *)addr + num_bytes - 1)) {
-		printk(KERN_DEBUG "[segfault] Fault at %p [pc=%p] [#GPF] [tid=%u]\n",
-		       addr, icpustate_getpc(state), (unsigned int)task_getroottid_s());
+		printk(KERN_DEBUG "[segfault] Fault at %p [pc=%p,%s] [#GPF] [tid=%u]\n",
+		       addr, icpustate_getpc(state),
+		       reading && writing ? "rw" : reading ? "ro" : "wo",
+		       (unsigned int)task_getroottid_s());
+		/* NOTE: When reading+writing, then the read always comes first, so even
+		 *       though the instruction would have also performed a write, the
+		 *       read happening first means that we mustn't set the WRITING flag. */
 		THROW(E_SEGFAULT_UNMAPPED,
 		      addr,
-		      writing ? E_SEGFAULT_CONTEXT_NONCANON | E_SEGFAULT_CONTEXT_WRITING
-		              : E_SEGFAULT_CONTEXT_NONCANON);
+		      (writing && !reading)
+		      ? E_SEGFAULT_CONTEXT_NONCANON | E_SEGFAULT_CONTEXT_WRITING
+		      : E_SEGFAULT_CONTEXT_NONCANON);
 	}
 }
 

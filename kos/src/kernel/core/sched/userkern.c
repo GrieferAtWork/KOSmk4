@@ -132,6 +132,7 @@ err_invalid_addr:
 	THROW(E_SEGFAULT_UNMAPPED,
 	      vio_args_faultaddr(args, addr),
 	      E_SEGFAULT_CONTEXT_FAULT |
+	      E_SEGFAULT_CONTEXT_EXEC |
 	      E_SEGFAULT_CONTEXT_USERCODE);
 }
 

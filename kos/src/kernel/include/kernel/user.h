@@ -41,13 +41,26 @@ FUNDEF void KCALL validate_readable(UNCHECKED USER void const *base, size_t num_
 FUNDEF void KCALL validate_readablem(UNCHECKED USER void const *base, size_t num_items, size_t item_size_in_bytes) THROWS(E_SEGFAULT);
 FUNDEF void KCALL validate_writable(UNCHECKED USER void *base, size_t num_bytes) THROWS(E_SEGFAULT);
 FUNDEF void KCALL validate_writablem(UNCHECKED USER void *base, size_t num_items, size_t item_size_in_bytes) THROWS(E_SEGFAULT);
+FUNDEF void KCALL validate_readwrite(UNCHECKED USER void *base, size_t num_bytes) THROWS(E_SEGFAULT);
+FUNDEF void KCALL validate_readwritem(UNCHECKED USER void *base, size_t num_items, size_t item_size_in_bytes) THROWS(E_SEGFAULT);
 FUNDEF void KCALL validate_executable(UNCHECKED USER void const *base) THROWS(E_SEGFAULT);
 /* Same as the function above, but also accept `NULL' */
 FUNDEF void KCALL validate_readable_opt(UNCHECKED USER void const *base, size_t num_bytes) THROWS(E_SEGFAULT);
 FUNDEF void KCALL validate_readablem_opt(UNCHECKED USER void const *base, size_t num_items, size_t item_size_in_bytes) THROWS(E_SEGFAULT);
 FUNDEF void KCALL validate_writable_opt(UNCHECKED USER void *base, size_t num_bytes) THROWS(E_SEGFAULT);
 FUNDEF void KCALL validate_writablem_opt(UNCHECKED USER void *base, size_t num_items, size_t item_size_in_bytes) THROWS(E_SEGFAULT);
+FUNDEF void KCALL validate_readwrite_opt(UNCHECKED USER void *base, size_t num_bytes) THROWS(E_SEGFAULT);
+FUNDEF void KCALL validate_readwritem_opt(UNCHECKED USER void *base, size_t num_items, size_t item_size_in_bytes) THROWS(E_SEGFAULT);
 FUNDEF void KCALL validate_executable_opt(UNCHECKED USER void const *base) THROWS(E_SEGFAULT);
+
+/* TODO: Go through all uses of `validate_writable()' and use `validate_readwrite()' when necessary */
+/* TODO: Go through all uses of `validate_writablem()' and use `validate_readwritem()' when necessary */
+/* TODO: Go through all uses of `validate_writable_opt()' and use `validate_readwrite_opt()' when necessary */
+/* TODO: Go through all uses of `validate_writablem_opt()' and use `validate_readwritem_opt()' when necessary */
+/* TODO: Go through all uses of `compat_validate_writable()' and use `compat_validate_readwrite()' when necessary */
+/* TODO: Go through all uses of `compat_validate_writablem()' and use `compat_validate_readwritem()' when necessary */
+/* TODO: Go through all uses of `compat_validate_writable_opt()' and use `compat_validate_readwrite_opt()' when necessary */
+/* TODO: Go through all uses of `compat_validate_writablem_opt()' and use `compat_validate_readwritem_opt()' when necessary */
 
 /* Same as the regular validate functions, but are allowed to be used for verification
  * of pointers originating from compatibility mode (this allows for an optimization
@@ -66,11 +79,15 @@ FUNDEF void KCALL validate_executable_opt(UNCHECKED USER void const *base) THROW
 #define compat_validate_readablem      validate_readablem
 #define compat_validate_writable       validate_writable
 #define compat_validate_writablem      validate_writablem
+#define compat_validate_readwrite      validate_readwrite
+#define compat_validate_readwritem     validate_readwritem
 #define compat_validate_executable     validate_executable
 #define compat_validate_readable_opt   validate_readable_opt
 #define compat_validate_readablem_opt  validate_readablem_opt
 #define compat_validate_writable_opt   validate_writable_opt
 #define compat_validate_writablem_opt  validate_writablem_opt
+#define compat_validate_readwrite_opt  validate_readwrite_opt
+#define compat_validate_readwritem_opt validate_readwritem_opt
 #define compat_validate_executable_opt validate_executable_opt
 #endif /* __ARCH_HAVE_COMPAT */
 

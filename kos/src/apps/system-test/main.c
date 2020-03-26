@@ -38,9 +38,9 @@ INTDEF struct testdecl __system_tests_end[];
 
 PRIVATE struct testdecl *ctest_current_test = NULL;
 
-INTERN void
-NOTHROW_NCX(__LIBCCALL ctest_vsubtestf)(char const *__restrict format,
-                                        va_list args) {
+PRIVATE void
+NOTHROW_NCX(__LIBCCALL do_ctest_vsubtestf)(char const *__restrict format,
+                                           va_list args, bool is_status) {
 	va_list args_copy;
 	syslog(LOG_DEBUG, "[test:%s] %s:%d: ",
 	       ctest_current_test->td_name,
@@ -52,7 +52,20 @@ NOTHROW_NCX(__LIBCCALL ctest_vsubtestf)(char const *__restrict format,
 	syslog_printer((void *)(uintptr_t)LOG_DEBUG, "\n", 1);
 	printf("\tTesting if: ");
 	vprintf(format, args);
-	putchar('\n');
+	if (is_status) {
+		/* EL(ANSITTY_EL_AFTER);
+		 * CR(); */
+		printf("\e[K\r");
+	} else {
+		/* NL(); */
+		putchar('\n');
+	}
+}
+
+INTERN void
+NOTHROW_NCX(__LIBCCALL ctest_vsubtestf)(char const *__restrict format,
+                                        va_list args) {
+	do_ctest_vsubtestf(format, args, false);
 }
 
 INTERN void
@@ -60,6 +73,20 @@ NOTHROW_NCX(__VLIBCCALL ctest_subtestf)(char const *__restrict format, ...) {
 	va_list args;
 	va_start(args, format);
 	ctest_vsubtestf(format, args);
+	va_end(args);
+}
+
+INTERN void
+NOTHROW_NCX(__LIBCCALL ctest_vsubstatf)(char const *__restrict format,
+                                        va_list args) {
+	do_ctest_vsubtestf(format, args, true);
+}
+
+INTERN void
+NOTHROW_NCX(__VLIBCCALL ctest_substatf)(char const *__restrict format, ...) {
+	va_list args;
+	va_start(args, format);
+	ctest_vsubstatf(format, args);
 	va_end(args);
 }
 

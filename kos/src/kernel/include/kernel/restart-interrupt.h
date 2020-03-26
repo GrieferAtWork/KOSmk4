@@ -17,25 +17,30 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBVIOCORE_VIOCORE_H
-#define GUARD_LIBVIOCORE_VIOCORE_H 1
+#ifndef GUARD_KERNEL_INCLUDE_KERNEL_RESTART_INTERRUPT_H
+#define GUARD_KERNEL_INCLUDE_KERNEL_RESTART_INTERRUPT_H 1
 
-#include "api.h"
-#include <libviocore/viocore.h>
+#include <kernel/compiler.h>
 
-#ifdef LIBVIO_CONFIG_ENABLED
 DECL_BEGIN
 
-/* Emulate the instruction pointed-to by `self->vea_args.va_state' and dispatch
- * any memory access made to `self->vea_ptrlo ... self->vea_ptrhi' by dispatching
- * it using the VIO callback table.
- * Upon success, `self->vea_args.va_state' will point to the updated CPU state,
- * which may be placed at a different address than it was upon entry.
- * This function is intended to be called from a page fault handler. */
-INTDEF void CC libviocore_emulate(struct vio_emulate_args *__restrict self);
+#ifdef __CC__
 
+typedef struct icpustate *(FCALL *kernel_interrupt_callback_t)(struct icpustate *__restrict state);
+
+/* Hard-set the current stack depth to `start' and invoke `cb()' by passing `state' to it.
+ * Once `cb()' returns, the cpu state returned by it is loaded, and execution is resumed.
+ * WARNING: When this function is called, the caller's stack is _NOT_ unwound until `state'
+ *          is reached. - No TRY-EXCEPT/FINALLY blocks or destructors are invoked, and this
+ *          function does not return in any way that is observable to the caller.
+ *          Rather, it behaves similar to `longjmp()', in that `cb()' is made to return to
+ *          the origin of `state' after being injected ontop of that location. */
+FUNDEF ATTR_NORETURN void FCALL
+kernel_restart_interrupt(struct icpustate *__restrict state,
+                         kernel_interrupt_callback_t cb);
+
+#endif /* __CC__ */
 
 DECL_END
-#endif /* LIBVIO_CONFIG_ENABLED */
 
-#endif /* !GUARD_LIBVIOCORE_VIOCORE_H */
+#endif /* !GUARD_KERNEL_INCLUDE_KERNEL_RESTART_INTERRUPT_H */
