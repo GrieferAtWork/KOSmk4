@@ -263,9 +263,9 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 		if (EMU86_ISUSER() && EMU86_GETCR4_UMIP()) {
 #ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
 			EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV,
-			                                                 EMU86_F_IS64(op_flags)
-			                                                 ? X86_REGISTER_MISC_GDT_BASEQ
-			                                                 : X86_REGISTER_MISC_GDT_BASEL,
+			                                                 IF_64BIT(EMU86_F_IS64(op_flags)
+			                                                 ?  X86_REGISTER_MISC_GDT_BASEQ
+			                                                 :) X86_REGISTER_MISC_GDT_BASEL,
 			                                                 0, 0);
 #else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 #define NEED_return_privileged_instruction_rmreg
@@ -317,9 +317,9 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 		if (EMU86_ISUSER() && EMU86_GETCR4_UMIP()) {
 #ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
 			EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV,
-			                                                 EMU86_F_IS64(op_flags)
-			                                                 ? X86_REGISTER_MISC_IDT_BASEQ
-			                                                 : X86_REGISTER_MISC_IDT_BASEL,
+			                                                 IF_64BIT(EMU86_F_IS64(op_flags)
+			                                                 ?  X86_REGISTER_MISC_IDT_BASEQ
+			                                                 :) X86_REGISTER_MISC_IDT_BASEL,
 			                                                 0, 0);
 #else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 #define NEED_return_privileged_instruction_rmreg
@@ -389,9 +389,9 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 		if (EMU86_ISUSER()) {
 #ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
 			EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV,
-			                                                 EMU86_F_IS64(op_flags)
-			                                                 ? X86_REGISTER_MISC_GDT_BASEQ
-			                                                 : X86_REGISTER_MISC_GDT_BASEL,
+			                                                 IF_64BIT(EMU86_F_IS64(op_flags)
+			                                                 ?  X86_REGISTER_MISC_GDT_BASEQ
+			                                                 :) X86_REGISTER_MISC_GDT_BASEL,
 			                                                 base, limit);
 #else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 #define NEED_return_privileged_instruction_rmreg
@@ -445,9 +445,9 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 		if (EMU86_ISUSER()) {
 #ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
 			EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV,
-			                                                 EMU86_F_IS64(op_flags)
-			                                                 ? X86_REGISTER_MISC_IDT_BASEQ
-			                                                 : X86_REGISTER_MISC_IDT_BASEL,
+			                                                 IF_64BIT(EMU86_F_IS64(op_flags)
+			                                                 ?  X86_REGISTER_MISC_IDT_BASEQ
+			                                                 :) X86_REGISTER_MISC_IDT_BASEL,
 			                                                 base, 0);
 #else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 #define NEED_return_privileged_instruction_rmreg

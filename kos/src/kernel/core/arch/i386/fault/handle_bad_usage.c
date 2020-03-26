@@ -62,6 +62,7 @@ opt.append("-Os");
 
 #include <hybrid/overflow.h>
 
+#include <asm/cpu-flags.h>
 #include <asm/registers.h>
 #include <kos/kernel/cpu-state-compat.h>
 #include <kos/kernel/cpu-state-helpers.h>
@@ -610,10 +611,10 @@ throw_unsupported_instruction(struct icpustate *__restrict state,
 	        : IA32_GS_BASE,            \
 	        (uintptr_t)(v))
 #else /* __x86_64__ */
-#define EMU86_SETFSBASE(v) setfsbase(_state, (uintptr_t)(v))
-#define EMU86_SETGSBASE(v) setgsbase(_state, (uintptr_t)(v))
-PRIVATE NONNULL((1)) void FCALL
-setfsbase(struct icpustate *__restrict state, uintptr_t value) {
+#define EMU86_SETFSBASE(v) setfsbase((uintptr_t)(v))
+#define EMU86_SETGSBASE(v) setgsbase((uintptr_t)(v))
+PRIVATE void FCALL
+setfsbase(uintptr_t value) {
 	u16 myfs = __rdfs() & ~3;
 	if (myfs == SEGMENT_USER_FSBASE)
 		set_user_fsbase_noreload(value);
@@ -629,8 +630,8 @@ setfsbase(struct icpustate *__restrict state, uintptr_t value) {
 	update_user_fsbase();
 }
 
-PRIVATE NONNULL((1)) void FCALL
-setgsbase(struct icpustate *__restrict state, uintptr_t value) {
+PRIVATE void FCALL
+setgsbase(uintptr_t value) {
 	u16 mygs = __rdgs() & ~3;
 	if (mygs == SEGMENT_USER_GSBASE)
 		set_user_gsbase_noreload(value);
@@ -901,7 +902,7 @@ assert_canonical_address(struct icpustate *__restrict state,
 
 /* 32-bit mode supports non-zero bases for any segment! */
 #define EMU86_GETSEGBASE(segment_regno) \
-	i386_getsegment_base(self->vea_args.va_state, segment_regno)
+	i386_getsegment_base(_state, segment_regno)
 #define EMU86_GETDSBASE() EMU86_GETSEGBASE(EMU86_R_DS)
 #define EMU86_GETESBASE() EMU86_GETSEGBASE(EMU86_R_ES)
 #define EMU86_GETCSBASE() EMU86_GETSEGBASE(EMU86_R_CS)
