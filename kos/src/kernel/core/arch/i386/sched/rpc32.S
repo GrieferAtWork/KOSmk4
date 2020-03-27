@@ -276,10 +276,10 @@ END(x86_rpc_user_redirection)
 	.cfi_rel_offset %edx, OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EDX
 	.cfi_rel_offset %ecx, OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_ECX
 	.cfi_rel_offset %eax, OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EAX
-	.cfi_restore_iret_gs
-	.cfi_restore_iret_fs_or_offset (OFFSET_ICPUSTATE_FS - OFFSET_ICPUSTATE_IRREGS)
 	.cfi_restore_iret_es_or_offset (OFFSET_ICPUSTATE_ES - OFFSET_ICPUSTATE_IRREGS)
 	.cfi_restore_iret_ds_or_offset (OFFSET_ICPUSTATE_DS - OFFSET_ICPUSTATE_IRREGS)
+	.cfi_restore_iret_fs_or_offset (OFFSET_ICPUSTATE_FS - OFFSET_ICPUSTATE_IRREGS)
+	.cfi_restore_iret_gs
 
 	EXTERN(x86_rpc_kernel_redirection_personality)
 	.cfi_personality 0, x86_rpc_kernel_redirection_personality
@@ -335,10 +335,11 @@ INTERN_FUNCTION(x86_rpc_kernel_redirection_handler)
 	.cfi_rel_offset %edx, OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EDX
 	.cfi_rel_offset %ecx, OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_ECX
 	.cfi_rel_offset %eax, OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EAX
-	.cfi_restore_iret_gs
-	.cfi_restore_iret_fs_or_offset (OFFSET_ICPUSTATE_FS - OFFSET_ICPUSTATE_IRREGS)
 	.cfi_restore_iret_es_or_offset (OFFSET_ICPUSTATE_ES - OFFSET_ICPUSTATE_IRREGS)
 	.cfi_restore_iret_ds_or_offset (OFFSET_ICPUSTATE_DS - OFFSET_ICPUSTATE_IRREGS)
+	.cfi_restore_iret_fs_or_offset (OFFSET_ICPUSTATE_FS - OFFSET_ICPUSTATE_IRREGS)
+	.cfi_restore_iret_gs
+
 	/* EAX:    <task_rpc_t func>
 	 * ECX:    <void *arg>
 	 * EDX:    <struct icpustate *>    (contains the return location; also used for CFI)

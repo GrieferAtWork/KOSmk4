@@ -53,9 +53,9 @@ TEXT_SECTION
 	.cfi_restore_iret_eflags
 	.cfi_restore_iret_esp
 	.cfi_restore_iret_ss
-	.cfi_restore_iret_es_or_offset (OFFSET_ICPUSTATE_FS - OFFSET_ICPUSTATE_IRREGS)
-	.cfi_restore_iret_ds_or_offset (OFFSET_ICPUSTATE_ES - OFFSET_ICPUSTATE_IRREGS)
-	.cfi_restore_iret_fs_or_offset (OFFSET_ICPUSTATE_DS - OFFSET_ICPUSTATE_IRREGS)
+	.cfi_restore_iret_es_or_offset (OFFSET_ICPUSTATE_ES - OFFSET_ICPUSTATE_IRREGS)
+	.cfi_restore_iret_ds_or_offset (OFFSET_ICPUSTATE_DS - OFFSET_ICPUSTATE_IRREGS)
+	.cfi_restore_iret_fs_or_offset (OFFSET_ICPUSTATE_FS - OFFSET_ICPUSTATE_IRREGS)
 	.cfi_restore_iret_gs
 	.cfi_rel_offset %edi, (OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EDI)
 	.cfi_rel_offset %esi, (OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_ESI)

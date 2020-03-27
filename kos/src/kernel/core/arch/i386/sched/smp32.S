@@ -615,10 +615,10 @@ INTERN_FUNCTION(x86_smp_entry32)
 	.cfi_rel_offset %edx, OFFSET_SCPUSTATE_GPREGS + OFFSET_GPREGS_EDX
 	.cfi_rel_offset %ecx, OFFSET_SCPUSTATE_GPREGS + OFFSET_GPREGS_ECX
 	.cfi_rel_offset %eax, OFFSET_SCPUSTATE_GPREGS + OFFSET_GPREGS_EAX
-	.cfi_restore_iret_gs_or_offset ((OFFSET_SCPUSTATE_SGREGS + OFFSET_SGREGS_GS) - OFFSET_SCPUSTATE_IRREGS)
-	.cfi_restore_iret_fs_or_offset ((OFFSET_SCPUSTATE_SGREGS + OFFSET_SGREGS_FS) - OFFSET_SCPUSTATE_IRREGS)
 	.cfi_restore_iret_es_or_offset ((OFFSET_SCPUSTATE_SGREGS + OFFSET_SGREGS_ES) - OFFSET_SCPUSTATE_IRREGS)
 	.cfi_restore_iret_ds_or_offset ((OFFSET_SCPUSTATE_SGREGS + OFFSET_SGREGS_DS) - OFFSET_SCPUSTATE_IRREGS)
+	.cfi_restore_iret_fs_or_offset ((OFFSET_SCPUSTATE_SGREGS + OFFSET_SGREGS_FS) - OFFSET_SCPUSTATE_IRREGS)
+	.cfi_restore_iret_gs_or_offset ((OFFSET_SCPUSTATE_SGREGS + OFFSET_SGREGS_GS) - OFFSET_SCPUSTATE_IRREGS)
 
 	/* Reload debug registers */
 	reload_x86_debug_registers %ecx, %eax, %edx, 0

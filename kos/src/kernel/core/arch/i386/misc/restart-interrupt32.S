@@ -48,9 +48,9 @@ PUBLIC_FUNCTION(kernel_restart_interrupt)
 	.cfi_restore_iret_eflags
 	.cfi_restore_iret_esp
 	.cfi_restore_iret_ss
-	.cfi_restore_iret_es_or_offset (OFFSET_ICPUSTATE_FS - OFFSET_ICPUSTATE_IRREGS)
-	.cfi_restore_iret_ds_or_offset (OFFSET_ICPUSTATE_ES - OFFSET_ICPUSTATE_IRREGS)
-	.cfi_restore_iret_fs_or_offset (OFFSET_ICPUSTATE_DS - OFFSET_ICPUSTATE_IRREGS)
+	.cfi_restore_iret_es_or_offset (OFFSET_ICPUSTATE_ES - OFFSET_ICPUSTATE_IRREGS)
+	.cfi_restore_iret_ds_or_offset (OFFSET_ICPUSTATE_DS - OFFSET_ICPUSTATE_IRREGS)
+	.cfi_restore_iret_fs_or_offset (OFFSET_ICPUSTATE_FS - OFFSET_ICPUSTATE_IRREGS)
 	.cfi_restore_iret_gs
 	.cfi_rel_offset %edi, (OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EDI)
 	.cfi_rel_offset %esi, (OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_ESI)
@@ -61,7 +61,7 @@ PUBLIC_FUNCTION(kernel_restart_interrupt)
 	.cfi_rel_offset %eax, (OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EAX)
 	movl   %ecx, %esp
 	.cfi_def_cfa_register %esp
-	calll  *%edx
+	calll  *%edx /* %eax = (*cb)(state); */
 	movl   %eax, %esp
 	EXTERN(libcpu_apply_icpustate_esp)
 	jmp    libcpu_apply_icpustate_esp

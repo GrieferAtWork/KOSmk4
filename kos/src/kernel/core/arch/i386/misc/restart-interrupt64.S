@@ -46,7 +46,7 @@ PUBLIC_FUNCTION(kernel_restart_interrupt)
 	ASM_CFI_REL_OFFSET_RESTORE_ICPUSTATE(0)
 	movq   %rdi, %rsp
 	.cfi_def_cfa_register %rsp
-	callq  *%rsi
+	callq  *%rsi /* %rax = (*cb)(state); */
 	movq   %rax, %rsp
 	EXTERN(libcpu_apply_icpustate_rsp)
 	jmp    libcpu_apply_icpustate_rsp
