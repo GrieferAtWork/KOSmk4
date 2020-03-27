@@ -90,7 +90,7 @@ DECL_BEGIN
 #define BAD_USAGE_REASON_GFP 0x0d00
 #define BAD_USAGE_INTNO(usage)  (((usage) & 0xff00) >> 8)
 #define BAD_USAGE_REASON(usage) ((usage) & 0xff00)
-#define BAD_USAGE_ECODE(usage)  ((usage) & 0x00ff)
+#define BAD_USAGE_ECODE(usage)  ((usage) & 0x00ff) /* FIXME: Segment selector error codes can be up to 16 bits (not just 8)! */
 
 PRIVATE ATTR_RETNONNULL NONNULL((1)) struct icpustate *FCALL
 x86_handle_bad_usage(struct icpustate *__restrict state, u16 usage);
@@ -200,7 +200,7 @@ x86_handle_bad_usage(struct icpustate *__restrict state, u16 usage);
 #define EMU86_EMULATE_CONFIG_WANT_MOVSXD        0
 #define EMU86_EMULATE_CONFIG_WANT_MOVZX         0
 #define EMU86_EMULATE_CONFIG_WANT_ARPL          0
-#define EMU86_EMULATE_CONFIG_WANT_NOP_RM         1 /* TODO: Check if this instruction always exists on x86_64 */
+#define EMU86_EMULATE_CONFIG_WANT_NOP_RM        1 /* TODO: Check if this instruction always exists on x86_64 */
 #define EMU86_EMULATE_CONFIG_WANT_PEXT          1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_PDEP          1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_BZHI          1 /* Emulate non-standard instructions */
@@ -682,9 +682,11 @@ PRIVATE struct icpustate *FCALL
 dispatch_userkern_vio_r(struct icpustate *__restrict state) {
 	struct vio_emulate_args args;
 	struct vm *myvm = THIS_VM;
+
 	/* The VIO emulation will span the entirety of the KERNRESERVE node. */
 	args.vea_ptrlo = vm_node_getmin(&myvm->v_kernreserve);
 	args.vea_ptrhi = vm_node_getmax(&myvm->v_kernreserve);
+
 	/* Load VM component pointers. */
 	args.vea_args.va_block = myvm->v_kernreserve.vn_block;
 	args.vea_args.va_part  = myvm->v_kernreserve.vn_part;
@@ -693,8 +695,10 @@ dispatch_userkern_vio_r(struct icpustate *__restrict state) {
 	assert(args.vea_args.va_part->dp_block == args.vea_args.va_block);
 	assert(args.vea_args.va_part->dp_state == VM_DATAPART_STATE_VIOPRT);
 	assert(args.vea_args.va_block->db_vio);
+
 	/* Load the VIO dispatch table */
 	args.vea_args.va_ops = args.vea_args.va_block->db_vio;
+
 	/* Setup meta-data for where VIO is mapped
 	 * Since we know that the USERKERN VIO mapping consists of
 	 * only a single data part, this part is quite simple. */
@@ -702,8 +706,17 @@ dispatch_userkern_vio_r(struct icpustate *__restrict state) {
 	args.vea_args.va_acmap_offset = 0;
 	args.vea_args.va_state        = state;
 	args.vea_addr                 = 0;
+
 	/* Emulate the instruction. */
 	viocore_emulate(&args);
+
+#ifndef __x86_64__
+	/* NOTE: No need to deal with kernel ss/esp redirection, because we only
+	 *       ever get called for user-space VIO access (s.a. the fact that
+	 *       this function is only used to deal with userkern memory access,
+	 *       which in turn can only ever happen from user-space) */
+#endif /* !__x86_64__ */
+
 	/* Return the updated CPU state. */
 	return args.vea_args.va_state;
 }

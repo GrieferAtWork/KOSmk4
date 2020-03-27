@@ -444,6 +444,7 @@ void (__wrgsbase)(void *__val);
  *       to already provide them as an extension.
  * s.a.: https://www.felixcloutier.com/x86/rdfsbase:rdgsbase */
 __FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdfsbasel)(void) {
+	/* HINT: modrm.mi_reg = 0 */
 	__register __UINT32_TYPE__ __result;
 	__asm__(".byte 0xf3,0x0f,0xae\n\t"
 	        __PRIVATE_EMIT_BYTE_REGISTER_SELECT("%k0"
@@ -459,6 +460,7 @@ __FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdfsbasel)(void) {
 	return __result;
 }
 __FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdgsbasel)(void) {
+	/* HINT: modrm.mi_reg = 1 */
 	__register __UINT32_TYPE__ __result;
 	__asm__(".byte 0xf3,0x0f,0xae\n\t"
 	        __PRIVATE_EMIT_BYTE_REGISTER_SELECT("%k0"
@@ -475,6 +477,7 @@ __FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdgsbasel)(void) {
 }
 
 __FORCELOCAL void (__wrfsbasel)(__UINT32_TYPE__ __val) {
+	/* HINT: modrm.mi_reg = 2 */
 	__asm__(".byte 0xf3,0x0f,0xae\n\t"
 	        __PRIVATE_EMIT_BYTE_REGISTER_SELECT("%k0"
 	        , "0xd0" /* 0b_11_010_000 */
@@ -489,6 +492,7 @@ __FORCELOCAL void (__wrfsbasel)(__UINT32_TYPE__ __val) {
 }
 
 __FORCELOCAL void (__wrgsbasel)(__UINT32_TYPE__ __val) {
+	/* HINT: modrm.mi_reg = 3 */
 	__asm__(".byte 0xf3,0x0f,0xae\n\t"
 	        __PRIVATE_EMIT_BYTE_REGISTER_SELECT("%k0"
 	        , "0xd8" /* 0b_11_011_000 */

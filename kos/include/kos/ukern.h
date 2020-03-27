@@ -21,10 +21,12 @@
 #define _KOS_UKERN_H 1
 
 #include <__stdinc.h>
-#include <bits/types.h>
+
 #include <hybrid/host.h>
-#include <kos/bits/ukern.h>
+
+#include <bits/types.h>
 #include <kos/bits/ukern-struct.h>
+#include <kos/bits/ukern.h>
 
 __DECL_BEGIN
 
@@ -118,6 +120,31 @@ __CDECLARE_VOID(,__NOTHROW_NCX,userkern_reset,(void),())
 #ifndef userkern_setfield
 #define userkern_setfield(field, v) (userkern_self()->field = (v))
 #endif /* !userkern_setfield */
+
+/*
+#include <sys/syscall.h>
+#include <unistd.h>
+
+.rodata
+str: .string "Hello World\0"
+len = . - str
+.text
+_start:
+	movl   $0xc0000000, %eax
+	wrfsbasel %eax
+
+	pushl  $len
+	pushl  $str
+	pushl  $STDOUT_FILENO
+	call   sys_write
+	addl   $12, %esp
+
+	pushl  $0
+	call   sys_exit
+
+sys_write = 0xc0000000 + USERKERN_SYSCALL_ENCODE(SYS_write)
+sys_exit  = 0xc0000000 + USERKERN_SYSCALL_ENCODE(SYS_exit)
+*/
 
 #endif /* __CC__ */
 
