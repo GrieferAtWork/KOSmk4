@@ -28,18 +28,18 @@
 #define LIBVIO_CONFIG_ENABLED 1
 #undef LIBVIO_CONFIG_HAVE_QWORD
 #undef LIBVIO_CONFIG_HAVE_QWORD_CMPXCH
-#undef LIBVIO_CONFIG_HAVE_INT128_CMPXCH
+#undef LIBVIO_CONFIG_HAVE_XWORD_CMPXCH
 
 #if defined(__KERNEL__) && defined(CONFIG_NO_VIO)
 #undef LIBVIO_CONFIG_ENABLED
 #endif /* __KERNEL__ && CONFIG_NO_VIO */
 
 #if defined(__x86_64__)
-#define LIBVIO_CONFIG_HAVE_QWORD         1
-#define LIBVIO_CONFIG_HAVE_QWORD_CMPXCH  1
-#define LIBVIO_CONFIG_HAVE_INT128_CMPXCH 1 /* Because of the `cmpxchg16b' instruction */
+#define LIBVIO_CONFIG_HAVE_QWORD        1
+#define LIBVIO_CONFIG_HAVE_QWORD_CMPXCH 1
+#define LIBVIO_CONFIG_HAVE_XWORD_CMPXCH 1 /* Because of the `cmpxchg16b' instruction */
 #elif defined(__i386__)
-#define LIBVIO_CONFIG_HAVE_QWORD_CMPXCH  1 /* Because of the `cmpxchg8b' instruction */
+#define LIBVIO_CONFIG_HAVE_QWORD_CMPXCH 1 /* Because of the `cmpxchg8b' instruction */
 #else /* Arch... */
 #include <hybrid/typecore.h>
 #if __SIZEOF_POINTER__ >= 8

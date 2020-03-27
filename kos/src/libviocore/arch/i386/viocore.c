@@ -1055,16 +1055,16 @@ libviocore_atomic_cmpxch_or_writeq(struct vio_emulate_args *__restrict self,
 	return result == oldval;
 }
 
-#define EMU86_MEM_ATOMIC_CMPXCH128(addr, oldval, newval, force_atomic) \
-	libviocore_atomic_cmpxch128(self, addr, oldval, newval, force_atomic)
+#define EMU86_MEM_ATOMIC_CMPXCHX(addr, oldval, newval, force_atomic) \
+	libviocore_atomic_cmpxchx(self, addr, oldval, newval, force_atomic)
 PRIVATE NONNULL((1)) uint128_t CC
-libviocore_atomic_cmpxch128(struct vio_emulate_args *__restrict self,
-                            __USER __CHECKED void *addr,
-                            uint128_t oldval, uint128_t newval, bool force_atomic) {
+libviocore_atomic_cmpxchx(struct vio_emulate_args *__restrict self,
+                          __USER __CHECKED void *addr,
+                          uint128_t oldval, uint128_t newval, bool force_atomic) {
 	uint128_t result;
 	COMPILER_BARRIER();
 	if likely(CHK_VIO_ADDR(self, addr)) {
-		result = vio_cmpxch128(&self->vea_args, GET_VIO_ADDR(self, addr), oldval, newval, force_atomic);
+		result = vio_cmpxchx(&self->vea_args, GET_VIO_ADDR(self, addr), oldval, newval, force_atomic);
 	} else {
 		VALRDWR(addr, 16);
 		if (force_atomic) {

@@ -140,23 +140,23 @@ x86_handle_bad_usage(struct icpustate *__restrict state, u16 usage);
 #define EMU86_EMULATE_CONFIG_WANT_SETCC         (!CONFIG_LIBEMU86_WANT_64BIT) /* Only available on 486+ (emulate in 32-bit mode) */
 #define EMU86_EMULATE_CONFIG_WANT_CMOVCC        (!CONFIG_LIBEMU86_WANT_64BIT) /* Only available on 486+ (emulate in 32-bit mode) */
 #define EMU86_EMULATE_CONFIG_WANT_CMPS          0
-#if (defined(CONFIG_EMULOCK_HAVE_CMPXCH8) && defined(CONFIG_EMULOCK_HAVE_CMPXCH16) && \
-     defined(CONFIG_EMULOCK_HAVE_CMPXCH32) &&                                         \
-     (!CONFIG_LIBEMU86_WANT_64BIT || defined(CONFIG_EMULOCK_HAVE_CMPXCH64)))
+#if (defined(CONFIG_EMULOCK_HAVE_CMPXCHB) && defined(CONFIG_EMULOCK_HAVE_CMPXCHW) && \
+     defined(CONFIG_EMULOCK_HAVE_CMPXCHL) &&                                         \
+     (!CONFIG_LIBEMU86_WANT_64BIT || defined(CONFIG_EMULOCK_HAVE_CMPXCHQ)))
 #define EMU86_EMULATE_CONFIG_WANT_CMPXCHG       1
 #else /* ... */
 #define EMU86_EMULATE_CONFIG_WANT_CMPXCHG       0
 #endif /* !... */
-#if defined(__x86_64__) || defined(CONFIG_EMULOCK_HAVE_CMPXCH64)
+#if defined(__x86_64__) || defined(CONFIG_EMULOCK_HAVE_CMPXCHQ)
 #define EMU86_EMULATE_CONFIG_WANT_CMPXCHG8B     1
-#else /* __x86_64__ || CONFIG_EMULOCK_HAVE_CMPXCH64 */
+#else /* __x86_64__ || CONFIG_EMULOCK_HAVE_CMPXCHQ */
 #define EMU86_EMULATE_CONFIG_WANT_CMPXCHG8B     0
-#endif /* !__x86_64__ && !CONFIG_EMULOCK_HAVE_CMPXCH64 */
-#if CONFIG_LIBEMU86_WANT_64BIT && defined(CONFIG_EMULOCK_HAVE_CMPXCH128)
+#endif /* !__x86_64__ && !CONFIG_EMULOCK_HAVE_CMPXCHQ */
+#if CONFIG_LIBEMU86_WANT_64BIT && defined(CONFIG_EMULOCK_HAVE_CMPXCHX)
 #define EMU86_EMULATE_CONFIG_WANT_CMPXCHG16B    1
-#else /* CONFIG_LIBEMU86_WANT_64BIT && CONFIG_EMULOCK_HAVE_CMPXCH128 */
+#else /* CONFIG_LIBEMU86_WANT_64BIT && CONFIG_EMULOCK_HAVE_CMPXCHX */
 #define EMU86_EMULATE_CONFIG_WANT_CMPXCHG16B    0
-#endif /* !CONFIG_LIBEMU86_WANT_64BIT || !CONFIG_EMULOCK_HAVE_CMPXCH128 */
+#endif /* !CONFIG_LIBEMU86_WANT_64BIT || !CONFIG_EMULOCK_HAVE_CMPXCHX */
 #define EMU86_EMULATE_CONFIG_WANT_CPUID         (!CONFIG_LIBEMU86_WANT_64BIT) /* Only available on 486+ (emulate in 32-bit mode) */
 #define EMU86_EMULATE_CONFIG_WANT_ENTER         0
 #define EMU86_EMULATE_CONFIG_WANT_INVD          (!CONFIG_LIBEMU86_WANT_64BIT) /* Only available on 486+ (emulate in 32-bit mode) */
@@ -1133,40 +1133,40 @@ NOTHROW(KCALL cpuid)(struct icpustate *__restrict state) {
 #endif /* EMU86_EMULATE_CONFIG_WANT_CPUID */
 
 
-#define DEFINE_DO_ATOMIC_CMPXCH(Nbits)                                        \
-	PRIVATE NONNULL((1)) u##Nbits KCALL                                       \
-	do_atomic_cmpxch##Nbits(struct icpustate **__restrict pstate,             \
-	                        USER CHECKED u##Nbits *addr, u##Nbits oldval,     \
-	                        u##Nbits newval, bool force_atomic) {             \
-		u##Nbits result;                                                      \
-		if (force_atomic) {                                                   \
-			result = x86_emulock_cmpxch##Nbits(pstate, addr, oldval, newval); \
-		} else {                                                              \
-			COMPILER_READ_BARRIER();                                          \
-			result = *addr;                                                   \
-			COMPILER_READ_BARRIER();                                          \
-			if (result == oldval) {                                           \
-				COMPILER_WRITE_BARRIER();                                     \
-				*addr = newval;                                               \
-				COMPILER_WRITE_BARRIER();                                     \
-			}                                                                 \
-		}                                                                     \
-		return result;                                                        \
+#define DEFINE_DO_ATOMIC_CMPXCH(bwlq, Nbits)                                 \
+	PRIVATE NONNULL((1)) u##Nbits KCALL                                      \
+	do_atomic_cmpxch##bwlq(struct icpustate **__restrict pstate,             \
+	                       USER CHECKED u##Nbits *addr, u##Nbits oldval,     \
+	                       u##Nbits newval, bool force_atomic) {             \
+		u##Nbits result;                                                     \
+		if (force_atomic) {                                                  \
+			result = x86_emulock_cmpxch##bwlq(pstate, addr, oldval, newval); \
+		} else {                                                             \
+			COMPILER_READ_BARRIER();                                         \
+			result = *addr;                                                  \
+			COMPILER_READ_BARRIER();                                         \
+			if (result == oldval) {                                          \
+				COMPILER_WRITE_BARRIER();                                    \
+				*addr = newval;                                              \
+				COMPILER_WRITE_BARRIER();                                    \
+			}                                                                \
+		}                                                                    \
+		return result;                                                       \
 	}
 
-#define DEFINE_DO_ATOMIC_CMPXCH_OR_WRITE(Nbits)                                      \
-	PRIVATE NONNULL((1)) bool KCALL                                                  \
-	do_atomic_cmpxch##Nbits##_or_write(struct icpustate **__restrict pstate,         \
-	                                   USER CHECKED u##Nbits *addr, u##Nbits oldval, \
-	                                   u##Nbits newval, bool force_atomic) {         \
-		u##Nbits result;                                                             \
-		if (force_atomic) {                                                          \
-			result = x86_emulock_cmpxch##Nbits(pstate, addr, oldval, newval);        \
-		} else {                                                                     \
-			*addr = newval;                                                          \
-			return true;                                                             \
-		}                                                                            \
-		return result == oldval;                                                     \
+#define DEFINE_DO_ATOMIC_CMPXCH_OR_WRITE(bwlq, Nbits)                               \
+	PRIVATE NONNULL((1)) bool KCALL                                                 \
+	do_atomic_cmpxch##bwlq##_or_write(struct icpustate **__restrict pstate,         \
+	                                  USER CHECKED u##Nbits *addr, u##Nbits oldval, \
+	                                  u##Nbits newval, bool force_atomic) {         \
+		u##Nbits result;                                                            \
+		if (force_atomic) {                                                         \
+			result = x86_emulock_cmpxch##bwlq(pstate, addr, oldval, newval);        \
+		} else {                                                                    \
+			*addr = newval;                                                         \
+			return true;                                                            \
+		}                                                                           \
+		return result == oldval;                                                    \
 	}
 
 
@@ -1175,18 +1175,18 @@ NOTHROW(KCALL cpuid)(struct icpustate *__restrict state) {
 /* ATOMIC 128-BIT COMPARE-EXCHANGE                                      */
 /************************************************************************/
 #if EMU86_EMULATE_CONFIG_WANT_CMPXCHG16B
-#ifndef CONFIG_EMULOCK_HAVE_CMPXCH128
+#ifndef CONFIG_EMULOCK_HAVE_CMPXCHX
 #error "Bad configuration"
-#endif /* CONFIG_EMULOCK_HAVE_CMPXCH128 */
-#define EMU86_MEM_ATOMIC_CMPXCH128(addr, oldval, newval, force_atomic) \
-	do_atomic_cmpxch128((struct icpustate **)&_state, (uint128_t *)(addr), oldval, newval, force_atomic)
+#endif /* CONFIG_EMULOCK_HAVE_CMPXCHX */
+#define EMU86_MEM_ATOMIC_CMPXCHX(addr, oldval, newval, force_atomic) \
+	do_atomic_cmpxchx((struct icpustate **)&_state, (uint128_t *)(addr), oldval, newval, force_atomic)
 PRIVATE NONNULL((1)) uint128_t KCALL
-do_atomic_cmpxch128(struct icpustate **__restrict pstate,
-                    USER CHECKED uint128_t *addr, uint128_t oldval,
-                    uint128_t newval, bool force_atomic) {
+do_atomic_cmpxchx(struct icpustate **__restrict pstate,
+                  USER CHECKED uint128_t *addr, uint128_t oldval,
+                  uint128_t newval, bool force_atomic) {
 	uint128_t result;
 	if (force_atomic) {
-		result = x86_emulock_cmpxch128(pstate, addr, oldval, newval);
+		result = x86_emulock_cmpxchx(pstate, addr, oldval, newval);
 	} else {
 		COMPILER_READ_BARRIER();
 		result = *addr;
@@ -1208,18 +1208,16 @@ do_atomic_cmpxch128(struct icpustate **__restrict pstate,
 #if EMU86_EMULATE_CONFIG_WANT_CMPXCHG8B
 #ifdef __x86_64__
 #define EMU86_MEM_ATOMIC_CMPXCH_OR_WRITEQ(addr, oldval, newval, force_atomic) \
-	__hybrid_atomic_cmpxch(*(u64 *)EMU86_EMULATE_TRANSLATEADDR(addr),         \
-	                       oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
+	__hybrid_atomic_cmpxch(*(u64 *)(addr), oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
 #define EMU86_MEM_ATOMIC_CMPXCHQ(addr, oldval, newval, force_atomic)      \
-	__hybrid_atomic_cmpxch_val(*(u64 *)EMU86_EMULATE_TRANSLATEADDR(addr), \
-	                           oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
-#elif defined(CONFIG_EMULOCK_HAVE_CMPXCH64)
+	__hybrid_atomic_cmpxch_val(*(u64 *)(addr), oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
+#elif defined(CONFIG_EMULOCK_HAVE_CMPXCHQ)
 #define EMU86_MEM_ATOMIC_CMPXCHQ(addr, oldval, newval, force_atomic) \
-	do_atomic_cmpxch64((struct icpustate **)&_state, (u64 *)(addr), (u64)(oldval), (u64)(newval), force_atomic)
+	do_atomic_cmpxchq((struct icpustate **)&_state, (u64 *)(addr), (u64)(oldval), (u64)(newval), force_atomic)
 #define EMU86_MEM_ATOMIC_CMPXCH_OR_WRITEQ(addr, oldval, newval, force_atomic) \
-	do_atomic_cmpxch64_or_write((struct icpustate **)&_state, (u64 *)(addr), (u64)(oldval), (u64)(newval), force_atomic)
-DEFINE_DO_ATOMIC_CMPXCH(64)
-/*DEFINE_DO_ATOMIC_CMPXCH_OR_WRITE(64)*/ /* Unused */
+	do_atomic_cmpxchq_or_write((struct icpustate **)&_state, (u64 *)(addr), (u64)(oldval), (u64)(newval), force_atomic)
+DEFINE_DO_ATOMIC_CMPXCH(q, 64)
+/*DEFINE_DO_ATOMIC_CMPXCH_OR_WRITE(q, 64)*/ /* Unused */
 #else /* ... */
 #error "Bad configuration"
 #endif /* !... */
@@ -1231,23 +1229,23 @@ DEFINE_DO_ATOMIC_CMPXCH(64)
 /************************************************************************/
 #if EMU86_EMULATE_CONFIG_WANT_CMPXCHG
 #define EMU86_MEM_ATOMIC_CMPXCHB(addr, oldval, newval, force_atomic) \
-	do_atomic_cmpxch8((struct icpustate **)&_state, (u8 *)(addr), (u8)(oldval), (u8)(newval), force_atomic)
+	do_atomic_cmpxchb((struct icpustate **)&_state, (u8 *)(addr), (u8)(oldval), (u8)(newval), force_atomic)
 #define EMU86_MEM_ATOMIC_CMPXCHW(addr, oldval, newval, force_atomic) \
-	do_atomic_cmpxch16((struct icpustate **)&_state, (u16 *)(addr), (u16)(oldval), (u16)(newval), force_atomic)
+	do_atomic_cmpxchw((struct icpustate **)&_state, (u16 *)(addr), (u16)(oldval), (u16)(newval), force_atomic)
 #define EMU86_MEM_ATOMIC_CMPXCHL(addr, oldval, newval, force_atomic) \
-	do_atomic_cmpxch32((struct icpustate **)&_state, (u32 *)(addr), (u32)(oldval), (u32)(newval), force_atomic)
+	do_atomic_cmpxchl((struct icpustate **)&_state, (u32 *)(addr), (u32)(oldval), (u32)(newval), force_atomic)
 #define EMU86_MEM_ATOMIC_CMPXCH_OR_WRITEB(addr, oldval, newval, force_atomic) \
-	do_atomic_cmpxch8_or_write((struct icpustate **)&_state, (u8 *)(addr), (u8)(oldval), (u8)(newval), force_atomic)
+	do_atomic_cmpxchb_or_write((struct icpustate **)&_state, (u8 *)(addr), (u8)(oldval), (u8)(newval), force_atomic)
 #define EMU86_MEM_ATOMIC_CMPXCH_OR_WRITEW(addr, oldval, newval, force_atomic) \
-	do_atomic_cmpxch16_or_write((struct icpustate **)&_state, (u16 *)(addr), (u16)(oldval), (u16)(newval), force_atomic)
+	do_atomic_cmpxchw_or_write((struct icpustate **)&_state, (u16 *)(addr), (u16)(oldval), (u16)(newval), force_atomic)
 #define EMU86_MEM_ATOMIC_CMPXCH_OR_WRITEL(addr, oldval, newval, force_atomic) \
-	do_atomic_cmpxch32_or_write((struct icpustate **)&_state, (u32 *)(addr), (u32)(oldval), (u32)(newval), force_atomic)
-DEFINE_DO_ATOMIC_CMPXCH(8)
-/*DEFINE_DO_ATOMIC_CMPXCH_OR_WRITE(8)*/ /* Unused */
-DEFINE_DO_ATOMIC_CMPXCH(16)
-DEFINE_DO_ATOMIC_CMPXCH_OR_WRITE(16)
-DEFINE_DO_ATOMIC_CMPXCH(32)
-DEFINE_DO_ATOMIC_CMPXCH_OR_WRITE(32)
+	do_atomic_cmpxchl_or_write((struct icpustate **)&_state, (u32 *)(addr), (u32)(oldval), (u32)(newval), force_atomic)
+DEFINE_DO_ATOMIC_CMPXCH(b, 8)
+/*DEFINE_DO_ATOMIC_CMPXCH_OR_WRITE(b, 8)*/ /* Unused */
+DEFINE_DO_ATOMIC_CMPXCH(w, 16)
+DEFINE_DO_ATOMIC_CMPXCH_OR_WRITE(w, 16)
+DEFINE_DO_ATOMIC_CMPXCH(l, 32)
+DEFINE_DO_ATOMIC_CMPXCH_OR_WRITE(l, 32)
 #endif /* EMU86_EMULATE_CONFIG_WANT_CMPXCHG */
 
 #undef DEFINE_DO_ATOMIC_CMPXCH

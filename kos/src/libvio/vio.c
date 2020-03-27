@@ -345,12 +345,12 @@ PRIVATE void *uvio_service_thread(void *cookie) {
 
 
 			case UVIO_OPCODE_CMPXCH128: {
-#ifdef LIBVIO_CONFIG_HAVE_INT128_CMPXCH
-				resp.r128.ur_result = libvio_cmpxch128(&args, req.uq_addr,
+#ifdef LIBVIO_CONFIG_HAVE_XWORD_CMPXCH
+				resp.r128.ur_result = libvio_cmpxchx(&args, req.uq_addr,
 				                                       req.uq_data128[0],
 				                                       req.uq_data128[1],
 				                                       FORCE_ATOMIC());
-#else /* LIBVIO_CONFIG_HAVE_INT128_CMPXCH */
+#else /* LIBVIO_CONFIG_HAVE_XWORD_CMPXCH */
 				if (FORCE_ATOMIC()) {
 					THROW(E_SEGFAULT_NOTATOMIC,
 					      vio_args_faultaddr(&args, req.uq_addr),
@@ -384,7 +384,7 @@ PRIVATE void *uvio_service_thread(void *cookie) {
 					libvio_writel(&args, req.uq_addr + 0xc, req.uq_ldata[7]);
 				}
 #endif /* !LIBVIO_CONFIG_HAVE_QWORD */
-#endif /* !LIBVIO_CONFIG_HAVE_INT128_CMPXCH */
+#endif /* !LIBVIO_CONFIG_HAVE_XWORD_CMPXCH */
 				resp_size = sizeof(resp.r128);
 			}	break;
 

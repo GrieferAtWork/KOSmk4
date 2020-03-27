@@ -1216,32 +1216,42 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_emulate_l
 	__hybrid_atomic_fetchxor(*(u32 *)EMU86_EMULATE_TRANSLATEADDR(addr), addend, __ATOMIC_SEQ_CST)
 #endif /* !EMU86_MEM_ATOMIC_FETCHXORL */
 #ifndef EMU86_MEM_ATOMIC_CMPXCHB
-#define EMU86_MEM_ATOMIC_CMPXCHB(addr, oldval, newval, force_atomic) \
-	__hybrid_atomic_cmpxch_val(*(u8 *)EMU86_EMULATE_TRANSLATEADDR(addr), oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
+#define EMU86_MEM_ATOMIC_CMPXCHB(addr, oldval, newval, force_atomic)     \
+	__hybrid_atomic_cmpxch_val(*(u8 *)EMU86_EMULATE_TRANSLATEADDR(addr), \
+	                           oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
 #endif /* !EMU86_MEM_ATOMIC_CMPXCHB */
 #ifndef EMU86_MEM_ATOMIC_CMPXCHW
-#define EMU86_MEM_ATOMIC_CMPXCHW(addr, oldval, newval, force_atomic) \
-	__hybrid_atomic_cmpxch_val(*(u16 *)EMU86_EMULATE_TRANSLATEADDR(addr), oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
+#define EMU86_MEM_ATOMIC_CMPXCHW(addr, oldval, newval, force_atomic)      \
+	__hybrid_atomic_cmpxch_val(*(u16 *)EMU86_EMULATE_TRANSLATEADDR(addr), \
+	                           oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
 #endif /* !EMU86_MEM_ATOMIC_CMPXCHW */
 #ifndef EMU86_MEM_ATOMIC_CMPXCHL
-#define EMU86_MEM_ATOMIC_CMPXCHL(addr, oldval, newval, force_atomic) \
-	__hybrid_atomic_cmpxch_val(*(u32 *)EMU86_EMULATE_TRANSLATEADDR(addr), oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
+#define EMU86_MEM_ATOMIC_CMPXCHL(addr, oldval, newval, force_atomic)      \
+	__hybrid_atomic_cmpxch_val(*(u32 *)EMU86_EMULATE_TRANSLATEADDR(addr), \
+	                           oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
 #endif /* !EMU86_MEM_ATOMIC_CMPXCHL */
 #ifndef EMU86_MEM_ATOMIC_CMPXCHQ
-#define EMU86_MEM_ATOMIC_CMPXCHQ(addr, oldval, newval, force_atomic) \
-	__hybrid_atomic_cmpxch_val(*(u64 *)EMU86_EMULATE_TRANSLATEADDR(addr), oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
+#define EMU86_MEM_ATOMIC_CMPXCHQ(addr, oldval, newval, force_atomic)      \
+	__hybrid_atomic_cmpxch_val(*(u64 *)EMU86_EMULATE_TRANSLATEADDR(addr), \
+	                           oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
 #endif /* !EMU86_MEM_ATOMIC_CMPXCHQ */
 #ifndef EMU86_MEM_ATOMIC_CMPXCH_OR_WRITEB
-#define EMU86_MEM_ATOMIC_CMPXCH_OR_WRITEB(addr, oldval, newval, force_atomic) \
-	(__hybrid_atomic_cmpxch(*(u8 *)EMU86_EMULATE_TRANSLATEADDR(addr), oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST) || !(force_atomic))
+#define EMU86_MEM_ATOMIC_CMPXCH_OR_WRITEB(addr, oldval, newval, force_atomic)      \
+	(__hybrid_atomic_cmpxch(*(u8 *)EMU86_EMULATE_TRANSLATEADDR(addr),              \
+	                        oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST) || \
+	 !(force_atomic))
 #endif /* !EMU86_MEM_ATOMIC_CMPXCH_OR_WRITEB */
 #ifndef EMU86_MEM_ATOMIC_CMPXCH_OR_WRITEW
-#define EMU86_MEM_ATOMIC_CMPXCH_OR_WRITEW(addr, oldval, newval, force_atomic) \
-	(__hybrid_atomic_cmpxch(*(u16 *)EMU86_EMULATE_TRANSLATEADDR(addr), oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST) || !(force_atomic))
+#define EMU86_MEM_ATOMIC_CMPXCH_OR_WRITEW(addr, oldval, newval, force_atomic)      \
+	(__hybrid_atomic_cmpxch(*(u16 *)EMU86_EMULATE_TRANSLATEADDR(addr),             \
+	                        oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST) || \
+	 !(force_atomic))
 #endif /* !EMU86_MEM_ATOMIC_CMPXCH_OR_WRITEW */
 #ifndef EMU86_MEM_ATOMIC_CMPXCH_OR_WRITEL
-#define EMU86_MEM_ATOMIC_CMPXCH_OR_WRITEL(addr, oldval, newval, force_atomic) \
-	(__hybrid_atomic_cmpxch(*(u32 *)EMU86_EMULATE_TRANSLATEADDR(addr), oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST) || !(force_atomic))
+#define EMU86_MEM_ATOMIC_CMPXCH_OR_WRITEL(addr, oldval, newval, force_atomic)      \
+	(__hybrid_atomic_cmpxch(*(u32 *)EMU86_EMULATE_TRANSLATEADDR(addr),             \
+	                        oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST) || \
+	 !(force_atomic))
 #endif /* !EMU86_MEM_ATOMIC_CMPXCH_OR_WRITEL */
 #if CONFIG_LIBEMU86_WANT_64BIT
 #ifndef EMU86_MEMREADQ
@@ -1277,15 +1287,17 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_emulate_l
 	__hybrid_atomic_fetchxor(*(u64 *)EMU86_EMULATE_TRANSLATEADDR(addr), addend, __ATOMIC_SEQ_CST)
 #endif /* !EMU86_MEM_ATOMIC_FETCHXORQ */
 #ifndef EMU86_MEM_ATOMIC_CMPXCH_OR_WRITEQ
-#define EMU86_MEM_ATOMIC_CMPXCH_OR_WRITEQ(addr, oldval, newval, force_atomic) \
-	(__hybrid_atomic_cmpxch(*(u64 *)EMU86_EMULATE_TRANSLATEADDR(addr), oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST) || (force_atomic))
+#define EMU86_MEM_ATOMIC_CMPXCH_OR_WRITEQ(addr, oldval, newval, force_atomic)      \
+	(__hybrid_atomic_cmpxch(*(u64 *)EMU86_EMULATE_TRANSLATEADDR(addr),             \
+	                        oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST) || \
+	 (force_atomic))
 #endif /* !EMU86_MEM_ATOMIC_CMPXCH_OR_WRITEQ */
-#ifndef EMU86_MEM_ATOMIC_CMPXCH128
+#ifndef EMU86_MEM_ATOMIC_CMPXCHX
 #ifdef __x86_64__
-#define EMU86_MEM_ATOMIC_CMPXCH128(addr, oldval, newval, force_atomic) \
+#define EMU86_MEM_ATOMIC_CMPXCHX(addr, oldval, newval, force_atomic) \
 	__lock_cmpxchg16b((uint128_t *)(addr), oldval, newval)
 #endif /* __x86_64__ */
-#endif /* !EMU86_MEM_ATOMIC_CMPXCH128 */
+#endif /* !EMU86_MEM_ATOMIC_CMPXCHX */
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
 
 #ifndef EMU86_MEMREADLASW

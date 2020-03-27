@@ -82,9 +82,9 @@ INTDEF NONNULL((1)) void CC libvio_copytovio_from_phys(struct vio_args *__restri
 #if defined(LIBVIO_CONFIG_HAVE_QWORD) || defined(LIBVIO_CONFIG_HAVE_QWORD_CMPXCH)
 INTDEF NONNULL((1)) u64 CC libvio_cmpxchq(struct vio_args *__restrict args, vio_addr_t addr, u64 oldvalue, u64 newvalue, bool atomic);
 #endif /* LIBVIO_CONFIG_HAVE_QWORD || LIBVIO_CONFIG_HAVE_QWORD_CMPXCH */
-#ifdef LIBVIO_CONFIG_HAVE_INT128_CMPXCH
-INTDEF NONNULL((1)) uint128_t CC libvio_cmpxch128(struct vio_args *__restrict args, vio_addr_t addr, uint128_t oldvalue, uint128_t newvalue, bool atomic);
-#endif /* LIBVIO_CONFIG_HAVE_INT128_CMPXCH */
+#ifdef LIBVIO_CONFIG_HAVE_XWORD_CMPXCH
+INTDEF NONNULL((1)) uint128_t CC libvio_cmpxchx(struct vio_args *__restrict args, vio_addr_t addr, uint128_t oldvalue, uint128_t newvalue, bool atomic);
+#endif /* LIBVIO_CONFIG_HAVE_XWORD_CMPXCH */
 #ifdef LIBVIO_CONFIG_HAVE_QWORD
 INTDEF NONNULL((1)) u64 CC libvio_cmpxch_or_writeq(struct vio_args *__restrict args, vio_addr_t addr, u64 oldvalue, u64 newvalue, bool atomic);
 INTDEF NONNULL((1)) u64 CC libvio_readq(struct vio_args *__restrict args, vio_addr_t addr);

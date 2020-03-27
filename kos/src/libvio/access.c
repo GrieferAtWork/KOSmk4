@@ -45,9 +45,9 @@ opt.append("-Os");
 #include <hybrid/sched/yield.h>
 #endif /* !__KERNEL__ */
 
-#ifdef LIBVIO_CONFIG_HAVE_INT128_CMPXCH
+#ifdef LIBVIO_CONFIG_HAVE_XWORD_CMPXCH
 #include <int128.h>
-#endif /* LIBVIO_CONFIG_HAVE_INT128_CMPXCH */
+#endif /* LIBVIO_CONFIG_HAVE_XWORD_CMPXCH */
 
 DECL_BEGIN
 
@@ -72,7 +72,7 @@ libvio_illegal_write(struct vio_args const *__restrict args, vio_addr_t addr) {
 	      E_SEGFAULT_CONTEXT_VIO | E_SEGFAULT_CONTEXT_WRITING);
 }
 
-#ifdef LIBVIO_CONFIG_HAVE_INT128_CMPXCH
+#ifdef LIBVIO_CONFIG_HAVE_XWORD_CMPXCH
 PRIVATE ATTR_NORETURN void CC
 libvio_nonatomic_operation128(struct vio_args const *__restrict args,
                               vio_addr_t addr, uint128_t oldval, uint128_t newval) {
@@ -88,7 +88,7 @@ libvio_nonatomic_operation128(struct vio_args const *__restrict args,
 	      uint128_vec64_significand(newval, 0),
 	      uint128_vec64_significand(newval, 1));
 }
-#endif /* LIBVIO_CONFIG_HAVE_INT128_CMPXCH */
+#endif /* LIBVIO_CONFIG_HAVE_XWORD_CMPXCH */
 
 #if defined(LIBVIO_CONFIG_HAVE_QWORD) || defined(LIBVIO_CONFIG_HAVE_QWORD_CMPXCH)
 PRIVATE ATTR_NORETURN void CC
@@ -205,9 +205,9 @@ typedef union ATTR_PACKED {
 } qword;
 
 typedef union ATTR_PACKED {
-#ifdef LIBVIO_CONFIG_HAVE_INT128_CMPXCH
+#ifdef LIBVIO_CONFIG_HAVE_XWORD_CMPXCH
 	uint128_t x;
-#endif /* LIBVIO_CONFIG_HAVE_INT128_CMPXCH */
+#endif /* LIBVIO_CONFIG_HAVE_XWORD_CMPXCH */
 	u64 q[2];
 	u32 l[4];
 	u16 w[8];
@@ -335,22 +335,6 @@ typedef union ATTR_PACKED {
 #define AL     (addr & ~3)  /* dword-aligned */
 #define AQ     (addr & ~7)  /* qword-aligned */
 #define AX     (addr & ~15) /* xword-aligned */
-
-/* The max address mask that could ever be relevant. */
-#ifdef LIBVIO_CONFIG_HAVE_QWORD
-#define MMASK    7
-#define CASEB    case 1: case 3: case 5: case 7:
-#define CASEW    case 2: case 6:
-#define CASEL    case 4:
-#define CASEQ    case 0:
-#else /* LIBVIO_CONFIG_HAVE_QWORD */
-#define MMASK  3
-#define CASEB    case 1: case 3:
-#define CASEW    case 2:
-#define CASEL    case 0:
-#define CASEQ    /* nothing */
-#endif /* !LIBVIO_CONFIG_HAVE_QWORD */
-
 
 
 
@@ -967,7 +951,7 @@ _do_writeq_vo_cmpxch(struct vio_operators const *__restrict ops,
 }
 #endif /* LIBVIO_CONFIG_HAVE_QWORD || LIBVIO_CONFIG_HAVE_QWORD_CMPXCH */
 
-#ifdef LIBVIO_CONFIG_HAVE_INT128_CMPXCH
+#ifdef LIBVIO_CONFIG_HAVE_XWORD_CMPXCH
 PRIVATE NONNULL((1)) void CC
 _do_writex_vo_cmpxch(struct vio_operators const *__restrict ops,
                      struct vio_args *__restrict args,
@@ -983,7 +967,7 @@ _do_writex_vo_cmpxch(struct vio_operators const *__restrict ops,
 		LOOPHINT();
 	}
 }
-#endif /* LIBVIO_CONFIG_HAVE_INT128_CMPXCH */
+#endif /* LIBVIO_CONFIG_HAVE_XWORD_CMPXCH */
 
 #define do_writeb_vo_write(addr, value)  (*ops->vo_write.f_byte)(args, addr, value)
 #define do_writeb_vo_xch(addr, value)    (*ops->vo_xch.f_byte)(args, addr, value, false)
@@ -1004,9 +988,9 @@ _do_writex_vo_cmpxch(struct vio_operators const *__restrict ops,
 #if defined(LIBVIO_CONFIG_HAVE_QWORD) || defined(LIBVIO_CONFIG_HAVE_QWORD_CMPXCH)
 #define do_writeq_vo_cmpxch(addr, value) _do_writeq_vo_cmpxch(ops, args, addr, value)
 #endif /* LIBVIO_CONFIG_HAVE_QWORD || LIBVIO_CONFIG_HAVE_QWORD_CMPXCH */
-#ifdef LIBVIO_CONFIG_HAVE_INT128_CMPXCH
+#ifdef LIBVIO_CONFIG_HAVE_XWORD_CMPXCH
 #define do_writex_vo_cmpxch(addr, value) _do_writex_vo_cmpxch(ops, args, addr, value)
-#endif /* LIBVIO_CONFIG_HAVE_INT128_CMPXCH */
+#endif /* LIBVIO_CONFIG_HAVE_XWORD_CMPXCH */
 
 #ifndef __INTELLISENSE__
 DECL_END
@@ -1311,11 +1295,11 @@ libvio_cmpxchq(struct vio_args *__restrict args,
 }
 #endif /* LIBVIO_CONFIG_HAVE_QWORD || LIBVIO_CONFIG_HAVE_QWORD_CMPXCH */
 
-#ifdef LIBVIO_CONFIG_HAVE_INT128_CMPXCH
+#ifdef LIBVIO_CONFIG_HAVE_XWORD_CMPXCH
 INTERN NONNULL((1)) uint128_t CC
-libvio_cmpxch128(struct vio_args *__restrict args,
-                 vio_addr_t addr, uint128_t oldvalue,
-                 uint128_t newvalue, bool atomic) {
+libvio_cmpxchx(struct vio_args *__restrict args,
+               vio_addr_t addr, uint128_t oldvalue,
+               uint128_t newvalue, bool atomic) {
 	struct vio_operators const *ops = args->va_ops;
 	if (ops->vo_cmpxch.f_xword && ((uintptr_t)addr & 15) == 0)
 		return (*ops->vo_cmpxch.f_xword)(args, addr, oldvalue, newvalue, atomic);
@@ -1324,22 +1308,22 @@ libvio_cmpxch128(struct vio_args *__restrict args,
 		libvio_nonatomic_operation128(args, addr, oldvalue, newvalue);
 	{
 		union {
-			uint128_t v128; /* FIXME: Intellisense says default constructor deleted */
-			u64       v64[2];
-			u32       v32[4];
+			uint128_t x;
+			u64       q[2];
+			u32       l[4];
 		} result;
 #ifdef LIBVIO_CONFIG_HAVE_QWORD
-		result.v64[0] = libvio_readq(args, addr + 0);
-		result.v64[1] = libvio_readq(args, addr + 8);
+		result.q[0] = libvio_readq(args, addr + 0);
+		result.q[1] = libvio_readq(args, addr + 8);
 		if (memcmp(&result, &oldvalue, 16) == 0) {
 			libvio_writeq(args, addr + 0, uint128_vec64(newvalue)[0]);
 			libvio_writeq(args, addr + 8, uint128_vec64(newvalue)[1]);
 		}
 #else /* LIBVIO_CONFIG_HAVE_QWORD */
-		result.v32[0] = libvio_readl(args, addr + 0);
-		result.v32[1] = libvio_readl(args, addr + 4);
-		result.v32[2] = libvio_readl(args, addr + 8);
-		result.v32[3] = libvio_readl(args, addr + 12);
+		result.l[0] = libvio_readl(args, addr + 0);
+		result.l[1] = libvio_readl(args, addr + 4);
+		result.l[2] = libvio_readl(args, addr + 8);
+		result.l[3] = libvio_readl(args, addr + 12);
 		if (memcmp(&result, &oldvalue, 16) == 0) {
 			libvio_writel(args, addr + 0,  uint128_vec32(newvalue)[0]);
 			libvio_writel(args, addr + 4,  uint128_vec32(newvalue)[1]);
@@ -1347,10 +1331,10 @@ libvio_cmpxch128(struct vio_args *__restrict args,
 			libvio_writel(args, addr + 12, uint128_vec32(newvalue)[3]);
 		}
 #endif /* !LIBVIO_CONFIG_HAVE_QWORD */
-		return result.v128;
+		return result.x;
 	}
 }
-#endif /* LIBVIO_CONFIG_HAVE_INT128_CMPXCH */
+#endif /* LIBVIO_CONFIG_HAVE_XWORD_CMPXCH */
 
 INTERN NONNULL((1)) u8 CC
 libvio_cmpxch_or_writeb(struct vio_args *__restrict args,
@@ -1811,9 +1795,9 @@ DEFINE_PUBLIC_ALIAS(vio_writeq_aligned, libvio_writeq_aligned);
 #if defined(LIBVIO_CONFIG_HAVE_QWORD) || defined(LIBVIO_CONFIG_HAVE_QWORD_CMPXCH)
 DEFINE_PUBLIC_ALIAS(vio_cmpxchq, libvio_cmpxchq);
 #endif /* LIBVIO_CONFIG_HAVE_QWORD || LIBVIO_CONFIG_HAVE_QWORD_CMPXCH */
-#ifdef LIBVIO_CONFIG_HAVE_INT128_CMPXCH
-DEFINE_PUBLIC_ALIAS(vio_cmpxch128, libvio_cmpxch128);
-#endif /* LIBVIO_CONFIG_HAVE_INT128_CMPXCH */
+#ifdef LIBVIO_CONFIG_HAVE_XWORD_CMPXCH
+DEFINE_PUBLIC_ALIAS(vio_cmpxchx, libvio_cmpxchx);
+#endif /* LIBVIO_CONFIG_HAVE_XWORD_CMPXCH */
 
 DECL_END
 

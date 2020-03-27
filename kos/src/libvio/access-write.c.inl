@@ -52,7 +52,7 @@ DECL_BEGIN
      (defined(LIBVIO_CONFIG_HAVE_QWORD_CMPXCH) && _WRITE_METHOD == _WRITE_METHOD_vo_cmpxch))
 #define HAVE_QWORD
 #endif /* ... */
-#if (defined(LIBVIO_CONFIG_HAVE_INT128_CMPXCH) && _WRITE_METHOD == _WRITE_METHOD_vo_cmpxch)
+#if (defined(LIBVIO_CONFIG_HAVE_XWORD_CMPXCH) && _WRITE_METHOD == _WRITE_METHOD_vo_cmpxch)
 #define HAVE_XWORD
 #endif /* ... */
 

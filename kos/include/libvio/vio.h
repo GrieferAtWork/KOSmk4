@@ -24,9 +24,9 @@
 
 #include <bits/types.h>
 
-#ifdef LIBVIO_CONFIG_HAVE_INT128_CMPXCH
+#ifdef LIBVIO_CONFIG_HAVE_XWORD_CMPXCH
 #include <hybrid/int128.h>
-#endif /* LIBVIO_CONFIG_HAVE_INT128_CMPXCH */
+#endif /* LIBVIO_CONFIG_HAVE_XWORD_CMPXCH */
 #if defined(__KERNEL__) && !defined(__pos_t_defined)
 #include <hybrid/__altint.h>
 #endif /* __KERNEL__ && !__pos_t_defined */
@@ -147,9 +147,9 @@ struct vio_operators {
 #if defined(LIBVIO_CONFIG_HAVE_QWORD) || defined(LIBVIO_CONFIG_HAVE_QWORD_CMPXCH)
 		__ATTR_NONNULL((1)) __uint64_t (LIBVIO_CC *f_qword)(struct vio_args *__restrict args, vio_addr_t addr, __uint64_t oldvalue, __uint64_t newvalue, __BOOL atomic);
 #endif /* LIBVIO_CONFIG_HAVE_QWORD || LIBVIO_CONFIG_HAVE_QWORD_CMPXCH */
-#ifdef LIBVIO_CONFIG_HAVE_INT128_CMPXCH
+#ifdef LIBVIO_CONFIG_HAVE_XWORD_CMPXCH
 		__ATTR_NONNULL((1)) __hybrid_uint128_t (LIBVIO_CC *f_xword)(struct vio_args *__restrict args, vio_addr_t addr, __hybrid_uint128_t oldvalue, __hybrid_uint128_t newvalue, __BOOL atomic);
-#endif /* LIBVIO_CONFIG_HAVE_INT128_CMPXCH */
+#endif /* LIBVIO_CONFIG_HAVE_XWORD_CMPXCH */
 	} vo_cmpxch;
 
 	struct {
@@ -258,17 +258,17 @@ struct vio_operators {
 #endif /* !LIBVIO_CONFIG_HAVE_QWORD */
 
 #if defined(LIBVIO_CONFIG_HAVE_QWORD) || defined(LIBVIO_CONFIG_HAVE_QWORD_CMPXCH)
-#ifdef LIBVIO_CONFIG_HAVE_INT128_CMPXCH
+#ifdef LIBVIO_CONFIG_HAVE_XWORD_CMPXCH
 #define VIO_CALLBACK_INIT_CMPXCH(b, w, l, q, i128) { b, w, l, q, i128 }
-#else /* LIBVIO_CONFIG_HAVE_INT128_CMPXCH */
+#else /* LIBVIO_CONFIG_HAVE_XWORD_CMPXCH */
 #define VIO_CALLBACK_INIT_CMPXCH(b, w, l, q, i128) { b, w, l, q }
-#endif /* !LIBVIO_CONFIG_HAVE_INT128_CMPXCH */
+#endif /* !LIBVIO_CONFIG_HAVE_XWORD_CMPXCH */
 #else /* LIBVIO_CONFIG_HAVE_QWORD || LIBVIO_CONFIG_HAVE_QWORD_CMPXCH */
-#ifdef LIBVIO_CONFIG_HAVE_INT128_CMPXCH
+#ifdef LIBVIO_CONFIG_HAVE_XWORD_CMPXCH
 #define VIO_CALLBACK_INIT_CMPXCH(b, w, l, q, i128) { b, w, l, i128 }
-#else /* LIBVIO_CONFIG_HAVE_INT128_CMPXCH */
+#else /* LIBVIO_CONFIG_HAVE_XWORD_CMPXCH */
 #define VIO_CALLBACK_INIT_CMPXCH(b, w, l, q, i128) { b, w, l }
-#endif /* !LIBVIO_CONFIG_HAVE_INT128_CMPXCH */
+#endif /* !LIBVIO_CONFIG_HAVE_XWORD_CMPXCH */
 #endif /* !LIBVIO_CONFIG_HAVE_QWORD && !LIBVIO_CONFIG_HAVE_QWORD_CMPXCH */
 
 /* Initialize a set of VIO operators.

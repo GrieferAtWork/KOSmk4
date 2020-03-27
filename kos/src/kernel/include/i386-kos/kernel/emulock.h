@@ -24,30 +24,30 @@
 #include <kernel/types.h>
 
 #ifdef __x86_64__
-#define CONFIG_EMULOCK_HAVE_CMPXCH128 1
+#define CONFIG_EMULOCK_HAVE_CMPXCHX 1
 /* No need to emulate 8-64 bit atomics on x86_64 */
 #else /* __x86_64__ */
-#define CONFIG_EMULOCK_HAVE_CMPXCH8 1
-#define CONFIG_EMULOCK_HAVE_CMPXCH16 1
-#define CONFIG_EMULOCK_HAVE_CMPXCH32 1
-#define CONFIG_EMULOCK_HAVE_CMPXCH64 1
+#define CONFIG_EMULOCK_HAVE_CMPXCHB 1
+#define CONFIG_EMULOCK_HAVE_CMPXCHW 1
+#define CONFIG_EMULOCK_HAVE_CMPXCHL 1
+#define CONFIG_EMULOCK_HAVE_CMPXCHQ 1
 /* No 16-bit atomic instruction is defined
  * for i386, so no need to emulate it! */
 #endif /* !__x86_64__ */
 
 
 #undef CONFIG_HAVE_EMULOCK
-#if defined(CONFIG_EMULOCK_HAVE_CMPXCH8) || \
-    defined(CONFIG_EMULOCK_HAVE_CMPXCH16) || \
-    defined(CONFIG_EMULOCK_HAVE_CMPXCH32) || \
-    defined(CONFIG_EMULOCK_HAVE_CMPXCH64) || \
-    defined(CONFIG_EMULOCK_HAVE_CMPXCH128)
+#if defined(CONFIG_EMULOCK_HAVE_CMPXCHB) || \
+    defined(CONFIG_EMULOCK_HAVE_CMPXCHW) || \
+    defined(CONFIG_EMULOCK_HAVE_CMPXCHL) || \
+    defined(CONFIG_EMULOCK_HAVE_CMPXCHQ) || \
+    defined(CONFIG_EMULOCK_HAVE_CMPXCHX)
 #define CONFIG_HAVE_EMULOCK 1
 #endif /* ... */
 
-#ifdef CONFIG_EMULOCK_HAVE_CMPXCH128
+#ifdef CONFIG_EMULOCK_HAVE_CMPXCHX
 #include <int128.h>
-#endif /* CONFIG_EMULOCK_HAVE_CMPXCH128 */
+#endif /* CONFIG_EMULOCK_HAVE_CMPXCHX */
 
 
 DECL_BEGIN
@@ -65,37 +65,37 @@ DECL_BEGIN
 #ifdef CONFIG_HAVE_EMULOCK
 struct icpustate;
 
-#ifdef CONFIG_EMULOCK_HAVE_CMPXCH8
+#ifdef CONFIG_EMULOCK_HAVE_CMPXCHB
 FUNDEF u8 KCALL
-x86_emulock_cmpxch8(struct icpustate **__restrict pstate,
+x86_emulock_cmpxchb(struct icpustate **__restrict pstate,
                     USER CHECKED u8 *addr, u8 oldval, u8 newval);
-#endif /* CONFIG_EMULOCK_HAVE_CMPXCH8 */
+#endif /* CONFIG_EMULOCK_HAVE_CMPXCHB */
 
-#ifdef CONFIG_EMULOCK_HAVE_CMPXCH16
+#ifdef CONFIG_EMULOCK_HAVE_CMPXCHW
 FUNDEF u16 KCALL
-x86_emulock_cmpxch16(struct icpustate **__restrict pstate,
-                     USER CHECKED u16 *addr, u16 oldval, u16 newval);
-#endif /* CONFIG_EMULOCK_HAVE_CMPXCH16 */
+x86_emulock_cmpxchw(struct icpustate **__restrict pstate,
+                    USER CHECKED u16 *addr, u16 oldval, u16 newval);
+#endif /* CONFIG_EMULOCK_HAVE_CMPXCHW */
 
-#ifdef CONFIG_EMULOCK_HAVE_CMPXCH32
+#ifdef CONFIG_EMULOCK_HAVE_CMPXCHL
 FUNDEF u32 KCALL
-x86_emulock_cmpxch32(struct icpustate **__restrict pstate,
-                     USER CHECKED u32 *addr, u32 oldval, u32 newval);
-#endif /* CONFIG_EMULOCK_HAVE_CMPXCH32 */
+x86_emulock_cmpxchl(struct icpustate **__restrict pstate,
+                    USER CHECKED u32 *addr, u32 oldval, u32 newval);
+#endif /* CONFIG_EMULOCK_HAVE_CMPXCHL */
 
-#ifdef CONFIG_EMULOCK_HAVE_CMPXCH64
+#ifdef CONFIG_EMULOCK_HAVE_CMPXCHQ
 FUNDEF u64 KCALL
-x86_emulock_cmpxch64(struct icpustate **__restrict pstate,
-                     USER CHECKED u64 *addr, u64 oldval, u64 newval);
-#endif /* CONFIG_EMULOCK_HAVE_CMPXCH64 */
+x86_emulock_cmpxchq(struct icpustate **__restrict pstate,
+                    USER CHECKED u64 *addr, u64 oldval, u64 newval);
+#endif /* CONFIG_EMULOCK_HAVE_CMPXCHQ */
 
-#ifdef CONFIG_EMULOCK_HAVE_CMPXCH128
+#ifdef CONFIG_EMULOCK_HAVE_CMPXCHX
 FUNDEF uint128_t KCALL
-x86_emulock_cmpxch128(struct icpustate **__restrict pstate,
-                       USER CHECKED uint128_t *addr,
-                       uint128_t oldval,
-                       uint128_t newval);
-#endif /* CONFIG_EMULOCK_HAVE_CMPXCH128 */
+x86_emulock_cmpxchx(struct icpustate **__restrict pstate,
+                    USER CHECKED uint128_t *addr,
+                    uint128_t oldval,
+                    uint128_t newval);
+#endif /* CONFIG_EMULOCK_HAVE_CMPXCHX */
 #endif /* CONFIG_HAVE_EMULOCK */
 
 #endif /* __CC__ */

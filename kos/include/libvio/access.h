@@ -26,9 +26,9 @@
 
 #include "vio.h"
 
-#ifdef LIBVIO_CONFIG_HAVE_INT128_CMPXCH
+#ifdef LIBVIO_CONFIG_HAVE_XWORD_CMPXCH
 #include <hybrid/int128.h>
-#endif /* LIBVIO_CONFIG_HAVE_INT128_CMPXCH */
+#endif /* LIBVIO_CONFIG_HAVE_XWORD_CMPXCH */
 
 #ifdef __KERNEL__
 #include <kos/bits/types.h>
@@ -126,9 +126,9 @@ LIBVIO_DECL __ATTR_NONNULL((1)) void LIBVIO_CC vio_copytovio_from_phys(struct vi
 #if defined(LIBVIO_CONFIG_HAVE_QWORD) || defined(LIBVIO_CONFIG_HAVE_QWORD_CMPXCH)
 typedef __ATTR_NONNULL((1)) __uint64_t (LIBVIO_CC *PVIO_CMPXCHQ)(struct vio_args *__restrict args, vio_addr_t addr, __uint64_t oldvalue, __uint64_t newvalue, bool atomic);
 #endif /* LIBVIO_CONFIG_HAVE_QWORD || LIBVIO_CONFIG_HAVE_QWORD_CMPXCH */
-#ifdef LIBVIO_CONFIG_HAVE_INT128_CMPXCH
-typedef __ATTR_NONNULL((1)) __hybrid_uint128_t (LIBVIO_CC *PVIO_CMPXCH128)(struct vio_args *__restrict args, vio_addr_t addr, __hybrid_uint128_t oldvalue, __hybrid_uint128_t newvalue, bool atomic);
-#endif /* LIBVIO_CONFIG_HAVE_INT128_CMPXCH */
+#ifdef LIBVIO_CONFIG_HAVE_XWORD_CMPXCH
+typedef __ATTR_NONNULL((1)) __hybrid_uint128_t (LIBVIO_CC *PVIO_CMPXCHX)(struct vio_args *__restrict args, vio_addr_t addr, __hybrid_uint128_t oldvalue, __hybrid_uint128_t newvalue, bool atomic);
+#endif /* LIBVIO_CONFIG_HAVE_XWORD_CMPXCH */
 #ifdef LIBVIO_CONFIG_HAVE_QWORD
 typedef __ATTR_NONNULL((1)) __uint64_t (LIBVIO_CC *PVIO_CMPXCH_OR_WRITEQ)(struct vio_args *__restrict args, vio_addr_t addr, __uint64_t oldvalue, __uint64_t newvalue, bool atomic);
 typedef __ATTR_NONNULL((1)) __uint64_t (LIBVIO_CC *PVIO_READQ)(struct vio_args *__restrict args, vio_addr_t addr);
@@ -144,9 +144,9 @@ typedef __ATTR_NONNULL((1)) __uint64_t (LIBVIO_CC *PVIO_XORQ)(struct vio_args *_
 #if defined(LIBVIO_CONFIG_HAVE_QWORD) || defined(LIBVIO_CONFIG_HAVE_QWORD_CMPXCH)
 LIBVIO_DECL __ATTR_NONNULL((1)) __uint64_t LIBVIO_CC vio_cmpxchq(struct vio_args *__restrict args, vio_addr_t addr, __uint64_t oldvalue, __uint64_t newvalue, bool atomic);
 #endif /* LIBVIO_CONFIG_HAVE_QWORD || LIBVIO_CONFIG_HAVE_QWORD_CMPXCH */
-#ifdef LIBVIO_CONFIG_HAVE_INT128_CMPXCH
-LIBVIO_DECL __ATTR_NONNULL((1)) __hybrid_uint128_t LIBVIO_CC vio_cmpxch128(struct vio_args *__restrict args, vio_addr_t addr, __hybrid_uint128_t oldvalue, __hybrid_uint128_t newvalue, bool atomic);
-#endif /* LIBVIO_CONFIG_HAVE_INT128_CMPXCH */
+#ifdef LIBVIO_CONFIG_HAVE_XWORD_CMPXCH
+LIBVIO_DECL __ATTR_NONNULL((1)) __hybrid_uint128_t LIBVIO_CC vio_cmpxchx(struct vio_args *__restrict args, vio_addr_t addr, __hybrid_uint128_t oldvalue, __hybrid_uint128_t newvalue, bool atomic);
+#endif /* LIBVIO_CONFIG_HAVE_XWORD_CMPXCH */
 #ifdef LIBVIO_CONFIG_HAVE_QWORD
 LIBVIO_DECL __ATTR_NONNULL((1)) __uint64_t LIBVIO_CC vio_cmpxch_or_writeq(struct vio_args *__restrict args, vio_addr_t addr, __uint64_t oldvalue, __uint64_t newvalue, bool atomic);
 LIBVIO_DECL __ATTR_NONNULL((1)) __uint64_t LIBVIO_CC vio_readq(struct vio_args *__restrict args, vio_addr_t addr);

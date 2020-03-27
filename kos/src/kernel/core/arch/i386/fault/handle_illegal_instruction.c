@@ -255,7 +255,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 				uintptr_t addr;
 				addr = x86_decode_modrmgetmem(state, &mod, op_flags);
 				if (op_flags & F_LOCK) {
-					temp = x86_emulock_cmpxch8((struct icpustate **)&state,
+					temp = x86_emulock_cmpxchb((struct icpustate **)&state,
 					                            (u8 *)addr, value, newvalue);
 				} else {
 					temp = *(u8 volatile *)addr;
@@ -286,7 +286,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 					uintptr_t addr;
 					addr = x86_decode_modrmgetmem(state, &mod, op_flags);
 					if (op_flags & F_LOCK) {
-						temp = x86_emulock_cmpxch16((struct icpustate **)&state,
+						temp = x86_emulock_cmpxchw((struct icpustate **)&state,
 						                             (u16 *)addr, value, newvalue);
 					} else {
 						temp = *(u16 volatile *)addr;
@@ -309,7 +309,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 					uintptr_t addr;
 					addr = x86_decode_modrmgetmem(state, &mod, op_flags);
 					if (op_flags & F_LOCK) {
-						temp = x86_emulock_cmpxch32((struct icpustate **)&state,
+						temp = x86_emulock_cmpxchl((struct icpustate **)&state,
 						                             (u32 *)addr, value, newvalue);
 					} else {
 						temp = *(u32 volatile *)addr;
@@ -341,7 +341,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 				new_value = get_ebxecx();
 				addr      = x86_decode_modrmgetmem(state, &mod, op_flags);
 				if (op_flags & F_LOCK) {
-					real_old_value = x86_emulock_cmpxch64((struct icpustate **)&state,
+					real_old_value = x86_emulock_cmpxchq((struct icpustate **)&state,
 					                                       (u64 *)addr, old_value, new_value);
 				} else {
 					real_old_value = *(u64 volatile *)addr;
@@ -378,7 +378,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 				if (op_flags & F_LOCK) {
 					u8 real_old_value;
 					value = ATOMIC_READ(*(u8 *)addr);
-					while ((real_old_value = x86_emulock_cmpxch8((struct icpustate **)&state,
+					while ((real_old_value = x86_emulock_cmpxchb((struct icpustate **)&state,
 					                                              (u8 *)addr, value, value + temp)))
 						value = real_old_value;
 				} else {
@@ -410,7 +410,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 					if (op_flags & F_LOCK) {
 						u16 real_old_value;
 						value = ATOMIC_READ(*(u16 *)addr);
-						while ((real_old_value = x86_emulock_cmpxch16((struct icpustate **)&state,
+						while ((real_old_value = x86_emulock_cmpxchw((struct icpustate **)&state,
 						                                               (u16 *)addr, value, value + temp)))
 							value = real_old_value;
 					} else {
@@ -432,7 +432,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 					if (op_flags & F_LOCK) {
 						u32 real_old_value;
 						value = ATOMIC_READ(*(u32 *)addr);
-						while ((real_old_value = x86_emulock_cmpxch32((struct icpustate **)&state,
+						while ((real_old_value = x86_emulock_cmpxchl((struct icpustate **)&state,
 						                                               (u32 *)addr, value, value + temp)))
 							value = real_old_value;
 					} else {
