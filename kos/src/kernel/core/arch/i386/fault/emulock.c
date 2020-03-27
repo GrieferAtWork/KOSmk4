@@ -71,6 +71,36 @@ DECL_BEGIN
 #define bus_tryacquirelock()  true
 #define bus_acquirelock()     COMPILER_BARRIER()
 #define bus_releaselock()     COMPILER_BARRIER()
+#elif 1 /* `xchg' was already available, and was already atomic on the 8086, so we can simply use it! */
+
+PRIVATE u8 buslock = 0;
+
+LOCAL NOBLOCK u8
+NOTHROW(KCALL buslock_xch)(u8 value) {
+	u8 result;
+	__asm__ __volatile__("xchgb %b0, %b1"
+	                     : "=r" (result)
+	                     : "m" (buslock)
+	                     , "0" (value));
+	return result;
+}
+
+LOCAL NOBLOCK bool
+NOTHROW(KCALL bus_tryacquirelock)(void) {
+	return buslock_xch(1) == 0;
+}
+
+LOCAL NOBLOCK void
+NOTHROW(KCALL bus_acquirelock)(void) {
+	while (!bus_tryacquirelock())
+		__pause();
+}
+
+LOCAL NOBLOCK void
+NOTHROW(KCALL bus_releaselock)(void) {
+	buslock_xch(0);
+}
+
 #else /* CONFIG_NO_SMP */
 PRIVATE ATTR_ALIGNED(__ARCH_CACHELINESIZE) bool volatile bus_flags[CONFIG_MAX_CPU_COUNT];
 PRIVATE ATTR_PERCPU bool thiscpu_busline7 = false;
@@ -125,34 +155,34 @@ NOTHROW(KCALL bus_releaselock)(void) {
 
 
 #define EMULOCK_MAXBYTES 1
-#ifdef CONFIG_EMULOCK_HAVE_CMPXCHG16
+#ifdef CONFIG_EMULOCK_HAVE_CMPXCH16
 #undef EMULOCK_MAXBYTES
 #define EMULOCK_MAXBYTES 2
-#endif /* CONFIG_EMULOCK_HAVE_CMPXCHG16 */
+#endif /* CONFIG_EMULOCK_HAVE_CMPXCH16 */
 
-#ifdef CONFIG_EMULOCK_HAVE_CMPXCHG32
+#ifdef CONFIG_EMULOCK_HAVE_CMPXCH32
 #undef EMULOCK_MAXBYTES
 #define EMULOCK_MAXBYTES 4
-#endif /* CONFIG_EMULOCK_HAVE_CMPXCHG32 */
+#endif /* CONFIG_EMULOCK_HAVE_CMPXCH32 */
 
-#ifdef CONFIG_EMULOCK_HAVE_CMPXCHG64
+#ifdef CONFIG_EMULOCK_HAVE_CMPXCH64
 #undef EMULOCK_MAXBYTES
 #define EMULOCK_MAXBYTES 8
-#endif /* CONFIG_EMULOCK_HAVE_CMPXCHG64 */
+#endif /* CONFIG_EMULOCK_HAVE_CMPXCH64 */
 
-#ifdef CONFIG_EMULOCK_HAVE_CMPXCHG128
+#ifdef CONFIG_EMULOCK_HAVE_CMPXCH128
 #undef EMULOCK_MAXBYTES
 #define EMULOCK_MAXBYTES 16
-#endif /* CONFIG_EMULOCK_HAVE_CMPXCHG128 */
+#endif /* CONFIG_EMULOCK_HAVE_CMPXCH128 */
 
 
 PRIVATE void KCALL
-x86_emulock_cmpxchg(struct icpustate **__restrict pstate,
-                    USER CHECKED void *addr,
-                    void *preal_oldval,
-                    void *poldval,
-                    void *pnewval,
-                    size_t num_bytes) {
+x86_emulock_cmpxch(struct icpustate **__restrict pstate,
+                   USER CHECKED void *addr,
+                   void *preal_oldval,
+                   void *poldval,
+                   void *pnewval,
+                   size_t num_bytes) {
 	pflag_t was;
 	size_t error;
 	byte_t real_oldval[EMULOCK_MAXBYTES];
@@ -244,50 +274,50 @@ handle_vio_or_not_faulted:
 				vio_addr = args.va_acmap_offset + ((uintptr_t)addr - (uintptr_t)node_minaddr);
 				switch (num_bytes) {
 
-#ifdef CONFIG_EMULOCK_HAVE_CMPXCHG8
+#ifdef CONFIG_EMULOCK_HAVE_CMPXCH8
 				case 1:
 					*(u8 *)preal_oldval = vio_cmpxchb(&args, vio_addr,
 					                                  *(u8 *)poldval,
 					                                  *(u8 *)pnewval,
 					                                  true);
 					break;
-#endif /* CONFIG_EMULOCK_HAVE_CMPXCHG8 */
+#endif /* CONFIG_EMULOCK_HAVE_CMPXCH8 */
 
-#ifdef CONFIG_EMULOCK_HAVE_CMPXCHG16
+#ifdef CONFIG_EMULOCK_HAVE_CMPXCH16
 				case 2:
 					*(u16 *)preal_oldval = vio_cmpxchw(&args, vio_addr,
 					                                   *(u16 *)poldval,
 					                                   *(u16 *)pnewval,
 					                                   true);
 					break;
-#endif /* CONFIG_EMULOCK_HAVE_CMPXCHG16 */
+#endif /* CONFIG_EMULOCK_HAVE_CMPXCH16 */
 
-#ifdef CONFIG_EMULOCK_HAVE_CMPXCHG32
+#ifdef CONFIG_EMULOCK_HAVE_CMPXCH32
 				case 4:
 					*(u32 *)preal_oldval = vio_cmpxchl(&args, vio_addr,
 					                                   *(u32 *)poldval,
 					                                   *(u32 *)pnewval,
 					                                   true);
 					break;
-#endif /* CONFIG_EMULOCK_HAVE_CMPXCHG32 */
+#endif /* CONFIG_EMULOCK_HAVE_CMPXCH32 */
 
-#ifdef CONFIG_EMULOCK_HAVE_CMPXCHG64
+#ifdef CONFIG_EMULOCK_HAVE_CMPXCH64
 				case 8:
 					*(u64 *)preal_oldval = vio_cmpxchq(&args, vio_addr,
 					                                   *(u64 *)poldval,
 					                                   *(u64 *)pnewval,
 					                                   true);
 					break;
-#endif /* CONFIG_EMULOCK_HAVE_CMPXCHG64 */
+#endif /* CONFIG_EMULOCK_HAVE_CMPXCH64 */
 
-#ifdef CONFIG_EMULOCK_HAVE_CMPXCHG128
+#ifdef CONFIG_EMULOCK_HAVE_CMPXCH128
 				case 16:
 					*(uint128_t *)preal_oldval = vio_cmpxch128(&args, vio_addr,
 					                                           *(uint128_t *)poldval,
 					                                           *(uint128_t *)pnewval,
 					                                           true);
 					break;
-#endif /* CONFIG_EMULOCK_HAVE_CMPXCHG128 */
+#endif /* CONFIG_EMULOCK_HAVE_CMPXCH128 */
 
 				default:
 					__builtin_unreachable();
@@ -306,60 +336,60 @@ handle_vio_or_not_faulted:
 }
 
 
-#ifdef CONFIG_EMULOCK_HAVE_CMPXCHG8
+#ifdef CONFIG_EMULOCK_HAVE_CMPXCH8
 PUBLIC u8 KCALL
-x86_emulock_cmpxchg8(struct icpustate **__restrict pstate,
-                     USER CHECKED u8 *addr,
-                     u8 oldval, u8 newval) {
+x86_emulock_cmpxch8(struct icpustate **__restrict pstate,
+                    USER CHECKED u8 *addr,
+                    u8 oldval, u8 newval) {
 	u8 real_oldval;
-	x86_emulock_cmpxchg(pstate, addr, &real_oldval, &oldval, &newval, 1);
+	x86_emulock_cmpxch(pstate, addr, &real_oldval, &oldval, &newval, 1);
 	return real_oldval;
 }
-#endif /* CONFIG_EMULOCK_HAVE_CMPXCHG8 */
+#endif /* CONFIG_EMULOCK_HAVE_CMPXCH8 */
 
-#ifdef CONFIG_EMULOCK_HAVE_CMPXCHG16
+#ifdef CONFIG_EMULOCK_HAVE_CMPXCH16
 PUBLIC u16 KCALL
-x86_emulock_cmpxchg16(struct icpustate **__restrict pstate,
-                      USER CHECKED u16 *addr,
-                      u16 oldval, u16 newval) {
+x86_emulock_cmpxch16(struct icpustate **__restrict pstate,
+                     USER CHECKED u16 *addr,
+                     u16 oldval, u16 newval) {
 	u16 real_oldval;
-	x86_emulock_cmpxchg(pstate, addr, &real_oldval, &oldval, &newval, 2);
+	x86_emulock_cmpxch(pstate, addr, &real_oldval, &oldval, &newval, 2);
 	return real_oldval;
 }
-#endif /* CONFIG_EMULOCK_HAVE_CMPXCHG16 */
+#endif /* CONFIG_EMULOCK_HAVE_CMPXCH16 */
 
-#ifdef CONFIG_EMULOCK_HAVE_CMPXCHG32
+#ifdef CONFIG_EMULOCK_HAVE_CMPXCH32
 PUBLIC u32 KCALL
-x86_emulock_cmpxchg32(struct icpustate **__restrict pstate,
-                      USER CHECKED u32 *addr,
-                      u32 oldval, u32 newval) {
+x86_emulock_cmpxch32(struct icpustate **__restrict pstate,
+                     USER CHECKED u32 *addr,
+                     u32 oldval, u32 newval) {
 	u32 real_oldval;
-	x86_emulock_cmpxchg(pstate, addr, &real_oldval, &oldval, &newval, 4);
+	x86_emulock_cmpxch(pstate, addr, &real_oldval, &oldval, &newval, 4);
 	return real_oldval;
 }
-#endif /* CONFIG_EMULOCK_HAVE_CMPXCHG32 */
+#endif /* CONFIG_EMULOCK_HAVE_CMPXCH32 */
 
-#ifdef CONFIG_EMULOCK_HAVE_CMPXCHG64
+#ifdef CONFIG_EMULOCK_HAVE_CMPXCH64
 PUBLIC u64 KCALL
-x86_emulock_cmpxchg64(struct icpustate **__restrict pstate,
-                      USER CHECKED u64 *addr,
-                      u64 oldval, u64 newval) {
+x86_emulock_cmpxch64(struct icpustate **__restrict pstate,
+                     USER CHECKED u64 *addr,
+                     u64 oldval, u64 newval) {
 	u64 real_oldval;
-	x86_emulock_cmpxchg(pstate, addr, &real_oldval, &oldval, &newval, 8);
+	x86_emulock_cmpxch(pstate, addr, &real_oldval, &oldval, &newval, 8);
 	return real_oldval;
 }
-#endif /* CONFIG_EMULOCK_HAVE_CMPXCHG64 */
+#endif /* CONFIG_EMULOCK_HAVE_CMPXCH64 */
 
-#ifdef CONFIG_EMULOCK_HAVE_CMPXCHG128
+#ifdef CONFIG_EMULOCK_HAVE_CMPXCH128
 PUBLIC uint128_t KCALL
-x86_emulock_cmpxchg128(struct icpustate **__restrict pstate,
-                       USER CHECKED uint128_t *addr,
-                       uint128_t oldval, uint128_t newval) {
+x86_emulock_cmpxch128(struct icpustate **__restrict pstate,
+                      USER CHECKED uint128_t *addr,
+                      uint128_t oldval, uint128_t newval) {
 	uint128_t real_oldval;
-	x86_emulock_cmpxchg(pstate, addr, &real_oldval, &oldval, &newval, 16);
+	x86_emulock_cmpxch(pstate, addr, &real_oldval, &oldval, &newval, 16);
 	return real_oldval;
 }
-#endif /* CONFIG_EMULOCK_HAVE_CMPXCHG128 */
+#endif /* CONFIG_EMULOCK_HAVE_CMPXCH128 */
 
 
 DECL_END

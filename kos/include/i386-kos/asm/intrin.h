@@ -21,8 +21,13 @@
 #define _I386_KOS_ASM_INTRIN_H 1
 
 #include <__stdinc.h>
+
 #include <hybrid/host.h>
 #include <hybrid/typecore.h>
+
+#ifdef __x86_64__
+#include <hybrid/int128.h>
+#endif /* __x86_64__ */
 
 #ifdef __CC__
 __DECL_BEGIN
@@ -586,6 +591,58 @@ __FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdpmc32)(__UINT32_TYPE__ __id) { 
 __FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdtsc32)(void) { __UINT32_TYPE__ __res; __asm__ __volatile__("rdtsc" : "=a" (__res) : : "edx"); return __res; }
 __FORCELOCAL void (__wrmsr)(__UINT32_TYPE__ __id, __UINT64_TYPE__ __val) { __asm__ __volatile__("wrmsr" : : "c" (__id), "A" (__val)); }
 #endif /* !__x86_64__ */
+
+
+#ifdef __x86_64__
+__FORCELOCAL __ATTR_WUNUSED __hybrid_uint128_t
+(__lock_cmpxchg16b)(__hybrid_uint128_t *__ptr, __hybrid_uint128_t __oldval, __hybrid_uint128_t __newval) {
+	union {
+		__hybrid_uint128_t __x;
+		__UINT64_TYPE__ __q[2];
+	} __res;
+	__asm__ __volatile__("lock; cmpxchg16b %0"
+	                     : "+m" (*__ptr)
+	                     , "+a" (__res.__q[0])
+	                     , "+d" (__res.__q[1])
+	                     : "b" (__hybrid_uint128_vec64_significand(__newval, 0))
+	                     , "c" (__hybrid_uint128_vec64_significand(__newval, 1))
+	                     , "1" (__hybrid_uint128_vec64_significand(__oldval, 0))
+	                     , "2" (__hybrid_uint128_vec64_significand(__oldval, 1))
+	                     : "cc");
+	return __res.__x;
+}
+#endif /* __x86_64__ */
+
+__FORCELOCAL __ATTR_WUNUSED __UINT64_TYPE__
+(__lock_cmpxchg8b)(__UINT64_TYPE__ *__ptr, __UINT64_TYPE__ __oldval, __UINT64_TYPE__ __newval) {
+#ifdef __x86_64__
+	union {
+		__UINT64_TYPE__ __q;
+		__UINT32_TYPE__ __l[2];
+	} __res;
+	__asm__ __volatile__("lock; cmpxchg8b %0"
+	                     : "+m" (*__ptr)
+	                     , "=a" (__res.__l[0])
+	                     , "=d" (__res.__l[1])
+	                     : "b" ((__UINT32_TYPE__)(__newval))
+	                     , "c" ((__UINT32_TYPE__)(__newval >> 32))
+	                     , "1" ((__UINT32_TYPE__)(__oldval))
+	                     , "2" ((__UINT32_TYPE__)(__oldval >> 32))
+	                     : "cc");
+	return __res.__q;
+#else /* __x86_64__ */
+	__UINT64_TYPE__ __res;
+	__asm__ __volatile__("lock; cmpxchg8b %0"
+	                     : "+m" (*__ptr)
+	                     , "+A" (__res)
+	                     : "b" ((__UINT32_TYPE__)(__newval))
+	                     , "c" ((__UINT32_TYPE__)(__newval >> 32))
+	                     , "1" (__oldval)
+	                     : "cc");
+	return __res;
+#endif /* !__x86_64__ */
+}
+
 
 #undef __PRIVATE_PREFIX_REP_CLD
 #elif defined(_MSC_VER)

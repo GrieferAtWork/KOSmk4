@@ -964,7 +964,7 @@ libviocore_atomic_cmpxchq(struct vio_emulate_args *__restrict self,
 
 #define EMU86_MEM_ATOMIC_CMPXCH_OR_WRITEB(addr, oldval, newval, force_atomic) \
 	libviocore_atomic_cmpxch_or_writeb(self, (void *)(uintptr_t)(addr), oldval, newval, force_atomic)
-PRIVATE NONNULL((1)) u8 CC
+PRIVATE NONNULL((1)) bool CC
 libviocore_atomic_cmpxch_or_writeb(struct vio_emulate_args *__restrict self,
                                    __USER __CHECKED void *addr,
                                    u8 oldval, u8 newval, bool force_atomic) {
@@ -977,19 +977,17 @@ libviocore_atomic_cmpxch_or_writeb(struct vio_emulate_args *__restrict self,
 		if (force_atomic)
 			result = ATOMIC_CMPXCH(*(u8 *)addr, oldval, newval);
 		else {
-			result = *(u8 *)addr;
-			COMPILER_READ_BARRIER();
-			if (result == oldval)
-				*(u8 *)addr = newval;
+			*(u8 *)addr = newval;
+			return true;
 		}
 	}
 	COMPILER_BARRIER();
-	return result;
+	return result == oldval;
 }
 
 #define EMU86_MEM_ATOMIC_CMPXCH_OR_WRITEW(addr, oldval, newval, force_atomic) \
 	libviocore_atomic_cmpxch_or_writew(self, (void *)(uintptr_t)(addr), oldval, newval, force_atomic)
-PRIVATE NONNULL((1)) u16 CC
+PRIVATE NONNULL((1)) bool CC
 libviocore_atomic_cmpxch_or_writew(struct vio_emulate_args *__restrict self,
                                    __USER __CHECKED void *addr,
                                    u16 oldval, u16 newval, bool force_atomic) {
@@ -1002,19 +1000,17 @@ libviocore_atomic_cmpxch_or_writew(struct vio_emulate_args *__restrict self,
 		if (force_atomic)
 			result = ATOMIC_CMPXCH(*(u16 *)addr, oldval, newval);
 		else {
-			result = *(u16 *)addr;
-			COMPILER_READ_BARRIER();
-			if (result == oldval)
-				*(u16 *)addr = newval;
+			*(u16 *)addr = newval;
+			return true;
 		}
 	}
 	COMPILER_BARRIER();
-	return result;
+	return result == oldval;
 }
 
 #define EMU86_MEM_ATOMIC_CMPXCH_OR_WRITEL(addr, oldval, newval, force_atomic) \
 	libviocore_atomic_cmpxch_or_writel(self, (void *)(uintptr_t)(addr), oldval, newval, force_atomic)
-PRIVATE NONNULL((1)) u32 CC
+PRIVATE NONNULL((1)) bool CC
 libviocore_atomic_cmpxch_or_writel(struct vio_emulate_args *__restrict self,
                                    __USER __CHECKED void *addr,
                                    u32 oldval, u32 newval, bool force_atomic) {
@@ -1027,14 +1023,12 @@ libviocore_atomic_cmpxch_or_writel(struct vio_emulate_args *__restrict self,
 		if (force_atomic)
 			result = ATOMIC_CMPXCH(*(u32 *)addr, oldval, newval);
 		else {
-			result = *(u32 *)addr;
-			COMPILER_READ_BARRIER();
-			if (result == oldval)
-				*(u32 *)addr = newval;
+			*(u32 *)addr = newval;
+			return true;
 		}
 	}
 	COMPILER_BARRIER();
-	return result;
+	return result == oldval;
 }
 
 #ifdef __x86_64__
@@ -1053,14 +1047,12 @@ libviocore_atomic_cmpxch_or_writeq(struct vio_emulate_args *__restrict self,
 		if (force_atomic)
 			result = ATOMIC_CMPXCH(*(u64 *)addr, oldval, newval);
 		else {
-			result = *(u64 *)addr;
-			COMPILER_READ_BARRIER();
-			if (result == oldval)
-				*(u64 *)addr = newval;
+			*(u64 *)addr = newval;
+			return true;
 		}
 	}
 	COMPILER_BARRIER();
-	return result;
+	return result == oldval;
 }
 
 #define EMU86_MEM_ATOMIC_CMPXCH128(addr, oldval, newval, force_atomic) \

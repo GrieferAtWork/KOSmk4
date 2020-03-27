@@ -48,6 +48,7 @@ opt.append("-Os");
 
 #include <kernel/arch/cpuid.h>
 #include <kernel/debugtrap.h>
+#include <kernel/emulock.h>
 #include <kernel/except.h>
 #include <kernel/gdt.h>
 #include <kernel/printk.h>
@@ -82,6 +83,9 @@ opt.append("-Os");
 #include <libviocore/viocore.h>
 #endif /* !CONFIG_NO_USERKERN_SEGMENT */
 
+#ifdef __x86_64__
+#include <int128.h>
+#endif /* __x86_64__ */
 
 DECL_BEGIN
 
@@ -136,13 +140,27 @@ x86_handle_bad_usage(struct icpustate *__restrict state, u16 usage);
 #define EMU86_EMULATE_CONFIG_WANT_SETCC         (!CONFIG_LIBEMU86_WANT_64BIT) /* Only available on 486+ (emulate in 32-bit mode) */
 #define EMU86_EMULATE_CONFIG_WANT_CMOVCC        (!CONFIG_LIBEMU86_WANT_64BIT) /* Only available on 486+ (emulate in 32-bit mode) */
 #define EMU86_EMULATE_CONFIG_WANT_CMPS          0
-#define EMU86_EMULATE_CONFIG_WANT_CMPXCHG       0 /* TODO: Try to emulate this! */
-#define EMU86_EMULATE_CONFIG_WANT_CMPXCHG8B     0 /* TODO: Try to emulate this! */
-#define EMU86_EMULATE_CONFIG_WANT_CMPXCHG16B    0 /* TODO: Try to emulate this! */
+#if (defined(CONFIG_EMULOCK_HAVE_CMPXCH8) && defined(CONFIG_EMULOCK_HAVE_CMPXCH16) && \
+     defined(CONFIG_EMULOCK_HAVE_CMPXCH32) &&                                         \
+     (!CONFIG_LIBEMU86_WANT_64BIT || defined(CONFIG_EMULOCK_HAVE_CMPXCH64)))
+#define EMU86_EMULATE_CONFIG_WANT_CMPXCHG       1
+#else /* ... */
+#define EMU86_EMULATE_CONFIG_WANT_CMPXCHG       0
+#endif /* !... */
+#if defined(__x86_64__) || defined(CONFIG_EMULOCK_HAVE_CMPXCH64)
+#define EMU86_EMULATE_CONFIG_WANT_CMPXCHG8B     1
+#else /* __x86_64__ || CONFIG_EMULOCK_HAVE_CMPXCH64 */
+#define EMU86_EMULATE_CONFIG_WANT_CMPXCHG8B     0
+#endif /* !__x86_64__ && !CONFIG_EMULOCK_HAVE_CMPXCH64 */
+#if CONFIG_LIBEMU86_WANT_64BIT && defined(CONFIG_EMULOCK_HAVE_CMPXCH128)
+#define EMU86_EMULATE_CONFIG_WANT_CMPXCHG16B    1
+#else /* CONFIG_LIBEMU86_WANT_64BIT && CONFIG_EMULOCK_HAVE_CMPXCH128 */
+#define EMU86_EMULATE_CONFIG_WANT_CMPXCHG16B    0
+#endif /* !CONFIG_LIBEMU86_WANT_64BIT || !CONFIG_EMULOCK_HAVE_CMPXCH128 */
 #define EMU86_EMULATE_CONFIG_WANT_CPUID         (!CONFIG_LIBEMU86_WANT_64BIT) /* Only available on 486+ (emulate in 32-bit mode) */
 #define EMU86_EMULATE_CONFIG_WANT_ENTER         0
-#define EMU86_EMULATE_CONFIG_WANT_INVD          1 /* TODO: Check if this instruction always exists on x86_64 */
-#define EMU86_EMULATE_CONFIG_WANT_WBINVD        1 /* TODO: Check if this instruction always exists on x86_64 */
+#define EMU86_EMULATE_CONFIG_WANT_INVD          (!CONFIG_LIBEMU86_WANT_64BIT) /* Only available on 486+ (emulate in 32-bit mode) */
+#define EMU86_EMULATE_CONFIG_WANT_WBINVD        (!CONFIG_LIBEMU86_WANT_64BIT) /* Only available on 486+ (emulate in 32-bit mode) */
 #define EMU86_EMULATE_CONFIG_WANT_PREFETCHW     1 /* TODO: Check if this instruction always exists on x86_64 */
 #define EMU86_EMULATE_CONFIG_WANT_PREFETCHNTA   1 /* TODO: Check if this instruction always exists on x86_64 */
 #define EMU86_EMULATE_CONFIG_WANT_PREFETCH0     1 /* TODO: Check if this instruction always exists on x86_64 */
@@ -157,7 +175,7 @@ x86_handle_bad_usage(struct icpustate *__restrict state, u16 usage);
 #define EMU86_EMULATE_CONFIG_WANT_INT           0
 #define EMU86_EMULATE_CONFIG_WANT_INTO          0
 #define EMU86_EMULATE_CONFIG_WANT_IO            0
-#define EMU86_EMULATE_CONFIG_WANT_IRET          0 /* TODO: Emulation for vm86 */
+#define EMU86_EMULATE_CONFIG_WANT_IRET          0 /* TODO: vm86 support */
 #define EMU86_EMULATE_CONFIG_WANT_JCC_DISP8     0
 #define EMU86_EMULATE_CONFIG_WANT_JCC_DISP32    0
 #define EMU86_EMULATE_CONFIG_WANT_JCXZ          0
@@ -200,7 +218,7 @@ x86_handle_bad_usage(struct icpustate *__restrict state, u16 usage);
 #define EMU86_EMULATE_CONFIG_WANT_MOVSXD        0
 #define EMU86_EMULATE_CONFIG_WANT_MOVZX         0
 #define EMU86_EMULATE_CONFIG_WANT_ARPL          0
-#define EMU86_EMULATE_CONFIG_WANT_NOP_RM        1 /* TODO: Check if this instruction always exists on x86_64 */
+#define EMU86_EMULATE_CONFIG_WANT_NOP_RM        1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_PEXT          1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_PDEP          1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_BZHI          1 /* Emulate non-standard instructions */
@@ -222,8 +240,8 @@ x86_handle_bad_usage(struct icpustate *__restrict state, u16 usage);
 #define EMU86_EMULATE_CONFIG_WANT_POPCNT        1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_PUSHA         0
 #define EMU86_EMULATE_CONFIG_WANT_POPA          0
-#define EMU86_EMULATE_CONFIG_WANT_PUSHF         0 /* TODO: Emulation for vm86 */
-#define EMU86_EMULATE_CONFIG_WANT_POPF          0 /* TODO: Emulation for vm86 */
+#define EMU86_EMULATE_CONFIG_WANT_PUSHF         0 /* TODO: vm86 support */
+#define EMU86_EMULATE_CONFIG_WANT_POPF          0 /* TODO: vm86 support */
 #define EMU86_EMULATE_CONFIG_WANT_PUSH_IMM      0
 #define EMU86_EMULATE_CONFIG_WANT_PUSH_REG      0
 #define EMU86_EMULATE_CONFIG_WANT_POP_REG       0
@@ -254,14 +272,14 @@ x86_handle_bad_usage(struct icpustate *__restrict state, u16 usage);
 #define EMU86_EMULATE_CONFIG_WANT_STC           0
 #define EMU86_EMULATE_CONFIG_WANT_CLD           0
 #define EMU86_EMULATE_CONFIG_WANT_STD           0
-#define EMU86_EMULATE_CONFIG_WANT_CLI           0 /* TODO: Emulation for vm86 */
-#define EMU86_EMULATE_CONFIG_WANT_STI           0 /* TODO: Emulation for vm86 */
+#define EMU86_EMULATE_CONFIG_WANT_CLI           0 /* TODO: vm86 support */
+#define EMU86_EMULATE_CONFIG_WANT_STI           0 /* TODO: vm86 support */
 #define EMU86_EMULATE_CONFIG_WANT_STOS          0
 #define EMU86_EMULATE_CONFIG_WANT_SYSCALL       CONFIG_LIBEMU86_WANT_64BIT
 #define EMU86_EMULATE_CONFIG_WANT_SYSRET        0
 #define EMU86_EMULATE_CONFIG_WANT_SYSENTER      1
 #define EMU86_EMULATE_CONFIG_WANT_SYSEXIT       0
-#define EMU86_EMULATE_CONFIG_WANT_XADD          0
+#define EMU86_EMULATE_CONFIG_WANT_XADD          (!CONFIG_LIBEMU86_WANT_64BIT) /* Only available on 486+ (emulate in 32-bit mode) */
 #define EMU86_EMULATE_CONFIG_WANT_XCHG_RM       0
 #define EMU86_EMULATE_CONFIG_WANT_NOP           0
 #define EMU86_EMULATE_CONFIG_WANT_PAUSE         0
@@ -1113,6 +1131,168 @@ NOTHROW(KCALL cpuid)(struct icpustate *__restrict state) {
 	}
 }
 #endif /* EMU86_EMULATE_CONFIG_WANT_CPUID */
+
+
+#define DEFINE_DO_ATOMIC_CMPXCH(Nbits)                                        \
+	PRIVATE NONNULL((1)) u##Nbits KCALL                                       \
+	do_atomic_cmpxch##Nbits(struct icpustate **__restrict pstate,             \
+	                        USER CHECKED u##Nbits *addr, u##Nbits oldval,     \
+	                        u##Nbits newval, bool force_atomic) {             \
+		u##Nbits result;                                                      \
+		if (force_atomic) {                                                   \
+			result = x86_emulock_cmpxch##Nbits(pstate, addr, oldval, newval); \
+		} else {                                                              \
+			COMPILER_READ_BARRIER();                                          \
+			result = *addr;                                                   \
+			COMPILER_READ_BARRIER();                                          \
+			if (result == oldval) {                                           \
+				COMPILER_WRITE_BARRIER();                                     \
+				*addr = newval;                                               \
+				COMPILER_WRITE_BARRIER();                                     \
+			}                                                                 \
+		}                                                                     \
+		return result;                                                        \
+	}
+
+#define DEFINE_DO_ATOMIC_CMPXCH_OR_WRITE(Nbits)                                      \
+	PRIVATE NONNULL((1)) bool KCALL                                                  \
+	do_atomic_cmpxch##Nbits##_or_write(struct icpustate **__restrict pstate,         \
+	                                   USER CHECKED u##Nbits *addr, u##Nbits oldval, \
+	                                   u##Nbits newval, bool force_atomic) {         \
+		u##Nbits result;                                                             \
+		if (force_atomic) {                                                          \
+			result = x86_emulock_cmpxch##Nbits(pstate, addr, oldval, newval);        \
+		} else {                                                                     \
+			*addr = newval;                                                          \
+			return true;                                                             \
+		}                                                                            \
+		return result == oldval;                                                     \
+	}
+
+
+
+/************************************************************************/
+/* ATOMIC 128-BIT COMPARE-EXCHANGE                                      */
+/************************************************************************/
+#if EMU86_EMULATE_CONFIG_WANT_CMPXCHG16B
+#ifndef CONFIG_EMULOCK_HAVE_CMPXCH128
+#error "Bad configuration"
+#endif /* CONFIG_EMULOCK_HAVE_CMPXCH128 */
+#define EMU86_MEM_ATOMIC_CMPXCH128(addr, oldval, newval, force_atomic) \
+	do_atomic_cmpxch128((struct icpustate **)&_state, (uint128_t *)(addr), oldval, newval, force_atomic)
+PRIVATE NONNULL((1)) uint128_t KCALL
+do_atomic_cmpxch128(struct icpustate **__restrict pstate,
+                    USER CHECKED uint128_t *addr, uint128_t oldval,
+                    uint128_t newval, bool force_atomic) {
+	uint128_t result;
+	if (force_atomic) {
+		result = x86_emulock_cmpxch128(pstate, addr, oldval, newval);
+	} else {
+		COMPILER_READ_BARRIER();
+		result = *addr;
+		COMPILER_READ_BARRIER();
+		if (uint128_eq128(result, oldval)) {
+			COMPILER_WRITE_BARRIER();
+			*addr = newval;
+			COMPILER_WRITE_BARRIER();
+		}
+	}
+	return result;
+}
+#endif /* EMU86_EMULATE_CONFIG_WANT_CMPXCHG16B */
+
+
+/************************************************************************/
+/* ATOMIC 64-BIT COMPARE-EXCHANGE                                       */
+/************************************************************************/
+#if EMU86_EMULATE_CONFIG_WANT_CMPXCHG8B
+#ifdef __x86_64__
+#define EMU86_MEM_ATOMIC_CMPXCH_OR_WRITEQ(addr, oldval, newval, force_atomic) \
+	__hybrid_atomic_cmpxch(*(u64 *)EMU86_EMULATE_TRANSLATEADDR(addr),         \
+	                       oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
+#define EMU86_MEM_ATOMIC_CMPXCHQ(addr, oldval, newval, force_atomic)      \
+	__hybrid_atomic_cmpxch_val(*(u64 *)EMU86_EMULATE_TRANSLATEADDR(addr), \
+	                           oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
+#elif defined(CONFIG_EMULOCK_HAVE_CMPXCH64)
+#define EMU86_MEM_ATOMIC_CMPXCHQ(addr, oldval, newval, force_atomic) \
+	do_atomic_cmpxch64((struct icpustate **)&_state, (u64 *)(addr), (u64)(oldval), (u64)(newval), force_atomic)
+#define EMU86_MEM_ATOMIC_CMPXCH_OR_WRITEQ(addr, oldval, newval, force_atomic) \
+	do_atomic_cmpxch64_or_write((struct icpustate **)&_state, (u64 *)(addr), (u64)(oldval), (u64)(newval), force_atomic)
+DEFINE_DO_ATOMIC_CMPXCH(64)
+/*DEFINE_DO_ATOMIC_CMPXCH_OR_WRITE(64)*/ /* Unused */
+#else /* ... */
+#error "Bad configuration"
+#endif /* !... */
+#endif /* EMU86_EMULATE_CONFIG_WANT_CMPXCHG8B */
+
+
+/************************************************************************/
+/* ATOMIC 64-BIT COMPARE-EXCHANGE                                       */
+/************************************************************************/
+#if EMU86_EMULATE_CONFIG_WANT_CMPXCHG
+#define EMU86_MEM_ATOMIC_CMPXCHB(addr, oldval, newval, force_atomic) \
+	do_atomic_cmpxch8((struct icpustate **)&_state, (u8 *)(addr), (u8)(oldval), (u8)(newval), force_atomic)
+#define EMU86_MEM_ATOMIC_CMPXCHW(addr, oldval, newval, force_atomic) \
+	do_atomic_cmpxch16((struct icpustate **)&_state, (u16 *)(addr), (u16)(oldval), (u16)(newval), force_atomic)
+#define EMU86_MEM_ATOMIC_CMPXCHL(addr, oldval, newval, force_atomic) \
+	do_atomic_cmpxch32((struct icpustate **)&_state, (u32 *)(addr), (u32)(oldval), (u32)(newval), force_atomic)
+#define EMU86_MEM_ATOMIC_CMPXCH_OR_WRITEB(addr, oldval, newval, force_atomic) \
+	do_atomic_cmpxch8_or_write((struct icpustate **)&_state, (u8 *)(addr), (u8)(oldval), (u8)(newval), force_atomic)
+#define EMU86_MEM_ATOMIC_CMPXCH_OR_WRITEW(addr, oldval, newval, force_atomic) \
+	do_atomic_cmpxch16_or_write((struct icpustate **)&_state, (u16 *)(addr), (u16)(oldval), (u16)(newval), force_atomic)
+#define EMU86_MEM_ATOMIC_CMPXCH_OR_WRITEL(addr, oldval, newval, force_atomic) \
+	do_atomic_cmpxch32_or_write((struct icpustate **)&_state, (u32 *)(addr), (u32)(oldval), (u32)(newval), force_atomic)
+DEFINE_DO_ATOMIC_CMPXCH(8)
+/*DEFINE_DO_ATOMIC_CMPXCH_OR_WRITE(8)*/ /* Unused */
+DEFINE_DO_ATOMIC_CMPXCH(16)
+DEFINE_DO_ATOMIC_CMPXCH_OR_WRITE(16)
+DEFINE_DO_ATOMIC_CMPXCH(32)
+DEFINE_DO_ATOMIC_CMPXCH_OR_WRITE(32)
+#endif /* EMU86_EMULATE_CONFIG_WANT_CMPXCHG */
+
+#undef DEFINE_DO_ATOMIC_CMPXCH
+#undef DEFINE_DO_ATOMIC_CMPXCH_OR_WRITE
+
+
+/* None of these should ever be used */
+#ifdef __x86_64__
+#define EMU86_MEM_ATOMIC_CMPXCHB(addr, oldval, newval, force_atomic) DONE_USE
+#define EMU86_MEM_ATOMIC_CMPXCHW(addr, oldval, newval, force_atomic) DONE_USE
+#define EMU86_MEM_ATOMIC_CMPXCHL(addr, oldval, newval, force_atomic) DONE_USE
+#endif /* __x86_64__ */
+
+#define EMU86_MEM_ATOMIC_XCHB(addr, addend, force_atomic) DONT_USE
+#define EMU86_MEM_ATOMIC_XCHW(addr, addend, force_atomic) DONT_USE
+#define EMU86_MEM_ATOMIC_XCHL(addr, addend, force_atomic) DONT_USE
+#define EMU86_MEM_ATOMIC_XCHQ(addr, addend, force_atomic) DONT_USE
+
+#ifdef __x86_64__ /* Needed to emulate xadd on i386 */
+#define EMU86_MEM_ATOMIC_FETCHADDB(addr, addend, force_atomic) DONT_USE
+#define EMU86_MEM_ATOMIC_FETCHADDW(addr, addend, force_atomic) DONT_USE
+#define EMU86_MEM_ATOMIC_FETCHADDL(addr, addend, force_atomic) DONT_USE
+#endif /* __x86_64__ */
+#define EMU86_MEM_ATOMIC_FETCHADDQ(addr, addend, force_atomic) DONT_USE
+
+#define EMU86_MEM_ATOMIC_FETCHSUBB(addr, addend, force_atomic) DONT_USE
+#define EMU86_MEM_ATOMIC_FETCHSUBW(addr, addend, force_atomic) DONT_USE
+#define EMU86_MEM_ATOMIC_FETCHSUBL(addr, addend, force_atomic) DONT_USE
+#define EMU86_MEM_ATOMIC_FETCHSUBQ(addr, addend, force_atomic) DONT_USE
+
+#define EMU86_MEM_ATOMIC_FETCHANDB(addr, addend, force_atomic) DONT_USE
+#define EMU86_MEM_ATOMIC_FETCHANDW(addr, addend, force_atomic) DONT_USE
+#define EMU86_MEM_ATOMIC_FETCHANDL(addr, addend, force_atomic) DONT_USE
+#define EMU86_MEM_ATOMIC_FETCHANDQ(addr, addend, force_atomic) DONT_USE
+
+#define EMU86_MEM_ATOMIC_FETCHORB(addr, addend, force_atomic) DONT_USE
+#define EMU86_MEM_ATOMIC_FETCHORW(addr, addend, force_atomic) DONT_USE
+#define EMU86_MEM_ATOMIC_FETCHORL(addr, addend, force_atomic) DONT_USE
+#define EMU86_MEM_ATOMIC_FETCHORQ(addr, addend, force_atomic) DONT_USE
+
+#define EMU86_MEM_ATOMIC_FETCHXORB(addr, addend, force_atomic) DONT_USE
+#define EMU86_MEM_ATOMIC_FETCHXORW(addr, addend, force_atomic) DONT_USE
+#define EMU86_MEM_ATOMIC_FETCHXORL(addr, addend, force_atomic) DONT_USE
+#define EMU86_MEM_ATOMIC_FETCHXORQ(addr, addend, force_atomic) DONT_USE
+
 
 
 DECL_END

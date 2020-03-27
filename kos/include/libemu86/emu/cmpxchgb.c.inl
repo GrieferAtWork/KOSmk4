@@ -50,9 +50,9 @@ case EMU86_OPCODE_ENCODE(0x0fc7):
 			newval.qwords[0]      = EMU86_GETRBX();
 			newval.qwords[1]      = EMU86_GETRCX();
 			addr                  = MODRM_MEMADDR();
-			EMU86_WRITE_USER_MEMORY(addr, 16);
+			EMU86_READWRITE_USER_MEMORY(addr, 16);
 			real_oldval.word128 = EMU86_MEM_ATOMIC_CMPXCH128(addr, want_oldval.word128, newval.word128,
-			                                                     (op_flags & EMU86_F_LOCK) != 0);
+			                                                 (op_flags & EMU86_F_LOCK) != 0);
 			if (real_oldval.qwords[0] == want_oldval.qwords[0] &&
 			    real_oldval.qwords[1] == want_oldval.qwords[1]) {
 				EMU86_MSKFLAGS(~EFLAGS_ZF, EFLAGS_ZF);
@@ -61,7 +61,40 @@ case EMU86_OPCODE_ENCODE(0x0fc7):
 				EMU86_SETRAX(real_oldval.qwords[0]);
 				EMU86_SETRDX(real_oldval.qwords[1]);
 			}
+			goto done;
 #else /* EMU86_EMULATE_CONFIG_WANT_CMPXCHG16B && EMU86_MEM_ATOMIC_CMPXCH128 */
+#if EMU86_EMULATE_CONFIG_WANT_CMPXCHG16B
+			if (!(op_flags & EMU86_F_LOCK)) {
+				/* We can easily emulate the non-atomic variant! */
+				union {
+					u64 qwords[2];
+				} real_oldval, want_oldval, newval;
+				byte_t *addr;
+				want_oldval.qwords[0] = EMU86_GETRAX();
+				want_oldval.qwords[1] = EMU86_GETRDX();
+				newval.qwords[0]      = EMU86_GETRBX();
+				newval.qwords[1]      = EMU86_GETRCX();
+				addr                  = MODRM_MEMADDR();
+				EMU86_READWRITE_USER_MEMORY(addr, 16);
+				COMPILER_READ_BARRIER();
+				real_oldval.qwords[0] = EMU86_MEMREADQ(addr + 0);
+				real_oldval.qwords[1] = EMU86_MEMREADQ(addr + 8);
+				COMPILER_READ_BARRIER();
+				if (real_oldval.qwords[0] == want_oldval.qwords[0] &&
+				    real_oldval.qwords[1] == want_oldval.qwords[1]) {
+					COMPILER_WRITE_BARRIER();
+					EMU86_MEMWRITEQ(addr + 0, newval.qwords[0]);
+					EMU86_MEMWRITEQ(addr + 8, newval.qwords[1]);
+					COMPILER_WRITE_BARRIER();
+					EMU86_MSKFLAGS(~EFLAGS_ZF, EFLAGS_ZF);
+				} else {
+					EMU86_MSKFLAGS(~EFLAGS_ZF, 0);
+					EMU86_SETRAX(real_oldval.qwords[0]);
+					EMU86_SETRDX(real_oldval.qwords[1]);
+				}
+				goto done;
+			}
+#endif /* EMU86_EMULATE_CONFIG_WANT_CMPXCHG16B */
 			EMU86_UNSUPPORTED_MEMACCESS(MODRM_MEMADDR(), 16, true, true);
 #define NEED_return_unsupported_instruction_rmreg
 			goto return_unsupported_instruction_rmreg;
@@ -80,9 +113,9 @@ case EMU86_OPCODE_ENCODE(0x0fc7):
 			newval.dwords[0]      = EMU86_GETEBX();
 			newval.dwords[1]      = EMU86_GETECX();
 			addr                  = MODRM_MEMADDR();
-			EMU86_WRITE_USER_MEMORY(addr, 8);
+			EMU86_READWRITE_USER_MEMORY(addr, 8);
 			real_oldval.qword = EMU86_MEM_ATOMIC_CMPXCHQ(addr, want_oldval.qword, newval.qword,
-			                                                 (op_flags & EMU86_F_LOCK) != 0);
+			                                             (op_flags & EMU86_F_LOCK) != 0);
 #if __SIZEOF_POINTER__ >= 8
 			if (real_oldval.qword == want_oldval.qword)
 #else /* __SIZEOF_POINTER__ >= 8 */
@@ -96,13 +129,56 @@ case EMU86_OPCODE_ENCODE(0x0fc7):
 				EMU86_SETEAX(real_oldval.dwords[0]);
 				EMU86_SETEDX(real_oldval.dwords[1]);
 			}
+			goto done;
 #else /* EMU86_EMULATE_CONFIG_WANT_CMPXCHG8B && EMU86_MEM_ATOMIC_CMPXCHQ */
+#if EMU86_EMULATE_CONFIG_WANT_CMPXCHG8B
+			if (!(op_flags & EMU86_F_LOCK)) {
+				/* We can easily emulate the non-atomic variant! */
+				union {
+					u64 qword;
+					u32 dwords[2];
+				} real_oldval, want_oldval, newval;
+				byte_t *addr;
+				want_oldval.dwords[0] = EMU86_GETEAX();
+				want_oldval.dwords[1] = EMU86_GETEDX();
+				newval.dwords[0]      = EMU86_GETEBX();
+				newval.dwords[1]      = EMU86_GETECX();
+				addr                  = MODRM_MEMADDR();
+				EMU86_READWRITE_USER_MEMORY(addr, 8);
+#if CONFIG_LIBEMU86_WANT_64BIT
+				real_oldval.qword = EMU86_MEMREADQ(addr);
+#else /* CONFIG_LIBEMU86_WANT_64BIT */
+				real_oldval.dwords[0] = EMU86_MEMREADL(addr + 0);
+				real_oldval.dwords[1] = EMU86_MEMREADL(addr + 4);
+#endif /* !CONFIG_LIBEMU86_WANT_64BIT */
+#if __SIZEOF_POINTER__ >= 8
+				if (real_oldval.qword == want_oldval.qword)
+#else /* __SIZEOF_POINTER__ >= 8 */
+				if (real_oldval.dwords[0] == want_oldval.dwords[0] &&
+				    real_oldval.dwords[1] == want_oldval.dwords[1])
+#endif /* __SIZEOF_POINTER__ < 8 */
+				{
+#if CONFIG_LIBEMU86_WANT_64BIT
+					EMU86_MEMWRITEQ(addr, newval.qword);
+#else /* CONFIG_LIBEMU86_WANT_64BIT */
+					EMU86_MEMWRITEL(addr + 0, newval.dwords[0]);
+					EMU86_MEMWRITEL(addr + 4, newval.dwords[1]);
+#endif /* !CONFIG_LIBEMU86_WANT_64BIT */
+					EMU86_MSKFLAGS(~EFLAGS_ZF, EFLAGS_ZF);
+				} else {
+					EMU86_MSKFLAGS(~EFLAGS_ZF, 0);
+					EMU86_SETEAX(real_oldval.dwords[0]);
+					EMU86_SETEDX(real_oldval.dwords[1]);
+				}
+				goto done;
+			}
+#endif /* EMU86_EMULATE_CONFIG_WANT_CMPXCHG8B */
 			EMU86_UNSUPPORTED_MEMACCESS(MODRM_MEMADDR(), 8, true, true);
 #define NEED_return_unsupported_instruction_rmreg
 			goto return_unsupported_instruction_rmreg;
 #endif /* !EMU86_EMULATE_CONFIG_WANT_CMPXCHG8B || !EMU86_MEM_ATOMIC_CMPXCHQ */
 		}
-		goto done;
+		break;
 	}
 
 	default:
