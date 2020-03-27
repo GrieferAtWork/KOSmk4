@@ -38,6 +38,8 @@ INTDEF struct testdecl __system_tests_end[];
 
 PRIVATE struct testdecl *ctest_current_test = NULL;
 
+#define EL "\e[K" /* EL(ANSITTY_EL_AFTER); */
+
 PRIVATE void
 NOTHROW_NCX(__LIBCCALL do_ctest_vsubtestf)(char const *__restrict format,
                                            va_list args, bool is_status) {
@@ -53,12 +55,9 @@ NOTHROW_NCX(__LIBCCALL do_ctest_vsubtestf)(char const *__restrict format,
 	printf("\tTesting if: ");
 	vprintf(format, args);
 	if (is_status) {
-		/* EL(ANSITTY_EL_AFTER);
-		 * CR(); */
-		printf("\e[K\r");
+		printf(EL "\r");
 	} else {
-		/* NL(); */
-		putchar('\n');
+		printf(EL "\n");
 	}
 }
 
@@ -100,7 +99,7 @@ PRIVATE void run_all_tests(void) {
 		       iter->td_name,
 		       iter->td_file,
 		       iter->td_line);
-		printf("test:%s\n", iter->td_name);
+		printf("test:%s" EL "\n", iter->td_name);
 		(*iter->td_func)();
 	}
 }
@@ -117,7 +116,7 @@ int main(int argc, char *argv[], char *envp[]) {
 	 * KOS should support this feature, but it's never actually been tested... */
 
 	run_all_tests();
-	printf("All tests OK\n");
+	printf("All tests OK" EL "\n");
 	return 0;
 }
 
