@@ -611,11 +611,11 @@ throw_unsupported_instruction(struct icpustate *__restrict state,
 	        : IA32_GS_BASE,            \
 	        (uintptr_t)(v))
 #else /* __x86_64__ */
-#define EMU86_SETFSBASE(v) setfsbase((uintptr_t)(v))
+#define EMU86_SETFSBASE(v) setfsbase(_state, (uintptr_t)(v))
 #define EMU86_SETGSBASE(v) setgsbase((uintptr_t)(v))
 PRIVATE void FCALL
-setfsbase(uintptr_t value) {
-	u16 myfs = __rdfs() & ~3;
+setfsbase(struct icpustate32 *__restrict state, uintptr_t value) {
+	u16 myfs = icpustate_getfs_novm86(state) & ~3;
 	if (myfs == SEGMENT_USER_FSBASE)
 		set_user_fsbase_noreload(value);
 	else if (myfs == SEGMENT_USER_GSBASE)
