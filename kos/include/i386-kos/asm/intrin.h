@@ -25,17 +25,25 @@
 #include <hybrid/typecore.h>
 
 #ifdef __CC__
-
-__SYSDECL_BEGIN
-
+__DECL_BEGIN
 
 #ifdef __COMPILER_HAVE_GCC_ASM
+
+/* `-fnon-call-exception' currently requires __asm__ to be marked as volatile.
+ * s.a. the following bug report: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=94357 */
+#ifndef __asm_ncx_memop__
+#ifdef __NON_CALL_EXCEPTIONS
+#define __asm_ncx_memop__ __asm__ __volatile__
+#else /* __NON_CALL_EXCEPTIONS */
+#define __asm_ncx_memop__	__asm__
+#endif /* !__NON_CALL_EXCEPTIONS */
+#endif /* !__asm_ncx_memop__ */
+
 #ifdef __KERNEL__
 #define __PRIVATE_PREFIX_REP_CLD "cld\n\t"
 #else /* __KERNEL__ */
 #define __PRIVATE_PREFIX_REP_CLD /* nothing */
 #endif /* !__KERNEL__ */
-
 
 /* Read from / write to general purpose registers. */
 #ifdef __x86_64__
@@ -197,15 +205,15 @@ __FORCELOCAL __ATTR_WUNUSED __UINT8_TYPE__ (__lahf)(void) { __UINT16_TYPE__ __re
 __FORCELOCAL void (__sahf)(__UINT8_TYPE__ __fl) { __asm__ __volatile__("sahf" : : "a" ((__UINT16_TYPE__)__fl << 8) : "cc"); }
 __FORCELOCAL __ATTR_NORETURN void (__sysenter)(void) { __asm__ __volatile__("sysenter"); __builtin_unreachable(); }
 __FORCELOCAL __ATTR_NORETURN void (__sysexit)(__UINT32_TYPE__ __uesp, __UINT32_TYPE__ __ueip) { __asm__ __volatile__("sysexit" : : "c" (__uesp), "d" (__ueip)); __builtin_unreachable(); }
-__FORCELOCAL void (__movsb)(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes) { __asm__(__PRIVATE_PREFIX_REP_CLD "rep; movsb" : "+D" (__dst), "+S" (__src), "+c" (__n_bytes), "=m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__,__n_bytes,__dst)) : "m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__,__n_bytes,__src))); }
-__FORCELOCAL void (__movsw)(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_words) { __asm__(__PRIVATE_PREFIX_REP_CLD "rep; movsw" : "+D" (__dst), "+S" (__src), "+c" (__n_words), "=m" (__COMPILER_ASM_BUFFER(__UINT16_TYPE__,__n_words,__dst)) : "m" (__COMPILER_ASM_BUFFER(__UINT16_TYPE__,__n_words,__src))); }
-__FORCELOCAL void (__movsl)(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_dwords) { __asm__(__PRIVATE_PREFIX_REP_CLD "rep; movsl" : "+D" (__dst), "+S" (__src), "+c" (__n_dwords), "=m" (__COMPILER_ASM_BUFFER(__UINT32_TYPE__,__n_dwords,__dst)) : "m" (__COMPILER_ASM_BUFFER(__UINT32_TYPE__,__n_dwords,__src))); }
-__FORCELOCAL void (__stosb)(void *__restrict __dst, __UINT8_TYPE__ __byteval, __SIZE_TYPE__ __n_bytes) { __asm__(__PRIVATE_PREFIX_REP_CLD "rep; stosb" : "+D" (__dst), "+c" (__n_bytes), "=m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__,__n_bytes,__dst)) : "a" (__byteval)); }
-__FORCELOCAL void (__stosw)(void *__restrict __dst, __UINT16_TYPE__ __wordval, __SIZE_TYPE__ __n_words) { __asm__(__PRIVATE_PREFIX_REP_CLD "rep; stosw" : "+D" (__dst), "+c" (__n_words), "=m" (__COMPILER_ASM_BUFFER(__UINT16_TYPE__,__n_words,__dst)) : "a" (__wordval)); }
-__FORCELOCAL void (__stosl)(void *__restrict __dst, __UINT32_TYPE__ __dwordval, __SIZE_TYPE__ __n_dwords) { __asm__(__PRIVATE_PREFIX_REP_CLD "rep; stosl" : "+D" (__dst), "+c" (__n_dwords), "=m" (__COMPILER_ASM_BUFFER(__UINT32_TYPE__,__n_dwords,__dst)) : "a" (__dwordval)); }
+__FORCELOCAL void (__movsb)(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes) { __asm_ncx_memop__(__PRIVATE_PREFIX_REP_CLD "rep; movsb" : "+D" (__dst), "+S" (__src), "+c" (__n_bytes), "=m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__,__n_bytes,__dst)) : "m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__,__n_bytes,__src))); }
+__FORCELOCAL void (__movsw)(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_words) { __asm_ncx_memop__(__PRIVATE_PREFIX_REP_CLD "rep; movsw" : "+D" (__dst), "+S" (__src), "+c" (__n_words), "=m" (__COMPILER_ASM_BUFFER(__UINT16_TYPE__,__n_words,__dst)) : "m" (__COMPILER_ASM_BUFFER(__UINT16_TYPE__,__n_words,__src))); }
+__FORCELOCAL void (__movsl)(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_dwords) { __asm_ncx_memop__(__PRIVATE_PREFIX_REP_CLD "rep; movsl" : "+D" (__dst), "+S" (__src), "+c" (__n_dwords), "=m" (__COMPILER_ASM_BUFFER(__UINT32_TYPE__,__n_dwords,__dst)) : "m" (__COMPILER_ASM_BUFFER(__UINT32_TYPE__,__n_dwords,__src))); }
+__FORCELOCAL void (__stosb)(void *__restrict __dst, __UINT8_TYPE__ __byteval, __SIZE_TYPE__ __n_bytes) { __asm_ncx_memop__(__PRIVATE_PREFIX_REP_CLD "rep; stosb" : "+D" (__dst), "+c" (__n_bytes), "=m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__,__n_bytes,__dst)) : "a" (__byteval)); }
+__FORCELOCAL void (__stosw)(void *__restrict __dst, __UINT16_TYPE__ __wordval, __SIZE_TYPE__ __n_words) { __asm_ncx_memop__(__PRIVATE_PREFIX_REP_CLD "rep; stosw" : "+D" (__dst), "+c" (__n_words), "=m" (__COMPILER_ASM_BUFFER(__UINT16_TYPE__,__n_words,__dst)) : "a" (__wordval)); }
+__FORCELOCAL void (__stosl)(void *__restrict __dst, __UINT32_TYPE__ __dwordval, __SIZE_TYPE__ __n_dwords) { __asm_ncx_memop__(__PRIVATE_PREFIX_REP_CLD "rep; stosl" : "+D" (__dst), "+c" (__n_dwords), "=m" (__COMPILER_ASM_BUFFER(__UINT32_TYPE__,__n_dwords,__dst)) : "a" (__dwordval)); }
 #ifdef __x86_64__
-__FORCELOCAL void (__movsq)(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_qwords) { __asm__(__PRIVATE_PREFIX_REP_CLD "rep; movsq" : "+D" (__dst), "+S" (__src), "+c" (__n_qwords), "=m" (__COMPILER_ASM_BUFFER(__UINT64_TYPE__,__n_qwords,__dst)) : "m" (__COMPILER_ASM_BUFFER(__UINT64_TYPE__,__n_qwords,__src))); }
-__FORCELOCAL void (__stosq)(void *__restrict __dst, __UINT64_TYPE__ __dword, __SIZE_TYPE__ __n_qwords) { __asm__(__PRIVATE_PREFIX_REP_CLD "rep; stosq" : "+D" (__dst), "+c" (__n_qwords), "=m" (__COMPILER_ASM_BUFFER(__UINT64_TYPE__,__n_qwords,__dst)) : "a" (__dword)); }
+__FORCELOCAL void (__movsq)(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_qwords) { __asm_ncx_memop__(__PRIVATE_PREFIX_REP_CLD "rep; movsq" : "+D" (__dst), "+S" (__src), "+c" (__n_qwords), "=m" (__COMPILER_ASM_BUFFER(__UINT64_TYPE__,__n_qwords,__dst)) : "m" (__COMPILER_ASM_BUFFER(__UINT64_TYPE__,__n_qwords,__src))); }
+__FORCELOCAL void (__stosq)(void *__restrict __dst, __UINT64_TYPE__ __dword, __SIZE_TYPE__ __n_qwords) { __asm_ncx_memop__(__PRIVATE_PREFIX_REP_CLD "rep; stosq" : "+D" (__dst), "+c" (__n_qwords), "=m" (__COMPILER_ASM_BUFFER(__UINT64_TYPE__,__n_qwords,__dst)) : "a" (__dword)); }
 #else /* __x86_64__ */
 __FORCELOCAL void (__boundw)(__INT16_TYPE__ const __limits[2], __INT16_TYPE__ __index) { __asm__ __volatile__("boundw %0, %w1" : : "m" (__COMPILER_ASM_BUFFER(__UINT16_TYPE__, 2, __limits)), "r" (__index)); }
 __FORCELOCAL void (__boundl)(__INT32_TYPE__ const __limits[2], __INT32_TYPE__ __index) { __asm__ __volatile__("boundl %0, %k1" : : "m" (__COMPILER_ASM_BUFFER(__UINT32_TYPE__, 2, __limits)), "r" (__index)); }
@@ -309,48 +317,48 @@ __FORCELOCAL void (__ltr)(__UINT16_TYPE__ __val) { __asm__ __volatile__("ltr %w0
 
 /* Segment read/write operators. */
 #ifndef __x86_64__
-__FORCELOCAL __ATTR_PURE __UINT8_TYPE__ (__rddsb)(__UINTPTR_TYPE__ __offset) { __register __UINT8_TYPE__ __result; __asm__("movb %%ds:%1, %b0" : "=q" (__result) : "m" (*(__UINT8_TYPE__ *)__offset)); return __result; }
-__FORCELOCAL __ATTR_PURE __UINT8_TYPE__ (__rdesb)(__UINTPTR_TYPE__ __offset) { __register __UINT8_TYPE__ __result; __asm__("movb %%es:%1, %b0" : "=q" (__result) : "m" (*(__UINT8_TYPE__ *)__offset)); return __result; }
-__FORCELOCAL __ATTR_PURE __UINT8_TYPE__ (__rdssb)(__UINTPTR_TYPE__ __offset) { __register __UINT8_TYPE__ __result; __asm__("movb %%ss:%1, %b0" : "=q" (__result) : "m" (*(__UINT8_TYPE__ *)__offset)); return __result; }
-__FORCELOCAL __ATTR_PURE __UINT8_TYPE__ (__rdcsb)(__UINTPTR_TYPE__ __offset) { __register __UINT8_TYPE__ __result; __asm__("movb %%cs:%1, %b0" : "=q" (__result) : "m" (*(__UINT8_TYPE__ *)__offset)); return __result; }
-__FORCELOCAL __ATTR_PURE __UINT16_TYPE__ (__rddsw)(__UINTPTR_TYPE__ __offset) { __register __UINT16_TYPE__ __result; __asm__("movw %%ds:%1, %w0" : "=r" (__result) : "m" (*(__UINT16_TYPE__ *)__offset)); return __result; }
-__FORCELOCAL __ATTR_PURE __UINT16_TYPE__ (__rdesw)(__UINTPTR_TYPE__ __offset) { __register __UINT16_TYPE__ __result; __asm__("movw %%es:%1, %w0" : "=r" (__result) : "m" (*(__UINT16_TYPE__ *)__offset)); return __result; }
-__FORCELOCAL __ATTR_PURE __UINT16_TYPE__ (__rdssw)(__UINTPTR_TYPE__ __offset) { __register __UINT16_TYPE__ __result; __asm__("movw %%ss:%1, %w0" : "=r" (__result) : "m" (*(__UINT16_TYPE__ *)__offset)); return __result; }
-__FORCELOCAL __ATTR_PURE __UINT16_TYPE__ (__rdcsw)(__UINTPTR_TYPE__ __offset) { __register __UINT16_TYPE__ __result; __asm__("movw %%cs:%1, %w0" : "=r" (__result) : "m" (*(__UINT16_TYPE__ *)__offset)); return __result; }
-__FORCELOCAL __ATTR_PURE __UINT32_TYPE__ (__rddsl)(__UINTPTR_TYPE__ __offset) { __register __UINT32_TYPE__ __result; __asm__("movl %%ds:%1, %k0" : "=r" (__result) : "m" (*(__UINT32_TYPE__ *)__offset)); return __result; }
-__FORCELOCAL __ATTR_PURE __UINT32_TYPE__ (__rdesl)(__UINTPTR_TYPE__ __offset) { __register __UINT32_TYPE__ __result; __asm__("movl %%es:%1, %k0" : "=r" (__result) : "m" (*(__UINT32_TYPE__ *)__offset)); return __result; }
-__FORCELOCAL __ATTR_PURE __UINT32_TYPE__ (__rdssl)(__UINTPTR_TYPE__ __offset) { __register __UINT32_TYPE__ __result; __asm__("movl %%ss:%1, %k0" : "=r" (__result) : "m" (*(__UINT32_TYPE__ *)__offset)); return __result; }
-__FORCELOCAL __ATTR_PURE __UINT32_TYPE__ (__rdcsl)(__UINTPTR_TYPE__ __offset) { __register __UINT32_TYPE__ __result; __asm__("movl %%cs:%1, %k0" : "=r" (__result) : "m" (*(__UINT32_TYPE__ *)__offset)); return __result; }
-__FORCELOCAL void (__wrdsb)(__UINTPTR_TYPE__ __offset, __UINT8_TYPE__ __val) { __asm__("movb %b1, %%ds:%b0" : : "m" (*(__UINT8_TYPE__ *)__offset), "q" (__val)); }
-__FORCELOCAL void (__wresb)(__UINTPTR_TYPE__ __offset, __UINT8_TYPE__ __val) { __asm__("movb %b1, %%es:%b0" : : "m" (*(__UINT8_TYPE__ *)__offset), "q" (__val)); }
-__FORCELOCAL void (__wrssb)(__UINTPTR_TYPE__ __offset, __UINT8_TYPE__ __val) { __asm__("movb %b1, %%ss:%b0" : : "m" (*(__UINT8_TYPE__ *)__offset), "q" (__val)); }
-__FORCELOCAL void (__wrcsb)(__UINTPTR_TYPE__ __offset, __UINT8_TYPE__ __val) { __asm__("movb %b1, %%cs:%b0" : : "m" (*(__UINT8_TYPE__ *)__offset), "q" (__val)); }
-__FORCELOCAL void (__wrdsw)(__UINTPTR_TYPE__ __offset, __UINT16_TYPE__ __val) { __asm__("movw %w1, %%ds:%w0" : : "m" (*(__UINT16_TYPE__ *)__offset), "r" (__val)); }
-__FORCELOCAL void (__wresw)(__UINTPTR_TYPE__ __offset, __UINT16_TYPE__ __val) { __asm__("movw %w1, %%es:%w0" : : "m" (*(__UINT16_TYPE__ *)__offset), "r" (__val)); }
-__FORCELOCAL void (__wrssw)(__UINTPTR_TYPE__ __offset, __UINT16_TYPE__ __val) { __asm__("movw %w1, %%ss:%w0" : : "m" (*(__UINT16_TYPE__ *)__offset), "r" (__val)); }
-__FORCELOCAL void (__wrcsw)(__UINTPTR_TYPE__ __offset, __UINT16_TYPE__ __val) { __asm__("movw %w1, %%cs:%w0" : : "m" (*(__UINT16_TYPE__ *)__offset), "r" (__val)); }
-__FORCELOCAL void (__wrdsl)(__UINTPTR_TYPE__ __offset, __UINT32_TYPE__ __val) { __asm__("movl %k1, %%ds:%k0" : : "m" (*(__UINT32_TYPE__ *)__offset), "r" (__val)); }
-__FORCELOCAL void (__wresl)(__UINTPTR_TYPE__ __offset, __UINT32_TYPE__ __val) { __asm__("movl %k1, %%es:%k0" : : "m" (*(__UINT32_TYPE__ *)__offset), "r" (__val)); }
-__FORCELOCAL void (__wrssl)(__UINTPTR_TYPE__ __offset, __UINT32_TYPE__ __val) { __asm__("movl %k1, %%ss:%k0" : : "m" (*(__UINT32_TYPE__ *)__offset), "r" (__val)); }
-__FORCELOCAL void (__wrcsl)(__UINTPTR_TYPE__ __offset, __UINT32_TYPE__ __val) { __asm__("movl %k1, %%cs:%k0" : : "m" (*(__UINT32_TYPE__ *)__offset), "r" (__val)); }
+__FORCELOCAL __ATTR_PURE __UINT8_TYPE__ (__rddsb)(__UINTPTR_TYPE__ __offset) { __register __UINT8_TYPE__ __result; __asm_ncx_memop__("movb %%ds:%1, %b0" : "=q" (__result) : "m" (*(__UINT8_TYPE__ *)__offset)); return __result; }
+__FORCELOCAL __ATTR_PURE __UINT8_TYPE__ (__rdesb)(__UINTPTR_TYPE__ __offset) { __register __UINT8_TYPE__ __result; __asm_ncx_memop__("movb %%es:%1, %b0" : "=q" (__result) : "m" (*(__UINT8_TYPE__ *)__offset)); return __result; }
+__FORCELOCAL __ATTR_PURE __UINT8_TYPE__ (__rdssb)(__UINTPTR_TYPE__ __offset) { __register __UINT8_TYPE__ __result; __asm_ncx_memop__("movb %%ss:%1, %b0" : "=q" (__result) : "m" (*(__UINT8_TYPE__ *)__offset)); return __result; }
+__FORCELOCAL __ATTR_PURE __UINT8_TYPE__ (__rdcsb)(__UINTPTR_TYPE__ __offset) { __register __UINT8_TYPE__ __result; __asm_ncx_memop__("movb %%cs:%1, %b0" : "=q" (__result) : "m" (*(__UINT8_TYPE__ *)__offset)); return __result; }
+__FORCELOCAL __ATTR_PURE __UINT16_TYPE__ (__rddsw)(__UINTPTR_TYPE__ __offset) { __register __UINT16_TYPE__ __result; __asm_ncx_memop__("movw %%ds:%1, %w0" : "=r" (__result) : "m" (*(__UINT16_TYPE__ *)__offset)); return __result; }
+__FORCELOCAL __ATTR_PURE __UINT16_TYPE__ (__rdesw)(__UINTPTR_TYPE__ __offset) { __register __UINT16_TYPE__ __result; __asm_ncx_memop__("movw %%es:%1, %w0" : "=r" (__result) : "m" (*(__UINT16_TYPE__ *)__offset)); return __result; }
+__FORCELOCAL __ATTR_PURE __UINT16_TYPE__ (__rdssw)(__UINTPTR_TYPE__ __offset) { __register __UINT16_TYPE__ __result; __asm_ncx_memop__("movw %%ss:%1, %w0" : "=r" (__result) : "m" (*(__UINT16_TYPE__ *)__offset)); return __result; }
+__FORCELOCAL __ATTR_PURE __UINT16_TYPE__ (__rdcsw)(__UINTPTR_TYPE__ __offset) { __register __UINT16_TYPE__ __result; __asm_ncx_memop__("movw %%cs:%1, %w0" : "=r" (__result) : "m" (*(__UINT16_TYPE__ *)__offset)); return __result; }
+__FORCELOCAL __ATTR_PURE __UINT32_TYPE__ (__rddsl)(__UINTPTR_TYPE__ __offset) { __register __UINT32_TYPE__ __result; __asm_ncx_memop__("movl %%ds:%1, %k0" : "=r" (__result) : "m" (*(__UINT32_TYPE__ *)__offset)); return __result; }
+__FORCELOCAL __ATTR_PURE __UINT32_TYPE__ (__rdesl)(__UINTPTR_TYPE__ __offset) { __register __UINT32_TYPE__ __result; __asm_ncx_memop__("movl %%es:%1, %k0" : "=r" (__result) : "m" (*(__UINT32_TYPE__ *)__offset)); return __result; }
+__FORCELOCAL __ATTR_PURE __UINT32_TYPE__ (__rdssl)(__UINTPTR_TYPE__ __offset) { __register __UINT32_TYPE__ __result; __asm_ncx_memop__("movl %%ss:%1, %k0" : "=r" (__result) : "m" (*(__UINT32_TYPE__ *)__offset)); return __result; }
+__FORCELOCAL __ATTR_PURE __UINT32_TYPE__ (__rdcsl)(__UINTPTR_TYPE__ __offset) { __register __UINT32_TYPE__ __result; __asm_ncx_memop__("movl %%cs:%1, %k0" : "=r" (__result) : "m" (*(__UINT32_TYPE__ *)__offset)); return __result; }
+__FORCELOCAL void (__wrdsb)(__UINTPTR_TYPE__ __offset, __UINT8_TYPE__ __val) { __asm_ncx_memop__("movb %b1, %%ds:%b0" : : "m" (*(__UINT8_TYPE__ *)__offset), "q" (__val)); }
+__FORCELOCAL void (__wresb)(__UINTPTR_TYPE__ __offset, __UINT8_TYPE__ __val) { __asm_ncx_memop__("movb %b1, %%es:%b0" : : "m" (*(__UINT8_TYPE__ *)__offset), "q" (__val)); }
+__FORCELOCAL void (__wrssb)(__UINTPTR_TYPE__ __offset, __UINT8_TYPE__ __val) { __asm_ncx_memop__("movb %b1, %%ss:%b0" : : "m" (*(__UINT8_TYPE__ *)__offset), "q" (__val)); }
+__FORCELOCAL void (__wrcsb)(__UINTPTR_TYPE__ __offset, __UINT8_TYPE__ __val) { __asm_ncx_memop__("movb %b1, %%cs:%b0" : : "m" (*(__UINT8_TYPE__ *)__offset), "q" (__val)); }
+__FORCELOCAL void (__wrdsw)(__UINTPTR_TYPE__ __offset, __UINT16_TYPE__ __val) { __asm_ncx_memop__("movw %w1, %%ds:%w0" : : "m" (*(__UINT16_TYPE__ *)__offset), "r" (__val)); }
+__FORCELOCAL void (__wresw)(__UINTPTR_TYPE__ __offset, __UINT16_TYPE__ __val) { __asm_ncx_memop__("movw %w1, %%es:%w0" : : "m" (*(__UINT16_TYPE__ *)__offset), "r" (__val)); }
+__FORCELOCAL void (__wrssw)(__UINTPTR_TYPE__ __offset, __UINT16_TYPE__ __val) { __asm_ncx_memop__("movw %w1, %%ss:%w0" : : "m" (*(__UINT16_TYPE__ *)__offset), "r" (__val)); }
+__FORCELOCAL void (__wrcsw)(__UINTPTR_TYPE__ __offset, __UINT16_TYPE__ __val) { __asm_ncx_memop__("movw %w1, %%cs:%w0" : : "m" (*(__UINT16_TYPE__ *)__offset), "r" (__val)); }
+__FORCELOCAL void (__wrdsl)(__UINTPTR_TYPE__ __offset, __UINT32_TYPE__ __val) { __asm_ncx_memop__("movl %k1, %%ds:%k0" : : "m" (*(__UINT32_TYPE__ *)__offset), "r" (__val)); }
+__FORCELOCAL void (__wresl)(__UINTPTR_TYPE__ __offset, __UINT32_TYPE__ __val) { __asm_ncx_memop__("movl %k1, %%es:%k0" : : "m" (*(__UINT32_TYPE__ *)__offset), "r" (__val)); }
+__FORCELOCAL void (__wrssl)(__UINTPTR_TYPE__ __offset, __UINT32_TYPE__ __val) { __asm_ncx_memop__("movl %k1, %%ss:%k0" : : "m" (*(__UINT32_TYPE__ *)__offset), "r" (__val)); }
+__FORCELOCAL void (__wrcsl)(__UINTPTR_TYPE__ __offset, __UINT32_TYPE__ __val) { __asm_ncx_memop__("movl %k1, %%cs:%k0" : : "m" (*(__UINT32_TYPE__ *)__offset), "r" (__val)); }
 #endif /* !__x86_64__ */
-__FORCELOCAL __ATTR_PURE __UINT8_TYPE__ (__rdfsb)(__UINTPTR_TYPE__ __offset) { __register __UINT8_TYPE__ __result; __asm__("movb %%fs:%1, %b0" : "=q" (__result) : "m" (*(__UINT8_TYPE__ *)__offset)); return __result; }
-__FORCELOCAL __ATTR_PURE __UINT8_TYPE__ (__rdgsb)(__UINTPTR_TYPE__ __offset) { __register __UINT8_TYPE__ __result; __asm__("movb %%gs:%1, %b0" : "=q" (__result) : "m" (*(__UINT8_TYPE__ *)__offset)); return __result; }
-__FORCELOCAL __ATTR_PURE __UINT16_TYPE__ (__rdfsw)(__UINTPTR_TYPE__ __offset) { __register __UINT16_TYPE__ __result; __asm__("movw %%fs:%1, %w0" : "=r" (__result) : "m" (*(__UINT16_TYPE__ *)__offset)); return __result; }
-__FORCELOCAL __ATTR_PURE __UINT16_TYPE__ (__rdgsw)(__UINTPTR_TYPE__ __offset) { __register __UINT16_TYPE__ __result; __asm__("movw %%gs:%1, %w0" : "=r" (__result) : "m" (*(__UINT16_TYPE__ *)__offset)); return __result; }
-__FORCELOCAL __ATTR_PURE __UINT32_TYPE__ (__rdfsl)(__UINTPTR_TYPE__ __offset) { __register __UINT32_TYPE__ __result; __asm__("movl %%fs:%1, %k0" : "=r" (__result) : "m" (*(__UINT32_TYPE__ *)__offset)); return __result; }
-__FORCELOCAL __ATTR_PURE __UINT32_TYPE__ (__rdgsl)(__UINTPTR_TYPE__ __offset) { __register __UINT32_TYPE__ __result; __asm__("movl %%gs:%1, %k0" : "=r" (__result) : "m" (*(__UINT32_TYPE__ *)__offset)); return __result; }
-__FORCELOCAL void (__wrfsb)(__UINTPTR_TYPE__ __offset, __UINT8_TYPE__ __val) { __asm__("movb %b1, %%fs:%b0" : : "m" (*(__UINT8_TYPE__ *)__offset), "q" (__val)); }
-__FORCELOCAL void (__wrgsb)(__UINTPTR_TYPE__ __offset, __UINT8_TYPE__ __val) { __asm__("movb %b1, %%gs:%b0" : : "m" (*(__UINT8_TYPE__ *)__offset), "q" (__val)); }
-__FORCELOCAL void (__wrfsw)(__UINTPTR_TYPE__ __offset, __UINT16_TYPE__ __val) { __asm__("movw %w1, %%fs:%w0" : : "m" (*(__UINT16_TYPE__ *)__offset), "r" (__val)); }
-__FORCELOCAL void (__wrgsw)(__UINTPTR_TYPE__ __offset, __UINT16_TYPE__ __val) { __asm__("movw %w1, %%gs:%w0" : : "m" (*(__UINT16_TYPE__ *)__offset), "r" (__val)); }
-__FORCELOCAL void (__wrfsl)(__UINTPTR_TYPE__ __offset, __UINT32_TYPE__ __val) { __asm__("movl %k1, %%fs:%k0" : : "m" (*(__UINT32_TYPE__ *)__offset), "r" (__val)); }
-__FORCELOCAL void (__wrgsl)(__UINTPTR_TYPE__ __offset, __UINT32_TYPE__ __val) { __asm__("movl %k1, %%gs:%k0" : : "m" (*(__UINT32_TYPE__ *)__offset), "r" (__val)); }
+__FORCELOCAL __ATTR_PURE __UINT8_TYPE__ (__rdfsb)(__UINTPTR_TYPE__ __offset) { __register __UINT8_TYPE__ __result; __asm_ncx_memop__("movb %%fs:%1, %b0" : "=q" (__result) : "m" (*(__UINT8_TYPE__ *)__offset)); return __result; }
+__FORCELOCAL __ATTR_PURE __UINT8_TYPE__ (__rdgsb)(__UINTPTR_TYPE__ __offset) { __register __UINT8_TYPE__ __result; __asm_ncx_memop__("movb %%gs:%1, %b0" : "=q" (__result) : "m" (*(__UINT8_TYPE__ *)__offset)); return __result; }
+__FORCELOCAL __ATTR_PURE __UINT16_TYPE__ (__rdfsw)(__UINTPTR_TYPE__ __offset) { __register __UINT16_TYPE__ __result; __asm_ncx_memop__("movw %%fs:%1, %w0" : "=r" (__result) : "m" (*(__UINT16_TYPE__ *)__offset)); return __result; }
+__FORCELOCAL __ATTR_PURE __UINT16_TYPE__ (__rdgsw)(__UINTPTR_TYPE__ __offset) { __register __UINT16_TYPE__ __result; __asm_ncx_memop__("movw %%gs:%1, %w0" : "=r" (__result) : "m" (*(__UINT16_TYPE__ *)__offset)); return __result; }
+__FORCELOCAL __ATTR_PURE __UINT32_TYPE__ (__rdfsl)(__UINTPTR_TYPE__ __offset) { __register __UINT32_TYPE__ __result; __asm_ncx_memop__("movl %%fs:%1, %k0" : "=r" (__result) : "m" (*(__UINT32_TYPE__ *)__offset)); return __result; }
+__FORCELOCAL __ATTR_PURE __UINT32_TYPE__ (__rdgsl)(__UINTPTR_TYPE__ __offset) { __register __UINT32_TYPE__ __result; __asm_ncx_memop__("movl %%gs:%1, %k0" : "=r" (__result) : "m" (*(__UINT32_TYPE__ *)__offset)); return __result; }
+__FORCELOCAL void (__wrfsb)(__UINTPTR_TYPE__ __offset, __UINT8_TYPE__ __val) { __asm_ncx_memop__("movb %b1, %%fs:%b0" : : "m" (*(__UINT8_TYPE__ *)__offset), "q" (__val)); }
+__FORCELOCAL void (__wrgsb)(__UINTPTR_TYPE__ __offset, __UINT8_TYPE__ __val) { __asm_ncx_memop__("movb %b1, %%gs:%b0" : : "m" (*(__UINT8_TYPE__ *)__offset), "q" (__val)); }
+__FORCELOCAL void (__wrfsw)(__UINTPTR_TYPE__ __offset, __UINT16_TYPE__ __val) { __asm_ncx_memop__("movw %w1, %%fs:%w0" : : "m" (*(__UINT16_TYPE__ *)__offset), "r" (__val)); }
+__FORCELOCAL void (__wrgsw)(__UINTPTR_TYPE__ __offset, __UINT16_TYPE__ __val) { __asm_ncx_memop__("movw %w1, %%gs:%w0" : : "m" (*(__UINT16_TYPE__ *)__offset), "r" (__val)); }
+__FORCELOCAL void (__wrfsl)(__UINTPTR_TYPE__ __offset, __UINT32_TYPE__ __val) { __asm_ncx_memop__("movl %k1, %%fs:%k0" : : "m" (*(__UINT32_TYPE__ *)__offset), "r" (__val)); }
+__FORCELOCAL void (__wrgsl)(__UINTPTR_TYPE__ __offset, __UINT32_TYPE__ __val) { __asm_ncx_memop__("movl %k1, %%gs:%k0" : : "m" (*(__UINT32_TYPE__ *)__offset), "r" (__val)); }
 #ifdef __x86_64__
-__FORCELOCAL __ATTR_PURE __UINT64_TYPE__ (__rdfsq)(__UINTPTR_TYPE__ __offset) { __register __UINT64_TYPE__ __result; __asm__("movq %%fs:%1, %q0" : "=r" (__result) : "m" (*(__UINT64_TYPE__ *)__offset)); return __result; }
-__FORCELOCAL __ATTR_PURE __UINT64_TYPE__ (__rdgsq)(__UINTPTR_TYPE__ __offset) { __register __UINT64_TYPE__ __result; __asm__("movq %%gs:%1, %q0" : "=r" (__result) : "m" (*(__UINT64_TYPE__ *)__offset)); return __result; }
-__FORCELOCAL void (__wrfsq)(__UINTPTR_TYPE__ __offset, __UINT64_TYPE__ __val) { __asm__("movq %q1, %%fs:%0" : : "m" (*(__UINT64_TYPE__ *)__offset), "r" (__val)); }
-__FORCELOCAL void (__wrgsq)(__UINTPTR_TYPE__ __offset, __UINT64_TYPE__ __val) { __asm__("movq %q1, %%gs:%0" : : "m" (*(__UINT64_TYPE__ *)__offset), "r" (__val)); }
+__FORCELOCAL __ATTR_PURE __UINT64_TYPE__ (__rdfsq)(__UINTPTR_TYPE__ __offset) { __register __UINT64_TYPE__ __result; __asm_ncx_memop__("movq %%fs:%1, %q0" : "=r" (__result) : "m" (*(__UINT64_TYPE__ *)__offset)); return __result; }
+__FORCELOCAL __ATTR_PURE __UINT64_TYPE__ (__rdgsq)(__UINTPTR_TYPE__ __offset) { __register __UINT64_TYPE__ __result; __asm_ncx_memop__("movq %%gs:%1, %q0" : "=r" (__result) : "m" (*(__UINT64_TYPE__ *)__offset)); return __result; }
+__FORCELOCAL void (__wrfsq)(__UINTPTR_TYPE__ __offset, __UINT64_TYPE__ __val) { __asm_ncx_memop__("movq %q1, %%fs:%0" : : "m" (*(__UINT64_TYPE__ *)__offset), "r" (__val)); }
+__FORCELOCAL void (__wrgsq)(__UINTPTR_TYPE__ __offset, __UINT64_TYPE__ __val) { __asm_ncx_memop__("movq %q1, %%gs:%0" : : "m" (*(__UINT64_TYPE__ *)__offset), "r" (__val)); }
 __FORCELOCAL __ATTR_PURE void *(__rdfsptr)(__UINTPTR_TYPE__ __offset) { return (void *)__rdfsq(__offset); }
 __FORCELOCAL __ATTR_PURE void *(__rdgsptr)(__UINTPTR_TYPE__ __offset) { return (void *)__rdgsq(__offset); }
 __FORCELOCAL void (__wrfsptr)(__UINTPTR_TYPE__ __offset, void *__val) { __wrfsq(__offset,(__UINT64_TYPE__)__val); }
@@ -388,30 +396,30 @@ __FORCELOCAL void (__outsl)(__UINT16_TYPE__ __port, void const *__restrict __src
 #ifdef __x86_64__
 #ifdef __KERNEL__
 #include <kernel/arch/fsgsbase.h>
-__FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdfsbasel)(void) { __register __UINT64_TYPE__ __result; __asm__("safe_rdfsbase %0" : "=r" (__result)); return (__UINT32_TYPE__)__result; }
-__FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdgsbasel)(void) { __register __UINT64_TYPE__ __result; __asm__("safe_rdgsbase %0" : "=r" (__result)); return (__UINT32_TYPE__)__result; }
-__FORCELOCAL void (__wrfsbasel)(__UINT32_TYPE__ __val) { __asm__("safe_wrfsbase %0" : : "r" ((__UINT64_TYPE__)__val)); }
-__FORCELOCAL void (__wrgsbasel)(__UINT32_TYPE__ __val) { __asm__("safe_wrgsbase %0" : : "r" ((__UINT64_TYPE__)__val)); }
-__FORCELOCAL __ATTR_WUNUSED __UINT64_TYPE__ (__rdfsbaseq)(void) { __register __UINT64_TYPE__ __result; __asm__("safe_rdfsbase %0" : "=r" (__result)); return __result; }
-__FORCELOCAL __ATTR_WUNUSED __UINT64_TYPE__ (__rdgsbaseq)(void) { __register __UINT64_TYPE__ __result; __asm__("safe_rdgsbase %0" : "=r" (__result)); return __result; }
-__FORCELOCAL void (__wrfsbaseq)(__UINT64_TYPE__ __val) { __asm__("safe_wrfsbase %0" : : "r" (__val)); }
-__FORCELOCAL void (__wrgsbaseq)(__UINT64_TYPE__ __val) { __asm__("safe_wrgsbase %0" : : "r" (__val)); }
+__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __UINT32_TYPE__ (__rdfsbasel)(void) { __register __UINT64_TYPE__ __result; __asm__("safe_rdfsbase %0" : "=r" (__result)); return (__UINT32_TYPE__)__result; }
+__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __UINT32_TYPE__ (__rdgsbasel)(void) { __register __UINT64_TYPE__ __result; __asm__("safe_rdgsbase %0" : "=r" (__result)); return (__UINT32_TYPE__)__result; }
+__FORCELOCAL void (__wrfsbasel)(__UINT32_TYPE__ __val) { __asm__ __volatile__("safe_wrfsbase %0" : : "r" ((__UINT64_TYPE__)__val)); }
+__FORCELOCAL void (__wrgsbasel)(__UINT32_TYPE__ __val) { __asm__ __volatile__("safe_wrgsbase %0" : : "r" ((__UINT64_TYPE__)__val)); }
+__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __UINT64_TYPE__ (__rdfsbaseq)(void) { __register __UINT64_TYPE__ __result; __asm__("safe_rdfsbase %0" : "=r" (__result)); return __result; }
+__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __UINT64_TYPE__ (__rdgsbaseq)(void) { __register __UINT64_TYPE__ __result; __asm__("safe_rdgsbase %0" : "=r" (__result)); return __result; }
+__FORCELOCAL void (__wrfsbaseq)(__UINT64_TYPE__ __val) { __asm__ __volatile__("safe_wrfsbase %0" : : "r" (__val)); }
+__FORCELOCAL void (__wrgsbaseq)(__UINT64_TYPE__ __val) { __asm__ __volatile__("safe_wrgsbase %0" : : "r" (__val)); }
 #else /* __KERNEL__ */
-__FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdfsbasel)(void) { __register __UINT32_TYPE__ __result; __asm__("rdfsbase %d0" : "=r" (__result)); return __result; }
-__FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdgsbasel)(void) { __register __UINT32_TYPE__ __result; __asm__("rdgsbase %d0" : "=r" (__result)); return __result; }
-__FORCELOCAL void (__wrfsbasel)(__UINT32_TYPE__ __val) { __asm__("wrfsbase %d0" : : "r" (__val)); }
-__FORCELOCAL void (__wrgsbasel)(__UINT32_TYPE__ __val) { __asm__("wrgsbase %d0" : : "r" (__val)); }
-__FORCELOCAL __ATTR_WUNUSED __UINT64_TYPE__ (__rdfsbaseq)(void) { __register __UINT64_TYPE__ __result; __asm__("rdfsbase %0" : "=r" (__result)); return __result; }
-__FORCELOCAL __ATTR_WUNUSED __UINT64_TYPE__ (__rdgsbaseq)(void) { __register __UINT64_TYPE__ __result; __asm__("rdgsbase %0" : "=r" (__result)); return __result; }
-__FORCELOCAL void (__wrfsbaseq)(__UINT64_TYPE__ __val) { __asm__("wrfsbase %0" : : "r" (__val)); }
-__FORCELOCAL void (__wrgsbaseq)(__UINT64_TYPE__ __val) { __asm__("wrgsbase %0" : : "r" (__val)); }
+__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __UINT32_TYPE__ (__rdfsbasel)(void) { __register __UINT32_TYPE__ __result; __asm__("rdfsbase %d0" : "=r" (__result)); return __result; }
+__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __UINT32_TYPE__ (__rdgsbasel)(void) { __register __UINT32_TYPE__ __result; __asm__("rdgsbase %d0" : "=r" (__result)); return __result; }
+__FORCELOCAL void (__wrfsbasel)(__UINT32_TYPE__ __val) { __asm__ __volatile__("wrfsbase %d0" : : "r" (__val)); }
+__FORCELOCAL void (__wrgsbasel)(__UINT32_TYPE__ __val) { __asm__ __volatile__("wrgsbase %d0" : : "r" (__val)); }
+__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __UINT64_TYPE__ (__rdfsbaseq)(void) { __register __UINT64_TYPE__ __result; __asm__("rdfsbase %0" : "=r" (__result)); return __result; }
+__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __UINT64_TYPE__ (__rdgsbaseq)(void) { __register __UINT64_TYPE__ __result; __asm__("rdgsbase %0" : "=r" (__result)); return __result; }
+__FORCELOCAL void (__wrfsbaseq)(__UINT64_TYPE__ __val) { __asm__ __volatile__("wrfsbase %0" : : "r" (__val)); }
+__FORCELOCAL void (__wrgsbaseq)(__UINT64_TYPE__ __val) { __asm__ __volatile__("wrgsbase %0" : : "r" (__val)); }
 #endif /* !__KERNEL__ */
 __FORCELOCAL void (__swapgs)(void) { __asm__ __volatile__("swapgs"); }
 
 /* Get/Set the fs/gs base as a pointer */
 #ifdef __INTELLISENSE__
-__ATTR_WUNUSED void *(__rdfsbase)(void);
-__ATTR_WUNUSED void *(__rdgsbase)(void);
+__ATTR_PURE __ATTR_WUNUSED void *(__rdfsbase)(void);
+__ATTR_PURE __ATTR_WUNUSED void *(__rdgsbase)(void);
 void (__wrfsbase)(void *__val);
 void (__wrgsbase)(void *__val);
 #else /* __INTELLISENSE__ */
@@ -443,7 +451,7 @@ void (__wrgsbase)(void *__val);
  *       let's just be safe and encode them manually, rather than relying on the assembler
  *       to already provide them as an extension.
  * s.a.: https://www.felixcloutier.com/x86/rdfsbase:rdgsbase */
-__FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdfsbasel)(void) {
+__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __UINT32_TYPE__ (__rdfsbasel)(void) {
 	/* HINT: modrm.mi_reg = 0 */
 	__register __UINT32_TYPE__ __result;
 	__asm__(".byte 0xf3,0x0f,0xae\n\t"
@@ -459,7 +467,7 @@ __FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdfsbasel)(void) {
 	        ) : "=r" (__result));
 	return __result;
 }
-__FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdgsbasel)(void) {
+__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __UINT32_TYPE__ (__rdgsbasel)(void) {
 	/* HINT: modrm.mi_reg = 1 */
 	__register __UINT32_TYPE__ __result;
 	__asm__(".byte 0xf3,0x0f,0xae\n\t"
@@ -478,46 +486,46 @@ __FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdgsbasel)(void) {
 
 __FORCELOCAL void (__wrfsbasel)(__UINT32_TYPE__ __val) {
 	/* HINT: modrm.mi_reg = 2 */
-	__asm__(".byte 0xf3,0x0f,0xae\n\t"
-	        __PRIVATE_EMIT_BYTE_REGISTER_SELECT("%k0"
-	        , "0xd0" /* 0b_11_010_000 */
-	        , "0xd1" /* 0b_11_010_001 */
-	        , "0xd2" /* 0b_11_010_010 */
-	        , "0xd3" /* 0b_11_010_011 */
-	        , "0xd4" /* 0b_11_010_100 */
-	        , "0xd5" /* 0b_11_010_101 */
-	        , "0xd6" /* 0b_11_010_110 */
-	        , "0xd7" /* 0b_11_010_111 */
-	        ) : : "r" (__val));
+	__asm__ __volatile__(".byte 0xf3,0x0f,0xae\n\t"
+	                     __PRIVATE_EMIT_BYTE_REGISTER_SELECT("%k0"
+	                     , "0xd0" /* 0b_11_010_000 */
+	                     , "0xd1" /* 0b_11_010_001 */
+	                     , "0xd2" /* 0b_11_010_010 */
+	                     , "0xd3" /* 0b_11_010_011 */
+	                     , "0xd4" /* 0b_11_010_100 */
+	                     , "0xd5" /* 0b_11_010_101 */
+	                     , "0xd6" /* 0b_11_010_110 */
+	                     , "0xd7" /* 0b_11_010_111 */
+	                     ) : : "r" (__val));
 }
 
 __FORCELOCAL void (__wrgsbasel)(__UINT32_TYPE__ __val) {
 	/* HINT: modrm.mi_reg = 3 */
-	__asm__(".byte 0xf3,0x0f,0xae\n\t"
-	        __PRIVATE_EMIT_BYTE_REGISTER_SELECT("%k0"
-	        , "0xd8" /* 0b_11_011_000 */
-	        , "0xd9" /* 0b_11_011_001 */
-	        , "0xda" /* 0b_11_011_010 */
-	        , "0xdb" /* 0b_11_011_011 */
-	        , "0xdc" /* 0b_11_011_100 */
-	        , "0xdd" /* 0b_11_011_101 */
-	        , "0xde" /* 0b_11_011_110 */
-	        , "0xdf" /* 0b_11_011_111 */
-	        ) : : "r" (__val));
+	__asm__ __volatile__(".byte 0xf3,0x0f,0xae\n\t"
+	                     __PRIVATE_EMIT_BYTE_REGISTER_SELECT("%k0"
+	                     , "0xd8" /* 0b_11_011_000 */
+	                     , "0xd9" /* 0b_11_011_001 */
+	                     , "0xda" /* 0b_11_011_010 */
+	                     , "0xdb" /* 0b_11_011_011 */
+	                     , "0xdc" /* 0b_11_011_100 */
+	                     , "0xdd" /* 0b_11_011_101 */
+	                     , "0xde" /* 0b_11_011_110 */
+	                     , "0xdf" /* 0b_11_011_111 */
+	                     ) : : "r" (__val));
 }
 #undef __PRIVATE_EMIT_BYTE_REGISTER_SELECT
 
 /* Get/Set the fs/gs base as a pointer */
 #ifdef __INTELLISENSE__
-__ATTR_WUNUSED void *(__rdfsbase)(void);
-__ATTR_WUNUSED void *(__rdgsbase)(void);
+__ATTR_PURE __ATTR_WUNUSED void *(__rdfsbase)(void);
+__ATTR_PURE __ATTR_WUNUSED void *(__rdgsbase)(void);
 void (__wrfsbase)(void *__val);
 void (__wrgsbase)(void *__val);
 #else /* __INTELLISENSE__ */
-#define __rdfsbase()     ((void *)__rdfsbasel())
-#define __rdgsbase()     ((void *)__rdgsbasel())
-#define __wrfsbase(val)    __wrfsbasel((__UINT32_TYPE__)(void *)(val))
-#define __wrgsbase(val)    __wrgsbasel((__UINT32_TYPE__)(void *)(val))
+#define __rdfsbase()    ((void *)__rdfsbasel())
+#define __rdgsbase()    ((void *)__rdgsbasel())
+#define __wrfsbase(val) __wrfsbasel((__UINT32_TYPE__)(void *)(val))
+#define __wrgsbase(val) __wrgsbasel((__UINT32_TYPE__)(void *)(val))
 #endif /* !__INTELLISENSE__ */
 #endif
 
@@ -586,8 +594,7 @@ __NAMESPACE_INT_BEGIN
 __NAMESPACE_INT_END
 #endif
 
-__SYSDECL_END
-
+__DECL_END
 #endif /* __CC__ */
 
 

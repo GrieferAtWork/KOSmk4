@@ -478,10 +478,10 @@ DEFINE_TEST(segfault_special_addresses) {
 	test_addr((void *)UINT64_C(0xffff800000000000), true, true);   /* Min kernel-space address */
 	test_addr((void *)UINT64_C(0xffffffffffffffff), true, true);   /* Max kernel-space address */
 #else /* __x86_64__ */
-	test_addr((void *)UINT32_C(0x00000000), true, false);  /* Min user-space address */
-	test_addr((void *)UINT32_C(0xbfffffff), true, false);  /* Max user-space address */
-	test_addr((void *)UINT32_C(0xc0000000), true, true);   /* Min kernel-space address */
-	test_addr((void *)UINT32_C(0xffffffff), true, true);   /* Max kernel-space address */
+	test_addr((void *)UINT32_C(0x00000000), true, false); /* Min user-space address */
+	test_addr((void *)UINT32_C(0xbfffffff), true, false); /* Max user-space address */
+	test_addr((void *)UINT32_C(0xc0000000), true, true);  /* Min kernel-space address */
+	test_addr((void *)UINT32_C(0xffffffff), true, true);  /* Max kernel-space address */
 #endif /* !__x86_64__ */
 }
 

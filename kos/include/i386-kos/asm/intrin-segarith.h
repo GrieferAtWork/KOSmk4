@@ -28,7 +28,17 @@
 /* Segment-relative arithmetic */
 
 #ifdef __CC__
-__SYSDECL_BEGIN
+__DECL_BEGIN
+
+/* `-fnon-call-exception' currently requires __asm__ to be marked as volatile.
+ * s.a. the following bug report: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=94357 */
+#ifndef __asm_ncx_memop__
+#ifdef __NON_CALL_EXCEPTIONS
+#define __asm_ncx_memop__ __asm__ __volatile__
+#else /* __NON_CALL_EXCEPTIONS */
+#define __asm_ncx_memop__	__asm__
+#endif /* !__NON_CALL_EXCEPTIONS */
+#endif /* !__asm_ncx_memop__ */
 
 #ifdef __x86_64__
 #define __INTRIN_LOCK_IF_X86_64(...) __VA_ARGS__
@@ -37,50 +47,50 @@ __SYSDECL_BEGIN
 #endif /* !__x86_64__ */
 
 
-#define __DEFINE_ARTH_UNARY_SEG(name, seg) \
+#define __DEFINE_ARTH_UNARY_SEG(name, seg)                             \
 	__FORCELOCAL void (__##name##seg##b)(__ULONGPTR_TYPE__ __offset) { \
-		__asm__(#name "b %%" #seg ":%b0"                               \
-		        :                                                      \
-		        : "m" (*(__UINT8_TYPE__ *)__offset)                    \
-		        : "cc", "memory");                                     \
+		__asm_ncx_memop__(#name "b %%" #seg ":%b0"                     \
+		                  :                                            \
+		                  : "m" (*(__UINT8_TYPE__ *)__offset)          \
+		                  : "cc", "memory");                           \
 	}                                                                  \
 	__FORCELOCAL void (__##name##seg##w)(__ULONGPTR_TYPE__ __offset) { \
-		__asm__(#name "w %%" #seg ":%w0"                               \
-		        :                                                      \
-		        : "m" (*(__UINT16_TYPE__ *)__offset)                   \
-		        : "cc", "memory");                                     \
+		__asm_ncx_memop__(#name "w %%" #seg ":%w0"                     \
+		                  :                                            \
+		                  : "m" (*(__UINT16_TYPE__ *)__offset)         \
+		                  : "cc", "memory");                           \
 	}                                                                  \
 	__FORCELOCAL void (__##name##seg##l)(__ULONGPTR_TYPE__ __offset) { \
-		__asm__(#name "l %%" #seg ":%k0"                               \
-		        :                                                      \
-		        : "m" (*(__UINT32_TYPE__ *)__offset)                   \
-		        : "cc", "memory");                                     \
+		__asm_ncx_memop__(#name "l %%" #seg ":%k0"                     \
+		                  :                                            \
+		                  : "m" (*(__UINT32_TYPE__ *)__offset)         \
+		                  : "cc", "memory");                           \
 	}
-#define __DEFINE_ARTH_BINARY_SEG(name, seg) \
+#define __DEFINE_ARTH_BINARY_SEG(name, seg)                                                   \
 	__FORCELOCAL void (__##name##seg##b)(__ULONGPTR_TYPE__ __offset, __UINT8_TYPE__ __val) {  \
-		__asm__(#name "b %%" #seg ":%b1, %b0"                                                 \
-		        :                                                                             \
-		        : "m" (*(__UINT8_TYPE__ *)__offset), "q" (__val)                              \
-		        : "cc", "memory");                                                            \
+		__asm_ncx_memop__(#name "b %%" #seg ":%b1, %b0"                                       \
+		                  :                                                                   \
+		                  : "m" (*(__UINT8_TYPE__ *)__offset), "q" (__val)                    \
+		                  : "cc", "memory");                                                  \
 	}                                                                                         \
 	__FORCELOCAL void (__##name##seg##w)(__ULONGPTR_TYPE__ __offset, __UINT16_TYPE__ __val) { \
-		__asm__(#name "w %%" #seg ":%w1, %w0"                                                 \
-		        :                                                                             \
-		        : "m" (*(__UINT16_TYPE__ *)__offset), "r" (__val)                             \
-		        : "cc", "memory");                                                            \
+		__asm_ncx_memop__(#name "w %%" #seg ":%w1, %w0"                                       \
+		                  :                                                                   \
+		                  : "m" (*(__UINT16_TYPE__ *)__offset), "r" (__val)                   \
+		                  : "cc", "memory");                                                  \
 	}                                                                                         \
 	__FORCELOCAL void (__##name##seg##l)(__ULONGPTR_TYPE__ __offset, __UINT32_TYPE__ __val) { \
-		__asm__(#name "l %%" #seg ":%k1, %k0"                                                 \
-		        :                                                                             \
-		        : "m" (*(__UINT32_TYPE__ *)__offset), "r" (__val)                             \
-		        : "cc", "memory");                                                            \
+		__asm_ncx_memop__(#name "l %%" #seg ":%k1, %k0"                                       \
+		                  :                                                                   \
+		                  : "m" (*(__UINT32_TYPE__ *)__offset), "r" (__val)                   \
+		                  : "cc", "memory");                                                  \
 	}
 #define __DEFINE_WITH_SEGMENTS(callback, name) \
-	callback(name, ds) \
-	callback(name, es) \
-	callback(name, fs) \
-	callback(name, gs) \
-	callback(name, cs) \
+	callback(name, ds)                         \
+	callback(name, es)                         \
+	callback(name, fs)                         \
+	callback(name, gs)                         \
+	callback(name, cs)                         \
 	callback(name, ss)
 __DEFINE_WITH_SEGMENTS(__DEFINE_ARTH_BINARY_SEG, add)
 __DEFINE_WITH_SEGMENTS(__DEFINE_ARTH_BINARY_SEG, sub)
@@ -90,7 +100,7 @@ __DEFINE_WITH_SEGMENTS(__DEFINE_ARTH_UNARY_SEG, dec)
 #undef __DEFINE_ARTH_UNARY_SEG
 #undef __INTRIN_LOCK_IF_X86_64
 
-__SYSDECL_END
+__DECL_END
 #endif /* __CC__ */
 
 
