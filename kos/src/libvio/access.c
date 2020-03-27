@@ -39,9 +39,24 @@ opt.append("-Os");
 
 #ifdef __KERNEL__
 #include <kernel/except.h>
-#endif /* __KERNEL__ */
+#include <sched/rpc.h>
+#include <sched/task.h>
+#else /* __KERNEL__ */
+#include <hybrid/sched/yield.h>
+#endif /* !__KERNEL__ */
+
+#ifdef LIBVIO_CONFIG_HAVE_INT128_CMPXCH
+#include <int128.h>
+#endif /* LIBVIO_CONFIG_HAVE_INT128_CMPXCH */
 
 DECL_BEGIN
+
+#ifdef __KERNEL__
+#define LOOPHINT() (task_serve(), task_yield())
+#else /* __KERNEL__ */
+#define LOOPHINT() SCHED_YIELD()
+#endif /* !__KERNEL__ */
+
 
 PRIVATE ATTR_NORETURN void CC
 libvio_illegal_read(struct vio_args const *__restrict args, vio_addr_t addr) {
@@ -190,6 +205,9 @@ typedef union ATTR_PACKED {
 } qword;
 
 typedef union ATTR_PACKED {
+#ifdef LIBVIO_CONFIG_HAVE_INT128_CMPXCH
+	uint128_t x;
+#endif /* LIBVIO_CONFIG_HAVE_INT128_CMPXCH */
 	u64 q[2];
 	u32 l[4];
 	u16 w[8];
@@ -286,25 +304,37 @@ typedef union ATTR_PACKED {
 
 /* Naming: [BWLQ][MASK] where MASK is the a mask `addr & mask' describing an offset into `x' */
 #define B1     x.b[(uintptr_t)addr & 1]
+#define BX1    x.b[((uintptr_t)addr & 1) ^ 1]
 #define B3     x.b[(uintptr_t)addr & 3]
 #define B7     x.b[(uintptr_t)addr & 7]
+#define B15    x.b[(uintptr_t)addr & 15]
 
 #define W2     x.w[((uintptr_t)addr & 2) >> 1]
-#define W3     (*(u16 *)((u8 *)&(x) + ((uintptr_t)addr & 3)))
+#define WX2    x.w[(((uintptr_t)addr & 2) ^ 2) >> 1]
+#define W3     (*(u16 *)(x.b + ((uintptr_t)addr & 3)))
 #define W6     x.w[((uintptr_t)addr & 6) >> 1]
-#define W7     (*(u16 *)((u8 *)&(x) + ((uintptr_t)addr & 7)))
+#define W7     (*(u16 *)(x.b + ((uintptr_t)addr & 7)))
+#define W14    x.w[((uintptr_t)addr & 14) >> 1]
+#define W15    (*(u16 *)(x.b + ((uintptr_t)addr & 15)))
 
-#define L3     (*(u32 *)((u8 *)&(x) + ((uintptr_t)addr & 3)))
+#define L3     (*(u32 *)(x.b + ((uintptr_t)addr & 3)))
 #define L4     x.l[((uintptr_t)addr & 4) >> 2]
-#define L7     (*(u32 *)((u8 *)&(x) + ((uintptr_t)addr & 7)))
+#define LX4    x.l[(((uintptr_t)addr & 4) ^ 4) >> 2]
+#define L7     (*(u32 *)(x.b + ((uintptr_t)addr & 7)))
+#define L12    x.l[((uintptr_t)addr & 12) >> 2]
+#define L15    (*(u32 *)(x.b + ((uintptr_t)addr & 15)))
 
-#define Q3     (*(u64 *)((u8 *)&(x) + ((uintptr_t)addr & 3)))
-#define Q7     (*(u64 *)((u8 *)&(x) + ((uintptr_t)addr & 7)))
+#define Q3     (*(u64 *)(x.b + ((uintptr_t)addr & 3)))
+#define Q7     (*(u64 *)(x.b + ((uintptr_t)addr & 7)))
+#define Q8     x.q[((uintptr_t)addr & 8) >> 3]
+#define QX8    x.q[(((uintptr_t)addr & 8) ^ 8) >> 3]
+#define Q15    (*(u64 *)(x.b + ((uintptr_t)addr & 15)))
 
 /* Aligned base-addresses */
-#define AW     (addr & ~1) /* word-aligned */
-#define AL     (addr & ~3) /* dword-aligned */
-#define AQ     (addr & ~7) /* qword-aligned */
+#define AW     (addr & ~1)  /* word-aligned */
+#define AL     (addr & ~3)  /* dword-aligned */
+#define AQ     (addr & ~7)  /* qword-aligned */
+#define AX     (addr & ~15) /* xword-aligned */
 
 /* The max address mask that could ever be relevant. */
 #ifdef LIBVIO_CONFIG_HAVE_QWORD
@@ -864,174 +894,175 @@ libvio_readq_aligned(struct vio_args *__restrict args, vio_addr_t addr) {
 }
 #endif /* LIBVIO_CONFIG_HAVE_QWORD */
 
-#define IF_WW(name, ...) { __auto_type func = ops->vo_write.name; if (func) { __VA_ARGS__ } }
-#define IF_WX(name, ...) { __auto_type func = ops->vo_xch.name; if (func) { __VA_ARGS__ } }
+
+PRIVATE NONNULL((1)) void CC
+_do_writeb_vo_cmpxch(struct vio_operators const *__restrict ops,
+                     struct vio_args *__restrict args,
+                     vio_addr_t addr, u8 value) {
+	u8 oldval = 0;
+	if (ops->vo_read.f_byte)
+		oldval = (*ops->vo_read.f_byte)(args, addr);
+	for (;;) {
+		u8 real_oldval;
+		real_oldval = (*ops->vo_cmpxch.f_byte)(args, addr, oldval, value, false);
+		if (real_oldval == oldval)
+			break;
+		oldval = real_oldval;
+		LOOPHINT();
+	}
+}
+
+PRIVATE NONNULL((1)) void CC
+_do_writew_vo_cmpxch(struct vio_operators const *__restrict ops,
+                     struct vio_args *__restrict args,
+                     vio_addr_t addr, u16 value) {
+	u16 oldval = 0;
+	if (ops->vo_read.f_word)
+		oldval = (*ops->vo_read.f_word)(args, addr);
+	for (;;) {
+		u16 real_oldval;
+		real_oldval = (*ops->vo_cmpxch.f_word)(args, addr, oldval, value, false);
+		if (real_oldval == oldval)
+			break;
+		oldval = real_oldval;
+		LOOPHINT();
+	}
+}
+
+PRIVATE NONNULL((1)) void CC
+_do_writel_vo_cmpxch(struct vio_operators const *__restrict ops,
+                     struct vio_args *__restrict args,
+                     vio_addr_t addr, u32 value) {
+	u32 oldval = 0;
+	if (ops->vo_read.f_dword)
+		oldval = (*ops->vo_read.f_dword)(args, addr);
+	for (;;) {
+		u32 real_oldval;
+		real_oldval = (*ops->vo_cmpxch.f_dword)(args, addr, oldval, value, false);
+		if (real_oldval == oldval)
+			break;
+		oldval = real_oldval;
+		LOOPHINT();
+	}
+}
+
+#if defined(LIBVIO_CONFIG_HAVE_QWORD) || defined(LIBVIO_CONFIG_HAVE_QWORD_CMPXCH)
+PRIVATE NONNULL((1)) void CC
+_do_writeq_vo_cmpxch(struct vio_operators const *__restrict ops,
+                     struct vio_args *__restrict args,
+                     vio_addr_t addr, u64 value) {
+	u64 oldval = 0;
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
+	if (ops->vo_read.f_qword)
+		oldval = (*ops->vo_read.f_qword)(args, addr);
+#endif /* LIBVIO_CONFIG_HAVE_QWORD */
+	for (;;) {
+		u64 real_oldval;
+		real_oldval = (*ops->vo_cmpxch.f_qword)(args, addr, oldval, value, false);
+		if (real_oldval == oldval)
+			break;
+		oldval = real_oldval;
+		LOOPHINT();
+	}
+}
+#endif /* LIBVIO_CONFIG_HAVE_QWORD || LIBVIO_CONFIG_HAVE_QWORD_CMPXCH */
+
+#ifdef LIBVIO_CONFIG_HAVE_INT128_CMPXCH
+PRIVATE NONNULL((1)) void CC
+_do_writex_vo_cmpxch(struct vio_operators const *__restrict ops,
+                     struct vio_args *__restrict args,
+                     vio_addr_t addr, uint128_t value) {
+	uint128_t oldval;
+	uint128_setzero(oldval);
+	for (;;) {
+		u64 real_oldval;
+		real_oldval = (*ops->vo_cmpxch.f_xword)(args, addr, oldval, value, false);
+		if (int128_eq128(real_oldval, oldval))
+			break;
+		oldval = real_oldval;
+		LOOPHINT();
+	}
+}
+#endif /* LIBVIO_CONFIG_HAVE_INT128_CMPXCH */
+
+#define do_writeb_vo_write(addr, value)  (*ops->vo_write.f_byte)(args, addr, value)
+#define do_writeb_vo_xch(addr, value)    (*ops->vo_xch.f_byte)(args, addr, value, false)
+#define do_writeb_vo_cmpxch(addr, value) _do_writeb_vo_cmpxch(ops, args, addr, value)
+
+#define do_writew_vo_write(addr, value)  (*ops->vo_write.f_word)(args, addr, value)
+#define do_writew_vo_xch(addr, value)    (*ops->vo_xch.f_word)(args, addr, value, false)
+#define do_writew_vo_cmpxch(addr, value) _do_writew_vo_cmpxch(ops, args, addr, value)
+
+#define do_writel_vo_write(addr, value)  (*ops->vo_write.f_dword)(args, addr, value)
+#define do_writel_vo_xch(addr, value)    (*ops->vo_xch.f_dword)(args, addr, value, false)
+#define do_writel_vo_cmpxch(addr, value) _do_writel_vo_cmpxch(ops, args, addr, value)
+
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
+#define do_writeq_vo_write(addr, value)  (*ops->vo_write.f_qword)(args, addr, value)
+#define do_writeq_vo_xch(addr, value)    (*ops->vo_xch.f_qword)(args, addr, value, false)
+#endif /* LIBVIO_CONFIG_HAVE_QWORD */
+#if defined(LIBVIO_CONFIG_HAVE_QWORD) || defined(LIBVIO_CONFIG_HAVE_QWORD_CMPXCH)
+#define do_writeq_vo_cmpxch(addr, value) _do_writeq_vo_cmpxch(ops, args, addr, value)
+#endif /* LIBVIO_CONFIG_HAVE_QWORD || LIBVIO_CONFIG_HAVE_QWORD_CMPXCH */
+#ifdef LIBVIO_CONFIG_HAVE_INT128_CMPXCH
+#define do_writex_vo_cmpxch(addr, value) _do_writex_vo_cmpxch(ops, args, addr, value)
+#endif /* LIBVIO_CONFIG_HAVE_INT128_CMPXCH */
+
+#ifndef __INTELLISENSE__
+DECL_END
+
+#define WRITE_METHOD vo_write
+#include "access-write.c.inl"
+
+#define WRITE_METHOD vo_xch
+#include "access-write.c.inl"
+
+#define WRITE_METHOD vo_cmpxch
+#include "access-write.c.inl"
+
+DECL_BEGIN
+#endif /* !__INTELLISENSE__ */
 
 INTERN NONNULL((1)) void CC
 libvio_writeb(struct vio_args *__restrict args, vio_addr_t addr, u8 value) {
 	struct vio_operators const *ops = args->va_ops;
-	IF_WW(f_byte, { (*func)(args, addr, value); return; })
-	IF_WX(f_byte, { (*func)(args, addr, value, false); return; })
-	/* Atomic writes are impossible - Try them as non-atomic ones */
-	IF_WW(f_word, {
-		word x;
-		x.b[(uintptr_t)addr & 1] = value;
-		x.b[((uintptr_t)addr ^ 1) & 1] = libvio_readb(args, addr ^ 1);
-		(*func)(args, addr, x.w);
+#ifndef __INTELLISENSE__
+	if (libvio_writeb_vo_write(ops, args, addr, value))
 		return;
-	})
-	IF_WX(f_word, {
-		word x;
-		x.b[(uintptr_t)addr & 1] = value;
-		x.b[((uintptr_t)addr ^ 1) & 1] = libvio_readb(args, addr ^ 1);
-		(*func)(args, addr, x.w, false);
+	if (libvio_writeb_vo_xch(ops, args, addr, value))
 		return;
-	})
-	IF_WW(f_dword, {
-		dword x = { libvio_readl_aligned(args, AL) };
-		B3 = value;
-		(*func)(args, addr, x.l);
+	if (libvio_writeb_vo_cmpxch(ops, args, addr, value))
 		return;
-	})
-	IF_WX(f_dword, {
-		dword x = { libvio_readl_aligned(args, AL) };
-		B3 = value;
-		(*func)(args, addr, x.l, false);
-		return;
-	})
-#ifdef LIBVIO_CONFIG_HAVE_QWORD
-	IF_WW(f_qword, {
-		qword x = { libvio_readq_aligned(args, AQ) };
-		B7 = value;
-		(*func)(args, addr, x.q);
-		return;
-	})
-	IF_WX(f_qword, {
-		qword x = { libvio_readq_aligned(args, AQ) };
-		B7 = value;
-		(*func)(args, addr, x.q, false);
-		return;
-	})
-#endif /* LIBVIO_CONFIG_HAVE_QWORD */
+#endif /* !__INTELLISENSE__ */
 	libvio_illegal_write(args, addr);
 }
-
 
 
 INTERN NONNULL((1)) void CC
 libvio_writew(struct vio_args *__restrict args, vio_addr_t addr, u16 value) {
 	struct vio_operators const *ops = args->va_ops;
-	if (((uintptr_t)addr & 1) == 0) {
-		IF_WW(f_word, { (*func)(args, addr, value); return; })
-		IF_WX(f_word, { (*func)(args, addr, value, false); return; })
-	}
-	IF_WW(f_byte, {
-		word x = { value };
-		(*func)(args, addr & ~1, x.b[0]);
-		(*func)(args, addr | 1, x.b[1]);
+#ifndef __INTELLISENSE__
+	if (libvio_writew_vo_write(ops, args, addr, value))
 		return;
-	})
-	IF_WX(f_byte, {
-		word x = { value };
-		(*func)(args, addr & ~1, x.b[0], false);
-		(*func)(args, addr | 1, x.b[1], false);
+	if (libvio_writew_vo_xch(ops, args, addr, value))
 		return;
-	})
-	if (((uintptr_t)addr & 3) != 3) {
-		IF_WW(f_dword, {
-			dword x = { libvio_readl_aligned(args, addr & ~3) };
-			W3 = value;
-			(*func)(args, addr & ~3, x.l);
-			return;
-		})
-		IF_WX(f_dword, {
-			dword x = { libvio_readl_aligned(args, addr & ~3) };
-			W3 = value;
-			(*func)(args, addr & ~3, x.l, false);
-			return;
-		})
-	}
-#ifdef LIBVIO_CONFIG_HAVE_QWORD
-	if (((uintptr_t)addr & 7) != 7) {
-		IF_WW(f_qword, {
-			qword x = { libvio_readq_aligned(args, addr & ~7) };
-			W7 = value;
-			(*func)(args, addr & ~7, x.q);
-			return;
-		})
-		IF_WX(f_qword, {
-			qword x = { libvio_readq_aligned(args, addr & ~7) };
-			W7 = value;
-			(*func)(args, addr & ~7, x.q, false);
-			return;
-		})
-	}
-#endif /* LIBVIO_CONFIG_HAVE_QWORD */
-	IF_WW(f_word, {
-		dword x = { libvio_readl_aligned(args, addr & ~3) };
-		W3 = value;
-		(*func)(args, addr & ~3, x.w[0]);
-		(*func)(args, (addr & ~3) + 2, x.w[0]);
+	if (libvio_writew_vo_cmpxch(ops, args, addr, value))
 		return;
-	})
-	IF_WX(f_word, {
-		dword x = { libvio_readl_aligned(args, addr & ~3) };
-		W3 = value;
-		(*func)(args, addr & ~3, x.w[0], false);
-		(*func)(args, (addr & ~3) + 2, x.w[0], false);
-		return;
-	})
+#endif /* !__INTELLISENSE__ */
 	libvio_illegal_write(args, addr);
 }
 
 INTERN NONNULL((1)) void CC
 libvio_writew_aligned(struct vio_args *__restrict args, vio_addr_t addr, u16 value) {
 	struct vio_operators const *ops = args->va_ops;
-	assert(((uintptr_t)addr & 1) == 0);
-	IF_WW(f_word, { (*func)(args, addr, value); return; })
-	IF_WX(f_word, { (*func)(args, addr, value, false); return; })
-	IF_WW(f_byte, {
-		word x = { value };
-		(*func)(args, addr + 0, x.b[0]);
-		(*func)(args, addr + 1, x.b[1]);
+#ifndef __INTELLISENSE__
+	if (libvio_writew_aligned_vo_write(ops, args, addr, value))
 		return;
-	})
-	IF_WX(f_byte, {
-		word x = { value };
-		(*func)(args, addr + 0, x.b[0], false);
-		(*func)(args, addr + 1, x.b[1], false);
+	if (libvio_writew_aligned_vo_xch(ops, args, addr, value))
 		return;
-	})
-	if (!((uintptr_t)addr & 2)) {
-		IF_WW(f_dword, {
-			dword x = { libvio_readl_aligned(args, addr & ~3) };
-			W2 = value;
-			(*func)(args, addr & ~3, x.l);
-			return;
-		})
-		IF_WX(f_dword, {
-			dword x = { libvio_readl_aligned(args, addr & ~3) };
-			W2 = value;
-			(*func)(args, addr & ~3, x.l, false);
-			return;
-		})
-	}
-#ifdef LIBVIO_CONFIG_HAVE_QWORD
-	if (((uintptr_t)addr & 7) != 7) {
-		IF_WW(f_qword, {
-			qword x = { libvio_readq_aligned(args, addr & ~7) };
-			W6 = value;
-			(*func)(args, addr & ~7, x.q);
-			return;
-		})
-		IF_WX(f_qword, {
-			qword x = { libvio_readq_aligned(args, addr & ~7) };
-			W6 = value;
-			(*func)(args, addr & ~7, x.q, false);
-			return;
-		})
-	}
-#endif /* LIBVIO_CONFIG_HAVE_QWORD */
+	if (libvio_writew_aligned_vo_cmpxch(ops, args, addr, value))
+		return;
+#endif /* !__INTELLISENSE__ */
 	libvio_illegal_write(args, addr);
 }
 
@@ -1039,185 +1070,29 @@ INTERN NONNULL((1)) void CC
 libvio_writel(struct vio_args *__restrict args,
               vio_addr_t addr, u32 value) {
 	struct vio_operators const *ops = args->va_ops;
-	if (((uintptr_t)addr & 3) == 0) {
-		IF_WW(f_dword, { (*func)(args, addr, value); return; })
-		IF_WX(f_dword, { (*func)(args, addr, value, false); return; })
-	}
-	if (((uintptr_t)addr & 1) == 0) {
-		IF_WW(f_word, {
-			dword x = { value };
-			(*func)(args, addr + 0, x.w[0]);
-			(*func)(args, addr + 2, x.w[1]);
-			return;
-		})
-		IF_WX(f_word, {
-			dword x = { value };
-			(*func)(args, addr + 0, x.w[0], false);
-			(*func)(args, addr + 2, x.w[1], false);
-			return;
-		})
-	}
-	IF_WW(f_byte, {
-		dword x = { value };
-		(*func)(args, addr + 0, x.b[0]);
-		(*func)(args, addr + 1, x.b[1]);
-		(*func)(args, addr + 2, x.b[2]);
-		(*func)(args, addr + 3, x.b[3]);
+#ifndef __INTELLISENSE__
+	if (libvio_writel_vo_write(ops, args, addr, value))
 		return;
-	})
-	IF_WX(f_byte, {
-		dword x = { value };
-		(*func)(args, addr + 0, x.b[0], false);
-		(*func)(args, addr + 1, x.b[1], false);
-		(*func)(args, addr + 2, x.b[2], false);
-		(*func)(args, addr + 3, x.b[3], false);
+	if (libvio_writel_vo_xch(ops, args, addr, value))
 		return;
-	})
-	if (((uintptr_t)addr & 1) == 1) {
-		IF_WW(f_word, {
-			qword x;
-			x.b[0] = libvio_readb(args, addr - 1);
-			x.b[5] = libvio_readb(args, addr + 4);
-			x.l_1 = value;
-			(*func)(args, addr - 1, x.w[0]);
-			(*func)(args, addr + 1, x.w[1]);
-			(*func)(args, addr + 3, x.w[2]);
-			return;
-		})
-		IF_WX(f_word, {
-			qword x;
-			x.b[0] = libvio_readb(args, addr - 1);
-			x.b[5] = libvio_readb(args, addr + 4);
-			x.l_1 = value;
-			(*func)(args, addr - 1, x.w[0], false);
-			(*func)(args, addr + 1, x.w[1], false);
-			(*func)(args, addr + 3, x.w[2], false);
-			return;
-		})
-	}
-#ifdef LIBVIO_CONFIG_HAVE_QWORD
-	IF_WW(f_qword, {
-		qword x;
-		x.q = libvio_readq(args, addr & ~7);
-		L7 = value;
-		(*func)(args, addr, value);
+	if (libvio_writel_vo_cmpxch(ops, args, addr, value))
 		return;
-	})
-	IF_WX(f_qword, {
-		qword x;
-		x.q = libvio_readq(args, addr & ~7);
-		L7 = value;
-		(*func)(args, addr, value, false);
-		return;
-	})
-#endif /* LIBVIO_CONFIG_HAVE_QWORD */
-	if (((uintptr_t)addr & 3) != 0) {
-#ifdef LIBVIO_CONFIG_HAVE_QWORD
-		IF_WW(f_dword, {
-			qword x;
-			x.q = libvio_readq_aligned(args, addr & ~7);
-			L3 = value;
-			(*func)(args, (addr & ~3), x.l_0);
-			(*func)(args, (addr & ~3) + 4, x.l_4);
-			return;
-		})
-		IF_WX(f_dword, {
-			qword x;
-			x.q = libvio_readq_aligned(args, addr & ~7);
-			L3 = value;
-			(*func)(args, (addr & ~3), x.l_0, false);
-			(*func)(args, (addr & ~3) + 4, x.l_4, false);
-			return;
-		})
-#else
-		IF_WW(f_dword, {
-			qword x;
-			x.l_0 = libvio_readl_aligned(args, (addr & ~7));
-			x.l_4 = libvio_readl_aligned(args, (addr & ~7) + 4);
-			L3 = value;
-			(*func)(args, (addr & ~3), x.l_0);
-			(*func)(args, (addr & ~3) + 4, x.l_4);
-			return;
-		})
-		IF_WX(f_dword, {
-			qword x;
-			x.l_0 = libvio_readl_aligned(args, (addr & ~7));
-			x.l_4 = libvio_readl_aligned(args, (addr & ~7) + 4);
-			L3 = value;
-			(*func)(args, (addr & ~3), x.l_0, false);
-			(*func)(args, (addr & ~3) + 4, x.l_4, false);
-			return;
-		})
-#endif
-	}
-#ifdef LIBVIO_CONFIG_HAVE_QWORD
-	IF_WW(f_qword, {
-		qword x = { libvio_readq_aligned(args, addr & ~7) };
-		L3 = value;
-		(*func)(args, addr & ~7, x.q);
-		return;
-	})
-	IF_WX(f_qword, {
-		qword x = { libvio_readq_aligned(args, addr & ~7) };
-		L3 = value;
-		(*func)(args, addr & ~7, x.q, false);
-		return;
-	})
-#endif /* LIBVIO_CONFIG_HAVE_QWORD */
+#endif /* !__INTELLISENSE__ */
 	libvio_illegal_write(args, addr);
 }
 
 INTERN NONNULL((1)) void CC
-liblibvio_writel_aligned(struct vio_args *__restrict args,
-                         vio_addr_t addr, u32 value) {
+libvio_writel_aligned(struct vio_args *__restrict args,
+                      vio_addr_t addr, u32 value) {
 	struct vio_operators const *ops = args->va_ops;
-	assert(((uintptr_t)addr & 3) == 0);
-	IF_WW(f_dword, { (*func)(args, addr, value); return; })
-	IF_WX(f_dword, { (*func)(args, addr, value, false); return; })
-	IF_WW(f_word, {
-		dword x = { value };
-		(*func)(args, addr + 0, x.w[0]);
-		(*func)(args, addr + 2, x.w[1]);
+#ifndef __INTELLISENSE__
+	if (libvio_writel_aligned_vo_write(ops, args, addr, value))
 		return;
-	})
-	IF_WX(f_word, {
-		dword x = { value };
-		(*func)(args, addr + 0, x.w[0], false);
-		(*func)(args, addr + 2, x.w[1], false);
+	if (libvio_writel_aligned_vo_xch(ops, args, addr, value))
 		return;
-	})
-	IF_WW(f_byte, {
-		dword x = { value };
-		(*func)(args, addr + 0, x.b[0]);
-		(*func)(args, addr + 1, x.b[1]);
-		(*func)(args, addr + 2, x.b[2]);
-		(*func)(args, addr + 3, x.b[3]);
+	if (libvio_writel_aligned_vo_cmpxch(ops, args, addr, value))
 		return;
-	})
-	IF_WX(f_byte, {
-		dword x = { value };
-		(*func)(args, addr + 0, x.b[0], false);
-		(*func)(args, addr + 1, x.b[1], false);
-		(*func)(args, addr + 2, x.b[2], false);
-		(*func)(args, addr + 3, x.b[3], false);
-		return;
-	})
-#ifdef LIBVIO_CONFIG_HAVE_QWORD
-	IF_WW(f_qword, {
-		qword x;
-		x.q = libvio_readq(args, addr & ~4);
-		L4 = value;
-		(*func)(args, addr, x.q);
-		return;
-	})
-	IF_WX(f_qword, {
-		qword x;
-		x.q = libvio_readq(args, addr & ~4);
-		L4 = value;
-		(*func)(args, addr, x.q, false);
-		return;
-	})
-#endif /* LIBVIO_CONFIG_HAVE_QWORD */
+#endif /* !__INTELLISENSE__ */
 	libvio_illegal_write(args, addr);
 }
 
@@ -1226,195 +1101,28 @@ INTERN NONNULL((1)) void CC
 libvio_writeq(struct vio_args *__restrict args,
               vio_addr_t addr, u64 value) {
 	struct vio_operators const *ops = args->va_ops;
-	if (((uintptr_t)addr & 7) == 0) {
-		IF_WW(f_qword, { (*func)(args, addr, value); return; })
-		IF_WX(f_qword, { (*func)(args, addr, value, false); return; })
-	}
-	if (((uintptr_t)addr & 3) == 0) {
-		IF_WW(f_dword, {
-			qword x = { value };
-			(*func)(args, addr + 0, x.l[0]);
-			(*func)(args, addr + 4, x.l[1]);
-			return;
-		})
-		IF_WX(f_dword, {
-			qword x = { value };
-			(*func)(args, addr + 0, x.l[0], false);
-			(*func)(args, addr + 4, x.l[1], false);
-			return;
-		})
-	}
-	if (((uintptr_t)addr & 1) == 0) {
-		IF_WW(f_word, {
-			qword x = { value };
-			(*func)(args, addr + 0, x.w[0]);
-			(*func)(args, addr + 2, x.w[1]);
-			(*func)(args, addr + 4, x.w[2]);
-			(*func)(args, addr + 6, x.w[3]);
-			return;
-		})
-		IF_WX(f_word, {
-			qword x = { value };
-			(*func)(args, addr + 0, x.w[0], false);
-			(*func)(args, addr + 2, x.w[1], false);
-			(*func)(args, addr + 4, x.w[2], false);
-			(*func)(args, addr + 6, x.w[3], false);
-			return;
-		})
-	}
-	IF_WW(f_byte, {
-		qword x = { value };
-		(*func)(args, addr + 0, x.b[0]);
-		(*func)(args, addr + 1, x.b[1]);
-		(*func)(args, addr + 2, x.b[2]);
-		(*func)(args, addr + 3, x.b[3]);
-		(*func)(args, addr + 4, x.b[4]);
-		(*func)(args, addr + 5, x.b[5]);
-		(*func)(args, addr + 6, x.b[6]);
-		(*func)(args, addr + 7, x.b[7]);
+#ifndef __INTELLISENSE__
+	if (libvio_writeq_vo_write(ops, args, addr, value))
 		return;
-	})
-	IF_WX(f_byte, {
-		qword x = { value };
-		(*func)(args, addr + 0, x.b[0], false);
-		(*func)(args, addr + 1, x.b[1], false);
-		(*func)(args, addr + 2, x.b[2], false);
-		(*func)(args, addr + 3, x.b[3], false);
-		(*func)(args, addr + 4, x.b[4], false);
-		(*func)(args, addr + 5, x.b[5], false);
-		(*func)(args, addr + 6, x.b[6], false);
-		(*func)(args, addr + 7, x.b[7], false);
+	if (libvio_writeq_vo_xch(ops, args, addr, value))
 		return;
-	})
-	if (((uintptr_t)addr & 1) == 1) {
-		IF_WW(f_word, {
-			xword x;
-			x.b[0] = libvio_readb(args, addr - 1);
-			x.b[9] = libvio_readb(args, addr + 8);
-			x.q_1 = value;
-			(*func)(args, addr - 1, x.w[0]);
-			(*func)(args, addr + 1, x.w[1]);
-			(*func)(args, addr + 3, x.w[2]);
-			(*func)(args, addr + 5, x.w[3]);
-			(*func)(args, addr + 7, x.w[4]);
-			return;
-		})
-		IF_WX(f_word, {
-			xword x;
-			x.b[0] = libvio_readb(args, addr - 1);
-			x.b[9] = libvio_readb(args, addr + 8);
-			x.q_1 = value;
-			(*func)(args, addr - 1, x.w[0], false);
-			(*func)(args, addr + 1, x.w[1], false);
-			(*func)(args, addr + 3, x.w[2], false);
-			(*func)(args, addr + 5, x.w[3], false);
-			(*func)(args, addr + 7, x.w[4], false);
-			return;
-		})
-	}
-	if (((uintptr_t)addr & 3) != 0) {
-		IF_WW(f_dword, {
-			xword x;
-			x.q[0] = libvio_readq_aligned(args, addr & ~7);
-			x.q[1] = libvio_readq_aligned(args, (addr & ~7) + 8);
-			Q7 = value;
-			(*func)(args, (addr & ~3), x.l_0);
-			(*func)(args, (addr & ~3) + 4, x.l_4);
-			(*func)(args, (addr & ~3) + 8, x.l_8);
-			(*func)(args, (addr & ~3) + 12, x.l_12);
-			return;
-		})
-		IF_WX(f_dword, {
-			xword x;
-			x.q[0] = libvio_readq_aligned(args, addr & ~7);
-			x.q[1] = libvio_readq_aligned(args, (addr & ~7) + 8);
-			Q7 = value;
-			(*func)(args, (addr & ~3), x.l_0, false);
-			(*func)(args, (addr & ~3) + 4, x.l_4, false);
-			(*func)(args, (addr & ~3) + 8, x.l_8, false);
-			(*func)(args, (addr & ~3) + 12, x.l_12, false);
-			return;
-		})
-	}
-	IF_WW(f_qword, {
-		xword x;
-		x.q[0] = libvio_readq_aligned(args, addr & ~7);
-		x.q[1] = libvio_readq_aligned(args, (addr & ~7) + 8);
-		Q7 = value;
-		(*func)(args, addr & ~7, x.q[0]);
-		(*func)(args, (addr & ~7) + 8, x.q[0]);
+	if (libvio_writeq_vo_cmpxch(ops, args, addr, value))
 		return;
-	})
-	IF_WX(f_qword, {
-		xword x;
-		x.q[0] = libvio_readq_aligned(args, addr & ~7);
-		x.q[1] = libvio_readq_aligned(args, (addr & ~7) + 8);
-		Q7 = value;
-		(*func)(args, addr & ~7, x.q[0], false);
-		(*func)(args, (addr & ~7) + 8, x.q[0], false);
-		return;
-	})
+#endif /* !__INTELLISENSE__ */
 	libvio_illegal_write(args, addr);
 }
 INTERN NONNULL((1)) void CC
 libvio_writeq_aligned(struct vio_args *__restrict args,
                       vio_addr_t addr, u64 value) {
 	struct vio_operators const *ops = args->va_ops;
-	assert(((uintptr_t)addr & 7) == 0);
-	IF_WW(f_qword, { (*func)(args, addr, value); return; })
-	IF_WX(f_qword, { (*func)(args, addr, value, false); return; })
-	IF_WW(f_dword, {
-		qword x = { value };
-		(*func)(args, addr + 0, x.l[0]);
-		(*func)(args, addr + 4, x.l[1]);
+#ifndef __INTELLISENSE__
+	if (libvio_writeq_aligned_vo_write(ops, args, addr, value))
 		return;
-	})
-	IF_WX(f_dword, {
-		qword x = { value };
-		(*func)(args, addr + 0, x.l[0], false);
-		(*func)(args, addr + 4, x.l[1], false);
+	if (libvio_writeq_aligned_vo_xch(ops, args, addr, value))
 		return;
-	})
-	IF_WW(f_word, {
-		qword x = { value };
-		(*func)(args, addr + 0, x.w[0]);
-		(*func)(args, addr + 2, x.w[1]);
-		(*func)(args, addr + 4, x.w[2]);
-		(*func)(args, addr + 6, x.w[3]);
+	if (libvio_writeq_aligned_vo_cmpxch(ops, args, addr, value))
 		return;
-	})
-	IF_WX(f_word, {
-		qword x = { value };
-		(*func)(args, addr + 0, x.w[0], false);
-		(*func)(args, addr + 2, x.w[1], false);
-		(*func)(args, addr + 4, x.w[2], false);
-		(*func)(args, addr + 6, x.w[3], false);
-		return;
-	})
-	IF_WW(f_byte, {
-		qword x = { value };
-		(*func)(args, addr + 0, x.b[0]);
-		(*func)(args, addr + 1, x.b[1]);
-		(*func)(args, addr + 2, x.b[2]);
-		(*func)(args, addr + 3, x.b[3]);
-		(*func)(args, addr + 4, x.b[4]);
-		(*func)(args, addr + 5, x.b[5]);
-		(*func)(args, addr + 6, x.b[6]);
-		(*func)(args, addr + 7, x.b[7]);
-		return;
-	})
-	IF_WX(f_byte, {
-		qword x = { value };
-		(*func)(args, addr + 0, x.b[0], false);
-		(*func)(args, addr + 1, x.b[1], false);
-		(*func)(args, addr + 2, x.b[2], false);
-		(*func)(args, addr + 3, x.b[3], false);
-		(*func)(args, addr + 4, x.b[4], false);
-		(*func)(args, addr + 5, x.b[5], false);
-		(*func)(args, addr + 6, x.b[6], false);
-		(*func)(args, addr + 7, x.b[7], false);
-		return;
-	})
+#endif /* !__INTELLISENSE__ */
 	libvio_illegal_write(args, addr);
 }
 #endif /* LIBVIO_CONFIG_HAVE_QWORD */
@@ -1609,8 +1317,8 @@ libvio_cmpxch128(struct vio_args *__restrict args,
                  vio_addr_t addr, uint128_t oldvalue,
                  uint128_t newvalue, bool atomic) {
 	struct vio_operators const *ops = args->va_ops;
-	if (ops->vo_cmpxch.f_int128 && ((uintptr_t)addr & 15) == 0)
-		return (*ops->vo_cmpxch.f_int128)(args, addr, oldvalue, newvalue, atomic);
+	if (ops->vo_cmpxch.f_xword && ((uintptr_t)addr & 15) == 0)
+		return (*ops->vo_cmpxch.f_xword)(args, addr, oldvalue, newvalue, atomic);
 	/* Non-atomic compare-exchange */
 	if (atomic)
 		libvio_nonatomic_operation128(args, addr, oldvalue, newvalue);
@@ -1898,7 +1606,7 @@ libvio_copytovio(struct vio_args *__restrict args,
 #ifdef LIBVIO_CONFIG_HAVE_QWORD
 	if ((offset & 4) && num_bytes >= 4) {
 		u32 temp = UNALIGNED_GET32((u32 *)buf);
-		liblibvio_writel_aligned(args, offset, temp);
+		libvio_writel_aligned(args, offset, temp);
 		buf = (byte_t *)buf + 4;
 		num_bytes -= 4;
 		offset += 4;
@@ -1912,7 +1620,7 @@ libvio_copytovio(struct vio_args *__restrict args,
 	}
 	if (num_bytes >= 4) {
 		u32 temp = UNALIGNED_GET32((u32 *)buf);
-		liblibvio_writel_aligned(args, offset, temp);
+		libvio_writel_aligned(args, offset, temp);
 		buf = (byte_t *)buf + 4;
 		num_bytes -= 4;
 		offset += 4;
@@ -1920,7 +1628,7 @@ libvio_copytovio(struct vio_args *__restrict args,
 #else /* LIBVIO_CONFIG_HAVE_QWORD */
 	while (num_bytes >= 4) {
 		u32 temp = UNALIGNED_GET32((u32 *)buf);
-		liblibvio_writel_aligned(args, offset, temp);
+		libvio_writel_aligned(args, offset, temp);
 		buf = (byte_t *)buf + 4;
 		num_bytes -= 4;
 		offset += 4;
@@ -1963,7 +1671,7 @@ libvio_memset(struct vio_args *__restrict args,
 	if ((offset & 4) && num_bytes >= 4) {
 		u32 temp = (u32)byte | (u32)byte << 8 |
 		           (u32)byte << 16 | (u32)byte << 24;
-		liblibvio_writel_aligned(args, offset, temp);
+		libvio_writel_aligned(args, offset, temp);
 		num_bytes -= 4;
 		offset += 4;
 	}
@@ -1981,7 +1689,7 @@ libvio_memset(struct vio_args *__restrict args,
 	if (num_bytes >= 4) {
 		u32 temp = (u32)byte | (u32)byte << 8 |
 		           (u32)byte << 16 | (u32)byte << 24;
-		liblibvio_writel_aligned(args, offset, temp);
+		libvio_writel_aligned(args, offset, temp);
 		num_bytes -= 4;
 		offset += 4;
 	}
@@ -1990,7 +1698,7 @@ libvio_memset(struct vio_args *__restrict args,
 		u32 temp = (u32)byte | (u32)byte << 8 |
 		           (u32)byte << 16 | (u32)byte << 24;
 		while (num_bytes >= 4) {
-			liblibvio_writel_aligned(args, offset, temp);
+			libvio_writel_aligned(args, offset, temp);
 			num_bytes -= 4;
 			offset += 4;
 		}

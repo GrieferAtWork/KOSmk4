@@ -113,11 +113,11 @@ struct vio_operators {
 	 * NOTE: For unrecognized addresses, VIO should throw
 	 *      `E_SEGFAULT_NOTREADABLE' / `E_SEGFAULT_NOTWRITABLE' exceptions.
 	 * NOTE: Call operators are allowed to assume that the given `addr' has ~natural~ alignment:
-	 *       f_byte:   No assumptions may be made
-	 *       f_word:   Can assume that `addr' is a multiple of `2' (aka. `(addr & 1) == 0')
-	 *       f_dword:  Can assume that `addr' is a multiple of `4' (aka. `(addr & 3) == 0')
-	 *       f_qword:  Can assume that `addr' is a multiple of `8' (aka. `(addr & 7) == 0')
-	 *       f_int128: Can assume that `addr' is a multiple of `16' (aka. `(addr & 15) == 0')
+	 *       f_byte:  No assumptions may be made
+	 *       f_word:  Can assume that `addr' is a multiple of `2' (aka. `(addr & 1) == 0')
+	 *       f_dword: Can assume that `addr' is a multiple of `4' (aka. `(addr & 3) == 0')
+	 *       f_qword: Can assume that `addr' is a multiple of `8' (aka. `(addr & 7) == 0')
+	 *       f_xword: Can assume that `addr' is a multiple of `16' (aka. `(addr & 15) == 0')
 	 */
 	struct {
 		/* [0..1] Read memory */
@@ -148,7 +148,7 @@ struct vio_operators {
 		__ATTR_NONNULL((1)) __uint64_t (LIBVIO_CC *f_qword)(struct vio_args *__restrict args, vio_addr_t addr, __uint64_t oldvalue, __uint64_t newvalue, __BOOL atomic);
 #endif /* LIBVIO_CONFIG_HAVE_QWORD || LIBVIO_CONFIG_HAVE_QWORD_CMPXCH */
 #ifdef LIBVIO_CONFIG_HAVE_INT128_CMPXCH
-		__ATTR_NONNULL((1)) __hybrid_uint128_t (LIBVIO_CC *f_int128)(struct vio_args *__restrict args, vio_addr_t addr, __hybrid_uint128_t oldvalue, __hybrid_uint128_t newvalue, __BOOL atomic);
+		__ATTR_NONNULL((1)) __hybrid_uint128_t (LIBVIO_CC *f_xword)(struct vio_args *__restrict args, vio_addr_t addr, __hybrid_uint128_t oldvalue, __hybrid_uint128_t newvalue, __BOOL atomic);
 #endif /* LIBVIO_CONFIG_HAVE_INT128_CMPXCH */
 	} vo_cmpxch;
 

@@ -101,7 +101,7 @@ INTDEF NONNULL((1)) u64 CC libvio_xorq(struct vio_args *__restrict args, vio_add
 INTDEF NONNULL((1)) u16 CC libvio_readw_aligned(struct vio_args *__restrict args, vio_addr_t addr);
 INTDEF NONNULL((1)) u32 CC libvio_readl_aligned(struct vio_args *__restrict args, vio_addr_t addr);
 INTDEF NONNULL((1)) void CC libvio_writew_aligned(struct vio_args *__restrict args, vio_addr_t addr, u16 value);
-INTDEF NONNULL((1)) void CC liblibvio_writel_aligned(struct vio_args *__restrict args, vio_addr_t addr, u32 value);
+INTDEF NONNULL((1)) void CC libvio_writel_aligned(struct vio_args *__restrict args, vio_addr_t addr, u32 value);
 #ifdef LIBVIO_CONFIG_HAVE_QWORD
 INTDEF NONNULL((1)) u64 CC libvio_readq_aligned(struct vio_args *__restrict args, vio_addr_t addr);
 INTDEF NONNULL((1)) void CC libvio_writeq_aligned(struct vio_args *__restrict args, vio_addr_t addr, u64 value);
