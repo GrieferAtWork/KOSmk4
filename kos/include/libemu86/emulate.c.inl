@@ -2817,11 +2817,11 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 		/* 64-bit address size */                                                                \
 		do64;                                                                                    \
 	} else if ((EMU86_F_IS64(op_flags) || EMU86_F_IS16(op_flags)) ^ !!(op_flags & EMU86_F_67)) { \
-		/* 32-bit address size */                                                                \
-		do32;                                                                                    \
-	} else {                                                                                     \
 		/* 16-bit address size */                                                                \
 		do16;                                                                                    \
+	} else {                                                                                     \
+		/* 32-bit address size */                                                                \
+		do32;                                                                                    \
 	}
 #elif !CONFIG_LIBEMU86_WANT_64BIT
 #define EMU86_ADDRSIZE_SWITCH(do64, do32, do16)                 \
@@ -2869,20 +2869,20 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 		/* 64-bit address size */                                      \
 		do64;                                                          \
 	} else if (!!EMU86_F_IS16(op_flags) ^ !!(op_flags & EMU86_F_67)) { \
-		/* 32-bit address size */                                      \
-		do32;                                                          \
-	} else {                                                           \
 		/* 16-bit address size */                                      \
 		do16;                                                          \
+	} else {                                                           \
+		/* 32-bit address size */                                      \
+		do32;                                                          \
 	}
 #elif !CONFIG_LIBEMU86_WANT_64BIT
 #define EMU86_ADDRSIZE_SWITCH64(do64, do32, do16)               \
 	if (!!EMU86_F_IS16(op_flags) ^ !!(op_flags & EMU86_F_67)) { \
-		/* 32-bit address size */                               \
-		do32;                                                   \
-	} else {                                                    \
 		/* 16-bit address size */                               \
 		do16;                                                   \
+	} else {                                                    \
+		/* 32-bit address size */                               \
+		do32;                                                   \
 	}
 #elif CONFIG_LIBEMU86_WANT_64BIT && !(CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT)
 #define EMU86_ADDRSIZE_SWITCH64(do64, do32, do16) \
