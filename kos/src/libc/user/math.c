@@ -1750,7 +1750,7 @@ NOTHROW(LIBCCALL libc_rintf)(float x)
 #ifdef __LIBM_MATHFUNF
 	return __LIBM_MATHFUNF(rint, x);
 #else /* __LIBM_MATHFUNF */
-	return (float)rint((double)x);
+	return (float)libc_rint((double)x);
 #endif /* !__LIBM_MATHFUNF */
 }
 /*[[[end:rintf]]]*/
@@ -1766,7 +1766,7 @@ NOTHROW(LIBCCALL libc_nextafterf)(float x,
 #ifdef __LIBM_MATHFUN2F
 	return __LIBM_MATHFUN2F(nextafter, x, y);
 #else /* __LIBM_MATHFUN2F */
-	return (float)nextafter((double)x, (double)y);
+	return (float)libc_nextafter((double)x, (double)y);
 #endif /* !__LIBM_MATHFUN2F */
 }
 /*[[[end:nextafterf]]]*/
@@ -1820,7 +1820,7 @@ NOTHROW(LIBCCALL libc_rintl)(__LONGDOUBLE x)
 #ifdef __LIBM_MATHFUNL
 	return __LIBM_MATHFUNL(rint, x);
 #else /* __LIBM_MATHFUNL */
-	return (__LONGDOUBLE)rint((double)x);
+	return (__LONGDOUBLE)libc_rint((double)x);
 #endif /* !__LIBM_MATHFUNL */
 }
 /*[[[end:rintl]]]*/
@@ -1836,7 +1836,7 @@ NOTHROW(LIBCCALL libc_nextafterl)(__LONGDOUBLE x,
 #ifdef __LIBM_MATHFUN2L
 	return __LIBM_MATHFUN2L(nextafter, x, y);
 #else /* __LIBM_MATHFUN2L */
-	return (__LONGDOUBLE)nextafter((double)x, (double)y);
+	return (__LONGDOUBLE)libc_nextafter((double)x, (double)y);
 #endif /* !__LIBM_MATHFUN2L */
 }
 /*[[[end:nextafterl]]]*/

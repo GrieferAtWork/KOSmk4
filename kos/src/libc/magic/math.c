@@ -840,7 +840,7 @@ tgammal:(__LONGDOUBLE x) -> __LONGDOUBLE %{auto_block(math)} /* TODO */
           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]
 rint:(double x) -> double {
-	return __LIBM_MATHFUN(rint, x);
+	return __LIBM_MATHFUN(@rint@, x);
 }
 
 
@@ -851,7 +851,7 @@ rint:(double x) -> double {
           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]
 nextafter:(double x, double y) -> double {
-	return __LIBM_MATHFUN2(nextafter, x, y);
+	return __LIBM_MATHFUN2(@nextafter@, x, y);
 }
 
 @@Return the remainder of integer division X/P with infinite precision
