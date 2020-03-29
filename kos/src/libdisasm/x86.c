@@ -1120,10 +1120,10 @@ do_nextop_nocomma:
 							regname[2] = '8' + (name - OP_X64_RN_MIN);
 							reglen = 3;
 						}
-					} else if (name == 'a' || name == 'b') {
+					} else if (name == 'a' || name == 'b' || name == 'c') {
 						unsigned int i, n;
-						/* OP_PAX_PCX_PDX / OP_PAX_PCX */
-						n = name == 'b' ? 2 : 3;
+						/* OP_PAX / OP_PAX_PCX / OP_PAX_PCX_PDX */
+						n = 1 + (name - 'a');
 						if (!DA86_IS64(self) && (DA86_IS16(self) ^ ((flags & EMU86_F_66) != 0))) {
 							regname[2] = 'x';
 							for (i = 0; i < n; ++i) {
@@ -1147,7 +1147,7 @@ do_nextop_nocomma:
 							}
 						}
 						goto done_escape_register;
-					} else if (name == 'c') { /* OP_PSI */
+					} else if (name == 'd') { /* OP_PSI */
 						if (!DA86_IS64(self) && (DA86_IS16(self) ^ ((flags & EMU86_F_66) != 0))) {
 							regname[1] = 's';
 							regname[2] = 'i';

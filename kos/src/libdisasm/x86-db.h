@@ -359,9 +359,10 @@ struct instruction {
 #define OPC_XRM16       '~' /* 16-bit register or memory location prefixed by `*' (requires IF_MODRM) */
 #define OP_XRM16        "~" /* 16-bit register or memory location prefixed by `*' (requires IF_MODRM) */
 
-#define OP_PAX_PCX_PDX OP_SHORT "a" /* %ax, %cx, %dx | %eax, %ecx, %edx | %rax, %rcx, %rdx (same as pointer-size; s.a. `DA86_IS(16|32|64)()') */
+#define OP_PAX         OP_SHORT "a" /* %ax | %eax | %rax (same as pointer-size; s.a. `DA86_IS(16|32|64)()') */
 #define OP_PAX_PCX     OP_SHORT "b" /* %ax, %cx | %eax, %ecx | %rax, %rcx (same as pointer-size; s.a. `DA86_IS(16|32|64)()') */
-#define OP_PSI         OP_SHORT "c" /* %si, %esi, %rsi (same as pointer-size; s.a. `DA86_IS(16|32|64)()') */
+#define OP_PAX_PCX_PDX OP_SHORT "c" /* %ax, %cx, %dx | %eax, %ecx, %edx | %rax, %rcx, %rdx (same as pointer-size; s.a. `DA86_IS(16|32|64)()') */
+#define OP_PSI         OP_SHORT "d" /* %si, %esi, %rsi (same as pointer-size; s.a. `DA86_IS(16|32|64)()') */
 
 /* Smaller encodings for a couple of fixed register operands.
  * While all of these could be implemented with `OP_ESC()', this
@@ -935,12 +936,51 @@ PRIVATE struct instruction const ops[] = {
 	I(0x8e, IF_MODRM,         "movl\t" OP_RM32 OP_RSEG),
 	I(0x8e, IF_MODRM|IF_REXW, "movq\t" OP_RM64 OP_RSEG),
 
-	I(0x8f, IF_66|IF_MODRM,         "popw\t" OP_RM16), /* Actually also requires IF_REG0 */
-	I(0x8f, IF_MODRM,               "popl\t" OP_RM32), /* Actually also requires IF_REG0 */
-	I(0x8f, IF_MODRM|IF_REXW,       "popq\t" OP_RM64), /* Actually also requires IF_REG0 */
-	I(0x8f, IF_67|IF_66|IF_MODRM,   "popw\t" OP_RM16), /* Actually also requires IF_REG0 */
-	I(0x8f, IF_67|IF_MODRM,         "popl\t" OP_RM32), /* Actually also requires IF_REG0 */
-	I(0x8f, IF_67|IF_MODRM|IF_REXW, "popq\t" OP_RM64), /* Actually also requires IF_REG0 */
+	I(0x8f, IF_66|IF_MODRM|IF_REG0,         "popw\t" OP_RM16), /* Actually also requires IF_REG0 */
+	I(0x8f, IF_MODRM|IF_REG0,               "popl\t" OP_RM32), /* Actually also requires IF_REG0 */
+	I(0x8f, IF_MODRM|IF_REXW|IF_REG0,       "popq\t" OP_RM64), /* Actually also requires IF_REG0 */
+	I(0x8f, IF_67|IF_66|IF_MODRM|IF_REG0,   "popw\t" OP_RM16), /* Actually also requires IF_REG0 */
+	I(0x8f, IF_67|IF_MODRM|IF_REG0,         "popl\t" OP_RM32), /* Actually also requires IF_REG0 */
+	I(0x8f, IF_67|IF_MODRM|IF_REXW|IF_REG0, "popq\t" OP_RM64), /* Actually also requires IF_REG0 */
+		/* TODO: XOP opcodes seem to always start with 0x8f (find out what's the deal with them...) */
+
+		/* TODO: XOP instructions (from AMD):
+		 *    BLCFILL reg32, reg/mem32             8F RXB.09 0.dest.0.00 01 /1
+		 *    BLCFILL reg64, reg/mem64             8F RXB.09 1.dest.0.00 01 /1
+		 *    BLSFILL reg32, reg/mem32             8F RXB.09 0.dest.0.00 01 /2
+		 *    BLSFILL reg64, reg/mem64             8F RXB.09 1.dest.0.00 01 /2
+		 *    BLCS reg32, reg/mem32                8F RXB.09 0.dest.0.00 01 /3
+		 *    BLCS reg64, reg/mem64                8F RXB.09 1.dest.0.00 01 /3
+		 *    TZMSK reg32, reg/mem32               8F RXB.09 0.dest.0.00 01 /4
+		 *    TZMSK reg64, reg/mem64               8F RXB.09 1.dest.0.00 01 /4
+		 *    BLCIC reg32, reg/mem32               8F RXB.09 0.dest.0.00 01 /5
+		 *    BLCIC reg64, reg/mem64               8F RXB.09 1.dest.0.00 01 /5
+		 *    BLSIC reg32, reg/mem32               8F RXB.09 0.dest.0.00 01 /6
+		 *    BLSIC reg64, reg/mem64               8F RXB.09 1.dest.0.00 01 /6
+		 *    T1MSKC reg32, reg/mem32              8F RXB.09 0.dest.0.00 01 /7
+		 *    T1MSKC reg64, reg/mem64              8F RXB.09 1.dest.0.00 01 /7
+		 *
+		 *    BLCMSK reg32, reg/mem32              8F RXB.09 0.dest.0.00 02 /1
+		 *    BLCMSK reg64, reg/mem64              8F RXB.09 1.dest.0.00 02 /1
+		 *    BLCI reg32, reg/mem32                8F RXB.09 0.dest.0.00 02 /6
+		 *    BLCI reg64, reg/mem64                8F RXB.09 1.dest.0.00 02 /6
+		 *
+		 *    BEXTR reg32, reg/mem32, imm32        8F RXB.0A 0.1111.0.00 10 /r /id
+		 *    BEXTR reg64, reg/mem64, imm32        8F RXB.0A 1.1111.0.00 10 /r /id
+		 *
+		 *    LLWPCB reg32                         8F RXB.09 0.1111.0.00 12 /0
+		 *    LLWPCB reg64                         8F RXB.09 1.1111.0.00 12 /0
+		 *    LWPINS reg32.vvvv, reg/mem32, imm32  8F RXB.0A 0.src1.0.00 12 /0 /imm32
+		 *    LWPINS reg64.vvvv, reg/mem32, imm32  8F RXB.0A 1.src1.0.00 12 /0 /imm32
+		 *    SLWPCB reg32                         8F RXB.09 0.1111.0.00 12 /1
+		 *    SLWPCB reg64                         8F RXB.09 1.1111.0.00 12 /1
+		 *    LWPVAL reg32.vvvv, reg/mem32, imm32  8F RXB.0A 0.src1.0.00 12 /1 /imm32
+		 *    LWPVAL reg64.vvvv, reg/mem32, imm32  8F RXB.0A 1.src1.0.00 12 /1 /imm32
+		 *
+		 *    BEXTR reg32, reg/mem32, reg32        C4 RXB.02 0.cntl.0.00 F7 /r
+		 *    BEXTR reg64, reg/mem64, reg64        C4 RXB.02 1.cntl.0.00 F7 /r
+		 *
+		 */
 
 	I(0x90, 0,                "nop"),
 	I(0x90, IF_F3,            "pause"),
@@ -1154,9 +1194,9 @@ PRIVATE struct instruction const ops[] = {
 	I(0xc0, IF_MODRM|IF_REG1, "rorb\t" OP_U8 OP_RM8),
 	I(0xc0, IF_MODRM|IF_REG2, "rclb\t" OP_U8 OP_RM8),
 	I(0xc0, IF_MODRM|IF_REG3, "rcrb\t" OP_U8 OP_RM8),
-	I(0xc0, IF_MODRM|IF_REG4, "salb\t" OP_U8 OP_RM8),
+	I(0xc0, IF_MODRM|IF_REG4, "shlb\t" OP_U8 OP_RM8),
 	I(0xc0, IF_MODRM|IF_REG5, "shrb\t" OP_U8 OP_RM8),
-	I(0xc0, IF_MODRM|IF_REG6, "shlb\t" OP_U8 OP_RM8),
+	I(0xc0, IF_MODRM|IF_REG6, "salb\t" OP_U8 OP_RM8),
 	I(0xc0, IF_MODRM|IF_REG7, "sarb\t" OP_U8 OP_RM8),
 
 	I(0xc1, IF_66|IF_MODRM|IF_REG0,   "rolw\t" OP_U8 OP_RM16),
@@ -1175,17 +1215,17 @@ PRIVATE struct instruction const ops[] = {
 	I(0xc1, IF_MODRM|IF_REG3,         "rcrl\t" OP_U8 OP_RM32),
 	I(0xc1, IF_MODRM|IF_REXW|IF_REG3, "rcrq\t" OP_U8 OP_RM64),
 
-	I(0xc1, IF_66|IF_MODRM|IF_REG4,   "salw\t" OP_U8 OP_RM16),
-	I(0xc1, IF_MODRM|IF_REG4,         "sall\t" OP_U8 OP_RM32),
-	I(0xc1, IF_MODRM|IF_REXW|IF_REG4, "salq\t" OP_U8 OP_RM64),
+	I(0xc1, IF_66|IF_MODRM|IF_REG4,   "shlw\t" OP_U8 OP_RM16),
+	I(0xc1, IF_MODRM|IF_REG4,         "shll\t" OP_U8 OP_RM32),
+	I(0xc1, IF_MODRM|IF_REXW|IF_REG4, "shlq\t" OP_U8 OP_RM64),
 
 	I(0xc1, IF_66|IF_MODRM|IF_REG5,   "shrw\t" OP_U8 OP_RM16),
 	I(0xc1, IF_MODRM|IF_REG5,         "shrl\t" OP_U8 OP_RM32),
 	I(0xc1, IF_MODRM|IF_REXW|IF_REG5, "shrq\t" OP_U8 OP_RM64),
 
-	I(0xc1, IF_66|IF_MODRM|IF_REG6,   "shlw\t" OP_U8 OP_RM16),
-	I(0xc1, IF_MODRM|IF_REG6,         "shll\t" OP_U8 OP_RM32),
-	I(0xc1, IF_MODRM|IF_REXW|IF_REG6, "shlq\t" OP_U8 OP_RM64),
+	I(0xc1, IF_66|IF_MODRM|IF_REG6,   "salw\t" OP_U8 OP_RM16),
+	I(0xc1, IF_MODRM|IF_REG6,         "sall\t" OP_U8 OP_RM32),
+	I(0xc1, IF_MODRM|IF_REXW|IF_REG6, "salq\t" OP_U8 OP_RM64),
 
 	I(0xc1, IF_66|IF_MODRM|IF_REG7,   "sarw\t" OP_U8 OP_RM16),
 	I(0xc1, IF_MODRM|IF_REG7,         "sarl\t" OP_U8 OP_RM32),
@@ -1207,7 +1247,7 @@ PRIVATE struct instruction const ops[] = {
 	I(0xc7, IF_66|IF_MODRM|IF_REG0,  "movw\t" OP_U16 OP_RM16),
 	I(0xc7, IF_MODRM|IF_REG0,        "movl\t" OP_U32 OP_RM32),
 	I(0xc7, IF_MODRM|IF_REXW|IF_REG0,"movq\t" OP_S32 OP_RM64),
-	I(0xc7, IF_BYTE2|IF_66,   "\xf8" "xbeginw\t" OP_DISP16),
+	I(0xc7, IF_66|IF_BYTE2,   "\xf8" "xbeginw\t" OP_DISP16),
 	I(0xc7, IF_BYTE2,         "\xf8" "xbegin\t" OP_DISP32),
 
 	I(0xc8, 0,                "enter\t" OP_U16 OP_U8),
@@ -1309,213 +1349,233 @@ PRIVATE struct instruction const ops[] = {
 	I(0xd6, 0,                "salc"), /* http://www.rcollins.org/secrets/opcodes/SALC.html */
 	I(0xd7, 0,                "xlatb"),
 
+
 	I(0xd8, IF_MODRM|IF_RMR|IF_REG0, "fadd\t" OP_RMSTi OP_ST0),
 	I(0xd8, IF_MODRM|IF_RMM|IF_REG0, "faddl\t" OP_RMSTi OP_VERBOSE_ST0),
+
 	I(0xd8, IF_MODRM|IF_RMR|IF_REG1, "fmul\t" OP_RMSTi OP_ST0),
 	I(0xd8, IF_MODRM|IF_RMM|IF_REG1, "fmull\t" OP_RM32 OP_VERBOSE_ST0),
 
 	I(0xd8, IF_MODRM|IF_RMR|IF_REG2, "fcom\t" OP_RMSTi OP_VERBOSE_ST0),
 	I(0xd8, IF_MODRM|IF_RMM|IF_REG2, "fcoml\t" OP_RM32 OP_VERBOSE_ST0),
+
 	I(0xd8, IF_MODRM|IF_RMR|IF_REG3, "fcomp\t" OP_RMSTi OP_VERBOSE_ST0),
 	I(0xd8, IF_MODRM|IF_RMM|IF_REG3, "fcompl\t" OP_RM32 OP_VERBOSE_ST0),
+
 	I(0xd8, IF_MODRM|IF_RMR|IF_REG4, "fsub\t" OP_RMSTi OP_ST0),
 	I(0xd8, IF_MODRM|IF_RMM|IF_REG4, "fsubl\t" OP_RM32 OP_VERBOSE_ST0),
+
 	I(0xd8, IF_MODRM|IF_RMR|IF_REG5, "fsubr\t" OP_RMSTi OP_ST0),
 	I(0xd8, IF_MODRM|IF_RMM|IF_REG5, "fsubrl\t" OP_RM32 OP_VERBOSE_ST0),
+
 	I(0xd8, IF_MODRM|IF_RMR|IF_REG6, "fdiv\t" OP_RMSTi OP_VERBOSE_ST0),
 	I(0xd8, IF_MODRM|IF_RMM|IF_REG6, "fdivl\t" OP_RM32 OP_VERBOSE_ST0),
+
 	I(0xd8, IF_MODRM|IF_RMR|IF_REG7, "fdivr\t" OP_RMSTi OP_VERBOSE_ST0),
 	I(0xd8, IF_MODRM|IF_RMM|IF_REG7, "fdivrl\t" OP_RM32 OP_VERBOSE_ST0),
 
-	I(0xd9, IF_BYTE2,        "\xc0" "fld" OP_ST0),
-	I(0xd9, IF_BYTE2,        "\xc1" "fld" OP_ST1),
-	I(0xd9, IF_BYTE2,        "\xc2" "fld" OP_ST2),
-	I(0xd9, IF_BYTE2,        "\xc3" "fld" OP_ST3),
-	I(0xd9, IF_BYTE2,        "\xc4" "fld" OP_ST4),
-	I(0xd9, IF_BYTE2,        "\xc5" "fld" OP_ST5),
-	I(0xd9, IF_BYTE2,        "\xc6" "fld" OP_ST6),
-	I(0xd9, IF_BYTE2,        "\xc7" "fld" OP_ST7),
-	I(0xd9, IF_BYTE2,        "\xc8" "fxch" OP_ST0),
-	I(0xd9, IF_BYTE2,        "\xc9" "fxch" OP_ST1),
-	I(0xd9, IF_BYTE2,        "\xca" "fxch" OP_ST2),
-	I(0xd9, IF_BYTE2,        "\xcb" "fxch" OP_ST3),
-	I(0xd9, IF_BYTE2,        "\xcc" "fxch" OP_ST4),
-	I(0xd9, IF_BYTE2,        "\xcd" "fxch" OP_ST5),
-	I(0xd9, IF_BYTE2,        "\xce" "fxch" OP_ST6),
-	I(0xd9, IF_BYTE2,        "\xcf" "fxch" OP_ST7),
-	I(0xd9, IF_BYTE2,        "\xd0" "fnop"),
-	I(0xd9, IF_BYTE2,        "\xe0" "fchs"),
-	I(0xd9, IF_BYTE2,        "\xe1" "fabs"),
-	I(0xd9, IF_BYTE2,        "\xe4" "ftst"),
-	I(0xd9, IF_BYTE2,        "\xe5" "fxam"),
-	I(0xd9, IF_BYTE2,        "\xe8" "fld1"),
-	I(0xd9, IF_BYTE2,        "\xe9" "fldl2t"),
-	I(0xd9, IF_BYTE2,        "\xea" "fldl2e"),
-	I(0xd9, IF_BYTE2,        "\xeb" "fldpi"),
-	I(0xd9, IF_BYTE2,        "\xec" "fldlg2"),
-	I(0xd9, IF_BYTE2,        "\xed" "fldln2"),
-	I(0xd9, IF_BYTE2,        "\xee" "fldz"),
-	I(0xd9, IF_BYTE2,        "\xf0" "f2xm1"),
-	I(0xd9, IF_BYTE2,        "\xf1" "fyl2x"),
-	I(0xd9, IF_BYTE2,        "\xf2" "fptan"),
-	I(0xd9, IF_BYTE2,        "\xf3" "fpatan"),
-	I(0xd9, IF_BYTE2,        "\xf4" "fxtract"),
-	I(0xd9, IF_BYTE2,        "\xf5" "fprem1"),
-	I(0xd9, IF_BYTE2,        "\xf6" "fdecstp"),
-	I(0xd9, IF_BYTE2,        "\xf7" "fincstp"),
-	I(0xd9, IF_BYTE2,        "\xf8" "fprem"),
-	I(0xd9, IF_BYTE2,        "\xf9" "fyl2xp1"),
-	I(0xd9, IF_BYTE2,        "\xfa" "fsqrt"),
-	I(0xd9, IF_BYTE2,        "\xfb" "fsincos"),
-	I(0xd9, IF_BYTE2,        "\xfc" "frndint"),
-	I(0xd9, IF_BYTE2,        "\xfd" "fscale"),
-	I(0xd9, IF_BYTE2,        "\xfe" "fsin"),
-	I(0xd9, IF_BYTE2,        "\xff" "fcos"),
+
 	I(0xd9, IF_MODRM|IF_RMM|IF_REG0, "fldl\t" OP_RM32),
+	I(0xd9, IF_MODRM|IF_RMR|IF_REG0, "fld" OP_RMSTi),
+
+	I(0xd9, IF_MODRM|IF_RMR|IF_REG1, "fxch" OP_RMSTi),
+
 	I(0xd9, IF_MODRM|IF_RMM|IF_REG2, "fstl\t" OP_RM32),
+
 	I(0xd9, IF_MODRM|IF_RMM|IF_REG3, "fstpl\t" OP_RM32),
+
 	I(0xd9, IF_66|IF_MODRM|IF_RMM|IF_REG4, "fldenv14\t" OP_MEM),
 	I(0xd9, IF_MODRM|IF_RMM|IF_REG4, "fldenv28\t" OP_MEM),
+
 	I(0xd9, IF_MODRM|IF_RMM|IF_REG5, "fldcww\t" OP_RM16),
+
 	I(0xd9, IF_66|IF_MODRM|IF_RMM|IF_REG6, "fnstenv94\t" OP_MEM),
 	I(0xd9, IF_MODRM|IF_RMM|IF_REG6, "fnstenv108\t" OP_MEM),
+
 	I(0xd9, IF_MODRM|IF_RMM|IF_REG7, "fnstcww\t" OP_RM16),
 
-	I(0xda, IF_BYTE2, LONGREPR_B(0xe9, LO_FUCOMPP)), /* fucompp %st(1), %st(0) */
+	I(0xd9, IF_BYTE2,        "\xd0" "fnop"),    /* 0xd0: [mod=3,reg=2,rm=0] */
+	/*0xd9, IF_BYTE2,        "\xd1" ???          * 0xd1: [mod=3,reg=2,rm=1] */
+	/*0xd9, IF_BYTE2,        "\xd2" ???          * 0xd2: [mod=3,reg=2,rm=2] */
+	/*0xd9, IF_BYTE2,        "\xd3" ???          * 0xd3: [mod=3,reg=2,rm=3] */
+	/*0xd9, IF_BYTE2,        "\xd4" ???          * 0xd4: [mod=3,reg=2,rm=4] */
+	/*0xd9, IF_BYTE2,        "\xd5" ???          * 0xd5: [mod=3,reg=2,rm=5] */
+	/*0xd9, IF_BYTE2,        "\xd6" ???          * 0xd6: [mod=3,reg=2,rm=6] */
+	/*0xd9, IF_BYTE2,        "\xd7" ???          * 0xd7: [mod=3,reg=2,rm=7] */
+	/*0xd9, IF_BYTE2,        "\xd8" ???          * 0xd8: [mod=3,reg=3,rm=0] */
+	/*0xd9, IF_BYTE2,        "\xd9" ???          * 0xd9: [mod=3,reg=3,rm=1] */
+	/*0xd9, IF_BYTE2,        "\xda" ???          * 0xda: [mod=3,reg=3,rm=2] */
+	/*0xd9, IF_BYTE2,        "\xdb" ???          * 0xdb: [mod=3,reg=3,rm=3] */
+	/*0xd9, IF_BYTE2,        "\xdc" ???          * 0xdc: [mod=3,reg=3,rm=4] */
+	/*0xd9, IF_BYTE2,        "\xdd" ???          * 0xdd: [mod=3,reg=3,rm=5] */
+	/*0xd9, IF_BYTE2,        "\xde" ???          * 0xde: [mod=3,reg=3,rm=6] */
+	/*0xd9, IF_BYTE2,        "\xdf" ???          * 0xdf: [mod=3,reg=3,rm=7] */
+	I(0xd9, IF_BYTE2,        "\xe0" "fchs"),    /* 0xe0: [mod=3,reg=4,rm=0] */
+	I(0xd9, IF_BYTE2,        "\xe1" "fabs"),    /* 0xe1: [mod=3,reg=4,rm=1] */
+	/*0xd9, IF_BYTE2,        "\xe2" ???          * 0xe2: [mod=3,reg=4,rm=2] */
+	/*0xd9, IF_BYTE2,        "\xe3" ???          * 0xe3: [mod=3,reg=4,rm=3] */
+	I(0xd9, IF_BYTE2,        "\xe4" "ftst"),    /* 0xe4: [mod=3,reg=4,rm=4] */
+	I(0xd9, IF_BYTE2,        "\xe5" "fxam"),    /* 0xe5: [mod=3,reg=4,rm=5] */
+	/*0xd9, IF_BYTE2,        "\xe6" ???          * 0xe6: [mod=3,reg=4,rm=6] */
+	/*0xd9, IF_BYTE2,        "\xe7" ???          * 0xe7: [mod=3,reg=4,rm=7] */
+	I(0xd9, IF_BYTE2,        "\xe8" "fld1"),    /* 0xe8: [mod=3,reg=5,rm=0] */
+	I(0xd9, IF_BYTE2,        "\xe9" "fldl2t"),  /* 0xe9: [mod=3,reg=5,rm=1] */
+	I(0xd9, IF_BYTE2,        "\xea" "fldl2e"),  /* 0xea: [mod=3,reg=5,rm=2] */
+	I(0xd9, IF_BYTE2,        "\xeb" "fldpi"),   /* 0xeb: [mod=3,reg=5,rm=3] */
+	I(0xd9, IF_BYTE2,        "\xec" "fldlg2"),  /* 0xec: [mod=3,reg=5,rm=4] */
+	I(0xd9, IF_BYTE2,        "\xed" "fldln2"),  /* 0xed: [mod=3,reg=5,rm=5] */
+	I(0xd9, IF_BYTE2,        "\xee" "fldz"),    /* 0xee: [mod=3,reg=5,rm=6] */
+	/*0xd9, IF_BYTE2,        "\xef" ???          * 0xef: [mod=3,reg=5,rm=7] */
+	I(0xd9, IF_BYTE2,        "\xf0" "f2xm1"),   /* 0xf0: [mod=3,reg=6,rm=0] */
+	I(0xd9, IF_BYTE2,        "\xf1" "fyl2x"),   /* 0xf1: [mod=3,reg=6,rm=1] */
+	I(0xd9, IF_BYTE2,        "\xf2" "fptan"),   /* 0xf2: [mod=3,reg=6,rm=2] */
+	I(0xd9, IF_BYTE2,        "\xf3" "fpatan"),  /* 0xf3: [mod=3,reg=6,rm=3] */
+	I(0xd9, IF_BYTE2,        "\xf4" "fxtract"), /* 0xf4: [mod=3,reg=6,rm=4] */
+	I(0xd9, IF_BYTE2,        "\xf5" "fprem1"),  /* 0xf5: [mod=3,reg=6,rm=5] */
+	I(0xd9, IF_BYTE2,        "\xf6" "fdecstp"), /* 0xf6: [mod=3,reg=6,rm=6] */
+	I(0xd9, IF_BYTE2,        "\xf7" "fincstp"), /* 0xf7: [mod=3,reg=6,rm=7] */
+	I(0xd9, IF_BYTE2,        "\xf8" "fprem"),   /* 0xf8: [mod=3,reg=7,rm=0] */
+	I(0xd9, IF_BYTE2,        "\xf9" "fyl2xp1"), /* 0xf9: [mod=3,reg=7,rm=1] */
+	I(0xd9, IF_BYTE2,        "\xfa" "fsqrt"),   /* 0xfa: [mod=3,reg=7,rm=2] */
+	I(0xd9, IF_BYTE2,        "\xfb" "fsincos"), /* 0xfb: [mod=3,reg=7,rm=3] */
+	I(0xd9, IF_BYTE2,        "\xfc" "frndint"), /* 0xfc: [mod=3,reg=7,rm=4] */
+	I(0xd9, IF_BYTE2,        "\xfd" "fscale"),  /* 0xfd: [mod=3,reg=7,rm=5] */
+	I(0xd9, IF_BYTE2,        "\xfe" "fsin"),    /* 0xfe: [mod=3,reg=7,rm=6] */
+	I(0xd9, IF_BYTE2,        "\xff" "fcos"),    /* 0xff: [mod=3,reg=7,rm=7] */
+
+
 	I(0xda, IF_MODRM|IF_RMM|IF_REG0, "fiaddl\t" OP_RM32 OP_VERBOSE_ST0),
 	I(0xda, IF_MODRM|IF_RMR|IF_REG0, "fcmovb\t" OP_RMSTi OP_ST0),
-	I(0xda, IF_MODRM|IF_RMR|IF_REG1, "fcmove\t" OP_RMSTi OP_ST0),
-	I(0xda, IF_MODRM|IF_RMR|IF_REG2, "fcmovbe\t" OP_RMSTi OP_ST0),
-	I(0xda, IF_MODRM|IF_RMR|IF_REG3, "fcmovu\t" OP_RMSTi OP_ST0),
 
 	I(0xda, IF_MODRM|IF_RMM|IF_REG1, "fimull\t" OP_RM32 OP_VERBOSE_ST0),
+	I(0xda, IF_MODRM|IF_RMR|IF_REG1, "fcmove\t" OP_RMSTi OP_ST0),
+
 	I(0xda, IF_MODRM|IF_RMM|IF_REG2, "ficoml\t" OP_RM32 OP_VERBOSE_ST0),
+	I(0xda, IF_MODRM|IF_RMR|IF_REG2, "fcmovbe\t" OP_RMSTi OP_ST0),
+
 	I(0xda, IF_MODRM|IF_RMM|IF_REG3, "ficompl\t" OP_RM32 OP_VERBOSE_ST0),
+	I(0xda, IF_MODRM|IF_RMR|IF_REG3, "fcmovu\t" OP_RMSTi OP_ST0),
+
 	I(0xda, IF_MODRM|IF_RMM|IF_REG4, "fisubl\t" OP_RM32 OP_VERBOSE_ST0),
+
 	I(0xda, IF_MODRM|IF_RMM|IF_REG5, "fisubrl\t" OP_RM32 OP_VERBOSE_ST0),
+
 	I(0xda, IF_MODRM|IF_RMM|IF_REG6, "fidivl\t" OP_RM32 OP_VERBOSE_ST0),
+
 	I(0xda, IF_MODRM|IF_RMM|IF_REG7, "fidivrl\t" OP_RM32 OP_VERBOSE_ST0),
 
-	I(0xdb, IF_BYTE2,  "\xe2" "fnclex"),
-	I(0xdb, IF_BYTE2,  "\xe3" "fninit"),
-	I(0xdb, IF_BYTE2,  "\xe8" "fucomi" OP_ST0 OP_ST0),
-	I(0xdb, IF_BYTE2,  "\xe9" "fucomi" OP_ST1 OP_ST0),
-	I(0xdb, IF_BYTE2,  "\xea" "fucomi" OP_ST2 OP_ST0),
-	I(0xdb, IF_BYTE2,  "\xeb" "fucomi" OP_ST3 OP_ST0),
-	I(0xdb, IF_BYTE2,  "\xec" "fucomi" OP_ST4 OP_ST0),
-	I(0xdb, IF_BYTE2,  "\xed" "fucomi" OP_ST5 OP_ST0),
-	I(0xdb, IF_BYTE2,  "\xee" "fucomi" OP_ST6 OP_ST0),
-	I(0xdb, IF_BYTE2,  "\xef" "fucomi" OP_ST7 OP_ST0),
-	I(0xdb, IF_BYTE2,  "\xf0" "fcomi" OP_ST0 OP_ST0),
-	I(0xdb, IF_BYTE2,  "\xf1" "fcomi" OP_ST1 OP_ST0),
-	I(0xdb, IF_BYTE2,  "\xf2" "fcomi" OP_ST2 OP_ST0),
-	I(0xdb, IF_BYTE2,  "\xf3" "fcomi" OP_ST3 OP_ST0),
-	I(0xdb, IF_BYTE2,  "\xf4" "fcomi" OP_ST4 OP_ST0),
-	I(0xdb, IF_BYTE2,  "\xf5" "fcomi" OP_ST5 OP_ST0),
-	I(0xdb, IF_BYTE2,  "\xf6" "fcomi" OP_ST6 OP_ST0),
-	I(0xdb, IF_BYTE2,  "\xf7" "fcomi" OP_ST7 OP_ST0),
+	I(0xda, IF_BYTE2, LONGREPR_B(0xe9, LO_FUCOMPP)), /* fucompp %st(1), %st(0) */
+
+
 	I(0xdb, IF_MODRM|IF_RMM|IF_REG0, "fildl\t" OP_RM32),
+	I(0xdb, IF_MODRM|IF_RMR|IF_REG0, "fcmovnb\t" OP_RMSTi OP_ST0),
+
 	I(0xdb, IF_MODRM|IF_RMM|IF_REG1, "fisttpl\t" OP_RM32),
+	I(0xdb, IF_MODRM|IF_RMR|IF_REG1, "fcmovne\t" OP_RMSTi OP_ST0),
+
 	I(0xdb, IF_MODRM|IF_RMM|IF_REG2, "fistl\t" OP_RM32),
+	I(0xdb, IF_MODRM|IF_RMR|IF_REG2, "fcmovnbe\t" OP_RMSTi OP_ST0),
+
 	I(0xdb, IF_MODRM|IF_RMM|IF_REG3, "fistpl\t" OP_RM32),
+	I(0xdb, IF_MODRM|IF_RMR|IF_REG3, "fcmovnu\t" OP_RMSTi OP_ST0),
+
 	I(0xdb, IF_MODRM|IF_RMM|IF_REG5, "fld80" OP_MEM),
+	I(0xdb, IF_MODRM|IF_RMR|IF_REG5, "fucomi" OP_RMSTi OP_ST0),
+
+	I(0xdb, IF_MODRM|IF_RMR|IF_REG6, "fcomi" OP_RMSTi OP_ST0),
+
 	I(0xdb, IF_MODRM|IF_RMM|IF_REG7, "fstp80" OP_MEM),
+
+	I(0xdb, IF_BYTE2,  "\xe2" "fnclex"), /* 0xe2: [mod=3,reg=4,rm=2] */
+	I(0xdb, IF_BYTE2,  "\xe3" "fninit"), /* 0xe3: [mod=3,reg=4,rm=3] */
+
 
 	I(0xdc, IF_MODRM|IF_RMR|IF_REG0, "fadd\t" OP_ST0 OP_RMSTi),
 	I(0xdc, IF_MODRM|IF_RMM|IF_REG0, "faddq\t" OP_RM64 OP_VERBOSE_ST0),
+
 	I(0xdc, IF_MODRM|IF_RMR|IF_REG1, "fmul\t" OP_ST0 OP_RMSTi),
 	I(0xdc, IF_MODRM|IF_RMM|IF_REG1, "fmulq\t" OP_RM64 OP_VERBOSE_ST0),
+
 	I(0xdc, IF_MODRM|IF_RMM|IF_REG2, "fcomq\t" OP_RM64 OP_VERBOSE_ST0),
 	I(0xdc, IF_MODRM|IF_RMM|IF_REG3, "fcompq\t" OP_RM64 OP_VERBOSE_ST0),
+
 	I(0xdc, IF_MODRM|IF_RMR|IF_REG4, "fsub\t" OP_ST0 OP_RMSTi),
 	I(0xdc, IF_MODRM|IF_RMM|IF_REG4, "fsubq\t" OP_RM64 OP_VERBOSE_ST0),
+
 	I(0xdc, IF_MODRM|IF_RMR|IF_REG5, "fsubr\t" OP_ST0 OP_RMSTi),
 	I(0xdc, IF_MODRM|IF_RMM|IF_REG5, "fsubrq\t" OP_RM64 OP_VERBOSE_ST0),
+
 	I(0xdc, IF_MODRM|IF_RMR|IF_REG6, "fdiv\t" OP_RMSTi OP_VERBOSE_ST0),
 	I(0xdc, IF_MODRM|IF_RMM|IF_REG6, "fdivq\t" OP_RM64 OP_VERBOSE_ST0),
+
 	I(0xdc, IF_MODRM|IF_RMR|IF_REG7, "fdivr\t" OP_RMSTi OP_VERBOSE_ST0),
 	I(0xdc, IF_MODRM|IF_RMM|IF_REG7, "fdivrq\t" OP_RM64 OP_VERBOSE_ST0),
 
-	I(0xdd, IF_BYTE2, "\xc0" "ffree\t" OP_ST0),
-	I(0xdd, IF_BYTE2, "\xc1" "ffree\t" OP_ST1),
-	I(0xdd, IF_BYTE2, "\xc2" "ffree\t" OP_ST2),
-	I(0xdd, IF_BYTE2, "\xc3" "ffree\t" OP_ST3),
-	I(0xdd, IF_BYTE2, "\xc4" "ffree\t" OP_ST4),
-	I(0xdd, IF_BYTE2, "\xc5" "ffree\t" OP_ST5),
-	I(0xdd, IF_BYTE2, "\xc6" "ffree\t" OP_ST6),
-	I(0xdd, IF_BYTE2, "\xc7" "ffree\t" OP_ST7),
-	I(0xdd, IF_BYTE2, "\xe0" "fucom\t" OP_ST0),
-	I(0xdd, IF_BYTE2, "\xe1" "fucom\t" OP_ST1),
-	I(0xdd, IF_BYTE2, "\xe2" "fucom\t" OP_ST2),
-	I(0xdd, IF_BYTE2, "\xe3" "fucom\t" OP_ST3),
-	I(0xdd, IF_BYTE2, "\xe4" "fucom\t" OP_ST4),
-	I(0xdd, IF_BYTE2, "\xe5" "fucom\t" OP_ST5),
-	I(0xdd, IF_BYTE2, "\xe6" "fucom\t" OP_ST6),
-	I(0xdd, IF_BYTE2, "\xe7" "fucom\t" OP_ST7),
-	I(0xdd, IF_BYTE2, "\xe8" "fucomp\t" OP_ST0),
-	I(0xdd, IF_BYTE2, "\xe9" "fucomp\t" OP_ST1),
-	I(0xdd, IF_BYTE2, "\xea" "fucomp\t" OP_ST2),
-	I(0xdd, IF_BYTE2, "\xeb" "fucomp\t" OP_ST3),
-	I(0xdd, IF_BYTE2, "\xec" "fucomp\t" OP_ST4),
-	I(0xdd, IF_BYTE2, "\xed" "fucomp\t" OP_ST5),
-	I(0xdd, IF_BYTE2, "\xee" "fucomp\t" OP_ST6),
-	I(0xdd, IF_BYTE2, "\xef" "fucomp\t" OP_ST7),
 
 	I(0xdd, IF_MODRM|IF_RMM|IF_REG0, "fldq" OP_RM64),
+	I(0xdd, IF_MODRM|IF_RMR|IF_REG0, "ffree\t" OP_RMSTi),
+
 	I(0xdd, IF_MODRM|IF_RMM|IF_REG1, "fisttpq\t" OP_RM64),
+
 	I(0xdd, IF_MODRM|IF_RMR|IF_REG2, "fst\t" OP_RMSTi),
+
 	I(0xdd, IF_MODRM|IF_RMM|IF_REG2, "fstq\t" OP_RM64),
+
 	I(0xdd, IF_MODRM|IF_RMR|IF_REG3, "fstp\t" OP_RMSTi),
 	I(0xdd, IF_MODRM|IF_RMM|IF_REG3, "fstpq\t" OP_RM64),
+
 	I(0xdd, IF_66|IF_MODRM|IF_RMM|IF_REG4, "frstor94\t" OP_MEM),
 	I(0xdd, IF_MODRM|IF_RMM|IF_REG4, "frstor108\t" OP_MEM),
+	I(0xdd, IF_MODRM|IF_RMR|IF_REG4, "fucom\t" OP_RMSTi),
+
+	I(0xdd, IF_MODRM|IF_RMR|IF_REG5, "fucomp\t" OP_RMSTi),
+
 	I(0xdd, IF_66|IF_MODRM|IF_RMM|IF_REG6, "fnsave94\t" OP_MEM),
 	I(0xdd, IF_MODRM|IF_RMM|IF_REG6, "fnsave108\t" OP_MEM),
+
 	I(0xdd, IF_MODRM|IF_RMM|IF_REG7, "fnstcww\t" OP_RM16),
 
-	I(0xde, IF_BYTE2, "\xd9" "fcompp\t" OP_VERBOSE_ST1 OP_VERBOSE_ST0),
 
 	I(0xde, IF_MODRM|IF_RMR|IF_REG0, "faddp\t" OP_ST0 OP_RMSTi),
 	I(0xde, IF_MODRM|IF_RMM|IF_REG0, "fiaddw\t" OP_RM16 OP_VERBOSE_ST0),
+
 	I(0xde, IF_MODRM|IF_RMR|IF_REG1, "fmulp\t" OP_ST0 OP_RMSTi),
 	I(0xde, IF_MODRM|IF_RMM|IF_REG1, "fimulw\t" OP_RM16 OP_VERBOSE_ST0),
+
 	I(0xde, IF_MODRM|IF_RMM|IF_REG2, "ficomw\t" OP_RM16 OP_VERBOSE_ST0),
+
 	I(0xde, IF_MODRM|IF_RMM|IF_REG3, "ficompw\t" OP_RM16 OP_VERBOSE_ST0),
+
 	I(0xde, IF_MODRM|IF_RMR|IF_REG4, "fsubp\t" OP_ST0 OP_RMSTi),
 	I(0xde, IF_MODRM|IF_RMM|IF_REG4, "fisubw\t" OP_RM16 OP_VERBOSE_ST0),
+
 	I(0xde, IF_MODRM|IF_RMR|IF_REG5, "fsubrp\t" OP_ST0 OP_RMSTi),
 	I(0xde, IF_MODRM|IF_RMM|IF_REG5, "fisubrw\t" OP_RM16 OP_VERBOSE_ST0),
+
 	I(0xde, IF_MODRM|IF_RMR|IF_REG6, "fdivp\t" OP_ST0 OP_RMSTi),
 	I(0xde, IF_MODRM|IF_RMM|IF_REG6, "fidivw\t" OP_RM16 OP_VERBOSE_ST0),
+
 	I(0xde, IF_MODRM|IF_RMR|IF_REG7, "fdivrp\t" OP_ST0 OP_RMSTi),
 	I(0xde, IF_MODRM|IF_RMM|IF_REG7, "fidivrw\t" OP_RM16 OP_VERBOSE_ST0),
 
-	I(0xdf, IF_BYTE2,  "\xe0" "fnstsw" OP_AX),
-	I(0xdf, IF_BYTE2,  "\xe8" "fucomip" OP_ST0 OP_ST0),
-	I(0xdf, IF_BYTE2,  "\xe9" "fucomip" OP_ST1 OP_ST0),
-	I(0xdf, IF_BYTE2,  "\xea" "fucomip" OP_ST2 OP_ST0),
-	I(0xdf, IF_BYTE2,  "\xeb" "fucomip" OP_ST3 OP_ST0),
-	I(0xdf, IF_BYTE2,  "\xec" "fucomip" OP_ST4 OP_ST0),
-	I(0xdf, IF_BYTE2,  "\xed" "fucomip" OP_ST5 OP_ST0),
-	I(0xdf, IF_BYTE2,  "\xee" "fucomip" OP_ST6 OP_ST0),
-	I(0xdf, IF_BYTE2,  "\xef" "fucomip" OP_ST7 OP_ST0),
-	I(0xdf, IF_BYTE2,  "\xf0" "fcomip" OP_ST0 OP_ST0),
-	I(0xdf, IF_BYTE2,  "\xf1" "fcomip" OP_ST1 OP_ST0),
-	I(0xdf, IF_BYTE2,  "\xf2" "fcomip" OP_ST2 OP_ST0),
-	I(0xdf, IF_BYTE2,  "\xf3" "fcomip" OP_ST3 OP_ST0),
-	I(0xdf, IF_BYTE2,  "\xf4" "fcomip" OP_ST4 OP_ST0),
-	I(0xdf, IF_BYTE2,  "\xf5" "fcomip" OP_ST5 OP_ST0),
-	I(0xdf, IF_BYTE2,  "\xf6" "fcomip" OP_ST6 OP_ST0),
-	I(0xdf, IF_BYTE2,  "\xf7" "fcomip" OP_ST7 OP_ST0),
+	I(0xde, IF_BYTE2, "\xd9" "fcompp\t" OP_VERBOSE_ST1 OP_VERBOSE_ST0), /* 0xd9: [mod=3,reg=3,rm=1] */
+
 
 	I(0xdf, IF_MODRM|IF_RMM|IF_REG0, "fildw\t" OP_RM16),
 	I(0xdf, IF_MODRM|IF_RMM|IF_REG1, "fisttpw\t" OP_RM16),
 	I(0xdf, IF_MODRM|IF_RMM|IF_REG2, "fistw\t" OP_RM16),
 	I(0xdf, IF_MODRM|IF_RMM|IF_REG3, "fistpw\t" OP_RM16),
 	I(0xdf, IF_MODRM|IF_RMM|IF_REG4, "fbld\t" OP_MEM),
+
 	I(0xdf, IF_MODRM|IF_RMM|IF_REG5, "fildq\t" OP_RM64),
+	I(0xdf, IF_MODRM|IF_RMR|IF_REG5, "fucomip" OP_RMSTi OP_ST0),
+
 	I(0xdf, IF_MODRM|IF_RMM|IF_REG6, "fbstp\t" OP_MEM),
+	I(0xdf, IF_MODRM|IF_RMR|IF_REG6, "fcomip" OP_RMSTi OP_ST0),
+
 	I(0xdf, IF_MODRM|IF_RMM|IF_REG7, "fistpq\t" OP_RM64),
+
+	I(0xdf, IF_BYTE2,  "\xe0" "fnstsw" OP_AX),
 
 
 	I(0xe0, 0,                "loopnz\t" OP_DISP8),
@@ -1676,28 +1736,78 @@ PRIVATE struct instruction const ops_0f[] = {
 	I(0x01, IF_MODRM|IF_REG4,                "smswl\t" OP_RM32),
 	I(0x01, IF_MODRM|IF_REXW|IF_REG4,        "smswq\t" OP_RM64),
 
+	/* NOTE: Interestingly, IF_REG5 isn't used by anything I could find, such that
+	 *       0f01/5 appears fully available for some `foo r/mNN' instruction... */
+
 	I(0x01, IF_MODRM|IF_REG6,                "lmsw\t" OP_RM16),
 
 	I(0x01, IF_MODRM|IF_RMM|IF_REG7,         "invlpg\t" OP_MEM),
 
-	I(0x01, IF_BYTE2,                 "\xc1" "vmcall"),
-	I(0x01, IF_BYTE2,                 "\xc2" "vmlaunch"),
-	I(0x01, IF_BYTE2,                 "\xc3" "vmresume"),
-	I(0x01, IF_BYTE2,                 "\xc4" "vmxoff"),
-	I(0x01, IF_BYTE2,                 "\xc8" "monitor\t" OP_PAX_PCX_PDX),
-	I(0x01, IF_BYTE2,                 "\xc9" "mwait\t" OP_PAX_PCX),
-	I(0x01, IF_BYTE2,                 "\xca" "clac"),
-	I(0x01, IF_BYTE2,                 "\xcb" "stac"),
-	I(0x01, IF_BYTE2,                 "\xcf" "encls"),
-	I(0x01, IF_BYTE2,                 "\xd0" "xgetbv"),
-	I(0x01, IF_BYTE2,                 "\xd1" "xsetbv"),
-	I(0x01, IF_BYTE2,                 "\xd4" "vmfunc"),
-	I(0x01, IF_BYTE2,                 "\xd5" "xend"),
-	I(0x01, IF_BYTE2,                 "\xd6" "xtest"),
-	I(0x01, IF_BYTE2,                 "\xd7" "enclu"),
-
-	I(0x01, IF_BYTE2,                 "\xf8" "swapgs"),
-	I(0x01, IF_BYTE2,                 "\xf9" "rdtscp"),
+	/*0x01, IF_BYTE2,                 "\xc0"  ???                          * 0xc0: [mod=3,reg=0,rm=0] */
+	I(0x01, IF_BYTE2,                 "\xc1" "vmcall"),                   /* 0xc1: [mod=3,reg=0,rm=1] */
+	I(0x01, IF_BYTE2,                 "\xc2" "vmlaunch"),                 /* 0xc2: [mod=3,reg=0,rm=2] */
+	I(0x01, IF_BYTE2,                 "\xc3" "vmresume"),                 /* 0xc3: [mod=3,reg=0,rm=3] */
+	I(0x01, IF_BYTE2,                 "\xc4" "vmxoff"),                   /* 0xc4: [mod=3,reg=0,rm=4] */
+	/*0x01, IF_BYTE2,                 "\xc5"  ???                          * 0xc5: [mod=3,reg=0,rm=5] */
+	/*0x01, IF_BYTE2,                 "\xc6"  ???                          * 0xc6: [mod=3,reg=0,rm=6] */
+	/*0x01, IF_BYTE2,                 "\xc7"  ???                          * 0xc7: [mod=3,reg=0,rm=7] */
+	I(0x01, IF_BYTE2,                 "\xc8" "monitor\t" OP_PAX_PCX_PDX), /* 0xc8: [mod=3,reg=1,rm=0] */
+	I(0x01, IF_BYTE2,                 "\xc9" "mwait\t" OP_PAX_PCX),       /* 0xc9: [mod=3,reg=1,rm=1] */
+	I(0x01, IF_BYTE2,                 "\xca" "clac"),                     /* 0xca: [mod=3,reg=1,rm=2] */
+	I(0x01, IF_BYTE2,                 "\xcb" "stac"),                     /* 0xcb: [mod=3,reg=1,rm=3] */
+	/*0x01, IF_BYTE2,                 "\xcc"  ???                          * 0xdc: [mod=3,reg=1,rm=4] */
+	/*0x01, IF_BYTE2,                 "\xcd"  ???                          * 0xdd: [mod=3,reg=1,rm=5] */
+	/*0x01, IF_BYTE2,                 "\xce"  ???                          * 0xde: [mod=3,reg=1,rm=6] */
+	I(0x01, IF_BYTE2,                 "\xcf" "encls"),                    /* 0xcf: [mod=3,reg=1,rm=7] */
+	I(0x01, IF_BYTE2,                 "\xd0" "xgetbv"),                   /* 0xd0: [mod=3,reg=2,rm=0] */
+	I(0x01, IF_BYTE2,                 "\xd1" "xsetbv"),                   /* 0xd1: [mod=3,reg=2,rm=1] */
+	/*0x01, IF_BYTE2,                 "\xd2"  ???                          * 0xd2: [mod=3,reg=2,rm=2] */
+	/*0x01, IF_BYTE2,                 "\xd3"  ???                          * 0xd3: [mod=3,reg=2,rm=3] */
+	I(0x01, IF_BYTE2,                 "\xd4" "vmfunc"),                   /* 0xd4: [mod=3,reg=2,rm=4] */
+	I(0x01, IF_BYTE2,                 "\xd5" "xend"),                     /* 0xd5: [mod=3,reg=2,rm=5] */
+	I(0x01, IF_BYTE2,                 "\xd6" "xtest"),                    /* 0xd6: [mod=3,reg=2,rm=6] */
+	I(0x01, IF_BYTE2,                 "\xd7" "enclu"),                    /* 0xd7: [mod=3,reg=2,rm=7] */
+	I(0x01, IF_BYTE2,                 "\xd8" "vmrun" OP_PAX),             /* 0xd8: [mod=3,reg=3,rm=0] */
+	I(0x01, IF_BYTE2,                 "\xd9" "vmmcall"),                  /* 0xd9: [mod=3,reg=3,rm=1] */
+	I(0x01, IF_BYTE2,                 "\xda" "vmload"),                   /* 0xda: [mod=3,reg=3,rm=2] */
+	I(0x01, IF_BYTE2,                 "\xdb" "vmsave"),                   /* 0xdb: [mod=3,reg=3,rm=3] */
+	I(0x01, IF_BYTE2,                 "\xdc" "stgi"),                     /* 0xdc: [mod=3,reg=3,rm=4] */
+	I(0x01, IF_BYTE2,                 "\xdd" "clgi"),                     /* 0xdd: [mod=3,reg=3,rm=5] */
+	/*0x01, IF_BYTE2,                 "\xde"  ???                          * 0xde: [mod=3,reg=3,rm=6] */
+	I(0x01, IF_BYTE2,                 "\xdf" "invlpga" OP_PAX_PCX),       /* 0xdf: [mod=3,reg=3,rm=7] */
+	/*0x01, IF_BYTE2,                 "\xe0" "smsw %eax"                   * 0xe0: [mod=3,reg=4,rm=0] */
+	/*0x01, IF_BYTE2,                 "\xe1" "smsw %ecx"                   * 0xe1: [mod=3,reg=4,rm=1] */
+	/*0x01, IF_BYTE2,                 "\xe2" "smsw %edx"                   * 0xe2: [mod=3,reg=4,rm=2] */
+	/*0x01, IF_BYTE2,                 "\xe3" "smsw %ebx"                   * 0xe3: [mod=3,reg=4,rm=3] */
+	/*0x01, IF_BYTE2,                 "\xe4" "smsw %esp"                   * 0xe4: [mod=3,reg=4,rm=4] */
+	/*0x01, IF_BYTE2,                 "\xe5" "smsw %ebp"                   * 0xe5: [mod=3,reg=4,rm=5] */
+	/*0x01, IF_BYTE2,                 "\xe6" "smsw %esi"                   * 0xe6: [mod=3,reg=4,rm=6] */
+	/*0x01, IF_BYTE2,                 "\xe7" "smsw %edi"                   * 0xe7: [mod=3,reg=4,rm=7] */
+	/*0x01, IF_BYTE2,                 "\xe8" ???                           * 0xe8: [mod=3,reg=5,rm=0] */
+	/*0x01, IF_BYTE2,                 "\xe9" ???                           * 0xe9: [mod=3,reg=5,rm=1] */
+	/*0x01, IF_BYTE2,                 "\xea" ???                           * 0xea: [mod=3,reg=5,rm=2] */
+	/*0x01, IF_BYTE2,                 "\xeb" ???                           * 0xeb: [mod=3,reg=5,rm=3] */
+	/*0x01, IF_BYTE2,                 "\xec" ???                           * 0xec: [mod=3,reg=5,rm=4] */
+	/*0x01, IF_BYTE2,                 "\xed" ???                           * 0xed: [mod=3,reg=5,rm=5] */
+	/*0x01, IF_BYTE2,                 "\xee" ???                           * 0xee: [mod=3,reg=5,rm=6] */
+	/*0x01, IF_BYTE2,                 "\xef" ???                           * 0xef: [mod=3,reg=5,rm=7] */
+	/*0x01, IF_BYTE2,                 "\xf0" "lmsw %ax"                    * 0xf0: [mod=3,reg=6,rm=0] */
+	/*0x01, IF_BYTE2,                 "\xf1" "lmsw %cx"                    * 0xf1: [mod=3,reg=6,rm=1] */
+	/*0x01, IF_BYTE2,                 "\xf2" "lmsw %dx"                    * 0xf2: [mod=3,reg=6,rm=2] */
+	/*0x01, IF_BYTE2,                 "\xf3" "lmsw %bx"                    * 0xf3: [mod=3,reg=6,rm=3] */
+	/*0x01, IF_BYTE2,                 "\xf4" "lmsw %sp"                    * 0xf4: [mod=3,reg=6,rm=4] */
+	/*0x01, IF_BYTE2,                 "\xf5" "lmsw %bp"                    * 0xf5: [mod=3,reg=6,rm=5] */
+	/*0x01, IF_BYTE2,                 "\xf6" "lmsw %si"                    * 0xf6: [mod=3,reg=6,rm=6] */
+	/*0x01, IF_BYTE2,                 "\xf7" "lmsw %di"                    * 0xf7: [mod=3,reg=6,rm=7] */
+	I(0x01, IF_BYTE2,                 "\xf8" "swapgs"),                   /* 0xf8: [mod=3,reg=7,rm=0] */
+	I(0x01, IF_BYTE2,                 "\xf9" "rdtscp"),                   /* 0xf9: [mod=3,reg=7,rm=1] */
+	I(0x01, IF_F3|IF_BYTE2,           "\xfa" "mcommit"),                  /* 0xfa: [mod=3,reg=7,rm=2] */
+	I(0x01, IF_BYTE2,                 "\xfa" "monitorx" OP_PAX_PCX_PDX),  /* 0xfa: [mod=3,reg=7,rm=2] */
+	I(0x01, IF_BYTE2,                 "\xfb" "mwaitx" OP_PAX_PCX),        /* 0xfb: [mod=3,reg=7,rm=3] */
+	I(0x01, IF_BYTE2,                 "\xfc" "clzero" OP_PAX),            /* 0xfc: [mod=3,reg=7,rm=4] */
+	I(0x01, IF_BYTE2,                 "\xfd" "rdpru"),                    /* 0xfd: [mod=3,reg=7,rm=5] */
+	/*0x01, IF_BYTE2,                 "\xfe"  ???                          * 0xfe: [mod=3,reg=7,rm=6] */
+	/*0x01, IF_BYTE2,                 "\xff"  ???                          * 0xff: [mod=3,reg=7,rm=7] */
 
 	I(0x02, IF_MODRM,         "lar\t" OP_RM16 OP_R16),
 
@@ -1711,6 +1821,7 @@ PRIVATE struct instruction const ops_0f[] = {
 	I(0x07, IF_X32,           "loadall\t" OP_PSI), /* http://www.geoffchappell.com/notes/windows/archive/linkcpu.htm */
 	I(0x07, IF_X64,           "sysret"),
 	I(0x08, 0,                "invd"),
+	I(0x09, IF_F3,            "wbnoinvd"),
 	I(0x09, 0,                "wbinvd"),
 
 	I(0x0a, 0,                "cflsh"), /* http://www.geoffchappell.com/notes/windows/archive/linkcpu.htm */
@@ -2999,9 +3110,9 @@ PRIVATE struct instruction const ops_0f[] = {
 	I(0xae, IF_66|IF_MODRM|IF_RMM|IF_REG7, "clflushopt\t" OP_RM32),
 	I(0xae, IF_MODRM|IF_RMM|IF_REG7,       "clflush\t" OP_MEM),
 
-	I(0xae, IF_BYTE2,                "\xe8" "lfence"), /* 0xe8: [mod=3,reg=5,rm=0] (aka. `foo [rm]:%ax, [reg]:%bp') */
-	I(0xae, IF_BYTE2,                "\xf0" "mfence"), /* 0xf0: [mod=3,reg=6,rm=0] (aka. `foo [rm]:%ax, [reg]:%si') */
-	I(0xae, IF_BYTE2,                "\xf8" "sfence"), /* 0xf8: [mod=3,reg=7,rm=0] (aka. `foo [rm]:%ax, [reg]:%di') */
+	I(0xae, IF_BYTE2, "\xe8" "lfence"), /* 0xe8: [mod=3,reg=5,rm=0] (aka. `foo [rm]:%ax, [reg]:%bp') */
+	I(0xae, IF_BYTE2, "\xf0" "mfence"), /* 0xf0: [mod=3,reg=6,rm=0] (aka. `foo [rm]:%ax, [reg]:%si') */
+	I(0xae, IF_BYTE2, "\xf8" "sfence"), /* 0xf8: [mod=3,reg=7,rm=0] (aka. `foo [rm]:%ax, [reg]:%di') */
 
 	I(0xaf, IF_66|IF_MODRM,  "imulb\t" OP_RM8 OP_R8),
 	I(0xaf, IF_MODRM,        "imulw\t" OP_RM16 OP_R16),
@@ -3037,7 +3148,8 @@ PRIVATE struct instruction const ops_0f[] = {
 	I(0xb8, IF_F3|IF_MODRM,        "popcntl\t" OP_RM32 OP_R32),
 	I(0xb8, IF_F3|IF_MODRM|IF_REXW,"popcntq\t" OP_RM64 OP_R64),
 
-	I(0xb9, IF_MODRM,        "ud1\t" OP_RM32 OP_R32),
+	I(0xb9, IF_X64|IF_MODRM,   "ud1\t" OP_RM64 OP_R64),
+	I(0xb9, IF_X32|IF_MODRM,   "ud1\t" OP_RM32 OP_R32),
 
 	I(0xba, IF_66|IF_MODRM|IF_REG4,   "btw\t" OP_U8 OP_RM16),
 	I(0xba, IF_MODRM|IF_REG4,         "btl\t" OP_U8 OP_RM32),
@@ -3541,7 +3653,7 @@ PRIVATE struct instruction const ops_0f[] = {
 	I(0xfe, IF_MODRM,                                    "paddd\t" OP_RM64_MM OP_RMM),                     /*                 0f fe /r paddd mm, mm/m64 */
 	I(0xfe, IF_66|IF_MODRM,                              "paddd\t" OP_RM128_XMM OP_RXMM),                  /*              66 0f fe /r paddd xmm1, xmm2/m128 */
 
-	I(0xff, IF_MODRM,        "ud0\t" OP_RM32 OP_R32),
+	I(0xff, 0,        "ud0"), /* Not modr/m (according to AMD) */
 
 	I(0, 0, "")
 /*[[[end:ops_0f]]]*/
@@ -4837,17 +4949,6 @@ PRIVATE struct instruction const ops_0f3a[] = {
 /* clang-format on */
 
 #if 0
-	//TODO: https://en.wikipedia.org/wiki/Bit_Manipulation_Instruction_Sets
-	//      BEXTR
-	//      BLCFILL
-	//      BLCI
-	//      BLCIC
-	//      BLCMSK
-	//      BLCS
-	//      BLSFILL
-	//      BLSIC
-	//      T1MSKC
-	//      TZMSK
 
 
 	I(0x92, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 0) "vgatherdpd\txmm, vm32x, xmm"), /* VEX.128.66.0f38.W1 92 /r vgatherdpd xmm1, vm32x, xmm2 */
@@ -5028,45 +5129,45 @@ generateOffsetTable("ops_0f38");
 generateOffsetTable("ops_0f3a");
 ]]]*/
 #define HAVE_OPS_OFFSETS 1
-STATIC_ASSERT(COMPILER_LENOF(ops) == 955);
+STATIC_ASSERT(COMPILER_LENOF(ops) == 896);
 PRIVATE u16 const ops_offsets[256] = {
-	0, 1, 4, 5, 8, 9, 12, 14, 16, 17, 20, 21, 24, 25, 28, 954,
+	0, 1, 4, 5, 8, 9, 12, 14, 16, 17, 20, 21, 24, 25, 28, 895,
 	30, 31, 34, 35, 38, 39, 42, 44, 46, 47, 50, 51, 54, 55, 58, 60,
-	62, 63, 66, 67, 70, 71, 954, 74, 75, 76, 79, 80, 83, 84, 954, 87,
-	88, 89, 92, 93, 96, 97, 954, 100, 101, 102, 105, 106, 109, 110, 954, 113,
+	62, 63, 66, 67, 70, 71, 895, 74, 75, 76, 79, 80, 83, 84, 895, 87,
+	88, 89, 92, 93, 96, 97, 895, 100, 101, 102, 105, 106, 109, 110, 895, 113,
 	114, 116, 118, 120, 122, 124, 126, 128, 130, 132, 134, 136, 138, 140, 142, 144,
 	146, 150, 154, 158, 162, 166, 170, 174, 178, 182, 186, 190, 194, 198, 202, 206,
-	210, 212, 214, 216, 954, 954, 954, 954, 217, 220, 223, 226, 229, 231, 235, 237,
+	210, 212, 214, 216, 895, 895, 895, 895, 217, 220, 223, 226, 229, 231, 235, 237,
 	241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256,
 	257, 265, 289, 297, 321, 322, 325, 326, 329, 330, 333, 334, 337, 340, 343, 346,
 	352, 359, 365, 371, 377, 383, 389, 395, 401, 402, 404, 406, 408, 411, 414, 415,
 	416, 418, 422, 424, 428, 430, 436, 439, 448, 449, 452, 454, 460, 462, 468, 471,
 	480, 482, 484, 486, 488, 490, 492, 494, 496, 502, 508, 514, 520, 526, 532, 538,
 	544, 552, 576, 578, 580, 582, 584, 586, 591, 592, 593, 594, 595, 596, 597, 598,
-	602, 610, 634, 642, 666, 667, 668, 669, 670, 686, 739, 752, 776, 790, 825, 840,
-	865, 866, 867, 868, 871, 872, 874, 875, 877, 879, 881, 883, 884, 885, 887, 888,
-	954, 890, 954, 954, 891, 892, 893, 901, 925, 926, 927, 928, 929, 930, 931, 933
+	602, 610, 634, 642, 666, 667, 668, 669, 670, 686, 725, 738, 752, 766, 780, 795,
+	806, 807, 808, 809, 812, 813, 815, 816, 818, 820, 822, 824, 825, 826, 828, 829,
+	895, 831, 895, 895, 832, 833, 834, 842, 866, 867, 868, 869, 870, 871, 872, 874
 };
 
 #define HAVE_OPS_0F_OFFSETS 1
-STATIC_ASSERT(COMPILER_LENOF(ops_0f) == 1508);
+STATIC_ASSERT(COMPILER_LENOF(ops_0f) == 1522);
 PRIVATE u16 const ops_0f_offsets[256] = {
-	0, 6, 36, 37, 1507, 40, 42, 43, 45, 46, 47, 48, 1507, 49, 1507, 1507,
-	51, 75, 97, 118, 124, 136, 148, 163, 169, 1507, 173, 179, 184, 1507, 1507, 185,
-	187, 189, 191, 193, 195, 1507, 196, 1507, 197, 209, 221, 231, 243, 253, 263, 269,
-	275, 276, 277, 278, 279, 280, 281, 282, 1507, 1507, 1507, 1507, 1507, 1507, 1507, 283,
-	284, 287, 294, 301, 304, 311, 318, 325, 332, 335, 338, 345, 351, 354, 357, 360,
-	363, 375, 393, 398, 403, 415, 427, 439, 451, 469, 487, 505, 526, 544, 562, 580,
-	598, 603, 608, 615, 620, 625, 630, 637, 642, 647, 652, 659, 664, 670, 676, 682,
-	706, 721, 736, 772, 794, 799, 804, 811, 814, 832, 852, 870, 880, 886, 892, 898,
-	922, 924, 926, 928, 930, 932, 934, 936, 938, 940, 942, 944, 946, 948, 950, 952,
-	954, 959, 964, 969, 974, 975, 976, 977, 978, 983, 988, 989, 990, 991, 992, 993,
-	994, 997, 1000, 1001, 1004, 1007, 1507, 1507, 1010, 1013, 1016, 1017, 1020, 1023, 1026, 1057,
-	1060, 1061, 1064, 1067, 1070, 1073, 1076, 1079, 1081, 1084, 1085, 1097, 1100, 1106, 1112, 1115,
-	1117, 1118, 1121, 1139, 1141, 1145, 1153, 1165, 1181, 1185, 1189, 1193, 1197, 1201, 1205, 1209,
-	1213, 1219, 1224, 1231, 1238, 1245, 1250, 1252, 1260, 1265, 1270, 1275, 1285, 1290, 1295, 1300,
-	1310, 1315, 1320, 1330, 1335, 1340, 1345, 1366, 1373, 1378, 1383, 1388, 1398, 1403, 1408, 1413,
-	1423, 1426, 1431, 1438, 1445, 1452, 1457, 1462, 1465, 1470, 1475, 1482, 1489, 1494, 1499, 1506
+	0, 6, 48, 49, 1521, 52, 54, 55, 57, 58, 60, 61, 1521, 62, 1521, 1521,
+	64, 88, 110, 131, 137, 149, 161, 176, 182, 1521, 186, 192, 197, 1521, 1521, 198,
+	200, 202, 204, 206, 208, 1521, 209, 1521, 210, 222, 234, 244, 256, 266, 276, 282,
+	288, 289, 290, 291, 292, 293, 294, 295, 1521, 1521, 1521, 1521, 1521, 1521, 1521, 296,
+	297, 300, 307, 314, 317, 324, 331, 338, 345, 348, 351, 358, 364, 367, 370, 373,
+	376, 388, 406, 411, 416, 428, 440, 452, 464, 482, 500, 518, 539, 557, 575, 593,
+	611, 616, 621, 628, 633, 638, 643, 650, 655, 660, 665, 672, 677, 683, 689, 695,
+	719, 734, 749, 785, 807, 812, 817, 824, 827, 845, 865, 883, 893, 899, 905, 911,
+	935, 937, 939, 941, 943, 945, 947, 949, 951, 953, 955, 957, 959, 961, 963, 965,
+	967, 972, 977, 982, 987, 988, 989, 990, 991, 996, 1001, 1002, 1003, 1004, 1005, 1006,
+	1007, 1010, 1013, 1014, 1017, 1020, 1521, 1521, 1023, 1026, 1029, 1030, 1033, 1036, 1039, 1070,
+	1073, 1074, 1077, 1080, 1083, 1086, 1089, 1092, 1094, 1097, 1099, 1111, 1114, 1120, 1126, 1129,
+	1131, 1132, 1135, 1153, 1155, 1159, 1167, 1179, 1195, 1199, 1203, 1207, 1211, 1215, 1219, 1223,
+	1227, 1233, 1238, 1245, 1252, 1259, 1264, 1266, 1274, 1279, 1284, 1289, 1299, 1304, 1309, 1314,
+	1324, 1329, 1334, 1344, 1349, 1354, 1359, 1380, 1387, 1392, 1397, 1402, 1412, 1417, 1422, 1427,
+	1437, 1440, 1445, 1452, 1459, 1466, 1471, 1476, 1479, 1484, 1489, 1496, 1503, 1508, 1513, 1520
 };
 
 #define HAVE_OPS_0F38_OFFSETS 1
