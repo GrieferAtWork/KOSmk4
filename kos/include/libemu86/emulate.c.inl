@@ -2165,6 +2165,13 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_modrm_mem
 		result += EMU86_GETREGP(modrm->mi_index, op_flags) << modrm->mi_shift;
 #ifndef EMU86_GETSEGBASE_IS_NOOP_ALL
 	{
+		/* TODO: When no segment override is given, and `modrm->mi_rm' is either
+		 *       ESP or EBP, then %ss must be used; else %ds must be used.
+		 *       Currently we always use %ds, and don't even know if %ds
+		 *       was given to us explicitly (it's just set-up as the default
+		 *       right now).
+		 * -> This needs to be fixed, as it could easily break libvm86 executing
+		 *    BIOS code that more likely than not depends on implied segment bases. */
 		u8 reg = EMU86_F_SEGREG(op_flags);
 		if (!EMU86_GETSEGBASE_IS_NOOP(reg)) {
 			uintptr_t segment_base;
@@ -3182,17 +3189,42 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 			/* TODO: stac */
 			/* TODO: movnti */
 
-			//TODO: https://en.wikipedia.org/wiki/Bit_Manipulation_Instruction_Sets
-			//      BEXTR
-			//      BLCFILL
-			//      BLCI
-			//      BLCIC
-			//      BLCMSK
-			//      BLCS
-			//      BLSFILL
-			//      BLSIC
-			//      T1MSKC
-			//      TZMSK
+			/* TODO: XOP instructions (from AMD):
+			 *    BLCFILL reg32, reg/mem32             8F RXB.09 0.dest.0.00 01 /1
+			 *    BLCFILL reg64, reg/mem64             8F RXB.09 1.dest.0.00 01 /1
+			 *    BLSFILL reg32, reg/mem32             8F RXB.09 0.dest.0.00 01 /2
+			 *    BLSFILL reg64, reg/mem64             8F RXB.09 1.dest.0.00 01 /2
+			 *    BLCS reg32, reg/mem32                8F RXB.09 0.dest.0.00 01 /3
+			 *    BLCS reg64, reg/mem64                8F RXB.09 1.dest.0.00 01 /3
+			 *    TZMSK reg32, reg/mem32               8F RXB.09 0.dest.0.00 01 /4
+			 *    TZMSK reg64, reg/mem64               8F RXB.09 1.dest.0.00 01 /4
+			 *    BLCIC reg32, reg/mem32               8F RXB.09 0.dest.0.00 01 /5
+			 *    BLCIC reg64, reg/mem64               8F RXB.09 1.dest.0.00 01 /5
+			 *    BLSIC reg32, reg/mem32               8F RXB.09 0.dest.0.00 01 /6
+			 *    BLSIC reg64, reg/mem64               8F RXB.09 1.dest.0.00 01 /6
+			 *    T1MSKC reg32, reg/mem32              8F RXB.09 0.dest.0.00 01 /7
+			 *    T1MSKC reg64, reg/mem64              8F RXB.09 1.dest.0.00 01 /7
+			 *
+			 *    BLCMSK reg32, reg/mem32              8F RXB.09 0.dest.0.00 02 /1
+			 *    BLCMSK reg64, reg/mem64              8F RXB.09 1.dest.0.00 02 /1
+			 *    BLCI reg32, reg/mem32                8F RXB.09 0.dest.0.00 02 /6
+			 *    BLCI reg64, reg/mem64                8F RXB.09 1.dest.0.00 02 /6
+			 *
+			 *    BEXTR reg32, reg/mem32, imm32        8F RXB.0A 0.1111.0.00 10 /r /id
+			 *    BEXTR reg64, reg/mem64, imm32        8F RXB.0A 1.1111.0.00 10 /r /id
+			 *
+			 *    LLWPCB reg32                         8F RXB.09 0.1111.0.00 12 /0
+			 *    LLWPCB reg64                         8F RXB.09 1.1111.0.00 12 /0
+			 *    LWPINS reg32.vvvv, reg/mem32, imm32  8F RXB.0A 0.src1.0.00 12 /0 /imm32
+			 *    LWPINS reg64.vvvv, reg/mem32, imm32  8F RXB.0A 1.src1.0.00 12 /0 /imm32
+			 *    SLWPCB reg32                         8F RXB.09 0.1111.0.00 12 /1
+			 *    SLWPCB reg64                         8F RXB.09 1.1111.0.00 12 /1
+			 *    LWPVAL reg32.vvvv, reg/mem32, imm32  8F RXB.0A 0.src1.0.00 12 /1 /imm32
+			 *    LWPVAL reg64.vvvv, reg/mem32, imm32  8F RXB.0A 1.src1.0.00 12 /1 /imm32
+			 *
+			 *    BEXTR reg32, reg/mem32, reg32        C4 RXB.02 0.cntl.0.00 F7 /r
+			 *    BEXTR reg64, reg/mem64, reg64        C4 RXB.02 1.cntl.0.00 F7 /r
+			 */
 
 			/* TODO: Go through all instructions and add LOCK-missing assertions.
 			 *       The following is a list of all instructions that allow for a lock prefix */

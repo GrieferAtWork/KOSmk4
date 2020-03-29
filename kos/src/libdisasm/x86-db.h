@@ -936,51 +936,12 @@ PRIVATE struct instruction const ops[] = {
 	I(0x8e, IF_MODRM,         "movl\t" OP_RM32 OP_RSEG),
 	I(0x8e, IF_MODRM|IF_REXW, "movq\t" OP_RM64 OP_RSEG),
 
-	I(0x8f, IF_66|IF_MODRM|IF_REG0,         "popw\t" OP_RM16), /* Actually also requires IF_REG0 */
-	I(0x8f, IF_MODRM|IF_REG0,               "popl\t" OP_RM32), /* Actually also requires IF_REG0 */
-	I(0x8f, IF_MODRM|IF_REXW|IF_REG0,       "popq\t" OP_RM64), /* Actually also requires IF_REG0 */
-	I(0x8f, IF_67|IF_66|IF_MODRM|IF_REG0,   "popw\t" OP_RM16), /* Actually also requires IF_REG0 */
-	I(0x8f, IF_67|IF_MODRM|IF_REG0,         "popl\t" OP_RM32), /* Actually also requires IF_REG0 */
-	I(0x8f, IF_67|IF_MODRM|IF_REXW|IF_REG0, "popq\t" OP_RM64), /* Actually also requires IF_REG0 */
-		/* TODO: XOP opcodes seem to always start with 0x8f (find out what's the deal with them...) */
-
-		/* TODO: XOP instructions (from AMD):
-		 *    BLCFILL reg32, reg/mem32             8F RXB.09 0.dest.0.00 01 /1
-		 *    BLCFILL reg64, reg/mem64             8F RXB.09 1.dest.0.00 01 /1
-		 *    BLSFILL reg32, reg/mem32             8F RXB.09 0.dest.0.00 01 /2
-		 *    BLSFILL reg64, reg/mem64             8F RXB.09 1.dest.0.00 01 /2
-		 *    BLCS reg32, reg/mem32                8F RXB.09 0.dest.0.00 01 /3
-		 *    BLCS reg64, reg/mem64                8F RXB.09 1.dest.0.00 01 /3
-		 *    TZMSK reg32, reg/mem32               8F RXB.09 0.dest.0.00 01 /4
-		 *    TZMSK reg64, reg/mem64               8F RXB.09 1.dest.0.00 01 /4
-		 *    BLCIC reg32, reg/mem32               8F RXB.09 0.dest.0.00 01 /5
-		 *    BLCIC reg64, reg/mem64               8F RXB.09 1.dest.0.00 01 /5
-		 *    BLSIC reg32, reg/mem32               8F RXB.09 0.dest.0.00 01 /6
-		 *    BLSIC reg64, reg/mem64               8F RXB.09 1.dest.0.00 01 /6
-		 *    T1MSKC reg32, reg/mem32              8F RXB.09 0.dest.0.00 01 /7
-		 *    T1MSKC reg64, reg/mem64              8F RXB.09 1.dest.0.00 01 /7
-		 *
-		 *    BLCMSK reg32, reg/mem32              8F RXB.09 0.dest.0.00 02 /1
-		 *    BLCMSK reg64, reg/mem64              8F RXB.09 1.dest.0.00 02 /1
-		 *    BLCI reg32, reg/mem32                8F RXB.09 0.dest.0.00 02 /6
-		 *    BLCI reg64, reg/mem64                8F RXB.09 1.dest.0.00 02 /6
-		 *
-		 *    BEXTR reg32, reg/mem32, imm32        8F RXB.0A 0.1111.0.00 10 /r /id
-		 *    BEXTR reg64, reg/mem64, imm32        8F RXB.0A 1.1111.0.00 10 /r /id
-		 *
-		 *    LLWPCB reg32                         8F RXB.09 0.1111.0.00 12 /0
-		 *    LLWPCB reg64                         8F RXB.09 1.1111.0.00 12 /0
-		 *    LWPINS reg32.vvvv, reg/mem32, imm32  8F RXB.0A 0.src1.0.00 12 /0 /imm32
-		 *    LWPINS reg64.vvvv, reg/mem32, imm32  8F RXB.0A 1.src1.0.00 12 /0 /imm32
-		 *    SLWPCB reg32                         8F RXB.09 0.1111.0.00 12 /1
-		 *    SLWPCB reg64                         8F RXB.09 1.1111.0.00 12 /1
-		 *    LWPVAL reg32.vvvv, reg/mem32, imm32  8F RXB.0A 0.src1.0.00 12 /1 /imm32
-		 *    LWPVAL reg64.vvvv, reg/mem32, imm32  8F RXB.0A 1.src1.0.00 12 /1 /imm32
-		 *
-		 *    BEXTR reg32, reg/mem32, reg32        C4 RXB.02 0.cntl.0.00 F7 /r
-		 *    BEXTR reg64, reg/mem64, reg64        C4 RXB.02 1.cntl.0.00 F7 /r
-		 *
-		 */
+	I(0x8f, IF_66|IF_MODRM|IF_REG0,         "popw\t" OP_RM16),
+	I(0x8f, IF_MODRM|IF_REG0,               "popl\t" OP_RM32),
+	I(0x8f, IF_MODRM|IF_REXW|IF_REG0,       "popq\t" OP_RM64),
+	I(0x8f, IF_67|IF_66|IF_MODRM|IF_REG0,   "popw\t" OP_RM16),
+	I(0x8f, IF_67|IF_MODRM|IF_REG0,         "popl\t" OP_RM32),
+	I(0x8f, IF_67|IF_MODRM|IF_REXW|IF_REG0, "popq\t" OP_RM64),
 
 	I(0x90, 0,                "nop"),
 	I(0x90, IF_F3,            "pause"),
@@ -4948,6 +4909,157 @@ PRIVATE struct instruction const ops_0f3a[] = {
 };
 /* clang-format on */
 
+
+#if 0 /* Currently unused... */
+/* clang-format off */
+PRIVATE struct instruction const ops_xop8[] = {
+/*[[[begin:ops_xop8]]]*/
+	I(0, 0, "")
+/*[[[end:ops_xop8]]]*/
+};
+/* clang-format on */
+#endif
+
+/* clang-format off */
+PRIVATE struct instruction const ops_xop9[] = {
+/*[[[begin:ops_xop9]]]*/
+
+	I(0x01, IF_VEXW0|IF_MODRM|IF_REG1, "blcfilll\t" OP_RM32 OP_VR32),
+	I(0x01, IF_VEXW1|IF_MODRM|IF_REG1, "blcfillq\t" OP_RM64 OP_VR64),
+
+	I(0x01, IF_VEXW0|IF_MODRM|IF_REG2, "blsfilll\t" OP_RM32 OP_VR32),
+	I(0x01, IF_VEXW1|IF_MODRM|IF_REG2, "blsfillq\t" OP_RM64 OP_VR64),
+
+	I(0x01, IF_VEXW0|IF_MODRM|IF_REG3, "blcsl\t" OP_RM32 OP_VR32),
+	I(0x01, IF_VEXW1|IF_MODRM|IF_REG3, "blcsq\t" OP_RM64 OP_VR64),
+
+	I(0x01, IF_VEXW0|IF_MODRM|IF_REG4, "tzmskl\t" OP_RM32 OP_VR32),
+	I(0x01, IF_VEXW1|IF_MODRM|IF_REG4, "tzmskq\t" OP_RM64 OP_VR64),
+
+	I(0x01, IF_VEXW0|IF_MODRM|IF_REG5, "blcicl\t" OP_RM32 OP_VR32),
+	I(0x01, IF_VEXW1|IF_MODRM|IF_REG5, "blcicq\t" OP_RM64 OP_VR64),
+
+	I(0x01, IF_VEXW0|IF_MODRM|IF_REG6, "blsicl\t" OP_RM32 OP_VR32),
+	I(0x01, IF_VEXW1|IF_MODRM|IF_REG6, "blsicq\t" OP_RM64 OP_VR64),
+
+	I(0x01, IF_VEXW0|IF_MODRM|IF_REG7, "t1mskcl\t" OP_RM32 OP_VR32),
+	I(0x01, IF_VEXW1|IF_MODRM|IF_REG7, "t1mskcq\t" OP_RM64 OP_VR64),
+
+
+	I(0x02, IF_VEXW0|IF_MODRM|IF_REG1, "blcmskl\t" OP_RM32 OP_VR32),
+	I(0x02, IF_VEXW1|IF_MODRM|IF_REG1, "blcmskq\t" OP_RM64 OP_VR64),
+
+	I(0x02, IF_VEXW0|IF_MODRM|IF_REG6, "blcil\t" OP_RM32 OP_VR32),
+	I(0x02, IF_VEXW1|IF_MODRM|IF_REG6, "blciq\t" OP_RM64 OP_VR64),
+
+
+	I(0x12, IF_VEXW0|IF_MODRM|IF_RMR|IF_REG0, "llwpcbl\t" OP_RM32),
+	I(0x12, IF_VEXW1|IF_MODRM|IF_RMR|IF_REG0, "llwpcbq\t" OP_RM64),
+
+	I(0x12, IF_VEXW0|IF_MODRM|IF_RMR|IF_REG1, "slwpcbl\t" OP_RM32),
+	I(0x12, IF_VEXW1|IF_MODRM|IF_RMR|IF_REG1, "slwpcbq\t" OP_RM64),
+
+
+	I(0, 0, "")
+/*[[[end:ops_xop9]]]*/
+};
+/* clang-format on */
+
+
+/* clang-format off */
+PRIVATE struct instruction const ops_xopa[] = {
+/*[[[begin:ops_xopa]]]*/
+	I(0x10, IF_VEXW0|IF_MODRM, "bextrl\t" OP_U32 OP_RM32 OP_R32),
+	I(0x10, IF_VEXW1|IF_MODRM, "bextrq\t" OP_S32 OP_RM64 OP_R64),
+
+	I(0x12, IF_VEXW0|IF_MODRM|IF_REG0, "lwpinsl\t" OP_U32 OP_RM32 OP_VR32),
+	I(0x12, IF_VEXW1|IF_MODRM|IF_REG0, "lwpinsq\t" OP_S32 OP_RM32 OP_VR64),
+
+	I(0x12, IF_VEXW0|IF_MODRM|IF_REG1, "lwpvall\t" OP_U32 OP_RM32 OP_VR32),
+	I(0x12, IF_VEXW1|IF_MODRM|IF_REG1, "lwpvalq\t" OP_S32 OP_RM32 OP_VR64),
+
+	I(0, 0, "")
+/*[[[end:ops_xopa]]]*/
+};
+/* clang-format on */
+
+
+/* TODO: Add the following missing XOP opcodes:
+ *    XOP8 85h     vpmacssww      Vo,Ho,Wo,Lo
+ *    XOP8 86h     vpmacsswd      Vo,Ho,Wo,Lo
+ *    XOP8 87h     vpmacssdql     Vo,Ho,Wo,Lo
+ *    XOP8 8Eh     vpmacssdd      Vo,Ho,Wo,Lo
+ *    XOP8 8Fh     vpmacssdqh     Vo,Ho,Wo,Lo
+ *    XOP8 95h     vpmacsww       Vo,Ho,Wo,Lo
+ *    XOP8 96h     vpmacswd       Vo,Ho,Wo,Lo
+ *    XOP8 97h     vpmacsdql      Vo,Ho,Wo,Lo
+ *    XOP8 9Eh     vpmacsdd       Vo,Ho,Wo,Lo
+ *    XOP8 9Fh     vpmacsdqh      Vo,Ho,Wo,Lo
+ *    XOP8 A2h     vpcmov         Vx,Hx,Wx,Lx (W=0)
+ *    XOP8 A2h     vpcmov         Vx,Hx,Lx,Wx (W=1)
+ *    XOP8 A3h     vpperm         Vo,Ho,Wo,Lo (W=0)
+ *    XOP8 A3h     vpperm         Vo,Ho,Lo,Wo (W=1)
+ *    XOP8 A6h     vpmadcsswd     Vo,Ho,Wo,Lo
+ *    XOP8 B6h     vpmadcswd      Vo,Ho,Wo,Lo
+ *    XOP8 C0h     vprotb         Vo,Wo,Ib
+ *    XOP8 C1h     vprotw         Vo,Wo,Ib
+ *    XOP8 C2h     vprotd         Vo,Wo,Ib
+ *    XOP8 C3h     vprotq         Vo,Wo,Ib
+ *    XOP8 CCh     vpcomccb       Vo,Ho,Wo,Ib
+ *    XOP8 CDh     vpcomccw       Vo,Ho,Wo,Ib
+ *    XOP8 CEh     vpcomccd       Vo,Ho,Wo,Ib
+ *    XOP8 CFh     vpcomccq       Vo,Ho,Wo,Ib
+ *    XOP8 ECh     vpcomccub      Vo,Ho,Wo,Ib
+ *    XOP8 EDh     vpcomccuw      Vo,Ho,Wo,Ib
+ *    XOP8 EEh     vpcomccud      Vo,Ho,Wo,Ib
+ *    XOP8 EFh     vpcomccuq      Vo,Ho,Wo,Ib
+ *
+ *    XOP9 80h     vfrczps        Vx,Wx
+ *    XOP9 81h     vfrczpd        Vx,Wx
+ *    XOP9 82h     vfrczss        Vo,Wo.d
+ *    XOP9 83h     vfrczsd        Vo,Wo.q
+ *    XOP9 90h     vprotb         Vo,Wo,Ho (W=0)
+ *    XOP9 90h     vprotb         Vo,Ho,Wo (W=1)
+ *    XOP9 91h     vprotw         Vo,Wo,Ho (W=0)
+ *    XOP9 91h     vprotw         Vo,Ho,Wo (W=1)
+ *    XOP9 92h     vprotd         Vo,Wo,Ho (W=0)
+ *    XOP9 92h     vprotd         Vo,Ho,Wo (W=1)
+ *    XOP9 93h     vprotq         Vo,Wo,Ho (W=0)
+ *    XOP9 93h     vprotq         Vo,Ho,Wo (W=1)
+ *    XOP9 94h     vpshlb         Vo,Wo,Ho (W=0)
+ *    XOP9 94h     vpshlb         Vo,Ho,Wo (W=1)
+ *    XOP9 95h     vpshlw         Vo,Wo,Ho (W=0)
+ *    XOP9 95h     vpshlw         Vo,Ho,Wo (W=1)
+ *    XOP9 96h     vpshld         Vo,Wo,Ho (W=0)
+ *    XOP9 96h     vpshld         Vo,Ho,Wo (W=1)
+ *    XOP9 97h     vpshlq         Vo,Wo,Ho (W=0)
+ *    XOP9 97h     vpshlq         Vo,Ho,Wo (W=1)
+ *    XOP9 98h     vpshab         Vo,Wo,Ho (W=0)
+ *    XOP9 98h     vpshab         Vo,Ho,Wo (W=1)
+ *    XOP9 99h     vpshaw         Vo,Wo,Ho (W=0)
+ *    XOP9 99h     vpshaw         Vo,Ho,Wo (W=1)
+ *    XOP9 9ah     vpshad         Vo,Wo,Ho (W=0)
+ *    XOP9 9ah     vpshad         Vo,Ho,Wo (W=1)
+ *    XOP9 9bh     vpshaq         Vo,Wo,Ho (W=0)
+ *    XOP9 9bh     vpshaq         Vo,Ho,Wo (W=1)
+ *    XOP9 C1h     vphaddbw       Vo,Wo
+ *    XOP9 C2h     vphaddbd       Vo,Wo
+ *    XOP9 C3h     vphaddbq       Vo,Wo
+ *    XOP9 C6h     vphaddwd       Vo,Wo
+ *    XOP9 C7h     vphaddwq       Vo,Wo
+ *    XOP9 CBh     vphadddq       Vo,Wo
+ *    XOP9 D1h     vphaddubwd     Vo,Wo
+ *    XOP9 D2h     vphaddubd      Vo,Wo
+ *    XOP9 D3h     vphaddubq      Vo,Wo
+ *    XOP9 D6h     vphadduwd      Vo,Wo
+ *    XOP9 D7h     vphadduwq      Vo,Wo
+ *    XOP9 DBh     vphaddudq      Vo,Wo
+ *    XOP9 E1h     VPHSUBBW       Vo,Wo
+ *    XOP9 E2h     VPHSUBWD       Vo,Wo
+ *    XOP9 E3h     VPHSUBDQ       Vo,Wo
+ */
+
+
 #if 0
 
 
@@ -5122,11 +5234,15 @@ function generateOffsetTable(name: string) {
 	}
 	print "};";
 	print;
+	return offsets;
 }
-generateOffsetTable("ops");
+local normal_offsets = generateOffsetTable("ops");
 generateOffsetTable("ops_0f");
 generateOffsetTable("ops_0f38");
 generateOffsetTable("ops_0f3a");
+// generateOffsetTable("ops_xop");
+print "#define OPS_OFFETSOF_90h", normal_offsets[0x90];
+
 ]]]*/
 #define HAVE_OPS_OFFSETS 1
 STATIC_ASSERT(COMPILER_LENOF(ops) == 896);
@@ -5211,6 +5327,8 @@ PRIVATE u8 const ops_0f3a_offsets[256] = {
 	229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229,
 	227, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229, 229
 };
+
+#define OPS_OFFETSOF_90h 352
 //[[[end]]]
 
 

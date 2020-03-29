@@ -557,53 +557,53 @@ PRIVATE ATTR_CONST bool CC
 is_carry_instruction(u32 opcode, u8 reg) {
 	switch (opcode) {
 
-	case 0xc0:
-	case 0xc1:
-	case 0xd0:
-	case 0xd1:
-	case 0xd2:
-	case 0xd3:
-	case 0x0fa3:
-	case 0x0fa4:
-	case 0x0fa5:
-	case 0x0fab:
-	case 0x0fac:
-	case 0x0fad:
-	case 0x0fb3:
-	case 0x0fba:
-	case 0x0fbb:
-	case 0x0fbc:
-	case 0x0ff7:
-	case 0x00:
-	case 0x01:
-	case 0x02:
-	case 0x03:
-	case 0x04:
-	case 0x05:
-	case 0x10:
-	case 0x11:
-	case 0x12:
-	case 0x13:
-	case 0x14:
-	case 0x15:
-	case 0x18:
-	case 0x19:
-	case 0x1a:
-	case 0x1b:
-	case 0x1c:
-	case 0x1d:
-	case 0x28:
-	case 0x29:
-	case 0x2a:
-	case 0x2b:
-	case 0x2c:
-	case 0x2d:
+	case EMU86_OPCODE_ENCODE(0xc0):
+	case EMU86_OPCODE_ENCODE(0xc1):
+	case EMU86_OPCODE_ENCODE(0xd0):
+	case EMU86_OPCODE_ENCODE(0xd1):
+	case EMU86_OPCODE_ENCODE(0xd2):
+	case EMU86_OPCODE_ENCODE(0xd3):
+	case EMU86_OPCODE_ENCODE(0x0fa3):
+	case EMU86_OPCODE_ENCODE(0x0fa4):
+	case EMU86_OPCODE_ENCODE(0x0fa5):
+	case EMU86_OPCODE_ENCODE(0x0fab):
+	case EMU86_OPCODE_ENCODE(0x0fac):
+	case EMU86_OPCODE_ENCODE(0x0fad):
+	case EMU86_OPCODE_ENCODE(0x0fb3):
+	case EMU86_OPCODE_ENCODE(0x0fba):
+	case EMU86_OPCODE_ENCODE(0x0fbb):
+	case EMU86_OPCODE_ENCODE(0x0fbc):
+	case EMU86_OPCODE_ENCODE(0x0ff7):
+	case EMU86_OPCODE_ENCODE(0x00):
+	case EMU86_OPCODE_ENCODE(0x01):
+	case EMU86_OPCODE_ENCODE(0x02):
+	case EMU86_OPCODE_ENCODE(0x03):
+	case EMU86_OPCODE_ENCODE(0x04):
+	case EMU86_OPCODE_ENCODE(0x05):
+	case EMU86_OPCODE_ENCODE(0x10):
+	case EMU86_OPCODE_ENCODE(0x11):
+	case EMU86_OPCODE_ENCODE(0x12):
+	case EMU86_OPCODE_ENCODE(0x13):
+	case EMU86_OPCODE_ENCODE(0x14):
+	case EMU86_OPCODE_ENCODE(0x15):
+	case EMU86_OPCODE_ENCODE(0x18):
+	case EMU86_OPCODE_ENCODE(0x19):
+	case EMU86_OPCODE_ENCODE(0x1a):
+	case EMU86_OPCODE_ENCODE(0x1b):
+	case EMU86_OPCODE_ENCODE(0x1c):
+	case EMU86_OPCODE_ENCODE(0x1d):
+	case EMU86_OPCODE_ENCODE(0x28):
+	case EMU86_OPCODE_ENCODE(0x29):
+	case EMU86_OPCODE_ENCODE(0x2a):
+	case EMU86_OPCODE_ENCODE(0x2b):
+	case EMU86_OPCODE_ENCODE(0x2c):
+	case EMU86_OPCODE_ENCODE(0x2d):
 		return true;
 
-	case 0x80:
-	case 0x81:
-	case 0x82:
-	case 0x83:
+	case EMU86_OPCODE_ENCODE(0x80):
+	case EMU86_OPCODE_ENCODE(0x81):
+	case EMU86_OPCODE_ENCODE(0x82):
+	case EMU86_OPCODE_ENCODE(0x83):
 		return reg == 0 || reg == 2 ||
 		       reg == 3 || reg == 5;
 
@@ -616,20 +616,20 @@ PRIVATE ATTR_CONST bool CC
 is_compare_instruction(u32 opcode, u8 reg) {
 	switch (opcode) {
 
-	case 0x38:
-	case 0x39:
-	case 0x3a:
-	case 0x3b:
-	case 0x3c:
-	case 0x3d:
-	case 0xa6:
-	case 0xa7:
+	case EMU86_OPCODE_ENCODE(0x38):
+	case EMU86_OPCODE_ENCODE(0x39):
+	case EMU86_OPCODE_ENCODE(0x3a):
+	case EMU86_OPCODE_ENCODE(0x3b):
+	case EMU86_OPCODE_ENCODE(0x3c):
+	case EMU86_OPCODE_ENCODE(0x3d):
+	case EMU86_OPCODE_ENCODE(0xa6):
+	case EMU86_OPCODE_ENCODE(0xa7):
 		return true;
 
-	case 0x80:
-	case 0x81:
-	case 0x82:
-	case 0x83:
+	case EMU86_OPCODE_ENCODE(0x80):
+	case EMU86_OPCODE_ENCODE(0x81):
+	case EMU86_OPCODE_ENCODE(0x82):
+	case EMU86_OPCODE_ENCODE(0x83):
 		return reg == 7;
 
 	default:
@@ -716,7 +716,7 @@ libda_single_x86(struct disassembler *__restrict self) {
 	emu86_opcode_t whole_opcode;
 #endif /* CONFIG_AUTOSELECT_JCC */
 	emu86_opcode_t opcode;
-	emu86_opflags_t flags;
+	emu86_opflags_t op_flags;
 	byte_t *text_start = self->d_pc;
 	byte_t *args_start = NULL;
 	struct instruction const *chain;
@@ -724,17 +724,17 @@ libda_single_x86(struct disassembler *__restrict self) {
 	memset(&rm, 0, sizeof(rm));
 	switch (self->d_target) {
 	case DISASSEMBLER_TARGET_8086:
-		flags = EMU86_F_NORMAL | EMU86_F_16BIT;
+		op_flags = EMU86_F_NORMAL | EMU86_F_16BIT;
 		break;
 	case DISASSEMBLER_TARGET_I386:
-		flags = EMU86_F_NORMAL | EMU86_F_32BIT;
+		op_flags = EMU86_F_NORMAL | EMU86_F_32BIT;
 		break;
 	case DISASSEMBLER_TARGET_X86_64:
-		flags = EMU86_F_NORMAL | EMU86_F_64BIT;
+		op_flags = EMU86_F_NORMAL | EMU86_F_64BIT;
 		break;
 	default: __builtin_unreachable();
 	}
-	self->d_pc = (byte_t *)emu86_opcode_decode(self->d_pc, &opcode, &flags);
+	self->d_pc = (byte_t *)emu86_opcode_decode(self->d_pc, &opcode, &op_flags);
 #ifdef CONFIG_AUTOSELECT_JCC
 	whole_opcode = opcode;
 #endif /* CONFIG_AUTOSELECT_JCC */
@@ -774,6 +774,7 @@ libda_single_x86(struct disassembler *__restrict self) {
 		chain += ops_0f3a_offsets[opcode];
 #endif /* HAVE_OPS_0F3A_OFFSETS */
 	}
+search_chain:
 	for (;; ++chain) {
 		if (chain->i_opcode != opcode) {
 			if (chain->i_opcode > opcode) {
@@ -785,7 +786,7 @@ libda_single_x86(struct disassembler *__restrict self) {
 			continue;
 		}
 		if (((chain->i_flags & IF_REXW) != 0) !=
-		    ((flags & EMU86_F_REX_W) != 0))
+		    ((op_flags & EMU86_F_REX_W) != 0))
 			continue;
 		if (DA86_IS16(self)) {
 			/* The 0x66 prefix acts inverted on 16-bit mode.
@@ -793,27 +794,27 @@ libda_single_x86(struct disassembler *__restrict self) {
 			 * whilst instruction _without_ the prefix are used any other
 			 * time (thus not breaking instructions that don't care about
 			 * the prefix at all). */
-			if ((chain->i_flags & IF_66) && (flags & EMU86_F_66))
+			if ((chain->i_flags & IF_66) && (op_flags & EMU86_F_66))
 				continue;
-			if ((chain->i_flags & IF_67) && (flags & EMU86_F_67))
+			if ((chain->i_flags & IF_67) && (op_flags & EMU86_F_67))
 				continue;
 		} else {
 			/* Do an exact match for the 0x66 prefix due to it being a
 			 * so-called mandatory prefix, that also modifies the name
 			 * of an instruction when ATnT representation is printed. */
-			if (((chain->i_flags & IF_66) != 0) != ((flags & EMU86_F_66) != 0))
+			if (((chain->i_flags & IF_66) != 0) != ((op_flags & EMU86_F_66) != 0))
 				continue;
-			if ((chain->i_flags & IF_67) && !(flags & EMU86_F_67))
+			if ((chain->i_flags & IF_67) && !(op_flags & EMU86_F_67))
 				continue;
 		}
 		if (((chain->i_flags & IF_F2) != 0) !=
-		    ((flags & EMU86_F_f2) != 0))
+		    ((op_flags & EMU86_F_f2) != 0))
 			continue;
 		if (((chain->i_flags & IF_F3) != 0) !=
-		    ((flags & EMU86_F_f3) != 0))
+		    ((op_flags & EMU86_F_f3) != 0))
 			continue;
 		if ((chain->i_flags & IF_REXB) == IF_REXB) {
-			if (!(flags & EMU86_F_REX_B))
+			if (!(op_flags & EMU86_F_REX_B))
 				continue;
 		} else if (chain->i_flags & (IF_X32 | IF_X64)) {
 			if (chain->i_flags & IF_X32) {
@@ -832,37 +833,37 @@ libda_single_x86(struct disassembler *__restrict self) {
 			++self->d_pc;
 		} else {
 			if (chain->i_flags & IF_VEX) {
-				if (!(flags & EMU86_F_HASVEX))
+				if (!(op_flags & EMU86_F_HASVEX))
 					continue;
 				if ((chain->i_flags & IF_VEX) == IF_VEX) {
 					byte_t f = (byte_t)chain->i_repr[0];
 					if ((f & IF_VEX_B0_LIG) != IF_VEX_B0_LIG) {
-						if (flags & EMU86_F_EVEX_b) {
+						if (op_flags & EMU86_F_EVEX_b) {
 							/* When EVEX.b is set, then a 512-bit vector size is implied,
 							 * SAE is enabled, and VEX.LL is used as a rounding control
 							 * indicator, as displayed by `OP_ER' and `OP_SAE' */
 							if ((f & IF_VEX_B0_LL_M) != 2 << IF_VEX_B0_LL_S)
 								continue; /* Different length value */
 						} else {
-							if (EMU86_F_VEX_LL(flags) != IF_VEX_B0_LL(f))
+							if (EMU86_F_VEX_LL(op_flags) != IF_VEX_B0_LL(f))
 								continue; /* Different length value */
 						}
 					}
-					if ((f & IF_VEX_B0_NOEVEX) && (flags & EMU86_F_HASEVEX))
+					if ((f & IF_VEX_B0_NOEVEX) && (op_flags & EMU86_F_HASEVEX))
 						continue; /* Require that no EVEX prefix was used. */
 					if (!(f & IF_VEX_B0_WIG)) {
-						if (!!(f & IF_VEX_B0_W) != !!(flags & EMU86_F_VEX_W))
+						if (!!(f & IF_VEX_B0_W) != !!(op_flags & EMU86_F_VEX_W))
 							continue; /* Different width value */
 					}
 				} else {
-					if (!!(flags & EMU86_F_VEX_W) != !!(flags & IF_VEXW1))
+					if (!!(chain->i_flags & IF_VEXW1) != !!(op_flags & EMU86_F_VEX_W))
 						continue;
 				}
 			}
 			if (chain->i_flags & IF_MODRM) {
 				if (!args_start) {
 					args_start = self->d_pc;
-					self->d_pc = (byte_t *)emu86_modrm_decode(args_start, &rm, flags);
+					self->d_pc = (byte_t *)emu86_modrm_decode(args_start, &rm, op_flags);
 				}
 				if (chain->i_flags & IF_REG0) {
 					if (rm.mi_reg != (chain->i_flags & 7))
@@ -894,7 +895,7 @@ libda_single_x86(struct disassembler *__restrict self) {
 			if (*p)
 				++p;
 			disasm_print_format(self, DISASSEMBLER_FORMAT_MNEMONIC_PREFIX);
-			if (flags & EMU86_F_LOCK)
+			if (op_flags & EMU86_F_LOCK)
 				disasm_print(self, "lock ", 5);
 			{
 #ifdef CONFIG_AUTOSELECT_JCC
@@ -933,44 +934,44 @@ no_jcc_sel:
 				is_first = false;
 do_nextop_nocomma:
 				switch (ch) {
-#define VEX_VVVVV() EMU86_F_VEX_VVVVV(flags)
+#define VEX_VVVVV() EMU86_F_VEX_VVVVV(op_flags)
 
 				case OPC_RM8:
-					da_print_modrm_rm(self, &rm, flags, 1);
+					da_print_modrm_rm(self, &rm, op_flags, 1);
 					break;
 
 				case OPC_RM16:
-					da_print_modrm_rm(self, &rm, flags, 2);
+					da_print_modrm_rm(self, &rm, op_flags, 2);
 					break;
 
 				case OPC_RM32:
-					da_print_modrm_rm(self, &rm, flags, 4);
+					da_print_modrm_rm(self, &rm, op_flags, 4);
 					break;
 
 				case OPC_RM64:
-					da_print_modrm_rm(self, &rm, flags, 8);
+					da_print_modrm_rm(self, &rm, op_flags, 8);
 					break;
 
 				case OPC_XRM16:
 					disasm_print(self, "*", 1);
-					da_print_modrm_rm(self, &rm, flags, 2);
+					da_print_modrm_rm(self, &rm, op_flags, 2);
 					break;
 
 				case OPC_XRM32:
 					disasm_print(self, "*", 1);
-					da_print_modrm_rm(self, &rm, flags, 4);
+					da_print_modrm_rm(self, &rm, op_flags, 4);
 					break;
 
 				case OPC_XRM64:
 					disasm_print(self, "*", 1);
-					da_print_modrm_rm(self, &rm, flags, 8);
+					da_print_modrm_rm(self, &rm, op_flags, 8);
 					break;
 
 				case OPC_RMBND:
 					if (EMU86_MODRM_ISREG(rm.mi_type)) {
 						da_print_bndreg(self, rm.mi_rm);
 					} else {
-						da_print_modrm_rm(self, &rm, flags, DA86_IS64(self) ? 16 : 8);
+						da_print_modrm_rm(self, &rm, op_flags, DA86_IS64(self) ? 16 : 8);
 					}
 					break;
 
@@ -979,7 +980,7 @@ do_nextop_nocomma:
 					    rm.mi_index == 0xff ||
 					    rm.mi_rm == 0xff) {
 						disasm_print(self, "??" "? /*", 6);
-						da_print_modrm_rm(self, &rm, flags, DA86_IS64(self) ? 8 : 4);
+						da_print_modrm_rm(self, &rm, op_flags, DA86_IS64(self) ? 8 : 4);
 						disasm_print(self, "*/", 2);
 					} else if (DA86_IS64(self)) {
 						da_print_reg64(self, rm.mi_rm);
@@ -996,7 +997,7 @@ do_nextop_nocomma:
 					if (EMU86_MODRM_ISREG(rm.mi_type)) {
 						da_print_stireg(self, rm.mi_rm);
 					} else {
-						da_print_modrm_rm(self, &rm, flags, DA86_IS64(self) ? 16 : 8);
+						da_print_modrm_rm(self, &rm, op_flags, DA86_IS64(self) ? 16 : 8);
 					}
 					break;
 
@@ -1097,7 +1098,7 @@ do_nextop_nocomma:
 						reglen     = 4;
 					} else if (name >= OP_GP16_MIN && name <= OP_GP16_MAX) {
 						/* %al, %cl, %dl, %bl, %(ah|spl), %(ch|bpl), %(dh|dil), %(bh|sil) */
-						if (name >= (OP_GP16_MIN + 4) && (flags & EMU86_F_HASREX)) {
+						if (name >= (OP_GP16_MIN + 4) && (op_flags & EMU86_F_HASREX)) {
 							unsigned int index;
 							index      = (unsigned int)(name - OP_GP16_MIN);
 							regname[1] = conv_table2[index];
@@ -1124,7 +1125,7 @@ do_nextop_nocomma:
 						unsigned int i, n;
 						/* OP_PAX / OP_PAX_PCX / OP_PAX_PCX_PDX */
 						n = 1 + (name - 'a');
-						if (!DA86_IS64(self) && (DA86_IS16(self) ^ ((flags & EMU86_F_66) != 0))) {
+						if (!DA86_IS64(self) && (DA86_IS16(self) ^ ((op_flags & EMU86_F_66) != 0))) {
 							regname[2] = 'x';
 							for (i = 0; i < n; ++i) {
 								regname[1] = conv_table2[i];
@@ -1148,7 +1149,7 @@ do_nextop_nocomma:
 						}
 						goto done_escape_register;
 					} else if (name == 'd') { /* OP_PSI */
-						if (!DA86_IS64(self) && (DA86_IS16(self) ^ ((flags & EMU86_F_66) != 0))) {
+						if (!DA86_IS64(self) && (DA86_IS16(self) ^ ((op_flags & EMU86_F_66) != 0))) {
 							regname[1] = 's';
 							regname[2] = 'i';
 							reglen = 3;
@@ -1188,13 +1189,13 @@ done_escape_register:
 					addr = (uintptr_t)UNALIGNED_GET64((u64 *)self->d_pc);
 					self->d_pc += 8;
 do_print_moffs:
-					if (EMU86_F_HASSEG(flags))
-						disasm_print(self, segment_prefix[EMU86_F_SEGREG(flags)], 4);
+					if (EMU86_F_HASSEG(op_flags))
+						disasm_print(self, segment_prefix[EMU86_F_SEGREG(op_flags)], 4);
 					libda_disasm_print_symbol(self, (void *)addr);
 				}	break;
 
 				case OPC_R8:
-					da_print_reg8(self, rm.mi_reg, flags);
+					da_print_reg8(self, rm.mi_reg, op_flags);
 					break;
 
 				case OPC_R16:
@@ -1210,7 +1211,7 @@ do_print_moffs:
 					break;
 
 				case OPC_VR8:
-					da_print_reg8(self, VEX_VVVVV(), flags);
+					da_print_reg8(self, VEX_VVVVV(), op_flags);
 					break;
 
 				case OPC_VR16:
@@ -1267,61 +1268,61 @@ do_print_moffs:
 
 				case OPC_RXMM_MASK:
 					da_print_xmmreg(self, rm.mi_reg);
-					da_print_Xmmmask(self, flags);
+					da_print_Xmmmask(self, op_flags);
 					break;
 
 				case OPC_RYMM_MASK:
 					da_print_ymmreg(self, rm.mi_reg);
-					da_print_Xmmmask(self, flags);
+					da_print_Xmmmask(self, op_flags);
 					break;
 
 				case OPC_RZMM_MASK:
 					da_print_zmmreg(self, rm.mi_reg);
-					da_print_Xmmmask(self, flags);
+					da_print_Xmmmask(self, op_flags);
 					break;
 
 				case OPC_RK_MASK:
 					da_print_kreg(self, rm.mi_reg);
-					da_print_Xmmmask(self, flags);
+					da_print_Xmmmask(self, op_flags);
 					break;
 
 				case OPC_RMK:
 					if (EMU86_MODRM_ISREG(rm.mi_type)) {
 						da_print_kreg(self, rm.mi_rm);
 					} else {
-						da_print_modrm_rm(self, &rm, flags, DA86_IS64(self) ? 16 : 8);
+						da_print_modrm_rm(self, &rm, op_flags, DA86_IS64(self) ? 16 : 8);
 					}
 					break;
 
 				case OPC_RM64_MM:
-					da_print_modrm_rm64_mm(self, &rm, flags);
+					da_print_modrm_rm64_mm(self, &rm, op_flags);
 					break;
 
 				case OPC_RM128_XMM:
-					da_print_modrm_rm128_xmm(self, &rm, flags);
+					da_print_modrm_rm128_xmm(self, &rm, op_flags);
 					break;
 
 				case OPC_RM256_YMM:
-					da_print_modrm_rm256_ymm(self, &rm, flags);
+					da_print_modrm_rm256_ymm(self, &rm, op_flags);
 					break;
 
 				case OPC_RM512_ZMM:
-					da_print_modrm_rm512_zmm(self, &rm, flags);
+					da_print_modrm_rm512_zmm(self, &rm, op_flags);
 					break;
 
 				case OPC_RM128_XMM_MASK:
-					da_print_modrm_rm128_xmm(self, &rm, flags);
-					da_print_Xmmmask(self, flags);
+					da_print_modrm_rm128_xmm(self, &rm, op_flags);
+					da_print_Xmmmask(self, op_flags);
 					break;
 
 				case OPC_RM256_YMM_MASK:
-					da_print_modrm_rm256_ymm(self, &rm, flags);
-					da_print_Xmmmask(self, flags);
+					da_print_modrm_rm256_ymm(self, &rm, op_flags);
+					da_print_Xmmmask(self, op_flags);
 					break;
 
 				case OPC_RM512_ZMM_MASK:
-					da_print_modrm_rm512_zmm(self, &rm, flags);
-					da_print_Xmmmask(self, flags);
+					da_print_modrm_rm512_zmm(self, &rm, op_flags);
+					da_print_Xmmmask(self, op_flags);
 					break;
 
 				case OPC_VRK:
@@ -1342,17 +1343,17 @@ do_print_moffs:
 
 				case OPC_VRXMM_MASK:
 					da_print_xmmreg(self, VEX_VVVVV());
-					da_print_Xmmmask(self, flags);
+					da_print_Xmmmask(self, op_flags);
 					break;
 
 				case OPC_VRYMM_MASK:
 					da_print_ymmreg(self, VEX_VVVVV());
-					da_print_Xmmmask(self, flags);
+					da_print_Xmmmask(self, op_flags);
 					break;
 
 				case OPC_VRZMM_MASK:
 					da_print_zmmreg(self, VEX_VVVVV());
-					da_print_Xmmmask(self, flags);
+					da_print_Xmmmask(self, op_flags);
 					break;
 
 				case OPC_IMM8_XMM: {
@@ -1371,38 +1372,38 @@ do_print_moffs:
 
 				case OPC_RM128_XMM__OPC_VRXMM__OPC_RXMM_MASK:
 					/* OPC_RM128_XMM OPC_VRXMM OPC_RXMM_MASK */
-					da_print_modrm_rm128_xmm(self, &rm, flags);
+					da_print_modrm_rm128_xmm(self, &rm, op_flags);
 					disasm_print(self, ", ", 2);
 					da_print_xmmreg(self, VEX_VVVVV());
 					disasm_print(self, ", ", 2);
 					da_print_xmmreg(self, rm.mi_reg);
-					da_print_Xmmmask(self, flags);
+					da_print_Xmmmask(self, op_flags);
 					break;
 
 				case OPC_RM256_YMM__OPC_VRYMM__OPC_RYMM_MASK:
 					/* OPC_RM256_YMM OPC_VRYMM OPC_RYMM_MASK */
-					da_print_modrm_rm256_ymm(self, &rm, flags);
+					da_print_modrm_rm256_ymm(self, &rm, op_flags);
 					disasm_print(self, ", ", 2);
 					da_print_ymmreg(self, VEX_VVVVV());
 					disasm_print(self, ", ", 2);
 					da_print_ymmreg(self, rm.mi_reg);
-					da_print_Xmmmask(self, flags);
+					da_print_Xmmmask(self, op_flags);
 					break;
 
 				case OPC_RM512_ZMM__OPC_VRZMM__OPC_RZMM_MASK:
 					/* OPC_RM512_ZMM OPC_VRZMM OPC_RZMM_MASK */
-					da_print_modrm_rm512_zmm(self, &rm, flags);
+					da_print_modrm_rm512_zmm(self, &rm, op_flags);
 					disasm_print(self, ", ", 2);
 					da_print_zmmreg(self, VEX_VVVVV());
 					disasm_print(self, ", ", 2);
 					da_print_zmmreg(self, rm.mi_reg);
-					da_print_Xmmmask(self, flags);
+					da_print_Xmmmask(self, op_flags);
 					break;
 
 				case OPC_ER: {
 					PRIVATE char const rounding_modes[4] = { 'n', 'd', 'u', 'z' };
 					char rmrepr[6];
-					if (!(flags & EMU86_F_EVEX_b)) {
+					if (!(op_flags & EMU86_F_EVEX_b)) {
 nextop_nocomma:
 						ch = *p++;
 						if (!ch)
@@ -1412,7 +1413,7 @@ nextop_nocomma:
 					disasm_print(self, "{", 1);
 					disasm_print_format(self, DISASSEMBLER_FORMAT_MNEMONIC_PREFIX);
 					rmrepr[0] = 'r';
-					rmrepr[1] = rounding_modes[EMU86_F_VEX_LL(flags)];
+					rmrepr[1] = rounding_modes[EMU86_F_VEX_LL(op_flags)];
 					rmrepr[2] = '-';
 					rmrepr[3] = 's';
 					rmrepr[4] = 'a';
@@ -1423,7 +1424,7 @@ nextop_nocomma:
 				}	break;
 
 				case OPC_SAE:
-					if (!(flags & EMU86_F_EVEX_b))
+					if (!(op_flags & EMU86_F_EVEX_b))
 						goto nextop_nocomma;
 					disasm_print(self, "{", 1);
 					disasm_print_format(self, DISASSEMBLER_FORMAT_MNEMONIC_PREFIX);
@@ -1456,7 +1457,7 @@ nextop_nocomma:
 				case OPC_LJMP: {
 					u16 segment;
 					u32 offset;
-					if (flags & EMU86_F_AD16) {
+					if (op_flags & EMU86_F_AD16) {
 						offset = UNALIGNED_GET16((u16 *)self->d_pc);
 						self->d_pc += 2;
 					} else {
@@ -1512,7 +1513,70 @@ done_operands:
 	}
 unknown_opcode:
 	self->d_pc = text_start;
-/*print_byte:*/
+	if (chain == ops + OPS_OFFETSOF_90h &&
+	    !(op_flags & ~(EMU86_F_SEGMASK | EMU86_F_BITMASK))) { /* whole_opcode == 0x8f */
+		/* Try to decode an XOP instruction. */
+		u16 vex;
+		byte_t *pc = text_start + 1;
+		vex = *pc++;
+		vex <<= 8;
+		vex |= *pc++;
+		op_flags |= EMU86_F_HASVEX;
+		if (!(vex & EMU86_VEX3B_R))
+			op_flags |= EMU86_F_REX_R;
+		if (!(vex & EMU86_VEX3B_X))
+			op_flags |= EMU86_F_REX_X;
+		if (!(vex & EMU86_VEX3B_B))
+			op_flags |= EMU86_F_REX_B;
+		if (vex & EMU86_VEX3B_L)
+			op_flags |= 1 << EMU86_F_VEX_LL_S;
+		if (vex & EMU86_VEX3B_W)
+			op_flags |= EMU86_F_VEX_W;
+		op_flags |= ((~vex & EMU86_VEX3B_VVVV_M) >> EMU86_VEX3B_VVVV_S) << EMU86_F_VEX_VVVVV_S;
+		switch (vex & EMU86_VEX3B_PP_M) {
+		case 0x01 << EMU86_VEX3B_PP_S: op_flags |= EMU86_F_OP16; break;  /* same as 0x66 prefix */
+		case 0x02 << EMU86_VEX3B_PP_S: op_flags |= EMU86_F_REP; break;   /* same as 0xf3 prefix */
+		case 0x03 << EMU86_VEX3B_PP_S: op_flags |= EMU86_F_REPNE; break; /* same as 0xf2 prefix */
+		default: break;
+		}
+		/* The actual instruction opcode byte */
+		opcode = *pc++;
+		switch (vex & EMU86_VEX3B_MMMMM_M) {
+
+#if 0 /* Currently unused... */
+		case 0x8 << EMU86_VEX3B_MMMMM_S:
+			chain = ops_xop8;
+#ifdef HAVE_OPS_XOP8_OFFSETS
+			chain += ops_xop8_offsets[opcode];
+#endif /* HAVE_OPS_XOP8_OFFSETS */
+			break;
+#endif
+
+		case 0x9 << EMU86_VEX3B_MMMMM_S:
+			chain = ops_xop9;
+#ifdef HAVE_OPS_XOP9_OFFSETS
+			chain += ops_xop9_offsets[opcode];
+#endif /* HAVE_OPS_XOP9_OFFSETS */
+			break;
+
+		case 0xa << EMU86_VEX3B_MMMMM_S:
+			chain = ops_xopa;
+#ifdef HAVE_OPS_XOPA_OFFSETS
+			chain += ops_xopa_offsets[opcode];
+#endif /* HAVE_OPS_XOPA_OFFSETS */
+			break;
+
+		default:
+			goto print_byte;
+		}
+		self->d_pc = pc;
+#ifdef CONFIG_AUTOSELECT_JCC
+		whole_opcode = 0;
+#endif /* CONFIG_AUTOSELECT_JCC */
+		args_start = NULL;
+		goto search_chain;
+	}
+print_byte:
 	disasm_print_format(self, DISASSEMBLER_FORMAT_PSEUDOOP_PREFIX);
 	disasm_print(self, ".byte", 5);
 	disasm_print_format(self, DISASSEMBLER_FORMAT_PSEUDOOP_SUFFIX);
