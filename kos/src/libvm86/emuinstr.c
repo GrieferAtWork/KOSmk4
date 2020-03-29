@@ -23,9 +23,6 @@ opt.append("-Os");
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#if 1                         /* TODO: Remove me */
-#include "emuinstr-old.c.inl" /* TODO: Remove me */
-#else                         /* TODO: Remove me */
 #ifndef GUARD_LIBVM86_EMUINSTR_C
 #define GUARD_LIBVM86_EMUINSTR_C 1
 #define DISABLE_BRANCH_PROFILING 1
@@ -43,8 +40,6 @@ opt.append("-Os");
 #include <kos/types.h>
 
 #include "emulator.h"
-#include "x86.h"
-
 
 DECL_BEGIN
 
@@ -376,18 +371,18 @@ libvm86_loginstr(vm86_state_t *__restrict self) {
 	       self->vr_regs.vr_es, self->vr_regs.vr_edi,
 	       self->vr_regs.vr_cs, self->vr_regs.vr_ip,
 	       self->vr_regs.vr_flags);
-	if (self->vr_regs.vr_flags & CF)
+	if (self->vr_regs.vr_flags & VM86_EFLAGS_CF)
 		printk(KERN_RAW "CF");
-	if (self->vr_regs.vr_flags & PF)
-		printk(KERN_RAW "%sPF", self->vr_regs.vr_flags & CF ? "," : "");
-	if (self->vr_regs.vr_flags & ZF)
-		printk(KERN_RAW "%sZF", self->vr_regs.vr_flags & (CF | PF) ? "," : "");
-	if (self->vr_regs.vr_flags & SF)
-		printk(KERN_RAW "%sSF", self->vr_regs.vr_flags & (CF | PF | ZF) ? "," : "");
-	if (self->vr_regs.vr_flags & OF)
-		printk(KERN_RAW "%sOF", self->vr_regs.vr_flags & (CF | PF | ZF | SF) ? "," : "");
-	if (self->vr_regs.vr_flags & AF)
-		printk(KERN_RAW "%sAF", self->vr_regs.vr_flags & (CF | PF | ZF | SF | OF) ? "," : "");
+	if (self->vr_regs.vr_flags & VM86_EFLAGS_PF)
+		printk(KERN_RAW "%sPF", self->vr_regs.vr_flags & VM86_EFLAGS_CF ? "," : "");
+	if (self->vr_regs.vr_flags & VM86_EFLAGS_ZF)
+		printk(KERN_RAW "%sZF", self->vr_regs.vr_flags & (VM86_EFLAGS_CF | VM86_EFLAGS_PF) ? "," : "");
+	if (self->vr_regs.vr_flags & VM86_EFLAGS_SF)
+		printk(KERN_RAW "%sSF", self->vr_regs.vr_flags & (VM86_EFLAGS_CF | VM86_EFLAGS_PF | VM86_EFLAGS_ZF) ? "," : "");
+	if (self->vr_regs.vr_flags & VM86_EFLAGS_OF)
+		printk(KERN_RAW "%sOF", self->vr_regs.vr_flags & (VM86_EFLAGS_CF | VM86_EFLAGS_PF | VM86_EFLAGS_ZF | VM86_EFLAGS_SF) ? "," : "");
+	if (self->vr_regs.vr_flags & VM86_EFLAGS_AF)
+		printk(KERN_RAW "%sAF", self->vr_regs.vr_flags & (VM86_EFLAGS_CF | VM86_EFLAGS_PF | VM86_EFLAGS_ZF | VM86_EFLAGS_SF | VM86_EFLAGS_OF) ? "," : "");
 	printk(KERN_RAW "]\n");
 }
 DECL_END
@@ -410,4 +405,3 @@ DEFINE_PUBLIC_ALIAS(vm86_step, libvm86_step);
 DECL_END
 
 #endif /* !GUARD_LIBVM86_EMUINSTR_C */
-#endif /* TODO: Remove me */

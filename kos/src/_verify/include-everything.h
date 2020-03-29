@@ -660,7 +660,6 @@ incdir("", "../../include");
 #include <libvideo/window/api.h>
 #include <libvm86/api.h>
 #include <libvm86/emulator.h>
-#include <libvm86/intrin86.h>
 #include <libzlib/api.h>
 #include <libzlib/error.h>
 #include <libzlib/inflate.h>

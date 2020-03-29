@@ -36,7 +36,6 @@
 #include <libvm86/emulator.h>
 
 #include "emulator.h"
-#include "x86.h"
 
 #ifdef __KERNEL__
 #include <kernel/except.h>
@@ -90,7 +89,7 @@ libvm86_intr(vm86_state_t *__restrict self, uint8_t intno) {
 		sp[-1] = self->vr_regs.vr_flags;
 		sp[-2] = self->vr_regs.vr_cs;
 		sp[-3] = self->vr_regs.vr_ip;
-		self->vr_regs.vr_flags &= ~(IF | TF);
+		self->vr_regs.vr_flags &= ~(VM86_EFLAGS_IF | VM86_EFLAGS_TF);
 		self->vr_regs.vr_cs = cs;
 		self->vr_regs.vr_ip = ip;
 		self->vr_regs.vr_sp -= 6;
