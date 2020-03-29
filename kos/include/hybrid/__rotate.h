@@ -41,6 +41,7 @@ __DECL_BEGIN
 #endif /* __UINT64_TYPE__ */
 
 /* TODO: X86-specific inline-assembly implementation */
+/* TODO: clang has builtins for this: `__builtin_rotate(left|right)(8|16|32|64)' */
 
 #define __hybrid_rol8(x,shift)   __hybrid_rol8_c(x,shift)
 #define __hybrid_ror8(x,shift)   __hybrid_ror8_c(x,shift)

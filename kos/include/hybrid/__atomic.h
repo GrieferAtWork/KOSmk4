@@ -134,6 +134,7 @@ __SYSDECL_BEGIN
 /************************************************************************/
 /* __sync_xxx()                                                         */
 /************************************************************************/
+/* XXX: clang has a builtin `__sync_swap()' that is basically `__hybrid_atomic_xch()' */
 #define __impl_hybrid_atomic_addfetch_seqcst(x, v)  __sync_add_and_fetch(&(x), v)
 #define __impl_hybrid_atomic_subfetch_seqcst(x, v)  __sync_sub_and_fetch(&(x), v)
 #define __impl_hybrid_atomic_orfetch_seqcst(x, v)   __sync_or_and_fetch(&(x), v)
