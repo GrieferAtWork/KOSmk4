@@ -108,6 +108,7 @@ x86_handle_bad_usage(struct icpustate *__restrict state, u16 usage);
 #define EMU86_EMULATE_CONFIG_ONLY_CHECKERROR 1
 #define EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC 1
 #define EMU86_EMULATE_CONFIG_FSGSBASE_32BIT 1
+#define EMU86_EMULATE_CONFIG_ALLOW_USER_STAC_CLAC 1
 
 /* Configure for which instructions emulation should be attempted.
  * Any instruction enabled here will be emulated if not supported natively! */
@@ -211,6 +212,8 @@ x86_handle_bad_usage(struct icpustate *__restrict state, u16 usage);
 #define EMU86_EMULATE_CONFIG_WANT_MOV_RM        0
 #define EMU86_EMULATE_CONFIG_WANT_MOVBE         1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_MOV_IMM       0
+#define EMU86_EMULATE_CONFIG_WANT_XABORT        1 /* Emulate non-standard instructions */
+#define EMU86_EMULATE_CONFIG_WANT_XBEGIN        1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_MOV_MOFFS     0
 #define EMU86_EMULATE_CONFIG_WANT_MOVNTI        1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_MOVS          0
@@ -229,6 +232,8 @@ x86_handle_bad_usage(struct icpustate *__restrict state, u16 usage);
 #define EMU86_EMULATE_CONFIG_WANT_LTR           0
 #define EMU86_EMULATE_CONFIG_WANT_SGDT          0
 #define EMU86_EMULATE_CONFIG_WANT_LGDT          0
+#define EMU86_EMULATE_CONFIG_WANT_XEND          1 /* Emulate non-standard instructions */
+#define EMU86_EMULATE_CONFIG_WANT_XTEST         1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_SIDT          0
 #define EMU86_EMULATE_CONFIG_WANT_LIDT          0
 #define EMU86_EMULATE_CONFIG_WANT_VERR          0
@@ -268,6 +273,8 @@ x86_handle_bad_usage(struct icpustate *__restrict state, u16 usage);
 #define EMU86_EMULATE_CONFIG_WANT_SHIFT2        1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_BEXTR         1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_SHIFTX        1 /* Emulate non-standard instructions */
+#define EMU86_EMULATE_CONFIG_WANT_STAC          1 /* Emulate non-standard instructions */
+#define EMU86_EMULATE_CONFIG_WANT_CLAC          1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_CMC           0
 #define EMU86_EMULATE_CONFIG_WANT_CLC           0
 #define EMU86_EMULATE_CONFIG_WANT_STC           0
@@ -304,6 +311,7 @@ x86_handle_bad_usage(struct icpustate *__restrict state, u16 usage);
 #define EMU86_EMULATE_HELPER_ARGS_  EMU86_EMULATE_HELPER_ARGS,
 #define EMU86_EMULATE_HELPER_PARAM_ EMU86_EMULATE_HELPER_PARAM,
 
+#if 0 /* Unused... */
 PRIVATE NONNULL((1)) void FCALL
 loophint(struct icpustate *__restrict state) {
 	if (icpustate_getpreemption(state)) {
@@ -311,8 +319,10 @@ loophint(struct icpustate *__restrict state) {
 		task_yield();
 	}
 }
-
 #define EMU86_EMULATE_LOOPHINT() loophint(_state)
+#else
+#define EMU86_EMULATE_LOOPHINT() DONT_USE
+#endif
 
 #undef EMU86_EMULATE_RETURN_AFTER_INT  /* Not needed because we don't emulate the instruction */
 #undef EMU86_EMULATE_RETURN_AFTER_INT1 /* Not needed because we don't emulate the instruction */
@@ -1244,9 +1254,9 @@ DEFINE_DO_ATOMIC_CMPXCH(q, 64)
 DEFINE_DO_ATOMIC_CMPXCH(b, 8)
 /*DEFINE_DO_ATOMIC_CMPXCH_OR_WRITE(b, 8)*/ /* Unused */
 DEFINE_DO_ATOMIC_CMPXCH(w, 16)
-DEFINE_DO_ATOMIC_CMPXCH_OR_WRITE(w, 16)
+/*DEFINE_DO_ATOMIC_CMPXCH_OR_WRITE(w, 16)*/ /* Unused */
 DEFINE_DO_ATOMIC_CMPXCH(l, 32)
-DEFINE_DO_ATOMIC_CMPXCH_OR_WRITE(l, 32)
+/*DEFINE_DO_ATOMIC_CMPXCH_OR_WRITE(l, 32)*/ /* Unused */
 #endif /* EMU86_EMULATE_CONFIG_WANT_CMPXCHG */
 
 #undef DEFINE_DO_ATOMIC_CMPXCH

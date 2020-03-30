@@ -962,6 +962,7 @@ libviocore_atomic_cmpxchq(struct vio_emulate_args *__restrict self,
 	return result;
 }
 
+#if 0 /* Unused... */
 #define EMU86_MEM_ATOMIC_CMPXCH_OR_WRITEB(addr, oldval, newval, force_atomic) \
 	libviocore_atomic_cmpxch_or_writeb(self, (void *)(uintptr_t)(addr), oldval, newval, force_atomic)
 PRIVATE NONNULL((1)) bool CC
@@ -984,6 +985,9 @@ libviocore_atomic_cmpxch_or_writeb(struct vio_emulate_args *__restrict self,
 	COMPILER_BARRIER();
 	return result == oldval;
 }
+#else
+#define EMU86_MEM_ATOMIC_CMPXCH_OR_WRITEB(addr, oldval, newval, force_atomic) DONT_USE
+#endif
 
 #define EMU86_MEM_ATOMIC_CMPXCH_OR_WRITEW(addr, oldval, newval, force_atomic) \
 	libviocore_atomic_cmpxch_or_writew(self, (void *)(uintptr_t)(addr), oldval, newval, force_atomic)

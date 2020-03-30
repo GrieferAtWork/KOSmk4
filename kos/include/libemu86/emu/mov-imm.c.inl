@@ -24,11 +24,12 @@
 EMU86_INTELLISENSE_BEGIN(mov_imm) {
 
 
-#if EMU86_EMULATE_CONFIG_WANT_MOV_IMM
+#if EMU86_EMULATE_CONFIG_WANT_MOV_IMM || EMU86_EMULATE_CONFIG_WANT_XABORT
 case EMU86_OPCODE_ENCODE(0xc6):
 	MODRM_DECODE();
 	switch (modrm.mi_reg) {
 
+#if EMU86_EMULATE_CONFIG_WANT_MOV_IMM
 	case 0: {
 		/* C6 /0      MOV r/m8,imm8      Move imm8 to r/m8 */
 		u8 value;
@@ -37,6 +38,40 @@ case EMU86_OPCODE_ENCODE(0xc6):
 		MODRM_SETRMB(value);
 		goto done;
 	}
+#elif EMU86_EMULATE_CONFIG_CHECKERROR
+	case 0:
+		goto notsup_modrm_setb_rmreg_modrm_parsed;
+#define NEED_notsup_modrm_setb_rmreg_modrm_parsed
+#endif /* ... */
+
+
+#if EMU86_EMULATE_CONFIG_WANT_XABORT
+	case 7: {
+		/* C6 F8 ib     XABORT imm8     Causes an RTM abort if in RTM execution */
+		if (!EMU86_MODRM_ISREG(modrm.mi_type))
+			goto return_expected_register_modrm;
+#define NEED_return_expected_register_modrm
+		if (modrm.mi_rm != 0)
+			goto return_unknown_instruction_rmreg;
+#define NEED_return_unknown_instruction_rmreg
+		pc += 1; /* imm8 */
+		/* Since we emulate transactions by always choosing the fallback-branch,
+		 * we must emulate this instruction as a no-op, since that's what it's
+		 * supposed to behave as whenever not inside of a transaction. */
+		goto done;
+	}
+#elif EMU86_EMULATE_CONFIG_CHECKERROR
+	case 7:
+		if (!EMU86_MODRM_ISREG(modrm.mi_type))
+			goto return_expected_register_modrm;
+#define NEED_return_expected_register_modrm
+		if (modrm.mi_rm != 0)
+			goto return_unknown_instruction_rmreg;
+#define NEED_return_unknown_instruction_rmreg
+		goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
+#endif /* ... */
+
 
 	default:
 #define NEED_return_unknown_instruction_rmreg
@@ -45,17 +80,36 @@ case EMU86_OPCODE_ENCODE(0xc6):
 	break;
 #elif EMU86_EMULATE_CONFIG_CHECKERROR
 case EMU86_OPCODE_ENCODE(0xc6):
-	goto notsup_modrm_setb_rmreg;
-#define NEED_notsup_modrm_setb_rmreg
+	MODRM_DECODE();
+	switch (modrm.mi_reg) {
+	case 0:
+		goto notsup_modrm_setb_rmreg_modrm_parsed;
+#define NEED_notsup_modrm_setb_rmreg_modrm_parsed
+
+	case 7:
+		if (!EMU86_MODRM_ISREG(modrm.mi_type))
+			goto return_expected_register_modrm;
+#define NEED_return_expected_register_modrm
+		if (modrm.mi_rm != 0)
+			goto return_unknown_instruction_rmreg;
+#define NEED_return_unknown_instruction_rmreg
+		goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
+
+	default:
+		goto return_unknown_instruction_rmreg;
+#define NEED_return_unknown_instruction_rmreg
+	}
 #endif /* ... */
 
 
 
-#if EMU86_EMULATE_CONFIG_WANT_MOV_IMM
+#if EMU86_EMULATE_CONFIG_WANT_MOV_IMM || EMU86_EMULATE_CONFIG_WANT_XBEGIN
 case EMU86_OPCODE_ENCODE(0xc7):
 	MODRM_DECODE();
 	switch (modrm.mi_reg) {
 
+#if EMU86_EMULATE_CONFIG_WANT_MOV_IMM
 	case 0: {
 		s32 value;
 		/* C7 /0      MOV r/m16,imm16      Move imm16 to r/m16 */
@@ -76,6 +130,53 @@ case EMU86_OPCODE_ENCODE(0xc7):
 		}
 		goto done;
 	}
+#elif EMU86_EMULATE_CONFIG_CHECKERROR
+	case 0:
+		goto notsup_modrm_setwlq_rmreg_modrm_parsed;
+#define NEED_notsup_modrm_setwlq_rmreg_modrm_parsed
+#endif /* ... */
+
+
+#if EMU86_EMULATE_CONFIG_WANT_XBEGIN
+	case 7: {
+		/* C7 F8 XBEGIN rel16     Specifies the start of an RTM region. Provides a 16-bit relative offset to compute the address of the fallback instruction address at which execution resumes following an RTM abort.
+		 * C7 F8 XBEGIN rel32     Specifies the start of an RTM region. Provides a 32-bit relative offset to compute the address of the fallback instruction address at which execution resumes following an RTM abort. */
+		s32 offset;
+		if (!EMU86_MODRM_ISREG(modrm.mi_type))
+			goto return_expected_register_modrm;
+#define NEED_return_expected_register_modrm
+		if (modrm.mi_rm != 0)
+			goto return_unknown_instruction_rmreg;
+#define NEED_return_unknown_instruction_rmreg
+		if (op_flags & EMU86_F_66) {
+			offset = (s32)(s16)UNALIGNED_GET16((u16 *)pc);
+			pc += 2;
+		} else {
+			offset = (s32)UNALIGNED_GET32((u32 *)pc);
+			pc += 4;
+		}
+		/* We don't actually implement proper transaction support.
+		 * Instead, what we do is behave like an implementation that
+		 * doesn't have support for any kind of transactional instruction,
+		 * such that we immediately branch to the fallback branch, whilst
+		 * also clearing %eax to `_XABORT_FAILED' */
+		EMU86_SETIPREG(REAL_IP() + offset);
+		EMU86_SETEAX(_XABORT_FAILED);
+		goto done_dont_set_pc;
+#define NEED_done_dont_set_pc
+	}
+#elif EMU86_EMULATE_CONFIG_CHECKERROR
+	case 7:
+		if (!EMU86_MODRM_ISREG(modrm.mi_type))
+			goto return_expected_register_modrm;
+#define NEED_return_expected_register_modrm
+		if (modrm.mi_rm != 0)
+			goto return_unknown_instruction_rmreg;
+#define NEED_return_unknown_instruction_rmreg
+		goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
+#endif /* ... */
+
 
 	default:
 #define NEED_return_unknown_instruction_rmreg
@@ -84,8 +185,26 @@ case EMU86_OPCODE_ENCODE(0xc7):
 	break;
 #elif EMU86_EMULATE_CONFIG_CHECKERROR
 case EMU86_OPCODE_ENCODE(0xc7):
-	goto notsup_modrm_setwlq_rmreg;
-#define NEED_notsup_modrm_setwlq_rmreg
+	MODRM_DECODE();
+	switch (modrm.mi_reg) {
+	case 0:
+		goto notsup_modrm_setwlq_rmreg_modrm_parsed;
+#define NEED_notsup_modrm_setwlq_rmreg_modrm_parsed
+
+	case 7:
+		if (!EMU86_MODRM_ISREG(modrm.mi_type))
+			goto return_expected_register_modrm;
+#define NEED_return_expected_register_modrm
+		if (modrm.mi_rm != 0)
+			goto return_unknown_instruction_rmreg;
+#define NEED_return_unknown_instruction_rmreg
+		goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
+
+	default:
+		goto return_unknown_instruction_rmreg;
+#define NEED_return_unknown_instruction_rmreg
+	}
 #endif /* ... */
 
 

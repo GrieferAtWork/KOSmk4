@@ -42,6 +42,7 @@
 #include <i386-kos/asm/cpu-cpuid.h>
 #include <i386-kos/asm/cpu-flags.h>
 #include <i386-kos/asm/registers.h>
+#include <i386-kos/asm/rtm.h>
 #include <kos/except.h>
 #include <kos/except/inval.h>
 #include <kos/kernel/types.h>
@@ -169,6 +170,24 @@ __DECL_BEGIN
 #ifndef EMU86_EMULATE_CONFIG_LOCK_ARPL
 #define EMU86_EMULATE_CONFIG_LOCK_ARPL EMU86_EMULATE_CONFIG_LOCK_EXTENSION
 #endif /* !EMU86_EMULATE_CONFIG_LOCK_ARPL */
+
+
+/* Allow use of `stac' and `clac' from user-space (by having the instruction
+ * enable/disable the EFLAGS.AC bit as normal). Technically, this isn't done
+ * on real hardware, since the instruction pair was introduced to allow a
+ * kernel to temporarily enable/disable the effects of `CR4_SMAP' (which
+ * causes any kernel-access to pages marked with the U-bit to generate a #PF
+ * so-long as `CR4.SMAP == true && EFLAGS.AC == true')
+ * However, EFLAGS.AC also has meaning in user-space, where it can be used
+ * to enable/disable AlignmentChecking (hence the name AC), causing any
+ * unaligned memory access to trigger a #AC fault.
+ * Furthermore, regardless of this these instructions being allowed to be
+ * executed outside of ring #0, ring #3 already has the ability to set/clear
+ * the EFLAGS.AC bit freely, as that bit can be modified by `popf'.
+ * s.a. the implementation of `__stac()' / `__clac()' in <i386-kos/asm/intrin.h> */
+#ifndef EMU86_EMULATE_CONFIG_ALLOW_USER_STAC_CLAC
+#define EMU86_EMULATE_CONFIG_ALLOW_USER_STAC_CLAC 1
+#endif /* !EMU86_EMULATE_CONFIG_ALLOW_USER_STAC_CLAC */
 
 
 /* Explicit feature-support configuration for individual instructions */
@@ -427,6 +446,12 @@ __DECL_BEGIN
 #ifndef EMU86_EMULATE_CONFIG_WANT_MOV_IMM
 #define EMU86_EMULATE_CONFIG_WANT_MOV_IMM (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
 #endif /* !EMU86_EMULATE_CONFIG_WANT_MOV_IMM */
+#ifndef EMU86_EMULATE_CONFIG_WANT_XABORT
+#define EMU86_EMULATE_CONFIG_WANT_XABORT (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_XABORT */
+#ifndef EMU86_EMULATE_CONFIG_WANT_XBEGIN
+#define EMU86_EMULATE_CONFIG_WANT_XBEGIN (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_XBEGIN */
 #ifndef EMU86_EMULATE_CONFIG_WANT_MOV_MOFFS
 #define EMU86_EMULATE_CONFIG_WANT_MOV_MOFFS (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
 #endif /* !EMU86_EMULATE_CONFIG_WANT_MOV_MOFFS */
@@ -481,6 +506,12 @@ __DECL_BEGIN
 #ifndef EMU86_EMULATE_CONFIG_WANT_LGDT
 #define EMU86_EMULATE_CONFIG_WANT_LGDT 0
 #endif /* !EMU86_EMULATE_CONFIG_WANT_LGDT */
+#ifndef EMU86_EMULATE_CONFIG_WANT_XEND
+#define EMU86_EMULATE_CONFIG_WANT_XEND (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_XEND */
+#ifndef EMU86_EMULATE_CONFIG_WANT_XTEST
+#define EMU86_EMULATE_CONFIG_WANT_XTEST (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_XTEST */
 #ifndef EMU86_EMULATE_CONFIG_WANT_SIDT
 #define EMU86_EMULATE_CONFIG_WANT_SIDT 0
 #endif /* !EMU86_EMULATE_CONFIG_WANT_SIDT */
@@ -598,6 +629,12 @@ __DECL_BEGIN
 #ifndef EMU86_EMULATE_CONFIG_WANT_SHIFTX
 #define EMU86_EMULATE_CONFIG_WANT_SHIFTX (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
 #endif /* !EMU86_EMULATE_CONFIG_WANT_SHIFTX */
+#ifndef EMU86_EMULATE_CONFIG_WANT_STAC
+#define EMU86_EMULATE_CONFIG_WANT_STAC (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_STAC */
+#ifndef EMU86_EMULATE_CONFIG_WANT_CLAC
+#define EMU86_EMULATE_CONFIG_WANT_CLAC (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_CLAC */
 #ifndef EMU86_EMULATE_CONFIG_WANT_CMC
 #define EMU86_EMULATE_CONFIG_WANT_CMC (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
 #endif /* !EMU86_EMULATE_CONFIG_WANT_CMC */
@@ -790,6 +827,10 @@ __DECL_BEGIN
 #define EMU86_EMULATE_RETURN_AFTER_INTO() \
 	EMU86_EMULATE_RETURN_AFTER_INT(0x04) /* #OF */
 #endif /* !EMU86_EMULATE_RETURN_AFTER_INTO */
+#ifndef EMU86_EMULATE_RETURN_AFTER_XEND
+#define EMU86_EMULATE_RETURN_AFTER_XEND() \
+	EMU86_EMULATE_RETURN_AFTER_INT(0x0d) /* #GP */
+#endif /* !EMU86_EMULATE_RETURN_AFTER_XEND */
 #ifndef EMU86_EMULATE_THROW_BOUNDERR
 #define EMU86_EMULATE_THROW_BOUNDERR(bound_idx, bound_min, bound_max) \
 	EMU86_EMULATE_RETURN_AFTER_INT(0x05) /* #BR */
@@ -3512,43 +3553,42 @@ checklock_modrm_memory_parsed:
 			/* XXX: vmxoff     (if only for verbose exception messages?) */
 			/* XXX: invpcid    (if only for verbose exception messages?) */
 
-			/* TODO: crc32 */
-			/* TODO: clac */
-			/* TODO: stac */
+			/* TODO: Emulate crc32 */
+			/* TODO: Emulate mcommit */
+			/* TODO: Emulate xend */
+			/* TODO: Emulate xtest */
+			/* TODO: Emulate clzero (as a no-op) */
 
-//TODO:	I(0x1a, IF_X32|IF_F2|IF_MODRM, "bndcu\t" OP_RM32 OP_RBND),
-//TODO:	I(0x1a, IF_X64|IF_F2|IF_MODRM, "bndcu\t" OP_RM64 OP_RBND),
-//TODO:	I(0x1a, IF_X32|IF_F3|IF_MODRM, "bndcl\t" OP_RM32 OP_RBND),
-//TODO:	I(0x1a, IF_X64|IF_F3|IF_MODRM, "bndcl\t" OP_RM64 OP_RBND),
-//TODO:	I(0x1a, IF_MODRM,              "bndldx\t" OP_RMBND_RANGE OP_RBND),
-//TODO:	I(0x1a, IF_66|IF_MODRM,        "bndmov\t" OP_RMBND OP_RBND),
-//TODO:	I(0x1b, IF_X32|IF_F2|IF_MODRM, "bndcn\t" OP_RM32 OP_RBND),
-//TODO:	I(0x1b, IF_X64|IF_F2|IF_MODRM, "bndcn\t" OP_RM64 OP_RBND),
-//TODO:	I(0x1b, IF_66|IF_MODRM,        "bndmov\t" OP_RBND OP_RMBND),
-//TODO:	I(0x1b, IF_X32|IF_F3|IF_MODRM, "bndmk\t" OP_RM32 OP_RBND),
-//TODO:	I(0x1b, IF_X64|IF_F3|IF_MODRM, "bndmk\t" OP_RM64 OP_RBND),
+//???:	I(0x1a, IF_X32|IF_F2|IF_MODRM, "bndcu\t" OP_RM32 OP_RBND),
+//???:	I(0x1a, IF_X64|IF_F2|IF_MODRM, "bndcu\t" OP_RM64 OP_RBND),
+//???:	I(0x1a, IF_X32|IF_F3|IF_MODRM, "bndcl\t" OP_RM32 OP_RBND),
+//???:	I(0x1a, IF_X64|IF_F3|IF_MODRM, "bndcl\t" OP_RM64 OP_RBND),
+//???:	I(0x1a, IF_MODRM,              "bndldx\t" OP_RMBND_RANGE OP_RBND),
+//???:	I(0x1a, IF_66|IF_MODRM,        "bndmov\t" OP_RMBND OP_RBND),
+//???:	I(0x1b, IF_X32|IF_F2|IF_MODRM, "bndcn\t" OP_RM32 OP_RBND),
+//???:	I(0x1b, IF_X64|IF_F2|IF_MODRM, "bndcn\t" OP_RM64 OP_RBND),
+//???:	I(0x1b, IF_66|IF_MODRM,        "bndmov\t" OP_RBND OP_RMBND),
+//???:	I(0x1b, IF_X32|IF_F3|IF_MODRM, "bndmk\t" OP_RM32 OP_RBND),
+//???:	I(0x1b, IF_X64|IF_F3|IF_MODRM, "bndmk\t" OP_RM64 OP_RBND),
 
-//TODO:	I(0x20, IF_X32|IF_MODRM|IF_RMR,"movl\t" OP_RCR OP_RM32),
-//TODO:	I(0x20, IF_X64|IF_MODRM|IF_RMR,"movq\t" OP_RCR OP_RM64),
-//TODO:	I(0x21, IF_X32|IF_MODRM|IF_RMR,"movl\t" OP_RDR OP_RM32),
-//TODO:	I(0x21, IF_X64|IF_MODRM|IF_RMR,"movq\t" OP_RDR OP_RM64),
-//TODO:	I(0x22, IF_X32|IF_MODRM|IF_RMR,"movl\t" OP_RM32 OP_RCR),
-//TODO:	I(0x22, IF_X64|IF_MODRM|IF_RMR,"movq\t" OP_RM64 OP_RCR),
-//TODO:	I(0x23, IF_X32|IF_MODRM|IF_RMR,"movl\t" OP_RM32 OP_RDR),
-//TODO:	I(0x23, IF_X64|IF_MODRM|IF_RMR,"movq\t" OP_RM64 OP_RDR),
+//???:	I(0x20, IF_X32|IF_MODRM|IF_RMR,"movl\t" OP_RCR OP_RM32),
+//???:	I(0x20, IF_X64|IF_MODRM|IF_RMR,"movq\t" OP_RCR OP_RM64),
+//???:	I(0x21, IF_X32|IF_MODRM|IF_RMR,"movl\t" OP_RDR OP_RM32),
+//???:	I(0x21, IF_X64|IF_MODRM|IF_RMR,"movq\t" OP_RDR OP_RM64),
+//???:	I(0x22, IF_X32|IF_MODRM|IF_RMR,"movl\t" OP_RM32 OP_RCR),
+//???:	I(0x22, IF_X64|IF_MODRM|IF_RMR,"movq\t" OP_RM64 OP_RCR),
+//???:	I(0x23, IF_X32|IF_MODRM|IF_RMR,"movl\t" OP_RM32 OP_RDR),
+//???:	I(0x23, IF_X64|IF_MODRM|IF_RMR,"movq\t" OP_RM64 OP_RDR),
 
-//TODO:	I(0x24, IF_MODRM|IF_RMR,  "movl\t" OP_RTR OP_RM32),
-//TODO:	I(0x26, IF_MODRM|IF_RMR,  "movl\t" OP_RM32 OP_RTR),
+//???:	I(0x24, IF_MODRM|IF_RMR,  "movl\t" OP_RTR OP_RM32),
+//???:	I(0x26, IF_MODRM|IF_RMR,  "movl\t" OP_RM32 OP_RTR),
 
-//TODO:	I(0xc3, IF_MODRM|IF_RMM,        "movntil\t" OP_R32 OP_RM32),
-//TODO:	I(0xc3, IF_MODRM|IF_REXW|IF_RMM,"movntiq\t" OP_R64 OP_RM64),
-
-//TODO:	I(0x80, IF_X32|IF_66|IF_MODRM|IF_RMM,"inveptl\t" OP_MEM OP_R32),
-//TODO:	I(0x80, IF_X64|IF_66|IF_MODRM|IF_RMM,"inveptq\t" OP_MEM OP_R64),
-//TODO:	I(0x81, IF_X32|IF_66|IF_MODRM|IF_RMM,"invvpidl\t" OP_MEM OP_R32),
-//TODO:	I(0x81, IF_X64|IF_66|IF_MODRM|IF_RMM,"invvpidq\t" OP_MEM OP_R64),
-//TODO:	I(0x82, IF_X32|IF_66|IF_MODRM|IF_RMM,"invpcidl\t" OP_MEM OP_R32),
-//TODO:	I(0x82, IF_X64|IF_66|IF_MODRM|IF_RMM,"invpcidq\t" OP_MEM OP_R64),
+//???:	I(0x80, IF_X32|IF_66|IF_MODRM|IF_RMM,"inveptl\t" OP_MEM OP_R32),
+//???:	I(0x80, IF_X64|IF_66|IF_MODRM|IF_RMM,"inveptq\t" OP_MEM OP_R64),
+//???:	I(0x81, IF_X32|IF_66|IF_MODRM|IF_RMM,"invvpidl\t" OP_MEM OP_R32),
+//???:	I(0x81, IF_X64|IF_66|IF_MODRM|IF_RMM,"invvpidq\t" OP_MEM OP_R64),
+//???:	I(0x82, IF_X32|IF_66|IF_MODRM|IF_RMM,"invpcidl\t" OP_MEM OP_R32),
+//???:	I(0x82, IF_X64|IF_66|IF_MODRM|IF_RMM,"invpcidq\t" OP_MEM OP_R64),
 
 
 			/* TODO: XOP instructions (from AMD):
@@ -3840,6 +3880,18 @@ notsup_modrm_setwlq:
 notsup_modrm_setb_rmreg:
 #if CONFIG_LIBEMU86_WANT_64BIT || defined(EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION_RMREG)
 		MODRM_DECODE();
+		goto notsup_modrm_setb_rmreg_modrm_parsed;
+#define NEED_notsup_modrm_setb_rmreg_modrm_parsed
+#else /* CONFIG_LIBEMU86_WANT_64BIT || EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION_RMREG */
+		goto notsup_modrm_setb;
+#define NEED_notsup_modrm_setb
+#endif /* !CONFIG_LIBEMU86_WANT_64BIT && !EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION_RMREG */
+#endif /* NEED_notsup_modrm_setb_rmreg */
+
+
+#ifdef NEED_notsup_modrm_setb_rmreg_modrm_parsed
+#undef NEED_notsup_modrm_setb_rmreg_modrm_parsed
+notsup_modrm_setb_rmreg_modrm_parsed:
 #if CONFIG_LIBEMU86_WANT_64BIT
 		if (modrm.mi_reg >= 8) {
 #define NEED_return_unknown_instruction_rmreg
@@ -3849,11 +3901,7 @@ notsup_modrm_setb_rmreg:
 		MODRM_NOSUP_SETRMB();
 		goto return_unsupported_instruction_rmreg;
 #define NEED_return_unsupported_instruction_rmreg
-#else /* CONFIG_LIBEMU86_WANT_64BIT || EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION_RMREG */
-		goto notsup_modrm_setb;
-#define NEED_notsup_modrm_setb
-#endif /* !CONFIG_LIBEMU86_WANT_64BIT && !EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION_RMREG */
-#endif /* NEED_notsup_modrm_setb_rmreg */
+#endif /* NEED_notsup_modrm_setb_rmreg_modrm_parsed */
 
 
 #ifdef NEED_notsup_modrm_setb

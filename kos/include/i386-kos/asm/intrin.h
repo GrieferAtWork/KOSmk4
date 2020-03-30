@@ -167,9 +167,25 @@ __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __UINT32_TYPE__ (__cpuid2_edx)(__UINT32
 __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __UINT32_TYPE__ (__cpuid2_ebx)(__UINT32_TYPE__ __leaf_eax, __UINT32_TYPE__ __leaf_ecx) { __UINT32_TYPE__ __res, __eax, __ecx; __asm__("cpuid" : "=b" (__res), "=a" (__eax), "=c" (__ecx) : "a" (__leaf_eax), "c" (__leaf_ecx) : "edx"); return __res; }
 __FORCELOCAL __ATTR_WUNUSED __UINT8_TYPE__ (__daa)(__UINT8_TYPE__ __x) { __UINT8_TYPE__ __result; __asm__("daa" : "=a" (__result) : "0" (__x) : "cc"); return __result; }
 __FORCELOCAL __ATTR_WUNUSED __UINT8_TYPE__ (__dal)(__UINT8_TYPE__ __x) { __UINT8_TYPE__ __result; __asm__("dal" : "=a" (__result) : "0" (__x) : "cc"); return __result; }
-__FORCELOCAL __ATTR_NORETURN void (__rsm)(void) { __asm__ __volatile__("rsm" : : : "memory"); __builtin_unreachable(); }
-__FORCELOCAL void (__clac)(void) { __asm__ __volatile__("clac" : : : "memory"); }
-__FORCELOCAL void (__stac)(void) { __asm__ __volatile__("stac" : : : "memory"); }
+#if defined(__KERNEL__) || (defined(__KOS__) && defined(__OPTIMIZE_SIZE__))
+__FORCELOCAL void (__stac)(void) { __asm__ __volatile__("stac" : : : "memory", "cc"); }
+__FORCELOCAL void (__clac)(void) { __asm__ __volatile__("clac" : : : "memory", "cc"); }
+#else /* __KERNEL__ || (__KOS__ && __OPTIMIZE_SIZE__) */
+/* For whatever reason, STAC and CLAC can't be used to modify EFLAGS.AC in user-space.
+ * However, user-space is allowed to modify EFLAGS.AC through use of `popf', meaning
+ * that this restriction is completely pointless...
+ * Furthermore, the KOS kernel emulates these 2 instructions when executed from user-space
+ * essentially do the same as also done here (which is why we still encode the ~privileged~
+ * instructions when optimizing for size with KOS as target, but encode a sequence to modify
+ * EFLAGS directly in all other cases, which ends up having identical behavior) */
+#ifdef __x86_64__
+__FORCELOCAL void (__stac)(void) { __asm__ __volatile__("pushfq\n\torq $0x40000, 0(%%rsp)\n\tpopfq" : : : "memory", "cc"); }
+__FORCELOCAL void (__clac)(void) { __asm__ __volatile__("pushfq\n\tandq $~0x40000, 0(%%rsp)\n\tpopfq" : : : "memory", "cc"); }
+#else /* __x86_64__ */
+__FORCELOCAL void (__stac)(void) { __asm__ __volatile__("pushfl\n\torl $0x40000, 0(%%esp)\n\tpopfl" : : : "memory", "cc"); }
+__FORCELOCAL void (__clac)(void) { __asm__ __volatile__("pushfl\n\tandl $~0x40000, 0(%%esp)\n\tpopfl" : : : "memory", "cc"); }
+#endif /* !__x86_64__ */
+#endif /* !__KERNEL__ && (!__KOS__ || !__OPTIMIZE_SIZE__) */
 __FORCELOCAL void (__hlt)(void) { __asm__ __volatile__("hlt" : : : "memory"); }
 __FORCELOCAL void (__into)(void) { __asm__ __volatile__("into"); }
 __FORCELOCAL void (__int3)(void) { __asm__ __volatile__("int {$}3" : ); }
@@ -177,9 +193,9 @@ __FORCELOCAL void (__int3)(void) { __asm__ __volatile__("int {$}3" : ); }
 void (__int)(__UINT8_TYPE__ __intno);
 #elif !defined(__NO_XBLOCK)
 #define __int(intno)  __XBLOCK({ __asm__ __volatile__("int %0" : : "N" (intno)); (void)0; })
-#else
+#else /* ... */
 #define __int(intno)  __asm__ __volatile__("int %0" : : "N" (intno))
-#endif
+#endif /* !... */
 __FORCELOCAL void (__invd)(void) { __asm__ __volatile__("invd"); }
 __FORCELOCAL void (__wbinvd)(void) { __asm__ __volatile__("wbinvd"); }
 __FORCELOCAL void (__invlpg)(void *__p) { __asm__ __volatile__("invlpg %0" : : "m" (*(int *)__p)); }

@@ -1203,13 +1203,13 @@ PRIVATE struct instruction const ops[] = {
 	I(0xc5, IF_MODRM|IF_RMM,       "ldsl\t" OP_MEM/*48*/ OP_R32),
 
 	I(0xc6, IF_MODRM|IF_REG0,        "movb\t" OP_U8 OP_RM8),
-	I(0xc6, IF_BYTE2,         "\xf8" "xabort\t" OP_U8),
+	I(0xc6, IF_BYTE2,         "\xf8" "xabort\t" OP_U8), /* 0xf8: [mod=3,reg=7,rm=0] */
 
 	I(0xc7, IF_66|IF_MODRM|IF_REG0,  "movw\t" OP_U16 OP_RM16),
 	I(0xc7, IF_MODRM|IF_REG0,        "movl\t" OP_U32 OP_RM32),
 	I(0xc7, IF_MODRM|IF_REXW|IF_REG0,"movq\t" OP_S32 OP_RM64),
-	I(0xc7, IF_66|IF_BYTE2,   "\xf8" "xbeginw\t" OP_DISP16),
-	I(0xc7, IF_BYTE2,         "\xf8" "xbegin\t" OP_DISP32),
+	I(0xc7, IF_66|IF_BYTE2,   "\xf8" "xbeginw\t" OP_DISP16), /* 0xf8: [mod=3,reg=7,rm=0] */
+	I(0xc7, IF_BYTE2,         "\xf8" "xbegin\t" OP_DISP32),  /* 0xf8: [mod=3,reg=7,rm=0] */
 
 	I(0xc8, 0,                "enter\t" OP_U16 OP_U8),
 	I(0xc9, 0,                "leave"),

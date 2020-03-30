@@ -627,14 +627,14 @@ notsup_modrm_getxyzmm:
 
 #ifdef NEED_notsup_modrm_setxyzmm
 #undef NEED_notsup_modrm_setxyzmm
-notsup_modrm_getxyzmm:
+notsup_modrm_setxyzmm:
 		goto return_unsupported_instruction;
 #define NEED_return_unsupported_instruction
 #endif /* NEED_notsup_modrm_setxyzmm */
 
 #ifdef NEED_notsup_modrm_getsetxyzmm
 #undef NEED_notsup_modrm_getsetxyzmm
-notsup_modrm_getxyzmm:
+notsup_modrm_getsetxyzmm:
 		goto return_unsupported_instruction;
 #define NEED_return_unsupported_instruction
 #endif /* NEED_notsup_modrm_getsetxyzmm */

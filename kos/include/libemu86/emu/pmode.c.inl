@@ -241,16 +241,41 @@ case EMU86_OPCODE_ENCODE(0x0f00): {
 
 
 
-#if (EMU86_EMULATE_CONFIG_WANT_SGDT || EMU86_EMULATE_CONFIG_WANT_SIDT || \
-     EMU86_EMULATE_CONFIG_WANT_LGDT || EMU86_EMULATE_CONFIG_WANT_LIDT || \
-     EMU86_EMULATE_CONFIG_WANT_SMSW || EMU86_EMULATE_CONFIG_WANT_LMSW || \
-     EMU86_EMULATE_CONFIG_WANT_INVLPG || EMU86_EMULATE_CONFIG_CHECKERROR)
+#if (EMU86_EMULATE_CONFIG_WANT_SGDT || EMU86_EMULATE_CONFIG_WANT_SIDT ||    \
+     EMU86_EMULATE_CONFIG_WANT_LGDT || EMU86_EMULATE_CONFIG_WANT_LIDT ||    \
+     EMU86_EMULATE_CONFIG_WANT_SMSW || EMU86_EMULATE_CONFIG_WANT_LMSW ||    \
+     EMU86_EMULATE_CONFIG_WANT_INVLPG || EMU86_EMULATE_CONFIG_CHECKERROR || \
+     (!EMU86_EMULATE_CONFIG_ONLY_MEMORY &&                                  \
+      (EMU86_EMULATE_CONFIG_WANT_STAC || EMU86_EMULATE_CONFIG_WANT_CLAC ||  \
+       EMU86_EMULATE_CONFIG_WANT_XEND || EMU86_EMULATE_CONFIG_WANT_XTEST)))
 case EMU86_OPCODE_ENCODE(0x0f01): {
 	MODRM_DECODE();
 	switch (modrm.mi_reg) {
 
 #if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_SGDT
 	case 0: {
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
+#if (EMU86_EMULATE_CONFIG_CHECKERROR && \
+     (EMU86_EMULATE_CONFIG_CHECKUSER || !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC))
+		if (EMU86_MODRM_ISREG(modrm.mi_type)) {
+			switch (modrm.mi_rm) {
+
+			case 1: /* 0F 01 C1     VMCALL       Call to VM monitor by causing VM exit. */
+			case 2: /* 0F 01 C2     VMLAUNCH     Launch virtual machine managed by current VMCS. */
+			case 3: /* 0F 01 C3     VMRESUME     Resume virtual machine managed by current VMCS. */
+			case 4: /* 0F 01 C4     VMXOFF       Leaves VMX operation. */
+				if (EMU86_ISUSER())
+					goto return_privileged_instruction_rmreg;
+#define NEED_return_privileged_instruction_rmreg
+				goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
+
+			default: break;
+			}
+		}
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_... */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
+
 		/* 0F 01 /0     SGDT m16&32     Store GDTR to m.
 		 * 0F 01 /0     SGDT m16&64     Store GDTR to m. */
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
@@ -303,8 +328,107 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 #endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_SGDT */
 
 
-#if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_SIDT
+#if (EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_SIDT || \
+     (!EMU86_EMULATE_CONFIG_ONLY_MEMORY &&                                \
+      (EMU86_EMULATE_CONFIG_WANT_STAC || EMU86_EMULATE_CONFIG_WANT_CLAC)))
 	case 1: {
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
+#if ((EMU86_EMULATE_CONFIG_CHECKERROR &&                                                     \
+      (EMU86_EMULATE_CONFIG_CHECKUSER || !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC)) || \
+     EMU86_EMULATE_CONFIG_WANT_STAC || EMU86_EMULATE_CONFIG_WANT_CLAC)
+		if (EMU86_MODRM_ISREG(modrm.mi_type)) {
+			switch (modrm.mi_rm) {
+
+
+#if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_CLAC
+			case 2:
+				/* 0F 01 CA     CLAC     Clear the AC flag in the EFLAGS register. */
+#if EMU86_EMULATE_CONFIG_CHECKUSER && !EMU86_EMULATE_CONFIG_ALLOW_USER_STAC_CLAC
+				if (EMU86_ISUSER()) {
+#ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
+					EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV,
+					                                                 IF_64BIT(EMU86_F_IS64(op_flags)
+					                                                 ?  X86_REGISTER_MISC_RFLAGS
+					                                                 :) X86_REGISTER_MISC_EFLAGS,
+					                                                 ~EFLAGS_AC, 0);
+#else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
+					goto return_privileged_instruction_rmreg;
+#define NEED_return_privileged_instruction_rmreg
+#endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
+				}
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER && !EMU86_EMULATE_CONFIG_ALLOW_USER_STAC_CLAC */
+#if EMU86_EMULATE_CONFIG_WANT_CLAC
+				{
+					u32 eflags;
+					eflags = EMU86_GETFLAGS();
+					eflags &= ~EFLAGS_AC;
+					EMU86_SETFLAGS(eflags);
+				}
+				goto done;
+#else /* EMU86_EMULATE_CONFIG_WANT_CLAC */
+				break;
+#endif /* !EMU86_EMULATE_CONFIG_WANT_CLAC */
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_CLAC */
+
+
+#if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_STAC
+			case 3:
+				/* 0F 01 CB     STAC     Set the AC flag in the EFLAGS register. */
+#if EMU86_EMULATE_CONFIG_CHECKUSER && !EMU86_EMULATE_CONFIG_ALLOW_USER_STAC_CLAC
+				if (EMU86_ISUSER()) {
+#ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
+					EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV,
+					                                                 IF_64BIT(EMU86_F_IS64(op_flags)
+					                                                 ?  X86_REGISTER_MISC_RFLAGS
+					                                                 :) X86_REGISTER_MISC_EFLAGS,
+					                                                 ~EFLAGS_AC, EFLAGS_AC);
+#else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
+					goto return_privileged_instruction_rmreg;
+#define NEED_return_privileged_instruction_rmreg
+#endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
+				}
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER && !EMU86_EMULATE_CONFIG_ALLOW_USER_STAC_CLAC */
+#if EMU86_EMULATE_CONFIG_WANT_STAC
+				{
+					u32 eflags;
+					eflags = EMU86_GETFLAGS();
+					eflags |= EFLAGS_AC;
+					EMU86_SETFLAGS(eflags);
+				}
+				goto done;
+#else /* EMU86_EMULATE_CONFIG_WANT_STAC */
+				break;
+#endif /* !EMU86_EMULATE_CONFIG_WANT_STAC */
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_STAC */
+
+
+#if (EMU86_EMULATE_CONFIG_CHECKERROR && \
+     (EMU86_EMULATE_CONFIG_CHECKUSER || !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC))
+			case 0:
+				/* 0F 01 C8     MONITOR     Sets up a linear address range to be monitored by hardware and
+				 *                          activates the monitor. The address range should be a write-back
+				 *                          memory caching type. The address is DS:RAX/EAX/AX. */
+			case 1:
+				/* 0F 01 C9     MWAIT     A hint that allows the processor to stop instruction execution
+				 *                        and enter an implementation-dependent optimized state until
+				 *                        occurrence of a class of events. */
+			case 7:
+				/* 0F 01 CF     ENCLS     This instruction is used to execute privileged Intel SGX leaf
+				 *                        functions that are used for managing and debugging the enclaves. */
+				if (EMU86_ISUSER())
+					goto return_privileged_instruction_rmreg;
+#define NEED_return_privileged_instruction_rmreg
+				goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR && (EMU86_EMULATE_CONFIG_CHECKUSER || !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC) */
+
+			default: break;
+			}
+		}
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_... */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
+
+#if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_SIDT
 		/* 0F 01 /1     SIDT m16&32     Store IDTR to m.
 		 * 0F 01 /1     SIDT m16&64     Store IDTR to m. */
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
@@ -353,18 +477,87 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 		goto return_unsupported_instruction_rmreg;
 #define NEED_return_unsupported_instruction_rmreg
 #endif /* !EMU86_EMULATE_CONFIG_WANT_SIDT || !EMU86_EMULATE_SIDT */
+#else /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_SIDT */
+#define NEED_return_unknown_instruction_rmreg
+		goto return_unknown_instruction_rmreg;
+#endif /* !EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_WANT_SIDT */
 	}
-#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_SIDT */
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_SIDT || (WANT_<0F01h/1/0-7>) */
 
 
-#if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_LGDT
+#if (EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_LGDT || \
+     (!EMU86_EMULATE_CONFIG_ONLY_MEMORY &&                                \
+      (EMU86_EMULATE_CONFIG_WANT_XEND || EMU86_EMULATE_CONFIG_WANT_XTEST)))
 	case 2: {
-		/* 0F 01 /2     LGDT m16&32     Load m into GDTR.
-		 * 0F 01 /2     LGDT m16&64     Load m into GDTR. */
 #if EMU86_EMULATE_CONFIG_CHECKUSER || EMU86_EMULATE_CONFIG_WANT_LGDT
 		u16 limit;
 		EMU86_UREG_TYPE base;
 #endif /* EMU86_EMULATE_CONFIG_CHECKUSER || EMU86_EMULATE_CONFIG_WANT_LGDT */
+
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
+#if ((EMU86_EMULATE_CONFIG_CHECKERROR &&                                                     \
+      (EMU86_EMULATE_CONFIG_CHECKUSER || !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC)) || \
+     (EMU86_EMULATE_CONFIG_WANT_XEND || EMU86_EMULATE_CONFIG_WANT_XTEST))
+		if (EMU86_MODRM_ISREG(modrm.mi_type)) {
+			switch (modrm.mi_rm) {
+
+
+#if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_XEND
+			case 5: /* 0F 01 D5     XEND       Specifies the end of an RTM code region. */
+				/* XEND is supposed to RAISE a #GP(0) when executed outside of a transaction
+				 * Since we always choose the fallback-branch, this instruction should never
+				 * be encountered during normal execution, and as such is considered to be
+				 * unsupported (during said normal execution) */
+#ifdef EMU86_EMULATE_RETURN_AFTER_XEND
+				EMU86_EMULATE_RETURN_AFTER_XEND();
+#else /* EMU86_EMULATE_RETURN_AFTER_XEND */
+				goto return_unsupported_instruction_rmreg;
+#endif /* !EMU86_EMULATE_RETURN_AFTER_XEND */
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_XEND */
+
+
+#if EMU86_EMULATE_CONFIG_WANT_XTEST
+			case 6: /* 0F 01 D6     XTEST      Test if executing in a transactional region */
+				/* XTEST clears EFLAGS.ZF if inside of a transaction, and sets it if outside.
+				 * Since we're always outside of a transaction, simply always set the flag. */
+				{
+					u32 eflags;
+					eflags = EMU86_GETFLAGS();
+					eflags |= EFLAGS_ZF;
+					/* Intel documents that these flags are always cleared... */
+					eflags &= ~(EFLAGS_CF | EFLAGS_OF | EFLAGS_SF | EFLAGS_PF | EFLAGS_AF);
+					EMU86_SETFLAGS(eflags);
+				}
+				goto done;
+#elif EMU86_EMULATE_CONFIG_CHECKERROR
+			case 6: /* 0F 01 D6     XTEST      Test if executing in a transactional region */
+				goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
+#endif /* ... */
+
+
+#if (EMU86_EMULATE_CONFIG_CHECKERROR && \
+     (EMU86_EMULATE_CONFIG_CHECKUSER || !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC))
+			case 0: /* 0F 01 D0     XGETBV     Reads an XCR specified by ECX into EDX:EAX. */
+			case 1: /* 0F 01 D1     XSETBV     Write the value in EDX:EAX to the XCR specified by ECX. */
+			case 4: /* 0F 01 D4     VMFUNC     Invoke VM function specified in EAX. */
+			case 7: /* 0F 01 D7     ENCLU      This instruction is used to execute non-privileged Intel SGX leaf functions. */
+				if (EMU86_ISUSER())
+					goto return_privileged_instruction_rmreg;
+#define NEED_return_privileged_instruction_rmreg
+				goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR && ... */
+
+			default: break;
+			}
+		}
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_... */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
+
+
+		/* 0F 01 /2     LGDT m16&32     Load m into GDTR.
+		 * 0F 01 /2     LGDT m16&64     Load m into GDTR. */
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 #define NEED_return_expected_memory_modrm_rmreg
 		if (!EMU86_MODRM_ISMEM(modrm.mi_type))
@@ -410,23 +603,51 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 #define NEED_return_unsupported_instruction_rmreg
 #endif /* !EMU86_EMULATE_CONFIG_WANT_LGDT || !EMU86_EMULATE_LGDT */
 	}
-#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_LGDT */
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_LGDT || ... */
 
 
 #if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_LIDT
 	case 3: {
 		/* 0F 01 /3     LIDT m16&32     Load m into IDTR.
 		 * 0F 01 /3     LIDT m16&64     Load m into IDTR. */
-#if EMU86_EMULATE_CONFIG_CHECKUSER || EMU86_EMULATE_CONFIG_WANT_LGDT
+#if EMU86_EMULATE_CONFIG_CHECKUSER || EMU86_EMULATE_CONFIG_WANT_LIDT
 		u16 limit;
 		EMU86_UREG_TYPE base;
-#endif /* EMU86_EMULATE_CONFIG_CHECKUSER || EMU86_EMULATE_CONFIG_WANT_LGDT */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER || EMU86_EMULATE_CONFIG_WANT_LIDT */
+
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
+#if (EMU86_EMULATE_CONFIG_CHECKERROR && \
+     (EMU86_EMULATE_CONFIG_CHECKUSER || !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC))
+		if (EMU86_MODRM_ISREG(modrm.mi_type)) {
+			switch (modrm.mi_rm) {
+
+			case 0: /* vmrun */
+			case 1: /* vmmcall */
+			case 2: /* vmload */
+			case 3: /* vmsave */
+			case 4: /* stgi */
+			case 5: /* clgi */
+			case 6: /* skinit */
+			case 7: /* invlpga */
+				if (EMU86_ISUSER())
+					goto return_privileged_instruction_rmreg;
+#define NEED_return_privileged_instruction_rmreg
+				goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
+
+			default: break;
+			}
+		}
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_... */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
+
+
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 #define NEED_return_expected_memory_modrm_rmreg
 		if (!EMU86_MODRM_ISMEM(modrm.mi_type))
 			goto return_expected_memory_modrm_rmreg;
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
-#if EMU86_EMULATE_CONFIG_CHECKUSER || EMU86_EMULATE_CONFIG_WANT_LGDT
+#if EMU86_EMULATE_CONFIG_CHECKUSER || EMU86_EMULATE_CONFIG_WANT_LIDT
 		{
 			byte_t *rmaddr;
 			rmaddr = MODRM_MEMADDR();
@@ -440,7 +661,7 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 				base  = EMU86_MEMREADL(rmaddr + 2);
 			}
 		}
-#endif /* EMU86_EMULATE_CONFIG_CHECKUSER || EMU86_EMULATE_CONFIG_WANT_LGDT */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER || EMU86_EMULATE_CONFIG_WANT_LIDT */
 #if EMU86_EMULATE_CONFIG_CHECKUSER
 		if (EMU86_ISUSER()) {
 #ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
@@ -534,6 +755,40 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 
 #if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_INVLPG
 	case 7: {
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
+#if (EMU86_EMULATE_CONFIG_CHECKERROR && \
+     (EMU86_EMULATE_CONFIG_CHECKUSER || !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC))
+		if (EMU86_MODRM_ISREG(modrm.mi_type)) {
+			switch (modrm.mi_rm) {
+
+			case 2:
+				if (op_flags & EMU86_F_f3) {
+					/* mcommit */
+					/* TODO: Emulation of `mcommit'! */
+				}
+				/* monitorx */
+				ATTR_FALLTHROUGH
+			case 0: /* 0F 01 F8     SWAPGS     Exchanges the current GS base register value with the value contained in MSR address C0000102H. */
+			case 1: /* 0F 01 F9     RDTSCP     Read 64-bit time-stamp counter and IA32_TSC_AUX value into EDX:EAX and ECX. */
+			case 3: /* mwaitx */
+			case 5: /* rdpru */
+				if (EMU86_ISUSER())
+					goto return_privileged_instruction_rmreg;
+#define NEED_return_privileged_instruction_rmreg
+				goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
+
+			case 4: /* clzero */
+				goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
+
+			default: break;
+			}
+		}
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_... */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
+
+
 		/* 0F 01 /7     INVLPG m      Invalidate TLB entries for page containing m. */
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 #define NEED_return_expected_memory_modrm_rmreg

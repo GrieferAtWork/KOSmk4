@@ -292,6 +292,8 @@ DECL_END
 	return libvm86_intr(self, 0x03) /* #BP */
 #define EMU86_EMULATE_RETURN_AFTER_INTO() \
 	return libvm86_intr(self, 0x04) /* #OF */
+#define EMU86_EMULATE_RETURN_AFTER_XEND() \
+	return libvm86_intr(self, 0x0d) /* #GP */
 #define EMU86_EMULATE_THROW_BOUNDERR(bound_idx, bound_min, bound_max) \
 	return libvm86_intr(self, 0x05) /* #BR */
 #define EMU86_EMULATE_THROW_SEGFAULT_UNALIGNED(addr, context, req_alignment) \
