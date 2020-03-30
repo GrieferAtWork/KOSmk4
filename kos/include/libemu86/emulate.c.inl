@@ -430,6 +430,9 @@ __DECL_BEGIN
 #ifndef EMU86_EMULATE_CONFIG_WANT_MOV_MOFFS
 #define EMU86_EMULATE_CONFIG_WANT_MOV_MOFFS (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
 #endif /* !EMU86_EMULATE_CONFIG_WANT_MOV_MOFFS */
+#ifndef EMU86_EMULATE_CONFIG_WANT_MOVNTI
+#define EMU86_EMULATE_CONFIG_WANT_MOVNTI (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_MOVNTI */
 #ifndef EMU86_EMULATE_CONFIG_WANT_MOVS
 #define EMU86_EMULATE_CONFIG_WANT_MOVS (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
 #endif /* !EMU86_EMULATE_CONFIG_WANT_MOVS */
@@ -3447,6 +3450,7 @@ checklock_modrm_memory_parsed:
 #include "emu/mov.c.inl"
 #include "emu/movbe.c.inl"
 #include "emu/movdir64b.c.inl"
+#include "emu/movnti.c.inl"
 #include "emu/movs.c.inl"
 #include "emu/movsx.c.inl"
 #include "emu/movsxd.c.inl"
@@ -3511,7 +3515,6 @@ checklock_modrm_memory_parsed:
 			/* TODO: crc32 */
 			/* TODO: clac */
 			/* TODO: stac */
-			/* TODO: movnti */
 
 //TODO:	I(0x1a, IF_X32|IF_F2|IF_MODRM, "bndcu\t" OP_RM32 OP_RBND),
 //TODO:	I(0x1a, IF_X64|IF_F2|IF_MODRM, "bndcu\t" OP_RM64 OP_RBND),
@@ -3809,6 +3812,17 @@ notsup_modrm_setwlq_rmreg_modrm_parsed:
 		goto return_unsupported_instruction_rmreg;
 #define NEED_return_unsupported_instruction_rmreg
 #endif /* NEED_notsup_modrm_setwlq_rmreg_modrm_parsed */
+
+
+#ifdef NEED_notsup_modrm_setlq_memonly
+#undef NEED_notsup_modrm_setlq_memonly
+notsup_modrm_setlq_memonly:
+		MODRM_DECODE_MEMONLY();
+#define NEED_return_expected_memory_modrm
+		MODRM_NOSUP_SETRMZ(IF_64BIT(IS_64BIT() ? 8 :) 4);
+		goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* NEED_notsup_modrm_setlq_memonly */
 
 
 #ifdef NEED_notsup_modrm_setwlq

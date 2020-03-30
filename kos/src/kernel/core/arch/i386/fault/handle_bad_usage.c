@@ -212,6 +212,7 @@ x86_handle_bad_usage(struct icpustate *__restrict state, u16 usage);
 #define EMU86_EMULATE_CONFIG_WANT_MOVBE         1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_MOV_IMM       0
 #define EMU86_EMULATE_CONFIG_WANT_MOV_MOFFS     0
+#define EMU86_EMULATE_CONFIG_WANT_MOVNTI        1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_MOVS          0
 #define EMU86_EMULATE_CONFIG_WANT_MOV_SREG      0
 #define EMU86_EMULATE_CONFIG_WANT_MOVSX         0
