@@ -570,6 +570,9 @@ throw_unsupported_instruction(struct icpustate *__restrict state,
 #define EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER_RMREG(how, regno, regval, offset)    \
 	throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER), \
 	                                    _EMU86_GETOPCODE_RMREG(), op_flags, how, regno, regval, offset)
+#define EMU86_EMULATE_RETURN_AFTER_XEND()                                                               \
+	throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE), \
+	                                    _EMU86_GETOPCODE_RMREG(), op_flags, 0, 0, 0, 0)
 
 #define EMU86_EMULATE_GETOPFLAGS() emu86_opflagsof_icpustate(_state)
 #define EMU86_EMULATE_TRANSLATEADDR_IS_NOOP 1

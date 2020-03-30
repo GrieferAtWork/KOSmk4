@@ -48,15 +48,16 @@ __DECL_BEGIN
 /* Start a transaction
  * @return: _XBEGIN_STARTED: Transaction started.
  * @return: _XABORT_* :      Transaction failed. */
+__FORCELOCAL __UINT32_TYPE__(__xbegin)(void)
 #if __has_builtin(__builtin_ia32_xbegin)
-__FORCELOCAL __UINT32_TYPE__(__xbegin)(void) {
+{
 	return (__UINT32_TYPE__)__builtin_ia32_xbegin();
 }
 #else /* __has_builtin(__builtin_ia32_xbegin) */
-__FORCELOCAL __UINT32_TYPE__(__xbegin)(void) {
+{
 	__register __UINT32_TYPE__ __result;
 	__asm__ __volatile__("xbegin 991f\n\t"
-	                     "movl $-1, %%eax\n\t"
+	                     "movl $-1, %%eax\n\t" /* -1 == _XBEGIN_STARTED */
 	                     "991:"
 	                     : "=a" (__result));
 	return __result;
@@ -67,13 +68,15 @@ __FORCELOCAL __UINT32_TYPE__(__xbegin)(void) {
 /* End a transaction
  * If the transaction was successful, return normally.
  * If the transaction failed, `__xbegin()' returns `_XABORT_*'
- * If no transaction was in progress, trigger #GP(0) */
+ * If no transaction was in progress, trigger #GP(0) that is propagated to user-space as
+ * `E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE:E_ILLEGAL_INSTRUCTION_X86_OPCODE(0x0f01, 2)' */
+__FORCELOCAL void(__xend)(void)
 #if __has_builtin(__builtin_ia32_xend)
-__FORCELOCAL void (__xend)(void) {
+{
 	__builtin_ia32_xend();
 }
 #else /* __has_builtin(__builtin_ia32_xend) */
-__FORCELOCAL void (__xend)(void) {
+{
 	__asm__ __volatile__("xend");
 }
 #endif /* !__has_builtin(__builtin_ia32_xend) */
@@ -92,12 +95,17 @@ __FORCELOCAL void (__xend)(void) {
 
 
 /* Check if a transaction is currently in progress */
+#ifdef __KOS__ /* Always available under KOS */
+__FORCELOCAL __BOOL __NOTHROW(__xtest)(void)
+#else /* __KOS__ */
+__FORCELOCAL __BOOL(__xtest)(void)
+#endif /* !__KOS__ */
 #if __has_builtin(__builtin_ia32_xtest)
-__FORCELOCAL __BOOL (__xtest)(void) {
+{
 	return __builtin_ia32_xtest();
 }
 #else /* __has_builtin(__builtin_ia32_xtest) */
-__FORCELOCAL __BOOL (__xtest)(void) {
+{
 	__BOOL __result;
 	__asm__ __volatile__("xtest" : "=@ccnz" (__result));
 	return __result;

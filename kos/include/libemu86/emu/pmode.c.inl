@@ -501,7 +501,6 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 		if (EMU86_MODRM_ISREG(modrm.mi_type)) {
 			switch (modrm.mi_rm) {
 
-
 #if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_XEND
 			case 5: /* 0F 01 D5     XEND       Specifies the end of an RTM code region. */
 				/* XEND is supposed to RAISE a #GP(0) when executed outside of a transaction
