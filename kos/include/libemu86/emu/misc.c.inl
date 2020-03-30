@@ -24,15 +24,11 @@
 #include "push-pop-util.h"
 
 #if EMU86_EMULATE_CONFIG_WANT_INC_RM
-#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
-#define NEED_return_unexpected_lock_rmreg
-#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 #define DO_INC_modrm(bwlq, BWLQ, Nbits, Nbytes)                                   \
 	u##Nbits oldval, newval;                                                      \
 	u32 eflags_addend = 0;                                                        \
 	NIF_ONLY_MEMORY(                                                              \
 	if (EMU86_MODRM_ISREG(modrm.mi_type)) {                                       \
-		EMU86_REQUIRE_NO_LOCK_RMREG();                                            \
 		oldval = MODRM_GETRMREG##BWLQ();                                          \
 		MODRM_SETRMREG##BWLQ((u##Nbits)(oldval + 1));                             \
 	} else) {                                                                     \
@@ -50,15 +46,11 @@
 #endif /* EMU86_EMULATE_CONFIG_WANT_INC_RM */
 
 #if EMU86_EMULATE_CONFIG_WANT_DEC_RM
-#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
-#define NEED_return_unexpected_lock_rmreg
-#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 #define DO_DEC_modrm(bwlq, BWLQ, Nbits, Nbytes)                                   \
 	u##Nbits oldval, newval;                                                      \
 	u32 eflags_addend = 0;                                                        \
 	NIF_ONLY_MEMORY(                                                              \
 	if (EMU86_MODRM_ISREG(modrm.mi_type)) {                                       \
-		EMU86_REQUIRE_NO_LOCK_RMREG();                                            \
 		oldval = MODRM_GETRMREG##BWLQ();                                          \
 		MODRM_SETRMREG##BWLQ(oldval - 1);                                         \
 	} else) {                                                                     \
@@ -369,8 +361,6 @@ case EMU86_OPCODE_ENCODE(0xff):
 		/* FF /6     PUSH r/m16     Push r/m16.
 		 * FF /6     PUSH r/m32     Push r/m32.
 		 * FF /6     PUSH r/m64     Push r/m64. */
-#define NEED_return_unexpected_lock_rmreg
-		EMU86_REQUIRE_NO_LOCK_RMREG();
 		EMU86_PUSH163264(MODRM_GETRMW(),
 		                 MODRM_GETRML(),
 		                 MODRM_GETRMQ());

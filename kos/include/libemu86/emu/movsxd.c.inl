@@ -77,18 +77,30 @@ case EMU86_OPCODE_ENCODE(0x63): {
 			byte_t *addr;
 			addr = MODRM_MEMADDR();
 			EMU86_WRITE_USER_MEMORY(addr, 2);
-			for (;;) {
+#if EMU86_EMULATE_CONFIG_LOCK_ARPL
+			for (;;)
+#endif /* EMU86_EMULATE_CONFIG_LOCK_ARPL */
+			{
 				u16 newval;
 				dst = EMU86_MEMREADW(addr);
-				if ((dst & 3) >= (src & 3))
+				if ((dst & 3) >= (src & 3)) {
+#if EMU86_EMULATE_CONFIG_LOCK_ARPL
 					break;
-				newval = (dst & ~3) | (src & 3);
-				if (EMU86_MEM_ATOMIC_CMPXCH_OR_WRITEW(addr, dst, newval,
-				                                      (op_flags & EMU86_F_LOCK) != 0)) {
+#endif /* EMU86_EMULATE_CONFIG_LOCK_ARPL */
+				} else {
+					newval = (dst & ~3) | (src & 3);
+#if EMU86_EMULATE_CONFIG_LOCK_ARPL
+					if (EMU86_MEM_ATOMIC_CMPXCH_OR_WRITEW(addr, dst, newval,
+					                                      (op_flags & EMU86_F_LOCK) != 0)) {
+						eflags_addend = EFLAGS_ZF;
+						break;
+					}
+					EMU86_EMULATE_LOOPHINT();
+#else /* EMU86_EMULATE_CONFIG_LOCK_ARPL */
+					EMU86_MEMWRITEW(addr, newval);
 					eflags_addend = EFLAGS_ZF;
-					break;
+#endif /* !EMU86_EMULATE_CONFIG_LOCK_ARPL */
 				}
-				EMU86_EMULATE_LOOPHINT();
 			}
 		}
 		EMU86_MSKFLAGS(~EFLAGS_ZF, eflags_addend);

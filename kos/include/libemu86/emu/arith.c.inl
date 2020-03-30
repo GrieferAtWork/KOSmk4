@@ -90,7 +90,6 @@ do_adc##Nbits:                                                                  
 			goto do_add##Nbits;                                                      \
 		NIF_ONLY_MEMORY(                                                             \
 		if (EMU86_MODRM_ISREG(modrm.mi_type)) {                                      \
-			EMU86_REQUIRE_NO_LOCK_RMREG();                                           \
 			oldval = MODRM_GETRMREG##BWLQ();                                         \
 			eflags_addend = 0;                                                       \
 			if (OVERFLOW_SADD((s##Nbits)oldval, (s##Nbits)rhs, (s##Nbits *)&newval)) \
@@ -131,7 +130,6 @@ do_sbb##Nbits:                                                                  
 			goto do_sub##Nbits;                                                      \
 		NIF_ONLY_MEMORY(                                                             \
 		if (EMU86_MODRM_ISREG(modrm.mi_type)) {                                      \
-			EMU86_REQUIRE_NO_LOCK_RMREG();                                           \
 			oldval = MODRM_GETRMREG##BWLQ();                                         \
 			eflags_addend = 0;                                                       \
 			if (OVERFLOW_SSUB((s##Nbits)oldval, (s##Nbits)rhs,                       \
@@ -201,7 +199,6 @@ set_test##Nbits:                                                                
 		                                                                             \
 	case 7:                                                                          \
 do_cmp##Nbits:                                                                       \
-		EMU86_REQUIRE_NO_LOCK_RMREG();                                               \
 		/* Always support REGISTER-R/M here! (needed for register write-back) */     \
 		IF_ONLY_MEMORY(                                                              \
 		oldval = unlikely(EMU86_MODRM_ISREG(modrm.mi_type))                          \
@@ -219,7 +216,6 @@ do_cmp##Nbits:                                                                  
 #if CONFIG_LIBEMU86_WANT_64BIT
 #define NEED_return_unknown_instruction_rmreg
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
-#define NEED_return_unexpected_lock_rmreg
 
 
 /* ======================================================================== */
@@ -231,14 +227,14 @@ case EMU86_OPCODE_ENCODE(0x80): {
 	op8 = *(u8 *)pc;
 	pc += 1;
 /*do_op8:*/
-	/* 80 /0 ib      ADD r/m8,imm8      Add imm8 to r/m8 */
-	/* 80 /1 ib      OR r/m8,imm8       r/m8 OR imm8 */
-	/* 80 /2 ib      ADC r/m8,imm8      Add with carry imm8 to r/m8 */
-	/* 80 /3 ib      SBB r/m8,imm8      Subtract with borrow imm8 from r/m8 */
-	/* 80 /4 ib      AND r/m8,imm8      r/m8 AND imm8 */
-	/* 80 /5 ib      SUB r/m8,imm8      Subtract imm8 from r/m8 */
-	/* 80 /6 ib      XOR r/m8,imm8      r/m8 XOR imm8 */
-	/* 80 /7 ib      CMP r/m8,imm8      Compare imm8 with r/m8 */
+	/* 80 /0 ib      ADD r/m8,imm8      Add imm8 to r/m8
+	 * 80 /1 ib      OR r/m8,imm8       r/m8 OR imm8
+	 * 80 /2 ib      ADC r/m8,imm8      Add with carry imm8 to r/m8
+	 * 80 /3 ib      SBB r/m8,imm8      Subtract with borrow imm8 from r/m8
+	 * 80 /4 ib      AND r/m8,imm8      r/m8 AND imm8
+	 * 80 /5 ib      SUB r/m8,imm8      Subtract imm8 from r/m8
+	 * 80 /6 ib      XOR r/m8,imm8      r/m8 XOR imm8
+	 * 80 /7 ib      CMP r/m8,imm8      Compare imm8 with r/m8 */
 	DO_ARITH_SWITCH_rmdst_mi_reg(b, B, 1, 8, op8)
 	goto done;
 #else /* EMU86_EMULATE_CONFIG_WANT_ARITH */
@@ -248,7 +244,6 @@ case EMU86_OPCODE_ENCODE(0x80): {
 #define NEED_return_unknown_instruction_rmreg
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
 	if (modrm.mi_reg == 7) {
-		EMU86_REQUIRE_NO_LOCK_RMREG();
 		MODRM_NOSUP_GETRMB();
 	} else {
 		MODRM_NOSUP_GETSETRMB();
@@ -270,14 +265,14 @@ case EMU86_OPCODE_ENCODE(0x83):
 		op64 = (u64)(s64)(s32)UNALIGNED_GET32((u32 *)pc);
 		pc += 4;
 do_op64:
-		/* 81 /0 iq      ADD r/m64,Simm32      Add Simm32 to r/m64 */
-		/* 81 /1 iq      OR r/m64,Simm32       r/m64 OR Simm32 */
-		/* 81 /2 iq      ADC r/m64,Simm32      Add with carry Simm32 to r/m64 */
-		/* 81 /3 iq      SBB r/m64,Simm32      Subtract with borrow Simm32 from r/m64 */
-		/* 81 /4 iq      AND r/m64,Simm32      r/m64 AND Simm32 */
-		/* 81 /5 iq      SUB r/m64,Simm32      Subtract Simm32 from r/m64 */
-		/* 81 /6 iq      XOR r/m64,Simm32      r/m64 XOR Simm32 */
-		/* 81 /7 iq      CMP r/m64,Simm32      Compare Simm32 with r/m64 */
+		/* 81 /0 iq      ADD r/m64,Simm32      Add Simm32 to r/m64
+		 * 81 /1 iq      OR r/m64,Simm32       r/m64 OR Simm32
+		 * 81 /2 iq      ADC r/m64,Simm32      Add with carry Simm32 to r/m64
+		 * 81 /3 iq      SBB r/m64,Simm32      Subtract with borrow Simm32 from r/m64
+		 * 81 /4 iq      AND r/m64,Simm32      r/m64 AND Simm32
+		 * 81 /5 iq      SUB r/m64,Simm32      Subtract Simm32 from r/m64
+		 * 81 /6 iq      XOR r/m64,Simm32      r/m64 XOR Simm32
+		 * 81 /7 iq      CMP r/m64,Simm32      Compare Simm32 with r/m64 */
 		DO_ARITH_SWITCH_rmdst_mi_reg(q, Q, 8, 64, op64)
 	} else
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
@@ -285,14 +280,14 @@ do_op64:
 		op32 = UNALIGNED_GET32((u32 *)pc);
 		pc += 4;
 do_op32:
-		/* 81 /0 id      ADD r/m32,imm32      Add imm32 to r/m32 */
-		/* 81 /1 id      OR r/m32,imm32       r/m32 OR imm32 */
-		/* 81 /2 id      ADC r/m32,imm32      Add with CF imm32 to r/m32 */
-		/* 81 /3 id      SBB r/m32,imm32      Subtract with borrow imm32 from r/m32 */
-		/* 81 /4 id      AND r/m32,imm32      r/m32 AND imm32 */
-		/* 81 /5 id      SUB r/m32,imm32      Subtract imm32 from r/m32 */
-		/* 81 /6 id      XOR r/m32,imm32      r/m32 XOR imm32 */
-		/* 81 /7 id      CMP r/m32,imm32      Compare imm32 with r/m32 */
+		/* 81 /0 id      ADD r/m32,imm32      Add imm32 to r/m32
+		 * 81 /1 id      OR r/m32,imm32       r/m32 OR imm32
+		 * 81 /2 id      ADC r/m32,imm32      Add with CF imm32 to r/m32
+		 * 81 /3 id      SBB r/m32,imm32      Subtract with borrow imm32 from r/m32
+		 * 81 /4 id      AND r/m32,imm32      r/m32 AND imm32
+		 * 81 /5 id      SUB r/m32,imm32      Subtract imm32 from r/m32
+		 * 81 /6 id      XOR r/m32,imm32      r/m32 XOR imm32
+		 * 81 /7 id      CMP r/m32,imm32      Compare imm32 with r/m32 */
 		DO_ARITH_SWITCH_rmdst_mi_reg(l, L, 4, 32, op32)
 	} else {
 		op16 = UNALIGNED_GET16((u16 *)pc);
@@ -316,7 +311,6 @@ do_op16:
 #define NEED_return_unknown_instruction_rmreg
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
 	if (modrm.mi_reg == 7) {
-		EMU86_REQUIRE_NO_LOCK_RMREG();
 		MODRM_NOSUP_GETRMWLQ();
 	} else {
 		MODRM_NOSUP_GETSETRMWLQ();
@@ -501,45 +495,53 @@ case EMU86_OPCODE_ENCODE(0x83):
 	/*         00 /r     ADD r/m8, r8       Add r8 to r/m8.
 	 *         01 /r     ADD r/m16, r16     Add r16 to r/m16.
 	 *         01 /r     ADD r/m32, r32     Add r32 to r/m32.
+	 *         01 /r     ADD r/m64, r64     Add r64 to r/m64.
 	 *         02 /r     ADD r8, r/m8       Add r/m8 to r8.
 	 *         03 /r     ADD r16, r/m16     Add r/m16 to r16.
 	 *         03 /r     ADD r32, r/m32     Add r/m32 to r32.
+	 *         03 /r     ADD r64, r/m64     Add r/m64 to r64.
 	 *         04 ib     ADD AL, imm8       Add imm8 to AL.
 	 *         05 iw     ADD AX, imm16      Add imm16 to AX.
 	 *         05 id     ADD EAX, imm32     Add imm32 to EAX.
 	 * REX.W + 05 id     ADD RAX, imm32     Add imm32 sign-extended to 64-bits to RAX. */
 	DEFINE_REGISTER_MEMORY_INSTRUCTIONS(0x00, add, ADD)
 
-	/*         08 /r     OR r/m8,r8        r/m8 OR r8.
-	 *         09 /r     OR r/m16,r16      r/m16 OR r16.
-	 *         09 /r     OR r/m32,r32      r/m32 OR r32.
-	 *         0A /r     OR r8,r/m8        r8 OR r/m8.
-	 *         0B /r     OR r16,r/m16      r16 OR r/m16.
-	 *         0B /r     OR r32,r/m32      r32 OR r/m32.
-	 *         0C ib     OR AL, imm8       imm8 OR AL.
-	 *         0D iw     OR AX, imm16      imm16 OR AX.
-	 *         0D id     OR EAX, imm32     imm32 OR EAX.
-	 * REX.W + 0D id     OR RAX, imm32     imm32 sign-extended to 64-bits OR RAX. */
+	/*         08 /r     OR r/m8, r8        r/m8 OR r8.
+	 *         09 /r     OR r/m16, r16      r/m16 OR r16.
+	 *         09 /r     OR r/m32, r32      r/m32 OR r32.
+	 *         09 /r     OR r/m64, r64      r/m64 OR r64.
+	 *         0A /r     OR r8, r/m8        r8 OR r/m8.
+	 *         0B /r     OR r16, r/m16      r16 OR r/m16.
+	 *         0B /r     OR r32, r/m32      r32 OR r/m32.
+	 *         0B /r     OR r32, r/m64      r32 OR r/m64.
+	 *         0C ib     OR AL, imm8        imm8 OR AL.
+	 *         0D iw     OR AX, imm16       imm16 OR AX.
+	 *         0D id     OR EAX, imm32      imm32 OR EAX.
+	 * REX.W + 0D id     OR RAX, imm32      imm32 sign-extended to 64-bits OR RAX. */
 	DEFINE_REGISTER_MEMORY_INSTRUCTIONS(0x08, or, OR)
 
 	/*         10 /r     ADC r/m8, r8       Add with carry r8 to r/m8.
 	 *         11 /r     ADC r/m16, r16     Add with carry r16 to r/m16.
 	 *         11 /r     ADC r/m32, r32     Add with carry r32 to r/m32.
+	 *         11 /r     ADC r/m64, r64     Add with carry r64 to r/m64.
 	 *         12 /r     ADC r8, r/m8       Add with carry r/m8 to r8.
 	 *         13 /r     ADC r16, r/m16     Add with carry r/m16 to r16.
 	 *         13 /r     ADC r32, r/m32     Add with carry r/m32 to r32.
+	 *         13 /r     ADC r64, r/m64     Add with carry r/m64 to r64.
 	 *         14 ib     ADC AL, imm8       Add with carry imm8 to AL.
 	 *         15 iw     ADC AX, imm16      Add with carry imm16 to AX.
 	 *         15 id     ADC EAX, imm32     Add with carry imm32 to EAX.
 	 * REX.W + 15 id     ADC RAX, imm32     Add with carry imm32 sign-extended to 64-bits to RAX. */
 	DEFINE_REGISTER_MEMORY_INSTRUCTIONS(0x10, adc, ADC)
 
-	/*         18 /r     SBB r/m8,r8        Subtract with borrow r8 from r/m8
-	 *         19 /r     SBB r/m16,r16      Subtract with borrow r16 from r/m16
-	 *         19 /r     SBB r/m32,r32      Subtract with borrow r32 from r/m32
-	 *         1A /r     SBB r8,r/m8        Subtract with borrow r/m8 from r8
-	 *         1B /r     SBB r16,r/m16      Subtract with borrow r/m16 from r16
-	 *         1B /r     SBB r32,r/m32      Subtract with borrow r/m32 from r32
+	/*         18 /r     SBB r/m8, r8       Subtract with borrow r8 from r/m8
+	 *         19 /r     SBB r/m16, r16     Subtract with borrow r16 from r/m16
+	 *         19 /r     SBB r/m32, r32     Subtract with borrow r32 from r/m32
+	 *         19 /r     SBB r/m64, r64     Subtract with borrow r64 from r/m64
+	 *         1A /r     SBB r8, r/m8       Subtract with borrow r/m8 from r8
+	 *         1B /r     SBB r16, r/m16     Subtract with borrow r/m16 from r16
+	 *         1B /r     SBB r32, r/m32     Subtract with borrow r/m32 from r32
+	 *         1B /r     SBB r64, r/m64     Subtract with borrow r/m64 from r64
 	 *         1C ib     SBB AL, imm8       Subtract with borrow imm8 from AL.
 	 *         1D iw     SBB AX, imm16      Subtract with borrow imm16 from AX.
 	 *         1D id     SBB EAX, imm32     Subtract with borrow imm32 from EAX.
@@ -549,45 +551,53 @@ case EMU86_OPCODE_ENCODE(0x83):
 	/*         20 /r     AND r/m8, r8       r/m8 AND r8.
 	 *         21 /r     AND r/m16, r16     r/m16 AND r16.
 	 *         21 /r     AND r/m32, r32     r/m32 AND r32.
+	 *         21 /r     AND r/m64, r64     r/m64 AND r64.
 	 *         22 /r     AND r8, r/m8       r8 AND r/m8.
 	 *         23 /r     AND r16, r/m16     r16 AND r/m16.
 	 *         23 /r     AND r32, r/m32     r32 AND r/m32.
+	 *         23 /r     AND r64, r/m64     r64 AND r/m64.
 	 *         24 ib     AND AL, imm8       imm8 AND AL.
 	 *         25 iw     AND AX, imm16      imm16 AND AX.
 	 *         25 id     AND EAX, imm32     imm32 AND EAX.
 	 * REX.W + 25 id     AND RAX, imm32     imm32 sign-extended to 64-bits AND RAX. */
 	DEFINE_REGISTER_MEMORY_INSTRUCTIONS(0x20, and, AND)
 
-	/*         28 /r     SUB r/m8,r8        Subtract r8 from r/m8.
-	 *         29 /r     SUB r/m16,r16      Subtract r16 from r/m16.
-	 *         29 /r     SUB r/m32,r32      Subtract r32 from r/m32.
-	 *         2A /r     SUB r8,r/m8        Subtract r/m8 from r8.
-	 *         2B /r     SUB r16,r/m16      Subtract r/m16 from r16.
-	 *         2B /r     SUB r32,r/m32      Subtract r/m32 from r32.
+	/*         28 /r     SUB r/m8, r8       Subtract r8 from r/m8.
+	 *         29 /r     SUB r/m16, r16     Subtract r16 from r/m16.
+	 *         29 /r     SUB r/m32, r32     Subtract r32 from r/m32.
+	 *         29 /r     SUB r/m64, r64     Subtract r64 from r/m64.
+	 *         2A /r     SUB r8, r/m8       Subtract r/m8 from r8.
+	 *         2B /r     SUB r16, r/m16     Subtract r/m16 from r16.
+	 *         2B /r     SUB r32, r/m32     Subtract r/m32 from r32.
+	 *         2B /r     SUB r64, r/m64     Subtract r/m64 from r64.
 	 *         2C ib     SUB AL, imm8       Subtract imm8 from AL.
 	 *         2D iw     SUB AX, imm16      Subtract imm16 from AX.
 	 *         2D id     SUB EAX, imm32     Subtract imm32 from EAX.
 	 * REX.W + 2D id     SUB RAX, imm32     Subtract imm32 sign-extended to 64-bits from RAX. */
 	DEFINE_REGISTER_MEMORY_INSTRUCTIONS(0x28, sub, SUB)
 
-	/*         30 /r     XOR r/m8,r8        r/m8 XOR r8.
-	 *         31 /r     XOR r/m16,r16      r/m16 XOR r16.
-	 *         31 /r     XOR r/m32,r32      r/m32 XOR r32.
-	 *         32 /r     XOR r8,r/m8        r8 XOR r/m8.
-	 *         33 /r     XOR r16,r/m16      r16 XOR r/m16.
-	 *         33 /r     XOR r32,r/m32      r32 XOR r/m32.
+	/*         30 /r     XOR r/m8, r8       r/m8 XOR r8.
+	 *         31 /r     XOR r/m16, r16     r/m16 XOR r16.
+	 *         31 /r     XOR r/m32, r32     r/m32 XOR r32.
+	 *         31 /r     XOR r/m64, r64     r/m64 XOR r64.
+	 *         32 /r     XOR r8, r/m8       r8 XOR r/m8.
+	 *         33 /r     XOR r16, r/m16     r16 XOR r/m16.
+	 *         33 /r     XOR r32, r/m32     r32 XOR r/m32.
+	 *         33 /r     XOR r64, r/m64     r64 XOR r/m64.
 	 *         34 ib     XOR AL, imm8       imm8 XOR AL.
 	 *         35 iw     XOR AX, imm16      imm16 XOR AX.
 	 *         35 id     XOR EAX, imm32     imm32 XOR EAX.
 	 * REX.W + 35 id     XOR RAX, imm32     imm32 sign-extended to 64-bits XOR RAX. */
 	DEFINE_REGISTER_MEMORY_INSTRUCTIONS(0x30, xor, XOR)
 
-	/*         38 /r     CMP r/m8,r8        Compare r8 with r/m8.
-	 *         39 /r     CMP r/m16,r16      Compare r16 with r/m16.
-	 *         39 /r     CMP r/m32,r32      Compare r32 with r/m32.
-	 *         3A /r     CMP r8,r/m8        Compare r/m8 with r8.
-	 *         3B /r     CMP r16,r/m16      Compare r/m16 with r16.
-	 *         3B /r     CMP r32,r/m32      Compare r/m32 with r32.
+	/*         38 /r     CMP r/m8, r8       Compare r8 with r/m8.
+	 *         39 /r     CMP r/m16, r16     Compare r16 with r/m16.
+	 *         39 /r     CMP r/m32, r32     Compare r32 with r/m32.
+	 *         39 /r     CMP r/m64, r64     Compare r64 with r/m64.
+	 *         3A /r     CMP r8, r/m8       Compare r/m8 with r8.
+	 *         3B /r     CMP r16, r/m16     Compare r/m16 with r16.
+	 *         3B /r     CMP r32, r/m32     Compare r/m32 with r32.
+	 *         3B /r     CMP r64, r/m64     Compare r/m64 with r64.
 	 *         3C ib     CMP AL, imm8       Compare imm8 with AL.
 	 *         3D iw     CMP AX, imm16      Compare imm16 with AX.
 	 *         3D id     CMP EAX, imm32     Compare imm32 with EAX.

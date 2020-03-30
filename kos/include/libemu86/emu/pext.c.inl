@@ -31,7 +31,7 @@ EMU86_INTELLISENSE_BEGIN(pext) {
 case EMU86_OPCODE_ENCODE(0x0f38f5): {
 	MODRM_DECODE();
 	if ((op_flags & (EMU86_F_HASVEX | EMU86_F_VEX_LL_M |
-	                 EMU86_F_LOCK | EMU86_F_66)) != EMU86_F_HASVEX)
+	                 EMU86_F_66)) != EMU86_F_HASVEX)
 		goto return_unknown_instruction;
 	if (op_flags & EMU86_F_f3) {
 #if EMU86_EMULATE_CONFIG_WANT_PEXT

@@ -134,6 +134,42 @@ __DECL_BEGIN
 #define EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC 0
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC */
 
+/* Check that the `lock' prefix is only used by one of the white-listed lock-able instructions.
+ * Enabling this option matches hardware behavior, but adds a small amount of overhead to every
+ * instruction that gets emulated. Disabling this option causes a lock prefix to be ignored by
+ * instructions that don't actually support it */
+#ifndef EMU86_EMULATE_CONFIG_ONLY_CHECKLOCK
+#define EMU86_EMULATE_CONFIG_ONLY_CHECKLOCK 1
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_CHECKLOCK */
+
+
+/* Accept the `lock' prefix for various instructions where hardware doesn't
+ * normally support this. However support can be augmented by enabling this
+ * option as part of the #UD handler, alongside enabling emulation of individual
+ * instruction affected by this (NOTE: By default, KOS is _NOT_ configured to
+ * do this) */
+#ifndef EMU86_EMULATE_CONFIG_LOCK_EXTENSION
+#define EMU86_EMULATE_CONFIG_LOCK_EXTENSION 0
+#endif /* !EMU86_EMULATE_CONFIG_LOCK_EXTENSION */
+
+/* Accept the `lock' prefix for the rol/ror/rcl/rcr/shl/shr/sal/sar instructions.
+ * s.a. `EMU86_EMULATE_CONFIG_LOCK_EXTENSION' */
+#ifndef EMU86_EMULATE_CONFIG_LOCK_SHIFT
+#define EMU86_EMULATE_CONFIG_LOCK_SHIFT EMU86_EMULATE_CONFIG_LOCK_EXTENSION
+#endif /* !EMU86_EMULATE_CONFIG_LOCK_SHIFT */
+
+/* Accept the `lock' prefix for the shld/shrd instructions.
+ * s.a. `EMU86_EMULATE_CONFIG_LOCK_EXTENSION' */
+#ifndef EMU86_EMULATE_CONFIG_LOCK_SHIFT2
+#define EMU86_EMULATE_CONFIG_LOCK_SHIFT2 EMU86_EMULATE_CONFIG_LOCK_EXTENSION
+#endif /* !EMU86_EMULATE_CONFIG_LOCK_SHIFT2 */
+
+/* Accept the `lock' prefix for the arpl instructions.
+ * s.a. `EMU86_EMULATE_CONFIG_LOCK_EXTENSION' */
+#ifndef EMU86_EMULATE_CONFIG_LOCK_ARPL
+#define EMU86_EMULATE_CONFIG_LOCK_ARPL EMU86_EMULATE_CONFIG_LOCK_EXTENSION
+#endif /* !EMU86_EMULATE_CONFIG_LOCK_ARPL */
+
 
 /* Explicit feature-support configuration for individual instructions */
 #ifndef EMU86_EMULATE_CONFIG_WANT_ADCX
@@ -2584,8 +2620,6 @@ _EMU86_INTELLISENSE_DEFINE_LABEL(return_expected_memory_modrm)         \
 _EMU86_INTELLISENSE_DEFINE_LABEL(return_expected_register_modrm_rmreg) \
 _EMU86_INTELLISENSE_DEFINE_LABEL(return_expected_register_modrm)       \
 _EMU86_INTELLISENSE_DEFINE_LABEL(return_unexpected_lock_prefix_rmreg)  \
-_EMU86_INTELLISENSE_DEFINE_LABEL(return_unexpected_lock_rmreg)         \
-_EMU86_INTELLISENSE_DEFINE_LABEL(return_unexpected_lock)               \
 _EMU86_INTELLISENSE_DEFINE_LABEL(return_unsupported_instruction_rmreg) \
 _EMU86_INTELLISENSE_DEFINE_LABEL(return_unsupported_instruction)       \
 _EMU86_INTELLISENSE_DEFINE_LABEL(return_unavailable_instruction_rmreg) \
@@ -2650,8 +2684,6 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 		EMU86_EMULATE_TRY_SWITCH
 #endif /* EMU86_EMULATE_TRY_SWITCH */
 		{
-			switch (tiny_opcode) {
-
 #if CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT
 #define IF_16BIT_OR_32BIT(...) __VA_ARGS__
 #else /* CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT */
@@ -3051,24 +3083,316 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #error "Invalid configuration"
 #endif
 
-
-	/* TODO: Go through all instructions and add LOCK checks! */
-#define EMU86_REQUIRE_NO_LOCK()                 \
-	do {                                        \
-		if unlikely(op_flags & EMU86_F_LOCK)    \
-			goto return_unexpected_lock;        \
-	} __WHILE0
-#define EMU86_REQUIRE_NO_LOCK_RMREG()          \
-	do {                                       \
-		if unlikely(op_flags & EMU86_F_LOCK)   \
-			goto return_unexpected_lock_rmreg; \
-	} __WHILE0
+#if EMU86_EMULATE_CONFIG_ONLY_CHECKLOCK
+			if unlikely(op_flags & EMU86_F_LOCK) {
+				switch (tiny_opcode) {
+#define HAVEOP(config) config || EMU86_EMULATE_CONFIG_CHECKERROR
 
 
+#if HAVEOP(EMU86_EMULATE_CONFIG_WANT_BITTEST)
+	/*         0F BB /r     BTC r/m16, r16      Store selected bit in CF flag and complement.
+	 *         0F BB /r     BTC r/m32, r32      Store selected bit in CF flag and complement.
+	 * REX.W + 0F BB /r     BTC r/m64, r64      Store selected bit in CF flag and complement. */
+case EMU86_OPCODE_ENCODE(0x0fbb):
+
+	/*         0F B3 /r     BTR r/m16, r16      Store selected bit in CF flag and clear.
+	 *         0F B3 /r     BTR r/m32, r32      Store selected bit in CF flag and clear.
+	 * REX.W + 0F B3 /r     BTR r/m64, r64      Store selected bit in CF flag and clear. */
+case EMU86_OPCODE_ENCODE(0x0fb3):
+
+	/*         0F AB /r     BTS r/m16, r16      Store selected bit in CF flag and set.
+	 *         0F AB /r     BTS r/m32, r32      Store selected bit in CF flag and set.
+	 * REX.W + 0F AB /r     BTS r/m64, r64      Store selected bit in CF flag and set. */
+case EMU86_OPCODE_ENCODE(0x0fab):
+	goto checklock_modrm_memory;
+#define NEED_checklock_modrm_memory
+
+case EMU86_OPCODE_ENCODE(0x0fba):
+	emu86_modrm_decode(pc, &modrm, op_flags);
+	if unlikely(modrm.mi_reg != 5 && /* bts */
+	            modrm.mi_reg != 6 && /* btr */
+	            modrm.mi_reg != 7)   /* btc */
+		goto return_unexpected_lock_rmreg;
+#define NEED_return_unexpected_lock_rmreg
+	goto checklock_modrm_memory_parsed;
+#define NEED_checklock_modrm_memory_parsed
+#endif /* HAVEOP(EMU86_EMULATE_CONFIG_WANT_BITTEST) */
 
 
+#if HAVEOP(EMU86_EMULATE_CONFIG_WANT_INC_RM || EMU86_EMULATE_CONFIG_WANT_DEC_RM)
+	/* FE /0      INC r/m8      Increment r/m byte by 1 */
+	/* FE /1      DEC r/m8      Decrement r/m8 by 1 */
+case EMU86_OPCODE_ENCODE(0xfe):
+	/* FF /0      INC r/m16      Increment r/m byte by 1
+	 * FF /0      INC r/m32      Increment r/m byte by 1
+	 * FF /0      INC r/m64      Increment r/m byte by 1 */
+	/* FF /1      DEC r/m16      Decrement r/m byte by 1
+	 * FF /1      DEC r/m32      Decrement r/m byte by 1
+	 * FF /1      DEC r/m64      Decrement r/m byte by 1 */
+case EMU86_OPCODE_ENCODE(0xff):
+	emu86_modrm_decode(pc, &modrm, op_flags);
+	if unlikely(modrm.mi_reg != 0 && /* inc */
+	            modrm.mi_reg != 1)   /* dec */
+		goto return_unexpected_lock_rmreg;
+#define NEED_return_unexpected_lock_rmreg
+	goto checklock_modrm_memory_parsed;
+#define NEED_checklock_modrm_memory_parsed
+#endif /* HAVEOP(EMU86_EMULATE_CONFIG_WANT_INC_RM || EMU86_EMULATE_CONFIG_WANT_DEC_RM) */
 
-		/* Pull in emulated instructions. */
+
+#if HAVEOP(EMU86_EMULATE_CONFIG_WANT_CMPXCHG)
+	/* 0F B0 /r      CMPXCHG r/m8,r8      Compare AL with r/m8. If equal, ZF is set and r8 is
+	 *                                    loaded into r/m8. Else, clear ZF and load r/m8 into AL */
+case EMU86_OPCODE_ENCODE(0x0fb0):
+	/* 0F B1 /r      CMPXCHG r/m16,r16    Compare AX with r/m16. If equal, ZF is set and r16 is
+	 *                                    loaded into r/m16. Else, clear ZF and load r/m16 into AX.
+	 * 0F B1 /r      CMPXCHG r/m32,r32    Compare EAX with r/m32. If equal, ZF is set and r32 is
+	 *                                    loaded into r/m32. Else, clear ZF and load r/m32 into EAX.
+	 * 0F B1 /r      CMPXCHG r/m64,r64    Compare RAX with r/m64. If equal, ZF is set and r64 is
+	 *                                    loaded into r/m64. Else, clear ZF and load r/m64 into RAX. */
+case EMU86_OPCODE_ENCODE(0x0fb1):
+	goto checklock_modrm_memory;
+#define NEED_checklock_modrm_memory
+#endif /* HAVEOP(EMU86_EMULATE_CONFIG_WANT_CMPXCHG) */
+
+
+#if HAVEOP(EMU86_EMULATE_CONFIG_WANT_CMPXCHG8B || EMU86_EMULATE_CONFIG_WANT_CMPXCHG16B)
+	/*         0F C7 /1 CMPXCHG8B m64      Compare EDX:EAX with m64. If equal, set ZF and load ECX:EBX
+	 *                                     into m64. Else, clear ZF and load m64 into EDX:EAX.
+	 * REX.W + 0F C7 /1 CMPXCHG16B m128    Compare RDX:RAX with m128. If equal, set ZF and load RCX:RBX
+	 *                                     into m128. Else, clear ZF and load m128 into RDX:RAX. */
+case EMU86_OPCODE_ENCODE(0x0fc7):
+	goto checklock_modrm_memory;
+#define NEED_checklock_modrm_memory
+#endif /* HAVEOP(EMU86_EMULATE_CONFIG_WANT_CMPXCHG8B || EMU86_EMULATE_CONFIG_WANT_CMPXCHG16B) */
+
+
+#if HAVEOP(EMU86_EMULATE_CONFIG_WANT_ARITH2)
+	/* F6 /2      NOT r/m8      Reverse each bit of r/m8 */
+	/* F6 /3      NEG r/m8      Two's complement negate r/m8 */
+case EMU86_OPCODE_ENCODE(0xf6):
+	/* F7 /2      NOT r/m16      Reverse each bit of r/m16
+	 * F7 /2      NOT r/m32      Reverse each bit of r/m32
+	 * F7 /2      NOT r/m64      Reverse each bit of r/m64 */
+	/* F7 /3      NEG r/m16      Two's complement negate r/m16
+	 * F7 /3      NEG r/m32      Two's complement negate r/m32
+	 * F7 /3      NEG r/m64      Two's complement negate r/m64 */
+case EMU86_OPCODE_ENCODE(0xf7):
+	emu86_modrm_decode(pc, &modrm, op_flags);
+	if unlikely(modrm.mi_reg != 2 && /* not */
+	            modrm.mi_reg != 3)   /* neg */
+		goto return_unexpected_lock_rmreg;
+#define NEED_return_unexpected_lock_rmreg
+	goto checklock_modrm_memory_parsed;
+#define NEED_checklock_modrm_memory_parsed
+#endif /* HAVEOP(EMU86_EMULATE_CONFIG_WANT_ARITH2) */
+
+
+#if HAVEOP(EMU86_EMULATE_CONFIG_WANT_XADD)
+	/* 0F C0 /r      XADD r/m8, r8      Exchange r8 and r/m8; load sum into r/m8 */
+case EMU86_OPCODE_ENCODE(0x0fc0):
+	/* 0F C1 /r      XADD r/m16, r16      Exchange r16 and r/m16; load sum into r/m16
+	 * 0F C1 /r      XADD r/m32, r32      Exchange r32 and r/m32; load sum into r/m32
+	 * 0F C1 /r      XADD r/m64, r64      Exchange r64 and r/m64; load sum into r/m64 */
+case EMU86_OPCODE_ENCODE(0x0fc1):
+	goto checklock_modrm_memory;
+#define NEED_checklock_modrm_memory
+#endif /* HAVEOP(EMU86_EMULATE_CONFIG_WANT_XADD) */
+
+
+#if HAVEOP(EMU86_EMULATE_CONFIG_WANT_XCHG_RM)
+	/* 86 /r      XCHG r/m8, r8      Exchange r8 (byte register) with byte from r/m8 */
+	/* 86 /r      XCHG r8, r/m8      Exchange byte from r/m8 with r8 (byte register) */
+case EMU86_OPCODE_ENCODE(0x86):
+	/* 87 /r      XCHG r/m16, r16      Exchange r16 with word from r/m16
+	 * 87 /r      XCHG r16, r/m16      Exchange word from r/m16 with r16
+	 * 87 /r      XCHG r/m32, r32      Exchange r32 with doubleword from r/m32
+	 * 87 /r      XCHG r32, r/m32      Exchange doubleword from r/m32 with r32
+	 * 87 /r      XCHG r/m64, r64      Exchange r64 with quadword from r/m64
+	 * 87 /r      XCHG r64, r/m64      Exchange quadword from r/m64 with r64 */
+case EMU86_OPCODE_ENCODE(0x87):
+	goto checklock_modrm_memory;
+#define NEED_checklock_modrm_memory
+#endif /* HAVEOP(EMU86_EMULATE_CONFIG_WANT_XCHG_RM) */
+
+
+#if HAVEOP(EMU86_EMULATE_CONFIG_WANT_ARITH)
+	/* 80 /0-6 ib      FOO r/m8,imm8 */
+case EMU86_OPCODE_ENCODE(0x80):
+	/* 81 /0-6 iq      FOO r/m16,imm16
+	 * 81 /0-6 iq      FOO r/m32,imm32
+	 * 81 /0-6 iq      FOO r/m64,Simm32 */
+case EMU86_OPCODE_ENCODE(0x81):
+	/* 81 /0-6 iq      FOO r/m16,Simm8
+	 * 81 /0-6 iq      FOO r/m32,Simm8
+	 * 81 /0-6 iq      FOO r/m64,Simm8 */
+case EMU86_OPCODE_ENCODE(0x83):
+	emu86_modrm_decode(pc, &modrm, op_flags);
+	if unlikely(modrm.mi_reg > 6) /* cmp, ... */
+		goto return_unexpected_lock_rmreg;
+#define NEED_return_unexpected_lock_rmreg
+	goto checklock_modrm_memory_parsed;
+#define NEED_checklock_modrm_memory_parsed
+
+	/* 00 /r     ADD r/m8, r8       Add r8 to r/m8.
+	 * 01 /r     ADD r/m16, r16     Add r16 to r/m16.
+	 * 01 /r     ADD r/m32, r32     Add r32 to r/m32.
+	 * 01 /r     ADD r/m64, r64     Add r64 to r/m64. */
+case EMU86_OPCODE_ENCODE(0x00):
+case EMU86_OPCODE_ENCODE(0x01):
+	goto checklock_modrm_memory;
+#define NEED_checklock_modrm_memory
+
+	/* 08 /r     OR r/m8, r8        r/m8 OR r8.
+	 * 09 /r     OR r/m16, r16      r/m16 OR r16.
+	 * 09 /r     OR r/m32, r32      r/m32 OR r32.
+	 * 09 /r     OR r/m64, r64      r/m64 OR r64. */
+case EMU86_OPCODE_ENCODE(0x08):
+case EMU86_OPCODE_ENCODE(0x09):
+	goto checklock_modrm_memory;
+#define NEED_checklock_modrm_memory
+
+	/* 10 /r     ADC r/m8, r8       Add with carry r8 to r/m8.
+	 * 11 /r     ADC r/m16, r16     Add with carry r16 to r/m16.
+	 * 11 /r     ADC r/m32, r32     Add with carry r32 to r/m32.
+	 * 11 /r     ADC r/m64, r64     Add with carry r64 to r/m64. */
+case EMU86_OPCODE_ENCODE(0x10):
+case EMU86_OPCODE_ENCODE(0x11):
+	goto checklock_modrm_memory;
+#define NEED_checklock_modrm_memory
+
+	/* 18 /r     SBB r/m8, r8       Subtract with borrow r8 from r/m8
+	 * 19 /r     SBB r/m16, r16     Subtract with borrow r16 from r/m16
+	 * 19 /r     SBB r/m32, r32     Subtract with borrow r32 from r/m32
+	 * 19 /r     SBB r/m64, r64     Subtract with borrow r64 from r/m64 */
+case EMU86_OPCODE_ENCODE(0x18):
+case EMU86_OPCODE_ENCODE(0x19):
+	goto checklock_modrm_memory;
+#define NEED_checklock_modrm_memory
+
+	/* 20 /r     AND r/m8, r8       r/m8 AND r8.
+	 * 21 /r     AND r/m16, r16     r/m16 AND r16.
+	 * 21 /r     AND r/m32, r32     r/m32 AND r32.
+	 * 21 /r     AND r/m64, r64     r/m64 AND r64. */
+case EMU86_OPCODE_ENCODE(0x20):
+case EMU86_OPCODE_ENCODE(0x21):
+	goto checklock_modrm_memory;
+#define NEED_checklock_modrm_memory
+
+	/* 28 /r     SUB r/m8, r8       Subtract r8 from r/m8.
+	 * 29 /r     SUB r/m16, r16     Subtract r16 from r/m16.
+	 * 29 /r     SUB r/m32, r32     Subtract r32 from r/m32.
+	 * 29 /r     SUB r/m64, r64     Subtract r64 from r/m64. */
+case EMU86_OPCODE_ENCODE(0x28):
+case EMU86_OPCODE_ENCODE(0x29):
+	goto checklock_modrm_memory;
+#define NEED_checklock_modrm_memory
+
+	/* 30 /r     XOR r/m8, r8       r/m8 XOR r8.
+	 * 31 /r     XOR r/m16, r16     r/m16 XOR r16.
+	 * 31 /r     XOR r/m32, r32     r/m32 XOR r32.
+	 * 31 /r     XOR r/m64, r64     r/m64 XOR r64. */
+case EMU86_OPCODE_ENCODE(0x30):
+case EMU86_OPCODE_ENCODE(0x31):
+	goto checklock_modrm_memory;
+#define NEED_checklock_modrm_memory
+
+#endif /* HAVEOP(EMU86_EMULATE_CONFIG_WANT_ARITH) */
+
+
+#if EMU86_EMULATE_CONFIG_LOCK_SHIFT /* Extension!!! */
+#if HAVEOP(EMU86_EMULATE_CONFIG_WANT_SHIFT)
+	/* D2 /X      FOO r/m8,CL */
+case EMU86_OPCODE_ENCODE(0xd2):
+	/* D3 /X      FOO r/m16,CL */
+	/* D3 /X      FOO r/m32,CL */
+	/* D3 /X      FOO r/m64,CL */
+case EMU86_OPCODE_ENCODE(0xd3):
+	/* C0 /X ib   FOO r/m8,imm8 */
+case EMU86_OPCODE_ENCODE(0xc0):
+	/* D1 /X ib   FOO r/m16,imm8 */
+	/* D1 /X ib   FOO r/m32,imm8 */
+	/* D1 /X ib   FOO r/m64,imm8 */
+case EMU86_OPCODE_ENCODE(0xc1):
+	/* D0 /X      FOO r/m8,1 */
+case EMU86_OPCODE_ENCODE(0xd0):
+	/* D1 /X      FOO r/m16,1 */
+	/* D1 /X      FOO r/m32,1 */
+	/* D1 /X      FOO r/m64,1 */
+case EMU86_OPCODE_ENCODE(0xd1):
+	goto checklock_modrm_memory;
+#define NEED_checklock_modrm_memory
+#endif /* HAVEOP(EMU86_EMULATE_CONFIG_WANT_SHIFT) */
+#endif /* EMU86_EMULATE_CONFIG_LOCK_SHIFT */
+
+
+#if EMU86_EMULATE_CONFIG_LOCK_SHIFT2 /* Extension!!! */
+#if HAVEOP(EMU86_EMULATE_CONFIG_WANT_SHIFT2)
+	/* 0F A5      SHLD r/m16, r16, CL      Shift r/m16 to left CL places while shifting bits from r16 in from the right
+	 * 0F A5      SHLD r/m32, r32, CL      Shift r/m32 to left CL places while shifting bits from r32 in from the right
+	 * 0F A5      SHLD r/m64, r64, CL      Shift r/m64 to left CL places while shifting bits from r64 in from the right */
+case EMU86_OPCODE_ENCODE(0x0fa5):
+	/* 0F A4      SHLD r/m16, r16, imm8      Shift r/m16 to left imm8 places while shifting bits from r16 in from the right
+	 * 0F A4      SHLD r/m32, r32, imm8      Shift r/m32 to left imm8 places while shifting bits from r32 in from the right
+	 * 0F A4      SHLD r/m64, r64, imm8      Shift r/m64 to left imm8 places while shifting bits from r64 in from the right */
+case EMU86_OPCODE_ENCODE(0x0fa4):
+	/* 0F AD      SHRD r/m16, r16, CL      Shift r/m16 to right CL places while shifting bits from r16 in from the left
+	 * 0F AD      SHRD r/m32, r32, CL      Shift r/m32 to right CL places while shifting bits from r32 in from the left
+	 * 0F AD      SHRD r/m64, r64, CL      Shift r/m64 to right CL places while shifting bits from r64 in from the left */
+case EMU86_OPCODE_ENCODE(0x0fad):
+	/* 0F AC      SHRD r/m16, r16, imm8      Shift r/m16 to right imm8 places while shifting bits from r16 in from the left
+	 * 0F AC      SHRD r/m32, r32, imm8      Shift r/m32 to right imm8 places while shifting bits from r32 in from the left
+	 * 0F AC      SHRD r/m64, r64, imm8      Shift r/m64 to right imm8 places while shifting bits from r64 in from the left */
+case EMU86_OPCODE_ENCODE(0x0fac):
+	goto checklock_modrm_memory;
+#define NEED_checklock_modrm_memory
+#endif /* HAVEOP(EMU86_EMULATE_CONFIG_WANT_SHIFT2) */
+#endif /* EMU86_EMULATE_CONFIG_LOCK_SHIFT2 */
+
+
+#if EMU86_EMULATE_CONFIG_LOCK_ARPL /* Extension!!! */
+#if (HAVEOP(EMU86_EMULATE_CONFIG_WANT_ARPL)) && (CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT)
+	/* 63 /r     ARPL r/m16, r16     Adjust RPL of r/m16 to not less than RPL of r16. */
+case EMU86_OPCODE_ENCODE(0x63):
+#if EMU86_EMULATE_CONFIG_WANT_MOVSXD && CONFIG_LIBEMU86_WANT_64BIT
+	if (EMU86_F_IS64(op_flags)) {
+		goto return_unexpected_lock;
+#define NEED_return_unexpected_lock
+	}
+#endif /* EMU86_EMULATE_CONFIG_WANT_MOVSXD && CONFIG_LIBEMU86_WANT_64BIT */
+	goto checklock_modrm_memory;
+#define NEED_checklock_modrm_memory
+#endif /* HAVEOP(EMU86_EMULATE_CONFIG_WANT_ARPL) */
+#endif /* EMU86_EMULATE_CONFIG_LOCK_ARPL */
+
+
+#undef HAVEOP
+#ifdef NEED_checklock_modrm_memory
+#undef NEED_checklock_modrm_memory
+checklock_modrm_memory:
+	emu86_modrm_decode(pc, &modrm, op_flags);
+	goto checklock_modrm_memory_parsed;
+#define NEED_checklock_modrm_memory_parsed
+#endif /* NEED_checklock_modrm_memory */
+
+#ifdef NEED_checklock_modrm_memory_parsed
+#undef NEED_checklock_modrm_memory_parsed
+checklock_modrm_memory_parsed:
+	if unlikely(!EMU86_MODRM_ISMEM(modrm.mi_type))
+		goto return_unexpected_lock;
+#define NEED_return_unexpected_lock
+	break;
+#endif /* NEED_checklock_modrm_memory_parsed */
+
+				default:
+					goto return_unexpected_lock;
+#define NEED_return_unexpected_lock
+				}
+			}
+#endif /* EMU86_EMULATE_CONFIG_ONLY_CHECKLOCK */
+			switch (tiny_opcode) {
+
+				/* Pull in emulated instructions. */
 #ifndef __INTELLISENSE__
 #ifdef EMU86_EMULATE_IMPL_HEADER
 /* Allow the user to specify a custom header that gets included for
@@ -3260,93 +3584,6 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 			 *    BEXTR reg32, reg/mem32, reg32        C4 RXB.02 0.cntl.0.00 F7 /r
 			 *    BEXTR reg64, reg/mem64, reg64        C4 RXB.02 1.cntl.0.00 F7 /r
 			 */
-
-			/* TODO: Go through all instructions and add LOCK-missing assertions.
-			 *       The following is a list of all instructions that allow for a lock prefix
-			 *  XXX: Better check for lock-prefix before the opcode-switch, and fault for
-			 *       any instruction that isn't part of this list (there are _way_ more
-			 *       instructions without atomic support, than there are with atomic support) */
-			/* 0F BB     BTC r/m16, r16     Store selected bit in CF flag and complement */
-			/* 0F BB     BTC r/m32, r32     Store selected bit in CF flag and complement */
-			/* 0F B3     BTR r/m16, r16     Store selected bit in CF flag and clear */
-			/* 0F B3     BTR r/m32, r32     Store selected bit in CF flag and clear */
-			/* 0F AB     BTS r/m16, r16     Store selected bit in CF flag and set */
-			/* 0F AB     BTS r/m32, r32     Store selected bit in CF flag and set */
-			/* FE /0     INC r/m8     Increment r/m byte by 1 */
-			/* FE /1     DEC r/m8     Decrement r/m8 by 1 */
-			/* FF /0     INC r/m16     Increment r/m word by 1 */
-			/* FF /0     INC r/m32     Increment r/m doubleword by 1 */
-			/* FF /1     DEC r/m16     Decrement r/m16 by 1 */
-			/* FF /1     DEC r/m32     Decrement r/m32 by 1 */
-			/* 0F B0 /r     CMPXCHG r/m8,r8     Compare AL with r/m8. If equal, ZF is set and r8 is loaded into r/m8. Else, clear ZF and load r/m8 into AL */
-			/* 0F B1 /r     CMPXCHG r/m16,r16    Compare AX with r/m16. If equal, ZF is set and r16 is loaded into r/m16. Else, clear ZF and load r/m16 into AX */
-			/* 0F B1 /r     CMPXCHG r/m32,r32    Compare EAX with r/m32. If equal, ZF is set and r32 is loaded into r/m32. Else, clear ZF and load r/m32 into EAX */
-			/* 0F C7 /1 m64     CMPXCHG8B m64     Compare EDX:EAX with m64. If equal, set ZF and load ECX:EBX into m64. Else, clear ZF and load m64 into EDX:EAX */
-			/* F6 /2     NOT r/m8     Reverse each bit of r/m8 */
-			/* F6 /3     NEG r/m8     Two's complement negate r/m8 */
-			/* F7 /2     NOT r/m16     Reverse each bit of r/m16 */
-			/* F7 /2     NOT r/m32     Reverse each bit of r/m32 */
-			/* F7 /3     NEG r/m16     Two's complement negate r/m16 */
-			/* F7 /3     NEG r/m32     Two's complement negate r/m32 */
-			/* 0F C0 /r     XADD r/m8, r8     Exchange r8 and r/m8; load sum into r/m8 */
-			/* 0F C1 /r     XADD r/m16, r16     Exchange r16 and r/m16; load sum into r/m16 */
-			/* 0F C1 /r     XADD r/m32, r32     Exchange r32 and r/m32; load sum into r/m32 */
-			/* C0 /0 ib     ROL r/m8,imm8     Rotate 8 bits r/m8 left imm8 times */
-			/* C0 /1 ib     ROR r/m8,imm8     Rotate 8 bits r/m16 right imm8 times */
-			/* C0 /2 ib     RCL r/m8,imm8     Rotate 9 bits (CF, r/m8) left imm8 times */
-			/* C0 /3 ib     RCR r/m8,imm8     Rotate 9 bits (CF, r/m8) right imm8 times */
-			/* C0 /4 ib     SAL r/m8,imm8     Multiply r/m8 by 2, imm8 times */
-			/* C0 /4 ib     SHL r/m8,imm8     Multiply r/m8 by 2, imm8 times */
-			/* C0 /5 ib     SHR r/m8,imm8     Unsigned divide r/m8 by 2, imm8 times */
-			/* C0 /7 ib     SAR r/m8,imm8     Signed divide* r/m8 by 2, imm8 times */
-			/* C1 /0 ib     ROL r/m16,imm8     Rotate 16 bits r/m16 left imm8 times. */
-			/* C1 /0 ib     ROL r/m32,imm8     Rotate 32 bits r/m32 left imm8 times */
-			/* C1 /1 ib     ROR r/m16,imm8     Rotate 16 bits r/m16 right imm8 times */
-			/* C1 /1 ib     ROR r/m32,imm8     Rotate 32 bits r/m32 right imm8 times */
-			/* C1 /2 ib     RCL r/m16,imm8     Rotate 17 bits (CF, r/m16) left imm8 times */
-			/* C1 /2 ib     RCL r/m32,imm8     Rotate 33 bits (CF, r/m32) left imm8 times */
-			/* C1 /3 ib     RCR r/m16,imm8     Rotate 17 bits (CF, r/m16) right imm8 times */
-			/* C1 /3 ib     RCR r/m32,imm8     Rotate 33 bits (CF, r/m32) right imm8 times */
-			/* C1 /4 ib     SAL r/m16,imm8     Multiply r/m16 by 2, imm8 times */
-			/* C1 /4 ib     SAL r/m32,imm8     Multiply r/m32 by 2, imm8 times */
-			/* C1 /4 ib     SHL r/m16,imm8     Multiply r/m16 by 2, imm8 times */
-			/* C1 /4 ib     SHL r/m32,imm8     Multiply r/m32 by 2, imm8 times */
-			/* C1 /5 ib     SHR r/m16,imm8     Unsigned divide r/m16 by 2, imm8 times */
-			/* C1 /5 ib     SHR r/m32,imm8     Unsigned divide r/m32 by 2, imm8 times */
-			/* C1 /7 ib     SAR r/m16,imm8     Signed divide* r/m16 by 2, imm8 times */
-			/* C1 /7 ib     SAR r/m32,imm8     Signed divide* r/m32 by 2, imm8 times */
-			/* D0 /0     ROL r/m8, 1     Rotate 8 bits r/m8 left once */
-			/* D0 /1     ROR r/m8, 1     Rotate 8 bits r/m8 right once */
-			/* D0 /2     RCL r/m8, 1     Rotate 9 bits (CF, r/m8) left once */
-			/* D0 /3     RCR r/m8, 1     Rotate 9 bits (CF, r/m8) right once */
-			/* D0 /4     SAL r/m8     Multiply r/m8 by 2, 1 time */
-			/* D0 /4     SHL r/m8     Multiply r/m8 by 2, 1 time */
-			/* D0 /5     SHR r/m8     Unsigned divide r/m8 by 2, 1 time */
-			/* D0 /7     SAR r/m8     Signed divide* r/m8 by 2, 1 times */
-			/* D1 /0     ROL r/m16, 1     Rotate 16 bits r/m16 left once */
-			/* D1 /0     ROL r/m32, 1     Rotate 32 bits r/m32 left once */
-			/* D1 /1     ROR r/m16, 1     Rotate 16 bits r/m16 right once */
-			/* D1 /1     ROR r/m32, 1     Rotate 32 bits r/m32 right once */
-			/* D1 /2     RCL r/m16, 1     Rotate 17 bits (CF, r/m16) left once */
-			/* D1 /2     RCL r/m32, 1     Rotate 33 bits (CF, r/m32) left once */
-			/* D1 /3     RCR r/m16, 1     Rotate 17 bits (CF, r/m16) right once */
-			/* D1 /3     RCR r/m32, 1     Rotate 33 bits (CF, r/m32) right once */
-			/* D1 /4     SAL r/m16     Multiply r/m16 by 2, 1 time */
-			/* D1 /4     SAL r/m32     Multiply r/m32 by 2, 1 time */
-			/* D1 /4     SHL r/m16     Multiply r/m16 by 2, 1 time */
-			/* D1 /4     SHL r/m32     Multiply r/m32 by 2, 1 time */
-			/* D1 /5     SHR r/m16     Unsigned divide r/m16 by 2, 1 time */
-			/* D1 /5     SHR r/m32     Unsigned divide r/m32 by 2, 1 time */
-			/* D1 /7     SAR r/m16     Signed divide* r/m16 by 2, 1 time */
-			/* D1 /7     SAR r/m32     Signed divide* r/m32 by 2, 1 time */
-			/* 0F A4     SHLD r/m16, r16, imm8     Shift r/m16 to left imm8 places while shifting bits from r16 in from the right */
-			/* 0F A4     SHLD r/m32, r32, imm8     Shift r/m32 to left imm8 places while shifting bits from r32 in from the right */
-			/* 0F A5     SHLD r/m16, r16, CL     Shift r/m16 to left CL places while shifting bits from r16 in from the right */
-			/* 0F A5     SHLD r/m32, r32, CL     Shift r/m32 to left CL places while shifting bits from r32 in from the right */
-			/* 0F AC     SHRD r/m16, r16, imm8     Shift r/m16 to right imm8 places while shifting bits from r16 in from the left */
-			/* 0F AC     SHRD r/m32, r32, imm8     Shift r/m32 to right imm8 places while shifting bits from r32 in from the left */
-			/* 0F AD     SHRD r/m16, r16, CL     Shift r/m16 to right CL places while shifting bits from r16 in from the left */
-			/* 0F AD     SHRD r/m32, r32, CL     Shift r/m32 to right CL places while shifting bits from r32 in from the left */
 
 			default:
 				goto return_unknown_instruction;
@@ -3624,6 +3861,15 @@ notsup_modrm_getz_rex_w:
 #endif /* NEED_notsup_modrm_getz_rex_w */
 
 
+#ifdef NEED_notsup_modrm_getz_rex_w_modrm_parsed_rmreg
+#undef NEED_notsup_modrm_getz_rex_w_modrm_parsed_rmreg
+notsup_modrm_getz_rex_w_modrm_parsed_rmreg:
+		MODRM_NOSUP_GETRMZ_VEX_W();
+		goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
+#endif /* NEED_notsup_modrm_getz_rex_w_modrm_parsed_rmreg */
+
+
 #ifdef NEED_notsup_modrm_getz_rex_w_modrm_parsed
 #undef NEED_notsup_modrm_getz_rex_w_modrm_parsed
 notsup_modrm_getz_rex_w_modrm_parsed:
@@ -3671,16 +3917,6 @@ notsup_modrm_getwlq_rmreg_modrm_parsed:
 		goto return_unsupported_instruction_rmreg;
 #define NEED_return_unsupported_instruction_rmreg
 #endif /* NEED_notsup_modrm_getwlq_rmreg_modrm_parsed */
-
-
-#ifdef NEED_notsup_modrm_getwlq_nolock
-#undef NEED_notsup_modrm_getwlq_nolock
-notsup_modrm_getwlq_nolock:
-		EMU86_REQUIRE_NO_LOCK();
-#define NEED_return_unexpected_lock
-		goto notsup_modrm_getwlq;
-#define NEED_notsup_modrm_getwlq
-#endif /* NEED_notsup_modrm_getwlq_nolock */
 
 
 #ifdef NEED_notsup_modrm_getwlq

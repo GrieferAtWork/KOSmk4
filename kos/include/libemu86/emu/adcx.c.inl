@@ -31,7 +31,7 @@ case EMU86_OPCODE_ENCODE(0x0f38f6): {
 	if (op_flags & EMU86_F_f2) {
 		/* VEX.LZ.F2.0F38.W0 F6 /r     MULX r32a, r32b, r/m32     Unsigned multiply of r/m32 with EDX without affecting arithmetic flags.
 		 * VEX.LZ.F2.0F38.W1 F6 /r     MULX r64a, r64b, r/m64     Unsigned multiply of r/m64 with RDX without affecting arithmetic flags. */
-		if ((op_flags & (EMU86_F_HASVEX | EMU86_F_VEX_LL_M | EMU86_F_LOCK)) != EMU86_F_HASVEX)
+		if ((op_flags & (EMU86_F_HASVEX | EMU86_F_VEX_LL_M)) != EMU86_F_HASVEX)
 			goto return_unknown_instruction;
 #if EMU86_EMULATE_CONFIG_WANT_MULX
 #if CONFIG_LIBEMU86_WANT_64BIT
@@ -90,7 +90,7 @@ case EMU86_OPCODE_ENCODE(0x0f38f6): {
 		if (op_flags & EMU86_F_66) {
 			/* 66       0F 38 F6 /r     ADCX r32, r/m32     Unsigned addition of r32 with CF, r/m32 to r32, writes CF.
 			 * 66 REX.w 0F 38 F6 /r     ADCX r64, r/m64     Unsigned addition of r64 with CF, r/m64 to r64, writes CF. */
-			if ((op_flags & (EMU86_F_HASVEX | EMU86_F_LOCK)) != 0)
+			if ((op_flags & (EMU86_F_HASVEX)) != 0)
 				goto return_unknown_instruction;
 #if EMU86_EMULATE_CONFIG_WANT_ADCX
 			new_eflags &= ~EFLAGS_CF;
@@ -127,7 +127,7 @@ case EMU86_OPCODE_ENCODE(0x0f38f6): {
 		} else if (op_flags & EMU86_F_f3) {
 			/* F3       0F 38 F6 /r     ADOX r32, r/m32     Unsigned addition of r32 with OF, r/m32 to r32, writes OF.
 			 * F3 REX.w 0F 38 F6 /r     ADOX r64, r/m64     Unsigned addition of r64 with OF, r/m64 to r64, writes OF. */
-			if ((op_flags & (EMU86_F_HASVEX | EMU86_F_LOCK)) != 0)
+			if ((op_flags & (EMU86_F_HASVEX)) != 0)
 				goto return_unknown_instruction;
 #if EMU86_EMULATE_CONFIG_WANT_ADOX
 			new_eflags &= ~EFLAGS_OF;

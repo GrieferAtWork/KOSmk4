@@ -25,10 +25,6 @@ EMU86_INTELLISENSE_BEGIN(cmpxchg) {
 
 #if EMU86_EMULATE_CONFIG_WANT_CMPXCHG
 
-#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
-#define NEED_return_unexpected_lock
-#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
-
 /* Perform a CMPXCHG operation on MODRM.RM */
 #define DEFINE_CMPXCHG_modrm_rm(bwlq, BWLQ, Nbits, Nbytes, get_want_oldval)          \
 	u##Nbits real_oldval, want_oldval, newval;                                       \
@@ -37,7 +33,6 @@ EMU86_INTELLISENSE_BEGIN(cmpxchg) {
 	newval      = MODRM_GETREG##BWLQ();                                              \
 	NIF_ONLY_MEMORY(                                                                 \
 	if (EMU86_MODRM_ISREG(modrm.mi_type)) {                                          \
-		EMU86_REQUIRE_NO_LOCK();                                                     \
 		real_oldval = MODRM_GETRMREG##BWLQ();                                        \
 		if (real_oldval == want_oldval)                                              \
 			MODRM_SETRMREG##BWLQ(newval);                                            \

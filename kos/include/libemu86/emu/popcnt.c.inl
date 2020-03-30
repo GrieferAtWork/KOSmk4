@@ -33,8 +33,6 @@ case EMU86_OPCODE_ENCODE(0x0fb8): {
 		goto return_unknown_instruction;
 #define NEED_return_unknown_instruction
 	MODRM_DECODE();
-	EMU86_REQUIRE_NO_LOCK();
-#define NEED_return_unexpected_lock
 #ifdef EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BIT
 	{
 		EMU86_UREG_TYPE word;
@@ -80,8 +78,8 @@ case EMU86_OPCODE_ENCODE(0x0fb8): {
 case EMU86_OPCODE_ENCODE(0x0fb8):
 	if unlikely(!(op_flags & EMU86_F_f3))
 		goto return_unknown_instruction;
-	goto notsup_modrm_getwlq_nolock;
-#define NEED_notsup_modrm_getwlq_nolock
+	goto notsup_modrm_getwlq;
+#define NEED_notsup_modrm_getwlq
 #endif /* ... */
 
 }

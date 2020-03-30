@@ -29,33 +29,10 @@ EMU86_INTELLISENSE_BEGIN(blsx) {
 case EMU86_OPCODE_ENCODE(0x0f38f3): {
 	MODRM_DECODE();
 	if ((op_flags & (EMU86_F_HASVEX | EMU86_F_VEX_LL_M |
-	                 EMU86_F_LOCK | EMU86_F_66 |
-	                 EMU86_F_f2 | EMU86_F_f3)) != EMU86_F_HASVEX)
+	                 EMU86_F_66 | EMU86_F_f2 | EMU86_F_f3)) != EMU86_F_HASVEX)
 		goto return_unknown_instruction_rmreg;
 #define NEED_return_unknown_instruction_rmreg
 	switch (modrm.mi_reg) {
-
-#if EMU86_EMULATE_CONFIG_CHECKERROR
-#if !EMU86_EMULATE_CONFIG_WANT_BLSR
-#define NEED_UNSUPPORTED_BLSX_HANDLER
-	case 1:
-#endif /* !EMU86_EMULATE_CONFIG_WANT_BLSR */
-#if !EMU86_EMULATE_CONFIG_WANT_BLSMSK
-#define NEED_UNSUPPORTED_BLSX_HANDLER
-	case 2:
-#endif /* !EMU86_EMULATE_CONFIG_WANT_BLSMSK */
-#if !EMU86_EMULATE_CONFIG_WANT_BLSI
-#define NEED_UNSUPPORTED_BLSX_HANDLER
-	case 3:
-#endif /* !EMU86_EMULATE_CONFIG_WANT_BLSI */
-#ifdef NEED_UNSUPPORTED_BLSX_HANDLER
-#undef NEED_UNSUPPORTED_BLSX_HANDLER
-		MODRM_NOSUP_GETRMZ_VEX_W();
-		goto return_unknown_instruction_rmreg;
-#define NEED_return_unknown_instruction_rmreg
-#endif /* NEED_UNSUPPORTED_BLSX_HANDLER */
-#endif /* EMU86_EMULATE_CONFIG_CHECKERROR */
-
 
 #if EMU86_EMULATE_CONFIG_WANT_BLSR
 	case 1: {
@@ -92,7 +69,11 @@ case EMU86_OPCODE_ENCODE(0x0f38f3): {
 		               eflags_addend);
 		goto done;
 	}
-#endif /* EMU86_EMULATE_CONFIG_WANT_BLSR */
+#elif EMU86_EMULATE_CONFIG_CHECKERROR
+	case 1:
+		goto notsup_modrm_getz_rex_w_modrm_parsed_rmreg;
+#define NEED_notsup_modrm_getz_rex_w_modrm_parsed_rmreg
+#endif /* ... */
 
 
 #if EMU86_EMULATE_CONFIG_WANT_BLSMSK
@@ -126,7 +107,11 @@ case EMU86_OPCODE_ENCODE(0x0f38f3): {
 		               eflags_addend);
 		goto done;
 	}
-#endif /* EMU86_EMULATE_CONFIG_WANT_BLSMSK */
+#elif EMU86_EMULATE_CONFIG_CHECKERROR
+	case 2:
+		goto notsup_modrm_getz_rex_w_modrm_parsed_rmreg;
+#define NEED_notsup_modrm_getz_rex_w_modrm_parsed_rmreg
+#endif /* ... */
 
 
 #if EMU86_EMULATE_CONFIG_WANT_BLSI
@@ -164,7 +149,11 @@ case EMU86_OPCODE_ENCODE(0x0f38f3): {
 		               eflags_addend);
 		goto done;
 	}
-#endif /* EMU86_EMULATE_CONFIG_WANT_BLSI */
+#elif EMU86_EMULATE_CONFIG_CHECKERROR
+	case 3:
+		goto notsup_modrm_getz_rex_w_modrm_parsed_rmreg;
+#define NEED_notsup_modrm_getz_rex_w_modrm_parsed_rmreg
+#endif /* ... */
 
 
 	default:

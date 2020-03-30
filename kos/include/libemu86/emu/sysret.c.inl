@@ -28,8 +28,6 @@ EMU86_INTELLISENSE_BEGIN(sysret) {
 case EMU86_OPCODE_ENCODE(0x0f07): {
 	/*         0F 07     SYSRET     Return to compatibility mode from fast system call
 	 * REX.W + 0F 07     SYSRET     Return to 64-bit mode from fast system call */
-#define NEED_return_unexpected_lock
-	EMU86_REQUIRE_NO_LOCK();
 	/* XXX: Emulate? */
 	goto return_unsupported_instruction;
 #define NEED_return_unsupported_instruction

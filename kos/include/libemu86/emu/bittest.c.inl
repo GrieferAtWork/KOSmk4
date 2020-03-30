@@ -22,6 +22,9 @@
 #endif /* __INTELLISENSE__ */
 
 EMU86_INTELLISENSE_BEGIN(bittest) {
+
+#if EMU86_EMULATE_CONFIG_WANT_BITTEST || EMU86_EMULATE_CONFIG_CHECKERROR
+
 #if EMU86_EMULATE_CONFIG_WANT_BITTEST
 	bool nonzero;
 	unsigned int bitno;
@@ -55,16 +58,12 @@ set_cf_from_nonzero:
 
 
 #if EMU86_EMULATE_CONFIG_WANT_BITTEST
-#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
-#define NEED_return_unexpected_lock
-#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 #define DEFINE_BIT_TEST_AND_op(pred_oldval_mask)                                       \
 	IF_64BIT(if (IS_64BIT()) {                                                         \
 		u64 oldval, mask;                                                              \
 		mask = (u64)1 << (bitno % 64);                                                 \
 		NIF_ONLY_MEMORY(                                                               \
 		if (EMU86_MODRM_ISREG(modrm.mi_type)) {                                        \
-			EMU86_REQUIRE_NO_LOCK();                                                   \
 			oldval = MODRM_GETRMREGQ();                                                \
 			MODRM_SETRMREGQ(pred_oldval_mask(oldval, mask));                           \
 		} else) {                                                                      \
@@ -85,7 +84,6 @@ set_cf_from_nonzero:
 		mask = (u32)1 << (bitno % 32);                                                 \
 		NIF_ONLY_MEMORY(                                                               \
 		if (EMU86_MODRM_ISREG(modrm.mi_type)) {                                        \
-			EMU86_REQUIRE_NO_LOCK();                                                   \
 			oldval = MODRM_GETRMREGL();                                                \
 			MODRM_SETRMREGL(pred_oldval_mask(oldval, mask));                           \
 		} else) {                                                                      \
@@ -106,7 +104,6 @@ set_cf_from_nonzero:
 		mask = (u16)1 << (bitno % 16);                                                 \
 		NIF_ONLY_MEMORY(                                                               \
 		if (EMU86_MODRM_ISREG(modrm.mi_type)) {                                        \
-			EMU86_REQUIRE_NO_LOCK();                                                   \
 			oldval = MODRM_GETRMREGW();                                                \
 			MODRM_SETRMREGW(pred_oldval_mask(oldval, mask));                           \
 		} else) {                                                                      \
@@ -222,10 +219,14 @@ case EMU86_OPCODE_ENCODE(0x0fba):
 	MODRM_DECODE();
 #if CONFIG_LIBEMU86_WANT_64BIT
 	if (modrm.mi_reg >= 8) {
-#define NEED_return_unknown_instruction_rmreg
 		goto return_unknown_instruction_rmreg;
+#define NEED_return_unknown_instruction_rmreg
 	}
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
+	if (modrm.mi_reg >= 1 && modrm.mi_reg <= 3) {
+		goto return_unknown_instruction_rmreg;
+#define NEED_return_unknown_instruction_rmreg
+	}
 	if (modrm.mi_reg == 0) {
 		MODRM_NOSUP_GETRMWLQ();
 	} else {
@@ -235,7 +236,7 @@ case EMU86_OPCODE_ENCODE(0x0fba):
 #define NEED_return_unsupported_instruction_rmreg
 #endif /* !EMU86_EMULATE_CONFIG_WANT_BITTEST */
 
-
+#endif /* EMU86_EMULATE_CONFIG_WANT_BITTEST || EMU86_EMULATE_CONFIG_CHECKERROR */
 
 }
 EMU86_INTELLISENSE_END

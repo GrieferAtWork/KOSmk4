@@ -28,8 +28,6 @@ EMU86_INTELLISENSE_BEGIN(sysexit) {
 case EMU86_OPCODE_ENCODE(0x0f35): {
 	/*         0F 35     SYSEXIT     Fast return to privilege level 3 user code.
 	 * REX.W + 0F 35     SYSEXIT     Fast return to 64-bit mode privilege level 3 user code. */
-#define NEED_return_unexpected_lock
-	EMU86_REQUIRE_NO_LOCK();
 	/* XXX: Emulate? */
 	goto return_unsupported_instruction;
 #define NEED_return_unsupported_instruction

@@ -28,6 +28,12 @@ EMU86_INTELLISENSE_BEGIN(shift) {
 	/* The number of bits by which to shift */
 	u8 num_bits;
 
+#if EMU86_EMULATE_CONFIG_LOCK_SHIFT /* Extension!!! */
+#define EMU86_EMULATE_IF_CONFIG_LOCK_SHIFT(tt, ff) tt
+#else /* EMU86_EMULATE_CONFIG_LOCK_SHIFT */
+#define EMU86_EMULATE_IF_CONFIG_LOCK_SHIFT(tt, ff) ff
+#endif /* !EMU86_EMULATE_CONFIG_LOCK_SHIFT */
+
 #define DEFINE_SHIFT_OPERATIONS_MODRM_reg(bwlq, BWLQ, Nbits, Nbytes, msb_bit_set)          \
 	do {                                                                                   \
 		u32 eflags_addend = 0;                                                             \
@@ -35,7 +41,7 @@ EMU86_INTELLISENSE_BEGIN(shift) {
 		num_bits &= (Nbits - 1);                                                           \
 		if (!num_bits)                                                                     \
 			goto done; /* no-op */                                                         \
-do_shift##Nbits:                                                                           \
+EMU86_EMULATE_IF_CONFIG_LOCK_SHIFT(do_shift##Nbits:, (void)0);                             \
 		oldval = MODRM_GETRM##BWLQ();                                                      \
 		switch (modrm.mi_reg) {                                                            \
 			                                                                               \
@@ -93,11 +99,13 @@ do_shift##Nbits:                                                                
 			byte_t *addr;                                                                  \
 			addr = MODRM_MEMADDR();                                                        \
 			EMU86_WRITE_USER_MEMORY(addr, Nbytes);                                         \
+			EMU86_EMULATE_IF_CONFIG_LOCK_SHIFT(                                            \
 			if (!EMU86_MEM_ATOMIC_CMPXCH_OR_WRITE##BWLQ(addr, oldval, newval,              \
 			                                            (op_flags & EMU86_F_LOCK) != 0)) { \
 				EMU86_EMULATE_LOOPHINT();                                                  \
 				goto do_shift##Nbits;                                                      \
-			}                                                                              \
+			},                                                                             \
+			EMU86_MEMWRITE##BWLQ(addr, newval);)                                           \
 		}                                                                                  \
 		/* Update %eflags. */                                                              \
 		{                                                                                  \
@@ -144,9 +152,9 @@ case EMU86_OPCODE_ENCODE(0xd2): {
 	/* D2 /1      ROR r/m8,CL      Rotate 8 bits r/m8 right CL times */
 	/* D2 /2      RCL r/m8,CL      Rotate 9 bits (CF, r/m8) left CL times */
 	/* D2 /3      RCR r/m8,CL      Rotate 9 bits (CF, r/m8) right CL times */
-	/* D2 /4|6    SAL r/m8,CL      Multiply r/m8 by 2, CL times */
+	/* D2 /4|6    SHL r/m8,CL      Multiply r/m8 by 2, CL times */
 	/* D2 /5      SHR r/m8,CL      Unsigned divide r/m8 by 2, CL times */
-	/* D2 /6|4    SHL r/m8,CL      Multiply r/m8 by 2, CL times */
+	/* D2 /6|4    SAL r/m8,CL      Multiply r/m8 by 2, CL times */
 	/* D2 /7      SAR r/m8,CL      Signed divide* r/m8 by 2, CL times */
 	MODRM_DECODE();
 	num_bits = EMU86_GETCL();
@@ -169,15 +177,15 @@ case EMU86_OPCODE_ENCODE(0xd3): {
 	/* D3 /3      RCR r/m16,CL      Rotate 17 bits (CF, r/m16) right CL times */
 	/* D3 /3      RCR r/m32,CL      Rotate 33 bits (CF, r/m32) right CL times */
 	/* D3 /3      RCR r/m64,CL      Rotate 65 bits (CF, r/m64) right CL times */
-	/* D3 /4|6    SAL r/m16,CL      Multiply r/m16 by 2, CL times */
-	/* D3 /4|6    SAL r/m32,CL      Multiply r/m32 by 2, CL times */
-	/* D3 /4|6    SAL r/m64,CL      Multiply r/m64 by 2, CL times */
+	/* D3 /4|6    SHL r/m16,CL      Multiply r/m16 by 2, CL times */
+	/* D3 /4|6    SHL r/m32,CL      Multiply r/m32 by 2, CL times */
+	/* D3 /4|6    SHL r/m64,CL      Multiply r/m64 by 2, CL times */
 	/* D3 /5      SHR r/m16,CL      Unsigned divide r/m16 by 2, CL times */
 	/* D3 /5      SHR r/m32,CL      Unsigned divide r/m32 by 2, CL times */
 	/* D3 /5      SHR r/m64,CL      Unsigned divide r/m64 by 2, CL times */
-	/* D3 /6|4    SHL r/m16,CL      Multiply r/m16 by 2, CL times */
-	/* D3 /6|4    SHL r/m32,CL      Multiply r/m32 by 2, CL times */
-	/* D3 /6|4    SHL r/m64,CL      Multiply r/m64 by 2, CL times */
+	/* D3 /6|4    SAL r/m16,CL      Multiply r/m16 by 2, CL times */
+	/* D3 /6|4    SAL r/m32,CL      Multiply r/m32 by 2, CL times */
+	/* D3 /6|4    SAL r/m64,CL      Multiply r/m64 by 2, CL times */
 	/* D3 /7      SAR r/m16,CL      Signed divide* r/m16 by 2, CL times */
 	/* D3 /7      SAR r/m32,CL      Signed divide* r/m32 by 2, CL times */
 	/* D3 /7      SAR r/m64,CL      Signed divide* r/m64 by 2, CL times */
@@ -199,9 +207,9 @@ case EMU86_OPCODE_ENCODE(0xc0): {
 	/* C0 /1   ib     ROR r/m8,imm8      Rotate 8 bits r/m16 right imm8 times */
 	/* C0 /2   ib     RCL r/m8,imm8      Rotate 9 bits (CF, r/m8) left imm8 times */
 	/* C0 /3   ib     RCR r/m8,imm8      Rotate 9 bits (CF, r/m8) right imm8 times */
-	/* C0 /4|6 ib     SAL r/m8,imm8      Multiply r/m8 by 2, imm8 times */
+	/* C0 /4|6 ib     SHL r/m8,imm8      Multiply r/m8 by 2, imm8 times */
 	/* C0 /5   ib     SHR r/m8,imm8      Unsigned divide r/m8 by 2, imm8 times */
-	/* C0 /6|4 ib     SHL r/m8,imm8      Multiply r/m8 by 2, imm8 times */
+	/* C0 /6|4 ib     SAL r/m8,imm8      Multiply r/m8 by 2, imm8 times */
 	/* C0 /7   ib     SAR r/m8,imm8      Signed divide* r/m8 by 2, imm8 times */
 	MODRM_DECODE();
 	num_bits  = *(u8 *)pc;
@@ -222,15 +230,15 @@ case EMU86_OPCODE_ENCODE(0xc1): {
 	/* D1 /3   ib     RCR r/m16,imm8      Rotate 17 bits (CF, r/m16) right imm8 times */
 	/* D1 /3   ib     RCR r/m32,imm8      Rotate 33 bits (CF, r/m32) right imm8 times */
 	/* D1 /3   ib     RCR r/m64,imm8      Rotate 65 bits (CF, r/m64) right imm8 times */
-	/* D1 /4|6 ib     SAL r/m16,imm8      Multiply r/m16 by 2, imm8 times */
-	/* D1 /4|6 ib     SAL r/m32,imm8      Multiply r/m32 by 2, imm8 times */
-	/* D1 /4|6 ib     SAL r/m64,imm8      Multiply r/m64 by 2, imm8 times */
+	/* D1 /4|6 ib     SHL r/m16,imm8      Multiply r/m16 by 2, imm8 times */
+	/* D1 /4|6 ib     SHL r/m32,imm8      Multiply r/m32 by 2, imm8 times */
+	/* D1 /4|6 ib     SHL r/m64,imm8      Multiply r/m64 by 2, imm8 times */
 	/* D1 /5   ib     SHR r/m16,imm8      Unsigned divide r/m16 by 2, imm8 times */
 	/* D1 /5   ib     SHR r/m32,imm8      Unsigned divide r/m32 by 2, imm8 times */
 	/* D1 /5   ib     SHR r/m64,imm8      Unsigned divide r/m64 by 2, imm8 times */
-	/* D1 /6|4 ib     SHL r/m16,imm8      Multiply r/m16 by 2, imm8 times */
-	/* D1 /6|4 ib     SHL r/m32,imm8      Multiply r/m32 by 2, imm8 times */
-	/* D1 /6|4 ib     SHL r/m64,imm8      Multiply r/m64 by 2, imm8 times */
+	/* D1 /6|4 ib     SAL r/m16,imm8      Multiply r/m16 by 2, imm8 times */
+	/* D1 /6|4 ib     SAL r/m32,imm8      Multiply r/m32 by 2, imm8 times */
+	/* D1 /6|4 ib     SAL r/m64,imm8      Multiply r/m64 by 2, imm8 times */
 	/* D1 /7   ib     SAR r/m16,imm8      Signed divide* r/m16 by 2, imm8 times */
 	/* D1 /7   ib     SAR r/m32,imm8      Signed divide* r/m32 by 2, imm8 times */
 	/* D1 /7   ib     SAR r/m64,imm8      Signed divide* r/m64 by 2, imm8 times */
@@ -246,9 +254,9 @@ case EMU86_OPCODE_ENCODE(0xd0): {
 	/* D0 /1      ROR r/m8,1      Rotate 8 bits r/m8 right once */
 	/* D0 /2      RCL r/m8,1      Rotate 9 bits (CF, r/m8) left once */
 	/* D0 /3      RCR r/m8,1      Rotate 9 bits (CF, r/m8) right once */
-	/* D0 /4|6    SAL r/m8,1      Multiply r/m8 by 2, 1 time */
+	/* D0 /4|6    SHL r/m8,1      Multiply r/m8 by 2, 1 time */
 	/* D0 /5      SHR r/m8,1      Unsigned divide r/m8 by 2, 1 time */
-	/* D0 /6|4    SHL r/m8,1      Multiply r/m8 by 2, 1 time */
+	/* D0 /6|4    SAL r/m8,1      Multiply r/m8 by 2, 1 time */
 	/* D0 /7      SAR r/m8,1      Signed divide* r/m8 by 2, 1 times */
 	MODRM_DECODE();
 	num_bits = 1;
@@ -268,15 +276,15 @@ case EMU86_OPCODE_ENCODE(0xd1): {
 	/* D1 /3      RCR r/m16,1      Rotate 17 bits (CF, r/m16) right once */
 	/* D1 /3      RCR r/m32,1      Rotate 33 bits (CF, r/m32) right once */
 	/* D1 /3      RCR r/m64,1      Rotate 65 bits (CF, r/m64) right once */
-	/* D1 /4|6    SAL r/m16,1      Multiply r/m16 by 2, 1 time */
-	/* D1 /4|6    SAL r/m32,1      Multiply r/m32 by 2, 1 time */
-	/* D1 /4|6    SAL r/m64,1      Multiply r/m64 by 2, 1 time */
+	/* D1 /4|6    SHL r/m16,1      Multiply r/m16 by 2, 1 time */
+	/* D1 /4|6    SHL r/m32,1      Multiply r/m32 by 2, 1 time */
+	/* D1 /4|6    SHL r/m64,1      Multiply r/m64 by 2, 1 time */
 	/* D1 /5      SHR r/m16,1      Unsigned divide r/m16 by 2, 1 time */
 	/* D1 /5      SHR r/m32,1      Unsigned divide r/m32 by 2, 1 time */
 	/* D1 /5      SHR r/m64,1      Unsigned divide r/m64 by 2, 1 time */
-	/* D1 /6|4    SHL r/m16,1      Multiply r/m16 by 2, 1 time */
-	/* D1 /6|4    SHL r/m32,1      Multiply r/m32 by 2, 1 time */
-	/* D1 /6|4    SHL r/m64,1      Multiply r/m64 by 2, 1 time */
+	/* D1 /6|4    SAL r/m16,1      Multiply r/m16 by 2, 1 time */
+	/* D1 /6|4    SAL r/m32,1      Multiply r/m32 by 2, 1 time */
+	/* D1 /6|4    SAL r/m64,1      Multiply r/m64 by 2, 1 time */
 	/* D1 /7      SAR r/m16,1      Signed divide* r/m16 by 2, 1 times */
 	/* D1 /7      SAR r/m32,1      Signed divide* r/m32 by 2, 1 times */
 	/* D1 /7      SAR r/m64,1      Signed divide* r/m64 by 2, 1 times */
@@ -286,6 +294,7 @@ case EMU86_OPCODE_ENCODE(0xd1): {
 }
 
 #undef DEFINE_SHIFT_OPERATIONS_MODRM_reg
+#undef EMU86_EMULATE_IF_CONFIG_LOCK_SHIFT
 #else /* EMU86_EMULATE_CONFIG_WANT_SHIFT */
 
 #if EMU86_EMULATE_CONFIG_CHECKERROR

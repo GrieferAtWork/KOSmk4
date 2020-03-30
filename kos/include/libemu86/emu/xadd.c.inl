@@ -24,16 +24,12 @@
 EMU86_INTELLISENSE_BEGIN(xadd) {
 
 #if EMU86_EMULATE_CONFIG_WANT_XADD
-#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
-#define NEED_return_unexpected_lock
-#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 #define DEFINE_XADD_MODRM_reg_rm(bwlq, BWLQ, Nbits, Nbytes)                       \
 	u##Nbits rhs, oldval, newval;                                                 \
 	u32 eflags_addend = 0;                                                        \
 	rhs = MODRM_GETREG##BWLQ();                                                   \
 	NIF_ONLY_MEMORY(                                                              \
 	if (EMU86_MODRM_ISREG(modrm.mi_type)) {                                       \
-		EMU86_REQUIRE_NO_LOCK();                                                  \
 		oldval = MODRM_GETRMREG##BWLQ();                                          \
 		MODRM_SETRMREG##BWLQ(oldval + rhs);                                       \
 	} else) {                                                                     \

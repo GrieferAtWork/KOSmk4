@@ -29,8 +29,6 @@ EMU86_INTELLISENSE_BEGIN(sysenter) {
       EMU86_EMULATE_CONFIG_WANT_SYSENTER))
 case EMU86_OPCODE_ENCODE(0x0f34): {
 	/* 0F 34     SYSENTER     Fast call to privilege level 0 system procedures. */
-#define NEED_return_unexpected_lock
-	EMU86_REQUIRE_NO_LOCK();
 #if EMU86_EMULATE_CONFIG_WANT_SYSENTER && defined(EMU86_EMULATE_RETURN_AFTER_SYSENTER)
 #if CONFIG_LIBEMU86_WANT_16BIT
 	/* Intel documents that sysenter cannot be used from

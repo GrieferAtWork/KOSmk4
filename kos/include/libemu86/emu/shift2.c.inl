@@ -28,9 +28,13 @@ EMU86_INTELLISENSE_BEGIN(shift2) {
 	/* The number of bits by which to shift */
 	u8 num_bits;
 
-#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
-#define NEED_return_unexpected_lock
-#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
+#if EMU86_EMULATE_CONFIG_LOCK_SHIFT2 /* Extension!!! */
+#define EMU86_EMULATE_IF_CONFIG_LOCK_SHIFT2(tt, ff) tt
+#else /* EMU86_EMULATE_CONFIG_LOCK_SHIFT2 */
+#define EMU86_EMULATE_IF_CONFIG_LOCK_SHIFT2(tt, ff) ff
+#endif /* !EMU86_EMULATE_CONFIG_LOCK_SHIFT2 */
+
+
 #define DEFINE_SHLD_MODRM_rm_reg(bwlq, BWLQ, Nbits, Nbytes, msb_bit_set)                \
 	u##Nbits oldval, bitsrc, newval;                                                    \
 	num_bits &= (Nbits - 1);                                                            \
@@ -38,7 +42,6 @@ EMU86_INTELLISENSE_BEGIN(shift2) {
 		goto done;                                                                      \
 	bitsrc = MODRM_GETREG##BWLQ();                                                      \
 	NIF_ONLY_MEMORY(if (EMU86_MODRM_ISREG(modrm.mi_type)) {                             \
-		EMU86_REQUIRE_NO_LOCK();                                                        \
 		oldval = MODRM_GETRMREG##BWLQ();                                                \
 		newval = (oldval << num_bits) |                                                 \
 		         (bitsrc >> (Nbits - num_bits));                                        \
@@ -47,6 +50,7 @@ EMU86_INTELLISENSE_BEGIN(shift2) {
 		byte_t *addr;                                                                   \
 		addr = MODRM_MEMADDR();                                                         \
 		EMU86_WRITE_USER_MEMORY(addr, Nbytes);                                          \
+		EMU86_EMULATE_IF_CONFIG_LOCK_SHIFT2(                                            \
 		for (;;) {                                                                      \
 			oldval = EMU86_MEMREAD##BWLQ(addr);                                         \
 			newval = (oldval << num_bits) |                                             \
@@ -55,7 +59,11 @@ EMU86_INTELLISENSE_BEGIN(shift2) {
 			                                           (op_flags & EMU86_F_LOCK) != 0)) \
 				break;                                                                  \
 			EMU86_EMULATE_LOOPHINT();                                                   \
-		}                                                                               \
+		},                                                                              \
+		oldval = EMU86_MEMREAD##BWLQ(addr);                                             \
+		newval = (oldval << num_bits) |                                                 \
+		         (bitsrc >> (Nbits - num_bits));                                        \
+		EMU86_MEMWRITE##BWLQ(addr, newval);)                                            \
 	}                                                                                   \
 	if ((oldval << (num_bits - 1)) & msb_bit_set)                                       \
 		eflags_addend |= EFLAGS_CF;                                                     \
@@ -100,11 +108,6 @@ case EMU86_OPCODE_ENCODE(0x0fa4): {
 
 #undef DEFINE_SHLD_MODRM_rm_reg
 
-
-
-#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
-#define NEED_return_unexpected_lock
-#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 #define DEFINE_SHRD_MODRM_rm_reg(bwlq, BWLQ, Nbits, Nbytes, msb_bit_set)                \
 	u##Nbits oldval, bitsrc, newval;                                                    \
 	num_bits &= (Nbits - 1);                                                            \
@@ -112,7 +115,6 @@ case EMU86_OPCODE_ENCODE(0x0fa4): {
 		goto done;                                                                      \
 	bitsrc = MODRM_GETREG##BWLQ();                                                      \
 	NIF_ONLY_MEMORY(if (EMU86_MODRM_ISREG(modrm.mi_type)) {                             \
-		EMU86_REQUIRE_NO_LOCK();                                                        \
 		oldval = MODRM_GETRMREG##BWLQ();                                                \
 		newval = (oldval >> num_bits) |                                                 \
 		         (bitsrc << (Nbits - num_bits));                                        \
@@ -121,6 +123,7 @@ case EMU86_OPCODE_ENCODE(0x0fa4): {
 		byte_t *addr;                                                                   \
 		addr = MODRM_MEMADDR();                                                         \
 		EMU86_WRITE_USER_MEMORY(addr, Nbytes);                                          \
+		EMU86_EMULATE_IF_CONFIG_LOCK_SHIFT2(                                            \
 		for (;;) {                                                                      \
 			oldval = EMU86_MEMREAD##BWLQ(addr);                                         \
 			newval = (oldval >> num_bits) |                                             \
@@ -129,7 +132,11 @@ case EMU86_OPCODE_ENCODE(0x0fa4): {
 			                                           (op_flags & EMU86_F_LOCK) != 0)) \
 				break;                                                                  \
 			EMU86_EMULATE_LOOPHINT();                                                   \
-		}                                                                               \
+		},                                                                              \
+		oldval = EMU86_MEMREAD##BWLQ(addr);                                             \
+		newval = (oldval >> num_bits) |                                                 \
+		         (bitsrc << (Nbits - num_bits));                                        \
+		EMU86_MEMWRITE##BWLQ(addr, newval);)                                            \
 	}                                                                                   \
 	if ((oldval >> (num_bits - 1)) & 1)                                                 \
 		eflags_addend |= EFLAGS_CF;                                                     \
@@ -173,6 +180,7 @@ case EMU86_OPCODE_ENCODE(0x0fac): {
 }
 
 #undef DEFINE_SHRD_MODRM_rm_reg
+#undef EMU86_EMULATE_IF_CONFIG_LOCK_SHIFT2
 #else /* EMU86_EMULATE_CONFIG_WANT_SHIFT2 */
 
 #if EMU86_EMULATE_CONFIG_CHECKERROR

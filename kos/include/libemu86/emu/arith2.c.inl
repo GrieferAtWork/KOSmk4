@@ -26,13 +26,9 @@ EMU86_INTELLISENSE_BEGIN(arith2) {
 #if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_ARITH2
 
 #if EMU86_EMULATE_CONFIG_WANT_ARITH2
-#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
-#define NEED_return_unexpected_lock_rmreg
-#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 #define DEFINE_NOT_MODRM_rm(BWLQ, Nbits, Nbytes, mask)                   \
 	NIF_ONLY_MEMORY(if (EMU86_MODRM_ISREG(modrm.mi_type)) {              \
 		u##Nbits reg;                                                    \
-		EMU86_REQUIRE_NO_LOCK_RMREG();                                   \
 		reg = MODRM_GETRMREG##BWLQ();                                    \
 		MODRM_SETRMREG##BWLQ(~reg);                                      \
 	} else) {                                                            \
@@ -48,7 +44,6 @@ EMU86_INTELLISENSE_BEGIN(arith2) {
 	u32 eflags_addend = 0;                                                     \
 	u##Nbits oldval, newval;                                                   \
 	NIF_ONLY_MEMORY(if (EMU86_MODRM_ISREG(modrm.mi_type)) {                    \
-		EMU86_REQUIRE_NO_LOCK_RMREG();                                         \
 		oldval = MODRM_GETRMREG##BWLQ();                                       \
 		newval = (u##Nbits)0 - oldval;                                         \
 		MODRM_SETRMREG##BWLQ(newval);                                          \

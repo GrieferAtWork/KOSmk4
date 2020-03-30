@@ -52,7 +52,7 @@ case EMU86_OPCODE_ENCODE(0x0fc7):
 			addr                  = MODRM_MEMADDR();
 			EMU86_READWRITE_USER_MEMORY(addr, 16);
 			real_oldval.word128 = EMU86_MEM_ATOMIC_CMPXCHX(addr, want_oldval.word128, newval.word128,
-			                                                 (op_flags & EMU86_F_LOCK) != 0);
+			                                               (op_flags & EMU86_F_LOCK) != 0);
 			if (real_oldval.qwords[0] == want_oldval.qwords[0] &&
 			    real_oldval.qwords[1] == want_oldval.qwords[1]) {
 				EMU86_MSKFLAGS(~EFLAGS_ZF, EFLAGS_ZF);
