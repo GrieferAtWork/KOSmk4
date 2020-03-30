@@ -3313,8 +3313,8 @@ PRIVATE struct instruction const ops_0f[] = {
 	I(0xd5, IF_MODRM,              "pmullw\t" OP_RMM OP_RM64_MM),
 	I(0xd5, IF_66|IF_MODRM,        "pmullw\t" OP_RM128_XMM OP_RXMM_MASK),
 
-	I(0xd6, IF_F2|IF_MODRM|IF_RMR, "movdq2q\t" OP_RM128_XMM OP_RMM),
-	I(0xd6, IF_F2|IF_MODRM|IF_RMR, "movq2dq\t" OP_RMM OP_RM128_XMM),
+	I(0xd6, IF_F2|IF_MODRM|IF_RMR, "movdq2q\t" OP_RM128_XMM OP_RMM), /* f2 0f d6 /r movdq2q mm, xmm */
+	I(0xd6, IF_F2|IF_MODRM|IF_RMR, "movq2dq\t" OP_RMM OP_RM128_XMM), /* f3 0f d6 /r movq2dq xmm, mm */
 
 	I(0xd7, IF_66|IF_VEX|IF_MODRM,         LONGREPR_B(B_OP_VEX_B0(0, 1, 0, 0), LO_VPMOVMSKB_XMM_R32)), /* VEX.128.66.0f.WIG d7 /r vpmovmskb r32, xmm1 */
 	I(0xd7, IF_66|IF_VEX|IF_MODRM|IF_REXW, LONGREPR_B(B_OP_VEX_B0(0, 1, 0, 0), LO_VPMOVMSKB_XMM_R64)), /* VEX.128.66.0f.WIG d7 /r vpmovmskb r64, xmm1 */
@@ -3561,10 +3561,10 @@ PRIVATE struct instruction const ops_0f[] = {
 	I(0xf6, IF_MODRM,                                    "psadbw\t" OP_RM64_MM OP_RMM),                /*                 0f f6 /r psadbw mm1, mm2/m64 */
 	I(0xf6, IF_66|IF_MODRM,                              "psadbw\t" OP_RM128_XMM OP_RXMM),             /*              66 0f f6 /r psadbw xmm1, xmm2/m128 */
 
-	I(0xf7, IF_MODRM|IF_RMR,       "maskmovq\t" OP_RM64_MM OP_RMM),
-
 	I(0xf7, IF_66|IF_VEX|IF_MODRM|IF_RMR, LONGREPR_B(B_OP_VEX_B0(0, 1, 0, 0), LO_VMASKMOVDQU)), /* VEX.128.66.0f.WIG f7 /r vmaskmovdqu xmm1, xmm2 */
 	I(0xf7, IF_66|IF_MODRM|IF_RMR,        LONGREPR(LO_MASKMOVDQU)),                             /*             66 0f f7 /r maskmovdqu xmm1, xmm2 */
+
+	I(0xf7, IF_MODRM|IF_RMR,       "maskmovq\t" OP_RM64_MM OP_RMM),
 
 	I(0xf8, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 1, 0, 0) "vpsubb\t" OP_RM128_XMM__OP_VRXMM__OP_RXMM_MASK), /* EVEX.128.66.0f.WIG f8 /r vpsubb xmm1{k1}{z}, xmm2, xmm3/m128 */
 	I(0xf8, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 1, 0, 1) "vpsubb\t" OP_RM256_YMM__OP_VRYMM__OP_RYMM_MASK), /* EVEX.256.66.0f.WIG f8 /r vpsubb ymm1{k1}{z}, ymm2, ymm3/m256 */
@@ -4497,7 +4497,7 @@ PRIVATE struct instruction const ops_0f38[] = {
 	I(0xc8, IF_66|IF_VEX|IF_MODRM, OP_VEX_B0(0, 0, 1, 2) "vexp2pd\t" OP_SAE OP_RM512_ZMM OP_RZMM_MASK), /* EVEX.512.66.0f38.W1 c8 /r vexp2pd zmm1{k1}{z}, zmm2/m512/m64bcst{sae} */
 	I(0xc8, IF_MODRM, "sha1nexte\t" OP_RM128_XMM OP_RXMM_MASK),
 
-	I(0xc9, IF_MODRM, "sha1msg1\t" OP_RM128_XMM OP_RXMM_MASK),
+	I(0xc9, IF_MODRM, "sha1msg1\t" OP_RM128_XMM OP_RXMM_MASK), /* 0f 38 c9 /r sha1msg1 xmm1, xmm2/m128 */
 
 	I(0xca, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(0, 0, 0, 2), LO_VRCP28PS)), /* EVEX.512.66.0f38.W0 ca /r vrcp28ps zmm1{k1}{z}, zmm2/m512/m32bcst{sae} */
 	I(0xca, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(0, 0, 1, 2), LO_VRCP28PD)), /* EVEX.512.66.0f38.W1 ca /r vrcp28pd zmm1{k1}{z}, zmm2/m512/m64bcst{sae} */
@@ -4910,7 +4910,6 @@ PRIVATE struct instruction const ops_0f3a[] = {
 /* clang-format on */
 
 
-#if 0 /* Currently unused... */
 /* clang-format off */
 PRIVATE struct instruction const ops_xop8[] = {
 /*[[[begin:ops_xop8]]]*/
@@ -4918,7 +4917,39 @@ PRIVATE struct instruction const ops_xop8[] = {
 /*[[[end:ops_xop8]]]*/
 };
 /* clang-format on */
-#endif
+
+/* TODO: Add the following missing XOP opcodes:
+ *    XOP8 85h     vpmacssww      Vo,Ho,Wo,Lo
+ *    XOP8 86h     vpmacsswd      Vo,Ho,Wo,Lo
+ *    XOP8 87h     vpmacssdql     Vo,Ho,Wo,Lo
+ *    XOP8 8Eh     vpmacssdd      Vo,Ho,Wo,Lo
+ *    XOP8 8Fh     vpmacssdqh     Vo,Ho,Wo,Lo
+ *    XOP8 95h     vpmacsww       Vo,Ho,Wo,Lo
+ *    XOP8 96h     vpmacswd       Vo,Ho,Wo,Lo
+ *    XOP8 97h     vpmacsdql      Vo,Ho,Wo,Lo
+ *    XOP8 9Eh     vpmacsdd       Vo,Ho,Wo,Lo
+ *    XOP8 9Fh     vpmacsdqh      Vo,Ho,Wo,Lo
+ *    XOP8 A2h     vpcmov         Vx,Hx,Wx,Lx (W=0)
+ *    XOP8 A2h     vpcmov         Vx,Hx,Lx,Wx (W=1)
+ *    XOP8 A3h     vpperm         Vo,Ho,Wo,Lo (W=0)
+ *    XOP8 A3h     vpperm         Vo,Ho,Lo,Wo (W=1)
+ *    XOP8 A6h     vpmadcsswd     Vo,Ho,Wo,Lo
+ *    XOP8 B6h     vpmadcswd      Vo,Ho,Wo,Lo
+ *    XOP8 C0h     vprotb         Vo,Wo,Ib
+ *    XOP8 C1h     vprotw         Vo,Wo,Ib
+ *    XOP8 C2h     vprotd         Vo,Wo,Ib
+ *    XOP8 C3h     vprotq         Vo,Wo,Ib
+ *    XOP8 CCh     vpcomccb       Vo,Ho,Wo,Ib
+ *    XOP8 CDh     vpcomccw       Vo,Ho,Wo,Ib
+ *    XOP8 CEh     vpcomccd       Vo,Ho,Wo,Ib
+ *    XOP8 CFh     vpcomccq       Vo,Ho,Wo,Ib
+ *    XOP8 ECh     vpcomccub      Vo,Ho,Wo,Ib
+ *    XOP8 EDh     vpcomccuw      Vo,Ho,Wo,Ib
+ *    XOP8 EEh     vpcomccud      Vo,Ho,Wo,Ib
+ *    XOP8 EFh     vpcomccuq      Vo,Ho,Wo,Ib
+ */
+
+
 
 /* clang-format off */
 PRIVATE struct instruction const ops_xop9[] = {
@@ -4965,55 +4996,7 @@ PRIVATE struct instruction const ops_xop9[] = {
 };
 /* clang-format on */
 
-
-/* clang-format off */
-PRIVATE struct instruction const ops_xopa[] = {
-/*[[[begin:ops_xopa]]]*/
-	I(0x10, IF_VEXW0|IF_MODRM, "bextrl\t" OP_U32 OP_RM32 OP_R32),
-	I(0x10, IF_VEXW1|IF_MODRM, "bextrq\t" OP_S32 OP_RM64 OP_R64),
-
-	I(0x12, IF_VEXW0|IF_MODRM|IF_REG0, "lwpinsl\t" OP_U32 OP_RM32 OP_VR32),
-	I(0x12, IF_VEXW1|IF_MODRM|IF_REG0, "lwpinsq\t" OP_S32 OP_RM32 OP_VR64),
-
-	I(0x12, IF_VEXW0|IF_MODRM|IF_REG1, "lwpvall\t" OP_U32 OP_RM32 OP_VR32),
-	I(0x12, IF_VEXW1|IF_MODRM|IF_REG1, "lwpvalq\t" OP_S32 OP_RM32 OP_VR64),
-
-	I(0, 0, "")
-/*[[[end:ops_xopa]]]*/
-};
-/* clang-format on */
-
-
 /* TODO: Add the following missing XOP opcodes:
- *    XOP8 85h     vpmacssww      Vo,Ho,Wo,Lo
- *    XOP8 86h     vpmacsswd      Vo,Ho,Wo,Lo
- *    XOP8 87h     vpmacssdql     Vo,Ho,Wo,Lo
- *    XOP8 8Eh     vpmacssdd      Vo,Ho,Wo,Lo
- *    XOP8 8Fh     vpmacssdqh     Vo,Ho,Wo,Lo
- *    XOP8 95h     vpmacsww       Vo,Ho,Wo,Lo
- *    XOP8 96h     vpmacswd       Vo,Ho,Wo,Lo
- *    XOP8 97h     vpmacsdql      Vo,Ho,Wo,Lo
- *    XOP8 9Eh     vpmacsdd       Vo,Ho,Wo,Lo
- *    XOP8 9Fh     vpmacsdqh      Vo,Ho,Wo,Lo
- *    XOP8 A2h     vpcmov         Vx,Hx,Wx,Lx (W=0)
- *    XOP8 A2h     vpcmov         Vx,Hx,Lx,Wx (W=1)
- *    XOP8 A3h     vpperm         Vo,Ho,Wo,Lo (W=0)
- *    XOP8 A3h     vpperm         Vo,Ho,Lo,Wo (W=1)
- *    XOP8 A6h     vpmadcsswd     Vo,Ho,Wo,Lo
- *    XOP8 B6h     vpmadcswd      Vo,Ho,Wo,Lo
- *    XOP8 C0h     vprotb         Vo,Wo,Ib
- *    XOP8 C1h     vprotw         Vo,Wo,Ib
- *    XOP8 C2h     vprotd         Vo,Wo,Ib
- *    XOP8 C3h     vprotq         Vo,Wo,Ib
- *    XOP8 CCh     vpcomccb       Vo,Ho,Wo,Ib
- *    XOP8 CDh     vpcomccw       Vo,Ho,Wo,Ib
- *    XOP8 CEh     vpcomccd       Vo,Ho,Wo,Ib
- *    XOP8 CFh     vpcomccq       Vo,Ho,Wo,Ib
- *    XOP8 ECh     vpcomccub      Vo,Ho,Wo,Ib
- *    XOP8 EDh     vpcomccuw      Vo,Ho,Wo,Ib
- *    XOP8 EEh     vpcomccud      Vo,Ho,Wo,Ib
- *    XOP8 EFh     vpcomccuq      Vo,Ho,Wo,Ib
- *
  *    XOP9 80h     vfrczps        Vx,Wx
  *    XOP9 81h     vfrczpd        Vx,Wx
  *    XOP9 82h     vfrczss        Vo,Wo.d
@@ -5058,6 +5041,25 @@ PRIVATE struct instruction const ops_xopa[] = {
  *    XOP9 E2h     VPHSUBWD       Vo,Wo
  *    XOP9 E3h     VPHSUBDQ       Vo,Wo
  */
+
+
+/* clang-format off */
+PRIVATE struct instruction const ops_xopa[] = {
+/*[[[begin:ops_xopa]]]*/
+	I(0x10, IF_VEXW0|IF_MODRM, "bextrl\t" OP_U32 OP_RM32 OP_R32),
+	I(0x10, IF_VEXW1|IF_MODRM, "bextrq\t" OP_S32 OP_RM64 OP_R64),
+
+	I(0x12, IF_VEXW0|IF_MODRM|IF_REG0, "lwpinsl\t" OP_U32 OP_RM32 OP_VR32),
+	I(0x12, IF_VEXW1|IF_MODRM|IF_REG0, "lwpinsq\t" OP_S32 OP_RM32 OP_VR64),
+
+	I(0x12, IF_VEXW0|IF_MODRM|IF_REG1, "lwpvall\t" OP_U32 OP_RM32 OP_VR32),
+	I(0x12, IF_VEXW1|IF_MODRM|IF_REG1, "lwpvalq\t" OP_S32 OP_RM32 OP_VR64),
+
+	I(0, 0, "")
+/*[[[end:ops_xopa]]]*/
+};
+/* clang-format on */
+
 
 
 #if 0
@@ -5240,7 +5242,9 @@ local normal_offsets = generateOffsetTable("ops");
 generateOffsetTable("ops_0f");
 generateOffsetTable("ops_0f38");
 generateOffsetTable("ops_0f3a");
-// generateOffsetTable("ops_xop");
+// generateOffsetTable("ops_xop8");
+// generateOffsetTable("ops_xop9");
+// generateOffsetTable("ops_xopa");
 print "#define OPS_OFFETSOF_90h", normal_offsets[0x90];
 
 ]]]*/

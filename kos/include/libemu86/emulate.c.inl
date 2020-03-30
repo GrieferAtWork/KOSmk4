@@ -3189,6 +3189,41 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 			/* TODO: stac */
 			/* TODO: movnti */
 
+//TODO:	I(0x1a, IF_X32|IF_F2|IF_MODRM, "bndcu\t" OP_RM32 OP_RBND),
+//TODO:	I(0x1a, IF_X64|IF_F2|IF_MODRM, "bndcu\t" OP_RM64 OP_RBND),
+//TODO:	I(0x1a, IF_X32|IF_F3|IF_MODRM, "bndcl\t" OP_RM32 OP_RBND),
+//TODO:	I(0x1a, IF_X64|IF_F3|IF_MODRM, "bndcl\t" OP_RM64 OP_RBND),
+//TODO:	I(0x1a, IF_MODRM,              "bndldx\t" OP_RMBND_RANGE OP_RBND),
+//TODO:	I(0x1a, IF_66|IF_MODRM,        "bndmov\t" OP_RMBND OP_RBND),
+//TODO:	I(0x1b, IF_X32|IF_F2|IF_MODRM, "bndcn\t" OP_RM32 OP_RBND),
+//TODO:	I(0x1b, IF_X64|IF_F2|IF_MODRM, "bndcn\t" OP_RM64 OP_RBND),
+//TODO:	I(0x1b, IF_66|IF_MODRM,        "bndmov\t" OP_RBND OP_RMBND),
+//TODO:	I(0x1b, IF_X32|IF_F3|IF_MODRM, "bndmk\t" OP_RM32 OP_RBND),
+//TODO:	I(0x1b, IF_X64|IF_F3|IF_MODRM, "bndmk\t" OP_RM64 OP_RBND),
+
+//TODO:	I(0x20, IF_X32|IF_MODRM|IF_RMR,"movl\t" OP_RCR OP_RM32),
+//TODO:	I(0x20, IF_X64|IF_MODRM|IF_RMR,"movq\t" OP_RCR OP_RM64),
+//TODO:	I(0x21, IF_X32|IF_MODRM|IF_RMR,"movl\t" OP_RDR OP_RM32),
+//TODO:	I(0x21, IF_X64|IF_MODRM|IF_RMR,"movq\t" OP_RDR OP_RM64),
+//TODO:	I(0x22, IF_X32|IF_MODRM|IF_RMR,"movl\t" OP_RM32 OP_RCR),
+//TODO:	I(0x22, IF_X64|IF_MODRM|IF_RMR,"movq\t" OP_RM64 OP_RCR),
+//TODO:	I(0x23, IF_X32|IF_MODRM|IF_RMR,"movl\t" OP_RM32 OP_RDR),
+//TODO:	I(0x23, IF_X64|IF_MODRM|IF_RMR,"movq\t" OP_RM64 OP_RDR),
+
+//TODO:	I(0x24, IF_MODRM|IF_RMR,  "movl\t" OP_RTR OP_RM32),
+//TODO:	I(0x26, IF_MODRM|IF_RMR,  "movl\t" OP_RM32 OP_RTR),
+
+//TODO:	I(0xc3, IF_MODRM|IF_RMM,        "movntil\t" OP_R32 OP_RM32),
+//TODO:	I(0xc3, IF_MODRM|IF_REXW|IF_RMM,"movntiq\t" OP_R64 OP_RM64),
+
+//TODO:	I(0x80, IF_X32|IF_66|IF_MODRM|IF_RMM,"inveptl\t" OP_MEM OP_R32),
+//TODO:	I(0x80, IF_X64|IF_66|IF_MODRM|IF_RMM,"inveptq\t" OP_MEM OP_R64),
+//TODO:	I(0x81, IF_X32|IF_66|IF_MODRM|IF_RMM,"invvpidl\t" OP_MEM OP_R32),
+//TODO:	I(0x81, IF_X64|IF_66|IF_MODRM|IF_RMM,"invvpidq\t" OP_MEM OP_R64),
+//TODO:	I(0x82, IF_X32|IF_66|IF_MODRM|IF_RMM,"invpcidl\t" OP_MEM OP_R32),
+//TODO:	I(0x82, IF_X64|IF_66|IF_MODRM|IF_RMM,"invpcidq\t" OP_MEM OP_R64),
+
+
 			/* TODO: XOP instructions (from AMD):
 			 *    BLCFILL reg32, reg/mem32             8F RXB.09 0.dest.0.00 01 /1
 			 *    BLCFILL reg64, reg/mem64             8F RXB.09 1.dest.0.00 01 /1
@@ -3227,7 +3262,10 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 			 */
 
 			/* TODO: Go through all instructions and add LOCK-missing assertions.
-			 *       The following is a list of all instructions that allow for a lock prefix */
+			 *       The following is a list of all instructions that allow for a lock prefix
+			 *  XXX: Better check for lock-prefix before the opcode-switch, and fault for
+			 *       any instruction that isn't part of this list (there are _way_ more
+			 *       instructions without atomic support, than there are with atomic support) */
 			/* 0F BB     BTC r/m16, r16     Store selected bit in CF flag and complement */
 			/* 0F BB     BTC r/m32, r32     Store selected bit in CF flag and complement */
 			/* 0F B3     BTR r/m16, r16     Store selected bit in CF flag and clear */
