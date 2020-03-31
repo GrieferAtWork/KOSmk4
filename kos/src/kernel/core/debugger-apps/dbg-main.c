@@ -480,7 +480,7 @@ again_readline:
 			cmdline[0] = '\0';
 			/* Switch back to the latest entry in the backlog */
 			cmdline_current = cmdline_latest;
-continue_readline_sol:
+/*continue_readline_sol:*/
 			cursor_pos = screen_left = 0;
 continue_readline:
 			field_width = dbg_screen_width - DBG_GETCUR_X(cur);
@@ -521,14 +521,17 @@ continue_readline:
 				return; /* Exit (logout) */
 
 			case DBG_EDITFIELD_RETURN_UP:
-				if (!cmdline_backlog_prev())
-					goto continue_readline;
-				goto continue_readline_sol;
+				if (cmdline_backlog_prev()) {
+continue_readline_eol:
+					cursor_pos  = strlen(cmdline);
+					screen_left = 0;
+				}
+				goto continue_readline;
 
 			case DBG_EDITFIELD_RETURN_DOWN:
-				if (!cmdline_backlog_next())
-					goto continue_readline;
-				goto continue_readline_sol;
+				if (cmdline_backlog_next())
+					goto continue_readline_eol;
+				goto continue_readline;
 
 			default:
 				goto continue_readline;
