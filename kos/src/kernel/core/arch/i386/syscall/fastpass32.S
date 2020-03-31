@@ -21,16 +21,18 @@
 #define GUARD_KERNEL_CORE_ARCH_I386_SYSCALL_FASTPASS32_S 1
 
 #include <hybrid/compiler.h>
-#include <kernel/syscall.h>
-#include <kernel/syscall-tables.h>
-#include <syscall.h>
 
-#include <kos/kernel/gdt.h>
-#include <kos/kernel/cpu-state.h>
-#include <kos/kernel/paging.h>
+#include <kernel/arch/syscall-tables.h>
+#include <kernel/syscall.h>
+
 #include <asm/cfi.h>
 #include <asm/cpu-flags.h>
+#include <kos/kernel/cpu-state.h>
+#include <kos/kernel/gdt.h>
+#include <kos/kernel/paging.h>
+
 #include <fcntl.h>
+#include <syscall.h>
 
 #ifndef __INTELLISENSE__
 #define SYSCALL_DEFMODE_INT80 1

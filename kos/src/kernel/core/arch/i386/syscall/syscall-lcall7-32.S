@@ -22,7 +22,7 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/syscall-tables.h>
+#include <kernel/arch/syscall-tables.h> /* CONFIG_X86_EMULATE_LCALL7 */
 
 #include <asm/cfi.h>
 #include <asm/cpu-flags.h>

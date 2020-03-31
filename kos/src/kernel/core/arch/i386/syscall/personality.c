@@ -23,12 +23,12 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/arch/syscall-info.h>
+#include <kernel/arch/syscall-tables.h> /* CONFIG_X86_EMULATE_LCALL7 */
 #include <kernel/except.h>
 #include <kernel/paging.h>
 #include <kernel/syscall-properties.h>
-#include <kernel/syscall-tables.h>
 #include <kernel/syscall.h>
-#include <kernel/syscall-info.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <sched/except-handler.h>

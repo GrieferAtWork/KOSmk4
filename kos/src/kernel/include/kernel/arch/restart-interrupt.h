@@ -17,23 +17,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_KERNEL_SERIAL_H
-#define GUARD_KERNEL_INCLUDE_KERNEL_SERIAL_H 1
+#ifndef GUARD_KERNEL_INCLUDE_KERNEL_ARCH_RESTART_INTERRUPT_H
+#define GUARD_KERNEL_INCLUDE_KERNEL_ARCH_RESTART_INTERRUPT_H 1
 
 #include <kernel/compiler.h>
-#include <kernel/types.h>
-#include <kos/io/serial.h>
-#include <sys/io.h>
 
-DECL_BEGIN
+/* ... */
 
-#ifdef __CC__
-
-/* Probe for a serial port with the given base address. */
-FUNDEF bool KCALL serial_probe(port_t base);
-
-#endif /* __CC__ */
-
-DECL_END
-
-#endif /* !GUARD_KERNEL_INCLUDE_KERNEL_SERIAL_H */
+#endif /* !GUARD_KERNEL_INCLUDE_KERNEL_ARCH_RESTART_INTERRUPT_H */

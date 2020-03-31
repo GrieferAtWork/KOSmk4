@@ -65,8 +65,15 @@ if (gcc_opt.remove("-O3"))
 
 DECL_BEGIN
 
-#define LOG_STACK_REMAINDER 1
+DATDEF bool const _kernel_poisoned;
+DATDEF bool __kernel_poisoned ASMNAME("_kernel_poisoned");
+PUBLIC bool __kernel_poisoned = false;
 
+
+#undef LOG_STACK_REMAINDER
+#if 1
+#define LOG_STACK_REMAINDER 1
+#endif
 
 LOCAL ATTR_COLDTEXT NOBLOCK void
 NOTHROW(KCALL fixup_uninitialized_thread)(struct task *__restrict thread) {
@@ -94,6 +101,12 @@ NOTHROW(KCALL fixup_potential_system_inconsistencies)(void) {
 	    mythread != &_asyncwork &&
 	    mythread != &_bootidle && mythread != NULL)
 		fixup_uninitialized_thread(mythread);
+	/* Poison the kernel (indicating that the kernel has become
+	 * inconsistent, and can no longer be trusted to sporadically
+	 * crash and burn) */
+	COMPILER_WRITE_BARRIER();
+	__kernel_poisoned = true;
+	COMPILER_WRITE_BARRIER();
 }
 
 
@@ -342,6 +355,7 @@ panic_assert_chk_dbg_main(void *arg) {
 		uintptr_t acheck_result;
 handle_retry_or_ignore:
 		acheck_result = option == ASSERTION_OPTION_RETRY ? 1 : 0;
+		/* Select the current thread as target for register accessors. */
 		dbg_current = THIS_TASK;
 		/* TODO: Make this part arch-independent */
 #ifdef __x86_64__

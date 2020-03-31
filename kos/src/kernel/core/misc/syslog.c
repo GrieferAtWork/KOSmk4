@@ -74,15 +74,16 @@ PUBLIC_CONST char const syslog_level_names[SYSLOG_LEVEL_COUNT][8] = {
 /* Destroy the given syslog sink */
 PUBLIC ATTR_COLDTEXT NOBLOCK void
 NOTHROW(KCALL syslog_sink_destroy)(struct syslog_sink *__restrict self) {
-	if (self->ss_fini)
-		(*self->ss_fini)(self);
 	/* Check for kernel poisoning, since the syslog must
 	 * continue working normally even after panic() or assert().
 	 * HINT: This is also the reason why you shouldn't add any
-	 *       assertion checks to this file and write code that
-	 *       shouldn't contain any undefined behavior. */
-	if likely(!kernel_poisoned())
+	 *       assertion checks to functions that may be called by
+	 *       printk() (as this function ~can~ be called by printk) */
+	if likely(!kernel_poisoned()) {
+		if (self->ss_fini)
+			(*self->ss_fini)(self);
 		kfree(self);
+	}
 }
 
 

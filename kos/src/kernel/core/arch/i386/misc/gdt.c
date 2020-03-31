@@ -23,8 +23,8 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/arch/syscall-tables.h> /* CONFIG_X86_EMULATE_LCALL7 */
 #include <kernel/gdt.h>
-#include <kernel/syscall-tables.h>
 #include <kernel/vm.h>
 #include <sched/pertask.h>
 #include <sched/task.h>

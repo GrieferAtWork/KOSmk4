@@ -28,29 +28,39 @@ DECL_BEGIN
 #ifdef __CC__
 
 /* Generate and return a 32-bit, pseudo-random integer. */
-FUNDEF NOBLOCK WUNUSED u32 NOTHROW(KCALL krand32)(void);
-FUNDEF NOBLOCK WUNUSED u32 NOTHROW(KCALL krand32_r)(u32 *__restrict pseed);
+FUNDEF NOBLOCK WUNUSED ATTR_LEAF u32
+NOTHROW(KCALL krand32)(void);
 
-LOCAL NOBLOCK WUNUSED u64 NOTHROW(KCALL krand64)(void) {
+/* Same as `krand32()', but use `*pseed' instead of `krand_seed'
+ * WARNING: Unlike `krand32()', `*pseed' is _NOT_ modified atomically!
+ *          This means that `krand32_r(&krand_seed)' is _NOT_ equal to
+ *          a call to `krand32()', since the call would result in weak
+ *          undefined behavior when called from multiple threads at
+ *          the same time */
+FUNDEF NOBLOCK WUNUSED ATTR_LEAF NONNULL((1)) u32
+NOTHROW(KCALL krand32_r)(u32 *__restrict pseed);
+
+LOCAL NOBLOCK WUNUSED ATTR_LEAF u64 NOTHROW(KCALL krand64)(void) {
 	return (u64)krand32() | (u64)krand32() << 32;
 }
 
+/* Produce a pointer-sized random number. */
 #ifdef __INTELLISENSE__
 FUNDEF NOBLOCK WUNUSED uintptr_t NOTHROW(KCALL krand)(void);
 #elif __SIZEOF_POINTER__ <= 4
 #define krand() krand32()
-#else
+#else /* ... */
 #define krand() krand64()
-#endif
+#endif /* !... */
 
+/* Produce a random number with at least as many bits as also found in `T' */
 #ifdef __NO_builtin_choose_expr
 #define KRAND(T) (sizeof(T) <= 4 ? krand32() : krand64())
 #else /* __NO_builtin_choose_expr */
 #define KRAND(T) __builtin_choose_expr(sizeof(T) <= 4, krand32(), krand64())
 #endif /* !__NO_builtin_choose_expr */
 
-
-/* The current kernel seed. */
+/* The current kernel seed. (modified by `krand(|32|64)') */
 DATDEF WEAK u32 krand_seed;
 
 #endif /* __CC__ */

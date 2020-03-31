@@ -25,6 +25,7 @@
 
 #include <fs/vfs.h>
 #include <kernel/apic.h>
+#include <kernel/arch/syscall-tables.h> /* CONFIG_X86_EMULATE_LCALL7 */
 #include <kernel/except.h>
 #include <kernel/gdt.h>
 #include <kernel/handle.h>
@@ -33,7 +34,6 @@
 #include <kernel/pic.h>
 #include <kernel/pit.h>
 #include <kernel/printk.h>
-#include <kernel/syscall-tables.h>
 #include <kernel/syscall.h>
 #include <kernel/user.h>
 #include <sched/async.h>

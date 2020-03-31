@@ -25,11 +25,11 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/arch/syscall-tables.h>
 #include <kernel/gdt.h>
 #include <kernel/idt.h>
 #include <kernel/multiboot.h>
 #include <kernel/paging.h>
-#include <kernel/syscall-tables.h>
 #include <sched/tss.h>
 
 #include <hybrid/align.h>

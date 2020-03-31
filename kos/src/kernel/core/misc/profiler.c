@@ -23,11 +23,164 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/driver.h>
+#include <kernel/except.h>
 #include <kernel/printk.h>
 #include <kernel/profiler.h>
 #include <kernel/types.h>
 
+#include <string.h>
+
 DECL_BEGIN
+
+/* Branch predictions for the kernel core. */
+INTDEF ATTR_WEAK struct branch_prediction kernel_profile_branch_start[];
+INTDEF ATTR_WEAK struct branch_prediction kernel_profile_branch_end[];
+INTDEF ATTR_WEAK struct branch_prediction kernel_profile_branch_annotated_start[];
+INTDEF ATTR_WEAK struct branch_prediction kernel_profile_branch_annotated_end[];
+
+
+/* Invoke `cb()' for all traced branches from all drivers, as well as the kernel core.
+ * NOTE: Branch enumeration is sorted by individual drivers, in that all branches of
+ *       one driver are enumerated before any branch from another driver is enumerated.
+ *       The order in which branches of individual drivers are enumerated is undefined,
+ *       however any branch will only ever be enumerated once. Similarly, the order in
+ *       which individual drivers are enumerated is also undefined.
+ * @param: cb:    The callback to-be invoked.
+ * @param: arg:   Argument passed to `cb()'
+ * @return: >= 0: The sum of all return values returned by `cb()'
+ * @return: < 0:  The first negative return value returned by `cb()' */
+PUBLIC NONNULL((1)) ssize_t KCALL
+branchstat(branchstat_callback_t cb, void *arg) {
+	ssize_t result;
+	/* Enumerate the kernel core. */
+	result = branchstat_d(cb, arg, &kernel_driver);
+	if likely(result >= 0) {
+		REF struct driver_state *ds;
+		size_t i;
+		/* Enumerate all loaded drivers. */
+		ds = driver_get_state();
+		FINALLY_DECREF_UNLIKELY(ds);
+		for (i = 0; i < ds->ds_count; ++i) {
+			ssize_t temp;
+			temp = branchstat_d(cb, arg, ds->ds_drivers[i]);
+			if unlikely(temp < 0) {
+				result = temp;
+				break;
+			}
+			result += temp;
+		}
+	}
+	return result;
+}
+
+PRIVATE NONNULL((1, 3)) ssize_t KCALL
+branchstat_listone(branchstat_callback_t cb, void *arg,
+                   struct driver *__restrict mod,
+                   struct branch_prediction const *__restrict pred,
+                   bool annotated, bool is_driver) {
+	ssize_t result;
+	struct branch_prediction used_pred;
+	memcpy(&used_pred, pred, sizeof(used_pred));
+	/* In drivers, branch predictions contain driver-relative addresses.
+	 * Hide this detail from `cb()' and pass a relocated copy of `pred' */
+	if (is_driver) {
+		used_pred.bp_addr = (__BRANCH_PREDITION_ADDRESS_TYPE)((uintptr_t)used_pred.bp_addr +
+		                                                      mod->d_loadaddr);
+	}
+	result = (*cb)(arg, mod, &used_pred, annotated);
+	return result;
+}
+
+PRIVATE NONNULL((1, 3)) ssize_t KCALL
+branchstat_list(branchstat_callback_t cb, void *arg,
+                struct driver *__restrict mod,
+                struct branch_prediction const *start,
+                struct branch_prediction const *end,
+                bool annotated, bool is_driver) {
+	ssize_t temp, result = 0;
+	struct branch_prediction const *iter, *next;
+	for (iter = start;;) {
+		/* Make sure that the branch prediction doesn't go out-of-bounds! */
+		next = iter + 1;
+		if (next >= end)
+			break;
+		/* Enumerate this prediction entry. */
+		temp = branchstat_listone(cb, arg, mod, iter,
+		                          annotated, is_driver);
+		if unlikely(temp < 0)
+			goto err;
+		result += temp;
+		iter = next;
+	}
+	return result;
+err:
+	return temp;
+}
+
+
+PRIVATE NONNULL((1, 3, 4)) ssize_t KCALL
+branchstat_listsection(branchstat_callback_t cb, void *arg,
+                       struct driver *__restrict mod,
+                       struct driver_section *__restrict sect,
+                       bool annotated, bool is_driver) {
+	ssize_t result;
+	/* Enumerate all entires contains within the given section. */
+	result = branchstat_list(cb, arg, mod,
+	                         (struct branch_prediction *)((byte_t *)sect->ds_data),
+	                         (struct branch_prediction *)((byte_t *)sect->ds_data + sect->ds_size),
+	                         annotated, is_driver);
+	return result;
+}
+
+/* Same as `branchstat()', but only invoke `cb()' for branches listed by `mod' */
+PUBLIC NONNULL((1, 3)) ssize_t KCALL
+branchstat_d(branchstat_callback_t cb, void *arg,
+             struct driver *__restrict mod) {
+	ssize_t temp, result;
+	if (mod == &kernel_driver) {
+		/* Special handling for the kernel driver. */
+		result = branchstat_list(cb, arg, &kernel_driver,
+		                         kernel_profile_branch_start,
+		                         kernel_profile_branch_end,
+		                         false, false);
+		if likely(result >= 0) {
+			temp = branchstat_list(cb, arg, &kernel_driver,
+			                       kernel_profile_branch_annotated_start,
+			                       kernel_profile_branch_annotated_end,
+			                       true, false);
+			if unlikely(temp < 0)
+				goto err;
+			result += temp;
+		}
+	} else {
+		REF struct driver_section *sect;
+		result = 0;
+		/* Lock the individual sections. */
+		sect = driver_section_lock(mod, BRANCH_PREDICTION_SECTION,
+		                           DRIVER_SECTION_LOCK_FNORMAL);
+		if (sect) {
+			FINALLY_DECREF(sect);
+			temp = branchstat_listsection(cb, arg, mod, sect, false, true);
+			if unlikely(temp < 0)
+				goto err;
+			result += temp;
+		}
+		sect = driver_section_lock(mod, BRANCH_PREDICTION_SECTION_ANNOTATED,
+		                           DRIVER_SECTION_LOCK_FNORMAL);
+		if (sect) {
+			FINALLY_DECREF(sect);
+			temp = branchstat_listsection(cb, arg, mod, sect, true, true);
+			if unlikely(temp < 0)
+				goto err;
+			result += temp;
+		}
+	}
+	return result;
+err:
+	return temp;
+}
+
 
 PRIVATE void KCALL
 dump_branch_stats_for(struct branch_prediction *start,

@@ -23,10 +23,10 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/arch/syscall-info.h>
+#include <kernel/arch/syscall-tables.h>
 #include <kernel/except.h>
-#include <kernel/syscall-info.h>
 #include <kernel/syscall-properties.h>
-#include <kernel/syscall-tables.h>
 #include <kernel/syscall.h>
 #include <kernel/user.h>
 #include <sched/except-handler.h>

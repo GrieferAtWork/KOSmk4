@@ -22,11 +22,22 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/arch/restart-interrupt.h>
+
 DECL_BEGIN
+
+#ifndef KERNEL_INTERRUPT_CALLBACK_CC
+#define KERNEL_INTERRUPT_CALLBACK_CC FCALL
+#endif /* !KERNEL_INTERRUPT_CALLBACK_CC */
 
 #ifdef __CC__
 
-typedef struct icpustate *(FCALL *kernel_interrupt_callback_t)(struct icpustate *__restrict state);
+/* Callback prototype for `kernel_restart_interrupt()' */
+#ifndef __kernel_interrupt_callback_t_defined
+#define __kernel_interrupt_callback_t_defined 1
+typedef struct icpustate *
+(KERNEL_INTERRUPT_CALLBACK_CC *kernel_interrupt_callback_t)(struct icpustate *__restrict state);
+#endif /* !__kernel_interrupt_callback_t_defined */
 
 /* Hard-set the current stack depth to `start' and invoke `cb()' by passing `state' to it.
  * Once `cb()' returns, the cpu state returned by it is loaded, and execution is resumed.
@@ -35,9 +46,12 @@ typedef struct icpustate *(FCALL *kernel_interrupt_callback_t)(struct icpustate 
  *          function does not return in any way that is observable to the caller.
  *          Rather, it behaves similar to `longjmp()', in that `cb()' is made to return to
  *          the origin of `state' after being injected ontop of that location. */
-FUNDEF ATTR_NORETURN void FCALL
+#ifndef __kernel_restart_interrupt_defined
+#define __kernel_restart_interrupt_defined 1
+FUNDEF ATTR_NORETURN void KERNEL_INTERRUPT_CALLBACK_CC
 kernel_restart_interrupt(struct icpustate *__restrict state,
                          kernel_interrupt_callback_t cb);
+#endif /* !__kernel_restart_interrupt_defined */
 
 #endif /* __CC__ */
 

@@ -43,7 +43,8 @@ PRIVATE u32 const rand_map[] = {
 };
 
 /* Generate and return a 32-bit, pseudo-random integer. */
-PUBLIC NOBLOCK WUNUSED u32 NOTHROW(KCALL krand32)(void) {
+PUBLIC NOBLOCK WUNUSED ATTR_LEAF u32
+NOTHROW(KCALL krand32)(void) {
 	u32 old_seed, new_seed;
 	do {
 		new_seed = old_seed = ATOMIC_READ(krand_seed);
@@ -53,7 +54,13 @@ PUBLIC NOBLOCK WUNUSED u32 NOTHROW(KCALL krand32)(void) {
 	return old_seed;
 }
 
-PUBLIC NOBLOCK WUNUSED u32
+/* Same as `krand32()', but use `*pseed' instead of `krand_seed'
+ * WARNING: Unlike `krand32()', `*pseed' is _NOT_ modified atomically!
+ *          This means that `krand32_r(&krand_seed)' is _NOT_ equal to
+ *          a call to `krand32()', since the call would result in weak
+ *          undefined behavior when called from multiple threads at
+ *          the same time */
+PUBLIC NOBLOCK WUNUSED ATTR_LEAF NONNULL((1)) u32
 NOTHROW(KCALL krand32_r)(u32 *__restrict pseed) {
 	u32 old_seed, new_seed;
 	new_seed = old_seed = *pseed;

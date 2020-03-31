@@ -71,14 +71,6 @@ struct branch_prediction {
 #define BRANCH_PREDICTION_SECTION             ".data.profile_branch"
 #define BRANCH_PREDICTION_SECTION_ANNOTATED   ".data.profile_branch_annotated"
 
-#ifdef CONFIG_BUILDING_KERNEL_CORE
-/* Branch predictions for the kernel core. */
-INTDEF struct branch_prediction kernel_profile_branch_start[];
-INTDEF struct branch_prediction kernel_profile_branch_end[];
-INTDEF struct branch_prediction kernel_profile_branch_annotated_start[];
-INTDEF struct branch_prediction kernel_profile_branch_annotated_end[];
-#endif /* CONFIG_BUILDING_KERNEL_CORE */
-
 struct branch_stat_group {
 	size_t                    g_cover_reach; /* Number of reached branches */
 	size_t                    g_cover_total; /* Total number of known branches */
@@ -98,8 +90,42 @@ struct branch_stat {
 };
 
 
+/* Callback for `branchstat()'
+ * @param: arg:       The argument given to `branchstat()'
+ * @param: mod:       The driver containing `pred' (may also be `&kernel_driver')
+ * @param: pred:      The branch prediction being enumerated.
+ * @param: annotated: `true' if the branch was annotated with `likely()' or `unlikely()'.
+ * @return: >= 0: Add all positive return values together and re-return from `branchstat()'
+ * @return: < 0:  Immediatly propagate a negative return value */
+typedef NONNULL((2, 3)) ssize_t
+(KCALL *branchstat_callback_t)(void *arg,
+                               struct driver *__restrict mod,
+                               struct branch_prediction const *__restrict pred,
+                               bool annotated);
+
+/* Invoke `cb()' for all traced branches from all drivers, as well as the kernel core.
+ * NOTE: Branch enumeration is sorted by individual drivers, in that all branches of
+ *       one driver are enumerated before any branch from another driver is enumerated.
+ *       The order in which branches of individual drivers are enumerated is undefined,
+ *       however any branch will only ever be enumerated once. Similarly, the order in
+ *       which individual drivers are enumerated is also undefined.
+ * @param: cb:    The callback to-be invoked.
+ * @param: arg:   Argument passed to `cb()'
+ * @return: >= 0: The sum of all return values returned by `cb()'
+ * @return: < 0:  The first negative return value returned by `cb()' */
+FUNDEF NONNULL((1)) ssize_t KCALL
+branchstat(branchstat_callback_t cb, void *arg);
+
+/* Same as `branchstat()', but only invoke `cb()' for branches listed by `mod' */
+FUNDEF NONNULL((1, 3)) ssize_t KCALL
+branchstat_d(branchstat_callback_t cb, void *arg,
+             struct driver *__restrict mod);
+
+
+
 /* Dump branch statistics on each traced branch to printk(KERN_RAW) */
 FUNDEF void KCALL dump_branch_stats(void);
+
 
 
 

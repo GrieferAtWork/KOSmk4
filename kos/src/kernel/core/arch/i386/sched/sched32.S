@@ -24,13 +24,13 @@
 
 #include <debugger/config.h>
 #include <kernel/apic.h>
+#include <kernel/arch/syscall-tables.h>
 #include <kernel/breakpoint.h>
 #include <kernel/except.h>
 #include <kernel/fpu.h>
 #include <kernel/gdt.h>
 #include <kernel/pic.h>
 #include <kernel/pit.h>
-#include <kernel/syscall-tables.h>
 #include <kernel/syscall.h>
 #include <sched/task.h>
 #include <sched/tss.h>

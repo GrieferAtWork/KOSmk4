@@ -25,6 +25,7 @@
 
 DECL_BEGIN
 
+/* Level prefix strings for use with `printk()' */
 #define KERN_EMERG   "\001" "0" /* s.a. `SYSLOG_LEVEL_EMERG' */
 #define KERN_ALERT   "\001" "1" /* s.a. `SYSLOG_LEVEL_ALERT' */
 #define KERN_CRIT    "\001" "2" /* s.a. `SYSLOG_LEVEL_CRIT' */
@@ -41,7 +42,8 @@ DECL_BEGIN
 /* Print formatted system log message:
  * >> printk(KERN_DEBUG "Hello %s!\n", "World");
  * Same as:
- * >> format_printf(&syslog_printer, SYSLOG_LEVEL_DEBUG, "Hello %s!\n", "World"); */
+ * >> format_printf(&syslog_printer, SYSLOG_LEVEL_DEBUG, "Hello %s!\n", "World");
+ * HINT: These functions can safely be called from _any_ context! */
 FUNDEF NOBLOCK ssize_t (VCALL printk)(char const *__restrict format, ...);
 FUNDEF NOBLOCK ssize_t (KCALL vprintk)(char const *__restrict format, __builtin_va_list args);
 #endif /* __CC__ */
