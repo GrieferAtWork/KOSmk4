@@ -23,11 +23,13 @@
 
 #include <kernel/compiler.h>
 
+#include <debugger/rt.h>
 #include <kernel/except.h>
 #include <kernel/idt-foreach.h>
 #include <kernel/idt.h>
 #include <kernel/isr.h>
 #include <kernel/malloc.h>
+#include <kernel/printk.h>
 #include <kernel/types.h>
 #include <sched/cpu.h>
 #include <sched/shared_rwlock.h>
@@ -125,6 +127,8 @@ NOTHROW(FCALL x86_idt_setcurrent_ipi)(struct icpustate *__restrict state,
                                       void *args[CPU_IPI_ARGCOUNT]) {
 	__lidt_p(args[0]);
 	ATOMIC_FETCHINC(x86_idt_setcurrent_ack);
+	printk(KERN_DEBUG "[idt#%u] Acknowledge new IDT\n",
+	       THIS_CPU->c_id);
 	return state;
 }
 #endif /* !CONFIG_NO_SMP */
@@ -162,8 +166,10 @@ NOTHROW(FCALL x86_idt_setcurrent)(struct desctab const *__restrict ptr) {
 			task_pause();
 	}
 #endif /* !CONFIG_NO_SMP */
-	/* Finally, apply the new IDT within the calling CPU. */
-	__lidt_p(ptr);
+	if (!dbg_active) {
+		/* Finally, apply the new IDT within the calling CPU. */
+		__lidt_p(ptr);
+	}
 	COMPILER_BARRIER();
 }
 
@@ -201,6 +207,10 @@ PUBLIC ATTR_COLDTEXT void FCALL x86_idt_modify_begin(void)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INTERRUPT) {
 	struct idt_segment *copy;
 	struct desctab dt;
+#ifdef CONFIG_HAVE_DEBUGGER
+	if unlikely(dbg_active)
+		return; /* no-op */
+#endif /* CONFIG_HAVE_DEBUGGER */
 	copy = (struct idt_segment *)kmalloc(256 * sizeof(struct idt_segment),
 	                                     GFP_LOCKED | GFP_PREFLT);
 	TRY {
@@ -222,6 +232,14 @@ PUBLIC ATTR_COLDTEXT void FCALL x86_idt_modify_begin(void)
 PUBLIC ATTR_COLDTEXT NOBLOCK void
 NOTHROW(FCALL x86_idt_modify_end)(bool discard_changes) {
 	struct idt_segment *copy;
+#ifdef CONFIG_HAVE_DEBUGGER
+	if unlikely(dbg_active) {
+		assert(!discard_changes);
+		/* Simply force an IDT re-load */
+		x86_idt_setcurrent(&x86_idt_ptr);
+		return;
+	}
+#endif /* CONFIG_HAVE_DEBUGGER */
 	assert(sync_writing(&x86_idt_modify_lock));
 	assert(x86_idt_modify_copy);
 	copy = x86_idt_modify_copy;

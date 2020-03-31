@@ -64,9 +64,12 @@ struct dbg_entry_info {
 		size_t      ei_argc;       /* Number of pointer-arguments taken by `ei_entry' */ \
 	}
 
+#ifndef __dbg_active_defined
+#define __dbg_active_defined 1
 /* Set to true while the debugger is currently active.
  * NOTE: This variable may be used to test if the system is being debugged. */
 DATDEF bool dbg_active;
+#endif /* !__dbg_active_defined */
 
 /* The default debugger main entry function.
  * This function is used as entry when `dbg()' is
@@ -173,6 +176,11 @@ FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 4)) struct scpustate *FCALL dbg_en
 #endif /* __CC__ */
 
 DECL_END
-#endif /* CONFIG_HAVE_DEBUGGER */
+#else /* CONFIG_HAVE_DEBUGGER */
+#ifndef __dbg_active_defined
+#define __dbg_active_defined 1
+#define dbg_active 0
+#endif /* !__dbg_active_defined */
+#endif /* !CONFIG_HAVE_DEBUGGER */
 
 #endif /* !GUARD_KERNEL_INCLUDE_DEBUGGER_ENTRY_H */

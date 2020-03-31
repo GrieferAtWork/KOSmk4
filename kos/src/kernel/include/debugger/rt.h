@@ -45,9 +45,12 @@ DECL_BEGIN
 /* The stack from which debug code is executed. */
 DATDEF byte_t dbg_stack[KERNEL_DEBUG_STACKSIZE];
 
+#ifndef __dbg_active_defined
+#define __dbg_active_defined 1
 /* Set to true while the debugger is currently active.
  * NOTE: This variable may be used to test if the system is being debugged. */
 DATDEF bool dbg_active;
+#endif /* !__dbg_active_defined */
 
 /* [1..1] The thread that is currently being viewed. */
 DATDEF struct task *dbg_current;
@@ -149,6 +152,11 @@ FUNDEF ATTR_PURE WUNUSED bool NOTHROW(FCALL dbg_changedview)(void);
 #endif /* __CC__ */
 
 DECL_END
-#endif /* CONFIG_HAVE_DEBUGGER */
+#else /* CONFIG_HAVE_DEBUGGER */
+#ifndef __dbg_active_defined
+#define __dbg_active_defined 1
+#define dbg_active 0
+#endif /* !__dbg_active_defined */
+#endif /* !CONFIG_HAVE_DEBUGGER */
 
 #endif /* !GUARD_KERNEL_INCLUDE_DEBUGGER_RT_H */

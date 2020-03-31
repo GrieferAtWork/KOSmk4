@@ -23,9 +23,11 @@
 
 #include <kernel/compiler.h>
 
+#include <debugger/function.h>
+#include <debugger/io.h>
+#include <kernel/arch/cpuid.h>
 #include <kernel/arch/isr.h>
 #include <kernel/coredump.h>
-#include <kernel/arch/cpuid.h>
 #include <kernel/debugtrap.h>
 #include <kernel/except.h>
 #include <kernel/idt.h>
@@ -96,7 +98,6 @@ NOTHROW(FCALL syscall_tracing_ipi)(struct icpustate *__restrict state,
 		                : (u64)&x86_syscall64_syscall);
 	}
 #endif /* __x86_64__ */
-	__lidt_p(&x86_idt_ptr);
 	return state;
 }
 #endif /* !CONFIG_NO_SMP */
@@ -212,9 +213,9 @@ PUBLIC bool KCALL syscall_tracing_setenabled(bool enable) {
 		               : (u64)&x86_syscall64_syscall);
 	}
 #endif /* __x86_64__ */
-	__lidt_p(&x86_idt_ptr);
 	return result;
 }
+
 /* Check if system call tracing is enabled. */
 PUBLIC WUNUSED bool
 NOTHROW(KCALL syscall_tracing_getenabled)(void) {
@@ -248,6 +249,33 @@ NOTHROW(KCALL x86_initialize_sysenter)(void) {
 	}
 #endif /* __x86_64__ */
 }
+
+#ifdef CONFIG_HAVE_DEBUGGER
+DEFINE_DEBUG_FUNCTION(
+		"sctrace",
+		"sctrace [0|1]\n"
+		"\tGet or set system call tracing\n"
+		, argc, argv) {
+	bool enabled;
+	if (argc == 1) {
+		enabled = syscall_tracing_getenabled();
+		dbg_print(enabled ? DBGSTR("enabled\n") : DBGSTR("disabled\n"));
+		return enabled ? 0 : 1;
+	}
+	if (argc != 2)
+		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	if (strcmp(argv[1], DBGSTR("1")) == 0) {
+		enabled = true;
+	} else if (strcmp(argv[1], DBGSTR("0")) == 0) {
+		enabled = false;
+	} else {
+		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	}
+	syscall_tracing_setenabled(enabled);
+	return 0;
+}
+#endif /* CONFIG_HAVE_DEBUGGER */
+
 
 DECL_END
 
