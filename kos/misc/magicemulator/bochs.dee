@@ -43,16 +43,15 @@ final global BOCHS_BIOS    = "BIOS-bochs-latest";
 final global BOCHS_VGABIOS = "VGABIOS-lgpl-latest";
 
 function enumerateBochsInstallationLocations(): {string...} {
+	/* Check the bochs version created by `bash kos/misc/make_tool.sh bochs` */
+	yield "binutils/build-bochs-2.6.11";
 #ifdef __WINDOWS__
-	yield "D:\\Bochs-2.6.9\\";
-	yield "C:\\Program Files\\Bochs-2.6.9";
-	yield "C:\\Program Files (x86)\\Bochs-2.6.9";
-	yield "D:\\Bochs-2.6.8\\";
-	yield "C:\\Program Files\\Bochs-2.6.8";
-	yield "C:\\Program Files (x86)\\Bochs-2.6.8";
+	for (local ver: ["2.6.11", "2.6.9", "2.6.8"]) {
+		yield "D:\\Bochs-{}\\".format({ ver });
+		yield "C:\\Program Files\\Bochs-{}".format({ ver });
+		yield "C:\\Program Files (x86)\\Bochs-{}".format({ ver });
+	}
 #endif /* __WINDOWS__ */
-	yield "binutils/bochs-2.6.9";
-	yield "binutils/build-bochs-2.6.9";
 	yield fs.environ["PATH"].split(fs.DELIM)...;
 }
 
@@ -143,7 +142,10 @@ got_bios:
 		rc << "cpuid: level=6, stepping=3, model=3, family=6, vendor_string=\"GenuineIntel\", brand_string=\"BOCHS         Intel(R) Pentium(R) 4 CPU        \"\n";
 		rc << "cpu: count=1, ips=4000000, model=bx_generic, reset_on_triple_fault=0, cpuid_limit_winnt=0, ignore_bad_msrs=1, mwait_is_nop=0\n";
 		rc << "cpuid: mmx=1, apic=xapic, simd=sse2, sse4a=0, misaligned_sse=0, sep=1, movbe=0, adx=0\n";
-		rc << "cpuid: aes=0, sha=0, xsave=0, xsaveopt=0, x86_64=1, 1g_pages=0, pcid=0, fsgsbase=0\n";
+		rc << "cpuid: aes=0, sha=0, xsave=0, xsaveopt=0";
+		if (TARGET_ARCH == "x86_64")
+			rc << ", x86_64=1, 1g_pages=0, pcid=0, fsgsbase=0";
+		rc << "\n";
 		rc << "vga: extension=vbe, update_freq=30, realtime=1\n";
 		rc << "port_e9_hack: enabled=1\n";
 		rc << "clock: sync=none\n";
@@ -151,7 +153,7 @@ got_bios:
 		local gdb_mode = options.get(opt.QEMU_GDB);
 		if (gdb_mode !is none) {
 			if (gdb_mode == "qemu")
-				rc << "gdbstub: enabled=1, port=1234\n";
+				rc << "gdbstub: enabled=1, port=1234, text_base=0, data_base=0, bss_base=0\n";
 			else {
 				throw Error("bochs only supports --gdb=qemu mode");
 			}

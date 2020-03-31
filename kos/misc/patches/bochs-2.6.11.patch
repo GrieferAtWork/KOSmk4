@@ -1,0 +1,120 @@
+diff -Naur bochs-2.6.11-orig/gdbstub.cc bochs-2.6.11/gdbstub.cc
+--- bochs-2.6.11-orig/gdbstub.cc	2017-03-06 22:30:05.467768000 +0100
++++ bochs-2.6.11/gdbstub.cc	2020-03-31 15:33:09.651025300 +0200
+@@ -23,7 +23,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <sys/types.h>
+-#if defined(__MINGW32__) || defined(_MSC_VER)
++#if defined(_WIN32) || defined(__MINGW32__) || defined(_MSC_VER)
+ #include <winsock2.h>
+ #define SIGTRAP 5
+ #else
+@@ -260,7 +260,7 @@
+   unsigned int i;
+   unsigned char ch;
+   int r;
+-#if defined(__CYGWIN__) || defined(__MINGW32__) || defined(_MSC_VER)
++#if defined(__CYGWIN__) || defined(_WIN32) || defined(__MINGW32__) || defined(_MSC_VER)
+   fd_set fds;
+   struct timeval tv = {0, 0};
+ #else
+@@ -278,7 +278,7 @@
+ 
+   if ((instr_count % 500) == 0)
+   {
+-#if defined(__CYGWIN__) || defined(__MINGW32__) || defined(_MSC_VER)
++#if defined(__CYGWIN__) || defined(_WIN32) || defined(__MINGW32__) || defined(_MSC_VER)
+     FD_ZERO(&fds);
+     FD_SET(socket_fd, &fds);
+     r = select(socket_fd + 1, &fds, NULL, NULL, &tv);
+@@ -834,7 +834,7 @@
+ 
+   /* Allow rapid reuse of this port */
+   opt = 1;
+-#if defined(__MINGW32__) || defined(_MSC_VER)
++#if defined(_WIN32) || defined(__MINGW32__) || defined(_MSC_VER)
+   r = setsockopt(listen_socket_fd, SOL_SOCKET, SO_REUSEADDR, (const char *)&opt, sizeof(opt));
+ #else
+   r = setsockopt(listen_socket_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+@@ -883,7 +883,7 @@
+ 
+   /* Disable Nagle - allow small packets to be sent without delay. */
+   opt = 1;
+-#if defined(__MINGW32__) || defined(_MSC_VER)
++#if defined(_WIN32) || defined(__MINGW32__) || defined(_MSC_VER)
+   r = setsockopt (socket_fd, protoent->p_proto, TCP_NODELAY, (const char *)&opt, sizeof(opt));
+ #else
+   r = setsockopt (socket_fd, protoent->p_proto, TCP_NODELAY, &opt, sizeof(opt));
+@@ -905,7 +905,7 @@
+   gdbstub_list = (bx_list_c*) SIM->get_param(BXPN_GDBSTUB);
+   int portn = SIM->get_param_num("port", gdbstub_list)->get();
+ 
+-#if defined(__MINGW32__) || defined(_MSC_VER)
++#if defined(_WIN32) || defined(__MINGW32__) || defined(_MSC_VER)
+   WSADATA wsaData;
+   WSAStartup(2, &wsaData);
+ #endif
+@@ -920,7 +920,7 @@
+   /* CPU loop */
+   bx_cpu.cpu_loop();
+ 
+-#ifdef WIN32
++#if defined(_WIN32) || defined(__MINGW32__) || defined(_MSC_VER)
+   WSACleanup();
+ #endif
+ }
+diff -Naur bochs-2.6.11-orig/gui/sdl.cc bochs-2.6.11/gui/sdl.cc
+--- bochs-2.6.11-orig/gui/sdl.cc	2017-04-04 19:57:44.224165000 +0200
++++ bochs-2.6.11/gui/sdl.cc	2020-03-31 15:33:27.506840300 +0200
+@@ -417,7 +417,7 @@
+ 
+ 
+ #if BX_SHOW_IPS
+-#if defined(__MINGW32__) || defined(_MSC_VER)
++#if defined(_WIN32) || defined(__MINGW32__) || defined(_MSC_VER)
+ Uint32 SDLCALL sdlTimer(Uint32 interval)
+ {
+   bx_show_ips_handler();
+@@ -468,7 +468,7 @@
+ 
+   flags = SDL_INIT_VIDEO;
+ #if BX_SHOW_IPS
+-#if  defined(__MINGW32__) || defined(_MSC_VER)
++#if  defined(_WIN32) || defined(__MINGW32__) || defined(_MSC_VER)
+   flags |= SDL_INIT_TIMER;
+ #endif
+ #endif
+diff -Naur bochs-2.6.11-orig/gui/sdl2.cc bochs-2.6.11/gui/sdl2.cc
+--- bochs-2.6.11-orig/gui/sdl2.cc	2017-04-04 19:57:44.224165000 +0200
++++ bochs-2.6.11/gui/sdl2.cc	2020-03-31 15:33:51.776586800 +0200
+@@ -354,7 +354,7 @@
+ 
+ 
+ #if BX_SHOW_IPS
+-#if defined(__MINGW32__) || defined(_MSC_VER)
++#if defined(_WIN32) || defined(__MINGW32__) || defined(_MSC_VER)
+ Uint32 sdlTimer(Uint32 interval, void *param)
+ {
+   bx_show_ips_handler();
+@@ -386,7 +386,7 @@
+   put("SDL2");
+   flags = SDL_INIT_VIDEO;
+ #if BX_SHOW_IPS
+-#if  defined(__MINGW32__) || defined(_MSC_VER)
++#if  defined(_WIN32) || defined(__MINGW32__) || defined(_MSC_VER)
+   flags |= SDL_INIT_TIMER;
+ #endif
+ #endif
+diff -Naur bochs-2.6.11-orig/main.cc bochs-2.6.11/main.cc
+--- bochs-2.6.11-orig/main.cc	2020-01-02 17:19:02.083668000 +0100
++++ bochs-2.6.11/main.cc	2020-03-31 15:35:56.042828800 +0200
+@@ -1454,7 +1454,7 @@
+ #endif
+ 
+ #if BX_SHOW_IPS
+-#if !defined(__MINGW32__) && !defined(_MSC_VER)
++#if !defined(_WIN32) && !defined(__MINGW32__) && !defined(_MSC_VER)
+   if (!SIM->is_wx_selected()) {
+     alarm(0);
+     signal(SIGALRM, SIG_DFL);

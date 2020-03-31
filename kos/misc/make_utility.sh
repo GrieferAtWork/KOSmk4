@@ -300,12 +300,12 @@ case $UTILITY_NAME in
 				rm -rf 
 				cmd cp -R "${SRCPATH}" "$BINUTILS_SYSROOT/opt/"
 			fi
-			apply_patch "${OPTPATH}" "$KOS_ROOT/kos/misc/patches/busybox-$BUSYBOX_VERISON.patch"
+			apply_patch "${OPTPATH}" "$KOS_PATCHES/busybox-$BUSYBOX_VERISON.patch"
 			cmd cd "${OPTPATH}"
-			PATCH_CONFIG="$KOS_ROOT/kos/misc/patches/busybox.config"
+			PATCH_CONFIG="$KOS_PATCHES/busybox.config"
 			if ! [ -f ".config" ] || [ ".config" -ot "$PATCH_CONFIG" ]; then
 				unlink ".config" > /dev/null 2>&1
-				cmd cp "$KOS_ROOT/kos/misc/patches/busybox.config" ".config"
+				cmd cp "$KOS_PATCHES/busybox.config" ".config"
 			fi
 			cmd make -j $MAKE_PARALLEL_COUNT CROSS_COMPILE="$CROSS_PREFIX"
 		fi
@@ -320,7 +320,7 @@ case $UTILITY_NAME in
 		# Build and install KOS graphics mode fonts
 		cd "$KOS_ROOT"
 		rundeemon "kos/misc/fonts/tlft/build_u_vga16.dee"
-		install_file /lib/fonts/u_vga16 "$KOS_ROOT/kos/misc/fonts/tlft/u_vga16"
+		install_file /lib/fonts/u_vga16 "$KOS_MISC/fonts/tlft/u_vga16"
 		;;
 ##############################################################################
 
@@ -374,7 +374,7 @@ case $UTILITY_NAME in
 			rm -rf "$OPTPATH" > /dev/null 2>&1
 			cmd cp -R "$SRCPATH" "$BINUTILS_SYSROOT/opt/"
 			cmd cd "$OPTPATH"
-			apply_patch "$OPTPATH" "$KOS_ROOT/kos/misc/patches/tcc-$TCC_VERISON.patch"
+			apply_patch "$OPTPATH" "$KOS_PATCHES/tcc-$TCC_VERISON.patch"
 			cmd bash configure \
 				--with-libgcc \
 				--with-selinux \
@@ -547,7 +547,7 @@ EOF
 				fi
 				apply_patch \
 					"$SRCPATH" \
-					"$KOS_ROOT/kos/misc/patches/nano-$NANO_VERISON.patch"
+					"$KOS_PATCHES/nano-$NANO_VERISON.patch"
 				rm -rf "$OPTPATH" > /dev/null 2>&1
 				cmd mkdir -p "$OPTPATH"
 				cmd cd "$OPTPATH"
