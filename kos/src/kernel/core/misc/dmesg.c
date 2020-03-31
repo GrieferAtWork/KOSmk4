@@ -266,7 +266,7 @@ NOTHROW(FCALL dmesg_sink_impl)(struct syslog_sink *__restrict UNUSED(self),
  * the optional, arch-specific `ARCH_DEFAULT_SYSLOG_SINK' */
 PUBLIC struct syslog_sink dmesg_sink = {
 	/* .ss_refcnt = */ 2, /* +1: dmesg_sink, +1: default_syslog_sink_array */
-	/* .ss_levels = */ SYSLOG_SINK_DEFAULT_LEVELS,
+	/* .ss_levels = */ (uintptr_t)-1,
 	/* .ss_sink   = */ &dmesg_sink_impl,
 	/* .ss_fini   = */ NULL
 };
@@ -478,8 +478,8 @@ PRIVATE ATTR_DBGRODATA char const dbg_dmesg_colors[SYSLOG_LEVEL_COUNT][10] = {
 	/* [(unsigned int)SYSLOG_LEVEL_CRIT   ] */ DF_SETCOLOR(DBG_COLOR_RED, DBG_COLOR_WHITE),
 	/* [(unsigned int)SYSLOG_LEVEL_ERR    ] */ DF_SETFGCOLOR(DBG_COLOR_MAROON),
 	/* [(unsigned int)SYSLOG_LEVEL_WARNING] */ DF_SETFGCOLOR(DBG_COLOR_YELLOW),
-	/* [(unsigned int)SYSLOG_LEVEL_NOTICE ] */ DF_SETFGCOLOR(DBG_COLOR_NAVY),
-	/* [(unsigned int)SYSLOG_LEVEL_INFO   ] */ DF_SETFGCOLOR(DBG_COLOR_BLUE),
+	/* [(unsigned int)SYSLOG_LEVEL_NOTICE ] */ DF_SETCOLOR(DBG_COLOR_NAVY, DBG_COLOR_LIGHT_GRAY),
+	/* [(unsigned int)SYSLOG_LEVEL_INFO   ] */ DF_SETCOLOR(DBG_COLOR_AQUA, DBG_COLOR_DARK_GRAY),
 	/* [(unsigned int)SYSLOG_LEVEL_TRACE  ] */ DF_SETFGCOLOR(DBG_COLOR_CYAN),
 	/* [(unsigned int)SYSLOG_LEVEL_DEBUG  ] */ DF_SETFGCOLOR(DBG_COLOR_OLIVE),
 	/* [(unsigned int)SYSLOG_LEVEL_DEFAULT] */ "",

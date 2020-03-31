@@ -864,7 +864,7 @@ NOTHROW(FCALL task_start)(struct task *__restrict thread, unsigned int flags) {
 		} while (!ATOMIC_CMPXCH_WEAK(thread->t_flags, old_flags,
 		                             old_flags | (TASK_FSTARTED |
 		                                          TASK_FPENDING)));
-		printk(KERN_INFO "[sched:cpu#%u] Starting thread %p [tid=%u]\n",
+		printk(KERN_TRACE "[sched:cpu#%u] Starting thread %p [tid=%u]\n",
 		       (unsigned int)target_cpu->c_id, thread,
 		       (unsigned int)task_getroottid_of_s(thread));
 		thread->t_ctime = cpu_quantum_time();
@@ -902,7 +902,7 @@ done_pop_preemption:
 		} while (!ATOMIC_CMPXCH_WEAK(thread->t_flags, old_flags,
 		                             old_flags | (TASK_FSTARTED |
 		                                          TASK_FRUNNING)));
-		printk(KERN_INFO "[sched:cpu#%u] Starting thread %p [tid=%u]\n",
+		printk(KERN_TRACE "[sched:cpu#%u] Starting thread %p [tid=%u]\n",
 		       (unsigned int)target_cpu->c_id, thread,
 		       (unsigned int)task_getroottid_of_s(thread));
 		thread->t_ctime = cpu_quantum_time();

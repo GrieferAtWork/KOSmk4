@@ -44,7 +44,22 @@ DECL_BEGIN
 #define SYSLOG_LEVEL_RAW     __CCAST(void *)10
 #define SYSLOG_LEVEL_COUNT   11
 
-#define SYSLOG_SINK_DEFAULT_LEVELS __CCAST(uintptr_t)(-1)
+/* By default, only log stuff with level<=INFO */
+#ifndef SYSLOG_SINK_DEFAULT_LEVEL
+#if 1
+#define SYSLOG_SINK_DEFAULT_LEVEL SYSLOG_LEVEL_DEFAULT
+#else
+#define SYSLOG_SINK_DEFAULT_LEVEL SYSLOG_LEVEL_INFO
+#endif
+#endif /* !SYSLOG_SINK_DEFAULT_LEVEL */
+
+/* The default set of accepted system log levels. */
+#ifndef SYSLOG_SINK_DEFAULT_LEVELS
+#define SYSLOG_SINK_DEFAULT_LEVELS                                                                                     \
+	(((((__CCAST(uintptr_t) 1 << __CCAST(unsigned int) __CCAST(uintptr_t) SYSLOG_SINK_DEFAULT_LEVEL) - 1) << 1) | 1) | \
+	 (__CCAST(uintptr_t) 1 << __CCAST(unsigned int) __CCAST(uintptr_t) SYSLOG_LEVEL_RAW))
+#endif /* !SYSLOG_SINK_DEFAULT_LEVELS */
+
 
 #define OFFSET_SYSLOG_PACKET_TIME  0
 #define OFFSET_SYSLOG_PACKET_NSEC  8
@@ -88,6 +103,9 @@ struct syslog_sink {
  * Be careful when tinkering with this, and don't accidentally
  * disable logging of some of the more important message types! */
 DATDEF WEAK uintptr_t syslog_levels;
+
+/* The names of the various system log levels */
+DATDEF char const syslog_level_names[SYSLOG_LEVEL_COUNT][8];
 
 /* Destroy the given syslog sink */
 FUNDEF NOBLOCK void NOTHROW(KCALL syslog_sink_destroy)(struct syslog_sink *__restrict self);

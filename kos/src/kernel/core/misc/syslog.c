@@ -29,8 +29,13 @@
  *       must be fully re-entrant and non-blocking! */
 
 #include <kernel/compiler.h>
+
+#include <debugger/function.h>
+#include <debugger/io.h>
+#include <debugger/rt.h>
 #include <kernel/arch/syslog.h> /* ARCH_DEFAULT_SYSLOG_SINK */
 #include <kernel/dmesg.h>
+#include <kernel/driver-param.h>
 #include <kernel/except.h>
 #include <kernel/malloc.h>
 #include <kernel/panic.h>
@@ -43,9 +48,27 @@
 #include <hybrid/atomic.h>
 
 #include <assert.h>
+#include <ctype.h>
 #include <stddef.h>
+#include <string.h>
 
 DECL_BEGIN
+
+/* The names of the various system log levels */
+PUBLIC_CONST char const syslog_level_names[SYSLOG_LEVEL_COUNT][8] = {
+	/* [(uintptr_t)SYSLOG_LEVEL_EMERG  ] = */ "emerg",
+	/* [(uintptr_t)SYSLOG_LEVEL_ALERT  ] = */ "alert",
+	/* [(uintptr_t)SYSLOG_LEVEL_CRIT   ] = */ "crit",
+	/* [(uintptr_t)SYSLOG_LEVEL_ERR    ] = */ "err",
+	/* [(uintptr_t)SYSLOG_LEVEL_WARNING] = */ "warning",
+	/* [(uintptr_t)SYSLOG_LEVEL_NOTICE ] = */ "notice",
+	/* [(uintptr_t)SYSLOG_LEVEL_INFO   ] = */ "info",
+	/* [(uintptr_t)SYSLOG_LEVEL_TRACE  ] = */ "trace",
+	/* [(uintptr_t)SYSLOG_LEVEL_DEBUG  ] = */ "debug",
+	/* [(uintptr_t)SYSLOG_LEVEL_DEFAULT] = */ "default",
+	/* [(uintptr_t)SYSLOG_LEVEL_RAW    ] = */ "raw"
+};
+
 
 
 /* Destroy the given syslog sink */
@@ -218,8 +241,129 @@ NOTHROW(FCALL dmesg_post)(struct syslog_packet const *__restrict packet,
  * Be careful when tinkering with this, and don't accidentally
  * disable logging of some of the more important message types! */
 PUBLIC WEAK uintptr_t syslog_levels = SYSLOG_SINK_DEFAULT_LEVELS;
-/* TODO: Add a kernel commandline option to control `syslog_levels' */
 /* TODO: Add a file to /proc to control `syslog_levels' */
+
+PRIVATE ATTR_FREETEXT uintptr_t
+NOTHROW(KCALL setup_loglevel_from_name)(char const *__restrict name,
+                                        size_t namelen) {
+	unsigned int i;
+	/* Strip leading/trailing whitespace */
+	while (namelen && isspace(*name))
+		++name, --namelen;
+	while (namelen && isspace(name[namelen - 1]))
+		--namelen;
+	if (!namelen)
+		return 0; /* Ignore empty names. */
+	for (i = 0; i < SYSLOG_LEVEL_COUNT; ++i) {
+		if (strlen(syslog_level_names[i]) != namelen)
+			continue;
+		if (memcmp(name, syslog_level_names[i], namelen * sizeof(char)) == 0)
+			return (uintptr_t)1 << i;
+	}
+	kernel_panic(FREESTR("Unknown syslog level: %q"), name);
+}
+
+
+/* Configure syslog levels from a kernel commandline option */
+PRIVATE ATTR_USED ATTR_FREETEXT void KCALL
+kernel_configure_syslog_levels(char *__restrict arg) {
+	uintptr_t levels;
+	char *comma = strchr(arg, ',');
+	if (comma) {
+		/* Comma-separated list of active levels. */
+		levels = setup_loglevel_from_name(arg, (size_t)(comma - arg));
+		arg = comma + 1;
+		for (;;) {
+			while (isspace(*arg))
+				++arg;
+			if (!*arg)
+				break;
+			comma = strchr(arg, ',');
+			if (!comma)
+				comma = strend(arg);
+			levels |= setup_loglevel_from_name(arg, (size_t)(comma - arg));
+			if (!*comma)
+				break;
+			arg = comma + 1;
+		}
+	} else {
+		levels = setup_loglevel_from_name(arg, strlen(arg));
+		levels = ((levels - 1) << 1) | 1;
+		levels = levels | ((uintptr_t)1 << (unsigned int)(uintptr_t)SYSLOG_LEVEL_RAW);
+	}
+	/* Restrict mask to valid levels. */
+	levels &= ((uintptr_t)1 << SYSLOG_LEVEL_COUNT) - 1;
+	syslog_levels = levels;
+}
+
+DEFINE_VERY_EARLY_KERNEL_COMMANDLINE_OPTION(kernel_configure_syslog_levels,
+                                            KERNEL_COMMANDLINE_OPTION_TYPE_FUNC,
+                                            "loglevel");
+
+
+
+
+
+
+#ifdef CONFIG_HAVE_DEBUGGER
+PRIVATE ATTR_DBGTEXT unsigned int DBG_CALL
+dbg_loglevel_from_name(char const *__restrict name) {
+	unsigned int i;
+	for (i = 0; i < SYSLOG_LEVEL_COUNT; ++i) {
+		if (strcmp(name, syslog_level_names[i]) == 0)
+			return i;
+	}
+	return (unsigned int)-1;
+}
+
+DEFINE_DEBUG_FUNCTION(
+		"loglevel",
+		"loglevel [level|-level|+level]...\n"
+		"\tList currently enabled syslog levels when no arguments are given\n"
+		"\tOtherwise, enable/disable specific levels (+level|-level) or restrict\n"
+		"\tlogging to only include messages of level and greater priority\n"
+		, argc, argv) {
+	unsigned int level;
+	--argc;
+	++argv;
+	if (!argc) {
+		for (level = 0; level < SYSLOG_LEVEL_COUNT; ++level) {
+			char const *name = syslog_level_names[level];
+			bool on = (syslog_levels & ((uintptr_t)1 << level)) != 0;
+			dbg_setfgcolor(on ? DBG_COLOR_GREEN : DBG_COLOR_RED);
+			dbg_putc(on ? '+' : '-');
+			dbg_print(name);
+			dbg_attr = dbg_default_attr;
+			dbg_putc('\n');
+		}
+		return 0;
+	}
+	for (; argc; --argc, ++argv) {
+		char op = 0;
+		char const *name = argv[0];
+		if (name[0] == '-' || name[0] == '+') {
+			op = name[0];
+			++name;
+		}
+		level = dbg_loglevel_from_name(name);
+		if (level == (unsigned int)-1)
+			return DBG_FUNCTION_INVALID_ARGUMENTS;
+		if (op == '-') {
+			/* Disable level */
+			syslog_levels &= ~((uintptr_t)1 << level);
+		} else if (op == '+') {
+			/* Enable level */
+			syslog_levels |= (uintptr_t)1 << level;
+		} else {
+			/* Set level */
+			syslog_levels = ((((uintptr_t)1 << level) - 1) << 1) | 1;
+			/* Keep raw syslog messages enabled */
+			syslog_levels |= (uintptr_t)1 << (unsigned int)(uintptr_t)SYSLOG_LEVEL_RAW;
+		}
+	}
+	return 0;
+}
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 
 

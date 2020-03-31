@@ -520,7 +520,7 @@ do_TCSETA: {
 			FINALLY_DECREF_UNLIKELY(newthread);
 			newpid = task_getprocessgroupleaderpid_of(newthread);
 		}
-		printk(KERN_INFO "[tty:%q] Set foreground process group to [tid=%u]\n",
+		printk(KERN_TRACE "[tty:%q] Set foreground process group to [tid=%u]\n",
 		       me->cd_name, (unsigned int)taskpid_getrootpid(newpid));
 		oldpid = me->t_fproc.exchange_inherit_new(newpid);
 		xdecref(oldpid);

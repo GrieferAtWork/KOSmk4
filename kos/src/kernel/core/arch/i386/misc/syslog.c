@@ -77,7 +77,7 @@ NOTHROW(FCALL x86_syslog_sink_impl)(struct syslog_sink *__restrict UNUSED(self),
 /* The x86 hook for the arch-specific, default system log sink */
 PUBLIC struct syslog_sink x86_default_syslog_sink = {
 	/* .ss_refcnt = */ 2, /* +1: x86_default_syslog_sink, +1: <DEFAULT_SYSLOG_SINKS> */
-	/* .ss_levels = */ SYSLOG_SINK_DEFAULT_LEVELS,
+	/* .ss_levels = */ (uintptr_t)-1,
 	/* .ss_sink   = */ &x86_syslog_sink_impl,
 	/* .ss_fini   = */ NULL
 };
