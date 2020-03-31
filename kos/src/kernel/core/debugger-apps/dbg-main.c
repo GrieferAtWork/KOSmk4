@@ -95,15 +95,12 @@ dbg_getfunc_start(char const *__restrict name) {
 	for (iter = __kernel_debug_functions_start;
 	     iter < __kernel_debug_functions_end; ++iter) {
 		size_t new_score;
-		size_t funclen    = strlen(iter->df_name);
-		size_t comparelen = funclen;
-		if (comparelen > name_len)
-			comparelen = name_len;
-		if (memcmp(iter->df_name, name, comparelen * sizeof(char)) != 0)
+		size_t funclen = strlen(iter->df_name);
+		if (funclen < name_len)
 			continue;
-		new_score = name_len >= funclen
-		            ? name_len - funclen
-		            : funclen - name_len;
+		if (memcmp(iter->df_name, name, name_len * sizeof(char)) != 0)
+			continue;
+		new_score = name_len - funclen;
 		if (new_score < score) {
 			is_ambig = false;
 			score    = new_score;
@@ -449,7 +446,7 @@ dbg_main(uintptr_t show_welcome) {
 	cmdline_didsavetemp = false;
 
 	/* The main entry function for the debugger.
-	 * Called once the debugger context of single-core + no preemptive interrupts has setup. */
+	 * Called once the debugger context of single-core + no preemptive interrupts was set up. */
 	if (show_welcome) {
 		dbg_print(DBGSTR("Use CTRL + SHIFT + UP/DOWN/PAGE_UP/PAGE_DOWN/HOME/END to scroll\n"
 		                 "Type " DF_SETFGCOLOR(DBG_COLOR_WHITE) "help" DF_DEFFGCOLOR
