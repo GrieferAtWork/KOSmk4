@@ -32,7 +32,7 @@ DECL_BEGIN
 #ifdef __CC__
 
 #ifndef CONFIG_DMESG_BUFFER_SIZE
-#define CONFIG_DMESG_BUFFER_SIZE 8192
+#define CONFIG_DMESG_BUFFER_SIZE 16384
 #endif /* !CONFIG_DMESG_BUFFER_SIZE */
 
 /* The dmesg buffer is a wrap-around buffer of tightly packed, consecutive packets
