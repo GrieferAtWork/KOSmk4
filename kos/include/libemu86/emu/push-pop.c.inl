@@ -80,10 +80,84 @@ case EMU86_OPCODE_ENCODE(0x58) ... EMU86_OPCODE_ENCODE(0x5f):
 
 
 
-#if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_POP_RM
+#if (EMU86_EMULATE_CONFIG_CHECKERROR ||  \
+     EMU86_EMULATE_CONFIG_WANT_POP_RM || \
+     EMU86_EMULATE_CONFIG_WANT_XOP)
 case EMU86_OPCODE_ENCODE(0x8f): {
 	MODRM_DECODE();
 	if unlikely(modrm.mi_reg != 0) {
+#if EMU86_EMULATE_CONFIG_WANT_XOP
+#ifdef EMU86_F_BITMASK
+		if (!(op_flags & ~(EMU86_F_SEGMASK | EMU86_F_BITMASK)))
+#else /* EMU86_F_BITMASK */
+		if (!(op_flags & ~(EMU86_F_SEGMASK)))
+#endif /* !EMU86_F_BITMASK */
+		{
+			byte_t const *orig_modrm_pc = pc;
+			u8 orig_modrm_reg = modrm.mi_reg;
+			u16 vex;
+			pc = start_pc;
+			vex = *pc++;
+			vex <<= 8;
+			vex |= *pc++;
+			/*op_flags |= EMU86_F_HASVEX;*/ /* Not needed */
+#if CONFIG_LIBEMU86_WANT_64BIT
+			IF_16BIT_OR_32BIT(if (EMU86_F_IS64(op_flags))) {
+				if (!(vex & EMU86_VEX3B_R))
+					op_flags |= EMU86_F_REX_R;
+				if (!(vex & EMU86_VEX3B_X))
+					op_flags |= EMU86_F_REX_X;
+				if (!(vex & EMU86_VEX3B_B))
+					op_flags |= EMU86_F_REX_B;
+			} IF_16BIT_OR_32BIT(else)
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#if CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT
+			{
+				if unlikely((vex & (EMU86_VEX3B_R | EMU86_VEX3B_X | EMU86_VEX3B_B)) !=
+				            /*  */ (EMU86_VEX3B_R | EMU86_VEX3B_X | EMU86_VEX3B_B))
+					goto xop_fallback;
+			}
+#endif /* CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT */
+			if (vex & EMU86_VEX3B_L)
+				op_flags |= 1 << EMU86_F_VEX_LL_S;
+			if (vex & EMU86_VEX3B_W)
+				op_flags |= EMU86_F_VEX_W;
+			op_flags |= ((~vex & EMU86_VEX3B_VVVV_M) >> EMU86_VEX3B_VVVV_S) << EMU86_F_VEX_VVVVV_S;
+			switch (vex & EMU86_VEX3B_PP_M) {
+			case 0x01 << EMU86_VEX3B_PP_S: op_flags |= EMU86_F_OP16; break;  /* same as 0x66 prefix */
+			case 0x02 << EMU86_VEX3B_PP_S: op_flags |= EMU86_F_REP; break;   /* same as 0xf3 prefix */
+			case 0x03 << EMU86_VEX3B_PP_S: op_flags |= EMU86_F_REPNE; break; /* same as 0xf2 prefix */
+			default: break;
+			}
+			/* The actual instruction opcode byte */
+			tiny_opcode = *pc++;
+			if likely((vex & EMU86_VEX3B_MMMMM_M) >= 0x8 << EMU86_VEX3B_MMMMM_S) {
+				tiny_opcode |= EMU86_OPCODE_BASEXOP((vex & EMU86_VEX3B_MMMMM_M) >> EMU86_VEX3B_MMMMM_S);
+				switch (tiny_opcode) {
+
+#ifndef __INTELLISENSE__
+#ifdef EMU86_EMULATE_IMPL_XOP_HEADER
+#include EMU86_EMULATE_IMPL_XOP_HEADER
+#else /* EMU86_EMULATE_IMPL_XOP_HEADER */
+#include "xop-tbm.c.inl"
+#endif /* !EMU86_EMULATE_IMPL_XOP_HEADER */
+#endif /* !__INTELLISENSE__ */
+
+				default:
+					goto return_unknown_instruction;
+				}
+			}
+IF_16BIT_OR_32BIT(xop_fallback:)
+			pc           = orig_modrm_pc;
+			modrm.mi_reg = orig_modrm_reg;
+#ifdef EMU86_F_BITMASK
+			op_flags &= (EMU86_F_SEGMASK | EMU86_F_BITMASK);
+#else /* EMU86_F_BITMASK */
+			op_flags &= (EMU86_F_SEGMASK);
+#endif /* !EMU86_F_BITMASK */
+			tiny_opcode = EMU86_OPCODE_ENCODE(0x8f);
+		}
+#endif /* EMU86_EMULATE_CONFIG_WANT_XOP */
 #define NEED_return_unknown_instruction_rmreg
 		goto return_unknown_instruction_rmreg;
 	}
@@ -101,7 +175,7 @@ case EMU86_OPCODE_ENCODE(0x8f): {
 #define NEED_notsup_modrm_setwlq_rmreg_modrm_parsed_popwlq
 #endif /* !EMU86_EMULATE_CONFIG_WANT_POP_RM */
 }
-#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_POP_RM */
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_POP_RM || EMU86_EMULATE_CONFIG_WANT_XOP */
 
 
 }

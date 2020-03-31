@@ -942,6 +942,7 @@ PRIVATE struct instruction const ops[] = {
 	I(0x8f, IF_67|IF_66|IF_MODRM|IF_REG0,   "popw\t" OP_RM16),
 	I(0x8f, IF_67|IF_MODRM|IF_REG0,         "popl\t" OP_RM32),
 	I(0x8f, IF_67|IF_MODRM|IF_REXW|IF_REG0, "popq\t" OP_RM64),
+	/* The remainder of 0x8f (REG1-7) is used for XOP prefixes. */
 
 	I(0x90, 0,                "nop"),
 	I(0x90, IF_F3,            "pause"),
@@ -4957,6 +4958,7 @@ PRIVATE struct instruction const ops_0f3a[] = {
 /* clang-format on */
 
 
+#if 0 /* Currently unused */
 /* clang-format off */
 PRIVATE struct instruction const ops_xop8[] = {
 /*[[[begin:ops_xop8]]]*/
@@ -4964,6 +4966,7 @@ PRIVATE struct instruction const ops_xop8[] = {
 /*[[[end:ops_xop8]]]*/
 };
 /* clang-format on */
+#endif
 
 /* TODO: Add the following missing XOP opcodes:
  *    XOP8 85h     vpmacssww      Vo,Ho,Wo,Lo
@@ -5036,7 +5039,6 @@ PRIVATE struct instruction const ops_xop9[] = {
 
 	I(0x12, IF_VEXW0|IF_MODRM|IF_RMR|IF_REG1, "slwpcbl\t" OP_RM32),
 	I(0x12, IF_VEXW1|IF_MODRM|IF_RMR|IF_REG1, "slwpcbq\t" OP_RM64),
-
 
 	I(0, 0, "")
 /*[[[end:ops_xop9]]]*/

@@ -293,6 +293,13 @@ x86_handle_bad_usage(struct icpustate *__restrict state, u16 usage);
 #define EMU86_EMULATE_CONFIG_WANT_PAUSE         0
 #define EMU86_EMULATE_CONFIG_WANT_XCHG_REG      0
 #define EMU86_EMULATE_CONFIG_WANT_XLATB         0
+#define EMU86_EMULATE_CONFIG_WANT_XOP_BLCFILL   1 /* Emulate non-standard instructions */
+#define EMU86_EMULATE_CONFIG_WANT_XOP_BLSFILL   1 /* Emulate non-standard instructions */
+#define EMU86_EMULATE_CONFIG_WANT_XOP_BLCS      1 /* Emulate non-standard instructions */
+#define EMU86_EMULATE_CONFIG_WANT_XOP_TZMSK     1 /* Emulate non-standard instructions */
+#define EMU86_EMULATE_CONFIG_WANT_XOP_BLCIC     1 /* Emulate non-standard instructions */
+#define EMU86_EMULATE_CONFIG_WANT_XOP_BLSIC     1 /* Emulate non-standard instructions */
+#define EMU86_EMULATE_CONFIG_WANT_XOP_T1MSKC    1 /* Emulate non-standard instructions */
 
 
 
@@ -560,8 +567,8 @@ throw_unsupported_instruction(struct icpustate *__restrict state,
 #define EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM_RMREG()   throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE_RMREG(), op_flags, E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE, 0, 0, 0)
 #define EMU86_EMULATE_RETURN_EXPECTED_REGISTER_MODRM()       throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE(), op_flags, E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE, 0, 0, 0)
 #define EMU86_EMULATE_RETURN_EXPECTED_REGISTER_MODRM_RMREG() throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE_RMREG(), op_flags, E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE, 0, 0, 0)
-#define EMU86_EMULATE_RETURN_UNEXPECTED_LOCK()               throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE(), op_flags, 0, 0, 0, 0)
-#define EMU86_EMULATE_RETURN_UNEXPECTED_LOCK_RMREG()         throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE_RMREG(), op_flags, 0, 0, 0, 0)
+#define EMU86_EMULATE_RETURN_UNEXPECTED_PREFIX()             throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX), _EMU86_GETOPCODE(), op_flags, 0, 0, 0, 0)
+#define EMU86_EMULATE_RETURN_UNEXPECTED_PREFIX_RMREG()       throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX), _EMU86_GETOPCODE_RMREG(), op_flags, 0, 0, 0, 0)
 #define EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION()       throw_unsupported_instruction(_state, usage, _EMU86_GETOPCODE(), op_flags)
 #define EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION_RMREG() throw_unsupported_instruction(_state, usage, _EMU86_GETOPCODE_RMREG(), op_flags)
 #define EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(how, regno, regval, offset)          \

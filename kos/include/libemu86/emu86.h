@@ -335,10 +335,17 @@ __DECL_BEGIN
 #define EMU86_MODRM_ISMEM(x) ((x) != 0)
 
 
-#define EMU86_OPCODE_BASE0    0x0000
-#define EMU86_OPCODE_BASE0f   0x0100
-#define EMU86_OPCODE_BASE0f38 0x0200
-#define EMU86_OPCODE_BASE0f3a 0x0300
+#define EMU86_OPCODE_BASE0         0x0000
+#define EMU86_OPCODE_BASE0f        0x0100
+#define EMU86_OPCODE_BASE0f38      0x0200
+#define EMU86_OPCODE_BASE0f3a      0x0300
+
+/* May appear in exceptions (map is in range of [8,31])
+ * NOTE: Tiny opcodes in this range are _NOT_ returned by `emu86_opcode_decode()'!
+ *       To handle XOP opcodes, you must handle the `0x8f' opcode instead, and have
+ *       the case of modrm.mi_reg != 0 be used for processing XOP opcodes. */
+#define EMU86_OPCODE_BASEXOP(map) (0xe000 | (((map)/* & 0x1f*/) << 8))
+#define EMU86_OPCODE_ENCODE_XOP(map, opcode) (EMU86_OPCODE_BASEXOP(map) | (opcode))
 
 /* Encode/Decode an x86 opcode `real_opcode' */
 #define EMU86_OPCODE_ENCODE(real_opcode)                                             \

@@ -40,7 +40,7 @@ __DECL_BEGIN
 #ifdef __NON_CALL_EXCEPTIONS
 #define __asm_ncx_memop__ __asm__ __volatile__
 #else /* __NON_CALL_EXCEPTIONS */
-#define __asm_ncx_memop__	__asm__
+#define __asm_ncx_memop__ __asm__
 #endif /* !__NON_CALL_EXCEPTIONS */
 #endif /* !__asm_ncx_memop__ */
 

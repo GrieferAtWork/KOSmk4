@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBEMU86_PLACEHOLDER_C
-#define GUARD_LIBEMU86_PLACEHOLDER_C 1
+#ifndef GUARD_LIBEMU86_EMU86_C
+#define GUARD_LIBEMU86_EMU86_C 1
 
 #include "api.h"
 /**/
@@ -34,4 +34,4 @@ DEFINE_PUBLIC_ALIAS(emu86_modrm_decode, libemu86_modrm_decode);
 
 DECL_END
 
-#endif /* !GUARD_LIBEMU86_PLACEHOLDER_C */
+#endif /* !GUARD_LIBEMU86_EMU86_C */

@@ -29,6 +29,7 @@
 #include <hybrid/atomic.h>
 
 #include <asm/intrin-arith.h>
+#include <asm/intrin-tbm.h>
 #include <asm/intrin.h>
 #include <kos/except.h>
 #include <kos/kernel/paging.h>
@@ -463,6 +464,22 @@ PRIVATE void test_addr(void *addr, bool is_canon, bool is_vio) {
 
 DEFINE_TEST(segfault_special_addresses) {
 	/* Prevent the UKERN segment from interfering. */
+#if 0 /* QEMU appears to emulate _all_ 0x8f instructions as `pop'
+       * (even when `modrm.mi_reg != 0'), so the kernel can't intercept
+       * any exception to emulate the instruction, and %cs:%(r)ip becomes
+       * unaligned since pop:0x8f/0 is shorter than the XOP that is actually
+       * hidden within... (TODO: Investigate if this can be fixed in qemu...) */
+	{
+		unsigned int i;
+		for (i = 0; i < 0xff; ++i) {
+			unsigned int a, b;
+			a = i & (i + 1);
+			b = __blcfilll(i);
+			assertf(a == b, "%#x == %#x", a, b);
+		}
+	}
+#endif
+
 #ifdef __x86_64__
 	__wrgsbase((void *)UINT64_C(0xffff8000000ff000));
 #else /* __x86_64__ */
