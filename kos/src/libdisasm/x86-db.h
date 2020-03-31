@@ -1209,7 +1209,8 @@ PRIVATE struct instruction const ops[] = {
 	I(0xc7, IF_MODRM|IF_REG0,        "movl\t" OP_U32 OP_RM32),
 	I(0xc7, IF_MODRM|IF_REXW|IF_REG0,"movq\t" OP_S32 OP_RM64),
 	I(0xc7, IF_66|IF_BYTE2,   "\xf8" "xbeginw\t" OP_DISP16), /* 0xf8: [mod=3,reg=7,rm=0] */
-	I(0xc7, IF_BYTE2,         "\xf8" "xbegin\t" OP_DISP32),  /* 0xf8: [mod=3,reg=7,rm=0] */
+	I(0xc7, IF_X32|IF_BYTE2,  "\xf8" "xbeginl\t" OP_DISP32), /* 0xf8: [mod=3,reg=7,rm=0] */
+	I(0xc7, IF_X64|IF_BYTE2,  "\xf8" "xbeginq\t" OP_DISP32), /* 0xf8: [mod=3,reg=7,rm=0] */
 
 	I(0xc8, 0,                "enter\t" OP_U16 OP_U8),
 	I(0xc9, 0,                "leave"),
@@ -1536,7 +1537,7 @@ PRIVATE struct instruction const ops[] = {
 
 	I(0xdf, IF_MODRM|IF_RMM|IF_REG7, "fistpq\t" OP_RM64),
 
-	I(0xdf, IF_BYTE2,  "\xe0" "fnstsw" OP_AX),
+	I(0xdf, IF_BYTE2,  "\xe0" "fnstsw" OP_AX), /* 0xe0: [mod=3,reg=4,rm=0] */
 
 
 	I(0xe0, 0,                "loopnz\t" OP_DISP8),
@@ -1683,6 +1684,7 @@ PRIVATE struct instruction const ops_0f[] = {
 	I(0x00, IF_MODRM|IF_REG3, "ltr\t"  OP_RM16),
 	I(0x00, IF_MODRM|IF_REG4, "verr\t" OP_RM16),
 	I(0x00, IF_MODRM|IF_REG5, "verw\t" OP_RM16),
+	/* IF_REG6: jmpe (IA-64) */
 
 	I(0x01, IF_X32|IF_MODRM|IF_RMM|IF_REG0,  "sgdtl\t" OP_MEM),
 	I(0x01, IF_X64|IF_MODRM|IF_RMM|IF_REG0,  "sgdtq\t" OP_MEM),
@@ -1778,10 +1780,14 @@ PRIVATE struct instruction const ops_0f[] = {
 
 	I(0x05, IF_X32,           "loadall"), /* http://www.geoffchappell.com/notes/windows/archive/linkcpu.htm */
 	I(0x05, IF_X64,           "syscall"),
+
 	I(0x06, 0,                "clts"),
+
 	I(0x07, IF_X32,           "loadall\t" OP_PSI), /* http://www.geoffchappell.com/notes/windows/archive/linkcpu.htm */
 	I(0x07, IF_X64,           "sysret"),
+
 	I(0x08, 0,                "invd"),
+
 	I(0x09, IF_F3,            "wbnoinvd"),
 	I(0x09, 0,                "wbinvd"),
 
@@ -1789,8 +1795,22 @@ PRIVATE struct instruction const ops_0f[] = {
 
 	I(0x0b, 0,                "ud2"),
 
+	/*0x0c, 0,                ??? */
+
 	I(0x0d, IF_MODRM|IF_REG1|IF_RMM, "prefetchw\t" OP_MEM),
 	I(0x0d, IF_MODRM|IF_REG2|IF_RMM, LONGREPR(LO_PREFETCHWT1)),
+
+	I(0x0e, 0,                "femms"), /* https://sandpile.org/x86/opc_k3d.htm */
+
+	/* TODO: 0x0f0f is an instruction:
+	 * >> I(0x0f, IF_MODRM, "3dnow\t" OP_U8 OP_RMxx OP_Rxx),
+	 * Where OP_U8 is the actual opcode byte.
+	 * Yes, the encoding order here is:
+	 *    0F 0F MODR/M OPCODE
+	 * Instead of what one would expect as:
+	 *    0F 0F OPCODE MODR/M
+	 * s.a. https://sandpile.org/x86/opc_k3d.htm
+	 */
 
 	I(0x10, IF_VEX|IF_MODRM, OP_VEX_B0(1, 1, 0, 0) "vmovups\t" OP_RM128_XMM OP_RXMM),      /*  VEX.128.0f.WIG 10 /r vmovups xmm1, xmm2/m128 */
 	I(0x10, IF_VEX|IF_MODRM, OP_VEX_B0(1, 1, 0, 1) "vmovups\t" OP_RM256_YMM OP_RYMM),      /*  VEX.256.0f.WIG 10 /r vmovups ymm1, ymm2/m256 */
@@ -1943,12 +1963,15 @@ PRIVATE struct instruction const ops_0f[] = {
 	I(0x18, IF_MODRM|IF_REG2|IF_RMM, "prefetcht1\t" OP_MEM),
 	I(0x18, IF_MODRM|IF_REG3|IF_RMM, "prefetcht2\t" OP_MEM),
 
+	/*0x19 is documented as I(0x19, IF_MODRM|IF_REGn, "HINT_NOP\t" OP_RMxx), */
+
 	I(0x1a, IF_X32|IF_F2|IF_MODRM, "bndcu\t" OP_RM32 OP_RBND),
 	I(0x1a, IF_X64|IF_F2|IF_MODRM, "bndcu\t" OP_RM64 OP_RBND),
 	I(0x1a, IF_X32|IF_F3|IF_MODRM, "bndcl\t" OP_RM32 OP_RBND),
 	I(0x1a, IF_X64|IF_F3|IF_MODRM, "bndcl\t" OP_RM64 OP_RBND),
 	I(0x1a, IF_MODRM,              "bndldx\t" OP_RMBND_RANGE OP_RBND),
 	I(0x1a, IF_66|IF_MODRM,        "bndmov\t" OP_RMBND OP_RBND),
+
 	I(0x1b, IF_X32|IF_F2|IF_MODRM, "bndcn\t" OP_RM32 OP_RBND),
 	I(0x1b, IF_X64|IF_F2|IF_MODRM, "bndcn\t" OP_RM64 OP_RBND),
 	I(0x1b, IF_66|IF_MODRM,        "bndmov\t" OP_RBND OP_RMBND),
@@ -1957,15 +1980,26 @@ PRIVATE struct instruction const ops_0f[] = {
 
 	I(0x1c, IF_MODRM|IF_REG0|IF_RMM, "cldemote\t" OP_MEM),
 
+	/*0x1d is documented as I(0x1d, IF_MODRM|IF_REGn, "HINT_NOP\t" OP_RMxx), */
+
+	/* https://sandpile.org/x86/opc_grp.htm */
+	I(0x1e, IF_F3|IF_MODRM|IF_REG1|IF_RMR,         "rdsspd\t" OP_RM32),
+	I(0x1e, IF_F3|IF_MODRM|IF_REG1|IF_RMR|IF_REXW, "rdsspq\t" OP_RM64),
+	I(0x1e, IF_F3|IF_BYTE2, "\xfa" "endbr64"), /* 0xfa: [mod=3,reg=7,rm=2] */
+	I(0x1e, IF_F3|IF_BYTE2, "\xfb" "endbr32"), /* 0xfb: [mod=3,reg=7,rm=3] */
+
 	I(0x1f, IF_66|IF_MODRM|IF_REG0, "nopw\t" OP_RM16),
 	I(0x1f, IF_MODRM|IF_REG0,       "nopl\t" OP_RM32),
 
 	I(0x20, IF_X32|IF_MODRM|IF_RMR,"movl\t" OP_RCR OP_RM32),
 	I(0x20, IF_X64|IF_MODRM|IF_RMR,"movq\t" OP_RCR OP_RM64),
+
 	I(0x21, IF_X32|IF_MODRM|IF_RMR,"movl\t" OP_RDR OP_RM32),
 	I(0x21, IF_X64|IF_MODRM|IF_RMR,"movq\t" OP_RDR OP_RM64),
+
 	I(0x22, IF_X32|IF_MODRM|IF_RMR,"movl\t" OP_RM32 OP_RCR),
 	I(0x22, IF_X64|IF_MODRM|IF_RMR,"movq\t" OP_RM64 OP_RCR),
+
 	I(0x23, IF_X32|IF_MODRM|IF_RMR,"movl\t" OP_RM32 OP_RDR),
 	I(0x23, IF_X64|IF_MODRM|IF_RMR,"movq\t" OP_RM64 OP_RDR),
 
@@ -3012,6 +3046,19 @@ PRIVATE struct instruction const ops_0f[] = {
 	I(0xa5, IF_66|IF_MODRM,   "shldw\t" OP_RM16 OP_R16 OP_CL),
 	I(0xa5, IF_MODRM,         "shldl\t" OP_RM32 OP_R32 OP_CL),
 	I(0xa5, IF_MODRM|IF_REXW, "shldq\t" OP_RM64 OP_R64 OP_CL),
+
+	/* source: https://sandpile.org/x86/opc_2.htm */
+	I(0xa6, IF_F3|IF_BYTE2, "\xc0" "montmul"), /* 0xc0: [mod=3,reg=0,rm=0] */
+	I(0xa6, IF_F3|IF_BYTE2, "\xc8" "xsha1"),   /* 0xc8: [mod=3,reg=1,rm=0] */
+	I(0xa6, IF_F3|IF_BYTE2, "\xd0" "xsha256"), /* 0xd0: [mod=3,reg=2,rm=0] */
+
+	/* source: https://sandpile.org/x86/opc_2.htm */
+	I(0xa7, IF_F3|IF_BYTE2, "\xc0" "xstore"),     /* 0xc0: [mod=3,reg=0,rm=0] */
+	I(0xa7, IF_F3|IF_BYTE2, "\xc8" "xcrypt-ecb"), /* 0xc8: [mod=3,reg=1,rm=0] */
+	I(0xa7, IF_F3|IF_BYTE2, "\xd0" "xcrypt-cbc"), /* 0xd0: [mod=3,reg=2,rm=0] */
+	I(0xa7, IF_F3|IF_BYTE2, "\xd8" "xcrypt-ctr"), /* 0xd8: [mod=3,reg=3,rm=0] */
+	I(0xa7, IF_F3|IF_BYTE2, "\xe0" "xcrypt-cfb"), /* 0xe0: [mod=3,reg=4,rm=0] */
+	I(0xa7, IF_F3|IF_BYTE2, "\xe8" "xcrypt-ofb"), /* 0xe8: [mod=3,reg=5,rm=0] */
 
 	I(0xa8, IF_66,            "pushw\t" OP_GS),
 	I(0xa8, IF_X32,           "pushl\t" OP_GS),
@@ -5249,45 +5296,45 @@ print "#define OPS_OFFETSOF_90h", normal_offsets[0x90];
 
 ]]]*/
 #define HAVE_OPS_OFFSETS 1
-STATIC_ASSERT(COMPILER_LENOF(ops) == 896);
+STATIC_ASSERT(COMPILER_LENOF(ops) == 897);
 PRIVATE u16 const ops_offsets[256] = {
-	0, 1, 4, 5, 8, 9, 12, 14, 16, 17, 20, 21, 24, 25, 28, 895,
+	0, 1, 4, 5, 8, 9, 12, 14, 16, 17, 20, 21, 24, 25, 28, 896,
 	30, 31, 34, 35, 38, 39, 42, 44, 46, 47, 50, 51, 54, 55, 58, 60,
-	62, 63, 66, 67, 70, 71, 895, 74, 75, 76, 79, 80, 83, 84, 895, 87,
-	88, 89, 92, 93, 96, 97, 895, 100, 101, 102, 105, 106, 109, 110, 895, 113,
+	62, 63, 66, 67, 70, 71, 896, 74, 75, 76, 79, 80, 83, 84, 896, 87,
+	88, 89, 92, 93, 96, 97, 896, 100, 101, 102, 105, 106, 109, 110, 896, 113,
 	114, 116, 118, 120, 122, 124, 126, 128, 130, 132, 134, 136, 138, 140, 142, 144,
 	146, 150, 154, 158, 162, 166, 170, 174, 178, 182, 186, 190, 194, 198, 202, 206,
-	210, 212, 214, 216, 895, 895, 895, 895, 217, 220, 223, 226, 229, 231, 235, 237,
+	210, 212, 214, 216, 896, 896, 896, 896, 217, 220, 223, 226, 229, 231, 235, 237,
 	241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256,
 	257, 265, 289, 297, 321, 322, 325, 326, 329, 330, 333, 334, 337, 340, 343, 346,
 	352, 359, 365, 371, 377, 383, 389, 395, 401, 402, 404, 406, 408, 411, 414, 415,
 	416, 418, 422, 424, 428, 430, 436, 439, 448, 449, 452, 454, 460, 462, 468, 471,
 	480, 482, 484, 486, 488, 490, 492, 494, 496, 502, 508, 514, 520, 526, 532, 538,
-	544, 552, 576, 578, 580, 582, 584, 586, 591, 592, 593, 594, 595, 596, 597, 598,
-	602, 610, 634, 642, 666, 667, 668, 669, 670, 686, 725, 738, 752, 766, 780, 795,
-	806, 807, 808, 809, 812, 813, 815, 816, 818, 820, 822, 824, 825, 826, 828, 829,
-	895, 831, 895, 895, 832, 833, 834, 842, 866, 867, 868, 869, 870, 871, 872, 874
+	544, 552, 576, 578, 580, 582, 584, 586, 592, 593, 594, 595, 596, 597, 598, 599,
+	603, 611, 635, 643, 667, 668, 669, 670, 671, 687, 726, 739, 753, 767, 781, 796,
+	807, 808, 809, 810, 813, 814, 816, 817, 819, 821, 823, 825, 826, 827, 829, 830,
+	896, 832, 896, 896, 833, 834, 835, 843, 867, 868, 869, 870, 871, 872, 873, 875
 };
 
 #define HAVE_OPS_0F_OFFSETS 1
-STATIC_ASSERT(COMPILER_LENOF(ops_0f) == 1523);
+STATIC_ASSERT(COMPILER_LENOF(ops_0f) == 1537);
 PRIVATE u16 const ops_0f_offsets[256] = {
-	0, 6, 49, 50, 1522, 53, 55, 56, 58, 59, 61, 62, 1522, 63, 1522, 1522,
-	65, 89, 111, 132, 138, 150, 162, 177, 183, 1522, 187, 193, 198, 1522, 1522, 199,
-	201, 203, 205, 207, 209, 1522, 210, 1522, 211, 223, 235, 245, 257, 267, 277, 283,
-	289, 290, 291, 292, 293, 294, 295, 296, 1522, 1522, 1522, 1522, 1522, 1522, 1522, 297,
-	298, 301, 308, 315, 318, 325, 332, 339, 346, 349, 352, 359, 365, 368, 371, 374,
-	377, 389, 407, 412, 417, 429, 441, 453, 465, 483, 501, 519, 540, 558, 576, 594,
-	612, 617, 622, 629, 634, 639, 644, 651, 656, 661, 666, 673, 678, 684, 690, 696,
-	720, 735, 750, 786, 808, 813, 818, 825, 828, 846, 866, 884, 894, 900, 906, 912,
-	936, 938, 940, 942, 944, 946, 948, 950, 952, 954, 956, 958, 960, 962, 964, 966,
-	968, 973, 978, 983, 988, 989, 990, 991, 992, 997, 1002, 1003, 1004, 1005, 1006, 1007,
-	1008, 1011, 1014, 1015, 1018, 1021, 1522, 1522, 1024, 1027, 1030, 1031, 1034, 1037, 1040, 1071,
-	1074, 1075, 1078, 1081, 1084, 1087, 1090, 1093, 1095, 1098, 1100, 1112, 1115, 1121, 1127, 1130,
-	1132, 1133, 1136, 1154, 1156, 1160, 1168, 1180, 1196, 1200, 1204, 1208, 1212, 1216, 1220, 1224,
-	1228, 1234, 1239, 1246, 1253, 1260, 1265, 1267, 1275, 1280, 1285, 1290, 1300, 1305, 1310, 1315,
-	1325, 1330, 1335, 1345, 1350, 1355, 1360, 1381, 1388, 1393, 1398, 1403, 1413, 1418, 1423, 1428,
-	1438, 1441, 1446, 1453, 1460, 1467, 1472, 1477, 1480, 1485, 1490, 1497, 1504, 1509, 1514, 1521
+	0, 6, 49, 50, 1536, 53, 55, 56, 58, 59, 61, 62, 1536, 63, 65, 1536,
+	66, 90, 112, 133, 139, 151, 163, 178, 184, 1536, 188, 194, 199, 1536, 200, 204,
+	206, 208, 210, 212, 214, 1536, 215, 1536, 216, 228, 240, 250, 262, 272, 282, 288,
+	294, 295, 296, 297, 298, 299, 300, 301, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 302,
+	303, 306, 313, 320, 323, 330, 337, 344, 351, 354, 357, 364, 370, 373, 376, 379,
+	382, 394, 412, 417, 422, 434, 446, 458, 470, 488, 506, 524, 545, 563, 581, 599,
+	617, 622, 627, 634, 639, 644, 649, 656, 661, 666, 671, 678, 683, 689, 695, 701,
+	725, 740, 755, 791, 813, 818, 823, 830, 833, 851, 871, 889, 899, 905, 911, 917,
+	941, 943, 945, 947, 949, 951, 953, 955, 957, 959, 961, 963, 965, 967, 969, 971,
+	973, 978, 983, 988, 993, 994, 995, 996, 997, 1002, 1007, 1008, 1009, 1010, 1011, 1012,
+	1013, 1016, 1019, 1020, 1023, 1026, 1029, 1032, 1038, 1041, 1044, 1045, 1048, 1051, 1054, 1085,
+	1088, 1089, 1092, 1095, 1098, 1101, 1104, 1107, 1109, 1112, 1114, 1126, 1129, 1135, 1141, 1144,
+	1146, 1147, 1150, 1168, 1170, 1174, 1182, 1194, 1210, 1214, 1218, 1222, 1226, 1230, 1234, 1238,
+	1242, 1248, 1253, 1260, 1267, 1274, 1279, 1281, 1289, 1294, 1299, 1304, 1314, 1319, 1324, 1329,
+	1339, 1344, 1349, 1359, 1364, 1369, 1374, 1395, 1402, 1407, 1412, 1417, 1427, 1432, 1437, 1442,
+	1452, 1455, 1460, 1467, 1474, 1481, 1486, 1491, 1494, 1499, 1504, 1511, 1518, 1523, 1528, 1535
 };
 
 #define HAVE_OPS_0F38_OFFSETS 1
