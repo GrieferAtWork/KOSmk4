@@ -159,6 +159,8 @@ coredump_create(struct ucpustate const *curr_ustate,
 			printk(KERN_ERR "\terrno: %u\n", reason_signal->si_errno);
 	}
 #define VINFO_FORMAT  "%[vinfo:%p [%Rf:%l,%c:%n]]"
+	if (reason_error)
+		printk(KERN_RAW VINFO_FORMAT " faultaddr\n", reason_error->e_faultaddr);
 	if (orig_kstate)
 		printk(KERN_RAW VINFO_FORMAT " orig_kstate\n", kcpustate_getpc(orig_kstate));
 	for (tbi = 0; tbi < ktraceback_length; ++tbi) {
@@ -188,6 +190,7 @@ coredump_create(struct ucpustate const *curr_ustate,
 		curr_ustate = kernel_debugtrap_r((struct ucpustate *)curr_ustate, siginfo.si_signo);
 #endif
 	}
+
 	/* TODO */
 	(void)unwind_error;
 }
