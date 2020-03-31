@@ -89,28 +89,18 @@ PUBLIC ATTR_DBGTEXT WUNUSED ATTR_PURE NONNULL((1)) struct debug_function const *
 dbg_getfunc_start(char const *__restrict name) {
 	struct debug_function const *result = NULL;
 	struct debug_function const *iter;
-	size_t score    = (size_t)-1;
 	size_t name_len = strlen(name);
-	bool is_ambig   = false;
 	for (iter = __kernel_debug_functions_start;
 	     iter < __kernel_debug_functions_end; ++iter) {
-		size_t new_score;
 		size_t funclen = strlen(iter->df_name);
 		if (funclen < name_len)
 			continue;
 		if (memcmp(iter->df_name, name, name_len * sizeof(char)) != 0)
 			continue;
-		new_score = name_len - funclen;
-		if (new_score < score) {
-			is_ambig = false;
-			score    = new_score;
-			result   = iter;
-		} else if (new_score == score) {
-			is_ambig = true;
-		}
+		if (result)
+			return NULL; /* Ambiguous */
+		result = iter;
 	}
-	if (is_ambig)
-		result = NULL;
 	return result;
 }
 
