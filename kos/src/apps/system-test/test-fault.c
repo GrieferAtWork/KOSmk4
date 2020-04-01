@@ -468,7 +468,15 @@ DEFINE_TEST(segfault_special_addresses) {
        * (even when `modrm.mi_reg != 0'), so the kernel can't intercept
        * any exception to emulate the instruction, and %cs:%(r)ip becomes
        * unaligned since pop:0x8f/0 is shorter than the XOP that is actually
-       * hidden within... (TODO: Investigate if this can be fixed in qemu...) */
+       * hidden within...
+       * ... After investigating the issue, QEMU does appear to simply ignore
+       *     the MODRM.REG field of the 0x8f opcode (and does so unconditionally)
+       *     Furthermore a real machine (mine) raises a #UD exception when trying
+       *     to execute something like 0x8f/1 (which is what the correct behavior
+       *     would be).
+       *     Sadly, I don't have an account for the QEMU bug tracker, and I don't
+       *     feel like making one right now, so I'm going to leave it at that for
+       *     the time being... */
 	{
 		unsigned int i;
 		for (i = 0; i < 0xff; ++i) {
