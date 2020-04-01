@@ -42,6 +42,7 @@ if (gcc_opt.remove("-O3"))
 #include <hybrid/align.h>
 
 #include <kos/kernel/cpu-state-helpers.h>
+#include <kos/keyboard.h>
 #include <sys/io.h>
 
 #include <stdio.h>
@@ -54,11 +55,31 @@ if (gcc_opt.remove("-O3"))
 DECL_BEGIN
 
 DEFINE_DEBUG_FUNCTION_EX(
+		"screen", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
+		"screen\n"
+		"\tShow the original screen contents (before the debugger was entered)\n"
+		"\tReturn back to the debugger once the user presses any key\n"
+		, argc, argv) {
+	u16 key;
+	if (argc != 1)
+		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	(void)argv;
+	dbg_beginshowscreen();
+	/* Wait for the user to press a button. */
+	do {
+		key = dbg_getkey();
+	} while (!KEY_ISDOWN(key));
+	dbg_endshowscreen();
+	return 0;
+}
+
+DEFINE_DEBUG_FUNCTION_EX(
 		"freeze", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
 		"freeze\n"
-		"\tFree the debugger in an infinite loop (used to test the F12-reset function)\n",
-		argc, argv) {
-	(void)argc;
+		"\tFree the debugger in an infinite loop (used to test the F12-reset function)\n"
+		, argc, argv) {
+	if (argc != 1)
+		return DBG_FUNCTION_INVALID_ARGUMENTS;
 	(void)argv;
 	for (;;)
 		PREEMPTION_WAIT();

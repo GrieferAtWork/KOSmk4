@@ -1631,10 +1631,11 @@ NOTHROW(KCALL x86_initialize_debugger_textfont)(void) {
 /* TTY show-screen support (display the contents of the monitor before the debugger was enabled) */
 PUBLIC void NOTHROW(KCALL dbg_beginshowscreen)(void) {
 	if (!vga_showscreen_enabled) {
+		dbg_endupdate(true);
 		if (vga_backlog_scrollpos)
 			vga_backlog_setscrollpos(0);
-		dbg_beginupdate();
 		VGA_GetCursor(&vga_showscreen_oldcursor);
+		vga_vram(VGA_VRAM_TEXT - VGA_VRAM_BASE);
 		memcpyw(vga_backlog_screen, vga_real_terminal_start, VGA_WIDTH * VGA_HEIGHT);
 		memcpyw(vga_real_terminal_start, vga_oldtext, VGA_WIDTH * VGA_HEIGHT);
 		if (vga_did_initialized_textfont)
@@ -1652,10 +1653,10 @@ PUBLIC void NOTHROW(KCALL dbg_endshowscreen)(void) {
 		VGA_SetPalette(&vga_biospal, sizeof(vga_biospal));
 		if (vga_did_initialized_textfont)
 			VGA_SetFont(&vga_textfont);
+		vga_vram(VGA_VRAM_TEXT - VGA_VRAM_BASE);
 		memcpyw(vga_real_terminal_start, vga_backlog_screen, VGA_WIDTH * VGA_HEIGHT);
 		vga_showscreen_enabled = false;
 		VGA_SetCursor(&vga_showscreen_oldcursor);
-		dbg_endupdate();
 	}
 }
 
