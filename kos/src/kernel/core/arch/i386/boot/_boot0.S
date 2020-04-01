@@ -55,6 +55,9 @@ PRIVATE_FUNCTION(x86_boot0_sector)
 	/* . = 0x7c00 */
 	pushw  %dx
 
+	movb   $'1', %al
+	call16 bios_putc
+
 	/* GET DRIVE PARAMETERS  */
 	xorw   %ax, %ax
 	movw   %ax, %es
@@ -75,6 +78,9 @@ PRIVATE_FUNCTION(x86_boot0_sector)
 #define NUM_HEADS  2(%bp) /* Number of heads */
 #define BOOTDISK   4(%bp) /* %dx, as given by the bios */
 
+	movb   $'2', %al
+	call16 bios_putc
+
 	/* At this point, we must:
 	 * - Enabled A20 (Using the keyboard controller method)
 	 * - Load the kernel using `read_lba' and copy its data to 0x00100000
@@ -84,6 +90,16 @@ PRIVATE_FUNCTION(x86_boot0_sector)
 	 *   to pass information about `BOOTDISK' to the kernel. */
 
 	/* Enable A20 (from https://wiki.osdev.org/A20_Line) */
+	/* FIXME: When trying to boot KOS in VirtualBox, this hangs indefinitely.
+	 *        -> It seems like VirtualBox doesn't like this A20 method...
+	 * Solution: Re-write boot0 to only load the first couple of kilo-byte of
+	 *           the kernel, before jumping to a second state bootloader that
+	 *           contains code for _all_ of the different methods of enabling
+	 *           the A20 line (I doubt that all methods could fit into 512
+	 *           bytes).
+	 *           Additionally, this method also allows us to handle all of the
+	 *           different BIOS error codes with human-readable messages
+	 *           displayed on-screen! */
 	call16 a20wait
 	movb   $(0xad), %al
 	outb   %al, $(0x64)
@@ -105,10 +121,16 @@ PRIVATE_FUNCTION(x86_boot0_sector)
 	outb   %al, $(0x64)
 	call16 a20wait
 
+	movb   $'3', %al
+	call16 bios_putc
+
 	xorw   %ax, %ax
 	movw   %ax, %ds
 	movl   $(S(boot0_gdt_ptr)), %eax
 	lgdtl  (%eax)
+
+	movb   $'4', %al
+	call16 bios_putc
 
 	EXTERN(__kernel_sector_count)
 	movw   $(__kernel_sector_count), %cx
@@ -117,6 +139,32 @@ PRIVATE_FUNCTION(x86_boot0_sector)
 1:
 
 #if 1
+#if 1
+#define PROGRESS_UPDATE_USES_BIOS
+	testb  $(0x3), %al /* BIOS is slow, so only do this every couple of turns */
+	jnz8   2f
+	pushaw
+	movw   %ax, %cx
+	shrw   $(12), %ax
+	movw   $(0), %dx
+	call16 bios_puthex
+
+	movw   %cx, %ax
+	shrw   $(8), %ax
+	movb   $(1), %dl
+	call16 bios_puthex
+
+	movw   %cx, %ax
+	shrw   $(4), %ax
+	movb   $(2), %dl
+	call16 bios_puthex
+
+	movw   %cx, %ax
+	movb   $(3), %dl
+	call16 bios_puthex
+	popaw
+2:
+#else
 	pushaw
 	movw   $(0xb800), %dx
 	movw   %dx, %es
@@ -141,6 +189,7 @@ PRIVATE_FUNCTION(x86_boot0_sector)
 	movb   $(0x07), %ah
 	stosw
 	popaw
+#endif
 #endif
 
 	movw   %cx, %dx
@@ -213,6 +262,37 @@ a20wait2:
 	testb  $(1), %al
 	jz8    a20wait2
 	ret
+
+#ifdef PROGRESS_UPDATE_USES_BIOS
+	/* PUTHEX(row: %dh, column: %dl, hexdigit: %al) */
+PRIVATE_FUNCTION(bios_puthex)
+	pushaw
+	movb   $(0x02), %ah
+	movb   $(0), %bh
+	int    $(0x10) /* set_cursor */
+	popaw
+	pushaw
+	call16 tohex
+	movb   $(0x0a), %ah
+	movb   $(0), %bh
+	movw   $(1), %cx
+	int    $(0x10) /* putchar */
+	popaw
+	ret
+END(bios_puthex)
+#endif /* PROGRESS_UPDATE_USES_BIOS */
+
+PRIVATE_FUNCTION(bios_putc)
+	pushaw
+	movb   $(0x0a), %ah
+	movb   $(0), %bh
+	movw   $(1), %cx
+	movw   $(0), %dx
+	int    $(0x10) /* putchar */
+	popaw
+	ret
+END(bios_putc)
+
 
 PRIVATE_FUNCTION(pmode_enter)
 	movl   %cr0, %eax
