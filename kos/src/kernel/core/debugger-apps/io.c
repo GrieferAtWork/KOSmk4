@@ -69,7 +69,7 @@ DEFINE_DEBUG_FUNCTION_EX(
 		"apply", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
 		"apply\n"
 		"\tApply modifications made to the currently viewed register\n"
-		"\tstate onto the return state (loaded when `exit' is typed)\n"
+		"\tstate onto the return state (loaded when " DF_WHITE("exit") " is typed)\n"
 		, argc, argv) {
 	if (argc != 1)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;

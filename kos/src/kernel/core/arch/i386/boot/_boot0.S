@@ -28,6 +28,16 @@
 #include <asm/instr/jccN.h>
 #include <kos/kernel/segment.h>
 
+.macro jmp16 sym:req
+	.byte  0xe9
+#ifdef __x86_64__
+	.reloc ., R_X86_64_PC16, \sym
+#else /* __x86_64__ */
+	.reloc ., R_386_PC16, \sym
+#endif /* !__x86_64__ */
+	.word  -2
+.endm
+
 .macro call16 sym:req
 	.byte  0xe8
 #ifdef __x86_64__
@@ -55,16 +65,12 @@ PRIVATE_FUNCTION(x86_boot0_sector)
 	/* . = 0x7c00 */
 	pushw  %dx
 
-	movb   $'1', %al
-	call16 bios_putc
-
 	/* GET DRIVE PARAMETERS  */
 	xorw   %ax, %ax
 	movw   %ax, %es
 	movw   %ax, %di
 	movb   $(0x08), %ah
 	int    $(0x13)
-//	jc8    boot_error
 	andb   $(0x3f), %cl
 	/* DH: Number of Heads -1 */
 	/* CL: Sectors per Track */
@@ -74,12 +80,10 @@ PRIVATE_FUNCTION(x86_boot0_sector)
 	pushw  %dx
 	pushw  %cx
 	movw   %sp, %bp
+	pushaw
 #define SEC_TRACK  0(%bp) /* Sectors per track */
 #define NUM_HEADS  2(%bp) /* Number of heads */
 #define BOOTDISK   4(%bp) /* %dx, as given by the bios */
-
-	movb   $'2', %al
-	call16 bios_putc
 
 	/* At this point, we must:
 	 * - Enabled A20 (Using the keyboard controller method)
@@ -90,47 +94,130 @@ PRIVATE_FUNCTION(x86_boot0_sector)
 	 *   to pass information about `BOOTDISK' to the kernel. */
 
 	/* Enable A20 (from https://wiki.osdev.org/A20_Line) */
-	/* FIXME: When trying to boot KOS in VirtualBox, this hangs indefinitely.
-	 *        -> It seems like VirtualBox doesn't like this A20 method...
-	 * Solution: Re-write boot0 to only load the first couple of kilo-byte of
-	 *           the kernel, before jumping to a second state bootloader that
-	 *           contains code for _all_ of the different methods of enabling
-	 *           the A20 line (I doubt that all methods could fit into 512
-	 *           bytes).
-	 *           Additionally, this method also allows us to handle all of the
-	 *           different BIOS error codes with human-readable messages
-	 *           displayed on-screen! */
-	call16 a20wait
+
+	/* Step #1: Check if A20 is alredy enabled. */
+	call16 a20test
+
+	/* Step #2: Try the BIOS A20 method. */
+	movw   $(0x2403), %ax /* Check if enable-A20 is supported */
+	int    $(0x15)
+	jc8    .La20_keyboard_begin /* Unsupported */
+	cmpb   $0, %ah
+	jnz8   .La20_keyboard_begin /* Unsupported */
+	mov    $0x2401, %ax /* Enable-A20 */
+	int    $(0x15)
+
+	/* Step #3: Check if A20 is enabled now. */
+	call16 a20test
+
+	/* Step #4: Try the keyboard controller method. */
+.La20_keyboard_begin:
+	call16 a20wait_x2
 	movb   $(0xad), %al
 	outb   %al, $(0x64)
-	call16 a20wait
+	call16 a20wait_x2
 	movb   $(0xd0), %al
 	outb   %al, $(0x64)
-	call16 a20wait2
+
+	/* begin:inline:a20wait_x1() */
+	movw   $(0xffff), %cx
+1:	inb    $(0x64), %al
+	testb  $(1), %al
+	jnz8   2f
+	loop   1b
+	jmp8   .La20_keyboard_failed
+2:	/* end:inline:a20wait_x1() */
+
 	inb    $(0x60), %al
 	pushw  %ax
-	call16 a20wait
+	call16 a20wait_x2
 	movb   $(0xd1), %al
 	outb   %al, $(0x64)
-	call16 a20wait
+	call16 a20wait_x2
 	popw   %ax
 	orb    $(2), %al
 	outb   %al, $(0x60)
-	call16 a20wait
+	call16 a20wait_x2
 	movb   $(0xae), %al
 	outb   %al, $(0x64)
-	call16 a20wait
+	call16 a20wait_x2
 
-	movb   $'3', %al
-	call16 bios_putc
+	/* Step #5: Check if A20 is enabled now. (do this a couple of times) */
+	movw   $(0xffff), %cx
+1:	call16 a20test
+	loop   1b
 
+.La20_keyboard_failed:
+	/* Step #6: Try the fast-A20 method. */
+	inb    $(0x92), %al
+	orb    $(0x02), %al
+	outb   %al, $(0x92)
+1:	call16 a20test
+	jmp8   1b
+
+	/* Wait for the keyboard controller
+	 * CLOBBER: %dl, %cx, %flags */
+PRIVATE_FUNCTION(a20wait_x2)
+	movw   $(0xffff), %cx
+1:	inb    $(0x64), %al
+	testb  $(2), %al
+	jz8    99f
+	loop   1b
+	jmp8   .La20_keyboard_failed
+END(a20wait_x2)
+
+#if 0
+	/* Wait for the keyboard controller
+	 * CLOBBER: %dl, %cx, %flags */
+PRIVATE_FUNCTION(a20wait_x1)
+	movw   $(0xffff), %cx
+1:	inb    $(0x64), %al
+	testb  $(1), %al
+	jnz8   99f
+	loop   1b
+	jmp8   .La20_keyboard_failed
+END(a20wait_x1)
+#endif
+
+
+	/* Check if a20 is enabled and return to .Ldone_a20 if that is the case.
+	 * CLOBBER: %flags, %ax, %si, %di */
+PRIVATE_FUNCTION(a20test)
+	pushw  %es
+	pushw  %ds
+	xorw   %ax, %ax              /*                                                */
+	movw   %ax, %ds              /* %ds = 0x0000;                                  */
+	notw   %ax                   /*                                                */
+	movw   %ax, %es              /* %es = 0xffff;                                  */
+	movw   $(0x7dfe), %si        /* %si = 0x7dfe;                                  */
+	movw   $(0x7e0e), %di        /* %di = 0x7e0e; # (== 1MiB + 0x0000:0x7dfe)      */
+	cmpsw  %es:(%di), %ds:(%si)  /* FLAGS.ZF = *(u16 *)0x7dfe == *(u16 *)0x107dfe; */
+	jne8   2f                    /* if (!FLAGS.ZF) goto 2f; // non-equal -> A20 is enabled. */
+	/* NOTE: `2x decw %...' encodes as 2 bytes, while `subw $(2), %...' would be 3 bytes! */
+	decw   %si; decw  %si        /* %si -= 2;                                      */
+	decw   %di; decw  %di        /* %di -= 2;                                      */
+	/* Negate the word at %ds:%si */
+	notw   %ds:(%si)             /* *(u16 *)0x7dfe = ~*(u16 *)0x7dfe;              */
+	/* Repeat the compare (if A20 was enabled, the only 0x0000:0x7dfe was
+	 * changed. Otherwise, both memory locations will have been changed) */
+	cmpsw  %es:(%di), %ds:(%si)  /* FLAGS.ZF = *(u16 *)0x7dfe == *(u16 *)0x107dfe; */
+	jne8   2f                    /* if (!FLAGS.ZF) goto 2f; // non-equal -> A20 is enabled. */
+	popw   %ds
+	popw   %es
+99:	ret
+2:	popw   %ds
+	popw   %es
+	popw   %ax /* Return address (must be popped) */
+/*	jmp8   .Ldone_a20 */
+END(a20test)
+
+
+.Ldone_a20:
+	popaw
 	xorw   %ax, %ax
 	movw   %ax, %ds
 	movl   $(S(boot0_gdt_ptr)), %eax
 	lgdtl  (%eax)
-
-	movb   $'4', %al
-	call16 bios_putc
 
 	EXTERN(__kernel_sector_count)
 	movw   $(__kernel_sector_count), %cx
@@ -220,49 +307,6 @@ PRIVATE_FUNCTION(x86_boot0_sector)
 	jmpl   *%eax
 .code16
 
-//	subw   $(512), %sp
-//	movw   %ss, %ax
-//	movw   %ax, %es
-//	movw   %sp, %bx
-//	movw   $(15), %ax /* LBA */
-//	call16 read_lba
-//
-//	/* For debugging: Hexdump to VGA display */
-//	movw   %ss, %ax
-//	movw   %ax, %ds
-//	movw   %sp, %si
-//	movw   $(0xb800), %ax
-//	movw   %ax, %es
-//	movw   $(0), %di
-//	movw   $(512), %cx
-//
-//	movb   $(0x07), %ah
-//1:	lodsb
-//	movb   %al, %dl
-//	shrb   $(4), %al
-//	call16 tohex
-//	stosw
-//	movb   %dl, %al
-//	call16 tohex
-//	stosw
-//	loop   1b
-//
-//
-//1:	hlt
-//	jmp8   1b
-
-a20wait:
-	inb    $(0x64), %al
-	testb  $(2), %al
-	jnz8   a20wait
-	ret
-
-a20wait2:
-	inb    $(0x64), %al
-	testb  $(1), %al
-	jz8    a20wait2
-	ret
-
 #ifdef PROGRESS_UPDATE_USES_BIOS
 	/* PUTHEX(row: %dh, column: %dl, hexdigit: %al) */
 PRIVATE_FUNCTION(bios_puthex)
@@ -281,18 +325,6 @@ PRIVATE_FUNCTION(bios_puthex)
 	ret
 END(bios_puthex)
 #endif /* PROGRESS_UPDATE_USES_BIOS */
-
-PRIVATE_FUNCTION(bios_putc)
-	pushaw
-	movb   $(0x0a), %ah
-	movb   $(0), %bh
-	movw   $(1), %cx
-	movw   $(0), %dx
-	int    $(0x10) /* putchar */
-	popaw
-	ret
-END(bios_putc)
-
 
 PRIVATE_FUNCTION(pmode_enter)
 	movl   %cr0, %eax
@@ -339,22 +371,6 @@ PRIVATE_FUNCTION(pmode_leave)
 	popw   %cx
 	ret
 END(pmode_enter)
-
-PRIVATE_OBJECT(boot0_gdt_ptr)
-	.word  (5 * SIZEOF_SEGMENT_DESCRIPTOR) - 1
-	.long  S(boot0_gdt)
-END(boot0_gdt_ptr)
-PRIVATE_OBJECT(boot0_gdt)
-#define DEFINE_SEGMENT_DESCRIPTOR(TYPE, args) \
-	.long  SEGMENT_##TYPE##_INIT_UL args; \
-	.long  SEGMENT_##TYPE##_INIT_UH args;
-1:	DEFINE_SEGMENT_DESCRIPTOR(DESCRIPTOR, (0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
-	DEFINE_SEGMENT_DESCRIPTOR(DESCRIPTOR, (0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_CODE_EXRD, 1, 0, 1, 0, 0, 1, 1)) /* protected-mode */
-	DEFINE_SEGMENT_DESCRIPTOR(DESCRIPTOR, (0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_DATA_RDWR, 1, 0, 1, 0, 0, 1, 1)) /* protected-mode */
-	DEFINE_SEGMENT_DESCRIPTOR(DESCRIPTOR, (0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_CODE_EXRD, 1, 0, 1, 0, 0, 0, 1)) /* real-mode */
-	DEFINE_SEGMENT_DESCRIPTOR(DESCRIPTOR, (0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_DATA_RDWR, 1, 0, 1, 0, 0, 0, 1)) /* real-mode */
-#undef DEFINE_SEGMENT_DESCRIPTOR
-END(boot0_gdt)
 
 	/* %al = (%al >= 10 ? 'A' + (%al - 10) : '0' + %al)
 	 * IN:  u8 value = %al;   (Upper 4 bits are ignored)
@@ -412,15 +428,25 @@ PRIVATE_FUNCTION(read_lba)
 	movw   $(0x0201), %ax /* 0x01: # of sectors; 0x0200: Function ID */
 	int    $(0x13)
 	popaw
-//	jc8    boot_error
 	ret
 END(read_lba)
 
-PRIVATE_FUNCTION(boot_error)
-	xchgw %bx, %bx /* Bochs magic breakpoint... */
-1:	hlt
-	jmp8 1b
-END(boot_error)
+PRIVATE_OBJECT(boot0_gdt_ptr)
+	.word  (5 * SIZEOF_SEGMENT_DESCRIPTOR) - 1
+	.long  S(boot0_gdt)
+END(boot0_gdt_ptr)
+PRIVATE_OBJECT(boot0_gdt)
+#define DEFINE_SEGMENT_DESCRIPTOR(TYPE, args) \
+	.long  SEGMENT_##TYPE##_INIT_UL args; \
+	.long  SEGMENT_##TYPE##_INIT_UH args;
+1:	DEFINE_SEGMENT_DESCRIPTOR(DESCRIPTOR, (0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+	DEFINE_SEGMENT_DESCRIPTOR(DESCRIPTOR, (0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_CODE_EXRD, 1, 0, 1, 0, 0, 1, 1)) /* protected-mode */
+	DEFINE_SEGMENT_DESCRIPTOR(DESCRIPTOR, (0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_DATA_RDWR, 1, 0, 1, 0, 0, 1, 1)) /* protected-mode */
+	DEFINE_SEGMENT_DESCRIPTOR(DESCRIPTOR, (0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_CODE_EXRD, 1, 0, 1, 0, 0, 0, 1)) /* real-mode */
+	DEFINE_SEGMENT_DESCRIPTOR(DESCRIPTOR, (0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_DATA_RDWR, 1, 0, 1, 0, 0, 0, 1)) /* real-mode */
+#undef DEFINE_SEGMENT_DESCRIPTOR
+END(boot0_gdt)
+
 .if (. - x86_boot0_sector) > 510
 .error "Boot sector too large"
 .endif
