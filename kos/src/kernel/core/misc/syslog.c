@@ -324,14 +324,13 @@ autocomplete_loglevel(size_t argc, char *argv[],
                       size_t starts_with_len) {
 	(void)argv;
 	if (argc == 1) {
-		char buf[COMPILER_STRLEN(syslog_level_names[0]) + 2];
+		char buf[1 + COMPILER_STRLEN(syslog_level_names[0]) + 1];
 		char *p = buf;
 		unsigned int i;
 		if (starts_with_len >= 1) {
 			char ch = starts_with[0];
-			if (ch != '+' && ch != '-')
-				return;
-			*p++ = ch;
+			if (ch == '+' || ch == '-')
+				*p++ = ch;
 		}
 		for (i = 0; i < SYSLOG_LEVEL_COUNT; ++i) {
 			memcpy(p, syslog_level_names[i], sizeof(syslog_level_names[i]));
