@@ -291,8 +291,57 @@ evalthreadexpr(char *expr, struct task **presult) {
 }
 
 
-DEFINE_DEBUG_FUNCTION(
-		"thread",
+PRIVATE ATTR_DBGTEXT void DBG_CALL
+autocomplete_thread(size_t argc, char *argv[],
+                    debug_auto_cb_t cb, void *arg,
+                    char const *starts_with,
+                    size_t starts_with_len) {
+	(void)argv;
+	if (argc == 1) {
+		if (!starts_with_len) {
+			(*cb)(arg, DBGSTR("p"), 1);
+			return;
+		}
+		if (starts_with[0] == 'p') {
+			char pidtext[80];
+			size_t pidtextlen;
+			char const *format = DBGSTR("p%lu");
+			uintptr_t i;
+			if (starts_with_len >= 2 && starts_with[1] == '0') {
+				format = DBGSTR("p0%lo");
+				if (starts_with_len >= 3) {
+					char ns = starts_with[2];
+					if (ns == 'x')
+						format = DBGSTR("p0x%lx");
+					else if (ns == 'X')
+						format = DBGSTR("p0X%lx");
+					else if (ns == 'b')
+						format = DBGSTR("p0b%#lb");
+					else if (ns == 'B')
+						format = DBGSTR("p0B%#lb");
+					else if (ns >= '0' && ns <= '7')
+						;
+					else {
+						return;
+					}
+				}
+			}
+			for (i = 0; i <= pidns_root.pn_mask; ++i) {
+				struct taskpid *ent;
+				ent = pidns_root.pn_list[i].pe_pid;
+				if (!ent || ent == PIDNS_ENTRY_DELETED || wasdestroyed(ent))
+					continue;
+				pidtextlen = sprintf(pidtext, format,
+				                     ent->tp_pids[pidns_root.pn_indirection]);
+				(*cb)(arg, pidtext, pidtextlen);
+			}
+			return;
+		}
+	}
+}
+
+DEFINE_DEBUG_FUNCTION_EX(
+		"thread", &autocomplete_thread,
 		"thread ADDR\n"
 		"\tSet the thread that is being debuged\n"
 		"\tWarning: Setting an invalid thread address may triple-fault the kernel\n"

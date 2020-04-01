@@ -2653,8 +2653,23 @@ PRIVATE ATTR_DBGTEXT void KCALL p64_do_ldpd(unsigned int vec4_max) {
 		p64_doenum(&data, data.ed_prevstart, data.ed_prevsize, data.ed_prevword, data.ed_mask);
 }
 
-DEFINE_DEBUG_FUNCTION(
-		"lspd",
+PRIVATE ATTR_DBGRODATA char const lspd_str_kernel[] = "kernel";
+PRIVATE ATTR_DBGRODATA char const lspd_str_user[] = "user";
+
+PRIVATE ATTR_DBGTEXT void DBG_CALL
+autocomplete_lspd(size_t argc, char *argv[],
+                  debug_auto_cb_t cb, void *arg,
+                  char const *UNUSED(starts_with),
+                  size_t UNUSED(starts_with_len)) {
+	(void)argv;
+	if (argc == 1) {
+		(*cb)(arg, lspd_str_kernel, COMPILER_STRLEN(lspd_str_kernel));
+		(*cb)(arg, lspd_str_user, COMPILER_STRLEN(lspd_str_user));
+	}
+}
+
+DEFINE_DEBUG_FUNCTION_EX(
+		"lspd", &autocomplete_lspd,
 		"lspd [MODE:kernel|user=user]\n"
 		"\tDo a raw walk over the loaded page directory and enumerate mappings.\n"
 		"\t" DF_WHITE("mode") " can be specified as either " DF_WHITE("kernel") " or " DF_WHITE("user") " to select if " DF_WHITE("vm_kernel") "\n"
@@ -2662,9 +2677,9 @@ DEFINE_DEBUG_FUNCTION(
 		argc, argv) {
 	PAGEDIR_P_SELFTYPE pdir;
 	if (argc == 2) {
-		if (strcmp(argv[1], "kernel") == 0)
+		if (strcmp(argv[1], lspd_str_kernel) == 0)
 			goto do_ls_kernel;
-		if (strcmp(argv[1], "user") != 0)
+		if (strcmp(argv[1], lspd_str_user) != 0)
 			return DBG_FUNCTION_INVALID_ARGUMENTS;
 	} else {
 		if (argc != 1)

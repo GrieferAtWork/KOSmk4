@@ -114,6 +114,7 @@ DEFINE_DEBUG_FUNCTION(
 	dbg_setregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS, pflags);
 	return 0;
 }
+
 DEFINE_DEBUG_FUNCTION(
 		"sti",
 		"sti\n"
@@ -130,6 +131,7 @@ DEFINE_DEBUG_FUNCTION(
 	dbg_setregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS, pflags);
 	return 0;
 }
+
 DEFINE_DEBUG_FUNCTION(
 		"cld",
 		"cld\n"
@@ -146,6 +148,7 @@ DEFINE_DEBUG_FUNCTION(
 	dbg_setregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS, pflags);
 	return 0;
 }
+
 DEFINE_DEBUG_FUNCTION(
 		"std",
 		"std\n"
@@ -162,6 +165,7 @@ DEFINE_DEBUG_FUNCTION(
 	dbg_setregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS, pflags);
 	return 0;
 }
+
 DEFINE_DEBUG_FUNCTION(
 		"clc",
 		"clc\n"
@@ -178,6 +182,7 @@ DEFINE_DEBUG_FUNCTION(
 	dbg_setregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS, pflags);
 	return 0;
 }
+
 DEFINE_DEBUG_FUNCTION(
 		"stc",
 		"stc\n"
@@ -194,6 +199,7 @@ DEFINE_DEBUG_FUNCTION(
 	dbg_setregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS, pflags);
 	return 0;
 }
+
 DEFINE_DEBUG_FUNCTION(
 		"cmc",
 		"cmc\n"
@@ -413,6 +419,7 @@ DEFINE_DEBUG_FUNCTION(
 	           id, id, val, val);
 	return 0;
 }
+
 DEFINE_DEBUG_FUNCTION(
 		"wrmsr",
 		"wrmsr ID VAL\n"

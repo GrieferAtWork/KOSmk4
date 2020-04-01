@@ -317,8 +317,31 @@ dbg_loglevel_from_name(char const *__restrict name) {
 	return (unsigned int)-1;
 }
 
-DEFINE_DEBUG_FUNCTION(
-		"loglevel",
+PRIVATE ATTR_DBGTEXT void DBG_CALL
+autocomplete_loglevel(size_t argc, char *argv[],
+                      debug_auto_cb_t cb, void *arg,
+                      char const *starts_with,
+                      size_t starts_with_len) {
+	(void)argv;
+	if (argc == 1) {
+		char buf[COMPILER_STRLEN(syslog_level_names[0]) + 2];
+		char *p = buf;
+		unsigned int i;
+		if (starts_with_len >= 1) {
+			char ch = starts_with[0];
+			if (ch != '+' && ch != '-')
+				return;
+			*p++ = ch;
+		}
+		for (i = 0; i < SYSLOG_LEVEL_COUNT; ++i) {
+			memcpy(p, syslog_level_names[i], sizeof(syslog_level_names[i]));
+			(*cb)(arg, buf, strlen(buf));
+		}
+	}
+}
+
+DEFINE_DEBUG_FUNCTION_EX(
+		"loglevel", &autocomplete_loglevel,
 		"loglevel [level|-level|+level]...\n"
 		"\tList currently enabled syslog levels when no arguments are given\n"
 		"\tOtherwise, enable/disable specific levels (+level|-level) or restrict\n"

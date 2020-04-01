@@ -112,6 +112,7 @@ DEFINE_DEBUG_FUNCTION(
 	dbg_printf(DBGSTR("inb %#.4I16x: %#.2I8x (%I8u)\n"), (u16)port, val, val);
 	return (uintptr_t)val;
 }
+
 DEFINE_DEBUG_FUNCTION(
 		"inw",
 		"inw PORT\n"
@@ -198,7 +199,7 @@ DEFINE_DEBUG_FUNCTION(
 	uintptr_t count, addr;
 	unsigned int size = 1;
 	while (argc > 2 && argv[1][0] == '-') {
-		/**/ if (!strcmp(argv[1], DBGSTR("-p")))
+		if (!strcmp(argv[1], DBGSTR("-p")))
 			size = sizeof(void *);
 		else if (!strcmp(argv[1], DBGSTR("-b")))
 			size = 1;

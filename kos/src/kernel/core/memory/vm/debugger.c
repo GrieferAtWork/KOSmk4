@@ -49,9 +49,24 @@ if (gcc_opt.remove("-O3"))
 
 DECL_BEGIN
 
-DEFINE_DEBUG_FUNCTION(
-		"lsvm",
-		"lsvm [NAME=kern] [MINADDR=0] [MAXADDR=...]\n"
+PRIVATE ATTR_DBGRODATA char const lsvm_str_kernel[] = "kernel";
+PRIVATE ATTR_DBGRODATA char const lsvm_str_user[] = "user";
+
+PRIVATE ATTR_DBGTEXT void DBG_CALL
+autocomplete_lsvm(size_t argc, char *argv[],
+                  debug_auto_cb_t cb, void *arg,
+                  char const *UNUSED(starts_with),
+                  size_t UNUSED(starts_with_len)) {
+	(void)argv;
+	if (argc == 1) {
+		(*cb)(arg, lsvm_str_kernel, COMPILER_STRLEN(lsvm_str_kernel));
+		(*cb)(arg, lsvm_str_user, COMPILER_STRLEN(lsvm_str_user));
+	}
+}
+
+DEFINE_DEBUG_FUNCTION_EX(
+		"lsvm", &autocomplete_lsvm,
+		"lsvm [NAME=kernel|user] [MINADDR=0] [MAXADDR=...]\n"
 		"\tList all VM mappings with the given VM. " DF_WHITE("NAME") " must be done of " DF_WHITE("kern")
 			", " DF_WHITE("user") " or the hex-base address of a " DF_BLUE("struct vm") "\n"
 		"Nodes are enumerated as:\n\n"
@@ -82,9 +97,9 @@ DEFINE_DEBUG_FUNCTION(
 	--argc;
 	++argv;
 	if (argc) {
-		if (strcmp(argv[0], DBGSTR("kern")) == 0)
+		if (strcmp(argv[0], lsvm_str_kernel) == 0)
 			;
-		else if (strcmp(argv[0], DBGSTR("user")) == 0)
+		else if (strcmp(argv[0], lsvm_str_user) == 0)
 			v = dbg_current->t_vm;
 		else if (!sscanf(argv[0], DBGSTR("%p"), &v))
 			return DBG_FUNCTION_INVALID_ARGUMENTS;

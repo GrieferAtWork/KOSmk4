@@ -251,8 +251,23 @@ NOTHROW(KCALL x86_initialize_sysenter)(void) {
 }
 
 #ifdef CONFIG_HAVE_DEBUGGER
-DEFINE_DEBUG_FUNCTION(
-		"sctrace",
+PRIVATE ATTR_DBGRODATA char const sctrace_str_0[] = "0";
+PRIVATE ATTR_DBGRODATA char const sctrace_str_1[] = "1";
+
+PRIVATE ATTR_DBGTEXT void DBG_CALL
+autocomplete_sctrace(size_t argc, char *argv[],
+                     debug_auto_cb_t cb, void *arg,
+                     char const *UNUSED(starts_with),
+                     size_t UNUSED(starts_with_len)) {
+	(void)argv;
+	if (argc == 1) {
+		(*cb)(arg, sctrace_str_0, COMPILER_STRLEN(sctrace_str_0));
+		(*cb)(arg, sctrace_str_1, COMPILER_STRLEN(sctrace_str_1));
+	}
+}
+
+DEFINE_DEBUG_FUNCTION_EX(
+		"sctrace", &autocomplete_sctrace,
 		"sctrace [0|1]\n"
 		"\tGet or set system call tracing\n"
 		, argc, argv) {
@@ -264,9 +279,9 @@ DEFINE_DEBUG_FUNCTION(
 	}
 	if (argc != 2)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
-	if (strcmp(argv[1], DBGSTR("1")) == 0) {
+	if (strcmp(argv[1], sctrace_str_1) == 0) {
 		enabled = true;
-	} else if (strcmp(argv[1], DBGSTR("0")) == 0) {
+	} else if (strcmp(argv[1], sctrace_str_0) == 0) {
 		enabled = false;
 	} else {
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
