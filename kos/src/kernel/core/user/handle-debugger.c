@@ -57,8 +57,8 @@ printhandle(unsigned int fd, struct handle const *__restrict hand) {
 	dbg_putc('\n');
 }
 
-DEFINE_DEBUG_FUNCTION(
-		"lsfd",
+DEFINE_DEBUG_FUNCTION_EX(
+		"lsfd", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
 		"lsfd\n"
 		"Enumate open file descriptors within the current thread\n"
 		"The " DF_WHITE("flags") " field consists of:\n"

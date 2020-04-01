@@ -271,7 +271,7 @@ autocomplete_help(size_t argc, char *argv[],
 }
 
 DEFINE_DEBUG_FUNCTION_EX(
-		"help", &autocomplete_help,
+		"help", &autocomplete_help, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
 		"help\n"
 		"\tDisplay a list of available commands\n"
 		"help command\n"
@@ -518,6 +518,7 @@ NOTHROW(KCALL dbg_autocomplete)(size_t cursor,
                                 ) {
 	size_t argc, effective_argc;
 	debug_auto_t autofun;
+	uintptr_t func_flags;
 	char *cmdline_copy;
 	union {
 		struct dbg_autocomplete_cnt_cookie cnt;
@@ -552,7 +553,8 @@ do_autocomplete:
 	if (argc == 0 || (argc == 1 && incomplete_word)) {
 		/* Auto-complete the name of a command
 		 * -> Same as the auto-completion for `help' */
-		autofun = &autocomplete_help;
+		autofun    = &autocomplete_help;
+		func_flags = DBG_FUNCTION_FLAG_AUTOEXCLUSIVE;
 	} else {
 		/* Auto-complete arguments for a command `argv[0]' */
 		struct debug_function const *func;
@@ -569,7 +571,8 @@ setcolor_badcmd:
 		}
 		if (!func->df_auto)
 			goto done; /* No auto-completion for this function... */
-		autofun = func->df_auto;
+		autofun    = func->df_auto;
+		func_flags = func->df_flag;
 	}
 	effective_argc   = argc;
 	if (incomplete_word) {
@@ -590,7 +593,7 @@ set_starts_empty_string:
 	           &dbg_autocomplete_countmatches, &cookie.cnt,
 	           cookie.cnt.acc_starts, cookie.cnt.acc_startslen);
 	if (cookie.cnt.acc_count == 0) {
-		if (autofun == &autocomplete_help)
+		if (func_flags & DBG_FUNCTION_FLAG_AUTOEXCLUSIVE)
 			goto setcolor_badcmd;
 		goto done; /* Nothing to do here! */
 	}
@@ -740,8 +743,8 @@ done:
 
 
 
-DEFINE_DEBUG_FUNCTION(
-		"exit",
+DEFINE_DEBUG_FUNCTION_EX(
+		"exit", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
 		"exit\n"
 		"\tExit debugger mode and resume execution\n"
 		, argc, argv) {

@@ -500,8 +500,8 @@ dmesg_print_packet(struct syslog_packet *__restrict packet,
 	           (size_t)packet->sp_msg);
 }
 
-DEFINE_DEBUG_FUNCTION(
-		"dmesg",
+DEFINE_DEBUG_FUNCTION_EX(
+		"dmesg", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
 		"dmesg\n"
 		"\tEnumerate most recent system log messages\n",
 		argc, argv) {

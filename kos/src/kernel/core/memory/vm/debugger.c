@@ -65,7 +65,7 @@ autocomplete_lsvm(size_t argc, char *argv[],
 }
 
 DEFINE_DEBUG_FUNCTION_EX(
-		"lsvm", &autocomplete_lsvm,
+		"lsvm", &autocomplete_lsvm, DBG_FUNCTION_FLAG_NORMAL,
 		"lsvm [NAME=kernel|user] [MINADDR=0] [MAXADDR=...]\n"
 		"\tList all VM mappings with the given VM. " DF_WHITE("NAME") " must be done of " DF_WHITE("kern")
 			", " DF_WHITE("user") " or the hex-base address of a " DF_BLUE("struct vm") "\n"
@@ -261,7 +261,7 @@ autocomplete_aslr(size_t argc, char *argv[],
 }
 
 DEFINE_DEBUG_FUNCTION_EX(
-		"aslr", &autocomplete_aslr,
+		"aslr", &autocomplete_aslr, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
 		"aslr [0|1]\n"
 		"\tView or enable/disable AddressSpaceLayoutRandomization\n"
 		, argc, argv) {

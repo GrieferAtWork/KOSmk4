@@ -2669,7 +2669,7 @@ autocomplete_lspd(size_t argc, char *argv[],
 }
 
 DEFINE_DEBUG_FUNCTION_EX(
-		"lspd", &autocomplete_lspd,
+		"lspd", &autocomplete_lspd, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
 		"lspd [MODE:kernel|user=user]\n"
 		"\tDo a raw walk over the loaded page directory and enumerate mappings.\n"
 		"\t" DF_WHITE("mode") " can be specified as either " DF_WHITE("kernel") " or " DF_WHITE("user") " to select if " DF_WHITE("vm_kernel") "\n"

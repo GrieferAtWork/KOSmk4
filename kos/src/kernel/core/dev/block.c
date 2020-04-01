@@ -1585,8 +1585,8 @@ again:
 	}
 }
 
-DEFINE_DEBUG_FUNCTION(
-		"lsblk",
+DEFINE_DEBUG_FUNCTION_EX(
+		"lsblk", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
 		"lsblk\n"
 		"\tList all defined block devices\n"
 		, argc, argv) {

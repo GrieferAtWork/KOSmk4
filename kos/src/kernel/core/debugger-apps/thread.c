@@ -159,8 +159,8 @@ LOCAL bool KCALL verify_thread_address(struct task *p) {
 }
 
 
-DEFINE_DEBUG_FUNCTION(
-		"lsthread",
+DEFINE_DEBUG_FUNCTION_EX(
+		"lsthread", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
 		"lsthread\n"
 		"\tList all threads running on the system\n",
 		argc, argv) {
@@ -341,7 +341,7 @@ autocomplete_thread(size_t argc, char *argv[],
 }
 
 DEFINE_DEBUG_FUNCTION_EX(
-		"thread", &autocomplete_thread,
+		"thread", &autocomplete_thread, DBG_FUNCTION_FLAG_NORMAL,
 		"thread ADDR\n"
 		"\tSet the thread that is being debuged\n"
 		"\tWarning: Setting an invalid thread address may triple-fault the kernel\n"

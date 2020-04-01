@@ -63,6 +63,22 @@ DECL_BEGIN
 
 #define DBG_CALL VCALL
 
+/* Flags for `debug_function::df_flag' */
+#define DBG_FUNCTION_FLAG_NORMAL        0x0000
+
+/* Options listed by the auto-completion callback are exclusive, in
+ * that no other options are accepted than those that can be enumerated
+ * by the auto-completion callback (if no auto-completion callback was
+ * specified, then the function doesn't accept any argument and will
+ * return `DBG_FUNCTION_INVALID_ARGUMENTS' whenever `argc != 1' (1,
+ * because argv[0] is the name of the function))
+ * When this flag is set, the commandline changes its color (to red)
+ * whenever the word currently being written can no longer be auto-
+ * completed (the same way it changes color when the name of the current
+ * command is unknown) */
+#define DBG_FUNCTION_FLAG_AUTOEXCLUSIVE 0x0001
+
+
 #ifdef __CC__
 /* The prototype for the callback of a debugger service function. */
 typedef uintptr_t (DBG_CALL *debug_func_t)(size_t argc, char *argv[]);
@@ -85,6 +101,7 @@ struct debug_function {
 	char const  *df_name; /* [1..1][const] The function's name. */
 	char const  *df_help; /* [0..1][const] An optional help string for the function. */
 	debug_auto_t df_auto; /* [0..1][const] An optional callback for tab-auto-completion. */
+	uintptr_t    df_flag; /* [const] Set of `DBG_FUNCTION_FLAG_*' */
 };
 
 /* Search for a debug function matching the given name.
@@ -109,16 +126,16 @@ dbg_getfunc_start(char const *__restrict name);
 #define _DBG_PRIVATE_FUNCTION_NAME(x) _DBG_PRIVATE_FUNCTION_NAME2(x, __LINE__)
 
 #define _DEFINE_DEBUG_FUNCTION(name, help, main) \
-	_DEFINE_DEBUG_FUNCTION_EX(name, __NULLPTR, help, main)
-#define _DEFINE_DEBUG_FUNCTION_EX(name, auto, help, main)                                                                 \
+	_DEFINE_DEBUG_FUNCTION_EX(name, __NULLPTR, DBG_FUNCTION_FLAG_NORMAL, help, main)
+#define _DEFINE_DEBUG_FUNCTION_EX(name, auto, flags, help, main)                                                                 \
 	PRIVATE ATTR_SECTION(".rodata.cold.debug_function_str") char const _DBG_PRIVATE_FUNCTION_NAME(_debug_name_)[] = name; \
 	PRIVATE ATTR_SECTION(".rodata.cold.debug_function_str") char const _DBG_PRIVATE_FUNCTION_NAME(_debug_help_)[] = help; \
 	PRIVATE ATTR_SECTION(DBG_SECTION_FUNCTIONS) ATTR_USED ATTR_ALIGNED(__SIZEOF_POINTER__)                                \
 	struct debug_function const _DBG_PRIVATE_FUNCTION_NAME(_debug_def) =                                                  \
-		{ &main, _DBG_PRIVATE_FUNCTION_NAME(_debug_name_), _DBG_PRIVATE_FUNCTION_NAME(_debug_help_), auto }
+		{ &main, _DBG_PRIVATE_FUNCTION_NAME(_debug_name_), _DBG_PRIVATE_FUNCTION_NAME(_debug_help_), auto, flags }
 #define DEFINE_DEBUG_FUNCTION(name, help, argc, argv) \
-	DEFINE_DEBUG_FUNCTION_EX(name, __NULLPTR, help, argc, argv)
-#define DEFINE_DEBUG_FUNCTION_EX(name, auto, help, argc, argv)                                                            \
+	DEFINE_DEBUG_FUNCTION_EX(name, __NULLPTR, DBG_FUNCTION_FLAG_NORMAL, help, argc, argv)
+#define DEFINE_DEBUG_FUNCTION_EX(name, auto, flags, help, argc, argv)                                                            \
 	PRIVATE uintptr_t DBG_CALL _DBG_PRIVATE_FUNCTION_NAME(_debug_main_)(size_t argc, char *argv[]);                       \
 	PRIVATE ATTR_SECTION(".rodata.cold.debug_function_str") char const _DBG_PRIVATE_FUNCTION_NAME(_debug_name_)[] = name; \
 	PRIVATE ATTR_SECTION(".rodata.cold.debug_function_str") char const _DBG_PRIVATE_FUNCTION_NAME(_debug_help_)[] = help; \
@@ -126,7 +143,7 @@ dbg_getfunc_start(char const *__restrict name);
 	struct debug_function const _DBG_PRIVATE_FUNCTION_NAME(_debug_def) =                                                  \
 		{	&_DBG_PRIVATE_FUNCTION_NAME(_debug_main_),                                                                    \
 			_DBG_PRIVATE_FUNCTION_NAME(_debug_name_),                                                                     \
-			_DBG_PRIVATE_FUNCTION_NAME(_debug_help_), auto };                                                             \
+			_DBG_PRIVATE_FUNCTION_NAME(_debug_help_), auto, flags };                                                      \
 	PRIVATE ATTR_DBGTEXT uintptr_t DBG_CALL _DBG_PRIVATE_FUNCTION_NAME(_debug_main_)(size_t argc, char *argv[])
 #endif /* __CC__ */
 
@@ -221,9 +238,9 @@ DECL_END
 #else /* CONFIG_HAVE_DEBUGGER */
 
 #define DEFINE_DEBUG_FUNCTION(name, help, argc, argv)                                     /* nothing */
-#define DEFINE_DEBUG_FUNCTION_EX(name, auto, help, argc, argv)                            /* nothing */
+#define DEFINE_DEBUG_FUNCTION_EX(name, auto, flags, help, argc, argv)                     /* nothing */
 #define _DEFINE_DEBUG_FUNCTION(name, help, main)                                          /* nothing */
-#define _DEFINE_DEBUG_FUNCTION_EX(name, auto, help, main)                                 /* nothing */
+#define _DEFINE_DEBUG_FUNCTION_EX(name, auto, flags, help, main)                          /* nothing */
 #define DEFINE_DBG_INIT(func)                                                             /* nothing */
 #define DEFINE_DBG_RESET(func)                                                            /* nothing */
 #define DEFINE_DBG_FINI(func)                                                             /* nothing */

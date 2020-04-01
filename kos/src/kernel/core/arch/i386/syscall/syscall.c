@@ -267,7 +267,7 @@ autocomplete_sctrace(size_t argc, char *argv[],
 }
 
 DEFINE_DEBUG_FUNCTION_EX(
-		"sctrace", &autocomplete_sctrace,
+		"sctrace", &autocomplete_sctrace, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
 		"sctrace [0|1]\n"
 		"\tGet or set system call tracing\n"
 		, argc, argv) {

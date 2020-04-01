@@ -259,8 +259,8 @@ again:
 
 
 
-DEFINE_DEBUG_FUNCTION(
-		"locals",
+DEFINE_DEBUG_FUNCTION_EX(
+		"locals", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
 		"locals\n"
 		"List the names, types and values of locally defined C variables at the current source location\n"
 		, argc, argv) {
@@ -294,8 +294,8 @@ locals_maxlen(void *arg,
 	return 0;
 }
 
-DEFINE_DEBUG_FUNCTION(
-		"l",
+DEFINE_DEBUG_FUNCTION_EX(
+		"l", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
 		"l\n"
 		"\tSimilar to " DF_WHITE("locals") ", however the presentation layout is somewhat "
 		"different, in that instead of following C syntax, variable names are written "

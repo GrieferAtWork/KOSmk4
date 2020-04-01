@@ -837,8 +837,8 @@ again:
 	}
 }
 
-DEFINE_DEBUG_FUNCTION(
-		"lschr",
+DEFINE_DEBUG_FUNCTION_EX(
+		"lschr", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
 		"lschr\n"
 		"\tList all defined character devices\n"
 		, argc, argv) {

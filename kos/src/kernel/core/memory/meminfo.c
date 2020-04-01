@@ -901,8 +901,8 @@ PRIVATE char const pmembank_type_colors[PMEMBANK_TYPE_COUNT][6] = {
 	/* [PMEMBANK_TYPE_BADRAM]    = */ DF_SETFGCOLOR(DBG_COLOR_MAROON),
 };
 
-DEFINE_DEBUG_FUNCTION(
-		"lsmem",
+DEFINE_DEBUG_FUNCTION_EX(
+		"lsmem", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
 		"lsmem\n"
 		"\tList known memory banks, as well as their typing\n"
 		"\tBanks are listed as <start-end type bytes>\n",

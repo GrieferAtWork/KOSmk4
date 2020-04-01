@@ -53,8 +53,8 @@ if (gcc_opt.remove("-O3"))
 
 DECL_BEGIN
 
-DEFINE_DEBUG_FUNCTION(
-		"freeze",
+DEFINE_DEBUG_FUNCTION_EX(
+		"freeze", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
 		"freeze\n"
 		"\tFree the debugger in an infinite loop (used to test the F12-reset function)\n",
 		argc, argv) {
@@ -65,8 +65,8 @@ DEFINE_DEBUG_FUNCTION(
 	return 0;
 }
 
-DEFINE_DEBUG_FUNCTION(
-		"apply",
+DEFINE_DEBUG_FUNCTION_EX(
+		"apply", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
 		"apply\n"
 		"\tApply modifications made to the currently viewed register\n"
 		"\tstate onto the return state (loaded when `exit' is typed)\n"
@@ -78,8 +78,8 @@ DEFINE_DEBUG_FUNCTION(
 	return 0;
 }
 
-DEFINE_DEBUG_FUNCTION(
-		"undo",
+DEFINE_DEBUG_FUNCTION_EX(
+		"undo", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
 		"undo\n"
 		"\tUndo all unapplied changes to the return register state\n"
 		, argc, argv) {
@@ -341,8 +341,8 @@ DEFINE_DEBUG_FUNCTION(
 	return 0;
 }
 
-DEFINE_DEBUG_FUNCTION(
-		"trace",
+DEFINE_DEBUG_FUNCTION_EX(
+		"trace", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
 		"\tDisplay a traceback for the current source location\n"
 		"\tInlined functions are displayed in blue\n"
 		"\tPC       IS   Name           Off   File    Line  Info\n"
@@ -429,8 +429,8 @@ DEFINE_DEBUG_FUNCTION(
 	return 0;
 }
 
-DEFINE_DEBUG_FUNCTION(
-		"u",
+DEFINE_DEBUG_FUNCTION_EX(
+		"u", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
 		"u\n"
 		"\tUnwind the current source location to its call-site\n"
 		, argc, argv) {

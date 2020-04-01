@@ -341,7 +341,7 @@ autocomplete_loglevel(size_t argc, char *argv[],
 }
 
 DEFINE_DEBUG_FUNCTION_EX(
-		"loglevel", &autocomplete_loglevel,
+		"loglevel", &autocomplete_loglevel, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
 		"loglevel [level|-level|+level]...\n"
 		"\tList currently enabled syslog levels when no arguments are given\n"
 		"\tOtherwise, enable/disable specific levels (+level|-level) or restrict\n"

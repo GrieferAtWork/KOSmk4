@@ -98,8 +98,8 @@ DEFINE_DEBUG_FUNCTION(
 #endif /* !__x86_64__ */
 
 
-DEFINE_DEBUG_FUNCTION(
-		"cli",
+DEFINE_DEBUG_FUNCTION_EX(
+		"cli", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
 		"cli\n"
 		"\tSet " DF_COLOR(DBG_COLOR_DARK_GRAY, DBG_COLOR_LIGHT_GRAY, "EFLAGS.IF = 0") "\n"
 		, argc, argv) {
@@ -115,8 +115,8 @@ DEFINE_DEBUG_FUNCTION(
 	return 0;
 }
 
-DEFINE_DEBUG_FUNCTION(
-		"sti",
+DEFINE_DEBUG_FUNCTION_EX(
+		"sti", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
 		"sti\n"
 		"\tSet " DF_COLOR(DBG_COLOR_DARK_GRAY, DBG_COLOR_LIGHT_GRAY, "EFLAGS.IF = 1") "\n"
 		, argc, argv) {
@@ -132,8 +132,8 @@ DEFINE_DEBUG_FUNCTION(
 	return 0;
 }
 
-DEFINE_DEBUG_FUNCTION(
-		"cld",
+DEFINE_DEBUG_FUNCTION_EX(
+		"cld", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
 		"cld\n"
 		"\tSet " DF_COLOR(DBG_COLOR_DARK_GRAY, DBG_COLOR_LIGHT_GRAY, "EFLAGS.DF = 0") "\n"
 		, argc, argv) {
@@ -149,8 +149,8 @@ DEFINE_DEBUG_FUNCTION(
 	return 0;
 }
 
-DEFINE_DEBUG_FUNCTION(
-		"std",
+DEFINE_DEBUG_FUNCTION_EX(
+		"std", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
 		"std\n"
 		"\tSet " DF_COLOR(DBG_COLOR_DARK_GRAY, DBG_COLOR_LIGHT_GRAY, "EFLAGS.DF = 1") "\n"
 		, argc, argv) {
@@ -166,8 +166,8 @@ DEFINE_DEBUG_FUNCTION(
 	return 0;
 }
 
-DEFINE_DEBUG_FUNCTION(
-		"clc",
+DEFINE_DEBUG_FUNCTION_EX(
+		"clc", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
 		"clc\n"
 		"\tSet " DF_COLOR(DBG_COLOR_DARK_GRAY, DBG_COLOR_LIGHT_GRAY, "EFLAGS.CF = 0") "\n"
 		, argc, argv) {
@@ -183,8 +183,8 @@ DEFINE_DEBUG_FUNCTION(
 	return 0;
 }
 
-DEFINE_DEBUG_FUNCTION(
-		"stc",
+DEFINE_DEBUG_FUNCTION_EX(
+		"stc", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
 		"stc\n"
 		"\tSet " DF_COLOR(DBG_COLOR_DARK_GRAY, DBG_COLOR_LIGHT_GRAY, "EFLAGS.CF = 1") "\n"
 		, argc, argv) {
@@ -200,8 +200,8 @@ DEFINE_DEBUG_FUNCTION(
 	return 0;
 }
 
-DEFINE_DEBUG_FUNCTION(
-		"cmc",
+DEFINE_DEBUG_FUNCTION_EX(
+		"cmc", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
 		"cmc\n"
 		"\tSet " DF_COLOR(DBG_COLOR_DARK_GRAY, DBG_COLOR_LIGHT_GRAY, "EFLAGS.CF = -EFLAGS.CF") "\n"
 		, argc, argv) {
@@ -238,8 +238,8 @@ DEFINE_DEBUG_FUNCTION(
 	return 0;
 }
 
-DEFINE_DEBUG_FUNCTION(
-		"sgdt",
+DEFINE_DEBUG_FUNCTION_EX(
+		"sgdt", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
 		"sgdt\n"
 		"\tPrint the base and limit of the current Global Descriptor Table\n"
 		, argc, argv) {
@@ -276,8 +276,8 @@ DEFINE_DEBUG_FUNCTION(
 	return 0;
 }
 
-DEFINE_DEBUG_FUNCTION(
-		"sidt",
+DEFINE_DEBUG_FUNCTION_EX(
+		"sidt", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
 		"sidt\n"
 		"\tPrint the base and limit of the current Interrupt Descriptor Table\n"
 		, argc, argv) {
@@ -328,8 +328,8 @@ debug_regdump_print_format(struct regdump_printer *__restrict self,
 }
 
 
-DEFINE_DEBUG_FUNCTION(
-		"r",
+DEFINE_DEBUG_FUNCTION_EX(
+		"r", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
 		"r\n"
 		"\tDisplay a dump of the current register state\n"
 		, argc, argv) {

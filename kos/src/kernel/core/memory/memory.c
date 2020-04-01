@@ -1129,8 +1129,8 @@ NOTHROW(KCALL page_ismapped)(pageptr_t page, pagecnt_t num_pages) {
 }
 
 #ifdef CONFIG_HAVE_DEBUGGER
-DEFINE_DEBUG_FUNCTION(
-		"lsram",
+DEFINE_DEBUG_FUNCTION_EX(
+		"lsram", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
 		"lsram\n"
 		"\tList page allocation zones, as well as the amount of available ram\n"
 		"\tZones are listed as <id start-end 1.23456% used (used_pages/total_pages)>\n",

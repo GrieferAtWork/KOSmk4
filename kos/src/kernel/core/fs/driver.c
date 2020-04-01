@@ -4495,8 +4495,8 @@ again_init_drivers:
 
 
 #ifdef CONFIG_HAVE_DEBUGGER
-DEFINE_DEBUG_FUNCTION(
-		"lsmod",
+DEFINE_DEBUG_FUNCTION_EX(
+		"lsmod", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
 		"lsmod\n"
 		"\tList all currently loaded drivers\n"
 		, argc, argv) {
