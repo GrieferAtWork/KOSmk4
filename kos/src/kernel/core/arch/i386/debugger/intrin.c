@@ -62,7 +62,7 @@ print_cpuid_reg(u32 leaf, char reg_acdb, u32 reg_value) {
 	dbg_printf(DBGSTR("cpuid "    DF_SETFGCOLOR(DBG_COLOR_WHITE) "%#.8I32x" DF_DEFFGCOLOR
 	                  ": %%e%cx=" DF_SETFGCOLOR(DBG_COLOR_WHITE) "%#.8I32x" DF_DEFFGCOLOR
 	                  " (" DF_SETFGCOLOR(DBG_COLOR_YELLOW) "%$q" DF_DEFFGCOLOR ")"
-	                  " (" DF_SETFGCOLOR(DBG_COLOR_WHITE) "%I32u" ")" DF_DEFFGCOLOR "\n"),
+	                  " (" DF_SETFGCOLOR(DBG_COLOR_WHITE) "%I32u" DF_DEFFGCOLOR ")" "\n"),
 	           leaf, reg_acdb, reg_value, 4, &reg_value, reg_value);
 }
 
