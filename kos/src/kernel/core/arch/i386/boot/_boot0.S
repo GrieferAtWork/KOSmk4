@@ -216,8 +216,6 @@ END(a20test)
 	popaw
 	xorw   %ax, %ax
 	movw   %ax, %ds
-	movl   $(S(boot0_gdt_ptr)), %eax
-	lgdtl  (%eax)
 
 	EXTERN(__kernel_sector_count)
 	movw   $(__kernel_sector_count), %cx
@@ -327,6 +325,8 @@ END(bios_puthex)
 #endif /* PROGRESS_UPDATE_USES_BIOS */
 
 PRIVATE_FUNCTION(pmode_enter)
+	cli
+	lgdtl  %cs:S(boot0_gdt_ptr)
 	movl   %cr0, %eax
 	orw    $(CR0_PE), %ax
 	movl   %eax, %cr0
@@ -350,6 +350,7 @@ END(pmode_enter)
 
 PRIVATE_FUNCTION(pmode_leave)
 	.code32
+	cli
 	pushw  %cx
 	pushw  %dx
 	/* Split ESP */
@@ -358,7 +359,7 @@ PRIVATE_FUNCTION(pmode_leave)
 	movw   $(32), %cx
 	movw   %cx, %ss
 	movl   %cr0, %ecx
-	ljmpl  $(24), $(S(1f)) /* Jump to segmented real-mode */
+	ljmpl  $(24), $(S(1f)) /* Jump to segmented real-mode (16-bit protected mode) */
 1:	.code16
 	andw   $(~CR0_PE), %cx
 	movl   %ecx, %cr0
@@ -370,7 +371,7 @@ PRIVATE_FUNCTION(pmode_leave)
 	popw   %dx
 	popw   %cx
 	ret
-END(pmode_enter)
+END(pmode_leave)
 
 	/* %al = (%al >= 10 ? 'A' + (%al - 10) : '0' + %al)
 	 * IN:  u8 value = %al;   (Upper 4 bits are ignored)
