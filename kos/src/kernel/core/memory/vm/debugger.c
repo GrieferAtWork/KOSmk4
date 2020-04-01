@@ -245,6 +245,45 @@ do_print_part_position:
 }
 
 
+PRIVATE ATTR_DBGRODATA char const aslr_str_0[] = "0";
+PRIVATE ATTR_DBGRODATA char const aslr_str_1[] = "1";
+
+PRIVATE ATTR_DBGTEXT void DBG_CALL
+autocomplete_aslr(size_t argc, char *argv[],
+                  debug_auto_cb_t cb, void *arg,
+                  char const *UNUSED(starts_with),
+                  size_t UNUSED(starts_with_len)) {
+	(void)argv;
+	if (argc == 1) {
+		(*cb)(arg, aslr_str_0, COMPILER_STRLEN(aslr_str_0));
+		(*cb)(arg, aslr_str_1, COMPILER_STRLEN(aslr_str_1));
+	}
+}
+
+DEFINE_DEBUG_FUNCTION_EX(
+		"aslr", &autocomplete_aslr,
+		"aslr [0|1]\n"
+		"\tView or enable/disable AddressSpaceLayoutRandomization\n"
+		, argc, argv) {
+	bool enabled;
+	if (argc == 1) {
+		enabled = !vm_get_aslr_disabled();
+		dbg_print(enabled ? DBGSTR("enabled\n") : DBGSTR("disabled\n"));
+		return enabled ? 0 : 1;
+	}
+	if (argc != 2)
+		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	if (strcmp(argv[1], aslr_str_1) == 0) {
+		enabled = true;
+	} else if (strcmp(argv[1], aslr_str_0) == 0) {
+		enabled = false;
+	} else {
+		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	}
+	vm_set_aslr_disabled(!enabled);
+	return 0;
+}
+
 DECL_END
 
 #endif /* CONFIG_HAVE_DEBUGGER */
