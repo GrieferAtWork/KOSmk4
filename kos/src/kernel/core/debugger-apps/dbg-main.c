@@ -750,7 +750,7 @@ done:
 DEFINE_DEBUG_FUNCTION_EX(
 		"exit", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
 		"exit\n"
-		"\tExit debugger mode and resume execution\n"
+		"\tExit debugger mode and resume execution (same as pressing CTRL+D)\n"
 		, argc, argv) {
 	if (argc != 1)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
