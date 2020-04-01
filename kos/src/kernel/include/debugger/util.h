@@ -76,12 +76,17 @@ FUNDEF void *NOTHROW(FCALL dbg_asmview)(void *addr);
  * editing will resume with the current contents of `buf'
  * @param: pcursor_pos:  [0..1][in|out]: The index where the cursor starts out/ends up
  * @param: pscreen_left: [0..1][in|out]: The index of the left-most visible character
+ * @param: return_on_changed: When true, return `DBG_EDITFIELD_RETURN_CHANGED' after any
+ *                            kind of user-input that changes `buf', `pcursor_pos', or
+ *                            `pscreen_left' and doesn't already return one of the other
+ *                            return codes.
  * @return: * : One of `DBG_EDITFIELD_RETURN_*' */
 FUNDEF unsigned int
 NOTHROW(FCALL dbg_editfield)(int x, int y, unsigned int field_width,
                              char *buf, size_t buflen,
                              size_t *pcursor_pos DFL(__NULLPTR),
-                             size_t *pscreen_left DFL(__NULLPTR));
+                             size_t *pscreen_left DFL(__NULLPTR),
+                             __BOOL return_on_changed DFL(0));
 #define DBG_EDITFIELD_RETURN_ENTER     0 /* Enter (confirm) */
 #define DBG_EDITFIELD_RETURN_TAB       1 /* Tab (go to next field?) */
 #define DBG_EDITFIELD_RETURN_SHIFT_TAB 2 /* Shift+Tab (go to next field?) */
@@ -90,14 +95,15 @@ NOTHROW(FCALL dbg_editfield)(int x, int y, unsigned int field_width,
 #define DBG_EDITFIELD_RETURN_DOWN      5 /* Down was pressed */
 #define DBG_EDITFIELD_RETURN_CTRL_C    6 /* CTRL+C was pressed */
 #define DBG_EDITFIELD_RETURN_CTRL_D    7 /* CTRL+D was pressed */
+#define DBG_EDITFIELD_RETURN_CHANGED   8 /* Text has changed (only when `return_on_changed' is `true') */
 #define DBG_EDITFIELD_RETURN_F(n)      (16 + ((n)-1)) /* Fn key was pressed */
 
 /* Same as `dbg_editfield()', but only draw the edit field. */
 FUNDEF void
 NOTHROW(FCALL dbg_draweditfield)(int x, int y, unsigned int field_width,
                                  char *buf, size_t buflen,
-                                 size_t *pcursor_pos DFL(__NULLPTR),
-                                 size_t *pscreen_left DFL(__NULLPTR));
+                                 size_t const *pcursor_pos DFL(__NULLPTR),
+                                 size_t const *pscreen_left DFL(__NULLPTR));
 
 
 /* Evaluate an address expression

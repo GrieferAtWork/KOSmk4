@@ -156,7 +156,6 @@ SECTIONS {
 		PROVIDE_HIDDEN(__kernel_debug_functions_start = ABSOLUTE(.));
 		KEEP(*(.rodata.cold.debug_functions))
 		PROVIDE_HIDDEN(__kernel_debug_functions_end = ABSOLUTE(.));
-		PROVIDE_HIDDEN(__kernel_debug_functions_size = ABSOLUTE(ABSOLUTE(__kernel_debug_functions_end) - ABSOLUTE(__kernel_debug_functions_start)));
 		DEFINE_CALLBACK_VECTOR(dbg_init, .rodata.cold.callback.dbg_init)
 		DEFINE_CALLBACK_VECTOR(dbg_reset, .rodata.cold.callback.dbg_reset)
 		DEFINE_CALLBACK_VECTOR(dbg_fini, .rodata.cold.callback.dbg_fini)

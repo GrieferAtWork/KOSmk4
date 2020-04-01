@@ -29,6 +29,8 @@
 
 #include <stdbool.h>
 
+#include <libc/string.h>
+
 DECL_BEGIN
 
 #ifdef __CC__
@@ -77,6 +79,10 @@ typedef struct {
 	u8  p_utf8[8]; /* Pending UTF-8 characters */
 } dbg_pprinter_arg_t;
 #define DBG_PPRINTER_ARG_INIT(x, y) { x, y, { 0, 0, 0, 0, 0, 0, 0, 0  } }
+#define dbg_pprinter_arg_init(self, x, y) \
+	((self)->p_printx = (x),              \
+	 (self)->p_printy = (y),              \
+	 __libc_memset((self)->p_utf8, 0, 8))
 
 
 

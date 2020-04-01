@@ -29,6 +29,28 @@
 
 DECL_BEGIN
 
+#define DBG_SECTION_FUNCTIONS_DRIVER ".dbg.functions"
+#define DBG_SECTION_FUNCTIONS_KERNEL ".rodata.cold.debug_functions"
+#define DBG_SECTION_INIT_DRIVER      ".dbg.dbg_init"
+#define DBG_SECTION_INIT_KERNEL      ".rodata.cold.callback.dbg_init"
+#define DBG_SECTION_RESET_DRIVER     ".dbg.dbg_reset"
+#define DBG_SECTION_RESET_KERNEL     ".rodata.cold.callback.dbg_reset"
+#define DBG_SECTION_FINI_DRIVER      ".dbg.dbg_fini"
+#define DBG_SECTION_FINI_KERNEL      ".rodata.cold.callback.dbg_fini"
+
+#ifdef CONFIG_BUILDING_KERNEL_CORE
+#define DBG_SECTION_FUNCTIONS DBG_SECTION_FUNCTIONS_KERNEL
+#define DBG_SECTION_INIT      DBG_SECTION_INIT_KERNEL
+#define DBG_SECTION_RESET     DBG_SECTION_RESET_KERNEL
+#define DBG_SECTION_FINI      DBG_SECTION_FINI_KERNEL
+#else /* CONFIG_BUILDING_KERNEL_CORE */
+#define DBG_SECTION_FUNCTIONS DBG_SECTION_FUNCTIONS_DRIVER
+#define DBG_SECTION_INIT      DBG_SECTION_INIT_DRIVER
+#define DBG_SECTION_RESET     DBG_SECTION_RESET_DRIVER
+#define DBG_SECTION_FINI      DBG_SECTION_FINI_DRIVER
+#endif /* !CONFIG_BUILDING_KERNEL_CORE */
+
+
 #define ATTR_DBGTEXT        ATTR_COLDTEXT
 #define ATTR_DBGRODATA      ATTR_COLDRODATA
 #define ATTR_DBGDATA        ATTR_COLDDATA
@@ -44,10 +66,25 @@ DECL_BEGIN
 #ifdef __CC__
 /* The prototype for the callback of a debugger service function. */
 typedef uintptr_t (DBG_CALL *debug_func_t)(size_t argc, char *argv[]);
+
+/* Callback prototype for `debug_auto_t()' */
+typedef void (DBG_CALL *debug_auto_cb_t)(void *arg, char const *name, size_t namelen);
+
+/* Enumerate a list of possible words that may follow after
+ * argc+argv by invoking `(*cb)(arg, ...)' for each possibility.
+ * @param: starts_with: (optional) When non-NULL (and non-empty), the function
+ *                       is allowed to skip enumeration auto-completion options
+ *                       that start with the C-string `starts_with' */
+typedef void (DBG_CALL *debug_auto_t)(size_t argc, char *argv[],
+                                      debug_auto_cb_t cb, void *arg,
+                                      char const *starts_with,
+                                      size_t starts_with_len);
+
 struct debug_function {
 	debug_func_t df_main; /* [1..1][const] The function's callback. */
 	char const  *df_name; /* [1..1][const] The function's name. */
 	char const  *df_help; /* [0..1][const] An optional help string for the function. */
+	debug_auto_t df_auto; /* [0..1][const] An optional callback for tab-auto-completion. */
 };
 
 /* Search for a debug function matching the given name.
@@ -71,21 +108,25 @@ dbg_getfunc_start(char const *__restrict name);
 #define _DBG_PRIVATE_FUNCTION_NAME2(x, y) _DBG_PRIVATE_FUNCTION_NAME3(x, y)
 #define _DBG_PRIVATE_FUNCTION_NAME(x) _DBG_PRIVATE_FUNCTION_NAME2(x, __LINE__)
 
-#define REGISTER_DEBUG_FUNCTION_EX(name, help, main)                                                                      \
+#define _DEFINE_DEBUG_FUNCTION(name, help, main) \
+	_DEFINE_DEBUG_FUNCTION_EX(name, __NULLPTR, help, main)
+#define _DEFINE_DEBUG_FUNCTION_EX(name, auto, help, main)                                                                 \
 	PRIVATE ATTR_SECTION(".rodata.cold.debug_function_str") char const _DBG_PRIVATE_FUNCTION_NAME(_debug_name_)[] = name; \
 	PRIVATE ATTR_SECTION(".rodata.cold.debug_function_str") char const _DBG_PRIVATE_FUNCTION_NAME(_debug_help_)[] = help; \
-	PRIVATE ATTR_SECTION(".rodata.cold.debug_functions") ATTR_USED ATTR_ALIGNED(__SIZEOF_POINTER__)                       \
+	PRIVATE ATTR_SECTION(DBG_SECTION_FUNCTIONS) ATTR_USED ATTR_ALIGNED(__SIZEOF_POINTER__)                                \
 	struct debug_function const _DBG_PRIVATE_FUNCTION_NAME(_debug_def) =                                                  \
-		{ &main, _DBG_PRIVATE_FUNCTION_NAME(_debug_name_), _DBG_PRIVATE_FUNCTION_NAME(_debug_help_) }
-#define DEFINE_DEBUG_FUNCTION(name, help, argc, argv)                                                                     \
+		{ &main, _DBG_PRIVATE_FUNCTION_NAME(_debug_name_), _DBG_PRIVATE_FUNCTION_NAME(_debug_help_), auto }
+#define DEFINE_DEBUG_FUNCTION(name, help, argc, argv) \
+	DEFINE_DEBUG_FUNCTION_EX(name, __NULLPTR, help, argc, argv)
+#define DEFINE_DEBUG_FUNCTION_EX(name, auto, help, argc, argv)                                                            \
 	PRIVATE uintptr_t DBG_CALL _DBG_PRIVATE_FUNCTION_NAME(_debug_main_)(size_t argc, char *argv[]);                       \
 	PRIVATE ATTR_SECTION(".rodata.cold.debug_function_str") char const _DBG_PRIVATE_FUNCTION_NAME(_debug_name_)[] = name; \
 	PRIVATE ATTR_SECTION(".rodata.cold.debug_function_str") char const _DBG_PRIVATE_FUNCTION_NAME(_debug_help_)[] = help; \
-	PRIVATE ATTR_SECTION(".rodata.cold.debug_functions") ATTR_USED ATTR_ALIGNED(__SIZEOF_POINTER__)                       \
+	PRIVATE ATTR_SECTION(DBG_SECTION_FUNCTIONS) ATTR_USED ATTR_ALIGNED(__SIZEOF_POINTER__)                                \
 	struct debug_function const _DBG_PRIVATE_FUNCTION_NAME(_debug_def) =                                                  \
 		{	&_DBG_PRIVATE_FUNCTION_NAME(_debug_main_),                                                                    \
 			_DBG_PRIVATE_FUNCTION_NAME(_debug_name_),                                                                     \
-			_DBG_PRIVATE_FUNCTION_NAME(_debug_help_) };                                                                   \
+			_DBG_PRIVATE_FUNCTION_NAME(_debug_help_), auto };                                                             \
 	PRIVATE ATTR_DBGTEXT uintptr_t DBG_CALL _DBG_PRIVATE_FUNCTION_NAME(_debug_main_)(size_t argc, char *argv[])
 #endif /* __CC__ */
 
@@ -94,9 +135,9 @@ dbg_getfunc_start(char const *__restrict name);
  * INIT:  Called whenever the debugger is entered (not called upon recursive re-entry)
  * FINI:  Called whenever the debugger is exited
  * RESET: Called whenever the debugger is entered (after INIT, including on recursive re-entry) */
-#define DEFINE_DBG_INIT(func)  DEFINE_CALLBACK(".rodata.cold.callback.dbg_init", func)
-#define DEFINE_DBG_RESET(func) DEFINE_CALLBACK(".rodata.cold.callback.dbg_reset", func)
-#define DEFINE_DBG_FINI(func)  DEFINE_CALLBACK(".rodata.cold.callback.dbg_fini", func)
+#define DEFINE_DBG_INIT(func)  DEFINE_CALLBACK(DBG_SECTION_INIT, func)
+#define DEFINE_DBG_RESET(func) DEFINE_CALLBACK(DBG_SECTION_RESET, func)
+#define DEFINE_DBG_FINI(func)  DEFINE_CALLBACK(DBG_SECTION_FINI, func)
 
 DECL_END
 
@@ -179,7 +220,10 @@ DECL_END
 
 #else /* CONFIG_HAVE_DEBUGGER */
 
-#define DEFINE_DEBUG_FUNCTION(name, main, help)                                           /* nothing */
+#define DEFINE_DEBUG_FUNCTION(name, help, argc, argv)                                     /* nothing */
+#define DEFINE_DEBUG_FUNCTION_EX(name, auto, help, argc, argv)                            /* nothing */
+#define _DEFINE_DEBUG_FUNCTION(name, help, main)                                          /* nothing */
+#define _DEFINE_DEBUG_FUNCTION_EX(name, auto, help, main)                                 /* nothing */
 #define DEFINE_DBG_INIT(func)                                                             /* nothing */
 #define DEFINE_DBG_RESET(func)                                                            /* nothing */
 #define DEFINE_DBG_FINI(func)                                                             /* nothing */

@@ -54,8 +54,12 @@ FUNDEF NOBLOCK /*utf-32*/ char32_t KCALL dbg_trygetuni(void); /* @return: 0: No 
 FUNDEF NOBLOCK bool NOTHROW(KCALL dbg_ungetc)(/*utf-8*/ char ch);
 FUNDEF NOBLOCK bool NOTHROW(KCALL dbg_ungetuni)(/*utf-32*/ char32_t ch);
 
-/* Check if there are pending unicode characters. */
+/* Check if there are pending unicode characters. (s.a. `dbg_getuni()') */
 FUNDEF NOBLOCK WUNUSED ATTR_PURE bool NOTHROW(KCALL dbg_hasuni)(void);
+
+/* Check if there are pending utf-8 characters. (s.a. `dbg_getc()') */
+FUNDEF NOBLOCK WUNUSED ATTR_PURE bool NOTHROW(KCALL dbg_haschar)(void);
+
 /* Purge pending unicode characters. */
 FUNDEF NOBLOCK void NOTHROW(KCALL dbg_purgeuni)(void);
 

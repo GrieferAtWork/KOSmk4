@@ -38,6 +38,7 @@ if (gcc_opt.remove("-O3"))
 #include <kos/keyboard.h>
 
 #include <ctype.h>
+#include <stdbool.h>
 #include <string.h>
 
 DECL_BEGIN
@@ -83,7 +84,8 @@ PUBLIC ATTR_DBGTEXT unsigned int
 NOTHROW(FCALL dbg_editfield)(int x, int y, unsigned int field_width,
                              char *buf, size_t buflen,
                              size_t *pcursor_pos,
-                             size_t *pscreen_left) {
+                             size_t *pscreen_left,
+                             bool return_on_changed) {
 	unsigned int result;
 	char *screen_left, *pos, *endptr, *bufend;
 	if unlikely(field_width < 2)
@@ -170,7 +172,8 @@ continue_norender:
 				pos -= n;
 				endptr -= n;
 				*endptr = 0;
-			}	continue;
+				goto continue_main_loop;
+			}
 
 			case KEY_DELETE: {
 				unsigned int n;
@@ -192,7 +195,8 @@ continue_norender:
 				            sizeof(char));
 				endptr -= n;
 				*endptr = 0;
-			}	continue;
+				goto continue_main_loop;
+			}
 
 			case KEY_LEFT: {
 				unsigned int n;
@@ -210,7 +214,8 @@ continue_norender:
 					n = (unsigned int)(pos - newpos);
 				}
 				pos -= n;
-			}	continue;
+				goto continue_main_loop;
+			}
 
 			case KEY_RIGHT: {
 				unsigned int n;
@@ -228,7 +233,8 @@ continue_norender:
 					n = (unsigned int)(newpos - pos);
 				}
 				pos += n;
-			}	continue;
+				goto continue_main_loop;
+			}
 
 			case KEY_HOME:
 				if (pos <= buf) {
@@ -236,7 +242,7 @@ continue_norender:
 					continue;
 				}
 				pos = buf;
-				continue;
+				goto continue_main_loop;
 
 			case KEY_END:
 				if (pos >= endptr) {
@@ -244,7 +250,7 @@ continue_norender:
 					continue;
 				}
 				pos = endptr;
-				continue;
+				goto continue_main_loop;
 
 			case KEY_UP:
 				result = DBG_EDITFIELD_RETURN_UP;
@@ -283,6 +289,18 @@ continue_norender:
 		*pos++ = ch;
 		++endptr;
 		*endptr = '\0';
+continue_main_loop:
+		if (return_on_changed) {
+			if (screen_left > pos)
+				screen_left = pos;
+			onscreen = (size_t)(pos - screen_left);
+			if (onscreen > field_width - 1)
+				screen_left = pos - (field_width - 1);
+			/* Re-draw the edit field one more time. */
+			dbg_drawedit(x, y, field_width, screen_left, pos, endptr);
+			result = DBG_EDITFIELD_RETURN_CHANGED;
+			goto done;
+		}
 	}
 done:
 	if (pcursor_pos)
@@ -298,8 +316,8 @@ done:
 PUBLIC ATTR_DBGTEXT void
 NOTHROW(FCALL dbg_draweditfield)(int x, int y, unsigned int field_width,
                                  char *buf, size_t buflen,
-                                 size_t *pcursor_pos,
-                                 size_t *pscreen_left) {
+                                 size_t const *pcursor_pos,
+                                 size_t const *pscreen_left) {
 	char *screen_left, *pos, *endptr;
 	size_t onscreen;
 	if unlikely(field_width < 2)

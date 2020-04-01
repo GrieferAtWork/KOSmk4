@@ -982,7 +982,8 @@ NOTHROW(KCALL dbg_getuni_setstring)(char const *__restrict text) {
 	return result;
 }
 
-PUBLIC ATTR_DBGTEXT NOBLOCK bool NOTHROW(KCALL dbg_ungetuni)(/*utf-32*/ char32_t ch) {
+PUBLIC ATTR_DBGTEXT NOBLOCK bool
+NOTHROW(KCALL dbg_ungetuni)(/*utf-32*/ char32_t ch) {
 	if (dbg_getuni_pending_cnt >= COMPILER_LENOF(dbg_getuni_pending))
 		return false;
 	dbg_getuni_pending[dbg_getuni_pending_cnt] = ch;
@@ -1234,6 +1235,14 @@ again_getkey:
 
 PRIVATE ATTR_DBGBSS uint8_t dbg_getc_pending_cnt = 0;
 PRIVATE ATTR_DBGBSS uint8_t dbg_getc_pending[UNICODE_UTF8_CURLEN] = { 0, };
+
+/* Check if there are pending utf-8 characters. (s.a. `dbg_getc()') */
+PUBLIC ATTR_DBGTEXT NOBLOCK WUNUSED ATTR_PURE bool
+NOTHROW(KCALL dbg_haschar)(void) {
+	return dbg_getc_pending_cnt != 0;
+}
+
+
 
 PUBLIC ATTR_DBGTEXT NOBLOCK bool
 NOTHROW(KCALL dbg_ungetc)(/*utf-8*/ char ch) {

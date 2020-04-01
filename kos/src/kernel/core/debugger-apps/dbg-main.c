@@ -32,14 +32,19 @@ if (gcc_opt.remove("-O3"))
 
 #include <debugger/config.h>
 #ifdef CONFIG_HAVE_DEBUGGER
+#include <debugger/entry.h>
 #include <debugger/function.h>
 #include <debugger/io.h>
 #include <debugger/rt.h>
 #include <debugger/util.h>
 #include <kernel/except.h>
 
-#include <kos/kernel/cpu-state.h>
+#include <hybrid/align.h>
 
+#include <kos/kernel/cpu-state.h>
+#include <kos/keyboard.h>
+
+#include <alloca.h>
 #include <ctype.h>
 #include <stddef.h>
 #include <string.h>
@@ -47,9 +52,152 @@ if (gcc_opt.remove("-O3"))
 
 DECL_BEGIN
 
+
+/* Always display a list above of the commandline containing the
+ * names of all commands start with the currently entered word.
+ *
+ *   lsMOD   lsMEM   lsRAM
+ *   lsBLK   lsCHR
+ * $ ls_
+ * Where uppercase letter are printed in a different color. (and _ is the cursor)
+ * Without this option, this list is only displayed after TAB is pressed.
+ */
+#undef CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE
+#if 1
+#define CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE 1
+#endif
+
+
+/* ColorConfiguration for the auto-completion box. */
+#define AUTOCOMPLETE_CC_BADCMD     DBG_COLOR_RED              /* Text-color for unmatched commands */
+#define AUTOCOMPLETE_CC_BACKGROUND DBG_COLOR_DARK_GRAY        /* Background color for the auto-completion box */
+#define AUTOCOMPLETE_CC_MATCHFG    DBG_COLOR_WHITE            /* Foreground color for matched text */
+#define AUTOCOMPLETE_CC_MATCHBG    AUTOCOMPLETE_CC_BACKGROUND /* Background color for matched text */
+#define AUTOCOMPLETE_CC_SUGGESTFG  DBG_COLOR_LIGHT_GRAY       /* Foreground color for suggested text */
+#define AUTOCOMPLETE_CC_SUGGESTBG  AUTOCOMPLETE_CC_BACKGROUND /* Background color for suggested text */
+
+
+
+#define DBG_ARGC_MAX        16  /* Max # of different arguments. */
+#define DBG_MAXLINE         128 /* Default max length of an input line */
+#define DBG_MAXLINE_BACKLOG 512 /* Max # of bytes in the cmdline backlog */
+
+PRIVATE ATTR_DBGBSS char cmdline[DBG_MAXLINE];
+PRIVATE ATTR_DBGBSS char *argv[DBG_ARGC_MAX];
+
+
+/* Split the given commandline and store the arguments in `argv'
+ * @param: pincomplete: When non-NULL, set to true when the `cmdln' ends
+ *                      with an incomplete " or '-sequence, or a trailing
+ *                      \-character */
+PRIVATE ATTR_DBGTEXT size_t KCALL
+split_cmdline(char *__restrict cmdln,
+              char **__restrict argv,
+              size_t argc_max,
+              bool *pincomplete) {
+	size_t argi, i;
+	size_t cmdline_len;
+	if unlikely(!argc_max) {
+		return 0;
+	}
+	/* Skip leading space. */
+	while (isspace(*cmdln))
+		++cmdln;
+	/* Check for empty commandline. */
+	if (!*cmdln)
+		return 0;
+	--argc_max;
+	i = 0, argi = 1;
+	cmdline_len = strlen(cmdln);
+	argv[0]     = cmdln;
+	for (;;) {
+		char ch = cmdln[i];
+		/* Escaped characters. */
+		if (ch == '\\') {
+			--cmdline_len;
+			memmovedown(&cmdln[i],
+			            &cmdln[i + 1],
+			            cmdline_len - i,
+			            sizeof(char));
+			++i;
+			if (i >= cmdline_len) {
+break_incomplete:
+				if (pincomplete)
+					*pincomplete = true;
+				break;
+			}
+			continue;
+		}
+		/* String arguments. */
+		if (ch == '\'' || ch == '\"') {
+			char end_ch = ch;
+			--cmdline_len;
+			memmovedown(&cmdln[i],
+			            &cmdln[i + 1],
+			            cmdline_len - i,
+			            sizeof(char));
+			while (i < cmdline_len) {
+				ch = cmdln[i];
+				if (ch == '\\') {
+					--cmdline_len;
+					memmovedown(&cmdln[i],
+					            &cmdln[i + 1],
+					            cmdline_len - i,
+					            sizeof(char));
+					++i;
+					if (i >= cmdline_len)
+						goto break_incomplete;
+					continue;
+				}
+				if (ch == end_ch) {
+					--cmdline_len;
+					memmovedown(&cmdln[i],
+					            &cmdln[i + 1],
+					            cmdline_len - i,
+					            sizeof(char));
+					break;
+				}
+				++i;
+			}
+			if (i >= cmdline_len)
+				goto break_incomplete;
+			continue;
+		}
+		/* Space -> Argument separator. */
+		if (isspace(ch)) {
+			cmdln[i] = '\0'; /* Terminate the previous argument. */
+			++i;
+			/* Skip multiple consecutive spaces. */
+			while (i < cmdline_len && isspace(cmdln[i]))
+				++i;
+			if (i >= cmdline_len)
+				break;
+			/* Start a new argument. */
+			argv[argi] = &cmdln[i];
+			++argi;
+			if (argi >= argc_max) {
+				while (cmdline_len && isspace(cmdln[cmdline_len - 1]))
+					--cmdline_len;
+				cmdln[cmdline_len] = '\0';
+				break;
+			}
+			continue;
+		}
+		++i;
+		if (i >= cmdline_len)
+			break;
+	}
+	/* Always terminate argv with a NULL entry. */
+	argv[argi] = NULL;
+	return argi;
+}
+
+
+
+
+
 INTDEF struct debug_function const __kernel_debug_functions_start[];
 INTDEF struct debug_function const __kernel_debug_functions_end[];
-INTDEF byte_t __kernel_debug_functions_size[];
 
 /* Search for a debug function matching the given name.
  * @return: NULL: No function exists that matches `name' */
@@ -105,55 +253,25 @@ dbg_getfunc_start(char const *__restrict name) {
 }
 
 
-PRIVATE ATTR_DBGTEXT NONNULL((1)) size_t
-NOTHROW(KCALL dbg_autocomplete)(char *__restrict line,
-                                size_t bufsize,
-                                size_t cursor) {
-	char *word_start, temp;
-	struct debug_function const *func;
-	size_t namelen, maxbuf;
-	word_start = line + cursor;
-	while (word_start > line) {
-		char32_t ch;
-		char *temp = word_start;
-		ch = unicode_readutf8_rev((char const **)&temp);
-		if (unicode_isspace(ch))
-			break;
-		word_start = temp;
-	}
-	temp = line[cursor];
-	line[cursor] = '\0';
-	func = dbg_getfunc_start(word_start);
-	line[cursor] = temp;
-	if (!func)
-		return cursor;
-	namelen = strlen(func->df_name);
-	if (namelen <= cursor - (size_t)(word_start - line))
-		return cursor;
-	maxbuf = (size_t)((line + bufsize) - word_start);
-	if (namelen >= maxbuf)
-		namelen = maxbuf - 1;
-	memmoveup(word_start + namelen, line + cursor, bufsize - cursor);
-	memcpy(word_start, func->df_name, namelen, sizeof(char));
-	return (size_t)(word_start - line) + namelen;
-}
-
-
-PRIVATE ATTR_DBGTEXT uintptr_t DBG_CALL
-debug_exit(size_t argc, char *argv[]) {
+PRIVATE ATTR_DBGTEXT void DBG_CALL
+autocomplete_help(size_t argc, char *argv[],
+                  debug_auto_cb_t cb, void *arg,
+                  char const *starts_with,
+                  size_t starts_with_len) {
+	struct debug_function const *iter;
 	(void)argc;
 	(void)argv;
-	return 0;
+	for (iter = __kernel_debug_functions_start;
+	     iter < __kernel_debug_functions_end; ++iter) {
+		if (memcmp(iter->df_name, starts_with,
+		           starts_with_len * sizeof(char)) != 0)
+			continue; /* Skip this one */
+		(*cb)(arg, iter->df_name, strlen(iter->df_name));
+	}
 }
 
-REGISTER_DEBUG_FUNCTION_EX(
-		"exit",
-		"exit\n"
-		"\tExit debugger mode and resume execution\n",
-		debug_exit);
-
-DEFINE_DEBUG_FUNCTION(
-		"help",
+DEFINE_DEBUG_FUNCTION_EX(
+		"help", &autocomplete_help,
 		"help\n"
 		"\tDisplay a list of available commands\n"
 		"help command\n"
@@ -218,13 +336,421 @@ DEFINE_DEBUG_FUNCTION(
 }
 
 
-#define DBG_ARGC_MAX        16  /* Max # of different arguments. */
-#define DBG_MAXLINE         128 /* Default max length of an input line */
-#define DBG_MAXLINE_BACKLOG 512 /* Max # of bytes in the cmdline backlog */
 
-PRIVATE ATTR_DBGBSS char cmdline[DBG_MAXLINE];
-PRIVATE ATTR_DBGBSS char *argv[DBG_ARGC_MAX];
 
+
+struct dbg_autocomplete_cnt_cookie {
+	char   *acc_starts;    /* [1..1][const] Incomplete starting string. */
+	size_t  acc_startslen; /* [const] Length of `acc_starts' */
+	size_t  acc_count;     /* # of matching auto-completions */
+};
+
+PRIVATE ATTR_DBGTEXT void DBG_CALL
+dbg_autocomplete_countmatches(void *arg,
+                              char const *name,
+                              size_t namelen) {
+	struct dbg_autocomplete_cnt_cookie *cookie;
+	cookie = (struct dbg_autocomplete_cnt_cookie *)arg;
+	if (namelen < cookie->acc_startslen)
+		return; /* Not a match */
+	if (memcmp(name, cookie->acc_starts, cookie->acc_startslen) != 0)
+		return; /* Not a match */
+	++cookie->acc_count;
+}
+
+struct dbg_autocomplete_ins_cookie {
+	char   *acc_starts;    /* [1..1][const] Incomplete starting string. */
+	size_t  acc_startslen; /* [const] Length of `acc_starts' */
+	char   *acc_dest;      /* [0..1] Destination buffer (cleared to NULL after the insert) */
+	size_t  acc_destavl;   /* [IN] Available buffer size in `acc_dest' */
+	size_t  acc_destdel;   /* [IN] # of characters to delete at `acc_dest' */
+	size_t  acc_destmov;   /* [IN] # of characters to keep after `acc_dest' */
+	size_t  acc_destreq;   /* [OUT] Required buffer size in `acc_dest' */
+};
+
+PRIVATE ATTR_DBGTEXT void DBG_CALL
+dbg_autocomplete_insertmatch(void *arg,
+                             char const *name,
+                             size_t namelen) {
+	struct dbg_autocomplete_ins_cookie *cookie;
+	cookie = (struct dbg_autocomplete_ins_cookie *)arg;
+	if (!cookie->acc_dest)
+		return; /* Already inserted. */
+	if (namelen < cookie->acc_startslen)
+		return; /* Not a match */
+	if (memcmp(name, cookie->acc_starts, cookie->acc_startslen) != 0)
+		return; /* Not a match */
+	cookie->acc_destreq = namelen;
+	if (namelen <= cookie->acc_destavl) {
+		memmovedown(cookie->acc_dest,
+		            cookie->acc_dest + cookie->acc_destdel,
+		            cookie->acc_destmov, sizeof(char));
+		memmoveup(cookie->acc_dest + namelen,
+		          cookie->acc_dest,
+		          cookie->acc_destmov, sizeof(char));
+		memcpy(cookie->acc_dest, name, namelen, sizeof(char));
+		cookie->acc_dest[namelen + cookie->acc_destmov] = '\0';
+	}
+	cookie->acc_dest = NULL;
+}
+
+PRIVATE ATTR_DBGTEXT void DBG_CALL
+dbg_autocomplete_longestmatch(void *arg,
+                              char const *name,
+                              size_t namelen) {
+	struct dbg_autocomplete_cnt_cookie *cookie;
+	cookie = (struct dbg_autocomplete_cnt_cookie *)arg;
+	if (namelen < cookie->acc_startslen)
+		return; /* Not a match */
+	if (memcmp(name, cookie->acc_starts, cookie->acc_startslen) != 0)
+		return; /* Not a match */
+	if (cookie->acc_count < namelen)
+		cookie->acc_count = namelen;
+}
+
+struct dbg_autocomplete_prn_cookie {
+	char        *acc_starts;         /* [1..1][const] Incomplete starting string. */
+	size_t       acc_startslen;      /* [const] Length of `acc_starts' */
+	unsigned int acc_match_count;    /* Max # of remaining matches to print. */
+	unsigned int acc_match_width;    /* [!0][const] Max width of a single match +1 / width of a column
+	                                  * NOTE: longer matches are truncated and extended with `...' */
+	unsigned int acc_matchlist_x;    /* [const] Starting X-offset of the match list. */
+	unsigned int acc_matchlist_cury; /* Current output line Y. */
+	int          acc_matchlist_nxty; /* [const] Offset to the next output line. */
+	unsigned int acc_matchlist_colx; /* [< acc_matchlist_colc] Current column index */
+	unsigned int acc_matchlist_col0; /* [const] Cloumn index with which to start a line */
+	unsigned int acc_matchlist_colc; /* [!0][const] # of horizontal columns in use */
+};
+
+PRIVATE ATTR_DBGTEXT void DBG_CALL
+dbg_autocomplete_matchlist(void *arg,
+                           char const *name,
+                           size_t namelen) {
+	struct dbg_autocomplete_prn_cookie *cookie;
+	dbg_pprinter_arg_t printer;
+	size_t unmatched_length;
+	cookie = (struct dbg_autocomplete_prn_cookie *)arg;
+	if (namelen < cookie->acc_startslen)
+		return; /* Not a match */
+	if (memcmp(name, cookie->acc_starts, cookie->acc_startslen) != 0)
+		return; /* Not a match */
+	if (!cookie->acc_match_count)
+		return; /* No space for any more matches. */
+	unmatched_length = namelen - cookie->acc_startslen;
+	dbg_pprinter_arg_init(&printer,
+	                      cookie->acc_matchlist_x +
+	                      cookie->acc_matchlist_colx *
+	                      cookie->acc_match_width,
+	                      cookie->acc_matchlist_cury);
+	if likely(namelen <= cookie->acc_match_width - 1) {
+		/* Print the matched portion in a different color. */
+		dbg_setcolor(AUTOCOMPLETE_CC_MATCHFG, AUTOCOMPLETE_CC_MATCHBG);
+		dbg_pprinter(&printer, name, cookie->acc_startslen);
+do_print_unmatched:
+		dbg_setcolor(AUTOCOMPLETE_CC_SUGGESTFG, AUTOCOMPLETE_CC_SUGGESTBG);
+		dbg_pprinter(&printer, name + cookie->acc_startslen, unmatched_length);
+	} else {
+		/* Match is too long (truncate and extend with trailing `...') */
+		unsigned int lenavail = cookie->acc_match_width - 1;
+		bool print_dots = false;
+		if unlikely(!lenavail)
+			return; /* Shouldn't happen */
+		if likely(lenavail >= 3) {
+			lenavail -= 3;
+			print_dots = true;
+		}
+		if (cookie->acc_startslen <= lenavail) {
+			/* The matched portion cannot be printed completely. */
+			dbg_setcolor(AUTOCOMPLETE_CC_MATCHFG, AUTOCOMPLETE_CC_MATCHBG);
+			dbg_pprinter(&printer, name, lenavail);
+		} else {
+			dbg_setcolor(AUTOCOMPLETE_CC_MATCHFG, AUTOCOMPLETE_CC_MATCHBG);
+			dbg_pprinter(&printer, name, cookie->acc_startslen);
+			lenavail -= cookie->acc_startslen;
+			if unlikely(lenavail >= unmatched_length)
+				goto do_print_unmatched; /* Shouldn't happen... */
+			dbg_setcolor(AUTOCOMPLETE_CC_SUGGESTFG, AUTOCOMPLETE_CC_SUGGESTBG);
+			dbg_pprinter(&printer, name + cookie->acc_startslen, lenavail);
+		}
+		if (print_dots) {
+			dbg_setcolor(AUTOCOMPLETE_CC_SUGGESTFG, AUTOCOMPLETE_CC_SUGGESTBG);
+			dbg_pprinter(&printer, DBGSTR("..."), 3);
+		}
+	}
+	/* Advance the  */
+	--cookie->acc_match_count;
+	++cookie->acc_matchlist_colx;
+	if (cookie->acc_matchlist_colx >= cookie->acc_matchlist_colc)
+		cookie->acc_matchlist_colx = 0; /* Wrap to start of line. */
+	if (cookie->acc_matchlist_colx == cookie->acc_matchlist_col0)
+		cookie->acc_matchlist_cury += cookie->acc_matchlist_nxty; /* Next line. */
+}
+
+
+/* Wait for user-input in the form of a key-down event (key-up
+ * events are discarded), but don't consume that key-down event. */
+PRIVATE ATTR_DBGTEXT void
+NOTHROW(KCALL dbg_waitforinput)(void) {
+	/* Wait for the user to press a button. */
+	if (!dbg_hasuni() && !dbg_haschar()) {
+		for (;;) {
+			u16 key;
+			key = dbg_getkey();
+			if (KEY_ISDOWN(key)) {
+				dbg_ungetkey(key);
+				break;
+			}
+		}
+	}
+}
+
+
+/* @param: insert_match: When true, insert a matched word when there is only one that matches.
+ * @param: pbad_cmd:     Set to true if the written command is badly formatted. */
+PRIVATE ATTR_DBGTEXT ATTR_NOINLINE size_t
+NOTHROW(KCALL dbg_autocomplete)(size_t cursor,
+                                u32 screen_cursor_pos
+#ifdef CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE
+                                ,
+                                bool *pbad_cmd,
+                                bool insert_match
+#endif /* CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE */
+                                ) {
+	size_t argc, effective_argc;
+	debug_auto_t autofun;
+	char *cmdline_copy;
+	union {
+		struct dbg_autocomplete_cnt_cookie cnt;
+		struct dbg_autocomplete_ins_cookie ins;
+		struct dbg_autocomplete_prn_cookie prn;
+	} cookie;
+	/* Set to `true' if the current word is incomplete (no
+	 * trailing space, or incomplete ", ', or \-sequence). */
+	bool incomplete_word = false;
+	{
+		size_t i = cursor;
+		/* Don't do anything if the cursor is at the start of the
+		 * commandline, or is only preceded by white-space characters. */
+		if (!cursor)
+			goto done;
+		do {
+			--i;
+			if (!isspace(cmdline[i]))
+				goto do_autocomplete;
+		} while (i);
+		goto done;
+	}
+do_autocomplete:
+	cmdline_copy = (char *)alloca(cursor + 1);
+	*(char *)mempcpy(cmdline_copy, cmdline, cursor) = '\0';
+	argc = split_cmdline(cmdline_copy, argv, DBG_ARGC_MAX, &incomplete_word);
+	if (!incomplete_word) {
+		/* Check for trailing space in the original commandline. */
+		if (!cursor || !isspace(cmdline[cursor - 1]))
+			incomplete_word = true;
+	}
+	if (argc == 0 || (argc == 1 && incomplete_word)) {
+		/* Auto-complete the name of a command
+		 * -> Same as the auto-completion for `help' */
+		autofun = &autocomplete_help;
+	} else {
+		/* Auto-complete arguments for a command `argv[0]' */
+		struct debug_function const *func;
+		func = dbg_getfunc(argv[0]);
+		if unlikely(!func) {
+			/* No such command (can't auto-complete).
+			 * -> Re-print the command name in red */
+setcolor_badcmd:
+#ifdef CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE
+			if (pbad_cmd)
+				*pbad_cmd = true;
+#endif /* CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE */
+			goto done;
+		}
+		if (!func->df_auto)
+			goto done; /* No auto-completion for this function... */
+		autofun = func->df_auto;
+	}
+	effective_argc   = argc;
+	if (incomplete_word) {
+		if (!effective_argc)
+			goto set_starts_empty_string;
+		--effective_argc;
+		cookie.cnt.acc_starts    = argv[effective_argc];
+		cookie.cnt.acc_startslen = strlen(cookie.cnt.acc_starts);
+		argv[effective_argc] = NULL;
+	} else {
+set_starts_empty_string:
+		cookie.cnt.acc_starts    = strend(cmdline_copy);
+		cookie.cnt.acc_startslen = 0;
+	}
+	/* Figure out how many options match. */
+	cookie.cnt.acc_count = 0;
+	(*autofun)(effective_argc, argv,
+	           &dbg_autocomplete_countmatches, &cookie.cnt,
+	           cookie.cnt.acc_starts, cookie.cnt.acc_startslen);
+	if (cookie.cnt.acc_count == 0) {
+		if (autofun == &autocomplete_help)
+			goto setcolor_badcmd;
+		goto done; /* Nothing to do here! */
+	}
+#ifdef CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE
+	if (cookie.cnt.acc_count == 1 && insert_match)
+#else /* CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE */
+	if (cookie.cnt.acc_count == 1)
+#endif /* !CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE */
+	{
+		/* Auto-complete this single word. */
+		size_t new_cursor;
+		if unlikely(cursor < cookie.cnt.acc_startslen)
+			goto done; /* shouldn't happen... */
+		if unlikely(memcmp(cmdline + cursor - cookie.cnt.acc_startslen,
+		                   cookie.cnt.acc_starts, cookie.cnt.acc_startslen))
+			goto done; /* Shouldn't happen... */
+		new_cursor = cursor - cookie.cnt.acc_startslen;
+		{
+			if unlikely(new_cursor >= (DBG_MAXLINE - 1))
+				goto done; /* Shouldn't happen... */
+			cookie.ins.acc_destavl   = (DBG_MAXLINE - 1) - new_cursor;
+			cookie.ins.acc_dest      = cmdline + new_cursor;
+			cookie.ins.acc_destdel   = cookie.cnt.acc_startslen;
+			cookie.ins.acc_destmov   = strlen(cmdline + cursor);
+/*			cookie.ins.acc_starts    = cookie.cnt.acc_starts; */
+/*			cookie.ins.acc_startslen = cookie.cnt.acc_startslen; */
+			(*autofun)(effective_argc, argv,
+			           &dbg_autocomplete_insertmatch, &cookie.ins,
+			           cookie.ins.acc_starts, cookie.ins.acc_startslen);
+			if unlikely(cookie.ins.acc_dest != NULL)
+				goto done; /* shouldn't happen... (match no found) */
+			if unlikely(cookie.ins.acc_destreq > cookie.ins.acc_destavl)
+				goto do_print_options; /* Prevent overflow */
+			new_cursor += cookie.ins.acc_destreq;
+		}
+		return new_cursor;
+	}
+do_print_options:
+	/* Print a list of all available options and
+	 * wait until the user presses another key. */
+	{
+		size_t match_count;
+		unsigned int matchlist_y, wordstart_x;
+		unsigned int matchlist_sx, matchlist_sy;
+		void *matchlist_screendata_backup;
+		dbg_attr_t orig_attr;
+
+		/* Figure out the length of the longest match. */
+		match_count = cookie.cnt.acc_count;
+		cookie.cnt.acc_count = 0;
+		(*autofun)(effective_argc, argv,
+				   &dbg_autocomplete_longestmatch, &cookie.cnt,
+				   cookie.cnt.acc_starts, cookie.cnt.acc_startslen);
+		if unlikely(!cookie.cnt.acc_count)
+			goto done; /* Shouldn't happen... */
+		cookie.prn.acc_match_width = (unsigned int)cookie.cnt.acc_count + 1; /* +1 for spacing between columns */
+
+		if unlikely(cookie.prn.acc_match_width > dbg_screen_width)
+			cookie.prn.acc_match_width = dbg_screen_width;
+		if unlikely(!cookie.prn.acc_match_width)
+			goto done; /* Shouldn't happen */
+		/* Figure out where we want to print the match-list at. */
+		wordstart_x = DBG_GETCUR_X(screen_cursor_pos);
+		if (wordstart_x < cookie.cnt.acc_startslen)
+			wordstart_x = cookie.cnt.acc_startslen; /* Current word is truncated. */
+		wordstart_x -= cookie.cnt.acc_startslen;
+		/* Figure out how many match columns we want to print. */
+		cookie.prn.acc_matchlist_x = wordstart_x % cookie.prn.acc_match_width;
+		matchlist_sx = dbg_screen_width - cookie.prn.acc_matchlist_x;
+		if (matchlist_sx < cookie.prn.acc_match_width) {
+set_fullwidth_print:
+			if (cookie.prn.acc_match_width > dbg_screen_width)
+				cookie.prn.acc_match_width = dbg_screen_width;
+			matchlist_sx = cookie.prn.acc_match_width;
+			cookie.prn.acc_matchlist_x = (dbg_screen_width - matchlist_sx) / 2;
+			cookie.prn.acc_matchlist_colc = 1;
+		} else {
+			cookie.prn.acc_matchlist_colc = matchlist_sx / cookie.prn.acc_match_width;
+			if (!cookie.prn.acc_matchlist_colc)
+				goto set_fullwidth_print;
+			matchlist_sx = cookie.prn.acc_matchlist_colc * cookie.prn.acc_match_width;
+		}
+		cookie.prn.acc_matchlist_col0 = (wordstart_x - cookie.prn.acc_matchlist_x) / cookie.prn.acc_match_width;
+		cookie.prn.acc_matchlist_colx = cookie.prn.acc_matchlist_col0;
+		matchlist_sy = CEILDIV(match_count, cookie.prn.acc_matchlist_colc);
+		cookie.prn.acc_match_count = cookie.prn.acc_matchlist_colc * matchlist_sy;
+		cookie.prn.acc_matchlist_cury = DBG_GETCUR_Y(screen_cursor_pos);
+		if ((cookie.prn.acc_matchlist_cury + matchlist_sy <= dbg_screen_height) ||
+			(cookie.prn.acc_matchlist_cury + 1 < dbg_screen_height / 2)) {
+do_print_below:
+			/* Print the list below the commandline */
+			++cookie.prn.acc_matchlist_cury;
+			matchlist_y = cookie.prn.acc_matchlist_cury;
+			if unlikely(matchlist_y >= dbg_screen_height) {
+				--cookie.prn.acc_matchlist_cury;
+				if unlikely(!cookie.prn.acc_matchlist_cury)
+					goto done; /* Shouldn't happen... */
+				goto do_print_above;
+			}
+			cookie.prn.acc_matchlist_nxty = 1;
+		} else {
+			if unlikely(!cookie.prn.acc_matchlist_cury)
+				goto do_print_below; /* Shouldn't happen... */
+do_print_above:
+			/* Print the list above the commandline */
+			if (cookie.prn.acc_matchlist_cury < matchlist_sy) {
+				/* Don't write past the top of the screen. */
+				matchlist_sy = cookie.prn.acc_matchlist_cury;
+				cookie.prn.acc_match_count = matchlist_sy * cookie.prn.acc_matchlist_colc;
+			}
+			matchlist_y = cookie.prn.acc_matchlist_cury - matchlist_sy;
+			--cookie.prn.acc_matchlist_cury;
+			cookie.prn.acc_matchlist_nxty = -1;
+		}
+		if (matchlist_y + matchlist_sy > dbg_screen_height) {
+			/* Don't write past the end of the screen. */
+			matchlist_sy = dbg_screen_height - matchlist_y;
+			cookie.prn.acc_match_count = matchlist_sy * cookie.prn.acc_matchlist_colc;
+		}
+		/* Backup the screen-area containing the match list. */
+		matchlist_screendata_backup = alloca(matchlist_sx * matchlist_sy * dbg_screen_cellsize);
+		orig_attr = dbg_attr;
+		dbg_beginupdate();
+		dbg_getscreendata(cookie.prn.acc_matchlist_x, matchlist_y,
+		                  matchlist_sx, matchlist_sy,
+		                  matchlist_screendata_backup);
+		dbg_setcolor(AUTOCOMPLETE_CC_BACKGROUND, AUTOCOMPLETE_CC_BACKGROUND);
+		dbg_fillbox(cookie.prn.acc_matchlist_x, matchlist_y,
+		            matchlist_sx, matchlist_sy, ' ');
+		/* Print the match list. */
+		(*autofun)(effective_argc, argv,
+		           &dbg_autocomplete_matchlist, &cookie.prn,
+		           cookie.prn.acc_starts, cookie.prn.acc_startslen);
+		dbg_endupdate(true);
+		/* Wait for the user to press a button. */
+		dbg_waitforinput();
+		/* Restore the screen-area we overwrote with the completion list. */
+		dbg_setscreendata(cookie.prn.acc_matchlist_x, matchlist_y,
+		                  matchlist_sx, matchlist_sy,
+		                  matchlist_screendata_backup);
+		/* Restore original output attributes */
+		dbg_attr = orig_attr;
+	}
+done:
+	return cursor;
+}
+
+
+
+DEFINE_DEBUG_FUNCTION(
+		"exit",
+		"exit\n"
+		"\tExit debugger mode and resume execution\n"
+		, argc, argv) {
+	if (argc != 1)
+		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	(void)argv;
+	dbg_exit();
+	return 0;
+}
 
 /* Debug commandline backlog (entries are separated by \0) */
 PRIVATE ATTR_DBGBSS char cmdline_backlog[DBG_MAXLINE_BACKLOG];
@@ -327,106 +853,6 @@ NOTHROW(KCALL cmdline_backlog_next)(void) {
 
 
 
-/* Split the given commandline and store the arguments in `argv' */
-PRIVATE ATTR_DBGTEXT size_t KCALL
-split_cmdline(char *__restrict cmdln,
-              char **__restrict argv,
-              size_t argc_max) {
-	size_t argi, i;
-	size_t cmdline_len;
-	if unlikely(!argc_max) {
-		return 0;
-	}
-	/* Skip leading space. */
-	while (isspace(*cmdln))
-		++cmdln;
-	/* Check for empty commandline. */
-	if (!*cmdln)
-		return 0;
-	--argc_max;
-	i = 0, argi = 1;
-	cmdline_len = strlen(cmdln);
-	argv[0]     = cmdln;
-	for (;;) {
-		char ch = cmdln[i];
-		/* Escaped characters. */
-		if (ch == '\\') {
-			--cmdline_len;
-			memmovedown(&cmdln[i],
-			            &cmdln[i + 1],
-			            cmdline_len - i,
-			            sizeof(char));
-			++i;
-			if (i >= cmdline_len)
-				break;
-			continue;
-		}
-		/* String arguments. */
-		if (ch == '\'' || ch == '\"') {
-			char end_ch = ch;
-			--cmdline_len;
-			memmovedown(&cmdln[i],
-			            &cmdln[i + 1],
-			            cmdline_len - i,
-			            sizeof(char));
-			while (i < cmdline_len) {
-				ch = cmdln[i];
-				if (ch == '\\') {
-					--cmdline_len;
-					memmovedown(&cmdln[i],
-					            &cmdln[i + 1],
-					            cmdline_len - i,
-					            sizeof(char));
-					++i;
-					if (i >= cmdline_len)
-						break;
-					continue;
-				}
-				if (ch == end_ch) {
-					--cmdline_len;
-					memmovedown(&cmdln[i],
-					            &cmdln[i + 1],
-					            cmdline_len - i,
-					            sizeof(char));
-					break;
-				}
-				++i;
-			}
-			if (i >= cmdline_len)
-				break;
-			continue;
-		}
-		/* Space -> Argument separator. */
-		if (isspace(ch)) {
-			cmdln[i] = '\0'; /* Terminate the previous argument. */
-			++i;
-			/* Skip multiple consecutive spaces. */
-			while (i < cmdline_len && isspace(cmdln[i]))
-				++i;
-			if (i >= cmdline_len)
-				break;
-			/* Start a new argument. */
-			argv[argi] = &cmdln[i];
-			++argi;
-			if (argi >= argc_max) {
-				while (cmdline_len && isspace(cmdln[cmdline_len - 1]))
-					--cmdline_len;
-				cmdln[cmdline_len] = '\0';
-				break;
-			}
-			continue;
-		}
-		++i;
-		if (i >= cmdline_len)
-			break;
-	}
-	/* Always terminate argv with a NULL entry. */
-	argv[argi] = NULL;
-	return argi;
-}
-
-
-
 PUBLIC ATTR_DBGTEXT void KCALL
 dbg_main(uintptr_t show_welcome) {
 	/* Reset the backlog */
@@ -461,6 +887,9 @@ again_readline:
 		dbg_setcolor(DBG_COLOR_WHITE, DBG_COLOR_DARK_GRAY);
 		dbg_setcur_visible(true);
 		{
+#ifdef CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE
+			bool should_print_autocomplete, did_press_tab;
+#endif /* CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE */
 			unsigned int code, field_width;
 			u32 cur = dbg_getcur();
 			size_t cursor_pos, screen_left;
@@ -469,18 +898,65 @@ again_readline:
 			cmdline_current = cmdline_latest;
 /*continue_readline_sol:*/
 			cursor_pos = screen_left = 0;
+#ifdef CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE
+			should_print_autocomplete = true;
+			did_press_tab             = false;
+#endif /* CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE */
 continue_readline:
 			field_width = dbg_screen_width - DBG_GETCUR_X(cur);
+#ifdef CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE
+			if (should_print_autocomplete || did_press_tab) {
+				bool badcmd = false;
+				cursor_pos = dbg_autocomplete(cursor_pos,
+				                              DBG_MAKECUR(DBG_GETCUR_X(cur) + (cursor_pos -
+				                                                               screen_left),
+				                                          DBG_GETCUR_Y(cur)),
+				                              &badcmd, did_press_tab);
+				if (badcmd) {
+					dbg_beginupdate();
+					dbg_setcolor(AUTOCOMPLETE_CC_BADCMD, DBG_COLOR_DARK_GRAY);
+					dbg_draweditfield(DBG_GETCUR_X(cur), DBG_GETCUR_Y(cur),
+					                  field_width, cmdline, DBG_MAXLINE,
+					                  &cursor_pos, &screen_left);
+					dbg_endupdate();
+					/* Wait for the user to press a button. */
+					dbg_waitforinput();
+					dbg_setcolor(DBG_COLOR_WHITE, DBG_COLOR_DARK_GRAY);
+				}
+			}
+			did_press_tab             = false;
+			should_print_autocomplete = true;
+#endif /* CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE */
 			code = dbg_editfield(DBG_GETCUR_X(cur), DBG_GETCUR_Y(cur),
 			                     field_width, cmdline, DBG_MAXLINE,
-			                     &cursor_pos, &screen_left);
+			                     &cursor_pos, &screen_left,
+#ifdef CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE
+			                     true
+#else /* CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE */
+			                     false
+#endif /* !CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE */
+			                     );
 			switch (code) {
+
+#ifdef CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE
+			case DBG_EDITFIELD_RETURN_ESC:
+				/* Re-print while hiding the autocompletion menu. */
+				should_print_autocomplete = false;
+				goto continue_readline;
+#endif /* CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE */
 
 			case DBG_EDITFIELD_RETURN_ENTER:
 				break;
 
 			case DBG_EDITFIELD_RETURN_TAB:
-				cursor_pos = dbg_autocomplete(cmdline, DBG_MAXLINE, cursor_pos);
+#ifdef CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE
+				did_press_tab = true;
+#else /* CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE */
+				cursor_pos = dbg_autocomplete(cursor_pos,
+				                              DBG_MAKECUR(DBG_GETCUR_X(cur) + (cursor_pos -
+				                                                               screen_left),
+				                                          DBG_GETCUR_Y(cur)));
+#endif /* !CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE */
 				goto continue_readline;
 
 			case DBG_EDITFIELD_RETURN_CTRL_C: {
@@ -513,12 +989,19 @@ continue_readline_eol:
 					cursor_pos  = strlen(cmdline);
 					screen_left = 0;
 				}
+#ifdef CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE
+continue_readline_noauto:
+				should_print_autocomplete = false;
 				goto continue_readline;
+#else /* CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE */
+#define continue_readline_noauto continue_readline
+				goto continue_readline;
+#endif /* !CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE */
 
 			case DBG_EDITFIELD_RETURN_DOWN:
 				if (cmdline_backlog_next())
 					goto continue_readline_eol;
-				goto continue_readline;
+				goto continue_readline_noauto;
 
 			default:
 				goto continue_readline;
@@ -532,7 +1015,7 @@ continue_readline_eol:
 		}
 		dbg_attr = attr;
 		cmdline_backlog_try_appendcurrent();
-		argc = split_cmdline(cmdline, argv, DBG_ARGC_MAX);
+		argc = split_cmdline(cmdline, argv, DBG_ARGC_MAX, NULL);
 		if (!argc)
 			continue;
 		cmd = dbg_getfunc(argv[0]);
@@ -551,8 +1034,6 @@ continue_readline_eol:
 			dbg_print(DBGSTR("?)\n"));
 			continue;
 		}
-		if (cmd->df_main == &debug_exit)
-			break;
 		TRY {
 			errorcode = (*cmd->df_main)(argc, argv);
 		} EXCEPT {
