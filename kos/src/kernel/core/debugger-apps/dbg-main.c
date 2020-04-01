@@ -569,8 +569,12 @@ setcolor_badcmd:
 #endif /* CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE */
 			goto done;
 		}
-		if (!func->df_auto)
+		if (!func->df_auto) {
+			if ((argc >= 2 || incomplete_word) &&
+			    (func->df_flag & DBG_FUNCTION_FLAG_AUTOEXCLUSIVE))
+				goto setcolor_badcmd;
 			goto done; /* No auto-completion for this function... */
+		}
 		autofun    = func->df_auto;
 		func_flags = func->df_flag;
 	}
