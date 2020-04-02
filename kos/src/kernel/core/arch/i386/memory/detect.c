@@ -45,9 +45,10 @@ INTDEF byte_t __kernel_end[];
 #define V2P(x) ((uintptr_t)(x) - KERNEL_CORE_BASE)
 PRIVATE ATTR_FREERODATA struct pmembank const default_memory_banks[] = {
 	PMEMBANK_INIT(0x00000000, PMEMBANK_TYPE_ALLOCATED),  /* Keep the first page as allocated */
-	PMEMBANK_INIT(0x00001000, PMEMBANK_TYPE_UNDEF),
+	PMEMBANK_INIT(0x00001000, PMEMBANK_TYPE_RAM),        /* Available as RAM on any PC-derivative */
+	PMEMBANK_INIT(0x00080000, PMEMBANK_TYPE_UNDEF),      /* EBDA (max-sized) */
 	PMEMBANK_INIT(0x000a0000, PMEMBANK_TYPE_DEVICE),     /* VGA display buffer (Not defined by BIOS functions) */
-	PMEMBANK_INIT(0x00100000, PMEMBANK_TYPE_UNDEF),
+	/*PMEMBANK_INIT(0x00100000, PMEMBANK_TYPE_UNDEF),*/
 	PMEMBANK_INIT(V2P(__kernel_start), PMEMBANK_TYPE_KERNEL),
 	PMEMBANK_INIT(V2P(__kernel_free_start), PMEMBANK_TYPE_KFREE),
 	PMEMBANK_INIT(V2P(__kernel_end), PMEMBANK_TYPE_UNDEF),

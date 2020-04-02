@@ -111,6 +111,7 @@ PRIVATE_FUNCTION(x86_boot0_sector)
 	call16 a20test
 
 	/* Step #4: Try the keyboard controller method. */
+PRIVATE(.La20_keyboard_begin)
 .La20_keyboard_begin:
 	call16 a20wait_x2
 	movb   $(0xad), %al
@@ -147,6 +148,7 @@ PRIVATE_FUNCTION(x86_boot0_sector)
 1:	call16 a20test
 	loop   1b
 
+PRIVATE(.La20_keyboard_failed)
 .La20_keyboard_failed:
 	/* Step #6: Try the fast-A20 method. */
 	inb    $(0x92), %al
@@ -212,6 +214,7 @@ PRIVATE_FUNCTION(a20test)
 END(a20test)
 
 
+PRIVATE(.Ldone_a20)
 .Ldone_a20:
 	popaw
 	xorw   %ax, %ax
