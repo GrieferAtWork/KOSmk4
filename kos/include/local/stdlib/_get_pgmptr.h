@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x96050148 */
+/* HASH CRC-32:0x70d89bc8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_get_pgmptr) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_get_pgmptr))(char **__pvalue) {
-#line 2028 "kos/src/libc/magic/stdlib.c"
+#line 2030 "kos/src/libc/magic/stdlib.c"
 	*__pvalue = __LOCAL_program_invocation_name;
 	return 0;
 }

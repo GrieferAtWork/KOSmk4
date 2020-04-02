@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xed94e38 */
+/* HASH CRC-32:0xcadbad88 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,8 @@ struct __invoke_compare_helper_s_data {
 	__dos_compar_d_fn_t __fun;
 	void               *__arg;
 };
-__PRIVATE int (__LIBCCALL __invoke_compare_helper_s)(void const *__a, void const *__b, void *__arg) {
+__LOCAL_LIBC(__invoke_compare_helper_s) int
+(__LIBCCALL __invoke_compare_helper_s)(void const *__a, void const *__b, void *__arg) {
 	return (*((struct __invoke_compare_helper_s_data *)__arg)->__fun)(((struct __invoke_compare_helper_s_data *)__arg)->__arg, __a, __b);
 }
 #endif /* !____invoke_compare_helper_defined */
@@ -57,7 +58,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(bsearch_s))(void const *__key,
                                                        __SIZE_TYPE__ __size,
                                                        __dos_compar_d_fn_t __compar,
                                                        void *__arg) {
-#line 2171 "kos/src/libc/magic/stdlib.c"
+#line 2174 "kos/src/libc/magic/stdlib.c"
 	struct __invoke_compare_helper_s_data __data;
 	__data.__fun = __compar;
 	__data.__arg = __arg;

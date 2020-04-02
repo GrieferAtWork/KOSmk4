@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x515cfb63 */
+/* HASH CRC-32:0x8d66b9a0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,7 +65,7 @@ __LOCAL_LIBC(strtoull) __ATTR_LEAF __ATTR_NONNULL((1)) __ULONGLONG
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtoull))(char const *__restrict __nptr,
                                                       char **__endptr,
                                                       int __base) {
-#line 880 "kos/src/libc/magic/stdlib.c"
+#line 882 "kos/src/libc/magic/stdlib.c"
 #if __SIZEOF_LONG_LONG__ <= 4
 	return (__ULONGLONG)__localdep_strtou32(__nptr, __endptr, __base);
 #else /* __SIZEOF_LONG_LONG__ <= 4 */

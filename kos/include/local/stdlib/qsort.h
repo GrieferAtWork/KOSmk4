@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8cb10761 */
+/* HASH CRC-32:0xc222aefd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,8 @@ __CREDIRECT_VOID(__ATTR_NONNULL((1, 4)),,__localdep_qsort_r,(void *__pbase, __SI
 __NAMESPACE_LOCAL_BEGIN
 #ifndef ____invoke_compare_helper_defined
 #define ____invoke_compare_helper_defined 1
-__PRIVATE int (__LIBCCALL __invoke_compare_helper)(void const *__a, void const *__b, void *__arg) {
+__LOCAL_LIBC(__invoke_compare_helper) int
+(__LIBCCALL __invoke_compare_helper)(void const *__a, void const *__b, void *__arg) {
 	return (*(__compar_fn_t)__arg)(__a, __b);
 }
 #endif /* !____invoke_compare_helper_defined */
@@ -48,7 +49,7 @@ __LOCAL_LIBC(qsort) __ATTR_NONNULL((1, 4)) void
                                       __SIZE_TYPE__ __item_count,
                                       __SIZE_TYPE__ __item_size,
                                       __compar_fn_t __cmp) __THROWS(...) {
-#line 433 "kos/src/libc/magic/stdlib.c"
+#line 434 "kos/src/libc/magic/stdlib.c"
 	__localdep_qsort_r(__pbase, __item_count, __item_size, &__invoke_compare_helper, (void *)__cmp);
 }
 __NAMESPACE_LOCAL_END

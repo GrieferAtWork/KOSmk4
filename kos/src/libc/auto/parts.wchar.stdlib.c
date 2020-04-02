@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe2a117a9 */
+/* HASH CRC-32:0x88a4ac3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ DECL_BEGIN
 INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.unicode.static.convert.wtoi") int
 NOTHROW_NCX(LIBCCALL libc_wtoi)(char32_t const *nptr) {
-#line 813 "kos/src/libc/magic/stdlib.c"
+#line 815 "kos/src/libc/magic/stdlib.c"
 #if __SIZEOF_INT__ <= 4
 	return (int)libc_wcsto32(nptr, NULL, 10);
 #else /* __SIZEOF_INT__ <= 4 */
@@ -43,7 +43,7 @@ NOTHROW_NCX(LIBCCALL libc_wtoi)(char32_t const *nptr) {
 INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert.wtoi") int
 NOTHROW_NCX(LIBDCALL libd_wtoi)(char16_t const *nptr) {
-#line 813 "kos/src/libc/magic/stdlib.c"
+#line 815 "kos/src/libc/magic/stdlib.c"
 #if __SIZEOF_INT__ <= 4
 	return (int)libd_wcsto32(nptr, NULL, 10);
 #else /* __SIZEOF_INT__ <= 4 */
@@ -57,7 +57,7 @@ DEFINE_INTERN_ALIAS(libc_wtol, libc_wtoi);
 INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.unicode.static.convert.wtol") long
 NOTHROW_NCX(LIBCCALL libc_wtol)(char32_t const *nptr) {
-#line 823 "kos/src/libc/magic/stdlib.c"
+#line 825 "kos/src/libc/magic/stdlib.c"
 #if __SIZEOF_LONG__ <= 4
 	return (long)libc_wcsto32(nptr, NULL, 10);
 #else /* __SIZEOF_LONG__ <= 4 */
@@ -71,7 +71,7 @@ DEFINE_INTERN_ALIAS(libd_wtol, libd_wtoi);
 INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert.wtol") long
 NOTHROW_NCX(LIBDCALL libd_wtol)(char16_t const *nptr) {
-#line 823 "kos/src/libc/magic/stdlib.c"
+#line 825 "kos/src/libc/magic/stdlib.c"
 #if __SIZEOF_LONG__ <= 4
 	return (long)libd_wcsto32(nptr, NULL, 10);
 #else /* __SIZEOF_LONG__ <= 4 */
@@ -88,7 +88,7 @@ DEFINE_INTERN_ALIAS(libc_wtoll, libc_wtol);
 INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.unicode.static.convert.wtoll") __LONGLONG
 NOTHROW_NCX(LIBCCALL libc_wtoll)(char32_t const *nptr) {
-#line 834 "kos/src/libc/magic/stdlib.c"
+#line 836 "kos/src/libc/magic/stdlib.c"
 #if __SIZEOF_LONG_LONG__ <= 4
 	return (__LONGLONG)libc_wcsto32(nptr, NULL, 10);
 #else /* __SIZEOF_LONG_LONG__ <= 4 */
@@ -104,7 +104,7 @@ DEFINE_INTERN_ALIAS(libd_wtoll, libd_wtol);
 INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert.wtoll") __LONGLONG
 NOTHROW_NCX(LIBDCALL libd_wtoll)(char16_t const *nptr) {
-#line 834 "kos/src/libc/magic/stdlib.c"
+#line 836 "kos/src/libc/magic/stdlib.c"
 #if __SIZEOF_LONG_LONG__ <= 4
 	return (__LONGLONG)libd_wcsto32(nptr, NULL, 10);
 #else /* __SIZEOF_LONG_LONG__ <= 4 */

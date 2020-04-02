@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x926854af */
+/* HASH CRC-32:0x7457d588 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,6 @@
 
 DECL_BEGIN
 
-#ifndef __KERNEL__
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.ctype.iscntrl") int
 NOTHROW(LIBCCALL libc_iscntrl)(int ch) {
@@ -132,6 +131,7 @@ NOTHROW(LIBCCALL libc_isblank)(int ch) {
 	return (u8)ch == 0x09 || (u8)ch == 0x20;
 }
 
+#ifndef __KERNEL__
 INTERN ATTR_PURE WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.ctype.iscntrl_l") int
 NOTHROW_NCX(LIBCCALL libc_iscntrl_l)(int ch,
@@ -275,7 +275,6 @@ NOTHROW_NCX(LIBCCALL libc_toupper_l)(int ch,
 }
 
 #endif /* !__KERNEL__ */
-#ifndef __KERNEL__
 DEFINE_PUBLIC_WEAK_ALIAS(iscntrl, libc_iscntrl);
 DEFINE_PUBLIC_WEAK_ALIAS(isspace, libc_isspace);
 DEFINE_PUBLIC_WEAK_ALIAS(isupper, libc_isupper);
@@ -288,10 +287,11 @@ DEFINE_PUBLIC_WEAK_ALIAS(ispunct, libc_ispunct);
 DEFINE_PUBLIC_WEAK_ALIAS(isgraph, libc_isgraph);
 DEFINE_PUBLIC_WEAK_ALIAS(isprint, libc_isprint);
 DEFINE_PUBLIC_WEAK_ALIAS(tolower, libc_tolower);
-DEFINE_PUBLIC_WEAK_ALIAS(_tolower, libc_tolower);
 DEFINE_PUBLIC_WEAK_ALIAS(toupper, libc_toupper);
-DEFINE_PUBLIC_WEAK_ALIAS(_toupper, libc_toupper);
 DEFINE_PUBLIC_WEAK_ALIAS(isblank, libc_isblank);
+#ifndef __KERNEL__
+DEFINE_PUBLIC_WEAK_ALIAS(_tolower, libc_tolower);
+DEFINE_PUBLIC_WEAK_ALIAS(_toupper, libc_toupper);
 DEFINE_PUBLIC_WEAK_ALIAS(iscntrl_l, libc_iscntrl_l);
 DEFINE_PUBLIC_WEAK_ALIAS(__iscntrl_l, libc_iscntrl_l);
 DEFINE_PUBLIC_WEAK_ALIAS(isspace_l, libc_isspace_l);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5a201bbb */
+/* HASH CRC-32:0x17d8a0de */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -304,7 +304,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.wchar.unicode.static.convert.wcstol") long
 NOTHROW_NCX(LIBCCALL libc_wcstol)(char32_t const *__restrict nptr,
                                   char32_t **endptr,
                                   int base) {
-#line 864 "kos/src/libc/magic/stdlib.c"
+#line 866 "kos/src/libc/magic/stdlib.c"
 #if __SIZEOF_LONG__ <= 4
 	return (long)libc_wcsto32(nptr, endptr, base);
 #else /* __SIZEOF_LONG__ <= 4 */
@@ -316,7 +316,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert.wcstol") long
 NOTHROW_NCX(LIBDCALL libd_wcstol)(char16_t const *__restrict nptr,
                                   char16_t **endptr,
                                   int base) {
-#line 864 "kos/src/libc/magic/stdlib.c"
+#line 866 "kos/src/libc/magic/stdlib.c"
 #if __SIZEOF_LONG__ <= 4
 	return (long)libd_wcsto32(nptr, endptr, base);
 #else /* __SIZEOF_LONG__ <= 4 */
@@ -329,7 +329,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.wchar.unicode.static.convert.wcstoul") unsigne
 NOTHROW_NCX(LIBCCALL libc_wcstoul)(char32_t const *__restrict nptr,
                                    char32_t **endptr,
                                    int base) {
-#line 850 "kos/src/libc/magic/stdlib.c"
+#line 852 "kos/src/libc/magic/stdlib.c"
 #if __SIZEOF_LONG__ <= 4
 	return (unsigned long)libc_wcstou32(nptr, endptr, base);
 #else /* __SIZEOF_LONG__ <= 4 */
@@ -341,7 +341,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert.wcstoul") uns
 NOTHROW_NCX(LIBDCALL libd_wcstoul)(char16_t const *__restrict nptr,
                                    char16_t **endptr,
                                    int base) {
-#line 850 "kos/src/libc/magic/stdlib.c"
+#line 852 "kos/src/libc/magic/stdlib.c"
 #if __SIZEOF_LONG__ <= 4
 	return (unsigned long)libd_wcstou32(nptr, endptr, base);
 #else /* __SIZEOF_LONG__ <= 4 */
@@ -1054,7 +1054,7 @@ INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.unicode.static.convert.wcstod") double
 NOTHROW_NCX(LIBCCALL libc_wcstod)(char32_t const *__restrict nptr,
                                   char32_t **endptr) {
-#line 911 "kos/src/libc/magic/stdlib.c"
+#line 913 "kos/src/libc/magic/stdlib.c"
 	/* TODO */
 	COMPILER_IMPURE();
 	if (endptr)
@@ -1065,7 +1065,7 @@ INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert.wcstod") double
 NOTHROW_NCX(LIBDCALL libd_wcstod)(char16_t const *__restrict nptr,
                                   char16_t **endptr) {
-#line 911 "kos/src/libc/magic/stdlib.c"
+#line 913 "kos/src/libc/magic/stdlib.c"
 	/* TODO */
 	COMPILER_IMPURE();
 	if (endptr)
@@ -1077,7 +1077,7 @@ INTERN ATTR_PURE NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.unicode.static.convert.wcstof") float
 NOTHROW_NCX(LIBCCALL libc_wcstof)(char32_t const *__restrict nptr,
                                   char32_t **endptr) {
-#line 921 "kos/src/libc/magic/stdlib.c"
+#line 923 "kos/src/libc/magic/stdlib.c"
 	/* TODO */
 	COMPILER_IMPURE();
 	if (endptr)
@@ -1088,7 +1088,7 @@ INTERN ATTR_PURE NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert.wcstof") float
 NOTHROW_NCX(LIBDCALL libd_wcstof)(char16_t const *__restrict nptr,
                                   char16_t **endptr) {
-#line 921 "kos/src/libc/magic/stdlib.c"
+#line 923 "kos/src/libc/magic/stdlib.c"
 	/* TODO */
 	COMPILER_IMPURE();
 	if (endptr)
@@ -1100,7 +1100,7 @@ INTERN ATTR_PURE NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.unicode.static.convert.wcstold") __LONGDOUBLE
 NOTHROW_NCX(LIBCCALL libc_wcstold)(char32_t const *__restrict nptr,
                                    char32_t **endptr) {
-#line 932 "kos/src/libc/magic/stdlib.c"
+#line 934 "kos/src/libc/magic/stdlib.c"
 	/* TODO */
 	COMPILER_IMPURE();
 	if (endptr)
@@ -1111,7 +1111,7 @@ INTERN ATTR_PURE NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert.wcstold") __LONGDOUBLE
 NOTHROW_NCX(LIBDCALL libd_wcstold)(char16_t const *__restrict nptr,
                                    char16_t **endptr) {
-#line 932 "kos/src/libc/magic/stdlib.c"
+#line 934 "kos/src/libc/magic/stdlib.c"
 	/* TODO */
 	COMPILER_IMPURE();
 	if (endptr)
@@ -1124,7 +1124,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.wchar.unicode.static.convert.wcstoll") __LONGL
 NOTHROW_NCX(LIBCCALL libc_wcstoll)(char32_t const *__restrict nptr,
                                    char32_t **endptr,
                                    int base) {
-#line 893 "kos/src/libc/magic/stdlib.c"
+#line 895 "kos/src/libc/magic/stdlib.c"
 #if __SIZEOF_LONG_LONG__ <= 4
 	return (__LONGLONG)libc_wcsto32(nptr, endptr, base);
 #else /* __SIZEOF_LONG_LONG__ <= 4 */
@@ -1136,7 +1136,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert.wcstoll") __L
 NOTHROW_NCX(LIBDCALL libd_wcstoll)(char16_t const *__restrict nptr,
                                    char16_t **endptr,
                                    int base) {
-#line 893 "kos/src/libc/magic/stdlib.c"
+#line 895 "kos/src/libc/magic/stdlib.c"
 #if __SIZEOF_LONG_LONG__ <= 4
 	return (__LONGLONG)libd_wcsto32(nptr, endptr, base);
 #else /* __SIZEOF_LONG_LONG__ <= 4 */
@@ -1149,7 +1149,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.wchar.unicode.static.convert.wcstoull") __ULON
 NOTHROW_NCX(LIBCCALL libc_wcstoull)(char32_t const *__restrict nptr,
                                     char32_t **endptr,
                                     int base) {
-#line 880 "kos/src/libc/magic/stdlib.c"
+#line 882 "kos/src/libc/magic/stdlib.c"
 #if __SIZEOF_LONG_LONG__ <= 4
 	return (__ULONGLONG)libc_wcstou32(nptr, endptr, base);
 #else /* __SIZEOF_LONG_LONG__ <= 4 */
@@ -1161,7 +1161,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert.wcstoull") __
 NOTHROW_NCX(LIBDCALL libd_wcstoull)(char16_t const *__restrict nptr,
                                     char16_t **endptr,
                                     int base) {
-#line 880 "kos/src/libc/magic/stdlib.c"
+#line 882 "kos/src/libc/magic/stdlib.c"
 #if __SIZEOF_LONG_LONG__ <= 4
 	return (__ULONGLONG)libd_wcstou32(nptr, endptr, base);
 #else /* __SIZEOF_LONG_LONG__ <= 4 */
@@ -1476,7 +1476,7 @@ NOTHROW_NCX(LIBCCALL libc_wcstol_l)(char32_t const *__restrict nptr,
                                     char32_t **__restrict endptr,
                                     int base,
                                     locale_t locale) {
-#line 1624 "kos/src/libc/magic/stdlib.c"
+#line 1626 "kos/src/libc/magic/stdlib.c"
 	(void)locale;
 	return libc_wcstol(nptr, endptr, base);
 }
@@ -1486,7 +1486,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstol_l)(char16_t const *__restrict nptr,
                                     char16_t **__restrict endptr,
                                     int base,
                                     locale_t locale) {
-#line 1624 "kos/src/libc/magic/stdlib.c"
+#line 1626 "kos/src/libc/magic/stdlib.c"
 	(void)locale;
 	return libd_wcstol(nptr, endptr, base);
 }
@@ -1497,7 +1497,7 @@ NOTHROW_NCX(LIBCCALL libc_wcstoul_l)(char32_t const *__restrict nptr,
                                      char32_t **__restrict endptr,
                                      int base,
                                      locale_t locale) {
-#line 1634 "kos/src/libc/magic/stdlib.c"
+#line 1636 "kos/src/libc/magic/stdlib.c"
 	(void)locale;
 	return libc_wcstoul(nptr, endptr, base);
 }
@@ -1507,7 +1507,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstoul_l)(char16_t const *__restrict nptr,
                                      char16_t **__restrict endptr,
                                      int base,
                                      locale_t locale) {
-#line 1634 "kos/src/libc/magic/stdlib.c"
+#line 1636 "kos/src/libc/magic/stdlib.c"
 	(void)locale;
 	return libd_wcstoul(nptr, endptr, base);
 }
@@ -1518,7 +1518,7 @@ NOTHROW_NCX(LIBCCALL libc_wcstoll_l)(char32_t const *__restrict nptr,
                                      char32_t **endptr,
                                      int base,
                                      locale_t locale) {
-#line 1646 "kos/src/libc/magic/stdlib.c"
+#line 1648 "kos/src/libc/magic/stdlib.c"
 	(void)locale;
 	return libc_wcstoll(nptr, endptr, base);
 }
@@ -1528,7 +1528,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstoll_l)(char16_t const *__restrict nptr,
                                      char16_t **endptr,
                                      int base,
                                      locale_t locale) {
-#line 1646 "kos/src/libc/magic/stdlib.c"
+#line 1648 "kos/src/libc/magic/stdlib.c"
 	(void)locale;
 	return libd_wcstoll(nptr, endptr, base);
 }
@@ -1539,7 +1539,7 @@ NOTHROW_NCX(LIBCCALL libc_wcstoull_l)(char32_t const *__restrict nptr,
                                       char32_t **endptr,
                                       int base,
                                       locale_t locale) {
-#line 1657 "kos/src/libc/magic/stdlib.c"
+#line 1659 "kos/src/libc/magic/stdlib.c"
 	(void)locale;
 	return libc_wcstoull(nptr, endptr, base);
 }
@@ -1549,7 +1549,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstoull_l)(char16_t const *__restrict nptr,
                                       char16_t **endptr,
                                       int base,
                                       locale_t locale) {
-#line 1657 "kos/src/libc/magic/stdlib.c"
+#line 1659 "kos/src/libc/magic/stdlib.c"
 	(void)locale;
 	return libd_wcstoull(nptr, endptr, base);
 }
@@ -1559,7 +1559,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.wchar.unicode.locale.convert.wcstof_l") float
 NOTHROW_NCX(LIBCCALL libc_wcstof_l)(char32_t const *__restrict nptr,
                                     char32_t **endptr,
                                     locale_t locale) {
-#line 1674 "kos/src/libc/magic/stdlib.c"
+#line 1676 "kos/src/libc/magic/stdlib.c"
 	(void)locale;
 	return libc_wcstof(nptr, endptr);
 }
@@ -1568,7 +1568,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert.wcstof_l") fl
 NOTHROW_NCX(LIBDCALL libd_wcstof_l)(char16_t const *__restrict nptr,
                                     char16_t **endptr,
                                     locale_t locale) {
-#line 1674 "kos/src/libc/magic/stdlib.c"
+#line 1676 "kos/src/libc/magic/stdlib.c"
 	(void)locale;
 	return libd_wcstof(nptr, endptr);
 }
@@ -1578,7 +1578,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.wchar.unicode.locale.convert.wcstod_l") double
 NOTHROW_NCX(LIBCCALL libc_wcstod_l)(char32_t const *__restrict nptr,
                                     char32_t **endptr,
                                     locale_t locale) {
-#line 1667 "kos/src/libc/magic/stdlib.c"
+#line 1669 "kos/src/libc/magic/stdlib.c"
 	(void)locale;
 	return libc_wcstod(nptr, endptr);
 }
@@ -1587,7 +1587,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert.wcstod_l") do
 NOTHROW_NCX(LIBDCALL libd_wcstod_l)(char16_t const *__restrict nptr,
                                     char16_t **endptr,
                                     locale_t locale) {
-#line 1667 "kos/src/libc/magic/stdlib.c"
+#line 1669 "kos/src/libc/magic/stdlib.c"
 	(void)locale;
 	return libd_wcstod(nptr, endptr);
 }
@@ -1597,7 +1597,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.wchar.unicode.locale.convert.wcstold_l") __LON
 NOTHROW_NCX(LIBCCALL libc_wcstold_l)(char32_t const *__restrict nptr,
                                      char32_t **endptr,
                                      locale_t locale) {
-#line 1683 "kos/src/libc/magic/stdlib.c"
+#line 1685 "kos/src/libc/magic/stdlib.c"
 	(void)locale;
 	return libc_wcstold(nptr, endptr);
 }
@@ -1606,7 +1606,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert.wcstold_l") _
 NOTHROW_NCX(LIBDCALL libd_wcstold_l)(char16_t const *__restrict nptr,
                                      char16_t **endptr,
                                      locale_t locale) {
-#line 1683 "kos/src/libc/magic/stdlib.c"
+#line 1685 "kos/src/libc/magic/stdlib.c"
 	(void)locale;
 	return libd_wcstold(nptr, endptr);
 }
@@ -1743,7 +1743,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.wchar.unicode.static.convert.wcsto32") int32_t
 NOTHROW_NCX(LIBCCALL libc_wcsto32)(char32_t const *__restrict nptr,
                                    char32_t **endptr,
                                    int base) {
-#line 1007 "kos/src/libc/magic/stdlib.c"
+#line 1009 "kos/src/libc/magic/stdlib.c"
 	u32 result;
 	bool neg = 0;
 	while (*nptr == '-') {
@@ -1758,7 +1758,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert.wcsto32") int
 NOTHROW_NCX(LIBDCALL libd_wcsto32)(char16_t const *__restrict nptr,
                                    char16_t **endptr,
                                    int base) {
-#line 1007 "kos/src/libc/magic/stdlib.c"
+#line 1009 "kos/src/libc/magic/stdlib.c"
 	u32 result;
 	bool neg = 0;
 	while (*nptr == '-') {
@@ -1774,7 +1774,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.wchar.unicode.static.convert.wcstou32") uint32
 NOTHROW_NCX(LIBCCALL libc_wcstou32)(char32_t const *__restrict nptr,
                                     char32_t **endptr,
                                     int base) {
-#line 962 "kos/src/libc/magic/stdlib.c"
+#line 964 "kos/src/libc/magic/stdlib.c"
 	u32 result, temp;
 	if (!base) {
 		if (*nptr == '0') {
@@ -1819,7 +1819,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert.wcstou32") ui
 NOTHROW_NCX(LIBDCALL libd_wcstou32)(char16_t const *__restrict nptr,
                                     char16_t **endptr,
                                     int base) {
-#line 962 "kos/src/libc/magic/stdlib.c"
+#line 964 "kos/src/libc/magic/stdlib.c"
 	u32 result, temp;
 	if (!base) {
 		if (*nptr == '0') {
@@ -1865,7 +1865,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.wchar.unicode.static.convert.wcstou64") uint64
 NOTHROW_NCX(LIBCCALL libc_wcstou64)(char32_t const *__restrict nptr,
                                     char32_t **endptr,
                                     int base) {
-#line 1022 "kos/src/libc/magic/stdlib.c"
+#line 1024 "kos/src/libc/magic/stdlib.c"
 	u64 result, temp;
 	if (!base) {
 		if (*nptr == '0') {
@@ -1910,7 +1910,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert.wcstou64") ui
 NOTHROW_NCX(LIBDCALL libd_wcstou64)(char16_t const *__restrict nptr,
                                     char16_t **endptr,
                                     int base) {
-#line 1022 "kos/src/libc/magic/stdlib.c"
+#line 1024 "kos/src/libc/magic/stdlib.c"
 	u64 result, temp;
 	if (!base) {
 		if (*nptr == '0') {
@@ -1956,7 +1956,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.wchar.unicode.static.convert.wcsto64") int64_t
 NOTHROW_NCX(LIBCCALL libc_wcsto64)(char32_t const *__restrict nptr,
                                    char32_t **endptr,
                                    int base) {
-#line 1066 "kos/src/libc/magic/stdlib.c"
+#line 1068 "kos/src/libc/magic/stdlib.c"
 	u64 result;
 	bool neg = 0;
 	while (*nptr == '-') {
@@ -1971,7 +1971,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert.wcsto64") int
 NOTHROW_NCX(LIBDCALL libd_wcsto64)(char16_t const *__restrict nptr,
                                    char16_t **endptr,
                                    int base) {
-#line 1066 "kos/src/libc/magic/stdlib.c"
+#line 1068 "kos/src/libc/magic/stdlib.c"
 	u64 result;
 	bool neg = 0;
 	while (*nptr == '-') {
@@ -1988,7 +1988,7 @@ NOTHROW_NCX(LIBCCALL libc_wcsto32_l)(char32_t const *__restrict nptr,
                                      char32_t **endptr,
                                      int base,
                                      locale_t locale) {
-#line 1092 "kos/src/libc/magic/stdlib.c"
+#line 1094 "kos/src/libc/magic/stdlib.c"
 	(void)locale;
 	return libc_wcsto32(nptr, endptr, base);
 }
@@ -1998,7 +1998,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsto32_l)(char16_t const *__restrict nptr,
                                      char16_t **endptr,
                                      int base,
                                      locale_t locale) {
-#line 1092 "kos/src/libc/magic/stdlib.c"
+#line 1094 "kos/src/libc/magic/stdlib.c"
 	(void)locale;
 	return libd_wcsto32(nptr, endptr, base);
 }
@@ -2009,7 +2009,7 @@ NOTHROW_NCX(LIBCCALL libc_wcstou32_l)(char32_t const *__restrict nptr,
                                       char32_t **endptr,
                                       int base,
                                       locale_t locale) {
-#line 1083 "kos/src/libc/magic/stdlib.c"
+#line 1085 "kos/src/libc/magic/stdlib.c"
 	(void)locale;
 	return libc_wcstou32(nptr, endptr, base);
 }
@@ -2019,7 +2019,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstou32_l)(char16_t const *__restrict nptr,
                                       char16_t **endptr,
                                       int base,
                                       locale_t locale) {
-#line 1083 "kos/src/libc/magic/stdlib.c"
+#line 1085 "kos/src/libc/magic/stdlib.c"
 	(void)locale;
 	return libd_wcstou32(nptr, endptr, base);
 }
@@ -2030,7 +2030,7 @@ NOTHROW_NCX(LIBCCALL libc_wcsto64_l)(char32_t const *__restrict nptr,
                                      char32_t **endptr,
                                      int base,
                                      locale_t locale) {
-#line 1111 "kos/src/libc/magic/stdlib.c"
+#line 1113 "kos/src/libc/magic/stdlib.c"
 	(void)locale;
 	return libc_wcsto64(nptr, endptr, base);
 }
@@ -2040,7 +2040,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsto64_l)(char16_t const *__restrict nptr,
                                      char16_t **endptr,
                                      int base,
                                      locale_t locale) {
-#line 1111 "kos/src/libc/magic/stdlib.c"
+#line 1113 "kos/src/libc/magic/stdlib.c"
 	(void)locale;
 	return libd_wcsto64(nptr, endptr, base);
 }
@@ -2051,7 +2051,7 @@ NOTHROW_NCX(LIBCCALL libc_wcstou64_l)(char32_t const *__restrict nptr,
                                       char32_t **endptr,
                                       int base,
                                       locale_t locale) {
-#line 1102 "kos/src/libc/magic/stdlib.c"
+#line 1104 "kos/src/libc/magic/stdlib.c"
 	(void)locale;
 	return libc_wcstou64(nptr, endptr, base);
 }
@@ -2061,7 +2061,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstou64_l)(char16_t const *__restrict nptr,
                                       char16_t **endptr,
                                       int base,
                                       locale_t locale) {
-#line 1102 "kos/src/libc/magic/stdlib.c"
+#line 1104 "kos/src/libc/magic/stdlib.c"
 	(void)locale;
 	return libd_wcstou64(nptr, endptr, base);
 }

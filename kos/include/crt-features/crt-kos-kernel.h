@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x111c8ca1 */
+/* HASH CRC-32:0x9f62b616 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,6 +60,18 @@
 #define __CRT_HAVE_format_vprintf 1
 #define __CRT_HAVE_format_vscanf 1
 #define __CRT_HAVE_format_width 1
+#define __CRT_HAVE_isalnum 1
+#define __CRT_HAVE_isalpha 1
+#define __CRT_HAVE_isblank 1
+#define __CRT_HAVE_iscntrl 1
+#define __CRT_HAVE_isdigit 1
+#define __CRT_HAVE_isgraph 1
+#define __CRT_HAVE_islower 1
+#define __CRT_HAVE_isprint 1
+#define __CRT_HAVE_ispunct 1
+#define __CRT_HAVE_isspace 1
+#define __CRT_HAVE_isupper 1
+#define __CRT_HAVE_isxdigit 1
 #define __CRT_HAVE_memchr 1
 #define __CRT_HAVE_memchrl 1
 #define __CRT_HAVE_memchrq 1
@@ -159,6 +171,8 @@
 #define __CRT_HAVE_strto64 1
 #define __CRT_HAVE_strtou32 1
 #define __CRT_HAVE_strtou64 1
+#define __CRT_HAVE_tolower 1
+#define __CRT_HAVE_toupper 1
 #define __CRT_HAVE_unicode_16to32 1
 #define __CRT_HAVE_unicode_16to8 1
 #define __CRT_HAVE_unicode_32to16 1

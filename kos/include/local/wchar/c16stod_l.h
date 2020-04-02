@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6149a149 */
+/* HASH CRC-32:0xb11d1c78 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ __LOCAL_LIBC(c16stod_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) double
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16stod_l))(__CHAR16_TYPE__ const *__restrict __nptr,
                                                        __CHAR16_TYPE__ **__endptr,
                                                        __locale_t __locale) {
-#line 1667 "kos/src/libc/magic/stdlib.c"
+#line 1669 "kos/src/libc/magic/stdlib.c"
 	(void)__locale;
 	return __localdep_c16stod(__nptr, __endptr);
 }

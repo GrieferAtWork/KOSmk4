@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e3f7afb */
+/* HASH CRC-32:0x17ff8b43 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_splitpath))(char const *__restrict _
                                                         char *__dir,
                                                         char *__file,
                                                         char *__ext) {
-#line 2906 "kos/src/libc/magic/stdlib.c"
+#line 2910 "kos/src/libc/magic/stdlib.c"
 	__localdep__splitpath_s(__abspath,
 	             __drive, __drive ? 3 : 0,
 	             __dir, __dir ? 256 : 0,
