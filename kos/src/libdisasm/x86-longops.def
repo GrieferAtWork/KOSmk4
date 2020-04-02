@@ -27,7 +27,9 @@ LONGOP(LO_PREFETCHWT1, "prefetchwt1\t" OP_MEM)
 LONGOP(LO_SHA1RNDS4, "sha1rnds4\t" OP_U8 OP_RM128_XMM OP_RXMM_MASK)
 
 LONGOP(LO_SHA256RNDS2, "sha256rnds2\t" OP_XMM0 OP_RM128_XMM OP_RXMM_MASK)
+
 LONGOP(LO_SHA256MSG1, "sha256msg1\t" OP_RM128_XMM OP_RXMM_MASK)
+
 LONGOP(LO_SHA256MSG2, "sha256msg2\t" OP_RM128_XMM OP_RXMM_MASK)
 
 LONGOP(LO_VPUNPCKHBW, "vpunpckhbw\t" OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK) /* EVEX.128.66.0f.WIG 68 /r vpunpckhbw xmm1{k1}{z}, xmm2, xmm3/m128
@@ -67,7 +69,8 @@ LONGOP(LO_VPUNPCKLQDQ, "vpunpcklqdq\t" OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK) /* EV
 LONGOP(LO_PUNPCKLQDQ, "punpcklqdq\t" OP_RM128_XMM OP_RXMM_MASK) /*              66 0f 6c /r punpcklqdq xmm1, xmm2/m128 */
 
 LONGOP(LO_VPHMINPOSUW, "vphminposuw\t" OP_RM128_XMM OP_RXMM_MASK) /* VEX.128.66.0f38.WIG 41 /r vphminposuw xmm1, xmm2/m128 */
-LONGOP(LO_PHMINPOSUW, "phminposuw\t" OP_RM128_XMM OP_RXMM_MASK)   /*            66 0f 38 41 /r phminposuw xmm1, xmm2/m128 */
+
+LONGOP(LO_PHMINPOSUW, "phminposuw\t" OP_RM128_XMM OP_RXMM_MASK) /*            66 0f 38 41 /r phminposuw xmm1, xmm2/m128 */
 
 LONGOP(LO_VCVTDQ2PD,     "vcvtdq2pd\t" OP_RM128_XMM OP_RxMM_MASK) /* EVEX.128.f3.0f.W0  e6 /r vcvtdq2pd xmm1{k1}{z}, xmm2/m128/m32bcst
                                                                    * EVEX.256.f3.0f.W0  e6 /r vcvtdq2pd ymm1{k1}{z}, xmm2/m128/m32bcst */
@@ -151,6 +154,7 @@ LONGOP(LO_VINSERTI64X2, "vinserti64x2\t" OP_U8 OP_RMn_xMM__OP_VRxMM__OP_RxMM_MAS
                                                                                     * EVEX.512.66.0f3a.W1 38 /r ib vinserti64x2 zmm1{k1}{z}, zmm2, xmm3/m128, imm8 */
 
 LONGOP(LO_VINSERTI32X8, "vinserti32x8\t" OP_U8 OP_RM512_ZMM__OP_VRZMM__OP_RZMM_MASK) /* EVEX.512.66.0f3a.W0 3a /r ib vinserti32x8 zmm1{k1}{z}, zmm2, ymm3/m256, imm8 */
+
 LONGOP(LO_VINSERTI64X4, "vinserti64x4\t" OP_U8 OP_RM512_ZMM__OP_VRZMM__OP_RZMM_MASK) /* EVEX.512.66.0f3a.W1 3a /r ib vinserti64x4 zmm1{k1}{z}, zmm2, ymm3/m256, imm8 */
 
 LONGOP(LO_VPBROADCASTD_Xx, "vpbroadcastd\t" OP_RM128_XMM OP_RxMM_MASK) /* EVEX.128.66.0f38.W0 58 /r vpbroadcastd xmm1{k1}{z}, xmm2/m32
@@ -194,95 +198,107 @@ LONGOP(LO_VPERM2F128, "vperm2f128\t" OP_U8 OP_RM256_YMM__OP_VRYMM__OP_RYMM_MASK)
 
 LONGOP(LO_VPERM2I128, "vperm2i128\t" OP_U8 OP_RM256_YMM__OP_VRYMM__OP_RYMM_MASK) /* VEX.256.66.0f3a.W0 46 /r ib vperm2i128 ymm1, ymm2, ymm3/m256, imm8 */
 
-LONGOP(LO_VPMOVSXBW_R,    "vpmovsxbw\t" OP_RM128_XMM OP_RxMM_MASK) /* EVEX.128.66.0f38.WIG 20 /r vpmovsxbw xmm1{k1}{z}, xmm2/m64
-                                                                    * EVEX.256.66.0f38.WIG 20 /r vpmovsxbw ymm1{k1}{z}, xmm2/m128 */
-LONGOP(LO_VPMOVSXBW_RZMM, "vpmovsxbw\t" OP_RM256_YMM OP_RZMM_MASK) /* EVEX.512.66.0f38.WIG 20 /r vpmovsxbw zmm1{k1}{z}, ymm2/m256 */
+LONGOP(LO_VPMOVSXBW,     "vpmovsxbw\t" OP_RM128_XMM OP_RxMM_MASK) /* EVEX.128.66.0f38.WIG 20 /r vpmovsxbw xmm1{k1}{z}, xmm2/m64
+                                                                   * EVEX.256.66.0f38.WIG 20 /r vpmovsxbw ymm1{k1}{z}, xmm2/m128 */
+LONGOP(LO_VPMOVSXBW_ZMM, "vpmovsxbw\t" OP_RM256_YMM OP_RZMM_MASK) /* EVEX.512.66.0f38.WIG 20 /r vpmovsxbw zmm1{k1}{z}, ymm2/m256 */
 
-LONGOP(LO_VPMOVSXBD_R, "vpmovsxbd\t" OP_RM128_XMM OP_RxMM_MASK) /* EVEX.128.66.0f38.WIG 21 /r vpmovsxbd xmm1{k1}{z}, xmm2/m32
-                                                                 * EVEX.256.66.0f38.WIG 21 /r vpmovsxbd ymm1{k1}{z}, xmm2/m64
-                                                                 * EVEX.512.66.0f38.WIG 21 /r vpmovsxbd zmm1{k1}{z}, xmm2/m128 */
+LONGOP(LO_VPMOVSXBD, "vpmovsxbd\t" OP_RM128_XMM OP_RxMM_MASK) /* EVEX.128.66.0f38.WIG 21 /r vpmovsxbd xmm1{k1}{z}, xmm2/m32
+                                                               * EVEX.256.66.0f38.WIG 21 /r vpmovsxbd ymm1{k1}{z}, xmm2/m64
+                                                               * EVEX.512.66.0f38.WIG 21 /r vpmovsxbd zmm1{k1}{z}, xmm2/m128 */
 
-LONGOP(LO_VPMOVSXBQ_R, "vpmovsxbq\t" OP_RM128_XMM OP_RxMM_MASK) /* EVEX.128.66.0f38.WIG 22 /r vpmovsxbq xmm1{k1}{z}, xmm2/m16
-                                                                 * EVEX.256.66.0f38.WIG 22 /r vpmovsxbq ymm1{k1}{z}, xmm2/m32
-                                                                 * EVEX.512.66.0f38.WIG 22 /r vpmovsxbq zmm1{k1}{z}, xmm2/m64 */
+LONGOP(LO_VPMOVSXBQ, "vpmovsxbq\t" OP_RM128_XMM OP_RxMM_MASK) /* EVEX.128.66.0f38.WIG 22 /r vpmovsxbq xmm1{k1}{z}, xmm2/m16
+                                                               * EVEX.256.66.0f38.WIG 22 /r vpmovsxbq ymm1{k1}{z}, xmm2/m32
+                                                               * EVEX.512.66.0f38.WIG 22 /r vpmovsxbq zmm1{k1}{z}, xmm2/m64 */
 
-LONGOP(LO_VPMOVSXWD_R,    "vpmovsxwd\t" OP_RM128_XMM OP_RxMM_MASK) /* EVEX.128.66.0f38.WIG 23 /r vpmovsxwd xmm1{k1}{z}, xmm2/m64
-                                                                    * EVEX.256.66.0f38.WIG 23 /r vpmovsxwd ymm1{k1}{z}, xmm2/m128 */
-LONGOP(LO_VPMOVSXWD_RZMM, "vpmovsxwd\t" OP_RM256_YMM OP_RZMM_MASK) /* EVEX.512.66.0f38.WIG 23 /r vpmovsxwd zmm1{k1}{z}, ymm2/m256 */
+LONGOP(LO_VPMOVSXWD,     "vpmovsxwd\t" OP_RM128_XMM OP_RxMM_MASK) /* EVEX.128.66.0f38.WIG 23 /r vpmovsxwd xmm1{k1}{z}, xmm2/m64
+                                                                   * EVEX.256.66.0f38.WIG 23 /r vpmovsxwd ymm1{k1}{z}, xmm2/m128 */
+LONGOP(LO_VPMOVSXWD_ZMM, "vpmovsxwd\t" OP_RM256_YMM OP_RZMM_MASK) /* EVEX.512.66.0f38.WIG 23 /r vpmovsxwd zmm1{k1}{z}, ymm2/m256 */
 
-LONGOP(LO_VPMOVSXWQ_R, "vpmovsxwq\t" OP_RM128_XMM OP_RxMM_MASK) /* EVEX.128.66.0f38.WIG 24 /r vpmovsxwq xmm1{k1}{z}, xmm2/m32
-                                                                 * EVEX.256.66.0f38.WIG 24 /r vpmovsxwq ymm1{k1}{z}, xmm2/m64
-                                                                 * EVEX.512.66.0f38.WIG 24 /r vpmovsxwq zmm1{k1}{z}, xmm2/m128 */
+LONGOP(LO_VPMOVSXWQ, "vpmovsxwq\t" OP_RM128_XMM OP_RxMM_MASK) /* EVEX.128.66.0f38.WIG 24 /r vpmovsxwq xmm1{k1}{z}, xmm2/m32
+                                                               * EVEX.256.66.0f38.WIG 24 /r vpmovsxwq ymm1{k1}{z}, xmm2/m64
+                                                               * EVEX.512.66.0f38.WIG 24 /r vpmovsxwq zmm1{k1}{z}, xmm2/m128 */
 
-LONGOP(LO_VPMOVSXDQ_R,    "vpmovsxdq\t" OP_RM128_XMM OP_RxMM_MASK) /* EVEX.128.66.0f38.W0  25 /r vpmovsxdq xmm1{k1}{z}, xmm2/m64
-                                                                    * EVEX.256.66.0f38.W0  25 /r vpmovsxdq ymm1{k1}{z}, xmm2/m128 */
-LONGOP(LO_VPMOVSXDQ_RZMM, "vpmovsxdq\t" OP_RM256_YMM OP_RZMM_MASK) /* EVEX.512.66.0f38.W0  25 /r vpmovsxdq zmm1{k1}{z}, ymm2/m256 */
+LONGOP(LO_VPMOVSXDQ,     "vpmovsxdq\t" OP_RM128_XMM OP_RxMM_MASK) /* EVEX.128.66.0f38.W0  25 /r vpmovsxdq xmm1{k1}{z}, xmm2/m64
+                                                                   * EVEX.256.66.0f38.W0  25 /r vpmovsxdq ymm1{k1}{z}, xmm2/m128 */
+LONGOP(LO_VPMOVSXDQ_ZMM, "vpmovsxdq\t" OP_RM256_YMM OP_RZMM_MASK) /* EVEX.512.66.0f38.W0  25 /r vpmovsxdq zmm1{k1}{z}, ymm2/m256 */
 
-LONGOP(LO_VPMOVZXBW_R,    "vpmovzxbw\t" OP_RM128_XMM OP_RxMM_MASK) /* EVEX.128.66.0f38.WIG 30 /r vpmovzxbw xmm1{k1}{z}, xmm2/m64
-                                                                    * EVEX.256.66.0f38.WIG 30 /r vpmovzxbw ymm1{k1}{z}, xmm2/m128 */
-LONGOP(LO_VPMOVZXBW_RZMM, "vpmovzxbw\t" OP_RM256_YMM OP_RZMM_MASK) /* EVEX.512.66.0f38.WIG 30 /r vpmovzxbw zmm1{k1}{z}, ymm2/m256 */
+LONGOP(LO_VPMOVZXBW,     "vpmovzxbw\t" OP_RM128_XMM OP_RxMM_MASK) /* EVEX.128.66.0f38.WIG 30 /r vpmovzxbw xmm1{k1}{z}, xmm2/m64
+                                                                   * EVEX.256.66.0f38.WIG 30 /r vpmovzxbw ymm1{k1}{z}, xmm2/m128 */
+LONGOP(LO_VPMOVZXBW_ZMM, "vpmovzxbw\t" OP_RM256_YMM OP_RZMM_MASK) /* EVEX.512.66.0f38.WIG 30 /r vpmovzxbw zmm1{k1}{z}, ymm2/m256 */
 
-LONGOP(LO_VPMOVZXBD_R, "vpmovzxbd\t" OP_RM128_XMM OP_RxMM_MASK) /* EVEX.128.66.0f38.WIG 31 /r vpmovzxbd xmm1{k1}{z}, xmm2/m32
-                                                                 * EVEX.256.66.0f38.WIG 31 /r vpmovzxbd ymm1{k1}{z}, xmm2/m64
-                                                                 * EVEX.512.66.0f38.WIG 31 /r vpmovzxbd zmm1{k1}{z}, xmm2/m128 */
+LONGOP(LO_VPMOVZXBD, "vpmovzxbd\t" OP_RM128_XMM OP_RxMM_MASK) /* EVEX.128.66.0f38.WIG 31 /r vpmovzxbd xmm1{k1}{z}, xmm2/m32
+                                                               * EVEX.256.66.0f38.WIG 31 /r vpmovzxbd ymm1{k1}{z}, xmm2/m64
+                                                               * EVEX.512.66.0f38.WIG 31 /r vpmovzxbd zmm1{k1}{z}, xmm2/m128 */
 
-LONGOP(LO_VPMOVZXBQ_R, "vpmovzxbq\t" OP_RM128_XMM OP_RxMM_MASK) /* EVEX.128.66.0f38.WIG 32 /r vpmovzxbq xmm1{k1}{z}, xmm2/m16
-                                                                 * EVEX.256.66.0f38.WIG 32 /r vpmovzxbq ymm1{k1}{z}, xmm2/m32
-                                                                 * EVEX.512.66.0f38.WIG 32 /r vpmovzxbq zmm1{k1}{z}, xmm2/m64 */
+LONGOP(LO_VPMOVZXBQ, "vpmovzxbq\t" OP_RM128_XMM OP_RxMM_MASK) /* EVEX.128.66.0f38.WIG 32 /r vpmovzxbq xmm1{k1}{z}, xmm2/m16
+                                                               * EVEX.256.66.0f38.WIG 32 /r vpmovzxbq ymm1{k1}{z}, xmm2/m32
+                                                               * EVEX.512.66.0f38.WIG 32 /r vpmovzxbq zmm1{k1}{z}, xmm2/m64 */
 
-LONGOP(LO_VPMOVZXWD_R,    "vpmovzxwd\t" OP_RM128_XMM OP_RxMM_MASK) /* EVEX.128.66.0f38.WIG 33 /r vpmovzxwd xmm1{k1}{z}, xmm2/m64
-                                                                    * EVEX.256.66.0f38.WIG 33 /r vpmovzxwd ymm1{k1}{z}, xmm2/m128 */
-LONGOP(LO_VPMOVZXWD_RZMM, "vpmovzxwd\t" OP_RM256_YMM OP_RZMM_MASK) /* EVEX.512.66.0f38.WIG 33 /r vpmovzxwd zmm1{k1}{z}, ymm2/m256 */
+LONGOP(LO_VPMOVZXWD,     "vpmovzxwd\t" OP_RM128_XMM OP_RxMM_MASK) /* EVEX.128.66.0f38.WIG 33 /r vpmovzxwd xmm1{k1}{z}, xmm2/m64
+                                                                   * EVEX.256.66.0f38.WIG 33 /r vpmovzxwd ymm1{k1}{z}, xmm2/m128 */
+LONGOP(LO_VPMOVZXWD_ZMM, "vpmovzxwd\t" OP_RM256_YMM OP_RZMM_MASK) /* EVEX.512.66.0f38.WIG 33 /r vpmovzxwd zmm1{k1}{z}, ymm2/m256 */
 
-LONGOP(LO_VPMOVZXWQ_R, "vpmovzxwq\t" OP_RM128_XMM OP_RxMM_MASK) /* EVEX.128.66.0f38.WIG 34 /r vpmovzxwq xmm1{k1}{z}, xmm2/m32
-                                                                 * EVEX.256.66.0f38.WIG 34 /r vpmovzxwq ymm1{k1}{z}, xmm2/m64
-                                                                 * EVEX.512.66.0f38.WIG 34 /r vpmovzxwq zmm1{k1}{z}, xmm2/m128 */
+LONGOP(LO_VPMOVZXWQ, "vpmovzxwq\t" OP_RM128_XMM OP_RxMM_MASK) /* EVEX.128.66.0f38.WIG 34 /r vpmovzxwq xmm1{k1}{z}, xmm2/m32
+                                                               * EVEX.256.66.0f38.WIG 34 /r vpmovzxwq ymm1{k1}{z}, xmm2/m64
+                                                               * EVEX.512.66.0f38.WIG 34 /r vpmovzxwq zmm1{k1}{z}, xmm2/m128 */
 
-LONGOP(LO_VPMOVZXDQ_R,    "vpmovzxdq\t" OP_RM128_XMM OP_RxMM_MASK) /* EVEX.128.66.0f38.W0  35 /r vpmovzxdq xmm1{k1}{z}, xmm2/m64
-                                                                    * EVEX.256.66.0f38.W0  35 /r vpmovzxdq ymm1{k1}{z}, xmm2/m128 */
-LONGOP(LO_VPMOVZXDQ_RZMM, "vpmovzxdq\t" OP_RM256_YMM OP_RZMM_MASK) /* EVEX.512.66.0f38.W0  35 /r vpmovzxdq zmm1{k1}{z}, ymm2/m256 */
+LONGOP(LO_VPMOVZXDQ,     "vpmovzxdq\t" OP_RM128_XMM OP_RxMM_MASK) /* EVEX.128.66.0f38.W0  35 /r vpmovzxdq xmm1{k1}{z}, xmm2/m64
+                                                                   * EVEX.256.66.0f38.W0  35 /r vpmovzxdq ymm1{k1}{z}, xmm2/m128 */
+LONGOP(LO_VPMOVZXDQ_ZMM, "vpmovzxdq\t" OP_RM256_YMM OP_RZMM_MASK) /* EVEX.512.66.0f38.W0  35 /r vpmovzxdq zmm1{k1}{z}, ymm2/m256 */
 
-LONGOP(LO_VROUNDPS_R, "vroundps\t" OP_U8 OP_RMn_xMM OP_RxMM_MASK) /* VEX.128.66.0f3a.WIG 08 /r ib vroundps xmm1, xmm2/m128, imm8
+LONGOP(LO_VROUNDPS, "vroundps\t" OP_U8 OP_RMn_xMM OP_RxMM_MASK) /* VEX.128.66.0f3a.WIG 08 /r ib vroundps xmm1, xmm2/m128, imm8
                                                                    * VEX.256.66.0f3a.WIG 08 /r ib vroundps ymm1, ymm2/m256, imm8 */
 
-LONGOP(LO_VROUNDPD_R, "vroundpd\t" OP_U8 OP_RMn_xMM OP_RxMM_MASK) /* VEX.128.66.0f3a.WIG 09 /r ib vroundpd xmm1, xmm2/m128, imm8
+LONGOP(LO_VROUNDPD, "vroundpd\t" OP_U8 OP_RMn_xMM OP_RxMM_MASK) /* VEX.128.66.0f3a.WIG 09 /r ib vroundpd xmm1, xmm2/m128, imm8
                                                                    * VEX.256.66.0f3a.WIG 09 /r ib vroundpd ymm1, ymm2/m256, imm8 */
 
 LONGOP(LO_VAESDECLAST, "vaesdeclast\t" OP_RM128_XMM__OP_VRXMM__OP_RXMM_MASK) /* VEX.128.66.0f38.WIG df /r vaesdeclast xmm1, xmm2, xmm3/m128 */
+
 LONGOP(LO_AESDECLAST, "aesdeclast\t" OP_RM128_XMM OP_RXMM_MASK)              /*            66 0f 38 df /r aesdeclast xmm1, xmm2/m128 */
 
 LONGOP(LO_VAESENCLAST, "vaesenclast\t" OP_RM128_XMM__OP_VRXMM__OP_RXMM_MASK) /* VEX.128.66.0f38.WIG dd /r vaesenclast xmm1, xmm2, xmm3/m128 */
+
 LONGOP(LO_AESEECLAST, "aeseeclast\t" OP_RM128_XMM OP_RXMM_MASK)              /*            66 0f 38 dd /r aesenclast xmm1, xmm2/m128 */
 
 LONGOP(LO_VGF2P8MULB, "vgf2p8mulb\t" OP_RM128_XMM OP_RXMM_MASK) /* VEX.128.66.0f38.WIG cf /r vgf2p8mulb xmm1, xmm2/m128 */
 
 LONGOP(LO_VPCMPESTRI, "vpcmpestri\t" OP_U8 OP_RM128_XMM OP_RXMM_MASK) /* VEX.128.66.0f3a.WIG 61 /r ib vpcmpestri xmm1, xmm2/m128, imm8 */
+
 LONGOP(LO_PCMPESTRI, "pcmpestri\t" OP_U8 OP_RM128_XMM OP_RXMM_MASK)   /*            66 0f 3a 61 /r ib pcmpestri xmm1, xmm2/m128, imm8 */
 
 LONGOP(LO_VPCMPESTRM, "vpcmpestrm\t" OP_U8 OP_RM128_XMM OP_RXMM_MASK) /* VEX.128.66.0f3a.WIG 60 /r ib vpcmpestrm xmm1, xmm2/m128, imm8 */
+
 LONGOP(LO_PCMPESTRM, "pcmpestrm\t" OP_U8 OP_RM128_XMM OP_RXMM_MASK)   /*            66 0f 3a 60 /r ib pcmpestrm xmm1, xmm2/m128, imm8 */
 
 LONGOP(LO_VPCMPISTRI, "vpcmpistri\t" OP_U8 OP_RM128_XMM OP_RXMM_MASK) /* VEX.128.66.0f3a.WIG 63 /r ib vpcmpistri xmm1, xmm2/m128, imm8 */
+
 LONGOP(LO_PCMPISTRI, "pcmpistri\t" OP_U8 OP_RM128_XMM OP_RXMM_MASK)   /*            66 0f 3a 63 /r ib pcmpistri xmm1, xmm2/m128, imm8 */
 
 LONGOP(LO_VPCMPISTRM, "vpcmpistrm\t" OP_U8 OP_RM128_XMM OP_RXMM_MASK) /* VEX.128.66.0f3a.WIG 62 /r ib vpcmpistrm xmm1, xmm2/m128, imm8 */
+
 LONGOP(LO_PCMPISTRM, "pcmpistrm\t" OP_U8 OP_RM128_XMM OP_RXMM_MASK)   /*            66 0f 3a 62 /r ib pcmpistrm xmm1, xmm2/m128, imm8 */
 
 LONGOP(LO_VAESKEYGENASSIST, "vaeskeygenassist\t" OP_U8 OP_RM128_XMM OP_RXMM_MASK) /* VEX.128.66.0f3a.WIG df /r ib vaeskeygenassist xmm1, xmm2/m128, imm8 */
+
 LONGOP(LO_AESKEYGENASSIST, "aeskeygenassist\t" OP_U8 OP_RM128_XMM OP_RXMM_MASK)   /*            66 0f 3a df /r ib aeskeygenassist xmm1, xmm2/m128, imm8 */
 
 LONGOP(LO_VPCLMULQDQ, "vpclmulqdq\t" OP_U8 OP_RM128_XMM__OP_VRXMM__OP_RXMM_MASK) /* VEX.128.66.0f3a.WIG 44 /r ib vpclmulqdq xmm1, xmm2, xmm3/m128, imm8 */
+
 LONGOP(LO_PCLMULQDQ, "pclmulqdq\t" OP_U8 OP_RM128_XMM OP_RXMM_MASK)              /*            66 0f 3a 44 /r ib pclmulqdq xmm1, xmm2/m128, imm8 */
 
 LONGOP(LO_VGF2P8AFFINEQB, "vgf2p8affineqb\t" OP_U8 OP_RM128_XMM OP_RXMM_MASK) /* VEX.128.66.0f3a.WIG ce /r ib vgf2p8affineqb xmm1, xmm2/m128, imm8 */
+
 LONGOP(LO_GF2P8AFFINEQB, "gf2p8affineqb\t" OP_U8 OP_RM128_XMM OP_RXMM_MASK)   /*             66 0f3a ce /r ib gf2p8affineqb xmm1, xmm2/m128, imm8 */
 
 LONGOP(LO_VGF2P8AFFINEINVQB, "vgf2p8affineinvqb\t" OP_U8 OP_RM128_XMM OP_RXMM_MASK) /* VEX.128.66.0f3a.WIG cf /r ib vgf2p8affineinvqb xmm1, xmm2/m128, imm8 */
+
 LONGOP(LO_GF2P8AFFINEINVQB, "gf2p8affineinvqb\t" OP_U8 OP_RM128_XMM OP_RXMM_MASK)   /*             66 0f3a cf /r ib gf2p8affineinvqb xmm1, xmm2/m128, imm8 */
 
 LONGOP(LO_VINSERTF128, "vinsertf128\t" OP_U8 OP_RM256_YMM__OP_VRYMM__OP_RYMM_MASK) /*  VEX.256.66.0f3a.W0 18 /r ib vinsertf128 ymm1, ymm2, xmm3/m128, imm8 */
+
 LONGOP(LO_VINSERTF32X4, "vinsertf32x4\t" OP_U8 OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK) /* EVEX.256.66.0f3a.W0 18 /r ib vinsertf32x4 ymm1{k1}{z}, ymm2, xmm3/m128, imm8
                                                                                     * EVEX.512.66.0f3a.W0 18 /r ib vinsertf32x4 zmm1{k1}{z}, zmm2, xmm3/m128, imm8 */
+
 LONGOP(LO_VINSERTF64X2, "vinsertf64x2\t" OP_U8 OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK) /* EVEX.256.66.0f3a.W1 18 /r ib vinsertf64x2 ymm1{k1}{z}, ymm2, xmm3/m128, imm8
                                                                                     * EVEX.512.66.0f3a.W1 18 /r ib vinsertf64x2 zmm1{k1}{z}, zmm2, xmm3/m128, imm8 */
 
@@ -670,149 +686,157 @@ LONGOP(LO_VCVTQQ2PS,     "vcvtqq2ps\t" OP_RMn_xMM OP_RXMM_MASK)         /* EVEX.
                                                                          * EVEX.256.0f.W1 5b /r vcvtqq2ps xmm1{k1}{z}, ymm2/m256/m64bcst */
 LONGOP(LO_VCVTQQ2PS_ZMM, "vcvtqq2ps\t" OP_ER OP_RM512_ZMM OP_RYMM_MASK) /* EVEX.512.0f.W1 5b /r vcvtqq2ps ymm1{k1}{z}, zmm2/m512/m64bcst{er} */
 
-LONGOP(LO_VCVTPH2PS,     "vcvtph2ps\t" OP_RMn_xMM OP_RXMM_MASK)          /* EVEX.128.66.0f38.W0 13 /r vcvtph2ps xmm1{k1}{z}, xmm2/m64
-                                                                          * EVEX.256.66.0f38.W0 13 /r vcvtph2ps ymm1{k1}{z}, xmm2/m128 */
-LONGOP(LO_VCVTPH2PS_ZMM, "vcvtph2ps\t" OP_SAE OP_RM512_ZMM OP_RZMM_MASK) /* EVEX.512.66.0f38.W0 13 /r vcvtph2ps zmm1{k1}{z}, ymm2/m256{sae} */
+LONGOP(LO_VCVTPH2PS, "vcvtph2ps\t" OP_SAE OP_RMn_xMM OP_RXMM_MASK) /* EVEX.128.66.0f38.W0 13 /r vcvtph2ps xmm1{k1}{z}, xmm2/m64
+                                                                    * EVEX.256.66.0f38.W0 13 /r vcvtph2ps ymm1{k1}{z}, xmm2/m128
+                                                                    * EVEX.512.66.0f38.W0 13 /r vcvtph2ps zmm1{k1}{z}, ymm2/m256{sae} */
 
-LONGOP(LO_VFMADD132PD,     "vfmadd132pd\t" OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK)         /* EVEX.128.66.0f38.W1 98 /r vfmadd132pd xmm1{k1}{z}, xmm2, xmm3/m128/m64bcst
-                                                                                        * EVEX.256.66.0f38.W1 98 /r vfmadd132pd ymm1{k1}{z}, ymm2, ymm3/m256/m64bcst */
-LONGOP(LO_VFMADD132PD_ZMM, "vfmadd132pd\t" OP_ER OP_RM512_ZMM__OP_VRZMM__OP_RZMM_MASK) /* EVEX.512.66.0f38.W1 98 /r vfmadd132pd zmm1{k1}{z}, zmm2, zmm3/m512/m64bcst{er} */
+LONGOP(LO_VFMADD132PD, "vfmadd132pd\t" OP_ER OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK) /* EVEX.128.66.0f38.W1 98 /r vfmadd132pd xmm1{k1}{z}, xmm2, xmm3/m128/m64bcst
+                                                                                  * EVEX.256.66.0f38.W1 98 /r vfmadd132pd ymm1{k1}{z}, ymm2, ymm3/m256/m64bcst
+                                                                                  * EVEX.512.66.0f38.W1 98 /r vfmadd132pd zmm1{k1}{z}, zmm2, zmm3/m512/m64bcst{er} */
 
-LONGOP(LO_VFMADD213PD,     "vfmadd213pd\t" OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK)         /* EVEX.128.66.0f38.W1 a8 /r vfmadd213pd xmm1{k1}{z}, xmm2, xmm3/m128/m64bcst
-                                                                                        * EVEX.256.66.0f38.W1 a8 /r vfmadd213pd ymm1{k1}{z}, ymm2, ymm3/m256/m64bcst */
-LONGOP(LO_VFMADD213PD_ZMM, "vfmadd213pd\t" OP_ER OP_RM512_ZMM__OP_VRZMM__OP_RZMM_MASK) /* EVEX.512.66.0f38.W1 a8 /r vfmadd213pd zmm1{k1}{z}, zmm2, zmm3/m512/m64bcst{er} */
+LONGOP(LO_VFMADD213PD, "vfmadd213pd\t" OP_ER OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK) /* EVEX.128.66.0f38.W1 a8 /r vfmadd213pd xmm1{k1}{z}, xmm2, xmm3/m128/m64bcst
+                                                                                  * EVEX.256.66.0f38.W1 a8 /r vfmadd213pd ymm1{k1}{z}, ymm2, ymm3/m256/m64bcst
+                                                                                  * EVEX.512.66.0f38.W1 a8 /r vfmadd213pd zmm1{k1}{z}, zmm2, zmm3/m512/m64bcst{er} */
 
-LONGOP(LO_VFMADD231PD,     "vfmadd231pd\t" OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK)         /* EVEX.128.66.0f38.W1 b8 /r vfmadd231pd xmm1{k1}{z}, xmm2, xmm3/m128/m64bcst
-                                                                                        * EVEX.256.66.0f38.W1 b8 /r vfmadd231pd ymm1{k1}{z}, ymm2, ymm3/m256/m64bcst */
-LONGOP(LO_VFMADD231PD_ZMM, "vfmadd231pd\t" OP_ER OP_RM512_ZMM__OP_VRZMM__OP_RZMM_MASK) /* EVEX.512.66.0f38.W1 b8 /r vfmadd231pd zmm1{k1}{z}, zmm2, zmm3/m512/m64bcst{er} */
+LONGOP(LO_VFMADD231PD, "vfmadd231pd\t" OP_ER OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK) /* EVEX.128.66.0f38.W1 b8 /r vfmadd231pd xmm1{k1}{z}, xmm2, xmm3/m128/m64bcst
+                                                                                  * EVEX.256.66.0f38.W1 b8 /r vfmadd231pd ymm1{k1}{z}, ymm2, ymm3/m256/m64bcst
+                                                                                  * EVEX.512.66.0f38.W1 b8 /r vfmadd231pd zmm1{k1}{z}, zmm2, zmm3/m512/m64bcst{er} */
 
-LONGOP(LO_VFMADD132PS,     "vfmadd132ps\t" OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK)         /* EVEX.128.66.0f38.W0 98 /r vfmadd132ps xmm1{k1}{z}, xmm2, xmm3/m128/m32bcst
-                                                                                        * EVEX.256.66.0f38.W0 98 /r vfmadd132ps ymm1{k1}{z}, ymm2, ymm3/m256/m32bcst */
-LONGOP(LO_VFMADD132PS_ZMM, "vfmadd132ps\t" OP_ER OP_RM512_ZMM__OP_VRZMM__OP_RZMM_MASK) /* EVEX.512.66.0f38.W0 98 /r vfmadd132ps zmm1{k1}{z}, zmm2, zmm3/m512/m32bcst{er} */
+LONGOP(LO_VFMADD132PS, "vfmadd132ps\t" OP_ER OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK) /* EVEX.128.66.0f38.W0 98 /r vfmadd132ps xmm1{k1}{z}, xmm2, xmm3/m128/m32bcst
+                                                                                  * EVEX.256.66.0f38.W0 98 /r vfmadd132ps ymm1{k1}{z}, ymm2, ymm3/m256/m32bcst
+                                                                                  * EVEX.512.66.0f38.W0 98 /r vfmadd132ps zmm1{k1}{z}, zmm2, zmm3/m512/m32bcst{er} */
 
-LONGOP(LO_VFMADD213PS,     "vfmadd213ps\t" OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK)         /* EVEX.128.66.0f38.W0 a8 /r vfmadd213ps xmm1{k1}{z}, xmm2, xmm3/m128/m32bcst
-                                                                                        * EVEX.256.66.0f38.W0 a8 /r vfmadd213ps ymm1{k1}{z}, ymm2, ymm3/m256/m32bcst */
-LONGOP(LO_VFMADD213PS_ZMM, "vfmadd213ps\t" OP_ER OP_RM512_ZMM__OP_VRZMM__OP_RZMM_MASK) /* EVEX.512.66.0f38.W0 a8 /r vfmadd213ps zmm1{k1}{z}, zmm2, zmm3/m512/m32bcst{er} */
+LONGOP(LO_VFMADD213PS, "vfmadd213ps\t" OP_ER OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK) /* EVEX.128.66.0f38.W0 a8 /r vfmadd213ps xmm1{k1}{z}, xmm2, xmm3/m128/m32bcst
+                                                                                  * EVEX.256.66.0f38.W0 a8 /r vfmadd213ps ymm1{k1}{z}, ymm2, ymm3/m256/m32bcst
+                                                                                  * EVEX.512.66.0f38.W0 a8 /r vfmadd213ps zmm1{k1}{z}, zmm2, zmm3/m512/m32bcst{er} */
 
-LONGOP(LO_VFMADD231PS,     "vfmadd231ps\t" OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK)         /* EVEX.128.66.0f38.W0 b8 /r vfmadd231ps xmm1{k1}{z}, xmm2, xmm3/m128/m32bcst
-                                                                                        * EVEX.256.66.0f38.W0 b8 /r vfmadd231ps ymm1{k1}{z}, ymm2, ymm3/m256/m32bcst */
-LONGOP(LO_VFMADD231PS_ZMM, "vfmadd231ps\t" OP_ER OP_RM512_ZMM__OP_VRZMM__OP_RZMM_MASK) /* EVEX.512.66.0f38.W0 b8 /r vfmadd231ps zmm1{k1}{z}, zmm2, zmm3/m512/m32bcst{er} */
+LONGOP(LO_VFMADD231PS, "vfmadd231ps\t" OP_ER OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK) /* EVEX.128.66.0f38.W0 b8 /r vfmadd231ps xmm1{k1}{z}, xmm2, xmm3/m128/m32bcst
+                                                                                  * EVEX.256.66.0f38.W0 b8 /r vfmadd231ps ymm1{k1}{z}, ymm2, ymm3/m256/m32bcst
+                                                                                  * EVEX.512.66.0f38.W0 b8 /r vfmadd231ps zmm1{k1}{z}, zmm2, zmm3/m512/m32bcst{er} */
 
 LONGOP(LO_VFMADD132SD_XMM, "vfmadd132sd\t" OP_ER OP_RM128_XMM__OP_VRXMM__OP_RXMM_MASK) /* EVEX.LIG.66.0f38.W1 99 /r vfmadd132sd xmm1{k1}{z}, xmm2, xmm3/m64{er} */
+
 LONGOP(LO_VFMADD213SD_XMM, "vfmadd213sd\t" OP_ER OP_RM128_XMM__OP_VRXMM__OP_RXMM_MASK) /* EVEX.LIG.66.0f38.W1 a9 /r vfmadd213sd xmm1{k1}{z}, xmm2, xmm3/m64{er} */
+
 LONGOP(LO_VFMADD231SD_XMM, "vfmadd231sd\t" OP_ER OP_RM128_XMM__OP_VRXMM__OP_RXMM_MASK) /* EVEX.LIG.66.0f38.W1 b9 /r vfmadd231sd xmm1{k1}{z}, xmm2, xmm3/m64{er} */
 
 LONGOP(LO_VFMADD132SS_XMM, "vfmadd132ss\t" OP_ER OP_RM128_XMM__OP_VRXMM__OP_RXMM_MASK) /* EVEX.LIG.66.0f38.W0 99 /r vfmadd132ss xmm1{k1}{z}, xmm2, xmm3/m32{er} */
+
 LONGOP(LO_VFMADD213SS_XMM, "vfmadd213ss\t" OP_ER OP_RM128_XMM__OP_VRXMM__OP_RXMM_MASK) /* EVEX.LIG.66.0f38.W0 a9 /r vfmadd213ss xmm1{k1}{z}, xmm2, xmm3/m32{er} */
+
 LONGOP(LO_VFMADD231SS_XMM, "vfmadd231ss\t" OP_ER OP_RM128_XMM__OP_VRXMM__OP_RXMM_MASK) /* EVEX.LIG.66.0f38.W0 b9 /r vfmadd231ss xmm1{k1}{z}, xmm2, xmm3/m32{er} */
 
-LONGOP(LO_VFMADDSUB132PD,     "vfmaddsub132pd\t" OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK)         /* EVEX.128.66.0f38.W1 96 /r vfmaddsub132pd xmm1{k1}{z}, xmm2, xmm3/m128/m64bcst
-                                                                                        * EVEX.256.66.0f38.W1 96 /r vfmaddsub132pd ymm1{k1}{z}, ymm2, ymm3/m256/m64bcst */
-LONGOP(LO_VFMADDSUB132PD_ZMM, "vfmaddsub132pd\t" OP_ER OP_RM512_ZMM__OP_VRZMM__OP_RZMM_MASK) /* EVEX.512.66.0f38.W1 96 /r vfmaddsub132pd zmm1{k1}{z}, zmm2, zmm3/m512/m64bcst{er} */
+LONGOP(LO_VFMADDSUB132PD, "vfmaddsub132pd\t" OP_ER OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK) /* EVEX.128.66.0f38.W1 96 /r vfmaddsub132pd xmm1{k1}{z}, xmm2, xmm3/m128/m64bcst
+                                                                                        * EVEX.256.66.0f38.W1 96 /r vfmaddsub132pd ymm1{k1}{z}, ymm2, ymm3/m256/m64bcst
+                                                                                        * EVEX.512.66.0f38.W1 96 /r vfmaddsub132pd zmm1{k1}{z}, zmm2, zmm3/m512/m64bcst{er} */
 
-LONGOP(LO_VFMADDSUB213PD,     "vfmaddsub213pd\t" OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK)         /* EVEX.128.66.0f38.W1 a6 /r vfmaddsub213pd xmm1{k1}{z}, xmm2, xmm3/m128/m64bcst
-                                                                                        * EVEX.256.66.0f38.W1 a6 /r vfmaddsub213pd ymm1{k1}{z}, ymm2, ymm3/m256/m64bcst */
-LONGOP(LO_VFMADDSUB213PD_ZMM, "vfmaddsub213pd\t" OP_ER OP_RM512_ZMM__OP_VRZMM__OP_RZMM_MASK) /* EVEX.512.66.0f38.W1 a6 /r vfmaddsub213pd zmm1{k1}{z}, zmm2, zmm3/m512/m64bcst{er} */
+LONGOP(LO_VFMADDSUB213PD, "vfmaddsub213pd\t" OP_ER OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK) /* EVEX.128.66.0f38.W1 a6 /r vfmaddsub213pd xmm1{k1}{z}, xmm2, xmm3/m128/m64bcst
+                                                                                        * EVEX.256.66.0f38.W1 a6 /r vfmaddsub213pd ymm1{k1}{z}, ymm2, ymm3/m256/m64bcst
+                                                                                        * EVEX.512.66.0f38.W1 a6 /r vfmaddsub213pd zmm1{k1}{z}, zmm2, zmm3/m512/m64bcst{er} */
 
-LONGOP(LO_VFMADDSUB231PD,     "vfmaddsub231pd\t" OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK)         /* EVEX.128.66.0f38.W1 b6 /r vfmaddsub231pd xmm1{k1}{z}, xmm2, xmm3/m128/m64bcst
-                                                                                        * EVEX.256.66.0f38.W1 b6 /r vfmaddsub231pd ymm1{k1}{z}, ymm2, ymm3/m256/m64bcst */
-LONGOP(LO_VFMADDSUB231PD_ZMM, "vfmaddsub231pd\t" OP_ER OP_RM512_ZMM__OP_VRZMM__OP_RZMM_MASK) /* EVEX.512.66.0f38.W1 b6 /r vfmaddsub231pd zmm1{k1}{z}, zmm2, zmm3/m512/m64bcst{er} */
+LONGOP(LO_VFMADDSUB231PD, "vfmaddsub231pd\t" OP_ER OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK) /* EVEX.128.66.0f38.W1 b6 /r vfmaddsub231pd xmm1{k1}{z}, xmm2, xmm3/m128/m64bcst
+                                                                                        * EVEX.256.66.0f38.W1 b6 /r vfmaddsub231pd ymm1{k1}{z}, ymm2, ymm3/m256/m64bcst
+                                                                                        * EVEX.512.66.0f38.W1 b6 /r vfmaddsub231pd zmm1{k1}{z}, zmm2, zmm3/m512/m64bcst{er} */
 
-LONGOP(LO_VFMADDSUB132PS,     "vfmaddsub132ps\t" OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK)         /* EVEX.128.66.0f38.W0 96 /r vfmaddsub132ps xmm1{k1}{z}, xmm2, xmm3/m128/m32bcst
-                                                                                        * EVEX.256.66.0f38.W0 96 /r vfmaddsub132ps ymm1{k1}{z}, ymm2, ymm3/m256/m32bcst */
-LONGOP(LO_VFMADDSUB132PS_ZMM, "vfmaddsub132ps\t" OP_ER OP_RM512_ZMM__OP_VRZMM__OP_RZMM_MASK) /* EVEX.512.66.0f38.W0 96 /r vfmaddsub132ps zmm1{k1}{z}, zmm2, zmm3/m512/m32bcst{er} */
+LONGOP(LO_VFMADDSUB132PS, "vfmaddsub132ps\t" OP_ER OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK) /* EVEX.128.66.0f38.W0 96 /r vfmaddsub132ps xmm1{k1}{z}, xmm2, xmm3/m128/m32bcst
+                                                                                        * EVEX.256.66.0f38.W0 96 /r vfmaddsub132ps ymm1{k1}{z}, ymm2, ymm3/m256/m32bcst
+                                                                                        * EVEX.512.66.0f38.W0 96 /r vfmaddsub132ps zmm1{k1}{z}, zmm2, zmm3/m512/m32bcst{er} */
 
-LONGOP(LO_VFMADDSUB213PS,     "vfmaddsub213ps\t" OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK)         /* EVEX.128.66.0f38.W0 a6 /r vfmaddsub213ps xmm1{k1}{z}, xmm2, xmm3/m128/m32bcst
-                                                                                        * EVEX.256.66.0f38.W0 a6 /r vfmaddsub213ps ymm1{k1}{z}, ymm2, ymm3/m256/m32bcst */
-LONGOP(LO_VFMADDSUB213PS_ZMM, "vfmaddsub213ps\t" OP_ER OP_RM512_ZMM__OP_VRZMM__OP_RZMM_MASK) /* EVEX.512.66.0f38.W0 a6 /r vfmaddsub213ps zmm1{k1}{z}, zmm2, zmm3/m512/m32bcst{er} */
+LONGOP(LO_VFMADDSUB213PS, "vfmaddsub213ps\t" OP_ER OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK) /* EVEX.128.66.0f38.W0 a6 /r vfmaddsub213ps xmm1{k1}{z}, xmm2, xmm3/m128/m32bcst
+                                                                                        * EVEX.256.66.0f38.W0 a6 /r vfmaddsub213ps ymm1{k1}{z}, ymm2, ymm3/m256/m32bcst
+                                                                                        * EVEX.512.66.0f38.W0 a6 /r vfmaddsub213ps zmm1{k1}{z}, zmm2, zmm3/m512/m32bcst{er} */
 
-LONGOP(LO_VFMADDSUB231PS,     "vfmaddsub231ps\t" OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK)         /* EVEX.128.66.0f38.W0 b6 /r vfmaddsub231ps xmm1{k1}{z}, xmm2, xmm3/m128/m32bcst
-                                                                                        * EVEX.256.66.0f38.W0 b6 /r vfmaddsub231ps ymm1{k1}{z}, ymm2, ymm3/m256/m32bcst */
-LONGOP(LO_VFMADDSUB231PS_ZMM, "vfmaddsub231ps\t" OP_ER OP_RM512_ZMM__OP_VRZMM__OP_RZMM_MASK) /* EVEX.512.66.0f38.W0 b6 /r vfmaddsub231ps zmm1{k1}{z}, zmm2, zmm3/m512/m32bcst{er} */
+LONGOP(LO_VFMADDSUB231PS, "vfmaddsub231ps\t" OP_ER OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK) /* EVEX.128.66.0f38.W0 b6 /r vfmaddsub231ps xmm1{k1}{z}, xmm2, xmm3/m128/m32bcst
+                                                                                        * EVEX.256.66.0f38.W0 b6 /r vfmaddsub231ps ymm1{k1}{z}, ymm2, ymm3/m256/m32bcst
+                                                                                        * EVEX.512.66.0f38.W0 b6 /r vfmaddsub231ps zmm1{k1}{z}, zmm2, zmm3/m512/m32bcst{er} */
 
-LONGOP(LO_VFMSUBADD132PD,     "vfmsubadd132pd\t" OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK)         /* EVEX.128.66.0f38.W1 97 /r vfmsubadd132pd xmm1{k1}{z}, xmm2, xmm3/m128/m64bcst
-                                                                                        * EVEX.256.66.0f38.W1 97 /r vfmsubadd132pd ymm1{k1}{z}, ymm2, ymm3/m256/m64bcst */
-LONGOP(LO_VFMSUBADD132PD_ZMM, "vfmsubadd132pd\t" OP_ER OP_RM512_ZMM__OP_VRZMM__OP_RZMM_MASK) /* EVEX.512.66.0f38.W1 97 /r vfmsubadd132pd zmm1{k1}{z}, zmm2, zmm3/m512/m64bcst{er} */
+LONGOP(LO_VFMSUBADD132PD, "vfmsubadd132pd\t" OP_ER OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK) /* EVEX.128.66.0f38.W1 97 /r vfmsubadd132pd xmm1{k1}{z}, xmm2, xmm3/m128/m64bcst
+                                                                                        * EVEX.256.66.0f38.W1 97 /r vfmsubadd132pd ymm1{k1}{z}, ymm2, ymm3/m256/m64bcst
+                                                                                        * EVEX.512.66.0f38.W1 97 /r vfmsubadd132pd zmm1{k1}{z}, zmm2, zmm3/m512/m64bcst{er} */
 
-LONGOP(LO_VFMSUBADD213PD,     "vfmsubadd213pd\t" OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK)         /* EVEX.128.66.0f38.W1 a7 /r vfmsubadd213pd xmm1{k1}{z}, xmm2, xmm3/m128/m64bcst
-                                                                                        * EVEX.256.66.0f38.W1 a7 /r vfmsubadd213pd ymm1{k1}{z}, ymm2, ymm3/m256/m64bcst */
-LONGOP(LO_VFMSUBADD213PD_ZMM, "vfmsubadd213pd\t" OP_ER OP_RM512_ZMM__OP_VRZMM__OP_RZMM_MASK) /* EVEX.512.66.0f38.W1 a7 /r vfmsubadd213pd zmm1{k1}{z}, zmm2, zmm3/m512/m64bcst{er} */
+LONGOP(LO_VFMSUBADD213PD, "vfmsubadd213pd\t" OP_ER OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK) /* EVEX.128.66.0f38.W1 a7 /r vfmsubadd213pd xmm1{k1}{z}, xmm2, xmm3/m128/m64bcst
+                                                                                        * EVEX.256.66.0f38.W1 a7 /r vfmsubadd213pd ymm1{k1}{z}, ymm2, ymm3/m256/m64bcst
+                                                                                        * EVEX.512.66.0f38.W1 a7 /r vfmsubadd213pd zmm1{k1}{z}, zmm2, zmm3/m512/m64bcst{er} */
 
-LONGOP(LO_VFMSUBADD231PD,     "vfmsubadd231pd\t" OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK)         /* EVEX.128.66.0f38.W1 b7 /r vfmsubadd231pd xmm1{k1}{z}, xmm2, xmm3/m128/m64bcst
-                                                                                        * EVEX.256.66.0f38.W1 b7 /r vfmsubadd231pd ymm1{k1}{z}, ymm2, ymm3/m256/m64bcst */
-LONGOP(LO_VFMSUBADD231PD_ZMM, "vfmsubadd231pd\t" OP_ER OP_RM512_ZMM__OP_VRZMM__OP_RZMM_MASK) /* EVEX.512.66.0f38.W1 b7 /r vfmsubadd231pd zmm1{k1}{z}, zmm2, zmm3/m512/m64bcst{er} */
+LONGOP(LO_VFMSUBADD231PD, "vfmsubadd231pd\t" OP_ER OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK) /* EVEX.128.66.0f38.W1 b7 /r vfmsubadd231pd xmm1{k1}{z}, xmm2, xmm3/m128/m64bcst
+                                                                                        * EVEX.256.66.0f38.W1 b7 /r vfmsubadd231pd ymm1{k1}{z}, ymm2, ymm3/m256/m64bcst
+                                                                                        * EVEX.512.66.0f38.W1 b7 /r vfmsubadd231pd zmm1{k1}{z}, zmm2, zmm3/m512/m64bcst{er} */
 
-LONGOP(LO_VFMSUBADD132PS,     "vfmsubadd132ps\t" OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK)         /* EVEX.128.66.0f38.W0 97 /r vfmsubadd132ps xmm1{k1}{z}, xmm2, xmm3/m128/m32bcst
-                                                                                        * EVEX.256.66.0f38.W0 97 /r vfmsubadd132ps ymm1{k1}{z}, ymm2, ymm3/m256/m32bcst */
-LONGOP(LO_VFMSUBADD132PS_ZMM, "vfmsubadd132ps\t" OP_ER OP_RM512_ZMM__OP_VRZMM__OP_RZMM_MASK) /* EVEX.512.66.0f38.W0 97 /r vfmsubadd132ps zmm1{k1}{z}, zmm2, zmm3/m512/m32bcst{er} */
+LONGOP(LO_VFMSUBADD132PS, "vfmsubadd132ps\t" OP_ER OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK) /* EVEX.128.66.0f38.W0 97 /r vfmsubadd132ps xmm1{k1}{z}, xmm2, xmm3/m128/m32bcst
+                                                                                        * EVEX.256.66.0f38.W0 97 /r vfmsubadd132ps ymm1{k1}{z}, ymm2, ymm3/m256/m32bcst
+                                                                                        * EVEX.512.66.0f38.W0 97 /r vfmsubadd132ps zmm1{k1}{z}, zmm2, zmm3/m512/m32bcst{er} */
 
-LONGOP(LO_VFMSUBADD213PS,     "vfmsubadd213ps\t" OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK)         /* EVEX.128.66.0f38.W0 a7 /r vfmsubadd213ps xmm1{k1}{z}, xmm2, xmm3/m128/m32bcst
-                                                                                        * EVEX.256.66.0f38.W0 a7 /r vfmsubadd213ps ymm1{k1}{z}, ymm2, ymm3/m256/m32bcst */
-LONGOP(LO_VFMSUBADD213PS_ZMM, "vfmsubadd213ps\t" OP_ER OP_RM512_ZMM__OP_VRZMM__OP_RZMM_MASK) /* EVEX.512.66.0f38.W0 a7 /r vfmsubadd213ps zmm1{k1}{z}, zmm2, zmm3/m512/m32bcst{er} */
+LONGOP(LO_VFMSUBADD213PS, "vfmsubadd213ps\t" OP_ER OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK) /* EVEX.128.66.0f38.W0 a7 /r vfmsubadd213ps xmm1{k1}{z}, xmm2, xmm3/m128/m32bcst
+                                                                                        * EVEX.256.66.0f38.W0 a7 /r vfmsubadd213ps ymm1{k1}{z}, ymm2, ymm3/m256/m32bcst
+                                                                                        * EVEX.512.66.0f38.W0 a7 /r vfmsubadd213ps zmm1{k1}{z}, zmm2, zmm3/m512/m32bcst{er} */
 
-LONGOP(LO_VFMSUBADD231PS,     "vfmsubadd231ps\t" OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK)         /* EVEX.128.66.0f38.W0 b7 /r vfmsubadd231ps xmm1{k1}{z}, xmm2, xmm3/m128/m32bcst
-                                                                                        * EVEX.256.66.0f38.W0 b7 /r vfmsubadd231ps ymm1{k1}{z}, ymm2, ymm3/m256/m32bcst */
-LONGOP(LO_VFMSUBADD231PS_ZMM, "vfmsubadd231ps\t" OP_ER OP_RM512_ZMM__OP_VRZMM__OP_RZMM_MASK) /* EVEX.512.66.0f38.W0 b7 /r vfmsubadd231ps zmm1{k1}{z}, zmm2, zmm3/m512/m32bcst{er} */
+LONGOP(LO_VFMSUBADD231PS, "vfmsubadd231ps\t" OP_ER OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK) /* EVEX.128.66.0f38.W0 b7 /r vfmsubadd231ps xmm1{k1}{z}, xmm2, xmm3/m128/m32bcst
+                                                                                        * EVEX.256.66.0f38.W0 b7 /r vfmsubadd231ps ymm1{k1}{z}, ymm2, ymm3/m256/m32bcst
+                                                                                        * EVEX.512.66.0f38.W0 b7 /r vfmsubadd231ps zmm1{k1}{z}, zmm2, zmm3/m512/m32bcst{er} */
 
-LONGOP(LO_VFMSUB132PD,     "vfmsub132pd\t" OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK)         /* EVEX.128.66.0f38.W1 9a /r vfmsub132pd xmm1{k1}{z}, xmm2, xmm3/m128/m64bcst
-                                                                                        * EVEX.256.66.0f38.W1 9a /r vfmsub132pd ymm1{k1}{z}, ymm2, ymm3/m256/m64bcst */
-LONGOP(LO_VFMSUB132PD_ZMM, "vfmsub132pd\t" OP_ER OP_RM512_ZMM__OP_VRZMM__OP_RZMM_MASK) /* EVEX.512.66.0f38.W1 9a /r vfmsub132pd zmm1{k1}{z}, zmm2, zmm3/m512/m64bcst{er} */
+LONGOP(LO_VFMSUB132PD, "vfmsub132pd\t" OP_ER OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK) /* EVEX.128.66.0f38.W1 9a /r vfmsub132pd xmm1{k1}{z}, xmm2, xmm3/m128/m64bcst
+                                                                                  * EVEX.256.66.0f38.W1 9a /r vfmsub132pd ymm1{k1}{z}, ymm2, ymm3/m256/m64bcst
+                                                                                  * EVEX.512.66.0f38.W1 9a /r vfmsub132pd zmm1{k1}{z}, zmm2, zmm3/m512/m64bcst{er} */
 
-LONGOP(LO_VFMSUB213PD,     "vfmsub213pd\t" OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK)         /* EVEX.128.66.0f38.W1 aa /r vfmsub213pd xmm1{k1}{z}, xmm2, xmm3/m128/m64bcst
-                                                                                        * EVEX.256.66.0f38.W1 aa /r vfmsub213pd ymm1{k1}{z}, ymm2, ymm3/m256/m64bcst */
-LONGOP(LO_VFMSUB213PD_ZMM, "vfmsub213pd\t" OP_ER OP_RM512_ZMM__OP_VRZMM__OP_RZMM_MASK) /* EVEX.512.66.0f38.W1 aa /r vfmsub213pd zmm1{k1}{z}, zmm2, zmm3/m512/m64bcst{er} */
+LONGOP(LO_VFMSUB213PD, "vfmsub213pd\t" OP_ER OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK) /* EVEX.128.66.0f38.W1 aa /r vfmsub213pd xmm1{k1}{z}, xmm2, xmm3/m128/m64bcst
+                                                                                  * EVEX.256.66.0f38.W1 aa /r vfmsub213pd ymm1{k1}{z}, ymm2, ymm3/m256/m64bcst
+                                                                                  * EVEX.512.66.0f38.W1 aa /r vfmsub213pd zmm1{k1}{z}, zmm2, zmm3/m512/m64bcst{er} */
 
-LONGOP(LO_VFMSUB231PD,     "vfmsub231pd\t" OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK)         /* EVEX.128.66.0f38.W1 ba /r vfmsub231pd xmm1{k1}{z}, xmm2, xmm3/m128/m64bcst
-                                                                                        * EVEX.256.66.0f38.W1 ba /r vfmsub231pd ymm1{k1}{z}, ymm2, ymm3/m256/m64bcst */
-LONGOP(LO_VFMSUB231PD_ZMM, "vfmsub231pd\t" OP_ER OP_RM512_ZMM__OP_VRZMM__OP_RZMM_MASK) /* EVEX.512.66.0f38.W1 ba /r vfmsub231pd zmm1{k1}{z}, zmm2, zmm3/m512/m64bcst{er} */
+LONGOP(LO_VFMSUB231PD, "vfmsub231pd\t" OP_ER OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK) /* EVEX.128.66.0f38.W1 ba /r vfmsub231pd xmm1{k1}{z}, xmm2, xmm3/m128/m64bcst
+                                                                                  * EVEX.256.66.0f38.W1 ba /r vfmsub231pd ymm1{k1}{z}, ymm2, ymm3/m256/m64bcst
+                                                                                  * EVEX.512.66.0f38.W1 ba /r vfmsub231pd zmm1{k1}{z}, zmm2, zmm3/m512/m64bcst{er} */
 
-LONGOP(LO_VFMSUB132PS,     "vfmsub132ps\t" OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK)         /* EVEX.128.66.0f38.W0 9a /r vfmsub132ps xmm1{k1}{z}, xmm2, xmm3/m128/m32bcst
-                                                                                        * EVEX.256.66.0f38.W0 9a /r vfmsub132ps ymm1{k1}{z}, ymm2, ymm3/m256/m32bcst */
-LONGOP(LO_VFMSUB132PS_ZMM, "vfmsub132ps\t" OP_ER OP_RM512_ZMM__OP_VRZMM__OP_RZMM_MASK) /* EVEX.512.66.0f38.W0 9a /r vfmsub132ps zmm1{k1}{z}, zmm2, zmm3/m512/m32bcst{er} */
+LONGOP(LO_VFMSUB132PS, "vfmsub132ps\t" OP_ER OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK) /* EVEX.128.66.0f38.W0 9a /r vfmsub132ps xmm1{k1}{z}, xmm2, xmm3/m128/m32bcst
+                                                                                  * EVEX.256.66.0f38.W0 9a /r vfmsub132ps ymm1{k1}{z}, ymm2, ymm3/m256/m32bcst
+                                                                                  * EVEX.512.66.0f38.W0 9a /r vfmsub132ps zmm1{k1}{z}, zmm2, zmm3/m512/m32bcst{er} */
 
-LONGOP(LO_VFMSUB213PS,     "vfmsub213ps\t" OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK)         /* EVEX.128.66.0f38.W0 aa /r vfmsub213ps xmm1{k1}{z}, xmm2, xmm3/m128/m32bcst
-                                                                                        * EVEX.256.66.0f38.W0 aa /r vfmsub213ps ymm1{k1}{z}, ymm2, ymm3/m256/m32bcst */
-LONGOP(LO_VFMSUB213PS_ZMM, "vfmsub213ps\t" OP_ER OP_RM512_ZMM__OP_VRZMM__OP_RZMM_MASK) /* EVEX.512.66.0f38.W0 aa /r vfmsub213ps zmm1{k1}{z}, zmm2, zmm3/m512/m32bcst{er} */
+LONGOP(LO_VFMSUB213PS, "vfmsub213ps\t" OP_ER OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK) /* EVEX.128.66.0f38.W0 aa /r vfmsub213ps xmm1{k1}{z}, xmm2, xmm3/m128/m32bcst
+                                                                                  * EVEX.256.66.0f38.W0 aa /r vfmsub213ps ymm1{k1}{z}, ymm2, ymm3/m256/m32bcst
+                                                                                  * EVEX.512.66.0f38.W0 aa /r vfmsub213ps zmm1{k1}{z}, zmm2, zmm3/m512/m32bcst{er} */
 
-LONGOP(LO_VFMSUB231PS,     "vfmsub231ps\t" OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK)         /* EVEX.128.66.0f38.W0 ba /r vfmsub231ps xmm1{k1}{z}, xmm2, xmm3/m128/m32bcst
-                                                                                        * EVEX.256.66.0f38.W0 ba /r vfmsub231ps ymm1{k1}{z}, ymm2, ymm3/m256/m32bcst */
-LONGOP(LO_VFMSUB231PS_ZMM, "vfmsub231ps\t" OP_ER OP_RM512_ZMM__OP_VRZMM__OP_RZMM_MASK) /* EVEX.512.66.0f38.W0 ba /r vfmsub231ps zmm1{k1}{z}, zmm2, zmm3/m512/m32bcst{er} */
+LONGOP(LO_VFMSUB231PS, "vfmsub231ps\t" OP_ER OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK) /* EVEX.128.66.0f38.W0 ba /r vfmsub231ps xmm1{k1}{z}, xmm2, xmm3/m128/m32bcst
+                                                                                  * EVEX.256.66.0f38.W0 ba /r vfmsub231ps ymm1{k1}{z}, ymm2, ymm3/m256/m32bcst
+                                                                                  * EVEX.512.66.0f38.W0 ba /r vfmsub231ps zmm1{k1}{z}, zmm2, zmm3/m512/m32bcst{er} */
 
 LONGOP(LO_VFMSUB132SD_XMM, "vfmsub132sd\t" OP_ER OP_RM128_XMM__OP_VRXMM__OP_RXMM_MASK) /* EVEX.LIG.66.0f38.W1 9b /r vfmsub132sd xmm1{k1}{z}, xmm2, xmm3/m64{er} */
+
 LONGOP(LO_VFMSUB213SD_XMM, "vfmsub213sd\t" OP_ER OP_RM128_XMM__OP_VRXMM__OP_RXMM_MASK) /* EVEX.LIG.66.0f38.W1 ab /r vfmsub213sd xmm1{k1}{z}, xmm2, xmm3/m64{er} */
+
 LONGOP(LO_VFMSUB231SD_XMM, "vfmsub231sd\t" OP_ER OP_RM128_XMM__OP_VRXMM__OP_RXMM_MASK) /* EVEX.LIG.66.0f38.W1 bb /r vfmsub231sd xmm1{k1}{z}, xmm2, xmm3/m64{er} */
 
 LONGOP(LO_VFMSUB132SS_XMM, "vfmsub132ss\t" OP_ER OP_RM128_XMM__OP_VRXMM__OP_RXMM_MASK) /* EVEX.LIG.66.0f38.W0 9b /r vfmsub132ss xmm1{k1}{z}, xmm2, xmm3/m32{er} */
+
 LONGOP(LO_VFMSUB213SS_XMM, "vfmsub213ss\t" OP_ER OP_RM128_XMM__OP_VRXMM__OP_RXMM_MASK) /* EVEX.LIG.66.0f38.W0 ab /r vfmsub213ss xmm1{k1}{z}, xmm2, xmm3/m32{er} */
+
 LONGOP(LO_VFMSUB231SS_XMM, "vfmsub231ss\t" OP_ER OP_RM128_XMM__OP_VRXMM__OP_RXMM_MASK) /* EVEX.LIG.66.0f38.W0 bb /r vfmsub231ss xmm1{k1}{z}, xmm2, xmm3/m32{er} */
 
-LONGOP(LO_VCVTPD2QQ,     "vcvtpd2qq\t" OP_RMn_xMM OP_RxMM_MASK)         /* EVEX.128.66.0f.W1 7b /r vcvtpd2qq xmm1{k1}{z}, xmm2/m128/m64bcst
-                                                                         * EVEX.256.66.0f.W1 7b /r vcvtpd2qq ymm1{k1}{z}, ymm2/m256/m64bcst */
-LONGOP(LO_VCVTPD2QQ_ZMM, "vcvtpd2qq\t" OP_ER OP_RM512_ZMM OP_RZMM_MASK) /* EVEX.512.66.0f.W1 7b /r vcvtpd2qq zmm1{k1}{z}, zmm2/m512/m64bcst{er} */
+LONGOP(LO_VCVTPD2QQ, "vcvtpd2qq\t" OP_ER OP_RMn_xMM OP_RxMM_MASK) /* EVEX.128.66.0f.W1 7b /r vcvtpd2qq xmm1{k1}{z}, xmm2/m128/m64bcst
+                                                                   * EVEX.256.66.0f.W1 7b /r vcvtpd2qq ymm1{k1}{z}, ymm2/m256/m64bcst
+                                                                   * EVEX.512.66.0f.W1 7b /r vcvtpd2qq zmm1{k1}{z}, zmm2/m512/m64bcst{er} */
 
-LONGOP(LO_VCVTPD2UDQ,     "vcvtpd2udq\t" OP_RMn_xMM OP_RxMM_MASK)         /* EVEX.128.0f.W1 79 /r vcvtpd2udq xmm1{k1}{z}, xmm2/m128/m64bcst
+LONGOP(LO_VCVTPD2UDQ,     "vcvtpd2udq\t" OP_RMn_xMM OP_RXMM_MASK)         /* EVEX.128.0f.W1 79 /r vcvtpd2udq xmm1{k1}{z}, xmm2/m128/m64bcst
                                                                            * EVEX.256.0f.W1 79 /r vcvtpd2udq xmm1{k1}{z}, ymm2/m256/m64bcst */
 LONGOP(LO_VCVTPD2UDQ_ZMM, "vcvtpd2udq\t" OP_ER OP_RM512_ZMM OP_RYMM_MASK) /* EVEX.512.0f.W1 79 /r vcvtpd2udq ymm1{k1}{z}, zmm2/m512/m64bcst{er} */
 
-LONGOP(LO_VCVTPD2UQQ,     "vcvtpd2uqq\t" OP_RMn_xMM OP_RxMM_MASK)         /* EVEX.128.66.0f.W1 79 /r vcvtpd2uqq xmm1{k1}{z}, xmm2/m128/m64bcst
-                                                                           * EVEX.256.66.0f.W1 79 /r vcvtpd2uqq ymm1{k1}{z}, ymm2/m256/m64bcst */
-LONGOP(LO_VCVTPD2UQQ_ZMM, "vcvtpd2uqq\t" OP_ER OP_RM512_ZMM OP_RZMM_MASK) /* EVEX.512.66.0f.W1 79 /r vcvtpd2uqq zmm1{k1}{z}, zmm2/m512/m64bcst{er} */
+LONGOP(LO_VCVTPD2UQQ, "vcvtpd2uqq\t" OP_ER OP_RMn_xMM OP_RxMM_MASK) /* EVEX.128.66.0f.W1 79 /r vcvtpd2uqq xmm1{k1}{z}, xmm2/m128/m64bcst
+                                                                     * EVEX.256.66.0f.W1 79 /r vcvtpd2uqq ymm1{k1}{z}, ymm2/m256/m64bcst
+                                                                     * EVEX.512.66.0f.W1 79 /r vcvtpd2uqq zmm1{k1}{z}, zmm2/m512/m64bcst{er} */
 
-LONGOP(LO_VCVTPS2QQ,     "vcvtps2qq\t" OP_RMn_xMM OP_RxMM_MASK)         /* EVEX.128.66.0f.W0 7b /r vcvtps2qq xmm1{k1}{z}, xmm2/m64/m32bcst
-                                                                         * EVEX.256.66.0f.W0 7b /r vcvtps2qq ymm1{k1}{z}, xmm2/m128/m32bcst */
-LONGOP(LO_VCVTPS2QQ_ZMM, "vcvtps2qq\t" OP_ER OP_RM512_ZMM OP_RZMM_MASK) /* EVEX.512.66.0f.W0 7b /r vcvtps2qq zmm1{k1}{z}, ymm2/m256/m32bcst{er} */
+LONGOP(LO_VCVTPS2QQ, "vcvtps2qq\t" OP_ER OP_RMn_xMM OP_RxMM_MASK) /* EVEX.128.66.0f.W0 7b /r vcvtps2qq xmm1{k1}{z}, xmm2/m64/m32bcst
+                                                                   * EVEX.256.66.0f.W0 7b /r vcvtps2qq ymm1{k1}{z}, xmm2/m128/m32bcst
+                                                                   * EVEX.512.66.0f.W0 7b /r vcvtps2qq zmm1{k1}{z}, ymm2/m256/m32bcst{er} */
 
-LONGOP(LO_VCVTPS2UDQ,     "vcvtps2udq\t" OP_RMn_xMM OP_RxMM_MASK)         /* EVEX.128.0f.W0 79 /r vcvtps2udq xmm1{k1}{z}, xmm2/m128/m32bcst
-                                                                           * EVEX.256.0f.W0 79 /r vcvtps2udq ymm1{k1}{z}, ymm2/m256/m32bcst */
-LONGOP(LO_VCVTPS2UDQ_ZMM, "vcvtps2udq\t" OP_ER OP_RM512_ZMM OP_RZMM_MASK) /* EVEX.512.0f.W0 79 /r vcvtps2udq zmm1{k1}{z}, zmm2/m512/m32bcst{er} */
+LONGOP(LO_VCVTPS2UDQ, "vcvtps2udq\t" OP_ER OP_RMn_xMM OP_RxMM_MASK) /* EVEX.128.0f.W0 79 /r vcvtps2udq xmm1{k1}{z}, xmm2/m128/m32bcst
+                                                                     * EVEX.256.0f.W0 79 /r vcvtps2udq ymm1{k1}{z}, ymm2/m256/m32bcst
+                                                                     * EVEX.512.0f.W0 79 /r vcvtps2udq zmm1{k1}{z}, zmm2/m512/m32bcst{er} */
 
-LONGOP(LO_VCVTPS2UQQ,     "vcvtps2uqq\t" OP_RMn_xMM OP_RxMM_MASK)         /* EVEX.128.66.0f.W0 79 /r vcvtps2uqq xmm1{k1}{z}, xmm2/m64/m32bcst
-                                                                           * EVEX.256.66.0f.W0 79 /r vcvtps2uqq ymm1{k1}{z}, xmm2/m128/m32bcst */
-LONGOP(LO_VCVTPS2UQQ_ZMM, "vcvtps2uqq\t" OP_ER OP_RM512_ZMM OP_RZMM_MASK) /* EVEX.512.66.0f.W0 79 /r vcvtps2uqq zmm1{k1}{z}, ymm2/m256/m32bcst{er} */
+LONGOP(LO_VCVTPS2UQQ, "vcvtps2uqq\t" OP_ER OP_RMn_xMM OP_RxMM_MASK) /* EVEX.128.66.0f.W0 79 /r vcvtps2uqq xmm1{k1}{z}, xmm2/m64/m32bcst
+                                                                     * EVEX.256.66.0f.W0 79 /r vcvtps2uqq ymm1{k1}{z}, xmm2/m128/m32bcst
+                                                                     * EVEX.512.66.0f.W0 79 /r vcvtps2uqq zmm1{k1}{z}, ymm2/m256/m32bcst{er} */
 
-LONGOP(LO_VCVTQQ2PD,     "vcvtqq2pd\t" OP_RMn_xMM OP_RxMM_MASK)         /* EVEX.128.f3.0f.W1 e6 /r vcvtqq2pd xmm1{k1}{z}, xmm2/m128/m64bcst
-                                                                         * EVEX.256.f3.0f.W1 e6 /r vcvtqq2pd ymm1{k1}{z}, ymm2/m256/m64bcst */
-LONGOP(LO_VCVTQQ2PD_ZMM, "vcvtqq2pd\t" OP_ER OP_RM512_ZMM OP_RZMM_MASK) /* EVEX.512.f3.0f.W1 e6 /r vcvtqq2pd zmm1{k1}{z}, zmm2/m512/m64bcst{er} */
+LONGOP(LO_VCVTQQ2PD, "vcvtqq2pd\t" OP_ER OP_RMn_xMM OP_RxMM_MASK) /* EVEX.128.f3.0f.W1 e6 /r vcvtqq2pd xmm1{k1}{z}, xmm2/m128/m64bcst
+                                                                   * EVEX.256.f3.0f.W1 e6 /r vcvtqq2pd ymm1{k1}{z}, ymm2/m256/m64bcst
+                                                                   * EVEX.512.f3.0f.W1 e6 /r vcvtqq2pd zmm1{k1}{z}, zmm2/m512/m64bcst{er} */
 
 LONGOP(LO_VCVTSD2USI_R32, "vcvtsd2usi\t" OP_ER OP_RM128_XMM OP_R32) /* EVEX.LIG.f2.0f.W0 79 /r vcvtsd2usi r32, xmm1/m64{er} */
 LONGOP(LO_VCVTSD2USI_R64, "vcvtsd2usi\t" OP_ER OP_RM128_XMM OP_R64) /* EVEX.LIG.f2.0f.W1 79 /r vcvtsd2usi r64, xmm1/m64{er} */
@@ -820,29 +844,29 @@ LONGOP(LO_VCVTSD2USI_R64, "vcvtsd2usi\t" OP_ER OP_RM128_XMM OP_R64) /* EVEX.LIG.
 LONGOP(LO_VCVTSS2USI_R32, "vcvtss2usi\t" OP_ER OP_RM128_XMM OP_R32) /* EVEX.LIG.f3.0f.W0 79 /r vcvtss2usi r32, xmm1/m32{er} */
 LONGOP(LO_VCVTSS2USI_R64, "vcvtss2usi\t" OP_ER OP_RM128_XMM OP_R64) /* EVEX.LIG.f3.0f.W1 79 /r vcvtss2usi r64, xmm1/m32{er} */
 
-LONGOP(LO_VCVTTPD2QQ,     "vcvttpd2qq\t" OP_RMn_xMM OP_RxMM_MASK)          /* EVEX.128.66.0f.W1 7a /r vcvttpd2qq xmm1{k1}{z}, xmm2/m128/m64bcst
-                                                                            * EVEX.256.66.0f.W1 7a /r vcvttpd2qq ymm1{k1}{z}, ymm2/m256/m64bcst */
-LONGOP(LO_VCVTTPD2QQ_ZMM, "vcvttpd2qq\t" OP_SAE OP_RM512_ZMM OP_RZMM_MASK) /* EVEX.512.66.0f.W1 7a /r vcvttpd2qq zmm1{k1}{z}, zmm2/m512/m64bcst{sae} */
+LONGOP(LO_VCVTTPD2QQ, "vcvttpd2qq\t" OP_SAE OP_RMn_xMM OP_RxMM_MASK) /* EVEX.128.66.0f.W1 7a /r vcvttpd2qq xmm1{k1}{z}, xmm2/m128/m64bcst
+                                                                      * EVEX.256.66.0f.W1 7a /r vcvttpd2qq ymm1{k1}{z}, ymm2/m256/m64bcst
+                                                                      * EVEX.512.66.0f.W1 7a /r vcvttpd2qq zmm1{k1}{z}, zmm2/m512/m64bcst{sae} */
 
-LONGOP(LO_VCVTTPD2UDQ,     "vcvttpd2udq\t" OP_RMn_xMM OP_RxMM_MASK)          /* EVEX.128.0f.W1 78 /r vcvttpd2udq xmm1{k1}{z}, xmm2/m128/m64bcst
+LONGOP(LO_VCVTTPD2UDQ,     "vcvttpd2udq\t" OP_RMn_xMM OP_RXMM_MASK)          /* EVEX.128.0f.W1 78 /r vcvttpd2udq xmm1{k1}{z}, xmm2/m128/m64bcst
                                                                               * EVEX.256.0f.W1 78 /r vcvttpd2udq xmm1{k1}{z}, ymm2/m256/m64bcst */
 LONGOP(LO_VCVTTPD2UDQ_ZMM, "vcvttpd2udq\t" OP_SAE OP_RM512_ZMM OP_RYMM_MASK) /* EVEX.512.0f.W1 78 /r vcvttpd2udq ymm1{k1}{z}, zmm2/m512/m64bcst{sae} */
 
-LONGOP(LO_VCVTTPD2UQQ,     "vcvttpd2uqq\t" OP_RMn_xMM OP_RxMM_MASK)          /* EVEX.128.66.0f.W1 78 /r vcvttpd2uqq xmm1{k1}{z}, xmm2/m128/m64bcst
-                                                                              * EVEX.256.66.0f.W1 78 /r vcvttpd2uqq ymm1{k1}{z}, ymm2/m256/m64bcst */
-LONGOP(LO_VCVTTPD2UQQ_ZMM, "vcvttpd2uqq\t" OP_SAE OP_RM512_ZMM OP_RZMM_MASK) /* EVEX.512.66.0f.W1 78 /r vcvttpd2uqq zmm1{k1}{z}, zmm2/m512/m64bcst{sae} */
+LONGOP(LO_VCVTTPD2UQQ, "vcvttpd2uqq\t" OP_SAE OP_RMn_xMM OP_RxMM_MASK) /* EVEX.128.66.0f.W1 78 /r vcvttpd2uqq xmm1{k1}{z}, xmm2/m128/m64bcst
+                                                                        * EVEX.256.66.0f.W1 78 /r vcvttpd2uqq ymm1{k1}{z}, ymm2/m256/m64bcst
+                                                                        * EVEX.512.66.0f.W1 78 /r vcvttpd2uqq zmm1{k1}{z}, zmm2/m512/m64bcst{sae} */
 
-LONGOP(LO_VCVTTPS2QQ,     "vcvttps2qq\t" OP_RMn_xMM OP_RxMM_MASK)          /* EVEX.128.66.0f.W0 7a /r vcvttps2qq xmm1{k1}{z}, xmm2/m64/m32bcst
-                                                                            * EVEX.256.66.0f.W0 7a /r vcvttps2qq ymm1{k1}{z}, xmm2/m128/m32bcst */
-LONGOP(LO_VCVTTPS2QQ_ZMM, "vcvttps2qq\t" OP_SAE OP_RM512_ZMM OP_RZMM_MASK) /* EVEX.512.66.0f.W0 7a /r vcvttps2qq zmm1{k1}{z}, ymm2/m256/m32bcst{sae} */
+LONGOP(LO_VCVTTPS2QQ, "vcvttps2qq\t" OP_SAE OP_RMn_xMM OP_RxMM_MASK) /* EVEX.128.66.0f.W0 7a /r vcvttps2qq xmm1{k1}{z}, xmm2/m64/m32bcst
+                                                                      * EVEX.256.66.0f.W0 7a /r vcvttps2qq ymm1{k1}{z}, xmm2/m128/m32bcst
+                                                                      * EVEX.512.66.0f.W0 7a /r vcvttps2qq zmm1{k1}{z}, ymm2/m256/m32bcst{sae} */
 
-LONGOP(LO_VCVTTPS2UDQ,     "vcvttps2udq\t" OP_RMn_xMM OP_RxMM_MASK)          /* EVEX.128.0f.W0 78 /r vcvttps2udq xmm1{k1}{z}, xmm2/m128/m32bcst
-                                                                              * EVEX.256.0f.W0 78 /r vcvttps2udq ymm1{k1}{z}, ymm2/m256/m32bcst */
-LONGOP(LO_VCVTTPS2UDQ_ZMM, "vcvttps2udq\t" OP_SAE OP_RM512_ZMM OP_RZMM_MASK) /* EVEX.512.0f.W0 78 /r vcvttps2udq zmm1{k1}{z}, zmm2/m512/m32bcst{sae} */
+LONGOP(LO_VCVTTPS2UDQ, "vcvttps2udq\t" OP_SAE OP_RMn_xMM OP_RxMM_MASK) /* EVEX.128.0f.W0 78 /r vcvttps2udq xmm1{k1}{z}, xmm2/m128/m32bcst
+                                                                        * EVEX.256.0f.W0 78 /r vcvttps2udq ymm1{k1}{z}, ymm2/m256/m32bcst
+                                                                        * EVEX.512.0f.W0 78 /r vcvttps2udq zmm1{k1}{z}, zmm2/m512/m32bcst{sae} */
 
-LONGOP(LO_VCVTTPS2UQQ,     "vcvttps2uqq\t" OP_RMn_xMM OP_RxMM_MASK)          /* EVEX.128.66.0f.W0 78 /r vcvttps2uqq xmm1{k1}{z}, xmm2/m64/m32bcst
-                                                                              * EVEX.256.66.0f.W0 78 /r vcvttps2uqq ymm1{k1}{z}, xmm2/m128/m32bcst */
-LONGOP(LO_VCVTTPS2UQQ_ZMM, "vcvttps2uqq\t" OP_SAE OP_RM512_ZMM OP_RZMM_MASK) /* EVEX.512.66.0f.W0 78 /r vcvttps2uqq zmm1{k1}{z}, ymm2/m256/m32bcst{sae} */
+LONGOP(LO_VCVTTPS2UQQ, "vcvttps2uqq\t" OP_SAE OP_RMn_xMM OP_RxMM_MASK) /* EVEX.128.66.0f.W0 78 /r vcvttps2uqq xmm1{k1}{z}, xmm2/m64/m32bcst
+                                                                        * EVEX.256.66.0f.W0 78 /r vcvttps2uqq ymm1{k1}{z}, xmm2/m128/m32bcst
+                                                                        * EVEX.512.66.0f.W0 78 /r vcvttps2uqq zmm1{k1}{z}, ymm2/m256/m32bcst{sae} */
 
 LONGOP(LO_VCVTTSD2USI_R32, "vcvttsd2usi\t" OP_SAE OP_RM128_XMM OP_R32) /* EVEX.LIG.f2.0f.W0 78 /r vcvttsd2usi r32, xmm1/m64{sae} */
 LONGOP(LO_VCVTTSD2USI_R64, "vcvttsd2usi\t" OP_SAE OP_RM128_XMM OP_R64) /* EVEX.LIG.f2.0f.W1 78 /r vcvttsd2usi r64, xmm1/m64{sae} */
@@ -850,13 +874,13 @@ LONGOP(LO_VCVTTSD2USI_R64, "vcvttsd2usi\t" OP_SAE OP_RM128_XMM OP_R64) /* EVEX.L
 LONGOP(LO_VCVTTSS2USI_R32, "vcvttss2usi\t" OP_SAE OP_RM128_XMM OP_R32) /* EVEX.LIG.f3.0f.W0 78 /r vcvttss2usi r32, xmm1/m32{sae} */
 LONGOP(LO_VCVTTSS2USI_R64, "vcvttss2usi\t" OP_SAE OP_RM128_XMM OP_R64) /* EVEX.LIG.f3.0f.W1 78 /r vcvttss2usi r64, xmm1/m32{sae} */
 
-LONGOP(LO_VCVTUDQ2PS,     "vcvtudq2ps\t" OP_RMn_xMM OP_RXMM_MASK)         /* EVEX.128.f2.0f.W0 7a /r vcvtudq2ps xmm1{k1}{z}, xmm2/m128/m32bcst
-                                                                           * EVEX.256.f2.0f.W0 7a /r vcvtudq2ps ymm1{k1}{z}, ymm2/m256/m32bcst */
-LONGOP(LO_VCVTUDQ2PS_ZMM, "vcvtudq2ps\t" OP_ER OP_RM512_ZMM OP_RZMM_MASK) /* EVEX.512.f2.0f.W0 7a /r vcvtudq2ps zmm1{k1}{z}, zmm2/m512/m32bcst{er} */
+LONGOP(LO_VCVTUDQ2PS, "vcvtudq2ps\t" OP_ER OP_RMn_xMM OP_RXMM_MASK) /* EVEX.128.f2.0f.W0 7a /r vcvtudq2ps xmm1{k1}{z}, xmm2/m128/m32bcst
+                                                                     * EVEX.256.f2.0f.W0 7a /r vcvtudq2ps ymm1{k1}{z}, ymm2/m256/m32bcst
+                                                                     * EVEX.512.f2.0f.W0 7a /r vcvtudq2ps zmm1{k1}{z}, zmm2/m512/m32bcst{er} */
 
-LONGOP(LO_VCVTUQQ2PD,     "vcvtuqq2pd\t" OP_RMn_xMM OP_RXMM_MASK)         /* EVEX.128.f3.0f.W1 7a /r vcvtuqq2pd xmm1{k1}{z}, xmm2/m128/m64bcst
-                                                                           * EVEX.256.f3.0f.W1 7a /r vcvtuqq2pd ymm1{k1}{z}, ymm2/m256/m64bcst */
-LONGOP(LO_VCVTUQQ2PD_ZMM, "vcvtuqq2pd\t" OP_ER OP_RM512_ZMM OP_RZMM_MASK) /* EVEX.512.f3.0f.W1 7a /r vcvtuqq2pd zmm1{k1}{z}, zmm2/m512/m64bcst{er} */
+LONGOP(LO_VCVTUQQ2PD, "vcvtuqq2pd\t" OP_ER OP_RMn_xMM OP_RXMM_MASK) /* EVEX.128.f3.0f.W1 7a /r vcvtuqq2pd xmm1{k1}{z}, xmm2/m128/m64bcst
+                                                                     * EVEX.256.f3.0f.W1 7a /r vcvtuqq2pd ymm1{k1}{z}, ymm2/m256/m64bcst
+                                                                     * EVEX.512.f3.0f.W1 7a /r vcvtuqq2pd zmm1{k1}{z}, zmm2/m512/m64bcst{er} */
 
 LONGOP(LO_VCVTUQQ2PS,     "vcvtuqq2ps\t" OP_RMn_xMM OP_RXMM_MASK)         /* EVEX.128.f2.0f.W1 7a /r vcvtuqq2ps xmm1{k1}{z}, xmm2/m128/m64bcst
                                                                            * EVEX.256.f2.0f.W1 7a /r vcvtuqq2ps xmm1{k1}{z}, ymm2/m256/m64bcst */
@@ -872,21 +896,25 @@ LONGOP(LO_VCVTPS2PH,     "vcvtps2ph\t" OP_U8 OP_RxMM OP_RM128_XMM_MASK)        /
                                                                                 * EVEX.256.66.0f3a.W0 1d /r ib vcvtps2ph xmm1/m128{k1}{z}, ymm2, imm8 */
 LONGOP(LO_VCVTPS2PH_ZMM, "vcvtps2ph\t" OP_U8 OP_SAE OP_RZMM OP_RM256_YMM_MASK) /* EVEX.512.66.0f3a.W0 1d /r ib vcvtps2ph ymm1/m256{k1}{z}, zmm2{sae}, imm8 */
 
-LONGOP(LO_VFIXUPIMMPD,     "vfixupimmpd\t" OP_U8 OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK)          /* EVEX.128.66.0f3a.W1 54 /r ib vfixupimmpd xmm1{k1}{z}, xmm2, xmm3/m128/m64bcst, imm8
-                                                                                               * EVEX.256.66.0f3a.W1 54 /r ib vfixupimmpd ymm1{k1}{z}, ymm2, ymm3/m256/m64bcst, imm8 */
-LONGOP(LO_VFIXUPIMMPD_ZMM, "vfixupimmpd\t" OP_U8 OP_SAE OP_RM512_ZMM__OP_VRZMM__OP_RZMM_MASK) /* EVEX.512.66.0f3a.W1 54 /r ib vfixupimmpd zmm1{k1}{z}, zmm2, zmm3/m512/m64bcst{sae}, imm8 */
+LONGOP(LO_VFIXUPIMMPD, "vfixupimmpd\t" OP_U8 OP_SAE OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK) /* EVEX.128.66.0f3a.W1 54 /r ib vfixupimmpd xmm1{k1}{z}, xmm2, xmm3/m128/m64bcst, imm8
+                                                                                         * EVEX.256.66.0f3a.W1 54 /r ib vfixupimmpd ymm1{k1}{z}, ymm2, ymm3/m256/m64bcst, imm8
+                                                                                         * EVEX.512.66.0f3a.W1 54 /r ib vfixupimmpd zmm1{k1}{z}, zmm2, zmm3/m512/m64bcst{sae}, imm8 */
 
-LONGOP(LO_VFIXUPIMMPS,     "vfixupimmps\t" OP_U8 OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK)          /* EVEX.128.66.0f3a.W0 54 /r vfixupimmps xmm1{k1}{z}, xmm2, xmm3/m128/m32bcst, imm8
-                                                                                               * EVEX.256.66.0f3a.W0 54 /r vfixupimmps ymm1{k1}{z}, ymm2, ymm3/m256/m32bcst, imm8 */
-LONGOP(LO_VFIXUPIMMPS_ZMM, "vfixupimmps\t" OP_U8 OP_SAE OP_RM512_ZMM__OP_VRZMM__OP_RZMM_MASK) /* EVEX.512.66.0f3a.W0 54 /r ib vfixupimmps zmm1{k1}{z}, zmm2, zmm3/m512/m32bcst{sae}, imm8 */
+LONGOP(LO_VFIXUPIMMPS, "vfixupimmps\t" OP_U8 OP_SAE OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK) /* EVEX.128.66.0f3a.W0 54 /r ib vfixupimmps xmm1{k1}{z}, xmm2, xmm3/m128/m32bcst, imm8
+                                                                                         * EVEX.256.66.0f3a.W0 54 /r ib vfixupimmps ymm1{k1}{z}, ymm2, ymm3/m256/m32bcst, imm8
+                                                                                         * EVEX.512.66.0f3a.W0 54 /r ib vfixupimmps zmm1{k1}{z}, zmm2, zmm3/m512/m32bcst{sae}, imm8 */
 
 LONGOP(LO_VFIXUPIMMSD, "vfixupimmsd\t" OP_U8 OP_SAE OP_RM128_XMM__OP_VRXMM__OP_RXMM_MASK) /* EVEX.LIG.66.0f3a.W1 55 /r ib vfixupimmsd xmm1{k1}{z}, xmm2, xmm3/m64{sae}, imm8 */
 
 LONGOP(LO_VFIXUPIMMSS, "vfixupimmss\t" OP_U8 OP_SAE OP_RM128_XMM__OP_VRXMM__OP_RXMM_MASK) /* EVEX.LIG.66.0f3a.W0 55 /r ib vfixupimmss xmm1{k1}{z}, xmm2, xmm3/m32{sae}, imm8 */
 
-LONGOP(LO_VSCALEFPD, "vscalefpd\t" OP_ER OP_RM512_ZMM__OP_VRZMM__OP_RZMM_MASK) /* EVEX.512.66.0f38.W1 2c /r vscalefpd zmm1{k1}{z}, zmm2, zmm3/m512/m64bcst{er} */
+LONGOP(LO_VSCALEFPD, "vscalefpd\t" OP_ER OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK) /* EVEX.128.66.0f38.W1 2c /r vscalefpd xmm1{k1}{z}, xmm2, xmm3/m128/m64bcst
+                                                                              * EVEX.256.66.0f38.W1 2c /r vscalefpd ymm1{k1}{z}, ymm2, ymm3/m256/m64bcst
+                                                                              * EVEX.512.66.0f38.W1 2c /r vscalefpd zmm1{k1}{z}, zmm2, zmm3/m512/m64bcst{er} */
 
-LONGOP(LO_VSCALEFPS, "vscalefps\t" OP_ER OP_RM512_ZMM__OP_VRZMM__OP_RZMM_MASK) /* EVEX.512.66.0f38.W0 2c /r vscalefps zmm1{k1}{z}, zmm2, zmm3/m512/m32bcst{er} */
+LONGOP(LO_VSCALEFPS, "vscalefps\t" OP_ER OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK) /* EVEX.128.66.0f38.W0 2c /r vscalefps xmm1{k1}{z}, xmm2, xmm3/m128/m32bcst
+                                                                              * EVEX.256.66.0f38.W0 2c /r vscalefps ymm1{k1}{z}, ymm2, ymm3/m256/m32bcst
+                                                                              * EVEX.512.66.0f38.W0 2c /r vscalefps zmm1{k1}{z}, zmm2, zmm3/m512/m32bcst{er} */
 
 LONGOP(LO_VSCALEFSD, "vscalefsd\t" OP_ER OP_RM128_XMM__OP_VRXMM__OP_RXMM_MASK) /* EVEX.LIG.66.0f38.W1 2d /r vscalefsd xmm1{k1}{z}, xmm2, xmm3/m64{er} */
 
@@ -896,73 +924,79 @@ LONGOP(LO_VRCP28PD, "vrcp28pd\t" OP_SAE OP_RM512_ZMM OP_RZMM_MASK) /* EVEX.512.6
 
 LONGOP(LO_VRCP28PS, "vrcp28ps\t" OP_SAE OP_RM512_ZMM OP_RZMM_MASK) /* EVEX.512.66.0f38.W0 ca /r vrcp28ps zmm1{k1}{z}, zmm2/m512/m32bcst{sae} */
 
-LONGOP(LO_VGETEXPPD,     "vgetexppd\t" OP_RMn_xMM OP_RxMM_MASK)          /* EVEX.128.66.0f38.W1 42 /r vgetexppd xmm1{k1}{z}, xmm2/m128/m64bcst
-                                                                          * EVEX.256.66.0f38.W1 42 /r vgetexppd ymm1{k1}{z}, ymm2/m256/m64bcst */
-LONGOP(LO_VGETEXPPD_ZMM, "vgetexppd\t" OP_SAE OP_RM512_ZMM OP_RZMM_MASK) /* EVEX.512.66.0f38.W1 42 /r vgetexppd zmm1{k1}{z}, zmm2/m512/m64bcst{sae} */
+LONGOP(LO_VGETEXPPD, "vgetexppd\t" OP_SAE OP_RMn_xMM OP_RxMM_MASK) /* EVEX.128.66.0f38.W1 42 /r vgetexppd xmm1{k1}{z}, xmm2/m128/m64bcst
+                                                                    * EVEX.256.66.0f38.W1 42 /r vgetexppd ymm1{k1}{z}, ymm2/m256/m64bcst
+                                                                    * EVEX.512.66.0f38.W1 42 /r vgetexppd zmm1{k1}{z}, zmm2/m512/m64bcst{sae} */
 
-LONGOP(LO_VGETEXPPS,     "vgetexpps\t" OP_RMn_xMM OP_RxMM_MASK)          /* EVEX.128.66.0f38.W0 42 /r vgetexpps xmm1{k1}{z}, xmm2/m128/m32bcst
-                                                                          * EVEX.256.66.0f38.W0 42 /r vgetexpps ymm1{k1}{z}, ymm2/m256/m32bcst */
-LONGOP(LO_VGETEXPPS_ZMM, "vgetexpps\t" OP_SAE OP_RM512_ZMM OP_RZMM_MASK) /* EVEX.512.66.0f38.W0 42 /r vgetexpps zmm1{k1}{z}, zmm2/m512/m32bcst{sae} */
+LONGOP(LO_VGETEXPPS, "vgetexpps\t" OP_SAE OP_RMn_xMM OP_RxMM_MASK) /* EVEX.128.66.0f38.W0 42 /r vgetexpps xmm1{k1}{z}, xmm2/m128/m32bcst
+                                                                    * EVEX.256.66.0f38.W0 42 /r vgetexpps ymm1{k1}{z}, ymm2/m256/m32bcst
+                                                                    * EVEX.512.66.0f38.W0 42 /r vgetexpps zmm1{k1}{z}, zmm2/m512/m32bcst{sae} */
 
 LONGOP(LO_VGETEXPSD, "vgetexpsd\t" OP_SAE OP_RM128_XMM__OP_VRXMM__OP_RXMM_MASK) /* EVEX.LIG.66.0f38.W1 43 /r vgetexpsd xmm1{k1}{z}, xmm2, xmm3/m64{sae} */
 
 LONGOP(LO_VGETEXPSS, "vgetexpss\t" OP_SAE OP_RM128_XMM__OP_VRXMM__OP_RXMM_MASK) /* EVEX.LIG.66.0f38.W0 43 /r vgetexpss xmm1{k1}{z}, xmm2, xmm3/m32{sae} */
 
-LONGOP(LO_VGETMANTPD,     "vgetmantpd\t" OP_U8 OP_RMn_xMM OP_RxMM_MASK)          /* EVEX.128.66.0f3a.W1 26 /r ib vgetmantpd xmm1{k1}{z}, xmm2/m128/m64bcst, imm8
-                                                                                  * EVEX.256.66.0f3a.W1 26 /r ib vgetmantpd ymm1{k1}{z}, ymm2/m256/m64bcst, imm8 */
-LONGOP(LO_VGETMANTPD_ZMM, "vgetmantpd\t" OP_U8 OP_SAE OP_RM512_ZMM OP_RZMM_MASK) /* EVEX.512.66.0f3a.W1 26 /r ib vgetmantpd zmm1{k1}{z}, zmm2/m512/m64bcst{sae}, imm8 */
+LONGOP(LO_VGETMANTPD, "vgetmantpd\t" OP_U8 OP_SAE OP_RMn_xMM OP_RxMM_MASK) /* EVEX.128.66.0f3a.W1 26 /r ib vgetmantpd xmm1{k1}{z}, xmm2/m128/m64bcst, imm8
+                                                                            * EVEX.256.66.0f3a.W1 26 /r ib vgetmantpd ymm1{k1}{z}, ymm2/m256/m64bcst, imm8
+                                                                            * EVEX.512.66.0f3a.W1 26 /r ib vgetmantpd zmm1{k1}{z}, zmm2/m512/m64bcst{sae}, imm8 */
 
-LONGOP(LO_VGETMANTPS,     "vgetmantps\t" OP_U8 OP_RMn_xMM OP_RxMM_MASK)          /* EVEX.128.66.0f3a.W0 26 /r ib vgetmantps xmm1{k1}{z}, xmm2/m128/m32bcst, imm8
-                                                                                  * EVEX.256.66.0f3a.W0 26 /r ib vgetmantps ymm1{k1}{z}, ymm2/m256/m32bcst, imm8 */
-LONGOP(LO_VGETMANTPS_ZMM, "vgetmantps\t" OP_U8 OP_SAE OP_RM512_ZMM OP_RZMM_MASK) /* EVEX.512.66.0f3a.W0 26 /r ib vgetmantps zmm1{k1}{z}, zmm2/m512/m32bcst{sae}, imm8 */
+LONGOP(LO_VGETMANTPS, "vgetmantps\t" OP_U8 OP_SAE OP_RMn_xMM OP_RxMM_MASK) /* EVEX.128.66.0f3a.W0 26 /r ib vgetmantps xmm1{k1}{z}, xmm2/m128/m32bcst, imm8
+                                                                            * EVEX.256.66.0f3a.W0 26 /r ib vgetmantps ymm1{k1}{z}, ymm2/m256/m32bcst, imm8
+                                                                            * EVEX.512.66.0f3a.W0 26 /r ib vgetmantps zmm1{k1}{z}, zmm2/m512/m32bcst{sae}, imm8 */
 
 LONGOP(LO_VGETMANTSD, "vgetmantsd\t" OP_U8 OP_SAE OP_RM128_XMM__OP_VRXMM__OP_RXMM_MASK) /* EVEX.LIG.66.0f3a.W1 27 /r ib vgetmantsd xmm1{k1}{z}, xmm2, xmm3/m64{sae}, imm8 */
 
 LONGOP(LO_VGETMANTSS, "vgetmantss\t" OP_U8 OP_SAE OP_RM128_XMM__OP_VRXMM__OP_RXMM_MASK) /* EVEX.LIG.66.0f3a.W0 27 /r ib vgetmantss xmm1{k1}{z}, xmm2, xmm3/m32{sae}, imm8 */
 
-LONGOP(LO_VRANGEPD, "vrangepd\t" OP_U8 OP_SAE OP_RM512_ZMM__OP_VRZMM__OP_RZMM_MASK) /* EVEX.512.66.0f3a.W1 50 /r ib vrangepd zmm1{k1}{z}, zmm2, zmm3/m512/m64bcst{sae}, imm8 */
+LONGOP(LO_VRANGEPD, "vrangepd\t" OP_U8 OP_SAE OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK) /* EVEX.128.66.0f3a.W1 50 /r ib vrangepd xmm1{k1}{z}, xmm2, xmm3/m128/m64bcst, imm8
+                                                                                   * EVEX.256.66.0f3a.W1 50 /r ib vrangepd ymm1{k1}{z}, ymm2, ymm3/m256/m64bcst, imm8
+                                                                                   * EVEX.512.66.0f3a.W1 50 /r ib vrangepd zmm1{k1}{z}, zmm2, zmm3/m512/m64bcst{sae}, imm8 */
 
-LONGOP(LO_VRANGEPS, "vrangeps\t" OP_U8 OP_SAE OP_RM512_ZMM__OP_VRZMM__OP_RZMM_MASK) /* EVEX.512.66.0f3a.W0 50 /r ib vrangeps zmm1{k1}{z}, zmm2, zmm3/m512/m32bcst{sae}, imm8 */
+LONGOP(LO_VRANGEPS, "vrangeps\t" OP_U8 OP_SAE OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK) /* EVEX.128.66.0f3a.W0 50 /r ib vrangeps xmm1{k1}{z}, xmm2, xmm3/m128/m32bcst, imm8
+                                                                                   * EVEX.256.66.0f3a.W0 50 /r ib vrangeps ymm1{k1}{z}, ymm2, ymm3/m256/m32bcst, imm8
+                                                                                   * EVEX.512.66.0f3a.W0 50 /r ib vrangeps zmm1{k1}{z}, zmm2, zmm3/m512/m32bcst{sae}, imm8 */
 
 LONGOP(LO_VRANGESD, "vrangesd\t" OP_U8 OP_SAE OP_RM128_XMM__OP_VRXMM__OP_RXMM_MASK) /* EVEX.LIG.66.0f3a.W1 51 /r vrangesd xmm1{k1}{z}, xmm2, xmm3/m64{sae}, imm8 */
 
 LONGOP(LO_VRANGESS, "vrangess\t" OP_U8 OP_SAE OP_RM128_XMM__OP_VRXMM__OP_RXMM_MASK) /* EVEX.LIG.66.0f3a.W0 51 /r vrangess xmm1{k1}{z}, xmm2, xmm3/m32{sae}, imm8 */
 
-LONGOP(LO_VREDUCEPD,     "vreducepd\t" OP_U8 OP_RMn_xMM OP_RxMM_MASK)          /* EVEX.128.66.0f3a.W1 56 /r ib vreducepd xmm1{k1}{z}, xmm2/m128/m64bcst, imm8
-                                                                                * EVEX.256.66.0f3a.W1 56 /r ib vreducepd ymm1{k1}{z}, ymm2/m256/m64bcst, imm8 */
-LONGOP(LO_VREDUCEPD_ZMM, "vreducepd\t" OP_U8 OP_SAE OP_RM512_ZMM OP_RZMM_MASK) /* EVEX.512.66.0f3a.W1 56 /r ib vreducepd zmm1{k1}{z}, zmm2/m512/m64bcst{sae}, imm8 */
+LONGOP(LO_VREDUCEPD, "vreducepd\t" OP_U8 OP_SAE OP_RMn_xMM OP_RxMM_MASK) /* EVEX.128.66.0f3a.W1 56 /r ib vreducepd xmm1{k1}{z}, xmm2/m128/m64bcst, imm8
+                                                                          * EVEX.256.66.0f3a.W1 56 /r ib vreducepd ymm1{k1}{z}, ymm2/m256/m64bcst, imm8
+                                                                          * EVEX.512.66.0f3a.W1 56 /r ib vreducepd zmm1{k1}{z}, zmm2/m512/m64bcst{sae}, imm8 */
 
-LONGOP(LO_VREDUCEPS,     "vreduceps\t" OP_U8 OP_RMn_xMM OP_RxMM_MASK)          /* EVEX.128.66.0f3a.W0 56 /r ib vreduceps xmm1{k1}{z}, xmm2/m128/m32bcst, imm8
-                                                                                * EVEX.256.66.0f3a.W0 56 /r ib vreduceps ymm1{k1}{z}, ymm2/m256/m32bcst, imm8 */
-LONGOP(LO_VREDUCEPS_ZMM, "vreduceps\t" OP_U8 OP_SAE OP_RM512_ZMM OP_RZMM_MASK) /* EVEX.512.66.0f3a.W0 56 /r ib vreduceps zmm1{k1}{z}, zmm2/m512/m32bcst{sae}, imm8 */
+LONGOP(LO_VREDUCEPS, "vreduceps\t" OP_U8 OP_SAE OP_RMn_xMM OP_RxMM_MASK) /* EVEX.128.66.0f3a.W0 56 /r ib vreduceps xmm1{k1}{z}, xmm2/m128/m32bcst, imm8
+                                                                          * EVEX.256.66.0f3a.W0 56 /r ib vreduceps ymm1{k1}{z}, ymm2/m256/m32bcst, imm8
+                                                                          * EVEX.512.66.0f3a.W0 56 /r ib vreduceps zmm1{k1}{z}, zmm2/m512/m32bcst{sae}, imm8 */
 
 LONGOP(LO_VREDUCESD, "vreducesd\t" OP_U8 OP_SAE OP_RM128_XMM__OP_VRXMM__OP_RXMM_MASK) /* EVEX.LIG.66.0f3a.W1 57 /r vreducesd xmm1{k1}{z}, xmm2, xmm3/m64{sae}, imm8 */
 
 LONGOP(LO_VREDUCESS, "vreducess\t" OP_U8 OP_SAE OP_RM128_XMM__OP_VRXMM__OP_RXMM_MASK) /* EVEX.LIG.66.0f3a.W0 57 /r ib vreducess xmm1{k1}{z}, xmm2, xmm3/m32{sae}, imm8 */
 
-LONGOP(LO_VRNDSCALEPD, "vrndscalepd\t" OP_U8 OP_RMn_xMM OP_RxMM_MASK)              /* EVEX.128.66.0f3a.W1 09 /r ib vrndscalepd xmm1{k1}{z}, xmm2/m128/m64bcst, imm8
-                                                                                    * EVEX.256.66.0f3a.W1 09 /r ib vrndscalepd ymm1{k1}{z}, ymm2/m256/m64bcst, imm8 */
-LONGOP(LO_VRNDSCALEPD_ZMM, "vrndscalepd\t" OP_U8 OP_SAE OP_RM512_ZMM OP_RZMM_MASK) /* EVEX.512.66.0f3a.W1 09 /r ib vrndscalepd zmm1{k1}{z}, zmm2/m512/m64bcst{sae}, imm8 */
+LONGOP(LO_VRNDSCALEPD, "vrndscalepd\t" OP_U8 OP_SAE OP_RMn_xMM OP_RxMM_MASK) /* EVEX.128.66.0f3a.W1 09 /r ib vrndscalepd xmm1{k1}{z}, xmm2/m128/m64bcst, imm8
+                                                                              * EVEX.256.66.0f3a.W1 09 /r ib vrndscalepd ymm1{k1}{z}, ymm2/m256/m64bcst, imm8
+                                                                              * EVEX.512.66.0f3a.W1 09 /r ib vrndscalepd zmm1{k1}{z}, zmm2/m512/m64bcst{sae}, imm8 */
 
-LONGOP(LO_VRNDSCALEPS,     "vrndscaleps\t" OP_U8 OP_RMn_xMM OP_RxMM_MASK)          /* EVEX.128.66.0f3a.W0 08 /r ib vrndscaleps xmm1{k1}{z}, xmm2/m128/m32bcst, imm8
-                                                                                    * EVEX.256.66.0f3a.W0 08 /r ib vrndscaleps ymm1{k1}{z}, ymm2/m256/m32bcst, imm8 */
-LONGOP(LO_VRNDSCALEPS_ZMM, "vrndscaleps\t" OP_U8 OP_SAE OP_RM512_ZMM OP_RZMM_MASK) /* EVEX.512.66.0f3a.W0 08 /r ib vrndscaleps zmm1{k1}{z}, zmm2/m512/m32bcst{sae}, imm8 */
+LONGOP(LO_VRNDSCALEPS, "vrndscaleps\t" OP_U8 OP_SAE OP_RMn_xMM OP_RxMM_MASK) /* EVEX.128.66.0f3a.W0 08 /r ib vrndscaleps xmm1{k1}{z}, xmm2/m128/m32bcst, imm8
+                                                                              * EVEX.256.66.0f3a.W0 08 /r ib vrndscaleps ymm1{k1}{z}, ymm2/m256/m32bcst, imm8
+                                                                              * EVEX.512.66.0f3a.W0 08 /r ib vrndscaleps zmm1{k1}{z}, zmm2/m512/m32bcst{sae}, imm8 */
 
 LONGOP(LO_VRNDSCALESD, "vrndscalesd\t" OP_U8 OP_SAE OP_RM128_XMM__OP_VRXMM__OP_RXMM_MASK) /* EVEX.LIG.66.0f3a.W1 0b /r ib vrndscalesd xmm1{k1}{z}, xmm2, xmm3/m64{sae}, imm8 */
 
 LONGOP(LO_VRNDSCALESS, "vrndscaless\t" OP_U8 OP_SAE OP_RM128_XMM__OP_VRXMM__OP_RXMM_MASK) /* EVEX.LIG.66.0f3a.W0 0a /r ib vrndscaless xmm1{k1}{z}, xmm2, xmm3/m32{sae}, imm8 */
 
-LONGOP(LO_VBLENDVPS_XMM, "vblendvps\t" OP_IMM8_XMM OP_RM128_XMM__OP_VRXMM__OP_RXMM) /* VEX.128.66.0f3a.W0 4a /r /is4 vblendvps xmm1, xmm2, xmm3/m128, xmm4 */
-LONGOP(LO_VBLENDVPS_YMM, "vblendvps\t" OP_IMM8_YMM OP_RM256_YMM__OP_VRYMM__OP_RYMM) /* VEX.256.66.0f3a.W0 4a /r /is4 vblendvps ymm1, ymm2, ymm3/m256, ymm4 */
+LONGOP(LO_VBLENDVPS, "vblendvps\t" OP_IMM8_xMM OP_RMn_xMM__OP_VRxMM__OP_RxMM) /* VEX.128.66.0f3a.W0 4a /r /is4 vblendvps xmm1, xmm2, xmm3/m128, xmm4
+                                                                               * VEX.256.66.0f3a.W0 4a /r /is4 vblendvps ymm1, ymm2, ymm3/m256, ymm4 */
 
-LONGOP(LO_VBLENDVPD_XMM, "vblendvpd\t" OP_IMM8_XMM OP_RM128_XMM__OP_VRXMM__OP_RXMM) /* VEX.128.66.0f3a.W0 4b /r /is4 vblendvpd xmm1, xmm2, xmm3/m128, xmm4 */
-LONGOP(LO_VBLENDVPD_YMM, "vblendvpd\t" OP_IMM8_YMM OP_RM256_YMM__OP_VRYMM__OP_RYMM) /* VEX.256.66.0f3a.W0 4b /r /is4 vblendvpd ymm1, ymm2, ymm3/m256, ymm4 */
+LONGOP(LO_VBLENDVPD, "vblendvpd\t" OP_IMM8_xMM OP_RMn_xMM__OP_VRxMM__OP_RxMM) /* VEX.128.66.0f3a.W0 4b /r /is4 vblendvpd xmm1, xmm2, xmm3/m128, xmm4
+                                                                               * VEX.256.66.0f3a.W0 4b /r /is4 vblendvpd ymm1, ymm2, ymm3/m256, ymm4 */
 
-LONGOP(LO_VPBLENDVB_XMM, "vpblendvb\t" OP_IMM8_XMM OP_RM128_XMM__OP_VRXMM__OP_RXMM) /* VEX.128.66.0f3a.W0 4c /r /is4 vpblendvb xmm1, xmm2, xmm3/m128, xmm4 */
-LONGOP(LO_VPBLENDVB_YMM, "vpblendvb\t" OP_IMM8_YMM OP_RM256_YMM__OP_VRYMM__OP_RYMM) /* VEX.256.66.0f3a.W0 4c /r /is4 vpblendvb ymm1, ymm2, ymm3/m256, ymm4 */
+LONGOP(LO_VPBLENDVB, "vpblendvb\t" OP_IMM8_xMM OP_RMn_xMM__OP_VRxMM__OP_RxMM) /* VEX.128.66.0f3a.W0 4c /r /is4 vpblendvb xmm1, xmm2, xmm3/m128, xmm4
+                                                                               * VEX.256.66.0f3a.W0 4c /r /is4 vpblendvb ymm1, ymm2, ymm3/m256, ymm4 */
 
 LONGOP(LO_PBLENDVB, "pblendvb\t" OP_XMM0 OP_RM128_XMM OP_RXMM) /* 66 0f 38 10 /r pblendvb xmm1, xmm2/m128, <xmm0> */
+
 LONGOP(LO_BLENDVPS, "blendvps\t" OP_XMM0 OP_RM128_XMM OP_RXMM) /* 66 0f 38 14 /r blendvps xmm1, xmm2/m128, <xmm0> */
+
 LONGOP(LO_BLENDVPD, "blendvpd\t" OP_XMM0 OP_RM128_XMM OP_RXMM) /* 66 0f 38 15 /r blendvpd xmm1, xmm2/m128, <xmm0> */
 
 LONGOP(LO_VP4DPWSSD, "vp4dpwssd\t" OP_MEM OP_VRZMM/*+3*/ OP_RZMM_MASK) /* EVEX.512.f2.0f38.W0 52 /r vp4dpwssd zmm1{k1}{z}, zmm2+3, m128 */
@@ -970,11 +1004,15 @@ LONGOP(LO_VP4DPWSSD, "vp4dpwssd\t" OP_MEM OP_VRZMM/*+3*/ OP_RZMM_MASK) /* EVEX.5
 LONGOP(LO_VP4DPWSSDS, "vp4dpwssds\t" OP_MEM OP_VRZMM/*+3*/ OP_RZMM_MASK) /* EVEX.512.f2.0f38.W0 53 /r vp4dpwssds zmm1{k1}{z}, zmm2+3, m128 */
 
 LONGOP(LO_V4FMADDPS_ZMM,  "v4fmaddps\t" OP_MEM OP_VRZMM/*+3*/ OP_RZMM_MASK)  /* EVEX.512.f2.0f38.W0 9a /r v4fmaddps zmm1{k1}{z}, zmm2+3, m128 */
+
 LONGOP(LO_V4FNMADDPS_ZMM, "v4fnmaddps\t" OP_MEM OP_VRZMM/*+3*/ OP_RZMM_MASK) /* EVEX.512.f2.0f38.W0 aa /r v4fnmaddps zmm1{k1}{z}, zmm2+3, m128 */
 
 LONGOP(LO_V4FMADDSS_XMM,  "v4fmaddss\t" OP_MEM OP_VRXMM/*+3*/ OP_RXMM_MASK)  /* EVEX.LIG.f2.0f38.W0 9b /r v4fmaddss xmm1{k1}{z}, xmm2+3, m128 */
+
 LONGOP(LO_V4FNMADDSS_XMM, "v4fnmaddss\t" OP_MEM OP_VRXMM/*+3*/ OP_RXMM_MASK) /* EVEX.LIG.f2.0f38.W0 ab /r v4fnmaddss xmm1{k1}{z}, xmm2+3, m128 */
 
 LONGOP(LO_MOVDIR64BW, "movdir64bw\t" OP_RM64 OP_R16)
+
 LONGOP(LO_MOVDIR64BL, "movdir64bl\t" OP_RM64 OP_R32)
+
 LONGOP(LO_MOVDIR64BQ, "movdir64bq\t" OP_RM64 OP_R64)
