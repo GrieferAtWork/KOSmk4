@@ -95,48 +95,41 @@ function start(
 		DISK_FILENAME: string,
 		options: {string: Object},
 		magic: Module) {
-	local qemu = options.get(opt.EXE)
-#ifdef __WINDOWS__
-		.replace("\\","/")
-#endif
-		;
+	local qemu = options.get("qemu.exe");
 	if (qemu is none) {
-		qemu = "qemu-system-" + TARGET_ARCH
-#ifdef __WINDOWS__
-			+ ".exe"
-#endif
-		;
+		qemu = common.findExecutableInPaths(
+			enumerateQEmuInstallationLocations(),
+			"qemu-system-" + TARGET_ARCH);
+		if (qemu is none)
+			throw Error("Cannot locate qemu binary");
 	}
-	if ("/" !in qemu) {
-		for (local x: enumerateQEmuInstallationLocations()) {
-			local fullPath = fs.joinpath(x,qemu);
-			if (fs.stat.isreg(fullPath)) {
-				qemu = fullPath;
-				goto got_exe;
-			}
-		}
-		print "Failed to locate:", repr qemu;
-		throw Error("Cannot locate qemu binary");
-	}
-got_exe:
 	local qemu_arguments = [];
 	qemu_arguments.extend({ "-serial", "stdio" });
-	if (options.get(opt.HOSTED, true))
+	local isHosted = options.get(opt.HOSTED, "true");
+	if (isHosted !in ["true", "false"])
+		throw Error("Bad value for " + opt.HOSTED + ": " + repr(isHosted));
+	if (isHosted == "true")
 		qemu_arguments.extend({ "-no-reboot", "-no-shutdown" });
 	local gdb_mode = options.get(opt.GDB);
 	local boot_drivers = List(DRIVERS);
 	if (gdb_mode !is none) {
+		local gdb_port = options.get(opt.GDB_PORT, "1234");
 		if (gdb_mode == "server") {
 			/* Make use of out GDB server driver */
 			boot_drivers.append((
 				BINPATH + "/os/drivers/gdbserver",
 				"transport=serial:0x2f8:0xf3"
 			));
-			qemu_arguments.extend({ "-serial", "tcp::1234,server" });
+			qemu_arguments.extend({ "-serial", "tcp::" + gdb_port + ",server" });
 		} else if (gdb_mode == "emulator") {
 			/* Use qemu's builtin GDB support */
 			/* Make use of out GDB-stub driver */
-			qemu_arguments.extend({ "-s", "-S" });
+			if (gdb_port != "1234") {
+				qemu_arguments.extend({ "-gdb", "tcp::" + gdb_port });
+			} else {
+				qemu_arguments.append("-s");
+			}
+			qemu_arguments.append("-S");
 		} else {
 			throw Error("Invalid GDB mode: " + repr gdb_mode);
 		}
@@ -200,7 +193,7 @@ did_update_x86_64_kernel:
 		"-drive", "file=bin/Postal2.iso,format=raw,index=1,media=disk",
 		"-drive", "file=bin/ext2.img,format=raw,index=2,media=disk",
 #endif
-		"-smp", "2",
+		"-smp", options.get(opt.SMP, opt.SMP_DEFAULT),
 		"-display", "gtk",
 		"-device", "isa-debug-exit,iobase=0xf4,iosize=0x04",
 //		"-d", "int",

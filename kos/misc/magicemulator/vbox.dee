@@ -49,12 +49,16 @@ function throwVBoxManageError(argv: {string...}, error: int) {
 		throw Error("`VBoxManage " + repr(argv) + "` failed with " + error);
 }
 function runVBoxManageCommand(argv: {string...}) {
+	if (BOCHSEXE_VBOXMANAGE is none)
+		throw Error("Failed to locate `VBoxManage`");
 	local proc = ipc.Process(BOCHSEXE_VBOXMANAGE, argv);
 	proc.start();
 	throwVBoxManageError(argv, proc.join());
 }
 
 function runVBoxManageCommandAndCaptureOutput(argv: {string...}): {string...} {
+	if (BOCHSEXE_VBOXMANAGE is none)
+		throw Error("Failed to locate `VBoxManage`");
 	local proc = ipc.Process(BOCHSEXE_VBOXMANAGE, argv);
 	local r, w = ipc.Pipe.new()...;
 	proc.stdout = w;
@@ -117,11 +121,18 @@ function createNamePipeAndStartLogProcessingThread(
 			win32.ConnectNamedPipe(hNamedPipe);
 			for (;;) {
 				local buf = Bytes(1024);
-				local cnt = win32.ReadFile(hNamedPipe, buf);
+				local cnt;
+				try {
+					cnt = win32.ReadFile(hNamedPipe, buf);
+				} catch (...) {
+					proc.terminate();
+					return;
+				}
 				File.stdout.write(buf.substr(0, cnt));
 			}
 		} @[interrupt] catch (e...) {
-			print "NamedPipe relay thread exited";
+			print "NamedPipe relay thread crashed:";
+			print e;
 			proc.terminate();
 			ipc.Process.current.terminate(1);
 		}
@@ -142,26 +153,39 @@ function start(
 		options: {string: Object},
 		magic: Module) {
 	if (DRIVERS)
-		throw Error("Bochs doesn't support booting KOS with additional drivers");
+		throw Error("VBox doesn't support booting KOS with additional drivers");
 	if (options.get(opt.CMDLINE))
-		throw Error("Bochs doesn't support a kernel commandline");
-	BOCHSEXE_VBOXMANAGE   = options.get(opt.EXE);
+		throw Error("VBox doesn't support a kernel commandline");
+	if (options.get(opt.GDB) !is none) {
+		/* TODO: VirtualBox _does_ have its own commandline-based debugger that
+		 *       could be adopted to be usable as a sort-of GDB stub by placing
+		 *       a compability driver (possible written in deemon) in-between.
+		 * s.a.: https://www.virtualbox.org/manual/ch12.html#ts_debugger
+		 *       Which states that telnet:5000 may be used to communicate with
+		 *       the VirtualBox debugger, so one solution could be to connect
+		 *       the two with some in-between glue... */
+		throw Error("VBox doesn't support any kind of GDB debugging");
+	}
+	BOCHSEXE_VBOXMANAGE   = options.get("vbox.VBoxManage");
 	BOCHSEXE_VIRTUALBOXVM = options.get("vbox.VirtualBoxVM");
 	if (BOCHSEXE_VBOXMANAGE is none) {
 		BOCHSEXE_VBOXMANAGE = common.findExecutableInPaths(
 			enumerateVirtualBoxInstallLocations(), "VBoxManage");
-		if (BOCHSEXE_VBOXMANAGE is none)
-			throw Error("Failed to locate `VBoxManage`");
 	}
 	if (BOCHSEXE_VIRTUALBOXVM is none) {
-		local ext = fs.extof(BOCHSEXE_VBOXMANAGE);
-		if (ext)
-			ext = "." + ext;
-		BOCHSEXE_VIRTUALBOXVM = fs.joinpath(
-			fs.headof(BOCHSEXE_VBOXMANAGE),
-			"VirtualBoxVM" + ext);
-		if (!fs.stat.exists(BOCHSEXE_VIRTUALBOXVM)) {
-			print "[vbox] `VirtualBoxVM` not found in expected location", repr BOCHSEXE_VIRTUALBOXVM;
+		if (BOCHSEXE_VBOXMANAGE !is none) {
+			local ext = fs.extof(BOCHSEXE_VBOXMANAGE);
+			if (ext)
+				ext = "." + ext;
+			BOCHSEXE_VIRTUALBOXVM = fs.joinpath(
+				fs.headof(BOCHSEXE_VBOXMANAGE),
+				"VirtualBoxVM" + ext);
+		}
+		if (BOCHSEXE_VIRTUALBOXVM is none || !fs.stat.exists(BOCHSEXE_VIRTUALBOXVM)) {
+			if (BOCHSEXE_VIRTUALBOXVM !is none) {
+				print "[vbox] `VirtualBoxVM` not found in expected location",
+					repr BOCHSEXE_VIRTUALBOXVM;
+			}
 			BOCHSEXE_VIRTUALBOXVM = common.findExecutableInPaths(
 				enumerateVirtualBoxInstallLocations(), "VirtualBoxVM");
 		}
@@ -227,11 +251,18 @@ function start(
 			<< repr(diskVmdkFilename) << " format=\"VMDK\" type=\"Normal\"/>\n";
 		vmVboxConfig << "</HardDisks></MediaRegistry>\n";
 		vmVboxConfig << "<Hardware>\n";
-		vmVboxConfig << "	<CPU count=\"1\">\n"; /* XXX: Make this configurable */
+		vmVboxConfig << "	<CPU count=\""
+			<< options.get(opt.SMP, opt.SMP_DEFAULT)
+			<< "\">\n";
 		vmVboxConfig << "		<PAE enabled=\"true\"/>\n";
 		vmVboxConfig << "		<LongMode enabled=\"" << (TARGET_ARCH == "x86_64" ? "true" : "false") << "\"/>\n";
 		vmVboxConfig << "		<HardwareVirtExLargePages enabled=\"true\"/>\n";
-		vmVboxConfig << "		<TripleFaultReset enabled=\"false\"/>\n";
+		local isHosted = options.get(opt.HOSTED, "true");
+		if (isHosted !in ["true", "false"])
+			throw Error("Bad value for " + opt.HOSTED + ": " + repr(isHosted));
+		vmVboxConfig << "		<TripleFaultReset enabled=\""
+			<< (isHosted == "true" ? "false" : "true")
+			<< "\"/>\n";
 		vmVboxConfig << "		<CpuIdTree>\n";
 		                 			/* BRAND_STRING = "VBox" */
 		vmVboxConfig << "			<CpuIdLeaf id=\"2147483650\" eax=\"2020557398\" ebx=\"0\" ecx=\"0\" edx=\"0\"/>\n";
@@ -269,7 +300,7 @@ function start(
 		vmVboxConfig.write("</Machine>\n</VirtualBox>\n");
 		vmVboxConfig.trunc();
 	}
-	local pipeName = r"\\.\pipe\" + vmName;
+	local pipeName = options.get("vbox.logpipe", r"\\.\pipe\" + vmName);
 	fs.environ["VBOX_GUI_DBG_ENABLED"] = "true";
 	fs.environ["VBOX_RELEASE_LOG_DEST"] = "nofile file=" + pipeName;
 	/* This options prevents excessive writes to port:0x504 from causing a mute. */

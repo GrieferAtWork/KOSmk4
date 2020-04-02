@@ -69,7 +69,7 @@ function start(
 		throw Error("Bochs doesn't support booting KOS with additional drivers");
 	if (options.get(opt.CMDLINE))
 		throw Error("Bochs doesn't support a kernel commandline");
-	local bochs = options.get(opt.EXE);
+	local bochs = options.get("bochs.exe");
 	if (bochs is none) {
 		bochs = common.findExecutableInPaths(
 			enumerateBochsInstallationLocations(), "bochs");
@@ -108,7 +108,14 @@ got_bios:
 		rc << "ata1-master: type=disk, path=" << repr(fs.relpath(DISK_FILENAME, fs.headof(kernelShadowFilename)))
 			<< ", mode=flat, cylinders=0, heads=0, spt=0, model=\"Generic 1234\", biosdetect=auto, translation=auto\n";
 		rc << "cpuid: level=6, stepping=3, model=3, family=6, vendor_string=\"GenuineIntel\", brand_string=\"BOCHS         Intel(R) Pentium(R) 4 CPU        \"\n";
-		rc << "cpu: count=1, ips=4000000, model=bx_generic, reset_on_triple_fault=0, cpuid_limit_winnt=0, ignore_bad_msrs=1, mwait_is_nop=0\n";
+		rc << "cpu: count="
+			<< options.get(opt.SMP, "1") /* Always default to 1, since bochs doesn't normally support this (you need to create your own custom build for SMP support) */
+			<< ", ips=4000000, model=bx_generic, reset_on_triple_fault=";
+		local isHosted = options.get(opt.HOSTED, "true");
+		if (isHosted !in ["true", "false"])
+			throw Error("Bad value for " + opt.HOSTED + ": " + repr(isHosted));
+		rc << (isHosted == "true" ? "0" : "1");
+		rc << ", cpuid_limit_winnt=0, ignore_bad_msrs=1, mwait_is_nop=0\n";
 		rc << "cpuid: mmx=1, apic=xapic, simd=sse2, sse4a=0, misaligned_sse=0, sep=1, movbe=0, adx=0\n";
 		rc << "cpuid: aes=0, sha=0, xsave=0, xsaveopt=0";
 		if (TARGET_ARCH == "x86_64")
@@ -120,9 +127,17 @@ got_bios:
 //		rc << "debug: action=report\n";
 		local gdb_mode = options.get(opt.GDB);
 		if (gdb_mode !is none) {
-			if (gdb_mode == "qemu")
-				rc << "gdbstub: enabled=1, port=1234, text_base=0, data_base=0, bss_base=0\n";
-			else {
+			if (gdb_mode == "qemu") {
+				rc << "gdbstub: enabled=1, port="
+					<< options.get(opt.GDB_PORT, "1234")
+					<< ", text_base="
+					<< options.get("bochs.gdb.text_base", "0")
+					<< ", data_base="
+					<< options.get("bochs.gdb.data_base", "0")
+					<< ", bss_base="
+					<< options.get("bochs.gdb.bss_base", "0")
+					<< "\n";
+			} else {
 				throw Error("bochs only supports --gdb=qemu mode");
 			}
 		}

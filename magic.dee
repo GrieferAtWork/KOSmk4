@@ -282,10 +282,10 @@ function main(argv: {string...}) {
 			config.FORCE = false;
 			break;
 		case "--emulator-hosted":
-			CONFIG_EMULATOR_OPTIONS[emulatorOptions.HOSTED] = true;
+			CONFIG_EMULATOR_OPTIONS[emulatorOptions.HOSTED] = "true";
 			break;
 		case "--no-emulator-hosted":
-			CONFIG_EMULATOR_OPTIONS[emulatorOptions.HOSTED] = false;
+			CONFIG_EMULATOR_OPTIONS[emulatorOptions.HOSTED] = "false";
 			break;
 		case "--format-error-messages":
 			config.FORMAT_ERRORS = true;
