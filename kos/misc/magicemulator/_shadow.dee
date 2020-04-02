@@ -1,0 +1,68 @@
+/* Copyright (c) 2019-2020 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifdef __WINDOWS__
+#define HOST_EXE(x)  x ".exe"
+#else
+#define HOST_EXE(x)  x
+#endif
+
+import * from deemon;
+import * from ..libmagic.libmagic;
+import flattenElfBinary from ..libmagic.steps.elf;
+import fs;
+
+function updateKernelShadow(KERNEL: string, TARGET_ARCH: string): string {
+	local kernelShadowFilename = fs.joinpath(fs.headof(KERNEL),
+		".{}-flat.{}".format({ fs.fileof(KERNEL), fs.extof(KERNEL) }));
+	local shadowLastModified = getLastModfiedTime(kernelShadowFilename);
+	if (shadowLastModified is none ||
+	    shadowLastModified < getLastModfiedTime(KERNEL)) {
+		print "[vbox] Updating kernel shadow", repr kernelShadowFilename;
+		flattenElfBinary(
+			inputFile: KERNEL,
+			outputFile: kernelShadowFilename,
+			physBase: 0x00100000, /* 1MiB */
+			virtBase: {
+				"i386"   : 0xc0100000, /* 3GiB + 1MiB */
+				"x86_64" : 0xffffffff80100000, /* -2GiB + 1MiB */
+			}[TARGET_ARCH],
+			keepBss: true,
+			overrideEntry: false);
+		/* In order to be accepted by BOCHS, the size of kernelFlatFilename
+		 * must be divisable by `0x7e000' (== 16heads * 63sectors_per_track * 512bytes)
+		 * Otherwise, the bootloader won't be able to read the entire kernel image! */
+		try {
+			with (local fp = File.open(kernelShadowFilename, "rb+,nobuf")) {
+				local isSize = fp.size();
+				local reqSize = ((isSize + (0x7e000 - 1)) / 0x7e000) * 0x7e000;
+				assert reqSize >= isSize;
+				if (reqSize > isSize) {
+					fp.seek(reqSize - 1);
+					fp.write("\0");
+				}
+			}
+		} @[interrupt] catch (...) {
+			try fs.unlink(kernelShadowFilename); catch (...);
+			throw;
+		}
+	}
+	return kernelShadowFilename;
+}
+

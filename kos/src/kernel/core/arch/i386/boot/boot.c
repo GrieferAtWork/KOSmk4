@@ -84,10 +84,11 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 */
 	if (x86_bootcpu_cpuid.ci_80000002a == MAKE_DWORD('Q', 'E', 'M', 'U'))
 		x86_syslog_port = (port_t)0x3f8;
-	else if (x86_bootcpu_cpuid.ci_80000002a == MAKE_DWORD('B', 'O', 'C', 'H')) {
+	else if (x86_bootcpu_cpuid.ci_80000002a == MAKE_DWORD('B', 'O', 'C', 'H'))
 		x86_syslog_port = (port_t)0xe9;
+	else if (x86_bootcpu_cpuid.ci_80000002a == MAKE_DWORD('V', 'B', 'o', 'x')) {
+		x86_syslog_port = (port_t)0x504;
 	}
-
 	x86_initialize_cmos();
 
 	printk(FREESTR(KERN_NOTICE "[boot] Begin kernel initialization\n"));

@@ -38,7 +38,7 @@ import * from .kos.misc.libmagic.steps.elf_dihack;
 import * from .kos.misc.libmagic.steps.custom;
 import * from .kos.misc.libmagic.steps.keymap;
 import * from .kos.misc.libmagic.toolchain.gcc;
-import .kos.misc.magicemulator.options as emulator_options;
+import .kos.misc.magicemulator._options as emulatorOptions;
 import AppExit from errors;
 
 File.stdout.setbuf("line");
@@ -281,11 +281,11 @@ function main(argv: {string...}) {
 		case "--no-force":
 			config.FORCE = false;
 			break;
-		case "--qemu-hosted":
-			CONFIG_EMULATOR_OPTIONS[emulator_options.QEMU_HOSTED] = true;
+		case "--emulator-hosted":
+			CONFIG_EMULATOR_OPTIONS[emulatorOptions.HOSTED] = true;
 			break;
-		case "--no-qemu-hosted":
-			CONFIG_EMULATOR_OPTIONS[emulator_options.QEMU_HOSTED] = false;
+		case "--no-emulator-hosted":
+			CONFIG_EMULATOR_OPTIONS[emulatorOptions.HOSTED] = false;
 			break;
 		case "--format-error-messages":
 			config.FORMAT_ERRORS = true;
@@ -294,7 +294,7 @@ function main(argv: {string...}) {
 			config.FORMAT_ERRORS = false;
 			break;
 		case "--":
-			CONFIG_EMULATOR_OPTIONS[emulator_options.QEMU_CMDLINE] = " ".join(args);
+			CONFIG_EMULATOR_OPTIONS[emulatorOptions.CMDLINE] = " ".join(args);
 			args = { };
 			break;
 		default:
@@ -314,9 +314,12 @@ function main(argv: {string...}) {
 				case "--compilers":
 					CONFIG_MAX_COMPILERS = int(value);
 					break;
-				case "--qemu":
-					CONFIG_EMULATOR_OPTIONS[emulator_options.QEMU_EXE] = value;
-					break;
+				case "--emulator-setopt": {
+					if ("=" !in value)
+						throw Error("--emulator-setopt requires the operand to contain \"=\", which isn't the case for " + repr(value));
+					local optnam, none, optval = value.partition("=")...;
+					CONFIG_EMULATOR_OPTIONS[optnam] = optval;
+				}	break;
 				case "--emulator":
 					CONFIG_EMULATOR_USED = value;
 					break;
@@ -327,7 +330,7 @@ function main(argv: {string...}) {
 					config.VERBOSE = BOOLMAP[value];
 					break;
 				case "--gdb":
-					CONFIG_EMULATOR_OPTIONS[emulator_options.QEMU_GDB] = value;
+					CONFIG_EMULATOR_OPTIONS[emulatorOptions.GDB] = value;
 					break;
 				case "--emulator-started-pattern":
 					CONFIG_EMULATOR_STARTED_PATTERN = value;
@@ -420,6 +423,7 @@ _err_unknown_argument:
 		}
 		if (CONFIG_EMULATOR_STARTED_PATTERN)
 			print CONFIG_EMULATOR_STARTED_PATTERN;
+		import . as me;
 		import(".kos.misc.magicemulator." + CONFIG_EMULATOR_USED).start(
 			groups:        groups,
 			config:        config,
@@ -430,6 +434,7 @@ _err_unknown_argument:
 			TARGET:        TARGET,
 			DISK_FILENAME: toolchain.options[TOOLCHAIN_MTOOLS_DISK],
 			options:       CONFIG_EMULATOR_OPTIONS,
+			magic:         me
 		);
 	}
 }

@@ -1,0 +1,335 @@
+/* Copyright (c) 2019-2020 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+
+import * from deemon;
+import * from ..libmagic.libmagic;
+import flattenElfBinary from ..libmagic.steps.elf;
+import opt = ._options;
+import fs;
+import ipc;
+import ._common as common;
+import ._shadow as shadow;
+
+global win32: Module;
+global BOCHSEXE_VBOXMANAGE: string;
+global BOCHSEXE_VIRTUALBOXVM: string;
+
+try {
+	win32 = import("win32");
+} catch (...) {
+	throw Error("VBox emulation currently requires windows");
+}
+
+function enumerateVirtualBoxInstallLocations(): {string...} {
+	yield fs.environ["PATH"].split(fs.DELIM)...;
+}
+
+
+
+function throwVBoxManageError(argv: {string...}, error: int) {
+	if (error != 0)
+		throw Error("`VBoxManage " + repr(argv) + "` failed with " + error);
+}
+function runVBoxManageCommand(argv: {string...}) {
+	local proc = ipc.Process(BOCHSEXE_VBOXMANAGE, argv);
+	proc.start();
+	throwVBoxManageError(argv, proc.join());
+}
+
+function runVBoxManageCommandAndCaptureOutput(argv: {string...}): {string...} {
+	local proc = ipc.Process(BOCHSEXE_VBOXMANAGE, argv);
+	local r, w = ipc.Pipe.new()...;
+	proc.stdout = w;
+	proc.start();
+	w.close();
+	r = File.Buffer(r, "ro,c,none");
+	try {
+		for (local l: r)
+			yield l;
+		r.close();
+		throwVBoxManageError(argv, proc.join());
+	} finally {
+		try {
+			proc.terminate();
+		} catch (...) {
+		}
+	}
+}
+
+function createVmdkDescriptor(diskFile: string): string {
+	local resultFilename = fs.joinpath(fs.headof(diskFile),
+		".{}.vmdk".format({ fs.fileof(diskFile).lstrip(".") }));
+	if (!fs.stat.exists(resultFilename)) {
+		/* Lazily create the VBox descriptor for the disk image. */
+		fs.chdir(fs.headof(resultFilename));
+		runVBoxManageCommand({
+			"internalcommands",
+			"createrawvmdk",
+			"-filename",
+			fs.tailof(resultFilename),
+			"-rawdisk",
+			fs.tailof(diskFile)
+		});
+	}
+	return resultFilename;
+}
+
+function getUUIDOfVmdkDescriptor(vmdkFilename: string): string {
+	final local PREFIX = "ddb.uuid.image=";
+	with (local fp = File.open(vmdkFilename, "r")) {
+		for (local l: fp) {
+			if (l.startswith(PREFIX))
+				return "{" + l[#PREFIX:].strip().strip("\"") + "}";
+		}
+	}
+	throw Error("Failed to find UUID descriptor in " + repr(vmdkFilename));
+}
+
+
+function createNamePipeAndStartLogProcessingThread(
+		proc: ipc.Process,
+		namedPipeName: string,
+		groups: {Group...},
+		config: Config) {
+	local hNamedPipe = win32.CreateNamedPipe(
+		namedPipeName, win32.PIPE_ACCESS_INBOUND, win32.PIPE_TYPE_BYTE, 1);
+	Thread([](proc, hNamedPipe, groups, config){
+		try {
+			/* Wait for VBox to open what it thinks to be a log file. */
+			win32.ConnectNamedPipe(hNamedPipe);
+			for (;;) {
+				local buf = Bytes(1024);
+				local cnt = win32.ReadFile(hNamedPipe, buf);
+				File.stdout.write(buf.substr(0, cnt));
+			}
+		} @[interrupt] catch (e...) {
+			print "NamedPipe relay thread exited";
+			proc.terminate();
+			ipc.Process.current.terminate(1);
+		}
+	}, (proc, hNamedPipe, groups, config)).start();
+}
+
+
+
+function start(
+		groups: {Group...},
+		config: Config,
+		BINPATH: string,
+		KERNEL: string,
+		DRIVERS: {(string, string)...},
+		TARGET_ARCH: string,
+		TARGET: Module,
+		DISK_FILENAME: string,
+		options: {string: Object},
+		magic: Module) {
+	if (DRIVERS)
+		throw Error("Bochs doesn't support booting KOS with additional drivers");
+	if (options.get(opt.CMDLINE))
+		throw Error("Bochs doesn't support a kernel commandline");
+	BOCHSEXE_VBOXMANAGE   = options.get(opt.EXE);
+	BOCHSEXE_VIRTUALBOXVM = options.get("vbox.VirtualBoxVM");
+	if (BOCHSEXE_VBOXMANAGE is none) {
+		BOCHSEXE_VBOXMANAGE = common.findExecutableInPaths(
+			enumerateVirtualBoxInstallLocations(), "VBoxManage");
+		if (BOCHSEXE_VBOXMANAGE is none)
+			throw Error("Failed to locate `VBoxManage`");
+	}
+	if (BOCHSEXE_VIRTUALBOXVM is none) {
+		local ext = fs.extof(BOCHSEXE_VBOXMANAGE);
+		if (ext)
+			ext = "." + ext;
+		BOCHSEXE_VIRTUALBOXVM = fs.joinpath(
+			fs.headof(BOCHSEXE_VBOXMANAGE),
+			"VirtualBoxVM" + ext);
+		if (!fs.stat.exists(BOCHSEXE_VIRTUALBOXVM)) {
+			print "[vbox] `VirtualBoxVM` not found in expected location", repr BOCHSEXE_VIRTUALBOXVM;
+			BOCHSEXE_VIRTUALBOXVM = common.findExecutableInPaths(
+				enumerateVirtualBoxInstallLocations(), "VirtualBoxVM");
+		}
+	}
+	KERNEL = fs.abspath(KERNEL);
+	DISK_FILENAME = fs.abspath(DISK_FILENAME);
+	local kernelShadowFilename = shadow.updateKernelShadow(KERNEL, TARGET_ARCH);
+	local kernelVmdkFilename = createVmdkDescriptor(kernelShadowFilename);
+	local diskVmdkFilename   = createVmdkDescriptor(DISK_FILENAME);
+	local vmName = magic.TARGET_NAME; /* e.g. i386-kos-nOD */
+	local vmVboxPath = fs.abspath(BINPATH) + "/.vbox";
+	local vmVboxConfigFilename = fs.joinpath(vmVboxPath, vmName, vmName + ".vbox");
+	try {
+		fs.unlink(vmVboxConfigFilename + ".prev");
+	} catch (...) {
+	}
+	local vmVboxConfig = try File.open(vmVboxConfigFilename, "r+") catch (...) none;
+	if (vmVboxConfig is none) {
+		/* Make sure that the VM doesn't already exist! */
+		local vmNameRepr = repr(vmName).encode("utf-8");
+		print "[vbox] (re-)configure VM:", repr(vmName);
+		for (local line: runVBoxManageCommandAndCaptureOutput({ "list", "vms" })) {
+			if (line.startswith(vmNameRepr)) {
+				try {
+					print "[vbox] Deleting existing VM:", repr(vmName);
+					runVBoxManageCommand({
+						"unregistervm",
+						vmName,
+						"--delete"
+					});
+				} catch (...) {
+				}
+				break;
+			}
+		}
+		/* Register a new VM */
+		print "[vbox] Creating new VM:", repr(vmName);
+		runVBoxManageCommand({
+			"createvm",
+			"--name", vmName,
+			"--ostype", "Other",
+			"--register",
+			"--basefolder", vmVboxPath,
+		});
+		vmVboxConfig = File.open(vmVboxConfigFilename, "r+");
+	}
+	with (vmVboxConfig) {
+		File.Writer keepPrefix;
+		for (local l: vmVboxConfig) {
+			keepPrefix << l;
+			if ("<Machine" in l)
+				break;
+		}
+		print "[vbox] Configuring VM:", repr(vmName);
+		local DISKUUID_KERNEL = getUUIDOfVmdkDescriptor(kernelVmdkFilename);
+		local DISKUUID_DISK   = getUUIDOfVmdkDescriptor(diskVmdkFilename);
+		vmVboxConfig.rewind();
+		vmVboxConfig.write(keepPrefix.string);
+		vmVboxConfig << "<MediaRegistry><HardDisks>\n";
+		vmVboxConfig << "	<HardDisk uuid=\"" << DISKUUID_KERNEL << "\" location="
+			<< repr(kernelVmdkFilename) << " format=\"VMDK\" type=\"Normal\"/>\n";
+		vmVboxConfig << "	<HardDisk uuid=\"" << DISKUUID_DISK << "\" location="
+			<< repr(diskVmdkFilename) << " format=\"VMDK\" type=\"Normal\"/>\n";
+		vmVboxConfig << "</HardDisks></MediaRegistry>\n";
+		vmVboxConfig << "<Hardware>\n";
+		vmVboxConfig << "	<CPU count=\"1\">\n"; /* XXX: Make this configurable */
+		vmVboxConfig << "		<PAE enabled=\"true\"/>\n";
+		vmVboxConfig << "		<LongMode enabled=\"" << (TARGET_ARCH == "x86_64" ? "true" : "false") << "\"/>\n";
+		vmVboxConfig << "		<HardwareVirtExLargePages enabled=\"true\"/>\n";
+		vmVboxConfig << "		<TripleFaultReset enabled=\"false\"/>\n";
+		vmVboxConfig << "		<CpuIdTree>\n";
+		                 			/* BRAND_STRING = "VBox" */
+		vmVboxConfig << "			<CpuIdLeaf id=\"2147483650\" eax=\"2020557398\" ebx=\"0\" ecx=\"0\" edx=\"0\"/>\n";
+		vmVboxConfig << "			<CpuIdLeaf id=\"2147483651\" eax=\"0\" ebx=\"0\" ecx=\"0\" edx=\"0\"/>\n";
+		vmVboxConfig << "			<CpuIdLeaf id=\"2147483652\" eax=\"0\" ebx=\"0\" ecx=\"0\" edx=\"0\"/>\n";
+		vmVboxConfig << "		</CpuIdTree>\n";
+		vmVboxConfig << "	</CPU>\n";
+		vmVboxConfig << "	<Memory RAMSize=\"128\"/>\n";
+		vmVboxConfig << "	<Firmware type=\"BIOS\"/>\n";
+		vmVboxConfig << "	<Boot>\n";
+		vmVboxConfig << "		<Order position=\"1\" device=\"HardDisk\"/>\n";
+		vmVboxConfig << "		<Order position=\"2\" device=\"None\"/>\n";
+		vmVboxConfig << "		<Order position=\"3\" device=\"None\"/>\n";
+		vmVboxConfig << "		<Order position=\"4\" device=\"None\"/>\n";
+		vmVboxConfig << "	</Boot>\n";
+		vmVboxConfig << "	<Display controller=\"VBOXVGA\"/>\n";
+		vmVboxConfig << "	<HPET enabled=\"false\"/>\n";
+		vmVboxConfig << "	<BIOS>\n";
+		vmVboxConfig << "		<ACPI enabled=\"false\"/>\n";
+		vmVboxConfig << "		<IOAPIC enabled=\"false\"/>\n";
+		vmVboxConfig << "		<Logo fadeIn=\"false\" fadeOut=\"false\" displayTime=\"0\"/>\n";
+		vmVboxConfig << "		<BootMenu mode=\"Disabled\"/>\n";
+		vmVboxConfig << "	</BIOS>\n";
+		vmVboxConfig << "</Hardware>\n";
+		vmVboxConfig << "<StorageControllers>\n";
+		vmVboxConfig << "<StorageController name=\"IDE Controller\" type=\"PIIX4\" PortCount=\"2\" useHostIOCache=\"true\" Bootable=\"true\">\n";
+		vmVboxConfig << "	<AttachedDevice type=\"HardDisk\" hotpluggable=\"false\" port=\"0\" device=\"0\">\n";
+		vmVboxConfig << "		<Image uuid=\"" << DISKUUID_KERNEL << "\"/>\n";
+		vmVboxConfig << "	</AttachedDevice>\n";
+		vmVboxConfig << "	<AttachedDevice type=\"HardDisk\" hotpluggable=\"false\" port=\"1\" device=\"0\">\n";
+		vmVboxConfig << "		<Image uuid=\"" << DISKUUID_DISK << "\"/>\n";
+		vmVboxConfig << "	</AttachedDevice>\n";
+		vmVboxConfig << "</StorageController>\n";
+		vmVboxConfig << "</StorageControllers>\n";
+		vmVboxConfig.write("</Machine>\n</VirtualBox>\n");
+		vmVboxConfig.trunc();
+	}
+	local pipeName = r"\\.\pipe\" + vmName;
+	fs.environ["VBOX_GUI_DBG_ENABLED"] = "true";
+	fs.environ["VBOX_RELEASE_LOG_DEST"] = "nofile file=" + pipeName;
+	/* This options prevents excessive writes to port:0x504 from causing a mute. */
+	fs.environ["VBOX_RELEASE_LOG"] = "-dev_vmm_backdoor.restrict";
+
+	/* Directly invoke VirtualBox so that we have terminate() powers over it,
+	 * and can immediatly shut down emulation when the user presses CTRL+C
+	 * from within our console. */
+//	runVBoxManageCommand({ "startvm", vmName });
+	local proc = ipc.Process(BOCHSEXE_VIRTUALBOXVM, [
+		"--comment", vmName,
+		"--startvm", vmName,
+		"--no-startvm-errormsgbox"
+	]);
+	/* Use a named pipe to relay log output such that we can process it. */
+	createNamePipeAndStartLogProcessingThread(proc, pipeName, groups, config);
+	/* Wait for the processing thread to starting accepting connections.
+	 * Once this has happened, anyone can CreateFile() to open the pipe,
+	 * at which point we'll be receiving anything that gets written to
+	 * said file! */
+	win32.WaitNamedPipe(pipeName);
+	proc.start();
+	try {
+		local error = proc.join();
+		if (error != 0)
+			throw Error("VirtualBox returned with " + error);
+	} @[interrupt] catch (...) {
+		try {
+			proc.terminate();
+		} catch (e...) {
+			print "Failed to terminate VirtualBox:";
+			print e;
+		}
+		throw;
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

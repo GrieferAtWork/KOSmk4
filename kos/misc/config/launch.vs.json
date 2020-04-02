@@ -211,7 +211,7 @@
 		},
 		{
 			"type": "cppdbg",
-			"name": "kernel (--gdb=qemu)",
+			"name": "kernel (--gdb=emulator)",
 			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
 			"project": "src",
 			"sourceFileMap": {
@@ -267,7 +267,7 @@
 			 *    >> "D:\FULL\PATH\TO\PROGRAM\PROGRAM.exe" %*
 			 */
 			"debugServerPath": "${env.SYSTEMROOT}\\system32\\cmd.exe",
-			"debugServerArgs": "/c \"deemon ABSOLUTE_KOS_NT_PROJECT_ROOT\\magic.dee --run-only --gdb=qemu --emulator-started-pattern=EMULATOR_STARTED --target=${env.TARGET} --config=${env.CONFIG}\"",
+			"debugServerArgs": "/c \"deemon ABSOLUTE_KOS_NT_PROJECT_ROOT\\magic.dee --run-only --gdb=emulator --emulator-started-pattern=EMULATOR_STARTED --target=${env.TARGET} --config=${env.CONFIG}\"",
 			"serverStarted": "EMULATOR_STARTED",
 			"serverLaunchTimeout": 120000,
 			"filterStdout": true,
@@ -275,7 +275,7 @@
 		},
 		{
 			"type": "cppdbg",
-			"name": "kernel (--gdb=qemu) (external)",
+			"name": "kernel (--gdb=emulator) (external)",
 			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
 			"project": "src",
 			"sourceFileMap": {

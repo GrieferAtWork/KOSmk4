@@ -23,7 +23,7 @@ In general, KOS isn't designed to re-invent the wheel (no square wheels here), b
 	- [`deemon magic.dee`](#magic)
 - [Programming KOS with an IDE](#programming)
 - [Notes on building KOS](#building-notes)
-- [Building & using Bochs to run KOS](#bochs)
+- [Using various emulators to run KOS](#emulators)
 - [Automatic System Headers](#headers)
 - [GPL Licensing](#gpl)
 - [Older KOS Revisions](#old-kos)
@@ -518,14 +518,14 @@ To help you understand how this script works to do what it does, here is a docum
 - `-n=N`, `--compilers=N` (Defaults to `-n=<number-of-cores-on-your-machine>`)
 	- Set the max number of parallel processes to run during building to `N`
 - `--emulator=NAME` (Defaults to `--emulator=qemu`)
-	- Select which emulator to use, where `NAME` must be one of `qemu`, `bochs`
+	- Select which emulator to use, where `NAME` must be one of `qemu`, `bochs` or `vbox`
 - `--changed=FILENAME`
 	- Force the build system to act as though the file referred to by `FILENAME` has changed
 	- The given `FILE` is interpreted relative to the PWD set when `magic.dee` got invoked
 - `--gdb=MODE` (Defaults to not-given)
 	- Enable GDB debugging support, where `MODE` must be one of
 		- `server`: Use the builtin GDB server driver
-		- `qemu`: Use QEMU's builtin GDB stub
+		- `emulator`: Use the emulators's builtin GDB stub (not supported by all emulators)
 	- Note that the GDB server/stub is always created as a server socket `tcp:localhost:1234` on your machine
 - `--emulator-started-pattern=TEXT`
 	- Print the given `TEXT` to `stdout` when the emulator is started (needed for syncing with Visual Studio)
@@ -605,7 +605,7 @@ So here are your options:
 - To debug the kernel, you must start it with one of the following 2 commandlines (both of which will run a GDB stub/server on `tcp:localhost:1234`, and have qemu wait until something connects to it):
 	- `deemon magic.dee --run-only --gdb=server --target=i386 --config=OD` 
 	This one uses my own personal gdb server that gets loaded into the kernel as a driver. It offers out-of-the-box support for enumerating libraries, drivers, and running threads/processes (offering both `multiprocess+` and `QNonStop:1` functionality)
-	- `deemon magic.dee --run-only --gdb=qemu --target=i386 --config=OD` 
+	- `deemon magic.dee --run-only --gdb=emulator --target=i386 --config=OD` 
 	This one uses qemu's built-in gdb stub, which offers less functionality since it won't know how to enumerate threads created by the KOS scheduler, or list all of the libraries/drivers loaded into the kernel, meaning that tracebacks will only include source locations from the kernel core.
 	This option is mainly meant for debugging things that happen before the GDB driver is loaded, or things that break the GDB stub driver itself (It's home-made and hacked together based on knowledge leared from observation, qemu's implementation, gdbserver, and bits and pieces of documentation from across the internet)
 - To connect to the stub/server, you can do one of the following:
@@ -644,16 +644,25 @@ For more information about the header substitution system, and how it makes it p
 
 
 
-<a name="bochs"></a>
-## Building & using Bochs to run KOS
+<a name="emulators"></a>
+## Using various emulators to run KOS
 
-Download and install [bochs 2.6.9](https://sourceforge.net/projects/bochs/files/latest/download) and use the following command to launch KOS
+KOS supports emulated execution via one of the following emulators
 
-```sh
-deemon magic.dee --emulator=bochs --target=i386 --config=nOD
-```
-
-Note that if you chose to install bochs in a non-standard location, then you will have to add your install location to the list of paths enumerated by `enumerateBochsInstallationLocations()` in `$PROJPATH/kos/misc/magicemulator/bochs.dee`
+- QEMU (default)
+	- Start this emulated with:
+		- `deemon magic.dee`
+		- `deemon magic.dee --emulator=qemu`
+	- This is the only emulator that supports the use of a kernel commandline, as well as boot modules
+	- Install locations searched for the qemu executable are enumerated by `enumerateQEmuInstallationLocations()` in `$PROJPATH/kos/misc/magicemulator/qemu.dee` (by default this list contains `$PATH`)
+- Bochs
+	- Start this emulated with:
+		- `deemon magic.dee --emulator=bochs`
+	- Install locations searched for the bochs executable are enumerated by `enumerateBochsInstallationLocations()` in `$PROJPATH/kos/misc/magicemulator/bochs.dee` (by default this list contains `$PATH`)
+- VirtualBox
+	- Start this emulated with:
+		- `deemon magic.dee --emulator=vbox`
+	- Install locations searched for the qemu executable are enumerated by `enumerateVirtualBoxInstallLocations()` in `$PROJPATH/kos/misc/magicemulator/vbox.dee` (by default this list contains `$PATH`)
 
 
 

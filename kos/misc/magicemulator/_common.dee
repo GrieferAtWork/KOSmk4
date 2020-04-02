@@ -33,6 +33,65 @@ import fs;
 import ipc;
 import net;
 
+@@Search for an executable @name in @path, returning
+@@its absolute path if found, or @none other.
+function findExecutableInPath(path: string, name: string): string | none {
+	local filename = fs.joinpath(path, name);
+	if (fs.stat.exists(filename))
+		return filename;
+#ifdef __WINDOWS__
+	{
+		local exeFilename = filename + ".exe";
+		if (fs.stat.exists(exeFilename))
+			return exeFilename;
+	}
+	/* Resolve batch-file forwarders:
+	 * >> @echo off
+	 * >> "D:\Path\To\Executable.exe" %*
+	 */
+	for (local ext: [".cmd", ".bat"]) {
+		local fullFilename = filename + ext;
+		local fp = try File.open(fullFilename, "r") catch (...) none;
+		if (fp is none)
+			continue;
+		local res = none;
+		with (fp) {
+			for (local l: fp) {
+				l = l.strip().lstrip("@").lstrip();
+				if (l.startswith("echo"))
+					continue;
+				if (l.endswith("%*")) {
+					if (res !is none)
+						res = false;
+					else {
+						l = l[:-2].rstrip();
+						if (l.startswith("\"") && l.endswith("\""))
+							l = l[1:-1];
+						res = l.decode("utf-8");
+					}
+					continue;
+				}
+				return none;
+			}
+		}
+		if (res is string)
+			return res;
+	}
+#endif /* __WINDOWS__ */
+	return none;
+}
+
+@@Same as @findExecutableInPath(), but search multiple @paths
+function findExecutableInPaths(paths: {string...}, name: string): string | none {
+	for (local path: paths) {
+		local r = findExecutableInPath(path, name);
+		if (r !is none)
+			return r;
+	}
+	return none;
+}
+
+
 function normalizeFilenameForLog(filename: string | Bytes): string {
 	if (filename !is string)
 		filename = filename.decode("utf-8");

@@ -220,6 +220,9 @@ PRIVATE(.Ldone_a20)
 	xorw   %ax, %ax
 	movw   %ax, %ds
 
+	cli
+	lgdtl  %cs:S(boot0_gdt_ptr)
+
 	EXTERN(__kernel_sector_count)
 	movw   $(__kernel_sector_count), %cx
 	movl   $(0x00100000), %edi /* DESTPTR */
@@ -329,7 +332,6 @@ END(bios_puthex)
 
 PRIVATE_FUNCTION(pmode_enter)
 	cli
-	lgdtl  %cs:S(boot0_gdt_ptr)
 	movl   %cr0, %eax
 	orw    $(CR0_PE), %ax
 	movl   %eax, %cr0

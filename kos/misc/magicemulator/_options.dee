@@ -21,22 +21,17 @@
 
 /* Emulator configuration options. */
 
-@@The used QEMU executable
-final global QEMU_EXE = "qemu.exe"; /* string = <AUTO> */
+@@The used emulator executable
+final global EXE = "exe"; /* string = <AUTO> */
+
 @@qemu -s -S
-final global QEMU_GDB = "qemu.gdb"; /* string = "stub"|"qemu" */
+final global GDB = "gdb"; /* string = "emulator"|"qemu" */
+
 @@qemu -no-reboot -no-shutdown
-final global QEMU_HOSTED = "qemu.hosted"; /* bool = true */
-@@Kernel command line (passwed with multiboot)
-final global QEMU_CMDLINE = "qemu.cmdline"; /* string = "" */
+final global HOSTED = "hosted"; /* bool = true */
 
-
-
-
-
-
-
-
+@@Kernel command line (passed with multiboot)
+final global CMDLINE = "cmdline"; /* string = "" */
 
 
 

@@ -27,17 +27,11 @@
 import * from deemon;
 import * from ..libmagic.libmagic;
 import flattenElfBinary from ..libmagic.steps.elf;
-import opt = .options;
+import opt = ._options;
 import fs;
 import ipc;
-import net;
-import .common;
-
-final global BOCHS_EXE = "bochs"
-#ifdef __WINDOWS__
-	".exe"
-#endif
-;
+import ._common as common;
+import ._shadow as shadow;
 
 final global BOCHS_BIOS    = "BIOS-bochs-latest";
 final global BOCHS_VGABIOS = "VGABIOS-lgpl-latest";
@@ -69,75 +63,49 @@ function start(
 		TARGET_ARCH: string,
 		TARGET: Module,
 		DISK_FILENAME: string,
-		options: {string: Object}) {
-	local bochs;
-	local bochs_bios;
-	for (local x: enumerateBochsInstallationLocations()) {
-		local fullPath = fs.joinpath(x, BOCHS_EXE);
-		if (fs.stat.isreg(fullPath)) {
-			bochs = fullPath;
-			goto got_exe;
+		options: {string: Object},
+		magic: Module) {
+	if (DRIVERS)
+		throw Error("Bochs doesn't support booting KOS with additional drivers");
+	if (options.get(opt.CMDLINE))
+		throw Error("Bochs doesn't support a kernel commandline");
+	local bochs = options.get(opt.EXE);
+	if (bochs is none) {
+		bochs = common.findExecutableInPaths(
+			enumerateBochsInstallationLocations(), "bochs");
+		if (bochs is none) {
+			print "Failed to locate bochs executable";
+			throw Error("Cannot locate bochs executable");
 		}
 	}
-	print "Failed to locate:", repr BOCHS_EXE;
-	throw Error("Cannot locate bochs binary");
-got_exe:
-	for (local x: enumerateBochsBiosLocations()) {
-		if (fs.stat.isreg(fs.joinpath(x, BOCHS_BIOS)) &&
-		    fs.stat.isreg(fs.joinpath(x, BOCHS_VGABIOS))) {
-			bochs_bios = x;
-			goto got_bios;
+	local bochsBiosFilename    = options.get("bochs.bios");
+	local bochsVGABiosFilename = options.get("bochs.vgabios");
+	if (bochsBiosFilename is none || bochsVGABiosFilename is none) {
+		for (local x: enumerateBochsBiosLocations()) {
+			bochsBiosFilename    = fs.joinpath(x, BOCHS_BIOS);
+			bochsVGABiosFilename = fs.joinpath(x, BOCHS_VGABIOS);
+			if (fs.stat.isreg(bochsBiosFilename) &&
+				fs.stat.isreg(bochsVGABiosFilename))
+				goto got_bios;
 		}
+		print "Failed to locate bochs BIOS/VGA-VIOS";
+		throw Error("Cannot locate bochs BIOS/VGA-VIOS");
 	}
-	print "Failed to locate:", repr BOCHS_EXE;
-	throw Error("Cannot locate bochs binary");
 got_bios:
 	local bochs_arguments = [];
-	local kernelFlatFilename = fs.joinpath(
-		fs.headof(KERNEL),
-		"." + fs.fileof(KERNEL) + "-flat." + fs.extof(KERNEL));
-	local bxrcFilename = kernelFlatFilename + ".bxrc";
-	local flat_last_modified = getLastModfiedTime(kernelFlatFilename);
-	if (flat_last_modified is none ||
-	    flat_last_modified < getLastModfiedTime(KERNEL)) {
-		print "[bochs] Updating kernel shadow", repr kernelFlatFilename;
-		flattenElfBinary(
-			inputFile: KERNEL,
-			outputFile: kernelFlatFilename,
-			physBase: 0x00100000, /* 1MiB */
-			virtBase: {
-				"i386"   : 0xc0100000, /* 3GiB + 1MiB */
-				"x86_64" : 0xffffffff80100000, /* -2GiB + 1MiB */
-			}[TARGET_ARCH],
-			keepBss: true,
-			overrideEntry: false);
-		/* In order to be accepted by BOCHS, the size of kernelFlatFilename
-		 * must be divisable by `0x7e000' (== 16heads * 63sectors_per_track * 512bytes)
-		 * Otherwise, the bootloader won't be able to read the entire kernel image! */
-		try {
-			with (local fp = File.open(kernelFlatFilename, "rb+,nobuf")) {
-				local isSize = fp.size();
-				local reqSize = ((isSize + (0x7e000 - 1)) / 0x7e000) * 0x7e000;
-				assert reqSize >= isSize;
-				if (reqSize > isSize) {
-					fp.seek(reqSize - 1);
-					fp.write("\0");
-				}
-			}
-		} @[interrupt] catch (...) {
-			try fs.unlink(kernelFlatFilename); catch (...);
-			throw;
-		}
-	}
+	local kernelShadowFilename = shadow.updateKernelShadow(KERNEL, TARGET_ARCH);
+	local bxrcFilename = "{}{}.bxrc".format({
+		fs.headof(kernelShadowFilename),
+		fs.fileof(kernelShadowFilename) });
 	try fs.unlink(DISK_FILENAME + ".lock"); catch (...);
-	try fs.unlink(kernelFlatFilename + ".lock"); catch (...);
+	try fs.unlink(kernelShadowFilename + ".lock"); catch (...);
 	with (local rc = File.open(bxrcFilename, "w")) {
-		rc << "romimage: file=" << repr(fs.joinpath(bochs_bios, BOCHS_BIOS)) << "\n";
-		rc << "vgaromimage: file=" << repr(fs.joinpath(bochs_bios, BOCHS_VGABIOS)) << "\n";
+		rc << "romimage: file=" << repr(bochsBiosFilename) << "\n";
+		rc << "vgaromimage: file=" << repr(bochsVGABiosFilename) << "\n";
 		rc << "boot: disk\n";
-		rc << "ata0-master: type=disk, path=" << repr(fs.tailof(kernelFlatFilename))
+		rc << "ata0-master: type=disk, path=" << repr(fs.tailof(kernelShadowFilename))
 			<< ", mode=flat, cylinders=0, heads=16, spt=63, model=\"Generic 1234\", biosdetect=auto, translation=auto\n";
-		rc << "ata1-master: type=disk, path=" << repr(fs.relpath(DISK_FILENAME, fs.headof(kernelFlatFilename)))
+		rc << "ata1-master: type=disk, path=" << repr(fs.relpath(DISK_FILENAME, fs.headof(kernelShadowFilename)))
 			<< ", mode=flat, cylinders=0, heads=0, spt=0, model=\"Generic 1234\", biosdetect=auto, translation=auto\n";
 		rc << "cpuid: level=6, stepping=3, model=3, family=6, vendor_string=\"GenuineIntel\", brand_string=\"BOCHS         Intel(R) Pentium(R) 4 CPU        \"\n";
 		rc << "cpu: count=1, ips=4000000, model=bx_generic, reset_on_triple_fault=0, cpuid_limit_winnt=0, ignore_bad_msrs=1, mwait_is_nop=0\n";
@@ -150,7 +118,7 @@ got_bios:
 		rc << "port_e9_hack: enabled=1\n";
 		rc << "clock: sync=none\n";
 //		rc << "debug: action=report\n";
-		local gdb_mode = options.get(opt.QEMU_GDB);
+		local gdb_mode = options.get(opt.GDB);
 		if (gdb_mode !is none) {
 			if (gdb_mode == "qemu")
 				rc << "gdbstub: enabled=1, port=1234, text_base=0, data_base=0, bss_base=0\n";
@@ -159,7 +127,7 @@ got_bios:
 			}
 		}
 
-//		rc << "load32bitOSImage: os=nullkernel, path=" << repr(kernelFlatFilename) << ", iolog=, initrd=\n";
+//		rc << "load32bitOSImage: os=nullkernel, path=" << repr(kernelShadowFilename) << ", iolog=, initrd=\n";
 //		rc << "plugin_ctrl: unmapped=1, biosdev=1, speaker=1, extfpuirq=1, parallel=1, serial=1, gameport=1\n";
 //		rc << "config_interface: win32config\n";
 //		rc << "display_library: win32, options=\"gui_debug\"\n";
@@ -204,7 +172,7 @@ got_bios:
 	proc.stdout = w;
 	proc.stderr = w;
 	local ocwd = fs.getcwd();
-	fs.chdir(fs.headof(kernelFlatFilename));
+	fs.chdir(fs.headof(kernelShadowFilename));
 	proc.start();
 	fs.chdir(ocwd);
 	try {
@@ -219,30 +187,6 @@ got_bios:
 		throw;
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

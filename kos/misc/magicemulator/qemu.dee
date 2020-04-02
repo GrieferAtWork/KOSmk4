@@ -26,11 +26,11 @@
 
 import * from deemon;
 import * from ..libmagic.libmagic;
-import opt = .options;
+import opt = ._options;
 import fs;
 import ipc;
 import net;
-import .common;
+import ._common as common;
 
 function enumerateQEmuInstallationLocations(): {string...} {
 #ifdef __WINDOWS__
@@ -93,8 +93,9 @@ function start(
 		TARGET_ARCH: string,
 		TARGET: Module,
 		DISK_FILENAME: string,
-		options: {string: Object}) {
-	local qemu = options.get(opt.QEMU_EXE)
+		options: {string: Object},
+		magic: Module) {
+	local qemu = options.get(opt.EXE)
 #ifdef __WINDOWS__
 		.replace("\\","/")
 #endif
@@ -120,9 +121,9 @@ function start(
 got_exe:
 	local qemu_arguments = [];
 	qemu_arguments.extend({ "-serial", "stdio" });
-	if (options.get(opt.QEMU_HOSTED, true))
+	if (options.get(opt.HOSTED, true))
 		qemu_arguments.extend({ "-no-reboot", "-no-shutdown" });
-	local gdb_mode = options.get(opt.QEMU_GDB);
+	local gdb_mode = options.get(opt.GDB);
 	local boot_drivers = List(DRIVERS);
 	if (gdb_mode !is none) {
 		if (gdb_mode == "server") {
@@ -132,7 +133,7 @@ got_exe:
 				"transport=serial:0x2f8:0xf3"
 			));
 			qemu_arguments.extend({ "-serial", "tcp::1234,server" });
-		} else if (gdb_mode == "qemu") {
+		} else if (gdb_mode == "emulator") {
 			/* Use qemu's builtin GDB support */
 			/* Make use of out GDB-stub driver */
 			qemu_arguments.extend({ "-s", "-S" });
@@ -228,7 +229,7 @@ did_update_x86_64_kernel:
 		r, monitorCommandPipe = ipc.Pipe.new()...;
 		enableMonitorCommands = Thread(qemuMonitorBackend, ("localhost:" + port, r));
 	}
-	local cmdline = options.get(opt.QEMU_CMDLINE);
+	local cmdline = options.get(opt.CMDLINE);
 	if (cmdline) {
 		print "QEMU_CMDLINE",repr(cmdline);
 		qemu_arguments.append("-append");
