@@ -200,7 +200,6 @@ for (local l: File.stdin) {
 			local r = l.index("/", c);
 			assert r <= commonRmOffset;
 			l = l[:c] + (" " * (commonRmOffset - r)) + l[c:];
-
 			currentGroup[i] = l;
 		}
 		local commonCommentPrefix = (

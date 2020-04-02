@@ -1255,28 +1255,34 @@ do_print_moffs:
 					break;
 
 				case OPC_RXMM:
+do_OPC_RXMM:
 					da_print_xmmreg(self, rm.mi_reg);
 					break;
 
 				case OPC_RYMM:
+do_OPC_RYMM:
 					da_print_ymmreg(self, rm.mi_reg);
 					break;
 
 				case OPC_RZMM:
+do_OPC_RZMM:
 					da_print_zmmreg(self, rm.mi_reg);
 					break;
 
 				case OPC_RXMM_MASK:
+do_OPC_RXMM_MASK:
 					da_print_xmmreg(self, rm.mi_reg);
 					da_print_Xmmmask(self, op_flags);
 					break;
 
 				case OPC_RYMM_MASK:
+do_OPC_RYMM_MASK:
 					da_print_ymmreg(self, rm.mi_reg);
 					da_print_Xmmmask(self, op_flags);
 					break;
 
 				case OPC_RZMM_MASK:
+do_OPC_RZMM_MASK:
 					da_print_zmmreg(self, rm.mi_reg);
 					da_print_Xmmmask(self, op_flags);
 					break;
@@ -1299,28 +1305,34 @@ do_print_moffs:
 					break;
 
 				case OPC_RM128_XMM:
+do_OPC_RM128_XMM:
 					da_print_modrm_rm128_xmm(self, &rm, op_flags);
 					break;
 
 				case OPC_RM256_YMM:
+do_OPC_RM256_YMM:
 					da_print_modrm_rm256_ymm(self, &rm, op_flags);
 					break;
 
 				case OPC_RM512_ZMM:
+do_OPC_RM512_ZMM:
 					da_print_modrm_rm512_zmm(self, &rm, op_flags);
 					break;
 
 				case OPC_RM128_XMM_MASK:
+do_OPC_RM128_XMM_MASK:
 					da_print_modrm_rm128_xmm(self, &rm, op_flags);
 					da_print_Xmmmask(self, op_flags);
 					break;
 
 				case OPC_RM256_YMM_MASK:
+do_OPC_RM256_YMM_MASK:
 					da_print_modrm_rm256_ymm(self, &rm, op_flags);
 					da_print_Xmmmask(self, op_flags);
 					break;
 
 				case OPC_RM512_ZMM_MASK:
+do_OPC_RM512_ZMM_MASK:
 					da_print_modrm_rm512_zmm(self, &rm, op_flags);
 					da_print_Xmmmask(self, op_flags);
 					break;
@@ -1330,34 +1342,41 @@ do_print_moffs:
 					break;
 
 				case OPC_VRXMM:
+do_OPC_VRXMM:
 					da_print_xmmreg(self, VEX_VVVVV());
 					break;
 
 				case OPC_VRYMM:
+do_OPC_VRYMM:
 					da_print_ymmreg(self, VEX_VVVVV());
 					break;
 
 				case OPC_VRZMM:
+do_OPC_VRZMM:
 					da_print_zmmreg(self, VEX_VVVVV());
 					break;
 
 				case OPC_VRXMM_MASK:
+do_OPC_VRXMM_MASK:
 					da_print_xmmreg(self, VEX_VVVVV());
 					da_print_Xmmmask(self, op_flags);
 					break;
 
 				case OPC_VRYMM_MASK:
+do_OPC_VRYMM_MASK:
 					da_print_ymmreg(self, VEX_VVVVV());
 					da_print_Xmmmask(self, op_flags);
 					break;
 
 				case OPC_VRZMM_MASK:
+do_OPC_VRZMM_MASK:
 					da_print_zmmreg(self, VEX_VVVVV());
 					da_print_Xmmmask(self, op_flags);
 					break;
 
 				case OPC_IMM8_XMM: {
 					u8 byte;
+do_OPC_IMM8_XMM:
 					byte = *(u8 *)self->d_pc;
 					self->d_pc += 1;
 					da_print_xmmreg(self, (byte & 0xf0) >> 4);
@@ -1365,12 +1384,22 @@ do_print_moffs:
 
 				case OPC_IMM8_YMM: {
 					u8 byte;
+do_OPC_IMM8_YMM:
 					byte = *(u8 *)self->d_pc;
 					self->d_pc += 1;
 					da_print_ymmreg(self, (byte & 0xf0) >> 4);
 				}	break;
 
+				case OPC_IMM8_ZMM: {
+					u8 byte;
+do_OPC_IMM8_ZMM:
+					byte = *(u8 *)self->d_pc;
+					self->d_pc += 1;
+					da_print_zmmreg(self, (byte & 0xf0) >> 4);
+				}	break;
+
 				case OPC_RM128_XMM__OPC_VRXMM__OPC_RXMM_MASK:
+do_OPC_RM128_XMM__OPC_VRXMM__OPC_RXMM_MASK:
 					/* OPC_RM128_XMM OPC_VRXMM OPC_RXMM_MASK */
 					da_print_modrm_rm128_xmm(self, &rm, op_flags);
 					disasm_print(self, ", ", 2);
@@ -1381,6 +1410,7 @@ do_print_moffs:
 					break;
 
 				case OPC_RM256_YMM__OPC_VRYMM__OPC_RYMM_MASK:
+do_OPC_RM256_YMM__OPC_VRYMM__OPC_RYMM_MASK:
 					/* OPC_RM256_YMM OPC_VRYMM OPC_RYMM_MASK */
 					da_print_modrm_rm256_ymm(self, &rm, op_flags);
 					disasm_print(self, ", ", 2);
@@ -1391,6 +1421,7 @@ do_print_moffs:
 					break;
 
 				case OPC_RM512_ZMM__OPC_VRZMM__OPC_RZMM_MASK:
+do_OPC_RM512_ZMM__OPC_VRZMM__OPC_RZMM_MASK:
 					/* OPC_RM512_ZMM OPC_VRZMM OPC_RZMM_MASK */
 					da_print_modrm_rm512_zmm(self, &rm, op_flags);
 					disasm_print(self, ", ", 2);
@@ -1399,6 +1430,62 @@ do_print_moffs:
 					da_print_zmmreg(self, rm.mi_reg);
 					da_print_Xmmmask(self, op_flags);
 					break;
+
+				case OPC_RMn_xMM__OPC_VRxMM__OPC_RxMM_MASK:
+					if ((op_flags & EMU86_F_VEX_LL_M) == 0 << EMU86_F_VEX_LL_S)
+						goto do_OPC_RM128_XMM__OPC_VRXMM__OPC_RXMM_MASK;
+					if ((op_flags & EMU86_F_VEX_LL_M) == 1 << EMU86_F_VEX_LL_S)
+						goto do_OPC_RM256_YMM__OPC_VRYMM__OPC_RYMM_MASK;
+					goto do_OPC_RM512_ZMM__OPC_VRZMM__OPC_RZMM_MASK;
+
+				case OPC_VRxMM_MASK:
+					if ((op_flags & EMU86_F_VEX_LL_M) == 0 << EMU86_F_VEX_LL_S)
+						goto do_OPC_VRXMM_MASK;
+					if ((op_flags & EMU86_F_VEX_LL_M) == 1 << EMU86_F_VEX_LL_S)
+						goto do_OPC_VRYMM_MASK;
+					goto do_OPC_VRZMM_MASK;
+
+				case OPC_RxMM:
+					if ((op_flags & EMU86_F_VEX_LL_M) == 0 << EMU86_F_VEX_LL_S)
+						goto do_OPC_RXMM;
+					if ((op_flags & EMU86_F_VEX_LL_M) == 1 << EMU86_F_VEX_LL_S)
+						goto do_OPC_RYMM;
+					goto do_OPC_RZMM;
+
+				case OPC_RxMM_MASK:
+					if ((op_flags & EMU86_F_VEX_LL_M) == 0 << EMU86_F_VEX_LL_S)
+						goto do_OPC_RXMM_MASK;
+					if ((op_flags & EMU86_F_VEX_LL_M) == 1 << EMU86_F_VEX_LL_S)
+						goto do_OPC_RYMM_MASK;
+					goto do_OPC_RZMM_MASK;
+
+				case OPC_RMn_xMM_MASK:
+					if ((op_flags & EMU86_F_VEX_LL_M) == 0 << EMU86_F_VEX_LL_S)
+						goto do_OPC_RM128_XMM_MASK;
+					if ((op_flags & EMU86_F_VEX_LL_M) == 1 << EMU86_F_VEX_LL_S)
+						goto do_OPC_RM256_YMM_MASK;
+					goto do_OPC_RM512_ZMM_MASK;
+
+				case OPC_RMn_xMM:
+					if ((op_flags & EMU86_F_VEX_LL_M) == 0 << EMU86_F_VEX_LL_S)
+						goto do_OPC_RM128_XMM;
+					if ((op_flags & EMU86_F_VEX_LL_M) == 1 << EMU86_F_VEX_LL_S)
+						goto do_OPC_RM256_YMM;
+					goto do_OPC_RM512_ZMM;
+
+				case OPC_VRxMM:
+					if ((op_flags & EMU86_F_VEX_LL_M) == 0 << EMU86_F_VEX_LL_S)
+						goto do_OPC_VRXMM;
+					if ((op_flags & EMU86_F_VEX_LL_M) == 1 << EMU86_F_VEX_LL_S)
+						goto do_OPC_VRYMM;
+					goto do_OPC_VRZMM;
+
+				case OPC_IMM8_xMM:
+					if ((op_flags & EMU86_F_VEX_LL_M) == 0 << EMU86_F_VEX_LL_S)
+						goto do_OPC_IMM8_XMM;
+					if ((op_flags & EMU86_F_VEX_LL_M) == 1 << EMU86_F_VEX_LL_S)
+						goto do_OPC_IMM8_YMM;
+					goto do_OPC_IMM8_ZMM;
 
 				case OPC_ER: {
 					PRIVATE char const rounding_modes[4] = { 'n', 'd', 'u', 'z' };
