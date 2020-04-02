@@ -1665,37 +1665,6 @@ DEFINE_SYSCALL2(errno_t, chmod, USER CHECKED char const *, filename, mode_t, mod
 /* fchownat(), fchown(), lchown(), chown()                              */
 /* fchownat32(), fchown32(), lchown32(), chown32()                      */
 /************************************************************************/
-#ifdef __ARCH_WANT_SYSCALL_FCHOWNAT
-DEFINE_SYSCALL5(errno_t, fchownat, fd_t, dirfd,
-                USER UNCHECKED char const *, filename,
-                __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT2_fchownat), owner,
-                __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT3_fchownat), group,
-                atflag_t, flags) {
-	struct fs *f = THIS_FS;
-	REF struct inode *node;
-	validate_readable(filename, 1);
-	VALIDATE_FLAGSET(flags,
-	                 AT_SYMLINK_NOFOLLOW | AT_DOSPATH,
-	                 E_INVALID_ARGUMENT_CONTEXT_FCHOWNAT_FLAGS);
-	node = path_traversefull_at(f,
-	                            (unsigned int)dirfd,
-	                            filename,
-	                            !(flags & AT_SYMLINK_NOFOLLOW),
-	                            fs_getmode_for(f, flags),
-	                            NULL,
-	                            NULL,
-	                            NULL,
-	                            NULL);
-	{
-		FINALLY_DECREF_UNLIKELY(node);
-		inode_chown(node,
-		            (uid_t)owner,
-		            (gid_t)group);
-	}
-	return -EOK;
-}
-#endif /* __ARCH_WANT_SYSCALL_FCHOWNAT */
-
 #ifdef __ARCH_WANT_SYSCALL_FCHOWNAT32
 DEFINE_SYSCALL5(errno_t, fchownat32, fd_t, dirfd,
                 USER UNCHECKED char const *, filename,
@@ -1727,12 +1696,33 @@ DEFINE_SYSCALL5(errno_t, fchownat32, fd_t, dirfd,
 }
 #endif /* __ARCH_WANT_SYSCALL_FCHOWNAT32 */
 
-#ifdef __ARCH_WANT_SYSCALL_FCHOWN
-DEFINE_SYSCALL3(errno_t, fchown, fd_t, fd,
-                __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT1_fchown), owner,
-                __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT2_fchown), group) {
+#ifdef __ARCH_WANT_SYSCALL_FCHOWNAT
+DEFINE_SYSCALL5(errno_t, fchownat, fd_t, dirfd,
+                USER UNCHECKED char const *, filename,
+                __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT2_fchownat), owner,
+                __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT3_fchownat), group,
+                atflag_t, flags) {
+#ifdef __ARCH_WANT_SYSCALL_FCHOWNAT32
+	return sys_fchownat32(dirfd, filename,
+	                      (__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT1_fchown32))owner,
+	                      (__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT1_fchown32))group,
+	                      flags);
+#else /* __ARCH_WANT_SYSCALL_FCHOWNAT32 */
+	struct fs *f = THIS_FS;
 	REF struct inode *node;
-	node = handle_get_inode((unsigned int)fd);
+	validate_readable(filename, 1);
+	VALIDATE_FLAGSET(flags,
+	                 AT_SYMLINK_NOFOLLOW | AT_DOSPATH,
+	                 E_INVALID_ARGUMENT_CONTEXT_FCHOWNAT_FLAGS);
+	node = path_traversefull_at(f,
+	                            (unsigned int)dirfd,
+	                            filename,
+	                            !(flags & AT_SYMLINK_NOFOLLOW),
+	                            fs_getmode_for(f, flags),
+	                            NULL,
+	                            NULL,
+	                            NULL,
+	                            NULL);
 	{
 		FINALLY_DECREF_UNLIKELY(node);
 		inode_chown(node,
@@ -1740,8 +1730,9 @@ DEFINE_SYSCALL3(errno_t, fchown, fd_t, fd,
 		            (gid_t)group);
 	}
 	return -EOK;
+#endif /* !__ARCH_WANT_SYSCALL_FCHOWNAT32 */
 }
-#endif /* __ARCH_WANT_SYSCALL_FCHOWN */
+#endif /* __ARCH_WANT_SYSCALL_FCHOWNAT */
 
 #ifdef __ARCH_WANT_SYSCALL_FCHOWN32
 DEFINE_SYSCALL3(errno_t, fchown32, fd_t, fd,
@@ -1759,22 +1750,17 @@ DEFINE_SYSCALL3(errno_t, fchown32, fd_t, fd,
 }
 #endif /* __ARCH_WANT_SYSCALL_FCHOWN32 */
 
-#ifdef __ARCH_WANT_SYSCALL_LCHOWN
-DEFINE_SYSCALL3(errno_t, lchown,
-                USER UNCHECKED char const *, filename,
-                __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT1_lchown), owner,
-                __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT2_lchown), group) {
-	struct fs *f = THIS_FS;
+#ifdef __ARCH_WANT_SYSCALL_FCHOWN
+DEFINE_SYSCALL3(errno_t, fchown, fd_t, fd,
+                __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT1_fchown), owner,
+                __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT2_fchown), group) {
+#ifdef __ARCH_WANT_SYSCALL_FCHOWN32
+	return sys_fchown32(fd,
+	                    (__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT1_fchown32))owner,
+	                    (__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT1_fchown32))group);
+#else /* __ARCH_WANT_SYSCALL_FCHOWN32 */
 	REF struct inode *node;
-	validate_readable(filename, 1);
-	node = path_traversefull(f,
-	                         filename,
-	                         false,
-	                         ATOMIC_READ(f->f_atflag),
-	                         NULL,
-	                         NULL,
-	                         NULL,
-	                         NULL);
+	node = handle_get_inode((unsigned int)fd);
 	{
 		FINALLY_DECREF_UNLIKELY(node);
 		inode_chown(node,
@@ -1782,8 +1768,9 @@ DEFINE_SYSCALL3(errno_t, lchown,
 		            (gid_t)group);
 	}
 	return -EOK;
+#endif /* !__ARCH_WANT_SYSCALL_FCHOWN32 */
 }
-#endif /* __ARCH_WANT_SYSCALL_LCHOWN */
+#endif /* __ARCH_WANT_SYSCALL_FCHOWN */
 
 #ifdef __ARCH_WANT_SYSCALL_LCHOWN32
 DEFINE_SYSCALL3(errno_t, lchown32,
@@ -1811,17 +1798,22 @@ DEFINE_SYSCALL3(errno_t, lchown32,
 }
 #endif /* __ARCH_WANT_SYSCALL_LCHOWN32 */
 
-#ifdef __ARCH_WANT_SYSCALL_CHOWN
-DEFINE_SYSCALL3(errno_t, chown,
+#ifdef __ARCH_WANT_SYSCALL_LCHOWN
+DEFINE_SYSCALL3(errno_t, lchown,
                 USER UNCHECKED char const *, filename,
-                __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT1_chown), owner,
-                __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT2_chown), group) {
+                __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT1_lchown), owner,
+                __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT2_lchown), group) {
+#ifdef __ARCH_WANT_SYSCALL_LCHOWN32
+	return sys_lchown32(filename,
+	                    (__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT1_fchown32))owner,
+	                    (__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT1_fchown32))group);
+#else /* __ARCH_WANT_SYSCALL_LCHOWN32 */
 	struct fs *f = THIS_FS;
 	REF struct inode *node;
 	validate_readable(filename, 1);
 	node = path_traversefull(f,
 	                         filename,
-	                         true,
+	                         false,
 	                         ATOMIC_READ(f->f_atflag),
 	                         NULL,
 	                         NULL,
@@ -1834,8 +1826,9 @@ DEFINE_SYSCALL3(errno_t, chown,
 		            (gid_t)group);
 	}
 	return -EOK;
+#endif /* !__ARCH_WANT_SYSCALL_LCHOWN32 */
 }
-#endif /* __ARCH_WANT_SYSCALL_CHOWN */
+#endif /* __ARCH_WANT_SYSCALL_LCHOWN */
 
 #ifdef __ARCH_WANT_SYSCALL_CHOWN32
 DEFINE_SYSCALL3(errno_t, chown32,
@@ -1862,6 +1855,38 @@ DEFINE_SYSCALL3(errno_t, chown32,
 	return -EOK;
 }
 #endif /* __ARCH_WANT_SYSCALL_CHOWN32 */
+
+#ifdef __ARCH_WANT_SYSCALL_CHOWN
+DEFINE_SYSCALL3(errno_t, chown,
+                USER UNCHECKED char const *, filename,
+                __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT1_chown), owner,
+                __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT2_chown), group) {
+#ifdef __ARCH_WANT_SYSCALL_CHOWN32
+	return sys_chown32(filename,
+	                   (__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT1_fchown32))owner,
+	                   (__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT1_fchown32))group);
+#else /* __ARCH_WANT_SYSCALL_CHOWN32 */
+	struct fs *f = THIS_FS;
+	REF struct inode *node;
+	validate_readable(filename, 1);
+	node = path_traversefull(f,
+	                         filename,
+	                         true,
+	                         ATOMIC_READ(f->f_atflag),
+	                         NULL,
+	                         NULL,
+	                         NULL,
+	                         NULL);
+	{
+		FINALLY_DECREF_UNLIKELY(node);
+		inode_chown(node,
+		            (uid_t)owner,
+		            (gid_t)group);
+	}
+	return -EOK;
+#endif /* !__ARCH_WANT_SYSCALL_CHOWN32 */
+}
+#endif /* __ARCH_WANT_SYSCALL_CHOWN */
 
 
 
