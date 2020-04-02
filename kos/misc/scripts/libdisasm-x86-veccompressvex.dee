@@ -1,0 +1,123 @@
+/* Copyright (c) 2019-2020 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+/* Helper script to auto-complete / auto-format x86 instructions
+ * for the libdisasm database */
+import * from deemon;
+
+
+function unifyMemoryAddend(x: string): string {
+	return x
+		.replace("m64", "m")
+		.replace("m128", "m")
+		.replace("m256", "m")
+		.replace("m512", "m")
+		.replace("/m8bcst", "")
+		.replace("/m16bcst", "")
+		.replace("/m32bcst", "")
+		.replace("/m64bcst", "")
+		.replace("/m128bcst", "")
+		.replace("/m256bcst", "")
+		.replace("/m512bcst", "")
+		;
+}
+
+local currentGroup = [];
+for (local l: File.stdin) {
+	l = l.decode("utf-8").rstrip();
+	if (!l) {
+		for (local has_xmm_alias: [:#currentGroup]) {
+			local xmm = currentGroup[has_xmm_alias];
+			if ("OP_VEX_B0(1" !in xmm)
+				continue;
+			local xmm_comment = xmm[xmm.index("/*"):];
+			local has_ymm_alias = -1;
+			xmm_comment = unifyMemoryAddend(xmm_comment
+				.replace("VEX.128", "VEX.nnn"));
+			for (local i = 0; i < #currentGroup; ++i) {
+				if (i == has_xmm_alias)
+					continue;
+				local l = currentGroup[i];
+				if ("OP_VEX_B0(1" !in l)
+					continue;
+				local l_comment = l[l.index("/*"):];
+				local newl = unifyMemoryAddend(l_comment
+					.replace("YMM", "XMM")
+					.replace("ymm", "xmm")
+					.replace("VEX.256", "VEX.nnn")
+				);
+				if (newl != l_comment && newl == xmm_comment)
+					has_ymm_alias = i;
+			}
+			if (has_ymm_alias >= 0) {
+				local ymm = currentGroup[has_ymm_alias];
+				local ymm_comment = ymm[ymm.index("/*")+2:];
+				local ids = [];
+				if (has_xmm_alias < has_ymm_alias) {
+					ids.append(has_ymm_alias);
+					ids.append(has_xmm_alias);
+				} else {
+					ids.append(has_xmm_alias);
+					ids.append(has_ymm_alias);
+				}
+				for (local j: ids) {
+					currentGroup.erase(j);
+				}
+				final local xmm_vex_start_prefix = "OP_VEX_B0(";
+				local xmm_vex_start = xmm.index(xmm_vex_start_prefix) + #xmm_vex_start_prefix;
+				local xmm_vex_end = xmm.indexmatch("(", ")", xmm_vex_start);
+				local xmm_vex_comma = xmm.rindex(",", xmm_vex_start, xmm_vex_end);
+				xmm = xmm[:xmm_vex_start - 1] + "_LIG(" +
+					xmm[xmm_vex_start:xmm_vex_comma] +
+					xmm[xmm_vex_end:];
+				for (local find, repl: {
+					("OP_RM128_XMM", "OP_RMn_xMM"),
+					("OP_VRXMM", "OP_VRxMM"),
+					("OP_RXMM", "OP_RxMM"),
+					("OP_IMM8_XMM", "OP_IMM8_xMM"),
+				}) {
+					xmm = xmm.replace(find, repl);
+				}
+				local xmm_comment_start = xmm.index("/*");
+				local xmm_lstrip = xmm.lstrip();
+				local xmm_leading_spaces = #xmm - #xmm_lstrip;
+				local xmm_prefix = xmm[:xmm_leading_spaces];
+				xmm_prefix += " " * ((xmm_comment_start - xmm_leading_spaces) + 1);
+				xmm_prefix += "*";
+				ymm = xmm_prefix + ymm_comment;
+				assert xmm.endswith("*/");
+				assert ymm.endswith("*/");
+				xmm = xmm[:-2].rstrip();
+				ymm = ymm[:-2].rstrip() + " */";
+				local i = ids.last;
+				currentGroup.insert(i + 0, xmm);
+				currentGroup.insert(i + 1, ymm);
+				break;
+			}
+		}
+		for (local l: currentGroup)
+			print l;
+		print;
+		currentGroup = [];
+	} else {
+		currentGroup.append(l);
+	}
+}
+
