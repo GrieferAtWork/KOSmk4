@@ -73,7 +73,7 @@ global gdbServerSocket: net.socket;
 function vBoxTelnetGetResponse(timeout_microseconds: int = -1): Bytes {
 	local result = none;
 	for (;;) {
-		local d = vBoxTelnetSocket.recv(timeout_microseconds);
+		local d = vBoxTelnetSocket.recv(-1, timeout_microseconds);
 		if (d is none || (d is string && !d))
 			break; /* Timeout */
 		if (result is none)
@@ -204,7 +204,7 @@ function gdbSocketUngetc(c: int) {
 /* Helper functions for controlling the VM */
 
 @@Execute a telnet command, wait for it to complete, and return its response
-function vBoxTelnetExec(command: Bytes): Bytes {
+function vBoxTelnetExec(command: Bytes, timeout_microseconds: int = -1): Bytes {
 	if (CONFIG_VERBOSE)
 		print "[vboxgdb->vbx]", repr(command);
 	if (command.endswith("\r\n")) {
@@ -212,14 +212,14 @@ function vBoxTelnetExec(command: Bytes): Bytes {
 	} else {
 		vBoxTelnetSocket.send(command.rstrip("\r\n") + "\r\n");
 	}
-	local result = vBoxTelnetGetResponse();
-	if (CONFIG_VERBOSE)
+	local result = vBoxTelnetGetResponse(timeout_microseconds);
+	if (CONFIG_VERBOSE && result !is none)
 		print "[vboxgdb<-vbx]", repr(result);
 	return result;
 }
 
-function vBoxTelnetExecNoError(command: Bytes): Bytes {
-	local response = vBoxTelnetExec(command);
+function vBoxTelnetExecNoError(command: Bytes, timeout_microseconds: int = -1): Bytes {
+	local response = vBoxTelnetExec(command, timeout_microseconds);
 	if ("error:" in response || "Error:" in response)
 		throw Error("Response for {!r} indicates an error {!r}"
 			.format({ command, response }));
@@ -242,11 +242,17 @@ global vmIsRunning = false;
 global _vmIsUiPaused = true;
 global _vmIsDebuggerPaused = false;
 
+function _vBoxManageControlVm(method: string) {
+	if (CONFIG_VERBOSE)
+		print("[vboxgdb->VBoxManage] [\"controlvm\", ", repr(vmName), ", ", repr(method), "]");
+	vbox.runVBoxManageCommand({ "controlvm", vmName, method });
+}
+
 function vmPause() {
 	if (!vmIsRunning)
 		return; /* Already paused */
 	if (!_vmIsUiPaused) {
-		vbox.runVBoxManageCommand({ "controlvm", vmName, "pause" });
+		_vBoxManageControlVm("pause");
 		_vmIsUiPaused = true;
 	}
 	if (!_vmIsDebuggerPaused) {
@@ -258,7 +264,11 @@ function vmPause() {
 
 function _vBoxTelnetExecContinue() {
 	for (;;) {
-		local response = vBoxTelnetExec("g");
+		/* Sometimes, the g-command arbitrarily doesn't return any response
+		 * -> So use a timeout to handle those cases... */
+		local response = vBoxTelnetExec("g", 100000);
+		if (response is none)
+			continue;
 		if ("error:" !in response && "Error:" !in response)
 			break;
 		if ("already running" in response)
@@ -271,7 +281,7 @@ function vmResume() {
 	if (vmIsRunning)
 		return; /* Already running */
 	if (!_vmIsUiPaused) {
-		vbox.runVBoxManageCommand({ "controlvm", vmName, "pause" });
+		_vBoxManageControlVm("pause");
 		_vmIsUiPaused = true;
 	}
 	if (_vmIsDebuggerPaused) {
@@ -279,13 +289,13 @@ function vmResume() {
 		_vmIsDebuggerPaused = false;
 	}
 	if (_vmIsUiPaused) {
-		vbox.runVBoxManageCommand({ "controlvm", vmName, "resume" });
+		_vBoxManageControlVm("resume");
 		_vmIsUiPaused = false;
 	}
 	vmIsRunning = true;
 }
 
-function vmSingleStep() {
+function vmSingleStep(): string {
 	/* Single-stepping is kind-of busted.
 	 * However doing it as a sequence of commands
 	 * every time we want to step seems to work:
@@ -297,7 +307,7 @@ function vmSingleStep() {
 	 *                           cmd>$ VBoxManage controlvm <vmName> pause
 	 *                           tel>$ g */
 	if (!_vmIsUiPaused) {
-		vbox.runVBoxManageCommand({ "controlvm", vmName, "pause" });
+		_vBoxManageControlVm("pause");
 		_vmIsUiPaused = true;
 	}
 	if (!_vmIsDebuggerPaused) {
@@ -306,7 +316,11 @@ function vmSingleStep() {
 	}
 	/* The p command can be a bit stingy... */
 	for (;;) {
-		local response = vBoxTelnetExec("p");
+		/* Sometimes, the p-command arbitrarily doesn't return any response
+		 * -> So use a timeout to handle those cases... */
+		local response = vBoxTelnetExec("p", 100000);
+		if (response is none)
+			break;
 		if ("error:" !in response && "Error:" !in response)
 			break;
 		if ("Invalid command event" !in response)
@@ -314,11 +328,11 @@ function vmSingleStep() {
 				.format({ response }));
 		/* Try again... */
 	}
-	vbox.runVBoxManageCommand({ "controlvm", vmName, "resume" });
+	_vBoxManageControlVm("resume");
 	local stepResponse = vBoxTelnetGetResponse();
 	if (CONFIG_VERBOSE)
 		print "[vboxgdb<-vbx] Step-response:", repr(stepResponse);
-	vbox.runVBoxManageCommand({ "controlvm", vmName, "pause" });
+	_vBoxManageControlVm("pause");
 	_vBoxTelnetExecContinue();
 	_vmIsUiPaused       = true;
 	_vmIsDebuggerPaused = false;
@@ -326,6 +340,16 @@ function vmSingleStep() {
 	if ("Single step" !in stepResponse)
 		throw Error("Unexpected response for single-step: {!r}"
 			.format({ stepResponse }));
+	/* TODO: Include registers (if given) from `stepResponse'
+	 * NOTE: stepResponse normally looks like:
+	 * >> "\r\n"
+	 * >> "dbgf event: Single step! (other)\r\n"
+	 * >> "eax=00000000 ebx=c0c85733 ecx=00000000 edx=00000504 esi=c0c85733 edi=c0c85656\r\n"
+	 * >> "eip=c02e0aae esp=c0cb4a00 ebp=c0cb4aa4 iopl=0 nv up di pl nz na pe nc\r\n"
+	 * >> "cs=0008 ds=0023 es=0023 fs=0040 gs=0033 ss=0010               eflags=00000002\r\n"
+	 * >> "0008:c02e0aae 8b 45 f0                mov eax, dword [ebp-010h]\r\n".bytes()
+	 * Which as you can see contains the same data as used by `vmGetRegisters()` */
+	return "T05"; /* SIGINT */
 }
 
 

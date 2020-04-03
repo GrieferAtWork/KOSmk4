@@ -333,6 +333,7 @@ function start(
 	 * at which point we'll be receiving anything that gets written to
 	 * said file! */
 	win32.WaitNamedPipe(pipeName);
+	print "[vbox] Starting VM:", repr(vmName);
 	proc.start();
 	try {
 		if (startVboxGDBGlue !is none) {
