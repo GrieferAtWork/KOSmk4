@@ -24,6 +24,30 @@ import fs;
 import net;
 import ipc;
 
+/* TODO:
+ * One big downside of vboxgdb is that setting breakpoints before the kernel has been
+ * loaded into memory (i.e. before connecting GDB and waiting for boot0 to finish,
+ * and _start32.S to have loaded the kernel page directory) won't work because before
+ * that point memory locations can't actually be translated, so attempting to set
+ * breakpoints will (correctly) trigger errors, causing gdb to go crazy and trying to
+ * set the breakpoints itself, which only results in a bunch of more errors from trying
+ * to access undefined memory locations...
+ * The solution here would be to inject a piece of code into the kernel that is executed
+ * just after pagedir_kernel is initialized for the kernel core, and loaded into %cr3.
+ * This piece of code would then interact as follows:
+ *   #1: The kernel tells us that it has fully initialized paging
+ *   #2: We start up the GDB server (Thread(GDBMain).start(), ...)
+ *   #3: GDB does its initialization
+ *   #4: GDB tells us to resume execution ($c#xx)
+ *   #5: At this point we override the kernel's EIP (which still points at
+ *       an idle loop within the injected code) to resume execution at the
+ *       original code site (i.e. just after the initial "mov $pagedir_kernel, %cr3")
+ * - The injection could be done by creating a special copy of ".kernel-flat.bin"
+ *   in which we've added additional code (somewhere where it won't bother anyone,
+ *   such as some .bss area that isn't located at the end of the kernel)
+ */
+
+
 @@Log comunications and other verbose informatino
 global final CONFIG_VERBOSE = true;
 
@@ -38,6 +62,11 @@ global final CONFIG_GDB_COMMAND_ACK_TIMEOUT = 10000000;
 @@Max # of times to re-attempt sending a response to GDB
 @@the total # of attempts is @(CONFIG_GDB_SEND_MAX_RETRY_COUNT + 1)
 global final CONFIG_GDB_SEND_MAX_RETRY_COUNT = 3;
+
+@@Timeout (in microseconds) before re-attempting a telnet command,
+@@or assuming that the command completed successfully.
+global final CONFIG_TELNET_TIMEOUT = 100000;
+global final CONFIG_VBOXMANAGE_TIMEOUT = 2000000;
 
 
 /* The different types of break points */
@@ -67,6 +96,9 @@ global gdbSocket: net.socket;
 global gdbServerSocket: net.socket;
 
 
+global CONFIG_GDB_REMOTE_SUPPORTS_SWBREAK: bool = false;
+global CONFIG_GDB_REMOTE_SUPPORTS_HWBREAK: bool = false;
+
 @@Read in response data until a line is read that doesn't contain a
 @@trailing line-feed and starts with @"VBoxDbg>". At that point, return
 @@all previously read lines.
@@ -87,8 +119,10 @@ function vBoxTelnetGetResponse(timeout_microseconds: int = -1): Bytes {
 			local r = result.rfind("\r");
 			if (n < 0) {
 				if (r < 0)
-					continue;
-				n = r + 1;
+					n = 0;
+				else {
+					n = r + 1;
+				}
 			} else {
 				if (r < 0) {
 					++n;
@@ -177,13 +211,17 @@ function startVboxGDBGlue(
 global gdbSocketBuffer: Bytes = "".bytes();
 
 @@Receive a single byte from @gdbSocket
-function gdbSocketGetc(timeout_microseconds: int = -1): int {
+function gdbSocketGetc(
+		timeout_microseconds: int = -1,
+		graceFulTimeout: bool = false): int {
 	local result;
 	if (!gdbSocketBuffer) {
-		gdbSocketBuffer = gdbSocket.recv(timeout_microseconds);
+		gdbSocketBuffer = gdbSocket.recv(-1, timeout_microseconds);
 		if (!gdbSocketBuffer) {
 			if (timeout_microseconds == -1)
 				throw Error("GDB Client gracefully disconnected");
+			if (graceFulTimeout)
+				return none;
 			throw Error("Timeout while receiding data from GDB");
 		}
 	}
@@ -203,36 +241,55 @@ function gdbSocketUngetc(c: int) {
 
 /* Helper functions for controlling the VM */
 
+function vBoxTelnetDiscardPendingData() {
+	local data = vBoxTelnetSocket.recv(-1, 0);
+	if (data) {
+		do {
+			data = vBoxTelnetSocket.recv(-1, 50000);
+		} while (data);
+	}
+}
+
 @@Execute a telnet command, wait for it to complete, and return its response
-function vBoxTelnetExec(command: Bytes, timeout_microseconds: int = -1): Bytes {
+function vBoxTelnetExec(command: Bytes, restartOnTimeout: bool = true): Bytes {
+again:
+	vBoxTelnetDiscardPendingData();
 	if (CONFIG_VERBOSE)
-		print "[vboxgdb->vbx]", repr(command);
+		print "[vboxgdb->telnet]", repr(command.rstrip("\r\n"));
 	if (command.endswith("\r\n")) {
 		vBoxTelnetSocket.send(command);
 	} else {
 		vBoxTelnetSocket.send(command.rstrip("\r\n") + "\r\n");
 	}
-	local result = vBoxTelnetGetResponse(timeout_microseconds);
-	if (CONFIG_VERBOSE && result !is none)
-		print "[vboxgdb<-vbx]", repr(result);
+	local result = vBoxTelnetGetResponse(CONFIG_TELNET_TIMEOUT);
+	if (result is none) {
+		if (CONFIG_VERBOSE && result !is none)
+			print "[vboxgdb<-telnet] <Timeout>";
+		if (restartOnTimeout)
+			goto again;
+	} else {
+		if (CONFIG_VERBOSE && result !is none)
+			print "[vboxgdb<-telnet]", repr(result);
+		/* This is an error that can happen sporadically for practically
+		 * any command. The solution is to try again when it happens... */
+		if ("Invalid command event" in result)
+			goto again;
+	}
 	return result;
 }
 
-function vBoxTelnetExecNoError(command: Bytes, timeout_microseconds: int = -1): Bytes {
-	local response = vBoxTelnetExec(command, timeout_microseconds);
-	if ("error:" in response || "Error:" in response)
-		throw Error("Response for {!r} indicates an error {!r}"
-			.format({ command, response }));
+function vBoxTelnetExecNoError(command: Bytes, restartOnTimeout: bool = true): Bytes {
+	local response = vBoxTelnetExec(command, restartOnTimeout);
+	if ("error:" in response || "Error:" in response) {
+		local i = response.find("Failed to disassemble instruction");
+		if (i >= 0)
+			response = response[:i].strip("\r\n") + "\r\n";
+		else {
+			throw Error("Response for {!r} indicates an error {!r}"
+				.format({ command, response }));
+		}
+	}
 	return response;
-}
-
-function vBoxTelnetExecNLines(command: Bytes, expectedLineCount: int): {Bytes...} {
-	local result = vBoxTelnetExec(command);
-	result = result.strip().splitlines(false);
-	if (#result != expectedLineCount)
-		throw Error("Unexpected # of lines in response to {!r} (response: {!r})"
-			.format({ command, result }));
-	return result;
 }
 
 
@@ -242,10 +299,52 @@ global vmIsRunning = false;
 global _vmIsUiPaused = true;
 global _vmIsDebuggerPaused = false;
 
-function _vBoxManageControlVm(method: string) {
+function _vBoxManageControlVm(method: string, allowFailure: bool = false): int {
+again:
 	if (CONFIG_VERBOSE)
 		print("[vboxgdb->VBoxManage] [\"controlvm\", ", repr(vmName), ", ", repr(method), "]");
-	vbox.runVBoxManageCommand({ "controlvm", vmName, method });
+	local error;
+	error = vbox.runVBoxManageCommandEx(
+		{ "controlvm", vmName, method },
+		CONFIG_VBOXMANAGE_TIMEOUT);
+	if (error is none) {
+		if (CONFIG_VERBOSE)
+			print "[vboxgdb<-VBoxManage] <Timeout>";
+		if (allowFailure)
+			return none;
+		goto again;
+	}
+	if (CONFIG_VERBOSE)
+		print "[vboxgdb<-VBoxManage] $? =", error;
+	if (error != 0 && !allowFailure)
+		goto again;
+	return error;
+}
+
+function _vBoxTelnetExecContinue(): Bytes {
+	local result;
+	result = vBoxTelnetExec("g");
+	if ("error:" !in result && "Error:" !in result)
+		;
+	else if ("already running" in result) {
+		result = "\r\n".bytes();
+	} else {
+		throw Error("Failed to continue vm: " + repr(result));
+	}
+	return result;
+}
+
+function _vBoxTelnetExecStop(): Bytes {
+	local result;
+	result = vBoxTelnetExec("stop");
+	if ("error:" !in result && "Error:" !in result)
+		;
+	else if ("The VM is already halted" in result)
+		result = "".bytes();
+	else {
+		throw Error("Failed to stop vm: " + repr(result));
+	}
+	return result;
 }
 
 function vmPause() {
@@ -256,25 +355,10 @@ function vmPause() {
 		_vmIsUiPaused = true;
 	}
 	if (!_vmIsDebuggerPaused) {
-		vBoxTelnetExecNoError("stop");
+		_vBoxTelnetExecStop();
 		_vmIsDebuggerPaused = true;
 	}
 	vmIsRunning = false;
-}
-
-function _vBoxTelnetExecContinue() {
-	for (;;) {
-		/* Sometimes, the g-command arbitrarily doesn't return any response
-		 * -> So use a timeout to handle those cases... */
-		local response = vBoxTelnetExec("g", 100000);
-		if (response is none)
-			continue;
-		if ("error:" !in response && "Error:" !in response)
-			break;
-		if ("already running" in response)
-			break;
-		/* Try again... */
-	}
 }
 
 function vmResume() {
@@ -295,9 +379,10 @@ function vmResume() {
 	vmIsRunning = true;
 }
 
+global GDBHandleVirtualBoxEvent;
 function vmSingleStep(): string {
 	/* Single-stepping is kind-of busted.
-	 * However doing it as a sequence of commands
+	 * However doing it as this sequence of commands
 	 * every time we want to step seems to work:
 	 * [if !_vmIsUiPaused]       cmd>$ VBoxManage controlvm <vmName> pause
 	 * [if !_vmIsDebuggerPaused] tel>$ stop
@@ -305,51 +390,56 @@ function vmSingleStep(): string {
 	 *                           cmd>$ VBoxManage controlvm <vmName> resume
 	 *                           tel<$ dbgf event: Single step! (other)
 	 *                           cmd>$ VBoxManage controlvm <vmName> pause
-	 *                           tel>$ g */
+	 *                           tel>$ g
+	 *                           tel>$ stop
+	 * The idea here seems to be that we don't want to use `p` to resume
+	 * VM execution, but only use it to set-up the VM for a single-step
+	 * once we resume it manually. Then, once that's done re-suspend the
+	 * VM globally, and toggle the debugger suspend sequence by invoking
+	 * `g` followed by `stop` (thus fixing up the probably broken internal
+	 * state of the VirtualBox debugger) */
 	if (!_vmIsUiPaused) {
 		_vBoxManageControlVm("pause");
 		_vmIsUiPaused = true;
 	}
 	if (!_vmIsDebuggerPaused) {
-		vBoxTelnetExecNoError("stop");
+		_vBoxTelnetExecStop();
 		_vmIsDebuggerPaused = true;
 	}
-	/* The p command can be a bit stingy... */
-	for (;;) {
-		/* Sometimes, the p-command arbitrarily doesn't return any response
-		 * -> So use a timeout to handle those cases... */
-		local response = vBoxTelnetExec("p", 100000);
-		if (response is none)
-			break;
-		if ("error:" !in response && "Error:" !in response)
-			break;
-		if ("Invalid command event" !in response)
-			throw Error("Failed to single-step (`p` returned {!r})"
-				.format({ response }));
-		/* Try again... */
-	}
-	_vBoxManageControlVm("resume");
-	local stepResponse = vBoxTelnetGetResponse();
+again_step:
 	if (CONFIG_VERBOSE)
-		print "[vboxgdb<-vbx] Step-response:", repr(stepResponse);
+		print "[vboxgdb->telnet] \"p\"";
+	/* The p command can be a bit stingy... */
+	vBoxTelnetDiscardPendingData();
+	vBoxTelnetSocket.send("p\r\n");
+	local error = _vBoxManageControlVm("resume", allowFailure: true);
+	local stepResponse;
+	if (error is none || error != 0) {
+		stepResponse = vBoxTelnetGetResponse(CONFIG_TELNET_TIMEOUT);
+		if (stepResponse is none)
+			goto handle_bad_step_response;
+	} else {
+		stepResponse = vBoxTelnetGetResponse();
+	}
+	if (CONFIG_VERBOSE)
+		print "[vboxgdb<-telnet] Step-response:", repr(stepResponse);
+	if ("Invalid command event" in stepResponse) {
+handle_bad_step_response:
+		local error;
+		error = _vBoxManageControlVm("pause", allowFailure: true);
+		if (error is none) {
+			_vBoxTelnetExecStop();
+			goto again_step;
+		}
+		goto again_step;
+	}
 	_vBoxManageControlVm("pause");
 	_vBoxTelnetExecContinue();
+	_vBoxTelnetExecStop();
 	_vmIsUiPaused       = true;
-	_vmIsDebuggerPaused = false;
+	_vmIsDebuggerPaused = true;
 	vmIsRunning         = false;
-	if ("Single step" !in stepResponse)
-		throw Error("Unexpected response for single-step: {!r}"
-			.format({ stepResponse }));
-	/* TODO: Include registers (if given) from `stepResponse'
-	 * NOTE: stepResponse normally looks like:
-	 * >> "\r\n"
-	 * >> "dbgf event: Single step! (other)\r\n"
-	 * >> "eax=00000000 ebx=c0c85733 ecx=00000000 edx=00000504 esi=c0c85733 edi=c0c85656\r\n"
-	 * >> "eip=c02e0aae esp=c0cb4a00 ebp=c0cb4aa4 iopl=0 nv up di pl nz na pe nc\r\n"
-	 * >> "cs=0008 ds=0023 es=0023 fs=0040 gs=0033 ss=0010               eflags=00000002\r\n"
-	 * >> "0008:c02e0aae 8b 45 f0                mov eax, dword [ebp-010h]\r\n".bytes()
-	 * Which as you can see contains the same data as used by `vmGetRegisters()` */
-	return "T05"; /* SIGINT */
+	return GDBHandleVirtualBoxEvent(stepResponse);
 }
 
 
@@ -360,12 +450,13 @@ global vmCurrentCpu = 0;
 function vmSetCurrentCpu(newCpu: int) {
 	if (newCpu == vmCurrentCpu)
 		return;
-	vBoxTelnetExec("cpu " + newCpu);
+	vBoxTelnetExecNoError("cpu " + newCpu);
 	vmCurrentCpu = newCpu;
 }
 
 @@Set of currently defined breakpoints
-global vmDefinedBreakpoints = HashSet();
+@@Mapping is @(breakpointId: (typ, addr, len))
+global vmDefinedBreakpoints: {int: (int, int, int)} = Dict();
 
 @@Clear all defined breakpoints
 function vmClearAllBreakpoints() {
@@ -375,15 +466,113 @@ function vmClearAllBreakpoints() {
 	vmDefinedBreakpoints.clear();
 }
 
-function vmSetRegister(name: string, value: string | int) {
-	if (value !is string)
-		value = value.hex();
-	vBoxTelnetExecNoError("rg {} = {}".format({ name, value }));
+@@Search for a defined breakpoint and returns
+@@its ID, or @none if no such breakpoint exists
+function vmFindDefinedBreakpoint(typ: int, addr: int, len: int): int | none {
+	local packedData = (typ, addr, len);
+	for (local id, data: vmDefinedBreakpoints) {
+		if (data == packedData)
+			return id;
+	}
+	return none;
+}
+
+@@Add/Remove a breakpoint
+@@@param: typ: One of @(GDB_BREAKPOINT_TYPE_*)
+function vmControlBreakpoint(add: bool, typ: int, addr: int, len: int) {
+	local id;
+	local response;
+	if (typ == GDB_BREAKPOINT_TYPE_READ)
+		typ = GDB_BREAKPOINT_TYPE_READWRITE;
+	if (typ == GDB_BREAKPOINT_TYPE_SWBREAK)
+		len = 0;
+	else if (typ == GDB_BREAKPOINT_TYPE_HWBREAK) {
+		if (TARGET_ARCH != "x86_64")
+			len = 1;
+		else if (len != 1 && len != 8) {
+			throw Error("Invalid breakpoint exec-length: " + len);
+		}
+	} else {
+		if (len !in [1, 2, 4, 8])
+			throw Error("Invalid breakpoint data-length: " + len);
+	}
+	id  = vmFindDefinedBreakpoint(typ, addr, len);
+	if (id !is none) {
+		if (add)
+			return; /* Already defined. */
+		/* Delete this breakpoint */
+again_delete_breakpoint:
+		if (vBoxTelnetExecNoError("bc " + id) is none) {
+			local idHex = id.hex()[2:].lower();
+			for (local l: vBoxTelnetExecNoError("bl").splitlines()) {
+				l = l.strip();
+				if (!l)
+					continue;
+				l = l.lower();
+				if (l.startswith("0x"))
+					l = l[2:];
+				if (l.startswith(idHex))
+					goto again_delete_breakpoint;
+			}
+		}
+		del vmDefinedBreakpoints[id];
+		return;
+	} else {
+		if (!add)
+			return; /* Doesn't exist. */
+		if (typ == GDB_BREAKPOINT_TYPE_SWBREAK) {
+			response = vBoxTelnetExecNoError("bp " + addr.hex());
+		} else {
+			response = vBoxTelnetExecNoError("ba {} {} {}".format({
+				{
+					GDB_BREAKPOINT_TYPE_HWBREAK   : "e",
+					GDB_BREAKPOINT_TYPE_READWRITE : "r",
+					GDB_BREAKPOINT_TYPE_WRITE     : "w",
+				}[typ], len, addr.hex()
+			}));
+		}
+	}
+	response = response.strip().lower();
+	final local PREFIX = "breakpoint ";
+	response = response[response.index(PREFIX) + #PREFIX:].lstrip();
+	local idEnd = 0;
+	while (idEnd < #response && response.isnumeric(idEnd))
+		++idEnd;
+	if (!idEnd) {
+		throw Error("Invalid breakpoint id in response {!r}"
+			.format({ response }));
+	}
+	id = int(response[:idEnd]);
+	vmDefinedBreakpoints[id] = (typ, addr, len);
 }
 
 function vmGetRegister(name: string): Bytes {
-	local resp = vBoxTelnetExecNLines("rg " + name, 1)[0];
-	return resp[resp.index("=") + 1:].strip();
+	local resp = vBoxTelnetExecNoError("rg " + name, 1).splitlines(false);
+	if (#resp != 1)
+		throw Error("Unexpected # of lines in response to {!r} (response: {!r})"
+			.format({ "rg " + name, resp }));
+	resp = resp[0];
+	resp = resp[resp.index("=") + 1:].strip();
+	return resp;
+}
+
+function vmSetRegister(name: string, value: string | int) {
+	if (value !is string)
+		value = value.hex();
+	if (name in ["cs"]) {
+		local oldval = str(vmGetRegister(name));
+		oldval = oldval.lower().lsstrip("0x").lstrip("0");
+		value  = value.lower().lsstrip("0x").lstrip("0");
+		if (oldval != value)
+			throw Error("Cannot set register {!r} = {!r} (oldval = {!r})"
+				.format({ name, value, oldval }));
+		return;
+	}
+	local resp;
+	do {
+		resp = vBoxTelnetExecNoError(
+			"rg {} = {}".format({ name, value }));
+	} while (resp is none);
 }
 
 @@Return a set of @(register, value) for the following registers:
@@ -393,8 +582,10 @@ function vmGetRegister(name: string): Bytes {
 @@mapping, however will have had the one of @"foo", @"efoo" or @"rfoo" in the
 @@original register list.
 function vmGetRegisters(): {string: int} {
-	local resp = vBoxTelnetExecNoError("rg")
-		.unifylines(" ");
+	local resp = vBoxTelnetExecNoError({
+		"i386"   : "rg32",
+		"x86_64" : "rg64",
+	}[TARGET_ARCH]).unifylines(" ");
 	for (;;) {
 		local newresp = resp.replace("  ", " ");
 		if (newresp == resp)
@@ -418,14 +609,21 @@ function vmGetRegisters(): {string: int} {
 		result[regnam] = regval;
 	}
 	final local SEGMENT_REGISTERS = { "cs", "ds", "es", "fs", "gs" };
-	final local MANDATORY_REGISTERS = {
+	final local MANDATORY_REGISTERS32 = {
 		"ax", "bx", "cx", "dx", "si", "di", "sp", "bp", "ip", "flags",
 		"cs", "ds", "es", "fs", "gs"
 	};
-	for (local reg: MANDATORY_REGISTERS) {
+	final local MANDATORY_REGISTERS64 = {
+		"ax", "bx", "cx", "dx", "si", "di", "sp", "bp", "ip", "flags",
+		"r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15",
+		"cs", "ds", "es", "fs", "gs"
+	};
+	for (local reg: TARGET_ARCH == "x86_64"
+			? MANDATORY_REGISTERS64
+			: MANDATORY_REGISTERS32) {
 		if (reg !in result) {
 			local regnam = reg;
-			if (reg !in SEGMENT_REGISTERS)
+			if (reg !in SEGMENT_REGISTERS && !reg.startswith("r"))
 				reg = "r" + reg;
 			local regval = vmGetRegister(reg);
 			if (regval.startswith("0x"))
@@ -481,8 +679,11 @@ function vmReadMemory(addr: int, count: int): Bytes {
 @@Write @data to memory at @addr
 @@@param: wordType: One of @("b", "w", "d", "q")
 function vmWriteMemoryWord(addr: int, wordType: string, value: int) {
-	vBoxTelnetExecNoError("e{} {} {}"
-		.format({ wordType, addr.hex(), value.hex() }));
+	local resp;
+	do {
+		resp = vBoxTelnetExecNoError("e{} {} {}"
+			.format({ wordType, addr.hex(), value.hex() }));
+	} while (resp is none);
 }
 
 function extractWordLeFromBytes(b: Bytes, i: int, nBytes: int): int {
@@ -512,12 +713,6 @@ function vmWriteMemory(addr: int, data: Bytes) {
 			++i;
 		}
 	}
-}
-
-@@Add/Remove a breakpoint
-@@@param: typ: One of @(GDB_BREAKPOINT_TYPE_*)
-function vmControlBreakpoint(add: bool, typ: int, addr: int, kind: int) {
-	throw Error("TODO");
 }
 
 
@@ -600,6 +795,96 @@ function gdbConstructStopReply(): Bytes {
 	});
 }
 
+
+
+
+global final BASIC_REGISTER_COUNT32 = 16;
+global final REGISTER_IDS32: {int: (int, string, string)} = {
+	0x00 : (4, "eax", "rax"),
+	0x01 : (4, "ecx", "rcx"),
+	0x02 : (4, "edx", "rdx"),
+	0x03 : (4, "ebx", "rbx"),
+	0x04 : (4, "esp", "rsp"),
+	0x05 : (4, "ebp", "rbp"),
+	0x06 : (4, "esi", "rsi"),
+	0x07 : (4, "edi", "rdi"),
+	0x08 : (4, "eip", "rip"),
+	0x09 : (4, "eflags", "rflags"),
+	0x0a : (4, "cs", "cs"),
+	0x0b : (4, "ss", "ss"),
+	0x0c : (4, "ds", "ds"),
+	0x0d : (4, "es", "es"),
+	0x0e : (4, "fs", "fs"),
+	0x0f : (4, "gs", "gs"),
+//TODO:#define GDB_REGISTER_I386_ST0    0x10 /* %st(0) */
+//TODO:#define GDB_REGISTER_I386_ST1    0x11 /* %st(1) */
+//TODO:#define GDB_REGISTER_I386_ST2    0x12 /* %st(2) */
+//TODO:#define GDB_REGISTER_I386_ST3    0x13 /* %st(3) */
+//TODO:#define GDB_REGISTER_I386_ST4    0x14 /* %st(4) */
+//TODO:#define GDB_REGISTER_I386_ST5    0x15 /* %st(5) */
+//TODO:#define GDB_REGISTER_I386_ST6    0x16 /* %st(6) */
+//TODO:#define GDB_REGISTER_I386_ST7    0x17 /* %st(7) */
+//TODO:#define GDB_REGISTER_I386_FCW    0x18 /* fs_fcw (fctrl) */
+//TODO:#define GDB_REGISTER_I386_FSW    0x19 /* fs_fsw (fstat) */
+//TODO:#define GDB_REGISTER_I386_FTW    0x1a /* fs_ftw (ftag) */
+//TODO:#define GDB_REGISTER_I386_FCS    0x1b /* fs_fcs (fiseg) */
+//TODO:#define GDB_REGISTER_I386_FIP    0x1c /* fs_fip (fioff) */
+//TODO:#define GDB_REGISTER_I386_FDS    0x1d /* fs_fds (foseg) */
+//TODO:#define GDB_REGISTER_I386_FDP    0x1e /* fs_fdp (fooff) */
+//TODO:#define GDB_REGISTER_I386_FOP    0x1f /* fs_fop (fop) */
+//TODO:#define GDB_REGISTER_I386_XMM0   0x20 /* %xmm0 */
+//TODO:#define GDB_REGISTER_I386_XMM1   0x21 /* %xmm1 */
+//TODO:#define GDB_REGISTER_I386_XMM2   0x22 /* %xmm2 */
+//TODO:#define GDB_REGISTER_I386_XMM3   0x23 /* %xmm3 */
+//TODO:#define GDB_REGISTER_I386_XMM4   0x24 /* %xmm4 */
+//TODO:#define GDB_REGISTER_I386_XMM5   0x25 /* %xmm5 */
+//TODO:#define GDB_REGISTER_I386_XMM6   0x26 /* %xmm6 */
+//TODO:#define GDB_REGISTER_I386_XMM7   0x27 /* %xmm7 */
+//TODO:#define GDB_REGISTER_I386_MXCSR  0x28 /* %mxcsr */
+//TODO:#define GDB_REGISTER_I386_FSBASE 0x30 /* %fs.base */
+//TODO:#define GDB_REGISTER_I386_GSBASE 0x31 /* %gs.base */
+};
+
+global final OSDATAFILES: {string: string | Callable} = {
+	"" :
+	"<osdata type=\"types\">"
+	"<item>"
+		"<column name=\"Type\">breakpoints</column>"
+		"<column name=\"Description\">Breakpoints</column>"
+		"<column name=\"Title\">Breakpoints</column>"
+	"</item>"
+	"</osdata>",
+
+	"breakpoints" : []{
+		File.Writer fp;
+		fp << "<osdata type=\"breakpoints\">";
+		for (local l: vBoxTelnetExecNoError("bl").splitlines()) {
+			fp << "<item><column name=\"line\">";
+			fp << l.replace("<", "_").replace(">", "_");
+			fp << "</column></item>";
+		}
+		fp << "</osdata>";
+		return fp.string;
+	},
+};
+
+function GDBEvaluateQXferRead(name: string, annex: string): Bytes | none {
+	if (name == "exec-file") {
+		if (annex)
+			return false;
+		return "/os/kernel.bin";
+	}
+	if (name == "osdata") {
+		local res = OSDATAFILES.get(annex);
+		if (res is none)
+			return false;
+		if (res !is string)
+			res = res();
+		return res;
+	}
+	return none;
+}
+
 @@Evaluate a given @cmd and return the intended response
 function GDBEvaluateCommand(cmd: Bytes): Bytes {
 	if (!cmd)
@@ -632,11 +917,12 @@ function GDBEvaluateCommand(cmd: Bytes): Bytes {
 		if (TARGET_ARCH == "x86_64") {
 			throw Error("TODO");
 		} else {
-			for (local name: {
-				"ax", "cx", "dx", "bx", "sp", "bp", "si", "di", "ip", "flags",
-				"cs", "ss", "ds", "es", "fs", "gs",
-			}) {
-				encodeHex4b(result, regs[name]);
+			for (local id: [:BASIC_REGISTER_COUNT32]) {
+				local none, name32, name64 = REGISTER_IDS32[id]...;
+				local usedName = name32;
+				if (name32 != name64)
+					usedName = name32[1:];
+				encodeHex4b(result, regs[usedName]);
 			}
 		}
 		return result.string;
@@ -648,17 +934,43 @@ function GDBEvaluateCommand(cmd: Bytes): Bytes {
 		if (TARGET_ARCH == "x86_64") {
 			throw Error("TODO");
 		} else {
-			local regs = {
-				"eax", "ecx", "edx", "ebx", "esp", "ebp", "esi", "edi",
-				"eip", "eflags", "cs", "ss", "ds", "es", "fs", "gs",
-			};
-			if (#data < #regs * 8)
+			if (#data < BASIC_REGISTER_COUNT32 * 8)
 				throw Error("Register data blob is too small");
 			local offset = 0;
-			for (local name: regs) {
+			for (local id: [:BASIC_REGISTER_COUNT32]) {
+				local name = REGISTER_IDS32[id][2];
 				vmSetRegister(name, decodeHex4b(data, offset));
 				offset += 8;
 			}
+		}
+		return "OK";
+	}
+
+	case "p".ord(): {
+		local id = int(cmd[1:], 16);
+		local data;
+		vmSetCurrentCpu(gdbCurrentThreadForGeneral);
+		if (TARGET_ARCH == "x86_64") {
+			throw Error("TODO");
+		} else {
+			local def = REGISTER_IDS32[id];
+			data = vmGetRegister(def[1]);
+			data = data.lower().lsstrip("0x");
+			data = data.zfill(def[0] * 2);
+		}
+		return data;
+	}
+
+	case "P".ord(): {
+		local idEnd = cmd.index("=");
+		local id    = int(cmd[1:idEnd], 16);
+		local value = "0x" + cmd[idEnd + 1:];
+		vmSetCurrentCpu(gdbCurrentThreadForGeneral);
+		if (TARGET_ARCH == "x86_64") {
+			throw Error("TODO");
+		} else {
+			local def = REGISTER_IDS32[id];
+			vmSetRegister(def[2], value);
 		}
 		return "OK";
 	}
@@ -737,30 +1049,102 @@ function GDBEvaluateCommand(cmd: Bytes): Bytes {
 		return "OK";
 	}
 
-	/* TODO: p */
-	/* TODO: P */
 	/* TODO: T */
 	/* TODO: vCont */
 	/* TODO: qSearch */
-	/* TODO: qXfer */
 	/* TODO: qThreadExtraInfo */
-	/* TODO: qSupported */
-	/* TODO: qThreadInfo */
+	/* TODO: qfThreadInfo */
+	/* TODO: qlThreadInfo */
 	/* TODO: qNoAckMode */
 	/* TODO: QStartNoAckMode */
 	/* TODO: QNoAckMode */
 	/* TODO: X */
 
+	case "q".ord(): {
+		local nameEnd = 1;
+		while (nameEnd < #cmd &&
+		       cmd[nameEnd] !in [",".ord(), ":".ord(), ";".ord()])
+			++nameEnd;
+		switch (cmd[1:nameEnd]) {
+
+		case "C":
+			return "QC" + gdbEncodeThreadId(gdbCurrentThreadForGeneral);
+
+		case "Xfer": {
+			local i;
+			i = nameEnd + 1;
+			nameEnd = cmd.index(":", i);
+			local name = cmd[i:nameEnd];
+			i = nameEnd + 1;
+			nameEnd = cmd.index(":", i);
+			local method = cmd[i:nameEnd];
+			i = nameEnd + 1;
+			nameEnd = cmd.index(":", i);
+			local annex = cmd[i:nameEnd];
+			i = nameEnd + 1;
+			nameEnd = cmd.index(",", i);
+			local offset = int(cmd[i:nameEnd], 16);
+			local size   = int(cmd[nameEnd + 1:], 16);
+			if (method == "read") {
+				local result = GDBEvaluateQXferRead(name, annex);
+				if (result is none)
+					return ""; /* Unknown */
+				if (result === false)
+					return "E02";
+				local reslen = #result;
+				if (offset >= reslen)
+					return "l"; /* Out-of-bounds (empty last packet) */
+				if (offset + size >= reslen)
+					return "l" + result[offset:];
+				return "m" + result[offset:offset + size];
+			} else if (method == "write") {
+				return "";
+			} else {
+				throw Error("Invalid qXfer method: " + repr(method));
+			}
+		}
+
+		case "Supported": {
+			local features = cmd[nameEnd + 1:];
+			CONFIG_GDB_REMOTE_SUPPORTS_SWBREAK = false;
+			CONFIG_GDB_REMOTE_SUPPORTS_HWBREAK = false;
+			for (local feat: features.split(";")) {
+				if (feat.endswith("+")) {
+					feat = feat[:-1];
+					if (feat == "swbreak")
+						CONFIG_GDB_REMOTE_SUPPORTS_SWBREAK = true;
+					else if (feat == "hwbreak")
+						CONFIG_GDB_REMOTE_SUPPORTS_HWBREAK = true;
+				}
+			}
+			File.Writer result;
+			result << "PacketSize=100000";
+			if (CONFIG_GDB_REMOTE_SUPPORTS_SWBREAK)
+				result << ";swbreak+";
+			if (CONFIG_GDB_REMOTE_SUPPORTS_HWBREAK)
+				result << ";hwbreak+";
+			result << ";qXfer:exec-file:read+";
+			result << ";qXfer:osdata:read+";
+			/* TODO: QNoAckMode */
+			return result.string;
+		}
+
+		default:
+			break;
+		}
+		break;
+	}
+
 	case "z".ord():
 	case "Z".ord(): {
-		local shouldAdd = cmd[0] == "z".ord();
+		local shouldAdd = cmd[0] == "Z".ord();
 		local type_end = cmd.index(",");
 		local addr_end = cmd.index(",", type_end + 1);
 		local typ  = int(cmd[1:type_end], 16);
 		local addr = int(cmd[type_end + 1:addr_end], 16);
-		local kind = int(cmd[addr_end + 1:], 16);
+		local len  = int(cmd[addr_end + 1:], 16);
 		vmSetCurrentCpu(gdbCurrentThreadForGeneral);
-		vmControlBreakpoint(shouldAdd, typ, addr, kind);
+		vmControlBreakpoint(shouldAdd, typ, addr, len);
 		return "OK";
 	}
 
@@ -772,10 +1156,43 @@ unknown:
 }
 
 @@Handle an event message send by the VirtualBox debugger
-@@@return: true:  Send a stop reply to GDB (must set @gdbStopReason before)
-@@@return: false: Ignore and resume execution
-function GDBHandleVirtualBoxEvent(event: Bytes): bool {
-	return false;
+@@@return: * :   Send this as a stop reply to GDB (value for @gdbStopReason)
+@@@return: none: Ignore and resume execution
+function GDBHandleVirtualBoxEvent(event: Bytes): string {
+	/* TODO: Include registers (if given) from `event'
+	 * NOTE: event normally looks like:
+	 * >> "\r\n"
+	 * >> "dbgf event: Single step! (other)\r\n"
+	 * >> "eax=00000000 ebx=c0c85733 ecx=00000000 edx=00000504 esi=c0c85733 edi=c0c85656\r\n"
+	 * >> "eip=c02e0aae esp=c0cb4a00 ebp=c0cb4aa4 iopl=0 nv up di pl nz na pe nc\r\n"
+	 * >> "cs=0008 ds=0023 es=0023 fs=0040 gs=0033 ss=0010               eflags=00000002\r\n"
+	 * >> "0008:c02e0aae 8b 45 f0                mov eax, dword [ebp-010h]\r\n".bytes()
+	 * Which as you can see contains the same data as used by `vmGetRegisters()` */
+	if ("Single step" in event)
+		return "T05"; /* SIGINT */
+	local i = event.find("Breakpoint ");
+	if (i >= 0) {
+		i += #"Breakpoint ";
+		local id = event[i:].lstrip();
+		local idEnd = 0;
+		while (idEnd < #id && id.isnumeric(idEnd))
+			++idEnd;
+		if (!idEnd) {
+			throw Error("Invalid breakpoint id in event {!r}"
+				.format({ event }));
+		}
+		id = int(id[:idEnd]);
+		local data = vmDefinedBreakpoints[id];
+		
+		if (data[0] == GDB_BREAKPOINT_TYPE_SWBREAK) {
+			if (CONFIG_GDB_REMOTE_SUPPORTS_SWBREAK)
+				return "T05swbreak:;";
+		} else {
+			if (CONFIG_GDB_REMOTE_SUPPORTS_HWBREAK)
+				return "T05hwbreak:;";
+		}
+	}
+	return "T05";
 }
 
 function GDBEnter() {
@@ -794,20 +1211,24 @@ function GDBMain() {
 			print "[vboxgdb] GDB connection established:", gdbSocket;
 		for (;;) {
 			local resp;
-wait_for_command:
 			local c;
+wait_for_command:
 			if (vmIsRunning) {
 				final local CHECK_TIMEOUT_MICROSECONDS = 50000;
 				for (;;) {
-					c = gdbSocketGetc(CHECK_TIMEOUT_MICROSECONDS);
-					if (c >= 0)
+					c = gdbSocketGetc(CHECK_TIMEOUT_MICROSECONDS,
+					                  graceFulTimeout: true);
+					if (c !is none)
 						break;
 					c = vBoxTelnetGetResponse(CHECK_TIMEOUT_MICROSECONDS);
 					if (c !is none) {
 						if (CONFIG_VERBOSE)
-							print "[vboxgdb<-vbx] Event:", repr(c);
-						if (GDBHandleVirtualBoxEvent(c))
+							print "[vboxgdb<-telnet] Event:", repr(c);
+						local reason = GDBHandleVirtualBoxEvent(c);
+						if (reason !is none) {
+							gdbStopReason = reason;
 							goto do_send_stop_reply;
+						}
 					}
 				}
 			} else {
@@ -931,6 +1352,5 @@ do_send_resp:
 		virtualBoxProc.terminate(1);
 	}
 }
-
 
 

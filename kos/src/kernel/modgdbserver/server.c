@@ -1967,7 +1967,8 @@ send_empty:
 			} else {
 				ERROR(err_qXfer_syntax);
 			}
-			if unlikely(*nameEnd++ != ':') ERROR(err_qXfer_syntax);
+			if unlikely(*nameEnd++ != ':')
+				ERROR(err_qXfer_syntax);
 			annex = nameEnd;
 			nameEnd = strchr(nameEnd, ':');
 			if unlikely(!nameEnd)

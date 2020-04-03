@@ -48,12 +48,23 @@ function throwVBoxManageError(argv: {string...}, error: int) {
 	if (error != 0)
 		throw Error("`VBoxManage " + repr(argv) + "` failed with " + error);
 }
-function runVBoxManageCommand(argv: {string...}) {
+
+function runVBoxManageCommandEx(argv: {string...}, timeout_microseconds: int = -1) {
 	if (EXE_VBOXMANAGE is none)
 		throw Error("Failed to locate `VBoxManage`");
 	local proc = ipc.Process(EXE_VBOXMANAGE, argv);
 	proc.start();
-	throwVBoxManageError(argv, proc.join());
+	if (timeout_microseconds < 0)
+		return proc.join();
+	local result = proc.timedjoin(timeout_microseconds);
+	if (result is none)
+		proc.terminate(1);
+	return result;
+}
+
+function runVBoxManageCommand(argv: {string...}) {
+	local error = runVBoxManageCommandEx(argv);
+	throwVBoxManageError(argv, error);
 }
 
 function runVBoxManageCommandAndCaptureOutput(argv: {string...}): {string...} {
