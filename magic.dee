@@ -46,7 +46,7 @@ File.stderr.setbuf("line");
 
 global CONFIG_MAX_COMPILERS: int = 12; /* TODO: Don't hardcode 12! - Calculate dynamically as the number of cores on our host machine */
 global CONFIG_EMULATOR_USED: string = "qemu"; /* none or "qemu" / "bochs" */
-global CONFIG_EMULATOR_OPTIONS: {string: Object} = Dict();
+global CONFIG_EMULATOR_OPTIONS: {string: Object} = Dict(); /* TODO: Change docs to {string: string} */
 global CONFIG_DONT_BUILD: bool = false;
 global CONFIG_ONLY_BUILD_LIBRARIES: bool = false;
 global CONFIG_EMULATOR_STARTED_PATTERN: string = none;
@@ -73,6 +73,12 @@ global TARGET: Module = none;    /* Target configuration module */
 global TARGET_BINPATH: string;   /* Target binpath (e.g. "/bin/i386-kos-OD") */
 global KERNEL_BINARY: string;
 
+@@Called by emulators once the emulator has been started.
+@@Preferrably called _after_ a GDB stub (if any) becomes available.
+function onEmulatorStarted() {
+	if (CONFIG_EMULATOR_STARTED_PATTERN)
+		print CONFIG_EMULATOR_STARTED_PATTERN;
+}
 
 function parseConfig(config: string): (bool, bool) {
 	return {

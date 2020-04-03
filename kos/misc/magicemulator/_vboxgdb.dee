@@ -1,0 +1,910 @@
+/* Copyright (c) 2019-2020 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+import * from deemon;
+import * from ..libmagic.libmagic;
+import fs;
+import net;
+import ipc;
+
+@@Log comunications and other verbose informatino
+global final CONFIG_VERBOSE = true;
+
+@@Timeout for the next byte in an on-going command (in microseconds)
+@@When this timeout is exceeded, the current command is discarded
+global final CONFIG_GDB_COMMAND_NEXTBYTE_TIMEOUT = 1000000;
+
+@@Timeout for waiting for GDB to ACK a command (in microseconds)
+@@When this timeout is exceeded, try to send the packet again
+global final CONFIG_GDB_COMMAND_ACK_TIMEOUT = 10000000;
+
+@@Max # of times to re-attempt sending a response to GDB
+@@the total # of attempts is @(CONFIG_GDB_SEND_MAX_RETRY_COUNT + 1)
+global final CONFIG_GDB_SEND_MAX_RETRY_COUNT = 3;
+
+
+/* The different types of break points */
+global final GDB_BREAKPOINT_TYPE_SWBREAK   = 0; /* int3 */
+global final GDB_BREAKPOINT_TYPE_HWBREAK   = 1; /* DRn-breakpoint */
+global final GDB_BREAKPOINT_TYPE_WRITE     = 2; /* Break on write to `addr' */
+global final GDB_BREAKPOINT_TYPE_READ      = 3; /* Break on read from `addr' */
+global final GDB_BREAKPOINT_TYPE_READWRITE = 4; /* Break on read or write to/from `addr' */
+
+
+/* Arguments passed to `startVboxGDBGlue()` */
+global KERNEL: string;
+global TARGET_ARCH: string;
+global options: {string: Object};
+global magic: Module;
+global vmName: string;
+global virtualBoxProc: ipc.Process;
+global vbox: Module;
+
+@@The socket through which we're connected to VirtualBox
+global vBoxTelnetSocket: net.socket;
+
+@@The gdb client socket
+global gdbSocket: net.socket;
+
+@@The server socket that is listening for GDB connections
+global gdbServerSocket: net.socket;
+
+
+@@Read in response data until a line is read that doesn't contain a
+@@trailing line-feed and starts with @"VBoxDbg>". At that point, return
+@@all previously read lines.
+function vBoxTelnetGetResponse(timeout_microseconds: int = -1): Bytes {
+	local result = none;
+	for (;;) {
+		local d = vBoxTelnetSocket.recv(timeout_microseconds);
+		if (d is none || (d is string && !d))
+			break; /* Timeout */
+		if (result is none)
+			result = d;
+		else {
+			result += d;
+		}
+		if (!result.endswith("\n") && !result.endswith("\r")) {
+			/* Find the start of the last line. */
+			local n = result.rfind("\n");
+			local r = result.rfind("\r");
+			if (n < 0) {
+				if (r < 0)
+					continue;
+				n = r + 1;
+			} else {
+				if (r < 0) {
+					++n;
+				} else {
+					if (r > n)
+						n = r + 1;
+					else {
+						++n;
+					}
+				}
+			}
+			final local LASTLN_START = "VBoxDbg>";
+			if (result.substr(n, n + #LASTLN_START) == LASTLN_START) {
+				result = result[:n];
+				break;
+			}
+		}
+	}
+	return result;
+}
+
+global GDBMain;
+
+function startVboxGDBGlue(
+		KERNEL: string,
+		TARGET_ARCH: string,
+		options: {string: Object},
+		magic: Module,
+		gdbPort: string,
+		vmName: string,
+		virtualBoxProc: ipc.Process,
+		vbox: Module) {
+	/* Save some of the arguments to global variables. */
+	global KERNEL = KERNEL;
+	global TARGET_ARCH = TARGET_ARCH;
+	global options = options;
+	global magic = magic;
+	global vmName = vmName;
+	global virtualBoxProc = virtualBoxProc;
+	global vbox = vbox;
+
+	final local vboxTelnetAddr = "localhost:5000";
+	local connectResponse;
+	/* Try to connect 20 times with a delay of 0.1 seconds in-between.
+	 * In theory (and practice), this succeeds on the first try, but
+	 * it only started doing so after I added the connectedSemaphore.wait();
+	 * call in our caller to wait for VirtualBox to connect to the log pipe.
+	 * And in theory, VirtualBox might open the debug server _much_ later than
+	 * then opening of the log file (so better be safe here...) */
+	for (local i: [:20]) {
+		vBoxTelnetSocket = net.socket("AF_INET", "SOCK_STREAM", "IPPROTO_TCP");
+		try {
+			vBoxTelnetSocket.connect(vboxTelnetAddr);
+			connectResponse = vBoxTelnetGetResponse(100000); /* 0.1 seconds */
+			if (connectResponse !is none)
+				break;
+		} catch (...) {
+			if (i == 19)
+				throw;
+		}
+		vBoxTelnetSocket.close();
+	}
+	print "[vboxgdb] Connected to telnet under", vboxTelnetAddr;
+
+	if (CONFIG_VERBOSE) {
+		/* The initial response is something like:
+		 * >> "Welcome to the VirtualBox Debugger!\r\nCurrent VM is 089b0000, CPU #0\r\n".bytes() */
+		print "[vboxgdb] Initial response was:", repr connectResponse;
+	}
+
+	/* At this point we've got full control over the VirtualBox VM, but we still
+	 * have to launch our gdb-stub glue as a TCP server on `localhost:<gdbPort>`
+	 * Once that one's up and running, we can invoke `magic.onEmulatorStarted()`
+	 * to indicate that GDB is up and running! */
+	gdbServerSocket = net.socket("AF_INET", "SOCK_STREAM", "IPPROTO_TCP");
+	gdbServerSocket.bind("localhost:" + gdbPort);
+	gdbServerSocket.listen();
+	Thread(GDBMain).start();
+
+	/* Inform magic that GDB is now accepting connection requests. */
+	magic.onEmulatorStarted();
+}
+
+
+@@Buffer of unread data from @gdbSocket
+global gdbSocketBuffer: Bytes = "".bytes();
+
+@@Receive a single byte from @gdbSocket
+function gdbSocketGetc(timeout_microseconds: int = -1): int {
+	local result;
+	if (!gdbSocketBuffer) {
+		gdbSocketBuffer = gdbSocket.recv(timeout_microseconds);
+		if (!gdbSocketBuffer) {
+			if (timeout_microseconds == -1)
+				throw Error("GDB Client gracefully disconnected");
+			throw Error("Timeout while receiding data from GDB");
+		}
+	}
+	result = gdbSocketBuffer[0];
+	gdbSocketBuffer = gdbSocketBuffer[1:];
+	return result;
+}
+
+function gdbSocketUngets(s: Bytes) {
+	gdbSocketBuffer = s + gdbSocketBuffer;
+}
+function gdbSocketUngetc(c: int) {
+	gdbSocketBuffer = Bytes({ c.u8 }) + gdbSocketBuffer;
+}
+
+
+
+/* Helper functions for controlling the VM */
+
+@@Execute a telnet command, wait for it to complete, and return its response
+function vBoxTelnetExec(command: Bytes): Bytes {
+	if (CONFIG_VERBOSE)
+		print "[vboxgdb->vbx]", repr(command);
+	if (command.endswith("\r\n")) {
+		vBoxTelnetSocket.send(command);
+	} else {
+		vBoxTelnetSocket.send(command.rstrip("\r\n") + "\r\n");
+	}
+	local result = vBoxTelnetGetResponse();
+	if (CONFIG_VERBOSE)
+		print "[vboxgdb<-vbx]", repr(result);
+	return result;
+}
+
+function vBoxTelnetExecNoError(command: Bytes): Bytes {
+	local response = vBoxTelnetExec(command);
+	if ("error:" in response || "Error:" in response)
+		throw Error("Response for {!r} indicates an error {!r}"
+			.format({ command, response }));
+	return response;
+}
+
+function vBoxTelnetExecNLines(command: Bytes, expectedLineCount: int): {Bytes...} {
+	local result = vBoxTelnetExec(command);
+	result = result.strip().splitlines(false);
+	if (#result != expectedLineCount)
+		throw Error("Unexpected # of lines in response to {!r} (response: {!r})"
+			.format({ command, result }));
+	return result;
+}
+
+
+@@The current state of the VM (set using @vmResume() and @vmPause())
+global vmIsRunning = false;
+
+global _vmIsUiPaused = true;
+global _vmIsDebuggerPaused = false;
+
+function vmPause() {
+	if (!vmIsRunning)
+		return; /* Already paused */
+	if (!_vmIsUiPaused) {
+		vbox.runVBoxManageCommand({ "controlvm", vmName, "pause" });
+		_vmIsUiPaused = true;
+	}
+	if (!_vmIsDebuggerPaused) {
+		vBoxTelnetExecNoError("stop");
+		_vmIsDebuggerPaused = true;
+	}
+	vmIsRunning = false;
+}
+
+function _vBoxTelnetExecContinue() {
+	for (;;) {
+		local response = vBoxTelnetExec("g");
+		if ("error:" !in response && "Error:" !in response)
+			break;
+		if ("already running" in response)
+			break;
+		/* Try again... */
+	}
+}
+
+function vmResume() {
+	if (vmIsRunning)
+		return; /* Already running */
+	if (!_vmIsUiPaused) {
+		vbox.runVBoxManageCommand({ "controlvm", vmName, "pause" });
+		_vmIsUiPaused = true;
+	}
+	if (_vmIsDebuggerPaused) {
+		_vBoxTelnetExecContinue();
+		_vmIsDebuggerPaused = false;
+	}
+	if (_vmIsUiPaused) {
+		vbox.runVBoxManageCommand({ "controlvm", vmName, "resume" });
+		_vmIsUiPaused = false;
+	}
+	vmIsRunning = true;
+}
+
+function vmSingleStep() {
+	/* Single-stepping is kind-of busted.
+	 * However doing it as a sequence of commands
+	 * every time we want to step seems to work:
+	 * [if !_vmIsUiPaused]       cmd>$ VBoxManage controlvm <vmName> pause
+	 * [if !_vmIsDebuggerPaused] tel>$ stop
+	 *                           tel>$ p
+	 *                           cmd>$ VBoxManage controlvm <vmName> resume
+	 *                           tel<$ dbgf event: Single step! (other)
+	 *                           cmd>$ VBoxManage controlvm <vmName> pause
+	 *                           tel>$ g */
+	if (!_vmIsUiPaused) {
+		vbox.runVBoxManageCommand({ "controlvm", vmName, "pause" });
+		_vmIsUiPaused = true;
+	}
+	if (!_vmIsDebuggerPaused) {
+		vBoxTelnetExecNoError("stop");
+		_vmIsDebuggerPaused = true;
+	}
+	/* The p command can be a bit stingy... */
+	for (;;) {
+		local response = vBoxTelnetExec("p");
+		if ("error:" !in response && "Error:" !in response)
+			break;
+		if ("Invalid command event" !in response)
+			throw Error("Failed to single-step (`p` returned {!r})"
+				.format({ response }));
+		/* Try again... */
+	}
+	vbox.runVBoxManageCommand({ "controlvm", vmName, "resume" });
+	local stepResponse = vBoxTelnetGetResponse();
+	if (CONFIG_VERBOSE)
+		print "[vboxgdb<-vbx] Step-response:", repr(stepResponse);
+	vbox.runVBoxManageCommand({ "controlvm", vmName, "pause" });
+	_vBoxTelnetExecContinue();
+	_vmIsUiPaused       = true;
+	_vmIsDebuggerPaused = false;
+	vmIsRunning         = false;
+	if ("Single step" !in stepResponse)
+		throw Error("Unexpected response for single-step: {!r}"
+			.format({ stepResponse }));
+}
+
+
+@@The currently selected CPU core (set using @vmSetCurrentCpu())
+global vmCurrentCpu = 0;
+
+@@Change the currently selected CPU
+function vmSetCurrentCpu(newCpu: int) {
+	if (newCpu == vmCurrentCpu)
+		return;
+	vBoxTelnetExec("cpu " + newCpu);
+	vmCurrentCpu = newCpu;
+}
+
+@@Set of currently defined breakpoints
+global vmDefinedBreakpoints = HashSet();
+
+@@Clear all defined breakpoints
+function vmClearAllBreakpoints() {
+	if (!vmDefinedBreakpoints)
+		return;
+	vBoxTelnetExecNoError("bc all");
+	vmDefinedBreakpoints.clear();
+}
+
+function vmSetRegister(name: string, value: string | int) {
+	if (value !is string)
+		value = value.hex();
+	vBoxTelnetExecNoError("rg {} = {}".format({ name, value }));
+}
+
+function vmGetRegister(name: string): Bytes {
+	local resp = vBoxTelnetExecNLines("rg " + name, 1)[0];
+	return resp[resp.index("=") + 1:].strip();
+}
+
+@@Return a set of @(register, value) for the following registers:
+@@   @"ax", @"bx", @"cx", @"dx", @"si", @"di", @"sp", @"bp", @"ip", @"flags"
+@@   @"cs", @"ds", @"es", @"fs", @"gs"
+@@The register names of the first line always have those names in the returned
+@@mapping, however will have had the one of @"foo", @"efoo" or @"rfoo" in the
+@@original register list.
+function vmGetRegisters(): {string: int} {
+	local resp = vBoxTelnetExecNoError("rg")
+		.unifylines(" ");
+	for (;;) {
+		local newresp = resp.replace("  ", " ");
+		if (newresp == resp)
+			break;
+		resp = newresp;
+	}
+	resp = resp.replace("= ", "=").replace(" =", "=").lower();
+	local result = Dict();
+	for (local elem: resp.split(" ")) {
+		local regnam, none, regval = elem.partition("=")...;
+		if (!regnam || !regval)
+			continue;
+		try {
+			regval = int(regval, 16);
+		} catch (...) {
+			continue;
+		}
+		if ((regnam.startswith("e") || regnam.startswith("r")) &&
+		    (#regnam == 3 || regnam[1:] == "flags"))
+			regnam = regnam[1:];
+		result[regnam] = regval;
+	}
+	final local SEGMENT_REGISTERS = { "cs", "ds", "es", "fs", "gs" };
+	final local MANDATORY_REGISTERS = {
+		"ax", "bx", "cx", "dx", "si", "di", "sp", "bp", "ip", "flags",
+		"cs", "ds", "es", "fs", "gs"
+	};
+	for (local reg: MANDATORY_REGISTERS) {
+		if (reg !in result) {
+			local regnam = reg;
+			if (reg !in SEGMENT_REGISTERS)
+				reg = "r" + reg;
+			local regval = vmGetRegister(reg);
+			if (regval.startswith("0x"))
+				regval = regval[2:];
+			result[regnam] = int(regval, 16);
+		}
+	}
+	return result;
+}
+
+
+function vmReadMemoryAt(addr: int): Bytes {
+	local response = vBoxTelnetExecNoError(
+		"dd " + addr.hex()).splitlines(false);
+	local resultlen = 16 * #response;
+	local result = Bytes(resultlen);
+	local offset = 0;
+	for (local l: response) {
+		if (!l)
+			continue;
+		local data = l[l.index(":") + 1:].lstrip();
+		for (local dword: data.split(" ")) {
+			if (!dword)
+				continue;
+			dword = int(dword, 16);
+			if (offset + 4 >= resultlen) {
+				resultlen = offset + 4;
+				result = result.resized(resultlen);
+			}
+			result[offset] = dword & 0xff;
+			++offset;
+			result[offset] = (dword >> 8) & 0xff;
+			++offset;
+			result[offset] = (dword >> 16) & 0xff;
+			++offset;
+			result[offset] = (dword >> 24) & 0xff;
+			++offset;
+		}
+	}
+	return result;
+}
+
+@@Read @count bytes of memory from @addr
+function vmReadMemory(addr: int, count: int): Bytes {
+	local result = vmReadMemoryAt(addr);
+	while (count > #result) {
+		/* Read more data */
+		result += vmReadMemoryAt(addr + #result);
+	}
+	return result[:count];
+}
+
+@@Write @data to memory at @addr
+@@@param: wordType: One of @("b", "w", "d", "q")
+function vmWriteMemoryWord(addr: int, wordType: string, value: int) {
+	vBoxTelnetExecNoError("e{} {} {}"
+		.format({ wordType, addr.hex(), value.hex() }));
+}
+
+function extractWordLeFromBytes(b: Bytes, i: int, nBytes: int): int {
+	local result = 0;
+	for (local j: [:nBytes])
+		result |= b[i + j] << (j * 8);
+	return result;
+}
+
+@@Write @data to memory at @addr
+function vmWriteMemory(addr: int, data: Bytes) {
+	local i = 0, len = #data;
+	while (i < len) {
+		local missing = len - i;
+		local realAddr = addr + i;
+		if (missing >= 8) {
+			vmWriteMemoryWord(realAddr, "q", extractWordLeFromBytes(data, i, 8));
+			i += 8;
+		} else if (missing >= 4) {
+			vmWriteMemoryWord(realAddr, "d", extractWordLeFromBytes(data, i, 4));
+			i += 4;
+		} else if (missing >= 2) {
+			vmWriteMemoryWord(realAddr, "w", extractWordLeFromBytes(data, i, 2));
+			i += 2;
+		} else {
+			vmWriteMemoryWord(realAddr, "b", data[i]);
+			++i;
+		}
+	}
+}
+
+@@Add/Remove a breakpoint
+@@@param: typ: One of @(GDB_BREAKPOINT_TYPE_*)
+function vmControlBreakpoint(add: bool, typ: int, addr: int, kind: int) {
+	throw Error("TODO");
+}
+
+
+
+
+@@The GDB stop reason (e.g. "T02")
+@@This is the pre-fixed string returned by @gdbConstructStopReply()
+global gdbStopReason: Bytes = none;
+
+global gdbCurrentThreadForContinue: int = none;
+global gdbCurrentThreadForGeneral: int = none;
+
+function tohex(val: int): int {
+	val = val & 0xf;
+	if (val <= 9)
+		return "0".ord() + val;
+	return "a".ord() + val - 10;
+}
+
+function fromhex(ord: int): int {
+	if (ord >= "0".ord() && ord <= "9".ord())
+		return ord - "0".ord();
+	if (ord >= "a".ord() && ord <= "f".ord())
+		return 10 + ord - "a".ord();
+	if (ord >= "A".ord() && ord <= "F".ord())
+		return 10 + ord - "A".ord();
+	throw Error("Invalid hex-character ordinal: " + repr(ord));
+}
+
+@@Calculate the correct checksum for a given GDB packet @data
+function calculateGdbChecksum(data: Bytes): int {
+	local result = 0;
+	for (local d: data)
+		result = (result + d) & 0xff;
+	return result;
+}
+
+function gdbEncodeThreadId(id: int): Bytes {
+	return vmCurrentCpu.hex()[2:].zfill(8).bytes();
+}
+
+function gdbDecodeThreadId(id: Bytes): int {
+	local result = int(id.decode("utf-8"), 16);
+	if (result < 0)
+		return 0;
+	return result;
+}
+
+function encodeHex4b(fp: File, s: int) {
+	fp.putc(tohex(s >> 4));
+	fp.putc(tohex(s));
+	fp.putc(tohex(s >> 12));
+	fp.putc(tohex(s >> 8));
+	fp.putc(tohex(s >> 20));
+	fp.putc(tohex(s >> 16));
+	fp.putc(tohex(s >> 28));
+	fp.putc(tohex(s >> 24));
+}
+
+function decodeHex4b(b: Bytes, i: int): int {
+	local result = 0;
+	for (local j: [:4]) {
+		local c1 = fromhex(b[i + j * 2]);
+		local c2 = fromhex(b[i + j * 2 + 1]);
+		local c  = c1 << 4 | c2;
+		result |= c << (j * 8);
+	}
+	return result;
+}
+
+
+
+@@Construct the response to-be returned by the '?' command (as well as \3 interrupts)
+function gdbConstructStopReply(): Bytes {
+	if (gdbStopReason is none)
+		gdbStopReason = "T02"; /* SIGINT */
+	return "{}thread:{};".format({
+		gdbStopReason,
+		gdbEncodeThreadId(vmCurrentCpu)
+	});
+}
+
+@@Evaluate a given @cmd and return the intended response
+function GDBEvaluateCommand(cmd: Bytes): Bytes {
+	if (!cmd)
+		goto unknown;
+	local ch0 = cmd[0];
+	switch (ch0) {
+
+	case "?".ord():
+		/* This query should only be issued during startup. Use it to clear breakpoints. */
+		vmClearAllBreakpoints();
+		return gdbConstructStopReply();
+
+	case "C".ord():
+		cmd = cmd[cmd.index(";") + 1:]; /* Skip the signal number */
+	case "c".ord(): {
+		local rip = cmd[1:];
+		if (rip) {
+			rip = int(rip, 16);
+			vmSetCurrentCpu(gdbCurrentThreadForContinue);
+			vmSetRegister("rip", rip);
+		}
+		vmResume();
+		return none;
+	}
+
+	case "g".ord(): {
+		vmSetCurrentCpu(gdbCurrentThreadForGeneral);
+		local regs = vmGetRegisters();
+		File.Writer result;
+		if (TARGET_ARCH == "x86_64") {
+			throw Error("TODO");
+		} else {
+			for (local name: {
+				"ax", "cx", "dx", "bx", "sp", "bp", "si", "di", "ip", "flags",
+				"cs", "ss", "ds", "es", "fs", "gs",
+			}) {
+				encodeHex4b(result, regs[name]);
+			}
+		}
+		return result.string;
+	}
+
+	case "G".ord(): {
+		local data = cmd[1:];
+		vmSetCurrentCpu(gdbCurrentThreadForGeneral);
+		if (TARGET_ARCH == "x86_64") {
+			throw Error("TODO");
+		} else {
+			local regs = {
+				"eax", "ecx", "edx", "ebx", "esp", "ebp", "esi", "edi",
+				"eip", "eflags", "cs", "ss", "ds", "es", "fs", "gs",
+			};
+			if (#data < #regs * 8)
+				throw Error("Register data blob is too small");
+			local offset = 0;
+			for (local name: regs) {
+				vmSetRegister(name, decodeHex4b(data, offset));
+				offset += 8;
+			}
+		}
+		return "OK";
+	}
+
+	case "H".ord(): {
+		local op = cmd[1];
+		local id = gdbDecodeThreadId(cmd[2:]);
+		if (op == "c".ord()) {
+			vmSetCurrentCpu(id);
+			gdbCurrentThreadForContinue = id;
+		} else if (op == "g".ord()) {
+			vmSetCurrentCpu(id);
+			gdbCurrentThreadForGeneral = id;
+		} else {
+			goto unknown;
+		}
+		return "OK";
+	}
+
+	case "I".ord():
+	case "S".ord():
+		cmd = cmd[cmd.index(";") + 1:]; /* Skip the signal number */
+	case "i".ord():
+	case "s".ord(): {
+		local rip = cmd[1:];
+		if (rip) {
+			rip = int(rip, 16);
+			vmSetCurrentCpu(gdbCurrentThreadForContinue);
+			vmSetRegister("rip", rip);
+		}
+		/* Do the single-step */
+		vmSingleStep();
+		/* Construct a new stop-reply */
+		gdbStopReason = "T05"; /* SIGINT */
+		return gdbConstructStopReply();
+	}
+
+	case "k".ord():
+		throw Error("GDB kill request");
+
+	case "m".ord(): {
+		local addr, none, length = cmd[1:].partition(",")...;
+		addr   = int(addr, 16);
+		length = int(length, 16);
+		vmSetCurrentCpu(gdbCurrentThreadForGeneral);
+		local data = vmReadMemory(addr, length);
+		local result = Bytes(length * 2);
+		for (local i: [:length]) {
+			local b = data[i];
+			result[(i * 2)]     = tohex(b >> 4);
+			result[(i * 2) + 1] = tohex(b);
+		}
+		return result;
+	}
+
+	case "M".ord(): {
+		local addr_end   = cmd.index(",");
+		local length_end = cmd.index(":", addr_end + 1);
+		local addr   = cmd[1:addr_end];
+		local length = cmd[addr_end + 1:length_end];
+		local data = cmd[length_end + 1:];
+		addr   = int(addr, 16);
+		length = int(length, 16);
+		if (length > #data / 2)
+			throw Error("Too few data digits for memory write");
+		local rawData = Bytes(length);
+		for (local i: [:length]) {
+			local lo = fromhex(data[i * 2]);
+			local hi = fromhex(data[i * 2 + 1]);
+			rawData[i] = (hi << 4) | lo;
+		}
+		vmSetCurrentCpu(gdbCurrentThreadForGeneral);
+		vmWriteMemory(addr, rawData);
+		return "OK";
+	}
+
+	/* TODO: p */
+	/* TODO: P */
+	/* TODO: T */
+	/* TODO: vCont */
+	/* TODO: qSearch */
+	/* TODO: qXfer */
+	/* TODO: qThreadExtraInfo */
+	/* TODO: qSupported */
+	/* TODO: qThreadInfo */
+	/* TODO: qNoAckMode */
+	/* TODO: QStartNoAckMode */
+	/* TODO: QNoAckMode */
+	/* TODO: X */
+
+	case "z".ord():
+	case "Z".ord(): {
+		local shouldAdd = cmd[0] == "z".ord();
+		local type_end = cmd.index(",");
+		local addr_end = cmd.index(",", type_end + 1);
+		local typ  = int(cmd[1:type_end], 16);
+		local addr = int(cmd[type_end + 1:addr_end], 16);
+		local kind = int(cmd[addr_end + 1:], 16);
+		vmSetCurrentCpu(gdbCurrentThreadForGeneral);
+		vmControlBreakpoint(shouldAdd, typ, addr, kind);
+		return "OK";
+	}
+
+	default:
+		break;
+	}
+unknown:
+	return "";
+}
+
+@@Handle an event message send by the VirtualBox debugger
+@@@return: true:  Send a stop reply to GDB (must set @gdbStopReason before)
+@@@return: false: Ignore and resume execution
+function GDBHandleVirtualBoxEvent(event: Bytes): bool {
+	return false;
+}
+
+function GDBEnter() {
+	/* Always make sure that the VM is paused when we get here! */
+	vmPause();
+	gdbCurrentThreadForContinue = vmCurrentCpu;
+	gdbCurrentThreadForGeneral  = vmCurrentCpu;
+}
+
+
+@@The main function for the GDB glue driver
+function GDBMain() {
+	try {
+		gdbSocket = gdbServerSocket.accept();
+		if (CONFIG_VERBOSE)
+			print "[vboxgdb] GDB connection established:", gdbSocket;
+		for (;;) {
+			local resp;
+wait_for_command:
+			local c;
+			if (vmIsRunning) {
+				final local CHECK_TIMEOUT_MICROSECONDS = 50000;
+				for (;;) {
+					c = gdbSocketGetc(CHECK_TIMEOUT_MICROSECONDS);
+					if (c >= 0)
+						break;
+					c = vBoxTelnetGetResponse(CHECK_TIMEOUT_MICROSECONDS);
+					if (c !is none) {
+						if (CONFIG_VERBOSE)
+							print "[vboxgdb<-vbx] Event:", repr(c);
+						if (GDBHandleVirtualBoxEvent(c))
+							goto do_send_stop_reply;
+					}
+				}
+			} else {
+				c = gdbSocketGetc();
+			}
+			if (c == 3) {
+				GDBEnter();
+				gdbStopReason = "T02"; /* SIGINT */
+do_send_stop_reply:
+				resp = gdbConstructStopReply();
+				goto do_send_resp;
+			} else if (c == "$".ord()) {
+				{
+					local i = 0, len = 256;
+					local commandBuffer = Bytes(len);
+					local hasEscapedBytes = false;
+					for (;;) {
+						c = gdbSocketGetc(CONFIG_GDB_COMMAND_NEXTBYTE_TIMEOUT);
+						if (c == "}".ord()) {
+							/* Escape the next character. */
+							while (i + 1 >= len) {
+								len *= 2;
+								commandBuffer = commandBuffer.resized(len);
+							}
+							commandBuffer[i] = c;
+							++i;
+							c = gdbSocketGetc(CONFIG_GDB_COMMAND_NEXTBYTE_TIMEOUT);
+							commandBuffer[i] = c;
+							++i;
+							hasEscapedBytes = true;
+							continue;
+						} else if (c == "#".ord()) {
+							break;
+						}
+						if (i >= len) {
+							len *= 2;
+							commandBuffer = commandBuffer.resized(len);
+						}
+						commandBuffer[i] = c;
+						++i;
+					}
+					commandBuffer = commandBuffer[:i];
+					local chka = fromhex(gdbSocketGetc(CONFIG_GDB_COMMAND_NEXTBYTE_TIMEOUT));
+					local chkb = fromhex(gdbSocketGetc(CONFIG_GDB_COMMAND_NEXTBYTE_TIMEOUT));
+					local checksum = chka << 4 | chkb;
+					local expectedChecksum = calculateGdbChecksum(commandBuffer);
+					if (checksum != expectedChecksum) {
+						print("[vboxgdb] WARNING: Bad checksum for packet ",
+							repr(commandBuffer), " (expected: ", expectedChecksum.hex(),
+							", got: ", checksum.hex(), ")");
+						gdbSocket.send("-".bytes());
+						goto wait_for_command;
+					}
+					/* Send the ACK */
+					gdbSocket.send("+".bytes());
+					if (hasEscapedBytes) {
+						/* Unescape data. */
+						len = #commandBuffer;
+						local realCommandBuffer = Bytes(len);
+						local realLen = 0;
+						for (local i = 0; i < len; ++i) {
+							local c = commandBuffer[i];
+							if (c == "}".ord()) {
+								++i;
+								c = commandBuffer[i] ^ 0x20;
+							}
+							realCommandBuffer[realLen] = c;
+							++realLen;
+						}
+						commandBuffer = realCommandBuffer.resized(realLen);
+					}
+					GDBEnter();
+					try {
+						if (CONFIG_VERBOSE)
+							print "[vboxgdb<-gdb]", repr commandBuffer;
+						resp = GDBEvaluateCommand(commandBuffer);
+					} catch (e...) {
+						if (CONFIG_VERBOSE) {
+							print "[vboxgdb] WARNING: Error while executing command",
+								repr(commandBuffer), ":", e;
+							print repr Traceback.current;
+						}
+						resp = "E16"; /* 0x16 == 22 == EINVAL (on linux) */
+					}
+					if (resp is none)
+						goto wait_for_command;
+				}
+do_send_resp:
+				if (resp !is Bytes)
+					resp = resp.bytes();
+				local respLen = #resp;
+				local fullResponse = Bytes(respLen + 4);
+				fullResponse[0]             = "$".ord();
+				fullResponse[1:1 + respLen] = resp;
+				local checksum = calculateGdbChecksum(resp);
+				fullResponse[respLen + 1] = "#".ord();
+				fullResponse[respLen + 2] = tohex(checksum >> 4);
+				fullResponse[respLen + 3] = tohex(checksum);
+				if (CONFIG_VERBOSE)
+					print "[vboxgdb->gdb]", repr fullResponse;
+				local retry = CONFIG_GDB_SEND_MAX_RETRY_COUNT;
+				for (;;) {
+					gdbSocket.send(fullResponse);
+					local resp = gdbSocketGetc(CONFIG_GDB_COMMAND_ACK_TIMEOUT);
+					if (resp == "+".ord())
+						break; /* Got it! */
+					if (resp >= 0 && resp != "-".ord())
+						print "[vboxgdb] WARNING: expected ACK/NACK, but got", resp.hex();
+					if (!retry)
+						throw Error("Too many NACKs sending response " + repr(fullResponse));
+					--retry;
+				}
+			} else {
+				print "[vboxgdb] WARNING: Unrecognized out-of-bad byte:", c.hex();
+			}
+		}
+	} @[interrupt] catch (e...) {
+		print "GDBMain() crashed:";
+		print e;
+		print repr Traceback.current;
+		virtualBoxProc.terminate(1);
+	}
+}
+
+
+

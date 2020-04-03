@@ -17,11 +17,6 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifdef __WINDOWS__
-#define HOST_EXE(x)  x ".exe"
-#else
-#define HOST_EXE(x)  x
-#endif
 
 
 import * from deemon;
@@ -125,9 +120,9 @@ got_bios:
 		rc << "port_e9_hack: enabled=1\n";
 		rc << "clock: sync=none\n";
 //		rc << "debug: action=report\n";
-		local gdb_mode = options.get(opt.GDB);
-		if (gdb_mode !is none) {
-			if (gdb_mode == "qemu") {
+		local gdbMode = options.get(opt.GDB);
+		if (gdbMode !is none) {
+			if (gdbMode == "emulator") {
 				rc << "gdbstub: enabled=1, port="
 					<< options.get(opt.GDB_PORT, "1234")
 					<< ", text_base="
@@ -138,7 +133,7 @@ got_bios:
 					<< options.get("bochs.gdb.bss_base", "0")
 					<< "\n";
 			} else {
-				throw Error("bochs only supports --gdb=qemu mode");
+				throw Error("bochs only supports --gdb=emulator mode");
 			}
 		}
 
@@ -189,9 +184,10 @@ got_bios:
 	local ocwd = fs.getcwd();
 	fs.chdir(fs.headof(kernelShadowFilename));
 	proc.start();
-	fs.chdir(ocwd);
 	try {
+		fs.chdir(ocwd);
 		w.close();
+		magic.onEmulatorStarted();
 		common.processKosDebugOutput(
 			r: r,
 			groups: groups,

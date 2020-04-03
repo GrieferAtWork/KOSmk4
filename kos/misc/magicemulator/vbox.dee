@@ -21,16 +21,16 @@
 
 import * from deemon;
 import * from ..libmagic.libmagic;
-import flattenElfBinary from ..libmagic.steps.elf;
 import opt = ._options;
 import fs;
 import ipc;
+import threading;
 import ._common as common;
 import ._shadow as shadow;
 
 global win32: Module;
-global BOCHSEXE_VBOXMANAGE: string;
-global BOCHSEXE_VIRTUALBOXVM: string;
+global EXE_VBOXMANAGE: string;
+global EXE_VIRTUALBOXVM: string;
 
 try {
 	win32 = import("win32");
@@ -49,17 +49,17 @@ function throwVBoxManageError(argv: {string...}, error: int) {
 		throw Error("`VBoxManage " + repr(argv) + "` failed with " + error);
 }
 function runVBoxManageCommand(argv: {string...}) {
-	if (BOCHSEXE_VBOXMANAGE is none)
+	if (EXE_VBOXMANAGE is none)
 		throw Error("Failed to locate `VBoxManage`");
-	local proc = ipc.Process(BOCHSEXE_VBOXMANAGE, argv);
+	local proc = ipc.Process(EXE_VBOXMANAGE, argv);
 	proc.start();
 	throwVBoxManageError(argv, proc.join());
 }
 
 function runVBoxManageCommandAndCaptureOutput(argv: {string...}): {string...} {
-	if (BOCHSEXE_VBOXMANAGE is none)
+	if (EXE_VBOXMANAGE is none)
 		throw Error("Failed to locate `VBoxManage`");
-	local proc = ipc.Process(BOCHSEXE_VBOXMANAGE, argv);
+	local proc = ipc.Process(EXE_VBOXMANAGE, argv);
 	local r, w = ipc.Pipe.new()...;
 	proc.stdout = w;
 	proc.start();
@@ -112,13 +112,15 @@ function createNamePipeAndStartLogProcessingThread(
 		proc: ipc.Process,
 		namedPipeName: string,
 		groups: {Group...},
-		config: Config) {
+		config: Config,
+		connectedSemaphore: threading.Semaphore) {
 	local hNamedPipe = win32.CreateNamedPipe(
 		namedPipeName, win32.PIPE_ACCESS_INBOUND, win32.PIPE_TYPE_BYTE, 1);
-	Thread([](proc, hNamedPipe, groups, config){
+	Thread([](proc, hNamedPipe, groups, config, connectedSemaphore){
 		try {
 			/* Wait for VBox to open what it thinks to be a log file. */
 			win32.ConnectNamedPipe(hNamedPipe);
+			connectedSemaphore.post();
 			for (;;) {
 				local buf = Bytes(1024);
 				local cnt;
@@ -128,7 +130,7 @@ function createNamePipeAndStartLogProcessingThread(
 					proc.terminate();
 					return;
 				}
-				File.stdout.write(buf.substr(0, cnt));
+				File.stderr.write(buf.substr(0, cnt));
 			}
 		} @[interrupt] catch (e...) {
 			print "NamedPipe relay thread crashed:";
@@ -136,7 +138,7 @@ function createNamePipeAndStartLogProcessingThread(
 			proc.terminate();
 			ipc.Process.current.terminate(1);
 		}
-	}, (proc, hNamedPipe, groups, config)).start();
+	}, (proc, hNamedPipe, groups, config, connectedSemaphore)).start();
 }
 
 
@@ -156,37 +158,27 @@ function start(
 		throw Error("VBox doesn't support booting KOS with additional drivers");
 	if (options.get(opt.CMDLINE))
 		throw Error("VBox doesn't support a kernel commandline");
-	if (options.get(opt.GDB) !is none) {
-		/* TODO: VirtualBox _does_ have its own commandline-based debugger that
-		 *       could be adopted to be usable as a sort-of GDB stub by placing
-		 *       a compability driver (possible written in deemon) in-between.
-		 * s.a.: https://www.virtualbox.org/manual/ch12.html#ts_debugger
-		 *       Which states that telnet:5000 may be used to communicate with
-		 *       the VirtualBox debugger, so one solution could be to connect
-		 *       the two with some in-between glue... */
-		throw Error("VBox doesn't support any kind of GDB debugging");
-	}
-	BOCHSEXE_VBOXMANAGE   = options.get("vbox.VBoxManage");
-	BOCHSEXE_VIRTUALBOXVM = options.get("vbox.VirtualBoxVM");
-	if (BOCHSEXE_VBOXMANAGE is none) {
-		BOCHSEXE_VBOXMANAGE = common.findExecutableInPaths(
+	EXE_VBOXMANAGE   = options.get("vbox.VBoxManage");
+	EXE_VIRTUALBOXVM = options.get("vbox.VirtualBoxVM");
+	if (EXE_VBOXMANAGE is none) {
+		EXE_VBOXMANAGE = common.findExecutableInPaths(
 			enumerateVirtualBoxInstallLocations(), "VBoxManage");
 	}
-	if (BOCHSEXE_VIRTUALBOXVM is none) {
-		if (BOCHSEXE_VBOXMANAGE !is none) {
-			local ext = fs.extof(BOCHSEXE_VBOXMANAGE);
+	if (EXE_VIRTUALBOXVM is none) {
+		if (EXE_VBOXMANAGE !is none) {
+			local ext = fs.extof(EXE_VBOXMANAGE);
 			if (ext)
 				ext = "." + ext;
-			BOCHSEXE_VIRTUALBOXVM = fs.joinpath(
-				fs.headof(BOCHSEXE_VBOXMANAGE),
+			EXE_VIRTUALBOXVM = fs.joinpath(
+				fs.headof(EXE_VBOXMANAGE),
 				"VirtualBoxVM" + ext);
 		}
-		if (BOCHSEXE_VIRTUALBOXVM is none || !fs.stat.exists(BOCHSEXE_VIRTUALBOXVM)) {
-			if (BOCHSEXE_VIRTUALBOXVM !is none) {
+		if (EXE_VIRTUALBOXVM is none || !fs.stat.exists(EXE_VIRTUALBOXVM)) {
+			if (EXE_VIRTUALBOXVM !is none) {
 				print "[vbox] `VirtualBoxVM` not found in expected location",
-					repr BOCHSEXE_VIRTUALBOXVM;
+					repr EXE_VIRTUALBOXVM;
 			}
-			BOCHSEXE_VIRTUALBOXVM = common.findExecutableInPaths(
+			EXE_VIRTUALBOXVM = common.findExecutableInPaths(
 				enumerateVirtualBoxInstallLocations(), "VirtualBoxVM");
 		}
 	}
@@ -232,6 +224,8 @@ function start(
 		});
 		vmVboxConfig = File.open(vmVboxConfigFilename, "r+");
 	}
+	local startVboxGDBGlue: Callable = none;
+	local gdbMode = options.get(opt.GDB);
 	with (vmVboxConfig) {
 		File.Writer keepPrefix;
 		for (local l: vmVboxConfig) {
@@ -297,6 +291,16 @@ function start(
 		vmVboxConfig << "	</AttachedDevice>\n";
 		vmVboxConfig << "</StorageController>\n";
 		vmVboxConfig << "</StorageControllers>\n";
+		if (gdbMode !is none) {
+			if (gdbMode == "emulator") {
+				startVboxGDBGlue = import("._vboxgdb").startVboxGDBGlue;
+				vmVboxConfig << "<ExtraData>\n";
+				vmVboxConfig << "	<ExtraDataItem name=\"VBoxInternal/DBGC/Enabled\" value=\"1\"/>\n";
+				vmVboxConfig << "</ExtraData>\n";
+			} else {
+				throw Error("VirtualBox only supports --gdb=emulator mode");
+			}
+		}
 		vmVboxConfig.write("</Machine>\n</VirtualBox>\n");
 		vmVboxConfig.trunc();
 	}
@@ -310,13 +314,20 @@ function start(
 	 * and can immediatly shut down emulation when the user presses CTRL+C
 	 * from within our console. */
 //	runVBoxManageCommand({ "startvm", vmName });
-	local proc = ipc.Process(BOCHSEXE_VIRTUALBOXVM, [
+	local vBoxArgs = [
 		"--comment", vmName,
 		"--startvm", vmName,
-		"--no-startvm-errormsgbox"
-	]);
+		"--no-startvm-errormsgbox",
+		"--dbg"];
+	if (gdbMode !is none)
+		vBoxArgs.append("--start-paused");
+	local proc = ipc.Process(EXE_VIRTUALBOXVM, vBoxArgs);
+	local connectedSemaphore = none;
+	if (startVboxGDBGlue !is none)
+		connectedSemaphore = threading.Semaphore(0);
 	/* Use a named pipe to relay log output such that we can process it. */
-	createNamePipeAndStartLogProcessingThread(proc, pipeName, groups, config);
+	createNamePipeAndStartLogProcessingThread(
+		proc, pipeName, groups, config, connectedSemaphore);
 	/* Wait for the processing thread to starting accepting connections.
 	 * Once this has happened, anyone can CreateFile() to open the pipe,
 	 * at which point we'll be receiving anything that gets written to
@@ -324,6 +335,21 @@ function start(
 	win32.WaitNamedPipe(pipeName);
 	proc.start();
 	try {
+		if (startVboxGDBGlue !is none) {
+			connectedSemaphore.wait();
+			import . as me;
+			startVboxGDBGlue(
+				KERNEL: KERNEL,
+				TARGET_ARCH: TARGET_ARCH,
+				options: options,
+				magic: magic,
+				gdbPort: options.get(opt.GDB_PORT, "1234"),
+				vmName: vmName,
+				virtualBoxProc: proc,
+				vbox: me);
+		} else {
+			magic.onEmulatorStarted();
+		}
 		local error = proc.join();
 		if (error != 0)
 			throw Error("VirtualBox returned with " + error);
@@ -337,29 +363,6 @@ function start(
 		throw;
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

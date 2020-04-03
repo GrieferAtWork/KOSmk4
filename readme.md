@@ -5,12 +5,12 @@ KOSmk4 (the 4th rendition of the KOS operating system series) is a home-made, ho
 
 It is designed with a *lot* of tricks up its sleeve to aid during debugging, such as a fully interactive builtin debugger that gives you the ability to interactively analyze the system state when something goes wrong, as well as support for various different forms of debugging using GDB.
 
-In general, KOS isn't designed to re-invent the wheel (no square wheels here), but rather tries to make said metaphorical wheel look and roll as best as possible. What this means is that:
+In general, KOS isn't designed to re-invent the wheel (no square wheels here), but rather tries to make said metaphorical wheel look and roll as well as possible. What this means is that:
 - KOS tries to be fully [POSIX](http://www.open-std.org/jtc1/sc22/open/n4217.pdf) compliant
 - KOS tries to be fully API- and ABI-compatible with Linux/GNU/GLibc/... on all supported architectures
-- KOS's source components of are very tightly interwoven with each other and both headers and sources will try to make use of the many GCC extensions that exist to improve generated code and behavioral inference
-- KOS's sources and headers contain a lot of documentation and I try to given every *magic* number that gets used a proper name, so to understand how KOS works, all that should be necessary is for you to read the documentation for whatever you're looking at
-- KOS also includes binary compatibility for simple NT programs compiled with VisualC (but is currently lacking a PE loader such that only ELF binaries can be loaded at the moment)
+- KOS's source components of are very tightly interwoven with each other, and both headers and sources make use of the many GCC extensions that exist to both improve generated code, as well as inducing the behavior of different functions
+- KOS's sources and headers contain a lot of documentation and I try to give every *magic* number that gets used a proper name. So to understand how KOS works, all that you need to do is to read the documentation of whatever you're looking at
+- KOS also includes binary compatibility for simple NT programs compiled with VisualC (but is currently lacking a PE loader such that only ELF binaries can be loaded right now)
 
 
 ## Table of contents
@@ -68,6 +68,11 @@ All ported applications can be installed onto your KOS disk image by using `bash
 		- Disassemble x86 assembly into human-readable assembly dumps
 	- GDB support
 		- QEMU features a builtin gdb server, that is supported for debugging the core itself
+			- This feature can be used via `deemon magic.dee --emulator=qemu --gdb=emulator`
+		- BOCHS can be compiled to support a builtin GDB stub
+			- This feature can be used via `deemon magic.dee --emulator=bochs --gdb=emulator`
+		- VirtualBox has its own builtin debugger (not GDB), that can be accessed via telnet. KOS's toolchain contains a (self-made) glue-driver that connects to VirtualBox to provide a(n experimental) GDB-compatible interface.
+			- This feature can be used via `deemon magic.dee --emulator=vbox --gdb=emulator`
 		- Seperately, KOS provides a custom GDB server driver (s.a. `/kos/src/kernel/modgdbserver`) for emulator-independent and real-hardware debugging
 		- Fully integrated with Visual Studio (who knew you could do this... I certainly didn't until I stumbled across some vague reports of GDB debugging support in VS2017, that later turned out to be true)
 - multiboot
@@ -650,17 +655,17 @@ For more information about the header substitution system, and how it makes it p
 KOS supports emulated execution via one of the following emulators
 
 - QEMU (default)
-	- Start this emulated with:
+	- Start this emulator with:
 		- `deemon magic.dee`
 		- `deemon magic.dee --emulator=qemu`
 	- This is the only emulator that supports the use of a kernel commandline, as well as boot modules
 	- Install locations searched for the qemu executable are enumerated by `enumerateQEmuInstallationLocations()` in `$PROJPATH/kos/misc/magicemulator/qemu.dee` (by default this list contains `$PATH`)
 - Bochs
-	- Start this emulated with:
+	- Start this emulator with:
 		- `deemon magic.dee --emulator=bochs`
 	- Install locations searched for the bochs executable are enumerated by `enumerateBochsInstallationLocations()` in `$PROJPATH/kos/misc/magicemulator/bochs.dee` (by default this list contains `$PATH`)
 - VirtualBox
-	- Start this emulated with:
+	- Start this emulator with:
 		- `deemon magic.dee --emulator=vbox`
 	- Install locations searched for the qemu executable are enumerated by `enumerateVirtualBoxInstallLocations()` in `$PROJPATH/kos/misc/magicemulator/vbox.dee` (by default this list contains `$PATH`)
 
@@ -738,13 +743,13 @@ One example for this would be the implementation of the libc function `qsort()`,
 
 For this purpose, note that the ZLib license is compatible with GPL (which is the license that applies to the aformentioned `qsort()` function), meaning that use of KOS in its entirety in any product requires that product to comply with the requirements of both GPL, as well as ZLib.
 
-For the purpose of using only parts of KOS (such as copy-pasting a piece of KOS-specific (*new*) code), it is usually sufficient to include a copy of the copyright notice that should be found at the top of the original source file, or can also be found in `$PROJPATH/LICENSE`, as well as include a reference (e.g. a link) to the original source, and document the fact if changes have been made. However, once any code is included that is not part of the aformentioned KOS-specific (*new*) code (such code is plainly marked as such), you once again will have to comply to its specific copyright requirements as well.
+For the purpose of using only parts of KOS (such as copy-pasting a piece of KOS-specific (*new*) code), it is usually sufficient to include a copy of the copyright notice that should be located at the top of the original source file, or can also be found in `$PROJPATH/LICENSE`, as well as include a reference (e.g. a link) to the original source (and git revision/commit id), and document the fact if changes have been made. However, once any code is included that is not part of the aformentioned KOS-specific (*new*) code (such code is plainly marked as such), you once again will have to comply to its specific copyright requirements as well.
 
 Note that for this purpose, GPL was only mentioned as an example, but not as the rule, as other pieces of code may exist that use different licenses yet.
 
 In practice this means that the KOS source tree, and its repository are required to remain open-source forever, thus complying with GPL, however other projects are allowed to lift KOS-specific code (and KOS-specific code only), and only have to comply with requirements stated by the ZLib license. (e.g. You could steal my pageframe allocator system and use it in a commercial kernel, so-long as you neither claim to have written it yourself, and as an extension: don't claim to have written everything in your project yourself, as well as take the blame when it does end up breaking for some reason at some point)
 
-Another important distinction applies to GPL code that has been modified for the purpose of being made functional with KOS. Such code will always be marked as such and must be handled as falling under both the GPL, and the ZLib license, meaning that it, too, has to remain open-source, may not end up being used in commercial products, and any further changes made to it in the context of other projects will also have to be marked as such (in this case it sufficies to include all pre-exting copyright notices, before adding your own (GPL- and ZLib-compatible) license alongside a comment stating something something along the lines of `Originally lifted from https://github.com/GrieferAtWork/KOSmk4/..., before changes were made to the original source material`) The exact changes are not required to be marked on a per-line basis, since the inclusion of a reference to the original source would allow one to perform a diff between the two versions to determine changes made.
+Another important distinction applies to GPL code that has been modified for the purpose of being made functional with KOS. Such code will always be marked as such and must be handled as falling under both the GPL, and the ZLib license (the original *base* code being GPL, and the changed made (i.e. an imaginary *\*.patch* file) being ZLib), meaning that it (the end-product of the imaginary *\*.patch* file), too, has to remain open-source, may not end up being used in commercial products, and any further changes made to it in the context of other projects will also have to be marked as such (in this case it sufficies to include all pre-exting copyright notices, before adding your own (GPL- and ZLib-compatible) license alongside a comment stating something something along the lines of `Originally lifted from https://github.com/GrieferAtWork/KOSmk4/..., before changes were made to the original source material`) The exact changes are not required to be marked on a per-line basis, since the inclusion of a reference to the original source (alongside a git revision/commit id) would allow one to perform a diff between the two versions to determine changes made.
 
 
 
