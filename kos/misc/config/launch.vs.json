@@ -5,7 +5,7 @@
 	"configurations": [
 		{
 			"type": "cppdbg",
-			"name": "kernel (--gdb=server)",
+			"name": "kernel (--emulator=qemu --gdb=server)",
 			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
 			"project": "src",
 			"sourceFileMap": {
@@ -51,7 +51,7 @@
 				{ "text": "set follow-fork-mode child", "ignoreFailures": false }
 			],
 			"debugServerPath": "${env.SYSTEMROOT}\\system32\\cmd.exe",
-			"debugServerArgs": "/c \"deemon ABSOLUTE_KOS_NT_PROJECT_ROOT\\magic.dee --run-only --gdb=server --emulator-started-pattern=EMULATOR_STARTED --target=${env.TARGET} --config=${env.CONFIG}\"",
+			"debugServerArgs": "/c \"deemon ABSOLUTE_KOS_NT_PROJECT_ROOT\\magic.dee --run-only --emulator=qemu --gdb=server --emulator-started-pattern=EMULATOR_STARTED --target=${env.TARGET} --config=${env.CONFIG}\"",
 			"serverStarted": "EMULATOR_STARTED",
 			"serverLaunchTimeout": 120000,
 			"filterStdout": true,
@@ -107,7 +107,7 @@
 		},
 		{
 			"type": "cppdbg",
-			"name": "kernel (--gdb=server) [QNonStop:1]",
+			"name": "kernel (--emulator=qemu --gdb=server) [QNonStop:1]",
 			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
 			"project": "src",
 			"sourceFileMap": {
@@ -154,7 +154,7 @@
 				{ "text": "set follow-fork-mode child", "ignoreFailures": false }
 			],
 			"debugServerPath": "${env.SYSTEMROOT}\\system32\\cmd.exe",
-			"debugServerArgs": "/c \"deemon ABSOLUTE_KOS_NT_PROJECT_ROOT\\magic.dee --run-only --gdb=server --emulator-started-pattern=EMULATOR_STARTED --target=${env.TARGET} --config=${env.CONFIG}\"",
+			"debugServerArgs": "/c \"deemon ABSOLUTE_KOS_NT_PROJECT_ROOT\\magic.dee --run-only --emulator=qemu --gdb=server --emulator-started-pattern=EMULATOR_STARTED --target=${env.TARGET} --config=${env.CONFIG}\"",
 			"serverStarted": "EMULATOR_STARTED",
 			"serverLaunchTimeout": 120000,
 			"filterStdout": true,
@@ -211,7 +211,7 @@
 		},
 		{
 			"type": "cppdbg",
-			"name": "kernel (--gdb=emulator)",
+			"name": "kernel (--emulator=qemu --gdb=emulator)",
 			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
 			"project": "src",
 			"sourceFileMap": {
@@ -267,7 +267,51 @@
 			 *    >> "D:\FULL\PATH\TO\PROGRAM\PROGRAM.exe" %*
 			 */
 			"debugServerPath": "${env.SYSTEMROOT}\\system32\\cmd.exe",
-			"debugServerArgs": "/c \"deemon ABSOLUTE_KOS_NT_PROJECT_ROOT\\magic.dee --run-only --gdb=emulator --emulator-started-pattern=EMULATOR_STARTED --target=${env.TARGET} --config=${env.CONFIG}\"",
+			"debugServerArgs": "/c \"deemon ABSOLUTE_KOS_NT_PROJECT_ROOT\\magic.dee --run-only --emulator=qemu --gdb=emulator --emulator-started-pattern=EMULATOR_STARTED --target=${env.TARGET} --config=${env.CONFIG}\"",
+			"serverStarted": "EMULATOR_STARTED",
+			"serverLaunchTimeout": 120000,
+			"filterStdout": true,
+			"filterStderr": true
+		},
+		{
+			"type": "cppdbg",
+			"name": "kernel (--emulator=vbox --gdb=emulator)",
+			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
+			"project": "src",
+			"sourceFileMap": {
+				"ABSOLUTE_KOS_PROJECT_ROOT": "ABSOLUTE_KOS_NT_PROJECT_ROOT",
+				"/cygdrive/c": "C:\\",
+				"/cygdrive/d": "D:\\",
+				"/cygdrive/e": "E:\\",
+				"/cygdrive/f": "F:\\",
+				"/cygdrive/g": "G:\\",
+				"/cygdrive/h": "H:\\",
+				"/cygdrive/i": "I:\\",
+				"/cygdrive/j": "J:\\",
+				"/cygdrive/k": "K:\\",
+				"/cygdrive/x": "X:\\",
+				"/cygdrive/y": "Y:\\",
+				"/cygdrive/z": "Z:\\"
+			},
+			"program": "ABSOLUTE_KOS_NT_PROJECT_ROOT\\bin\\${env.TARGET}-kos-${env.CONFIG}\\os\\kernel.bin",
+			"MIMode": "gdb",
+			"miDebuggerPath": "gdb.exe",
+			"targetArchitecture": "x86",
+			"debugType": "native",
+			"launchCompleteCommand": "None",
+			"miDebuggerServerAddress": "localhost:1234",
+			"setupCommands": [
+				{ "text": "-enable-pretty-printing", "ignoreFailures": true },
+				{ "text": "set print pretty on", "ignoreFailures": true },
+				{ "text": "set print object on", "ignoreFailures": true },
+				{ "text": "set print static-members on", "ignoreFailures": true },
+				{ "text": "set print vtbl on", "ignoreFailures": true },
+				{ "text": "set print demangle on", "ignoreFailures": true },
+				{ "text": "set demangle-style gnu-v3", "ignoreFailures": true },
+				{ "text": "set print sevenbit-strings off", "ignoreFailures": true }
+			],
+			"debugServerPath": "${env.SYSTEMROOT}\\system32\\cmd.exe",
+			"debugServerArgs": "/c \"deemon ABSOLUTE_KOS_NT_PROJECT_ROOT\\magic.dee --run-only --emulator=vbox --gdb=emulator --emulator-started-pattern=EMULATOR_STARTED --target=${env.TARGET} --config=${env.CONFIG}\"",
 			"serverStarted": "EMULATOR_STARTED",
 			"serverLaunchTimeout": 120000,
 			"filterStdout": true,

@@ -697,7 +697,9 @@ function GDBEvaluateCommand(cmd: Bytes): Bytes {
 	}
 
 	case "k".ord():
-		throw Error("GDB kill request");
+		print "[vboxgdb] GDB kill request";
+		virtualBoxProc.terminate(1);
+		return "OK";
 
 	case "m".ord(): {
 		local addr, none, length = cmd[1:].partition(",")...;
