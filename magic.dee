@@ -244,31 +244,17 @@ function main(argv: {string...}) {
 		local arg = args.pop(0);
 		switch (arg) {
 		case "-1":
-		case "--single":
 			CONFIG_MAX_COMPILERS = 1;
 			break;
 		case "-v":
 		case "--verbose":
-		case "--verbose=1":
 			config.VERBOSE = true;
 			break;
-		case "--no-verbose":
-		case "--verbose=0":
-			config.VERBOSE = false;
-			break;
 		case "-E":
-		case "--gen-pp":
 			options.setdefault(OPT_COMPILE_SECONDARY, []).append("E");
 			break;
-		case "--no-gen-pp":
-			options.get(OPT_COMPILE_SECONDARY).removeall("E");
-			break;
 		case "-S":
-		case "--gen-asm":
 			options.setdefault(OPT_COMPILE_SECONDARY, []).append("S");
-			break;
-		case "--no-gen-asm":
-			options.get(OPT_COMPILE_SECONDARY).removeall("S");
 			break;
 		case "--run-only":
 			CONFIG_DONT_BUILD = true;
@@ -277,27 +263,16 @@ function main(argv: {string...}) {
 			CONFIG_ONLY_BUILD_LIBRARIES = true;
 			break;
 		case "--build-only":
-		case "--no-emulator":
 			CONFIG_EMULATOR_USED = none;
 			break;
 		case "-f":
-		case "--force":
 			config.FORCE = true;
-			break;
-		case "--no-force":
-			config.FORCE = false;
 			break;
 		case "--emulator-hosted":
 			CONFIG_EMULATOR_OPTIONS[emulatorOptions.HOSTED] = "true";
 			break;
-		case "--no-emulator-hosted":
-			CONFIG_EMULATOR_OPTIONS[emulatorOptions.HOSTED] = "false";
-			break;
 		case "--format-error-messages":
 			config.FORMAT_ERRORS = true;
-			break;
-		case "--no-format-error-messages":
-			config.FORMAT_ERRORS = false;
 			break;
 		case "--":
 			CONFIG_EMULATOR_OPTIONS[emulatorOptions.CMDLINE] = " ".join(args);
@@ -317,7 +292,6 @@ function main(argv: {string...}) {
 					AppExit.exit(0);
 					break;
 				case "-n":
-				case "--compilers":
 					CONFIG_MAX_COMPILERS = int(value);
 					break;
 				case "--emulator-setopt": {

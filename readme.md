@@ -498,7 +498,7 @@ If the file extension (and the use of [`deemon`](#building) for starting) wasn't
 
 To help you understand how this script works to do what it does, here is a documentation about its options
 
-- `-1`, `--single`
+- `-1`
 	- Compile in single-core mode (don't run more than one build step at the same time)
 - `-v`, `--verbose`
 	- Print the full commandlines of processes as they are executed
@@ -508,10 +508,10 @@ To help you understand how this script works to do what it does, here is a docum
 		- `-S` assembler input files
 - `--run-only`
 	- Skip the build step and only run KOS
-- `--build-only`, `--no-emulator`
+- `--build-only`
 	- Skip running KOS and only build its source
 	- Passed by default when building was started by pressing CTRL+SHIFT+B in Visual Studio
-- `-f`, `--force`
+- `-f`
 	- Force a full re-build of everything (except for re-formatting the KOS disk image)
 	- Passed by default when selecting `Rebuild kernel` in Visual Studio
 - `--format-error-messages`
@@ -520,7 +520,7 @@ To help you understand how this script works to do what it does, here is a docum
 - `--`
 	- Join the remainder of the argument list into a single string seperated by 1-wide space characters and pass that string into the emulator for use as the kernel commandline
 		- e.g. `deemon magic.dee -- init=/bin/system-test` will run `system-test` after boot instead of `/bin/init`
-- `-n=N`, `--compilers=N` (Defaults to `-n=<number-of-cores-on-your-machine>`)
+- `-n=N` (Defaults to `-n=<number-of-cores-on-your-machine>`)
 	- Set the max number of parallel processes to run during building to `N`
 - `--emulator=NAME` (Defaults to `--emulator=qemu`)
 	- Select which emulator to use, where `NAME` must be one of `qemu`, `bochs` or `vbox`
