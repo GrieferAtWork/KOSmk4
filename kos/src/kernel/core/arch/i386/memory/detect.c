@@ -173,10 +173,13 @@ PRIVATE ATTR_FREETEXT bool NOTHROW(KCALL detect_e820)(void) {
 	struct smap_entry *entry;
 	vm86_state_t state;
 	bool result = false;
+	unsigned int was_empty = 0;
+	u32 prev_continue_id = 0;
 	memset(&state.vr_regs, 0, sizeof(state.vr_regs));
 /*	state.vr_regs.vr_ebx = 0; * continue-id. */
 	entry                = SMAP_BUFFER;
 	do {
+		memset(entry, 0, sizeof(*entry));
 		state.vr_regs.vr_eax = 0xe820;
 		state.vr_regs.vr_ecx = sizeof(struct smap_entry);
 		state.vr_regs.vr_edx = 0x534d4150;
@@ -194,10 +197,28 @@ PRIVATE ATTR_FREETEXT bool NOTHROW(KCALL detect_e820)(void) {
 			entry->sm_type = 0;
 		if (memtype_bios_matrix[entry->sm_type] >= PMEMBANK_TYPE_COUNT)
 			continue;
-		minfo_addbank((vm_phys_t)entry->sm_addr_lo | (vm_phys_t)entry->sm_addr_hi << 32,
-		              (vm_phys_t)entry->sm_size_lo | (vm_phys_t)entry->sm_size_hi << 32,
-		              memtype_bios_matrix[entry->sm_type]);
+		if (!entry->sm_size_lo && !entry->sm_size_hi) {
+			++was_empty;
+			/* Prevent infinite loops for any bios that doesn't clear the continue-id.
+			 * This fixes booting KOS in VirtualBox, but I'm not entirely convinced that
+			 * this isn't some problem with libemu86... (though going step-by-step through
+			 * the assembly used by VirtualBox, I'm unable to find the instruction that
+			 * would normally set the new continue-id when IN:ebx==9 (VirtualBox's bios
+			 * appears to use individual code-paths for every continue-id [0..9], while
+			 * rejecting IDs that are greater than 9), but the path for 9 itself doesn't
+			 * appear to re-set the continue-id back to 0) */
+			if (was_empty >= 8) {
+				if (prev_continue_id == state.vr_regs.vr_ebx)
+					break;
+			}
+		} else {
+			was_empty = 0;
+			minfo_addbank((vm_phys_t)entry->sm_addr_lo | (vm_phys_t)entry->sm_addr_hi << 32,
+			              (vm_phys_t)entry->sm_size_lo | (vm_phys_t)entry->sm_size_hi << 32,
+			              memtype_bios_matrix[entry->sm_type]);
+		}
 		result = true;
+		prev_continue_id = state.vr_regs.vr_ebx;
 	} while (state.vr_regs.vr_ebx);
 	return result;
 }
