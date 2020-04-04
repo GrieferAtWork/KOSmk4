@@ -221,6 +221,14 @@ do_cmp##Nbits:                                                                  
 /* ======================================================================== */
 /*    BINARY ARITHMATIC                                                     */
 /* ======================================================================== */
+#if CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT
+case EMU86_OPCODE_ENCODE(0x82): /* Undocumented alias (doesn't exist on x86_64) */
+#if CONFIG_LIBEMU86_WANT_64BIT
+	if (EMU86_F_IS64(op_flags))
+		goto return_unknown_instruction;
+	ATTR_FALLTHROUGH
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT */
 case EMU86_OPCODE_ENCODE(0x80): {
 	MODRM_DECODE();
 #if EMU86_EMULATE_CONFIG_WANT_ARITH
