@@ -400,6 +400,36 @@ function vmResume() {
 
 global GDBHandleVirtualBoxEvent;
 function vmSingleStep(): string {
+	/* TODO: There may be a chance that single-stepping
+	 *       could be implemented via ring0 code-injection:
+	 * cmd>$ VBoxManage controlvm <vmName> pause
+	 * tel>$ stop
+	 * tel>$ rg eflags
+	 * tel>$ rg eflags = <OLD_EFLAGS | EFLAGS_TF>
+	 * tel>$ eb <KOS_KERNEL_SINGLE_VBOX_STEP_ENABLED> <OLD_EFLAGS | EFLAGS_TF>
+	 * do {
+	 *     tel>$ g
+	 *     cmd>$ VBoxManage controlvm <vmName> resume
+	 *     -- The instruction being stepped is executed here
+	 *     cmd>$ VBoxManage controlvm <vmName> stop
+	 *     tel>$ stop
+	 *     tel>$ rg eip
+	 * } while (<EIP> != VBOX_SINGLE_STEP_WAITFOR_EIP);
+	 * tel>$ rg eflags = <OLD_EFLAGS>
+	 * if (OLD_EFLAGS & EFLAGS_TF) {
+	 *     tel>$ rg eip = <KOS_KERNEL_REAL_INT1_ENTRY_POINT>
+	 * } else {
+	 *     tel>$ dd <KOS_KERNEL_INT1_IRET_TAIL_EIP>
+	 *     tel>$ rg eip = <KOS_KERNEL_INT1_IRET_TAIL_EIP>
+	 * }
+	 * In this model, it won't be the VirtualBox debugger that triggers the
+	 * single-step event, but instead we'll be the ones to do everything!
+	 *
+	 * On a seperate note, this model could very efficiently implement range-
+	 * stepping by never having to leave the VM when checking if a trap should
+	 * be ignored!
+	 */
+
 	/* Single-stepping is kind-of busted.
 	 * However doing it as this sequence of commands
 	 * every time we want to step seems to work:
@@ -933,8 +963,8 @@ global final OSDATAFILES: {string: string | Callable} = {
 		gdbSocket.send("$l#6c");
 		for (;;) {
 			print "begin:vmSingleStep()";
-			vmSingleStep();
-			print "end:vmSingleStep()";
+			local event = vmSingleStep();
+			print "end:vmSingleStep():", event;
 		}
 	},
 
