@@ -39,8 +39,6 @@ opt.append("-Os");
 #define CONFIG_LIBEMU86_WANT_32BIT 1
 #define CONFIG_LIBEMU86_WANT_64BIT 0
 #endif /* !__x86_64__ */
-
-#define CONFIG_LIBEMU86_WANT_SEGREGID 1
 #define __LIBEMU86_STATIC 1
 
 

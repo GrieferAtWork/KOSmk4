@@ -2291,14 +2291,16 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_modrm_mem
 		result += EMU86_GETREGP(modrm->mi_index, op_flags) << modrm->mi_shift;
 #ifndef EMU86_GETSEGBASE_IS_NOOP_ALL
 	{
-		/* TODO: When no segment override is given, and `modrm->mi_rm' is either
-		 *       ESP or EBP, then %ss must be used; else %ds must be used.
-		 *       Currently we always use %ds, and don't even know if %ds
-		 *       was given to us explicitly (it's just set-up as the default
-		 *       right now).
-		 * -> This needs to be fixed, as it could easily break libvm86 executing
-		 *    BIOS code that more likely than not depends on implied segment bases. */
 		u8 reg = EMU86_F_SEGREG(op_flags);
+		if (!EMU86_F_HASSEG(reg)) {
+			reg = EMU86_R_DS;
+#if CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT
+			/* When no segment override is given, and `modrm->mi_rm' is
+			 * either ESP or EBP, then %ss must be used; else %ds must be used. */
+			if (modrm->mi_rm == EMU86_R_BP || modrm->mi_rm == EMU86_R_SP)
+				reg = EMU86_R_SS;
+#endif /* CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT */
+		}
 		if (!EMU86_GETSEGBASE_IS_NOOP(reg)) {
 			uintptr_t segment_base;
 			segment_base = (uintptr_t)EMU86_GETSEGBASE(reg);
@@ -3052,23 +3054,6 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #define VEX_GETREGQ()  EMU86_GETREGQ(EMU86_F_VEX_VVVVV(op_flags))
 #define VEX_SETREGQ(v) EMU86_SETREGQ(EMU86_F_VEX_VVVVV(op_flags), v)
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
-
-#ifdef EMU86_GETSEGBASE_IS_NOOP_ALL
-#define SEGMENT_ADDR2(segment_regno, offset) (byte_t *)(uintptr_t)(offset)
-#define SEGMENT_ADDR(offset)                 (byte_t *)(uintptr_t)(offset)
-#elif defined(EMU86_GETSEGBASE_IS_NOOP_ANY)
-#define SEGMENT_ADDR2(segment_regno, offset) \
-	(EMU86_GETSEGBASE_IS_NOOP(segment_regno) \
-	 ? (byte_t *)(uintptr_t)(offset)         \
-	 : EMU86_SEGADDR((uintptr_t)EMU86_GETSEGBASE(segment_regno), (uintptr_t)(offset)))
-#define SEGMENT_ADDR(offset) \
-	SEGMENT_ADDR2(EMU86_F_SEGREG(op_flags), offset)
-#else /* EMU86_GETSEGBASE_IS_NOOP */
-#define SEGMENT_ADDR2(segment_regno, offset) \
-	EMU86_SEGADDR((uintptr_t)EMU86_GETSEGBASE(segment_regno), (uintptr_t)(offset))
-#define SEGMENT_ADDR(offset) \
-	SEGMENT_ADDR2(EMU86_F_SEGREG(op_flags), offset)
-#endif /* !EMU86_GETSEGBASE_IS_NOOP */
 
 
 

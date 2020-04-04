@@ -186,21 +186,6 @@ __DECL_BEGIN
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
 #define EMU86_F_SEGMASK     0x00007000 /* Mask for segment overrides. */
 #define EMU86_F_SEGSHIFT            12 /* Shift for segment overrides. */
-#define EMU86_F_SEG(x)      (((x) & EMU86_F_SEGMASK) >> EMU86_F_SEGSHIFT)
-#if CONFIG_LIBEMU86_WANT_SEGREGID
-#define EMU86_F_SEGREG(x)   (((x) & EMU86_F_SEGMASK) >> EMU86_F_SEGSHIFT)
-#define EMU86_F_HASSEG(x)   (((x) & EMU86_F_SEGMASK) != EMU86_F_SEGDS)
-#if CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT
-#define EMU86_F_SEGES       0x00000000 /* ES override. */
-#define EMU86_F_SEGCS       0x00001000 /* CS override. */
-#define EMU86_F_SEGSS       0x00002000 /* SS override. */
-#endif /* CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT */
-#define EMU86_F_SEGDS       0x00003000 /* DS override. */
-#define EMU86_F_SEGFS       0x00004000 /* FS override. */
-#define EMU86_F_SEGGS       0x00005000 /* GS override. */
-/*      EMU86_F_SEG6        0x00006000  * ... */
-/*      EMU86_F_SEG7        0x00007000  * ... */
-#else /* CONFIG_LIBEMU86_WANT_SEGREGID */
 #define EMU86_F_SEGREG(x)   ((((x) & EMU86_F_SEGMASK) >> EMU86_F_SEGSHIFT) - 1)
 #define EMU86_F_HASSEG(x)   (((x) & EMU86_F_SEGMASK) != 0)
 #if CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT
@@ -212,7 +197,6 @@ __DECL_BEGIN
 #define EMU86_F_SEGFS       0x00005000 /* FS override. */
 #define EMU86_F_SEGGS       0x00006000 /* GS override. */
 /*      EMU86_F_SEG6        0x00007000  * ... */
-#endif /* !CONFIG_LIBEMU86_WANT_SEGREGID */
 #define EMU86_F_HASVEX      0x00008000 /* A VEX prefix was given. */
 #if CONFIG_LIBEMU86_WANT_64BIT
 #define EMU86_F_VEX_VVVVV_M 0x001f0000 /* Mask for EVEX.Vi + VEX.VVVV */
@@ -250,11 +234,7 @@ __DECL_BEGIN
 #define EMU86_F_f3 EMU86_F_REP   /* The 0xf3 prefix is being used. */
 
 /* Normal (initial) flags before calling `emu86_opcode_decode()' */
-#if CONFIG_LIBEMU86_WANT_SEGREGID
-#define EMU86_F_NORMAL EMU86_F_SEGDS
-#else /* CONFIG_LIBEMU86_WANT_SEGREGID */
 #define EMU86_F_NORMAL 0
-#endif /* !CONFIG_LIBEMU86_WANT_SEGREGID */
 
 
 #ifdef CONFIG_LIBEMU86_NEED_ARCHMODE

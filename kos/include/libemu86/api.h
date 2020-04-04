@@ -30,15 +30,6 @@
 #define LIBEMU86_CC /* nothing */
 #endif
 
-/* When non-zero, `EMU86_F_SEG()' returns the segment register index.
- * When zero, `EMU86_F_SEG()' returns `0' if no segment prefix was given,
- * and 1 + the segment register index when a prefix was given.
- * Note that when defined as non-zero, the caller of `emu86_opcode_decode()'
- * is responsible to pre-initialize opcode flags to `EMU86_F_SEGDS' */
-#ifndef CONFIG_LIBEMU86_WANT_SEGREGID
-#define CONFIG_LIBEMU86_WANT_SEGREGID 1
-#endif /* !CONFIG_LIBEMU86_WANT_SEGREGID */
-
 #if (!defined(LIBEMU86_WANT_PROTOTYPES) && \
      (defined(__LIBEMU86_STATIC) ||        \
       (defined(__KOS__) && defined(__KERNEL__))))
@@ -97,10 +88,9 @@
 #endif /* !__x86_64__ && __i386__ */
 #endif /* !CONFIG_LIBEMU86_WANT_64BIT */
 
-#if ((CONFIG_LIBEMU86_WANT_16BIT != !defined(__x86_64__)) ||                        \
-     (CONFIG_LIBEMU86_WANT_32BIT != 1) ||                                           \
-     (CONFIG_LIBEMU86_WANT_64BIT != (defined(__x86_64__) || !defined(__i386__))) || \
-     (CONFIG_LIBEMU86_WANT_SEGREGID != 1))
+#if ((CONFIG_LIBEMU86_WANT_16BIT != !defined(__x86_64__)) || \
+     (CONFIG_LIBEMU86_WANT_32BIT != 1) ||                    \
+     (CONFIG_LIBEMU86_WANT_64BIT != (defined(__x86_64__) || !defined(__i386__))))
 #error "Invalid configuration for non-static linkage (must enable `__LIBEMU86_STATIC')"
 #endif
 

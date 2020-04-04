@@ -24,6 +24,26 @@
 EMU86_INTELLISENSE_BEGIN(mov_moffs) {
 
 
+#ifdef EMU86_GETSEGBASE_IS_NOOP_ALL
+#define SEGMENT_ADDR_EX(segment_regno, offset) (byte_t *)(uintptr_t)(offset)
+#elif defined(EMU86_GETSEGBASE_IS_NOOP_ANY)
+#define SEGMENT_ADDR_EX(segment_regno, offset) \
+	(EMU86_GETSEGBASE_IS_NOOP(segment_regno) \
+	 ? (byte_t *)(uintptr_t)(offset)         \
+	 : EMU86_SEGADDR((uintptr_t)EMU86_GETSEGBASE(segment_regno), (uintptr_t)(offset)))
+#else /* EMU86_GETSEGBASE_IS_NOOP */
+#define SEGMENT_ADDR_EX(segment_regno, offset) \
+	EMU86_SEGADDR((uintptr_t)EMU86_GETSEGBASE(segment_regno), (uintptr_t)(offset))
+#endif /* !EMU86_GETSEGBASE_IS_NOOP */
+#define SEGMENT_ADDR(offset)                   \
+	SEGMENT_ADDR_EX(EMU86_F_HASSEG(op_flags)   \
+	                ? EMU86_F_SEGREG(op_flags) \
+	                : EMU86_R_DS,              \
+	                offset)
+
+
+
+
 #if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_MOV_MOFFS
 case EMU86_OPCODE_ENCODE(0xa0): {
 	/* A0      MOV AL,moffs8*      Move byte at (seg:offset) to AL */
@@ -167,6 +187,8 @@ case EMU86_OPCODE_ENCODE(0xa3): {
 }
 #endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_MOV_MOFFS */
 
+#undef SEGMENT_ADDR
+#undef SEGMENT_ADDR_EX
 
 }
 EMU86_INTELLISENSE_END

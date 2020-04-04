@@ -457,10 +457,18 @@ throw_exception(struct icpustate *__restrict state,
 	unwind(state);
 }
 
-PRIVATE ATTR_NORETURN NONNULL((1)) void FCALL
-throw_generic_unknown_instruction(struct icpustate *__restrict state,
-                                  u16 usage, uintptr_t opcode,
-                                  emu86_opflags_t op_flags) {
+PRIVATE ATTR_NORETURN NONNULL((1)) void
+(FCALL throw_generic_unknown_instruction)(struct icpustate *__restrict state,
+                                          u16 usage, uintptr_t opcode,
+                                          emu86_opflags_t op_flags
+#ifndef __x86_64__
+                                          ,
+                                          u8 rm
+#else /* !__x86_64__ */
+#define throw_generic_unknown_instruction(state, usage, opcode, op_flags, ...) \
+	throw_generic_unknown_instruction(state, usage, opcode, op_flags)
+#endif /* !__x86_64__ */
+                                          ) {
 
 	/* Produce some default exception. */
 	if (BAD_USAGE_REASON(usage) == BAD_USAGE_REASON_UD) {
@@ -470,25 +478,41 @@ throw_generic_unknown_instruction(struct icpustate *__restrict state,
 		                                    opcode, op_flags, 0, 0, 0, 0);
 	} else {
 		u16 segval;
+		u8 used_segment_register;
 		if (BAD_USAGE_REASON(usage) == BAD_USAGE_REASON_SS) {
 			segval = icpustate_getss(state);
+			used_segment_register = EMU86_R_SS;
 		} else {
+			used_segment_register = EMU86_F_SEGREG(op_flags);
 			switch (op_flags & EMU86_F_SEGMASK) {
 			case EMU86_F_SEGFS: segval = icpustate_getfs(state); break;
 			case EMU86_F_SEGGS: segval = icpustate_getgs(state); break;
-#ifndef __x86_64__
+#ifdef __x86_64__
+			default:
+				used_segment_register = EMU86_R_DS;
+				segval = icpustate_getds(state);
+				break;
+#else /* __x86_64__ */
 			case EMU86_F_SEGES: segval = icpustate_getes(state); break;
 			case EMU86_F_SEGCS: segval = icpustate_getcs(state); break;
 			case EMU86_F_SEGSS: segval = icpustate_getss(state); break;
+			default:
+				if (rm == EMU86_R_BP || rm == EMU86_R_SP) {
+					used_segment_register = EMU86_R_SS;
+					segval = icpustate_getss(state);
+				} else {
+					used_segment_register = EMU86_R_DS;
+					segval = icpustate_getds(state);
+				}
+				break;
 #endif /* !__x86_64__ */
-			default: segval = icpustate_getds(state); break;
 			}
 		}
 		if (!segval && BAD_USAGE_ECODE(usage) == 0) {
 			/* Throw a NULL-segment exception. */
 			throw_illegal_instruction_exception(state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER),
 			                                    opcode, op_flags, E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD,
-			                                    X86_REGISTER_SEGMENT_ES + EMU86_F_SEGREG(op_flags),
+			                                    X86_REGISTER_SEGMENT_ES + used_segment_register,
 			                                    0, 0);
 		}
 #ifdef __x86_64__
@@ -553,14 +577,14 @@ throw_unsupported_instruction(struct icpustate *__restrict state,
 	} else {
 		/* An unsupported instruction caused a #GPF or #SS
 		 * -> Handle the exception the same way we do for unknown instructions! */
-		throw_generic_unknown_instruction(state, usage, opcode, op_flags);
+		throw_generic_unknown_instruction(state, usage, opcode, op_flags, 0xff);
 	}
 }
 
 #define _EMU86_GETOPCODE()        EMU86_OPCODE()
 #define _EMU86_GETOPCODE_RMREG()  E_ILLEGAL_INSTRUCTION_X86_OPCODE(EMU86_OPCODE(), modrm.mi_reg)
-#define EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION()           throw_generic_unknown_instruction(_state, usage, _EMU86_GETOPCODE(), op_flags)
-#define EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION_RMREG()     throw_generic_unknown_instruction(_state, usage, _EMU86_GETOPCODE_RMREG(), op_flags)
+#define EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION()           throw_generic_unknown_instruction(_state, usage, _EMU86_GETOPCODE(), op_flags, 0xff)
+#define EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION_RMREG()     throw_generic_unknown_instruction(_state, usage, _EMU86_GETOPCODE_RMREG(), op_flags, EMU86_MODRM_ISMEM(modrm.mi_type) ? modrm.mi_rm : 0xff)
 #define EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION()        throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE), _EMU86_GETOPCODE(), op_flags, 0, 0, 0, 0)
 #define EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION_RMREG()  throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE), _EMU86_GETOPCODE_RMREG(), op_flags, 0, 0, 0, 0)
 #define EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM()         throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE(), op_flags, E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE, 0, 0, 0)
