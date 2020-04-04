@@ -2292,7 +2292,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_modrm_mem
 #ifndef EMU86_GETSEGBASE_IS_NOOP_ALL
 	{
 		u8 reg = EMU86_F_SEGREG(op_flags);
-		if (!EMU86_F_HASSEG(reg)) {
+		if (!EMU86_F_HASSEG(op_flags)) {
 			reg = EMU86_R_DS;
 #if CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT
 			/* When no segment override is given, and `modrm->mi_rm' is
