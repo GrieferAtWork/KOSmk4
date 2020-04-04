@@ -185,6 +185,8 @@ function startVboxGDBGlue(
 		}
 		vBoxTelnetSocket.close();
 	}
+	if (connectResponse is none)
+		throw Error("Failed to connect to VirtualBox telnet");
 	print "[vboxgdb] Connected to telnet under", vboxTelnetAddr;
 
 	if (CONFIG_VERBOSE) {
