@@ -610,21 +610,18 @@ case EMU86_OPCODE_ENCODE(0x85): {
 	MODRM_DECODE();
 	IF_64BIT(if (IS_64BIT()) {
 		u64 lhs, rhs;
-		MODRM_DECODE();
 		lhs = MODRM_GETRMQ();
 		rhs = MODRM_GETREGQ();
 		EMU86_MSKFLAGS(~(EFLAGS_SF | EFLAGS_ZF | EFLAGS_PF),
 		               emu86_geteflags_testq(lhs & rhs));
 	} else) if (!IS_16BIT()) {
 		u32 lhs, rhs;
-		MODRM_DECODE();
 		lhs = MODRM_GETRML();
 		rhs = MODRM_GETREGL();
 		EMU86_MSKFLAGS(~(EFLAGS_SF | EFLAGS_ZF | EFLAGS_PF),
 		               emu86_geteflags_testl(lhs & rhs));
 	} else {
 		u16 lhs, rhs;
-		MODRM_DECODE();
 		lhs = MODRM_GETRMW();
 		rhs = MODRM_GETREGW();
 		EMU86_MSKFLAGS(~(EFLAGS_SF | EFLAGS_ZF | EFLAGS_PF),
