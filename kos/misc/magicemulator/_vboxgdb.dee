@@ -35,7 +35,7 @@ import ipc;
  * The solution here would be to inject a piece of code into the kernel that is executed
  * just after pagedir_kernel is initialized for the kernel core, and loaded into %cr3.
  * This piece of code would then interact as follows:
- *   #1: The kernel tells us that it has fully initialized paging
+ *   #1: The kernel tells us that it has fully initialized paging (via port `$0x504')
  *   #2: We start up the GDB server (Thread(GDBMain).start(), ...)
  *   #3: GDB does its initialization
  *   #4: GDB tells us to resume execution ($c#xx)

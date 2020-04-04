@@ -28,7 +28,7 @@ import * from deemon;
 import * from errors;
 import * from ..libmagic.libmagic;
 import * from ..libmagic.steps.mtools;
-import opt = .options;
+import opt = ._options;
 import fs;
 import ipc;
 import net;
