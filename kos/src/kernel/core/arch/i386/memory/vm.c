@@ -308,7 +308,8 @@ INTDEF struct vm_datapart kernel_vm_part_pagedata;
 INTDEF struct vm_node kernel_vm_node_pagedata;
 INTERN struct vm_datapart kernel_vm_part_pagedata =
 	INIT_DATAPART(kernel_vm_part_pagedata, &kernel_vm_node_pagedata,
-	              0 /* Filled later */, 0 /* Filled later */);
+	              0 /* Filled later */,
+	              0 /* Filled later */);
 INTERN struct vm_node kernel_vm_node_pagedata =
 	INIT_NODE(kernel_vm_node_pagedata, 0, 0,
 	          VM_PROT_READ | VM_PROT_WRITE,
@@ -443,10 +444,10 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_kernel_vm)(void) {
 #endif /* !NDEBUG */
 
 	/* Map the LAPIC into the kernel VM. */
-	if (x86_vm_part_lapic.dp_tree.a_vmax >= x86_vm_part_lapic.dp_tree.a_vmin) {
+	assert(vm_datapart_numdpages(&x86_vm_part_lapic) ==
+	       x86_vm_part_lapic.dp_ramdata.rd_block0.rb_size);
+	if (x86_vm_part_lapic.dp_ramdata.rd_block0.rb_size) {
 		void *lapic_addr;
-		assert(vm_datapart_numdpages(&x86_vm_part_lapic) ==
-		       x86_vm_part_lapic.dp_ramdata.rd_block0.rb_size);
 		lapic_addr = vm_getfree(&vm_kernel,
 		                        HINT_GETADDR(KERNEL_VMHINT_LAPIC),
 		                        vm_datapart_numbytes(&x86_vm_part_lapic), PAGESIZE,
