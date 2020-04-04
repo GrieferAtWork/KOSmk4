@@ -48,7 +48,6 @@ import ipc;
  *   such as some .bss area that isn't located at the end of the kernel)
  */
 
-
 @@Log comunications and other verbose information
 global CONFIG_VERBOSE;
 
@@ -279,12 +278,12 @@ again:
 	}
 	local result = vBoxTelnetGetResponse(CONFIG_TELNET_RESPONSE_TIMEOUT);
 	if (result is none) {
-		if (CONFIG_VERBOSE && result !is none)
+		if (CONFIG_VERBOSE)
 			print "[vboxgdb<-telnet] <Timeout>";
 		if (restartOnTimeout)
 			goto again;
 	} else {
-		if (CONFIG_VERBOSE && result !is none)
+		if (CONFIG_VERBOSE)
 			print "[vboxgdb<-telnet]", repr(result);
 		/* This is an error that can happen sporadically for practically
 		 * any command. The solution is to try again when it happens... */
@@ -337,28 +336,32 @@ again:
 	return error;
 }
 
-function _vBoxTelnetExecContinue(): Bytes {
+function _vBoxTelnetExecContinue(restartOnTimeout: bool = true): Bytes {
 	local result;
-	result = vBoxTelnetExec("g");
-	if ("error:" !in result && "Error:" !in result)
-		;
-	else if ("already running" in result) {
-		result = "\r\n".bytes();
-	} else {
-		throw Error("Failed to continue vm: " + repr(result));
+	result = vBoxTelnetExec("g", restartOnTimeout);
+	if (result !is none) {
+		if ("error:" !in result && "Error:" !in result)
+			;
+		else if ("already running" in result) {
+			result = "\r\n".bytes();
+		} else {
+			throw Error("Failed to continue vm: " + repr(result));
+		}
 	}
 	return result;
 }
 
-function _vBoxTelnetExecStop(): Bytes {
+function _vBoxTelnetExecStop(restartOnTimeout: bool = true): Bytes {
 	local result;
-	result = vBoxTelnetExec("stop");
-	if ("error:" !in result && "Error:" !in result)
-		;
-	else if ("The VM is already halted" in result)
-		result = "".bytes();
-	else {
-		throw Error("Failed to stop vm: " + repr(result));
+	result = vBoxTelnetExec("stop", restartOnTimeout);
+	if (result !is none) {
+		if ("error:" !in result && "Error:" !in result)
+			;
+		else if ("The VM is already halted" in result)
+			result = "".bytes();
+		else {
+			throw Error("Failed to stop vm: " + repr(result));
+		}
 	}
 	return result;
 }
@@ -402,18 +405,24 @@ function vmSingleStep(): string {
 	 * every time we want to step seems to work:
 	 * [if !_vmIsUiPaused]       cmd>$ VBoxManage controlvm <vmName> pause
 	 * [if !_vmIsDebuggerPaused] tel>$ stop
-	 *                           tel>$ p
+	 *                           tel>$ t
 	 *                           cmd>$ VBoxManage controlvm <vmName> resume
 	 *                           tel<$ dbgf event: Single step! (other)
 	 *                           cmd>$ VBoxManage controlvm <vmName> pause
 	 *                           tel>$ g
 	 *                           tel>$ stop
-	 * The idea here seems to be that we don't want to use `p` to resume
+	 * The idea here seems to be that we don't want to use `t` to resume
 	 * VM execution, but only use it to set-up the VM for a single-step
 	 * once we resume it manually. Then, once that's done re-suspend the
 	 * VM globally, and toggle the debugger suspend sequence by invoking
 	 * `g` followed by `stop` (thus fixing up the probably broken internal
-	 * state of the VirtualBox debugger) */
+	 * state of the VirtualBox debugger)
+	 * NOTE: Despite everything I've tried, single-stepping still seems to be
+	 *       messed up. - Sooner or later, it always ends with your log getting
+	 *       spammed with `emR3Debug: rc=VERR_SEM_OUT_OF_TURN`
+	 *       Looking at the VirtualBox sources, I get the feeling that this sort
+	 *       of error can happen arbitrarily for any sort of debugger trap that
+	 *       is triggered from inside of VirtualBox itself... */
 	if (!_vmIsUiPaused) {
 		_vBoxManageControlVm("pause");
 		_vmIsUiPaused = true;
@@ -422,12 +431,13 @@ function vmSingleStep(): string {
 		_vBoxTelnetExecStop();
 		_vmIsDebuggerPaused = true;
 	}
+	local attempt = 0;
 again_step:
 	if (CONFIG_VERBOSE)
-		print "[vboxgdb->telnet] \"p\"";
-	/* The p command can be a bit stingy... */
+		print "[vboxgdb->telnet] \"t\"";
+	/* The t command can be a bit stingy... */
 	vBoxTelnetDiscardPendingData();
-	vBoxTelnetSocket.send("p\r\n");
+	vBoxTelnetSocket.send("t\r\n");
 	local error = _vBoxManageControlVm("resume", allowFailure: true);
 	local stepResponse;
 	if (error is none || error != 0) {
@@ -441,17 +451,25 @@ again_step:
 		print "[vboxgdb<-telnet] Step-response:", repr(stepResponse);
 	if ("Invalid command event" in stepResponse) {
 handle_bad_step_response:
-		local error;
-		error = _vBoxManageControlVm("pause", allowFailure: true);
+		_vBoxManageControlVm("pause", allowFailure: true);
+		_vBoxTelnetExecStop(false);
+		/* Only do this part if VBoxManage timed out */
 		if (error is none) {
-			_vBoxTelnetExecStop();
-			goto again_step;
+			if ((attempt % 3) == 2) {
+				_vBoxTelnetExecContinue(false);
+				_vBoxTelnetExecStop(false);
+			}
+			++attempt;
 		}
 		goto again_step;
 	}
+	if (!stepResponse)
+		goto handle_bad_step_response;
+	if ("error:" in stepResponse || "Error:" in stepResponse)
+		goto handle_bad_step_response;
 	_vBoxManageControlVm("pause");
-	_vBoxTelnetExecContinue();
-	_vBoxTelnetExecStop();
+	//_vBoxTelnetExecContinue();
+	//_vBoxTelnetExecStop();
 	_vmIsUiPaused       = true;
 	_vmIsDebuggerPaused = true;
 	vmIsRunning         = false;
@@ -911,6 +929,15 @@ global final OSDATAFILES: {string: string | Callable} = {
 	"</item>"
 	"</osdata>",
 
+	"keepstepping" : []{
+		gdbSocket.send("$l#6c");
+		for (;;) {
+			print "begin:vmSingleStep()";
+			vmSingleStep();
+			print "end:vmSingleStep()";
+		}
+	},
+
 	"breakpoints" : []{
 		File.Writer fp;
 		fp << "<osdata type=\"breakpoints\">";
@@ -1280,6 +1307,17 @@ wait_for_command:
 					if (c !is none) {
 						if (CONFIG_VERBOSE)
 							print "[vboxgdb<-telnet] Event:", repr(c);
+						if ("Invalid command event" in c) {
+							/* Let's try to fix this... */
+							_vBoxManageControlVm("pause");
+							_vBoxTelnetExecStop();
+							_vBoxTelnetExecContinue();
+							_vBoxManageControlVm("resume");
+							_vmIsDebuggerPaused = false;
+							_vmIsUiPaused = false;
+							vmIsRunning = true;
+							continue;
+						}
 						local reason = GDBHandleVirtualBoxEvent(c);
 						if (reason !is none) {
 							gdbStopReason = reason;
