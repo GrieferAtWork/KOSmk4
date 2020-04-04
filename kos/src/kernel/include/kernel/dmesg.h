@@ -148,11 +148,13 @@ dmesg_enum(dmesg_enum_t callback, void *arg,
            unsigned int limit DFL((unsigned int)-1));
 
 /* Lookup the `nth' latest dmesg packet, and store it within `buf'
+ * @param: buf:        The packet buffer (must be non-NULL)
+ * @param: plevel:     When non-NULL, store the level of the packet here.
  * @param: msg_buflen: The size of `buf->sp_msg' (in bytes)
- * @return: > msg_buflen:  The required buffer size for `buf->sp_msg'
- * @return: <= msg_buflen: [== buf->sp_len] Success 
- * @return: 0:             No such syslog packet. */
-FUNDEF u16 KCALL
+ * @return: > msg_buflen:          The required buffer size for `buf->sp_msg'
+ * @return: >= 0 && <= msg_buflen: [== buf->sp_len] Success
+ * @return: < 0:                   No such syslog packet. */
+FUNDEF s16 KCALL
 dmesg_getpacket(USER CHECKED struct syslog_packet *buf,
                 USER CHECKED unsigned int *plevel,
                 u16 msg_buflen, unsigned int nth);

@@ -402,8 +402,6 @@ dmesg_enum(dmesg_enum_t callback, void *arg,
 		if unlikely(packet.sp_nsec >= 1000000000)
 			goto done; /* Invalid nano seconds timestamp. */
 		message_length = message_end_offset - message_start_offset;
-		if unlikely(!message_length)
-			goto done; /* Message empty */
 		if unlikely(message_length > CONFIG_SYSLOG_LINEMAX)
 			goto done; /* Message too long */
 		/* Extract the entry's message and verify its checksum. */
@@ -451,23 +449,29 @@ dmesg_getpacket_callback(void *arg, struct syslog_packet *__restrict packet,
 		if (data->dp_plevel)
 			*data->dp_plevel = level;
 	}
-	return (ssize_t)packet->sp_len;
+	return (ssize_t)packet->sp_len + 1;
 }
 
 /* Lookup the `nth' latest dmesg packet, and store it within `buf'
+ * @param: buf:        The packet buffer (must be non-NULL)
+ * @param: plevel:     When non-NULL, store the level of the packet here.
  * @param: msg_buflen: The size of `buf->sp_msg' (in bytes)
- * @return: > msg_buflen:  The required buffer size for `buf->sp_msg'
- * @return: <= msg_buflen: [== buf->sp_len] Success 
- * @return: 0:             No such syslog packet. */
-PUBLIC u16 KCALL
+ * @return: > msg_buflen:          The required buffer size for `buf->sp_msg'
+ * @return: >= 0 && <= msg_buflen: [== buf->sp_len] Success
+ * @return: < 0:                   No such syslog packet. */
+PUBLIC s16 KCALL
 dmesg_getpacket(USER CHECKED struct syslog_packet *buf,
                 USER CHECKED unsigned int *plevel,
                 u16 msg_buflen, unsigned int nth) {
+	ssize_t error;
 	struct dmesg_getpacket_data data;
 	data.dg_buf        = buf;
 	data.dp_plevel     = plevel;
 	data.dg_msg_buflen = msg_buflen;
-	return (u16)dmesg_enum(&dmesg_getpacket_callback, &data, nth, 1);
+	error = dmesg_enum(&dmesg_getpacket_callback, &data, nth, 1);
+	if (error <= 0)
+		return -1; /* No such packet. */
+	return (s16)(u16)(error - 1);
 }
 
 
@@ -506,19 +510,19 @@ DEFINE_DEBUG_FUNCTION_EX(
 		"\tEnumerate most recent system log messages\n",
 		argc, argv) {
 	unsigned int nth;
+	struct syslog_packet packet;
 	/* TODO: Options to filter the log, etc... */
 	if (argc != 1)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
 	(void)argv;
 	for (nth = 0;; ++nth) {
-		if (!dmesg_getpacket(NULL, NULL, 0, nth))
+		if (dmesg_getpacket(&packet, NULL, 0, nth) < 0)
 			break;
 	}
 	while (nth) {
-		struct syslog_packet packet;
 		unsigned int level;
 		--nth;
-		if (!dmesg_getpacket(&packet, &level, sizeof(packet.sp_msg), nth))
+		if (dmesg_getpacket(&packet, &level, sizeof(packet.sp_msg), nth) < 0)
 			continue;
 		dmesg_print_packet(&packet, level);
 	}
