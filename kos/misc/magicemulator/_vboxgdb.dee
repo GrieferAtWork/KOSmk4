@@ -1283,6 +1283,7 @@ wait_for_command:
 						local reason = GDBHandleVirtualBoxEvent(c);
 						if (reason !is none) {
 							gdbStopReason = reason;
+							vmPause();
 							goto do_send_stop_reply;
 						}
 					}
