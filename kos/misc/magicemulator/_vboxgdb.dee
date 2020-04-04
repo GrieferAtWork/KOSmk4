@@ -652,7 +652,15 @@ function vmGetRegisters(): {string: int} {
 
 
 function vmReadMemoryAt(addr: int): Bytes {
-	local response = vBoxTelnetExecNoError(
+	/* NOTE: We use dd for reading memory (and not db), because
+	 *       dd returns the same about of bytes per line, but
+	 *       db also returns an ASCII representation that would
+	 *       only make this parser more complicated.
+	 *       Futhermore, if the memory contains an ASCII string
+	 *       equal to "error:", our response processing system
+	 *       wouldn't be able to differenciate between something
+	 *       like the ASCII string, and an actual error... */
+	local response = vBoxTelnetExec(
 		"dd " + addr.hex()).splitlines(false);
 	local resultlen = 16 * #response;
 	local result = Bytes(resultlen);
@@ -660,6 +668,8 @@ function vmReadMemoryAt(addr: int): Bytes {
 	for (local l: response) {
 		if (!l)
 			continue;
+		if ("error:" in l || "Error:" in l)
+			break;
 		local data = l[l.index(":") + 1:].lstrip();
 		for (local dword: data.split(" ")) {
 			if (!dword)
@@ -679,7 +689,37 @@ function vmReadMemoryAt(addr: int): Bytes {
 			++offset;
 		}
 	}
-	return result;
+	if (!offset) {
+		local offset = addr & 15;
+		if (offset) {
+			/* Virtualbox always prints memory in lines of 16 bytes.
+			 * If the given address isn't aligned by at least that much,
+			 * there is a chance that part of those 16 bytes is located
+			 * somewhere in memory where accessing it is impossible.
+			 * If this happens, VirtualBox will given us an error, when
+			 * in fact it would have been possible to read at least a
+			 * couple of leading bytes of memory.
+			 * To work around this issue, we handle a read-error with
+			 * an unaligned address by re-attempting the read with an
+			 * aligned address, thus allowing VirtualBox to at least
+			 * read one line of memory successfully.
+			 * HINT: In such a szenario, VirtualBox's response might look like:
+			 * >> "%00000000ffffffe8: 07fa5023 00000000 07fa4023 00000000\r\n"
+			 * >> "%00000000fffffff8: 07fa3023 00000000\r\n
+			 * >> error: VERR_PAGE_TABLE_NOT_PRESENT:  Reading memory at %0000000100000000.\r\n"
+			 */
+			result = vmReadMemoryAt(addr - offset);
+			if (offset > #result)
+				return result[offset:];
+			/* Fallthru to regular error handling */
+		}
+		if ("error:" in response || "Error:" in response)
+			throw Error("Response for {!r} indicates an error {!r}"
+				.format({ "dd " + addr.hex(), response }));
+		throw Error("Failed to read memory at {} (response was {!r})"
+			.format({ addr.hex(), response }));
+	}
+	return result[:offset];
 }
 
 @@Read @count bytes of memory from @addr
