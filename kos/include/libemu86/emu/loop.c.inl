@@ -28,75 +28,65 @@ EMU86_INTELLISENSE_BEGIN(loop) {
 
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 
-#if EMU86_EMULATE_CONFIG_WANT_LOOPNE
-case EMU86_OPCODE_ENCODE(0xe0): {
-	/* E0 cb     LOOPNE rel8     Decrement count; jump short if count!=0 and ZF=0. */
-	if ((EMU86_GETFLAGS() & EFLAGS_ZF) != 0) {
-		pc += 1;
-		goto done; /* Don't jump */
-	}
-	goto do_loop;
-}
-#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
-case EMU86_OPCODE_ENCODE(0xe0):
-	goto return_unsupported_instruction;
-#define NEED_return_unsupported_instruction
-#endif /* ... */
-
-
-#if EMU86_EMULATE_CONFIG_WANT_LOOPE
-case EMU86_OPCODE_ENCODE(0xe1): {
-	/* E1 cb     LOOPE rel8      Decrement count; jump short if count!=0 and ZF=1. */
-	if ((EMU86_GETFLAGS() & EFLAGS_ZF) == 0) {
-		pc += 1;
-		goto done; /* Don't jump */
-	}
-	goto do_loop;
-}
-#elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
-case EMU86_OPCODE_ENCODE(0xe1):
-	goto return_unsupported_instruction;
-#define NEED_return_unsupported_instruction
-#endif /* ... */
-
-
-#if EMU86_EMULATE_CONFIG_WANT_LOOP
-case EMU86_OPCODE_ENCODE(0xe2): {
-	/* E2 cb     LOOP rel8       Decrement count; jump short if count!=0. */
-	s8 offset;
-do_loop:
-	offset = *(s8 *)pc;
-	pc += 1;
+#if (EMU86_EMULATE_CONFIG_WANT_LOOPNE || \
+     EMU86_EMULATE_CONFIG_WANT_LOOPE || \
+     EMU86_EMULATE_CONFIG_WANT_LOOP)
+case EMU86_OPCODE_ENCODE(0xe0):   /* E0 cb     LOOPNE rel8     Decrement count; jump short if count!=0 and ZF=0. */
+case EMU86_OPCODE_ENCODE(0xe1):   /* E1 cb     LOOPE rel8      Decrement count; jump short if count!=0 and ZF=1. */
+case EMU86_OPCODE_ENCODE(0xe2): { /* E2 cb     LOOP rel8       Decrement count; jump short if count!=0. */
+	pc += 1; /* rel8 */
 	EMU86_ADDRSIZE_SWITCH({
-		u64 rax;
-		rax = EMU86_GETRAX() - 1;
-		EMU86_SETRAX(rax);
-		if (!rax)
+		u64 rcx = EMU86_GETRCX() - 1;
+		EMU86_SETRCX(rcx);
+		if (!rcx)
 			goto done;
 	}, {
-		u32 eax;
-		eax = EMU86_GETEAX() - 1;
-		EMU86_SETEAX(eax);
-		if (!eax)
+		u32 ecx = EMU86_GETECX() - 1;
+		EMU86_SETECX(ecx);
+		if (!ecx)
 			goto done;
 	}, {
-		u16 ax;
-		ax = EMU86_GETAX() - 1;
-		EMU86_SETAX(ax);
-		if (!ax)
+		u16 cx = EMU86_GETCX() - 1;
+		EMU86_SETCX(cx);
+		if (!cx)
 			goto done;
 	});
+	/* Check additional conditions based on `tiny_opcode' */
+	switch (tiny_opcode) {
+
+	case EMU86_OPCODE_ENCODE(0xe0):
+		/* E0 cb     LOOPNE rel8     Decrement count; jump short if count!=0 and ZF=0. */
+		if (EMU86_GETFLAGS() & EFLAGS_ZF)
+			goto done; /* ZF==1 -> Don't jump */
+		break;
+
+	case EMU86_OPCODE_ENCODE(0xe1):
+		/* E1 cb     LOOPE rel8      Decrement count; jump short if count!=0 and ZF=1. */
+		if (!(EMU86_GETFLAGS() & EFLAGS_ZF))
+			goto done; /* ZF==0 -> Don't jump */
+		break;
+
+	case EMU86_OPCODE_ENCODE(0xe2):
+		/* E2 cb     LOOP rel8       Decrement count; jump short if count!=0. */
+		break;
+
+	default: __builtin_unreachable();
+	}
+	/* Follow the loop branch */
 	{
 		EMU86_UREG_TYPE dest_ip;
-		dest_ip = REAL_IP() + offset;
+		s8 offset = ((s8 *)pc)[-1];
+		dest_ip   = REAL_IP() + offset;
 		if (IS_16BIT())
 			dest_ip &= 0xffff;
 		EMU86_SETIPREG(dest_ip);
-	}
-	goto done_dont_set_pc;
+		goto done_dont_set_pc;
 #define NEED_done_dont_set_pc
+	}
 }
 #elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
+case EMU86_OPCODE_ENCODE(0xe0):
+case EMU86_OPCODE_ENCODE(0xe1):
 case EMU86_OPCODE_ENCODE(0xe2):
 	goto return_unsupported_instruction;
 #define NEED_return_unsupported_instruction
