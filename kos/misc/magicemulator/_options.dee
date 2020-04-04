@@ -18,6 +18,8 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
+import * from deemon;
+
 /* Emulator-independent configuration options. */
 
 @@Enable the use of `gdb` to control and debug KOS.
@@ -51,7 +53,23 @@ final global SMP = "smp"; /* SMP_DEFAULT */
 final global SMP_DEFAULT = "2";
 
 
+function getBool(options: {string: string}, name: string, defl: bool): bool {
+	local val = options.get(name);
+	if (val is none)
+		return defl;
+	if (val !in ["true", "false"])
+		throw Error("Bad value for --emulator-setopt={}={} "
+		            "(must be \"true\" or \"false\")"
+			.format({ name, val }));
+	return val == "true";
+}
 
+function getInt(options: {string: string}, name: string, defl: int): int {
+	local val = options.get(name);
+	if (val is none)
+		return defl;
+	return int(val);
+}
 
 
 

@@ -20,6 +20,7 @@
 
 import * from deemon;
 import * from ..libmagic.libmagic;
+import ._options as opt;
 import fs;
 import net;
 import ipc;
@@ -48,25 +49,25 @@ import ipc;
  */
 
 
-@@Log comunications and other verbose informatino
-global final CONFIG_VERBOSE = true;
+@@Log comunications and other verbose information
+global CONFIG_VERBOSE;
 
 @@Timeout for the next byte in an on-going command (in microseconds)
 @@When this timeout is exceeded, the current command is discarded
-global final CONFIG_GDB_COMMAND_NEXTBYTE_TIMEOUT = 1000000;
+global CONFIG_GDB_COMMAND_NEXTBYTE_TIMEOUT;
 
 @@Timeout for waiting for GDB to ACK a command (in microseconds)
 @@When this timeout is exceeded, try to send the packet again
-global final CONFIG_GDB_COMMAND_ACK_TIMEOUT = 10000000;
+global CONFIG_GDB_COMMAND_ACK_TIMEOUT;
 
 @@Max # of times to re-attempt sending a response to GDB
 @@the total # of attempts is @(CONFIG_GDB_SEND_MAX_RETRY_COUNT + 1)
-global final CONFIG_GDB_SEND_MAX_RETRY_COUNT = 3;
+global CONFIG_GDB_SEND_MAX_RETRY_COUNT;
 
 @@Timeout (in microseconds) before re-attempting a telnet command,
 @@or assuming that the command completed successfully.
-global final CONFIG_TELNET_TIMEOUT = 100000;
-global final CONFIG_VBOXMANAGE_TIMEOUT = 2000000;
+global CONFIG_TELNET_RESPONSE_TIMEOUT;
+global CONFIG_VBOXMANAGE_COMPLETE_TIMEOUT;
 
 
 /* The different types of break points */
@@ -163,6 +164,19 @@ function startVboxGDBGlue(
 	global vmName = vmName;
 	global virtualBoxProc = virtualBoxProc;
 	global vbox = vbox;
+
+	/* Load configurations from emulator options */
+	global CONFIG_VERBOSE = opt.getBool(options, "vboxgdb.verbose", true);
+	global CONFIG_GDB_COMMAND_NEXTBYTE_TIMEOUT =
+		opt.getInt(options, "vboxgdb.gdb.command_timeout", 1000000);
+	global CONFIG_GDB_COMMAND_ACK_TIMEOUT =
+		opt.getInt(options, "vboxgdb.gdb.ack_timeout", 10000000);
+	global CONFIG_GDB_SEND_MAX_RETRY_COUNT =
+		opt.getInt(options, "vboxgdb.gdb.max_retry", 3);
+	global CONFIG_TELNET_RESPONSE_TIMEOUT =
+		opt.getInt(options, "vboxgdb.telnet.timeout", 100000);
+	global CONFIG_VBOXMANAGE_COMPLETE_TIMEOUT =
+		opt.getInt(options, "vboxgdb.vboxmanage.timeout", 2000000);
 
 	final local vboxTelnetAddr = "localhost:5000";
 	local connectResponse;
@@ -263,7 +277,7 @@ again:
 	} else {
 		vBoxTelnetSocket.send(command.rstrip("\r\n") + "\r\n");
 	}
-	local result = vBoxTelnetGetResponse(CONFIG_TELNET_TIMEOUT);
+	local result = vBoxTelnetGetResponse(CONFIG_TELNET_RESPONSE_TIMEOUT);
 	if (result is none) {
 		if (CONFIG_VERBOSE && result !is none)
 			print "[vboxgdb<-telnet] <Timeout>";
@@ -308,7 +322,7 @@ again:
 	local error;
 	error = vbox.runVBoxManageCommandEx(
 		{ "controlvm", vmName, method },
-		CONFIG_VBOXMANAGE_TIMEOUT);
+		CONFIG_VBOXMANAGE_COMPLETE_TIMEOUT);
 	if (error is none) {
 		if (CONFIG_VERBOSE)
 			print "[vboxgdb<-VBoxManage] <Timeout>";
@@ -417,7 +431,7 @@ again_step:
 	local error = _vBoxManageControlVm("resume", allowFailure: true);
 	local stepResponse;
 	if (error is none || error != 0) {
-		stepResponse = vBoxTelnetGetResponse(CONFIG_TELNET_TIMEOUT);
+		stepResponse = vBoxTelnetGetResponse(CONFIG_TELNET_RESPONSE_TIMEOUT);
 		if (stepResponse is none)
 			goto handle_bad_step_response;
 	} else {
@@ -1185,7 +1199,7 @@ function GDBHandleVirtualBoxEvent(event: Bytes): string {
 		}
 		id = int(id[:idEnd]);
 		local data = vmDefinedBreakpoints[id];
-		
+
 		if (data[0] == GDB_BREAKPOINT_TYPE_SWBREAK) {
 			if (CONFIG_GDB_REMOTE_SUPPORTS_SWBREAK)
 				return "T05swbreak:;";

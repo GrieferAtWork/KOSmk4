@@ -106,10 +106,7 @@ got_bios:
 		rc << "cpu: count="
 			<< options.get(opt.SMP, "1") /* Always default to 1, since bochs doesn't normally support this (you need to create your own custom build for SMP support) */
 			<< ", ips=4000000, model=bx_generic, reset_on_triple_fault=";
-		local isHosted = options.get(opt.HOSTED, "true");
-		if (isHosted !in ["true", "false"])
-			throw Error("Bad value for " + opt.HOSTED + ": " + repr(isHosted));
-		rc << (isHosted == "true" ? "0" : "1");
+		rc << (opt.getBool(options, opt.HOSTED, true) ? "0" : "1");
 		rc << ", cpuid_limit_winnt=0, ignore_bad_msrs=1, mwait_is_nop=0\n";
 		rc << "cpuid: mmx=1, apic=xapic, simd=sse2, sse4a=0, misaligned_sse=0, sep=1, movbe=0, adx=0\n";
 		rc << "cpuid: aes=0, sha=0, xsave=0, xsaveopt=0";

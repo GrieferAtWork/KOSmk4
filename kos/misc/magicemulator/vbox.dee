@@ -163,7 +163,7 @@ function start(
 		TARGET_ARCH: string,
 		TARGET: Module,
 		DISK_FILENAME: string,
-		options: {string: Object},
+		options: {string: string},
 		magic: Module) {
 	if (DRIVERS)
 		throw Error("VBox doesn't support booting KOS with additional drivers");
@@ -262,11 +262,8 @@ function start(
 		vmVboxConfig << "		<PAE enabled=\"true\"/>\n";
 		vmVboxConfig << "		<LongMode enabled=\"" << (TARGET_ARCH == "x86_64" ? "true" : "false") << "\"/>\n";
 		vmVboxConfig << "		<HardwareVirtExLargePages enabled=\"true\"/>\n";
-		local isHosted = options.get(opt.HOSTED, "true");
-		if (isHosted !in ["true", "false"])
-			throw Error("Bad value for " + opt.HOSTED + ": " + repr(isHosted));
 		vmVboxConfig << "		<TripleFaultReset enabled=\""
-			<< (isHosted == "true" ? "false" : "true")
+			<< (opt.getBool(options, opt.HOSTED, true) ? "false" : "true")
 			<< "\"/>\n";
 		vmVboxConfig << "		<CpuIdTree>\n";
 		                 			/* BRAND_STRING = "VBox" */

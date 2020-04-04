@@ -88,7 +88,7 @@ function start(
 		TARGET_ARCH: string,
 		TARGET: Module,
 		DISK_FILENAME: string,
-		options: {string: Object},
+		options: {string: string},
 		magic: Module) {
 	local qemu = options.get("qemu.exe");
 	if (qemu is none) {
@@ -100,10 +100,7 @@ function start(
 	}
 	local qemu_arguments = [];
 	qemu_arguments.extend({ "-serial", "stdio" });
-	local isHosted = options.get(opt.HOSTED, "true");
-	if (isHosted !in ["true", "false"])
-		throw Error("Bad value for " + opt.HOSTED + ": " + repr(isHosted));
-	if (isHosted == "true")
+	if (opt.getBool(options, opt.HOSTED, true))
 		qemu_arguments.extend({ "-no-reboot", "-no-shutdown" });
 	local gdb_mode = options.get(opt.GDB);
 	local boot_drivers = List(DRIVERS);
