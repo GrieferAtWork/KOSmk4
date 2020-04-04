@@ -401,8 +401,6 @@ _err_unknown_argument:
 				CONFIG_MULTIBOOT_DRIVERS[i] = (name, cmdline);
 			}
 		}
-		if (CONFIG_EMULATOR_STARTED_PATTERN)
-			print CONFIG_EMULATOR_STARTED_PATTERN;
 		import . as me;
 		import(".kos.misc.magicemulator." + CONFIG_EMULATOR_USED).start(
 			groups:        groups,
