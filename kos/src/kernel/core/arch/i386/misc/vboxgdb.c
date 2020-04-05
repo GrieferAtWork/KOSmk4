@@ -48,13 +48,13 @@ NOTHROW(KCALL x86_initialize_vboxgdb)(void) {
 	 * attached GDB instance to set initial kernel breakpoints. */
 	__asm__ __volatile__(""
 #ifdef __x86_64__
-	                     "movq   %%ss, %%rcx\t\n"
-	                     "movq   %%rsp, %%rsi\t\n"
-	                     "pushq  %%rcx\t\n"   /* IRET.SS */
-	                     "pushq  %%rsi\t\n"   /* IRET.RSP */
+	                     "movq   %%ss, %%rax\t\n"
+	                     "pushq  %%rax\t\n"   /* IRET.SS */
+	                     "leaq   8(%%rsp), %%rax\t\n"
+	                     "pushq  %%rax\t\n"   /* IRET.RSP */
 	                     "pushfq\t\n"         /* IRET.RFLAGS */
-	                     "movq   %%cs, %%rcx\t\n"
-	                     "pushq  %%rcx\t\n"   /* IRET.CS */
+	                     "movq   %%cs, %%rax\t\n"
+	                     "pushq  %%rax\t\n"   /* IRET.CS */
 	                     "pushq  $991f\t\n"   /* IRET.RIP */
 #else /* __x86_64__ */
 	                     "pushfl\t\n"         /* IRET.EFLAGS */
@@ -71,7 +71,12 @@ NOTHROW(KCALL x86_initialize_vboxgdb)(void) {
 	                     : "0" (COMPILER_STRLEN(_vboxgdb_startup_seq))
 	                     , "1" (0x504)
 	                     , "2" (_vboxgdb_startup_seq)
-	                     : "memory", "cc");
+	                     : "memory"
+	                     , "cc"
+#ifdef __x86_64__
+	                     , "%rax"
+#endif /* __x86_64__ */
+	                     );
 }
 
 
