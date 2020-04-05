@@ -17,6 +17,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifdef __WINDOWS__
+#define HOST_EXE(x)  x ".exe"
+#else
+#define HOST_EXE(x)  x
+#endif
 
 import * from deemon;
 import * from ..libmagic.libmagic;
@@ -24,29 +29,6 @@ import ._options as opt;
 import fs;
 import net;
 import ipc;
-
-/* TODO:
- * One big downside of vboxgdb is that setting breakpoints before the kernel has been
- * loaded into memory (i.e. before connecting GDB and waiting for boot0 to finish,
- * and _start32.S to have loaded the kernel page directory) won't work because before
- * that point memory locations can't actually be translated, so attempting to set
- * breakpoints will (correctly) trigger errors, causing gdb to go crazy and trying to
- * set the breakpoints itself, which only results in a bunch of more errors from trying
- * to access undefined memory locations...
- * The solution here would be to inject a piece of code into the kernel that is executed
- * just after pagedir_kernel is initialized for the kernel core, and loaded into %cr3.
- * This piece of code would then interact as follows:
- *   #1: The kernel tells us that it has fully initialized paging (via port `$0x504')
- *   #2: We start up the GDB server (Thread(GDBMain).start(), ...)
- *   #3: GDB does its initialization
- *   #4: GDB tells us to resume execution ($c#xx)
- *   #5: At this point we override the kernel's EIP (which still points at
- *       an idle loop within the injected code) to resume execution at the
- *       original code site (i.e. just after the initial "mov $pagedir_kernel, %cr3")
- * - The injection could be done by creating a special copy of ".kernel-flat.bin"
- *   in which we've added additional code (somewhere where it won't bother anyone,
- *   such as some .bss area that isn't located at the end of the kernel)
- */
 
 @@Log comunications and other verbose information
 global CONFIG_VERBOSE;
@@ -68,13 +50,18 @@ global CONFIG_GDB_SEND_MAX_RETRY_COUNT;
 global CONFIG_TELNET_RESPONSE_TIMEOUT;
 global CONFIG_VBOXMANAGE_COMPLETE_TIMEOUT;
 
-
 /* The different types of break points */
 global final GDB_BREAKPOINT_TYPE_SWBREAK   = 0; /* int3 */
 global final GDB_BREAKPOINT_TYPE_HWBREAK   = 1; /* DRn-breakpoint */
 global final GDB_BREAKPOINT_TYPE_WRITE     = 2; /* Break on write to `addr' */
 global final GDB_BREAKPOINT_TYPE_READ      = 3; /* Break on read from `addr' */
 global final GDB_BREAKPOINT_TYPE_READWRITE = 4; /* Break on read or write to/from `addr' */
+
+/* Values for `_vboxgdb_trapctl` */
+global final VBOXGDB_TRAPCTL_NTRAP = 0x00; /* Don't trap */
+global final VBOXGDB_TRAPCTL_SSTEP = 0x01; /* Trap single-step events */
+global final VBOXGDB_TRAPCTL_TRIGG = 0x02; /* Trap was triggered */
+
 
 
 /* Arguments passed to `startVboxGDBGlue()` */
@@ -85,6 +72,13 @@ global magic: Module;
 global vmName: string;
 global virtualBoxProc: ipc.Process;
 global vbox: Module;
+
+@@The address of @"_vboxgdb_trapctl"
+global KERNEL_ADDROF__vboxgdb_trapctl: int = none;
+
+@@The address of @"_vboxgdb_steploop"
+global KERNEL_ADDROF__vboxgdb_steploop: int = none;
+global final KERNEL_ADDROF__vboxgdb_steplooplen: int = 2;
 
 @@The socket through which we're connected to VirtualBox
 global vBoxTelnetSocket: net.socket;
@@ -146,80 +140,22 @@ function vBoxTelnetGetResponse(timeout_microseconds: int = -1): Bytes {
 
 global GDBMain;
 
-function startVboxGDBGlue(
-		KERNEL: string,
-		TARGET_ARCH: string,
-		options: {string: Object},
-		magic: Module,
-		gdbPort: string,
-		vmName: string,
-		virtualBoxProc: ipc.Process,
-		vbox: Module) {
-	/* Save some of the arguments to global variables. */
-	global KERNEL = KERNEL;
-	global TARGET_ARCH = TARGET_ARCH;
-	global options = options;
-	global magic = magic;
-	global vmName = vmName;
-	global virtualBoxProc = virtualBoxProc;
-	global vbox = vbox;
-
-	/* Load configurations from emulator options */
-	global CONFIG_VERBOSE = opt.getBool(options, "vboxgdb.verbose", true);
-	global CONFIG_GDB_COMMAND_NEXTBYTE_TIMEOUT =
-		opt.getInt(options, "vboxgdb.gdb.command_timeout", 1000000);
-	global CONFIG_GDB_COMMAND_ACK_TIMEOUT =
-		opt.getInt(options, "vboxgdb.gdb.ack_timeout", 10000000);
-	global CONFIG_GDB_SEND_MAX_RETRY_COUNT =
-		opt.getInt(options, "vboxgdb.gdb.max_retry", 3);
-	global CONFIG_TELNET_RESPONSE_TIMEOUT =
-		opt.getInt(options, "vboxgdb.telnet.timeout", 100000);
-	global CONFIG_VBOXMANAGE_COMPLETE_TIMEOUT =
-		opt.getInt(options, "vboxgdb.vboxmanage.timeout", 2000000);
-
-	final local vboxTelnetAddr = "localhost:5000";
-	local connectResponse;
-	/* Try to connect 20 times with a delay of 0.1 seconds in-between.
-	 * In theory (and practice), this succeeds on the first try, but
-	 * it only started doing so after I added the connectedSemaphore.wait();
-	 * call in our caller to wait for VirtualBox to connect to the log pipe.
-	 * And in theory, VirtualBox might open the debug server _much_ later than
-	 * then opening of the log file (so better be safe here...) */
-	for (local i: [:20]) {
-		vBoxTelnetSocket = net.socket("AF_INET", "SOCK_STREAM", "IPPROTO_TCP");
-		try {
-			vBoxTelnetSocket.connect(vboxTelnetAddr);
-			connectResponse = vBoxTelnetGetResponse(100000); /* 0.1 seconds */
-			if (connectResponse !is none)
-				break;
-		} catch (...) {
-			if (i == 19)
-				throw;
+function getLines(fp: File): Bytes {
+	local result = fp.read();
+again:
+	if (result &&
+	    !result.endswith("\n") &&
+	    !result.endswith("\r") &&
+	    !result.endswith("\r\n")) {
+		local d = fp.read();
+		if (d) {
+			result = result + d;
+			goto again;
 		}
-		vBoxTelnetSocket.close();
 	}
-	if (connectResponse is none)
-		throw Error("Failed to connect to VirtualBox telnet");
-	print "[vboxgdb] Connected to telnet under", vboxTelnetAddr;
-
-	if (CONFIG_VERBOSE) {
-		/* The initial response is something like:
-		 * >> "Welcome to the VirtualBox Debugger!\r\nCurrent VM is 089b0000, CPU #0\r\n".bytes() */
-		print "[vboxgdb] Initial response was:", repr connectResponse;
-	}
-
-	/* At this point we've got full control over the VirtualBox VM, but we still
-	 * have to launch our gdb-stub glue as a TCP server on `localhost:<gdbPort>`
-	 * Once that one's up and running, we can invoke `magic.onEmulatorStarted()`
-	 * to indicate that GDB is up and running! */
-	gdbServerSocket = net.socket("AF_INET", "SOCK_STREAM", "IPPROTO_TCP");
-	gdbServerSocket.bind("localhost:" + gdbPort);
-	gdbServerSocket.listen();
-	Thread(GDBMain).start();
-
-	/* Inform magic that GDB is now accepting connection requests. */
-	magic.onEmulatorStarted();
+	return result;
 }
+
 
 
 @@Buffer of unread data from @gdbSocket
@@ -308,203 +244,10 @@ function vBoxTelnetExecNoError(command: Bytes, restartOnTimeout: bool = true): B
 }
 
 
+
 @@The current state of the VM (set using @vmResume() and @vmPause())
-global vmIsRunning = false;
-
-global _vmIsUiPaused = true;
-global _vmIsDebuggerPaused = false;
-
-function _vBoxManageControlVm(method: string, allowFailure: bool = false): int {
-again:
-	if (CONFIG_VERBOSE)
-		print("[vboxgdb->VBoxManage] [\"controlvm\", ", repr(vmName), ", ", repr(method), "]");
-	local error;
-	error = vbox.runVBoxManageCommandEx(
-		{ "controlvm", vmName, method },
-		CONFIG_VBOXMANAGE_COMPLETE_TIMEOUT);
-	if (error is none) {
-		if (CONFIG_VERBOSE)
-			print "[vboxgdb<-VBoxManage] <Timeout>";
-		if (allowFailure)
-			return none;
-		goto again;
-	}
-	if (CONFIG_VERBOSE)
-		print "[vboxgdb<-VBoxManage] $? =", error;
-	if (error != 0 && !allowFailure)
-		goto again;
-	return error;
-}
-
-function _vBoxTelnetExecContinue(restartOnTimeout: bool = true): Bytes {
-	local result;
-	result = vBoxTelnetExec("g", restartOnTimeout);
-	if (result !is none) {
-		if ("error:" !in result && "Error:" !in result)
-			;
-		else if ("already running" in result) {
-			result = "\r\n".bytes();
-		} else {
-			throw Error("Failed to continue vm: " + repr(result));
-		}
-	}
-	return result;
-}
-
-function _vBoxTelnetExecStop(restartOnTimeout: bool = true): Bytes {
-	local result;
-	result = vBoxTelnetExec("stop", restartOnTimeout);
-	if (result !is none) {
-		if ("error:" !in result && "Error:" !in result)
-			;
-		else if ("The VM is already halted" in result)
-			result = "".bytes();
-		else {
-			throw Error("Failed to stop vm: " + repr(result));
-		}
-	}
-	return result;
-}
-
-function vmPause() {
-	if (!vmIsRunning)
-		return; /* Already paused */
-	if (!_vmIsUiPaused) {
-		_vBoxManageControlVm("pause");
-		_vmIsUiPaused = true;
-	}
-	if (!_vmIsDebuggerPaused) {
-		_vBoxTelnetExecStop();
-		_vmIsDebuggerPaused = true;
-	}
-	vmIsRunning = false;
-}
-
-function vmResume() {
-	if (vmIsRunning)
-		return; /* Already running */
-	if (!_vmIsUiPaused) {
-		_vBoxManageControlVm("pause");
-		_vmIsUiPaused = true;
-	}
-	if (_vmIsDebuggerPaused) {
-		_vBoxTelnetExecContinue();
-		_vmIsDebuggerPaused = false;
-	}
-	if (_vmIsUiPaused) {
-		_vBoxManageControlVm("resume");
-		_vmIsUiPaused = false;
-	}
-	vmIsRunning = true;
-}
-
-global GDBHandleVirtualBoxEvent;
-function vmSingleStep(): string {
-	/* TODO: There may be a chance that single-stepping
-	 *       could be implemented via ring0 code-injection:
-	 * cmd>$ VBoxManage controlvm <vmName> pause
-	 * tel>$ stop
-	 * tel>$ rg eflags
-	 * tel>$ rg eflags = <OLD_EFLAGS | EFLAGS_TF>
-	 * tel>$ eb <KOS_KERNEL_SINGLE_VBOX_STEP_ENABLED> <OLD_EFLAGS | EFLAGS_TF>
-	 * do {
-	 *     tel>$ g
-	 *     cmd>$ VBoxManage controlvm <vmName> resume
-	 *     -- The instruction being stepped is executed here
-	 *     cmd>$ VBoxManage controlvm <vmName> stop
-	 *     tel>$ stop
-	 *     tel>$ rg eip
-	 * } while (<EIP> != VBOX_SINGLE_STEP_WAITFOR_EIP);
-	 * tel>$ rg eflags = <OLD_EFLAGS>
-	 * if (OLD_EFLAGS & EFLAGS_TF) {
-	 *     tel>$ rg eip = <KOS_KERNEL_REAL_INT1_ENTRY_POINT>
-	 * } else {
-	 *     tel>$ dd <KOS_KERNEL_INT1_IRET_TAIL_EIP>
-	 *     tel>$ rg eip = <KOS_KERNEL_INT1_IRET_TAIL_EIP>
-	 * }
-	 * In this model, it won't be the VirtualBox debugger that triggers the
-	 * single-step event, but instead we'll be the ones to do everything!
-	 *
-	 * On a seperate note, this model could very efficiently implement range-
-	 * stepping by never having to leave the VM when checking if a trap should
-	 * be ignored!
-	 */
-
-	/* Single-stepping is kind-of busted.
-	 * However doing it as this sequence of commands
-	 * every time we want to step seems to work:
-	 * [if !_vmIsUiPaused]       cmd>$ VBoxManage controlvm <vmName> pause
-	 * [if !_vmIsDebuggerPaused] tel>$ stop
-	 *                           tel>$ t
-	 *                           cmd>$ VBoxManage controlvm <vmName> resume
-	 *                           tel<$ dbgf event: Single step! (other)
-	 *                           cmd>$ VBoxManage controlvm <vmName> pause
-	 *                           tel>$ g
-	 *                           tel>$ stop
-	 * The idea here seems to be that we don't want to use `t` to resume
-	 * VM execution, but only use it to set-up the VM for a single-step
-	 * once we resume it manually. Then, once that's done re-suspend the
-	 * VM globally, and toggle the debugger suspend sequence by invoking
-	 * `g` followed by `stop` (thus fixing up the probably broken internal
-	 * state of the VirtualBox debugger)
-	 * NOTE: Despite everything I've tried, single-stepping still seems to be
-	 *       messed up. - Sooner or later, it always ends with your log getting
-	 *       spammed with `emR3Debug: rc=VERR_SEM_OUT_OF_TURN`
-	 *       Looking at the VirtualBox sources, I get the feeling that this sort
-	 *       of error can happen arbitrarily for any sort of debugger trap that
-	 *       is triggered from inside of VirtualBox itself... */
-	if (!_vmIsUiPaused) {
-		_vBoxManageControlVm("pause");
-		_vmIsUiPaused = true;
-	}
-	if (!_vmIsDebuggerPaused) {
-		_vBoxTelnetExecStop();
-		_vmIsDebuggerPaused = true;
-	}
-	local attempt = 0;
-again_step:
-	if (CONFIG_VERBOSE)
-		print "[vboxgdb->telnet] \"t\"";
-	/* The t command can be a bit stingy... */
-	vBoxTelnetDiscardPendingData();
-	vBoxTelnetSocket.send("t\r\n");
-	local error = _vBoxManageControlVm("resume", allowFailure: true);
-	local stepResponse;
-	if (error is none || error != 0) {
-		stepResponse = vBoxTelnetGetResponse(CONFIG_TELNET_RESPONSE_TIMEOUT);
-		if (stepResponse is none)
-			goto handle_bad_step_response;
-	} else {
-		stepResponse = vBoxTelnetGetResponse();
-	}
-	if (CONFIG_VERBOSE)
-		print "[vboxgdb<-telnet] Step-response:", repr(stepResponse);
-	if ("Invalid command event" in stepResponse) {
-handle_bad_step_response:
-		_vBoxManageControlVm("pause", allowFailure: true);
-		_vBoxTelnetExecStop(false);
-		/* Only do this part if VBoxManage timed out */
-		if (error is none) {
-			if ((attempt % 3) == 2) {
-				_vBoxTelnetExecContinue(false);
-				_vBoxTelnetExecStop(false);
-			}
-			++attempt;
-		}
-		goto again_step;
-	}
-	if (!stepResponse)
-		goto handle_bad_step_response;
-	if ("error:" in stepResponse || "Error:" in stepResponse)
-		goto handle_bad_step_response;
-	_vBoxManageControlVm("pause");
-	//_vBoxTelnetExecContinue();
-	//_vBoxTelnetExecStop();
-	_vmIsUiPaused       = true;
-	_vmIsDebuggerPaused = true;
-	vmIsRunning         = false;
-	return GDBHandleVirtualBoxEvent(stepResponse);
-}
+global vmIsRunning         = false; /* Paused via `stop' */
+global _vmIsStepLoopPaused = none;  /* Paused via `_vboxgdb_steploop' (bool or none) */
 
 
 @@The currently selected CPU core (set using @vmSetCurrentCpu())
@@ -610,42 +353,427 @@ again_delete_breakpoint:
 	vmDefinedBreakpoints[id] = (typ, addr, len);
 }
 
-function vmGetRegister(name: string): Bytes {
-	local resp = vBoxTelnetExecNoError("rg " + name, 1).splitlines(false);
+function vmReadMemoryAt(addr: int | string): Bytes {
+	/* NOTE: We use dd for reading memory (and not db), because
+	 *       dd returns the same about of bytes per line, but
+	 *       db also returns an ASCII representation that would
+	 *       only make this parser more complicated.
+	 *       Futhermore, if the memory contains an ASCII string
+	 *       equal to "error:", our response processing system
+	 *       wouldn't be able to differenciate between something
+	 *       like the ASCII string, and an actual error... */
+	local hexaddr = addr;
+	if (addr is int)
+		hexaddr = addr.hex();
+	local response = vBoxTelnetExec(
+		"dd " + hexaddr).splitlines(false);
+	local resultlen = 16 * #response;
+	local result = Bytes(resultlen);
+	local offset = 0;
+	for (local l: response) {
+		if (!l)
+			continue;
+		if ("error:" in l || "Error:" in l)
+			break;
+		local data = l[l.index(":") + 1:].lstrip();
+		for (local dword: data.split(" ")) {
+			if (!dword)
+				continue;
+			dword = int(dword, 16);
+			if (offset + 4 >= resultlen) {
+				resultlen = offset + 4;
+				result = result.resized(resultlen);
+			}
+			result[offset] = dword & 0xff;
+			++offset;
+			result[offset] = (dword >> 8) & 0xff;
+			++offset;
+			result[offset] = (dword >> 16) & 0xff;
+			++offset;
+			result[offset] = (dword >> 24) & 0xff;
+			++offset;
+		}
+	}
+	if (!offset) {
+		if (addr is int) {
+			local offset = addr & 15;
+			if (offset) {
+				/* Virtualbox always prints memory in lines of 16 bytes.
+				 * If the given address isn't aligned by at least that much,
+				 * there is a chance that part of those 16 bytes is located
+				 * somewhere in memory where accessing it is impossible.
+				 * If this happens, VirtualBox will given us an error, when
+				 * in fact it would have been possible to read at least a
+				 * couple of leading bytes of memory.
+				 * To work around this issue, we handle a read-error with
+				 * an unaligned address by re-attempting the read with an
+				 * aligned address, thus allowing VirtualBox to at least
+				 * read one line of memory successfully.
+				 * HINT: In such a szenario, VirtualBox's response might look like:
+				 * >> "%00000000ffffffe8: 07fa5023 00000000 07fa4023 00000000\r\n"
+				 * >> "%00000000fffffff8: 07fa3023 00000000\r\n
+				 * >> error: VERR_PAGE_TABLE_NOT_PRESENT:  Reading memory at %0000000100000000.\r\n"
+				 */
+				result = vmReadMemoryAt(addr - offset);
+				if (offset > #result)
+					return result[offset:];
+				/* Fallthru to regular error handling */
+			}
+		}
+		if ("error:" in response || "Error:" in response)
+			throw Error("Response for {!r} indicates an error {!r}"
+				.format({ "dd " + hexaddr, response }));
+		throw Error("Failed to read memory at {!r} (response was {!r})"
+			.format({ hexaddr, response }));
+	}
+	return result[:offset];
+}
+
+@@Read @count bytes of memory from @addr
+function vmReadMemory(addr: int, count: int): Bytes {
+	local result = vmReadMemoryAt(addr);
+	while (count > #result) {
+		/* Read more data */
+		result += vmReadMemoryAt(addr + #result);
+	}
+	return result[:count];
+}
+
+
+#define vmWriteMemoryB(addr, value) vmWriteMemoryWord(addr, "b", value)
+#define vmWriteMemoryW(addr, value) vmWriteMemoryWord(addr, "w", value)
+#define vmWriteMemoryL(addr, value) vmWriteMemoryWord(addr, "d", value)
+#define vmWriteMemoryQ(addr, value) vmWriteMemoryWord(addr, "q", value)
+
+@@Write @data to memory at @addr
+@@@param: wordType: One of @("b", "w", "d", "q")
+function vmWriteMemoryWord(addr: string, wordType: string, value: int) {
+	local resp;
+	do {
+		resp = vBoxTelnetExecNoError("e{} {} {}"
+			.format({ wordType, addr, value.hex() }));
+	} while (resp is none);
+}
+
+function insertWordLeInfoBytes(b: Bytes, offset: int, nBytes: int, v: int) {
+	for (local j: [:nBytes]) {
+		b[offset + j] = (v >> (j * 8)) & 0xff;
+	}
+}
+
+function extractWordLeFromBytes(b: Bytes, offset: int, nBytes: int): int {
+	local result = 0;
+	for (local j: [:nBytes])
+		result |= b[offset + j] << (j * 8);
+	return result;
+}
+
+@@Write @data to memory at @addr
+function vmWriteMemory(addr: int, data: Bytes) {
+	local i = 0, len = #data;
+	while (i < len) {
+		local missing = len - i;
+		local realAddr = (addr + i).hex();
+		if (missing >= 8) {
+			vmWriteMemoryWord(realAddr, "q", extractWordLeFromBytes(data, i, 8));
+			i += 8;
+		} else if (missing >= 4) {
+			vmWriteMemoryWord(realAddr, "d", extractWordLeFromBytes(data, i, 4));
+			i += 4;
+		} else if (missing >= 2) {
+			vmWriteMemoryWord(realAddr, "w", extractWordLeFromBytes(data, i, 2));
+			i += 2;
+		} else {
+			vmWriteMemoryWord(realAddr, "b", data[i]);
+			++i;
+		}
+	}
+}
+
+@@Returns a lower-case hex-string without prefix
+function _vmGetRegisterAsHex(name: string): Bytes {
+	local resp = vBoxTelnetExecNoError("rg " + name, 1)
+		.strip().splitlines(false);
 	if (#resp != 1)
 		throw Error("Unexpected # of lines in response to {!r} (response: {!r})"
 			.format({ "rg " + name, resp }));
 	resp = resp[0];
-	resp = resp[resp.index("=") + 1:].strip();
+	resp = resp[resp.index("=") + 1:].strip().lower();
+	if (resp.startswith("0x"))
+		resp = resp[2:];
 	return resp;
 }
 
-function vmSetRegister(name: string, value: string | int) {
-	if (value !is string)
+function _vmGetRegister(name: string): int {
+	return int(_vmGetRegisterAsHex(name), 16);
+}
+
+function _vmSetRegister(name: string, value: string | int) {
+	if (value is int)
 		value = value.hex();
 	if (name in ["cs"]) {
-		local oldval = str(vmGetRegister(name));
-		oldval = oldval.lower().lsstrip("0x").lstrip("0");
-		value  = value.lower().lsstrip("0x").lstrip("0");
+		local oldval = str(_vmGetRegisterAsHex(name));
+		oldval = oldval.lstrip("0");
+		value = value.lower();
+		if (value.startswith("0x"))
+			value = value[2:];
+		value = value.lstrip("0");
 		if (oldval != value)
 			throw Error("Cannot set register {!r} = {!r} (oldval = {!r})"
 				.format({ name, value, oldval }));
 		return;
 	}
-	local resp;
-	do {
-		resp = vBoxTelnetExecNoError(
-			"rg {} = {}".format({ name, value }));
-	} while (resp is none);
+	vBoxTelnetExecNoError("rg {} = {}".format({ name, value }));
 }
 
-@@Return a set of @(register, value) for the following registers:
-@@   @"ax", @"bx", @"cx", @"dx", @"si", @"di", @"sp", @"bp", @"ip", @"flags"
-@@   @"cs", @"ds", @"es", @"fs", @"gs"
-@@The register names of the first line always have those names in the returned
-@@mapping, however will have had the one of @"foo", @"efoo" or @"rfoo" in the
-@@original register list.
-function vmGetRegisters(): {string: int} {
+@@When @_vmIsStepLoopPaused is @none, determine its
+@@proper value and assign @true or @false to it.
+function vmGetStepLoopPaused(rip: int = none): bool {
+	if (_vmIsStepLoopPaused is none) {
+		if (rip is none)
+			rip = int(_vmGetRegisterAsHex("rip"), 16);
+		_vmIsStepLoopPaused = rip >= KERNEL_ADDROF__vboxgdb_steploop &&
+		                      rip <= KERNEL_ADDROF__vboxgdb_steploop +
+		                             KERNEL_ADDROF__vboxgdb_steplooplen;
+	}
+	return _vmIsStepLoopPaused;
+}
+
+@@When not @none, the new (E|R)IP value to set in @vmResume()
+@@NOTE: Ignored when @vmGetStepLoopPaused() is @true
+global _vmNewRip = none;
+@@Same as @_vmNewRip, but for @"rflags"
+global _vmNewRflags = none;
+
+@@Returns a lower-case hex-string without prefix
+function vmGetRegisterAsHex(name: string): Bytes {
+	switch (name) {
+
+	case "eip":
+	case "rip": {
+		if (_vmIsStepLoopPaused === false && _vmNewRip !is none)
+			return _vmNewRip;
+		local result = _vmGetRegisterAsHex(name);
+		if (_vmIsStepLoopPaused is none)
+			vmGetStepLoopPaused(int(result, 16));
+		if (_vmIsStepLoopPaused) {
+			local iret = vmReadMemoryAt("rsp");
+			iret = extractWordLeFromBytes(iret, 0, TARGET_ARCH == "x86_64" ? 8 : 4);
+			return iret.hex()[2:];
+		} else if (_vmNewRip !is none) {
+			result = _vmNewRip.hex()[2:];
+		}
+		return result;
+	}
+
+	case "cs":
+		if (vmGetStepLoopPaused()) {
+			local iret = vmReadMemoryAt("rsp");
+			if (TARGET_ARCH == "x86_64") {
+				iret = extractWordLeFromBytes(iret, 8, 2);
+			} else {
+				iret = extractWordLeFromBytes(iret, 4, 2);
+			}
+			return iret.hex()[2:];
+		}
+		break;
+
+	case "eflags":
+	case "rflags":
+		if (vmGetStepLoopPaused()) {
+			local iret = vmReadMemoryAt("rsp");
+			if (TARGET_ARCH == "x86_64") {
+				iret = extractWordLeFromBytes(iret, 16, 8);
+			} else {
+				iret = extractWordLeFromBytes(iret, 8, 4);
+			}
+			return iret.hex()[2:];
+		} else if (_vmNewRflags !is none) {
+			return _vmNewRflags.hex()[2:];
+		}
+		break;
+
+	case "esp":
+	case "rsp":
+		if (vmGetStepLoopPaused()) {
+			local iret = vmReadMemoryAt("rsp");
+			if (TARGET_ARCH == "x86_64") {
+				iret = extractWordLeFromBytes(iret, 24, 8);
+			} else {
+				if ((extractWordLeFromBytes(iret, 4, 1) & 3) ||
+				    (extractWordLeFromBytes(iret, 10, 1) & 0x2)) {
+					iret = extractWordLeFromBytes(iret, 12, 4);
+				} else {
+					break;
+				}
+			}
+			return iret.hex()[2:];
+		}
+		break;
+
+	case "ss":
+		if (vmGetStepLoopPaused()) {
+			local iret = vmReadMemoryAt("rsp");
+			if (TARGET_ARCH == "x86_64") {
+				iret = extractWordLeFromBytes(iret, 32, 8);
+			} else {
+				if ((extractWordLeFromBytes(iret, 4, 1) & 3) ||
+				    (extractWordLeFromBytes(iret, 10, 1) & 0x2)) {
+					iret = extractWordLeFromBytes(iret, 16, 2);
+				} else {
+					break;
+				}
+			}
+			return iret.hex()[2:];
+		}
+		break;
+
+	case "es":
+	case "ds":
+	case "fs":
+	case "gs":
+		if (TARGET_ARCH != "x86_64" && vmGetStepLoopPaused()) {
+			local iret = vmReadMemoryAt("rsp");
+			if (extractWordLeFromBytes(iret, 10, 1) & 0x2) {
+				/* VM86 iret return registers. */
+				iret = extractWordLeFromBytes(iret, {
+					"es" : 20,
+					"ds" : 24,
+					"fs" : 28,
+					"gs" : 32,
+				}[name], 2);
+			} else {
+				break;
+			}
+			return iret.hex()[2:];
+		}
+		break;
+
+	default:
+		break;
+	}
+	return _vmGetRegisterAsHex(name);
+}
+
+function vmGetRegister(name: string): int {
+	return int(vmGetRegisterAsHex(name), 16);
+}
+
+function vmSetRegister(name: string, value: string | int) {
+	switch (name) {
+
+	case "eip":
+	case "rip":
+		if (vmGetStepLoopPaused()) {
+			if (TARGET_ARCH == "x86_64") {
+				vmWriteMemoryQ("%rsp", value);
+			} else {
+				vmWriteMemoryL("%rsp", value);
+			}
+			return;
+		} else {
+			if (value !is int)
+				value = int(value.lower().lstrip("0x"), 16);
+			_vmNewRip = value;
+			return;
+		}
+		break;
+
+	case "cs":
+		if (value !is int)
+			value = int(value.lower().lstrip("0x"), 16);
+		value = value & 0xffff;
+		if (vmGetStepLoopPaused()) {
+			if (TARGET_ARCH == "x86_64") {
+				vmWriteMemoryQ("(%rsp+8)", value);
+			} else {
+				vmWriteMemoryL("(%rsp+4)", value);
+			}
+			return;
+		}
+		break;
+
+	case "eflags":
+	case "rflags":
+		if (vmGetStepLoopPaused()) {
+			if (value !is int)
+				value = int(value.lower().lstrip("0x"), 16);
+			value = value & 0xffff;
+			if (TARGET_ARCH == "x86_64") {
+				vmWriteMemoryQ("(%rsp+0x10)", value);
+			} else {
+				vmWriteMemoryL("(%rsp+8)", value);
+			}
+			return;
+		} else {
+			if (value !is int)
+				value = int(value.lower().lstrip("0x"), 16);
+			_vmNewRflags = value;
+			return;
+		}
+		break;
+
+	case "esp":
+	case "rsp":
+		if (vmGetStepLoopPaused()) {
+			if (TARGET_ARCH == "x86_64") {
+				vmWriteMemoryQ("(%rsp+0x18)", value);
+			} else {
+				local iret = vmReadMemoryAt("rsp");
+				if ((extractWordLeFromBytes(iret, 4, 1) & 3) ||
+				    (extractWordLeFromBytes(iret, 10, 1) & 0x2)) {
+					vmWriteMemoryL("(%rsp+0xc)", value);
+				} else {
+					break;
+				}
+			}
+			return;
+		}
+		break;
+
+	case "ss":
+		if (value !is int)
+			value = int(value.lower().lstrip("0x"), 16);
+		value = value & 0xffff;
+		if (vmGetStepLoopPaused()) {
+			if (TARGET_ARCH == "x86_64") {
+				vmWriteMemoryQ("(%rsp+0x20)", value);
+			} else {
+				local iret = vmReadMemoryAt("rsp");
+				if ((extractWordLeFromBytes(iret, 4, 1) & 3) ||
+				    (extractWordLeFromBytes(iret, 10, 1) & 0x2)) {
+					vmWriteMemoryL("(%rsp+0x10)", value);
+				} else {
+					break;
+				}
+			}
+			return;
+		}
+		break;
+
+	case "es":
+	case "ds":
+	case "fs":
+	case "gs":
+		if (value !is int)
+			value = int(value.lower().lstrip("0x"), 16);
+		value = value & 0xffff;
+		if (TARGET_ARCH != "x86_64" && vmGetStepLoopPaused()) {
+			local iret = vmReadMemoryAt("rsp");
+			if (!(extractWordLeFromBytes(iret, 10, 1) & 0x2))
+				break;
+			vmWriteMemoryL("(%rsp+0x10)", value);
+			return;
+		}
+		break;
+
+	default:
+		break;
+	}
+	_vmSetRegister(name, value);
+}
+
+function _vmGetRegisters(): {string: int} {
 	local resp = vBoxTelnetExecNoError({
 		"i386"   : "rg32",
 		"x86_64" : "rg64",
@@ -689,135 +817,243 @@ function vmGetRegisters(): {string: int} {
 			local regnam = reg;
 			if (reg !in SEGMENT_REGISTERS && !reg.startswith("r"))
 				reg = "r" + reg;
-			local regval = vmGetRegister(reg);
-			if (regval.startswith("0x"))
-				regval = regval[2:];
-			result[regnam] = int(regval, 16);
+			result[regnam] = vmGetRegister(reg);
 		}
 	}
 	return result;
 }
 
-
-function vmReadMemoryAt(addr: int): Bytes {
-	/* NOTE: We use dd for reading memory (and not db), because
-	 *       dd returns the same about of bytes per line, but
-	 *       db also returns an ASCII representation that would
-	 *       only make this parser more complicated.
-	 *       Futhermore, if the memory contains an ASCII string
-	 *       equal to "error:", our response processing system
-	 *       wouldn't be able to differenciate between something
-	 *       like the ASCII string, and an actual error... */
-	local response = vBoxTelnetExec(
-		"dd " + addr.hex()).splitlines(false);
-	local resultlen = 16 * #response;
-	local result = Bytes(resultlen);
-	local offset = 0;
-	for (local l: response) {
-		if (!l)
-			continue;
-		if ("error:" in l || "Error:" in l)
-			break;
-		local data = l[l.index(":") + 1:].lstrip();
-		for (local dword: data.split(" ")) {
-			if (!dword)
-				continue;
-			dword = int(dword, 16);
-			if (offset + 4 >= resultlen) {
-				resultlen = offset + 4;
-				result = result.resized(resultlen);
-			}
-			result[offset] = dword & 0xff;
-			++offset;
-			result[offset] = (dword >> 8) & 0xff;
-			++offset;
-			result[offset] = (dword >> 16) & 0xff;
-			++offset;
-			result[offset] = (dword >> 24) & 0xff;
-			++offset;
-		}
-	}
-	if (!offset) {
-		local offset = addr & 15;
-		if (offset) {
-			/* Virtualbox always prints memory in lines of 16 bytes.
-			 * If the given address isn't aligned by at least that much,
-			 * there is a chance that part of those 16 bytes is located
-			 * somewhere in memory where accessing it is impossible.
-			 * If this happens, VirtualBox will given us an error, when
-			 * in fact it would have been possible to read at least a
-			 * couple of leading bytes of memory.
-			 * To work around this issue, we handle a read-error with
-			 * an unaligned address by re-attempting the read with an
-			 * aligned address, thus allowing VirtualBox to at least
-			 * read one line of memory successfully.
-			 * HINT: In such a szenario, VirtualBox's response might look like:
-			 * >> "%00000000ffffffe8: 07fa5023 00000000 07fa4023 00000000\r\n"
-			 * >> "%00000000fffffff8: 07fa3023 00000000\r\n
-			 * >> error: VERR_PAGE_TABLE_NOT_PRESENT:  Reading memory at %0000000100000000.\r\n"
-			 */
-			result = vmReadMemoryAt(addr - offset);
-			if (offset > #result)
-				return result[offset:];
-			/* Fallthru to regular error handling */
-		}
-		if ("error:" in response || "Error:" in response)
-			throw Error("Response for {!r} indicates an error {!r}"
-				.format({ "dd " + addr.hex(), response }));
-		throw Error("Failed to read memory at {} (response was {!r})"
-			.format({ addr.hex(), response }));
-	}
-	return result[:offset];
-}
-
-@@Read @count bytes of memory from @addr
-function vmReadMemory(addr: int, count: int): Bytes {
-	local result = vmReadMemoryAt(addr);
-	while (count > #result) {
-		/* Read more data */
-		result += vmReadMemoryAt(addr + #result);
-	}
-	return result[:count];
-}
-
-@@Write @data to memory at @addr
-@@@param: wordType: One of @("b", "w", "d", "q")
-function vmWriteMemoryWord(addr: int, wordType: string, value: int) {
-	local resp;
-	do {
-		resp = vBoxTelnetExecNoError("e{} {} {}"
-			.format({ wordType, addr.hex(), value.hex() }));
-	} while (resp is none);
-}
-
-function extractWordLeFromBytes(b: Bytes, i: int, nBytes: int): int {
-	local result = 0;
-	for (local j: [:nBytes])
-		result |= b[i + j] << (j * 8);
-	return result;
-}
-
-@@Write @data to memory at @addr
-function vmWriteMemory(addr: int, data: Bytes) {
-	local i = 0, len = #data;
-	while (i < len) {
-		local missing = len - i;
-		local realAddr = addr + i;
-		if (missing >= 8) {
-			vmWriteMemoryWord(realAddr, "q", extractWordLeFromBytes(data, i, 8));
-			i += 8;
-		} else if (missing >= 4) {
-			vmWriteMemoryWord(realAddr, "d", extractWordLeFromBytes(data, i, 4));
-			i += 4;
-		} else if (missing >= 2) {
-			vmWriteMemoryWord(realAddr, "w", extractWordLeFromBytes(data, i, 2));
-			i += 2;
+@@Return a set of @(register, value) for the following registers:
+@@   @"ax", @"bx", @"cx", @"dx", @"si", @"di", @"sp", @"bp", @"ip", @"flags"
+@@   @"cs", @"ds", @"es", @"fs", @"gs"
+@@The register names of the first line always have those names in the returned
+@@mapping, however will have had the one of @"foo", @"efoo" or @"rfoo" in the
+@@original register list.
+function vmGetRegisters(): {string: int} {
+	local result = _vmGetRegisters();
+	if (_vmIsStepLoopPaused is none)
+		vmGetStepLoopPaused(result["ip"]);
+	if (_vmIsStepLoopPaused) {
+		/* Override registers with the step-loop IRet tail. */
+		local iret = vmReadMemoryAt("rsp");
+		if (TARGET_ARCH == "x86_64") {
+			result["ip"]    = extractWordLeFromBytes(iret, 0, 8);
+			result["cs"]    = extractWordLeFromBytes(iret, 8, 2);
+			result["flags"] = extractWordLeFromBytes(iret, 16, 8);
+			result["sp"]    = extractWordLeFromBytes(iret, 24, 8);
+			result["ss"]    = extractWordLeFromBytes(iret, 32, 2);
 		} else {
-			vmWriteMemoryWord(realAddr, "b", data[i]);
-			++i;
+			result["ip"]    = extractWordLeFromBytes(iret, 0, 4);
+			local cs        = extractWordLeFromBytes(iret, 4, 2);
+			local eflags    = extractWordLeFromBytes(iret, 8, 4);
+			result["cs"]    = cs;
+			result["flags"] = eflags;
+			if ((cs & 3) || (eflags & 0x00020000)) {
+				/* user- or vm86- tail is present! */
+				result["sp"] = extractWordLeFromBytes(iret, 12, 4);
+				result["ss"] = extractWordLeFromBytes(iret, 16, 2);
+				if (eflags & 0x00020000) {
+					/* vm86-tail */
+					result["es"] = extractWordLeFromBytes(iret, 20, 2);
+					result["ds"] = extractWordLeFromBytes(iret, 24, 2);
+					result["fs"] = extractWordLeFromBytes(iret, 28, 2);
+					result["gs"] = extractWordLeFromBytes(iret, 32, 2);
+				}
+			}
 		}
+	} else {
+		if (_vmNewRip !is none)
+			result["ip"] = _vmNewRip;
+		if (_vmNewRflags !is none)
+			result["flags"] = _vmNewRflags;
+	}
+	return result;
+}
+
+
+
+function _vBoxManageControlVm(method: string, allowFailure: bool = false): int {
+again:
+	if (CONFIG_VERBOSE)
+		print("[vboxgdb->VBoxManage] [\"controlvm\", ", repr(vmName), ", ", repr(method), "]");
+	local error;
+	error = vbox.runVBoxManageCommandEx(
+		{ "controlvm", vmName, method },
+		CONFIG_VBOXMANAGE_COMPLETE_TIMEOUT);
+	if (error is none) {
+		if (CONFIG_VERBOSE)
+			print "[vboxgdb<-VBoxManage] <Timeout>";
+		if (allowFailure)
+			return none;
+		goto again;
+	}
+	if (CONFIG_VERBOSE)
+		print "[vboxgdb<-VBoxManage] $? =", error;
+	if (error != 0 && !allowFailure)
+		goto again;
+	return error;
+}
+
+
+global _vmIsUiPaused = false;
+
+function _vmPauseUi() {
+	if (!_vmIsUiPaused) {
+		_vBoxManageControlVm("pause");
+		_vmIsUiPaused = true;
 	}
 }
+
+function _vmResumeUi() {
+	if (_vmIsUiPaused) {
+		_vBoxManageControlVm("resume");
+		_vmIsUiPaused = false;
+	}
+}
+
+@@Pause the VM through use of the debugger's "stop" command
+function _vmPause() {
+	_vmPauseUi();
+	local response = vBoxTelnetExec("stop");
+	if ("error:" !in response && "Error:" !in response)
+		;
+	else if ("The VM is already halted" in response)
+		;
+	else {
+		throw Error("Failed to pause vm: " + repr(response));
+	}
+}
+
+function vmPause() {
+	if (!vmIsRunning)
+		return; /* Already paused */
+	_vmPause();
+	_vmIsStepLoopPaused = none; /* Unknown */
+	vmIsRunning = false;
+}
+
+function _vmResume() {
+	_vmPauseUi();
+	local response = vBoxTelnetExec("g");
+	if ("error:" !in response && "Error:" !in response)
+		;
+	else if ("already running" in response) {
+		;
+	} else {
+		throw Error("Failed to resume vm: " + repr(response));
+	}
+	_vmResumeUi();
+}
+
+function vmResume(singleStep: bool = false) {
+	local reallyNeedRflags = false;
+	if (vmIsRunning) {
+		if (!singleStep)
+			return; /* Already running */
+		vmPause();
+	}
+	if (singleStep) {
+		/* VirtualBox's builtin single-step command is busted.
+		 * As a work-around, use ring0 code-injection.
+		 * s.a. /kos/src/kernel/core/arch/i386/misc/vboxgdb32.S */
+		local flags = vmGetRegister("rflags");
+		if (!(flags | 0x00000100)) {
+			vmSetRegister("rflags", flags | 0x00000100); /* EFLAGS.TF = 1 */
+			reallyNeedRflags = true;
+		}
+		/* Tell the kernel to trap the next single-step event. */
+		vmWriteMemoryB(KERNEL_ADDROF__vboxgdb_trapctl.hex(), VBOXGDB_TRAPCTL_SSTEP);
+	}
+	if (vmGetStepLoopPaused()) {
+		/* Setting the IP-register of the VM can sporadically fail in
+		 * a way that doesn't actually produce any errors, but rather
+		 * causes the old IP value to be discarded...
+		 * Because the kernel is known to reside inside of `_vboxgdb_steploop',
+		 * we also know that entering that loop will always cause `_vboxgdb_trapctl'
+		 * to be set to `VBOXGDB_TRAPCTL_TRIGG' (with the exception of entering it
+		 * as part of the `vboxgdb:startup' control sequence, which doesn't matter
+		 * since that case has singleStep==false, meaning we're the ones responsible
+		 * for clearing the trap control byte) */
+		if (!singleStep)
+			vmWriteMemoryB(KERNEL_ADDROF__vboxgdb_trapctl.hex(), VBOXGDB_TRAPCTL_NTRAP);
+		/* Right now we know that:
+		 * >> _vboxgdb_trapctl != VBOXGDB_TRAPCTL_TRIGG
+		 * >> rip in _vboxgdb_steploop
+		 * And we want to change this state such that rip becomes newRip, but need to
+		 * make sure to handle the case where we did succeed in setting RIP to point
+		 * after the loop, only to have something in the kernel immediatly re-enter
+		 * the _vboxgdb_steploop loop (which we can detect via _vboxgdb_trapctl ==
+		 * VBOXGDB_TRAPCTL_TRIGG) */
+		local newRip = KERNEL_ADDROF__vboxgdb_steploop +
+		               KERNEL_ADDROF__vboxgdb_steplooplen + 1;
+		for (;;) {
+			_vmSetRegister("rip", newRip); /* This can fail without giving an error */
+			_vmResume();
+			/* Resume execution in the hope that us setting RIP succeeded */
+			Thread.yield();
+			_vmPause();
+			/* There also exists a second situtation where the register-set above
+			 * was successful: The case where the kernel immediatly re-entered the
+			 * step-loop. This case can be detected by looking at the current value
+			 * of `KERNEL_ADDROF__vboxgdb_trapctl'
+			 * NOTE: This case is actually highly likely when `singleStep==true`,
+			 *       since this is where the VM will end up once the single-step
+			 *       operation has been completed! */
+			local trapctl = vmReadMemory(KERNEL_ADDROF__vboxgdb_trapctl, 1)[0];
+			if (trapctl == VBOXGDB_TRAPCTL_TRIGG) {
+				_vmIsStepLoopPaused = true;
+				goto do_set_single_step_triggered;
+			}
+			local realNewRip = int(_vmGetRegisterAsHex("rip"), 16);
+			if (!(realNewRip >= KERNEL_ADDROF__vboxgdb_steploop &&
+			      realNewRip <= KERNEL_ADDROF__vboxgdb_steploop +
+			                    KERNEL_ADDROF__vboxgdb_steplooplen) &&
+			      realNewRip != newRip)
+				break; /* Success! */
+			/* The SetRegister must have failed... (try again) */
+		}
+		if (singleStep)
+			goto wait_for_single_step;
+		goto do_resume;
+	}
+	if (_vmNewRip !is none) {
+		if (_vmNewRip == _vmGetRegister("rip"))
+			_vmNewRip = none;
+	}
+	if (_vmNewRflags !is none && !reallyNeedRflags) {
+		if (_vmNewRflags == _vmGetRegister("rflags"))
+			_vmNewRflags = none;
+	}
+	if (_vmNewRip !is none || _vmNewRflags !is none) {
+		_vmNewRip    = none;
+		_vmNewRflags = none;
+		throw Error("TODO: `rg rip = ...` and `rg rflags = ...` is highly "
+		            "unreliable... (might be able to do some trickery with "
+		            "code injection?)");
+	}
+	if (singleStep) {
+		do {
+			_vmResume();
+			/* Given the current instruction some time to complete */
+			Thread.yield();
+			Thread.sleep(100);
+			_vmPause();
+wait_for_single_step:
+			_vmIsStepLoopPaused = none; /* Unknown */
+		} while (!vmGetStepLoopPaused());
+do_set_single_step_triggered:
+		assert _vmIsStepLoopPaused;
+		gdbStopReason = "T05"; /* SIGINT (used for single-step) */
+		vmIsRunning = false;
+	} else {
+do_resume:
+		_vmResume();
+		_vmIsStepLoopPaused = none; /* Unknown */
+		vmIsRunning = true;
+	}
+}
+
+
 
 
 
@@ -962,9 +1198,9 @@ global final OSDATAFILES: {string: string | Callable} = {
 	"keepstepping" : []{
 		gdbSocket.send("$l#6c");
 		for (;;) {
-			print "begin:vmSingleStep()";
-			local event = vmSingleStep();
-			print "end:vmSingleStep():", event;
+			print "begin:vmResume()";
+			vmResume(singleStep: true);
+			print "end:vmResume():";
 		}
 	},
 
@@ -1020,6 +1256,9 @@ function GDBEvaluateCommand(cmd: Bytes): Bytes {
 			vmSetRegister("rip", rip);
 		}
 		vmResume();
+		/* Check if the VM has already stopped once again. */
+		if (!vmIsRunning)
+			return gdbConstructStopReply();
 		return none;
 	}
 
@@ -1067,8 +1306,7 @@ function GDBEvaluateCommand(cmd: Bytes): Bytes {
 			throw Error("TODO");
 		} else {
 			local def = REGISTER_IDS32[id];
-			data = vmGetRegister(def[1]);
-			data = data.lower().lsstrip("0x");
+			data = vmGetRegisterAsHex(def[1]);
 			data = data.zfill(def[0] * 2);
 		}
 		return data;
@@ -1115,9 +1353,7 @@ function GDBEvaluateCommand(cmd: Bytes): Bytes {
 			vmSetRegister("rip", rip);
 		}
 		/* Do the single-step */
-		vmSingleStep();
-		/* Construct a new stop-reply */
-		gdbStopReason = "T05"; /* SIGINT */
+		vmResume(singleStep: true);
 		return gdbConstructStopReply();
 	}
 
@@ -1338,15 +1574,10 @@ wait_for_command:
 						if (CONFIG_VERBOSE)
 							print "[vboxgdb<-telnet] Event:", repr(c);
 						if ("Invalid command event" in c) {
-							/* Let's try to fix this... */
-							_vBoxManageControlVm("pause");
-							_vBoxTelnetExecStop();
-							_vBoxTelnetExecContinue();
-							_vBoxManageControlVm("resume");
-							_vmIsDebuggerPaused = false;
-							_vmIsUiPaused = false;
-							vmIsRunning = true;
-							continue;
+							/* This can happen if a previous resume attempt
+							 * failed with a delayed error. - Re-try the resume */
+							_vmResume();
+							continue; /* Ignore... */
 						}
 						local reason = GDBHandleVirtualBoxEvent(c);
 						if (reason !is none) {
@@ -1477,5 +1708,148 @@ do_send_resp:
 		virtualBoxProc.terminate(1);
 	}
 }
+
+
+
+
+
+
+function startVboxGDBGlue(
+		KERNEL: string,
+		TARGET_ARCH: string,
+		options: {string: Object},
+		magic: Module,
+		gdbPort: string,
+		vmName: string,
+		virtualBoxProc: ipc.Process,
+		vbox: Module,
+		connectedSemaphore: Object /* Semaphore from threading */) {
+	/* Save some of the arguments to global variables. */
+	global KERNEL = KERNEL;
+	global TARGET_ARCH = TARGET_ARCH;
+	global options = options;
+	global magic = magic;
+	global vmName = vmName;
+	global vbox = vbox;
+	global virtualBoxProc = virtualBoxProc;
+
+	/* Load configurations from emulator options */
+	global CONFIG_VERBOSE = opt.getBool(options, "vboxgdb.verbose", true);
+	global CONFIG_GDB_COMMAND_NEXTBYTE_TIMEOUT =
+		opt.getInt(options, "vboxgdb.gdb.command_timeout", 1000000);
+	global CONFIG_GDB_COMMAND_ACK_TIMEOUT =
+		opt.getInt(options, "vboxgdb.gdb.ack_timeout", 10000000);
+	global CONFIG_GDB_SEND_MAX_RETRY_COUNT =
+		opt.getInt(options, "vboxgdb.gdb.max_retry", 3);
+	global CONFIG_TELNET_RESPONSE_TIMEOUT =
+		opt.getInt(options, "vboxgdb.telnet.timeout", 100000);
+	global CONFIG_VBOXMANAGE_COMPLETE_TIMEOUT =
+		opt.getInt(options, "vboxgdb.vboxmanage.timeout", 2000000);
+
+	/* Figure out the addresses of some special vboxgdb control kernel symbols. */
+	if (CONFIG_VERBOSE)
+		print "[vboxgdb] Loading special kernel symbols...";
+	{
+		local readelf_bin = HOST_EXE(magic.toolchain.config.CROSS_PREFIX + "readelf");
+		local readelf = ipc.Process(readelf_bin, { "-s", "-W", KERNEL });
+		local r, w = ipc.Pipe.new()...;
+		readelf.stdout = w;
+		readelf.start();
+		w.close();
+		while (local d = getLines(r))
+		for (local l: d.splitlines()) {
+			/*    Num:    Value  Size Type    Bind   Vis      Ndx Name */
+			l = l.rstrip().replace("\t", " ");
+			if (l.endswith(" _vboxgdb_trapctl") ||
+			    l.endswith(" _vboxgdb_steploop")) {
+				local addr = l[l.index(":") + 1:].lstrip();
+				addr = int(addr.scanf("%[0-9a-fA-FxX]")[0].lower().lstrip("0x"), 16);
+				if (l.endswith(" _vboxgdb_trapctl"))
+					KERNEL_ADDROF__vboxgdb_trapctl = addr;
+				else {
+					KERNEL_ADDROF__vboxgdb_steploop = addr;
+				}
+				if (KERNEL_ADDROF__vboxgdb_trapctl !is none &&
+				    KERNEL_ADDROF__vboxgdb_steploop !is none)
+					break;
+			}
+		}
+		try {
+			readelf.terminate(1);
+			r.close();
+		} catch (...) {
+		}
+		if (KERNEL_ADDROF__vboxgdb_trapctl is none)
+			throw Error("Failed to determine address of symbol: _vboxgdb_trapctl");
+		if (KERNEL_ADDROF__vboxgdb_steploop is none)
+			throw Error("Failed to determine address of symbol: _vboxgdb_steploop");
+	}
+
+	final local vboxTelnetAddr = "localhost:5000";
+	local connectResponse;
+	/* Try to connect 20 times with a delay of 0.1 seconds in-between.
+	 * In theory (and practice), this succeeds on the first try, but
+	 * it only started doing so after I added the connectedSemaphore.wait();
+	 * call in our caller to wait for VirtualBox to connect to the log pipe.
+	 * And in theory, VirtualBox might open the debug server _much_ later than
+	 * then opening of the log file (so better be safe here...) */
+	if (CONFIG_VERBOSE)
+		print "[vboxgdb] Connecting to telnet under", vboxTelnetAddr, "...";
+	for (local i: [:20]) {
+		vBoxTelnetSocket = net.socket("AF_INET", "SOCK_STREAM", "IPPROTO_TCP");
+		try {
+			vBoxTelnetSocket.connect(vboxTelnetAddr);
+			connectResponse = vBoxTelnetGetResponse(100000); /* 0.1 seconds */
+			if (connectResponse !is none)
+				break;
+		} catch (...) {
+			if (i == 19)
+				throw;
+		}
+		vBoxTelnetSocket.close();
+	}
+	if (connectResponse is none)
+		throw Error("Failed to connect to VirtualBox telnet");
+	if (CONFIG_VERBOSE) {
+		/* The initial response is something like:
+		 * >> "Welcome to the VirtualBox Debugger!\r\nCurrent VM is 089b0000, CPU #0\r\n".bytes() */
+		print "[vboxgdb] Telnet connected. Initial response was:", repr connectResponse;
+	}
+
+	/* connectedSemaphore is once again posted to once the OS prints
+	 * the %{vboxgdb:startup} control sequence */
+	if (CONFIG_VERBOSE)
+		print("[vboxgdb] Waiting for boot0 and _start",
+			TARGET_ARCH == "x86_64" ? "64" : "32", " to complete...");
+	connectedSemaphore.wait();
+
+	/* Pause VM execution while we wait for GDB to become connected */
+	_vmPause();
+	/* Highly unlikely race condition... */
+	while (!vmGetStepLoopPaused()) {
+		_vmResume();
+		/* Given the current instruction some time to complete */
+		Thread.yield();
+		Thread.sleep(100);
+		_vmPause();
+		_vmIsStepLoopPaused = none; /* Unknown */
+	}
+
+	if (CONFIG_VERBOSE)
+		print("[vboxgdb] Starting GDB stub server...");
+
+	/* At this point we've got full control over the VirtualBox VM, but we still
+	 * have to launch our gdb-stub glue as a TCP server on `localhost:<gdbPort>`
+	 * Once that one's up and running, we can invoke `magic.onEmulatorStarted()`
+	 * to indicate that GDB is up and running! */
+	gdbServerSocket = net.socket("AF_INET", "SOCK_STREAM", "IPPROTO_TCP");
+	gdbServerSocket.bind("localhost:" + gdbPort);
+	gdbServerSocket.listen();
+	Thread(GDBMain).start();
+
+	/* Inform magic that GDB is now accepting connection requests. */
+	magic.onEmulatorStarted();
+}
+
 
 

@@ -128,11 +128,24 @@ function createNamePipeAndStartLogProcessingThread(
 	local hNamedPipe = win32.CreateNamedPipe(
 		namedPipeName, win32.PIPE_ACCESS_INBOUND, win32.PIPE_TYPE_BYTE, 1);
 	Thread([](proc, hNamedPipe, groups, config, connectedSemaphore){
+		function runCommand(command: Bytes) {
+			print "Embedded command:", repr command;
+			if (command == "vboxgdb:startup")
+				connectedSemaphore.post();
+			/* TODO: More commands */
+			/* TODO: Integration with the emulator-independent log-command API */
+			/* TODO: Check if a given line starts with "00:00:02.450585 VMMDev: Guest Log:",
+			 *       and only accept commands from those lines, as well as stripping the
+			 *       entire prefix from those lines. */
+		}
+#define PRINT_DATA(buf) File.stderr.write(buf)
 		try {
 			/* Wait for VBox to open what it thinks to be a log file. */
 			win32.ConnectNamedPipe(hNamedPipe);
 			connectedSemaphore.post();
+			local commandBuffer = Bytes();
 			for (;;) {
+readmore:
 				local buf = Bytes(1024);
 				local cnt;
 				try {
@@ -141,7 +154,49 @@ function createNamePipeAndStartLogProcessingThread(
 					proc.terminate();
 					return;
 				}
-				File.stderr.write(buf.substr(0, cnt));
+				buf = buf[:cnt];
+				if (commandBuffer) {
+					if (#commandBuffer == 1) {
+						if (!buf.startswith("{")) {
+							PRINT_DATA(commandBuffer);
+							goto do_search_buf;
+						}
+					}
+					local end = buf.find("}");
+					if (end < 0) {
+						commandBuffer += buf;
+						continue;
+					}
+					commandBuffer += buf[:end];
+					runCommand(commandBuffer[2:]);
+					commandBuffer = Bytes();
+					buf = buf[end + 1:];
+				} else {
+do_search_buf:
+					local i = 0;
+					for (;;) {
+						local cmdStart = buf.find("%", i);
+						if (cmdStart < 0)
+							break;
+						if (cmdStart >= cnt - 1) {
+set_command_buffer:
+							PRINT_DATA(buf[:cmdStart]);
+							commandBuffer = buf[cmdStart:];
+							goto readmore;
+						}
+						if (buf[cmdStart + 1] != "{".ord()) {
+							i = cmdStart + 1;
+							continue;
+						}
+						local cmdEnd = buf.find("}", cmdStart + 2);
+						if (cmdEnd < 0)
+							goto set_command_buffer;
+						runCommand(buf[cmdStart + 2:cmdEnd]);
+						buf = buf[cmdEnd + 1:];
+						i = 0;
+					}
+				}
+				PRINT_DATA(buf);
 			}
 		} @[interrupt] catch (e...) {
 			print "NamedPipe relay thread crashed:";
@@ -195,6 +250,9 @@ function start(
 	}
 	KERNEL = fs.abspath(KERNEL);
 	DISK_FILENAME = fs.abspath(DISK_FILENAME);
+	local gdbMode = options.get(opt.GDB);
+	if (gdbMode !is none && gdbMode != "emulator")
+		throw Error("VirtualBox only supports --gdb=emulator mode");
 	local kernelShadowFilename = shadow.updateKernelShadow(KERNEL, TARGET_ARCH);
 	local kernelVmdkFilename = createVmdkDescriptor(kernelShadowFilename);
 	local diskVmdkFilename   = createVmdkDescriptor(DISK_FILENAME);
@@ -236,7 +294,6 @@ function start(
 		vmVboxConfig = File.open(vmVboxConfigFilename, "r+");
 	}
 	local startVboxGDBGlue: Callable = none;
-	local gdbMode = options.get(opt.GDB);
 	with (vmVboxConfig) {
 		File.Writer keepPrefix;
 		for (local l: vmVboxConfig) {
@@ -265,9 +322,12 @@ function start(
 		vmVboxConfig << "		<TripleFaultReset enabled=\""
 			<< (opt.getBool(options, opt.HOSTED, true) ? "false" : "true")
 			<< "\"/>\n";
+		local brand_ebx = "0";
+		if (gdbMode !is none)
+			brand_ebx = "1111770912"; /* MAKE_DWORD(' ', 'G', 'D', 'B') */
 		vmVboxConfig << "		<CpuIdTree>\n";
-		                 			/* BRAND_STRING = "VBox" */
-		vmVboxConfig << "			<CpuIdLeaf id=\"2147483650\" eax=\"2020557398\" ebx=\"0\" ecx=\"0\" edx=\"0\"/>\n";
+		                 			/* BRAND_STRING = "VBox" or "VBox GDB" */
+		vmVboxConfig << "			<CpuIdLeaf id=\"2147483650\" eax=\"2020557398\" ebx=\"" << brand_ebx << "\" ecx=\"0\" edx=\"0\"/>\n";
 		vmVboxConfig << "			<CpuIdLeaf id=\"2147483651\" eax=\"0\" ebx=\"0\" ecx=\"0\" edx=\"0\"/>\n";
 		vmVboxConfig << "			<CpuIdLeaf id=\"2147483652\" eax=\"0\" ebx=\"0\" ecx=\"0\" edx=\"0\"/>\n";
 		vmVboxConfig << "		</CpuIdTree>\n";
@@ -300,14 +360,10 @@ function start(
 		vmVboxConfig << "</StorageController>\n";
 		vmVboxConfig << "</StorageControllers>\n";
 		if (gdbMode !is none) {
-			if (gdbMode == "emulator") {
-				startVboxGDBGlue = import("._vboxgdb").startVboxGDBGlue;
-				vmVboxConfig << "<ExtraData>\n";
-				vmVboxConfig << "	<ExtraDataItem name=\"VBoxInternal/DBGC/Enabled\" value=\"1\"/>\n";
-				vmVboxConfig << "</ExtraData>\n";
-			} else {
-				throw Error("VirtualBox only supports --gdb=emulator mode");
-			}
+			startVboxGDBGlue = import("._vboxgdb").startVboxGDBGlue;
+			vmVboxConfig << "<ExtraData>\n";
+			vmVboxConfig << "	<ExtraDataItem name=\"VBoxInternal/DBGC/Enabled\" value=\"1\"/>\n";
+			vmVboxConfig << "</ExtraData>\n";
 		}
 		vmVboxConfig.write("</Machine>\n</VirtualBox>\n");
 		vmVboxConfig.trunc();
@@ -322,14 +378,12 @@ function start(
 	 * and can immediatly shut down emulation when the user presses CTRL+C
 	 * from within our console. */
 //	runVBoxManageCommand({ "startvm", vmName });
-	local vBoxArgs = [
+	local proc = ipc.Process(EXE_VIRTUALBOXVM, {
 		"--comment", vmName,
 		"--startvm", vmName,
 		"--no-startvm-errormsgbox",
-		"--dbg"];
-	if (gdbMode !is none)
-		vBoxArgs.append("--start-paused");
-	local proc = ipc.Process(EXE_VIRTUALBOXVM, vBoxArgs);
+		"--dbg"
+	});
 	local connectedSemaphore = none;
 	if (startVboxGDBGlue !is none)
 		connectedSemaphore = threading.Semaphore(0);
@@ -355,7 +409,8 @@ function start(
 				gdbPort: options.get(opt.GDB_PORT, "1234"),
 				vmName: vmName,
 				virtualBoxProc: proc,
-				vbox: me);
+				vbox: me,
+				connectedSemaphore: connectedSemaphore);
 		} else {
 			magic.onEmulatorStarted();
 		}

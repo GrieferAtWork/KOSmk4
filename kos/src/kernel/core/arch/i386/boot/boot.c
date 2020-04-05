@@ -88,6 +88,10 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 		x86_syslog_port = (port_t)0xe9;
 	else if (x86_bootcpu_cpuid.ci_80000002a == MAKE_DWORD('V', 'B', 'o', 'x')) {
 		x86_syslog_port = (port_t)0x504;
+#ifndef CONFIG_NO_VBOXGDB
+		if (x86_bootcpu_cpuid.ci_80000002b == MAKE_DWORD(' ', 'G', 'D', 'B'))
+			x86_initialize_vboxgdb();
+#endif /* !CONFIG_NO_VBOXGDB */
 	}
 	x86_initialize_cmos();
 

@@ -22,6 +22,7 @@
 #define IDT_VECTOR 0e
 #endif /* __INTELLISENSE__ */
 
+
 #if IDT_CONFIG_GETDPL(IDT_VECTOR_ID) == 3
 IDT_HANDLER_SETDPL(3)
 #endif /* IDT_CONFIG_GETDPL(IDT_VECTOR_ID) == 3 */
@@ -244,13 +245,33 @@ __ASM_L(	.cfi_escape 0x23,(OFFSET_TSS_LDTR),0x56,0x22)
 	.cfi_def_cfa %esp, 0
 #endif /* !IDT_CONFIG_PUSHESERRORS(IDT_VECTOR_ID) */
 
-	pushl_cfi %ds
+	/* Encode instructions as explicit bytes so it's clear that the
+	 * following sequence of instructions is exactly 5 bytes long.
+	 * This is important for code that injects interrupt redirection,
+	 * which requires exactly 5 bytes of instructions (E9h, DISP32) */
+	.byte 0x1e /* pushl %ds */
+	.cfi_adjust_cfa_offset 4
 	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
+
+	.byte 0x06 /* pushl %es */
+	.cfi_adjust_cfa_offset 4
 	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
+
+	.byte 0x0f, 0xa0 /* pushl %fs */
+	.cfi_adjust_cfa_offset 4
 	.cfi_restore_iret_fs_or_offset -12
-	pushal_cfi_r
+
+	.byte 0x60 /* pushal */
+	.cfi_adjust_cfa_offset 32
+	.cfi_rel_offset %edi, 0
+	.cfi_rel_offset %esi, 4
+	.cfi_rel_offset %ebp, 8
+	.cfi_rel_offset %esp, 12
+	.cfi_rel_offset %ebx, 16
+	.cfi_rel_offset %edx, 20
+	.cfi_rel_offset %ecx, 24
+	.cfi_rel_offset %eax, 28
+
 
 	movw   $(SEGMENT_USER_DATA_RPL), %ax
 	movw   %ax, %ds
