@@ -29,12 +29,15 @@
 
 #define VBOXGDB_TRAPCTL_NTRAP 0x00 /* Don't trap */
 #define VBOXGDB_TRAPCTL_SSTEP 0x01 /* Trap single-step events */
-#define VBOXGDB_TRAPCTL_TRIGG 0x02 /* Trap was triggered */
+#define VBOXGDB_TRAPCTL_TRIGG 0xff /* Trap was triggered */
 
 .section .bss.cold
+.align 4
 PUBLIC_OBJECT(_vboxgdb_trapctl)
-	.byte 0x00 /* vboxgdb trap control byte (one of VBOXGDB_TRAPCTL_*) */
-	.byte 0x00 /* Should-continue control byte */
+	.byte 0x00       /* tc_ctrl;   vboxgdb trap control byte (one of VBOXGDB_TRAPCTL_*) */
+	.byte 0x00       /* tc_cont;   Should-continue control byte */
+	.word 0x0000     /* tc_pad;    pad... */
+	.long 0x00000000 /* tc_teaddr; Address of the current trap-enter instruction + 1 */
 END(_vboxgdb_trapctl)
 
 .section .text.cold

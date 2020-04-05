@@ -52,7 +52,7 @@ global CONFIG_VBOXMANAGE_COMPLETE_TIMEOUT;
 
 @@Use VirtualBox's builtin (and broken) single-step
 @@function, rather than using code injection.
-global final CONFIG_USE_NATIVE_STEP = true;
+global final CONFIG_USE_NATIVE_STEP = false;
 
 @@Keep the VM running during memory reads
 global final CONFIG_KEEP_RUNNING_DURING_MEMORY_READ = false;
@@ -67,7 +67,7 @@ global final GDB_BREAKPOINT_TYPE_READWRITE = 4; /* Break on read or write to/fro
 /* Values for `_vboxgdb_trapctl` */
 global final VBOXGDB_TRAPCTL_NTRAP = 0x00; /* Don't trap */
 global final VBOXGDB_TRAPCTL_SSTEP = 0x01; /* Trap single-step events */
-global final VBOXGDB_TRAPCTL_TRIGG = 0x02; /* Trap was triggered */
+global final VBOXGDB_TRAPCTL_TRIGG = 0xff; /* Trap was triggered */
 
 
 
@@ -919,16 +919,22 @@ function _vmResumeUi() {
 }
 
 @@Pause the VM through use of the debugger's "stop" command
-function _vmPause() {
-	_vmPauseUi();
+function _vmPause0() {
+again:
 	local response = vBoxTelnetExec("stop");
-	if ("error:" !in response && "Error:" !in response)
+	if ("The VM is already halted" in response)
 		;
-	else if ("The VM is already halted" in response)
-		;
+	else if ("error:" !in response && "Error:" !in response)
+		goto again;
 	else {
 		throw Error("Failed to pause vm: " + repr(response));
 	}
+}
+
+@@Pause the VM through use of the debugger's "stop" command
+function _vmPause() {
+	_vmPauseUi();
+	_vmPause0();
 }
 
 function vmPause() {
@@ -939,16 +945,15 @@ function vmPause() {
 	vmIsRunning = false;
 }
 
-function _vmResume(tryHard: bool = false) {
+function _vmResume() {
 	_vmPauseUi();
 again:
 	local response = vBoxTelnetExec("g");
-	if ("error:" !in response && "Error:" !in response) {
-		if (tryHard)
-			goto again;
-	} else if ("already running" in response) {
+	if ("already running" in response)
 		;
-	} else {
+	else if ("error:" !in response && "Error:" !in response)
+		goto again;
+	else {
 		throw Error("Failed to resume vm: " + repr(response));
 	}
 	_vmResumeUi();
@@ -978,7 +983,7 @@ function vmResume(singleStep: bool = false) {
 wait_for_single_step:
 		local usedDelay = 5000;
 		if (CONFIG_KEEP_RUNNING_DURING_MEMORY_READ) {
-			_vmResume(true);
+			_vmResume();
 			for (;;) {
 				/* Wait for the program to step */
 				Thread.yield();
@@ -993,7 +998,7 @@ wait_for_single_step:
 		} else {
 			for (;;) {
 				/* Wait for the program to step */
-				_vmResume(true);
+				_vmResume();
 				Thread.yield();
 				Thread.sleep(usedDelay);
 				_vmPause();
@@ -1036,6 +1041,50 @@ wait_for_single_step:
 		               0x100 | VBOXGDB_TRAPCTL_SSTEP);
 	}
 	if (_vmNewRip !is none || _vmNewRflags !is none) {
+		/* TODO: This can be done via ring0 code injection:
+		 *          Remember the old value of `*(u8 *)%rip`
+		 *    Tel>$ dd rip
+		 *          Insert a breakpoint instruction
+		 *    Tel>$ eb rip 0xcc
+		 *          Tell KOS to expect a breakpoint interrupt
+		 *          This causes a int3 from this address to be
+		 *          handled by entering _vboxgdb_steploop
+		 *    Tel>$ ed <_vboxgdb_trapctl.tc_teaddr>  <rip + 1>
+		 *    do {
+		 *        _vmResume();
+		 *        Thread.yield();
+		 *        Thread.sleep(5000);
+		 *        _vmPause();
+		 *    } while (!vmGetStepLoopPaused());
+		 *    Tel>$ eb <ORIG_RIP> <OLD_INSTR_BYTE>
+		 *    Tel>$ ed (%rsp+N) <_vmNewRip>
+		 *    Tel>$ ed (%rsp+N) <_vmNewRflags>
+		 *    _vmResume();
+		 *
+		 * The in-kernel int3-override looks like:
+		 *     pushl  %eax
+		 *     movl   OFFSET_IRREGS_EIP(%esp), %eax
+		 *     cmpl   %eax, <_vboxgdb_trapctl.tc_teaddr>
+		 *     je     1f
+		 * 2:  popl   %eax
+		 *     jmp    <normal_int3_handler>
+		 * EXCEPT_HANDLERS_START
+		 *     EXCEPT_HANDLERS_CATCHALL(
+		 *         1f, // start
+		 *         3f, // end
+		 *         2b) // entry
+		 * EXCEPT_HANDLERS_END
+		 * 1:  movb   -1(%eax), %al  // This instruction is guarded against exceptions
+		 * 3:  cmpb   $0xcc, %al
+		 *     jne    2b
+		 *     // Enter the debugger step-loop
+		 *     movw   $(0x0000 | VBOXGDB_TRAPCTL_TRIGG), _vboxgdb_trapctl
+		 *     jmp    _vboxgdb_steploop
+		 *
+		 * Once we're inside of the step-loop, we can simply store the
+		 * overwrite values `_vmNewRip' and `_vmNewRflags' into the iret
+		 * tail that leads back to where the int3 instruction was injected.
+		 */
 		_vmNewRip    = none;
 		_vmNewRflags = none;
 		throw Error("TODO: `rg rip = ...` and `rg rflags = ...` is highly "
