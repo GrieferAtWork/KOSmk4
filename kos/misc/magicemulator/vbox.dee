@@ -159,6 +159,7 @@ readmore:
 					if (#commandBuffer == 1) {
 						if (!buf.startswith("{")) {
 							PRINT_DATA(commandBuffer);
+							commandBuffer = none;
 							goto do_search_buf;
 						}
 					}
