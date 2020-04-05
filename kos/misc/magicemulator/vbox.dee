@@ -334,6 +334,7 @@ function start(
 		vmVboxConfig << "		</CpuIdTree>\n";
 		vmVboxConfig << "	</CPU>\n";
 		vmVboxConfig << "	<Memory RAMSize=\"128\"/>\n";
+//		vmVboxConfig << "	<Paravirt provider=\"None\"/>\n";
 		vmVboxConfig << "	<Firmware type=\"BIOS\"/>\n";
 		vmVboxConfig << "	<Boot>\n";
 		vmVboxConfig << "		<Order position=\"1\" device=\"HardDisk\"/>\n";

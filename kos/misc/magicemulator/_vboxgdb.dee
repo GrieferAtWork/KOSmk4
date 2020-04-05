@@ -50,6 +50,13 @@ global CONFIG_GDB_SEND_MAX_RETRY_COUNT;
 global CONFIG_TELNET_RESPONSE_TIMEOUT;
 global CONFIG_VBOXMANAGE_COMPLETE_TIMEOUT;
 
+@@Use VirtualBox's builtin (and broken) single-step
+@@function, rather than using code injection.
+global final CONFIG_USE_NATIVE_STEP = true;
+
+@@Keep the VM running during memory reads
+global final CONFIG_KEEP_RUNNING_DURING_MEMORY_READ = false;
+
 /* The different types of break points */
 global final GDB_BREAKPOINT_TYPE_SWBREAK   = 0; /* int3 */
 global final GDB_BREAKPOINT_TYPE_HWBREAK   = 1; /* DRn-breakpoint */
@@ -78,7 +85,7 @@ global KERNEL_ADDROF__vboxgdb_trapctl: int = none;
 
 @@The address of @"_vboxgdb_steploop"
 global KERNEL_ADDROF__vboxgdb_steploop: int = none;
-global final KERNEL_ADDROF__vboxgdb_steplooplen: int = 2;
+global KERNEL_ADDROF__vboxgdb_steplooplen: int = none;
 
 @@The socket through which we're connected to VirtualBox
 global vBoxTelnetSocket: net.socket;
@@ -932,12 +939,14 @@ function vmPause() {
 	vmIsRunning = false;
 }
 
-function _vmResume() {
+function _vmResume(tryHard: bool = false) {
 	_vmPauseUi();
+again:
 	local response = vBoxTelnetExec("g");
-	if ("error:" !in response && "Error:" !in response)
-		;
-	else if ("already running" in response) {
+	if ("error:" !in response && "Error:" !in response) {
+		if (tryHard)
+			goto again;
+	} else if ("already running" in response) {
 		;
 	} else {
 		throw Error("Failed to resume vm: " + repr(response));
@@ -945,84 +954,86 @@ function _vmResume() {
 	_vmResumeUi();
 }
 
+global GDBHandleVirtualBoxEvent;
 function vmResume(singleStep: bool = false) {
-	local reallyNeedRflags = false;
 	if (vmIsRunning) {
 		if (!singleStep)
 			return; /* Already running */
 		vmPause();
 	}
-	if (singleStep) {
+	if (vmGetStepLoopPaused()) {
+		if (!singleStep) {
+			vmWriteMemoryW(KERNEL_ADDROF__vboxgdb_trapctl.hex(),
+			               0x100 | VBOXGDB_TRAPCTL_NTRAP);
+			goto do_resume;
+		}
 		/* VirtualBox's builtin single-step command is busted.
 		 * As a work-around, use ring0 code-injection.
 		 * s.a. /kos/src/kernel/core/arch/i386/misc/vboxgdb32.S */
-		local flags = vmGetRegister("rflags");
-		if (!(flags | 0x00000100)) {
-			vmSetRegister("rflags", flags | 0x00000100); /* EFLAGS.TF = 1 */
-			reallyNeedRflags = true;
-		}
-		/* Tell the kernel to trap the next single-step event. */
-		vmWriteMemoryB(KERNEL_ADDROF__vboxgdb_trapctl.hex(), VBOXGDB_TRAPCTL_SSTEP);
-	}
-	if (vmGetStepLoopPaused()) {
-		/* Setting the IP-register of the VM can sporadically fail in
-		 * a way that doesn't actually produce any errors, but rather
-		 * causes the old IP value to be discarded...
-		 * Because the kernel is known to reside inside of `_vboxgdb_steploop',
-		 * we also know that entering that loop will always cause `_vboxgdb_trapctl'
-		 * to be set to `VBOXGDB_TRAPCTL_TRIGG' (with the exception of entering it
-		 * as part of the `vboxgdb:startup' control sequence, which doesn't matter
-		 * since that case has singleStep==false, meaning we're the ones responsible
-		 * for clearing the trap control byte) */
-		if (!singleStep)
-			vmWriteMemoryB(KERNEL_ADDROF__vboxgdb_trapctl.hex(), VBOXGDB_TRAPCTL_NTRAP);
-		/* Right now we know that:
-		 * >> _vboxgdb_trapctl != VBOXGDB_TRAPCTL_TRIGG
-		 * >> rip in _vboxgdb_steploop
-		 * And we want to change this state such that rip becomes newRip, but need to
-		 * make sure to handle the case where we did succeed in setting RIP to point
-		 * after the loop, only to have something in the kernel immediatly re-enter
-		 * the _vboxgdb_steploop loop (which we can detect via _vboxgdb_trapctl ==
-		 * VBOXGDB_TRAPCTL_TRIGG) */
-		local newRip = KERNEL_ADDROF__vboxgdb_steploop +
-		               KERNEL_ADDROF__vboxgdb_steplooplen + 1;
-		for (;;) {
-			_vmSetRegister("rip", newRip); /* This can fail without giving an error */
-			_vmResume();
-			/* Resume execution in the hope that us setting RIP succeeded */
-			Thread.yield();
-			_vmPause();
-			/* There also exists a second situtation where the register-set above
-			 * was successful: The case where the kernel immediatly re-entered the
-			 * step-loop. This case can be detected by looking at the current value
-			 * of `KERNEL_ADDROF__vboxgdb_trapctl'
-			 * NOTE: This case is actually highly likely when `singleStep==true`,
-			 *       since this is where the VM will end up once the single-step
-			 *       operation has been completed! */
-			local trapctl = vmReadMemory(KERNEL_ADDROF__vboxgdb_trapctl, 1)[0];
-			if (trapctl == VBOXGDB_TRAPCTL_TRIGG) {
-				_vmIsStepLoopPaused = true;
-				goto do_set_single_step_triggered;
+		local rflags = vmGetRegister("rflags");
+		if (!(rflags & 0x00000100))
+			vmSetRegister("rflags", rflags | 0x00000100); /* EFLAGS.TF = 1 */
+		vmWriteMemoryW(KERNEL_ADDROF__vboxgdb_trapctl.hex(),
+		               0x100 | VBOXGDB_TRAPCTL_SSTEP);
+wait_for_single_step:
+		local usedDelay = 5000;
+		if (CONFIG_KEEP_RUNNING_DURING_MEMORY_READ) {
+			_vmResume(true);
+			for (;;) {
+				/* Wait for the program to step */
+				Thread.yield();
+				Thread.sleep(usedDelay);
+				local trapctl = vmReadMemory(KERNEL_ADDROF__vboxgdb_trapctl, 1)[0];
+				if (trapctl == VBOXGDB_TRAPCTL_TRIGG)
+					break;
+				/* Continue waiting */
+				usedDelay += (usedDelay / 2);
 			}
-			local realNewRip = int(_vmGetRegisterAsHex("rip"), 16);
-			if (!(realNewRip >= KERNEL_ADDROF__vboxgdb_steploop &&
-			      realNewRip <= KERNEL_ADDROF__vboxgdb_steploop +
-			                    KERNEL_ADDROF__vboxgdb_steplooplen) &&
-			      realNewRip != newRip)
-				break; /* Success! */
-			/* The SetRegister must have failed... (try again) */
+			_vmPause();
+		} else {
+			for (;;) {
+				/* Wait for the program to step */
+				_vmResume(true);
+				Thread.yield();
+				Thread.sleep(usedDelay);
+				_vmPause();
+				local trapctl = vmReadMemory(KERNEL_ADDROF__vboxgdb_trapctl, 1)[0];
+				if (trapctl == VBOXGDB_TRAPCTL_TRIGG)
+					break;
+				/* Continue waiting */
+				usedDelay += (usedDelay / 2);
+			}
 		}
-		if (singleStep)
-			goto wait_for_single_step;
-		goto do_resume;
+		_vmIsStepLoopPaused = true;
+		gdbStopReason = "T05"; /* SIGINT (used for single-step) */
+		vmIsRunning = false;
+		return;
 	}
 	if (_vmNewRip !is none) {
 		if (_vmNewRip == _vmGetRegister("rip"))
 			_vmNewRip = none;
 	}
-	if (_vmNewRflags !is none && !reallyNeedRflags) {
+	if (_vmNewRflags !is none) {
 		if (_vmNewRflags == _vmGetRegister("rflags"))
 			_vmNewRflags = none;
+	}
+	if (singleStep) {
+		if (_vmNewRip is none && _vmNewRflags is none && CONFIG_USE_NATIVE_STEP) {
+			local resp = vBoxTelnetExecNoError("t");
+			_vmResumeUi();
+			if (!resp)
+				resp = vBoxTelnetGetResponse();
+			_vmPauseUi();
+			gdbStopReason = GDBHandleVirtualBoxEvent(resp);
+			_vmIsStepLoopPaused = none; /* Unknown */
+			vmIsRunning = false;
+			return;
+		}
+		local rflags = vmGetRegister("rflags");
+		if (!(rflags & 0x00000100))
+			vmSetRegister("rflags", rflags | 0x00000100); /* EFLAGS.TF = 1 */
+		vmWriteMemoryW(KERNEL_ADDROF__vboxgdb_trapctl.hex(),
+		               0x100 | VBOXGDB_TRAPCTL_SSTEP);
 	}
 	if (_vmNewRip !is none || _vmNewRflags !is none) {
 		_vmNewRip    = none;
@@ -1031,26 +1042,12 @@ function vmResume(singleStep: bool = false) {
 		            "unreliable... (might be able to do some trickery with "
 		            "code injection?)");
 	}
-	if (singleStep) {
-		do {
-			_vmResume();
-			/* Given the current instruction some time to complete */
-			Thread.yield();
-			Thread.sleep(100);
-			_vmPause();
-wait_for_single_step:
-			_vmIsStepLoopPaused = none; /* Unknown */
-		} while (!vmGetStepLoopPaused());
-do_set_single_step_triggered:
-		assert _vmIsStepLoopPaused;
-		gdbStopReason = "T05"; /* SIGINT (used for single-step) */
-		vmIsRunning = false;
-	} else {
+	if (singleStep)
+		goto wait_for_single_step;
 do_resume:
-		_vmResume();
-		_vmIsStepLoopPaused = none; /* Unknown */
-		vmIsRunning = true;
-	}
+	_vmResume();
+	_vmIsStepLoopPaused = none; /* Unknown */
+	vmIsRunning = true;
 }
 
 
@@ -1763,11 +1760,14 @@ function startVboxGDBGlue(
 			if (l.endswith(" _vboxgdb_trapctl") ||
 			    l.endswith(" _vboxgdb_steploop")) {
 				local addr = l[l.index(":") + 1:].lstrip();
-				addr = int(addr.scanf("%[0-9a-fA-FxX]")[0].lower().lstrip("0x"), 16);
+				local addr, size = addr.scanf("%[0-9a-fA-FxX] %[0-9a-fA-FxX]")...;
+				addr = int(addr.lower().lstrip("0x"), 16);
+				size = int(size.lower().lstrip("0x"), 16);
 				if (l.endswith(" _vboxgdb_trapctl"))
 					KERNEL_ADDROF__vboxgdb_trapctl = addr;
 				else {
-					KERNEL_ADDROF__vboxgdb_steploop = addr;
+					KERNEL_ADDROF__vboxgdb_steploop    = addr;
+					KERNEL_ADDROF__vboxgdb_steplooplen = size;
 				}
 				if (KERNEL_ADDROF__vboxgdb_trapctl !is none &&
 				    KERNEL_ADDROF__vboxgdb_steploop !is none)

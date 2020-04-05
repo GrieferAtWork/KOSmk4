@@ -34,6 +34,7 @@
 .section .bss.cold
 PUBLIC_OBJECT(_vboxgdb_trapctl)
 	.byte 0x00 /* vboxgdb trap control byte (one of VBOXGDB_TRAPCTL_*) */
+	.byte 0x00 /* Should-continue control byte */
 END(_vboxgdb_trapctl)
 
 .section .text.cold
@@ -75,17 +76,19 @@ PRIVATE_FUNCTION(_vboxgdb_debugtrap_chk_step)
 	andl   $(~EFLAGS_TF), OFFSET_IRREGS_EFLAGS(%esp)
 
 	/* Indicate that a trap was triggered */
-	movb   $(VBOXGDB_TRAPCTL_TRIGG), _vboxgdb_trapctl
+	movw   $(0x0000 | VBOXGDB_TRAPCTL_TRIGG), _vboxgdb_trapctl
 
 	/* This the vboxgdb single-step break loop.
 	 * In order to resume execution, vboxgdb will advance
 	 * our EIP to point after this loop whenever it wishes
-	 * to continue. */
+	 * to continue. (s.a. _vmIsStepLoopPaused) */
 PUBLIC_OBJECT(_vboxgdb_steploop)
-	.byte 0xeb, 0xfe /* 1: jmp8 1b  (s.a. `_vmIsSteploopPaused') */
+	cmpb   $(0), _vboxgdb_trapctl + 1
+	je     _vboxgdb_steploop
 END(_vboxgdb_steploop)
 	nop /* DONT REMOVE THIS NOP! IT'S IMPORTANT TO vboxgdb! */
 
+	movb   $(0), _vboxgdb_trapctl + 1
 	iret
 
 	.cfi_restore_state
