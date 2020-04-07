@@ -152,6 +152,16 @@ global final OSDATAFILES: {string: string | Callable} = {
 		}
 	},
 
+	"keepreading" : [](argv: {string...}) {
+		assert #argv == 1;
+		gdbSocket.send("$l#6c");
+		local addr = vmGetRegister("rip");
+		for (;;) {
+			vmReadMemoryAt(addr);
+			addr += 63;
+		}
+	},
+
 	"bl" : [](argv: {string...}) {
 		assert #argv == 1;
 		File.Writer fp;

@@ -76,8 +76,10 @@ global KERNEL_BINARY: string;
 @@Called by emulators once the emulator has been started.
 @@Preferrably called _after_ a GDB stub (if any) becomes available.
 function onEmulatorStarted() {
+	assert CONFIG_EMULATOR_STARTED_PATTERN !== false;
 	if (CONFIG_EMULATOR_STARTED_PATTERN)
 		print CONFIG_EMULATOR_STARTED_PATTERN;
+	CONFIG_EMULATOR_STARTED_PATTERN = false;
 }
 
 function parseConfig(config: string): (bool, bool) {

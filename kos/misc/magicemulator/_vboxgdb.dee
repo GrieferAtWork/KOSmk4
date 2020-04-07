@@ -32,7 +32,7 @@ import ipc;
 
 @@Log comunications and other verbose information
 global CONFIG_VERBOSE;
-global final DEFAULT_CONFIG_VERBOSE = true;
+global final DEFAULT_CONFIG_VERBOSE = false;
 
 @@Timeout for the next byte in an on-going command (in microseconds)
 @@When this timeout is exceeded, the current command is discarded
@@ -70,7 +70,7 @@ global final GDB_BREAKPOINT_TYPE_WRITE     = 2; /* Break on write to `addr' */
 global final GDB_BREAKPOINT_TYPE_READ      = 3; /* Break on read from `addr' */
 global final GDB_BREAKPOINT_TYPE_READWRITE = 4; /* Break on read or write to/from `addr' */
 
-/* Values for `_vboxgdb_trapctl` */
+/* Values for `_vboxgdb_trapctl.tc_ctrl` */
 global final VBOXGDB_TRAPCTL_NTRAP = 0x00; /* Don't trap */
 global final VBOXGDB_TRAPCTL_SSTEP = 0x01; /* Trap single-step events */
 global final VBOXGDB_TRAPCTL_TRIGG = 0xff; /* Trap was triggered */
