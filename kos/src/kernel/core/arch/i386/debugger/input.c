@@ -1314,8 +1314,23 @@ again:
 }
 
 
+INTERN ATTR_DBGTEXT bool
+NOTHROW(KCALL ps2_keyboard_assertbyte)(u8 expected) {
+	u8 got = ps2_keyboard_getbyte();
+	if likely(got == expected)
+		return true;
+	do {
+		printk(KERN_ERR "[dbg] Unexpected init response byte (got: %#I8x, expected: %#I8x)\n",
+		       got, expected);
+		got = ps2_keyboard_getbyte_nb();
+		if likely(got == expected)
+			return true;
+	} while (got);
+	return false;
+}
 
-INTERN ATTR_DBGTEXT void NOTHROW(KCALL x86_debug_initialize_ps2_keyboard)(void) {
+INTERN ATTR_DBGTEXT void
+NOTHROW(KCALL x86_debug_initialize_ps2_keyboard)(void) {
 	unsigned int position;
 	int data;
 
@@ -1326,11 +1341,13 @@ INTERN ATTR_DBGTEXT void NOTHROW(KCALL x86_debug_initialize_ps2_keyboard)(void) 
 
 	ps2_write_cmd(PS2_CONTROLLER_DISABLE_PORT1);
 	ps2_write_cmd(PS2_CONTROLLER_DISABLE_PORT2);
+	inb_p(PS2_DATA); /* Make sure that there is no dangling data */
 	ps2_keyboard_buffer_pos = 0;
 	ps2_keyboard_buffer_siz = 0;
 
 	/* Read RAM #0 */
 	position = __LINE__;
+	PREEMPTION_DISABLE(); /* Guaranty that the interrupt handler won't steal our data byte! */
 	if (!ps2_write_cmd(PS2_CONTROLLER_RRAM(0)))
 		goto err_no_ps2;
 	position = __LINE__;
@@ -1361,10 +1378,10 @@ INTERN ATTR_DBGTEXT void NOTHROW(KCALL x86_debug_initialize_ps2_keyboard)(void) 
 	if (!ps2_write_data(PS2_KEYBOARD_CMD_RESET))
 		goto err_no_ps2;
 	position = __LINE__;
-	if (ps2_keyboard_getbyte() != PS2_RSP_ACK)
+	if (!ps2_keyboard_assertbyte(PS2_RSP_ACK))
 		goto err_no_ps2;
 	position = __LINE__;
-	if (ps2_keyboard_getbyte() != 0xaa)
+	if (!ps2_keyboard_assertbyte(0xaa))
 		goto err_no_ps2;
 
 	/* Determine the scanset used by the keyboard, and try to set scanset #2. */
@@ -1372,28 +1389,28 @@ INTERN ATTR_DBGTEXT void NOTHROW(KCALL x86_debug_initialize_ps2_keyboard)(void) 
 	if (!ps2_write_data(PS2_KEYBOARD_CMD_SCANSET))
 		goto err_no_ps2;
 	position = __LINE__;
-	if (ps2_keyboard_getbyte() != PS2_RSP_ACK)
+	if (!ps2_keyboard_assertbyte(PS2_RSP_ACK))
 		goto err_no_ps2;
 	position = __LINE__;
 	if (!ps2_write_data(PS2_KEYBOARD_CMD_SCANSET_SET2))
 		goto err_no_ps2;
-	if (ps2_keyboard_getbyte() != PS2_RSP_ACK) {
+	if (!ps2_keyboard_assertbyte(PS2_RSP_ACK)) {
 		/* Try to re-initialize the keyboard (it may just be really
 		 * old, or not capable of supporting multiple scansets...) */
 		position = __LINE__;
 		if (!ps2_write_data(PS2_KEYBOARD_CMD_RESET))
 			goto err_no_ps2;
 		position = __LINE__;
-		if (ps2_keyboard_getbyte() != PS2_RSP_ACK)
+		if (!ps2_keyboard_assertbyte(PS2_RSP_ACK))
 			goto err_no_ps2;
 		position = __LINE__;
-		if (ps2_keyboard_getbyte() != 0xaa)
+		if (!ps2_keyboard_assertbyte(0xaa))
 			goto err_no_ps2;
 		position = __LINE__;
 		if (!ps2_write_data(PS2_KEYBOARD_CMD_SETDEFAULT))
 			goto err_no_ps2;
 		position = __LINE__;
-		if (ps2_keyboard_getbyte() != PS2_RSP_ACK)
+		if (!ps2_keyboard_assertbyte(PS2_RSP_ACK))
 			goto err_no_ps2;
 	}
 
@@ -1402,13 +1419,13 @@ INTERN ATTR_DBGTEXT void NOTHROW(KCALL x86_debug_initialize_ps2_keyboard)(void) 
 	if (!ps2_write_data(PS2_KEYBOARD_CMD_SCANSET))
 		goto err_no_ps2;
 	position = __LINE__;
-	if (ps2_keyboard_getbyte() != PS2_RSP_ACK)
+	if (!ps2_keyboard_assertbyte(PS2_RSP_ACK))
 		goto err_no_ps2;
 	position = __LINE__;
 	if (!ps2_write_data(PS2_KEYBOARD_CMD_SCANSET_GET))
 		goto err_no_ps2;
 	position = __LINE__;
-	if (ps2_keyboard_getbyte() != PS2_RSP_ACK)
+	if (!ps2_keyboard_assertbyte(PS2_RSP_ACK))
 		goto err_no_ps2;
 	ps2_keyboard_scanset = ps2_keyboard_getbyte() & 3;
 	if unlikely(!ps2_keyboard_scanset)
@@ -1419,7 +1436,7 @@ INTERN ATTR_DBGTEXT void NOTHROW(KCALL x86_debug_initialize_ps2_keyboard)(void) 
 	if (!ps2_write_data(PS2_KEYBOARD_CMD_ENABLE_SCANNING))
 		goto err_no_ps2;
 	position = __LINE__;
-	if (ps2_keyboard_getbyte() != PS2_RSP_ACK)
+	if (!ps2_keyboard_assertbyte(PS2_RSP_ACK))
 		goto err_no_ps2;
 
 	ps2_keyboard_modifiers = 0;
