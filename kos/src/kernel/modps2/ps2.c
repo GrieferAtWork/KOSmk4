@@ -58,7 +58,7 @@ PRIVATE NOBLOCK ATTR_FREETEXT void
 NOTHROW(FCALL ps2_probe_process_data)(struct ps2_probe_data *__restrict probe_data,
                                       ps2_portid_t portno, u8 data) {
 	struct ps2_probe_data &port = probe_data[portno];
-/*	printk(KERN_DEBUG "[ps2##%I8u] Received %#.2I8x\n", portno + 1, data); */
+/*	printk(KERN_DEBUG "[ps2##%I8u] Received %#.2I8x\n", portno + 1, data);*/
 	switch (port.pd_state) {
 
 	case PS2_PROBE_STATE_UNCONFIGURED:
@@ -297,29 +297,119 @@ init_mouse:
 	}
 }
 
-PRIVATE ATTR_FREETEXT void KCALL ps2_probe_install_handlers(struct ps2_probe_data *__restrict probe_data) {
+PRIVATE ATTR_FREETEXT void KCALL
+ps2_probe_install_handlers(struct ps2_probe_data *__restrict probe_data) {
 	isr_register_at(X86_INTNO_PIC1_KBD, &ps2_probe_handle_interrupt, probe_data);
 	isr_register_at(X86_INTNO_PIC2_PS2M, &ps2_probe_handle_interrupt, probe_data);
 }
 
-PRIVATE ATTR_FREETEXT void KCALL ps2_probe_delete_handlers(struct ps2_probe_data *__restrict probe_data) {
+PRIVATE ATTR_FREETEXT void KCALL
+ps2_probe_delete_handlers(struct ps2_probe_data *__restrict probe_data) {
 	isr_unregister_at(X86_INTNO_PIC1_KBD, &ps2_probe_handle_interrupt, probe_data);
 	isr_unregister_at(X86_INTNO_PIC2_PS2M, &ps2_probe_handle_interrupt, probe_data);
 }
 
-
 PRIVATE ATTR_FREEBSS struct ps2_probe_data ps2_probe_data_buffer[PS2_PORTCOUNT];
+
+PRIVATE NOBLOCK ATTR_FREETEXT bool
+NOTHROW(KCALL early_poll_probe)(u8 *__restrict presult) {
+	unsigned int i;
+	for (i = 0; i < PS2_PORTCOUNT; ++i) {
+		if (ps2_probe_data_buffer[i].pd_state == PS2_PROBE_STATE_UNCONFIGURED) {
+			/* Some data byte was received by this port! */
+			*presult = ps2_probe_data_buffer[i].pd_data.pd_dat[0];
+			return true;
+		}
+	}
+	return false;
+}
+
+PRIVATE NOBLOCK ATTR_FREETEXT bool
+NOTHROW(KCALL early_poll_outport)(u8 *__restrict presult) {
+	u8 status;
+	/* Check the status port before checking for interrupts such that the check
+	 * happens interlocked with a possible interrupt happening between us reading
+	 * the status port, and us reading the data port (where reading the data port
+	 * clears the PS2_STATUS_OUTFULL bit of the status port, which might also be
+	 * done by the interrupt handler) */
+	COMPILER_BARRIER();
+	status = inb_p(PS2_STATUS);
+	COMPILER_BARRIER();
+	if (early_poll_probe(presult))
+		return true;
+	COMPILER_BARRIER();
+	/* Check if the status port indicates that data may be available. */
+	if (status & PS2_STATUS_OUTFULL) {
+		u8 data;
+		pflag_t was;
+		data = inb_p(PS2_DATA);
+		COMPILER_BARRIER();
+		/* Check once again for the possibility that what we've just
+		 * read into `data' may have been garbage when an interrupt
+		 * could have already performed the read before we did. */
+		if (early_poll_probe(presult))
+			return true;
+		/* Nope! No interrupt has done the deed of reading the port,
+		 * so we know that `data' is the correct result value.
+		 * FIXME: This only works when PS/2 interrupt are handled
+		 *        by the same CPU as the one that we're currently
+		 *        running under! */
+		*presult = data;
+		return true;
+	}
+	return false;
+}
+
 PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL ps2_init(void) {
 	ps2_portid_t portno;
 	memset(ps2_probe_data_buffer, 0, sizeof(ps2_probe_data_buffer));
 	ps2_probe_install_handlers(ps2_probe_data_buffer);
 	TRY {
 		u8 data;
+
 		/* Configure the PS/2 controller. */
 		ps2_write_cmd(PS2_CONTROLLER_DISABLE_PORT1);
 		ps2_write_cmd(PS2_CONTROLLER_DISABLE_PORT2);
+		inb_p(PS2_DATA); /* Make sure that there is no dangling data */
+
+		/* Workaround: If the controller is configured to have interrupts enabled
+		 *             for either PORT1 or PORT2, then instead of us being able to
+		 *             read command data in the following call, the response byte
+		 *             will have already been read by `ps2_probe_handle_interrupt()',
+		 *             such that the following line will cause an exception
+		 *             `E_IOERROR_TIMEOUT:E_IOERROR_SUBSYSTEM_HID' to be thrown.
+		 *             The problem here is that the bit that can tell us if the PS/2
+		 *             controller is able to trigger interrupts right now is contained
+		 *             in the very byte which we're trying to extract from the thing.
+		 * Solution:   Configure the probe controller to accept interrupt data while
+		 *             simultaneously polling the port ourself.
+		 *             This gives us 3 different paths to success:
+		 *               #1: We manage to read the port ourself and interrupts were disabled.
+		 *               #2: We manage to read the port ourself and interrupts were enabled,
+		 *                   and the device did send an interrupt that was entered as an
+		 *                   Unhandled interrupt.
+		 *               #3: We don't manage to read the port ourself, but we do notice that
+		 *                   one of the probe controllers has received a data byte. */
+		{
+			unsigned int i;
+			for (i = 0; i < PS2_PORTCOUNT; ++i)
+				ps2_probe_data_buffer[i].pd_state = PS2_PROBE_STATE_DATA_0;
+		}
+		COMPILER_BARRIER();
 		ps2_write_cmd(PS2_CONTROLLER_RRAM(0));
-		data = ps2_read_cmddata();
+		COMPILER_BARRIER();
+		if (!early_poll_outport(&data)) {
+			/* Setup a timeout. */
+			struct timespec timeout;
+			timeout = realtime();
+			timeout.add_milliseconds(ps2_outfull_timeout);
+			while (!early_poll_outport(&data)) {
+				if unlikely(realtime() > timeout)
+					THROW(E_IOERROR_TIMEOUT, E_IOERROR_SUBSYSTEM_HID);
+				task_tryyield_or_pause();
+			}
+		}
+
 		/* Set up the PS/2 device configuration. */
 		data |= (PS2_CONTROLLER_CFG_PORT1_IRQ |
 		         PS2_CONTROLLER_CFG_PORT2_IRQ |
