@@ -23,7 +23,6 @@
 
 #include "push-pop-util.h"
 
-
 EMU86_INTELLISENSE_BEGIN(misc2) {
 
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
@@ -262,13 +261,21 @@ case EMU86_OPCODE_ENCODE(0x0fae): {
      EMU86_EMULATE_CONFIG_WANT_SFENCE || \
      EMU86_EMULATE_CONFIG_WANT_MFENCE)
 		{
-			static int fence_word = 0;
 do_mfence:
 			if (modrm.mi_rm != 0)
 				goto return_unknown_instruction_rmreg;
 #define NEED_return_unknown_instruction_rmreg
 			/* NP 0F AE F8     SFENCE     Serializes store operations. */
-			__hybrid_atomic_xch(fence_word, 1, __ATOMIC_SEQ_CST);
+#ifdef EMU86_EMULATE_FENCELOCK
+			EMU86_EMULATE_FENCELOCK();
+#elif defined(__i386__) || defined(__x86_64__)
+			__fencelock();
+#else /* ... */
+			{
+				static int volatile fence_word = 0;
+				__hybrid_atomic_xch(fence_word, 1, __ATOMIC_SEQ_CST);
+			}
+#endif /* !... */
 			goto done;
 		}
 #endif /* ... */

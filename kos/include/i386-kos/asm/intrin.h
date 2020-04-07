@@ -209,11 +209,13 @@ __FORCELOCAL void (__lgdt_p)(void const *__data) { typedef struct { __UINT16_TYP
 __FORCELOCAL void (__lidt_p)(void const *__data) { typedef struct { __UINT16_TYPE__ __x[5]; } __T; __asm__ __volatile__("lidt %0" : : "m" (*(__T *)__data)); }
 __FORCELOCAL void (__sgdt)(void *__p) { typedef struct { __UINT16_TYPE__ __x[5]; } __T; __asm__ __volatile__("sgdt %0" : "=m" (*(__T *)__p)); }
 __FORCELOCAL void (__sidt)(void *__p) { typedef struct { __UINT16_TYPE__ __x[5]; } __T; __asm__ __volatile__("sidt %0" : "=m" (*(__T *)__p)); }
+__FORCELOCAL void (__fencelock)(void) { __COMPILER_BARRIER(); __asm__ __volatile__("lock; addl $0, 0(%%rsp)" : : : "cc"); __COMPILER_BARRIER(); }
 #else /* __x86_64__ */
 __FORCELOCAL void (__lgdt_p)(void const *__data) { typedef struct { __UINT16_TYPE__ __x[3]; } __T; __asm__ __volatile__("lgdt %0" : : "m" (*(__T *)__data)); }
 __FORCELOCAL void (__lidt_p)(void const *__data) { typedef struct { __UINT16_TYPE__ __x[3]; } __T; __asm__ __volatile__("lidt %0" : : "m" (*(__T *)__data)); }
 __FORCELOCAL void (__sgdt)(void *__p) { typedef struct { __UINT16_TYPE__ __x[3]; } __T; __asm__ __volatile__("sgdt %0" : "=m" (*(__T *)__p)); }
 __FORCELOCAL void (__sidt)(void *__p) { typedef struct { __UINT16_TYPE__ __x[3]; } __T; __asm__ __volatile__("sidt %0" : "=m" (*(__T *)__p)); }
+__FORCELOCAL void (__fencelock)(void) { __COMPILER_BARRIER(); __asm__ __volatile__("lock; addl $0, 0(%%esp)" : : : "cc"); __COMPILER_BARRIER(); }
 #endif /* !__x86_64__ */
 __FORCELOCAL void (__lldt)(__UINT16_TYPE__ __x) { __asm__ __volatile__("lldt %0" : : "rm" (__x)); }
 __FORCELOCAL __ATTR_WUNUSED __UINT16_TYPE__ (__sldt)(void) { __UINT16_TYPE__ __result; __asm__ __volatile__("sldt %0" : "=g" (__result)); return __result; }
