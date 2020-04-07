@@ -316,9 +316,9 @@ autocomplete_thread(size_t argc, char *argv[],
 					else if (ns == 'X')
 						format = DBGSTR("p0X%lx");
 					else if (ns == 'b')
-						format = DBGSTR("p0b%#lb");
+						format = DBGSTR("p0b%lb");
 					else if (ns == 'B')
-						format = DBGSTR("p0B%#lb");
+						format = DBGSTR("p0B%lb");
 					else if (ns >= '0' && ns <= '7')
 						;
 					else {
