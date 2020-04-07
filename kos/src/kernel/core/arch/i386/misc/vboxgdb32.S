@@ -35,10 +35,17 @@
 .section .bss.cold
 .align 4
 PUBLIC_OBJECT(_vboxgdb_trapctl)
+#define tc_ctrl      0
 	.byte 0x00       /* tc_ctrl;   vboxgdb trap control byte (one of VBOXGDB_TRAPCTL_*) */
+#define tc_cont      1
 	.byte 0x00       /* tc_cont;   Should-continue control byte */
 	.word 0x0000     /* tc_pad;    pad... */
+#define tc_teaddr    4
 	.long 0x00000000 /* tc_teaddr; Address of the current trap-enter instruction + 1 */
+#define tc_rstpst    8
+	.long 0x00000000 /* tc_rstpst; Starting address for range-stepping */
+#define tc_rstpen    12
+	.long 0x00000000 /* tc_rstpen; End address for range-stepping */
 END(_vboxgdb_trapctl)
 
 
@@ -50,7 +57,7 @@ INTERN_FUNCTION(_vboxgdb_breakpoint) /* int3 */
 	.cfi_def_cfa %esp, 0
 	pushl_cfi_r %eax
 	movl   %ss:(4 + OFFSET_IRREGS_EIP)(%esp), %eax
-	cmpl   %eax, %ss:_vboxgdb_trapctl + 4 /* tc_teaddr */
+	cmpl   %eax, %ss:(_vboxgdb_trapctl + tc_teaddr)
 	popl_cfi_r %eax
 	je     .Lenter_steploop /* Enter the debugger step-loop */
 
@@ -77,7 +84,7 @@ INTERN_FUNCTION(_vboxgdb_debugtrap) /* int1 */
 	.cfi_startproc simple
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %esp, 0
-	cmpb   $(VBOXGDB_TRAPCTL_SSTEP), %ss:_vboxgdb_trapctl
+	cmpb   $(VBOXGDB_TRAPCTL_SSTEP), %ss:(_vboxgdb_trapctl + tc_ctrl)
 	je     _vboxgdb_debugtrap_chk_step
 PRIVATE_LABEL(.Lnormal_debugtrap):
 	.cfi_remember_state
@@ -103,6 +110,15 @@ PRIVATE_FUNCTION(_vboxgdb_debugtrap_chk_step)
 	jz     99f
 	andl   $(~DR6_BS), %eax
 	movl   %eax, %dr6
+	/* Check for range-stepping */
+	movl   %ss:(4 + OFFSET_IRREGS_EIP)(%esp), %eax
+	cmpl   %ss:(_vboxgdb_trapctl + tc_rstpst), %eax
+	jb     1f  /* if (%eax < tc_rstpst) DO_STEP() */
+	cmpl   %ss:(_vboxgdb_trapctl + tc_rstpen), %eax
+	jb     .Lpop_eax_and_resume /* if (%eax < tc_rstpen) DONT_STEP() */
+1:	xorl   %eax, %eax
+	movl   %eax, %ss:(_vboxgdb_trapctl + tc_rstpst)
+	movl   %eax, %ss:(_vboxgdb_trapctl + tc_rstpen)
 	.cfi_remember_state
 	popl_cfi_r %eax
 
@@ -111,19 +127,25 @@ PRIVATE_FUNCTION(_vboxgdb_debugtrap_chk_step)
 
 PRIVATE_LABEL(.Lenter_steploop):
 	/* Indicate that a trap was triggered */
-	movw   $(0x0000 | VBOXGDB_TRAPCTL_TRIGG), %ss:_vboxgdb_trapctl
+	movw   $(0x0000 | VBOXGDB_TRAPCTL_TRIGG), %ss:(_vboxgdb_trapctl + tc_ctrl)
 
 	/* This the vboxgdb single-step break loop.
 	 * In order to resume execution, vboxgdb will advance
 	 * our EIP to point after this loop whenever it wishes
 	 * to continue. (s.a. _vmIsStepLoopPaused) */
 PUBLIC_OBJECT(_vboxgdb_steploop)
-	cmpb   $(0), %ss:_vboxgdb_trapctl + 1
+	cmpb   $(0), %ss:(_vboxgdb_trapctl + tc_cont)
 	je     _vboxgdb_steploop
 END(_vboxgdb_steploop)
 	nop /* DONT REMOVE THIS NOP! IT'S IMPORTANT TO vboxgdb! */
 
-	movb   $(0), %ss:_vboxgdb_trapctl + 1
+	movb   $(0),  %ss:(_vboxgdb_trapctl + tc_cont)
+	iret
+
+PRIVATE_LABEL(.Lpop_eax_and_resume):
+	.cfi_restore_state
+	.cfi_remember_state
+	popl_cfi_r %eax
 	iret
 
 	.cfi_restore_state

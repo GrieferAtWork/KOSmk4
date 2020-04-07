@@ -69,7 +69,15 @@ global final VBOXGDB_TRAPCTL_NTRAP = 0x00; /* Don't trap */
 global final VBOXGDB_TRAPCTL_SSTEP = 0x01; /* Trap single-step events */
 global final VBOXGDB_TRAPCTL_TRIGG = 0xff; /* Trap was triggered */
 
-
+/* Offsets into `_vboxgdb_trapctl' */
+global final tc_ctrl     = 0;
+global final tc_cont     = 1;
+global final tc_teaddr32 = 4;
+global final tc_teaddr64 = 8;
+global final tc_rstpst32 = 8;
+global final tc_rstpst64 = 16;
+global final tc_rstpen32 = 12;
+global final tc_rstpen64 = 24;
 
 /* Arguments passed to `startVboxGDBGlue()` */
 global KERNEL: string;
@@ -1078,9 +1086,9 @@ set_trapctl_and_wait_for_single_step:
 		               0x100 | VBOXGDB_TRAPCTL_NTRAP);
 		vmWriteMemoryB(oldRip.hex(), 0xcc);
 		if (TARGET_ARCH == "x86_64") {
-			vmWriteMemoryQ((KERNEL_ADDROF__vboxgdb_trapctl + 8).hex(), oldRip + 1);
+			vmWriteMemoryQ((KERNEL_ADDROF__vboxgdb_trapctl + tc_teaddr64).hex(), oldRip + 1);
 		} else {
-			vmWriteMemoryL((KERNEL_ADDROF__vboxgdb_trapctl + 4).hex(), oldRip + 1);
+			vmWriteMemoryL((KERNEL_ADDROF__vboxgdb_trapctl + tc_teaddr32).hex(), oldRip + 1);
 		}
 		local usedDelay = 5000;
 		for (;;) {
@@ -1331,6 +1339,7 @@ function GDBEvaluateCommand(cmd: Bytes): Bytes {
 			vmSetCurrentCpu(gdbCurrentThreadForContinue);
 			vmSetRegister("rip", rip);
 		}
+do_vmResume:
 		vmResume();
 		/* Check if the VM has already stopped once again. */
 		if (!vmIsRunning)
@@ -1429,6 +1438,7 @@ function GDBEvaluateCommand(cmd: Bytes): Bytes {
 			vmSetRegister("rip", rip);
 		}
 		/* Do the single-step */
+do_vmStep:
 		vmResume(singleStep: true);
 		return gdbConstructStopReply();
 	}
@@ -1475,7 +1485,6 @@ function GDBEvaluateCommand(cmd: Bytes): Bytes {
 	}
 
 	/* TODO: T */
-	/* TODO: vCont */
 	/* TODO: qSearch */
 	/* TODO: qThreadExtraInfo */
 	/* TODO: qfThreadInfo */
@@ -1484,6 +1493,57 @@ function GDBEvaluateCommand(cmd: Bytes): Bytes {
 	/* TODO: QStartNoAckMode */
 	/* TODO: QNoAckMode */
 	/* TODO: X */
+
+	case "v".ord(): {
+		local nameEnd = 1;
+		while (nameEnd < #cmd &&
+		       cmd[nameEnd] !in [";".ord(), "?".ord()])
+			++nameEnd;
+		switch (cmd[1:nameEnd]) {
+
+		case "Cont": {
+			if (cmd[nameEnd] == "?".ord())
+				return "vCont;c;C;s;S;r";
+			local shouldStep = false;
+			local stepRangeStart = none;
+			local stepRangeEnd = none;
+			for (local act: cmd[nameEnd + 1:].split(";")) {
+				local c = act[0];
+				if (c in ["c".ord(), "C".ord()])
+					;
+				else if (c in ["s".ord(), "S".ord()])
+					shouldStep = true;
+				else if (c == "r".ord()) {
+					shouldStep = true;
+					local end = act.find(":");
+					if (end < 0)
+						end = #act;
+					stepRangeStart, none, stepRangeEnd =
+						act[1:end].partition(",")...;
+					stepRangeStart = int(stepRangeStart, 16);
+					stepRangeEnd   = int(stepRangeEnd, 16);
+				}
+			}
+			if (!shouldStep)
+				goto do_vmResume;
+			if (stepRangeStart !is none) {
+				if (TARGET_ARCH == "x86_64") {
+					vmWriteMemoryQ((KERNEL_ADDROF__vboxgdb_trapctl + tc_rstpst64).hex(), stepRangeStart);
+					vmWriteMemoryQ((KERNEL_ADDROF__vboxgdb_trapctl + tc_rstpen64).hex(), stepRangeEnd);
+				} else {
+					vmWriteMemoryL((KERNEL_ADDROF__vboxgdb_trapctl + tc_rstpst32).hex(), stepRangeStart);
+					vmWriteMemoryL((KERNEL_ADDROF__vboxgdb_trapctl + tc_rstpen32).hex(), stepRangeEnd);
+				}
+			}
+			goto do_vmStep;
+		}
+
+		default:
+			break;
+		}
+		break;
+	}
+
 
 	case "q".ord(): {
 		local nameEnd = 1;

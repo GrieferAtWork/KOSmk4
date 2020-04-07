@@ -34,11 +34,18 @@
 .section .bss.cold
 .align 8
 PUBLIC_OBJECT(_vboxgdb_trapctl)
+#define tc_ctrl      0
 	.byte 0x00               /* vboxgdb trap control byte (one of VBOXGDB_TRAPCTL_*) */
+#define tc_cont      1
 	.byte 0x00               /* Should-continue control byte */
 	.word 0x0000             /* tc_pad;    pad... */
 	.int  0x00000000         /* tc_pad2;   pad... */
+#define tc_teaddr    8
 	.quad 0x0000000000000000 /* tc_teaddr; Address of the current trap-enter instruction + 1 */
+#define tc_rstpst    16
+	.quad 0x0000000000000000 /* tc_rstpst; Starting address for range-stepping */
+#define tc_rstpen    24
+	.quad 0x0000000000000000 /* tc_rstpen; End address for range-stepping */
 END(_vboxgdb_trapctl)
 
 
@@ -49,7 +56,7 @@ INTERN_FUNCTION(_vboxgdb_breakpoint) /* int3 */
 	.cfi_def_cfa %rsp, 0
 	pushq_cfi_r %rax
 	movq   (8 + OFFSET_IRREGS_RIP)(%rsp), %rax
-	cmpq   %rax, _vboxgdb_trapctl + 8 /* tc_teaddr */
+	cmpq   %rax, (_vboxgdb_trapctl + tc_teaddr) /* tc_teaddr */
 	popq_cfi_r %rax
 	je     .Lenter_steploop /* Enter the debugger step-loop */
 
@@ -70,7 +77,7 @@ INTERN_FUNCTION(_vboxgdb_debugtrap) /* int1 */
 	.cfi_startproc simple
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %rsp, 0
-	cmpb   $(VBOXGDB_TRAPCTL_SSTEP), _vboxgdb_trapctl
+	cmpb   $(VBOXGDB_TRAPCTL_SSTEP), (_vboxgdb_trapctl + tc_ctrl)
 	je     _vboxgdb_debugtrap_chk_step
 PRIVATE_LABEL(.Lnormal_debugtrap):
 	.cfi_remember_state
@@ -90,6 +97,15 @@ PRIVATE_FUNCTION(_vboxgdb_debugtrap_chk_step)
 	jz     99f
 	andq   $(~DR6_BS), %rax
 	movq   %rax, %dr6
+	/* Check for range-stepping */
+	movq   (4 + OFFSET_IRREGS_RIP)(%rsp), %rax
+	cmpq   (_vboxgdb_trapctl + tc_rstpst), %rax
+	jb     1f  /* if (%rax < tc_rstpst) DO_STEP() */
+	cmpq   (_vboxgdb_trapctl + tc_rstpen), %rax
+	jb     .Lpop_rax_and_resume /* if (%rax < tc_rstpen) DONT_STEP() */
+1:	xorq   %rax, %rax
+	movq   %rax, (_vboxgdb_trapctl + tc_rstpst)
+	movq   %rax, (_vboxgdb_trapctl + tc_rstpen)
 	.cfi_remember_state
 	popq_cfi_r %rax
 
@@ -98,21 +114,26 @@ PRIVATE_FUNCTION(_vboxgdb_debugtrap_chk_step)
 
 PRIVATE_LABEL(.Lenter_steploop):
 	/* Indicate that a trap was triggered */
-	movw   $(0x0000 | VBOXGDB_TRAPCTL_TRIGG), _vboxgdb_trapctl
+	movw   $(0x0000 | VBOXGDB_TRAPCTL_TRIGG), (_vboxgdb_trapctl + tc_ctrl)
 
 	/* This the vboxgdb single-step break loop.
 	 * In order to resume execution, vboxgdb will advance
 	 * our RIP to point after this loop whenever it wishes
-	 * to continue. (s.a. _vmIsStepLoopPaused)
-	 * Alternatively, VirtualBox may  */
+	 * to continue. (s.a. _vmIsStepLoopPaused) */
 PUBLIC_OBJECT(_vboxgdb_steploop)
-	cmpb   $(0), _vboxgdb_trapctl + 1
+	cmpb   $(0), (_vboxgdb_trapctl + tc_cont)
 	je     _vboxgdb_steploop
 END(_vboxgdb_steploop)
 	nop /* DONT REMOVE THIS NOP! IT'S IMPORTANT TO vboxgdb! */
 
-	movb   $(0), _vboxgdb_trapctl + 1
+	movb   $(0),  (_vboxgdb_trapctl + tc_cont)
 	iretq
+
+PRIVATE_LABEL(.Lpop_rax_and_resume):
+	.cfi_restore_state
+	.cfi_remember_state
+	popq_cfi_r %rax
+	iret
 
 	.cfi_restore_state
 99:	popq_cfi_r %rax
