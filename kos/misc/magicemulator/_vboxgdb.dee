@@ -32,6 +32,7 @@ import ipc;
 
 @@Log comunications and other verbose information
 global CONFIG_VERBOSE;
+global final DEFAULT_CONFIG_VERBOSE = true;
 
 @@Timeout for the next byte in an on-going command (in microseconds)
 @@When this timeout is exceeded, the current command is discarded
@@ -201,7 +202,7 @@ function gdbSocketGetc(
 				throw Error("GDB Client gracefully disconnected");
 			if (graceFulTimeout)
 				return none;
-			throw Error("Timeout while receiding data from GDB");
+			throw Error("Timeout while receiving data from GDB");
 		}
 	}
 	result = gdbSocketBuffer[0];
@@ -252,6 +253,8 @@ again:
 		/* This is an error that can happen sporadically for practically
 		 * any command. The solution is to try again when it happens... */
 		if ("Invalid command event" in result)
+			goto again;
+		if ("Syntax error: Invalid command ''" in result)
 			goto again;
 	}
 	return result;
@@ -632,7 +635,9 @@ function vmGetRegisterAsHex(name: string): Bytes {
 				    (extractWordLeFromBytes(iret, 10, 1) & 0x2)) {
 					iret = extractWordLeFromBytes(iret, 12, 4);
 				} else {
-					break;
+					/* Special case: Return a pointer to the ~true~ SP value,
+					 *               which point to the end of the IRET tail. */
+					return (_vmGetRegister("rsp") + 12).hex()[2:];
 				}
 			}
 			return iret.hex()[2:];
@@ -752,7 +757,13 @@ function vmSetRegister(name: string, value: string | int) {
 				    (extractWordLeFromBytes(iret, 10, 1) & 0x2)) {
 					vmWriteMemoryL("(%rsp+0xc)", value);
 				} else {
-					break;
+					if (value !is int)
+						value = int(value.lower().lstrip("0x"), 16);
+					local oldSp = vmGetRegister("rsp");
+					if (oldSp == value)
+						return;
+					throw Error("Cannot move kernel stack-pointer (oldesp: 0x{}, newesp: 0x{})"
+						.format({ oldSp.hex()[2:].zfill(8), value.hex()[2:].zfill(8) }));
 				}
 			}
 			return;
@@ -887,6 +898,8 @@ function vmGetRegisters(): {string: int} {
 					result["fs"] = extractWordLeFromBytes(iret, 28, 2);
 					result["gs"] = extractWordLeFromBytes(iret, 32, 2);
 				}
+			} else {
+				result["sp"] = result["sp"] + 12;
 			}
 		}
 	} else {
@@ -1053,8 +1066,11 @@ set_trapctl_and_wait_for_single_step:
 		if (_vmNewRip is none && _vmNewRflags is none && CONFIG_USE_NATIVE_STEP) {
 			local resp = vBoxTelnetExecNoError("t");
 			_vmResumeUi();
-			if (!resp)
+			if (!resp) {
 				resp = vBoxTelnetGetResponse();
+				if (CONFIG_VERBOSE)
+					print "[vboxgdb<-telnet]", repr(resp);
+			}
 			_vmPauseUi();
 			gdbStopReason = GDBHandleVirtualBoxEvent(resp);
 			_vmIsStepLoopPaused = none; /* Unknown */
@@ -1970,7 +1986,8 @@ function startVboxGDBGlue(
 	global virtualBoxProc = virtualBoxProc;
 
 	/* Load configurations from emulator options */
-	global CONFIG_VERBOSE = opt.getBool(options, "vboxgdb.verbose", true);
+	global CONFIG_VERBOSE =
+		opt.getBool(options, "vboxgdb.verbose", DEFAULT_CONFIG_VERBOSE);
 	global CONFIG_GDB_COMMAND_NEXTBYTE_TIMEOUT =
 		opt.getInt(options, "vboxgdb.gdb.command_timeout", 1000000);
 	global CONFIG_GDB_COMMAND_ACK_TIMEOUT =
