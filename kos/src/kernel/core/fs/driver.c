@@ -38,6 +38,7 @@
 #include <kernel/panic.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
+#include <kernel/vboxgdb.h>
 #include <misc/atomic-ref.h>
 #include <sched/task.h>
 
@@ -50,8 +51,8 @@
 
 #include <kos/debugtrap.h>
 #include <kos/except/noexec.h>
-#include <kos/exec/elf.h> /* ELF_ARCH_USESRELA */
 #include <kos/exec/elf-rel.h> /* ELF_ARCH_*_R_* */
+#include <kos/exec/elf.h>     /* ELF_ARCH_USESRELA */
 
 #include <assert.h>
 #include <ctype.h>
@@ -385,8 +386,14 @@ PUBLIC struct callback_list_struct callback_list_empty = {
  * This needs to be implemented as an atomic_ref pointer, so-as to allow for NOBLOCK+NOEXCEPT
  * enumeration of loaded drivers for the purpose of both discovering, as well as locking of
  * the driver associated with some given static data pointer. */
+#ifndef CONFIG_VBOXGDB
 PRIVATE atomic_ref<struct driver_state>
 current_driver_state = ATOMIC_REF_INIT(&empty_driver_state);
+#else /* !CONFIG_VBOXGDB */
+INTDEF atomic_ref<struct driver_state> current_driver_state ASMNAME("current_driver_state");
+INTERN atomic_ref<struct driver_state> current_driver_state = ATOMIC_REF_INIT(&empty_driver_state);
+DEFINE_PUBLIC_ALIAS(_vboxgdb_kos_driver_state, current_driver_state);
+#endif /* CONFIG_VBOXGDB */
 
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL driver_state_destroy)(struct driver_state *__restrict self) {
@@ -861,6 +868,9 @@ PUBLIC struct driver kernel_driver = {
 	/* .d_eh_frame_cache_lock  = */ ATOMIC_RWLOCK_INIT,
 	/* .d_eh_frame_cache_semi0 = */ ATREE_SEMI0(uintptr_t),   /* TODO: Optimize specifically for the kernel core? */
 	/* .d_eh_frame_cache_leve0 = */ ATREE_LEVEL0(uintptr_t),  /* TODO: Optimize specifically for the kernel core? */
+#if __SIZEOF_POINTER__ > __SIZEOF_INT__
+	/* .d_pad                  = */ { 0, },
+#endif /* __SIZEOF_POINTER__ > __SIZEOF_INT__ */
 	/* .d_depcnt               = */ 0,
 	/* .d_depvec               = */ NULL,
 	/* .d_dyncnt               = */ 0,
@@ -878,6 +888,9 @@ PUBLIC struct driver kernel_driver = {
 	/* .d_shstrndx             = */ KERNEL_SECTIONS_COUNT - 1,
 	/* .d_shnum                = */ KERNEL_SECTIONS_COUNT,
 #endif /* !__INTELLISENSE__ */
+#if __SIZEOF_POINTER__ > 4
+	/* .d_pad2                 = */ { 0, },
+#endif /* __SIZEOF_POINTER__ > 4 */
 	/* .d_shdr                 = */ kernel_shdr,
 	/* .d_sections_lock        = */ ATOMIC_RWLOCK_INIT,
 	/* .d_sections             = */ (struct driver_section **)kernel_sections,
@@ -890,6 +903,7 @@ PUBLIC struct driver kernel_driver = {
 	/* .d_shstrtab_end         = */ kernel_shstrtab_data + sizeof(struct kernel_shstrtab),
 #endif /* !__INTELLISENSE__ */
 	/* .d_phnum                = */ 2,
+	/* .d_pad3                 = */ { 0, },
 	{
 		/* [0] = */ ELFW(PHDR_INIT)(
 			/* .p_type   = */ PT_LOAD,
@@ -3996,6 +4010,7 @@ done_dynsym:
 			 * NOTE: This is done after relocations, but before initializers, so that
 			 *       a debugger is able to safely set breakpoints without overriding
 			 *       memory locations possibly affected by relocations. */
+			vboxgdb_trap(FREESTR(VBOXGDB_TRAP_LIBRARY));
 			if (kernel_debugtrap_enabled()) {
 				struct debugtrap_reason r;
 				r.dtr_signo  = SIGTRAP;

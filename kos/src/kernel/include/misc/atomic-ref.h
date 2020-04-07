@@ -85,9 +85,9 @@ extern "C++" {
 template<class T> struct atomic_ref {
 
 #ifndef CONFIG_NO_SMP
-#define atomic_ref_init(self, p)  ((self)->m_inuse = 0, (self)->m_pointer = (p))
-#define atomic_ref_cinit(self, p) (__hybrid_assert((self)->m_inuse == 0), (self)->m_pointer = (p))
-#define ATOMIC_REF_INIT(p)        { 0, p }
+#define atomic_ref_init(self, p)  ((self)->m_pointer = (p), (self)->m_inuse = 0)
+#define atomic_ref_cinit(self, p) ((self)->m_pointer = (p), __hybrid_assert((self)->m_inuse == 0))
+#define ATOMIC_REF_INIT(p)        { p, 0}
 #else /* !CONFIG_NO_SMP */
 #define atomic_ref_init(self, p)  ((self)->m_pointer = (p))
 #define atomic_ref_cinit(self, p) ((self)->m_pointer = (p))
@@ -95,10 +95,10 @@ template<class T> struct atomic_ref {
 #endif /* CONFIG_NO_SMP */
 #define atomic_ref_fini(self)       decref((self)->m_pointer)
 
+	WEAK REF T      *m_pointer; /* [1..1][lock(COMPLEX(m_inuse))] The pointed-to object. */
 #ifndef CONFIG_NO_SMP
 	WEAK uintptr_t   m_inuse;   /* Cross-CPU is-in-use tracking */
 #endif /* !CONFIG_NO_SMP */
-	WEAK REF T      *m_pointer; /* [1..1][lock(COMPLEX(m_inuse))] The pointed-to object. */
 
 	/* Return a reference to the current pointed-to value */
 	__CXX_CLASSMEMBER ATTR_LEAF NOBLOCK WUNUSED ATTR_RETNONNULL REF T *KCALL get() __CXX_NOEXCEPT {
@@ -241,18 +241,18 @@ template<class T> struct atomic_ref {
 #define XATOMIC_REF_STRUCT(...) xatomic_ref_struct< __VA_ARGS__ >
 #define XATOMIC_REF(...)        xatomic_ref< __VA_ARGS__ >
 template<class T> struct xatomic_ref_struct {
+	WEAK REF T      *m_pointer; /* [0..1][lock(COMPLEX(m_inuse))] The pointed-to object. */
 #ifndef CONFIG_NO_SMP
 	WEAK uintptr_t   m_inuse;   /* Cross-CPU is-in-use tracking */
 #endif /* !CONFIG_NO_SMP */
-	WEAK REF T      *m_pointer; /* [0..1][lock(COMPLEX(m_inuse))] The pointed-to object. */
 };
 
 template<class T> struct xatomic_ref {
 
 #ifndef CONFIG_NO_SMP
-#define xatomic_ref_init(self, p)  ((self)->m_inuse = 0, (self)->m_pointer = (p))
-#define xatomic_ref_cinit(self, p) (__hybrid_assert((self)->m_inuse == 0), (self)->m_pointer = (p))
-#define XATOMIC_REF_INIT(p)        { 0, p }
+#define xatomic_ref_init(self, p)  ((self)->m_pointer = (p), (self)->m_inuse = 0)
+#define xatomic_ref_cinit(self, p) ((self)->m_pointer = (p), __hybrid_assert((self)->m_inuse == 0))
+#define XATOMIC_REF_INIT(p)        { p, 0}
 #else /* !CONFIG_NO_SMP */
 #define xatomic_ref_init(self, p)  ((self)->m_pointer = (p))
 #define xatomic_ref_cinit(self, p) ((self)->m_pointer = (p))
@@ -260,10 +260,10 @@ template<class T> struct xatomic_ref {
 #endif /* CONFIG_NO_SMP */
 #define xatomic_ref_fini(self)      xdecref((self)->m_pointer)
 
+	WEAK REF T      *m_pointer; /* [0..1][lock(COMPLEX(m_inuse))] The pointed-to object. */
 #ifndef CONFIG_NO_SMP
 	WEAK uintptr_t   m_inuse;   /* Cross-CPU is-in-use tracking */
 #endif /* !CONFIG_NO_SMP */
-	WEAK REF T      *m_pointer; /* [0..1][lock(COMPLEX(m_inuse))] The pointed-to object. */
 
 	/* Return a reference to the current pointed-to value */
 	__CXX_CLASSMEMBER NOBLOCK void KCALL clear() __CXX_NOEXCEPT {
@@ -435,11 +435,11 @@ template<class T> struct xatomic_ref {
 #define xatomic_weaklyref_clear(self) xatomic_weaklyref_set(self, __NULLPTR)
 
 template<class T> struct xatomic_weaklyref_struct {
+	WEAK T          *m_pointer; /* [0..1][lock(COMPLEX(m_inuse))] The pointed-to object.
+	                             * NOTE: This isn't an actual reference! */
 #ifndef CONFIG_NO_SMP
 	WEAK uintptr_t   m_inuse;   /* Cross-CPU is-in-use tracking */
 #endif /* !CONFIG_NO_SMP */
-	WEAK T          *m_pointer; /* [0..1][lock(COMPLEX(m_inuse))] The pointed-to object.
-	                             * NOTE: This isn't an actual reference! */
 };
 
 
@@ -448,20 +448,20 @@ template<class T> struct xatomic_weaklyref_struct {
 template<class T> struct xatomic_weaklyref {
 
 #ifndef CONFIG_NO_SMP
-#define xatomic_weaklyref_init(self, p)  ((self)->m_inuse = 0, (self)->m_pointer = (p))
-#define xatomic_weaklyref_cinit(self, p) (__hybrid_assert((self)->m_inuse == 0), (self)->m_pointer = (p))
-#define XATOMIC_WEAKLYREF_INIT(p)        { 0, p }
+#define xatomic_weaklyref_init(self, p)  ((self)->m_pointer = (p), (self)->m_inuse = 0)
+#define xatomic_weaklyref_cinit(self, p) ((self)->m_pointer = (p), __hybrid_assert((self)->m_inuse == 0))
+#define XATOMIC_WEAKLYREF_INIT(p)        { p, 0 }
 #else /* !CONFIG_NO_SMP */
 #define xatomic_weaklyref_init(self, p)  ((self)->m_pointer = (p))
 #define xatomic_weaklyref_cinit(self, p) ((self)->m_pointer = (p))
 #define XATOMIC_WEAKLYREF_INIT(p)        { p }
 #endif /* CONFIG_NO_SMP */
 
+	WEAK T          *m_pointer; /* [0..1][lock(COMPLEX(m_inuse))] The pointed-to object.
+	                             * NOTE: This isn't an actual reference! */
 #ifndef CONFIG_NO_SMP
 	WEAK uintptr_t   m_inuse;   /* Cross-CPU is-in-use tracking */
 #endif /* !CONFIG_NO_SMP */
-	WEAK T          *m_pointer; /* [0..1][lock(COMPLEX(m_inuse))] The pointed-to object.
-	                             * NOTE: This isn't an actual reference! */
 
 	/* Clear the pointed-to value. */
 	__CXX_CLASSMEMBER ATTR_LEAF NOBLOCK void KCALL clear() __CXX_NOEXCEPT {
@@ -564,8 +564,8 @@ template<class T> struct xatomic_weaklyref {
 #ifndef CONFIG_NO_SMP
 #define ATOMIC_REF(...)                                                                              \
 	struct {                                                                                         \
-		WEAK uintptr_t        m_inuse;          /* Cross-CPU is-in-use tracking */                   \
 		WEAK REF __VA_ARGS__ *m_pointer; /* [1..1][lock(COMPLEX(m_inuse))] The pointed-to object. */ \
+		WEAK uintptr_t        m_inuse;   /* Cross-CPU is-in-use tracking */                          \
 	}
 #else /* !CONFIG_NO_SMP */
 #define ATOMIC_REF(...)                                                                              \
@@ -575,35 +575,35 @@ template<class T> struct xatomic_weaklyref {
 #endif /* CONFIG_NO_SMP */
 
 #ifndef CONFIG_NO_SMP
-#define atomic_ref_init(self, p)  ((self)->m_inuse = 0, (self)->m_pointer = (p))
-#define atomic_ref_cinit(self, p) (__hybrid_assert((self)->m_inuse == 0), (self)->m_pointer = (p))
-#define ATOMIC_REF_INIT(p)        { 0, p }
+#define atomic_ref_init(self, p)  ((self)->m_pointer = (p), (self)->m_inuse = 0)
+#define atomic_ref_cinit(self, p) ((self)->m_pointer = (p), __hybrid_assert((self)->m_inuse == 0))
+#define ATOMIC_REF_INIT(p)        { p, 0 }
 #else /* !CONFIG_NO_SMP */
 #define atomic_ref_init(self, p)  ((self)->m_pointer = (p))
 #define atomic_ref_cinit(self, p) ((self)->m_pointer = (p))
 #define ATOMIC_REF_INIT(p)        { p }
 #endif /* CONFIG_NO_SMP */
-#define atomic_ref_fini(self)       decref((self)->m_pointer)
+#define atomic_ref_fini(self)     decref((self)->m_pointer)
 
 #define XATOMIC_REF_STRUCT ATOMIC_REF
 #define XATOMIC_REF        ATOMIC_REF
 #ifndef CONFIG_NO_SMP
-#define xatomic_ref_init(self, p)  ((self)->m_inuse = 0, (self)->m_pointer = (p))
-#define xatomic_ref_cinit(self, p) (__hybrid_assert((self)->m_inuse == 0), (self)->m_pointer = (p))
-#define XATOMIC_REF_INIT(p)        { 0, p }
+#define xatomic_ref_init(self, p)  ((self)->m_pointer = (p), (self)->m_inuse = 0)
+#define xatomic_ref_cinit(self, p) ((self)->m_pointer = (p), __hybrid_assert((self)->m_inuse == 0))
+#define XATOMIC_REF_INIT(p)        { p, 0 }
 #else /* !CONFIG_NO_SMP */
 #define xatomic_ref_init(self, p)  ((self)->m_pointer = (p))
 #define xatomic_ref_cinit(self, p) ((self)->m_pointer = (p))
 #define XATOMIC_REF_INIT(p)        { p }
 #endif /* CONFIG_NO_SMP */
-#define xatomic_ref_fini(self)      xdecref((self)->m_pointer)
+#define xatomic_ref_fini(self)     xdecref((self)->m_pointer)
 
 /* A weakly held reference (must be cleared by the associated object once that object gets destroyed) */
 #define XATOMIC_WEAKLYREF   ATOMIC_REF
 #ifndef CONFIG_NO_SMP
-#define xatomic_weaklyref_init(self, p)  ((self)->m_inuse = 0, (self)->m_pointer = (p))
-#define xatomic_weaklyref_cinit(self, p) (__hybrid_assert((self)->m_inuse == 0), (self)->m_pointer = (p))
-#define XATOMIC_WEAKLYREF_INIT(p)        { 0, p }
+#define xatomic_weaklyref_init(self, p)  ((self)->m_pointer = (p), (self)->m_inuse = 0)
+#define xatomic_weaklyref_cinit(self, p) ((self)->m_pointer = (p), __hybrid_assert((self)->m_inuse == 0))
+#define XATOMIC_WEAKLYREF_INIT(p)        { p, 0 }
 #else /* !CONFIG_NO_SMP */
 #define xatomic_weaklyref_init(self, p)  ((self)->m_pointer = (p))
 #define xatomic_weaklyref_cinit(self, p) ((self)->m_pointer = (p))

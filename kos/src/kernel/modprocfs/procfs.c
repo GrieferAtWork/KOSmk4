@@ -26,6 +26,7 @@
 #include <kernel/compiler.h>
 
 #include <fs/node.h>
+#include <kernel/printk.h>
 #include <kernel/driver.h>
 
 #include <libvio/api.h>

@@ -17,56 +17,51 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_CORE_ARCH_I386_MISC_VBOXGDB_C
-#define GUARD_KERNEL_CORE_ARCH_I386_MISC_VBOXGDB_C 1
+#ifndef GUARD_KERNEL_INCLUDE_KERNEL_VBOXGDB_H
+#define GUARD_KERNEL_INCLUDE_KERNEL_VBOXGDB_H 1
 
 #include <kernel/compiler.h>
 
-#include <kernel/vboxgdb.h>
-
-#ifdef CONFIG_VBOXGDB
 #include <kernel/types.h>
-
 #include <hybrid/host.h>
 
-#include <asm/intrin.h>
-#include <sys/io.h>
+#ifdef CONFIG_NO_VBOXGDB
+#undef CONFIG_VBOXGDB
+#elif (defined(CONFIG_VBOXGDB) && !(CONFIG_VBOXGDB + 0))
+#undef CONFIG_VBOXGDB
+#define CONFIG_NO_VBOXGDB 1
+#elif defined(__i386__) || defined(__x86_64__)
+/* VirtualBox can only emulate x86 machines, so there's no point
+ * in try to support vboxgdb when targeting anything else! */
+#define CONFIG_VBOXGDB 1
+#else /* ... */
+#define CONFIG_NO_VBOXGDB 1
+#endif /* !... */
 
-#include <string.h>
+
 
 DECL_BEGIN
 
-INTDEF byte_t x86_idt_debugtrap[];
-INTDEF byte_t x86_idt_breakpoint[];
-INTDEF byte_t _vboxgdb_debugtrap[];
-INTDEF byte_t _vboxgdb_breakpoint[];
-DATDEF byte_t _vboxgdb_trap[] ASMNAME("vboxgdb_trap");
+/* Known VBox GDB traps. */
+#define VBOXGDB_TRAP_STARTUP "startup" /* Invoked during kernel startup (starts the GDB stub & sets initial breakpoints) */
+#define VBOXGDB_TRAP_LIBRARY "library" /* Invoked when a driver is loaded/unloaded. */
 
-PRIVATE ATTR_FREETEXT void
-NOTHROW(KCALL inject_jmp)(byte_t *from, byte_t *to) {
-	from[0]            = 0xe9; /* jmp32 */
-	*(s32 *)(from + 1) = (s32)((intptr_t)((uintptr_t)to) -
-	                           (intptr_t)((uintptr_t)from + 5));
-}
+#ifdef __CC__
+#ifdef CONFIG_VBOXGDB
 
-INTERN ATTR_FREETEXT void
-NOTHROW(KCALL x86_initialize_vboxgdb)(void) {
-	/* Inject the int1 and int3 handler. (s.a. vboxgdb:vmResume) */
-	inject_jmp(x86_idt_debugtrap, _vboxgdb_debugtrap);
-	inject_jmp(x86_idt_breakpoint, _vboxgdb_breakpoint);
-	_vboxgdb_trap[0] = 0x90; /* nop (overwrite the `0xc3' (`ret') that was written here before now) */
-	__flush_instruction_cache();
-	COMPILER_WRITE_BARRIER();
-	/* Notify vboxgdb that the initial kernel init has completed
-	 * by sending a special control sequence through port:0x504
-	 * Afterwards, jump into the vboxgdb step loop to allow any
-	 * attached GDB instance to set initial kernel breakpoints. */
-	vboxgdb_trap(FREESTR(VBOXGDB_TRAP_STARTUP));
-}
+/* Trap into the vboxgdb sub-system by sending a command "%{vboxgdb:<name>}",
+ * and entering the vbox step-loop until the vbox debugger indicates that
+ * execution should be resumed.
+ * This function returns once vboxgdb tells it to do so.
+ * @param: name: The name of the trap. (one of `VBOXGDB_TRAP_*') */
+FUNDEF NONNULL((1)) NOBLOCK void
+NOTHROW(FCALL vboxgdb_trap)(char const *__restrict name);
 
+#else /* CONFIG_VBOXGDB */
+#define vboxgdb_trap(name) (void)0
+#endif /* !CONFIG_VBOXGDB */
+#endif /* __CC__ */
 
 DECL_END
 
-#endif /* CONFIG_VBOXGDB */
-
-#endif /* !GUARD_KERNEL_CORE_ARCH_I386_MISC_VBOXGDB_C */
+#endif /* !GUARD_KERNEL_INCLUDE_KERNEL_VBOXGDB_H */

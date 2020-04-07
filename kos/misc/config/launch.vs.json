@@ -299,7 +299,14 @@
 			"targetArchitecture": "x86",
 			"debugType": "native",
 			"launchCompleteCommand": "None",
-			"miDebuggerServerAddress": "localhost:1234",
+			"miDebuggerServerAddress": ".",
+			"customLaunchSetupCommands": [
+				{ "text": "cd ABSOLUTE_KOS_NT_PROJECT_ROOT", "ignoreFailures": false },
+				{ "text": "set sysroot ABSOLUTE_KOS_NT_PROJECT_ROOT\\bin\\${env.TARGET}-kos-${env.CONFIG}", "ignoreFailures": false },
+				{ "text": "set solib-search-path bin/${env.TARGET}-kos-${env.CONFIG}/lib:bin/${env.TARGET}-kos-${env.CONFIG}/os/drivers", "ignoreFailures": false },
+				{ "text": "set auto-solib-add on", "ignoreFailures": false },
+				{ "text": "-target-select remote localhost:1234", "ignoreFailures": false }
+			],
 			"setupCommands": [
 				{ "text": "-enable-pretty-printing", "ignoreFailures": true },
 				{ "text": "set print pretty on", "ignoreFailures": true },
@@ -343,7 +350,14 @@
 			"targetArchitecture": "x86",
 			"debugType": "native",
 			"launchCompleteCommand": "None",
-			"miDebuggerServerAddress": "localhost:1234",
+			"miDebuggerServerAddress": ".",
+			"customLaunchSetupCommands": [
+				{ "text": "cd ABSOLUTE_KOS_NT_PROJECT_ROOT", "ignoreFailures": false },
+				{ "text": "set sysroot ABSOLUTE_KOS_NT_PROJECT_ROOT\\bin\\${env.TARGET}-kos-${env.CONFIG}", "ignoreFailures": false },
+				{ "text": "set solib-search-path bin/${env.TARGET}-kos-${env.CONFIG}/lib:bin/${env.TARGET}-kos-${env.CONFIG}/os/drivers", "ignoreFailures": false },
+				{ "text": "set auto-solib-add on", "ignoreFailures": false },
+				{ "text": "-target-select remote localhost:1234", "ignoreFailures": false }
+			],
 			"setupCommands": [
 				{ "text": "-enable-pretty-printing", "ignoreFailures": true },
 				{ "text": "set print pretty on", "ignoreFailures": true },

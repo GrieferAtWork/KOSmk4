@@ -21,8 +21,9 @@
 #define GUARD_KERNEL_CORE_ARCH_I386_MISC_VBOXGDB64_S 1
 
 #include <kernel/compiler.h>
+#include <kernel/vboxgdb.h>
 
-#ifndef CONFIG_NO_VBOXGDB
+#ifdef CONFIG_VBOXGDB
 #include <asm/cfi.h>
 #include <asm/cpu-flags.h>
 #include <kos/kernel/cpu-state.h>
@@ -144,6 +145,57 @@ END(_vboxgdb_debugtrap_chk_step)
 END(_vboxgdb_debugtrap)
 
 
-#endif /* !CONFIG_NO_VBOXGDB */
+.section .rodata
+PRIVATE_OBJECT(.Lprefix)
+	.ascii "%{vboxgdb:"
+PRIVATE_CONST(.Lprefix_len, . - .Lprefix)
+END(.Lprefix)
+PRIVATE_OBJECT(.Lsuffix)
+	.ascii "}\n"
+PRIVATE_CONST(.Lsuffix_len, . - .Lsuffix)
+END(.Lsuffix)
+
+/* PUBLIC NONNULL((1)) NOBLOCK void
+ * NOTHROW(FCALL vboxgdb_trap)(char const *__restrict name) */
+.section .text
+PUBLIC_FUNCTION(vboxgdb_trap)
+	.cfi_startproc
+	.byte  0xc3 /* ret (overwritten with 0x90 (nop) when vboxgdb is enabled during early boot) */
+	pushfq_cfi_r
+	cli
+	pushq_cfi %rdi /* name */
+	movq   $(.Lprefix), %rsi
+	movq   $(.Lprefix_len), %rcx
+	movw   $(0x504), %dx
+	rep;   outsb
+	movq   0(%rsp), %rdi /* name */
+	EXTERN(strlen)
+	call   strlen
+	popq_cfi %rsi /* name */
+	movq   %rax, %rcx
+	movw   $(0x504), %dx
+	rep;   outsb
+	movq   $(.Lsuffix), %rsi
+	movq   $(.Lsuffix_len), %rcx
+	rep;   outsb
+	popq_cfi %rcx /* %rflags */
+	.cfi_register %rflags, %rcx
+	popq_cfi %rax /* %rip */
+	.cfi_register %rip, %rax
+
+	movq   %ss, %rdx
+	pushq_cfi %rdx /* IRET.SS */
+	leaq   8(%rsp), %rdx
+	pushq_cfi %rdx /* IRET.RSP */
+	pushq_cfi %rcx /* %rflags */
+	movq   %cs, %rdx
+	pushq_cfi %rdx /* IRET.CS */
+	pushq_cfi %rax /* IRET.RIP */
+	jmp    _vboxgdb_steploop
+	.cfi_endproc
+END(vboxgdb_trap)
+
+
+#endif /* CONFIG_VBOXGDB */
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_MISC_VBOXGDB64_S */

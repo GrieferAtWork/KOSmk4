@@ -301,7 +301,9 @@ struct driver {
 	struct atomic_rwlock          d_eh_frame_cache_lock;  /* Lock for `d_eh_frame_cache' */
 	uintptr_t        DRIVER_CONST d_eh_frame_cache_semi0; /* [const] SEMI0 for the eh_frame cache */
 	unsigned int     DRIVER_CONST d_eh_frame_cache_leve0; /* [const] LEVEL0 for the eh_frame cache */
-
+#if __SIZEOF_POINTER__ > __SIZEOF_INT__
+	byte_t d_pad[__SIZEOF_POINTER__ - __SIZEOF_INT__];
+#endif /* __SIZEOF_POINTER__ > __SIZEOF_INT__ */
 
 	/* Driver dependencies. */
 	size_t       DRIVER_CONST d_depcnt;     /* [const] Number of dependencies of this driver. */
@@ -329,6 +331,9 @@ struct driver {
 	ElfW(Off)                 d_shoff;      /* [const] File offset to section headers. */
 	ElfW(Half)                d_shstrndx;   /* [const] Index of the section header names section. */
 	ElfW(Half)                d_shnum;      /* [const] (Max) number of section headers. */
+#if __SIZEOF_POINTER__ > 4
+	__byte_t                  d_pad2[__SIZEOF_POINTER__ - 4];
+#endif /* __SIZEOF_POINTER__ > 4 */
 	ElfW(Shdr) const         *d_shdr;       /* [lock(WRITE_ONCE)][0..d_shnum][owned] Vector of section headers (or `NULL' if not loaded). */
 	struct atomic_rwlock      d_sections_lock; /* Lock for `d_sections' */
 	struct driver_section   **d_sections;   /* [0..1][weak][0..d_shnum][owned][lock(d_sections_lock)] Vector of locked sections. */
@@ -339,6 +344,7 @@ struct driver {
 
 	/* Module program headers */
 	ElfW(Half)   DRIVER_CONST d_phnum;      /* [const][valid_if(!DRIVER_FLAG_FINALIZED)][!0] (Max) number of program headers. */
+	byte_t                    d_pad3[sizeof(void *) - sizeof(ElfW(Half))];
 	ElfW(Phdr)   DRIVER_CONST d_phdr[];     /* [const][valid_if(!DRIVER_FLAG_FINALIZED)][d_phnum] Vector of program headers. */
 };
 

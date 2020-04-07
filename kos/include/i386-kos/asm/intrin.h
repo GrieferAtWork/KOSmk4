@@ -661,6 +661,14 @@ __FORCELOCAL __ATTR_WUNUSED __UINT64_TYPE__
 #endif /* !__x86_64__ */
 }
 
+/* Flush the instruction cache. */
+__FORCELOCAL void (__flush_instruction_cache)(void) {
+#ifdef __x86_64__
+	__asm__ __volatile__("cpuid" : : : "%rax", "%rcx", "%rdx", "%rbx");
+#else /* __x86_64__ */
+	__asm__ __volatile__("cpuid" : : : "%eax", "%ecx", "%edx", "%ebx");
+#endif /* !__x86_64__ */
+}
 
 #undef __PRIVATE_PREFIX_REP_CLD
 #elif defined(_MSC_VER)

@@ -24,6 +24,9 @@
 
 #include <kernel/phys2virt64.h>
 #include <kernel/types.h>
+#ifdef CONFIG_BUILDING_KERNEL_CORE
+#include <kernel/vboxgdb.h>
+#endif /* CONFIG_BUILDING_KERNEL_CORE */
 
 #include <asm/pagesize.h>
 #include <kos/kernel/cpu-state32.h> /* fcpustate32 */
@@ -56,9 +59,9 @@ DATDEF struct boot_device_info boot_device;
 
 
 #ifdef CONFIG_BUILDING_KERNEL_CORE
-#ifndef CONFIG_NO_VBOXGDB
+#ifdef CONFIG_VBOXGDB
 INTDEF FREE void NOTHROW(KCALL x86_initialize_vboxgdb)(void);
-#endif /* !CONFIG_NO_VBOXGDB */
+#endif /* CONFIG_VBOXGDB */
 INTDEF FREE void NOTHROW(KCALL x86_initialize_cmos)(void);
 INTDEF FREE void NOTHROW(KCALL x86_initialize_paging)(void);
 INTDEF FREE void NOTHROW(KCALL x86_load_mb1info)(PHYS u32 info);

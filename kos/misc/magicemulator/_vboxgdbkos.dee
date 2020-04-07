@@ -1,0 +1,315 @@
+/* Copyright (c) 2019-2020 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+/* KOS-specific helpers for vboxgdb (kernel module listings, etc...) */
+
+import * from deemon;
+import * from ._vboxgdb;
+
+#include "../../include/elf.h"
+#include "../../src/kernel/include/kernel/driver-offsets.h"
+
+#define PAGESIZE 4096
+#define PAGEMASK 4095
+
+#define SIZEOF_POINTER SIZEOF_POINTER_[TARGET_ARCH]
+global final SIZEOF_POINTER_: {string: int} = {
+	"i386" : 4,
+	"x86_64" : 4,
+};
+
+#define OFFSET_DRIVER OFFSET_DRIVER_[TARGET_ARCH]
+global final OFFSET_DRIVER_: {string: {string: int}} = {
+	"i386" : {
+		"refcnt" : OFFSET_DRIVER32_REFCNT,
+		"weakrefcnt" : OFFSET_DRIVER32_WEAKREFCNT,
+		"name" : OFFSET_DRIVER32_NAME,
+		"filename" : OFFSET_DRIVER32_FILENAME,
+		"file" : OFFSET_DRIVER32_FILE,
+		"cmdline" : OFFSET_DRIVER32_CMDLINE,
+		"argc" : OFFSET_DRIVER32_ARGC,
+		"argv" : OFFSET_DRIVER32_ARGV,
+		"flags" : OFFSET_DRIVER32_FLAGS,
+		"initthread" : OFFSET_DRIVER32_INITTHREAD,
+		"loadaddr" : OFFSET_DRIVER32_LOADADDR,
+		"loadstart" : OFFSET_DRIVER32_LOADSTART,
+		"loadend" : OFFSET_DRIVER32_LOADEND,
+		"eh_frame_start" : OFFSET_DRIVER32_EH_FRAME_START,
+		"eh_frame_end" : OFFSET_DRIVER32_EH_FRAME_END,
+		"eh_frame_cache" : OFFSET_DRIVER32_EH_FRAME_CACHE,
+		"eh_frame_cache_lock" : OFFSET_DRIVER32_EH_FRAME_CACHE_LOCK,
+		"eh_frame_cache_semi0" : OFFSET_DRIVER32_EH_FRAME_CACHE_SEMI0,
+		"eh_frame_cache_leve0" : OFFSET_DRIVER32_EH_FRAME_CACHE_LEVE0,
+		"depcnt" : OFFSET_DRIVER32_DEPCNT,
+		"depvec" : OFFSET_DRIVER32_DEPVEC,
+		"dyncnt" : OFFSET_DRIVER32_DYNCNT,
+		"dynhdr" : OFFSET_DRIVER32_DYNHDR,
+		"dynsym_tab" : OFFSET_DRIVER32_DYNSYM_TAB,
+		"dynsym_cnt" : OFFSET_DRIVER32_DYNSYM_CNT,
+		"hashtab" : OFFSET_DRIVER32_HASHTAB,
+		"dynstr" : OFFSET_DRIVER32_DYNSTR,
+		"dynstr_end" : OFFSET_DRIVER32_DYNSTR_END,
+		"shoff" : OFFSET_DRIVER32_SHOFF,
+		"shstrndx" : OFFSET_DRIVER32_SHSTRNDX,
+		"shnum" : OFFSET_DRIVER32_SHNUM,
+		"shdr" : OFFSET_DRIVER32_SHDR,
+		"sections_lock" : OFFSET_DRIVER32_SECTIONS_LOCK,
+		"sections" : OFFSET_DRIVER32_SECTIONS,
+		"deadsect" : OFFSET_DRIVER32_DEADSECT,
+		"dangsect" : OFFSET_DRIVER32_DANGSECT,
+		"shstrtab" : OFFSET_DRIVER32_SHSTRTAB,
+		"shstrtab_end" : OFFSET_DRIVER32_SHSTRTAB_END,
+		"phnum" : OFFSET_DRIVER32_PHNUM,
+		"phdr" : OFFSET_DRIVER32_PHDR,
+	},
+	"x86_64" : {
+		"refcnt" : OFFSET_DRIVER64_REFCNT,
+		"weakrefcnt" : OFFSET_DRIVER64_WEAKREFCNT,
+		"name" : OFFSET_DRIVER64_NAME,
+		"filename" : OFFSET_DRIVER64_FILENAME,
+		"file" : OFFSET_DRIVER64_FILE,
+		"cmdline" : OFFSET_DRIVER64_CMDLINE,
+		"argc" : OFFSET_DRIVER64_ARGC,
+		"argv" : OFFSET_DRIVER64_ARGV,
+		"flags" : OFFSET_DRIVER64_FLAGS,
+		"initthread" : OFFSET_DRIVER64_INITTHREAD,
+		"loadaddr" : OFFSET_DRIVER64_LOADADDR,
+		"loadstart" : OFFSET_DRIVER64_LOADSTART,
+		"loadend" : OFFSET_DRIVER64_LOADEND,
+		"eh_frame_start" : OFFSET_DRIVER64_EH_FRAME_START,
+		"eh_frame_end" : OFFSET_DRIVER64_EH_FRAME_END,
+		"eh_frame_cache" : OFFSET_DRIVER64_EH_FRAME_CACHE,
+		"eh_frame_cache_lock" : OFFSET_DRIVER64_EH_FRAME_CACHE_LOCK,
+		"eh_frame_cache_semi0" : OFFSET_DRIVER64_EH_FRAME_CACHE_SEMI0,
+		"eh_frame_cache_leve0" : OFFSET_DRIVER64_EH_FRAME_CACHE_LEVE0,
+		"depcnt" : OFFSET_DRIVER64_DEPCNT,
+		"depvec" : OFFSET_DRIVER64_DEPVEC,
+		"dyncnt" : OFFSET_DRIVER64_DYNCNT,
+		"dynhdr" : OFFSET_DRIVER64_DYNHDR,
+		"dynsym_tab" : OFFSET_DRIVER64_DYNSYM_TAB,
+		"dynsym_cnt" : OFFSET_DRIVER64_DYNSYM_CNT,
+		"hashtab" : OFFSET_DRIVER64_HASHTAB,
+		"dynstr" : OFFSET_DRIVER64_DYNSTR,
+		"dynstr_end" : OFFSET_DRIVER64_DYNSTR_END,
+		"shoff" : OFFSET_DRIVER64_SHOFF,
+		"shstrndx" : OFFSET_DRIVER64_SHSTRNDX,
+		"shnum" : OFFSET_DRIVER64_SHNUM,
+		"shdr" : OFFSET_DRIVER64_SHDR,
+		"sections_lock" : OFFSET_DRIVER64_SECTIONS_LOCK,
+		"sections" : OFFSET_DRIVER64_SECTIONS,
+		"deadsect" : OFFSET_DRIVER64_DEADSECT,
+		"dangsect" : OFFSET_DRIVER64_DANGSECT,
+		"shstrtab" : OFFSET_DRIVER64_SHSTRTAB,
+		"shstrtab_end" : OFFSET_DRIVER64_SHSTRTAB_END,
+		"phnum" : OFFSET_DRIVER64_PHNUM,
+		"phdr" : OFFSET_DRIVER64_PHDR,
+	},
+};
+
+
+#define OFFSET_DRIVER_STATE OFFSET_DRIVER_STATE_[TARGET_ARCH]
+global final OFFSET_DRIVER_STATE_: {string: {string: int}} = {
+	"i386" : {
+		"refcnt" : OFFSET_DRIVER_STATE32_REFCNT,
+		"count" : OFFSET_DRIVER_STATE32_COUNT,
+		"drivers" : OFFSET_DRIVER_STATE32_DRIVERS,
+	},
+	"x86_64" : {
+		"refcnt" : OFFSET_DRIVER_STATE64_REFCNT,
+		"count" : OFFSET_DRIVER_STATE64_COUNT,
+		"drivers" : OFFSET_DRIVER_STATE64_DRIVERS,
+	},
+};
+
+#define SIZEOF_PHDR SIZEOF_PHDR_[TARGET_ARCH]
+#define OFFSET_PHDR OFFSET_PHDR_[TARGET_ARCH]
+global final SIZEOF_PHDR_: {string: int} = {
+	"i386" : __SIZEOF_ELF32_PHDR,
+	"x86_64" : __SIZEOF_ELF64_PHDR,
+};
+global final OFFSET_PHDR_: {string: {string: int}} = {
+	"i386" : {
+		"type" : __OFFSET_ELF32_PHDR_TYPE,
+		"offset" : __OFFSET_ELF32_PHDR_OFFSET,
+		"vaddr" : __OFFSET_ELF32_PHDR_VADDR,
+		"paddr" : __OFFSET_ELF32_PHDR_PADDR,
+		"filesz" : __OFFSET_ELF32_PHDR_FILESZ,
+		"memsz" : __OFFSET_ELF32_PHDR_MEMSZ,
+		"flags" : __OFFSET_ELF32_PHDR_FLAGS,
+		"align" : __OFFSET_ELF32_PHDR_ALIGN,
+	},
+	"x86_64" : {
+		"type" : __OFFSET_ELF64_PHDR_TYPE,
+		"flags" : __OFFSET_ELF64_PHDR_FLAGS,
+		"offset" : __OFFSET_ELF64_PHDR_OFFSET,
+		"vaddr" : __OFFSET_ELF64_PHDR_VADDR,
+		"paddr" : __OFFSET_ELF64_PHDR_PADDR,
+		"filesz" : __OFFSET_ELF64_PHDR_FILESZ,
+		"memsz" : __OFFSET_ELF64_PHDR_MEMSZ,
+		"align" : __OFFSET_ELF64_PHDR_ALIGN,
+	},
+};
+
+
+@@Read a NUL-terminated C-string starting at @addr
+function vmReadMemoryString(addr: int): Bytes {
+	local result = vmReadMemoryAt(addr);
+	local i = result.find(0);
+	if (i >= 0)
+		return result[:i];
+	for (;;) {
+		local temp = vmReadMemoryAt(addr + #result);
+		i = temp.find(0);
+		if (i >= 0)
+			return result + temp[:i];
+		result += temp;
+	}
+}
+
+
+global _lastVmReadAddr: int;
+global _lastVmReadData: Bytes;
+
+function vmClearReadCache() {
+	_lastVmReadAddr = none;
+	_lastVmReadData = none;
+}
+
+@@Read a VM memory word through use of a cache
+function vmReadCachedMemoryWord(addr: int, nBytes: int): int {
+	if (_lastVmReadAddr !is none) {
+		if (addr < _lastVmReadAddr)
+			goto doRead;
+		if (addr + nBytes > _lastVmReadAddr + #_lastVmReadData)
+			goto doRead;
+		return extractWordLeFromBytes(_lastVmReadData, addr - _lastVmReadAddr, nBytes);
+	}
+doRead:
+	_lastVmReadAddr = addr;
+	_lastVmReadData = vmReadMemoryAt(addr);
+	return extractWordLeFromBytes(_lastVmReadData, 0, nBytes);
+}
+
+
+
+@@Enumerate the addresses of the `struct driver` of loaded drivers
+function enumerateDriverAddresses(): {int...} {
+	local data = vmReadMemoryAt(KERNEL_ADDROF["_vboxgdb_kos_driver_state"][0]);
+	/* dataAddr = atomic_ref<struct driver_state>::m_pointer */
+	local dataAddr = extractWordLeFromBytes(data, 0, SIZEOF_POINTER);
+	data = vmReadMemoryAt(dataAddr);
+	local count, scale, offset;
+	if (TARGET_ARCH == "x86_64") {
+		count  = extractWordLeFromBytes(data, 8, 8);
+		offset = dataAddr + 16; /* offsetof(struct driver_state, ds_drivers) */
+		scale  = 8;  /* sizeof(REF struct driver *) */
+	} else {
+		count  = extractWordLeFromBytes(data, 4, 4);
+		offset = dataAddr + 8; /* offsetof(struct driver_state, ds_drivers) */
+		scale  = 4; /* sizeof(REF struct driver *) */
+	}
+	for (local i: [:count]) {
+		local addr = offset + i * scale;
+		if ((addr + scale) >= (dataAddr + #data)) {
+			dataAddr = addr;
+			data = vmReadMemoryAt(dataAddr);
+		}
+		yield extractWordLeFromBytes(data, addr - dataAddr, scale);
+	}
+}
+
+
+#define FIELD(name)  structDriverAddr + OFFSET_DRIVER[name]
+function structDriverGetFilename(structDriverAddr: int): string {
+	local nameAddr = vmReadCachedMemoryWord(FIELD("filename"), SIZEOF_POINTER);
+	if (nameAddr == 0)
+		nameAddr = vmReadCachedMemoryWord(FIELD("name"), SIZEOF_POINTER);
+	return vmReadMemoryString(nameAddr);
+}
+
+function structDriverGdbSegmentAddress(structDriverAddr: int): int {
+	/* One would expect that GDB wants `d_loadaddr', but that is incorrect.
+	 * One might also thing that GDB wants `d_loadstart', and that is ~mostly~ correct.
+	 * But what GDB actually wants is the absolute address of the first segment, meaning
+	 * we need to adjust the driver load address for the sub-page offset of the segment
+	 * with the lowest vaddr offset. */
+	local d_loadstart = vmReadCachedMemoryWord(FIELD("loadstart"), SIZEOF_POINTER);
+	local d_phnum     = vmReadCachedMemoryWord(FIELD("phnum"), 2);
+	local d_phdr      = FIELD("phdr");
+	local alignment_offset      = 0;
+	local lowest_segment_offset = 0xffffffffffffffff;
+	for (local j: [:d_phnum]) {
+		local phdr = d_phdr + j * SIZEOF_PHDR;
+		local p_type = vmReadCachedMemoryWord(phdr + OFFSET_PHDR["type"], 4);
+		if (p_type != PT_LOAD)
+			continue;
+		local p_vaddr = vmReadCachedMemoryWord(phdr + OFFSET_PHDR["vaddr"], SIZEOF_POINTER);
+		if (p_vaddr >= lowest_segment_offset)
+			continue;
+		lowest_segment_offset = p_vaddr;
+		local p_offset = vmReadCachedMemoryWord(phdr + OFFSET_PHDR["offset"], SIZEOF_POINTER);
+		alignment_offset = p_offset & PAGEMASK;
+	}
+	return d_loadstart + alignment_offset;
+}
+#undef FIELD
+
+
+function printLibraryList(): string {
+	vmClearReadCache();
+	File.Writer fp;
+	fp << "<?xml version=\"1.0\"?>"
+		"<!DOCTYPE target SYSTEM \"library-list.dtd\">"
+		"<library-list>"
+			"<library name=\"/os/kernel.bin\">"
+				"<segment address=\"" << (
+					TARGET_ARCH == "x86_64"
+						? "0xffffffff80100000"
+						: "0xc0100000"
+				) << "\"/>"
+			"</library>";
+	/* Enumerate drivers. */
+	for (local structDriverAddr: enumerateDriverAddresses()) {
+		local filename  = structDriverGetFilename(structDriverAddr);
+		local loadstart = structDriverGdbSegmentAddress(structDriverAddr);
+		fp << "<library name=" << repr(filename.decode("utf-8")) << ">"
+			"<segment address=\"" << loadstart.hex() << "\"/>"
+		"</library>";
+	}
+	fp << "</library-list>";
+	return fp.string;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

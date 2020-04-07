@@ -21,8 +21,129 @@
 import * from deemon;
 import * from ._vboxgdb;
 
+
+function dg(argv: {string...}) {
+	File.Writer fp;
+	assert #argv == 1;
+	local lines = vBoxTelnetExecNoError(argv[0]).splitlines();
+	for (local line: lines) {
+		line = line.strip().replace("\t", " ");
+		if (!line)
+			continue;
+		local id, typ, base, limit, dpl, p, ab, g, avl, lr;
+		id = typ = base = limit = dpl = p = ab = g = avl = lr = "";
+		try {
+			/* 0008 CodeER Bas=00000000 Lim=fffff000 DPL=0 P  A  G BIG AVL=0 L=0 */
+			id, typ, base, limit, dpl, p, ab, g, none, avl, lr =
+				line.scanf("%[^ ] %[^ ] %[^ ] %[^ ] %[^ ] %[^ ] %[^ ] %[^ ] %[^ ] %[^ ] %[^]")...;
+		} catch (...) {
+			try {
+				/* 0038 LDT    Bas=c0ca30f8 Lim=00000007 DPL=3 P  B        AVL=0 R=0 */
+				id, typ, base, limit, dpl, p, ab, avl, lr =
+					line.scanf("%[^ ] %[^ ] %[^ ] %[^ ] %[^ ] %[^ ] %[^ ] %[^ ] %[^]")...;
+			} catch (...) {
+				try {
+					/* 0000 Ill-0  00 00 00 00 00 00 00 00   DPL=0 NP */
+					id, typ, none, dpl, p =
+						line.scanf("%[^ ] %[^ ] %[^D] %[^ ] %[^]")...;
+				} catch (...) {
+					try {
+						/* 0058 VERR_INVALID_SELECTOR */
+						id, typ = line.scanf("%[^ ] %[^]")...;
+					} catch (...) {
+						id = typ = base = limit = dpl =
+						p = ab = g = avl = lr = "?";
+					}
+				}
+			}
+		}
+		id = id.strip().lower();
+		typ = typ.strip().lower();
+		base = base.strip().lower();
+		limit = limit.strip().lower();
+		dpl = dpl.strip().lower();
+		p = p.strip().lower();
+		ab = ab.strip().lower();
+		g = g.strip().lower();
+		avl = avl.strip().lower();
+		lr = lr.strip().lower();
+		if (base.startswith("bas"))
+			base = base[3:].lstrip().lstrip("=").lstrip();
+		if (limit.startswith("lim"))
+			limit = limit[3:].lstrip().lstrip("=").lstrip();
+		if (dpl.startswith("dpl"))
+			dpl = dpl[3:].lstrip().lstrip("=").lstrip();
+		if (avl.startswith("avl"))
+			avl = avl[3:].lstrip().lstrip("=").lstrip();
+		if (p == "p")
+			p = "1";
+		else if (p == "np") {
+			p = "0";
+		}
+		if (ab == "a")
+			ab = "a=1";
+		else if (ab == "na")
+			ab = "a=0";
+		else if (ab == "b")
+			ab = "b=1";
+		else if (ab == "nb") {
+			ab = "b=0";
+		}
+		if (base.startswith("0x"))
+			base = base[2:];
+		if (limit.startswith("0x"))
+			limit = limit[2:];
+		if (base) {
+			try {
+				base = int(base, 16).hex();
+			} catch (...) {
+			}
+		}
+		if (limit) {
+			try {
+				local i = int(limit, 16);
+				if (i > 0xfffff)
+					i |= 0xfff;
+				limit = i.hex();
+			} catch (...) {
+			}
+		}
+		fp << "<item>"
+			"<column name=\"id\">" << id << "</column>"
+			"<column name=\"type\">" << typ << "</column>"
+			"<column name=\"base\">" << base << "</column>"
+			"<column name=\"limit\">" << limit << "</column>"
+			"<column name=\"dpl\">" << dpl << "</column>"
+			"<column name=\"p\">" << p << "</column>"
+			"<column name=\"ab\">" << ab << "</column>"
+			"<column name=\"g\">" << g << "</column>"
+			"<column name=\"avl\">" << avl << "</column>"
+			"<column name=\"lr\">" << lr << "</column>"
+		"</item>";
+	}
+	return fp.string;
+}
+
+function di(argv: {string...}) {
+	File.Writer fp;
+	assert #argv == 1;
+	local lines = vBoxTelnetExecNoError(argv[0]).splitlines();
+	for (local line: lines) {
+		/* TODO: Decode properly */
+		/* 0000 Trap32 Sel:Off=0008:c0328541     DPL=0 P */
+		/* 0008 TaskG  TSS=0050                  DPL=0 P */
+		line = line.replace("<", "_").replace(">", "_");
+		fp << "<item>"
+			"<column name=\"line\">" << line << "</column>"
+		"</item>";
+	}
+	return fp.string;
+}
+
+
 global final OSDATAFILES: {string: string | Callable} = {
-	"keepstepping" : []{
+	"keepstepping" : [](argv: {string...}) {
+		assert #argv == 1;
 		gdbSocket.send("$l#6c");
 		for (;;) {
 			print "begin:vmResume()";
@@ -31,16 +152,21 @@ global final OSDATAFILES: {string: string | Callable} = {
 		}
 	},
 
-	"breakpoints" : []{
+	"bl" : [](argv: {string...}) {
+		assert #argv == 1;
 		File.Writer fp;
-		fp << "<osdata type=\"breakpoints\">";
 		for (local l: vBoxTelnetExecNoError("bl").splitlines()) {
-			fp << "<item><column name=\"line\">";
-			fp << l.replace("<", "_").replace(">", "_");
-			fp << "</column></item>";
+			fp	<< "<item><column name=\"line\">"
+				<< l.replace("<", "_").replace(">", "_")
+				<< "</column></item>";
 		}
-		fp << "</osdata>";
 		return fp.string;
 	},
+
+	"dg" : dg,
+	"dga" : dg,
+
+	"di" : di,
+	"dia" : di,
 };
 

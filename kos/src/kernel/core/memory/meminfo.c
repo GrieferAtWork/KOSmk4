@@ -284,7 +284,7 @@ INTDEF struct vm_node kernel_vm_node_pagedata;
 
 #if defined(__i386__) || defined(__x86_64__)
 INTDEF byte_t __kernel_start[];
-#endif
+#endif /* __i386__ || __x86_64__ */
 
 PRIVATE ATTR_FREETEXT PHYS pageptr_t KCALL
 minfo_allocate_part_pagedata(size_t num_bytes) {

@@ -263,7 +263,7 @@ NOTHROW(FCALL GDBInfo_PrintKernelDriverList)(pformatprinter printer, void *arg) 
 	for (i = 0; i < state->ds_count; ++i) {
 		struct driver *d = state->ds_drivers[i];
 		ElfW(Half) j;
-		size_t lowest_segment_offset;
+		ElfW(Addr) lowest_segment_offset;
 		size_t alignment_offset;
 		/* One would expect that GDB wants `d_loadaddr', but that is incorrect.
 		 * One might also thing that GDB wants `d_loadstart', and that is ~mostly~ correct.
@@ -271,15 +271,15 @@ NOTHROW(FCALL GDBInfo_PrintKernelDriverList)(pformatprinter printer, void *arg) 
 		 * we need to adjust the driver load address for the sub-page offset of the segment
 		 * with the lowest vaddr offset. */
 		alignment_offset      = 0;
-		lowest_segment_offset = (size_t)-1;
+		lowest_segment_offset = (ElfW(Addr))-1;
 		assert(d->d_phnum != 0);
 		for (j = 0; j < d->d_phnum; ++j) {
 			if (d->d_phdr[j].p_type != PT_LOAD)
 				continue;
-			if (d->d_phdr[j].p_offset >= lowest_segment_offset)
+			if (d->d_phdr[j].p_vaddr >= lowest_segment_offset)
 				continue;
-			lowest_segment_offset = d->d_phdr[j].p_offset;
-			alignment_offset      = lowest_segment_offset & PAGEMASK;
+			lowest_segment_offset = d->d_phdr[j].p_vaddr;
+			alignment_offset      = d->d_phdr[j].p_offset & PAGEMASK;
 		}
 		if (d->d_filename) {
 			PRINTF("<library name=\"%#q\">", d->d_filename);

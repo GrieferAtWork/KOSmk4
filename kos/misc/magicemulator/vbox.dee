@@ -124,14 +124,22 @@ function createNamePipeAndStartLogProcessingThread(
 		namedPipeName: string,
 		groups: {Group...},
 		config: Config,
-		connectedSemaphore: threading.Semaphore) {
+		connectedSemaphore: threading.Semaphore,
+		vboxcmd: List) {
 	local hNamedPipe = win32.CreateNamedPipe(
 		namedPipeName, win32.PIPE_ACCESS_INBOUND, win32.PIPE_TYPE_BYTE, 1);
-	Thread([](proc, hNamedPipe, groups, config, connectedSemaphore){
+	Thread([](proc, hNamedPipe, groups, config, connectedSemaphore, vboxcmd) {
 		function runCommand(command: Bytes) {
-			print "Embedded command:", repr command;
-			if (command == "vboxgdb:startup")
-				connectedSemaphore.post();
+			print "[vbox] Embedded command:", repr command;
+			if (command.startswith("vboxgdb:")) {
+				command = command[8:];
+				if (command == "startup") {
+					connectedSemaphore.post();
+				} else {
+					vboxcmd.append(command);
+				}
+				return;
+			}
 			/* TODO: More commands */
 			/* TODO: Integration with the emulator-independent log-command API */
 			/* TODO: Check if a given line starts with "00:00:02.450585 VMMDev: Guest Log:",
@@ -205,7 +213,7 @@ set_command_buffer:
 			proc.terminate();
 			ipc.Process.current.terminate(1);
 		}
-	}, (proc, hNamedPipe, groups, config, connectedSemaphore)).start();
+	}, (proc, hNamedPipe, groups, config, connectedSemaphore, vboxcmd)).start();
 }
 
 
@@ -264,7 +272,9 @@ function start(
 		fs.unlink(vmVboxConfigFilename + ".prev");
 	} catch (...) {
 	}
-	local vmVboxConfig = try File.open(vmVboxConfigFilename, "r+") catch (...) none;
+	local vmVboxConfig = try
+		File.open(vmVboxConfigFilename, "r+")
+	catch (...) none;
 	if (vmVboxConfig is none) {
 		/* Make sure that the VM doesn't already exist! */
 		local vmNameRepr = repr(vmName).encode("utf-8");
@@ -294,6 +304,7 @@ function start(
 		});
 		vmVboxConfig = File.open(vmVboxConfigFilename, "r+");
 	}
+	local vboxcmd: List = none;
 	local startVboxGDBGlue: Callable = none;
 	with (vmVboxConfig) {
 		File.Writer keepPrefix;
@@ -362,6 +373,7 @@ function start(
 		vmVboxConfig << "</StorageController>\n";
 		vmVboxConfig << "</StorageControllers>\n";
 		if (gdbMode !is none) {
+			vboxcmd = List();
 			startVboxGDBGlue = import("._vboxgdb").startVboxGDBGlue;
 			vmVboxConfig << "<ExtraData>\n";
 			vmVboxConfig << "	<ExtraDataItem name=\"VBoxInternal/DBGC/Enabled\" value=\"1\"/>\n";
@@ -391,7 +403,7 @@ function start(
 		connectedSemaphore = threading.Semaphore(0);
 	/* Use a named pipe to relay log output such that we can process it. */
 	createNamePipeAndStartLogProcessingThread(
-		proc, pipeName, groups, config, connectedSemaphore);
+		proc, pipeName, groups, config, connectedSemaphore, vboxcmd);
 	/* Wait for the processing thread to starting accepting connections.
 	 * Once this has happened, anyone can CreateFile() to open the pipe,
 	 * at which point we'll be receiving anything that gets written to
@@ -412,6 +424,7 @@ function start(
 				vmName: vmName,
 				virtualBoxProc: proc,
 				vbox: me,
+				vboxcmd: vboxcmd,
 				connectedSemaphore: connectedSemaphore);
 		} else {
 			magic.onEmulatorStarted();

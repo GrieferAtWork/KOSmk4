@@ -57,6 +57,11 @@ global final CONFIG_USE_NATIVE_STEP = false;
 @@Keep the VM running during memory reads
 global final CONFIG_KEEP_RUNNING_DURING_MEMORY_READ = false;
 
+/* Options GDB features that are supported */
+global CONFIG_GDBFEAT_VCONT: bool;
+global CONFIG_GDBFEAT_KOS: bool; /* KOS-specific features (driver listings, etc.) */
+
+
 /* The different types of break points */
 global final GDB_BREAKPOINT_TYPE_SWBREAK   = 0; /* int3 */
 global final GDB_BREAKPOINT_TYPE_HWBREAK   = 1; /* DRn-breakpoint */
@@ -87,13 +92,21 @@ global magic: Module;
 global vmName: string;
 global virtualBoxProc: ipc.Process;
 global vbox: Module;
+global vboxcmd: List;
 
-@@The address of @"_vboxgdb_trapctl"
-global KERNEL_ADDROF__vboxgdb_trapctl: int = none;
+@@Special kernel symbols needed by vboxgdb
+global final KERNEL_ADDROF_NEEDED: {string...} = {
+	"_vboxgdb_trapctl",
+	"_vboxgdb_steploop",
+};
 
-@@The address of @"_vboxgdb_steploop"
-global KERNEL_ADDROF__vboxgdb_steploop: int = none;
-global KERNEL_ADDROF__vboxgdb_steplooplen: int = none;
+@@Special kernel symbols needed by vboxgdb extensions for KOS
+global final KERNEL_ADDROF_NEEDED_KOSEXT: {string...} = {
+	"_vboxgdb_kos_driver_state",
+};
+
+@@Mapping of @(symbolName: (addr, size)) for special kernel symbols
+global final KERNEL_ADDROF: {string: (int, int)} = Dict();
 
 @@The socket through which we're connected to VirtualBox
 global vBoxTelnetSocket: net.socket;
@@ -276,98 +289,6 @@ function vmSetCurrentCpu(newCpu: int) {
 	vmCurrentCpu = newCpu;
 }
 
-@@Set of currently defined breakpoints
-@@Mapping is @(breakpointId: (typ, addr, len))
-global vmDefinedBreakpoints: {int: (int, int, int)} = Dict();
-
-@@Clear all defined breakpoints
-function vmClearAllBreakpoints() {
-	if (!vmDefinedBreakpoints)
-		return;
-	vBoxTelnetExecNoError("bc all");
-	vmDefinedBreakpoints.clear();
-}
-
-@@Search for a defined breakpoint and returns
-@@its ID, or @none if no such breakpoint exists
-function vmFindDefinedBreakpoint(typ: int, addr: int, len: int): int | none {
-	local packedData = (typ, addr, len);
-	for (local id, data: vmDefinedBreakpoints) {
-		if (data == packedData)
-			return id;
-	}
-	return none;
-}
-
-@@Add/Remove a breakpoint
-@@@param: typ: One of @(GDB_BREAKPOINT_TYPE_*)
-function vmControlBreakpoint(add: bool, typ: int, addr: int, len: int) {
-	local id;
-	local response;
-	if (typ == GDB_BREAKPOINT_TYPE_READ)
-		typ = GDB_BREAKPOINT_TYPE_READWRITE;
-	if (typ == GDB_BREAKPOINT_TYPE_SWBREAK)
-		len = 0;
-	else if (typ == GDB_BREAKPOINT_TYPE_HWBREAK) {
-		if (TARGET_ARCH != "x86_64")
-			len = 1;
-		else if (len != 1 && len != 8) {
-			throw Error("Invalid breakpoint exec-length: " + len);
-		}
-	} else {
-		if (len !in [1, 2, 4, 8])
-			throw Error("Invalid breakpoint data-length: " + len);
-	}
-	id  = vmFindDefinedBreakpoint(typ, addr, len);
-	if (id !is none) {
-		if (add)
-			return; /* Already defined. */
-		/* Delete this breakpoint */
-again_delete_breakpoint:
-		if (vBoxTelnetExecNoError("bc " + id) is none) {
-			local idHex = id.hex()[2:].lower();
-			for (local l: vBoxTelnetExecNoError("bl").splitlines()) {
-				l = l.strip();
-				if (!l)
-					continue;
-				l = l.lower();
-				if (l.startswith("0x"))
-					l = l[2:];
-				if (l.startswith(idHex))
-					goto again_delete_breakpoint;
-			}
-		}
-		del vmDefinedBreakpoints[id];
-		return;
-	} else {
-		if (!add)
-			return; /* Doesn't exist. */
-		if (typ == GDB_BREAKPOINT_TYPE_SWBREAK) {
-			response = vBoxTelnetExecNoError("bp " + addr.hex());
-		} else {
-			response = vBoxTelnetExecNoError("ba {} {} {}".format({
-				{
-					GDB_BREAKPOINT_TYPE_HWBREAK   : "e",
-					GDB_BREAKPOINT_TYPE_READWRITE : "r",
-					GDB_BREAKPOINT_TYPE_WRITE     : "w",
-				}[typ], len, addr.hex()
-			}));
-		}
-	}
-	response = response.strip().lower();
-	final local PREFIX = "breakpoint ";
-	response = response[response.index(PREFIX) + #PREFIX:].lstrip();
-	local idEnd = 0;
-	while (idEnd < #response && response.isnumeric(idEnd))
-		++idEnd;
-	if (!idEnd) {
-		throw Error("Invalid breakpoint id in response {!r}"
-			.format({ response }));
-	}
-	id = int(response[:idEnd]);
-	vmDefinedBreakpoints[id] = (typ, addr, len);
-}
-
 function vmReadMemoryAt(addr: int | string): Bytes {
 	/* NOTE: We use dd for reading memory (and not db), because
 	 *       dd returns the same about of bytes per line, but
@@ -454,7 +375,6 @@ function vmReadMemory(addr: int, count: int): Bytes {
 	return result[:count];
 }
 
-
 #define vmWriteMemoryB(addr, value) vmWriteMemoryWord(addr, "b", value)
 #define vmWriteMemoryW(addr, value) vmWriteMemoryWord(addr, "w", value)
 #define vmWriteMemoryL(addr, value) vmWriteMemoryWord(addr, "d", value)
@@ -505,6 +425,99 @@ function vmWriteMemory(addr: int, data: Bytes) {
 	}
 }
 
+@@Set of currently defined breakpoints
+@@Mapping is @(breakpointId: (typ, addr, len))
+global vmDefinedBreakpoints: {int: (int, int, int)} = Dict();
+
+@@Clear all defined breakpoints
+function vmClearAllBreakpoints() {
+	if (!vmDefinedBreakpoints)
+		return;
+	vBoxTelnetExecNoError("bc all");
+	vmDefinedBreakpoints.clear();
+}
+
+@@Search for a defined breakpoint and returns
+@@its ID, or @none if no such breakpoint exists
+function vmFindDefinedBreakpoint(typ: int, addr: int, len: int): int | none {
+	local packedData = (typ, addr, len);
+	for (local id, data: vmDefinedBreakpoints) {
+		if (data == packedData)
+			return id;
+	}
+	return none;
+}
+
+@@Add/Remove a breakpoint
+@@@param: typ: One of @(GDB_BREAKPOINT_TYPE_*)
+function vmControlBreakpoint(add: bool, typ: int, addr: int, len: int) {
+	local id;
+	local response;
+	if (typ == GDB_BREAKPOINT_TYPE_READ)
+		typ = GDB_BREAKPOINT_TYPE_READWRITE;
+	if (typ == GDB_BREAKPOINT_TYPE_SWBREAK)
+		len = 0;
+	else if (typ == GDB_BREAKPOINT_TYPE_HWBREAK) {
+		if (TARGET_ARCH != "x86_64")
+			len = 1;
+		else if (len != 1 && len != 8) {
+			throw Error("Invalid breakpoint exec-length: " + len);
+		}
+	} else {
+		if (len !in [1, 2, 4, 8])
+			throw Error("Invalid breakpoint data-length: " + len);
+	}
+	id  = vmFindDefinedBreakpoint(typ, addr, len);
+	if (id !is none) {
+		if (add)
+			return; /* Already defined. */
+		/* Delete this breakpoint */
+again_delete_breakpoint:
+		if (vBoxTelnetExecNoError("bc " + id) is none) {
+			local idHex = id.hex()[2:].lower();
+			for (local l: vBoxTelnetExecNoError("bl").splitlines()) {
+				l = l.strip();
+				if (!l)
+					continue;
+				l = l.lower();
+				if (l.startswith("0x"))
+					l = l[2:];
+				if (l.startswith(idHex))
+					goto again_delete_breakpoint;
+			}
+		}
+		del vmDefinedBreakpoints[id];
+		return;
+	} else {
+		if (!add)
+			return; /* Doesn't exist. */
+		if (typ == GDB_BREAKPOINT_TYPE_SWBREAK) {
+			response = vBoxTelnetExecNoError("bp " + addr.hex());
+			vmReadMemoryAt(addr);
+		} else {
+			response = vBoxTelnetExecNoError("ba {} {} {}".format({
+				{
+					GDB_BREAKPOINT_TYPE_HWBREAK   : "e",
+					GDB_BREAKPOINT_TYPE_READWRITE : "r",
+					GDB_BREAKPOINT_TYPE_WRITE     : "w",
+				}[typ], len, addr.hex()
+			}));
+		}
+	}
+	response = response.strip().lower();
+	final local PREFIX = "breakpoint ";
+	response = response[response.index(PREFIX) + #PREFIX:].lstrip();
+	local idEnd = 0;
+	while (idEnd < #response && response.isnumeric(idEnd))
+		++idEnd;
+	if (!idEnd) {
+		throw Error("Invalid breakpoint id in response {!r}"
+			.format({ response }));
+	}
+	id = int(response[:idEnd]);
+	vmDefinedBreakpoints[id] = (typ, addr, len);
+}
+
 @@Returns a lower-case hex-string without prefix
 function _vmGetRegisterAsHex(name: string): Bytes {
 	local resp = vBoxTelnetExecNoError("rg " + name, 1)
@@ -547,9 +560,9 @@ function vmGetStepLoopPaused(rip: int = none): bool {
 	if (_vmIsStepLoopPaused is none) {
 		if (rip is none)
 			rip = int(_vmGetRegisterAsHex("rip"), 16);
-		_vmIsStepLoopPaused = rip >= KERNEL_ADDROF__vboxgdb_steploop &&
-		                      rip <= KERNEL_ADDROF__vboxgdb_steploop +
-		                             KERNEL_ADDROF__vboxgdb_steplooplen;
+		local steploop = KERNEL_ADDROF["_vboxgdb_steploop"];
+		_vmIsStepLoopPaused = rip >= steploop[0] &&
+		                      rip <= steploop[0] + steploop[1];
 	}
 	return _vmIsStepLoopPaused;
 }
@@ -982,7 +995,7 @@ function vmResume(singleStep: bool = false) {
 	if (vmGetStepLoopPaused()) {
 		if (!singleStep) {
 do_resume_from_steploop:
-			vmWriteMemoryW(KERNEL_ADDROF__vboxgdb_trapctl.hex(),
+			vmWriteMemoryW(KERNEL_ADDROF["_vboxgdb_trapctl"][0].hex(),
 			               0x100 | VBOXGDB_TRAPCTL_NTRAP);
 			goto do_resume;
 		}
@@ -993,7 +1006,7 @@ do_resume_from_steploop:
 		if (!(rflags & 0x00000100))
 			vmSetRegister("rflags", rflags | 0x00000100); /* EFLAGS.TF = 1 */
 set_trapctl_and_wait_for_single_step:
-		vmWriteMemoryW(KERNEL_ADDROF__vboxgdb_trapctl.hex(),
+		vmWriteMemoryW(KERNEL_ADDROF["_vboxgdb_trapctl"][0].hex(),
 		               0x100 | VBOXGDB_TRAPCTL_SSTEP);
 		local usedDelay = 5000;
 		if (CONFIG_KEEP_RUNNING_DURING_MEMORY_READ) {
@@ -1002,7 +1015,7 @@ set_trapctl_and_wait_for_single_step:
 				/* Wait for the program to step */
 				Thread.yield();
 				Thread.sleep(usedDelay);
-				local trapctl = vmReadMemory(KERNEL_ADDROF__vboxgdb_trapctl, 1)[0];
+				local trapctl = vmReadMemory(KERNEL_ADDROF["_vboxgdb_trapctl"][0], 1)[0];
 				if (trapctl == VBOXGDB_TRAPCTL_TRIGG)
 					break;
 				/* Continue waiting */
@@ -1016,7 +1029,7 @@ set_trapctl_and_wait_for_single_step:
 				Thread.yield();
 				Thread.sleep(usedDelay);
 				_vmPause();
-				local trapctl = vmReadMemory(KERNEL_ADDROF__vboxgdb_trapctl, 1)[0];
+				local trapctl = vmReadMemory(KERNEL_ADDROF["_vboxgdb_trapctl"][0], 1)[0];
 				if (trapctl == VBOXGDB_TRAPCTL_TRIGG)
 					break;
 				/* Continue waiting */
@@ -1075,20 +1088,21 @@ set_trapctl_and_wait_for_single_step:
 		 *    Tel>$ ed (%rsp+N) <_vmNewRip>
 		 *    Tel>$ ed (%rsp+N) <_vmNewRflags>
 		 *          # Allow the kernel to leave the step-loop
-		 *    Tel>$ ew <KERNEL_ADDROF__vboxgdb_trapctl> <0x100 | VBOXGDB_TRAPCTL_NTRAP>
+		 *    Tel>$ ew <KERNEL_ADDROF["_vboxgdb_trapctl"][0]> <0x100 | VBOXGDB_TRAPCTL_NTRAP>
 		 *    _vmResume();
 		 * Once we're inside of the step-loop, we can simply store the
 		 * overwrite values `_vmNewRip' and `_vmNewRflags' into the iret
 		 * tail that leads back to where the int3 instruction was injected. */
 		local oldRip = vmGetRegister("rip");
 		local oldInstruction = vmReadMemoryAt(oldRip);
-		vmWriteMemoryW(KERNEL_ADDROF__vboxgdb_trapctl.hex(),
+		local trapCtl = KERNEL_ADDROF["_vboxgdb_trapctl"][0];
+		vmWriteMemoryW(trapCtl.hex(),
 		               0x100 | VBOXGDB_TRAPCTL_NTRAP);
 		vmWriteMemoryB(oldRip.hex(), 0xcc);
 		if (TARGET_ARCH == "x86_64") {
-			vmWriteMemoryQ((KERNEL_ADDROF__vboxgdb_trapctl + tc_teaddr64).hex(), oldRip + 1);
+			vmWriteMemoryQ((trapCtl + tc_teaddr64).hex(), oldRip + 1);
 		} else {
-			vmWriteMemoryL((KERNEL_ADDROF__vboxgdb_trapctl + tc_teaddr32).hex(), oldRip + 1);
+			vmWriteMemoryL((trapCtl + tc_teaddr32).hex(), oldRip + 1);
 		}
 		local usedDelay = 5000;
 		for (;;) {
@@ -1136,6 +1150,26 @@ do_resume:
 	_vmIsStepLoopPaused = none; /* Unknown */
 	vmIsRunning = true;
 }
+
+@@Wait for the VM to enter the step-loop and pause it
+@@Use @vmResume() to continue execution at the step-loop's return location
+function vmPauseAndWaitForStepLoop() {
+	local usedDelay = 5000;
+	for (;;) {
+		vmPause();
+		if (vmGetStepLoopPaused())
+			break;
+		vmResume();
+		Thread.yield();
+		Thread.sleep(usedDelay);
+		usedDelay += (usedDelay / 2);
+	}
+}
+
+
+
+
+
 
 
 
@@ -1275,13 +1309,30 @@ global final REGISTER_IDS32: {int: (int, string, string)} = {
 @@@return: false: Invalid @annex
 function GDBEvaluateQXferRead(name: string, annex: string): Bytes | none {
 	switch (name) {
+
 	case "exec-file":
 		if (annex)
 			return false;
 		return "/os/kernel.bin";
+
+	case "libraries":
+		if (!CONFIG_GDBFEAT_KOS)
+			break;
+		if (annex)
+			return false;
+		return import("._vboxgdbkos").printLibraryList();
+
 	case "osdata": {
 		local files = import("._vboxgdbinfo").OSDATAFILES;
-		if (!annex) {
+		annex = annex.replace("\t", " ").strip();
+		for (;;) {
+			local newAnnex = annex.replace("  ", " ");
+			if (newAnnex == annex)
+				break;
+			annex = newAnnex;
+		}
+		local argv = Tuple(annex.split(" "));
+		if (!argv) {
 			File.Writer result;
 			result << "<osdata type=\"types\">";
 			for (local name: files.keys) {
@@ -1295,12 +1346,17 @@ function GDBEvaluateQXferRead(name: string, annex: string): Bytes | none {
 			result << "</osdata>";
 			return result.string;
 		}
-		local res = files.get(annex);
+		local res = files.get(argv[0]);
 		if (res is none)
 			return false;
 		if (res !is string)
-			res = res();
-		return res;
+			res = res(argv);
+		else {
+			if (#argv != 1)
+				return false;
+		}
+		return "<osdata type=\"{}\">{}</osdata>"
+			.format({ annex, res });
 	}
 	default:
 		break;
@@ -1492,6 +1548,8 @@ do_vmStep:
 		switch (cmd[1:nameEnd]) {
 
 		case "Cont": {
+			if (!CONFIG_GDBFEAT_VCONT)
+				break;
 			if (cmd[nameEnd] == "?".ord())
 				return "vCont;c;C;s;S;r";
 			local shouldStep = false;
@@ -1517,12 +1575,13 @@ do_vmStep:
 			if (!shouldStep)
 				goto do_vmResume;
 			if (stepRangeStart !is none) {
+				local trapctl = KERNEL_ADDROF["_vboxgdb_trapctl"][0];
 				if (TARGET_ARCH == "x86_64") {
-					vmWriteMemoryQ((KERNEL_ADDROF__vboxgdb_trapctl + tc_rstpst64).hex(), stepRangeStart);
-					vmWriteMemoryQ((KERNEL_ADDROF__vboxgdb_trapctl + tc_rstpen64).hex(), stepRangeEnd);
+					vmWriteMemoryQ((trapctl + tc_rstpst64).hex(), stepRangeStart);
+					vmWriteMemoryQ((trapctl + tc_rstpen64).hex(), stepRangeEnd);
 				} else {
-					vmWriteMemoryL((KERNEL_ADDROF__vboxgdb_trapctl + tc_rstpst32).hex(), stepRangeStart);
-					vmWriteMemoryL((KERNEL_ADDROF__vboxgdb_trapctl + tc_rstpen32).hex(), stepRangeEnd);
+					vmWriteMemoryL((trapctl + tc_rstpst32).hex(), stepRangeStart);
+					vmWriteMemoryL((trapctl + tc_rstpen32).hex(), stepRangeEnd);
 				}
 			}
 			goto do_vmStep;
@@ -1533,7 +1592,6 @@ do_vmStep:
 		}
 		break;
 	}
-
 
 	case "q".ord(): {
 		local nameEnd = 1;
@@ -1588,8 +1646,9 @@ do_vmStep:
 					feat = feat[:-1];
 					if (feat == "swbreak")
 						CONFIG_GDB_REMOTE_SUPPORTS_SWBREAK = true;
-					else if (feat == "hwbreak")
+					else if (feat == "hwbreak") {
 						CONFIG_GDB_REMOTE_SUPPORTS_HWBREAK = true;
+					}
 				}
 			}
 			File.Writer result;
@@ -1600,6 +1659,8 @@ do_vmStep:
 				result << ";hwbreak+";
 			result << ";qXfer:exec-file:read+";
 			result << ";qXfer:osdata:read+";
+			if (CONFIG_GDBFEAT_KOS)
+				result << ";qXfer:libraries:read+";
 			/* TODO: QNoAckMode */
 			return result.string;
 		}
@@ -1628,6 +1689,33 @@ do_vmStep:
 	}
 unknown:
 	return "";
+}
+
+@@Handle an event originating from the kernel as @"%{vboxgdb:<command>}"
+@@@return: * :   Send this as a stop reply to GDB (value for @gdbStopReason)
+@@@return: none: Ignore and resume execution
+function GDBHandleVBoxCommand(command: Bytes): string {
+	local name = command, args = "";
+	if (":" in command)
+		name, none, args = command.partition(":")...;
+	switch (name) {
+
+	case "library": {
+		/* OS is notifying us that the library list has changed.
+		 * Wait for the OS to enter the step-loop. */
+		vmPauseAndWaitForStepLoop();
+		/* Notify GDB that the list of drivers may have changed. */
+		if (CONFIG_GDBFEAT_KOS)
+			return "T05library:;";
+		/* KOS features are disabled (ignore library-events) */
+		vmResume();
+		return none;
+	}
+
+	default:
+		throw Error("Unknown command {!r} in {!r}".
+			format({ name, command }));
+	}
 }
 
 @@Handle an event message send by the VirtualBox debugger
@@ -1691,6 +1779,26 @@ wait_for_command:
 			if (vmIsRunning) {
 				final local CHECK_TIMEOUT_MICROSECONDS = 50000;
 				for (;;) {
+					if (vboxcmd) {
+						local cmd = vboxcmd.popfront();
+						if (CONFIG_VERBOSE)
+							print "[vboxgdb<-kos] Request:", repr(cmd);
+						local reason;
+						try {
+							reason = GDBHandleVBoxCommand(cmd);
+						} catch (e...) {
+							print "[vboxgdb] Warning: Error while handling OS request:", repr(cmd);
+							print e;
+							print repr Traceback.current;
+							continue;
+						}
+						if (reason !is none) {
+							gdbStopReason = reason;
+							vmPause();
+							goto do_send_stop_reply;
+						}
+						continue;
+					}
 					c = gdbSocketGetc(CHECK_TIMEOUT_MICROSECONDS,
 					                  graceFulTimeout: true);
 					if (c !is none)
@@ -1849,6 +1957,7 @@ function startVboxGDBGlue(
 		vmName: string,
 		virtualBoxProc: ipc.Process,
 		vbox: Module,
+		vboxcmd: List,
 		connectedSemaphore: Object /* Semaphore from threading */) {
 	/* Save some of the arguments to global variables. */
 	global KERNEL = KERNEL;
@@ -1857,6 +1966,7 @@ function startVboxGDBGlue(
 	global magic = magic;
 	global vmName = vmName;
 	global vbox = vbox;
+	global vboxcmd = vboxcmd;
 	global virtualBoxProc = virtualBoxProc;
 
 	/* Load configurations from emulator options */
@@ -1871,6 +1981,10 @@ function startVboxGDBGlue(
 		opt.getInt(options, "vboxgdb.telnet.timeout", 100000);
 	global CONFIG_VBOXMANAGE_COMPLETE_TIMEOUT =
 		opt.getInt(options, "vboxgdb.vboxmanage.timeout", 2000000);
+	global CONFIG_GDBFEAT_VCONT =
+		opt.getBool(options, "vboxgdb.gdb.feat.vcont", true);
+	global CONFIG_GDBFEAT_KOS =
+		opt.getBool(options, "vboxgdb.gdb.feat.kos", true);
 
 	/* Figure out the addresses of some special vboxgdb control kernel symbols. */
 	if (CONFIG_VERBOSE)
@@ -1882,36 +1996,73 @@ function startVboxGDBGlue(
 		readelf.stdout = w;
 		readelf.start();
 		w.close();
+		local foundSymbols = 0;
+		local neededSymbols = #KERNEL_ADDROF_NEEDED;
+		if (CONFIG_GDBFEAT_KOS)
+			neededSymbols += #KERNEL_ADDROF_NEEDED_KOSEXT;
 		while (local d = getLines(r))
 		for (local l: d.splitlines()) {
 			/*    Num:    Value  Size Type    Bind   Vis      Ndx Name */
 			l = l.rstrip().replace("\t", " ");
-			if (l.endswith(" _vboxgdb_trapctl") ||
-			    l.endswith(" _vboxgdb_steploop")) {
-				local addr = l[l.index(":") + 1:].lstrip();
-				local addr, size = addr.scanf("%[0-9a-fA-FxX] %[0-9a-fA-FxX]")...;
+			local i = l.find(":");
+			if (i < 0)
+				continue;
+			local addr = l[i + 1:].lstrip();
+			local addr, size;
+			try {
+				addr, size = addr.scanf("%[0-9a-fA-FxX] %[0-9a-fA-FxX]")...;
 				addr = int(addr.lower().lstrip("0x"), 16);
 				size = int(size.lower().lstrip("0x"), 16);
-				if (l.endswith(" _vboxgdb_trapctl"))
-					KERNEL_ADDROF__vboxgdb_trapctl = addr;
-				else {
-					KERNEL_ADDROF__vboxgdb_steploop    = addr;
-					KERNEL_ADDROF__vboxgdb_steplooplen = size;
-				}
-				if (KERNEL_ADDROF__vboxgdb_trapctl !is none &&
-				    KERNEL_ADDROF__vboxgdb_steploop !is none)
-					break;
+			} catch (...) {
+				continue;
 			}
+			local nameStart = l.rfind(" ");
+			if (nameStart < 0)
+				continue;
+			local name = l[nameStart + 1:];
+			if (name !in KERNEL_ADDROF_NEEDED &&
+			    (name !in KERNEL_ADDROF_NEEDED_KOSEXT || !CONFIG_GDBFEAT_KOS))
+				continue; /* Not needed */
+			if (name in KERNEL_ADDROF)
+				continue; /* Already known. */
+			KERNEL_ADDROF[name] = (addr, size);
+			++foundSymbols;
+			if (foundSymbols >= neededSymbols)
+				break;
 		}
 		try {
 			readelf.terminate(1);
 			r.close();
 		} catch (...) {
 		}
-		if (KERNEL_ADDROF__vboxgdb_trapctl is none)
-			throw Error("Failed to determine address of symbol: _vboxgdb_trapctl");
-		if (KERNEL_ADDROF__vboxgdb_steploop is none)
-			throw Error("Failed to determine address of symbol: _vboxgdb_steploop");
+		if (foundSymbols < neededSymbols) {
+			local unknownSymbols = HashSet();
+			for (local n: KERNEL_ADDROF_NEEDED) {
+				if (n !in KERNEL_ADDROF)
+					unknownSymbols.insert(n);
+			}
+			if (CONFIG_GDBFEAT_KOS) {
+				for (local n: KERNEL_ADDROF_NEEDED_KOSEXT) {
+					if (n !in KERNEL_ADDROF)
+						unknownSymbols.insert(n);
+				}
+			}
+			assert unknownSymbols;
+			/* Try to remove symbols needed for KOS extensions... */
+			if (CONFIG_GDBFEAT_KOS) {
+				CONFIG_GDBFEAT_KOS = false;
+				for (local x: KERNEL_ADDROF_NEEDED_KOSEXT) {
+					print "[vboxgdb] KOS extensions symbol", x, "is missing ("
+						"start with --emulator-setopt=vboxgdb.gdb.feat.kos=false)";
+					unknownSymbols.remove(x);
+				}
+			}
+			if (unknownSymbols) {
+				unknownSymbols = unknownSymbols.sorted();
+				throw Error("Failed to determine address of symbols: " +
+					repr(unknownSymbols));
+			}
+		}
 	}
 
 	final local vboxTelnetAddr = "localhost:5000";
