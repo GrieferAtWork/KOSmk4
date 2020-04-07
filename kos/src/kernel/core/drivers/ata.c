@@ -1296,22 +1296,44 @@ do_compat_hdio_getgeo:
 		bus = self->d_bus;
 		AtaBus_LockPIO(bus);
 		TRY {
-			struct sig *signal;
 			task_connect(&bus->b_piointr);
-			outb(bus->b_busio + ATA_FEATURES, 1); /* ??? */
-			outb(bus->b_busio + ATA_COMMAND, ATA_COMMAND_IDENTIFY);
+			outb(bus->b_busio + ATA_DRIVE_SELECT,
+			     0xa0 + (self->d_drive - ATA_DRIVE_MASTER));
 			ATA_SELECT_DELAY(bus->b_ctrlio);
-			if ((signal = task_trywait()) == NULL) {
-				struct timespec timeout;
-				timeout = realtime();
-				timeout.tv_sec += 2;
-				signal = task_waitfor(&timeout);
-				if (!signal)
+			outb(bus->b_busio + ATA_ADDRESS1, 0);
+			outb(bus->b_busio + ATA_ADDRESS2, 0);
+			outb(bus->b_busio + ATA_ADDRESS3, 0);
+			outb(bus->b_busio + ATA_FEATURES, 1); /* ??? */
+			TRY {
+				outb(bus->b_busio + ATA_COMMAND, ATA_COMMAND_IDENTIFY);
+				if (!task_trywait()) {
+					struct sig *signal;
+					u8 status;
+					status = inb(bus->b_ctrlio);
+					if (status == 0) {
+						signal = task_disconnectall();
+						if unlikely(signal)
+							goto got_identify_signal;
+						/* While not actually a timeout, this should be treated just like a timeout! */
+						THROW(E_IOERROR_TIMEOUT, E_IOERROR_SUBSYSTEM_HARDDISK);
+					}
+					{
+						struct timespec timeout;
+						timeout = realtime();
+						timeout.tv_sec += 2;
+						signal = task_waitfor(&timeout);
+					}
+					if (!signal)
+						THROW(E_IOERROR_TIMEOUT, E_IOERROR_SUBSYSTEM_HARDDISK);
+				}
+got_identify_signal:
+				if (Ata_WaitForDrq(bus->b_ctrlio) != ERRR_OK)
 					THROW(E_IOERROR_TIMEOUT, E_IOERROR_SUBSYSTEM_HARDDISK);
+				insw(bus->b_busio + ATA_DATA, &specs, 256);
+			} EXCEPT {
+				outb(bus->b_busio + ATA_FEATURES, 0); /* ??? */
+				RETHROW();
 			}
-			if (Ata_WaitForDrq(bus->b_ctrlio) != ERRR_OK)
-				THROW(E_IOERROR_TIMEOUT, E_IOERROR_SUBSYSTEM_HARDDISK);
-			insw(bus->b_busio + ATA_DATA, &specs, 256);
 			outb(bus->b_busio + ATA_FEATURES, 0); /* ??? */
 		} EXCEPT {
 			AtaBus_UnlockPIO(self->d_bus);
@@ -1408,6 +1430,14 @@ NOTHROW(KCALL Ata_InitializeDrive)(struct ata_ports *__restrict ports,
 	       ports->a_bus, ports->a_ctrl,
 	       ports->a_dma, is_default_ide ? 1 : 0);
 	TRY {
+		/* Check for a floating bus. */
+		{
+			u8 initial_status;
+			initial_status = inb(ports->a_bus + ATA_STATUS);
+			if (initial_status == 0xff)
+				return false; /* Floating bus */
+		}
+
 
 		/* Do a soft reset on both ATA device control ports. */
 		Ata_ResetBus(ports->a_ctrl);
@@ -1453,21 +1483,42 @@ NOTHROW(KCALL Ata_InitializeDrive)(struct ata_ports *__restrict ports,
 			}
 			TRY {
 				/* Construct and initialize a new ATA drive for this bus. */
-				struct sig *signal;
 				struct ata_drive *drive;
 				ATOMIC_WRITE(bus->b_state, ATA_BUS_STATE_INPIO);
 				if (Ata_WaitForBusyTimeout(bus->b_ctrlio) != ERRR_OK)
 					return false;
 				task_connect(&bus->b_piointr);
-				outb(bus->b_busio + ATA_FEATURES, 1); /* ??? */
+				outb(bus->b_busio + ATA_DRIVE_SELECT,
+				     0xa0 + (drive_id - ATA_DRIVE_MASTER));
+				ATA_SELECT_DELAY(ports->a_ctrl);
+				outb(bus->b_busio + ATA_ADDRESS1, 0);
+				outb(bus->b_busio + ATA_ADDRESS2, 0);
+				outb(bus->b_busio + ATA_ADDRESS3, 0);
 				outb(bus->b_busio + ATA_COMMAND, ATA_COMMAND_IDENTIFY);
-				ATA_SELECT_DELAY(bus->b_ctrlio);
-				if ((signal = task_trywait()) == NULL) {
-					struct timespec timeout;
-					timeout = realtime();
-					timeout.tv_sec += 2;
-					signal = task_waitfor(&timeout);
+				if (!task_trywait()) {
+					struct sig *signal;
+					u8 status;
+					status = inb(bus->b_ctrlio);
+					if (status == 0) {
+						signal = task_disconnectall();
+						if unlikely(signal)
+							goto got_identify_signal;
+						/* Drive doesn't exist (graceful exit) */
+						printk(FREESTR(KERN_INFO "[ata] No drive connected [status:0]\n"));
+						goto reset_bus_and_fail;
+					}
+					if unlikely(status & (ATA_DCR_ERR | ATA_DCR_DF))
+						goto reset_bus_and_fail;
+					{
+						struct timespec timeout;
+						timeout = realtime();
+						timeout.tv_sec += 2;
+						signal = task_waitfor(&timeout);
+					}
 					if (!signal) {
+						printk(FREESTR(KERN_ERR "[ata] Timeout while waiting for ATA_COMMAND_IDENTIFY "
+						                        "[status={then:%#I8x,now:%#I8x}]\n"),
+						       status, inb(bus->b_ctrlio));
 reset_bus_and_fail:
 						if (busptr.hp_siz) {
 							assert(*pbus == (struct ata_bus *)busptr.hp_ptr);
@@ -1485,6 +1536,7 @@ reset_bus_and_fail:
 						return false;
 					}
 				}
+got_identify_signal:
 				if (Ata_WaitForDrq(bus->b_ctrlio) != ERRR_OK)
 					goto reset_bus_and_fail;
 				insw(bus->b_busio + ATA_DATA, &specs, 256);

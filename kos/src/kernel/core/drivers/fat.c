@@ -2650,7 +2650,7 @@ Fat_OpenSuperblock(FatSuperblock *__restrict self, UNCHECKED USER char *args)
 		RETHROW();
 	}
 	rwlock_cinit(&self->f_fat_lock);
-	printk(KERN_INFO "Load FAT%u-filesystem on %.2x:%.2x (%q) [oem=%q] [label=%q] [sysname=%q]\n",
+	printk(KERN_INFO "[fat] Load FAT%u-filesystem on %.2x:%.2x (%q) [oem=%q] [label=%q] [sysname=%q]\n",
 	       self->f_type == FAT12 ? 12 : self->f_type == FAT16 ? 16 : 32,
 	       MAJOR(block_device_devno(self->s_device)),
 	       MINOR(block_device_devno(self->s_device)),

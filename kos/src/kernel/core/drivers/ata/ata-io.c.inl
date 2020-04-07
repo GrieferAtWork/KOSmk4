@@ -177,7 +177,7 @@ FUNC2(
 			ata_check_suspended_and_load_future(bus);
 			goto service_without_dma; /* Request contains non-canonical memory. */
 		}
-		ATA_VERBOSE("Switch to `ATA_BUS_STATE_INDMA_SWITCH' to setup initial DMA\n");
+		ATA_VERBOSE("[ata] Switch to `ATA_BUS_STATE_INDMA_SWITCH' to setup initial DMA\n");
 		aio_handle_init(aio, &Ata_DmaHandleType);
 		data->hd_drive = (REF struct ata_drive *)incref(self);
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__

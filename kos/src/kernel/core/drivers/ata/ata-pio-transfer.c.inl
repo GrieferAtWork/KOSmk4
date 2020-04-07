@@ -143,7 +143,7 @@ LOCAL errr_t
 		for (;;) {
 			struct sig *signal;
 			u8 status; /* Set of `ATA_DCR_*' */
-			ATA_VERBOSE("Begin waiting on data transfer to become ready\n");
+			ATA_VERBOSE("[ata] Begin waiting on data transfer to become ready\n");
 			assert(num_sectors);
 			signal = task_trywait();
 			if (!signal) {
@@ -167,7 +167,7 @@ LOCAL errr_t
 #elif defined(DEFINE_IO_READ)
 #define DO_IO(port, buf, count) insw(port, buf, count)
 #elif defined(DEFINE_IO_WRITE)
-#define DO_IO(port, buf, count) \
+#define DO_IO(port, buf, count)               \
 			do {                              \
 				size_t _i, _cnt = (count);    \
 				u16 *_buf = (u16 *)(buf);     \

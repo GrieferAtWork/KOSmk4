@@ -45,8 +45,8 @@ __DECL_BEGIN
 
 
 /* PS/2 controller command codes. */
-#define PS2_CONTROLLER_RRAM(n)           (0x20+(n))
-#define PS2_CONTROLLER_WRAM(n)           (0x60+(n))
+#define PS2_CONTROLLER_RRAM(n)            (0x20 + (n))
+#define PS2_CONTROLLER_WRAM(n)            (0x60 + (n))
 #define PS2_CONTROLLER_TEST_PORT1         0xaa
 #define PS2_CONTROLLER_ENABLE_PORT1       0xae
 #define PS2_CONTROLLER_DISABLE_PORT1      0xad
