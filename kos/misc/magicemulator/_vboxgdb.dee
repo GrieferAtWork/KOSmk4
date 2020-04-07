@@ -1269,51 +1269,41 @@ global final REGISTER_IDS32: {int: (int, string, string)} = {
 //TODO:#define GDB_REGISTER_I386_GSBASE 0x31 /* %gs.base */
 };
 
-global final OSDATAFILES: {string: string | Callable} = {
-	"" :
-	"<osdata type=\"types\">"
-	"<item>"
-		"<column name=\"Type\">breakpoints</column>"
-		"<column name=\"Description\">Breakpoints</column>"
-		"<column name=\"Title\">Breakpoints</column>"
-	"</item>"
-	"</osdata>",
 
-	"keepstepping" : []{
-		gdbSocket.send("$l#6c");
-		for (;;) {
-			print "begin:vmResume()";
-			vmResume(singleStep: true);
-			print "end:vmResume():";
-		}
-	},
-
-	"breakpoints" : []{
-		File.Writer fp;
-		fp << "<osdata type=\"breakpoints\">";
-		for (local l: vBoxTelnetExecNoError("bl").splitlines()) {
-			fp << "<item><column name=\"line\">";
-			fp << l.replace("<", "_").replace(">", "_");
-			fp << "</column></item>";
-		}
-		fp << "</osdata>";
-		return fp.string;
-	},
-};
-
+@@@return: * :    Text to return
+@@@return: none:  Unknown @name
+@@@return: false: Invalid @annex
 function GDBEvaluateQXferRead(name: string, annex: string): Bytes | none {
-	if (name == "exec-file") {
+	switch (name) {
+	case "exec-file":
 		if (annex)
 			return false;
 		return "/os/kernel.bin";
-	}
-	if (name == "osdata") {
-		local res = OSDATAFILES.get(annex);
+	case "osdata": {
+		local files = import("._vboxgdbinfo").OSDATAFILES;
+		if (!annex) {
+			File.Writer result;
+			result << "<osdata type=\"types\">";
+			for (local name: files.keys) {
+				local titleName = name.title();
+				result << "<item>"
+					"<column name=\"Type\">" << name << "</column>"
+					"<column name=\"Description\">" << titleName << "</column>"
+					"<column name=\"Title\">" << titleName << "</column>"
+				"</item>";
+			}
+			result << "</osdata>";
+			return result.string;
+		}
+		local res = files.get(annex);
 		if (res is none)
 			return false;
 		if (res !is string)
 			res = res();
 		return res;
+	}
+	default:
+		break;
 	}
 	return none;
 }
