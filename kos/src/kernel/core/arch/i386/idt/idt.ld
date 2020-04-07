@@ -100,7 +100,7 @@
 TRAP(00) /* #DE -- Divide by zero */
 INTR(01) /* #DB -- Debug */
 INTR(02) /* NMI -- Non-maskable Interrupt */
-TRAP(03) /* #BP -- Breakpoint */
+INTR(03) /* #BP -- Breakpoint */
 TRAP(04) /* #OF -- Overflow */
 TRAP(05) /* #BR -- Bound Range */
 INTR(06) /* #UD -- Illegal Instruction */

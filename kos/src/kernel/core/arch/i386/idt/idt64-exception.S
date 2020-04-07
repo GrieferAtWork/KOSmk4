@@ -42,7 +42,9 @@ IDT_HANDLER_BEGIN
 	intr_enter INTR
 #if IDT_VECTOR_ID == 0x1
 INTERN_LABEL(_x86_idt_debugtrap_after_enter):
-#endif /* IDT_VECTOR_ID == 0x1 */
+#elif IDT_VECTOR_ID == 0x3
+INTERN_LABEL(_x86_idt_breakpoint_after_enter):
+#endif /* ... */
 	ASM_PUSH_ICPUSTATE_AFTER_IRET_CFI_R
 
 #if IDT_CONFIG_PUSHESERRORS(IDT_VECTOR_ID)

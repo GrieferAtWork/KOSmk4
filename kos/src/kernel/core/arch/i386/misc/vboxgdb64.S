@@ -32,10 +32,38 @@
 #define VBOXGDB_TRAPCTL_TRIGG 0x02 /* Trap was triggered */
 
 .section .bss.cold
+.align 8
 PUBLIC_OBJECT(_vboxgdb_trapctl)
-	.byte 0x00 /* vboxgdb trap control byte (one of VBOXGDB_TRAPCTL_*) */
-	.byte 0x00 /* Should-continue control byte */
+	.byte 0x00               /* vboxgdb trap control byte (one of VBOXGDB_TRAPCTL_*) */
+	.byte 0x00               /* Should-continue control byte */
+	.word 0x0000             /* tc_pad;    pad... */
+	.int  0x00000000         /* tc_pad2;   pad... */
+	.quad 0x0000000000000000 /* tc_teaddr; Address of the current trap-enter instruction + 1 */
 END(_vboxgdb_trapctl)
+
+
+.section .text.cold
+INTERN_FUNCTION(_vboxgdb_breakpoint) /* int3 */
+	.cfi_startproc simple
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rax
+	movq   (8 + OFFSET_IRREGS_RIP)(%rsp), %rax
+	cmpq   %rax, _vboxgdb_trapctl + 8 /* tc_teaddr */
+	popq_cfi_r %rax
+	je     .Lenter_steploop /* Enter the debugger step-loop */
+
+	/* Repeat the piece of code that was overwritten by the code injection */
+	testq  $(3), OFFSET_IRREGS_CS(%rsp)
+	EXTERN(_x86_idt_breakpoint_after_enter)
+	jz     _x86_idt_breakpoint_after_enter
+	swapgs
+	jmp    _x86_idt_breakpoint_after_enter
+
+	.cfi_endproc
+END(_vboxgdb_breakpoint)
+
+
 
 .section .text.cold
 INTERN_FUNCTION(_vboxgdb_debugtrap) /* int1 */
@@ -44,11 +72,11 @@ INTERN_FUNCTION(_vboxgdb_debugtrap) /* int1 */
 	.cfi_def_cfa %rsp, 0
 	cmpb   $(VBOXGDB_TRAPCTL_SSTEP), _vboxgdb_trapctl
 	je     _vboxgdb_debugtrap_chk_step
-.Ldont_step:
+PRIVATE_LABEL(.Lnormal_debugtrap):
 	.cfi_remember_state
 
 	/* Repeat the piece of code that was overwritten by the code injection */
-	testq  $(3), 8(%rsp) /* 8 == OFFSET_IRREGS64_CS */
+	testq  $(3), OFFSET_IRREGS_CS(%rsp)
 	EXTERN(_x86_idt_debugtrap_after_enter)
 	jz     _x86_idt_debugtrap_after_enter
 	swapgs
@@ -68,6 +96,7 @@ PRIVATE_FUNCTION(_vboxgdb_debugtrap_chk_step)
 	/* Clear the trap flag (will be re-enabled by vboxgdb if needed) */
 	andq   $(~EFLAGS_TF), OFFSET_IRREGS_RFLAGS(%rsp)
 
+PRIVATE_LABEL(.Lenter_steploop):
 	/* Indicate that a trap was triggered */
 	movw   $(0x0000 | VBOXGDB_TRAPCTL_TRIGG), _vboxgdb_trapctl
 
@@ -87,8 +116,7 @@ END(_vboxgdb_steploop)
 
 	.cfi_restore_state
 99:	popq_cfi_r %rax
-	PRIVATE(.Ldont_step)
-	jmp   .Ldont_step
+	jmp   .Lnormal_debugtrap
 END(_vboxgdb_debugtrap_chk_step)
 
 	.cfi_endproc

@@ -52,38 +52,41 @@ typedef NONNULL((1, 2)) unsigned int
 
 
 #ifdef __ASSEMBLER__
-#define EXCEPT_HANDLERS_START \
-	.global x86_asm_except_personality; \
+#define EXCEPT_HANDLERS_START                        \
+	.global x86_asm_except_personality;              \
 	.cfi_personality 0,  x86_asm_except_personality; \
-	.cfi_lsda 0,  1f; \
-	.pushsection .rodata.cold; \
-1:
+	.cfi_lsda 0,  991f;                              \
+	.pushsection .rodata.cold;                       \
+991:
 #ifdef __x86_64__
 #define EXCEPT_HANDLERS_CATCHALL(start, end, entry) \
-	.local entry; .quad entry; \
-	.local start; .quad start; \
-	.local end;   .quad end; \
+	.local entry; .quad entry;                      \
+	.local start; .quad start;                      \
+	.local end;   .quad end;                        \
 	.quad -1;
 #define EXCEPT_HANDLERS_CATCH(code, start, end, entry) \
-	.local entry; .quad entry; \
-	.local start; .quad start; \
-	.local end;   .quad end; \
+	.local entry; .quad entry;                         \
+	.local start; .quad start;                         \
+	.local end;   .quad end;                           \
 	.quad ERROR_CODEOF(code);
+#define EXCEPT_HANDLERS_END \
+	.quad 0;                \
+	.popsection;
 #else /* __x86_64__ */
 #define EXCEPT_HANDLERS_CATCHALL(start, end, entry) \
-	.local entry; .long entry; \
-	.local start; .long start; \
-	.local end;   .long end; \
+	.local entry; .long entry;                      \
+	.local start; .long start;                      \
+	.local end;   .long end;                        \
 	.long -1;
 #define EXCEPT_HANDLERS_CATCH(code, start, end, entry) \
-	.local entry; .long entry; \
-	.local start; .long start; \
-	.local end;   .long end; \
+	.local entry; .long entry;                         \
+	.local start; .long start;                         \
+	.local end;   .long end;                           \
 	.long ERROR_CODEOF(code);
-#endif /* !__x86_64__ */
 #define EXCEPT_HANDLERS_END \
-	.long 0; \
+	.long 0;                \
 	.popsection;
+#endif /* !__x86_64__ */
 #endif /* __ASSEMBLER__ */
 
 

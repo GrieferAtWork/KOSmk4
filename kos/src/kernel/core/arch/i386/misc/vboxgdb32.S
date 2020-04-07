@@ -25,6 +25,7 @@
 #ifndef CONFIG_NO_VBOXGDB
 #include <asm/cfi.h>
 #include <asm/cpu-flags.h>
+#include <kernel/except.h>
 #include <kos/kernel/cpu-state.h>
 
 #define VBOXGDB_TRAPCTL_NTRAP 0x00 /* Don't trap */
@@ -40,16 +41,46 @@ PUBLIC_OBJECT(_vboxgdb_trapctl)
 	.long 0x00000000 /* tc_teaddr; Address of the current trap-enter instruction + 1 */
 END(_vboxgdb_trapctl)
 
+
+
+.section .text.cold
+INTERN_FUNCTION(_vboxgdb_breakpoint) /* int3 */
+	.cfi_startproc simple
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi_r %eax
+	movl   %ss:(4 + OFFSET_IRREGS_EIP)(%esp), %eax
+	cmpl   %eax, %ss:_vboxgdb_trapctl + 4 /* tc_teaddr */
+	popl_cfi_r %eax
+	je     .Lenter_steploop /* Enter the debugger step-loop */
+
+	/* Repeat the piece of code that was overwritten by the code injection */
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	pushal_cfi_r
+
+	/* Jump into the original breakpoint handler. */
+	EXTERN(x86_idt_debugtrap)
+	jmp    x86_idt_debugtrap + 5
+
+	.cfi_endproc
+END(_vboxgdb_breakpoint)
+
+
+
 .section .text.cold
 INTERN_FUNCTION(_vboxgdb_debugtrap) /* int1 */
 	.cfi_startproc simple
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %esp, 0
-	cmpb   $(VBOXGDB_TRAPCTL_SSTEP), _vboxgdb_trapctl
+	cmpb   $(VBOXGDB_TRAPCTL_SSTEP), %ss:_vboxgdb_trapctl
 	je     _vboxgdb_debugtrap_chk_step
-.Ldont_step:
+PRIVATE_LABEL(.Lnormal_debugtrap):
 	.cfi_remember_state
-
 
 	/* Repeat the piece of code that was overwritten by the code injection */
 	pushl_cfi %ds
@@ -76,28 +107,28 @@ PRIVATE_FUNCTION(_vboxgdb_debugtrap_chk_step)
 	popl_cfi_r %eax
 
 	/* Clear the trap flag (will be re-enabled by vboxgdb if needed) */
-	andl   $(~EFLAGS_TF), OFFSET_IRREGS_EFLAGS(%esp)
+	andl   $(~EFLAGS_TF), %ss:OFFSET_IRREGS_EFLAGS(%esp)
 
+PRIVATE_LABEL(.Lenter_steploop):
 	/* Indicate that a trap was triggered */
-	movw   $(0x0000 | VBOXGDB_TRAPCTL_TRIGG), _vboxgdb_trapctl
+	movw   $(0x0000 | VBOXGDB_TRAPCTL_TRIGG), %ss:_vboxgdb_trapctl
 
 	/* This the vboxgdb single-step break loop.
 	 * In order to resume execution, vboxgdb will advance
 	 * our EIP to point after this loop whenever it wishes
 	 * to continue. (s.a. _vmIsStepLoopPaused) */
 PUBLIC_OBJECT(_vboxgdb_steploop)
-	cmpb   $(0), _vboxgdb_trapctl + 1
+	cmpb   $(0), %ss:_vboxgdb_trapctl + 1
 	je     _vboxgdb_steploop
 END(_vboxgdb_steploop)
 	nop /* DONT REMOVE THIS NOP! IT'S IMPORTANT TO vboxgdb! */
 
-	movb   $(0), _vboxgdb_trapctl + 1
+	movb   $(0), %ss:_vboxgdb_trapctl + 1
 	iret
 
 	.cfi_restore_state
 99:	popl_cfi_r %eax
-	PRIVATE(.Ldont_step)
-	jmp   .Ldont_step
+	jmp   .Lnormal_debugtrap
 END(_vboxgdb_debugtrap_chk_step)
 
 	.cfi_endproc

@@ -29,18 +29,26 @@
 DECL_BEGIN
 
 INTDEF byte_t x86_idt_debugtrap[];
+INTDEF byte_t x86_idt_breakpoint[];
 INTDEF byte_t _vboxgdb_debugtrap[];
+INTDEF byte_t _vboxgdb_breakpoint[];
 
 PRIVATE ATTR_SECTION(".rodata.free") char const
 _vboxgdb_startup_seq[] = "%{vboxgdb:startup}\n";
 
+PRIVATE ATTR_FREETEXT void
+NOTHROW(KCALL inject_jmp)(byte_t *from, byte_t *to) {
+	from[0]            = 0xe9; /* jmp32 */
+	*(s32 *)(from + 1) = (s32)((intptr_t)((uintptr_t)to) -
+	                           (intptr_t)((uintptr_t)from + 5));
+}
+
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL x86_initialize_vboxgdb)(void) {
 	__register uintptr_t pcx, pdx, psi;
-	/* Inject the int1 step handler. (s.a. vboxgdb:vmSingleStep) */
-	x86_idt_debugtrap[0]            = 0xe9; /* jmp32 */
-	*(s32 *)(x86_idt_debugtrap + 1) = (s32)((intptr_t)((uintptr_t)_vboxgdb_debugtrap) -
-	                                        (intptr_t)((uintptr_t)x86_idt_debugtrap + 5));
+	/* Inject the int1 and int3 handler. (s.a. vboxgdb:vmResume) */
+	inject_jmp(x86_idt_debugtrap, _vboxgdb_debugtrap);
+	inject_jmp(x86_idt_breakpoint, _vboxgdb_breakpoint);
 	COMPILER_WRITE_BARRIER();
 	/* Notify vboxgdb that the initial kernel init has completed
 	 * by sending a special control sequence through port:0x504
