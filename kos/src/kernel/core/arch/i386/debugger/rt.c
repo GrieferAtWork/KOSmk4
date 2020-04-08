@@ -118,7 +118,7 @@ DATDEF ATTR_PERTASK struct vm_datapart this_kernel_stackpart_ ASMNAME("this_kern
 INTDEF NOBLOCK void NOTHROW(KCALL init_this_x86_kernel_psp0)(struct task *__restrict self);
 
 /* Check if preemptive interrupts are enabled on the calling CPU */
-PRIVATE ATTR_DBGTEXT NOBLOCK WUNUSED ATTR_PURE bool
+PRIVATE NOBLOCK ATTR_DBGTEXT WUNUSED ATTR_PURE bool
 NOTHROW(KCALL are_preemptive_interrupts_enabled)(void) {
 	COMPILER_IMPURE();
 	/* TODO */
@@ -127,7 +127,7 @@ NOTHROW(KCALL are_preemptive_interrupts_enabled)(void) {
 
 
 #ifndef CONFIG_NO_SMP
-PRIVATE ATTR_DBGTEXT NOBLOCK NONNULL((1, 2)) struct icpustate *
+PRIVATE NOBLOCK ATTR_DBGTEXT NONNULL((1, 2)) struct icpustate *
 NOTHROW(FCALL debugger_wait_for_done)(struct icpustate *__restrict state,
                                       void *args[CPU_IPI_ARGCOUNT]) {
 	struct x86_dbg_cpuammend ammend;
@@ -241,7 +241,7 @@ NOTHROW(FCALL debugger_wait_for_done)(struct icpustate *__restrict state,
 #ifndef CONFIG_NO_SMP
 
 /* Return the number of CPUs that have ACKed having been suspended. */
-PRIVATE ATTR_DBGTEXT NOBLOCK cpuid_t
+PRIVATE NOBLOCK ATTR_DBGTEXT cpuid_t
 NOTHROW(KCALL x86_dbg_hostbackup_cpu_suspended_count)(void) {
 	cpuid_t i, result = 0;
 	for (i = 0; i < cpu_count; ++i) {
@@ -251,7 +251,7 @@ NOTHROW(KCALL x86_dbg_hostbackup_cpu_suspended_count)(void) {
 	return result;
 }
 
-PRIVATE ATTR_DBGTEXT NOBLOCK NONNULL((1, 2)) cpuid_t
+PRIVATE NOBLOCK ATTR_DBGTEXT NONNULL((1, 2)) cpuid_t
 NOTHROW(KCALL cpu_broadcastipi_notthis_early_boot_aware)(cpu_ipi_t func,
                                                          void *args[CPU_IPI_ARGCOUNT],
                                                          unsigned int flags,
@@ -679,7 +679,7 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_reset(void) {
 }
 
 #ifndef CONFIG_NO_SMP
-PRIVATE ATTR_DBGTEXT NOBLOCK NONNULL((1, 2)) struct icpustate *
+PRIVATE NOBLOCK ATTR_DBGTEXT NONNULL((1, 2)) struct icpustate *
 NOTHROW(FCALL debugger_wake_after_done)(struct icpustate *__restrict state,
                                         void *args[CPU_IPI_ARGCOUNT]) {
 	(void)args;

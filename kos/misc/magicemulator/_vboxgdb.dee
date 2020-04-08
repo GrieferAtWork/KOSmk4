@@ -193,14 +193,14 @@ global gdbSocketBuffer: Bytes = "".bytes();
 @@Receive a single byte from @gdbSocket
 function gdbSocketGetc(
 		timeout_microseconds: int = -1,
-		graceFulTimeout: bool = false): int {
+		gracefulTimeout: bool = false): int {
 	local result;
 	if (!gdbSocketBuffer) {
 		gdbSocketBuffer = gdbSocket.recv(-1, timeout_microseconds);
 		if (!gdbSocketBuffer) {
 			if (timeout_microseconds == -1)
 				throw Error("GDB Client gracefully disconnected");
-			if (graceFulTimeout)
+			if (gracefulTimeout)
 				return none;
 			throw Error("Timeout while receiving data from GDB");
 		}
@@ -1816,7 +1816,7 @@ wait_for_command:
 						continue;
 					}
 					c = gdbSocketGetc(CHECK_TIMEOUT_MICROSECONDS,
-					                  graceFulTimeout: true);
+					                  gracefulTimeout: true);
 					if (c !is none)
 						break;
 					c = vBoxTelnetGetResponse(CHECK_TIMEOUT_MICROSECONDS);
@@ -2141,7 +2141,7 @@ function startVboxGDBGlue(
 	 * to indicate that GDB is up and running! */
 	gdbServerSocket = net.socket("AF_INET", "SOCK_STREAM", "IPPROTO_TCP");
 	gdbServerSocket.bind("localhost:" + gdbPort);
-	gdbServerSocket.listen();
+	gdbServerSocket.listen(1);
 	Thread(GDBMain).start();
 
 	/* Inform magic that GDB is now accepting connection requests. */

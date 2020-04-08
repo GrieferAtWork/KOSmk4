@@ -36,26 +36,26 @@ DECL_BEGIN
 #ifdef __CC__
 
 /* I/O within the debugger. */
-FUNDEF void NOTHROW(KCALL dbg_bell)(void);
-FUNDEF void NOTHROW(KCALL dbg_putc)(/*utf-8*/ char ch);
-FUNDEF void NOTHROW(KCALL dbg_putuni)(/*utf-32*/ char32_t ch);
-FUNDEF void NOTHROW(KCALL dbg_fillscreen)(/*utf-32*/ char32_t ch); /* Fill the entire screen with `ch' */
-FUNDEF NONNULL((1)) size_t KCALL dbg_print(/*utf-8*/ char const *__restrict str);
+FUNDEF void NOTHROW(FCALL dbg_bell)(void);
+FUNDEF void NOTHROW(FCALL dbg_putc)(/*utf-8*/ char ch);
+FUNDEF void NOTHROW(FCALL dbg_putuni)(/*utf-32*/ char32_t ch);
+FUNDEF void NOTHROW(FCALL dbg_fillscreen)(/*utf-32*/ char32_t ch); /* Fill the entire screen with `ch' */
+FUNDEF NONNULL((1)) size_t FCALL dbg_print(/*utf-8*/ char const *__restrict str);
 FUNDEF NONNULL((1)) size_t VCALL dbg_printf(/*utf-8*/ char const *__restrict format, ...);
-FUNDEF NONNULL((1)) size_t KCALL dbg_vprintf(/*utf-8*/ char const *__restrict format, __builtin_va_list args);
+FUNDEF NONNULL((1)) size_t FCALL dbg_vprintf(/*utf-8*/ char const *__restrict format, __builtin_va_list args);
 FUNDEF NONNULL((2)) ssize_t KCALL dbg_printer(void *ignored, /*utf-8*/ char const *__restrict data, size_t datalen);
 
 /* Display a rectangle (frame) or box (filled) on-screen. */
-FUNDEF void NOTHROW(KCALL dbg_fillbox)(int x, int y, unsigned int size_x,
+FUNDEF void NOTHROW(FCALL dbg_fillbox)(int x, int y, unsigned int size_x,
                                        unsigned int size_y, /*utf-32*/ char32_t ch);
-FUNDEF void NOTHROW(KCALL dbg_fillrect)(int x, int y, unsigned int size_x,
+FUNDEF void NOTHROW(FCALL dbg_fillrect)(int x, int y, unsigned int size_x,
                                         unsigned int size_y, /*utf-32*/ char32_t ch);
-FUNDEF void NOTHROW(KCALL dbg_fillrect2)(int x, int y, unsigned int size_x, unsigned int size_y,
+FUNDEF void NOTHROW(FCALL dbg_fillrect2)(int x, int y, unsigned int size_x, unsigned int size_y,
                                          /*utf-32*/ char32_t tl, /*utf-32*/ char32_t t, /*utf-32*/ char32_t tr,
                                          /*utf-32*/ char32_t l,                         /*utf-32*/ char32_t r,
                                          /*utf-32*/ char32_t bl, /*utf-32*/ char32_t b, /*utf-32*/ char32_t br);
-FUNDEF void NOTHROW(KCALL dbg_hline)(int x, int y, unsigned int size_x, /*utf-32*/ char32_t ch);
-FUNDEF void NOTHROW(KCALL dbg_vline)(int x, int y, unsigned int size_y, /*utf-32*/ char32_t ch);
+FUNDEF void NOTHROW(FCALL dbg_hline)(int x, int y, unsigned int size_x, /*utf-32*/ char32_t ch);
+FUNDEF void NOTHROW(FCALL dbg_vline)(int x, int y, unsigned int size_y, /*utf-32*/ char32_t ch);
 
 /* Fill a rectangle with single-stroke or double-stroke outline */
 #define dbg_fillrect_singlestroke(x, y, size_x, size_y) \
@@ -67,18 +67,21 @@ FUNDEF void NOTHROW(KCALL dbg_vline)(int x, int y, unsigned int size_y, /*utf-32
 	              0x2554, 0x2550, 0x2557, 0x2551,       \
 	              0x2551, 0x255A, 0x2550, 0x255D)
 
-/* Print text to the given coords. */
-FUNDEF void NOTHROW(KCALL dbg_pputuni)(int x, int y, /*utf-32*/ char32_t ch);
-FUNDEF size_t KCALL dbg_pprint(int x, int y, /*utf-8*/ char const *__restrict str);
+/* Print text to the given coords. (invalid coords are clamped) */
+FUNDEF void NOTHROW(FCALL dbg_pputuni)(int x, int y, /*utf-32*/ char32_t ch);
+FUNDEF size_t FCALL dbg_pprint(int x, int y, /*utf-8*/ char const *__restrict str);
 FUNDEF size_t VCALL dbg_pprintf(int x, int y, /*utf-8*/ char const *__restrict format, ...);
-FUNDEF size_t KCALL dbg_vpprintf(int x, int y, /*utf-8*/ char const *__restrict format, __builtin_va_list args);
+FUNDEF size_t FCALL dbg_vpprintf(int x, int y, /*utf-8*/ char const *__restrict format, __builtin_va_list args);
 FUNDEF ssize_t KCALL dbg_pprinter(/*dbg_pprinter_arg_t*/ void *arg, /*utf-8*/ char const *__restrict data, size_t datalen);
+
 typedef struct {
 	int p_printx;  /* X-coord of the next character */
 	int p_printy;  /* Y-coord of the next character */
 	u8  p_utf8[8]; /* Pending UTF-8 characters */
 } dbg_pprinter_arg_t;
-#define DBG_PPRINTER_ARG_INIT(x, y) { x, y, { 0, 0, 0, 0, 0, 0, 0, 0  } }
+
+#define DBG_PPRINTER_ARG_INIT(x, y) \
+	{ x, y, { 0, 0, 0, 0, 0, 0, 0, 0  } }
 #define dbg_pprinter_arg_init(self, x, y) \
 	((self)->p_printx = (x),              \
 	 (self)->p_printy = (y),              \
@@ -87,33 +90,34 @@ typedef struct {
 
 
 
-/* Scroll the DBG output display to the given position.
+/* Get/set the scroll position the DBG output display.
  * Scroll positions increment upwards, meaning that `pos=0'
  * scrolls to the active display, while any other number will
  * display content that has been visible before then.
- * NOTE: When `pos' > `dbg_scroll_max(line|page)', it will
+ * NOTE: When `pos' > `dbg_scroll_maxline', it will
  *       be clamped to that value before being applied.
- * @param: cmd: The command to perform (One of `DBG_SCROLL_CMD_*')
  * @param: pos: The position to which to scroll.
  * @return: * : The position that has been set. */
-FUNDEF unsigned int NOTHROW(KCALL dbg_scroll)(unsigned int cmd, unsigned int pos);
-#define DBG_SCROLL_CMD_GET 0 /* Get scroll position. */
-#define DBG_SCROLL_CMD_SET 1 /* Set scroll position. */
-DATDEF unsigned int const dbg_scroll_maxline;  /* The max line to which scrolling it possible. */
+FUNDEF unsigned int NOTHROW(FCALL dbg_getscroll)(void);
+FUNDEF unsigned int NOTHROW(FCALL dbg_setscroll)(unsigned int pos);
+
+/* The max line to which scrolling it possible. */
+DATDEF unsigned int const dbg_scroll_maxline;
 
 /* Debug TTY dimensions. */
 DATDEF unsigned int const dbg_screen_width;    /* Debug TTY width (in characters) */
 DATDEF unsigned int const dbg_screen_height;   /* Debug TTY height (in characters) */
 DATDEF unsigned int const dbg_screen_cellsize; /* Debug TTY cell size (in bytes) */
 
-/* Alignment of TAB characters (default: `4') */
+/* Alignment of TAB characters (default: `DBG_TABSIZE_DEFAULT') */
 DATDEF unsigned int dbg_tabsize;
-#define DBG_TABSIZE_DEFAULT      4 /* Default TAB size */
+#define DBG_TABSIZE_DEFAULT 4 /* Default TAB size */
 
 /* Cursor X-position assign after a line-feed */
 DATDEF unsigned int dbg_indent;
 
-DATDEF unsigned int dbg_newline_mode; /* Debugger new-line mode */
+/* Debugger new-line mode (one of `DBG_NEWLINE_MODE_*') */
+DATDEF unsigned int dbg_newline_mode;
 #define DBG_NEWLINE_MODE_NORMAL  0 /* Normal new-line mode */
 #define DBG_NEWLINE_MODE_CLRFREE 1 /* Override all unused positions of the old line with space characters.
                                     * NOTE: This also affects `\r', which will erase unwritten spaces before
@@ -129,11 +133,11 @@ DATDEF unsigned int dbg_newline_mode; /* Debugger new-line mode */
  *       cell when written using `dbg_putc(' ')' as the current cursor position.
  * NOTE: Writing Out-of-bound cells is a no-op.
  * NOTE: These functions will read/write the SCROLL-TOP screen data, and
- *      `dbg_setscreendata()' will apply `dbg_scroll(DBG_SCROLL_CMD_SET,0)'
+ *      `dbg_setscreendata()' will apply `dbg_setscroll(0)'
  *       before actually copying cells.
  * @param: buf: A buffer capable of holding `size_x * size_y * dbg_screen_cellsize' bytes of data. */
-FUNDEF NONNULL((5)) void KCALL dbg_getscreendata(int x, int y, unsigned int size_x, unsigned int size_y, void *__restrict buf);
-FUNDEF NONNULL((5)) void KCALL dbg_setscreendata(int x, int y, unsigned int size_x, unsigned int size_y, void const *__restrict buf);
+FUNDEF NONNULL((5)) void FCALL dbg_getscreendata(int x, int y, unsigned int size_x, unsigned int size_y, void *__restrict buf);
+FUNDEF NONNULL((5)) void FCALL dbg_setscreendata(int x, int y, unsigned int size_x, unsigned int size_y, void const *__restrict buf);
 
 
 /* Get/Set if the current cursor position should be visible.
@@ -149,21 +153,25 @@ FUNDEF bool NOTHROW(FCALL dbg_setcur_visible)(bool visible);
 FUNDEF void NOTHROW(FCALL dbg_beginupdate)(void);
 FUNDEF void NOTHROW(FCALL dbg_endupdate)(bool force DFL(false));
 
-/* TTY show-screen support (display the contents of the monitor before the debugger was enabled) */
-FUNDEF void NOTHROW(KCALL dbg_beginshowscreen)(void);
-FUNDEF void NOTHROW(KCALL dbg_endshowscreen)(void);
+/* TTY show-screen support (display the contents of the monitor before the debugger was enabled)
+ * WARNING: `dbg_beginshowscreen()' also implies the behavior of `dbg_endupdate(true)'
+ * NOTE: This functionality of these functions is also available through the `screen' command */
+FUNDEF void NOTHROW(FCALL dbg_beginshowscreen)(void);
+FUNDEF void NOTHROW(FCALL dbg_endshowscreen)(void);
 
 
 
 /* Get/Set the current on-screen cursor position.
  * NOTE: Out-of-bounds coords are clamped to their valid ranges. */
-FUNDEF u32 NOTHROW(KCALL dbg_setcur)(int x, int y);
-FUNDEF WUNUSED ATTR_PURE u32 NOTHROW(KCALL dbg_getcur)(void);
+FUNDEF u32 NOTHROW(FCALL dbg_setcur)(int x, int y);
+FUNDEF WUNUSED ATTR_PURE u32 NOTHROW(FCALL dbg_getcur)(void);
 #define DBG_GETCUR_X(val) ((unsigned int)((val)&0xffff))
 #define DBG_GETCUR_Y(val) ((unsigned int)((val) >> 16))
 #define DBG_MAKECUR(x, y) ((u32)(x) | ((u32)(y) << 16))
-LOCAL WUNUSED ATTR_PURE unsigned int NOTHROW(KCALL dbg_getcur_x)(void) { return DBG_GETCUR_X(dbg_getcur()); }
-LOCAL WUNUSED ATTR_PURE unsigned int NOTHROW(KCALL dbg_getcur_y)(void) { return DBG_GETCUR_Y(dbg_getcur()); }
+LOCAL WUNUSED ATTR_PURE unsigned int NOTHROW(FCALL dbg_getcur_x)(void) { return DBG_GETCUR_X(dbg_getcur()); }
+LOCAL WUNUSED ATTR_PURE unsigned int NOTHROW(FCALL dbg_getcur_y)(void) { return DBG_GETCUR_Y(dbg_getcur()); }
+LOCAL u32 NOTHROW(FCALL dbg_setcur_x)(int x) { return dbg_setcur(x, dbg_getcur_y()); }
+LOCAL u32 NOTHROW(FCALL dbg_setcur_y)(int y) { return dbg_setcur(dbg_getcur_x(), y); }
 
 
 /* TTY color codes. */
@@ -247,9 +255,9 @@ LOCAL WUNUSED ATTR_PURE unsigned int NOTHROW(KCALL dbg_getcur_y)(void) { return 
 #define DF_BLUE(text)          DF_SETBLUE text DF_RESETATTR
 
 
-#define DBG_COLOR_ATTR(fg, bg) ((dbg_attr_t)(fg)<<8|(dbg_attr_t)(bg)<<12)
-#define DBG_COLOR_FG(attr)     ((u8)(((attr) >> 8)&0xf))
-#define DBG_COLOR_BG(attr)     ((u8)(((attr) >> 12)&0xf))
+#define DBG_COLOR_ATTR(fg, bg) ((dbg_attr_t)(fg) << 8 | (dbg_attr_t)(bg) << 12)
+#define DBG_COLOR_FG(attr)     ((u8)(((attr) >> 8) & 0xf))
+#define DBG_COLOR_BG(attr)     ((u8)(((attr) >> 12) & 0xf))
 typedef u16 dbg_attr_t;
 
 /* Get/Set TTY text attributes. */

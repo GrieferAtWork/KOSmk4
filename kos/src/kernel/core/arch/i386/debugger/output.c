@@ -75,15 +75,18 @@ DECL_BEGIN
 
 
 /* generic VGA port read/write */
-FORCELOCAL ATTR_DBGTEXT u8 KCALL vga_r(port_t port) {
+FORCELOCAL NOBLOCK ATTR_DBGTEXT u8 
+NOTHROW(KCALL vga_r)(port_t port) {
 	return inb_p(port);
 }
 
-FORCELOCAL ATTR_DBGTEXT void KCALL vga_w(port_t port, u8 val) {
+FORCELOCAL NOBLOCK ATTR_DBGTEXT void
+NOTHROW(KCALL vga_w)(port_t port, u8 val) {
 	outb_p(port, val);
 }
 
-FORCELOCAL ATTR_DBGTEXT void KCALL vga_w_fast(port_t port, u8 reg, u8 val) {
+FORCELOCAL NOBLOCK ATTR_DBGTEXT void
+NOTHROW(KCALL vga_w_fast)(port_t port, u8 reg, u8 val) {
 	outw(port, VGA_OUT16VAL(val, reg));
 }
 
@@ -98,42 +101,50 @@ FORCELOCAL ATTR_DBGTEXT void KCALL vga_w_fast(port_t port, u8 reg, u8 val) {
 #endif /* !VGA_OUTW_WRITE */
 
 /* VGA CRTC register read/write */
-LOCAL ATTR_DBGTEXT u8 KCALL vga_rcrt(u8 reg) {
+LOCAL NOBLOCK ATTR_DBGTEXT u8
+NOTHROW(KCALL vga_rcrt)(u8 reg) {
 	vga_w(VGA_CRT_IC, reg);
 	return vga_r(VGA_CRT_DC);
 }
 
-LOCAL ATTR_DBGTEXT void KCALL vga_wcrt(u8 reg, u8 val) {
+LOCAL NOBLOCK ATTR_DBGTEXT void
+NOTHROW(KCALL vga_wcrt)(u8 reg, u8 val) {
 	__VGA_OUTW_SELECTOR(vga_w, VGA_CRT_IC, VGA_CRT_DC, reg, val);
 }
 
 /* VGA sequencer register read/write */
-LOCAL ATTR_DBGTEXT u8 KCALL vga_rseq(u8 reg) {
+LOCAL NOBLOCK ATTR_DBGTEXT u8
+NOTHROW(KCALL vga_rseq)(u8 reg) {
 	vga_w(VGA_SEQ_I, reg);
 	return vga_r(VGA_SEQ_D);
 }
 
-LOCAL ATTR_DBGTEXT void KCALL vga_wseq(u8 reg, u8 val) {
+LOCAL NOBLOCK ATTR_DBGTEXT void
+NOTHROW(KCALL vga_wseq)(u8 reg, u8 val) {
 	__VGA_OUTW_SELECTOR(vga_w, VGA_SEQ_I, VGA_SEQ_D, reg, val);
 }
 
 /* VGA graphics controller register read/write */
-LOCAL ATTR_DBGTEXT u8 KCALL vga_rgfx(u8 reg) {
+LOCAL NOBLOCK ATTR_DBGTEXT u8
+NOTHROW(KCALL vga_rgfx)(u8 reg) {
 	vga_w(VGA_GFX_I, reg);
 	return vga_r(VGA_GFX_D);
 }
 
-LOCAL ATTR_DBGTEXT void KCALL vga_wgfx(u8 reg, u8 val) {
+LOCAL NOBLOCK ATTR_DBGTEXT void
+NOTHROW(KCALL vga_wgfx)(u8 reg, u8 val) {
 	__VGA_OUTW_SELECTOR(vga_w, VGA_GFX_I, VGA_GFX_D, reg, val);
 }
 
 /* VGA attribute controller register read/write */
-LOCAL ATTR_DBGTEXT u8 KCALL vga_rattr(u8 reg) {
+LOCAL NOBLOCK ATTR_DBGTEXT u8
+NOTHROW(KCALL vga_rattr)(u8 reg) {
 	vga_w(VGA_ATT_IW, reg);
 	return vga_r(VGA_ATT_R);
 }
 
-LOCAL ATTR_DBGTEXT void KCALL vga_wattr(u8 reg, u8 val) {
+LOCAL NOBLOCK ATTR_DBGTEXT void
+NOTHROW(KCALL vga_wattr)(u8 reg, u8 val) {
 	vga_w(VGA_ATT_IW, reg);
 	vga_w(VGA_ATT_W, val);
 }
@@ -145,7 +156,7 @@ LOCAL ATTR_DBGTEXT void KCALL vga_wattr(u8 reg, u8 val) {
 
 /* # of screens stored in the VGA backlog. */
 #ifndef VGA_BACKLOG_NUMSCREENS
-#define VGA_BACKLOG_NUMSCREENS   8
+#define VGA_BACKLOG_NUMSCREENS 8
 #endif /* !VGA_BACKLOG_NUMSCREENS */
 
 PUBLIC_CONST ATTR_DBGRODATA unsigned int const dbg_scroll_maxline  = VGA_BACKLOG_NUMSCREENS * VGA_HEIGHT;
@@ -153,11 +164,17 @@ PUBLIC_CONST ATTR_DBGRODATA unsigned int const dbg_screen_width    = VGA_WIDTH;
 PUBLIC_CONST ATTR_DBGRODATA unsigned int const dbg_screen_height   = VGA_HEIGHT;
 PUBLIC_CONST ATTR_DBGRODATA unsigned int const dbg_screen_cellsize = 2;
 
-PUBLIC ATTR_DBGDATA unsigned int dbg_tabsize      = 0;
-PUBLIC ATTR_DBGDATA unsigned int dbg_indent       = 0;
+/* Alignment of TAB characters (default: `DBG_TABSIZE_DEFAULT') */
+PUBLIC ATTR_DBGDATA unsigned int dbg_tabsize = 0;
+
+/* Cursor X-position assign after a line-feed */
+PUBLIC ATTR_DBGDATA unsigned int dbg_indent = 0;
+
+/* Debugger new-line mode (one of `DBG_NEWLINE_MODE_*') */
 PUBLIC ATTR_DBGDATA unsigned int dbg_newline_mode = 0;
-PUBLIC ATTR_DBGBSS u16 dbg_attr                   = 0; /* Color attributes. */
-PUBLIC ATTR_DBGBSS u16 dbg_default_attr           = 0; /* Color attributes. */
+
+PUBLIC ATTR_DBGBSS u16 dbg_attr         = 0; /* Color attributes. */
+PUBLIC ATTR_DBGBSS u16 dbg_default_attr = 0; /* Color attributes. */
 
 PRIVATE ATTR_DBGBSS u32  vga_vram_offset         = 0;     /* [const] Current VRAM offset */
 PRIVATE ATTR_DBGBSS u16 *vga_real_terminal_start = NULL;  /* [const] Real terminal display start */
@@ -202,7 +219,8 @@ PRIVATE ATTR_DBGBSS u16 vga_offscreen_buffer[VGA_WIDTH * VGA_HEIGHT] = { 0 };
 
 
 PRIVATE ATTR_DBGBSS bool vga_cursor_is_shown = false;
-LOCAL ATTR_DBGTEXT void NOTHROW(KCALL vga_enable_cursor)(void) {
+LOCAL ATTR_DBGTEXT void
+NOTHROW(FCALL vga_enable_cursor)(void) {
 	if (!vga_cursor_is_shown) {
 		if (vga_suppress_update == 0) {
 			vga_wcrt(VGA_CRTC_CURSOR_START,
@@ -213,7 +231,7 @@ LOCAL ATTR_DBGTEXT void NOTHROW(KCALL vga_enable_cursor)(void) {
 }
 
 LOCAL ATTR_DBGTEXT void
-NOTHROW(KCALL vga_disable_cursor)(void) {
+NOTHROW(FCALL vga_disable_cursor)(void) {
 	if (vga_cursor_is_shown) {
 		if (vga_suppress_update == 0) {
 			vga_wcrt(VGA_CRTC_CURSOR_START,
@@ -224,7 +242,7 @@ NOTHROW(KCALL vga_disable_cursor)(void) {
 }
 
 PRIVATE ATTR_DBGTEXT void
-NOTHROW(KCALL vga_update_cursor_pos)(void) {
+NOTHROW(FCALL vga_update_cursor_pos)(void) {
 	if (vga_terminal_cur >= vga_terminal_end) {
 		vga_disable_cursor();
 	} else {
@@ -246,7 +264,7 @@ PRIVATE ATTR_DBGBSS unsigned int vga_backlog_scrollpos = 0;
 
 
 PRIVATE ATTR_DBGTEXT void
-NOTHROW(KCALL vga_backlog_setscrollpos)(unsigned int pos) {
+NOTHROW(FCALL vga_backlog_setscrollpos)(unsigned int pos) {
 	size_t backlog_offset;
 	if (!pos) {
 		/* Scroll to the bottom. */
@@ -327,10 +345,13 @@ NOTHROW(KCALL vga_backlog_setscrollpos)(unsigned int pos) {
 
 
 PUBLIC unsigned int
-NOTHROW(KCALL dbg_scroll)(unsigned int cmd, unsigned int pos) {
+NOTHROW(FCALL dbg_getscroll)(void) {
+	return vga_backlog_scrollpos;
+}
+
+PUBLIC unsigned int
+NOTHROW(FCALL dbg_setscroll)(unsigned int pos) {
 	unsigned int maxpos;
-	if (cmd == DBG_SCROLL_CMD_GET)
-		return vga_backlog_scrollpos;
 	if (!pos) {
 set_pos_0:
 		if (vga_backlog_scrollpos) {
@@ -378,7 +399,7 @@ NOTHROW(FCALL dbg_setcur_visible)(bool visible) {
 }
 
 PRIVATE ATTR_DBGTEXT void
-NOTHROW(KCALL vga_enable_offscreen_buffer)(void) {
+NOTHROW(FCALL vga_enable_offscreen_buffer)(void) {
 	if (vga_backlog_scrollpos)
 		vga_backlog_setscrollpos(0);
 	memcpyw(vga_offscreen_buffer, vga_real_terminal_start, VGA_WIDTH * VGA_HEIGHT);
@@ -390,7 +411,7 @@ NOTHROW(KCALL vga_enable_offscreen_buffer)(void) {
 }
 
 PRIVATE ATTR_DBGTEXT void
-NOTHROW(KCALL vga_disable_offscreen_buffer)(void) {
+NOTHROW(FCALL vga_disable_offscreen_buffer)(void) {
 	if (vga_backlog_scrollpos)
 		vga_backlog_setscrollpos(0);
 	memcpyw(vga_real_terminal_start, vga_offscreen_buffer, VGA_WIDTH * VGA_HEIGHT);
@@ -409,13 +430,15 @@ NOTHROW(KCALL vga_disable_offscreen_buffer)(void) {
  * case of whole screen redraw operations.
  * NOTE: Also affects updates made to the cursor position
  * @param: force: When true, force updates to stop. */
-PUBLIC ATTR_DBGTEXT void NOTHROW(FCALL dbg_beginupdate)(void) {
+PUBLIC ATTR_DBGTEXT void
+NOTHROW(FCALL dbg_beginupdate)(void) {
 	++vga_suppress_update;
 	if (vga_suppress_update == 1)
 		vga_enable_offscreen_buffer();
 }
 
-PUBLIC ATTR_DBGTEXT void NOTHROW(FCALL dbg_endupdate)(bool force) {
+PUBLIC ATTR_DBGTEXT void
+NOTHROW(FCALL dbg_endupdate)(bool force) {
 	if (vga_suppress_update == 0)
 		return; /* Missing `dbg_beginupdate()' */
 	if (force) {
@@ -428,7 +451,8 @@ PUBLIC ATTR_DBGTEXT void NOTHROW(FCALL dbg_endupdate)(bool force) {
 	vga_disable_offscreen_buffer();
 }
 
-PUBLIC ATTR_DBGTEXT WUNUSED ATTR_PURE u32 NOTHROW(KCALL dbg_getcur)(void) {
+PUBLIC ATTR_DBGTEXT WUNUSED ATTR_PURE u32
+NOTHROW(FCALL dbg_getcur)(void) {
 	unsigned int pos;
 	pos = (unsigned int)(vga_terminal_cur -
 	                     vga_terminal_start);
@@ -436,7 +460,8 @@ PUBLIC ATTR_DBGTEXT WUNUSED ATTR_PURE u32 NOTHROW(KCALL dbg_getcur)(void) {
 	                   pos / VGA_WIDTH);
 }
 
-PUBLIC ATTR_DBGTEXT u32 NOTHROW(KCALL dbg_setcur)(int x, int y) {
+PUBLIC ATTR_DBGTEXT u32
+NOTHROW(FCALL dbg_setcur)(int x, int y) {
 	unsigned int pos;
 	if (x < 0)
 		x = 0;
@@ -461,7 +486,7 @@ PUBLIC ATTR_DBGTEXT u32 NOTHROW(KCALL dbg_setcur)(int x, int y) {
 
 
 LOCAL ATTR_DBGTEXT void
-NOTHROW(KCALL scroll_down_if_cur_end)(void) {
+NOTHROW(FCALL scroll_down_if_cur_end)(void) {
 	if (vga_terminal_cur >= vga_terminal_end) {
 		/* Scroll down */
 		if (!vga_suppress_update)
@@ -666,7 +691,7 @@ for (local i,x: util.enumerate(l)) {
  * used by VGA) If the character can't be encoded, return 0 instead.
  * s.a.: https://en.wikipedia.org/wiki/Code_page_437  */
 LOCAL ATTR_CONST u8
-NOTHROW(KCALL cp437_encode)(/*utf-32*/ u32 ch) {
+NOTHROW(FCALL cp437_encode)(/*utf-32*/ u32 ch) {
 	u8 result;
 	if (ch <= 0xff) {
 		result = cp437_from_latin1[ch];
@@ -789,7 +814,7 @@ NOTHROW(KCALL cp437_encode)(/*utf-32*/ u32 ch) {
 
 PRIVATE ATTR_DBGBSS bool vga_last_chr_caused_linewrap = false;
 LOCAL ATTR_DBGTEXT void
-NOTHROW(KCALL dbg_putcp437)(/*cp-437*/ u8 ch) {
+NOTHROW(FCALL dbg_putcp437)(/*cp-437*/ u8 ch) {
 	/* VGA terminal output */
 	scroll_down_if_cur_end();
 	/* When indent-mode is active, wraps to the next line */
@@ -807,7 +832,8 @@ NOTHROW(KCALL dbg_putcp437)(/*cp-437*/ u8 ch) {
 	}
 }
 
-PUBLIC ATTR_DBGTEXT void NOTHROW(KCALL dbg_bell)(void) {
+PUBLIC ATTR_DBGTEXT void
+NOTHROW(FCALL dbg_bell)(void) {
 	/* TODO */
 }
 
@@ -1036,8 +1062,8 @@ PRIVATE ATTR_DBGRODATA struct ansitty_operators const vga_tty_operators = {
 
 
 
-LOCAL ATTR_DBGTEXT NONNULL((1)) void
-NOTHROW(KCALL dbg_pprinter_putcp437)(dbg_pprinter_arg_t *__restrict printer, /*cp-437*/ u8 ch) {
+LOCAL NOBLOCK ATTR_DBGTEXT NONNULL((1)) void
+NOTHROW(FCALL dbg_pprinter_putcp437)(dbg_pprinter_arg_t *__restrict printer, /*cp-437*/ u8 ch) {
 	/* VGA terminal output */
 	if (printer->p_printx >= 0 && printer->p_printx < VGA_WIDTH &&
 	    printer->p_printy >= 0 && printer->p_printy < VGA_HEIGHT)
@@ -1045,8 +1071,8 @@ NOTHROW(KCALL dbg_pprinter_putcp437)(dbg_pprinter_arg_t *__restrict printer, /*c
 	++printer->p_printx;
 }
 
-PRIVATE ATTR_DBGTEXT NONNULL((1)) void
-NOTHROW(KCALL vga_pprinter_do_putuni)(dbg_pprinter_arg_t *__restrict printer, /*utf-32*/ char32_t ch) {
+PRIVATE NOBLOCK ATTR_DBGTEXT NONNULL((1)) void
+NOTHROW(FCALL vga_pprinter_do_putuni)(dbg_pprinter_arg_t *__restrict printer, /*utf-32*/ char32_t ch) {
 	u8 cp_ch;
 	/* Scroll to bottom before printing a character. */
 	if (vga_backlog_scrollpos && !vga_suppress_update)
@@ -1105,8 +1131,8 @@ do_put_cp_ch:
 	}
 }
 
-PRIVATE ATTR_DBGTEXT NONNULL((1)) void KCALL
-dbg_pprinter_putuni(dbg_pprinter_arg_t *__restrict printer, /*utf-32*/ char32_t ch) {
+PRIVATE NOBLOCK ATTR_DBGTEXT NONNULL((1)) void
+NOTHROW(FCALL dbg_pprinter_putuni)(dbg_pprinter_arg_t *__restrict printer, /*utf-32*/ char32_t ch) {
 	if (vga_tty.at_state != 0 || ch == (unsigned char)'\033') {
 		ansitty_putuni(&vga_tty, ch);
 	} else {
@@ -1116,29 +1142,34 @@ dbg_pprinter_putuni(dbg_pprinter_arg_t *__restrict printer, /*utf-32*/ char32_t 
 }
 
 LOCAL ATTR_DBGTEXT NONNULL((1)) char32_t
-NOTHROW(KCALL dbg_pprinter_pending_ch32)(dbg_pprinter_arg_t *__restrict printer) {
+NOTHROW(FCALL dbg_pprinter_pending_ch32)(dbg_pprinter_arg_t *__restrict printer) {
 	char32_t result;
 	u8 seqlen = unicode_utf8seqlen[printer->p_utf8[0]];
 	result = (char32_t)printer->p_utf8[0];
 	switch (seqlen) {
+
 	case 0:
 	case 1:
 		break;
+
 	case 2:
 		result  = (result & 0x1f) << 6;
 		result |= (printer->p_utf8[1] & 0x3f);
 		break;
+
 	case 3:
 		result  = (result & 0x0f) << 12;
 		result |= (printer->p_utf8[1] & 0x3f) << 6;
 		result |= (printer->p_utf8[2] & 0x3f);
 		break;
+
 	case 4:
 		result  = (result & 0x07) << 18;
 		result |= (printer->p_utf8[1] & 0x3f) << 12;
 		result |= (printer->p_utf8[2] & 0x3f) << 6;
 		result |= (printer->p_utf8[3] & 0x3f);
 		break;
+
 	case 5:
 		result  = (result & 0x03) << 24;
 		result |= (printer->p_utf8[1] & 0x3f) << 18;
@@ -1146,6 +1177,7 @@ NOTHROW(KCALL dbg_pprinter_pending_ch32)(dbg_pprinter_arg_t *__restrict printer)
 		result |= (printer->p_utf8[3] & 0x3f) << 6;
 		result |= (printer->p_utf8[4] & 0x3f);
 		break;
+
 	case 6:
 		result  = (result & 0x01) << 30;
 		result |= (printer->p_utf8[1] & 0x3f) << 24;
@@ -1154,6 +1186,7 @@ NOTHROW(KCALL dbg_pprinter_pending_ch32)(dbg_pprinter_arg_t *__restrict printer)
 		result |= (printer->p_utf8[4] & 0x3f) << 6;
 		result |= (printer->p_utf8[5] & 0x3f);
 		break;
+
 	case 7:
 		result  = (printer->p_utf8[1] & 0x03/*0x3f*/) << 30;
 		result |= (printer->p_utf8[2] & 0x3f) << 24;
@@ -1162,6 +1195,7 @@ NOTHROW(KCALL dbg_pprinter_pending_ch32)(dbg_pprinter_arg_t *__restrict printer)
 		result |= (printer->p_utf8[5] & 0x3f) << 6;
 		result |= (printer->p_utf8[6] & 0x3f);
 		break;
+
 	case 8:
 		/*result = (result & 0x3f) << 36;*/
 		result  = (printer->p_utf8[1] & 0x03/*0x3f*/) << 30;
@@ -1171,6 +1205,7 @@ NOTHROW(KCALL dbg_pprinter_pending_ch32)(dbg_pprinter_arg_t *__restrict printer)
 		result |= (printer->p_utf8[5] & 0x3f) << 6;
 		result |= (printer->p_utf8[6] & 0x3f);
 		break;
+
 	default:
 		__builtin_unreachable();
 	}
@@ -1178,7 +1213,7 @@ NOTHROW(KCALL dbg_pprinter_pending_ch32)(dbg_pprinter_arg_t *__restrict printer)
 }
 
 PRIVATE ATTR_DBGTEXT NONNULL((1)) void
-NOTHROW(KCALL dbg_pprinter_putc)(dbg_pprinter_arg_t *__restrict printer, /*utf-8*/ char ch) {
+NOTHROW(FCALL dbg_pprinter_putc)(dbg_pprinter_arg_t *__restrict printer, /*utf-8*/ char ch) {
 	if (printer->p_utf8[0]) {
 		/* Continue a utf-8 sequence. */
 		u8 reqlen = unicode_utf8seqlen[printer->p_utf8[0]];
@@ -1233,18 +1268,18 @@ dbg_pprinter(/*dbg_pprinter_arg_t **/ void *__restrict arg,
 }
 
 PUBLIC ATTR_DBGTEXT void
-NOTHROW(KCALL dbg_pputuni)(int x, int y, /*utf-32*/ char32_t ch) {
+NOTHROW(FCALL dbg_pputuni)(int x, int y, /*utf-32*/ char32_t ch) {
 	dbg_pprinter_arg_t printer = DBG_PPRINTER_ARG_INIT(x, y);
 	dbg_pprinter_putuni(&printer, ch);
 }
 
-PUBLIC ATTR_DBGTEXT size_t KCALL
+PUBLIC ATTR_DBGTEXT size_t FCALL
 dbg_pprint(int x, int y, /*utf-8*/ char const *__restrict str) {
 	dbg_pprinter_arg_t printer = DBG_PPRINTER_ARG_INIT(x, y);
 	return (size_t)dbg_pprinter(&printer, str, strlen(str));
 }
 
-PUBLIC ATTR_DBGTEXT size_t KCALL
+PUBLIC ATTR_DBGTEXT size_t FCALL
 dbg_vpprintf(int x, int y, /*utf-8*/ char const *__restrict format, va_list args) {
 	dbg_pprinter_arg_t printer = DBG_PPRINTER_ARG_INIT(x, y);
 	return (size_t)format_vprintf(&dbg_pprinter, &printer, format, args);
@@ -1273,7 +1308,7 @@ PRIVATE ATTR_DBGBSS bool vga_oldmapping_did_prepare = false;
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 
 
-PRIVATE ATTR_DBGTEXT void NOTHROW(KCALL vga_map)(void) {
+PRIVATE ATTR_DBGTEXT void NOTHROW(FCALL vga_map)(void) {
 	unsigned int i;
 	if (vga_real_terminal_start != NULL)
 		return;
@@ -1309,7 +1344,7 @@ PRIVATE ATTR_DBGTEXT void NOTHROW(KCALL vga_map)(void) {
 	}
 }
 
-PRIVATE ATTR_DBGTEXT void NOTHROW(KCALL vga_unmap)(void) {
+PRIVATE ATTR_DBGTEXT void NOTHROW(FCALL vga_unmap)(void) {
 	unsigned int i;
 	if (vga_real_terminal_start == NULL)
 		return;
@@ -1327,7 +1362,7 @@ PRIVATE ATTR_DBGTEXT void NOTHROW(KCALL vga_unmap)(void) {
 
 
 PRIVATE NOBLOCK void
-NOTHROW(KCALL VGA_SetMode)(struct vga_mode const *__restrict mode) {
+NOTHROW(FCALL VGA_SetMode)(struct vga_mode const *__restrict mode) {
 	unsigned int i;
 	u8 temp, qr1;
 	qr1 = vga_rseq(VGA_SEQ_CLOCK_MODE);
@@ -1413,7 +1448,7 @@ NOTHROW(KCALL VGA_SetMode)(struct vga_mode const *__restrict mode) {
 
 
 PRIVATE NOBLOCK void
-NOTHROW(KCALL VGA_GetMode)(struct vga_mode *__restrict mode) {
+NOTHROW(FCALL VGA_GetMode)(struct vga_mode *__restrict mode) {
 	unsigned int i;
 	vga_r(VGA_IS1_RC), vga_w(VGA_ATT_W, 0x00);
 	vga_r(VGA_IS1_RC), mode->vm_att_mode         = vga_rattr(VGA_ATC_MODE) & ~VGA_AT10_FRESERVED;
@@ -1464,7 +1499,7 @@ NOTHROW(KCALL VGA_GetMode)(struct vga_mode *__restrict mode) {
 
 
 PRIVATE ATTR_DBGTEXT void
-NOTHROW(KCALL VGA_SetPalette)(void const *__restrict pal, size_t num_bytes) {
+NOTHROW(FCALL VGA_SetPalette)(void const *__restrict pal, size_t num_bytes) {
 	unsigned int i;
 	assert(num_bytes <= 768);
 	vga_w(VGA_PEL_MSK, 0xff);
@@ -1476,7 +1511,7 @@ NOTHROW(KCALL VGA_SetPalette)(void const *__restrict pal, size_t num_bytes) {
 }
 
 PRIVATE ATTR_DBGTEXT void
-NOTHROW(KCALL VGA_GetPalette)(void *__restrict pal, size_t num_bytes) {
+NOTHROW(FCALL VGA_GetPalette)(void *__restrict pal, size_t num_bytes) {
 	unsigned int i;
 	assert(num_bytes <= 768);
 	vga_w(VGA_PEL_MSK, 0xff);
@@ -1488,7 +1523,7 @@ NOTHROW(KCALL VGA_GetPalette)(void *__restrict pal, size_t num_bytes) {
 }
 
 PRIVATE ATTR_DBGTEXT byte_t *
-NOTHROW(KCALL vga_vram)(u32 vram_offset) {
+NOTHROW(FCALL vga_vram)(u32 vram_offset) {
 	u32 offset;
 	offset      = vram_offset & PAGEMASK;
 	vram_offset = vram_offset & ~PAGEMASK;
@@ -1519,7 +1554,7 @@ NOTHROW(KCALL vga_vram)(u32 vram_offset) {
 
 
 PRIVATE ATTR_DBGTEXT void
-NOTHROW(KCALL VGA_SetFont)(struct vga_font const *__restrict font) {
+NOTHROW(FCALL VGA_SetFont)(struct vga_font const *__restrict font) {
 	unsigned int i;
 	u32 dst = 0;
 	u8 old_seq_plane_write = vga_rseq(VGA_SEQ_PLANE_WRITE);
@@ -1558,7 +1593,7 @@ NOTHROW(KCALL VGA_SetFont)(struct vga_font const *__restrict font) {
 }
 
 PRIVATE ATTR_DBGTEXT void
-NOTHROW(KCALL VGA_GetFont)(struct vga_font *__restrict font) {
+NOTHROW(FCALL VGA_GetFont)(struct vga_font *__restrict font) {
 	unsigned int i;
 	u32 src = 0;
 	u8 old_seq_plane_write = vga_rseq(VGA_SEQ_PLANE_WRITE);
@@ -1592,14 +1627,14 @@ struct vga_cursor_regs {
 };
 
 PRIVATE NOBLOCK ATTR_FREETEXT void
-NOTHROW(KCALL VGA_GetCursor)(struct vga_cursor_regs *__restrict self) {
+NOTHROW(FCALL VGA_GetCursor)(struct vga_cursor_regs *__restrict self) {
 	self->crtc_cursor_start = vga_rcrt(VGA_CRTC_CURSOR_START);
 	self->crtc_cursor_hi    = vga_rcrt(VGA_CRTC_CURSOR_HI);
 	self->crtc_cursor_lo    = vga_rcrt(VGA_CRTC_CURSOR_LO);
 }
 
 PRIVATE NOBLOCK ATTR_FREETEXT void
-NOTHROW(KCALL VGA_SetCursor)(struct vga_cursor_regs const *__restrict self) {
+NOTHROW(FCALL VGA_SetCursor)(struct vga_cursor_regs const *__restrict self) {
 	vga_wcrt(VGA_CRTC_CURSOR_START, self->crtc_cursor_start);
 	vga_wcrt(VGA_CRTC_CURSOR_HI, self->crtc_cursor_hi);
 	vga_wcrt(VGA_CRTC_CURSOR_LO, self->crtc_cursor_lo);
@@ -1628,10 +1663,12 @@ NOTHROW(KCALL x86_initialize_debugger_textfont)(void) {
 }
 
 
-/* TTY show-screen support (display the contents of the monitor before the debugger was enabled) */
-PUBLIC void NOTHROW(KCALL dbg_beginshowscreen)(void) {
+/* TTY show-screen support (display the contents of the monitor before the debugger was enabled)
+ * WARNING: `dbg_beginshowscreen()' also implies the behavior of `dbg_endupdate(true)'
+ * NOTE: This functionality of these functions is also available through the `screen' command */
+PUBLIC void NOTHROW(FCALL dbg_beginshowscreen)(void) {
+	dbg_endupdate(true);
 	if (!vga_showscreen_enabled) {
-		dbg_endupdate(true);
 		if (vga_backlog_scrollpos)
 			vga_backlog_setscrollpos(0);
 		VGA_GetCursor(&vga_showscreen_oldcursor);
@@ -1647,7 +1684,7 @@ PUBLIC void NOTHROW(KCALL dbg_beginshowscreen)(void) {
 	}
 }
 
-PUBLIC void NOTHROW(KCALL dbg_endshowscreen)(void) {
+PUBLIC void NOTHROW(FCALL dbg_endshowscreen)(void) {
 	if (vga_showscreen_enabled) {
 		VGA_SetMode(&vga_textmode);
 		VGA_SetPalette(&vga_biospal, sizeof(vga_biospal));
@@ -1661,7 +1698,8 @@ PUBLIC void NOTHROW(KCALL dbg_endshowscreen)(void) {
 }
 
 
-INTERN ATTR_DBGTEXT void NOTHROW(KCALL dbg_initialize_tty)(void) {
+INTERN ATTR_DBGTEXT void
+NOTHROW(KCALL dbg_initialize_tty)(void) {
 	/* Map a portion of VRAM into memory. */
 	vga_map();
 	/* Save the old VGA mode. */
@@ -1684,7 +1722,8 @@ INTERN ATTR_DBGTEXT void NOTHROW(KCALL dbg_initialize_tty)(void) {
 		VGA_SetFont(&vga_textfont);
 }
 
-INTERN ATTR_DBGTEXT void NOTHROW(KCALL dbg_finalize_tty)(void) {
+INTERN ATTR_DBGTEXT void
+NOTHROW(KCALL dbg_finalize_tty)(void) {
 	/* Make sure we're not in show-screen mode. */
 	dbg_endshowscreen();
 	/* Restore font memory. */
@@ -1702,7 +1741,8 @@ INTERN ATTR_DBGTEXT void NOTHROW(KCALL dbg_finalize_tty)(void) {
 	vga_unmap();
 }
 
-INTERN ATTR_DBGTEXT void NOTHROW(KCALL dbg_reset_tty)(void) {
+INTERN ATTR_DBGTEXT void
+NOTHROW(KCALL dbg_reset_tty)(void) {
 	/* Make sure we're not in show-screen mode from before. */
 	dbg_endshowscreen();
 	vga_vram_offset = 0;
@@ -1739,17 +1779,17 @@ INTERN ATTR_DBGTEXT void NOTHROW(KCALL dbg_reset_tty)(void) {
 
 
 PUBLIC ATTR_DBGTEXT void
-NOTHROW(KCALL dbg_putc)(/*utf-8*/ char ch) {
+NOTHROW(FCALL dbg_putc)(/*utf-8*/ char ch) {
 	ansitty_putc(&vga_tty, ch);
 }
 
 PUBLIC ATTR_DBGTEXT void
-NOTHROW(KCALL dbg_putuni)(/*utf-32*/ char32_t ch) {
+NOTHROW(FCALL dbg_putuni)(/*utf-32*/ char32_t ch) {
 	ansitty_putuni(&vga_tty, ch);
 }
 
 PUBLIC ATTR_DBGTEXT void
-NOTHROW(KCALL dbg_fillscreen)(/*utf-32*/ char32_t ch) {
+NOTHROW(FCALL dbg_fillscreen)(/*utf-32*/ char32_t ch) {
 	u8 cp_ch;
 	if (vga_backlog_scrollpos && !vga_suppress_update)
 		vga_backlog_setscrollpos(0);
@@ -1763,12 +1803,12 @@ NOTHROW(KCALL dbg_fillscreen)(/*utf-32*/ char32_t ch) {
 	vga_last_chr_caused_linewrap = false;
 }
 
-PUBLIC ATTR_DBGTEXT size_t KCALL
+PUBLIC ATTR_DBGTEXT size_t FCALL
 dbg_print(/*utf-8*/ char const *__restrict str) {
 	return (size_t)ansitty_printer(&vga_tty, str, strlen(str));
 }
 
-PUBLIC ATTR_DBGTEXT size_t KCALL
+PUBLIC ATTR_DBGTEXT size_t FCALL
 dbg_vprintf(/*utf-8*/ char const *__restrict format, va_list args) {
 	return (size_t)format_vprintf(&ansitty_printer, &vga_tty, format, args);
 }
@@ -1791,7 +1831,15 @@ dbg_printer(void *UNUSED(ignored),
 }
 
 
-PUBLIC ATTR_DBGTEXT NONNULL((5)) void KCALL
+/* Get/Set debug TTY screen data
+ * NOTE: Reading Out-of-bound cells are read as the same value as a space-character
+ *       cell when written using `dbg_putc(' ')' as the current cursor position.
+ * NOTE: Writing Out-of-bound cells is a no-op.
+ * NOTE: These functions will read/write the SCROLL-TOP screen data, and
+ *      `dbg_setscreendata()' will apply `dbg_setscroll(0)'
+ *       before actually copying cells.
+ * @param: buf: A buffer capable of holding `size_x * size_y * dbg_screen_cellsize' bytes of data. */
+PUBLIC ATTR_DBGTEXT NONNULL((5)) void FCALL
 dbg_getscreendata(int x, int y,
                   unsigned int size_x,
                   unsigned int size_y,
@@ -1847,7 +1895,7 @@ dbg_getscreendata(int x, int y,
 	}
 }
 
-PUBLIC ATTR_DBGTEXT NONNULL((5)) void KCALL
+PUBLIC ATTR_DBGTEXT NONNULL((5)) void FCALL
 dbg_setscreendata(int x, int y,
                   unsigned int size_x,
                   unsigned int size_y,
@@ -1904,7 +1952,7 @@ done:
 
 
 PUBLIC ATTR_DBGTEXT void
-NOTHROW(KCALL dbg_fillrect)(int x, int y, unsigned int size_x,
+NOTHROW(FCALL dbg_fillrect)(int x, int y, unsigned int size_x,
                             unsigned int size_y, /*utf-32*/ char32_t ch) {
 	if (!size_x || !size_y) {
 		if (vga_backlog_scrollpos && !vga_suppress_update)
@@ -1922,7 +1970,7 @@ NOTHROW(KCALL dbg_fillrect)(int x, int y, unsigned int size_x,
 }
 
 PUBLIC ATTR_DBGTEXT void
-NOTHROW(KCALL dbg_fillrect2)(int x, int y, unsigned int size_x, unsigned int size_y,
+NOTHROW(FCALL dbg_fillrect2)(int x, int y, unsigned int size_x, unsigned int size_y,
                              /*utf-32*/ char32_t tl, /*utf-32*/ char32_t t, /*utf-32*/ char32_t tr,
                              /*utf-32*/ char32_t l,                         /*utf-32*/ char32_t r,
                              /*utf-32*/ char32_t bl, /*utf-32*/ char32_t b, /*utf-32*/ char32_t br) {
@@ -1950,7 +1998,7 @@ NOTHROW(KCALL dbg_fillrect2)(int x, int y, unsigned int size_x, unsigned int siz
 }
 
 PUBLIC ATTR_DBGTEXT void
-NOTHROW(KCALL dbg_hline)(int x, int y, unsigned int size_x, /*utf-32*/ char32_t ch) {
+NOTHROW(FCALL dbg_hline)(int x, int y, unsigned int size_x, /*utf-32*/ char32_t ch) {
 	u8 cp_ch;
 	if (vga_backlog_scrollpos && !vga_suppress_update)
 		vga_backlog_setscrollpos(0);
@@ -1980,7 +2028,7 @@ done:
 }
 
 PUBLIC ATTR_DBGTEXT void
-NOTHROW(KCALL dbg_vline)(int x, int y, unsigned int size_y, /*utf-32*/ char32_t ch) {
+NOTHROW(FCALL dbg_vline)(int x, int y, unsigned int size_y, /*utf-32*/ char32_t ch) {
 	u8 cp_ch;
 	unsigned int i;
 	u16 *dst, vga_ch;
@@ -2013,7 +2061,7 @@ done:
 }
 
 PUBLIC ATTR_DBGTEXT void
-NOTHROW(KCALL dbg_fillbox)(int x, int y,
+NOTHROW(FCALL dbg_fillbox)(int x, int y,
                            unsigned int size_x,
                            unsigned int size_y,
                            /*utf-32*/ char32_t ch) {

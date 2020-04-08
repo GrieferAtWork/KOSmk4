@@ -35,39 +35,39 @@ DECL_BEGIN
 
 /* Wait for the user to press a key and return its keycode.
  * @return: * : One of `KEY_*' (from <kos/keyboard.h>) */
-FUNDEF u16 NOTHROW(KCALL dbg_getkey)(void);
-FUNDEF NOBLOCK u16 NOTHROW(KCALL dbg_trygetkey)(void); /* @return: 0: No keys available. */
+FUNDEF u16 NOTHROW(FCALL dbg_getkey)(void);
+FUNDEF NOBLOCK u16 NOTHROW(FCALL dbg_trygetkey)(void); /* @return: 0: No keys available. */
 
 /* Unget a key to be re-returned by `dbg_(try)getkey'
  * When ungetting multiple keys, the key last unget'ed will be returned last. */
-FUNDEF NOBLOCK bool NOTHROW(KCALL dbg_ungetkey)(u16 key);
+FUNDEF NOBLOCK bool NOTHROW(FCALL dbg_ungetkey)(u16 key);
 
 /* Wait for the user to press a key and return the pressed character.
  * NOTE: Modifier keys aren't returned by this function. */
-FUNDEF /*utf-8*/ char KCALL dbg_getc(void);
-FUNDEF /*utf-32*/ char32_t KCALL dbg_getuni(void);
-FUNDEF NOBLOCK /*utf-8*/ char KCALL dbg_trygetc(void); /* @return: 0: No characters available. */
-FUNDEF NOBLOCK /*utf-32*/ char32_t KCALL dbg_trygetuni(void); /* @return: 0: No characters available. */
+FUNDEF /*utf-8*/ char NOTHROW(FCALL dbg_getc)(void);
+FUNDEF /*utf-32*/ char32_t NOTHROW(FCALL dbg_getuni)(void);
+FUNDEF NOBLOCK /*utf-8*/ char NOTHROW(FCALL dbg_trygetc)(void); /* @return: 0: No characters available. */
+FUNDEF NOBLOCK /*utf-32*/ char32_t NOTHROW(FCALL dbg_trygetuni)(void); /* @return: 0: No characters available. */
 
 /* Unget a character to be re-returned by `dbg_(try)get(c|uni)'
  * When ungetting multiple characters, the character last unget'ed will be returned last. */
-FUNDEF NOBLOCK bool NOTHROW(KCALL dbg_ungetc)(/*utf-8*/ char ch);
-FUNDEF NOBLOCK bool NOTHROW(KCALL dbg_ungetuni)(/*utf-32*/ char32_t ch);
+FUNDEF NOBLOCK bool NOTHROW(FCALL dbg_ungetc)(/*utf-8*/ char ch);
+FUNDEF NOBLOCK bool NOTHROW(FCALL dbg_ungetuni)(/*utf-32*/ char32_t ch);
 
 /* Check if there are pending unicode characters. (s.a. `dbg_getuni()') */
-FUNDEF NOBLOCK WUNUSED ATTR_PURE bool NOTHROW(KCALL dbg_hasuni)(void);
+FUNDEF NOBLOCK WUNUSED ATTR_PURE bool NOTHROW(FCALL dbg_hasuni)(void);
 
 /* Check if there are pending utf-8 characters. (s.a. `dbg_getc()') */
-FUNDEF NOBLOCK WUNUSED ATTR_PURE bool NOTHROW(KCALL dbg_haschar)(void);
+FUNDEF NOBLOCK WUNUSED ATTR_PURE bool NOTHROW(FCALL dbg_haschar)(void);
 
 /* Purge pending unicode characters. */
-FUNDEF NOBLOCK void NOTHROW(KCALL dbg_purgeuni)(void);
+FUNDEF NOBLOCK void NOTHROW(FCALL dbg_purgeuni)(void);
 
 /* Check if a given modifier key is being held down. */
-FUNDEF NOBLOCK WUNUSED ATTR_PURE bool NOTHROW(KCALL dbg_isholding_ctrl)(void);
-FUNDEF NOBLOCK WUNUSED ATTR_PURE bool NOTHROW(KCALL dbg_isholding_shift)(void);
-FUNDEF NOBLOCK WUNUSED ATTR_PURE bool NOTHROW(KCALL dbg_isholding_alt)(void);
-FUNDEF NOBLOCK WUNUSED ATTR_PURE bool NOTHROW(KCALL dbg_isholding_altgr)(void);
+FUNDEF NOBLOCK WUNUSED ATTR_PURE bool NOTHROW(FCALL dbg_isholding_ctrl)(void);
+FUNDEF NOBLOCK WUNUSED ATTR_PURE bool NOTHROW(FCALL dbg_isholding_shift)(void);
+FUNDEF NOBLOCK WUNUSED ATTR_PURE bool NOTHROW(FCALL dbg_isholding_alt)(void);
+FUNDEF NOBLOCK WUNUSED ATTR_PURE bool NOTHROW(FCALL dbg_isholding_altgr)(void);
 
 #endif /* __CC__ */
 

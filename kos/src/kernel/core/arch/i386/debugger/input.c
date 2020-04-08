@@ -72,7 +72,8 @@ if (gcc_opt.remove("-O3"))
 
 DECL_BEGIN
 
-LOCAL ATTR_DBGTEXT bool NOTHROW(KCALL ps2_write_cmd)(u8 cmd) {
+LOCAL ATTR_DBGTEXT bool
+NOTHROW(FCALL ps2_write_cmd)(u8 cmd) {
 	/* TODO: Add a timeout using PIT */
 	while (inb_p(PS2_STATUS) & PS2_STATUS_INFULL)
 		__pause();
@@ -81,14 +82,16 @@ LOCAL ATTR_DBGTEXT bool NOTHROW(KCALL ps2_write_cmd)(u8 cmd) {
 	return true;
 }
 
-LOCAL ATTR_DBGTEXT int NOTHROW(KCALL ps2_read_cmddata)(void) {
+LOCAL ATTR_DBGTEXT int
+NOTHROW(FCALL ps2_read_cmddata)(void) {
 	/* TODO: Add a timeout using PIT */
 	while (!(inb_p(PS2_STATUS) & PS2_STATUS_OUTFULL))
 		__pause();
 	return inb_p(PS2_DATA);
 }
 
-LOCAL ATTR_DBGTEXT bool NOTHROW(KCALL ps2_write_cmddata)(u8 data) {
+LOCAL ATTR_DBGTEXT bool
+NOTHROW(FCALL ps2_write_cmddata)(u8 data) {
 	/* TODO: Add a timeout using PIT */
 	while (inb_p(PS2_STATUS) & PS2_STATUS_INFULL)
 		__pause();
@@ -96,7 +99,8 @@ LOCAL ATTR_DBGTEXT bool NOTHROW(KCALL ps2_write_cmddata)(u8 data) {
 	return true;
 }
 
-LOCAL ATTR_DBGTEXT bool KCALL ps2_write_data(u8 data) {
+LOCAL ATTR_DBGTEXT bool
+NOTHROW(FCALL ps2_write_data)(u8 data) {
 #if 0
 	if (port == PS2_PORT2) {
 		while (inb_p(PS2_STATUS) & PS2_STATUS_INFULL)
@@ -141,7 +145,8 @@ PRIVATE ATTR_DBGBSS u8 ps2_keyboard_modifiers = 0;   /* Set of `PS2_KEYBOARD_MOD
 
 
 /* Blocking read a single keyboard control byte. */
-PRIVATE ATTR_DBGTEXT u8 KCALL ps2_keyboard_getbyte(void) {
+PRIVATE ATTR_DBGTEXT u8
+NOTHROW(FCALL ps2_keyboard_getbyte)(void) {
 	u8 result;
 	unsigned int index;
 	__cli();
@@ -163,8 +168,8 @@ PRIVATE ATTR_DBGTEXT u8 KCALL ps2_keyboard_getbyte(void) {
 	return result;
 }
 
-PRIVATE ATTR_DBGTEXT NOBLOCK u8
-NOTHROW(KCALL ps2_keyboard_getbyte_nb)(void) {
+PRIVATE NOBLOCK ATTR_DBGTEXT u8
+NOTHROW(FCALL ps2_keyboard_getbyte_nb)(void) {
 	u8 result;
 	unsigned int index;
 	__cli();
@@ -186,7 +191,7 @@ NOTHROW(KCALL ps2_keyboard_getbyte_nb)(void) {
 }
 
 PRIVATE ATTR_DBGTEXT void
-NOTHROW(KCALL ps2_keyboard_ungetbyte)(u8 byte) {
+NOTHROW(FCALL ps2_keyboard_ungetbyte)(u8 byte) {
 	unsigned int index;
 	__cli();
 	if (ps2_keyboard_buffer_siz < CONFIG_PS2_KEYBOARD_BUFFER_SIZE) {
@@ -203,7 +208,8 @@ NOTHROW(KCALL ps2_keyboard_ungetbyte)(u8 byte) {
 	__sti();
 }
 
-PRIVATE ATTR_DBGTEXT void KCALL check_reset(u8 f12) {
+PRIVATE ATTR_DBGTEXT void
+NOTHROW(FCALL check_reset)(u8 f12) {
 	unsigned int prev;
 	if (ps2_keyboard_buffer_siz < 2)
 		return;
@@ -225,21 +231,25 @@ PRIVATE ATTR_DBGTEXT void KCALL check_reset(u8 f12) {
 	dbg(); /* Reset the debugger. */
 }
 
-PRIVATE ATTR_DBGTEXT NOBLOCK void
-NOTHROW(KCALL ps2_keyboard_putbyte)(u8 byte) {
+PRIVATE NOBLOCK ATTR_DBGTEXT void
+NOTHROW(FCALL ps2_keyboard_putbyte)(u8 byte) {
 	switch (ps2_keyboard_scanset) {
+
 	case 1:
 		if (byte == 0x58) /* F12 */
 			check_reset(0x58);
 		break;
+
 	case 2:
 		if (byte == 0x07) /* F12 */
 			check_reset(0x07);
 		break;
+
 	case 3:
 		if (byte == 0x5e) /* F12 */
 			check_reset(0x5e);
 		break;
+
 	default: break;
 	}
 	if (ps2_keyboard_buffer_pos >= CONFIG_PS2_KEYBOARD_BUFFER_SIZE)
@@ -250,7 +260,7 @@ NOTHROW(KCALL ps2_keyboard_putbyte)(u8 byte) {
 		++ps2_keyboard_buffer_siz;
 }
 
-INTERN ATTR_DBGTEXT NOBLOCK void
+INTERN NOBLOCK ATTR_DBGTEXT void
 NOTHROW(KCALL x86_handle_dbg_ps2_interrupt)(void) {
 	u8 data;
 #if 1
@@ -271,8 +281,8 @@ NOTHROW(KCALL x86_handle_dbg_ps2_interrupt)(void) {
 
 
 /* Process a given `key', returning the new key, or 0 if it should be swallowed. */
-PRIVATE ATTR_DBGTEXT unsigned int KCALL
-dbg_process_key(unsigned int key) {
+PRIVATE NOBLOCK ATTR_DBGTEXT unsigned int
+NOTHROW(FCALL dbg_process_key)(unsigned int key) {
 	/* Update keyboard modifiers. */
 	switch (key) {
 
@@ -339,18 +349,19 @@ dbg_process_key(unsigned int key) {
 		if (HOLDING_CTRL_AND_SHIFT()) {
 			unsigned int pos;
 			/* Scroll down */
-			pos = dbg_scroll(DBG_SCROLL_CMD_GET, 0);
-			dbg_scroll(DBG_SCROLL_CMD_SET, pos + 1);
+			pos = dbg_getscroll();
+			dbg_setscroll(pos + 1);
 			key = 0;
 		}
 		break;
+
 	case KEY_DOWN:
 		if (HOLDING_CTRL_AND_SHIFT()) {
 			unsigned int pos;
 			/* Scroll down */
-			pos = dbg_scroll(DBG_SCROLL_CMD_GET, 0);
+			pos = dbg_getscroll();
 			if (pos)
-				dbg_scroll(DBG_SCROLL_CMD_SET, pos - 1);
+				dbg_setscroll(pos - 1);
 			key = 0;
 		}
 		break;
@@ -359,40 +370,45 @@ dbg_process_key(unsigned int key) {
 		if (HOLDING_CTRL_AND_SHIFT()) {
 			unsigned int pos;
 			/* Scroll down */
-			pos = dbg_scroll(DBG_SCROLL_CMD_GET, 0);
-			dbg_scroll(DBG_SCROLL_CMD_SET, pos + dbg_screen_height);
+			pos = dbg_getscroll();
+			dbg_setscroll(pos + dbg_screen_height);
 			key = 0;
 		}
 		break;
+
 	case KEY_PGDOWN:
 		if (HOLDING_CTRL_AND_SHIFT()) {
 			unsigned int pos;
 			/* Scroll down */
-			pos = dbg_scroll(DBG_SCROLL_CMD_GET, 0);
+			pos = dbg_getscroll();
 			if (pos >= dbg_screen_height)
 				pos -= dbg_screen_height;
-			else
+			else {
 				pos = 0;
-			dbg_scroll(DBG_SCROLL_CMD_SET, pos);
+			}
+			dbg_setscroll(pos);
 			key = 0;
 		}
 		break;
+
 	case KEY_HOME:
 		if (HOLDING_CTRL_AND_SHIFT()) {
 			/* Scroll to top */
-			dbg_scroll(DBG_SCROLL_CMD_SET, (unsigned int)-1);
+			dbg_setscroll((unsigned int)-1);
 			key = 0;
 		}
 		break;
+
 	case KEY_END:
 		if (HOLDING_CTRL_AND_SHIFT()) {
 			/* Scroll to end */
-			dbg_scroll(DBG_SCROLL_CMD_SET, 0);
+			dbg_setscroll(0);
 			key = 0;
 		}
 		break;
-#undef HOLDING_CTRL_AND_SHIFT
-	default: break;
+
+	default:
+		break;
 	}
 	return key;
 }
@@ -404,7 +420,8 @@ PRIVATE ATTR_DBGBSS u8 dbg_getkey_pending_cnt = 0;
 
 /* Unget a key to be re-returned by `dbg_(try)getkey'
  * When ungetting multiple keys, the key last unget'ed will be returned last. */
-PUBLIC ATTR_DBGTEXT NOBLOCK bool NOTHROW(KCALL dbg_ungetkey)(u16 key) {
+PUBLIC NOBLOCK ATTR_DBGTEXT bool
+NOTHROW(FCALL dbg_ungetkey)(u16 key) {
 	if (dbg_getkey_pending_cnt >= COMPILER_LENOF(dbg_getkey_pending))
 		return false;
 	dbg_getkey_pending[dbg_getkey_pending_cnt] = key;
@@ -417,7 +434,7 @@ PUBLIC ATTR_DBGTEXT NOBLOCK bool NOTHROW(KCALL dbg_ungetkey)(u16 key) {
 /* Wait for the user to press a key and return its keycode.
  * @return: * : One of `KEY_*' (from <kos/keyboard.h>) */
 LOCAL ATTR_DBGTEXT u16
-NOTHROW(KCALL dbg_getkey_impl)(bool blocking) {
+NOTHROW(FCALL dbg_getkey_impl)(bool blocking) {
 	u16 result;
 	u8 byte;
 	if (dbg_getkey_pending_cnt) {
@@ -798,14 +815,14 @@ nokey:
 
 /* @return: 0: No keys available. */
 PUBLIC ATTR_DBGTEXT u16
-NOTHROW(KCALL dbg_trygetkey)(void) {
+NOTHROW(FCALL dbg_trygetkey)(void) {
 	return dbg_getkey_impl(false);
 }
 
 /* Wait for the user to press a key and return its keycode.
  * @return: * : One of `KEY_*' (from <kos/keyboard.h>) */
 PUBLIC ATTR_DBGTEXT u16
-NOTHROW(KCALL dbg_getkey)(void) {
+NOTHROW(FCALL dbg_getkey)(void) {
 	return dbg_getkey_impl(true);
 }
 
@@ -971,8 +988,8 @@ PRIVATE ATTR_DBGBSS u8 dbg_getuni_pending_cnt = 0;
 
 #define ANSI_ESCAPE "\033"
 
-PRIVATE ATTR_DBGTEXT NOBLOCK NONNULL((1)) char32_t
-NOTHROW(KCALL dbg_getuni_setstring)(char const *__restrict text) {
+PRIVATE NOBLOCK ATTR_DBGTEXT NONNULL((1)) char32_t
+NOTHROW(FCALL dbg_getuni_setstring)(char const *__restrict text) {
 	char32_t result = (char32_t)(u8)*text++;
 	dbg_getuni_pending_cnt = 0;
 	for (; *text; ++text) {
@@ -982,8 +999,8 @@ NOTHROW(KCALL dbg_getuni_setstring)(char const *__restrict text) {
 	return result;
 }
 
-PUBLIC ATTR_DBGTEXT NOBLOCK bool
-NOTHROW(KCALL dbg_ungetuni)(/*utf-32*/ char32_t ch) {
+PUBLIC NOBLOCK ATTR_DBGTEXT bool
+NOTHROW(FCALL dbg_ungetuni)(/*utf-32*/ char32_t ch) {
 	if (dbg_getuni_pending_cnt >= COMPILER_LENOF(dbg_getuni_pending))
 		return false;
 	dbg_getuni_pending[dbg_getuni_pending_cnt] = ch;
@@ -991,27 +1008,28 @@ NOTHROW(KCALL dbg_ungetuni)(/*utf-32*/ char32_t ch) {
 	return true;
 }
 
-PUBLIC ATTR_DBGTEXT NOBLOCK WUNUSED ATTR_PURE bool
-NOTHROW(KCALL dbg_hasuni)(void) {
+PUBLIC NOBLOCK ATTR_DBGTEXT WUNUSED ATTR_PURE bool
+NOTHROW(FCALL dbg_hasuni)(void) {
 	return dbg_getuni_pending_cnt != 0;
 }
 
-PUBLIC ATTR_DBGTEXT NOBLOCK void
-NOTHROW(KCALL dbg_purgeuni)(void) {
+PUBLIC NOBLOCK ATTR_DBGTEXT void
+NOTHROW(FCALL dbg_purgeuni)(void) {
 	dbg_getuni_pending_cnt = 0;
 }
 
 /* Wait for the user to press a key and return the pressed character.
  * NOTE: Modifier keys aren't returned by this function. */
-PUBLIC ATTR_DBGTEXT /*utf-32*/ char32_t KCALL dbg_getuni(void) {
+PUBLIC ATTR_DBGTEXT /*utf-32*/ char32_t
+NOTHROW(FCALL dbg_getuni)(void) {
 	u16 key;
 	char32_t result;
 	if (dbg_getuni_pending_cnt) {
 		result = dbg_getuni_pending[0];
 		--dbg_getuni_pending_cnt;
-		memmovel(dbg_getuni_pending,
-		         dbg_getuni_pending + 1,
-		         dbg_getuni_pending_cnt);
+		memmovedownl(dbg_getuni_pending,
+		             dbg_getuni_pending + 1,
+		             dbg_getuni_pending_cnt);
 		return result;
 	} else {
 again_getkey:
@@ -1104,38 +1122,39 @@ again_getkey:
 	return result;
 }
 
-PUBLIC ATTR_DBGTEXT NOBLOCK WUNUSED ATTR_PURE bool
-NOTHROW(KCALL dbg_isholding_ctrl)(void) {
+PUBLIC NOBLOCK ATTR_DBGTEXT WUNUSED ATTR_PURE bool
+NOTHROW(FCALL dbg_isholding_ctrl)(void) {
 	return HOLDING_CTRL();
 }
 
-PUBLIC ATTR_DBGTEXT NOBLOCK WUNUSED ATTR_PURE bool
-NOTHROW(KCALL dbg_isholding_shift)(void) {
+PUBLIC NOBLOCK ATTR_DBGTEXT WUNUSED ATTR_PURE bool
+NOTHROW(FCALL dbg_isholding_shift)(void) {
 	return ((ps2_keyboard_modifiers & PS2_KEYBOARD_MODIFIER_SHIFT) != 0) !=
 	       ((ps2_keyboard_modifiers & PS2_KEYBOARD_MODIFIER_CAPS) != 0);
 }
 
-PUBLIC ATTR_DBGTEXT NOBLOCK WUNUSED ATTR_PURE bool
-NOTHROW(KCALL dbg_isholding_alt)(void) {
+PUBLIC NOBLOCK ATTR_DBGTEXT WUNUSED ATTR_PURE bool
+NOTHROW(FCALL dbg_isholding_alt)(void) {
 	return ps2_keyboard_modifiers & PS2_KEYBOARD_MODIFIER_ALT;
 }
 
-PUBLIC ATTR_DBGTEXT NOBLOCK WUNUSED ATTR_PURE bool
-NOTHROW(KCALL dbg_isholding_altgr)(void) {
+PUBLIC NOBLOCK ATTR_DBGTEXT WUNUSED ATTR_PURE bool
+NOTHROW(FCALL dbg_isholding_altgr)(void) {
 	return (ps2_keyboard_modifiers & PS2_KEYBOARD_MODIFIER_ALTGR) ||
 	       (ps2_keyboard_modifiers & (PS2_KEYBOARD_MODIFIER_CTRL | PS2_KEYBOARD_MODIFIER_ALT)) ==
 	       (PS2_KEYBOARD_MODIFIER_CTRL | PS2_KEYBOARD_MODIFIER_ALT);
 }
 
-PUBLIC ATTR_DBGTEXT /*utf-32*/ char32_t KCALL dbg_trygetuni(void) {
+PUBLIC NOBLOCK ATTR_DBGTEXT /*utf-32*/ char32_t
+NOTHROW(FCALL dbg_trygetuni)(void) {
 	u16 key;
 	char32_t result;
 	if (dbg_getuni_pending_cnt) {
 		result = dbg_getuni_pending[0];
 		--dbg_getuni_pending_cnt;
-		memmovel(dbg_getuni_pending,
-		         dbg_getuni_pending + 1,
-		         dbg_getuni_pending_cnt);
+		memmovedownl(dbg_getuni_pending,
+		             dbg_getuni_pending + 1,
+		             dbg_getuni_pending_cnt);
 		return result;
 	} else {
 again_getkey:
@@ -1237,15 +1256,15 @@ PRIVATE ATTR_DBGBSS uint8_t dbg_getc_pending_cnt = 0;
 PRIVATE ATTR_DBGBSS uint8_t dbg_getc_pending[UNICODE_UTF8_CURLEN] = { 0, };
 
 /* Check if there are pending utf-8 characters. (s.a. `dbg_getc()') */
-PUBLIC ATTR_DBGTEXT NOBLOCK WUNUSED ATTR_PURE bool
-NOTHROW(KCALL dbg_haschar)(void) {
+PUBLIC NOBLOCK ATTR_DBGTEXT WUNUSED ATTR_PURE bool
+NOTHROW(FCALL dbg_haschar)(void) {
 	return dbg_getc_pending_cnt != 0;
 }
 
 
 
-PUBLIC ATTR_DBGTEXT NOBLOCK bool
-NOTHROW(KCALL dbg_ungetc)(/*utf-8*/ char ch) {
+PUBLIC NOBLOCK ATTR_DBGTEXT bool
+NOTHROW(FCALL dbg_ungetc)(/*utf-8*/ char ch) {
 	if (dbg_getc_pending_cnt) {
 		uint8_t reqlen;
 		/* Unget a utf-8 sequence (continue) */
@@ -1269,7 +1288,8 @@ NOTHROW(KCALL dbg_ungetc)(/*utf-8*/ char ch) {
 }
 
 
-PUBLIC ATTR_DBGTEXT /*utf-8*/ char KCALL dbg_getc(void) {
+PUBLIC ATTR_DBGTEXT /*utf-8*/ char
+NOTHROW(FCALL dbg_getc)(void) {
 	/* Convert unicode characters to utf-8 */
 again:
 	if (dbg_getc_pending_cnt) {
@@ -1291,7 +1311,8 @@ again:
 	}
 }
 
-PUBLIC ATTR_DBGTEXT /*utf-8*/ char KCALL dbg_trygetc(void) {
+PUBLIC NOBLOCK ATTR_DBGTEXT /*utf-8*/ char
+NOTHROW(FCALL dbg_trygetc)(void) {
 	/* Convert unicode characters to utf-8 */
 again:
 	if (dbg_getc_pending_cnt) {
@@ -1314,8 +1335,8 @@ again:
 }
 
 
-INTERN ATTR_DBGTEXT bool
-NOTHROW(KCALL ps2_keyboard_assertbyte)(u8 expected) {
+PRIVATE NOBLOCK ATTR_DBGTEXT bool
+NOTHROW(FCALL ps2_keyboard_assertbyte)(u8 expected) {
 	u8 got = ps2_keyboard_getbyte();
 	if likely(got == expected)
 		return true;
@@ -1431,6 +1452,9 @@ NOTHROW(KCALL x86_debug_initialize_ps2_keyboard)(void) {
 	if unlikely(!ps2_keyboard_scanset)
 		ps2_keyboard_scanset = 1;
 
+	/* TODO: Set a faster default repeat rate (the default one
+	 *       is _way_ too slow; should be at least twice as fast) */
+
 	/* Enable scanning */
 	position = __LINE__;
 	if (!ps2_write_data(PS2_KEYBOARD_CMD_ENABLE_SCANNING))
@@ -1450,8 +1474,8 @@ err_no_ps2:
 	             position);
 }
 
-INTERN ATTR_DBGTEXT void KCALL
-x86_debug_finalize_ps2_keyboard(void) {
+INTERN NOBLOCK ATTR_DBGTEXT void
+NOTHROW(KCALL x86_debug_finalize_ps2_keyboard)(void) {
 	ps2_write_cmd(PS2_CONTROLLER_WRAM(0));
 	ps2_write_cmddata(old_ps2_controller_rram0);
 	ps2_write_cmd((old_ps2_controller_rram0 & PS2_CONTROLLER_CFG_PORT2_IRQ)

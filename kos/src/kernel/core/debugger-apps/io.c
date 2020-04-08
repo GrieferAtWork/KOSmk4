@@ -280,7 +280,7 @@ DEFINE_DEBUG_FUNCTION(
 }
 
 
-PRIVATE ATTR_DBGTEXT NOBLOCK bool
+PRIVATE NOBLOCK ATTR_DBGTEXT bool
 NOTHROW(KCALL is_pc)(void *pc) {
 	struct vm_node *node;
 	if (!ADDR_ISKERN(pc))
