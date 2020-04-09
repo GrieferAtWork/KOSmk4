@@ -780,7 +780,6 @@ x86_userexcept_unwind(struct ucpustate *__restrict ustate,
 	}
 #endif /* !__x86_64__ */
 
-
 	/* Now that we've constructed an entirely valid ICPUSTATE at the base of our
 	 * own stack, we can re-enable interrupts, as it will be this state which is
 	 * (presumably) going to be restored when jumping back into user-space. */

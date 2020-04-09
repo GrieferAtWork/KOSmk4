@@ -266,7 +266,7 @@ __ASM_L(	.cfi_escape 0x23,(OFFSET_TSS_LDTR),0x56,0x22)
 	.cfi_rel_offset %edi, 0
 	.cfi_rel_offset %esi, 4
 	.cfi_rel_offset %ebp, 8
-	.cfi_rel_offset %esp, 12
+/*	.cfi_rel_offset %esp, 12 */
 	.cfi_rel_offset %ebx, 16
 	.cfi_rel_offset %edx, 20
 	.cfi_rel_offset %ecx, 24

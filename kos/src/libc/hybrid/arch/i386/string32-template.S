@@ -20,6 +20,11 @@
 #include <hybrid/compiler.h>
 #include <asm/cfi.h>
 
+#ifdef __INTELLISENSE__
+#define N           1
+#define RETURN_PCPY 0
+#endif /* __INTELLISENSE__ */
+
 #ifndef __DEEMON__
 #ifndef N
 #error "Must #define N before #including this file"
@@ -30,12 +35,38 @@
 #endif /* !__DEEMON__ */
 
 #ifdef __KERNEL__
-#define ENTER_CLD  cld
 #define RET(n)     ret $n
 #else /* __KERNEL__ */
-#define ENTER_CLD  /* nothing */
 #define RET(n)     ret
 #endif /* !__KERNEL__ */
+
+/* Being/end a code-block during which EFLAGS.DF=0 is required */
+#ifdef __KERNEL__
+#define BEGIN_CLD cld
+#define END_CLD   /* nothing */
+#else /* __KERNEL__ */
+#define BEGIN_CLD /* nothing */
+#define END_CLD   /* nothing */
+#endif /* !__KERNEL__ */
+
+
+/* Being/end a code-block during which EFLAGS.DF=1 is required */
+#if !defined(__KERNEL__) || 1
+/* Setup a custom CFI restore function to clear EFLAGS.DF during unwinding */
+#define BEGIN_STD std; CFI_RESTORE_EFLAGS_CLEARDF
+#else /* !__KERNEL__ */
+#define BEGIN_STD std
+#endif /* __KERNEL__ */
+#ifdef __KERNEL__
+#define END_STD   /* nothing */
+#else /* __KERNEL__ */
+#define END_STD   cld; .cfi_restore %eflags
+#endif /* !__KERNEL__ */
+
+
+
+
+
 
 
 #if N == 1
@@ -47,7 +78,7 @@
 #elif N == 4
 #define F(x)   x##l
 #define I(x)   x##l
-#endif
+#endif /* N == ... */
 
 
 
@@ -75,7 +106,7 @@ INTERN_FUNCTION(F(libc_mempcpy))
 INTERN_FUNCTION(F(libc_memcpy))
 #endif /* !RETURN_PCPY */
 	.cfi_startproc
-	ENTER_CLD
+	BEGIN_CLD
 	pushl_cfi_r %edi
 	pushl_cfi_r %esi
 	movl   12(%esp), %edi /* dst */
@@ -100,14 +131,15 @@ INTERN_FUNCTION(F(libc_memcpy))
 	jnc    1f /* if (!(n_words & 1)) goto 1f; */
 	movsw
 1:
-#else
+#else /* N == ... */
 	rep;   movsl
-#endif
+#endif /* N != ... */
 #if RETURN_PCPY
 	movl   %edi, %eax
 #endif /* RETURN_PCPY */
 	popl_cfi_r  %esi
 	popl_cfi_r  %edi
+	END_CLD
 	RET(12)
 	.cfi_endproc
 #if RETURN_PCPY
@@ -140,6 +172,7 @@ INTERN_FUNCTION(F(libc_memmove))
 #else /* __OPTIMIZE_SIZE__ */
 	jb     USED_LIBC_MEMMOVEDOWN_START /* if (dst < src) memmovedown() */
 	ja     USED_LIBC_MEMMOVEUP_START   /* if (dst > src) memmoveup() */
+	/* dst == src */
 	popl_cfi_r  %esi
 	popl_cfi_r  %edi
 	RET(12)
@@ -163,7 +196,7 @@ INTERN_FUNCTION(F(libc_mempmovedown))
 INTERN_FUNCTION(F(libc_memmovedown))
 #endif /* !RETURN_PCPY */
 	/* assert(dst <= src || !n_bytes); */
-	ENTER_CLD
+	BEGIN_CLD
 	pushl_cfi_r %edi
 	pushl_cfi_r %esi
 	movl   12(%esp), %edi /* dst */
@@ -257,6 +290,7 @@ PRIVATE_LABEL(F(libc_x86_memmovedown_start)):
 #endif /* RETURN_PCPY */
 	popl_cfi_r  %esi
 	popl_cfi_r  %edi
+	END_CLD
 	RET(12)
 	.cfi_endproc
 #if RETURN_PCPY
@@ -266,6 +300,30 @@ DEFINE_PUBLIC_ALIAS(F(mempmovedown),F(libc_mempmovedown))
 END(F(libc_memmovedown))
 DEFINE_PUBLIC_ALIAS(F(memmovedown),F(libc_memmovedown))
 #endif /* !RETURN_PCPY */
+
+
+	/* Setup a custom CFI restore function to clear EFLAGS.DF during unwinding */
+/*[[[deemon
+import * from deemon;
+import compileExpression from ......misc.libgen.cfi.compiler;
+local fp = File.Writer();
+local oldOut = File.stdout;
+File.stdout = fp;
+compileExpression('i386', '%eflags', r'
+	push %eflags     # %eflags
+	push $EFLAGS_DF  # %eflags, EFLAGS_DF
+	not              # %eflags, ~EFLAGS_DF
+	and              # (%eflags & ~EFLAGS_DF)
+', deref_after: false);
+File.stdout = oldOut;
+print("#define CFI_RESTORE_EFLAGS_CLEARDF \\");
+print("\t", " \\\n\t".join(fp.string.strip().splitlines(false)));
+]]]*/
+#define CFI_RESTORE_EFLAGS_CLEARDF \
+	__ASM_L(	.cfi_escape 0x16,0x09,0x06,0x59,0x0a,0x00,0x04,0x20) \
+	__ASM_L(	.cfi_escape 0x1a)
+//[[[end]]]
+
 
 .section .text.crt.string.memory
 #if RETURN_PCPY
@@ -357,23 +415,7 @@ PRIVATE_LABEL(F(libc_x86_memmoveup_start)):
 
 	/* Make sure that the direction bit is set,
 	 * thus causing `movs' to do a top->down copy */
-	std
-#if !defined(__KERNEL__) || 1
-	/* Setup a custom CFI restore function to clear EFLAGS.DF during unwinding */
-/*[[[deemon
-import * from deemon;
-import compileExpression from ......misc.libgen.cfi.compiler;
-compileExpression('i386', '%eflags', r'
-	push %eflags     # %eflags
-	push $EFLAGS_DF  # %eflags, EFLAGS_DF
-	not              # %eflags, ~EFLAGS_DF
-	and              # (%eflags & ~EFLAGS_DF)
-', deref_after: false);
-]]]*/
-__ASM_L(	.cfi_escape 0x16,0x09,0x06,0x59,0x0a,0x00,0x04,0x20)
-__ASM_L(	.cfi_escape 0x1a)
-//[[[end]]]
-#endif /* !__KERNEL__ */
+	BEGIN_STD
 #if !RETURN_PCPY
 	movl   %edi, %eax
 #endif /* !RETURN_PCPY */
@@ -389,10 +431,7 @@ __ASM_L(	.cfi_escape 0x1a)
 	rep;   I(movs)
 
 	/* Restore the direction flag */
-#ifndef __KERNEL__
-	cld
-	.cfi_restore %eflags
-#endif /* !__KERNEL__ */
+	END_STD
 	popl_cfi_r  %esi
 	popl_cfi_r  %edi
 	RET(12)
@@ -416,11 +455,11 @@ DEFINE_PUBLIC_ALIAS(F(memmoveup),F(libc_memmoveup))
 .section .text.crt.string.memory
 #if RETURN_PCPY
 INTERN_FUNCTION(F(libc_mempset))
-#else
+#else /* RETURN_PCPY */
 INTERN_FUNCTION(F(libc_memset))
-#endif
+#endif /* !RETURN_PCPY */
 	.cfi_startproc
-	ENTER_CLD
+	BEGIN_CLD
 	pushl_cfi_r %edi
 	pushl_cfi_r %esi
 	movl   12(%esp), %edi /* dst */
@@ -433,7 +472,7 @@ INTERN_FUNCTION(F(libc_memset))
 	movl   20(%esp), %ecx /* n_bytes */
 #if !RETURN_PCPY
 	pushl_cfi %edi
-#endif
+#endif /* !RETURN_PCPY */
 	movl   %ecx, %edx
 	shrl   $(2), %ecx
 	rep;   stosl
@@ -445,9 +484,9 @@ INTERN_FUNCTION(F(libc_memset))
 1:
 #if !RETURN_PCPY
 	popl_cfi %eax
-#else
+#else /* !RETURN_PCPY */
 	movl   %edi, %eax
-#endif
+#endif /* RETURN_PCPY */
 #elif N == 2
 	movzwl 16(%esp), %eax /* word */
 	movw   %ax, %cx
@@ -456,7 +495,7 @@ INTERN_FUNCTION(F(libc_memset))
 	movl   20(%esp), %ecx /* n_words */
 #if !RETURN_PCPY
 	movl   %edi, %edx
-#endif
+#endif /* !RETURN_PCPY */
 	shrl   $(1), %ecx
 	rep;   stosl
 	jnc    1f /* if (!(n_words & 1)) goto 1f; */
@@ -464,24 +503,25 @@ INTERN_FUNCTION(F(libc_memset))
 1:
 #if !RETURN_PCPY
 	movl   %edx, %eax
-#else
+#else /* !RETURN_PCPY */
 	movl   %edi, %eax
-#endif
+#endif /* RETURN_PCPY */
 #else /* N == 4 */
 	movl   16(%esp), %eax /* dword */
 	movl   20(%esp), %ecx /* n_dwords */
 #if !RETURN_PCPY
 	movl   %edi, %edx
-#endif
+#endif /* !RETURN_PCPY */
 	rep;   stosl
 #if !RETURN_PCPY
 	movl   %edx, %eax
-#else
+#else /* !RETURN_PCPY */
 	movl   %edi, %eax
-#endif
-#endif
+#endif /* RETURN_PCPY */
+#endif /* N == ... */
 	popl_cfi_r  %esi
 	popl_cfi_r  %edi
+	END_CLD
 	RET(12)
 	.cfi_endproc
 #if RETURN_PCPY
@@ -496,6 +536,35 @@ DEFINE_PUBLIC_ALIAS(F(memset),F(libc_memset))
 
 
 #if !RETURN_PCPY
+
+
+
+.section .text.crt.string.memory
+INTERN_FUNCTION(F(libc_memcmp))
+	.cfi_startproc
+	BEGIN_CLD
+	pushl_cfi_r %edi
+	pushl_cfi_r %esi
+	/* Compare DS:ESI (lhs) with ES:EDI (rhs) */
+	movl   12(%esp), %esi /* lhs */
+	movl   16(%esp), %edi /* rhs */
+	movl   20(%esp), %ecx /* count */
+	xorl   %eax, %eax     /* result = 0; // HINT: This also forces %eflags to an equal-state to
+	                       *             //       handle %ecx==0 (where cmps won't update %eflags) */
+	repe;  I(cmps)        /* Do the actual compare */
+	/* jb -> return -1; */
+	/* ja -> return 1; */
+	/* je -> return 0; */
+	seta   %al            /* result = (result & 0xffffff00) | ((lhs > rhs) ? 1 : 0); */
+	movl   $(-1), %ecx
+	cmovb  %ecx, %eax     /* if (lhs < rhs) result = -1; */
+	popl_cfi_r  %esi
+	popl_cfi_r  %edi
+	END_CLD
+	RET(12)
+	.cfi_endproc
+END(F(libc_memcmp))
+DEFINE_PUBLIC_ALIAS(F(memcmp),F(libc_memcmp))
 
 /* TODO: memcmp[b|w|l]()      (cmps) */
 /* TODO: memchr[b|w|l]()      (scas) */
@@ -538,13 +607,12 @@ DEFINE_PUBLIC_ALIAS(F(memset),F(libc_memset))
 #endif
 #endif
 
-
 #ifdef F_STRING
 
 .section STRING_SECTION
 INTERN_FUNCTION(F_STRING(end))
 	.cfi_startproc
-	ENTER_CLD
+	BEGIN_CLD
 	pushl_cfi_r %edi
 	movl   8(%esp), %edi
 	movl   $-1, %ecx
@@ -552,6 +620,7 @@ INTERN_FUNCTION(F_STRING(end))
 	repne; I(scas)
 	leal   -N(%edi), %eax
 	popl_cfi_r %edi
+	END_CLD
 	RET(4)
 	.cfi_endproc
 END(F_STRING(end))
@@ -560,7 +629,7 @@ DEFINE_PUBLIC_ALIAS(F_STRING_EXPORT(end),F_STRING(end))
 .section STRING_SECTION
 INTERN_FUNCTION(F_STRING(len))
 	.cfi_startproc
-	ENTER_CLD
+	BEGIN_CLD
 	pushl_cfi_r %edi
 	movl   8(%esp), %edi
 	movl   $-1, %ecx
@@ -569,6 +638,7 @@ INTERN_FUNCTION(F_STRING(len))
 	subl   %ecx, %eax /* result = 0 - ECX; */
 	subl   $(2), %eax   /* result = (0 - ECX) - 2; */
 	popl_cfi_r %edi
+	END_CLD
 	RET(4)
 	.cfi_endproc
 END(F_STRING(len))
@@ -577,7 +647,7 @@ DEFINE_PUBLIC_ALIAS(F_STRING_EXPORT(len),F_STRING(len))
 .section STRING_SECTION
 INTERN_FUNCTION(F_STRING(nlen))
 	.cfi_startproc
-	ENTER_CLD
+	BEGIN_CLD
 	xorl   %eax, %eax
 	movl   8(%esp), %edx
 	testl  %edx, %edx
@@ -591,7 +661,8 @@ INTERN_FUNCTION(F_STRING(nlen))
 1:	subl   %ecx, %edx
 	movl   %edx, %eax /* result = max_chars - ECX; */
 	popl_cfi_r %edi
-2:	RET(8)
+2:	END_CLD
+	RET(8)
 	.cfi_endproc
 END(F_STRING(nlen))
 DEFINE_PUBLIC_ALIAS(F_STRING_EXPORT(nlen),F_STRING(nlen))
@@ -599,7 +670,7 @@ DEFINE_PUBLIC_ALIAS(F_STRING_EXPORT(nlen),F_STRING(nlen))
 .section STRING_SECTION
 INTERN_FUNCTION(F_STRING(nend))
 	.cfi_startproc
-	ENTER_CLD
+	BEGIN_CLD
 	pushl_cfi_r %edi
 	xorl   %eax, %eax
 	movl   8(%esp), %edi
@@ -610,11 +681,12 @@ INTERN_FUNCTION(F_STRING(nend))
 	jne    1f
 #if N == 1
 	decl   %edi
-#else
-	subl   $N, %edi
-#endif
+#else /* N == 1 */
+	subl   $(N), %edi
+#endif /* N != 1 */
 1:	movl   %edi, %eax
 	popl_cfi_r %edi
+	END_CLD
 	RET(8)
 	.cfi_endproc
 END(F_STRING(nend))
@@ -635,6 +707,9 @@ DEFINE_PUBLIC_ALIAS(F_STRING_EXPORT(nend),F_STRING(nend))
 #undef N
 #undef I
 #undef F
-#undef ENTER_CLD
+#undef BEGIN_CLD
+#undef END_CLD
+#undef BEGIN_STD
+#undef END_STD
 #undef RET
 

@@ -153,7 +153,7 @@ __ASM_L(	.cfi_adjust_cfa_offset 32)
 __ASM_L(	.cfi_rel_offset %edi, 0)
 __ASM_L(	.cfi_rel_offset %esi, 4)
 __ASM_L(	.cfi_rel_offset %ebp, 8)
-/*__ASM_L(	.cfi_rel_offset %esp, 12) */
+/*ASM_L(	.cfi_rel_offset %esp, 12) */
 __ASM_L(	.cfi_rel_offset %ebx, 16)
 __ASM_L(	.cfi_rel_offset %edx, 20)
 __ASM_L(	.cfi_rel_offset %ecx, 24)

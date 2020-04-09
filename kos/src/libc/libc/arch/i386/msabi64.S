@@ -66,6 +66,9 @@
  * TODO: We must also account for the difference in the implementation of `va_list'!
  * TODO: We must also account for floating point arguments! (which is something that
  *       generate_headers.dee could tell us, but doesn't at the moment...)
+ * TODO: All of this stuff really shouldn't go into libc.so. - Instead, there should
+ *       be a compatibility library (/lib64/libmsabi64.so) that is automatically loaded
+ *       alongside libc.so for exe programs running under x86_64!
  */
 
 

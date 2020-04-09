@@ -512,6 +512,16 @@ function scanFileForMacro(filename: string, name: string): int | none {
 			l = l[:p];
 		l = l.strip();
 		if (l) {
+			l = l.lstrip("_U");
+			if (l.startswith("INT")) {
+				local i = l.find("(");
+				if (i >= 0) {
+					local e = l.findmatch("(", ")", i + 1);
+					if (e >= 0)
+						l = l[i + 1:e].strip();
+				}
+			}
+
 			l = try int(l) catch (...) none;
 			if (l !is none) {
 				_filesWithUsedMacros.insert(filename);
