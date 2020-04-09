@@ -865,6 +865,8 @@ function _vmGetRegisters(): {string: int} {
 @@Return a set of @(register, value) for the following registers:
 @@   @"ax", @"bx", @"cx", @"dx", @"si", @"di", @"sp", @"bp", @"ip", @"flags"
 @@   @"cs", @"ds", @"es", @"fs", @"gs"
+@@On x86_64, the following registers are also contained:
+@@   @"r8", @"r9", @"r10", @"r11", @"r12", @"r13", @"r14", @"r15"
 @@The register names of the first line always have those names in the returned
 @@mapping, however will have had the one of @"foo", @"efoo" or @"rfoo" in the
 @@original register list.
@@ -1246,9 +1248,9 @@ function encodeHex4b(fp: File, s: int) {
 	fp.putc(tohex(s >> 24));
 }
 
-function decodeHex4b(b: Bytes, i: int): int {
+function decodeHex(b: Bytes, i: int, nBytes: int): int {
 	local result = 0;
-	for (local j: [:4]) {
+	for (local j: [:nBytes]) {
 		local c1 = fromhex(b[i + j * 2]);
 		local c2 = fromhex(b[i + j * 2 + 1]);
 		local c  = c1 << 4 | c2;
@@ -1271,25 +1273,89 @@ function gdbConstructStopReply(): Bytes {
 
 
 
+global final BASIC_REGISTER_COUNT64 = 24;
+global final REGISTER_IDS64: {int: (int, string, string)} = {
+	0x00 : (8, "ax", "rax"),       /* 64-bit [C] Accumulator register */
+	0x01 : (8, "bx", "rbx"),       /* 64-bit [P] Base register */
+	0x02 : (8, "cx", "rcx"),       /* 64-bit [C] Count register */
+	0x03 : (8, "dx", "rdx"),       /* 64-bit [C] Data register */
+	0x04 : (8, "si", "rsi"),       /* 64-bit [C] Source pointer */
+	0x05 : (8, "di", "rdi"),       /* 64-bit [C] Destination pointer */
+	0x06 : (8, "bp", "rbp"),       /* 64-bit [P] Frame base pointer */
+	0x07 : (8, "sp", "rsp"),       /* 64-bit [P] Stack pointer */
+	0x08 : (8, "r8",  "r8"),       /* 64-bit %r8 */
+	0x09 : (8, "r9",  "r9"),       /* 64-bit %r9 */
+	0x0a : (8, "r10", "r10"),      /* 64-bit %r10 */
+	0x0b : (8, "r11", "r11"),      /* 64-bit %r11 */
+	0x0c : (8, "r12", "r12"),      /* 64-bit %r12 */
+	0x0d : (8, "r13", "r13"),      /* 64-bit %r13 */
+	0x0e : (8, "r14", "r14"),      /* 64-bit %r14 */
+	0x0f : (8, "r15", "r15"),      /* 64-bit %r15 */
+	0x10 : (8, "ip", "rip"),       /* 64-bit Instruction pointer */
+	0x11 : (4, "flags", "rflags"), /* 32-bit Flags register */
+	0x12 : (4, "cs", "cs"),        /* 32-bit Code segment */
+	0x13 : (4, "ss", "ss"),        /* 32-bit Stack segment */
+	0x14 : (4, "ds", "ds"),        /* 32-bit D (destination) segment register */
+	0x15 : (4, "es", "es"),        /* 32-bit E (source) segment register */
+	0x16 : (4, "fs", "fs"),        /* 32-bit F segment register */
+	0x17 : (4, "gs", "gs"),        /* 32-bit G segment register */
+	/* NOTE: Reading/writing these registers could be done through use of code-injection! */
+//TODO:#define GDB_REGISTER_X86_64_ST0    0x18 /* 80-bit %st(0) */
+//TODO:#define GDB_REGISTER_X86_64_ST1    0x19 /* 80-bit %st(1) */
+//TODO:#define GDB_REGISTER_X86_64_ST2    0x1a /* 80-bit %st(2) */
+//TODO:#define GDB_REGISTER_X86_64_ST3    0x1b /* 80-bit %st(3) */
+//TODO:#define GDB_REGISTER_X86_64_ST4    0x1c /* 80-bit %st(4) */
+//TODO:#define GDB_REGISTER_X86_64_ST5    0x1d /* 80-bit %st(5) */
+//TODO:#define GDB_REGISTER_X86_64_ST6    0x1e /* 80-bit %st(6) */
+//TODO:#define GDB_REGISTER_X86_64_ST7    0x1f /* 80-bit %st(7) */
+//TODO:#define GDB_REGISTER_X86_64_FCW    0x20 /* 32-bit fs_fcw (fctrl) */
+//TODO:#define GDB_REGISTER_X86_64_FSW    0x21 /* 32-bit fs_fsw (fstat) */
+//TODO:#define GDB_REGISTER_X86_64_FTW    0x22 /* 32-bit fs_ftw (ftag) */
+//TODO:#define GDB_REGISTER_X86_64_FCS    0x23 /* 32-bit fs_fcs (fiseg) */
+//TODO:#define GDB_REGISTER_X86_64_FIP    0x24 /* 32-bit fs_fip (fioff) */
+//TODO:#define GDB_REGISTER_X86_64_FDS    0x25 /* 32-bit fs_fds (foseg) */
+//TODO:#define GDB_REGISTER_X86_64_FDP    0x26 /* 32-bit fs_fdp (fooff) */
+//TODO:#define GDB_REGISTER_X86_64_FOP    0x27 /* 32-bit fs_fop (fop) */
+//TODO:#define GDB_REGISTER_X86_64_XMM0   0x28 /* 128-bit %xmm0 */
+//TODO:#define GDB_REGISTER_X86_64_XMM1   0x29 /* 128-bit %xmm1 */
+//TODO:#define GDB_REGISTER_X86_64_XMM2   0x2a /* 128-bit %xmm2 */
+//TODO:#define GDB_REGISTER_X86_64_XMM3   0x2b /* 128-bit %xmm3 */
+//TODO:#define GDB_REGISTER_X86_64_XMM4   0x2c /* 128-bit %xmm4 */
+//TODO:#define GDB_REGISTER_X86_64_XMM5   0x2d /* 128-bit %xmm5 */
+//TODO:#define GDB_REGISTER_X86_64_XMM6   0x2e /* 128-bit %xmm6 */
+//TODO:#define GDB_REGISTER_X86_64_XMM7   0x2f /* 128-bit %xmm7 */
+//TODO:#define GDB_REGISTER_X86_64_XMM8   0x30 /* 128-bit %xmm8 */
+//TODO:#define GDB_REGISTER_X86_64_XMM9   0x31 /* 128-bit %xmm9 */
+//TODO:#define GDB_REGISTER_X86_64_XMM10  0x32 /* 128-bit %xmm10 */
+//TODO:#define GDB_REGISTER_X86_64_XMM11  0x33 /* 128-bit %xmm11 */
+//TODO:#define GDB_REGISTER_X86_64_XMM12  0x34 /* 128-bit %xmm12 */
+//TODO:#define GDB_REGISTER_X86_64_XMM13  0x35 /* 128-bit %xmm13 */
+//TODO:#define GDB_REGISTER_X86_64_XMM14  0x36 /* 128-bit %xmm14 */
+//TODO:#define GDB_REGISTER_X86_64_XMM15  0x37 /* 128-bit %xmm15 */
+//TODO:#define GDB_REGISTER_X86_64_MXCSR  0x38 /* 32-bit %mxcsr */
+//TODO:#define GDB_REGISTER_X86_64_FSBASE 0x40 /* 64-bit %fs.base */
+//TODO:#define GDB_REGISTER_X86_64_GSBASE 0x41 /* 64-bit %gs.base */
+};
 
 global final BASIC_REGISTER_COUNT32 = 16;
 global final REGISTER_IDS32: {int: (int, string, string)} = {
-	0x00 : (4, "eax", "rax"),
-	0x01 : (4, "ecx", "rcx"),
-	0x02 : (4, "edx", "rdx"),
-	0x03 : (4, "ebx", "rbx"),
-	0x04 : (4, "esp", "rsp"),
-	0x05 : (4, "ebp", "rbp"),
-	0x06 : (4, "esi", "rsi"),
-	0x07 : (4, "edi", "rdi"),
-	0x08 : (4, "eip", "rip"),
-	0x09 : (4, "eflags", "rflags"),
+	0x00 : (4, "ax", "rax"),
+	0x01 : (4, "cx", "rcx"),
+	0x02 : (4, "dx", "rdx"),
+	0x03 : (4, "bx", "rbx"),
+	0x04 : (4, "sp", "rsp"),
+	0x05 : (4, "bp", "rbp"),
+	0x06 : (4, "si", "rsi"),
+	0x07 : (4, "di", "rdi"),
+	0x08 : (4, "ip", "rip"),
+	0x09 : (4, "flags", "rflags"),
 	0x0a : (4, "cs", "cs"),
 	0x0b : (4, "ss", "ss"),
 	0x0c : (4, "ds", "ds"),
 	0x0d : (4, "es", "es"),
 	0x0e : (4, "fs", "fs"),
 	0x0f : (4, "gs", "gs"),
+	/* NOTE: Reading/writing these registers could be done through use of code-injection! */
 //TODO:#define GDB_REGISTER_I386_ST0    0x10 /* %st(0) */
 //TODO:#define GDB_REGISTER_I386_ST1    0x11 /* %st(1) */
 //TODO:#define GDB_REGISTER_I386_ST2    0x12 /* %st(2) */
@@ -1414,14 +1480,14 @@ do_vmResume:
 		local regs = vmGetRegisters();
 		File.Writer result;
 		if (TARGET_ARCH == "x86_64") {
-			throw Error("TODO");
+			for (local id: [:BASIC_REGISTER_COUNT64]) {
+				local name = REGISTER_IDS64[id][1];
+				encodeHex4b(result, regs[name]);
+			}
 		} else {
 			for (local id: [:BASIC_REGISTER_COUNT32]) {
-				local none, name32, name64 = REGISTER_IDS32[id]...;
-				local usedName = name32;
-				if (name32 != name64)
-					usedName = name32[1:];
-				encodeHex4b(result, regs[usedName]);
+				local name = REGISTER_IDS32[id][1];
+				encodeHex4b(result, regs[name]);
 			}
 		}
 		return result.string;
@@ -1430,32 +1496,38 @@ do_vmResume:
 	case "G".ord(): {
 		local data = cmd[1:];
 		vmSetCurrentCpu(gdbCurrentThreadForGeneral);
+		local count, table;
 		if (TARGET_ARCH == "x86_64") {
-			throw Error("TODO");
+			count = BASIC_REGISTER_COUNT64;
+			table = REGISTER_IDS64;
 		} else {
-			if (#data < BASIC_REGISTER_COUNT32 * 8)
-				throw Error("Register data blob is too small");
-			local offset = 0;
-			for (local id: [:BASIC_REGISTER_COUNT32]) {
-				local name = REGISTER_IDS32[id][2];
-				vmSetRegister(name, decodeHex4b(data, offset));
-				offset += 8;
-			}
+			count = BASIC_REGISTER_COUNT32;
+			table = REGISTER_IDS32;
+		}
+		local offset = 0;
+		for (local id: [:count]) {
+			local def = table[id];
+			local size = def[0];
+			vmSetRegister(def[2], decodeHex(data, offset, size));
+			offset += size * 2;
 		}
 		return "OK";
 	}
 
 	case "p".ord(): {
 		local id = int(cmd[1:], 16);
-		local data;
+		local data, def;
 		vmSetCurrentCpu(gdbCurrentThreadForGeneral);
 		if (TARGET_ARCH == "x86_64") {
-			throw Error("TODO");
+			def = REGISTER_IDS64[id];
 		} else {
-			local def = REGISTER_IDS32[id];
-			data = vmGetRegisterAsHex(def[1]);
-			data = data.zfill(def[0] * 2);
+			def = REGISTER_IDS32[id];
 		}
+		data = vmGetRegisterAsHex(def[2]);
+		local len = def[0] * 2;
+		data = data.lstrip("0").zfill(len);
+		if (#data > len)
+			data = data[#data - len:];
 		return data;
 	}
 
@@ -1463,13 +1535,14 @@ do_vmResume:
 		local idEnd = cmd.index("=");
 		local id    = int(cmd[1:idEnd], 16);
 		local value = "0x" + cmd[idEnd + 1:];
+		local def;
 		vmSetCurrentCpu(gdbCurrentThreadForGeneral);
 		if (TARGET_ARCH == "x86_64") {
-			throw Error("TODO");
+			def = REGISTER_IDS64[id];
 		} else {
-			local def = REGISTER_IDS32[id];
-			vmSetRegister(def[2], value);
+			def = REGISTER_IDS32[id];
 		}
+		vmSetRegister(def[2], value);
 		return "OK";
 	}
 
