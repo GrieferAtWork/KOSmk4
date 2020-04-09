@@ -341,7 +341,6 @@ NOTHROW(KCALL early_poll_outport)(u8 *__restrict presult) {
 	/* Check if the status port indicates that data may be available. */
 	if (status & PS2_STATUS_OUTFULL) {
 		u8 data;
-		pflag_t was;
 		data = inb_p(PS2_DATA);
 		COMPILER_BARRIER();
 		/* Check once again for the possibility that what we've just
