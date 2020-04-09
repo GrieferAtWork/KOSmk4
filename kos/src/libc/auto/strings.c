@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x120f012b */
+/* HASH CRC-32:0x9706a6fc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,7 +51,7 @@ INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.index") char *
 NOTHROW_NCX(LIBCCALL libc_index)(char const *__restrict haystack,
                                  int needle) {
-#line 61 "kos/src/libc/magic/strings.c"
+#line 60 "kos/src/libc/magic/strings.c"
 	for (; *haystack; ++haystack) {
 		if (*haystack == needle)
 			return (char *)haystack;
@@ -65,7 +65,7 @@ INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.rindex") char *
 NOTHROW_NCX(LIBCCALL libc_rindex)(char const *__restrict haystack,
                                   int needle) {
-#line 75 "kos/src/libc/magic/strings.c"
+#line 74 "kos/src/libc/magic/strings.c"
 	char const *result = NULL;
 	for (; *haystack; ++haystack) {
 		if (*haystack == needle)

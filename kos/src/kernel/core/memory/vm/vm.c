@@ -2334,7 +2334,7 @@ again_lock_datapart:
 					                               perm);
 				}
 				/* Synchronize the page directory for address range mapped by the node. */
-				/* FIXME: `vm_paged_sync()' can throw E_WOULDBLOCK!
+				/* FIXME: `vm_sync()' can throw E_WOULDBLOCK!
 				 *        Instead, we must acquire task chain locks alongside node tree locks above! */
 				vm_sync(v, vm_node_getstart(node), vm_node_getsize(node));
 			}

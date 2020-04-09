@@ -225,13 +225,7 @@ DEFINE_DBG_BZERO_OBJECT(mall_heap.h_lock);
 
 
 
-#if __SIZEOF_POINTER__ == 4
-typedef u16 mall_ver_t;
-#elif __SIZEOF_POINTER__ == 8
-typedef u32 mall_ver_t;
-#else
-#error FIXME
-#endif
+typedef uintptr_half_t mall_ver_t;
 
 struct mallnode {
 	ATREE_NODE(struct mallnode,uintptr_t) m_tree;     /* Tree of mall nodes. */

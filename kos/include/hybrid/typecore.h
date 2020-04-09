@@ -221,7 +221,7 @@
 #endif
 #endif /* __INTPTR_MAX__ */
 #ifndef __SIZEOF_POINTER__
-#   error FIXME
+#   error "Cannot determine `__SIZEOF_POINTER__'"
 #endif /* !__SIZEOF_POINTER__ */
 #endif /* !__SIZEOF_POINTER__ */
 #endif /* ... */
@@ -666,9 +666,9 @@
 #elif defined(__SIZEOF_LONG_LONG__) && __SIZEOF_LONG_LONG__ == 1
 #   define __TYPEFOR_INTIB1  signed long long
 #   define __TYPEFOR_UINTIB1 unsigned long long
-#else
-#   error FIXME
-#endif
+#else /* ... */
+#   error "Cannot determine 1-byte integer types"
+#endif /* !... */
 #if defined(__INT16_TYPE__) && defined(__UINT16_TYPE__)
 #   define __TYPEFOR_INTIB2  __INT16_TYPE__
 #   define __TYPEFOR_UINTIB2 __UINT16_TYPE__
@@ -687,9 +687,9 @@
 #elif __SIZEOF_CHAR__ == 2
 #   define __TYPEFOR_INTIB2  signed char
 #   define __TYPEFOR_UINTIB2 unsigned char
-#else
-#   error FIXME
-#endif
+#else /* ... */
+#   error "Cannot determine 2-byte integer types"
+#endif /* !... */
 #if defined(__INT32_TYPE__) && defined(__UINT32_TYPE__)
 #   define __TYPEFOR_INTIB4  __INT32_TYPE__
 #   define __TYPEFOR_UINTIB4 __UINT32_TYPE__
@@ -708,9 +708,9 @@
 #elif __SIZEOF_CHAR__ == 4
 #   define __TYPEFOR_INTIB4  signed char
 #   define __TYPEFOR_UINTIB4 unsigned char
-#else
-#   error FIXME
-#endif
+#else /* ... */
+#   error "Cannot determine 4-byte integer types"
+#endif /* !... */
 #if defined(__INT64_TYPE__) && defined(__UINT64_TYPE__)
 #   define __TYPEFOR_INTIB8  __INT64_TYPE__
 #   define __TYPEFOR_UINTIB8 __UINT64_TYPE__

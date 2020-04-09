@@ -34,6 +34,7 @@ typedef __cpu_set_t    cpu_set_t;
 #include <bits/types.h>
 #include <libc/string.h>
 #include <libc/malloc.h>
+#include <hybrid/__bit.h>
 
 #ifdef __USE_KOS
 #include <bits/signum.h>
@@ -343,20 +344,22 @@ typedef struct __cpu_set_struct {
 	[(((i) < __NCPUBITS || (i) >= (__CPU_SETSIZE-__NCPUBITS)) \
 		? __CPUELT(__CPU_SETSIZE)-1 : __CPUELT(i)+1) ... __CPUELT(__CPU_SETSIZE)-1] = \
 		(i) >= (__CPU_SETSIZE-__NCPUBITS) ? __CPUMASK(i) : 0, }}
-#else
+#else /* ... */
 #define __CPU_SETONE(i) \
 	{{[0 ... __CPUELT(__CPU_SETSIZE)-1] = 0, [__CPUELT(i)] = __CPUMASK(i)}}
-#endif
+#endif /* !... */
 
-#if __SIZEOF_CPU_MASK__ <= __SIZEOF_INT__
-#   define __CPUMASK_POPCOUNT __builtin_popcount
-#elif __SIZEOF_CPU_MASK__ <= __SIZEOF_LONG__
-#   define __CPUMASK_POPCOUNT __builtin_popcountl
-#elif __SIZEOF_CPU_MASK__ <= __SIZEOF_LONG_LONG__
-#   define __CPUMASK_POPCOUNT __builtin_popcountll
-#else
-#   error FIXME
-#endif
+#if __SIZEOF_CPU_MASK__ <= 1
+#define __CPUMASK_POPCOUNT __hybrid_popcount8
+#elif __SIZEOF_CPU_MASK__ <= 2
+#define __CPUMASK_POPCOUNT __hybrid_popcount16
+#elif __SIZEOF_CPU_MASK__ <= 4
+#define __CPUMASK_POPCOUNT __hybrid_popcount32
+#elif __SIZEOF_CPU_MASK__ <= 8
+#define __CPUMASK_POPCOUNT __hybrid_popcount64
+#else /* ... */
+#error "Unsupported __SIZEOF_CPU_MASK__"
+#endif /* !... */
 
 #define __CPU_FILL_S(setsize, cpusetp)         \
 	do {                                       \

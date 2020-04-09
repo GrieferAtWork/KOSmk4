@@ -89,15 +89,17 @@ opt.append("-Os");
 
 DECL_BEGIN
 
-#define BAD_USAGE_REASON_UD  0x0600
-#define BAD_USAGE_REASON_SS  0x0c00
-#define BAD_USAGE_REASON_GFP 0x0d00
-#define BAD_USAGE_INTNO(usage)  (((usage) & 0xff00) >> 8)
-#define BAD_USAGE_REASON(usage) ((usage) & 0xff00)
-#define BAD_USAGE_ECODE(usage)  ((usage) & 0x00ff) /* FIXME: Segment selector error codes can be up to 16 bits (not just 8)! */
+#define BAD_USAGE_REASON_UD     UINT32_C(0x060000)
+#define BAD_USAGE_REASON_SS     UINT32_C(0x0c0000)
+#define BAD_USAGE_REASON_GFP    UINT32_C(0x0d0000)
+#define BAD_USAGE_INTNO(usage)  (((usage) & UINT32_C(0xff0000)) >> 16)
+#define BAD_USAGE_REASON(usage) (((usage) & UINT32_C(0xff0000)))
+#define BAD_USAGE_ECODE(usage)  (((usage) & UINT32_C(0x00ffff)))
+typedef u32 bad_usage_reason_t;
+
 
 PRIVATE ATTR_RETNONNULL NONNULL((1)) struct icpustate *FCALL
-x86_handle_bad_usage(struct icpustate *__restrict state, u16 usage);
+x86_handle_bad_usage(struct icpustate *__restrict state, bad_usage_reason_t usage);
 
 
 #define EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BIT 1
@@ -311,7 +313,7 @@ x86_handle_bad_usage(struct icpustate *__restrict state, u16 usage);
 #define EMU86_EMULATE_CC            FCALL
 #define EMU86_EMULATE_NAME          x86_handle_bad_usage
 #define EMU86_EMULATE_HELPER_DECL   PRIVATE
-#define EMU86_EMULATE_ARGS          struct icpustate *__restrict _state, u16 usage
+#define EMU86_EMULATE_ARGS          struct icpustate *__restrict _state, bad_usage_reason_t usage
 #define EMU86_EMULATE_HELPER_ATTR   NONNULL((1))
 #define EMU86_EMULATE_HELPER_ARGS   struct icpustate *__restrict _state
 #define EMU86_EMULATE_HELPER_PARAM  _state
@@ -459,7 +461,7 @@ throw_exception(struct icpustate *__restrict state,
 
 PRIVATE ATTR_NORETURN NONNULL((1)) void
 (FCALL throw_generic_unknown_instruction)(struct icpustate *__restrict state,
-                                          u16 usage, uintptr_t opcode,
+                                          bad_usage_reason_t usage, uintptr_t opcode,
                                           emu86_opflags_t op_flags
 #ifndef __x86_64__
                                           ,
@@ -567,7 +569,8 @@ PRIVATE ATTR_NORETURN NONNULL((1)) void
 
 PRIVATE ATTR_NORETURN NONNULL((1)) void FCALL
 throw_unsupported_instruction(struct icpustate *__restrict state,
-                              u16 usage, uintptr_t opcode, uintptr_t op_flags) {
+                              bad_usage_reason_t usage,
+                              uintptr_t opcode, uintptr_t op_flags) {
 	if (BAD_USAGE_REASON(usage) == BAD_USAGE_REASON_UD) {
 		/* An unsupported instruction caused a #UD
 		 * -> Throw an UNSUPPORTED_OPCODE exception */
@@ -1349,12 +1352,12 @@ DECL_BEGIN
 
 INTERN struct icpustate *FCALL
 x86_handle_stackfault(struct icpustate *__restrict state, uintptr_t ecode) {
-	return x86_handle_bad_usage(state, BAD_USAGE_REASON_SS | ecode);
+	return x86_handle_bad_usage(state, BAD_USAGE_REASON_SS | (ecode & 0xffff));
 }
 
 INTERN struct icpustate *FCALL
 x86_handle_gpf(struct icpustate *__restrict state, uintptr_t ecode) {
-	return x86_handle_bad_usage(state, BAD_USAGE_REASON_GFP | ecode);
+	return x86_handle_bad_usage(state, BAD_USAGE_REASON_GFP | (ecode & 0xffff));
 }
 
 INTERN struct icpustate *FCALL

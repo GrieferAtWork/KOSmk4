@@ -57,10 +57,6 @@ libdl_dltlsaddr(DlModule *self)
 	/* Simple case: Static TLS, and special case: Empty TLS */
 	if (self->dm_tlsstoff || unlikely(!self->dm_tlsmsize))
 		return result + self->dm_tlsstoff;
-	/* FIXME: This isn't re-entrant! - What if a signal handler accesses a TLS variable from
-	 *        from a dynamically loaded library, while the calling thread was interrupted
-	 *        within the following atomic lock? (In other words: This lock needs to allow
-	 *        for recursion within the same thread) */
 	atomic_rwlock_read(&((struct tls_segment *)result)->ts_exlock);
 	extab = dtls_extension_tree_locate(((struct tls_segment *)result)->ts_extree, (uintptr_t)self);
 	atomic_rwlock_endread(&((struct tls_segment *)result)->ts_exlock);
@@ -122,6 +118,14 @@ libdl_dltlsaddr(DlModule *self)
 			}
 		}
 	}
+	/* XXX: This isn't re-entrant! - What if a signal handler accesses a TLS variable from
+	 *      from a dynamically loaded library, while the calling thread was interrupted
+	 *      within the following atomic lock? (In other words: This lock needs to allow
+	 *      for recursion within the same thread)
+	 * ->:  What about the fact that we're also using malloc() here? malloc() most definitely
+	 *      isn't (any probably couldn't) be re-entrant in the general case...
+	 *      What do the specs say about a signal handler being the first to access some
+	 *      thread-local variable? */
 	atomic_rwlock_write(&((struct tls_segment *)result)->ts_exlock);
 	{
 		struct dtls_extension *newtab;

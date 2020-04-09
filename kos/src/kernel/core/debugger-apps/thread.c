@@ -84,8 +84,6 @@ enum_thread(struct task *__restrict thread, unsigned int state) {
 #endif /* CONFIG_NO_SMP */
 	           ,
 	           (unsigned int)thread->t_cpu->c_id);
-	/* FIXME: Shouldn't access the arch-specific `x86_dbg_exitstate' object.
-	 *        Should instead use `' */
 	dbg_printf(DBGSTR("%[vinfo:%n(%p)]\t%p"),
 	           thread == THIS_TASK ? dbg_getpcreg(DBG_REGLEVEL_EXIT)
 	                               : scpustate_getpc(thread->t_sched.s_state),
