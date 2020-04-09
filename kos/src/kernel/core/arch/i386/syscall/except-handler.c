@@ -626,6 +626,7 @@ restore_exception:
 			if likely(result)
 				goto done;
 		} EXCEPT {
+			error_printf("raising exception/signal");
 			goto restore_exception2;
 		}
 		__IF0 {
