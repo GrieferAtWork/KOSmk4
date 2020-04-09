@@ -3,215 +3,13 @@
 	"defaults": {
 	},
 	"configurations": [
+
+/************************************************************************/
+/* QEMU                                                                 */
+/************************************************************************/
 		{
 			"type": "cppdbg",
-			"name": "kernel (--emulator=qemu --gdb=server)",
-			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
-			"project": "src",
-			"sourceFileMap": {
-				"ABSOLUTE_KOS_PROJECT_ROOT": "ABSOLUTE_KOS_NT_PROJECT_ROOT",
-				"/cygdrive/c": "C:\\",
-				"/cygdrive/d": "D:\\",
-				"/cygdrive/e": "E:\\",
-				"/cygdrive/f": "F:\\",
-				"/cygdrive/g": "G:\\",
-				"/cygdrive/h": "H:\\",
-				"/cygdrive/i": "I:\\",
-				"/cygdrive/j": "J:\\",
-				"/cygdrive/k": "K:\\",
-				"/cygdrive/x": "X:\\",
-				"/cygdrive/y": "Y:\\",
-				"/cygdrive/z": "Z:\\"
-			},
-			"program": ".",
-			"MIMode": "gdb",
-			"miDebuggerPath": "ABSOLUTE_KOS_NT_PROJECT_ROOT\\kos\\misc\\gdbridge\\gdbridge.exe",
-			"targetArchitecture": "x86",
-			"debugType": "native",
-			"launchCompleteCommand": "None",
-			"miDebuggerServerAddress": ".",
-			"customLaunchSetupCommands": [
-				{ "text": "cd ABSOLUTE_KOS_NT_PROJECT_ROOT", "ignoreFailures": false },
-				{ "text": "set sysroot ABSOLUTE_KOS_NT_PROJECT_ROOT\\bin\\${env.TARGET}-kos-${env.CONFIG}", "ignoreFailures": false },
-				{ "text": "set solib-search-path bin/${env.TARGET}-kos-${env.CONFIG}/lib:bin/${env.TARGET}-kos-${env.CONFIG}/os/drivers", "ignoreFailures": false },
-				{ "text": "set auto-solib-add on", "ignoreFailures": false },
-				{ "text": "-target-select remote localhost:1234", "ignoreFailures": false }
-			],
-			"setupCommands": [
-				{ "text": "-enable-pretty-printing", "ignoreFailures": true },
-				{ "text": "set print pretty on", "ignoreFailures": true },
-				{ "text": "set print object on", "ignoreFailures": true },
-				{ "text": "set print static-members on", "ignoreFailures": true },
-				{ "text": "set print vtbl on", "ignoreFailures": true },
-				{ "text": "set print demangle on", "ignoreFailures": true },
-				{ "text": "set demangle-style gnu-v3", "ignoreFailures": true },
-				{ "text": "set print sevenbit-strings off", "ignoreFailures": true },
-				{ "text": "set detach-on-fork off", "ignoreFailures": false },
-				{ "text": "set schedule-multiple on", "ignoreFailures": false },
-				{ "text": "set follow-fork-mode child", "ignoreFailures": false }
-			],
-			"debugServerPath": "${env.SYSTEMROOT}\\system32\\cmd.exe",
-			"debugServerArgs": "/c \"deemon ABSOLUTE_KOS_NT_PROJECT_ROOT\\magic.dee --run-only --emulator=qemu --gdb=server --emulator-started-pattern=EMULATOR_STARTED --target=${env.TARGET} --config=${env.CONFIG}\"",
-			"serverStarted": "EMULATOR_STARTED",
-			"serverLaunchTimeout": 120000,
-			"filterStdout": true,
-			"filterStderr": true
-		},
-		{
-			"type": "cppdbg",
-			"name": "kernel (--gdb=server) (external)",
-			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
-			"project": "src",
-			"sourceFileMap": {
-				"ABSOLUTE_KOS_PROJECT_ROOT": "ABSOLUTE_KOS_NT_PROJECT_ROOT",
-				"/cygdrive/c": "C:\\",
-				"/cygdrive/d": "D:\\",
-				"/cygdrive/e": "E:\\",
-				"/cygdrive/f": "F:\\",
-				"/cygdrive/g": "G:\\",
-				"/cygdrive/h": "H:\\",
-				"/cygdrive/i": "I:\\",
-				"/cygdrive/j": "J:\\",
-				"/cygdrive/k": "K:\\",
-				"/cygdrive/x": "X:\\",
-				"/cygdrive/y": "Y:\\",
-				"/cygdrive/z": "Z:\\"
-			},
-			"program": ".",
-			"MIMode": "gdb",
-			"miDebuggerPath": "ABSOLUTE_KOS_NT_PROJECT_ROOT\\kos\\misc\\gdbridge\\gdbridge.exe",
-			"targetArchitecture": "x86",
-			"debugType": "native",
-			"launchCompleteCommand": "None",
-			"miDebuggerServerAddress": ".",
-			"customLaunchSetupCommands": [
-				{ "text": "cd ABSOLUTE_KOS_NT_PROJECT_ROOT", "ignoreFailures": false },
-				{ "text": "set sysroot ABSOLUTE_KOS_NT_PROJECT_ROOT\\bin\\${env.TARGET}-kos-${env.CONFIG}", "ignoreFailures": false },
-				{ "text": "set solib-search-path bin/${env.TARGET}-kos-${env.CONFIG}/lib:bin/${env.TARGET}-kos-${env.CONFIG}/os/drivers", "ignoreFailures": false },
-				{ "text": "set auto-solib-add on", "ignoreFailures": false },
-				{ "text": "-target-select remote localhost:1234", "ignoreFailures": false }
-			],
-			"setupCommands": [
-				{ "text": "-enable-pretty-printing", "ignoreFailures": true },
-				{ "text": "set print pretty on", "ignoreFailures": true },
-				{ "text": "set print object on", "ignoreFailures": true },
-				{ "text": "set print static-members on", "ignoreFailures": true },
-				{ "text": "set print vtbl on", "ignoreFailures": true },
-				{ "text": "set print demangle on", "ignoreFailures": true },
-				{ "text": "set demangle-style gnu-v3", "ignoreFailures": true },
-				{ "text": "set print sevenbit-strings off", "ignoreFailures": true },
-				{ "text": "set detach-on-fork off", "ignoreFailures": false },
-				{ "text": "set schedule-multiple on", "ignoreFailures": false },
-				{ "text": "set follow-fork-mode child", "ignoreFailures": false }
-			]
-		},
-		{
-			"type": "cppdbg",
-			"name": "kernel (--emulator=qemu --gdb=server) [QNonStop:1]",
-			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
-			"project": "src",
-			"sourceFileMap": {
-				"ABSOLUTE_KOS_PROJECT_ROOT": "ABSOLUTE_KOS_NT_PROJECT_ROOT",
-				"/cygdrive/c": "C:\\",
-				"/cygdrive/d": "D:\\",
-				"/cygdrive/e": "E:\\",
-				"/cygdrive/f": "F:\\",
-				"/cygdrive/g": "G:\\",
-				"/cygdrive/h": "H:\\",
-				"/cygdrive/i": "I:\\",
-				"/cygdrive/j": "J:\\",
-				"/cygdrive/k": "K:\\",
-				"/cygdrive/x": "X:\\",
-				"/cygdrive/y": "Y:\\",
-				"/cygdrive/z": "Z:\\"
-			},
-			"program": ".",
-			"MIMode": "gdb",
-			"miDebuggerPath": "ABSOLUTE_KOS_NT_PROJECT_ROOT\\kos\\misc\\gdbridge\\gdbridge.exe",
-			"targetArchitecture": "x86",
-			"debugType": "native",
-			"launchCompleteCommand": "None",
-			"miDebuggerServerAddress": ".",
-			"customLaunchSetupCommands": [
-				{ "text": "cd ABSOLUTE_KOS_NT_PROJECT_ROOT", "ignoreFailures": false },
-				{ "text": "set sysroot ABSOLUTE_KOS_NT_PROJECT_ROOT\\bin\\${env.TARGET}-kos-${env.CONFIG}", "ignoreFailures": false },
-				{ "text": "set solib-search-path bin/${env.TARGET}-kos-${env.CONFIG}/lib:bin/${env.TARGET}-kos-${env.CONFIG}/os/drivers", "ignoreFailures": false },
-				{ "text": "set auto-solib-add on", "ignoreFailures": false },
-				{ "text": "-target-select remote localhost:1234", "ignoreFailures": false }
-			],
-			"setupCommands": [
-				{ "text": "-enable-pretty-printing", "ignoreFailures": true },
-				{ "text": "set print pretty on", "ignoreFailures": true },
-				{ "text": "set print object on", "ignoreFailures": true },
-				{ "text": "set print static-members on", "ignoreFailures": true },
-				{ "text": "set print vtbl on", "ignoreFailures": true },
-				{ "text": "set print demangle on", "ignoreFailures": true },
-				{ "text": "set demangle-style gnu-v3", "ignoreFailures": true },
-				{ "text": "set print sevenbit-strings off", "ignoreFailures": true },
-				{ "text": "set detach-on-fork off", "ignoreFailures": false },
-				{ "text": "set non-stop on", "ignoreFailures": false },
-				{ "text": "set schedule-multiple on", "ignoreFailures": false },
-				{ "text": "set follow-fork-mode child", "ignoreFailures": false }
-			],
-			"debugServerPath": "${env.SYSTEMROOT}\\system32\\cmd.exe",
-			"debugServerArgs": "/c \"deemon ABSOLUTE_KOS_NT_PROJECT_ROOT\\magic.dee --run-only --emulator=qemu --gdb=server --emulator-started-pattern=EMULATOR_STARTED --target=${env.TARGET} --config=${env.CONFIG}\"",
-			"serverStarted": "EMULATOR_STARTED",
-			"serverLaunchTimeout": 120000,
-			"filterStdout": true,
-			"filterStderr": true
-		},
-		{
-			"type": "cppdbg",
-			"name": "kernel (--gdb=server) [QNonStop:1] (external)",
-			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
-			"project": "src",
-			"sourceFileMap": {
-				"ABSOLUTE_KOS_PROJECT_ROOT": "ABSOLUTE_KOS_NT_PROJECT_ROOT",
-				"/cygdrive/c": "C:\\",
-				"/cygdrive/d": "D:\\",
-				"/cygdrive/e": "E:\\",
-				"/cygdrive/f": "F:\\",
-				"/cygdrive/g": "G:\\",
-				"/cygdrive/h": "H:\\",
-				"/cygdrive/i": "I:\\",
-				"/cygdrive/j": "J:\\",
-				"/cygdrive/k": "K:\\",
-				"/cygdrive/x": "X:\\",
-				"/cygdrive/y": "Y:\\",
-				"/cygdrive/z": "Z:\\"
-			},
-			"program": ".",
-			"MIMode": "gdb",
-			"miDebuggerPath": "ABSOLUTE_KOS_NT_PROJECT_ROOT\\kos\\misc\\gdbridge\\gdbridge.exe",
-			"targetArchitecture": "x86",
-			"debugType": "native",
-			"launchCompleteCommand": "None",
-			"miDebuggerServerAddress": ".",
-			"customLaunchSetupCommands": [
-				{ "text": "cd ABSOLUTE_KOS_NT_PROJECT_ROOT", "ignoreFailures": false },
-				{ "text": "set sysroot ABSOLUTE_KOS_NT_PROJECT_ROOT\\bin\\${env.TARGET}-kos-${env.CONFIG}", "ignoreFailures": false },
-				{ "text": "set solib-search-path bin/${env.TARGET}-kos-${env.CONFIG}/lib:bin/${env.TARGET}-kos-${env.CONFIG}/os/drivers", "ignoreFailures": false },
-				{ "text": "set auto-solib-add on", "ignoreFailures": false },
-				{ "text": "-target-select remote localhost:1234", "ignoreFailures": false }
-			],
-			"setupCommands": [
-				{ "text": "-enable-pretty-printing", "ignoreFailures": true },
-				{ "text": "set print pretty on", "ignoreFailures": true },
-				{ "text": "set print object on", "ignoreFailures": true },
-				{ "text": "set print static-members on", "ignoreFailures": true },
-				{ "text": "set print vtbl on", "ignoreFailures": true },
-				{ "text": "set print demangle on", "ignoreFailures": true },
-				{ "text": "set demangle-style gnu-v3", "ignoreFailures": true },
-				{ "text": "set print sevenbit-strings off", "ignoreFailures": true },
-				{ "text": "set detach-on-fork off", "ignoreFailures": false },
-				{ "text": "set non-stop on", "ignoreFailures": false },
-				{ "text": "set schedule-multiple on", "ignoreFailures": false },
-				{ "text": "set follow-fork-mode child", "ignoreFailures": false }
-			]
-		},
-		{
-			"type": "cppdbg",
-			"name": "kernel (--emulator=qemu --gdb=emulator)",
+			"name": "QEMU",
 			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
 			"project": "src",
 			"sourceFileMap": {
@@ -275,7 +73,120 @@
 		},
 		{
 			"type": "cppdbg",
-			"name": "kernel (--emulator=vbox --gdb=emulator)",
+			"name": "QEMU + modgdbserver",
+			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
+			"project": "src",
+			"sourceFileMap": {
+				"ABSOLUTE_KOS_PROJECT_ROOT": "ABSOLUTE_KOS_NT_PROJECT_ROOT",
+				"/cygdrive/c": "C:\\",
+				"/cygdrive/d": "D:\\",
+				"/cygdrive/e": "E:\\",
+				"/cygdrive/f": "F:\\",
+				"/cygdrive/g": "G:\\",
+				"/cygdrive/h": "H:\\",
+				"/cygdrive/i": "I:\\",
+				"/cygdrive/j": "J:\\",
+				"/cygdrive/k": "K:\\",
+				"/cygdrive/x": "X:\\",
+				"/cygdrive/y": "Y:\\",
+				"/cygdrive/z": "Z:\\"
+			},
+			"program": ".",
+			"MIMode": "gdb",
+			"miDebuggerPath": "ABSOLUTE_KOS_NT_PROJECT_ROOT\\kos\\misc\\gdbridge\\gdbridge.exe",
+			"targetArchitecture": "x86",
+			"debugType": "native",
+			"launchCompleteCommand": "None",
+			"miDebuggerServerAddress": ".",
+			"customLaunchSetupCommands": [
+				{ "text": "cd ABSOLUTE_KOS_NT_PROJECT_ROOT", "ignoreFailures": false },
+				{ "text": "set sysroot ABSOLUTE_KOS_NT_PROJECT_ROOT\\bin\\${env.TARGET}-kos-${env.CONFIG}", "ignoreFailures": false },
+				{ "text": "set solib-search-path bin/${env.TARGET}-kos-${env.CONFIG}/lib:bin/${env.TARGET}-kos-${env.CONFIG}/os/drivers", "ignoreFailures": false },
+				{ "text": "set auto-solib-add on", "ignoreFailures": false },
+				{ "text": "-target-select remote localhost:1234", "ignoreFailures": false }
+			],
+			"setupCommands": [
+				{ "text": "-enable-pretty-printing", "ignoreFailures": true },
+				{ "text": "set print pretty on", "ignoreFailures": true },
+				{ "text": "set print object on", "ignoreFailures": true },
+				{ "text": "set print static-members on", "ignoreFailures": true },
+				{ "text": "set print vtbl on", "ignoreFailures": true },
+				{ "text": "set print demangle on", "ignoreFailures": true },
+				{ "text": "set demangle-style gnu-v3", "ignoreFailures": true },
+				{ "text": "set print sevenbit-strings off", "ignoreFailures": true },
+				{ "text": "set detach-on-fork off", "ignoreFailures": false },
+				{ "text": "set schedule-multiple on", "ignoreFailures": false },
+				{ "text": "set follow-fork-mode child", "ignoreFailures": false }
+			],
+			"debugServerPath": "${env.SYSTEMROOT}\\system32\\cmd.exe",
+			"debugServerArgs": "/c \"deemon ABSOLUTE_KOS_NT_PROJECT_ROOT\\magic.dee --run-only --emulator=qemu --gdb=server --emulator-started-pattern=EMULATOR_STARTED --target=${env.TARGET} --config=${env.CONFIG}\"",
+			"serverStarted": "EMULATOR_STARTED",
+			"serverLaunchTimeout": 120000,
+			"filterStdout": true,
+			"filterStderr": true
+		},
+		{
+			"type": "cppdbg",
+			"name": "QEMU + modgdbserver [QNonStop:1]",
+			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
+			"project": "src",
+			"sourceFileMap": {
+				"ABSOLUTE_KOS_PROJECT_ROOT": "ABSOLUTE_KOS_NT_PROJECT_ROOT",
+				"/cygdrive/c": "C:\\",
+				"/cygdrive/d": "D:\\",
+				"/cygdrive/e": "E:\\",
+				"/cygdrive/f": "F:\\",
+				"/cygdrive/g": "G:\\",
+				"/cygdrive/h": "H:\\",
+				"/cygdrive/i": "I:\\",
+				"/cygdrive/j": "J:\\",
+				"/cygdrive/k": "K:\\",
+				"/cygdrive/x": "X:\\",
+				"/cygdrive/y": "Y:\\",
+				"/cygdrive/z": "Z:\\"
+			},
+			"program": ".",
+			"MIMode": "gdb",
+			"miDebuggerPath": "ABSOLUTE_KOS_NT_PROJECT_ROOT\\kos\\misc\\gdbridge\\gdbridge.exe",
+			"targetArchitecture": "x86",
+			"debugType": "native",
+			"launchCompleteCommand": "None",
+			"miDebuggerServerAddress": ".",
+			"customLaunchSetupCommands": [
+				{ "text": "cd ABSOLUTE_KOS_NT_PROJECT_ROOT", "ignoreFailures": false },
+				{ "text": "set sysroot ABSOLUTE_KOS_NT_PROJECT_ROOT\\bin\\${env.TARGET}-kos-${env.CONFIG}", "ignoreFailures": false },
+				{ "text": "set solib-search-path bin/${env.TARGET}-kos-${env.CONFIG}/lib:bin/${env.TARGET}-kos-${env.CONFIG}/os/drivers", "ignoreFailures": false },
+				{ "text": "set auto-solib-add on", "ignoreFailures": false },
+				{ "text": "-target-select remote localhost:1234", "ignoreFailures": false }
+			],
+			"setupCommands": [
+				{ "text": "-enable-pretty-printing", "ignoreFailures": true },
+				{ "text": "set print pretty on", "ignoreFailures": true },
+				{ "text": "set print object on", "ignoreFailures": true },
+				{ "text": "set print static-members on", "ignoreFailures": true },
+				{ "text": "set print vtbl on", "ignoreFailures": true },
+				{ "text": "set print demangle on", "ignoreFailures": true },
+				{ "text": "set demangle-style gnu-v3", "ignoreFailures": true },
+				{ "text": "set print sevenbit-strings off", "ignoreFailures": true },
+				{ "text": "set detach-on-fork off", "ignoreFailures": false },
+				{ "text": "set non-stop on", "ignoreFailures": false },
+				{ "text": "set schedule-multiple on", "ignoreFailures": false },
+				{ "text": "set follow-fork-mode child", "ignoreFailures": false }
+			],
+			"debugServerPath": "${env.SYSTEMROOT}\\system32\\cmd.exe",
+			"debugServerArgs": "/c \"deemon ABSOLUTE_KOS_NT_PROJECT_ROOT\\magic.dee --run-only --emulator=qemu --gdb=server --emulator-started-pattern=EMULATOR_STARTED --target=${env.TARGET} --config=${env.CONFIG}\"",
+			"serverStarted": "EMULATOR_STARTED",
+			"serverLaunchTimeout": 120000,
+			"filterStdout": true,
+			"filterStderr": true
+		},
+
+/************************************************************************/
+/* VirtualBox                                                           */
+/************************************************************************/
+		{
+			"type": "cppdbg",
+			"name": "VirtualBox",
 			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
 			"project": "src",
 			"sourceFileMap": {
@@ -324,9 +235,13 @@
 			"filterStdout": true,
 			"filterStderr": true
 		},
+
+/************************************************************************/
+/* external server                                                      */
+/************************************************************************/
 		{
 			"type": "cppdbg",
-			"name": "kernel (--gdb=emulator) (external)",
+			"name": "extern[localhost:1234]",
 			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
 			"project": "src",
 			"sourceFileMap": {
@@ -367,6 +282,103 @@
 				{ "text": "set print demangle on", "ignoreFailures": true },
 				{ "text": "set demangle-style gnu-v3", "ignoreFailures": true },
 				{ "text": "set print sevenbit-strings off", "ignoreFailures": true }
+			]
+		},
+		{
+			"type": "cppdbg",
+			"name": "extern[localhost:1234] + modgdbserver",
+			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
+			"project": "src",
+			"sourceFileMap": {
+				"ABSOLUTE_KOS_PROJECT_ROOT": "ABSOLUTE_KOS_NT_PROJECT_ROOT",
+				"/cygdrive/c": "C:\\",
+				"/cygdrive/d": "D:\\",
+				"/cygdrive/e": "E:\\",
+				"/cygdrive/f": "F:\\",
+				"/cygdrive/g": "G:\\",
+				"/cygdrive/h": "H:\\",
+				"/cygdrive/i": "I:\\",
+				"/cygdrive/j": "J:\\",
+				"/cygdrive/k": "K:\\",
+				"/cygdrive/x": "X:\\",
+				"/cygdrive/y": "Y:\\",
+				"/cygdrive/z": "Z:\\"
+			},
+			"program": ".",
+			"MIMode": "gdb",
+			"miDebuggerPath": "ABSOLUTE_KOS_NT_PROJECT_ROOT\\kos\\misc\\gdbridge\\gdbridge.exe",
+			"targetArchitecture": "x86",
+			"debugType": "native",
+			"launchCompleteCommand": "None",
+			"miDebuggerServerAddress": ".",
+			"customLaunchSetupCommands": [
+				{ "text": "cd ABSOLUTE_KOS_NT_PROJECT_ROOT", "ignoreFailures": false },
+				{ "text": "set sysroot ABSOLUTE_KOS_NT_PROJECT_ROOT\\bin\\${env.TARGET}-kos-${env.CONFIG}", "ignoreFailures": false },
+				{ "text": "set solib-search-path bin/${env.TARGET}-kos-${env.CONFIG}/lib:bin/${env.TARGET}-kos-${env.CONFIG}/os/drivers", "ignoreFailures": false },
+				{ "text": "set auto-solib-add on", "ignoreFailures": false },
+				{ "text": "-target-select remote localhost:1234", "ignoreFailures": false }
+			],
+			"setupCommands": [
+				{ "text": "-enable-pretty-printing", "ignoreFailures": true },
+				{ "text": "set print pretty on", "ignoreFailures": true },
+				{ "text": "set print object on", "ignoreFailures": true },
+				{ "text": "set print static-members on", "ignoreFailures": true },
+				{ "text": "set print vtbl on", "ignoreFailures": true },
+				{ "text": "set print demangle on", "ignoreFailures": true },
+				{ "text": "set demangle-style gnu-v3", "ignoreFailures": true },
+				{ "text": "set print sevenbit-strings off", "ignoreFailures": true },
+				{ "text": "set detach-on-fork off", "ignoreFailures": false },
+				{ "text": "set schedule-multiple on", "ignoreFailures": false },
+				{ "text": "set follow-fork-mode child", "ignoreFailures": false }
+			]
+		},
+		{
+			"type": "cppdbg",
+			"name": "extern[localhost:1234] + modgdbserver [QNonStop:1]",
+			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
+			"project": "src",
+			"sourceFileMap": {
+				"ABSOLUTE_KOS_PROJECT_ROOT": "ABSOLUTE_KOS_NT_PROJECT_ROOT",
+				"/cygdrive/c": "C:\\",
+				"/cygdrive/d": "D:\\",
+				"/cygdrive/e": "E:\\",
+				"/cygdrive/f": "F:\\",
+				"/cygdrive/g": "G:\\",
+				"/cygdrive/h": "H:\\",
+				"/cygdrive/i": "I:\\",
+				"/cygdrive/j": "J:\\",
+				"/cygdrive/k": "K:\\",
+				"/cygdrive/x": "X:\\",
+				"/cygdrive/y": "Y:\\",
+				"/cygdrive/z": "Z:\\"
+			},
+			"program": ".",
+			"MIMode": "gdb",
+			"miDebuggerPath": "ABSOLUTE_KOS_NT_PROJECT_ROOT\\kos\\misc\\gdbridge\\gdbridge.exe",
+			"targetArchitecture": "x86",
+			"debugType": "native",
+			"launchCompleteCommand": "None",
+			"miDebuggerServerAddress": ".",
+			"customLaunchSetupCommands": [
+				{ "text": "cd ABSOLUTE_KOS_NT_PROJECT_ROOT", "ignoreFailures": false },
+				{ "text": "set sysroot ABSOLUTE_KOS_NT_PROJECT_ROOT\\bin\\${env.TARGET}-kos-${env.CONFIG}", "ignoreFailures": false },
+				{ "text": "set solib-search-path bin/${env.TARGET}-kos-${env.CONFIG}/lib:bin/${env.TARGET}-kos-${env.CONFIG}/os/drivers", "ignoreFailures": false },
+				{ "text": "set auto-solib-add on", "ignoreFailures": false },
+				{ "text": "-target-select remote localhost:1234", "ignoreFailures": false }
+			],
+			"setupCommands": [
+				{ "text": "-enable-pretty-printing", "ignoreFailures": true },
+				{ "text": "set print pretty on", "ignoreFailures": true },
+				{ "text": "set print object on", "ignoreFailures": true },
+				{ "text": "set print static-members on", "ignoreFailures": true },
+				{ "text": "set print vtbl on", "ignoreFailures": true },
+				{ "text": "set print demangle on", "ignoreFailures": true },
+				{ "text": "set demangle-style gnu-v3", "ignoreFailures": true },
+				{ "text": "set print sevenbit-strings off", "ignoreFailures": true },
+				{ "text": "set detach-on-fork off", "ignoreFailures": false },
+				{ "text": "set non-stop on", "ignoreFailures": false },
+				{ "text": "set schedule-multiple on", "ignoreFailures": false },
+				{ "text": "set follow-fork-mode child", "ignoreFailures": false }
 			]
 		}
 	]
