@@ -15,8 +15,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- Fix ipc cmdline escaping for programs compiled using cygwin
-DEEMON_VERSION="4947d0eff9c740cdd1fee38fb14d0cf603aa81a5"
+#     v -- Make sure to #undef cpu_count() methods before selecting which one to use
+DEEMON_VERSION="452ef8ed081f342739a04ca776f83e5fb3161733"
 
 MAKE_PARALLEL_COUNT=$(grep -c ^processor /proc/cpuinfo)
 

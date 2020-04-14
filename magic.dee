@@ -44,7 +44,7 @@ import AppExit from errors;
 File.stdout.setbuf("line");
 File.stderr.setbuf("line");
 
-global CONFIG_MAX_COMPILERS: int = 12; /* TODO: Don't hardcode 12! - Calculate dynamically as the number of cores on our host machine */
+global CONFIG_MAX_COMPILERS: int = none;
 global CONFIG_EMULATOR_USED: string = "qemu"; /* none or "qemu" / "bochs" */
 global CONFIG_EMULATOR_OPTIONS: {string: string} = Dict();
 global CONFIG_DONT_BUILD: bool = false;
@@ -151,6 +151,8 @@ function generateProjectOfInputFile(filename: string) {
 }
 
 function buildToolchainsAndGroups() {
+	if (CONFIG_MAX_COMPILERS is none)
+		CONFIG_MAX_COMPILERS = try import("posix").cpu_count() catch (...) 1;
 	if (requiredOutputWhiteList !is none) {
 		return buildGroupsWithOutputWhitelist(
 			toolchainsAndGroups: toolchainsAndGroups,
