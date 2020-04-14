@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xffa25bda */
+/* HASH CRC-32:0xaf0ef090 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #ifndef ____localdep__aligned_recalloc_defined
 #define ____localdep__aligned_recalloc_defined 1
 #ifdef __CRT_HAVE__aligned_recalloc
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)) __ATTR_ALLOC_ALIGN(4),void *,__NOTHROW_NCX,__localdep__aligned_recalloc,(void *__aligned_mallptr, __SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment),_aligned_recalloc,(__aligned_mallptr,__count,__num_bytes,__min_alignment))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ALLOC_ALIGN(4) __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,__localdep__aligned_recalloc,(void *__aligned_mallptr, __SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment),_aligned_recalloc,(__aligned_mallptr,__count,__num_bytes,__min_alignment))
 #elif (defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE__aligned_malloc)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE__aligned_free))
 #include <local/stdlib/_aligned_recalloc.h>
 #define __localdep__aligned_recalloc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_recalloc))
@@ -35,7 +35,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)) __ATTR_ALLOC_ALIGN(4),void 
 #endif /* !____localdep__aligned_recalloc_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_aligned_recalloc_dbg) __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)) __ATTR_ALLOC_ALIGN(4) void *
+__LOCAL_LIBC(_aligned_recalloc_dbg) __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(4) __ATTR_ALLOC_SIZE((2, 3)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_aligned_recalloc_dbg))(void *__ptr,
                                                                    __SIZE_TYPE__ __count,
                                                                    __SIZE_TYPE__ __num_bytes,

@@ -71,8 +71,8 @@ NOTHROW_NCX(LIBCCALL libc_setlogmask)(int mask)
 }
 /*[[[end:setlogmask]]]*/
 
-/*[[[head:syslog,hash:CRC-32=0xbf8640b3]]]*/
-INTERN NONNULL((2)) ATTR_LIBC_PRINTF(2,3)
+/*[[[head:syslog,hash:CRC-32=0xc3bbe50b]]]*/
+INTERN ATTR_LIBC_PRINTF(2,3) NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.system.syslog.syslog") void
 NOTHROW_RPC(VLIBCCALL libc_syslog)(int level,
                                    char const *format,
@@ -89,8 +89,8 @@ NOTHROW_RPC(VLIBCCALL libc_syslog)(int level,
 }
 /*[[[end:syslog]]]*/
 
-/*[[[head:vsyslog,hash:CRC-32=0xbe66ccac]]]*/
-INTERN NONNULL((2)) ATTR_LIBC_PRINTF(2,0)
+/*[[[head:vsyslog,hash:CRC-32=0xe30c304]]]*/
+INTERN ATTR_LIBC_PRINTF(2,0) NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.system.syslog.vsyslog") void
 NOTHROW_RPC(LIBCCALL libc_vsyslog)(int level,
                                    char const *format,

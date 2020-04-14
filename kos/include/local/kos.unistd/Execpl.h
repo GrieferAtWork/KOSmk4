@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d985792 */
+/* HASH CRC-32:0x6083bf0e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
-__LOCAL_LIBC(Execpl) __ATTR_SENTINEL __ATTR_NORETURN __ATTR_NONNULL((1)) void
+__LOCAL_LIBC(Execpl) __ATTR_NORETURN __ATTR_SENTINEL __ATTR_NONNULL((1)) void
 (__VLIBCCALL __LIBC_LOCAL_NAME(Execpl))(char const *__restrict __file,
                                         char const *__args,
                                         ... /*, (char *)NULL*/) __THROWS(...) {

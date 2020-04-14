@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb7b6c057 */
+/* HASH CRC-32:0x86617894 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -114,7 +114,7 @@
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
-__CREDIRECT(__ATTR_NONNULL((1, 3)) __ATTR_LIBC_PRINTF(3, 0),__SSIZE_TYPE__,,__localdep_format_vprintf,(__pformatprinter __printer, void *__arg, char const *__restrict __format, __builtin_va_list __args),format_vprintf,(__printer,__arg,__format,__args)) __THROWS(...)
+__CREDIRECT(__ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,,__localdep_format_vprintf,(__pformatprinter __printer, void *__arg, char const *__restrict __format, __builtin_va_list __args),format_vprintf,(__printer,__arg,__format,__args)) __THROWS(...)
 #else /* LIBC: format_vprintf */
 #include <local/format-printer/format_vprintf.h>
 /* Generic printf implementation
@@ -232,7 +232,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vdprintf_printer) __ssize_t (__LIBCCALL __vdprintf_printer)(void *__arg, char const *__restrict __data, __size_t __datalen) {
 	return (__ssize_t)__localdep_write((int)(unsigned int)(__UINTPTR_TYPE__)__arg, __data, __datalen);
 }
-__LOCAL_LIBC(vdprintf) __ATTR_NONNULL((2)) __ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SSIZE_T
+__LOCAL_LIBC(vdprintf) __ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((2)) __STDC_INT_AS_SSIZE_T
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(vdprintf))(__fd_t __fd,
                                                       char const *__restrict __format,
                                                       __builtin_va_list __args) {

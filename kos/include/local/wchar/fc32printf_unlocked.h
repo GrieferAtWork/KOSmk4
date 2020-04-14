@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb4cdf135 */
+/* HASH CRC-32:0xa3c3bf04 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@
 #ifndef ____localdep_vfc32printf_unlocked_defined
 #define ____localdep_vfc32printf_unlocked_defined 1
 #if defined(__CRT_HAVE_vfwprintf_unlocked) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_NONNULL((1, 2)) __ATTR_LIBC_WPRINTF(2, 0),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vfc32printf_unlocked,(__FILE *__restrict __stream, __CHAR32_TYPE__ const *__restrict __format, __builtin_va_list __args),vfwprintf_unlocked,(__stream,__format,__args))
+__CREDIRECT(__ATTR_LIBC_WPRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vfc32printf_unlocked,(__FILE *__restrict __stream, __CHAR32_TYPE__ const *__restrict __format, __builtin_va_list __args),vfwprintf_unlocked,(__stream,__format,__args))
 #elif defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE__fputwc_nolock) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_file_wprinter)
 #if __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/vfwprintf_unlocked.h>
@@ -41,7 +41,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)) __ATTR_LIBC_WPRINTF(2, 0),__STDC_INT_AS_SIZE_
 #endif /* !____localdep_vfc32printf_unlocked_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(fc32printf_unlocked) __ATTR_NONNULL((1, 2)) __ATTR_LIBC_WPRINTF(2, 3) __STDC_INT_AS_SIZE_T
+__LOCAL_LIBC(fc32printf_unlocked) __ATTR_LIBC_WPRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (__VLIBCCALL __LIBC_LOCAL_NAME(fc32printf_unlocked))(__FILE *__restrict __stream,
                                                      __CHAR32_TYPE__ const *__restrict __format,
                                                      ...) __THROWS(...) {

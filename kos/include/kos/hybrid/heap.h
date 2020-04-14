@@ -80,11 +80,15 @@ __DECL_BEGIN
  * NULL, and must still be `os_heap_free()'d once no longer in use. */
 __ATTR_WUNUSED __ATTR_RETNONNULL __ATTR_MALLOC void *
 (os_heap_malloc)(__size_t __num_bytes, int __gfp) __THROWS(E_BADALLOC);
+__ATTR_WUNUSED __ATTR_RETNONNULL __ATTR_MALLOC void *
+(os_heap_calloc)(__size_t __num_bytes, int __gfp) __THROWS(E_BADALLOC);
 
 /* Same as `os_heap_malloc()', but return `NULL' on error instead of throwing an exception.
  * In user-space, a `NULL' return value is also accompanied by `errno == ENOMEM' */
 __ATTR_WUNUSED __ATTR_MALLOC void *
 __NOTHROW(os_heap_malloc_nx)(__size_t __num_bytes, int __gfp);
+__ATTR_WUNUSED __ATTR_MALLOC void *
+__NOTHROW(os_heap_calloc_nx)(__size_t __num_bytes, int __gfp);
 
 /* Re-allocate `PTR:os_heap_usable_size(PTR)' into a `NUM_BYTES'-large heap block,
  * and copy data from the old block before freeing said old block. If the old block
@@ -148,11 +152,13 @@ void __NOTHROW(os_heap_free)(/*nullable*/ void *__ptr);
  * while the general expectation for kernel-space is to throw an exception) */
 #ifdef __KERNEL__
 __ATTR_WUNUSED __ATTR_RETNONNULL __ATTR_MALLOC void *(os_heap_malloc_unx)(__size_t __num_bytes, int __gfp) __THROWS(E_BADALLOC);
+__ATTR_WUNUSED __ATTR_RETNONNULL __ATTR_MALLOC void *(os_heap_calloc_unx)(__size_t __num_bytes, int __gfp) __THROWS(E_BADALLOC);
 __ATTR_WUNUSED __ATTR_RETNONNULL void *(os_heap_realloc_unx)(/*nullable*/ void *__ptr, __size_t __num_bytes, int __gfp) __THROWS(E_BADALLOC);
 __ATTR_WUNUSED __ATTR_RETNONNULL void *(os_heap_realloc_in_place_unx)(/*nullable*/ void *__ptr, __size_t __num_bytes, int __gfp) __THROWS(E_BADALLOC);
 __ATTR_WUNUSED __ATTR_RETNONNULL __ATTR_MALLOC void *(os_heap_memalign_unx)(__size_t __min_alignment, __size_t __num_bytes, int __gfp) __THROWS(E_BADALLOC);
 #else /* __KERNEL__ */
 __ATTR_WUNUSED __ATTR_MALLOC void *__NOTHROW(os_heap_malloc_unx)(__size_t __num_bytes, int __gfp);
+__ATTR_WUNUSED __ATTR_MALLOC void *__NOTHROW(os_heap_calloc_unx)(__size_t __num_bytes, int __gfp);
 __ATTR_WUNUSED void *__NOTHROW(os_heap_realloc_unx)(/*nullable*/ void *__ptr, __size_t __num_bytes, int __gfp);
 __ATTR_WUNUSED void *__NOTHROW(os_heap_realloc_in_place_unx)(/*nullable*/ void *__ptr, __size_t __num_bytes, int __gfp);
 __ATTR_WUNUSED __ATTR_MALLOC void *__NOTHROW(os_heap_memalign_unx)(__size_t __min_alignment, __size_t __num_bytes, int __gfp);
@@ -161,6 +167,9 @@ __ATTR_WUNUSED __ATTR_MALLOC void *__NOTHROW(os_heap_memalign_unx)(__size_t __mi
 #define os_heap_malloc(num_bytes, gfp)                      kmalloc(num_bytes, gfp)
 #define os_heap_malloc_unx(num_bytes, gfp)                  kmalloc(num_bytes, gfp)
 #define os_heap_malloc_nx(num_bytes, gfp)                   kmalloc_nx(num_bytes, gfp)
+#define os_heap_calloc(num_bytes, gfp)                      kcalloc(num_bytes, gfp)
+#define os_heap_calloc_unx(num_bytes, gfp)                  kcalloc(num_bytes, gfp)
+#define os_heap_calloc_nx(num_bytes, gfp)                   kcalloc_nx(num_bytes, gfp)
 #define os_heap_realloc(ptr, num_bytes, gfp)                krealloc(ptr, num_bytes, gfp)
 #define os_heap_realloc_unx(ptr, num_bytes, gfp)            krealloc(ptr, num_bytes, gfp)
 #define os_heap_realloc_nx(ptr, num_bytes, gfp)             krealloc_nx(ptr, num_bytes, gfp)
@@ -175,6 +184,9 @@ __ATTR_WUNUSED __ATTR_MALLOC void *__NOTHROW(os_heap_memalign_unx)(__size_t __mi
 #define os_heap_malloc(num_bytes, ...)                      Malloc(num_bytes)
 #define os_heap_malloc_unx(num_bytes, ...)                  malloc(num_bytes)
 #define os_heap_malloc_nx(num_bytes, ...)                   malloc(num_bytes)
+#define os_heap_calloc(num_bytes, ...)                      Calloc(1, num_bytes)
+#define os_heap_calloc_unx(num_bytes, ...)                  calloc(1, num_bytes)
+#define os_heap_calloc_nx(num_bytes, ...)                   calloc(1, num_bytes)
 #define os_heap_realloc(ptr, num_bytes, ...)                Realloc(ptr, num_bytes)
 #define os_heap_realloc_unx(ptr, num_bytes, ...)            realloc(ptr, num_bytes)
 #define os_heap_realloc_nx(ptr, num_bytes, ...)             realloc(ptr, num_bytes)

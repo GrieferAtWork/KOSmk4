@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbc7bb030 */
+/* HASH CRC-32:0x992d6e52 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@
 #define ____localdep_vasprintf_defined 1
 #ifdef __CRT_HAVE_vasprintf
 /* Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_vasprintf,(char **__restrict __pstr, char const *__restrict __format, __builtin_va_list __args),vasprintf,(__pstr,__format,__args))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_vasprintf,(char **__restrict __pstr, char const *__restrict __format, __builtin_va_list __args),vasprintf,(__pstr,__format,__args))
 #elif (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_aprintf_pack)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_format_aprintf_printer)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
 #include <local/stdio/vasprintf.h>
 /* Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR' */

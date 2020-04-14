@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbbf4d28b */
+/* HASH CRC-32:0x3039f89f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1017,16 +1017,16 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strtold, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL
 #ifdef __aligned_alloc_defined
 __NAMESPACE_GLB_USING(aligned_alloc)
 #elif __has_builtin(__builtin_aligned_alloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_aligned_alloc)
-__CEIDECLARE(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_ALIGN(1),void *,__NOTHROW_NCX,aligned_alloc,(__SIZE_TYPE__ __alignment, __SIZE_TYPE__ __num_bytes),{ return __builtin_aligned_alloc(__alignment, __num_bytes); })
+__CEIDECLARE(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(1) __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,aligned_alloc,(__SIZE_TYPE__ __alignment, __SIZE_TYPE__ __num_bytes),{ return __builtin_aligned_alloc(__alignment, __num_bytes); })
 #elif defined(__CRT_HAVE_aligned_alloc)
-__CDECLARE(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_ALIGN(1),void *,__NOTHROW_NCX,aligned_alloc,(__SIZE_TYPE__ __alignment, __SIZE_TYPE__ __num_bytes),(__alignment,__num_bytes))
+__CDECLARE(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(1) __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,aligned_alloc,(__SIZE_TYPE__ __alignment, __SIZE_TYPE__ __num_bytes),(__alignment,__num_bytes))
 #elif defined(__CRT_HAVE_memalign)
-__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_ALIGN(1),void *,__NOTHROW_NCX,aligned_alloc,(__SIZE_TYPE__ __alignment, __SIZE_TYPE__ __num_bytes),memalign,(__alignment,__num_bytes))
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(1) __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,aligned_alloc,(__SIZE_TYPE__ __alignment, __SIZE_TYPE__ __num_bytes),memalign,(__alignment,__num_bytes))
 #elif defined(__CRT_HAVE_posix_memalign)
 __NAMESPACE_STD_END
 #include <local/malloc/memalign.h>
 __NAMESPACE_STD_BEGIN
-__FORCELOCAL __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_ALIGN(1) void *__NOTHROW_NCX(__LIBCCALL aligned_alloc)(__SIZE_TYPE__ __alignment, __SIZE_TYPE__ __num_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memalign))(__alignment, __num_bytes); }
+__FORCELOCAL __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(1) __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBCCALL aligned_alloc)(__SIZE_TYPE__ __alignment, __SIZE_TYPE__ __num_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memalign))(__alignment, __num_bytes); }
 #else /* CUSTOM: memalign */
 #undef __std_aligned_alloc_defined
 #endif /* aligned_alloc... */
@@ -1619,14 +1619,14 @@ __NAMESPACE_STD_USING(aligned_alloc)
 #ifdef __std_aligned_alloc_defined
 __NAMESPACE_STD_USING(aligned_alloc)
 #elif __has_builtin(__builtin_aligned_alloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_aligned_alloc)
-__CEIDECLARE(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_ALIGN(1),void *,__NOTHROW_NCX,aligned_alloc,(__SIZE_TYPE__ __alignment, __SIZE_TYPE__ __num_bytes),{ return __builtin_aligned_alloc(__alignment, __num_bytes); })
+__CEIDECLARE(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(1) __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,aligned_alloc,(__SIZE_TYPE__ __alignment, __SIZE_TYPE__ __num_bytes),{ return __builtin_aligned_alloc(__alignment, __num_bytes); })
 #elif defined(__CRT_HAVE_aligned_alloc)
-__CDECLARE(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_ALIGN(1),void *,__NOTHROW_NCX,aligned_alloc,(__SIZE_TYPE__ __alignment, __SIZE_TYPE__ __num_bytes),(__alignment,__num_bytes))
+__CDECLARE(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(1) __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,aligned_alloc,(__SIZE_TYPE__ __alignment, __SIZE_TYPE__ __num_bytes),(__alignment,__num_bytes))
 #elif defined(__CRT_HAVE_memalign)
-__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_ALIGN(1),void *,__NOTHROW_NCX,aligned_alloc,(__SIZE_TYPE__ __alignment, __SIZE_TYPE__ __num_bytes),memalign,(__alignment,__num_bytes))
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(1) __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,aligned_alloc,(__SIZE_TYPE__ __alignment, __SIZE_TYPE__ __num_bytes),memalign,(__alignment,__num_bytes))
 #elif defined(__CRT_HAVE_posix_memalign)
 #include <local/malloc/memalign.h>
-__FORCELOCAL __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_ALIGN(1) void *__NOTHROW_NCX(__LIBCCALL aligned_alloc)(__SIZE_TYPE__ __alignment, __SIZE_TYPE__ __num_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memalign))(__alignment, __num_bytes); }
+__FORCELOCAL __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(1) __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBCCALL aligned_alloc)(__SIZE_TYPE__ __alignment, __SIZE_TYPE__ __num_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memalign))(__alignment, __num_bytes); }
 #else /* CUSTOM: memalign */
 #undef __aligned_alloc_defined
 #endif /* aligned_alloc... */
@@ -3027,10 +3027,10 @@ __CDECLARE(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)),
 __NAMESPACE_LOCAL_USING_OR_IMPL(_recalloc, __FORCELOCAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBCCALL _recalloc)(void *__mallptr, __SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_recalloc))(__mallptr, __count, __num_bytes); })
 #endif /* _recalloc... */
 #ifdef __CRT_HAVE__aligned_malloc
-__CDECLARE(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) __ATTR_ALLOC_ALIGN(2),void *,__NOTHROW_NCX,_aligned_malloc,(__SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment),(__num_bytes,__min_alignment))
+__CDECLARE(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(2) __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,_aligned_malloc,(__SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment),(__num_bytes,__min_alignment))
 #elif defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_malloc)
 #include <local/stdlib/_aligned_malloc.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_malloc, __FORCELOCAL __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) __ATTR_ALLOC_ALIGN(2) void *__NOTHROW_NCX(__LIBCCALL _aligned_malloc)(__SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_malloc))(__num_bytes, __min_alignment); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_malloc, __FORCELOCAL __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(2) __ATTR_ALLOC_SIZE((1)) void *__NOTHROW_NCX(__LIBCCALL _aligned_malloc)(__SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_malloc))(__num_bytes, __min_alignment); })
 #endif /* _aligned_malloc... */
 #ifdef __CRT_HAVE__aligned_offset_malloc
 __CDECLARE(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,_aligned_offset_malloc,(__SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset),(__num_bytes,__min_alignment,__offset))
@@ -3039,16 +3039,16 @@ __CDECLARE(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_
 __NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_offset_malloc, __FORCELOCAL __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) void *__NOTHROW_NCX(__LIBCCALL _aligned_offset_malloc)(__SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_offset_malloc))(__num_bytes, __min_alignment, __offset); })
 #endif /* _aligned_offset_malloc... */
 #ifdef __CRT_HAVE__aligned_realloc
-__CDECLARE(__ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_ALIGN(3),void *,__NOTHROW_NCX,_aligned_realloc,(void *__aligned_mallptr, __SIZE_TYPE__ __newsize, __SIZE_TYPE__ __min_alignment),(__aligned_mallptr,__newsize,__min_alignment))
+__CDECLARE(__ATTR_WUNUSED __ATTR_ALLOC_ALIGN(3) __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,_aligned_realloc,(void *__aligned_mallptr, __SIZE_TYPE__ __newsize, __SIZE_TYPE__ __min_alignment),(__aligned_mallptr,__newsize,__min_alignment))
 #elif (defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE__aligned_malloc)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE__aligned_free))
 #include <local/stdlib/_aligned_realloc.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_realloc, __FORCELOCAL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_ALIGN(3) void *__NOTHROW_NCX(__LIBCCALL _aligned_realloc)(void *__aligned_mallptr, __SIZE_TYPE__ __newsize, __SIZE_TYPE__ __min_alignment) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_realloc))(__aligned_mallptr, __newsize, __min_alignment); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_realloc, __FORCELOCAL __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(3) __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBCCALL _aligned_realloc)(void *__aligned_mallptr, __SIZE_TYPE__ __newsize, __SIZE_TYPE__ __min_alignment) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_realloc))(__aligned_mallptr, __newsize, __min_alignment); })
 #endif /* _aligned_realloc... */
 #ifdef __CRT_HAVE__aligned_recalloc
-__CDECLARE(__ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)) __ATTR_ALLOC_ALIGN(4),void *,__NOTHROW_NCX,_aligned_recalloc,(void *__aligned_mallptr, __SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment),(__aligned_mallptr,__count,__num_bytes,__min_alignment))
+__CDECLARE(__ATTR_WUNUSED __ATTR_ALLOC_ALIGN(4) __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,_aligned_recalloc,(void *__aligned_mallptr, __SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment),(__aligned_mallptr,__count,__num_bytes,__min_alignment))
 #elif (defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE__aligned_malloc)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE__aligned_free))
 #include <local/stdlib/_aligned_recalloc.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_recalloc, __FORCELOCAL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)) __ATTR_ALLOC_ALIGN(4) void *__NOTHROW_NCX(__LIBCCALL _aligned_recalloc)(void *__aligned_mallptr, __SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_recalloc))(__aligned_mallptr, __count, __num_bytes, __min_alignment); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_recalloc, __FORCELOCAL __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(4) __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBCCALL _aligned_recalloc)(void *__aligned_mallptr, __SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_recalloc))(__aligned_mallptr, __count, __num_bytes, __min_alignment); })
 #endif /* _aligned_recalloc... */
 #ifdef __CRT_HAVE__aligned_offset_realloc
 __CDECLARE(__ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,_aligned_offset_realloc,(void *__aligned_mallptr, __SIZE_TYPE__ __newsize, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset),(__aligned_mallptr,__newsize,__min_alignment,__offset))

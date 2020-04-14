@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x520403ac */
+/* HASH CRC-32:0x4f40758b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -124,7 +124,7 @@ struct format_aprintf_data {
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
-__CREDIRECT(__ATTR_NONNULL((1, 3)) __ATTR_LIBC_PRINTF(3, 0),__SSIZE_TYPE__,,__localdep_format_vprintf,(__pformatprinter __printer, void *__arg, char const *__restrict __format, __builtin_va_list __args),format_vprintf,(__printer,__arg,__format,__args)) __THROWS(...)
+__CREDIRECT(__ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,,__localdep_format_vprintf,(__pformatprinter __printer, void *__arg, char const *__restrict __format, __builtin_va_list __args),format_vprintf,(__printer,__arg,__format,__args)) __THROWS(...)
 #else /* LIBC: format_vprintf */
 #include <local/format-printer/format_vprintf.h>
 /* Generic printf implementation
@@ -306,7 +306,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,_
 
 __NAMESPACE_LOCAL_BEGIN
 /* Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR' */
-__LOCAL_LIBC(vasprintf) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T
+__LOCAL_LIBC(vasprintf) __ATTR_WUNUSED __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(vasprintf))(char **__restrict __pstr,
                                                        char const *__restrict __format,
                                                        __builtin_va_list __args) {

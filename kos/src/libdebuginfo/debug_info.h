@@ -130,14 +130,14 @@ INTDEF NONNULL((1, 2)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_va
  * >>
  * >>     // Load type information for the variable.
  * >>     pp.dup_cu_info_pos = var.v_type;
- * >>     debuginfo_cu_parser_loadattr_type(&pp,&typ);
+ * >>     debuginfo_cu_parser_loadattr_type(&pp, &typ);
  * >>
  * >>     // Load the value of this variable.
  * >>     buffer = malloca(typ.t_sizeof);
- * >>     debug_cfa_getvalue(&REGISTERS,&GET_REGISTER,var.v_location,buffer,typ.t_sizeof);
+ * >>     debug_cfa_getvalue(&REGISTERS, &GET_REGISTER, var.v_location, buffer, typ.t_sizeof);
  * >>
  * >>     // Print a representation of the variable, and its data.
- * >>     debuginfo_print_value(PRINTER,ARG,&pp,&type,v.v_name,buffer,typ.t_sizeof);
+ * >>     debuginfo_print_value(PRINTER, ARG, &pp, &type, v.v_name, buffer, typ.t_sizeof);
  * >> }
  * @param: varname: Name of the value (when NULL, print as a cast-like expression;
  *                  otherwise, print as an declaration)

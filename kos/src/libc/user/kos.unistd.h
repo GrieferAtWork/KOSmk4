@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x309b4f81 */
+/* HASH CRC-32:0xf144da69 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,19 +44,19 @@ INTDEF ATTR_NORETURN NONNULL((1, 2)) void (LIBCCALL libc_Execvp)(char const *__r
 /* >> execl(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
-INTDEF ATTR_SENTINEL ATTR_NORETURN NONNULL((1)) void (VLIBCCALL libc_Execl)(char const *__restrict path, char const *args, ... /*, (char *)NULL*/) __THROWS(...);
+INTDEF ATTR_NORETURN ATTR_SENTINEL NONNULL((1)) void (VLIBCCALL libc_Execl)(char const *__restrict path, char const *args, ... /*, (char *)NULL*/) __THROWS(...);
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel */
-INTDEF ATTR_NORETURN ATTR_SENTINEL_O(1) NONNULL((1)) void (VLIBCCALL libc_Execle)(char const *__restrict path, char const *args, ... /*, (char *)NULL, (char **)environ*/) __THROWS(...);
+INTDEF ATTR_NORETURN NONNULL((1)) ATTR_SENTINEL_O(1) void (VLIBCCALL libc_Execle)(char const *__restrict path, char const *args, ... /*, (char *)NULL, (char **)environ*/) __THROWS(...);
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
-INTDEF ATTR_SENTINEL ATTR_NORETURN NONNULL((1)) void (VLIBCCALL libc_Execpl)(char const *__restrict file, char const *args, ... /*, (char *)NULL*/) __THROWS(...);
+INTDEF ATTR_NORETURN ATTR_SENTINEL NONNULL((1)) void (VLIBCCALL libc_Execpl)(char const *__restrict file, char const *args, ... /*, (char *)NULL*/) __THROWS(...);
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel */
-INTDEF ATTR_NORETURN ATTR_SENTINEL_O(1) NONNULL((1)) void (VLIBCCALL libc_Execlpe)(char const *__restrict file, char const *args, ... /*, (char *)NULL, (char **)environ*/) __THROWS(...);
+INTDEF ATTR_NORETURN NONNULL((1)) ATTR_SENTINEL_O(1) void (VLIBCCALL libc_Execlpe)(char const *__restrict file, char const *args, ... /*, (char *)NULL, (char **)environ*/) __THROWS(...);
 /* >> pipe(2)
  * Create a new pair of connected pipes ([0] = reader, [1] = writer) */
 INTDEF NONNULL((1)) void (LIBCCALL libc_Pipe)(fd_t pipedes[2]) __THROWS(...);
@@ -210,7 +210,7 @@ INTDEF void NOTHROW_NCX(LIBCCALL libc_SetResGid)(gid_t rgid, gid_t egid, gid_t s
 /* >> vfork(2)
  * Same as `fork(2)', but suspend the calling process until the child
  * process either calls `exit(2)' or one of the many `exec(2)' functions */
-INTDEF WUNUSED ATTR_RETURNS_TWICE pid_t (LIBCCALL libc_VFork)(void) __THROWS(...);
+INTDEF ATTR_RETURNS_TWICE WUNUSED pid_t (LIBCCALL libc_VFork)(void) __THROWS(...);
 /* >> fchown(2)
  * Change the ownership of a given `FD' to `GROUP:OWNER' */
 INTDEF void (LIBCCALL libc_FChown)(fd_t fd, uid_t owner, gid_t group) __THROWS(...);

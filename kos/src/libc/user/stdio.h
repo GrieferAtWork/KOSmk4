@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa9812482 */
+/* HASH CRC-32:0xd50391f4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -102,31 +102,31 @@ INTDEF NONNULL((1, 2)) int (LIBCCALL libc_fgetpos)(FILE *__restrict stream, fpos
 INTDEF NONNULL((1, 2)) int (LIBCCALL libc_fsetpos)(FILE *__restrict stream, fpos_t const *__restrict pos) __THROWS(...);
 /* Print data to `STREAM', following `FORMAT'
  * Return the number of successfully printed bytes */
-INTDEF NONNULL((1, 2)) ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SSIZE_T (LIBCCALL libc_vfprintf)(FILE *__restrict stream, char const *__restrict format, va_list args) __THROWS(...);
+INTDEF ATTR_LIBC_PRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (LIBCCALL libc_vfprintf)(FILE *__restrict stream, char const *__restrict format, va_list args) __THROWS(...);
 /* Print data to `STREAM', following `FORMAT'
  * Return the number of successfully printed bytes */
-INTDEF NONNULL((1, 2)) ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T (VLIBCCALL libc_fprintf)(FILE *__restrict stream, char const *__restrict format, ...) __THROWS(...);
+INTDEF ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (VLIBCCALL libc_fprintf)(FILE *__restrict stream, char const *__restrict format, ...) __THROWS(...);
 /* Print data to `stdout', following `FORMAT'
  * Return the number of successfully printed bytes */
-INTDEF NONNULL((1)) ATTR_LIBC_PRINTF(1, 0) __STDC_INT_AS_SSIZE_T (LIBCCALL libc_vprintf)(char const *__restrict format, va_list args) __THROWS(...);
+INTDEF ATTR_LIBC_PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T (LIBCCALL libc_vprintf)(char const *__restrict format, va_list args) __THROWS(...);
 /* Print data to `stdout', following `FORMAT'
  * Return the number of successfully printed bytes */
-INTDEF NONNULL((1)) ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SSIZE_T (VLIBCCALL libc_printf)(char const *__restrict format, ...) __THROWS(...);
+INTDEF ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T (VLIBCCALL libc_printf)(char const *__restrict format, ...) __THROWS(...);
 /* Scan data from `STREAM', following `FORMAT'
  * Return the number of successfully scanned data items */
-INTDEF WUNUSED NONNULL((1, 2)) ATTR_LIBC_SCANF(2, 0) __STDC_INT_AS_SIZE_T (LIBCCALL libc_vfscanf)(FILE *__restrict stream, char const *__restrict format, va_list args) __THROWS(...);
+INTDEF WUNUSED ATTR_LIBC_SCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (LIBCCALL libc_vfscanf)(FILE *__restrict stream, char const *__restrict format, va_list args) __THROWS(...);
 /* Scan data from `stdin', following `FORMAT'
  * Return the number of successfully scanned data items */
-INTDEF WUNUSED NONNULL((1)) ATTR_LIBC_SCANF(1, 0) __STDC_INT_AS_SIZE_T (LIBCCALL libc_vscanf)(char const *__restrict format, va_list args) __THROWS(...);
+INTDEF WUNUSED ATTR_LIBC_SCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T (LIBCCALL libc_vscanf)(char const *__restrict format, va_list args) __THROWS(...);
 /* Scan data from `STREAM', following `FORMAT'
  * Return the number of successfully scanned data items */
-INTDEF WUNUSED NONNULL((1, 2)) ATTR_LIBC_SCANF(2, 3) __STDC_INT_AS_SIZE_T (VLIBCCALL libc_fscanf)(FILE *__restrict stream, char const *__restrict format, ...) __THROWS(...);
+INTDEF WUNUSED ATTR_LIBC_SCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (VLIBCCALL libc_fscanf)(FILE *__restrict stream, char const *__restrict format, ...) __THROWS(...);
 /* Scan data from `stdin', following `FORMAT'
  * Return the number of successfully scanned data items */
-INTDEF WUNUSED NONNULL((1)) ATTR_LIBC_SCANF(1, 2) __STDC_INT_AS_SIZE_T (VLIBCCALL libc_scanf)(char const *__restrict format, ...) __THROWS(...);
-INTDEF WUNUSED NONNULL((1)) ATTR_DEPRECATED("No buffer size checks (use `fgets' instead)") char *(LIBCCALL libc_gets)(char *__restrict buf) __THROWS(...);
-INTDEF NONNULL((2)) ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBCCALL libc_vdprintf)(fd_t fd, char const *__restrict format, va_list args);
-INTDEF NONNULL((2)) ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(VLIBCCALL libc_dprintf)(fd_t fd, char const *__restrict format, ...);
+INTDEF WUNUSED ATTR_LIBC_SCANF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T (VLIBCCALL libc_scanf)(char const *__restrict format, ...) __THROWS(...);
+INTDEF WUNUSED ATTR_DEPRECATED("No buffer size checks (use `fgets' instead)") NONNULL((1)) char *(LIBCCALL libc_gets)(char *__restrict buf) __THROWS(...);
+INTDEF ATTR_LIBC_PRINTF(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBCCALL libc_vdprintf)(fd_t fd, char const *__restrict format, va_list args);
+INTDEF ATTR_LIBC_PRINTF(2, 3) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(VLIBCCALL libc_dprintf)(fd_t fd, char const *__restrict format, ...);
 INTDEF NONNULL((2, 4)) int NOTHROW_RPC(LIBCCALL libc_renameat)(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path);
 /* Remove a file or directory `FILENAME' relative to a given base directory `DIRFD' */
 INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_removeat)(fd_t dirfd, char const *filename);
@@ -185,8 +185,8 @@ INTDEF WUNUSED NONNULL((2)) FILE *NOTHROW_NCX(LIBCCALL libc_fopencookie)(void *_
 INTDEF WUNUSED NONNULL((1, 3)) char *(LIBCCALL libc_fgets_unlocked)(char *__restrict buf, __STDC_INT_AS_SIZE_T bufsize, FILE *__restrict stream) __THROWS(...);
 /* Same as `fputs()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
 INTDEF NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (LIBCCALL libc_fputs_unlocked)(char const *__restrict string, FILE *__restrict stream) __THROWS(...);
-INTDEF NONNULL((1, 2)) ATTR_LIBC_PRINTF(2, 0) int NOTHROW_NCX(LIBCCALL libc_obstack_vprintf)(struct obstack *__restrict obstack_, char const *__restrict format, va_list args);
-INTDEF NONNULL((1, 2)) ATTR_LIBC_PRINTF(2, 3) int NOTHROW_NCX(VLIBCCALL libc_obstack_printf)(struct obstack *__restrict obstack_, char const *__restrict format, ...);
+INTDEF ATTR_LIBC_PRINTF(2, 0) NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_obstack_vprintf)(struct obstack *__restrict obstack_, char const *__restrict format, va_list args);
+INTDEF ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) int NOTHROW_NCX(VLIBCCALL libc_obstack_printf)(struct obstack *__restrict obstack_, char const *__restrict format, ...);
 /* Change the current in-file position of `STREAM' */
 INTDEF NONNULL((1)) int (LIBCCALL libc_fseeko)(FILE *__restrict stream, off_t off, int whence) __THROWS(...);
 /* Return the current in-file position of `STREAM' */
@@ -210,9 +210,9 @@ INTDEF NONNULL((1, 2)) ssize_t (LIBCCALL libc_file_printer)(void *arg, char cons
 /* Same as `file_printer()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
 INTDEF NONNULL((1, 2)) ssize_t (LIBCCALL libc_file_printer_unlocked)(void *arg, char const *__restrict data, size_t datalen) __THROWS(...);
 /* Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR' */
-INTDEF WUNUSED NONNULL((1, 2)) ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc_vasprintf)(char **__restrict pstr, char const *__restrict format, va_list args);
+INTDEF WUNUSED ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc_vasprintf)(char **__restrict pstr, char const *__restrict format, va_list args);
 /* Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR' */
-INTDEF WUNUSED NONNULL((1, 2)) ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc_asprintf)(char **__restrict pstr, char const *__restrict format, ...);
+INTDEF WUNUSED ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc_asprintf)(char **__restrict pstr, char const *__restrict format, ...);
 /* Re-open the given `STREAM' as a file-stream for accessing `FD' */
 INTDEF NONNULL((2, 3)) FILE *NOTHROW_RPC(LIBCCALL libc_fdreopen)(fd_t fd, char const *__restrict modes, FILE *__restrict stream);
 /* Re-open the given `STREAM' as a file-stream for accessing `FD' */
@@ -270,28 +270,28 @@ INTDEF NONNULL((1)) int (LIBCCALL libc_fftruncate64)(FILE *__restrict stream, __
 /* >> fftruncate64_unlocked(3)
  * Truncate the given file `STREAM' to a length of `LENGTH' */
 INTDEF NONNULL((1)) int (LIBCCALL libc_fftruncate64_unlocked)(FILE *__restrict stream, __PIO_OFFSET64 length) __THROWS(...);
-INTDEF NONNULL((1, 2)) ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SSIZE_T (LIBCCALL libc_vfprintf_unlocked)(FILE *__restrict stream, char const *__restrict format, va_list args) __THROWS(...);
+INTDEF ATTR_LIBC_PRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (LIBCCALL libc_vfprintf_unlocked)(FILE *__restrict stream, char const *__restrict format, va_list args) __THROWS(...);
 /* Print data to `STREAM', following `FORMAT'
  * Return the number of successfully printed bytes */
-INTDEF NONNULL((1, 2)) ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T (VLIBCCALL libc_fprintf_unlocked)(FILE *__restrict stream, char const *__restrict format, ...) __THROWS(...);
+INTDEF ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (VLIBCCALL libc_fprintf_unlocked)(FILE *__restrict stream, char const *__restrict format, ...) __THROWS(...);
 /* Print data to `stdout', following `FORMAT'
  * Return the number of successfully printed bytes */
-INTDEF NONNULL((1)) ATTR_LIBC_PRINTF(1, 0) __STDC_INT_AS_SSIZE_T (LIBCCALL libc_vprintf_unlocked)(char const *__restrict format, va_list args) __THROWS(...);
+INTDEF ATTR_LIBC_PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T (LIBCCALL libc_vprintf_unlocked)(char const *__restrict format, va_list args) __THROWS(...);
 /* Print data to `stdout', following `FORMAT'
  * Return the number of successfully printed bytes */
-INTDEF NONNULL((1)) ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SSIZE_T (VLIBCCALL libc_printf_unlocked)(char const *__restrict format, ...) __THROWS(...);
+INTDEF ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T (VLIBCCALL libc_printf_unlocked)(char const *__restrict format, ...) __THROWS(...);
 /* Scan data from `STREAM', following `FORMAT'
  * Return the number of successfully scanned data items */
-INTDEF WUNUSED NONNULL((1, 2)) ATTR_LIBC_SCANF(2, 0) __STDC_INT_AS_SIZE_T (LIBCCALL libc_vfscanf_unlocked)(FILE *__restrict stream, char const *__restrict format, va_list args) __THROWS(...);
+INTDEF WUNUSED ATTR_LIBC_SCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (LIBCCALL libc_vfscanf_unlocked)(FILE *__restrict stream, char const *__restrict format, va_list args) __THROWS(...);
 /* Scan data from `stdin', following `FORMAT'
  * Return the number of successfully scanned data items */
-INTDEF WUNUSED NONNULL((1)) ATTR_LIBC_SCANF(1, 0) __STDC_INT_AS_SIZE_T (LIBCCALL libc_vscanf_unlocked)(char const *__restrict format, va_list args) __THROWS(...);
+INTDEF WUNUSED ATTR_LIBC_SCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T (LIBCCALL libc_vscanf_unlocked)(char const *__restrict format, va_list args) __THROWS(...);
 /* Scan data from `STREAM', following `FORMAT'
  * Return the number of successfully scanned data items */
-INTDEF WUNUSED NONNULL((1, 2)) ATTR_LIBC_SCANF(2, 3) __STDC_INT_AS_SIZE_T (VLIBCCALL libc_fscanf_unlocked)(FILE *__restrict stream, char const *__restrict format, ...) __THROWS(...);
+INTDEF WUNUSED ATTR_LIBC_SCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (VLIBCCALL libc_fscanf_unlocked)(FILE *__restrict stream, char const *__restrict format, ...) __THROWS(...);
 /* Scan data from `stdin', following `FORMAT'
  * Return the number of successfully scanned data items */
-INTDEF WUNUSED NONNULL((1)) ATTR_LIBC_SCANF(1, 2) __STDC_INT_AS_SIZE_T (VLIBCCALL libc_scanf_unlocked)(char const *__restrict format, ...) __THROWS(...);
+INTDEF WUNUSED ATTR_LIBC_SCANF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T (VLIBCCALL libc_scanf_unlocked)(char const *__restrict format, ...) __THROWS(...);
 INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_RPC(LIBCCALL libc__fsopen)(char const *filename, char const *modes, int sflag);
 INTDEF int (LIBCCALL libc__flushall)(void) __THROWS(...);
 INTDEF int NOTHROW_RPC(LIBCCALL libc__rmtmp)(void);
@@ -303,24 +303,24 @@ INTDEF WUNUSED int NOTHROW_NCX(LIBCCALL libc__get_printf_count_output)(void);
 INTDEF int NOTHROW_NCX(LIBCCALL libc__set_printf_count_output)(int val);
 INTDEF WUNUSED uint32_t NOTHROW_NCX(LIBCCALL libc__get_output_format)(void);
 INTDEF uint32_t NOTHROW_NCX(LIBCCALL libc__set_output_format)(uint32_t format);
-INTDEF WUNUSED NONNULL((1)) ATTR_LIBC_SCANF(1, 3) __STDC_INT_AS_SIZE_T (LIBCCALL libc__vscanf_l)(char const *__restrict format, locale_t locale, va_list args) __THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) ATTR_LIBC_SCANF(2, 4) __STDC_INT_AS_SIZE_T (LIBCCALL libc__vfscanf_l)(FILE *__restrict stream, char const *__restrict format, locale_t locale, va_list args) __THROWS(...);
-INTDEF NONNULL((1)) ATTR_LIBC_SCANF(1, 3) __STDC_INT_AS_SIZE_T (VLIBCCALL libc__scanf_l)(char const *__restrict format, locale_t locale, ...) __THROWS(...);
-INTDEF NONNULL((1, 2)) ATTR_LIBC_SCANF(2, 4) __STDC_INT_AS_SIZE_T (VLIBCCALL libc__fscanf_l)(FILE *__restrict stream, char const *__restrict format, locale_t locale, ...) __THROWS(...);
-INTDEF NONNULL((1)) ATTR_LIBC_PRINTF(1, 0) __STDC_INT_AS_SIZE_T (LIBCCALL libc__vprintf_l)(char const *__restrict format, locale_t locale, va_list args) __THROWS(...);
-INTDEF NONNULL((1)) ATTR_LIBC_PRINTF_P(1, 0) __STDC_INT_AS_SIZE_T (LIBCCALL libc__vprintf_p)(char const *__restrict format, va_list args) __THROWS(...);
-INTDEF NONNULL((1)) ATTR_LIBC_PRINTF_P(1, 0) __STDC_INT_AS_SIZE_T (LIBCCALL libc__vprintf_p_l)(char const *__restrict format, locale_t locale, va_list args) __THROWS(...);
-INTDEF NONNULL((1)) ATTR_LIBC_PRINTF(1, 3) __STDC_INT_AS_SIZE_T (VLIBCCALL libc__printf_l)(char const *__restrict format, locale_t locale, ...) __THROWS(...);
-INTDEF NONNULL((1)) ATTR_LIBC_PRINTF(1, 3) __STDC_INT_AS_SIZE_T (VLIBCCALL libc__printf_s_l)(char const *__restrict format, locale_t locale, ...) __THROWS(...);
-INTDEF NONNULL((1)) ATTR_LIBC_PRINTF_P(1, 2) __STDC_INT_AS_SIZE_T (VLIBCCALL libc__printf_p)(char const *__restrict format, ...) __THROWS(...);
-INTDEF NONNULL((1)) ATTR_LIBC_PRINTF_P(1, 3) __STDC_INT_AS_SIZE_T (VLIBCCALL libc__printf_p_l)(char const *__restrict format, locale_t locale, ...) __THROWS(...);
-INTDEF NONNULL((1, 2)) ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SIZE_T (LIBCCALL libc__vfprintf_l)(FILE *__restrict stream, char const *__restrict format, locale_t locale, va_list args) __THROWS(...);
-INTDEF NONNULL((1, 2)) ATTR_LIBC_PRINTF_P(2, 0) __STDC_INT_AS_SIZE_T (LIBCCALL libc__vfprintf_p)(FILE *__restrict stream, char const *__restrict format, va_list args) __THROWS(...);
-INTDEF NONNULL((1, 2)) ATTR_LIBC_PRINTF_P(2, 0) __STDC_INT_AS_SIZE_T (LIBCCALL libc__vfprintf_p_l)(FILE *__restrict stream, char const *__restrict format, locale_t locale, va_list args) __THROWS(...);
-INTDEF NONNULL((1, 2)) ATTR_LIBC_PRINTF(2, 4) __STDC_INT_AS_SIZE_T (VLIBCCALL libc__fprintf_l)(FILE *__restrict stream, char const *__restrict format, locale_t locale, ...) __THROWS(...);
-INTDEF NONNULL((1, 2)) ATTR_LIBC_PRINTF(2, 4) __STDC_INT_AS_SIZE_T (VLIBCCALL libc__fprintf_s_l)(FILE *__restrict stream, char const *__restrict format, locale_t locale, ...) __THROWS(...);
-INTDEF NONNULL((1, 2)) ATTR_LIBC_PRINTF_P(2, 3) __STDC_INT_AS_SIZE_T (VLIBCCALL libc__fprintf_p)(FILE *__restrict stream, char const *__restrict format, ...) __THROWS(...);
-INTDEF NONNULL((1, 2)) ATTR_LIBC_PRINTF_P(2, 4) __STDC_INT_AS_SIZE_T (VLIBCCALL libc__fprintf_p_l)(FILE *__restrict stream, char const *__restrict format, locale_t locale, ...) __THROWS(...);
+INTDEF WUNUSED ATTR_LIBC_SCANF(1, 3) NONNULL((1)) __STDC_INT_AS_SIZE_T (LIBCCALL libc__vscanf_l)(char const *__restrict format, locale_t locale, va_list args) __THROWS(...);
+INTDEF WUNUSED ATTR_LIBC_SCANF(2, 4) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (LIBCCALL libc__vfscanf_l)(FILE *__restrict stream, char const *__restrict format, locale_t locale, va_list args) __THROWS(...);
+INTDEF ATTR_LIBC_SCANF(1, 3) NONNULL((1)) __STDC_INT_AS_SIZE_T (VLIBCCALL libc__scanf_l)(char const *__restrict format, locale_t locale, ...) __THROWS(...);
+INTDEF ATTR_LIBC_SCANF(2, 4) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (VLIBCCALL libc__fscanf_l)(FILE *__restrict stream, char const *__restrict format, locale_t locale, ...) __THROWS(...);
+INTDEF ATTR_LIBC_PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T (LIBCCALL libc__vprintf_l)(char const *__restrict format, locale_t locale, va_list args) __THROWS(...);
+INTDEF ATTR_LIBC_PRINTF_P(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T (LIBCCALL libc__vprintf_p)(char const *__restrict format, va_list args) __THROWS(...);
+INTDEF ATTR_LIBC_PRINTF_P(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T (LIBCCALL libc__vprintf_p_l)(char const *__restrict format, locale_t locale, va_list args) __THROWS(...);
+INTDEF ATTR_LIBC_PRINTF(1, 3) NONNULL((1)) __STDC_INT_AS_SIZE_T (VLIBCCALL libc__printf_l)(char const *__restrict format, locale_t locale, ...) __THROWS(...);
+INTDEF ATTR_LIBC_PRINTF(1, 3) NONNULL((1)) __STDC_INT_AS_SIZE_T (VLIBCCALL libc__printf_s_l)(char const *__restrict format, locale_t locale, ...) __THROWS(...);
+INTDEF ATTR_LIBC_PRINTF_P(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T (VLIBCCALL libc__printf_p)(char const *__restrict format, ...) __THROWS(...);
+INTDEF ATTR_LIBC_PRINTF_P(1, 3) NONNULL((1)) __STDC_INT_AS_SIZE_T (VLIBCCALL libc__printf_p_l)(char const *__restrict format, locale_t locale, ...) __THROWS(...);
+INTDEF ATTR_LIBC_PRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (LIBCCALL libc__vfprintf_l)(FILE *__restrict stream, char const *__restrict format, locale_t locale, va_list args) __THROWS(...);
+INTDEF ATTR_LIBC_PRINTF_P(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (LIBCCALL libc__vfprintf_p)(FILE *__restrict stream, char const *__restrict format, va_list args) __THROWS(...);
+INTDEF ATTR_LIBC_PRINTF_P(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (LIBCCALL libc__vfprintf_p_l)(FILE *__restrict stream, char const *__restrict format, locale_t locale, va_list args) __THROWS(...);
+INTDEF ATTR_LIBC_PRINTF(2, 4) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (VLIBCCALL libc__fprintf_l)(FILE *__restrict stream, char const *__restrict format, locale_t locale, ...) __THROWS(...);
+INTDEF ATTR_LIBC_PRINTF(2, 4) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (VLIBCCALL libc__fprintf_s_l)(FILE *__restrict stream, char const *__restrict format, locale_t locale, ...) __THROWS(...);
+INTDEF ATTR_LIBC_PRINTF_P(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (VLIBCCALL libc__fprintf_p)(FILE *__restrict stream, char const *__restrict format, ...) __THROWS(...);
+INTDEF ATTR_LIBC_PRINTF_P(2, 4) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (VLIBCCALL libc__fprintf_p_l)(FILE *__restrict stream, char const *__restrict format, locale_t locale, ...) __THROWS(...);
 INTDEF NONNULL((1, 2, 3)) errno_t NOTHROW_RPC(LIBCCALL libc_fopen_s)(FILE **pstream, char const *filename, char const *modes);
 INTDEF NONNULL((1, 2, 3, 4)) errno_t NOTHROW_RPC(LIBCCALL libc_freopen_s)(FILE **pstream, char const *filename, char const *modes, FILE *oldstream);
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_tmpnam_s)(char *__restrict buf, rsize_t bufsize);

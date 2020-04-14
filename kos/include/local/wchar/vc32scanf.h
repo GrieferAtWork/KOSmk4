@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5ef15dad */
+/* HASH CRC-32:0x693ed3e4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,14 +27,14 @@
 #ifndef ____localdep_vfc32scanf_defined
 #define ____localdep_vfc32scanf_defined 1
 #if defined(__CRT_HAVE_vfwscanf) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __ATTR_LIBC_WSCANF(2, 0),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vfc32scanf,(__FILE *__restrict __stream, __CHAR32_TYPE__ const *__restrict __format, __builtin_va_list __args),vfwscanf,(__stream,__format,__args))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vfc32scanf,(__FILE *__restrict __stream, __CHAR32_TYPE__ const *__restrict __format, __builtin_va_list __args),vfwscanf,(__stream,__format,__args))
 #else /* LIBC: vfc32scanf */
 #undef ____localdep_vfc32scanf_defined
 #endif /* vfc32scanf... */
 #endif /* !____localdep_vfc32scanf_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(vc32scanf) __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_WSCANF(1, 0) __STDC_INT_AS_SIZE_T
+__LOCAL_LIBC(vc32scanf) __ATTR_WUNUSED __ATTR_LIBC_WSCANF(1, 0) __ATTR_NONNULL((1)) __STDC_INT_AS_SIZE_T
 (__LIBCCALL __LIBC_LOCAL_NAME(vc32scanf))(__CHAR32_TYPE__ const *__restrict __format,
                                           __builtin_va_list __args) __THROWS(...) {
 #line 744 "kos/src/libc/magic/wchar.c"

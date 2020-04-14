@@ -312,8 +312,8 @@ NOTHROW_RPC(VLIBCCALL libc_spawnl)(int mode,
 }
 /*[[[end:spawnl]]]*/
 
-/*[[[head:spawnle,hash:CRC-32=0x7fbe68bf]]]*/
-INTERN ATTR_SENTINEL_O(1) NONNULL((2))
+/*[[[head:spawnle,hash:CRC-32=0x703634ba]]]*/
+INTERN NONNULL((2)) ATTR_SENTINEL_O(1)
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.exec.spawn.spawnle") pid_t
 NOTHROW_RPC(VLIBCCALL libc_spawnle)(int mode,
                                     char const *__restrict path,
@@ -348,8 +348,8 @@ NOTHROW_RPC(VLIBCCALL libc_spawnlp)(int mode,
 }
 /*[[[end:spawnlp]]]*/
 
-/*[[[head:spawnlpe,hash:CRC-32=0x6022363f]]]*/
-INTERN ATTR_SENTINEL_O(1) NONNULL((2))
+/*[[[head:spawnlpe,hash:CRC-32=0x41a75fa2]]]*/
+INTERN NONNULL((2)) ATTR_SENTINEL_O(1)
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.exec.spawn.spawnlpe") pid_t
 NOTHROW_RPC(VLIBCCALL libc_spawnlpe)(int mode,
                                      char const *__restrict file,

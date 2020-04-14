@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x551c4f3e */
+/* HASH CRC-32:0xcdc622b2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,7 +50,7 @@
  * @return: 0 :  No data could be scanned.
  * @return: * :  The total number of successfully scanned arguments.
  * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
-__CREDIRECT(__ATTR_NONNULL((1, 2, 4)) __ATTR_LIBC_SCANF(4, 0),__SSIZE_TYPE__,,__localdep_format_vscanf,(__pformatgetc __pgetc, __pformatungetc __pungetc, void *__arg, char const *__restrict __format, __builtin_va_list __args),format_vscanf,(__pgetc,__pungetc,__arg,__format,__args)) __THROWS(...)
+__CREDIRECT(__ATTR_LIBC_SCANF(4, 0) __ATTR_NONNULL((1, 2, 4)),__SSIZE_TYPE__,,__localdep_format_vscanf,(__pformatgetc __pgetc, __pformatungetc __pungetc, void *__arg, char const *__restrict __format, __builtin_va_list __args),format_vscanf,(__pgetc,__pungetc,__arg,__format,__args)) __THROWS(...)
 #else /* LIBC: format_vscanf */
 #include <local/format-printer/format_vscanf.h>
 /* Generic scanf implementation
@@ -86,7 +86,7 @@ __LOCAL_LIBC(vfscanf_ungetc) __SSIZE_TYPE__ (__LIBCCALL __vfscanf_ungetc)(void *
 }
 /* Scan data from `STREAM', following `FORMAT'
  * Return the number of successfully scanned data items */
-__LOCAL_LIBC(vfscanf) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __ATTR_LIBC_SCANF(2, 0) __STDC_INT_AS_SIZE_T
+__LOCAL_LIBC(vfscanf) __ATTR_WUNUSED __ATTR_LIBC_SCANF(2, 0) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (__LIBCCALL __LIBC_LOCAL_NAME(vfscanf))(__FILE *__restrict __stream,
                                         char const *__restrict __format,
                                         __builtin_va_list __args) __THROWS(...) {

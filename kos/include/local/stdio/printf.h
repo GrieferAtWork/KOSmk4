@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x61fe49b5 */
+/* HASH CRC-32:0xef8f22d1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,23 +28,23 @@
 #if __has_builtin(__builtin_vprintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_vprintf)
 /* Print data to `stdout', following `FORMAT'
  * Return the number of successfully printed bytes */
-__CEIREDIRECT(__ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 0),__STDC_INT_AS_SSIZE_T,,__localdep_vprintf,(char const *__restrict __format, __builtin_va_list __args),vprintf,{ return __builtin_vprintf(__format, __args); }) __THROWS(...)
+__CEIREDIRECT(__ATTR_LIBC_PRINTF(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,,__localdep_vprintf,(char const *__restrict __format, __builtin_va_list __args),vprintf,{ return __builtin_vprintf(__format, __args); }) __THROWS(...)
 #elif defined(__CRT_HAVE_vprintf_unlocked) && defined(__USE_STDIO_UNLOCKED)
 /* Print data to `stdout', following `FORMAT'
  * Return the number of successfully printed bytes */
-__CREDIRECT(__ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 0),__STDC_INT_AS_SSIZE_T,,__localdep_vprintf,(char const *__restrict __format, __builtin_va_list __args),vprintf_unlocked,(__format,__args)) __THROWS(...)
+__CREDIRECT(__ATTR_LIBC_PRINTF(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,,__localdep_vprintf,(char const *__restrict __format, __builtin_va_list __args),vprintf_unlocked,(__format,__args)) __THROWS(...)
 #elif defined(__CRT_HAVE_vprintf)
 /* Print data to `stdout', following `FORMAT'
  * Return the number of successfully printed bytes */
-__CREDIRECT(__ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 0),__STDC_INT_AS_SSIZE_T,,__localdep_vprintf,(char const *__restrict __format, __builtin_va_list __args),vprintf,(__format,__args)) __THROWS(...)
+__CREDIRECT(__ATTR_LIBC_PRINTF(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,,__localdep_vprintf,(char const *__restrict __format, __builtin_va_list __args),vprintf,(__format,__args)) __THROWS(...)
 #elif defined(__CRT_HAVE_vprintf_s)
 /* Print data to `stdout', following `FORMAT'
  * Return the number of successfully printed bytes */
-__CREDIRECT(__ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 0),__STDC_INT_AS_SSIZE_T,,__localdep_vprintf,(char const *__restrict __format, __builtin_va_list __args),vprintf_s,(__format,__args)) __THROWS(...)
+__CREDIRECT(__ATTR_LIBC_PRINTF(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,,__localdep_vprintf,(char const *__restrict __format, __builtin_va_list __args),vprintf_s,(__format,__args)) __THROWS(...)
 #elif defined(__CRT_HAVE_vprintf_unlocked)
 /* Print data to `stdout', following `FORMAT'
  * Return the number of successfully printed bytes */
-__CREDIRECT(__ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 0),__STDC_INT_AS_SSIZE_T,,__localdep_vprintf,(char const *__restrict __format, __builtin_va_list __args),vprintf_unlocked,(__format,__args)) __THROWS(...)
+__CREDIRECT(__ATTR_LIBC_PRINTF(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,,__localdep_vprintf,(char const *__restrict __format, __builtin_va_list __args),vprintf_unlocked,(__format,__args)) __THROWS(...)
 #elif !defined(__NO_STDSTREAMS) && ((defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_vfprintf_unlocked))
 #include <local/stdio/vprintf.h>
 /* Print data to `stdout', following `FORMAT'
@@ -58,7 +58,7 @@ __CREDIRECT(__ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 0),__STDC_INT_AS_SSIZE_T,,
 __NAMESPACE_LOCAL_BEGIN
 /* Print data to `stdout', following `FORMAT'
  * Return the number of successfully printed bytes */
-__LOCAL_LIBC(printf) __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SSIZE_T
+__LOCAL_LIBC(printf) __ATTR_LIBC_PRINTF(1, 2) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T
 (__VLIBCCALL __LIBC_LOCAL_NAME(printf))(char const *__restrict __format,
                                         ...) __THROWS(...) {
 #line 853 "kos/src/libc/magic/stdio.c"

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbf5661fd */
+/* HASH CRC-32:0x2f17a397 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -467,7 +467,7 @@ __NAMESPACE_LOCAL_BEGIN
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
-__LOCAL_LIBC(format_vprintf) __ATTR_NONNULL((1, 3)) __ATTR_LIBC_PRINTF(3, 0) __SSIZE_TYPE__
+__LOCAL_LIBC(format_vprintf) __ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(format_vprintf))(__pformatprinter __printer,
                                                void *__arg,
                                                char const *__restrict __format,

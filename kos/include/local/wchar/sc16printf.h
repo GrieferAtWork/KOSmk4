@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3df34594 */
+/* HASH CRC-32:0x16e94bb5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,9 +24,9 @@
 #ifndef ____localdep_vsc16printf_defined
 #define ____localdep_vsc16printf_defined 1
 #if defined(__CRT_HAVE_vswprintf) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_NONNULL((3)) __ATTR_LIBC_WPRINTF(3, 0),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vsc16printf,(__CHAR16_TYPE__ *__restrict __buf, __SIZE_TYPE__ __buflen, __CHAR16_TYPE__ const *__restrict __format, __builtin_va_list __args),vswprintf,(__buf,__buflen,__format,__args))
+__CREDIRECT(__ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((3)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vsc16printf,(__CHAR16_TYPE__ *__restrict __buf, __SIZE_TYPE__ __buflen, __CHAR16_TYPE__ const *__restrict __format, __builtin_va_list __args),vswprintf,(__buf,__buflen,__format,__args))
 #elif defined(__CRT_HAVE_DOS$vswprintf)
-__CREDIRECT_DOS(__ATTR_NONNULL((3)) __ATTR_LIBC_WPRINTF(3, 0),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vsc16printf,(__CHAR16_TYPE__ *__restrict __buf, __SIZE_TYPE__ __buflen, __CHAR16_TYPE__ const *__restrict __format, __builtin_va_list __args),vswprintf,(__buf,__buflen,__format,__args))
+__CREDIRECT_DOS(__ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((3)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vsc16printf,(__CHAR16_TYPE__ *__restrict __buf, __SIZE_TYPE__ __buflen, __CHAR16_TYPE__ const *__restrict __format, __builtin_va_list __args),vswprintf,(__buf,__buflen,__format,__args))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/vswprintf.h>
 #define __localdep_vsc16printf (*(__STDC_INT_AS_SIZE_T(__LIBCCALL*)(__CHAR16_TYPE__ *__restrict, __SIZE_TYPE__, __CHAR16_TYPE__ const *__restrict, __builtin_va_list))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vswprintf)))
@@ -37,7 +37,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((3)) __ATTR_LIBC_WPRINTF(3, 0),__STDC_INT_AS_SIZE
 #endif /* !____localdep_vsc16printf_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(sc16printf) __ATTR_NONNULL((3)) __ATTR_LIBC_WPRINTF(3, 4) __STDC_INT_AS_SIZE_T
+__LOCAL_LIBC(sc16printf) __ATTR_LIBC_WPRINTF(3, 4) __ATTR_NONNULL((3)) __STDC_INT_AS_SIZE_T
 __NOTHROW_NCX(__VLIBDCALL __LIBC_LOCAL_NAME(sc16printf))(__CHAR16_TYPE__ *__restrict __buf,
                                                          __SIZE_TYPE__ __buflen,
                                                          __CHAR16_TYPE__ const *__restrict __format,

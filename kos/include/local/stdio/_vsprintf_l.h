@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x58bc50fa */
+/* HASH CRC-32:0x377c4f31 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,15 +26,15 @@
 #if __has_builtin(__builtin_vsprintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_vsprintf)
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Return the number of written characters, excluding a trailing NUL-character */
-__CEIREDIRECT(__ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_vsprintf,(char *__restrict __dest, char const *__restrict __format, __builtin_va_list __args),vsprintf,{ return __builtin_vsprintf(__dest, __format, __args); })
+__CEIREDIRECT(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_vsprintf,(char *__restrict __dest, char const *__restrict __format, __builtin_va_list __args),vsprintf,{ return __builtin_vsprintf(__dest, __format, __args); })
 #elif defined(__CRT_HAVE_vsprintf)
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Return the number of written characters, excluding a trailing NUL-character */
-__CREDIRECT(__ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_vsprintf,(char *__restrict __dest, char const *__restrict __format, __builtin_va_list __args),vsprintf,(__dest,__format,__args))
+__CREDIRECT(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_vsprintf,(char *__restrict __dest, char const *__restrict __format, __builtin_va_list __args),vsprintf,(__dest,__format,__args))
 #elif defined(__CRT_HAVE__IO_vsprintf)
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Return the number of written characters, excluding a trailing NUL-character */
-__CREDIRECT(__ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_vsprintf,(char *__restrict __dest, char const *__restrict __format, __builtin_va_list __args),_IO_vsprintf,(__dest,__format,__args))
+__CREDIRECT(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_vsprintf,(char *__restrict __dest, char const *__restrict __format, __builtin_va_list __args),_IO_vsprintf,(__dest,__format,__args))
 #else /* LIBC: vsprintf */
 #include <local/stdio/vsprintf.h>
 /* Print a formatted string to a given in-member string buffer `BUF'
@@ -44,7 +44,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 0),__STDC_INT_AS_SSIZE_
 #endif /* !____localdep_vsprintf_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_vsprintf_l) __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SIZE_T
+__LOCAL_LIBC(_vsprintf_l) __ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vsprintf_l))(char *__restrict __buf,
                                                          char const *__restrict __format,
                                                          __locale_t __locale,

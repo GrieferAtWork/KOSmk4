@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x82583d3e */
+/* HASH CRC-32:0xcb09d56d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_wexecve,(__WC
 #endif /* !____localdep_wexecve_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(wexecle) __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(wexecle) __ATTR_NONNULL((1)) __ATTR_SENTINEL_O(1) int
 __NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(wexecle))(__WCHAR_TYPE__ const *__restrict __path,
                                                       __WCHAR_TYPE__ const *__args,
                                                       ... /*, (wchar_t *)NULL, wchar_t **environ*/) {

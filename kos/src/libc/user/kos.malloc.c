@@ -89,9 +89,9 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.heap.malloc.Realloc") void *
 }
 /*[[[end:Realloc]]]*/
 
-/*[[[head:Memalign,hash:CRC-32=0x885b700a]]]*/
+/*[[[head:Memalign,hash:CRC-32=0xb7ad3dab]]]*/
 /* @throws: E_BADALLOC: ... */
-INTERN ATTR_MALLOC ATTR_RETNONNULL WUNUSED ATTR_ALLOC_SIZE((2)) ATTR_ALLOC_ALIGN(1)
+INTERN ATTR_MALLOC ATTR_RETNONNULL WUNUSED ATTR_ALLOC_ALIGN(1) ATTR_ALLOC_SIZE((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.except.heap.malloc.Memalign") void *
 (LIBCCALL libc_Memalign)(size_t alignment,
                          size_t num_bytes)
@@ -138,9 +138,9 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.heap.rare_helpers.Valloc") void *
 }
 /*[[[end:Valloc]]]*/
 
-/*[[[head:Memdup,hash:CRC-32=0x6eaa466a]]]*/
+/*[[[head:Memdup,hash:CRC-32=0xceca1e4f]]]*/
 /* @throws: E_BADALLOC: ... */
-INTERN ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED NONNULL((1)) ATTR_ALLOC_SIZE((2))
+INTERN ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ALLOC_SIZE((2)) NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.except.heap.rare_helpers.Memdup") void *
 (LIBCCALL libc_Memdup)(void const *__restrict ptr,
                        size_t num_bytes)

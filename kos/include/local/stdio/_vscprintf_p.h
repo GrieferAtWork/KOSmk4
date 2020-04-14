@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8d9f4f66 */
+/* HASH CRC-32:0x2991a920 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local__vscprintf_p_defined
 #define __local__vscprintf_p_defined 1
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_vscprintf_p) __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF_P(1, 0) __STDC_INT_AS_SIZE_T
+__LOCAL_LIBC(_vscprintf_p) __ATTR_WUNUSED __ATTR_LIBC_PRINTF_P(1, 0) __ATTR_NONNULL((1)) __STDC_INT_AS_SIZE_T
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vscprintf_p))(char const *__restrict __format,
                                                           __builtin_va_list __args) {
 #line 2445 "kos/src/libc/magic/stdio.c"

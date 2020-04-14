@@ -122,13 +122,13 @@ NOTHROW_NCX(LIBCCALL libc_format_aprintf_printer)(/*struct format_aprintf_data *
 }
 /*[[[end:format_aprintf_printer]]]*/
 
-/*[[[head:format_aprintf_alloc,hash:CRC-32=0x2120489]]]*/
+/*[[[head:format_aprintf_alloc,hash:CRC-32=0xb9692050]]]*/
 /* Allocate a buffer of `num_chars' characters at the end of `self'
  * The returned pointer remains valid until the next time this function is called,
  * the format_aprintf buffer `self' is finalized, or some other function is used
  * to append additional data to the end of `self'
  * @return: NULL: Failed to allocate additional memory */
-INTERN ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) ATTR_ALLOC_SIZE((2))
+INTERN ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_aprintf_alloc") char *
 NOTHROW_NCX(LIBCCALL libc_format_aprintf_alloc)(struct format_aprintf_data *__restrict self,
                                                 size_t num_chars)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6121c109 */
+/* HASH CRC-32:0xa36f805e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -274,17 +274,17 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _execlp
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel */
-__CEIREDIRECT(__ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)),int,__NOTHROW_RPC,_execle,(char const *__restrict __path, char const *__args, ... /*, (char *)NULL, (char **)environ*/),execle,{ return __builtin_execle(__path, __args, __builtin_va_arg_pack()); })
+__CEIREDIRECT(__ATTR_NONNULL((1)) __ATTR_SENTINEL_O(1),int,__NOTHROW_RPC,_execle,(char const *__restrict __path, char const *__args, ... /*, (char *)NULL, (char **)environ*/),execle,{ return __builtin_execle(__path, __args, __builtin_va_arg_pack()); })
 #elif defined(__CRT_HAVE_execle) && !defined(__NO_ASMNAME)
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel */
-__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _execle)(char const *__restrict __path, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __CASMNAME("execle");
+__LIBC __ATTR_NONNULL((1)) __ATTR_SENTINEL_O(1) int __NOTHROW_RPC(__VLIBCCALL _execle)(char const *__restrict __path, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __CASMNAME("execle");
 #elif defined(__CRT_HAVE__execle)
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel */
-__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _execle)(char const *__restrict __path, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __CASMNAME_SAME("_execle");
+__LIBC __ATTR_NONNULL((1)) __ATTR_SENTINEL_O(1) int __NOTHROW_RPC(__VLIBCCALL _execle)(char const *__restrict __path, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __CASMNAME_SAME("_execle");
 #elif defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)
 #include <local/unistd/execle.h>
 /* >> execle(3)
@@ -296,12 +296,12 @@ __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _e
 /* >> execlpe(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel */
-__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _execlpe)(char const *__restrict __file, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __CASMNAME("execlpe");
+__LIBC __ATTR_NONNULL((1)) __ATTR_SENTINEL_O(1) int __NOTHROW_RPC(__VLIBCCALL _execlpe)(char const *__restrict __file, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __CASMNAME("execlpe");
 #elif defined(__CRT_HAVE__execlpe)
 /* >> execlpe(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel */
-__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _execlpe)(char const *__restrict __file, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __CASMNAME_SAME("_execlpe");
+__LIBC __ATTR_NONNULL((1)) __ATTR_SENTINEL_O(1) int __NOTHROW_RPC(__VLIBCCALL _execlpe)(char const *__restrict __file, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __CASMNAME_SAME("_execlpe");
 #elif defined(__CRT_HAVE_execvpe) || defined(__CRT_HAVE__execvpe)
 #include <local/unistd/execlpe.h>
 /* >> execlpe(3)
@@ -351,19 +351,19 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) intptr_t __NOTHROW_RPC(__VLIBCCALL _s
 #define _spawnlp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spawnlp))
 #endif /* _spawnlp... */
 #if defined(__CRT_HAVE_spawnle) && !defined(__NO_ASMNAME)
-__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) intptr_t __NOTHROW_RPC(__VLIBCCALL _spawnle)(int __mode, char const *__restrict __path, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __CASMNAME("spawnle");
+__LIBC __ATTR_NONNULL((2)) __ATTR_SENTINEL_O(1) intptr_t __NOTHROW_RPC(__VLIBCCALL _spawnle)(int __mode, char const *__restrict __path, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __CASMNAME("spawnle");
 #elif defined(__CRT_HAVE__spawnle)
-__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) intptr_t __NOTHROW_RPC(__VLIBCCALL _spawnle)(int __mode, char const *__restrict __path, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __CASMNAME_SAME("_spawnle");
+__LIBC __ATTR_NONNULL((2)) __ATTR_SENTINEL_O(1) intptr_t __NOTHROW_RPC(__VLIBCCALL _spawnle)(int __mode, char const *__restrict __path, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __CASMNAME_SAME("_spawnle");
 #elif defined(__CRT_HAVE_spawnve) || defined(__CRT_HAVE__spawnve)
 #include <local/process/spawnle.h>
 #define _spawnle (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spawnle))
 #endif /* _spawnle... */
 #ifdef __CRT_HAVE__spawnlpe
-__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) intptr_t __NOTHROW_RPC(__VLIBCCALL _spawnlpe)(int __mode, char const *__restrict __file, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __CASMNAME_SAME("_spawnlpe");
+__LIBC __ATTR_NONNULL((2)) __ATTR_SENTINEL_O(1) intptr_t __NOTHROW_RPC(__VLIBCCALL _spawnlpe)(int __mode, char const *__restrict __file, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __CASMNAME_SAME("_spawnlpe");
 #elif defined(__CRT_HAVE_spawnlpe) && !defined(__NO_ASMNAME)
-__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) intptr_t __NOTHROW_RPC(__VLIBCCALL _spawnlpe)(int __mode, char const *__restrict __file, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __CASMNAME("spawnlpe");
+__LIBC __ATTR_NONNULL((2)) __ATTR_SENTINEL_O(1) intptr_t __NOTHROW_RPC(__VLIBCCALL _spawnlpe)(int __mode, char const *__restrict __file, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __CASMNAME("spawnlpe");
 #elif defined(__CRT_HAVE__spawnle) && !defined(__NO_ASMNAME)
-__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) intptr_t __NOTHROW_RPC(__VLIBCCALL _spawnlpe)(int __mode, char const *__restrict __file, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __CASMNAME("_spawnle");
+__LIBC __ATTR_NONNULL((2)) __ATTR_SENTINEL_O(1) intptr_t __NOTHROW_RPC(__VLIBCCALL _spawnlpe)(int __mode, char const *__restrict __file, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __CASMNAME("_spawnle");
 #elif defined(__CRT_HAVE_spawnvpe) || defined(__CRT_HAVE__spawnvpe)
 #include <local/process/spawnlpe.h>
 #define _spawnlpe (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spawnlpe))
@@ -453,19 +453,19 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _wexecl
 #define _wexeclp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wexeclp))
 #endif /* _wexeclp... */
 #if defined(__CRT_HAVE_wexecle) && !defined(__NO_ASMNAME)
-__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _wexecle)(wchar_t const *__restrict __path, wchar_t const *__args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) __CASMNAME("wexecle");
+__LIBC __ATTR_NONNULL((1)) __ATTR_SENTINEL_O(1) int __NOTHROW_RPC(__VLIBCCALL _wexecle)(wchar_t const *__restrict __path, wchar_t const *__args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) __CASMNAME("wexecle");
 #elif defined(__CRT_HAVE__wexecle)
-__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _wexecle)(wchar_t const *__restrict __path, wchar_t const *__args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) __CASMNAME_SAME("_wexecle");
+__LIBC __ATTR_NONNULL((1)) __ATTR_SENTINEL_O(1) int __NOTHROW_RPC(__VLIBCCALL _wexecle)(wchar_t const *__restrict __path, wchar_t const *__args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) __CASMNAME_SAME("_wexecle");
 #elif defined(__CRT_HAVE_wexecve) || defined(__CRT_HAVE__wexecve)
 #include <local/parts.wchar.process/wexecle.h>
 #define _wexecle (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wexecle))
 #endif /* _wexecle... */
 #ifdef __CRT_HAVE__wexeclpe
-__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _wexeclpe)(wchar_t const *__restrict __file, wchar_t const *__args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) __CASMNAME_SAME("_wexeclpe");
+__LIBC __ATTR_NONNULL((1)) __ATTR_SENTINEL_O(1) int __NOTHROW_RPC(__VLIBCCALL _wexeclpe)(wchar_t const *__restrict __file, wchar_t const *__args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) __CASMNAME_SAME("_wexeclpe");
 #elif defined(__CRT_HAVE_wexeclpe) && !defined(__NO_ASMNAME)
-__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _wexeclpe)(wchar_t const *__restrict __file, wchar_t const *__args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) __CASMNAME("wexeclpe");
+__LIBC __ATTR_NONNULL((1)) __ATTR_SENTINEL_O(1) int __NOTHROW_RPC(__VLIBCCALL _wexeclpe)(wchar_t const *__restrict __file, wchar_t const *__args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) __CASMNAME("wexeclpe");
 #elif defined(__CRT_HAVE__wexecle) && !defined(__NO_ASMNAME)
-__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _wexeclpe)(wchar_t const *__restrict __file, wchar_t const *__args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) __CASMNAME("_wexecle");
+__LIBC __ATTR_NONNULL((1)) __ATTR_SENTINEL_O(1) int __NOTHROW_RPC(__VLIBCCALL _wexeclpe)(wchar_t const *__restrict __file, wchar_t const *__args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) __CASMNAME("_wexecle");
 #elif defined(__CRT_HAVE_wexecvpe) || defined(__CRT_HAVE__wexecvpe)
 #include <local/parts.wchar.process/wexeclpe.h>
 #define _wexeclpe (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wexeclpe))
@@ -507,19 +507,19 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) intptr_t __NOTHROW_RPC(__VLIBCCALL _w
 #define _wspawnlp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wspawnlp))
 #endif /* _wspawnlp... */
 #if defined(__CRT_HAVE_wspawnle) && !defined(__NO_ASMNAME)
-__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) intptr_t __NOTHROW_RPC(__VLIBCCALL _wspawnle)(int __mode, wchar_t const *__restrict __path, wchar_t const *__args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) __CASMNAME("wspawnle");
+__LIBC __ATTR_NONNULL((2)) __ATTR_SENTINEL_O(1) intptr_t __NOTHROW_RPC(__VLIBCCALL _wspawnle)(int __mode, wchar_t const *__restrict __path, wchar_t const *__args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) __CASMNAME("wspawnle");
 #elif defined(__CRT_HAVE__wspawnle)
-__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) intptr_t __NOTHROW_RPC(__VLIBCCALL _wspawnle)(int __mode, wchar_t const *__restrict __path, wchar_t const *__args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) __CASMNAME_SAME("_wspawnle");
+__LIBC __ATTR_NONNULL((2)) __ATTR_SENTINEL_O(1) intptr_t __NOTHROW_RPC(__VLIBCCALL _wspawnle)(int __mode, wchar_t const *__restrict __path, wchar_t const *__args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) __CASMNAME_SAME("_wspawnle");
 #elif defined(__CRT_HAVE_wspawnve) || defined(__CRT_HAVE__wspawnve)
 #include <local/parts.wchar.process/wspawnle.h>
 #define _wspawnle (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wspawnle))
 #endif /* _wspawnle... */
 #ifdef __CRT_HAVE__wspawnlpe
-__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) intptr_t __NOTHROW_RPC(__VLIBCCALL _wspawnlpe)(int __mode, wchar_t const *__restrict __path, wchar_t const *__args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) __CASMNAME_SAME("_wspawnlpe");
+__LIBC __ATTR_NONNULL((2)) __ATTR_SENTINEL_O(1) intptr_t __NOTHROW_RPC(__VLIBCCALL _wspawnlpe)(int __mode, wchar_t const *__restrict __path, wchar_t const *__args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) __CASMNAME_SAME("_wspawnlpe");
 #elif defined(__CRT_HAVE_wspawnlpe) && !defined(__NO_ASMNAME)
-__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) intptr_t __NOTHROW_RPC(__VLIBCCALL _wspawnlpe)(int __mode, wchar_t const *__restrict __path, wchar_t const *__args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) __CASMNAME("wspawnlpe");
+__LIBC __ATTR_NONNULL((2)) __ATTR_SENTINEL_O(1) intptr_t __NOTHROW_RPC(__VLIBCCALL _wspawnlpe)(int __mode, wchar_t const *__restrict __path, wchar_t const *__args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) __CASMNAME("wspawnlpe");
 #elif defined(__CRT_HAVE__wspawnle) && !defined(__NO_ASMNAME)
-__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) intptr_t __NOTHROW_RPC(__VLIBCCALL _wspawnlpe)(int __mode, wchar_t const *__restrict __path, wchar_t const *__args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) __CASMNAME("_wspawnle");
+__LIBC __ATTR_NONNULL((2)) __ATTR_SENTINEL_O(1) intptr_t __NOTHROW_RPC(__VLIBCCALL _wspawnlpe)(int __mode, wchar_t const *__restrict __path, wchar_t const *__args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) __CASMNAME("_wspawnle");
 #elif defined(__CRT_HAVE_wspawnvpe) || defined(__CRT_HAVE__wspawnvpe)
 #include <local/parts.wchar.process/wspawnlpe.h>
 #define _wspawnlpe (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wspawnlpe))
@@ -713,17 +713,17 @@ __NAMESPACE_LOCAL_USING(execlp)
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel */
-__CEIDECLARE(__ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)),int,__NOTHROW_RPC,execle,(char const *__restrict __path, char const *__args, ... /*, (char *)NULL, (char **)environ*/),{ return __builtin_execle(__path, __args, __builtin_va_arg_pack()); })
+__CEIDECLARE(__ATTR_NONNULL((1)) __ATTR_SENTINEL_O(1),int,__NOTHROW_RPC,execle,(char const *__restrict __path, char const *__args, ... /*, (char *)NULL, (char **)environ*/),{ return __builtin_execle(__path, __args, __builtin_va_arg_pack()); })
 #elif defined(__CRT_HAVE_execle)
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel */
-__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execle)(char const *__restrict __path, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __CASMNAME_SAME("execle");
+__LIBC __ATTR_NONNULL((1)) __ATTR_SENTINEL_O(1) int __NOTHROW_RPC(__VLIBCCALL execle)(char const *__restrict __path, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __CASMNAME_SAME("execle");
 #elif defined(__CRT_HAVE__execle) && !defined(__NO_ASMNAME)
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel */
-__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execle)(char const *__restrict __path, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __CASMNAME("_execle");
+__LIBC __ATTR_NONNULL((1)) __ATTR_SENTINEL_O(1) int __NOTHROW_RPC(__VLIBCCALL execle)(char const *__restrict __path, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __CASMNAME("_execle");
 #elif defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)
 #include <local/unistd/execle.h>
 #ifdef __cplusplus
@@ -744,12 +744,12 @@ __NAMESPACE_LOCAL_USING(execle)
 /* >> execlpe(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel */
-__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execlpe)(char const *__restrict __file, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __CASMNAME_SAME("execlpe");
+__LIBC __ATTR_NONNULL((1)) __ATTR_SENTINEL_O(1) int __NOTHROW_RPC(__VLIBCCALL execlpe)(char const *__restrict __file, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __CASMNAME_SAME("execlpe");
 #elif defined(__CRT_HAVE__execlpe) && !defined(__NO_ASMNAME)
 /* >> execlpe(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel */
-__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execlpe)(char const *__restrict __file, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __CASMNAME("_execlpe");
+__LIBC __ATTR_NONNULL((1)) __ATTR_SENTINEL_O(1) int __NOTHROW_RPC(__VLIBCCALL execlpe)(char const *__restrict __file, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __CASMNAME("_execlpe");
 #elif defined(__CRT_HAVE_execvpe) || defined(__CRT_HAVE__execvpe)
 #include <local/unistd/execlpe.h>
 #ifdef __cplusplus
@@ -846,9 +846,9 @@ __NAMESPACE_LOCAL_USING(spawnlp)
 #ifndef __spawnle_defined
 #define __spawnle_defined 1
 #ifdef __CRT_HAVE_spawnle
-__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL spawnle)(int __mode, char const *__restrict __path, char const *__args, ... /*, (char *)NULL, char **environ*/) __CASMNAME_SAME("spawnle");
+__LIBC __ATTR_NONNULL((2)) __ATTR_SENTINEL_O(1) __pid_t __NOTHROW_RPC(__VLIBCCALL spawnle)(int __mode, char const *__restrict __path, char const *__args, ... /*, (char *)NULL, char **environ*/) __CASMNAME_SAME("spawnle");
 #elif defined(__CRT_HAVE__spawnle) && !defined(__NO_ASMNAME)
-__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL spawnle)(int __mode, char const *__restrict __path, char const *__args, ... /*, (char *)NULL, char **environ*/) __CASMNAME("_spawnle");
+__LIBC __ATTR_NONNULL((2)) __ATTR_SENTINEL_O(1) __pid_t __NOTHROW_RPC(__VLIBCCALL spawnle)(int __mode, char const *__restrict __path, char const *__args, ... /*, (char *)NULL, char **environ*/) __CASMNAME("_spawnle");
 #elif defined(__CRT_HAVE_spawnve) || defined(__CRT_HAVE__spawnve)
 #include <local/process/spawnle.h>
 #ifdef __cplusplus
@@ -863,9 +863,9 @@ __NAMESPACE_LOCAL_USING(spawnle)
 #ifndef __spawnlpe_defined
 #define __spawnlpe_defined 1
 #ifdef __CRT_HAVE_spawnlpe
-__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL spawnlpe)(int __mode, char const *__restrict __file, char const *__args, ... /*, (char *)NULL, char **environ*/) __CASMNAME_SAME("spawnlpe");
+__LIBC __ATTR_NONNULL((2)) __ATTR_SENTINEL_O(1) __pid_t __NOTHROW_RPC(__VLIBCCALL spawnlpe)(int __mode, char const *__restrict __file, char const *__args, ... /*, (char *)NULL, char **environ*/) __CASMNAME_SAME("spawnlpe");
 #elif defined(__CRT_HAVE__spawnle) && !defined(__NO_ASMNAME)
-__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL spawnlpe)(int __mode, char const *__restrict __file, char const *__args, ... /*, (char *)NULL, char **environ*/) __CASMNAME("_spawnle");
+__LIBC __ATTR_NONNULL((2)) __ATTR_SENTINEL_O(1) __pid_t __NOTHROW_RPC(__VLIBCCALL spawnlpe)(int __mode, char const *__restrict __file, char const *__args, ... /*, (char *)NULL, char **environ*/) __CASMNAME("_spawnle");
 #elif defined(__CRT_HAVE_spawnvpe) || defined(__CRT_HAVE__spawnvpe)
 #include <local/process/spawnlpe.h>
 #ifdef __cplusplus

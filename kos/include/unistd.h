@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeca4280c */
+/* HASH CRC-32:0xb1bfaa9a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -320,17 +320,17 @@ __NAMESPACE_LOCAL_USING(execl)
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel */
-__CEIDECLARE(__ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)),int,__NOTHROW_RPC,execle,(char const *__restrict __path, char const *__args, ... /*, (char *)NULL, (char **)environ*/),{ return __builtin_execle(__path, __args, __builtin_va_arg_pack()); })
+__CEIDECLARE(__ATTR_NONNULL((1)) __ATTR_SENTINEL_O(1),int,__NOTHROW_RPC,execle,(char const *__restrict __path, char const *__args, ... /*, (char *)NULL, (char **)environ*/),{ return __builtin_execle(__path, __args, __builtin_va_arg_pack()); })
 #elif defined(__CRT_HAVE_execle)
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel */
-__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execle)(char const *__restrict __path, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __CASMNAME_SAME("execle");
+__LIBC __ATTR_NONNULL((1)) __ATTR_SENTINEL_O(1) int __NOTHROW_RPC(__VLIBCCALL execle)(char const *__restrict __path, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __CASMNAME_SAME("execle");
 #elif defined(__CRT_HAVE__execle) && !defined(__NO_ASMNAME)
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel */
-__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execle)(char const *__restrict __path, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __CASMNAME("_execle");
+__LIBC __ATTR_NONNULL((1)) __ATTR_SENTINEL_O(1) int __NOTHROW_RPC(__VLIBCCALL execle)(char const *__restrict __path, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __CASMNAME("_execle");
 #elif defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)
 #include <local/unistd/execle.h>
 #ifdef __cplusplus
@@ -401,12 +401,12 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,execvpe,(char const *__r
 /* >> execlpe(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel */
-__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execlpe)(char const *__restrict __file, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __CASMNAME_SAME("execlpe");
+__LIBC __ATTR_NONNULL((1)) __ATTR_SENTINEL_O(1) int __NOTHROW_RPC(__VLIBCCALL execlpe)(char const *__restrict __file, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __CASMNAME_SAME("execlpe");
 #elif defined(__CRT_HAVE__execlpe) && !defined(__NO_ASMNAME)
 /* >> execlpe(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel */
-__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execlpe)(char const *__restrict __file, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __CASMNAME("_execlpe");
+__LIBC __ATTR_NONNULL((1)) __ATTR_SENTINEL_O(1) int __NOTHROW_RPC(__VLIBCCALL execlpe)(char const *__restrict __file, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __CASMNAME("_execlpe");
 #elif defined(__CRT_HAVE_execvpe) || defined(__CRT_HAVE__execvpe)
 #include <local/unistd/execlpe.h>
 #ifdef __cplusplus
@@ -1377,10 +1377,10 @@ __CDECLARE(,int,__NOTHROW_RPC,usleep,(__useconds_t __useconds),(__useconds))
 __NAMESPACE_LOCAL_USING_OR_IMPL(usleep, __FORCELOCAL int __NOTHROW_RPC(__LIBCCALL usleep)(__useconds_t __useconds) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(usleep))(__useconds); })
 #endif /* usleep... */
 #ifdef __CRT_HAVE_getwd
-__CDECLARE(__ATTR_NONNULL((1)) __ATTR_DEPRECATED("Use getcwd()"),char *,__NOTHROW_RPC,getwd,(char *__buf),(__buf))
+__CDECLARE(__ATTR_DEPRECATED("Use getcwd()") __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,getwd,(char *__buf),(__buf))
 #elif defined(__CRT_HAVE_getcwd) || defined(__CRT_HAVE__getcwd)
 #include <local/unistd/getwd.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(getwd, __FORCELOCAL __ATTR_NONNULL((1)) __ATTR_DEPRECATED("Use getcwd()") char *__NOTHROW_RPC(__LIBCCALL getwd)(char *__buf) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getwd))(__buf); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(getwd, __FORCELOCAL __ATTR_DEPRECATED("Use getcwd()") __ATTR_NONNULL((1)) char *__NOTHROW_RPC(__LIBCCALL getwd)(char *__buf) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getwd))(__buf); })
 #endif /* getwd... */
 #ifdef __CRT_HAVE_ualarm
 __CDECLARE(,__useconds_t,__NOTHROW_NCX,ualarm,(__useconds_t __value, __useconds_t __interval),(__value,__interval))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7a762e6c */
+/* HASH CRC-32:0x1ae4032e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,7 +61,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHRO
 #endif /* !____localdep_memcpy_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(memdup) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_ALLOC_SIZE((2)) void *
+__LOCAL_LIBC(memdup) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_NONNULL((1)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memdup))(void const *__restrict __ptr,
                                                     __SIZE_TYPE__ __n_bytes) {
 #line 170 "kos/src/libc/magic/malloc.c"

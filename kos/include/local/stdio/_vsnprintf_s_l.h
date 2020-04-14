@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x223ca0ec */
+/* HASH CRC-32:0xcf3d2fef */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #define ____localdep__vsnprintf_defined 1
 #ifdef __CRT_HAVE__vsnprintf
 /* WARNING: This function returns the number of written character. - Not the required buffer size! */
-__CREDIRECT(__ATTR_NONNULL((3)) __ATTR_LIBC_PRINTF(3, 0),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep__vsnprintf,(char *__restrict __buf, __SIZE_TYPE__ __bufsize, char const *__restrict __format, __builtin_va_list __args),_vsnprintf,(__buf,__bufsize,__format,__args))
+__CREDIRECT(__ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((3)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep__vsnprintf,(char *__restrict __buf, __SIZE_TYPE__ __bufsize, char const *__restrict __format, __builtin_va_list __args),_vsnprintf,(__buf,__bufsize,__format,__args))
 #else /* LIBC: _vsnprintf */
 #include <local/stdio/_vsnprintf.h>
 /* WARNING: This function returns the number of written character. - Not the required buffer size! */
@@ -34,7 +34,7 @@ __CREDIRECT(__ATTR_NONNULL((3)) __ATTR_LIBC_PRINTF(3, 0),__STDC_INT_AS_SIZE_T,__
 #endif /* !____localdep__vsnprintf_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_vsnprintf_s_l) __ATTR_NONNULL((4)) __ATTR_LIBC_PRINTF(4, 0) __STDC_INT_AS_SIZE_T
+__LOCAL_LIBC(_vsnprintf_s_l) __ATTR_LIBC_PRINTF(4, 0) __ATTR_NONNULL((4)) __STDC_INT_AS_SIZE_T
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vsnprintf_s_l))(char *__restrict __buf,
                                                             __SIZE_TYPE__ __bufsize,
                                                             __SIZE_TYPE__ __buflen,

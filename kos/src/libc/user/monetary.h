@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfbec2212 */
+/* HASH CRC-32:0x60188dc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,8 +28,8 @@
 
 DECL_BEGIN
 
-INTDEF NONNULL((1, 3)) ATTR_LIBC_STRFMON(3, 4) ssize_t NOTHROW_NCX(VLIBCCALL libc_strfmon)(char *__restrict s, size_t maxsize, char const *__restrict format, ...);
-INTDEF NONNULL((1, 4)) ATTR_LIBC_STRFMON(4, 5) ssize_t NOTHROW_NCX(VLIBCCALL libc_strfmon_l)(char *__restrict s, size_t maxsize, locale_t loc, const char *__restrict format, ...);
+INTDEF ATTR_LIBC_STRFMON(3, 4) NONNULL((1, 3)) ssize_t NOTHROW_NCX(VLIBCCALL libc_strfmon)(char *__restrict s, size_t maxsize, char const *__restrict format, ...);
+INTDEF ATTR_LIBC_STRFMON(4, 5) NONNULL((1, 4)) ssize_t NOTHROW_NCX(VLIBCCALL libc_strfmon_l)(char *__restrict s, size_t maxsize, locale_t loc, const char *__restrict format, ...);
 
 DECL_END
 

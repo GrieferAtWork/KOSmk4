@@ -50,8 +50,8 @@ NOTHROW_NCX(LIBCCALL libc__heapmin)(void)
 /*[[[end:_heapmin]]]*/
 
 
-/*[[[head:memcdup,hash:CRC-32=0x7b218add]]]*/
-INTERN ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) ATTR_ALLOC_SIZE((2))
+/*[[[head:memcdup,hash:CRC-32=0xbad869c1]]]*/
+INTERN ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.heap.rare_helpers.memcdup") void *
 NOTHROW_NCX(LIBCCALL libc_memcdup)(void const *__restrict ptr,
                                    int needle,
@@ -70,8 +70,8 @@ NOTHROW_NCX(LIBCCALL libc_memcdup)(void const *__restrict ptr,
 }
 /*[[[end:memcdup]]]*/
 
-/*[[[head:memdup,hash:CRC-32=0xded59272]]]*/
-INTERN ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) ATTR_ALLOC_SIZE((2))
+/*[[[head:memdup,hash:CRC-32=0x1f6fe48c]]]*/
+INTERN ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.heap.rare_helpers.memdup") void *
 NOTHROW_NCX(LIBCCALL libc_memdup)(void const *__restrict ptr,
                                   size_t n_bytes)

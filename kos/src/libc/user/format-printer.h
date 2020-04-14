@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0fcaf32 */
+/* HASH CRC-32:0x868bb41a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,7 +55,7 @@ INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char *NOTHROW_
  * the format_aprintf buffer `self' is finalized, or some other function is used
  * to append additional data to the end of `self'
  * @return: NULL: Failed to allocate additional memory */
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) ATTR_ALLOC_SIZE((2)) char *NOTHROW_NCX(LIBCCALL libc_format_aprintf_alloc)(struct format_aprintf_data *__restrict self, size_t num_chars);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_format_aprintf_alloc)(struct format_aprintf_data *__restrict self, size_t num_chars);
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned
  * This function is intended to be used as a pformatprinter-compatibile printer sink */
 INTDEF WUNUSED NONNULL((1, 2)) ssize_t NOTHROW_NCX(LIBCCALL libc_format_aprintf_printer)(/*struct format_aprintf_data **/ void *arg, /*utf-8*/ char const *__restrict data, size_t datalen);

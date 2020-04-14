@@ -363,17 +363,17 @@ typedef __ATTR_NONNULL((3)) __BOOL (LIBUNWIND_CC *unwind_getreg_t)(void const *_
 typedef __ATTR_NONNULL((3)) __BOOL (LIBUNWIND_CC *unwind_setreg_t)(void *__arg, unwind_regno_t __dw_regno, void const *__restrict __src);
 
 typedef struct unwind_emulator_sections_struct {
-	__byte_t             *ues_eh_frame_start;     /* [0..1][const] Starting address of the .eh_frame section (used for the `DW_OP_call_frame_cfa' instruction).
-	                                               * When set to be equal to `ues_eh_frame_end', consider `DW_OP_call_frame_cfa' as an illegal instruction. */
-	__byte_t             *ues_eh_frame_end;       /* [0..1][const] End address of the .eh_frame section. */
-	__byte_t             *ues_debug_info_start;   /* [0..1][const] Starting address of the .debug_info section (used for the `DW_OP_call2' / `DW_OP_call4' instructions).
-	                                               * When set to be equal to `ues_debug_info_end', consider `DW_OP_call2' / `DW_OP_call4' as illegal instructions. */
-	__byte_t             *ues_debug_info_end;     /* [0..1][const] End address of the .debug_info section. */
-	__byte_t             *ues_debug_abbrev_start; /* [0..1][const] Starting address of the .debug_abbrev section (used for the `DW_OP_call2' / `DW_OP_call4' instructions).
-	                                               * When set to be equal to `ues_debug_abbrev_end', consider `DW_OP_call2' / `DW_OP_call4' as illegal instructions. */
-	__byte_t             *ues_debug_abbrev_end;   /* [0..1][const] End address of the .debug_abbrev section. */
-	__byte_t             *ues_debug_loc_start;    /* [0..1][const] Starting address of the .debug_loc section. */
-	__byte_t             *ues_debug_loc_end;      /* [0..1][const] End address of the .debug_loc section. */
+	__byte_t *ues_eh_frame_start;     /* [0..1][const] Starting address of the .eh_frame section (used for the `DW_OP_call_frame_cfa' instruction).
+	                                   * When set to be equal to `ues_eh_frame_end', consider `DW_OP_call_frame_cfa' as an illegal instruction. */
+	__byte_t *ues_eh_frame_end;       /* [0..1][const] End address of the .eh_frame section. */
+	__byte_t *ues_debug_info_start;   /* [0..1][const] Starting address of the .debug_info section (used for the `DW_OP_call2' / `DW_OP_call4' instructions).
+	                                   * When set to be equal to `ues_debug_info_end', consider `DW_OP_call2' / `DW_OP_call4' as illegal instructions. */
+	__byte_t *ues_debug_info_end;     /* [0..1][const] End address of the .debug_info section. */
+	__byte_t *ues_debug_abbrev_start; /* [0..1][const] Starting address of the .debug_abbrev section (used for the `DW_OP_call2' / `DW_OP_call4' instructions).
+	                                   * When set to be equal to `ues_debug_abbrev_end', consider `DW_OP_call2' / `DW_OP_call4' as illegal instructions. */
+	__byte_t *ues_debug_abbrev_end;   /* [0..1][const] End address of the .debug_abbrev section. */
+	__byte_t *ues_debug_loc_start;    /* [0..1][const] Starting address of the .debug_loc section. */
+	__byte_t *ues_debug_loc_end;      /* [0..1][const] End address of the .debug_loc section. */
 } unwind_emulator_sections_t;
 
 #ifndef __di_debuginfo_location_t_defined

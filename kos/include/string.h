@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd1392d00 */
+/* HASH CRC-32:0x4156c344 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -5009,18 +5009,27 @@ __NAMESPACE_LOCAL_USING(strdupf)
 #ifdef __INTELLISENSE__
 #define mstrdupa  mstrdupa
 #define mstrndupa mstrndupa
-extern __ATTR_WUNUSED __ATTR_MALLOC __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *__NOTHROW_NCX(mstrdupa)(char const *__restrict __string);
-extern __ATTR_WUNUSED __ATTR_MALLOC __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *__NOTHROW_NCX(mstrndupa)(char const *__restrict __string, __size_t __maxlen);
+extern __ATTR_WUNUSED __ATTR_MALLOC __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *
+__NOTHROW_NCX(mstrdupa)(char const *__restrict __string);
+extern __ATTR_WUNUSED __ATTR_MALLOC __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *
+__NOTHROW_NCX(mstrndupa)(char const *__restrict __string, __size_t __maxlen);
 #elif defined(__NO_XBLOCK)
 __FORCELOCAL __ATTR_WUNUSED __ATTR_MALLOC __ATTR_NONNULL((2)) char *
 __NOTHROW_NCX(__LIBCCALL __mstrdupa_init)(void *__buf, char const *__restrict __string) {
+#ifdef __malloca_mayfail
 	if __likely(__buf)
+#endif /* __malloca_mayfail */
+	{
 		__buf = __NAMESPACE_STD_SYM strcpy((char *)__buf, __string);
+	}
 	return (char *)__buf;
 }
 __FORCELOCAL __ATTR_WUNUSED __ATTR_MALLOC __ATTR_NONNULL((2)) char *
 __NOTHROW_NCX(__LIBCCALL __mstrndupa_init)(void *__buf, char const *__restrict __string, __size_t __maxlen) {
-	if __likely(__buf) {
+#ifdef __malloca_mayfail
+	if __likely(__buf)
+#endif /* __malloca_mayfail */
+	{
 		__size_t __buflen = __NAMESPACE_STD_SYM strnlen(__string, __maxlen) * sizeof(char);
 #ifdef __mempcpy_defined
 		*(char *)mempcpy(__buf, __string, __buflen) = 0;
@@ -5036,14 +5045,15 @@ __NOTHROW_NCX(__LIBCCALL __mstrndupa_init)(void *__buf, char const *__restrict _
 #define strndupa(string, maxlen) \
 	__mstrndupa_init(__malloca((__NAMESPACE_STD_SYM strnlen(string, maxlen) + 1) * sizeof(char)), string, maxlen)
 #else /* __NO_XBLOCK */
+#ifdef __malloca_mayfail
 #define mstrdupa(string)                                                                  \
 	__XBLOCK({                                                                            \
 		char const *__orig_s = (string);                                                  \
 		__size_t __orig_len  = (__NAMESPACE_STD_SYM strlen(__orig_s) + 1) * sizeof(char); \
 		char *__copy_s       = (char *)__malloca(__orig_len);                             \
 		__XRETURN __likely(__copy_s)                                                      \
-			? (char *)__NAMESPACE_STD_SYM memcpy(__copy_s, __orig_s, __orig_len)          \
-			: __copy_s;                                                                   \
+		          ? (char *)__NAMESPACE_STD_SYM memcpy(__copy_s, __orig_s, __orig_len)    \
+		          : __copy_s;                                                             \
 	})
 #define mstrndupa(string, maxlen)                                                   \
 	__XBLOCK({                                                                      \
@@ -5056,6 +5066,23 @@ __NOTHROW_NCX(__LIBCCALL __mstrndupa_init)(void *__buf, char const *__restrict _
 		}                                                                           \
 		__XRETURN __copy_s;                                                         \
 	})
+#else /* __malloca_mayfail */
+#define mstrdupa(string)                                                                  \
+	__XBLOCK({                                                                            \
+		char const *__orig_s = (string);                                                  \
+		__size_t __orig_len  = (__NAMESPACE_STD_SYM strlen(__orig_s) + 1) * sizeof(char); \
+		char *__copy_s       = (char *)__malloca(__orig_len);                             \
+		__XRETURN (char *)__NAMESPACE_STD_SYM memcpy(__copy_s, __orig_s, __orig_len);     \
+	})
+#define mstrndupa(string, maxlen)                                                     \
+	__XBLOCK({                                                                        \
+		char const *__orig_s = (string);                                              \
+		__size_t __orig_len  = __NAMESPACE_STD_SYM strlen(__orig_s) * sizeof(char);   \
+		char *__copy_s = (char *)__malloca(__orig_len + sizeof(char));                \
+		__copy_s[__orig_len / sizeof(char)] = 0;                                      \
+		__XRETURN (char *)__NAMESPACE_STD_SYM memcpy(__copy_s, __orig_s, __orig_len); \
+	})
+#endif /* !__malloca_mayfail */
 #endif /* !__NO_XBLOCK */
 #ifdef __CRT_HAVE_wildstrcmp
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,wildstrcmp,(char const *__pattern, char const *__string),(__pattern,__string))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f0a5903 */
+/* HASH CRC-32:0x7e44b0c4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -119,7 +119,7 @@
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
-__CREDIRECT(__ATTR_NONNULL((1, 3)) __ATTR_LIBC_PRINTF(3, 0),__SSIZE_TYPE__,,__localdep_format_vprintf,(__pformatprinter __printer, void *__arg, char const *__restrict __format, __builtin_va_list __args),format_vprintf,(__printer,__arg,__format,__args)) __THROWS(...)
+__CREDIRECT(__ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,,__localdep_format_vprintf,(__pformatprinter __printer, void *__arg, char const *__restrict __format, __builtin_va_list __args),format_vprintf,(__printer,__arg,__format,__args)) __THROWS(...)
 #else /* LIBC: format_vprintf */
 #include <local/format-printer/format_vprintf.h>
 /* Generic printf implementation
@@ -301,7 +301,7 @@ __NAMESPACE_LOCAL_BEGIN
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
-__LOCAL_LIBC(format_printf) __ATTR_NONNULL((1, 3)) __ATTR_LIBC_PRINTF(3, 4) __SSIZE_TYPE__
+__LOCAL_LIBC(format_printf) __ATTR_LIBC_PRINTF(3, 4) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__
 (__VLIBCCALL __LIBC_LOCAL_NAME(format_printf))(__pformatprinter __printer,
                                                void *__arg,
                                                char const *__restrict __format,

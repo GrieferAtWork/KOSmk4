@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x10b6bad7 */
+/* HASH CRC-32:0xd1643760 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,7 +70,7 @@ __CDECLARE_VOID(__ATTR_NORETURN __ATTR_NONNULL((1, 2)),,Execvp,(char const *__re
 /* >> execl(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
-__LIBC __ATTR_SENTINEL __ATTR_NORETURN __ATTR_NONNULL((1)) void (__VLIBCCALL Execl)(char const *__restrict __path, char const *__args, ... /*, (char *)NULL*/) __THROWS(...) __CASMNAME_SAME("Execl");
+__LIBC __ATTR_NORETURN __ATTR_SENTINEL __ATTR_NONNULL((1)) void (__VLIBCCALL Execl)(char const *__restrict __path, char const *__args, ... /*, (char *)NULL*/) __THROWS(...) __CASMNAME_SAME("Execl");
 #elif defined(__CRT_HAVE_Execv)
 #include <local/kos.unistd/Execl.h>
 #ifdef __cplusplus
@@ -86,7 +86,7 @@ __NAMESPACE_LOCAL_USING(Execl)
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel */
-__LIBC __ATTR_NORETURN __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) void (__VLIBCCALL Execle)(char const *__restrict __path, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __THROWS(...) __CASMNAME_SAME("Execle");
+__LIBC __ATTR_NORETURN __ATTR_NONNULL((1)) __ATTR_SENTINEL_O(1) void (__VLIBCCALL Execle)(char const *__restrict __path, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __THROWS(...) __CASMNAME_SAME("Execle");
 #elif defined(__CRT_HAVE_Execve)
 #include <local/kos.unistd/Execle.h>
 #ifdef __cplusplus
@@ -102,7 +102,7 @@ __NAMESPACE_LOCAL_USING(Execle)
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
-__LIBC __ATTR_SENTINEL __ATTR_NORETURN __ATTR_NONNULL((1)) void (__VLIBCCALL Execpl)(char const *__restrict __file, char const *__args, ... /*, (char *)NULL*/) __THROWS(...) __CASMNAME_SAME("Execpl");
+__LIBC __ATTR_NORETURN __ATTR_SENTINEL __ATTR_NONNULL((1)) void (__VLIBCCALL Execpl)(char const *__restrict __file, char const *__args, ... /*, (char *)NULL*/) __THROWS(...) __CASMNAME_SAME("Execpl");
 #elif defined(__CRT_HAVE_Execvp)
 #include <local/kos.unistd/Execpl.h>
 #ifdef __cplusplus
@@ -118,7 +118,7 @@ __NAMESPACE_LOCAL_USING(Execpl)
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel */
-__LIBC __ATTR_NORETURN __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) void (__VLIBCCALL Execlpe)(char const *__restrict __file, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __THROWS(...) __CASMNAME_SAME("Execlpe");
+__LIBC __ATTR_NORETURN __ATTR_NONNULL((1)) __ATTR_SENTINEL_O(1) void (__VLIBCCALL Execlpe)(char const *__restrict __file, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __THROWS(...) __CASMNAME_SAME("Execlpe");
 #elif defined(__CRT_HAVE_Execvpe)
 #include <local/kos.unistd/Execlpe.h>
 #ifdef __cplusplus
@@ -545,7 +545,7 @@ __CDECLARE_VOID(,__NOTHROW_NCX,SetResGid,(__gid_t __rgid, __gid_t __egid, __gid_
 /* >> vfork(2)
  * Same as `fork(2)', but suspend the calling process until the child
  * process either calls `exit(2)' or one of the many `exec(2)' functions */
-__CDECLARE(__ATTR_WUNUSED __ATTR_RETURNS_TWICE,__pid_t,,VFork,(void),()) __THROWS(...)
+__CDECLARE(__ATTR_RETURNS_TWICE __ATTR_WUNUSED,__pid_t,,VFork,(void),()) __THROWS(...)
 #endif /* VFork... */
 #endif
 

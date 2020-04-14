@@ -4080,18 +4080,27 @@ strdupf:(char const *__restrict format, ...) -> char *
 #ifdef __INTELLISENSE__
 #define mstrdupa  mstrdupa
 #define mstrndupa mstrndupa
-extern __ATTR_WUNUSED __ATTR_MALLOC __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *__NOTHROW_NCX(mstrdupa)(char const *__restrict __string);
-extern __ATTR_WUNUSED __ATTR_MALLOC __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *__NOTHROW_NCX(mstrndupa)(char const *__restrict __string, __size_t __maxlen);
+extern __ATTR_WUNUSED __ATTR_MALLOC __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *
+__NOTHROW_NCX(mstrdupa)(char const *__restrict __string);
+extern __ATTR_WUNUSED __ATTR_MALLOC __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *
+__NOTHROW_NCX(mstrndupa)(char const *__restrict __string, __size_t __maxlen);
 #elif defined(__NO_XBLOCK)
 __FORCELOCAL __ATTR_WUNUSED __ATTR_MALLOC __ATTR_NONNULL((2)) char *
 __NOTHROW_NCX(__LIBCCALL __mstrdupa_init)(void *__buf, char const *__restrict __string) {
+#ifdef __malloca_mayfail
 	if __likely(__buf)
+#endif /* __malloca_mayfail */
+	{
 		__buf = __NAMESPACE_STD_SYM strcpy((char *)__buf, __string);
+	}
 	return (char *)__buf;
 }
 __FORCELOCAL __ATTR_WUNUSED __ATTR_MALLOC __ATTR_NONNULL((2)) char *
 __NOTHROW_NCX(__LIBCCALL __mstrndupa_init)(void *__buf, char const *__restrict __string, __size_t __maxlen) {
-	if __likely(__buf) {
+#ifdef __malloca_mayfail
+	if __likely(__buf)
+#endif /* __malloca_mayfail */
+	{
 		__size_t __buflen = __NAMESPACE_STD_SYM strnlen(__string, __maxlen) * sizeof(char);
 #ifdef __mempcpy_defined
 		*(char *)mempcpy(__buf, __string, __buflen) = 0;
@@ -4107,14 +4116,15 @@ __NOTHROW_NCX(__LIBCCALL __mstrndupa_init)(void *__buf, char const *__restrict _
 #define strndupa(string, maxlen) \
 	__mstrndupa_init(__malloca((__NAMESPACE_STD_SYM strnlen(string, maxlen) + 1) * sizeof(char)), string, maxlen)
 #else /* __NO_XBLOCK */
+#ifdef __malloca_mayfail
 #define mstrdupa(string)                                                                  \
 	__XBLOCK({                                                                            \
 		char const *__orig_s = (string);                                                  \
 		__size_t __orig_len  = (__NAMESPACE_STD_SYM strlen(__orig_s) + 1) * sizeof(char); \
 		char *__copy_s       = (char *)__malloca(__orig_len);                             \
 		__XRETURN __likely(__copy_s)                                                      \
-			? (char *)__NAMESPACE_STD_SYM memcpy(__copy_s, __orig_s, __orig_len)          \
-			: __copy_s;                                                                   \
+		          ? (char *)__NAMESPACE_STD_SYM memcpy(__copy_s, __orig_s, __orig_len)    \
+		          : __copy_s;                                                             \
 	})
 #define mstrndupa(string, maxlen)                                                   \
 	__XBLOCK({                                                                      \
@@ -4127,6 +4137,23 @@ __NOTHROW_NCX(__LIBCCALL __mstrndupa_init)(void *__buf, char const *__restrict _
 		}                                                                           \
 		__XRETURN __copy_s;                                                         \
 	})
+#else /* __malloca_mayfail */
+#define mstrdupa(string)                                                                  \
+	__XBLOCK({                                                                            \
+		char const *__orig_s = (string);                                                  \
+		__size_t __orig_len  = (__NAMESPACE_STD_SYM strlen(__orig_s) + 1) * sizeof(char); \
+		char *__copy_s       = (char *)__malloca(__orig_len);                             \
+		__XRETURN (char *)__NAMESPACE_STD_SYM memcpy(__copy_s, __orig_s, __orig_len);     \
+	})
+#define mstrndupa(string, maxlen)                                                     \
+	__XBLOCK({                                                                        \
+		char const *__orig_s = (string);                                              \
+		__size_t __orig_len  = __NAMESPACE_STD_SYM strlen(__orig_s) * sizeof(char);   \
+		char *__copy_s = (char *)__malloca(__orig_len + sizeof(char));                \
+		__copy_s[__orig_len / sizeof(char)] = 0;                                      \
+		__XRETURN (char *)__NAMESPACE_STD_SYM memcpy(__copy_s, __orig_s, __orig_len); \
+	})
+#endif /* !__malloca_mayfail */
 #endif /* !__NO_XBLOCK */
 }
 
@@ -4268,15 +4295,25 @@ fuzzy_memcmp:([nonnull] void const *s1, $size_t s1_bytes,
 	if unlikely(!s2_bytes)
 		return s1_bytes;
 	if (s2_bytes > s1_bytes) {
-		{ void const *temp = s1; s1 = s2; s2 = temp; }
-		{ size_t temp = s1_bytes; s1_bytes = s2_bytes; s2_bytes = temp; }
+		{
+			void const *temp;
+			temp = s1;
+			s1   = s2;
+			s2   = temp;
+		}
+		{
+			size_t temp;
+			temp     = s1_bytes;
+			s1_bytes = s2_bytes;
+			s2_bytes = temp;
+		}
 	}
-	__malloca_tryhard(v0, (s2_bytes+1) * sizeof(size_t));
+	__malloca_tryhard(v0, (s2_bytes + 1) * sizeof(size_t));
 #ifdef __malloca_tryhard_mayfail
 	if unlikely(!v0)
 		return (size_t)-1;
 #endif /* __malloca_tryhard_mayfail */
-	__malloca_tryhard(v1, (s2_bytes+1) * sizeof(size_t));
+	__malloca_tryhard(v1, (s2_bytes + 1) * sizeof(size_t));
 #ifdef __malloca_tryhard_mayfail
 	if unlikely(!v1) {
 		__freea(v0);
@@ -4286,25 +4323,19 @@ fuzzy_memcmp:([nonnull] void const *s1, $size_t s1_bytes,
 	for (i = 0; i < s2_bytes; ++i)
 		v0[i] = i;
 	for (i = 0; i < s1_bytes; ++i) {
-		v1[0] = i+1;
+		v1[0] = i + 1;
 		for (j = 0; j < s2_bytes; j++) {
 			cost  = ((byte_t *)s1)[i] != ((byte_t *)s2)[j];
 			cost += v0[j];
-			temp  = v1[j]+1;
-			if (cost > temp) cost = temp;
-			temp  = v0[j+1]+1;
-			if (cost > temp) cost = temp;
-			v1[j+1] = cost;
+			temp  = v1[j] + 1;
+			if (cost > temp)
+				cost = temp;
+			temp  = v0[j + 1] + 1;
+			if (cost > temp)
+				cost = temp;
+			v1[j + 1] = cost;
 		}
-#if __SIZEOF_SIZE_T__ == 8
-		memcpyq((u64 *)v0, (u64 *)v1, s2_bytes);
-#elif __SIZEOF_SIZE_T__ == 4
-		memcpyl((u32 *)v0, (u32 *)v1, s2_bytes);
-#elif __SIZEOF_SIZE_T__ == 2
-		memcpyw((u16 *)v0, (u16 *)v1, s2_bytes);
-#else
-		memcpy((u8 *)v0, (u8 *)v1, s2_bytes*sizeof(size_t));
-#endif
+		memcpyc((u8 *)v0, (u8 *)v1, s2_bytes, sizeof(size_t));
 	}
 	temp = v1[s2_bytes];
 	__freea(v1);
@@ -4323,15 +4354,25 @@ fuzzy_memcasecmp:([nonnull] void const *s1, $size_t s1_bytes,
 	if unlikely(!s2_bytes)
 		return s1_bytes;
 	if (s2_bytes > s1_bytes) {
-		{ @@yield $wchar_function ? "wchar_t" : "void"@@ const *temp = s1; s1 = s2; s2 = temp; }
-		{ size_t temp = s1_bytes; s1_bytes = s2_bytes; s2_bytes = temp; }
+		{
+			@@yield $wchar_function ? "wchar_t" : "void"@@ const *temp;
+			temp = s1;
+			s1   = s2;
+			s2   = temp;
+		}
+		{
+			size_t temp;
+			temp     = s1_bytes;
+			s1_bytes = s2_bytes;
+			s2_bytes = temp;
+		}
 	}
-	__malloca_tryhard(v0, (s2_bytes+1) * sizeof(size_t));
+	__malloca_tryhard(v0, (s2_bytes + 1) * sizeof(size_t));
 #ifdef __malloca_tryhard_mayfail
 	if unlikely(!v0)
 		return (size_t)-1;
 #endif /* __malloca_tryhard_mayfail */
-	__malloca_tryhard(v1, (s2_bytes+1) * sizeof(size_t));
+	__malloca_tryhard(v1, (s2_bytes + 1) * sizeof(size_t));
 #ifdef __malloca_tryhard_mayfail
 	if unlikely(!v1) {
 		__freea(v0);
@@ -4341,27 +4382,21 @@ fuzzy_memcasecmp:([nonnull] void const *s1, $size_t s1_bytes,
 	for (i = 0; i < s2_bytes; ++i)
 		v0[i] = i;
 	for (i = 0; i < s1_bytes; ++i) {
-		v1[0] = i+1;
+		v1[0] = i + 1;
 		for (j = 0; j < s2_bytes; j++) {
 			byte_t c1 = ((byte_t *)s1)[i];
 			byte_t c2 = ((byte_t *)s2)[j];
 			cost  = c1 != c2 && tolower(c1) != tolower(c2);
 			cost += v0[j];
-			temp  = v1[j]+1;
-			if (cost > temp) cost = temp;
-			temp  = v0[j+1]+1;
-			if (cost > temp) cost = temp;
-			v1[j+1] = cost;
+			temp  = v1[j] + 1;
+			if (cost > temp)
+				cost = temp;
+			temp  = v0[j + 1] + 1;
+			if (cost > temp)
+				cost = temp;
+			v1[j + 1] = cost;
 		}
-#if __SIZEOF_SIZE_T__ == 8
-		memcpyq((u64 *)v0, (u64 *)v1, s2_bytes);
-#elif __SIZEOF_SIZE_T__ == 4
-		memcpyl((u32 *)v0, (u32 *)v1, s2_bytes);
-#elif __SIZEOF_SIZE_T__ == 2
-		memcpyw((u16 *)v0, (u16 *)v1, s2_bytes);
-#else
-		memcpy((u8 *)v0, (u8 *)v1, s2_bytes*sizeof(size_t));
-#endif
+		memcpyc((u8 *)v0, (u8 *)v1, s2_bytes, sizeof(size_t));
 	}
 	temp = v1[s2_bytes];
 	__freea(v1);
@@ -4442,15 +4477,25 @@ fuzzy_memcasecmp_l:([nonnull] void const *s1, $size_t s1_bytes,
 	if unlikely(!s2_bytes)
 		return s1_bytes;
 	if (s2_bytes > s1_bytes) {
-		{ @@yield $wchar_function ? "wchar_t" : "void"@@ const *temp = s1; s1 = s2; s2 = temp; }
-		{ size_t temp = s1_bytes; s1_bytes = s2_bytes; s2_bytes = temp; }
+		{
+			@@yield $wchar_function ? "wchar_t" : "void"@@ const *temp;
+			temp = s1;
+			s1   = s2;
+			s2   = temp;
+		}
+		{
+			size_t temp;
+			temp     = s1_bytes;
+			s1_bytes = s2_bytes;
+			s2_bytes = temp;
+		}
 	}
-	__malloca_tryhard(v0, (s2_bytes+1) * sizeof(size_t));
+	__malloca_tryhard(v0, (s2_bytes + 1) * sizeof(size_t));
 #ifdef __malloca_tryhard_mayfail
 	if unlikely(!v0)
 		return (size_t)-1;
 #endif /* __malloca_tryhard_mayfail */
-	__malloca_tryhard(v1, (s2_bytes+1) * sizeof(size_t));
+	__malloca_tryhard(v1, (s2_bytes + 1) * sizeof(size_t));
 #ifdef __malloca_tryhard_mayfail
 	if unlikely(!v1) {
 		__freea(v0);
@@ -4460,27 +4505,21 @@ fuzzy_memcasecmp_l:([nonnull] void const *s1, $size_t s1_bytes,
 	for (i = 0; i < s2_bytes; ++i)
 		v0[i] = i;
 	for (i = 0; i < s1_bytes; ++i) {
-		v1[0] = i+1;
+		v1[0] = i + 1;
 		for (j = 0; j < s2_bytes; j++) {
 			byte_t c1 = ((byte_t *)s1)[i];
 			byte_t c2 = ((byte_t *)s2)[j];
 			cost  = c1 != c2 && tolower_l(c1, locale) != tolower_l(c2, locale);
 			cost += v0[j];
-			temp  = v1[j]+1;
-			if (cost > temp) cost = temp;
-			temp  = v0[j+1]+1;
-			if (cost > temp) cost = temp;
-			v1[j+1] = cost;
+			temp  = v1[j] + 1;
+			if (cost > temp)
+				cost = temp;
+			temp  = v0[j + 1] + 1;
+			if (cost > temp)
+				cost = temp;
+			v1[j + 1] = cost;
 		}
-#if __SIZEOF_SIZE_T__ == 8
-		memcpyq((u64 *)v0, (u64 *)v1, s2_bytes);
-#elif __SIZEOF_SIZE_T__ == 4
-		memcpyl((u32 *)v0, (u32 *)v1, s2_bytes);
-#elif __SIZEOF_SIZE_T__ == 2
-		memcpyw((u16 *)v0, (u16 *)v1, s2_bytes);
-#else
-		memcpy((u8 *)v0, (u8 *)v1, s2_bytes*sizeof(size_t));
-#endif
+		memcpyc((u8 *)v0, (u8 *)v1, s2_bytes, sizeof(size_t));
 	}
 	temp = v1[s2_bytes];
 	__freea(v1);
@@ -4508,8 +4547,18 @@ fuzzy_memcmpw:([nonnull] void const *s1, $size_t s1_words,
 	if unlikely(!s2_words)
 		return s1_words;
 	if (s2_words > s1_words) {
-		{ void const *temp = s1; s1 = s2; s2 = temp; }
-		{ size_t temp = s1_words; s1_words = s2_words; s2_words = temp; }
+		{
+			void const *temp;
+			temp = s1;
+			s1   = s2;
+			s2   = temp;
+		}
+		{
+			size_t temp;
+			temp     = s1_words;
+			s1_words = s2_words;
+			s2_words = temp;
+		}
 	}
 	__malloca_tryhard(v0, (s2_words+1) * sizeof(size_t));
 #ifdef __malloca_tryhard_mayfail
@@ -4526,25 +4575,19 @@ fuzzy_memcmpw:([nonnull] void const *s1, $size_t s1_words,
 	for (i = 0; i < s2_words; ++i)
 		v0[i] = i;
 	for (i = 0; i < s1_words; ++i) {
-		v1[0] = i+1;
+		v1[0] = i + 1;
 		for (j = 0; j < s2_words; j++) {
 			cost  = ((u16 *)s1)[i] != ((u16 *)s2)[j];
 			cost += v0[j];
-			temp  = v1[j]+1;
-			if (cost > temp) cost = temp;
-			temp  = v0[j+1]+1;
-			if (cost > temp) cost = temp;
-			v1[j+1] = cost;
+			temp  = v1[j] + 1;
+			if (cost > temp)
+				cost = temp;
+			temp  = v0[j + 1] + 1;
+			if (cost > temp)
+				cost = temp;
+			v1[j + 1] = cost;
 		}
-#if __SIZEOF_SIZE_T__ == 8
-		memcpyq((u64 *)v0, (u64 *)v1, s2_words);
-#elif __SIZEOF_SIZE_T__ == 4
-		memcpyl((u32 *)v0, (u32 *)v1, s2_words);
-#elif __SIZEOF_SIZE_T__ == 2
-		memcpyw((u16 *)v0, (u16 *)v1, s2_words);
-#else
-		memcpy((u8 *)v0, (u8 *)v1, s2_words*sizeof(size_t));
-#endif
+		memcpyc((u8 *)v0, (u8 *)v1, s2_words, sizeof(size_t));
 	}
 	temp = v1[s2_words];
 	__freea(v1);
@@ -4562,8 +4605,18 @@ fuzzy_memcmpl:([nonnull] void const *s1, $size_t s1_dwords,
 	if unlikely(!s2_dwords)
 		return s1_dwords;
 	if (s2_dwords > s1_dwords) {
-		{ void const *temp = s1; s1 = s2; s2 = temp; }
-		{ size_t temp = s1_dwords; s1_dwords = s2_dwords; s2_dwords = temp; }
+		{
+			void const *temp;
+			temp = s1;
+			s1   = s2;
+			s2   = temp;
+		}
+		{
+			size_t temp;
+			temp      = s1_dwords;
+			s1_dwords = s2_dwords;
+			s2_dwords = temp;
+		}
 	}
 	__malloca_tryhard(v0, (s2_dwords+1) * sizeof(size_t));
 #ifdef __malloca_tryhard_mayfail
@@ -4579,25 +4632,19 @@ fuzzy_memcmpl:([nonnull] void const *s1, $size_t s1_dwords,
 	for (i = 0; i < s2_dwords; ++i)
 		v0[i] = i;
 	for (i = 0; i < s1_dwords; ++i) {
-		v1[0] = i+1;
+		v1[0] = i + 1;
 		for (j = 0; j < s2_dwords; j++) {
 			cost  = ((u32 *)s1)[i] != ((u32 *)s2)[j];
 			cost += v0[j];
-			temp  = v1[j]+1;
-			if (cost > temp) cost = temp;
-			temp  = v0[j+1]+1;
-			if (cost > temp) cost = temp;
-			v1[j+1] = cost;
+			temp  = v1[j] + 1;
+			if (cost > temp)
+				cost = temp;
+			temp  = v0[j + 1] + 1;
+			if (cost > temp)
+				cost = temp;
+			v1[j + 1] = cost;
 		}
-#if __SIZEOF_SIZE_T__ == 8
-		memcpyq((u64 *)v0, (u64 *)v1, s2_dwords);
-#elif __SIZEOF_SIZE_T__ == 4
-		memcpyl((u32 *)v0, (u32 *)v1, s2_dwords);
-#elif __SIZEOF_SIZE_T__ == 2
-		memcpyw((u16 *)v0, (u16 *)v1, s2_dwords);
-#else
-		memcpy((u8 *)v0, (u8 *)v1, s2_dwords*sizeof(size_t));
-#endif
+		memcpyc((u8 *)v0, (u8 *)v1, s2_dwords, sizeof(size_t));
 	}
 	temp = v1[s2_dwords];
 	__freea(v1);
@@ -4616,8 +4663,18 @@ fuzzy_memcmpq:([nonnull] void const *s1, $size_t s1_qwords,
 	if unlikely(!s2_qwords)
 		return s1_qwords;
 	if (s2_qwords > s1_qwords) {
-		{ void const *temp = s1; s1 = s2; s2 = temp; }
-		{ size_t temp = s1_qwords; s1_qwords = s2_qwords; s2_qwords = temp; }
+		{
+			void const *temp;
+			temp = s1;
+			s1   = s2;
+			s2   = temp;
+		}
+		{
+			size_t temp;
+			temp      = s1_qwords;
+			s1_qwords = s2_qwords;
+			s2_qwords = temp;
+		}
 	}
 	__malloca_tryhard(v0, (s2_qwords+1) * sizeof(size_t));
 #ifdef __malloca_tryhard_mayfail
@@ -4633,25 +4690,19 @@ fuzzy_memcmpq:([nonnull] void const *s1, $size_t s1_qwords,
 	for (i = 0; i < s2_qwords; ++i)
 		v0[i] = i;
 	for (i = 0; i < s1_qwords; ++i) {
-		v1[0] = i+1;
+		v1[0] = i + 1;
 		for (j = 0; j < s2_qwords; j++) {
 			cost  = ((u64 *)s1)[i] != ((u64 *)s2)[j];
 			cost += v0[j];
-			temp  = v1[j]+1;
-			if (cost > temp) cost = temp;
-			temp  = v0[j+1]+1;
-			if (cost > temp) cost = temp;
-			v1[j+1] = cost;
+			temp  = v1[j] + 1;
+			if (cost > temp)
+				cost = temp;
+			temp  = v0[j + 1] + 1;
+			if (cost > temp)
+				cost = temp;
+			v1[j + 1] = cost;
 		}
-#if __SIZEOF_SIZE_T__ == 8
-		memcpyq((u64 *)v0, (u64 *)v1, s2_qwords);
-#elif __SIZEOF_SIZE_T__ == 4
-		memcpyl((u32 *)v0, (u32 *)v1, s2_qwords);
-#elif __SIZEOF_SIZE_T__ == 2
-		memcpyw((u16 *)v0, (u16 *)v1, s2_qwords);
-#else
-		memcpy((u8 *)v0, (u8 *)v1, s2_qwords*sizeof(size_t));
-#endif
+		memcpyc((u8 *)v0, (u8 *)v1, s2_qwords, sizeof(size_t));
 	}
 	temp = v1[s2_qwords];
 	__freea(v1);

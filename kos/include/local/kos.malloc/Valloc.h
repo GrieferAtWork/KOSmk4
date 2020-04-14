@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2e8c537 */
+/* HASH CRC-32:0xa16b4f09 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@
 #define ____localdep_Memalign_defined 1
 #ifdef __CRT_HAVE_Memalign
 /* @throws: E_BADALLOC: ... */
-__CREDIRECT(__ATTR_MALLOC __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_ALIGN(1),void *,,__localdep_Memalign,(__SIZE_TYPE__ __alignment, __SIZE_TYPE__ __num_bytes),Memalign,(__alignment,__num_bytes)) __THROWS(E_BADALLOC)
+__CREDIRECT(__ATTR_MALLOC __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(1) __ATTR_ALLOC_SIZE((2)),void *,,__localdep_Memalign,(__SIZE_TYPE__ __alignment, __SIZE_TYPE__ __num_bytes),Memalign,(__alignment,__num_bytes)) __THROWS(E_BADALLOC)
 #else /* LIBC: Memalign */
 #undef ____localdep_Memalign_defined
 #endif /* Memalign... */

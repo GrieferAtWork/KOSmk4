@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcfad88af */
+/* HASH CRC-32:0x3f8bb486 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,
 #define ____localdep_Memdup_defined 1
 #ifdef __CRT_HAVE_Memdup
 /* @throws: E_BADALLOC: ... */
-__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_ALLOC_SIZE((2)),void *,,__localdep_Memdup,(void const *__restrict __ptr, __SIZE_TYPE__ __num_bytes),Memdup,(__ptr,__num_bytes)) __THROWS(E_BADALLOC)
+__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_NONNULL((1)),void *,,__localdep_Memdup,(void const *__restrict __ptr, __SIZE_TYPE__ __num_bytes),Memdup,(__ptr,__num_bytes)) __THROWS(E_BADALLOC)
 #elif defined(__CRT_HAVE_Malloc)
 #include <local/kos.malloc/Memdup.h>
 /* @throws: E_BADALLOC: ... */

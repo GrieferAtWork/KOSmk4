@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd1ccc12c */
+/* HASH CRC-32:0x3cf854b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,23 +30,23 @@ __NAMESPACE_STD_USING(__localdep_vscanf)
 #elif __has_builtin(__builtin_vscanf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_vscanf)
 /* Scan data from `stdin', following `FORMAT'
  * Return the number of successfully scanned data items */
-__CEIREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 0),__STDC_INT_AS_SIZE_T,,__localdep_vscanf,(char const *__restrict __format, __builtin_va_list __args),vscanf,{ return __builtin_vscanf(__format, __args); }) __THROWS(...)
+__CEIREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,,__localdep_vscanf,(char const *__restrict __format, __builtin_va_list __args),vscanf,{ return __builtin_vscanf(__format, __args); }) __THROWS(...)
 #elif defined(__CRT_HAVE_vscanf_unlocked) && defined(__USE_STDIO_UNLOCKED)
 /* Scan data from `stdin', following `FORMAT'
  * Return the number of successfully scanned data items */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 0),__STDC_INT_AS_SIZE_T,,__localdep_vscanf,(char const *__restrict __format, __builtin_va_list __args),vscanf_unlocked,(__format,__args)) __THROWS(...)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,,__localdep_vscanf,(char const *__restrict __format, __builtin_va_list __args),vscanf_unlocked,(__format,__args)) __THROWS(...)
 #elif defined(__CRT_HAVE_vscanf)
 /* Scan data from `stdin', following `FORMAT'
  * Return the number of successfully scanned data items */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 0),__STDC_INT_AS_SIZE_T,,__localdep_vscanf,(char const *__restrict __format, __builtin_va_list __args),vscanf,(__format,__args)) __THROWS(...)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,,__localdep_vscanf,(char const *__restrict __format, __builtin_va_list __args),vscanf,(__format,__args)) __THROWS(...)
 #elif defined(__CRT_HAVE__vscanf)
 /* Scan data from `stdin', following `FORMAT'
  * Return the number of successfully scanned data items */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 0),__STDC_INT_AS_SIZE_T,,__localdep_vscanf,(char const *__restrict __format, __builtin_va_list __args),_vscanf,(__format,__args)) __THROWS(...)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,,__localdep_vscanf,(char const *__restrict __format, __builtin_va_list __args),_vscanf,(__format,__args)) __THROWS(...)
 #elif defined(__CRT_HAVE_vscanf_unlocked)
 /* Scan data from `stdin', following `FORMAT'
  * Return the number of successfully scanned data items */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 0),__STDC_INT_AS_SIZE_T,,__localdep_vscanf,(char const *__restrict __format, __builtin_va_list __args),vscanf_unlocked,(__format,__args)) __THROWS(...)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,,__localdep_vscanf,(char const *__restrict __format, __builtin_va_list __args),vscanf_unlocked,(__format,__args)) __THROWS(...)
 #elif !defined(__NO_STDSTREAMS) && ((((defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock))) || defined(__CRT_HAVE_vfscanf) || defined(__CRT_HAVE__vfscanf) || defined(__CRT_HAVE__vfscanf_s) || defined(__CRT_HAVE__IO_vfscanf) || defined(__CRT_HAVE_vfscanf_unlocked) || defined(__CRT_HAVE___vfscanf))
 #include <local/stdio/vscanf.h>
 /* Scan data from `stdin', following `FORMAT'
@@ -58,7 +58,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 0),__STDC_IN
 #endif /* !____localdep_vscanf_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_vscanf_l) __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 3) __STDC_INT_AS_SIZE_T
+__LOCAL_LIBC(_vscanf_l) __ATTR_WUNUSED __ATTR_LIBC_SCANF(1, 3) __ATTR_NONNULL((1)) __STDC_INT_AS_SIZE_T
 (__LIBCCALL __LIBC_LOCAL_NAME(_vscanf_l))(char const *__restrict __format,
                                           __locale_t __locale,
                                           __builtin_va_list __args) __THROWS(...) {

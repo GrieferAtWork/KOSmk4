@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb51721a8 */
+/* HASH CRC-32:0xebc99bb2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@
 #ifdef __std___localdep_vswscanf_defined
 __NAMESPACE_STD_USING(__localdep_vswscanf)
 #elif defined(__CRT_HAVE_vswscanf)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __ATTR_LIBC_WSCANF(2, 0),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vswscanf,(__WCHAR_TYPE__ const *__restrict __src, __WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),vswscanf,(__src,__format,__args))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vswscanf,(__WCHAR_TYPE__ const *__restrict __src, __WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),vswscanf,(__src,__format,__args))
 #else /* LIBC: vswscanf */
 #include <local/wchar/vswscanf.h>
 #define __localdep_vswscanf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vswscanf))

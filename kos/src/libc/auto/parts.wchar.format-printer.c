@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa526d6a8 */
+/* HASH CRC-32:0x4dddadbe */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1378,7 +1378,7 @@ err:
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
-INTERN NONNULL((1, 3)) ATTR_LIBC_PRINTF(3, 0)
+INTERN ATTR_LIBC_PRINTF(3, 0) NONNULL((1, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.string.format.format_vwprintf") ssize_t
 NOTHROW_NCX(LIBCCALL libc_format_vwprintf)(pc32formatprinter printer,
                                            void *arg,
@@ -1539,7 +1539,7 @@ NOTHROW_NCX(LIBCCALL libc_format_vwprintf)(pc32formatprinter printer,
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
-INTERN NONNULL((1, 3)) ATTR_LIBC_PRINTF(3, 0)
+INTERN ATTR_LIBC_PRINTF(3, 0) NONNULL((1, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.string.format.format_vwprintf") ssize_t
 NOTHROW_NCX(LIBDCALL libd_format_vwprintf)(pc16formatprinter printer,
                                            void *arg,
@@ -1681,7 +1681,7 @@ NOTHROW_NCX(LIBDCALL libd_format_vwprintf)(pc16formatprinter printer,
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
-INTERN NONNULL((1, 3)) ATTR_LIBC_PRINTF(3, 4)
+INTERN ATTR_LIBC_PRINTF(3, 4) NONNULL((1, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.string.format.format_wprintf") ssize_t
 NOTHROW_NCX(VLIBCCALL libc_format_wprintf)(pc32formatprinter printer,
                                            void *arg,
@@ -1788,7 +1788,7 @@ NOTHROW_NCX(VLIBCCALL libc_format_wprintf)(pc32formatprinter printer,
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
-INTERN NONNULL((1, 3)) ATTR_LIBC_PRINTF(3, 4)
+INTERN ATTR_LIBC_PRINTF(3, 4) NONNULL((1, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.string.format.format_wprintf") ssize_t
 NOTHROW_NCX(VLIBDCALL libd_format_wprintf)(pc16formatprinter printer,
                                            void *arg,

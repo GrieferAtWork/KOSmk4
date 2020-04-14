@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe14b8219 */
+/* HASH CRC-32:0x94b227b8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,7 +49,7 @@ INTDEF ATTR_SENTINEL NONNULL((1)) int NOTHROW_RPC(VLIBCCALL libc_execl)(char con
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel */
-INTDEF ATTR_SENTINEL_O(1) NONNULL((1)) int NOTHROW_RPC(VLIBCCALL libc_execle)(char const *__restrict path, char const *args, ... /*, (char *)NULL, (char **)environ*/);
+INTDEF NONNULL((1)) ATTR_SENTINEL_O(1) int NOTHROW_RPC(VLIBCCALL libc_execle)(char const *__restrict path, char const *args, ... /*, (char *)NULL, (char **)environ*/);
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
@@ -61,7 +61,7 @@ INTDEF NONNULL((1, 2, 3)) int NOTHROW_RPC(LIBCCALL libc_execvpe)(char const *__r
 /* >> execlpe(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel */
-INTDEF ATTR_SENTINEL_O(1) NONNULL((1)) int NOTHROW_RPC(VLIBCCALL libc_execlpe)(char const *__restrict file, char const *args, ... /*, (char *)NULL, (char **)environ*/);
+INTDEF NONNULL((1)) ATTR_SENTINEL_O(1) int NOTHROW_RPC(VLIBCCALL libc_execlpe)(char const *__restrict file, char const *args, ... /*, (char *)NULL, (char **)environ*/);
 /* >> getpid(2)
  * Return the PID of the calling process (that is the TID of the calling thread group's leader)
  * THIS_THREAD->LEADER->PID */
@@ -304,7 +304,7 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_setresgid)(gid_t rgid, gid_t egid, gid_t sg
 INTDEF void NOTHROW_RPC(LIBCCALL libc___crtSleep)(__UINT32_TYPE__ msecs);
 /* Sleep for `useconds' microseconds (1/1.000.000 seconds) */
 INTDEF int NOTHROW_RPC(LIBCCALL libc_usleep)(useconds_t useconds);
-INTDEF NONNULL((1)) ATTR_DEPRECATED("Use getcwd()") char *NOTHROW_RPC(LIBCCALL libc_getwd)(char *buf);
+INTDEF ATTR_DEPRECATED("Use getcwd()") NONNULL((1)) char *NOTHROW_RPC(LIBCCALL libc_getwd)(char *buf);
 INTDEF useconds_t NOTHROW_NCX(LIBCCALL libc_ualarm)(useconds_t value, useconds_t interval);
 /* >> vfork(2)
  * Same as `fork(2)', but suspend the calling process until the child

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5e9862c8 */
+/* HASH CRC-32:0xce3b0c89 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #ifndef ____localdep_vsc32printf_defined
 #define ____localdep_vsc32printf_defined 1
 #if defined(__CRT_HAVE_vswprintf) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_NONNULL((3)) __ATTR_LIBC_WPRINTF(3, 0),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vsc32printf,(__CHAR32_TYPE__ *__restrict __buf, __SIZE_TYPE__ __buflen, __CHAR32_TYPE__ const *__restrict __format, __builtin_va_list __args),vswprintf,(__buf,__buflen,__format,__args))
+__CREDIRECT(__ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((3)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vsc32printf,(__CHAR32_TYPE__ *__restrict __buf, __SIZE_TYPE__ __buflen, __CHAR32_TYPE__ const *__restrict __format, __builtin_va_list __args),vswprintf,(__buf,__buflen,__format,__args))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/vswprintf.h>
 #define __localdep_vsc32printf (*(__STDC_INT_AS_SIZE_T(__LIBCCALL*)(__CHAR32_TYPE__ *__restrict, __SIZE_TYPE__, __CHAR32_TYPE__ const *__restrict, __builtin_va_list))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vswprintf)))
@@ -35,7 +35,7 @@ __CREDIRECT(__ATTR_NONNULL((3)) __ATTR_LIBC_WPRINTF(3, 0),__STDC_INT_AS_SIZE_T,_
 #endif /* !____localdep_vsc32printf_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(sc32printf) __ATTR_NONNULL((3)) __ATTR_LIBC_WPRINTF(3, 4) __STDC_INT_AS_SIZE_T
+__LOCAL_LIBC(sc32printf) __ATTR_LIBC_WPRINTF(3, 4) __ATTR_NONNULL((3)) __STDC_INT_AS_SIZE_T
 __NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(sc32printf))(__CHAR32_TYPE__ *__restrict __buf,
                                                          __SIZE_TYPE__ __buflen,
                                                          __CHAR32_TYPE__ const *__restrict __format,

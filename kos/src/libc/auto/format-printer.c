@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x929ef7f3 */
+/* HASH CRC-32:0xe1e6435f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -780,7 +780,7 @@ err:
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
-INTERN NONNULL((1, 3)) ATTR_LIBC_PRINTF(3, 0)
+INTERN ATTR_LIBC_PRINTF(3, 0) NONNULL((1, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_vprintf") ssize_t
 (LIBCCALL libc_format_vprintf)(pformatprinter printer,
                                void *arg,
@@ -922,7 +922,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_vprintf") ssize_t
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
-INTERN NONNULL((1, 3)) ATTR_LIBC_PRINTF(3, 4)
+INTERN ATTR_LIBC_PRINTF(3, 4) NONNULL((1, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_printf") ssize_t
 (VLIBCCALL libc_format_printf)(pformatprinter printer,
                                void *arg,
@@ -969,7 +969,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_printf") ssize_t
  * @return: 0 :  No data could be scanned.
  * @return: * :  The total number of successfully scanned arguments.
  * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
-INTERN NONNULL((1, 2, 4)) ATTR_LIBC_SCANF(4, 0)
+INTERN ATTR_LIBC_SCANF(4, 0) NONNULL((1, 2, 4))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_vscanf") ssize_t
 (LIBCCALL libc_format_vscanf)(pformatgetc pgetc,
                               pformatungetc pungetc,
@@ -1016,7 +1016,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_vscanf") ssize_t
  * @return: 0 :  No data could be scanned.
  * @return: * :  The total number of successfully scanned arguments.
  * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
-INTERN NONNULL((1, 2, 4)) ATTR_LIBC_SCANF(4, 5)
+INTERN ATTR_LIBC_SCANF(4, 5) NONNULL((1, 2, 4))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_scanf") ssize_t
 (VLIBCCALL libc_format_scanf)(pformatgetc pgetc,
                               pformatungetc pungetc,

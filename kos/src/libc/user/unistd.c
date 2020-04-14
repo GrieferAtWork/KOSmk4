@@ -174,11 +174,11 @@ NOTHROW_RPC(VLIBCCALL libc_execl)(char const *__restrict path,
 }
 /*[[[end:execl]]]*/
 
-/*[[[head:execle,hash:CRC-32=0xbc5f767e]]]*/
+/*[[[head:execle,hash:CRC-32=0xff441fe1]]]*/
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel */
-INTERN ATTR_SENTINEL_O(1) NONNULL((1))
+INTERN NONNULL((1)) ATTR_SENTINEL_O(1)
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.exec.exec.execle") int
 NOTHROW_RPC(VLIBCCALL libc_execle)(char const *__restrict path,
                                    char const *args,
@@ -289,11 +289,11 @@ NOTHROW_RPC(LIBCCALL libc_execvpe)(char const *__restrict file,
 }
 /*[[[end:execvpe]]]*/
 
-/*[[[head:execlpe,hash:CRC-32=0x39f6ffa]]]*/
+/*[[[head:execlpe,hash:CRC-32=0xe759b517]]]*/
 /* >> execlpe(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel */
-INTERN ATTR_SENTINEL_O(1) NONNULL((1))
+INTERN NONNULL((1)) ATTR_SENTINEL_O(1)
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.exec.exec.execlpe") int
 NOTHROW_RPC(VLIBCCALL libc_execlpe)(char const *__restrict file,
                                     char const *args,
@@ -1478,8 +1478,8 @@ NOTHROW_RPC(LIBCCALL libc_usleep)(useconds_t useconds)
 }
 /*[[[end:usleep]]]*/
 
-/*[[[head:getwd,hash:CRC-32=0x65bd7dfc]]]*/
-INTERN NONNULL((1)) ATTR_DEPRECATED("Use getcwd()")
+/*[[[head:getwd,hash:CRC-32=0x97252e05]]]*/
+INTERN ATTR_DEPRECATED("Use getcwd()") NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.basic_property.getwd") char *
 NOTHROW_RPC(LIBCCALL libc_getwd)(char *buf)
 /*[[[body:getwd]]]*/

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd28bfe4c */
+/* HASH CRC-32:0x66bc1f5e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #define __local__vfprintf_p_defined 1
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_vfprintf_p) __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF_P(2, 0) __STDC_INT_AS_SIZE_T
+__LOCAL_LIBC(_vfprintf_p) __ATTR_LIBC_PRINTF_P(2, 0) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (__LIBCCALL __LIBC_LOCAL_NAME(_vfprintf_p))(__FILE *__restrict __stream,
                                             char const *__restrict __format,
                                             __builtin_va_list __args) __THROWS(...) {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9363863e */
+/* HASH CRC-32:0x6c0a4d52 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,22 +44,22 @@ INTDEF NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (LIBCCALL libc_fputws)(char32_t cons
 INTDEF NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (LIBDCALL libd_fputws)(char16_t const *__restrict string, FILE *__restrict stream) __THROWS(...);
 INTDEF NONNULL((2)) wint_t NOTHROW_NCX(LIBCCALL libc_ungetwc)(wint_t wc, FILE *stream);
 INTDEF NONNULL((2)) wint_t NOTHROW_NCX(LIBDCALL libd_ungetwc)(wint_t wc, FILE *stream);
-INTDEF NONNULL((1, 2)) ATTR_LIBC_WPRINTF(2, 3) __STDC_INT_AS_SIZE_T (VLIBCCALL libc_fwprintf)(FILE *__restrict stream, char32_t const *__restrict format, ...) __THROWS(...);
-INTDEF NONNULL((1, 2)) ATTR_LIBC_WPRINTF(2, 3) __STDC_INT_AS_SIZE_T (VLIBDCALL libd_fwprintf)(FILE *__restrict stream, char16_t const *__restrict format, ...) __THROWS(...);
-INTDEF NONNULL((1, 2)) ATTR_LIBC_WPRINTF(2, 0) __STDC_INT_AS_SIZE_T (LIBCCALL libc_vfwprintf)(FILE *__restrict stream, char32_t const *__restrict format, va_list args) __THROWS(...);
-INTDEF NONNULL((1, 2)) ATTR_LIBC_WPRINTF(2, 0) __STDC_INT_AS_SIZE_T (LIBDCALL libd_vfwprintf)(FILE *__restrict stream, char16_t const *__restrict format, va_list args) __THROWS(...);
-INTDEF NONNULL((1)) ATTR_LIBC_WPRINTF(1, 2) __STDC_INT_AS_SIZE_T (VLIBCCALL libc_wprintf)(char32_t const *__restrict format, ...) __THROWS(...);
-INTDEF NONNULL((1)) ATTR_LIBC_WPRINTF(1, 2) __STDC_INT_AS_SIZE_T (VLIBDCALL libd_wprintf)(char16_t const *__restrict format, ...) __THROWS(...);
-INTDEF NONNULL((1)) ATTR_LIBC_WPRINTF(1, 0) __STDC_INT_AS_SIZE_T (LIBCCALL libc_vwprintf)(char32_t const *__restrict format, va_list args) __THROWS(...);
-INTDEF NONNULL((1)) ATTR_LIBC_WPRINTF(1, 0) __STDC_INT_AS_SIZE_T (LIBDCALL libd_vwprintf)(char16_t const *__restrict format, va_list args) __THROWS(...);
-INTDEF NONNULL((1, 2)) ATTR_LIBC_WSCANF(2, 3) __STDC_INT_AS_SIZE_T (VLIBCCALL libc_fwscanf)(FILE *__restrict stream, char32_t const *__restrict format, ...) __THROWS(...);
-INTDEF NONNULL((1, 2)) ATTR_LIBC_WSCANF(2, 3) __STDC_INT_AS_SIZE_T (VLIBDCALL libd_fwscanf)(FILE *__restrict stream, char16_t const *__restrict format, ...) __THROWS(...);
-INTDEF NONNULL((1)) ATTR_LIBC_WSCANF(1, 2) __STDC_INT_AS_SIZE_T (VLIBCCALL libc_wscanf)(char32_t const *__restrict format, ...) __THROWS(...);
-INTDEF NONNULL((1)) ATTR_LIBC_WSCANF(1, 2) __STDC_INT_AS_SIZE_T (VLIBDCALL libd_wscanf)(char16_t const *__restrict format, ...) __THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) ATTR_LIBC_WSCANF(2, 0) __STDC_INT_AS_SIZE_T (LIBCCALL libc_vfwscanf)(FILE *__restrict stream, char32_t const *__restrict format, va_list args) __THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) ATTR_LIBC_WSCANF(2, 0) __STDC_INT_AS_SIZE_T (LIBDCALL libd_vfwscanf)(FILE *__restrict stream, char16_t const *__restrict format, va_list args) __THROWS(...);
-INTDEF WUNUSED NONNULL((1)) ATTR_LIBC_WSCANF(1, 0) __STDC_INT_AS_SIZE_T (LIBCCALL libc_vwscanf)(char32_t const *__restrict format, va_list args) __THROWS(...);
-INTDEF WUNUSED NONNULL((1)) ATTR_LIBC_WSCANF(1, 0) __STDC_INT_AS_SIZE_T (LIBDCALL libd_vwscanf)(char16_t const *__restrict format, va_list args) __THROWS(...);
+INTDEF ATTR_LIBC_WPRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (VLIBCCALL libc_fwprintf)(FILE *__restrict stream, char32_t const *__restrict format, ...) __THROWS(...);
+INTDEF ATTR_LIBC_WPRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (VLIBDCALL libd_fwprintf)(FILE *__restrict stream, char16_t const *__restrict format, ...) __THROWS(...);
+INTDEF ATTR_LIBC_WPRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (LIBCCALL libc_vfwprintf)(FILE *__restrict stream, char32_t const *__restrict format, va_list args) __THROWS(...);
+INTDEF ATTR_LIBC_WPRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (LIBDCALL libd_vfwprintf)(FILE *__restrict stream, char16_t const *__restrict format, va_list args) __THROWS(...);
+INTDEF ATTR_LIBC_WPRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T (VLIBCCALL libc_wprintf)(char32_t const *__restrict format, ...) __THROWS(...);
+INTDEF ATTR_LIBC_WPRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T (VLIBDCALL libd_wprintf)(char16_t const *__restrict format, ...) __THROWS(...);
+INTDEF ATTR_LIBC_WPRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T (LIBCCALL libc_vwprintf)(char32_t const *__restrict format, va_list args) __THROWS(...);
+INTDEF ATTR_LIBC_WPRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T (LIBDCALL libd_vwprintf)(char16_t const *__restrict format, va_list args) __THROWS(...);
+INTDEF ATTR_LIBC_WSCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (VLIBCCALL libc_fwscanf)(FILE *__restrict stream, char32_t const *__restrict format, ...) __THROWS(...);
+INTDEF ATTR_LIBC_WSCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (VLIBDCALL libd_fwscanf)(FILE *__restrict stream, char16_t const *__restrict format, ...) __THROWS(...);
+INTDEF ATTR_LIBC_WSCANF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T (VLIBCCALL libc_wscanf)(char32_t const *__restrict format, ...) __THROWS(...);
+INTDEF ATTR_LIBC_WSCANF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T (VLIBDCALL libd_wscanf)(char16_t const *__restrict format, ...) __THROWS(...);
+INTDEF WUNUSED ATTR_LIBC_WSCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (LIBCCALL libc_vfwscanf)(FILE *__restrict stream, char32_t const *__restrict format, va_list args) __THROWS(...);
+INTDEF WUNUSED ATTR_LIBC_WSCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (LIBDCALL libd_vfwscanf)(FILE *__restrict stream, char16_t const *__restrict format, va_list args) __THROWS(...);
+INTDEF WUNUSED ATTR_LIBC_WSCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T (LIBCCALL libc_vwscanf)(char32_t const *__restrict format, va_list args) __THROWS(...);
+INTDEF WUNUSED ATTR_LIBC_WSCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T (LIBDCALL libd_vwscanf)(char16_t const *__restrict format, va_list args) __THROWS(...);
 INTDEF NONNULL((2)) size_t NOTHROW_NCX(LIBCCALL libc_mbsnrtowcs)(char32_t *dst, char const **__restrict psrc, size_t nmc, size_t len, mbstate_t *ps);
 INTDEF NONNULL((2)) size_t NOTHROW_NCX(LIBDCALL libd_mbsnrtowcs)(char16_t *dst, char const **__restrict psrc, size_t nmc, size_t len, mbstate_t *ps);
 INTDEF NONNULL((2)) size_t NOTHROW_NCX(LIBCCALL libc_wcsnrtombs)(char *dst, char32_t const **__restrict psrc, size_t nwc, size_t len, mbstate_t *ps);
@@ -94,22 +94,22 @@ INTDEF NONNULL((1, 2)) ssize_t (LIBCCALL libc_file_wprinter_unlocked)(void *arg,
 INTDEF NONNULL((1, 2)) ssize_t (LIBDCALL libd_file_wprinter_unlocked)(void *arg, char16_t const *__restrict data, size_t datalen) __THROWS(...);
 INTDEF NONNULL((2)) wint_t NOTHROW_NCX(LIBCCALL libc_ungetwc_unlocked)(wint_t ch, FILE *__restrict stream);
 INTDEF NONNULL((2)) wint_t NOTHROW_NCX(LIBDCALL libd_ungetwc_unlocked)(wint_t ch, FILE *__restrict stream);
-INTDEF NONNULL((1, 2)) ATTR_LIBC_WPRINTF(2, 0) __STDC_INT_AS_SIZE_T (LIBCCALL libc_vfwprintf_unlocked)(FILE *__restrict stream, char32_t const *__restrict format, va_list args) __THROWS(...);
-INTDEF NONNULL((1, 2)) ATTR_LIBC_WPRINTF(2, 0) __STDC_INT_AS_SIZE_T (LIBDCALL libd_vfwprintf_unlocked)(FILE *__restrict stream, char16_t const *__restrict format, va_list args) __THROWS(...);
-INTDEF NONNULL((1, 2)) ATTR_LIBC_WPRINTF(2, 3) __STDC_INT_AS_SIZE_T (VLIBCCALL libc_fwprintf_unlocked)(FILE *__restrict stream, char32_t const *__restrict format, ...) __THROWS(...);
-INTDEF NONNULL((1, 2)) ATTR_LIBC_WPRINTF(2, 3) __STDC_INT_AS_SIZE_T (VLIBDCALL libd_fwprintf_unlocked)(FILE *__restrict stream, char16_t const *__restrict format, ...) __THROWS(...);
-INTDEF NONNULL((1)) ATTR_LIBC_WPRINTF(1, 2) __STDC_INT_AS_SIZE_T (VLIBCCALL libc_wprintf_unlocked)(char32_t const *__restrict format, ...) __THROWS(...);
-INTDEF NONNULL((1)) ATTR_LIBC_WPRINTF(1, 2) __STDC_INT_AS_SIZE_T (VLIBDCALL libd_wprintf_unlocked)(char16_t const *__restrict format, ...) __THROWS(...);
-INTDEF NONNULL((1)) ATTR_LIBC_WPRINTF(1, 0) __STDC_INT_AS_SIZE_T (LIBCCALL libc_vwprintf_unlocked)(char32_t const *__restrict format, va_list args) __THROWS(...);
-INTDEF NONNULL((1)) ATTR_LIBC_WPRINTF(1, 0) __STDC_INT_AS_SIZE_T (LIBDCALL libd_vwprintf_unlocked)(char16_t const *__restrict format, va_list args) __THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) ATTR_LIBC_WSCANF(2, 0) __STDC_INT_AS_SIZE_T (LIBCCALL libc_vfwscanf_unlocked)(FILE *__restrict stream, char32_t const *__restrict format, va_list args) __THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) ATTR_LIBC_WSCANF(2, 0) __STDC_INT_AS_SIZE_T (LIBDCALL libd_vfwscanf_unlocked)(FILE *__restrict stream, char16_t const *__restrict format, va_list args) __THROWS(...);
-INTDEF WUNUSED NONNULL((1)) ATTR_LIBC_SCANF(1, 0) __STDC_INT_AS_SIZE_T (LIBCCALL libc_vwscanf_unlocked)(char32_t const *__restrict format, va_list args) __THROWS(...);
-INTDEF WUNUSED NONNULL((1)) ATTR_LIBC_SCANF(1, 0) __STDC_INT_AS_SIZE_T (LIBDCALL libd_vwscanf_unlocked)(char16_t const *__restrict format, va_list args) __THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) ATTR_LIBC_SCANF(2, 3) __STDC_INT_AS_SIZE_T (VLIBCCALL libc_fwscanf_unlocked)(FILE *__restrict stream, char32_t const *__restrict format, ...) __THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) ATTR_LIBC_SCANF(2, 3) __STDC_INT_AS_SIZE_T (VLIBDCALL libd_fwscanf_unlocked)(FILE *__restrict stream, char16_t const *__restrict format, ...) __THROWS(...);
-INTDEF WUNUSED NONNULL((1)) ATTR_LIBC_SCANF(1, 2) __STDC_INT_AS_SIZE_T (VLIBCCALL libc_wscanf_unlocked)(char32_t const *__restrict format, ...) __THROWS(...);
-INTDEF WUNUSED NONNULL((1)) ATTR_LIBC_SCANF(1, 2) __STDC_INT_AS_SIZE_T (VLIBDCALL libd_wscanf_unlocked)(char16_t const *__restrict format, ...) __THROWS(...);
+INTDEF ATTR_LIBC_WPRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (LIBCCALL libc_vfwprintf_unlocked)(FILE *__restrict stream, char32_t const *__restrict format, va_list args) __THROWS(...);
+INTDEF ATTR_LIBC_WPRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (LIBDCALL libd_vfwprintf_unlocked)(FILE *__restrict stream, char16_t const *__restrict format, va_list args) __THROWS(...);
+INTDEF ATTR_LIBC_WPRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (VLIBCCALL libc_fwprintf_unlocked)(FILE *__restrict stream, char32_t const *__restrict format, ...) __THROWS(...);
+INTDEF ATTR_LIBC_WPRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (VLIBDCALL libd_fwprintf_unlocked)(FILE *__restrict stream, char16_t const *__restrict format, ...) __THROWS(...);
+INTDEF ATTR_LIBC_WPRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T (VLIBCCALL libc_wprintf_unlocked)(char32_t const *__restrict format, ...) __THROWS(...);
+INTDEF ATTR_LIBC_WPRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T (VLIBDCALL libd_wprintf_unlocked)(char16_t const *__restrict format, ...) __THROWS(...);
+INTDEF ATTR_LIBC_WPRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T (LIBCCALL libc_vwprintf_unlocked)(char32_t const *__restrict format, va_list args) __THROWS(...);
+INTDEF ATTR_LIBC_WPRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T (LIBDCALL libd_vwprintf_unlocked)(char16_t const *__restrict format, va_list args) __THROWS(...);
+INTDEF WUNUSED ATTR_LIBC_WSCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (LIBCCALL libc_vfwscanf_unlocked)(FILE *__restrict stream, char32_t const *__restrict format, va_list args) __THROWS(...);
+INTDEF WUNUSED ATTR_LIBC_WSCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (LIBDCALL libd_vfwscanf_unlocked)(FILE *__restrict stream, char16_t const *__restrict format, va_list args) __THROWS(...);
+INTDEF WUNUSED ATTR_LIBC_SCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T (LIBCCALL libc_vwscanf_unlocked)(char32_t const *__restrict format, va_list args) __THROWS(...);
+INTDEF WUNUSED ATTR_LIBC_SCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T (LIBDCALL libd_vwscanf_unlocked)(char16_t const *__restrict format, va_list args) __THROWS(...);
+INTDEF WUNUSED ATTR_LIBC_SCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (VLIBCCALL libc_fwscanf_unlocked)(FILE *__restrict stream, char32_t const *__restrict format, ...) __THROWS(...);
+INTDEF WUNUSED ATTR_LIBC_SCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (VLIBDCALL libd_fwscanf_unlocked)(FILE *__restrict stream, char16_t const *__restrict format, ...) __THROWS(...);
+INTDEF WUNUSED ATTR_LIBC_SCANF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T (VLIBCCALL libc_wscanf_unlocked)(char32_t const *__restrict format, ...) __THROWS(...);
+INTDEF WUNUSED ATTR_LIBC_SCANF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T (VLIBDCALL libd_wscanf_unlocked)(char16_t const *__restrict format, ...) __THROWS(...);
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char32_t *NOTHROW_NCX(LIBCCALL libc_wcsndup)(char32_t const *__restrict string, size_t max_chars);
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char16_t *NOTHROW_NCX(LIBDCALL libd_wcsndup)(char16_t const *__restrict string, size_t max_chars);
 INTDEF char32_t *NOTHROW_NCX(LIBCCALL libc__wcserror)(int errno_value);

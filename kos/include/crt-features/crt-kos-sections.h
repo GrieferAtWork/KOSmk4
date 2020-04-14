@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa4513662 */
+/* HASH CRC-32:0x3ed96f56 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -748,8 +748,8 @@
 #define __CRT_SECTION_rewind_unlocked                       __CRT_SECTINFO_FILE_unlocked_seek_utility               /* .text.crt.FILE.unlocked.seek.utility.rewind_unlocked */
 
 /* .text.crt.FILE.unlocked.utility.* */
-#define __CRT_SECTION_fftruncate_unlocked                   __CRT_SECTINFO_FILE_unlocked_utility                    /* .text.crt.FILE.unlocked.utility.fftruncate_unlocked */
 #define __CRT_SECTION_fftruncate64_unlocked                 __CRT_SECTINFO_FILE_unlocked_utility                    /* .text.crt.FILE.unlocked.utility.fftruncate64_unlocked */
+#define __CRT_SECTION_fftruncate_unlocked                   __CRT_SECTINFO_FILE_unlocked_utility                    /* .text.crt.FILE.unlocked.utility.fftruncate_unlocked */
 
 /* .text.crt.FILE.unlocked.write.printf.* */
 #define __CRT_SECTION_fprintf_unlocked                      __CRT_SECTINFO_FILE_unlocked_write_printf               /* .text.crt.FILE.unlocked.write.printf.fprintf_unlocked */
@@ -764,8 +764,8 @@
 #define __CRT_SECTION_putw_unlocked                         __CRT_SECTINFO_FILE_unlocked_write_putc                 /* .text.crt.FILE.unlocked.write.putc.putw_unlocked */
 
 /* .text.crt.FILE.unlocked.write.utility.* */
-#define __CRT_SECTION_flushall_unlocked                     __CRT_SECTINFO_FILE_unlocked_write_utility              /* .text.crt.FILE.unlocked.write.utility.flushall_unlocked */
 #define __CRT_SECTION_fflush_unlocked                       __CRT_SECTINFO_FILE_unlocked_write_utility              /* .text.crt.FILE.unlocked.write.utility.fflush_unlocked */
+#define __CRT_SECTION_flushall_unlocked                     __CRT_SECTINFO_FILE_unlocked_write_utility              /* .text.crt.FILE.unlocked.write.utility.flushall_unlocked */
 
 /* .text.crt.FILE.unlocked.write.write.* */
 #define __CRT_SECTION_file_printer_unlocked                 __CRT_SECTINFO_FILE_unlocked_write_write                /* .text.crt.FILE.unlocked.write.write.file_printer_unlocked */
@@ -976,8 +976,8 @@
 #define __CRT_SECTION__strerror_s                           __CRT_SECTINFO_dos_errno                                /* .text.crt.dos.errno._strerror_s */
 
 /* .text.crt.dos.errno.utility.* */
-#define __CRT_SECTION__wperror                              __CRT_SECTINFO_dos_errno_utility                        /* .text.crt.dos.errno.utility._wperror */
 #define __CRT_DOS_SECTION__wperror                          __CRT_SECTINFO_dos_errno_utility                        /* .text.crt.dos.errno.utility._wperror */
+#define __CRT_SECTION__wperror                              __CRT_SECTINFO_dos_errno_utility                        /* .text.crt.dos.errno.utility._wperror */
 
 /* .text.crt.dos.fs.basic_property.* */
 #define __CRT_SECTION_umask_s                               __CRT_SECTINFO_dos_fs_basic_property                    /* .text.crt.dos.fs.basic_property.umask_s */
@@ -1124,8 +1124,8 @@
 #define __CRT_SECTION__rotr64                               __CRT_SECTINFO_dos_math_utility                         /* .text.crt.dos.math.utility._rotr64 */
 
 /* .text.crt.dos.random.* */
-#define __CRT_SECTION_rand_s                                __CRT_SECTINFO_dos_random                               /* .text.crt.dos.random.rand_s */
 #define __CRT_DOS_SECTION_rand_s                            __CRT_SECTINFO_dos_random                               /* .text.crt.dos.random.rand_s */
+#define __CRT_SECTION_rand_s                                __CRT_SECTINFO_dos_random                               /* .text.crt.dos.random.rand_s */
 
 /* .text.crt.dos.sched.process.* */
 #define __CRT_SECTION__c_exit                               __CRT_SECTINFO_dos_sched_process                        /* .text.crt.dos.sched.process._c_exit */
@@ -1133,8 +1133,8 @@
 #define __CRT_SECTION_onexit                                __CRT_SECTINFO_dos_sched_process                        /* .text.crt.dos.sched.process.onexit */
 
 /* .text.crt.dos.sched.signal.* */
-#define __CRT_DOS_SECTION_signal                            __CRT_SECTINFO_dos_sched_signal                         /* .text.crt.dos.sched.signal.signal */
 #define __CRT_DOS_SECTION_raise                             __CRT_SECTINFO_dos_sched_signal                         /* .text.crt.dos.sched.signal.raise */
+#define __CRT_DOS_SECTION_signal                            __CRT_SECTINFO_dos_sched_signal                         /* .text.crt.dos.sched.signal.signal */
 
 /* .text.crt.dos.sched.thread.* */
 #define __CRT_SECTION__beginthread                          __CRT_SECTINFO_dos_sched_thread                         /* .text.crt.dos.sched.thread._beginthread */
@@ -1153,8 +1153,8 @@
 #define __CRT_SECTION_strncpy_s                             __CRT_SECTINFO_dos_string_memory                        /* .text.crt.dos.string.memory.strncpy_s */
 
 /* .text.crt.dos.system.* */
-#define __CRT_SECTION_delay                                 __CRT_SECTINFO_dos_system                               /* .text.crt.dos.system.delay */
 #define __CRT_SECTION__beep                                 __CRT_SECTINFO_dos_system                               /* .text.crt.dos.system._beep */
+#define __CRT_SECTION_delay                                 __CRT_SECTINFO_dos_system                               /* .text.crt.dos.system.delay */
 
 /* .text.crt.dos.system.utility.* */
 #define __CRT_SECTION___crtSleep                            __CRT_SECTINFO_dos_system_utility                       /* .text.crt.dos.system.utility.__crtSleep */
@@ -1200,8 +1200,8 @@
 #define __CRT_SECTION__vsscanf_l                            __CRT_SECTINFO_dos_unicode_locale_format_scanf          /* .text.crt.dos.unicode.locale.format.scanf._vsscanf_l */
 
 /* .text.crt.dos.unicode.locale.memory.* */
-#define __CRT_SECTION__strupr_s_l                           __CRT_SECTINFO_dos_unicode_locale_memory                /* .text.crt.dos.unicode.locale.memory._strupr_s_l */
 #define __CRT_SECTION__strlwr_s_l                           __CRT_SECTINFO_dos_unicode_locale_memory                /* .text.crt.dos.unicode.locale.memory._strlwr_s_l */
+#define __CRT_SECTION__strupr_s_l                           __CRT_SECTINFO_dos_unicode_locale_memory                /* .text.crt.dos.unicode.locale.memory._strupr_s_l */
 
 /* .text.crt.dos.unicode.static.convert.* */
 #define __CRT_SECTION__atoi64                               __CRT_SECTINFO_dos_unicode_static_convert               /* .text.crt.dos.unicode.static.convert._atoi64 */
@@ -1237,8 +1237,8 @@
 #define __CRT_SECTION__vsnscanf                             __CRT_SECTINFO_dos_unicode_static_format_scanf          /* .text.crt.dos.unicode.static.format.scanf._vsnscanf */
 
 /* .text.crt.dos.unicode.static.memory.* */
-#define __CRT_SECTION__strupr_s                             __CRT_SECTINFO_dos_unicode_static_memory                /* .text.crt.dos.unicode.static.memory._strupr_s */
 #define __CRT_SECTION__strlwr_s                             __CRT_SECTINFO_dos_unicode_static_memory                /* .text.crt.dos.unicode.static.memory._strlwr_s */
+#define __CRT_SECTION__strupr_s                             __CRT_SECTINFO_dos_unicode_static_memory                /* .text.crt.dos.unicode.static.memory._strupr_s */
 
 /* .text.crt.dos.unsorted.* */
 #define __CRT_DOS_SECTION__ftime32_s                        __CRT_SECTINFO_dos_unsorted                             /* .text.crt.dos.unsorted._ftime32_s */
@@ -1298,8 +1298,8 @@
 #define __CRT_SECTION__wfsopen                              __CRT_SECTINFO_dos_wchar_FILE_locked_access             /* .text.crt.dos.wchar.FILE.locked.access._wfsopen */
 
 /* .text.crt.dos.wchar.FILE.locked.read.getc.* */
-#define __CRT_DOS_SECTION_getwchar                          __CRT_SECTINFO_dos_wchar_FILE_locked_read_getc          /* .text.crt.dos.wchar.FILE.locked.read.getc.getwchar */
 #define __CRT_DOS_SECTION_fgetwc                            __CRT_SECTINFO_dos_wchar_FILE_locked_read_getc          /* .text.crt.dos.wchar.FILE.locked.read.getc.fgetwc */
+#define __CRT_DOS_SECTION_getwchar                          __CRT_SECTINFO_dos_wchar_FILE_locked_read_getc          /* .text.crt.dos.wchar.FILE.locked.read.getc.getwchar */
 
 /* .text.crt.dos.wchar.FILE.locked.read.read.* */
 #define __CRT_DOS_SECTION__getws_s                          __CRT_SECTINFO_dos_wchar_FILE_locked_read_read          /* .text.crt.dos.wchar.FILE.locked.read.read._getws_s */
@@ -1429,8 +1429,8 @@
 #define __CRT_SECTION__putws                                __CRT_SECTINFO_dos_wchar_FILE_locked_write_write        /* .text.crt.dos.wchar.FILE.locked.write.write._putws */
 
 /* .text.crt.dos.wchar.FILE.unlocked.read.getc.* */
-#define __CRT_DOS_SECTION_getwchar_unlocked                 __CRT_SECTINFO_dos_wchar_FILE_unlocked_read_getc        /* .text.crt.dos.wchar.FILE.unlocked.read.getc.getwchar_unlocked */
 #define __CRT_DOS_SECTION_fgetwc_unlocked                   __CRT_SECTINFO_dos_wchar_FILE_unlocked_read_getc        /* .text.crt.dos.wchar.FILE.unlocked.read.getc.fgetwc_unlocked */
+#define __CRT_DOS_SECTION_getwchar_unlocked                 __CRT_SECTINFO_dos_wchar_FILE_unlocked_read_getc        /* .text.crt.dos.wchar.FILE.unlocked.read.getc.getwchar_unlocked */
 
 /* .text.crt.dos.wchar.FILE.unlocked.read.read.* */
 #define __CRT_DOS_SECTION_fgetws_unlocked                   __CRT_SECTINFO_dos_wchar_FILE_unlocked_read_read        /* .text.crt.dos.wchar.FILE.unlocked.read.read.fgetws_unlocked */
@@ -1456,8 +1456,8 @@
 #define __CRT_DOS_SECTION_fputws_unlocked                   __CRT_SECTINFO_dos_wchar_FILE_unlocked_write_write      /* .text.crt.dos.wchar.FILE.unlocked.write.write.fputws_unlocked */
 
 /* .text.crt.dos.wchar.application.init.* */
-#define __CRT_SECTION__get_wpgmptr                          __CRT_SECTINFO_dos_wchar_application_init               /* .text.crt.dos.wchar.application.init._get_wpgmptr */
 #define __CRT_DOS_SECTION__get_wpgmptr                      __CRT_SECTINFO_dos_wchar_application_init               /* .text.crt.dos.wchar.application.init._get_wpgmptr */
+#define __CRT_SECTION__get_wpgmptr                          __CRT_SECTINFO_dos_wchar_application_init               /* .text.crt.dos.wchar.application.init._get_wpgmptr */
 
 /* .text.crt.dos.wchar.errno.* */
 #define __CRT_DOS_SECTION___wcserror                        __CRT_SECTINFO_dos_wchar_errno                          /* .text.crt.dos.wchar.errno.__wcserror */
@@ -1504,8 +1504,8 @@
 #define __CRT_DOS_SECTION_wremove                           __CRT_SECTINFO_dos_wchar_fs_modify                      /* .text.crt.dos.wchar.fs.modify.wremove */
 
 /* .text.crt.dos.wchar.fs.modify_time.* */
-#define __CRT_DOS_SECTION_wutime64                          __CRT_SECTINFO_dos_wchar_fs_modify_time                 /* .text.crt.dos.wchar.fs.modify_time.wutime64 */
 #define __CRT_DOS_SECTION_wutime                            __CRT_SECTINFO_dos_wchar_fs_modify_time                 /* .text.crt.dos.wchar.fs.modify_time.wutime */
+#define __CRT_DOS_SECTION_wutime64                          __CRT_SECTINFO_dos_wchar_fs_modify_time                 /* .text.crt.dos.wchar.fs.modify_time.wutime64 */
 
 /* .text.crt.dos.wchar.fs.stat.* */
 #define __CRT_DOS_SECTION__wstat32                          __CRT_SECTINFO_dos_wchar_fs_stat                        /* .text.crt.dos.wchar.fs.stat._wstat32 */
@@ -1524,8 +1524,8 @@
 #define __CRT_SECTION__wtmpnam_s                            __CRT_SECTINFO_dos_wchar_fs_utility                     /* .text.crt.dos.wchar.fs.utility._wtmpnam_s */
 
 /* .text.crt.dos.wchar.heap.strdup.* */
-#define __CRT_DOS_SECTION_wcsndup                           __CRT_SECTINFO_dos_wchar_heap_strdup                    /* .text.crt.dos.wchar.heap.strdup.wcsndup */
 #define __CRT_DOS_SECTION_wcsdup                            __CRT_SECTINFO_dos_wchar_heap_strdup                    /* .text.crt.dos.wchar.heap.strdup.wcsdup */
+#define __CRT_DOS_SECTION_wcsndup                           __CRT_SECTINFO_dos_wchar_heap_strdup                    /* .text.crt.dos.wchar.heap.strdup.wcsndup */
 
 /* .text.crt.dos.wchar.string.format.* */
 #define __CRT_DOS_SECTION_format_vwprintf                   __CRT_SECTINFO_dos_wchar_string_format                  /* .text.crt.dos.wchar.string.format.format_vwprintf */
@@ -1704,12 +1704,12 @@
 #define __CRT_SECTION__wtoi64                               __CRT_SECTINFO_dos_wchar_unicode_static_convert         /* .text.crt.dos.wchar.unicode.static.convert._wtoi64 */
 
 /* .text.crt.dos.wchar.unicode.static.format.printf.* */
-#define __CRT_DOS_SECTION_vswprintf                         __CRT_SECTINFO_dos_wchar_unicode_static_format_printf   /* .text.crt.dos.wchar.unicode.static.format.printf.vswprintf */
 #define __CRT_DOS_SECTION_swprintf                          __CRT_SECTINFO_dos_wchar_unicode_static_format_printf   /* .text.crt.dos.wchar.unicode.static.format.printf.swprintf */
+#define __CRT_DOS_SECTION_vswprintf                         __CRT_SECTINFO_dos_wchar_unicode_static_format_printf   /* .text.crt.dos.wchar.unicode.static.format.printf.vswprintf */
 
 /* .text.crt.dos.wchar.unicode.static.format.scanf.* */
-#define __CRT_DOS_SECTION_vswscanf                          __CRT_SECTINFO_dos_wchar_unicode_static_format_scanf    /* .text.crt.dos.wchar.unicode.static.format.scanf.vswscanf */
 #define __CRT_DOS_SECTION_swscanf                           __CRT_SECTINFO_dos_wchar_unicode_static_format_scanf    /* .text.crt.dos.wchar.unicode.static.format.scanf.swscanf */
+#define __CRT_DOS_SECTION_vswscanf                          __CRT_SECTINFO_dos_wchar_unicode_static_format_scanf    /* .text.crt.dos.wchar.unicode.static.format.scanf.vswscanf */
 
 /* .text.crt.dos.wchar.unicode.static.format.strftime.* */
 #define __CRT_DOS_SECTION_wcsftime                          __CRT_SECTINFO_dos_wchar_unicode_static_format_strftime /* .text.crt.dos.wchar.unicode.static.format.strftime.wcsftime */
@@ -1766,8 +1766,8 @@
 #define __CRT_SECTION_strsignal_s                           __CRT_SECTINFO_errno                                    /* .text.crt.errno.strsignal_s */
 
 /* .text.crt.errno.utility.* */
-#define __CRT_SECTION_perror                                __CRT_SECTINFO_errno_utility                            /* .text.crt.errno.utility.perror */
 #define __CRT_SECTION___p_program_invocation_short_name     __CRT_SECTINFO_errno_utility                            /* .text.crt.errno.utility.__p_program_invocation_short_name */
+#define __CRT_SECTION_perror                                __CRT_SECTINFO_errno_utility                            /* .text.crt.errno.utility.perror */
 
 /* .text.crt.errno_access.* */
 #define __CRT_SECTION___errno_location                      __CRT_SECTINFO_errno_access                             /* .text.crt.errno_access.__errno_location */
@@ -1881,15 +1881,15 @@
 #define __CRT_SECTION_Pipe2                                 __CRT_SECTINFO_except_io_access                         /* .text.crt.except.io.access.Pipe2 */
 
 /* .text.crt.except.io.large.read.* */
-#define __CRT_SECTION_PReadAll64                            __CRT_SECTINFO_except_io_large_read                     /* .text.crt.except.io.large.read.PReadAll64 */
 #define __CRT_SECTION_PRead64                               __CRT_SECTINFO_except_io_large_read                     /* .text.crt.except.io.large.read.PRead64 */
+#define __CRT_SECTION_PReadAll64                            __CRT_SECTINFO_except_io_large_read                     /* .text.crt.except.io.large.read.PReadAll64 */
 
 /* .text.crt.except.io.large.seek.* */
 #define __CRT_SECTION_LSeek64                               __CRT_SECTINFO_except_io_large_seek                     /* .text.crt.except.io.large.seek.LSeek64 */
 
 /* .text.crt.except.io.large.write.* */
-#define __CRT_SECTION_PWrite64                              __CRT_SECTINFO_except_io_large_write                    /* .text.crt.except.io.large.write.PWrite64 */
 #define __CRT_SECTION_FTruncate64                           __CRT_SECTINFO_except_io_large_write                    /* .text.crt.except.io.large.write.FTruncate64 */
+#define __CRT_SECTION_PWrite64                              __CRT_SECTINFO_except_io_large_write                    /* .text.crt.except.io.large.write.PWrite64 */
 
 /* .text.crt.except.io.read.* */
 #define __CRT_SECTION_PRead                                 __CRT_SECTINFO_except_io_read                           /* .text.crt.except.io.read.PRead */
@@ -1901,12 +1901,12 @@
 #define __CRT_SECTION_LSeek                                 __CRT_SECTINFO_except_io_seek                           /* .text.crt.except.io.seek.LSeek */
 
 /* .text.crt.except.io.sync.* */
-#define __CRT_SECTION_FSync                                 __CRT_SECTINFO_except_io_sync                           /* .text.crt.except.io.sync.FSync */
 #define __CRT_SECTION_FDataSync                             __CRT_SECTINFO_except_io_sync                           /* .text.crt.except.io.sync.FDataSync */
+#define __CRT_SECTION_FSync                                 __CRT_SECTINFO_except_io_sync                           /* .text.crt.except.io.sync.FSync */
 
 /* .text.crt.except.io.utility.* */
-#define __CRT_SECTION_Ioctl                                 __CRT_SECTINFO_except_io_utility                        /* .text.crt.except.io.utility.Ioctl */
 #define __CRT_SECTION_Fcntl                                 __CRT_SECTINFO_except_io_utility                        /* .text.crt.except.io.utility.Fcntl */
+#define __CRT_SECTION_Ioctl                                 __CRT_SECTINFO_except_io_utility                        /* .text.crt.except.io.utility.Ioctl */
 
 /* .text.crt.except.io.write.* */
 #define __CRT_SECTION_FTruncate                             __CRT_SECTINFO_except_io_write                          /* .text.crt.except.io.write.FTruncate */
@@ -1945,8 +1945,8 @@
 #define __CRT_SECTION_SetHostName                           __CRT_SECTINFO_except_system_configuration              /* .text.crt.except.system.configuration.SetHostName */
 
 /* .text.crt.except.system.utility.* */
-#define __CRT_SECTION_Syscall64                             __CRT_SECTINFO_except_system_utility                    /* .text.crt.except.system.utility.Syscall64 */
 #define __CRT_SECTION_Syscall                               __CRT_SECTINFO_except_system_utility                    /* .text.crt.except.system.utility.Syscall */
+#define __CRT_SECTION_Syscall64                             __CRT_SECTINFO_except_system_utility                    /* .text.crt.except.system.utility.Syscall64 */
 
 /* .text.crt.fs.basic_property.* */
 #define __CRT_SECTION_chdir                                 __CRT_SECTINFO_fs_basic_property                        /* .text.crt.fs.basic_property.chdir */
@@ -2133,8 +2133,8 @@
 #define __CRT_SECTION_statvfs64                             __CRT_SECTINFO_fs_statfs_statvfs                        /* .text.crt.fs.statfs.statvfs.statvfs64 */
 
 /* .text.crt.fs.swap.* */
-#define __CRT_SECTION_swapon                                __CRT_SECTINFO_fs_swap                                  /* .text.crt.fs.swap.swapon */
 #define __CRT_SECTION_swapoff                               __CRT_SECTINFO_fs_swap                                  /* .text.crt.fs.swap.swapoff */
+#define __CRT_SECTION_swapon                                __CRT_SECTINFO_fs_swap                                  /* .text.crt.fs.swap.swapon */
 
 /* .text.crt.fs.utility.* */
 #define __CRT_SECTION_chroot                                __CRT_SECTINFO_fs_utility                               /* .text.crt.fs.utility.chroot */
@@ -2153,8 +2153,8 @@
 #define __CRT_SECTION_tmpnam_r                              __CRT_SECTINFO_fs_utility                               /* .text.crt.fs.utility.tmpnam_r */
 
 /* .text.crt.heap.helpers.* */
-#define __CRT_SECTION_realloc_in_place                      __CRT_SECTINFO_heap_helpers                             /* .text.crt.heap.helpers.realloc_in_place */
 #define __CRT_SECTION_malloc_usable_size                    __CRT_SECTINFO_heap_helpers                             /* .text.crt.heap.helpers.malloc_usable_size */
+#define __CRT_SECTION_realloc_in_place                      __CRT_SECTINFO_heap_helpers                             /* .text.crt.heap.helpers.realloc_in_place */
 
 /* .text.crt.heap.malloc.* */
 #define __CRT_SECTION_calloc                                __CRT_SECTINFO_heap_malloc                              /* .text.crt.heap.malloc.calloc */
@@ -2210,15 +2210,15 @@
 #define __CRT_SECTION_lockf64                               __CRT_SECTINFO_io_large_lock                            /* .text.crt.io.large.lock.lockf64 */
 
 /* .text.crt.io.large.read.* */
-#define __CRT_SECTION_preadall64                            __CRT_SECTINFO_io_large_read                            /* .text.crt.io.large.read.preadall64 */
 #define __CRT_SECTION_pread64                               __CRT_SECTINFO_io_large_read                            /* .text.crt.io.large.read.pread64 */
+#define __CRT_SECTION_preadall64                            __CRT_SECTINFO_io_large_read                            /* .text.crt.io.large.read.preadall64 */
 
 /* .text.crt.io.large.seek.* */
 #define __CRT_SECTION_lseek64                               __CRT_SECTINFO_io_large_seek                            /* .text.crt.io.large.seek.lseek64 */
 
 /* .text.crt.io.large.utility.* */
-#define __CRT_SECTION_posix_fallocate64                     __CRT_SECTINFO_io_large_utility                         /* .text.crt.io.large.utility.posix_fallocate64 */
 #define __CRT_SECTION_posix_fadvise64                       __CRT_SECTINFO_io_large_utility                         /* .text.crt.io.large.utility.posix_fadvise64 */
+#define __CRT_SECTION_posix_fallocate64                     __CRT_SECTINFO_io_large_utility                         /* .text.crt.io.large.utility.posix_fallocate64 */
 
 /* .text.crt.io.large.write.* */
 #define __CRT_SECTION_ftruncate64                           __CRT_SECTINFO_io_large_write                           /* .text.crt.io.large.write.ftruncate64 */
@@ -2265,8 +2265,8 @@
 #define __CRT_SECTION_putpmsg                               __CRT_SECTINFO_io_stropts                               /* .text.crt.io.stropts.putpmsg */
 
 /* .text.crt.io.sync.* */
-#define __CRT_SECTION_fsync                                 __CRT_SECTINFO_io_sync                                  /* .text.crt.io.sync.fsync */
 #define __CRT_SECTION_fdatasync                             __CRT_SECTINFO_io_sync                                  /* .text.crt.io.sync.fdatasync */
+#define __CRT_SECTION_fsync                                 __CRT_SECTINFO_io_sync                                  /* .text.crt.io.sync.fsync */
 
 /* .text.crt.io.tty.* */
 #define __CRT_SECTION_cfgetispeed                           __CRT_SECTINFO_io_tty                                   /* .text.crt.io.tty.cfgetispeed */
@@ -2720,16 +2720,16 @@
 #define __CRT_SECTION_inet6_rth_space                       __CRT_SECTINFO_net_inet_6_RFC_3542                      /* .text.crt.net.inet.6.RFC_3542.inet6_rth_space */
 
 /* .text.crt.net.inet.6.bind_reserved.* */
-#define __CRT_SECTION_bindresvport6                         __CRT_SECTINFO_net_inet_6_bind_reserved                 /* .text.crt.net.inet.6.bind_reserved.bindresvport6 */
 #define __CRT_SECTION_bindresvport                          __CRT_SECTINFO_net_inet_6_bind_reserved                 /* .text.crt.net.inet.6.bind_reserved.bindresvport */
+#define __CRT_SECTION_bindresvport6                         __CRT_SECTINFO_net_inet_6_bind_reserved                 /* .text.crt.net.inet.6.bind_reserved.bindresvport6 */
 
 /* .text.crt.net.inet.6.ipv4_source_filter.* */
-#define __CRT_SECTION_setipv4sourcefilter                   __CRT_SECTINFO_net_inet_6_ipv4_source_filter            /* .text.crt.net.inet.6.ipv4_source_filter.setipv4sourcefilter */
 #define __CRT_SECTION_getipv4sourcefilter                   __CRT_SECTINFO_net_inet_6_ipv4_source_filter            /* .text.crt.net.inet.6.ipv4_source_filter.getipv4sourcefilter */
+#define __CRT_SECTION_setipv4sourcefilter                   __CRT_SECTINFO_net_inet_6_ipv4_source_filter            /* .text.crt.net.inet.6.ipv4_source_filter.setipv4sourcefilter */
 
 /* .text.crt.net.inet.6.source_filter.* */
-#define __CRT_SECTION_setsourcefilter                       __CRT_SECTINFO_net_inet_6_source_filter                 /* .text.crt.net.inet.6.source_filter.setsourcefilter */
 #define __CRT_SECTION_getsourcefilter                       __CRT_SECTINFO_net_inet_6_source_filter                 /* .text.crt.net.inet.6.source_filter.getsourcefilter */
+#define __CRT_SECTION_setsourcefilter                       __CRT_SECTINFO_net_inet_6_source_filter                 /* .text.crt.net.inet.6.source_filter.setsourcefilter */
 
 /* .text.crt.net.interface.* */
 #define __CRT_SECTION_if_freenameindex                      __CRT_SECTINFO_net_interface                            /* .text.crt.net.interface.if_freenameindex */
@@ -2773,8 +2773,8 @@
 #define __CRT_SECTION_socketpair                            __CRT_SECTINFO_net_socket                               /* .text.crt.net.socket.socketpair */
 
 /* .text.crt.obstack.* */
-#define __CRT_SECTION_obstack_vprintf                       __CRT_SECTINFO_obstack                                  /* .text.crt.obstack.obstack_vprintf */
 #define __CRT_SECTION_obstack_printf                        __CRT_SECTINFO_obstack                                  /* .text.crt.obstack.obstack_printf */
+#define __CRT_SECTION_obstack_vprintf                       __CRT_SECTINFO_obstack                                  /* .text.crt.obstack.obstack_vprintf */
 
 /* .text.crt.random.* */
 #define __CRT_SECTION_drand48                               __CRT_SECTINFO_random                                   /* .text.crt.random.drand48 */
@@ -2868,8 +2868,8 @@
 #define __CRT_SECTION_lfutex64                              __CRT_SECTINFO_sched_futex                              /* .text.crt.sched.futex.lfutex64 */
 
 /* .text.crt.sched.futexexpr.* */
-#define __CRT_SECTION_lfutexexpr64                          __CRT_SECTINFO_sched_futexexpr                          /* .text.crt.sched.futexexpr.lfutexexpr64 */
 #define __CRT_SECTION_lfutexexpr                            __CRT_SECTINFO_sched_futexexpr                          /* .text.crt.sched.futexexpr.lfutexexpr */
+#define __CRT_SECTION_lfutexexpr64                          __CRT_SECTINFO_sched_futexexpr                          /* .text.crt.sched.futexexpr.lfutexexpr64 */
 
 /* .text.crt.sched.futexlock.* */
 #define __CRT_SECTION_futexlock_timedwaitlock               __CRT_SECTINFO_sched_futexlock                          /* .text.crt.sched.futexlock.futexlock_timedwaitlock */
@@ -2917,8 +2917,8 @@
 #define __CRT_SECTION_lfutexlock64                          __CRT_SECTINFO_sched_futexlock                          /* .text.crt.sched.futexlock.lfutexlock64 */
 
 /* .text.crt.sched.futexlockexpr.* */
-#define __CRT_SECTION_lfutexlockexpr64                      __CRT_SECTINFO_sched_futexlockexpr                      /* .text.crt.sched.futexlockexpr.lfutexlockexpr64 */
 #define __CRT_SECTION_lfutexlockexpr                        __CRT_SECTINFO_sched_futexlockexpr                      /* .text.crt.sched.futexlockexpr.lfutexlockexpr */
+#define __CRT_SECTION_lfutexlockexpr64                      __CRT_SECTINFO_sched_futexlockexpr                      /* .text.crt.sched.futexlockexpr.lfutexlockexpr64 */
 
 /* .text.crt.sched.msg.* */
 #define __CRT_SECTION_msgctl                                __CRT_SECTINFO_sched_msg                                /* .text.crt.sched.msg.msgctl */
@@ -3087,8 +3087,8 @@
 #define __CRT_SECTION_pthread_yield                         __CRT_SECTINFO_sched_pthread                            /* .text.crt.sched.pthread.pthread_yield */
 
 /* .text.crt.sched.pthread_ext.* */
-#define __CRT_SECTION_pthread_set_num_processors_np         __CRT_SECTINFO_sched_pthread_ext                        /* .text.crt.sched.pthread_ext.pthread_set_num_processors_np */
 #define __CRT_SECTION_pthread_num_processors_np             __CRT_SECTINFO_sched_pthread_ext                        /* .text.crt.sched.pthread_ext.pthread_num_processors_np */
+#define __CRT_SECTION_pthread_set_num_processors_np         __CRT_SECTINFO_sched_pthread_ext                        /* .text.crt.sched.pthread_ext.pthread_set_num_processors_np */
 
 /* .text.crt.sched.resource.* */
 #define __CRT_SECTION_getpriority                           __CRT_SECTINFO_sched_resource                           /* .text.crt.sched.resource.getpriority */
@@ -3159,8 +3159,8 @@
 #define __CRT_SECTION_signalfd                              __CRT_SECTINFO_sched_signalfd                           /* .text.crt.sched.signalfd.signalfd */
 
 /* .text.crt.sched.thread.* */
-#define __CRT_SECTION_sched_yield                           __CRT_SECTINFO_sched_thread                             /* .text.crt.sched.thread.sched_yield */
 #define __CRT_SECTION_gettid                                __CRT_SECTINFO_sched_thread                             /* .text.crt.sched.thread.gettid */
+#define __CRT_SECTION_sched_yield                           __CRT_SECTINFO_sched_thread                             /* .text.crt.sched.thread.sched_yield */
 
 /* .text.crt.sched.threads.* */
 #define __CRT_SECTION_cnd_broadcast                         __CRT_SECTINFO_sched_threads                            /* .text.crt.sched.threads.cnd_broadcast */
@@ -3552,8 +3552,8 @@
 #define __CRT_SECTION_sysinfo                               __CRT_SECTINFO_system_info                              /* .text.crt.system.info.sysinfo */
 
 /* .text.crt.system.ioperm.* */
-#define __CRT_SECTION_iopl                                  __CRT_SECTINFO_system_ioperm                            /* .text.crt.system.ioperm.iopl */
 #define __CRT_SECTION_ioperm                                __CRT_SECTINFO_system_ioperm                            /* .text.crt.system.ioperm.ioperm */
+#define __CRT_SECTION_iopl                                  __CRT_SECTINFO_system_ioperm                            /* .text.crt.system.ioperm.iopl */
 
 /* .text.crt.system.mman.* */
 #define __CRT_SECTION_madvise                               __CRT_SECTINFO_system_mman                              /* .text.crt.system.mman.madvise */
@@ -3708,8 +3708,8 @@
 #define __CRT_SECTION_unicode_writeutf8                     __CRT_SECTINFO_unicode_UTF                              /* .text.crt.unicode.UTF.unicode_writeutf8 */
 
 /* .text.crt.unicode.locale.convert.* */
-#define __CRT_SECTION_strtoumax_l                           __CRT_SECTINFO_unicode_locale_convert                   /* .text.crt.unicode.locale.convert.strtoumax_l */
 #define __CRT_SECTION_strtoimax_l                           __CRT_SECTINFO_unicode_locale_convert                   /* .text.crt.unicode.locale.convert.strtoimax_l */
+#define __CRT_SECTION_strtoumax_l                           __CRT_SECTINFO_unicode_locale_convert                   /* .text.crt.unicode.locale.convert.strtoumax_l */
 
 /* .text.crt.unicode.locale.ctype.* */
 #define __CRT_SECTION___locale_ctype_ptr_l                  __CRT_SECTINFO_unicode_locale_ctype                     /* .text.crt.unicode.locale.ctype.__locale_ctype_ptr_l */
@@ -3835,8 +3835,8 @@
 #define __CRT_SECTION_vsprintf                              __CRT_SECTINFO_unicode_static_format_printf             /* .text.crt.unicode.static.format.printf.vsprintf */
 
 /* .text.crt.unicode.static.format.scanf.* */
-#define __CRT_SECTION_vsscanf                               __CRT_SECTINFO_unicode_static_format_scanf              /* .text.crt.unicode.static.format.scanf.vsscanf */
 #define __CRT_SECTION_sscanf                                __CRT_SECTINFO_unicode_static_format_scanf              /* .text.crt.unicode.static.format.scanf.sscanf */
+#define __CRT_SECTION_vsscanf                               __CRT_SECTINFO_unicode_static_format_scanf              /* .text.crt.unicode.static.format.scanf.vsscanf */
 
 /* .text.crt.unicode.static.memory.* */
 #define __CRT_SECTION_fuzzy_memcasecmp                      __CRT_SECTINFO_unicode_static_memory                    /* .text.crt.unicode.static.memory.fuzzy_memcasecmp */
@@ -3961,8 +3961,8 @@
 #define __CRT_SECTION_klogctl                               __CRT_SECTINFO_utility_klog                             /* .text.crt.utility.klog.klogctl */
 
 /* .text.crt.utility.monetary.* */
-#define __CRT_SECTION_strfmon_l                             __CRT_SECTINFO_utility_monetary                         /* .text.crt.utility.monetary.strfmon_l */
 #define __CRT_SECTION_strfmon                               __CRT_SECTINFO_utility_monetary                         /* .text.crt.utility.monetary.strfmon */
+#define __CRT_SECTION_strfmon_l                             __CRT_SECTINFO_utility_monetary                         /* .text.crt.utility.monetary.strfmon_l */
 
 /* .text.crt.utility.regex.* */
 #define __CRT_SECTION_re_compile_fastmap                    __CRT_SECTINFO_utility_regex                            /* .text.crt.utility.regex.re_compile_fastmap */
@@ -4017,8 +4017,8 @@
 #define __CRT_SECTION_wpopen                                __CRT_SECTINFO_wchar_FILE_locked_access                 /* .text.crt.wchar.FILE.locked.access.wpopen */
 
 /* .text.crt.wchar.FILE.locked.read.getc.* */
-#define __CRT_SECTION_getwchar                              __CRT_SECTINFO_wchar_FILE_locked_read_getc              /* .text.crt.wchar.FILE.locked.read.getc.getwchar */
 #define __CRT_SECTION_fgetwc                                __CRT_SECTINFO_wchar_FILE_locked_read_getc              /* .text.crt.wchar.FILE.locked.read.getc.fgetwc */
+#define __CRT_SECTION_getwchar                              __CRT_SECTINFO_wchar_FILE_locked_read_getc              /* .text.crt.wchar.FILE.locked.read.getc.getwchar */
 
 /* .text.crt.wchar.FILE.locked.read.read.* */
 #define __CRT_SECTION_fgetws                                __CRT_SECTINFO_wchar_FILE_locked_read_read              /* .text.crt.wchar.FILE.locked.read.read.fgetws */
@@ -4049,8 +4049,8 @@
 #define __CRT_SECTION_fputws                                __CRT_SECTINFO_wchar_FILE_locked_write_write            /* .text.crt.wchar.FILE.locked.write.write.fputws */
 
 /* .text.crt.wchar.FILE.unlocked.read.getc.* */
-#define __CRT_SECTION_getwchar_unlocked                     __CRT_SECTINFO_wchar_FILE_unlocked_read_getc            /* .text.crt.wchar.FILE.unlocked.read.getc.getwchar_unlocked */
 #define __CRT_SECTION_fgetwc_unlocked                       __CRT_SECTINFO_wchar_FILE_unlocked_read_getc            /* .text.crt.wchar.FILE.unlocked.read.getc.fgetwc_unlocked */
+#define __CRT_SECTION_getwchar_unlocked                     __CRT_SECTINFO_wchar_FILE_unlocked_read_getc            /* .text.crt.wchar.FILE.unlocked.read.getc.getwchar_unlocked */
 
 /* .text.crt.wchar.FILE.unlocked.read.read.* */
 #define __CRT_SECTION_fgetws_unlocked                       __CRT_SECTINFO_wchar_FILE_unlocked_read_read            /* .text.crt.wchar.FILE.unlocked.read.read.fgetws_unlocked */
@@ -4104,12 +4104,12 @@
 #define __CRT_SECTION_wremove                               __CRT_SECTINFO_wchar_fs_modify                          /* .text.crt.wchar.fs.modify.wremove */
 
 /* .text.crt.wchar.fs.modify_time.* */
-#define __CRT_SECTION_wutime64                              __CRT_SECTINFO_wchar_fs_modify_time                     /* .text.crt.wchar.fs.modify_time.wutime64 */
 #define __CRT_SECTION_wutime                                __CRT_SECTINFO_wchar_fs_modify_time                     /* .text.crt.wchar.fs.modify_time.wutime */
+#define __CRT_SECTION_wutime64                              __CRT_SECTINFO_wchar_fs_modify_time                     /* .text.crt.wchar.fs.modify_time.wutime64 */
 
 /* .text.crt.wchar.heap.strdup.* */
-#define __CRT_SECTION_wcsndup                               __CRT_SECTINFO_wchar_heap_strdup                        /* .text.crt.wchar.heap.strdup.wcsndup */
 #define __CRT_SECTION_wcsdup                                __CRT_SECTINFO_wchar_heap_strdup                        /* .text.crt.wchar.heap.strdup.wcsdup */
+#define __CRT_SECTION_wcsndup                               __CRT_SECTINFO_wchar_heap_strdup                        /* .text.crt.wchar.heap.strdup.wcsndup */
 
 /* .text.crt.wchar.string.format.* */
 #define __CRT_SECTION_format_vwprintf                       __CRT_SECTINFO_wchar_string_format                      /* .text.crt.wchar.string.format.format_vwprintf */
@@ -4270,12 +4270,12 @@
 #define __CRT_SECTION_towupper                              __CRT_SECTINFO_wchar_unicode_static_ctype               /* .text.crt.wchar.unicode.static.ctype.towupper */
 
 /* .text.crt.wchar.unicode.static.format.printf.* */
-#define __CRT_SECTION_vswprintf                             __CRT_SECTINFO_wchar_unicode_static_format_printf       /* .text.crt.wchar.unicode.static.format.printf.vswprintf */
 #define __CRT_SECTION_swprintf                              __CRT_SECTINFO_wchar_unicode_static_format_printf       /* .text.crt.wchar.unicode.static.format.printf.swprintf */
+#define __CRT_SECTION_vswprintf                             __CRT_SECTINFO_wchar_unicode_static_format_printf       /* .text.crt.wchar.unicode.static.format.printf.vswprintf */
 
 /* .text.crt.wchar.unicode.static.format.scanf.* */
-#define __CRT_SECTION_vswscanf                              __CRT_SECTINFO_wchar_unicode_static_format_scanf        /* .text.crt.wchar.unicode.static.format.scanf.vswscanf */
 #define __CRT_SECTION_swscanf                               __CRT_SECTINFO_wchar_unicode_static_format_scanf        /* .text.crt.wchar.unicode.static.format.scanf.swscanf */
+#define __CRT_SECTION_vswscanf                              __CRT_SECTINFO_wchar_unicode_static_format_scanf        /* .text.crt.wchar.unicode.static.format.scanf.vswscanf */
 
 /* .text.crt.wchar.unicode.static.format.strftime.* */
 #define __CRT_SECTION_wcsftime                              __CRT_SECTINFO_wchar_unicode_static_format_strftime     /* .text.crt.wchar.unicode.static.format.strftime.wcsftime */

@@ -347,8 +347,8 @@ NOTHROW_NCX(LIBCCALL libc__recalloc_dbg)(void *ptr,
 }
 /*[[[end:_recalloc_dbg]]]*/
 
-/*[[[head:_expand_dbg,hash:CRC-32=0x266a03f4]]]*/
-INTERN WUNUSED NONNULL((1)) ATTR_ALLOC_SIZE((2))
+/*[[[head:_expand_dbg,hash:CRC-32=0xe7dd7e2f]]]*/
+INTERN WUNUSED ATTR_ALLOC_SIZE((2)) NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._expand_dbg") void *
 NOTHROW_NCX(LIBCCALL libc__expand_dbg)(void *ptr,
                                        size_t num_bytes,
@@ -388,8 +388,8 @@ NOTHROW_NCX(LIBCCALL libc__msize_dbg)(void *ptr,
 /*[[[end:_msize_dbg]]]*/
 
 
-/*[[[head:_aligned_malloc_dbg,hash:CRC-32=0x1d1b470d]]]*/
-INTERN ATTR_MALLOC WUNUSED ATTR_ALLOC_SIZE((1)) ATTR_ALLOC_ALIGN(2)
+/*[[[head:_aligned_malloc_dbg,hash:CRC-32=0x68c67824]]]*/
+INTERN ATTR_MALLOC WUNUSED ATTR_ALLOC_ALIGN(2) ATTR_ALLOC_SIZE((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._aligned_malloc_dbg") void *
 NOTHROW_NCX(LIBCCALL libc__aligned_malloc_dbg)(size_t num_bytes,
                                                size_t min_alignment,
@@ -403,8 +403,8 @@ NOTHROW_NCX(LIBCCALL libc__aligned_malloc_dbg)(size_t num_bytes,
 }
 /*[[[end:_aligned_malloc_dbg]]]*/
 
-/*[[[head:_aligned_realloc_dbg,hash:CRC-32=0xa820728c]]]*/
-INTERN WUNUSED ATTR_ALLOC_SIZE((2)) ATTR_ALLOC_ALIGN(3)
+/*[[[head:_aligned_realloc_dbg,hash:CRC-32=0x1bbcae20]]]*/
+INTERN WUNUSED ATTR_ALLOC_ALIGN(3) ATTR_ALLOC_SIZE((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._aligned_realloc_dbg") void *
 NOTHROW_NCX(LIBCCALL libc__aligned_realloc_dbg)(void *ptr,
                                                 size_t num_bytes,
@@ -419,8 +419,8 @@ NOTHROW_NCX(LIBCCALL libc__aligned_realloc_dbg)(void *ptr,
 }
 /*[[[end:_aligned_realloc_dbg]]]*/
 
-/*[[[head:_aligned_recalloc_dbg,hash:CRC-32=0x2265bf66]]]*/
-INTERN WUNUSED ATTR_ALLOC_SIZE((2, 3)) ATTR_ALLOC_ALIGN(4)
+/*[[[head:_aligned_recalloc_dbg,hash:CRC-32=0x3aa7e3cc]]]*/
+INTERN WUNUSED ATTR_ALLOC_ALIGN(4) ATTR_ALLOC_SIZE((2, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._aligned_recalloc_dbg") void *
 NOTHROW_NCX(LIBCCALL libc__aligned_recalloc_dbg)(void *ptr,
                                                  size_t count,

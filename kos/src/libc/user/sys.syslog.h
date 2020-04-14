@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe7ea022a */
+/* HASH CRC-32:0xcd6aca36 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,8 +31,8 @@ DECL_BEGIN
 INTDEF void NOTHROW_NCX(LIBCCALL libc_closelog)(void);
 INTDEF void NOTHROW_RPC(LIBCCALL libc_openlog)(char const *ident, int option, int facility);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_setlogmask)(int mask);
-INTDEF NONNULL((2)) ATTR_LIBC_PRINTF(2,3) void NOTHROW_RPC(VLIBCCALL libc_syslog)(int level, char const *format, ...);
-INTDEF NONNULL((2)) ATTR_LIBC_PRINTF(2,0) void NOTHROW_RPC(LIBCCALL libc_vsyslog)(int level, char const *format, va_list args);
+INTDEF ATTR_LIBC_PRINTF(2,3) NONNULL((2)) void NOTHROW_RPC(VLIBCCALL libc_syslog)(int level, char const *format, ...);
+INTDEF ATTR_LIBC_PRINTF(2,0) NONNULL((2)) void NOTHROW_RPC(LIBCCALL libc_vsyslog)(int level, char const *format, va_list args);
 /* Helper functions for printing to the system log */
 INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_syslog_printer)(void *arg, char const *__restrict data, size_t datalen);
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x54195df9 */
+/* HASH CRC-32:0xb31719d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@
 #ifdef __std___localdep_vwprintf_defined
 __NAMESPACE_STD_USING(__localdep_vwprintf)
 #elif defined(__CRT_HAVE_vwprintf)
-__CREDIRECT(__ATTR_NONNULL((1)) __ATTR_LIBC_WPRINTF(1, 0),__STDC_INT_AS_SIZE_T,,__localdep_vwprintf,(__WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),vwprintf,(__format,__args)) __THROWS(...)
+__CREDIRECT(__ATTR_LIBC_WPRINTF(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,,__localdep_vwprintf,(__WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),vwprintf,(__format,__args)) __THROWS(...)
 #elif (defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_vfwprintf)) && !defined(__NO_STDSTREAMS)
 #include <local/wchar/vwprintf.h>
 #define __localdep_vwprintf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vwprintf))
@@ -38,7 +38,7 @@ __CREDIRECT(__ATTR_NONNULL((1)) __ATTR_LIBC_WPRINTF(1, 0),__STDC_INT_AS_SIZE_T,,
 #endif /* !____localdep_vwprintf_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(wprintf) __ATTR_NONNULL((1)) __ATTR_LIBC_WPRINTF(1, 2) __STDC_INT_AS_SIZE_T
+__LOCAL_LIBC(wprintf) __ATTR_LIBC_WPRINTF(1, 2) __ATTR_NONNULL((1)) __STDC_INT_AS_SIZE_T
 (__VLIBCCALL __LIBC_LOCAL_NAME(wprintf))(__WCHAR_TYPE__ const *__restrict __format,
                                          ...) __THROWS(...) {
 #line 654 "kos/src/libc/magic/wchar.c"

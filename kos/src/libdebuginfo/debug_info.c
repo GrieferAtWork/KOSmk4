@@ -2038,9 +2038,9 @@ libdi_debuginfo_do_print_value(pformatprinter printer, void *arg,
 		    datasize > type->t_sizeof)
 			datasize = type->t_sizeof;
 		switch (type->t_encoding) {
-		{
+
+		case DW_ATE_address: {
 			uintptr_t addr;
-		case DW_ATE_address:
 generic_print_address:
 #if __SIZEOF_POINTER__ >= 8
 			if (datasize >= 8)
@@ -2062,9 +2062,8 @@ generic_print_address:
 			FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_SUFFIX);
 		}	break;
 
-		{
+		case DW_ATE_boolean: {
 			uint64_t value;
-		case DW_ATE_boolean:
 			if (datasize >= 8)
 				value = UNALIGNED_GET64((uint64_t *)data);
 			else if (datasize >= 4)
@@ -2588,6 +2587,31 @@ err:
 }
 
 
+/* Print the C/C++-like representation of a given value, given DWARF debug information
+ * about its typing, where `parser' must have been set up to have already loaded the
+ * given `type' component for the given data blob:
+ * >> di_debuginfo_variable_t var;
+ * >> ... // Load `var'
+ * >> {
+ * >>     di_debuginfo_cu_parser_t pp = parser;
+ * >>     di_debuginfo_type_t typ;
+ * >>     void *buffer;
+ * >>
+ * >>     // Load type information for the variable.
+ * >>     pp.dup_cu_info_pos = var.v_type;
+ * >>     debuginfo_cu_parser_loadattr_type(&pp, &typ);
+ * >>
+ * >>     // Load the value of this variable.
+ * >>     buffer = malloca(typ.t_sizeof);
+ * >>     debug_cfa_getvalue(&REGISTERS, &GET_REGISTER, var.v_location, buffer, typ.t_sizeof);
+ * >>
+ * >>     // Print a representation of the variable, and its data.
+ * >>     debuginfo_print_value(PRINTER, ARG, &pp, &type, v.v_name, buffer, typ.t_sizeof);
+ * >> }
+ * @param: varname: Name of the value (when NULL, print as a cast-like expression;
+ *                  otherwise, print as an declaration)
+ * @param: flags:   Set of `DEBUGINFO_PRINT_VALUE_F*'
+ */
 INTERN TEXTSECTION NONNULL((1, 3, 4, 6)) ssize_t CC
 libdi_debuginfo_print_value(pformatprinter printer, void *arg,
                             di_debuginfo_cu_parser_t const *__restrict parser,

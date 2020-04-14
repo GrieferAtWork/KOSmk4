@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8c204813 */
+/* HASH CRC-32:0x424b0f79 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,9 +24,9 @@
 #ifndef ____localdep__vsnscanf_defined
 #define ____localdep__vsnscanf_defined 1
 #ifdef __CRT_HAVE__vsnscanf
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __ATTR_LIBC_SCANF(3, 4),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep__vsnscanf,(char const *__restrict __input, __SIZE_TYPE__ __inputlen, char const *__restrict __format, __builtin_va_list __args),_vsnscanf,(__input,__inputlen,__format,__args))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(3, 4) __ATTR_NONNULL((1, 3)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep__vsnscanf,(char const *__restrict __input, __SIZE_TYPE__ __inputlen, char const *__restrict __format, __builtin_va_list __args),_vsnscanf,(__input,__inputlen,__format,__args))
 #elif defined(__CRT_HAVE__vsnscanf_s)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __ATTR_LIBC_SCANF(3, 4),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep__vsnscanf,(char const *__restrict __input, __SIZE_TYPE__ __inputlen, char const *__restrict __format, __builtin_va_list __args),_vsnscanf_s,(__input,__inputlen,__format,__args))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(3, 4) __ATTR_NONNULL((1, 3)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep__vsnscanf,(char const *__restrict __input, __SIZE_TYPE__ __inputlen, char const *__restrict __format, __builtin_va_list __args),_vsnscanf_s,(__input,__inputlen,__format,__args))
 #else /* LIBC: _vsnscanf */
 #include <local/stdio/_vsnscanf.h>
 #define __localdep__vsnscanf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_vsnscanf))
@@ -34,7 +34,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __ATTR_LIBC_SCANF(3, 4),__STDC
 #endif /* !____localdep__vsnscanf_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_vsnscanf_l) __ATTR_NONNULL((1, 3)) __ATTR_LIBC_SCANF(3, 5) __STDC_INT_AS_SIZE_T
+__LOCAL_LIBC(_vsnscanf_l) __ATTR_LIBC_SCANF(3, 5) __ATTR_NONNULL((1, 3)) __STDC_INT_AS_SIZE_T
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vsnscanf_l))(char const *__restrict __input,
                                                          __SIZE_TYPE__ __inputlen,
                                                          char const *__restrict __format,

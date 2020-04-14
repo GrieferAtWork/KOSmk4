@@ -116,17 +116,17 @@ typedef struct di_debuginfo_component_struct {
 } di_debuginfo_component_t;
 
 typedef struct di_debuginfo_cu_parser_sections_struct {
-	__byte_t                *cps_debug_abbrev_start; /* [1..1][const] Starting address of `.debug_abbrev' */
-	__byte_t                *cps_debug_abbrev_end;   /* [1..1][const] End address of `.debug_abbrev' */
-	__byte_t                *cps_debug_loc_start;    /* [0..1][const] Starting address of `.debug_loc'
-	                                                  * NOTE: When set equal to `cps_debug_loc_end', location list expression
-	                                                  *       cannot be used and will appear as though they weren't present at
-	                                                  *       all. */
-	__byte_t                *cps_debug_loc_end;      /* [0..1][const] End address of `.debug_loc' */
-	__byte_t                *cps_debug_str_start;    /* [0..1][const] Starting address of `.debug_str'
-	                                                  * NOTE: When set equal to `cps_debug_str_end', strings referring to
-	                                                  *       this section will be returned as `???' (3 question marks) */
-	__byte_t                *cps_debug_str_end;      /* [0..1][const] End address of `.debug_str' */
+	__byte_t *cps_debug_abbrev_start; /* [1..1][const] Starting address of `.debug_abbrev' */
+	__byte_t *cps_debug_abbrev_end;   /* [1..1][const] End address of `.debug_abbrev' */
+	__byte_t *cps_debug_loc_start;    /* [0..1][const] Starting address of `.debug_loc'
+	                                   * NOTE: When set equal to `cps_debug_loc_end', location list expression
+	                                   *       cannot be used and will appear as though they weren't present at
+	                                   *       all. */
+	__byte_t *cps_debug_loc_end;      /* [0..1][const] End address of `.debug_loc' */
+	__byte_t *cps_debug_str_start;    /* [0..1][const] Starting address of `.debug_str'
+	                                   * NOTE: When set equal to `cps_debug_str_end', strings referring to
+	                                   *       this section will be returned as `???' (3 question marks) */
+	__byte_t *cps_debug_str_end;      /* [0..1][const] End address of `.debug_str' */
 } di_debuginfo_cu_parser_sections_t;
 
 typedef struct di_debuginfo_cu_abbrev_cache_entry_struct {
@@ -728,14 +728,14 @@ typedef __ATTR_NONNULL((2)) __ssize_t
  * >>
  * >>     // Load type information for the variable.
  * >>     pp.dup_cu_info_pos = var.v_type;
- * >>     debuginfo_cu_parser_loadattr_type(&pp,&typ);
+ * >>     debuginfo_cu_parser_loadattr_type(&pp, &typ);
  * >>
  * >>     // Load the value of this variable.
  * >>     buffer = malloca(typ.t_sizeof);
- * >>     debug_cfa_getvalue(&REGISTERS,&GET_REGISTER,var.v_location,buffer,typ.t_sizeof);
+ * >>     debug_cfa_getvalue(&REGISTERS, &GET_REGISTER, var.v_location, buffer, typ.t_sizeof);
  * >>
  * >>     // Print a representation of the variable, and its data.
- * >>     debuginfo_print_value(PRINTER,ARG,&pp,&type,v.v_name,buffer,typ.t_sizeof);
+ * >>     debuginfo_print_value(PRINTER, ARG, &pp, &type, v.v_name, buffer, typ.t_sizeof);
  * >> }
  * @param: varname: Name of the value (when NULL, print as a cast-like expression;
  *                  otherwise, print as an declaration)
@@ -794,8 +794,10 @@ typedef struct di_enum_locals_sections_struct {
 	__byte_t *el_debug_ranges_start;  /* [0..1] Starting address of the `.debug_ranges' section */
 	__byte_t *el_debug_ranges_end;    /* [0..1] End address of the `.debug_ranges' section */
 } di_enum_locals_sections_t;
-#define di_enum_locals_sections_as_unwind_emulator_sections(x)        ((struct unwind_emulator_sections_struct *)(x))
-#define di_enum_locals_sections_as_di_debuginfo_cu_parser_sections(x) ((struct di_debuginfo_cu_parser_sections_struct *)&(x)->el_debug_abbrev_start)
+#define di_enum_locals_sections_as_unwind_emulator_sections(x) \
+	((struct unwind_emulator_sections_struct *)(x))
+#define di_enum_locals_sections_as_di_debuginfo_cu_parser_sections(x) \
+	((struct di_debuginfo_cu_parser_sections_struct *)&(x)->el_debug_abbrev_start)
 
 
 /* Callback for `debuginfo_enum_locals()' */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d334952 */
+/* HASH CRC-32:0xd812f051 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,9 +44,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,
 #ifndef ____localdep_memdup_defined
 #define ____localdep_memdup_defined 1
 #ifdef __CRT_HAVE_memdup
-__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_memdup,(void const *__restrict __ptr, __SIZE_TYPE__ __n_bytes),memdup,(__ptr,__n_bytes))
+__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memdup,(void const *__restrict __ptr, __SIZE_TYPE__ __n_bytes),memdup,(__ptr,__n_bytes))
 #elif defined(__CRT_HAVE___memdup)
-__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_memdup,(void const *__restrict __ptr, __SIZE_TYPE__ __n_bytes),__memdup,(__ptr,__n_bytes))
+__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memdup,(void const *__restrict __ptr, __SIZE_TYPE__ __n_bytes),__memdup,(__ptr,__n_bytes))
 #elif defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_malloc)
 #include <local/malloc/memdup.h>
 #define __localdep_memdup (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memdup))
@@ -56,7 +56,7 @@ __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONN
 #endif /* !____localdep_memdup_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(memcdup) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_ALLOC_SIZE((2)) void *
+__LOCAL_LIBC(memcdup) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_NONNULL((1)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcdup))(void const *__restrict __ptr,
                                                      int __needle,
                                                      __SIZE_TYPE__ __n_bytes) {

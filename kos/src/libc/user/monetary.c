@@ -31,8 +31,8 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:strfmon,hash:CRC-32=0xb8cc79dc]]]*/
-INTERN NONNULL((1, 3)) ATTR_LIBC_STRFMON(3, 4)
+/*[[[head:strfmon,hash:CRC-32=0xf98316ab]]]*/
+INTERN ATTR_LIBC_STRFMON(3, 4) NONNULL((1, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.utility.monetary.strfmon") ssize_t
 NOTHROW_NCX(VLIBCCALL libc_strfmon)(char *__restrict s,
                                     size_t maxsize,
@@ -49,8 +49,8 @@ NOTHROW_NCX(VLIBCCALL libc_strfmon)(char *__restrict s,
 }
 /*[[[end:strfmon]]]*/
 
-/*[[[head:strfmon_l,hash:CRC-32=0xb5fdf0cf]]]*/
-INTERN NONNULL((1, 4)) ATTR_LIBC_STRFMON(4, 5)
+/*[[[head:strfmon_l,hash:CRC-32=0xf1cc417]]]*/
+INTERN ATTR_LIBC_STRFMON(4, 5) NONNULL((1, 4))
 ATTR_WEAK ATTR_SECTION(".text.crt.utility.monetary.strfmon_l") ssize_t
 NOTHROW_NCX(VLIBCCALL libc_strfmon_l)(char *__restrict s,
                                       size_t maxsize,
