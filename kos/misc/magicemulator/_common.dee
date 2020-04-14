@@ -292,6 +292,99 @@ class TraceController {
 }
 
 
+
+@@While it is impossible to get rid of the `cmd:' prefix on anything
+@@that we write to stdout ourself, it _is_ possible to hi-jack the
+@@stdout output stream of GDB:
+@@>> // NOTE: `hGDB' needs permissions:
+@@>> //   - PROCESS_QUERY_LIMITED_INFORMATION (identification)
+@@>> //   - PROCESS_DUP_HANDLE                (DuplicateHandle())
+@@>> //   - PROCESS_VM_READ                   (Read out the PEB)
+@@>> hGDB = FileProcessByName("gdb.exe");
+@@>> // ADDRESS_OF_PEB can be determined programmatically!
+@@>> // ProcessHacker has an option for this
+@@>> PEB = ProcessReadMemory(hGDB, <ADDRESS_OF_PEB>);
+@@>> hRemoteHandle = PEB.<STD_OUTPUT_HANDLE>;
+@@>> hGDBStdout = DuplicateHandle(hGDB, hRemoteHandle, GetCurrentProcess());
+@@>> // NOTE: It is important that the data buffer of this write isn't
+@@>> //       too large, since Windows might otherwise decide to only write
+@@>> //       a portion of it (causing any future data that the real GDB might
+@@>> //       try to write to end up inside of the message string we're trying
+@@>> //       to output to Visual Studio)
+@@>> //       That's fine however, since the messages written as ~"..." have
+@@>> //       their own buffer, and are re-assembled by Visual Studio as they
+@@>> //       are written by GDB. Furthermore, GDB doesn't make much use of
+@@>> //       the ~-stream (except for the initial greeting after startup)
+@@>> //       As such, we're pretty safe in using it for our own purposes!
+@@>> WriteFile(hGDBStdout, "~{!r}\n".format({
+@@>>     "Hello World (from " + GetCurrentProcessId() + ")\n"
+@@>> }));
+@@>> CloseHandle(hGDB);
+@@Output written with this method will appear unfiltered in the Output window
+@@in such a way that click-to-go-to-source is possible!
+@@NOTE: I've also tested what happens when GDB exists while we still have
+@@      a handle to its standard output handle. - It behaves normally, in
+@@      that Visual Studio appears to wait for GDB to terminate, and simply
+@@      ignores anyone else still having an open handle to GDB's old stdout
+@@      As a matter of fact, Visual Studio uses a Pipe for capturing the
+@@      output from GDB, and that pipe is closed once Visual Studio closes
+@@      its reader-end of said pipe (causing us attempting to write more
+@@      data in WriteFile() throwing an exception!)
+function reOpenProcessStdoutAndWrapAsGdbMIMessageStream(processName: string): Callable | none {
+	local _reopenhandle, win32, hGDB;
+	try {
+		_reopenhandle = import("._reopenhandle");
+		win32 = import("win32");
+		hGDB = _reopenhandle.FindProcessByImageName(processName);
+	} catch (...) {
+		return none;
+	}
+	/* XXX: Verify that `hGDB' is the correct instance of GDB? */
+	try {
+		local hGDBStdout = _reopenhandle.GetProcessStdHandles(hGDB)[1];
+		local hMyGDBStdout = win32.DuplicateHandle(
+			hGDB, hGDBStdout, win32.GetCurrentProcess());
+		try {
+			/* Overwrite the write-to-stdout callback to
+			 * instead perform writes to `hMyGDBStdout'! */
+			local write2gdb = File.System(hMyGDBStdout, inherit: true).write;
+			return [](data: string | Bytes) {
+				local final MAX_PACKET_SIZE = 512;
+#if 1 /* Technically, this is incorrect. GDB documents that the ~-stream
+       * should be used for "[...] the textual responses to CLI commands"
+       * https://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Stream-Records.html
+       * And that the @-stream should be used for what we're doing, as it
+       * contains "[...] any textual output from the running target".
+       * However, Visual Studio doesn't understand/support the @-stream,
+       * though it does understand (and accept at any point in time), messages
+       * received via the ~-stream (which it displays without any further
+       * processing of the output, and is exactly what we want to achieve) */
+				local final FORMAT = "~{!r}\n";
+#else
+				local final FORMAT = "@{!r}\n";
+#endif
+				if (data !is string) {
+					if (data is Bytes)
+						data = data.decode("utf-8");
+					else {
+						data = str(data);
+					}
+				}
+				while (#data > MAX_PACKET_SIZE) {
+					write2gdb(FORMAT.format({ data[:MAX_PACKET_SIZE] }));
+					data = data[MAX_PACKET_SIZE:];
+				}
+				write2gdb(FORMAT.format({ data }));
+			};
+		} catch (...) {
+			win32.CloseHandle(hMyGDBStdout);
+			throw;
+		}
+	} finally {
+		win32.CloseHandle(hGDB);
+	}
+}
+
 function processKosDebugOutput(
 		r: File,
 		groups: {Group...},
@@ -299,6 +392,23 @@ function processKosDebugOutput(
 		monitorCommandPipe: File | none = none,
 		options: {string: string} | none = none) {
 	writeStdout = File.stddbg.write;
+	local processName = options.get("redirect.stdout");
+	if (processName !is none) {
+		/* Setup the writeStdout function to re-direct itself to inject
+		 * its output into gdb.exe:stdout, such that all future calls
+		 * are simply forwarded to that handle. */
+		writeStdout = [](data) {
+			/* Capture the stdout of `processName' to inject our output into it. */
+			writeStdout = reOpenProcessStdoutAndWrapAsGdbMIMessageStream(processName);
+			if (writeStdout is none) {
+				print File.stderr: (
+					"[redirect.stdout] Failed to hi-jack stdout of process ",
+					repr(processName));
+				writeStdout = File.stddbg.write;
+			}
+			writeStdout(data);
+		};
+	}
 #undef CONFIG_POSTPROCESS_QEMU_SERIAL_OUTPUT
 #define CONFIG_POSTPROCESS_QEMU_SERIAL_OUTPUT 1
 #ifndef CONFIG_POSTPROCESS_QEMU_SERIAL_OUTPUT
@@ -498,94 +608,6 @@ again_find_match:
 						running_addr2line[argument] = a2l;
 					}
 					break;
-
-				/* While it is impossible to get rid of the `cmd:' prefix on anything
-				 * that we write to stdout ourself, it _is_ possible to hi-jack the
-				 * stdout output stream of GDB:
-				 * >> // NOTE: `hGDB' needs permissions:
-				 * >> //   - PROCESS_QUERY_LIMITED_INFORMATION (identification)
-				 * >> //   - PROCESS_DUP_HANDLE                (DuplicateHandle())
-				 * >> //   - PROCESS_VM_READ                   (Read out the PEB)
-				 * >> hGDB = FileProcessByName("gdb.exe");
-				 * >> // ADDRESS_OF_PEB can be determined programmatically!
-				 * >> // ProcessHacker has an option for this
-				 * >> PEB = ProcessReadMemory(hGDB, <ADDRESS_OF_PEB>);
-				 * >> hRemoteHandle = PEB.<STD_OUTPUT_HANDLE>;
-				 * >> hGDBStdout = DuplicateHandle(hGDB, hRemoteHandle, GetCurrentProcess());
-				 * >> // NOTE: It is important that the data buffer of this write isn't
-				 * >> //       too large, since Windows might otherwise decide to only write
-				 * >> //       a portion of it (causing any future data that the real GDB might
-				 * >> //       try to write to end up inside of the message string we're trying
-				 * >> //       to output to Visual Studio)
-				 * >> //       That's fine however, since the messages written as ~"..." have
-				 * >> //       their own buffer, and are re-assembled by Visual Studio as they
-				 * >> //       are written by GDB. Furthermore, GDB doesn't make much use of
-				 * >> //       the ~-stream (except for the initial greeting after startup)
-				 * >> //       As such, we're pretty safe in using it for our own purposes!
-				 * >> WriteFile(hGDBStdout, "~{!r}\n".format({
-				 * >>     "Hello World (from " + GetCurrentProcessId() + ")\n"
-				 * >> }));
-				 * >> CloseHandle(hGDB);
-				 * Output written with this method will appear unfiltered in the Output window
-				 * in such a way that click-to-go-to-source is possible!
-				 * NOTE: I've also tested what happens when GDB exists while we still have
-				 *       a handle to its standard output handle. - It behaves normally, in
-				 *       that Visual Studio appears to wait for GDB to terminate, and simply
-				 *       ignores anyone else still having an open handle to GDB's old stdout
-				 *       As a matter of fact, Visual Studio uses a Pipe for capturing the
-				 *       output from GDB, and that pipe is closed once Visual Studio closes
-				 *       its reader-end of said pipe (causing us attempting to write more
-				 *       data in WriteFile() throwing an exception!) */
-				case "redirect_stdout_gdb": {
-					local processName = options.get("redirect_stdout_gdb");
-					if (processName is none)
-						break;
-					local _reopenhandle = try import("._reopenhandle") catch (...) none;
-					if (_reopenhandle !is none) {
-						local win32 = import("win32");
-						local hGDB;
-						try {
-							hGDB = _reopenhandle.FindProcessByImageName(processName);
-						} catch (e...) {
-							writeStdout("\n>Stdout redirect failed:\n");
-							writeStdout(str(e).indent(">   "));
-							writeStdout("\n");
-							break;
-						}
-						/* XXX: Verify that `hGDB' is the correct instance of GDB? */
-						try {
-							local hGDBStdout = _reopenhandle.GetProcessStdHandles(hGDB)[1];
-							local hMyGDBStdout = win32.DuplicateHandle(
-								hGDB, hGDBStdout, win32.GetCurrentProcess());
-							try {
-								/* Overwrite the write-to-stdout callback to
-								 * instead perform writes to `hMyGDBStdout'! */
-								local write2gdb = File.System(hMyGDBStdout, inherit: true).write;
-								writeStdout = [](data: string | Bytes) {
-									local final MAX_PACKET_SIZE = 512;
-									local final FORMAT = "~{!r}\n";
-									if (data !is string) {
-										if (data is Bytes)
-											data = data.encode("utf-8");
-										else {
-											data = str(data);
-										}
-									}
-									while (#data > MAX_PACKET_SIZE) {
-										write2gdb(FORMAT.format({ data[:MAX_PACKET_SIZE] }));
-										data = data[MAX_PACKET_SIZE:];
-									}
-									write2gdb(FORMAT.format({ data }));
-								};
-							} catch (...) {
-								win32.CloseHandle(hMyGDBStdout);
-								throw;
-							}
-						} finally {
-							win32.CloseHandle(hGDB);
-						}
-					}
-				}	break;
 
 				default:
 					flushStart = i - 2;

@@ -94,13 +94,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 			x86_initialize_vboxgdb();
 #endif /* CONFIG_VBOXGDB */
 	}
-#ifndef NDEBUG
-	if (x86_syslog_port != (port_t)0x80) {
-		PRIVATE ATTR_FREERODATA char const startup_notice[] = "%{redirect_stdout_gdb}";
-		__outsb((u16)x86_syslog_port, startup_notice,
-		        COMPILER_STRLEN(startup_notice) * sizeof(char));
-	}
-#endif /* !NDEBUG */
 	x86_initialize_cmos();
 
 	printk(FREESTR(KERN_NOTICE "[boot] Begin kernel initialization\n"));

@@ -65,7 +65,7 @@
 			 *    >> "D:\FULL\PATH\TO\PROGRAM\PROGRAM.exe" %*
 			 */
 			"debugServerPath": "${env.SYSTEMROOT}\\system32\\cmd.exe",
-			"debugServerArgs": "/c \"deemon ABSOLUTE_KOS_NT_PROJECT_ROOT\\magic.dee --run-only --emulator=qemu --gdb=emulator --emulator-started-pattern=EMULATOR_STARTED --emulator-setopt=redirect_stdout_gdb=gdb.exe --target=${env.TARGET} --config=${env.CONFIG}\"",
+			"debugServerArgs": "/c \"deemon ABSOLUTE_KOS_NT_PROJECT_ROOT\\magic.dee --run-only --emulator=qemu --gdb=emulator --emulator-started-pattern=EMULATOR_STARTED --emulator-setopt=redirect.stdout=gdb.exe --target=${env.TARGET} --config=${env.CONFIG}\"",
 			"serverStarted": "EMULATOR_STARTED",
 			"serverLaunchTimeout": 120000,
 			"filterStdout": true,
@@ -119,7 +119,7 @@
 				{ "text": "set follow-fork-mode child", "ignoreFailures": false }
 			],
 			"debugServerPath": "${env.SYSTEMROOT}\\system32\\cmd.exe",
-			"debugServerArgs": "/c \"deemon ABSOLUTE_KOS_NT_PROJECT_ROOT\\magic.dee --run-only --emulator=qemu --gdb=server --emulator-started-pattern=EMULATOR_STARTED --emulator-setopt=redirect_stdout_gdb=gdb.exe --target=${env.TARGET} --config=${env.CONFIG}\"",
+			"debugServerArgs": "/c \"deemon ABSOLUTE_KOS_NT_PROJECT_ROOT\\magic.dee --run-only --emulator=qemu --gdb=server --emulator-started-pattern=EMULATOR_STARTED --emulator-setopt=redirect.stdout=gdb.exe --target=${env.TARGET} --config=${env.CONFIG}\"",
 			"serverStarted": "EMULATOR_STARTED",
 			"serverLaunchTimeout": 120000,
 			"filterStdout": true,
@@ -174,7 +174,7 @@
 				{ "text": "set follow-fork-mode child", "ignoreFailures": false }
 			],
 			"debugServerPath": "${env.SYSTEMROOT}\\system32\\cmd.exe",
-			"debugServerArgs": "/c \"deemon ABSOLUTE_KOS_NT_PROJECT_ROOT\\magic.dee --run-only --emulator=qemu --gdb=server --emulator-started-pattern=EMULATOR_STARTED --emulator-setopt=redirect_stdout_gdb=gdb.exe --target=${env.TARGET} --config=${env.CONFIG}\"",
+			"debugServerArgs": "/c \"deemon ABSOLUTE_KOS_NT_PROJECT_ROOT\\magic.dee --run-only --emulator=qemu --gdb=server --emulator-started-pattern=EMULATOR_STARTED --emulator-setopt=redirect.stdout=gdb.exe --target=${env.TARGET} --config=${env.CONFIG}\"",
 			"serverStarted": "EMULATOR_STARTED",
 			"serverLaunchTimeout": 120000,
 			"filterStdout": true,
@@ -229,7 +229,7 @@
 				{ "text": "set print sevenbit-strings off", "ignoreFailures": true }
 			],
 			"debugServerPath": "${env.SYSTEMROOT}\\system32\\cmd.exe",
-			"debugServerArgs": "/c \"deemon ABSOLUTE_KOS_NT_PROJECT_ROOT\\magic.dee --run-only --emulator=vbox --gdb=emulator --emulator-started-pattern=EMULATOR_STARTED --emulator-setopt=redirect_stdout_gdb=gdb.exe --target=${env.TARGET} --config=${env.CONFIG}\"",
+			"debugServerArgs": "/c \"deemon ABSOLUTE_KOS_NT_PROJECT_ROOT\\magic.dee --run-only --emulator=vbox --gdb=emulator --emulator-started-pattern=EMULATOR_STARTED --emulator-setopt=redirect.stdout=gdb.exe --target=${env.TARGET} --config=${env.CONFIG}\"",
 			"serverStarted": "EMULATOR_STARTED",
 			"serverLaunchTimeout": 120000,
 			"filterStdout": true,
