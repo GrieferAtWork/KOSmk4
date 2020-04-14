@@ -2676,112 +2676,6 @@ again_print_ent:
 }
 
 
-INTERN WUNUSED NONNULL((1, 2)) char **KCALL
-split_cmdline(char *__restrict cmdline,
-              size_t *__restrict pargc) {
-	/* TODO: Use `libcmdline' instead! */
-	size_t argc, i;
-	char **result;
-	size_t arga;
-	/* Skip leading space. */
-	while (isspace(*cmdline))
-		++cmdline;
-	/* Check for empty commandline. */
-	if (!*cmdline)
-		return 0;
-	i = 0, argc = 1, arga = 3;
-	result = (char **)kmalloc((arga + 1) * sizeof(char *),
-	                          GFP_LOCKED | GFP_PREFLT);
-	TRY {
-		size_t cmdline_len;
-		result[0]   = cmdline;
-		cmdline_len = strlen(cmdline);
-		for (;;) {
-			char ch;
-			assert(i < cmdline_len);
-			ch = cmdline[i];
-			/* Escaped characters. */
-			if (ch == '\\') {
-				--cmdline_len;
-				memmovedown(&cmdline[i],
-				            &cmdline[i + 1],
-				            cmdline_len - i,
-				            sizeof(char));
-				++i;
-				if (i >= cmdline_len)
-					break;
-				continue;
-			}
-			/* String arguments. */
-			if (ch == '\'' || ch == '\"') {
-				char end_ch = ch;
-				--cmdline_len;
-				memmovedown(&cmdline[i],
-				            &cmdline[i + 1],
-				            cmdline_len - i,
-				            sizeof(char));
-				while (i < cmdline_len) {
-					ch = cmdline[i];
-					if (ch == '\\') {
-						--cmdline_len;
-						memmovedown(&cmdline[i],
-						            &cmdline[i + 1],
-						            cmdline_len - i,
-						            sizeof(char));
-						++i;
-						if (i >= cmdline_len)
-							break;
-						continue;
-					}
-					if (ch == end_ch) {
-						--cmdline_len;
-						memmovedown(&cmdline[i],
-						            &cmdline[i + 1],
-						            cmdline_len - i,
-						            sizeof(char));
-						break;
-					}
-					++i;
-					if (i >= cmdline_len)
-						break;
-				}
-				continue;
-			}
-			/* Space -> Argument separator. */
-			if (isspace(ch)) {
-				cmdline[i] = '\0'; /* Terminate the previous argument. */
-				++i;
-				/* Skip multiple consecutive spaces. */
-				while (i < cmdline_len && isspace(cmdline[i]))
-					++i;
-				if (i >= cmdline_len)
-					break;
-				/* Start a new argument. */
-				if (argc >= arga) {
-					assert((argc / 2) != 0);
-					arga += argc / 2;
-					result = (char **)krealloc(result, (arga + 1) * sizeof(char *),
-					                           GFP_LOCKED | GFP_PREFLT);
-				}
-				result[argc] = &cmdline[i];
-				++argc;
-				continue;
-			}
-			++i;
-			if (i >= cmdline_len)
-				break;
-		}
-		/* Always terminate argv with a NULL entry. */
-		result[argc] = NULL;
-	} EXCEPT {
-		kfree(result);
-		RETHROW();
-	}
-	*pargc = argc;
-	return result;
-}
-
-
 PRIVATE NONNULL((1)) void KCALL
 driver_parse_cmdline(struct driver *__restrict self,
                      USER CHECKED char const *cmdline)
@@ -2789,15 +2683,17 @@ driver_parse_cmdline(struct driver *__restrict self,
 	size_t cmdline_length;
 	char *cmdline_copy;
 	cmdline_length = strlen(cmdline);
-	cmdline_copy   = (char *)kmalloc((cmdline_length + 2) * sizeof(char),
-                                   GFP_LOCKED | GFP_PREFLT);
+	cmdline_copy = (char *)kmalloc((cmdline_length + 2) * sizeof(char),
+	                               GFP_LOCKED | GFP_PREFLT);
 	TRY {
 		memcpy(cmdline_copy, cmdline, cmdline_length, sizeof(char));
-		/* Add a double-NUL terminator to allow this string
-		 * to always be conveted into a NUL-NUL string-list */
+		/* Add a double-NUL terminator to allow the commandline
+		 * to always be interpreted into a NUL-NUL string-list */
 		cmdline_copy[cmdline_length + 0] = '\0';
 		cmdline_copy[cmdline_length + 1] = '\0';
-		self->d_argv = split_cmdline(cmdline_copy, &self->d_argc);
+		/* Split the commandline through use of libcmdline */
+		self->d_argv = cmdline_decode_argv(cmdline_copy, &self->d_argc,
+		                                   GFP_LOCKED | GFP_PREFLT);
 	} EXCEPT {
 		kfree(cmdline_copy);
 		RETHROW();

@@ -374,7 +374,7 @@ NOTHROW(KCALL x86_load_mb1info)(PHYS u32 info) {
 	if (vinfo->flags & MB_INFO_MODS) {
 		size_t i;
 		PHYS mb_module_t *base;
-		/* Limit the module count just in case the bootloader is broken. */
+		/* Load modules (drivers) provided by the bootloader */
 		base = (PHYS mb_module_t *)((uintptr_t)vinfo->mods_addr + KERNEL_CORE_BASE);
 		for (i = 0; i < vinfo->mods_count; ++i) {
 			uintptr_t start, end;

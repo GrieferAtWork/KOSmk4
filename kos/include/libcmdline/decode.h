@@ -32,13 +32,28 @@
 #ifdef __CC__
 __DECL_BEGIN
 
-#ifndef __KERNEL__
+#ifdef __KERNEL__
+#ifndef __gfp_t_defined
+#define __gfp_t_defined 1
+typedef unsigned int gfp_t;
+#endif /* !__gfp_t_defined */
+#endif /* __KERNEL__ */
+
+
 /* Similar to `cmdline_decode()', however return a heap-allocated
  * vector of the individual argument strings, which itself is then
  * terminated by a NULL-entry.
  * When `pargc' is non-NULL, store the number of arguments leading
  * up to (but not including) the terminating NULL-entry.
  * Upon error, NULL is returned. */
+#ifdef __KERNEL__
+typedef __ATTR_NONNULL((1)) __ATTR_WUNUSED /*__ATTR_MALLOC*/ char **
+(LIBCMDLINE_CC *PCMDLINE_DECODE_ARGV)(char *cmdline, __size_t *pargc, gfp_t gfp);
+#ifdef LIBCMDLINE_WANT_PROTOTYPES
+LIBCMDLINE_DECL __ATTR_NONNULL((1)) __ATTR_WUNUSED __ATTR_MALLOC char **LIBCMDLINE_CC
+cmdline_decode_argv(char *cmdline, __size_t *pargc, gfp_t gfp __DFL(0));
+#endif /* LIBCMDLINE_WANT_PROTOTYPES */
+#else /* __KERNEL__ */
 typedef __ATTR_NONNULL((1)) __ATTR_WUNUSED /*__ATTR_MALLOC*/ char **
 (LIBCMDLINE_CC *PCMDLINE_DECODE_ARGV)(char *cmdline, __size_t *pargc);
 #ifdef LIBCMDLINE_WANT_PROTOTYPES

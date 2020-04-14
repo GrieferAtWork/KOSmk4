@@ -280,7 +280,7 @@ struct driver {
 	                          d_file;       /* [0..1][const] The file-INode from which this driver was loaded, or
 	                                         *              `NULL' if the driver was loaded as a multiboot module. */
 	char        *DRIVER_CONST d_cmdline;    /* [1..1][const][owned] Driver commandline (in the form of "foo\0bar\0baz\0\0") */
-	size_t       DRIVER_CONST d_argc;       /* [const] Driver commandline (in the form of "foo\0bar\0baz\0\0") */
+	size_t       DRIVER_CONST d_argc;       /* [const] # of arguments passed to the driver (# of strings pointed to by `d_argv') */
 	char       **DRIVER_CONST d_argv;       /* [1..1][1..d_argc][const][owned] Driver argument vector (terminated by a NULL-pointer) */
 	uintptr_t                 d_flags;      /* Driver flags (Set of `DRIVER_FLAG_*') */
 	struct task              *d_initthread; /* [?..1] Used internally to identify the thread responsible for an in-progress initialization.

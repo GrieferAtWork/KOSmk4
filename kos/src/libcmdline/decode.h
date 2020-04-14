@@ -34,13 +34,16 @@ DECL_BEGIN
 
 
 
-#ifndef __KERNEL__
 /* Similar to `cmdline_decode()', however return a heap-allocated
  * vector of the individual argument strings, which itself is then
  * terminated by a NULL-entry.
  * When `pargc' is non-NULL, store the number of arguments leading
  * up to (but not including) the terminating NULL-entry.
  * Upon error, NULL is returned. */
+#ifdef __KERNEL__
+INTDEF WUNUSED ATTR_MALLOC NONNULL((1)) /*utf-8*/ char **CC
+libcmdline_decode_argv(/*utf-8*/ char *__restrict cmdline, size_t *pargc, gfp_t gfp);
+#else /* __KERNEL__ */
 INTDEF WUNUSED ATTR_MALLOC NONNULL((1)) /*utf-8*/ char **CC
 libcmdline_decode_argv(/*utf-8*/ char *__restrict cmdline, size_t *pargc);
 #endif /* !__KERNEL__ */

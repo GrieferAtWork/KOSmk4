@@ -29,17 +29,35 @@
 #include <stddef.h>
 #include <string.h>
 #include <unicode.h>
+#ifdef __KERNEL__
+#include <kernel/malloc.h>
+#endif /* __KERNEL__ */
 
 #include "api.h"
 
 DECL_BEGIN
 
-#ifndef __KERNEL__
 struct argv_append_data {
 	/*utf-8*/ char **aad_argv; /* [1..1][1..aad_argc|alloc(aad_arga)][owned] Argument vector */
 	size_t           aad_argc; /* Used argument count */
 	size_t           aad_arga; /* Allocated argument count */
+#ifdef __KERNEL__
+	gfp_t            aad_gfp;  /* [const] Malloc flags. */
+#endif /* __KERNEL__ */
 };
+
+#ifdef __KERNEL__
+#define argv_append_data_realloc_nx(self, ptr, num_bytes) \
+	krealloc_nx(ptr, num_bytes, (self)->aad_gfp)
+#define argv_append_data_realloc(self, ptr, num_bytes) \
+	krealloc(ptr, num_bytes, (self)->aad_gfp)
+#else /* __KERNEL__ */
+#define argv_append_data_realloc_nx(self, ptr, num_bytes) \
+	realloc(ptr, num_bytes)
+#define argv_append_data_realloc(self, ptr, num_bytes) \
+	realloc(ptr, num_bytes)
+#endif /* !__KERNEL__ */
+
 
 PRIVATE NONNULL((1, 2)) ssize_t __LIBCCALL
 argv_append(void *__restrict arg,
@@ -49,13 +67,20 @@ argv_append(void *__restrict arg,
 	buf = (struct argv_append_data *)arg;
 	if (buf->aad_argc >= buf->aad_arga) {
 		char **new_argv;
-		size_t new_alloc = buf->aad_arga * 2;
-		new_argv = (char **)realloc(buf->aad_argv, (new_alloc + 1) * sizeof(char *));
+		size_t new_alloc;
+		new_alloc = buf->aad_arga * 2;
+		new_argv = (char **)argv_append_data_realloc_nx(buf, buf->aad_argv,
+		                                                (new_alloc + 1) *
+		                                                sizeof(char *));
 		if unlikely(!new_argv) {
 			new_alloc = buf->aad_argc + 1;
-			new_argv  = (char **)realloc(buf->aad_argv, (new_alloc + 1) * sizeof(char *));
+			new_argv = (char **)argv_append_data_realloc(buf, buf->aad_argv,
+			                                             (new_alloc + 1) *
+			                                             sizeof(char *));
+#ifndef __KERNEL__
 			if unlikely(!new_argv)
 				return -1; /* Error */
+#endif /* !__KERNEL__ */
 		}
 		buf->aad_argv = new_argv;
 		buf->aad_arga = new_alloc;
@@ -71,12 +96,28 @@ argv_append(void *__restrict arg,
  * When `pargc' is non-NULL, store the number of arguments leading
  * up to (but not including) the terminating NULL-entry.
  * Upon error, NULL is returned. */
+#ifdef __KERNEL__
 INTERN WUNUSED ATTR_MALLOC NONNULL((1)) /*utf-8*/ char **CC
-libcmdline_decode_argv(/*utf-8*/ char *__restrict cmdline, size_t *pargc) {
+libcmdline_decode_argv(/*utf-8*/ char *__restrict cmdline, size_t *pargc, gfp_t gfp)
+#else /* __KERNEL__ */
+INTERN WUNUSED ATTR_MALLOC NONNULL((1)) /*utf-8*/ char **CC
+libcmdline_decode_argv(/*utf-8*/ char *__restrict cmdline, size_t *pargc)
+#endif /* !__KERNEL__ */
+{
 	struct argv_append_data buf;
 	buf.aad_argc = 0;
 	buf.aad_arga = 8;
+#ifdef __KERNEL__
+	buf.aad_gfp = gfp;
+#endif /* __KERNEL__ */
 	/* Allocate the initial buffer */
+#ifdef __KERNEL__
+	buf.aad_argv = (char **)kmalloc_nx((buf.aad_arga + 1) * sizeof(char *), gfp);
+	if unlikely(!buf.aad_argv) {
+		buf.aad_arga = 1;
+		buf.aad_argv = (char **)kmalloc((buf.aad_arga + 1) * sizeof(char *), gfp);
+	}
+#else /* __KERNEL__ */
 	buf.aad_argv = (char **)malloc((buf.aad_arga + 1) * sizeof(char *));
 	if unlikely(!buf.aad_argv) {
 		buf.aad_arga = 1;
@@ -84,24 +125,35 @@ libcmdline_decode_argv(/*utf-8*/ char *__restrict cmdline, size_t *pargc) {
 		if unlikely(!buf.aad_argv)
 			goto done;
 	}
+#endif /* !__KERNEL__ */
 	/* Decode the cmdline */
 	if unlikely(libcmdline_decode(cmdline, &argv_append, &buf) < 0)
 		goto err;
 	/* Try to free unused memory. */
-	realloc_in_place(buf.aad_argv,
-	                 (buf.aad_argc + 1) *
-	                 sizeof(char *));
+	{
+		char **final_argv;
+		final_argv = (char **)argv_append_data_realloc_nx(&buf, buf.aad_argv,
+		                                                  (buf.aad_argc + 1) *
+		                                                  sizeof(char *));
+		if likely(final_argv)
+			buf.aad_argv = final_argv;
+	}
 	/* Terminate with argument vector with NULL */
 	buf.aad_argv[buf.aad_argc] = NULL;
 	if (pargc)
 		*pargc = buf.aad_argc;
+#ifndef __KERNEL__
 done:
+#endif /* !__KERNEL__ */
 	return buf.aad_argv;
 err:
+#ifdef __KERNEL__
+	kfree(buf.aad_argv);
+#else /* __KERNEL__ */
 	free(buf.aad_argv);
+#endif /* !__KERNEL__ */
 	return NULL;
 }
-#endif /* !__KERNEL__ */
 
 
 
@@ -326,9 +378,7 @@ libcmdline_split(/*utf-8*/ char *__restrict cmdline, char **pendptr) {
 
 
 
-#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(cmdline_decode_argv, libcmdline_decode_argv);
-#endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(cmdline_decode, libcmdline_decode);
 DEFINE_PUBLIC_ALIAS(cmdline_split, libcmdline_split);
 
