@@ -21,9 +21,11 @@
 #define _LIBCMDLINE_DECODE_H 1
 
 #include "api.h"
-#include <bits/types.h>
-#include <bits/format-printer.h>
+/**/
 
+#include <bits/format-printer.h>
+#include <bits/types.h>
+#include <kos/hybrid/heap.h>
 
 /* Trait checking for commandline special characters. */
 #define cmdline_isquote(ch) ((ch) == '\'' || (ch) == '\"')
@@ -46,21 +48,12 @@ typedef unsigned int gfp_t;
  * When `pargc' is non-NULL, store the number of arguments leading
  * up to (but not including) the terminating NULL-entry.
  * Upon error, NULL is returned. */
-#ifdef __KERNEL__
 typedef __ATTR_NONNULL((1)) __ATTR_WUNUSED /*__ATTR_MALLOC*/ char **
-(LIBCMDLINE_CC *PCMDLINE_DECODE_ARGV)(char *cmdline, __size_t *pargc, gfp_t gfp);
+(LIBCMDLINE_CC *PCMDLINE_DECODE_ARGV)(char *cmdline, __size_t *pargc _os_heap_gfparg(gfp));
 #ifdef LIBCMDLINE_WANT_PROTOTYPES
 LIBCMDLINE_DECL __ATTR_NONNULL((1)) __ATTR_WUNUSED __ATTR_MALLOC char **LIBCMDLINE_CC
-cmdline_decode_argv(char *cmdline, __size_t *pargc, gfp_t gfp __DFL(0));
+cmdline_decode_argv(char *cmdline, __size_t *pargc _os_heap_gfparg(gfp __DFL(0)));
 #endif /* LIBCMDLINE_WANT_PROTOTYPES */
-#else /* __KERNEL__ */
-typedef __ATTR_NONNULL((1)) __ATTR_WUNUSED /*__ATTR_MALLOC*/ char **
-(LIBCMDLINE_CC *PCMDLINE_DECODE_ARGV)(char *cmdline, __size_t *pargc);
-#ifdef LIBCMDLINE_WANT_PROTOTYPES
-LIBCMDLINE_DECL __ATTR_NONNULL((1)) __ATTR_WUNUSED __ATTR_MALLOC char **LIBCMDLINE_CC
-cmdline_decode_argv(char *cmdline, __size_t *pargc);
-#endif /* LIBCMDLINE_WANT_PROTOTYPES */
-#endif /* !__KERNEL__ */
 
 
 

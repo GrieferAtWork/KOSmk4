@@ -40,13 +40,9 @@ DECL_BEGIN
  * When `pargc' is non-NULL, store the number of arguments leading
  * up to (but not including) the terminating NULL-entry.
  * Upon error, NULL is returned. */
-#ifdef __KERNEL__
 INTDEF WUNUSED ATTR_MALLOC NONNULL((1)) /*utf-8*/ char **CC
-libcmdline_decode_argv(/*utf-8*/ char *__restrict cmdline, size_t *pargc, gfp_t gfp);
-#else /* __KERNEL__ */
-INTDEF WUNUSED ATTR_MALLOC NONNULL((1)) /*utf-8*/ char **CC
-libcmdline_decode_argv(/*utf-8*/ char *__restrict cmdline, size_t *pargc);
-#endif /* !__KERNEL__ */
+libcmdline_decode_argv(/*utf-8*/ char *__restrict cmdline,
+                       size_t *pargc _os_heap_gfparg(gfp));
 
 /* Decode and transform a given `cmdline' (which must be a \0-terminated string),
  * and invoke `arg_printer' with each individual argument segment.
