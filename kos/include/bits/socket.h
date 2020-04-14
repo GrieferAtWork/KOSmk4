@@ -282,9 +282,9 @@ enum {
 #undef gid
 /* User visible structure for SCM_CREDENTIALS message */
 struct ucred {
-	pid_t pid; /* PID of sending process. */
-	uid_t uid; /* UID of sending process. */
-	gid_t gid; /* GID of sending process. */
+	__pid_t pid; /* PID of sending process. */
+	__uid_t uid; /* UID of sending process. */
+	__gid_t gid; /* GID of sending process. */
 };
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma pop_macro("gid")
