@@ -1,0 +1,129 @@
+/* Copyright (c) 2019-2020 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+import * from deemon;
+import fs, ctypes, win32;
+
+function FindProcessByImageName(name: string): win32.HANDLE {
+	local myPid = win32.GetCurrentProcessId();
+	for (local pid: win32.EnumProcesses()) {
+		local hProcess;
+		if (pid == myPid)
+			continue;
+		try {
+			hProcess = win32.OpenProcess(
+				win32.PROCESS_QUERY_LIMITED_INFORMATION |
+				win32.PROCESS_DUP_HANDLE |
+				win32.PROCESS_VM_READ, false, pid);
+		} catch (...) {
+			continue;
+		}
+		local filename;
+		try {
+			filename = win32.GetProcessImageFileName(hProcess);
+		} catch (...) {
+			win32.CloseHandle(hProcess);
+			continue;
+		}
+		try {
+			filename = fs.tailof(filename);
+			if (filename == name)
+				return hProcess;
+		} catch (...) {
+			win32.CloseHandle(hProcess);
+			throw;
+		}
+	}
+	throw Error("Process not found: " + repr(name));
+}
+
+function getWord(b: Bytes, i: int = 0, s: int = -1): int {
+	local result = 0;
+	if (s < 0)
+		s = #b - i;
+	for (local j: [:s])
+		result |= b[i + j] << (j * 8);
+	return result;
+}
+
+@@Returns a triple @(STD_INPUT_HANDLE, STD_OUTPUT_HANDLE, STD_ERROR_HANDLE)
+@@describing the current standard handles for the given @hProcess.
+@@These handles can then be used with DuplicateHandle() to re-open the same
+@@underlying kernel object within the calling process.
+@@NOTE: The given @hProcess needs @PROCESS_QUERY_LIMITED_INFORMATION,
+@@      as well as @PROCESS_DUP_HANDLE
+function GetProcessStdHandles(hProcess: win32.HANDLE)
+		: (win32.HANDLE, win32.HANDLE, win32.HANDLE) {
+#define ProcessBasicInformation 0
+#define ProcessWow64Information 26
+	local mySizeOfPointer = ctypes.sizeof(ctypes.void.ptr);
+	local otSizeOfPointer;
+	if (mySizeOfPointer == 4) {
+		/* Check if we're running under wow64 */
+		local iAmAWow64Process = getWord(win32.NtQueryInformationProcess(
+			win32.GetCurrentProcess(), ProcessWow64Information, 4));
+		if (iAmAWow64Process)
+			goto check_ot_wow64;
+		otSizeOfPointer = 4;
+	} else {
+		/* Check if the other process is wow64 */
+check_ot_wow64:
+		local otIsAWow64Process = getWord(win32.NtQueryInformationProcess(
+			hProcess, ProcessWow64Information, mySizeOfPointer));
+		otSizeOfPointer = otIsAWow64Process ? 4 : 8;
+	}
+	local pPEBAddr;
+	local ReadMemory = win32.ReadProcessMemory;
+	if (mySizeOfPointer == 4) {
+		if (otSizeOfPointer == 4) {
+			local PROCESS_BASIC_INFORMATION = win32.NtQueryInformationProcess(
+				hProcess, ProcessBasicInformation, 24);
+			pPEBAddr = getWord(PROCESS_BASIC_INFORMATION, 4, 4);
+		} else {
+			local PROCESS_BASIC_INFORMATION = win32.NtWow64QueryInformationProcess64(
+				hProcess, ProcessBasicInformation, 48);
+			pPEBAddr = getWord(PROCESS_BASIC_INFORMATION, 8, 8);
+			ReadMemory = win32.NtWow64ReadVirtualMemory64;
+		}
+	} else {
+		local PROCESS_BASIC_INFORMATION = win32.NtQueryInformationProcess(
+			hProcess, ProcessBasicInformation, 48);
+		pPEBAddr = getWord(PROCESS_BASIC_INFORMATION, 8, 8);
+	}
+	/* STD Handles are found at:
+	 * PEB->ProcessParameters->StdHandles
+	 * Note that the StdHandles field is re not officially documented,
+	 * and its offet has been reverse engineered by me from looking at
+	 * the disassembly of `KernelBase.dll'. */
+	local final OFFSET_PEB_ProcessParameters = { 4 : 0x10, 8 : 0x20 };
+	local final OFFSET_RTL_USER_PROCESS_PARAMETERS_StdHandles = { 4 : 0x18, 8 : 0x20 };
+	local pProcessParameters = getWord(ReadMemory(hProcess,
+		pPEBAddr + OFFSET_PEB_ProcessParameters[otSizeOfPointer],
+		otSizeOfPointer));
+	local handleBlob;
+	handleBlob = ReadMemory(hProcess, pProcessParameters +
+		OFFSET_RTL_USER_PROCESS_PARAMETERS_StdHandles[otSizeOfPointer],
+		3 * otSizeOfPointer);
+	return (
+		win32.HANDLE(getWord(handleBlob, 0 * otSizeOfPointer, otSizeOfPointer)),
+		win32.HANDLE(getWord(handleBlob, 1 * otSizeOfPointer, otSizeOfPointer)),
+		win32.HANDLE(getWord(handleBlob, 2 * otSizeOfPointer, otSizeOfPointer)),
+	);
+}

@@ -234,37 +234,12 @@ did_update_x86_64_kernel:
 			r: r,
 			groups: groups,
 			config: config,
-			monitorCommandPipe: monitorCommandPipe);
+			monitorCommandPipe: monitorCommandPipe,
+			options: options);
 		joinProcess(proc);
 	} @[interrupt] catch (e...) {
 		proc.terminate();
 		throw;
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

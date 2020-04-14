@@ -33,6 +33,8 @@ import fs;
 import ipc;
 import net;
 
+global writeStdout: Callable;
+
 @@Search for an executable @name in @path, returning
 @@its absolute path if found, or @none other.
 function findExecutableInPath(path: string, name: string): string | none {
@@ -164,32 +166,32 @@ class Addr2line {
 }
 
 function printFormattedAddr2line(
-		outFile: File, format: string,
+		format: string,
 		file: string, line: string,
 		func: string, addr: string) {
 	for (local i = 0; i < #format; ++i) {
 		local ch = format[i];
 		if (ch != "%" || i == #format-1)
-			outFile.write(ch);
+			writeStdout(ch);
 		else {
 			++i;
 			ch = format[i];
 			if (ch == "f") {
-				outFile.write(file);
+				writeStdout(file);
 			} else if (ch == "l") {
-				outFile.write(str line);
+				writeStdout(str line);
 			} else if (ch == "c") {
-				outFile.write("0");
+				writeStdout("0");
 			} else if (ch == "n") {
-				outFile.write(func);
+				writeStdout(func);
 			} else if (ch == "<") {
-				outFile.write("0");
+				writeStdout("0");
 			} else if (ch == ">") {
-				outFile.write("0");
+				writeStdout("0");
 			} else if (ch == "p") {
-				outFile.write(addr.upper().lsstrip("0X"));
+				writeStdout(addr.upper().lsstrip("0X"));
 			} else {
-				outFile.write("%"+ch);
+				writeStdout("%" + ch);
 			}
 		}
 	}
@@ -206,11 +208,15 @@ class TraceController {
 		: m_name(name)
 	{}
 
-	function err(outFile: File, message: string) {
-		outFile << "{ERROR:trace(" << repr(m_name) <<  "): " << message << "}\n";
+	function err(message: string) {
+		writeStdout("{ERROR:trace(");
+		writeStdout(repr(m_name));
+		writeStdout("): ");
+		writeStdout(message);
+		writeStdout("}\n");
 	}
 
-	function printDiff(outFile: File, addrFormat: string, oldSet: {int...}) {
+	function printDiff(addrFormat: string, oldSet: {int...}) {
 			local added = HashSet(), removed = HashSet();
 			for (local x: oldSet) {
 				if (x !in m_addresses)
@@ -221,15 +227,15 @@ class TraceController {
 					added.insert(x);
 			}
 			if (added || removed) {
-				err(outFile, "Missmatched address sets");
+				err("Missmatched address sets");
 				for (local x: added)
-					err(outFile, "Leaked {}".format({ addrFormat % x }));
+					err("Leaked {}".format({ addrFormat % x }));
 				for (local x: removed)
-					err(outFile, "Freed {}".format({ addrFormat % x }));
+					err("Freed {}".format({ addrFormat % x }));
 			}
 	}
 
-	function doMethod(outFile: File, method: string, argument: string) {
+	function doMethod(method: string, argument: string) {
 		switch (method) {
 
 		case "alloc":
@@ -258,28 +264,28 @@ class TraceController {
 
 		case "diff":
 			if (!m_addresses_stack) {
-				err(outFile, "Stack is empty");
+				err("Stack is empty");
 				break;
 			}
 			if (!argument)
 				argument = "%.13I64X000";
-			printDiff(outFile, argument, m_addresses_stack.back);
+			printDiff(argument, m_addresses_stack.back);
 			break;
 
 		case "pop": {
 			if (!m_addresses_stack) {
-				err(outFile, "Stack is empty");
+				err("Stack is empty");
 				break;
 			}
 			local o = m_addresses_stack.popback();
 			if (!argument)
 				argument = "%.13I64X000";
-			printDiff(outFile, argument, o);
+			printDiff(argument, o);
 			m_addresses = o;
 		}	break;
 
 		default:
-			err(outFile, "Unknown trace method " << repr(method));
+			err("Unknown trace method " << repr(method));
 			break;
 		}
 	}
@@ -290,16 +296,16 @@ function processKosDebugOutput(
 		r: File,
 		groups: {Group...},
 		config: Config,
-		monitorCommandPipe: File | none = none) {
+		monitorCommandPipe: File | none = none,
+		options: {string: string} | none = none) {
+	writeStdout = File.stddbg.write;
 #undef CONFIG_POSTPROCESS_QEMU_SERIAL_OUTPUT
 #define CONFIG_POSTPROCESS_QEMU_SERIAL_OUTPUT 1
 #ifndef CONFIG_POSTPROCESS_QEMU_SERIAL_OUTPUT
 	while (local text = r.read(1)) {
-		File.stdout << text;
-		File.stdout.sync();
+		writeStdout(text);
 	}
 #else /* !CONFIG_POSTPROCESS_QEMU_SERIAL_OUTPUT */
-	local outFile = File.stddbg;
 	final local MAX_COMMAND_LENGTH = 512;
 	local running_addr2line: {string: Addr2line} = Dict();
 	local stored_data = Cell();
@@ -324,12 +330,12 @@ do_format_line:
 					continue;
 				}
 				/* Clickable line directive (must normalize the path) */
-				outFile.write(FINAL_FORMAT_RAW_DATA(data[flushStart:lineStart]));
+				writeStdout(FINAL_FORMAT_RAW_DATA(data[flushStart:lineStart]));
 				local filename, none, line = line.partition("(")...;
 				filename = normalizeFilenameForLog(filename);
-				outFile.write(filename);
-				outFile.write("(");
-				outFile.write(line);
+				writeStdout(filename);
+				writeStdout("(");
+				writeStdout(line);
 				flushStart = pos;
 			} else if (flushStart == 0) {
 				lineStart = 0;
@@ -343,7 +349,7 @@ do_format_line:
 			savedData = data[flushStart:];
 		} else {
 			++lineEnd;
-			outFile.write(FINAL_FORMAT_RAW_DATA(data[flushStart:lineEnd]));
+			writeStdout(FINAL_FORMAT_RAW_DATA(data[flushStart:lineEnd]));
 			savedData = data[lineEnd:];
 		}
 		if (savedData)
@@ -404,9 +410,11 @@ again_find_match:
 				if (":" in command)
 					command, none, argument = command.partition(":")...;
 				switch (command.strip()) {
+
 				case "monitor":
 					monitorCommandPipe.write(argument);
 					break;
+
 				case "trace": {
 					local method, name;
 					method, none, argument = argument.partition(":")...;
@@ -420,8 +428,9 @@ again_find_match:
 					local obj = tracedControllers.get(name);
 					if (obj is none)
 						tracedControllers[name] = obj = TraceController(name);
-					obj.doMethod(outFile, method, argument);
+					obj.doMethod(method, argument);
 				}	break;
+
 				case "artifact": {
 					local outfile, filesize = argument.scanf("%[^:]:%[^:]")...;
 					filesize = int(filesize);
@@ -442,6 +451,7 @@ again_find_match:
 						}
 					}
 				}	break;
+
 				case "vinfo": {
 					local binary, address, req_address;
 					binary, address, req_address, argument =
@@ -459,7 +469,6 @@ again_find_match:
 							writeData("\n");
 						is_first = false;
 						printFormattedAddr2line(
-							outFile: outFile,
 							format: argument,
 							file: file,
 							line: line,
@@ -468,7 +477,6 @@ again_find_match:
 					}
 					if (is_first) {
 						printFormattedAddr2line(
-							outFile: outFile,
 							format: argument,
 							file: "??" "?",
 							line: 0,
@@ -481,6 +489,7 @@ again_find_match:
 						}));
 					}
 				}	break;
+
 				case "vload":
 					argument = argument.replace("\\", "/").lstrip("/");
 					if (argument !in running_addr2line) {
@@ -489,6 +498,95 @@ again_find_match:
 						running_addr2line[argument] = a2l;
 					}
 					break;
+
+				/* While it is impossible to get rid of the `cmd:' prefix on anything
+				 * that we write to stdout ourself, it _is_ possible to hi-jack the
+				 * stdout output stream of GDB:
+				 * >> // NOTE: `hGDB' needs permissions:
+				 * >> //   - PROCESS_QUERY_LIMITED_INFORMATION (identification)
+				 * >> //   - PROCESS_DUP_HANDLE                (DuplicateHandle())
+				 * >> //   - PROCESS_VM_READ                   (Read out the PEB)
+				 * >> hGDB = FileProcessByName("gdb.exe");
+				 * >> // ADDRESS_OF_PEB can be determined programmatically!
+				 * >> // ProcessHacker has an option for this
+				 * >> PEB = ProcessReadMemory(hGDB, <ADDRESS_OF_PEB>);
+				 * >> hRemoteHandle = PEB.<STD_OUTPUT_HANDLE>;
+				 * >> hGDBStdout = DuplicateHandle(hGDB, hRemoteHandle, GetCurrentProcess());
+				 * >> // NOTE: It is important that the data buffer of this write isn't
+				 * >> //       too large, since Windows might otherwise decide to only write
+				 * >> //       a portion of it (causing any future data that the real GDB might
+				 * >> //       try to write to end up inside of the message string we're trying
+				 * >> //       to output to Visual Studio)
+				 * >> //       That's fine however, since the messages written as ~"..." have
+				 * >> //       their own buffer, and are re-assembled by Visual Studio as they
+				 * >> //       are written by GDB. Furthermore, GDB doesn't make much use of
+				 * >> //       the ~-stream (except for the initial greeting after startup)
+				 * >> //       As such, we're pretty safe in using it for our own purposes!
+				 * >> WriteFile(hGDBStdout, "~{!r}\n".format({
+				 * >>     "Hello World (from " + GetCurrentProcessId() + ")\n"
+				 * >> }));
+				 * >> CloseHandle(hGDB);
+				 * Output written with this method will appear unfiltered in the Output window
+				 * in such a way that click-to-go-to-source is possible!
+				 * NOTE: I've also tested what happens when GDB exists while we still have
+				 *       a handle to its standard output handle. - It behaves normally, in
+				 *       that Visual Studio appears to wait for GDB to terminate, and simply
+				 *       ignores anyone else still having an open handle to GDB's old stdout
+				 *       As a matter of fact, Visual Studio uses a Pipe for capturing the
+				 *       output from GDB, and that pipe is closed once Visual Studio closes
+				 *       its reader-end of said pipe (causing us attempting to write more
+				 *       data in WriteFile() throwing an exception!) */
+				case "redirect_stdout_gdb": {
+					local processName = options.get("redirect_stdout_gdb");
+					if (processName is none)
+						break;
+					local _reopenhandle = try import("._reopenhandle") catch (...) none;
+					if (_reopenhandle !is none) {
+						local win32 = import("win32");
+						local hGDB;
+						try {
+							hGDB = _reopenhandle.FindProcessByImageName(processName);
+						} catch (e...) {
+							writeStdout("\n>Stdout redirect failed:\n");
+							writeStdout(str(e).indent(">   "));
+							writeStdout("\n");
+							break;
+						}
+						/* XXX: Verify that `hGDB' is the correct instance of GDB? */
+						try {
+							local hGDBStdout = _reopenhandle.GetProcessStdHandles(hGDB)[1];
+							local hMyGDBStdout = win32.DuplicateHandle(
+								hGDB, hGDBStdout, win32.GetCurrentProcess());
+							try {
+								/* Overwrite the write-to-stdout callback to
+								 * instead perform writes to `hMyGDBStdout'! */
+								local write2gdb = File.System(hMyGDBStdout, inherit: true).write;
+								writeStdout = [](data: string | Bytes) {
+									local final MAX_PACKET_SIZE = 512;
+									local final FORMAT = "~{!r}\n";
+									if (data !is string) {
+										if (data is Bytes)
+											data = data.encode("utf-8");
+										else {
+											data = str(data);
+										}
+									}
+									while (#data > MAX_PACKET_SIZE) {
+										write2gdb(FORMAT.format({ data[:MAX_PACKET_SIZE] }));
+										data = data[MAX_PACKET_SIZE:];
+									}
+									write2gdb(FORMAT.format({ data }));
+								};
+							} catch (...) {
+								win32.CloseHandle(hMyGDBStdout);
+								throw;
+							}
+						} finally {
+							win32.CloseHandle(hGDB);
+						}
+					}
+				}	break;
+
 				default:
 					flushStart = i - 2;
 					goto do_flush_text;
@@ -501,7 +599,7 @@ do_flush_text:
 	}
 done_join:
 	if (stored_data.value is bound)
-		outFile.write(FINAL_FORMAT_RAW_DATA(stored_data.value));
+		writeStdout(FINAL_FORMAT_RAW_DATA(stored_data.value));
 	for (local none, x: running_addr2line)
 		x.close();
 #endif /* CONFIG_POSTPROCESS_QEMU_SERIAL_OUTPUT */

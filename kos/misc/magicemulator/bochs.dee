@@ -188,7 +188,8 @@ got_bios:
 		common.processKosDebugOutput(
 			r: r,
 			groups: groups,
-			config: config);
+			config: config,
+			options: options);
 		joinProcess(proc);
 	} @[interrupt] catch (e...) {
 		proc.terminate();

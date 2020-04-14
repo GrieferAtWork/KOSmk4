@@ -156,6 +156,10 @@ global final OSDATAFILES: {string: string | Callable} = {
 		assert #argv == 1;
 		gdbSocket.send("$l#6c");
 		local addr = vmGetRegister("rip");
+		/* TODO: Try to re-create a VirtualBox crash caused by memory reads.
+		 *       I've got a feeling that they tend to happen when breakpoints
+		 *       are being used. - If that's the case, it would be possible to
+		 *       emulate int3-style breakpoints via code-injection! */
 		for (;;) {
 			vmReadMemoryAt(addr);
 			addr += 63;
