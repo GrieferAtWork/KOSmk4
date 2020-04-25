@@ -37,10 +37,10 @@ DECL_BEGIN
 #endif /* !POINTER_SET_HASHNXT */
 #ifndef POINTER_SET_BUFSIZE
 #define POINTER_SET_BUFSIZE  16
-#endif
+#endif /* !POINTER_SET_BUFSIZE */
 #ifndef POINTER_SET_SENTINAL
 #define POINTER_SET_SENTINAL 0
-#endif
+#endif /* !POINTER_SET_SENTINAL */
 
 struct pointer_set {
 	size_t     ps_size; /* Number of elements contained. */
@@ -51,10 +51,11 @@ struct pointer_set {
 
 
 /* Enumerate all pointers stored with the given pointer-set. */
-#define POINTER_SET_FOREACH(ptr,set) \
-	for (size_t _fe_i=0; _fe_i <= (set)->ps_mask; ++_fe_i) \
-	if (((uintptr_t)((ptr)=(__typeof__(ptr))(set)->ps_list[_fe_i])) == POINTER_SET_SENTINAL); \
-	else
+#define POINTER_SET_FOREACH(ptr, set)                                                              \
+	for (size_t _fe_i = 0; _fe_i <= (set)->ps_mask; ++_fe_i)                                       \
+		if (((uintptr_t)((ptr) = (__typeof__(ptr))(set)->ps_list[_fe_i])) == POINTER_SET_SENTINAL) \
+			;                                                                                      \
+		else
 
 
 
@@ -78,9 +79,9 @@ NOTHROW(KCALL pointer_set_clear)(struct pointer_set *__restrict self) {
 	memsetq(self->ps_list, POINTER_SET_SENTINAL, self->ps_mask + 1);
 #elif __SIZEOF_POINTER__ == 4
 	memsetl(self->ps_list, POINTER_SET_SENTINAL, self->ps_mask + 1);
-#else
+#else /* __SIZEOF_POINTER__ == ... */
 	memset(self->ps_list, POINTER_SET_SENTINAL, (self->ps_mask + 1) * sizeof(void *));
-#endif
+#endif /* __SIZEOF_POINTER__ != ... */
 	self->ps_size = 0;
 }
 
@@ -258,9 +259,8 @@ NOTHROW(KCALL pointer_set_reset_rehash_nx)(struct pointer_set *__restrict self,
 	new_mask = 1;
 	while (new_mask <= (min_allocation * 3) / 2)
 		new_mask = (new_mask << 1) | 1;
-	if (self->ps_list != self->ps_buf) {
+	if (self->ps_list != self->ps_buf)
 		kfree(self->ps_list);
-	}
 	new_map = (uintptr_t *)kmalloc_nx((new_mask + 1) * sizeof(uintptr_t),
 #if POINTER_SET_SENTINAL == 0
 	                                  GFP_CALLOC |

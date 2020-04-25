@@ -432,28 +432,14 @@ pointer_set_unlock_vm_dataparts_except(struct pointer_set *__restrict self,
 PRIVATE NOBLOCK void KCALL
 pointer_set_unlock_vm_dataparts_and_clear(struct pointer_set *__restrict self) {
 	pointer_set_unlock_vm_dataparts(self);
-#if __SIZEOF_POINTER__ == 8
-	memsetq(self->ps_buf, POINTER_SET_SENTINAL, self->ps_mask + 1);
-#elif __SIZEOF_POINTER__ == 4
-	memsetl(self->ps_buf, POINTER_SET_SENTINAL, self->ps_mask + 1);
-#else
-	memset(self->ps_buf, POINTER_SET_SENTINAL, (self->ps_mask + 1) * sizeof(void *));
-#endif
-	self->ps_size = 0;
+	pointer_set_clear(self);
 }
 
 PRIVATE NOBLOCK void KCALL
 pointer_set_unlock_vm_dataparts_and_clear_except(struct pointer_set *__restrict self,
                                                  struct vm_datapart *__restrict not_this_one) {
 	pointer_set_unlock_vm_dataparts_except(self, not_this_one);
-#if __SIZEOF_POINTER__ == 8
-	memsetq(self->ps_buf, POINTER_SET_SENTINAL, self->ps_mask + 1);
-#elif __SIZEOF_POINTER__ == 4
-	memsetl(self->ps_buf, POINTER_SET_SENTINAL, self->ps_mask + 1);
-#else
-	memset(self->ps_buf, POINTER_SET_SENTINAL, (self->ps_mask + 1) * sizeof(void *));
-#endif
-	self->ps_size = 0;
+	pointer_set_clear(self);
 }
 
 PRIVATE NOBLOCK void KCALL
