@@ -237,17 +237,6 @@ nic_device_sendall_background(struct nic_device *__restrict self,
 		nic_device_send_background(self, packets->npl_vec[i]);
 }
 
-/* Same as `nic_device_sendall_background()', however handle _all_ exceptions as AIO-failures
- * WARNING: This function may still clobber exception pointers! */
-PUBLIC NONNULL((1, 2)) void
-NOTHROW(KCALL nic_device_sendall_background_nx)(struct nic_device *__restrict self,
-                                                struct nic_packetlist const *__restrict packets) {
-	size_t i;
-	/* XXX: Cancel already started packets on error! */
-	for (i = 0; i < packets->npl_cnt; ++i)
-		nic_device_send_background_nx(self, packets->npl_vec[i]);
-}
-
 
 
 

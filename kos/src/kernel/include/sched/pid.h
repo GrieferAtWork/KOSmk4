@@ -242,8 +242,8 @@ FORCELOCAL WUNUSED /*ATTR_RETNONNULL*/ ATTR_CONST NONNULL((1)) struct taskpid *K
 #endif /* !__INTELLISENSE__ */
 
 /* Returns a reference to the parent of the calling/given process.
- * If that parent has already terminated and has already been detach'ed,
- * or wait-ed, return `NULL' instead. */
+ * If that parent has already terminated and has already been detach(2)ed,
+ * or wait(2)ed, return `NULL' instead. */
 FORCELOCAL WUNUSED REF struct task *KCALL task_getprocessparent(void) THROWS(E_WOULDBLOCK);
 FORCELOCAL WUNUSED REF struct taskpid *KCALL task_getprocessparentpid(void) THROWS(E_WOULDBLOCK);
 FORCELOCAL WUNUSED NONNULL((1)) REF struct task *KCALL task_getprocessparent_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK);

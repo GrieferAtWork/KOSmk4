@@ -116,12 +116,6 @@ FUNDEF NONNULL((1, 2)) void KCALL
 nic_device_sendall_background(struct nic_device *__restrict self,
                               struct nic_packetlist const *__restrict packets);
 
-/* Same as `nic_device_sendall_background()', however handle _all_ exceptions as AIO-failures
- * WARNING: This function may still clobber exception pointers! */
-FUNDEF NONNULL((1, 2)) void
-NOTHROW(KCALL nic_device_sendall_background_nx)(struct nic_device *__restrict self,
-                                                struct nic_packetlist const *__restrict packets);
-
 
 
 

@@ -194,18 +194,6 @@ nic_device_send_background(struct nic_device *__restrict self,
 	}
 }
 
-/* Same as `nic_device_send_background()', however handle _all_ exceptions as AIO-failures
- * WARNING: This function may still clobber exception pointers! */
-PUBLIC NONNULL((1, 2)) void
-NOTHROW(KCALL nic_device_send_background_nx)(struct nic_device *__restrict self,
-                                             struct nic_packet *__restrict packet) {
-	TRY {
-		nic_device_send_background(self, packet);
-	} EXCEPT {
-		error_printf("Performing background AIO operation");
-	}
-}
-
 
 /* Default write-operator for NIC devices. */
 PUBLIC NONNULL((1)) size_t KCALL

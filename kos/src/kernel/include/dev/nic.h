@@ -278,12 +278,6 @@ FUNDEF NONNULL((1, 2)) void KCALL
 nic_device_send_background(struct nic_device *__restrict self,
                            struct nic_packet *__restrict packet);
 
-/* Same as `nic_device_send_background()', however handle _all_ exceptions as AIO-failures
- * WARNING: This function may still clobber exception pointers! */
-FUNDEF NONNULL((1, 2)) void
-NOTHROW(KCALL nic_device_send_background_nx)(struct nic_device *__restrict self,
-                                             struct nic_packet *__restrict packet);
-
 
 /* Routable packet buffer. */
 struct nic_rpacket {

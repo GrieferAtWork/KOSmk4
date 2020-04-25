@@ -3924,6 +3924,12 @@ done_dynsym:
 			TRY {
 				driver_finalize(result);
 			} EXCEPT {
+				error_code_t code = error_code();
+				if (code == ERROR_CODEOF(E_EXIT_THREAD) ||
+				    code == ERROR_CODEOF(E_EXIT_PROCESS)) {
+					decref(result);
+					RETHROW();
+				}
 				error_printf("Finalizing driver %q", result->d_name);
 			}
 			/* Restore original error data. */
