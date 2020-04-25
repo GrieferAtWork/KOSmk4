@@ -53,9 +53,12 @@ function findExecutableInPath(path: string, name: string): string | none {
 	 */
 	for (local ext: [".cmd", ".bat"]) {
 		local fullFilename = filename + ext;
-		local fp = try File.open(fullFilename, "r") catch (...) none;
-		if (fp is none)
+		local fp;
+		try {
+			fp = File.open(fullFilename, "r");
+		} catch (...) {
 			continue;
+		}
 		local res = none;
 		with (fp) {
 			for (local l: fp) {
