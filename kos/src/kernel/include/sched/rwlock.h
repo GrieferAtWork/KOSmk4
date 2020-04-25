@@ -89,7 +89,7 @@ struct rwlock {
 		WEAK u32         rw_state;       /* R/W-lock state. */
 #if __SIZEOF_POINTER__ > 4
 		uintptr_t        rw_pad;         /* Align by pointers. */
-#endif
+#endif /* __SIZEOF_POINTER__ > 4 */
 		struct __ATTR_PACKED {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 			WEAK u8      rw_mode;        /* R/W-lock mode (one of `RWLOCK_MODE_F*') */
@@ -119,7 +119,9 @@ struct rwlock {
 			};
 			u8           rw_flags;       /* R/W-lock flags (set of `RWLOCK_F*') */
 			WEAK u8      rw_mode;        /* R/W-lock mode (one of `RWLOCK_MODE_F*') */
-#endif
+#else /* __BYTE_ORDER__ == ... */
+#error "Unsupported __BYTE_ORDER__"
+#endif /* __BYTE_ORDER__ != ... */
 		};
 	};
 	struct sig           rw_chmode;      /* Signal boardcast when `rw_mode' is downgraded (write -> read / write -> none).
@@ -131,53 +133,60 @@ struct rwlock {
 	                                      * Exclusive owner of this R/W lock. */
 };
 
-#define RWLOCK_INIT    {{0},SIG_INIT,SIG_INIT,NULL}
-#define rwlock_init(x) \
-	(void)((x)->rw_mode  = RWLOCK_MODE_FREADING, \
-	       (x)->rw_flags = RWLOCK_FNORMAL,       \
-	       sig_init(&(x)->rw_chmode),            \
+#define RWLOCK_INIT \
+	{ { 0 }, SIG_INIT, SIG_INIT, __NULLPTR }
+#define rwlock_init(x)                                              \
+	(void)((x)->rw_state = __RWLOCK_STATE(RWLOCK_MODE_FREADING, 0), \
+	       sig_init(&(x)->rw_chmode),                               \
+	       sig_init(&(x)->rw_unshare))
+#define rwlock_init_write(x)                     \
+	(void)(sig_init(&(x)->rw_chmode),            \
 	       sig_init(&(x)->rw_unshare),           \
-	       (x)->rw_xind = 1)
-#define rwlock_init_write(x) \
-	(void)((x)->rw_mode  = RWLOCK_MODE_FWRITING, \
-	       (x)->rw_flags = RWLOCK_FNORMAL,       \
-	       sig_init(&(x)->rw_chmode),            \
-	       sig_init(&(x)->rw_unshare),           \
-	       (x)->rw_xind = 0,                     \
-	       (x)->rw_xowner = THIS_TASK)
-#define rwlock_cinit(x) \
+	       (x)->rw_xowner = THIS_TASK,           \
+	       (x)->rw_state  = __RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1))
+#define rwlock_cinit(x)                                           \
 	(void)(__hybrid_assert((x)->rw_mode == RWLOCK_MODE_FREADING), \
 	       __hybrid_assert((x)->rw_flags == RWLOCK_FNORMAL),      \
+	       __hybrid_assert((x)->rw_xowner == __NULLPTR),          \
+	       __hybrid_assert((x)->rw_xind == 0),                    \
 	       sig_cinit(&(x)->rw_chmode),                            \
-	       sig_cinit(&(x)->rw_unshare),                           \
-	       __hybrid_assert((x)->rw_xind == 0))
+	       sig_cinit(&(x)->rw_unshare))
 #define rwlock_cinit_write(x)                                     \
 	(void)(__hybrid_assert((x)->rw_mode == RWLOCK_MODE_FREADING), \
 	       __hybrid_assert((x)->rw_flags == RWLOCK_FNORMAL),      \
+	       __hybrid_assert((x)->rw_xowner == __NULLPTR),          \
+	       __hybrid_assert((x)->rw_xind == 0),                    \
 	       sig_cinit(&(x)->rw_chmode),                            \
 	       sig_cinit(&(x)->rw_unshare),                           \
-	       __hybrid_assert((x)->rw_xind == 0),                    \
 	       (x)->rw_xowner = THIS_TASK,                            \
 	       (x)->rw_state  = __RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1))
 
 /* Check if the caller is holding a read- or write-lock on `self' */
-FUNDEF WUNUSED ATTR_PURE NONNULL((1)) bool NOTHROW(FCALL rwlock_reading)(struct rwlock const *__restrict self);
-FUNDEF WUNUSED ATTR_PURE NONNULL((1)) bool NOTHROW(FCALL rwlock_writing)(struct rwlock const *__restrict self);
+FUNDEF WUNUSED ATTR_PURE NONNULL((1)) bool
+NOTHROW(FCALL rwlock_reading)(struct rwlock const *__restrict self);
+FUNDEF WUNUSED ATTR_PURE NONNULL((1)) bool
+NOTHROW(FCALL rwlock_writing)(struct rwlock const *__restrict self);
+
 /* Same as above, but return the effective access recursion */
-FUNDEF WUNUSED ATTR_PURE NONNULL((1)) uintptr_t NOTHROW(FCALL rwlock_reading_r)(struct rwlock const *__restrict self);
-FUNDEF WUNUSED ATTR_PURE NONNULL((1)) uintptr_t NOTHROW(FCALL rwlock_writing_r)(struct rwlock const *__restrict self);
+FUNDEF WUNUSED ATTR_PURE NONNULL((1)) uintptr_t
+NOTHROW(FCALL rwlock_reading_r)(struct rwlock const *__restrict self);
+FUNDEF WUNUSED ATTR_PURE NONNULL((1)) uintptr_t
+NOTHROW(FCALL rwlock_writing_r)(struct rwlock const *__restrict self);
+
 #ifndef __INTELLISENSE__
 #define rwlock_writing(self)                    \
 	((self)->rw_mode == RWLOCK_MODE_FWRITING && \
 	 (self)->rw_xowner == THIS_TASK)
 #define rwlock_writing_r(self) \
 	(rwlock_writing(self) ? (uintptr_t)(self)->rw_xind : 0)
-#endif
+#endif /* !__INTELLISENSE__ */
 
 /* Return the total number of hold read-locks (or 0 if this is not tracked by the implementation) */
 FUNDEF WUNUSED ATTR_PURE uintptr_t NOTHROW(FCALL rwlock_reading_any)(void);
 
+#ifndef CONFIG_TASK_STATIC_READLOCKS
 #define CONFIG_TASK_STATIC_READLOCKS 4 /* NOTE: Must be a power-of-2 (2, 4, 8, 16, etc...) */
+#endif /* !CONFIG_TASK_STATIC_READLOCKS */
 
 
 /* Try to acquire a shared/exclusive lock, or try to
@@ -211,6 +220,7 @@ NOTHROW(FCALL rwlock_tryread)(struct rwlock *__restrict self) {
 	COMPILER_READ_BARRIER();
 	return true;
 }
+
 FORCELOCAL NOBLOCK WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL rwlock_tryread_readonly)(struct rwlock *__restrict self) {
 	if (!__os_rwlock_tryread_readonly(self))
@@ -218,6 +228,7 @@ NOTHROW(FCALL rwlock_tryread_readonly)(struct rwlock *__restrict self) {
 	COMPILER_READ_BARRIER();
 	return true;
 }
+
 FORCELOCAL NOBLOCK WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL rwlock_trywrite)(struct rwlock *__restrict self) {
 	if (!__os_rwlock_trywrite(self))
@@ -225,6 +236,7 @@ NOTHROW(FCALL rwlock_trywrite)(struct rwlock *__restrict self) {
 	COMPILER_BARRIER();
 	return true;
 }
+
 FORCELOCAL NOBLOCK WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL rwlock_tryupgrade)(struct rwlock *__restrict self) {
 	if (!__os_rwlock_tryupgrade(self))
@@ -268,6 +280,7 @@ rwlock_read(struct rwlock *__restrict self, struct timespec const *abs_timeout)
 	COMPILER_READ_BARRIER();
 	return true;
 }
+
 FORCELOCAL NONNULL((1)) bool FCALL
 rwlock_write(struct rwlock *__restrict self, struct timespec const *abs_timeout)
 		THROWS(E_INTERRUPT,__E_RETRY_RWLOCK,...) {
@@ -276,6 +289,7 @@ rwlock_write(struct rwlock *__restrict self, struct timespec const *abs_timeout)
 	COMPILER_BARRIER();
 	return true;
 }
+
 FORCELOCAL WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL rwlock_read_nx)(struct rwlock *__restrict self, struct timespec const *abs_timeout) {
 	if (!__os_rwlock_read_nx(self, abs_timeout))
@@ -283,6 +297,7 @@ NOTHROW(FCALL rwlock_read_nx)(struct rwlock *__restrict self, struct timespec co
 	COMPILER_READ_BARRIER();
 	return true;
 }
+
 FORCELOCAL WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL rwlock_write_nx)(struct rwlock *__restrict self, struct timespec const *abs_timeout) {
 	if (!__os_rwlock_write_nx(self, abs_timeout))
@@ -416,6 +431,7 @@ NOTHROW(FCALL rwlock_downgrade)(struct rwlock *__restrict self) {
 	COMPILER_WRITE_BARRIER();
 	return __os_rwlock_downgrade(self);
 }
+
 FORCELOCAL NONNULL((1)) void FCALL
 rwlock_downgrade_readonly(struct rwlock *__restrict self) THROWS(E_BADALLOC) {
 	COMPILER_WRITE_BARRIER();
@@ -456,11 +472,13 @@ NOTHROW(FCALL rwlock_endwrite)(struct rwlock *__restrict self) {
 	COMPILER_BARRIER();
 	__os_rwlock_endwrite(self);
 }
+
 FORCELOCAL NOBLOCK NONNULL((1)) bool
 NOTHROW(FCALL rwlock_endread)(struct rwlock *__restrict self) {
 	COMPILER_READ_BARRIER();
 	return __os_rwlock_endread(self);
 }
+
 FORCELOCAL NOBLOCK NONNULL((1)) bool
 NOTHROW(FCALL rwlock_end)(struct rwlock *__restrict self) {
 	COMPILER_BARRIER();

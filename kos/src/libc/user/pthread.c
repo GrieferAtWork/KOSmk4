@@ -439,8 +439,9 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_detach") int
 NOTHROW_NCX(LIBCCALL libc_pthread_detach)(pthread_t pthread)
 /*[[[body:pthread_detach]]]*/
 {
-	struct pthread *pt = (struct pthread *)pthread;
+	struct pthread *pt;
 	refcnt_t refcnt;
+	pt = (struct pthread *)pthread;
 	for (;;) {
 		refcnt = ATOMIC_READ(pt->pt_refcnt);
 		assert(refcnt >= 1);

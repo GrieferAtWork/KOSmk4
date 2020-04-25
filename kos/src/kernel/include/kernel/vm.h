@@ -918,7 +918,10 @@ NOTHROW(KCALL vm_datapart_cmpxchstate)(struct vm_datapart *__restrict self,
 
 
 
-
+#ifndef __poll_mode_t_defined
+#define __poll_mode_t_defined 1
+typedef unsigned int poll_mode_t; /* Set of `POLL*' */
+#endif /* !poll_mode_t_defined */
 
 struct vm_datablock_type {
 	/* [0..1] Finalize + free the given data-block. */
@@ -933,12 +936,12 @@ struct vm_datablock_type {
 	NOBLOCK NONNULL((1)) void /*NOTHROW*/ (KCALL *dt_initpart)(struct vm_datapart *__restrict part);
 	/* [0..1] Initialize the data buffer.
 	 * @assume(num_data_pages != 0);
-	 * @assume(IS_ALIGNED(buffer,VM_DATABLOCK_PAGESIZE(self)));
+	 * @assume(IS_ALIGNED(buffer, VM_DATABLOCK_PAGESIZE(self)));
 	 * NOTE: `num_data_pages' refers to data-pages, not physical pages! */
 	NONNULL((1)) void (KCALL *dt_loadpart)(struct vm_datablock *__restrict self, datapage_t start, vm_phys_t buffer, size_t num_data_pages);
 	/* [0..1] Save the given data buffer.
 	 * @assume(num_data_pages != 0);
-	 * @assume(IS_ALIGNED(buffer,VM_DATABLOCK_PAGESIZE(self)));
+	 * @assume(IS_ALIGNED(buffer, VM_DATABLOCK_PAGESIZE(self)));
 	 * NOTE: `num_data_pages' refers to data-pages, not physical pages! */
 	NONNULL((1)) void (KCALL *dt_savepart)(struct vm_datablock *__restrict self, datapage_t start, vm_phys_t buffer, size_t num_data_pages);
 	/* [0..1] Called the first time the `VM_DATAPART_FLAG_CHANGED' flag is set for `part'.
@@ -948,6 +951,25 @@ struct vm_datablock_type {
 	NONNULL((1, 2)) void (KCALL *dt_changed)(struct vm_datablock *__restrict self, struct vm_datapart *__restrict part);
 	/* TODO: `dt_accessed'  (invoked whenever a part is loaded into the core)
 	 *        Meant to update the `st_atime' field of a memory-mapped file. */
+
+	/* [0..1] Optional operators for when read(2) or write(2) is used with
+	 *        a file descriptor pointing to a vm_datablock of this type.
+	 * These callbacks are used by UVIO datablocks to implement the
+	 * server/client architecture for user-space driven VIO emulation. */
+	WUNUSED NONNULL((1)) size_t
+	(KCALL *dt_handle_read)(struct vm_datablock *__restrict self,
+	                        USER CHECKED void *dst,
+	                        size_t num_bytes, iomode_t mode) THROWS(...);
+	WUNUSED NONNULL((1)) size_t
+	(KCALL *dt_handle_write)(struct vm_datablock *__restrict self,
+	                         USER CHECKED void const *src,
+	                         size_t num_bytes, iomode_t mode) THROWS(...);
+	/* [0..1] Same as above, but used when polling for data being available.
+	 * When not implemented (i.e. when set to `NULL'), poll is implemented for
+	 * the datablock through use of `rwlock_poll(read|write)(&self->db_lock)' */
+	WUNUSED NONNULL((1)) poll_mode_t
+	(KCALL *dt_handle_poll)(struct vm_datablock *__restrict self,
+	                        poll_mode_t what) THROWS(...);
 };
 
 

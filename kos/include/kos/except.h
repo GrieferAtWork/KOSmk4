@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd883892d */
+/* HASH CRC-32:0xcc3db1d3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -860,8 +860,10 @@ __NOTHROW_NCX(__ERROR_UNWIND_CC error_unwind)(error_register_state_t *__restrict
 #define error_subclass()  ERROR_SUBCLASS(error_code())
 #endif /* !__INTELLISENSE__ */
 
-/* Throw an exception. */
+/* Throw the currently set (in `error_data()' / `THIS_EXCEPTION_DATA') exception. */
 __CDECLARE_VOID(__ATTR_NORETURN __ATTR_COLD,,error_throw_current,(void),())
+
+/* Rethrow the current exception (same as a c++ `throw;' expression) */
 __CDECLARE_VOID(__ATTR_NORETURN __ATTR_COLD,,error_rethrow,(void),())
 
 /* Transform the given exception into a posix errno value. */

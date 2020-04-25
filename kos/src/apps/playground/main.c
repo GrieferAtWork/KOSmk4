@@ -46,6 +46,7 @@
 #include <netinet/ip.h>
 #include <netinet/udp.h>
 #include <sys/io.h>
+#include <sys/mman.h>
 #include <sys/mmio.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
@@ -71,6 +72,8 @@
 #include <syslog.h>
 #include <termios.h>
 #include <unistd.h>
+
+#include <libvio/vio.h>
 
 DECL_BEGIN
 
@@ -458,6 +461,67 @@ int main_dprint(int argc, char *argv[], char *envp[]) {
 
 
 
+/************************************************************************/
+static volatile u32 viovalue = 0;
+PRIVATE NONNULL((1)) u32 LIBVIO_CC
+myvio_readl(struct vio_args *__restrict args, vio_addr_t addr) {
+	/* This function is called every time our VIO region is read from! */
+	printf("VIO:readl(%p)\n", vio_args_faultaddr(args, addr));
+	return viovalue++;
+}
+
+PRIVATE struct vio_operators const myvio_ops = {
+	/* .vo_read = */ { NULL, NULL, &myvio_readl },
+};
+
+int main_vio(int argc, char *argv[], char *envp[]) {
+	void *libvio;
+	PVIO_CREATE vio_create;
+	PVIO_DESTROY vio_destroy;
+	fd_t uviofd;
+	volatile u32 *baseaddr;
+	(void)argc, (void)argv, (void)envp;
+
+	libvio = dlopen(LIBVIO_LIBRARY_NAME, RTLD_LOCAL);
+	if (!libvio)
+		err(1, "dlopen failed: %s", dlerror());
+	*(void **)&vio_create = dlsym(libvio, "vio_create");
+	if (!vio_create)
+		err(1, "dlsym failed: %s", dlerror());
+	*(void **)&vio_destroy = dlsym(libvio, "vio_destroy");
+	if (!vio_destroy)
+		err(1, "dlsym failed: %s", dlerror());
+	uviofd = vio_create(&myvio_ops, NULL, 0x1000, O_CLOEXEC | O_CLOFORK);
+	if (uviofd < 0)
+		err(1, "vio_create failed");
+	printf("uviofd = %d\n", uviofd);
+	baseaddr = (volatile u32 *)mmap(NULL, 0x1000,
+	                                PROT_READ | PROT_WRITE,
+	                                MAP_FILE | MAP_SHARED,
+	                                uviofd, 0);
+	if ((void *)baseaddr == MAP_FAILED)
+		err(1, "mmap failed");
+	printf("Start reading from: %p\n", baseaddr);
+	viovalue = 42;
+	printf("read: %I32u\n", baseaddr[0]); /* 42 */
+	printf("read: %I32u\n", baseaddr[1]); /* 43 */
+	printf("read: %I32u\n", baseaddr[4]); /* 44 */
+	printf("read: %I32u\n", baseaddr[3]); /* 45 */
+	printf("read: %I32u\n", baseaddr[2]); /* 46 */
+	viovalue = 7;
+	printf("read: %I32u\n", baseaddr[19]); /* 7 */
+	printf("read: %I32u\n", baseaddr[8]);  /* 8 */
+	printf("read: %I32u\n", baseaddr[0]);  /* 9 */
+
+	munmap((void *)baseaddr, 0x1000);
+	vio_destroy(uviofd);
+	dlclose(libvio);
+	return 0;
+}
+/************************************************************************/
+
+
+
 typedef int (*FUN)(int argc, char *argv[], char *envp[]);
 typedef struct {
 	char const *n;
@@ -482,6 +546,7 @@ PRIVATE DEF defs[] = {
 #ifdef HAVE_MAIN_SGBASE
 	{ "sgbase", &main_sgbase },
 #endif /* HAVE_MAIN_SGBASE */
+	{ "vio", &main_vio },
 	{ NULL, NULL }
 };
 

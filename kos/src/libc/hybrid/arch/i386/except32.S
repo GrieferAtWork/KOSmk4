@@ -454,7 +454,7 @@ IU(	movl   %ecx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_E
 #if EXCEPT_BACKTRACE_SIZE != 0
 .Ldo_fill_trace:
 	.Lindex = 0
-	.rept EXCEPT_BACKTRACE_SIZE-1
+	.rept  EXCEPT_BACKTRACE_SIZE-1
 	movl   $(0), FIELD_ERROR_TRACE(.Lindex)
 	.Lindex = .Lindex + 4
 	.endr

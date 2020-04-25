@@ -48,7 +48,7 @@
 
 /* KOS Handle type codes.
  * NOTE: Changes to this list must be updated with:
- * $ deemon -F kos/src/kernel/core/user/handle-router.c kos/src/kernel/include/kernel/handle-proto.h
+ * $ deemon -F kos/src/kernel/core/user/handle-router.c kos/src/kernel/include/kernel/handle-proto.h && touch kos/src/kernel/include/kernel/handle.h
  */
 #define HANDLE_TYPE_UNDEFINED       0x0000 /* Undefined/unused handle */
 #define HANDLE_TYPE_DATABLOCK       0x0001 /* `struct vm_datablock' (also includes `struct inode') */
@@ -83,7 +83,7 @@
 #define HANDLE_TYPE_UAIO            0x001a /* `struct uaio_controller' */
 #define HANDLE_TYPE_COUNT           0x001b /* # of recognized handle types
                                             * NOTE: After changing this value, be sure to
-                                            * `touch /kos/src/kernel/include/kernel/handle.h' */
+                                            * `touch kos/src/kernel/include/kernel/handle.h' */
 
 /* Invoke `cb(int HANDLE_TYPE, typename T)' for each handle type with an associated struct */
 #define HANDLE_FOREACH_TYPE(cb)                                           \

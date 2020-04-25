@@ -173,6 +173,9 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_SEND_MSG_FLAGS,                     /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of message flags passed to `sys_send()', `sys_sendto()', `sys_sendmsg()' or `sys_sendmmsg()' is not masked by `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT | MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
 	E_INVALID_ARGUMENT_CONTEXT_RECV_MSG_FLAGS,                     /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of message flags passed to `sys_recv()', `sys_recvfrom()', `sys_recvmsg()' or `sys_recvmmsg()' is not masked by `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB | MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
 	E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_HOW,                       /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `how' passed to `sys_shutdown()' isn't one of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR' */
+	E_INVALID_ARGUMENT_CONTEXT_UVIO_BAD_OPCODE,                    /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The kernel doesn't recognize, or doesn't support the given `struct uvio_response::ur_opcode' */
+	E_INVALID_ARGUMENT_CONTEXT_UVIO_BAD_RESPFLAGS,                 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags given in `struct uvio_response::ur_respflags' isn't masked by `UVIO_RESPONSE_FLAG_NORMAL' */
+	E_INVALID_ARGUMENT_CONTEXT_USERVIOFD_FLAGS,                    /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `userviofd(2)' isn't a set of `O_NONBLOCK | O_CLOEXEC | O_CLOFORK' */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -320,6 +323,10 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_ACCEPT4_SOCK_FLAGS                 E_INVALID_ARGUMENT_CONTEXT_ACCEPT4_SOCK_FLAGS                 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of socket flags passed to `sys_accept()' is not masked by `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK' */
 #define E_INVALID_ARGUMENT_CONTEXT_SEND_MSG_FLAGS                     E_INVALID_ARGUMENT_CONTEXT_SEND_MSG_FLAGS                     /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of message flags passed to `sys_send()', `sys_sendto()', `sys_sendmsg()' or `sys_sendmmsg()' is not masked by `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT | MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
 #define E_INVALID_ARGUMENT_CONTEXT_RECV_MSG_FLAGS                     E_INVALID_ARGUMENT_CONTEXT_RECV_MSG_FLAGS                     /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of message flags passed to `sys_recv()', `sys_recvfrom()', `sys_recvmsg()' or `sys_recvmmsg()' is not masked by `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB | MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+#define E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_HOW                       E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_HOW                       /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `how' passed to `sys_shutdown()' isn't one of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR' */
+#define E_INVALID_ARGUMENT_CONTEXT_UVIO_BAD_OPCODE                    E_INVALID_ARGUMENT_CONTEXT_UVIO_BAD_OPCODE                    /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The kernel doesn't recognize, or doesn't support the given `struct uvio_response::ur_opcode' */
+#define E_INVALID_ARGUMENT_CONTEXT_UVIO_BAD_RESPFLAGS                 E_INVALID_ARGUMENT_CONTEXT_UVIO_BAD_RESPFLAGS                 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags given in `struct uvio_response::ur_respflags' isn't masked by `UVIO_RESPONSE_FLAG_NORMAL' */
+#define E_INVALID_ARGUMENT_CONTEXT_USERVIOFD_FLAGS                    E_INVALID_ARGUMENT_CONTEXT_USERVIOFD_FLAGS                    /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `userviofd(2)' isn't a set of `O_NONBLOCK | O_CLOEXEC | O_CLOFORK' */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define E_INVALID_ARGUMENT_CONTEXT_GENERIC                            0   /* Generic context */
 #define E_INVALID_ARGUMENT_CONTEXT_SETFD_OFLAG                        1   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `O_*' flag passed to `F_SETFD' */
@@ -464,6 +471,10 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_ACCEPT4_SOCK_FLAGS                 126 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of socket flags passed to `sys_accept()' is not masked by `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK' */
 #define E_INVALID_ARGUMENT_CONTEXT_SEND_MSG_FLAGS                     127 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of message flags passed to `sys_send()', `sys_sendto()', `sys_sendmsg()' or `sys_sendmmsg()' is not masked by `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT | MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
 #define E_INVALID_ARGUMENT_CONTEXT_RECV_MSG_FLAGS                     128 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of message flags passed to `sys_recv()', `sys_recvfrom()', `sys_recvmsg()' or `sys_recvmmsg()' is not masked by `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB | MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+#define E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_HOW                       129 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `how' passed to `sys_shutdown()' isn't one of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR' */
+#define E_INVALID_ARGUMENT_CONTEXT_UVIO_BAD_OPCODE                    130 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The kernel doesn't recognize, or doesn't support the given `struct uvio_response::ur_opcode' */
+#define E_INVALID_ARGUMENT_CONTEXT_UVIO_BAD_RESPFLAGS                 131 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags given in `struct uvio_response::ur_respflags' isn't masked by `UVIO_RESPONSE_FLAG_NORMAL' */
+#define E_INVALID_ARGUMENT_CONTEXT_USERVIOFD_FLAGS                    132 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `userviofd(2)' isn't a set of `O_NONBLOCK | O_CLOEXEC | O_CLOFORK' */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

@@ -217,10 +217,11 @@ sys_mmap_impl(void *addr, size_t length, syscall_ulong_t prot,
 		datablock = incref(&vm_datablock_anonymous);
 	}
 	/* Make sure that the offset and byte counts are aligned by the pagesize. */
-	file_maxnumbytes += file_minoffset & PAGEMASK;
-	file_minoffset &= ~PAGEMASK;
-	file_maxnumbytes += PAGESIZE - 1;
+	if (OVERFLOW_UADD(file_maxnumbytes, file_minoffset & PAGEMASK, &file_maxnumbytes) ||
+	    OVERFLOW_UADD(file_maxnumbytes, PAGESIZE - 1, &file_maxnumbytes))
+		file_maxnumbytes = (pos_t)-1;
 	file_maxnumbytes &= ~PAGEMASK;
+	file_minoffset &= ~PAGEMASK;
 	TRY {
 		size_t num_bytes, guard;
 		uintptr_half_t node_flags;

@@ -36,6 +36,7 @@
 
 #include <hybrid/atomic.h>
 
+#include <kos/except/fs.h>
 #include <kos/except/inval.h>
 #include <kos/hop/datablock.h>
 #include <sys/stat.h>
@@ -47,6 +48,32 @@ DECL_BEGIN
 
 /* DATABLOCK HANDLE OPERATIONS */
 DEFINE_HANDLE_REFCNT_FUNCTIONS(datablock, struct vm_datablock)
+
+INTERN WUNUSED NONNULL((1)) size_t KCALL
+handle_datablock_read(struct vm_datablock *__restrict self,
+                      USER CHECKED void *dst,
+                      size_t num_bytes, iomode_t mode) THROWS(...) {
+	size_t result;
+	if unlikely(!self->db_type->dt_handle_read) {
+		THROW(E_FSERROR_UNSUPPORTED_OPERATION,
+		      E_FILESYSTEM_OPERATION_READ);
+	}
+	result = (*self->db_type->dt_handle_read)(self, dst, num_bytes, mode);
+	return result;
+}
+
+INTERN WUNUSED NONNULL((1)) size_t KCALL
+handle_datablock_write(struct vm_datablock *__restrict self,
+                       USER CHECKED void const *src,
+                       size_t num_bytes, iomode_t mode) THROWS(...) {
+	size_t result;
+	if unlikely(!self->db_type->dt_handle_write) {
+		THROW(E_FSERROR_UNSUPPORTED_OPERATION,
+		      E_FILESYSTEM_OPERATION_WRITE);
+	}
+	result = (*self->db_type->dt_handle_write)(self, src, num_bytes, mode);
+	return result;
+}
 
 INTERN size_t KCALL
 handle_datablock_pread(struct vm_datablock *__restrict self,
@@ -135,14 +162,20 @@ handle_datablock_datasync(struct vm_datablock *__restrict self) {
 
 INTERN poll_mode_t KCALL
 handle_datablock_poll(struct vm_datablock *__restrict self, poll_mode_t what) {
-	if (what & POLLOUT) {
-		if (rwlock_pollwrite(&self->db_lock))
-			return POLLOUT | POLLIN;
-	} else if (what & POLLIN) {
-		if (rwlock_pollread(&self->db_lock))
-			return POLLIN;
+	poll_mode_t result;
+	if (self->db_type->dt_handle_poll) {
+		result = (*self->db_type->dt_handle_poll)(self, what);
+	} else {
+		result = 0;
+		if (what & POLLOUT) {
+			if (rwlock_pollwrite(&self->db_lock))
+				result = POLLOUT | POLLIN;
+		} else if (what & POLLIN) {
+			if (rwlock_pollread(&self->db_lock))
+				result = POLLIN;
+		}
 	}
-	return 0;
+	return result;
 }
 
 

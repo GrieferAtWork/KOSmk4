@@ -363,6 +363,14 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	       icpustate_getpc(state),
 	       icpustate_getsp(state));
 
+	/* TODO: HOP_HANDLE_CREATE_STREAM
+	 *       Constructs a wrapper for another handle object that includes a `pos_t'
+	 *       file offset to implement read(), write() and lseek() by dispatching these
+	 *       operators through pread(), pwrite() and fstat() (fstat for `stat::st_size'
+	 *       with lseek(SEEK_END))
+	 *       -> Useful for turning UVIO objects into file-like objects.
+	 */
+
 	return state;
 }
 
