@@ -149,6 +149,8 @@ DATDEF ATTR_PERTASK struct sigqueue this_sigqueue;
 	FORTASK(task_getprocess(), this_taskgroup.tg_proc_signals)
 
 struct ttybase_device;
+struct rpc_entry;
+
 struct taskgroup {
 	/* Controller structure for tracing task association within/between
 	 * processes, process groups, as well as sessions. */

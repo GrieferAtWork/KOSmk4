@@ -33,9 +33,11 @@
 #include <sched/except-handler.h>
 #include <sched/pid.h>
 #include <sched/posix-signal.h>
+#include <sched/rpc-internal.h>
 #include <sched/rpc.h>
 #include <sched/task.h>
 
+#include <hybrid/atomic.h>
 #include <hybrid/host.h>
 
 #include <kos/bits/except-handler.h>
@@ -288,8 +290,34 @@ x86_userexcept_callhandler(struct icpustate *__restrict state,
 
 LOCAL ATTR_NORETURN void
 NOTHROW(FCALL process_exit)(int reason) {
-	/* TODO: If the crashing application is critical, invoke kernel PANIC() */
-	/* TODO: We need to terminate the _process_; not just this thread! */
+	if (!task_isprocessleader()) {
+		/* We need to terminate the _process_; not just this thread!
+		 * This can be done by re-using our exit RPC, and sending it
+		 * to the process leader. */
+		struct rpc_entry *rpc;
+		rpc = ATOMIC_XCH(PERTASK(this_taskgroup.tg_thread_exit), NULL);
+		/* When `rpc' was already `NULL', then our leader must already be
+		 * in the process of exiting, and already took our exit RPC away,
+		 * trying to terminate us.
+		 * Handle this case by letting it do its thing, even though this
+		 * will cause us to use a different exit reason than the leader. */
+		if likely(rpc) {
+			int rpc_status;
+			rpc->re_arg = (void *)(uintptr_t)(unsigned int)reason;
+			rpc_status = task_deliver_rpc(task_getprocess(), rpc, TASK_RPC_FNORMAL);
+			if (TASK_DELIVER_RPC_WASOK(rpc_status))
+				goto done;
+			/* Failed to deliver the RPC. The only reason this should be able to happen
+			 * is when the process leader has/is already terminated/terminating, and is
+			 * no longer able to service any RPCs. */
+			assertf(rpc_status == TASK_DELIVER_RPC_TERMINATED,
+			        "Unexpected failure reason for terminating process leader\n"
+			        "rpc_status = %d", rpc_status);
+			/* Cleanup the RPC, since it isn't inherited by `task_deliver_rpc()' upon failure. */
+			task_free_rpc(rpc);
+		}
+	}
+done:
 	task_exit(reason);
 }
 

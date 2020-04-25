@@ -188,7 +188,7 @@ NOTHROW(KCALL task_propagate_exit_status_to_worker_thread)(struct task *__restri
 	/* Save the exit-status from the originating thread, and use that status for the worker. */
 	rpc->re_arg = (void *)(uintptr_t)(unsigned int)origin_pid->tp_status.w_status;
 	/* Try to deliver the RPC */
-	rpc_status = task_deliver_rpc(worker, rpc, TASK_RPC_FHIGHPRIO);
+	rpc_status = task_deliver_rpc(worker, rpc, TASK_RPC_FNORMAL);
 	if (TASK_DELIVER_RPC_WASOK(rpc_status))
 		return;
 	/* Failed to deliver the RPC. The only reason this should be able to happen
