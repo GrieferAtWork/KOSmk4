@@ -173,7 +173,7 @@ DECL_BEGIN
 #define STATE_ESC_Y1_VAL(self) (*(uint8_t *)(COMPILER_ENDOF((self)->at_escape) - sizeof(uint8_t)))
 #define STATE_ESC_Y2          22 /* After `ESCY<ORD>' */
 #define STATE_LPAREN_PERCENT  23 /* After `ESC(%' */
-#define STATE_TEXT            24 /* DEC Special Character and Line Drawing Set, VT100. */
+#define STATE_TEXT            24 /* Non-utf8 character set */
 
 #define STATE_OSC_ADD_ESC(x) ((x)+5)
 #define STATE_OSC_DEL_ESC(x) ((x)-5)

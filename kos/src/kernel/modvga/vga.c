@@ -1115,11 +1115,6 @@ PRIVATE void KCALL flash_current_line(VGA *__restrict self) THROWS(E_WOULDBLOCK,
 	invert_current_line_colors(self);
 }
 
-#undef CONFIG_VGA_LESS_LINE_FEEDS
-#if 1
-#define CONFIG_VGA_LESS_LINE_FEEDS 1
-#endif
-
 PRIVATE NONNULL((1)) void LIBANSITTY_CC
 VGA_Putc(struct ansitty *__restrict self, char32_t ch)
 		THROWS(E_WOULDBLOCK, ...) {
@@ -1196,8 +1191,10 @@ again_dotab:
 					oldptr = ATOMIC_READ(me->v_textptr);
 					cur_x  = ((size_t)(oldptr - me->v_textbase) % size_x);
 #ifdef CONFIG_VGA_LESS_LINE_FEEDS
-					if (cur_x == 0 && cp437_encode(me->v_lastch) != 0)
+					if (cur_x == 0 && cp437_encode(me->v_lastch) != 0) {
 						cur_x = size_x;
+						printk(KERN_DEBUG "GOTO_PREV_LINE\n");
+					}
 #endif /* CONFIG_VGA_LESS_LINE_FEEDS */
 				} while (!ATOMIC_CMPXCH(me->v_textptr, oldptr, oldptr - cur_x));
 			}
@@ -1218,6 +1215,7 @@ again_dotab:
 						 *               linefeed. - In this case, don't wrap the line, as the linefeed requested
 						 *               by the caller already happened implicitly, thus not creating an entirely
 						 *               empty line and wasting what little screen space we only have. */
+						printk(KERN_DEBUG "SKIP_LINEFEED\n");
 					} else
 #endif /* CONFIG_VGA_LESS_LINE_FEEDS */
 					{
@@ -1256,7 +1254,9 @@ again_dotab:
 	}
 	if (!(me->at_ansi.at_ttymode & ANSITTY_MODE_HIDECURSOR))
 		vga_update_cursor_pos(me);
+#ifdef CONFIG_VGA_LESS_LINE_FEEDS
 	me->v_lastch = ch;
+#endif /* CONFIG_VGA_LESS_LINE_FEEDS */
 }
 
 PRIVATE NONNULL((1)) void LIBANSITTY_CC
@@ -1301,7 +1301,6 @@ VGA_SetScrollRegion(struct ansitty *__restrict self,
 		me->v_scrlllin = new_scrlllin;
 		me->v_scrlend  = new_scrlllin + sizex;
 		me->v_scrlsize = (size_t)(new_scrlllin - new_scrlbase);
-		me->v_lastch   = 0; /* Prevent the hidden-newline feature from triggering. */
 		sync_endread(&me->v_textlock);
 	}
 }
@@ -1332,6 +1331,9 @@ VGA_SetCursor(struct ansitty *__restrict self,
 		me->v_textptr = me->v_textbase + pos;
 		if (update_hw_cursor && !(me->at_ansi.at_ttymode & ANSITTY_MODE_HIDECURSOR))
 			vga_update_cursor_pos(me);
+#ifdef CONFIG_VGA_LESS_LINE_FEEDS
+		me->v_lastch = 0; /* Prevent the hidden-newline feature from triggering. */
+#endif /* CONFIG_VGA_LESS_LINE_FEEDS */
 		sync_endread(&me->v_textlock);
 	}
 }

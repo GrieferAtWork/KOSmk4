@@ -888,12 +888,17 @@ do_put_cp_ch:
 			}
 			break;
 
-		case '\r':
+		case '\r': {
+			unsigned int cury;
 			/* Return to the start of the current line. */
 			if (dbg_newline_mode & DBG_NEWLINE_MODE_CLRFREE)
 				memsetw(vga_terminal_cur, VGA_EMPTY, VGA_WIDTH - VGA_GETCUR_X());
-			VGA_SETCUR(dbg_indent, VGA_GETCUR_Y());
-			break;
+			cury = VGA_GETCUR_Y();
+			if (VGA_GETCUR_X() <= dbg_indent &&
+			    cp437_encode(dbg_last_character) != 0 && cury)
+				--cury;
+			VGA_SETCUR(dbg_indent, cury);
+		}	break;
 
 		case '\n':
 			if (VGA_GETCUR_X() <= dbg_indent &&
@@ -955,6 +960,7 @@ NOTHROW(LIBANSITTY_CC vga_tty_setcursor)(struct ansitty *__restrict UNUSED(self)
 	vga_terminal_cur = vga_terminal_start + newpos;
 	if (update_hw_cursor && vga_terminal_showcur && !vga_suppress_update)
 		vga_update_cursor_pos();
+	dbg_last_character = 0;
 }
 
 PRIVATE ATTR_DBGTEXT void

@@ -34,6 +34,11 @@
 
 DECL_BEGIN
 
+#undef CONFIG_VGA_LESS_LINE_FEEDS
+#if 1
+#define CONFIG_VGA_LESS_LINE_FEEDS 1
+#endif
+
 /* macro for composing an 8-bit VGA register
  * index and value into a single 16-bit quantity */
 #define VGA_OUT16VAL(v,r)    (((v) << 8)|(r))
@@ -146,7 +151,9 @@ typedef struct
 	WEAK size_t             v_scrlsize;  /* Number of characters that get moved during a 1-line scroll operation. */
 	WEAK size_t             v_textsizex; /* Text-mode screen size in X */
 	WEAK size_t             v_textsizey; /* Text-mode screen size in Y */
+#ifdef CONFIG_VGA_LESS_LINE_FEEDS
 	char32_t                v_lastch;    /* Last-written text-mode character. */
+#endif /* CONFIG_VGA_LESS_LINE_FEEDS */
 } VGA;
 
 INTDEF struct vga_mode       const vga_ansitty_mode; /* 80x25 color text mode (w/ modified palette indices). */
