@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x11243e0d */
+/* HASH CRC-32:0x7bcfdf25 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __NAMESPACE_LOCAL_BEGIN
  * s.a. `pthread_cond_signal()' */
 __LOCAL_LIBC(cnd_signal) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cnd_signal))(__cnd_t *__restrict __cond) {
-#line 415 "kos/src/libc/magic/threads.c"
+#line 417 "kos/src/libc/magic/threads.c"
 	int __error;
 	__error = __localdep_pthread_cond_signal((__pthread_cond_t *)__cond);
 	if __likely(!__error)

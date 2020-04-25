@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdaf4c3bd */
+/* HASH CRC-32:0x16e682d0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -604,9 +604,7 @@
  * @param: state: The state state at which to raise the signal, or `NULL' if the signal should
  *                be raised for the caller's source location. Note that only in the later case
  *                will this function return to its caller. - When `state' is non-NULL, it will
- *                return to the text location described by it.
- * TODO: Add a flags argument to control if the current signal mask
- *       should be ignored (currently, it's always being ignored) */
+ *                return to the text location described by it. */
 #define SYS_raiseat                 __NR_raiseat                 /* errno_t raiseat(struct ucpustate32 const *state, struct __siginfox32_struct const *si) */
 /* Create and return a new tty terminal controller connected to the given keyboard and display
  * The newly created device automatically gets assigned an arbitrary device number, before

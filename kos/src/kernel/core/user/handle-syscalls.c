@@ -1741,9 +1741,12 @@ again:
 			poll_mode_t what, mode;
 			struct handle hnd;
 			mode = 0;
-			if (rbits & mask) mode |= POLLIN;
-			if (wbits & mask) mode |= POLLOUT;
-			if (ebits & mask) mode |= POLLPRI;
+			if (rbits & mask)
+				mode |= POLLSELECT_READFDS;
+			if (wbits & mask)
+				mode |= POLLSELECT_WRITEFDS;
+			if (ebits & mask)
+				mode |= POLLSELECT_EXCEPTFDS;
 			if (!mode)
 				continue;
 			hnd = handle_lookup(i * BITS_PER_FDS_WORD + j);
@@ -1759,24 +1762,25 @@ again:
 				decref(hnd);
 				RETHROW();
 			}
-			assert(!(what & POLLIN) || (mode & POLLIN));
-			assert(!(what & POLLOUT) || (mode & POLLOUT));
-			assert(!(what & POLLPRI) || (mode & POLLPRI));
+			assert(!(what & ~mode));
 			decref(hnd);
-			if (!(what & (POLLIN | POLLOUT | POLLPRI)))
+			if (!what)
 				continue;
 			if (!result) {
 				/* Clear all fd_set bits leading words. */
-				if (readfds)   memset(readfds, 0, i * sizeof(fds_word_t));
-				if (writefds)  memset(writefds, 0, i * sizeof(fds_word_t));
-				if (exceptfds) memset(exceptfds, 0, i * sizeof(fds_word_t));
+				if (readfds)
+					memset(readfds, 0, i * sizeof(fds_word_t));
+				if (writefds)
+					memset(writefds, 0, i * sizeof(fds_word_t));
+				if (exceptfds)
+					memset(exceptfds, 0, i * sizeof(fds_word_t));
 			}
 			++result;
-			if (what & POLLIN)
+			if (what & POLLSELECT_READFDS)
 				new_rbits |= mask;
-			if (what & POLLOUT)
+			if (what & POLLSELECT_WRITEFDS)
 				new_wbits |= mask;
-			if (what & POLLPRI)
+			if (what & POLLSELECT_EXCEPTFDS)
 				new_ebits |= mask;
 		}
 		if (result) {

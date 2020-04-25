@@ -43,7 +43,7 @@ struct __siginfo_struct;
  *                            is the result of an unhandled signal, the contents of this structure
  *                            are identical to `curr_ustate'
  *                            Note that in the later case, the caller must ensure that
- *                            `traceback_vector' is `NULL', and that `traceback_length'
+ *                            `traceback_vector' is `NULL', and `traceback_length' is 0
  * @param: traceback_vector:  A selection of known traceback instruction points that were traversed
  *                            by the user-space unwind process between `orig_ustate' and `curr_ustate'
  *                            Note that this vector may be incomplete and therefor is only useful
@@ -58,7 +58,7 @@ struct __siginfo_struct;
  *                            displaying a traceback.
  * @param: traceback_length:  The number of instruction pointers within `traceback_vector'
  * @param: reason_error:      The error that brought forth the coredump.
- *                            without any explicit error (or if the coredump was only signal-related),
+ *                            Without any explicit error (or if the coredump was only signal-related),
  *                            this argument is `NULL'
  * @param: reason_signal:     The signal that was the reason for the coredump.
  *                            When the coredump was triggered by an exception, this is the result

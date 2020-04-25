@@ -59,7 +59,9 @@ __SYSDECL_BEGIN
    <http://www.gnu.org/licenses/>.  */
 
 
+#ifndef TSS_DTOR_ITERATIONS
 #define TSS_DTOR_ITERATIONS 4
+#endif /* !TSS_DTOR_ITERATIONS */
 
 /* Exit and error codes.  */
 }%[enum @undef @macro {

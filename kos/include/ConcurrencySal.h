@@ -31,18 +31,18 @@
 #define _Analysis_assume_same_lock_(lock1, lock2)
 #define _Analysis_suppress_lock_checking_(lock)
 #define _Create_lock_level_(level)
-#define _Csalcat1_(x,y)
-#define _Csalcat2_(x,y)
+#define _Csalcat1_(x, y)
+#define _Csalcat2_(x, y)
 #define _Function_ignore_lock_checking_(lock)
 #define _Guarded_by_(lock)
 #define _Has_lock_kind_(kind)
 #define _Has_lock_level_(level)
 #define _Interlocked_
-#define _Internal_lock_level_order_(a,b)
+#define _Internal_lock_level_order_(a, b)
 #define _Internal_set_lock_count_(lock, count)
-#define _Lock_level_order_(a,b)
+#define _Lock_level_order_(a, b)
 #define _No_competing_thread_
-#define _Post_same_lock_(lock1,lock2)
+#define _Post_same_lock_(lock1, lock2)
 #define _Releases_exclusive_lock_(lock)
 #define _Releases_lock_(lock)
 #define _Releases_nonreentrant_lock_(lock)
@@ -65,8 +65,8 @@
 #define __has_lock_level(level)
 #define __has_lock_property(kind)
 #define __interlocked
-#define __internal_lock_level_order(a,b)
-#define __lock_level_order(a,b)
+#define __internal_lock_level_order(a, b)
+#define __lock_level_order(a, b)
 #define __no_competing_thread
 #define __releases_exclusive_lock(lock)
 #define __releases_lock(lock)
@@ -80,29 +80,29 @@
 
 #ifndef _Interlocked_operand_
 #define _Interlocked_operand_
-#endif
+#endif /* !_Interlocked_operand_ */
 
 //#define CSALCAT1(x,y)
 //#define CSALCAT2(x,y)
 
 #ifdef _MSC_VER
-#   define BENIGN_RACE_BEGIN __pragma(warning(push))
-#   define BENIGN_RACE_END __pragma(warning(pop))
-#   define NO_COMPETING_THREAD_BEGIN __pragma(warning(push))
-#   define NO_COMPETING_THREAD_END __pragma(warning(pop))
-#   define _Benign_race_begin_ __pragma(warning(push))
-#   define _Benign_race_end_ __pragma(warning(pop))
-#   define _No_competing_thread_begin_ __pragma(warning(push))
-#   define _No_competing_thread_end_ __pragma(warning(pop))
-#else
-#   define BENIGN_RACE_BEGIN
-#   define BENIGN_RACE_END
-#   define NO_COMPETING_THREAD_BEGIN
-#   define NO_COMPETING_THREAD_END
-#   define _Benign_race_begin_
-#   define _Benign_race_end_
-#   define _No_competing_thread_begin_
-#   define _No_competing_thread_end_
-#endif
+#define BENIGN_RACE_BEGIN __pragma(warning(push))
+#define BENIGN_RACE_END __pragma(warning(pop))
+#define NO_COMPETING_THREAD_BEGIN __pragma(warning(push))
+#define NO_COMPETING_THREAD_END __pragma(warning(pop))
+#define _Benign_race_begin_ __pragma(warning(push))
+#define _Benign_race_end_ __pragma(warning(pop))
+#define _No_competing_thread_begin_ __pragma(warning(push))
+#define _No_competing_thread_end_ __pragma(warning(pop))
+#else /* _MSC_VER */
+#define BENIGN_RACE_BEGIN
+#define BENIGN_RACE_END
+#define NO_COMPETING_THREAD_BEGIN
+#define NO_COMPETING_THREAD_END
+#define _Benign_race_begin_
+#define _Benign_race_end_
+#define _No_competing_thread_begin_
+#define _No_competing_thread_end_
+#endif /* !_MSC_VER */
 
 #endif /* !_CONCURRENCYSAL_H */

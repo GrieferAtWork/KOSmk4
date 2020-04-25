@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbad0e8eb */
+/* HASH CRC-32:0xda6e9316 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,7 +56,9 @@ __SYSDECL_BEGIN
    <http://www.gnu.org/licenses/>.  */
 
 
+#ifndef TSS_DTOR_ITERATIONS
 #define TSS_DTOR_ITERATIONS 4
+#endif /* !TSS_DTOR_ITERATIONS */
 
 /* Exit and error codes.  */
 #undef thrd_success

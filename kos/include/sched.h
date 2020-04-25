@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3fe14cff */
+/* HASH CRC-32:0x1f46cdad */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,9 +29,10 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
+
 #include <bits/sched.h>
-#include <bits/types.h>
 #include <bits/timespec.h>
+#include <bits/types.h>
 
 #define sched_priority __sched_priority
 
@@ -40,7 +41,7 @@ __SYSDECL_BEGIN
 #ifdef __USE_GNU
 
 #ifdef __CC__
-typedef __cpu_set_t    cpu_set_t;
+typedef __cpu_set_t cpu_set_t;
 #endif /* __CC__ */
 
 #ifdef __USE_KOS
@@ -50,30 +51,30 @@ typedef __cpu_set_t    cpu_set_t;
 #define CPU_ISEMPTY(cpusetp)         __CPU_ISEMPTY_S(sizeof(cpu_set_t), cpusetp)
 #define CPU_FILL(cpusetp)            __CPU_FILL_S(sizeof(cpu_set_t), cpusetp)
 #define CPU_FILL_S(setsize, cpusetp) __CPU_FILL_S(setsize, cpusetp)
-#endif
+#endif /* __USE_KOS */
 #define CPU_SETSIZE   __CPU_SETSIZE
 
-#define CPU_SET(cpu, cpusetp)                        __CPU_SET_S(cpu, sizeof(cpu_set_t), cpusetp)
-#define CPU_CLR(cpu, cpusetp)                        __CPU_CLR_S(cpu, sizeof(cpu_set_t), cpusetp)
-#define CPU_ISSET(cpu, cpusetp)                    __CPU_ISSET_S(cpu, sizeof(cpu_set_t), cpusetp)
-#define CPU_ZERO(cpusetp)                           __CPU_ZERO_S(sizeof(cpu_set_t), cpusetp)
-#define CPU_COUNT(cpusetp)                         __CPU_COUNT_S(sizeof(cpu_set_t), cpusetp)
-#define CPU_SET_S(cpu, setsize, cpusetp)             __CPU_SET_S(cpu, setsize, cpusetp)
-#define CPU_CLR_S(cpu, setsize, cpusetp)             __CPU_CLR_S(cpu, setsize, cpusetp)
-#define CPU_ISSET_S(cpu, setsize, cpusetp)         __CPU_ISSET_S(cpu, setsize, cpusetp)
-#define CPU_ZERO_S(setsize, cpusetp)                __CPU_ZERO_S(setsize, cpusetp)
-#define CPU_COUNT_S(setsize, cpusetp)              __CPU_COUNT_S(setsize, cpusetp)
-#define CPU_EQUAL(cpusetp1, cpusetp2)              __CPU_EQUAL_S(sizeof(cpu_set_t), cpusetp1, cpusetp2)
-#define CPU_EQUAL_S(setsize, cpusetp1, cpusetp2)   __CPU_EQUAL_S(setsize, cpusetp1, cpusetp2)
-#define CPU_AND(destset, srcset1, srcset2)            __CPU_OP_S(sizeof(cpu_set_t), destset, srcset1, srcset2, &)
-#define CPU_OR(destset, srcset1, srcset2)             __CPU_OP_S(sizeof(cpu_set_t), destset, srcset1, srcset2, |)
-#define CPU_XOR(destset, srcset1, srcset2)            __CPU_OP_S(sizeof(cpu_set_t), destset, srcset1, srcset2, ^)
-#define CPU_AND_S(setsize, destset, srcset1, srcset2) __CPU_OP_S(setsize, destset, srcset1, srcset2, &)
-#define CPU_OR_S(setsize, destset, srcset1, srcset2)  __CPU_OP_S(setsize, destset, srcset1, srcset2, |)
-#define CPU_XOR_S(setsize, destset, srcset1, srcset2) __CPU_OP_S(setsize, destset, srcset1, srcset2, ^)
-#define CPU_ALLOC_SIZE(count)                   __CPU_ALLOC_SIZE(count)
-#define CPU_ALLOC(count)                             __CPU_ALLOC(count)
-#define CPU_FREE(cpuset)                              __CPU_FREE(cpuset)
+#define CPU_SET(cpu, cpusetp)                         __CPU_SET_S(cpu, sizeof(cpu_set_t), cpusetp)
+#define CPU_CLR(cpu, cpusetp)                         __CPU_CLR_S(cpu, sizeof(cpu_set_t), cpusetp)
+#define CPU_ISSET(cpu, cpusetp)                     __CPU_ISSET_S(cpu, sizeof(cpu_set_t), cpusetp)
+#define CPU_ZERO(cpusetp)                            __CPU_ZERO_S(sizeof(cpu_set_t), cpusetp)
+#define CPU_COUNT(cpusetp)                          __CPU_COUNT_S(sizeof(cpu_set_t), cpusetp)
+#define CPU_SET_S(cpu, setsize, cpusetp)              __CPU_SET_S(cpu, setsize, cpusetp)
+#define CPU_CLR_S(cpu, setsize, cpusetp)              __CPU_CLR_S(cpu, setsize, cpusetp)
+#define CPU_ISSET_S(cpu, setsize, cpusetp)          __CPU_ISSET_S(cpu, setsize, cpusetp)
+#define CPU_ZERO_S(setsize, cpusetp)                 __CPU_ZERO_S(setsize, cpusetp)
+#define CPU_COUNT_S(setsize, cpusetp)               __CPU_COUNT_S(setsize, cpusetp)
+#define CPU_EQUAL(cpusetp1, cpusetp2)               __CPU_EQUAL_S(sizeof(cpu_set_t), cpusetp1, cpusetp2)
+#define CPU_EQUAL_S(setsize, cpusetp1, cpusetp2)    __CPU_EQUAL_S(setsize, cpusetp1, cpusetp2)
+#define CPU_AND(destset, srcset1, srcset2)            __CPU_AND_S(sizeof(cpu_set_t), destset, srcset1, srcset2, &)
+#define CPU_OR(destset, srcset1, srcset2)              __CPU_OR_S(sizeof(cpu_set_t), destset, srcset1, srcset2, |)
+#define CPU_XOR(destset, srcset1, srcset2)            __CPU_XOR_S(sizeof(cpu_set_t), destset, srcset1, srcset2, ^)
+#define CPU_AND_S(setsize, destset, srcset1, srcset2) __CPU_AND_S(setsize, destset, srcset1, srcset2, &)
+#define CPU_OR_S(setsize, destset, srcset1, srcset2)   __CPU_OR_S(setsize, destset, srcset1, srcset2, |)
+#define CPU_XOR_S(setsize, destset, srcset1, srcset2) __CPU_XOR_S(setsize, destset, srcset1, srcset2, ^)
+#define CPU_ALLOC_SIZE(count)                    __CPU_ALLOC_SIZE(count)
+#define CPU_ALLOC(count)                              __CPU_ALLOC(count)
+#define CPU_FREE(cpuset)                               __CPU_FREE(cpuset)
 
 #ifdef __CC__
 #ifdef __CRT_HAVE_sched_setparam

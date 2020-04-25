@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f5ecb49 */
+/* HASH CRC-32:0x1c1f35cd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -67,7 +67,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(thrd_sleep64) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(thrd_sleep64))(struct __timespec64 const *__time_point,
                                                           struct __timespec64 *__remaining) {
-#line 188 "kos/src/libc/magic/threads.c"
+#line 190 "kos/src/libc/magic/threads.c"
 #if defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep) || defined(__CRT_HAVE_nanosleep64)
 	int __error;
 	__error = __localdep_nanosleep64(__time_point, __remaining);

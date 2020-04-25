@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdd627cef */
+/* HASH CRC-32:0x4fc1a98c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -8669,9 +8669,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_Xcoredump, libc_sys_Xcoredump)
  * @param: state: The state state at which to raise the signal, or `NULL' if the signal should
  *                be raised for the caller's source location. Note that only in the later case
  *                will this function return to its caller. - When `state' is non-NULL, it will
- *                return to the text location described by it.
- * TODO: Add a flags argument to control if the current signal mask
- *       should be ignored (currently, it's always being ignored) */
+ *                return to the text location described by it. */
 /* errno_t raiseat(struct ucpustate64 const *state, struct __siginfox64_struct const *si) */
 .section .text.crt.syscall.raiseat
 INTERN_FUNCTION(libc_sys_raiseat)
@@ -8689,9 +8687,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_raiseat, libc_sys_raiseat)
  * @param: state: The state state at which to raise the signal, or `NULL' if the signal should
  *                be raised for the caller's source location. Note that only in the later case
  *                will this function return to its caller. - When `state' is non-NULL, it will
- *                return to the text location described by it.
- * TODO: Add a flags argument to control if the current signal mask
- *       should be ignored (currently, it's always being ignored) */
+ *                return to the text location described by it. */
 /* errno_t raiseat(struct ucpustate64 const *state, struct __siginfox64_struct const *si) */
 .section .text.crt.syscall.Xraiseat
 INTERN_FUNCTION(libc_sys_Xraiseat)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xace435c6 */
+/* HASH CRC-32:0xe28a81c4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,7 +49,7 @@ __LOCAL_LIBC(thrd_create) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(thrd_create))(__thrd_t *__thr,
                                                          __thrd_start_t __func,
                                                          void *__arg) {
-#line 101 "kos/src/libc/magic/threads.c"
+#line 103 "kos/src/libc/magic/threads.c"
 	int __error;
 	__STATIC_ASSERT(sizeof(int) <= sizeof(void *));
 	__error = __localdep_pthread_create((__pthread_t *)__thr, __NULLPTR,

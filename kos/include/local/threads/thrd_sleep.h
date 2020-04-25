@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1b599bac */
+/* HASH CRC-32:0xd1badfdf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -87,7 +87,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(thrd_sleep) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(thrd_sleep))(struct timespec const *__time_point,
                                                         struct timespec *__remaining) {
-#line 138 "kos/src/libc/magic/threads.c"
+#line 140 "kos/src/libc/magic/threads.c"
 #ifdef __CRT_HAVE_thrd_sleep
 	int __result;
 	struct __timespec32 __tp32, __rem32;

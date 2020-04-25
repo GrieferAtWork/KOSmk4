@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa630164b */
+/* HASH CRC-32:0x92bed6e5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -10550,9 +10550,7 @@ END(__x86_asm64_syscall_coredump)
  * @param: state: The state state at which to raise the signal, or `NULL' if the signal should
  *                be raised for the caller's source location. Note that only in the later case
  *                will this function return to its caller. - When `state' is non-NULL, it will
- *                return to the text location described by it.
- * TODO: Add a flags argument to control if the current signal mask
- *       should be ignored (currently, it's always being ignored) */
+ *                return to the text location described by it. */
 /* errno_t raiseat(struct ucpustate64 const *state, struct __siginfox64_struct const *si) */
 .section .text.x86.asm64_syscall.raiseat
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_raiseat)
@@ -25835,9 +25833,7 @@ END(__x86_asm32_int80_coredump)
  * @param: state: The state state at which to raise the signal, or `NULL' if the signal should
  *                be raised for the caller's source location. Note that only in the later case
  *                will this function return to its caller. - When `state' is non-NULL, it will
- *                return to the text location described by it.
- * TODO: Add a flags argument to control if the current signal mask
- *       should be ignored (currently, it's always being ignored) */
+ *                return to the text location described by it. */
 /* errno_t raiseat(struct ucpustate32 const *state, struct __siginfox32_struct const *si) */
 .section .text.x86.asm32_syscall_int80.raiseat
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_raiseat)
@@ -30241,9 +30237,7 @@ END(__x86_asm32_sysenter_coredump)
  * @param: state: The state state at which to raise the signal, or `NULL' if the signal should
  *                be raised for the caller's source location. Note that only in the later case
  *                will this function return to its caller. - When `state' is non-NULL, it will
- *                return to the text location described by it.
- * TODO: Add a flags argument to control if the current signal mask
- *       should be ignored (currently, it's always being ignored) */
+ *                return to the text location described by it. */
 /* errno_t raiseat(struct ucpustate32 const *state, struct __siginfox32_struct const *si) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_raiseat, __x86_asm32_int80_raiseat)
 
@@ -35606,9 +35600,7 @@ END(__x86_asm32_sysrun32_coredump)
  * @param: state: The state state at which to raise the signal, or `NULL' if the signal should
  *                be raised for the caller's source location. Note that only in the later case
  *                will this function return to its caller. - When `state' is non-NULL, it will
- *                return to the text location described by it.
- * TODO: Add a flags argument to control if the current signal mask
- *       should be ignored (currently, it's always being ignored) */
+ *                return to the text location described by it. */
 /* errno_t raiseat(struct ucpustate32 const *state, struct __siginfox32_struct const *si) */
 .section .text.x86.asm32_syscall_sysrun32.raiseat
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_raiseat)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xae44d121 */
+/* HASH CRC-32:0x991906ff */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,13 +29,19 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
-#include <bits/types.h>
-#include <libc/string.h>
-#include <libc/malloc.h>
+
 #include <hybrid/__bit.h>
 
+#include <asm/sched.h>
+#include <bits/types.h>
+
+#include <libc/malloc.h>
+#include <libc/string.h>
+
 #ifdef __USE_KOS
-#include <bits/signum.h>
+#include <hybrid/host.h>
+
+#include <bits/signum-values.h>
 #endif /* __USE_KOS */
 
 __SYSDECL_BEGIN
@@ -125,157 +131,124 @@ __SYSDECL_BEGIN
  *   - An SID is always the GPID of the leader of that session!
  */
 
-
-
-
-
-/* SERIOUSLY F$CK COMPATIBILITY WITH LINUX!
- * And here's why I'm doing it right, even though I'm breaking compatibility
- * with a system which in its core is ONE BIG RACE CONDITION ABOUT TO HAPPEN:
- *
- * At one point, linux also had a `CLONE_DETACHED' flag.
- * Nowadays that flag barely has any documentation left, but the documentation
- * that still exists states `It's being ignored and its behavior was absorbed
- * by the CLONE_THREAD flag'.
- * What I'm guessing it used to do (and once again does right here and now),
- * is that it allows the thread to >> reap itself when exiting <<.
- * Now why is that important? Well although (possibly intentionally obscured), the
- * `CLONE_THREAD' flag states the following (http://man7.org/linux/man-pages/man2/clone.2.html):
- *  """
- *           When a CLONE_THREAD thread terminates, the thread that created it using
- *           clone() is not sent a SIGCHLD (or other termination) signal; nor can the
- *           status of such a thread be obtained using wait(2).
- *           (The thread is said to be detached.)
- *  """
- * Now what can be gathered from this?
- *  #1  As plainly stated, you can't use wait(2) to join the thread.
- *      OK. Makes sense. - That's the basic idea of what one would
- *      refer to as a detach-mechanism.
- *  #2  Since wait(2) is normally used to reap zombie processes,
- *      this must also mean that the thread will be able to:
- *      >> reap itself when exiting << (see above)
- *      because otherwise we'd end up with a bunch of unreapable
- *      zombies eating up all of our brains (memory), so the kernel
- *      must be able to free the TID descriptor of the thread as
- *      soon as it dies, _without_ any additional input required
- *      from user-space.
- *      OK. Makes sense. - Again, that's what one would expect
- *      from the behavior of a detach-mechanism.
- *
- * Well. The problem here is that this is all implied behavior of
- * the `CLONE_THREAD' flag used to create new threads in linux.
- * However, just so you truly understand what the problem is, take
- * a look at the set of flags used by the pthread library found
- * on any linux system to create new threads using clone(2):
- * >> const int clone_flags = (CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SYSVSEM
- * >>                        | CLONE_SIGHAND | CLONE_THREAD          // <<< RIGHT HERE!!
- * >>                        | CLONE_SETTLS | CLONE_PARENT_SETTID
- * >>                        | CLONE_CHILD_CLEARTID
- * >>                        | 0);
- * It's using the `CLONE_THREAD' flag!
- * Now I'm not saying that it shouldn't, but you should realize that
- * as soon as one starts making use of `CLONE_THREAD', the training
- * wheels cleanly come off, and you have no way of safely using the
- * thread's TID in ANY OTHER SYSTEM CALL without running the chance
- * of the following happening:
- *  #1 You read out the TID from wherever you wrote it.
- *     Assuming that you're using the `set_tid_address()'
- *     functionality to have the kernel ZERO it out when the
- *     thread dies, you check if that happened and error out
- *     if what you get is a tid equal to ZERO.
- *  #2 You do the system call, say `tgkill()' as invoked by `pthread_kill()',
- *     but any number of other calls would work just as well, such as
- *     `sched_setaffinity()' invoked by `pthread_setaffinity()', or
- *     `rt_tgsigqueueinfo()' used by `pthread_sigqueue()'
- *  #3 Between the time that you read the TID and the time
- *     that the underlying system call evaluates the TID
- *     in order to translate it back into the kernel's thread
- *     structure (in KOS that would be `struct thread_pid'),
- *     the thread terminates.
- *     Ok. No problem. That would just mean that there'd be
- *     no thread associated with the TID, causing the system
- *     call to fail with ESRCH, as defined by POSIX.
- *    (Again: There won't be anything associated with the TID
- *            because using CLONE_THREAD means that the thread
- *            will have reaped itself when exit(2)ing)
- *     However, consider this:
- *       Another thread was creating a new thread at just the
- *       right time, and just before the kernel was assigning
- *       it a PID, the thread you were trying to access terminates
- *       and releases its PID.
- *       And as a result of this, as is the very principal of
- *       resource allocation, the kernel decides to re-use the
- *       PID, causing your system call (say tgkill invoked by pthread_kill)
- *       to suddenly refer to a brand new, but unrelated process.
- *     AND THERE YOU HAVE IT! A RACE CONDITION OF THE WORST MAGNITUDE!
- *     Because this is a race condition by DESIGN! _This_ can't
- *     easily be fixed by patching a bug. This is a fundamental
- *     flaw in how threads are implemented in linux.
- * -> Now I'm guessing linux tries to hide this problem by trying its
- *    darn hardest not to re-use TIDs for as long as possible, but the
- *    problem still stands, and _COULD_ _HAPPEN_.
- *    And simply never re-using TIDs isn't an answer either. Because
- *    that would mean that eventually it'd run out of IDs to hand out.
- * And if you think this isn't a problem, tell that to this code:
- *
- * Somewhere in the programming of the life support
- * systems of a space station, or whatever:
- * >> void stop_unrelated_workers() {
- * >> 	pthread_kill(unrelated_worker,SIGKILL);
- * >> 	// (Remember what we just learned this could do if
- * >> 	//  the race condition I described were to happen)
- * >> }
- *
- *
- * Meanwhile, in a different part of the code:
- * >> void *vent_open(void *vent) {
- * >> 	while (!try_open_vent(vent))
- * >> 		try_harder("Or people will die :(");
- * >> 	return VENT_OPEN_OK;
- * >> }
- * >> void enable_oxygen_ventilation_system(void) {
- * >> 	pthread_create(&vent_worker_0,&vent_open,get_vent(0));
- * >> 	pthread_create(&vent_worker_1,&vent_open,get_vent(1));
- * >> 	pthread_create(&vent_worker_2,&vent_open,get_vent(2));
- * >> 	pthread_create(&vent_worker_3,&vent_open,get_vent(3));
- * >>
- * >> 	pthread_join(vent_worker_3);
- * >> 	pthread_join(vent_worker_2);
- * >> 	pthread_join(vent_worker_1);
- * >> 	pthread_join(vent_worker_0);
- * >> }
- *
- * Yea. Tell that to the Astronaut that suffocated
- * because their air supply wouldn't engage...
- */
-
 #if defined(__USE_GNU) || defined(__USE_KOS)
 /* Cloning flags. */
-#define CSIGNAL              0x000000ff /* Signal mask to be sent at exit. */
-#define CLONE_VM             0x00000100 /* Set if VM shared between processes. */
-#define CLONE_FS             0x00000200 /* Set if fs info shared between processes. */
-#define CLONE_FILES          0x00000400 /* Set if open files shared between processes. */
-#define CLONE_SIGHAND        0x00000800 /* Set if signal handlers shared. */
-/*      CLONE_               0x00001000  * ... */
-#define CLONE_PTRACE         0x00002000 /* Set if tracing continues on the child. */
-#define CLONE_VFORK          0x00004000 /* Set if the parent wants the child to wake it up on mm_release. */
-#define CLONE_PARENT         0x00008000 /* Set if we want to have the same parent as the cloner. */
-#define CLONE_THREAD         0x00010000 /* Set to add to same thread group. */
-#define CLONE_NEWNS          0x00020000 /* Set to create new namespace. */
-#define CLONE_SYSVSEM        0x00040000 /* Set to shared SVID SEM_UNDO semantics. */
-#define CLONE_SETTLS         0x00080000 /* Set TLS info. */
-#define CLONE_PARENT_SETTID  0x00100000 /* Store TID in userlevel buffer before MM copy. */
-#define CLONE_CHILD_CLEARTID 0x00200000 /* Register exit futex and memory location to clear. */
-#define CLONE_DETACHED       0x00400000 /* Create clone detached. */
-#define CLONE_UNTRACED       0x00800000 /* Set if the tracing process can't force CLONE_PTRACE on this clone. */
-#define CLONE_CHILD_SETTID   0x01000000 /* Store TID in userlevel buffer in the child. */
-/*      CLONE_               0x02000000  * ... */
-#define CLONE_NEWUTS         0x04000000 /* New utsname group. */
-#define CLONE_NEWIPC         0x08000000 /* New ipcs. */
-#define CLONE_NEWUSER        0x10000000 /* New user namespace. */
-#define CLONE_NEWPID         0x20000000 /* New pid namespace. */
-#define CLONE_NEWNET         0x40000000 /* New network namespace. */
-#define CLONE_IO             0x80000000 /* Clone I/O context. */
+
+/* Signal mask to be sent at exit. */
+#ifdef __CSIGNAL
+#define CSIGNAL __CSIGNAL
+#endif /* __CSIGNAL */
+
+/* Set if VM shared between processes. */
+#ifdef __CLONE_VM
+#define CLONE_VM __CLONE_VM
+#endif /* __CLONE_VM */
+
+/* Set if fs info shared between processes. */
+#ifdef __CLONE_FS
+#define CLONE_FS __CLONE_FS
+#endif /* __CLONE_FS */
+
+/* Set if open files shared between processes. */
+#ifdef __CLONE_FILES
+#define CLONE_FILES __CLONE_FILES
+#endif /* __CLONE_FILES */
+
+/* Set if signal handlers shared. */
+#ifdef __CLONE_SIGHAND
+#define CLONE_SIGHAND __CLONE_SIGHAND
+#endif /* __CLONE_SIGHAND */
+
+/* Set if tracing continues on the child. */
+#ifdef __CLONE_PTRACE
+#define CLONE_PTRACE __CLONE_PTRACE
+#endif /* __CLONE_PTRACE */
+
+/* Set if the parent wants the child to wake it up on mm_release. */
+#ifdef __CLONE_VFORK
+#define CLONE_VFORK __CLONE_VFORK
+#endif /* __CLONE_VFORK */
+
+/* Set if we want to have the same parent as the cloner. */
+#ifdef __CLONE_PARENT
+#define CLONE_PARENT __CLONE_PARENT
+#endif /* __CLONE_PARENT */
+
+/* Set to add to same thread group. */
+#ifdef __CLONE_THREAD
+#define CLONE_THREAD __CLONE_THREAD
+#endif /* __CLONE_THREAD */
+
+/* Set to create new namespace. */
+#ifdef __CLONE_NEWNS
+#define CLONE_NEWNS __CLONE_NEWNS
+#endif /* __CLONE_NEWNS */
+
+/* Set to shared SVID SEM_UNDO semantics. */
+#ifdef __CLONE_SYSVSEM
+#define CLONE_SYSVSEM __CLONE_SYSVSEM
+#endif /* __CLONE_SYSVSEM */
+
+/* Set TLS info. */
+#ifdef __CLONE_SETTLS
+#define CLONE_SETTLS __CLONE_SETTLS
+#endif /* __CLONE_SETTLS */
+
+/* Store TID in userlevel buffer before MM copy. */
+#ifdef __CLONE_PARENT_SETTID
+#define CLONE_PARENT_SETTID __CLONE_PARENT_SETTID
+#endif /* __CLONE_PARENT_SETTID */
+
+/* Register exit futex and memory location to clear. */
+#ifdef __CLONE_CHILD_CLEARTID
+#define CLONE_CHILD_CLEARTID __CLONE_CHILD_CLEARTID
+#endif /* __CLONE_CHILD_CLEARTID */
+
+/* Create clone detached. */
+#ifdef __CLONE_DETACHED
+#define CLONE_DETACHED __CLONE_DETACHED
+#endif /* __CLONE_DETACHED */
+
+/* Set if the tracing process can't force CLONE_PTRACE on this clone. */
+#ifdef __CLONE_UNTRACED
+#define CLONE_UNTRACED __CLONE_UNTRACED
+#endif /* __CLONE_UNTRACED */
+
+/* Store TID in userlevel buffer in the child. */
+#ifdef __CLONE_CHILD_SETTID
+#define CLONE_CHILD_SETTID __CLONE_CHILD_SETTID
+#endif /* __CLONE_CHILD_SETTID */
+
+/* New utsname group. */
+#ifdef __CLONE_NEWUTS
+#define CLONE_NEWUTS __CLONE_NEWUTS
+#endif /* __CLONE_NEWUTS */
+
+/* New ipcs. */
+#ifdef __CLONE_NEWIPC
+#define CLONE_NEWIPC __CLONE_NEWIPC
+#endif /* __CLONE_NEWIPC */
+
+/* New user namespace. */
+#ifdef __CLONE_NEWUSER
+#define CLONE_NEWUSER __CLONE_NEWUSER
+#endif /* __CLONE_NEWUSER */
+
+/* New pid namespace. */
+#ifdef __CLONE_NEWPID
+#define CLONE_NEWPID __CLONE_NEWPID
+#endif /* __CLONE_NEWPID */
+
+/* New network namespace. */
+#ifdef __CLONE_NEWNET
+#define CLONE_NEWNET __CLONE_NEWNET
+#endif /* __CLONE_NEWNET */
+
+/* Clone I/O context. */
+#ifdef __CLONE_IO
+#define CLONE_IO __CLONE_IO
+#endif /* __CLONE_IO */
+
 
 #ifdef __USE_KOS
 /* Value passed for 'CHILD_STACK' to 'clone()':
@@ -291,19 +264,63 @@ __SYSDECL_BEGIN
  *       to either all ZEROs or a debug constant such as `0xCC'.
  * NOTE: Of course this auto-generated stack will also be automatically
  *       munmap()'ed once the thread exists, meaning it's the perfect solution
- *       for simple user-space multithreading that doesn't require -pthread. */
+ *       for simple user-space multithreading that doesn't want to use <pthread.h>. */
 #ifndef CLONE_CHILDSTACK_AUTO
-#ifdef __ARCH_STACK_GROWS_UP
-#   define CLONE_CHILDSTACK_AUTO ((void *)-1)
-#else
-#   define CLONE_CHILDSTACK_AUTO ((void *)0)
-#endif
+#ifdef __ARCH_STACK_GROWS_DOWNWARDS
+#define CLONE_CHILDSTACK_AUTO ((void *)0)
+#else /* __ARCH_STACK_GROWS_DOWNWARDS */
+#define CLONE_CHILDSTACK_AUTO ((void *)-1)
+#endif /* !__ARCH_STACK_GROWS_DOWNWARDS */
 #endif /* !CLONE_CHILDSTACK_AUTO */
+
+#ifdef __CLONE_THREAD
+#define __PRIVATE_CLONE_THREAD __CLONE_THREAD
+#else /* __CLONE_THREAD */
+#define __PRIVATE_CLONE_THREAD 0
+#endif /* !__CLONE_THREAD */
+#ifdef __CLONE_VM
+#define __PRIVATE_CLONE_VM __CLONE_VM
+#else /* __CLONE_VM */
+#define __PRIVATE_CLONE_VM 0
+#endif /* !__CLONE_VM */
+#ifdef __CLONE_FS
+#define __PRIVATE_CLONE_FS __CLONE_FS
+#else /* __CLONE_FS */
+#define __PRIVATE_CLONE_FS 0
+#endif /* !__CLONE_FS */
+#ifdef __CLONE_FILES
+#define __PRIVATE_CLONE_FILES __CLONE_FILES
+#else /* __CLONE_FILES */
+#define __PRIVATE_CLONE_FILES 0
+#endif /* !__CLONE_FILES */
+#ifdef __CLONE_SIGHAND
+#define __PRIVATE_CLONE_SIGHAND __CLONE_SIGHAND
+#else /* __CLONE_SIGHAND */
+#define __PRIVATE_CLONE_SIGHAND 0
+#endif /* !__CLONE_SIGHAND */
+#ifdef __CLONE_IO
+#define __PRIVATE_CLONE_IO __CLONE_IO
+#else /* __CLONE_IO */
+#define __PRIVATE_CLONE_IO 0
+#endif /* !__CLONE_IO */
 
 /* Generic set of clone flags implementing behavior
  * that one would expect for a thread or process. */
-#define CLONE_NEW_THREAD    (0|CLONE_THREAD|CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_IO)
-#define CLONE_NEW_PROCESS   (SIGCHLD) /* Same flags as used by fork() */
+#define CLONE_NEW_THREAD       \
+	(0 |                       \
+	 __PRIVATE_CLONE_THREAD |  \
+	 __PRIVATE_CLONE_VM |      \
+	 __PRIVATE_CLONE_FS |      \
+	 __PRIVATE_CLONE_FILES |   \
+	 __PRIVATE_CLONE_SIGHAND | \
+	 __PRIVATE_CLONE_IO)
+
+/* Same flags as used by fork() */
+#ifdef __SIGCHLD
+#define CLONE_NEW_PROCESS (__SIGCHLD)
+#else /* __SIGCHLD */
+#define CLONE_NEW_PROCESS 0
+#endif /* !__SIGCHLD */
 
 #endif /* __USE_KOS */
 #endif /* __USE_GNU || __USE_KOS */
@@ -317,31 +334,37 @@ __SYSDECL_BEGIN
 #define __SIZEOF_CPU_SET_T__  (__CPU_SETSIZE / 8)
 #define __NCPUBITS            (8*sizeof(__cpu_mask))
 #define __SIZEOF_CPU_MASK__    4
-#define __CPUELT(cpu)         ((cpu)/__NCPUBITS)
-#define __CPUMASK(cpu)        ((__cpu_mask)1 << ((cpu)%__NCPUBITS))
+#define __CPUELT(cpuno)         ((cpuno)/__NCPUBITS)
+#define __CPUMASK(cpuno)        ((__cpu_mask)1 << ((cpuno)%__NCPUBITS))
 #ifdef __CC__
 typedef __UINT32_TYPE__ __cpu_mask;
 typedef struct __cpu_set_struct {
 	__cpu_mask __bits[__CPU_SETSIZE / __NCPUBITS];
 } __cpu_set_t;
 #endif /* __CC__ */
-#define __CPU_SETNONE   {{[0 ... __CPUELT(__CPU_SETSIZE)-1] = 0}}
-#define __CPU_SETALL    {{[0 ... __CPUELT(__CPU_SETSIZE)-1] = (__cpu_mask)-1}}
+#define __CPU_SETNONE   { { [0 ... __CPUELT(__CPU_SETSIZE) - 1] = 0 } }
+#define __CPU_SETALL    { { [0 ... __CPUELT(__CPU_SETSIZE) - 1] = (__cpu_mask)-1 } }
 #if defined(__GNUC__) && 0
-#define __CPU_SETONE(i) \
-	_Pragma("GCC diagnostic push") \
-	_Pragma("GCC diagnostic ignored \"-Woverride-init\"") \
-		{{[0 ... __CPUELT(__CPU_SETSIZE)-1] = 0, [__CPUELT(i)] = __CPUMASK(i)}} \
+#define __CPU_SETONE(i)                                                               \
+	_Pragma("GCC diagnostic push")                                                    \
+	_Pragma("GCC diagnostic ignored \"-Woverride-init\"")                             \
+		{ { [0 ... __CPUELT(__CPU_SETSIZE) - 1] = 0, [__CPUELT(i)] = __CPUMASK(i) } } \
 	_Pragma("GCC diagnostic pop")
 #elif 1
-#define __CPU_SETONE(i) \
-	{{[0 ... ((i) < __NCPUBITS ? 0 : __CPUELT(i)-1)] = (i) < __NCPUBITS ? __CPUMASK(i) : 0, \
-		[((i) < __NCPUBITS ? 1 : __CPUELT(i)) ... \
-		(((i) < __NCPUBITS || (i) >= (__CPU_SETSIZE-__NCPUBITS)) ? __CPUELT(__CPU_SETSIZE)-2 : __CPUELT(i))] = \
-		((i) < __NCPUBITS || (i) >= (__CPU_SETSIZE-__NCPUBITS)) ? 0 : __CPUMASK(i), \
-	[(((i) < __NCPUBITS || (i) >= (__CPU_SETSIZE-__NCPUBITS)) \
-		? __CPUELT(__CPU_SETSIZE)-1 : __CPUELT(i)+1) ... __CPUELT(__CPU_SETSIZE)-1] = \
-		(i) >= (__CPU_SETSIZE-__NCPUBITS) ? __CPUMASK(i) : 0, }}
+#define __CPU_SETONE(i)                                                                                          \
+	{                                                                                                            \
+		{                                                                                                        \
+			[0 ... ((i) < __NCPUBITS ? 0 : __CPUELT(i) - 1)] = (i) < __NCPUBITS ? __CPUMASK(i) : 0,              \
+			[((i) < __NCPUBITS ? 1 : __CPUELT(i)) ... (((i) < __NCPUBITS || (i) >= (__CPU_SETSIZE - __NCPUBITS)) \
+			                                           ? __CPUELT(__CPU_SETSIZE) - 2                             \
+			                                           : __CPUELT(i))] =                                         \
+				((i) < __NCPUBITS || (i) >= (__CPU_SETSIZE - __NCPUBITS)) ? 0 : __CPUMASK(i),                    \
+			[(((i) < __NCPUBITS || (i) >= (__CPU_SETSIZE - __NCPUBITS))                                          \
+			  ? __CPUELT(__CPU_SETSIZE) - 1                                                                      \
+			  : __CPUELT(i) + 1) ...  __CPUELT(__CPU_SETSIZE) - 1] =                                             \
+				(i) >= (__CPU_SETSIZE - __NCPUBITS) ? __CPUMASK(i) : 0                                           \
+		}                                                                                                        \
+	}
 #else /* ... */
 #define __CPU_SETONE(i) \
 	{{[0 ... __CPUELT(__CPU_SETSIZE)-1] = 0, [__CPUELT(i)] = __CPUMASK(i)}}
@@ -359,33 +382,28 @@ typedef struct __cpu_set_struct {
 #error "Unsupported __SIZEOF_CPU_MASK__"
 #endif /* !... */
 
-#define __CPU_FILL_S(setsize, cpusetp)         \
-	do {                                       \
-		__libc_memset(cpusetp, 0xff, setsize); \
-	} __WHILE0
-#define __CPU_ZERO_S(setsize, cpusetp)         \
-	do {                                       \
-		__libc_memset(cpusetp, 0x00, setsize); \
-	} __WHILE0
-#define __CPU_SET_S(cpu, setsize, cpusetp)                                   \
-	__XBLOCK({                                                               \
-		__size_t const __cpu = (cpu);                                        \
-		__XRETURN((__cpu / 8 < (setsize))                                    \
-		          ? ((cpusetp)->__bits[__CPUELT(__cpu)] |= __CPUMASK(__cpu)) \
-		          : 0);                                                      \
+#define __CPU_FILL_S(setsize, cpusetp) __libc_memset(cpusetp, 0xff, setsize)
+#define __CPU_ZERO_S(setsize, cpusetp) __libc_memset(cpusetp, 0x00, setsize)
+#ifndef __NO_XBLOCK
+#define __CPU_SET_S(cpuno, setsize, cpusetp)                                           \
+	__XBLOCK({                                                                         \
+		__size_t const __cs_cpuno = (cpuno);                                           \
+		__XRETURN((__cs_cpuno / 8 < (setsize))                                         \
+		          ? ((cpusetp)->__bits[__CPUELT(__cs_cpuno)] |= __CPUMASK(__cs_cpuno)) \
+		          : 0);                                                                \
 	})
-#define __CPU_CLR_S(cpu, setsize, cpusetp)                                    \
-	__XBLOCK({                                                                \
-		__size_t const __cpu = (cpu);                                         \
-		__XRETURN((__cpu / 8 < (setsize))                                     \
-		          ? ((cpusetp)->__bits[__CPUELT(__cpu)] &= ~__CPUMASK(__cpu)) \
-		          : 0);                                                       \
+#define __CPU_CLR_S(cpuno, setsize, cpusetp)                                            \
+	__XBLOCK({                                                                          \
+		__size_t const __cs_cpuno = (cpuno);                                            \
+		__XRETURN((__cs_cpuno / 8 < (setsize))                                          \
+		          ? ((cpusetp)->__bits[__CPUELT(__cs_cpuno)] &= ~__CPUMASK(__cs_cpuno)) \
+		          : 0);                                                                 \
 	})
-#define __CPU_ISSET_S(cpu, setsize, cpusetp)                                \
-	__XBLOCK({                                                              \
-		__size_t const __cpu = (cpu);                                       \
-		__XRETURN((__cpu / 8 < (setsize)) &&                                \
-		          ((cpusetp)->__bits[__CPUELT(__cpu)] & __CPUMASK(__cpu))); \
+#define __CPU_ISSET_S(cpuno, setsize, cpusetp)                                        \
+	__XBLOCK({                                                                        \
+		__size_t const __cs_cpuno = (cpuno);                                          \
+		__XRETURN((__cs_cpuno / 8 < (setsize)) &&                                     \
+		          ((cpusetp)->__bits[__CPUELT(__cs_cpuno)] & __CPUMASK(__cs_cpuno))); \
 	})
 #define __CPU_COUNT_S(setsize, cpusetp)                                          \
 	__XBLOCK({                                                                   \
@@ -409,9 +427,7 @@ typedef struct __cpu_set_struct {
 		__XRETURN __res;                                                         \
 	})
 
-#define __CPU_EQUAL_S(setsize, cpusetp1, cpusetp2) \
-	(!__libc_memcmp(cpusetp1, cpusetp2, setsize))
-#define __CPU_OP_S(setsize, destset, srcset1, srcset2, op)          \
+#define __PRIVATE_CPU_OP_S(setsize, destset, srcset1, srcset2, op)  \
 	__XBLOCK({                                                      \
 		__cpu_set_t *const __dest      = (destset);                 \
 		__cpu_mask const *const __arr1 = (srcset1)->__bits;         \
@@ -421,6 +437,64 @@ typedef struct __cpu_set_struct {
 			__dest->__bits[__i] = __arr1[__i] op __arr2[__i];       \
 		__XRETURN __dest;                                           \
 	})
+#define __CPU_AND_S(setsize, destset, srcset1, srcset2) __PRIVATE_CPU_OP_S(setsize, destset, srcset1, srcset2, &)
+#define __CPU_OR_S(setsize, destset, srcset1, srcset2)  __PRIVATE_CPU_OP_S(setsize, destset, srcset1, srcset2, |)
+#define __CPU_XOR_S(setsize, destset, srcset1, srcset2) __PRIVATE_CPU_OP_S(setsize, destset, srcset1, srcset2, ^)
+#else /* !__NO_XBLOCK */
+#define __CPU_SET_S(cpuno, setsize, cpusetp)                    \
+	(((cpuno) / 8 < (setsize))                                  \
+	 ? ((cpusetp)->__bits[__CPUELT(cpuno)] |= __CPUMASK(cpuno)) \
+	 : 0)
+#define __CPU_CLR_S(cpuno, setsize, cpusetp)                     \
+	(((cpuno) / 8 < (setsize))                                   \
+	 ? ((cpusetp)->__bits[__CPUELT(cpuno)] &= ~__CPUMASK(cpuno)) \
+	 : 0)
+#define __CPU_ISSET_S(cpuno, setsize, cpusetp) \
+	(((cpuno) / 8 < (setsize)) && ((cpusetp)->__bits[__CPUELT(cpuno)] & __CPUMASK(cpuno)))
+__LOCAL __ATTR_PURE __STDC_INT_AS_SIZE_T
+(__cpu_count_s_impl)(__SIZE_TYPE__ __count, __cpu_mask const *__cpusetp) {
+	__STDC_INT_AS_SIZE_T __res = 0;
+	__cpu_mask const *__iter, *__end;
+	__end = (__iter = __cpusetp) + (__count / sizeof(__cpu_mask));
+	for (; __iter < __end; ++__iter)
+		__res += __CPUMASK_POPCOUNT(*__iter);
+	return __res;
+}
+#define __CPU_COUNT_S(setsize, cpusetp) \
+	__cpu_count_s_impl((__SIZE_TYPE__)(setsize), (cpusetp)->__bits)
+__LOCAL __ATTR_PURE int
+(__cpu_isempty_s_impl)(__SIZE_TYPE__ __count, __cpu_mask const *__cpusetp) {
+	__cpu_mask const *__iter, *__end;
+	__end = (__iter = __cpusetp) + (__count / sizeof(__cpu_mask));
+	for (; __iter < __end; ++__iter) {
+		if (*__iter)
+			return 0;
+	}
+	return 1;
+}
+#define __CPU_ISEMPTY_S(setsize, cpusetp) \
+	__cpu_isempty_s_impl((__SIZE_TYPE__)(setsize), (cpusetp)->__bits)
+#define __PRIVATE_DEFINE_CPU_OP_S(name, op)                                           \
+	__LOCAL __cpu_set_t *(name)(__SIZE_TYPE__ __count, __cpu_set_t *__dest,           \
+	                            __cpu_mask const *__arr1, __cpu_mask const *__arr2) { \
+		__SIZE_TYPE__ __i, __imax = __count / sizeof(__cpu_mask);                     \
+		for (__i = 0; __i < __imax; ++__i)                                            \
+			__dest->__bits[__i] = __arr1[__i] op __arr2[__i];                         \
+		return __dest;                                                                \
+	}
+__PRIVATE_DEFINE_CPU_OP_S(__cpu_and_s_impl, &)
+__PRIVATE_DEFINE_CPU_OP_S(__cpu_or_s_impl, |)
+__PRIVATE_DEFINE_CPU_OP_S(__cpu_xor_s_impl, ^)
+#undef __PRIVATE_DEFINE_CPU_OP_S
+#define __CPU_AND_S(setsize, destset, srcset1, srcset2) \
+	__cpu_and_s_impl((__SIZE_TYPE__)(setsize), destset, (srcset1)->__bits, (srcset2)->__bits)
+#define __CPU_OR_S(setsize, destset, srcset1, srcset2) \
+	__cpu_or_s_impl((__SIZE_TYPE__)(setsize), destset, (srcset1)->__bits, (srcset2)->__bits)
+#define __CPU_XOR_S(setsize, destset, srcset1, srcset2) \
+	__cpu_xor_s_impl((__SIZE_TYPE__)(setsize), destset, (srcset1)->__bits, (srcset2)->__bits)
+#endif /* __NO_XBLOCK */
+#define __CPU_EQUAL_S(setsize, cpusetp1, cpusetp2) \
+	(__libc_memcmp(cpusetp1, cpusetp2, setsize) == 0)
 #define __CPU_ALLOC_SIZE(count) \
 	((((count) + __NCPUBITS - 1) / __NCPUBITS) * sizeof(__cpu_mask))
 #define __CPU_ALLOC(count) \

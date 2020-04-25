@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc561f41 */
+/* HASH CRC-32:0x901a387c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ __NAMESPACE_LOCAL_BEGIN
  * s.a. `pthread_mutex_lock()' */
 __LOCAL_LIBC(mtx_lock) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(mtx_lock))(__mtx_t *__restrict __mutex) {
-#line 307 "kos/src/libc/magic/threads.c"
+#line 309 "kos/src/libc/magic/threads.c"
 	int __error;
 	__error = __localdep_pthread_mutex_lock((__pthread_mutex_t *)__mutex);
 	if __likely(!__error)

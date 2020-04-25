@@ -1380,9 +1380,9 @@ NOTHROW_NCX(LIBCCALL libc_group_member)(gid_t gid)
 	int result;
 #if !defined(NGROUPS_MAX) || NGROUPS_MAX > 32
 	unsigned int size = 32;
-#else
+#else /* !NGROUPS_MAX || NGROUPS_MAX > 32 */
 	unsigned int size = NGROUPS_MAX;
-#endif
+#endif /* NGROUPS_MAX && NGROUPS_MAX <= 32 */
 	while ((result = group_member_impl(gid, size)) < 0 && libc_geterrno() == EINVAL)
 		size *= 2;
 	return result;
@@ -1500,9 +1500,11 @@ NOTHROW_NCX(LIBCCALL libc_ualarm)(useconds_t value,
 	timer.it_interval.tv_sec  = interval / 1000000;
 	timer.it_interval.tv_usec = interval % 1000000;
 	if (setitimer(ITIMER_REAL, &timer, &otimer) < 0)
-		return -1;
+		goto err;
 	return (otimer.it_value.tv_sec * 1000000) +
 	       (otimer.it_value.tv_usec);
+err:
+	return (useconds_t)-1;
 }
 /*[[[end:ualarm]]]*/
 
@@ -1763,7 +1765,7 @@ NOTHROW_NCX(LIBCCALL libc_sethostid)(long int id)
 	if (fd < 0) {
 		if (fd == -ENOTDIR) {
 			/* Check if /etc was already created. */
-			fd = sys_mkdir(hostid_pathname, 0644);
+			fd = sys_mkdir(hostid_pathname, 0755);
 			if (fd == -EOK || fd == -EEXIST) {
 				fd = sys_open(hostid_filename, O_CREAT | O_WRONLY | O_TRUNC, 0644);
 				if (fd >= 0)
@@ -1993,21 +1995,21 @@ NOTHROW_NCX(LIBCCALL libc_profil)(unsigned short int *sample_buffer,
                                   unsigned int scale)
 /*[[[body:profil]]]*/
 {
-#ifdef __NR_profil
+#ifdef SYS_profil
 	errno_t result;
 	result = sys_profil((uint16_t *)sample_buffer,
 	                    size,
 	                    offset,
 	                    (syscall_ulong_t)scale);
 	return libc_seterrno_syserr(result);
-#else /* __NR_profil */
+#else /* SYS_profil */
 	(void)sample_buffer;
 	(void)size;
 	(void)offset;
 	(void)scale;
 	libc_seterrno(ENOSYS);
 	return -1;
-#endif /* !__NR_profil */
+#endif /* !SYS_profil */
 }
 /*[[[end:profil]]]*/
 

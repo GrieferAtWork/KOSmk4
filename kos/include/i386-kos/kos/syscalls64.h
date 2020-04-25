@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xccd2e162 */
+/* HASH CRC-32:0x1ea33545 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -79,11 +79,11 @@
 __SYSDECL_BEGIN
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma push_macro("timezone")
 #pragma push_macro("dirent")
+#pragma push_macro("timezone")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#undef timezone
 #undef dirent
+#undef timezone
 
 struct __cpu_set_struct;
 struct __fd_set_struct;
@@ -1100,9 +1100,7 @@ __CDECLARE_SC(,__errno_t,quotactl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
  * @param: state: The state state at which to raise the signal, or `NULL' if the signal should
  *                be raised for the caller's source location. Note that only in the later case
  *                will this function return to its caller. - When `state' is non-NULL, it will
- *                return to the text location described by it.
- * TODO: Add a flags argument to control if the current signal mask
- *       should be ignored (currently, it's always being ignored) */
+ *                return to the text location described by it. */
 __CDECLARE_SC(,__errno_t,raiseat,(struct ucpustate64 const *__state, struct __siginfox64_struct const *__si),(__state,__si))
 #endif /* __CRT_HAVE_SC(raiseat) */
 #if __CRT_HAVE_SC(read)
@@ -2580,9 +2578,7 @@ __CDECLARE_XSC(,__errno_t,quotactl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
  * @param: state: The state state at which to raise the signal, or `NULL' if the signal should
  *                be raised for the caller's source location. Note that only in the later case
  *                will this function return to its caller. - When `state' is non-NULL, it will
- *                return to the text location described by it.
- * TODO: Add a flags argument to control if the current signal mask
- *       should be ignored (currently, it's always being ignored) */
+ *                return to the text location described by it. */
 __CDECLARE_XSC(,__errno_t,raiseat,(struct ucpustate64 const *__state, struct __siginfox64_struct const *__si),(__state,__si))
 #endif /* __CRT_HAVE_XSC(raiseat) */
 #if __CRT_HAVE_XSC(read)
@@ -3076,8 +3072,8 @@ __CDECLARE_XSC(,__ssize_t,writevf,(__fd_t __fd, struct __iovecx64 const *__iovec
 #endif /* __CRT_HAVE_XSC(writevf) */
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma pop_macro("dirent")
 #pragma pop_macro("timezone")
+#pragma pop_macro("dirent")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
 
