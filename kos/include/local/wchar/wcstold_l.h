@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x22d3d49b */
+/* HASH CRC-32:0x93994284 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __LOCAL_LIBC(wcstold_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __LONGDOU
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcstold_l))(__WCHAR_TYPE__ const *__restrict __nptr,
                                                        __WCHAR_TYPE__ **__endptr,
                                                        __locale_t __locale) {
-#line 1685 "kos/src/libc/magic/stdlib.c"
+#line 1712 "kos/src/libc/magic/stdlib.c"
 	(void)__locale;
 	return __localdep_wcstold(__nptr, __endptr);
 }

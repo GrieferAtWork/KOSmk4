@@ -1573,12 +1573,39 @@ fcvt:(double val, int ndigit,
 getsubopt:([nonnull] char **__restrict optionp,
            [nonnull] char *const *__restrict tokens,
            [nonnull] char **__restrict valuep) -> int {
-	/* TODO: Implement here */
-	(void)optionp;
-	(void)tokens;
-	(void)valuep;
-	COMPILER_IMPURE();
-	return 0;
+	unsigned int i;
+	char *option, *nextopt;
+	size_t option_len;
+	option  = *optionp;
+	*valuep = NULL;
+	/* Find the next option */
+	nextopt = strchr(option, ',');
+	if (nextopt) {
+		option_len = (size_t)(nextopt - option);
+		*nextopt++ = '\0';
+	} else {
+		option_len = strlen(option);
+		nextopt = option + option_len;
+	}
+	*optionp = nextopt;
+	for (i = 0; tokens[i]; ++i) {
+		size_t toklen = strlen(tokens[i]);
+		/* Check if this token is matches the found option */
+		if (memcmp(tokens[i], option, toklen * sizeof(char)) != 0)
+			continue;
+		/* Deal with a potential option value. */
+		if (option[toklen] == '=') {
+			*valuep = option + toklen + 1;
+		} else {
+			/* Make sure that the option doesn't keep on going */
+			if (option[toklen] != 0)
+				continue;
+		}
+		return (int)i;
+	}
+	/* Not found (return the whole `name[=value]' string) */
+	*valuep = option;
+	return -1;
 }
 
 %[default_impl_section(.text.crt.fs.utility)]
