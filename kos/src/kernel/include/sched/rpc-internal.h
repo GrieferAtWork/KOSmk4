@@ -44,9 +44,9 @@ DECL_BEGIN
 #define RPC_KIND_SYNC            0x0000 /* Synchronous RPC */
 #define RPC_KIND_USER            0x0001 /* User RPC (service before returning to user-space) */
 #define RPC_KIND_INTERRUPT       0x0002 /* Interrupting user RPC (throw an `E_INTERRUPT_USER_RPC') */
-#define RPC_KIND_USER_INTR       0x0003 /* Interrupting user RPC (== RPC_KIND_USER|RPC_KIND_INTERRUPT) */
+#define RPC_KIND_USER_INTR       0x0003 /* Interrupting user RPC (== RPC_KIND_USER | RPC_KIND_INTERRUPT) */
 #define RPC_KIND_USER_SYNC       0x0004 /* Synchronous user-level RPC (Only service before user-space, and after a call to `task_serve()') */
-#define RPC_KIND_USER_INTR_SYNC  0x0007 /* Synchronous user-level RPC (== RPC_KIND_USER|RPC_KIND_INTERRUPT|RPC_KIND_USER_SYNC) */
+#define RPC_KIND_USER_INTR_SYNC  0x0007 /* Synchronous user-level RPC (== RPC_KIND_USER | RPC_KIND_INTERRUPT | RPC_KIND_USER_SYNC) */
 #define RPC_KIND_MASK            0x000f /* Mask for the RPC kind. */
 #define RPC_KIND_NOTHROW         0x0010 /* FLAG: Non-throwing RPC */
 #define RPC_KIND_NONSYSCALL      0x0400 /* FLAG: (for `RPC_KIND_USER_INTR_SYNC'): The RPC may be serviced for reasons other than `TASK_RPC_REASON_SYSCALL' */
@@ -111,7 +111,7 @@ NOTHROW(KCALL task_free_rpc)(struct rpc_entry *__restrict rpc);
 /* Deliver a given `rpc' to the specified `target' thread.
  * @param: target:   The target thread to which to deliver the RPC.
  * @param: rpc:      The rpc to-be delivered (inherited upon success; s.a. possible return values)
- * @param: priority: Set of `TASK_RPC_FNORMAL|TASK_RPC_FDONTWAKE|TASK_RPC_FHIGHPRIO|TASK_RPC_FLOWPRIO|TASK_RPC_FWAITFOR'
+ * @param: priority: Set of `TASK_RPC_FNORMAL | TASK_RPC_FDONTWAKE | TASK_RPC_FHIGHPRIO | TASK_RPC_FLOWPRIO | TASK_RPC_FWAITFOR'
  * @return: TASK_DELIVER_RPC_KERNTHREAD:  Failed to deliver the RPC: `rpc' is a USER-level RPC, and `target' is a kernel thread.
  * @return: TASK_DELIVER_RPC_TERMINATED:  Failed to deliver the RPC: The given `target' has already terminated.
  * @return: TASK_DELIVER_RPC_SUCCESS:     Successfully delivered RPC

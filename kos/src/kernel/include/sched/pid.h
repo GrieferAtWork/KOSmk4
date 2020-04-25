@@ -166,13 +166,24 @@ struct taskgroup {
 	                                                      *     is apart of a chain of other worker threads.
 	                                                      *   - Any kernel thread is always its own process. */
 	/* All of the following fields are only valid when `tg_process == THIS_TASK' (Otherwise, they are all `[0..1][const]') */
-	struct atomic_rwlock         tg_proc_threads_lock;   /* Lock for `tg_proc_threads' */
+	union {
+		struct rpc_entry        *tg_thread_exit;         /* [valid_if(tg_process != THIS_TASK)][lock(PRIVATE(tg_process), CLEAR_ONCE)][0..1][owned]
+		                                                  * A pre-allocated RPC used by the process leader to propagate its exit status to this thread. */
+		struct atomic_rwlock     tg_proc_threads_lock;   /* [valid_if(tg_process == THIS_TASK)] Lock for `tg_proc_threads' */
+	};
+	union {
 #define TASKGROUP_TG_PROC_THREADS_TERMINATED ((REF struct taskpid *)-1)
-	LLIST(REF struct taskpid)    tg_proc_threads;        /* [0..1][lock(tg_proc_threads_lock)]
-	                                                      * Chain of threads & child processes of this process (excluding the calling (aka. leader) thread)
-	                                                      * Tasks are removed from this chain, either by being `detach(2)'ed, or by being `wait(2)'ed on.
-	                                                      * NOTE: This chain is set to `TASKGROUP_TG_PROC_THREADS_TERMINATED' once the associated
-	                                                      *       process terminates, in order to prevent any new threads from being added. */
+		LLIST(REF struct taskpid) tg_proc_threads;       /* [0..1][lock(tg_proc_threads_lock)][valid_if(tg_process == THIS_TASK)]
+		                                                  * Chain of threads & child processes of this process (excluding the calling (aka. leader) thread)
+		                                                  * Child processes are removed from this chain, either by being `detach(2)'ed, or by being `wait(2)'ed on.
+		                                                  * NOTE: This chain is set to `TASKGROUP_TG_PROC_THREADS_TERMINATED' once the associated
+		                                                  *       process terminates, in order to prevent any new threads from being added.
+		                                                  * NOTE: When a thread is detached, the `tg_thread_detached' field is updated */
+#define TASKGROUP_TG_THREAD_DETACHED_NO         0 /* The thread is not detached */
+#define TASKGROUP_TG_THREAD_DETACHED_YES        1 /* The thread is detached */
+#define TASKGROUP_TG_THREAD_DETACHED_TERMINATED 2 /* The thread has terminated */
+		uintptr_t                tg_thread_detached;     /* [valid_if(tg_process != THIS_TASK)] Thread detach state (one of `TASKGROUP_TG_THREAD_DETACHED_*') */
+	};
 	struct sig                   tg_proc_threads_change; /* Broadcast when one of the threads (or child processes) of this process changes state.
 	                                                      * For this purpose, the changed child has previously set its `tp_status' field to describe
 	                                                      * its new state.

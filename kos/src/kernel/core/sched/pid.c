@@ -37,6 +37,8 @@
 #include <sched/cpu.h>
 #include <sched/pid.h>
 #include <sched/posix-signal.h>
+#include <sched/rpc-internal.h>
+#include <sched/rpc.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
@@ -158,31 +160,46 @@ PUBLIC ATTR_PERTASK struct sigqueue this_sigqueue = {
 PUBLIC ATTR_PERTASK struct taskpid *this_taskpid = NULL;
 
 
+PRIVATE WUNUSED NONNULL((2)) struct icpustate *FCALL
+rpc_propagate_exit_state_to_worker(void *arg, struct icpustate *__restrict state,
+                                   unsigned int reason,
+                                   struct rpc_syscall_info const *UNUSED(sc_info)) {
+	if (reason != TASK_RPC_REASON_SHUTDOWN)
+		THROW(E_EXIT_THREAD, (uintptr_t)arg);
+	return state;
+}
+
+
 PRIVATE NOBLOCK void
 NOTHROW(KCALL task_propagate_exit_status_to_worker_thread)(struct task *__restrict worker,
-                                                           struct taskpid *__restrict worker_pid,
+                                                           struct taskpid *__restrict UNUSED(worker_pid),
                                                            struct task *__restrict origin,
                                                            struct taskpid *__restrict origin_pid) {
-	/* TODO: Send an RPC callback to `worker' to propagate the exit status
-	 *       that caused the task associated with `origin_pid' to exit. */
-	(void)worker;
-	(void)worker_pid;
-	(void)origin;
-	(void)origin_pid;
+	struct taskgroup *worker_group;
+	struct rpc_entry *rpc;
+	int rpc_status;
+	/* Send an RPC callback to `worker' to propagate the exit status
+	 * that caused the task associated with `origin_pid' to exit. */
+	worker_group = &FORTASK(worker, this_taskgroup);
+	assert(worker_group->tg_process == origin);
+	rpc = ATOMIC_XCH(worker_group->tg_thread_exit, NULL);
+	if unlikely(!rpc)
+		return; /* Shouldn't happen, but would indicate that an RPC was already delivered. */
+	/* Save the exit-status from the originating thread, and use that status for the worker. */
+	rpc->re_arg = (void *)(uintptr_t)(unsigned int)origin_pid->tp_status.w_status;
+	/* Try to deliver the RPC */
+	rpc_status = task_deliver_rpc(worker, rpc, TASK_RPC_FHIGHPRIO);
+	if (TASK_DELIVER_RPC_WASOK(rpc_status))
+		return;
+	/* Failed to deliver the RPC. The only reason this should be able to happen
+	 * is when the worker thread has/is already terminated/terminating, and is
+	 * no longer able to service any RPCs. */
+	assertf(rpc_status == TASK_DELIVER_RPC_TERMINATED,
+	        "Unexpected failure reason for terminating worker thread\n"
+	        "rpc_status = %d", rpc_status);
+	/* Cleanup the RPC, since it isn't inherited by `task_deliver_rpc()' upon failure. */
+	task_free_rpc(rpc);
 }
-
-#undef CONFIG_TERMINATE_PROCESS_GROUP_WHEN_GROUP_LEADER_DIES
-//#define CONFIG_TERMINATE_PROCESS_GROUP_WHEN_GROUP_LEADER_DIES 1 /* This would not be posix behavior */
-
-#ifdef CONFIG_TERMINATE_PROCESS_GROUP_WHEN_GROUP_LEADER_DIES
-PRIVATE NOBLOCK void
-NOTHROW(KCALL task_propagate_exit_status_to_group_process)(struct task *__restrict process,
-                                                           struct task *__restrict origin,
-                                                           struct taskpid *__restrict origin_pid) {
-	/* TODO: Same as `task_propagate_exit_status_to_worker_thread()', but used
-	 *       to propagate an exit status to the members of a process group. */
-}
-#endif /* CONFIG_TERMINATE_PROCESS_GROUP_WHEN_GROUP_LEADER_DIES */
 
 PRIVATE NOBLOCK void
 NOTHROW(KCALL task_send_sigcld_to_parent_process)(struct task *__restrict parent,
@@ -191,7 +208,8 @@ NOTHROW(KCALL task_send_sigcld_to_parent_process)(struct task *__restrict parent
 	/* Signal that we've changed state. */
 	sig_altbroadcast(&FORTASK(parent, this_taskgroup).tg_proc_threads_change,
 	                 (struct sig *)origin_pid);
-	/* TODO: Send a SIGCLD to `parent' */
+	/* TODO: Send a `SIGCLD' to `parent' */
+	/*task_raisesignalprocess_nx(parent, SIGCLD, GFP_ATOMIC);*/
 	(void)parent;
 	(void)origin;
 	(void)origin_pid;
@@ -298,59 +316,6 @@ NOTHROW(KCALL this_taskgroup_cleanup)(void) {
 			decref(threads);
 			threads = next;
 		}
-#ifdef CONFIG_TERMINATE_PROCESS_GROUP_WHEN_GROUP_LEADER_DIES
-		if (mygroup.tg_proc_group == proc) {
-			/* Propagate the exit status to all of the other processes without this group. */
-			while (ATOMIC_READ(mygroup.tg_pgrp_processes)) {
-				struct task *group_proc;
-				REF struct taskpid *my_session;
-				while (!sync_tryread(&mygroup.tg_pgrp_session_lock))
-					task_tryyield_or_pause();
-				my_session = incref(mygroup.tg_pgrp_session);
-				sync_endread(&mygroup.tg_pgrp_session_lock);
-				while (!sync_trywrite(&mygroup.tg_pgrp_processes_lock))
-					task_tryyield_or_pause();
-				group_proc = mygroup.tg_pgrp_processes;
-				while (group_proc && !tryincref(group_proc)) {
-					assert(group_proc != proc);
-					assert(FORTASK(group_proc, this_taskgroup).tg_pgrp_processes == proc);
-					group_proc = FORTASK(group_proc, this_taskgroup).tg_proc_group_siblings.ln_next;
-				}
-				assert(group_proc != proc);
-				if unlikely(!group_proc) {
-					sync_endwrite(&mygroup.tg_pgrp_processes_lock);
-					decref_unlikely(my_session);
-					break;
-				}
-				/* Move the given `proc' into its own process group, thus disconnecting. */
-				if (!sync_trywrite(&FORTASK(group_proc, this_taskgroup).tg_proc_group_lock)) {
-					sync_endwrite(&mygroup.tg_pgrp_processes_lock);
-					decref_unlikely(group_proc);
-					decref_unlikely(my_session);
-					task_tryyield_or_pause();
-					continue;
-				}
-				assert(FORTASK(group_proc, this_taskgroup).tg_proc_group == proc);
-				/* Remove the `group_proc' from our process group member list. */
-				LLIST_REMOVE_P(group_proc, PATH_this_taskgroup__tg_proc_group_siblings);
-				FORTASK(group_proc, this_taskgroup).tg_proc_group = group_proc;
-#ifndef NDEBUG
-				memset(&FORTASK(group_proc, this_taskgroup).tg_proc_group_siblings, 0xcc,
-				       sizeof(FORTASK(group_proc, this_taskgroup).tg_proc_group_siblings));
-#endif /* !NDEBUG */
-				FORTASK(group_proc, this_taskgroup).tg_pgrp_processes = NULL;
-				atomic_rwlock_init(&FORTASK(group_proc, this_taskgroup).tg_pgrp_processes_lock);
-				atomic_rwlock_init(&FORTASK(group_proc, this_taskgroup).tg_pgrp_session_lock);
-				FORTASK(group_proc, this_taskgroup).tg_pgrp_session = my_session; /* Inherit reference */
-				sync_endwrite(&FORTASK(group_proc, this_taskgroup).tg_proc_group_lock);
-				sync_endwrite(&mygroup.tg_pgrp_processes_lock);
-				decref_nokill(proc); /* The reference taken from `FORTASK(group_proc,this_taskgroup).tg_proc_group' */
-				/* Propagate our exit status to this process. */
-				task_propagate_exit_status_to_group_process(group_proc, proc, mypid);
-				decref(group_proc);
-			}
-		}
-#endif /* CONFIG_TERMINATE_PROCESS_GROUP_WHEN_GROUP_LEADER_DIES */
 		/* Load the parent of the process */
 		{
 			REF struct task *parent;
@@ -369,26 +334,34 @@ NOTHROW(KCALL this_taskgroup_cleanup)(void) {
 		}
 		process_sigqueue_set_term(&mygroup.tg_proc_signals);
 	} else {
+		uintptr_t thread_detach_state;
 		assert(mypid);
 		assert(!WIFCONTINUED(mypid->tp_status) && !WIFSTOPPED(mypid->tp_status));
 		/* Broadcast without our thread that we've changed state */
 		sig_altbroadcast(&mygroup.tg_proc_threads_change, (struct sig *)mypid);
-#if 0 /* Don't do this. - This is what CLONE_DETACHED, as well as `detach(2)' are for! */
-		/* Remove our thread link from the chain of threads of our process's leader. */
-		if (ATOMIC_READ(mypid->tp_siblings.ln_pself) != NULL) {
-			while (!sync_trywrite(&mygroup.tg_proc_threads_lock)) {
-				if (ATOMIC_READ(mygroup.tg_proc_threads) == TASKGROUP_TG_PROC_THREADS_TERMINATED)
-					goto done_unlink_pid_sibling; /* The leader has already terminated. */
-				task_tryyield_or_pause();
+		do {
+			COMPILER_READ_BARRIER();
+			thread_detach_state = PERTASK_GET(this_taskgroup.tg_thread_detached);
+			COMPILER_READ_BARRIER();
+		} while (!ATOMIC_CMPXCH_WEAK(THIS_TASKGROUP.tg_thread_detached,
+		                             thread_detach_state,
+		                             TASKGROUP_TG_THREAD_DETACHED_TERMINATED));
+		if (thread_detach_state != TASKGROUP_TG_THREAD_DETACHED_NO) {
+			/* Remove our thread link from the chain of threads of our process's leader. */
+			if (ATOMIC_READ(mypid->tp_siblings.ln_pself) != NULL) {
+				while (!sync_trywrite(&mygroup.tg_proc_threads_lock)) {
+					if (ATOMIC_READ(mygroup.tg_proc_threads) == TASKGROUP_TG_PROC_THREADS_TERMINATED)
+						goto done_unlink_pid_sibling; /* The leader has already terminated. */
+					task_tryyield_or_pause();
+				}
+				LLIST_REMOVE(mypid, tp_siblings);
+				LLIST_UNBIND(mypid, tp_siblings);
+				sync_endwrite(&mygroup.tg_proc_threads_lock);
+				decref_nokill(mypid); /* The reference previously contained within the `tp_siblings' chain */
 			}
-			LLIST_REMOVE(mypid, tp_siblings);
-			LLIST_UNBIND(mypid, tp_siblings);
-			sync_endwrite(&mygroup.tg_proc_threads_lock);
-			decref_nokill(mypid); /* The reference previously contained within the `tp_siblings' chain */
 		}
 done_unlink_pid_sibling:
 		;
-#endif
 	}
 #undef mygroup
 }
@@ -407,9 +380,13 @@ NOTHROW(KCALL this_taskgroup_fini)(struct task *__restrict self) {
 	sigqueue_fini(&FORTASK(self, this_sigqueue));
 	if unlikely(mygroup.tg_process == NULL)
 		; /* Incomplete initialization... */
-	else if (mygroup.tg_process != self)
+	else if (mygroup.tg_process != self) {
 		decref_unlikely(mygroup.tg_process);
-	else {
+		/* Free up the thread-exit RPC (this happens if
+		 * a thread exits prior to the process leader) */
+		if (mygroup.tg_thread_exit)
+			task_free_rpc(mygroup.tg_thread_exit);
+	} else {
 		/* Process leader. */
 		REF struct taskpid *iter, *next;
 		iter = mygroup.tg_proc_threads;
@@ -480,8 +457,12 @@ NOTHROW(KCALL this_taskgroup_fini)(struct task *__restrict self) {
 
 PUBLIC ATTR_PERTASK struct taskgroup this_taskgroup = {
 	/* .tg_process             = */ NULL,                /* Initialized by `task_setthread()' / `task_setprocess()' */
-	/* .tg_proc_threads_lock   = */ ATOMIC_RWLOCK_INIT,
-	/* .tg_proc_threads        = */ LLIST_INIT,
+	{
+		/* .tg_proc_threads_lock = */ ATOMIC_RWLOCK_INIT
+	},
+	{
+		/* .tg_proc_threads    = */ LLIST_INIT
+	},
 	/* .tg_proc_threads_change = */ SIG_INIT,
 	/* .tg_proc_parent_lock    = */ ATOMIC_RWLOCK_INIT,
 	/* .tg_proc_parent         = */ NULL,                /* Initialized by `task_setprocess()' */
@@ -516,26 +497,37 @@ task_setthread(struct task *__restrict self,
 		THROWS(E_WOULDBLOCK) {
 	struct taskpid *next;
 	struct taskpid *pid = FORTASK(self, this_taskpid);
+	struct rpc_entry *exit_rpc;
 	assertf(pid, "Must call `task_setpid()' before `task_setthread()'");
 	assertf(leader && leader != self, "Must use `task_setprocess()' to create a new process");
 	assertf(FORTASK(self, this_taskgroup).tg_process == NULL, "`task_setthread()' and `task_setprocess()' may only be called once");
 	assertf(!(self->t_flags & TASK_FKERNTHREAD), "`task_setthread()' and `task_setprocess()' may not be used with kernel threads");
-	leader = task_getprocess_of(leader);
-	sync_write(&FORTASK(leader, this_taskgroup).tg_proc_threads_lock);
-	FORTASK(self, this_taskgroup).tg_process = incref(leader);
-	pid->tp_siblings.ln_pself                 = &FORTASK(leader, this_taskgroup).tg_proc_threads;
+	leader   = task_getprocess_of(leader);
+	exit_rpc = task_alloc_synchronous_rpc(&rpc_propagate_exit_state_to_worker);
+	TRY {
+		sync_write(&FORTASK(leader, this_taskgroup).tg_proc_threads_lock);
+	} EXCEPT {
+		task_free_rpc(exit_rpc);
+		RETHROW();
+	}
+	FORTASK(self, this_taskgroup).tg_process     = incref(leader);
+	FORTASK(self, this_taskgroup).tg_thread_exit = exit_rpc;
+	assertf(FORTASK(self, this_taskgroup).tg_thread_detached == TASKGROUP_TG_THREAD_DETACHED_NO,
+	        "tg_thread_detached = %Iu", FORTASK(self, this_taskgroup).tg_thread_detached);
+	pid->tp_siblings.ln_pself = &FORTASK(leader, this_taskgroup).tg_proc_threads;
 	incref(pid); /* The reference for the child chain */
 	COMPILER_WRITE_BARRIER();
 	do {
 		next = FORTASK(leader, this_taskgroup).tg_proc_threads;
 		if unlikely(next == TASKGROUP_TG_PROC_THREADS_TERMINATED) {
-			pid->tp_siblings.ln_pself                 = NULL;
+			pid->tp_siblings.ln_pself                = NULL;
 			FORTASK(self, this_taskgroup).tg_process = NULL;
 			COMPILER_WRITE_BARRIER();
 			sync_endwrite(&FORTASK(leader, this_taskgroup).tg_proc_threads_lock);
 			decref_nokill(leader); /* The reference that had already been stored in
-			                        * `FORTASK(self,this_taskgroup).tg_process' */
+			                        * `FORTASK(self, this_taskgroup).tg_process' */
 			decref_nokill(pid);    /* The reference that had been created for the child chain */
+			task_free_rpc(exit_rpc);
 			return false;
 		}
 		ATOMIC_WRITE(pid->tp_siblings.ln_next, next);
@@ -1739,10 +1731,12 @@ PUBLIC bool KCALL
 task_detach(struct task *__restrict thread)
 		THROWS(E_WOULDBLOCK) {
 	struct taskpid *pid;
+	struct task *process;
 	pid = FORTASK(thread, this_taskpid);
 	if (ATOMIC_READ(pid->tp_siblings.ln_pself) == NULL)
 		return false; /* Already detached. */
-	if (thread == FORTASK(thread, this_taskgroup).tg_process) {
+	process = FORTASK(thread, this_taskgroup).tg_process;
+	if (thread == process) {
 		struct task *parent;
 		/* Detach from the parent process. */
 again_acquire_parent_lock:
@@ -1786,20 +1780,36 @@ parent_is_dead:
 		sync_endwrite(&FORTASK(thread, this_taskgroup).tg_proc_parent_lock);
 		return false;
 	}
-	/* Detach from the current process. */
-	sync_write(&FORTASK(thread, this_taskgroup).tg_proc_threads_lock);
-	if (LLIST_ISBOUND(pid, tp_siblings)) {
-		LLIST_REMOVE(pid, tp_siblings);
-		LLIST_UNBIND(pid, tp_siblings);
+	/* Update the deatch-state of a child thread. */
+	{
+		uintptr_t thread_detach_state;
+		do {
+			thread_detach_state = ATOMIC_READ(FORTASK(thread, this_taskgroup).tg_thread_detached);
+			if (thread_detach_state == TASKGROUP_TG_THREAD_DETACHED_TERMINATED) {
+				/* Child thread has already terminated (check for manual detach) */
+				sync_write(&FORTASK(process, this_taskgroup).tg_proc_threads_lock);
+				if (LLIST_ISBOUND(pid, tp_siblings)) {
+					LLIST_REMOVE(pid, tp_siblings);
+					LLIST_UNBIND(pid, tp_siblings);
 #ifndef NDEBUG
-		memset(&pid->tp_siblings.ln_next, 0xcc,
-		       sizeof(pid->tp_siblings.ln_next));
+					memset(&pid->tp_siblings.ln_next, 0xcc,
+					       sizeof(pid->tp_siblings.ln_next));
 #endif /* !NDEBUG */
-		sync_endwrite(&FORTASK(thread, this_taskgroup).tg_proc_threads_lock);
-		decref_nokill(pid); /* Inherited from the `tp_siblings' chain */
+					sync_endwrite(&FORTASK(process, this_taskgroup).tg_proc_threads_lock);
+					decref_nokill(pid); /* Inherited from the `tp_siblings' chain */
+					return true;
+				}
+				sync_endwrite(&FORTASK(process, this_taskgroup).tg_proc_threads_lock);
+				return false;
+			}
+			if (thread_detach_state == TASKGROUP_TG_THREAD_DETACHED_YES)
+				return false; /* Child thread was already detached */
+		} while (!ATOMIC_CMPXCH_WEAK(FORTASK(thread, this_taskgroup).tg_thread_detached,
+		                             thread_detach_state,
+		                             TASKGROUP_TG_THREAD_DETACHED_YES));
+		/* The thread's detach-state was changed to YES */
 		return true;
 	}
-	sync_endwrite(&FORTASK(thread, this_taskgroup).tg_proc_threads_lock);
 	return false;
 }
 
@@ -1821,7 +1831,9 @@ task_detach_children(struct task *__restrict process)
 	/* Detach all child threads. */
 again:
 	sync_write(&procgroup.tg_proc_threads_lock);
-	for (piter = &procgroup.tg_proc_threads; (iter = *piter) != NULL;
+	piter = &procgroup.tg_proc_threads;
+continue_with_piter:
+	for (; (iter = *piter) != NULL;
 	     piter = &iter->tp_siblings.ln_next) {
 		if (!wasdestroyed(iter))
 			break;
@@ -1833,25 +1845,44 @@ again:
 			REF struct task *child_thread;
 			child_thread = iter->tp_thread.get();
 			if likely(child_thread) {
-				if (FORTASK(child_thread, this_taskgroup).tg_process == child_thread) {
-					/* Child process! */
-					if (!sync_trywrite(&FORTASK(child_thread, this_taskgroup).tg_proc_parent_lock)) {
-						sync_endwrite(&procgroup.tg_proc_threads_lock);
-						{
-							FINALLY_DECREF_UNLIKELY(child_thread);
-							sync_write(&FORTASK(child_thread, this_taskgroup).tg_proc_parent_lock);
-						}
-						sync_endwrite(&FORTASK(child_thread, this_taskgroup).tg_proc_parent_lock);
-						goto again;
+				if (FORTASK(child_thread, this_taskgroup).tg_process != child_thread) {
+					/* Child thread! */
+					uintptr_t thread_detach_state;
+					for (;;) {
+						thread_detach_state = ATOMIC_READ(FORTASK(child_thread, this_taskgroup).tg_thread_detached);
+						if (thread_detach_state == TASKGROUP_TG_THREAD_DETACHED_TERMINATED)
+							goto detach_manually; /* Child thread has already terminated (detach manually) */
+						if (thread_detach_state == TASKGROUP_TG_THREAD_DETACHED_YES)
+							break;
+						if (!ATOMIC_CMPXCH_WEAK(FORTASK(child_thread, this_taskgroup).tg_thread_detached,
+						                        thread_detach_state,
+						                        TASKGROUP_TG_THREAD_DETACHED_YES))
+							continue;
+						/* Changed a child thread to become detached! */
+						++result;
+						break;
 					}
-					assert(FORTASK(child_thread, this_taskgroup).tg_proc_parent == process);
-					FORTASK(child_thread, this_taskgroup).tg_proc_parent = NULL;
-					sync_endwrite(&FORTASK(child_thread, this_taskgroup).tg_proc_parent_lock);
+					decref_unlikely(child_thread);
+					goto continue_with_piter;
 				}
+				/* Child process! */
+				if (!sync_trywrite(&FORTASK(child_thread, this_taskgroup).tg_proc_parent_lock)) {
+					sync_endwrite(&procgroup.tg_proc_threads_lock);
+					{
+						FINALLY_DECREF_UNLIKELY(child_thread);
+						sync_write(&FORTASK(child_thread, this_taskgroup).tg_proc_parent_lock);
+					}
+					sync_endwrite(&FORTASK(child_thread, this_taskgroup).tg_proc_parent_lock);
+					goto again;
+				}
+				assert(FORTASK(child_thread, this_taskgroup).tg_proc_parent == process);
+				FORTASK(child_thread, this_taskgroup).tg_proc_parent = NULL;
+				sync_endwrite(&FORTASK(child_thread, this_taskgroup).tg_proc_parent_lock);
 				decref_unlikely(child_thread);
 			}
 		}
-		/* Unlink the child node */
+		/* Detach the child thread */
+detach_manually:
 		assert(iter->tp_siblings.ln_pself == piter);
 		if ((*piter = iter->tp_siblings.ln_next) != NULL)
 			iter->tp_siblings.ln_next->tp_siblings.ln_pself = piter;
@@ -1929,22 +1960,43 @@ again:
 			tpid_thread = tpid->tp_thread.get();
 			if (tpid_thread) {
 				FINALLY_DECREF_UNLIKELY(tpid_thread);
-				if (task_isprocessleader_p(tpid_thread)) {
-					/* We're dealing with another process here, meaning we also have
-					 * to delete the target process's `tg_proc_parent' field. */
-					if (!sync_trywrite(&FORTASK(tpid_thread, this_taskgroup).tg_proc_parent_lock)) {
-						sync_endwrite(&procgroup->tg_proc_threads_lock);
-						sync_write(&FORTASK(tpid_thread, this_taskgroup).tg_proc_parent_lock);
-						sync_endwrite(&FORTASK(tpid_thread, this_taskgroup).tg_proc_parent_lock);
-						goto again;
+				if (!task_isprocessleader_p(tpid_thread)) {
+					/* Detach a child thread. */
+					uintptr_t thread_detach_state;
+					for (;;) {
+						thread_detach_state = ATOMIC_READ(FORTASK(tpid_thread, this_taskgroup).tg_thread_detached);
+						if (thread_detach_state == TASKGROUP_TG_THREAD_DETACHED_TERMINATED)
+							goto detach_manually; /* Child thread has already terminated (detach manually) */
+						if (thread_detach_state == TASKGROUP_TG_THREAD_DETACHED_YES)
+							break; /* Already detached. */
+						if (!ATOMIC_CMPXCH_WEAK(FORTASK(tpid_thread, this_taskgroup).tg_thread_detached,
+						                        thread_detach_state,
+						                        TASKGROUP_TG_THREAD_DETACHED_YES))
+							continue;
+						/* Changed a child thread to become detached! */
+						result = -EOK;
+						break;
 					}
-					assert(FORTASK(tpid_thread, this_taskgroup).tg_proc_parent == THIS_TASK);
-					FORTASK(tpid_thread, this_taskgroup).tg_proc_parent = NULL;
-					sync_endwrite(&FORTASK(tpid_thread, this_taskgroup).tg_proc_parent_lock);
+					sync_endwrite(&procgroup->tg_proc_threads_lock);
+					goto done;
 				}
+				/* We're dealing with another process here, meaning we also have
+				 * to delete the target process's `tg_proc_parent' field. */
+				if (!sync_trywrite(&FORTASK(tpid_thread, this_taskgroup).tg_proc_parent_lock)) {
+					sync_endwrite(&procgroup->tg_proc_threads_lock);
+					sync_write(&FORTASK(tpid_thread, this_taskgroup).tg_proc_parent_lock);
+					sync_endwrite(&FORTASK(tpid_thread, this_taskgroup).tg_proc_parent_lock);
+					goto again;
+				}
+				assert(FORTASK(tpid_thread, this_taskgroup).tg_proc_parent == THIS_TASK);
+				FORTASK(tpid_thread, this_taskgroup).tg_proc_parent = NULL;
+				sync_endwrite(&FORTASK(tpid_thread, this_taskgroup).tg_proc_parent_lock);
 			}
 			/* Unlink the thread's PID from our chain of children. */
-			*piter                     = iter->tp_siblings.ln_next;
+detach_manually:
+			assert(iter->tp_siblings.ln_pself == piter);
+			if ((*piter = iter->tp_siblings.ln_next) != NULL)
+				iter->tp_siblings.ln_next->tp_siblings.ln_pself = piter;
 			iter->tp_siblings.ln_pself = NULL;
 #ifndef NDEBUG
 			memset(&iter->tp_siblings.ln_next, 0xcc,

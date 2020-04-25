@@ -144,14 +144,14 @@ PUBLIC NONNULL((1, 2)) bool
 	entry->re_func = func;
 	entry->re_arg  = arg;
 #ifdef RPC_USER
-#if RPC_KIND_USER_INTR == (RPC_KIND_USER | TASK_USER_RPC_FINTR) &&                            \
-    RPC_KIND_USER_INTR_SYNC == (RPC_KIND_USER | TASK_USER_RPC_FINTR | TASK_USER_RPC_FSYNC) && \
-    RPC_KIND_NONSYSCALL == TASK_USER_RPC_FNONSYSCALL &&                                       \
-    TASK_USER_RPC_FNOTHROW == RPC_KIND_NOTHROW
+#if (RPC_KIND_USER_INTR == (RPC_KIND_USER | TASK_USER_RPC_FINTR) &&                            \
+     RPC_KIND_USER_INTR_SYNC == (RPC_KIND_USER | TASK_USER_RPC_FINTR | TASK_USER_RPC_FSYNC) && \
+     RPC_KIND_NONSYSCALL == TASK_USER_RPC_FNONSYSCALL &&                                       \
+     TASK_USER_RPC_FNOTHROW == RPC_KIND_NOTHROW)
 	entry->re_kind = RPC_KIND_USER |
 	                 (mode & (TASK_USER_RPC_FINTR | TASK_USER_RPC_FSYNC |
 	                          TASK_USER_RPC_FNONSYSCALL | TASK_USER_RPC_FNOTHROW));
-#else
+#else /* ... */
 	entry->re_kind = RPC_KIND_USER;
 	if (mode & TASK_USER_RPC_FINTR)
 		entry->re_kind |= RPC_KIND_USER_INTR;
@@ -161,7 +161,7 @@ PUBLIC NONNULL((1, 2)) bool
 		entry->re_kind |= RPC_KIND_NONSYSCALL;
 	if (mode & TASK_USER_RPC_FNOTHROW)
 		entry->re_kind |= RPC_KIND_NOTHROW;
-#endif
+#endif /* !... */
 #else /* RPC_USER */
 #if TASK_SYNC_RPC_FNOTHROW == RPC_KIND_NOTHROW
 	entry->re_kind = RPC_KIND_SYNC | (mode & RPC_KIND_NOTHROW);
