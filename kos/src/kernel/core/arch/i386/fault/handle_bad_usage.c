@@ -720,14 +720,33 @@ throw_unsupported_instruction(struct icpustate *__restrict state,
 #define EMU86_EMULATE_RDTSC_INDIRECT() __rdtsc()
 
 /* Return the OS-specific ID for the current CPU (same as the `IA32_TSC_AUX' MSR) */
-#define EMU86_EMULATE_RDTSC_AUX() emulate_read_rsc_aux()
-PRIVATE WUNUSED ATTR_PURE u32 KCALL emulate_read_rsc_aux(void) {
+#define EMU86_EMULATE_RDTSC_AUX() emulate_read_tsc_aux()
+PRIVATE WUNUSED ATTR_PURE u32 KCALL emulate_read_tsc_aux(void) {
 	/* TODO: KOS currently doesn't program the `IA32_TSC_AUX' MSR during CPU initialization.
 	 *       We really need to do this, though (programming should always be done when cpuid
 	 *       bit `CPUID_80000001D_RDTSCP' is enabled, in which case `rdtscp' exists, and should
 	 *       consequently also be able to hold the ID of the current CPU) */
 	return THIS_CPU->c_id;
 }
+
+#define EMU86_EMULATE_RDTSC_INDIRECT_AND_RDTSC_AUX(tsc, tsc_aux) \
+	((tsc) = emulate_read_tsc_and_aux(&(tsc_aux)))
+LOCAL WUNUSED NONNULL((1)) u64 KCALL
+emulate_read_tsc_and_aux(u32 *__restrict p_tsc_aux) {
+	u64 tsc;
+	pflag_t was;
+	/* To guaranty that the hosting CPU doesn't change during
+	 * execution here, temporarily disable preemption, so that
+	 * the TSC and CPU-ID are consistent with each other! */
+	was = PREEMPTION_PUSHOFF();
+	COMPILER_BARRIER();
+	*p_tsc_aux = EMU86_EMULATE_RDTSC_AUX();
+	tsc        = EMU86_EMULATE_RDTSC_INDIRECT();
+	COMPILER_BARRIER();
+	PREEMPTION_POP(was);
+	return tsc;
+}
+
 
 
 /* Emulation of the `rdtsc' instruction (cpu quantum time is the best we've got for this...) */

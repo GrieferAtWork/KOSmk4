@@ -3814,11 +3814,11 @@ checklock_modrm_memory_parsed:
 			/* XXX: swapgs     (if only for verbose exception messages?) */
 			/* XXX: rdrand     (if only for verbose exception messages?) */
 			/* XXX: rdseed     (if only for verbose exception messages?) */
-			/* XXX: rdpid      (if only for verbose exception messages?) */
 			/* XXX: invpcid    (if only for verbose exception messages?) */
 			/* XXX: tpause     (if only for verbose exception messages?) */
 			/* XXX: ldmxcsr    (Can throw a #GPF when attempting to set a reserved bit) */
 
+			/* TODO: Emulate rdpid */
 			/* TODO: Emulate crc32 */
 			/* TODO: Emulate mcommit */
 			/* TODO: Emulate clzero (as a no-op) */
