@@ -440,6 +440,9 @@ __DECL_BEGIN
 #ifndef EMU86_EMULATE_CONFIG_WANT_MOVBE
 #define EMU86_EMULATE_CONFIG_WANT_MOVBE (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
 #endif /* !EMU86_EMULATE_CONFIG_WANT_MOVBE */
+#ifndef EMU86_EMULATE_CONFIG_WANT_MOV_CREG
+#define EMU86_EMULATE_CONFIG_WANT_MOV_CREG 0
+#endif /* !EMU86_EMULATE_CONFIG_WANT_MOV_CREG */
 #ifndef EMU86_EMULATE_CONFIG_WANT_MOVDIR64B
 #define EMU86_EMULATE_CONFIG_WANT_MOVDIR64B (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
 #endif /* !EMU86_EMULATE_CONFIG_WANT_MOVDIR64B */
@@ -1193,6 +1196,40 @@ __DECL_BEGIN
 #if !defined(EMU86_EMULATE_INVLPG) && EMU86_EMULATE_CONFIG_WANT_INVLPG
 #define EMU86_EMULATE_INVLPG(addr) __invlpg(addr)
 #endif /* !EMU86_EMULATE_INVLPG && EMU86_EMULATE_CONFIG_WANT_INVLPG */
+#if EMU86_EMULATE_CONFIG_WANT_MOV_CREG
+#ifndef EMU86_EMULATE_RDCR0
+#define EMU86_EMULATE_RDCR0() __rdcr0()
+#endif /* !EMU86_EMULATE_RDCR0 */
+#ifndef EMU86_EMULATE_WRCR0
+#define EMU86_EMULATE_WRCR0(v) __wrcr0(v)
+#endif /* !EMU86_EMULATE_WRCR0 */
+#ifndef EMU86_EMULATE_RDCR2
+#define EMU86_EMULATE_RDCR2() __rdcr2()
+#endif /* !EMU86_EMULATE_RDCR2 */
+#ifndef EMU86_EMULATE_WRCR2
+#define EMU86_EMULATE_WRCR2(v) __wrcr2(v)
+#endif /* !EMU86_EMULATE_WRCR2 */
+#ifndef EMU86_EMULATE_RDCR3
+#define EMU86_EMULATE_RDCR3() __rdcr3()
+#endif /* !EMU86_EMULATE_RDCR3 */
+#ifndef EMU86_EMULATE_WRCR3
+#define EMU86_EMULATE_WRCR3(v) __wrcr3(v)
+#endif /* !EMU86_EMULATE_WRCR3 */
+#ifndef EMU86_EMULATE_RDCR4
+#define EMU86_EMULATE_RDCR4() __rdcr4()
+#endif /* !EMU86_EMULATE_RDCR4 */
+#ifndef EMU86_EMULATE_WRCR4
+#define EMU86_EMULATE_WRCR4(v) __wrcr4(v)
+#endif /* !EMU86_EMULATE_WRCR4 */
+#ifdef __x86_64__
+#ifndef EMU86_EMULATE_RDCR8
+#define EMU86_EMULATE_RDCR8() __rdcr8()
+#endif /* !EMU86_EMULATE_RDCR8 */
+#ifndef EMU86_EMULATE_WRCR8
+#define EMU86_EMULATE_WRCR8(v) __wrcr8(v)
+#endif /* !EMU86_EMULATE_WRCR8 */
+#endif /* __x86_64__ */
+#endif /* EMU86_EMULATE_CONFIG_WANT_MOV_CREG */
 #if CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_64BIT
 #if !defined(EMU86_EMULATE_LAR) && EMU86_EMULATE_CONFIG_WANT_LAR
 #define EMU86_EMULATE_LAR(segment_index, result) __lar(segment_index, /*(u16 *)*/&(result))
@@ -3519,6 +3556,7 @@ checklock_modrm_memory_parsed:
 #include "emu/lxs.c.inl"
 #include "emu/misc.c.inl"
 #include "emu/misc2.c.inl"
+#include "emu/mov-creg.c.inl"
 #include "emu/mov-imm.c.inl"
 #include "emu/mov-moffs.c.inl"
 #include "emu/mov-sreg.c.inl"
@@ -3561,7 +3599,6 @@ checklock_modrm_memory_parsed:
 #endif /* !EMU86_EMULATE_IMPL_HEADER */
 #endif /* !__INTELLISENSE__ */
 
-			/* XXX: mov (crN)  (if only for verbose exception messages?) */
 #if 0 /* TODO: Missing stuff from the old `handle_illegal_instruction.c' */
 #ifndef __x86_64__
 		case 0x0f31: {
@@ -3645,61 +3682,6 @@ checklock_modrm_memory_parsed:
 				goto generic_privileged_instruction_if_user;
 			goto generic_failure;
 #endif /* __x86_64__ */
-
-		case 0x0f22:
-			/* MOV CRx,r32 */
-			MOD_DECODE();
-			for (i = 4; i < EXCEPTION_DATA_POINTERS; ++i)
-				PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
-			PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
-			PERTASK_SET(this_exception_pointers[0], E_ILLEGAL_INSTRUCTION_X86_OPCODE(opcode, mod.mi_reg));
-			PERTASK_SET(this_exception_pointers[2], (uintptr_t)(X86_REGISTER_CONTROL + mod.mi_reg));
-			PERTASK_SET(this_exception_pointers[3], (uintptr_t)RD_REG());
-#ifdef __x86_64__
-			if (mod.mi_reg == 1 || (mod.mi_reg > 4 && mod.mi_reg != 8))
-#else /* __x86_64__ */
-			if (mod.mi_reg == 1 || mod.mi_reg > 4)
-#endif /* !__x86_64__ */
-			{
-				/* Error was caused because CR* doesn't exist */
-				PERTASK_SET(this_exception_pointers[1],
-				            (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRINV);
-			} else if (isuser()) {
-				/* Error was caused because CR* are privileged */
-				PERTASK_SET(this_exception_pointers[1],
-				            (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV);
-			} else {
-				/* Error was caused because value written must be invalid. */
-				PERTASK_SET(this_exception_pointers[1],
-				            (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD);
-			}
-			goto unwind_state;
-
-
-		case 0x0f20:
-			/* MOV r32,CRx */
-			MOD_DECODE();
-			for (i = 3; i < EXCEPTION_DATA_POINTERS; ++i)
-				PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
-			PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
-			PERTASK_SET(this_exception_pointers[0], E_ILLEGAL_INSTRUCTION_X86_OPCODE(opcode, mod.mi_reg));
-			PERTASK_SET(this_exception_pointers[2], (uintptr_t)X86_REGISTER_CONTROL + mod.mi_reg);
-#ifdef __x86_64__
-			if (mod.mi_reg == 1 || (mod.mi_reg > 4 && mod.mi_reg != 8))
-#else /* __x86_64__ */
-			if (mod.mi_reg == 1 || mod.mi_reg > 4)
-#endif /* !__x86_64__ */
-			{
-				/* Undefined control register. */
-				PERTASK_SET(this_exception_pointers[1],
-				            (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_RDINV);
-			} else {
-				/* Userspace tried to read from an control register. */
-				PERTASK_SET(this_exception_pointers[1],
-				            (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV);
-			}
-			goto unwind_state;
-
 
 		case 0x0f21:
 		case 0x0f23:
