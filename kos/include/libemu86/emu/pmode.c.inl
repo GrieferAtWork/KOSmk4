@@ -31,6 +31,8 @@
 #define EMU86_EMULATE_CONFIG_WANT_SMSW 1
 #define EMU86_EMULATE_CONFIG_WANT_LMSW 1
 #define EMU86_EMULATE_CONFIG_WANT_INVLPG 1
+#define EMU86_EMULATE_CONFIG_WANT_RDTSCP 1
+#define EMU86_EMULATE_CONFIG_WANT_MCOMMIT 1
 #define EMU86_EMULATE_CONFIG_WANT_LAR 1
 #define EMU86_EMULATE_CONFIG_WANT_LSL 1
 #include "../emulate.c.inl"
@@ -58,7 +60,7 @@ case EMU86_OPCODE_ENCODE(0x0f00): {
 		if (EMU86_ISUSER() && EMU86_GETCR4_UMIP()) {
 #ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
 			EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV,
-			                                                 X86_REGISTER_MISC_LDT, 0, 0);
+			                                                 X86_REGISTER_MISC_LDT, 0, 0, 0);
 #else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 #define NEED_return_privileged_instruction_rmreg
 			goto return_privileged_instruction_rmreg;
@@ -90,7 +92,7 @@ case EMU86_OPCODE_ENCODE(0x0f00): {
 		if (EMU86_ISUSER() && EMU86_GETCR4_UMIP()) {
 #ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
 			EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV,
-			                                                 X86_REGISTER_MISC_TR, 0, 0);
+			                                                 X86_REGISTER_MISC_TR, 0, 0, 0);
 #else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 #define NEED_return_privileged_instruction_rmreg
 			goto return_privileged_instruction_rmreg;
@@ -127,7 +129,7 @@ case EMU86_OPCODE_ENCODE(0x0f00): {
 		if (EMU86_ISUSER()) {
 #ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
 			EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV,
-			                                                 X86_REGISTER_MISC_LDT, ldtr, 0);
+			                                                 X86_REGISTER_MISC_LDT, 0, ldtr, 0);
 #else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 #define NEED_return_privileged_instruction_rmreg
 			goto return_privileged_instruction_rmreg;
@@ -158,7 +160,7 @@ case EMU86_OPCODE_ENCODE(0x0f00): {
 		if (EMU86_ISUSER()) {
 #ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
 			EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV,
-			                                                 X86_REGISTER_MISC_TR, tr, 0);
+			                                                 X86_REGISTER_MISC_TR, 0, tr, 0);
 #else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 #define NEED_return_privileged_instruction_rmreg
 			goto return_privileged_instruction_rmreg;
@@ -247,7 +249,8 @@ case EMU86_OPCODE_ENCODE(0x0f00): {
      EMU86_EMULATE_CONFIG_WANT_INVLPG || EMU86_EMULATE_CONFIG_CHECKERROR || \
      (!EMU86_EMULATE_CONFIG_ONLY_MEMORY &&                                  \
       (EMU86_EMULATE_CONFIG_WANT_STAC || EMU86_EMULATE_CONFIG_WANT_CLAC ||  \
-       EMU86_EMULATE_CONFIG_WANT_XEND || EMU86_EMULATE_CONFIG_WANT_XTEST)))
+       EMU86_EMULATE_CONFIG_WANT_XEND || EMU86_EMULATE_CONFIG_WANT_XTEST || \
+       EMU86_EMULATE_CONFIG_WANT_RDTSCP || EMU86_EMULATE_CONFIG_WANT_MCOMMIT)))
 case EMU86_OPCODE_ENCODE(0x0f01): {
 	MODRM_DECODE();
 	switch (modrm.mi_reg) {
@@ -291,7 +294,7 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 			                                                 IF_64BIT(EMU86_F_IS64(op_flags)
 			                                                 ?  X86_REGISTER_MISC_GDT_BASEQ
 			                                                 :) X86_REGISTER_MISC_GDT_BASEL,
-			                                                 0, 0);
+			                                                 0, 0, 0);
 #else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 #define NEED_return_privileged_instruction_rmreg
 			goto return_privileged_instruction_rmreg;
@@ -350,7 +353,7 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 					                                                 IF_64BIT(EMU86_F_IS64(op_flags)
 					                                                 ?  X86_REGISTER_MISC_RFLAGS
 					                                                 :) X86_REGISTER_MISC_EFLAGS,
-					                                                 ~EFLAGS_AC, 0);
+					                                                 0, ~EFLAGS_AC, 0);
 #else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 					goto return_privileged_instruction_rmreg;
 #define NEED_return_privileged_instruction_rmreg
@@ -381,7 +384,7 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 					                                                 IF_64BIT(EMU86_F_IS64(op_flags)
 					                                                 ?  X86_REGISTER_MISC_RFLAGS
 					                                                 :) X86_REGISTER_MISC_EFLAGS,
-					                                                 ~EFLAGS_AC, EFLAGS_AC);
+					                                                 0, ~EFLAGS_AC, EFLAGS_AC);
 #else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 					goto return_privileged_instruction_rmreg;
 #define NEED_return_privileged_instruction_rmreg
@@ -444,7 +447,7 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 			                                                 IF_64BIT(EMU86_F_IS64(op_flags)
 			                                                 ?  X86_REGISTER_MISC_IDT_BASEQ
 			                                                 :) X86_REGISTER_MISC_IDT_BASEL,
-			                                                 0, 0);
+			                                                 0, 0, 0);
 #else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 #define NEED_return_privileged_instruction_rmreg
 			goto return_privileged_instruction_rmreg;
@@ -583,7 +586,7 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 			                                                 IF_64BIT(EMU86_F_IS64(op_flags)
 			                                                 ?  X86_REGISTER_MISC_GDT_BASEQ
 			                                                 :) X86_REGISTER_MISC_GDT_BASEL,
-			                                                 base, limit);
+			                                                 limit, base, 0);
 #else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 #define NEED_return_privileged_instruction_rmreg
 			goto return_privileged_instruction_rmreg;
@@ -667,7 +670,7 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 			                                                 IF_64BIT(EMU86_F_IS64(op_flags)
 			                                                 ?  X86_REGISTER_MISC_IDT_BASEQ
 			                                                 :) X86_REGISTER_MISC_IDT_BASEL,
-			                                                 base, 0);
+			                                                 limit, base, 0);
 #else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 #define NEED_return_privileged_instruction_rmreg
 			goto return_privileged_instruction_rmreg;
@@ -696,7 +699,7 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 		if (EMU86_ISUSER() && EMU86_GETCR4_UMIP()) {
 #ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
 			EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV,
-			                                                 X86_REGISTER_CONTROL_CR0, 0, 0);
+			                                                 X86_REGISTER_CONTROL_CR0, 0, 0, 0);
 #else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 #define NEED_return_privileged_instruction_rmreg
 			goto return_privileged_instruction_rmreg;
@@ -733,7 +736,7 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 		if (EMU86_ISUSER()) {
 #ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
 			EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV,
-			                                                 X86_REGISTER_CONTROL_CR0, msw, 0);
+			                                                 X86_REGISTER_CONTROL_CR0, 0, msw, 0);
 #else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 #define NEED_return_privileged_instruction_rmreg
 			goto return_privileged_instruction_rmreg;
@@ -751,28 +754,72 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 #endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_LMSW */
 
 
-#if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_INVLPG
+#if (EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_INVLPG || \
+     (!EMU86_EMULATE_CONFIG_ONLY_MEMORY &&                                  \
+      (EMU86_EMULATE_CONFIG_WANT_RDTSCP || EMU86_EMULATE_CONFIG_WANT_MCOMMIT)))
 	case 7: {
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
-#if (EMU86_EMULATE_CONFIG_CHECKERROR && \
-     (EMU86_EMULATE_CONFIG_CHECKUSER || !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC))
+#if (EMU86_EMULATE_CONFIG_WANT_RDTSCP || EMU86_EMULATE_CONFIG_WANT_MCOMMIT || \
+     (EMU86_EMULATE_CONFIG_CHECKERROR && \
+      (EMU86_EMULATE_CONFIG_CHECKUSER || !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC)))
 		if (EMU86_MODRM_ISREG(modrm.mi_type)) {
 			switch (modrm.mi_rm) {
 
+#if EMU86_EMULATE_CONFIG_WANT_RDTSCP || (EMU86_EMULATE_CONFIG_CHECKERROR && EMU86_EMULATE_CONFIG_CHECKUSER)
+			case 1: {
+				/* 0F 01 F9     RDTSCP     Read 64-bit time-stamp counter and IA32_TSC_AUX value into EDX:EAX and ECX. */
+#if EMU86_EMULATE_CONFIG_CHECKUSER
+#ifndef EMU86_GETCR4_TSD_IS_ZERO
+				if (EMU86_GETCR4_TSD() && EMU86_ISUSER()) {
+#ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER_RMREG
+					EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER_RMREG(E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV,
+					                                                       X86_REGISTER_MSR,
+					                                                       IA32_TIME_STAMP_COUNTER, 0, 0);
+#else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER_RMREG */
+					goto return_privileged_instruction_rmreg;
+#define NEED_return_privileged_instruction_rmreg
+#endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER_RMREG */
+				}
+#endif /* !EMU86_GETCR4_TSD_IS_ZERO */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
+#if defined(EMU86_EMULATE_RDTSC_INDIRECT) && defined(EMU86_EMULATE_RDTSC_AUX)
+				{
+					u64 tsc;
+					u32 tsc_aux;
+					tsc     = EMU86_EMULATE_RDTSC_INDIRECT();
+					tsc_aux = EMU86_EMULATE_RDTSC_AUX();
+					EMU86_SETEAX((u32)(tsc));
+					EMU86_SETEDX((u32)(tsc >> 32));
+					EMU86_SETECX(tsc_aux);
+				}
+				goto done;
+#else /* EMU86_EMULATE_RDTSC_INDIRECT && EMU86_EMULATE_RDTSC_AUX */
+				goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
+#endif /* !EMU86_EMULATE_RDTSC_INDIRECT || !EMU86_EMULATE_RDTSC_AUX */
+			}
+#endif /* EMU86_EMULATE_CONFIG_WANT_RDTSCP || (EMU86_EMULATE_CONFIG_CHECKERROR && EMU86_EMULATE_CONFIG_CHECKUSER) */
+
 			case 2:
+#if EMU86_EMULATE_CONFIG_WANT_MCOMMIT
 				if (op_flags & EMU86_F_f3) {
 					/* mcommit */
 					/* TODO: Emulation of `mcommit'! */
 				}
+#endif /* EMU86_EMULATE_CONFIG_WANT_MCOMMIT */
 				/* monitorx */
 				ATTR_FALLTHROUGH
 			case 0: /* 0F 01 F8     SWAPGS     Exchanges the current GS base register value with the value contained in MSR address C0000102H. */
+#if !EMU86_EMULATE_CONFIG_WANT_RDTSCP && (!EMU86_EMULATE_CONFIG_CHECKERROR || !EMU86_EMULATE_CONFIG_CHECKUSER)
 			case 1: /* 0F 01 F9     RDTSCP     Read 64-bit time-stamp counter and IA32_TSC_AUX value into EDX:EAX and ECX. */
+#endif /* !EMU86_EMULATE_CONFIG_WANT_RDTSCP && (!EMU86_EMULATE_CONFIG_CHECKERROR || !EMU86_EMULATE_CONFIG_CHECKUSER) */
 			case 3: /* mwaitx */
 			case 5: /* rdpru */
+#if EMU86_EMULATE_CONFIG_CHECKUSER
 				if (EMU86_ISUSER())
 					goto return_privileged_instruction_rmreg;
 #define NEED_return_privileged_instruction_rmreg
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
 				goto return_unsupported_instruction_rmreg;
 #define NEED_return_unsupported_instruction_rmreg
 

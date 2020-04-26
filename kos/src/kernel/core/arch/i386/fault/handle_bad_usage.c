@@ -28,6 +28,32 @@ opt.append("-Os");
 #define _KOS_SOURCE 1
 #define DISABLE_BRANCH_PROFILING 1
 
+/* NOTE: Alongside emulating various instructions that might not normally be
+ *       available on any X86-PC, KOS extends X86 architecture functionality by:
+ *
+ *  - Allowing use of `rdfsbase', `rdgsbase', `wrfsbase' and `wrgsbase' in 32-bit mode,
+ *    where these instructions allow write access to the BASE fields of the following
+ *    GDT segments (which are indexed by the %fs or %gs registers respectivly, such that
+ *    e.g. `wrgsbase' will attempt to write the base field of GDT[%gs]):
+ *     - SEGMENT_USER_FSBASE
+ *     - SEGMENT_USER_GSBASE
+ *    Note that these segments ~normally~ map to the %fs and %gs registers, however
+ *    since %fs and %gs are merely selectors, they could be changed to any other
+ *    segment, though the rule persists that only these 2 segments are writable from
+ *    user-space.
+ *    Read access is granted to any arbitrary segment, so-long as SEGMENT.DPL >= CPL
+ *
+ *  - Allowing use of `rdmsr' from user-space in order to read from:
+ *     - IA32_FS_BASE            (same as the `rdfsbase' instruction)
+ *     - IA32_GS_BASE            (same as the `rdgsbase' instruction)
+ *     - IA32_TIME_STAMP_COUNTER (same as the `rdtsc' instruction)
+ *     - IA32_TSC_AUX            (same as the value written to `%ecx' by the `rdtscp' instruction)
+ *
+ *  - Allowing use of `wrmsr' from user-space in order to write to:
+ *     - IA32_FS_BASE            (same as the `wrfsbase' instruction)
+ *     - IA32_GS_BASE            (same as the `wrgsbase' instruction)
+ */
+
 #include <hybrid/host.h>
 
 #ifdef __x86_64__
@@ -51,6 +77,7 @@ opt.append("-Os");
 #include <kernel/restart-interrupt.h>
 #include <kernel/syscall.h>
 #include <kernel/user.h>
+#include <sched/cpu.h>
 #include <sched/except-handler.h>
 #include <sched/pid.h>
 #include <sched/rpc.h>
@@ -82,6 +109,7 @@ opt.append("-Os");
 #ifdef __x86_64__
 #include <int128.h>
 #endif /* __x86_64__ */
+
 
 DECL_BEGIN
 
@@ -223,6 +251,11 @@ x86_handle_bad_usage(struct icpustate *__restrict state, bad_usage_reason_t usag
 #define EMU86_EMULATE_CONFIG_WANT_MOVSXD        0
 #define EMU86_EMULATE_CONFIG_WANT_MOVZX         0
 #define EMU86_EMULATE_CONFIG_WANT_ARPL          0
+#define EMU86_EMULATE_CONFIG_WANT_RDMSR         0 /* No, but see `EMU86_EMULATE_CONFIG_WANT_RDMSR_EMULATED' below */
+#define EMU86_EMULATE_CONFIG_WANT_WRMSR         0 /* No, but see `EMU86_EMULATE_CONFIG_WANT_WRMSR_EMULATED' below */
+#define EMU86_EMULATE_CONFIG_WANT_RDTSC         (!CONFIG_LIBEMU86_WANT_64BIT) /* Only available on Pentium+ (emulate in 32-bit mode) */
+#define EMU86_EMULATE_CONFIG_WANT_RDTSCP        1 /* Emulate non-standard instructions */
+#define EMU86_EMULATE_CONFIG_WANT_RDPMC         1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_NOP_RM        1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_PEXT          1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_PDEP          1 /* Emulate non-standard instructions */
@@ -235,6 +268,7 @@ x86_handle_bad_usage(struct icpustate *__restrict state, bad_usage_reason_t usag
 #define EMU86_EMULATE_CONFIG_WANT_LGDT          0
 #define EMU86_EMULATE_CONFIG_WANT_XEND          1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_XTEST         1 /* Emulate non-standard instructions */
+#define EMU86_EMULATE_CONFIG_WANT_MCOMMIT       1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_SIDT          0
 #define EMU86_EMULATE_CONFIG_WANT_LIDT          0
 #define EMU86_EMULATE_CONFIG_WANT_VERR          0
@@ -417,7 +451,7 @@ throw_illegal_instruction_exception(struct icpustate *__restrict state,
                                     error_code_t code, uintptr_t opcode,
                                     uintptr_t op_flags, uintptr_t ptr2,
                                     uintptr_t ptr3, uintptr_t ptr4,
-                                    uintptr_t ptr5) {
+                                    uintptr_t ptr5, uintptr_t ptr6) {
 	unsigned int i;
 	void const *pc, *next_pc;
 	pc      = (void const *)icpustate_getpc(state);
@@ -432,7 +466,8 @@ throw_illegal_instruction_exception(struct icpustate *__restrict state,
 	PERTASK_SET(this_exception_pointers[3], ptr3);
 	PERTASK_SET(this_exception_pointers[4], ptr4);
 	PERTASK_SET(this_exception_pointers[5], ptr5);
-	for (i = 6; i < EXCEPTION_DATA_POINTERS; ++i)
+	PERTASK_SET(this_exception_pointers[6], ptr6);
+	for (i = 7; i < EXCEPTION_DATA_POINTERS; ++i)
 		PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_enabled() && (kernel_debugtrap_on & KERNEL_DEBUGTRAP_ON_ILLEGAL_INSTRUCTION))
@@ -476,7 +511,7 @@ PRIVATE ATTR_NORETURN NONNULL((1)) void
 		/* #UD simply results in a generic BAD_OPCODE exception! */
 		throw_illegal_instruction_exception(state,
 		                                    ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPCODE),
-		                                    opcode, op_flags, 0, 0, 0, 0);
+		                                    opcode, op_flags, 0, 0, 0, 0, 0);
 	} else {
 		u16 segval;
 		u8 used_segment_register;
@@ -512,9 +547,13 @@ PRIVATE ATTR_NORETURN NONNULL((1)) void
 		if (!segval && BAD_USAGE_ECODE(usage) == 0) {
 			/* Throw a NULL-segment exception. */
 			throw_illegal_instruction_exception(state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER),
-			                                    opcode, op_flags, E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD,
-			                                    X86_REGISTER_SEGMENT_ES + used_segment_register,
-			                                    0, 0);
+			                                    /* opcode:   */ opcode,
+			                                    /* op_flags: */ op_flags,
+			                                    /* how:      */ E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD,
+			                                    /* regno:    */ X86_REGISTER_SEGMENT_ES + used_segment_register,
+			                                    /* offset:   */ 0,
+			                                    /* regval:   */ 0,
+			                                    /* regval2:  */ 0);
 		}
 #ifdef __x86_64__
 		/* On x86_64, a #GPF is thrown when attempting to access a non-canonical address.
@@ -557,12 +596,12 @@ PRIVATE ATTR_NORETURN NONNULL((1)) void
 				                : E_SEGFAULT_CONTEXT_NONCANON);
 			}
 			throw_illegal_instruction_exception(state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE),
-			                                    opcode, op_flags, 0, 0, 0, 0);
+			                                    opcode, op_flags, 0, 0, 0, 0, 0);
 		}
 		/* In kernel space, this one's a wee bit more complicated... */
 		throw_illegal_instruction_exception(state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_X86_INTERRUPT),
 		                                    opcode, op_flags, BAD_USAGE_INTNO(usage),
-		                                    BAD_USAGE_ECODE(usage), segval, 0);
+		                                    BAD_USAGE_ECODE(usage), segval, 0, 0);
 	}
 }
 
@@ -575,7 +614,7 @@ throw_unsupported_instruction(struct icpustate *__restrict state,
 		 * -> Throw an UNSUPPORTED_OPCODE exception */
 		throw_illegal_instruction_exception(state,
 		                                    ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE),
-		                                    opcode, op_flags, 0, 0, 0, 0);
+		                                    opcode, op_flags, 0, 0, 0, 0, 0);
 	} else {
 		/* An unsupported instruction caused a #GPF or #SS
 		 * -> Handle the exception the same way we do for unknown instructions! */
@@ -587,31 +626,45 @@ throw_unsupported_instruction(struct icpustate *__restrict state,
 #define _EMU86_GETOPCODE_RMREG()  E_ILLEGAL_INSTRUCTION_X86_OPCODE(EMU86_OPCODE(), modrm.mi_reg)
 #define EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION()           throw_generic_unknown_instruction(_state, usage, _EMU86_GETOPCODE(), op_flags, 0xff)
 #define EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION_RMREG()     throw_generic_unknown_instruction(_state, usage, _EMU86_GETOPCODE_RMREG(), op_flags, EMU86_MODRM_ISMEM(modrm.mi_type) ? modrm.mi_rm : 0xff)
-#define EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION()        throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE), _EMU86_GETOPCODE(), op_flags, 0, 0, 0, 0)
-#define EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION_RMREG()  throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE), _EMU86_GETOPCODE_RMREG(), op_flags, 0, 0, 0, 0)
-#define EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM()         throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE(), op_flags, E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE, 0, 0, 0)
-#define EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM_RMREG()   throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE_RMREG(), op_flags, E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE, 0, 0, 0)
-#define EMU86_EMULATE_RETURN_EXPECTED_REGISTER_MODRM()       throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE(), op_flags, E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE, 0, 0, 0)
-#define EMU86_EMULATE_RETURN_EXPECTED_REGISTER_MODRM_RMREG() throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE_RMREG(), op_flags, E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE, 0, 0, 0)
-#define EMU86_EMULATE_RETURN_UNEXPECTED_PREFIX()             throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX), _EMU86_GETOPCODE(), op_flags, 0, 0, 0, 0)
-#define EMU86_EMULATE_RETURN_UNEXPECTED_PREFIX_RMREG()       throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX), _EMU86_GETOPCODE_RMREG(), op_flags, 0, 0, 0, 0)
+#define EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION()        throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE), _EMU86_GETOPCODE(), op_flags, 0, 0, 0, 0, 0)
+#define EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION_RMREG()  throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE), _EMU86_GETOPCODE_RMREG(), op_flags, 0, 0, 0, 0, 0)
+#define EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM()         throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE(), op_flags, E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE, 0, 0, 0, 0)
+#define EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM_RMREG()   throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE_RMREG(), op_flags, E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE, 0, 0, 0, 0)
+#define EMU86_EMULATE_RETURN_EXPECTED_REGISTER_MODRM()       throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE(), op_flags, E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE, 0, 0, 0, 0)
+#define EMU86_EMULATE_RETURN_EXPECTED_REGISTER_MODRM_RMREG() throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE_RMREG(), op_flags, E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE, 0, 0, 0, 0)
+#define EMU86_EMULATE_RETURN_UNEXPECTED_PREFIX()             throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX), _EMU86_GETOPCODE(), op_flags, 0, 0, 0, 0, 0)
+#define EMU86_EMULATE_RETURN_UNEXPECTED_PREFIX_RMREG()       throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX), _EMU86_GETOPCODE_RMREG(), op_flags, 0, 0, 0, 0, 0)
 #define EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION()       throw_unsupported_instruction(_state, usage, _EMU86_GETOPCODE(), op_flags)
 #define EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION_RMREG() throw_unsupported_instruction(_state, usage, _EMU86_GETOPCODE_RMREG(), op_flags)
-#define EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(how, regno, regval, offset)          \
+#define EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(how, regno, offset, regval, regval2) \
 	throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER), \
-	                                    _EMU86_GETOPCODE(), op_flags, how, regno, regval, offset)
-#define EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER_RMREG(how, regno, regval, offset)    \
-	throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER), \
-	                                    _EMU86_GETOPCODE_RMREG(), op_flags, how, regno, regval, offset)
+	                                    /* opcode:   */ _EMU86_GETOPCODE(),                   \
+	                                    /* op_flags: */ op_flags,                             \
+	                                    /* how:      */ how,                                  \
+	                                    /* regno:    */ regno,                                \
+	                                    /* offset:   */ offset,                               \
+	                                    /* regval:   */ regval,                               \
+	                                    /* regval2:  */ regval2)
+#define EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER_RMREG(how, regno, offset, regval, regval2) \
+	throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER),       \
+	                                    /* opcode:   */ _EMU86_GETOPCODE_RMREG(),                   \
+	                                    /* op_flags: */ op_flags,                                   \
+	                                    /* how:      */ how,                                        \
+	                                    /* regno:    */ regno,                                      \
+	                                    /* offset:   */ offset,                                     \
+	                                    /* regval:   */ regval,                                     \
+	                                    /* regval2:  */ regval2)
 #define EMU86_EMULATE_RETURN_AFTER_XEND()                                                               \
 	throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE), \
-	                                    _EMU86_GETOPCODE_RMREG(), op_flags, 0, 0, 0, 0)
+	                                    _EMU86_GETOPCODE_RMREG(), op_flags, 0, 0, 0, 0, 0)
 
 #define EMU86_EMULATE_GETOPFLAGS() emu86_opflagsof_icpustate(_state)
 #define EMU86_EMULATE_TRANSLATEADDR_IS_NOOP 1
 #define EMU86_EMULATE_TRANSLATEADDR(addr) (addr)
 #define EMU86_GETCR4_UMIP_IS_ZERO 1 /* TODO: Support me! */
-#define EMU86_GETCR4_UMIP() 0       /* TODO: Support me! */
+#define EMU86_GETCR4_UMIP()       0 /* TODO: Support me! */
+#define EMU86_GETCR4_DE_IS_ONE    1 /* TODO: Support me! */
+#define EMU86_GETCR4_DE()         1 /* TODO: Support me! */
 
 
 /* Tell libemu86 how to emulate certain instructions. */
@@ -629,6 +682,70 @@ throw_unsupported_instruction(struct icpustate *__restrict state,
 #define EMU86_EMULATE_INVLPG(addr)               pagedir_syncall()
 #define EMU86_EMULATE_LAR(segment_index, result) DONT_USE
 #define EMU86_EMULATE_LSL(segment_index, result) DONT_USE
+
+#define EMU86_EMULATE_RDCR0()  DONT_USE
+#define EMU86_EMULATE_WRCR0(v) DONT_USE
+#define EMU86_EMULATE_RDCR2()  DONT_USE
+#define EMU86_EMULATE_WRCR2(v) DONT_USE
+#define EMU86_EMULATE_RDCR3()  DONT_USE
+#define EMU86_EMULATE_WRCR3(v) DONT_USE
+#define EMU86_EMULATE_RDCR4()  DONT_USE
+#define EMU86_EMULATE_WRCR4(v) DONT_USE
+#define EMU86_EMULATE_RDCR8()  DONT_USE
+#define EMU86_EMULATE_WRCR8(v) DONT_USE
+
+#define EMU86_EMULATE_RDDR0()  DONT_USE
+#define EMU86_EMULATE_WRDR0(v) DONT_USE
+#define EMU86_EMULATE_RDDR1()  DONT_USE
+#define EMU86_EMULATE_WRDR1(v) DONT_USE
+#define EMU86_EMULATE_RDDR2()  DONT_USE
+#define EMU86_EMULATE_WRDR2(v) DONT_USE
+#define EMU86_EMULATE_RDDR3()  DONT_USE
+#define EMU86_EMULATE_WRDR3(v) DONT_USE
+#define EMU86_EMULATE_RDDR6()  DONT_USE
+#define EMU86_EMULATE_WRDR6(v) DONT_USE
+#define EMU86_EMULATE_RDDR7()  DONT_USE
+#define EMU86_EMULATE_WRDR7(v) DONT_USE
+
+
+/* Enable the emulation of rdmsr/wrmsr for certain MSR registers:
+ *  - IA32_FS_BASE            (read-write)
+ *  - IA32_GS_BASE            (read-write)
+ *  - IA32_TIME_STAMP_COUNTER (read-only)
+ *  - IA32_TSC_AUX            (read-only) */
+#define EMU86_EMULATE_CONFIG_WANT_RDMSR_EMULATED 1
+#define EMU86_EMULATE_CONFIG_WANT_WRMSR_EMULATED 1
+
+/* Indirect use of __rdtsc() uses the `rdtsc' instruction directly. */
+#define EMU86_EMULATE_RDTSC_INDIRECT() __rdtsc()
+
+/* Return the OS-specific ID for the current CPU (same as the `IA32_TSC_AUX' MSR) */
+#define EMU86_EMULATE_RDTSC_AUX() emulate_read_rsc_aux()
+PRIVATE WUNUSED ATTR_PURE u32 KCALL emulate_read_rsc_aux(void) {
+	/* TODO: KOS currently doesn't program the `IA32_TSC_AUX' MSR during CPU initialization.
+	 *       We really need to do this, though (programming should always be done when cpuid
+	 *       bit `CPUID_80000001D_RDTSCP' is enabled, in which case `rdtscp' exists, and should
+	 *       consequently also be able to hold the ID of the current CPU) */
+	return THIS_CPU->c_id;
+}
+
+
+/* Emulation of the `rdtsc' instruction (cpu quantum time is the best we've got for this...) */
+#if EMU86_EMULATE_CONFIG_WANT_RDTSC
+#define EMU86_EMULATE_RDTSC() emulate_rdtsc()
+PRIVATE u64 KCALL emulate_rdtsc(void) {
+	qtime_t now = cpu_quantum_time();
+	return (u64)((u64)now.q_jtime * now.q_qsize) + now.q_qtime;
+}
+#else /* EMU86_EMULATE_CONFIG_WANT_RDTSC */
+#define EMU86_EMULATE_RDTSC() DONT_USE
+#endif /* !EMU86_EMULATE_CONFIG_WANT_RDTSC */
+
+
+#undef EMU86_EMULATE_CONFIG_WANT_RDPMC
+#define EMU86_EMULATE_CONFIG_WANT_RDPMC 0   /* TODO: Emulate */
+#define EMU86_EMULATE_RDPMC(index) DONT_USE /* TODO: Emulate */
+
 
 #ifdef __x86_64__
 #define NEED_return_unsupported_instruction
@@ -1034,6 +1151,17 @@ NOTHROW(KCALL i386_getsegment_base)(struct icpustate32 *__restrict state,
 		return 0;
 
 	case SEGMENT_KERNEL_FSBASE:
+		if (icpustate_isuser(state)) {
+err_privileged_segment:
+			THROW(E_ILLEGAL_INSTRUCTION_REGISTER,
+			      0,                                       /* opcode */
+			      0,                                       /* op_flags */
+			      E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV,    /* what */
+			      /* XXX: regno should be `X86_REGISTER_SEGMENT_xS_BASE' */
+			      X86_REGISTER_SEGMENT_ES + segment_regno, /* regno */
+			      0,                                       /* offset */
+			      segment_index);                          /* regval */
+		}
 		return (u32)THIS_TASK;
 
 	case SEGMENT_USER_FSBASE:
@@ -1056,8 +1184,10 @@ NOTHROW(KCALL i386_getsegment_base)(struct icpustate32 *__restrict state,
 			/* Deal with an invalid / disabled LDT by throwing an error indicating an invalid LDT. */
 			THROW(E_ILLEGAL_INSTRUCTION_REGISTER,
 			      0,                                    /* opcode */
+			      0,                                    /* op_flags */
 			      E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD, /* what */
 			      X86_REGISTER_MISC_LDT,                /* regno */
+			      0,                                    /* offset */
 			      ldt);                                 /* regval */
 		}
 		seg = (struct segment *)((byte_t *)dt.dt_base + ldt);
@@ -1069,11 +1199,18 @@ NOTHROW(KCALL i386_getsegment_base)(struct icpustate32 *__restrict state,
 		PREEMPTION_POP(was);
 		THROW(E_ILLEGAL_INSTRUCTION_REGISTER,
 		      0,                                       /* opcode */
+		      0,                                       /* op_flags */
 		      E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD,    /* what */
 		      X86_REGISTER_SEGMENT_ES + segment_regno, /* regno */
+		      0,                                       /* offset */
 		      segment_index);                          /* regval */
 	}
 	seg = (struct segment *)((byte_t *)dt.dt_base + segment_index);
+	if (seg->s_descriptor.d_dpl != 3 && icpustate_isuser(state)) {
+		/* User-space can't read the base address of a privileged segment! */
+		PREEMPTION_POP(was);
+		goto err_privileged_segment;
+	}
 	result = segment_rdbaseX(seg);
 	PREEMPTION_POP(was);
 	return result;

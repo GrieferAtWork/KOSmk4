@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f8dafcf */
+/* HASH CRC-32:0xb0697eb5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -246,10 +246,13 @@
  * 	@@NOTE: When set to `X86_REGISTER_MSR', then the next 3
  * 	@@      pointers are index(%ecx), loval(%eax), hival(%edx)
  * 	member regno: uintptr_t;
+ * 	@@An offset applied to the register (set in case of an illegal lcall/ljmp; 0 otherwise)
+ * 	@@In case an MSR register was accessed, this is the MSR index
+ * 	member offset: uintptr_t;
  * 	@@The associated register value (or 0 for read operations)
  * 	member regval: uintptr_t;
- * 	@@An offset applied to the register (set in case of an illegal lcall/ljmp; 0 otherwise)
- * 	member offset: uintptr_t;
+ * 	@@The associated register value (or 0 for read operations) (high 32 bits in case of an MSR write)
+ * 	member regval2: uintptr_t;
  */
 #define E_ILLEGAL_INSTRUCTION_REGISTER (E_ILLEGAL_INSTRUCTION,0x0011)
 /* Read from invalid register */

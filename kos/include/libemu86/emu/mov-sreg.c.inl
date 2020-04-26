@@ -39,7 +39,7 @@ case EMU86_OPCODE_ENCODE(0x8c): {
 #else /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 		EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_RDINV,
 		                                                 X86_REGISTER_SEGMENT_ES + modrm.mi_reg,
-		                                                 0, 0);
+		                                                 0, 0, 0);
 #endif /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 	}
 #if EMU86_EMULATE_CONFIG_WANT_MOV_SREG
@@ -75,7 +75,7 @@ case EMU86_OPCODE_ENCODE(0x8e): {
 #ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
 		EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRINV,
 		                                                 X86_REGISTER_SEGMENT_ES + modrm.mi_reg,
-		                                                 segment, 0);
+		                                                 0, segment, 0);
 #else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 #define NEED_return_unsupported_instruction
 		goto return_unsupported_instruction;
@@ -88,7 +88,7 @@ case EMU86_OPCODE_ENCODE(0x8e): {
 #ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
 		EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV,
 		                                                 X86_REGISTER_SEGMENT_ES + modrm.mi_reg,
-		                                                 segment, 0);
+		                                                 0, segment, 0);
 #else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 #define NEED_return_privileged_instruction
 		goto return_privileged_instruction;

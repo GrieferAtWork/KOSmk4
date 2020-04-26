@@ -287,6 +287,9 @@
 #   define X86_REGISTER_MISC_MXCSR      __UINT16_C(0xe439) /* %mxcsr (MXCSR (SSE only); `xfpustate::fx_mxcsr') */
 #   define X86_REGISTER_MISC_MXCSR_MASK __UINT16_C(0xe43a) /* %mxcsr_mask (MXCSR mask (SSE only); `xfpustate::fx_mxcsr_mask') */
 
+/* Performance counter register */
+#define X86_REGISTER_PCR __UINT16_C(0xe000)
+
 /* Model-specific registers. */
 #define X86_REGISTER_MSR __UINT16_C(0xf000)
 

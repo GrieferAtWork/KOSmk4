@@ -168,15 +168,16 @@ x86_handle_segment_not_present(struct icpustate *__restrict state,
 #endif /* CONFIG_X86_EMULATE_LCALL7 */
 				/* Invalid use of the lcall instruction. */
 				PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
-				PERTASK_SET(this_exception_pointers[0], (uintptr_t)opcode);
-				PERTASK_SET(this_exception_pointers[1],
+				PERTASK_SET(this_exception_pointers[0], (uintptr_t)opcode);   /* opcode */
+				PERTASK_SET(this_exception_pointers[1], (uintptr_t)op_flags); /* op_flags */
+				PERTASK_SET(this_exception_pointers[2],                       /* how */
 				            !(segment & 3) && !isuser()
 				            ? (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV
 				            : (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD);
-				PERTASK_SET(this_exception_pointers[2], (uintptr_t)X86_REGISTER_SEGMENT_CS);
-				PERTASK_SET(this_exception_pointers[3], (uintptr_t)segment);
-				PERTASK_SET(this_exception_pointers[4], (uintptr_t)offset);
-				for (i = 5; i < EXCEPTION_DATA_POINTERS; ++i)
+				PERTASK_SET(this_exception_pointers[3], (uintptr_t)X86_REGISTER_SEGMENT_CS); /* regno */
+				PERTASK_SET(this_exception_pointers[4], (uintptr_t)offset);                  /* offset */
+				PERTASK_SET(this_exception_pointers[5], (uintptr_t)segment);                 /* regval */
+				for (i = 6; i < EXCEPTION_DATA_POINTERS; ++i)
 					PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
 			}	goto unwind_state;
 
@@ -216,12 +217,13 @@ x86_handle_segment_not_present(struct icpustate *__restrict state,
 #endif /* CONFIG_X86_EMULATE_LCALL7 */
 					/* Invalid use of the lcall instruction. */
 					PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
-					PERTASK_SET(this_exception_pointers[0],
+					PERTASK_SET(this_exception_pointers[0], /* opcode */
 					            (uintptr_t)E_ILLEGAL_INSTRUCTION_X86_OPCODE(opcode, mod.mi_reg));
-					PERTASK_SET(this_exception_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRNPSEG);
-					PERTASK_SET(this_exception_pointers[2], (uintptr_t)X86_REGISTER_SEGMENT_CS);
-					PERTASK_SET(this_exception_pointers[3], (uintptr_t)segment);
-					PERTASK_SET(this_exception_pointers[4], (uintptr_t)offset);
+					PERTASK_SET(this_exception_pointers[1], (uintptr_t)op_flags);                               /* op_flags */
+					PERTASK_SET(this_exception_pointers[2], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRNPSEG); /* how */
+					PERTASK_SET(this_exception_pointers[3], (uintptr_t)X86_REGISTER_SEGMENT_CS);                /* regno */
+					PERTASK_SET(this_exception_pointers[4], (uintptr_t)offset);                                 /* offset */
+					PERTASK_SET(this_exception_pointers[5], (uintptr_t)segment);                                /* regval */
 					for (i = 5; i < EXCEPTION_DATA_POINTERS; ++i)
 						PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
 					goto unwind_state;
@@ -233,17 +235,20 @@ x86_handle_segment_not_present(struct icpustate *__restrict state,
 				MOD_DECODE();
 				if (mod.mi_reg == 3) {
 					/* LTR r/m16 */
-					PERTASK_SET(this_exception_pointers[2], (uintptr_t)X86_REGISTER_MISC_TR);
+					PERTASK_SET(this_exception_pointers[3], (uintptr_t)X86_REGISTER_MISC_TR);
 				} else if (mod.mi_reg == 2) {
 					/* LLDT r/m16 */
-					PERTASK_SET(this_exception_pointers[2], (uintptr_t)X86_REGISTER_MISC_LDT);
+					PERTASK_SET(this_exception_pointers[3], (uintptr_t)X86_REGISTER_MISC_LDT);
 				} else {
 					goto generic_failure;
 				}
 				PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
-				PERTASK_SET(this_exception_pointers[0], E_ILLEGAL_INSTRUCTION_X86_OPCODE(opcode, mod.mi_reg));
-				PERTASK_SET(this_exception_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRNPSEG);
-				PERTASK_SET(this_exception_pointers[3], (uintptr_t)modrm_getrmw(state, &mod, op_flags));
+				PERTASK_SET(this_exception_pointers[0], E_ILLEGAL_INSTRUCTION_X86_OPCODE(opcode, mod.mi_reg)); /* opcode */
+				PERTASK_SET(this_exception_pointers[1], (uintptr_t)op_flags);                                  /* op_flags */
+				PERTASK_SET(this_exception_pointers[2], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRNPSEG);    /* how */
+/*				PERTASK_SET(this_exception_pointers[3], (uintptr_t)...);                                        * regno */
+				PERTASK_SET(this_exception_pointers[4], (uintptr_t)0);                                         /* offset */
+				PERTASK_SET(this_exception_pointers[5], (uintptr_t)modrm_getrmw(state, &mod, op_flags));       /* regval */
 				for (i = 4; i < EXCEPTION_DATA_POINTERS; ++i)
 					PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
 				goto unwind_state;
@@ -253,11 +258,13 @@ x86_handle_segment_not_present(struct icpustate *__restrict state,
 				/* MOV Sreg**,r/m16 */
 				MOD_DECODE();
 				PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
-				PERTASK_SET(this_exception_pointers[0], E_ILLEGAL_INSTRUCTION_X86_OPCODE(opcode, mod.mi_reg));
-				PERTASK_SET(this_exception_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRNPSEG);
-				PERTASK_SET(this_exception_pointers[2], (uintptr_t)X86_REGISTER_SEGMENT_ES + mod.mi_reg);
-				PERTASK_SET(this_exception_pointers[3], (uintptr_t)modrm_getrmw(state, &mod, op_flags));
-				for (i = 4; i < EXCEPTION_DATA_POINTERS; ++i)
+				PERTASK_SET(this_exception_pointers[0], E_ILLEGAL_INSTRUCTION_X86_OPCODE(opcode, mod.mi_reg)); /* opcode */
+				PERTASK_SET(this_exception_pointers[1], (uintptr_t)op_flags);                                  /* op_flags */
+				PERTASK_SET(this_exception_pointers[2], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRNPSEG);    /* how */
+				PERTASK_SET(this_exception_pointers[3], (uintptr_t)X86_REGISTER_SEGMENT_ES + mod.mi_reg);      /* regno */
+				PERTASK_SET(this_exception_pointers[4], (uintptr_t)0);                                         /* offset */
+				PERTASK_SET(this_exception_pointers[5], (uintptr_t)modrm_getrmw(state, &mod, op_flags));       /* regval */
+				for (i = 6; i < EXCEPTION_DATA_POINTERS; ++i)
 					PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
 				goto unwind_state;
 
@@ -285,9 +292,11 @@ generic_failure:
 	}
 	/* Fallback: Throw an `E_ILLEGAL_INSTRUCTION_REGISTER' exception */
 	PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
-	PERTASK_SET(this_exception_pointers[0], (uintptr_t)opcode);
-	PERTASK_SET(this_exception_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRNPSEG);
-	PERTASK_SET(this_exception_pointers[2], (uintptr_t)X86_REGISTER_SEGMENT);
+	PERTASK_SET(this_exception_pointers[0], (uintptr_t)opcode);                                 /* opcode */
+	PERTASK_SET(this_exception_pointers[1], (uintptr_t)op_flags);                               /* op_flags */
+	PERTASK_SET(this_exception_pointers[2], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRNPSEG); /* how */
+	PERTASK_SET(this_exception_pointers[3], (uintptr_t)X86_REGISTER_SEGMENT);                   /* regno */
+	PERTASK_SET(this_exception_pointers[4], (uintptr_t)0);                                      /* offset */
 	/* XXX: Actually, bits from `ecode & 3' have special meaning:
 	 *      0x1: External event
 	 *      0x2: Refers to an IDT entry
@@ -296,8 +305,8 @@ generic_failure:
 	 * -> In general, though: #NP exceptions are really hard to represent in
 	 *    the KOS exception model, and using a general ~illegal instruction~
 	 *    exception might already be the wrong thing to do... */
-	PERTASK_SET(this_exception_pointers[3], (uintptr_t)ecode);
-	for (i = 4; i < EXCEPTION_DATA_POINTERS; ++i)
+	PERTASK_SET(this_exception_pointers[5], (uintptr_t)ecode); /* regval */
+	for (i = 6; i < EXCEPTION_DATA_POINTERS; ++i)
 		PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
 unwind_state:
 	PERTASK_SET(this_exception_faultaddr, (void *)orig_pc);

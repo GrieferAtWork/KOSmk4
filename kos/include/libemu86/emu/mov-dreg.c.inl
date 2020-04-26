@@ -24,6 +24,8 @@
 #define EMU86_EMULATE_MANDATORY_DEBUG_REGISTERS 0xcf
 
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
+
+#if EMU86_EMULATE_CONFIG_WANT_MOV_DREG
 #ifdef EMU86_EMULATE_RDDR0
 #define EMU86_EMULATE_HAVE_RDDRn_0 0x0001
 #else /* EMU86_EMULATE_RDDR0 */
@@ -231,18 +233,23 @@
 #define EMU86_EMULATE_HAVE_WRDRn 0
 #endif /* !EMU86_EMULATE_HAVE_WRDRn */
 
+#else /* EMU86_EMULATE_CONFIG_WANT_MOV_DREG */
+#define EMU86_EMULATE_HAVE_RDDRn 0
+#define EMU86_EMULATE_HAVE_WRDRn 0
+#endif /* !EMU86_EMULATE_CONFIG_WANT_MOV_DREG */
+
 #undef EMU86_EMULATE_CONFIG_WANT_MOV_DREG_RD
 #undef EMU86_EMULATE_CONFIG_WANT_MOV_DREG_WR
-#if EMU86_EMULATE_HAVE_RDDRn && EMU86_EMULATE_CONFIG_WANT_MOV_DREG
+#if EMU86_EMULATE_HAVE_RDDRn
 #define EMU86_EMULATE_CONFIG_WANT_MOV_DREG_RD 1
-#else /* EMU86_EMULATE_HAVE_RDDRn && EMU86_EMULATE_CONFIG_WANT_MOV_DREG */
+#else /* EMU86_EMULATE_HAVE_RDDRn */
 #define EMU86_EMULATE_CONFIG_WANT_MOV_DREG_RD 0
-#endif /* !EMU86_EMULATE_HAVE_RDDRn || !EMU86_EMULATE_CONFIG_WANT_MOV_DREG */
-#if EMU86_EMULATE_HAVE_WRDRn && EMU86_EMULATE_CONFIG_WANT_MOV_DREG
+#endif /* !EMU86_EMULATE_HAVE_RDDRn */
+#if EMU86_EMULATE_HAVE_WRDRn
 #define EMU86_EMULATE_CONFIG_WANT_MOV_DREG_WR 1
-#else /* EMU86_EMULATE_HAVE_WRDRn && EMU86_EMULATE_CONFIG_WANT_MOV_DREG */
+#else /* EMU86_EMULATE_HAVE_WRDRn */
 #define EMU86_EMULATE_CONFIG_WANT_MOV_DREG_WR 0
-#endif /* !EMU86_EMULATE_HAVE_WRDRn || !EMU86_EMULATE_CONFIG_WANT_MOV_DREG */
+#endif /* !EMU86_EMULATE_HAVE_WRDRn */
 
 
 EMU86_INTELLISENSE_BEGIN(mov_creg) {
@@ -273,7 +280,7 @@ case EMU86_OPCODE_ENCODE(0x0f21): {
 #ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
 		EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_RDINV,
 		                                                 X86_REGISTER_DEBUG_DR0 + modrm.mi_reg,
-		                                                 0, 0);
+		                                                 0, 0, 0);
 		__builtin_unreachable();
 #else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 #define NEED_return_privileged_instruction
@@ -362,7 +369,7 @@ case EMU86_OPCODE_ENCODE(0x0f21): {
 #ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
 	EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV,
 	                                                 X86_REGISTER_DEBUG_DR0 + modrm.mi_reg,
-	                                                 0, 0);
+	                                                 0, 0, 0);
 #else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 #define NEED_return_privileged_instruction
 	goto return_privileged_instruction;
@@ -416,7 +423,7 @@ case EMU86_OPCODE_ENCODE(0x0f23): {
 #ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
 		EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRINV,
 		                                                 X86_REGISTER_DEBUG_DR0 + modrm.mi_reg,
-		                                                 value, 0);
+		                                                 0, value, 0);
 		__builtin_unreachable();
 #else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 #define NEED_return_privileged_instruction
@@ -493,7 +500,7 @@ case EMU86_OPCODE_ENCODE(0x0f23): {
 #ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
 	EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV,
 	                                                 X86_REGISTER_DEBUG_DR0 + modrm.mi_reg,
-	                                                 value, 0);
+	                                                 0, value, 0);
 #else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 #define NEED_return_privileged_instruction
 	goto return_privileged_instruction;

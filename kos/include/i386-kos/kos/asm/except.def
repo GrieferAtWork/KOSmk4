@@ -297,19 +297,28 @@ class E_ILLEGAL_INSTRUCTION_REGISTER: E_ILLEGAL_INSTRUCTION = 0x0011 {
 	@@The opcode that caused the exception
 	@@NOTE: This field should be decoded using `E_ILLEGAL_INSTRUCTION_X86_OPCODE_*'
 	member opcode: uintptr_t;
+
 	@@Opcode flags (set of `EMU86_F_*')
 	member op_flags: uintptr_t;
+
 	@@How was the register accessed (One of `E_ILLEGAL_INSTRUCTION_REGISTER_*')
 	[tostr(select("E_ILLEGAL_INSTRUCTION_REGISTER_*"))]
 	member how: uintptr_t;
+
 	@@The accessed register index
 	@@NOTE: When set to `X86_REGISTER_MSR', then the next 3
 	@@      pointers are index(%ecx), loval(%eax), hival(%edx)
 	member regno: uintptr_t;
+
+	@@An offset applied to the register (set in case of an illegal lcall/ljmp; 0 otherwise)
+	@@In case an MSR register was accessed, this is the MSR index
+	member offset: uintptr_t;
+
 	@@The associated register value (or 0 for read operations)
 	member regval: uintptr_t;
-	@@An offset applied to the register (set in case of an illegal lcall/ljmp; 0 otherwise)
-	member offset: uintptr_t;
+
+	@@The associated register value (or 0 for read operations) (high 32 bits in case of an MSR write)
+	member regval2: uintptr_t;
 }
 
 @@Read from invalid register

@@ -207,7 +207,7 @@ NOTHROW_NCX_KERNEL(LIBCCALL libc_error_as_signal)(struct exception_data const *_
 			break;
 
 		case ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER):
-			switch (data->e_pointers[1]) {
+			switch (data->e_pointers[2]) { /* how */
 			case E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV:
 			case E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV:
 				result->si_code = ILL_PRVREG;

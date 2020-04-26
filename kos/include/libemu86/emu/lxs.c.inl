@@ -111,7 +111,7 @@ do_lxs:
 #ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
 		EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV,
 		                                                 X86_REGISTER_SEGMENT_ES + segment_regno,
-		                                                 segment, offset);
+		                                                 offset, segment, 0);
 #else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 #define NEED_return_privileged_instruction
 		goto return_privileged_instruction;

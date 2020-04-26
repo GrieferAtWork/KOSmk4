@@ -344,31 +344,32 @@ NOTHROW(KCALL print_exception_desc_of)(struct exception_data const *__restrict d
 
 		case E_ILLEGAL_INSTRUCTION_REGISTER: {
 			char const *name;
-			switch (data->e_pointers[1]) {
+			switch (data->e_pointers[2]) {
 			case E_ILLEGAL_INSTRUCTION_REGISTER_RDINV: name = "rdinv"; break; /* Read from invalid register */
 			case E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV: name = "rdprv"; break; /* Read from privileged register */
 			case E_ILLEGAL_INSTRUCTION_REGISTER_WRINV: name = "wrinv"; break; /* Write to invalid register */
 			case E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV: name = "wrprv"; break; /* Write to privileged register */
 			case E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD: name = "wrbad"; break; /* Bad value written to register */
-			default: name = NULL;
+			default: name = NULL; break;
 			}
 			if (name) {
 				format_printf(printer, arg, " [%s:", name);
 			} else {
-				format_printf(printer, arg, " [?(%#Ix):", data->e_pointers[1]);
+				format_printf(printer, arg, " [?(%#Ix):", data->e_pointers[2]);
 			}
-			if (data->e_pointers[2] == X86_REGISTER_MSR) {
+			if (data->e_pointers[3] == X86_REGISTER_MSR) {
 				format_printf(printer, arg, "%%msr(%#Ix),%#I64x]",
-				              data->e_pointers[3],
-				              (uint64_t)data->e_pointers[4] |
-				              (uint64_t)data->e_pointers[5] << 32);
+				              data->e_pointers[4],
+				              (uint64_t)data->e_pointers[5] |
+				              (uint64_t)data->e_pointers[6] << 32);
 			} else {
-				name = register_name(data->e_pointers[2]);
+				name = register_name(data->e_pointers[3]);
 				if (name)
 					format_printf(printer, arg, "%%%s,", name);
-				else
-					format_printf(printer, arg, "?(%#x),", data->e_pointers[2]);
-				format_printf(printer, arg, "%#Ix]", data->e_pointers[3]);
+				else {
+					format_printf(printer, arg, "?(%#x),", data->e_pointers[3]);
+				}
+				format_printf(printer, arg, "%#Ix]", data->e_pointers[4]);
 			}
 		}	break;
 

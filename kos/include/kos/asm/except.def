@@ -156,10 +156,10 @@ class E_ILLEGAL_INSTRUCTION_REGISTER: E_ILLEGAL_INSTRUCTION = 0x0011 {
 	@@How was the register accessed (One of `E_ILLEGAL_INSTRUCTION_REGISTER_*')
 	[tostr(select("E_ILLEGAL_INSTRUCTION_REGISTER_*"))]
 	member how: uintptr_t;
-	@@The accessed register index
-	member regno: uintptr_t;
 	@@The associated register value (or 0 for read operations)
 	member regval: uintptr_t;
+	@@The accessed register index
+	member regno: uintptr_t;
 }
 @@Read from invalid register
 const E_ILLEGAL_INSTRUCTION_REGISTER_RDINV = 0x0001;

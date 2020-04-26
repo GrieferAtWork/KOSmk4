@@ -116,10 +116,15 @@ NOTHROW(FCALL x86_icpustate_get64)(struct icpustate *__restrict state, u8 regno)
 #ifndef __x86_64__
 PRIVATE ATTR_NORETURN void FCALL
 throw_bad_kernel_esp(uintptr_t value) THROWS(E_ILLEGAL_INSTRUCTION_REGISTER) {
-	THROW(E_ILLEGAL_INSTRUCTION_REGISTER, 0,
-	      E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD, value,
-	      X86_REGISTER_GENERAL_PURPOSE_ESP, value);
+	THROW(E_ILLEGAL_INSTRUCTION_REGISTER,
+	      /* opcode:   */ 0,
+	      /* op_flags: */ 0,
+	      /* how:      */ E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD,
+	      /* regno:    */ X86_REGISTER_GENERAL_PURPOSE_ESP,
+	      /* offset:   */ 0,
+	      /* regval:   */ value);
 }
+
 INTERN void FCALL
 x86_icpustate_set32(struct icpustate *__restrict state,
                     u8 regno, u32 value) {
@@ -148,10 +153,12 @@ NOTHROW(FCALL get_segment_base)(u16 segid) {
 			PREEMPTION_POP(was);
 			/* Deal with an invalid / disabled LDT by throwing an error indicating an invalid LDT. */
 			THROW(E_ILLEGAL_INSTRUCTION_REGISTER,
-			      0,                                    /* opcode */
-			      E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD, /* what */
-			      X86_REGISTER_MISC_LDT,                /* regno */
-			      ldt);                                 /* regval */
+			      /* opcode:   */ 0,
+			      /* op_flags: */ 0,
+			      /* how:      */ E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD,
+			      /* regno:    */ X86_REGISTER_MISC_LDT,
+			      /* offset:   */ 0,
+			      /* regval:   */ ldt);
 		}
 		seg          = &((struct segment *)gdt.dt_base)[SEGMENT_INDEX(ldt)];
 		gdt.dt_base  = segment_rdbaseX(seg);

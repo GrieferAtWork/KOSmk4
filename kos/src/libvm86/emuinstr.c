@@ -317,10 +317,10 @@ DECL_END
 #define EMU86_EMULATE_THROW_DIVIDE_BY_ZERO_ALLOW_RETHROW 0
 #define EMU86_EMULATE_THROW_DIVIDE_ERROR() \
 	return libvm86_intr(self, 0x0) /* #DE */
-#define EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(how, regno, regval, offset) \
-	return libvm86_intr(self, (how) == E_ILLEGAL_INSTRUCTION_REGISTER_RDINV ||       \
-	                          (how) == E_ILLEGAL_INSTRUCTION_REGISTER_WRINV          \
-	                          ? 0x06 /* #UD */                                       \
+#define EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(how, regno, offset, regval, regval2) \
+	return libvm86_intr(self, (how) == E_ILLEGAL_INSTRUCTION_REGISTER_RDINV ||                \
+	                          (how) == E_ILLEGAL_INSTRUCTION_REGISTER_WRINV                   \
+	                          ? 0x06 /* #UD */                                                \
 	                          : 0x0d /* #GP */)
 
 

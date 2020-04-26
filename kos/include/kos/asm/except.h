@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x70386f4f */
+/* HASH CRC-32:0xddf58d46 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -110,10 +110,10 @@
  * 	member opcode: uintptr_t;
  * 	@@How was the register accessed (One of `E_ILLEGAL_INSTRUCTION_REGISTER_*')
  * 	member how: uintptr_t;
- * 	@@The accessed register index
- * 	member regno: uintptr_t;
  * 	@@The associated register value (or 0 for read operations)
- * 	member regval: uintptr_t; */
+ * 	member regval: uintptr_t;
+ * 	@@The accessed register index
+ * 	member regno: uintptr_t; */
 #define E_ILLEGAL_INSTRUCTION_REGISTER (E_ILLEGAL_INSTRUCTION,0x0011)
 /* Read from invalid register */
 #define E_ILLEGAL_INSTRUCTION_REGISTER_RDINV 0x0001

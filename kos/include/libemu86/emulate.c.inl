@@ -41,6 +41,7 @@
 
 #include <i386-kos/asm/cpu-cpuid.h>
 #include <i386-kos/asm/cpu-flags.h>
+#include <i386-kos/asm/cpu-msr.h>
 #include <i386-kos/asm/registers.h>
 #include <i386-kos/asm/rtm.h>
 #include <kos/except.h>
@@ -482,6 +483,21 @@ __DECL_BEGIN
 #ifndef EMU86_EMULATE_CONFIG_WANT_ARPL
 #define EMU86_EMULATE_CONFIG_WANT_ARPL (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
 #endif /* !EMU86_EMULATE_CONFIG_WANT_ARPL */
+#ifndef EMU86_EMULATE_CONFIG_WANT_RDMSR
+#define EMU86_EMULATE_CONFIG_WANT_RDMSR 0
+#endif /* !EMU86_EMULATE_CONFIG_WANT_RDMSR */
+#ifndef EMU86_EMULATE_CONFIG_WANT_WRMSR
+#define EMU86_EMULATE_CONFIG_WANT_WRMSR 0
+#endif /* !EMU86_EMULATE_CONFIG_WANT_WRMSR */
+#ifndef EMU86_EMULATE_CONFIG_WANT_RDTSC
+#define EMU86_EMULATE_CONFIG_WANT_RDTSC (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_RDTSC */
+#ifndef EMU86_EMULATE_CONFIG_WANT_RDPMC
+#define EMU86_EMULATE_CONFIG_WANT_RDPMC (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_RDPMC */
+#ifndef EMU86_EMULATE_CONFIG_WANT_RDTSCP
+#define EMU86_EMULATE_CONFIG_WANT_RDTSCP (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_RDTSCP */
 #ifndef EMU86_EMULATE_CONFIG_WANT_NOP_RM
 #define EMU86_EMULATE_CONFIG_WANT_NOP_RM (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
 #endif /* !EMU86_EMULATE_CONFIG_WANT_NOP_RM */
@@ -518,6 +534,9 @@ __DECL_BEGIN
 #ifndef EMU86_EMULATE_CONFIG_WANT_XTEST
 #define EMU86_EMULATE_CONFIG_WANT_XTEST (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
 #endif /* !EMU86_EMULATE_CONFIG_WANT_XTEST */
+#ifndef EMU86_EMULATE_CONFIG_WANT_MCOMMIT
+#define EMU86_EMULATE_CONFIG_WANT_MCOMMIT (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_MCOMMIT */
 #ifndef EMU86_EMULATE_CONFIG_WANT_SIDT
 #define EMU86_EMULATE_CONFIG_WANT_SIDT 0
 #endif /* !EMU86_EMULATE_CONFIG_WANT_SIDT */
@@ -717,6 +736,23 @@ __DECL_BEGIN
 #define EMU86_EMULATE_CONFIG_WANT_XOP_T1MSKC (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
 #endif /* !EMU86_EMULATE_CONFIG_WANT_XOP_T1MSKC */
 
+/* Emulate `rdmsr' for the following MSRs (if possible):
+ *  - IA32_FS_BASE            (#if 1; uses `EMU86_GETFSBASE()')
+ *  - IA32_GS_BASE            (#if 1; uses `EMU86_GETGSBASE()')
+ *  - IA32_TIME_STAMP_COUNTER (#ifdef EMU86_EMULATE_RDTSC_INDIRECT)
+ *  - IA32_TSC_AUX            (#ifdef EMU86_EMULATE_RDTSC_AUX)
+ */
+#ifndef EMU86_EMULATE_CONFIG_WANT_RDMSR_EMULATED
+#define EMU86_EMULATE_CONFIG_WANT_RDMSR_EMULATED (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_RDMSR_EMULATED */
+
+/* Emulate `wrmsr' for the following MSRs (if possible):
+ *  - IA32_FS_BASE            (#if EMU86_SETFSBASE; uses `EMU86_SETFSBASE()')
+ *  - IA32_GS_BASE            (#if EMU86_SETGSBASE; uses `EMU86_SETGSBASE()') */
+#ifndef EMU86_EMULATE_CONFIG_WANT_WRMSR_EMULATED /* emulate specific MSR accesses for user-space */
+#define EMU86_EMULATE_CONFIG_WANT_WRMSR_EMULATED (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_WRMSR_EMULATED */
+
 #ifndef EMU86_EMULATE_CONFIG_WANT_XOP
 #if (EMU86_EMULATE_CONFIG_WANT_XOP_BLCFILL || EMU86_EMULATE_CONFIG_WANT_XOP_BLSFILL || \
      EMU86_EMULATE_CONFIG_WANT_XOP_BLCS || EMU86_EMULATE_CONFIG_WANT_XOP_TZMSK ||      \
@@ -878,10 +914,10 @@ __DECL_BEGIN
 	EMU86_EMULATE_RETURN_AFTER_INT(0x06) /* #UD */
 #endif /* !EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION */
 #ifndef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
-#define EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(how, regno, regval, offset) \
-	EMU86_EMULATE_RETURN_AFTER_INT((how) == E_ILLEGAL_INSTRUCTION_REGISTER_RDINV ||  \
-	                               (how) == E_ILLEGAL_INSTRUCTION_REGISTER_WRINV     \
-	                               ? 0x06 /* #UD */                                  \
+#define EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(how, regno, offset, regval, regval2) \
+	EMU86_EMULATE_RETURN_AFTER_INT((how) == E_ILLEGAL_INSTRUCTION_REGISTER_RDINV ||           \
+	                               (how) == E_ILLEGAL_INSTRUCTION_REGISTER_WRINV              \
+	                               ? 0x06 /* #UD */                                           \
 	                               : 0x0d /* #GP */)
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 #ifndef EMU86_EMULATE_THROW_SEGFAULT_UNALIGNED
@@ -923,10 +959,10 @@ __DECL_BEGIN
 #endif /* E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX */
 #define EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION()       THROW(E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE, _EMU86_GETOPCODE(), op_flags)
 #define EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION_RMREG() THROW(E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE, _EMU86_GETOPCODE_RMREG(), op_flags)
-#define EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(how, regno, regval, offset) \
-	THROW(E_ILLEGAL_INSTRUCTION_REGISTER, _EMU86_GETOPCODE(), op_flags, how, regno, regval, offset)
-#define EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER_RMREG(how, regno, regval, offset) \
-	THROW(E_ILLEGAL_INSTRUCTION_REGISTER, _EMU86_GETOPCODE_RMREG(), op_flags, how, regno, regval, offset)
+#define EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(how, regno, offset, regval, regval2) \
+	THROW(E_ILLEGAL_INSTRUCTION_REGISTER, _EMU86_GETOPCODE(), op_flags, how, regno, offset, regval, regval2)
+#define EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER_RMREG(how, regno, offset, regval, regval2) \
+	THROW(E_ILLEGAL_INSTRUCTION_REGISTER, _EMU86_GETOPCODE_RMREG(), op_flags, how, regno, offset, regval, regval2)
 #if CONFIG_LIBEMU86_WANT_64BIT
 #define EMU86_EMULATE_THROW_SEGFAULT_UNMAPPED_NONCANON(addr) \
 	THROW(E_SEGFAULT_UNMAPPED, addr, E_SEGFAULT_CONTEXT_NONCANON)
@@ -1030,12 +1066,13 @@ __DECL_BEGIN
  *   how == E_ILLEGAL_INSTRUCTION_REGISTER_WRNPSEG: return_unsupported_instruction
  *   how == E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV:   return_privileged_instruction  (only with `EMU86_EMULATE_CONFIG_CHECKUSER')
  *   how == E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV:   return_privileged_instruction  (only with `EMU86_EMULATE_CONFIG_CHECKUSER')
- * @param: how:    How was the register accessed (One of `E_ILLEGAL_INSTRUCTION_REGISTER_*')
- * @param: regno:  The accessed register index (one of `X86_REGISTER_*')
- * @param: regval: The value that was attempted to be assigned (only for write operations)
- * @param: offset: An offset applied to the register (in case of an illegal lcall/ljmp; 0 otherwise) */
-/* #define EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(how, regno, regval, offset)       ... */
-/* #define EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER_RMREG(how, regno, regval, offset) ... */
+ * @param: how:     How was the register accessed (One of `E_ILLEGAL_INSTRUCTION_REGISTER_*')
+ * @param: regno:   The accessed register index (one of `X86_REGISTER_*')
+ * @param: offset:  An offset applied to the register (in case of an illegal lcall/ljmp; 0 otherwise)
+ * @param: regval:  The value that was attempted to be assigned (only for write operations)
+ * @param: regval2: High 32-bit of the written value in case of an MSR register write. */
+/* #define EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(how, regno, offset, regval, regval2)       ... */
+/* #define EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER_RMREG(how, regno, offset, regval, regval2) ... */
 
 
 /* Throw an exception as the result of `addr' being non-canonical in 64-bit mode.
@@ -1297,7 +1334,44 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_emulate_l
 #endif /* !EMU86_SETGSBASE */
 #endif /* __KOS__ || __x86_64__ */
 #endif /* CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_64BIT */
+#if !defined(EMU86_EMULATE_RDMSR) && EMU86_EMULATE_CONFIG_WANT_RDMSR
+#define EMU86_EMULATE_RDMSR(index) __rdmsr(index)
+#endif /* !EMU86_EMULATE_RDMSR && EMU86_EMULATE_CONFIG_WANT_RDMSR */
+#if !defined(EMU86_EMULATE_WRMSR) && EMU86_EMULATE_CONFIG_WANT_WRMSR
+#define EMU86_EMULATE_WRMSR(index, value) __wrmsr(index, value)
+#endif /* !EMU86_EMULATE_WRMSR && EMU86_EMULATE_CONFIG_WANT_WRMSR */
+#if !defined(EMU86_EMULATE_RDTSC) && (EMU86_EMULATE_CONFIG_WANT_RDTSC || EMU86_EMULATE_CONFIG_WANT_RDTSCP || EMU86_EMULATE_CONFIG_WANT_RDMSR_EMULATED)
+#define EMU86_EMULATE_RDTSC() __rdtsc()
+#endif /* !EMU86_EMULATE_RDTSC && (EMU86_EMULATE_CONFIG_WANT_RDTSC || EMU86_EMULATE_CONFIG_WANT_RDTSCP || EMU86_EMULATE_CONFIG_WANT_RDMSR_EMULATED */
+#if !defined(EMU86_EMULATE_RDTSC_AUX) && (EMU86_EMULATE_CONFIG_WANT_RDTSCP || EMU86_EMULATE_CONFIG_WANT_RDMSR_EMULATED)
+#define EMU86_EMULATE_RDTSC_AUX() __rdmsr(IA32_TSC_AUX)
+#endif /* !EMU86_EMULATE_RDTSC_AUX && (EMU86_EMULATE_CONFIG_WANT_RDTSCP || EMU86_EMULATE_CONFIG_WANT_RDMSR_EMULATED) */
+#if !defined(EMU86_EMULATE_RDTSC_AUX) && EMU86_EMULATE_CONFIG_WANT_RDPMC
+#define EMU86_EMULATE_RDPMC(index) __rdpmc(index)
+#endif /* !EMU86_EMULATE_RDTSC_AUX && EMU86_EMULATE_CONFIG_WANT_RDPMC */
 #endif /* __x86_64__ || __i386__ */
+
+#if !defined(EMU86_EMULATE_RDTSC) && defined(EMU86_EMULATE_RDMSR)
+#define EMU86_EMULATE_RDTSC() EMU86_EMULATE_RDMSR(IA32_TIME_STAMP_COUNTER)
+#endif /* !EMU86_EMULATE_RDTSC && EMU86_EMULATE_RDMSR */
+
+/* An optional override for the method used to read the TSC when read
+ * from user-space via `__rdmsr(IA32_TIME_STAMP_COUNTER)' (which is
+ * emulated as one of the white-listed MSRs that can actually be read
+ * from user-space under KOS), or `__rdtscp()'
+ * A different method is used for this in order to allow instruction
+ * emulation to use the native `__rdtsc()' for this method, such that in
+ * its absence the instruction emulator will fault into itself recursively,
+ * at which point `EMU86_EMULATE_RDTSC()' will be used to emulate the
+ * recursive use-case, such that `EMU86_EMULATE_RDTSC()' may use some
+ * different method to implement some kind of cycle counter (such as
+ * APIC counters, or something similar). */
+#if !defined(EMU86_EMULATE_RDTSC_INDIRECT) && defined(EMU86_EMULATE_RDTSC)
+#define EMU86_EMULATE_RDTSC_INDIRECT() EMU86_EMULATE_RDTSC()
+#endif /* !EMU86_EMULATE_RDTSC_INDIRECT && EMU86_EMULATE_RDTSC */
+#if !defined(EMU86_EMULATE_RDTSC) && defined(EMU86_EMULATE_RDTSC_INDIRECT)
+#define EMU86_EMULATE_RDTSC() EMU86_EMULATE_RDTSC_INDIRECT()
+#endif /* !EMU86_EMULATE_RDTSC && EMU86_EMULATE_RDTSC_INDIRECT */
 
 
 /* Get the value of `CR4.UMIP', which when enabled causes the following
@@ -1341,6 +1415,35 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_emulate_l
 #endif
 #endif /* !EMU86_GETCR4_DE */
 #endif /* !EMU86_GETCR4_DE */
+
+
+/* CR4.TSD -- When enabled, user-space isn't allowed to access to `IA32_TIME_STAMP_COUNTER',
+ *            either via rdmsr, rdtsc or rdtscp, all of which will instead call to:
+ *            >> EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV,
+ *            >>                                                  X86_REGISTER_MSR, IA32_TIME_STAMP_COUNTER, 0, 0) */
+#ifndef EMU86_GETCR4_TSD
+#if defined(__KERNEL__) && (defined(__x86_64__) || defined(__i386__))
+#define EMU86_GETCR4_TSD() (__rdcr4() & CR4_TSD)
+#endif /* __KERNEL__ && (__x86_64__ || __i386__) */
+#ifndef EMU86_GETCR4_TSD
+#define EMU86_GETCR4_TSD_IS_ZERO 1
+#define EMU86_GETCR4_TSD() 0
+#endif /* !EMU86_GETCR4_TSD */
+#endif /* !EMU86_GETCR4_TSD */
+
+
+/* CR4.PCE -- When enabled, user-space isn't allowed to access to `rdpmc', which will instead call to:
+ *            >> EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV,
+ *            >>                                                  X86_REGISTER_PCR, %ecx, 0, 0) */
+#ifndef EMU86_GETCR4_PCE
+#if defined(__KERNEL__) && (defined(__x86_64__) || defined(__i386__))
+#define EMU86_GETCR4_PCE() (__rdcr4() & CR4_PCE)
+#endif /* __KERNEL__ && (__x86_64__ || __i386__) */
+#ifndef EMU86_GETCR4_PCE
+#define EMU86_GETCR4_PCE_IS_ZERO 1
+#define EMU86_GETCR4_PCE() 0
+#endif /* !EMU86_GETCR4_PCE */
+#endif /* !EMU86_GETCR4_PCE */
 
 
 
@@ -3634,6 +3737,7 @@ checklock_modrm_memory_parsed:
 #include "emu/movsx.c.inl"
 #include "emu/movsxd.c.inl"
 #include "emu/movzx.c.inl"
+#include "emu/msr.c.inl"
 #include "emu/nop.c.inl"
 #include "emu/pext.c.inl"
 #include "emu/pmode.c.inl"
@@ -3665,43 +3769,6 @@ checklock_modrm_memory_parsed:
 #endif /* !EMU86_EMULATE_IMPL_HEADER */
 #endif /* !__INTELLISENSE__ */
 
-#if 0 /* TODO: Missing stuff from the old `handle_illegal_instruction.c' */
-#ifndef __x86_64__
-		case 0x0f31: {
-			qtime_t now;
-			u64 result;
-			/* 0F 31       RDTSC       Read time-stamp counter into EDX:EAX */
-			if ((__rdcr4() & CR4_TSD) && isuser())
-				goto e_privileged_instruction;
-			now    = cpu_quantum_time();
-			result = (u64)now.q_jtime * now.q_qsize;
-			result += (u64)now.q_qtime;
-			set_eax((u32)result);
-			set_edx((u32)(result >> 32));
-		} break;
-#endif /* !__x86_64__ */
-
-		case 0x0f32: /* RDMSR */
-			if (op_flags & (EMU86_F_AD16 | EMU86_F_LOCK | EMU86_F_REP | EMU86_F_REPNE))
-				goto e_bad_prefix;
-			PERTASK_SET(this_exception_pointers[1],
-			            isuser() ? (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV
-			                      : (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_RDINV);
-			PERTASK_SET(this_exception_pointers[4], (uintptr_t)0);
-			PERTASK_SET(this_exception_pointers[5], (uintptr_t)0);
-			goto e_bad_msr_regno;
-
-		case 0x0f30: /* WRMSR */
-			if (op_flags & (EMU86_F_AD16 | EMU86_F_LOCK | EMU86_F_REP | EMU86_F_REPNE))
-				goto e_bad_prefix;
-			PERTASK_SET(this_exception_pointers[1],
-			            isuser() ? (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV
-			                      : (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRINV);
-			PERTASK_SET(this_exception_pointers[4], (uintptr_t)get_eax());
-			PERTASK_SET(this_exception_pointers[5], (uintptr_t)get_edx());
-			goto e_bad_msr_regno;
-#endif
-
 #if 0 /* TODO: Missing stuff from the old `handle_gpf.c' */
 		case 0x0fae:
 			MOD_DECODE();
@@ -3719,13 +3786,6 @@ checklock_modrm_memory_parsed:
 						PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
 					goto unwind_state;
 				}
-#ifdef __x86_64__
-				else {
-					/* F3       0F AE /2 WRFSBASE r32     Load the FS base address with the 32-bit value in the source register.
-					 * F3 REX.W 0F AE /2 WRFSBASE r64     Load the FS base address with the 64-bit value in the source register. */
-					goto check_x86_64_noncanon_fsgsbase;
-				}
-#endif /* __x86_64__ */
 				break;
 
 #ifdef __x86_64__
@@ -3748,105 +3808,19 @@ checklock_modrm_memory_parsed:
 				goto generic_privileged_instruction_if_user;
 			goto generic_failure;
 #endif /* __x86_64__ */
-
-		case 0x0f31: /* rdtsc */
-		case 0x0f32: /* rdmsr */
-		case 0x0f33: /* rdpmc */
-			PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
-			PERTASK_SET(this_exception_pointers[0], (uintptr_t)opcode);
-			PERTASK_SET(this_exception_pointers[1],
-			            isuser() ? (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV
-			                     : (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_RDINV);
-			PERTASK_SET(this_exception_pointers[2], (uintptr_t)X86_REGISTER_MSR);
-			PERTASK_SET(this_exception_pointers[3], (uintptr_t)(u32)gpregs_getpcx(&state->ics_gpregs));
-			if (opcode == 0x0f31) {
-				PERTASK_SET(this_exception_pointers[3],
-				            (uintptr_t)IA32_TIME_STAMP_COUNTER);
-			}
-			for (i = 4; i < EXCEPTION_DATA_POINTERS; ++i)
-				PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
-			goto unwind_state;
-
-		case 0x0f30: /* wrmsr */
-#ifdef __x86_64__
-			/* A couple of MSR registers can throw #GP if the written value
-			 * is a non-canonical pointer. Since KOS throws `E_SEGFAULT' for
-			 * this case, manually check if we're dealing with one of these MSRs,
-			 * and the written value is such a pointer.
-			 * s.a. Intel instruction set reference for `WRMSR' (Vol. 2C) */
-			if ((u32)gpregs_getpcx(&state->ics_gpregs) == IA32_DS_AREA ||
-			    (u32)gpregs_getpcx(&state->ics_gpregs) == IA32_FS_BASE ||
-			    (u32)gpregs_getpcx(&state->ics_gpregs) == IA32_GS_BASE ||
-			    (u32)gpregs_getpcx(&state->ics_gpregs) == IA32_KERNEL_GS_BASE ||
-			    (u32)gpregs_getpcx(&state->ics_gpregs) == IA32_LSTAR ||
-			    (u32)gpregs_getpcx(&state->ics_gpregs) == IA32_SYSENTER_EIP ||
-			    (u32)gpregs_getpcx(&state->ics_gpregs) == IA32_SYSENTER_ESP) {
-				u64 nc_addr;
-				nc_addr = ((u64)(u32)gpregs_getpax(&state->ics_gpregs)) |
-				          ((u64)(u32)gpregs_getpdx(&state->ics_gpregs) << 32);
-				if (ADDR_IS_NONCANON(nc_addr)) {
-					PERTASK_SET(this_exception_pointers[0], (uintptr_t)nc_addr);
-					printk(KERN_DEBUG "[segfault] Non-canonical write to msr#%#I32x with %p [pc=%p,%p] [#GPF] [tid=%u]\n",
-					       (u32)gpregs_getpcx(&state->ics_gpregs), nc_addr,
-					       orig_pc, pc, (unsigned int)task_getroottid_s());
-set_x86_64_non_canon_special:
-					PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_UNMAPPED));
-					PERTASK_SET(this_exception_pointers[1], (uintptr_t)E_SEGFAULT_CONTEXT_NONCANON);
-					if (isuser()) {
-						PERTASK_SET(this_exception_pointers[1],
-						            (uintptr_t)(E_SEGFAULT_CONTEXT_NONCANON |
-						                        E_SEGFAULT_CONTEXT_USERCODE));
-					}
-					for (i = 2; i < EXCEPTION_DATA_POINTERS; ++i)
-						PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
-					goto unwind_state;
-				}
-			}
-#endif /* __x86_64__ */
-			PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
-			PERTASK_SET(this_exception_pointers[0], (uintptr_t)opcode);
-			PERTASK_SET(this_exception_pointers[1],
-			            isuser() ? (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV
-			                     : (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRINV);
-			PERTASK_SET(this_exception_pointers[2], (uintptr_t)X86_REGISTER_MSR);
-			PERTASK_SET(this_exception_pointers[3], (uintptr_t)(u32)gpregs_getpcx(&state->ics_gpregs));
-			PERTASK_SET(this_exception_pointers[4], (uintptr_t)(u32)gpregs_getpax(&state->ics_gpregs));
-			PERTASK_SET(this_exception_pointers[5], (uintptr_t)(u32)gpregs_getpdx(&state->ics_gpregs));
-			goto unwind_state;
-
 #endif
 
 			/* XXX: clts       (if only for verbose exception messages?) */
 			/* XXX: swapgs     (if only for verbose exception messages?) */
-			/* XXX: rdtscp     (if only for verbose exception messages?) */
-			/* XXX: wrmsr      (if only for verbose exception messages?) */
-			/* XXX: rdtsc      (if only for verbose exception messages?) */
-			/* XXX: rdmsr      (if only for verbose exception messages?) */
-			/* XXX: rdpmc      (if only for verbose exception messages?) */
 			/* XXX: rdrand     (if only for verbose exception messages?) */
 			/* XXX: rdseed     (if only for verbose exception messages?) */
 			/* XXX: rdpid      (if only for verbose exception messages?) */
-			/* XXX: xgetbv     (if only for verbose exception messages?) */
-			/* XXX: xsetbv     (if only for verbose exception messages?) */
-			/* XXX: vmfunc     (if only for verbose exception messages?) */
-			/* XXX: vmfunc     (if only for verbose exception messages?) */
-			/* XXX: xtest      (if only for verbose exception messages?) */
-			/* XXX: enclu      (if only for verbose exception messages?) */
-			/* XXX: monitor    (if only for verbose exception messages?) */
-			/* XXX: mwait      (if only for verbose exception messages?) */
-			/* XXX: encls      (if only for verbose exception messages?) */
-			/* XXX: vmcall     (if only for verbose exception messages?) */
-			/* XXX: vmlaunch   (if only for verbose exception messages?) */
-			/* XXX: vmresume   (if only for verbose exception messages?) */
-			/* XXX: vmxoff     (if only for verbose exception messages?) */
 			/* XXX: invpcid    (if only for verbose exception messages?) */
 			/* XXX: tpause     (if only for verbose exception messages?) */
 			/* XXX: ldmxcsr    (Can throw a #GPF when attempting to set a reserved bit) */
 
 			/* TODO: Emulate crc32 */
 			/* TODO: Emulate mcommit */
-			/* TODO: Emulate xend */
-			/* TODO: Emulate xtest */
 			/* TODO: Emulate clzero (as a no-op) */
 
 //???:	I(0x1a, IF_X32|IF_F2|IF_MODRM, "bndcu\t" OP_RM32 OP_RBND),
