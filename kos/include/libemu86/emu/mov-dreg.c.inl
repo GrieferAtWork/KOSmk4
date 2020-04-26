@@ -1,0 +1,551 @@
+/* Copyright (c) 2019-2020 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifdef __INTELLISENSE__
+#include "../emulate.c.inl"
+#endif /* __INTELLISENSE__ */
+
+#define EMU86_EMULATE_MANDATORY_DEBUG_REGISTERS 0xcf
+
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
+#ifdef EMU86_EMULATE_RDDR0
+#define EMU86_EMULATE_HAVE_RDDRn_0 0x0001
+#else /* EMU86_EMULATE_RDDR0 */
+#define EMU86_EMULATE_HAVE_RDDRn_0 0x0000
+#endif /* !EMU86_EMULATE_RDDR0 */
+#ifdef EMU86_EMULATE_RDDR1
+#define EMU86_EMULATE_HAVE_RDDRn_1 0x0002
+#else /* EMU86_EMULATE_RDDR1 */
+#define EMU86_EMULATE_HAVE_RDDRn_1 0x0000
+#endif /* !EMU86_EMULATE_RDDR1 */
+#ifdef EMU86_EMULATE_RDDR2
+#define EMU86_EMULATE_HAVE_RDDRn_2 0x0004
+#else /* EMU86_EMULATE_RDDR2 */
+#define EMU86_EMULATE_HAVE_RDDRn_2 0x0000
+#endif /* !EMU86_EMULATE_RDDR2 */
+#ifdef EMU86_EMULATE_RDDR3
+#define EMU86_EMULATE_HAVE_RDDRn_3 0x0008
+#else /* EMU86_EMULATE_RDDR3 */
+#define EMU86_EMULATE_HAVE_RDDRn_3 0x0000
+#endif /* !EMU86_EMULATE_RDDR3 */
+#ifdef EMU86_EMULATE_RDDR4
+#define EMU86_EMULATE_HAVE_RDDRn_4 0x0010
+#else /* EMU86_EMULATE_RDDR4 */
+#define EMU86_EMULATE_HAVE_RDDRn_4 0x0000
+#endif /* !EMU86_EMULATE_RDDR4 */
+#ifdef EMU86_EMULATE_RDDR5
+#define EMU86_EMULATE_HAVE_RDDRn_5 0x0020
+#else /* EMU86_EMULATE_RDDR5 */
+#define EMU86_EMULATE_HAVE_RDDRn_5 0x0000
+#endif /* !EMU86_EMULATE_RDDR5 */
+#ifdef EMU86_EMULATE_RDDR6
+#define EMU86_EMULATE_HAVE_RDDRn_6 0x0040
+#else /* EMU86_EMULATE_RDDR6 */
+#define EMU86_EMULATE_HAVE_RDDRn_6 0x0000
+#endif /* !EMU86_EMULATE_RDDR6 */
+#ifdef EMU86_EMULATE_RDDR7
+#define EMU86_EMULATE_HAVE_RDDRn_7 0x0080
+#else /* EMU86_EMULATE_RDDR7 */
+#define EMU86_EMULATE_HAVE_RDDRn_7 0x0000
+#endif /* !EMU86_EMULATE_RDDR7 */
+
+#ifdef EMU86_EMULATE_WRDR0
+#define EMU86_EMULATE_HAVE_WRDRn_0 0x0001
+#else /* EMU86_EMULATE_WRDR0 */
+#define EMU86_EMULATE_HAVE_WRDRn_0 0x0000
+#endif /* !EMU86_EMULATE_WRDR0 */
+#ifdef EMU86_EMULATE_WRDR1
+#define EMU86_EMULATE_HAVE_WRDRn_1 0x0002
+#else /* EMU86_EMULATE_WRDR1 */
+#define EMU86_EMULATE_HAVE_WRDRn_1 0x0000
+#endif /* !EMU86_EMULATE_WRDR1 */
+#ifdef EMU86_EMULATE_WRDR2
+#define EMU86_EMULATE_HAVE_WRDRn_2 0x0004
+#else /* EMU86_EMULATE_WRDR2 */
+#define EMU86_EMULATE_HAVE_WRDRn_2 0x0000
+#endif /* !EMU86_EMULATE_WRDR2 */
+#ifdef EMU86_EMULATE_WRDR3
+#define EMU86_EMULATE_HAVE_WRDRn_3 0x0008
+#else /* EMU86_EMULATE_WRDR3 */
+#define EMU86_EMULATE_HAVE_WRDRn_3 0x0000
+#endif /* !EMU86_EMULATE_WRDR3 */
+#ifdef EMU86_EMULATE_WRDR4
+#define EMU86_EMULATE_HAVE_WRDRn_4 0x0010
+#else /* EMU86_EMULATE_WRDR4 */
+#define EMU86_EMULATE_HAVE_WRDRn_4 0x0000
+#endif /* !EMU86_EMULATE_WRDR4 */
+#ifdef EMU86_EMULATE_WRDR5
+#define EMU86_EMULATE_HAVE_WRDRn_5 0x0020
+#else /* EMU86_EMULATE_WRDR5 */
+#define EMU86_EMULATE_HAVE_WRDRn_5 0x0000
+#endif /* !EMU86_EMULATE_WRDR5 */
+#ifdef EMU86_EMULATE_WRDR6
+#define EMU86_EMULATE_HAVE_WRDRn_6 0x0040
+#else /* EMU86_EMULATE_WRDR6 */
+#define EMU86_EMULATE_HAVE_WRDRn_6 0x0000
+#endif /* !EMU86_EMULATE_WRDR6 */
+#ifdef EMU86_EMULATE_WRDR7
+#define EMU86_EMULATE_HAVE_WRDRn_7 0x0080
+#else /* EMU86_EMULATE_WRDR7 */
+#define EMU86_EMULATE_HAVE_WRDRn_7 0x0000
+#endif /* !EMU86_EMULATE_WRDR7 */
+
+#if CONFIG_LIBEMU86_WANT_64BIT
+#ifdef EMU86_EMULATE_RDDR8
+#define EMU86_EMULATE_HAVE_RDDRn_8 0x0100
+#else /* EMU86_EMULATE_RDDR8 */
+#define EMU86_EMULATE_HAVE_RDDRn_8 0x0000
+#endif /* !EMU86_EMULATE_RDDR8 */
+#ifdef EMU86_EMULATE_RDDR9
+#define EMU86_EMULATE_HAVE_RDDRn_9 0x0200
+#else /* EMU86_EMULATE_RDDR9 */
+#define EMU86_EMULATE_HAVE_RDDRn_9 0x0000
+#endif /* !EMU86_EMULATE_RDDR9 */
+#ifdef EMU86_EMULATE_RDDR10
+#define EMU86_EMULATE_HAVE_RDDRn_10 0x0400
+#else /* EMU86_EMULATE_RDDR10 */
+#define EMU86_EMULATE_HAVE_RDDRn_10 0x0000
+#endif /* !EMU86_EMULATE_RDDR10 */
+#ifdef EMU86_EMULATE_RDDR11
+#define EMU86_EMULATE_HAVE_RDDRn_11 0x0800
+#else /* EMU86_EMULATE_RDDR11 */
+#define EMU86_EMULATE_HAVE_RDDRn_11 0x0000
+#endif /* !EMU86_EMULATE_RDDR11 */
+#ifdef EMU86_EMULATE_RDDR12
+#define EMU86_EMULATE_HAVE_RDDRn_12 0x1000
+#else /* EMU86_EMULATE_RDDR12 */
+#define EMU86_EMULATE_HAVE_RDDRn_12 0x0000
+#endif /* !EMU86_EMULATE_RDDR12 */
+#ifdef EMU86_EMULATE_RDDR13
+#define EMU86_EMULATE_HAVE_RDDRn_13 0x2000
+#else /* EMU86_EMULATE_RDDR13 */
+#define EMU86_EMULATE_HAVE_RDDRn_13 0x0000
+#endif /* !EMU86_EMULATE_RDDR13 */
+#ifdef EMU86_EMULATE_RDDR14
+#define EMU86_EMULATE_HAVE_RDDRn_14 0x4000
+#else /* EMU86_EMULATE_RDDR14 */
+#define EMU86_EMULATE_HAVE_RDDRn_14 0x0000
+#endif /* !EMU86_EMULATE_RDDR14 */
+#ifdef EMU86_EMULATE_RDDR15
+#define EMU86_EMULATE_HAVE_RDDRn_15 0x8000
+#else /* EMU86_EMULATE_RDDR15 */
+#define EMU86_EMULATE_HAVE_RDDRn_15 0x0000
+#endif /* !EMU86_EMULATE_RDDR15 */
+
+#ifdef EMU86_EMULATE_WRDR8
+#define EMU86_EMULATE_HAVE_WRDRn_8 0x0100
+#else /* EMU86_EMULATE_WRDR8 */
+#define EMU86_EMULATE_HAVE_WRDRn_8 0x0000
+#endif /* !EMU86_EMULATE_WRDR8 */
+#ifdef EMU86_EMULATE_WRDR9
+#define EMU86_EMULATE_HAVE_WRDRn_9 0x0200
+#else /* EMU86_EMULATE_WRDR9 */
+#define EMU86_EMULATE_HAVE_WRDRn_9 0x0000
+#endif /* !EMU86_EMULATE_WRDR9 */
+#ifdef EMU86_EMULATE_WRDR10
+#define EMU86_EMULATE_HAVE_WRDRn_10 0x0400
+#else /* EMU86_EMULATE_WRDR10 */
+#define EMU86_EMULATE_HAVE_WRDRn_10 0x0000
+#endif /* !EMU86_EMULATE_WRDR10 */
+#ifdef EMU86_EMULATE_WRDR11
+#define EMU86_EMULATE_HAVE_WRDRn_11 0x0800
+#else /* EMU86_EMULATE_WRDR11 */
+#define EMU86_EMULATE_HAVE_WRDRn_11 0x0000
+#endif /* !EMU86_EMULATE_WRDR11 */
+#ifdef EMU86_EMULATE_WRDR12
+#define EMU86_EMULATE_HAVE_WRDRn_12 0x1000
+#else /* EMU86_EMULATE_WRDR12 */
+#define EMU86_EMULATE_HAVE_WRDRn_12 0x0000
+#endif /* !EMU86_EMULATE_WRDR12 */
+#ifdef EMU86_EMULATE_WRDR13
+#define EMU86_EMULATE_HAVE_WRDRn_13 0x2000
+#else /* EMU86_EMULATE_WRDR13 */
+#define EMU86_EMULATE_HAVE_WRDRn_13 0x0000
+#endif /* !EMU86_EMULATE_WRDR13 */
+#ifdef EMU86_EMULATE_WRDR14
+#define EMU86_EMULATE_HAVE_WRDRn_14 0x4000
+#else /* EMU86_EMULATE_WRDR14 */
+#define EMU86_EMULATE_HAVE_WRDRn_14 0x0000
+#endif /* !EMU86_EMULATE_WRDR14 */
+#ifdef EMU86_EMULATE_WRDR15
+#define EMU86_EMULATE_HAVE_WRDRn_15 0x8000
+#else /* EMU86_EMULATE_WRDR15 */
+#define EMU86_EMULATE_HAVE_WRDRn_15 0x0000
+#endif /* !EMU86_EMULATE_WRDR15 */
+
+#define EMU86_EMULATE_HAVE_RDDRn                                 \
+	(EMU86_EMULATE_HAVE_RDDRn_0 | EMU86_EMULATE_HAVE_RDDRn_1 |   \
+	 EMU86_EMULATE_HAVE_RDDRn_2 | EMU86_EMULATE_HAVE_RDDRn_3 |   \
+	 EMU86_EMULATE_HAVE_RDDRn_4 | EMU86_EMULATE_HAVE_RDDRn_5 |   \
+	 EMU86_EMULATE_HAVE_RDDRn_6 | EMU86_EMULATE_HAVE_RDDRn_7 |   \
+	 EMU86_EMULATE_HAVE_RDDRn_8 | EMU86_EMULATE_HAVE_RDDRn_9 |   \
+	 EMU86_EMULATE_HAVE_RDDRn_10 | EMU86_EMULATE_HAVE_RDDRn_11 | \
+	 EMU86_EMULATE_HAVE_RDDRn_12 | EMU86_EMULATE_HAVE_RDDRn_13 | \
+	 EMU86_EMULATE_HAVE_RDDRn_14 | EMU86_EMULATE_HAVE_RDDRn_15)
+
+#define EMU86_EMULATE_HAVE_WRDRn                                 \
+	(EMU86_EMULATE_HAVE_WRDRn_0 | EMU86_EMULATE_HAVE_WRDRn_1 |   \
+	 EMU86_EMULATE_HAVE_WRDRn_2 | EMU86_EMULATE_HAVE_WRDRn_3 |   \
+	 EMU86_EMULATE_HAVE_WRDRn_4 | EMU86_EMULATE_HAVE_WRDRn_5 |   \
+	 EMU86_EMULATE_HAVE_WRDRn_6 | EMU86_EMULATE_HAVE_WRDRn_7 |   \
+	 EMU86_EMULATE_HAVE_WRDRn_8 | EMU86_EMULATE_HAVE_WRDRn_9 |   \
+	 EMU86_EMULATE_HAVE_WRDRn_10 | EMU86_EMULATE_HAVE_WRDRn_11 | \
+	 EMU86_EMULATE_HAVE_WRDRn_12 | EMU86_EMULATE_HAVE_WRDRn_13 | \
+	 EMU86_EMULATE_HAVE_WRDRn_14 | EMU86_EMULATE_HAVE_WRDRn_15)
+#else /* CONFIG_LIBEMU86_WANT_64BIT */
+#define EMU86_EMULATE_HAVE_RDDRn                               \
+	(EMU86_EMULATE_HAVE_RDDRn_0 | EMU86_EMULATE_HAVE_RDDRn_1 | \
+	 EMU86_EMULATE_HAVE_RDDRn_2 | EMU86_EMULATE_HAVE_RDDRn_3 | \
+	 EMU86_EMULATE_HAVE_RDDRn_4 | EMU86_EMULATE_HAVE_RDDRn_5 | \
+	 EMU86_EMULATE_HAVE_RDDRn_6 | EMU86_EMULATE_HAVE_RDDRn_7)
+#define EMU86_EMULATE_HAVE_WRDRn                               \
+	(EMU86_EMULATE_HAVE_WRDRn_0 | EMU86_EMULATE_HAVE_WRDRn_1 | \
+	 EMU86_EMULATE_HAVE_WRDRn_2 | EMU86_EMULATE_HAVE_WRDRn_3 | \
+	 EMU86_EMULATE_HAVE_WRDRn_4 | EMU86_EMULATE_HAVE_WRDRn_5 | \
+	 EMU86_EMULATE_HAVE_WRDRn_6 | EMU86_EMULATE_HAVE_WRDRn_7)
+#endif /* !CONFIG_LIBEMU86_WANT_64BIT */
+
+#if !EMU86_EMULATE_HAVE_RDDRn
+#undef EMU86_EMULATE_HAVE_RDDRn
+#define EMU86_EMULATE_HAVE_RDDRn 0
+#endif /* !EMU86_EMULATE_HAVE_RDDRn */
+
+#if !EMU86_EMULATE_HAVE_WRDRn
+#undef EMU86_EMULATE_HAVE_WRDRn
+#define EMU86_EMULATE_HAVE_WRDRn 0
+#endif /* !EMU86_EMULATE_HAVE_WRDRn */
+
+#undef EMU86_EMULATE_CONFIG_WANT_MOV_DREG_RD
+#undef EMU86_EMULATE_CONFIG_WANT_MOV_DREG_WR
+#if EMU86_EMULATE_HAVE_RDDRn && EMU86_EMULATE_CONFIG_WANT_MOV_DREG
+#define EMU86_EMULATE_CONFIG_WANT_MOV_DREG_RD 1
+#else /* EMU86_EMULATE_HAVE_RDDRn && EMU86_EMULATE_CONFIG_WANT_MOV_DREG */
+#define EMU86_EMULATE_CONFIG_WANT_MOV_DREG_RD 0
+#endif /* !EMU86_EMULATE_HAVE_RDDRn || !EMU86_EMULATE_CONFIG_WANT_MOV_DREG */
+#if EMU86_EMULATE_HAVE_WRDRn && EMU86_EMULATE_CONFIG_WANT_MOV_DREG
+#define EMU86_EMULATE_CONFIG_WANT_MOV_DREG_WR 1
+#else /* EMU86_EMULATE_HAVE_WRDRn && EMU86_EMULATE_CONFIG_WANT_MOV_DREG */
+#define EMU86_EMULATE_CONFIG_WANT_MOV_DREG_WR 0
+#endif /* !EMU86_EMULATE_HAVE_WRDRn || !EMU86_EMULATE_CONFIG_WANT_MOV_DREG */
+
+
+EMU86_INTELLISENSE_BEGIN(mov_creg) {
+
+#if EMU86_EMULATE_CONFIG_WANT_MOV_DREG_RD || EMU86_EMULATE_CONFIG_CHECKERROR
+case EMU86_OPCODE_ENCODE(0x0f21): {
+	/* 0F 21 /r MOV r32, DR0-DR7     Move debug register to r32.
+	 * 0F 21 /r MOV r64, DR0-DR7     Move extended debug register to r64. */
+	MODRM_DECODE();
+	if (!EMU86_MODRM_ISREG(modrm.mi_type))
+		goto return_expected_register_modrm;
+#define NEED_return_expected_register_modrm
+#ifndef EMU86_GETCR4_DE_IS_ONE
+	if (!EMU86_ISUSER()) {
+#ifndef EMU86_GETCR4_DE_IS_ZERO
+		if (!EMU86_GETCR4_DE())
+#endif /* !EMU86_GETCR4_DE_IS_ZERO */
+		{
+			/* Re-route %dr4 and %dr5 to %dr6 and %dr7 */
+			if (modrm.mi_reg == 4 || modrm.mi_reg == 5)
+				modrm.mi_reg += 2;
+		}
+	}
+#endif /* !EMU86_GETCR4_DE_IS_ONE */
+#if (defined(EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER) || EMU86_EMULATE_CONFIG_WANT_MOV_DREG_RD)
+	/* Not all debug registers are defined. - Verify that the index is valid! */
+	if (!((EMU86_EMULATE_HAVE_RDDRn | EMU86_EMULATE_MANDATORY_DEBUG_REGISTERS) & (1 << modrm.mi_reg))) {
+#ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
+		EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_RDINV,
+		                                                 X86_REGISTER_DEBUG_DR0 + modrm.mi_reg,
+		                                                 0, 0);
+		__builtin_unreachable();
+#else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
+#define NEED_return_privileged_instruction
+		goto return_privileged_instruction;
+#endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
+	}
+#if EMU86_EMULATE_CONFIG_WANT_MOV_DREG_RD
+#if EMU86_EMULATE_CONFIG_CHECKUSER
+	if (!EMU86_ISUSER())
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
+	{
+		EMU86_UREG_TYPE value;
+		switch (modrm.mi_reg) {
+#ifdef EMU86_EMULATE_RDDR0
+		case 0: value = EMU86_EMULATE_RDDR0(); break;
+#endif /* EMU86_EMULATE_RDDR0 */
+#ifdef EMU86_EMULATE_RDDR1
+		case 1: value = EMU86_EMULATE_RDDR1(); break;
+#endif /* EMU86_EMULATE_RDDR1 */
+#ifdef EMU86_EMULATE_RDDR2
+		case 2: value = EMU86_EMULATE_RDDR2(); break;
+#endif /* EMU86_EMULATE_RDDR2 */
+#ifdef EMU86_EMULATE_RDDR3
+		case 3: value = EMU86_EMULATE_RDDR3(); break;
+#endif /* EMU86_EMULATE_RDDR3 */
+#ifdef EMU86_EMULATE_RDDR4
+		case 4: value = EMU86_EMULATE_RDDR4(); break;
+#endif /* EMU86_EMULATE_RDDR4 */
+#ifdef EMU86_EMULATE_RDDR5
+		case 5: value = EMU86_EMULATE_RDDR5(); break;
+#endif /* EMU86_EMULATE_RDDR5 */
+#ifdef EMU86_EMULATE_RDDR6
+		case 6: value = EMU86_EMULATE_RDDR6(); break;
+#endif /* EMU86_EMULATE_RDDR6 */
+#ifdef EMU86_EMULATE_RDDR7
+		case 7: value = EMU86_EMULATE_RDDR7(); break;
+#endif /* EMU86_EMULATE_RDDR7 */
+#if CONFIG_LIBEMU86_WANT_64BIT
+#ifdef EMU86_EMULATE_RDDR8
+		case 8: value = EMU86_EMULATE_RDDR8(); break;
+#endif /* EMU86_EMULATE_RDDR8 */
+#ifdef EMU86_EMULATE_RDDR9
+		case 9: value = EMU86_EMULATE_RDDR9(); break;
+#endif /* EMU86_EMULATE_RDDR9 */
+#ifdef EMU86_EMULATE_RDDR10
+		case 10: value = EMU86_EMULATE_RDDR10(); break;
+#endif /* EMU86_EMULATE_RDDR10 */
+#ifdef EMU86_EMULATE_RDDR11
+		case 11: value = EMU86_EMULATE_RDDR11(); break;
+#endif /* EMU86_EMULATE_RDDR11 */
+#ifdef EMU86_EMULATE_RDDR12
+		case 12: value = EMU86_EMULATE_RDDR12(); break;
+#endif /* EMU86_EMULATE_RDDR12 */
+#ifdef EMU86_EMULATE_RDDR13
+		case 13: value = EMU86_EMULATE_RDDR13(); break;
+#endif /* EMU86_EMULATE_RDDR13 */
+#ifdef EMU86_EMULATE_RDDR14
+		case 14: value = EMU86_EMULATE_RDDR14(); break;
+#endif /* EMU86_EMULATE_RDDR14 */
+#ifdef EMU86_EMULATE_RDDR15
+		case 15: value = EMU86_EMULATE_RDDR15(); break;
+#endif /* EMU86_EMULATE_RDDR15 */
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+		default:
+#if (EMU86_EMULATE_HAVE_RDDRn & EMU86_EMULATE_MANDATORY_DEBUG_REGISTERS) == EMU86_EMULATE_MANDATORY_DEBUG_REGISTERS
+			__builtin_unreachable(); /* All mandatory registers are supported */
+#else /* (EMU86_EMULATE_HAVE_RDDRn & EMU86_EMULATE_MANDATORY_DEBUG_REGISTERS) == EMU86_EMULATE_MANDATORY_DEBUG_REGISTERS */
+#define WANT_return_unsupported_instruction_rmreg
+			goto return_unsupported_instruction_rmreg;
+#endif /* (EMU86_EMULATE_HAVE_RDDRn & EMU86_EMULATE_MANDATORY_DEBUG_REGISTERS) != EMU86_EMULATE_MANDATORY_DEBUG_REGISTERS */
+		}
+#if CONFIG_LIBEMU86_WANT_64BIT && (CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT)
+		if (EMU86_F_IS64(op_flags)) {
+			MODRM_SETRMREGQ((u64)value);
+		} else {
+			MODRM_SETRMREGL((u32)value);
+		}
+#elif CONFIG_LIBEMU86_WANT_64BIT
+		MODRM_SETRMREGQ((u64)value);
+#else /* CONFIG_LIBEMU86_WANT_... */
+		MODRM_SETRMREGL((u32)value);
+#endif /* !CONFIG_LIBEMU86_WANT_... */
+		goto done;
+	}
+#endif /* EMU86_EMULATE_CONFIG_WANT_MOV_DREG_RD */
+#ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
+	EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV,
+	                                                 X86_REGISTER_DEBUG_DR0 + modrm.mi_reg,
+	                                                 0, 0);
+#else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
+#define NEED_return_privileged_instruction
+	goto return_privileged_instruction;
+#endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
+#else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER || EMU86_EMULATE_CONFIG_WANT_MOV_DREG_RD */
+#define NEED_return_privileged_instruction
+	goto return_privileged_instruction;
+#endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER && !EMU86_EMULATE_CONFIG_WANT_MOV_DREG_RD */
+}
+#endif /* EMU86_EMULATE_CONFIG_WANT_MOV_DREG_RD || EMU86_EMULATE_CONFIG_CHECKERROR */
+
+
+
+#if EMU86_EMULATE_CONFIG_WANT_MOV_DREG_WR || EMU86_EMULATE_CONFIG_CHECKERROR
+case EMU86_OPCODE_ENCODE(0x0f23): {
+	/* 0F 23 /r MOV DR0-DR7, r32     Move r32 to debug register.
+	 * 0F 23 /r MOV DR0-DR7, r64     Move r64 to extended debug register. */
+#if (defined(EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER) || EMU86_EMULATE_CONFIG_WANT_MOV_DREG_WR)
+	EMU86_UREG_TYPE value;
+#endif /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER || EMU86_EMULATE_CONFIG_WANT_MOV_DREG_WR */
+	MODRM_DECODE();
+	if (!EMU86_MODRM_ISREG(modrm.mi_type))
+		goto return_expected_register_modrm;
+#define NEED_return_expected_register_modrm
+#if (defined(EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER) || EMU86_EMULATE_CONFIG_WANT_MOV_DREG_WR)
+#if CONFIG_LIBEMU86_WANT_64BIT && (CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT)
+	if (EMU86_F_IS64(op_flags)) {
+		value = MODRM_GETRMREGQ();
+	} else {
+		value = MODRM_GETRMREGL();
+	}
+#elif CONFIG_LIBEMU86_WANT_64BIT
+	value = MODRM_GETRMREGQ();
+#else /* CONFIG_LIBEMU86_WANT_... */
+	value = MODRM_GETRMREGL();
+#endif /* !CONFIG_LIBEMU86_WANT_... */
+#ifndef EMU86_GETCR4_DE_IS_ONE
+	if (!EMU86_ISUSER()) {
+#ifndef EMU86_GETCR4_DE_IS_ZERO
+		if (!EMU86_GETCR4_DE())
+#endif /* !EMU86_GETCR4_DE_IS_ZERO */
+		{
+			/* Re-route %dr4 and %dr5 to %dr6 and %dr7 */
+			if (modrm.mi_reg == 4 || modrm.mi_reg == 5)
+				modrm.mi_reg += 2;
+		}
+	}
+#endif /* !EMU86_GETCR4_DE_IS_ONE */
+	/* Not all debug registers are defined. - Verify that the index is valid! */
+	if (!((EMU86_EMULATE_HAVE_WRDRn | EMU86_EMULATE_MANDATORY_DEBUG_REGISTERS) & (1 << modrm.mi_reg))) {
+#ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
+		EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRINV,
+		                                                 X86_REGISTER_DEBUG_DR0 + modrm.mi_reg,
+		                                                 value, 0);
+		__builtin_unreachable();
+#else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
+#define NEED_return_privileged_instruction
+		goto return_privileged_instruction;
+#endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
+	}
+#if EMU86_EMULATE_CONFIG_WANT_MOV_DREG_WR
+#if EMU86_EMULATE_CONFIG_CHECKUSER
+	if (!EMU86_ISUSER())
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
+	{
+		switch (modrm.mi_reg) {
+#ifdef EMU86_EMULATE_WRDR0
+		case 0: EMU86_EMULATE_WRDR0(value); break;
+#endif /* EMU86_EMULATE_WRDR0 */
+#ifdef EMU86_EMULATE_WRDR1
+		case 1: EMU86_EMULATE_WRDR1(value); break;
+#endif /* EMU86_EMULATE_WRDR1 */
+#ifdef EMU86_EMULATE_WRDR2
+		case 2: EMU86_EMULATE_WRDR2(value); break;
+#endif /* EMU86_EMULATE_WRDR2 */
+#ifdef EMU86_EMULATE_WRDR3
+		case 3: EMU86_EMULATE_WRDR3(value); break;
+#endif /* EMU86_EMULATE_WRDR3 */
+#ifdef EMU86_EMULATE_WRDR4
+		case 4: EMU86_EMULATE_WRDR4(value); break;
+#endif /* EMU86_EMULATE_WRDR4 */
+#ifdef EMU86_EMULATE_WRDR5
+		case 5: EMU86_EMULATE_WRDR5(value); break;
+#endif /* EMU86_EMULATE_WRDR5 */
+#ifdef EMU86_EMULATE_WRDR6
+		case 6: EMU86_EMULATE_WRDR6(value); break;
+#endif /* EMU86_EMULATE_WRDR6 */
+#ifdef EMU86_EMULATE_WRDR7
+		case 7: EMU86_EMULATE_WRDR7(value); break;
+#endif /* EMU86_EMULATE_WRDR7 */
+#if CONFIG_LIBEMU86_WANT_64BIT
+#ifdef EMU86_EMULATE_WRDR8
+		case 8: EMU86_EMULATE_WRDR8(value); break;
+#endif /* EMU86_EMULATE_WRDR8 */
+#ifdef EMU86_EMULATE_WRDR9
+		case 9: EMU86_EMULATE_WRDR9(value); break;
+#endif /* EMU86_EMULATE_WRDR9 */
+#ifdef EMU86_EMULATE_WRDR10
+		case 10: EMU86_EMULATE_WRDR10(value); break;
+#endif /* EMU86_EMULATE_WRDR10 */
+#ifdef EMU86_EMULATE_WRDR11
+		case 11: EMU86_EMULATE_WRDR11(value); break;
+#endif /* EMU86_EMULATE_WRDR11 */
+#ifdef EMU86_EMULATE_WRDR12
+		case 12: EMU86_EMULATE_WRDR12(value); break;
+#endif /* EMU86_EMULATE_WRDR12 */
+#ifdef EMU86_EMULATE_WRDR13
+		case 13: EMU86_EMULATE_WRDR13(value); break;
+#endif /* EMU86_EMULATE_WRDR13 */
+#ifdef EMU86_EMULATE_WRDR14
+		case 14: EMU86_EMULATE_WRDR14(value); break;
+#endif /* EMU86_EMULATE_WRDR14 */
+#ifdef EMU86_EMULATE_WRDR15
+		case 15: EMU86_EMULATE_WRDR15(value); break;
+#endif /* EMU86_EMULATE_WRDR15 */
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+		default:
+#if (EMU86_EMULATE_HAVE_WRDRn & EMU86_EMULATE_MANDATORY_DEBUG_REGISTERS) == EMU86_EMULATE_MANDATORY_DEBUG_REGISTERS
+			__builtin_unreachable(); /* All mandatory registers are supported */
+#else /* (EMU86_EMULATE_HAVE_WRDRn & EMU86_EMULATE_MANDATORY_DEBUG_REGISTERS) == EMU86_EMULATE_MANDATORY_DEBUG_REGISTERS */
+#define WANT_return_unsupported_instruction_rmreg
+			goto return_unsupported_instruction_rmreg;
+#endif /* (EMU86_EMULATE_HAVE_WRDRn & EMU86_EMULATE_MANDATORY_DEBUG_REGISTERS) != EMU86_EMULATE_MANDATORY_DEBUG_REGISTERS */
+		}
+		goto done;
+	}
+#endif /* EMU86_EMULATE_CONFIG_WANT_MOV_DREG_WR */
+#ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
+	EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV,
+	                                                 X86_REGISTER_DEBUG_DR0 + modrm.mi_reg,
+	                                                 value, 0);
+#else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
+#define NEED_return_privileged_instruction
+	goto return_privileged_instruction;
+#endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
+#else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER || EMU86_EMULATE_CONFIG_WANT_MOV_DREG_WR */
+#define NEED_return_privileged_instruction
+	goto return_privileged_instruction;
+#endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER && !EMU86_EMULATE_CONFIG_WANT_MOV_DREG_WR */
+}
+#endif /* EMU86_EMULATE_CONFIG_WANT_MOV_DREG_WR || EMU86_EMULATE_CONFIG_CHECKERROR */
+
+#undef EMU86_EMULATE_CONFIG_WANT_MOV_DREG_RD
+#undef EMU86_EMULATE_CONFIG_WANT_MOV_DREG_WR
+#undef EMU86_EMULATE_HAVE_RDDRn_0
+#undef EMU86_EMULATE_HAVE_RDDRn_1
+#undef EMU86_EMULATE_HAVE_RDDRn_2
+#undef EMU86_EMULATE_HAVE_RDDRn_3
+#undef EMU86_EMULATE_HAVE_RDDRn_4
+#undef EMU86_EMULATE_HAVE_RDDRn_5
+#undef EMU86_EMULATE_HAVE_RDDRn_6
+#undef EMU86_EMULATE_HAVE_RDDRn_7
+#undef EMU86_EMULATE_HAVE_WRDRn_0
+#undef EMU86_EMULATE_HAVE_WRDRn_1
+#undef EMU86_EMULATE_HAVE_WRDRn_2
+#undef EMU86_EMULATE_HAVE_WRDRn_3
+#undef EMU86_EMULATE_HAVE_WRDRn_4
+#undef EMU86_EMULATE_HAVE_WRDRn_5
+#undef EMU86_EMULATE_HAVE_WRDRn_6
+#undef EMU86_EMULATE_HAVE_WRDRn_7
+#if CONFIG_LIBEMU86_WANT_64BIT
+#undef EMU86_EMULATE_HAVE_RDDRn_8
+#undef EMU86_EMULATE_HAVE_RDDRn_9
+#undef EMU86_EMULATE_HAVE_RDDRn_10
+#undef EMU86_EMULATE_HAVE_RDDRn_11
+#undef EMU86_EMULATE_HAVE_RDDRn_12
+#undef EMU86_EMULATE_HAVE_RDDRn_13
+#undef EMU86_EMULATE_HAVE_RDDRn_14
+#undef EMU86_EMULATE_HAVE_RDDRn_15
+#undef EMU86_EMULATE_HAVE_WRDRn_8
+#undef EMU86_EMULATE_HAVE_WRDRn_9
+#undef EMU86_EMULATE_HAVE_WRDRn_10
+#undef EMU86_EMULATE_HAVE_WRDRn_11
+#undef EMU86_EMULATE_HAVE_WRDRn_12
+#undef EMU86_EMULATE_HAVE_WRDRn_13
+#undef EMU86_EMULATE_HAVE_WRDRn_14
+#undef EMU86_EMULATE_HAVE_WRDRn_15
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#undef EMU86_EMULATE_HAVE_RDDRn
+#undef EMU86_EMULATE_HAVE_WRDRn
+#undef EMU86_EMULATE_MANDATORY_DEBUG_REGISTERS
+
+}
+EMU86_INTELLISENSE_END
+
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */

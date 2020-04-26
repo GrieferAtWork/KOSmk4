@@ -446,6 +446,9 @@ __DECL_BEGIN
 #ifndef EMU86_EMULATE_CONFIG_WANT_MOVDIR64B
 #define EMU86_EMULATE_CONFIG_WANT_MOVDIR64B (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
 #endif /* !EMU86_EMULATE_CONFIG_WANT_MOVDIR64B */
+#ifndef EMU86_EMULATE_CONFIG_WANT_MOV_DREG
+#define EMU86_EMULATE_CONFIG_WANT_MOV_DREG 0
+#endif /* !EMU86_EMULATE_CONFIG_WANT_MOV_DREG */
 #ifndef EMU86_EMULATE_CONFIG_WANT_MOV_IMM
 #define EMU86_EMULATE_CONFIG_WANT_MOV_IMM (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
 #endif /* !EMU86_EMULATE_CONFIG_WANT_MOV_IMM */
@@ -1230,6 +1233,44 @@ __DECL_BEGIN
 #endif /* !EMU86_EMULATE_WRCR8 */
 #endif /* __x86_64__ */
 #endif /* EMU86_EMULATE_CONFIG_WANT_MOV_CREG */
+#if EMU86_EMULATE_CONFIG_WANT_MOV_DREG
+#ifndef EMU86_EMULATE_RDDR0
+#define EMU86_EMULATE_RDDR0() __rddr0()
+#endif /* !EMU86_EMULATE_RDDR0 */
+#ifndef EMU86_EMULATE_WRDR0
+#define EMU86_EMULATE_WRDR0(v) __wrdr0(v)
+#endif /* !EMU86_EMULATE_WRDR0 */
+#ifndef EMU86_EMULATE_RDDR1
+#define EMU86_EMULATE_RDDR1() __rddr1()
+#endif /* !EMU86_EMULATE_RDDR1 */
+#ifndef EMU86_EMULATE_WRDR1
+#define EMU86_EMULATE_WRDR1(v) __wrdr1(v)
+#endif /* !EMU86_EMULATE_WRDR1 */
+#ifndef EMU86_EMULATE_RDDR2
+#define EMU86_EMULATE_RDDR2() __rddr2()
+#endif /* !EMU86_EMULATE_RDDR2 */
+#ifndef EMU86_EMULATE_WRDR2
+#define EMU86_EMULATE_WRDR2(v) __wrdr2(v)
+#endif /* !EMU86_EMULATE_WRDR2 */
+#ifndef EMU86_EMULATE_RDDR3
+#define EMU86_EMULATE_RDDR3() __rddr3()
+#endif /* !EMU86_EMULATE_RDDR3 */
+#ifndef EMU86_EMULATE_WRDR3
+#define EMU86_EMULATE_WRDR3(v) __wrdr3(v)
+#endif /* !EMU86_EMULATE_WRDR3 */
+#ifndef EMU86_EMULATE_RDDR6
+#define EMU86_EMULATE_RDDR6() __rddr6()
+#endif /* !EMU86_EMULATE_RDDR6 */
+#ifndef EMU86_EMULATE_WRDR6
+#define EMU86_EMULATE_WRDR6(v) __wrdr6(v)
+#endif /* !EMU86_EMULATE_WRDR6 */
+#ifndef EMU86_EMULATE_RDDR7
+#define EMU86_EMULATE_RDDR7() __rddr7()
+#endif /* !EMU86_EMULATE_RDDR7 */
+#ifndef EMU86_EMULATE_WRDR7
+#define EMU86_EMULATE_WRDR7(v) __wrdr7(v)
+#endif /* !EMU86_EMULATE_WRDR7 */
+#endif /* EMU86_EMULATE_CONFIG_WANT_MOV_DREG */
 #if CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_64BIT
 #if !defined(EMU86_EMULATE_LAR) && EMU86_EMULATE_CONFIG_WANT_LAR
 #define EMU86_EMULATE_LAR(segment_index, result) __lar(segment_index, /*(u16 *)*/&(result))
@@ -1276,6 +1317,30 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_emulate_l
 #define EMU86_GETCR4_UMIP() 0
 #endif /* !EMU86_GETCR4_UMIP */
 #endif /* EMU86_EMULATE_CONFIG_CHECKUSER && !EMU86_GETCR4_UMIP */
+
+/* CR4.DE -- When disabled, read/write to/from %dr4 and %dr5 actually use %dr6 and %dr7
+ *           When enabled, such reads/writes actually affect the proper registers (which
+ *           can be provided with `EMU86_EMULATE_(RD|WR)DR(4|5)'), or cause a call to
+ *           `EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER()' with the actually used
+ *           register ID.
+ * NOTE: To prevent leaking the state of CR4.DE to user-space via exceptions (attempting
+ *       to access %dr4 would otherwise (correctly) cause an exception with %dr6), the
+ *       state of CR4.DE is always handled as though it was 1 (i.e. don't re-route debug
+ *       register indices) when `EMU86_ISUSER()' evaluates to true. */
+#ifndef EMU86_GETCR4_DE
+#if defined(__KERNEL__) && (defined(__x86_64__) || defined(__i386__))
+#define EMU86_GETCR4_DE() (__rdcr4() & CR4_DE)
+#endif /* __KERNEL__ && (__x86_64__ || __i386__) */
+#ifndef EMU86_GETCR4_DE
+#if 1
+#define EMU86_GETCR4_DE_IS_ONE 1
+#define EMU86_GETCR4_DE() 1
+#else
+#define EMU86_GETCR4_DE_IS_ZERO 1
+#define EMU86_GETCR4_DE() 0
+#endif
+#endif /* !EMU86_GETCR4_DE */
+#endif /* !EMU86_GETCR4_DE */
 
 
 
@@ -3557,6 +3622,7 @@ checklock_modrm_memory_parsed:
 #include "emu/misc.c.inl"
 #include "emu/misc2.c.inl"
 #include "emu/mov-creg.c.inl"
+#include "emu/mov-dreg.c.inl"
 #include "emu/mov-imm.c.inl"
 #include "emu/mov-moffs.c.inl"
 #include "emu/mov-sreg.c.inl"
@@ -3683,29 +3749,6 @@ checklock_modrm_memory_parsed:
 			goto generic_failure;
 #endif /* __x86_64__ */
 
-		case 0x0f21:
-		case 0x0f23:
-			/* MOV r32, DR0-DR7 */
-			/* MOV DR0-DR7, r32 */
-			MOD_DECODE();
-			/* Userspace tried to access an control register. */
-			for (i = 3; i < EXCEPTION_DATA_POINTERS; ++i)
-				PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
-			PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
-			PERTASK_SET(this_exception_pointers[0], E_ILLEGAL_INSTRUCTION_X86_OPCODE(opcode, mod.mi_reg));
-			PERTASK_SET(this_exception_pointers[2], (uintptr_t)X86_REGISTER_CONTROL + mod.mi_reg);
-			if (opcode == 0x0f23) {
-				/* Save the value user-space tried to write. */
-				PERTASK_SET(this_exception_pointers[1],
-				            (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV);
-				PERTASK_SET(this_exception_pointers[3],
-				            (uintptr_t)RD_REG());
-			} else {
-				PERTASK_SET(this_exception_pointers[1],
-				            (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV);
-			}
-			break;
-
 		case 0x0f31: /* rdtsc */
 		case 0x0f32: /* rdmsr */
 		case 0x0f33: /* rdpmc */
@@ -3773,7 +3816,6 @@ set_x86_64_non_canon_special:
 
 #endif
 
-			/* XXX: mov (drN)  (if only for verbose exception messages?) */
 			/* XXX: clts       (if only for verbose exception messages?) */
 			/* XXX: swapgs     (if only for verbose exception messages?) */
 			/* XXX: rdtscp     (if only for verbose exception messages?) */
