@@ -82,12 +82,15 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 
 	__LIBM_SET_FLOAT_WORD(__x, __hx); /* x <- |x| */
 	/* rough cbrt to 5 bits */
+#ifndef _FLT_NO_DENORMALS
 	if (__LIBM_FLT_UWORD_IS_SUBNORMAL(__hx)) { /* subnormal number */
 		__LIBM_SET_FLOAT_WORD(__t, 0x4b800000); /* set t= 2**24 */
 		__t *= __x;
 		__LIBM_GET_FLOAT_WORD(__high, __t);
 		__LIBM_SET_FLOAT_WORD(__t, __high / 3 + __LIBM_LOCAL_VALUE(B2f));
-	} else {
+	} else
+#endif /* !_FLT_NO_DENORMALS */
+	{
 		__LIBM_SET_FLOAT_WORD(__t, __hx / 3 + __LIBM_LOCAL_VALUE(B1f));
 	}
 

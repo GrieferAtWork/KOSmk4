@@ -58,75 +58,24 @@
 DECL_BEGIN
 
 
-PRIVATE u16 const x86_icpustate_8bit_offsets[] = {
-#ifdef __x86_64__
-	[R_EAX]        = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RAX, /* %al */
-	[R_ECX]        = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RCX, /* %cl */
-	[R_EDX]        = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RDX, /* %dl */
-	[R_EBX]        = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RBX, /* %bl */
-	[R_ESP]        = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RAX + 1, /* %ah */
-	[R_EBP]        = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RCX + 1, /* %ch */
-	[R_ESI]        = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RDX + 1, /* %dh */
-	[R_EDI]        = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RBX + 1, /* %bh */
-	[R_R8]         = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R8,   /* %r8l */
-	[R_R9]         = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R9,   /* %r9l */
-	[R_R10]        = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R10,  /* %r10l */
-	[R_R11]        = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R11,  /* %r11l */
-	[R_R12]        = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R12,  /* %r12l */
-	[R_R13]        = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R13,  /* %r13l */
-	[R_R14]        = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R14,  /* %r14l */
-	[R_R15]        = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R15,  /* %r15l */
-#else /* __x86_64__ */
-	[R_EAX]        = OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EAX, /* %al */
-	[R_ECX]        = OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_ECX, /* %cl */
-	[R_EDX]        = OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EDX, /* %dl */
-	[R_EBX]        = OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EBX, /* %bl */
-	[R_ESP]        = OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EAX + 1, /* %ah */
-	[R_EBP]        = OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_ECX + 1, /* %ch */
-	[R_ESI]        = OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EDX + 1, /* %dh */
-	[R_EDI]        = OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EBX + 1  /* %bh */
-#endif /* !__x86_64__ */
-};
-
-#ifdef __x86_64__
-PRIVATE u16 const x86_icpustate_8bit_rex_offsets[] = {
-	[R_EAX] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RAX,  /* %al */
-	[R_ECX] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RCX,  /* %cl */
-	[R_EDX] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RDX,  /* %dl */
-	[R_EBX] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RBX,  /* %bl */
-	[R_ESP] = OFFSET_ICPUSTATE_IRREGS    + OFFSET_IRREGS_RSP,     /* %spl */
-	[R_EBP] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RBP,  /* %bpl */
-	[R_ESI] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RSI,  /* %sil */
-	[R_EDI] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RDI,  /* %dil */
-	[R_R8 ] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R8,   /* %r8l */
-	[R_R9 ] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R9,   /* %r9l */
-	[R_R10] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R10,  /* %r10l */
-	[R_R11] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R11,  /* %r11l */
-	[R_R12] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R12,  /* %r12l */
-	[R_R13] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R13,  /* %r13l */
-	[R_R14] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R14,  /* %r14l */
-	[R_R15] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R15,  /* %r15l */
-};
-#endif /* __x86_64__ */
-
 #ifdef __x86_64__
 PRIVATE u16 const x86_icpustate_64bit_offsets[] = {
-	[R_EAX] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RAX, /* %rax */
-	[R_ECX] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RCX, /* %rcx */
-	[R_EDX] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RDX, /* %rdx */
-	[R_EBX] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RBX, /* %rbx */
-	[R_ESP] = OFFSET_ICPUSTATE_IRREGS    + OFFSET_IRREGS_RSP,    /* %rsp */
-	[R_EBP] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RBP, /* %rbp */
-	[R_ESI] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RSI, /* %rsi */
-	[R_EDI] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RDI, /* %rdi */
-	[R_R8]  = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R8,  /* %r8 */
-	[R_R9]  = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R9,  /* %r9 */
-	[R_R10] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R10, /* %r10 */
-	[R_R11] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R11, /* %r11 */
-	[R_R12] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R12, /* %r12 */
-	[R_R13] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R13, /* %r13 */
-	[R_R14] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R14, /* %r14 */
-	[R_R15] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R15, /* %r15 */
+	[EMU86_R_EAX] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RAX, /* %rax */
+	[EMU86_R_ECX] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RCX, /* %rcx */
+	[EMU86_R_EDX] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RDX, /* %rdx */
+	[EMU86_R_EBX] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RBX, /* %rbx */
+	[EMU86_R_ESP] = OFFSET_ICPUSTATE_IRREGS    + OFFSET_IRREGS_RSP,    /* %rsp */
+	[EMU86_R_EBP] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RBP, /* %rbp */
+	[EMU86_R_ESI] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RSI, /* %rsi */
+	[EMU86_R_EDI] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RDI, /* %rdi */
+	[EMU86_R_R8]  = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R8,  /* %r8 */
+	[EMU86_R_R9]  = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R9,  /* %r9 */
+	[EMU86_R_R10] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R10, /* %r10 */
+	[EMU86_R_R11] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R11, /* %r11 */
+	[EMU86_R_R12] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R12, /* %r12 */
+	[EMU86_R_R13] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R13, /* %r13 */
+	[EMU86_R_R14] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R14, /* %r14 */
+	[EMU86_R_R15] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R15, /* %r15 */
 };
 
 #define ACCESS_GPREG(state,regno) (*(u64 *)((byte_t *)(state) + x86_icpustate_64bit_offsets[(regno) & 0xf]))
@@ -137,28 +86,10 @@ PRIVATE u16 const x86_icpustate_64bit_offsets[] = {
 #endif /* !__x86_64__ */
 
 
-/* @param: regno: One of `R_*' */
-INTERN WUNUSED ATTR_PURE NONNULL((1)) u8
-NOTHROW(FCALL x86_icpustate_get8)(struct icpustate *__restrict state,
-                                  u8 regno
-#ifdef __x86_64__
-                                  ,
-                                  op_flag_t flags
-#endif /* __x86_64__ */
-                                  ) {
-	assert(regno < COMPILER_LENOF(x86_icpustate_8bit_offsets));
-#ifdef __x86_64__
-	if (flags & F_HASREX)
-		return *(u8 *)((byte_t *)state + x86_icpustate_8bit_rex_offsets[regno]);
-#endif /* __x86_64__ */
-	return *(u8 *)((byte_t *)state + x86_icpustate_8bit_offsets[regno]);
-}
-
-
 INTERN WUNUSED ATTR_PURE NONNULL((1)) u16
 NOTHROW(FCALL x86_icpustate_get16)(struct icpustate *__restrict state, u8 regno) {
 #ifndef __x86_64__
-	if (EFFECTIVE_REGNO(regno) == R_ESP)
+	if (EFFECTIVE_REGNO(regno) == EMU86_R_ESP)
 		return (u16)icpustate_getsp(state);
 #endif /* !__x86_64__ */
 	return *(u16 *)&ACCESS_GPREG(state, regno);
@@ -167,7 +98,7 @@ NOTHROW(FCALL x86_icpustate_get16)(struct icpustate *__restrict state, u8 regno)
 INTERN WUNUSED ATTR_PURE NONNULL((1)) u32
 NOTHROW(FCALL x86_icpustate_get32)(struct icpustate *__restrict state, u8 regno) {
 #ifndef __x86_64__
-	if (EFFECTIVE_REGNO(regno) == R_ESP)
+	if (EFFECTIVE_REGNO(regno) == EMU86_R_ESP)
 		return (u32)icpustate_getsp(state);
 #endif /* !__x86_64__ */
 	return *(u32 *)&ACCESS_GPREG(state, regno);
@@ -179,47 +110,10 @@ INTERN WUNUSED ATTR_PURE NONNULL((1)) u64
 NOTHROW(FCALL x86_icpustate_get64)(struct icpustate *__restrict state, u8 regno) {
 	return ACCESS_GPREG(state, regno);
 }
-
-INTERN NONNULL((1)) void
-NOTHROW(FCALL x86_icpustate_set64)(struct icpustate *__restrict state, u8 regno, u64 value) {
-	ACCESS_GPREG(state, regno) = (uintptr_t)value;
-}
 #endif /* __x86_64__ */
 
 
-INTERN NONNULL((1)) void
-NOTHROW(FCALL x86_icpustate_set8)(struct icpustate *__restrict state,
-                                  u8 regno,
-#ifdef __x86_64__
-                                  op_flag_t flags,
-#endif /* __x86_64__ */
-                                  u8 value) {
-	assert(regno < COMPILER_LENOF(x86_icpustate_8bit_offsets));
-#ifdef __x86_64__
-	if (flags & F_HASREX) {
-		*(u8 *)((byte_t *)state + x86_icpustate_8bit_rex_offsets[regno]) = value;
-	} else
-#endif /* __x86_64__ */
-	{
-		*(u8 *)((byte_t *)state + x86_icpustate_8bit_offsets[regno]) = value;
-	}
-}
-
-#ifdef __x86_64__
-INTERN NONNULL((1)) void
-NOTHROW(FCALL x86_icpustate_set16)(struct icpustate *__restrict state,
-                                   u8 regno, u16 value) {
-	ACCESS_GPREG(state, regno) = (uintptr_t)value;
-}
-
-INTERN NONNULL((1)) void
-NOTHROW(FCALL x86_icpustate_set32)(struct icpustate *__restrict state,
-                                   u8 regno, u32 value) {
-	ACCESS_GPREG(state, regno) = (uintptr_t)value;
-}
-
-#else /* __x86_64__ */
-
+#ifndef __x86_64__
 PRIVATE ATTR_NORETURN void FCALL
 throw_bad_kernel_esp(uintptr_t value) THROWS(E_ILLEGAL_INSTRUCTION_REGISTER) {
 	THROW(E_ILLEGAL_INSTRUCTION_REGISTER, 0,
@@ -227,19 +121,9 @@ throw_bad_kernel_esp(uintptr_t value) THROWS(E_ILLEGAL_INSTRUCTION_REGISTER) {
 	      X86_REGISTER_GENERAL_PURPOSE_ESP, value);
 }
 INTERN void FCALL
-x86_icpustate_set16(struct icpustate *__restrict state,
-                    u8 regno, u16 value) {
-	if (EFFECTIVE_REGNO(regno) == R_ESP) {
-		if (!icpustate_trysetsp(state, value))
-			throw_bad_kernel_esp(value);
-	}
-	ACCESS_GPREG(state, regno) = (uintptr_t)value;
-}
-
-INTERN void FCALL
 x86_icpustate_set32(struct icpustate *__restrict state,
                     u8 regno, u32 value) {
-	if (EFFECTIVE_REGNO(regno) == R_ESP) {
+	if (EFFECTIVE_REGNO(regno) == EMU86_R_ESP) {
 		if (!icpustate_trysetsp(state, value))
 			throw_bad_kernel_esp(value);
 	}
@@ -286,28 +170,28 @@ fail:
 }
 #endif /* !__x86_64__ */
 
-INTERN uintptr_t
-NOTHROW(KCALL x86_decode_segmentbase)(struct icpustate *__restrict state, op_flag_t flags) {
+PRIVATE uintptr_t
+NOTHROW(KCALL x86_decode_segmentbase)(struct icpustate *__restrict state, emu86_opflags_t flags) {
 	uintptr_t result;
-	switch (flags & F_SEGMASK) {
+	switch (flags & EMU86_F_SEGMASK) {
 #if defined(__x86_64__)
 	default: result = 0; break;
-	case F_SEGFS:
+	case EMU86_F_SEGFS:
 		result = __rdfsbaseq();
 		break;
-	case F_SEGGS:
+	case EMU86_F_SEGGS:
 		result = irregs_isuser(&state->ics_irregs)
 		         ? get_user_gsbase()
 		         : __rdgsbaseq();
 		break;
 #else /* __x86_64__ */
 	default:
-	case F_SEGDS: result = get_segment_base(state->ics_ds); break;
-	case F_SEGES: result = get_segment_base(state->ics_es); break;
-	case F_SEGFS: result = get_segment_base(state->ics_fs); break;
-	case F_SEGGS: result = get_segment_base(__rdgs()); break;
-	case F_SEGCS: result = get_segment_base(irregs_getcs(&state->ics_irregs)); break;
-	case F_SEGSS: result = get_segment_base(irregs_getss(&state->ics_irregs)); break;
+	case EMU86_F_SEGDS: result = get_segment_base(state->ics_ds); break;
+	case EMU86_F_SEGES: result = get_segment_base(state->ics_es); break;
+	case EMU86_F_SEGFS: result = get_segment_base(state->ics_fs); break;
+	case EMU86_F_SEGGS: result = get_segment_base(__rdgs()); break;
+	case EMU86_F_SEGCS: result = get_segment_base(irregs_getcs(&state->ics_irregs)); break;
+	case EMU86_F_SEGSS: result = get_segment_base(irregs_getss(&state->ics_irregs)); break;
 #endif /* !__x86_64__ */
 	}
 	return result;
@@ -316,7 +200,7 @@ NOTHROW(KCALL x86_decode_segmentbase)(struct icpustate *__restrict state, op_fla
 INTERN uintptr_t
 NOTHROW(KCALL x86_decode_modrmgetmem)(struct icpustate *__restrict state,
                                       struct emu86_modrm *__restrict modrm,
-                                      op_flag_t flags) {
+                                      emu86_opflags_t flags) {
 	uintptr_t result;
 	if (EMU86_MODRM_ISREG(modrm->mi_type))
 		return x86_icpustate_get(state, modrm->mi_rm);
@@ -335,38 +219,9 @@ NOTHROW(KCALL x86_decode_modrmgetmem)(struct icpustate *__restrict state,
 #define IRREGS(state) (&(state)->ics_irregs_k)
 #endif /* !__x86_64__ */
 
-INTERN u8 KCALL
-modrm_getrmb(struct icpustate *__restrict state,
-             struct emu86_modrm *__restrict modrm, op_flag_t flags)
-		THROWS(E_SEGFAULT) {
-	uintptr_t addr;
-	if (EMU86_MODRM_ISREG(modrm->mi_type))
-		return x86_icpustate_get8(state, modrm->mi_rm, flags);
-	addr = x86_decode_modrmgetmem(state, modrm, flags);
-	if (irregs_isuser(IRREGS(state)))
-		validate_readable((void *)addr, 1);
-	return *(u8 *)addr;
-}
-
-INTERN void KCALL
-modrm_setrmb(struct icpustate *__restrict state,
-             struct emu86_modrm *__restrict modrm,
-             op_flag_t flags, u8 value)
-		THROWS(E_SEGFAULT) {
-	if (EMU86_MODRM_ISREG(modrm->mi_type)) {
-		x86_icpustate_set8(state, modrm->mi_rm, flags, value);
-	} else {
-		uintptr_t addr;
-		addr = x86_decode_modrmgetmem(state, modrm, flags);
-		if (irregs_isuser(IRREGS(state)))
-			validate_writable((void *)addr, 1);
-		*(u8 *)addr = value;
-	}
-}
-
 INTERN u16 KCALL
 modrm_getrmw(struct icpustate *__restrict state,
-             struct emu86_modrm *__restrict modrm, op_flag_t flags)
+             struct emu86_modrm *__restrict modrm, emu86_opflags_t flags)
 		THROWS(E_SEGFAULT) {
 	uintptr_t addr;
 	if (EMU86_MODRM_ISREG(modrm->mi_type))
@@ -376,84 +231,6 @@ modrm_getrmw(struct icpustate *__restrict state,
 		validate_readable((void *)addr, 2);
 	return *(u16 *)addr;
 }
-
-INTERN void KCALL
-modrm_setrmw(struct icpustate *__restrict state,
-             struct emu86_modrm *__restrict modrm,
-             op_flag_t flags, u16 value)
-		THROWS(E_SEGFAULT) {
-	if (EMU86_MODRM_ISREG(modrm->mi_type)) {
-		x86_icpustate_set16(state, modrm->mi_rm, value);
-	} else {
-		uintptr_t addr;
-		addr = x86_decode_modrmgetmem(state, modrm, flags);
-		if (irregs_isuser(IRREGS(state)))
-			validate_writable((void *)addr, 2);
-		*(u16 *)addr = value;
-	}
-}
-
-INTERN u32 KCALL
-modrm_getrml(struct icpustate *__restrict state,
-             struct emu86_modrm *__restrict modrm, op_flag_t flags)
-		THROWS(E_SEGFAULT) {
-	uintptr_t addr;
-	if (EMU86_MODRM_ISREG(modrm->mi_type))
-		return x86_icpustate_get32(state, modrm->mi_rm);
-	addr = x86_decode_modrmgetmem(state, modrm, flags);
-	if (irregs_isuser(IRREGS(state)))
-		validate_readable((void *)addr, 4);
-	return *(u32 *)addr;
-}
-
-INTERN void KCALL
-modrm_setrml(struct icpustate *__restrict state,
-             struct emu86_modrm *__restrict modrm,
-             op_flag_t flags, u32 value)
-		THROWS(E_SEGFAULT) {
-	if (EMU86_MODRM_ISREG(modrm->mi_type)) {
-		x86_icpustate_set32(state, modrm->mi_rm, value);
-	} else {
-		uintptr_t addr;
-		addr = x86_decode_modrmgetmem(state, modrm, flags);
-		if (irregs_isuser(IRREGS(state)))
-			validate_writable((void *)addr, 4);
-		*(u32 *)addr = value;
-	}
-}
-
-#ifdef __x86_64__
-INTERN u64 KCALL
-modrm_getrmq(struct icpustate *__restrict state,
-             struct emu86_modrm *__restrict modrm, op_flag_t flags)
-		THROWS(E_SEGFAULT) {
-	uintptr_t addr;
-	if (EMU86_MODRM_ISREG(modrm->mi_type))
-		return x86_icpustate_get64(state, modrm->mi_rm);
-	addr = x86_decode_modrmgetmem(state, modrm, flags);
-	if (irregs_isuser(IRREGS(state)))
-		validate_readable((void *)addr, 8);
-	return *(u64 *)addr;
-}
-
-INTERN void KCALL
-modrm_setrmq(struct icpustate *__restrict state,
-             struct emu86_modrm *__restrict modrm,
-             op_flag_t flags, u64 value)
-		THROWS(E_SEGFAULT) {
-	if (EMU86_MODRM_ISREG(modrm->mi_type)) {
-		x86_icpustate_set64(state, modrm->mi_rm, value);
-	} else {
-		uintptr_t addr;
-		addr = x86_decode_modrmgetmem(state, modrm, flags);
-		if (irregs_isuser(IRREGS(state)))
-			validate_writable((void *)addr, 8);
-		*(u64 *)addr = value;
-	}
-}
-#endif /* __x86_64__ */
-
-
 
 DECL_END
 

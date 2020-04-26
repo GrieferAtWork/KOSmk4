@@ -174,12 +174,12 @@ struct instruction {
 #define OPC_RM512_ZMM__OPC_VRZMM__OPC_RZMM_MASK '#' /* Short form of: OPC_RM512_ZMM OPC_VRZMM OPC_RZMM_MASK */
 #define OP_RM512_ZMM__OP_VRZMM__OP_RZMM_MASK    "#" /* Short form of: OP_RM512_ZMM OP_VRZMM OP_RZMM_MASK */
 #define OP_RM512_ZMM__OP_VRZMM__OP_RZMM         "#" /* Short form of: OP_RM512_ZMM OP_VRZMM OP_RZMM_MASK */
-#define OPC_VRXMM_MASK  '$' /* %xmm0, %xmm1, etc. (based on F_VEX_VVVVV_M) (followed by {%kN}{z}) */
-#define OP_VRXMM_MASK   "$" /* %xmm0, %xmm1, etc. (based on F_VEX_VVVVV_M) (followed by {%kN}{z}) */
-#define OPC_VRYMM_MASK  '%' /* %ymm0, %ymm1, etc. (based on F_VEX_VVVVV_M) (followed by {%kN}{z}) */
-#define OP_VRYMM_MASK   "%" /* %ymm0, %ymm1, etc. (based on F_VEX_VVVVV_M) (followed by {%kN}{z}) */
-#define OPC_VRZMM_MASK  '&' /* %zmm0, %zmm1, etc. (based on F_VEX_VVVVV_M) (followed by {%kN}{z}) */
-#define OP_VRZMM_MASK   "&" /* %zmm0, %zmm1, etc. (based on F_VEX_VVVVV_M) (followed by {%kN}{z}) */
+#define OPC_VRXMM_MASK  '$' /* %xmm0, %xmm1, etc. (based on EMU86_F_VEX_VVVVV_M) (followed by {%kN}{z}) */
+#define OP_VRXMM_MASK   "$" /* %xmm0, %xmm1, etc. (based on EMU86_F_VEX_VVVVV_M) (followed by {%kN}{z}) */
+#define OPC_VRYMM_MASK  '%' /* %ymm0, %ymm1, etc. (based on EMU86_F_VEX_VVVVV_M) (followed by {%kN}{z}) */
+#define OP_VRYMM_MASK   "%" /* %ymm0, %ymm1, etc. (based on EMU86_F_VEX_VVVVV_M) (followed by {%kN}{z}) */
+#define OPC_VRZMM_MASK  '&' /* %zmm0, %zmm1, etc. (based on EMU86_F_VEX_VVVVV_M) (followed by {%kN}{z}) */
+#define OP_VRZMM_MASK   "&" /* %zmm0, %zmm1, etc. (based on EMU86_F_VEX_VVVVV_M) (followed by {%kN}{z}) */
 #define OPC_RXMM        '\''/* %xmm0, %xmm1, etc. (based on rm.mi_reg) */
 #define OP_RXMM         "\'"/* %xmm0, %xmm1, etc. (based on rm.mi_reg) */
 #define OPC_RYMM        '(' /* %ymm0, %ymm1, etc. (based on rm.mi_reg) */
@@ -231,8 +231,8 @@ struct instruction {
 #define OPC_RM512_ZMM   '>' /* 512-bit memory location or %zmm0, %zmm1, etc. (based on rm.mi_rm) */
 #define OP_RM512_ZMM    ">" /* 512-bit memory location or %zmm0, %zmm1, etc. (based on rm.mi_rm) */
 #define OPC_LONGREPR    '?' /* Indicator for a long representation string. */
-#define OPC_VRXMM       '@' /* %xmm0, %xmm1, etc. (based on F_VEX_VVVVV_M) */
-#define OP_VRXMM        "@" /* %xmm0, %xmm1, etc. (based on F_VEX_VVVVV_M) */
+#define OPC_VRXMM       '@' /* %xmm0, %xmm1, etc. (based on EMU86_F_VEX_VVVVV_M) */
+#define OP_VRXMM        "@" /* %xmm0, %xmm1, etc. (based on EMU86_F_VEX_VVVVV_M) */
 #define OPC_U8          'A' /* imm8 (read from *PC before doing PC+=1) */
 #define OP_U8           "A" /* imm8 (read from *PC before doing PC+=1) */
 #define OPC_U16         'B' /* imm16 (read from *PC before doing PC+=2) */
@@ -293,10 +293,10 @@ struct instruction {
 /*      OP_             "]"  * ... */
 /*      OPC_            '^'  * ... */
 /*      OP_             "^"  * ... */
-#define OPC_VRK         '_' /* %kN register (based on F_VEX_VVVVV_M) */
-#define OP_VRK          "_" /* %kN register (based on F_VEX_VVVVV_M) */
-#define OPC_VRYMM       '`' /* %ymm0, %ymm1, etc. (based on F_VEX_VVVVV_M) */
-#define OP_VRYMM        "`" /* %ymm0, %ymm1, etc. (based on F_VEX_VVVVV_M) */
+#define OPC_VRK         '_' /* %kN register (based on EMU86_F_VEX_VVVVV_M) */
+#define OP_VRK          "_" /* %kN register (based on EMU86_F_VEX_VVVVV_M) */
+#define OPC_VRYMM       '`' /* %ymm0, %ymm1, etc. (based on EMU86_F_VEX_VVVVV_M) */
+#define OP_VRYMM        "`" /* %ymm0, %ymm1, etc. (based on EMU86_F_VEX_VVVVV_M) */
 #define OPC_S8          'a' /* Simm8 (read from *PC before doing PC+=1) */
 #define OP_S8           "a" /* Simm8 (read from *PC before doing PC+=1) */
 #define OPC_S16         'b' /* Simm16 (read from *PC before doing PC+=2) */
@@ -308,8 +308,8 @@ struct instruction {
 #define OPC_RMn_xMM__OPC_VRxMM__OPC_RxMM_MASK 'e' /* Short form of: OPC_RMn_xMM OPC_VRxMM OPC_RxMM_MASK */
 #define OP_RMn_xMM__OP_VRxMM__OP_RxMM_MASK    "e" /* Short form of: OP_RMn_xMM OP_VRxMM OP_RxMM_MASK */
 #define OP_RMn_xMM__OP_VRxMM__OP_RxMM         "e" /* Short form of: OP_RMn_xMM OP_VRxMM OP_RxMM_MASK */
-#define OPC_VRxMM_MASK  'f' /* %(x|y|z)mm0, %(x|y|z)mm1, etc. (based on F_VEX_VVVVV_M) (followed by {%kN}{z}) */
-#define OP_VRxMM_MASK   "f" /* %(x|y|z)mm0, %(x|y|z)mm1, etc. (based on F_VEX_VVVVV_M) (followed by {%kN}{z}) */
+#define OPC_VRxMM_MASK  'f' /* %(x|y|z)mm0, %(x|y|z)mm1, etc. (based on EMU86_F_VEX_VVVVV_M) (followed by {%kN}{z}) */
+#define OP_VRxMM_MASK   "f" /* %(x|y|z)mm0, %(x|y|z)mm1, etc. (based on EMU86_F_VEX_VVVVV_M) (followed by {%kN}{z}) */
 #define OPC_RxMM        'g'/* %(x|y|z)mm0, %(x|y|z)mm1, etc. (based on rm.mi_reg) */
 #define OP_RxMM         "g"/* %(x|y|z)mm0, %(x|y|z)mm1, etc. (based on rm.mi_reg) */
 #define OPC_RxMM_MASK   'h' /* %(x|y|z)mm0, %(x|y|z)mm1, etc. (based on rm.mi_reg) (followed by {%kN}{z}) */
@@ -318,8 +318,8 @@ struct instruction {
 #define OP_RMn_xMM_MASK "i" /* 128-bit memory location or %(x|y|z)mm0, %(x|y|z)mm1, etc. (based on rm.mi_rm) (followed by {%kN}{z}) */
 #define OPC_RMn_xMM     'j' /* 128-bit memory location or %(x|y|z)mm0, %(x|y|z)mm1, etc. (based on rm.mi_rm) */
 #define OP_RMn_xMM      "j" /* 128-bit memory location or %(x|y|z)mm0, %(x|y|z)mm1, etc. (based on rm.mi_rm) */
-#define OPC_VRxMM       'k' /* %(x|y|z)mm0, %(x|y|z)mm1, etc. (based on F_VEX_VVVVV_M) */
-#define OP_VRxMM        "k" /* %(x|y|z)mm0, %(x|y|z)mm1, etc. (based on F_VEX_VVVVV_M) */
+#define OPC_VRxMM       'k' /* %(x|y|z)mm0, %(x|y|z)mm1, etc. (based on EMU86_F_VEX_VVVVV_M) */
+#define OP_VRxMM        "k" /* %(x|y|z)mm0, %(x|y|z)mm1, etc. (based on EMU86_F_VEX_VVVVV_M) */
 #define OPC_IMM8_xMM    'l' /* %(x|y|z)mmN (based on *PC & 0xf0 before doing PC+=1) */
 #define OP_IMM8_xMM     "l" /* %(x|y|z)mmN (based on *PC & 0xf0 before doing PC+=1) */
 #define OPC_DISP8       'm' /* 8-bit PC-displacement symbol */
@@ -353,8 +353,8 @@ struct instruction {
 #define OPC_ESC         '{' /* Start of an inlined, escaped operand representation */
 #define OPC_ESC_END     '}' /* End of an inlined, escaped operand representation (only recognized after `OPC_ESC') */
 #define OP_ESC(s)       "{" s "}" /* Insert an escaped operand representation */
-#define OPC_VRZMM       '|' /* %zmm0, %zmm1, etc. (based on F_VEX_VVVVV_M) */
-#define OP_VRZMM        "|" /* %zmm0, %zmm1, etc. (based on F_VEX_VVVVV_M) */
+#define OPC_VRZMM       '|' /* %zmm0, %zmm1, etc. (based on EMU86_F_VEX_VVVVV_M) */
+#define OP_VRZMM        "|" /* %zmm0, %zmm1, etc. (based on EMU86_F_VEX_VVVVV_M) */
 /*      OPC_            '}'  * ... */
 /*      OP_             "}"  * ... */
 #define OPC_XRM16       '~' /* 16-bit register or memory location prefixed by `*' (requires IF_MODRM) */
@@ -3097,6 +3097,7 @@ PRIVATE struct instruction const ops_0f[] = {
 	I(0xae, IF_F3|IF_MODRM|IF_REG6|IF_RMR|IF_X64, "umonitorq\t" OP_RM64),
 	I(0xae, IF_F2|IF_MODRM|IF_REG6,               "umwait\t" OP_EAX OP_EDX OP_RM32),
 	I(0xae, IF_66|IF_MODRM|IF_RMM|IF_REG6,        "clwb\t" OP_MEM),
+	I(0xae, IF_66|IF_MODRM|IF_RMR|IF_REG6,        "tpause\t" OP_EAX OP_EDX OP_RM32),
 	I(0xae, IF_MODRM|IF_RMM|IF_REG6,              "xsaveopt\t" OP_MEM),
 	I(0xae, IF_MODRM|IF_REXW|IF_RMM|IF_REG6,      "xsaveopt64\t" OP_MEM),
 
@@ -5277,24 +5278,24 @@ PRIVATE u16 const ops_offsets[256] = {
 };
 
 #define HAVE_OPS_0F_OFFSETS 1
-STATIC_ASSERT(COMPILER_LENOF(ops_0f) == 1155);
+STATIC_ASSERT(COMPILER_LENOF(ops_0f) == 1156);
 PRIVATE u16 const ops_0f_offsets[256] = {
-	0, 6, 49, 50, 1154, 53, 55, 56, 58, 59, 61, 62, 1154, 63, 65, 1154,
-	66, 84, 100, 115, 121, 127, 133, 145, 151, 1154, 155, 161, 166, 1154, 167, 171,
-	173, 175, 177, 179, 181, 1154, 182, 1154, 183, 189, 195, 205, 211, 221, 231, 237,
-	243, 244, 245, 246, 247, 248, 249, 250, 1154, 1154, 1154, 1154, 1154, 1154, 1154, 251,
+	0, 6, 49, 50, 1155, 53, 55, 56, 58, 59, 61, 62, 1155, 63, 65, 1155,
+	66, 84, 100, 115, 121, 127, 133, 145, 151, 1155, 155, 161, 166, 1155, 167, 171,
+	173, 175, 177, 179, 181, 1155, 182, 1155, 183, 189, 195, 205, 211, 221, 231, 237,
+	243, 244, 245, 246, 247, 248, 249, 250, 1155, 1155, 1155, 1155, 1155, 1155, 1155, 251,
 	252, 255, 262, 269, 272, 279, 286, 293, 300, 303, 306, 313, 319, 322, 325, 328,
 	331, 343, 355, 359, 363, 369, 375, 381, 387, 399, 411, 427, 445, 457, 469, 481,
 	493, 496, 499, 503, 506, 509, 512, 517, 520, 523, 526, 530, 533, 536, 539, 545,
 	555, 563, 572, 589, 601, 604, 607, 611, 614, 626, 640, 650, 656, 660, 664, 670,
 	680, 682, 684, 686, 688, 690, 692, 694, 696, 698, 700, 702, 704, 706, 708, 710,
 	712, 717, 722, 727, 732, 733, 734, 735, 736, 741, 746, 747, 748, 749, 750, 751,
-	752, 755, 758, 759, 762, 765, 768, 771, 777, 780, 783, 784, 787, 790, 793, 824,
-	827, 828, 831, 834, 837, 840, 843, 846, 848, 851, 853, 865, 868, 874, 880, 883,
-	885, 886, 889, 905, 907, 911, 919, 925, 941, 945, 949, 953, 957, 961, 965, 969,
-	973, 977, 980, 984, 988, 992, 995, 997, 1005, 1008, 1011, 1014, 1020, 1023, 1026, 1029,
-	1034, 1037, 1040, 1045, 1048, 1051, 1054, 1070, 1074, 1077, 1080, 1083, 1088, 1091, 1094, 1097,
-	1102, 1105, 1108, 1112, 1116, 1120, 1123, 1126, 1129, 1132, 1135, 1139, 1143, 1146, 1149, 1153
+	752, 755, 758, 759, 762, 765, 768, 771, 777, 780, 783, 784, 787, 790, 793, 825,
+	828, 829, 832, 835, 838, 841, 844, 847, 849, 852, 854, 866, 869, 875, 881, 884,
+	886, 887, 890, 906, 908, 912, 920, 926, 942, 946, 950, 954, 958, 962, 966, 970,
+	974, 978, 981, 985, 989, 993, 996, 998, 1006, 1009, 1012, 1015, 1021, 1024, 1027, 1030,
+	1035, 1038, 1041, 1046, 1049, 1052, 1055, 1071, 1075, 1078, 1081, 1084, 1089, 1092, 1095, 1098,
+	1103, 1106, 1109, 1113, 1117, 1121, 1124, 1127, 1130, 1133, 1136, 1140, 1144, 1147, 1150, 1154
 };
 
 #define HAVE_OPS_0F38_OFFSETS 1

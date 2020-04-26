@@ -44,21 +44,22 @@ fs::chdir(fs::path::head(__FILE__));
 local names = dict {};
 
 function do_file(filename) {
-	print file.io.stderr: "Header:",filename;
-	local p = process("cproto",[
-		"-msivx","-D__CPROTO__","-DCORRECT_ARGNAMES",
-		"-I..","-I../i386-kos",filename]);
+	print file.io.stderr: "Header:", filename;
+	local p = process("cproto", [
+		"-msivx", "-D__CPROTO__", "-DCORRECT_ARGNAMES",
+		"-I..", "-I../i386-kos", filename]);
 	local r,w = pipe.new()...;
 	p.stdout = w;
 #ifdef __WINDOWS__
-	p.stderr = file.open("NUL","w");
+	p.stderr = file.open("NUL", "w");
 #else
-	p.stderr = file.open("/dev/null","w");
+	p.stderr = file.open("/dev/null", "w");
 #endif
 	p.start();
 	w.close();
 	for (local l: r) {
-		if ("P_((" !in l) continue;
+		if ("P_((" !in l)
+			continue;
 		local pars = l.partition("P_((")[2].strip();
 		pars = pars[:#pars-#"));"];
 		for (local x: pars.split(",")) {
@@ -73,10 +74,10 @@ function do_folder(path) {
 	for (local f: fs::dir(path)) {
 		if (f.endswith(".h")) {
 			if (!fs::isdir(f))
-				do_file(path+"/"+f);
-		} else if (fs::isdir(fs::path::join(path,f))) {
+				do_file(path + "/" + f);
+		} else if (fs::isdir(fs::path::join(path, f))) {
 			if (f != "private")
-				do_folder(fs::path::join(path,f));
+				do_folder(fs::path::join(path, f));
 		}
 	}
 }
@@ -85,8 +86,9 @@ do_folder("..");
 
 local argnames = names.keys().sorted();
 for (local name: argnames) {
-	if (!name.startswith("__")) continue;
-	print "#define",name,name.lstrip("_");
+	if (!name.startswith("__"))
+		continue;
+	print "#define", name, name.lstrip("_");
 }
 
 ]]]*/

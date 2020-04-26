@@ -1,6 +1,6 @@
 /*[[[magic
 // Optimize this file for size
-local opt = options.setdefault("GCC.options",[]);
+local opt = options.setdefault("GCC.options", []);
 opt.removeif([](e) -> e.startswith("-O"));
 opt.append("-Os");
 ]]]*/
@@ -28,10 +28,6 @@ opt.append("-Os");
 #define _KOS_SOURCE 1
 #define DISABLE_BRANCH_PROFILING 1
 
-#include "decode.h" /* TODO: Remove me! */
-/**/
-
-#ifdef CONFIG_USE_HANDLE_BAD_USAGE
 #include <hybrid/host.h>
 
 #ifdef __x86_64__
@@ -213,6 +209,7 @@ x86_handle_bad_usage(struct icpustate *__restrict state, bad_usage_reason_t usag
 #define EMU86_EMULATE_CONFIG_WANT_MFENCE        1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_MOV_RM        0
 #define EMU86_EMULATE_CONFIG_WANT_MOVBE         1 /* Emulate non-standard instructions */
+#define EMU86_EMULATE_CONFIG_WANT_MOV_CREG      0
 #define EMU86_EMULATE_CONFIG_WANT_MOV_IMM       0
 #define EMU86_EMULATE_CONFIG_WANT_XABORT        1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_XBEGIN        1 /* Emulate non-standard instructions */
@@ -1367,6 +1364,5 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 
 
 DECL_END
-#endif /* CONFIG_USE_HANDLE_BAD_USAGE */
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_HANDLE_BAD_USAGE_C */

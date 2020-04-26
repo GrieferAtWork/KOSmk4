@@ -194,8 +194,10 @@ case EMU86_OPCODE_ENCODE(0x0fae): {
 			/* 66 0F AE /6     CLWB m8     Writes back modified cache line containing m8, and may
 			 *                             retain the line in cache hierarchy in non-modified state. */
 			if (op_flags & EMU86_F_66) {
-				if (!EMU86_MODRM_ISMEM(modrm.mi_type))
+				if (!EMU86_MODRM_ISMEM(modrm.mi_type)) {
+					/* TODO: 66 0F AE /6     TPAUSE r32, <edx>, <eax> */
 					goto return_expected_memory_modrm_rmreg;
+				}
 #define NEED_return_expected_memory_modrm_rmreg
 #if EMU86_EMULATE_CONFIG_WANT_CLWB
 #ifdef EMU86_EMULATE_CLWB

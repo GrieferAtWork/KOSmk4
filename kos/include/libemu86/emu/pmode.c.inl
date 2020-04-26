@@ -534,7 +534,6 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 #define NEED_return_unsupported_instruction_rmreg
 #endif /* ... */
 
-
 #if (EMU86_EMULATE_CONFIG_CHECKERROR && \
      (EMU86_EMULATE_CONFIG_CHECKUSER || !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC))
 			case 0: /* 0F 01 D0     XGETBV     Reads an XCR specified by ECX into EDX:EAX. */

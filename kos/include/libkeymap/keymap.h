@@ -113,10 +113,10 @@ typedef struct __ATTR_PACKED {
                                * >> if ((op & KMP_OP_MEXTENDED) == KMP_OP_FSETCOL) ...; */
 #define KMP_OP_FDEFLATIN 0x20 /* >> press[%key] = 'a' + (op & 0x1f);
                                * >> shift[%key] = 'A' + (op & 0x1f);
-                               * >> %key += KEY(0,1); */
+                               * >> %key += KEY(0, 1); */
 #define KMP_OP_FDEFDIGIT 0x40 /* >> press[%key] = '1' + (op & 0x1f);
                                * >> shift[%key] = '!' + (op & 0x1f);
-                               * >> %key += KEY(0,1); */
+                               * >> %key += KEY(0, 1); */
 /*      KMP_OP_F         0x60  * ... */
 /*      KMP_OP_F         0x80  * ... */
 /*      KMP_OP_F         0xa0  * ... */

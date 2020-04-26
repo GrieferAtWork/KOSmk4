@@ -24,7 +24,7 @@
  * where `options' is the same dict as used below to specify
  * compiler options. */
 /*[[[magic
-local opt = options.setdefault("GCC.options",[]);
+local opt = options.setdefault("GCC.options", []);
 opt.removeif([](e) -> e.startswith("-O"));
 opt.append("-O2");
 ]]]*/
@@ -41,16 +41,16 @@ opt.append("-O2");
 function getDefPath(filename: string) -> fs.relpath(fs.headof(filename),ROOTDIR);
 
 /* A whole bunch of useful helpers to quickly describe compilation rules. */
-#define SOURCE(...)              options.setdefault(OPT_COMPILE_SOURCES,[]).extend(__VA_ARGS__);
+#define SOURCE(...)              options.setdefault(OPT_COMPILE_SOURCES, []).extend(__VA_ARGS__);
 #define SET_LINK_OUTPUT(name)    options[OPT_LINK_OUTPUT] = name;
 #define SET_ARCHIVE_OUTPUT(name) options[OPT_ARCHIVE_OUTPUT] = name;
 #define SET_STATIC_OUTPUT(name)  options[OPT_ARCHIVE_OUTPUT] = name;
 #define SET_LANGUAGE(name)       options[OPT_COMPILE_LANGUAGE] = name;
-#define GCC_FLAGS(...)           options.setdefault(OPT_GCC_OPTIONS,[]).extend(__VA_ARGS__);
-#define CC_FLAGS(...)            options.setdefault(OPT_COMPILE_CCFLAGS,[]).extend(__VA_ARGS__);
-#define PP_FLAGS(...)            options.setdefault(OPT_COMPILE_PPFLAGS,[]).extend(__VA_ARGS__);
-#define AS_FLAGS(...)            options.setdefault(OPT_COMPILE_ASFLAGS,[]).extend(__VA_ARGS__);
-#define LD_FLAGS(...)            options.setdefault(OPT_LINK_LDFLAGS,[]).extend(__VA_ARGS__);
+#define GCC_FLAGS(...)           options.setdefault(OPT_GCC_OPTIONS, []).extend(__VA_ARGS__);
+#define CC_FLAGS(...)            options.setdefault(OPT_COMPILE_CCFLAGS, []).extend(__VA_ARGS__);
+#define PP_FLAGS(...)            options.setdefault(OPT_COMPILE_PPFLAGS, []).extend(__VA_ARGS__);
+#define AS_FLAGS(...)            options.setdefault(OPT_COMPILE_ASFLAGS, []).extend(__VA_ARGS__);
+#define LD_FLAGS(...)            options.setdefault(OPT_LINK_LDFLAGS, []).extend(__VA_ARGS__);
 #define REMOVE_GCC_FLAGS(...)    options.get(OPT_GCC_OPTIONS).removeif([](x) -> x in __VA_ARGS__);
 #define REMOVE_CC_FLAGS(...)     options.get(OPT_COMPILE_CCFLAGS).removeif([](x) -> x in __VA_ARGS__);
 #define REMOVE_PP_FLAGS(...)     options.get(OPT_COMPILE_PPFLAGS).removeif([](x) -> x in __VA_ARGS__);
@@ -68,10 +68,10 @@ function getDefPath(filename: string) -> fs.relpath(fs.headof(filename),ROOTDIR)
 	options[OPT_MCOPY_OUTPUT]   = filename + ".so";
 #define SET_OUTPUT_LIBDLL(name)     SET_OUTPUT_DLL(DISK_LIBPATH + name)
 #define SET_OUTPUT_USRLIBDLL(name)  SET_OUTPUT_DLL(DISK_USRLIBPATH + name)
-#define DEFINE(...)              options.setdefault(OPT_COMPILE_MACROS,Dict()).update(__VA_ARGS__);
-#define INCLUDE(...)             options.setdefault(OPT_COMPILE_INCPATH,[]).extend(__VA_ARGS__);
-#define LIBPATH(...)             options.setdefault(OPT_LINK_LIBPATH,[]).extend(__VA_ARGS__);
-#define LIB(x)                   options.setdefault(OPT_LINK_LIBRARIES,[]).append(x);
+#define DEFINE(...)              options.setdefault(OPT_COMPILE_MACROS, Dict()).update(__VA_ARGS__);
+#define INCLUDE(...)             options.setdefault(OPT_COMPILE_INCPATH, []).extend(__VA_ARGS__);
+#define LIBPATH(...)             options.setdefault(OPT_LINK_LIBPATH, []).extend(__VA_ARGS__);
+#define LIB(x)                   options.setdefault(OPT_LINK_LIBRARIES, []).append(x);
 #define SET_SHARED()             GCC_FLAGS({ "-fPIC", "-shared" })
 #define SET_NOSTDLIB()           options[OPT_LINK_NOSTDLIB] = true;
 

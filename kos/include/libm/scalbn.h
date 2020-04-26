@@ -81,6 +81,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 		return __x;
 	if (!__LIBM_FLT_UWORD_IS_FINITE(__hx))
 		return __x + __x; /* NaN or Inf */
+#ifndef _FLT_NO_DENORMALS
 	if (__LIBM_FLT_UWORD_IS_SUBNORMAL(__hx)) {
 		__x *= __LIBM_LOCAL_VALUE(two25f);
 		__LIBM_GET_FLOAT_WORD(__ix, __x);
@@ -88,6 +89,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 		if (__n < -50000)
 			return __LIBM_LOCAL_VALUE(tinyf) * __x; /*underflow*/
 	}
+#endif /* !_FLT_NO_DENORMALS */
 	__k = __k + __n;
 	if (__k > __LIBM_FLT_LARGEST_EXP)
 		return __LIBM_LOCAL_VALUE(hugef) * __ieee754_copysignf(__LIBM_LOCAL_VALUE(hugef), __x); /* overflow  */

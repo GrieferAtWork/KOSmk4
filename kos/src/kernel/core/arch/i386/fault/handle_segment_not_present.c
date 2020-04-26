@@ -140,42 +140,6 @@ x86_handle_segment_not_present(struct icpustate *__restrict state,
 #define isuser()     icpustate_isuser(state)
 #define MOD_DECODE() (pc = emu86_modrm_decode(pc, &mod, op_flags))
 
-#define RD_RMB()  modrm_getrmb(state, &mod, op_flags)
-#define WR_RMB(v) modrm_setrmb(state, &mod, op_flags, v)
-#define RD_RMW()  modrm_getrmw(state, &mod, op_flags)
-#define WR_RMW(v) modrm_setrmw(state, &mod, op_flags, v)
-#define RD_RML()  modrm_getrml(state, &mod, op_flags)
-#define WR_RML(v) modrm_setrml(state, &mod, op_flags, v)
-#ifdef __x86_64__
-#define RD_RMQ()  modrm_getrmq(state, &mod, op_flags)
-#define WR_RMQ(v) modrm_setrmq(state, &mod, op_flags, v)
-#endif /* __x86_64__ */
-
-#define RD_RMREGB()  modrm_getrmregb(state, &mod, op_flags)
-#define WR_RMREGB(v) modrm_setrmregb(state, &mod, op_flags, v)
-#define RD_RMREGW()  modrm_getrmregw(state, &mod, op_flags)
-#define WR_RMREGW(v) modrm_setrmregw(state, &mod, op_flags, v)
-#define RD_RMREGL()  modrm_getrmregl(state, &mod, op_flags)
-#define WR_RMREGL(v) modrm_setrmregl(state, &mod, op_flags, v)
-#ifdef __x86_64__
-#define RD_RMREGQ()  modrm_getrmregq(state, &mod, op_flags)
-#define WR_RMREGQ(v) modrm_setrmregq(state, &mod, op_flags, v)
-#endif /* __x86_64__ */
-
-#define RD_REG()   modrm_getreg(state, &mod, op_flags)
-#define WR_REG(v)  modrm_setreg(state, &mod, op_flags, v)
-#define RD_REGB()  modrm_getregb(state, &mod, op_flags)
-#define WR_REGB(v) modrm_setregb(state, &mod, op_flags, v)
-#define RD_REGW()  modrm_getregw(state, &mod, op_flags)
-#define WR_REGW(v) modrm_setregw(state, &mod, op_flags, v)
-#define RD_REGL()  modrm_getregl(state, &mod, op_flags)
-#define WR_REGL(v) modrm_setregl(state, &mod, op_flags, v)
-#ifdef __x86_64__
-#define RD_REGQ()  modrm_getregq(state, &mod, op_flags)
-#define WR_REGQ(v) modrm_setregq(state, &mod, op_flags, v)
-#endif /* !__x86_64__ */
-
-	
 			case 0x9a: {
 				u16 segment;
 				u32 offset;
@@ -183,10 +147,10 @@ x86_handle_segment_not_present(struct icpustate *__restrict state,
 				 * CALL ptr16:32 D Invalid Valid Call far, absolute, address given in operand. */
 #ifdef __x86_64__
 				/* This instruction only exists in compatibility mode! */
-				if (!(op_flags & F_IS_X32))
+				if (!EMU86_F_IS32(op_flags))
 					goto unsupported_instruction;
 #endif /* __x86_64__ */
-				if (op_flags & F_OP16) {
+				if (op_flags & EMU86_F_OP16) {
 					offset = UNALIGNED_GET16((u16 *)pc);
 					pc += 2;
 				} else {
@@ -227,12 +191,12 @@ x86_handle_segment_not_present(struct icpustate *__restrict state,
 					if (isuser())
 						validate_readable(addr, 1);
 #ifdef __x86_64__
-					if (op_flags & F_REX_W) {
+					if (op_flags & EMU86_F_REX_W) {
 						segment = UNALIGNED_GET16((u16 *)(addr + 0));
 						offset  = UNALIGNED_GET64((u64 *)(addr + 2));
 					} else
 #endif /* __x86_64__ */
-					if (!(op_flags & F_OP16)) {
+					if (!(op_flags & EMU86_F_OP16)) {
 						segment = UNALIGNED_GET16((u16 *)(addr + 0));
 						offset  = UNALIGNED_GET32((u32 *)(addr + 2));
 					} else {
@@ -244,7 +208,7 @@ x86_handle_segment_not_present(struct icpustate *__restrict state,
 					if (segment == 7 && (__sldt() & ~7) == SEGMENT_CPU_LDT) {
 						icpustate_setpc(state, (uintptr_t)pc);
 #ifdef __x86_64__
-						if (!(op_flags & F_IS_X32))
+						if (EMU86_F_IS64(op_flags))
 							x86_emulate_syscall64_lcall7(state, offset);
 #endif /* __x86_64__ */
 						x86_emulate_syscall32_lcall7(state, (u32)offset);
@@ -279,7 +243,7 @@ x86_handle_segment_not_present(struct icpustate *__restrict state,
 				PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
 				PERTASK_SET(this_exception_pointers[0], E_ILLEGAL_INSTRUCTION_X86_OPCODE(opcode, mod.mi_reg));
 				PERTASK_SET(this_exception_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRNPSEG);
-				PERTASK_SET(this_exception_pointers[3], (uintptr_t)RD_RMW());
+				PERTASK_SET(this_exception_pointers[3], (uintptr_t)modrm_getrmw(state, &mod, op_flags));
 				for (i = 4; i < EXCEPTION_DATA_POINTERS; ++i)
 					PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
 				goto unwind_state;
@@ -292,7 +256,7 @@ x86_handle_segment_not_present(struct icpustate *__restrict state,
 				PERTASK_SET(this_exception_pointers[0], E_ILLEGAL_INSTRUCTION_X86_OPCODE(opcode, mod.mi_reg));
 				PERTASK_SET(this_exception_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRNPSEG);
 				PERTASK_SET(this_exception_pointers[2], (uintptr_t)X86_REGISTER_SEGMENT_ES + mod.mi_reg);
-				PERTASK_SET(this_exception_pointers[3], (uintptr_t)RD_RMW());
+				PERTASK_SET(this_exception_pointers[3], (uintptr_t)modrm_getrmw(state, &mod, op_flags));
 				for (i = 4; i < EXCEPTION_DATA_POINTERS; ++i)
 					PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
 				goto unwind_state;

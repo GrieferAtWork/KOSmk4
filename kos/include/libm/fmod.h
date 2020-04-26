@@ -88,18 +88,24 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 	/* Note: y cannot be zero if we reach here. */
 
 	/* determine ix = ilogb(x) */
+#ifndef _FLT_NO_DENORMALS
 	if (__LIBM_FLT_UWORD_IS_SUBNORMAL(__hx)) { /* subnormal x */
 		for (__ix = -126, __i = (__hx << 8); __i > 0; __i <<= 1)
 			__ix -= 1;
-	} else {
+	} else
+#endif /* !_FLT_NO_DENORMALS */
+	{
 		__ix = (__hx >> 23) - 127;
 	}
 
 	/* determine iy = ilogb(y) */
+#ifndef _FLT_NO_DENORMALS
 	if (__LIBM_FLT_UWORD_IS_SUBNORMAL(__hy)) { /* subnormal y */
 		for (__iy = -126, __i = (__hy << 8); __i >= 0; __i <<= 1)
 			__iy -= 1;
-	} else {
+	} else
+#endif /* !_FLT_NO_DENORMALS */
+	{
 		__iy = (__hy >> 23) - 127;
 	}
 

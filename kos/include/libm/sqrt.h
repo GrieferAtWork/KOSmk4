@@ -82,11 +82,13 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 		return (__x - __x) / (__x - __x); /* sqrt(-ve) = sNaN */
 	/* normalize x */
 	__m = (__ix >> 23);
+#ifndef _FLT_NO_DENORMALS
 	if (__LIBM_FLT_UWORD_IS_SUBNORMAL(__hx)) { /* subnormal x */
 		for (_i = 0; (__ix & 0x00800000L) == 0; _i++)
 			__ix <<= 1;
 		__m -= _i - 1;
 	}
+#endif /* !_FLT_NO_DENORMALS */
 	__m -= 127; /* unbias exponent */
 	__ix = (__ix & 0x007fffffL) | 0x00800000L;
 	if (__m & 1) /* odd m, double x to make it even */

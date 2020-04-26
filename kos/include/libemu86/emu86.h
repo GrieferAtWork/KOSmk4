@@ -218,7 +218,7 @@ __DECL_BEGIN
 #if CONFIG_LIBEMU86_WANT_64BIT
 #define EMU86_F_EVEX_z      0x01000000 /* Value of EVEX.z */
 #define EMU86_F_EVEX_b      0x02000000 /* Value of EVEX.b */
-#define EMU86_F_EVEX_R      0x04000000 /* The EVEX.R flag (a second 1-bit extension to MODRM.reg; use with `F_REX_R'). */
+#define EMU86_F_EVEX_R      0x04000000 /* The EVEX.R flag (a second 1-bit extension to MODRM.reg; use with `EMU86_F_REX_R'). */
 #define EMU86_F_EVEX_aaa_M  0x38000000 /* Value of EVEX.aaa */
 #define EMU86_F_EVEX_aaa_S          27 /* Shift for EVEX.aaa */
 #define EMU86_F_EVEX_aaa(x) (((x) & EMU86_F_EVEX_aaa_M) >> EMU86_F_EVEX_aaa_S)

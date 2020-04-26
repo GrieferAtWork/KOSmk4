@@ -26,7 +26,7 @@
 #include <hybrid/typecore.h>
 
 #include <bits/types.h>
-#include <machine/ieeefp.h>
+#include <machine/ieeefp.h> /* _FLT_LARGEST_EXPONENT_IS_NORMAL, _FLT_NO_DENORMALS */
 
 #include <ieee754.h>
 
@@ -49,7 +49,7 @@
 __DECL_BEGIN
 
 #define __LIBM_LOCAL_DECLARE_BEGIN __NAMESPACE_LOCAL_BEGIN
-#define __LIBM_LOCAL_DECLARE_END __NAMESPACE_LOCAL_END
+#define __LIBM_LOCAL_DECLARE_END   __NAMESPACE_LOCAL_END
 #define __LIBM_LOCAL_DECLARE(T, name, value) \
 	__LOCAL_LIBC_CONST_DATA(libm_##name)     \
 	T const __libm_##name = value;
@@ -347,11 +347,11 @@ typedef union {
 
 __DECL_END
 #else /* __CC__ */
-#define __LIBM_LOCAL_DECLARE_BEGIN                      /* nothing */
-#define __LIBM_LOCAL_DECLARE_END                        /* nothing */
-#define __LIBM_LOCAL_DECLARE(T, name, value)            /* nothing */
-#define __LIBM_LOCAL_DECLARE_ARRAY(T, name, array, ...) /* nothing */
-#define __LIBM_LOCAL_VALUE(name)                        /* nothing */
+#define __LIBM_LOCAL_DECLARE_BEGIN                  /* nothing */
+#define __LIBM_LOCAL_DECLARE_END                    /* nothing */
+#define __LIBM_LOCAL_DECLARE(T, name, value)        /* nothing */
+#define __LIBM_LOCAL_DECLARE_ARRAY(T, name, n, ...) /* nothing */
+#define __LIBM_LOCAL_VALUE(name)                    /* nothing */
 #endif /* !__CC__ */
 
 /* double __LIBM_MATHFUN(KEYWORD name, double x) */

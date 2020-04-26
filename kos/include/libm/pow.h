@@ -207,12 +207,14 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 	} else {
 		__IEEE754_FLOAT_TYPE__ s2, s_h, s_l, t_h, t_l;
 		__n = 0;
+#ifndef _FLT_NO_DENORMALS
 		/* take care subnormal number */
 		if (__LIBM_FLT_UWORD_IS_SUBNORMAL(__ix)) {
 			__ax *= __LIBM_LOCAL_VALUE(two24f);
 			__n -= 24;
 			__LIBM_GET_FLOAT_WORD(__ix, __ax);
 		}
+#endif /* !_FLT_NO_DENORMALS */
 		__n += ((__ix) >> 23) - 0x7f;
 		__j = __ix & 0x007fffff;
 		/* determine interval */

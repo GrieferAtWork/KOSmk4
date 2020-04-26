@@ -1,6 +1,6 @@
 /*[[[magic
 // Turn on full optimizations for this file!
-local opt = options.setdefault("GCC.options",[]);
+local opt = options.setdefault("GCC.options", []);
 opt.removeif([](e) -> e.startswith("-O"));
 opt.append("-O3");
 ]]]*/

@@ -49,13 +49,15 @@ __LOCAL __ATTR_WUNUSED __ATTR_NONNULL((2)) __IEEE754_FLOAT_TYPE__
 	__ix         = __UINT32_C(0x7fffffff) & __hx;
 	*__pexponent = 0;
 	if (!__LIBM_FLT_UWORD_IS_FINITE(__ix) || __LIBM_FLT_UWORD_IS_ZERO(__ix))
-		return __x;                            /* 0,inf,nan */
+		return __x; /* 0,inf,nan */
+#ifndef _FLT_NO_DENORMALS
 	if (__LIBM_FLT_UWORD_IS_SUBNORMAL(__ix)) { /* subnormal */
 		__x *= __LIBM_LOCAL_VALUE(two25f);
 		__LIBM_GET_FLOAT_WORD(__hx, __x);
 		__ix         = __hx & __UINT32_C(0x7fffffff);
 		*__pexponent = -25;
 	}
+#endif /* !_FLT_NO_DENORMALS */
 	*__pexponent += (int)(__ix >> 23) - 126;
 	__hx = (__hx & __UINT32_C(0x807fffff)) | __UINT32_C(0x3f000000);
 	__LIBM_SET_FLOAT_WORD(__x, __hx);

@@ -3562,6 +3562,236 @@ checklock_modrm_memory_parsed:
 #endif /* !__INTELLISENSE__ */
 
 			/* XXX: mov (crN)  (if only for verbose exception messages?) */
+#if 0 /* TODO: Missing stuff from the old `handle_illegal_instruction.c' */
+#ifndef __x86_64__
+		case 0x0f31: {
+			qtime_t now;
+			u64 result;
+			/* 0F 31       RDTSC       Read time-stamp counter into EDX:EAX */
+			if ((__rdcr4() & CR4_TSD) && isuser())
+				goto e_privileged_instruction;
+			now    = cpu_quantum_time();
+			result = (u64)now.q_jtime * now.q_qsize;
+			result += (u64)now.q_qtime;
+			set_eax((u32)result);
+			set_edx((u32)(result >> 32));
+		} break;
+#endif /* !__x86_64__ */
+
+		case 0x0f32: /* RDMSR */
+			if (op_flags & (EMU86_F_AD16 | EMU86_F_LOCK | EMU86_F_REP | EMU86_F_REPNE))
+				goto e_bad_prefix;
+			PERTASK_SET(this_exception_pointers[1],
+			            isuser() ? (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV
+			                      : (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_RDINV);
+			PERTASK_SET(this_exception_pointers[4], (uintptr_t)0);
+			PERTASK_SET(this_exception_pointers[5], (uintptr_t)0);
+			goto e_bad_msr_regno;
+
+		case 0x0f30: /* WRMSR */
+			if (op_flags & (EMU86_F_AD16 | EMU86_F_LOCK | EMU86_F_REP | EMU86_F_REPNE))
+				goto e_bad_prefix;
+			PERTASK_SET(this_exception_pointers[1],
+			            isuser() ? (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV
+			                      : (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRINV);
+			PERTASK_SET(this_exception_pointers[4], (uintptr_t)get_eax());
+			PERTASK_SET(this_exception_pointers[5], (uintptr_t)get_edx());
+			goto e_bad_msr_regno;
+#endif
+
+#if 0 /* TODO: Missing stuff from the old `handle_gpf.c' */
+		case 0x0fae:
+			MOD_DECODE();
+			switch (mod.mi_reg) {
+
+			case 2:
+				if (mod.mi_type == EMU86_MODRM_MEMORY) {
+					/* LDMXCSR m32 (attempted to set a reserved bit) */
+					PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
+					PERTASK_SET(this_exception_pointers[0], E_ILLEGAL_INSTRUCTION_X86_OPCODE(opcode, mod.mi_reg));
+					PERTASK_SET(this_exception_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD);
+					PERTASK_SET(this_exception_pointers[2], (uintptr_t)X86_REGISTER_MISC_MXCSR);
+					PERTASK_SET(this_exception_pointers[3], (uintptr_t)RD_RML());
+					for (i = 4; i < EXCEPTION_DATA_POINTERS; ++i)
+						PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
+					goto unwind_state;
+				}
+#ifdef __x86_64__
+				else {
+					/* F3       0F AE /2 WRFSBASE r32     Load the FS base address with the 32-bit value in the source register.
+					 * F3 REX.W 0F AE /2 WRFSBASE r64     Load the FS base address with the 64-bit value in the source register. */
+					goto check_x86_64_noncanon_fsgsbase;
+				}
+#endif /* __x86_64__ */
+				break;
+
+#ifdef __x86_64__
+			case 5: /* xrstor */
+				goto generic_privileged_instruction_if_user;
+
+			case 6: /* tpause */
+				goto generic_privileged_instruction_if_user;
+#endif /* __x86_64__ */
+
+			default:
+				break;
+			}
+			goto generic_failure;
+
+#ifdef __x86_64__
+		case 0x0fc3:
+			MOD_DECODE();
+			if (mod.mi_reg == 3) /* xrstors */
+				goto generic_privileged_instruction_if_user;
+			goto generic_failure;
+#endif /* __x86_64__ */
+
+		case 0x0f22:
+			/* MOV CRx,r32 */
+			MOD_DECODE();
+			for (i = 4; i < EXCEPTION_DATA_POINTERS; ++i)
+				PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
+			PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
+			PERTASK_SET(this_exception_pointers[0], E_ILLEGAL_INSTRUCTION_X86_OPCODE(opcode, mod.mi_reg));
+			PERTASK_SET(this_exception_pointers[2], (uintptr_t)(X86_REGISTER_CONTROL + mod.mi_reg));
+			PERTASK_SET(this_exception_pointers[3], (uintptr_t)RD_REG());
+#ifdef __x86_64__
+			if (mod.mi_reg == 1 || (mod.mi_reg > 4 && mod.mi_reg != 8))
+#else /* __x86_64__ */
+			if (mod.mi_reg == 1 || mod.mi_reg > 4)
+#endif /* !__x86_64__ */
+			{
+				/* Error was caused because CR* doesn't exist */
+				PERTASK_SET(this_exception_pointers[1],
+				            (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRINV);
+			} else if (isuser()) {
+				/* Error was caused because CR* are privileged */
+				PERTASK_SET(this_exception_pointers[1],
+				            (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV);
+			} else {
+				/* Error was caused because value written must be invalid. */
+				PERTASK_SET(this_exception_pointers[1],
+				            (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD);
+			}
+			goto unwind_state;
+
+
+		case 0x0f20:
+			/* MOV r32,CRx */
+			MOD_DECODE();
+			for (i = 3; i < EXCEPTION_DATA_POINTERS; ++i)
+				PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
+			PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
+			PERTASK_SET(this_exception_pointers[0], E_ILLEGAL_INSTRUCTION_X86_OPCODE(opcode, mod.mi_reg));
+			PERTASK_SET(this_exception_pointers[2], (uintptr_t)X86_REGISTER_CONTROL + mod.mi_reg);
+#ifdef __x86_64__
+			if (mod.mi_reg == 1 || (mod.mi_reg > 4 && mod.mi_reg != 8))
+#else /* __x86_64__ */
+			if (mod.mi_reg == 1 || mod.mi_reg > 4)
+#endif /* !__x86_64__ */
+			{
+				/* Undefined control register. */
+				PERTASK_SET(this_exception_pointers[1],
+				            (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_RDINV);
+			} else {
+				/* Userspace tried to read from an control register. */
+				PERTASK_SET(this_exception_pointers[1],
+				            (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV);
+			}
+			goto unwind_state;
+
+
+		case 0x0f21:
+		case 0x0f23:
+			/* MOV r32, DR0-DR7 */
+			/* MOV DR0-DR7, r32 */
+			MOD_DECODE();
+			/* Userspace tried to access an control register. */
+			for (i = 3; i < EXCEPTION_DATA_POINTERS; ++i)
+				PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
+			PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
+			PERTASK_SET(this_exception_pointers[0], E_ILLEGAL_INSTRUCTION_X86_OPCODE(opcode, mod.mi_reg));
+			PERTASK_SET(this_exception_pointers[2], (uintptr_t)X86_REGISTER_CONTROL + mod.mi_reg);
+			if (opcode == 0x0f23) {
+				/* Save the value user-space tried to write. */
+				PERTASK_SET(this_exception_pointers[1],
+				            (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV);
+				PERTASK_SET(this_exception_pointers[3],
+				            (uintptr_t)RD_REG());
+			} else {
+				PERTASK_SET(this_exception_pointers[1],
+				            (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV);
+			}
+			break;
+
+		case 0x0f31: /* rdtsc */
+		case 0x0f32: /* rdmsr */
+		case 0x0f33: /* rdpmc */
+			PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
+			PERTASK_SET(this_exception_pointers[0], (uintptr_t)opcode);
+			PERTASK_SET(this_exception_pointers[1],
+			            isuser() ? (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV
+			                     : (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_RDINV);
+			PERTASK_SET(this_exception_pointers[2], (uintptr_t)X86_REGISTER_MSR);
+			PERTASK_SET(this_exception_pointers[3], (uintptr_t)(u32)gpregs_getpcx(&state->ics_gpregs));
+			if (opcode == 0x0f31) {
+				PERTASK_SET(this_exception_pointers[3],
+				            (uintptr_t)IA32_TIME_STAMP_COUNTER);
+			}
+			for (i = 4; i < EXCEPTION_DATA_POINTERS; ++i)
+				PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
+			goto unwind_state;
+
+		case 0x0f30: /* wrmsr */
+#ifdef __x86_64__
+			/* A couple of MSR registers can throw #GP if the written value
+			 * is a non-canonical pointer. Since KOS throws `E_SEGFAULT' for
+			 * this case, manually check if we're dealing with one of these MSRs,
+			 * and the written value is such a pointer.
+			 * s.a. Intel instruction set reference for `WRMSR' (Vol. 2C) */
+			if ((u32)gpregs_getpcx(&state->ics_gpregs) == IA32_DS_AREA ||
+			    (u32)gpregs_getpcx(&state->ics_gpregs) == IA32_FS_BASE ||
+			    (u32)gpregs_getpcx(&state->ics_gpregs) == IA32_GS_BASE ||
+			    (u32)gpregs_getpcx(&state->ics_gpregs) == IA32_KERNEL_GS_BASE ||
+			    (u32)gpregs_getpcx(&state->ics_gpregs) == IA32_LSTAR ||
+			    (u32)gpregs_getpcx(&state->ics_gpregs) == IA32_SYSENTER_EIP ||
+			    (u32)gpregs_getpcx(&state->ics_gpregs) == IA32_SYSENTER_ESP) {
+				u64 nc_addr;
+				nc_addr = ((u64)(u32)gpregs_getpax(&state->ics_gpregs)) |
+				          ((u64)(u32)gpregs_getpdx(&state->ics_gpregs) << 32);
+				if (ADDR_IS_NONCANON(nc_addr)) {
+					PERTASK_SET(this_exception_pointers[0], (uintptr_t)nc_addr);
+					printk(KERN_DEBUG "[segfault] Non-canonical write to msr#%#I32x with %p [pc=%p,%p] [#GPF] [tid=%u]\n",
+					       (u32)gpregs_getpcx(&state->ics_gpregs), nc_addr,
+					       orig_pc, pc, (unsigned int)task_getroottid_s());
+set_x86_64_non_canon_special:
+					PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_UNMAPPED));
+					PERTASK_SET(this_exception_pointers[1], (uintptr_t)E_SEGFAULT_CONTEXT_NONCANON);
+					if (isuser()) {
+						PERTASK_SET(this_exception_pointers[1],
+						            (uintptr_t)(E_SEGFAULT_CONTEXT_NONCANON |
+						                        E_SEGFAULT_CONTEXT_USERCODE));
+					}
+					for (i = 2; i < EXCEPTION_DATA_POINTERS; ++i)
+						PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
+					goto unwind_state;
+				}
+			}
+#endif /* __x86_64__ */
+			PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
+			PERTASK_SET(this_exception_pointers[0], (uintptr_t)opcode);
+			PERTASK_SET(this_exception_pointers[1],
+			            isuser() ? (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV
+			                     : (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRINV);
+			PERTASK_SET(this_exception_pointers[2], (uintptr_t)X86_REGISTER_MSR);
+			PERTASK_SET(this_exception_pointers[3], (uintptr_t)(u32)gpregs_getpcx(&state->ics_gpregs));
+			PERTASK_SET(this_exception_pointers[4], (uintptr_t)(u32)gpregs_getpax(&state->ics_gpregs));
+			PERTASK_SET(this_exception_pointers[5], (uintptr_t)(u32)gpregs_getpdx(&state->ics_gpregs));
+			goto unwind_state;
+
+#endif
+
+			/* XXX: mov (drN)  (if only for verbose exception messages?) */
 			/* XXX: clts       (if only for verbose exception messages?) */
 			/* XXX: swapgs     (if only for verbose exception messages?) */
 			/* XXX: rdtscp     (if only for verbose exception messages?) */
@@ -3586,6 +3816,8 @@ checklock_modrm_memory_parsed:
 			/* XXX: vmresume   (if only for verbose exception messages?) */
 			/* XXX: vmxoff     (if only for verbose exception messages?) */
 			/* XXX: invpcid    (if only for verbose exception messages?) */
+			/* XXX: tpause     (if only for verbose exception messages?) */
+			/* XXX: ldmxcsr    (Can throw a #GPF when attempting to set a reserved bit) */
 
 			/* TODO: Emulate crc32 */
 			/* TODO: Emulate mcommit */
