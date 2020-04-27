@@ -34,6 +34,7 @@
 #define EMU86_EMULATE_CONFIG_WANT_RDTSCP 1
 #define EMU86_EMULATE_CONFIG_WANT_SWAPGS 1
 #define EMU86_EMULATE_CONFIG_WANT_MCOMMIT 1
+#define EMU86_EMULATE_CONFIG_WANT_CLZERO 1
 #define EMU86_EMULATE_CONFIG_WANT_LAR 1
 #define EMU86_EMULATE_CONFIG_WANT_LSL 1
 #include "../emulate.c.inl"
@@ -252,6 +253,7 @@ case EMU86_OPCODE_ENCODE(0x0f00): {
       (EMU86_EMULATE_CONFIG_WANT_STAC || EMU86_EMULATE_CONFIG_WANT_CLAC ||      \
        EMU86_EMULATE_CONFIG_WANT_XEND || EMU86_EMULATE_CONFIG_WANT_XTEST ||     \
        EMU86_EMULATE_CONFIG_WANT_RDTSCP || EMU86_EMULATE_CONFIG_WANT_MCOMMIT || \
+       EMU86_EMULATE_CONFIG_WANT_CLZERO ||                                      \
        (EMU86_EMULATE_CONFIG_WANT_SWAPGS && CONFIG_LIBEMU86_WANT_64BIT))))
 case EMU86_OPCODE_ENCODE(0x0f01): {
 	MODRM_DECODE();
@@ -763,6 +765,7 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 	case 7: {
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 #if (EMU86_EMULATE_CONFIG_WANT_RDTSCP || EMU86_EMULATE_CONFIG_WANT_MCOMMIT || \
+     EMU86_EMULATE_CONFIG_WANT_CLZERO ||                                      \
      (EMU86_EMULATE_CONFIG_WANT_SWAPGS && CONFIG_LIBEMU86_WANT_64BIT) ||      \
      (EMU86_EMULATE_CONFIG_CHECKERROR &&                                      \
       (EMU86_EMULATE_CONFIG_CHECKUSER || !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC)))
@@ -894,9 +897,24 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 				goto return_unsupported_instruction_rmreg;
 #define NEED_return_unsupported_instruction_rmreg
 
+#if EMU86_EMULATE_CONFIG_WANT_CLZERO
 			case 4: /* clzero */
+#ifdef EMU86_EMULATE_CLZERO
+				{
+					void *addr;
+					IF_64BIT(if (EMU86_F_IS64(op_flags)) {
+						addr = (void *)(uintptr_t)EMU86_GETRAX();
+					} else) {
+						addr = (void *)(uintptr_t)EMU86_GETEAX();
+					}
+					EMU86_EMULATE_CLZERO(addr);
+				}
+#endif /* EMU86_EMULATE_CLZERO */
+				goto done;
+#else /* EMU86_EMULATE_CONFIG_WANT_CLZERO */
 				goto return_unsupported_instruction_rmreg;
 #define NEED_return_unsupported_instruction_rmreg
+#endif /* !EMU86_EMULATE_CONFIG_WANT_CLZERO */
 
 			default: break;
 			}
