@@ -325,6 +325,7 @@ DECL_END
 
 
 
+/* Configure general library implementation */
 #define EMU86_EMULATE_CONFIG_ONLY_MEMORY     0 /* Emulate all instructions */
 #define EMU86_EMULATE_CONFIG_CHECKUSER       0 /* Disable user-access checks (realmode always has full permissions) */
 #define EMU86_EMULATE_CONFIG_CHECKERROR      0 /* Don't check disabled instructions for usage errors (disabled
@@ -334,9 +335,18 @@ DECL_END
 /* Configure ISA extensions */
 #define EMU86_EMULATE_CONFIG_FSGSBASE_32BIT       0 /* [not enabled: fsgsbase isn't enabled in realmode] */
 #define EMU86_EMULATE_CONFIG_ALLOW_USER_STAC_CLAC 0 /* [not enabled: There is no user-space in realmode] */
+/* Ignore this config option. - Only realmode code specifically written for KOS would be
+ * able to take advantage of this, and given that libvm86 is meant to emulate 3rd-party
+ * assembly, that assembly probably would never make use of something like this. */
+#if defined(CONFIG_X86ISA_ENABLE_LOCK_EXTENSIONS) && 0
+#define EMU86_EMULATE_CONFIG_LOCK_SHIFT           1 /* [enabled] Accept `lock' for shl/shr/sal/sar/rol/ror/rcl/rcr */
+#define EMU86_EMULATE_CONFIG_LOCK_SHIFT2          1 /* [enabled] Accept `lock' for shld/shrd */
+#define EMU86_EMULATE_CONFIG_LOCK_ARPL            1 /* [enabled] Accept `lock' for arpl */
+#else /* CONFIG_X86ISA_ENABLE_LOCK_EXTENSIONS */
 #define EMU86_EMULATE_CONFIG_LOCK_SHIFT           0 /* [not enabled] Accept `lock' for shl/shr/sal/sar/rol/ror/rcl/rcr */
 #define EMU86_EMULATE_CONFIG_LOCK_SHIFT2          0 /* [not enabled] Accept `lock' for shld/shrd */
 #define EMU86_EMULATE_CONFIG_LOCK_ARPL            0 /* [not enabled] Accept `lock' for arpl */
+#endif /* !CONFIG_X86ISA_ENABLE_LOCK_EXTENSIONS */
 
 /* Configure how/if MSR register access should be emulated */
 #define EMU86_EMULATE_CONFIG_WANT_RDMSR_EMULATED          1 /* Emulate rdmsr for `IA32_TIME_STAMP_COUNTER' and `IA32_TSC_AUX' */

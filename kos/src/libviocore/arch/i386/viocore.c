@@ -1115,7 +1115,6 @@ libviocore_atomic_cmpxchx(struct vio_emulate_args *__restrict self,
 		libviocore_complete_except(self, EMU86_OPCODE(), op_flags); \
 	}
 #define EMU86_EMULATE_GETOPFLAGS() _CS(emu86_opflagsof)(self->vea_args.va_state)
-#define EMU86_EMULATE_CONFIG_ONLY_MEMORY 1 /* _ONLY_ emulate memory-based instructions! */
 #ifdef __x86_64__
 #define EMU86_EMULATE_VM86 0
 #else /* __x86_64__ */
@@ -1826,6 +1825,27 @@ NOTHROW(CC CS_setregl)(struct vio_emulate_args *__restrict self, u8 regno, u32 v
 #define EMU86_SETPSI(value, op_flags) (_CPUSTATE_GPREGS.gp_psi = (uintptr_t)(value) & _EMU86_REGP_MASK(op_flags))
 #define EMU86_SETPDI(value, op_flags) (_CPUSTATE_GPREGS.gp_pdi = (uintptr_t)(value) & _EMU86_REGP_MASK(op_flags))
 
+
+/* Configure general library implementation */
+#define EMU86_EMULATE_CONFIG_ONLY_MEMORY     1 /* _ONLY_ emulate memory-based instructions! */
+#define EMU86_EMULATE_CONFIG_CHECKERROR      0 /* Don't emulate error checks for instructions that are disabled */
+#define EMU86_EMULATE_CONFIG_ONLY_CHECKERROR 0 /* Enable instruction emulator by default (though only for memory-based instruction) */
+#define EMU86_EMULATE_CONFIG_ONLY_CHECKLOCK  1 /* Make sure of that lock prefixes are used properly */
+
+/* Configure ISA extensions */
+#define EMU86_EMULATE_CONFIG_FSGSBASE_32BIT       1 /* [enabled] Allow use of (rd|wr)(fs|gs)base from 32-bit */
+#define EMU86_EMULATE_CONFIG_ALLOW_USER_STAC_CLAC 1 /* [enabled] Allow user-space use of stac/clac */
+#ifdef CONFIG_X86ISA_ENABLE_LOCK_EXTENSIONS
+#define EMU86_EMULATE_CONFIG_LOCK_SHIFT           1 /* [enabled] Accept `lock' for shl/shr/sal/sar/rol/ror/rcl/rcr */
+#define EMU86_EMULATE_CONFIG_LOCK_SHIFT2          1 /* [enabled] Accept `lock' for shld/shrd */
+#define EMU86_EMULATE_CONFIG_LOCK_ARPL            1 /* [enabled] Accept `lock' for arpl */
+#else /* CONFIG_X86ISA_ENABLE_LOCK_EXTENSIONS */
+#define EMU86_EMULATE_CONFIG_LOCK_SHIFT           0 /* [not enabled] Accept `lock' for shl/shr/sal/sar/rol/ror/rcl/rcr */
+#define EMU86_EMULATE_CONFIG_LOCK_SHIFT2          0 /* [not enabled] Accept `lock' for shld/shrd */
+#define EMU86_EMULATE_CONFIG_LOCK_ARPL            0 /* [not enabled] Accept `lock' for arpl */
+#endif /* !CONFIG_X86ISA_ENABLE_LOCK_EXTENSIONS */
+
+
 /* Enable support for protected-mode instructions
  * This is required because all of these instructions can take
  * a memory location as operand, thus allowing them to trigger
@@ -1846,6 +1866,9 @@ NOTHROW(CC CS_setregl)(struct vio_emulate_args *__restrict self, u8 regno, u32 v
 #define EMU86_EMULATE_CONFIG_WANT_LAR 1
 #define EMU86_EMULATE_CONFIG_WANT_LSL 1
 
+
+/* Implementations of the P-mode instructions that
+ * must be enabled due to being able to access memory. */
 #define EMU86_EMULATE_SLDT() __sldt()
 #define EMU86_EMULATE_LLDT(segment_index) __lldt(segment_index)
 #define EMU86_EMULATE_STR() __str()
@@ -1874,6 +1897,7 @@ NOTHROW(CC CS_setregl)(struct vio_emulate_args *__restrict self, u8 regno, u32 v
 #define EMU86_EMULATE_LMSW(value) __lmsw(value)
 #define EMU86_EMULATE_LAR(segment_index, result) __lar(segment_index, &(result))
 #define EMU86_EMULATE_LSL(segment_index, result) __lsl(segment_index, &(result))
+
 
 
 

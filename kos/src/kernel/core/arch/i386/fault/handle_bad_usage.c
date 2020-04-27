@@ -135,11 +135,15 @@ x86_handle_bad_usage(struct icpustate *__restrict state, bad_usage_reason_t usag
 #define EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC 1 /* Don't include code-paths for basic instructions that are assumed to always be available */
 
 /* Configure ISA extensions */
-#define EMU86_EMULATE_CONFIG_FSGSBASE_32BIT       1 /* [enabled]     Allow use of (rd|wr)(fs|gs)base from 32-bit */
-#define EMU86_EMULATE_CONFIG_ALLOW_USER_STAC_CLAC 1 /* [enabled]     Allow user-space use of stac/clac */
-#define EMU86_EMULATE_CONFIG_LOCK_SHIFT           0 /* [not enabled] Accept `lock' for shl/shr/sal/sar/rol/ror/rcl/rcr */
-#define EMU86_EMULATE_CONFIG_LOCK_SHIFT2          0 /* [not enabled] Accept `lock' for shld/shrd */
-#define EMU86_EMULATE_CONFIG_LOCK_ARPL            0 /* [not enabled] Accept `lock' for arpl */
+#ifdef CONFIG_X86ISA_ENABLE_LOCK_EXTENSIONS
+#define EMU86_EMULATE_CONFIG_LOCK_SHIFT  1 /* [enabled] Accept `lock' for shl/shr/sal/sar/rol/ror/rcl/rcr */
+#define EMU86_EMULATE_CONFIG_LOCK_SHIFT2 1 /* [enabled] Accept `lock' for shld/shrd */
+#define EMU86_EMULATE_CONFIG_LOCK_ARPL   1 /* [enabled] Accept `lock' for arpl */
+#else /* CONFIG_X86ISA_ENABLE_LOCK_EXTENSIONS */
+#define EMU86_EMULATE_CONFIG_LOCK_SHIFT  0 /* [not enabled] Accept `lock' for shl/shr/sal/sar/rol/ror/rcl/rcr */
+#define EMU86_EMULATE_CONFIG_LOCK_SHIFT2 0 /* [not enabled] Accept `lock' for shld/shrd */
+#define EMU86_EMULATE_CONFIG_LOCK_ARPL   0 /* [not enabled] Accept `lock' for arpl */
+#endif /* !CONFIG_X86ISA_ENABLE_LOCK_EXTENSIONS */
 
 /* Configure for which instructions emulation should be attempted.
  * Any instruction enabled here will be emulated if not supported natively! */

@@ -133,7 +133,8 @@ __DECL_BEGIN
 /* Don't necessarily include basic instructions that _only_ ever result in
  * an unsupported instruction case in the only-check-error configuration.
  * This means that no additional code is generated for (e.g.) `add $imm8, %al'
- * when configured for `EMU86_EMULATE_CONFIG_ONLY_CHECKERROR' */
+ * when configured for `EMU86_EMULATE_CONFIG_ONLY_CHECKERROR'
+ * This option is ignored when `EMU86_EMULATE_CONFIG_ONLY_CHECKERROR == 0' */
 #ifndef EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
 #define EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC 0
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC */
