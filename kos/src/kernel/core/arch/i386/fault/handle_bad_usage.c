@@ -264,6 +264,7 @@ x86_handle_bad_usage(struct icpustate *__restrict state, bad_usage_reason_t usag
 #define EMU86_EMULATE_CONFIG_WANT_WRMSR         0 /* No, but see `EMU86_EMULATE_CONFIG_WANT_WRMSR_EMULATED' below */
 #define EMU86_EMULATE_CONFIG_WANT_RDTSC         (!CONFIG_LIBEMU86_WANT_64BIT) /* Only available on Pentium+ (emulate in 32-bit mode) */
 #define EMU86_EMULATE_CONFIG_WANT_RDTSCP        1 /* Emulate non-standard instructions */
+#define EMU86_EMULATE_CONFIG_WANT_SWAPGS        0
 #define EMU86_EMULATE_CONFIG_WANT_RDRAND        1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_RDSEED        1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_RDPMC         1 /* Emulate non-standard instructions */

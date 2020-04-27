@@ -176,11 +176,24 @@ case EMU86_OPCODE_ENCODE(0x0fae): {
 
 #if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_LFENCE
 		case 5: {
+			/* NP 0F AE E8     LFENCE     Serializes load operations. */
 			if (!EMU86_MODRM_ISREG(modrm.mi_type))
 				goto return_expected_memory_modrm_rmreg;
 #define NEED_return_expected_memory_modrm_rmreg
 #if EMU86_EMULATE_CONFIG_WANT_LFENCE
-			goto do_mfence;
+#ifdef EMU86_EMULATE_LFENCE
+			if unlikely(modrm.mi_rm != 0)
+				goto return_unknown_instruction_rmreg;
+#define NEED_return_unknown_instruction_rmreg
+			if unlikely(op_flags & (EMU86_F_66 | EMU86_F_f2 | EMU86_F_f3))
+				goto return_unexpected_prefix_rmreg;
+#define NEED_return_unexpected_prefix_rmreg
+			EMU86_EMULATE_LFENCE();
+			goto done;
+#else /* EMU86_EMULATE_LFENCE */
+			goto check_mi_rm_and_op_flags_and_do_fencelock;
+#define NEED_check_mi_rm_and_op_flags_and_do_fencelock
+#endif /* !EMU86_EMULATE_LFENCE */
 #else /* EMU86_EMULATE_CONFIG_WANT_LFENCE */
 			goto return_unsupported_instruction_rmreg;
 #define NEED_return_unsupported_instruction_rmreg
@@ -211,7 +224,20 @@ case EMU86_OPCODE_ENCODE(0x0fae): {
 			}
 #if EMU86_EMULATE_CONFIG_WANT_MFENCE
 			else if (EMU86_MODRM_ISREG(modrm.mi_type)) {
-				goto do_mfence;
+				/* NP 0F AE F0     MFENCE     Serializes load and store operations. */
+#ifdef EMU86_EMULATE_MFENCE
+				if unlikely(modrm.mi_rm != 0)
+					goto return_unknown_instruction_rmreg;
+#define NEED_return_unknown_instruction_rmreg
+				if unlikely(op_flags & (EMU86_F_66 | EMU86_F_f2 | EMU86_F_f3))
+					goto return_unexpected_prefix_rmreg;
+#define NEED_return_unexpected_prefix_rmreg
+				EMU86_EMULATE_MFENCE();
+				goto done;
+#else /* EMU86_EMULATE_MFENCE */
+				goto check_mi_rm_and_op_flags_and_do_fencelock;
+#define NEED_check_mi_rm_and_op_flags_and_do_fencelock
+#endif /* !EMU86_EMULATE_MFENCE */
 			}
 #endif /* EMU86_EMULATE_CONFIG_WANT_MFENCE */
 			break;
@@ -250,7 +276,20 @@ case EMU86_OPCODE_ENCODE(0x0fae): {
 			}
 #if EMU86_EMULATE_CONFIG_WANT_SFENCE
 			else {
-				goto do_mfence;
+				/* NP 0F AE F8     SFENCE     Serializes store operations. */
+#ifdef EMU86_EMULATE_SFENCE
+				if unlikely(modrm.mi_rm != 0)
+					goto return_unknown_instruction_rmreg;
+#define NEED_return_unknown_instruction_rmreg
+				if unlikely(op_flags & (EMU86_F_66 | EMU86_F_f2 | EMU86_F_f3))
+					goto return_unexpected_prefix_rmreg;
+#define NEED_return_unexpected_prefix_rmreg
+				EMU86_EMULATE_SFENCE();
+				goto done;
+#else /* EMU86_EMULATE_SFENCE */
+				goto check_mi_rm_and_op_flags_and_do_fencelock;
+#define NEED_check_mi_rm_and_op_flags_and_do_fencelock
+#endif /* !EMU86_EMULATE_SFENCE */
 			}
 #endif /* EMU86_EMULATE_CONFIG_WANT_SFENCE */
 			break;
@@ -259,28 +298,23 @@ case EMU86_OPCODE_ENCODE(0x0fae): {
 		default:
 			break;
 
-#if (EMU86_EMULATE_CONFIG_WANT_LFENCE || \
-     EMU86_EMULATE_CONFIG_WANT_SFENCE || \
-     EMU86_EMULATE_CONFIG_WANT_MFENCE)
-		{
-do_mfence:
-			if (modrm.mi_rm != 0)
+#ifdef NEED_check_mi_rm_and_op_flags_and_do_fencelock
+#undef NEED_check_mi_rm_and_op_flags_and_do_fencelock
+check_mi_rm_and_op_flags_and_do_fencelock:
+			if unlikely(modrm.mi_rm != 0)
 				goto return_unknown_instruction_rmreg;
 #define NEED_return_unknown_instruction_rmreg
-			/* NP 0F AE F8     SFENCE     Serializes store operations. */
+			if unlikely(op_flags & (EMU86_F_66 | EMU86_F_f2 | EMU86_F_f3))
+				goto return_unexpected_prefix_rmreg;
+#define NEED_return_unexpected_prefix_rmreg
 #ifdef EMU86_EMULATE_FENCELOCK
 			EMU86_EMULATE_FENCELOCK();
-#elif defined(__i386__) || defined(__x86_64__)
-			__fencelock();
-#else /* ... */
-			{
-				static int volatile fence_word = 0;
-				__hybrid_atomic_xch(fence_word, 1, __ATOMIC_SEQ_CST);
-			}
-#endif /* !... */
 			goto done;
-		}
-#endif /* ... */
+#else /* EMU86_EMULATE_FENCELOCK */
+			goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
+#endif /* !EMU86_EMULATE_FENCELOCK */
+#endif /* NEED_check_mi_rm_and_op_flags_and_do_fencelock */
 
 		}
 	}

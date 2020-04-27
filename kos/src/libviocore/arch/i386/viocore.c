@@ -1869,10 +1869,10 @@ NOTHROW(CC CS_setregl)(struct vio_emulate_args *__restrict self, u8 regno, u32 v
 
 /* Implementations of the P-mode instructions that
  * must be enabled due to being able to access memory. */
-#define EMU86_EMULATE_SLDT() __sldt()
+#define EMU86_EMULATE_SLDT()              __sldt()
 #define EMU86_EMULATE_LLDT(segment_index) __lldt(segment_index)
-#define EMU86_EMULATE_STR() __str()
-#define EMU86_EMULATE_LTR(segment_index) __ltr(segment_index)
+#define EMU86_EMULATE_STR()               __str()
+#define EMU86_EMULATE_LTR(segment_index)  __ltr(segment_index)
 #define EMU86_EMULATE_VERR(segment_index) __verr(segment_index)
 #define EMU86_EMULATE_VERW(segment_index) __verw(segment_index)
 #define EMU86_EMULATE_SGDT(limit, base)        \

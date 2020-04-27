@@ -359,6 +359,7 @@ DECL_END
 #define EMU86_EMULATE_CONFIG_WANT_RDGSBASE 0 /* ... */
 #define EMU86_EMULATE_CONFIG_WANT_WRFSBASE 0 /* ... */
 #define EMU86_EMULATE_CONFIG_WANT_WRGSBASE 0 /* ... */
+#define EMU86_EMULATE_CONFIG_WANT_SWAPGS   0 /* ... */
 #define EMU86_EMULATE_CONFIG_WANT_MOV_DREG 0 /* We're not emulating debug registers, so disable this instruction! */
 
 /* Actually enable emulation of mov-from-creg, but implement mov-to-creg such

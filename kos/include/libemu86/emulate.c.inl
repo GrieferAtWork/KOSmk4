@@ -501,6 +501,9 @@ __DECL_BEGIN
 #ifndef EMU86_EMULATE_CONFIG_WANT_RDTSCP
 #define EMU86_EMULATE_CONFIG_WANT_RDTSCP (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
 #endif /* !EMU86_EMULATE_CONFIG_WANT_RDTSCP */
+#ifndef EMU86_EMULATE_CONFIG_WANT_SWAPGS
+#define EMU86_EMULATE_CONFIG_WANT_SWAPGS (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_SWAPGS */
 #ifndef EMU86_EMULATE_CONFIG_WANT_RDRAND
 #define EMU86_EMULATE_CONFIG_WANT_RDRAND (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
 #endif /* !EMU86_EMULATE_CONFIG_WANT_RDRAND */
@@ -1294,6 +1297,12 @@ bool EMU86_EMULATE_RDSEED16(u16 &result);                   /* EMU86_EMULATE_CON
 bool EMU86_EMULATE_RDSEED32(u32 &result);                   /* EMU86_EMULATE_CONFIG_WANT_RDSEED */
 bool EMU86_EMULATE_RDSEED64(u64 &result);                   /* EMU86_EMULATE_CONFIG_WANT_RDSEED */
 void EMU86_EMULATE_CLTS(void);                              /* EMU86_EMULATE_CONFIG_WANT_CLTS */
+void EMU86_EMULATE_MCOMMIT(void);                           /* EMU86_EMULATE_CONFIG_WANT_SWAPGS */
+void EMU86_EMULATE_SWAPGS(void);                            /* EMU86_EMULATE_CONFIG_WANT_SWAPGS */
+void EMU86_EMULATE_LFENCE(void);                            /* EMU86_EMULATE_CONFIG_WANT_LFENCE */
+void EMU86_EMULATE_SFENCE(void);                            /* EMU86_EMULATE_CONFIG_WANT_SFENCE */
+void EMU86_EMULATE_MFENCE(void);                            /* EMU86_EMULATE_CONFIG_WANT_MFENCE */
+void EMU86_EMULATE_FENCELOCK(void);                         /* EMU86_EMULATE_CONFIG_WANT_LFENCE || EMU86_EMULATE_CONFIG_WANT_SFENCE || EMU86_EMULATE_CONFIG_WANT_MFENCE */
 #endif
 
 
@@ -1301,11 +1310,14 @@ void EMU86_EMULATE_CLTS(void);                              /* EMU86_EMULATE_CON
 /* Emulate certain (harmless) instructions via native intrinsics
  * NOTE: All of these instructions are emulated within the KOS
  *       kernel when they're not supported by the hosting CPU. */
-#if defined(__KOS__) && (defined(__x86_64__) || defined(__i386__))
+#if defined(__x86_64__) || defined(__i386__)
 #if !defined(EMU86_EMULATE_CONFIG_NO_INTRIN) || !(EMU86_EMULATE_CONFIG_NO_INTRIN + 0)
+#if defined(__KOS__) || defined(__x86_64__)
 #ifndef EMU86_EMULATE_RDTSC
 #define EMU86_EMULATE_RDTSC() __rdtsc()
 #endif /* !EMU86_EMULATE_RDTSC */
+#endif /* __KOS__ || __x86_64__ */
+#ifdef __KOS__
 #ifndef EMU86_EMULATE_RDPID
 #ifdef __KERNEL__ /* Don't rely on the existance of `__rdpid()' when running from kernel-space! */
 #define EMU86_EMULATE_RDPID() __rdmsr(IA32_TSC_AUX)
@@ -1339,8 +1351,22 @@ void EMU86_EMULATE_CLTS(void);                              /* EMU86_EMULATE_CON
 #define EMU86_EMULATE_RDSEED64(result) __rdseedq(&(result))
 #endif /* !EMU86_EMULATE_RDSEED64 */
 #endif /* __x86_64__ */
+#endif /* __KOS__ */
+#ifndef EMU86_EMULATE_FENCELOCK
+#define EMU86_EMULATE_FENCELOCK() __fencelock()
+#endif /* !EMU86_EMULATE_FENCELOCK */
 #endif /* !EMU86_EMULATE_CONFIG_NO_INTRIN */
-#endif /* __KOS__ && (__x86_64__ || __i386__) */
+#endif /* __x86_64__ || __i386__ */
+
+#if !defined(EMU86_EMULATE_CONFIG_NO_INTRIN) || !(EMU86_EMULATE_CONFIG_NO_INTRIN + 0)
+#ifndef EMU86_EMULATE_FENCELOCK
+#define EMU86_EMULATE_FENCELOCK()                             \
+	do {                                                      \
+		static int volatile fence_word = 0;                   \
+		__hybrid_atomic_xch(fence_word, 1, __ATOMIC_SEQ_CST); \
+	} __WHILE0
+#endif /* !EMU86_EMULATE_FENCELOCK */
+#endif /* !EMU86_EMULATE_CONFIG_NO_INTRIN */
 
 
 /* Substitute smsw/lmsw with read/write to/from %cr0 */
@@ -1925,10 +1951,27 @@ void EMU86_EMULATE_CLTS(void);                              /* EMU86_EMULATE_CON
 #define EMU86_GETGSBASE() EMU86_GETSEGBASE(EMU86_R_GS)
 #endif /* !EMU86_GETGSBASE */
 
+
+/* Substitute swapgs with MSR access */
+#if (!defined(EMU86_EMULATE_SWAPGS) &&                               \
+     defined(EMU86_EMULATE_RDMSR) && defined(EMU86_EMULATE_WRMSR) && \
+     defined(EMU86_GETGSBASE) && defined(EMU86_SETGSBASE))
+#define EMU86_EMULATE_SWAPGS()                                          \
+	do {                                                                \
+		EMU86_UREG_TYPE _gsbase, _kernel_gsbase;                        \
+		_gsbase        = (EMU86_UREG_TYPE)(uintptr_t)EMU86_GETGSBASE(); \
+		_kernel_gsbase = EMU86_EMULATE_RDMSR(IA32_KERNEL_GS_BASE);      \
+		EMU86_SETGSBASE(_kernel_gsbase);                                \
+		EMU86_EMULATE_WRMSR(IA32_KERNEL_GS_BASE, _gsbase);              \
+	} __WHILE0
+#endif /* !EMU86_EMULATE_SWAPGS && ... */
+
+
 /* Form a memory address from a segment, and an offset to that segment */
 #ifndef EMU86_SEGADDR
 #define EMU86_SEGADDR(segbase, segoffset) (byte_t *)(uintptr_t)((segbase) + (segoffset))
 #endif /* !EMU86_SEGADDR */
+
 
 /* Get/Set the %es register */
 #ifndef EMU86_GETES
