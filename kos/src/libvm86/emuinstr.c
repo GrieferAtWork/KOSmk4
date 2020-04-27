@@ -375,6 +375,17 @@ DECL_END
 #define EMU86_EMULATE_WRCR2(value) (void)(self->vr_regs.vr_cr2 = (u32)(value))
 #define EMU86_EMULATE_WRCR3(value) (void)(self->vr_regs.vr_cr3 = (u32)(value))
 
+/* The TS-bit of our emulated %cr0 has a fixed value. - As such, `clts'
+ * is either always a no-op, or always causes a #GP as the result of
+ * attempting to set a bit into an unexpected state. */
+#define EMU86_EMULATE_CONFIG_WANT_CLTS 1
+#if (EMU86_EMULATE_RDCR0() & CR0_TS) == 0
+#define EMU86_EMULATE_CLTS() (void)0 /* no-op */
+#else /* (EMU86_EMULATE_RDCR0() & CR0_TS) == 0 */
+#define EMU86_EMULATE_CLTS() return libvm86_intr(self, 0x0d /* #GP */)
+#endif /* (EMU86_EMULATE_RDCR0() & CR0_TS) != 0 */
+
+
 #define EMU86_EMULATE_CONFIG_WANT_RDMSR 0 /* Arbitrary MSR access isn't allowed (but note that certain MSR are still emulated, though) */
 #define EMU86_EMULATE_CONFIG_WANT_WRMSR 0 /* ... */
 

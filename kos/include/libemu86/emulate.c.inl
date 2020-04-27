@@ -260,6 +260,9 @@ __DECL_BEGIN
 #ifndef EMU86_EMULATE_CONFIG_WANT_CWD /* CWD, CDQ, CQO */
 #define EMU86_EMULATE_CONFIG_WANT_CWD (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
 #endif /* !EMU86_EMULATE_CONFIG_WANT_CWD */
+#ifndef EMU86_EMULATE_CONFIG_WANT_CLTS
+#define EMU86_EMULATE_CONFIG_WANT_CLTS (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_CLTS */
 #ifndef EMU86_EMULATE_CONFIG_WANT_SETCC
 #define EMU86_EMULATE_CONFIG_WANT_SETCC (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
 #endif /* !EMU86_EMULATE_CONFIG_WANT_SETCC */
@@ -1289,6 +1292,7 @@ bool EMU86_EMULATE_RDRAND64(u64 &result);                   /* EMU86_EMULATE_CON
 bool EMU86_EMULATE_RDSEED16(u16 &result);                   /* EMU86_EMULATE_CONFIG_WANT_RDSEED */
 bool EMU86_EMULATE_RDSEED32(u32 &result);                   /* EMU86_EMULATE_CONFIG_WANT_RDSEED */
 bool EMU86_EMULATE_RDSEED64(u64 &result);                   /* EMU86_EMULATE_CONFIG_WANT_RDSEED */
+void EMU86_EMULATE_CLTS(void);                              /* EMU86_EMULATE_CONFIG_WANT_CLTS */
 #endif
 
 
@@ -1374,14 +1378,18 @@ bool EMU86_EMULATE_RDSEED64(u64 &result);                   /* EMU86_EMULATE_CON
 #define EMU86_EMULATE_RDTSC() EMU86_EMULATE_RDTSC_INDIRECT()
 #endif /* !EMU86_EMULATE_RDTSC && EMU86_EMULATE_RDTSC_INDIRECT */
 
-
-
 #if (!defined(EMU86_EMULATE_RDTSCP) && \
      (defined(EMU86_EMULATE_RDTSC_INDIRECT) && defined(EMU86_EMULATE_RDPID)))
 #define EMU86_EMULATE_RDTSCP(tsc, tsc_aux)       \
 	((tsc)     = EMU86_EMULATE_RDTSC_INDIRECT(), \
 	 (tsc_aux) = EMU86_EMULATE_RDPID())
 #endif /* !EMU86_EMULATE_RDTSCP && (EMU86_EMULATE_RDTSC_INDIRECT && EMU86_EMULATE_RDPID) */
+
+/* Substitute clts with read/write to/from %cr0 */
+#if !defined(EMU86_EMULATE_CLTS) && defined(EMU86_EMULATE_RDCR0) && defined(EMU86_EMULATE_WRCR0)
+#define EMU86_EMULATE_CLTS() EMU86_EMULATE_WRCR0(EMU86_EMULATE_RDCR0() & ~(CR0_TS))
+#endif /* !EMU86_EMULATE_CLTS && EMU86_EMULATE_RDCR0 && EMU86_EMULATE_WRCR0 */
+
 
 
 /* Get the value of `CR4.UMIP', which when enabled causes the following
@@ -3726,6 +3734,7 @@ checklock_modrm_memory_parsed:
 #include "emu/bswap.c.inl"
 #include "emu/call.c.inl"
 #include "emu/cbw.c.inl"
+#include "emu/clts.c.inl"
 #include "emu/cmovcc.c.inl"
 #include "emu/cmps.c.inl"
 #include "emu/cmpxchg.c.inl"
@@ -3835,7 +3844,6 @@ checklock_modrm_memory_parsed:
 #endif /* __x86_64__ */
 #endif
 
-			/* XXX: clts       (if only for verbose exception messages?) */
 			/* XXX: swapgs     (if only for verbose exception messages?) */
 			/* XXX: rdrand     (if only for verbose exception messages?) */
 			/* XXX: rdseed     (if only for verbose exception messages?) */

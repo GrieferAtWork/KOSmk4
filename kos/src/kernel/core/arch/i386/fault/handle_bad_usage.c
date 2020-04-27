@@ -168,6 +168,7 @@ x86_handle_bad_usage(struct icpustate *__restrict state, bad_usage_reason_t usag
 #define EMU86_EMULATE_CONFIG_WANT_CALL          0
 #define EMU86_EMULATE_CONFIG_WANT_CBW           0
 #define EMU86_EMULATE_CONFIG_WANT_CWD           0
+#define EMU86_EMULATE_CONFIG_WANT_CLTS          0
 #define EMU86_EMULATE_CONFIG_WANT_SETCC         (!CONFIG_LIBEMU86_WANT_64BIT) /* Only available on 486+ (emulate in 32-bit mode) */
 #define EMU86_EMULATE_CONFIG_WANT_CMOVCC        (!CONFIG_LIBEMU86_WANT_64BIT) /* Only available on 486+ (emulate in 32-bit mode) */
 #define EMU86_EMULATE_CONFIG_WANT_CMPS          0
