@@ -33,9 +33,9 @@ case EMU86_OPCODE_ENCODE(0x0fc7):
 		 * REX.W + 0F C7 /1 CMPXCHG16B m128    Compare RDX:RAX with m128. If equal, set ZF and load RCX:RBX
 		 *                                     into m128. Else, clear ZF and load m128 into RDX:RAX. */
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
-#define NEED_return_expected_memory_modrm
 		if (!EMU86_MODRM_ISMEM(modrm.mi_type))
 			goto return_expected_memory_modrm;
+#define NEED_return_expected_memory_modrm
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 #if CONFIG_LIBEMU86_WANT_64BIT
 		if (IS_64BIT()) {
@@ -96,8 +96,8 @@ case EMU86_OPCODE_ENCODE(0x0fc7):
 			}
 #endif /* EMU86_EMULATE_CONFIG_WANT_CMPXCHG16B */
 			EMU86_UNSUPPORTED_MEMACCESS(MODRM_MEMADDR(), 16, true, true);
-#define NEED_return_unsupported_instruction_rmreg
 			goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
 #endif /* !EMU86_EMULATE_CONFIG_WANT_CMPXCHG16B || !EMU86_MEM_ATOMIC_CMPXCHX */
 		} else
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
@@ -174,16 +174,63 @@ case EMU86_OPCODE_ENCODE(0x0fc7):
 			}
 #endif /* EMU86_EMULATE_CONFIG_WANT_CMPXCHG8B */
 			EMU86_UNSUPPORTED_MEMACCESS(MODRM_MEMADDR(), 8, true, true);
-#define NEED_return_unsupported_instruction_rmreg
 			goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
 #endif /* !EMU86_EMULATE_CONFIG_WANT_CMPXCHG8B || !EMU86_MEM_ATOMIC_CMPXCHQ */
 		}
 		break;
 	}
 
-	default:
+
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
+#if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_RDPID
+	case 7: {
+		if (!(op_flags & EMU86_F_f3))
+			goto return_unknown_instruction_rmreg;
 #define NEED_return_unknown_instruction_rmreg
+		if (!EMU86_MODRM_ISREG(modrm.mi_type))
+			goto return_expected_register_modrm;
+#define NEED_return_expected_register_modrm
+
+		/* F3 0F C7 /7 RDPID r32     R     Read IA32_TSC_AUX into r32.
+		 * F3 0F C7 /7 RDPID r64     R     Read IA32_TSC_AUX into r64. */
+#if EMU86_EMULATE_CONFIG_CHECKUSER && 0 /* Intel doesn't document this instruction as checking for permissions... */
+#ifndef EMU86_GETCR4_TSD_IS_ZERO
+		if (EMU86_GETCR4_TSD() && EMU86_ISUSER()) {
+#ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
+			EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV,
+			                                                 X86_REGISTER_MSR,
+			                                                 IA32_TSC_AUX, 0, 0);
+#else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
+			goto return_privileged_instruction;
+#define NEED_return_privileged_instruction
+#endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
+		}
+#endif /* !EMU86_GETCR4_TSD_IS_ZERO */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
+
+#if EMU86_EMULATE_CONFIG_WANT_RDPID && defined(EMU86_EMULATE_RDTSC_AUX)
+		{
+			u32 value = EMU86_EMULATE_RDTSC_AUX();
+			MODRM_SETRMREGL(value);
+		}
+#else /* EMU86_EMULATE_CONFIG_WANT_RDPID && EMU86_EMULATE_RDTSC_AUX */
+#ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
+		EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER_RMREG(E_ILLEGAL_INSTRUCTION_REGISTER_RDINV,
+		                                                       X86_REGISTER_MSR,
+		                                                       IA32_TSC_AUX, 0, 0);
+#else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
+		goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
+#endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
+#endif /* !EMU86_EMULATE_CONFIG_WANT_RDPID || !EMU86_EMULATE_RDTSC_AUX */
+	}
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_RDPID */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
+
+	default:
 		goto return_unknown_instruction_rmreg;
+#define NEED_return_unknown_instruction_rmreg
 	}
 	break;
 

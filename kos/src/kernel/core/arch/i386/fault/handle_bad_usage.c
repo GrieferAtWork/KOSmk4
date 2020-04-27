@@ -256,6 +256,7 @@ x86_handle_bad_usage(struct icpustate *__restrict state, bad_usage_reason_t usag
 #define EMU86_EMULATE_CONFIG_WANT_RDTSC         (!CONFIG_LIBEMU86_WANT_64BIT) /* Only available on Pentium+ (emulate in 32-bit mode) */
 #define EMU86_EMULATE_CONFIG_WANT_RDTSCP        1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_RDPMC         1 /* Emulate non-standard instructions */
+#define EMU86_EMULATE_CONFIG_WANT_RDPID         1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_NOP_RM        1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_PEXT          1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_PDEP          1 /* Emulate non-standard instructions */

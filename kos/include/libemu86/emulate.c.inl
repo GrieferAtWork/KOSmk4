@@ -495,6 +495,9 @@ __DECL_BEGIN
 #ifndef EMU86_EMULATE_CONFIG_WANT_RDPMC
 #define EMU86_EMULATE_CONFIG_WANT_RDPMC (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
 #endif /* !EMU86_EMULATE_CONFIG_WANT_RDPMC */
+#ifndef EMU86_EMULATE_CONFIG_WANT_RDPID
+#define EMU86_EMULATE_CONFIG_WANT_RDPID (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_RDPID */
 #ifndef EMU86_EMULATE_CONFIG_WANT_RDTSCP
 #define EMU86_EMULATE_CONFIG_WANT_RDTSCP (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
 #endif /* !EMU86_EMULATE_CONFIG_WANT_RDTSCP */
@@ -3817,7 +3820,6 @@ checklock_modrm_memory_parsed:
 			/* XXX: tpause     (if only for verbose exception messages?) */
 			/* XXX: ldmxcsr    (Can throw a #GPF when attempting to set a reserved bit) */
 
-			/* TODO: Emulate rdpid */
 			/* TODO: Emulate crc32 */
 			/* TODO: Emulate mcommit */
 			/* TODO: Emulate clzero (as a no-op) */
