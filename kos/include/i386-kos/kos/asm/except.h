@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb0697eb5 */
+/* HASH CRC-32:0x94d9e8a0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -230,10 +230,26 @@
  * 	@@Opcode flags (set of `EMU86_F_*')
  * 	member op_flags: uintptr_t;
  * 	@@For what reason was the operand invalid (One of `E_ILLEGAL_INSTRUCTION_BAD_OPERAND_*')
- * 	member what: uintptr_t; */
+ * 	member what: uintptr_t;
+ * 	@@The accessed register index
+ * 	@@NOTE: When set to `X86_REGISTER_MSR', then the next 3
+ * 	@@      pointers are index(%ecx), loval(%eax), hival(%edx)
+ * 	member regno: uintptr_t;
+ * 	@@An offset applied to the register (set in case of an illegal lcall/ljmp; 0 otherwise)
+ * 	@@In case an MSR register was accessed, this is the MSR index
+ * 	member offset: uintptr_t;
+ * 	@@The associated register value
+ * 	member regval: uintptr_t;
+ * 	@@The associated register value (high 32 bits in case of an MSR write)
+ * 	member regval2: uintptr_t;
+ */
 #define E_ILLEGAL_INSTRUCTION_BAD_OPERAND (E_ILLEGAL_INSTRUCTION,0x0010)
-/* Invalid addressing mode used with the instruction */
-#define E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE 0x0001
+/* Unexpectedly, the instruction has a memory operand (the memory operand's address is stored in `offset') */
+#define E_ILLEGAL_INSTRUCTION_BAD_OPERAND_UNEXPECTED_MEMORY 0x0001
+/* Unexpectedly, the instruction has a register operand (register and its value is stored in `regno' and `regval') */
+#define E_ILLEGAL_INSTRUCTION_BAD_OPERAND_UNEXPECTED_REGISTER 0x0002
+/* A register operand has a bad value */
+#define E_ILLEGAL_INSTRUCTION_BAD_OPERAND_VALUE 0x0003
 /* Attempted to access an invalid register `regno' (one of `<ARCH>_REGISTER_*')
  * 	@@The opcode that caused the exception
  * 	@@NOTE: This field should be decoded using `E_ILLEGAL_INSTRUCTION_X86_OPCODE_*'

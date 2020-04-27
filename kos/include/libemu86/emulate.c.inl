@@ -435,6 +435,9 @@ __DECL_BEGIN
 #ifndef EMU86_EMULATE_CONFIG_WANT_MFENCE
 #define EMU86_EMULATE_CONFIG_WANT_MFENCE (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
 #endif /* !EMU86_EMULATE_CONFIG_WANT_MFENCE */
+#ifndef EMU86_EMULATE_CONFIG_WANT_TPAUSE
+#define EMU86_EMULATE_CONFIG_WANT_TPAUSE (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_TPAUSE */
 #ifndef EMU86_EMULATE_CONFIG_WANT_MOV_RM
 #define EMU86_EMULATE_CONFIG_WANT_MOV_RM (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
 #endif /* !EMU86_EMULATE_CONFIG_WANT_MOV_RM */
@@ -944,28 +947,70 @@ __DECL_BEGIN
 #endif /* EMU86_EMULATE_RETURN_AFTER_INT */
 
 
-/* Return in the event of an unrecognized instruction.
- * HINT: Additionally, you may use the following expressions:
- *     - REAL_START_IP()  Evaluates to the starting IP of the faulting
- *                        instruction (i.e. the fault address)
- *     - op_flags         Set of `EMU86_F_*'
- *     - EMU86_OPCODE()   The absolute opcode of the faulting instruction
- *     - modrm            The decoded modr/m suffix (only for *_RMREG handlers) */
-#ifndef EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION
-#define _EMU86_GETOPCODE()        EMU86_OPCODE()
+
+/* Helper macros for defining error handling macros */
+#if CONFIG_LIBEMU86_WANT_64BIT && CONFIG_LIBEMU86_WANT_32BIT && CONFIG_LIBEMU86_WANT_16BIT
+#define _EMU86_GETMODRM_REGNOSIZE()   (EMU86_F_IS64(op_flags) ? X86_REGISTER_SIZEMASK_8BYTE : EMU86_F_IS32(op_flags) ? X86_REGISTER_SIZEMASK_4BYTE : X86_REGISTER_SIZEMASK_2BYTE)
+#define _EMU86_GETMODRM_RM_GPREGVAL() (EMU86_F_IS64(op_flags) ? MODRM_GETRMREGQ() : EMU86_F_IS32(op_flags) ? (u64)MODRM_GETRMREGL() : (u64)MODRM_GETRMREGW())
+#elif CONFIG_LIBEMU86_WANT_64BIT && CONFIG_LIBEMU86_WANT_32BIT
+#define _EMU86_GETMODRM_REGNOSIZE()   (EMU86_F_IS64(op_flags) ? X86_REGISTER_SIZEMASK_8BYTE : X86_REGISTER_SIZEMASK_4BYTE)
+#define _EMU86_GETMODRM_RM_GPREGVAL() (EMU86_F_IS64(op_flags) ? MODRM_GETRMREGQ() : (u64)MODRM_GETRMREGL())
+#elif CONFIG_LIBEMU86_WANT_64BIT && CONFIG_LIBEMU86_WANT_16BIT
+#define _EMU86_GETMODRM_REGNOSIZE()   (EMU86_F_IS64(op_flags) ? X86_REGISTER_SIZEMASK_8BYTE : X86_REGISTER_SIZEMASK_2BYTE)
+#define _EMU86_GETMODRM_RM_GPREGVAL() (EMU86_F_IS64(op_flags) ? MODRM_GETRMREGQ() : (u64)MODRM_GETRMREGW())
+#elif CONFIG_LIBEMU86_WANT_32BIT && CONFIG_LIBEMU86_WANT_16BIT
+#define _EMU86_GETMODRM_REGNOSIZE()   (EMU86_F_IS32(op_flags) ? X86_REGISTER_SIZEMASK_4BYTE : X86_REGISTER_SIZEMASK_2BYTE)
+#define _EMU86_GETMODRM_RM_GPREGVAL() (EMU86_F_IS32(op_flags) ? MODRM_GETRMREGL() : (u32)MODRM_GETRMREGW())
+#elif CONFIG_LIBEMU86_WANT_64BIT
+#define _EMU86_GETMODRM_REGNOSIZE()   X86_REGISTER_SIZEMASK_8BYTE
+#define _EMU86_GETMODRM_RM_GPREGVAL() MODRM_GETRMREGQ()
+#elif CONFIG_LIBEMU86_WANT_32BIT
+#define _EMU86_GETMODRM_REGNOSIZE()   X86_REGISTER_SIZEMASK_4BYTE
+#define _EMU86_GETMODRM_RM_GPREGVAL() MODRM_GETRMREGL()
+#elif CONFIG_LIBEMU86_WANT_16BIT
+#define _EMU86_GETMODRM_REGNOSIZE()   X86_REGISTER_SIZEMASK_2BYTE
+#define _EMU86_GETMODRM_RM_GPREGVAL() MODRM_GETRMREGW()
+#else /* ... */
+#error "Invalid configuration"
+#endif /* !... */
+
+/* Returns the name of a general-purpose register described by `MODRM.RM' */
+#define _EMU86_GETMODRM_RM_GPREGNO() (_EMU86_GETMODRM_REGNOSIZE() | X86_REGISTER_GENERAL_PURPOSE | modrm.mi_rm)
+
+/* Returns the memory address pointed to by a general-purpose register described by `MODRM.RM' */
+#define _EMU86_GETMODRM_RM_MEMADDR() ((uintptr_t)MODRM_MEMADDR())
+
+/* Returns the opcode for the current instruction */
+#define _EMU86_GETOPCODE() EMU86_OPCODE()
+
+/* Returns the opcode for the current instruction, while also taking `MODRM.REG' into account */
 #ifdef E_ILLEGAL_INSTRUCTION_X86_OPCODE
 #define _EMU86_GETOPCODE_RMREG()  E_ILLEGAL_INSTRUCTION_X86_OPCODE(EMU86_OPCODE(), modrm.mi_reg)
 #else /* E_ILLEGAL_INSTRUCTION_X86_OPCODE */
 #define _EMU86_GETOPCODE_RMREG()  EMU86_OPCODE()
 #endif /* !E_ILLEGAL_INSTRUCTION_X86_OPCODE */
+
+/* Return in the event of an unrecognized instruction.
+ * HINT: Additionally, you may use the following expressions:
+ *     - REAL_START_IP()               Evaluates to the starting IP of the faulting
+ *                                     instruction (i.e. the fault address)
+ *     - op_flags                      Set of `EMU86_F_*'
+ *     - _EMU86_GETOPCODE()            The absolute opcode of the faulting instruction
+ *     - _EMU86_GETOPCODE_RMREG()      The absolute opcode of the faulting instruction (with accounting for `MODRM.REG')
+ *     - modrm                         The decoded modr/m suffix (only for *_RMREG handlers)
+ *     - _EMU86_GETMODRM_REGNOSIZE()   The size addend for `_EMU86_GETMODRM_RM_GPREGNO()' (one of `X86_REGISTER_SIZEMASK_(2|4|8)BYTE')
+ *     - _EMU86_GETMODRM_RM_GPREGNO()  The name of the GP register pointed to by MODRM.RM (one of `X86_REGISTER_*')
+ *     - _EMU86_GETMODRM_RM_GPREGVAL() The value of the exec-mode-sized GP register pointed to by MODRM.RM
+ */
+#ifndef EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION
 #define EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION()           THROW(E_ILLEGAL_INSTRUCTION_BAD_OPCODE, _EMU86_GETOPCODE(), op_flags)
 #define EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION_RMREG()     THROW(E_ILLEGAL_INSTRUCTION_BAD_OPCODE, _EMU86_GETOPCODE_RMREG(), op_flags)
 #define EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION()        THROW(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE, _EMU86_GETOPCODE(), op_flags)
 #define EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION_RMREG()  THROW(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE, _EMU86_GETOPCODE_RMREG(), op_flags)
-#define EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM()         THROW(E_ILLEGAL_INSTRUCTION_BAD_OPERAND, _EMU86_GETOPCODE(), op_flags, E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE)
-#define EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM_RMREG()   THROW(E_ILLEGAL_INSTRUCTION_BAD_OPERAND, _EMU86_GETOPCODE_RMREG(), op_flags, E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE)
-#define EMU86_EMULATE_RETURN_EXPECTED_REGISTER_MODRM()       THROW(E_ILLEGAL_INSTRUCTION_BAD_OPERAND, _EMU86_GETOPCODE(), op_flags, E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE)
-#define EMU86_EMULATE_RETURN_EXPECTED_REGISTER_MODRM_RMREG() THROW(E_ILLEGAL_INSTRUCTION_BAD_OPERAND, _EMU86_GETOPCODE_RMREG(), op_flags, E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE)
+#define EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM()         THROW(E_ILLEGAL_INSTRUCTION_BAD_OPERAND, _EMU86_GETOPCODE(), op_flags, E_ILLEGAL_INSTRUCTION_BAD_OPERAND_UNEXPECTED_REGISTER, _EMU86_GETMODRM_RM_GPREGNO(), 0, _EMU86_GETMODRM_RM_GPREGVAL())
+#define EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM_RMREG()   THROW(E_ILLEGAL_INSTRUCTION_BAD_OPERAND, _EMU86_GETOPCODE_RMREG(), op_flags, E_ILLEGAL_INSTRUCTION_BAD_OPERAND_UNEXPECTED_REGISTER, _EMU86_GETMODRM_RM_GPREGNO(), 0, _EMU86_GETMODRM_RM_GPREGVAL())
+#define EMU86_EMULATE_RETURN_EXPECTED_REGISTER_MODRM()       THROW(E_ILLEGAL_INSTRUCTION_BAD_OPERAND, _EMU86_GETOPCODE(), op_flags, E_ILLEGAL_INSTRUCTION_BAD_OPERAND_UNEXPECTED_MEMORY, 0, _EMU86_GETMODRM_RM_MEMADDR())
+#define EMU86_EMULATE_RETURN_EXPECTED_REGISTER_MODRM_RMREG() THROW(E_ILLEGAL_INSTRUCTION_BAD_OPERAND, _EMU86_GETOPCODE_RMREG(), op_flags, E_ILLEGAL_INSTRUCTION_BAD_OPERAND_UNEXPECTED_MEMORY, 0, _EMU86_GETMODRM_RM_MEMADDR())
 #ifdef E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX
 #define EMU86_EMULATE_RETURN_UNEXPECTED_PREFIX()       THROW(E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX, _EMU86_GETOPCODE(), op_flags)
 #define EMU86_EMULATE_RETURN_UNEXPECTED_PREFIX_RMREG() THROW(E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX, _EMU86_GETOPCODE_RMREG(), op_flags)
@@ -1303,6 +1348,7 @@ void EMU86_EMULATE_LFENCE(void);                            /* EMU86_EMULATE_CON
 void EMU86_EMULATE_SFENCE(void);                            /* EMU86_EMULATE_CONFIG_WANT_SFENCE */
 void EMU86_EMULATE_MFENCE(void);                            /* EMU86_EMULATE_CONFIG_WANT_MFENCE */
 void EMU86_EMULATE_FENCELOCK(void);                         /* EMU86_EMULATE_CONFIG_WANT_LFENCE || EMU86_EMULATE_CONFIG_WANT_SFENCE || EMU86_EMULATE_CONFIG_WANT_MFENCE */
+bool EMU86_EMULATE_TPAUSE(bool want_c01, u64 tsc_deadline); /* EMU86_EMULATE_CONFIG_WANT_TPAUSE */
 #endif
 
 
@@ -3888,15 +3934,24 @@ checklock_modrm_memory_parsed:
 #endif /* __x86_64__ */
 #endif
 
-			/* XXX: swapgs     (if only for verbose exception messages?) */
-			/* XXX: rdrand     (if only for verbose exception messages?) */
-			/* XXX: rdseed     (if only for verbose exception messages?) */
 			/* XXX: invpcid    (if only for verbose exception messages?) */
 			/* XXX: tpause     (if only for verbose exception messages?) */
+			/* XXX: xrstor     (if only for verbose exception messages?) */
+			/* XXX: xrstor64   (if only for verbose exception messages?) */
+			/* XXX: fxrstor    (if only for verbose exception messages?) */
+			/* XXX: fxrstor64  (if only for verbose exception messages?) */
+			/* XXX: xsave      (if only for verbose exception messages?) */
+			/* XXX: xsave64    (if only for verbose exception messages?) */
+			/* XXX: fxsave     (if only for verbose exception messages?) */
+			/* XXX: fxsave64   (if only for verbose exception messages?) */
 			/* XXX: ldmxcsr    (Can throw a #GPF when attempting to set a reserved bit) */
+			/* XXX: vldmxcsr   (if only for verbose exception messages?) */
+			/* XXX: vstmxcsr   (if only for verbose exception messages?) */
+			/* XXX: stmxcsr    (if only for verbose exception messages?) */
+			/* XXX: xsaveopt   (if only for verbose exception messages?) */
+			/* XXX: xsaveopt64 (if only for verbose exception messages?) */
 
 			/* TODO: Emulate crc32 */
-			/* TODO: Emulate mcommit */
 			/* TODO: Emulate clzero (as a no-op) */
 
 //???:	I(0x1a, IF_X32|IF_F2|IF_MODRM, "bndcu\t" OP_RM32 OP_RBND),

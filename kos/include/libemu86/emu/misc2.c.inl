@@ -32,7 +32,7 @@ EMU86_INTELLISENSE_BEGIN(misc2) {
       (CONFIG_LIBEMU86_WANT_64BIT || EMU86_EMULATE_CONFIG_FSGSBASE_32BIT)) ||       \
      (EMU86_EMULATE_CONFIG_WANT_CLWB || EMU86_EMULATE_CONFIG_WANT_CLFLUSH ||        \
       EMU86_EMULATE_CONFIG_WANT_LFENCE || EMU86_EMULATE_CONFIG_WANT_SFENCE ||       \
-      EMU86_EMULATE_CONFIG_WANT_MFENCE))
+      EMU86_EMULATE_CONFIG_WANT_MFENCE || EMU86_EMULATE_CONFIG_WANT_TPAUSE))
 
 case EMU86_OPCODE_ENCODE(0x0fae): {
 	MODRM_DECODE();
@@ -158,22 +158,6 @@ case EMU86_OPCODE_ENCODE(0x0fae): {
 	} else {
 		switch (modrm.mi_reg) {
 
-//TODO:	I(0xae, IF_MODRM|IF_RMM|IF_REG0,               "fxsave\t" OP_MEM),
-//TODO:	I(0xae, IF_MODRM|IF_REXW|IF_RMM|IF_REG0,       "fxsave64\t" OP_MEM),
-//TODO:	I(0xae, IF_MODRM|IF_RMM|IF_REG1,               "fxrstor\t" OP_MEM),
-//TODO:	I(0xae, IF_MODRM|IF_REXW|IF_RMM|IF_REG1,       "fxrstor64\t" OP_MEM),
-//TODO:	I(0xae, IF_VEX|IF_MODRM|IF_RMM|IF_REG2, OP_VEX_B0(0,1,0,0) "vldmxcsr\t" OP_MEM),
-//TODO:	I(0xae, IF_MODRM|IF_RMM|IF_REG2,               "ldmxcsr\t" OP_MEM),
-//TODO:	I(0xae, IF_VEX|IF_MODRM|IF_RMM|IF_REG3, OP_VEX_B0(0,1,0,0) "vstmxcsr\t" OP_MEM),
-//TODO:	I(0xae, IF_MODRM|IF_RMM|IF_REG3,               "stmxcsr\t" OP_MEM),
-//TODO:	I(0xae, IF_MODRM|IF_RMM|IF_REG4,               "xsave\t" OP_MEM),
-//TODO:	I(0xae, IF_MODRM|IF_REXW|IF_RMM|IF_REG4,       "xsave64\t" OP_MEM),
-//TODO:	I(0xae, IF_MODRM|IF_RMM|IF_REG5,               "xrstor\t" OP_MEM),
-//TODO:	I(0xae, IF_MODRM|IF_REXW|IF_RMM|IF_REG5,       "xrstor64\t" OP_MEM),
-//TODO:	I(0xae, IF_MODRM|IF_RMM|IF_REG6,               "xsaveopt\t" OP_MEM),
-//TODO:	I(0xae, IF_MODRM|IF_REXW|IF_RMM|IF_REG6,       "xsaveopt64\t" OP_MEM),
-
-
 #if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_LFENCE
 		case 5: {
 			/* NP 0F AE E8     LFENCE     Serializes load operations. */
@@ -202,23 +186,64 @@ case EMU86_OPCODE_ENCODE(0x0fae): {
 #endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_LFENCE */
 
 
-#if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_CLWB || EMU86_EMULATE_CONFIG_WANT_MFENCE
+
+#if (EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_CLWB || \
+     EMU86_EMULATE_CONFIG_WANT_MFENCE || EMU86_EMULATE_CONFIG_WANT_TPAUSE)
 		case 6:
-			/* 66 0F AE /6     CLWB m8     Writes back modified cache line containing m8, and may
-			 *                             retain the line in cache hierarchy in non-modified state. */
 			if (op_flags & EMU86_F_66) {
 				if (!EMU86_MODRM_ISMEM(modrm.mi_type)) {
-					/* TODO: 66 0F AE /6     TPAUSE r32, <edx>, <eax> */
+#if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_TPAUSE
+					/* 66 0F AE /6     TPAUSE r32, <edx>, <eax> */
+#if EMU86_EMULATE_CONFIG_CHECKUSER
+#ifndef EMU86_GETCR4_TSD_IS_ZERO
+					if (EMU86_GETCR4_TSD() && EMU86_ISUSER()) {
+						goto return_privileged_instruction_rmreg;
+#define NEED_return_privileged_instruction_rmreg
+					}
+#endif /* !EMU86_GETCR4_TSD_IS_ZERO */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
+#if EMU86_EMULATE_CONFIG_CHECKERROR || (EMU86_EMULATE_CONFIG_WANT_TPAUSE && defined(EMU86_EMULATE_TPAUSE))
+					{
+						u32 mode;
+						mode = MODRM_GETRMREGL();
+						if ((mode & ~1) != 0) {
+
+						}
+#if EMU86_EMULATE_CONFIG_WANT_TPAUSE && defined(EMU86_EMULATE_TPAUSE)
+						{
+							bool ok;
+							ok = EMU86_EMULATE_TPAUSE((mode & 1) != 0,
+							                          (u64)(EMU86_GETEAX()) |
+							                          (u64)(EMU86_GETEDX() << 32));
+							EMU86_MSKFLAGS(~(EFLAGS_AF | EFLAGS_PF | EFLAGS_SF | EFLAGS_ZF | EFLAGS_OF),
+							               ok ? EFLAGS_CF : 0);
+							goto done;
+						}
+#else /* EMU86_EMULATE_CONFIG_WANT_TPAUSE && EMU86_EMULATE_TPAUSE */
+						goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
+#endif /* !EMU86_EMULATE_CONFIG_WANT_TPAUSE || !EMU86_EMULATE_TPAUSE */
+					}
+#else /* EMU86_EMULATE_CONFIG_CHECKERROR || (EMU86_EMULATE_CONFIG_WANT_TPAUSE && EMU86_EMULATE_TPAUSE) */
+					goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
+#endif /* !EMU86_EMULATE_CONFIG_CHECKERROR && (!EMU86_EMULATE_CONFIG_WANT_TPAUSE || !EMU86_EMULATE_TPAUSE) */
+#else /* EMU86_EMULATE_CONFIG_WANT_TPAUSE */
 					goto return_expected_memory_modrm_rmreg;
-				}
 #define NEED_return_expected_memory_modrm_rmreg
+#endif /* !EMU86_EMULATE_CONFIG_WANT_TPAUSE */
+				}
+
+
+				/* 66 0F AE /6     CLWB m8     Writes back modified cache line containing m8, and may
+				 *                             retain the line in cache hierarchy in non-modified state. */
 #if EMU86_EMULATE_CONFIG_WANT_CLWB
 #ifdef EMU86_EMULATE_CLWB
 				EMU86_EMULATE_CLWB(MODRM_MEMADDR());
 #endif /* EMU86_EMULATE_CLWB */
 				goto done;
 #else /* EMU86_EMULATE_CONFIG_WANT_CLWB */
-			goto return_unsupported_instruction_rmreg;
+				goto return_unsupported_instruction_rmreg;
 #define NEED_return_unsupported_instruction_rmreg
 #endif /* !EMU86_EMULATE_CONFIG_WANT_CLWB */
 			}
@@ -241,7 +266,8 @@ case EMU86_OPCODE_ENCODE(0x0fae): {
 			}
 #endif /* EMU86_EMULATE_CONFIG_WANT_MFENCE */
 			break;
-#endif /* EMU86_EMULATE_CONFIG_WANT_CLWB || EMU86_EMULATE_CONFIG_WANT_MFENCE */
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_(CLWB|MFENCE|TPAUSE) */
+
 
 
 #if (EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_CLFLUSHOPT || \

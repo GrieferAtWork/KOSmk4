@@ -244,6 +244,7 @@ x86_handle_bad_usage(struct icpustate *__restrict state, bad_usage_reason_t usag
 #define EMU86_EMULATE_CONFIG_WANT_LFENCE        1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_SFENCE        1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_MFENCE        1 /* Emulate non-standard instructions */
+#define EMU86_EMULATE_CONFIG_WANT_TPAUSE        0
 #define EMU86_EMULATE_CONFIG_WANT_MOV_RM        0
 #define EMU86_EMULATE_CONFIG_WANT_MOVBE         1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_MOV_CREG      0
@@ -407,9 +408,9 @@ NOTHROW(FCALL unwind)(struct icpustate *__restrict self) {
 
 #define EMU86_EMULATE_TRY_SWITCH \
 	TRY
-#define EMU86_EMULATE_EXCEPT_SWITCH                               \
-	EXCEPT {                                                      \
-		complete_except_switch(_state, EMU86_OPCODE(), op_flags); \
+#define EMU86_EMULATE_EXCEPT_SWITCH                                   \
+	EXCEPT {                                                          \
+		complete_except_switch(_state, _EMU86_GETOPCODE(), op_flags); \
 	}
 
 /* Fill in missing exception pointer. */
@@ -635,16 +636,14 @@ throw_unsupported_instruction(struct icpustate *__restrict state,
 	}
 }
 
-#define _EMU86_GETOPCODE()        EMU86_OPCODE()
-#define _EMU86_GETOPCODE_RMREG()  E_ILLEGAL_INSTRUCTION_X86_OPCODE(EMU86_OPCODE(), modrm.mi_reg)
 #define EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION()           throw_generic_unknown_instruction(_state, usage, _EMU86_GETOPCODE(), op_flags, 0xff)
 #define EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION_RMREG()     throw_generic_unknown_instruction(_state, usage, _EMU86_GETOPCODE_RMREG(), op_flags, EMU86_MODRM_ISMEM(modrm.mi_type) ? modrm.mi_rm : 0xff)
 #define EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION()        throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE), _EMU86_GETOPCODE(), op_flags, 0, 0, 0, 0, 0)
 #define EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION_RMREG()  throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE), _EMU86_GETOPCODE_RMREG(), op_flags, 0, 0, 0, 0, 0)
-#define EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM()         throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE(), op_flags, E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE, 0, 0, 0, 0)
-#define EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM_RMREG()   throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE_RMREG(), op_flags, E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE, 0, 0, 0, 0)
-#define EMU86_EMULATE_RETURN_EXPECTED_REGISTER_MODRM()       throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE(), op_flags, E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE, 0, 0, 0, 0)
-#define EMU86_EMULATE_RETURN_EXPECTED_REGISTER_MODRM_RMREG() throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE_RMREG(), op_flags, E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE, 0, 0, 0, 0)
+#define EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM()         throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE(), op_flags, E_ILLEGAL_INSTRUCTION_BAD_OPERAND_UNEXPECTED_REGISTER, _EMU86_GETMODRM_RM_GPREGNO(), 0, _EMU86_GETMODRM_RM_GPREGVAL(), 0)
+#define EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM_RMREG()   throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE_RMREG(), op_flags, E_ILLEGAL_INSTRUCTION_BAD_OPERAND_UNEXPECTED_REGISTER, _EMU86_GETMODRM_RM_GPREGNO(), 0, _EMU86_GETMODRM_RM_GPREGVAL(), 0)
+#define EMU86_EMULATE_RETURN_EXPECTED_REGISTER_MODRM()       throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE(), op_flags, E_ILLEGAL_INSTRUCTION_BAD_OPERAND_UNEXPECTED_MEMORY, 0, _EMU86_GETMODRM_RM_MEMADDR(), 0, 0)
+#define EMU86_EMULATE_RETURN_EXPECTED_REGISTER_MODRM_RMREG() throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE_RMREG(), op_flags, E_ILLEGAL_INSTRUCTION_BAD_OPERAND_UNEXPECTED_MEMORY, 0, _EMU86_GETMODRM_RM_MEMADDR(), 0, 0)
 #define EMU86_EMULATE_RETURN_UNEXPECTED_PREFIX()             throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX), _EMU86_GETOPCODE(), op_flags, 0, 0, 0, 0, 0)
 #define EMU86_EMULATE_RETURN_UNEXPECTED_PREFIX_RMREG()       throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX), _EMU86_GETOPCODE_RMREG(), op_flags, 0, 0, 0, 0, 0)
 #define EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION()       throw_unsupported_instruction(_state, usage, _EMU86_GETOPCODE(), op_flags)

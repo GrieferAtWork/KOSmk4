@@ -138,15 +138,32 @@ class E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE: E_ILLEGAL_INSTRUCTION = 0x0003 {
 [message("Invalid instruction operand")]
 @@An operand of the instruction is invalid
 class E_ILLEGAL_INSTRUCTION_BAD_OPERAND: E_ILLEGAL_INSTRUCTION = 0x0010 {
+
 	@@The opcode that caused the exception
 	member opcode: uintptr_t;
+
 	@@For what reason was the operand invalid (One of `E_ILLEGAL_INSTRUCTION_BAD_OPERAND_*')
 	[tostr(select("E_ILLEGAL_INSTRUCTION_BAD_OPERAND_*"))]
 	member what: uintptr_t;
+
+	@@The accessed register index
+	member regno: uintptr_t;
+
+	@@An offset applied to the register
+	member offset: uintptr_t;
+
+	@@The associated register value
+	member regval: uintptr_t;
 }
 
-@@Invalid addressing mode used with the instruction
-const E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE = 0x0001;
+@@Unexpectedly, the instruction has a memory operand (the memory operand's address is stored in `offset')
+const E_ILLEGAL_INSTRUCTION_BAD_OPERAND_UNEXPECTED_MEMORY = 0x0001;
+
+@@Unexpectedly, the instruction has a register operand (register and its value is stored in `regno' and `regval')
+const E_ILLEGAL_INSTRUCTION_BAD_OPERAND_UNEXPECTED_REGISTER = 0x0002;
+
+@@A register operand has a bad value
+const E_ILLEGAL_INSTRUCTION_BAD_OPERAND_VALUE = 0x0003;
 
 [message("Invalid register")]
 @@Attempted to access an invalid register `regno' (one of `<ARCH>_REGISTER_*')

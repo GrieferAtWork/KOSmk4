@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xddf58d46 */
+/* HASH CRC-32:0x6b75ff21 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -101,10 +101,20 @@
  * 	@@The opcode that caused the exception
  * 	member opcode: uintptr_t;
  * 	@@For what reason was the operand invalid (One of `E_ILLEGAL_INSTRUCTION_BAD_OPERAND_*')
- * 	member what: uintptr_t; */
+ * 	member what: uintptr_t;
+ * 	@@The accessed register index
+ * 	member regno: uintptr_t;
+ * 	@@An offset applied to the register
+ * 	member offset: uintptr_t;
+ * 	@@The associated register value
+ * 	member regval: uintptr_t; */
 #define E_ILLEGAL_INSTRUCTION_BAD_OPERAND (E_ILLEGAL_INSTRUCTION,0x0010)
-/* Invalid addressing mode used with the instruction */
-#define E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE 0x0001
+/* Unexpectedly, the instruction has a memory operand (the memory operand's address is stored in `offset') */
+#define E_ILLEGAL_INSTRUCTION_BAD_OPERAND_UNEXPECTED_MEMORY 0x0001
+/* Unexpectedly, the instruction has a register operand (register and its value is stored in `regno' and `regval') */
+#define E_ILLEGAL_INSTRUCTION_BAD_OPERAND_UNEXPECTED_REGISTER 0x0002
+/* A register operand has a bad value */
+#define E_ILLEGAL_INSTRUCTION_BAD_OPERAND_VALUE 0x0003
 /* Attempted to access an invalid register `regno' (one of `<ARCH>_REGISTER_*')
  * 	@@The opcode that caused the exception
  * 	member opcode: uintptr_t;
