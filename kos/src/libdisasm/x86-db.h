@@ -561,6 +561,8 @@ PRIVATE struct instruction const ops[] = {
 	I(0x0e, IF_66,           "pushw\t" OP_CS),
 	I(0x0e, 0,               "pushl\t" OP_CS),
 
+	/* 0x0f: 2-byte instruction prefix */
+
 	I(0x10, IF_MODRM,        "adcb\t" OP_R8   OP_RM8),
 	I(0x11, IF_66|IF_MODRM,  "adcw\t" OP_R16  OP_RM16),
 	I(0x11, IF_MODRM,        "adcl\t" OP_R32  OP_RM32),
@@ -3024,13 +3026,13 @@ PRIVATE struct instruction const ops_0f[] = {
 	I(0xa3, IF_MODRM,         "btl\t" OP_R32 OP_RM32),
 	I(0xa3, IF_MODRM|IF_REXW, "btq\t" OP_R64 OP_RM64),
 
-	I(0xa4, IF_66|IF_MODRM,   "shldw\t" OP_RM16 OP_R16 OP_U8),
-	I(0xa4, IF_MODRM,         "shldl\t" OP_RM32 OP_R32 OP_U8),
-	I(0xa4, IF_MODRM|IF_REXW, "shldq\t" OP_RM64 OP_R64 OP_U8),
+	I(0xa4, IF_66|IF_MODRM,   "shldw\t" OP_U8 OP_R16 OP_RM16),
+	I(0xa4, IF_MODRM,         "shldl\t" OP_U8 OP_R32 OP_RM32),
+	I(0xa4, IF_MODRM|IF_REXW, "shldq\t" OP_U8 OP_R64 OP_RM64),
 
-	I(0xa5, IF_66|IF_MODRM,   "shldw\t" OP_RM16 OP_R16 OP_CL),
-	I(0xa5, IF_MODRM,         "shldl\t" OP_RM32 OP_R32 OP_CL),
-	I(0xa5, IF_MODRM|IF_REXW, "shldq\t" OP_RM64 OP_R64 OP_CL),
+	I(0xa5, IF_66|IF_MODRM,   "shldw\t" OP_CL OP_R16 OP_RM16),
+	I(0xa5, IF_MODRM,         "shldl\t" OP_CL OP_R32 OP_RM32),
+	I(0xa5, IF_MODRM|IF_REXW, "shldq\t" OP_CL OP_R64 OP_RM64),
 
 	/* source: https://sandpile.org/x86/opc_2.htm */
 	I(0xa6, IF_F3|IF_BYTE2, "\xc0" "montmul"), /* 0xc0: [mod=3,reg=0,rm=0] */
@@ -3059,13 +3061,13 @@ PRIVATE struct instruction const ops_0f[] = {
 	I(0xab, IF_MODRM,         "btsl\t" OP_R16 OP_RM16),
 	I(0xab, IF_MODRM|IF_REXW, "btsq\t" OP_R32 OP_RM32),
 
-	I(0xac, IF_66|IF_MODRM,   "shrdw\t" OP_RM16 OP_R16 OP_U8),
-	I(0xac, IF_MODRM,         "shrdl\t" OP_RM32 OP_R32 OP_U8),
-	I(0xac, IF_MODRM|IF_REXW, "shrdq\t" OP_RM64 OP_R64 OP_U8),
+	I(0xac, IF_66|IF_MODRM,   "shrdw\t" OP_U8 OP_R16 OP_RM16),
+	I(0xac, IF_MODRM,         "shrdl\t" OP_U8 OP_R32 OP_RM32),
+	I(0xac, IF_MODRM|IF_REXW, "shrdq\t" OP_U8 OP_R64 OP_RM64),
 
-	I(0xad, IF_66|IF_MODRM,   "shrdw\t" OP_RM16 OP_R16 OP_CL),
-	I(0xad, IF_MODRM,         "shrdl\t" OP_RM32 OP_R32 OP_CL),
-	I(0xad, IF_MODRM|IF_REXW, "shrdq\t" OP_RM64 OP_R64 OP_CL),
+	I(0xad, IF_66|IF_MODRM,   "shrdw\t" OP_CL OP_R16 OP_RM16),
+	I(0xad, IF_MODRM,         "shrdl\t" OP_CL OP_R32 OP_RM32),
+	I(0xad, IF_MODRM|IF_REXW, "shrdq\t" OP_CL OP_R64 OP_RM64),
 
 	I(0xae, IF_F3|IF_MODRM|IF_RMR|IF_REG0,         "rdfsbasel\t" OP_RM32),
 	I(0xae, IF_F3|IF_MODRM|IF_RMR|IF_REXW|IF_REG0, "rdfsbaseq\t" OP_RM64),
@@ -3248,29 +3250,34 @@ PRIVATE struct instruction const ops_0f[] = {
 	                                                                                                              * EVEX.512.66.0f.W1  c6 /r ib vshufpd zmm1{k1}{z}, zmm2, zmm3/m512/m64bcst, imm8 */
 	I(0xc6, IF_66|IF_MODRM,                               "shufpd\t" OP_U8 OP_RM128_XMM OP_RXMM),                /*              66 0f c6 /r ib shufpd xmm1, xmm2/m128, imm8 */
 
-	I(0xc7, IF_X32|IF_MODRM|IF_RMM|IF_REG1,       "cmpxchg8b\t" OP_MEM),
-	I(0xc7, IF_X64|IF_MODRM|IF_RMM|IF_REG1,       "cmpxchg16b\t" OP_MEM),
+	I(0xc7, IF_X32|IF_MODRM|IF_RMM|IF_REG1,       "cmpxchg8b\t" OP_MEM),  /*         0F C7 /1 CMPXCHG8B m64       Compare EDX:EAX with m64. If equal, set ZF and load ECX:EBX into m64. Else, clear ZF and load m64 into EDX:EAX. */
+	I(0xc7, IF_X64|IF_MODRM|IF_RMM|IF_REG1,       "cmpxchg16b\t" OP_MEM), /* REX.W + 0F C7 /1 CMPXCHG16B m128     Compare RDX:RAX with m128. If equal, set ZF and load RCX:RBX into m128. Else, clear ZF and load m128 into RDX:RAX. */
 
-	I(0xc7, IF_MODRM|IF_RMM|IF_REG4,              "xsavec\t" OP_MEM),
-	I(0xc7, IF_MODRM|IF_REXW|IF_RMM|IF_REG4,      "xsavec64\t" OP_MEM),
+	I(0xc7, IF_MODRM|IF_RMM|IF_REG3,              "xrstors\t" OP_MEM),   /* NP         0F C7 /3     XRSTORS mem       Restore state components specified by EDX:EAX from mem. */
+	I(0xc7, IF_MODRM|IF_REXW|IF_RMM|IF_REG3,      "xrstors64\t" OP_MEM), /* NP REX.W + 0F C7 /3     XRSTORS64 mem     Restore state components specified by EDX:EAX from mem. */
 
-	I(0xc7, IF_MODRM|IF_RMM|IF_REG5,              "xsaves\t" OP_MEM),
-	I(0xc7, IF_MODRM|IF_REXW|IF_RMM|IF_REG5,      "xsaves64\t" OP_MEM),
+	I(0xc7, IF_MODRM|IF_RMM|IF_REG4,              "xsavec\t" OP_MEM),   /* NP         0F C7 /4     XSAVEC mem       Save state components specified by EDX:EAX to mem with compaction. */
+	I(0xc7, IF_MODRM|IF_REXW|IF_RMM|IF_REG4,      "xsavec64\t" OP_MEM), /* NP REX.W + 0F C7 /4     XSAVEC64 mem     Save state components specified by EDX:EAX to mem with compaction. */
 
-	I(0xc7, IF_MODRM|IF_RMM|IF_REG6,              "vmptrld\t" OP_RM64),
-	I(0xc7, IF_66|IF_MODRM|IF_RMM|IF_REG6,        "vmclear\t" OP_RM64),
-	I(0xc7, IF_F3|IF_MODRM|IF_RMM|IF_REG6,        "vmxon\t" OP_RM64),
-	I(0xc7, IF_66|IF_MODRM|IF_RMR|IF_REG6,        "rdrandw\t" OP_RM16),
-	I(0xc7, IF_MODRM|IF_RMR|IF_REG6,              "rdrandl\t" OP_RM32),
-	I(0xc7, IF_REXW|IF_MODRM|IF_RMR|IF_REG6,      "rdrandq\t" OP_RM64),
+	I(0xc7, IF_MODRM|IF_RMM|IF_REG5,              "xsaves\t" OP_MEM),   /* NP         0F C7 /5     XSAVES mem       Save state components specified by EDX:EAX to mem with compaction, optimizing if possible. */
+	I(0xc7, IF_MODRM|IF_REXW|IF_RMM|IF_REG5,      "xsaves64\t" OP_MEM), /* NP REX.W + 0F C7 /5     XSAVES64 mem     Save state components specified by EDX:EAX to mem with compaction, optimizing if possible. */
 
-	I(0xc7, IF_MODRM|IF_RMM|IF_RMM|IF_REG7,       "vmptrst\t" OP_MEM),
-	I(0xc7, IF_66|IF_MODRM|IF_RMR|IF_REG7,        "rdseedw\t" OP_RM16),
-	I(0xc7, IF_MODRM|IF_RMR|IF_REG7,              "rdseedl\t" OP_RM32),
-	I(0xc7, IF_REXW|IF_MODRM|IF_RMR|IF_REG7,      "rdseedq\t" OP_RM64),
-	I(0xc7, IF_X32|IF_F3|IF_MODRM|IF_RMR|IF_REG7, "rdpidl\t" OP_RM32),
-	I(0xc7, IF_X64|IF_F3|IF_MODRM|IF_RMR|IF_REG7, "rdpidq\t" OP_RM64),
+	I(0xc7, IF_MODRM|IF_RMM|IF_REG6,              "vmptrld\t" OP_RM64), /* NP 0F C7 /6     VMPTRLD m64     Loads the current VMCS pointer from memory. */
+	I(0xc7, IF_66|IF_MODRM|IF_RMM|IF_REG6,        "vmclear\t" OP_RM64), /* 66 0F C7 /6     VMCLEAR m64     Copy VMCS data to VMCS region in memory. */
+	I(0xc7, IF_F3|IF_MODRM|IF_RMM|IF_REG6,        "vmxon\t" OP_RM64),   /* F3 0F C7 /6     VMXON m64     Enter VMX root operation. */
+	I(0xc7, IF_66|IF_MODRM|IF_RMR|IF_REG6,        "rdrandw\t" OP_RM16), /* NFx         0F C7 /6     RDRAND r16     RDRAND 	Read a 16-bit random number and store in the destination register. */
+	I(0xc7, IF_MODRM|IF_RMR|IF_REG6,              "rdrandl\t" OP_RM32), /* NFx         0F C7 /6     RDRAND r32     RDRAND 	Read a 32-bit random number and store in the destination register. */
+	I(0xc7, IF_REXW|IF_MODRM|IF_RMR|IF_REG6,      "rdrandq\t" OP_RM64), /* NFx REX.W + 0F C7 /6     RDRAND r64     RDRAND 	Read a 64-bit random number and store in the destination register. */
 
+	I(0xc7, IF_MODRM|IF_RMM|IF_RMM|IF_REG7,       "vmptrst\t" OP_MEM),  /* NP 0F C7 /7     VMPTRST m64     Stores the current VMCS pointer into memory. */
+	I(0xc7, IF_66|IF_MODRM|IF_RMR|IF_REG7,        "rdseedw\t" OP_RM16), /* NFx         0F C7 /7     RDSEED r16     Read a 16-bit NIST SP800-90B & C compliant random value and store in the destination register. */
+	I(0xc7, IF_MODRM|IF_RMR|IF_REG7,              "rdseedl\t" OP_RM32), /* NFx         0F C7 /7     RDSEED r32     Read a 32-bit NIST SP800-90B & C compliant random value and store in the destination register. */
+	I(0xc7, IF_REXW|IF_MODRM|IF_RMR|IF_REG7,      "rdseedq\t" OP_RM64), /* NFx REX.W + 0F C7 /7     RDSEED r64     Read a 64-bit NIST SP800-90B & C compliant random value and store in the destination register. */
+	I(0xc7, IF_X32|IF_F3|IF_MODRM|IF_RMR|IF_REG7, "rdpidl\t" OP_RM32), /* F3 0F C7 /7     RDPID r32     Read IA32_TSC_AUX into r32. */
+	I(0xc7, IF_X64|IF_F3|IF_MODRM|IF_RMR|IF_REG7, "rdpidq\t" OP_RM64), /* F3 0F C7 /7     RDPID r64     Read IA32_TSC_AUX into r64. */
+
+	/*         0F C8+rd     BSWAP r32     Reverses the byte order of a 32-bit register.
+	 * REX.W + 0F C8+rd     BSWAP r64     Reverses the byte order of a 64-bit register. */
 	I(0xc8, IF_REXB,         "bswapl\t" OP_R8D),
 	I(0xc8, IF_REXB|IF_REXW, "bswapq\t" OP_X64_R8),
 	I(0xc8, 0,               "bswapl\t" OP_EAX),
@@ -4312,14 +4319,14 @@ PRIVATE struct instruction const ops_0f38[] = {
 	                                                                                                          * EVEX.256.66.0f38.W1 7f /r vpermt2pd ymm1{k1}{z}, ymm2, ymm3/m256/m64bcst
 	                                                                                                          * EVEX.512.66.0f38.W1 7f /r vpermt2pd zmm1{k1}{z}, zmm2, zmm3/m512/m64bcst */
 
-	I(0x80, IF_X32|IF_66|IF_MODRM|IF_RMM,"inveptl\t" OP_MEM OP_R32),
-	I(0x80, IF_X64|IF_66|IF_MODRM|IF_RMM,"inveptq\t" OP_MEM OP_R64),
+	I(0x80, IF_X32|IF_66|IF_MODRM|IF_RMM,"inveptl\t" OP_MEM OP_R32), /* 66 0F 38 80 /r     INVEPT r64, m128     Invalidates EPT-derived entries in the TLBs and paging-structure caches (in 64-bit mode). */
+	I(0x80, IF_X64|IF_66|IF_MODRM|IF_RMM,"inveptq\t" OP_MEM OP_R64), /* 66 0F 38 80 /r     INVEPT r32, m128     Invalidates EPT-derived entries in the TLBs and paging-structure caches (outside 64-bit mode). */
 
-	I(0x81, IF_X32|IF_66|IF_MODRM|IF_RMM,"invvpidl\t" OP_MEM OP_R32),
-	I(0x81, IF_X64|IF_66|IF_MODRM|IF_RMM,"invvpidq\t" OP_MEM OP_R64),
+	I(0x81, IF_X32|IF_66|IF_MODRM|IF_RMM,"invvpidl\t" OP_MEM OP_R32), /* 66 0F 38 81 /r     INVVPID r64, m128     Invalidates entries in the TLBs and paging-structure caches based on VPID (in 64-bit mode). */
+	I(0x81, IF_X64|IF_66|IF_MODRM|IF_RMM,"invvpidq\t" OP_MEM OP_R64), /* 66 0F 38 81 /r     INVVPID r32, m128     Invalidates entries in the TLBs and paging-structure caches based on VPID (outside 64-bit mode). */
 
-	I(0x82, IF_X32|IF_66|IF_MODRM|IF_RMM,"invpcidl\t" OP_MEM OP_R32),
-	I(0x82, IF_X64|IF_66|IF_MODRM|IF_RMM,"invpcidq\t" OP_MEM OP_R64),
+	I(0x82, IF_X32|IF_66|IF_MODRM|IF_RMM,"invpcidl\t" OP_MEM OP_R32), /* 66 0F 38 82 /r     INVPCID r32, m128     Invalidates entries in the TLBs and paging-structure caches based on invalidation type in r32 and descriptor in m128. */
+	I(0x82, IF_X64|IF_66|IF_MODRM|IF_RMM,"invpcidq\t" OP_MEM OP_R64), /* 66 0F 38 82 /r     INVPCID r64, m128     Invalidates entries in the TLBs and paging-structure caches based on invalidation type in r64 and descriptor in m128. */
 
 	I(0x83, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0_LIG(0, 0, 1), LO_VPMULTISHIFTQB)), /* EVEX.128.66.0f38.W1 83 /r vpmultishiftqb xmm1{k1}{z}, xmm2, xmm3/m128/m64bcst
 	                                                                                          * EVEX.256.66.0f38.W1 83 /r vpmultishiftqb ymm1{k1}{z}, ymm2, ymm3/m256/m64bcst
@@ -5280,12 +5287,12 @@ PRIVATE u16 const ops_offsets[256] = {
 };
 
 #define HAVE_OPS_0F_OFFSETS 1
-STATIC_ASSERT(COMPILER_LENOF(ops_0f) == 1158);
+STATIC_ASSERT(COMPILER_LENOF(ops_0f) == 1160);
 PRIVATE u16 const ops_0f_offsets[256] = {
-	0, 6, 49, 50, 1157, 53, 55, 56, 58, 59, 61, 62, 1157, 63, 65, 1157,
-	66, 84, 100, 115, 121, 127, 133, 145, 151, 1157, 155, 161, 166, 1157, 167, 171,
-	173, 175, 177, 179, 181, 1157, 182, 1157, 183, 189, 195, 205, 211, 221, 231, 237,
-	243, 244, 245, 246, 247, 248, 249, 250, 1157, 1157, 1157, 1157, 1157, 1157, 1157, 251,
+	0, 6, 49, 50, 1159, 53, 55, 56, 58, 59, 61, 62, 1159, 63, 65, 1159,
+	66, 84, 100, 115, 121, 127, 133, 145, 151, 1159, 155, 161, 166, 1159, 167, 171,
+	173, 175, 177, 179, 181, 1159, 182, 1159, 183, 189, 195, 205, 211, 221, 231, 237,
+	243, 244, 245, 246, 247, 248, 249, 250, 1159, 1159, 1159, 1159, 1159, 1159, 1159, 251,
 	252, 255, 262, 269, 272, 279, 286, 293, 300, 303, 306, 313, 319, 322, 325, 328,
 	331, 343, 355, 359, 363, 369, 375, 381, 387, 399, 411, 427, 445, 457, 469, 481,
 	493, 496, 499, 503, 506, 509, 512, 517, 520, 523, 526, 530, 533, 536, 539, 545,
@@ -5294,10 +5301,10 @@ PRIVATE u16 const ops_0f_offsets[256] = {
 	712, 717, 722, 727, 732, 733, 734, 735, 736, 741, 746, 747, 748, 749, 750, 751,
 	752, 755, 758, 759, 762, 765, 768, 771, 777, 780, 783, 784, 787, 790, 793, 825,
 	828, 829, 832, 835, 838, 841, 844, 847, 849, 852, 854, 866, 869, 875, 881, 884,
-	886, 887, 890, 906, 908, 912, 920, 926, 944, 948, 952, 956, 960, 964, 968, 972,
-	976, 980, 983, 987, 991, 995, 998, 1000, 1008, 1011, 1014, 1017, 1023, 1026, 1029, 1032,
-	1037, 1040, 1043, 1048, 1051, 1054, 1057, 1073, 1077, 1080, 1083, 1086, 1091, 1094, 1097, 1100,
-	1105, 1108, 1111, 1115, 1119, 1123, 1126, 1129, 1132, 1135, 1138, 1142, 1146, 1149, 1152, 1156
+	886, 887, 890, 906, 908, 912, 920, 926, 946, 950, 954, 958, 962, 966, 970, 974,
+	978, 982, 985, 989, 993, 997, 1000, 1002, 1010, 1013, 1016, 1019, 1025, 1028, 1031, 1034,
+	1039, 1042, 1045, 1050, 1053, 1056, 1059, 1075, 1079, 1082, 1085, 1088, 1093, 1096, 1099, 1102,
+	1107, 1110, 1113, 1117, 1121, 1125, 1128, 1131, 1134, 1137, 1140, 1144, 1148, 1151, 1154, 1158
 };
 
 #define HAVE_OPS_0F38_OFFSETS 1

@@ -3916,26 +3916,10 @@ checklock_modrm_memory_parsed:
 				}
 				break;
 
-#ifdef __x86_64__
-			case 5: /* xrstor */
-				goto generic_privileged_instruction_if_user;
-
-			case 6: /* tpause */
-				goto generic_privileged_instruction_if_user;
-#endif /* __x86_64__ */
-
 			default:
 				break;
 			}
 			goto generic_failure;
-
-#ifdef __x86_64__
-		case 0x0fc3:
-			MOD_DECODE();
-			if (mod.mi_reg == 3) /* xrstors */
-				goto generic_privileged_instruction_if_user;
-			goto generic_failure;
-#endif /* __x86_64__ */
 #endif
 
 			/* XXX: invpcid    (if only for verbose exception messages?) */
@@ -3954,30 +3938,86 @@ checklock_modrm_memory_parsed:
 			/* XXX: stmxcsr    (if only for verbose exception messages?) */
 			/* XXX: xsaveopt   (if only for verbose exception messages?) */
 			/* XXX: xsaveopt64 (if only for verbose exception messages?) */
+			/* XXX: xrstors    (if only for verbose exception messages?) */
+			/* XXX: xrstors64  (if only for verbose exception messages?) */
+			/* XXX: xsaves     (if only for verbose exception messages?) */
+			/* XXX: xsaves64   (if only for verbose exception messages?) */
+			/* XXX: xsavec     (if only for verbose exception messages?) */
+			/* XXX: xsavec64   (if only for verbose exception messages?) */
+			/* XXX: vmptrst    (if only for verbose exception messages?) */
+			/* XXX: vmxon      (if only for verbose exception messages?) */
+			/* XXX: vmclear    (if only for verbose exception messages?) */
+			/* XXX: vmptrld    (if only for verbose exception messages?) */
+			/* XXX: vmcall     (if only for verbose exception messages?) */
+			/* XXX: vmlaunch   (if only for verbose exception messages?) */
+			/* XXX: vmresume   (if only for verbose exception messages?) */
+			/* XXX: vmxoff     (if only for verbose exception messages?) */
+			/* XXX: monitor    (if only for verbose exception messages?) */
+			/* XXX: mwait      (if only for verbose exception messages?) */
+			/* XXX: encls      (if only for verbose exception messages?) */
+			/* XXX: xgetbv     (if only for verbose exception messages?) */
+			/* XXX: xsetbv     (if only for verbose exception messages?) */
+			/* XXX: vmfunc     (if only for verbose exception messages?) */
+			/* XXX: enclu      (if only for verbose exception messages?) */
+			/* XXX: vmrun      (if only for verbose exception messages?) */
+			/* XXX: vmmcall    (if only for verbose exception messages?) */
+			/* XXX: vmload     (if only for verbose exception messages?) */
+			/* XXX: vmsave     (if only for verbose exception messages?) */
+			/* XXX: vmreadl    (if only for verbose exception messages?) */
+			/* XXX: vmreadq    (if only for verbose exception messages?) */
+			/* XXX: vmwritel   (if only for verbose exception messages?) */
+			/* XXX: vmwriteq   (if only for verbose exception messages?) */
+			/* XXX: montmul    (if only for verbose exception messages?) */
+			/* XXX: xsha1      (if only for verbose exception messages?) */
+			/* XXX: xsha256    (if only for verbose exception messages?) */
+			/* XXX: xstore     (if only for verbose exception messages?) */
+			/* XXX: xcrypt-ecb (if only for verbose exception messages?) */
+			/* XXX: xcrypt-cbc (if only for verbose exception messages?) */
+			/* XXX: xcrypt-ctr (if only for verbose exception messages?) */
+			/* XXX: xcrypt-cfb (if only for verbose exception messages?) */
+			/* XXX: xcrypt-ofb (if only for verbose exception messages?) */
+			/* XXX: umonitorl  (if only for verbose exception messages?) */
+			/* XXX: umonitorq  (if only for verbose exception messages?) */
+			/* XXX: umwait     (if only for verbose exception messages?) */
+			/* XXX: stgi       (if only for verbose exception messages?) */
+			/* XXX: clgi       (if only for verbose exception messages?) */
+			/* XXX: skinit     (if only for verbose exception messages?) */
+			/* XXX: invlpga    (if only for verbose exception messages?) */
+			/* XXX: monitorx   (if only for verbose exception messages?) */
+			/* XXX: mwaitx     (if only for verbose exception messages?) */
+			/* XXX: rdpru      (if only for verbose exception messages?) */
+			/* XXX: rdsspd     (if only for verbose exception messages?) */
+			/* XXX: rdsspq     (if only for verbose exception messages?) */
+			/* XXX: endbr64    (if only for verbose exception messages?) */
+			/* XXX: endbr32    (if only for verbose exception messages?) */
+			/* XXX: rdecr      (if only for verbose exception messages?) */
+			/* XXX: getsec     (if only for verbose exception messages?) */
+			/* XXX: 0x0f3f:jmp (if only for verbose exception messages?) */
 
 			/* TODO: Emulate crc32 */
 
-//???:	I(0x1a, IF_X32|IF_F2|IF_MODRM, "bndcu\t" OP_RM32 OP_RBND),
-//???:	I(0x1a, IF_X64|IF_F2|IF_MODRM, "bndcu\t" OP_RM64 OP_RBND),
-//???:	I(0x1a, IF_X32|IF_F3|IF_MODRM, "bndcl\t" OP_RM32 OP_RBND),
-//???:	I(0x1a, IF_X64|IF_F3|IF_MODRM, "bndcl\t" OP_RM64 OP_RBND),
-//???:	I(0x1a, IF_MODRM,              "bndldx\t" OP_RMBND_RANGE OP_RBND),
-//???:	I(0x1a, IF_66|IF_MODRM,        "bndmov\t" OP_RMBND OP_RBND),
-//???:	I(0x1b, IF_X32|IF_F2|IF_MODRM, "bndcn\t" OP_RM32 OP_RBND),
-//???:	I(0x1b, IF_X64|IF_F2|IF_MODRM, "bndcn\t" OP_RM64 OP_RBND),
-//???:	I(0x1b, IF_66|IF_MODRM,        "bndmov\t" OP_RBND OP_RMBND),
-//???:	I(0x1b, IF_X32|IF_F3|IF_MODRM, "bndmk\t" OP_RM32 OP_RBND),
-//???:	I(0x1b, IF_X64|IF_F3|IF_MODRM, "bndmk\t" OP_RM64 OP_RBND),
+// XXX: I(0x80, IF_X32|IF_66|IF_MODRM|IF_RMM,"inveptl\t" OP_MEM OP_R32),  /* 66 0F 38 80 /r     INVEPT r64, m128     Invalidates EPT-derived entries in the TLBs and paging-structure caches (in 64-bit mode). */
+// XXX: I(0x80, IF_X64|IF_66|IF_MODRM|IF_RMM,"inveptq\t" OP_MEM OP_R64),  /* 66 0F 38 80 /r     INVEPT r32, m128     Invalidates EPT-derived entries in the TLBs and paging-structure caches (outside 64-bit mode). */
+// XXX: I(0x81, IF_X32|IF_66|IF_MODRM|IF_RMM,"invvpidl\t" OP_MEM OP_R32), /* 66 0F 38 81 /r     INVVPID r64, m128     Invalidates entries in the TLBs and paging-structure caches based on VPID (in 64-bit mode). */
+// XXX: I(0x81, IF_X64|IF_66|IF_MODRM|IF_RMM,"invvpidq\t" OP_MEM OP_R64), /* 66 0F 38 81 /r     INVVPID r32, m128     Invalidates entries in the TLBs and paging-structure caches based on VPID (outside 64-bit mode). */
+// XXX: I(0x82, IF_X32|IF_66|IF_MODRM|IF_RMM,"invpcidl\t" OP_MEM OP_R32), /* 66 0F 38 82 /r     INVPCID r32, m128     Invalidates entries in the TLBs and paging-structure caches based on invalidation type in r32 and descriptor in m128. */
+// XXX: I(0x82, IF_X64|IF_66|IF_MODRM|IF_RMM,"invpcidq\t" OP_MEM OP_R64), /* 66 0F 38 82 /r     INVPCID r64, m128     Invalidates entries in the TLBs and paging-structure caches based on invalidation type in r64 and descriptor in m128. */
 
-//???:	I(0x24, IF_MODRM|IF_RMR,  "movl\t" OP_RTR OP_RM32),
-//???:	I(0x26, IF_MODRM|IF_RMR,  "movl\t" OP_RM32 OP_RTR),
+// ???:	I(0x1a, IF_X32|IF_F2|IF_MODRM, "bndcu\t" OP_RM32 OP_RBND),
+// ???:	I(0x1a, IF_X64|IF_F2|IF_MODRM, "bndcu\t" OP_RM64 OP_RBND),
+// ???:	I(0x1a, IF_X32|IF_F3|IF_MODRM, "bndcl\t" OP_RM32 OP_RBND),
+// ???:	I(0x1a, IF_X64|IF_F3|IF_MODRM, "bndcl\t" OP_RM64 OP_RBND),
+// ???:	I(0x1a, IF_MODRM,              "bndldx\t" OP_RMBND_RANGE OP_RBND),
+// ???:	I(0x1a, IF_66|IF_MODRM,        "bndmov\t" OP_RMBND OP_RBND),
+// ???:	I(0x1b, IF_X32|IF_F2|IF_MODRM, "bndcn\t" OP_RM32 OP_RBND),
+// ???:	I(0x1b, IF_X64|IF_F2|IF_MODRM, "bndcn\t" OP_RM64 OP_RBND),
+// ???:	I(0x1b, IF_66|IF_MODRM,        "bndmov\t" OP_RBND OP_RMBND),
+// ???:	I(0x1b, IF_X32|IF_F3|IF_MODRM, "bndmk\t" OP_RM32 OP_RBND),
+// ???:	I(0x1b, IF_X64|IF_F3|IF_MODRM, "bndmk\t" OP_RM64 OP_RBND),
 
-//???:	I(0x80, IF_X32|IF_66|IF_MODRM|IF_RMM,"inveptl\t" OP_MEM OP_R32),
-//???:	I(0x80, IF_X64|IF_66|IF_MODRM|IF_RMM,"inveptq\t" OP_MEM OP_R64),
-//???:	I(0x81, IF_X32|IF_66|IF_MODRM|IF_RMM,"invvpidl\t" OP_MEM OP_R32),
-//???:	I(0x81, IF_X64|IF_66|IF_MODRM|IF_RMM,"invvpidq\t" OP_MEM OP_R64),
-//???:	I(0x82, IF_X32|IF_66|IF_MODRM|IF_RMM,"invpcidl\t" OP_MEM OP_R32),
-//???:	I(0x82, IF_X64|IF_66|IF_MODRM|IF_RMM,"invpcidq\t" OP_MEM OP_R64),
+// ???:	I(0x24, IF_MODRM|IF_RMR,  "movl\t" OP_RTR OP_RM32),
+// ???:	I(0x26, IF_MODRM|IF_RMR,  "movl\t" OP_RM32 OP_RTR),
+
 
 
 			/* TODO: XOP instructions (from AMD):
