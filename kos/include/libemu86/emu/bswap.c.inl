@@ -35,7 +35,7 @@ case EMU86_OPCODE_ENCODE(0x0fc8) ... EMU86_OPCODE_ENCODE(0x0fcf): {
 	if (op_flags & EMU86_F_REX_B)
 		regno |= 0x8;
 	if (IS_64BIT()) {
-#ifdef EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BSWAP
+#ifdef EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BYTESWAP
 		union {
 			u8  bytes[8];
 			u64 qword;
@@ -50,16 +50,16 @@ case EMU86_OPCODE_ENCODE(0x0fc8) ... EMU86_OPCODE_ENCODE(0x0fcf): {
 		newval.bytes[6] = oldval.bytes[1];
 		newval.bytes[7] = oldval.bytes[0];
 		EMU86_SETREGQ(regno, newval.qword);
-#else /* EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BSWAP */
+#else /* EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BYTESWAP */
 		u64 temp;
 		temp = EMU86_GETREGQ(regno);
 		temp = BSWAP64(temp);
 		EMU86_SETREGQ(regno, temp);
-#endif /* !EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BSWAP */
+#endif /* !EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BYTESWAP */
 	} else
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
 	{
-#ifdef EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BSWAP
+#ifdef EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BYTESWAP
 		union {
 			u8  bytes[4];
 			u32 dword;
@@ -70,12 +70,12 @@ case EMU86_OPCODE_ENCODE(0x0fc8) ... EMU86_OPCODE_ENCODE(0x0fcf): {
 		newval.bytes[2] = oldval.bytes[1];
 		newval.bytes[3] = oldval.bytes[0];
 		EMU86_SETREGL(regno, newval.dword);
-#else /* EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BSWAP */
+#else /* EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BYTESWAP */
 		u32 temp;
 		temp = EMU86_GETREGL(regno);
 		temp = BSWAP32(temp);
 		EMU86_SETREGL(regno, temp);
-#endif /* !EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BSWAP */
+#endif /* !EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BYTESWAP */
 	}
 	goto done;
 }

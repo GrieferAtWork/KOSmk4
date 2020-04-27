@@ -33,7 +33,7 @@ case EMU86_OPCODE_ENCODE(0x0f38f0): {
 	MODRM_DECODE_MEMONLY();
 #define NEED_return_expected_memory_modrm
 	addr = MODRM_MEMADDR();
-#ifdef EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BSWAP
+#ifdef EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BYTESWAP
 	IF_64BIT(if (IS_64BIT()) {
 		union {
 			u8  bytes[8];
@@ -73,7 +73,7 @@ case EMU86_OPCODE_ENCODE(0x0f38f0): {
 		newword.bytes[1] = oldword.bytes[0];
 		MODRM_SETREGW(newword.word);
 	}
-#else /* EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BSWAP */
+#else /* EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BYTESWAP */
 	IF_64BIT(if (IS_64BIT()) {
 		u64 oldword, newword;
 		EMU86_READ_USER_MEMORY(addr, 8);
@@ -93,7 +93,7 @@ case EMU86_OPCODE_ENCODE(0x0f38f0): {
 		newword = BSWAP16(oldword);
 		MODRM_SETREGW(newword);
 	}
-#endif /* !EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BSWAP */
+#endif /* !EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BYTESWAP */
 	goto done;
 }
 #elif EMU86_EMULATE_CONFIG_CHECKERROR
@@ -112,7 +112,7 @@ case EMU86_OPCODE_ENCODE(0x0f38f1): {
 	MODRM_DECODE_MEMONLY();
 #define NEED_return_expected_memory_modrm
 	addr = MODRM_MEMADDR();
-#ifdef EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BSWAP
+#ifdef EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BYTESWAP
 	IF_64BIT(if (IS_64BIT()) {
 		union {
 			u8  bytes[8];
@@ -152,7 +152,7 @@ case EMU86_OPCODE_ENCODE(0x0f38f1): {
 		newword.bytes[1] = oldword.bytes[0];
 		EMU86_MEMWRITEW(addr, newword.word);
 	}
-#else /* EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BSWAP */
+#else /* EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BYTESWAP */
 	IF_64BIT(if (IS_64BIT()) {
 		u64 oldword, newword;
 		EMU86_WRITE_USER_MEMORY(addr, 8);
@@ -172,7 +172,7 @@ case EMU86_OPCODE_ENCODE(0x0f38f1): {
 		newword = BSWAP16(oldword);
 		EMU86_MEMWRITEW(addr, newword);
 	}
-#endif /* !EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BSWAP */
+#endif /* !EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BYTESWAP */
 	goto done;
 }
 #elif EMU86_EMULATE_CONFIG_CHECKERROR

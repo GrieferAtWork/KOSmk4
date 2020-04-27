@@ -782,28 +782,23 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 				}
 #endif /* !EMU86_GETCR4_TSD_IS_ZERO */
 #endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
-#if defined(EMU86_EMULATE_RDTSC_INDIRECT) && defined(EMU86_EMULATE_RDTSC_AUX)
+				/* Allow the privisioning of `EMU86_EMULATE_RDTSCP()'
+				 * in order to prevent a race condition when the hosting CPU changes
+				 * between reading its performance counter, and its ID. */
+#ifdef EMU86_EMULATE_RDTSCP
 				{
 					u64 tsc;
 					u32 tsc_aux;
-					/* Allow the privisioning of `EMU86_EMULATE_RDTSC_INDIRECT_AND_RDTSC_AUX()'
-					 * in order to prevent a race condition when the hosting CPU changes
-					 * between reading its performance counter, and its ID. */
-#ifdef EMU86_EMULATE_RDTSC_INDIRECT_AND_RDTSC_AUX
-					EMU86_EMULATE_RDTSC_INDIRECT_AND_RDTSC_AUX(tsc, tsc_aux);
-#else /* EMU86_EMULATE_RDTSC_INDIRECT_AND_RDTSC_AUX */
-					tsc     = EMU86_EMULATE_RDTSC_INDIRECT();
-					tsc_aux = EMU86_EMULATE_RDTSC_AUX();
-#endif /* !EMU86_EMULATE_RDTSC_INDIRECT_AND_RDTSC_AUX */
+					tsc = EMU86_EMULATE_RDTSCP(tsc_aux);
 					EMU86_SETEAX((u32)(tsc));
 					EMU86_SETEDX((u32)(tsc >> 32));
 					EMU86_SETECX(tsc_aux);
 				}
 				goto done;
-#else /* EMU86_EMULATE_RDTSC_INDIRECT && EMU86_EMULATE_RDTSC_AUX */
+#else /* EMU86_EMULATE_RDTSCP */
 				goto return_unsupported_instruction_rmreg;
 #define NEED_return_unsupported_instruction_rmreg
-#endif /* !EMU86_EMULATE_RDTSC_INDIRECT || !EMU86_EMULATE_RDTSC_AUX */
+#endif /* !EMU86_EMULATE_RDTSCP */
 			}
 #endif /* EMU86_EMULATE_CONFIG_WANT_RDTSCP || (EMU86_EMULATE_CONFIG_CHECKERROR && EMU86_EMULATE_CONFIG_CHECKUSER) */
 

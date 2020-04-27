@@ -92,6 +92,10 @@ typedef struct {
 		};
 		__uint16_t vr_segments[6];
 	};
+	__uint32_t vr_cr2; /* %cr2 is writable in proper real-mode, but never written to by
+	                    * the processor itself (since paging is disabled). As such, code
+	                    * may still read/write it explicitly without any effect. */
+	__uint32_t vr_cr3; /* Same as with %cr2. */
 } vm86_registers_t;
 #undef VM86_REGISTER_GP
 #undef VM86_REGISTER_PT

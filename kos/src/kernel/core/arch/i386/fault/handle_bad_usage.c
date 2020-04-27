@@ -125,20 +125,24 @@ typedef u32 bad_usage_reason_t;
 PRIVATE ATTR_RETNONNULL NONNULL((1)) struct icpustate *FCALL
 x86_handle_bad_usage(struct icpustate *__restrict state, bad_usage_reason_t usage);
 
+/* Configure general library implementation */
+#define EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BIT      1 /* Don't use `<hybrid/bit.h>' to emulate bit-instructions (such as `popcount') (prevent any possible recursion) */
+#define EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BYTESWAP 1 /* Don't use `<hybrid/byteswap.h>' to emulate `bswap' and `movbe' (prevent any possible recursion) */
+#define EMU86_EMULATE_CONFIG_ONLY_MEMORY              0 /* Emulate all instructions (as opposed to only those that access memory) */
+#define EMU86_EMULATE_CONFIG_CHECKUSER                1 /* Restrict system instructions in user-space */
+#define EMU86_EMULATE_CONFIG_CHECKERROR               1 /* Disabled instructions (`EMU86_EMULATE_CONFIG_WANT_* == 0') are still checked for usage errors */
+#define EMU86_EMULATE_CONFIG_ONLY_CHECKERROR          1 /* Default: Any instruction not explicitly configured defaults to `#define EMU86_EMULATE_CONFIG_WANT_... 0' */
+#define EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC 1 /* Don't include code-paths for basic instructions that are assumed to always be available */
 
-#define EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BIT 1
-#define EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BSWAP 1
-#define EMU86_EMULATE_CONFIG_ONLY_MEMORY 0
-#define EMU86_EMULATE_CONFIG_CHECKUSER 1
-#define EMU86_EMULATE_CONFIG_CHECKERROR 1
-#define EMU86_EMULATE_CONFIG_ONLY_CHECKERROR 1
-#define EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC 1
-#define EMU86_EMULATE_CONFIG_FSGSBASE_32BIT 1
-#define EMU86_EMULATE_CONFIG_ALLOW_USER_STAC_CLAC 1
+/* Configure ISA extensions */
+#define EMU86_EMULATE_CONFIG_FSGSBASE_32BIT       1 /* [enabled]     Allow use of (rd|wr)(fs|gs)base from 32-bit */
+#define EMU86_EMULATE_CONFIG_ALLOW_USER_STAC_CLAC 1 /* [enabled]     Allow user-space use of stac/clac */
+#define EMU86_EMULATE_CONFIG_LOCK_SHIFT           0 /* [not enabled] Accept `lock' for shl/shr/sal/sar/rol/ror/rcl/rcr */
+#define EMU86_EMULATE_CONFIG_LOCK_SHIFT2          0 /* [not enabled] Accept `lock' for shld/shrd */
+#define EMU86_EMULATE_CONFIG_LOCK_ARPL            0 /* [not enabled] Accept `lock' for arpl */
 
 /* Configure for which instructions emulation should be attempted.
  * Any instruction enabled here will be emulated if not supported natively! */
-
 #define EMU86_EMULATE_CONFIG_WANT_ADCX          1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_ADOX          1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_MULX          1 /* Emulate non-standard instructions */
@@ -255,6 +259,8 @@ x86_handle_bad_usage(struct icpustate *__restrict state, bad_usage_reason_t usag
 #define EMU86_EMULATE_CONFIG_WANT_WRMSR         0 /* No, but see `EMU86_EMULATE_CONFIG_WANT_WRMSR_EMULATED' below */
 #define EMU86_EMULATE_CONFIG_WANT_RDTSC         (!CONFIG_LIBEMU86_WANT_64BIT) /* Only available on Pentium+ (emulate in 32-bit mode) */
 #define EMU86_EMULATE_CONFIG_WANT_RDTSCP        1 /* Emulate non-standard instructions */
+#define EMU86_EMULATE_CONFIG_WANT_RDRAND        1 /* Emulate non-standard instructions */
+#define EMU86_EMULATE_CONFIG_WANT_RDSEED        1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_RDPMC         1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_RDPID         1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_NOP_RM        1 /* Emulate non-standard instructions */
@@ -504,7 +510,7 @@ PRIVATE ATTR_NORETURN NONNULL((1)) void
 #else /* !__x86_64__ */
 #define throw_generic_unknown_instruction(state, usage, opcode, op_flags, ...) \
 	throw_generic_unknown_instruction(state, usage, opcode, op_flags)
-#endif /* !__x86_64__ */
+#endif /* __x86_64__ */
                                           ) {
 
 	/* Produce some default exception. */
@@ -708,7 +714,6 @@ throw_unsupported_instruction(struct icpustate *__restrict state,
 #define EMU86_EMULATE_RDDR7()  DONT_USE
 #define EMU86_EMULATE_WRDR7(v) DONT_USE
 
-
 /* Enable the emulation of rdmsr/wrmsr for certain MSR registers:
  *  - IA32_FS_BASE            (read-write)
  *  - IA32_GS_BASE            (read-write)
@@ -721,8 +726,8 @@ throw_unsupported_instruction(struct icpustate *__restrict state,
 #define EMU86_EMULATE_RDTSC_INDIRECT() __rdtsc()
 
 /* Return the OS-specific ID for the current CPU (same as the `IA32_TSC_AUX' MSR) */
-#define EMU86_EMULATE_RDTSC_AUX() emulate_read_tsc_aux()
-PRIVATE WUNUSED ATTR_PURE u32 KCALL emulate_read_tsc_aux(void) {
+#define EMU86_EMULATE_RDPID() emulate_rdpid()
+PRIVATE WUNUSED ATTR_PURE u32 KCALL emulate_rdpid(void) {
 	/* TODO: KOS currently doesn't program the `IA32_TSC_AUX' MSR during CPU initialization.
 	 *       We really need to do this, though (programming should always be done when cpuid
 	 *       bit `CPUID_80000001D_RDTSCP' is enabled, in which case `rdtscp' exists, and should
@@ -730,10 +735,9 @@ PRIVATE WUNUSED ATTR_PURE u32 KCALL emulate_read_tsc_aux(void) {
 	return THIS_CPU->c_id;
 }
 
-#define EMU86_EMULATE_RDTSC_INDIRECT_AND_RDTSC_AUX(tsc, tsc_aux) \
-	((tsc) = emulate_read_tsc_and_aux(&(tsc_aux)))
+#define EMU86_EMULATE_RDTSCP(tsc_aux) emulate_rdtscp(&(tsc_aux))
 LOCAL WUNUSED NONNULL((1)) u64 KCALL
-emulate_read_tsc_and_aux(u32 *__restrict p_tsc_aux) {
+emulate_rdtscp(u32 *__restrict p_tsc_aux) {
 	u64 tsc;
 	pflag_t was;
 	/* To guaranty that the hosting CPU doesn't change during
@@ -741,7 +745,7 @@ emulate_read_tsc_and_aux(u32 *__restrict p_tsc_aux) {
 	 * the TSC and CPU-ID are consistent with each other! */
 	was = PREEMPTION_PUSHOFF();
 	COMPILER_BARRIER();
-	*p_tsc_aux = EMU86_EMULATE_RDTSC_AUX();
+	*p_tsc_aux = EMU86_EMULATE_RDPID();
 	tsc        = EMU86_EMULATE_RDTSC_INDIRECT();
 	COMPILER_BARRIER();
 	PREEMPTION_POP(was);
@@ -765,6 +769,25 @@ PRIVATE u64 KCALL emulate_rdtsc(void) {
 #undef EMU86_EMULATE_CONFIG_WANT_RDPMC
 #define EMU86_EMULATE_CONFIG_WANT_RDPMC 0   /* TODO: Emulate */
 #define EMU86_EMULATE_RDPMC(index) DONT_USE /* TODO: Emulate */
+
+#undef EMU86_EMULATE_CONFIG_WANT_RDRAND
+#define EMU86_EMULATE_CONFIG_WANT_RDRAND 0      /* TODO: Emulate */
+#define EMU86_EMULATE_RDRAND16(result) DONT_USE /* TODO: Emulate */
+#define EMU86_EMULATE_RDRAND32(result) DONT_USE /* TODO: Emulate */
+#define EMU86_EMULATE_RDRAND64(result) DONT_USE /* TODO: Emulate */
+
+#undef EMU86_EMULATE_CONFIG_WANT_RDSEED
+#define EMU86_EMULATE_CONFIG_WANT_RDSEED 0      /* TODO: Emulate */
+#define EMU86_EMULATE_RDSEED16(result) DONT_USE /* TODO: Emulate */
+#define EMU86_EMULATE_RDSEED32(result) DONT_USE /* TODO: Emulate */
+#define EMU86_EMULATE_RDSEED64(result) DONT_USE /* TODO: Emulate */
+
+/* Configure user-visible CR4 bits as fixed. */
+#define EMU86_GETCR4_UMIP_IS_ONE 1 /* Disable access to some super-visor-mode instructions */
+#define EMU86_GETCR4_DE_IS_ONE   1 /* Disallow use of %dr4 and %dr5 */
+#define EMU86_GETCR4_TSD_IS_ZERO 1 /* Allow user-space use of `rdtsc' and `rdtscp' */
+#define EMU86_GETCR4_PCE_IS_ZERO 1 /* Allow user-space use of `rdpmc' */
+
 
 
 #ifdef __x86_64__

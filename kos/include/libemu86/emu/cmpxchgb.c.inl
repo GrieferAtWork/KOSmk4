@@ -183,15 +183,172 @@ case EMU86_OPCODE_ENCODE(0x0fc7):
 
 
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
-#if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_RDPID
-	case 7: {
-		if (!(op_flags & EMU86_F_f3))
-			goto return_unknown_instruction_rmreg;
-#define NEED_return_unknown_instruction_rmreg
+
+#if defined(EMU86_EMULATE_RDRAND64) && !defined(EMU86_EMULATE_RDRAND32)
+#endif
+
+#if ((EMU86_EMULATE_CONFIG_CHECKERROR &&                 \
+      !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC) || \
+     EMU86_EMULATE_CONFIG_WANT_RDRAND)
+	case 6: {
+		if (op_flags & (EMU86_F_f2 | EMU86_F_f3))
+			goto return_unexpected_prefix_rmreg;
+#define NEED_return_unexpected_prefix_rmreg
 		if (!EMU86_MODRM_ISREG(modrm.mi_type))
 			goto return_expected_register_modrm;
 #define NEED_return_expected_register_modrm
+		/* NFx         0F C7 /6 RDRAND r16     Read a 16-bit random number and store in the destination register.
+		 * NFx         0F C7 /6 RDRAND r32     Read a 32-bit random number and store in the destination register.
+		 * NFx REX.W + 0F C7 /6 RDRAND r64     Read a 64-bit random number and store in the destination register. */
+#if (EMU86_EMULATE_CONFIG_WANT_RDRAND &&                                    \
+     (defined(EMU86_EMULATE_RDRAND16) || defined(EMU86_EMULATE_RDRAND32) || \
+      defined(EMU86_EMULATE_RDRAND64)))
+		{
+			bool ok;
+#if CONFIG_LIBEMU86_WANT_64BIT
+			if (IS_64BIT()) {
+#ifdef EMU86_EMULATE_RDRAND64
+				u64 value;
+				ok = EMU86_EMULATE_RDRAND64(value);
+				if (!ok)
+					value = 0;
+				MODRM_SETRMREGQ(value);
+#else /* EMU86_EMULATE_RDRAND64 */
+				goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
+#endif /* !EMU86_EMULATE_RDRAND64 */
+			} else
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+			{
+				if (!IS_16BIT()) {
+#ifdef EMU86_EMULATE_RDRAND32
+					u32 value;
+					ok = EMU86_EMULATE_RDRAND32(value);
+					if (!ok)
+						value = 0;
+					MODRM_SETRMREGL(value);
+#elif defined(EMU86_EMULATE_RDRAND64)
+					u64 value;
+					ok = EMU86_EMULATE_RDRAND64(value);
+					if (!ok)
+						value = 0;
+					MODRM_SETRMREGL((u32)value);
+#else /* ... */
+				goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
+#endif /* !... */
+				} else {
+#ifdef EMU86_EMULATE_RDRAND16
+					u16 value;
+					ok = EMU86_EMULATE_RDRAND16(value);
+					if (!ok)
+						value = 0;
+					MODRM_SETRMREGW(value);
+#elif defined(EMU86_EMULATE_RDRAND32)
+					u32 value;
+					ok = EMU86_EMULATE_RDRAND32(value);
+					if (!ok)
+						value = 0;
+					MODRM_SETRMREGW((u16)value);
+#else /* ... */
+					u64 value;
+					ok = EMU86_EMULATE_RDRAND64(value);
+					if (!ok)
+						value = 0;
+					MODRM_SETRMREGW((u16)value);
+#endif /* !... */
+				}
+			}
+			EMU86_MSKFLAGS(~(EFLAGS_OF | EFLAGS_SF | EFLAGS_ZF | EFLAGS_AF | EFLAGS_PF | EFLAGS_CF),
+			               ok ? EFLAGS_CF : 0);
+			goto done;
+		}
+#else /* EMU86_EMULATE_CONFIG_WANT_RDRAND && EMU86_EMULATE_RDRANDnn */
+		goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
+#endif /* !EMU86_EMULATE_CONFIG_WANT_RDRAND || !EMU86_EMULATE_RDRANDnn */
+	}
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_RDRAND */
 
+
+
+#if (EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_RDPID || EMU86_EMULATE_CONFIG_WANT_RDSEED)
+	case 7: {
+		if (!EMU86_MODRM_ISREG(modrm.mi_type))
+			goto return_expected_register_modrm;
+#define NEED_return_expected_register_modrm
+		if (!(op_flags & EMU86_F_f3)) {
+			/* NFx         0F C7 /7 RDSEED r16     Read a 16-bit NIST SP800-90B & C compliant random value and store in the destination register.
+			 * NFx         0F C7 /7 RDSEED r32     Read a 32-bit NIST SP800-90B & C compliant random value and store in the destination register.
+			 * NFx REX.W + 0F C7 /7 RDSEED r64     Read a 64-bit NIST SP800-90B & C compliant random value and store in the destination register. */
+#if (EMU86_EMULATE_CONFIG_WANT_RDSEED &&                                    \
+     (defined(EMU86_EMULATE_RDSEED16) || defined(EMU86_EMULATE_RDSEED32) || \
+      defined(EMU86_EMULATE_RDSEED64)))
+			bool ok;
+#if CONFIG_LIBEMU86_WANT_64BIT
+			if (IS_64BIT()) {
+#ifdef EMU86_EMULATE_RDSEED64
+				u64 value;
+				ok = EMU86_EMULATE_RDSEED64(value);
+				if (!ok)
+					value = 0;
+				MODRM_SETRMREGQ(value);
+#else /* EMU86_EMULATE_RDSEED64 */
+				goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
+#endif /* !EMU86_EMULATE_RDSEED64 */
+			} else
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+			{
+				if (!IS_16BIT()) {
+#ifdef EMU86_EMULATE_RDSEED32
+					u32 value;
+					ok = EMU86_EMULATE_RDSEED32(value);
+					if (!ok)
+						value = 0;
+					MODRM_SETRMREGL(value);
+#elif defined(EMU86_EMULATE_RDSEED64)
+					u64 value;
+					ok = EMU86_EMULATE_RDSEED64(value);
+					if (!ok)
+						value = 0;
+					MODRM_SETRMREGL((u32)value);
+#else /* ... */
+					goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
+#endif /* !... */
+				} else {
+#ifdef EMU86_EMULATE_RDSEED16
+					u16 value;
+					ok = EMU86_EMULATE_RDSEED16(value);
+					if (!ok)
+						value = 0;
+					MODRM_SETRMREGW(value);
+#elif defined(EMU86_EMULATE_RDSEED32)
+					u32 value;
+					ok = EMU86_EMULATE_RDSEED32(value);
+					if (!ok)
+						value = 0;
+					MODRM_SETRMREGW((u16)value);
+#else  /* ... */
+					u64 value;
+					ok = EMU86_EMULATE_RDSEED64(value);
+					if (!ok)
+						value = 0;
+					MODRM_SETRMREGW((u16)value);
+#endif /* !... */
+				}
+			}
+			EMU86_MSKFLAGS(~(EFLAGS_OF | EFLAGS_SF | EFLAGS_ZF | EFLAGS_AF | EFLAGS_PF | EFLAGS_CF),
+			               ok ? EFLAGS_CF : 0);
+			goto done;
+#else /* EMU86_EMULATE_CONFIG_WANT_RDSEED && EMU86_EMULATE_RDSEEDnn */
+			goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
+#endif /* !EMU86_EMULATE_CONFIG_WANT_RDSEED || !EMU86_EMULATE_RDSEEDnn */
+		}
+
+#if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_RDPID
 		/* F3 0F C7 /7 RDPID r32     R     Read IA32_TSC_AUX into r32.
 		 * F3 0F C7 /7 RDPID r64     R     Read IA32_TSC_AUX into r64. */
 #if EMU86_EMULATE_CONFIG_CHECKUSER && 0 /* Intel doesn't document this instruction as checking for permissions... */
@@ -209,23 +366,27 @@ case EMU86_OPCODE_ENCODE(0x0fc7):
 #endif /* !EMU86_GETCR4_TSD_IS_ZERO */
 #endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
 
-#if EMU86_EMULATE_CONFIG_WANT_RDPID && defined(EMU86_EMULATE_RDTSC_AUX)
+#if EMU86_EMULATE_CONFIG_WANT_RDPID && defined(EMU86_EMULATE_RDPID)
 		{
-			u32 value = EMU86_EMULATE_RDTSC_AUX();
+			u32 value = EMU86_EMULATE_RDPID();
 			MODRM_SETRMREGL(value);
 		}
-#else /* EMU86_EMULATE_CONFIG_WANT_RDPID && EMU86_EMULATE_RDTSC_AUX */
+#else /* EMU86_EMULATE_CONFIG_WANT_RDPID && EMU86_EMULATE_RDPID */
 #ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
 		EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER_RMREG(E_ILLEGAL_INSTRUCTION_REGISTER_RDINV,
 		                                                       X86_REGISTER_MSR,
 		                                                       IA32_TSC_AUX, 0, 0);
 #else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
-		goto return_unsupported_instruction;
-#define NEED_return_unsupported_instruction
+		goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
-#endif /* !EMU86_EMULATE_CONFIG_WANT_RDPID || !EMU86_EMULATE_RDTSC_AUX */
+#endif /* !EMU86_EMULATE_CONFIG_WANT_RDPID || !EMU86_EMULATE_RDPID */
+#else /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_RDPID */
+		goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
+#endif /* !EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_WANT_RDPID */
 	}
-#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_RDPID */
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_RDPID || EMU86_EMULATE_CONFIG_WANT_RDSEED */
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 
 	default:

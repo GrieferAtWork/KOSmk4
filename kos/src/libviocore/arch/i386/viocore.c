@@ -1846,6 +1846,36 @@ NOTHROW(CC CS_setregl)(struct vio_emulate_args *__restrict self, u8 regno, u32 v
 #define EMU86_EMULATE_CONFIG_WANT_LAR 1
 #define EMU86_EMULATE_CONFIG_WANT_LSL 1
 
+#define EMU86_EMULATE_SLDT() __sldt()
+#define EMU86_EMULATE_LLDT(segment_index) __lldt(segment_index)
+#define EMU86_EMULATE_STR() __str()
+#define EMU86_EMULATE_LTR(segment_index) __ltr(segment_index)
+#define EMU86_EMULATE_VERR(segment_index) __verr(segment_index)
+#define EMU86_EMULATE_VERW(segment_index) __verw(segment_index)
+#define EMU86_EMULATE_SGDT(limit, base)        \
+	do {                                       \
+		struct desctab dt;                     \
+		__sgdt(&dt);                           \
+		(limit) = (u16)dt.dt_limit;            \
+		(base)  = (EMU86_UREG_TYPE)dt.dt_base; \
+	} __WHILE0
+#define EMU86_EMULATE_LGDT(limit, base) \
+	__lgdt(limit, (void *)(uintptr_t)(base))
+#define EMU86_EMULATE_SIDT(limit, base)        \
+	do {                                       \
+		struct desctab dt;                     \
+		__sidt(&dt);                           \
+		(limit) = (u16)dt.dt_limit;            \
+		(base)  = (EMU86_UREG_TYPE)dt.dt_base; \
+	} __WHILE0
+#define EMU86_EMULATE_LIDT(limit, base) \
+	__lidt(limit, (void *)(uintptr_t)(base))
+#define EMU86_EMULATE_SMSW() __smsw()
+#define EMU86_EMULATE_LMSW(value) __lmsw(value)
+#define EMU86_EMULATE_LAR(segment_index, result) __lar(segment_index, &(result))
+#define EMU86_EMULATE_LSL(segment_index, result) __lsl(segment_index, &(result))
+
+
 
 PRIVATE ATTR_NORETURN void CC
 libviocore_throw_unknown_instruction(struct vio_emulate_args *__restrict self,

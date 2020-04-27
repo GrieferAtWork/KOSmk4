@@ -34,6 +34,7 @@ opt.append("-Os");
 #include "api.h"
 /**/
 
+#include <i386-kos/asm/cpu-flags.h>
 #include <kos/except.h>
 #include <kos/kernel/types.h>
 #include <kos/types.h>
@@ -137,7 +138,6 @@ DECL_END
 #undef EMU86_EMULATE_TRANSLATEADDR_IS_NOOP
 #define EMU86_EMULATE_TRANSLATEADDR(addr) libvm86_translate(self, addr)
 #define EMU86_EMULATE_VM86 0 /* We're emulating realmode, not vm86 */
-#define EMU86_EMULATE_CONFIG_CHECKUSER 0
 #define EMU86_ISUSER() 0
 #define EMU86_ISUSER_NOVM86() 0
 #define EMU86_ISVM86() 0
@@ -322,6 +322,90 @@ DECL_END
 	                          (how) == E_ILLEGAL_INSTRUCTION_REGISTER_WRINV                   \
 	                          ? 0x06 /* #UD */                                                \
 	                          : 0x0d /* #GP */)
+
+
+
+#define EMU86_EMULATE_CONFIG_ONLY_MEMORY     0 /* Emulate all instructions */
+#define EMU86_EMULATE_CONFIG_CHECKUSER       0 /* Disable user-access checks (realmode always has full permissions) */
+#define EMU86_EMULATE_CONFIG_CHECKERROR      0 /* Don't check disabled instructions for usage errors (disabled
+                                                * instruction don't exist for all that we're concerned about) */
+#define EMU86_EMULATE_CONFIG_ONLY_CHECKERROR 0 /* Any instruction not explicitly configured is enabled */
+
+/* Configure ISA extensions */
+#define EMU86_EMULATE_CONFIG_FSGSBASE_32BIT       0 /* [not enabled: fsgsbase isn't enabled in realmode] */
+#define EMU86_EMULATE_CONFIG_ALLOW_USER_STAC_CLAC 0 /* [not enabled: There is no user-space in realmode] */
+#define EMU86_EMULATE_CONFIG_LOCK_SHIFT           0 /* [not enabled] Accept `lock' for shl/shr/sal/sar/rol/ror/rcl/rcr */
+#define EMU86_EMULATE_CONFIG_LOCK_SHIFT2          0 /* [not enabled] Accept `lock' for shld/shrd */
+#define EMU86_EMULATE_CONFIG_LOCK_ARPL            0 /* [not enabled] Accept `lock' for arpl */
+
+/* Configure how/if MSR register access should be emulated */
+#define EMU86_EMULATE_CONFIG_WANT_RDMSR_EMULATED          1 /* Emulate rdmsr for `IA32_TIME_STAMP_COUNTER' and `IA32_TSC_AUX' */
+#define EMU86_EMULATE_CONFIG_WANT_RDMSR_EMULATED_FSGSBASE 0 /* Don't emulate `IA32_FS_BASE' or `IA32_GS_BASE' */
+#define EMU86_EMULATE_CONFIG_WANT_WRMSR_EMULATED          0 /* Don't emulate wrmsr */
+
+/* Disable some instructions who's use doesn't make sense in pure real-mode, or
+ * that couldn't actually be emulated without also emulating all of protected-mode! */
+#define EMU86_EMULATE_CONFIG_WANT_RDFSBASE 0 /* Realmode uses the segment index << 4 as segment base! */
+#define EMU86_EMULATE_CONFIG_WANT_RDGSBASE 0 /* ... */
+#define EMU86_EMULATE_CONFIG_WANT_WRFSBASE 0 /* ... */
+#define EMU86_EMULATE_CONFIG_WANT_WRGSBASE 0 /* ... */
+#define EMU86_EMULATE_CONFIG_WANT_MOV_DREG 0 /* We're not emulating debug registers, so disable this instruction! */
+
+/* Actually enable emulation of mov-from-creg, but implement mov-to-creg such
+ * that any attempt to modify any of the bits from their fixed, constant state
+ * will result in a #GP getting thrown. */
+#define EMU86_EMULATE_CONFIG_WANT_MOV_CREG 1
+#define EMU86_EMULATE_CONFIG_WANT_SMSW 1 /* Substituted by read from %cr0 */
+#define EMU86_EMULATE_CONFIG_WANT_LMSW 1 /* Substituted by write to %cr0 */
+#define EMU86_EMULATE_RDCR0() 0
+#define EMU86_EMULATE_RDCR4() 0
+#define EMU86_EMULATE_WRCR0(value)                     \
+	do {                                               \
+		if (EMU86_EMULATE_RDCR0() != (value))          \
+			return libvm86_intr(self, 0x0d /* #GP */); \
+	} __WHILE0
+#define EMU86_EMULATE_WRCR4(value)                     \
+	do {                                               \
+		if (EMU86_EMULATE_RDCR4() != (value))          \
+			return libvm86_intr(self, 0x0d /* #GP */); \
+	} __WHILE0
+/* %cr2 and %cr3 are treated as auxiliary general purpose registers. */
+#define EMU86_EMULATE_RDCR2()      (u32)self->vr_regs.vr_cr2
+#define EMU86_EMULATE_RDCR3()      (u32)self->vr_regs.vr_cr3
+#define EMU86_EMULATE_WRCR2(value) (void)(self->vr_regs.vr_cr2 = (u32)(value))
+#define EMU86_EMULATE_WRCR3(value) (void)(self->vr_regs.vr_cr3 = (u32)(value))
+
+#define EMU86_EMULATE_CONFIG_WANT_RDMSR 0 /* Arbitrary MSR access isn't allowed (but note that certain MSR are still emulated, though) */
+#define EMU86_EMULATE_CONFIG_WANT_WRMSR 0 /* ... */
+
+#define EMU86_EMULATE_CONFIG_WANT_RDPID  1 /* rdpid always returns 0 */
+#define EMU86_EMULATE_RDPID()            0 /* This 0 to be exact! */
+#define EMU86_EMULATE_RDTSCP(tsc_aux)    ((tsc_aux) = EMU86_EMULATE_RDPID(), __rdtsc())
+#define EMU86_EMULATE_CONFIG_WANT_RDTSC  1 /* Enabled... */
+#define EMU86_EMULATE_CONFIG_WANT_RDTSCP 1 /* Enabled... */
+
+/* Disable various instruction used to configure P-mode registers. */
+#define EMU86_EMULATE_CONFIG_WANT_SLDT   0 /* P-mode configure instruction */
+#define EMU86_EMULATE_CONFIG_WANT_LLDT   0 /* P-mode configure instruction */
+#define EMU86_EMULATE_CONFIG_WANT_STR    0 /* P-mode configure instruction */
+#define EMU86_EMULATE_CONFIG_WANT_LTR    0 /* P-mode configure instruction */
+#define EMU86_EMULATE_CONFIG_WANT_SGDT   0 /* P-mode configure instruction */
+#define EMU86_EMULATE_CONFIG_WANT_LGDT   0 /* P-mode configure instruction */
+#define EMU86_EMULATE_CONFIG_WANT_SIDT   0 /* P-mode configure instruction */
+#define EMU86_EMULATE_CONFIG_WANT_LIDT   0 /* P-mode configure instruction */
+#define EMU86_EMULATE_CONFIG_WANT_VERR   0 /* P-mode configure instruction */
+#define EMU86_EMULATE_CONFIG_WANT_VERW   0 /* P-mode configure instruction */
+#define EMU86_EMULATE_CONFIG_WANT_INVLPG 0 /* Without paging, this instruction shouldn't exist */
+#define EMU86_EMULATE_CONFIG_WANT_LAR    0 /* P-mode configure instruction */
+#define EMU86_EMULATE_CONFIG_WANT_LSL    0 /* P-mode configure instruction */
+
+#define EMU86_EMULATE_CONFIG_WANT_SYSCALL  0 /* Not valid outside of P-mode */
+#define EMU86_EMULATE_CONFIG_WANT_SYSRET   0 /* Not valid outside of P-mode */
+#define EMU86_EMULATE_CONFIG_WANT_SYSENTER 0 /* Not valid outside of P-mode */
+#define EMU86_EMULATE_CONFIG_WANT_SYSEXIT  0 /* Not valid outside of P-mode */
+
+
+
 
 
 #if defined(__KERNEL__) && 1

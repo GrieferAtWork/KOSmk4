@@ -52,37 +52,53 @@ case EMU86_OPCODE_ENCODE(0x0f32): {
 		{
 			value = EMU86_EMULATE_RDTSC_INDIRECT();
 			goto rdmsr_do_set_value;
+#define NEED_rdmsr_do_set_value
 		}
 	}
 #endif /* EMU86_EMULATE_RDTSC_INDIRECT && !EMU86_GETCR4_TSD_IS_ONE */
 
 	/* ==== IA32_TSC_AUX ==== */
-#if defined(EMU86_EMULATE_RDTSC_AUX) && !defined(EMU86_GETCR4_TSD_IS_ONE)
+#if defined(EMU86_EMULATE_RDPID) && !defined(EMU86_GETCR4_TSD_IS_ONE)
 	if (index == IA32_TSC_AUX) {
 #if EMU86_EMULATE_CONFIG_CHECKUSER && !defined(EMU86_GETCR4_TSD_IS_ZERO)
 		if (!EMU86_GETCR4_TSD() && EMU86_ISUSER())
 #endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
 		{
-			value = (u64)(u32)EMU86_EMULATE_RDTSC_AUX();
+			value = (u64)(u32)EMU86_EMULATE_RDPID();
 			goto rdmsr_do_set_value;
+#define NEED_rdmsr_do_set_value
 		}
 	}
-#endif /* EMU86_EMULATE_RDTSC_AUX && !EMU86_GETCR4_TSD_IS_ONE */
+#endif /* EMU86_EMULATE_RDPID && !EMU86_GETCR4_TSD_IS_ONE */
 
+#if EMU86_EMULATE_CONFIG_WANT_RDMSR_EMULATED_FSGSBASE
 	/* ==== IA32_FS_BASE ==== */
 	if (index == IA32_FS_BASE) {
 		value = (u64)(uintptr_t)EMU86_GETFSBASE();
 		goto rdmsr_do_set_value;
+#define NEED_rdmsr_do_set_value
 	}
+#endif /* EMU86_EMULATE_CONFIG_WANT_RDMSR_EMULATED_FSGSBASE */
 
 	/* ==== IA32_GS_BASE ==== */
+#if EMU86_EMULATE_CONFIG_WANT_RDMSR_EMULATED_FSGSBASE
 	if (index == IA32_GS_BASE) {
 		value = (u64)(uintptr_t)EMU86_GETGSBASE();
+#undef NEED_rdmsr_do_set_value
 rdmsr_do_set_value:
 		EMU86_SETEAX((u32)(value));
 		EMU86_SETEDX((u32)(value >> 32));
 		goto done;
 	}
+#elif defined(NEED_rdmsr_do_set_value)
+#undef NEED_rdmsr_do_set_value
+	__IF0 {
+rdmsr_do_set_value:
+		EMU86_SETEAX((u32)(value));
+		EMU86_SETEDX((u32)(value >> 32));
+		goto done;
+	}
+#endif /* ... */
 #endif /* EMU86_EMULATE_CONFIG_WANT_RDMSR_EMULATED */
 
 	/* Emulate the instruction */
@@ -260,8 +276,8 @@ case EMU86_OPCODE_ENCODE(0x0f31): {
 #if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_RDPMC
 case EMU86_OPCODE_ENCODE(0x0f33): {
 	/* 0F 33     RDPMC     Read performance-monitoring counter specified by ECX into EDX:EAX. */
-#if EMU86_EMULATE_CONFIG_CHECKUSER && !defined(EMU86_GETCR4_PCE_IS_ZERO)
-	if (EMU86_GETCR4_PCE() && EMU86_ISUSER()) {
+#if EMU86_EMULATE_CONFIG_CHECKUSER && !defined(EMU86_GETCR4_PCE_IS_ONE)
+	if (!EMU86_GETCR4_PCE() && EMU86_ISUSER()) {
 #ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
 		EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV,
 		                                                 X86_REGISTER_PCR, EMU86_GETECX(), 0, 0);
@@ -270,7 +286,7 @@ case EMU86_OPCODE_ENCODE(0x0f33): {
 #define NEED_return_privileged_instruction
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 	}
-#endif /* EMU86_EMULATE_CONFIG_CHECKUSER && !EMU86_GETCR4_PCE_IS_ZERO */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER && !EMU86_GETCR4_PCE_IS_ONE */
 
 	/* Emulate the instruction */
 #if EMU86_EMULATE_CONFIG_WANT_RDPMC && defined(EMU86_EMULATE_RDPMC)
