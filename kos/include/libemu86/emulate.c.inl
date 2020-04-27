@@ -740,8 +740,7 @@ __DECL_BEGIN
  *  - IA32_FS_BASE            (#if 1; uses `EMU86_GETFSBASE()')
  *  - IA32_GS_BASE            (#if 1; uses `EMU86_GETGSBASE()')
  *  - IA32_TIME_STAMP_COUNTER (#ifdef EMU86_EMULATE_RDTSC_INDIRECT)
- *  - IA32_TSC_AUX            (#ifdef EMU86_EMULATE_RDTSC_AUX)
- */
+ *  - IA32_TSC_AUX            (#ifdef EMU86_EMULATE_RDTSC_AUX) */
 #ifndef EMU86_EMULATE_CONFIG_WANT_RDMSR_EMULATED
 #define EMU86_EMULATE_CONFIG_WANT_RDMSR_EMULATED (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
 #endif /* !EMU86_EMULATE_CONFIG_WANT_RDMSR_EMULATED */
@@ -3835,15 +3834,6 @@ checklock_modrm_memory_parsed:
 //???:	I(0x1b, IF_X32|IF_F3|IF_MODRM, "bndmk\t" OP_RM32 OP_RBND),
 //???:	I(0x1b, IF_X64|IF_F3|IF_MODRM, "bndmk\t" OP_RM64 OP_RBND),
 
-//???:	I(0x20, IF_X32|IF_MODRM|IF_RMR,"movl\t" OP_RCR OP_RM32),
-//???:	I(0x20, IF_X64|IF_MODRM|IF_RMR,"movq\t" OP_RCR OP_RM64),
-//???:	I(0x21, IF_X32|IF_MODRM|IF_RMR,"movl\t" OP_RDR OP_RM32),
-//???:	I(0x21, IF_X64|IF_MODRM|IF_RMR,"movq\t" OP_RDR OP_RM64),
-//???:	I(0x22, IF_X32|IF_MODRM|IF_RMR,"movl\t" OP_RM32 OP_RCR),
-//???:	I(0x22, IF_X64|IF_MODRM|IF_RMR,"movq\t" OP_RM64 OP_RCR),
-//???:	I(0x23, IF_X32|IF_MODRM|IF_RMR,"movl\t" OP_RM32 OP_RDR),
-//???:	I(0x23, IF_X64|IF_MODRM|IF_RMR,"movq\t" OP_RM64 OP_RDR),
-
 //???:	I(0x24, IF_MODRM|IF_RMR,  "movl\t" OP_RTR OP_RM32),
 //???:	I(0x26, IF_MODRM|IF_RMR,  "movl\t" OP_RM32 OP_RTR),
 
@@ -4654,7 +4644,7 @@ return_unknown_instruction_rmreg:;
 #endif /* EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION_RMREG */
 #endif /* NEED_return_unknown_instruction_rmreg */
 	}
-return_unknown_instruction: /* TODO: Go through all uses of this label and use the labels above instead! */
+return_unknown_instruction:
 	/* Default case: Handle as an unknown instruction */
 	EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION();
 

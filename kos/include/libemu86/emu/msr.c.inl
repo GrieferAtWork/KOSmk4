@@ -98,8 +98,8 @@ rdmsr_do_set_value:
 		                                                 X86_REGISTER_MSR, EMU86_GETECX(), 0, 0);
 #endif /* !EMU86_EMULATE_CONFIG_WANT_RDMSR_EMULATED */
 #else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
-#define NEED_return_privileged_instruction
 		goto return_privileged_instruction;
+#define NEED_return_privileged_instruction
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 	}
 #endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
@@ -130,8 +130,8 @@ rdmsr_do_set_value:
 	                                                 X86_REGISTER_MSR, EMU86_GETECX(), 0, 0);
 #endif /* !EMU86_EMULATE_CONFIG_WANT_RDMSR_EMULATED */
 #else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
-#define NEED_return_privileged_instruction
 	goto return_privileged_instruction;
+#define NEED_return_privileged_instruction
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 #endif /* !EMU86_EMULATE_CONFIG_WANT_RDMSR || !EMU86_EMULATE_RDMSR */
 }
@@ -194,8 +194,8 @@ case EMU86_OPCODE_ENCODE(0x0f30): {
 		                                                 X86_REGISTER_MSR, index,
 		                                                 (u32)value, (u32)(value >> 32));
 #else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
-#define NEED_return_privileged_instruction
 		goto return_privileged_instruction;
+#define NEED_return_privileged_instruction
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 	}
 #endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
@@ -209,8 +209,8 @@ case EMU86_OPCODE_ENCODE(0x0f30): {
 	                                                 X86_REGISTER_MSR, index,
 	                                                 (u32)value, (u32)(value >> 32));
 #else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
-#define NEED_return_privileged_instruction
 	goto return_privileged_instruction;
+#define NEED_return_privileged_instruction
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 #endif /* !EMU86_EMULATE_CONFIG_WANT_WRMSR || !EMU86_EMULATE_WRMSR */
 }
@@ -229,8 +229,8 @@ case EMU86_OPCODE_ENCODE(0x0f31): {
 		                                                 X86_REGISTER_MSR,
 		                                                 IA32_TIME_STAMP_COUNTER, 0, 0);
 #else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
-#define NEED_return_privileged_instruction
 		goto return_privileged_instruction;
+#define NEED_return_privileged_instruction
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 	}
 #endif /* !EMU86_GETCR4_TSD_IS_ZERO */
@@ -266,8 +266,8 @@ case EMU86_OPCODE_ENCODE(0x0f33): {
 		EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV,
 		                                                 X86_REGISTER_PCR, EMU86_GETECX(), 0, 0);
 #else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
-#define NEED_return_privileged_instruction
 		goto return_privileged_instruction;
+#define NEED_return_privileged_instruction
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 	}
 #endif /* EMU86_EMULATE_CONFIG_CHECKUSER && !EMU86_GETCR4_PCE_IS_ZERO */
@@ -288,12 +288,15 @@ case EMU86_OPCODE_ENCODE(0x0f33): {
 	EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_RDINV,
 	                                                 X86_REGISTER_PCR, EMU86_GETECX(), 0, 0);
 #else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
-#define NEED_return_privileged_instruction
 	goto return_privileged_instruction;
+#define NEED_return_privileged_instruction
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 #endif /* !EMU86_EMULATE_CONFIG_WANT_RDPMC || !EMU86_EMULATE_RDPMC */
 }
 #endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_RDPMC */
+
+
+
 
 
 }

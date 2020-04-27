@@ -32,7 +32,8 @@ case EMU86_OPCODE_ENCODE(0x0f38f5): {
 	MODRM_DECODE();
 	if ((op_flags & (EMU86_F_HASVEX | EMU86_F_VEX_LL_M |
 	                 EMU86_F_66)) != EMU86_F_HASVEX)
-		goto return_unknown_instruction;
+		goto return_unexpected_prefix;
+#define NEED_return_unexpected_prefix
 	if (op_flags & EMU86_F_f3) {
 #if EMU86_EMULATE_CONFIG_WANT_PEXT
 		/* VEX.LZ.F3.0F38.W0 F5 /r     PEXT r32a, r32b, r/m32     Parallel extract of bits from r32b using mask in r/m32, result is written to r32a.
@@ -160,7 +161,8 @@ case EMU86_OPCODE_ENCODE(0x0f38f5): {
      (!EMU86_EMULATE_CONFIG_WANT_PEXT || \
       !EMU86_EMULATE_CONFIG_WANT_PDEP || \
       !EMU86_EMULATE_CONFIG_WANT_BZHI))
-	goto return_unknown_instruction;
+	goto return_unexpected_prefix;
+#define NEED_return_unexpected_prefix
 #endif /* ... */
 }
 #endif /* EMU86_EMULATE_CONFIG_CHECKERROR || ... */

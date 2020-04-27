@@ -28,7 +28,8 @@ EMU86_INTELLISENSE_BEGIN(shiftx) {
 case EMU86_OPCODE_ENCODE(0x0f38f7): {
 	MODRM_DECODE();
 	if ((op_flags & (EMU86_F_HASVEX | EMU86_F_VEX_LL_M)) != EMU86_F_HASVEX)
-		goto return_unknown_instruction;
+		goto return_unexpected_prefix;
+#define NEED_return_unexpected_prefix
 	if ((op_flags & (EMU86_F_66 | EMU86_F_f2 | EMU86_F_f3)) == 0) {
 #if EMU86_EMULATE_CONFIG_WANT_BEXTR
 		/* VEX.LZ.0F38.W0 F7 /r     BEXTR r32a, r/m32, r32b     Contiguous bitwise extract from r/m32 using r32b as control; store result in r32a.

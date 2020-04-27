@@ -30,7 +30,8 @@ case EMU86_OPCODE_ENCODE(0x0f3af0): {
 	 * VEX.LZ.F2.0F3A.W1 F0 /r ib     RORX r64, r/m64, imm8     Rotate 64-bit r/m64 right imm8 times without affecting arithmetic flags. */
 	if ((op_flags & (EMU86_F_HASVEX | EMU86_F_VEX_LL_M |
 	                 EMU86_F_66 | EMU86_F_f2 | EMU86_F_f3)) != EMU86_F_HASVEX)
-		goto return_unknown_instruction;
+		goto return_unexpected_prefix;
+#define NEED_return_unexpected_prefix
 #if EMU86_EMULATE_CONFIG_WANT_RORX
 	MODRM_DECODE();
 	{

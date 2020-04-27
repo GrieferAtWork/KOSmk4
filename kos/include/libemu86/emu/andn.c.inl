@@ -34,7 +34,8 @@ case EMU86_OPCODE_ENCODE(0x0f38f2): {
 #endif /* EMU86_EMULATE_CONFIG_WANT_ANDN */
 	if ((op_flags & (EMU86_F_HASVEX | EMU86_F_VEX_LL_M |
 	                 EMU86_F_66 | EMU86_F_f2 | EMU86_F_f3)) != EMU86_F_HASVEX)
-		goto return_unknown_instruction;
+		goto return_unexpected_prefix;
+#define NEED_return_unexpected_prefix
 	MODRM_DECODE();
 #if EMU86_EMULATE_CONFIG_WANT_ANDN
 #if CONFIG_LIBEMU86_WANT_64BIT

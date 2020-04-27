@@ -30,8 +30,8 @@ case EMU86_OPCODE_ENCODE(0x0fb8): {
 	 * F3 REX.W 0F B8 /r     POPCNT r64, r/m64     POPCNT on r/m64 */
 	unsigned int result;
 	if unlikely(!(op_flags & EMU86_F_f3))
-		goto return_unknown_instruction;
-#define NEED_return_unknown_instruction
+		goto return_unexpected_prefix;
+#define NEED_return_unexpected_prefix
 	MODRM_DECODE();
 #ifdef EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BIT
 	{
@@ -77,7 +77,8 @@ case EMU86_OPCODE_ENCODE(0x0fb8): {
 #elif EMU86_EMULATE_CONFIG_CHECKERROR
 case EMU86_OPCODE_ENCODE(0x0fb8):
 	if unlikely(!(op_flags & EMU86_F_f3))
-		goto return_unknown_instruction;
+		goto return_unexpected_prefix;
+#define NEED_return_unexpected_prefix
 	goto notsup_modrm_getwlq;
 #define NEED_notsup_modrm_getwlq
 #endif /* ... */
