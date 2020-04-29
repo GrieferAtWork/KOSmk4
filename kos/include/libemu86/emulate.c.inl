@@ -784,6 +784,9 @@ __DECL_BEGIN
 #ifndef EMU86_EMULATE_CONFIG_WANT_XOP_T1MSKC
 #define EMU86_EMULATE_CONFIG_WANT_XOP_T1MSKC (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
 #endif /* !EMU86_EMULATE_CONFIG_WANT_XOP_T1MSKC */
+#ifndef EMU86_EMULATE_CONFIG_WANT_XOP_BLCMSK
+#define EMU86_EMULATE_CONFIG_WANT_XOP_BLCMSK (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_XOP_BLCMSK */
 
 /* Emulate `rdmsr' for the following MSRs (if possible):
  *  - IA32_FS_BASE            (#if EMU86_EMULATE_CONFIG_WANT_RDMSR_EMULATED_FSGSBASE; uses `EMU86_GETFSBASE()')
@@ -811,7 +814,7 @@ __DECL_BEGIN
 #if (EMU86_EMULATE_CONFIG_WANT_XOP_BLCFILL || EMU86_EMULATE_CONFIG_WANT_XOP_BLSFILL || \
      EMU86_EMULATE_CONFIG_WANT_XOP_BLCS || EMU86_EMULATE_CONFIG_WANT_XOP_TZMSK ||      \
      EMU86_EMULATE_CONFIG_WANT_XOP_BLCIC || EMU86_EMULATE_CONFIG_WANT_XOP_BLSIC ||     \
-     EMU86_EMULATE_CONFIG_WANT_XOP_T1MSKC)
+     EMU86_EMULATE_CONFIG_WANT_XOP_T1MSKC || EMU86_EMULATE_CONFIG_WANT_XOP_BLCMSK)
 #define EMU86_EMULATE_CONFIG_WANT_XOP 1
 #else /* EMU86_EMULATE_CONFIG_WANT_XOP_* */
 #define EMU86_EMULATE_CONFIG_WANT_XOP 0
@@ -4030,23 +4033,22 @@ checklock_modrm_memory_parsed:
 
 
 			/* TODO: XOP instructions (from AMD):
-			 *    BLCMSK reg32, reg/mem32              8F RXB.09 0.dest.0.00 02 /1
-			 *    BLCMSK reg64, reg/mem64              8F RXB.09 1.dest.0.00 02 /1
-			 *    BLCI reg32, reg/mem32                8F RXB.09 0.dest.0.00 02 /6
-			 *    BLCI reg64, reg/mem64                8F RXB.09 1.dest.0.00 02 /6
 			 *
-			 *    LLWPCB reg32                         8F RXB.09 0.1111.0.00 12 /0
-			 *    LLWPCB reg64                         8F RXB.09 1.1111.0.00 12 /0
-			 *    SLWPCB reg32                         8F RXB.09 0.1111.0.00 12 /1
-			 *    SLWPCB reg64                         8F RXB.09 1.1111.0.00 12 /1
+			 * BLCI reg32, reg/mem32                8F RXB.09 0.dest.0.00 02 /6
+			 * BLCI reg64, reg/mem64                8F RXB.09 1.dest.0.00 02 /6
 			 *
-			 *    BEXTR reg32, reg/mem32, imm32        8F RXB.0A 0.1111.0.00 10 /r /id
-			 *    BEXTR reg64, reg/mem64, imm32        8F RXB.0A 1.1111.0.00 10 /r /id
+			 * LLWPCB reg32                         8F RXB.09 0.1111.0.00 12 /0
+			 * LLWPCB reg64                         8F RXB.09 1.1111.0.00 12 /0
+			 * SLWPCB reg32                         8F RXB.09 0.1111.0.00 12 /1
+			 * SLWPCB reg64                         8F RXB.09 1.1111.0.00 12 /1
 			 *
-			 *    LWPINS reg32.vvvv, reg/mem32, imm32  8F RXB.0A 0.src1.0.00 12 /0 /imm32
-			 *    LWPINS reg64.vvvv, reg/mem32, imm32  8F RXB.0A 1.src1.0.00 12 /0 /imm32
-			 *    LWPVAL reg32.vvvv, reg/mem32, imm32  8F RXB.0A 0.src1.0.00 12 /1 /imm32
-			 *    LWPVAL reg64.vvvv, reg/mem32, imm32  8F RXB.0A 1.src1.0.00 12 /1 /imm32
+			 * BEXTR reg32, reg/mem32, imm32        8F RXB.0A 0.1111.0.00 10 /r /id
+			 * BEXTR reg64, reg/mem64, imm32        8F RXB.0A 1.1111.0.00 10 /r /id
+			 *
+			 * LWPINS reg32.vvvv, reg/mem32, imm32  8F RXB.0A 0.src1.0.00 12 /0 /imm32
+			 * LWPINS reg64.vvvv, reg/mem32, imm32  8F RXB.0A 1.src1.0.00 12 /0 /imm32
+			 * LWPVAL reg32.vvvv, reg/mem32, imm32  8F RXB.0A 0.src1.0.00 12 /1 /imm32
+			 * LWPVAL reg64.vvvv, reg/mem32, imm32  8F RXB.0A 1.src1.0.00 12 /1 /imm32
 			 *
 			 */
 
