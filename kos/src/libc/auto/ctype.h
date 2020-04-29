@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd5c9cf76 */
+/* HASH CRC-32:0xea21a2a6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,6 +57,10 @@ INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc_isprint_l)(int ch, __loca
 INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc_isblank_l)(int ch, __locale_t locale);
 INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc_tolower_l)(int ch, __locale_t locale);
 INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc_toupper_l)(int ch, __locale_t locale);
+/* Returns non-zero if `(C & ~0x7f) == 0' */
+INTDEF ATTR_CONST int NOTHROW(LIBCCALL libc_isascii)(int c);
+/* Re-returns `C & 0x7f' */
+INTDEF ATTR_CONST int NOTHROW(LIBCCALL libc_toascii)(int c);
 #endif /* !__KERNEL__ */
 
 DECL_END

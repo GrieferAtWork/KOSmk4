@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x55c6e74b */
+/* HASH CRC-32:0x90f1e05 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -406,6 +406,7 @@
 #define __CRT_ATTR_NOTHROW_imaxdiv 1
 #define __CRT_ATTR_NOTHROW_isalnum 1
 #define __CRT_ATTR_NOTHROW_isalpha 1
+#define __CRT_ATTR_NOTHROW_isascii 1
 #define __CRT_ATTR_NOTHROW_isastream 1
 #define __CRT_ATTR_NOTHROW_isblank 1
 #define __CRT_ATTR_NOTHROW_iscntrl 1
@@ -550,6 +551,7 @@
 #define __CRT_ATTR_NOTHROW_tgammaf 1
 #define __CRT_ATTR_NOTHROW_tgammal 1
 #define __CRT_ATTR_NOTHROW_timerfd_create 1
+#define __CRT_ATTR_NOTHROW_toascii 1
 #define __CRT_ATTR_NOTHROW_tolower 1
 #define __CRT_ATTR_NOTHROW_toupper 1
 #define __CRT_ATTR_NOTHROW_towlower 1
@@ -4813,6 +4815,7 @@
 #define __CRT_ATTR_CONST_inet_netof 1
 #define __CRT_ATTR_CONST_isalnum 1
 #define __CRT_ATTR_CONST_isalpha 1
+#define __CRT_ATTR_CONST_isascii 1
 #define __CRT_ATTR_CONST_isblank 1
 #define __CRT_ATTR_CONST_iscntrl 1
 #define __CRT_ATTR_CONST_isdigit 1
@@ -4897,6 +4900,7 @@
 #define __CRT_ATTR_CONST_strerror_s 1
 #define __CRT_ATTR_CONST_strerrorname_s 1
 #define __CRT_ATTR_CONST_strsignal_s 1
+#define __CRT_ATTR_CONST_toascii 1
 #define __CRT_ATTR_CONST_tolower 1
 #define __CRT_ATTR_CONST_toupper 1
 #define __CRT_ATTR_CONST_towctrans 1

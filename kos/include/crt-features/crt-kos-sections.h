@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3ed96f56 */
+/* HASH CRC-32:0x737ce875 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3815,6 +3815,7 @@
 #define __CRT_SECTION__isctype                              __CRT_SECTINFO_unicode_static_ctype                     /* .text.crt.unicode.static.ctype._isctype */
 #define __CRT_SECTION_isalnum                               __CRT_SECTINFO_unicode_static_ctype                     /* .text.crt.unicode.static.ctype.isalnum */
 #define __CRT_SECTION_isalpha                               __CRT_SECTINFO_unicode_static_ctype                     /* .text.crt.unicode.static.ctype.isalpha */
+#define __CRT_SECTION_isascii                               __CRT_SECTINFO_unicode_static_ctype                     /* .text.crt.unicode.static.ctype.isascii */
 #define __CRT_SECTION_isblank                               __CRT_SECTINFO_unicode_static_ctype                     /* .text.crt.unicode.static.ctype.isblank */
 #define __CRT_SECTION_iscntrl                               __CRT_SECTINFO_unicode_static_ctype                     /* .text.crt.unicode.static.ctype.iscntrl */
 #define __CRT_SECTION_isdigit                               __CRT_SECTINFO_unicode_static_ctype                     /* .text.crt.unicode.static.ctype.isdigit */
@@ -3825,6 +3826,7 @@
 #define __CRT_SECTION_isspace                               __CRT_SECTINFO_unicode_static_ctype                     /* .text.crt.unicode.static.ctype.isspace */
 #define __CRT_SECTION_isupper                               __CRT_SECTINFO_unicode_static_ctype                     /* .text.crt.unicode.static.ctype.isupper */
 #define __CRT_SECTION_isxdigit                              __CRT_SECTINFO_unicode_static_ctype                     /* .text.crt.unicode.static.ctype.isxdigit */
+#define __CRT_SECTION_toascii                               __CRT_SECTINFO_unicode_static_ctype                     /* .text.crt.unicode.static.ctype.toascii */
 #define __CRT_SECTION_tolower                               __CRT_SECTINFO_unicode_static_ctype                     /* .text.crt.unicode.static.ctype.tolower */
 #define __CRT_SECTION_toupper                               __CRT_SECTINFO_unicode_static_ctype                     /* .text.crt.unicode.static.ctype.toupper */
 

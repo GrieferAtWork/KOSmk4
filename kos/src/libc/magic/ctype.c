@@ -990,6 +990,30 @@ __NAMESPACE_INT_END
 
 #endif /* (!__cplusplus || __USE_CTYPE_MACROS) && !__CXX_SYSTEM_HEADER */
 
+
+#if defined(__USE_MISC) || defined(__USE_XOPEN)
+}
+%[default_impl_section(.text.crt.unicode.static.ctype)]
+
+@@Returns non-zero if `(C & ~0x7f) == 0'
+[ATTR_CONST][nothrow] isascii:(int c) -> int {
+	return (c & ~0x7f) == 0;
+}
+
+@@Re-returns `C & 0x7f'
+[ATTR_CONST][nothrow] toascii:(int c) -> int {
+	return c & 0x7f;
+}
+
+%{
+#if (!defined(__cplusplus) || defined(__USE_CTYPE_MACROS)) && !defined(__CXX_SYSTEM_HEADER)
+#define isascii(c) (((c) & ~0x7f) == 0)
+#define toascii(c) ((c) & 0x7f)
+#endif /* (!__cplusplus || __USE_CTYPE_MACROS) && !__CXX_SYSTEM_HEADER */
+
+#endif /* __USE_MISC || __USE_XOPEN */
+
+
 #endif /* __CC__ */
 
 __SYSDECL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x46a56bb7 */
+/* HASH CRC-32:0x72b08e0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -695,6 +695,32 @@ __NAMESPACE_INT_END
 #endif /* __NO_builtin_constant_p */
 
 #endif /* (!__cplusplus || __USE_CTYPE_MACROS) && !__CXX_SYSTEM_HEADER */
+
+
+#if defined(__USE_MISC) || defined(__USE_XOPEN)
+#ifdef __CRT_HAVE_isascii
+/* Returns non-zero if `(C & ~0x7f) == 0' */
+__CDECLARE(__ATTR_CONST,int,__NOTHROW,isascii,(int __c),(__c))
+#else /* LIBC: isascii */
+#include <local/ctype/isascii.h>
+/* Returns non-zero if `(C & ~0x7f) == 0' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(isascii, __FORCELOCAL __ATTR_CONST int __NOTHROW(__LIBCCALL isascii)(int __c) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isascii))(__c); })
+#endif /* isascii... */
+#ifdef __CRT_HAVE_toascii
+/* Re-returns `C & 0x7f' */
+__CDECLARE(__ATTR_CONST,int,__NOTHROW,toascii,(int __c),(__c))
+#else /* LIBC: toascii */
+#include <local/ctype/toascii.h>
+/* Re-returns `C & 0x7f' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(toascii, __FORCELOCAL __ATTR_CONST int __NOTHROW(__LIBCCALL toascii)(int __c) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(toascii))(__c); })
+#endif /* toascii... */
+#if (!defined(__cplusplus) || defined(__USE_CTYPE_MACROS)) && !defined(__CXX_SYSTEM_HEADER)
+#define isascii(c) (((c) & ~0x7f) == 0)
+#define toascii(c) ((c) & 0x7f)
+#endif /* (!__cplusplus || __USE_CTYPE_MACROS) && !__CXX_SYSTEM_HEADER */
+
+#endif /* __USE_MISC || __USE_XOPEN */
+
 
 #endif /* __CC__ */
 

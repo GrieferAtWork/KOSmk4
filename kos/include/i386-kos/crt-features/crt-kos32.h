@@ -2602,6 +2602,7 @@
 #define __CRT_HAVE_isalnum_l 1
 #define __CRT_HAVE_isalpha 1
 #define __CRT_HAVE_isalpha_l 1
+#define __CRT_HAVE_isascii 1
 #define __CRT_HAVE_isastream 1
 #define __CRT_HAVE_isatty 1
 #define __CRT_HAVE_isblank 1
@@ -4669,6 +4670,7 @@
 #define __CRT_HAVE_tmpnam 1
 #define __CRT_HAVE_tmpnam_r 1
 #define __CRT_HAVE_tmpnam_s 1
+#define __CRT_HAVE_toascii 1
 #define __CRT_HAVE_tolower 1
 #define __CRT_HAVE_tolower_l 1
 #define __CRT_HAVE_toupper 1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7457d588 */
+/* HASH CRC-32:0x9f5c9b22 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -274,6 +274,22 @@ NOTHROW_NCX(LIBCCALL libc_toupper_l)(int ch,
 	return libc_toupper(ch);
 }
 
+/* Returns non-zero if `(C & ~0x7f) == 0' */
+INTERN ATTR_CONST
+ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.ctype.isascii") int
+NOTHROW(LIBCCALL libc_isascii)(int c) {
+#line 1000 "kos/src/libc/magic/ctype.c"
+	return (c & ~0x7f) == 0;
+}
+
+/* Re-returns `C & 0x7f' */
+INTERN ATTR_CONST
+ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.ctype.toascii") int
+NOTHROW(LIBCCALL libc_toascii)(int c) {
+#line 1005 "kos/src/libc/magic/ctype.c"
+	return c & 0x7f;
+}
+
 #endif /* !__KERNEL__ */
 DEFINE_PUBLIC_WEAK_ALIAS(iscntrl, libc_iscntrl);
 DEFINE_PUBLIC_WEAK_ALIAS(isspace, libc_isspace);
@@ -322,6 +338,8 @@ DEFINE_PUBLIC_WEAK_ALIAS(__tolower_l, libc_tolower_l);
 DEFINE_PUBLIC_WEAK_ALIAS(toupper_l, libc_toupper_l);
 DEFINE_PUBLIC_WEAK_ALIAS(_toupper_l, libc_toupper_l);
 DEFINE_PUBLIC_WEAK_ALIAS(__toupper_l, libc_toupper_l);
+DEFINE_PUBLIC_WEAK_ALIAS(isascii, libc_isascii);
+DEFINE_PUBLIC_WEAK_ALIAS(toascii, libc_toascii);
 #endif /* !__KERNEL__ */
 
 DECL_END

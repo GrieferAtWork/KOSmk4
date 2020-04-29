@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd0c3db8c */
+/* HASH CRC-32:0xc4027399 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1263,6 +1263,7 @@ __CRT_FUNCTION(isalnum,0,(),1,(int,ch),int)
 __CRT_FUNCTION(isalnum_l,0,(),2,(int,ch,__locale_t,locale),int)
 __CRT_FUNCTION(isalpha,0,(),1,(int,ch),int)
 __CRT_FUNCTION(isalpha_l,0,(),2,(int,ch,__locale_t,locale),int)
+__CRT_FUNCTION(isascii,0,(),1,(int,c),int)
 __CRT_FUNCTION(isastream,0,(),1,(fd_t,fildes),int)
 __CRT_FUNCTION(isatty,0,(),1,(fd_t,fd),int)
 __CRT_FUNCTION(isblank,0,(),1,(int,ch),int)
@@ -2345,6 +2346,7 @@ __CRT_FUNCTION(tmpfile_s,0,(),1,(FILE **,pstream),errno_t)
 __CRT_FUNCTION(tmpnam,0,(),1,(char *,buf),char *)
 __CRT_FUNCTION(tmpnam_r,0,(),1,(char *,buf),char *)
 __CRT_FUNCTION(tmpnam_s,0,(),2,(char *__restrict,buf,rsize_t,bufsize),errno_t)
+__CRT_FUNCTION(toascii,0,(),1,(int,c),int)
 __CRT_FUNCTION(tolower,0,(),1,(int,ch),int)
 __CRT_FUNCTION(tolower_l,0,(),2,(int,ch,__locale_t,locale),int)
 __CRT_FUNCTION(toupper,0,(),1,(int,ch),int)
