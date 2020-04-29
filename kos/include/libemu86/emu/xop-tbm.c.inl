@@ -47,7 +47,7 @@ case EMU86_OPCODE_ENCODE_XOP(9, 0x01): {
 			if (OVERFLOW_UADD(src, 1, &temp))
 				eflags_addend |= EFLAGS_CF;
 			temp &= src;
-			MODRM_SETREGQ(temp);
+			VEX_SETREGQ(temp);
 			eflags_addend |= emu86_geteflags_SFq(temp);
 			eflags_addend |= emu86_geteflags_ZFq(temp);
 		} else
@@ -59,7 +59,7 @@ case EMU86_OPCODE_ENCODE_XOP(9, 0x01): {
 			if (OVERFLOW_UADD(src, 1, &temp))
 				eflags_addend |= EFLAGS_CF;
 			temp &= src;
-			MODRM_SETREGL(temp);
+			VEX_SETREGL(temp);
 			eflags_addend |= emu86_geteflags_SFl(temp);
 			eflags_addend |= emu86_geteflags_ZFl(temp);
 		}

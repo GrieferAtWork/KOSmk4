@@ -40,22 +40,22 @@ __DECL_BEGIN
 #endif /* !__asm_ncx_memop__ */
 
 
-__FORCELOCAL __ATTR_CONST __UINT32_TYPE__ (__blcfilll)(__UINT32_TYPE__ __val) { __UINT32_TYPE__ __res; __asm_ncx_memop__("blcfill %k1, %k0" : "=r" (__res) : "g" (__val)); return __res; }
-__FORCELOCAL __ATTR_CONST __UINT32_TYPE__ (__blsfilll)(__UINT32_TYPE__ __val) { __UINT32_TYPE__ __res; __asm_ncx_memop__("blsfill %k1, %k0" : "=r" (__res) : "g" (__val)); return __res; }
-__FORCELOCAL __ATTR_CONST __UINT32_TYPE__ (__blcsl)(__UINT32_TYPE__ __val) { __UINT32_TYPE__ __res; __asm_ncx_memop__("blcs %k1, %k0" : "=r" (__res) : "g" (__val)); return __res; }
-__FORCELOCAL __ATTR_CONST __UINT32_TYPE__ (__tzmskl)(__UINT32_TYPE__ __val) { __UINT32_TYPE__ __res; __asm_ncx_memop__("tzmsk %k1, %k0" : "=r" (__res) : "g" (__val)); return __res; }
-__FORCELOCAL __ATTR_CONST __UINT32_TYPE__ (__blcicl)(__UINT32_TYPE__ __val) { __UINT32_TYPE__ __res; __asm_ncx_memop__("blcic %k1, %k0" : "=r" (__res) : "g" (__val)); return __res; }
-__FORCELOCAL __ATTR_CONST __UINT32_TYPE__ (__blsicl)(__UINT32_TYPE__ __val) { __UINT32_TYPE__ __res; __asm_ncx_memop__("blsic %k1, %k0" : "=r" (__res) : "g" (__val)); return __res; }
-__FORCELOCAL __ATTR_CONST __UINT32_TYPE__ (__t1mskcl)(__UINT32_TYPE__ __val) { __UINT32_TYPE__ __res; __asm_ncx_memop__("t1mskc %k1, %k0" : "=r" (__res) : "g" (__val)); return __res; }
+__FORCELOCAL __ATTR_CONST __UINT32_TYPE__ (__blcfilll)(__UINT32_TYPE__ __val) { __UINT32_TYPE__ __res; __asm_ncx_memop__("blcfill %k1, %k0" : "=r" (__res) : "g" (__val) : "cc"); return __res; }
+__FORCELOCAL __ATTR_CONST __UINT32_TYPE__ (__blsfilll)(__UINT32_TYPE__ __val) { __UINT32_TYPE__ __res; __asm_ncx_memop__("blsfill %k1, %k0" : "=r" (__res) : "g" (__val) : "cc"); return __res; }
+__FORCELOCAL __ATTR_CONST __UINT32_TYPE__ (__blcsl)(__UINT32_TYPE__ __val) { __UINT32_TYPE__ __res; __asm_ncx_memop__("blcs %k1, %k0" : "=r" (__res) : "g" (__val) : "cc"); return __res; }
+__FORCELOCAL __ATTR_CONST __UINT32_TYPE__ (__tzmskl)(__UINT32_TYPE__ __val) { __UINT32_TYPE__ __res; __asm_ncx_memop__("tzmsk %k1, %k0" : "=r" (__res) : "g" (__val) : "cc"); return __res; }
+__FORCELOCAL __ATTR_CONST __UINT32_TYPE__ (__blcicl)(__UINT32_TYPE__ __val) { __UINT32_TYPE__ __res; __asm_ncx_memop__("blcic %k1, %k0" : "=r" (__res) : "g" (__val) : "cc"); return __res; }
+__FORCELOCAL __ATTR_CONST __UINT32_TYPE__ (__blsicl)(__UINT32_TYPE__ __val) { __UINT32_TYPE__ __res; __asm_ncx_memop__("blsic %k1, %k0" : "=r" (__res) : "g" (__val) : "cc"); return __res; }
+__FORCELOCAL __ATTR_CONST __UINT32_TYPE__ (__t1mskcl)(__UINT32_TYPE__ __val) { __UINT32_TYPE__ __res; __asm_ncx_memop__("t1mskc %k1, %k0" : "=r" (__res) : "g" (__val) : "cc"); return __res; }
 
 #ifdef __x86_64__
-__FORCELOCAL __ATTR_CONST __UINT64_TYPE__ (__blcfillq)(__UINT64_TYPE__ __val) { __UINT64_TYPE__ __res; __asm_ncx_memop__("blcfill %q1, %q0" : "=r" (__res) : "g" (__val)); return __res; }
-__FORCELOCAL __ATTR_CONST __UINT64_TYPE__ (__blsfillq)(__UINT64_TYPE__ __val) { __UINT64_TYPE__ __res; __asm_ncx_memop__("blsfill %q1, %q0" : "=r" (__res) : "g" (__val)); return __res; }
-__FORCELOCAL __ATTR_CONST __UINT64_TYPE__ (__blcsq)(__UINT64_TYPE__ __val) { __UINT64_TYPE__ __res; __asm_ncx_memop__("blcs %q1, %q0" : "=r" (__res) : "g" (__val)); return __res; }
-__FORCELOCAL __ATTR_CONST __UINT64_TYPE__ (__tzmskq)(__UINT64_TYPE__ __val) { __UINT64_TYPE__ __res; __asm_ncx_memop__("tzmsk %q1, %q0" : "=r" (__res) : "g" (__val)); return __res; }
-__FORCELOCAL __ATTR_CONST __UINT64_TYPE__ (__blcicq)(__UINT64_TYPE__ __val) { __UINT64_TYPE__ __res; __asm_ncx_memop__("blcic %q1, %q0" : "=r" (__res) : "g" (__val)); return __res; }
-__FORCELOCAL __ATTR_CONST __UINT64_TYPE__ (__blsicq)(__UINT64_TYPE__ __val) { __UINT64_TYPE__ __res; __asm_ncx_memop__("blsic %q1, %q0" : "=r" (__res) : "g" (__val)); return __res; }
-__FORCELOCAL __ATTR_CONST __UINT64_TYPE__ (__t1mskcq)(__UINT64_TYPE__ __val) { __UINT64_TYPE__ __res; __asm_ncx_memop__("t1mskc %q1, %q0" : "=r" (__res) : "g" (__val)); return __res; }
+__FORCELOCAL __ATTR_CONST __UINT64_TYPE__ (__blcfillq)(__UINT64_TYPE__ __val) { __UINT64_TYPE__ __res; __asm_ncx_memop__("blcfill %q1, %q0" : "=r" (__res) : "g" (__val) : "cc"); return __res; }
+__FORCELOCAL __ATTR_CONST __UINT64_TYPE__ (__blsfillq)(__UINT64_TYPE__ __val) { __UINT64_TYPE__ __res; __asm_ncx_memop__("blsfill %q1, %q0" : "=r" (__res) : "g" (__val) : "cc"); return __res; }
+__FORCELOCAL __ATTR_CONST __UINT64_TYPE__ (__blcsq)(__UINT64_TYPE__ __val) { __UINT64_TYPE__ __res; __asm_ncx_memop__("blcs %q1, %q0" : "=r" (__res) : "g" (__val) : "cc"); return __res; }
+__FORCELOCAL __ATTR_CONST __UINT64_TYPE__ (__tzmskq)(__UINT64_TYPE__ __val) { __UINT64_TYPE__ __res; __asm_ncx_memop__("tzmsk %q1, %q0" : "=r" (__res) : "g" (__val) : "cc"); return __res; }
+__FORCELOCAL __ATTR_CONST __UINT64_TYPE__ (__blcicq)(__UINT64_TYPE__ __val) { __UINT64_TYPE__ __res; __asm_ncx_memop__("blcic %q1, %q0" : "=r" (__res) : "g" (__val) : "cc"); return __res; }
+__FORCELOCAL __ATTR_CONST __UINT64_TYPE__ (__blsicq)(__UINT64_TYPE__ __val) { __UINT64_TYPE__ __res; __asm_ncx_memop__("blsic %q1, %q0" : "=r" (__res) : "g" (__val) : "cc"); return __res; }
+__FORCELOCAL __ATTR_CONST __UINT64_TYPE__ (__t1mskcq)(__UINT64_TYPE__ __val) { __UINT64_TYPE__ __res; __asm_ncx_memop__("t1mskc %q1, %q0" : "=r" (__res) : "g" (__val) : "cc"); return __res; }
 #endif /* __x86_64__ */
 
 

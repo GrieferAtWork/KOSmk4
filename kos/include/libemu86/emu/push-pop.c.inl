@@ -96,7 +96,7 @@ case EMU86_OPCODE_ENCODE(0x8f): {
 			byte_t const *orig_modrm_pc = pc;
 			u8 orig_modrm_reg = modrm.mi_reg;
 			u16 vex;
-			pc = start_pc;
+			pc = start_pc + 1;
 			vex = *pc++;
 			vex <<= 8;
 			vex |= *pc++;

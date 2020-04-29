@@ -420,7 +420,7 @@ parse_sib_byte:
 			result->mi_type  = EMU86_MODRM_MEMORY;
 			result->mi_index = 0xff;
 			if (result->mi_rm == EMU86_R_ESP) {
-				sibbyte         = *pc++;
+				sibbyte           = *pc++;
 				result->mi_offset = (__int32_t)*(__int8_t *)pc;
 				++pc;
 				goto parse_sib_byte;
