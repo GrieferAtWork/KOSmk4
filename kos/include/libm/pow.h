@@ -146,7 +146,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 			return __LIBM_LOCAL_VALUE(onef); /* +-1**+-inf = 1 */
 		else if (__ix > 0x3f800000) /* (|x|>1)**+-inf = inf,0 */
 			return (__hy >= 0) ? __y : __LIBM_LOCAL_VALUE(zerof);
-		else { /* (|x|<1)**-,+inf = inf,0 */
+		else { /* (|x| < 1)**-,+inf = inf,0 */
 			return (__hy < 0) ? -__y : __LIBM_LOCAL_VALUE(zerof);
 		}
 	}
@@ -186,7 +186,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 		return (__x - __x) / (__x - __x);
 
 	/* |y| is huge */
-	if (__iy > 0x4d000000) { /* if |y| > 2**27 */
+	if (__iy > 0x4d000000) { /* if |y| > 2 ** 27 */
 		                   /* over/underflow if x is not close to one */
 		if (__ix < 0x3f7ffff8)
 			return (__hy < 0) ? __LIBM_LOCAL_VALUE(hugef) * __LIBM_LOCAL_VALUE(hugef)
@@ -194,7 +194,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 		if (__ix > 0x3f800007)
 			return (__hy > 0) ? __LIBM_LOCAL_VALUE(hugef) * __LIBM_LOCAL_VALUE(hugef)
 			                  : __LIBM_LOCAL_VALUE(tinyf) * __LIBM_LOCAL_VALUE(tinyf);
-		/* now |1-x| is tiny <= 2**-20, suffice to compute 
+		/* now |1-x| is tiny <= 2 ** -20, suffice to compute 
 	   log(x) by x-x^2/2+x^3/3-x^4/4 */
 		__t  = __ax - 1; /* t has 20 trailing zeros */
 		__w  = (__t * __t) * (__IEEE754_FLOAT_C(0.5) - __t * (__IEEE754_FLOAT_C(0.333333333333) - __t * __IEEE754_FLOAT_C(0.25)));
@@ -220,9 +220,9 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 		/* determine interval */
 		__ix = __j | 0x3f800000; /* normalize ix */
 		if (__j <= 0x1cc471)
-			__k = 0; /* |x|<sqrt(3/2) */
+			__k = 0; /* |x| < sqrt(3/2) */
 		else if (__j < 0x5db3d7)
-			__k = 1; /* |x|<sqrt(3)   */
+			__k = 1; /* |x| < sqrt(3)   */
 		else {
 			__k = 0;
 			__n += 1;
@@ -301,7 +301,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 				return __s * __LIBM_LOCAL_VALUE(tinyf) * __LIBM_LOCAL_VALUE(tinyf); /* underflow */
 		}
 	}
-	/* compute 2**(p_h+p_l) */
+	/* compute 2 ** (p_h+p_l) */
 	__k = (__i >> 23) - 0x7f;
 	__n = 0;
 	if (__i > 0x3f000000) { /* if |z| > 0.5, set n = [z+0.5] */
@@ -460,7 +460,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 			else if (__ix >= 0x3ff00000) /* (|x|>1)**+-inf = inf,0 */
 				return (__hy >= 0) ? __y : __LIBM_LOCAL_VALUE(zero);
 			else {
-				/* (|x|<1)**-,+inf = inf,0 */
+				/* (|x| < 1)**-,+inf = inf,0 */
 				return (__hy < 0) ? -__y : __LIBM_LOCAL_VALUE(zero);
 			}
 		}
@@ -501,8 +501,8 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 		return (__x - __x) / (__x - __x);
 
 	/* |y| is huge */
-	if (__iy > 0x41e00000) {     /* if |y| > 2**31 */
-		if (__iy > 0x43f00000) { /* if |y| > 2**64, must o/uflow */
+	if (__iy > 0x41e00000) {     /* if |y| > 2 ** 31 */
+		if (__iy > 0x43f00000) { /* if |y| > 2 ** 64, must o/uflow */
 			if (__ix <= 0x3fefffff)
 				return (__hy < 0) ? __LIBM_LOCAL_VALUE(huge) * __LIBM_LOCAL_VALUE(huge)
 				                  : __LIBM_LOCAL_VALUE(tiny) * __LIBM_LOCAL_VALUE(tiny);
@@ -517,7 +517,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 		if (__ix > 0x3ff00000)
 			return (__hy > 0) ? __LIBM_LOCAL_VALUE(huge) * __LIBM_LOCAL_VALUE(huge)
 			                  : __LIBM_LOCAL_VALUE(tiny) * __LIBM_LOCAL_VALUE(tiny);
-		/* now |1-x| is tiny <= 2**-20, suffice to compute log(x) by x-x^2/2+x^3/3-x^4/4 */
+		/* now |1-x| is tiny <= 2 ** -20, suffice to compute log(x) by x-x^2/2+x^3/3-x^4/4 */
 		__t  = __ax - 1; /* t has 20 trailing zeros */
 		__w  = (__t * __t) * (0.5 - __t * (0.3333333333333333333333 - __t * 0.25));
 		__u  = __LIBM_LOCAL_VALUE(ivln2_h) * __t; /* ivln2_h has 21 sig. bits */
@@ -539,9 +539,9 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 		/* determine interval */
 		__ix = __j | 0x3ff00000; /* normalize ix */
 		if (__j <= 0x3988E)
-			__k = 0; /* |x|<sqrt(3/2) */
+			__k = 0; /* |x| < sqrt(3/2) */
 		else if (__j < 0xBB67A)
-			__k = 1; /* |x|<sqrt(3)   */
+			__k = 1; /* |x| < sqrt(3)   */
 		else {
 			__k = 0;
 			__n += 1;
@@ -618,7 +618,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 				return __s * __LIBM_LOCAL_VALUE(tiny) * __LIBM_LOCAL_VALUE(tiny); /* underflow */
 		}
 	}
-	/* compute 2**(p_h+p_l) */
+	/* compute 2 ** (p_h+p_l) */
 	__i = __j & 0x7fffffff;
 	__k = (__i >> 20) - 0x3ff;
 	__n = 0;

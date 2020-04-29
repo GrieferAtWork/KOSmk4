@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc3db1d3 */
+/* HASH CRC-32:0x129751e1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -93,19 +93,19 @@ __DECL_BEGIN
 /* Insufficient virtual address space
  * 	@@The number of bytes that could not be allocated
  * 	member num_bytes: size_t; */
-#define E_BADALLOC_INSUFFICIENT_HEAP_MEMORY (E_BADALLOC,0x0001)
+#define E_BADALLOC_INSUFFICIENT_HEAP_MEMORY (E_BADALLOC, 0x0001)
 /* Insufficient virtual address space
  * 	@@The number of bytes that could not be allocated
  * 	member num_pages: size_t; */
-#define E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY (E_BADALLOC,0x0002)
+#define E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY (E_BADALLOC, 0x0002)
 /* Insufficient physical memory
  * 	@@The number of bytes that could not be allocated
  * 	member num_pages: size_t; */
-#define E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY (E_BADALLOC,0x0003)
+#define E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY (E_BADALLOC, 0x0003)
 /* Insufficient space in swap
  * 	@@The number of bytes that could not be allocated
  * 	member num_pages: size_t; */
-#define E_BADALLOC_INSUFFICIENT_SWAP_SPACE (E_BADALLOC,0x0004)
+#define E_BADALLOC_INSUFFICIENT_SWAP_SPACE (E_BADALLOC, 0x0004)
 /* The caller is not allowed to allocate more handles without first closing some old ones
  * s.a.: /src/kernel/include/kernel/handle.h
  * 	@@The number of handles that were attempted to be allocated (usually 1)
@@ -114,7 +114,7 @@ __DECL_BEGIN
  * 	member cur_handles: unsigned int;
  * 	@@The max number of handles that may be allocated by the caller
  * 	member max_handles: unsigned int; */
-#define E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS (E_BADALLOC,0x0005)
+#define E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS (E_BADALLOC, 0x0005)
 /* Attempted to allocated a handle index greater than the max allowed index
  * s.a.: /src/kernel/include/kernel/handle.h
  * 	@@The requested handle number, past which no more unused handles exist.
@@ -123,16 +123,16 @@ __DECL_BEGIN
  * 	member cur_max: unsigned int;
  * 	@@The set handle id which may not be exceeded
  * 	member cur_limit: unsigned int; */
-#define E_BADALLOC_INSUFFICIENT_HANDLE_RANGE (E_BADALLOC,0x0006)
+#define E_BADALLOC_INSUFFICIENT_HANDLE_RANGE (E_BADALLOC, 0x0006)
 /* No suitable, free device numbers are available
  * 	@@The kind of device number lacking (One of `E_NO_DEVICE_KIND_*')
  * 	member dev_kind: unsigned int; */
-#define E_BADALLOC_INSUFFICIENT_DEVICE_NUMBERS (E_BADALLOC,0x0007)
+#define E_BADALLOC_INSUFFICIENT_DEVICE_NUMBERS (E_BADALLOC, 0x0007)
 /* The given interrupt vector is, or all usable vectors are already in use
  * 	@@The given vector (if that specific vector is already in use),
  * 	@@or (uintptr_t)-1 when all vectors are already in use.
  * 	member vector: uintptr_t; */
-#define E_BADALLOC_INSUFFICIENT_INTERRUPT_VECTORS (E_BADALLOC,0x0008)
+#define E_BADALLOC_INSUFFICIENT_INTERRUPT_VECTORS (E_BADALLOC, 0x0008)
 /* Failed to dynamically allocate a socket port number
  * 	@@The socket's address family (one of `AF_*')
  * 	member address_family: uintptr_t;
@@ -140,7 +140,7 @@ __DECL_BEGIN
  * 	member socket_type: uintptr_t;
  * 	@@The socket's protocol (dependent on `address_family' and `socket_type')
  * 	member protocol: uintptr_t; */
-#define E_BADALLOC_INSUFFICIENT_PORT_NUMBERS (E_BADALLOC,0x0009)
+#define E_BADALLOC_INSUFFICIENT_PORT_NUMBERS (E_BADALLOC, 0x0009)
 
 
 
@@ -155,7 +155,7 @@ __DECL_BEGIN
  * 	member mask: uintptr_t;
  * 	@@The mask of fixed bits
  * 	member result: uintptr_t; */
-#define E_INVALID_ARGUMENT_UNKNOWN_FLAG (E_INVALID_ARGUMENT,0x0001)
+#define E_INVALID_ARGUMENT_UNKNOWN_FLAG (E_INVALID_ARGUMENT, 0x0001)
 /* A reserved bit was set incorrectly, such that `(value & mask) != result' was the case
  * 	@@Argument context (One of `E_INVALID_ARGUMENT_CONTEXT_*')
  * 	member context: unsigned int;
@@ -165,7 +165,7 @@ __DECL_BEGIN
  * 	member mask: uintptr_t;
  * 	@@The mask of fixed bits
  * 	member result: uintptr_t; */
-#define E_INVALID_ARGUMENT_RESERVED_FLAG (E_INVALID_ARGUMENT,0x0002)
+#define E_INVALID_ARGUMENT_RESERVED_FLAG (E_INVALID_ARGUMENT, 0x0002)
 /* An invalid combination of flags was set, such that `(value & mask) == result' was the case
  * 	@@Argument context (One of `E_INVALID_ARGUMENT_CONTEXT_*')
  * 	member context: unsigned int;
@@ -175,7 +175,7 @@ __DECL_BEGIN
  * 	member mask: uintptr_t;
  * 	@@The invalid resulting value
  * 	member result: uintptr_t; */
-#define E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION (E_INVALID_ARGUMENT,0x0003)
+#define E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION (E_INVALID_ARGUMENT, 0x0003)
 /* A masked type field `(value & mask)' contains an invalid value
  * 	@@Argument context (One of `E_INVALID_ARGUMENT_CONTEXT_*')
  * 	member context: unsigned int;
@@ -183,7 +183,7 @@ __DECL_BEGIN
  * 	member value: uintptr_t;
  * 	@@The mask of relevant bits
  * 	member mask: uintptr_t; */
-#define E_INVALID_ARGUMENT_BAD_FLAG_MASK (E_INVALID_ARGUMENT,0x0004)
+#define E_INVALID_ARGUMENT_BAD_FLAG_MASK (E_INVALID_ARGUMENT, 0x0004)
 /* A given `value' has an invalid alignment when masked by `mask', such that
  * the expression `(mask & value) != required_masked_value' was the case.
  * 	@@Argument context (One of `E_INVALID_ARGUMENT_CONTEXT_*')
@@ -194,27 +194,27 @@ __DECL_BEGIN
  * 	member mask: uintptr_t;
  * 	@@The required result of masking `value'
  * 	member required_masked_value: uintptr_t; */
-#define E_INVALID_ARGUMENT_BAD_ALIGNMENT (E_INVALID_ARGUMENT,0x0005)
+#define E_INVALID_ARGUMENT_BAD_ALIGNMENT (E_INVALID_ARGUMENT, 0x0005)
 /* A given `value' is invalid for the associated argument
  * 	@@Argument context (One of `E_INVALID_ARGUMENT_CONTEXT_*')
  * 	member context: unsigned int;
  * 	@@The value that was given
  * 	member value: uintptr_t; */
-#define E_INVALID_ARGUMENT_BAD_VALUE (E_INVALID_ARGUMENT,0x0006)
+#define E_INVALID_ARGUMENT_BAD_VALUE (E_INVALID_ARGUMENT, 0x0006)
 /* A reserved argument had an unexpected value
  * 	@@Argument context (One of `E_INVALID_ARGUMENT_CONTEXT_*')
  * 	member context: unsigned int; */
-#define E_INVALID_ARGUMENT_RESERVED_ARGUMENT (E_INVALID_ARGUMENT,0x0007)
+#define E_INVALID_ARGUMENT_RESERVED_ARGUMENT (E_INVALID_ARGUMENT, 0x0007)
 /* An unknown command was given
  * 	@@Argument context (One of `E_INVALID_ARGUMENT_CONTEXT_*')
  * 	member context: unsigned int;
  * 	@@The command that was given
  * 	member command: uintptr_t; */
-#define E_INVALID_ARGUMENT_UNKNOWN_COMMAND (E_INVALID_ARGUMENT,0x0008)
+#define E_INVALID_ARGUMENT_UNKNOWN_COMMAND (E_INVALID_ARGUMENT, 0x0008)
 /* The current object state does not allow this operation
  * 	@@Argument context (One of `E_INVALID_ARGUMENT_CONTEXT_*')
  * 	member context: unsigned int; */
-#define E_INVALID_ARGUMENT_BAD_STATE (E_INVALID_ARGUMENT,0x0009)
+#define E_INVALID_ARGUMENT_BAD_STATE (E_INVALID_ARGUMENT, 0x0009)
 /* Unrecognized combination of level/optname
  * 	@@Argument context (One of `E_INVALID_ARGUMENT_CONTEXT_*')
  * 	member context: unsigned int;
@@ -228,7 +228,7 @@ __DECL_BEGIN
  * 	member socket_type: uintptr_t;
  * 	@@The socket's protocol (dependent on `address_family' and `socket_type')
  * 	member protocol: uintptr_t; */
-#define E_INVALID_ARGUMENT_SOCKET_OPT (E_INVALID_ARGUMENT,0x000a)
+#define E_INVALID_ARGUMENT_SOCKET_OPT (E_INVALID_ARGUMENT, 0x000a)
 /* One command was given when a different one was expected
  * 	@@Argument context (One of `E_INVALID_ARGUMENT_CONTEXT_*')
  * 	member context: unsigned int;
@@ -236,15 +236,15 @@ __DECL_BEGIN
  * 	member command: uintptr_t;
  * 	@@The command that had been expected
  * 	member expected_command: uintptr_t; */
-#define E_INVALID_ARGUMENT_UNEXPECTED_COMMAND (E_INVALID_ARGUMENT,0x000b)
+#define E_INVALID_ARGUMENT_UNEXPECTED_COMMAND (E_INVALID_ARGUMENT, 0x000b)
 
 
 
 
 /* Unimplemented function */
 #define E_NOT_IMPLEMENTED (0x0003)
-#define E_NOT_IMPLEMENTED_UNSUPPORTED (E_NOT_IMPLEMENTED,0x0001)
-#define E_NOT_IMPLEMENTED_TODO (E_NOT_IMPLEMENTED,0x0002)
+#define E_NOT_IMPLEMENTED_UNSUPPORTED (E_NOT_IMPLEMENTED, 0x0001)
+#define E_NOT_IMPLEMENTED_TODO (E_NOT_IMPLEMENTED, 0x0002)
 
 
 
@@ -260,7 +260,7 @@ __DECL_BEGIN
  * 	member fd_max: unsigned int;
  * 	@@The max allowed FD number that may be assigned
  * 	member fd_limit: unsigned int; */
-#define E_INVALID_HANDLE_FILE (E_INVALID_HANDLE,0x0001)
+#define E_INVALID_HANDLE_FILE (E_INVALID_HANDLE, 0x0001)
 /* The FD slot associated with the given number has no bound value */
 #define E_INVALID_HANDLE_FILE_UNBOUND 0x0001
 /* The FD slot associated with the given number isn't allocated (`fd >= fd_max') */
@@ -278,7 +278,7 @@ __DECL_BEGIN
  * 	member needed_handle_kind: unsigned int;
  * 	@@The type-kind of handle that was found (One of `HANDLE_TYPEKIND_*' from <kos/kernel/handle.h>)
  * 	member actual_handle_kind: unsigned int; */
-#define E_INVALID_HANDLE_FILETYPE (E_INVALID_HANDLE,0x0002)
+#define E_INVALID_HANDLE_FILETYPE (E_INVALID_HANDLE, 0x0002)
 /* Invalid handle operation
  * 	@@The FD number that was accessed
  * 	member fd: unsigned int;
@@ -286,7 +286,7 @@ __DECL_BEGIN
  * 	member op: unsigned int;
  * 	@@The access permissions of the handle
  * 	member handle_mode: iomode_t; */
-#define E_INVALID_HANDLE_OPERATION (E_INVALID_HANDLE,0x0003)
+#define E_INVALID_HANDLE_OPERATION (E_INVALID_HANDLE, 0x0003)
 /* Attempted to read() on a handle opened as IO_WRONLY */
 #define E_INVALID_HANDLE_OPERATION_READ 0x0001
 /* Attempted to write() on a handle opened as IO_RDONLY */
@@ -311,7 +311,7 @@ __DECL_BEGIN
  * 	member socket_type: uintptr_t;
  * 	@@The socket's protocol (dependent on `address_family' and `socket_type')
  * 	member protocol: uintptr_t; */
-#define E_INVALID_HANDLE_NET_OPERATION (E_INVALID_HANDLE,0x0004)
+#define E_INVALID_HANDLE_NET_OPERATION (E_INVALID_HANDLE, 0x0004)
 
 
 
@@ -319,9 +319,9 @@ __DECL_BEGIN
 /* A blocking call was attempted when non-blocking behavior was requested */
 #define E_WOULDBLOCK (0x0005)
 /* An attempt to task_yield() / sched_yield() / etc. would have blocked */
-#define E_WOULDBLOCK_PREEMPTED (E_WOULDBLOCK,0x0001)
+#define E_WOULDBLOCK_PREEMPTED (E_WOULDBLOCK, 0x0001)
 /* An attempt to wait for a signal would have blocked */
-#define E_WOULDBLOCK_WAITFORSIGNAL (E_WOULDBLOCK,0x0002)
+#define E_WOULDBLOCK_WAITFORSIGNAL (E_WOULDBLOCK, 0x0002)
 
 
 
@@ -368,13 +368,13 @@ __DECL_BEGIN
 /* The specified object doesn't exist */
 #define E_NO_SUCH_OBJECT (0x0009)
 /* No block device has been bound */
-#define E_NO_SUCH_BLOCKDEVICE (E_NO_SUCH_OBJECT,0x0001)
+#define E_NO_SUCH_BLOCKDEVICE (E_NO_SUCH_OBJECT, 0x0001)
 /* No process has been bound */
-#define E_NO_SUCH_PROCESS (E_NO_SUCH_OBJECT,0x0002)
+#define E_NO_SUCH_PROCESS (E_NO_SUCH_OBJECT, 0x0002)
 /* No pid namespace has been bound */
-#define E_NO_SUCH_PIDNS (E_NO_SUCH_OBJECT,0x0003)
+#define E_NO_SUCH_PIDNS (E_NO_SUCH_OBJECT, 0x0003)
 /* No controlling terminal has been assigned to the calling session */
-#define E_NO_CTTY (E_NO_SUCH_OBJECT,0x0004)
+#define E_NO_CTTY (E_NO_SUCH_OBJECT, 0x0004)
 
 
 
@@ -388,7 +388,7 @@ __DECL_BEGIN
  * 	member action: pid_t;
  * 	@@A second pid, or 0 if unused
  * 	member pid2: pid_t; */
-#define E_ILLEGAL_PROCESS_OPERATION (E_ILLEGAL_OPERATION,0x0001)
+#define E_ILLEGAL_PROCESS_OPERATION (E_ILLEGAL_OPERATION, 0x0001)
 /* Attempted to move the leader of a process group into a different process group (`pid2' is the PID of the target process group) */
 #define E_ILLEGAL_PROCESS_OPERATION_SETPGID_LEADER 0x0001
 
@@ -400,19 +400,19 @@ __DECL_BEGIN
 /* Attempted to access a file that has been deleted
  * 	@@The reason/context in which the file was deleted (One of `E_FILESYSTEM_DELETED_*')
  * 	member reason: unsigned int; */
-#define E_FSERROR_DELETED (E_FSERROR,0x0001)
+#define E_FSERROR_DELETED (E_FSERROR, 0x0001)
 /* File not found */
-#define E_FSERROR_FILE_NOT_FOUND (E_FSERROR,0x0002)
+#define E_FSERROR_FILE_NOT_FOUND (E_FSERROR, 0x0002)
 /* Path not found
  * 	@@The reason/context why the path wasn't found (One of `E_FILESYSTEM_PATH_NOT_FOUND_*')
  * 	member reason: unsigned int; */
-#define E_FSERROR_PATH_NOT_FOUND (E_FSERROR,0x0003)
+#define E_FSERROR_PATH_NOT_FOUND (E_FSERROR, 0x0003)
 /* Illegal or malformed path */
-#define E_FSERROR_ILLEGAL_PATH (E_FSERROR,0x0004)
+#define E_FSERROR_ILLEGAL_PATH (E_FSERROR, 0x0004)
 /* A directory was expected, but something else was found
  * 	@@The context in which a filesystem component was required to be a directory, but wasn't (One of `E_FILESYSTEM_NOT_A_DIRECTORY_*')
  * 	member action_context: uintptr_t; */
-#define E_FSERROR_NOT_A_DIRECTORY (E_FSERROR,0x0005)
+#define E_FSERROR_NOT_A_DIRECTORY (E_FSERROR, 0x0005)
 /* Thrown as the result of attempting to traverse a non-directory item as though it was one (e.g. `open("/opt/readme.txt/foobar")') */
 #define E_FILESYSTEM_NOT_A_DIRECTORY_WALK 0x0001
 /* Thrown as the result of `open(path, O_DIRECTORY)', where `path' isn't a directory */
@@ -428,23 +428,23 @@ __DECL_BEGIN
 #define E_FSERROR_IS_FILE_NOT_FOUND(x) (ERROR_SUBCLASS(x) <= 0x0005)
 
 /* Attempted to follow too many symbolic links (probably as the result of a loop) */
-#define E_FSERROR_TOO_MANY_SYMBOLIC_LINKS (E_FSERROR,0x0006)
+#define E_FSERROR_TOO_MANY_SYMBOLIC_LINKS (E_FSERROR, 0x0006)
 /* File access was denied */
-#define E_FSERROR_ACCESS_DENIED (E_FSERROR,0x0007)
+#define E_FSERROR_ACCESS_DENIED (E_FSERROR, 0x0007)
 /* Attempted to write when the disk was already full */
-#define E_FSERROR_DISK_FULL (E_FSERROR,0x0008)
+#define E_FSERROR_DISK_FULL (E_FSERROR, 0x0008)
 /* Read-only filesystem */
-#define E_FSERROR_READONLY (E_FSERROR,0x0009)
+#define E_FSERROR_READONLY (E_FSERROR, 0x0009)
 /* Too many hard links already exist for a given file */
-#define E_FSERROR_TOO_MANY_HARD_LINKS (E_FSERROR,0x000a)
+#define E_FSERROR_TOO_MANY_HARD_LINKS (E_FSERROR, 0x000a)
 /* A directory was found, but something else was expected
  * 	@@The context in which a filesystem component was required to not be a directory, but was one (One of `E_FILESYSTEM_IS_A_DIRECTORY_*')
  * 	member action_context: uintptr_t; */
-#define E_FSERROR_IS_A_DIRECTORY (E_FSERROR,0x000b)
+#define E_FSERROR_IS_A_DIRECTORY (E_FSERROR, 0x000b)
 /* A symbolic link was expected when something else was found
  * 	@@The context in which a filesystem component was required to be a symlink, but was one (One of `E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_*')
  * 	member action_context: uintptr_t; */
-#define E_FSERROR_NOT_A_SYMBOLIC_LINK (E_FSERROR,0x000c)
+#define E_FSERROR_NOT_A_SYMBOLIC_LINK (E_FSERROR, 0x000c)
 /* Thrown as the result of `open(path, O_SYMLINK | O_EXCL)', where `path' isn't a symbolic link */
 #define E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_OPEN 0x0001
 /* Thrown as the result of using `readlink(path)', where `path' isn't a symbolic link */
@@ -452,41 +452,41 @@ __DECL_BEGIN
 /* A symbolic link was encountered when none was expected
  * 	@@The context in which a filesystem component was required to not be a symlink, but was one (One of `E_FILESYSTEM_IS_A_SYMBOLIC_LINK_*')
  * 	member action_context: uintptr_t; */
-#define E_FSERROR_IS_A_SYMBOLIC_LINK (E_FSERROR,0x000d)
+#define E_FSERROR_IS_A_SYMBOLIC_LINK (E_FSERROR, 0x000d)
 /* Thrown as the result of `open(path,O_NOFOLLOW)', where `path' refers to a symbolic link */
 #define E_FILESYSTEM_IS_A_SYMBOLIC_LINK_OPEN 0x0001
 /* Thrown as the result of `exec(path,AT_SYMLINK_NOFOLLOW)', where `path' refers to a symbolic link */
 #define E_FILESYSTEM_IS_A_SYMBOLIC_LINK_EXEC 0x0002
 /* Thrown as the result of `open(path,O_CREAT|O_EXCL)', where `path' already exists */
-#define E_FSERROR_FILE_ALREADY_EXISTS (E_FSERROR,0x000e)
+#define E_FSERROR_FILE_ALREADY_EXISTS (E_FSERROR, 0x000e)
 /* Attempted to remove a non-empty directory */
-#define E_FSERROR_DIRECTORY_NOT_EMPTY (E_FSERROR,0x000f)
+#define E_FSERROR_DIRECTORY_NOT_EMPTY (E_FSERROR, 0x000f)
 /* Attempted to rename() or link() a file from one device to another */
-#define E_FSERROR_CROSS_DEVICE_LINK (E_FSERROR,0x0010)
+#define E_FSERROR_CROSS_DEVICE_LINK (E_FSERROR, 0x0010)
 /* Attempted to move a directory such that it would become a child of itself */
-#define E_FSERROR_DIRECTORY_MOVE_TO_CHILD (E_FSERROR,0x0011)
+#define E_FSERROR_DIRECTORY_MOVE_TO_CHILD (E_FSERROR, 0x0011)
 /* Attempted to mount() something that isn't a block-device */
-#define E_FSERROR_NOT_A_BLOCK_DEVICE (E_FSERROR,0x0012)
+#define E_FSERROR_NOT_A_BLOCK_DEVICE (E_FSERROR, 0x0012)
 /* Attempted to mount() a filesystem without a block-device, when that filesystem requires one */
-#define E_FSERROR_NO_BLOCK_DEVICE (E_FSERROR,0x0013)
+#define E_FSERROR_NO_BLOCK_DEVICE (E_FSERROR, 0x0013)
 /* Attempted to mount a block-device with the wrong file system */
-#define E_FSERROR_WRONG_FILE_SYSTEM (E_FSERROR,0x0014)
+#define E_FSERROR_WRONG_FILE_SYSTEM (E_FSERROR, 0x0014)
 /* Attempted to mount an unknown file system type */
-#define E_FSERROR_UNKNOWN_FILE_SYSTEM (E_FSERROR,0x0015)
+#define E_FSERROR_UNKNOWN_FILE_SYSTEM (E_FSERROR, 0x0015)
 /* The filesystem data found within a given block-device has been corrupted and cannot be mounted */
-#define E_FSERROR_CORRUPTED_FILE_SYSTEM (E_FSERROR,0x0016)
+#define E_FSERROR_CORRUPTED_FILE_SYSTEM (E_FSERROR, 0x0016)
 /* Attempted to mount a block-device with a different file system type than the one it had already been mounted with */
-#define E_FSERROR_DEVICE_ALREADY_MOUNTED (E_FSERROR,0x0017)
+#define E_FSERROR_DEVICE_ALREADY_MOUNTED (E_FSERROR, 0x0017)
 /* Attempted to create a new mounting point for a path that has already been mounted */
-#define E_FSERROR_PATH_ALREADY_MOUNTED (E_FSERROR,0x0018)
+#define E_FSERROR_PATH_ALREADY_MOUNTED (E_FSERROR, 0x0018)
 /* Attempted to umount() a path that isn't a mounting point */
-#define E_FSERROR_NOT_A_MOUNTING_POINT (E_FSERROR,0x0019)
+#define E_FSERROR_NOT_A_MOUNTING_POINT (E_FSERROR, 0x0019)
 /* Attempted to rmdir() or rename() a mounting point */
-#define E_FSERROR_IS_A_MOUNTING_POINT (E_FSERROR,0x001a)
+#define E_FSERROR_IS_A_MOUNTING_POINT (E_FSERROR, 0x001a)
 /* The object does not support the operation
  * 	@@The unsupported operation (One of `E_FILESYSTEM_OPERATION_*')
  * 	member operation_id: uintptr_t; */
-#define E_FSERROR_UNSUPPORTED_OPERATION (E_FSERROR,0x0100)
+#define E_FSERROR_UNSUPPORTED_OPERATION (E_FSERROR, 0x0100)
 
 
 
@@ -494,31 +494,31 @@ __DECL_BEGIN
 /* Network error */
 #define E_NET_ERROR (0x0081)
 /* The given host cannot be reached */
-#define E_NET_HOST_UNREACHABLE (E_NET_ERROR,0x0001)
+#define E_NET_HOST_UNREACHABLE (E_NET_ERROR, 0x0001)
 /* The specified address is already in use
  * 	@@The context under which the address is already in use
  * 	member context: unsigned int; */
-#define E_NET_ADDRESS_IN_USE (E_NET_ERROR,0x0002)
+#define E_NET_ADDRESS_IN_USE (E_NET_ERROR, 0x0002)
 /* The given message is too long
  * 	@@The requested message length
  * 	member req_length: size_t;
  * 	@@The max possible message length
  * 	member max_length: size_t; */
-#define E_NET_MESSAGE_TOO_LONG (E_NET_ERROR,0x0003)
+#define E_NET_MESSAGE_TOO_LONG (E_NET_ERROR, 0x0003)
 /* accept() failed to fully establish a connection */
-#define E_NET_CONNECTION_ABORT (E_NET_ERROR,0x0004)
+#define E_NET_CONNECTION_ABORT (E_NET_ERROR, 0x0004)
 /* connect() or recv() found no one to be listening on the remote address */
-#define E_NET_CONNECTION_REFUSED (E_NET_ERROR,0x0005)
+#define E_NET_CONNECTION_REFUSED (E_NET_ERROR, 0x0005)
 /* The connection was reset by the remote during send() */
-#define E_NET_CONNECTION_RESET (E_NET_ERROR,0x0006)
+#define E_NET_CONNECTION_RESET (E_NET_ERROR, 0x0006)
 /* Establishing a connection has failed due to a timeout */
-#define E_NET_TIMEOUT (E_NET_ERROR,0x0007)
+#define E_NET_TIMEOUT (E_NET_ERROR, 0x0007)
 /* The requested network cannot be reached */
-#define E_NET_UNREACHABLE (E_NET_ERROR,0x0008)
+#define E_NET_UNREACHABLE (E_NET_ERROR, 0x0008)
 /* Attempted to bind() to a non-local address */
-#define E_NET_ADDRESS_NOT_AVAILABLE (E_NET_ERROR,0x0009)
+#define E_NET_ADDRESS_NOT_AVAILABLE (E_NET_ERROR, 0x0009)
 /* Attempted to write() after the local end had been shutdown() */
-#define E_NET_SHUTDOWN (E_NET_ERROR,0x000a)
+#define E_NET_SHUTDOWN (E_NET_ERROR, 0x000a)
 
 
 
@@ -530,31 +530,31 @@ __DECL_BEGIN
  * 	member subsystem: uintptr_t;
  * 	@@A more precise description of the error (One of `E_IOERROR_REASON_*')
  * 	member reason: uintptr_t; */
-#define E_IOERROR_ERRORBIT (E_IOERROR,0x0001)
+#define E_IOERROR_ERRORBIT (E_IOERROR, 0x0001)
 /* Hardware component timed out
  * 	@@The miss-behaving sub-system (One of `E_IOERROR_SUBSYSTEM_*')
  * 	member subsystem: uintptr_t;
  * 	@@A more precise description of the error (One of `E_IOERROR_REASON_*')
  * 	member reason: uintptr_t; */
-#define E_IOERROR_TIMEOUT (E_IOERROR,0x0002)
+#define E_IOERROR_TIMEOUT (E_IOERROR, 0x0002)
 /* Attempted to write to read-only disk component
  * 	@@The miss-behaving sub-system (One of `E_IOERROR_SUBSYSTEM_*')
  * 	member subsystem: uintptr_t;
  * 	@@A more precise description of the error (One of `E_IOERROR_REASON_*')
  * 	member reason: uintptr_t; */
-#define E_IOERROR_READONLY (E_IOERROR,0x0003)
+#define E_IOERROR_READONLY (E_IOERROR, 0x0003)
 /* Attempted to write beyond the end of a disk
  * 	@@The miss-behaving sub-system (One of `E_IOERROR_SUBSYSTEM_*')
  * 	member subsystem: uintptr_t;
  * 	@@A more precise description of the error (One of `E_IOERROR_REASON_*')
  * 	member reason: uintptr_t; */
-#define E_IOERROR_BADBOUNDS (E_IOERROR,0x0004)
+#define E_IOERROR_BADBOUNDS (E_IOERROR, 0x0004)
 /* No data could be read/written
  * 	@@The miss-behaving sub-system (One of `E_IOERROR_SUBSYSTEM_*')
  * 	member subsystem: uintptr_t;
  * 	@@A more precise description of the error (One of `E_IOERROR_REASON_*')
  * 	member reason: uintptr_t; */
-#define E_IOERROR_NODATA (E_IOERROR,0x0005)
+#define E_IOERROR_NODATA (E_IOERROR, 0x0005)
 
 
 
@@ -562,21 +562,21 @@ __DECL_BEGIN
 /* The named file was not recognized as a valid executable */
 #define E_NOT_EXECUTABLE (0x0083)
 /* Cannot execute a file with the X file permission (s.a. `chmod') */
-#define E_NOT_EXECUTABLE_NOEXEC (E_NOT_EXECUTABLE,0x0001)
+#define E_NOT_EXECUTABLE_NOEXEC (E_NOT_EXECUTABLE, 0x0001)
 /* Cannot execute anything other than a regular file */
-#define E_NOT_EXECUTABLE_NOT_REGULAR (E_NOT_EXECUTABLE,0x0002)
+#define E_NOT_EXECUTABLE_NOT_REGULAR (E_NOT_EXECUTABLE, 0x0002)
 /* The given file's contents weren't recognized as a known/valid binary format */
-#define E_NOT_EXECUTABLE_NOT_A_BINARY (E_NOT_EXECUTABLE,0x0003)
+#define E_NOT_EXECUTABLE_NOT_A_BINARY (E_NOT_EXECUTABLE, 0x0003)
 /* The executable's binary state is faulty
  * 	@@The binary format (One of `E_NOT_EXECUTABLE_FAULTY_FORMAT_*')
  * 	member format: uintptr_t;
  * 	@@The format-specific reason why the load failed (One of `E_NOT_EXECUTABLE_FAULTY_REASON_*_*')
  * 	member reason: uintptr_t; */
-#define E_NOT_EXECUTABLE_FAULTY (E_NOT_EXECUTABLE,0x0004)
+#define E_NOT_EXECUTABLE_FAULTY (E_NOT_EXECUTABLE, 0x0004)
 /* Only when loading drivers: Executable file is too large */
-#define E_NOT_EXECUTABLE_TOOLARGE (E_NOT_EXECUTABLE,0x0005)
+#define E_NOT_EXECUTABLE_TOOLARGE (E_NOT_EXECUTABLE, 0x0005)
 /* Only when loading drivers: Executable file is too small */
-#define E_NOT_EXECUTABLE_TOOSMALL (E_NOT_EXECUTABLE,0x0006)
+#define E_NOT_EXECUTABLE_TOOSMALL (E_NOT_EXECUTABLE, 0x0006)
 
 
 
@@ -584,7 +584,7 @@ __DECL_BEGIN
 /* Insufficient Rights */
 #define E_INSUFFICIENT_RIGHTS (0x0084)
 /* Only root can steal already-assigned controlling terminals */
-#define E_INSUFFICIENT_RIGHTS_CTTY_STEALING (E_INSUFFICIENT_RIGHTS,0x0001)
+#define E_INSUFFICIENT_RIGHTS_CTTY_STEALING (E_INSUFFICIENT_RIGHTS, 0x0001)
 
 
 
@@ -592,11 +592,11 @@ __DECL_BEGIN
 /* Insufficient Context */
 #define E_INVALID_CONTEXT (0x0085)
 /* The calling process isn't the session leader */
-#define E_INVALID_CONTEXT_NOT_SESSION_LEADER (E_INVALID_CONTEXT,0x0001)
+#define E_INVALID_CONTEXT_NOT_SESSION_LEADER (E_INVALID_CONTEXT, 0x0001)
 /* A controlling terminal had already been assigned */
-#define E_INVALID_CONTEXT_CTTY_ALREADY_ASSIGNED (E_INVALID_CONTEXT,0x0002)
+#define E_INVALID_CONTEXT_CTTY_ALREADY_ASSIGNED (E_INVALID_CONTEXT, 0x0002)
 /* The calling session uses a different CTTY */
-#define E_INVALID_CONTEXT_CTTY_DIFFERS (E_INVALID_CONTEXT,0x0003)
+#define E_INVALID_CONTEXT_CTTY_DIFFERS (E_INVALID_CONTEXT, 0x0003)
 
 
 
@@ -645,7 +645,7 @@ __DECL_BEGIN
  */
 #define E_INTERRUPT (0xf000)
 /* Unwind in order to execute an RPC callback before returning to user-space */
-#define E_INTERRUPT_USER_RPC (E_INTERRUPT,0x0001)
+#define E_INTERRUPT_USER_RPC (E_INTERRUPT, 0x0001)
 #endif /* !E_INTERRUPT */
 
 

@@ -168,8 +168,8 @@ typedef int (__LIBCCALL *__glob_errfunc_t)(char const *__path, int __flags);
 @@`glob' returns GLOB_ABEND; if it returns zero, the error is ignored.
 @@If memory cannot be allocated for PGLOB, GLOB_NOSPACE is returned.
 @@Otherwise, `glob' returns zero
-[if(defined(__USE_FILE_OFFSET64)),preferred_alias(glob64)]
-[if(!defined(__USE_FILE_OFFSET64)),preferred_alias(glob)][noexport][user]
+[if(defined(__USE_FILE_OFFSET64)), preferred_alias(glob64)]
+[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(glob)][noexport][user]
 glob:([nonnull] char const *__restrict pattern, int flags,
       [nullable] __glob_errfunc_t errfunc,
       [nonnull] glob_t *__restrict pglob) -> int {
@@ -191,8 +191,8 @@ glob:([nonnull] char const *__restrict pattern, int flags,
 
 
 @@Free storage allocated in PGLOB by a previous `glob' call
-[if(defined(__USE_FILE_OFFSET64)),preferred_alias(globfree64)]
-[if(!defined(__USE_FILE_OFFSET64)),preferred_alias(globfree)][noexport][user]
+[if(defined(__USE_FILE_OFFSET64)), preferred_alias(globfree64)]
+[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(globfree)][noexport][user]
 globfree:([nonnull] glob_t *pglob) {
 #if defined(__CRT_HAVE_globfree)
 	globfree32(pglob);

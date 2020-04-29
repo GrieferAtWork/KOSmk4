@@ -119,7 +119,7 @@ struct task {
 				                              *       the end of a CPU's pending task chain!
 				                              *       This, alongside the overlap with the `sr_runprv' and `ss_pself'
 				                              *       fields above is a requirement for scheduling to function properly,
-				                              *       as it allowed an ATOMIC_CMPXCH(ss_pennxt,NULL,...) to be used to
+				                              *       as it allowed an ATOMIC_CMPXCH(ss_pennxt, NULL, ...) to be used to
 				                              *       designate a single thread that is then responsible for properly
 				                              *       scheduling some task as pending in another CPU. */
 			} s_pending;                     /* [valid_if(THIS_TASK in t_cpu->c_pending)] Pending-task chain */

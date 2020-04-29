@@ -118,26 +118,28 @@ typedef struct {
  * >> void print_addr2line(void *p) {
  * >>     struct dl_section *s = NULL;
  * >>     di_debugline_unit_t unit;
- * >>     __byte_t *reader;
- * >>     __uintptr_t relpc;
+ * >>     byte_t *reader;
+ * >>     uintptr_t relpc;
  * >>     void *m;
- * >>     if ((m = dlgethandle(p,DLGETHANDLE_FNORMAL)) == NULL) goto done;
- * >>     if ((s = dllocksection(m,".debug_line")) == NULL) goto done;
- * >>     reader = (__byte_t *)s->ds_data;
- * >>     relpc = (__uintptr_t)((__byte_t *)p - (__byte_t *)dlmodulebase(m));
- * >>     while (debugline_loadunit(reader,reader + s->ds_size,&unit) == DEBUG_INFO_ERROR_SUCCESS) {
+ * >>     if ((m = dlgethandle(p, DLGETHANDLE_FNORMAL)) == NULL)
+ * >>         goto done;
+ * >>     if ((s = dllocksection(m, ".debug_line")) == NULL)
+ * >>         goto done;
+ * >>     reader = (byte_t *)s->ds_data;
+ * >>     relpc = (uintptr_t)((__byte_t *)p - (__byte_t *)dlmodulebase(m));
+ * >>     while (debugline_loadunit(reader, reader + s->ds_size, &unit) == DEBUG_INFO_ERROR_SUCCESS) {
  * >>         di_debugline_info_t info;
- * >>         if (debugline_scanunit(&unit,&info,relpc) == DEBUG_INFO_ERROR_SUCCESS) {
+ * >>         if (debugline_scanunit(&unit, &info, relpc) == DEBUG_INFO_ERROR_SUCCESS) {
  * >>             char *file,*path;
- * >>             debugline_loadfile(&unit,info.dl_srcfile,&file,&path);
- * >>             printf("path: %s\n",path);
- * >>             printf("file: %s\n",file);
- * >>             printf("line: %d\n",(int)info.dl_srcline);
- * >>             printf("col:  %u\n",(unsigned int)info.dl_srccol);
+ * >>             debugline_loadfile(&unit, info.dl_srcfile, &file, &path);
+ * >>             printf("path: %s\n", path);
+ * >>             printf("file: %s\n", file);
+ * >>             printf("line: %d\n", (int)info.dl_srcline);
+ * >>             printf("col:  %u\n", (unsigned int)info.dl_srccol);
  * >>             goto done;
  * >>         }
  * >>     }
- * >>     printf("Unknown: %p\n",p);
+ * >>     printf("Unknown: %p\n", p);
  * >> done:
  * >>     dlunlocksection(s);
  * >> }

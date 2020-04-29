@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9fad7e73 */
+/* HASH CRC-32:0x96e00ced */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,22 +37,22 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(futime64) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futime64))(__fd_t __fd,
                                                       struct utimbuf64 const *__file_times) {
-#line 170 "kos/src/libc/magic/utime.c"
+#line 171 "kos/src/libc/magic/utime.c"
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma __push_macro("actime")
-#pragma __push_macro("modtime")
+#pragma push_macro("actime")
+#pragma push_macro("modtime")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#undef __actime
-#undef __modtime
+#undef actime
+#undef modtime
 	struct __utimbuf32 __buf32;
 	if (!__file_times)
-		return __localdep_crt_futime32(__fd,__NULLPTR);
-	__buf32.__actime  = (__time32_t)__file_times->__actime;
-	__buf32.__modtime = (__time32_t)__file_times->__modtime;
-	return __localdep_crt_futime32(__fd,&__buf32);
+		return __localdep_crt_futime32(__fd, __NULLPTR);
+	__buf32.actime  = (__time32_t)__file_times->actime;
+	__buf32.modtime = (__time32_t)__file_times->modtime;
+	return __localdep_crt_futime32(__fd, &__buf32);
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma __pop_macro("modtime")
-#pragma __pop_macro("actime")
+#pragma pop_macro("modtime")
+#pragma pop_macro("actime")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 }
 __NAMESPACE_LOCAL_END

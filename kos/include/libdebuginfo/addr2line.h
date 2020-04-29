@@ -172,7 +172,7 @@ typedef struct {
  * >> unsigned int error;
  * >> uintptr_t level = 0;
  * >> do {
- * >>     error = debug_sections_addr2line((uintptr_t)ptr,&info,level);
+ * >>     error = debug_sections_addr2line((uintptr_t)ptr, &info, level);
  * >>     if (error != DEBUG_INFO_ERROR_SUCCESS)
  * >>         break;
  * >>     printf("%s(%Iu) : %s : HERE\n",
@@ -213,8 +213,8 @@ __NOTHROW_NCX(LIBDEBUGINFO_CC debug_sections_addr2line)(di_debug_sections_t cons
 
 /* Print the fully qualified filename for a given string
  * triplet, as extractable from `di_debug_addr2line_t':
- *   - debug_print_filename(...,info.al_cubase,info.al_srcpath,info.al_srcfile); // /home/me/project/c/foo/src/bar.c
- *   - debug_print_filename(...,info.al_cubase,info.al_dclpath,info.al_dclfile); // /home/me/project/c/foo/include/bar.h
+ *   - debug_print_filename(..., info.al_cubase, info.al_srcpath, info.al_srcfile); // /home/me/project/c/foo/src/bar.c
+ *   - debug_print_filename(..., info.al_cubase, info.al_dclpath, info.al_dclfile); // /home/me/project/c/foo/include/bar.h
  */
 typedef __ATTR_NONNULL((1)) __ssize_t
 (LIBDEBUGINFO_CC *PDEBUG_PRINT_FILENAME)(__pformatprinter printer, void *arg,

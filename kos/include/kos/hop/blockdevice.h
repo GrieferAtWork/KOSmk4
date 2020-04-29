@@ -89,12 +89,12 @@ struct hop_blockdevice_openpart /*[PREFIX(bop_)]*/ {
                                                   * WARNING: Setting a drive root to read-only will prevent writes to partitions,
                                                   *          even though the partitions will continue to indicate being writable!
                                                   * To ensure that read-only is disabled for a partition & drive, do this:
-                                                  * >> hop(fd,HOP_BLOCKDEVICE_WRREADONLY,0);           // Drive
+                                                  * >> hop(fd, HOP_BLOCKDEVICE_WRREADONLY, 0);  // Drive
                                                   * >> struct hop_openfd root;
                                                   * >> root.of_mode  = HOP_OPENFD_MODE_AUTO;
                                                   * >> root.of_flags = 0;
-                                                  * >> hop(fd,HOP_BLOCKDEVICE_OPENDRIVEROOT,&root);
-                                                  * >> hop(root.of_hint,HOP_BLOCKDEVICE_WRREADONLY,0);
+                                                  * >> hop(fd, HOP_BLOCKDEVICE_OPENDRIVEROOT, &root);
+                                                  * >> hop(root.of_hint, HOP_BLOCKDEVICE_WRREADONLY, 0);
                                                   * >> close(root.of_hint); */
 #define HOP_BLOCKDEVICE_OPENDRIVEROOT 0x00020005 /* [struct hop_openfd *arg] Open the drive root of a partition, or re-open a partition.
                                                   * @return: == arg->of_hint

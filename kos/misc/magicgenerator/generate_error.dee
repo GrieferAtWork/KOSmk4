@@ -307,7 +307,7 @@ function do_load_error_def(filename: string): {(ErrorClass, Constant, ImmediateS
 
 			case "class": {
 				if (i >= end || !text.issymstrt(i))
-					err(i, "Expected keyword after `class', but got " + text.substr(i, i+1));
+					err(i, "Expected keyword after `class', but got " + text.substr(i, i + 1));
 				local name_end = i + 1;
 				while (name_end < end && text.issymcont(name_end))
 					++name_end;
@@ -317,13 +317,13 @@ function do_load_error_def(filename: string): {(ErrorClass, Constant, ImmediateS
 					++i;
 				local class_basename: string | none = none;
 				if (i >= end || text[i] !in [":", "="])
-					err(i, "Expected `:' or `=' after `class', but got " + text.substr(i, i+1));
+					err(i, "Expected `:' or `=' after `class', but got " + text.substr(i, i + 1));
 				if (text[i] == ":") {
 					++i;
 					while (i < end && text.isspace(i))
 						++i;
 					if (i >= end || !text.issymstrt(i))
-						err(i, "Expected keyword after `class ...:', but got " + text.substr(i, i+1));
+						err(i, "Expected keyword after `class ...:', but got " + text.substr(i, i + 1));
 					local name_end = i + 1;
 					while (name_end < end && text.issymcont(name_end))
 						++name_end;
@@ -332,7 +332,7 @@ function do_load_error_def(filename: string): {(ErrorClass, Constant, ImmediateS
 					while (i < end && text.isspace(i))
 						++i;
 					if (i >= end || text[i] != "=")
-						err(i, "Expected `=' after `class ...: ...', but got " + text.substr(i, i+1));
+						err(i, "Expected `=' after `class ...: ...', but got " + text.substr(i, i + 1));
 				}
 				++i;
 				while (i < end && text.isspace(i))
@@ -443,7 +443,7 @@ function do_load_error_def(filename: string): {(ErrorClass, Constant, ImmediateS
 							current_tostr_expr_impl_prefix = none;
 							current_tostr_expr_dependency_prefix = none;
 							if (i >= body_end || !text.issymstrt(i))
-								err(i, "Unexpected keyword after `member' in class, but got " + repr(text.substr(i, i+1)));
+								err(i, "Unexpected keyword after `member' in class, but got " + repr(text.substr(i, i + 1)));
 							local name_end = i + 1;
 							while (name_end < body_end && text.issymcont(name_end))
 								++name_end;
@@ -452,7 +452,7 @@ function do_load_error_def(filename: string): {(ErrorClass, Constant, ImmediateS
 							while (i < body_end && text.isspace(i))
 								++i;
 							if (i >= body_end || text[i] != ":")
-								err(i, "Expected `:' after `member ...' in class, but got " + repr(text.substr(i, i+1)));
+								err(i, "Expected `:' after `member ...' in class, but got " + repr(text.substr(i, i + 1)));
 							++i;
 							while (i < body_end && text.isspace(i))
 								++i;
@@ -477,7 +477,7 @@ function do_load_error_def(filename: string): {(ErrorClass, Constant, ImmediateS
 
 			case "const": {
 				if (i >= end || !text.issymstrt(i))
-					err(i, "Expected keyword after `const', but got " + text.substr(i, i+1));
+					err(i, "Expected keyword after `const', but got " + text.substr(i, i + 1));
 				local name_end = i + 1;
 				while (name_end < end && text.issymcont(name_end))
 					++name_end;
@@ -486,7 +486,7 @@ function do_load_error_def(filename: string): {(ErrorClass, Constant, ImmediateS
 				while (i < end && text.isspace(i))
 					++i;
 				if (i >= end || text[i] != "=")
-					err(i, "Expected `=' after `const', but got " + text.substr(i, i+1));
+					err(i, "Expected `=' after `const', but got " + text.substr(i, i + 1));
 				++i;
 				while (i < end && text.isspace(i))
 					++i;
@@ -615,7 +615,7 @@ function generate_header(filename: string, defs) {
 				print_doc_as_c_comment(fp, docwriter.string.lstrip("\n"));
 				fp << "#define " << x.name << " " << "(";
 				if (x.base !is none)
-					fp << x.base.name << ",";
+					fp << x.base.name << ", ";
 				fp << x.code << ")\n";
 			}
 		}
@@ -666,8 +666,8 @@ write_hashed_file("include/kos/except-codes.def", [](fp){
 	fp << "#endif\n";
 	function print_class_arguments(fp, x: ErrorClass) {
 		fp << x.name
-			<< "," << (x.message !is none ? "MESSAGE({!r})".format({ x.message }) : "NO_MESSAGE")
-			<< "," << (x.errno_expr !is none ? "ERRNO({})".format({
+			<< ", " << (x.message !is none ? "MESSAGE({!r})".format({ x.message }) : "NO_MESSAGE")
+			<< ", " << (x.errno_expr !is none ? "ERRNO({})".format({
 				x.errno_expr.format({
 					"ptr0" : "GET_EXCEPTION_POINTER(0)",
 					"ptr1" : "GET_EXCEPTION_POINTER(1)",
@@ -679,14 +679,14 @@ write_hashed_file("include/kos/except-codes.def", [](fp){
 					"ptr7" : "GET_EXCEPTION_POINTER(7)",
 				})
 			}) : "NO_ERRNO")
-			<< ",(";
+			<< ", (";
 		local isfirst = true;
 		for (local m: x.members) {
 			if (!isfirst)
 				fp << " ";
 			isfirst = false;
 			fp << "MEMBER(";
-			fp << m.typ << "," << m.name;
+			fp << m.typ << ", " << m.name;
 			fp << ")";
 		}
 		fp << ")";

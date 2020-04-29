@@ -119,8 +119,8 @@ struct __ntptimeval_alt {
 
 [attribute(*)][alias(*)] __adjtimex:(*) = adjtimex;
 
-[if(defined(__USE_TIME_BITS64)),preferred_alias(adjtimex64,__adjtimex64)]
-[if(!defined(__USE_TIME_BITS64)),preferred_alias(adjtimex,__adjtimex)]
+[if(defined(__USE_TIME_BITS64)), preferred_alias(adjtimex64,__adjtimex64)]
+[if(!defined(__USE_TIME_BITS64)), preferred_alias(adjtimex,__adjtimex)]
 [requires(defined(__CRT_HAVE_adjtimex) || defined(__CRT_HAVE___adjtimex) || defined(__CRT_HAVE_adjtimex64) || defined(__CRT_HAVE___adjtimex64))]
 adjtimex:([nonnull] struct timex *__restrict ntx) -> int {
 	int result;
@@ -224,8 +224,8 @@ adjtimex:([nonnull] struct timex *__restrict ntx) -> int {
 
 
 [user][nocrt][alternate_names(ntp_gettimex)]
-[if(defined(__USE_TIME_BITS64)),preferred_alias(ntp_gettimex64)]
-[if(!defined(__USE_TIME_BITS64)),preferred_alias(ntp_gettimex)]
+[if(defined(__USE_TIME_BITS64)), preferred_alias(ntp_gettimex64)]
+[if(!defined(__USE_TIME_BITS64)), preferred_alias(ntp_gettimex)]
 [requires(defined(__CRT_HAVE_ntp_gettimex) || defined(__CRT_HAVE_ntp_gettimex64))]
 ntp_gettime:([nonnull] struct ntptimeval *__restrict ntv) -> int {
 #ifdef __CRT_HAVE_ntp_gettimex
@@ -261,8 +261,8 @@ ntp_gettime:([nonnull] struct ntptimeval *__restrict ntv) -> int {
 #endif /* !__CRT_HAVE_ntp_gettimex */
 }
 
-[if(defined(__USE_TIME_BITS64)),preferred_alias(ntp_adjtime64)]
-[if(!defined(__USE_TIME_BITS64)),preferred_alias(ntp_adjtime)]
+[if(defined(__USE_TIME_BITS64)), preferred_alias(ntp_adjtime64)]
+[if(!defined(__USE_TIME_BITS64)), preferred_alias(ntp_adjtime)]
 [requires(defined(__CRT_HAVE_ntp_adjtime) || defined(__CRT_HAVE_ntp_adjtime64))]
 ntp_adjtime:([nonnull] struct timex *__restrict tntx) -> int {
 	int result;

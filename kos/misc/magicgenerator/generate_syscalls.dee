@@ -2200,7 +2200,7 @@ function unpackTrace(cType: CType): (string, string) {
 		x = syscallTostrExpressions.get(cType.typename);
 	if (x is none) {
 		if (cType.typename.endswith("*") || cType.typename.endswith("]"))
-			return ("\"%p\"", ",{me}");
+			return ("\"%p\"", ", {me}");
 		print "Warning: Missing tostr() for", repr cType.typename;
 		return none;
 	}
@@ -2217,7 +2217,7 @@ function unpackTrace(cType: CType): (string, string) {
 			x = x.strip();
 		}
 		File.Writer args_writer;
-		args_writer << ",({me}),";
+		args_writer << ", ({me}),";
 		for (local f: x.split(",")) {
 			f = f.strip();
 			local fval = f;
@@ -2227,11 +2227,11 @@ function unpackTrace(cType: CType): (string, string) {
 				fval = fval.strip();
 			}
 			args_writer
-				<< "({me}) == " << fval
+				<< " ({me}) == " << fval
 				<< " ? " << repr(f)
-				<< " : ";
+				<< " :";
 		}
-		args_writer << repr(basevalue);
+		args_writer << " " << repr(basevalue);
 		return ("\"%#Ix=%s\"", args_writer.string);
 	}
 	if (x.startswith("flagset")) {
@@ -2252,7 +2252,7 @@ function unpackTrace(cType: CType): (string, string) {
 		local format_string = "%s" * ((#flags * 2) - 1);
 		format_string = "%#Ix=" + format_string;
 		File.Writer args_writer;
-		args_writer << ",(uintptr_t)({me})";
+		args_writer << ", (uintptr_t)({me})";
 		for (local i = 0; i < #flags; ++i) {
 			local f = flags[i];
 			local fval = f;
@@ -2263,8 +2263,8 @@ function unpackTrace(cType: CType): (string, string) {
 			}
 			if (i) {
 				args_writer
-					<< ",(({me}) & " << fval << ") && (({me}) & ("
-					<< "|".join(
+					<< ", (({me}) & " << fval << ") && (({me}) & ("
+					<< " | ".join(
 						for (local r: flags[:i])
 							"=" in r
 								? r.partition("=")[2].lstrip()
@@ -2272,9 +2272,9 @@ function unpackTrace(cType: CType): (string, string) {
 					<< ")) ? \"|\" : \"\"";
 			}
 			if (i == 0 && baseflag) {
-				args_writer << ",({me}) & " << fval << " ? " << repr(f) << " : ({me}) ? \"\" : " << repr(baseflag) << "\n";
+				args_writer << ", ({me}) & " << fval << " ? " << repr(f) << " : ({me}) ? \"\" : " << repr(baseflag) << "\n";
 			} else {
-				args_writer << ",({me}) & " << fval << " ? " << repr(f) << " : \"\"\n";
+				args_writer << ", ({me}) & " << fval << " ? " << repr(f) << " : \"\"\n";
 			}
 		}
 		return (optimizePrintf(format_string), args_writer.string.rstrip());
@@ -2290,7 +2290,7 @@ function unpackTrace(cType: CType): (string, string) {
 	assert x.startswith(",");
 	x = x[1:].lstrip();
 	format_string = optimizePrintf(format_string.decode("c-escape"));
-	return (format_string, "," + x);
+	return (format_string, ", " + x);
 }
 
 @@Generate include/asm/syscalls-trace.h

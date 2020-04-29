@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6b75ff21 */
+/* HASH CRC-32:0xaef54429 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,25 +32,25 @@
  * 	member addr: void *;
  * 	@@Fault context (Set of `E_SEGFAULT_CONTEXT_*')
  * 	member context: uintptr_t; */
-#define E_SEGFAULT_UNMAPPED (E_SEGFAULT,0x0001)
+#define E_SEGFAULT_UNMAPPED (E_SEGFAULT, 0x0001)
 /* Attempted to write to a read-only memory location
  * 	@@The virtual memory address where the fault happened
  * 	member addr: void *;
  * 	@@Fault context (Set of `E_SEGFAULT_CONTEXT_*')
  * 	member context: uintptr_t; */
-#define E_SEGFAULT_READONLY (E_SEGFAULT,0x0002)
+#define E_SEGFAULT_READONLY (E_SEGFAULT, 0x0002)
 /* Attempted to read from a memory location that is not readable
  * 	@@The virtual memory address where the fault happened
  * 	member addr: void *;
  * 	@@Fault context (Set of `E_SEGFAULT_CONTEXT_*')
  * 	member context: uintptr_t; */
-#define E_SEGFAULT_NOTREADABLE (E_SEGFAULT,0x0003)
+#define E_SEGFAULT_NOTREADABLE (E_SEGFAULT, 0x0003)
 /* Attempted to execute a non-executable memory location
  * 	@@The virtual memory address where the fault happened
  * 	member addr: void *;
  * 	@@Fault context (Set of `E_SEGFAULT_CONTEXT_*')
  * 	member context: uintptr_t; */
-#define E_SEGFAULT_NOTEXECUTABLE (E_SEGFAULT,0x0004)
+#define E_SEGFAULT_NOTEXECUTABLE (E_SEGFAULT, 0x0004)
 /* Faulty address */
 #define E_SEGFAULT_CONTEXT_FAULT 0x0001
 /* FLAG: The fault happened during a write operation */
@@ -88,15 +88,15 @@
 /* The instruction opcode was not recognized
  * 	@@The opcode that caused the exception
  * 	member opcode: uintptr_t; */
-#define E_ILLEGAL_INSTRUCTION_BAD_OPCODE (E_ILLEGAL_INSTRUCTION,0x0001)
+#define E_ILLEGAL_INSTRUCTION_BAD_OPCODE (E_ILLEGAL_INSTRUCTION, 0x0001)
 /* The instruction's opcode is not supported by the host (not thrown if the instruction was emulated)
  * 	@@The opcode that caused the exception
  * 	member opcode: uintptr_t; */
-#define E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE (E_ILLEGAL_INSTRUCTION,0x0002)
+#define E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE (E_ILLEGAL_INSTRUCTION, 0x0002)
 /* The calling code does not have the necessary privilege to invoke the instruction `opcode'
  * 	@@The opcode that caused the exception
  * 	member opcode: uintptr_t; */
-#define E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE (E_ILLEGAL_INSTRUCTION,0x0003)
+#define E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE (E_ILLEGAL_INSTRUCTION, 0x0003)
 /* An operand of the instruction is invalid
  * 	@@The opcode that caused the exception
  * 	member opcode: uintptr_t;
@@ -108,7 +108,7 @@
  * 	member offset: uintptr_t;
  * 	@@The associated register value
  * 	member regval: uintptr_t; */
-#define E_ILLEGAL_INSTRUCTION_BAD_OPERAND (E_ILLEGAL_INSTRUCTION,0x0010)
+#define E_ILLEGAL_INSTRUCTION_BAD_OPERAND (E_ILLEGAL_INSTRUCTION, 0x0010)
 /* Unexpectedly, the instruction has a memory operand (the memory operand's address is stored in `offset') */
 #define E_ILLEGAL_INSTRUCTION_BAD_OPERAND_UNEXPECTED_MEMORY 0x0001
 /* Unexpectedly, the instruction has a register operand (register and its value is stored in `regno' and `regval') */
@@ -124,7 +124,7 @@
  * 	member regval: uintptr_t;
  * 	@@The accessed register index
  * 	member regno: uintptr_t; */
-#define E_ILLEGAL_INSTRUCTION_REGISTER (E_ILLEGAL_INSTRUCTION,0x0011)
+#define E_ILLEGAL_INSTRUCTION_REGISTER (E_ILLEGAL_INSTRUCTION, 0x0011)
 /* Read from invalid register */
 #define E_ILLEGAL_INSTRUCTION_REGISTER_RDINV 0x0001
 /* Read from privileged register */
@@ -155,6 +155,6 @@
  * 	member min: intptr_t;
  * 	@@The high bound of valid indices
  * 	member max: intptr_t; */
-#define E_INDEX_ERROR_OUT_OF_BOUNDS (E_INDEX_ERROR,0x0001)
+#define E_INDEX_ERROR_OUT_OF_BOUNDS (E_INDEX_ERROR, 0x0001)
 
 #endif /* !_KOS_ASM_EXCEPT_H */

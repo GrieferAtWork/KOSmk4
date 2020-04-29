@@ -52,7 +52,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 	__j0 = ((__i0 >> IEEE754_FLOAT_SHIFT) & IEEE754_FLOAT_MAXEXP) - IEEE754_FLOAT_BIAS;
 	if (__j0 < IEEE754_FLOAT_SHIFT) {
 		if (__j0 < 0) { /* raise inexact if x != 0 */
-			__libm_math_force_eval_r(__IEEE754_FLOAT_TYPE__, __LIBM_LOCAL_VALUE(hugef) + __x); /* return 0*sign(x) if |x|<1 */
+			__libm_math_force_eval_r(__IEEE754_FLOAT_TYPE__, __LIBM_LOCAL_VALUE(hugef) + __x); /* return 0*sign(x) if |x| < 1 */
 			if (__i0 < 0) {
 				__i0 = __INT32_C(0x80000000);
 			} else if (__i0 != 0) {
@@ -110,7 +110,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 	if (__j0 < IEEE754_DOUBLE_SHIFT) {
 		if (__j0 < 0) { /* raise inexact if x != 0 */
 			__libm_math_force_eval_r(__IEEE754_DOUBLE_TYPE__, __LIBM_LOCAL_VALUE(huge) + __x);
-			/* return 0*sign(x) if |x|<1 */
+			/* return 0*sign(x) if |x| < 1 */
 			if (__i0 < 0) {
 				__i0 = __INT32_C(0x80000000);
 				__i1 = 0;
@@ -179,7 +179,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
 	if (__j0 < 31) {
 		if (__j0 < 0) { /* raise inexact if x != 0 */
 			__libm_math_force_eval_r(__IEEE854_LONG_DOUBLE_TYPE__, __LIBM_LOCAL_VALUE(hugeval4930l) + __x);
-			/* return 0*sign(x) if |x|<1 */
+			/* return 0*sign(x) if |x| < 1 */
 			if (__sx) {
 				__se = 0x8000;
 				__i0 = __UINT32_C(0x80000000);

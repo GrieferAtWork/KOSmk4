@@ -66,7 +66,7 @@ struct vmb {
 #ifdef __INTELLISENSE__
 LOCAL NOBLOCK void NOTHROW(KCALL vmb_init)(struct vmb *__restrict self);
 #else /* __INTELLISENSE__ */
-#define vmb_init(self)  ((self)->v_tree = NULL,(self)->v_byaddr = NULL)
+#define vmb_init(self) ((self)->v_tree = NULL, (self)->v_byaddr = NULL)
 #endif /* !__INTELLISENSE__ */
 
 /* Finalize a given VM Builder.

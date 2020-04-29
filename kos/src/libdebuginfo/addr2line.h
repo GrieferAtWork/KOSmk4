@@ -49,7 +49,7 @@ DECL_BEGIN
  * >> addr2line_errno_t error;
  * >> uintptr_t level = 0;
  * >> do {
- * >>     error = debug_sections_addr2line((uintptr_t)ptr,&info,level);
+ * >>     error = debug_sections_addr2line((uintptr_t)ptr, &info, level);
  * >>     if (error != DEBUG_INFO_ERROR_SUCCESS)
  * >>         break;
  * >>     printk("%s(%Iu) : %s : HERE\n",
@@ -74,8 +74,8 @@ NOTHROW_NCX(CC libdi_debug_sections_addr2line)(di_debug_sections_t const *__rest
 
 /* Print the fully qualified filename for a given string
  * triplet, as extractable from `di_debug_addr2line_t':
- *   - debug_print_filename(...,info.al_cubase,info.al_srcpath,info.al_srcfile); // /home/me/project/c/foo/src/bar.c
- *   - debug_print_filename(...,info.al_cubase,info.al_dclpath,info.al_dclfile); // /home/me/project/c/foo/include/bar.h
+ *   - debug_print_filename(..., info.al_cubase, info.al_srcpath, info.al_srcfile); // /home/me/project/c/foo/src/bar.c
+ *   - debug_print_filename(..., info.al_cubase, info.al_dclpath, info.al_dclfile); // /home/me/project/c/foo/include/bar.h
  * NOTE: When `filename' is NULL, print `???' (3 question marks) instead. */
 INTDEF __ATTR_NONNULL((1)) ssize_t CC
 libdi_debug_print_filename(pformatprinter printer, void *arg,

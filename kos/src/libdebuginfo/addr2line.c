@@ -92,16 +92,20 @@ NOTHROW_NCX(CC search_symtab)(di_debug_sections_t const *__restrict sections,
 	if (symaddr) {
 		uint32_t name_offset;
 		if (sections->ds_symtab_ent == sizeof(Elf32_Sym)) {
-			name_offset = ((Elf32_Sym const *)symaddr)->st_name;
+			Elf32_Sym const *ent;
+			ent = (Elf32_Sym const *)symaddr;
+			name_offset = ent->st_name;
 			if (fill_symstart_symend) {
-				result->al_symstart = (uintptr_t)((Elf32_Sym const *)symaddr)->st_value;
-				result->al_symend   = result->al_symstart + (size_t)((Elf32_Sym const *)symaddr)->st_size;
+				result->al_symstart = (uintptr_t)ent->st_value;
+				result->al_symend   = result->al_symstart + (size_t)ent->st_size;
 			}
 		} else {
-			name_offset = ((Elf64_Sym const *)symaddr)->st_name;
+			Elf64_Sym const *ent;
+			ent = (Elf64_Sym const *)symaddr;
+			name_offset = ent->st_name;
 			if (fill_symstart_symend) {
-				result->al_symstart = (uintptr_t)((Elf64_Sym const *)symaddr)->st_value;
-				result->al_symend   = result->al_symstart + (size_t)((Elf64_Sym const *)symaddr)->st_size;
+				result->al_symstart = (uintptr_t)ent->st_value;
+				result->al_symend   = result->al_symstart + (size_t)ent->st_size;
 			}
 		}
 		if (name_offset < (size_t)((char *)sections->ds_strtab_end -
@@ -266,9 +270,9 @@ again_cu_component:
 				 * >> 	inline_function2();
 				 * >> 	return result;
 				 * >> }
-				 * LEVEL(0,test_function()) --> inline_function
-				 * LEVEL(1,test_function()) --> inline_function2
-				 * LEVEL(2,test_function()) --> test_function
+				 * LEVEL(0, test_function()) --> inline_function
+				 * LEVEL(1, test_function()) --> inline_function2
+				 * LEVEL(2, test_function()) --> test_function
 				 */
 				/* Search for inlined sub-programs */
 				if (!self->dup_comp.dic_haschildren) {
@@ -553,7 +557,7 @@ err_corrupt:
  * >> addr2line_errno_t error;
  * >> uintptr_t level = 0;
  * >> do {
- * >>     error = debug_sections_addr2line((uintptr_t)ptr,&info,level);
+ * >>     error = debug_sections_addr2line((uintptr_t)ptr, &info, level);
  * >>     if (error != DEBUG_INFO_ERROR_SUCCESS)
  * >>         break;
  * >>     printk("%s(%Iu) : %s : HERE\n",

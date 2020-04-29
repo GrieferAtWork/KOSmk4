@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x94d9e8a0 */
+/* HASH CRC-32:0xcc09098b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -92,25 +92,25 @@
  * 	member addr: void *;
  * 	@@Fault context (Set of `E_SEGFAULT_CONTEXT_*')
  * 	member context: uintptr_t; */
-#define E_SEGFAULT_UNMAPPED (E_SEGFAULT,0x0001)
+#define E_SEGFAULT_UNMAPPED (E_SEGFAULT, 0x0001)
 /* Attempted to write to a read-only memory location
  * 	@@The virtual memory address where the fault happened
  * 	member addr: void *;
  * 	@@Fault context (Set of `E_SEGFAULT_CONTEXT_*')
  * 	member context: uintptr_t; */
-#define E_SEGFAULT_READONLY (E_SEGFAULT,0x0002)
+#define E_SEGFAULT_READONLY (E_SEGFAULT, 0x0002)
 /* Attempted to read from a memory location that is not readable
  * 	@@The virtual memory address where the fault happened
  * 	member addr: void *;
  * 	@@Fault context (Set of `E_SEGFAULT_CONTEXT_*')
  * 	member context: uintptr_t; */
-#define E_SEGFAULT_NOTREADABLE (E_SEGFAULT,0x0003)
+#define E_SEGFAULT_NOTREADABLE (E_SEGFAULT, 0x0003)
 /* Attempted to execute a non-executable memory location
  * 	@@The virtual memory address where the fault happened
  * 	member addr: void *;
  * 	@@Fault context (Set of `E_SEGFAULT_CONTEXT_*')
  * 	member context: uintptr_t; */
-#define E_SEGFAULT_NOTEXECUTABLE (E_SEGFAULT,0x0004)
+#define E_SEGFAULT_NOTEXECUTABLE (E_SEGFAULT, 0x0004)
 /* Attempted to perform an impossible atomic operation
  * 	@@The virtual memory address where the access was attempted
  * 	member addr: void *;
@@ -127,7 +127,7 @@
  * 	@@High data word of the intended new value
  * 	member newval_hi: uintptr_t;
  */
-#define E_SEGFAULT_NOTATOMIC (E_SEGFAULT,0x0005)
+#define E_SEGFAULT_NOTATOMIC (E_SEGFAULT, 0x0005)
 /* Attempted to access an unaligned pointer
  * 	@@The (unaligned) virtual memory address accessed
  * 	member addr: void *;
@@ -135,7 +135,7 @@
  * 	member context: uintptr_t;
  * 	@@The required alignment of `addr' (power-of-2)
  * 	member required_alignemnt: size_t; */
-#define E_SEGFAULT_UNALIGNED (E_SEGFAULT,0x0006)
+#define E_SEGFAULT_UNALIGNED (E_SEGFAULT, 0x0006)
 
 /* Faulty address */
 #define E_SEGFAULT_CONTEXT_FAULT 0x0001
@@ -181,35 +181,35 @@
  * 	member opcode: uintptr_t;
  * 	@@Opcode flags (set of `EMU86_F_*')
  * 	member op_flags: uintptr_t; */
-#define E_ILLEGAL_INSTRUCTION_BAD_OPCODE (E_ILLEGAL_INSTRUCTION,0x0001)
+#define E_ILLEGAL_INSTRUCTION_BAD_OPCODE (E_ILLEGAL_INSTRUCTION, 0x0001)
 /* An unsupported prefix byte was encountered
  * 	@@The opcode that caused the exception
  * 	@@NOTE: This field should be decoded using `E_ILLEGAL_INSTRUCTION_X86_OPCODE_*'
  * 	member opcode: uintptr_t;
  * 	@@Opcode flags (set of `EMU86_F_*')
  * 	member op_flags: uintptr_t; */
-#define E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX (E_ILLEGAL_INSTRUCTION,0x0002)
+#define E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX (E_ILLEGAL_INSTRUCTION, 0x0002)
 /* The instruction's opcode is not supported by the host (not thrown if the instruction was emulated)
  * 	@@The opcode that caused the exception
  * 	@@NOTE: This field should be decoded using `E_ILLEGAL_INSTRUCTION_X86_OPCODE_*'
  * 	member opcode: uintptr_t;
  * 	@@Opcode flags (set of `EMU86_F_*')
  * 	member op_flags: uintptr_t; */
-#define E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE (E_ILLEGAL_INSTRUCTION,0x0003)
+#define E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE (E_ILLEGAL_INSTRUCTION, 0x0003)
 /* Including all prefixes, the instruction is too long
  * 	@@The opcode that caused the exception
  * 	@@NOTE: This field should be decoded using `E_ILLEGAL_INSTRUCTION_X86_OPCODE_*'
  * 	member opcode: uintptr_t;
  * 	@@Opcode flags (set of `EMU86_F_*')
  * 	member op_flags: uintptr_t; */
-#define E_ILLEGAL_INSTRUCTION_X86_TOO_LONG (E_ILLEGAL_INSTRUCTION,0x0004)
+#define E_ILLEGAL_INSTRUCTION_X86_TOO_LONG (E_ILLEGAL_INSTRUCTION, 0x0004)
 /* The calling code does not have the necessary privilege to invoke the instruction `opcode'
  * 	@@The opcode that caused the exception
  * 	@@NOTE: This field should be decoded using `E_ILLEGAL_INSTRUCTION_X86_OPCODE_*'
  * 	member opcode: uintptr_t;
  * 	@@Opcode flags (set of `EMU86_F_*')
  * 	member op_flags: uintptr_t; */
-#define E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE (E_ILLEGAL_INSTRUCTION,0x0005)
+#define E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE (E_ILLEGAL_INSTRUCTION, 0x0005)
 /* A kernel-space instruction has caused an unhandled #GP or #SS
  * 	@@The opcode that caused the exception
  * 	@@NOTE: This field should be decoded using `E_ILLEGAL_INSTRUCTION_X86_OPCODE_*'
@@ -222,7 +222,7 @@
  * 	member ecode: uintptr_t;
  * 	@@The segment value of the segment in question
  * 	member segval: uintptr_t; */
-#define E_ILLEGAL_INSTRUCTION_X86_INTERRUPT (E_ILLEGAL_INSTRUCTION,0x000f)
+#define E_ILLEGAL_INSTRUCTION_X86_INTERRUPT (E_ILLEGAL_INSTRUCTION, 0x000f)
 /* An operand of the instruction is invalid
  * 	@@The opcode that caused the exception
  * 	@@NOTE: This field should be decoded using `E_ILLEGAL_INSTRUCTION_X86_OPCODE_*'
@@ -243,7 +243,7 @@
  * 	@@The associated register value (high 32 bits in case of an MSR write)
  * 	member regval2: uintptr_t;
  */
-#define E_ILLEGAL_INSTRUCTION_BAD_OPERAND (E_ILLEGAL_INSTRUCTION,0x0010)
+#define E_ILLEGAL_INSTRUCTION_BAD_OPERAND (E_ILLEGAL_INSTRUCTION, 0x0010)
 /* Unexpectedly, the instruction has a memory operand (the memory operand's address is stored in `offset') */
 #define E_ILLEGAL_INSTRUCTION_BAD_OPERAND_UNEXPECTED_MEMORY 0x0001
 /* Unexpectedly, the instruction has a register operand (register and its value is stored in `regno' and `regval') */
@@ -270,7 +270,7 @@
  * 	@@The associated register value (or 0 for read operations) (high 32 bits in case of an MSR write)
  * 	member regval2: uintptr_t;
  */
-#define E_ILLEGAL_INSTRUCTION_REGISTER (E_ILLEGAL_INSTRUCTION,0x0011)
+#define E_ILLEGAL_INSTRUCTION_REGISTER (E_ILLEGAL_INSTRUCTION, 0x0011)
 /* Read from invalid register */
 #define E_ILLEGAL_INSTRUCTION_REGISTER_RDINV 0x0001
 /* Read from privileged register */
@@ -318,7 +318,7 @@
  * 	member min: intptr_t;
  * 	@@The high bound of valid indices
  * 	member max: intptr_t; */
-#define E_INDEX_ERROR_OUT_OF_BOUNDS (E_INDEX_ERROR,0x0001)
+#define E_INDEX_ERROR_OUT_OF_BOUNDS (E_INDEX_ERROR, 0x0001)
 
 
 

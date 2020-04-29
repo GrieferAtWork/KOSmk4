@@ -45,7 +45,7 @@ struct addr2line_buf {
  * >> addr2line_errno_t error;
  * >> uintptr_t level = 0;
  * >> do {
- * >>     error = addr2line((uintptr_t)ptr,&info,level);
+ * >>     error = addr2line((uintptr_t)ptr, &info, level);
  * >>     if (error != DEBUG_INFO_ERROR_SUCCESS)
  * >>         break;
  * >>     printk("%s(%Iu) : %s : HERE\n",

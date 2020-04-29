@@ -335,15 +335,15 @@ __SYSDECL_BEGIN
 
 #define __SIZEOF_CPU_SET_T__  (__CPU_SETSIZE / 8)
 #define __NCPUBITS            (8*sizeof(__cpu_mask))
-#define __SIZEOF_CPU_MASK__    4
-#define __CPUELT(cpuno)         ((cpuno)/__NCPUBITS)
-#define __CPUMASK(cpuno)        ((__cpu_mask)1 << ((cpuno)%__NCPUBITS))
+#define __SIZEOF_CPU_MASK__   4
+#define __CPUELT(cpuno)       ((cpuno)/__NCPUBITS)
+#define __CPUMASK(cpuno)      ((__cpu_mask)1 << ((cpuno)%__NCPUBITS))
+
 #ifdef __CC__
 typedef __UINT32_TYPE__ __cpu_mask;
 typedef struct __cpu_set_struct {
 	__cpu_mask __bits[__CPU_SETSIZE / __NCPUBITS];
 } __cpu_set_t;
-#endif /* __CC__ */
 #define __CPU_SETNONE   { { [0 ... __CPUELT(__CPU_SETSIZE) - 1] = 0 } }
 #define __CPU_SETALL    { { [0 ... __CPUELT(__CPU_SETSIZE) - 1] = (__cpu_mask)-1 } }
 #if defined(__GNUC__) && 0
@@ -504,8 +504,6 @@ __PRIVATE_DEFINE_CPU_OP_S(__cpu_xor_s_impl, ^)
 #define __CPU_FREE(cpuset) \
 	__libc_free(cpuset)
 
-
-#ifdef __CC__
 
 #ifndef __sched_param_defined
 #define __sched_param_defined 1

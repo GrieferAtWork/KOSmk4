@@ -122,14 +122,20 @@ STATIC_ASSERT(SIZEOF_MFREE == offsetof(struct mfree, mf_data));
 
 
 #if !defined(NDEBUG) && 0
-#define HEAP_ADD_DANGLE(self,count) \
-        (((count) && (self) == &kernel_locked_heap) ? printk(KERN_RAW "%s(%d) : Add dangle %Iu + %Iu -> %Iu\n", \
-                          __FILE__,__LINE__,(self)->h_dangle,count,(self)->h_dangle + (count)) : (void)0, \
-         ATOMIC_FETCHADD((self)->h_dangle,count))
-#define HEAP_SUB_DANGLE(self,count) \
-        (((count) && (self) == &kernel_locked_heap) ? printk(KERN_RAW "%s(%d) : Sub dangle %Iu - %Iu -> %Iu\n", \
-                          __FILE__,__LINE__,(self)->h_dangle,count,(self)->h_dangle - (count)) : (void)0, \
-         ATOMIC_FETCHSUB((self)->h_dangle,count))
+#define HEAP_ADD_DANGLE(self, count)                             \
+	(((count) && (self) == &kernel_locked_heap)                  \
+	 ? printk(KERN_RAW "%s(%d) : Add dangle %Iu + %Iu -> %Iu\n", \
+	          __FILE__, __LINE__, (self)->h_dangle,              \
+	          count, (self)->h_dangle + (count))                 \
+	 : (void)0,                                                  \
+	 ATOMIC_FETCHADD((self)->h_dangle, count))
+#define HEAP_SUB_DANGLE(self, count)                             \
+	(((count) && (self) == &kernel_locked_heap)                  \
+	 ? printk(KERN_RAW "%s(%d) : Sub dangle %Iu - %Iu -> %Iu\n", \
+	          __FILE__, __LINE__, (self)->h_dangle,              \
+	          count, (self)->h_dangle - (count))                 \
+	 : (void)0,                                                  \
+	 ATOMIC_FETCHSUB((self)->h_dangle, count))
 #else /* !NDEBUG */
 #define HEAP_ADD_DANGLE(self,count) ATOMIC_FETCHADD((self)->h_dangle,count)
 #define HEAP_SUB_DANGLE(self,count) ATOMIC_FETCHSUB((self)->h_dangle,count)

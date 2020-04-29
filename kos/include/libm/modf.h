@@ -59,7 +59,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_NONNULL((2)) __IEEE754_FLOAT_TYPE__
 	__LIBM_GET_FLOAT_WORD(__i0, __x);
 	__j0 = ((__i0 >> IEEE754_FLOAT_SHIFT) & IEEE754_FLOAT_MAXEXP) - IEEE754_FLOAT_BIAS; /* exponent of x */
 	if (__j0 < IEEE754_FLOAT_SHIFT) {                                                   /* integer part in x */
-		if (__j0 < 0) {                                                                 /* |x|<1 */
+		if (__j0 < 0) {                                                                 /* |x| < 1 */
 			__LIBM_SET_FLOAT_WORD(*__iptr, __i0 & __UINT32_C(0x80000000));              /* *iptr = +-0 */
 			return __x;
 		} else {
@@ -115,7 +115,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_NONNULL((2)) __IEEE754_DOUBLE_TYPE__
 	__LIBM_GET_DOUBLE_WORDS(__i0, __i1, __x);
 	__j0 = ((__i0 >> IEEE754_DOUBLE_SHIFT) & IEEE754_DOUBLE_MAXEXP) - IEEE754_DOUBLE_BIAS; /* exponent of x */
 	if (__j0 < IEEE754_DOUBLE_SHIFT) {                                                     /* integer part in high x */
-		if (__j0 < 0) {                                                                    /* |x|<1 */
+		if (__j0 < 0) {                                                                    /* |x| < 1 */
 			__LIBM_INSERT_WORDS(*__iptr, __i0 & __UINT32_C(0x80000000), 0);                /* *iptr = +-0 */
 			return __x;
 		} else {
@@ -179,7 +179,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_NONNULL((2)) __IEEE854_LONG_DOUBLE_TYPE__
 	__LIBM_GET_LDOUBLE_WORDS(__se, __i0, __i1, __x);
 	__j0 = (__se & IEEE854_LONG_DOUBLE_MAXEXP) - IEEE854_LONG_DOUBLE_BIAS; /* exponent of x */
 	if (__j0 < 32) {                                                     /* integer part in high x */
-		if (__j0 < 0) {                                                  /* |x|<1 */
+		if (__j0 < 0) {                                                  /* |x| < 1 */
 			__LIBM_SET_LDOUBLE_WORDS(*__iptr, __se & 0x8000, 0, 0);      /* *iptr = +-0 */
 			return __x;
 		} else {

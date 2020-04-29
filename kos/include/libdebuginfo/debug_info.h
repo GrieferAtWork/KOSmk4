@@ -181,20 +181,23 @@ typedef struct di_debuginfo_location_struct {
  * >> while (debuginfo_cu_parser_loadunit(..., &parser) == DEBUG_INFO_ERROR_SUCCESS) {
  * >>     do {
  * >>         di_debuginfo_component_attrib_t attr;
- * >>         DI_DEBUGINFO_CU_PARSER_EACHATTR(attr,& parser) {
+ * >>         DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, &parser) {
  * >>             ...
  * >>         }
  * >>     } while (debuginfo_cu_parser_next(&parser) == DEBUG_INFO_ERROR_SUCCESS);
  * >> }
  */
-#define DI_DEBUGINFO_CU_PARSER_EACHATTR(attr,self)                                \
-	for (__byte_t *_attr_reader = (__byte_t *)(self)->dup_comp.dic_attrib_start;  \
-	               _attr_reader < (__byte_t *)(self)->dup_comp.dic_attrib_end &&  \
-	              (self)->dup_cu_info_pos < (self)->dup_cu_info_end;              \
-	     debuginfo_cu_parser_skipform(self,(attr).dica_form))                     \
-	if (((attr).dica_name = dwarf_decode_uleb128((__byte_t **)&_attr_reader),     \
-	     (attr).dica_form = dwarf_decode_uleb128((__byte_t **)&_attr_reader),0)); \
-	else if (!(attr).dica_name && !(attr).dica_form) break; else
+#define DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, self)                                   \
+	for (__byte_t *_attr_reader = (__byte_t *)(self)->dup_comp.dic_attrib_start;      \
+	     /*     */ _attr_reader < (__byte_t *)(self)->dup_comp.dic_attrib_end &&      \
+	     (self)->dup_cu_info_pos < (self)->dup_cu_info_end;                           \
+	     debuginfo_cu_parser_skipform(self, (attr).dica_form))                        \
+		if (((attr).dica_name = dwarf_decode_uleb128((__byte_t **)&_attr_reader),     \
+		     (attr).dica_form = dwarf_decode_uleb128((__byte_t **)&_attr_reader), 0)) \
+			;                                                                         \
+		else if (!(attr).dica_name && !(attr).dica_form)                              \
+			break;                                                                    \
+		else
 
 
 /* Given a pointer to the start of a debug_info CU (or a pointer to the start
@@ -319,8 +322,8 @@ typedef struct {
 /* Initialize an iterator for enumerating ranges stored within a given debug_info range selector.
  * >> __uintptr_t start_pc,end_pc;
  * >> di_debuginfo_ranges_iterator_t iter;
- * >> di_debuginfo_ranges_iterator_init(&iter,...);
- * >> while (di_debuginfo_ranges_iterator_next(&iter,&start_pc,&end_pc)) {
+ * >> di_debuginfo_ranges_iterator_init(&iter, ...);
+ * >> while (di_debuginfo_ranges_iterator_next(&iter, &start_pc, &end_pc)) {
  * >>     ...
  * >> }
  * @param: debug_ranges_start: Starting address of the `.debug_ranges' section.
@@ -618,7 +621,7 @@ typedef struct di_debuginfo_inlined_subroutine_struct {
 	                                         * >>     debuginfo_cu_parser_next(&parser);
 	                                         * >>     if (parser.dup_comp.dic_tag == DW_TAG_subprogram) {
 	                                         * >>         di_debuginfo_subprogram_t prog;
-	                                         * >>         if (debuginfo_cu_parser_loadattr_subprogram(&parser,&prog) == DEBUG_INFO_ERROR_SUCCESS) {
+	                                         * >>         if (debuginfo_cu_parser_loadattr_subprogram(&parser, &prog) == DEBUG_INFO_ERROR_SUCCESS) {
 	                                         * >>             // Success
 	                                         * >>             ...
 	                                         * >>         }

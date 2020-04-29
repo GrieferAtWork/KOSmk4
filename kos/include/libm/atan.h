@@ -111,10 +111,10 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 	} else {
 		__x = __ieee754_fabsf(__x);
 		if (__ix < 0x3f980000) {     /* |x| < 1.1875 */
-			if (__ix < 0x3f300000) { /* 7/16 <=|x|<11/16 */
+			if (__ix < 0x3f300000) { /* 7/16 <=|x| < 11/16 */
 				__id = 0;
 				__x  = (__IEEE754_FLOAT_C(2.0) * __x - __LIBM_LOCAL_VALUE(onef)) / (__IEEE754_FLOAT_C(2.0) + __x);
-			} else { /* 11/16<=|x|< 19/16 */
+			} else { /* 11/16<=|x| <  19/16 */
 				__id = 1;
 				__x  = (__x - __LIBM_LOCAL_VALUE(onef)) / (__x + __LIBM_LOCAL_VALUE(onef));
 			}
@@ -230,10 +230,10 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 	} else {
 		__x = __ieee754_fabs(__x);
 		if (__ix < 0x3ff30000) {     /* |x| < 1.1875 */
-			if (__ix < 0x3fe60000) { /* 7/16 <=|x|<11/16 */
+			if (__ix < 0x3fe60000) { /* 7/16 <=|x| < 11/16 */
 				__id = 0;
 				__x  = (__IEEE754_DOUBLE_C(2.0) * __x - __LIBM_LOCAL_VALUE(one)) / (__IEEE754_DOUBLE_C(2.0) + __x);
-			} else { /* 11/16<=|x|< 19/16 */
+			} else { /* 11/16<=|x| <  19/16 */
 				__id = 1;
 				__x  = (__x - __LIBM_LOCAL_VALUE(one)) / (__x + __LIBM_LOCAL_VALUE(one));
 			}
@@ -427,12 +427,12 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
 			return __LIBM_LOCAL_VALUE(atantbll)[83];
 		}
 	}
-	if (__k <= 0x3fc5) { /* |x| < 2**-58 */
+	if (__k <= 0x3fc5) { /* |x| < 2 ** -58 */
 		/* Raise inexact. */
 		if (__LIBM_LOCAL_VALUE(hugeval4930l) + __x > __IEEE854_LONG_DOUBLE_C(0.0))
 			return __x;
 	}
-	if (__k >= 0x4072) { /* |x| > 2**115 */
+	if (__k >= 0x4072) { /* |x| > 2 ** 115 */
 		/* Saturate result to {-,+}pi/2 */
 		if (__sign)
 			return -__LIBM_LOCAL_VALUE(atantbll)[83];

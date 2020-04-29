@@ -39,7 +39,7 @@ struct floppy_struct {
 	__UINT32_TYPE__ sect;    /* sectors per track */
 	__UINT32_TYPE__ head;    /* nr of heads */
 	__UINT32_TYPE__ track;   /* nr of tracks */
-	__UINT32_TYPE__ stretch; /* bit 0 !=0 means double track steps */
+	__UINT32_TYPE__ stretch; /* bit 0 != 0 means double track steps */
 	                         /* bit 1 != 0 means swap sides */
 	                         /* bits 2..9 give the first sector number (the LSB is flipped) */
 #define FD_STRETCH          1

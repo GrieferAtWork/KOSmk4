@@ -64,7 +64,7 @@ DECL_BEGIN
  * >>              target,
  * >>              flags,
  * >>              0);
- * >> return disasm_print_until(&da,(byte_t *)pc + num_bytes);
+ * >> return disasm_print_until(&da, (byte_t *)pc + num_bytes);
  * @return: * : The sum of all callbacks to `printer' ever executed with `self'
  * @return: <0: The first negative return value of `printer'. */
 INTERN NONNULL((1)) ssize_t CC

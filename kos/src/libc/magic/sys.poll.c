@@ -84,27 +84,27 @@ ppoll32:([inp(nfds)] struct pollfd *fds, nfds_t nfds,
          [nullable] $sigset_t const *ss) -> int = ppoll?;
 
 [cp][noexport]
-[if(defined(__USE_TIME_BITS64)),preferred_alias(ppoll)]
-[if(!defined(__USE_TIME_BITS64)),preferred_alias(ppoll64)]
-[requires(defined(__CRT_HAVE_ppoll) || defined(__CRT_HAVE_ppoll64))]
+[if(defined(__USE_TIME_BITS64)), preferred_alias(ppoll)]
+[if(!defined(__USE_TIME_BITS64)), preferred_alias(ppoll64)]
+[requires($has_function(ppoll32) || $has_function(ppoll64))]
 ppoll:([inp(nfds)] struct pollfd *fds, nfds_t nfds,
        [nullable] struct timespec const *timeout,
        [nullable] $sigset_t const *ss) -> int {
-#ifdef __CRT_HAVE_ppoll
+@@if_has_function(ppoll32)@@
 	struct timespec32 tmo32;
 	if (!timeout)
-		return ppoll32(fds,nfds,NULL,ss);
+		return ppoll32(fds, nfds, NULL, ss);
 	tmo32.@tv_sec@  = (time32_t)timeout->@tv_sec@;
 	tmo32.@tv_nsec@ = timeout->@tv_nsec@;
-	return ppoll32(fds,nfds,&tmo32,ss);
-#else
+	return ppoll32(fds, nfds, &tmo32, ss);
+@@else_has_function(ppoll32)@@
 	struct timespec64 tmo64;
 	if (!timeout)
-		return ppoll64(fds,nfds,NULL,ss);
+		return ppoll64(fds, nfds, NULL, ss);
 	tmo64.@tv_sec@  = (time64_t)timeout->@tv_sec@;
 	tmo64.@tv_nsec@ = timeout->@tv_nsec@;
-	return ppoll64(fds,nfds,&tmo64,ss);
-#endif
+	return ppoll64(fds, nfds, &tmo64, ss);
+@@endif_has_function(ppoll32)@@
 }
 
 %
@@ -116,10 +116,10 @@ ppoll64:([inp(nfds)] struct pollfd *fds, nfds_t nfds,
          [nullable] $sigset_t const *ss) -> int {
 	struct timespec32 tmo32;
 	if (!timeout)
-		return ppoll32(fds,nfds,NULL,ss);
+		return ppoll32(fds, nfds, NULL, ss);
 	tmo32.@tv_sec@  = (time32_t)timeout->@tv_sec@;
 	tmo32.@tv_nsec@ = timeout->@tv_nsec@;
-	return ppoll32(fds,nfds,&tmo32,ss);
+	return ppoll32(fds, nfds, &tmo32, ss);
 }
 %#endif /* __USE_TIME64 */
 %#endif /* __USE_GNU */

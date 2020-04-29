@@ -40,6 +40,7 @@
 #include <assert.h>
 #include <malloc.h>
 #include <sched.h>
+#include <signal.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
@@ -251,7 +252,7 @@ libc_cxa_begin_catch(struct _Unwind_Exception *ptr) {
 	 * >> try {
 	 * >>     ...
 	 * >> } catch (MyException &exc) {
-	 * >>     printk("exc @ %p\n",&exc); // Prints the address that this function returns.
+	 * >>     printk("exc @ %p\n", &exc); // Prints the address that this function returns.
 	 * >> }
 	 * The given `ptr' is what `libc_error_unwind()' originally set as value
 	 * for the `__ERROR_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION' register. */
@@ -267,7 +268,7 @@ libc_cxa_end_catch(void) {
 	 * >> } catch (MyException) {
 	 * >>     MyException &exc = *__cxa_begin_catch(%eax);
 	 * >>     try {
-	 * >>         printk("exc @ %p\n",&exc);
+	 * >>         printk("exc @ %p\n", &exc);
 	 * >>     } finally {
 	 * >>         __cxa_end_catch();
 	 * >>     }

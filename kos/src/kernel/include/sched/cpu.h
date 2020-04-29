@@ -211,21 +211,21 @@ DECL_END
 DECL_BEGIN
 typedef uintptr_t cpuset_t[(CONFIG_MAX_CPU_COUNT + (BITS_PER_POINTER-1)) / BITS_PER_POINTER];
 #if __SIZEOF_POINTER__ == 8
-#define CPUSET_COPY(dst,src)  (void)__libc_memcpyq(dst,src,(CONFIG_MAX_CPU_COUNT + (BITS_PER_POINTER-1)) / BITS_PER_POINTER)
-#define CPUSET_CLEAR(x)       (void)__libc_memsetq(x,0,(CONFIG_MAX_CPU_COUNT + (BITS_PER_POINTER-1)) / BITS_PER_POINTER)
-#define CPUSET_SETFULL(x)     (void)__libc_memsetq(x,(uintptr_t)-1,(CONFIG_MAX_CPU_COUNT + (BITS_PER_POINTER-1)) / BITS_PER_POINTER)
+#define CPUSET_COPY(dst, src) (void)__libc_memcpyq(dst, src, (CONFIG_MAX_CPU_COUNT + (BITS_PER_POINTER - 1)) / BITS_PER_POINTER)
+#define CPUSET_CLEAR(x)       (void)__libc_memsetq(x, 0, (CONFIG_MAX_CPU_COUNT + (BITS_PER_POINTER - 1)) / BITS_PER_POINTER)
+#define CPUSET_SETFULL(x)     (void)__libc_memsetq(x, (uintptr_t)-1, (CONFIG_MAX_CPU_COUNT + (BITS_PER_POINTER - 1)) / BITS_PER_POINTER)
 #elif __SIZEOF_POINTER__ == 4
-#define CPUSET_COPY(dst,src)  (void)__libc_memcpyl(dst,src,(CONFIG_MAX_CPU_COUNT + (BITS_PER_POINTER-1)) / BITS_PER_POINTER)
-#define CPUSET_CLEAR(x)       (void)__libc_memsetl(x,0,(CONFIG_MAX_CPU_COUNT + (BITS_PER_POINTER-1)) / BITS_PER_POINTER)
-#define CPUSET_SETFULL(x)     (void)__libc_memsetl(x,(uintptr_t)-1,(CONFIG_MAX_CPU_COUNT + (BITS_PER_POINTER-1)) / BITS_PER_POINTER)
-#else
-#define CPUSET_COPY(dst,src)  (void)__libc_memcpy(dst,src,sizeof(cpuset_t))
-#define CPUSET_CLEAR(x)       (void)__libc_memset(x,0,sizeof(cpuset_t))
-#define CPUSET_SETFULL(x)     (void)__libc_memset(x,0xff,sizeof(cpuset_t))
-#endif
-#define CPUSET_CONTAINS(x,id) ((x)[(id) / BITS_PER_POINTER] & ((uintptr_t)1 << ((id) % BITS_PER_POINTER)))
-#define CPUSET_INSERT(x,id)   (void)((x)[(id) / BITS_PER_POINTER] |= ((uintptr_t)1 << ((id) % BITS_PER_POINTER)))
-#define CPUSET_REMOVE(x,id)   (void)((x)[(id) / BITS_PER_POINTER] &= ~((uintptr_t)1 << ((id) % BITS_PER_POINTER)))
+#define CPUSET_COPY(dst, src) (void)__libc_memcpyl(dst, src, (CONFIG_MAX_CPU_COUNT + (BITS_PER_POINTER - 1)) / BITS_PER_POINTER)
+#define CPUSET_CLEAR(x)       (void)__libc_memsetl(x, 0, (CONFIG_MAX_CPU_COUNT + (BITS_PER_POINTER - 1)) / BITS_PER_POINTER)
+#define CPUSET_SETFULL(x)     (void)__libc_memsetl(x, (uintptr_t)-1, (CONFIG_MAX_CPU_COUNT + (BITS_PER_POINTER - 1)) / BITS_PER_POINTER)
+#else /* __SIZEOF_POINTER__ == ... */
+#define CPUSET_COPY(dst, src) (void)__libc_memcpy(dst, src, sizeof(cpuset_t))
+#define CPUSET_CLEAR(x)       (void)__libc_memset(x, 0, sizeof(cpuset_t))
+#define CPUSET_SETFULL(x)     (void)__libc_memset(x, 0xff, sizeof(cpuset_t))
+#endif /* __SIZEOF_POINTER__ != ... */
+#define CPUSET_CONTAINS(x, id) ((x)[(id) / BITS_PER_POINTER] & ((uintptr_t)1 << ((id) % BITS_PER_POINTER)))
+#define CPUSET_INSERT(x, id)   (void)((x)[(id) / BITS_PER_POINTER] |= ((uintptr_t)1 << ((id) % BITS_PER_POINTER)))
+#define CPUSET_REMOVE(x, id)   (void)((x)[(id) / BITS_PER_POINTER] &= ~((uintptr_t)1 << ((id) % BITS_PER_POINTER)))
 #define CPUSET_COUNT(x) cpuset_count_impl(x)
 FORCELOCAL size_t NOTHROW(KCALL cpuset_count_impl)(cpuset_t self) {
 	size_t result = 0;

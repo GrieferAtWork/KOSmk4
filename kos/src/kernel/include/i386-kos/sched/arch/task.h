@@ -289,7 +289,7 @@ NOTHROW(KCALL x86_interrupt_pop)(pflag_t flag) {
  * >> }
  * The `redirect_iret_to_execute_rpcs()' is then simply called
  * from another, asynchronous kernel RPC:
- * >> task_schedule_asynchronous_rpc(target,&redirect_iret_to_execute_rpcs);
+ * >> task_schedule_asynchronous_rpc(target, &redirect_iret_to_execute_rpcs);
  * Once entered, `x86_rpc_user_redirection()' will then restore the saved IRET
  * tail, before proceeding to serve _all_ pending RPC callbacks (s.a.:
  * the `Anytime the thread returns to user-space' row in `task_rpc()')

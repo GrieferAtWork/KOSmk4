@@ -37,73 +37,73 @@ __SYSDECL_BEGIN
 
 }
 
-[if(__SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__),alias(wcstol)]
-[if(__SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__),alias(wcstoll,wcstoq)]
-[if(__SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == 8),alias(wcsto64)]
-[if(__SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == 4),alias(wcsto32)]
-[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__),alias(DOS$wcstol)]
-[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__),alias(DOS$wcstoll,DOS$wcstoq)]
-[if(__SIZEOF_INTMAX_T__ == 8),alias(DOS$wcsto64)]
-[if(__SIZEOF_INTMAX_T__ == 4),alias(DOS$wcsto32)]
+[if(__SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__), alias(wcstol)]
+[if(__SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias(wcstoll,wcstoq)]
+[if(__SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == 8), alias(wcsto64)]
+[if(__SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == 4), alias(wcsto32)]
+[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__), alias(DOS$wcstol)]
+[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias(DOS$wcstoll,DOS$wcstoq)]
+[if(__SIZEOF_INTMAX_T__ == 8), alias(DOS$wcsto64)]
+[if(__SIZEOF_INTMAX_T__ == 4), alias(DOS$wcsto32)]
 [attribute(*)] c16toimax:(*) %{uchar(wcstoimax)}
 
-[if(__SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__),alias(wcstol)]
-[if(__SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__),alias(wcstoll,wcstoq)]
-[if(__SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INTMAX_T__ == 8),alias(wcsto64)]
-[if(__SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INTMAX_T__ == 4),alias(wcsto32)]
+[if(__SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__), alias(wcstol)]
+[if(__SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias(wcstoll,wcstoq)]
+[if(__SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INTMAX_T__ == 8), alias(wcsto64)]
+[if(__SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INTMAX_T__ == 4), alias(wcsto32)]
 [attribute(*)] c32toimax:(*) %{uchar(wcstoimax)}
 
-[if(__SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__),alias(wcstoul)]
-[if(__SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__),alias(wcstoull,wcstouq)]
-[if(__SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == 8),alias(wcstou64)]
-[if(__SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == 4),alias(wcstou32)]
-[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__),alias(DOS$wcstoul)]
-[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__),alias(DOS$wcstoull,DOS$wcstouq)]
-[if(__SIZEOF_INTMAX_T__ == 8),alias(DOS$wcstou64)]
-[if(__SIZEOF_INTMAX_T__ == 4),alias(DOS$wcstou32)]
+[if(__SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__), alias(wcstoul)]
+[if(__SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias(wcstoull,wcstouq)]
+[if(__SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == 8), alias(wcstou64)]
+[if(__SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == 4), alias(wcstou32)]
+[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__), alias(DOS$wcstoul)]
+[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias(DOS$wcstoull,DOS$wcstouq)]
+[if(__SIZEOF_INTMAX_T__ == 8), alias(DOS$wcstou64)]
+[if(__SIZEOF_INTMAX_T__ == 4), alias(DOS$wcstou32)]
 [attribute(*)] c16toumax:(*) %{uchar(wcstoumax)}
 
-[if(__SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__),alias(wcstoul)]
-[if(__SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__),alias(wcstoull,wcstouq)]
-[if(__SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INTMAX_T__ == 8),alias(wcstou64)]
-[if(__SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INTMAX_T__ == 4),alias(wcstou32)]
+[if(__SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__), alias(wcstoul)]
+[if(__SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias(wcstoull,wcstouq)]
+[if(__SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INTMAX_T__ == 8), alias(wcstou64)]
+[if(__SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INTMAX_T__ == 4), alias(wcstou32)]
 [attribute(*)] c32toumax:(*) %{uchar(wcstoumax)}
 
 
 %#ifdef __USE_XOPEN2K8
 
-[if(__SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__),alias(wcstol_l,_wcstol_l)]
-[if(__SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__),alias(wcstoll_l,_wcstoll_l)]
-[if(__SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == 8),alias(wcsto64_l,_wcstoi64_l)]
-[if(__SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == 4),alias(wcsto32_l)]
-[if(__SIZEOF_WCHAR_T__ == 2),alias(_wcstoimax_l)]
-[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__),alias(DOS$_wcstol_l)]
-[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__),alias(DOS$_wcstoll_l)]
-[if(__SIZEOF_INTMAX_T__ == 8),alias(DOS$_wcstoi64_l)][alias(DOS$_wcstoimax_l)]
+[if(__SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__), alias(wcstol_l,_wcstol_l)]
+[if(__SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias(wcstoll_l,_wcstoll_l)]
+[if(__SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == 8), alias(wcsto64_l,_wcstoi64_l)]
+[if(__SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == 4), alias(wcsto32_l)]
+[if(__SIZEOF_WCHAR_T__ == 2), alias(_wcstoimax_l)]
+[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__), alias(DOS$_wcstol_l)]
+[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias(DOS$_wcstoll_l)]
+[if(__SIZEOF_INTMAX_T__ == 8), alias(DOS$_wcstoi64_l)][alias(DOS$_wcstoimax_l)]
 [attribute(*)] c16toimax_l:(*) %{uchar(wcstoimax_l)}
 
-[if(__SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__),alias(wcstol_l,_wcstol_l)]
-[if(__SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__),alias(wcstoll_l,_wcstoll_l)]
-[if(__SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INTMAX_T__ == 8),alias(wcsto64_l,_wcstoi64_l)]
-[if(__SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INTMAX_T__ == 4),alias(wcsto32_l)]
-[if(__SIZEOF_WCHAR_T__ == 4),alias(_wcstoimax_l)]
+[if(__SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__), alias(wcstol_l,_wcstol_l)]
+[if(__SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias(wcstoll_l,_wcstoll_l)]
+[if(__SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INTMAX_T__ == 8), alias(wcsto64_l,_wcstoi64_l)]
+[if(__SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INTMAX_T__ == 4), alias(wcsto32_l)]
+[if(__SIZEOF_WCHAR_T__ == 4), alias(_wcstoimax_l)]
 [attribute(*)] c32toimax_l:(*) %{uchar(wcstoimax_l)}
 
-[if(__SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__),alias(wcstoul_l,_wcstoul_l)]
-[if(__SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__),alias(wcstoull_l,_wcstoull_l)]
-[if(__SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == 8),alias(wcstou64_l,_wcstoui64_l)]
-[if(__SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == 4),alias(wcstou32_l)]
-[if(__SIZEOF_WCHAR_T__ == 2),alias(DOS$_wcstoumax_l)]
-[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__),alias(DOS$_wcstoul_l)]
-[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__),alias(DOS$_wcstoull_l)]
-[if(__SIZEOF_INTMAX_T__ == 8),alias(DOS$_wcstoui64_l)][alias(DOS$_wcstoumax_l)]
+[if(__SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__), alias(wcstoul_l,_wcstoul_l)]
+[if(__SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias(wcstoull_l,_wcstoull_l)]
+[if(__SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == 8), alias(wcstou64_l,_wcstoui64_l)]
+[if(__SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == 4), alias(wcstou32_l)]
+[if(__SIZEOF_WCHAR_T__ == 2), alias(DOS$_wcstoumax_l)]
+[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__), alias(DOS$_wcstoul_l)]
+[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias(DOS$_wcstoull_l)]
+[if(__SIZEOF_INTMAX_T__ == 8), alias(DOS$_wcstoui64_l)][alias(DOS$_wcstoumax_l)]
 [attribute(*)] c16toumax_l:(*) %{uchar(wcstoumax_l)}
 
-[if(__SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__),alias(wcstoul_l,_wcstoul_l)]
-[if(__SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__),alias(wcstoull_l,_wcstoull_l)]
-[if(__SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INTMAX_T__ == 8),alias(wcstou64_l,_wcstoui64_l)]
-[if(__SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INTMAX_T__ == 4),alias(wcstou32_l)]
-[if(__SIZEOF_WCHAR_T__ == 4),alias(_wcstoumax_l)]
+[if(__SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__), alias(wcstoul_l,_wcstoul_l)]
+[if(__SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias(wcstoull_l,_wcstoull_l)]
+[if(__SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INTMAX_T__ == 8), alias(wcstou64_l,_wcstoui64_l)]
+[if(__SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INTMAX_T__ == 4), alias(wcstou32_l)]
+[if(__SIZEOF_WCHAR_T__ == 4), alias(_wcstoumax_l)]
 [attribute(*)] c32toumax_l:(*) %{uchar(wcstoumax_l)}
 
 %#endif /* __USE_XOPEN2K8 */

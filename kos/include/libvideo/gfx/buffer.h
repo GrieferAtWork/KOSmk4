@@ -147,7 +147,7 @@ public:
 	 * @return: -1: Error (s.a. `errno') */
 	__CXX_CLASSMEMBER __ATTR_NONNULL((1))
 	int LIBVIDEO_GFX_CC lock(struct video_lock &__lock) {
-		return (*vb_ops->vi_lock)(this,&__lock);
+		return (*vb_ops->vi_lock)(this, &__lock);
 	}
 
 	/* Unlock a video buffer that has previously been mapped into memory. */

@@ -77,8 +77,8 @@ timerfd_gettime32:($fd_t ufd, [nonnull] struct __itimerspec32 *__restrict otmr) 
 @@Set next expiration time of interval timer source UFD to UTMR.
 @@If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout utmr
 @@is absolute. Optionally return the old expiration time in OTMR
-[if(defined(__USE_TIME_BITS64)),preferred_alias(timerfd_settime64)]
-[if(!defined(__USE_TIME_BITS64)),preferred_alias(timerfd_settime)]
+[if(defined(__USE_TIME_BITS64)), preferred_alias(timerfd_settime64)]
+[if(!defined(__USE_TIME_BITS64)), preferred_alias(timerfd_settime)]
 [requires(defined(__CRT_HAVE_timerfd_settime) || defined(__CRT_HAVE_timerfd_settime64))]
 timerfd_settime:($fd_t ufd, int flags,
                  [nonnull] struct itimerspec const *utmr,
@@ -117,8 +117,8 @@ timerfd_settime:($fd_t ufd, int flags,
 }
 
 @@Return the next expiration time of UFD
-[if(defined(__USE_TIME_BITS64)),preferred_alias(timerfd_gettime64)]
-[if(!defined(__USE_TIME_BITS64)),preferred_alias(timerfd_gettime)]
+[if(defined(__USE_TIME_BITS64)), preferred_alias(timerfd_gettime64)]
+[if(!defined(__USE_TIME_BITS64)), preferred_alias(timerfd_gettime)]
 [requires(defined(__CRT_HAVE_timerfd_gettime) || defined(__CRT_HAVE_timerfd_gettime64))]
 timerfd_gettime:($fd_t ufd, [nonnull] struct itimerspec *__restrict otmr) -> int {
 #ifdef __CRT_HAVE_timer_settime

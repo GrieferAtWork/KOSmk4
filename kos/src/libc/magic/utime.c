@@ -31,6 +31,7 @@
 
 %{
 #include <features.h>
+
 #include <bits/types.h>
 #include <bits/utimbuf.h>
 
@@ -69,58 +70,58 @@ typedef __TM_TYPE(time) time_t;
 [cp][ignore][alias(_futime64)] crt_futime64:($fd_t fd, [nullable] struct __utimbuf64 const *file_times) -> int = futime64?;
 
 [cp]
-[if(defined(__USE_TIME_BITS64)),preferred_alias(utime64,_utime64)]
-[if(!defined(__USE_TIME_BITS64)),preferred_alias(utime,_utime32)]
-[requires(defined(__CRT_HAVE_utime) || defined(__CRT_HAVE__utime32) || defined(__CRT_HAVE_utime64) || defined(__CRT_HAVE__utime64))]
+[if(defined(__USE_TIME_BITS64)), preferred_alias(utime64,_utime64)]
+[if(!defined(__USE_TIME_BITS64)), preferred_alias(utime,_utime32)]
+[requires($has_function(crt_utime32) || $has_function(crt_utime64))]
 [alternate_names(_utime32)]
 utime:([nonnull] char const *filename, [nullable] struct utimbuf const *file_times) -> int {
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma push_macro("actime")
-#pragma push_macro("modtime")
+#pragma @push_macro@("actime")
+#pragma @push_macro@("modtime")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#undef actime
-#undef modtime
-#if defined(__CRT_HAVE_utime) || defined(__CRT_HAVE__utime32)
+#undef @actime@
+#undef @modtime@
+@@if_has_function(crt_utime32)@@
 	struct __utimbuf32 buf32;
 	if (!file_times)
-		return crt_utime32(filename,NULL);
-	buf32.actime  = (time32_t)file_times->actime;
-	buf32.modtime = (time32_t)file_times->modtime;
-	return crt_utime32(filename,&buf32);
-#else
+		return crt_utime32(filename, NULL);
+	buf32.@actime@  = (time32_t)file_times->@actime@;
+	buf32.@modtime@ = (time32_t)file_times->@modtime@;
+	return crt_utime32(filename, &buf32);
+@@else_has_function(crt_utime32)@@
 	struct __utimbuf64 buf64;
 	if (!file_times)
-		return utime64(filename,NULL);
-	buf64.actime  = (time64_t)file_times->actime;
-	buf64.modtime = (time64_t)file_times->modtime;
-	return utime64(filename,&buf64);
-#endif
+		return crt_utime64(filename, NULL);
+	buf64.@actime@  = (time64_t)file_times->@actime@;
+	buf64.@modtime@ = (time64_t)file_times->@modtime@;
+	return crt_utime64(filename, &buf64);
+@@endif_has_function(crt_utime32)@@
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma pop_macro("modtime")
-#pragma pop_macro("actime")
+#pragma @pop_macro@("modtime")
+#pragma @pop_macro@("actime")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 }
 
 %
 %#ifdef __USE_TIME64
 [cp][alias(_utime64)][time64_variant_of(utime)]
-[requires(defined(__CRT_HAVE_utime) || defined(__CRT_HAVE__utime32))]
+[requires($has_function(crt_utime32))]
 utime64:([nonnull] char const *filename, [nullable] struct utimbuf64 const *file_times) -> int {
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma push_macro("actime")
-#pragma push_macro("modtime")
+#pragma @push_macro@("actime")
+#pragma @push_macro@("modtime")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#undef actime
-#undef modtime
+#undef @actime@
+#undef @modtime@
 	struct __utimbuf32 buf32;
 	if (!file_times)
-		return crt_utime32(filename,NULL);
-	buf32.actime  = (time32_t)file_times->actime;
-	buf32.modtime = (time32_t)file_times->modtime;
-	return crt_utime32(filename,&buf32);
+		return crt_utime32(filename, NULL);
+	buf32.@actime@  = (time32_t)file_times->@actime@;
+	buf32.@modtime@ = (time32_t)file_times->@modtime@;
+	return crt_utime32(filename, &buf32);
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma pop_macro("modtime")
-#pragma pop_macro("actime")
+#pragma @pop_macro@("modtime")
+#pragma @pop_macro@("actime")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 }
 %#endif /* __USE_TIME64 */
@@ -130,58 +131,58 @@ utime64:([nonnull] char const *filename, [nullable] struct utimbuf64 const *file
 %#ifdef __USE_KOS
 
 [cp]
-[if(defined(__USE_TIME_BITS64)),preferred_alias(futime64,_futime64)]
-[if(!defined(__USE_TIME_BITS64)),preferred_alias(futime,_futime32)]
-[requires(defined(__CRT_HAVE_futime) || defined(__CRT_HAVE__futime32) || defined(__CRT_HAVE_futime64) || defined(__CRT_HAVE__futime64))]
+[if(defined(__USE_TIME_BITS64)), preferred_alias(futime64,_futime64)]
+[if(!defined(__USE_TIME_BITS64)), preferred_alias(futime,_futime32)]
+[requires($has_function(crt_futime32) || $has_function(crt_futime64))]
 [alternate_names(_futime32)]
 futime:($fd_t fd, [nullable] struct utimbuf const *file_times) -> int {
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma push_macro("actime")
-#pragma push_macro("modtime")
+#pragma @push_macro@("actime")
+#pragma @push_macro@("modtime")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#undef actime
-#undef modtime
-#if defined(__CRT_HAVE_futime) || defined(__CRT_HAVE__futime32)
+#undef @actime@
+#undef @modtime@
+@@if_has_function(crt_futime32)@@
 	struct __utimbuf32 buf32;
 	if (!file_times)
-		return crt_futime32(fd,NULL);
-	buf32.actime  = (time32_t)file_times->actime;
-	buf32.modtime = (time32_t)file_times->modtime;
-	return crt_futime32(fd,&buf32);
-#else
+		return crt_futime32(fd, NULL);
+	buf32.@actime@  = (time32_t)file_times->@actime@;
+	buf32.@modtime@ = (time32_t)file_times->@modtime@;
+	return crt_futime32(fd, &buf32);
+@@else_has_function(crt_futime32)@@
 	struct __utimbuf64 buf64;
 	if (!file_times)
-		return futime64(fd,NULL);
-	buf64.actime  = (time64_t)file_times->actime;
-	buf64.modtime = (time64_t)file_times->modtime;
-	return futime64(fd,&buf64);
-#endif
+		return crt_futime64(fd, NULL);
+	buf64.@actime@  = (time64_t)file_times->@actime@;
+	buf64.@modtime@ = (time64_t)file_times->@modtime@;
+	return crt_futime64(fd, &buf64);
+@@endif_has_function(crt_futime32)@@
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma pop_macro("modtime")
-#pragma pop_macro("actime")
+#pragma @pop_macro@("modtime")
+#pragma @pop_macro@("actime")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 }
 
 %
 %#ifdef __USE_TIME64
 [cp][alias(_futime64)][time64_variant_of(futime)]
-[requires(defined(__CRT_HAVE_futime) || defined(__CRT_HAVE__futime32))]
+[requires($has_function(crt_futime32))]
 futime64:($fd_t fd, [nullable] struct utimbuf64 const *file_times) -> int {
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma push_macro("actime")
-#pragma push_macro("modtime")
+#pragma @push_macro@("actime")
+#pragma @push_macro@("modtime")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#undef actime
-#undef modtime
+#undef @actime@
+#undef @modtime@
 	struct __utimbuf32 buf32;
 	if (!file_times)
-		return crt_futime32(fd,NULL);
-	buf32.actime  = (time32_t)file_times->actime;
-	buf32.modtime = (time32_t)file_times->modtime;
-	return crt_futime32(fd,&buf32);
+		return crt_futime32(fd, NULL);
+	buf32.@actime@  = (time32_t)file_times->@actime@;
+	buf32.@modtime@ = (time32_t)file_times->@modtime@;
+	return crt_futime32(fd, &buf32);
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma pop_macro("modtime")
-#pragma pop_macro("actime")
+#pragma @pop_macro@("modtime")
+#pragma @pop_macro@("actime")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 }
 %#endif /* __USE_TIME64 */
@@ -198,56 +199,89 @@ futime64:($fd_t fd, [nullable] struct utimbuf64 const *file_times) -> int {
 %#endif /* !__wchar_t_defined */
 
 [cp][noexport][nocrt]
-[if(defined(__USE_TIME_BITS64)),preferred_alias(utime64, _utime64)]
-[if(!defined(__USE_TIME_BITS64)),preferred_alias(utime, _utime32)]
+[if(defined(__USE_TIME_BITS64)), preferred_alias(utime64, _utime64)]
+[if(!defined(__USE_TIME_BITS64)), preferred_alias(utime, _utime32)]
 _utime:([notnull] char const *filename, [nullable] struct _utimbuf __KOS_FIXED_CONST *file_times) -> int = utime;
 
 [cp]
-[if(defined(__USE_TIME_BITS64)),preferred_alias(futime64,_futime64)]
-[if(!defined(__USE_TIME_BITS64)),preferred_alias(futime,_futime32)][noexport][nocrt]
+[if(defined(__USE_TIME_BITS64)), preferred_alias(futime64,_futime64)]
+[if(!defined(__USE_TIME_BITS64)), preferred_alias(futime,_futime32)][noexport][nocrt]
 _futime:($fd_t fd, [nullable] struct _utimbuf __KOS_FIXED_CONST *file_times) -> int = futime;
 
 [cp][alias(utime)][nouser][noexport]
-[requires(defined(__CRT_HAVE__utime64) || defined(__CRT_HAVE_utime64))]
+[requires($has_function(crt_utime64))]
 _utime32:([notnull] char const *filename, [nullable] struct __utimbuf32 __KOS_FIXED_CONST *file_times) -> int {
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma @push_macro@("actime")
+#pragma @push_macro@("modtime")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef @actime@
+#undef @modtime@
 	struct __utimbuf64 buf64;
 	if (!file_times)
-		return crt_utime64(filename,NULL);
-	buf64.actime  = (time64_t)file_times->actime;
-	buf64.modtime = (time64_t)file_times->modtime;
-	return crt_utime64(filename,&buf64);
+		return crt_utime64(filename, NULL);
+	buf64.@actime@  = (time64_t)file_times->@actime@;
+	buf64.@modtime@ = (time64_t)file_times->@modtime@;
+	return crt_utime64(filename, &buf64);
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma @pop_macro@("modtime")
+#pragma @pop_macro@("actime")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 }
 [cp] _utime64:([notnull] char const *filename, [nullable] struct utimbuf64 const *file_times) -> int = utime64;
 
 [cp][alias(futime)][nouser][noexport]
-[requires(defined(__CRT_HAVE__futime64) || defined(__CRT_HAVE_futime64))]
+[requires($has_function(crt_futime64))]
 _futime32:($fd_t fd, [nullable] struct __utimbuf32 __KOS_FIXED_CONST *file_times) -> int {
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma @push_macro@("actime")
+#pragma @push_macro@("modtime")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef @actime@
+#undef @modtime@
 	struct __utimbuf64 buf64;
 	if (!file_times)
-		return crt_futime64(fd,NULL);
-	buf64.actime  = (time64_t)file_times->actime;
-	buf64.modtime = (time64_t)file_times->modtime;
-	return crt_futime64(fd,&buf64);
+		return crt_futime64(fd, NULL);
+	buf64.@actime@  = (time64_t)file_times->@actime@;
+	buf64.@modtime@ = (time64_t)file_times->@modtime@;
+	return crt_futime64(fd, &buf64);
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma @pop_macro@("modtime")
+#pragma @pop_macro@("actime")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 }
 [cp] _futime64:($fd_t fd, struct utimbuf64 const *file_times) -> int = futime64;
 
 [cp][noexport][nocrt][wchar]
-[if(defined(__USE_TIME_BITS64)),preferred_alias(wutime64,_wutime64)]
-[if(!defined(__USE_TIME_BITS64)),preferred_alias(wutime,_wutime32)]
+[if(defined(__USE_TIME_BITS64)), preferred_alias(wutime64,_wutime64)]
+[if(!defined(__USE_TIME_BITS64)), preferred_alias(wutime,_wutime32)]
 _wutime:([notnull] wchar_t const *filename, [nullable] struct _utimbuf __KOS_FIXED_CONST *file_times) -> int = wutime;
 
 [cp][alias(wutime)][nouser][noexport][wchar]
-[requires(defined(__CRT_HAVE__wutime64) || defined(__CRT_HAVE_wutime64))]
-_wutime32:([notnull] wchar_t const *filename, [nullable] struct __utimbuf32 __KOS_FIXED_CONST *file_times) -> int {
+[requires($has_function(crt_wutime64))]
+_wutime32:([notnull] wchar_t const *filename,
+           [nullable] struct __utimbuf32 __KOS_FIXED_CONST *file_times) -> int {
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma @push_macro@("actime")
+#pragma @push_macro@("modtime")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef @actime@
+#undef @modtime@
 	struct __utimbuf64 buf64;
 	if (!file_times)
-		return crt_wutime64(filename,NULL);
-	buf64.actime  = (time64_t)file_times->actime;
-	buf64.modtime = (time64_t)file_times->modtime;
-	return crt_wutime64(filename,&buf64);
+		return crt_wutime64(filename, NULL);
+	buf64.@actime@  = (time64_t)file_times->@actime@;
+	buf64.@modtime@ = (time64_t)file_times->@modtime@;
+	return crt_wutime64(filename, &buf64);
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma @pop_macro@("modtime")
+#pragma @pop_macro@("actime")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 }
 
-[cp][wchar] _wutime64:([notnull] wchar_t const *filename, [nullable] struct utimbuf64 const *file_times) -> int = wutime64;
+[cp][wchar]
+_wutime64:([notnull] wchar_t const *filename,
+           [nullable] struct utimbuf64 const *file_times) -> int = wutime64;
 %#endif /* __USE_DOS */
 
 
@@ -260,13 +294,13 @@ __SYSDECL_END
 #ifdef __USE_KOS
 #if defined(_WCHAR_H) && !defined(_PARTS_WCHAR_UTIME_H)
 #include <parts/wchar/utime.h>
-#endif
+#endif /* _WCHAR_H && !_PARTS_WCHAR_UTIME_H */
 #endif /* __USE_KOS */
 
 #ifdef __USE_UTF
 #if defined(_UCHAR_H) && !defined(_PARTS_UCHAR_UTIME_H)
 #include <parts/uchar/utime.h>
-#endif
+#endif /* _UCHAR_H && !_PARTS_UCHAR_UTIME_H */
 #endif /* __USE_UTF */
 
 

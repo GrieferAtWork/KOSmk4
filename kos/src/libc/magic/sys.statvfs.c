@@ -62,13 +62,13 @@ typedef __FS_TYPE(fsfilcnt) fsfilcnt_t; /* Type to count file system inodes.  */
 
 
 @@Return information about the filesystem on which FILE resides
-[if(!defined(__USE_FILE_OFFSET64)),preferred_alias(statvfs)]
-[if(defined(__USE_FILE_OFFSET64)),preferred_alias(statvfs64)]
+[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(statvfs)]
+[if(defined(__USE_FILE_OFFSET64)), preferred_alias(statvfs64)]
 statvfs:([nonnull] char const *file, [nonnull] struct statvfs *buf) -> int;
 
 @@Return information about the filesystem containing the file FILDES refers to
-[if(!defined(__USE_FILE_OFFSET64)),preferred_alias(fstatvfs)]
-[if(defined(__USE_FILE_OFFSET64)),preferred_alias(fstatvfs64)]
+[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(fstatvfs)]
+[if(defined(__USE_FILE_OFFSET64)), preferred_alias(fstatvfs64)]
 fstatvfs:($fd_t filedes, [nonnull] struct statvfs *buf) -> int;
 
 %

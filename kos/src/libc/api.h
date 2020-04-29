@@ -165,9 +165,9 @@
 
 #include <errno.h>
 #define libc_seterrno_syserr(e)       (likely(!E_ISERR(e)) ? (e) : libc_seterrno((errno_t)-(syscall_slong_t)(syscall_ulong_t)(e)))
-#define libc_seterrno_syserr2(e,ERR)  (likely(!E_ISERR(e)) ? (e) : (libc_seterrno((errno_t)-(syscall_slong_t)(syscall_ulong_t)(e)),(ERR)))
-#define ISSEP(x)                  ((x) == '/') /* TODO: In DOS-mode, `\\' must also be accepted */
-#define GET_PATHLIST_SEP()         ':'         /* TODO: In DOS-mode, `;' must be used */
+#define libc_seterrno_syserr2(e, ERR) (likely(!E_ISERR(e)) ? (e) : (libc_seterrno((errno_t) - (syscall_slong_t)(syscall_ulong_t)(e)), (ERR)))
+#define ISSEP(x)           ((x) == '/') /* TODO: In DOS-mode, `\\' must also be accepted */
+#define GET_PATHLIST_SEP() ':'          /* TODO: In DOS-mode, `;' must be used */
 
 
 #define ATTR_MALL_DEFAULT_ALIGNED   __ATTR_MALL_DEFAULT_ALIGNED

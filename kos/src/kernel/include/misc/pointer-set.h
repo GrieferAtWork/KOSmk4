@@ -30,10 +30,10 @@ DECL_BEGIN
 /* A simple heap-based hash-set for pointers
  * Settings are meant to be overwritten on a per-source bases. */
 #ifndef POINTER_SET_HASHPTR
-#define POINTER_SET_HASHPTR(x)         ((x) >> 6)
+#define POINTER_SET_HASHPTR(x) ((x) >> 6)
 #endif /* !POINTER_SET_HASHPTR */
 #ifndef POINTER_SET_HASHNXT
-#define POINTER_SET_HASHNXT(i,perturb) ((i) = (((i) << 2) + (i) + (perturb) + 1),(perturb) >>= 5)
+#define POINTER_SET_HASHNXT(i, perturb) ((i) = (((i) << 2) + (i) + (perturb) + 1), (perturb) >>= 5)
 #endif /* !POINTER_SET_HASHNXT */
 #ifndef POINTER_SET_BUFSIZE
 #define POINTER_SET_BUFSIZE  16

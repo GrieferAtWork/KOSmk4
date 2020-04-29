@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x657aaeb7 */
+/* HASH CRC-32:0x4c5a1ccf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__utime32_defined
-#if defined(__CRT_HAVE__utime64) || defined(__CRT_HAVE_utime64)
+#if defined(__CRT_HAVE_utime64) || defined(__CRT_HAVE__utime64)
 #define __local__utime32_defined 1
 /* Dependency: "crt_utime64" from "utime" */
 #ifndef ____localdep_crt_utime64_defined
@@ -37,14 +37,24 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_utime32) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_utime32))(char const *__filename,
                                                       struct __utimbuf32 __KOS_FIXED_CONST *__file_times) {
-#line 213 "kos/src/libc/magic/utime.c"
+#line 214 "kos/src/libc/magic/utime.c"
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma push_macro("actime")
+#pragma push_macro("modtime")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef actime
+#undef modtime
 	struct __utimbuf64 __buf64;
 	if (!__file_times)
-		return __localdep_crt_utime64(__filename,__NULLPTR);
-	__buf64.__actime  = (__time64_t)__file_times->__actime;
-	__buf64.__modtime = (__time64_t)__file_times->__modtime;
-	return __localdep_crt_utime64(__filename,&__buf64);
+		return __localdep_crt_utime64(__filename, __NULLPTR);
+	__buf64.actime  = (__time64_t)__file_times->actime;
+	__buf64.modtime = (__time64_t)__file_times->modtime;
+	return __localdep_crt_utime64(__filename, &__buf64);
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma pop_macro("modtime")
+#pragma pop_macro("actime")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE__utime64 || __CRT_HAVE_utime64 */
+#endif /* __CRT_HAVE_utime64 || __CRT_HAVE__utime64 */
 #endif /* !__local__utime32_defined */

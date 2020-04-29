@@ -430,7 +430,7 @@ __LIBM_LOCAL_DECLARE_ARRAY(__IEEE754_DOUBLE_TYPE__, halF, 2, {
 #define __libm_huge_defined 1
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, huge, __IEEE754_DOUBLE_C(1.0e300))
 #endif /* !__libm_huge_defined */
-__LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, twom1000, __IEEE754_DOUBLE_C(9.33263618503218878990e-302))    /* 2**-1000=0x01700000,0 */
+__LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, twom1000, __IEEE754_DOUBLE_C(9.33263618503218878990e-302))    /* 2 ** -1000=0x01700000,0 */
 #ifndef __libm_o_threshold_defined
 #define __libm_o_threshold_defined 1
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, o_threshold, __IEEE754_DOUBLE_C(7.09782712893383973096e+02)) /* 0x40862E42, 0xFEFA39EF */
@@ -467,12 +467,12 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 	__xsb = (__hx >> 31) & 1;        /* sign bit of x */
 	__hx &= __INT32_C(0x7fffffff);   /* high word of |x| */
 	/* filter out non-finite argument */
-	if (__hx >= __INT32_C(0x40862E42)) { /* if |x|>=709.78... */
+	if (__hx >= __INT32_C(0x40862E42)) { /* if |x| >= 709.78... */
 		if (__hx >= __INT32_C(0x7ff00000)) {
 			__LIBM_GET_LOW_WORD(__k, __x);
 			if (((__hx & __INT32_C(0xfffff)) | __k) != 0)
 				return __x;                /* NaN */
-			return (__xsb == 0) ? __x : 0.0; /* exp(+-inf)={inf,0} */
+			return (__xsb == 0) ? __x : 0.0; /* exp(+-inf) = {inf,0} */
 		}
 		if (__x > __LIBM_LOCAL_VALUE(o_threshold)) { /* overflow */
 			__libc_feraiseexcept(FE_OVERFLOW);
@@ -496,7 +496,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 			__lo = __t * __LIBM_LOCAL_VALUE(ln2LO)[0];
 		}
 		__x = __hi - __lo;
-	} else if (__hx < __INT32_C(0x3e300000)) { /* when |x|<2**-28 */
+	} else if (__hx < __INT32_C(0x3e300000)) { /* when |x| < 2 ** -28 */
 		if (__LIBM_LOCAL_VALUE(huge) + __x > __LIBM_LOCAL_VALUE(one))
 			return __LIBM_LOCAL_VALUE(one) + __x; /* trigger inexact */
 		return __LIBM_LOCAL_VALUE(one);
@@ -559,7 +559,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
 		if ((__hx | __lx) != 0)
 			return __x; /* NaN */
 		return __sign ? __IEEE854_LONG_DOUBLE_C(0.0)
-		              : __x; /* exp(+-inf)={inf,0} */
+		              : __x; /* exp(+-inf) = {inf,0} */
 	}
 	if (__x > __LIBM_LOCAL_VALUE(o_thresholdl)) { /* overflow */
 		__libc_feraiseexcept(FE_OVERFLOW);

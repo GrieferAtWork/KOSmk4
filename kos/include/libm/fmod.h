@@ -81,7 +81,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 	    __LIBM_FLT_UWORD_IS_NAN(__hy))
 		return (__x * __y) / (__x * __y);
 	if (__hx < __hy)
-		return __x; /* |x|<|y| return x */
+		return __x; /* |x| < |y| return x */
 	if (__hx == __hy)
 		return __LIBM_LOCAL_VALUE(zero2f)[(__uint32_t)__sx >> 31]; /* |x|=|y| return x*0*/
 
@@ -207,7 +207,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 		return (__x * __y) / (__x * __y);
 	if (__hx <= __hy) {
 		if ((__hx < __hy) || (__lx < __ly))
-			return __x; /* |x|<|y| return x */
+			return __x; /* |x| < |y| return x */
 		if (__lx == __ly)
 			return __LIBM_LOCAL_VALUE(zero2)[(__uint32_t)__sx >> 31]; /* |x|=|y| return x*0*/
 	}

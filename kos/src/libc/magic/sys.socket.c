@@ -299,8 +299,8 @@ recvmmsg32:($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages,
 @@@param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
 @@                           MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
 @@                           MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
-[cp][if(defined(__USE_TIME_BITS64)),preferred_alias(recvmmsg64)]
-[if(!defined(__USE_TIME_BITS64)),preferred_alias(recvmmsg)]
+[cp][if(defined(__USE_TIME_BITS64)), preferred_alias(recvmmsg64)]
+[if(!defined(__USE_TIME_BITS64)), preferred_alias(recvmmsg)]
 [requires(defined(__CRT_HAVE_recvmmsg) || defined(__CRT_HAVE_recvmmsg64))]
 recvmmsg:($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages,
           __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags,

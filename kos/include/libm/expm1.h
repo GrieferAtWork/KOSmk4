@@ -84,18 +84,18 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 	}
 	__hx &= __UINT32_C(0x7fffffff); /* high word of |x| */
 	/* filter out huge and non-finite argument */
-	if (__hx >= __UINT32_C(0x4195b844)) {     /* if |x|>=27*ln2 */
-		if (__hx >= __UINT32_C(0x42b17218)) { /* if |x|>=88.721... */
+	if (__hx >= __UINT32_C(0x4195b844)) {     /* if |x| >= 27 * ln2 */
+		if (__hx >= __UINT32_C(0x42b17218)) { /* if |x| >= 88.721... */
 			if (__hx > __UINT32_C(0x7f800000))
 				return __x + __x; /* NaN */
 			if (__hx == __UINT32_C(0x7f800000))
-				return (__xsb == 0) ? __x : -__LIBM_LOCAL_VALUE(onef); /* exp(+-inf)={inf,-1} */
+				return (__xsb == 0) ? __x : -__LIBM_LOCAL_VALUE(onef); /* exp(+-inf) = {inf, -1} */
 			if (__x > __LIBM_LOCAL_VALUE(o_thresholdf)) {
 				__libc_feraiseexcept(FE_OVERFLOW);
 				return __ieee754_inff(); /* overflow */
 			}
 		}
-		if (__xsb != 0) {                     /* x < -27*ln2, return -1.0 with inexact */
+		if (__xsb != 0) {                     /* x < -27 * ln2, return -1.0 with inexact */
 			__libc_feraiseexcept(FE_INEXACT); /* raise inexact */
 			return -__LIBM_LOCAL_VALUE(onef); /* return -1 */
 		}
@@ -121,8 +121,8 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 		}
 		__x = __hi - __lo;
 		__c = (__hi - __x) - __lo;
-	} else if (__hx < __UINT32_C(0x33000000)) { /* when |x|<2**-25, return x */
-		__t = __LIBM_LOCAL_VALUE(hugef) + __x;  /* return x with inexact flags when x!=0 */
+	} else if (__hx < __UINT32_C(0x33000000)) { /* when |x| < 2 ** -25, return x */
+		__t = __LIBM_LOCAL_VALUE(hugef) + __x;  /* return x with inexact flags when x != 0 */
 		return __x - (__t - (__LIBM_LOCAL_VALUE(hugef) + __x));
 	} else {
 		__k = 0;
@@ -237,15 +237,15 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 	}
 	__hx &= __UINT32_C(0x7fffffff); /* high word of |x| */
 	/* filter out hugeval and non-finite argument */
-	if (__hx >= __UINT32_C(0x4043687A)) {     /* if |x|>=56*ln2 */
-		if (__hx >= __UINT32_C(0x40862E42)) { /* if |x|>=709.78... */
+	if (__hx >= __UINT32_C(0x4043687A)) {     /* if |x| >= 56 * ln2 */
+		if (__hx >= __UINT32_C(0x40862E42)) { /* if |x| >= 709.78... */
 			if (__hx >= __UINT32_C(0x7ff00000)) {
 				__uint32_t __low;
 				__LIBM_GET_LOW_WORD(__low, __x);
 				if (((__hx & __UINT32_C(0xfffff)) | __low) != 0)
 					return __x + __x; /* NaN */
 				return __xsb == 0
-				       ? __x /* exp(+-inf)={inf,-1} */
+				       ? __x /* exp(+-inf) = {inf, -1} */
 				       : -__LIBM_LOCAL_VALUE(Q)[0];
 			}
 			if (__x > __LIBM_LOCAL_VALUE(o_threshold)) {
@@ -253,7 +253,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 				return __ieee754_inf(); /* overflow */
 			}
 		}
-		if (__xsb != 0) {                     /* x < -56*ln2, return -1.0 with inexact */
+		if (__xsb != 0) {                     /* x < -56 * ln2, return -1.0 with inexact */
 			__libc_feraiseexcept(FE_INEXACT); /* raise inexact */
 			return -__LIBM_LOCAL_VALUE(Q)[0]; /* return -1 */
 		}
@@ -279,8 +279,8 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 		}
 		__x = __hi - __lo;
 		__c = (__hi - __x) - __lo;
-	} else if (__hx < __UINT32_C(0x3c900000)) { /* when |x|<2**-54, return x */
-		__t = __LIBM_LOCAL_VALUE(huge) + __x;   /* return x with inexact flags when x!=0 */
+	} else if (__hx < __UINT32_C(0x3c900000)) { /* when |x| < 2 ** -54, return x */
+		__t = __LIBM_LOCAL_VALUE(huge) + __x;   /* return x with inexact flags when x != 0 */
 		return __x - (__t - (__LIBM_LOCAL_VALUE(huge) + __x));
 	} else {
 		__k = 0;

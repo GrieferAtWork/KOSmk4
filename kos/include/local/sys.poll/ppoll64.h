@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6658f773 */
+/* HASH CRC-32:0x3702117c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,10 +40,10 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(ppoll64))(struct pollfd *__fds,
 #line 117 "kos/src/libc/magic/sys.poll.c"
 	struct __timespec32 __tmo32;
 	if (!__timeout)
-		return __localdep_ppoll32(__fds,__nfds,__NULLPTR,__ss);
+		return __localdep_ppoll32(__fds, __nfds, __NULLPTR, __ss);
 	__tmo32.tv_sec  = (__time32_t)__timeout->tv_sec;
 	__tmo32.tv_nsec = __timeout->tv_nsec;
-	return __localdep_ppoll32(__fds,__nfds,&__tmo32,__ss);
+	return __localdep_ppoll32(__fds, __nfds, &__tmo32, __ss);
 }
 __NAMESPACE_LOCAL_END
 #endif /* __CRT_HAVE_ppoll */

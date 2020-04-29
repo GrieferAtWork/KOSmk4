@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x561de47a */
+/* HASH CRC-32:0x331ab1b8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,7 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
+
 #include <bits/types.h>
 #include <bits/utimbuf.h>
 
@@ -149,7 +150,7 @@ __FORCELOCAL int __NOTHROW_RPC(__LIBCCALL _futime)(__fd_t __fd, struct _utimbuf 
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_utime32,(char const *__filename, struct __utimbuf32 __KOS_FIXED_CONST *__file_times),(__filename,__file_times))
 #elif defined(__CRT_HAVE_utime)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_utime32,(char const *__filename, struct __utimbuf32 __KOS_FIXED_CONST *__file_times),utime,(__filename,__file_times))
-#elif defined(__CRT_HAVE__utime64) || defined(__CRT_HAVE_utime64)
+#elif defined(__CRT_HAVE_utime64) || defined(__CRT_HAVE__utime64)
 #include <local/utime/_utime32.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_utime32, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL _utime32)(char const *__filename, struct __utimbuf32 __KOS_FIXED_CONST *__file_times) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_utime32))(__filename, __file_times); })
 #endif /* _utime32... */
@@ -165,7 +166,7 @@ __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL _utime64)(char con
 __CDECLARE(,int,__NOTHROW_RPC,_futime32,(__fd_t __fd, struct __utimbuf32 __KOS_FIXED_CONST *__file_times),(__fd,__file_times))
 #elif defined(__CRT_HAVE_futime)
 __CREDIRECT(,int,__NOTHROW_RPC,_futime32,(__fd_t __fd, struct __utimbuf32 __KOS_FIXED_CONST *__file_times),futime,(__fd,__file_times))
-#elif defined(__CRT_HAVE__futime64) || defined(__CRT_HAVE_futime64)
+#elif defined(__CRT_HAVE_futime64) || defined(__CRT_HAVE__futime64)
 #include <local/utime/_futime32.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_futime32, __FORCELOCAL int __NOTHROW_RPC(__LIBCCALL _futime32)(__fd_t __fd, struct __utimbuf32 __KOS_FIXED_CONST *__file_times) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_futime32))(__fd, __file_times); })
 #endif /* _futime32... */
@@ -193,7 +194,7 @@ __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL _wutime)(wchar_t c
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_wutime32,(wchar_t const *__filename, struct __utimbuf32 __KOS_FIXED_CONST *__file_times),(__filename,__file_times))
 #elif defined(__CRT_HAVE_wutime)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_wutime32,(wchar_t const *__filename, struct __utimbuf32 __KOS_FIXED_CONST *__file_times),wutime,(__filename,__file_times))
-#elif defined(__CRT_HAVE__wutime64) || defined(__CRT_HAVE_wutime64)
+#elif defined(__CRT_HAVE_wutime64) || defined(__CRT_HAVE__wutime64)
 #include <local/utime/_wutime32.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_wutime32, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL _wutime32)(wchar_t const *__filename, struct __utimbuf32 __KOS_FIXED_CONST *__file_times) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wutime32))(__filename, __file_times); })
 #endif /* _wutime32... */
@@ -213,13 +214,13 @@ __SYSDECL_END
 #ifdef __USE_KOS
 #if defined(_WCHAR_H) && !defined(_PARTS_WCHAR_UTIME_H)
 #include <parts/wchar/utime.h>
-#endif
+#endif /* _WCHAR_H && !_PARTS_WCHAR_UTIME_H */
 #endif /* __USE_KOS */
 
 #ifdef __USE_UTF
 #if defined(_UCHAR_H) && !defined(_PARTS_UCHAR_UTIME_H)
 #include <parts/uchar/utime.h>
-#endif
+#endif /* _UCHAR_H && !_PARTS_UCHAR_UTIME_H */
 #endif /* __USE_UTF */
 
 

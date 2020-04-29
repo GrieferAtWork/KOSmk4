@@ -298,7 +298,7 @@ struct handle_manager {
 			                           * Note that this is very similar to `hm_count', but includes handles
 			                           * that have been deleted (i.e. `hh_vector_index == (unsigned int)-1') */
 			unsigned int   hm_vecfree;/* [lock(hm_lock)] Lowest index in `hm_vector' that may contain an unused slot. */
-#define handle_manager_hashnext(i, perturb) ((i) = (((i) << 2) + (i) + (perturb) + 1),(perturb) >>= 5)
+#define handle_manager_hashnext(i, perturb) ((i) = (((i) << 2) + (i) + (perturb) + 1), (perturb) >>= 5)
 		}                hm_hashvector; /* HANDLE_MANAGER_MODE_HASHVECTOR */
 	};
 };

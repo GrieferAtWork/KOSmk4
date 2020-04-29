@@ -32,7 +32,41 @@ DECL_BEGIN
 
 /* Given a pointer to the start of a debug_line CU (or a pointer to the start of
  * the .debug_line section), initialize the given debugline CU structure `result',
- * and advance `*preader' to the start of the next unit.
+ * and advance `*preader' to the start of the next unit:
+ * >> #define _KOS_SOURCE 1
+ * >> #include <dlfcn.h>
+ * >> #include <stdio.h>
+ * >> #include <libdebuginfo/debug_line.h>
+ * >>
+ * >> // Print the source location for a given address `p'
+ * >> void print_addr2line(void *p) {
+ * >>     struct dl_section *s = NULL;
+ * >>     di_debugline_unit_t unit;
+ * >>     byte_t *reader;
+ * >>     uintptr_t relpc;
+ * >>     void *m;
+ * >>     if ((m = dlgethandle(p, DLGETHANDLE_FNORMAL)) == NULL)
+ * >>         goto done;
+ * >>     if ((s = dllocksection(m, ".debug_line")) == NULL)
+ * >>         goto done;
+ * >>     reader = (byte_t *)s->ds_data;
+ * >>     relpc = (uintptr_t)((__byte_t *)p - (__byte_t *)dlmodulebase(m));
+ * >>     while (debugline_loadunit(reader, reader + s->ds_size, &unit) == DEBUG_INFO_ERROR_SUCCESS) {
+ * >>         di_debugline_info_t info;
+ * >>         if (debugline_scanunit(&unit, &info, relpc) == DEBUG_INFO_ERROR_SUCCESS) {
+ * >>             char *file,*path;
+ * >>             debugline_loadfile(&unit, info.dl_srcfile, &file, &path);
+ * >>             printf("path: %s\n", path);
+ * >>             printf("file: %s\n", file);
+ * >>             printf("line: %d\n", (int)info.dl_srcline);
+ * >>             printf("col:  %u\n", (unsigned int)info.dl_srccol);
+ * >>             goto done;
+ * >>         }
+ * >>     }
+ * >>     printf("Unknown: %p\n", p);
+ * >> done:
+ * >>     dlunlocksection(s);
+ * >> }
  * @return: DEBUG_INFO_ERROR_SUCCESS: ...
  * @return: DEBUG_INFO_ERROR_NOFRAME: All units have been loaded.
  * @return: DEBUG_INFO_ERROR_CORRUPT: ... */
@@ -42,8 +76,9 @@ NOTHROW_NCX(CC libdi_debugline_loadunit)(byte_t **__restrict preader,
                                          di_debugline_unit_t *__restrict result);
 
 
-/* Scan the given .debug_line unit `self' for information related to the
- * given `module_relative_pc', and store that information into `*result' upon success.
+/* Scan the given .debug_line unit `self' for information related to the given
+ * `module_relative_pc', and store that information into `*result' upon success.
+ * @param: module_relative_pc: The starting address of the instruction to scan for.
  * @return: DEBUG_INFO_ERROR_SUCCESS: ...
  * @return: DEBUG_INFO_ERROR_NOFRAME: ...
  * @return: DEBUG_INFO_ERROR_CORRUPT: ... */

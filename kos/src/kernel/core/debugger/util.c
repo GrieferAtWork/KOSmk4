@@ -163,7 +163,7 @@ again_printlevel:
 				dbg_vprintf(message_format, copy);
 				va_end(copy);
 			} else
-#endif
+#endif /* !__i386__ */
 			{
 				dbg_vprintf(message_format, args);
 			}

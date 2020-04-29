@@ -164,8 +164,8 @@ fdclosedir:([nonnull] DIR *dirp) -> $fd_t;
 @@Read and return the next pending directory entry of the given directory stream `DIRP'
 @@@EXCEPT: Returns NULL for end-of-directory; throws an error if something else went wrong
 [cp][decl_prefix(DEFINE_STRUCT_DIRSTREAM)]
-[if(!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)),preferred_alias(readdir)]
-[if(defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)),preferred_alias(readdir64)]
+[if(!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias(readdir)]
+[if(defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias(readdir64)]
 readdir:([nonnull] DIR *__restrict dirp) -> struct dirent *;
 
 %
@@ -191,8 +191,8 @@ readdir64:([nonnull] DIR *__restrict dirp) -> struct dirent64 *;
 
 %#ifdef __USE_POSIX
 @@Reentrant version of `readdir(3)' (Using this is not recommended in KOS)
-[if(!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)),preferred_alias(readdir_r)]
-[if(defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)),preferred_alias(readdir64_r)]
+[if(!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias(readdir_r)]
+[if(defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias(readdir64_r)]
 [cp][decl_prefix(DEFINE_STRUCT_DIRSTREAM)]
 readdir_r:([nonnull] DIR *__restrict dirp,
            [nonnull] struct dirent *__restrict entry,
@@ -237,8 +237,8 @@ dirfd:([nonnull] DIR __KOS_FIXED_CONST *__restrict dirp) -> $fd_t;
 %
 @@Scan a directory `DIR' for all contained directory entries
 [cp][noexport]
-[if(!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)),preferred_alias(scandir)]
-[if(defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)),preferred_alias(scandir64)]
+[if(!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias(scandir)]
+[if(defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias(scandir64)]
 [requires(defined(__CRT_AT_FDCWD) && $has_function(scandirat))]
 scandir:([nonnull] char const *__restrict dir,
          [nonnull] struct dirent ***__restrict namelist,
