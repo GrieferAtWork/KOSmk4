@@ -32,6 +32,7 @@
 #define EMU86_EMULATE_CONFIG_WANT_LMSW 1
 #define EMU86_EMULATE_CONFIG_WANT_MONITOR 1
 #define EMU86_EMULATE_CONFIG_WANT_MWAIT 1
+#define EMU86_EMULATE_CONFIG_WANT_ENCLS 1
 #define EMU86_EMULATE_CONFIG_WANT_INVLPG 1
 #define EMU86_EMULATE_CONFIG_WANT_RDTSCP 1
 #define EMU86_EMULATE_CONFIG_WANT_SWAPGS 1
@@ -259,10 +260,10 @@ case EMU86_OPCODE_ENCODE(0x0f00): {
      (!EMU86_EMULATE_CONFIG_ONLY_MEMORY &&                                      \
       (EMU86_EMULATE_CONFIG_WANT_STAC || EMU86_EMULATE_CONFIG_WANT_CLAC ||      \
        EMU86_EMULATE_CONFIG_WANT_MONITOR || EMU86_EMULATE_CONFIG_WANT_MWAIT ||  \
-       EMU86_EMULATE_CONFIG_WANT_XEND || EMU86_EMULATE_CONFIG_WANT_XTEST ||     \
-       EMU86_EMULATE_CONFIG_WANT_RDTSCP || EMU86_EMULATE_CONFIG_WANT_MCOMMIT || \
-       EMU86_EMULATE_CONFIG_WANT_CLZERO || EMU86_EMULATE_CONFIG_WANT_XGETBV ||  \
-       EMU86_EMULATE_CONFIG_WANT_XSETBV ||                                      \
+       EMU86_EMULATE_CONFIG_WANT_ENCLS || EMU86_EMULATE_CONFIG_WANT_XEND ||     \
+       EMU86_EMULATE_CONFIG_WANT_XTEST || EMU86_EMULATE_CONFIG_WANT_RDTSCP ||   \
+       EMU86_EMULATE_CONFIG_WANT_MCOMMIT || EMU86_EMULATE_CONFIG_WANT_CLZERO || \
+       EMU86_EMULATE_CONFIG_WANT_XGETBV || EMU86_EMULATE_CONFIG_WANT_XSETBV ||  \
        (EMU86_EMULATE_CONFIG_WANT_SWAPGS && CONFIG_LIBEMU86_WANT_64BIT))))
 case EMU86_OPCODE_ENCODE(0x0f01): {
 	MODRM_DECODE();
@@ -344,16 +345,18 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 #endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_SGDT */
 
 
-#if (EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_SIDT ||  \
-     (!EMU86_EMULATE_CONFIG_ONLY_MEMORY &&                                 \
-      (EMU86_EMULATE_CONFIG_WANT_STAC || EMU86_EMULATE_CONFIG_WANT_CLAC || \
-       EMU86_EMULATE_CONFIG_WANT_MONITOR || EMU86_EMULATE_CONFIG_WANT_MWAIT)))
+#if (EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_SIDT ||      \
+     (!EMU86_EMULATE_CONFIG_ONLY_MEMORY &&                                     \
+      (EMU86_EMULATE_CONFIG_WANT_STAC || EMU86_EMULATE_CONFIG_WANT_CLAC ||     \
+       EMU86_EMULATE_CONFIG_WANT_MONITOR || EMU86_EMULATE_CONFIG_WANT_MWAIT || \
+       EMU86_EMULATE_CONFIG_WANT_ENCLS)))
 	case 1: {
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 #if ((EMU86_EMULATE_CONFIG_CHECKERROR &&                                                     \
       (EMU86_EMULATE_CONFIG_CHECKUSER || !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC)) || \
      EMU86_EMULATE_CONFIG_WANT_STAC || EMU86_EMULATE_CONFIG_WANT_CLAC ||                     \
-     EMU86_EMULATE_CONFIG_WANT_MONITOR || EMU86_EMULATE_CONFIG_WANT_MWAIT)
+     EMU86_EMULATE_CONFIG_WANT_MONITOR || EMU86_EMULATE_CONFIG_WANT_MWAIT ||                 \
+     EMU86_EMULATE_CONFIG_WANT_ENCLS)
 		if (EMU86_MODRM_ISREG(modrm.mi_type)) {
 			switch (modrm.mi_rm) {
 
@@ -489,9 +492,41 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 #endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_STAC */
 
 
+#if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_ENCLS
+#define EMU86_EMULATE_HAVE_ENCLS
+			case 7:
+				if (op_flags & (EMU86_F_f2 | EMU86_F_f3 | EMU86_F_66))
+					goto return_unexpected_prefix_rmreg;
+#define NEED_return_unexpected_prefix_rmreg
+				/* 0F 01 CF     ENCLS     This instruction is used to execute privileged Intel SGX leaf
+				 *                        functions that are used for managing and debugging the enclaves. */
+#if EMU86_EMULATE_CONFIG_CHECKUSER
+				if (EMU86_ISUSER()) {
+					goto return_privileged_instruction_rmreg;
+#define NEED_return_privileged_instruction_rmreg
+				}
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
+#if EMU86_EMULATE_CONFIG_WANT_ENCLS && defined(EMU86_EMULATE_ENCLS)
+				EMU86_EMULATE_ENCLS(EMU86_GETEAX());
+				goto done;
+#else /* EMU86_EMULATE_CONFIG_WANT_ENCLS && EMU86_EMULATE_ENCLS */
+#ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
+				EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD,
+				                                                 X86_REGISTER_MISC_ENCLS, 0,
+				                                                 EMU86_GETEAX(), 0);
+#else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
+				goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
+#endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
+#endif /* !EMU86_EMULATE_CONFIG_WANT_ENCLS || !EMU86_EMULATE_ENCLS */
+				break;
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_ENCLS */
+
+
 #if (EMU86_EMULATE_CONFIG_CHECKERROR && \
      (EMU86_EMULATE_CONFIG_CHECKUSER || !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC))
 #ifndef EMU86_EMULATE_HAVE_MONITOR
+#define EMU86_EMULATE_HAVE_0F01_1_FALLBACK
 			case 0:
 				/* 0F 01 C8     MONITOR     Sets up a linear address range to be monitored by hardware and
 				 *                          activates the monitor. The address range should be a write-back
@@ -499,6 +534,7 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 #endif /* !EMU86_EMULATE_HAVE_MONITOR */
 #undef EMU86_EMULATE_HAVE_MONITOR
 #ifndef EMU86_EMULATE_HAVE_MWAIT
+#define EMU86_EMULATE_HAVE_0F01_1_FALLBACK
 			case 1:
 				/* 0F 01 C9     MWAIT     A hint that allows the processor to stop instruction execution
 				 *                        and enter an implementation-dependent optimized state until
@@ -506,23 +542,32 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 #endif /* !EMU86_EMULATE_HAVE_MWAIT */
 #undef EMU86_EMULATE_HAVE_MWAIT
 #ifndef EMU86_EMULATE_HAVE_CLAC
+#define EMU86_EMULATE_HAVE_0F01_1_FALLBACK
 			case 2:
 				/* 0F 01 CA     CLAC     Clear the AC flag in the EFLAGS register. */
 #endif /* !EMU86_EMULATE_HAVE_CLAC */
 #undef EMU86_EMULATE_HAVE_CLAC
 #ifndef EMU86_EMULATE_HAVE_STAC
+#define EMU86_EMULATE_HAVE_0F01_1_FALLBACK
 			case 3:
 				/* 0F 01 CB     STAC     Set the AC flag in the EFLAGS register. */
 #endif /* !EMU86_EMULATE_HAVE_STAC */
 #undef EMU86_EMULATE_HAVE_STAC
+#ifndef EMU86_EMULATE_HAVE_ENCLS
 			case 7:
+#define EMU86_EMULATE_HAVE_0F01_1_FALLBACK
 				/* 0F 01 CF     ENCLS     This instruction is used to execute privileged Intel SGX leaf
 				 *                        functions that are used for managing and debugging the enclaves. */
+#endif /* !EMU86_EMULATE_HAVE_ENCLS */
+#undef EMU86_EMULATE_HAVE_ENCLS
+#ifdef EMU86_EMULATE_HAVE_0F01_1_FALLBACK
+#undef EMU86_EMULATE_HAVE_0F01_1_FALLBACK
 				if (EMU86_ISUSER())
 					goto return_privileged_instruction_rmreg;
 #define NEED_return_privileged_instruction_rmreg
 				goto return_unsupported_instruction_rmreg;
 #define NEED_return_unsupported_instruction_rmreg
+#endif /* EMU86_EMULATE_HAVE_0F01_1_FALLBACK */
 #endif /* EMU86_EMULATE_CONFIG_CHECKERROR && (EMU86_EMULATE_CONFIG_CHECKUSER || !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC) */
 
 			default: break;
