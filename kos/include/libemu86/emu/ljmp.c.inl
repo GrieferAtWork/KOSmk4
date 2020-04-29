@@ -44,13 +44,13 @@ case EMU86_OPCODE_ENCODE(0xea): {
 		u32 offset;
 		u16 cs;
 		if (!!EMU86_F_IS16(op_flags) ^ !!(op_flags & EMU86_F_AD16)) {
-			offset = UNALIGNED_GET16((u16 *)pc);
+			offset = UNALIGNED_GETLE16((u16 *)pc);
 			pc += 2;
 		} else {
-			offset = UNALIGNED_GET32((u32 *)pc);
+			offset = UNALIGNED_GETLE32((u32 *)pc);
 			pc += 4;
 		}
-		cs = UNALIGNED_GET16((u16 *)pc);
+		cs = UNALIGNED_GETLE16((u16 *)pc);
 		pc += 2;
 #endif /* EMU86_EMULATE_CONFIG_CHECKUSER || EMU86_EMULATE_CONFIG_WANT_LJMP */
 		/* Verify the segment index. */

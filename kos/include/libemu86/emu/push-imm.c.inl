@@ -38,10 +38,10 @@ case EMU86_OPCODE_ENCODE(0x68):
 	 * 68 iw     PUSH imm16     Push imm16.
 	 * 68 id     PUSH imm32     Push imm32. */
 	if (IS_16BIT()) {
-		imm = (EMU86_UREG_TYPE)(EMU86_SREG_TYPE)(s16)UNALIGNED_GET16((u16 *)pc);
+		imm = (EMU86_UREG_TYPE)(EMU86_SREG_TYPE)(s16)UNALIGNED_GETLE16((u16 *)pc);
 		pc += 2;
 	} else {
-		imm = (EMU86_UREG_TYPE)(EMU86_SREG_TYPE)(s32)UNALIGNED_GET32((u32 *)pc);
+		imm = (EMU86_UREG_TYPE)(EMU86_SREG_TYPE)(s32)UNALIGNED_GETLE32((u32 *)pc);
 		pc += 4;
 	}
 do_push_imm:

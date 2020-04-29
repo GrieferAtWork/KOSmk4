@@ -67,9 +67,9 @@
  * libemu86 is being used to emulate instructions not supported by the
  * host, in which case it couldn't very well use the instructions it's
  * trying to emulate. */
-#ifndef EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BYTESWAP
+#if !defined(EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BYTESWAP) || 1
 #include <hybrid/byteswap.h>
-#endif /* !EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BYTESWAP */
+#endif /* !EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BYTESWAP || 1 */
 
 #if defined(__x86_64__) || defined(__i386__)
 #if !defined(EMU86_EMULATE_CONFIG_NO_INTRIN) || !(EMU86_EMULATE_CONFIG_NO_INTRIN + 0)
@@ -1621,11 +1621,11 @@ void EMU86_EMULATE_LDMXCSR(u32 mxcsr);                      /* EMU86_EMULATE_CON
 #endif /* !EMU86_MEMREADB */
 #ifndef EMU86_MEMREADW
 #define EMU86_MEMREADW(addr) \
-	UNALIGNED_GET16((u16 *)EMU86_EMULATE_TRANSLATEADDR(addr))
+	UNALIGNED_GETLE16((u16 *)EMU86_EMULATE_TRANSLATEADDR(addr))
 #endif /* !EMU86_MEMREADW */
 #ifndef EMU86_MEMREADL
 #define EMU86_MEMREADL(addr) \
-	UNALIGNED_GET32((u32 *)EMU86_EMULATE_TRANSLATEADDR(addr))
+	UNALIGNED_GETLE32((u32 *)EMU86_EMULATE_TRANSLATEADDR(addr))
 #endif /* !EMU86_MEMREADL */
 #ifndef EMU86_MEMWRITEB
 #define EMU86_MEMWRITEB(addr, v) \
@@ -1633,11 +1633,11 @@ void EMU86_EMULATE_LDMXCSR(u32 mxcsr);                      /* EMU86_EMULATE_CON
 #endif /* !EMU86_MEMWRITEB */
 #ifndef EMU86_MEMWRITEW
 #define EMU86_MEMWRITEW(addr, v) \
-	UNALIGNED_SET16((u16 *)EMU86_EMULATE_TRANSLATEADDR(addr), v)
+	UNALIGNED_SETLE16((u16 *)EMU86_EMULATE_TRANSLATEADDR(addr), v)
 #endif /* !EMU86_MEMWRITEW */
 #ifndef EMU86_MEMWRITEL
 #define EMU86_MEMWRITEL(addr, v) \
-	UNALIGNED_SET32((u32 *)EMU86_EMULATE_TRANSLATEADDR(addr), v)
+	UNALIGNED_SETLE32((u32 *)EMU86_EMULATE_TRANSLATEADDR(addr), v)
 #endif /* !EMU86_MEMWRITEL */
 #ifndef EMU86_MEM_ATOMIC_XCHB
 #define EMU86_MEM_ATOMIC_XCHB(addr, addend, force_atomic) \

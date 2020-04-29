@@ -53,10 +53,10 @@ case EMU86_OPCODE_ENCODE(0xa0): {
 	u8 value;
 #endif /* EMU86_EMULATE_CONFIG_WANT_MOV_MOFFS */
 	if (!!EMU86_F_IS16(op_flags) ^ !!(op_flags & EMU86_F_AD16)) {
-		offset = UNALIGNED_GET16((u16 *)pc);
+		offset = UNALIGNED_GETLE16((u16 *)pc);
 		pc += 2;
 	} else {
-		offset = UNALIGNED_GET32((u32 *)pc);
+		offset = UNALIGNED_GETLE32((u32 *)pc);
 		pc += 4;
 	}
 	addr = SEGMENT_ADDR(offset);
@@ -82,10 +82,10 @@ case EMU86_OPCODE_ENCODE(0xa1): {
 	byte_t *addr;
 	u32 offset;
 	if (!!EMU86_F_IS16(op_flags) ^ !!(op_flags & EMU86_F_AD16)) {
-		offset = UNALIGNED_GET16((u16 *)pc);
+		offset = UNALIGNED_GETLE16((u16 *)pc);
 		pc += 2;
 	} else {
-		offset = UNALIGNED_GET32((u32 *)pc);
+		offset = UNALIGNED_GETLE32((u32 *)pc);
 		pc += 4;
 	}
 	addr = SEGMENT_ADDR(offset);
@@ -125,10 +125,10 @@ case EMU86_OPCODE_ENCODE(0xa2): {
 	u8 value;
 #endif /* EMU86_EMULATE_CONFIG_WANT_MOV_MOFFS */
 	if (!!EMU86_F_IS16(op_flags) ^ !!(op_flags & EMU86_F_AD16)) {
-		offset = UNALIGNED_GET16((u16 *)pc);
+		offset = UNALIGNED_GETLE16((u16 *)pc);
 		pc += 2;
 	} else {
-		offset = UNALIGNED_GET32((u32 *)pc);
+		offset = UNALIGNED_GETLE32((u32 *)pc);
 		pc += 4;
 	}
 	addr = SEGMENT_ADDR(offset);
@@ -154,10 +154,10 @@ case EMU86_OPCODE_ENCODE(0xa3): {
 	byte_t *addr;
 	u32 offset;
 	if (!!EMU86_F_IS16(op_flags) ^ !!(op_flags & EMU86_F_AD16)) {
-		offset = UNALIGNED_GET16((u16 *)pc);
+		offset = UNALIGNED_GETLE16((u16 *)pc);
 		pc += 2;
 	} else {
-		offset = UNALIGNED_GET32((u32 *)pc);
+		offset = UNALIGNED_GETLE32((u32 *)pc);
 		pc += 4;
 	}
 	addr = SEGMENT_ADDR(offset);

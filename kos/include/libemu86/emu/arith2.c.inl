@@ -222,7 +222,7 @@ case EMU86_OPCODE_ENCODE(0xf7):
 		 * F7 /0 id      TEST r/m64,Simm32     AND Simm32 with r/m64; set SF, ZF, PF according to result */
 		IF_64BIT(if (IS_64BIT()) {
 			u64 oldval, mask;
-			mask = (u64)(s64)(s32)UNALIGNED_GET32((u32 *)pc);
+			mask = (u64)(s64)(s32)UNALIGNED_GETLE32((u32 *)pc);
 			pc += 4;
 			oldval = MODRM_GETRMQ();
 			oldval &= mask;
@@ -230,7 +230,7 @@ case EMU86_OPCODE_ENCODE(0xf7):
 			               emu86_geteflags_testq(oldval));
 		} else) if (!IS_16BIT()) {
 			u32 oldval, mask;
-			mask = UNALIGNED_GET32((u32 *)pc);
+			mask = UNALIGNED_GETLE32((u32 *)pc);
 			pc += 4;
 			oldval = MODRM_GETRML();
 			oldval &= mask;
@@ -238,7 +238,7 @@ case EMU86_OPCODE_ENCODE(0xf7):
 			               emu86_geteflags_testl(oldval));
 		} else {
 			u16 oldval, mask;
-			mask = UNALIGNED_GET16((u16 *)pc);
+			mask = UNALIGNED_GETLE16((u16 *)pc);
 			pc += 2;
 			oldval = MODRM_GETRMW();
 			oldval &= mask;
@@ -721,21 +721,21 @@ case EMU86_OPCODE_ENCODE(0x69): {
 	IF_64BIT(if (IS_64BIT()) {
 		s32 imm;
 		s64 lhs, result;
-		imm = (s32)UNALIGNED_GET32((u32 *)pc);
+		imm = (s32)UNALIGNED_GETLE32((u32 *)pc);
 		pc += 4;
 		lhs      = (s64)MODRM_GETRMQ();
 		overflow = OVERFLOW_SMUL(lhs, imm, &result);
 		MODRM_SETREGQ((u64)result);
 	} else) if (!IS_16BIT()) {
 		s32 lhs, imm, result;
-		imm = (s32)UNALIGNED_GET32((u32 *)pc);
+		imm = (s32)UNALIGNED_GETLE32((u32 *)pc);
 		pc += 4;
 		lhs      = (s32)MODRM_GETRML();
 		overflow = OVERFLOW_SMUL(lhs, imm, &result);
 		MODRM_SETREGL((u32)result);
 	} else {
 		s16 lhs, imm, result;
-		imm = (s16)UNALIGNED_GET16((u16 *)pc);
+		imm = (s16)UNALIGNED_GETLE16((u16 *)pc);
 		pc += 2;
 		lhs      = (s16)MODRM_GETRMW();
 		overflow = OVERFLOW_SMUL(lhs, imm, &result);
@@ -779,21 +779,21 @@ case EMU86_OPCODE_ENCODE(0xa9): {
 	 * REX.W + A9 id     TEST RAX, imm32     AND imm32 sign-extended to 64-bits with RAX; set SF, ZF, PF according to result. */
 	IF_64BIT(if (IS_64BIT()) {
 		u64 lhs, imm;
-		imm = (u64)(s64)(s32)UNALIGNED_GET32((u32 *)pc);
+		imm = (u64)(s64)(s32)UNALIGNED_GETLE32((u32 *)pc);
 		pc += 4;
 		lhs = EMU86_GETRAX();
 		EMU86_MSKFLAGS(~(EFLAGS_SF | EFLAGS_ZF | EFLAGS_PF),
 		               emu86_geteflags_testq(lhs & imm));
 	} else) if (!IS_16BIT()) {
 		u32 lhs, imm;
-		imm = UNALIGNED_GET32((u32 *)pc);
+		imm = UNALIGNED_GETLE32((u32 *)pc);
 		pc += 4;
 		lhs = EMU86_GETEAX();
 		EMU86_MSKFLAGS(~(EFLAGS_SF | EFLAGS_ZF | EFLAGS_PF),
 		               emu86_geteflags_testl(lhs & imm));
 	} else {
 		u16 lhs, imm;
-		imm = UNALIGNED_GET16((u16 *)pc);
+		imm = UNALIGNED_GETLE16((u16 *)pc);
 		pc += 2;
 		lhs = EMU86_GETAX();
 		EMU86_MSKFLAGS(~(EFLAGS_SF | EFLAGS_ZF | EFLAGS_PF),

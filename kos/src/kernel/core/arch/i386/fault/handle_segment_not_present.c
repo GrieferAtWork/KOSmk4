@@ -33,6 +33,8 @@
 #include <sched/except-handler.h> /* x86_userexcept_unwind_interrupt() */
 
 #include <hybrid/atomic.h>
+#include <hybrid/byteorder.h>
+#include <hybrid/byteswap.h>
 #include <hybrid/unaligned.h>
 
 #include <asm/cpu-flags.h>
@@ -151,13 +153,13 @@ x86_handle_segment_not_present(struct icpustate *__restrict state,
 					goto unsupported_instruction;
 #endif /* __x86_64__ */
 				if (op_flags & EMU86_F_OP16) {
-					offset = UNALIGNED_GET16((u16 *)pc);
+					offset = UNALIGNED_GETLE16((u16 *)pc);
 					pc += 2;
 				} else {
-					offset = UNALIGNED_GET32((u32 *)pc);
+					offset = UNALIGNED_GETLE32((u32 *)pc);
 					pc += 4;
 				}
-				segment = UNALIGNED_GET16((u16 *)pc);
+				segment = UNALIGNED_GETLE16((u16 *)pc);
 				pc += 2;
 #ifdef CONFIG_X86_EMULATE_LCALL7
 				/* lcall7 emulation */
@@ -193,16 +195,16 @@ x86_handle_segment_not_present(struct icpustate *__restrict state,
 						validate_readable(addr, 1);
 #ifdef __x86_64__
 					if (op_flags & EMU86_F_REX_W) {
-						segment = UNALIGNED_GET16((u16 *)(addr + 0));
-						offset  = UNALIGNED_GET64((u64 *)(addr + 2));
+						segment = UNALIGNED_GETLE16((u16 *)(addr + 0));
+						offset  = UNALIGNED_GETLE64((u64 *)(addr + 2));
 					} else
 #endif /* __x86_64__ */
 					if (!(op_flags & EMU86_F_OP16)) {
-						segment = UNALIGNED_GET16((u16 *)(addr + 0));
-						offset  = UNALIGNED_GET32((u32 *)(addr + 2));
+						segment = UNALIGNED_GETLE16((u16 *)(addr + 0));
+						offset  = UNALIGNED_GETLE32((u32 *)(addr + 2));
 					} else {
-						segment = UNALIGNED_GET16((u16 *)(addr + 0));
-						offset  = UNALIGNED_GET16((u16 *)(addr + 2));
+						segment = UNALIGNED_GETLE16((u16 *)(addr + 0));
+						offset  = UNALIGNED_GETLE16((u16 *)(addr + 2));
 					}
 #ifdef CONFIG_X86_EMULATE_LCALL7
 					/* lcall7 emulation */

@@ -35,7 +35,7 @@ case EMU86_OPCODE_ENCODE(0xc8): {
 	u16 alloc_size;
 	u8 nesting_level;
 	byte_t *sp;
-	alloc_size = UNALIGNED_GET16((u16 *)pc);
+	alloc_size = UNALIGNED_GETLE16((u16 *)pc);
 	pc += 2;
 	nesting_level = *(u8 *)pc;
 	pc += 1;

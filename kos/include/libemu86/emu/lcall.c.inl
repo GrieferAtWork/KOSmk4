@@ -43,13 +43,13 @@ case EMU86_OPCODE_ENCODE(0x9a): {
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
 #if EMU86_EMULATE_CONFIG_WANT_LCALL || EMU86_EMULATE_CONFIG_CHECKUSER
 	if (!IS_16BIT()) {
-		offset = UNALIGNED_GET32((u32 *)pc);
+		offset = UNALIGNED_GETLE32((u32 *)pc);
 		pc += 4;
 	} else {
-		offset = UNALIGNED_GET16((u16 *)pc);
+		offset = UNALIGNED_GETLE16((u16 *)pc);
 		pc += 2;
 	}
-	segment = UNALIGNED_GET16((u16 *)pc);
+	segment = UNALIGNED_GETLE16((u16 *)pc);
 	pc += 2;
 #endif /* EMU86_EMULATE_CONFIG_WANT_LCALL || EMU86_EMULATE_CONFIG_CHECKUSER */
 	/* Verify the segment index. */
