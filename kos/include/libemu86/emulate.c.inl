@@ -687,6 +687,9 @@ __DECL_BEGIN
 #ifndef EMU86_EMULATE_CONFIG_WANT_ENCLS
 #define EMU86_EMULATE_CONFIG_WANT_ENCLS (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
 #endif /* !EMU86_EMULATE_CONFIG_WANT_ENCLS */
+#ifndef EMU86_EMULATE_CONFIG_WANT_ENCLU
+#define EMU86_EMULATE_CONFIG_WANT_ENCLU (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_ENCLU */
 #ifndef EMU86_EMULATE_CONFIG_WANT_MONITOR
 #define EMU86_EMULATE_CONFIG_WANT_MONITOR (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
 #endif /* !EMU86_EMULATE_CONFIG_WANT_MONITOR */
@@ -1373,6 +1376,7 @@ void EMU86_EMULATE_XSETBV(u32 index, u64 value);            /* EMU86_EMULATE_CON
 void EMU86_EMULATE_MONITOR(void *addr, u32 extensions, u32 hints); /* EMU86_EMULATE_CONFIG_WANT_MONITOR */
 void EMU86_EMULATE_MWAIT(u32 ecx, u32 edx);                        /* EMU86_EMULATE_CONFIG_WANT_MWAIT */
 void EMU86_EMULATE_ENCLS(u32 leaf);                         /* EMU86_EMULATE_CONFIG_WANT_ENCLS */
+void EMU86_EMULATE_ENCLU(u32 leaf);                         /* EMU86_EMULATE_CONFIG_WANT_ENCLU */
 #endif
 
 
@@ -3963,8 +3967,6 @@ checklock_modrm_memory_parsed:
 			/* XXX: vldmxcsr   (if only for verbose exception messages?) */
 			/* XXX: vstmxcsr   (if only for verbose exception messages?) */
 			/* XXX: stmxcsr    (if only for verbose exception messages?) */
-			/* XXX: encls      (if only for verbose exception messages?) */
-			/* XXX: enclu      (if only for verbose exception messages?) */
 			/* XXX: vmptrst    (if only for verbose exception messages?) */
 			/* XXX: vmxon      (if only for verbose exception messages?) */
 			/* XXX: vmclear    (if only for verbose exception messages?) */

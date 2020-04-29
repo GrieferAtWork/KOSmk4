@@ -755,6 +755,38 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 #define NEED_return_unsupported_instruction_rmreg
 #endif /* ... */
 
+
+
+#if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_ENCLU
+#define EMU86_EMULATE_HAVE_ENCLU
+			case 7:
+				if (op_flags & (EMU86_F_f2 | EMU86_F_f3 | EMU86_F_66))
+					goto return_unexpected_prefix_rmreg;
+#define NEED_return_unexpected_prefix_rmreg
+				/* 0F 01 D7     ENCLU      This instruction is used to execute non-privileged Intel SGX leaf functions. */
+#if EMU86_EMULATE_CONFIG_CHECKUSER
+				if (!EMU86_ISUSER()) { /* Only allowed in user-space... */
+					goto return_privileged_instruction_rmreg;
+#define NEED_return_privileged_instruction_rmreg
+				}
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
+#if EMU86_EMULATE_CONFIG_WANT_ENCLU && defined(EMU86_EMULATE_ENCLU)
+				EMU86_EMULATE_ENCLU(EMU86_GETEAX());
+				goto done;
+#else /* EMU86_EMULATE_CONFIG_WANT_ENCLU && EMU86_EMULATE_ENCLU */
+#ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
+				EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD,
+				                                                 X86_REGISTER_MISC_ENCLU, 0,
+				                                                 EMU86_GETEAX(), 0);
+#else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
+				goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
+#endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
+#endif /* !EMU86_EMULATE_CONFIG_WANT_ENCLU || !EMU86_EMULATE_ENCLU */
+				break;
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_ENCLU */
+
+
 #if (EMU86_EMULATE_CONFIG_CHECKERROR && \
      (EMU86_EMULATE_CONFIG_CHECKUSER || !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC))
 #ifndef EMU86_EMULATE_HAVE_XGETBV
@@ -766,7 +798,10 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 #endif /* !EMU86_EMULATE_HAVE_XSETBV */
 #undef EMU86_EMULATE_HAVE_XSETBV
 			case 4: /* 0F 01 D4     VMFUNC     Invoke VM function specified in EAX. */
+#ifndef EMU86_EMULATE_HAVE_ENCLU
 			case 7: /* 0F 01 D7     ENCLU      This instruction is used to execute non-privileged Intel SGX leaf functions. */
+#endif /* !EMU86_EMULATE_HAVE_ENCLU */
+#undef EMU86_EMULATE_HAVE_ENCLU
 				if (EMU86_ISUSER())
 					goto return_privileged_instruction_rmreg;
 #define NEED_return_privileged_instruction_rmreg
