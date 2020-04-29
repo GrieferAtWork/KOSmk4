@@ -199,12 +199,12 @@ __DECL_BEGIN
 /*      EMU86_F_SEG6        0x00007000  * ... */
 #define EMU86_F_HASVEX      0x00008000 /* A VEX prefix was given. */
 #if CONFIG_LIBEMU86_WANT_64BIT
-#define EMU86_F_VEX_VVVVV_M 0x001f0000 /* Mask for EVEX.Vi + VEX.VVVV */
+#define EMU86_F_VEX_VVVVV_M 0x001f0000 /* Mask for EVEX.~Vi + VEX.~VVVV */
 #else /* CONFIG_LIBEMU86_WANT_64BIT */
-#define EMU86_F_VEX_VVVVV_M 0x000f0000 /* Mask for VEX.VVVV */
+#define EMU86_F_VEX_VVVVV_M 0x000f0000 /* Mask for VEX.~VVVV */
 /*      EMU86_F_            0x00100000  * ... */
 #endif /* !CONFIG_LIBEMU86_WANT_64BIT */
-#define EMU86_F_VEX_VVVVV_S         16 /* Shift for EVEX.Vi + VEX.VVVV */
+#define EMU86_F_VEX_VVVVV_S         16 /* Shift for EVEX.~Vi + VEX.~VVVV */
 #define EMU86_F_VEX_VVVVV(x) (((x) & EMU86_F_VEX_VVVVV_M) >> EMU86_F_VEX_VVVVV_S)
 #define EMU86_F_VEX_W       0x00200000 /* Value of VEX.W */
 #if CONFIG_LIBEMU86_WANT_64BIT

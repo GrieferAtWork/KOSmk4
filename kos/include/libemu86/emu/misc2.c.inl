@@ -25,18 +25,21 @@
 
 EMU86_INTELLISENSE_BEGIN(misc2) {
 
-#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
-#if (EMU86_EMULATE_CONFIG_CHECKERROR ||                                             \
-     ((EMU86_EMULATE_CONFIG_WANT_RDFSBASE || EMU86_EMULATE_CONFIG_WANT_RDGSBASE ||  \
-       EMU86_EMULATE_CONFIG_WANT_WRFSBASE || EMU86_EMULATE_CONFIG_WANT_WRGSBASE) && \
-      (CONFIG_LIBEMU86_WANT_64BIT || EMU86_EMULATE_CONFIG_FSGSBASE_32BIT)) ||       \
-     (EMU86_EMULATE_CONFIG_WANT_CLWB || EMU86_EMULATE_CONFIG_WANT_CLFLUSH ||        \
-      EMU86_EMULATE_CONFIG_WANT_LFENCE || EMU86_EMULATE_CONFIG_WANT_SFENCE ||       \
-      EMU86_EMULATE_CONFIG_WANT_MFENCE || EMU86_EMULATE_CONFIG_WANT_TPAUSE))
+#if ((!EMU86_EMULATE_CONFIG_ONLY_MEMORY &&                                            \
+      (EMU86_EMULATE_CONFIG_CHECKERROR ||                                             \
+       ((EMU86_EMULATE_CONFIG_WANT_RDFSBASE || EMU86_EMULATE_CONFIG_WANT_RDGSBASE ||  \
+         EMU86_EMULATE_CONFIG_WANT_WRFSBASE || EMU86_EMULATE_CONFIG_WANT_WRGSBASE) && \
+        (CONFIG_LIBEMU86_WANT_64BIT || EMU86_EMULATE_CONFIG_FSGSBASE_32BIT)) ||       \
+       (EMU86_EMULATE_CONFIG_WANT_CLWB || EMU86_EMULATE_CONFIG_WANT_CLFLUSH ||        \
+        EMU86_EMULATE_CONFIG_WANT_LFENCE || EMU86_EMULATE_CONFIG_WANT_SFENCE ||       \
+        EMU86_EMULATE_CONFIG_WANT_MFENCE || EMU86_EMULATE_CONFIG_WANT_TPAUSE))) ||    \
+     (EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_LDMXCSR ||         \
+      EMU86_EMULATE_CONFIG_WANT_STMXCSR))
 
 case EMU86_OPCODE_ENCODE(0x0fae): {
 	MODRM_DECODE();
 	if (op_flags & EMU86_F_f3) {
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 #if (EMU86_EMULATE_CONFIG_CHECKERROR ||                                             \
      ((EMU86_EMULATE_CONFIG_WANT_RDFSBASE || EMU86_EMULATE_CONFIG_WANT_RDGSBASE ||  \
        EMU86_EMULATE_CONFIG_WANT_WRFSBASE || EMU86_EMULATE_CONFIG_WANT_WRGSBASE) && \
@@ -167,15 +170,80 @@ case EMU86_OPCODE_ENCODE(0x0fae): {
 			break;
 		}
 #endif /* ... */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 	} else {
 		switch (modrm.mi_reg) {
 
+
+#if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_LDMXCSR
+		case 2: {
+			/*         NP 0F AE /2 LDMXCSR m32      Load MXCSR register from m32.
+			 * VEX.LZ.0F.WIG AE /2 VLDMXCSR m32     Load MXCSR register from m32. */
+			u32 mxcsr;
+			if ((op_flags & (EMU86_F_VEX_VVVVV_M | EMU86_F_VEX_LL_M)) != 0)
+				goto return_unknown_instruction_rmreg;
+#define NEED_return_unknown_instruction_rmreg
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
+			if (!EMU86_MODRM_ISMEM(modrm.mi_type))
+				goto return_expected_memory_modrm_rmreg;
+#define NEED_return_expected_memory_modrm_rmreg
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
+			mxcsr = MODRM_GETRMMEML();
+			if (mxcsr & ~0xffff) {
+#ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
+				EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD,
+				                                                 X86_REGISTER_MISC_MXCSR, 0, mxcsr, 0);
+#else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
+				goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
+#endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
+			}
+#if EMU86_EMULATE_CONFIG_WANT_LDMXCSR && defined(EMU86_EMULATE_LDMXCSR)
+			EMU86_EMULATE_LDMXCSR(mxcsr);
+			goto done;
+#else /* EMU86_EMULATE_CONFIG_WANT_LDMXCSR && EMU86_EMULATE_LDMXCSR */
+#define NEED_notsup_modrm_getl_rmreg_modrm_parsed
+			goto notsup_modrm_getl_rmreg_modrm_parsed;
+#endif /* !EMU86_EMULATE_CONFIG_WANT_LDMXCSR || !EMU86_EMULATE_LDMXCSR */
+		}
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_LDMXCSR */
+
+
+
+#if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_STMXCSR
+		case 3: {
+			/*         NP 0F AE /3 STMXCSR m32      Store contents of MXCSR register to m32.
+			 * VEX.LZ.0F.WIG AE /3 VSTMXCSR m32     Store contents of MXCSR register to m32.*/
+			if ((op_flags & (EMU86_F_VEX_VVVVV_M | EMU86_F_VEX_LL_M)) != 0)
+				goto return_unknown_instruction_rmreg;
+#define NEED_return_unknown_instruction_rmreg
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
+			if (!EMU86_MODRM_ISMEM(modrm.mi_type))
+				goto return_expected_memory_modrm_rmreg;
+#define NEED_return_expected_memory_modrm_rmreg
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
+#if EMU86_EMULATE_CONFIG_WANT_STMXCSR && defined(EMU86_EMULATE_STMXCSR)
+			{
+				u32 mxcsr = EMU86_EMULATE_STMXCSR();
+				MODRM_SETRMMEML(mxcsr);
+				goto done;
+			}
+#else /* EMU86_EMULATE_CONFIG_WANT_STMXCSR && EMU86_EMULATE_STMXCSR */
+#define NEED_notsup_modrm_setl_rmreg_modrm_parsed
+			goto notsup_modrm_setl_rmreg_modrm_parsed;
+#endif /* !EMU86_EMULATE_CONFIG_WANT_STMXCSR || !EMU86_EMULATE_STMXCSR */
+		}
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_STMXCSR */
+
+
+
+#if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 #if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_LFENCE
 		case 5: {
 			/* NP 0F AE E8     LFENCE     Serializes load operations. */
 			if (!EMU86_MODRM_ISREG(modrm.mi_type))
-				goto return_expected_memory_modrm_rmreg;
-#define NEED_return_expected_memory_modrm_rmreg
+				goto return_expected_register_modrm_rmreg;
+#define NEED_return_expected_register_modrm_rmreg
 #if EMU86_EMULATE_CONFIG_WANT_LFENCE
 #ifdef EMU86_EMULATE_LFENCE
 			if unlikely(modrm.mi_rm != 0)
@@ -247,8 +315,8 @@ case EMU86_OPCODE_ENCODE(0x0fae): {
 #define NEED_return_unsupported_instruction_rmreg
 #endif /* !EMU86_EMULATE_CONFIG_CHECKERROR && (!EMU86_EMULATE_CONFIG_WANT_TPAUSE || !EMU86_EMULATE_TPAUSE) */
 #else /* EMU86_EMULATE_CONFIG_WANT_TPAUSE */
-					goto return_expected_memory_modrm_rmreg;
-#define NEED_return_expected_memory_modrm_rmreg
+					goto return_expected_register_modrm_rmreg;
+#define NEED_return_expected_register_modrm_rmreg
 #endif /* !EMU86_EMULATE_CONFIG_WANT_TPAUSE */
 				}
 
@@ -338,6 +406,7 @@ case EMU86_OPCODE_ENCODE(0x0fae): {
 #endif /* EMU86_EMULATE_CONFIG_WANT_SFENCE */
 			break;
 #endif /* ... */
+#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 
 		default:
 			break;
@@ -366,8 +435,6 @@ check_mi_rm_and_op_flags_and_do_fencelock:
 #define NEED_return_unknown_instruction_rmreg
 }
 #endif /* ... */
-
-#endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 
 }
 EMU86_INTELLISENSE_END

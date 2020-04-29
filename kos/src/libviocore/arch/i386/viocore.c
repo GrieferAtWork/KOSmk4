@@ -50,6 +50,7 @@ opt.append("-Os");
 
 #include <asm/cpu-flags.h>
 #include <asm/cpu-msr.h>
+#include <asm/intrin-fpu.h>
 #include <asm/intrin.h>
 #include <asm/registers-compat.h>
 #include <asm/registers.h>
@@ -1893,12 +1894,16 @@ NOTHROW(CC CS_setregl)(struct vio_emulate_args *__restrict self, u8 regno, u32 v
 	} __WHILE0
 #define EMU86_EMULATE_LIDT(limit, base) \
 	__lidt(limit, (void *)(uintptr_t)(base))
-#define EMU86_EMULATE_SMSW() __smsw()
-#define EMU86_EMULATE_LMSW(value) __lmsw(value)
+#define EMU86_EMULATE_SMSW()                     __smsw()
+#define EMU86_EMULATE_LMSW(value)                __lmsw(value)
 #define EMU86_EMULATE_LAR(segment_index, result) __lar(segment_index, &(result))
 #define EMU86_EMULATE_LSL(segment_index, result) __lsl(segment_index, &(result))
 
 
+#define EMU86_EMULATE_CONFIG_WANT_LDMXCSR 1
+#define EMU86_EMULATE_CONFIG_WANT_STMXCSR 1
+#define EMU86_EMULATE_STMXCSR()      __stmxcsr()
+#define EMU86_EMULATE_LDMXCSR(mxcsr) __ldmxcsr(mxcsr)
 
 
 PRIVATE ATTR_NORETURN void CC

@@ -74,6 +74,7 @@
 #if defined(__x86_64__) || defined(__i386__)
 #if !defined(EMU86_EMULATE_CONFIG_NO_INTRIN) || !(EMU86_EMULATE_CONFIG_NO_INTRIN + 0)
 #include <asm/intrin.h>
+#include <asm/intrin-fpu.h>
 #endif /* !EMU86_EMULATE_CONFIG_NO_INTRIN */
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
@@ -438,6 +439,12 @@ __DECL_BEGIN
 #ifndef EMU86_EMULATE_CONFIG_WANT_TPAUSE
 #define EMU86_EMULATE_CONFIG_WANT_TPAUSE (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
 #endif /* !EMU86_EMULATE_CONFIG_WANT_TPAUSE */
+#ifndef EMU86_EMULATE_CONFIG_WANT_STMXCSR
+#define EMU86_EMULATE_CONFIG_WANT_STMXCSR (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_STMXCSR */
+#ifndef EMU86_EMULATE_CONFIG_WANT_LDMXCSR
+#define EMU86_EMULATE_CONFIG_WANT_LDMXCSR (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_LDMXCSR */
 #ifndef EMU86_EMULATE_CONFIG_WANT_MOV_RM
 #define EMU86_EMULATE_CONFIG_WANT_MOV_RM (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
 #endif /* !EMU86_EMULATE_CONFIG_WANT_MOV_RM */
@@ -1387,6 +1394,7 @@ void EMU86_EMULATE_MONITOR(void *addr, u32 extensions, u32 hints); /* EMU86_EMUL
 void EMU86_EMULATE_MWAIT(u32 ecx, u32 edx);                        /* EMU86_EMULATE_CONFIG_WANT_MWAIT */
 void EMU86_EMULATE_ENCLS(u32 leaf);                         /* EMU86_EMULATE_CONFIG_WANT_ENCLS */
 void EMU86_EMULATE_ENCLU(u32 leaf);                         /* EMU86_EMULATE_CONFIG_WANT_ENCLU */
+void EMU86_EMULATE_LDMXCSR(u32 mxcsr);                      /* EMU86_EMULATE_CONFIG_WANT_LDMXCSR */
 #endif
 
 
@@ -1439,6 +1447,12 @@ void EMU86_EMULATE_ENCLU(u32 leaf);                         /* EMU86_EMULATE_CON
 #ifndef EMU86_EMULATE_FENCELOCK
 #define EMU86_EMULATE_FENCELOCK() __fencelock()
 #endif /* !EMU86_EMULATE_FENCELOCK */
+#ifndef EMU86_EMULATE_STMXCSR
+#define EMU86_EMULATE_STMXCSR() __stmxcsr()
+#endif /* !EMU86_EMULATE_STMXCSR */
+#ifndef EMU86_EMULATE_LDMXCSR
+#define EMU86_EMULATE_LDMXCSR(mxcsr) __ldmxcsr(mxcsr)
+#endif /* !EMU86_EMULATE_LDMXCSR */
 #endif /* !EMU86_EMULATE_CONFIG_NO_INTRIN */
 #endif /* __x86_64__ || __i386__ */
 
@@ -3931,31 +3945,6 @@ checklock_modrm_memory_parsed:
 #endif /* !EMU86_EMULATE_IMPL_HEADER */
 #endif /* !__INTELLISENSE__ */
 
-#if 0 /* TODO: Missing stuff from the old `handle_gpf.c' */
-		case 0x0fae:
-			MOD_DECODE();
-			switch (mod.mi_reg) {
-
-			case 2:
-				if (mod.mi_type == EMU86_MODRM_MEMORY) {
-					/* LDMXCSR m32 (attempted to set a reserved bit) */
-					PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
-					PERTASK_SET(this_exception_pointers[0], E_ILLEGAL_INSTRUCTION_X86_OPCODE(opcode, mod.mi_reg));
-					PERTASK_SET(this_exception_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD);
-					PERTASK_SET(this_exception_pointers[2], (uintptr_t)X86_REGISTER_MISC_MXCSR);
-					PERTASK_SET(this_exception_pointers[3], (uintptr_t)RD_RML());
-					for (i = 4; i < EXCEPTION_DATA_POINTERS; ++i)
-						PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
-					goto unwind_state;
-				}
-				break;
-
-			default:
-				break;
-			}
-			goto generic_failure;
-#endif
-
 			/* XXX: xrstor     (if only for verbose exception messages?) */
 			/* XXX: xrstor64   (if only for verbose exception messages?) */
 			/* XXX: xsave      (if only for verbose exception messages?) */
@@ -3973,10 +3962,6 @@ checklock_modrm_memory_parsed:
 			/* XXX: fxsave     (if only for verbose exception messages?) */
 			/* XXX: fxsave64   (if only for verbose exception messages?) */
 			/* XXX: invpcid    (if only for verbose exception messages?) */
-			/* XXX: ldmxcsr    (Can throw a #GPF when attempting to set a reserved bit) */
-			/* XXX: vldmxcsr   (if only for verbose exception messages?) */
-			/* XXX: vstmxcsr   (if only for verbose exception messages?) */
-			/* XXX: stmxcsr    (if only for verbose exception messages?) */
 			/* XXX: vmptrst    (if only for verbose exception messages?) */
 			/* XXX: vmxon      (if only for verbose exception messages?) */
 			/* XXX: vmclear    (if only for verbose exception messages?) */
@@ -4298,6 +4283,15 @@ notsup_modrm_getl_rmreg_modrm_parsed:
 		goto return_unsupported_instruction_rmreg;
 #define NEED_return_unsupported_instruction_rmreg
 #endif /* NEED_notsup_modrm_getl_rmreg_modrm_parsed */
+
+
+#ifdef NEED_notsup_modrm_setl_rmreg_modrm_parsed
+#undef NEED_notsup_modrm_setl_rmreg_modrm_parsed
+notsup_modrm_setl_rmreg_modrm_parsed:
+		MODRM_NOSUP_SETRML();
+		goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
+#endif /* NEED_notsup_modrm_setl_rmreg_modrm_parsed */
 
 
 #ifdef NEED_notsup_modrm_setwlq_rmreg
