@@ -427,7 +427,13 @@ DECL_END
 #define EMU86_EMULATE_CONFIG_WANT_SYSEXIT  0 /* Not valid outside of P-mode */
 
 
-
+/* Disable some instructions that would only add bloat */
+#define EMU86_EMULATE_CONFIG_WANT_MONITOR 0
+#define EMU86_EMULATE_CONFIG_WANT_MWAIT   0
+#define EMU86_EMULATE_CONFIG_WANT_ENCLS   0
+#define EMU86_EMULATE_CONFIG_WANT_ENCLU   0
+#define EMU86_EMULATE_CONFIG_WANT_STGI    0
+#define EMU86_EMULATE_CONFIG_WANT_CLGI    0
 
 
 #if defined(__KERNEL__) && 1

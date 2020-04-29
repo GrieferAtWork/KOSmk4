@@ -331,6 +331,8 @@ x86_handle_bad_usage(struct icpustate *__restrict state, bad_usage_reason_t usag
 #define EMU86_EMULATE_CONFIG_WANT_MWAIT         0
 #define EMU86_EMULATE_CONFIG_WANT_ENCLS         0
 #define EMU86_EMULATE_CONFIG_WANT_ENCLU         0
+#define EMU86_EMULATE_CONFIG_WANT_STGI          0
+#define EMU86_EMULATE_CONFIG_WANT_CLGI          0
 #define EMU86_EMULATE_CONFIG_WANT_CMC           0
 #define EMU86_EMULATE_CONFIG_WANT_CLC           0
 #define EMU86_EMULATE_CONFIG_WANT_STC           0

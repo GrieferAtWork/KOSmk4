@@ -696,6 +696,12 @@ __DECL_BEGIN
 #ifndef EMU86_EMULATE_CONFIG_WANT_MWAIT
 #define EMU86_EMULATE_CONFIG_WANT_MWAIT (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
 #endif /* !EMU86_EMULATE_CONFIG_WANT_MWAIT */
+#ifndef EMU86_EMULATE_CONFIG_WANT_STGI
+#define EMU86_EMULATE_CONFIG_WANT_STGI (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_STGI */
+#ifndef EMU86_EMULATE_CONFIG_WANT_CLGI
+#define EMU86_EMULATE_CONFIG_WANT_CLGI (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_CLGI */
 #ifndef EMU86_EMULATE_CONFIG_WANT_CMC
 #define EMU86_EMULATE_CONFIG_WANT_CMC (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
 #endif /* !EMU86_EMULATE_CONFIG_WANT_CMC */
@@ -3996,8 +4002,6 @@ checklock_modrm_memory_parsed:
 			/* XXX: umonitorl  (if only for verbose exception messages?) */
 			/* XXX: umonitorq  (if only for verbose exception messages?) */
 			/* XXX: umwait     (if only for verbose exception messages?) */
-			/* XXX: stgi       (if only for verbose exception messages?) */
-			/* XXX: clgi       (if only for verbose exception messages?) */
 			/* XXX: skinit     (if only for verbose exception messages?) */
 			/* XXX: invlpga    (if only for verbose exception messages?) */
 			/* XXX: monitorx   (if only for verbose exception messages?) */

@@ -291,6 +291,7 @@
 #   define X86_REGISTER_MISC_TPAUSE     __UINT16_C(0x9703) /* tpause:operand */
 #   define X86_REGISTER_MISC_ENCLS      __UINT16_C(0x9704) /* encls:%eax */
 #   define X86_REGISTER_MISC_ENCLU      __UINT16_C(0x9705) /* enclu:%eax */
+#   define X86_REGISTER_MISC_GI         __UINT16_C(0x9706) /* GlobalInterrupt (s.a. clgi/stgi) */
 
 /* Extended Control Register */
 #define X86_REGISTER_XCR __UINT16_C(0xd000)
