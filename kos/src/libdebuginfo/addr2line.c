@@ -578,7 +578,9 @@ NOTHROW_NCX(CC libdi_debug_sections_addr2line)(di_debug_sections_t const *__rest
 	unsigned int error;
 	if unlikely(sections->ds_debug_line_end <= sections->ds_debug_line_start) {
 		/* Scan the symbol tables. */
+err_nodata_nolevel:
 		fill_error_state(result, module_relative_pc);
+err_nodata:
 		search_symtab(sections, result, module_relative_pc, true);
 		if (result->al_rawname) {
 			result->al_levelcnt = 1;
@@ -707,10 +709,7 @@ done_success:
 			}
 		}
 	}
-err_nodata_nolevel:
-	fill_error_state(result, module_relative_pc);
-err_nodata:
-	return DEBUG_INFO_ERROR_NOFRAME;
+	goto err_nodata_nolevel;
 err_forward:
 	fill_error_state(result, module_relative_pc);
 	return error;
