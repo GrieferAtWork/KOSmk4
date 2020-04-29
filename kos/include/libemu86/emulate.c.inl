@@ -4030,21 +4030,6 @@ checklock_modrm_memory_parsed:
 
 
 			/* TODO: XOP instructions (from AMD):
-			 *    BLCFILL reg32, reg/mem32             8F RXB.09 0.dest.0.00 01 /1
-			 *    BLCFILL reg64, reg/mem64             8F RXB.09 1.dest.0.00 01 /1
-			 *    BLSFILL reg32, reg/mem32             8F RXB.09 0.dest.0.00 01 /2
-			 *    BLSFILL reg64, reg/mem64             8F RXB.09 1.dest.0.00 01 /2
-			 *    BLCS reg32, reg/mem32                8F RXB.09 0.dest.0.00 01 /3
-			 *    BLCS reg64, reg/mem64                8F RXB.09 1.dest.0.00 01 /3
-			 *    TZMSK reg32, reg/mem32               8F RXB.09 0.dest.0.00 01 /4
-			 *    TZMSK reg64, reg/mem64               8F RXB.09 1.dest.0.00 01 /4
-			 *    BLCIC reg32, reg/mem32               8F RXB.09 0.dest.0.00 01 /5
-			 *    BLCIC reg64, reg/mem64               8F RXB.09 1.dest.0.00 01 /5
-			 *    BLSIC reg32, reg/mem32               8F RXB.09 0.dest.0.00 01 /6
-			 *    BLSIC reg64, reg/mem64               8F RXB.09 1.dest.0.00 01 /6
-			 *    T1MSKC reg32, reg/mem32              8F RXB.09 0.dest.0.00 01 /7
-			 *    T1MSKC reg64, reg/mem64              8F RXB.09 1.dest.0.00 01 /7
-			 *
 			 *    BLCMSK reg32, reg/mem32              8F RXB.09 0.dest.0.00 02 /1
 			 *    BLCMSK reg64, reg/mem64              8F RXB.09 1.dest.0.00 02 /1
 			 *    BLCI reg32, reg/mem32                8F RXB.09 0.dest.0.00 02 /6

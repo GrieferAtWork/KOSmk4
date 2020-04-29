@@ -44,7 +44,7 @@ case EMU86_OPCODE_ENCODE_XOP(9, 0x01): {
 			/* 64-bit */
 			u64 temp, src;
 			src = MODRM_GETRMQ();
-			if (OVERFLOW_UADD(src, 1, &temp))
+			if (OVERFLOW_SADD((s64)src, 1, (s64 *)&temp))
 				eflags_addend |= EFLAGS_CF;
 			temp &= src;
 			VEX_SETREGQ(temp);
@@ -56,7 +56,7 @@ case EMU86_OPCODE_ENCODE_XOP(9, 0x01): {
 			/* 32-bit */
 			u32 temp, src;
 			src = MODRM_GETRML();
-			if (OVERFLOW_UADD(src, 1, &temp))
+			if (OVERFLOW_SADD((s32)src, 1, (s32 *)&temp))
 				eflags_addend |= EFLAGS_CF;
 			temp &= src;
 			VEX_SETREGL(temp);
@@ -74,20 +74,244 @@ case EMU86_OPCODE_ENCODE_XOP(9, 0x01): {
 #endif /* ... */
 
 
-//    BLCFILL reg32, reg/mem32             8F RXB.09 0.dest.0.00 01 /1
-//    BLCFILL reg64, reg/mem64             8F RXB.09 1.dest.0.00 01 /1
-//    BLSFILL reg32, reg/mem32             8F RXB.09 0.dest.0.00 01 /2
-//    BLSFILL reg64, reg/mem64             8F RXB.09 1.dest.0.00 01 /2
-//    BLCS reg32, reg/mem32                8F RXB.09 0.dest.0.00 01 /3
-//    BLCS reg64, reg/mem64                8F RXB.09 1.dest.0.00 01 /3
-//    TZMSK reg32, reg/mem32               8F RXB.09 0.dest.0.00 01 /4
-//    TZMSK reg64, reg/mem64               8F RXB.09 1.dest.0.00 01 /4
-//    BLCIC reg32, reg/mem32               8F RXB.09 0.dest.0.00 01 /5
-//    BLCIC reg64, reg/mem64               8F RXB.09 1.dest.0.00 01 /5
-//    BLSIC reg32, reg/mem32               8F RXB.09 0.dest.0.00 01 /6
-//    BLSIC reg64, reg/mem64               8F RXB.09 1.dest.0.00 01 /6
-//    T1MSKC reg32, reg/mem32              8F RXB.09 0.dest.0.00 01 /7
-//    T1MSKC reg64, reg/mem64              8F RXB.09 1.dest.0.00 01 /7
+#if EMU86_EMULATE_CONFIG_WANT_XOP_BLSFILL
+	case 2: {
+		/* BLSFILL reg32, reg/mem32             8F RXB.09 0.dest.0.00 01 /2
+		 * BLSFILL reg64, reg/mem64             8F RXB.09 1.dest.0.00 01 /2 */
+		u32 eflags_addend = 0;
+#if CONFIG_LIBEMU86_WANT_64BIT
+		if (op_flags & EMU86_F_VEX_W) {
+			/* 64-bit */
+			u64 temp, src;
+			src = MODRM_GETRMQ();
+			if (OVERFLOW_SSUB((s64)src, 1, (s64 *)&temp))
+				eflags_addend |= EFLAGS_CF;
+			temp |= src;
+			VEX_SETREGQ(temp);
+			eflags_addend |= emu86_geteflags_SFq(temp);
+			eflags_addend |= emu86_geteflags_ZFq(temp);
+		} else
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+		{
+			/* 32-bit */
+			u32 temp, src;
+			src = MODRM_GETRML();
+			if (OVERFLOW_SSUB((s32)src, 1, (s32 *)&temp))
+				eflags_addend |= EFLAGS_CF;
+			temp |= src;
+			VEX_SETREGL(temp);
+			eflags_addend |= emu86_geteflags_SFl(temp);
+			eflags_addend |= emu86_geteflags_ZFl(temp);
+		}
+		EMU86_MSKFLAGS(~(EFLAGS_OF | EFLAGS_SF | EFLAGS_ZF | EFLAGS_CF),
+		               eflags_addend);
+		goto done;
+	}
+#elif EMU86_EMULATE_CONFIG_CHECKERROR
+	case 2:
+		goto notsup_modrm_getlq_vex_w_rmreg_modrm_parsed;
+#define NEED_notsup_modrm_getlq_vex_w_rmreg_modrm_parsed
+#endif /* ... */
+
+
+#if EMU86_EMULATE_CONFIG_WANT_XOP_BLCS
+	case 3: {
+		/* BLCS reg32, reg/mem32                8F RXB.09 0.dest.0.00 01 /3
+		 * BLCS reg64, reg/mem64                8F RXB.09 1.dest.0.00 01 /3 */
+		u32 eflags_addend = 0;
+#if CONFIG_LIBEMU86_WANT_64BIT
+		if (op_flags & EMU86_F_VEX_W) {
+			/* 64-bit */
+			u64 temp, src;
+			src = MODRM_GETRMQ();
+			if (OVERFLOW_SADD((s64)src, 1, (s64 *)&temp))
+				eflags_addend |= EFLAGS_CF;
+			temp |= src;
+			VEX_SETREGQ(temp);
+			eflags_addend |= emu86_geteflags_SFq(temp);
+			eflags_addend |= emu86_geteflags_ZFq(temp);
+		} else
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+		{
+			/* 32-bit */
+			u32 temp, src;
+			src = MODRM_GETRML();
+			if (OVERFLOW_SADD((s32)src, 1, (s32 *)&temp))
+				eflags_addend |= EFLAGS_CF;
+			temp |= src;
+			VEX_SETREGL(temp);
+			eflags_addend |= emu86_geteflags_SFl(temp);
+			eflags_addend |= emu86_geteflags_ZFl(temp);
+		}
+		EMU86_MSKFLAGS(~(EFLAGS_OF | EFLAGS_SF | EFLAGS_ZF | EFLAGS_CF),
+		               eflags_addend);
+		goto done;
+	}
+#elif EMU86_EMULATE_CONFIG_CHECKERROR
+	case 3:
+		goto notsup_modrm_getlq_vex_w_rmreg_modrm_parsed;
+#define NEED_notsup_modrm_getlq_vex_w_rmreg_modrm_parsed
+#endif /* ... */
+
+
+#if EMU86_EMULATE_CONFIG_WANT_XOP_TZMSK
+	case 4: {
+		/* TZMSK reg32, reg/mem32               8F RXB.09 0.dest.0.00 01 /4
+		 * TZMSK reg64, reg/mem64               8F RXB.09 1.dest.0.00 01 /4 */
+		u32 eflags_addend = 0;
+#if CONFIG_LIBEMU86_WANT_64BIT
+		if (op_flags & EMU86_F_VEX_W) {
+			/* 64-bit */
+			u64 temp, src;
+			src = MODRM_GETRMQ();
+			if (OVERFLOW_SSUB((s64)src, 1, (s64 *)&temp))
+				eflags_addend |= EFLAGS_CF;
+			temp &= ~src;
+			VEX_SETREGQ(temp);
+			eflags_addend |= emu86_geteflags_SFq(temp);
+			eflags_addend |= emu86_geteflags_ZFq(temp);
+		} else
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+		{
+			/* 32-bit */
+			u32 temp, src;
+			src = MODRM_GETRML();
+			if (OVERFLOW_SSUB((s32)src, 1, (s32 *)&temp))
+				eflags_addend |= EFLAGS_CF;
+			temp &= ~src;
+			VEX_SETREGL(temp);
+			eflags_addend |= emu86_geteflags_SFl(temp);
+			eflags_addend |= emu86_geteflags_ZFl(temp);
+		}
+		EMU86_MSKFLAGS(~(EFLAGS_OF | EFLAGS_SF | EFLAGS_ZF | EFLAGS_CF),
+		               eflags_addend);
+		goto done;
+	}
+#elif EMU86_EMULATE_CONFIG_CHECKERROR
+	case 4:
+		goto notsup_modrm_getlq_vex_w_rmreg_modrm_parsed;
+#define NEED_notsup_modrm_getlq_vex_w_rmreg_modrm_parsed
+#endif /* ... */
+
+
+#if EMU86_EMULATE_CONFIG_WANT_XOP_BLCIC
+	case 5: {
+		/* BLCIC reg32, reg/mem32               8F RXB.09 0.dest.0.00 01 /5
+		 * BLCIC reg64, reg/mem64               8F RXB.09 1.dest.0.00 01 /5 */
+		u32 eflags_addend = 0;
+#if CONFIG_LIBEMU86_WANT_64BIT
+		if (op_flags & EMU86_F_VEX_W) {
+			/* 64-bit */
+			u64 temp, src;
+			src = MODRM_GETRMQ();
+			if (OVERFLOW_SADD((s64)src, 1, (s64 *)&temp))
+				eflags_addend |= EFLAGS_CF;
+			temp &= ~src;
+			VEX_SETREGQ(temp);
+			eflags_addend |= emu86_geteflags_SFq(temp);
+			eflags_addend |= emu86_geteflags_ZFq(temp);
+		} else
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+		{
+			/* 32-bit */
+			u32 temp, src;
+			src = MODRM_GETRML();
+			if (OVERFLOW_SADD((s32)src, 1, (s32 *)&temp))
+				eflags_addend |= EFLAGS_CF;
+			temp &= ~src;
+			VEX_SETREGL(temp);
+			eflags_addend |= emu86_geteflags_SFl(temp);
+			eflags_addend |= emu86_geteflags_ZFl(temp);
+		}
+		EMU86_MSKFLAGS(~(EFLAGS_OF | EFLAGS_SF | EFLAGS_ZF | EFLAGS_CF),
+		               eflags_addend);
+		goto done;
+	}
+#elif EMU86_EMULATE_CONFIG_CHECKERROR
+	case 5:
+		goto notsup_modrm_getlq_vex_w_rmreg_modrm_parsed;
+#define NEED_notsup_modrm_getlq_vex_w_rmreg_modrm_parsed
+#endif /* ... */
+
+
+#if EMU86_EMULATE_CONFIG_WANT_XOP_BLSIC
+	case 6: {
+		/* BLSIC reg32, reg/mem32               8F RXB.09 0.dest.0.00 01 /6
+		 * BLSIC reg64, reg/mem64               8F RXB.09 1.dest.0.00 01 /6 */
+		u32 eflags_addend = 0;
+#if CONFIG_LIBEMU86_WANT_64BIT
+		if (op_flags & EMU86_F_VEX_W) {
+			/* 64-bit */
+			u64 temp, src;
+			src = MODRM_GETRMQ();
+			if (OVERFLOW_SSUB((s64)src, 1, (s64 *)&temp))
+				eflags_addend |= EFLAGS_CF;
+			temp |= ~src;
+			VEX_SETREGQ(temp);
+			eflags_addend |= emu86_geteflags_SFq(temp);
+			eflags_addend |= emu86_geteflags_ZFq(temp);
+		} else
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+		{
+			/* 32-bit */
+			u32 temp, src;
+			src = MODRM_GETRML();
+			if (OVERFLOW_SSUB((s32)src, 1, (s32 *)&temp))
+				eflags_addend |= EFLAGS_CF;
+			temp |= ~src;
+			VEX_SETREGL(temp);
+			eflags_addend |= emu86_geteflags_SFl(temp);
+			eflags_addend |= emu86_geteflags_ZFl(temp);
+		}
+		EMU86_MSKFLAGS(~(EFLAGS_OF | EFLAGS_SF | EFLAGS_ZF | EFLAGS_CF),
+		               eflags_addend);
+		goto done;
+	}
+#elif EMU86_EMULATE_CONFIG_CHECKERROR
+	case 6:
+		goto notsup_modrm_getlq_vex_w_rmreg_modrm_parsed;
+#define NEED_notsup_modrm_getlq_vex_w_rmreg_modrm_parsed
+#endif /* ... */
+
+
+#if EMU86_EMULATE_CONFIG_WANT_XOP_T1MSKC
+	case 7: {
+		/* T1MSKC reg32, reg/mem32              8F RXB.09 0.dest.0.00 01 /7
+		 * T1MSKC reg64, reg/mem64              8F RXB.09 1.dest.0.00 01 /7 */
+		u32 eflags_addend = 0;
+#if CONFIG_LIBEMU86_WANT_64BIT
+		if (op_flags & EMU86_F_VEX_W) {
+			/* 64-bit */
+			u64 temp, src;
+			src = MODRM_GETRMQ();
+			if (OVERFLOW_SADD((s64)src, 1, (s64 *)&temp))
+				eflags_addend |= EFLAGS_CF;
+			temp |= ~src;
+			VEX_SETREGQ(temp);
+			eflags_addend |= emu86_geteflags_SFq(temp);
+			eflags_addend |= emu86_geteflags_ZFq(temp);
+		} else
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+		{
+			/* 32-bit */
+			u32 temp, src;
+			src = MODRM_GETRML();
+			if (OVERFLOW_SADD((s32)src, 1, (s32 *)&temp))
+				eflags_addend |= EFLAGS_CF;
+			temp |= ~src;
+			VEX_SETREGL(temp);
+			eflags_addend |= emu86_geteflags_SFl(temp);
+			eflags_addend |= emu86_geteflags_ZFl(temp);
+		}
+		EMU86_MSKFLAGS(~(EFLAGS_OF | EFLAGS_SF | EFLAGS_ZF | EFLAGS_CF),
+		               eflags_addend);
+		goto done;
+	}
+#elif EMU86_EMULATE_CONFIG_CHECKERROR
+	case 6:
+		goto notsup_modrm_getlq_vex_w_rmreg_modrm_parsed;
+#define NEED_notsup_modrm_getlq_vex_w_rmreg_modrm_parsed
+#endif /* ... */
 
 
 	default:

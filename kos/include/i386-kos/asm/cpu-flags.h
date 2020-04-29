@@ -22,7 +22,7 @@
 
 #include <hybrid/typecore.h>
 
-#define EFLAGS_CF          __UINT32_C(0x00000001) /* [bit(0)] Carry Flag Status. */
+#define EFLAGS_CF          __UINT32_C(0x00000001) /* [bit(0)] Carry Flag Status. (signed arithmetic) */
 #define EFLAGS_PF          __UINT32_C(0x00000004) /* [bit(2)] Parity Flag Status. */
 #define EFLAGS_AF          __UINT32_C(0x00000010) /* [bit(4)] Auxiliary Carry Flag Status. */
 #define EFLAGS_ZF          __UINT32_C(0x00000040) /* [bit(6)] Zero Flag Status. */
@@ -30,7 +30,7 @@
 #define EFLAGS_TF          __UINT32_C(0x00000100) /* [bit(8)] Trap Flag (System). (generate an `int1' after executing a single instruction) */
 #define EFLAGS_IF          __UINT32_C(0x00000200) /* [bit(9)] Interrupt Enable Flag (System). */
 #define EFLAGS_DF          __UINT32_C(0x00000400) /* [bit(10)] Direction Flag (Control). */
-#define EFLAGS_OF          __UINT32_C(0x00000800) /* [bit(11)] Overflow Flag Status. */
+#define EFLAGS_OF          __UINT32_C(0x00000800) /* [bit(11)] Overflow Flag Status. (unsigned arithmetic) */
 #define EFLAGS_IOPL(n) (((n)&3) << 12)/* [bit(12,13)] I/O Privilege Level (System). */
 #define EFLAGS_IOPLMASK    __UINT32_C(0x00003000) /* [bit(12,13)] I/O Privilege Level (System). */
 #define EFLAGS_NT          __UINT32_C(0x00004000) /* [bit(14)] Nested Task Flag (System). */
