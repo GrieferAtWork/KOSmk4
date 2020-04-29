@@ -737,6 +737,19 @@ throw_unsupported_instruction(struct icpustate *__restrict state,
 #define EMU86_EMULATE_RDDR7()  DONT_USE
 #define EMU86_EMULATE_WRDR7(v) DONT_USE
 
+#define EMU86_EMULATE_RDMSR(index)                     DONT_USE
+#define EMU86_EMULATE_WRMSR(index, value)              DONT_USE
+#define EMU86_EMULATE_CLTS()                           DONT_USE
+#define EMU86_EMULATE_SWAPGS()                         DONT_USE
+#define EMU86_EMULATE_TPAUSE(want_c01, tsc_deadline)   DONT_USE
+#define EMU86_EMULATE_XGETBV(index)                    DONT_USE
+#define EMU86_EMULATE_XSETBV(index, value)             DONT_USE
+#define EMU86_EMULATE_MONITOR(addr, extensions, hints) DONT_USE
+#define EMU86_EMULATE_MWAIT(ecx, edx)                  DONT_USE
+#define EMU86_EMULATE_ENCLS(leaf)                      DONT_USE
+#define EMU86_EMULATE_ENCLU(leaf)                      DONT_USE
+#define EMU86_EMULATE_LDMXCSR(mxcsr)                   DONT_USE
+
 /* Enable the emulation of rdmsr/wrmsr for certain MSR registers:
  *  - IA32_FS_BASE            (read-write)
  *  - IA32_GS_BASE            (read-write)
