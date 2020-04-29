@@ -107,6 +107,10 @@ opt.append("-Os");
 #endif /* !CONFIG_NO_USERKERN_SEGMENT */
 
 #ifdef __x86_64__
+#include <kernel/driver.h>
+#include <kernel/fsgsbase.h>
+#include <kernel/vm/phys.h>
+
 #include <int128.h>
 #endif /* __x86_64__ */
 
@@ -1532,6 +1536,120 @@ DEFINE_DO_ATOMIC_CMPXCH(l, 32)
 #define EMU86_MEM_ATOMIC_FETCHXORL(addr, addend, force_atomic) DONT_USE
 #define EMU86_MEM_ATOMIC_FETCHXORQ(addr, addend, force_atomic) DONT_USE
 
+
+
+#ifdef __x86_64__
+#define HINT_ADDR(x, y) x
+#define HINT_MODE(x, y) y
+#define HINT_GETADDR(x) HINT_ADDR x
+#define HINT_GETMODE(x) HINT_MODE x
+
+
+/* Define handlers for automatic patching of (rd|wr)(fs|gs)base instructions in drivers.
+ * When the faulting reason is a #UD, then we know that the instruction isn't recognized,
+ * in which case a kernel-space fault address can be patched into a call to one of the
+ * emulated fs/gs-access functions. */
+PRIVATE NOBLOCK bool
+NOTHROW(KCALL patch_fsgsbase_at)(void const *pc) {
+	bool ok = false;
+	REF struct driver *d;
+	/* Make sure that there's a driver mapped here.
+	 * HINT: This also asserts that `pc' points into kernel-space! */
+	d = driver_at_address(pc);
+	if unlikely(!d)
+		goto done;
+	if unlikely(d == &kernel_driver) {
+		/* The kernel core is set-up to automatically patch all instances
+		 * of fs/gs-base instructions during early bootup, so technically
+		 * would should never get here.
+		 * Still though, allow the kernel core to assume that its code won't
+		 * get patched, and do nothing for this case (and simply emulate the
+		 * instruction without patching) */
+	} else {
+		/* By holding a reference to `d' (as returned by `driver_at_address()'),
+		 * we know that the associated driver won't get unloaded from memory
+		 * while we're in here, meaning that we're safe to access its backing
+		 * segment memory.
+		 * However, we must still acquire a lock to the kernel VM, so-as to
+		 * ensure that no-one tries to off-load the drivers text data into a
+		 * different memory bank. Because even though driver sections are
+		 * loaded into LOCKED memory, the backing banks are still allowed to
+		 * be changed, which can only be prevented by holding a lock to the
+		 * kernel VM. */
+		if (sync_trywrite(&vm_kernel)) {
+			/* With a lock to the kernel VM held, do another sanity check to ensure
+			 * that the backing memory of return-PC is still mapped into memory.
+			 * There isn't any rule against drivers doing weird trickery with their
+			 * own program segments, so-long as they follow the rules that kernel
+			 * memory can only be altered while holding a lock to the kernel VM. */
+			if (pagedir_ismapped((void *)pc)) {
+				vm_phys_t pc_phys;
+				pc_phys = pagedir_translate((void *)pc);
+				/* Try to patch the instruction at `pc' */
+#ifndef NO_PHYS_IDENTITY
+				if (PHYS_IS_IDENTITY(pc_phys, 5)) {
+					/* Simple case: Can simply patch the instruction within the phys-identity-mapping */
+					ok = x86_fsgsbase_patch(PHYS_TO_IDENTITY(pc_phys), pc);
+				} else
+#endif /* !NO_PHYS_IDENTITY */
+				if ((uintptr_t)(pc_phys & PAGEMASK) < (PAGESIZE - 5)) {
+					/* Simple case: The All (5) bytes that might possibly need
+					 *              patching are contained within the same page.
+					 * In this case, we can simply use our trampoline to gain
+					 * write-access. */
+					pagedir_pushval_t pv;
+					byte_t *tramp = THIS_TRAMPOLINE_BASE;
+					pv = pagedir_push_mapone(tramp, pc_phys & ~PAGEMASK,
+					                         PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
+					pagedir_syncone(tramp);
+					ok = x86_fsgsbase_patch(tramp + (uintptr_t)(pc_phys & ~PAGEMASK), pc);
+					pagedir_pop_mapone(tramp, pv);
+				} else {
+					/* Cross-page instruction patching! */
+					void *tempaddr;
+					tempaddr = vm_getfree(&vm_kernel,
+					                      HINT_GETADDR(KERNEL_VMHINT_TEMPORARY),
+					                      2 * PAGESIZE,
+					                      PAGESIZE,
+					                      HINT_GETMODE(KERNEL_VMHINT_TEMPORARY));
+					if (tempaddr != VM_GETFREE_ERROR) {
+						if (pagedir_prepare_map(tempaddr, 2 * PAGESIZE)) {
+							pagedir_map(tempaddr, 2 * PAGESIZE, pc_phys & ~PAGEMASK,
+							            PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
+							pagedir_sync(tempaddr, 2 * PAGESIZE);
+							ok = x86_fsgsbase_patch((byte_t *)tempaddr +
+							                        ((uintptr_t)pc & PAGEMASK),
+							                        pc);
+							pagedir_unmap(tempaddr, 2 * PAGESIZE);
+							pagedir_unprepare_map(tempaddr, 2 * PAGESIZE);
+						}
+					}
+				}
+			}
+			sync_endwrite(&vm_kernel);
+		}
+	}
+	decref_unlikely(d);
+done:
+	if (ok)
+		__flush_instruction_cache();
+	return ok;
+}
+
+/* NOTE: Only patch 64-bit, kernel-space segment accesses.
+ *       The 32-bit variants can't be patched because they
+ *       are only encoded with 4 bytes, but we need 5 bytes
+ *       for the patch */
+#define PATCH_FSGSBASE(pc)                                \
+	if (!EMU86_ISUSER() && (op_flags & EMU86_F_REX_W) &&  \
+	    BAD_USAGE_REASON(usage) == BAD_USAGE_REASON_UD) { \
+		patch_fsgsbase_at(pc);                            \
+	}
+#define EMU86_EMULATE_PATCH_RDFSBASE(pc) PATCH_FSGSBASE(pc)
+#define EMU86_EMULATE_PATCH_RDGSBASE(pc) PATCH_FSGSBASE(pc)
+#define EMU86_EMULATE_PATCH_WRFSBASE(pc) PATCH_FSGSBASE(pc)
+#define EMU86_EMULATE_PATCH_WRGSBASE(pc) PATCH_FSGSBASE(pc)
+#endif /* __x86_64__ */
 
 
 DECL_END

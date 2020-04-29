@@ -1353,6 +1353,10 @@ void EMU86_EMULATE_WRDR14(EMU86_UREG_TYPE value);           /* EMU86_EMULATE_CON
 void EMU86_EMULATE_WRDR15(EMU86_UREG_TYPE value);           /* EMU86_EMULATE_CONFIG_WANT_MOV_DREG */
 bool EMU86_EMULATE_LAR(u16 value, u16 &result);             /* EMU86_EMULATE_CONFIG_WANT_LAR */
 bool EMU86_EMULATE_LSL(u16 value, EMU86_UREG_TYPE &result); /* EMU86_EMULATE_CONFIG_WANT_LSL */
+void EMU86_EMULATE_PATCH_RDFSBASE(void *pc);                /* EMU86_EMULATE_CONFIG_WANT_RDFSBASE */
+void EMU86_EMULATE_PATCH_RDGSBASE(void *pc);                /* EMU86_EMULATE_CONFIG_WANT_RDGSBASE */
+void EMU86_EMULATE_PATCH_WRFSBASE(void *pc);                /* EMU86_EMULATE_CONFIG_WANT_WRFSBASE */
+void EMU86_EMULATE_PATCH_WRGSBASE(void *pc);                /* EMU86_EMULATE_CONFIG_WANT_WRGSBASE */
 bool EMU86_SETFSBASE(EMU86_UREG_TYPE value);                /* EMU86_EMULATE_CONFIG_WANT_WRFSBASE */
 bool EMU86_SETGSBASE(EMU86_UREG_TYPE value);                /* EMU86_EMULATE_CONFIG_WANT_WRGSBASE */
 u64 EMU86_EMULATE_RDMSR(u32 index);                         /* EMU86_EMULATE_CONFIG_WANT_RDMSR */
@@ -4011,7 +4015,6 @@ checklock_modrm_memory_parsed:
 			/* XXX: rdsspq     (if only for verbose exception messages?) */
 			/* XXX: endbr64    (if only for verbose exception messages?) */
 			/* XXX: endbr32    (if only for verbose exception messages?) */
-			/* XXX: rdecr      (if only for verbose exception messages?) */
 			/* XXX: getsec     (if only for verbose exception messages?) */
 			/* XXX: 0x0f3f:jmp (if only for verbose exception messages?) */
 

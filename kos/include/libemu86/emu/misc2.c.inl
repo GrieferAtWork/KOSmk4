@@ -58,6 +58,9 @@ case EMU86_OPCODE_ENCODE(0x0fae): {
 			/* F3       0F AE /0     RDFSBASE r32     Load the 32-bit destination register with the FS base address.
 			 * F3 REX.W 0F AE /0     RDFSBASE r64     Load the 64-bit destination register with the FS base address. */
 			EMU86_UREG_TYPE value;
+#ifdef EMU86_EMULATE_PATCH_RDFSBASE
+			EMU86_EMULATE_PATCH_RDFSBASE(start_pc);
+#endif /* EMU86_EMULATE_PATCH_RDFSBASE */
 			value = (EMU86_UREG_TYPE)(uintptr_t)EMU86_GETFSBASE();
 			IF_64BIT(if (IS_64BIT()) {
 				MODRM_SETRMREGQ(value);
@@ -78,6 +81,9 @@ case EMU86_OPCODE_ENCODE(0x0fae): {
 			/* F3       0F AE /1     RDGSBASE r32     Load the 32-bit destination register with the GS base address.
 			 * F3 REX.W 0F AE /1     RDGSBASE r64     Load the 64-bit destination register with the GS base address. */
 			EMU86_UREG_TYPE value;
+#ifdef EMU86_EMULATE_PATCH_RDGSBASE
+			EMU86_EMULATE_PATCH_RDGSBASE(start_pc);
+#endif /* EMU86_EMULATE_PATCH_RDGSBASE */
 			value = (EMU86_UREG_TYPE)(uintptr_t)EMU86_GETGSBASE();
 			IF_64BIT(if (IS_64BIT()) {
 				MODRM_SETRMREGQ(value);
@@ -98,6 +104,9 @@ case EMU86_OPCODE_ENCODE(0x0fae): {
 			/* F3       0F AE /2     WRFSBASE r32     Load the FS base address with the 32-bit value in the source register.
 			 * F3 REX.W 0F AE /2     WRFSBASE r64     Load the FS base address with the 64-bit value in the source register. */
 			EMU86_UREG_TYPE value;
+#ifdef EMU86_EMULATE_PATCH_WRFSBASE
+			EMU86_EMULATE_PATCH_WRFSBASE(start_pc);
+#endif /* EMU86_EMULATE_PATCH_WRFSBASE */
 			IF_64BIT(if (IS_64BIT()) {
 				value = MODRM_GETRMREGQ();
 				EMU86_VALIDATE_CANONICAL(value);
@@ -122,11 +131,14 @@ case EMU86_OPCODE_ENCODE(0x0fae): {
 #define NEED_return_unsupported_instruction_rmreg
 #endif /* ... */
 	
-#if EMU86_EMULATE_CONFIG_WANT_WRFSBASE && defined(EMU86_SETGSBASE)
+#if EMU86_EMULATE_CONFIG_WANT_WRGSBASE && defined(EMU86_SETGSBASE)
 		case 3: {
 			/* F3       0F AE /3     WRGSBASE r32     Load the GS base address with the 32-bit value in the source register.
 			 * F3 REX.W 0F AE /3     WRGSBASE r64     Load the GS base address with the 64-bit value in the source register. */
 			EMU86_UREG_TYPE value;
+#ifdef EMU86_EMULATE_PATCH_WRGSBASE
+			EMU86_EMULATE_PATCH_WRGSBASE(start_pc);
+#endif /* EMU86_EMULATE_PATCH_WRGSBASE */
 			IF_64BIT(if (IS_64BIT()) {
 				value = MODRM_GETRMREGQ();
 				EMU86_VALIDATE_CANONICAL(value);

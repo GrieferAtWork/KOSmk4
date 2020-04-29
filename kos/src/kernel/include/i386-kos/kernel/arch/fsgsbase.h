@@ -55,7 +55,7 @@ __ASM_BEGIN
 #undef wrfsbase
 #undef wrgsbase
 
-#ifdef CONFIG_ASSUME_CPU_SUPPORTS_FSGSBASE
+#if defined(CONFIG_ASSUME_CPU_SUPPORTS_FSGSBASE) || !defined(CONFIG_BUILDING_KERNEL_CORE)
 __ASM_L(.macro safe_rdfsbase reg:req)
 __ASM_L(	rdfsbase __ASM_ARG(\reg))
 __ASM_L(.endm)
@@ -72,16 +72,9 @@ __ASM_L(.macro safe_wrgsbase reg:req)
 __ASM_L(	wrgsbase __ASM_ARG(\reg))
 __ASM_L(.endm)
 
-#else /* CONFIG_ASSUME_CPU_SUPPORTS_FSGSBASE */
+#else /* CONFIG_ASSUME_CPU_SUPPORTS_FSGSBASE || !CONFIG_BUILDING_KERNEL_CORE */
 
-#ifdef CONFIG_BUILDING_KERNEL_CORE
 #define __MODREL_POINTER(x) .int x - KERNEL_CORE_BASE
-#elif defined(__x86_64__)
-#define __MODREL_POINTER(x) .reloc ., R_X86_64_RELATIVE, x; .quad 0
-#else
-#define __MODREL_POINTER(x) .reloc ., R_X86_64_RELATIVE, x; .quad 0
-#endif
-
 __ASM_L(.macro safe_rdfsbase reg:req)
 __ASM_L(.pushsection .rodata.free.x86.fixup_fsgsbase)
 __ASM_L(	__MODREL_POINTER(991f))
@@ -110,7 +103,7 @@ __ASM_L(.popsection)
 __ASM_L(991: wrgsbase __ASM_ARG(\reg))
 __ASM_L(.endm)
 #undef __MODREL_POINTER
-#endif /* !CONFIG_ASSUME_CPU_SUPPORTS_FSGSBASE */
+#endif /* !CONFIG_ASSUME_CPU_SUPPORTS_FSGSBASE && CONFIG_BUILDING_KERNEL_CORE */
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma pop_macro("wrgsbase")

@@ -33,6 +33,7 @@
 #include <kernel/types.h>
 
 #include <hybrid/unaligned.h>
+#include <hybrid/atomic.h>
 
 #include <asm/cpu-cpuid.h>
 
@@ -99,13 +100,18 @@ PRIVATE ATTR_COLDRODATA fsgsbase_patches_t const fsgsbase_patches = {
 /* Patch one of the (rd|wr)(fs|gs)base instructions at `pc' to instead
  * become a call to one of the internal functions capable of emulating
  * the behavior of the instruction.
+ * WARNING: Only the 64-bit variants of these instructions can be patched!
+ *          The 32-bit variants cannot.
  * Before using this function, the caller should check that fsgsbase really
  * isn't supported by the host CPU, as indicated by `CPUID_7B_FSGSBASE'
- * @return: true:  Successfully patched the given code location.
- * @return: false: The given code location was already patched,
- *                 or isn't one of the above instructions. */
+ * @param: real_pc: The real PC that should be used for DISP-offsets.
+ *                  May differ from `pc' when `pc' points into an aliasing
+ *                  memory mapping with write-access
+ * @return: true:   Successfully patched the given code location.
+ * @return: false:  The given code location was already patched,
+ *                  or isn't one of the above instructions. */
 PUBLIC ATTR_COLDTEXT NOBLOCK bool
-NOTHROW(FCALL x86_fsgsbase_patch)(void *__restrict pc) {
+NOTHROW(FCALL x86_fsgsbase_patch)(void *pc, void const *real_pc) {
 	/* F3 REX.W 0F AE /0 RDFSBASE r64 */
 	/* F3 REX.W 0F AE /1 RDGSBASE r64 */
 	/* F3 REX.W 0F AE /2 WRFSBASE r64 */
@@ -148,17 +154,30 @@ NOTHROW(FCALL x86_fsgsbase_patch)(void *__restrict pc) {
 	}
 	patch = fsgsbase_patches[method][regno];
 	/* Generate a call to `patch' */
-	pcrel = (intptr_t)patch - (intptr_t)(code + 5);
-#if 0 /* This can't happen because that would mean that `pc' is outside of the kernel's memory region. */
+	pcrel = (intptr_t)patch - (intptr_t)((byte_t *)real_pc + 5);
 	if unlikely(!(pcrel >= INT32_MIN || pcrel <= INT32_MAX))
 		return false; /* Code is too far apart. */
-#else
-	assertf(pcrel >= INT32_MIN || pcrel <= INT32_MAX,
-	        "Attempted to patch code at %p, which is outside of the -2Gib...+2Gib range", pc);
-#endif
 	/* Patch the affected code location. */
-	code[0] = 0xe8;
-	UNALIGNED_SET32((u32 *)(code + 1), (u32)pcrel);
+	{
+		union {
+			u64 qword;
+			u8  bytes[8];
+		} oldword, newword;
+		unsigned int patch_offset = 0;
+		if (((uintptr_t)code & PAGEMASK) >= PAGESIZE - 8) {
+			patch_offset = 3;
+			code -= 3;
+		}
+		/* Use atomics to modify memory to ensure that code is always in a consistent state! */
+		do {
+			oldword.qword = ATOMIC_READ(*(u64 *)code);
+			newword.qword = oldword.qword;
+			newword.bytes[patch_offset] = 0xe8;
+			UNALIGNED_SET32((u32 *)&newword.bytes[patch_offset + 1], (u32)pcrel);
+		} while (!ATOMIC_CMPXCH_WEAK(*(u64 *)code,
+		                             oldword.qword,
+		                             newword.qword));
+	}
 	return true;
 }
 
@@ -180,7 +199,7 @@ NOTHROW(KCALL x86_initialize_fsgsbase)(void) {
 	for (iter = __x86_fixup_fsgsbase_start;
 	     iter < __x86_fixup_fsgsbase_end; ++iter) {
 		uintptr_t pc = KERNEL_CORE_BASE + *iter;
-		bool was_ok = x86_fsgsbase_patch((void *)pc);
+		bool was_ok = x86_fsgsbase_patch((void *)pc, (void *)pc);
 		if unlikely(!was_ok)
 			kernel_panic(FREESTR("Failed to patch fsgsbase instruction at %p\n"), pc);
 	}

@@ -36,10 +36,14 @@ DECL_BEGIN
  *          The 32-bit variants cannot.
  * Before using this function, the caller should check that fsgsbase really
  * isn't supported by the host CPU, as indicated by `CPUID_7B_FSGSBASE'
- * @return: true:  Successfully patched the given code location.
- * @return: false: The given code location was already patched,
- *                 or isn't one of the above instructions. */
-FUNDEF NOBLOCK bool NOTHROW(FCALL x86_fsgsbase_patch)(void *__restrict pc);
+ * @param: real_pc: The real PC that should be used for DISP-offsets.
+ *                  May differ from `pc' when `pc' points into an aliasing
+ *                  memory mapping with write-access
+ * @return: true:   Successfully patched the given code location.
+ * @return: false:  The given code location was already patched,
+ *                  or isn't one of the above instructions. */
+FUNDEF NOBLOCK bool
+NOTHROW(FCALL x86_fsgsbase_patch)(void *pc, void const *real_pc);
 #endif /* __CC__ */
 
 DECL_END
