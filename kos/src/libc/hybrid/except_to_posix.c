@@ -192,7 +192,8 @@ NOTHROW_NCX_KERNEL(LIBCCALL libc_error_as_signal)(struct exception_data const *_
 
 		case ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND):
 			result->si_code = ILL_ILLOPN;
-			if (data->e_pointers[1] == E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE)
+			if (data->e_pointers[2] == E_ILLEGAL_INSTRUCTION_BAD_OPERAND_UNEXPECTED_MEMORY ||
+			    data->e_pointers[2] == E_ILLEGAL_INSTRUCTION_BAD_OPERAND_UNEXPECTED_REGISTER)
 				result->si_code = ILL_ILLADR;
 			break;
 

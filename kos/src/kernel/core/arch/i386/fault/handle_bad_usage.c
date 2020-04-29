@@ -282,6 +282,8 @@ x86_handle_bad_usage(struct icpustate *__restrict state, bad_usage_reason_t usag
 #define EMU86_EMULATE_CONFIG_WANT_LGDT          0
 #define EMU86_EMULATE_CONFIG_WANT_XEND          1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_XTEST         1 /* Emulate non-standard instructions */
+#define EMU86_EMULATE_CONFIG_WANT_XGETBV        0
+#define EMU86_EMULATE_CONFIG_WANT_XSETBV        0
 #define EMU86_EMULATE_CONFIG_WANT_MCOMMIT       1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_CLZERO        1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_SIDT          0

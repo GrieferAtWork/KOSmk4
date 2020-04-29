@@ -227,27 +227,27 @@
 #endif /* !__x86_64__ */
 
 /* Misc. registers. */
-#define X86_REGISTER_MISC               __UINT16_C(0xe000)
-#   define X86_REGISTER_MISC_EFLAGS     __UINT16_C(0xe400) /* %eflags */
-#   define X86_REGISTER_MISC_FLAGS      __UINT16_C(0xe800) /* %flags */
-#   define X86_REGISTER_MISC_EIP        __UINT16_C(0xe401) /* %eip */
-#   define X86_REGISTER_MISC_IP         __UINT16_C(0xe801) /* %ip */
+#define X86_REGISTER_MISC               __UINT16_C(0x9000)
+#   define X86_REGISTER_MISC_EFLAGS     __UINT16_C(0x9400) /* %eflags */
+#   define X86_REGISTER_MISC_FLAGS      __UINT16_C(0x9800) /* %flags */
+#   define X86_REGISTER_MISC_EIP        __UINT16_C(0x9401) /* %eip */
+#   define X86_REGISTER_MISC_IP         __UINT16_C(0x9801) /* %ip */
 #ifdef __x86_64__
-#   define X86_REGISTER_MISC_RFLAGS     __UINT16_C(0xe000) /* %rflags */
-#   define X86_REGISTER_MISC_RIP        __UINT16_C(0xe001) /* %rip */
+#   define X86_REGISTER_MISC_RFLAGS     __UINT16_C(0x9000) /* %rflags */
+#   define X86_REGISTER_MISC_RIP        __UINT16_C(0x9001) /* %rip */
 #endif /* __x86_64__ */
-#   define X86_REGISTER_MISC_TR         __UINT16_C(0xe810) /* %tr (ltr, str; TaskRegister) */
-#   define X86_REGISTER_MISC_LDT        __UINT16_C(0xe811) /* %ldt (lldt, sldt; LocalDescriptorTable) */
-#   define X86_REGISTER_MISC_GDT_LIMIT  __UINT16_C(0xe812) /* %gdt.limit (lgdt, sgdt; GlobalDescriptorTable) */
-#   define X86_REGISTER_MISC_GDT_BASEL  __UINT16_C(0xe413) /* %gdt.basel (lgdt, sgdt; GlobalDescriptorTable) */
-#   define X86_REGISTER_MISC_IDT_LIMIT  __UINT16_C(0xe814) /* %idt.limit (lidt, sidt; InterruptDescriptorTable) */
-#   define X86_REGISTER_MISC_IDT_BASEL  __UINT16_C(0xe415) /* %idt.basel (lidt, sidt; InterruptDescriptorTable) */
+#   define X86_REGISTER_MISC_TR         __UINT16_C(0x9810) /* %tr (ltr, str; TaskRegister) */
+#   define X86_REGISTER_MISC_LDT        __UINT16_C(0x9811) /* %ldt (lldt, sldt; LocalDescriptorTable) */
+#   define X86_REGISTER_MISC_GDT_LIMIT  __UINT16_C(0x9812) /* %gdt.limit (lgdt, sgdt; GlobalDescriptorTable) */
+#   define X86_REGISTER_MISC_GDT_BASEL  __UINT16_C(0x9413) /* %gdt.basel (lgdt, sgdt; GlobalDescriptorTable) */
+#   define X86_REGISTER_MISC_IDT_LIMIT  __UINT16_C(0x9814) /* %idt.limit (lidt, sidt; InterruptDescriptorTable) */
+#   define X86_REGISTER_MISC_IDT_BASEL  __UINT16_C(0x9415) /* %idt.basel (lidt, sidt; InterruptDescriptorTable) */
 #ifdef __x86_64__
-#   define X86_REGISTER_MISC_GDT_BASEQ  __UINT16_C(0xe013) /* %gdt.baseq (lgdt, sgdt; GlobalDescriptorTable) */
-#   define X86_REGISTER_MISC_IDT_BASEQ  __UINT16_C(0xe015) /* %idt.baseq (lidt, sidt; InterruptDescriptorTable) */
+#   define X86_REGISTER_MISC_GDT_BASEQ  __UINT16_C(0x9013) /* %gdt.baseq (lgdt, sgdt; GlobalDescriptorTable) */
+#   define X86_REGISTER_MISC_IDT_BASEQ  __UINT16_C(0x9015) /* %idt.baseq (lidt, sidt; InterruptDescriptorTable) */
 #endif /* __x86_64__ */
-#   define X86_REGISTER_MISC_FSBASEL    __UINT16_C(0xe420) /* %fs.basel */
-#   define X86_REGISTER_MISC_GSBASEL    __UINT16_C(0xe421) /* %gs.basel */
+#   define X86_REGISTER_MISC_FSBASEL    __UINT16_C(0x9420) /* %fs.basel */
+#   define X86_REGISTER_MISC_GSBASEL    __UINT16_C(0x9421) /* %gs.basel */
 #ifdef __x86_64__
 /* NOTE:
  *   - `X86_REGISTER_MISC_GSBASE(L|Q)' always refers to the
@@ -265,32 +265,35 @@
  *     >> // Not actually allowed to be read, but this is what you ~would~ have to do
  *     >> __rdmsr(IA32_KERNEL_GS_BASE);
  *     >> #endif */
-#   define X86_REGISTER_MISC_FSBASEQ    __UINT16_C(0xe020) /* %fs.baseq (user-space) */
-#   define X86_REGISTER_MISC_GSBASEQ    __UINT16_C(0xe021) /* %gs.baseq (user-space) */
-#   define X86_REGISTER_MISC_KGSBASEL   __UINT16_C(0xe422) /* %kernel_gs.baseq (kernel-space; should always equal `THIS_TASK') */
-#   define X86_REGISTER_MISC_KGSBASEQ   __UINT16_C(0xe022) /* %kernel_gs.baseq (kernel-space; should always equal `THIS_TASK') */
+#   define X86_REGISTER_MISC_FSBASEQ    __UINT16_C(0x9020) /* %fs.baseq (user-space) */
+#   define X86_REGISTER_MISC_GSBASEQ    __UINT16_C(0x9021) /* %gs.baseq (user-space) */
+#   define X86_REGISTER_MISC_KGSBASEL   __UINT16_C(0x9422) /* %kernel_gs.baseq (kernel-space; should always equal `THIS_TASK') */
+#   define X86_REGISTER_MISC_KGSBASEQ   __UINT16_C(0x9022) /* %kernel_gs.baseq (kernel-space; should always equal `THIS_TASK') */
 #endif /* __x86_64__ */
-#   define X86_REGISTER_MISC_FCW        __UINT16_C(0xe830) /* %fcw (FpuControlWord; `sfpuenv::fe_fcw,sfpustate::fs_fcw,xfpustate::fx_fcw') */
-#   define X86_REGISTER_MISC_FSW        __UINT16_C(0xe831) /* %fsw (FpuStatusWord; `sfpuenv::fe_fsw,sfpustate::fs_fsw,xfpustate::fx_fsw') */
-#   define X86_REGISTER_MISC_FTW        __UINT16_C(0xe832) /* %ftw (FpuTagWord; `sfpuenv::fe_ftw,sfpustate::fs_ftw') */
-#   define X86_REGISTER_MISC_FTWX       __UINT16_C(0xec33) /* %ftwx (FpuTagWordX; `xfpustate::fx_ftw') */
-#   define X86_REGISTER_MISC_FOP        __UINT16_C(0xe834) /* %fop (FpuOPcode; `sfpuenv::fe_fop,sfpustate::fs_fop,xfpustate::fx_fop')
+#   define X86_REGISTER_MISC_FCW        __UINT16_C(0x9830) /* %fcw (FpuControlWord; `sfpuenv::fe_fcw,sfpustate::fs_fcw,xfpustate::fx_fcw') */
+#   define X86_REGISTER_MISC_FSW        __UINT16_C(0x9831) /* %fsw (FpuStatusWord; `sfpuenv::fe_fsw,sfpustate::fs_fsw,xfpustate::fx_fsw') */
+#   define X86_REGISTER_MISC_FTW        __UINT16_C(0x9832) /* %ftw (FpuTagWord; `sfpuenv::fe_ftw,sfpustate::fs_ftw') */
+#   define X86_REGISTER_MISC_FTWX       __UINT16_C(0x9c33) /* %ftwx (FpuTagWordX; `xfpustate::fx_ftw') */
+#   define X86_REGISTER_MISC_FOP        __UINT16_C(0x9834) /* %fop (FpuOPcode; `sfpuenv::fe_fop,sfpustate::fs_fop,xfpustate::fx_fop')
                                                 * NOTE: actually an 11-bit register */
-#   define X86_REGISTER_MISC_FIPL       __UINT16_C(0xe435) /* %fipl (FpuInstructionPointer; `sfpuenv::fe_fip,sfpustate::fs_fip,xfpustate::fx_fip') */
-#   define X86_REGISTER_MISC_FCS        __UINT16_C(0xe836) /* %fcs (FpuCodeSegment; `sfpuenv::fe_fcs,sfpustate::fs_fcs') (NOTE: Always `0' for `xfpustate') */
-#   define X86_REGISTER_MISC_FDPL       __UINT16_C(0xe437) /* %fdpl (FpuDataPointer; `sfpuenv::fe_fdp,sfpustate::fs_fdp,xfpustate::fx_fdp') */
-#   define X86_REGISTER_MISC_FDS        __UINT16_C(0xe838) /* %fds (FpuDataSegment; `sfpuenv::fe_fds,sfpustate::fs_fds') (NOTE: Always `0' for `xfpustate') */
+#   define X86_REGISTER_MISC_FIPL       __UINT16_C(0x9435) /* %fipl (FpuInstructionPointer; `sfpuenv::fe_fip,sfpustate::fs_fip,xfpustate::fx_fip') */
+#   define X86_REGISTER_MISC_FCS        __UINT16_C(0x9836) /* %fcs (FpuCodeSegment; `sfpuenv::fe_fcs,sfpustate::fs_fcs') (NOTE: Always `0' for `xfpustate') */
+#   define X86_REGISTER_MISC_FDPL       __UINT16_C(0x9437) /* %fdpl (FpuDataPointer; `sfpuenv::fe_fdp,sfpustate::fs_fdp,xfpustate::fx_fdp') */
+#   define X86_REGISTER_MISC_FDS        __UINT16_C(0x9838) /* %fds (FpuDataSegment; `sfpuenv::fe_fds,sfpustate::fs_fds') (NOTE: Always `0' for `xfpustate') */
 #ifdef __x86_64__
-#   define X86_REGISTER_MISC_FIPQ       __UINT16_C(0xe035) /* %fipq (FpuInstructionPointer; `sfpuenv::fe_fip,sfpustate::fs_fip,xfpustate::fx_fip') */
-#   define X86_REGISTER_MISC_FDPQ       __UINT16_C(0xe037) /* %fdpq (FpuDataPointer; `sfpuenv::fe_fdp,sfpustate::fs_fdp,xfpustate::fx_fdp') */
+#   define X86_REGISTER_MISC_FIPQ       __UINT16_C(0x9035) /* %fipq (FpuInstructionPointer; `sfpuenv::fe_fip,sfpustate::fs_fip,xfpustate::fx_fip') */
+#   define X86_REGISTER_MISC_FDPQ       __UINT16_C(0x9037) /* %fdpq (FpuDataPointer; `sfpuenv::fe_fdp,sfpustate::fs_fdp,xfpustate::fx_fdp') */
 #endif /* __x86_64__ */
-#   define X86_REGISTER_MISC_MXCSR      __UINT16_C(0xe439) /* %mxcsr (MXCSR (SSE only); `xfpustate::fx_mxcsr') */
-#   define X86_REGISTER_MISC_MXCSR_MASK __UINT16_C(0xe43a) /* %mxcsr_mask (MXCSR mask (SSE only); `xfpustate::fx_mxcsr_mask') */
+#   define X86_REGISTER_MISC_MXCSR      __UINT16_C(0x9439) /* %mxcsr (MXCSR (SSE only); `xfpustate::fx_mxcsr') */
+#   define X86_REGISTER_MISC_MXCSR_MASK __UINT16_C(0x943a) /* %mxcsr_mask (MXCSR mask (SSE only); `xfpustate::fx_mxcsr_mask') */
 
-/* Performance counter register */
+/* Extended Control Register */
+#define X86_REGISTER_XCR __UINT16_C(0xd000)
+
+/* Performance Counter Register */
 #define X86_REGISTER_PCR __UINT16_C(0xe000)
 
-/* Model-specific registers. */
+/* Model-Specific Registers. */
 #define X86_REGISTER_MSR __UINT16_C(0xf000)
 
 

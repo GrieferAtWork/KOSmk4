@@ -327,20 +327,28 @@ NOTHROW(KCALL print_exception_desc_of)(struct exception_data const *__restrict d
 
 		case E_ILLEGAL_INSTRUCTION_BAD_OPERAND: {
 			char const *what_name;
-			switch (data->e_pointers[1]) {
-			case E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE:
+			switch (data->e_pointers[2]) {
+
+			case E_ILLEGAL_INSTRUCTION_BAD_OPERAND_UNEXPECTED_MEMORY:
+			case E_ILLEGAL_INSTRUCTION_BAD_OPERAND_UNEXPECTED_REGISTER:
 				what_name = "addrmode";
 				break;
-			default: what_name = NULL; break;
+
+			case E_ILLEGAL_INSTRUCTION_BAD_OPERAND_VALUE:
+				what_name = "value";
+				break;
+
+			default:
+				what_name = NULL;
+				break;
 			}
 			if (what_name) {
 				format_printf(printer, arg, " [what=%s]", what_name);
 			} else {
 				format_printf(printer, arg, " [what=?(%#Ix)]",
-				              data->e_pointers[1]);
+				              data->e_pointers[2]);
 			}
-		}
-		break;
+		}	break;
 
 		case E_ILLEGAL_INSTRUCTION_REGISTER: {
 			char const *name;

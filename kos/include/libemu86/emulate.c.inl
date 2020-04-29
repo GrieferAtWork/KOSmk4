@@ -549,6 +549,12 @@ __DECL_BEGIN
 #ifndef EMU86_EMULATE_CONFIG_WANT_XTEST
 #define EMU86_EMULATE_CONFIG_WANT_XTEST (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
 #endif /* !EMU86_EMULATE_CONFIG_WANT_XTEST */
+#ifndef EMU86_EMULATE_CONFIG_WANT_XGETBV
+#define EMU86_EMULATE_CONFIG_WANT_XGETBV (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_XGETBV */
+#ifndef EMU86_EMULATE_CONFIG_WANT_XSETBV
+#define EMU86_EMULATE_CONFIG_WANT_XSETBV (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_XSETBV */
 #ifndef EMU86_EMULATE_CONFIG_WANT_MCOMMIT
 #define EMU86_EMULATE_CONFIG_WANT_MCOMMIT (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
 #endif /* !EMU86_EMULATE_CONFIG_WANT_MCOMMIT */
@@ -1353,6 +1359,8 @@ void EMU86_EMULATE_MFENCE(void);                            /* EMU86_EMULATE_CON
 void EMU86_EMULATE_FENCELOCK(void);                         /* EMU86_EMULATE_CONFIG_WANT_LFENCE || EMU86_EMULATE_CONFIG_WANT_SFENCE || EMU86_EMULATE_CONFIG_WANT_MFENCE */
 bool EMU86_EMULATE_TPAUSE(bool want_c01, u64 tsc_deadline); /* EMU86_EMULATE_CONFIG_WANT_TPAUSE */
 void EMU86_EMULATE_CLZERO(void *addr);                      /* EMU86_EMULATE_CONFIG_WANT_CLZERO */
+u64 EMU86_EMULATE_XGETBV(u32 index);                        /* EMU86_EMULATE_CONFIG_WANT_XGETBV */
+void EMU86_EMULATE_XSETBV(u32 index, u64 value);            /* EMU86_EMULATE_CONFIG_WANT_XSETBV */
 #endif
 
 
@@ -3922,20 +3930,10 @@ checklock_modrm_memory_parsed:
 			goto generic_failure;
 #endif
 
-			/* XXX: invpcid    (if only for verbose exception messages?) */
-			/* XXX: tpause     (if only for verbose exception messages?) */
 			/* XXX: xrstor     (if only for verbose exception messages?) */
 			/* XXX: xrstor64   (if only for verbose exception messages?) */
-			/* XXX: fxrstor    (if only for verbose exception messages?) */
-			/* XXX: fxrstor64  (if only for verbose exception messages?) */
 			/* XXX: xsave      (if only for verbose exception messages?) */
 			/* XXX: xsave64    (if only for verbose exception messages?) */
-			/* XXX: fxsave     (if only for verbose exception messages?) */
-			/* XXX: fxsave64   (if only for verbose exception messages?) */
-			/* XXX: ldmxcsr    (Can throw a #GPF when attempting to set a reserved bit) */
-			/* XXX: vldmxcsr   (if only for verbose exception messages?) */
-			/* XXX: vstmxcsr   (if only for verbose exception messages?) */
-			/* XXX: stmxcsr    (if only for verbose exception messages?) */
 			/* XXX: xsaveopt   (if only for verbose exception messages?) */
 			/* XXX: xsaveopt64 (if only for verbose exception messages?) */
 			/* XXX: xrstors    (if only for verbose exception messages?) */
@@ -3944,6 +3942,19 @@ checklock_modrm_memory_parsed:
 			/* XXX: xsaves64   (if only for verbose exception messages?) */
 			/* XXX: xsavec     (if only for verbose exception messages?) */
 			/* XXX: xsavec64   (if only for verbose exception messages?) */
+			/* XXX: fxrstor    (if only for verbose exception messages?) */
+			/* XXX: fxrstor64  (if only for verbose exception messages?) */
+			/* XXX: fxsave     (if only for verbose exception messages?) */
+			/* XXX: fxsave64   (if only for verbose exception messages?) */
+			/* XXX: invpcid    (if only for verbose exception messages?) */
+			/* XXX: ldmxcsr    (Can throw a #GPF when attempting to set a reserved bit) */
+			/* XXX: vldmxcsr   (if only for verbose exception messages?) */
+			/* XXX: vstmxcsr   (if only for verbose exception messages?) */
+			/* XXX: stmxcsr    (if only for verbose exception messages?) */
+			/* XXX: monitor    (if only for verbose exception messages?) */
+			/* XXX: mwait      (if only for verbose exception messages?) */
+			/* XXX: encls      (if only for verbose exception messages?) */
+			/* XXX: enclu      (if only for verbose exception messages?) */
 			/* XXX: vmptrst    (if only for verbose exception messages?) */
 			/* XXX: vmxon      (if only for verbose exception messages?) */
 			/* XXX: vmclear    (if only for verbose exception messages?) */
@@ -3952,13 +3963,7 @@ checklock_modrm_memory_parsed:
 			/* XXX: vmlaunch   (if only for verbose exception messages?) */
 			/* XXX: vmresume   (if only for verbose exception messages?) */
 			/* XXX: vmxoff     (if only for verbose exception messages?) */
-			/* XXX: monitor    (if only for verbose exception messages?) */
-			/* XXX: mwait      (if only for verbose exception messages?) */
-			/* XXX: encls      (if only for verbose exception messages?) */
-			/* XXX: xgetbv     (if only for verbose exception messages?) */
-			/* XXX: xsetbv     (if only for verbose exception messages?) */
 			/* XXX: vmfunc     (if only for verbose exception messages?) */
-			/* XXX: enclu      (if only for verbose exception messages?) */
 			/* XXX: vmrun      (if only for verbose exception messages?) */
 			/* XXX: vmmcall    (if only for verbose exception messages?) */
 			/* XXX: vmload     (if only for verbose exception messages?) */

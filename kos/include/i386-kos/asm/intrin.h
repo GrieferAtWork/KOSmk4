@@ -602,6 +602,8 @@ __FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdpmc32)(__UINT32_TYPE__ __id) { 
 __FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdtsc32)(void) { __UINT32_TYPE__ __res; __asm__ __volatile__("rdtsc" : "=a" (__res) : : "rdx"); return __res; }
 __FORCELOCAL void (__wrmsr)(__UINT32_TYPE__ __id, __UINT64_TYPE__ __val) { union __ATTR_PACKED { __UINT32_TYPE__ __lohi[2]; __UINT64_TYPE__ __val; } __arg; __arg.__val = __val; __asm__ __volatile__("wrmsr" : : "c" (__id), "a" (__arg.__lohi[0]), "d" (__arg.__lohi[1])); }
 __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ (__rdtscp)(__UINT32_TYPE__ *__restrict __pprocessor_id) { union __ATTR_PACKED { __UINT32_TYPE__ __lohi[2]; __UINT64_TYPE__ __result; } __res; __asm__ __volatile__("rdtscp" : "=a" (__res.__lohi[0]), "=d" (__res.__lohi[1]), "=c" (*__pprocessor_id)); return __res.__result; }
+__FORCELOCAL __ATTR_WUNUSED __UINT64_TYPE__ (__xgetbv)(__UINT32_TYPE__ __id) { union __ATTR_PACKED { __UINT32_TYPE__ __lohi[2]; __UINT64_TYPE__ __result; } __res; __asm__ __volatile__("xgetbv" : "=a" (__res.__lohi[0]), "=d" (__res.__lohi[1]) : "c" (__id)); return __res.__result; }
+__FORCELOCAL void (__xsetbv)(__UINT32_TYPE__ __id, __UINT64_TYPE__ __val) { union __ATTR_PACKED { __UINT32_TYPE__ __lohi[2]; __UINT64_TYPE__ __val; } __arg; __arg.__val = __val; __asm__ __volatile__("xsetbv" : : "c" (__id), "a" (__arg.__lohi[0]), "d" (__arg.__lohi[1])); }
 #else /* __x86_64__ */
 __FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdpid)(void) { __UINT32_TYPE__ __res; __asm__ __volatile__("rdpid %k0" : "=r" (__res)); return __res; }
 __FORCELOCAL __ATTR_WUNUSED __UINT64_TYPE__ (__rdmsr)(__UINT32_TYPE__ __id) { __UINT64_TYPE__ __result; __asm__ __volatile__("rdmsr" : "=A" (__result) : "c" (__id)); return __result; }
@@ -612,6 +614,8 @@ __FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdpmc32)(__UINT32_TYPE__ __id) { 
 __FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdtsc32)(void) { __UINT32_TYPE__ __res; __asm__ __volatile__("rdtsc" : "=a" (__res) : : "edx"); return __res; }
 __FORCELOCAL void (__wrmsr)(__UINT32_TYPE__ __id, __UINT64_TYPE__ __val) { __asm__ __volatile__("wrmsr" : : "c" (__id), "A" (__val)); }
 __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ (__rdtscp)(__UINT32_TYPE__ *__restrict __pprocessor_id) { __UINT64_TYPE__ __result; __asm__ __volatile__("rdtscp" : "=A" (__result), "=c" (*__pprocessor_id)); return __result; }
+__FORCELOCAL __ATTR_WUNUSED __UINT64_TYPE__ (__xgetbv)(__UINT32_TYPE__ __id) { __UINT64_TYPE__ __result; __asm__ __volatile__("xgetbv" : "=A" (__result) : "c" (__id)); return __result; }
+__FORCELOCAL void (__xsetbv)(__UINT32_TYPE__ __id, __UINT64_TYPE__ __val) { __asm__ __volatile__("xsetbv" : : "c" (__id), "A" (__val)); }
 #endif /* !__x86_64__ */
 __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL (__rdrandw)(__UINT16_TYPE__ *__restrict __presult) { __BOOL __ok; __asm__ __volatile__("rdrand %w0" : "=r" (*__presult), "=@ccc" (__ok)); return __ok; }
 __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL (__rdseedw)(__UINT16_TYPE__ *__restrict __presult) { __BOOL __ok; __asm__ __volatile__("rdseed %w0" : "=r" (*__presult), "=@ccc" (__ok)); return __ok; }
@@ -621,6 +625,30 @@ __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL (__rdseedl)(__UINT32_TYPE
 __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL (__rdrandq)(__UINT64_TYPE__ *__restrict __presult) { __BOOL __ok; __asm__ __volatile__("rdrand %q0" : "=r" (*__presult), "=@ccc" (__ok)); return __ok; }
 __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL (__rdseedq)(__UINT64_TYPE__ *__restrict __presult) { __BOOL __ok; __asm__ __volatile__("rdseed %q0" : "=r" (*__presult), "=@ccc" (__ok)); return __ok; }
 #endif /* __x86_64__ */
+
+
+#ifdef __x86_64__
+__FORCELOCAL __ATTR_NONNULL((1)) void (__xsave)(void *__restrict __buf, __UINT64_TYPE__ __mask) { union __ATTR_PACKED { __UINT32_TYPE__ __lohi[2]; __UINT64_TYPE__ __val; } __umask; __umask.__val = __mask; __asm__ __volatile__("xsave %0" : "=m" (*(__UINT8_TYPE__ *)__buf) : "a" (__umask.__lohi[0]), "d" (__umask.__lohi[1]) : "memory"); }
+__FORCELOCAL __ATTR_NONNULL((1)) void (__xsave64)(void *__restrict __buf, __UINT64_TYPE__ __mask) { union __ATTR_PACKED { __UINT32_TYPE__ __lohi[2]; __UINT64_TYPE__ __val; } __umask; __umask.__val = __mask; __asm__ __volatile__("xsave64 %0" : "=m" (*(__UINT8_TYPE__ *)__buf) : "a" (__umask.__lohi[0]), "d" (__umask.__lohi[1]) : "memory"); }
+__FORCELOCAL __ATTR_NONNULL((1)) void (__xsaveopt)(void *__restrict __buf, __UINT64_TYPE__ __mask) { union __ATTR_PACKED { __UINT32_TYPE__ __lohi[2]; __UINT64_TYPE__ __val; } __umask; __umask.__val = __mask; __asm__ __volatile__("xsaveopt %0" : "=m" (*(__UINT8_TYPE__ *)__buf) : "a" (__umask.__lohi[0]), "d" (__umask.__lohi[1]) : "memory"); }
+__FORCELOCAL __ATTR_NONNULL((1)) void (__xsaveopt64)(void *__restrict __buf, __UINT64_TYPE__ __mask) { union __ATTR_PACKED { __UINT32_TYPE__ __lohi[2]; __UINT64_TYPE__ __val; } __umask; __umask.__val = __mask; __asm__ __volatile__("xsaveopt64 %0" : "=m" (*(__UINT8_TYPE__ *)__buf) : "a" (__umask.__lohi[0]), "d" (__umask.__lohi[1]) : "memory"); }
+__FORCELOCAL __ATTR_NONNULL((1)) void (__xrstor)(void const *__restrict __buf, __UINT64_TYPE__ __mask) { union __ATTR_PACKED { __UINT32_TYPE__ __lohi[2]; __UINT64_TYPE__ __val; } __umask; __umask.__val = __mask; __asm__ __volatile__("xrstor %0" : : "m" (*(__UINT8_TYPE__ const *)__buf), "a" (__umask.__lohi[0]), "d" (__umask.__lohi[1]) : "memory"); }
+__FORCELOCAL __ATTR_NONNULL((1)) void (__xrstor64)(void const *__restrict __buf, __UINT64_TYPE__ __mask) { union __ATTR_PACKED { __UINT32_TYPE__ __lohi[2]; __UINT64_TYPE__ __val; } __umask; __umask.__val = __mask; __asm__ __volatile__("xrstor64 %0" : : "m" (*(__UINT8_TYPE__ const *)__buf), "a" (__umask.__lohi[0]), "d" (__umask.__lohi[1]) : "memory"); }
+__FORCELOCAL __ATTR_NONNULL((1)) void (__xsaves)(void *__restrict __buf, __UINT64_TYPE__ __mask) { union __ATTR_PACKED { __UINT32_TYPE__ __lohi[2]; __UINT64_TYPE__ __val; } __umask; __umask.__val = __mask; __asm__ __volatile__("xsaves %0" : "=m" (*(__UINT8_TYPE__ *)__buf) : "a" (__umask.__lohi[0]), "d" (__umask.__lohi[1]) : "memory"); }
+__FORCELOCAL __ATTR_NONNULL((1)) void (__xsaves64)(void *__restrict __buf, __UINT64_TYPE__ __mask) { union __ATTR_PACKED { __UINT32_TYPE__ __lohi[2]; __UINT64_TYPE__ __val; } __umask; __umask.__val = __mask; __asm__ __volatile__("xsaves64 %0" : "=m" (*(__UINT8_TYPE__ *)__buf) : "a" (__umask.__lohi[0]), "d" (__umask.__lohi[1]) : "memory"); }
+__FORCELOCAL __ATTR_NONNULL((1)) void (__xsavec)(void *__restrict __buf, __UINT64_TYPE__ __mask) { union __ATTR_PACKED { __UINT32_TYPE__ __lohi[2]; __UINT64_TYPE__ __val; } __umask; __umask.__val = __mask; __asm__ __volatile__("xsavec %0" : "=m" (*(__UINT8_TYPE__ *)__buf) : "a" (__umask.__lohi[0]), "d" (__umask.__lohi[1]) : "memory"); }
+__FORCELOCAL __ATTR_NONNULL((1)) void (__xsavec64)(void *__restrict __buf, __UINT64_TYPE__ __mask) { union __ATTR_PACKED { __UINT32_TYPE__ __lohi[2]; __UINT64_TYPE__ __val; } __umask; __umask.__val = __mask; __asm__ __volatile__("xsavec64 %0" : "=m" (*(__UINT8_TYPE__ *)__buf) : "a" (__umask.__lohi[0]), "d" (__umask.__lohi[1]) : "memory"); }
+__FORCELOCAL __ATTR_NONNULL((1)) void (__xrstors)(void const *__restrict __buf, __UINT64_TYPE__ __mask) { union __ATTR_PACKED { __UINT32_TYPE__ __lohi[2]; __UINT64_TYPE__ __val; } __umask; __umask.__val = __mask; __asm__ __volatile__("xrstors %0" : : "m" (*(__UINT8_TYPE__ const *)__buf), "a" (__umask.__lohi[0]), "d" (__umask.__lohi[1]) : "memory"); }
+__FORCELOCAL __ATTR_NONNULL((1)) void (__xrstors64)(void const *__restrict __buf, __UINT64_TYPE__ __mask) { union __ATTR_PACKED { __UINT32_TYPE__ __lohi[2]; __UINT64_TYPE__ __val; } __umask; __umask.__val = __mask; __asm__ __volatile__("xrstors64 %0" : : "m" (*(__UINT8_TYPE__ const *)__buf), "a" (__umask.__lohi[0]), "d" (__umask.__lohi[1]) : "memory"); }
+#else /* __x86_64__ */
+__FORCELOCAL __ATTR_NONNULL((1)) void (__xsave)(void *__restrict __buf, __UINT64_TYPE__ __mask) { __asm__ __volatile__("xsave %0" : "=m" (*(__UINT8_TYPE__ *)__buf) : "A" (__mask) : "memory"); }
+__FORCELOCAL __ATTR_NONNULL((1)) void (__xsaveopt)(void *__restrict __buf, __UINT64_TYPE__ __mask) { __asm__ __volatile__("xsaveopt %0" : "=m" (*(__UINT8_TYPE__ *)__buf) : "A" (__mask) : "memory"); }
+__FORCELOCAL __ATTR_NONNULL((1)) void (__xrstor)(void const *__restrict __buf, __UINT64_TYPE__ __mask) { __asm__ __volatile__("xrstor %0" : : "m" (*(__UINT8_TYPE__ const *)__buf), "A" (__mask) : "memory"); }
+__FORCELOCAL __ATTR_NONNULL((1)) void (__xsaves)(void *__restrict __buf, __UINT64_TYPE__ __mask) { __asm__ __volatile__("xsaves %0" : "=m" (*(__UINT8_TYPE__ *)__buf) : "A" (__mask) : "memory"); }
+__FORCELOCAL __ATTR_NONNULL((1)) void (__xsavec)(void *__restrict __buf, __UINT64_TYPE__ __mask) { __asm__ __volatile__("xsavec %0" : "=m" (*(__UINT8_TYPE__ *)__buf) : "A" (__mask) : "memory"); }
+__FORCELOCAL __ATTR_NONNULL((1)) void (__xrstors)(void const *__restrict __buf, __UINT64_TYPE__ __mask) { __asm__ __volatile__("xrstors %0" : : "m" (*(__UINT8_TYPE__ const *)__buf), "A" (__mask) : "memory"); }
+#endif /* !__x86_64__ */
+
 
 
 #ifdef __x86_64__
