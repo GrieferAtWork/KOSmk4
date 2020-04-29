@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb1bfaa9a */
+/* HASH CRC-32:0xce8339b4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1386,17 +1386,22 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getwd, __FORCELOCAL __ATTR_DEPRECATED("Use getcw
 __CDECLARE(,__useconds_t,__NOTHROW_NCX,ualarm,(__useconds_t __value, __useconds_t __interval),(__value,__interval))
 #endif /* ualarm... */
 
+#ifndef __vfork_defined
+#define __vfork_defined 1
 #ifdef __CRT_HAVE_vfork
 /* >> vfork(2)
- * Same as `fork(2)', but suspend the calling process until the child
- * process either calls `exit(2)' or one of the many `exec(2)' functions */
+ * Same as `fork(2)', but possibly suspend the calling process until the
+ * child process either calls `exit(2)' or one of the many `exec(2)' functions */
 __CDECLARE(__ATTR_RETURNS_TWICE __ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,vfork,(void),())
 #elif defined(__CRT_HAVE___vfork)
 /* >> vfork(2)
- * Same as `fork(2)', but suspend the calling process until the child
- * process either calls `exit(2)' or one of the many `exec(2)' functions */
+ * Same as `fork(2)', but possibly suspend the calling process until the
+ * child process either calls `exit(2)' or one of the many `exec(2)' functions */
 __CREDIRECT(__ATTR_RETURNS_TWICE __ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,vfork,(void),__vfork,())
+#else /* LIBC: vfork */
+#undef __vfork_defined
 #endif /* vfork... */
+#endif /* !__vfork_defined */
 #endif /* (__USE_XOPEN_EXTENDED && !__USE_XOPEN2K8) || __USE_MISC */
 
 #ifdef __CRT_HAVE_fchown

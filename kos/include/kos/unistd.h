@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd1643760 */
+/* HASH CRC-32:0xa4b37a84 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -543,8 +543,8 @@ __CDECLARE_VOID(,__NOTHROW_NCX,SetResGid,(__gid_t __rgid, __gid_t __egid, __gid_
      defined(__USE_MISC)
 #ifdef __CRT_HAVE_VFork
 /* >> vfork(2)
- * Same as `fork(2)', but suspend the calling process until the child
- * process either calls `exit(2)' or one of the many `exec(2)' functions */
+ * Same as `fork(2)', but possibly suspend the calling process until the
+ * child process either calls `exit(2)' or one of the many `exec(2)' functions */
 __CDECLARE(__ATTR_RETURNS_TWICE __ATTR_WUNUSED,__pid_t,,VFork,(void),()) __THROWS(...)
 #endif /* VFork... */
 #endif

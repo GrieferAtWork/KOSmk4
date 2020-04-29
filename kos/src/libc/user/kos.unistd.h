@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf144da69 */
+/* HASH CRC-32:0x3f348704 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -208,8 +208,8 @@ INTDEF void NOTHROW_NCX(LIBCCALL libc_GetResGid)(gid_t *rgid, gid_t *egid, gid_t
 INTDEF void NOTHROW_NCX(LIBCCALL libc_SetResUid)(uid_t ruid, uid_t euid, uid_t suid);
 INTDEF void NOTHROW_NCX(LIBCCALL libc_SetResGid)(gid_t rgid, gid_t egid, gid_t sgid);
 /* >> vfork(2)
- * Same as `fork(2)', but suspend the calling process until the child
- * process either calls `exit(2)' or one of the many `exec(2)' functions */
+ * Same as `fork(2)', but possibly suspend the calling process until the
+ * child process either calls `exit(2)' or one of the many `exec(2)' functions */
 INTDEF ATTR_RETURNS_TWICE WUNUSED pid_t (LIBCCALL libc_VFork)(void) __THROWS(...);
 /* >> fchown(2)
  * Change the ownership of a given `FD' to `GROUP:OWNER' */

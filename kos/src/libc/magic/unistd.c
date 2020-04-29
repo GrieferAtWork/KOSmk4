@@ -1175,9 +1175,9 @@ ualarm:($useconds_t value, $useconds_t interval) -> $useconds_t;
 
 %
 @@>> vfork(2)
-@@Same as `fork(2)', but suspend the calling process until the child
-@@process either calls `exit(2)' or one of the many `exec(2)' functions
-[section(.text.crt.sched.access)][export_alias(__vfork)]
+@@Same as `fork(2)', but possibly suspend the calling process until the
+@@child process either calls `exit(2)' or one of the many `exec(2)' functions
+[section(.text.crt.sched.access)][export_alias(__vfork)][guard]
 [ATTR_RETURNS_TWICE][ATTR_WUNUSED] vfork:() -> $pid_t;
 %#endif /* (__USE_XOPEN_EXTENDED && !__USE_XOPEN2K8) || __USE_MISC */
 

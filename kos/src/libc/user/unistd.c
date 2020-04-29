@@ -1508,10 +1508,10 @@ err:
 }
 /*[[[end:ualarm]]]*/
 
-/*[[[head:vfork,hash:CRC-32=0xebaf332d]]]*/
+/*[[[head:vfork,hash:CRC-32=0x14960c03]]]*/
 /* >> vfork(2)
- * Same as `fork(2)', but suspend the calling process until the child
- * process either calls `exit(2)' or one of the many `exec(2)' functions */
+ * Same as `fork(2)', but possibly suspend the calling process until the
+ * child process either calls `exit(2)' or one of the many `exec(2)' functions */
 INTERN ATTR_RETURNS_TWICE WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.access.vfork") pid_t
 NOTHROW_NCX(LIBCCALL libc_vfork)(void)

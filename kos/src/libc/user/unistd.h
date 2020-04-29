@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x94b227b8 */
+/* HASH CRC-32:0x7e360869 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -307,8 +307,8 @@ INTDEF int NOTHROW_RPC(LIBCCALL libc_usleep)(useconds_t useconds);
 INTDEF ATTR_DEPRECATED("Use getcwd()") NONNULL((1)) char *NOTHROW_RPC(LIBCCALL libc_getwd)(char *buf);
 INTDEF useconds_t NOTHROW_NCX(LIBCCALL libc_ualarm)(useconds_t value, useconds_t interval);
 /* >> vfork(2)
- * Same as `fork(2)', but suspend the calling process until the child
- * process either calls `exit(2)' or one of the many `exec(2)' functions */
+ * Same as `fork(2)', but possibly suspend the calling process until the
+ * child process either calls `exit(2)' or one of the many `exec(2)' functions */
 INTDEF ATTR_RETURNS_TWICE WUNUSED pid_t NOTHROW_NCX(LIBCCALL libc_vfork)(void);
 /* >> fchown(2)
  * Change the ownership of a given `FD' to `GROUP:OWNER' */
