@@ -416,11 +416,81 @@ case EMU86_OPCODE_ENCODE_XOP(9, 0x02): {
 #endif /* ... */
 
 
+
 	default:
 		goto return_unknown_instruction_rmreg;
 #define NEED_return_unknown_instruction_rmreg
 	}
 	break;
+}
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_XOP_... */
+
+
+
+
+
+
+#if (EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_XOP_BEXTR_IMM)
+case EMU86_OPCODE_ENCODE_XOP(0xa, 0x10): {
+	union {
+		u8 start;
+		u8 len;
+		u16 word;
+	} imm;
+	u32 eflags_addend;
+	/* BEXTR reg32, reg/mem32, imm32        8F RXB.0A 0.1111.0.00 10 /r /id
+	 * BEXTR reg64, reg/mem64, imm32        8F RXB.0A 1.1111.0.00 10 /r /id */
+	if unlikely((op_flags & EMU86_F_VEX_VVVVV_M) != 0)
+		goto return_unknown_instruction;
+	MODRM_DECODE();
+	if unlikely((op_flags & EMU86_F_VEX_LL_M) != 0)
+		goto return_unexpected_vex_ll_rmreg;
+#define NEED_return_unexpected_vex_ll_rmreg
+	/* NOTE: Only the lower 2 bytes of the immediate operand are actually used.
+	 *       As such, a 2-byte read is sufficient here, so-long as we increment
+	 *       `pc' by the full 4 bytes.
+	 * HINT: If x86 was a big-endian machine, this next line would say:
+	 *       >> imm.word = UNALIGNED_GETBE16((u16 *)(pc + 2)); */
+	imm.word = UNALIGNED_GETLE16((u16 *)pc);
+	pc += 4;
+	eflags_addend = 0;
+#if CONFIG_LIBEMU86_WANT_64BIT
+	if (op_flags & EMU86_F_VEX_W) {
+		u64 value, result;
+		if (imm.start >= 64)
+			goto bextr_imm_write_dst_0;
+		if (imm.len > 63)
+			imm.len = 63;
+		value  = MODRM_GETRMQ();
+		result = (value >> imm.start) & (((u64)1 << imm.len) - 1);
+		if (result == 0)
+			eflags_addend |= EFLAGS_ZF;
+		MODRM_SETREGQ(result);
+	} else
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+	{
+		if (imm.start >= 32) {
+#if CONFIG_LIBEMU86_WANT_64BIT
+bextr_imm_write_dst_0:
+			MODRM_SETREGQ(0);
+#else /* CONFIG_LIBEMU86_WANT_64BIT */
+			MODRM_SETREGL(0);
+#endif /* !CONFIG_LIBEMU86_WANT_64BIT */
+			eflags_addend |= EFLAGS_ZF; /* Result is 0 */
+		} else {
+			u32 value, result;
+			if (imm.len > 31)
+				imm.len = 31;
+			value  = MODRM_GETRML();
+			result = (value >> imm.start) & (((u32)1 << imm.len) - 1);
+			if (result == 0)
+				eflags_addend |= EFLAGS_ZF;
+			MODRM_SETREGL(result);
+		}
+	}
+	EMU86_MSKFLAGS(~(EFLAGS_ZF | EFLAGS_CF | EFLAGS_OF),
+	               eflags_addend);
+	goto done;
 }
 #endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_XOP_... */
 

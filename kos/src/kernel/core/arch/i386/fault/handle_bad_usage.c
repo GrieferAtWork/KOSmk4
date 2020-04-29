@@ -366,6 +366,7 @@ x86_handle_bad_usage(struct icpustate *__restrict state, bad_usage_reason_t usag
 #define EMU86_EMULATE_CONFIG_WANT_XOP_T1MSKC    1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_XOP_BLCMSK    1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_XOP_BLCI      1 /* Emulate non-standard instructions */
+#define EMU86_EMULATE_CONFIG_WANT_XOP_BEXTR_IMM 1 /* Emulate non-standard instructions */
 
 
 

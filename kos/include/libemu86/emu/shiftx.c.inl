@@ -69,7 +69,7 @@ bextr_write_dst_0:
 				u32 value, result;
 				if (len > 31)
 					len = 31;
-				value = MODRM_GETRML();
+				value  = MODRM_GETRML();
 				result = (value >> start) & (((u32)1 << len) - 1);
 				if (result == 0)
 					eflags_addend |= EFLAGS_ZF;
