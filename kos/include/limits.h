@@ -32,9 +32,9 @@
 #elif defined(__CRT_CYG_PRIMARY)
 #include <newlib.h>
 #define MB_LEN_MAX _MB_LEN_MAX
-#else
+#else /* ... */
 #define MB_LEN_MAX 16
-#endif
+#endif /* !... */
 
 __SYSDECL_BEGIN
 
