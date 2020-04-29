@@ -327,6 +327,8 @@ x86_handle_bad_usage(struct icpustate *__restrict state, bad_usage_reason_t usag
 #define EMU86_EMULATE_CONFIG_WANT_SHIFTX        1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_STAC          1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_CLAC          1 /* Emulate non-standard instructions */
+#define EMU86_EMULATE_CONFIG_WANT_MONITOR       0
+#define EMU86_EMULATE_CONFIG_WANT_MWAIT         0
 #define EMU86_EMULATE_CONFIG_WANT_CMC           0
 #define EMU86_EMULATE_CONFIG_WANT_CLC           0
 #define EMU86_EMULATE_CONFIG_WANT_STC           0

@@ -684,6 +684,12 @@ __DECL_BEGIN
 #ifndef EMU86_EMULATE_CONFIG_WANT_CLAC
 #define EMU86_EMULATE_CONFIG_WANT_CLAC (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
 #endif /* !EMU86_EMULATE_CONFIG_WANT_CLAC */
+#ifndef EMU86_EMULATE_CONFIG_WANT_MONITOR
+#define EMU86_EMULATE_CONFIG_WANT_MONITOR (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_MONITOR */
+#ifndef EMU86_EMULATE_CONFIG_WANT_MWAIT
+#define EMU86_EMULATE_CONFIG_WANT_MWAIT (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
+#endif /* !EMU86_EMULATE_CONFIG_WANT_MWAIT */
 #ifndef EMU86_EMULATE_CONFIG_WANT_CMC
 #define EMU86_EMULATE_CONFIG_WANT_CMC (!EMU86_EMULATE_CONFIG_ONLY_CHECKERROR)
 #endif /* !EMU86_EMULATE_CONFIG_WANT_CMC */
@@ -1361,6 +1367,8 @@ bool EMU86_EMULATE_TPAUSE(bool want_c01, u64 tsc_deadline); /* EMU86_EMULATE_CON
 void EMU86_EMULATE_CLZERO(void *addr);                      /* EMU86_EMULATE_CONFIG_WANT_CLZERO */
 u64 EMU86_EMULATE_XGETBV(u32 index);                        /* EMU86_EMULATE_CONFIG_WANT_XGETBV */
 void EMU86_EMULATE_XSETBV(u32 index, u64 value);            /* EMU86_EMULATE_CONFIG_WANT_XSETBV */
+void EMU86_EMULATE_MONITOR(void *addr, u32 extensions, u32 hints); /* EMU86_EMULATE_CONFIG_WANT_MONITOR */
+void EMU86_EMULATE_MWAIT(u32 ecx, u32 edx);                        /* EMU86_EMULATE_CONFIG_WANT_MWAIT */
 #endif
 
 
@@ -3951,8 +3959,6 @@ checklock_modrm_memory_parsed:
 			/* XXX: vldmxcsr   (if only for verbose exception messages?) */
 			/* XXX: vstmxcsr   (if only for verbose exception messages?) */
 			/* XXX: stmxcsr    (if only for verbose exception messages?) */
-			/* XXX: monitor    (if only for verbose exception messages?) */
-			/* XXX: mwait      (if only for verbose exception messages?) */
 			/* XXX: encls      (if only for verbose exception messages?) */
 			/* XXX: enclu      (if only for verbose exception messages?) */
 			/* XXX: vmptrst    (if only for verbose exception messages?) */

@@ -30,6 +30,8 @@
 #define EMU86_EMULATE_CONFIG_WANT_VERW 1
 #define EMU86_EMULATE_CONFIG_WANT_SMSW 1
 #define EMU86_EMULATE_CONFIG_WANT_LMSW 1
+#define EMU86_EMULATE_CONFIG_WANT_MONITOR 1
+#define EMU86_EMULATE_CONFIG_WANT_MWAIT 1
 #define EMU86_EMULATE_CONFIG_WANT_INVLPG 1
 #define EMU86_EMULATE_CONFIG_WANT_RDTSCP 1
 #define EMU86_EMULATE_CONFIG_WANT_SWAPGS 1
@@ -256,6 +258,7 @@ case EMU86_OPCODE_ENCODE(0x0f00): {
      EMU86_EMULATE_CONFIG_WANT_INVLPG || EMU86_EMULATE_CONFIG_CHECKERROR ||     \
      (!EMU86_EMULATE_CONFIG_ONLY_MEMORY &&                                      \
       (EMU86_EMULATE_CONFIG_WANT_STAC || EMU86_EMULATE_CONFIG_WANT_CLAC ||      \
+       EMU86_EMULATE_CONFIG_WANT_MONITOR || EMU86_EMULATE_CONFIG_WANT_MWAIT ||  \
        EMU86_EMULATE_CONFIG_WANT_XEND || EMU86_EMULATE_CONFIG_WANT_XTEST ||     \
        EMU86_EMULATE_CONFIG_WANT_RDTSCP || EMU86_EMULATE_CONFIG_WANT_MCOMMIT || \
        EMU86_EMULATE_CONFIG_WANT_CLZERO || EMU86_EMULATE_CONFIG_WANT_XGETBV ||  \
@@ -341,19 +344,87 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 #endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_SGDT */
 
 
-#if (EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_SIDT || \
-     (!EMU86_EMULATE_CONFIG_ONLY_MEMORY &&                                \
-      (EMU86_EMULATE_CONFIG_WANT_STAC || EMU86_EMULATE_CONFIG_WANT_CLAC)))
+#if (EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_SIDT ||  \
+     (!EMU86_EMULATE_CONFIG_ONLY_MEMORY &&                                 \
+      (EMU86_EMULATE_CONFIG_WANT_STAC || EMU86_EMULATE_CONFIG_WANT_CLAC || \
+       EMU86_EMULATE_CONFIG_WANT_MONITOR || EMU86_EMULATE_CONFIG_WANT_MWAIT)))
 	case 1: {
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 #if ((EMU86_EMULATE_CONFIG_CHECKERROR &&                                                     \
       (EMU86_EMULATE_CONFIG_CHECKUSER || !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC)) || \
-     EMU86_EMULATE_CONFIG_WANT_STAC || EMU86_EMULATE_CONFIG_WANT_CLAC)
+     EMU86_EMULATE_CONFIG_WANT_STAC || EMU86_EMULATE_CONFIG_WANT_CLAC ||                     \
+     EMU86_EMULATE_CONFIG_WANT_MONITOR || EMU86_EMULATE_CONFIG_WANT_MWAIT)
 		if (EMU86_MODRM_ISREG(modrm.mi_type)) {
 			switch (modrm.mi_rm) {
 
+#if ((EMU86_EMULATE_CONFIG_CHECKERROR && defined(EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER)) || \
+     (EMU86_EMULATE_CONFIG_WANT_MONITOR && defined(EMU86_EMULATE_MONITOR)))
+#define EMU86_EMULATE_HAVE_MONITOR
+			case 0:
+				/* 0F 01 C8     MONITOR     Sets up a linear address range to be monitored by hardware and
+				 *                          activates the monitor. The address range should be a write-back
+				 *                          memory caching type. The address is DS:RAX/EAX/AX. */
+#if EMU86_EMULATE_CONFIG_CHECKUSER
+				if (EMU86_ISUSER()) {
+					goto return_privileged_instruction_rmreg;
+#define NEED_return_privileged_instruction_rmreg
+				}
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
+#if EMU86_EMULATE_CONFIG_WANT_MONITOR && defined(EMU86_EMULATE_MONITOR)
+				EMU86_EMULATE_MONITOR(EMU86_SEGADDR(EMU86_GETDSBASE(), EMU86_GETPAX()),
+				                      EMU86_GETECX(), EMU86_GETEDX());
+				goto done;
+#else /* EMU86_EMULATE_CONFIG_WANT_MONITOR && EMU86_EMULATE_MONITOR */
+#ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
+				if (EMU86_GETECX() != 0) {
+					EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD,
+					                                                 X86_REGISTER_MISC_MONITOR, 0,
+					                                                 EMU86_GETECX(), 0);
+				}
+#endif /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
+				goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
+#endif /* !EMU86_EMULATE_CONFIG_WANT_MONITOR || !EMU86_EMULATE_MONITOR */
+#endif /* ... */
+
+
+#if ((EMU86_EMULATE_CONFIG_CHECKERROR && defined(EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER)) || \
+     (EMU86_EMULATE_CONFIG_WANT_MWAIT && defined(EMU86_EMULATE_WAIT)))
+#define EMU86_EMULATE_HAVE_MWAIT
+			case 1:
+				/* 0F 01 C9     MWAIT     A hint that allows the processor to stop instruction execution
+				 *                        and enter an implementation-dependent optimized state until
+				 *                        occurrence of a class of events. */
+#if EMU86_EMULATE_CONFIG_CHECKUSER
+				if (EMU86_ISUSER()) {
+					goto return_privileged_instruction_rmreg;
+#define NEED_return_privileged_instruction_rmreg
+				}
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
+				{
+					u32 ecx = EMU86_GETECX();
+					if ((ecx & ~1) != 0) {
+#ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
+						EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD,
+						                                                 X86_REGISTER_MISC_MWAIT, 0, ecx, 0);
+#else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
+						goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
+#endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
+					}
+#if EMU86_EMULATE_CONFIG_WANT_MWAIT && defined(EMU86_EMULATE_MWAIT)
+					EMU86_EMULATE_MWAIT(ecx, EMU86_GETEAX());
+					goto done;
+#else /* EMU86_EMULATE_CONFIG_WANT_MWAIT && EMU86_EMULATE_MWAIT */
+					goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
+#endif /* !EMU86_EMULATE_CONFIG_WANT_MWAIT || !EMU86_EMULATE_MWAIT */
+				}
+#endif /* ... */
+
 
 #if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_CLAC
+#define EMU86_EMULATE_HAVE_CLAC
 			case 2:
 				/* 0F 01 CA     CLAC     Clear the AC flag in the EFLAGS register. */
 #if EMU86_EMULATE_CONFIG_CHECKUSER && !EMU86_EMULATE_CONFIG_ALLOW_USER_STAC_CLAC
@@ -379,12 +450,14 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 				}
 				goto done;
 #else /* EMU86_EMULATE_CONFIG_WANT_CLAC */
-				break;
+				goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
 #endif /* !EMU86_EMULATE_CONFIG_WANT_CLAC */
 #endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_CLAC */
 
 
 #if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_STAC
+#define EMU86_EMULATE_HAVE_STAC
 			case 3:
 				/* 0F 01 CB     STAC     Set the AC flag in the EFLAGS register. */
 #if EMU86_EMULATE_CONFIG_CHECKUSER && !EMU86_EMULATE_CONFIG_ALLOW_USER_STAC_CLAC
@@ -410,21 +483,38 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 				}
 				goto done;
 #else /* EMU86_EMULATE_CONFIG_WANT_STAC */
-				break;
+				goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
 #endif /* !EMU86_EMULATE_CONFIG_WANT_STAC */
 #endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_STAC */
 
 
 #if (EMU86_EMULATE_CONFIG_CHECKERROR && \
      (EMU86_EMULATE_CONFIG_CHECKUSER || !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC))
+#ifndef EMU86_EMULATE_HAVE_MONITOR
 			case 0:
 				/* 0F 01 C8     MONITOR     Sets up a linear address range to be monitored by hardware and
 				 *                          activates the monitor. The address range should be a write-back
 				 *                          memory caching type. The address is DS:RAX/EAX/AX. */
+#endif /* !EMU86_EMULATE_HAVE_MONITOR */
+#undef EMU86_EMULATE_HAVE_MONITOR
+#ifndef EMU86_EMULATE_HAVE_MWAIT
 			case 1:
 				/* 0F 01 C9     MWAIT     A hint that allows the processor to stop instruction execution
 				 *                        and enter an implementation-dependent optimized state until
 				 *                        occurrence of a class of events. */
+#endif /* !EMU86_EMULATE_HAVE_MWAIT */
+#undef EMU86_EMULATE_HAVE_MWAIT
+#ifndef EMU86_EMULATE_HAVE_CLAC
+			case 2:
+				/* 0F 01 CA     CLAC     Clear the AC flag in the EFLAGS register. */
+#endif /* !EMU86_EMULATE_HAVE_CLAC */
+#undef EMU86_EMULATE_HAVE_CLAC
+#ifndef EMU86_EMULATE_HAVE_STAC
+			case 3:
+				/* 0F 01 CB     STAC     Set the AC flag in the EFLAGS register. */
+#endif /* !EMU86_EMULATE_HAVE_STAC */
+#undef EMU86_EMULATE_HAVE_STAC
 			case 7:
 				/* 0F 01 CF     ENCLS     This instruction is used to execute privileged Intel SGX leaf
 				 *                        functions that are used for managing and debugging the enclaves. */

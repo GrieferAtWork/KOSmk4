@@ -207,7 +207,13 @@ case EMU86_OPCODE_ENCODE(0x0fae): {
 						u32 mode;
 						mode = MODRM_GETRMREGL();
 						if ((mode & ~1) != 0) {
-
+#ifdef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
+							EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD,
+							                                                 X86_REGISTER_MISC_TPAUSE, 0, mode, 0);
+#else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
+							goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
+#endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 						}
 #if EMU86_EMULATE_CONFIG_WANT_TPAUSE && defined(EMU86_EMULATE_TPAUSE)
 						{

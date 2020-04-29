@@ -286,6 +286,9 @@
 #endif /* __x86_64__ */
 #   define X86_REGISTER_MISC_MXCSR      __UINT16_C(0x9439) /* %mxcsr (MXCSR (SSE only); `xfpustate::fx_mxcsr') */
 #   define X86_REGISTER_MISC_MXCSR_MASK __UINT16_C(0x943a) /* %mxcsr_mask (MXCSR mask (SSE only); `xfpustate::fx_mxcsr_mask') */
+#   define X86_REGISTER_MISC_MWAIT      __UINT16_C(0x9701) /* mwait:%ecx */
+#   define X86_REGISTER_MISC_MONITOR    __UINT16_C(0x9702) /* monitor:%ecx */
+#   define X86_REGISTER_MISC_TPAUSE     __UINT16_C(0x9703) /* tpause:operand */
 
 /* Extended Control Register */
 #define X86_REGISTER_XCR __UINT16_C(0xd000)
