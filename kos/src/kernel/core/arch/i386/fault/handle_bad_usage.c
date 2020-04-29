@@ -937,7 +937,7 @@ setgsbase(uintptr_t value) {
  * However, the UKERN segment exists as an overlay on-top of kernel-space,
  * and as such any memory access originating from user-space, and targeting
  * a kernel-space address (while also overlapping with the UKERN segment),
- * must be dispatched through VIO. */
+ * must be dispatched through VIO, as implemented by libviocore. */
 #ifndef CONFIG_NO_USERKERN_SEGMENT
 PRIVATE struct icpustate *FCALL
 dispatch_userkern_vio_r(struct icpustate *__restrict state) {

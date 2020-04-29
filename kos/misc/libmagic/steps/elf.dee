@@ -92,6 +92,7 @@ function flattenElfBinary(
 		requireNoRelocations: bool = true) {
 	with (local o = File.open(outputFile, "wb,nobuf")) {
 		local e_entry;
+		local maxOffset = 0;
 		with (local i = File.open(inputFile, "rb")) {
 			if (i.read(SELFMAG) != ELFMAG)
 				throw Error("Bad ELF magic");
@@ -153,13 +154,20 @@ function flattenElfBinary(
 					o.seek(p_paddr - physBase);
 					local data = i.read(p_filesz);
 					o.write(data);
+					local oEnd = (p_paddr - physBase);
 					if (keepBss && p_memsz > p_filesz) {
+						oEnd = oEnd + p_memsz;
 						o.seek((p_paddr - physBase) + p_memsz - 1);
 						o.write("\0");
+					} else {
+						oEnd = oEnd + p_filesz;
 					}
+					if (maxOffset < oEnd)
+						maxOffset = oEnd;
 				}
 			}
 		}
+		o.trunc(maxOffset);
 		if (overrideEntry) {
 			o.seek(0);
 			o.putc(0xe9); /* jmp rel32 */
