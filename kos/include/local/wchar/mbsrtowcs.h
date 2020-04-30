@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xadb1f004 */
+/* HASH CRC-32:0x6ca6f7a1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,9 +24,9 @@
 #ifndef ____localdep_mbrtowc_defined
 #define ____localdep_mbrtowc_defined 1
 #ifdef __CRT_HAVE_mbrtowc
-__CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbrtowc,(__WCHAR_TYPE__ *__pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__ps),mbrtowc,(__pwc,__str,__maxlen,__ps))
+__CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbrtowc,(__WCHAR_TYPE__ *__pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__mbs),mbrtowc,(__pwc,__str,__maxlen,__mbs))
 #elif defined(__CRT_HAVE___mbrtowc)
-__CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbrtowc,(__WCHAR_TYPE__ *__pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__ps),__mbrtowc,(__pwc,__str,__maxlen,__ps))
+__CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbrtowc,(__WCHAR_TYPE__ *__pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__mbs),__mbrtowc,(__pwc,__str,__maxlen,__mbs))
 #else /* LIBC: mbrtowc */
 #include <local/wchar/mbrtowc.h>
 #define __localdep_mbrtowc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mbrtowc))
@@ -38,14 +38,14 @@ __LOCAL_LIBC(mbsrtowcs) __ATTR_NONNULL((1, 2)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mbsrtowcs))(__WCHAR_TYPE__ *__restrict __dst,
                                                        char const **__restrict __psrc,
                                                        __SIZE_TYPE__ __dstlen,
-                                                       __mbstate_t *__ps) {
-#line 278 "kos/src/libc/magic/wchar.c"
+                                                       __mbstate_t *__mbs) {
+#line 313 "kos/src/libc/magic/wchar.c"
 	__SIZE_TYPE__ __result = 0;
 	char const *__src = *__psrc;
 	while (__dstlen) {
 		__SIZE_TYPE__ __error;
 		__WCHAR_TYPE__ __wc;
-		__error = __localdep_mbrtowc(&__wc, __src, (__SIZE_TYPE__)-1, __ps);
+		__error = __localdep_mbrtowc(&__wc, __src, (__SIZE_TYPE__)-1, __mbs);
 		if (!__error)
 			break;
 		if (__error == (__SIZE_TYPE__)-1)

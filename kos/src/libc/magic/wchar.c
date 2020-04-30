@@ -224,21 +224,21 @@ wctob:(wint_t ch) -> int {
 )][std][wchar][export_alias(__mbrtowc)][dependency_include(<parts/errno.h>)]
 mbrtowc:([nullable] wchar_t *pwc,
          [inp_opt(maxlen)] char const *__restrict str, size_t maxlen,
-         [nullable] mbstate_t *ps) -> size_t {
+         [nullable] mbstate_t *mbs) -> size_t {
 	size_t error;
-	if (!ps)
-		ps = &mbrtowc_ps;
+	if (!mbs)
+		mbs = &mbrtowc_ps;
 	if (!str) {
-		ps->@__word@ = 0;
+		mbs->@__word@ = 0;
 		return 0;
 	}
 	if (!maxlen || !*str)
 		return 0;
 #if __SIZEOF_WCHAR_T__ == 2
-	error = unicode_c8toc16((char16_t *)pwc, str, maxlen, ps);
-#else
-	error = unicode_c8toc32((char32_t *)pwc, str, maxlen, ps);
-#endif
+	error = unicode_c8toc16((char16_t *)pwc, str, maxlen, mbs);
+#else /* __SIZEOF_WCHAR_T__ == 2 */
+	error = unicode_c8toc32((char32_t *)pwc, str, maxlen, mbs);
+#endif /* __SIZEOF_WCHAR_T__ != 2 */
 #ifdef @__EILSEQ@
 	if (error == (size_t)-1)
 		__libc_seterrno(@__EILSEQ@);
@@ -247,40 +247,75 @@ mbrtowc:([nullable] wchar_t *pwc,
 }
 
 [impl_prefix(
+#if __SIZEOF_WCHAR_T__ == 2
 #ifndef ____local_wcrtomb_ps_defined
 #define ____local_wcrtomb_ps_defined 1
 @__LOCAL_LIBC_DATA@(wcrtomb_ps) mbstate_t wcrtomb_ps = @__MBSTATE_INIT@;
 #endif /* !____local_wcrtomb_ps_defined */
+#endif /* __SIZEOF_WCHAR_T__ == 2 */
 )][std][wchar]
 wcrtomb:(char *__restrict str, wchar_t wc,
-         [nullable] mbstate_t *ps) -> size_t {
-	if (!ps)
-		ps = &wcrtomb_ps;
+         [nullable] mbstate_t *mbs) -> size_t {
+	char *endptr;
+	size_t result;
+#if __SIZEOF_WCHAR_T__ == 2
+	/* unicode_c16toc8() */
+	if (!mbs)
+		mbs = &wcrtomb_ps;
 	if (!str) {
-		ps->@__word@ = 0;
-		return 0;
+		mbs->@__word@ = 0;
+		return 1;
 	}
-	*str = (char)wc;
-	return 1;
+	if ((mbs->@__word@ & __MBSTATE_TYPE_MASK) == __MBSTATE_TYPE_UTF16_LO) {
+		/* Complete surrogate */
+		char32_t ch32;
+		if unlikely(!((u16)wc >= UTF16_LOW_SURROGATE_MIN &&
+		              (u16)wc <= UTF16_LOW_SURROGATE_MAX)) {
+			/* Expected low surrogate */
+#ifdef @__EILSEQ@
+			__libc_seterrno(@__EILSEQ@);
+#endif /* EILSEQ */
+			return (size_t)-1;
+		}
+		ch32 = ((mbs->@__word@ & 0x000003ff) << 10) +
+		       0x10000 + ((u16)wc - 0xdc00);
+		mbs->@__word@ = 0;
+		endptr = unicode_writeutf8(str, ch32);
+	} else if ((u16)wc >= UTF16_HIGH_SURROGATE_MIN &&
+	           (u16)wc <= UTF16_HIGH_SURROGATE_MAX) {
+		mbs->@__word@ = __MBSTATE_TYPE_UTF16_LO | ((u16)wc - UTF16_HIGH_SURROGATE_MIN);
+		return 0;
+	} else {
+		endptr = unicode_writeutf8(str, (char32_t)(u32)(u16)wc);
+	}
+#else /* __SIZEOF_WCHAR_T__ == 2 */
+	/* unicode_c32toc8() */
+	(void)mbs;
+	if (!str)
+		return 1;
+	endptr = unicode_writeutf8(str, (char32_t)wc);
+#endif /* __SIZEOF_WCHAR_T__ != 2 */
+	result = (size_t)(endptr - str);
+	return result;
 }
 
 [std][ATTR_WUNUSED][wchar][export_alias(__mbrlen)]
 mbrlen:([inp_opt(maxlen)] char const *__restrict str, size_t maxlen,
-        [nullable] mbstate_t *ps) -> size_t {
+        [nullable] mbstate_t *mbs) -> size_t {
 	wchar_t wc;
-	return mbrtowc(&wc, str, maxlen, ps);
+	return mbrtowc(&wc, str, maxlen, mbs);
 }
 
 [std][wchar]
 mbsrtowcs:([outp(dstlen)] wchar_t *__restrict dst,
            [nonnull] char const **__restrict psrc, size_t dstlen,
-           [nullable] mbstate_t *ps) -> size_t {
+           [nullable] mbstate_t *mbs) -> size_t {
 	size_t result = 0;
 	char const *src = *psrc;
 	while (dstlen) {
 		size_t error;
 		wchar_t wc;
-		error = mbrtowc(&wc, src, (size_t)-1, ps);
+		error = mbrtowc(&wc, src, (size_t)-1, mbs);
 		if (!error)
 			break;
 		if (error == (size_t)-1)
@@ -297,13 +332,13 @@ mbsrtowcs:([outp(dstlen)] wchar_t *__restrict dst,
 [std][wchar]
 wcsrtombs:([outp(dstlen)] char *dst,
            [nonnull] wchar_t const **__restrict psrc, size_t dstlen,
-           [nullable] mbstate_t *ps) -> size_t {
+           [nullable] mbstate_t *mbs) -> size_t {
 	size_t result = 0;
 	wchar_t const *src = *psrc;
 	while (dstlen) {
 		size_t error;
 		char buf[8]; /* 8 == UNICODE_UTF8_MAXLEN */
-		error = wcrtomb(buf, *src, ps);
+		error = wcrtomb(buf, *src, mbs);
 		if (!error)
 			break;
 		if (error == (size_t)-1)
@@ -337,8 +372,8 @@ wcstoul:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr, 
 
 [std][ATTR_WUNUSED][ATTR_PURE]
 [section({.text.crt.wchar.unicode.static.mbs|.text.crt.dos.wchar.unicode.static.mbs})]
-mbsinit:([nullable] mbstate_t const *ps) -> int {
-	return !ps || @__MBSTATE_ISINIT@(ps);
+mbsinit:([nullable] mbstate_t const *mbs) -> int {
+	return !mbs || @__MBSTATE_ISINIT@(mbs);
 }
 
 [std][ATTR_WUNUSED][ATTR_PURE][wchar]
@@ -805,7 +840,7 @@ __NAMESPACE_STD_USING(wcstok)
 
 [ATTR_WUNUSED][alias(*)]
 __mbrlen:([inp(maxlen)] char const *__restrict str, $size_t maxlen,
-          [nullable] $mbstate_t *ps) -> $size_t = mbrlen;
+          [nullable] $mbstate_t *mbs) -> $size_t = mbrlen;
 
 
 %
@@ -852,12 +887,12 @@ wcpncpy:([nonnull] wchar_t *__restrict buf, [nonnull] wchar_t const *__restrict 
 [wchar][section({.text.crt.wchar.unicode.static.mbs|.text.crt.dos.wchar.unicode.static.mbs})]
 mbsnrtowcs:([nullable] wchar_t *dst,
             [nonnull] char const **__restrict psrc, $size_t nmc, $size_t len,
-            [nullable] $mbstate_t *ps) -> $size_t;
+            [nullable] $mbstate_t *mbs) -> $size_t;
 
 [wchar][section({.text.crt.wchar.unicode.static.mbs|.text.crt.dos.wchar.unicode.static.mbs})]
 wcsnrtombs:([nullable] char *dst,
             [nonnull] wchar_t const **__restrict psrc, $size_t nwc, $size_t len,
-            [nullable] $mbstate_t *ps) -> $size_t;
+            [nullable] $mbstate_t *mbs) -> $size_t;
 
 [wchar][section({.text.crt.wchar.FILE.locked.access|.text.crt.dos.wchar.FILE.locked.access})]
 open_wmemstream:(wchar_t **bufloc, $size_t *sizeloc) -> $FILE *;

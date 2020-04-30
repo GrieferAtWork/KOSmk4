@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x622aa2f6 */
+/* HASH CRC-32:0xa4f259ef */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -497,7 +497,6 @@
 #define __CRT_STUB_setipv4sourcefilter 1
 #define __CRT_STUB_setkey 1
 #define __CRT_STUB_setkey_r 1
-#define __CRT_STUB_setlocale 1
 #define __CRT_STUB_setlogin 1
 #define __CRT_STUB_setlogmask 1
 #define __CRT_STUB_setmntent 1

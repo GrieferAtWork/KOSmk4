@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xba22c3ec */
+/* HASH CRC-32:0x8251e6e1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@
 #ifndef ____localdep_wcrtomb_defined
 #define ____localdep_wcrtomb_defined 1
 #ifdef __CRT_HAVE_wcrtomb
-__CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcrtomb,(char *__restrict __str, __WCHAR_TYPE__ __wc, __mbstate_t *__ps),wcrtomb,(__str,__wc,__ps))
+__CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcrtomb,(char *__restrict __str, __WCHAR_TYPE__ __wc, __mbstate_t *__mbs),wcrtomb,(__str,__wc,__mbs))
 #else /* LIBC: wcrtomb */
 #include <local/wchar/wcrtomb.h>
 #define __localdep_wcrtomb (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcrtomb))
@@ -58,14 +58,14 @@ __LOCAL_LIBC(wcsrtombs) __ATTR_NONNULL((1, 2)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsrtombs))(char *__dst,
                                                        __WCHAR_TYPE__ const **__restrict __psrc,
                                                        __SIZE_TYPE__ __dstlen,
-                                                       __mbstate_t *__ps) {
-#line 301 "kos/src/libc/magic/wchar.c"
+                                                       __mbstate_t *__mbs) {
+#line 336 "kos/src/libc/magic/wchar.c"
 	__SIZE_TYPE__ __result = 0;
 	__WCHAR_TYPE__ const *__src = *__psrc;
 	while (__dstlen) {
 		__SIZE_TYPE__ __error;
 		char __buf[8]; /* 8 == UNICODE_UTF8_MAXLEN */
-		__error = __localdep_wcrtomb(__buf, *__src, __ps);
+		__error = __localdep_wcrtomb(__buf, *__src, __mbs);
 		if (!__error)
 			break;
 		if (__error == (__SIZE_TYPE__)-1)

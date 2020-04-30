@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe2f08098 */
+/* HASH CRC-32:0xa56febc3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,9 +24,9 @@
 #ifndef ____localdep_mbrtowc_defined
 #define ____localdep_mbrtowc_defined 1
 #ifdef __CRT_HAVE_mbrtowc
-__CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbrtowc,(__WCHAR_TYPE__ *__pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__ps),mbrtowc,(__pwc,__str,__maxlen,__ps))
+__CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbrtowc,(__WCHAR_TYPE__ *__pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__mbs),mbrtowc,(__pwc,__str,__maxlen,__mbs))
 #elif defined(__CRT_HAVE___mbrtowc)
-__CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbrtowc,(__WCHAR_TYPE__ *__pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__ps),__mbrtowc,(__pwc,__str,__maxlen,__ps))
+__CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbrtowc,(__WCHAR_TYPE__ *__pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__mbs),__mbrtowc,(__pwc,__str,__maxlen,__mbs))
 #else /* LIBC: mbrtowc */
 #include <local/wchar/mbrtowc.h>
 #define __localdep_mbrtowc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mbrtowc))
@@ -37,10 +37,10 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(mbrlen) __ATTR_WUNUSED __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mbrlen))(char const *__restrict __str,
                                                     __SIZE_TYPE__ __maxlen,
-                                                    __mbstate_t *__ps) {
-#line 270 "kos/src/libc/magic/wchar.c"
+                                                    __mbstate_t *__mbs) {
+#line 305 "kos/src/libc/magic/wchar.c"
 	__WCHAR_TYPE__ __wc;
-	return __localdep_mbrtowc(&__wc, __str, __maxlen, __ps);
+	return __localdep_mbrtowc(&__wc, __str, __maxlen, __mbs);
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_mbrlen_defined */

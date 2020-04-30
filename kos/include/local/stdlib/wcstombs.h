@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xca0dc217 */
+/* HASH CRC-32:0x86c4aada */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #ifndef ____localdep_wcsrtombs_defined
 #define ____localdep_wcsrtombs_defined 1
 #ifdef __CRT_HAVE_wcsrtombs
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsrtombs,(char *__dst, __WCHAR_TYPE__ const **__restrict __psrc, __SIZE_TYPE__ __dstlen, __mbstate_t *__ps),wcsrtombs,(__dst,__psrc,__dstlen,__ps))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsrtombs,(char *__dst, __WCHAR_TYPE__ const **__restrict __psrc, __SIZE_TYPE__ __dstlen, __mbstate_t *__mbs),wcsrtombs,(__dst,__psrc,__dstlen,__mbs))
 #else /* LIBC: wcsrtombs */
 #include <local/wchar/wcsrtombs.h>
 #define __localdep_wcsrtombs (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsrtombs))

@@ -441,7 +441,7 @@ EOF
 		SRCPATH="$KOS_ROOT/binutils/src/ncurses-$NCURSES_VERISON"
 		OPTPATH="$BINUTILS_SYSROOT/opt/ncurses-$NCURSES_VERISON"
 		if [ "$MODE_FORCE_MAKE" == yes ] || \
-		 ! [ -f "$OPTPATH/lib/libncurses.so" ]; then
+		 ! [ -f "$OPTPATH/lib/libncursesw.so" ]; then
 			if [ "$MODE_FORCE_CONF" == yes ] || \
 			 ! [ -f "$OPTPATH/Makefile" ]; then
 				if ! [ -f "$SRCPATH/configure" ]; then
@@ -471,6 +471,7 @@ EOF
 					--infodir="/usr/share/info" \
 					--mandir="/usr/share/man" \
 					--host="$TARGET_NAME-linux-gnu" \
+					--enable-widec \
 					--without-ada \
 					--without-cxx-binding \
 					--disable-db-install \
@@ -497,10 +498,10 @@ EOF
 			install_file_nodisk /$TARGET_LIBPATH/${1}.a "$OPTPATH/lib/${1}.a"
 			install_file_nodisk /$TARGET_LIBPATH/${1}_g.a "$OPTPATH/lib/${1}_g.a"
 		}
-		install_ncurses_library libform
-		install_ncurses_library libmenu
-		install_ncurses_library libncurses
-		install_ncurses_library libpanel
+		install_ncurses_library libformw
+		install_ncurses_library libmenuw
+		install_ncurses_library libncursesw
+		install_ncurses_library libpanelw
 		install_header_ex() {
 			echo "Installing header:/include/$2"
 			unlink "$KOS_ROOT/kos/include/$2" > /dev/null 2>&1

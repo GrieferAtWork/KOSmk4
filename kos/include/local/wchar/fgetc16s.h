@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd53b6288 */
+/* HASH CRC-32:0x6631f27e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -91,7 +91,7 @@ __LOCAL_LIBC(fgetc16s) __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __CHAR16_TYPE__ *
 (__LIBDCALL __LIBC_LOCAL_NAME(fgetc16s))(__CHAR16_TYPE__ *__restrict __buf,
                                          __STDC_INT_AS_SIZE_T __bufsize,
                                          __FILE *__restrict __stream) __THROWS(...) {
-#line 500 "kos/src/libc/magic/wchar.c"
+#line 535 "kos/src/libc/magic/wchar.c"
 	__SIZE_TYPE__ __n;
 	if __unlikely(!__buf || !__bufsize) {
 		/* The buffer cannot be empty! */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xca0e1e2 */
+/* HASH CRC-32:0xeebe4170 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #ifndef ____localdep_wcrtomb_defined
 #define ____localdep_wcrtomb_defined 1
 #ifdef __CRT_HAVE_wcrtomb
-__CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcrtomb,(char *__restrict __str, __WCHAR_TYPE__ __wc, __mbstate_t *__ps),wcrtomb,(__str,__wc,__ps))
+__CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcrtomb,(char *__restrict __str, __WCHAR_TYPE__ __wc, __mbstate_t *__mbs),wcrtomb,(__str,__wc,__mbs))
 #else /* LIBC: wcrtomb */
 #include <local/wchar/wcrtomb.h>
 #define __localdep_wcrtomb (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcrtomb))

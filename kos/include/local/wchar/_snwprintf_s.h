@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xecbe9bcd */
+/* HASH CRC-32:0x98bb7922 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(_snwprintf_s))(__WCHAR_TYPE__ *__buf
                                                            __SIZE_TYPE__ __buflen,
                                                            __WCHAR_TYPE__ const *__format,
                                                            ...) {
-#line 1896 "kos/src/libc/magic/wchar.c"
+#line 1931 "kos/src/libc/magic/wchar.c"
 	__STDC_INT_AS_SSIZE_T __result;
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __format);

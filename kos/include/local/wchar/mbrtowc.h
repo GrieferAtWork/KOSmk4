@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x51ae9e6b */
+/* HASH CRC-32:0xe2712d15 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,22 +66,22 @@ __LOCAL_LIBC(mbrtowc) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mbrtowc))(__WCHAR_TYPE__ *__pwc,
                                                      char const *__restrict __str,
                                                      __SIZE_TYPE__ __maxlen,
-                                                     __mbstate_t *__ps) {
+                                                     __mbstate_t *__mbs) {
 #line 228 "kos/src/libc/magic/wchar.c"
 	__SIZE_TYPE__ __error;
-	if (!__ps)
-		__ps = &__mbrtowc_ps;
+	if (!__mbs)
+		__mbs = &__mbrtowc_ps;
 	if (!__str) {
-		__ps->__word = 0;
+		__mbs->__word = 0;
 		return 0;
 	}
 	if (!__maxlen || !*__str)
 		return 0;
 #if __SIZEOF_WCHAR_T__ == 2
-	__error = __localdep_unicode_c8toc16((__CHAR16_TYPE__ *)__pwc, __str, __maxlen, __ps);
-#else
-	__error = __localdep_unicode_c8toc32((__CHAR32_TYPE__ *)__pwc, __str, __maxlen, __ps);
-#endif
+	__error = __localdep_unicode_c8toc16((__CHAR16_TYPE__ *)__pwc, __str, __maxlen, __mbs);
+#else /* __SIZEOF_WCHAR_T__ == 2 */
+	__error = __localdep_unicode_c8toc32((__CHAR32_TYPE__ *)__pwc, __str, __maxlen, __mbs);
+#endif /* __SIZEOF_WCHAR_T__ != 2 */
 #ifdef __EILSEQ
 	if (__error == (__SIZE_TYPE__)-1)
 		__libc_seterrno(__EILSEQ);

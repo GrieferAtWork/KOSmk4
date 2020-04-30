@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8bdca566 */
+/* HASH CRC-32:0xc749b2c4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,9 +24,9 @@
 #ifndef ____localdep_mbrlen_defined
 #define ____localdep_mbrlen_defined 1
 #ifdef __CRT_HAVE_mbrlen
-__CREDIRECT(__ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbrlen,(char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__ps),mbrlen,(__str,__maxlen,__ps))
+__CREDIRECT(__ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbrlen,(char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__mbs),mbrlen,(__str,__maxlen,__mbs))
 #elif defined(__CRT_HAVE___mbrlen)
-__CREDIRECT(__ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbrlen,(char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__ps),__mbrlen,(__str,__maxlen,__ps))
+__CREDIRECT(__ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbrlen,(char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__mbs),__mbrlen,(__str,__maxlen,__mbs))
 #else /* LIBC: mbrlen */
 #include <local/wchar/mbrlen.h>
 #define __localdep_mbrlen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mbrlen))
