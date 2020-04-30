@@ -775,7 +775,7 @@ EOF
 		VERSION="0268d6df09990cbb85682b1ad947b8d602acb097"
 		SRCPATH="$KOS_ROOT/binutils/src/tty-solitaire"
 		OPTPATH="$BINUTILS_SYSROOT/opt/tty-solitaire"
-		EXEFILE="$OPTPATH/tty-solitaire"
+		EXEFILE="$OPTPATH/ttysolitaire"
 		if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$EXEFILE" ]; then
 			if ! [ -f "$SRCPATH/Makefile" ]; then
 				cmd mkdir -p "$SRCPATH"
@@ -807,8 +807,8 @@ EOF
 			echo "link: $CC -o $EXEFILE $TS_OBJECTS -lncursesw"
 			cmd "$CC" -g -o "$EXEFILE" "$TS_OBJECTS" -lncursesw
 		fi
-		# Install tty-solitaire to disk
-		install_file /bin/tty-solitaire "$EXEFILE"
+		# Install ttysolitaire to disk
+		install_file /bin/ttysolitaire "$EXEFILE"
 		;;
 ##############################################################################
 
