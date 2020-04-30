@@ -575,3 +575,12 @@
 #define DLIST_RFOREACH_P(elem,l,getpath) for(;;)
 
 #define __SOCKADDR_COMMON(x) sa_family_t x##family
+
+#define NCURSES_API
+#define NCURSES_IMPEXP
+#define NCURSES_SP_NAME(name) name##_sp
+#define NCURSES_EXPORT(type) type
+#define NCURSES_EXPORT_VAR(type) type
+#define NCURSES_CONST const
+#define NCURSES_SBOOL char
+

@@ -36,6 +36,13 @@ __ice__
 /kos/include/term.h
 /kos/include/termcap.h
 /kos/include/unctrl.h
+/kos/include/cursesapp.h
+/kos/include/cursesf.h
+/kos/include/cursesm.h
+/kos/include/cursesp.h
+/kos/include/cursesw.h
+/kos/include/cursslk.h
+/kos/include/etip.h
 
 # These headers are installed by `make_utility.sh i386 zlib`
 /kos/include/zconf.h

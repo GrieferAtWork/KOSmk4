@@ -467,26 +467,28 @@ EOF
 					--sysconfdir="/etc" \
 					--localstatedir="/var" \
 					--libdir="/usr/$TARGET_LIBPATH" \
-					--includedir="/usr/include" \
-					--oldincludedir="/usr/include" \
+					--includedir="$KOS_ROOT/kos/include" \
+					--oldincludedir="$KOS_ROOT/kos/include" \
 					--infodir="/usr/share/info" \
 					--mandir="/usr/share/man" \
 					--host="$TARGET_NAME-linux-gnu" \
 					--enable-widec \
 					--without-ada \
-					--without-cxx-binding \
 					--disable-db-install \
 					--without-progs \
 					--without-tack \
 					--without-tests \
+					--without-manpages \
 					--with-shared \
 					--with-normal \
 					--with-debug \
+					--with-cxx-shared \
 					--disable-big-core \
 					--disable-database \
 					--with-fallbacks=xterm,unknown \
 					--enable-const \
 					--enable-ext-mouse \
+					--enable-sigwinch \
 					--disable-stripping
 			fi
 			cmd cd "$OPTPATH"
@@ -527,6 +529,14 @@ EOF
 		install_header termcap.h
 		install_header_ex "$SRCPATH/include/tic.h" tic.h
 		install_header unctrl.h
+		# C++ headers
+		install_header_ex "$SRCPATH/c++/cursesapp.h" cursesapp.h
+		install_header_ex "$SRCPATH/c++/cursesf.h" cursesf.h
+		install_header_ex "$SRCPATH/c++/cursesm.h" cursesm.h
+		install_header_ex "$SRCPATH/c++/cursesp.h" cursesp.h
+		install_header_ex "$SRCPATH/c++/cursesw.h" cursesw.h
+		install_header_ex "$SRCPATH/c++/cursslk.h" cursslk.h
+		install_header_ex "$OPTPATH/c++/etip.h" etip.h
 		;;
 ##############################################################################
 
