@@ -298,7 +298,6 @@ case $UTILITY_NAME in
 				if [ -d "${OPTPATH}" ]; then
 					cmd rm -rf "${OPTPATH}"
 				fi
-				rm -rf 
 				cmd cp -R "${SRCPATH}" "$BINUTILS_SYSROOT/opt/"
 			fi
 			apply_patch "${OPTPATH}" "$KOS_PATCHES/busybox-$BUSYBOX_VERISON.patch"
@@ -505,10 +504,13 @@ EOF
 		install_ncurses_library libmenuw
 		install_ncurses_library libncursesw
 		install_ncurses_library libpanelw
+
+		cmd mkdir -p "$KOS_ROOT/kos/include/ncursesw"
 		install_header_ex() {
 			echo "Installing header:/include/$2"
 			unlink "$KOS_ROOT/kos/include/$2" > /dev/null 2>&1
 			cmd cp "$1" "$KOS_ROOT/kos/include/$2"
+			echo "#include \"../$2\"" > "$KOS_ROOT/kos/include/ncursesw/$2"
 		}
 		install_header() {
 			install_header_ex "$OPTPATH/include/$1" "$1"
@@ -523,6 +525,7 @@ EOF
 		install_header_ex "$SRCPATH/include/nc_tparm.h" nc_tparm.h
 		echo "Installing header:/include/ncurses.h"
 		echo '#include "curses.h"' > "$KOS_ROOT/kos/include/ncurses.h"
+		echo '#include "../curses.h"' > "$KOS_ROOT/kos/include/ncursesw/ncurses.h"
 		install_header ncurses_dll.h
 		install_header term.h
 		install_header_ex "$SRCPATH/include/term_entry.h" term_entry.h
