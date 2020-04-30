@@ -273,6 +273,7 @@ case $UTILITY_NAME in
 		cmd bash "$KOS_MISC/make_utility.sh" $OPTS "$TARGET_NAME" deemon
 		cmd bash "$KOS_MISC/make_utility.sh" $OPTS "$TARGET_NAME" python
 		cmd bash "$KOS_MISC/make_utility.sh" $OPTS "$TARGET_NAME" kos-headers
+		cmd bash "$KOS_MISC/make_utility.sh" $OPTS "$TARGET_NAME" tty-solitaire
 		;;
 ##############################################################################
 
@@ -763,6 +764,51 @@ EOF
 		# Install modules under `/lib/python2.7/[os.py...]'
 		install_path_hardcopy /$TARGET_LIBPATH/python${PYTHON_VERISON_MAJOR}.${PYTHON_VERISON_MINOR} "${SRCPATH}/Lib"
 		install_path /$TARGET_LIBPATH/python${PYTHON_VERISON_MAJOR}.${PYTHON_VERISON_MINOR}/lib-dynload "${OPTPATH}/build/lib.linux2-${TARGET_NAME}-${PYTHON_VERISON_MAJOR}.${PYTHON_VERISON_MINOR}"
+		;;
+##############################################################################
+
+
+##############################################################################
+	tty-solitaire | tty-solitaire-1.1.1)
+		# NOTE: This program requires that you first run:
+		#       $ make_utility.sh <TARGET> ncurses
+		VERSION="0268d6df09990cbb85682b1ad947b8d602acb097"
+		SRCPATH="$KOS_ROOT/binutils/src/tty-solitaire"
+		OPTPATH="$BINUTILS_SYSROOT/opt/tty-solitaire"
+		EXEFILE="$OPTPATH/tty-solitaire"
+		if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$EXEFILE" ]; then
+			if ! [ -f "$SRCPATH/Makefile" ]; then
+				cmd mkdir -p "$SRCPATH"
+				cmd cd "$SRCPATH/.."
+				cmd git clone https://github.com/mpereira/tty-solitaire.git
+				cmd cd "$SRCPATH"
+				cmd git checkout "$VERSION" -f
+			fi
+			cmd mkdir -p "$OPTPATH"
+			apply_patch "$SRCPATH" "$KOS_PATCHES/tty-solitaire-$VERSION.patch"
+			# The program's Makefile isn't designed for cross-compiling
+			# But since the program is fairly simple, just compile all *.c
+			# files from its /src directory, and link them together into a
+			# single program
+			set_archpath
+			TS_OBJECTS=""
+			cmd cd "$SRCPATH/src"
+			for SRCFILE in *.c; do
+				OBJFILE="$OPTPATH/$SRCFILE.o"
+				SRCFILE="$SRCPATH/src/$SRCFILE"
+				TS_OBJECTS="$TS_OBJECTS $OBJFILE"
+				if [ "$MODE_FORCE_MAKE" == yes ] || [ "$OBJFILE" -ot "$SRCFILE" ]; then
+					echo "compile: $CC -c -o $OBJFILE $SRCFILE"
+					cmd "$CC" -g -c -o "$OBJFILE" "$SRCFILE" &
+				fi
+			done
+			cmd wait
+			# Build and link against ncurses
+			echo "link: $CC -o $EXEFILE $TS_OBJECTS -lncursesw"
+			cmd "$CC" -g -o "$EXEFILE" "$TS_OBJECTS" -lncursesw
+		fi
+		# Install tty-solitaire to disk
+		install_file /bin/tty-solitaire "$EXEFILE"
 		;;
 ##############################################################################
 

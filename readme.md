@@ -43,6 +43,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 	- [python-2.7.16](https://www.python.org/)
 - Games
 	- [vitetris-0.58.0](https://www.victornils.net/tetris/)
+	- [tty-solitaire-1.1.1](https://github.com/mpereira/tty-solitaire)
 - Libraries
 	- [ncurses-6.1](https://www.gnu.org/software/ncurses/)
 	- [zlib-1.2.11](https://www.zlib.net/)

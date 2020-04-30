@@ -1,0 +1,17 @@
+diff -Naur tty-solitaire-orig/src/common.h tty-solitaire/src/common.h
+--- tty-solitaire-orig/src/common.h	2020-04-30 12:57:29.656945700 +0200
++++ tty-solitaire/src/common.h	2020-04-30 13:04:50.728930600 +0200
+@@ -3,11 +3,11 @@
+ 
+ #include <stdbool.h>
+ 
+-#define MIN_TERM_LINES 28
++#define MIN_TERM_LINES 25
+ #define MIN_TERM_COLS 57
+ #define TTY_SOLITAIRE_BUFSIZ 100
+ 
+-#define SMALL_TERM_MSG "Please increase your terminal size to at least 57x28 or press q to quit."
++#define SMALL_TERM_MSG "Please increase your terminal size to at least 57x25 or press q to quit."
+ 
+ extern const char *program_name;
+ 
