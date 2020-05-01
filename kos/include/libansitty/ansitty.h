@@ -326,29 +326,37 @@ struct ansitty_operators {
 	                                    struct termios const *newios);
 };
 
+#ifdef LIBANSITTY_EXPOSE_INTERNALS
+#define ANSITTY_INTERNAL(x) x
+#else /* LIBANSITTY_EXPOSE_INTERNALS */
+#define ANSITTY_INTERNAL(x) _##x
+#endif /* !LIBANSITTY_EXPOSE_INTERNALS */
+
 struct ansitty {
 	struct ansitty_operators  at_ops;         /* [const] ANSI TTY operators. */
 	__uint8_t                 at_color;       /* Selected color index (0xf0: bg; 0x0f: fg). */
 	__uint8_t                 at_defcolor;    /* Default color index (usually `ANSITTY_CL_DEFAULT').
 	                                           * This index is used when `\ec' is encountered */
-	__uint16_t                at_ttyflag;     /* Internal TTY mode flags. */
+	__uint16_t                ANSITTY_INTERNAL(at_ttyflag); /* Internal TTY mode flags. */
 	__uint16_t                at_ttymode;     /* TTY mode (Set of `ANSITTY_MODE_*') */
 	__uint16_t                at_attrib;      /* Text mode attributes (set of `ANSITTY_ATTRIB_*'). */
 	ansitty_coord_t           at_savecur[2];  /* Saved cursor position */
 	ansitty_coord_t           at_scroll_sl;   /* Scroll region starting line */
 	ansitty_coord_t           at_scroll_el;   /* Scroll region end line */
-	ansitty_coord_t           at_scroll_sc;   /* Scroll region starting column (only used internally!) */
-	ansitty_coord_t           at_scroll_ec;   /* Scroll region end column (only used internally!) */
-	__UINTPTR_HALF_TYPE__     at_state;       /* Current state-machine state. (not exposed) */
+	ansitty_coord_t           ANSITTY_INTERNAL(at_scroll_sc);   /* Scroll region starting column (only used internally!) */
+	ansitty_coord_t           ANSITTY_INTERNAL(at_scroll_ec);   /* Scroll region end column (only used internally!) */
+	__UINTPTR_HALF_TYPE__     ANSITTY_INTERNAL(at_state);       /* Current state-machine state. (not exposed) */
 	__UINTPTR_HALF_TYPE__     at_codepage;    /* Current code-page state. (not exposed, but 0 means UTF-8) */
 	union {
-		__UINTPTR_TYPE__      at_esclen;      /* Number of written, escaped bytes. */
-		__UINTPTR_HALF_TYPE__ at_escwrd[2];   /* Double-word status (used by some values for `at_state') */
+		__UINTPTR_TYPE__      ANSITTY_INTERNAL(at_esclen);      /* Number of written, escaped bytes. */
+		__UINTPTR_HALF_TYPE__ ANSITTY_INTERNAL(at_escwrd)[2];   /* Double-word status (used by some values for `at_state') */
 	};
-	__byte_t                  at_escape[256]; /* Escape text buffer (also used for unicode translation). */
-	__byte_t                  at_zero;        /* [const] Always ZERO. */
+	__byte_t                  ANSITTY_INTERNAL(at_escape)[256]; /* Escape text buffer (also used for unicode translation). */
+	__byte_t                  ANSITTY_INTERNAL(at_zero);        /* [const] Always ZERO. */
 	__CHAR32_TYPE__           at_lastch;      /* The last successfully printed character (used for `\e[<n>b'). */
 };
+
+#undef ANSITTY_INTERNAL
 
 
 /* Initialize the given ANSI TTY */

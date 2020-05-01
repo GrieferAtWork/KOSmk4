@@ -57,6 +57,7 @@
 /*[[[deemon
 local chk_include = {
 	"eti.h",
+	"etip.h",
 	"form.h",
 	"menu.h",
 	"panel.h",
@@ -71,8 +72,35 @@ local chk_include = {
 	"termcap.h",
 	"tic.h",
 	"unctrl.h",
+	"cursesapp.h",
+	"cursesf.h",
+	"cursesm.h",
+	"cursesp.h",
+	"cursesw.h",
+	"cursslk.h",
+
 	"zconf.h",
 	"zlib.h",
+};
+
+local cxx_include = {
+	"__stdcxx.h",
+
+	"cursesapp.h",
+	"cursesf.h",
+	"cursesm.h",
+	"cursesp.h",
+	"cursesw.h",
+	"cursslk.h",
+	"etip.h",
+
+	"ncursesw/cursesapp.h",
+	"ncursesw/cursesf.h",
+	"ncursesw/cursesm.h",
+	"ncursesw/cursesp.h",
+	"ncursesw/cursesw.h",
+	"ncursesw/cursslk.h",
+	"ncursesw/etip.h",
 };
 
 import fs;
@@ -88,8 +116,24 @@ function incdir(prefix, path) {
 			incdir(prefix + x + "/", total);
 			continue;
 		}
-		if ("." !in x || x in ["__stdcxx.h"]) {
+		if ("." !in x) {
 			// c++ header
+		} else if (x in cxx_include) {
+			local full;
+			if (".." in prefix) {
+				full = "\"" + prefix + x + "\"";
+			} else {
+				full = "<" + prefix + x + ">";
+			}
+			if (x in chk_include || x.startswith("ncursesw/")) {
+				print "#if defined(__cpluslus) && __has_include(" + full + ")";
+				print "#include",full;
+				print "#endif /" "* __cpluslus && __has_include(" + full + ") *" "/";
+			} else {
+				print "#ifdef __cpluslus";
+				print "#include",full;
+				print "#endif /" "* __cpluslus *" "/";
+			}
 		} else if (x !in [
 			"atree-abi.h", "__atomic-gasm.h", "__atomic-msvc.h",
 			"__atomic-libatomic.h", "service-lock.h"
@@ -101,7 +145,7 @@ function incdir(prefix, path) {
 				} else {
 					full = "<" + prefix + x + ">";
 				}
-				if (x in chk_include) {
+				if (x in chk_include || x.startswith("ncursesw/")) {
 					print "#if __has_include(" + full + ")";
 					print "#include",full;
 					print "#endif /" "* __has_include(" + full + ") *" "/";
@@ -121,6 +165,9 @@ incdir("", "../../include");
 ]]]*/
 #include <ConcurrencySal.h>
 #include <__crt.h>
+#ifdef __cpluslus
+#include <__stdcxx.h>
+#endif /* __cpluslus */
 #include <__stdinc.h>
 #include <_ansi.h>
 #include <_lfs_64.h>
@@ -150,6 +197,7 @@ incdir("", "../../include");
 #include <asm/param.h>
 #include <asm/poll.h>
 #include <asm/posix_types.h>
+#include <asm/sched.h>
 #include <asm/socket-families.h>
 #include <asm/socket.h>
 #include <asm/sockios.h>
@@ -356,6 +404,24 @@ incdir("", "../../include");
 #if __has_include(<curses.h>)
 #include <curses.h>
 #endif /* __has_include(<curses.h>) */
+#if defined(__cpluslus) && __has_include(<cursesapp.h>)
+#include <cursesapp.h>
+#endif /* __cpluslus && __has_include(<cursesapp.h>) */
+#if defined(__cpluslus) && __has_include(<cursesf.h>)
+#include <cursesf.h>
+#endif /* __cpluslus && __has_include(<cursesf.h>) */
+#if defined(__cpluslus) && __has_include(<cursesm.h>)
+#include <cursesm.h>
+#endif /* __cpluslus && __has_include(<cursesm.h>) */
+#if defined(__cpluslus) && __has_include(<cursesp.h>)
+#include <cursesp.h>
+#endif /* __cpluslus && __has_include(<cursesp.h>) */
+#if defined(__cpluslus) && __has_include(<cursesw.h>)
+#include <cursesw.h>
+#endif /* __cpluslus && __has_include(<cursesw.h>) */
+#if defined(__cpluslus) && __has_include(<cursslk.h>)
+#include <cursslk.h>
+#endif /* __cpluslus && __has_include(<cursslk.h>) */
 #include <dir.h>
 #include <direct.h>
 #include <dirent.h>
@@ -370,6 +436,9 @@ incdir("", "../../include");
 #if __has_include(<eti.h>)
 #include <eti.h>
 #endif /* __has_include(<eti.h>) */
+#if defined(__cpluslus) && __has_include(<etip.h>)
+#include <etip.h>
+#endif /* __cpluslus && __has_include(<etip.h>) */
 #include <execinfo.h>
 #include <fcntl.h>
 #include <features.h>
@@ -385,8 +454,8 @@ incdir("", "../../include");
 #include <getopt.h>
 #include <getpagesize.h>
 #include <glob.h>
-#include <gnu/stubs.h>
 #include <gnu/lib-names.h>
+#include <gnu/stubs.h>
 #include <grp.h>
 #include <hybrid/__alloca.h>
 #include <hybrid/__altint.h>
@@ -428,6 +497,7 @@ incdir("", "../../include");
 #include <hybrid/sched/__yield.h>
 #include <hybrid/sched/yield.h>
 #include <hybrid/sequence/atree.h>
+#include <hybrid/sequence/bitset.h>
 #include <hybrid/sequence/bsearch.h>
 #include <hybrid/sequence/list.h>
 #include <hybrid/sequence/vector.h>
@@ -469,8 +539,8 @@ incdir("", "../../include");
 #include <kos/except/noexec.h>
 #include <kos/except-handler.h>
 #include <kos/except.h>
-#include <kos/exec/asm/rtld.h>
 #include <kos/exec/asm/elf.h>
+#include <kos/exec/asm/rtld.h>
 #include <kos/exec/bits/library-listdef.h>
 #include <kos/exec/bits/library.h>
 #include <kos/exec/bits/peb.h>
@@ -501,8 +571,8 @@ incdir("", "../../include");
 #include <kos/hop/task.h>
 #include <kos/hop/uaio.h>
 #include <kos/hop/vm.h>
-#include <kos/hybrid/sched-signal.h>
 #include <kos/hybrid/heap.h>
+#include <kos/hybrid/sched-signal.h>
 #include <kos/io/ne2k.h>
 #include <kos/io/ohci.h>
 #include <kos/io/pci.h>
@@ -531,8 +601,8 @@ incdir("", "../../include");
 #include <kos/personality.h>
 #include <kos/refcnt.h>
 #include <kos/refptr.h>
-#include <kos/sys/stat.h>
 #include <kos/sys/ioctl.h>
+#include <kos/sys/stat.h>
 #include <kos/syscalls.h>
 #include <kos/thread.h>
 #include <kos/types.h>
@@ -581,34 +651,68 @@ incdir("", "../../include");
 #include <libdisasm/api.h>
 #include <libdisasm/disassembler.h>
 #include <libdisasm/format.h>
+#include <libemu86/api.h>
+#include <libemu86/eflags.h>
+#include <libemu86/emu/push-pop-util.h>
+#include <libemu86/emu/string-util.h>
+#include <libemu86/emu86.h>
+#include <libemu86/helpers.h>
 #include <libgen.h>
-#include <libinstrlen/instrlen.h>
 #include <libinstrlen/api.h>
+#include <libinstrlen/instrlen.h>
 #include <libio.h>
 #include <libjson/api.h>
 #include <libjson/generator.h>
 #include <libjson/parser.h>
 #include <libjson/writer.h>
-#include <libkeymap/keymap.h>
 #include <libkeymap/api.h>
+#include <libkeymap/keymap.h>
 #include <libm/api.h>
+#include <libm/asm/_builtin.h>
+#include <libm/asm/atan.h>
+#include <libm/asm/atan2.h>
+#include <libm/asm/builtin.h>
+#include <libm/asm/ceil.h>
+#include <libm/asm/exp.h>
+#include <libm/asm/expm1.h>
+#include <libm/asm/fabs.h>
+#include <libm/asm/fcomp.h>
+#include <libm/asm/floor.h>
+#include <libm/asm/inf.h>
+#include <libm/asm/lrint.h>
+#include <libm/asm/lround.h>
+#include <libm/asm/nan.h>
+#include <libm/asm/rint.h>
+#include <libm/asm/round.h>
+#include <libm/asm/significand.h>
+#include <libm/asm/sqrt.h>
+#include <libm/asm/trunc.h>
 #include <libm/atan.h>
 #include <libm/atan2.h>
 #include <libm/cbrt.h>
 #include <libm/ceil.h>
 #include <libm/copysign.h>
+#include <libm/exp.h>
+#include <libm/expm1.h>
 #include <libm/fabs.h>
+#include <libm/fcomp.h>
 #include <libm/fdlibm.h>
 #include <libm/finite.h>
 #include <libm/floor.h>
 #include <libm/fmod.h>
 #include <libm/fpclassify.h>
 #include <libm/frexp.h>
+#include <libm/ilogb.h>
+#include <libm/inf.h>
 #include <libm/isinf.h>
 #include <libm/isnan.h>
 #include <libm/issignaling.h>
 #include <libm/ldexp.h>
+#include <libm/lrint.h>
+#include <libm/lround.h>
+#include <libm/matherr.h>
 #include <libm/modf.h>
+#include <libm/nan.h>
 #include <libm/nextafter.h>
 #include <libm/nexttoward.h>
 #include <libm/pow.h>
@@ -618,15 +722,16 @@ incdir("", "../../include");
 #include <libm/scalb.h>
 #include <libm/scalbn.h>
 #include <libm/signbit.h>
+#include <libm/significand.h>
 #include <libm/sqrt.h>
 #include <libm/trunc.h>
-#include <libregdump/printer.h>
 #include <libregdump/api.h>
-#include <libregex/regex.h>
+#include <libregdump/printer.h>
 #include <libregex/api.h>
+#include <libregex/regex.h>
 #include <librpc/api.h>
-#include <librpc/bits/syscall-info.h>
 #include <librpc/bits/rpc.h>
+#include <librpc/bits/syscall-info.h>
 #include <librpc/rpc.h>
 #include <librt/_api.h>
 #include <librt/aio.h>
@@ -636,12 +741,12 @@ incdir("", "../../include");
 #include <librt/bits/aioinit.h>
 #include <librt/bits/mqueue.h>
 #include <librt/mqueue.h>
-#include <libterm/termio.h>
 #include <libterm/api.h>
+#include <libterm/termio.h>
 #include <libunwind/api.h>
 #include <libunwind/arch-register.h>
-#include <libunwind/cfi/x86_64.h>
 #include <libunwind/cfi/i386.h>
+#include <libunwind/cfi/x86_64.h>
 #include <libunwind/cfi.h>
 #include <libunwind/eh_frame.h>
 #include <libunwind/except.h>
@@ -656,8 +761,15 @@ incdir("", "../../include");
 #include <libvideo/gfx/font.h>
 #include <libvideo/gfx/fonts/tlft.h>
 #include <libvideo/gfx/gfx.h>
-#include <libvideo/window/window.h>
 #include <libvideo/window/api.h>
+#include <libvideo/window/window.h>
+#include <libvio/access.h>
+#include <libvio/api.h>
+#include <libvio/userviofd.h>
+#include <libvio/vio.h>
+#include <libviocore/api.h>
+#include <libviocore/bits/viocore.h>
+#include <libviocore/viocore.h>
 #include <libvm86/api.h>
 #include <libvm86/emulator.h>
 #include <libzlib/api.h>
@@ -693,6 +805,7 @@ incdir("", "../../include");
 #include <machine/_types.h>
 #include <machine/ansi.h>
 #include <machine/endian.h>
+#include <machine/ieeefp.h>
 #include <machine/malloc.h>
 #include <machine/param.h>
 #include <machine/setjmp-dj.h>
@@ -728,6 +841,72 @@ incdir("", "../../include");
 #if __has_include(<ncurses_dll.h>)
 #include <ncurses_dll.h>
 #endif /* __has_include(<ncurses_dll.h>) */
+#if __has_include(<ncursesw/curses.h>)
+#include <ncursesw/curses.h>
+#endif /* __has_include(<ncursesw/curses.h>) */
+#if defined(__cpluslus) && __has_include(<ncursesw/cursesapp.h>)
+#include <ncursesw/cursesapp.h>
+#endif /* __cpluslus && __has_include(<ncursesw/cursesapp.h>) */
+#if defined(__cpluslus) && __has_include(<ncursesw/cursesf.h>)
+#include <ncursesw/cursesf.h>
+#endif /* __cpluslus && __has_include(<ncursesw/cursesf.h>) */
+#if defined(__cpluslus) && __has_include(<ncursesw/cursesm.h>)
+#include <ncursesw/cursesm.h>
+#endif /* __cpluslus && __has_include(<ncursesw/cursesm.h>) */
+#if defined(__cpluslus) && __has_include(<ncursesw/cursesp.h>)
+#include <ncursesw/cursesp.h>
+#endif /* __cpluslus && __has_include(<ncursesw/cursesp.h>) */
+#if defined(__cpluslus) && __has_include(<ncursesw/cursesw.h>)
+#include <ncursesw/cursesw.h>
+#endif /* __cpluslus && __has_include(<ncursesw/cursesw.h>) */
+#if defined(__cpluslus) && __has_include(<ncursesw/cursslk.h>)
+#include <ncursesw/cursslk.h>
+#endif /* __cpluslus && __has_include(<ncursesw/cursslk.h>) */
+#if __has_include(<ncursesw/eti.h>)
+#include <ncursesw/eti.h>
+#endif /* __has_include(<ncursesw/eti.h>) */
+#if defined(__cpluslus) && __has_include(<ncursesw/etip.h>)
+#include <ncursesw/etip.h>
+#endif /* __cpluslus && __has_include(<ncursesw/etip.h>) */
+#if __has_include(<ncursesw/form.h>)
+#include <ncursesw/form.h>
+#endif /* __has_include(<ncursesw/form.h>) */
+#if __has_include(<ncursesw/menu.h>)
+#include <ncursesw/menu.h>
+#endif /* __has_include(<ncursesw/menu.h>) */
+#if __has_include(<ncursesw/nc_tparm.h>)
+#include <ncursesw/nc_tparm.h>
+#endif /* __has_include(<ncursesw/nc_tparm.h>) */
+#if __has_include(<ncursesw/ncurses.h>)
+#include <ncursesw/ncurses.h>
+#endif /* __has_include(<ncursesw/ncurses.h>) */
+#if __has_include(<ncursesw/ncurses_cfg.h>)
+#include <ncursesw/ncurses_cfg.h>
+#endif /* __has_include(<ncursesw/ncurses_cfg.h>) */
+#if __has_include(<ncursesw/ncurses_def.h>)
+#include <ncursesw/ncurses_def.h>
+#endif /* __has_include(<ncursesw/ncurses_def.h>) */
+#if __has_include(<ncursesw/ncurses_dll.h>)
+#include <ncursesw/ncurses_dll.h>
+#endif /* __has_include(<ncursesw/ncurses_dll.h>) */
+#if __has_include(<ncursesw/panel.h>)
+#include <ncursesw/panel.h>
+#endif /* __has_include(<ncursesw/panel.h>) */
+#if __has_include(<ncursesw/term.h>)
+#include <ncursesw/term.h>
+#endif /* __has_include(<ncursesw/term.h>) */
+#if __has_include(<ncursesw/term_entry.h>)
+#include <ncursesw/term_entry.h>
+#endif /* __has_include(<ncursesw/term_entry.h>) */
+#if __has_include(<ncursesw/termcap.h>)
+#include <ncursesw/termcap.h>
+#endif /* __has_include(<ncursesw/termcap.h>) */
+#if __has_include(<ncursesw/tic.h>)
+#include <ncursesw/tic.h>
+#endif /* __has_include(<ncursesw/tic.h>) */
+#if __has_include(<ncursesw/unctrl.h>)
+#include <ncursesw/unctrl.h>
+#endif /* __has_include(<ncursesw/unctrl.h>) */
 #include <net/bits/types.h>
 #include <net/ethernet.h>
 #include <net/if.h>
@@ -778,8 +957,8 @@ incdir("", "../../include");
 #include <parts/uchar/stdio.h>
 #include <parts/uchar/stdlib.h>
 #include <parts/uchar/string.h>
-#include <parts/uchar/sys/stat.h>
 #include <parts/uchar/sys/mman.h>
+#include <parts/uchar/sys/stat.h>
 #include <parts/uchar/time.h>
 #include <parts/uchar/unistd.h>
 #include <parts/uchar/utime.h>
@@ -886,6 +1065,7 @@ incdir("", "../../include");
 #include <sys/timerfd.h>
 #include <sys/times.h>
 #include <sys/timex.h>
+#include <sys/ttychars.h>
 #include <sys/ttydefaults.h>
 #include <sys/types.h>
 #include <sys/uio.h>
@@ -935,6 +1115,7 @@ incdir("", "../../include");
 #include <utmpx.h>
 #include <vadefs.h>
 #include <values.h>
+#include <vfork.h>
 #include <wait.h>
 #include <wchar.h>
 #include <wctype.h>

@@ -20,6 +20,7 @@
 #ifndef GUARD_LIBANSITTY_ANSITTY_C
 #define GUARD_LIBANSITTY_ANSITTY_C 1
 #define _KOS_SOURCE 1
+#define LIBANSITTY_EXPOSE_INTERNALS 1
 
 /* NOTE: References used during the implementation of this ansitty
  *       processor can be found in `/kos/include/libansitty/ansitty.h' */

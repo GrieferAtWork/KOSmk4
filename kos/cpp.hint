@@ -584,3 +584,5 @@
 #define NCURSES_CONST const
 #define NCURSES_SBOOL char
 
+#define ANSITTY_INTERNAL(x) x
+

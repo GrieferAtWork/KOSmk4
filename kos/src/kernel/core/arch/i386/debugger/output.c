@@ -1138,7 +1138,7 @@ do_put_cp_ch:
 
 PRIVATE NOBLOCK ATTR_DBGTEXT NONNULL((1)) void
 NOTHROW(FCALL dbg_pprinter_putuni)(dbg_pprinter_arg_t *__restrict printer, /*utf-32*/ char32_t ch) {
-	if (dbg_tty.at_state != 0 || ch == (unsigned char)'\033') {
+	if (dbg_tty._at_state != 0 || ch == (unsigned char)'\033') {
 		ansitty_putuni(&dbg_tty, ch);
 	} else {
 		/* Output a regular, old character. */

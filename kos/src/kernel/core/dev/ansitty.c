@@ -61,7 +61,7 @@ ansitty_device_ioctl(struct character_device *__restrict self, syscall_ulong_t c
 	case TIOCGWINSZ:
 	case _IOR(_IOC_TYPE(TIOCGWINSZ), _IOC_NR(TIOCGWINSZ), struct winsize): {
 		struct winsize ws;
-		ansitty_coord_t xy[2], sxy[2];
+		ansitty_coord_t sxy[2];
 		validate_writable(arg, sizeof(struct winsize));
 		/* These 2 operators are emulated by libansitty and should _always_ be present. */
 		assert(me->at_ansi.at_ops.ato_getcursor);
@@ -69,14 +69,19 @@ ansitty_device_ioctl(struct character_device *__restrict self, syscall_ulong_t c
 		/* Make use of the fact that the cursor position is clamped to the display bounds.
 		 * Note that libansitty makes use of the same fact to determine the window size
 		 * whenever it needs to know that value. */
-		(*me->at_ansi.at_ops.ato_getcursor)(&me->at_ansi, xy);
-		(*me->at_ansi.at_ops.ato_setcursor)(&me->at_ansi, (ansitty_coord_t)-1, (ansitty_coord_t)-1, false);
-		(*me->at_ansi.at_ops.ato_getcursor)(&me->at_ansi, sxy);
-		(*me->at_ansi.at_ops.ato_setcursor)(&me->at_ansi, xy[0], xy[1], false);
-		/* Because the cursor coords are clamped to the max valid values, the
-		 * actual display size is described by the max valid coords +1 each. */
-		++sxy[0];
-		++sxy[1];
+		if (me->at_ansi.at_ops.ato_getsize) {
+			(*me->at_ansi.at_ops.ato_getsize)(&me->at_ansi, sxy);
+		} else {
+			ansitty_coord_t xy[2];
+			(*me->at_ansi.at_ops.ato_getcursor)(&me->at_ansi, xy);
+			(*me->at_ansi.at_ops.ato_setcursor)(&me->at_ansi, (ansitty_coord_t)-1, (ansitty_coord_t)-1, false);
+			(*me->at_ansi.at_ops.ato_getcursor)(&me->at_ansi, sxy);
+			(*me->at_ansi.at_ops.ato_setcursor)(&me->at_ansi, xy[0], xy[1], false);
+			/* Because the cursor coords are clamped to the max valid values, the
+			 * actual display size is described by the max valid coords +1 each. */
+			++sxy[0];
+			++sxy[1];
+		}
 		if (sxy[0] == 1 && sxy[1] == 1) {
 			/* If we couldn't get anything useful, default to some sane values. */
 			sxy[0] = 80;
