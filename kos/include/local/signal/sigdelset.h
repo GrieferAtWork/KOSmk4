@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb632e88 */
+/* HASH CRC-32:0x998f3ca1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_sigdelset_defined
 #define __local_sigdelset_defined 1
+#include <__crt.h>
 #include <bits/sigset.h>
 __NAMESPACE_LOCAL_BEGIN
 /* @param signo: One of `SIG*' */

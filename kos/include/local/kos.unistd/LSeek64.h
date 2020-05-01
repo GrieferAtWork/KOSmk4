@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2deca87b */
+/* HASH CRC-32:0x8a5f2710 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_LSeek64_defined
 #ifdef __CRT_HAVE_LSeek
 #define __local_LSeek64_defined 1
+#include <__crt.h>
 #include <kos/anno.h>
 /* Dependency: "LSeek32" from "kos.unistd" */
 #ifndef ____localdep_LSeek32_defined

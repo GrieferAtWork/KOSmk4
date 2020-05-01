@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf67501e2 */
+/* HASH CRC-32:0xb1826ff2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_settimeofday64_defined
 #ifdef __CRT_HAVE_settimeofday
 #define __local_settimeofday64_defined 1
+#include <__crt.h>
 /* Dependency: "settimeofday32" from "sys.time" */
 #ifndef ____localdep_settimeofday32_defined
 #define ____localdep_settimeofday32_defined 1

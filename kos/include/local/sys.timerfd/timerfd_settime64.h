@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6a7d8857 */
+/* HASH CRC-32:0x9029cd44 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_timerfd_settime64_defined
 #ifdef __CRT_HAVE_timerfd_settime
 #define __local_timerfd_settime64_defined 1
+#include <__crt.h>
 /* Dependency: "timerfd_settime32" from "sys.timerfd" */
 #ifndef ____localdep_timerfd_settime32_defined
 #define ____localdep_timerfd_settime32_defined 1

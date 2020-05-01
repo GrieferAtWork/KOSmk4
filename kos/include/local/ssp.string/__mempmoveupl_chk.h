@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbba94462 */
+/* HASH CRC-32:0xef25ab72 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local___mempmoveupl_chk_defined
 #define __local___mempmoveupl_chk_defined 1
+#include <__crt.h>
 #ifdef __LIBC_BIND_OPTIMIZATIONS
 #include <optimized/string.h>
 #endif /* __LIBC_BIND_OPTIMIZATIONS */

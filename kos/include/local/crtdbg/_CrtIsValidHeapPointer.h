@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3974a3c */
+/* HASH CRC-32:0x1646d16 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local__CrtIsValidHeapPointer_defined
 #define __local__CrtIsValidHeapPointer_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_CrtIsValidHeapPointer) __ATTR_PURE __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_CrtIsValidHeapPointer))(void const *__heap_ptr) {

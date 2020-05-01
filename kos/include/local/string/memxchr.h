@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6cf6a5e2 */
+/* HASH CRC-32:0xfa81cb3b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_memxchr_defined
 #define __local_memxchr_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memchr', but search for non-matching locations. */
 __LOCAL_LIBC(memxchr) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) void *

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x384e5c75 */
+/* HASH CRC-32:0x16fb949d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_maybe_split_for_insert_defined
 #define __local_maybe_split_for_insert_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Possibly "split" a node with two red successors, and/or fix up two red
  * edges in a row. ROOTP is a pointer to the lowest node we visited, PARENTP

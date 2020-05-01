@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa6b8e269 */
+/* HASH CRC-32:0x87004214 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_format_aprintf_printer_defined
 #if defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_aprintf_alloc)
 #define __local_format_aprintf_printer_defined 1
+#include <__crt.h>
 #ifdef __LIBC_BIND_OPTIMIZATIONS
 #include <optimized/string.h>
 #endif /* __LIBC_BIND_OPTIMIZATIONS */

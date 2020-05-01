@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcd16dd98 */
+/* HASH CRC-32:0x2ad0b14a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_GetCurrentDirName_defined
 #ifdef __CRT_HAVE_GetCwd
 #define __local_GetCurrentDirName_defined 1
+#include <__crt.h>
 #include <kos/anno.h>
 /* Dependency: "GetCwd" */
 #ifndef ____localdep_GetCwd_defined

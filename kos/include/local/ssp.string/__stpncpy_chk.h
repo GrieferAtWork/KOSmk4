@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8929b482 */
+/* HASH CRC-32:0xb16a2e90 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local___stpncpy_chk_defined
 #define __local___stpncpy_chk_defined 1
+#include <__crt.h>
 #include <ssp/chk.h>
 /* Dependency: "stpncpy" from "string" */
 #ifndef ____localdep_stpncpy_defined

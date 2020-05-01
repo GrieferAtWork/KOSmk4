@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6abf2077 */
+/* HASH CRC-32:0x1adacf53 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local__rotr_defined
 #define __local__rotr_defined 1
+#include <__crt.h>
 #include <hybrid/__rotate.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_rotr) __ATTR_CONST unsigned int

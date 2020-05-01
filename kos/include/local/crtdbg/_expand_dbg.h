@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc643fef */
+/* HASH CRC-32:0xb786cf02 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local__expand_dbg_defined
 #if defined(__CRT_HAVE_realloc_in_place) || defined(__CRT_HAVE__expand)
 #define __local__expand_dbg_defined 1
+#include <__crt.h>
 /* Dependency: "realloc_in_place" */
 #ifndef ____localdep_realloc_in_place_defined
 #define ____localdep_realloc_in_place_defined 1

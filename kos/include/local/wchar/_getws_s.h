@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x77f0fcf3 */
+/* HASH CRC-32:0xd541a65c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local__getws_s_defined
 #if (((defined(__CRT_HAVE_fgetwc) || defined(__CRT_HAVE_getwc)) && (defined(__CRT_HAVE_ungetwc) || defined(__CRT_HAVE_ungetwc_unlocked)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE_ferror_unlocked) || defined(__CRT_HAVE__IO_ferror))) || defined(__CRT_HAVE_fgetws) || defined(__CRT_HAVE_fgetws_unlocked) || defined(__CRT_HAVE__fgetws_nolock)) && !defined(__NO_STDSTREAMS)
 #define __local__getws_s_defined 1
+#include <__crt.h>
 #include <kos/anno.h>
 /* Dependency: "fgetws" from "wchar" */
 #ifndef ____localdep_fgetws_defined

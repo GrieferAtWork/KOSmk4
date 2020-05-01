@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x617636c4 */
+/* HASH CRC-32:0x39315f36 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_eventfd_write_defined
 #if defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)
 #define __local_eventfd_write_defined 1
+#include <__crt.h>
 #include <parts/errno.h>
 /* Dependency: "write" */
 #ifndef ____localdep_write_defined

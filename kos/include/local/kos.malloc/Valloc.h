@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa16b4f09 */
+/* HASH CRC-32:0xdd113be8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_Valloc_defined
 #ifdef __CRT_HAVE_Memalign
 #define __local_Valloc_defined 1
+#include <__crt.h>
 #include <kos/anno.h>
 /* Dependency: "Memalign" */
 #ifndef ____localdep_Memalign_defined

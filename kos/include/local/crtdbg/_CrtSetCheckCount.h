@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x258c3e6 */
+/* HASH CRC-32:0x5ca9814b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local__CrtSetCheckCount_defined
 #define __local__CrtSetCheckCount_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_CrtSetCheckCount) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_CrtSetCheckCount))(int __check_count) {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x54de8182 */
+/* HASH CRC-32:0x9f03047c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_c32cmp_defined
 #define __local_c32cmp_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
 __LOCAL_LIBC(c32cmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int

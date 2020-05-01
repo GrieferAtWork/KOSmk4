@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcb3edfab */
+/* HASH CRC-32:0x2be75c37 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_setbuffer_defined
 #if defined(__CRT_HAVE_setvbuf) || defined(__CRT_HAVE__IO_setvbuf) || defined(__CRT_HAVE_setvbuf_unlocked)
 #define __local_setbuffer_defined 1
+#include <__crt.h>
 /* Dependency: "setvbuf" */
 #ifndef ____localdep_setvbuf_defined
 #define ____localdep_setvbuf_defined 1

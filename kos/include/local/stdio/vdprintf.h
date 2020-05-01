@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x86617894 */
+/* HASH CRC-32:0x2e19ef36 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_vdprintf_defined
 #if defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)
 #define __local_vdprintf_defined 1
+#include <__crt.h>
 #include <kos/anno.h>
 #include <bits/format-printer.h>
 /* Dependency: "format_vprintf" from "format-printer" */

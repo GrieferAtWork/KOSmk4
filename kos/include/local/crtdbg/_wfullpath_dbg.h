@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5fd00f07 */
+/* HASH CRC-32:0x44179e5c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local__wfullpath_dbg_defined
 #define __local__wfullpath_dbg_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_wfullpath_dbg) __ATTR_WUNUSED __ATTR_NONNULL((2)) __WCHAR16_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wfullpath_dbg))(__WCHAR16_TYPE__ *__full_path,

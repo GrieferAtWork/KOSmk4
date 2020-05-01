@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x228a9e9a */
+/* HASH CRC-32:0x70df065c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local__iswcsymf_l_defined
 #define __local__iswcsymf_l_defined 1
+#include <__crt.h>
 /* Dependency: "iswalpha_l" from "wctype" */
 #ifndef ____localdep_iswalpha_l_defined
 #define ____localdep_iswalpha_l_defined 1

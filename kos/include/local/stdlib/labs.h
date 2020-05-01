@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc5443db */
+/* HASH CRC-32:0xd5444b38 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_labs_defined
 #define __local_labs_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(labs) __ATTR_CONST __ATTR_WUNUSED long
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(labs))(long __x) {

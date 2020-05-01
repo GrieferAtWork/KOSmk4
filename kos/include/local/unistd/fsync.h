@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x26c2e51 */
+/* HASH CRC-32:0x3a5226d1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_fsync_defined
 #define __local_fsync_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> fsync(2)
  * Synchronize a file (including its descriptor which contains timestamps, and its size),

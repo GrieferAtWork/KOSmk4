@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e1839ed */
+/* HASH CRC-32:0x4118676d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_format_c32snprintf_printer_defined
 #define __local_format_c32snprintf_printer_defined 1
+#include <__crt.h>
 #include <hybrid/typecore.h>
 /* Dependency: "wmemcpy" from "wchar" */
 #ifndef ____localdep_c32memcpy_defined

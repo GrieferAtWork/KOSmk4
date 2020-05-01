@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x548a1062 */
+/* HASH CRC-32:0xb1730514 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_wmemmove_s_defined
 #define __local_wmemmove_s_defined 1
+#include <__crt.h>
 #include <parts/errno.h>
 /* Dependency: "wmemmove" from "wchar" */
 #ifndef ____localdep_wmemmove_defined

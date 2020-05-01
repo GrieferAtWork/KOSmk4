@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf5c273dc */
+/* HASH CRC-32:0xb7264f02 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_tolower_l_defined
 #define __local_tolower_l_defined 1
+#include <__crt.h>
 /* Dependency: "tolower" from "ctype" */
 #ifndef ____localdep_tolower_defined
 #define ____localdep_tolower_defined 1

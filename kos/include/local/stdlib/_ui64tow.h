@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x89396952 */
+/* HASH CRC-32:0x71b0a2ef */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local__ui64tow_defined
 #define __local__ui64tow_defined 1
+#include <__crt.h>
 /* Dependency: "_ui64tow_s" from "stdlib" */
 #ifndef ____localdep__ui64tow_s_defined
 #define ____localdep__ui64tow_s_defined 1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc257e672 */
+/* HASH CRC-32:0x6464ea5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_lseek_defined
 #if defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)
 #define __local_lseek_defined 1
+#include <__crt.h>
 /* Dependency: "lseek32" from "unistd" */
 #ifndef ____localdep_lseek32_defined
 #define ____localdep_lseek32_defined 1

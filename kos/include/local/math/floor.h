@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x34304d09 */
+/* HASH CRC-32:0xe7edf5be */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_floor_defined
 #define __local_floor_defined 1
+#include <__crt.h>
 #include <hybrid/typecore.h>
 
 #include <libm/floor.h>

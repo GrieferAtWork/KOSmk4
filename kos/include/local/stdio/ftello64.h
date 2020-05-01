@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcd6f158 */
+/* HASH CRC-32:0xd48e02bb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_ftello64_defined
 #if defined(__CRT_HAVE_fgetpos64) || defined(__CRT_HAVE__IO_fgetpos64) || defined(__CRT_HAVE_fgetpos64_unlocked) || defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE__IO_fgetpos) || defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello_unlocked) || defined(__CRT_HAVE_ftell) || defined(__CRT_HAVE_ftell_unlocked) || defined(__CRT_HAVE__ftell_nolock) || defined(__CRT_HAVE__IO_ftell)
 #define __local_ftello64_defined 1
+#include <__crt.h>
 #include <kos/anno.h>
 /* Dependency: "crt_fgetpos64" from "stdio" */
 #ifndef ____localdep_crt_fgetpos64_defined

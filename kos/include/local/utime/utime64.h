@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0f28c3f */
+/* HASH CRC-32:0x9c950866 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_utime64_defined
 #if defined(__CRT_HAVE_utime) || defined(__CRT_HAVE__utime32)
 #define __local_utime64_defined 1
+#include <__crt.h>
 /* Dependency: "crt_utime32" from "utime" */
 #ifndef ____localdep_crt_utime32_defined
 #define ____localdep_crt_utime32_defined 1

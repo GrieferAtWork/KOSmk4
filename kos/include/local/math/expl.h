@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x75155004 */
+/* HASH CRC-32:0x788d9ca5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #include <ieee754.h>
 #if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_exp) || defined(__CRT_HAVE___exp)
 #define __local_expl_defined 1
+#include <__crt.h>
 #include <bits/math-vector.h>
 #include <bits/math-vector.h>
 #include <libm/signbit.h>

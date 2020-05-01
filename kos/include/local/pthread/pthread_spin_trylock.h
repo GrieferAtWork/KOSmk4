@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd1947008 */
+/* HASH CRC-32:0x7f7105a3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_pthread_spin_trylock_defined
 #define __local_pthread_spin_trylock_defined 1
+#include <__crt.h>
 #include <hybrid/__atomic.h>
 
 #include <parts/errno.h>

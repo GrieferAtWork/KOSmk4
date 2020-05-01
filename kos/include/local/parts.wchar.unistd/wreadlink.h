@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb961699 */
+/* HASH CRC-32:0xabc3a91a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_wreadlink_defined
 #if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wreadlinkat)
 #define __local_wreadlink_defined 1
+#include <__crt.h>
 /* Dependency: "wreadlinkat" from "parts.wchar.unistd" */
 #ifndef ____localdep_wreadlinkat_defined
 #define ____localdep_wreadlinkat_defined 1

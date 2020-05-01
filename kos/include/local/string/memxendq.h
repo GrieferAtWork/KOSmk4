@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb2aa2010 */
+/* HASH CRC-32:0xa36251c2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_memxendq_defined
 #define __local_memxendq_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memendq', but search for non-matching locations. */
 __LOCAL_LIBC(memxendq) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ *

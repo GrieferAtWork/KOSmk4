@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4ea099d9 */
+/* HASH CRC-32:0xb69ff17a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_clock_nanosleep_defined
 #if defined(__CRT_HAVE_clock_nanosleep) || defined(__CRT_HAVE___clock_nanosleep) || defined(__CRT_HAVE_clock_nanosleep64)
 #define __local_clock_nanosleep_defined 1
+#include <__crt.h>
 /* Dependency: "clock_nanosleep32" from "time" */
 #ifndef ____localdep_clock_nanosleep32_defined
 #define ____localdep_clock_nanosleep32_defined 1

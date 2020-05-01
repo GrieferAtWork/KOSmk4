@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdd9f866a */
+/* HASH CRC-32:0x74f30059 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_wcstoumax_defined
 #define __local_wcstoumax_defined 1
+#include <__crt.h>
 /* Dependency: "wcstou32" from "wchar" */
 #ifndef ____localdep_wcstou32_defined
 #define ____localdep_wcstou32_defined 1

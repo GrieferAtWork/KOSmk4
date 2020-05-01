@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x775c34e5 */
+/* HASH CRC-32:0xe53dbc45 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_globfree64_defined
 #define __local_globfree64_defined 1
+#include <__crt.h>
 struct __glob64_struct;
 /* Dependency: "globfree32" from "glob" */
 #ifndef ____localdep_globfree32_defined

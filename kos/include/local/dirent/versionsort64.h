@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe65c05bb */
+/* HASH CRC-32:0x2a21a3f7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_versionsort64_defined
 #define __local_versionsort64_defined 1
+#include <__crt.h>
 /* Dependency: "strverscmp" from "string" */
 #ifndef ____localdep_strverscmp_defined
 #define ____localdep_strverscmp_defined 1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa976b7f7 */
+/* HASH CRC-32:0xf06920da */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_argz_create_sep_defined
 #if (defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_malloc)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
 #define __local_argz_create_sep_defined 1
+#include <__crt.h>
 #include <parts/errno.h>
 /* Dependency: "strlen" from "string" */
 #ifndef ____localdep_strlen_defined

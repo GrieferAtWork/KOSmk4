@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3011d79a */
+/* HASH CRC-32:0xb440c6d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_syslog_defined
 #if defined(__CRT_HAVE_syslog_printer) || defined(__CRT_HAVE_vsyslog)
 #define __local_syslog_defined 1
+#include <__crt.h>
 /* Dependency: "vsyslog" from "sys.syslog" */
 #ifndef ____localdep_vsyslog_defined
 #define ____localdep_vsyslog_defined 1

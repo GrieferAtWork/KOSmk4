@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x98747049 */
+/* HASH CRC-32:0xdaf5824a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_iswxdigit_l_defined
 #define __local_iswxdigit_l_defined 1
+#include <__crt.h>
 /* Dependency: "iswxdigit" from "wctype" */
 #ifndef ____localdep_iswxdigit_defined
 #define ____localdep_iswxdigit_defined 1

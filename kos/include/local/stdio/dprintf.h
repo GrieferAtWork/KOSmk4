@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbbb53f99 */
+/* HASH CRC-32:0x818c258d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_dprintf_defined
 #if defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write) || defined(__CRT_HAVE_vdprintf)
 #define __local_dprintf_defined 1
+#include <__crt.h>
 /* Dependency: "vdprintf" from "stdio" */
 #ifndef ____localdep_vdprintf_defined
 #define ____localdep_vdprintf_defined 1

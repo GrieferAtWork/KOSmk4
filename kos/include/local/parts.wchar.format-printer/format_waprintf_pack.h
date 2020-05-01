@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbbbdc1c6 */
+/* HASH CRC-32:0x5e04ad65 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_format_waprintf_pack_defined
 #ifdef __CRT_HAVE_realloc
 #define __local_format_waprintf_pack_defined 1
+#include <__crt.h>
 #include <hybrid/__assert.h>
 
 #include <hybrid/typecore.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcfee7441 */
+/* HASH CRC-32:0xf0304c68 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_remove_defined
 #if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_removeat)
 #define __local_remove_defined 1
+#include <__crt.h>
 /* Dependency: "removeat" */
 #ifndef ____localdep_removeat_defined
 #define ____localdep_removeat_defined 1

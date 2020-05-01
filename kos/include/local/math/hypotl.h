@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7b3f62c9 */
+/* HASH CRC-32:0x8fb6d944 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_hypotl_defined
 #if defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE___hypot)
 #define __local_hypotl_defined 1
+#include <__crt.h>
 /* Dependency: "hypot" */
 #ifndef ____localdep_hypot_defined
 #define ____localdep_hypot_defined 1

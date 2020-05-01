@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3e8b0f37 */
+/* HASH CRC-32:0x9464b517 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local__strlwr_s_defined
 #define __local__strlwr_s_defined 1
+#include <__crt.h>
 #include <parts/errno.h>
 /* Dependency: "strnlen" from "string" */
 #ifndef ____localdep_strnlen_defined

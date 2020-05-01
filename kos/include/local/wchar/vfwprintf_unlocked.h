@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xde4e1b51 */
+/* HASH CRC-32:0xb1c2df83 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_vfwprintf_unlocked_defined
 #if defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE__fputwc_nolock) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_file_wprinter)
 #define __local_vfwprintf_unlocked_defined 1
+#include <__crt.h>
 #include <kos/anno.h>
 #include <bits/wformat-printer.h>
 #include <bits/uformat-printer.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x52e3861e */
+/* HASH CRC-32:0x8ae65fd4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_pwritev_defined
 #if defined(__CRT_HAVE_pwritev) || defined(__CRT_HAVE_pwritev64)
 #define __local_pwritev_defined 1
+#include <__crt.h>
 /* Dependency: "pwritev64" from "sys.uio" */
 #ifndef ____localdep_pwritev64_defined
 #define ____localdep_pwritev64_defined 1

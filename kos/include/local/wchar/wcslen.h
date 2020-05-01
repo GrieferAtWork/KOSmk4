@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa9e34735 */
+/* HASH CRC-32:0xbf0d381a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_wcslen_defined
 #define __local_wcslen_defined 1
+#include <__crt.h>
 /* Dependency: "wcsend" from "wchar" */
 #ifndef ____localdep_wcsend_defined
 #define ____localdep_wcsend_defined 1

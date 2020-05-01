@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb264939b */
+/* HASH CRC-32:0x276b6f7e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_feclearexcept_defined
 #define __local_feclearexcept_defined 1
+#include <__crt.h>
 #include <bits/fenv-inline.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Clear the supported exceptions represented by EXCEPTS */

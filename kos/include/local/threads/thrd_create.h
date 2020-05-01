@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe28a81c4 */
+/* HASH CRC-32:0x8f2344d4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_thrd_create_defined
 #ifdef __CRT_HAVE_pthread_create
 #define __local_thrd_create_defined 1
+#include <__crt.h>
 #include <bits/pthreadtypes.h>
 #ifndef ____pthread_start_routine_t_defined
 #define ____pthread_start_routine_t_defined 1

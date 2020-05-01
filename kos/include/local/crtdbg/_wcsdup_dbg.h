@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xde9bbb06 */
+/* HASH CRC-32:0xea8ce678 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local__wcsdup_dbg_defined
 #if (defined(__CRT_HAVE_wcsdup) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_c16dup) || (defined(__CRT_HAVE__wcsdup) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_DOS$_wcsdup) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_malloc)
 #define __local__wcsdup_dbg_defined 1
+#include <__crt.h>
 /* Dependency: "c16dup" from "parts.uchar.string" */
 #ifndef ____localdep_c16dup_defined
 #define ____localdep_c16dup_defined 1

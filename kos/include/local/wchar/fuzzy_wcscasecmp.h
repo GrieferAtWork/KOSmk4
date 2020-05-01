@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x98ddf86a */
+/* HASH CRC-32:0x81808978 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_fuzzy_wcscasecmp_defined
 #if !defined(__NO_MALLOCA) || defined(__CRT_HAVE_fuzzy_wmemcasecmp)
 #define __local_fuzzy_wcscasecmp_defined 1
+#include <__crt.h>
 #include <parts/malloca.h>
 /* Dependency: "fuzzy_wmemcasecmp" from "wchar" */
 #ifndef ____localdep_fuzzy_wmemcasecmp_defined

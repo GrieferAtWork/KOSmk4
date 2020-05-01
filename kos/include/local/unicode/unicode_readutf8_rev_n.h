@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x605881a */
+/* HASH CRC-32:0xba079f29 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_unicode_readutf8_rev_n_defined
 #define __local_unicode_readutf8_rev_n_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `unicode_readutf8_rev()', but don't read ahead of `text_start' */
 __LOCAL_LIBC(unicode_readutf8_rev_n) __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__

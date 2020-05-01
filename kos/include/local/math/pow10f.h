@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6cfba188 */
+/* HASH CRC-32:0xce4714c3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #include <ieee754.h>
 #if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow) || defined(__CRT_HAVE_powf) || defined(__CRT_HAVE___powf)
 #define __local_pow10f_defined 1
+#include <__crt.h>
 #include <bits/math-vector.h>
 /* Dependency: "powf" from "math" */
 #ifndef ____localdep_powf_defined

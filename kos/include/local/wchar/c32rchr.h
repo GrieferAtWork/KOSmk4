@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb80f6f39 */
+/* HASH CRC-32:0x78e8f107 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_c32rchr_defined
 #define __local_c32rchr_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Return the pointer of the last instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
 __LOCAL_LIBC(c32rchr) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __CHAR32_TYPE__ *

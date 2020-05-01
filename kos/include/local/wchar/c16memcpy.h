@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbba2dc0a */
+/* HASH CRC-32:0xd1935350 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_c16memcpy_defined
 #define __local_c16memcpy_defined 1
+#include <__crt.h>
 #ifdef __LIBC_BIND_OPTIMIZATIONS
 #include <optimized/string.h>
 #endif /* __LIBC_BIND_OPTIMIZATIONS */

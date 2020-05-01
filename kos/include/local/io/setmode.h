@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x91b7c456 */
+/* HASH CRC-32:0x48e46544 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_setmode_defined
 #if (defined(__CRT_HAVE_fcntl) || defined(__CRT_HAVE___fcntl)) && (defined(__KOS__) || defined(__linux__))
 #define __local_setmode_defined 1
+#include <__crt.h>
 #include <bits/types.h>
 #include <bits/types.h>
 /* Dependency: "fcntl" */

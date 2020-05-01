@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbc472238 */
+/* HASH CRC-32:0xba05b32 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #include <asm/pagesize.h>
 #ifdef __ARCH_PAGESIZE
 #define __local_getpagesize_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> getpagesize(3)
  * Return the size of a PAGE (in bytes) */

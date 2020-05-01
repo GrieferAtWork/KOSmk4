@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xae6695d */
+/* HASH CRC-32:0x5b66a8c5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_c16pcpy_defined
 #define __local_c16pcpy_defined 1
+#include <__crt.h>
 /* Dependency: "wmempcpy" from "wchar" */
 #ifndef ____localdep_c16mempcpy_defined
 #define ____localdep_c16mempcpy_defined 1

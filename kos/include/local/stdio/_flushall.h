@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x319f7f2b */
+/* HASH CRC-32:0x6d7c28a1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local__flushall_defined
 #define __local__flushall_defined 1
+#include <__crt.h>
 #include <kos/anno.h>
 /* Dependency: "fflush" from "stdio" */
 #ifndef ____localdep_fflush_defined

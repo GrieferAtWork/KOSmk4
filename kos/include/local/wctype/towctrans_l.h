@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbcb22c0e */
+/* HASH CRC-32:0xeeef2811 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_towctrans_l_defined
 #define __local_towctrans_l_defined 1
+#include <__crt.h>
 /* Dependency: "towctrans" from "wctype" */
 #ifndef ____localdep_towctrans_defined
 #define ____localdep_towctrans_defined 1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2971f87a */
+/* HASH CRC-32:0xf3f9bfe0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_asprintf_defined
 #if ((defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_aprintf_pack)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_format_aprintf_printer)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))) || defined(__CRT_HAVE_vasprintf)
 #define __local_asprintf_defined 1
+#include <__crt.h>
 /* Dependency: "vasprintf" from "stdio" */
 #ifndef ____localdep_vasprintf_defined
 #define ____localdep_vasprintf_defined 1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab5f3065 */
+/* HASH CRC-32:0xb2b73a9f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_truncate_defined
 #if defined(__CRT_HAVE_truncate64) || defined(__CRT_HAVE_truncate) || ((defined(__CRT_HAVE_open) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE__open)) && (defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE__chsize) || defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE_ftruncate64)))
 #define __local_truncate_defined 1
+#include <__crt.h>
 #include <bits/types.h>
 /* Dependency: "truncate64" from "unistd" */
 #ifndef ____localdep_truncate64_defined

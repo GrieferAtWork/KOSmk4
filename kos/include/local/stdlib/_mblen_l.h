@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x80e3d6c2 */
+/* HASH CRC-32:0x89df4d2b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local__mblen_l_defined
 #define __local__mblen_l_defined 1
+#include <__crt.h>
 /* Dependency: "mblen" from "stdlib" */
 #ifndef ____localdep_mblen_defined
 #define ____localdep_mblen_defined 1

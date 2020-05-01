@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5b1147e2 */
+/* HASH CRC-32:0x2059a1bd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_copysign_defined
 #define __local_copysign_defined 1
+#include <__crt.h>
 #include <libm/copysign.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Return X with its signed changed to Y's */

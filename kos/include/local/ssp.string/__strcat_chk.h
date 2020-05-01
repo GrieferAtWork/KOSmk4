@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x92a144de */
+/* HASH CRC-32:0xcf214520 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local___strcat_chk_defined
 #define __local___strcat_chk_defined 1
+#include <__crt.h>
 #include <ssp/chk.h>
 /* Dependency: "strcat" from "string" */
 #ifndef ____localdep_strcat_defined

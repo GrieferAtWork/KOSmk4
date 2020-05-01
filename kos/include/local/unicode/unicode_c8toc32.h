@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x43b603f2 */
+/* HASH CRC-32:0x17852363 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_unicode_c8toc32_defined
 #define __local_unicode_c8toc32_defined 1
+#include <__crt.h>
 #include <bits/mbstate.h>
 __NAMESPACE_LOCAL_BEGIN
 /* @return: *:          Success (*pc32 was filled; the return value is the number of bytes taken from `s')

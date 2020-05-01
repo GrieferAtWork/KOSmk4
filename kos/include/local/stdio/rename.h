@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x920e6f2b */
+/* HASH CRC-32:0xedea70f0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_rename_defined
 #if defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_frenameat) || defined(__CRT_HAVE_renameat))
 #define __local_rename_defined 1
+#include <__crt.h>
 /* Dependency: "renameat" from "stdio" */
 #ifndef ____localdep_renameat_defined
 #define ____localdep_renameat_defined 1

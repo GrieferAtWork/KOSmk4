@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb1c1d0b9 */
+/* HASH CRC-32:0x22263b69 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_thrd_detach_defined
 #ifdef __CRT_HAVE_pthread_detach
 #define __local_thrd_detach_defined 1
+#include <__crt.h>
 #include <bits/threads.h>
 /* Dependency: "pthread_detach" */
 #ifndef ____localdep_pthread_detach_defined

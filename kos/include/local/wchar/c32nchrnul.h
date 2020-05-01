@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9c6296ed */
+/* HASH CRC-32:0xfc798479 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_c32nchrnul_defined
 #define __local_c32nchrnul_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `c32nchr', but return `c32nend(STR, MAX_CHARS)', rather than `NULL' if `NEEDLE' wasn't found. */
 __LOCAL_LIBC(c32nchrnul) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) __CHAR32_TYPE__ *

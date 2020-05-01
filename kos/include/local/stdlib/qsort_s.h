@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x67445394 */
+/* HASH CRC-32:0xa6ac4339 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_qsort_s_defined
 #define __local_qsort_s_defined 1
+#include <__crt.h>
 #include <kos/anno.h>
 #ifndef __compar_d_fn_t_defined
 #define __compar_d_fn_t_defined 1

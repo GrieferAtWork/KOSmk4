@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5a4db24c */
+/* HASH CRC-32:0xad98db3b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_trunc_defined
 #define __local_trunc_defined 1
+#include <__crt.h>
 #include <hybrid/typecore.h>
 
 #include <libm/trunc.h>

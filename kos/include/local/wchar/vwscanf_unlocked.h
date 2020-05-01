@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x20ab7ae2 */
+/* HASH CRC-32:0xda86d73d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_vwscanf_unlocked_defined
 #if (defined(__CRT_HAVE_vfwscanf_unlocked) || defined(__CRT_HAVE_vfwscanf)) && !defined(__NO_STDSTREAMS)
 #define __local_vwscanf_unlocked_defined 1
+#include <__crt.h>
 #include <kos/anno.h>
 #include <local/stdstreams.h>
 /* Dependency: "vfwscanf_unlocked" */

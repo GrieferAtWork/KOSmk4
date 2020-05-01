@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8eba57b1 */
+/* HASH CRC-32:0x5978e79 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_wctob_defined
 #define __local_wctob_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __EOF
 #ifdef EOF

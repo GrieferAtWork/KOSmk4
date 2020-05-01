@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa03a324b */
+/* HASH CRC-32:0xa4e373df */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_fegetexceptflag_defined
 #define __local_fegetexceptflag_defined 1
+#include <__crt.h>
 #include <bits/fenv-inline.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Store implementation-defined representation of the exception

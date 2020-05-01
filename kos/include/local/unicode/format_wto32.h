@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x70a581a4 */
+/* HASH CRC-32:0x45e2a845 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_format_wto32_defined
 #define __local_format_wto32_defined 1
+#include <__crt.h>
 #include <bits/uformat-printer.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Format printer (compatible with `__pc16formatprinter') for

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xea72ee18 */
+/* HASH CRC-32:0x8aeed0bf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #include <ieee754.h>
 #if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_significand) || defined(__CRT_HAVE___significand)
 #define __local_significandf_defined 1
+#include <__crt.h>
 #include <libm/significand.h>
 /* Dependency: "significand" from "math" */
 #ifndef ____localdep_significand_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x278c42d4 */
+/* HASH CRC-32:0xfcb50ade */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_memxendl_defined
 #define __local_memxendl_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memendl', but search for non-matching locations. */
 __LOCAL_LIBC(memxendl) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ *

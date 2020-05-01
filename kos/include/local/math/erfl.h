@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe1e9f7b */
+/* HASH CRC-32:0x8eb66aac */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_erfl_defined
 #if defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf)
 #define __local_erfl_defined 1
+#include <__crt.h>
 /* Dependency: "erf" */
 #ifndef ____localdep_erf_defined
 #define ____localdep_erf_defined 1

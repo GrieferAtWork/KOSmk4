@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa5e7a15b */
+/* HASH CRC-32:0xaa5c042b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_llrint_defined
 #define __local_llrint_defined 1
+#include <__crt.h>
 #include <hybrid/typecore.h>
 
 #include <libm/lrint.h>

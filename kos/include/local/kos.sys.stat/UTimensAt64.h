@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x30bcac49 */
+/* HASH CRC-32:0x4e1f1bd9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_UTimensAt64_defined
 #ifdef __CRT_HAVE_UTimensAt
 #define __local_UTimensAt64_defined 1
+#include <__crt.h>
 #include <kos/anno.h>
 /* Dependency: "UTimensAt32" from "kos.sys.stat" */
 #ifndef ____localdep_UTimensAt32_defined

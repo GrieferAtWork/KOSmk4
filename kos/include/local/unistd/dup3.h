@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb92f750c */
+/* HASH CRC-32:0xea24f0e0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_dup3_defined
 #if defined(__CRT_HAVE_dup2) || defined(__CRT_HAVE__dup2) || defined(__CRT_HAVE___dup2)
 #define __local_dup3_defined 1
+#include <__crt.h>
 /* Dependency: "dup2" */
 #ifndef ____localdep_dup2_defined
 #define ____localdep_dup2_defined 1

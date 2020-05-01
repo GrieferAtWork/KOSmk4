@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6bea757 */
+/* HASH CRC-32:0xa9868c9d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_futexlock_timedwaituntil_cmpxch_defined
 #if defined(__CRT_HAVE_lfutexlock) || defined(__CRT_HAVE_lfutexlock64)
 #define __local_futexlock_timedwaituntil_cmpxch_defined 1
+#include <__crt.h>
 #include <bits/types.h>
 #include <bits/types.h>
 

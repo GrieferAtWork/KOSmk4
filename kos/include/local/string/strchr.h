@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x73e56f11 */
+/* HASH CRC-32:0x6e78ec40 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_strchr_defined
 #define __local_strchr_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Return the pointer of the first instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
 __LOCAL_LIBC(strchr) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) char *

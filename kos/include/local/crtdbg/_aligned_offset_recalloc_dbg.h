@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa5ddadd7 */
+/* HASH CRC-32:0xad2e2011 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local__aligned_offset_recalloc_dbg_defined
 #if ((defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE__aligned_offset_malloc)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE__aligned_free))) || defined(__CRT_HAVE__aligned_offset_recalloc)
 #define __local__aligned_offset_recalloc_dbg_defined 1
+#include <__crt.h>
 /* Dependency: "_aligned_offset_recalloc" from "stdlib" */
 #ifndef ____localdep__aligned_offset_recalloc_defined
 #define ____localdep__aligned_offset_recalloc_defined 1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x351913f9 */
+/* HASH CRC-32:0x57a48353 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local__isleadbyte_l_defined
 #define __local__isleadbyte_l_defined 1
+#include <__crt.h>
 /* Dependency: "isleadbyte" from "wctype" */
 #ifndef ____localdep_isleadbyte_defined
 #define ____localdep_isleadbyte_defined 1

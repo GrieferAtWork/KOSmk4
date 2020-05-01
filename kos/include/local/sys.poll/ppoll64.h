@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3702117c */
+/* HASH CRC-32:0xa4d92ec0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_ppoll64_defined
 #ifdef __CRT_HAVE_ppoll
 #define __local_ppoll64_defined 1
+#include <__crt.h>
 /* Dependency: "ppoll32" from "sys.poll" */
 #ifndef ____localdep_ppoll32_defined
 #define ____localdep_ppoll32_defined 1

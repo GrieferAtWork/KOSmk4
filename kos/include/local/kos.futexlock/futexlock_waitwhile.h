@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf53ca511 */
+/* HASH CRC-32:0xced8d405 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_futexlock_waitwhile_defined
 #if defined(__CRT_HAVE_lfutexlock) || defined(__CRT_HAVE_lfutexlock64)
 #define __local_futexlock_waitwhile_defined 1
+#include <__crt.h>
 #include <bits/types.h>
 #include <bits/types.h>
 #include <kos/bits/futex.h>

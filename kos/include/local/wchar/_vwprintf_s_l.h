@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa69ebc3d */
+/* HASH CRC-32:0x2139fc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local__vwprintf_s_l_defined
 #if defined(__CRT_HAVE_vwprintf_s) || defined(__CRT_HAVE_vwprintf) || ((defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_vfwprintf)) && !defined(__NO_STDSTREAMS))
 #define __local__vwprintf_s_l_defined 1
+#include <__crt.h>
 #include <kos/anno.h>
 /* Dependency: "vwprintf_s" from "wchar" */
 #ifndef ____localdep_vwprintf_s_defined

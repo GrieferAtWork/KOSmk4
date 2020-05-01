@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf064a848 */
+/* HASH CRC-32:0xdaf73370 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local__itow_s_defined
 #define __local__itow_s_defined 1
+#include <__crt.h>
 #include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_itow_s) __errno_t

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4cd00a4b */
+/* HASH CRC-32:0xa1e7385e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_ctime64_defined
 #define __local_ctime64_defined 1
+#include <__crt.h>
 #if !(defined(__CRT_HAVE_ctime) || defined(__CRT_HAVE__ctime32))
 #ifndef __LIBC_CTIME_BUFFER_DEFINED
 #define __LIBC_CTIME_BUFFER_DEFINED 1

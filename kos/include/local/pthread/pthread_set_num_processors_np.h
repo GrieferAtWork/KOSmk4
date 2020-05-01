@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x67735814 */
+/* HASH CRC-32:0x17fa5494 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_pthread_set_num_processors_np_defined
 #ifdef __CRT_HAVE_sched_setaffinity
 #define __local_pthread_set_num_processors_np_defined 1
+#include <__crt.h>
 #include <bits/sched.h>
 
 #include <parts/errno.h>

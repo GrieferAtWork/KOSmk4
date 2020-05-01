@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x67009c15 */
+/* HASH CRC-32:0x570132fa */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local__fdpcomp_defined
 #ifdef __CRT_HAVE__dpcomp
 #define __local__fdpcomp_defined 1
+#include <__crt.h>
 /* Dependency: "_dpcomp" from "math" */
 #ifndef ____localdep__dpcomp_defined
 #define ____localdep__dpcomp_defined 1

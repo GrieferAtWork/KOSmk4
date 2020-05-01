@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x80b8cf67 */
+/* HASH CRC-32:0x3677b8ae */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local__mbstrlen_l_defined
 #define __local__mbstrlen_l_defined 1
+#include <__crt.h>
 /* Dependency: "_mbstrlen" from "stdlib" */
 #ifndef ____localdep__mbstrlen_defined
 #define ____localdep__mbstrlen_defined 1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4077baae */
+/* HASH CRC-32:0xa1f5ef33 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_strrev_defined
 #define __local_strrev_defined 1
+#include <__crt.h>
 /* Dependency: "memrev" from "string" */
 #ifndef ____localdep_memrev_defined
 #define ____localdep_memrev_defined 1

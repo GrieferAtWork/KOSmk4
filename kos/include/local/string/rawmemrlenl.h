@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb7825c0f */
+/* HASH CRC-32:0x40d8fc76 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_rawmemrlenl_defined
 #define __local_rawmemrlenl_defined 1
+#include <__crt.h>
 /* Dependency: "rawmemrchrl" from "string" */
 #ifndef ____localdep_rawmemrchrl_defined
 #define ____localdep_rawmemrchrl_defined 1

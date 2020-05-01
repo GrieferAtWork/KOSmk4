@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc20d1c3f */
+/* HASH CRC-32:0x90f01d42 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_mktime_defined
 #define __local_mktime_defined 1
+#include <__crt.h>
 #ifndef __STRUCT_TM
 #ifdef __tm_defined
 #define __STRUCT_TM struct __NAMESPACE_STD_SYM tm

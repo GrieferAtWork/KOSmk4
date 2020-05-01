@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdcb1ad36 */
+/* HASH CRC-32:0x36c1a8f3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_getchar32_unlocked_defined
 #if (defined(__CRT_HAVE_fgetwc_unlocked) || defined(__CRT_HAVE__fgetwc_nolock)) && !defined(__NO_STDSTREAMS)
 #define __local_getchar32_unlocked_defined 1
+#include <__crt.h>
 #include <kos/anno.h>
 /* Dependency: "fgetwc_unlocked" */
 #ifndef ____localdep_fgetc32_unlocked_defined

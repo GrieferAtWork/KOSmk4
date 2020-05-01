@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8bbd74b6 */
+/* HASH CRC-32:0xd61dded3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_ether_ntoa_defined
 #define __local_ether_ntoa_defined 1
+#include <__crt.h>
 #include <net/ethernet.h>
 /* Dependency: "ether_ntoa_r" from "netinet.ether" */
 #ifndef ____localdep_ether_ntoa_r_defined

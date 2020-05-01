@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e3e3d1d */
+/* HASH CRC-32:0x861e1fb7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_c16ndup_defined
 #if defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_malloc)
 #define __local_c16ndup_defined 1
+#include <__crt.h>
 /* Dependency: "wcsnlen" from "wchar" */
 #ifndef ____localdep_c16nlen_defined
 #define ____localdep_c16nlen_defined 1

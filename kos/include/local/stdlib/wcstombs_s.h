@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5abd1649 */
+/* HASH CRC-32:0x8455a8ca */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_wcstombs_s_defined
 #define __local_wcstombs_s_defined 1
+#include <__crt.h>
 #include <parts/errno.h>
 /* Dependency: "wcstombs" from "stdlib" */
 #ifndef ____localdep_wcstombs_defined

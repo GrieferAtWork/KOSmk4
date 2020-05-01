@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8e834037 */
+/* HASH CRC-32:0x12cbb071 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_sinhl_defined
 #if defined(__CRT_HAVE_sinh) || defined(__CRT_HAVE___sinh)
 #define __local_sinhl_defined 1
+#include <__crt.h>
 /* Dependency: "sinh" */
 #ifndef ____localdep_sinh_defined
 #define ____localdep_sinh_defined 1

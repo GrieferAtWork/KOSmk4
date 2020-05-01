@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7675cdb4 */
+/* HASH CRC-32:0xecd22842 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_lockf64_defined
 #if defined(__CRT_HAVE_lockf) || defined(__CRT_HAVE__locking) || defined(__CRT_HAVE_locking)
 #define __local_lockf64_defined 1
+#include <__crt.h>
 #include <bits/types.h>
 #include <bits/types.h>
 /* Dependency: "lockf32" from "fcntl" */

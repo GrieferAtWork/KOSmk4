@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6cce4aa6 */
+/* HASH CRC-32:0x67e194e1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_hcreate_defined
 #if defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_hcreate_r)
 #define __local_hcreate_defined 1
+#include <__crt.h>
 #ifndef __hsearch_data_defined
 #define __hsearch_data_defined 1
 struct _ENTRY;

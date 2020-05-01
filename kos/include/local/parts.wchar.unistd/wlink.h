@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcde5143e */
+/* HASH CRC-32:0x3bff5256 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_wlink_defined
 #if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wlinkat)
 #define __local_wlink_defined 1
+#include <__crt.h>
 /* Dependency: "wlinkat" from "parts.wchar.unistd" */
 #ifndef ____localdep_wlinkat_defined
 #define ____localdep_wlinkat_defined 1

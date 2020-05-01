@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1c38086d */
+/* HASH CRC-32:0x1467510a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_dysize_defined
 #define __local_dysize_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __isleap
 #define __isleap(__year) ((__year)%4 == 0 && ((__year)%100 != 0 || (__year)%400 == 0))

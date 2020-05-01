@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x39b2b30f */
+/* HASH CRC-32:0xfe5ef0f6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_mkstemp_defined
 #if defined(__CRT_HAVE_mktemp) || defined(__CRT_HAVE__mktemp) || defined(__CRT_HAVE___mktemp)
 #define __local_mkstemp_defined 1
+#include <__crt.h>
 /* Dependency: "mktemp" */
 #ifndef ____localdep_mktemp_defined
 #define ____localdep_mktemp_defined 1

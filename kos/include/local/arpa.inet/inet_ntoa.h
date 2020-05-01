@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x69b178df */
+/* HASH CRC-32:0x79b6cd08 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_inet_ntoa_defined
 #define __local_inet_ntoa_defined 1
+#include <__crt.h>
 /* Dependency: "inet_ntoa_r" from "arpa.inet" */
 #ifndef ____localdep_inet_ntoa_r_defined
 #define ____localdep_inet_ntoa_r_defined 1

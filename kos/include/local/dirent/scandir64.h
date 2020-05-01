@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x377e3b7c */
+/* HASH CRC-32:0xfd1bf892 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_scandir64_defined
 #if defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_scandirat64) || (defined(__CRT_HAVE_scandirat) && defined(_DIRENT_MATCHES_DIRENT64)))
 #define __local_scandir64_defined 1
+#include <__crt.h>
 /* Dependency: "scandirat64" */
 #ifndef ____localdep_scandirat64_defined
 #define ____localdep_scandirat64_defined 1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfaeb6ebd */
+/* HASH CRC-32:0x487cd469 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_j0l_defined
 #if defined(__CRT_HAVE_j0) || defined(__CRT_HAVE___j0)
 #define __local_j0l_defined 1
+#include <__crt.h>
 /* Dependency: "j0" */
 #ifndef ____localdep_j0_defined
 #define ____localdep_j0_defined 1

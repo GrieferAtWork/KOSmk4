@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe335213e */
+/* HASH CRC-32:0x262e72b5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_wcsncmp_defined
 #define __local_wcsncmp_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `wcscmp', but compare at most `MAXLEN' characters from either string */
 __LOCAL_LIBC(wcsncmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int

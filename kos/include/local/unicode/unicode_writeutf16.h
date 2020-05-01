@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdb726c89 */
+/* HASH CRC-32:0x49c69eb8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_unicode_writeutf16_defined
 #define __local_unicode_writeutf16_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
  * This function will write at most `UNICODE_UTF16_CURLEN' bytes to `dst' */

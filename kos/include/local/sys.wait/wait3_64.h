@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8868553d */
+/* HASH CRC-32:0x68a8701c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_wait3_64_defined
 #ifdef __CRT_HAVE_wait3
 #define __local_wait3_64_defined 1
+#include <__crt.h>
 #include <bits/rusage-struct.h>
 #include <bits/rusage-struct.h>
 /* Dependency: "wait3_32" from "sys.wait" */

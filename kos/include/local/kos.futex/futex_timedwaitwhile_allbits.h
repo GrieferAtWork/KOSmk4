@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc44baf0 */
+/* HASH CRC-32:0x8a4697b9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_futex_timedwaitwhile_allbits_defined
 #if defined(__CRT_HAVE_lfutex) || defined(__CRT_HAVE_lfutex64)
 #define __local_futex_timedwaitwhile_allbits_defined 1
+#include <__crt.h>
 #include <bits/types.h>
 #include <bits/types.h>
 

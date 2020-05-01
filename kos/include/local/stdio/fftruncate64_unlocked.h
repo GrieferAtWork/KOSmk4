@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd926a0e0 */
+/* HASH CRC-32:0x68da52f7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_fftruncate64_unlocked_defined
 #if (defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE__chsize) || defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s)) && (defined(__CRT_HAVE_fileno_unlocked) || defined(__CRT_HAVE__fileno) || defined(__CRT_HAVE_fileno))
 #define __local_fftruncate64_unlocked_defined 1
+#include <__crt.h>
 #include <kos/anno.h>
 #ifndef __PIO_OFFSET
 #ifdef __USE_KOS

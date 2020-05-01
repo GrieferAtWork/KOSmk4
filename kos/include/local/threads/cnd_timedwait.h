@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f76b483 */
+/* HASH CRC-32:0xeb143f58 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_cnd_timedwait_defined
 #if defined(__CRT_HAVE_pthread_cond_timedwait) || defined(__CRT_HAVE_pthread_cond_timedwait64)
 #define __local_cnd_timedwait_defined 1
+#include <__crt.h>
 #include <bits/pthreadtypes.h>
 #include <bits/timespec.h>
 #include <bits/threads.h>

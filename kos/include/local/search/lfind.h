@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xada9e0c6 */
+/* HASH CRC-32:0xf1858b17 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_lfind_defined
 #define __local_lfind_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Perform linear search for KEY by comparing by COMPAR in an array [BASE, BASE+NMEMB*SIZE) */
 __LOCAL_LIBC(lfind) void *

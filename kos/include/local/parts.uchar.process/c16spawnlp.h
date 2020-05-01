@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5b5caf8e */
+/* HASH CRC-32:0x5b836227 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_c16spawnlp_defined
 #if (defined(__CRT_HAVE_wspawnvp) && __SIZEOF_WCHAR_T__ == 2) || (defined(__CRT_HAVE__wspawnvp) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_DOS$_wspawnvp)
 #define __local_c16spawnlp_defined 1
+#include <__crt.h>
 #include <parts/redirect-exec.h>
 /* Dependency: "c16spawnvp" from "parts.uchar.process" */
 #ifndef ____localdep_c16spawnvp_defined

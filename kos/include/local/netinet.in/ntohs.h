@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc2613328 */
+/* HASH CRC-32:0xf2490e20 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_ntohs_defined
 #define __local_ntohs_defined 1
+#include <__crt.h>
 #include <hybrid/__byteswap.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(ntohs) __ATTR_CONST __UINT16_TYPE__

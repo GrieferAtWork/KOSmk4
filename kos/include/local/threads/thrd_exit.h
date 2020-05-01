@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdd207d82 */
+/* HASH CRC-32:0xa36459ba */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_thrd_exit_defined
 #ifdef __CRT_HAVE_pthread_exit
 #define __local_thrd_exit_defined 1
+#include <__crt.h>
 /* Dependency: "pthread_exit" */
 #ifndef ____localdep_pthread_exit_defined
 #define ____localdep_pthread_exit_defined 1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6b4ce3ae */
+/* HASH CRC-32:0x91df03a4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_acosl_defined
 #if defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos)
 #define __local_acosl_defined 1
+#include <__crt.h>
 /* Dependency: "acos" */
 #ifndef ____localdep_acos_defined
 #define ____localdep_acos_defined 1

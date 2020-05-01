@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3d178e4 */
+/* HASH CRC-32:0x6c8509c0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_c32ncmp_defined
 #define __local_c32ncmp_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `c32cmp', but compare at most `MAXLEN' characters from either string */
 __LOCAL_LIBC(c32ncmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int

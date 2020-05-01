@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x16b430f5 */
+/* HASH CRC-32:0xe7620c93 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_c32execle_defined
 #if (defined(__CRT_HAVE_wexecve) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE__wexecve) && __SIZEOF_WCHAR_T__ == 4)
 #define __local_c32execle_defined 1
+#include <__crt.h>
 #include <parts/redirect-exec.h>
 /* Dependency: "c32execve" from "parts.uchar.process" */
 #ifndef ____localdep_c32execve_defined

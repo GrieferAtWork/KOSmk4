@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa19547ce */
+/* HASH CRC-32:0xd6748569 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_qfcvt_r_defined
 #define __local_qfcvt_r_defined 1
+#include <__crt.h>
 /* Dependency: "dos_fcvt_s" from "stdlib" */
 #ifndef ____localdep_dos_fcvt_s_defined
 #define ____localdep_dos_fcvt_s_defined 1

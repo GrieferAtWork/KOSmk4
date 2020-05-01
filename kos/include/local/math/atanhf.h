@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8e43c01 */
+/* HASH CRC-32:0xd7973915 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_atanhf_defined
 #if defined(__CRT_HAVE_atanh) || defined(__CRT_HAVE___atanh)
 #define __local_atanhf_defined 1
+#include <__crt.h>
 /* Dependency: "atanh" */
 #ifndef ____localdep_atanh_defined
 #define ____localdep_atanh_defined 1

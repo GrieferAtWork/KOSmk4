@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7abc7dde */
+/* HASH CRC-32:0x93f771f5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_feholdexcept_defined
 #define __local_feholdexcept_defined 1
+#include <__crt.h>
 #include <bits/fenv-inline.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Save the current environment in the object pointed to by ENVP, clear

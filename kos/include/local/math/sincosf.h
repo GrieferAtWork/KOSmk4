@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2392ec1e */
+/* HASH CRC-32:0x25377dda */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_sincosf_defined
 #if defined(__CRT_HAVE_sincos) || defined(__CRT_HAVE___sincos)
 #define __local_sincosf_defined 1
+#include <__crt.h>
 #include <bits/math-vector.h>
 #include <bits/math-vector.h>
 /* Dependency: "sincos" */

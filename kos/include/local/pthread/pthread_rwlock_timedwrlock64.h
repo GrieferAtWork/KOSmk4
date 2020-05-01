@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x516dcfab */
+/* HASH CRC-32:0xe7c4dad0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_pthread_rwlock_timedwrlock64_defined
 #ifdef __CRT_HAVE_pthread_rwlock_timedwrlock
 #define __local_pthread_rwlock_timedwrlock64_defined 1
+#include <__crt.h>
 #include <bits/pthreadtypes.h>
 #include <bits/timespec.h>
 #include <bits/pthreadtypes.h>

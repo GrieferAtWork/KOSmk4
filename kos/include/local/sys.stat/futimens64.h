@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe0dc4f7f */
+/* HASH CRC-32:0x8eaf0d50 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_futimens64_defined
 #ifdef __CRT_HAVE_futimens
 #define __local_futimens64_defined 1
+#include <__crt.h>
 /* Dependency: "futimens32" from "sys.stat" */
 #ifndef ____localdep_futimens32_defined
 #define ____localdep_futimens32_defined 1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x55256570 */
+/* HASH CRC-32:0x14f9a5a2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_tss_create_defined
 #ifdef __CRT_HAVE_pthread_key_create
 #define __local_tss_create_defined 1
+#include <__crt.h>
 #ifndef ____pthread_destr_function_t_defined
 #define ____pthread_destr_function_t_defined 1
 typedef void (__LIBCCALL *__pthread_destr_function_t)(void *);

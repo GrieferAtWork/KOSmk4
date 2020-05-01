@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3b003e4 */
+/* HASH CRC-32:0x54365400 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_isascii_defined
 #define __local_isascii_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Returns non-zero if `(C & ~0x7f) == 0' */
 __LOCAL_LIBC(isascii) __ATTR_CONST int

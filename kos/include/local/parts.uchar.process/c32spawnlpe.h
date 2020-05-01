@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x21a5e1bc */
+/* HASH CRC-32:0x44ef6d6a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_c32spawnlpe_defined
 #if (defined(__CRT_HAVE_wspawnvpe) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE__wspawnvpe) && __SIZEOF_WCHAR_T__ == 4)
 #define __local_c32spawnlpe_defined 1
+#include <__crt.h>
 #include <parts/redirect-exec.h>
 /* Dependency: "c32spawnvpe" from "parts.uchar.process" */
 #ifndef ____localdep_c32spawnvpe_defined

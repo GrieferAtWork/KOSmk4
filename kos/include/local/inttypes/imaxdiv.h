@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x65c0f454 */
+/* HASH CRC-32:0x2aa7c3e1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_imaxdiv_defined
 #define __local_imaxdiv_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(imaxdiv) __ATTR_CONST struct __imaxdiv_struct
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(imaxdiv))(__INTMAX_TYPE__ __numer,

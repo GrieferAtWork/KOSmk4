@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xed06f750 */
+/* HASH CRC-32:0x141308cd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_rand_s_defined
 #define __local_rand_s_defined 1
+#include <__crt.h>
 #include <parts/errno.h>
 /* Dependency: "rand" from "stdlib" */
 #ifndef ____localdep_rand_defined

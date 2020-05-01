@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdc48c445 */
+/* HASH CRC-32:0xed146896 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_malloc_defined
 #if defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc)
 #define __local_malloc_defined 1
+#include <__crt.h>
 /* Dependency: "crt_calloc" from "stdlib" */
 #ifndef ____localdep_crt_calloc_defined
 #define ____localdep_crt_calloc_defined 1

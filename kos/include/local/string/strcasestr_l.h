@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa1a044e7 */
+/* HASH CRC-32:0x52cf28f1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_strcasestr_l_defined
 #define __local_strcasestr_l_defined 1
+#include <__crt.h>
 /* Dependency: "strcasecmp_l" from "string" */
 #ifndef ____localdep_strcasecmp_l_defined
 #define ____localdep_strcasecmp_l_defined 1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xabb57f2 */
+/* HASH CRC-32:0xcc313f3a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_asctime_s_defined
 #define __local_asctime_s_defined 1
+#include <__crt.h>
 #include <parts/errno.h>
 /* Dependency: "asctime_r" from "time" */
 #ifndef ____localdep_asctime_r_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7c89d133 */
+/* HASH CRC-32:0x749b7ccb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local__byteswap_uint64_defined
 #define __local__byteswap_uint64_defined 1
+#include <__crt.h>
 #include <hybrid/__byteswap.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_byteswap_uint64) __ATTR_CONST __ATTR_WUNUSED __UINT64_TYPE__

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5480ce14 */
+/* HASH CRC-32:0x6f661ef7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local__vfwprintf_p_l_defined
 #define __local__vfwprintf_p_l_defined 1
+#include <__crt.h>
 #include <kos/anno.h>
 /* Dependency: "_vfwprintf_p" from "wchar" */
 #ifndef ____localdep__vfwprintf_p_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xde2e54fe */
+/* HASH CRC-32:0x3b76d247 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_twalk_defined
 #define __local_twalk_defined 1
+#include <__crt.h>
 /* Dependency: "trecurse" from "search" */
 #ifndef ____localdep_trecurse_defined
 #define ____localdep_trecurse_defined 1

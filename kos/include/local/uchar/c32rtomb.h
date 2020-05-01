@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb250a547 */
+/* HASH CRC-32:0x93c4e3b9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_c32rtomb_defined
 #define __local_c32rtomb_defined 1
+#include <__crt.h>
 #include <parts/errno.h>
 
 #include <bits/mbstate.h>

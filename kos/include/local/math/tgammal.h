@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x684f85a3 */
+/* HASH CRC-32:0xc6b781ea */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_tgammal_defined
 #if defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma)
 #define __local_tgammal_defined 1
+#include <__crt.h>
 /* Dependency: "tgamma" */
 #ifndef ____localdep_tgamma_defined
 #define ____localdep_tgamma_defined 1

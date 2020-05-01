@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbce4e7ef */
+/* HASH CRC-32:0x67f55c29 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_fmaxf_defined
 #define __local_fmaxf_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Return maximum numeric value from X and Y */
 __LOCAL_LIBC(fmaxf) __ATTR_CONST __ATTR_WUNUSED float

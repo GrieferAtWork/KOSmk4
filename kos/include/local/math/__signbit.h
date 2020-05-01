@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x957b2ddf */
+/* HASH CRC-32:0x45822676 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local___signbit_defined
 #define __local___signbit_defined 1
+#include <__crt.h>
 #include <libm/signbit.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__signbit) __ATTR_CONST __ATTR_WUNUSED int

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xff145faf */
+/* HASH CRC-32:0x4bba91b8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_div_defined
 #define __local_div_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(div) __ATTR_CONST __ATTR_WUNUSED struct __div_struct
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(div))(int __numer,

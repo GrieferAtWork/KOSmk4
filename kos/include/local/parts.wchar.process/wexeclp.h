@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x90144a24 */
+/* HASH CRC-32:0x950ff44a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_wexeclp_defined
 #if defined(__CRT_HAVE_wexecvp) || defined(__CRT_HAVE__wexecvp)
 #define __local_wexeclp_defined 1
+#include <__crt.h>
 #include <parts/redirect-exec.h>
 /* Dependency: "wexecvp" */
 #ifndef ____localdep_wexecvp_defined

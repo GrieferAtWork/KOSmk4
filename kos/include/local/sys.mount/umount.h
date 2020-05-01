@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc70389b */
+/* HASH CRC-32:0x8be46e06 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_umount_defined
 #ifdef __CRT_HAVE_umount2
 #define __local_umount_defined 1
+#include <__crt.h>
 /* Dependency: "umount2" */
 #ifndef ____localdep_umount2_defined
 #define ____localdep_umount2_defined 1

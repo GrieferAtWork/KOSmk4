@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x22f0b182 */
+/* HASH CRC-32:0xf719ae7f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_Execle_defined
 #ifdef __CRT_HAVE_Execve
 #define __local_Execle_defined 1
+#include <__crt.h>
 #include <kos/anno.h>
 #include <parts/redirect-exec.h>
 /* Dependency: "Execve" */

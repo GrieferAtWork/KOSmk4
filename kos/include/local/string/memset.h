@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdd9a6772 */
+/* HASH CRC-32:0x48614150 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_memset_defined
 #define __local_memset_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Fill memory with a given byte
  * @return: * : Always re-returns `dst' */

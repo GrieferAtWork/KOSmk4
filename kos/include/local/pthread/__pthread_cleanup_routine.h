@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc378778c */
+/* HASH CRC-32:0x3f21b8f8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local___pthread_cleanup_routine_defined
 #define __local___pthread_cleanup_routine_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Function called to call the cleanup handler. As an extern inline
  * function the compiler is free to decide inlining the change when

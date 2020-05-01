@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa6084aef */
+/* HASH CRC-32:0x13a0238b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local__aligned_msize_dbg_defined
 #define __local__aligned_msize_dbg_defined 1
+#include <__crt.h>
 /* Dependency: "_aligned_msize" from "stdlib" */
 #ifndef ____localdep__aligned_msize_defined
 #define ____localdep__aligned_msize_defined 1

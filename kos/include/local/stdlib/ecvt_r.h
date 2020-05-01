@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x19def35d */
+/* HASH CRC-32:0xb108591c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_ecvt_r_defined
 #define __local_ecvt_r_defined 1
+#include <__crt.h>
 /* Dependency: "dos_ecvt_s" from "stdlib" */
 #ifndef ____localdep_dos_ecvt_s_defined
 #define ____localdep_dos_ecvt_s_defined 1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe5fef795 */
+/* HASH CRC-32:0xfc873d15 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_fseeko64_defined
 #if defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock)
 #define __local_fseeko64_defined 1
+#include <__crt.h>
 #include <kos/anno.h>
 /* Dependency: "crt_fseeko" from "stdio" */
 #ifndef ____localdep_crt_fseeko_defined

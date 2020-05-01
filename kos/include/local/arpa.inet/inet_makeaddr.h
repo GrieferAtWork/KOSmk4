@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x23bdc8c6 */
+/* HASH CRC-32:0x5c5eab7b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_inet_makeaddr_defined
 #define __local_inet_makeaddr_defined 1
+#include <__crt.h>
 #include <netinet/in.h>
 
 #include <hybrid/__byteswap.h>

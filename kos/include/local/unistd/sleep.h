@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7be48c92 */
+/* HASH CRC-32:0xd18b8dd3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_sleep_defined
 #ifdef __CRT_HAVE__sleep
 #define __local_sleep_defined 1
+#include <__crt.h>
 /* Dependency: "dos_sleep" from "unistd" */
 #ifndef ____localdep_dos_sleep_defined
 #define ____localdep_dos_sleep_defined 1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb6f846e6 */
+/* HASH CRC-32:0x7d99f274 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local__ltow_defined
 #define __local__ltow_defined 1
+#include <__crt.h>
 /* Dependency: "_ltow_s" from "stdlib" */
 #ifndef ____localdep__ltow_s_defined
 #define ____localdep__ltow_s_defined 1

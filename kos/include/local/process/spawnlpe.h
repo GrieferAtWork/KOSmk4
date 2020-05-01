@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbfa96126 */
+/* HASH CRC-32:0xa47a8476 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_spawnlpe_defined
 #if defined(__CRT_HAVE_spawnvpe) || defined(__CRT_HAVE__spawnvpe)
 #define __local_spawnlpe_defined 1
+#include <__crt.h>
 #include <parts/redirect-exec.h>
 /* Dependency: "spawnvpe" */
 #ifndef ____localdep_spawnvpe_defined

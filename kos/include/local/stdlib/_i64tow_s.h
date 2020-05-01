@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb94f58dd */
+/* HASH CRC-32:0x2216bf45 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local__i64tow_s_defined
 #define __local__i64tow_s_defined 1
+#include <__crt.h>
 #include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_i64tow_s) __errno_t

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa8f81fac */
+/* HASH CRC-32:0x38444741 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_sync_defined
 #define __local_sync_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> sync(2)
  * Synchronize all disk operations of all mounted file systems and flush

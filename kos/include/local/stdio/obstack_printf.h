@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2cdcf447 */
+/* HASH CRC-32:0xbc13e34e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_obstack_printf_defined
 #ifdef __CRT_HAVE_obstack_vprintf
 #define __local_obstack_printf_defined 1
+#include <__crt.h>
 /* Dependency: "obstack_vprintf" */
 #ifndef ____localdep_obstack_vprintf_defined
 #define ____localdep_obstack_vprintf_defined 1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x68c58bb5 */
+/* HASH CRC-32:0xd1485df9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_c16access_defined
 #if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wfaccessat)
 #define __local_c16access_defined 1
+#include <__crt.h>
 /* Dependency: "wfaccessat" from "parts.wchar.unistd" */
 #ifndef ____localdep_c16faccessat_defined
 #define ____localdep_c16faccessat_defined 1

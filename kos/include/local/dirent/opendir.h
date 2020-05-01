@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4aede2b8 */
+/* HASH CRC-32:0x15c50554 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_opendir_defined
 #if defined(__CRT_AT_FDCWD) && ((defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_openat64) || (defined(__CRT_HAVE_openat) && !defined(__USE_FILE_OFFSET64)))) || defined(__CRT_HAVE_fopendirat) || defined(__CRT_HAVE_opendirat))
 #define __local_opendir_defined 1
+#include <__crt.h>
 struct __dirstream;
 struct __dirstream;
 /* Dependency: "opendirat" from "dirent" */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbfcaab37 */
+/* HASH CRC-32:0xa10de2ee */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_gai_suspend_defined
 #if defined(__CRT_HAVE_gai_suspend64) || defined(__CRT_HAVE_gai_suspend)
 #define __local_gai_suspend_defined 1
+#include <__crt.h>
 /* Dependency: "crt_gai_suspend" from "netdb" */
 #ifndef ____localdep_crt_gai_suspend_defined
 #define ____localdep_crt_gai_suspend_defined 1

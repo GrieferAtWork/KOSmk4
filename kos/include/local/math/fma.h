@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x43e66f1c */
+/* HASH CRC-32:0x25b49834 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_fma_defined
 #define __local_fma_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Multiply-add function computed as a ternary operation */
 __LOCAL_LIBC(fma) __ATTR_CONST __ATTR_WUNUSED double

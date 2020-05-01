@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x916d2139 */
+/* HASH CRC-32:0x5a566bdf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_fminf_defined
 #define __local_fminf_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Return minimum numeric value from X and Y */
 __LOCAL_LIBC(fminf) __ATTR_CONST __ATTR_WUNUSED float

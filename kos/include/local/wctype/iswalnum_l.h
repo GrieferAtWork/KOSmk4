@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5ae07477 */
+/* HASH CRC-32:0x4d9d8327 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_iswalnum_l_defined
 #define __local_iswalnum_l_defined 1
+#include <__crt.h>
 /* Dependency: "iswalnum" from "wctype" */
 #ifndef ____localdep_iswalnum_defined
 #define ____localdep_iswalnum_defined 1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8fd965d6 */
+/* HASH CRC-32:0xc81a56ef */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_rmdir_defined
 #if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
 #define __local_rmdir_defined 1
+#include <__crt.h>
 /* Dependency: "unlinkat" */
 #ifndef ____localdep_unlinkat_defined
 #define ____localdep_unlinkat_defined 1

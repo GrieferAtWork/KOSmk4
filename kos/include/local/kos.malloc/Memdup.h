@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc3fa2c11 */
+/* HASH CRC-32:0xb182b57c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_Memdup_defined
 #ifdef __CRT_HAVE_Malloc
 #define __local_Memdup_defined 1
+#include <__crt.h>
 #include <kos/anno.h>
 #ifdef __LIBC_BIND_OPTIMIZATIONS
 #include <optimized/string.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ec3278c */
+/* HASH CRC-32:0xea3911d5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_format_c16width_defined
 #define __local_format_c16width_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Returns the width (number of characters; not bytes) of the given unicode string */
 __LOCAL_LIBC(format_c16width) __ATTR_PURE __ATTR_NONNULL((2)) __SSIZE_TYPE__

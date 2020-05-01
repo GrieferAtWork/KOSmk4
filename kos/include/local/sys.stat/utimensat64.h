@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4b2845ef */
+/* HASH CRC-32:0x6b9b001d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_utimensat64_defined
 #ifdef __CRT_HAVE_utimensat
 #define __local_utimensat64_defined 1
+#include <__crt.h>
 /* Dependency: "utimensat32" from "sys.stat" */
 #ifndef ____localdep_utimensat32_defined
 #define ____localdep_utimensat32_defined 1

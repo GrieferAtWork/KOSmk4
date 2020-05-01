@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc68d8e55 */
+/* HASH CRC-32:0x8e91d86d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local__fsopen_defined
 #if defined(__CRT_HAVE_fopen) || defined(__CRT_HAVE__IO_fopen) || defined(__CRT_HAVE_fopen64)
 #define __local__fsopen_defined 1
+#include <__crt.h>
 /* Dependency: "fopen" */
 #ifndef ____localdep_fopen_defined
 #define ____localdep_fopen_defined 1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf10c028f */
+/* HASH CRC-32:0x1d2e735f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_log2f_defined
 #if defined(__CRT_HAVE_log2) || defined(__CRT_HAVE___log2)
 #define __local_log2f_defined 1
+#include <__crt.h>
 /* Dependency: "log2" */
 #ifndef ____localdep_log2_defined
 #define ____localdep_log2_defined 1

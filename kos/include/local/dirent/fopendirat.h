@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9ebc2e20 */
+/* HASH CRC-32:0xa8c39cfc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_fopendirat_defined
 #if defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_openat64) || (defined(__CRT_HAVE_openat) && !defined(__USE_FILE_OFFSET64)))
 #define __local_fopendirat_defined 1
+#include <__crt.h>
 #include <bits/types.h>
 struct __dirstream;
 struct __dirstream;

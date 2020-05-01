@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f0a5423 */
+/* HASH CRC-32:0x330a104f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #include <ieee754.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #define __local_cbrt_defined 1
+#include <__crt.h>
 #include <libm/cbrt.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Return the cube root of X */

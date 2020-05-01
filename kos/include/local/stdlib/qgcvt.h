@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa01866e9 */
+/* HASH CRC-32:0x9c80facc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_qgcvt_defined
 #define __local_qgcvt_defined 1
+#include <__crt.h>
 /* Dependency: "sprintf" from "stdio" */
 #ifndef ____localdep_sprintf_defined
 #define ____localdep_sprintf_defined 1

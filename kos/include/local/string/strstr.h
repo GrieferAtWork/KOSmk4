@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2b9ca36f */
+/* HASH CRC-32:0x1d413391 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_strstr_defined
 #define __local_strstr_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Search for a given `NEEDLE' appearing as a sub-string within `HAYSTACK'
  * If no such needle exists, return `NULL' */

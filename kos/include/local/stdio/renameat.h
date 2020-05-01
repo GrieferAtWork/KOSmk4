@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x88e6323d */
+/* HASH CRC-32:0xd55a6294 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_renameat_defined
 #ifdef __CRT_HAVE_frenameat
 #define __local_renameat_defined 1
+#include <__crt.h>
 /* Dependency: "frenameat" */
 #ifndef ____localdep_frenameat_defined
 #define ____localdep_frenameat_defined 1

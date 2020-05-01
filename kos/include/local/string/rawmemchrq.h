@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaf4f8168 */
+/* HASH CRC-32:0x1b6003d8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_rawmemchrq_defined
 #define __local_rawmemchrq_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memchrq' with a search limit of `(size_t)-1 / 8' */
 __LOCAL_LIBC(rawmemchrq) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ *

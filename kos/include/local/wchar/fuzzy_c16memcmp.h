@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x632c433 */
+/* HASH CRC-32:0xbf127807 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_fuzzy_c16memcmp_defined
 #ifndef __NO_MALLOCA
 #define __local_fuzzy_c16memcmp_defined 1
+#include <__crt.h>
 #include <parts/malloca.h>
 /* Dependency: "fuzzy_memcmpw" from "string" */
 #ifndef ____localdep_fuzzy_memcmpw_defined

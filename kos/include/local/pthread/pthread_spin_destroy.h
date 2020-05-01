@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa084bb82 */
+/* HASH CRC-32:0xeb811e2d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_pthread_spin_destroy_defined
 #define __local_pthread_spin_destroy_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Destroy the spinlock LOCK */
 __LOCAL_LIBC(pthread_spin_destroy) __ATTR_NONNULL((1)) int

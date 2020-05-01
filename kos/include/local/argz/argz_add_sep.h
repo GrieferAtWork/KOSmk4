@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x455bdb8 */
+/* HASH CRC-32:0xa4f9d252 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_argz_add_sep_defined
 #ifdef __CRT_HAVE_realloc
 #define __local_argz_add_sep_defined 1
+#include <__crt.h>
 #include <parts/errno.h>
 /* Dependency: "strlen" from "string" */
 #ifndef ____localdep_strlen_defined

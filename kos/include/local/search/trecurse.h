@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcb3b394b */
+/* HASH CRC-32:0x2900fc08 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_trecurse_defined
 #define __local_trecurse_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Walk the nodes of a tree.
  * ROOT is the root of the tree to be walked, ACTION the function to be

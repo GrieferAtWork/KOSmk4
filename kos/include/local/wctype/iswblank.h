@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x97715988 */
+/* HASH CRC-32:0x6daf97b1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_iswblank_defined
 #define __local_iswblank_defined 1
+#include <__crt.h>
 /* Dependency: "isblank" from "ctype" */
 #ifndef ____localdep_isblank_defined
 #define ____localdep_isblank_defined 1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x12441364 */
+/* HASH CRC-32:0x257adbd4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local__scprintf_p_defined
 #define __local__scprintf_p_defined 1
+#include <__crt.h>
 /* Dependency: "_vscprintf_p" from "stdio" */
 #ifndef ____localdep__vscprintf_p_defined
 #define ____localdep__vscprintf_p_defined 1

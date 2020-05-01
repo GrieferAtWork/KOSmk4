@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x11cce88 */
+/* HASH CRC-32:0x943efed3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_pselect_defined
 #if defined(__CRT_HAVE_pselect) || defined(__CRT_HAVE_pselect64)
 #define __local_pselect_defined 1
+#include <__crt.h>
 /* Dependency: "pselect64" from "sys.select" */
 #ifndef ____localdep_pselect64_defined
 #define ____localdep_pselect64_defined 1

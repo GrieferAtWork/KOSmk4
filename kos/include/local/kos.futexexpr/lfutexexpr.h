@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x85b6d3f8 */
+/* HASH CRC-32:0x49bd443d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_lfutexexpr_defined
 #if defined(__CRT_HAVE_lfutexexpr) || defined(__CRT_HAVE_lfutexexpr64)
 #define __local_lfutexexpr_defined 1
+#include <__crt.h>
 #include <bits/timespec.h>
 #include <kos/bits/futex-expr.h>
 #include <bits/types.h>

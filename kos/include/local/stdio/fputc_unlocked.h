@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb545d564 */
+/* HASH CRC-32:0xfeb6a70a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_fputc_unlocked_defined
 #if (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s)
 #define __local_fputc_unlocked_defined 1
+#include <__crt.h>
 #include <kos/anno.h>
 /* Dependency: "_flsbuf" */
 #ifndef ____localdep__flsbuf_defined

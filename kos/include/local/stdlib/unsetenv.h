@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x40cf8b46 */
+/* HASH CRC-32:0xb9a3ecc9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_unsetenv_defined
 #if defined(__CRT_HAVE_putenv) || defined(__CRT_HAVE__putenv)
 #define __local_unsetenv_defined 1
+#include <__crt.h>
 #ifdef __LIBC_BIND_OPTIMIZATIONS
 #include <optimized/string.h>
 #endif /* __LIBC_BIND_OPTIMIZATIONS */

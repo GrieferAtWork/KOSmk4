@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8cbf70ae */
+/* HASH CRC-32:0x4e5b12c1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_strdupf_defined
 #if ((defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_aprintf_pack)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_format_aprintf_printer)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))) || defined(__CRT_HAVE_vasprintf) || defined(__CRT_HAVE_vstrdupf)
 #define __local_strdupf_defined 1
+#include <__crt.h>
 /* Dependency: "vstrdupf" from "string" */
 #ifndef ____localdep_vstrdupf_defined
 #define ____localdep_vstrdupf_defined 1

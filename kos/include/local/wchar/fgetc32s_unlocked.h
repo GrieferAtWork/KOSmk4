@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x871e07e5 */
+/* HASH CRC-32:0x2c0c2692 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_fgetc32s_unlocked_defined
 #if (defined(__CRT_HAVE_fgetwc_unlocked) || defined(__CRT_HAVE__fgetwc_nolock)) && (defined(__CRT_HAVE_ungetwc_unlocked) || defined(__CRT_HAVE_ungetwc) || defined(__CRT_HAVE__ungetwc_nolock)) && (defined(__CRT_HAVE_ferror_unlocked) || defined(__CRT_HAVE_ferror))
 #define __local_fgetc32s_unlocked_defined 1
+#include <__crt.h>
 #include <kos/anno.h>
 #include <parts/errno.h>
 /* Dependency: "fgetwc_unlocked" */

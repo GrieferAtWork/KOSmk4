@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9855d265 */
+/* HASH CRC-32:0x8e7e3fb1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_isprime_defined
 #define __local_isprime_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 /* For the used double hash method the table size has to be a prime. To
  * correct the user given table size we need a prime test.  This trivial

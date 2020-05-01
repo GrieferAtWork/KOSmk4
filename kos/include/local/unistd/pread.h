@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x752b3725 */
+/* HASH CRC-32:0x15c1b862 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_pread_defined
 #if defined(__CRT_HAVE_pread64) || ((defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE__lseeki64)))
 #define __local_pread_defined 1
+#include <__crt.h>
 /* Dependency: "pread64" from "unistd" */
 #ifndef ____localdep_pread64_defined
 #define ____localdep_pread64_defined 1

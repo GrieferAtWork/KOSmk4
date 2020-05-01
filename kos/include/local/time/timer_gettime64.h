@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x399fcc32 */
+/* HASH CRC-32:0xb8240498 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_timer_gettime64_defined
 #ifdef __CRT_HAVE_timer_gettime
 #define __local_timer_gettime64_defined 1
+#include <__crt.h>
 #include <bits/itimerspec.h>
 #include <bits/itimerspec.h>
 /* Dependency: "timer_gettime32" from "time" */

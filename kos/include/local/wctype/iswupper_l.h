@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x91bd741d */
+/* HASH CRC-32:0xe00b5e48 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_iswupper_l_defined
 #define __local_iswupper_l_defined 1
+#include <__crt.h>
 /* Dependency: "iswupper" from "wctype" */
 #ifndef ____localdep_iswupper_defined
 #define ____localdep_iswupper_defined 1

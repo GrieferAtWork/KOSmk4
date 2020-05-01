@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfb4d85af */
+/* HASH CRC-32:0xbbb55e44 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_unicode_readutf8_n_defined
 #define __local_unicode_readutf8_n_defined 1
+#include <__crt.h>
 #include <local/unicode_utf8seqlen.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `unicode_readutf8()', but don't read past `text_end' */

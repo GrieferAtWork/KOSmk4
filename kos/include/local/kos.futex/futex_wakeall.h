@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc72d8c2 */
+/* HASH CRC-32:0xdf4b4382 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_futex_wakeall_defined
 #if defined(__CRT_HAVE_lfutex) || defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_futex_wake)
 #define __local_futex_wakeall_defined 1
+#include <__crt.h>
 #include <bits/types.h>
 #include <bits/types.h>
 /* Dependency: "futex_wake" from "kos.futex" */

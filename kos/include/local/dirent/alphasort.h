@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9aede444 */
+/* HASH CRC-32:0x4e046b6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_alphasort_defined
 #define __local_alphasort_defined 1
+#include <__crt.h>
 /* Dependency: "strcoll" from "string" */
 #ifndef ____localdep_strcoll_defined
 #define ____localdep_strcoll_defined 1

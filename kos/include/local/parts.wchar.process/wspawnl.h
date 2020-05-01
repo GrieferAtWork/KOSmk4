@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x85dca5b */
+/* HASH CRC-32:0x4bfbfd1d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_wspawnl_defined
 #if defined(__CRT_HAVE_wspawnv) || defined(__CRT_HAVE__wspawnv)
 #define __local_wspawnl_defined 1
+#include <__crt.h>
 #include <parts/redirect-exec.h>
 /* Dependency: "wspawnv" */
 #ifndef ____localdep_wspawnv_defined

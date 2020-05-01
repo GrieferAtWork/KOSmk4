@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2bba9e8a */
+/* HASH CRC-32:0x8ed14076 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_ftruncate64_defined
 #if defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE__chsize)
 #define __local_ftruncate64_defined 1
+#include <__crt.h>
 /* Dependency: "ftruncate32" from "unistd" */
 #ifndef ____localdep_ftruncate32_defined
 #define ____localdep_ftruncate32_defined 1

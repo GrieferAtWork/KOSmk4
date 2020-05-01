@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7cced225 */
+/* HASH CRC-32:0xab9856e3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_tmpnam_r_defined
 #ifdef __CRT_HAVE_tmpnam
 #define __local_tmpnam_r_defined 1
+#include <__crt.h>
 /* Dependency: "tmpnam" */
 #ifndef ____localdep_tmpnam_defined
 #define ____localdep_tmpnam_defined 1

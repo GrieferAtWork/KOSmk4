@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f4710a4 */
+/* HASH CRC-32:0x7511b3b1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_dos_ctime64_s_defined
 #ifdef __CRT_HAVE__ctime32_s
 #define __local_dos_ctime64_s_defined 1
+#include <__crt.h>
 /* Dependency: "dos_ctime32_s" from "time" */
 #ifndef ____localdep_dos_ctime32_s_defined
 #define ____localdep_dos_ctime32_s_defined 1

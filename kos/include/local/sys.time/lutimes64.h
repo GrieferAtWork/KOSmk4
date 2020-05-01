@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x347a3d1e */
+/* HASH CRC-32:0xd6bd726 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_lutimes64_defined
 #ifdef __CRT_HAVE_lutimes
 #define __local_lutimes64_defined 1
+#include <__crt.h>
 /* Dependency: "lutimes32" from "sys.time" */
 #ifndef ____localdep_lutimes32_defined
 #define ____localdep_lutimes32_defined 1

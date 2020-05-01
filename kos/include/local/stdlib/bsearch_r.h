@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7017d960 */
+/* HASH CRC-32:0xf2ad69b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_bsearch_r_defined
 #define __local_bsearch_r_defined 1
+#include <__crt.h>
 #ifndef __compar_d_fn_t_defined
 #define __compar_d_fn_t_defined 1
 typedef int (__LIBCCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xed8d4343 */
+/* HASH CRC-32:0x3616c856 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_remque_defined
 #define __local_remque_defined 1
+#include <__crt.h>
 /* Dependency: "link" from "unistd" */
 #ifndef ____localdep_link_defined
 #define ____localdep_link_defined 1

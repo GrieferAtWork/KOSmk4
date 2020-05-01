@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf1dbb6df */
+/* HASH CRC-32:0x4032fc03 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_recvmmsg64_defined
 #ifdef __CRT_HAVE_recvmmsg
 #define __local_recvmmsg64_defined 1
+#include <__crt.h>
 /* Dependency: "recvmmsg32" from "sys.socket" */
 #ifndef ____localdep_recvmmsg32_defined
 #define ____localdep_recvmmsg32_defined 1

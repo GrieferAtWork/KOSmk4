@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbb79c6fe */
+/* HASH CRC-32:0xe0f27afc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local__CrtMemDumpStatistics_defined
 #define __local__CrtMemDumpStatistics_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_CrtMemDumpStatistics) __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_CrtMemDumpStatistics))(_CrtMemState const *__state) {

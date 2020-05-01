@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5fde4cb4 */
+/* HASH CRC-32:0x855efc13 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_memcmpw_defined
 #define __local_memcmpw_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Compare memory buffers and return the difference of the first non-matching word */
 __LOCAL_LIBC(memcmpw) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __INT16_TYPE__

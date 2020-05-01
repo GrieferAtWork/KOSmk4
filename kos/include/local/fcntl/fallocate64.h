@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdf965f8f */
+/* HASH CRC-32:0xf9853c19 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_fallocate64_defined
 #define __local_fallocate64_defined 1
+#include <__crt.h>
 #include <bits/types.h>
 #include <bits/types.h>
 /* Dependency: "fallocate" from "fcntl" */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe553fca8 */
+/* HASH CRC-32:0xd963a06e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_c32stol_defined
 #define __local_c32stol_defined 1
+#include <__crt.h>
 /* Dependency: "wcsto32" from "wchar" */
 #ifndef ____localdep_c32sto32_defined
 #define ____localdep_c32sto32_defined 1

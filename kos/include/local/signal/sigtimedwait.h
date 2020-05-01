@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf09500b */
+/* HASH CRC-32:0xddc4b5f9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_sigtimedwait_defined
 #if defined(__CRT_HAVE_sigtimedwait) || defined(__CRT_HAVE_sigtimedwait64)
 #define __local_sigtimedwait_defined 1
+#include <__crt.h>
 /* Dependency: "sigtimedwait64" from "signal" */
 #ifndef ____localdep_sigtimedwait64_defined
 #define ____localdep_sigtimedwait64_defined 1

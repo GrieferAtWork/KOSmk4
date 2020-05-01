@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x10b3a650 */
+/* HASH CRC-32:0xb8f3457 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_c16execl_defined
 #if (defined(__CRT_HAVE_wexecv) && __SIZEOF_WCHAR_T__ == 2) || (defined(__CRT_HAVE__wexecv) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_DOS$_wexecv)
 #define __local_c16execl_defined 1
+#include <__crt.h>
 #include <parts/redirect-exec.h>
 /* Dependency: "c16execv" from "parts.uchar.process" */
 #ifndef ____localdep_c16execv_defined

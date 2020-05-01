@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaaf8c5e */
+/* HASH CRC-32:0xfda4b8f9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_writeall_defined
 #if (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE__lseeki64))
 #define __local_writeall_defined 1
+#include <__crt.h>
 #include <parts/errno.h>
 /* Dependency: "write" */
 #ifndef ____localdep_write_defined

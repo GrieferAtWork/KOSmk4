@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x87f3316f */
+/* HASH CRC-32:0x40b139b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local__vsnwscanf_s_l_defined
 #define __local__vsnwscanf_s_l_defined 1
+#include <__crt.h>
 /* Dependency: "_vsnwscanf_s" from "wchar" */
 #ifndef ____localdep__vsnwscanf_s_defined
 #define ____localdep__vsnwscanf_s_defined 1

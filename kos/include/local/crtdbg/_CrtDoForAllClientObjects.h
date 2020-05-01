@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f72390 */
+/* HASH CRC-32:0x1499454a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local__CrtDoForAllClientObjects_defined
 #define __local__CrtDoForAllClientObjects_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_CrtDoForAllClientObjects) __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_CrtDoForAllClientObjects))(_PFNCRTDOFORALLCLIENTOBJECTS __pfn,

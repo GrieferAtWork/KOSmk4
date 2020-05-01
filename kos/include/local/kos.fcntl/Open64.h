@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfa9ffd75 */
+/* HASH CRC-32:0xb005217 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_Open64_defined
 #if (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_OpenAt) || defined(__CRT_HAVE_OpenAt64))) || defined(__CRT_HAVE_Open)
 #define __local_Open64_defined 1
+#include <__crt.h>
 #include <kos/anno.h>
 #include <bits/types.h>
 #include <bits/types.h>

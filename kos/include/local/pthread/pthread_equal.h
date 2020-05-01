@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x36a46595 */
+/* HASH CRC-32:0x616c877f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_pthread_equal_defined
 #define __local_pthread_equal_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Compare two thread identifiers */
 __LOCAL_LIBC(pthread_equal) __ATTR_CONST int

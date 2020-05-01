@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x67c5bdbd */
+/* HASH CRC-32:0x65ebbdca */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_ether_ntoa_r_defined
 #define __local_ether_ntoa_r_defined 1
+#include <__crt.h>
 #include <net/ethernet.h>
 /* Dependency: "sprintf" from "stdio" */
 #ifndef ____localdep_sprintf_defined

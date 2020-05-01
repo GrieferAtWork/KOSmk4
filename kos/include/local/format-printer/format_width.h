@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x431e6c98 */
+/* HASH CRC-32:0x5fa73d7c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_format_width_defined
 #define __local_format_width_defined 1
+#include <__crt.h>
 #include <local/unicode_utf8seqlen.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Returns the width (number of characters; not bytes) of the given unicode string */

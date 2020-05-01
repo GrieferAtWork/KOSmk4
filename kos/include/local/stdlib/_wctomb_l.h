@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf5f9232c */
+/* HASH CRC-32:0x1cc06c6f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local__wctomb_l_defined
 #define __local__wctomb_l_defined 1
+#include <__crt.h>
 /* Dependency: "wctomb" from "stdlib" */
 #ifndef ____localdep_wctomb_defined
 #define ____localdep_wctomb_defined 1

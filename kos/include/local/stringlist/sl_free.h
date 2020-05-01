@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd0505b54 */
+/* HASH CRC-32:0x6d6e7e3f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_sl_free_defined
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 #define __local_sl_free_defined 1
+#include <__crt.h>
 #ifndef ___stringlist_defined
 #define ___stringlist_defined 1
 typedef struct _stringlist {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x93654e15 */
+/* HASH CRC-32:0x7921860f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_c32casecoll_defined
 #define __local_c32casecoll_defined 1
+#include <__crt.h>
 /* Dependency: "wcscasecmp" from "wchar" */
 #ifndef ____localdep_c32casecmp_defined
 #define ____localdep_c32casecmp_defined 1

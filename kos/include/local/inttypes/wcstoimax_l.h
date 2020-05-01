@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x81a2311 */
+/* HASH CRC-32:0x16876f36 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_wcstoimax_l_defined
 #define __local_wcstoimax_l_defined 1
+#include <__crt.h>
 /* Dependency: "wcstoimax" from "inttypes" */
 #ifndef ____localdep_wcstoimax_defined
 #define ____localdep_wcstoimax_defined 1

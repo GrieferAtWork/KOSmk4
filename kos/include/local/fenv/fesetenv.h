@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb9c3618d */
+/* HASH CRC-32:0x931599c4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_fesetenv_defined
 #define __local_fesetenv_defined 1
+#include <__crt.h>
 #include <bits/fenv-inline.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Establish the floating-point environment represented by the object pointed to by ENVP */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcd0b752 */
+/* HASH CRC-32:0x29839941 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_copysignl_defined
 #define __local_copysignl_defined 1
+#include <__crt.h>
 #include <libm/copysign.h>
 /* Dependency: "copysign" from "math" */
 #ifndef ____localdep_copysign_defined

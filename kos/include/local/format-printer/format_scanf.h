@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ef87ea6 */
+/* HASH CRC-32:0xa738e1ce */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_format_scanf_defined
 #define __local_format_scanf_defined 1
+#include <__crt.h>
 #include <kos/anno.h>
 #include <bits/format-printer.h>
 

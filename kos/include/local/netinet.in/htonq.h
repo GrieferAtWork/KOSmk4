@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4819d617 */
+/* HASH CRC-32:0xc71bfa7e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_htonq_defined
 #define __local_htonq_defined 1
+#include <__crt.h>
 #include <hybrid/__byteswap.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(htonq) __ATTR_CONST __UINT64_TYPE__

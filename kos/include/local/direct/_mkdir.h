@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x41004b33 */
+/* HASH CRC-32:0x8a872e4e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local__mkdir_defined
 #ifdef __CRT_HAVE_mkdir
 #define __local__mkdir_defined 1
+#include <__crt.h>
 /* Dependency: "mkdir" from "sys.stat" */
 #ifndef ____localdep_mkdir_defined
 #define ____localdep_mkdir_defined 1

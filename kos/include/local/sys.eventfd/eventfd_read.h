@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb7202bbf */
+/* HASH CRC-32:0x434acd5d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_eventfd_read_defined
 #if defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)
 #define __local_eventfd_read_defined 1
+#include <__crt.h>
 #include <parts/errno.h>
 /* Dependency: "read" */
 #ifndef ____localdep_read_defined

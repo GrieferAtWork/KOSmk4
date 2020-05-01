@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaffe23f9 */
+/* HASH CRC-32:0xbe3b6f6e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local__dupenv_s_dbg_defined
 #ifdef __CRT_HAVE__dupenv_s
 #define __local__dupenv_s_dbg_defined 1
+#include <__crt.h>
 /* Dependency: "_dupenv_s" */
 #ifndef ____localdep__dupenv_s_defined
 #define ____localdep__dupenv_s_defined 1

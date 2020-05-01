@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf75c2474 */
+/* HASH CRC-32:0x5fc64c0e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_format_c16aprintf_printer_defined
 #if defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_waprintf_alloc)
 #define __local_format_c16aprintf_printer_defined 1
+#include <__crt.h>
 /* Dependency: "format_waprintf_alloc" from "parts.wchar.format-printer" */
 #ifndef ____localdep_format_c16aprintf_alloc_defined
 #define ____localdep_format_c16aprintf_alloc_defined 1

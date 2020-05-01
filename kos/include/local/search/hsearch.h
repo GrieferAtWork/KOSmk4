@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x638268ac */
+/* HASH CRC-32:0x80651a7e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_hsearch_defined
 #define __local_hsearch_defined 1
+#include <__crt.h>
 #ifndef __hsearch_data_defined
 #define __hsearch_data_defined 1
 struct _ENTRY;

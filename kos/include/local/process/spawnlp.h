@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd466499a */
+/* HASH CRC-32:0xff015510 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_spawnlp_defined
 #if defined(__CRT_HAVE_spawnvp) || defined(__CRT_HAVE__spawnvp)
 #define __local_spawnlp_defined 1
+#include <__crt.h>
 #include <parts/redirect-exec.h>
 /* Dependency: "spawnvp" */
 #ifndef ____localdep_spawnvp_defined

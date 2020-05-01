@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x17b072de */
+/* HASH CRC-32:0x25d9afdf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_strtold_defined
 #define __local_strtold_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strtold) __ATTR_LEAF __ATTR_NONNULL((1)) __LONGDOUBLE
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtold))(char const *__restrict __nptr,

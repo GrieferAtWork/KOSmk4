@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x79ac4723 */
+/* HASH CRC-32:0x9a96f871 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #include <ieee754.h>
 #if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_modf) || defined(__CRT_HAVE___modf)
 #define __local_modff_defined 1
+#include <__crt.h>
 #include <libm/modf.h>
 /* Dependency: "modf" from "math" */
 #ifndef ____localdep_modf_defined

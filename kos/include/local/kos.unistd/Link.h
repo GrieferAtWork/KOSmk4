@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe5ca2179 */
+/* HASH CRC-32:0xde143a4a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_Link_defined
 #if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_LinkAt)
 #define __local_Link_defined 1
+#include <__crt.h>
 #include <kos/anno.h>
 /* Dependency: "LinkAt" */
 #ifndef ____localdep_LinkAt_defined

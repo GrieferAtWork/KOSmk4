@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc14c353f */
+/* HASH CRC-32:0x17909a87 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_swab_defined
 #define __local_swab_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Copy `n_bytes & ~1' (FLOOR_ALIGN(n_bytes, 2)) from `from' to `to',
  * exchanging the order of even and odd bytes ("123456" --> "214365")

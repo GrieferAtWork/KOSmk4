@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x61b8b46 */
+/* HASH CRC-32:0x9e2a53cc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_c32casecmp_defined
 #define __local_c32casecmp_defined 1
+#include <__crt.h>
 /* Dependency: "towlower" from "wctype" */
 #ifndef ____localdep_towlower_defined
 #define ____localdep_towlower_defined 1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x23979506 */
+/* HASH CRC-32:0x4fa627d2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_FSync_defined
 #define __local_FSync_defined 1
+#include <__crt.h>
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> fsync(2)

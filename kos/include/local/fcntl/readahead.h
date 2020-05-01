@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x429ef6ca */
+/* HASH CRC-32:0xbc293e82 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_readahead_defined
 #define __local_readahead_defined 1
+#include <__crt.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(readahead) __SSIZE_TYPE__

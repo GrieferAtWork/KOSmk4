@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd9714991 */
+/* HASH CRC-32:0x14da10cb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_lgammal_r_defined
 #if defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r)
 #define __local_lgammal_r_defined 1
+#include <__crt.h>
 /* Dependency: "lgamma_r" */
 #ifndef ____localdep_lgamma_r_defined
 #define ____localdep_lgamma_r_defined 1

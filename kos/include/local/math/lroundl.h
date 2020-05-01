@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd15b5dfe */
+/* HASH CRC-32:0xeb3bca0a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_lroundl_defined
 #define __local_lroundl_defined 1
+#include <__crt.h>
 #include <hybrid/typecore.h>
 
 #include <libm/lround.h>

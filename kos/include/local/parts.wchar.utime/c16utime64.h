@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x382a46f2 */
+/* HASH CRC-32:0x3dede031 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_c16utime64_defined
 #if defined(__CRT_HAVE_wutime) || defined(__CRT_HAVE__wutime32)
 #define __local_c16utime64_defined 1
+#include <__crt.h>
 /* Dependency: "crt_wutime32" from "parts.wchar.utime" */
 #ifndef ____localdep_crt_c16utime32_defined
 #define ____localdep_crt_c16utime32_defined 1

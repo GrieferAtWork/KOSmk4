@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe8698703 */
+/* HASH CRC-32:0xee94a7b3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_mbrtoc32_defined
 #define __local_mbrtoc32_defined 1
+#include <__crt.h>
 #include <parts/errno.h>
 
 #include <bits/mbstate.h>

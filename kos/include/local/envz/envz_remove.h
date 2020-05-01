@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ccd3323 */
+/* HASH CRC-32:0x35212201 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_envz_remove_defined
 #define __local_envz_remove_defined 1
+#include <__crt.h>
 /* Dependency: "envz_entry" from "envz" */
 #ifndef ____localdep_envz_entry_defined
 #define ____localdep_envz_entry_defined 1

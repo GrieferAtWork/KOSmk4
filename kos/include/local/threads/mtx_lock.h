@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x901a387c */
+/* HASH CRC-32:0x8ac51283 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_mtx_lock_defined
 #ifdef __CRT_HAVE_pthread_mutex_lock
 #define __local_mtx_lock_defined 1
+#include <__crt.h>
 #include <bits/threads.h>
 
 #include <bits/pthreadtypes.h>

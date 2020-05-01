@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4dc42ce8 */
+/* HASH CRC-32:0x9e5806a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_c32chown_defined
 #if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wfchownat)
 #define __local_c32chown_defined 1
+#include <__crt.h>
 /* Dependency: "wfchownat" from "parts.wchar.unistd" */
 #ifndef ____localdep_c32fchownat_defined
 #define ____localdep_c32fchownat_defined 1

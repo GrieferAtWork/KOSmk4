@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2ca50472 */
+/* HASH CRC-32:0x8dd547df */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local__abs64_defined
 #define __local__abs64_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_abs64) __ATTR_CONST __ATTR_WUNUSED __INT64_TYPE__
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(_abs64))(__INT64_TYPE__ __x) {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1edf9326 */
+/* HASH CRC-32:0x717b05d8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_ynl_defined
 #if defined(__CRT_HAVE_yn) || defined(__CRT_HAVE___yn)
 #define __local_ynl_defined 1
+#include <__crt.h>
 /* Dependency: "yn" */
 #ifndef ____localdep_yn_defined
 #define ____localdep_yn_defined 1

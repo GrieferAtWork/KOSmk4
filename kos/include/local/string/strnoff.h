@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb6891ffd */
+/* HASH CRC-32:0xd6371772 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_strnoff_defined
 #define __local_strnoff_defined 1
+#include <__crt.h>
 /* Dependency: "strnchrnul" from "string" */
 #ifndef ____localdep_strnchrnul_defined
 #define ____localdep_strnchrnul_defined 1

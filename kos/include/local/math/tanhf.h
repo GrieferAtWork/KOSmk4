@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb830e34c */
+/* HASH CRC-32:0xb4248aa1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_tanhf_defined
 #if defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh)
 #define __local_tanhf_defined 1
+#include <__crt.h>
 /* Dependency: "tanh" */
 #ifndef ____localdep_tanh_defined
 #define ____localdep_tanh_defined 1

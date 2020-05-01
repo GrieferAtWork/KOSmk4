@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2755c2e1 */
+/* HASH CRC-32:0xb2608d46 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_memmoveupl_defined
 #define __local_memmoveupl_defined 1
+#include <__crt.h>
 #include <hybrid/__assert.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_DWORDS') */

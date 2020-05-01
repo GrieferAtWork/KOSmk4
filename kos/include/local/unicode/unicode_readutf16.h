@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7da3d2ff */
+/* HASH CRC-32:0xcf4f8a36 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_unicode_readutf16_defined
 #define __local_unicode_readutf16_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Read a single Unicode character from a given UTF-16 string */
 __LOCAL_LIBC(unicode_readutf16) __ATTR_NONNULL((1)) __CHAR32_TYPE__

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2fe522ef */
+/* HASH CRC-32:0x6767eae1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_format_c32repeat_defined
 #define __local_format_c32repeat_defined 1
+#include <__crt.h>
 #ifdef __LIBC_BIND_OPTIMIZATIONS
 #include <optimized/string.h>
 #endif /* __LIBC_BIND_OPTIMIZATIONS */

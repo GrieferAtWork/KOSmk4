@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x69ead2da */
+/* HASH CRC-32:0x5904ef77 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_clock_getres64_defined
 #if defined(__CRT_HAVE_clock_getres) || defined(__CRT_HAVE___clock_getres)
 #define __local_clock_getres64_defined 1
+#include <__crt.h>
 /* Dependency: "clock_getres32" from "time" */
 #ifndef ____localdep_clock_getres32_defined
 #define ____localdep_clock_getres32_defined 1

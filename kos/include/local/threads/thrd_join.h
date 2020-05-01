@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3da757e9 */
+/* HASH CRC-32:0x8643b521 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_thrd_join_defined
 #ifdef __CRT_HAVE_pthread_join
 #define __local_thrd_join_defined 1
+#include <__crt.h>
 #include <bits/pthreadtypes.h>
 #include <hybrid/typecore.h>
 

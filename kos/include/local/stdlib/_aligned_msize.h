@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2aacf4a */
+/* HASH CRC-32:0x27ecace6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local__aligned_msize_defined
 #define __local__aligned_msize_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_aligned_msize) __ATTR_PURE __ATTR_WUNUSED __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_aligned_msize))(void *__aligned_mallptr,

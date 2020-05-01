@@ -5264,6 +5264,7 @@ class Function {
 			fp << optimizeAndWrapProcessorExpressionForIf(formatedDefineRequireString) << "\n";
 		}
 		fp << "#define __local_" << used_name << "_defined 1\n";
+		fp << "#include <__crt.h>\n";
 		/* Include dependencies. */
 		local fast_dependency_components = HashSet();
 		local dependency_prefix_lines = List();

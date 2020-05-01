@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x65971244 */
+/* HASH CRC-32:0xefcd3d0d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_futexlock_wakeall_defined
 #if defined(__CRT_HAVE_lfutex) || defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_futex_wake) || defined(__CRT_HAVE_futex_wakeall)
 #define __local_futexlock_wakeall_defined 1
+#include <__crt.h>
 #include <bits/types.h>
 #include <bits/types.h>
 #include <hybrid/__atomic.h>

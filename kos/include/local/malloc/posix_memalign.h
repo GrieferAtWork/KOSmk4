@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc8937489 */
+/* HASH CRC-32:0xadfc3eca */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_posix_memalign_defined
 #if defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc)
 #define __local_posix_memalign_defined 1
+#include <__crt.h>
 #include <parts/errno.h>
 /* Dependency: "memalign" from "malloc" */
 #ifndef ____localdep_memalign_defined

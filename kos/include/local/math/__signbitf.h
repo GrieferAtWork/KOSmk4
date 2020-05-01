@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xda8c88db */
+/* HASH CRC-32:0xa23c8f47 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local___signbitf_defined
 #define __local___signbitf_defined 1
+#include <__crt.h>
 #include <libm/signbit.h>
 /* Dependency: "__signbit" from "math" */
 #ifndef ____localdep___signbit_defined

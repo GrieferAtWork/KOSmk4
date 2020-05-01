@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5b6167df */
+/* HASH CRC-32:0xa7ccdeff */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_strtoul_defined
 #define __local_strtoul_defined 1
+#include <__crt.h>
 /* Dependency: "strtou32" from "stdlib" */
 #ifndef ____localdep_strtou32_defined
 #define ____localdep_strtou32_defined 1

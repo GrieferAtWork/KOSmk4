@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa37a2b4b */
+/* HASH CRC-32:0xcc0866a0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local__endthread_defined
 #ifdef __CRT_HAVE__endthreadex
 #define __local__endthread_defined 1
+#include <__crt.h>
 /* Dependency: "_endthreadex" */
 #ifndef ____localdep__endthreadex_defined
 #define ____localdep__endthreadex_defined 1

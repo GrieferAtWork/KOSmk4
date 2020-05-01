@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf00c8236 */
+/* HASH CRC-32:0x80ebfd15 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_ether_aton_r_defined
 #define __local_ether_aton_r_defined 1
+#include <__crt.h>
 #include <net/ethernet.h>
 /* Dependency: "ether_paton_r" from "netinet.ether" */
 #ifndef ____localdep_ether_paton_r_defined

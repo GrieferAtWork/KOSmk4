@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe2712d15 */
+/* HASH CRC-32:0xa8addb9e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_mbrtowc_defined
 #define __local_mbrtowc_defined 1
+#include <__crt.h>
 #include <parts/errno.h>
 /* Dependency: "unicode_c8toc16" from "unicode" */
 #ifndef ____localdep_unicode_c8toc16_defined

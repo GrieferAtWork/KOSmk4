@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c25a829 */
+/* HASH CRC-32:0x71fd81b9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local__ftime64_s_defined
 #if defined(__CRT_HAVE_ftime64) || defined(__CRT_HAVE__ftime32_s) || defined(__CRT_HAVE_ftime) || defined(__CRT_HAVE__ftime64) || defined(__CRT_HAVE__ftime32)
 #define __local__ftime64_s_defined 1
+#include <__crt.h>
 #include <parts/errno.h>
 /* Dependency: "crt_ftime64" from "sys.timeb" */
 #ifndef ____localdep_crt_ftime64_defined

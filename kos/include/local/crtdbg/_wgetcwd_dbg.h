@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdf8252f0 */
+/* HASH CRC-32:0xcac0ac2b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local__wgetcwd_dbg_defined
 #if defined(__CRT_HAVE_c16getcwd) || defined(__CRT_HAVE_DOS$_wgetcwd) || defined(__CRT_HAVE_wgetcwd) || defined(__CRT_HAVE__wgetcwd)
 #define __local__wgetcwd_dbg_defined 1
+#include <__crt.h>
 /* Dependency: "c16getcwd" from "parts.uchar.unistd" */
 #ifndef ____localdep_c16getcwd_defined
 #define ____localdep_c16getcwd_defined 1

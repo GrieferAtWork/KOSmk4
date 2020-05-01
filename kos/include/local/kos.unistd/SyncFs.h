@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e91558c */
+/* HASH CRC-32:0xd3e63161 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_SyncFs_defined
 #define __local_SyncFs_defined 1
+#include <__crt.h>
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(SyncFs) void

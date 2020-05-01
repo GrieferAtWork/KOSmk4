@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xde451ef4 */
+/* HASH CRC-32:0x946a2a50 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_tdelete_defined
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 #define __local_tdelete_defined 1
+#include <__crt.h>
 #ifdef __LIBC_BIND_OPTIMIZATIONS
 #include <optimized/string.h>
 #endif /* __LIBC_BIND_OPTIMIZATIONS */

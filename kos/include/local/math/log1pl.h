@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f1d41f6 */
+/* HASH CRC-32:0x5806846c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_log1pl_defined
 #if defined(__CRT_HAVE_log1p) || defined(__CRT_HAVE___log1p)
 #define __local_log1pl_defined 1
+#include <__crt.h>
 /* Dependency: "log1p" */
 #ifndef ____localdep_log1p_defined
 #define ____localdep_log1p_defined 1

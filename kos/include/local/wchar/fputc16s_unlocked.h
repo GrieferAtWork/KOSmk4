@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x68cf9540 */
+/* HASH CRC-32:0x80e9c60d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_fputc16s_unlocked_defined
 #if defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE__fputwc_nolock) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_file_wprinter)
 #define __local_fputc16s_unlocked_defined 1
+#include <__crt.h>
 #include <kos/anno.h>
 /* Dependency: "file_wprinter_unlocked" from "wchar" */
 #ifndef ____localdep_file_c16printer_unlocked_defined

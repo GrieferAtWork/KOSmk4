@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x30845ffd */
+/* HASH CRC-32:0xec82372b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_unicode_readutf8_rev_defined
 #define __local_unicode_readutf8_rev_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `unicode_readutf8', but read backwards, with `*ptext'
  * starting out as a pointer after the character to be read, before

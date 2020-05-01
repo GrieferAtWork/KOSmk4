@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6a993fb3 */
+/* HASH CRC-32:0x98858a91 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_adjtime64_defined
 #ifdef __CRT_HAVE_adjtime
 #define __local_adjtime64_defined 1
+#include <__crt.h>
 /* Dependency: "adjtime32" from "sys.time" */
 #ifndef ____localdep_adjtime32_defined
 #define ____localdep_adjtime32_defined 1

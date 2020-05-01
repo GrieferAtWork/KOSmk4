@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2ff8084f */
+/* HASH CRC-32:0x32f648ea */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_posix_fadvise_defined
 #define __local_posix_fadvise_defined 1
+#include <__crt.h>
 #include <bits/types.h>
 #include <bits/types.h>
 /* Dependency: "posix_fadvise64" from "fcntl" */

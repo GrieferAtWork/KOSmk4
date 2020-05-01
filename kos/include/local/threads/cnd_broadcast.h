@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc217c20b */
+/* HASH CRC-32:0x9cd4cf21 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_cnd_broadcast_defined
 #ifdef __CRT_HAVE_pthread_cond_broadcast
 #define __local_cnd_broadcast_defined 1
+#include <__crt.h>
 #include <bits/threads.h>
 
 #include <bits/pthreadtypes.h>

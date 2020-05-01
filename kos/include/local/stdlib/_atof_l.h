@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdb38df54 */
+/* HASH CRC-32:0xdad62b72 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local__atof_l_defined
 #define __local__atof_l_defined 1
+#include <__crt.h>
 /* Dependency: "strtod_l" from "stdlib" */
 #ifndef ____localdep_strtod_l_defined
 #define ____localdep_strtod_l_defined 1

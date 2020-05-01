@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5cd7e649 */
+/* HASH CRC-32:0xfcec462e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_usleep_defined
 #if defined(__CRT_HAVE___crtSleep) || defined(__CRT_HAVE_delay)
 #define __local_usleep_defined 1
+#include <__crt.h>
 /* Dependency: "__crtSleep" from "unistd" */
 #ifndef ____localdep___crtSleep_defined
 #define ____localdep___crtSleep_defined 1

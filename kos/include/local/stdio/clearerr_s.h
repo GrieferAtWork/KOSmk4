@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1958285 */
+/* HASH CRC-32:0x1d790953 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_clearerr_s_defined
 #if defined(__CRT_HAVE_clearerr) || defined(__CRT_HAVE_clearerr_unlocked)
 #define __local_clearerr_s_defined 1
+#include <__crt.h>
 #include <parts/errno.h>
 /* Dependency: "clearerr" */
 #ifndef ____localdep_clearerr_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9bd83cc */
+/* HASH CRC-32:0x7ae90dd5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_c16nset_defined
 #define __local_c16nset_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c16nset) __ATTR_RETNONNULL __ATTR_NONNULL((1)) __CHAR16_TYPE__ *
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16nset))(__CHAR16_TYPE__ *__restrict __str,

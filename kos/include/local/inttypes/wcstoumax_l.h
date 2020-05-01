@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9a0e4db5 */
+/* HASH CRC-32:0xfa1de07 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_wcstoumax_l_defined
 #define __local_wcstoumax_l_defined 1
+#include <__crt.h>
 /* Dependency: "wcstoumax" from "inttypes" */
 #ifndef ____localdep_wcstoumax_defined
 #define ____localdep_wcstoumax_defined 1

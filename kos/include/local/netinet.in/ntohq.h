@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd2e12846 */
+/* HASH CRC-32:0xe6017400 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_ntohq_defined
 #define __local_ntohq_defined 1
+#include <__crt.h>
 #include <hybrid/__byteswap.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(ntohq) __ATTR_CONST __UINT64_TYPE__

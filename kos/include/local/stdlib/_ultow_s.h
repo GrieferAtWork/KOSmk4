@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcdc475b2 */
+/* HASH CRC-32:0x5978bfb3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local__ultow_s_defined
 #define __local__ultow_s_defined 1
+#include <__crt.h>
 #include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_ultow_s) __errno_t

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe062de9e */
+/* HASH CRC-32:0x5b4508da */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_pwrite64_defined
 #if defined(__CRT_HAVE_pread) || ((defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE__lseeki64)))
 #define __local_pwrite64_defined 1
+#include <__crt.h>
 /* Dependency: "pwrite32" from "unistd" */
 #ifndef ____localdep_pwrite32_defined
 #define ____localdep_pwrite32_defined 1

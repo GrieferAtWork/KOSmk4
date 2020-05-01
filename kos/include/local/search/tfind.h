@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x85cfbf9 */
+/* HASH CRC-32:0x422b9e3c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_tfind_defined
 #define __local_tfind_defined 1
+#include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Search for an entry matching the given KEY in the tree pointed
  * to by *ROOTP. If no matching entry is available return NULL */

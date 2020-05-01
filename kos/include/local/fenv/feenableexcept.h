@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa3416843 */
+/* HASH CRC-32:0x5d7dfcd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_feenableexcept_defined
 #define __local_feenableexcept_defined 1
+#include <__crt.h>
 #include <bits/fenv-inline.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Enable individual exceptions.  Will not enable more exceptions than

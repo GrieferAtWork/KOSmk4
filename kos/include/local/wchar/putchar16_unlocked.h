@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcad64eec */
+/* HASH CRC-32:0xaae25453 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_putchar16_unlocked_defined
 #if (defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE__fputwc_nolock)) && !defined(__NO_STDSTREAMS)
 #define __local_putchar16_unlocked_defined 1
+#include <__crt.h>
 #include <kos/anno.h>
 /* Dependency: "fputwc_unlocked" */
 #ifndef ____localdep_fputc16_unlocked_defined

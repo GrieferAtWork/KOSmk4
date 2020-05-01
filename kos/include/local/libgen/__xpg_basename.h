@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7416c20f */
+/* HASH CRC-32:0xfdf2011f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local___xpg_basename_defined
 #define __local___xpg_basename_defined 1
+#include <__crt.h>
 /* Dependency: "strrchr" from "string" */
 #ifndef ____localdep_strrchr_defined
 #define ____localdep_strrchr_defined 1

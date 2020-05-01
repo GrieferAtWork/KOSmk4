@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x68bdf5fc */
+/* HASH CRC-32:0x276d6b04 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_sigfillset_defined
 #define __local_sigfillset_defined 1
+#include <__crt.h>
 #include <bits/sigset.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(sigfillset) __ATTR_NONNULL((1)) int

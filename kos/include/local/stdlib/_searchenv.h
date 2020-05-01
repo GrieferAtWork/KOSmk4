@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb9739e79 */
+/* HASH CRC-32:0x3375f779 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local__searchenv_defined
 #ifdef __CRT_HAVE__searchenv_s
 #define __local__searchenv_defined 1
+#include <__crt.h>
 /* Dependency: "_searchenv_s" */
 #ifndef ____localdep__searchenv_s_defined
 #define ____localdep__searchenv_s_defined 1

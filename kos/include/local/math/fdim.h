@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x94ff5a52 */
+/* HASH CRC-32:0x66171d40 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local_fdim_defined
 #define __local_fdim_defined 1
+#include <__crt.h>
 /* Dependency: "fabs" from "math" */
 #ifndef ____localdep_fabs_defined
 #define ____localdep_fabs_defined 1
