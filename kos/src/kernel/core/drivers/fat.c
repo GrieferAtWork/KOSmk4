@@ -821,10 +821,10 @@ continue_reading:
 				src = lfn_name + off;
 			}
 			/* Safety check: if the LFN filename ends up empty, use the 8.3 name instead! */
-			if unlikely(dst == lfn_name)
+			if unlikely(dst <= lfn_name)
 				goto dos_8dot3;
 			/* Allocate the directory entry. */
-			result                     = directory_entry_alloc_s(lfn_name, dst - lfn_name);
+			result = directory_entry_alloc_s(lfn_name, (u16)(size_t)(dst - lfn_name));
 			result->de_pos             = lfn_start;
 			result->de_fsdata.de_start = pos - sizeof(FatFile);
 			/* Use the absolute-ondisk position of the file's FatFile as INode number. */
@@ -880,7 +880,7 @@ dos_8dot3:
 		if (dst != entry_name && dst[-1] == '.')
 			--dst;
 		*dst        = 0;
-		name_length = (u16)(dst - entry_name);
+		name_length = (u16)(size_t)(dst - entry_name);
 		/* Make sure there aren't any illegal characters */
 		for (i = 0; i < name_length; ++i) {
 			char ch = entry_name[i];
@@ -891,13 +891,20 @@ dos_8dot3:
 			}
 		}
 		/* Check for entries that we're supposed to skip over. */
-		if (name_length <= 2 && entry_name[0] == '.') {
-			/* The kernel implements these itself, so
-			 * we don't actually want to emit them! */
-			if (name_length == 1)
-				goto continue_reading; /* Directory-self-reference. */
-			if (entry_name[1] == '.')
-				goto continue_reading; /* Directory-parent-reference. */
+		if (name_length <= 2) {
+			if unlikely(!name_length) {
+				printk(KERN_ERR "[fat] Unnamed directory entry at ino:%#I64x,off=%I64u\n",
+				       self->i_fileino, pos - sizeof(FatFile));
+				goto continue_reading; /* Empty name? (well... this shouldn't happen!) */
+			}
+			if (entry_name[0] == '.') {
+				/* The kernel implements these itself, so
+				 * we don't actually want to emit them! */
+				if (name_length == 1)
+					goto continue_reading; /* Directory-self-reference. */
+				if (entry_name[1] == '.')
+					goto continue_reading; /* Directory-parent-reference. */
+			}
 		}
 		/* Create a short-directory entry. */
 		result = directory_entry_alloc_s(entry_name, name_length);
