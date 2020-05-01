@@ -25,6 +25,7 @@
 
 #include <debugger/config.h>
 #include <debugger/entry.h>
+#include <dev/ansitty.h>
 #include <dev/keyboard.h>
 #include <kernel/compat.h>
 #include <kernel/except.h>
@@ -38,12 +39,14 @@
 
 #include <kos/except/inval.h>
 #include <kos/ioctl/keyboard.h>
+#include <kos/kernel/handle.h>
 #include <linux/kd.h> /* Needed to emulate the linux keyboard interface */
 #include <sys/stat.h>
 
 #include <assert.h>
 #include <errno.h>
 #include <string.h>
+#include <unicode.h>
 
 DECL_BEGIN
 
@@ -612,6 +615,8 @@ NOTHROW(KCALL keyboard_device_do_translate)(struct keyboard_device *__restrict s
 	key &= ~(KEY_FREPEAT);
 	result = keymap_translate_buf(&self->kd_map, key, mod, self->kd_map_pend,
 	                              COMPILER_LENOF(self->kd_map_pend));
+	if unlikely(result > COMPILER_LENOF(self->kd_map_pend))
+		goto nope; /* XXX: Better handling? */
 	if (!result) {
 		/* No layout-specific mapping given for this key.
 		 * Check for special mappings of CONTROL character, as well as
@@ -690,6 +695,56 @@ nope:
 }
 
 
+/* Apply transformations mandated by the currently
+ * set code-page of a potentially connected ANSI tty. */
+PRIVATE NOBLOCK /*utf-8*/ size_t
+NOTHROW(KCALL keyboard_device_encode_cp)(struct keyboard_device *__restrict self,
+                                         size_t len) {
+	REF struct tty_device *tty;
+	struct ansitty_device *atty;
+	char const *reader, *end;
+	char newbuf[COMPILER_LENOF(self->kd_map_pend)];
+	size_t newlen;
+	tty = self->kb_tty.get();
+	if (!tty)
+		goto done;
+	if (tty->t_ohandle_typ != HANDLE_TYPE_CHARACTERDEVICE)
+		goto done_tty;
+	atty = (struct ansitty_device *)tty->t_ohandle_ptr;
+	if (!character_device_isanansitty(atty))
+		goto done_tty;
+	/* Re-encode unicode characters */
+	reader = self->kd_map_pend;
+	end    = self->kd_map_pend + len;
+	newlen = 0;
+	while (reader < end) {
+		char32_t ch;
+		char tempbuf[ANSITTY_TRANSLATE_BUFSIZE];
+		size_t encoded_length;
+		ch             = unicode_readutf8_n(&reader, end);
+		encoded_length = ansitty_translate(&atty->at_ansi, tempbuf, ch);
+		encoded_length = memlen(tempbuf, 0, encoded_length); /* Stop on the first NUL-character */
+		if (!encoded_length) /* Fallback: Anything that can't be encoded must be discarded */
+			continue;
+		enum { x = '\e' };
+		if (newlen + encoded_length >= COMPILER_LENOF(self->kd_map_pend))
+			break; /* Sequence too long (drop trailing characters...) */
+		/* Append the newly encoded `tempbuf' */
+		memcpy(newbuf + newlen, tempbuf, encoded_length, sizeof(char));
+		newlen += encoded_length;
+	}
+	assert(newlen <= COMPILER_LENOF(self->kd_map_pend) - 1);
+	/* Apply the new pending character buffer. */
+	newbuf[newlen] = 0; /* Enshure NUL-termination! */
+	memcpy(self->kd_map_pend, newbuf, newlen + 1, sizeof(char));
+	len = newlen;
+done_tty:
+	decref_unlikely(tty);
+done:
+	return len;
+}
+
+
 /* Try to read a character from the given keyboard buffer.
  * @return: -1: The buffer is empty. */
 PUBLIC /*utf-8*/ int KCALL
@@ -701,7 +756,8 @@ again:
 	if (self->kd_map_pend[0] != 0) {
 		result = (int)(unsigned int)(unsigned char)self->kd_map_pend[0];
 		memmovedown(self->kd_map_pend, self->kd_map_pend + 1,
-		            COMPILER_LENOF(self->kd_map_pend) - 1, sizeof(char));
+		            COMPILER_LENOF(self->kd_map_pend) - 1,
+		            sizeof(char));
 		self->kd_map_pend[COMPILER_LENOF(self->kd_map_pend) - 1] = 0;
 		sync_endwrite(&self->kd_map_lock);
 	} else {
@@ -714,6 +770,7 @@ again_getkey:
 			if (key.kp_key & KEY_FRELEASED)
 				goto again_getkey; /* Only generate characters on make-codes */
 			len = keyboard_device_do_translate(self, key.kp_key, key.kp_mod);
+			len = keyboard_device_encode_cp(self, len);
 			if (len == 0) {
 				printk(KERN_DEBUG "[keyboard:%q] translate(%#I16x,%#I16x): <empty>\n",
 				       self->cd_name, key.kp_key, key.kp_mod);
@@ -939,7 +996,8 @@ linux_keyboard_setmode(struct keyboard_device *__restrict self,
 		ATOMIC_FETCHAND(self->kd_flags, ~KEYBOARD_DEVICE_FLAG_RDKEYS);
 	} else {
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
-		      E_INVALID_ARGUMENT_CONTEXT_GENERIC, mode);
+		      E_INVALID_ARGUMENT_CONTEXT_GENERIC,
+		      mode);
 	}
 }
 
@@ -953,9 +1011,11 @@ LOCAL void KCALL
 linux_keyboard_setmeta(struct keyboard_device *__restrict self,
                        unsigned int mode) {
 	(void)self;
-	if (mode != K_METABIT)
+	if (mode != K_METABIT) {
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
-		      E_INVALID_ARGUMENT_CONTEXT_GENERIC, mode);
+		      E_INVALID_ARGUMENT_CONTEXT_GENERIC,
+		      mode);
+	}
 }
 
 

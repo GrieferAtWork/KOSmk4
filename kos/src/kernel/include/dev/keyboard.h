@@ -24,7 +24,9 @@
 
 #include <debugger/config.h> /* CONFIG_HAVE_DEBUGGER */
 #include <dev/char.h>
+#include <dev/tty.h>
 #include <kernel/types.h>
+#include <misc/atomic-ref.h>
 #include <sched/mutex.h>
 #include <sched/signal.h>
 
@@ -32,6 +34,7 @@
 
 #include <stdbool.h>
 
+#include <libansitty/ansitty.h>
 #include <libkeymap/keymap.h>
 
 #ifndef CONFIG_NO_SMP
@@ -94,19 +97,21 @@ struct keyboard_device
 #endif /* __cplusplus */
 {
 #ifndef __cplusplus
-	struct character_device    kd_dev;          /* The underlying character device. */
+	struct character_device    kd_dev;           /* The underlying character device. */
 #endif /* !__cplusplus */
-	struct keyboard_device_ops kd_ops;          /* [const] Keyboard device operators. */
-	struct keyboard_buffer     kd_buf;          /* Keyboard input buffer. */
-	WEAK uintptr_t             kd_flags;        /* Keyboard operation flags (set of `KEYBOARD_DEVICE_FLAG_*').
-	                                             * NOTE: When changed, you must broadcast `kd_buf.kb_avail' */
-	struct atomic_rwlock       kd_map_lock;     /* Lock for `kd_map' */
-	struct keymap              kd_map;          /* [lock(kd_maplock)][owned(kfree(.km_ext))] Keyboard key translation map. */
-	size_t                     kd_map_extsiz;   /* [lock(kd_maplock)] Size (in bytes) of `kd_map::km_ext' */
-	/*utf-8*/ char              kd_map_pend[32]; /* [lock(kd_maplock)] List of pending utf-8 characters (terminated by a NUL-character; empty if `kd_map_pend[0] == NUL') */
-	uintptr_t                  kd_mods;         /* [lock(kd_maplock)] Currently active keyboard modifiers (Set of `KEYMOD_*'). */
-	struct mutex               kd_leds_lock;    /* Lock for updating `kd_leds' */
-	uintptr_t                  kd_leds;         /* [lock(kd_leds)] Set of currently lit LEDs (when modified, `ko_setled' must be called). */
+	struct keyboard_device_ops kd_ops;           /* [const] Keyboard device operators. */
+	struct keyboard_buffer     kd_buf;           /* Keyboard input buffer. */
+	WEAK uintptr_t             kd_flags;         /* Keyboard operation flags (set of `KEYBOARD_DEVICE_FLAG_*').
+	                                              * NOTE: When changed, you must broadcast `kd_buf.kb_avail' */
+	struct atomic_rwlock       kd_map_lock;      /* Lock for `kd_map' */
+	struct keymap              kd_map;           /* [lock(kd_maplock)][owned(kfree(.km_ext))] Keyboard key translation map. */
+	size_t                     kd_map_extsiz;    /* [lock(kd_maplock)] Size (in bytes) of `kd_map::km_ext' */
+	/*utf-8*/ char             kd_map_pend[32];  /* [lock(kd_maplock)] List of pending utf-8 characters (terminated by a NUL-character; empty if `kd_map_pend[0] == NUL') */
+	uintptr_t                  kd_mods;          /* [lock(kd_maplock)] Currently active keyboard modifiers (Set of `KEYMOD_*'). */
+	struct mutex               kd_leds_lock;     /* Lock for updating `kd_leds' */
+	uintptr_t                  kd_leds;          /* [lock(kd_leds)] Set of currently lit LEDs (when modified, `ko_setled' must be called). */
+	XATOMIC_WEAKLYREF(struct tty_device) kb_tty; /* [0..1] Weak reference to a connected TTY (used for encoding keyboard
+	                                              * input with `ansitty_translate()', when an ansitty is connected) */
 };
 
 

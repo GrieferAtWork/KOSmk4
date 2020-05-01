@@ -3288,52 +3288,48 @@ do_encode_utf8:
 		uint8_t cp_byte;
 		switch (self->at_codepage) {
 
-		case CP_LDM:
-			cp_byte = libansitty_decode_cp_ldm(ch);
-			break;
-
 		case CP_DUTCH:
-			cp_byte = libansitty_decode_cp_dutch(ch);
+			cp_byte = libansitty_encode_cp_dutch(ch);
 			break;
 
 		case CP_FINNISH:
-			cp_byte = libansitty_decode_cp_finnish(ch);
+			cp_byte = libansitty_encode_cp_finnish(ch);
 			break;
 
 		case CP_FRENCH:
-			cp_byte = libansitty_decode_cp_french(ch);
+			cp_byte = libansitty_encode_cp_french(ch);
 			break;
 
 		case CP_FRENCH_CANADIAN:
-			cp_byte = libansitty_decode_cp_french_canadian(ch);
+			cp_byte = libansitty_encode_cp_french_canadian(ch);
 			break;
 
 		case CP_GERMAN:
-			cp_byte = libansitty_decode_cp_german(ch);
+			cp_byte = libansitty_encode_cp_german(ch);
 			break;
 
 		case CP_ITALIAN:
-			cp_byte = libansitty_decode_cp_italian(ch);
+			cp_byte = libansitty_encode_cp_italian(ch);
 			break;
 
 		case CP_NORWEGIAN:
-			cp_byte = libansitty_decode_cp_norwegian(ch);
+			cp_byte = libansitty_encode_cp_norwegian(ch);
 			break;
 
 		case CP_PORTUGUESE:
-			cp_byte = libansitty_decode_cp_portuguese(ch);
+			cp_byte = libansitty_encode_cp_portuguese(ch);
 			break;
 
 		case CP_SPANISH:
-			cp_byte = libansitty_decode_cp_spanish(ch);
+			cp_byte = libansitty_encode_cp_spanish(ch);
 			break;
 
 		case CP_SWEDISH:
-			cp_byte = libansitty_decode_cp_swedish(ch);
+			cp_byte = libansitty_encode_cp_swedish(ch);
 			break;
 
 		case CP_SWISS:
-			cp_byte = libansitty_decode_cp_swiss(ch);
+			cp_byte = libansitty_encode_cp_swiss(ch);
 			break;
 
 		default:

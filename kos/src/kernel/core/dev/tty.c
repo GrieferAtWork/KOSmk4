@@ -54,10 +54,13 @@ PRIVATE ssize_t LIBTERM_CC
 tty_device_oprinter(struct terminal *__restrict term,
                     void const *__restrict src,
                     size_t num_bytes, iomode_t mode) {
+	size_t result;
 	struct tty_device *me;
 	me = container_of(term, struct tty_device, t_term);
 	/* Forward output text to the display data handler. */
-	return (ssize_t)(*me->t_ohandle_write)(me->t_ohandle_ptr, src, num_bytes, mode);
+	result = (*me->t_ohandle_write)(me->t_ohandle_ptr,
+	                                src, num_bytes, mode);
+	return (ssize_t)result;
 }
 
 
@@ -67,6 +70,12 @@ NOTHROW(KCALL tty_device_fini)(struct character_device *__restrict self) {
 	me = (struct tty_device *)self;
 	/* Stop the associated forwarding thread (if one is running) */
 	tty_device_stopfwd(me);
+	if (me->t_ihandle_typ == HANDLE_TYPE_CHARACTERDEVICE &&
+	    character_device_isakeyboard((struct character_device *)me->t_ihandle_ptr)) {
+		struct keyboard_device *idev;
+		idev = (struct keyboard_device *)me->t_ihandle_ptr;
+		idev->kb_tty.cmpxch(me, NULL);
+	}
 	if (me->t_ohandle_typ == HANDLE_TYPE_CHARACTERDEVICE &&
 	    character_device_isanansitty((struct character_device *)me->t_ohandle_ptr)) {
 		struct ansitty_device *odev;
@@ -364,11 +373,25 @@ tty_device_alloc(uintptr_half_t ihandle_typ, void *ihandle_ptr,
 		if (cdev->cd_type.ct_write)
 			result->t_ohandle_write = (phandle_write_function_t)cdev->cd_type.ct_write;
 	}
+	/* incref() input and output handles, since we keep references to each. */
+	(*handle_type_db.h_incref[ihandle_typ])(ihandle_ptr);
+	(*handle_type_db.h_incref[ohandle_typ])(ohandle_ptr);
+	COMPILER_BARRIER();
 	/* Special case: Always read characters from a connected
 	 *               keyboard device, rather than reading key codes. */
 	if (ihandle_typ == HANDLE_TYPE_CHARACTERDEVICE &&
 	    character_device_isakeyboard((struct character_device *)ihandle_ptr)) {
+		struct keyboard_device *idev;
+		idev = (struct keyboard_device *)ihandle_ptr;
 		result->t_ihandle_read = (phandle_read_function_t)&keyboard_device_readchars;
+		COMPILER_BARRIER();
+		/* When the output handle is an ansitty, then we must somehow register
+		 * that ansitty within the keyboard, such that the keyboard can call
+		 * into `ansitty_translate()' for the encoding of keyboard input into
+		 * a CP-specific, encoded byte sequence! */
+		if (ohandle_typ == HANDLE_TYPE_CHARACTERDEVICE &&
+		    character_device_isanansitty((struct character_device *)ohandle_ptr))
+			idev->kb_tty.cmpxch(NULL, result);
 	}
 	/* Try to bind the new TTY device to an ANSI TTY output device.
 	 * Note that a single output device may have multiple TTY drivers
@@ -379,9 +402,6 @@ tty_device_alloc(uintptr_half_t ihandle_typ, void *ihandle_ptr,
 		odev = (struct ansitty_device *)ohandle_ptr;
 		odev->at_tty.cmpxch(NULL, result);
 	}
-	/* incref() input and output handles, since we keep references to each. */
-	(*handle_type_db.h_incref[ihandle_typ])(ihandle_ptr);
-	(*handle_type_db.h_incref[ohandle_typ])(ohandle_ptr);
 	return result;
 }
 
