@@ -423,7 +423,7 @@ encode_hex:
 					encoded_text[1] = 'x';
 					encoded_text[2] = c_hex[ch];
 					encoded_text_size = 3;
-				} else if (ch <= 0xff) {
+				} else if (ch <= 0x7f) {
 					encoded_text[1] = 'x';
 					encoded_text[2] = c_hex[(ch & 0x000000f0) >> 4];
 					encoded_text[3] = c_hex[ch & 0x0000000f];
