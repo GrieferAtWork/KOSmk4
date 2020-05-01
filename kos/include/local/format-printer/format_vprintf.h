@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f17a397 */
+/* HASH CRC-32:0xfaceb626 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -472,7 +472,7 @@ __LOCAL_LIBC(format_vprintf) __ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1, 3)) __S
                                                void *__arg,
                                                char const *__restrict __format,
                                                __builtin_va_list __args) __THROWS(...) {
-#line 858 "kos/src/libc/magic/format-printer.c"
+#line 845 "kos/src/libc/magic/format-printer.c"
 #ifndef __INTELLISENSE__
 #define __CHAR_TYPE                 char
 #define __CHAR_SIZE                 __SIZEOF_CHAR__

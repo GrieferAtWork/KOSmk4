@@ -242,9 +242,9 @@ format_escape:([nonnull] pformatprinter printer, void *arg,
 @@if $wchar_function@@
 #if __SIZEOF_WCHAR_T__ == 2
 		uint32_t ch = unicode_readutf16_n((char16_t const **)&text, textend);
-#else
+#else /* __SIZEOF_WCHAR_T__ == 2 */
 		uint32_t ch = (uint32_t)*text++;
-#endif
+#endif /* __SIZEOF_WCHAR_T__ != 2 */
 @@else@@
 		uint32_t ch = unicode_readutf8_n((char const **)&text, textend);
 @@endif@@
@@ -373,34 +373,21 @@ encode_oct:
 				}
 special_control:
 				switch (ch) {
-				case '\a':
-					ch = 'a';
-					break;
-				case '\b':
-					ch = 'b';
-					break;
-				case '\f':
-					ch = 'f';
-					break;
-				case '\n':
-					ch = 'n';
-					break;
-				case '\r':
-					ch = 'r';
-					break;
-				case '\t':
-					ch = 't';
-					break;
-				case '\v':
-					ch = 'v';
-					break;
-				case '\033':
-					ch = 'e';
-					break;
+
+				case 7:  ch = 'a'; break;
+				case 8:  ch = 'b'; break;
+				case 9:  ch = 't'; break;
+				case 10: ch = 'n'; break;
+				case 11: ch = 'v'; break;
+				case 12: ch = 'f'; break;
+				case 13: ch = 'r'; break;
+				case 27: ch = 'e'; break;
+
 				case '\\':
 				case '\'':
 				case '\"':
 					break;
+
 				default:
 					goto default_ctrl;
 				}

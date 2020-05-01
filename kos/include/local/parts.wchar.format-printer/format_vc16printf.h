@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xce0e3e62 */
+/* HASH CRC-32:0xb1723b47 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -626,7 +626,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(format_vc16printf))(__pc16formatprint
                                                                void *__arg,
                                                                __CHAR16_TYPE__ const *__restrict __format,
                                                                __builtin_va_list __args) {
-#line 858 "kos/src/libc/magic/format-printer.c"
+#line 845 "kos/src/libc/magic/format-printer.c"
 #ifndef __INTELLISENSE__
 #define __CHAR_TYPE                 __CHAR16_TYPE__
 #define __CHAR_SIZE                 2

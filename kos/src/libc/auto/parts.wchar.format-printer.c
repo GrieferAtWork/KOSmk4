@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4dddadbe */
+/* HASH CRC-32:0x64eb7656 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -248,9 +248,9 @@ NOTHROW_NCX(LIBCCALL libc_format_wescape)(pc32formatprinter printer,
 
 #if 4 == 2
 		uint32_t ch = libc_unicode_readutf16_n((char16_t const **)&text, textend);
-#else
+#else /* __SIZEOF_WCHAR_T__ == 2 */
 		uint32_t ch = (uint32_t)*text++;
-#endif
+#endif /* __SIZEOF_WCHAR_T__ != 2 */
 
 
 
@@ -379,34 +379,21 @@ encode_oct:
 				}
 special_control:
 				switch (ch) {
-				case '\a':
-					ch = 'a';
-					break;
-				case '\b':
-					ch = 'b';
-					break;
-				case '\f':
-					ch = 'f';
-					break;
-				case '\n':
-					ch = 'n';
-					break;
-				case '\r':
-					ch = 'r';
-					break;
-				case '\t':
-					ch = 't';
-					break;
-				case '\v':
-					ch = 'v';
-					break;
-				case '\033':
-					ch = 'e';
-					break;
+
+				case 7:  ch = 'a'; break;
+				case 8:  ch = 'b'; break;
+				case 9:  ch = 't'; break;
+				case 10: ch = 'n'; break;
+				case 11: ch = 'v'; break;
+				case 12: ch = 'f'; break;
+				case 13: ch = 'r'; break;
+				case 27: ch = 'e'; break;
+
 				case '\\':
 				case '\'':
 				case '\"':
 					break;
+
 				default:
 					goto default_ctrl;
 				}
@@ -442,7 +429,7 @@ encode_hex:
 					encoded_text[1] = 'x';
 					encoded_text[2] = c_hex[ch];
 					encoded_text_size = 3;
-				} else if (ch <= 0xff) {
+				} else if (ch <= 0x7f) {
 					encoded_text[1] = 'x';
 					encoded_text[2] = c_hex[(ch & 0x000000f0) >> 4];
 					encoded_text[3] = c_hex[ch & 0x0000000f];
@@ -563,9 +550,9 @@ NOTHROW_NCX(LIBDCALL libd_format_wescape)(pc16formatprinter printer,
 
 #if 2 == 2
 		uint32_t ch = libc_unicode_readutf16_n((char16_t const **)&text, textend);
-#else
+#else /* __SIZEOF_WCHAR_T__ == 2 */
 		uint32_t ch = (uint32_t)*text++;
-#endif
+#endif /* __SIZEOF_WCHAR_T__ != 2 */
 
 
 
@@ -694,34 +681,21 @@ encode_oct:
 				}
 special_control:
 				switch (ch) {
-				case '\a':
-					ch = 'a';
-					break;
-				case '\b':
-					ch = 'b';
-					break;
-				case '\f':
-					ch = 'f';
-					break;
-				case '\n':
-					ch = 'n';
-					break;
-				case '\r':
-					ch = 'r';
-					break;
-				case '\t':
-					ch = 't';
-					break;
-				case '\v':
-					ch = 'v';
-					break;
-				case '\033':
-					ch = 'e';
-					break;
+
+				case 7:  ch = 'a'; break;
+				case 8:  ch = 'b'; break;
+				case 9:  ch = 't'; break;
+				case 10: ch = 'n'; break;
+				case 11: ch = 'v'; break;
+				case 12: ch = 'f'; break;
+				case 13: ch = 'r'; break;
+				case 27: ch = 'e'; break;
+
 				case '\\':
 				case '\'':
 				case '\"':
 					break;
+
 				default:
 					goto default_ctrl;
 				}
@@ -757,7 +731,7 @@ encode_hex:
 					encoded_text[1] = 'x';
 					encoded_text[2] = c_hex[ch];
 					encoded_text_size = 3;
-				} else if (ch <= 0xff) {
+				} else if (ch <= 0x7f) {
 					encoded_text[1] = 'x';
 					encoded_text[2] = c_hex[(ch & 0x000000f0) >> 4];
 					encoded_text[3] = c_hex[ch & 0x0000000f];
@@ -844,7 +818,7 @@ NOTHROW_NCX(LIBCCALL libc_format_whexdump)(pc32formatprinter printer,
                                            size_t size,
                                            size_t linesize,
                                            unsigned int flags) {
-#line 538 "kos/src/libc/magic/format-printer.c"
+#line 525 "kos/src/libc/magic/format-printer.c"
 #ifndef FORMAT_HEXDUMP_FNORMAL
 #define FORMAT_HEXDUMP_FNORMAL    0x0000 /* Normal hexdump flags. */
 #define FORMAT_HEXDUMP_FHEXLOWER  0x0001 /* Print hex text of the dump in lowercase (does not affect address/offset). */
@@ -1068,7 +1042,7 @@ NOTHROW_NCX(LIBDCALL libd_format_whexdump)(pc16formatprinter printer,
                                            size_t size,
                                            size_t linesize,
                                            unsigned int flags) {
-#line 538 "kos/src/libc/magic/format-printer.c"
+#line 525 "kos/src/libc/magic/format-printer.c"
 #ifndef FORMAT_HEXDUMP_FNORMAL
 #define FORMAT_HEXDUMP_FNORMAL    0x0000 /* Normal hexdump flags. */
 #define FORMAT_HEXDUMP_FHEXLOWER  0x0001 /* Print hex text of the dump in lowercase (does not affect address/offset). */
@@ -1384,7 +1358,7 @@ NOTHROW_NCX(LIBCCALL libc_format_vwprintf)(pc32formatprinter printer,
                                            void *arg,
                                            char32_t const *__restrict format,
                                            __builtin_va_list args) {
-#line 858 "kos/src/libc/magic/format-printer.c"
+#line 845 "kos/src/libc/magic/format-printer.c"
 #ifndef __INTELLISENSE__
 #define __CHAR_TYPE                 char32_t
 #define __CHAR_SIZE                 4
@@ -1545,7 +1519,7 @@ NOTHROW_NCX(LIBDCALL libd_format_vwprintf)(pc16formatprinter printer,
                                            void *arg,
                                            char16_t const *__restrict format,
                                            __builtin_va_list args) {
-#line 858 "kos/src/libc/magic/format-printer.c"
+#line 845 "kos/src/libc/magic/format-printer.c"
 #ifndef __INTELLISENSE__
 #define __CHAR_TYPE                 char16_t
 #define __CHAR_SIZE                 2
@@ -1687,7 +1661,7 @@ NOTHROW_NCX(VLIBCCALL libc_format_wprintf)(pc32formatprinter printer,
                                            void *arg,
                                            char32_t const *__restrict format,
                                            ...) {
-#line 911 "kos/src/libc/magic/format-printer.c"
+#line 898 "kos/src/libc/magic/format-printer.c"
 	ssize_t result;
 	va_list args;
 	va_start(args, format);
@@ -1794,7 +1768,7 @@ NOTHROW_NCX(VLIBDCALL libd_format_wprintf)(pc16formatprinter printer,
                                            void *arg,
                                            char16_t const *__restrict format,
                                            ...) {
-#line 911 "kos/src/libc/magic/format-printer.c"
+#line 898 "kos/src/libc/magic/format-printer.c"
 	ssize_t result;
 	va_list args;
 	va_start(args, format);
@@ -1810,7 +1784,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.wchar.string.format.format_wsprintf_printer") 
 NOTHROW_NCX(LIBCCALL libc_format_wsprintf_printer)(/*wchar_t ***/ void *arg,
                                                    char32_t const *__restrict data,
                                                    size_t datalen) {
-#line 998 "kos/src/libc/magic/format-printer.c"
+#line 985 "kos/src/libc/magic/format-printer.c"
 
 	*(char32_t **)arg = (char32_t *)libc_wmempcpy(*(char32_t **)arg, data, datalen);
 
@@ -1825,7 +1799,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.string.format.format_wsprintf_printe
 NOTHROW_NCX(LIBDCALL libd_format_wsprintf_printer)(/*wchar_t ***/ void *arg,
                                                    char16_t const *__restrict data,
                                                    size_t datalen) {
-#line 998 "kos/src/libc/magic/format-printer.c"
+#line 985 "kos/src/libc/magic/format-printer.c"
 
 	*(char16_t **)arg = (char16_t *)libd_wmempcpy(*(char16_t **)arg, data, datalen);
 
@@ -1844,7 +1818,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.wchar.string.format.format_wsnprintf_printer")
 NOTHROW_NCX(LIBCCALL libc_format_wsnprintf_printer)(/*struct format_wsnprintf_data**/ void *arg,
                                                     char32_t const *__restrict data,
                                                     size_t datalen) {
-#line 1030 "kos/src/libc/magic/format-printer.c"
+#line 1017 "kos/src/libc/magic/format-printer.c"
 	struct format_snprintf_data_ {
 		char32_t         *sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
 		__SIZE_TYPE__ sd_bufsiz; /* Remaining buffer size. */
@@ -1873,7 +1847,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.string.format.format_wsnprintf_print
 NOTHROW_NCX(LIBDCALL libd_format_wsnprintf_printer)(/*struct format_wsnprintf_data**/ void *arg,
                                                     char16_t const *__restrict data,
                                                     size_t datalen) {
-#line 1030 "kos/src/libc/magic/format-printer.c"
+#line 1017 "kos/src/libc/magic/format-printer.c"
 	struct format_snprintf_data_ {
 		char16_t         *sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
 		__SIZE_TYPE__ sd_bufsiz; /* Remaining buffer size. */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1d2f7223 */
+/* HASH CRC-32:0x778f4bd3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -96,9 +96,9 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(format_c16escape))(__pc16formatprinte
 
 #if 2 == 2
 		__UINT32_TYPE__ __ch = __localdep_unicode_readutf16_n((__CHAR16_TYPE__ const **)&__text, __textend);
-#else
+#else /* __SIZEOF_WCHAR_T__ == 2 */
 		__UINT32_TYPE__ __ch = (__UINT32_TYPE__)*__text++;
-#endif
+#endif /* __SIZEOF_WCHAR_T__ != 2 */
 
 
 
@@ -227,34 +227,21 @@ __encode_oct:
 				}
 __special_control:
 				switch (__ch) {
-				case '\a':
-					__ch = 'a';
-					break;
-				case '\b':
-					__ch = 'b';
-					break;
-				case '\f':
-					__ch = 'f';
-					break;
-				case '\n':
-					__ch = 'n';
-					break;
-				case '\r':
-					__ch = 'r';
-					break;
-				case '\t':
-					__ch = 't';
-					break;
-				case '\v':
-					__ch = 'v';
-					break;
-				case '\033':
-					__ch = 'e';
-					break;
+
+				case 7:  __ch = 'a'; break;
+				case 8:  __ch = 'b'; break;
+				case 9:  __ch = 't'; break;
+				case 10: __ch = 'n'; break;
+				case 11: __ch = 'v'; break;
+				case 12: __ch = 'f'; break;
+				case 13: __ch = 'r'; break;
+				case 27: __ch = 'e'; break;
+
 				case '\\':
 				case '\'':
 				case '\"':
 					break;
+
 				default:
 					goto __default_ctrl;
 				}
@@ -290,7 +277,7 @@ __encode_hex:
 					__encoded_text[1] = 'x';
 					__encoded_text[2] = __c_hex[__ch];
 					__encoded_text_size = 3;
-				} else if (__ch <= 0xff) {
+				} else if (__ch <= 0x7f) {
 					__encoded_text[1] = 'x';
 					__encoded_text[2] = __c_hex[(__ch & 0x000000f0) >> 4];
 					__encoded_text[3] = __c_hex[__ch & 0x0000000f];

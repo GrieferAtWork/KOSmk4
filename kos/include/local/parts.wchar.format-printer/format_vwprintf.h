@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xede08f73 */
+/* HASH CRC-32:0x9338637d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -557,7 +557,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_vwprintf))(__pwformatprinter _
                                                              void *__arg,
                                                              __WCHAR_TYPE__ const *__restrict __format,
                                                              __builtin_va_list __args) {
-#line 858 "kos/src/libc/magic/format-printer.c"
+#line 845 "kos/src/libc/magic/format-printer.c"
 #ifndef __INTELLISENSE__
 #define __CHAR_TYPE                 __WCHAR_TYPE__
 #define __CHAR_SIZE                 __SIZEOF_WCHAR_T__
