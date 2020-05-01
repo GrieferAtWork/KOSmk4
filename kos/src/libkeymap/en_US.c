@@ -40,7 +40,7 @@ gcc_opt.append("-fexceptions");
 
 DECL_BEGIN
 
-PRIVATE struct basic_key const basic_keys_en_US[0xe0] = {
+PRIVATE struct basic_key const basic_keys_en_US[128] = {
 #define DEF(key, lower, upper) [key] = { lower, upper }
 
 	DEF(KEY_BACKTICK, '`', '~'),
@@ -96,24 +96,6 @@ PRIVATE struct basic_key const basic_keys_en_US[0xe0] = {
 	DEF(KEY_SLASH, '/', '?'),
 
 	DEF(KEY_SPACE, ' ', ' '),
-
-	DEF(KEY_KP_SLASH, '/', 0),
-	DEF(KEY_KP_STAR, '*', 0),
-	DEF(KEY_KP_MINUS, '-', 0),
-	DEF(KEY_KP_7, '7', 0),
-	DEF(KEY_KP_8, '8', 0),
-	DEF(KEY_KP_9, '9', 0),
-	DEF(KEY_KP_PLUS, '+', 0),
-	DEF(KEY_KP_4, '4', 0),
-	DEF(KEY_KP_5, '5', 0),
-	DEF(KEY_KP_6, '6', 0),
-	DEF(KEY_KP_1, '1', 0),
-	DEF(KEY_KP_2, '2', 0),
-	DEF(KEY_KP_3, '3', 0),
-	DEF(KEY_KP_ENTER, '\n', 0),
-	DEF(KEY_KP_0, '0', 0),
-	DEF(KEY_KP_DOT, '.', 0),
-
 #undef DEF
 };
 
