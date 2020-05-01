@@ -337,7 +337,7 @@ struct ansitty {
 	ansitty_coord_t           at_scroll_sc;   /* Scroll region starting column (only used internally!) */
 	ansitty_coord_t           at_scroll_ec;   /* Scroll region end column (only used internally!) */
 	__UINTPTR_HALF_TYPE__     at_state;       /* Current state-machine state. (not exposed) */
-	__UINTPTR_HALF_TYPE__     at_codepage;    /* Current code-page state. (not exposed) */
+	__UINTPTR_HALF_TYPE__     at_codepage;    /* Current code-page state. (not exposed, but 0 means UTF-8) */
 	union {
 		__UINTPTR_TYPE__      at_esclen;      /* Number of written, escaped bytes. */
 		__UINTPTR_HALF_TYPE__ at_escwrd[2];   /* Double-word status (used by some values for `at_state') */

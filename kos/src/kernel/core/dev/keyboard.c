@@ -713,6 +713,13 @@ NOTHROW(KCALL keyboard_device_encode_cp)(struct keyboard_device *__restrict self
 	atty = (struct ansitty_device *)tty->t_ohandle_ptr;
 	if (!character_device_isanansitty(atty))
 		goto done_tty;
+	/* When the TTY uses CP#0 (UTF-8), then we don't actually need to re-encode
+	 * the input text sequence, since both input and output would use pure UTF-8.
+	 * And given that the most likely situation has the ANSITTY be in UTF-8 mode,
+	 * as everything in KOS is (at heart) designed for full UTF-8 support, check
+	 * for this highly likely case and optimize for it. */
+	if likely(atty->at_ansi.at_codepage == 0)
+		goto done_tty;
 	/* Re-encode unicode characters */
 	reader = self->kd_map_pend;
 	end    = self->kd_map_pend + len;
@@ -726,7 +733,6 @@ NOTHROW(KCALL keyboard_device_encode_cp)(struct keyboard_device *__restrict self
 		encoded_length = memlen(tempbuf, 0, encoded_length); /* Stop on the first NUL-character */
 		if (!encoded_length) /* Fallback: Anything that can't be encoded must be discarded */
 			continue;
-		enum { x = '\e' };
 		if (newlen + encoded_length >= COMPILER_LENOF(self->kd_map_pend))
 			break; /* Sequence too long (drop trailing characters...) */
 		/* Append the newly encoded `tempbuf' */

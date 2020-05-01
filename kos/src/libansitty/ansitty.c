@@ -197,6 +197,10 @@ DECL_BEGIN
 #define CP_SWEDISH         12
 #define CP_SWISS           13
 
+STATIC_ASSERT_MSG(CP_UTF8 == 0,
+                  "CP=0 meaning UTF-8 appears in documentation "
+                  "and is therefor part of the API/ABI");
+
 
 /* Anything in this range (should) exit escape mode. */
 #define ANSI_LOW       'A'
