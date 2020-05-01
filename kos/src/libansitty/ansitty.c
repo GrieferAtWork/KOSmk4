@@ -29,16 +29,18 @@
 
 #include <hybrid/compiler.h>
 
+#include <hybrid/atomic.h>
+
+#include <kos/keyboard.h>
+
 #include <assert.h>
-#include <string.h>
-#include <unicode.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
+#include <termios.h>
+#include <unicode.h>
 
 #include <libansitty/ansitty.h>
-#include <termios.h>
-#include <hybrid/atomic.h>
 
 #include "ansitty.h"
 #include "cp.h"
@@ -135,14 +137,16 @@ DECL_BEGIN
 #define MAXCOORD        ((ansitty_coord_t)-1)
 
 /* Values for `at_ttyflag' */
-#define ANSITTY_FLAG_NORMAL       0x0000 /* Normal flags */
-#define ANSITTY_FLAG_CONCEIL      0x0001 /* FLAG: Use background color as foreground */
-#define ANSITTY_FLAG_VT52         0x0002 /* FLAG: VT52 compatibility mode. */
-#define ANSITTY_FLAG_HEDIT        0x0004 /* FLAG: Horizontal Editing mode (ICH/DCH/IRM go backwards). */
-#define ANSITTY_FLAG_INSERT       0x0008 /* FLAG: Enable insertion mode. */
-#define ANSITTY_FLAG_INSDEL_SCRN  0x0010 /* FLAG: Insert/Delete affect the entire screen. */
-#define ANSITTY_FLAG_CRM          0x0020 /* FLAG: Control representation mode (https://en.wikipedia.org/wiki/Unicode_control_characters#Control_pictures) */
-#define ANSITTY_FLAG_RENDERMASK  (ANSITTY_FLAG_CONCEIL | ANSITTY_FLAG_CRM) /* Mask for flags that affect rendering */
+#define ANSITTY_FLAG_NORMAL            0x0000 /* Normal flags */
+#define ANSITTY_FLAG_CONCEIL           0x0001 /* FLAG: Use background color as foreground */
+#define ANSITTY_FLAG_VT52              0x0002 /* FLAG: VT52 compatibility mode. */
+#define ANSITTY_FLAG_HEDIT             0x0004 /* FLAG: Horizontal Editing mode (ICH/DCH/IRM go backwards). */
+#define ANSITTY_FLAG_INSERT            0x0008 /* FLAG: Enable insertion mode. */
+#define ANSITTY_FLAG_INSDEL_SCRN       0x0010 /* FLAG: Insert/Delete affect the entire screen. */
+#define ANSITTY_FLAG_CRM               0x0020 /* FLAG: Control representation mode (https://en.wikipedia.org/wiki/Unicode_control_characters#Control_pictures) */
+#define ANSITTY_FLAG_ENABLE_APP_CURSOR 0x0040 /* FLAG: Enable application cursor keys */
+#define ANSITTY_FLAG_ENABLE_APP_KEYPAD 0x0080 /* FLAG: Enable application keypad keys */
+#define ANSITTY_FLAG_RENDERMASK        (ANSITTY_FLAG_CONCEIL | ANSITTY_FLAG_CRM) /* Mask for flags that affect rendering */
 
 
 /* TTY states */
@@ -175,8 +179,8 @@ DECL_BEGIN
 #define STATE_LPAREN_PERCENT  23 /* After `ESC(%' */
 #define STATE_TEXT            24 /* Non-utf8 character set */
 
-#define STATE_OSC_ADD_ESC(x) ((x)+5)
-#define STATE_OSC_DEL_ESC(x) ((x)-5)
+#define STATE_OSC_ADD_ESC(x) ((x) + 5)
+#define STATE_OSC_DEL_ESC(x) ((x) - 5)
 
 
 /* Code page codes. */
@@ -1630,8 +1634,14 @@ done_insert_ansitty_flag_hedit:
 				/* Must be ignored. */
 				break;
 
-//			case 1:  /* \e[?1h    DECCKM   Cursor Keys Mode, send ESC O A for cursor up */
-//			         /* \e[?1l             Cursor keys send ANSI cursor position commands DECCKM */
+			case 1:  /* \e[?1h    DECCKM   Cursor Keys Mode, send ESC O A for cursor up */
+			         /* \e[?1l             Cursor keys send ANSI cursor position commands DECCKM */
+				if (lastch == 'h') {
+					self->at_ttyflag |= ANSITTY_FLAG_ENABLE_APP_CURSOR;
+				} else {
+					self->at_ttyflag &= ~ANSITTY_FLAG_ENABLE_APP_CURSOR;
+				}
+				break;
 
 			case 2:  /* \e[?2h    DECANM   ANSI Mode, use ESC < to switch VT52 to ANSI */
 			         /* \e[?2l             Use VT52 emulation instead of ANSI mode DECANM */
@@ -2818,6 +2828,16 @@ do_insuni:
 			}
 			goto unknown_character_after_esc;
 
+		case '=':
+			/* Application Keypad (DECKPAM). */
+			self->at_ttyflag |= ANSITTY_FLAG_ENABLE_APP_KEYPAD;
+			goto set_text_and_done;
+
+		case '>':
+			/* Normal Keypad (DECKPNM) */
+			self->at_ttyflag &= ~ANSITTY_FLAG_ENABLE_APP_KEYPAD;
+			goto set_text_and_done;
+
 		case 'M': /* RI */
 			/* Move/scroll window down one line */
 			SCROLL(-1);
@@ -3280,9 +3300,10 @@ libansitty_printer(void *arg, char const *data, size_t datalen) {
  * @return: * : The number of produced bytes (<= ANSITTY_TRANSLATE_BUFSIZE)
  * @return: 0 : The character cannot be represented in the current CP, and
  *              should be discarded. */
-INTERN NONNULL((1, 2)) size_t CC
-libansitty_translate(struct ansitty *__restrict self,
-                     char *buf, char32_t ch) {
+INTERN NONNULL((1, 2)) size_t
+NOTHROW_NCX(CC libansitty_translate)(struct ansitty *__restrict self,
+                                     char buf[ANSITTY_TRANSLATE_BUFSIZE],
+                                     char32_t ch) {
 	size_t result;
 	if likely(self->at_codepage == CP_UTF8) {
 do_encode_utf8:
@@ -3349,11 +3370,295 @@ do_encode_utf8:
 
 
 
+/* Encode the representation of a misc. keyboard key `key' with `mod',
+ * and finalize encoding of certain keyboard characters after already
+ * having been translated through the keymap.
+ * @param: self: The ANSITTY to use (or `NULL' to use default settings)
+ * @param: key:  The keyboard key (one of `KEY_*' from <kos/keyboard.h>; e.g. `KEY_UP')
+ * @param: mod:  Keyboard modifiers (set of `KEYMOD_*' from <kos/keyboard.h>)
+ * @param: len:  The # of bytes from `buf' that were previously encoded by the keymap.
+ * @return: * :  The number of produced bytes (<= ANSITTY_TRANSLATE_BUFSIZE)
+ * @return: 0 :  The key cannot be represented and should be discarded. */
+INTERN NONNULL((2)) size_t
+NOTHROW_NCX(CC libansitty_translate_misc)(struct ansitty *self,
+                                          char buf[ANSITTY_TRANSLATE_BUFSIZE],
+                                          size_t len, uint16_t key, uint16_t mod) {
+#define IS_VT52()           (self && (self->at_ttyflag & ANSITTY_FLAG_VT52) != 0)
+#define ENABLE_APP_CURSOR() (!!KEYMOD_HASCTRL(mod) ^ !!(self && (self->at_ttyflag & ANSITTY_FLAG_ENABLE_APP_CURSOR) != 0))
+#define ENABLE_APP_KEYPAD() (self && (self->at_ttyflag & ANSITTY_FLAG_ENABLE_APP_KEYPAD) != 0)
+	size_t result;
+	size_t addend;
+	if (len != 0) {
+		/* Only override keymap settings in certain cases.
+		 * Also: In some cases, re-use certain bits of information from the keymap! */
+		switch (key) {
+
+		case KEY_KPCOMMA:
+		case KEY_KPDOT:
+			if (len == 1) {
+				/* Deal with internationalization */
+				if (buf[0] == '.')
+					key = KEY_KPDOT;
+				else if (buf[0] == ',') {
+					key = KEY_KPCOMMA;
+				}
+			}
+			ATTR_FALLTHROUGH
+#ifdef KEY_KPSPACE
+		case KEY_KPSPACE:
+#endif /* KEY_KPSPACE */
+#ifdef KEY_KPTAB
+		case KEY_KPTAB:
+#endif /* KEY_KPTAB */
+		case KEY_KPENTER:
+		case KEY_KPASTERISK:
+		case KEY_KPPLUS:
+		case KEY_KPMINUS:
+		case KEY_KPSLASH:
+		case KEY_KP0: case KEY_KP1: case KEY_KP2: case KEY_KP3: case KEY_KP4:
+		case KEY_KP5: case KEY_KP6: case KEY_KP7: case KEY_KP8: case KEY_KP9:
+		case KEY_KPEQUAL:
+			if (ENABLE_APP_KEYPAD()) {
+				addend = 0;
+				/* Prefix with 0x1b (ESC; aka. `\e') */
+				if (KEYMOD_HASALT(mod)) {
+					*buf++ = (char)'\033';
+					addend = 1;
+				}
+				goto handle_app_keypad;
+			}
+			break;
+
+		default:
+			break;
+		}
+		return len;
+	}
+	addend = 0;
+	/* Prefix with 0x1b (ESC; aka. `\e') */
+	if (KEYMOD_HASALT(mod)) {
+		*buf++ = (char)'\033';
+		addend = 1;
+	}
+	switch (key) {
+
+		/* Keypad keys. */
+#ifdef KEY_KPSPACE
+	case KEY_KPSPACE:     buf[0] = ' '; goto check_app_keypad;
+#endif /* KEY_KPSPACE */
+#ifdef KEY_KPTAB
+	case KEY_KPTAB:       buf[0] = '\t'; goto check_app_keypad;
+#endif /* KEY_KPTAB */
+	case KEY_KPCOMMA:     buf[0] = ','; goto check_app_keypad;
+	case KEY_KPDOT:       buf[0] = '.'; goto check_app_keypad;
+	case KEY_KPENTER:     buf[0] = '\r'; goto check_app_keypad;
+	case KEY_KPASTERISK:  buf[0] = '*'; goto check_app_keypad;
+	case KEY_KPPLUS:      buf[0] = '+'; goto check_app_keypad;
+	case KEY_KPMINUS:     buf[0] = '-'; goto check_app_keypad;
+	case KEY_KPSLASH:     buf[0] = '/'; goto check_app_keypad;
+	case KEY_KP0:         buf[0] = '0'; goto check_app_keypad;
+	case KEY_KP1:         buf[0] = '1'; goto check_app_keypad;
+	case KEY_KP2:         buf[0] = '2'; goto check_app_keypad;
+	case KEY_KP3:         buf[0] = '3'; goto check_app_keypad;
+	case KEY_KP4:         buf[0] = '4'; goto check_app_keypad;
+	case KEY_KP5:         buf[0] = '5'; goto check_app_keypad;
+	case KEY_KP6:         buf[0] = '6'; goto check_app_keypad;
+	case KEY_KP7:         buf[0] = '7'; goto check_app_keypad;
+	case KEY_KP8:         buf[0] = '8'; goto check_app_keypad;
+	case KEY_KP9:         buf[0] = '9'; goto check_app_keypad;
+	case KEY_KPEQUAL:     buf[0] = '='; goto check_app_keypad;
+check_app_keypad:
+		result = 1;
+		if (ENABLE_APP_KEYPAD()) {
+handle_app_keypad:
+			switch (key) {
+#ifdef KEY_KPSPACE
+			case KEY_KPSPACE:     buf[2] = ' '; break;
+#endif /* KEY_KPSPACE */
+#ifdef KEY_KPTAB
+			case KEY_KPTAB:       buf[2] = 'I'; break;
+#endif /* KEY_KPTAB */
+			case KEY_KPCOMMA:     buf[2] = 'l'; break;
+			case KEY_KPDOT:       buf[2] = 'n'; break;
+			case KEY_KPENTER:     buf[2] = 'M'; break;
+			case KEY_KPASTERISK:  buf[2] = 'j'; break;
+			case KEY_KPPLUS:      buf[2] = 'k'; break;
+			case KEY_KPMINUS:     buf[2] = 'm'; break;
+			case KEY_KPSLASH:     buf[2] = 'o'; break;
+			case KEY_KP0:         buf[2] = 'p'; break;
+			case KEY_KP1:         buf[2] = 'q'; break;
+			case KEY_KP2:         buf[2] = 'r'; break;
+			case KEY_KP3:         buf[2] = 's'; break;
+			case KEY_KP4:         buf[2] = 't'; break;
+			case KEY_KP5:         buf[2] = 'u'; break;
+			case KEY_KP6:         buf[2] = 'v'; break;
+			case KEY_KP7:         buf[2] = 'w'; break;
+			case KEY_KP8:         buf[2] = 'x'; break;
+			case KEY_KP9:         buf[2] = 'y'; break;
+			case KEY_KPEQUAL:     buf[2] = 'X'; break;
+			default: __builtin_unreachable();
+			}
+			if (IS_VT52()) {
+				buf[1] = '?';
+/*set_buf_escape_3:*/
+				result = 3;
+				goto set_buf_escape;
+			}
+			goto set_buf_escape_O_3;
+		}
+		if (KEYMOD_HASCTRL(mod)) {
+			/* Deal with control characters.
+			 * s.a. /kos/src/kernel/core/dev/keyboard.c:get_control_key() */
+			switch (buf[0]) {
+			case '2': buf[0] = 0x00; break;
+			case '3': buf[0] = 0x1b; break;
+			case '4': buf[0] = 0x1c; break;
+			case '5': buf[0] = 0x1d; break;
+			case '6': buf[0] = 0x1e; break;
+			case '-':
+			case '7': buf[0] = 0x1f; break;
+			case '8': buf[0] = 0x7f; break;
+			default: break;
+			}
+		}
+		break;
+
+#if 0 /* ??? */
+	case KEY_PF1 ... KEY_PF4:
+		if (IS_VT52()) {
+			buf[1] = 'P' + (key - KEY_PF1);
+			goto set_buf_escape_2;
+		}
+		buf[2] = 'P' + (key - KEY_PF1);
+		goto set_buf_escape_O_3;
+#endif
+
+
+	case KEY_F1 ... KEY_F4:
+		/* KEY_F1: \eOP
+		 * KEY_F2: \eOQ
+		 * KEY_F3: \eOR
+		 * KEY_F4: \eOS */
+		buf[2] = 'P' + (key - KEY_F1);
+set_buf_escape_O_3:
+		result = 3;
+		goto set_buf_escape_O;
+
+	case KEY_F5:
+		key = 15;
+		goto do_f_xx_key;
+	case KEY_F6 ... KEY_F10:
+		key = 17 + (key - KEY_F6);
+		goto do_f_xx_key;
+	case KEY_F11 ... KEY_F12:
+		key = 23 + (key - KEY_F11);
+		goto do_f_xx_key;
+	case KEY_F13 ... KEY_F24:
+		key = 25 + (key - KEY_F13);
+do_f_xx_key:
+		buf[2] = '0' + (key / 10);
+		buf[3] = '0' + (key % 10);
+		buf[4] = '~';
+/*set_buf_escape_lbracket_5:*/
+		result = 5;
+		goto set_buf_escape_lbracket;
+
+	case KEY_HOME:
+	case KEY_FIND:
+		buf[2] = '1';
+		goto set_buf_escape_lbracket_4_tilde_3;
+
+	case KEY_INSERT:
+		buf[2] = '2';
+		goto set_buf_escape_lbracket_4_tilde_3;
+
+	case KEY_DELETE:
+		buf[2] = '3';
+		goto set_buf_escape_lbracket_4_tilde_3;
+
+	case KEY_SELECT:
+	case KEY_END:
+		buf[2] = '4';
+		goto set_buf_escape_lbracket_4_tilde_3;
+
+	case KEY_PREVIOUS:
+	case KEY_PAGEUP:
+		buf[2] = '5';
+		goto set_buf_escape_lbracket_4_tilde_3;
+
+	case KEY_NEXT:
+	case KEY_PAGEDOWN:
+		buf[2] = '6';
+set_buf_escape_lbracket_4_tilde_3:
+		buf[3] = '~';
+/*set_buf_escape_lbracket_4:*/
+		result = 4;
+		goto set_buf_escape_lbracket;
+
+	case KEY_MACRO:
+		buf[2] = 'M';
+		goto set_buf_escape_lbracket_3;
+
+	case KEY_PAUSE:
+		buf[2] = 'P';
+set_buf_escape_lbracket_3:
+		result = 3;
+		goto set_buf_escape_lbracket;
+
+	case KEY_ESC:
+/*set_buf_escape_1:*/
+		result = 1;
+		goto set_buf_escape;
+
+	case KEY_UP:
+		buf[2] = 'A';
+		goto handle_cursor_key;
+
+	case KEY_DOWN:
+		buf[2] = 'B';
+		goto handle_cursor_key;
+
+	case KEY_RIGHT:
+		buf[2] = 'C';
+		goto handle_cursor_key;
+
+	case KEY_LEFT:
+		buf[2] = 'D';
+handle_cursor_key:
+		result = 3;
+		if (IS_VT52()) {
+			/* VT52-specific cursor key encoding */
+			buf[1] = buf[2];
+/*set_buf_escape_2:*/
+			result = 2;
+			goto set_buf_escape;
+		} else if (ENABLE_APP_CURSOR()) {
+			/* Application cursor key mode. */
+set_buf_escape_O:
+			buf[1] = 'O';
+			goto set_buf_escape;
+		}
+set_buf_escape_lbracket:
+		buf[1] = '[';
+set_buf_escape:
+		buf[0] = '\033';
+		break;
+
+	default:
+		/* Key cannot be encoded! */
+		return 0;
+	}
+	return addend + result;
+}
+
+
+
 DEFINE_PUBLIC_ALIAS(ansitty_init, libansitty_init);
 DEFINE_PUBLIC_ALIAS(ansitty_putc, libansitty_putc);
 DEFINE_PUBLIC_ALIAS(ansitty_putuni, libansitty_putuni);
 DEFINE_PUBLIC_ALIAS(ansitty_printer, libansitty_printer);
 DEFINE_PUBLIC_ALIAS(ansitty_translate, libansitty_translate);
+DEFINE_PUBLIC_ALIAS(ansitty_translate_misc, libansitty_translate_misc);
 
 DECL_END
 

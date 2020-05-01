@@ -24,6 +24,7 @@
 
 #include <hybrid/compiler.h>
 
+#include <kos/anno.h>
 #include <kos/types.h>
 
 #include <libansitty/ansitty.h>
@@ -57,9 +58,24 @@ libansitty_printer(void *arg, char const *data, size_t datalen);
  * @return: * : The number of produced bytes (<= ANSITTY_TRANSLATE_BUFSIZE)
  * @return: 0 : The character cannot be represented in the current CP, and
  *              should be discarded. */
-INTDEF NONNULL((1, 2)) size_t CC
-libansitty_translate(struct ansitty *__restrict self,
-                     char *buf, char32_t ch);
+INTDEF __NOBLOCK NONNULL((1, 2)) size_t
+NOTHROW_NCX(CC libansitty_translate)(struct ansitty *__restrict self,
+                                     char buf[ANSITTY_TRANSLATE_BUFSIZE],
+                                     char32_t ch);
+
+/* Encode the representation of a misc. keyboard key `key' with `mod',
+ * and finalize encoding of certain keyboard characters after already
+ * having been translated through the keymap.
+ * @param: self: The ANSITTY to use (or `NULL' to use default settings)
+ * @param: key:  The keyboard key (one of `KEY_*' from <kos/keyboard.h>; e.g. `KEY_UP')
+ * @param: mod:  Keyboard modifiers (set of `KEYMOD_*' from <kos/keyboard.h>)
+ * @param: len:  The # of bytes from `buf' that were previously encoded by the keymap.
+ * @return: * :  The number of produced bytes (<= ANSITTY_TRANSLATE_BUFSIZE)
+ * @return: 0 :  The key cannot be represented and should be discarded. */
+INTDEF __NOBLOCK NONNULL((2)) size_t
+NOTHROW_NCX(CC libansitty_translate_misc)(struct ansitty *self,
+                                          char buf[ANSITTY_TRANSLATE_BUFSIZE],
+                                          size_t len, uint16_t key, uint16_t mod);
 
 
 DECL_END

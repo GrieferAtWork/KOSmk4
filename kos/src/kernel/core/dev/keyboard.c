@@ -423,74 +423,6 @@ keyboard_device_getkey(struct keyboard_device *__restrict self)
 	return result;
 }
 
-PRIVATE NOBLOCK size_t
-NOTHROW(KCALL keyboard_device_do_misc_repr)(uint16_t key, uint16_t mod, char *buf) {
-	size_t result;
-#define SET1(a)             (buf[0] = (a), result = 1)
-#define SET2(a, b)          (buf[0] = (a), buf[1] = (b), result = 2)
-#define SET3(a, b, c)       (buf[0] = (a), buf[1] = (b), buf[2] = (c), result = 3)
-#define SET4(a, b, c, d)    (buf[0] = (a), buf[1] = (b), buf[2] = (c), buf[3] = (d), result = 4)
-#define SET5(a, b, c, d, e) (buf[0] = (a), buf[1] = (b), buf[2] = (c), buf[3] = (d), buf[4] = (e), result = 5)
-	switch (key) {
-
-	case KEY_F1 ... KEY_F5:
-		SET4('\033', '[', '[', 'A' + (key - KEY_F1));
-		break;
-
-	case KEY_F6 ... KEY_F10:
-		key = 6 + (key - KEY_F6);
-		goto do_f_xx_key;
-	case KEY_F11 ... KEY_F12:
-		key = 11 + (key - KEY_F11);
-		goto do_f_xx_key;
-	case KEY_F13 ... KEY_F24:
-		key = 13 + (key - KEY_F13);
-		goto do_f_xx_key;
-do_f_xx_key:
-		/* All Fnn keys with nn>=6 are encoded as `\e[<TWO_DIGIT_DECIMAL_nn_PLUS_11>~'
-		 * e.g. F6 is encoded as `\e[17~' */
-		key += 11;
-		SET5('\033', '[',
-		     '0' + (key / 10),
-		     '0' + (key % 10),
-		     '~');
-		break;
-
-	case KEY_HOME:
-	case KEY_FIND:     SET4('\033', '[', '1', '~'); break;
-	case KEY_INSERT:   SET4('\033', '[', '2', '~'); break;
-	case KEY_DELETE:   SET4('\033', '[', '3', '~'); break;
-	case KEY_SELECT:
-	case KEY_END:      SET4('\033', '[', '4', '~'); break;
-	case KEY_PREVIOUS:
-	case KEY_PAGEUP:   SET4('\033', '[', '5', '~'); break;
-	case KEY_NEXT:
-	case KEY_PAGEDOWN: SET4('\033', '[', '6', '~'); break;
-	case KEY_MACRO:    SET3('\033', '[', 'M'); break;
-	case KEY_PAUSE:    SET3('\033', '[', 'P'); break;
-	case KEY_ESC:      SET1('\033'); break;
-
-	case KEY_UP:    SET3('\033', '[', 'A'); goto check_ctrl_dir;
-	case KEY_DOWN:  SET3('\033', '[', 'B'); goto check_ctrl_dir;
-	case KEY_RIGHT: SET3('\033', '[', 'C'); goto check_ctrl_dir;
-	case KEY_LEFT:  SET3('\033', '[', 'D');
-check_ctrl_dir:
-		if (KEYMOD_HASCTRL(mod))
-			buf[1] = 'O';
-		break;
-
-	default:
-		result = 0;
-		break;
-	}
-#undef SET5
-#undef SET4
-#undef SET3
-#undef SET2
-#undef SET1
-	return result;
-}
-
 LOCAL NOBLOCK u8
 NOTHROW(KCALL get_control_key)(u8 ch) {
 	/* Playing around with linux, I've noticed some mappings which I can't
@@ -632,7 +564,7 @@ NOTHROW(KCALL keyboard_device_do_translate)(struct keyboard_device *__restrict s
 			                              (char *)&ch, 1);
 			if (result != 1) {
 				if (result == 0)
-					goto check_misc_key;
+					goto done;
 				goto nope;
 			}
 			/* Transform into a control character,
@@ -651,7 +583,7 @@ NOTHROW(KCALL keyboard_device_do_translate)(struct keyboard_device *__restrict s
 			                              (char *)&ch, 1);
 			if (result != 1) {
 				if (result == 0)
-					goto check_misc_key;
+					goto done;
 				goto nope;
 			}
 			/* Transform into a control character. */
@@ -668,7 +600,7 @@ NOTHROW(KCALL keyboard_device_do_translate)(struct keyboard_device *__restrict s
 			                              &self->kd_map_pend[1],
 			                              COMPILER_LENOF(self->kd_map_pend) - 1);
 			if (result == 0)
-				goto check_misc_key;
+				goto done;
 			if unlikely(result > (COMPILER_LENOF(self->kd_map_pend) - 1))
 				goto nope;
 			/* Prefix with 0x1b (ESC; aka. `\e') */
@@ -676,19 +608,23 @@ NOTHROW(KCALL keyboard_device_do_translate)(struct keyboard_device *__restrict s
 			++result;
 			goto done;
 		}
-check_misc_key:
-		if (KEYMOD_HASALT(mod)) {
-			result = keyboard_device_do_misc_repr(key, mod, &self->kd_map_pend[1]);
-			if (result) {
-				/* Prefix with 0x1b (ESC; aka. `\e') */
-				self->kd_map_pend[0] = (char)0x1b;
-				++result;
-			}
-		} else {
-			result = keyboard_device_do_misc_repr(key, mod, self->kd_map_pend);
-		}
 	}
+	{
+		REF struct tty_device *tty;
+		struct ansitty *atty;
 done:
+		atty = NULL;
+		tty  = self->kb_tty.get();
+		if (tty && tty->t_ohandle_typ == HANDLE_TYPE_CHARACTERDEVICE) {
+			struct ansitty_device *ttydev;
+			ttydev = (struct ansitty_device *)tty->t_ohandle_ptr;
+			if (character_device_isanansitty(ttydev))
+				atty = &ttydev->at_ansi;
+		}
+		/* Encode a misc. key using the currently active ANSI tty settings. */
+		result = ansitty_translate_misc(atty, self->kd_map_pend, result, key, mod);
+		xdecref_unlikely(tty);
+	}
 	return result;
 nope:
 	return 0;
@@ -741,7 +677,7 @@ NOTHROW(KCALL keyboard_device_encode_cp)(struct keyboard_device *__restrict self
 	}
 	assert(newlen <= COMPILER_LENOF(self->kd_map_pend) - 1);
 	/* Apply the new pending character buffer. */
-	newbuf[newlen] = 0; /* Enshure NUL-termination! */
+	newbuf[newlen] = 0; /* Ensure NUL-termination! */
 	memcpy(self->kd_map_pend, newbuf, newlen + 1, sizeof(char));
 	len = newlen;
 done_tty:

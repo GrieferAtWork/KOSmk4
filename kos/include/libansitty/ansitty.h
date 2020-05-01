@@ -21,8 +21,11 @@
 #define _LIBANSITTY_ANSITTY_H 1
 
 #include "api.h"
+
 #include <hybrid/__byteorder.h>
+
 #include <bits/types.h>
+#include <kos/anno.h>
 
 /* s.a.
  *  - https://en.wikipedia.org/wiki/ANSI_escape_code
@@ -394,13 +397,36 @@ ansitty_printer(void *arg, char const *data, __size_t datalen);
  * @return: * : The number of produced bytes (<= ANSITTY_TRANSLATE_BUFSIZE)
  * @return: 0 : The character cannot be represented in the current CP, and
  *              should be discarded. */
-typedef __ATTR_NONNULL((1, 2)) __size_t
-(LIBANSITTY_CC *PANSITTY_TRANSLATE)(struct ansitty *__restrict self,
-                                    char *buf, __CHAR32_TYPE__ ch);
+typedef __NOBLOCK __ATTR_NONNULL((1, 2)) __size_t
+/*__NOTHROW_NCX*/ (LIBANSITTY_CC *PANSITTY_TRANSLATE)(struct ansitty *__restrict self,
+                                                      char buf[ANSITTY_TRANSLATE_BUFSIZE],
+                                                      __CHAR32_TYPE__ ch);
 #ifdef LIBANSITTY_WANT_PROTOTYPES
-LIBANSITTY_DECL __ATTR_NONNULL((1, 2)) __size_t LIBANSITTY_CC
-ansitty_translate(struct ansitty *__restrict self,
-                  char *buf, __CHAR32_TYPE__ ch);
+LIBANSITTY_DECL __NOBLOCK __ATTR_NONNULL((1, 2)) __size_t
+__NOTHROW_NCX(LIBANSITTY_CC ansitty_translate)(struct ansitty *__restrict self,
+                                               char buf[ANSITTY_TRANSLATE_BUFSIZE],
+                                               __CHAR32_TYPE__ ch);
+#endif /* LIBANSITTY_WANT_PROTOTYPES */
+
+
+/* Encode the representation of a misc. keyboard key `key' with `mod',
+ * and finalize encoding of certain keyboard characters after already
+ * having been translated through the keymap.
+ * @param: self: The ANSITTY to use (or `NULL' to use default settings)
+ * @param: key:  The keyboard key (one of `KEY_*' from <kos/keyboard.h>; e.g. `KEY_UP')
+ * @param: mod:  Keyboard modifiers (set of `KEYMOD_*' from <kos/keyboard.h>)
+ * @param: len:  The # of bytes from `buf' that were previously encoded by the keymap.
+ * @return: * :  The number of produced bytes (<= ANSITTY_TRANSLATE_BUFSIZE)
+ * @return: 0 :  The key cannot be represented and should be discarded. */
+typedef __NOBLOCK __ATTR_NONNULL((2)) __size_t
+/*__NOTHROW_NCX*/ (LIBANSITTY_CC *PANSITTY_TRANSLATE_MISC)(struct ansitty *self,
+                                                           char buf[ANSITTY_TRANSLATE_BUFSIZE], __size_t len,
+                                                           __UINT16_TYPE__ key, __UINT16_TYPE__ mod);
+#ifdef LIBANSITTY_WANT_PROTOTYPES
+LIBANSITTY_DECL __NOBLOCK __ATTR_NONNULL((2)) __size_t
+__NOTHROW_NCX(LIBANSITTY_CC ansitty_translate_misc)(struct ansitty *self,
+                                                    char buf[ANSITTY_TRANSLATE_BUFSIZE], __size_t len,
+                                                    __UINT16_TYPE__ key, __UINT16_TYPE__ mod);
 #endif /* LIBANSITTY_WANT_PROTOTYPES */
 
 

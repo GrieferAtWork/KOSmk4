@@ -45,7 +45,7 @@ KEY_EQUALS:'='
 KEY_EQUALS:shift:'+'
 KEY_BACKSLASH:'\\'
 KEY_BACKSLASH:shift:'|'
-KEY_BACKSPACE:'\x8'
+KEY_BACKSPACE:'\x7f'
 KEY_BACKSPACE:shift:'\x8'
 
 KEY_TAB:'\t'
