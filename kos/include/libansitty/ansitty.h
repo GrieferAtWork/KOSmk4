@@ -101,22 +101,44 @@
 
 
 #define ANSITTY_COLORS       16
-#define ANSITTY_CL_BLACK     0
-#define ANSITTY_CL_RED       1
-#define ANSITTY_CL_GREEN     2
-#define ANSITTY_CL_YELLOW    3
-#define ANSITTY_CL_BLUE      4
-#define ANSITTY_CL_MAGENTA   5
-#define ANSITTY_CL_CYAN      6
-#define ANSITTY_CL_WHITE     7
+#ifndef ANSITTY_CL_BLACK
+#define ANSITTY_CL_BLACK     0x0 /* RGB(0x00, 0x00, 0x00) */
+#define ANSITTY_CL_MAROON    0x1 /* RGB(0xaa, 0x00, 0x00) */
+#define ANSITTY_CL_GREEN     0x2 /* RGB(0x00, 0xaa, 0x00) */
+#define ANSITTY_CL_OLIVE     0x3 /* RGB(0xaa, 0x55, 0x00) */
+#define ANSITTY_CL_NAVY      0x4 /* RGB(0x00, 0x00, 0xaa) */
+#define ANSITTY_CL_PURPLE    0x5 /* RGB(0xaa, 0x00, 0xaa) */
+#define ANSITTY_CL_TEAL      0x6 /* RGB(0x00, 0xaa, 0xaa) */
+#define ANSITTY_CL_SILVER    0x7 /* RGB(0xaa, 0xaa, 0xaa) */
+#define ANSITTY_CL_GREY      0x8 /* RGB(0x55, 0x55, 0x55) */
+#define ANSITTY_CL_RED       0x9 /* RGB(0xff, 0x55, 0x55) */
+#define ANSITTY_CL_LIME      0xa /* RGB(0x55, 0xff, 0x55) */
+#define ANSITTY_CL_YELLOW    0xb /* RGB(0xff, 0xff, 0x55) */
+#define ANSITTY_CL_BLUE      0xc /* RGB(0x55, 0x55, 0xff) */
+#define ANSITTY_CL_FUCHSIA   0xd /* RGB(0xff, 0x55, 0xff) */
+#define ANSITTY_CL_AQUA      0xe /* RGB(0x55, 0xff, 0xff) */
+#define ANSITTY_CL_WHITE     0xf /* RGB(0xff, 0xff, 0xff) */
+#endif /* !ANSITTY_CL_BLACK */
+
 #define ANSITTY_IFSTRONG     0x8 /* Intensify a given ANSI color. */
 #define ANSITTY_ISSTRONG(x) ((x) & ANSITTY_IFSTRONG)
 #define ANSITTY_TOSTRONG(x) ((x) | ANSITTY_IFSTRONG)
 
+/* Color name aliases */
+#ifndef ANSITTY_CL_LIGHT_GRAY
+#define ANSITTY_CL_LIGHT_GRAY    ANSITTY_CL_SILVER
+#define ANSITTY_CL_DARK_GRAY     ANSITTY_CL_GREY
+#define ANSITTY_CL_MAGENTA       ANSITTY_CL_PURPLE
+#define ANSITTY_CL_CYAN          ANSITTY_CL_TEAL
+#define ANSITTY_CL_LIGHT_GREEN   ANSITTY_CL_LIME
+#define ANSITTY_CL_BRIGHT_GREEN  ANSITTY_CL_LIME
+#define ANSITTY_CL_DARK_BLUE     ANSITTY_CL_NAVY
+#endif /* !ANSITTY_CL_LIGHT_GRAY */
+
 #define ANSITTY_PALETTE_INDEX(fg, bg) (((bg) << 4) | (fg))
 #define ANSITTY_PALETTE_INDEX_FG(idx) ((idx) & 0xf)
 #define ANSITTY_PALETTE_INDEX_BG(idx) ((idx) >> 4)
-#define ANSITTY_CL_DEFAULT     ANSITTY_PALETTE_INDEX(ANSITTY_CL_WHITE, ANSITTY_CL_BLACK)
+#define ANSITTY_CL_DEFAULT     ANSITTY_PALETTE_INDEX(ANSITTY_CL_LIGHT_GRAY, ANSITTY_CL_BLACK)
 
 /* Sequence that can be printed at any time to reset the ANSI driver to its default
  * state, where it accepts regular text input for immediate display, with all attributes
@@ -127,7 +149,6 @@
  *   - `\033c' -- Reset TTY (resets colors, display-attributes, tty-flags and tty-mode)
  */
 #define ANSITTY_RESET_SEQUENCE  "\030\033c"
-
 
 #define ANSITTY_CLS_AFTER    0 /* Clear everything after the cursor (including the cursor itself). */
 #define ANSITTY_CLS_BEFORE   1 /* Clear everything before the cursor (excluding the cursor itself). */
@@ -152,22 +173,22 @@
 
 
 /* Display flags (text attributes) (for `struct ansitty::at_attrib') */
-#define ANSITTY_ATTRIB_DEFAULT   0x0000 /* Default attributes */
-#define ANSITTY_ATTRIB_UNDERLINE 0x0001 /* FLAG: Print a line below the character */
-#define ANSITTY_ATTRIB_OVERLINE  0x0002 /* FLAG: Print a line above the character */
-#define ANSITTY_ATTRIB_ITALIC    0x0004 /* FLAG: Print the character in cursive */
-#define ANSITTY_ATTRIB_BLINK     0x0008 /* FLAG: Cause text to blink (don't use this one; please...) */
-#define ANSITTY_ATTRIB_CROSS     0x0010 /* FLAG: Cross-out written text. */
-#define ANSITTY_ATTRIB_FRAMED    0x0020 /* FLAG: Surround text with a frame. */
-#define ANSITTY_ATTRIB_CIRCLED   0x0040 /* FLAG: Surround text with a frame (with rounded corners).
-                                         * NOTE: This flag always appears in conjunction with `ANSITTY_ATTRIB_FRAMED' */
-#define ANSITTY_ATTRIB_LET_SWSH  0x0000 /* Letter mode: Single-Width, Single-Height */
-#define ANSITTY_ATTRIB_LET_DWSH  0x0100 /* Letter mode: Double-Width, Single-Height */
-#define ANSITTY_ATTRIB_LET_DHTP  0x0200 /* Letter mode: Single-Width, Double-Height (top-half) */
-#define ANSITTY_ATTRIB_LET_DHBP  0x0300 /* Letter mode: Single-Width, Double-Height (bottom-half) */
-#define ANSITTY_ATTRIB_LET_MASK  0x0300 /* Mask for letter mode. */
-#define ANSITTY_ATTRIB_FONTMASK  0xf000 /* MASK: Alternate font selection */
-#define ANSITTY_ATTRIB_FONTSHFT      12 /* SHFT: Alternate font selection */
+#define ANSITTY_ATTRIB_DEFAULT       0x0000 /* Default attributes */
+#define ANSITTY_ATTRIB_UNDERLINE     0x0001 /* FLAG: Print a line below the character */
+#define ANSITTY_ATTRIB_OVERLINE      0x0002 /* FLAG: Print a line above the character */
+#define ANSITTY_ATTRIB_ITALIC        0x0004 /* FLAG: Print the character in cursive */
+#define ANSITTY_ATTRIB_BLINK         0x0008 /* FLAG: Cause text to blink (don't use this one; please...) */
+#define ANSITTY_ATTRIB_STRIKETHROUGH 0x0010 /* FLAG: Strike-through text. */
+#define ANSITTY_ATTRIB_FRAMED        0x0020 /* FLAG: Surround text with a frame. */
+#define ANSITTY_ATTRIB_CIRCLED       0x0040 /* FLAG: Surround text with a frame (with rounded corners).
+                                             * NOTE: This flag always appears in conjunction with `ANSITTY_ATTRIB_FRAMED' */
+#define ANSITTY_ATTRIB_LET_SWSH      0x0000 /* Letter mode: Single-Width, Single-Height */
+#define ANSITTY_ATTRIB_LET_DWSH      0x0100 /* Letter mode: Double-Width, Single-Height */
+#define ANSITTY_ATTRIB_LET_DHTP      0x0200 /* Letter mode: Single-Width, Double-Height (top-half) */
+#define ANSITTY_ATTRIB_LET_DHBP      0x0300 /* Letter mode: Single-Width, Double-Height (bottom-half) */
+#define ANSITTY_ATTRIB_LET_MASK      0x0300 /* Mask for letter mode. */
+#define ANSITTY_ATTRIB_FONTMASK      0xf000 /* MASK: Alternate font selection */
+#define ANSITTY_ATTRIB_FONTSHFT          12 /* SHFT: Alternate font selection */
 
 
 #ifdef __CC__

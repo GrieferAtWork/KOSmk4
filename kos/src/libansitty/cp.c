@@ -32,7 +32,10 @@ DECL_BEGIN
 /* Ansi box character set (translate to the unicode equivalents) */
 #define LDM_CHARS_START '_'
 PRIVATE char16_t const ldm_chars[] = {
-	/* s.a.: https://vt100.net/docs/vt100-ug/table3-9.html */
+	/* s.a.: https://vt100.net/docs/vt100-ug/table3-9.html
+	 * NOTE: Link has gone dead. - Use this WayBackMachine snapshot:
+	 * https://web.archive.org/web/20191225064516/https://vt100.net/docs/vt100-ug/table3-9.html
+	 */
 #ifdef __INTELLISENSE__
 #define CHR(x) [x - LDM_CHARS_START] =
 #else /* __INTELLISENSE__ */
@@ -66,7 +69,7 @@ PRIVATE char16_t const ldm_chars[] = {
 	CHR('x') 0x2502, /* | Vertical bar */
 	CHR('y') 0x2264, /* Less than or equal to */
 	CHR('z') 0x2265, /* Greater than or equal to */
-	CHR('{') 0x03a0, /* Pi */
+	CHR('{') 0x03c0, /* Pi */
 	CHR('|') 0x2260, /* Not equal to */
 	CHR('}') 0x00a3, /* UK pound sign */
 	CHR('~') 0x2219, /* Centered dot */
