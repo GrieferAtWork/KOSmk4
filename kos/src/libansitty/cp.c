@@ -76,10 +76,11 @@ PRIVATE char16_t const ldm_chars[] = {
 INTERN WUNUSED ATTR_CONST char32_t
 NOTHROW(FCALL libansitty_decode_cp_ldm)(uint8_t byte) {
 	/* Translate line-drawing-mode characters. */
+	char32_t result = (char32_t)byte;
 	if (byte >= LDM_CHARS_START &&
 	    byte < (LDM_CHARS_START + COMPILER_LENOF(ldm_chars)))
-		byte = (ldm_chars[byte - LDM_CHARS_START]);
-	return byte;
+		result = ldm_chars[byte - LDM_CHARS_START];
+	return result;
 }
 
 

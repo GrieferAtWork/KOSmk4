@@ -29,19 +29,19 @@
 
 /* GLibc includes these two headers unconditionally,
  * but as an extension KOS doesn't. */
-#ifndef __USE_KOS
+#ifdef __USE_GLIBC
 #include "limits.h"
 #include "float.h"
-#endif /* !__USE_KOS */
+#endif /* __USE_GLIBC */
 
-#define _TYPEBITS(type) (sizeof(type)*__CHAR_BIT__)
-#define CHARBITS    __CHAR_BIT__
-#define SHORTBITS  (__CHAR_BIT__*__SIZEOF_SHORT__)
-#define INTBITS    (__CHAR_BIT__*__SIZEOF_INT__)
-#define LONGBITS   (__CHAR_BIT__*__SIZEOF_LONG__)
-#define PTRBITS    (__CHAR_BIT__*__SIZEOF_POINTER__)
-#define DOUBLEBITS (__CHAR_BIT__*__SIZEOF_DOUBLE__)
-#define FLOATBITS  (__CHAR_BIT__*__SIZEOF_FLOAT__)
+#define _TYPEBITS(type) (sizeof(type) * __CHAR_BIT__)
+#define CHARBITS        __CHAR_BIT__
+#define SHORTBITS       (__CHAR_BIT__ * __SIZEOF_SHORT__)
+#define INTBITS         (__CHAR_BIT__ * __SIZEOF_INT__)
+#define LONGBITS        (__CHAR_BIT__ * __SIZEOF_LONG__)
+#define PTRBITS         (__CHAR_BIT__ * __SIZEOF_POINTER__)
+#define DOUBLEBITS      (__CHAR_BIT__ * __SIZEOF_DOUBLE__)
+#define FLOATBITS       (__CHAR_BIT__ * __SIZEOF_FLOAT__)
 
 #define MINSHORT    __SHRT_MIN__
 #define MAXSHORT    __SHRT_MAX__

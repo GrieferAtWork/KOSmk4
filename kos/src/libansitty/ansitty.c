@@ -3280,7 +3280,7 @@ INTERN NONNULL((1, 2)) size_t CC
 libansitty_translate(struct ansitty *__restrict self,
                      char *buf, char32_t ch) {
 	size_t result;
-	if (self->at_codepage == CP_UTF8) {
+	if likely(self->at_codepage == CP_UTF8) {
 do_encode_utf8:
 		/* Default: Encode a utf-8 character. */
 		result = (size_t)(unicode_writeutf8(buf, ch) - buf);
