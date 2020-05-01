@@ -1047,7 +1047,7 @@ NOTHROW(LIBANSITTY_CC vga_do_putcp437)(VGA *__restrict self, u8 ch) {
 			memsetw(self->v_textlline, VGA_CHR(self, ' '), self->v_textsizex);
 			continue;
 		}
-		if (self->at_ansi.at_ttyflag & ANSITTY_MODE_NOLINEWRAP) {
+		if (self->at_ansi.at_ttymode & ANSITTY_MODE_NOLINEWRAP) {
 			if (((size_t)(oldptr - self->v_textbase) % self->v_textsizex) != (self->v_textsizex - 1))
 				goto do_increment_oldptr;
 		} else {

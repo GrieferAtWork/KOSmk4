@@ -1634,8 +1634,8 @@ done_insert_ansitty_flag_hedit:
 				/* Must be ignored. */
 				break;
 
-			case 1:  /* \e[?1h    DECCKM   Cursor Keys Mode, send ESC O A for cursor up */
-			         /* \e[?1l             Cursor keys send ANSI cursor position commands DECCKM */
+			case 1: /* \e[?1h    DECCKM   Cursor Keys Mode, send ESC O A for cursor up */
+			        /* \e[?1l             Cursor keys send ANSI cursor position commands DECCKM */
 				if (lastch == 'h') {
 					self->at_ttyflag |= ANSITTY_FLAG_ENABLE_APP_CURSOR;
 				} else {
@@ -1643,8 +1643,8 @@ done_insert_ansitty_flag_hedit:
 				}
 				break;
 
-			case 2:  /* \e[?2h    DECANM   ANSI Mode, use ESC < to switch VT52 to ANSI */
-			         /* \e[?2l             Use VT52 emulation instead of ANSI mode DECANM */
+			case 2: /* \e[?2h    DECANM   ANSI Mode, use ESC < to switch VT52 to ANSI */
+			        /* \e[?2l             Use VT52 emulation instead of ANSI mode DECANM */
 				if (lastch == 'h') {
 					/* \e[?2h -- Set ANSI (versus VT52) */
 					self->at_ttyflag &= ~ANSITTY_FLAG_VT52;
@@ -1654,25 +1654,25 @@ done_insert_ansitty_flag_hedit:
 				}
 				break;
 
-//			case 3:  /* \e[?3h    DECCOLM  COLumn mode, 132 characters per line */
-//			         /* \e[?3l             80 characters per line (erases screen) DECCOLM */
-//			case 4:  /* \e[?4h    DECSCLM  SCrolL Mode, smooth scrolling */
-//			         /* \e[?4l             Jump scrolling DECSCLM */
-//			case 5:  /* \e[?5h    DECSCNM  SCreeN Mode,  white on black background */
-//			         /* \e[?5l             black on white background) DEC SCNM */
-//			case 6:  /* \e[?6h    DECOM    Origin Mode, line 1 is relative to scroll region */
-//			         /* \e[?6l             Line numbers are independent of scrolling region DECOM */
+//			case 3: /* \e[?3h    DECCOLM  COLumn mode, 132 characters per line */
+//			        /* \e[?3l             80 characters per line (erases screen) DECCOLM */
+//			case 4: /* \e[?4h    DECSCLM  SCrolL Mode, smooth scrolling */
+//			        /* \e[?4l             Jump scrolling DECSCLM */
+//			case 5: /* \e[?5h    DECSCNM  SCreeN Mode,  white on black background */
+//			        /* \e[?5l             black on white background) DEC SCNM */
+//			case 6: /* \e[?6h    DECOM    Origin Mode, line 1 is relative to scroll region */
+//			        /* \e[?6l             Line numbers are independent of scrolling region DECOM */
 
-			case 7:  /* \e[?7h    DECAWM   AutoWrap Mode, start newline after column 80 */
-			         /* \e[?7l             Cursor remains at end of line after column 80 DECAWM */
-				setattrib(self, (self->at_attrib & ~ANSITTY_MODE_NOLINEWRAP) |
-				                (lastch == 'l' ? ANSITTY_MODE_NOLINEWRAP : 0));
+			case 7: /* \e[?7h    DECAWM   AutoWrap Mode, start newline after column 80 */
+			        /* \e[?7l             Cursor remains at end of line after column 80 DECAWM */
+				setttymode(self, (self->at_ttymode & ~ANSITTY_MODE_NOLINEWRAP) |
+				                 (lastch == 'l' ? ANSITTY_MODE_NOLINEWRAP : 0));
 				break;
 
-//			case 8:  /* \e[?8h    DECARM   Auto Repeat Mode, key will autorepeat */
-//			         /* \e[?8l             Keys do not repeat when held down DECARM */
-//			case 9:  /* \e[?9h    DECINLM  INterLace Mode, interlaced for taking photos */
-//			         /* \e[?9l             Display is not interlaced to avoid flicker DECINLM */
+//			case 8: /* \e[?8h    DECARM   Auto Repeat Mode, key will autorepeat */
+//			        /* \e[?8l             Keys do not repeat when held down DECARM */
+//			case 9: /* \e[?9h    DECINLM  INterLace Mode, interlaced for taking photos */
+//			        /* \e[?9l             Display is not interlaced to avoid flicker DECINLM */
 //			case 10: /* \e[?10h   DECEDM   Edit Mode, VT132 is in EDIT mode */
 //			         /* \e[?10l            VT132 transmits all key presses DECEDM */
 //			case 11: /* \e[?11h   DECLTM   Line Transmit Mode, ignore TTM, send line */

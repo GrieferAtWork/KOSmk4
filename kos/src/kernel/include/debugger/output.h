@@ -29,6 +29,7 @@
 
 #include <stdbool.h>
 
+#include <libansitty/ansitty.h>
 #include <libc/string.h>
 
 DECL_BEGIN
@@ -116,16 +117,20 @@ DATDEF unsigned int dbg_tabsize;
 /* Cursor X-position assign after a line-feed */
 DATDEF unsigned int dbg_indent;
 
-/* Debugger new-line mode (one of `DBG_NEWLINE_MODE_*') */
-DATDEF unsigned int dbg_newline_mode;
-#define DBG_NEWLINE_MODE_NORMAL  0 /* Normal new-line mode */
-#define DBG_NEWLINE_MODE_CLRFREE 1 /* Override all unused positions of the old line with space characters.
-                                    * NOTE: This also affects `\r', which will erase unwritten spaces before
-                                    *       jumping back to the start of the line.
-                                    * HINT: This mode is useful for progress indicators, as well as well as
-                                    *       self-updating menus. */
-#define DBG_NEWLINE_MODE_NOWRAP  2 /* Don't automatically wrap to the next line when writing past the end
-                                    * of the current line. */
+/* The ANSI TTY used for printing screen-output within the builtin debugger */
+DATDEF struct ansitty dbg_tty;
+
+/* Override all unused positions of the old line with space characters.
+ * NOTE: This also affects `\r', which will erase unwritten spaces before
+ *       jumping back to the start of the line.
+ * HINT: This mode is useful for progress indicators, as well as well as
+ *       self-updating menus. */
+#define dbg_newline_newline_clrfree_enable()  (void)(dbg_tty.at_ttymode |= ANSITTY_MODE_NEWLINE_CLRFREE)
+#define dbg_newline_newline_clrfree_disable() (void)(dbg_tty.at_ttymode &= ~ANSITTY_MODE_NEWLINE_CLRFREE)
+
+/* Don't automatically wrap to the next line when writing past the end of the current line. */
+#define dbg_newline_nowrap_enable()  (void)(dbg_tty.at_ttymode |= ANSITTY_MODE_NOLINEWRAP)  /* dbg_print(DBGSTR("\033[?7l")) */
+#define dbg_newline_nowrap_disable() (void)(dbg_tty.at_ttymode &= ~ANSITTY_MODE_NOLINEWRAP) /* dbg_print(DBGSTR("\033[?7h")) */
 
 
 /* Get/Set debug TTY screen data
@@ -261,8 +266,8 @@ LOCAL u32 NOTHROW(FCALL dbg_setcur_y)(int y) { return dbg_setcur(dbg_getcur_x(),
 typedef u16 dbg_attr_t;
 
 /* Get/Set TTY text attributes. */
-DATDEF dbg_attr_t dbg_attr;
-DATDEF dbg_attr_t dbg_default_attr; /* Attributes restored by `DF_RESETATTR' */
+DATDEF dbg_attr_t dbg_attr;         /* TODO: Get rid of me (use dbg_tty.at_color instead) */
+DATDEF dbg_attr_t dbg_default_attr; /* TODO: Get rid of me (use dbg_tty.at_defcolor instead) */ /* Attributes restored by `DF_RESETATTR' */
 
 /* Get/Set TTY colors. */
 LOCAL void NOTHROW(KCALL dbg_setcolor)(u8 fg, u8 bg) { dbg_attr = DBG_COLOR_ATTR(fg, bg); }

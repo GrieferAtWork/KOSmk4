@@ -170,8 +170,8 @@ PUBLIC ATTR_DBGDATA unsigned int dbg_tabsize = 0;
 /* Cursor X-position assign after a line-feed */
 PUBLIC ATTR_DBGDATA unsigned int dbg_indent = 0;
 
-/* Debugger new-line mode (one of `DBG_NEWLINE_MODE_*') */
-PUBLIC ATTR_DBGDATA unsigned int dbg_newline_mode = 0;
+/* The ANSI TTY used for printing screen-output within the builtin debugger */
+PUBLIC ATTR_DBGBSS struct ansitty dbg_tty = {};
 
 PUBLIC ATTR_DBGBSS u16 dbg_attr         = 0; /* Color attributes. */
 PUBLIC ATTR_DBGBSS u16 dbg_default_attr = 0; /* Color attributes. */
@@ -819,10 +819,10 @@ NOTHROW(FCALL dbg_putcp437)(/*cp-437*/ u8 ch) {
 	scroll_down_if_cur_end();
 	/* When indent-mode is active, wraps to the next line */
 	if (dbg_indent != 0 && vga_last_chr_caused_linewrap &&
-	    !(dbg_newline_mode & DBG_NEWLINE_MODE_NOWRAP) && VGA_GETCUR_X() == 0)
+	    !(dbg_tty.at_ttymode & ANSITTY_MODE_NOLINEWRAP) && VGA_GETCUR_X() == 0)
 		vga_terminal_cur += dbg_indent;
 	*vga_terminal_cur = VGA_CHR(ch);
-	if (dbg_newline_mode & DBG_NEWLINE_MODE_NOWRAP) {
+	if (dbg_tty.at_ttymode & ANSITTY_MODE_NOLINEWRAP) {
 		if (VGA_GETCUR_X() != VGA_WIDTH - 1)
 			++vga_terminal_cur;
 		vga_last_chr_caused_linewrap = false;
@@ -891,7 +891,7 @@ do_put_cp_ch:
 		case '\r': {
 			unsigned int cury;
 			/* Return to the start of the current line. */
-			if (dbg_newline_mode & DBG_NEWLINE_MODE_CLRFREE)
+			if (dbg_tty.at_ttymode & ANSITTY_MODE_NEWLINE_CLRFREE)
 				memsetw(vga_terminal_cur, VGA_EMPTY, VGA_WIDTH - VGA_GETCUR_X());
 			cury = VGA_GETCUR_Y();
 			if (VGA_GETCUR_X() <= dbg_indent &&
@@ -910,7 +910,7 @@ do_put_cp_ch:
 				 *               empty line and wasting what little screen space we only have. */
 			} else {
 				/* Clear the remainder of the old line */
-				if (dbg_newline_mode & DBG_NEWLINE_MODE_CLRFREE)
+				if (dbg_tty.at_ttymode & ANSITTY_MODE_NEWLINE_CLRFREE)
 					memsetw(vga_terminal_cur, VGA_EMPTY, VGA_WIDTH - VGA_GETCUR_X());
 				if (vga_terminal_cur >= vga_terminal_lastln) {
 					/* Scroll down */
@@ -1044,7 +1044,6 @@ NOTHROW(LIBANSITTY_CC vga_tty_output)(struct ansitty *__restrict UNUSED(self),
 
 
 
-PRIVATE ATTR_DBGBSS struct ansitty vga_tty = {};
 PRIVATE ATTR_DBGRODATA struct ansitty_operators const vga_tty_operators = {
 	.ato_putc         = &vga_tty_putc,
 	.ato_setcursor    = &vga_tty_setcursor,
@@ -1119,7 +1118,7 @@ do_put_cp_ch:
 		case '\r':
 		case '\n':
 			/* Return to the start of the current line. */
-			if (dbg_newline_mode & DBG_NEWLINE_MODE_CLRFREE) {
+			if (dbg_tty.at_ttymode & ANSITTY_MODE_NEWLINE_CLRFREE) {
 				if (printer->p_printx >= 0 && printer->p_printx < VGA_WIDTH &&
 				    printer->p_printy >= 0 && printer->p_printy < VGA_HEIGHT)
 					memsetw(&vga_terminal_start[printer->p_printx + printer->p_printy * VGA_WIDTH],
@@ -1139,8 +1138,8 @@ do_put_cp_ch:
 
 PRIVATE NOBLOCK ATTR_DBGTEXT NONNULL((1)) void
 NOTHROW(FCALL dbg_pprinter_putuni)(dbg_pprinter_arg_t *__restrict printer, /*utf-32*/ char32_t ch) {
-	if (vga_tty.at_state != 0 || ch == (unsigned char)'\033') {
-		ansitty_putuni(&vga_tty, ch);
+	if (dbg_tty.at_state != 0 || ch == (unsigned char)'\033') {
+		ansitty_putuni(&dbg_tty, ch);
 	} else {
 		/* Output a regular, old character. */
 		vga_pprinter_do_putuni(printer, ch);
@@ -1753,7 +1752,7 @@ NOTHROW(KCALL dbg_reset_tty)(void) {
 	dbg_endshowscreen();
 	vga_vram_offset = 0;
 	vga_vram(VGA_VRAM_TEXT - VGA_VRAM_BASE);
-	ansitty_init(&vga_tty, &vga_tty_operators);
+	ansitty_init(&dbg_tty, &vga_tty_operators);
 	vga_showscreen_enabled       = false;
 	vga_terminal_backlog_cur     = vga_terminal_backlog;
 	dbg_attr                     = DBG_COLOR_ATTR(DBG_COLOR_SILVER, DBG_COLOR_BLACK);
@@ -1769,7 +1768,6 @@ NOTHROW(KCALL dbg_reset_tty)(void) {
 	vga_terminal_lastln          = vga_real_terminal_start + VGA_WIDTH * (VGA_HEIGHT - 1);
 	dbg_tabsize                  = DBG_TABSIZE_DEFAULT;
 	dbg_indent                   = 0;
-	dbg_newline_mode             = DBG_NEWLINE_MODE_NORMAL;
 	vga_suppress_update          = 0;
 	dbg_last_character           = 0;
 	vga_cursor_is_shown          = false;
@@ -1786,12 +1784,12 @@ NOTHROW(KCALL dbg_reset_tty)(void) {
 
 PUBLIC ATTR_DBGTEXT void
 NOTHROW(FCALL dbg_putc)(/*utf-8*/ char ch) {
-	ansitty_putc(&vga_tty, ch);
+	ansitty_putc(&dbg_tty, ch);
 }
 
 PUBLIC ATTR_DBGTEXT void
 NOTHROW(FCALL dbg_putuni)(/*utf-32*/ char32_t ch) {
-	ansitty_putuni(&vga_tty, ch);
+	ansitty_putuni(&dbg_tty, ch);
 }
 
 PUBLIC ATTR_DBGTEXT void
@@ -1811,12 +1809,12 @@ NOTHROW(FCALL dbg_fillscreen)(/*utf-32*/ char32_t ch) {
 
 PUBLIC ATTR_DBGTEXT size_t FCALL
 dbg_print(/*utf-8*/ char const *__restrict str) {
-	return (size_t)ansitty_printer(&vga_tty, str, strlen(str));
+	return (size_t)ansitty_printer(&dbg_tty, str, strlen(str));
 }
 
 PUBLIC ATTR_DBGTEXT size_t FCALL
 dbg_vprintf(/*utf-8*/ char const *__restrict format, va_list args) {
-	return (size_t)format_vprintf(&ansitty_printer, &vga_tty, format, args);
+	return (size_t)format_vprintf(&ansitty_printer, &dbg_tty, format, args);
 }
 
 PUBLIC ATTR_DBGTEXT size_t VCALL
@@ -1833,7 +1831,7 @@ PUBLIC ATTR_DBGTEXT ssize_t KCALL
 dbg_printer(void *UNUSED(ignored),
             /*utf-8*/ char const *__restrict data,
             size_t datalen) {
-	return ansitty_printer(&vga_tty, data, datalen);
+	return ansitty_printer(&dbg_tty, data, datalen);
 }
 
 

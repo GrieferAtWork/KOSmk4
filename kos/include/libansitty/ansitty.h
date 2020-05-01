@@ -139,7 +139,7 @@
 #define ANSITTY_EL_ALL    2 /* Erase the line. */
 
 
-/* TTY mode flags */
+/* TTY mode flags (for `struct ansitty::at_ttymode') */
 #define ANSITTY_MODE_DEFAULT            0x0000 /* Default TTY mode */
 #define ANSITTY_MODE_MOUSEON_NO         0x0000 /* Don't report mouse data */
 #define ANSITTY_MODE_MOUSEON_YES        0x0001 /* Report mouse position */
@@ -151,7 +151,7 @@
 #define ANSITTY_MODE_NEWLINE_CLRFREE    0x0010 /* FLAG: CR and LF should fill trailing cells with space characters. */
 
 
-/* Display flags (text attributes) */
+/* Display flags (text attributes) (for `struct ansitty::at_attrib') */
 #define ANSITTY_ATTRIB_DEFAULT   0x0000 /* Default attributes */
 #define ANSITTY_ATTRIB_UNDERLINE 0x0001 /* FLAG: Print a line below the character */
 #define ANSITTY_ATTRIB_OVERLINE  0x0002 /* FLAG: Print a line above the character */
