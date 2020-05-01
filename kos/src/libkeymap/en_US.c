@@ -57,9 +57,7 @@ PRIVATE struct basic_key const basic_keys_en_US[0xe0] = {
 	DEF(KEY_MINUS, '-', '_'),
 	DEF(KEY_EQUALS, '=', '+'),
 	DEF(KEY_BACKSLASH, '\\', '|'),
-	DEF(KEY_BACKSPACE, '\x7f', '\x8'),
 
-	DEF(KEY_TAB, '\t', 0),
 	DEF(KEY_Q, 'q', 'Q'),
 	DEF(KEY_W, 'w', 'W'),
 	DEF(KEY_E, 'e', 'E'),

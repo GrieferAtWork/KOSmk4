@@ -112,6 +112,11 @@ DECL_BEGIN
 #endif
 
 
+/* When this bit is set in `at_scroll_ec', then the horizontal margin is disabled. */
+#define HORIZONTAL_MARGIN_DISABLE_BIT \
+	((ansitty_coord_t)1 << ((sizeof(ansitty_coord_t) * 8) - 1))
+
+
 #define PUTUNI(uni)                 (*self->at_ops.ato_putc)(self, uni)
 #define PUTUNILAST(uni)             (PUTUNI(uni), self->at_lastch = (uni))
 #define GETCURSOR(pxy)              ((*self->at_ops.ato_getcursor)(self, pxy), TRACE_OPERATION("getcur:{%u,%u}\n", (pxy)[0], (pxy)[1]))
@@ -147,6 +152,7 @@ DECL_BEGIN
 #define ANSITTY_FLAG_CRM               0x0020 /* FLAG: Control representation mode (https://en.wikipedia.org/wiki/Unicode_control_characters#Control_pictures) */
 #define ANSITTY_FLAG_ENABLE_APP_CURSOR 0x0040 /* FLAG: Enable application cursor keys */
 #define ANSITTY_FLAG_ENABLE_APP_KEYPAD 0x0080 /* FLAG: Enable application keypad keys */
+#define ANSITTY_FLAG_BACKSPACE_REVERSE 0x0100 /* FLAG: 0: BS=8,CTRL+BS=127; 1: BS=127,CTRL+BS=8 */
 #define ANSITTY_FLAG_RENDERMASK        (ANSITTY_FLAG_CONCEIL | ANSITTY_FLAG_CRM) /* Mask for flags that affect rendering */
 
 
@@ -479,7 +485,7 @@ libansitty_init(struct ansitty *__restrict self,
 	self->at_scroll_sl  = 0;
 	self->at_scroll_sc  = 0;
 	self->at_scroll_el  = MAXCOORD;
-	self->at_scroll_ec  = MAXCOORD;
+	self->at_scroll_ec  = MAXCOORD & ~HORIZONTAL_MARGIN_DISABLE_BIT;
 	self->at_state      = STATE_TEXT_UTF8;
 	self->at_codepage   = CP_UTF8;
 	self->at_zero       = 0;
@@ -562,7 +568,7 @@ setscrollmargin(struct ansitty *__restrict self,
                 ansitty_coord_t sc,
                 ansitty_coord_t ec) {
 	self->at_scroll_sc = sc;
-	self->at_scroll_ec = ec;
+	self->at_scroll_ec = ec & ~HORIZONTAL_MARGIN_DISABLE_BIT;
 }
 
 
@@ -577,7 +583,7 @@ resetterminal(struct ansitty *__restrict self,
 	setcolor(self, self->at_defcolor);
 	setscrollregion(self, 0, MAXCOORD);
 	self->at_scroll_sc = 0;
-	self->at_scroll_ec = MAXCOORD;
+	self->at_scroll_ec = MAXCOORD & ~HORIZONTAL_MARGIN_DISABLE_BIT;
 	if (self->at_ops.ato_termios) {
 		struct termios oldios, newios;
 		for (;;) {
@@ -1049,8 +1055,8 @@ get_index_for_color(uint8_t r, uint8_t g, uint8_t b) {
 
 PRIVATE void CC
 do_ident_DA(struct ansitty *__restrict self) {
-	/* Do what linux does: Report `\e[6c` */
-	OUTPUT(CC_SESC "[6c");
+	/* Do what linux does: Report `\e[?6c` */
+	OUTPUT(CC_SESC "[?6c"); /* VT102 */
 }
 
 
@@ -1112,6 +1118,10 @@ ansitty_do_hscroll(struct ansitty *__restrict self, int offset) {
 	ansitty_coord_t x_start, x_end;
 	x_start = self->at_scroll_sc;
 	x_end   = self->at_scroll_ec;
+	if (x_end & HORIZONTAL_MARGIN_DISABLE_BIT) {
+		x_start = 0;
+		x_end   = MAXCOORD;
+	}
 	y_start = self->at_scroll_sl;
 	y_end   = self->at_scroll_el;
 	if (x_start >= x_end)
@@ -1729,15 +1739,34 @@ done_insert_ansitty_flag_hedit:
 
 //			case 29: /* \e[?29h   Use only the proper pitch for the LA100 font */
 //			         /* \e[?29l   Allow all character pitches on the LA100 */
+
 //			case 38: /* \e[?38h   DECTEK  TEKtronix mode graphics */
 //			         /* \e[?38l           Ignore TEKtronix graphics commands */
-//			case 1004: /* \e[?1004h focus notify enable (causes mac os terminal to "alert" when  gaining/loosing focus) */
-//			           /* \e[?1004l focus notify disable */
 
-			case 1049:
+			case 66: /* \e[?66h   Application keypad (DECNKM), VT320. */
+			         /* \e[?66l   Numeric keypad (DECNKM), VT320. */
 				if (lastch == 'h') {
-					CLS(ANSITTY_CLS_ALL);
-					SETCURSOR(0, 0, true);
+					self->at_ttyflag |= ANSITTY_FLAG_ENABLE_APP_KEYPAD;
+				} else {
+					self->at_ttyflag &= ~ANSITTY_FLAG_ENABLE_APP_KEYPAD;
+				}
+				break;
+
+			case 67: /* \e[?67h   Backarrow key sends backspace (DECBKM), VT340, VT420. */
+			         /* \e[?67l   Backarrow key sends delete (DECBKM), VT340, VT420 */
+				if (lastch == 'h') {
+					self->at_ttyflag &= ~ANSITTY_FLAG_BACKSPACE_REVERSE;
+				} else {
+					self->at_ttyflag |= ANSITTY_FLAG_BACKSPACE_REVERSE;
+				}
+				break;
+
+			case 69: /* \e[?69h   Enable left and right margin mode (DECLRMM), VT420 and up. */
+			         /* \e[?69l   Disable left and right margin mode (DECLRMM), VT420 and up. */
+				if (lastch == 'h') {
+					self->at_scroll_ec &= ~HORIZONTAL_MARGIN_DISABLE_BIT;
+				} else {
+					self->at_scroll_ec |= HORIZONTAL_MARGIN_DISABLE_BIT;
 				}
 				break;
 
@@ -1751,6 +1780,16 @@ done_insert_ansitty_flag_hedit:
 				setttymode(self, (self->at_ttymode & ~ANSITTY_MODE_MOUSEON_MASK) |
 				                 (lastch == 'h' ? ANSITTY_MODE_MOUSEON_WITHMOTION
 				                                : ANSITTY_MODE_MOUSEON_NO));
+				break;
+
+//			case 1004: /* \e[?1004h focus notify enable (causes mac os terminal to "alert" when  gaining/loosing focus) */
+//			           /* \e[?1004l focus notify disable */
+
+			case 1049:
+				if (lastch == 'h') {
+					CLS(ANSITTY_CLS_ALL);
+					SETCURSOR(0, 0, true);
+				}
 				break;
 
 			ARGUMENT_CODE_QSWITCH_ELSE()
@@ -2012,7 +2051,7 @@ done_insert_ansitty_flag_hedit:
 				break;
 
 			case 9:
-				setattrib(self, self->at_attrib | ANSITTY_ATTRIB_CROSS);
+				setattrib(self, self->at_attrib | ANSITTY_ATTRIB_STRIKETHROUGH);
 				break;
 
 			case 10 ... 19:
@@ -2049,7 +2088,7 @@ done_insert_ansitty_flag_hedit:
 				break;
 
 			case 29:
-				setattrib(self, self->at_attrib & ~ANSITTY_ATTRIB_CROSS);
+				setattrib(self, self->at_attrib & ~ANSITTY_ATTRIB_STRIKETHROUGH);
 				break;
 
 			case 30 ... 37:
@@ -2123,7 +2162,8 @@ done_insert_ansitty_flag_hedit:
 			}	break;
 
 			case 51:
-				setattrib(self, self->at_attrib | ANSITTY_ATTRIB_FRAMED);
+				setattrib(self, (self->at_attrib & ~ANSITTY_ATTRIB_CIRCLED) |
+				                /*               */ ANSITTY_ATTRIB_FRAMED);
 				break;
 
 			case 52:
@@ -2352,8 +2392,11 @@ done_insert_ansitty_flag_hedit:
 		}
 		break;
 
-	case 's': /* DECSTRM */
-		if (arglen == 0) {
+	case 's':
+		/* DECSLRM */
+		if (self->at_scroll_ec & HORIZONTAL_MARGIN_DISABLE_BIT) {
+			if (arglen != 0)
+				goto nope;
 			/* ANSI/VT100: Save Cursor */
 			savecursor(self);
 		} else {
@@ -2824,7 +2867,7 @@ do_insuni:
 
 		case 'Z':
 			if (self->at_ttyflag & ANSITTY_FLAG_VT52) {
-				OUTPUT(CC_SESC "/Z");
+				do_ident_DA(self);
 				goto set_text_and_done;
 			}
 			goto unknown_character_after_esc;
@@ -2910,7 +2953,7 @@ do_insuni:
 			break;
 
 		case 'c':
-			/* Reset graphics, tabs, font and color. */
+			/* RIS: Reset graphics, tabs, font and color. */
 			resetterminal(self, false);
 			goto set_text_and_done;
 
@@ -2937,6 +2980,7 @@ unknown_character_after_esc:
 
 	case STATE_LPAREN:
 		switch (ch) {
+
 		case '0': /* DEC Special Character and Line Drawing Set, VT100. */
 enable_box_mode:
 			SET_CP(CP_LDM);
@@ -3423,7 +3467,7 @@ NOTHROW_NCX(CC libansitty_translate_misc)(struct ansitty *self,
 				addend = 0;
 				/* Prefix with 0x1b (ESC; aka. `\e') */
 				if (KEYMOD_HASALT(mod)) {
-					*buf++ = (char)'\033';
+					*buf++ = CC_ESC;
 					addend = 1;
 				}
 				goto handle_app_keypad;
@@ -3438,10 +3482,30 @@ NOTHROW_NCX(CC libansitty_translate_misc)(struct ansitty *self,
 	addend = 0;
 	/* Prefix with 0x1b (ESC; aka. `\e') */
 	if (KEYMOD_HASALT(mod)) {
-		*buf++ = (char)'\033';
+		*buf++ = CC_ESC;
 		addend = 1;
 	}
 	switch (key) {
+
+	case KEY_TAB:
+		if (KEYMOD_HASSHIFT(mod)) {
+			/* Cursor Backward Tabulation */
+			buf[2] = 'Z';
+			goto set_buf_escape_lbracket_3;
+		}
+		buf[0] = '\t';
+		result = 1;
+		break;
+
+	case KEY_BACKSPACE:
+		if (!!KEYMOD_HASCTRL(mod) ^
+		    !!(self && (self->at_ttyflag & ANSITTY_FLAG_BACKSPACE_REVERSE) != 0)) {
+			buf[0] = 127;
+		} else {
+			buf[0] = 8;
+		}
+		result = 1;
+		break;
 
 		/* Keypad keys. */
 #ifdef KEY_KPSPACE
@@ -3533,7 +3597,6 @@ handle_app_keypad:
 		buf[2] = 'P' + (key - KEY_PF1);
 		goto set_buf_escape_O_3;
 #endif
-
 
 	case KEY_F1 ... KEY_F4:
 		/* KEY_F1: \eOP
@@ -3642,7 +3705,7 @@ set_buf_escape_O:
 set_buf_escape_lbracket:
 		buf[1] = '[';
 set_buf_escape:
-		buf[0] = '\033';
+		buf[0] = CC_ESC;
 		break;
 
 	default:
