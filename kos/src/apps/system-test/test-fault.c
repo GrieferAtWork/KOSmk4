@@ -396,7 +396,7 @@ test_addr_op(unsigned int op, void *addr, bool is_canon, bool is_vio) {
 		default:
 			return false;
 		}
-		assert_failed("Shouldn't get here: %p\n", addr);
+		assert_failed("Shouldn't get here: %p (op:%u)\n", addr, op);
 	} EXCEPT {
 		assert_error_code(E_SEGFAULT);
 		if (is_vio) {
