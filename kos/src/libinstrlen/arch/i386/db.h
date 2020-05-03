@@ -202,7 +202,6 @@ final local UNDEF = -1;
 final local NO    = 0;
 final local YES   = 1;
 
-#define APPLY(dst, src) if (dst is none) dst = int(src); else if (dst != src) dst = UNDEF;
 function isOpcodeTail1632(decls: HashSet with string, if_66: string = "IF_66"): bool {
 	for (local d: decls) {
 		if ("OP_U16" in d) {
@@ -315,6 +314,11 @@ function getOpcodeType(opcode: int, decls: HashSet with string): string {
 		local d_has64 = "OP_U64" in d;
 		local d_hasrm = declHasModrm(d);
 		local d_hasljmp = "OP_LJMP" in d;
+#define APPLY(dst, src)      \
+		if (dst is none)     \
+			dst = int(src);  \
+		else if (dst != src) \
+			dst = UNDEF;
 		APPLY(has8, d_has8)
 		APPLY(has16, d_has16)
 		APPLY(has32, d_has32)

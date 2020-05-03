@@ -1351,6 +1351,7 @@ PRIVATE struct instruction const ops[] = {
 	I(0xd9, IF_MODRM|IF_RMM|IF_REG2, "fstl\t" OP_RM32),
 
 	I(0xd9, IF_MODRM|IF_RMM|IF_REG3, "fstpl\t" OP_RM32),
+	I(0xd9, IF_MODRM|IF_RMR|IF_REG3, "fstp1\t" OP_RMSTi), /* https://sandpile.org/x86/opc_fpu.htm#D9  */
 
 	I(0xd9, IF_66|IF_MODRM|IF_RMM|IF_REG4, "fldenv14\t" OP_MEM),
 	I(0xd9, IF_MODRM|IF_RMM|IF_REG4, "fldenv28\t" OP_MEM),
@@ -1370,21 +1371,21 @@ PRIVATE struct instruction const ops[] = {
 	/*0xd9, IF_BYTE2,        "\xd5" ???          * 0xd5: [mod=3,reg=2,rm=5] */
 	/*0xd9, IF_BYTE2,        "\xd6" ???          * 0xd6: [mod=3,reg=2,rm=6] */
 	/*0xd9, IF_BYTE2,        "\xd7" ???          * 0xd7: [mod=3,reg=2,rm=7] */
-	/*0xd9, IF_BYTE2,        "\xd8" ???          * 0xd8: [mod=3,reg=3,rm=0] */
-	/*0xd9, IF_BYTE2,        "\xd9" ???          * 0xd9: [mod=3,reg=3,rm=1] */
-	/*0xd9, IF_BYTE2,        "\xda" ???          * 0xda: [mod=3,reg=3,rm=2] */
-	/*0xd9, IF_BYTE2,        "\xdb" ???          * 0xdb: [mod=3,reg=3,rm=3] */
-	/*0xd9, IF_BYTE2,        "\xdc" ???          * 0xdc: [mod=3,reg=3,rm=4] */
-	/*0xd9, IF_BYTE2,        "\xdd" ???          * 0xdd: [mod=3,reg=3,rm=5] */
-	/*0xd9, IF_BYTE2,        "\xde" ???          * 0xde: [mod=3,reg=3,rm=6] */
-	/*0xd9, IF_BYTE2,        "\xdf" ???          * 0xdf: [mod=3,reg=3,rm=7] */
+	/*0xd9, IF_BYTE2,        "\xd8" "fstp1 %st0" * 0xd8: [mod=3,reg=3,rm=0] https://sandpile.org/x86/opc_fpu.htm#D9 */
+	/*0xd9, IF_BYTE2,        "\xd9" "fstp1 %st0" * 0xd9: [mod=3,reg=3,rm=1] https://sandpile.org/x86/opc_fpu.htm#D9 */
+	/*0xd9, IF_BYTE2,        "\xda" "fstp1 %st0" * 0xda: [mod=3,reg=3,rm=2] https://sandpile.org/x86/opc_fpu.htm#D9 */
+	/*0xd9, IF_BYTE2,        "\xdb" "fstp1 %st0" * 0xdb: [mod=3,reg=3,rm=3] https://sandpile.org/x86/opc_fpu.htm#D9 */
+	/*0xd9, IF_BYTE2,        "\xdc" "fstp1 %st0" * 0xdc: [mod=3,reg=3,rm=4] https://sandpile.org/x86/opc_fpu.htm#D9 */
+	/*0xd9, IF_BYTE2,        "\xdd" "fstp1 %st0" * 0xdd: [mod=3,reg=3,rm=5] https://sandpile.org/x86/opc_fpu.htm#D9 */
+	/*0xd9, IF_BYTE2,        "\xde" "fstp1 %st0" * 0xde: [mod=3,reg=3,rm=6] https://sandpile.org/x86/opc_fpu.htm#D9 */
+	/*0xd9, IF_BYTE2,        "\xdf" "fstp1 %st0" * 0xdf: [mod=3,reg=3,rm=7] https://sandpile.org/x86/opc_fpu.htm#D9 */
 	I(0xd9, IF_BYTE2,        "\xe0" "fchs"),    /* 0xe0: [mod=3,reg=4,rm=0] */
 	I(0xd9, IF_BYTE2,        "\xe1" "fabs"),    /* 0xe1: [mod=3,reg=4,rm=1] */
 	/*0xd9, IF_BYTE2,        "\xe2" ???          * 0xe2: [mod=3,reg=4,rm=2] */
 	/*0xd9, IF_BYTE2,        "\xe3" ???          * 0xe3: [mod=3,reg=4,rm=3] */
 	I(0xd9, IF_BYTE2,        "\xe4" "ftst"),    /* 0xe4: [mod=3,reg=4,rm=4] */
 	I(0xd9, IF_BYTE2,        "\xe5" "fxam"),    /* 0xe5: [mod=3,reg=4,rm=5] */
-	/*0xd9, IF_BYTE2,        "\xe6" ???          * 0xe6: [mod=3,reg=4,rm=6] */
+	I(0xd9, IF_BYTE2,        "\xe6" "ftstp"),   /* 0xe6: [mod=3,reg=4,rm=6] (Cyrix) https://sandpile.org/x86/opc_fpu.htm#D9 */
 	/*0xd9, IF_BYTE2,        "\xe7" ???          * 0xe7: [mod=3,reg=4,rm=7] */
 	I(0xd9, IF_BYTE2,        "\xe8" "fld1"),    /* 0xe8: [mod=3,reg=5,rm=0] */
 	I(0xd9, IF_BYTE2,        "\xe9" "fldl2t"),  /* 0xe9: [mod=3,reg=5,rm=1] */
@@ -1432,7 +1433,38 @@ PRIVATE struct instruction const ops[] = {
 
 	I(0xda, IF_MODRM|IF_RMM|IF_REG7, "fidivrl\t" OP_RM32 OP_VERBOSE_ST0),
 
-	I(0xda, IF_BYTE2, LONGREPR_B(0xe9, LO_FUCOMPP)), /* fucompp %st(1), %st(0) */
+	/*0xda, IF_BYTE2,           "\xe0" ???            * 0xea: [mod=3,reg=4,rm=0] */
+	/*0xda, IF_BYTE2,           "\xe1" ???            * 0xea: [mod=3,reg=4,rm=1] */
+	/*0xda, IF_BYTE2,           "\xe2" ???            * 0xea: [mod=3,reg=4,rm=2] */
+	/*0xda, IF_BYTE2,           "\xe3" ???            * 0xea: [mod=3,reg=4,rm=3] */
+	/*0xda, IF_BYTE2,           "\xe4" ???            * 0xea: [mod=3,reg=4,rm=4] */
+	/*0xda, IF_BYTE2,           "\xe5" ???            * 0xea: [mod=3,reg=4,rm=5] */
+	/*0xda, IF_BYTE2,           "\xe6" ???            * 0xea: [mod=3,reg=4,rm=6] */
+	/*0xda, IF_BYTE2,           "\xe7" ???            * 0xea: [mod=3,reg=4,rm=7] */
+	/*0xda, IF_BYTE2,           "\xe8" ???            * 0xea: [mod=3,reg=5,rm=0] */
+	I(0xda, IF_BYTE2, LONGREPR_B(0xe9, LO_FUCOMPP)), /* 0xe9: [mod=3,reg=5,rm=1] */ /* fucompp %st(1), %st(0) */
+	/*0xda, IF_BYTE2,           "\xea" ???            * 0xea: [mod=3,reg=5,rm=2] */
+	/*0xda, IF_BYTE2,           "\xeb" ???            * 0xea: [mod=3,reg=5,rm=3] */
+	/*0xda, IF_BYTE2,           "\xec" ???            * 0xea: [mod=3,reg=5,rm=4] */
+	/*0xda, IF_BYTE2,           "\xed" ???            * 0xea: [mod=3,reg=5,rm=5] */
+	/*0xda, IF_BYTE2,           "\xee" ???            * 0xea: [mod=3,reg=5,rm=6] */
+	/*0xda, IF_BYTE2,           "\xef" ???            * 0xea: [mod=3,reg=5,rm=7] */
+	/*0xda, IF_BYTE2,           "\xf0" ???            * 0xea: [mod=3,reg=6,rm=0] */
+	/*0xda, IF_BYTE2,           "\xf1" ???            * 0xea: [mod=3,reg=6,rm=1] */
+	/*0xda, IF_BYTE2,           "\xf2" ???            * 0xea: [mod=3,reg=6,rm=2] */
+	/*0xda, IF_BYTE2,           "\xf3" ???            * 0xea: [mod=3,reg=6,rm=3] */
+	/*0xda, IF_BYTE2,           "\xf4" ???            * 0xea: [mod=3,reg=6,rm=4] */
+	/*0xda, IF_BYTE2,           "\xf5" ???            * 0xea: [mod=3,reg=6,rm=5] */
+	/*0xda, IF_BYTE2,           "\xf6" ???            * 0xea: [mod=3,reg=6,rm=6] */
+	/*0xda, IF_BYTE2,           "\xf7" ???            * 0xea: [mod=3,reg=6,rm=7] */
+	/*0xda, IF_BYTE2,           "\xf8" ???            * 0xea: [mod=3,reg=7,rm=0] */
+	/*0xda, IF_BYTE2,           "\xf9" ???            * 0xea: [mod=3,reg=7,rm=1] */
+	/*0xda, IF_BYTE2,           "\xfa" ???            * 0xea: [mod=3,reg=7,rm=2] */
+	/*0xda, IF_BYTE2,           "\xfb" ???            * 0xea: [mod=3,reg=7,rm=3] */
+	/*0xda, IF_BYTE2,           "\xfc" ???            * 0xea: [mod=3,reg=7,rm=4] */
+	/*0xda, IF_BYTE2,           "\xfd" ???            * 0xea: [mod=3,reg=7,rm=5] */
+	/*0xda, IF_BYTE2,           "\xfe" ???            * 0xea: [mod=3,reg=7,rm=6] */
+	/*0xda, IF_BYTE2,           "\xff" ???            * 0xea: [mod=3,reg=7,rm=7] */
 
 
 	I(0xdb, IF_MODRM|IF_RMM|IF_REG0, "fildl\t" OP_RM32),
@@ -1454,43 +1486,81 @@ PRIVATE struct instruction const ops[] = {
 
 	I(0xdb, IF_MODRM|IF_RMM|IF_REG7, "fstp80" OP_MEM),
 
-	I(0xdb, IF_BYTE2,  "\xe2" "fnclex"), /* 0xe2: [mod=3,reg=4,rm=2] */
-	I(0xdb, IF_BYTE2,  "\xe3" "fninit"), /* 0xe3: [mod=3,reg=4,rm=3] */
+	I(0xdb, IF_BYTE2, "\xe0" "fneni"),   /* 0xe0: [mod=3,reg=4,rm=0] https://sandpile.org/x86/opc_fpu.htm#DB */
+	I(0xdb, IF_BYTE2, "\xe1" "fndisi"),  /* 0xe1: [mod=3,reg=4,rm=1] https://sandpile.org/x86/opc_fpu.htm#DB */
+	I(0xdb, IF_BYTE2, "\xe2" "fnclex"),  /* 0xe2: [mod=3,reg=4,rm=2] */
+	I(0xdb, IF_BYTE2, "\xe3" "fninit"),  /* 0xe3: [mod=3,reg=4,rm=3] */
+	I(0xdb, IF_BYTE2, "\xe4" "fnsetpm"), /* 0xe4: [mod=3,reg=4,rm=4] https://sandpile.org/x86/opc_fpu.htm#DB */
+	I(0xdb, IF_BYTE2, "\xe5" "frstpm"),  /* 0xe5: [mod=3,reg=4,rm=5] https://sandpile.org/x86/opc_fpu.htm#DB */
+	/*0xdb, IF_BYTE2, "\xe6" ???          * 0xe6: [mod=3,reg=4,rm=6] */
+	/*0xdb, IF_BYTE2, "\xe7" ???          * 0xe7: [mod=3,reg=4,rm=7] */
+	/*0xdb, IF_BYTE2, "\xe8" "fucomi..."  * 0xe8: [mod=3,reg=5,rm=0] */
+	/*0xdb, IF_BYTE2, "\xe8" "fsbp0"),    * 0xe8: [mod=3,reg=5,rm=0] (IIT) OVERLAP! https://sandpile.org/x86/opc_fpu.htm#DB */
+	/*0xdb, IF_BYTE2, "\xe9" "fucomi..."  * 0xe9: [mod=3,reg=5,rm=1] */
+	/*0xdb, IF_BYTE2, "\xe9" "fsbp3"),    * 0xe9: [mod=3,reg=5,rm=1] (IIT) OVERLAP! https://sandpile.org/x86/opc_fpu.htm#DB */
+	/*0xdb, IF_BYTE2, "\xea" "fucomi..."  * 0xea: [mod=3,reg=5,rm=2] */
+	/*0xdb, IF_BYTE2, "\xea" "fsbp2"),    * 0xea: [mod=3,reg=5,rm=2] (IIT) OVERLAP! https://sandpile.org/x86/opc_fpu.htm#DB */
+	/*0xdb, IF_BYTE2, "\xeb" "fucomi..."  * 0xeb: [mod=3,reg=5,rm=3] */
+	/*0xdb, IF_BYTE2, "\xeb" "fsbp1"),    * 0xeb: [mod=3,reg=5,rm=3] (IIT) OVERLAP! https://sandpile.org/x86/opc_fpu.htm#DB */
+	/*0xdb, IF_BYTE2, "\xec" "fucomi..."  * 0xec: [mod=3,reg=5,rm=4] */
+	/*0xdb, IF_BYTE2, "\xed" "fucomi..."  * 0xed: [mod=3,reg=5,rm=5] */
+	/*0xdb, IF_BYTE2, "\xee" "fucomi..."  * 0xee: [mod=3,reg=5,rm=6] */
+	/*0xdb, IF_BYTE2, "\xef" "fucomi..."  * 0xef: [mod=3,reg=5,rm=7] */
+	/*0xdb, IF_BYTE2, "\xf0" "fcomi..."   * 0xf0: [mod=3,reg=6,rm=0] */
+	/*0xdb, IF_BYTE2, "\xf1" "fcomi..."   * 0xf1: [mod=3,reg=6,rm=1] */
+	/*0xdb, IF_BYTE2, "\xf1" "f4x4"),     * 0xf1: [mod=3,reg=6,rm=1] (IIT) OVERLAP! https://sandpile.org/x86/opc_fpu.htm#DB */
+	/*0xdb, IF_BYTE2, "\xf2" "fcomi..."   * 0xf2: [mod=3,reg=6,rm=2] */
+	/*0xdb, IF_BYTE2, "\xf3" "fcomi..."   * 0xf3: [mod=3,reg=6,rm=3] */
+	/*0xdb, IF_BYTE2, "\xf4" "fcomi..."   * 0xf4: [mod=3,reg=6,rm=4] */
+	/*0xdb, IF_BYTE2, "\xf5" "fcomi..."   * 0xf5: [mod=3,reg=6,rm=5] */
+	/*0xdb, IF_BYTE2, "\xf6" "fcomi..."   * 0xf6: [mod=3,reg=6,rm=6] */
+	/*0xdb, IF_BYTE2, "\xf7" "fcomi..."   * 0xf7: [mod=3,reg=6,rm=7] */
+	/*0xdb, IF_BYTE2, "\xf8" ???          * 0xf8: [mod=3,reg=7,rm=0] */
+	/*0xdb, IF_BYTE2, "\xf9" ???          * 0xf9: [mod=3,reg=7,rm=1] */
+	/*0xdb, IF_BYTE2, "\xfa" ???          * 0xfa: [mod=3,reg=7,rm=2] */
+	/*0xdb, IF_BYTE2, "\xfb" ???          * 0xfb: [mod=3,reg=7,rm=3] */
+	I(0xdb, IF_BYTE2, "\xfc" "frint2"),  /* 0xfc: [mod=3,reg=7,rm=4] (Cyrix) https://sandpile.org/x86/opc_fpu.htm#DB */
+	/*0xdb, IF_BYTE2, "\xfd" ???          * 0xfd: [mod=3,reg=7,rm=5] */
+	/*0xdb, IF_BYTE2, "\xfe" ???          * 0xfe: [mod=3,reg=7,rm=6] */
+	/*0xdb, IF_BYTE2, "\xff" ???          * 0xff: [mod=3,reg=7,rm=7] */
 
 
-	I(0xdc, IF_MODRM|IF_RMR|IF_REG0, "fadd\t" OP_ST0 OP_RMSTi),
 	I(0xdc, IF_MODRM|IF_RMM|IF_REG0, "faddq\t" OP_RM64 OP_VERBOSE_ST0),
+	I(0xdc, IF_MODRM|IF_RMR|IF_REG0, "fadd\t" OP_ST0 OP_RMSTi),
 
-	I(0xdc, IF_MODRM|IF_RMR|IF_REG1, "fmul\t" OP_ST0 OP_RMSTi),
 	I(0xdc, IF_MODRM|IF_RMM|IF_REG1, "fmulq\t" OP_RM64 OP_VERBOSE_ST0),
+	I(0xdc, IF_MODRM|IF_RMR|IF_REG1, "fmul\t" OP_ST0 OP_RMSTi),
 
 	I(0xdc, IF_MODRM|IF_RMM|IF_REG2, "fcomq\t" OP_RM64 OP_VERBOSE_ST0),
+	I(0xdc, IF_MODRM|IF_RMR|IF_REG2, "fcom2\t" OP_RMSTi), /* https://sandpile.org/x86/opc_fpu.htm#DC */
+
 	I(0xdc, IF_MODRM|IF_RMM|IF_REG3, "fcompq\t" OP_RM64 OP_VERBOSE_ST0),
+	I(0xdc, IF_MODRM|IF_RMR|IF_REG3, "fcomp3\t" OP_RMSTi), /* https://sandpile.org/x86/opc_fpu.htm#DC */
 
-	I(0xdc, IF_MODRM|IF_RMR|IF_REG4, "fsub\t" OP_ST0 OP_RMSTi),
 	I(0xdc, IF_MODRM|IF_RMM|IF_REG4, "fsubq\t" OP_RM64 OP_VERBOSE_ST0),
+	I(0xdc, IF_MODRM|IF_RMR|IF_REG4, "fsub\t" OP_ST0 OP_RMSTi),
 
-	I(0xdc, IF_MODRM|IF_RMR|IF_REG5, "fsubr\t" OP_ST0 OP_RMSTi),
 	I(0xdc, IF_MODRM|IF_RMM|IF_REG5, "fsubrq\t" OP_RM64 OP_VERBOSE_ST0),
+	I(0xdc, IF_MODRM|IF_RMR|IF_REG5, "fsubr\t" OP_ST0 OP_RMSTi),
 
-	I(0xdc, IF_MODRM|IF_RMR|IF_REG6, "fdiv\t" OP_RMSTi OP_VERBOSE_ST0),
 	I(0xdc, IF_MODRM|IF_RMM|IF_REG6, "fdivq\t" OP_RM64 OP_VERBOSE_ST0),
+	I(0xdc, IF_MODRM|IF_RMR|IF_REG6, "fdiv\t" OP_RMSTi OP_VERBOSE_ST0),
 
-	I(0xdc, IF_MODRM|IF_RMR|IF_REG7, "fdivr\t" OP_RMSTi OP_VERBOSE_ST0),
 	I(0xdc, IF_MODRM|IF_RMM|IF_REG7, "fdivrq\t" OP_RM64 OP_VERBOSE_ST0),
+	I(0xdc, IF_MODRM|IF_RMR|IF_REG7, "fdivr\t" OP_RMSTi OP_VERBOSE_ST0),
 
 
 	I(0xdd, IF_MODRM|IF_RMM|IF_REG0, "fldq" OP_RM64),
 	I(0xdd, IF_MODRM|IF_RMR|IF_REG0, "ffree\t" OP_RMSTi),
 
 	I(0xdd, IF_MODRM|IF_RMM|IF_REG1, "fisttpq\t" OP_RM64),
-
-	I(0xdd, IF_MODRM|IF_RMR|IF_REG2, "fst\t" OP_RMSTi),
+	I(0xdd, IF_MODRM|IF_RMR|IF_REG1, "fxch4\t" OP_RMSTi), /* https://sandpile.org/x86/opc_fpu.htm#DD */
 
 	I(0xdd, IF_MODRM|IF_RMM|IF_REG2, "fstq\t" OP_RM64),
+	I(0xdd, IF_MODRM|IF_RMR|IF_REG2, "fst\t" OP_RMSTi),
 
-	I(0xdd, IF_MODRM|IF_RMR|IF_REG3, "fstp\t" OP_RMSTi),
 	I(0xdd, IF_MODRM|IF_RMM|IF_REG3, "fstpq\t" OP_RM64),
+	I(0xdd, IF_MODRM|IF_RMR|IF_REG3, "fstp\t" OP_RMSTi),
 
 	I(0xdd, IF_66|IF_MODRM|IF_RMM|IF_REG4, "frstor94\t" OP_MEM),
 	I(0xdd, IF_MODRM|IF_RMM|IF_REG4, "frstor108\t" OP_MEM),
@@ -1503,36 +1573,69 @@ PRIVATE struct instruction const ops[] = {
 
 	I(0xdd, IF_MODRM|IF_RMM|IF_REG7, "fnstcww\t" OP_RM16),
 
+	/*0xdd, IF_BYTE2, "\xf0" ???          * 0xf0: [mod=3,reg=6,rm=0] */
+	/*0xdd, IF_BYTE2, "\xf1" ???          * 0xf1: [mod=3,reg=6,rm=1] */
+	/*0xdd, IF_BYTE2, "\xf2" ???          * 0xf2: [mod=3,reg=6,rm=2] */
+	/*0xdd, IF_BYTE2, "\xf3" ???          * 0xf3: [mod=3,reg=6,rm=3] */
+	/*0xdd, IF_BYTE2, "\xf4" ???          * 0xf4: [mod=3,reg=6,rm=4] */
+	/*0xdd, IF_BYTE2, "\xf5" ???          * 0xf5: [mod=3,reg=6,rm=5] */
+	/*0xdd, IF_BYTE2, "\xf6" ???          * 0xf6: [mod=3,reg=6,rm=6] */
+	/*0xdd, IF_BYTE2, "\xf7" ???          * 0xf7: [mod=3,reg=6,rm=7] */
+	/*0xdd, IF_BYTE2, "\xf8" ???          * 0xf8: [mod=3,reg=7,rm=0] */
+	/*0xdd, IF_BYTE2, "\xf9" ???          * 0xf9: [mod=3,reg=7,rm=1] */
+	/*0xdd, IF_BYTE2, "\xfa" ???          * 0xfa: [mod=3,reg=7,rm=2] */
+	/*0xdd, IF_BYTE2, "\xfb" ???          * 0xfb: [mod=3,reg=7,rm=3] */
+	I(0xdd, IF_BYTE2, "\xfc" "frichop"), /* 0xfc: [mod=3,reg=7,rm=4] (Cyrix) https://sandpile.org/x86/opc_fpu.htm#DD */
+	/*0xdd, IF_BYTE2, "\xfd" ???          * 0xfd: [mod=3,reg=7,rm=5] */
+	/*0xdd, IF_BYTE2, "\xfe" ???          * 0xfe: [mod=3,reg=7,rm=6] */
+	/*0xdd, IF_BYTE2, "\xff" ???          * 0xff: [mod=3,reg=7,rm=7] */
 
-	I(0xde, IF_MODRM|IF_RMR|IF_REG0, "faddp\t" OP_ST0 OP_RMSTi),
+
 	I(0xde, IF_MODRM|IF_RMM|IF_REG0, "fiaddw\t" OP_RM16 OP_VERBOSE_ST0),
+	I(0xde, IF_MODRM|IF_RMR|IF_REG0, "faddp\t" OP_ST0 OP_RMSTi),
 
-	I(0xde, IF_MODRM|IF_RMR|IF_REG1, "fmulp\t" OP_ST0 OP_RMSTi),
 	I(0xde, IF_MODRM|IF_RMM|IF_REG1, "fimulw\t" OP_RM16 OP_VERBOSE_ST0),
+	I(0xde, IF_MODRM|IF_RMR|IF_REG1, "fmulp\t" OP_ST0 OP_RMSTi),
 
 	I(0xde, IF_MODRM|IF_RMM|IF_REG2, "ficomw\t" OP_RM16 OP_VERBOSE_ST0),
+	I(0xde, IF_MODRM|IF_RMR|IF_REG2, "fcomp5\t" OP_RMSTi),
 
 	I(0xde, IF_MODRM|IF_RMM|IF_REG3, "ficompw\t" OP_RM16 OP_VERBOSE_ST0),
 
-	I(0xde, IF_MODRM|IF_RMR|IF_REG4, "fsubp\t" OP_ST0 OP_RMSTi),
 	I(0xde, IF_MODRM|IF_RMM|IF_REG4, "fisubw\t" OP_RM16 OP_VERBOSE_ST0),
+	I(0xde, IF_MODRM|IF_RMR|IF_REG4, "fsubp\t" OP_ST0 OP_RMSTi),
 
-	I(0xde, IF_MODRM|IF_RMR|IF_REG5, "fsubrp\t" OP_ST0 OP_RMSTi),
 	I(0xde, IF_MODRM|IF_RMM|IF_REG5, "fisubrw\t" OP_RM16 OP_VERBOSE_ST0),
+	I(0xde, IF_MODRM|IF_RMR|IF_REG5, "fsubrp\t" OP_ST0 OP_RMSTi),
 
-	I(0xde, IF_MODRM|IF_RMR|IF_REG6, "fdivp\t" OP_ST0 OP_RMSTi),
 	I(0xde, IF_MODRM|IF_RMM|IF_REG6, "fidivw\t" OP_RM16 OP_VERBOSE_ST0),
+	I(0xde, IF_MODRM|IF_RMR|IF_REG6, "fdivp\t" OP_ST0 OP_RMSTi),
 
-	I(0xde, IF_MODRM|IF_RMR|IF_REG7, "fdivrp\t" OP_ST0 OP_RMSTi),
 	I(0xde, IF_MODRM|IF_RMM|IF_REG7, "fidivrw\t" OP_RM16 OP_VERBOSE_ST0),
+	I(0xde, IF_MODRM|IF_RMR|IF_REG7, "fdivrp\t" OP_ST0 OP_RMSTi),
 
+	/*0xde, IF_BYTE2, "\xd8" ???                                         * 0xd8: [mod=3,reg=3,rm=0] */
 	I(0xde, IF_BYTE2, "\xd9" "fcompp\t" OP_VERBOSE_ST1 OP_VERBOSE_ST0), /* 0xd9: [mod=3,reg=3,rm=1] */
+	/*0xde, IF_BYTE2, "\xda" ???                                         * 0xda: [mod=3,reg=3,rm=2] */
+	/*0xde, IF_BYTE2, "\xdb" ???                                         * 0xdb: [mod=3,reg=3,rm=3] */
+	/*0xde, IF_BYTE2, "\xdc" ???                                         * 0xdc: [mod=3,reg=3,rm=4] */
+	/*0xde, IF_BYTE2, "\xdd" ???                                         * 0xdd: [mod=3,reg=3,rm=5] */
+	/*0xde, IF_BYTE2, "\xde" ???                                         * 0xde: [mod=3,reg=3,rm=6] */
+	/*0xde, IF_BYTE2, "\xdf" ???                                         * 0xdf: [mod=3,reg=3,rm=7] */
 
 
 	I(0xdf, IF_MODRM|IF_RMM|IF_REG0, "fildw\t" OP_RM16),
+	I(0xdf, IF_MODRM|IF_RMR|IF_REG0, "ffreep\t" OP_RMSTi), /* https://sandpile.org/x86/opc_fpu.htm#DF */
+
 	I(0xdf, IF_MODRM|IF_RMM|IF_REG1, "fisttpw\t" OP_RM16),
+	I(0xdf, IF_MODRM|IF_RMR|IF_REG1, "fxch7\t" OP_RMSTi), /* https://sandpile.org/x86/opc_fpu.htm#DF */
+
 	I(0xdf, IF_MODRM|IF_RMM|IF_REG2, "fistw\t" OP_RM16),
+	I(0xdf, IF_MODRM|IF_RMR|IF_REG2, "fstp8\t" OP_RMSTi), /* https://sandpile.org/x86/opc_fpu.htm#DF */
+
 	I(0xdf, IF_MODRM|IF_RMM|IF_REG3, "fistpw\t" OP_RM16),
+	I(0xdf, IF_MODRM|IF_RMR|IF_REG3, "fstp9\t" OP_RMSTi), /* https://sandpile.org/x86/opc_fpu.htm#DF */
+
 	I(0xdf, IF_MODRM|IF_RMM|IF_REG4, "fbld\t" OP_MEM),
 
 	I(0xdf, IF_MODRM|IF_RMM|IF_REG5, "fildq\t" OP_RM64),
@@ -1543,7 +1646,38 @@ PRIVATE struct instruction const ops[] = {
 
 	I(0xdf, IF_MODRM|IF_RMM|IF_REG7, "fistpq\t" OP_RM64),
 
-	I(0xdf, IF_BYTE2,  "\xe0" "fnstsw" OP_AX), /* 0xe0: [mod=3,reg=4,rm=0] */
+	I(0xdf, IF_BYTE2, "\xe0" "fnstsw" OP_AX), /* 0xe0: [mod=3,reg=4,rm=0] */
+	I(0xdf, IF_BYTE2, "\xe1" "fstdw" OP_AX),  /* 0xe1: [mod=3,reg=4,rm=1] (80387SL) https://sandpile.org/x86/opc_fpu.htm#DF */
+	I(0xdf, IF_BYTE2, "\xe2" "fstsg" OP_AX),  /* 0xe2: [mod=3,reg=4,rm=2] (80387SL) https://sandpile.org/x86/opc_fpu.htm#DF */
+	/*0xdf, IF_BYTE2, "\xe3" ???               * 0xe3: [mod=3,reg=4,rm=3] */
+	/*0xdf, IF_BYTE2, "\xe4" ???               * 0xe4: [mod=3,reg=4,rm=4] */
+	/*0xdf, IF_BYTE2, "\xe5" ???               * 0xe5: [mod=3,reg=4,rm=5] */
+	/*0xdf, IF_BYTE2, "\xe6" ???               * 0xe6: [mod=3,reg=4,rm=6] */
+	/*0xdf, IF_BYTE2, "\xe7" ???               * 0xe7: [mod=3,reg=4,rm=7] */
+	/*0xdf, IF_BYTE2, "\xe8" "fucomip..."      * 0xe8: [mod=3,reg=5,rm=0] */
+	/*0xdf, IF_BYTE2, "\xe9" "fucomip..."      * 0xe9: [mod=3,reg=5,rm=1] */
+	/*0xdf, IF_BYTE2, "\xea" "fucomip..."      * 0xea: [mod=3,reg=5,rm=2] */
+	/*0xdf, IF_BYTE2, "\xeb" "fucomip..."      * 0xeb: [mod=3,reg=5,rm=3] */
+	/*0xdf, IF_BYTE2, "\xec" "fucomip..."      * 0xec: [mod=3,reg=5,rm=4] */
+	/*0xdf, IF_BYTE2, "\xed" "fucomip..."      * 0xed: [mod=3,reg=5,rm=5] */
+	/*0xdf, IF_BYTE2, "\xee" "fucomip..."      * 0xee: [mod=3,reg=5,rm=6] */
+	/*0xdf, IF_BYTE2, "\xef" "fucomip..."      * 0xef: [mod=3,reg=5,rm=7] */
+	/*0xdf, IF_BYTE2, "\xf0" "fcomip..."       * 0xf0: [mod=3,reg=6,rm=0] */
+	/*0xdf, IF_BYTE2, "\xf1" "fcomip..."       * 0xf1: [mod=3,reg=6,rm=1] */
+	/*0xdf, IF_BYTE2, "\xf2" "fcomip..."       * 0xf2: [mod=3,reg=6,rm=2] */
+	/*0xdf, IF_BYTE2, "\xf3" "fcomip..."       * 0xf3: [mod=3,reg=6,rm=3] */
+	/*0xdf, IF_BYTE2, "\xf4" "fcomip..."       * 0xf4: [mod=3,reg=6,rm=4] */
+	/*0xdf, IF_BYTE2, "\xf5" "fcomip..."       * 0xf5: [mod=3,reg=6,rm=5] */
+	/*0xdf, IF_BYTE2, "\xf6" "fcomip..."       * 0xf6: [mod=3,reg=6,rm=6] */
+	/*0xdf, IF_BYTE2, "\xf7" "fcomip..."       * 0xf7: [mod=3,reg=6,rm=7] */
+	/*0xdf, IF_BYTE2, "\xf8" ???               * 0xf8: [mod=3,reg=7,rm=0] */
+	/*0xdf, IF_BYTE2, "\xf9" ???               * 0xf9: [mod=3,reg=7,rm=1] */
+	/*0xdf, IF_BYTE2, "\xfa" ???               * 0xfa: [mod=3,reg=7,rm=2] */
+	/*0xdf, IF_BYTE2, "\xfb" ???               * 0xfb: [mod=3,reg=7,rm=3] */
+	I(0xdf, IF_BYTE2, "\xfc" "frinear"),      /* 0xfc: [mod=3,reg=7,rm=4] (Cyrix) https://sandpile.org/x86/opc_fpu.htm#DF */
+	/*0xdf, IF_BYTE2, "\xfd" ???               * 0xfd: [mod=3,reg=7,rm=5] */
+	/*0xdf, IF_BYTE2, "\xfe" ???               * 0xfe: [mod=3,reg=7,rm=6] */
+	/*0xdf, IF_BYTE2, "\xff" ???               * 0xff: [mod=3,reg=7,rm=7] */
 
 
 	I(0xe0, 0,                "loopnz\t" OP_DISP8),
@@ -5266,24 +5400,24 @@ print "#define OPS_OFFETSOF_90h", normal_offsets[0x90];
 
 ]]]*/
 #define HAVE_OPS_OFFSETS 1
-STATIC_ASSERT(COMPILER_LENOF(ops) == 897);
+STATIC_ASSERT(COMPILER_LENOF(ops) == 916);
 PRIVATE u16 const ops_offsets[256] = {
-	0, 1, 4, 5, 8, 9, 12, 14, 16, 17, 20, 21, 24, 25, 28, 896,
+	0, 1, 4, 5, 8, 9, 12, 14, 16, 17, 20, 21, 24, 25, 28, 915,
 	30, 31, 34, 35, 38, 39, 42, 44, 46, 47, 50, 51, 54, 55, 58, 60,
-	62, 63, 66, 67, 70, 71, 896, 74, 75, 76, 79, 80, 83, 84, 896, 87,
-	88, 89, 92, 93, 96, 97, 896, 100, 101, 102, 105, 106, 109, 110, 896, 113,
+	62, 63, 66, 67, 70, 71, 915, 74, 75, 76, 79, 80, 83, 84, 915, 87,
+	88, 89, 92, 93, 96, 97, 915, 100, 101, 102, 105, 106, 109, 110, 915, 113,
 	114, 116, 118, 120, 122, 124, 126, 128, 130, 132, 134, 136, 138, 140, 142, 144,
 	146, 150, 154, 158, 162, 166, 170, 174, 178, 182, 186, 190, 194, 198, 202, 206,
-	210, 212, 214, 216, 896, 896, 896, 896, 217, 220, 223, 226, 229, 231, 235, 237,
+	210, 212, 214, 216, 915, 915, 915, 915, 217, 220, 223, 226, 229, 231, 235, 237,
 	241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256,
 	257, 265, 289, 297, 321, 322, 325, 326, 329, 330, 333, 334, 337, 340, 343, 346,
 	352, 359, 365, 371, 377, 383, 389, 395, 401, 402, 404, 406, 408, 411, 414, 415,
 	416, 418, 422, 424, 428, 430, 436, 439, 448, 449, 452, 454, 460, 462, 468, 471,
 	480, 482, 484, 486, 488, 490, 492, 494, 496, 502, 508, 514, 520, 526, 532, 538,
 	544, 552, 576, 578, 580, 582, 584, 586, 592, 593, 594, 595, 596, 597, 598, 599,
-	603, 611, 635, 643, 667, 668, 669, 670, 671, 687, 726, 739, 753, 767, 781, 796,
-	807, 808, 809, 810, 813, 814, 816, 817, 819, 821, 823, 825, 826, 827, 829, 830,
-	896, 832, 896, 896, 833, 834, 835, 843, 867, 868, 869, 870, 871, 872, 873, 875
+	603, 611, 635, 643, 667, 668, 669, 670, 671, 687, 728, 741, 760, 776, 792, 808,
+	826, 827, 828, 829, 832, 833, 835, 836, 838, 840, 842, 844, 845, 846, 848, 849,
+	915, 851, 915, 915, 852, 853, 854, 862, 886, 887, 888, 889, 890, 891, 892, 894
 };
 
 #define HAVE_OPS_0F_OFFSETS 1
