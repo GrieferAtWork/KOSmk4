@@ -32,21 +32,24 @@ DECL_BEGIN
 
 /* Return the length of an instruction that starts at `pc'
  * WARNING: This function may trigger a segmentation fault when `pc' is an invalid pointer.
+ * @param: isa: The ISA type (s.a. `instrlen_isa_from_Xcpustate()' or `INSTRLEN_ISA_DEFAULT')
  * @return: 0 : The pointed-to instruction wasn't recognized. */
-INTDEF ATTR_PURE WUNUSED size_t NOTHROW_NCX(CC libil_instruction_length)(void const *pc);
+INTDEF ATTR_PURE WUNUSED size_t NOTHROW_NCX(CC libil_instruction_length)(void const *pc, instrlen_isa_t isa);
 
 /* Return a pointer to the successor/predecessor instruction of `pc',
  * assuming that `pc' points to the start of another instruction.
  * WARNING: These functions may trigger a segmentation fault when `pc' is an invalid pointer.
+ * @param: isa: The ISA type (s.a. `instrlen_isa_from_Xcpustate()' or `INSTRLEN_ISA_DEFAULT')
  * @return: NULL: The pointed-to instruction wasn't recognized. */
-INTDEF ATTR_PURE WUNUSED void const *NOTHROW_NCX(CC libil_instruction_succ)(void const *pc);
-INTDEF ATTR_PURE WUNUSED void const *NOTHROW_NCX(CC libil_instruction_pred)(void const *pc);
+INTDEF ATTR_PURE WUNUSED byte_t *NOTHROW_NCX(CC libil_instruction_succ)(void const *pc, instrlen_isa_t isa);
+INTDEF ATTR_PURE WUNUSED byte_t *NOTHROW_NCX(CC libil_instruction_pred)(void const *pc, instrlen_isa_t isa);
 
 /* Same as above, but return pc +/- 1, and discard a SEGFAULT and restore any old
  * exception when `pc' is invalid invalid pointer, or when `arch_instruction_(curr|pred)'
- * would have returned `NULL'. */
-INTDEF ATTR_PURE WUNUSED void const *NOTHROW(CC libil_instruction_trysucc)(void const *pc);
-INTDEF ATTR_PURE WUNUSED void const *NOTHROW(CC libil_instruction_trypred)(void const *pc);
+ * would have returned `NULL'.
+ * @param: isa: The ISA type (s.a. `instrlen_isa_from_Xcpustate()' or `INSTRLEN_ISA_DEFAULT') */
+INTDEF ATTR_PURE WUNUSED byte_t *NOTHROW_NCX(CC libil_instruction_trysucc)(void const *pc, instrlen_isa_t isa);
+INTDEF ATTR_PURE WUNUSED byte_t *NOTHROW_NCX(CC libil_instruction_trypred)(void const *pc, instrlen_isa_t isa);
 
 
 DECL_END

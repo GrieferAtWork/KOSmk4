@@ -41,7 +41,7 @@ __DECL_BEGIN
  * @return: * :   A pointer to the first byte past the opcode's ID
  * @param: popcode: Filled with the opcode's number
  * @param: pflags:  [in(EMU86_F_BITMASK)|out] Opcode flags. */
-LIBEMU86_IMPL __ATTR_UNUSED __ATTR_RETNONNULL __ATTR_NONNULL((1, 2, 3)) __byte_t const *
+LIBEMU86_IMPL __ATTR_UNUSED __ATTR_RETNONNULL __ATTR_NONNULL((1, 2, 3)) __byte_t *
 __NOTHROW_NCX(LIBEMU86_CC emu86_opcode_decode)(__byte_t const *__restrict pc,
                                                emu86_opcode_t *__restrict popcode,
                                                emu86_opflags_t *__restrict pflags) {
@@ -279,7 +279,7 @@ next_byte:
 	}
 done:
 	*popcode = opcode;
-	return pc;
+	return (__byte_t *)pc;
 }
 
 
@@ -288,7 +288,7 @@ done:
 /* Decode a MODRM suffix from `pc' and return a pointer past the end of the suffix.
  * @param: result: Filled in with information regarding the MODRM value.
  * @param: flags:  Opcode flags. */
-LIBEMU86_IMPL __ATTR_UNUSED __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __byte_t const *
+LIBEMU86_IMPL __ATTR_UNUSED __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __byte_t *
 __NOTHROW_NCX(LIBEMU86_CC emu86_modrm_decode)(__byte_t const *__restrict pc,
                                               struct emu86_modrm *__restrict result,
                                               emu86_opflags_t flags) {
@@ -460,7 +460,7 @@ parse_sib_byte:
 			result->mi_rm |= 0x8;
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
 	}
-	return pc;
+	return (__byte_t *)pc;
 }
 
 #endif /* __CC__ */

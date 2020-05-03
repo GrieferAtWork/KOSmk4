@@ -263,8 +263,8 @@ struct instruction {
 /*      OP_             "N"  * ... */
 /*      OPC_            'O'  * ... */
 /*      OP_             "O"  * ... */
-#define OPC_LJMP        'P' /* seg:offset pair (read from *PC before doing PC+=(4|6)) */
-#define OP_LJMP         "P" /* seg:offset pair (read from *PC before doing PC+=(4|6)) */
+#define OPC_LJMP        'P' /* seg:offset pair (read from *PC before doing PC+=(4|6), based on `EMU86_F_AD16') */
+#define OP_LJMP         "P" /* seg:offset pair (read from *PC before doing PC+=(4|6), based on `EMU86_F_AD16') */
 /*      OPC_            'Q'  * ... */
 /*      OP_             "Q"  * ... */
 #define OPC_VR8         'R' /* 8-bit general purpose register (based on `VEX.VVVVV'; requires IF_VEX*) */

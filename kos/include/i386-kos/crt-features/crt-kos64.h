@@ -1403,6 +1403,7 @@
 #define __CRT_HAVE_DOS$isalnum_l 1
 #define __CRT_HAVE_DOS$isalpha 1
 #define __CRT_HAVE_DOS$isalpha_l 1
+#define __CRT_HAVE_DOS$isascii 1
 #define __CRT_HAVE_DOS$isastream 1
 #define __CRT_HAVE_DOS$isatty 1
 #define __CRT_HAVE_DOS$isblank 1
@@ -2476,6 +2477,7 @@
 #define __CRT_HAVE_DOS$tmpnam 1
 #define __CRT_HAVE_DOS$tmpnam_r 1
 #define __CRT_HAVE_DOS$tmpnam_s 1
+#define __CRT_HAVE_DOS$toascii 1
 #define __CRT_HAVE_DOS$tolower 1
 #define __CRT_HAVE_DOS$tolower_l 1
 #define __CRT_HAVE_DOS$toupper 1
@@ -4952,6 +4954,7 @@
 #define __CRT_HAVE_isalnum_l 1
 #define __CRT_HAVE_isalpha 1
 #define __CRT_HAVE_isalpha_l 1
+#define __CRT_HAVE_isascii 1
 #define __CRT_HAVE_isastream 1
 #define __CRT_HAVE_isatty 1
 #define __CRT_HAVE_isblank 1
@@ -6860,6 +6863,7 @@
 #define __CRT_HAVE_tmpnam 1
 #define __CRT_HAVE_tmpnam_r 1
 #define __CRT_HAVE_tmpnam_s 1
+#define __CRT_HAVE_toascii 1
 #define __CRT_HAVE_tolower 1
 #define __CRT_HAVE_tolower_l 1
 #define __CRT_HAVE_toupper 1

@@ -825,8 +825,10 @@ search_chain:
 			}
 		}
 		if ((chain->i_flags & IF_BYTE2) == IF_BYTE2) {
-			if (args_start)
-				self->d_pc = args_start, args_start = NULL;
+			if (args_start) {
+				self->d_pc = args_start;
+				args_start = NULL;
+			}
 			if (self->d_pc[0] != (byte_t)chain->i_repr[0])
 				continue;
 			++self->d_pc;
@@ -862,7 +864,7 @@ search_chain:
 			if (chain->i_flags & IF_MODRM) {
 				if (!args_start) {
 					args_start = self->d_pc;
-					self->d_pc = (byte_t *)emu86_modrm_decode(args_start, &rm, op_flags);
+					self->d_pc = emu86_modrm_decode(args_start, &rm, op_flags);
 				}
 				if (chain->i_flags & IF_REG0) {
 					if (rm.mi_reg != (chain->i_flags & 7))
@@ -1603,7 +1605,9 @@ unknown_opcode:
 	    !(op_flags & ~(EMU86_F_SEGMASK | EMU86_F_BITMASK))) { /* whole_opcode == 0x8f */
 		/* Try to decode an XOP instruction. */
 		u16 vex;
-		byte_t *pc = text_start + 1;
+		byte_t *pc = args_start;
+		if unlikely(!pc) /* Shouldn't happen... */
+			pc = text_start + 1;
 		vex = *pc++;
 		vex <<= 8;
 		vex |= *pc++;

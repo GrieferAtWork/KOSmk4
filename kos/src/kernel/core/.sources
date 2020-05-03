@@ -49,6 +49,7 @@ BEGIN
 
 		/* Required for: Exception handlers to unify PC positions
 		 * (exceptions always point _after_ the faulting instruction) */
+		"../../libinstrlen/arch/" + XARCH + "/*.c",
 		"../../libinstrlen/*.c",
 
 		/* Required for: Exception handling, as well as tracebacks */

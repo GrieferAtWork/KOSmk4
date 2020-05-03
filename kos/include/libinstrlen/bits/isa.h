@@ -17,25 +17,28 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBINSTRLEN_API_H
-#define GUARD_LIBINSTRLEN_API_H 1
+#ifndef _LIBINSTRLEN_ISA_H
+#define _LIBINSTRLEN_ISA_H 1
 
-#include <hybrid/compiler.h>
+#include "../api.h"
 
-#include <hybrid/host.h>
+/* Default ISA type. */
+#define INSTRLEN_ISA_DEFAULT 0
 
-#include <libinstrlen/api.h>
+/* Return the ISA type, given a CPU state structure. */
+#define instrlen_isa_from_icpustate(s) INSTRLEN_ISA_DEFAULT
+#define instrlen_isa_from_scpustate(s) INSTRLEN_ISA_DEFAULT
+#define instrlen_isa_from_ucpustate(s) INSTRLEN_ISA_DEFAULT
+#define instrlen_isa_from_kcpustate(s) INSTRLEN_ISA_DEFAULT
+#define instrlen_isa_from_lcpustate(s) INSTRLEN_ISA_DEFAULT
+#define instrlen_isa_from_fcpustate(s) INSTRLEN_ISA_DEFAULT
 
-#define CC LIBINSTRLEN_CC
+#ifdef __CC__
+__DECL_BEGIN
 
+typedef unsigned int instrlen_isa_t;
 
-/* #define LIBINSTRLEN_ARCH_HAVE_INSTRUCTION_LENGTH 1 */
-/* #define LIBINSTRLEN_ARCH_HAVE_INSTRUCTION_SUCC 1 */
-/* #define LIBINSTRLEN_ARCH_HAVE_INSTRUCTION_PRED 1 */
-/* #define LIBINSTRLEN_ARCH_HAVE_INSTRUCTION_TRYSUCC 1 */
-/* #define LIBINSTRLEN_ARCH_HAVE_INSTRUCTION_TRYPRED 1 */
-#if defined(__i386__) || defined(__x86_64__)
-#include "arch/i386/config.h"
-#endif /* __i386__ || __x86_64__ */
+__DECL_END
+#endif /* __CC__ */
 
-#endif /* !GUARD_LIBINSTRLEN_API_H */
+#endif /* !_LIBINSTRLEN_ISA_H */

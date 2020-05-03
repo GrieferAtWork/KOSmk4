@@ -92,7 +92,7 @@ __FORCELOCAL __ATTR_CONST __UINT32_TYPE__ /*xop*/ (__t1mskcl)(__UINT32_TYPE__ __
 __FORCELOCAL __ATTR_CONST __UINT32_TYPE__ /*xop*/ (__blcil)(__UINT32_TYPE__ __val) { __UINT32_TYPE__ __res; __asm_ncx_memop__("blci %k1, %k0" : "=r" (__res) : "g" (__val) : "cc"); return __res; }
 
 #ifdef __x86_64__
-__FORCELOCAL __ATTR_CONST __UINT64_TYPE__ /*   */ (__bextrl)(__UINT64_TYPE__ __x, __UINT8_TYPE__ __start, __UINT8_TYPE__ __len) { __UINT64_TYPE__ __res; __asm_ncx_memop__("bextr %q2, %q1, %q0" : "=r" (__res) : "g" (__x), __X86_BEXTR_STARTLEN_CONSTRAINTS ((__UINT64_TYPE__)__start | ((__UINT64_TYPE__)__len << 8)) : "cc"); return __res; }
+__FORCELOCAL __ATTR_CONST __UINT64_TYPE__ /*   */ (__bextrq)(__UINT64_TYPE__ __x, __UINT8_TYPE__ __start, __UINT8_TYPE__ __len) { __UINT64_TYPE__ __res; __asm_ncx_memop__("bextr %q2, %q1, %q0" : "=r" (__res) : "g" (__x), __X86_BEXTR_STARTLEN_CONSTRAINTS ((__UINT64_TYPE__)__start | ((__UINT64_TYPE__)__len << 8)) : "cc"); return __res; }
 __FORCELOCAL __ATTR_CONST __UINT64_TYPE__ /*   */ (__andnq)(__UINT64_TYPE__ __x, __UINT64_TYPE__ __y) { __UINT64_TYPE__ __res; __asm_ncx_memop__("andn %q2, %q1, %q0" : "=r" (__res) : "r" (__x), "g" (__y) : "cc"); return __res; }
 __FORCELOCAL __ATTR_CONST __UINT64_TYPE__ /*   */ (__blsiq)(__UINT64_TYPE__ __val) { __UINT64_TYPE__ __res; __asm_ncx_memop__("blsi %q1, %q0" : "=r" (__res) : "g" (__val) : "cc"); return __res; }
 __FORCELOCAL __ATTR_CONST __UINT64_TYPE__ /*xop*/ (__blcmskq)(__UINT64_TYPE__ __val) { __UINT64_TYPE__ __res; __asm_ncx_memop__("blcmsk %q1, %q0" : "=r" (__res) : "g" (__val) : "cc"); return __res; }
