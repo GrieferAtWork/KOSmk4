@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x92876751 */
+/* HASH CRC-32:0xc5cd677e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -242,7 +242,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(vsnprintf))(char *__restrict __buf,
                                                        __SIZE_TYPE__ __buflen,
                                                        char const *__restrict __format,
                                                        __builtin_va_list __args) {
-#line 1024 "kos/src/libc/magic/stdio.c"
+#line 1026 "kos/src/libc/magic/stdio.c"
 	struct __format_snprintf_data __data;
 	__STDC_INT_AS_SSIZE_T __result;
 	__data.__sd_buffer = __buf;

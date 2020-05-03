@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc24fe37f */
+/* HASH CRC-32:0x57f93dfb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,11 +50,11 @@ __NAMESPACE_LOCAL_USING(unicode_utf8seqlen)
 #else /* __cplusplus */
 #define unicode_utf8seqlen    (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_utf8seqlen))
 #endif /* !__cplusplus */
-#else
+#else /* ... */
 __LOCAL_LIBC_CONST_DATA(unicode_utf8seqlen) __UINT8_TYPE__ const unicode_utf8seqlen[256] =
 #include "local/utf8-seqlen.h"
 ;
-#endif
+#endif /* !... */
 #define __utf8_seqlen_defined 1
 
 /* The max length of any UTF-8 byte sequence describing a single unicode character. */
@@ -88,9 +88,11 @@ __LOCAL_LIBC_CONST_DATA(unicode_utf8seqlen) __UINT8_TYPE__ const unicode_utf8seq
  * returning non-zero if it can, and zero if not.
  * The below function `unicode_writeutf16()' will cause weak undefined
  * behavior if the passed character does not fulfill this requirement. */
-#define UNICODE_ISVALIDUTF16(ch) \
-	(sizeof(ch) == 1 ? 1 : ((sizeof(ch) == 2 || (ch) <= 0x10ffff)) && \
-	((ch) < 0xd800 || (ch) > 0xdfff))
+#define UNICODE_ISVALIDUTF16(ch)                  \
+	(sizeof(ch) == 1                              \
+	 ? 1                                          \
+	 : ((sizeof(ch) == 2 || (ch) <= 0x10ffff)) && \
+	   ((ch) < 0xd800 || (ch) > 0xdfff))
 
 /* The (currently) greatest unicode character */
 #define UNICODE_MAXCHAR  0x10ffff
@@ -1047,15 +1049,15 @@ __LIBC __UINT16_TYPE__ const __unicode_asciiflags[256];
 #define unicode_isalpha(ch)        (__unicode_flags(ch) & __UNICODE_FALPHA)
 #define unicode_islower(ch)        (__unicode_flags(ch) & __UNICODE_FLOWER)
 #define unicode_isupper(ch)        (__unicode_flags(ch) & __UNICODE_FUPPER)
-#define unicode_isalnum(ch)        (__unicode_flags(ch) & (__UNICODE_FALPHA|__UNICODE_FDECIMAL))
+#define unicode_isalnum(ch)        (__unicode_flags(ch) & (__UNICODE_FALPHA | __UNICODE_FDECIMAL))
 #define unicode_isspace(ch)        (__unicode_flags(ch) & __UNICODE_FSPACE)
 #define unicode_istab(ch)          ((ch) == 9)
 #define unicode_islf(ch)           (__unicode_flags(ch) & __UNICODE_FLF)
 #define unicode_isprint(ch)        (__unicode_flags(ch) & __UNICODE_FPRINT)
 #define unicode_isdigit(ch)        (__unicode_flags(ch) & __UNICODE_FDIGIT)
 #define unicode_isdecimal(ch)      (__unicode_flags(ch) & __UNICODE_FDECIMAL)
-#define unicode_isnumeric(ch)      (__unicode_flags(ch) & (__UNICODE_FDIGIT|__UNICODE_FDECIMAL))
-#define unicode_istitle(ch)        (__unicode_flags(ch) & (__UNICODE_FTITLE|__UNICODE_FUPPER))
+#define unicode_isnumeric(ch)      (__unicode_flags(ch) & (__UNICODE_FDIGIT | __UNICODE_FDECIMAL))
+#define unicode_istitle(ch)        (__unicode_flags(ch) & (__UNICODE_FTITLE | __UNICODE_FUPPER))
 #define unicode_issymstrt(ch)      (__unicode_flags(ch) & __UNICODE_FSYMSTRT)
 #define unicode_issymcont(ch)      (__unicode_flags(ch) & __UNICODE_FSYMCONT)
 #define unicode_iscntrl(ch)        (__unicode_flags(ch) & __UNICODE_FCNTRL)

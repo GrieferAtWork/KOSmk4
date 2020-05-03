@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x93c4e3b9 */
+/* HASH CRC-32:0x3dc58b09 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,16 +44,17 @@ __LOCAL_LIBC(c32rtomb) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(c32rtomb))(char *__restrict __s,
                                                       __CHAR32_TYPE__ __c32,
                                                       __mbstate_t *__restrict __mbs) {
-#line 192 "kos/src/libc/magic/uchar.c"
+#line 194 "kos/src/libc/magic/uchar.c"
 	if (!__s) {
 		if (__mbs)
 			__mbs->__word = __MBSTATE_TYPE_EMPTY;
 		return 1;
 	}
-	if __unlikely((__c32 > 0x10ffff) || (__mbs && (__mbs->__word & __MBSTATE_TYPE_MASK) != __MBSTATE_TYPE_EMPTY)) {
+	if __unlikely((__c32 > 0x10ffff) ||
+	            (__mbs && (__mbs->__word & __MBSTATE_TYPE_MASK) != __MBSTATE_TYPE_EMPTY)) {
 #ifdef __EILSEQ
 		__libc_seterrno(__EILSEQ);
-#endif /* __EILSEQ */
+#endif /* EILSEQ */
 		return (__SIZE_TYPE__)-1;
 	}
 	/* Write a utf-8 sequence */

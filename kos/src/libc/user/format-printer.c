@@ -64,22 +64,29 @@ NOTHROW_NCX(LIBCCALL libc_format_aprintf_pack)(struct format_aprintf_data *__res
 	/* Free unused buffer memory. */
 	char *result;
 	if (self->ap_avail != 0) {
+#ifdef __CRT_HAVE_realloc
 		char *newbuf;
 		newbuf = (char *)libc_realloc(self->ap_base,
-		                         (self->ap_used + 1) * sizeof(char));
+		                         (self->ap_used + 1) *
+		                         sizeof(char));
 		if likely(newbuf)
 			self->ap_base = newbuf;
+#endif /* __CRT_HAVE_realloc */
 	} else {
 		if unlikely(!self->ap_used) {
 			/* Special case: Nothing was printed. */
 			__hybrid_assert(!self->ap_base);
-#ifdef __CRT_HAVE_malloc
+#if defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_malloc)
 			self->ap_base = (char *)libc_malloc(1 * sizeof(char));
-#else /* __CRT_HAVE_malloc */
-			self->ap_base = (char *)libc_realloc(NULL, 1 * sizeof(char));
-#endif /* !__CRT_HAVE_malloc */
 			if unlikely(!self->ap_base)
 				return NULL;
+#elif defined(__CRT_HAVE_realloc)
+			self->ap_base = (char *)libc_realloc(NULL, 1 * sizeof(char));
+			if unlikely(!self->ap_base)
+				return NULL;
+#else /* __CRT_HAVE_realloc */
+			return NULL;
+#endif /* !__CRT_HAVE_realloc */
 		}
 	}
 	result = self->ap_base;

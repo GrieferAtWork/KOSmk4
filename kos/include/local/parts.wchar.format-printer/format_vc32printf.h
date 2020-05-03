@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5bb7fd09 */
+/* HASH CRC-32:0xcff81fc3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -145,7 +145,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,__local
  * >> hat a great day.
  * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
  * Output #2: >> Hello \"World\" W\nhat a great day
- * NOTE: Output #2 is generated if the `FORMAT_ESCAPE_FPRINTRAW' is set
+ * NOTE: Output #2 is generated if the `0x0001' is set
  * This function escapes all control and non-ascii characters,
  * preferring octal encoding for control characters and hex-encoding
  * for other non-ascii characters, a behavior that may be modified
@@ -161,7 +161,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_c
  * >> hat a great day.
  * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
  * Output #2: >> Hello \"World\" W\nhat a great day
- * NOTE: Output #2 is generated if the `FORMAT_ESCAPE_FPRINTRAW' is set
+ * NOTE: Output #2 is generated if the `0x0001' is set
  * This function escapes all control and non-ascii characters,
  * preferring octal encoding for control characters and hex-encoding
  * for other non-ascii characters, a behavior that may be modified
@@ -177,7 +177,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_c
  * >> hat a great day.
  * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
  * Output #2: >> Hello \"World\" W\nhat a great day
- * NOTE: Output #2 is generated if the `FORMAT_ESCAPE_FPRINTRAW' is set
+ * NOTE: Output #2 is generated if the `0x0001' is set
  * This function escapes all control and non-ascii characters,
  * preferring octal encoding for control characters and hex-encoding
  * for other non-ascii characters, a behavior that may be modified
@@ -283,7 +283,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,__local
  * >> hat a great day.
  * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
  * Output #2: >> Hello \"World\" W\nhat a great day
- * NOTE: Output #2 is generated if the `FORMAT_ESCAPE_FPRINTRAW' is set
+ * NOTE: Output #2 is generated if the `0x0001' is set
  * This function escapes all control and non-ascii characters,
  * preferring octal encoding for control characters and hex-encoding
  * for other non-ascii characters, a behavior that may be modified
@@ -299,7 +299,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_c
  * >> hat a great day.
  * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
  * Output #2: >> Hello \"World\" W\nhat a great day
- * NOTE: Output #2 is generated if the `FORMAT_ESCAPE_FPRINTRAW' is set
+ * NOTE: Output #2 is generated if the `0x0001' is set
  * This function escapes all control and non-ascii characters,
  * preferring octal encoding for control characters and hex-encoding
  * for other non-ascii characters, a behavior that may be modified
@@ -315,7 +315,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_c
  * >> hat a great day.
  * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
  * Output #2: >> Hello \"World\" W\nhat a great day
- * NOTE: Output #2 is generated if the `FORMAT_ESCAPE_FPRINTRAW' is set
+ * NOTE: Output #2 is generated if the `0x0001' is set
  * This function escapes all control and non-ascii characters,
  * preferring octal encoding for control characters and hex-encoding
  * for other non-ascii characters, a behavior that may be modified
@@ -406,7 +406,7 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,__l
  * >> hat a great day.
  * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
  * Output #2: >> Hello \"World\" W\nhat a great day
- * NOTE: Output #2 is generated if the `FORMAT_ESCAPE_FPRINTRAW' is set
+ * NOTE: Output #2 is generated if the `0x0001' is set
  * This function escapes all control and non-ascii characters,
  * preferring octal encoding for control characters and hex-encoding
  * for other non-ascii characters, a behavior that may be modified
@@ -421,7 +421,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_c
  * >> hat a great day.
  * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
  * Output #2: >> Hello \"World\" W\nhat a great day
- * NOTE: Output #2 is generated if the `FORMAT_ESCAPE_FPRINTRAW' is set
+ * NOTE: Output #2 is generated if the `0x0001' is set
  * This function escapes all control and non-ascii characters,
  * preferring octal encoding for control characters and hex-encoding
  * for other non-ascii characters, a behavior that may be modified
@@ -437,7 +437,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_form
  * >> hat a great day.
  * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
  * Output #2: >> Hello \"World\" W\nhat a great day
- * NOTE: Output #2 is generated if the `FORMAT_ESCAPE_FPRINTRAW' is set
+ * NOTE: Output #2 is generated if the `0x0001' is set
  * This function escapes all control and non-ascii characters,
  * preferring octal encoding for control characters and hex-encoding
  * for other non-ascii characters, a behavior that may be modified
@@ -453,7 +453,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_form
  * >> hat a great day.
  * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
  * Output #2: >> Hello \"World\" W\nhat a great day
- * NOTE: Output #2 is generated if the `FORMAT_ESCAPE_FPRINTRAW' is set
+ * NOTE: Output #2 is generated if the `0x0001' is set
  * This function escapes all control and non-ascii characters,
  * preferring octal encoding for control characters and hex-encoding
  * for other non-ascii characters, a behavior that may be modified
@@ -535,12 +535,12 @@ __NAMESPACE_LOCAL_BEGIN
  *             - `%$[hex]' / `%$[hex:lLoOpPaAhH]'
  *                 - Invoke `format_c32hexdump(..., va_arg(args, void *))'
  *                 - Integer-length (`%$I32[hex]') flags affect `FORMAT_HEXDUMP_(BYTES|WORDS|DWORDS|QWORDS)'
- *                 - The argument string affect flags (defaults to `FORMAT_HEXDUMP_FNORMAL')
- *                    - `FORMAT_HEXDUMP_FHEXLOWER':  yes:l, no:L
- *                    - `FORMAT_HEXDUMP_FOFFSETS':   yes:o, no:O
- *                    - `FORMAT_HEXDUMP_FNOADDRESS': yes:P, no:p
- *                    - `FORMAT_HEXDUMP_FNOASCII':   yes:A, no:a
- *                    - `FORMAT_HEXDUMP_FNOHEX':     yes:H, no:h
+ *                 - The argument string affect flags (defaults to `0x0000')
+ *                    - `0x0001':  yes:l, no:L
+ *                    - `0x0004':   yes:o, no:O
+ *                    - `0x0002': yes:P, no:p
+ *                    - `0x0010':   yes:A, no:a
+ *                    - `0x0008':     yes:H, no:h
  *             - `%[gen]'
  *                 - Invoke a custom format printer function pointer passed through args
  *                   >> typedef ssize_t (*PGEN)(pwformatprinter printer, void *arg);
@@ -596,10 +596,10 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_vc32printf))(__pc32formatprint
                                                                void *__arg,
                                                                __CHAR32_TYPE__ const *__restrict __format,
                                                                __builtin_va_list __args) {
-#line 845 "kos/src/libc/magic/format-printer.c"
+#line 851 "kos/src/libc/magic/format-printer.c"
 #ifndef __INTELLISENSE__
 #define __CHAR_TYPE                 __CHAR32_TYPE__
-#define __CHAR_SIZE                 4
+#define __CHAR_SIZE                 __SIZEOF_WCHAR_T__
 #define __FORMAT_REPEAT             __localdep_format_c32repeat
 #define __FORMAT_HEXDUMP            __localdep_format_c32hexdump
 
@@ -607,19 +607,19 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_vc32printf))(__pc32formatprint
 #define __FORMAT_ESCAPE             __localdep_format_c32escape
 #define __FORMAT_WIDTH8             __localdep_format_width
 #define __FORMAT_ESCAPE8            __localdep_format_escape
-#if 4 == 2
+#if __SIZEOF_WCHAR_T__ == 2
 #define __FORMAT_WIDTH32            __localdep_format_c32width
 #define __FORMAT_ESCAPE32           __localdep_format_c32escape
 #define __FORMAT_UNICODE_WRITECHAR  __localdep_unicode_writeutf16
 #define __FORMAT_UNICODE_FORMAT8    __localdep_format_8to16
 #define __FORMAT_UNICODE_FORMAT32   __localdep_format_32to16
-#else
+#else /* __SIZEOF_WCHAR_T__ == 2 */
 #define __FORMAT_WIDTH16            __localdep_format_c16width
 #define __FORMAT_ESCAPE16           __localdep_format_c16escape
 #define __FORMAT_UNICODE_WRITECHAR(__dst, __ch) ((__dst)[0] = (__ch), (__dst) + 1)
 #define __FORMAT_UNICODE_FORMAT8    __localdep_format_8to32
 #define __FORMAT_UNICODE_FORMAT16   __localdep_format_16to32
-#endif
+#endif /* __SIZEOF_WCHAR_T__ != 2 */
 
 
 

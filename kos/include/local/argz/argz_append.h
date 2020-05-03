@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab1485ee */
+/* HASH CRC-32:0xd78c1653 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -73,9 +73,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_append))(char **__restrict __par
 	if __unlikely(!__newargz) {
 #ifdef __ENOMEM
 		return __ENOMEM;
-#else /* __ENOMEM */
+#else /* ENOMEM */
 		return 1;
-#endif /* !__ENOMEM */
+#endif /* !ENOMEM */
 	}
 	__localdep_memcpyc(__newargz + __oldlen, __buf, __buf_len, sizeof(char));
 	*__pargz     = __newargz;

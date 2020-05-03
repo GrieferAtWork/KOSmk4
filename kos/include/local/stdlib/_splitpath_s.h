@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x755316f6 */
+/* HASH CRC-32:0x36f163bd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,7 +55,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_splitpath_s))(char const *__restrict
                                                           __SIZE_TYPE__ __filelen,
                                                           char *__ext,
                                                           __SIZE_TYPE__ __extlen) {
-#line 2998 "kos/src/libc/magic/stdlib.c"
+#line 3063 "kos/src/libc/magic/stdlib.c"
 	__SIZE_TYPE__ __len, __last_slash, __last_dot;
 	if __unlikely(!__abspath)
 		goto __err_inval;
@@ -128,16 +128,16 @@ __got_drive:
 __err_inval:
 #ifdef __EINVAL
 	return __EINVAL;
-#else /* __EINVAL */
-	return -1;
-#endif /* !__EINVAL */
+#else /* EINVAL */
+	return 1;
+#endif /* !EINVAL */
 __err_range:
 #ifdef __ERANGE
 	__libc_seterrno(__ERANGE);
 	return __ERANGE;
-#else /* __ERANGE */
-	return -1;
-#endif /* !__ERANGE */
+#else /* ERANGE */
+	return 1;
+#endif /* !ERANGE */
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local__splitpath_s_defined */

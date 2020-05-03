@@ -372,12 +372,12 @@ inet_neta:($uint32_t net, [outp(len)] char *buf, $size_t len) -> char * {
 		goto too_small;
 	return buf;
 too_small:
-#ifdef @__EMSGSIZE@
-	__libc_seterrno(@__EMSGSIZE@);
-#elif defined(@__ERANGE@)
-	__libc_seterrno(@__ERANGE@);
-#elif defined(@__EINVAL@)
-	__libc_seterrno(@__EINVAL@);
+#ifdef EMSGSIZE
+	__libc_seterrno(EMSGSIZE);
+#elif defined(ERANGE)
+	__libc_seterrno(ERANGE);
+#elif defined(EINVAL)
+	__libc_seterrno(EINVAL);
 #endif
 	return NULL;
 }

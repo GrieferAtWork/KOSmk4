@@ -40,20 +40,19 @@
    License along with the GNU C Library; if not, see
    <http://www.gnu.org/licenses/>.  */
 
-#define FNM_PATHNAME    (1 << 0) /* No wildcard can ever match '/'. */
-#define FNM_NOESCAPE    (1 << 1) /* Backslashes don't quote special chars. */
-#define FNM_PERIOD      (1 << 2) /* Leading '.' is matched only explicitly. */
-#if (!defined(_POSIX_C_SOURCE) || _POSIX_C_SOURCE < 2 || \
-     defined(_GNU_SOURCE) || defined(_EVERY_SOURCE))
+#define FNM_PATHNAME    0x01 /* No wildcard can ever match '/'. */
+#define FNM_NOESCAPE    0x02 /* Backslashes don't quote special chars. */
+#define FNM_PERIOD      0x04 /* Leading '.' is matched only explicitly. */
+#if (!defined(_POSIX_C_SOURCE) || _POSIX_C_SOURCE < 2 || defined(__USE_GNU))
 #define FNM_FILE_NAME   FNM_PATHNAME /* Preferred GNU name. */
-#define FNM_LEADING_DIR (1 << 3)     /* Ignore '/...' after a match. */
-#define FNM_CASEFOLD    (1 << 4)     /* Compare without regard to case. */
-#define FNM_EXTMATCH    (1 << 5)     /* Use ksh-like extended matching. */
-#endif /* !_POSIX_C_SOURCE || _POSIX_C_SOURCE < 2 || _GNU_SOURCE || _EVERY_SOURCE */
+#define FNM_LEADING_DIR 0x08 /* Ignore '/...' after a match. */
+#define FNM_CASEFOLD    0x10 /* Compare without regard to case. */
+#define FNM_EXTMATCH    0x20 /* Use ksh-like extended matching. */
+#endif /* !_POSIX_C_SOURCE || _POSIX_C_SOURCE < 2 || __USE_GNU */
 #define FNM_NOMATCH      1 /* Value returned by 'fnmatch' if STRING does not match PATTERN. */
-#ifdef _XOPEN_SOURCE
+#ifdef __USE_XOPEN
 #define FNM_NOSYS      (-1)
-#endif /* _XOPEN_SOURCE */
+#endif /* __USE_XOPEN */
 
 #ifdef __CC__
 __SYSDECL_BEGIN
@@ -61,32 +60,35 @@ __SYSDECL_BEGIN
 }
 
 
+%[define(FNM_PATHNAME    = 0x01)] /* No wildcard can ever match '/'. */
+%[define(FNM_NOESCAPE    = 0x02)] /* Backslashes don't quote special chars. */
+%[define(FNM_PERIOD      = 0x04)] /* Leading '.' is matched only explicitly. */
+%[define(FNM_LEADING_DIR = 0x08)] /* Ignore '/...' after a match. */
+%[define(FNM_CASEFOLD    = 0x10)] /* Compare without regard to case. */
+%[define(FNM_EXTMATCH    = 0x20)] /* Use ksh-like extended matching. */
+%[define(FNM_NOMATCH     = 1)]    /* Value returned by 'fnmatch' if STRING does not match PATTERN. */
+
+
+
 @@Match NAME against the filename pattern PATTERN,
 @@returning zero if it matches, FNM_NOMATCH if not
 [ATTR_WUNUSED][ATTR_PURE]
 fnmatch:([nonnull] char const *pattern, [nonnull] char const *name, int match_flags) -> int {
-#define @__FNM_PATHNAME@    (1 << 0) /* No wildcard can ever match '/'. */
-#define @__FNM_NOESCAPE@    (1 << 1) /* Backslashes don't quote special chars. */
-#define @__FNM_PERIOD@      (1 << 2) /* Leading '.' is matched only explicitly. */
-#define @__FNM_LEADING_DIR@ (1 << 3) /* Ignore '/...' after a match. */
-#define @__FNM_CASEFOLD@    (1 << 4) /* Compare without regard to case. */
-#define @__FNM_EXTMATCH@    (1 << 5) /* Use ksh-like extended matching. */
-#define @__FNM_NOMATCH@      1       /* Value returned by 'fnmatch' if STRING does not match PATTERN. */
 	char card_post;
 	for (;;) {
 		if (!*name) {
 			/* End of name (if the patter is empty, or only contains '*', we have a match) */
 			while (*pattern == '*')
 				++pattern;
-			return @__FNM_NOMATCH@;
+			goto nomatch;
 		}
 		if (!*pattern)
-			return @__FNM_NOMATCH@; /* Pattern end doesn't match */
+			goto nomatch; /* Pattern end doesn't match */
 		if (*pattern == '*') {
-			/* Skip starts */
-			do
+			/* Skip leading asterisks */
+			do {
 				++pattern;
-			while (*pattern == '*');
+			} while (*pattern == '*');
 			if ((card_post = *pattern++) == '\0')
 				return 0; /* Pattern ends with '*' (matches everything) */
 			if (card_post == '?')
@@ -94,17 +96,19 @@ fnmatch:([nonnull] char const *pattern, [nonnull] char const *name, int match_fl
 			for (;;) {
 				char ch = *name++;
 				if (ch == card_post ||
-				    ((match_flags & @__FNM_CASEFOLD@) && tolower(ch) == tolower(card_post))) {
+				    ((match_flags & FNM_CASEFOLD) &&
+				     tolower(ch) == tolower(card_post))) {
 					/* Recursively check if the rest of the name and pattern match */
 					if (!fnmatch(name, pattern, match_flags))
 						return 0;
 				} else if (!ch) {
-					return @__FNM_NOMATCH@; /* Wildcard suffix not found */
+					goto nomatch; /* Wildcard suffix not found */
 				} else if (ch == '/') {
-					if ((match_flags & @__FNM_PATHNAME@))
-						return @__FNM_NOMATCH@;
-					if ((match_flags & @__FNM_PERIOD@) && name[0] == '.' && card_post != '.')
-						return @__FNM_NOMATCH@;
+					if ((match_flags & FNM_PATHNAME))
+						goto nomatch;
+					if ((match_flags & FNM_PERIOD) &&
+					    name[0] == '.' && card_post != '.')
+						goto nomatch;
 				}
 			}
 		}
@@ -116,16 +120,18 @@ next:
 		}
 		if (*pattern == '?') {
 			if (*name == '/') {
-				if (match_flags & @__FNM_PATHNAME@)
-					return @__FNM_NOMATCH@;
-				if ((match_flags & @__FNM_PERIOD@) && name[1] == '.' && pattern[1] != '.')
-					return @__FNM_NOMATCH@;
+				if (match_flags & FNM_PATHNAME)
+					goto nomatch;
+				if ((match_flags & FNM_PERIOD) &&
+				    name[1] == '.' && pattern[1] != '.')
+					goto nomatch;
 			}
 			goto next;
 		}
 		break; /* mismatch */
 	}
-	return @__FNM_NOMATCH@;
+nomatch:
+	return FNM_NOMATCH;
 }
 
 %{

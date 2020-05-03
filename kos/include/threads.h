@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xda6e9316 */
+/* HASH CRC-32:0x8bd97712 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,10 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
+
 #include <hybrid/typecore.h>
+
+#include <asm/threads.h>
 #include <bits/threads.h>
 #include <bits/timespec.h>
 
@@ -68,11 +71,11 @@ __SYSDECL_BEGIN
 #undef thrd_timedout
 #ifdef __CC__
 enum {
-	thrd_success  = 0,
-	thrd_busy     = 1,
-	thrd_error    = 2,
-	thrd_nomem    = 3,
-	thrd_timedout = 4
+	thrd_success  = __thrd_success,
+	thrd_busy     = __thrd_busy,
+	thrd_error    = __thrd_error,
+	thrd_nomem    = __thrd_nomem,
+	thrd_timedout = __thrd_timedout
 };
 #endif /* __CC__ */
 #ifdef __COMPILER_PREFERR_ENUMS
@@ -82,11 +85,11 @@ enum {
 #define thrd_nomem    thrd_nomem
 #define thrd_timedout thrd_timedout
 #else /* __COMPILER_PREFERR_ENUMS */
-#define thrd_success  0
-#define thrd_busy     1
-#define thrd_error    2
-#define thrd_nomem    3
-#define thrd_timedout 4
+#define thrd_success  __thrd_success
+#define thrd_busy     __thrd_busy
+#define thrd_error    __thrd_error
+#define thrd_nomem    __thrd_nomem
+#define thrd_timedout __thrd_timedout
 #endif /* !__COMPILER_PREFERR_ENUMS */
 
 /* Mutex types.  */
@@ -95,9 +98,9 @@ enum {
 #undef mtx_timed
 #ifdef __CC__
 enum {
-	mtx_plain     = 0,
-	mtx_recursive = 1,
-	mtx_timed     = 2
+	mtx_plain     = __mtx_plain,
+	mtx_recursive = __mtx_recursive,
+	mtx_timed     = __mtx_timed
 };
 #endif /* __CC__ */
 #ifdef __COMPILER_PREFERR_ENUMS
@@ -105,9 +108,9 @@ enum {
 #define mtx_recursive mtx_recursive
 #define mtx_timed     mtx_timed
 #else /* __COMPILER_PREFERR_ENUMS */
-#define mtx_plain     0
-#define mtx_recursive 1
-#define mtx_timed     2
+#define mtx_plain     __mtx_plain
+#define mtx_recursive __mtx_recursive
+#define mtx_timed     __mtx_timed
 #endif /* !__COMPILER_PREFERR_ENUMS */
 
 

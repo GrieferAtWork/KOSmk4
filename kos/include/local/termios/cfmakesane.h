@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa91c9349 */
+/* HASH CRC-32:0xc0d3a698 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,6 +24,7 @@
 #ifdef __LIBC_BIND_OPTIMIZATIONS
 #include <optimized/string.h>
 #endif /* __LIBC_BIND_OPTIMIZATIONS */
+#include <bits/termios.h>
 #include <sys/ttydefaults.h>
 /* Dependency: "memset" from "string" */
 #ifndef ____localdep_memset_defined
@@ -49,7 +50,7 @@ __NAMESPACE_LOCAL_BEGIN
  * Sane here refers to setting all values to their defaults, as they are defined in <sys/ttydefaults.h> */
 __LOCAL_LIBC(cfmakesane) __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cfmakesane))(struct termios *__restrict __termios_p) {
-#line 126 "kos/src/libc/magic/termios.c"
+#line 135 "kos/src/libc/magic/termios.c"
 	/* Set sane values. */
 	__localdep_memset(__termios_p, 0, sizeof(*__termios_p));
 #ifdef TTYDEF_CFLAG

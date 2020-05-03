@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x84504326 */
+/* HASH CRC-32:0xabe264f3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,7 +64,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Alias for `fputc(CH, stdout)' */
 __LOCAL_LIBC(putchar) int
 (__LIBCCALL __LIBC_LOCAL_NAME(putchar))(int __ch) __THROWS(...) {
-#line 497 "kos/src/libc/magic/stdio.c"
+#line 505 "kos/src/libc/magic/stdio.c"
 	return __localdep_fputc(__ch, __LOCAL_stdout);
 }
 __NAMESPACE_LOCAL_END

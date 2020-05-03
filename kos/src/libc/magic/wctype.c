@@ -27,9 +27,11 @@
 %{
 #include <features.h>
 
-#include <bits/types.h>
-#include <hybrid/typecore.h>
 #include <hybrid/byteorder.h>
+#include <hybrid/typecore.h>
+
+#include <asm/stdio.h> /* __WEOF */
+#include <bits/types.h>
 
 #if defined(__USE_XOPEN2K8) || defined(__USE_DOS)
 #include <xlocale.h>
@@ -38,11 +40,7 @@
 __SYSDECL_BEGIN
 
 #ifndef WEOF
-#if __SIZEOF_WCHAR_T__ == 4
-#define WEOF (__CCAST(__WINT_TYPE__)0xffffffffu)
-#else /* __SIZEOF_WCHAR_T__ == 4 */
-#define WEOF (__CCAST(__WINT_TYPE__)0xffff)
-#endif /* __SIZEOF_WCHAR_T__ != 4 */
+#define WEOF __WEOF
 #endif /* !WEOF */
 
 #ifdef __CC__

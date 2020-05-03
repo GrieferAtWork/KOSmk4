@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x90f1e05 */
+/* HASH CRC-32:0x7f92bfab */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3767,6 +3767,7 @@
 #define __CRT_ATTR_NOTHROW_RPC_nanosleep32 1
 #define __CRT_ATTR_NOTHROW_RPC_nanosleep64 1
 #define __CRT_ATTR_NOTHROW_RPC_open 1
+#define __CRT_ATTR_NOTHROW_RPC_open32 1
 #define __CRT_ATTR_NOTHROW_RPC_open64 1
 #define __CRT_ATTR_NOTHROW_RPC_open_by_handle_at 1
 #define __CRT_ATTR_NOTHROW_RPC_openat 1

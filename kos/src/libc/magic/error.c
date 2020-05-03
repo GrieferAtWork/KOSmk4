@@ -107,21 +107,21 @@ error:(int status, $errno_t errnum, const char *format, ...) {
 	} else
 #endif /* __LOCAL_error_print_progname */
 	{
-		fflush(@__LOCAL_stdout@);
-		fprintf(@__LOCAL_stderr@, "%s: ", @__LOCAL_program_invocation_short_name@);
+		fflush(stdout);
+		fprintf(stderr, "%s: ", @__LOCAL_program_invocation_short_name@);
 	}
 	if (format) {
 		va_list args;
 		va_start(args, format);
-		vfprintf(@__LOCAL_stderr@, format, args);
+		vfprintf(stderr, format, args);
 		va_end(args);
 	}
 #ifdef @__LOCAL_error_message_count@
 	++@__LOCAL_error_message_count@;
 #endif /* __LOCAL_error_message_count */
 	if (errnum != 0)
-		fprintf(@__LOCAL_stderr@, ": %s", strerror(errnum));
-	fputc('\n', @__LOCAL_stderr@);
+		fprintf(stderr, ": %s", strerror(errnum));
+	fputc('\n', stderr);
 	if (status != 0)
 		exit(status);
 }
@@ -166,22 +166,22 @@ error_at_line:(int status, $errno_t errnum, char const *filename,
 		} else
 #endif /* __LOCAL_error_print_progname */
 		{
-			fflush(@__LOCAL_stdout@);
-			fprintf(@__LOCAL_stderr@, "%s:", @__LOCAL_program_invocation_short_name@);
+			fflush(stdout);
+			fprintf(stderr, "%s:", @__LOCAL_program_invocation_short_name@);
 		}
-		fprintf(@__LOCAL_stderr@, "%s:%u: ", filename, line);
+		fprintf(stderr, "%s:%u: ", filename, line);
 		if (format) {
 			va_list args;
 			va_start(args, format);
-			vfprintf(@__LOCAL_stderr@, format, args);
+			vfprintf(stderr, format, args);
 			va_end(args);
 		}
 #ifdef @__LOCAL_error_message_count@
 		++@__LOCAL_error_message_count@;
 #endif /* __LOCAL_error_message_count */
 		if (errnum != 0)
-			fprintf(@__LOCAL_stderr@, ": %s", strerror(errnum));
-		fputc('\n', @__LOCAL_stderr@);
+			fprintf(stderr, ": %s", strerror(errnum));
+		fputc('\n', stderr);
 		if (status != 0)
 			exit(status);
 	}

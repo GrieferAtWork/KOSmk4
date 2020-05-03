@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9ce28c21 */
+/* HASH CRC-32:0x62047802 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __LOCAL_LIBC(vsc32scanf) __ATTR_WUNUSED __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL(
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(vsc32scanf))(__CHAR32_TYPE__ const *__restrict __src,
                                                         __CHAR32_TYPE__ const *__restrict __format,
                                                         __builtin_va_list __args) {
-#line 785 "kos/src/libc/magic/wchar.c"
+#line 777 "kos/src/libc/magic/wchar.c"
 	/* TODO: format_wscanf() */
 	(void)__src;
 	(void)__format;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdaf73370 */
+/* HASH CRC-32:0xaeead478 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,16 +35,26 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_itow_s))(int __val,
 		__radix = 10;
 	__p = __buf;
 	if (__val < 0) {
-		if (!__buflen--)
+		if (!__buflen--) {
+#ifdef __ERANGE
 			return __ERANGE;
+#else /* ERANGE */
+			return 1;
+#endif /* !ERANGE */
+		}
 		*__p++ = '-';
 		__val = -__val;
 	}
 	__temp = __val;
 	do ++__p;
 	while ((__temp /= (unsigned int)__radix) != 0);
-	if (__buflen <= (__SIZE_TYPE__)(__p - __buf))
+	if (__buflen <= (__SIZE_TYPE__)(__p - __buf)) {
+#ifdef __ERANGE
 		return __ERANGE;
+#else /* ERANGE */
+		return 1;
+#endif /* !ERANGE */
+	}
 	__temp = __val;
 	*__p = '\0';
 	do {

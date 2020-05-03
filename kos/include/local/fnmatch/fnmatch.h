@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9ba1a5c3 */
+/* HASH CRC-32:0xe657e883 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,29 +43,22 @@ __LOCAL_LIBC(fnmatch) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fnmatch))(char const *__pattern,
                                                      char const *__name,
                                                      int __match_flags) {
-#line 68 "kos/src/libc/magic/fnmatch.c"
-#define __FNM_PATHNAME    (1 << 0) /* No wildcard can ever match '/'. */
-#define __FNM_NOESCAPE    (1 << 1) /* Backslashes don't quote special chars. */
-#define __FNM_PERIOD      (1 << 2) /* Leading '.' is matched only explicitly. */
-#define __FNM_LEADING_DIR (1 << 3) /* Ignore '/...' after a match. */
-#define __FNM_CASEFOLD    (1 << 4) /* Compare without regard to case. */
-#define __FNM_EXTMATCH    (1 << 5) /* Use ksh-like extended matching. */
-#define __FNM_NOMATCH      1       /* Value returned by 'fnmatch' if STRING does not match PATTERN. */
+#line 77 "kos/src/libc/magic/fnmatch.c"
 	char __card_post;
 	for (;;) {
 		if (!*__name) {
 			/* End of name (if the patter is empty, or only contains '*', we have a match) */
 			while (*__pattern == '*')
 				++__pattern;
-			return __FNM_NOMATCH;
+			goto __nomatch;
 		}
 		if (!*__pattern)
-			return __FNM_NOMATCH; /* Pattern end doesn't match */
+			goto __nomatch; /* Pattern end doesn't match */
 		if (*__pattern == '*') {
-			/* Skip starts */
-			do
+			/* Skip leading asterisks */
+			do {
 				++__pattern;
-			while (*__pattern == '*');
+			} while (*__pattern == '*');
 			if ((__card_post = *__pattern++) == '\0')
 				return 0; /* Pattern ends with '*' (matches everything) */
 			if (__card_post == '?')
@@ -73,17 +66,19 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fnmatch))(char const *__pattern,
 			for (;;) {
 				char __ch = *__name++;
 				if (__ch == __card_post ||
-				    ((__match_flags & __FNM_CASEFOLD) && __localdep_tolower(__ch) == __localdep_tolower(__card_post))) {
+				    ((__match_flags & 0x10) &&
+				     __localdep_tolower(__ch) == __localdep_tolower(__card_post))) {
 					/* Recursively check if the rest of the name and pattern match */
 					if (!__LIBC_LOCAL_NAME(fnmatch)(__name, __pattern, __match_flags))
 						return 0;
 				} else if (!__ch) {
-					return __FNM_NOMATCH; /* Wildcard suffix not found */
+					goto __nomatch; /* Wildcard suffix not found */
 				} else if (__ch == '/') {
-					if ((__match_flags & __FNM_PATHNAME))
-						return __FNM_NOMATCH;
-					if ((__match_flags & __FNM_PERIOD) && __name[0] == '.' && __card_post != '.')
-						return __FNM_NOMATCH;
+					if ((__match_flags & 0x01))
+						goto __nomatch;
+					if ((__match_flags & 0x04) &&
+					    __name[0] == '.' && __card_post != '.')
+						goto __nomatch;
 				}
 			}
 		}
@@ -95,16 +90,18 @@ __next:
 		}
 		if (*__pattern == '?') {
 			if (*__name == '/') {
-				if (__match_flags & __FNM_PATHNAME)
-					return __FNM_NOMATCH;
-				if ((__match_flags & __FNM_PERIOD) && __name[1] == '.' && __pattern[1] != '.')
-					return __FNM_NOMATCH;
+				if (__match_flags & 0x01)
+					goto __nomatch;
+				if ((__match_flags & 0x04) &&
+				    __name[1] == '.' && __pattern[1] != '.')
+					goto __nomatch;
 			}
 			goto __next;
 		}
 		break; /* mismatch */
 	}
-	return __FNM_NOMATCH;
+__nomatch:
+	return 1;
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_fnmatch_defined */

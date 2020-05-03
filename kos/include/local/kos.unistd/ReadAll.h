@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x83401b1f */
+/* HASH CRC-32:0x2aaacf9b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -99,7 +99,7 @@ __LOCAL_LIBC(ReadAll) __ATTR_NONNULL((2)) __SIZE_TYPE__
 				int __old_error = __errno;
 #endif
 				/* Try to un-read data that had already been loaded. */
-				__localdep_lseek(__fd, -(__FS_TYPE(off))(__FS_TYPE(pos))__result, 1);
+				__localdep_lseek(__fd, -(__FS_TYPE(off))(__FS_TYPE(pos))__result, __SEEK_CUR);
 #ifdef __errno
 				__errno = __old_error;
 #endif

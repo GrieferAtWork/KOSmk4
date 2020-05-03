@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x614cae78 */
+/* HASH CRC-32:0xd1b35049 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,11 +21,12 @@
 #ifndef __local_cfsetispeed_defined
 #define __local_cfsetispeed_defined 1
 #include <__crt.h>
+#include <bits/termios.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(cfsetispeed) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cfsetispeed))(struct termios *__restrict __termios_p,
                                                          speed_t __speed) {
-#line 67 "kos/src/libc/magic/termios.c"
+#line 71 "kos/src/libc/magic/termios.c"
 	__termios_p->c_ispeed = __speed;
 	return 0;
 }

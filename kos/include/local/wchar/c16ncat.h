@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x31fbb05a */
+/* HASH CRC-32:0x6b9c7d7f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -84,7 +84,7 @@ __LOCAL_LIBC(c16ncat) __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __CHAR16_TYPE__ *
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16ncat))(__CHAR16_TYPE__ *__restrict __buf,
                                                      __CHAR16_TYPE__ const *__restrict __src,
                                                      __SIZE_TYPE__ __buflen) {
-#line 457 "kos/src/libc/magic/wchar.c"
+#line 453 "kos/src/libc/magic/wchar.c"
 	__SIZE_TYPE__ __srclen = __localdep_c16nlen(__src, __buflen);
 	__CHAR16_TYPE__ *__dst = __localdep_c16end(__buf);
 	__localdep_c16memcpy(__dst, __src, __srclen);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x68e4da25 */
+/* HASH CRC-32:0x5fe1ab6b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -98,7 +98,7 @@ __LOCAL_LIBC(wmemcmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wmemcmp))(__WCHAR_TYPE__ const *__s1,
                                                      __WCHAR_TYPE__ const *__s2,
                                                      __SIZE_TYPE__ __num_chars) {
-#line 384 "kos/src/libc/magic/wchar.c"
+#line 380 "kos/src/libc/magic/wchar.c"
 #if __SIZEOF_WCHAR_T__ == 2
 	return __localdep_memcmpw(__s1, __s2, __num_chars);
 #elif __SIZEOF_WCHAR_T__ == 4

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd541a65c */
+/* HASH CRC-32:0x58848cd0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,7 +50,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_getws_s) __WCHAR_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_getws_s))(__WCHAR_TYPE__ *__buf,
                                                       __SIZE_TYPE__ __buflen) {
-#line 2238 "kos/src/libc/magic/wchar.c"
+#line 2212 "kos/src/libc/magic/wchar.c"
 	return __localdep_fgetws(__buf, __buflen, __LOCAL_stdin);
 }
 __NAMESPACE_LOCAL_END

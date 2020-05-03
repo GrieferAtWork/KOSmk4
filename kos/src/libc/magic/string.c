@@ -3019,432 +3019,432 @@ strerror_s:(int errnum) -> char const * {
 	char const *result;
 	switch (errnum) {
 
-#ifdef @__EPERM@
-	case @__EPERM@:           result = "Operation not permitted"; break;
-#endif /* __EPERM */
-#ifdef @__ENOENT@
-	case @__ENOENT@:          result = "No such file or directory"; break;
-#endif /* __ENOENT */
-#ifdef @__ESRCH@
-	case @__ESRCH@:           result = "No such process"; break;
-#endif /* __ESRCH */
-#ifdef @__EINTR@
-	case @__EINTR@:           result = "Interrupted system call"; break;
-#endif /* __EINTR */
-#ifdef @__EIO@
-	case @__EIO@:             result = "I/O error"; break;
-#endif /* __EIO */
-#ifdef @__ENXIO@
-	case @__ENXIO@:           result = "No such device or address"; break;
-#endif /* __ENXIO */
-#ifdef @__E2BIG@
-	case @__E2BIG@:           result = "Argument list too long"; break;
-#endif /* __E2BIG */
-#ifdef @__ENOEXEC@
-	case @__ENOEXEC@:         result = "Exec format error"; break;
-#endif /* __ENOEXEC */
-#ifdef @__EBADF@
-	case @__EBADF@:           result = "Bad file number"; break;
-#endif /* __EBADF */
-#ifdef @__ECHILD@
-	case @__ECHILD@:          result = "No child processes"; break;
-#endif /* __ECHILD */
-#ifdef @__EAGAIN@
-	case @__EAGAIN@:          result = "Try again"; break;
-#endif /* __EAGAIN */
-#ifdef @__ENOMEM@
-	case @__ENOMEM@:          result = "Out of memory"; break;
-#endif /* __ENOMEM */
-#ifdef @__EACCES@
-	case @__EACCES@:          result = "Permission denied"; break;
-#endif /* __EACCES */
-#ifdef @__EFAULT@
-	case @__EFAULT@:          result = "Bad address"; break;
-#endif /* __EFAULT */
-#ifdef @__EBUSY@
-	case @__EBUSY@:           result = "Device or resource busy"; break;
-#endif /* __EBUSY */
-#ifdef @__EEXIST@
-	case @__EEXIST@:          result = "File exists"; break;
-#endif /* __EEXIST */
-#ifdef @__EXDEV@
-	case @__EXDEV@:           result = "Cross-device link"; break;
-#endif /* __EXDEV */
-#ifdef @__ENODEV@
-	case @__ENODEV@:          result = "No such device"; break;
-#endif /* __ENODEV */
-#ifdef @__ENOTDIR@
-	case @__ENOTDIR@:         result = "Not a directory"; break;
-#endif /* __ENOTDIR */
-#ifdef @__EISDIR@
-	case @__EISDIR@:          result = "Is a directory"; break;
-#endif /* __EISDIR */
-#ifdef @__ENFILE@
-	case @__ENFILE@:          result = "File table overflow"; break;
-#endif /* __ENFILE */
-#ifdef @__EMFILE@
-	case @__EMFILE@:          result = "Too many open files"; break;
-#endif /* __EMFILE */
-#ifdef @__ENOTTY@
-	case @__ENOTTY@:          result = "Not a typewriter"; break;
-#endif /* __ENOTTY */
-#ifdef @__EFBIG@
-	case @__EFBIG@:           result = "File too large"; break;
-#endif /* __EFBIG */
-#ifdef @__ENOSPC@
-	case @__ENOSPC@:          result = "No space left on device"; break;
-#endif /* __ENOSPC */
-#ifdef @__ESPIPE@
-	case @__ESPIPE@:          result = "Illegal seek"; break;
-#endif /* __ESPIPE */
-#ifdef @__EROFS@
-	case @__EROFS@:           result = "Read-only file system"; break;
-#endif /* __EROFS */
-#ifdef @__EMLINK@
-	case @__EMLINK@:          result = "Too many links"; break;
-#endif /* __EMLINK */
-#ifdef @__EPIPE@
-	case @__EPIPE@:           result = "Broken pipe"; break;
-#endif /* __EPIPE */
-#ifdef @__EDOM@
-	case @__EDOM@:            result = "Math argument out of domain of func"; break;
-#endif /* __EDOM */
-#ifdef @__ENAMETOOLONG@
-	case @__ENAMETOOLONG@:    result = "File name too long"; break;
-#endif /* __ENAMETOOLONG */
-#ifdef @__ENOLCK@
-	case @__ENOLCK@:          result = "No record locks available"; break;
-#endif /* __ENOLCK */
-#ifdef @__ENOSYS@
-	case @__ENOSYS@:          result = "Function not implemented"; break;
-#endif /* __ENOSYS */
-#ifdef @__ENOTEMPTY@
-	case @__ENOTEMPTY@:       result = "Directory not empty"; break;
-#endif /* __ENOTEMPTY */
-#ifdef @__EINVAL@
-	case @__EINVAL@:          result = "Invalid argument"; break;
-#endif /* __EINVAL */
-#ifdef @__ERANGE@
-	case @__ERANGE@:          result = "Math result not representable"; break;
-#endif /* __ERANGE */
-#ifdef @__EILSEQ@
-	case @__EILSEQ@:          result = "Illegal byte sequence"; break;
-#endif /* __EILSEQ */
-#ifdef @__EDEADLOCK@
-	case @__EDEADLOCK@:       result = "Resource deadlock would occur"; break;
-#endif /* __EDEADLOCK */
-#ifdef @__EADDRINUSE@
-	case @__EADDRINUSE@:      result = "Address already in use"; break;
-#endif /* __EADDRINUSE */
-#ifdef @__EADDRNOTAVAIL@
-	case @__EADDRNOTAVAIL@:   result = "Cannot assign requested address"; break;
-#endif /* __EADDRNOTAVAIL */
-#ifdef @__EAFNOSUPPORT@
-	case @__EAFNOSUPPORT@:    result = "Address family not supported by protocol"; break;
-#endif /* __EAFNOSUPPORT */
-#ifdef @__EALREADY@
-	case @__EALREADY@:        result = "Operation already in progress"; break;
-#endif /* __EALREADY */
-#ifdef @__EBADMSG@
-	case @__EBADMSG@:         result = "Not a data message"; break;
-#endif /* __EBADMSG */
-#ifdef @__ECANCELED@
-	case @__ECANCELED@:       result = "Operation Canceled"; break;
-#endif /* __ECANCELED */
-#ifdef @__ECONNABORTED@
-	case @__ECONNABORTED@:    result = "Software caused connection abort"; break;
-#endif /* __ECONNABORTED */
-#ifdef @__ECONNREFUSED@
-	case @__ECONNREFUSED@:    result = "Connection refused"; break;
-#endif /* __ECONNREFUSED */
-#ifdef @__ECONNRESET@
-	case @__ECONNRESET@:      result = "Connection reset by peer"; break;
-#endif /* __ECONNRESET */
-#ifdef @__EDESTADDRREQ@
-	case @__EDESTADDRREQ@:    result = "Destination address required"; break;
-#endif /* __EDESTADDRREQ */
-#ifdef @__EHOSTUNREACH@
-	case @__EHOSTUNREACH@:    result = "No route to host"; break;
-#endif /* __EHOSTUNREACH */
-#ifdef @__EIDRM@
-	case @__EIDRM@:           result = "Identifier removed"; break;
-#endif /* __EIDRM */
-#ifdef @__EINPROGRESS@
-	case @__EINPROGRESS@:     result = "Operation now in progress"; break;
-#endif /* __EINPROGRESS */
-#ifdef @__EISCONN@
-	case @__EISCONN@:         result = "Transport endpoint is already connected"; break;
-#endif /* __EISCONN */
-#ifdef @__ELOOP@
-	case @__ELOOP@:           result = "Too many symbolic links encountered"; break;
-#endif /* __ELOOP */
-#ifdef @__EMSGSIZE@
-	case @__EMSGSIZE@:        result = "Message too long"; break;
-#endif /* __EMSGSIZE */
-#ifdef @__ENETDOWN@
-	case @__ENETDOWN@:        result = "Network is down"; break;
-#endif /* __ENETDOWN */
-#ifdef @__ENETRESET@
-	case @__ENETRESET@:       result = "Network dropped connection because of reset"; break;
-#endif /* __ENETRESET */
-#ifdef @__ENETUNREACH@
-	case @__ENETUNREACH@:     result = "Network is unreachable"; break;
-#endif /* __ENETUNREACH */
-#ifdef @__ENOBUFS@
-	case @__ENOBUFS@:         result = "No buffer space available"; break;
-#endif /* __ENOBUFS */
-#ifdef @__ENODATA@
-	case @__ENODATA@:         result = "No data available"; break;
-#endif /* __ENODATA */
-#ifdef @__ENOLINK@
-	case @__ENOLINK@:         result = "Link has been severed"; break;
-#endif /* __ENOLINK */
-#ifdef @__ENOMSG@
-	case @__ENOMSG@:          result = "No message of desired type"; break;
-#endif /* __ENOMSG */
-#ifdef @__ENOPROTOOPT@
-	case @__ENOPROTOOPT@:     result = "Protocol not available"; break;
-#endif /* __ENOPROTOOPT */
-#ifdef @__ENOSR@
-	case @__ENOSR@:           result = "Out of streams resources"; break;
-#endif /* __ENOSR */
-#ifdef @__ENOSTR@
-	case @__ENOSTR@:          result = "Device not a stream"; break;
-#endif /* __ENOSTR */
-#ifdef @__ENOTCONN@
-	case @__ENOTCONN@:        result = "Transport endpoint is not connected"; break;
-#endif /* __ENOTCONN */
-#ifdef @__ENOTRECOVERABLE@
-	case @__ENOTRECOVERABLE@: result = "State not recoverable"; break;
-#endif /* __ENOTRECOVERABLE */
-#ifdef @__ENOTSOCK@
-	case @__ENOTSOCK@:        result = "Socket operation on non-socket"; break;
-#endif /* __ENOTSOCK */
-#ifdef @__ENOTSUP@
-	case @__ENOTSUP@:         result = "Not supported"; break;
-#endif /* __ENOTSUP */
-#ifdef @__EOPNOTSUPP@
-	case @__EOPNOTSUPP@:      result = "Operation not supported on transport endpoint"; break;
-#endif /* __EOPNOTSUPP */
-#ifdef @__EOTHER@
-	case @__EOTHER@:          result = "Other"; break;
-#endif /* __EOTHER */
-#ifdef @__EOVERFLOW@
-	case @__EOVERFLOW@:       result = "Value too large for defined data type"; break;
-#endif /* __EOVERFLOW */
-#ifdef @__EOWNERDEAD@
-	case @__EOWNERDEAD@:      result = "Owner died"; break;
-#endif /* __EOWNERDEAD */
-#ifdef @__EPROTO@
-	case @__EPROTO@:          result = "Protocol error"; break;
-#endif /* __EPROTO */
-#ifdef @__EPROTONOSUPPORT@
-	case @__EPROTONOSUPPORT@: result = "Protocol not supported"; break;
-#endif /* __EPROTONOSUPPORT */
-#ifdef @__EPROTOTYPE@
-	case @__EPROTOTYPE@:      result = "Protocol wrong type for socket"; break;
-#endif /* __EPROTOTYPE */
-#ifdef @__ETIME@
-	case @__ETIME@:           result = "Timer expired"; break;
-#endif /* __ETIME */
-#ifdef @__ETIMEDOUT@
-	case @__ETIMEDOUT@:       result = "Connection timed out"; break;
-#endif /* __ETIMEDOUT */
-#ifdef @__ETXTBSY@
-	case @__ETXTBSY@:         result = "Text file busy"; break;
-#endif /* __ETXTBSY */
-#ifdef @__EFTYPE@
-	case @__EFTYPE@:          result = "Inappropriate file type or format"; break;
-#endif /* __EFTYPE */
-#ifdef @__ENMFILE@
-	case @__ENMFILE@:         result = "No more files"; break;
-#endif /* __ENMFILE */
-#ifdef @__EPFNOSUPPORT@
-	case @__EPFNOSUPPORT@:    result = "Protocol family not supported"; break;
-#endif /* __EPFNOSUPPORT */
-#ifdef @__EHOSTDOWN@
-	case @__EHOSTDOWN@:       result = "Host is down"; break;
-#endif /* __EHOSTDOWN */
-#ifdef @__ETOOMANYREFS@
-	case @__ETOOMANYREFS@:    result = "Too many references: cannot splice"; break;
-#endif /* __ETOOMANYREFS */
-#ifdef @__EDQUOT@
-	case @__EDQUOT@:          result = "Quota exceeded"; break;
-#endif /* __EDQUOT */
-#ifdef @__ESTALE@
-	case @__ESTALE@:          result = "Stale file handle"; break;
-#endif /* __ESTALE */
-#ifdef @__ENOSHARE@
-	case @__ENOSHARE@:        result = "No such host or network path"; break;
-#endif /* __ENOSHARE */
-#ifdef @__ECASECLASH@
-	case @__ECASECLASH@:      result = "Filename exists with different case"; break;
-#endif /* __ECASECLASH */
-#ifdef @__ENOTBLK@
-	case @__ENOTBLK@:         result = "Block device required"; break;
-#endif /* __ENOTBLK */
-#ifdef @__ECHRNG@
-	case @__ECHRNG@:          result = "Channel number out of range"; break;
-#endif /* __ECHRNG */
-#ifdef @__EL2NSYNC@
-	case @__EL2NSYNC@:        result = "Level 2 not synchronized"; break;
-#endif /* __EL2NSYNC */
-#ifdef @__EL3HLT@
-	case @__EL3HLT@:          result = "Level 3 halted"; break;
-#endif /* __EL3HLT */
-#ifdef @__EL3RST@
-	case @__EL3RST@:          result = "Level 3 reset"; break;
-#endif /* __EL3RST */
-#ifdef @__ELNRNG@
-	case @__ELNRNG@:          result = "Link number out of range"; break;
-#endif /* __ELNRNG */
-#ifdef @__EUNATCH@
-	case @__EUNATCH@:         result = "Protocol driver not attached"; break;
-#endif /* __EUNATCH */
-#ifdef @__ENOCSI@
-	case @__ENOCSI@:          result = "No CSI structure available"; break;
-#endif /* __ENOCSI */
-#ifdef @__EL2HLT@
-	case @__EL2HLT@:          result = "Level 2 halted"; break;
-#endif /* __EL2HLT */
-#ifdef @__EBADE@
-	case @__EBADE@:           result = "Invalid exchange"; break;
-#endif /* __EBADE */
-#ifdef @__EBADR@
-	case @__EBADR@:           result = "Invalid request descriptor"; break;
-#endif /* __EBADR */
-#ifdef @__EXFULL@
-	case @__EXFULL@:          result = "Exchange full"; break;
-#endif /* __EXFULL */
-#ifdef @__ENOANO@
-	case @__ENOANO@:          result = "No anode"; break;
-#endif /* __ENOANO */
-#ifdef @__EBADRQC@
-	case @__EBADRQC@:         result = "Invalid request code"; break;
-#endif /* __EBADRQC */
-#ifdef @__EBADSLT@
-	case @__EBADSLT@:         result = "Invalid slot"; break;
-#endif /* __EBADSLT */
-#ifdef @__EBFONT@
-	case @__EBFONT@:          result = "Bad font file fmt"; break;
-#endif /* __EBFONT */
-#ifdef @__ENONET@
-	case @__ENONET@:          result = "Machine is not on the network"; break;
-#endif /* __ENONET */
-#ifdef @__ENOPKG@
-	case @__ENOPKG@:          result = "Package not installed"; break;
-#endif /* __ENOPKG */
-#ifdef @__EREMOTE@
-	case @__EREMOTE@:         result = "The object is remote"; break;
-#endif /* __EREMOTE */
-#ifdef @__EADV@
-	case @__EADV@:            result = "Advertise error"; break;
-#endif /* __EADV */
-#ifdef @__ESRMNT@
-	case @__ESRMNT@:          result = "Srmount error"; break;
-#endif /* __ESRMNT */
-#ifdef @__ECOMM@
-	case @__ECOMM@:           result = "Communication error on send"; break;
-#endif /* __ECOMM */
-#ifdef @__ELBIN@
-	case @__ELBIN@:           result = "Inode is remote (not really error)"; break;
-#endif /* __ELBIN */
-#ifdef @__EDOTDOT@
-	case @__EDOTDOT@:         result = "Cross mount point (not really error)"; break;
-#endif /* __EDOTDOT */
-#ifdef @__ENOTUNIQ@
-	case @__ENOTUNIQ@:        result = "Given log. name not unique"; break;
-#endif /* __ENOTUNIQ */
-#ifdef @__EBADFD@
-	case @__EBADFD@:          result = "f.d. invalid for this operation"; break;
-#endif /* __EBADFD */
-#ifdef @__EREMCHG@
-	case @__EREMCHG@:         result = "Remote address changed"; break;
-#endif /* __EREMCHG */
-#ifdef @__ELIBACC@
-	case @__ELIBACC@:         result = "Can't access a needed shared lib"; break;
-#endif /* __ELIBACC */
-#ifdef @__ELIBBAD@
-	case @__ELIBBAD@:         result = "Accessing a corrupted shared lib"; break;
-#endif /* __ELIBBAD */
-#ifdef @__ELIBSCN@
-	case @__ELIBSCN@:         result = ".lib section in a.out corrupted"; break;
-#endif /* __ELIBSCN */
-#ifdef @__ELIBMAX@
-	case @__ELIBMAX@:         result = "Attempting to link in too many libs"; break;
-#endif /* __ELIBMAX */
-#ifdef @__ELIBEXEC@
-	case @__ELIBEXEC@:        result = "Attempting to exec a shared library"; break;
-#endif /* __ELIBEXEC */
-#ifdef @__ESHUTDOWN@
-	case @__ESHUTDOWN@:       result = "Can't send after socket shutdown"; break;
-#endif /* __ESHUTDOWN */
-#ifdef @__ESOCKTNOSUPPORT@
-	case @__ESOCKTNOSUPPORT@: result = "Socket type not supported"; break;
-#endif /* __ESOCKTNOSUPPORT */
-#ifdef @__EPROCLIM@
-	case @__EPROCLIM@:        result = "Process limit reached"; break;
-#endif /* __EPROCLIM */
-#ifdef @__EUSERS@
-	case @__EUSERS@:          result = "Too many users"; break;
-#endif /* __EUSERS */
-#ifdef @__ENOMEDIUM@
-	case @__ENOMEDIUM@:       result = "No medium (in tape drive)"; break;
-#endif /* __ENOMEDIUM */
-#ifdef @__ESTRPIPE@
-	case @__ESTRPIPE@:        result = "Streams pipe error"; break;
-#endif /* __ESTRPIPE */
-#ifdef @__EMULTIHOP@
-	case @__EMULTIHOP@:       result = "Multihop attempted"; break;
-#endif /* __EMULTIHOP */
-#ifdef @__ERESTART@
-	case @__ERESTART@:        result = "Interrupted system call should be restarted"; break;
-#endif /* __ERESTART */
-#ifdef @__EUCLEAN@
-	case @__EUCLEAN@:         result = "Structure needs cleaning"; break;
-#endif /* __EUCLEAN */
-#ifdef @__ENOTNAM@
-	case @__ENOTNAM@:         result = "Not a XENIX named type file"; break;
-#endif /* __ENOTNAM */
-#ifdef @__ENAVAIL@
-	case @__ENAVAIL@:         result = "No XENIX semaphores available"; break;
-#endif /* __ENAVAIL */
-#ifdef @__EISNAM@
-	case @__EISNAM@:          result = "Is a named type file"; break;
-#endif /* __EISNAM */
-#ifdef @__EREMOTEIO@
-	case @__EREMOTEIO@:       result = "Remote I/O error"; break;
-#endif /* __EREMOTEIO */
-#ifdef @__EMEDIUMTYPE@
-	case @__EMEDIUMTYPE@:     result = "Wrong medium type"; break;
-#endif /* __EMEDIUMTYPE */
-#ifdef @__ENOKEY@
-	case @__ENOKEY@:          result = "Required key not available"; break;
-#endif /* __ENOKEY */
-#ifdef @__EKEYEXPIRED@
-	case @__EKEYEXPIRED@:     result = "Key has expired"; break;
-#endif /* __EKEYEXPIRED */
-#ifdef @__EKEYREVOKED@
-	case @__EKEYREVOKED@:     result = "Key has been revoked"; break;
-#endif /* __EKEYREVOKED */
-#ifdef @__EKEYREJECTED@
-	case @__EKEYREJECTED@:    result = "Key was rejected by service"; break;
-#endif /* __EKEYREJECTED */
-#ifdef @__ERFKILL@
-	case @__ERFKILL@:         result = "Operation not possible due to RF-kill"; break;
-#endif /* __ERFKILL */
-#ifdef @__EHWPOISON@
-	case @__EHWPOISON@:       result = "Memory page has hardware error"; break;
-#endif /* __EHWPOISON */
-#if defined(@__STRUNCATE@) && (!defined(@__ERANGE@) || @__STRUNCATE@ != @__ERANGE@)
-	case @__STRUNCATE@:       result = "Truncated"; break;
-#endif /* __STRUNCATE && (!__ERANGE || __STRUNCATE != __ERANGE) */
-#if defined(@__EWOULDBLOCK@) && (!defined(@__EAGAIN@) || @__EWOULDBLOCK@ != @__EAGAIN@)
-	case @__EWOULDBLOCK@:     result = "Operation would block"; break;
-#endif /* __EWOULDBLOCK && (!__EAGAIN || __EWOULDBLOCK != __EAGAIN) */
-#if defined(@__EDEADLK@) && (!defined(@__EDEADLOCK@) || @__EDEADLOCK@ != @__EDEADLK@)
-	case @__EDEADLK@:         result = "Resource deadlock would occur"; break;
-#endif /* __EDEADLK && (!__EDEADLOCK || __EDEADLOCK != __EDEADLK) */
+#ifdef EPERM
+	case EPERM:           result = "Operation not permitted"; break;
+#endif /* EPERM */
+#ifdef ENOENT
+	case ENOENT:          result = "No such file or directory"; break;
+#endif /* ENOENT */
+#ifdef ESRCH
+	case ESRCH:           result = "No such process"; break;
+#endif /* ESRCH */
+#ifdef EINTR
+	case EINTR:           result = "Interrupted system call"; break;
+#endif /* EINTR */
+#ifdef EIO
+	case EIO:             result = "I/O error"; break;
+#endif /* EIO */
+#ifdef ENXIO
+	case ENXIO:           result = "No such device or address"; break;
+#endif /* ENXIO */
+#ifdef E2BIG
+	case E2BIG:           result = "Argument list too long"; break;
+#endif /* E2BIG */
+#ifdef ENOEXEC
+	case ENOEXEC:         result = "Exec format error"; break;
+#endif /* ENOEXEC */
+#ifdef EBADF
+	case EBADF:           result = "Bad file number"; break;
+#endif /* EBADF */
+#ifdef ECHILD
+	case ECHILD:          result = "No child processes"; break;
+#endif /* ECHILD */
+#ifdef EAGAIN
+	case EAGAIN:          result = "Try again"; break;
+#endif /* EAGAIN */
+#ifdef ENOMEM
+	case ENOMEM:          result = "Out of memory"; break;
+#endif /* ENOMEM */
+#ifdef EACCES
+	case EACCES:          result = "Permission denied"; break;
+#endif /* EACCES */
+#ifdef EFAULT
+	case EFAULT:          result = "Bad address"; break;
+#endif /* EFAULT */
+#ifdef EBUSY
+	case EBUSY:           result = "Device or resource busy"; break;
+#endif /* EBUSY */
+#ifdef EEXIST
+	case EEXIST:          result = "File exists"; break;
+#endif /* EEXIST */
+#ifdef EXDEV
+	case EXDEV:           result = "Cross-device link"; break;
+#endif /* EXDEV */
+#ifdef ENODEV
+	case ENODEV:          result = "No such device"; break;
+#endif /* ENODEV */
+#ifdef ENOTDIR
+	case ENOTDIR:         result = "Not a directory"; break;
+#endif /* ENOTDIR */
+#ifdef EISDIR
+	case EISDIR:          result = "Is a directory"; break;
+#endif /* EISDIR */
+#ifdef ENFILE
+	case ENFILE:          result = "File table overflow"; break;
+#endif /* ENFILE */
+#ifdef EMFILE
+	case EMFILE:          result = "Too many open files"; break;
+#endif /* EMFILE */
+#ifdef ENOTTY
+	case ENOTTY:          result = "Not a typewriter"; break;
+#endif /* ENOTTY */
+#ifdef EFBIG
+	case EFBIG:           result = "File too large"; break;
+#endif /* EFBIG */
+#ifdef ENOSPC
+	case ENOSPC:          result = "No space left on device"; break;
+#endif /* ENOSPC */
+#ifdef ESPIPE
+	case ESPIPE:          result = "Illegal seek"; break;
+#endif /* ESPIPE */
+#ifdef EROFS
+	case EROFS:           result = "Read-only file system"; break;
+#endif /* EROFS */
+#ifdef EMLINK
+	case EMLINK:          result = "Too many links"; break;
+#endif /* EMLINK */
+#ifdef EPIPE
+	case EPIPE:           result = "Broken pipe"; break;
+#endif /* EPIPE */
+#ifdef EDOM
+	case EDOM:            result = "Math argument out of domain of func"; break;
+#endif /* EDOM */
+#ifdef ENAMETOOLONG
+	case ENAMETOOLONG:    result = "File name too long"; break;
+#endif /* ENAMETOOLONG */
+#ifdef ENOLCK
+	case ENOLCK:          result = "No record locks available"; break;
+#endif /* ENOLCK */
+#ifdef ENOSYS
+	case ENOSYS:          result = "Function not implemented"; break;
+#endif /* ENOSYS */
+#ifdef ENOTEMPTY
+	case ENOTEMPTY:       result = "Directory not empty"; break;
+#endif /* ENOTEMPTY */
+#ifdef EINVAL
+	case EINVAL:          result = "Invalid argument"; break;
+#endif /* EINVAL */
+#ifdef ERANGE
+	case ERANGE:          result = "Math result not representable"; break;
+#endif /* ERANGE */
+#ifdef EILSEQ
+	case EILSEQ:          result = "Illegal byte sequence"; break;
+#endif /* EILSEQ */
+#ifdef EDEADLOCK
+	case EDEADLOCK:       result = "Resource deadlock would occur"; break;
+#endif /* EDEADLOCK */
+#ifdef EADDRINUSE
+	case EADDRINUSE:      result = "Address already in use"; break;
+#endif /* EADDRINUSE */
+#ifdef EADDRNOTAVAIL
+	case EADDRNOTAVAIL:   result = "Cannot assign requested address"; break;
+#endif /* EADDRNOTAVAIL */
+#ifdef EAFNOSUPPORT
+	case EAFNOSUPPORT:    result = "Address family not supported by protocol"; break;
+#endif /* EAFNOSUPPORT */
+#ifdef EALREADY
+	case EALREADY:        result = "Operation already in progress"; break;
+#endif /* EALREADY */
+#ifdef EBADMSG
+	case EBADMSG:         result = "Not a data message"; break;
+#endif /* EBADMSG */
+#ifdef ECANCELED
+	case ECANCELED:       result = "Operation Canceled"; break;
+#endif /* ECANCELED */
+#ifdef ECONNABORTED
+	case ECONNABORTED:    result = "Software caused connection abort"; break;
+#endif /* ECONNABORTED */
+#ifdef ECONNREFUSED
+	case ECONNREFUSED:    result = "Connection refused"; break;
+#endif /* ECONNREFUSED */
+#ifdef ECONNRESET
+	case ECONNRESET:      result = "Connection reset by peer"; break;
+#endif /* ECONNRESET */
+#ifdef EDESTADDRREQ
+	case EDESTADDRREQ:    result = "Destination address required"; break;
+#endif /* EDESTADDRREQ */
+#ifdef EHOSTUNREACH
+	case EHOSTUNREACH:    result = "No route to host"; break;
+#endif /* EHOSTUNREACH */
+#ifdef EIDRM
+	case EIDRM:           result = "Identifier removed"; break;
+#endif /* EIDRM */
+#ifdef EINPROGRESS
+	case EINPROGRESS:     result = "Operation now in progress"; break;
+#endif /* EINPROGRESS */
+#ifdef EISCONN
+	case EISCONN:         result = "Transport endpoint is already connected"; break;
+#endif /* EISCONN */
+#ifdef ELOOP
+	case ELOOP:           result = "Too many symbolic links encountered"; break;
+#endif /* ELOOP */
+#ifdef EMSGSIZE
+	case EMSGSIZE:        result = "Message too long"; break;
+#endif /* EMSGSIZE */
+#ifdef ENETDOWN
+	case ENETDOWN:        result = "Network is down"; break;
+#endif /* ENETDOWN */
+#ifdef ENETRESET
+	case ENETRESET:       result = "Network dropped connection because of reset"; break;
+#endif /* ENETRESET */
+#ifdef ENETUNREACH
+	case ENETUNREACH:     result = "Network is unreachable"; break;
+#endif /* ENETUNREACH */
+#ifdef ENOBUFS
+	case ENOBUFS:         result = "No buffer space available"; break;
+#endif /* ENOBUFS */
+#ifdef ENODATA
+	case ENODATA:         result = "No data available"; break;
+#endif /* ENODATA */
+#ifdef ENOLINK
+	case ENOLINK:         result = "Link has been severed"; break;
+#endif /* ENOLINK */
+#ifdef ENOMSG
+	case ENOMSG:          result = "No message of desired type"; break;
+#endif /* ENOMSG */
+#ifdef ENOPROTOOPT
+	case ENOPROTOOPT:     result = "Protocol not available"; break;
+#endif /* ENOPROTOOPT */
+#ifdef ENOSR
+	case ENOSR:           result = "Out of streams resources"; break;
+#endif /* ENOSR */
+#ifdef ENOSTR
+	case ENOSTR:          result = "Device not a stream"; break;
+#endif /* ENOSTR */
+#ifdef ENOTCONN
+	case ENOTCONN:        result = "Transport endpoint is not connected"; break;
+#endif /* ENOTCONN */
+#ifdef ENOTRECOVERABLE
+	case ENOTRECOVERABLE: result = "State not recoverable"; break;
+#endif /* ENOTRECOVERABLE */
+#ifdef ENOTSOCK
+	case ENOTSOCK:        result = "Socket operation on non-socket"; break;
+#endif /* ENOTSOCK */
+#ifdef ENOTSUP
+	case ENOTSUP:         result = "Not supported"; break;
+#endif /* ENOTSUP */
+#ifdef EOPNOTSUPP
+	case EOPNOTSUPP:      result = "Operation not supported on transport endpoint"; break;
+#endif /* EOPNOTSUPP */
+#ifdef EOTHER
+	case EOTHER:          result = "Other"; break;
+#endif /* EOTHER */
+#ifdef EOVERFLOW
+	case EOVERFLOW:       result = "Value too large for defined data type"; break;
+#endif /* EOVERFLOW */
+#ifdef EOWNERDEAD
+	case EOWNERDEAD:      result = "Owner died"; break;
+#endif /* EOWNERDEAD */
+#ifdef EPROTO
+	case EPROTO:          result = "Protocol error"; break;
+#endif /* EPROTO */
+#ifdef EPROTONOSUPPORT
+	case EPROTONOSUPPORT: result = "Protocol not supported"; break;
+#endif /* EPROTONOSUPPORT */
+#ifdef EPROTOTYPE
+	case EPROTOTYPE:      result = "Protocol wrong type for socket"; break;
+#endif /* EPROTOTYPE */
+#ifdef ETIME
+	case ETIME:           result = "Timer expired"; break;
+#endif /* ETIME */
+#ifdef ETIMEDOUT
+	case ETIMEDOUT:       result = "Connection timed out"; break;
+#endif /* ETIMEDOUT */
+#ifdef ETXTBSY
+	case ETXTBSY:         result = "Text file busy"; break;
+#endif /* ETXTBSY */
+#ifdef EFTYPE
+	case EFTYPE:          result = "Inappropriate file type or format"; break;
+#endif /* EFTYPE */
+#ifdef ENMFILE
+	case ENMFILE:         result = "No more files"; break;
+#endif /* ENMFILE */
+#ifdef EPFNOSUPPORT
+	case EPFNOSUPPORT:    result = "Protocol family not supported"; break;
+#endif /* EPFNOSUPPORT */
+#ifdef EHOSTDOWN
+	case EHOSTDOWN:       result = "Host is down"; break;
+#endif /* EHOSTDOWN */
+#ifdef ETOOMANYREFS
+	case ETOOMANYREFS:    result = "Too many references: cannot splice"; break;
+#endif /* ETOOMANYREFS */
+#ifdef EDQUOT
+	case EDQUOT:          result = "Quota exceeded"; break;
+#endif /* EDQUOT */
+#ifdef ESTALE
+	case ESTALE:          result = "Stale file handle"; break;
+#endif /* ESTALE */
+#ifdef ENOSHARE
+	case ENOSHARE:        result = "No such host or network path"; break;
+#endif /* ENOSHARE */
+#ifdef ECASECLASH
+	case ECASECLASH:      result = "Filename exists with different case"; break;
+#endif /* ECASECLASH */
+#ifdef ENOTBLK
+	case ENOTBLK:         result = "Block device required"; break;
+#endif /* ENOTBLK */
+#ifdef ECHRNG
+	case ECHRNG:          result = "Channel number out of range"; break;
+#endif /* ECHRNG */
+#ifdef EL2NSYNC
+	case EL2NSYNC:        result = "Level 2 not synchronized"; break;
+#endif /* EL2NSYNC */
+#ifdef EL3HLT
+	case EL3HLT:          result = "Level 3 halted"; break;
+#endif /* EL3HLT */
+#ifdef EL3RST
+	case EL3RST:          result = "Level 3 reset"; break;
+#endif /* EL3RST */
+#ifdef ELNRNG
+	case ELNRNG:          result = "Link number out of range"; break;
+#endif /* ELNRNG */
+#ifdef EUNATCH
+	case EUNATCH:         result = "Protocol driver not attached"; break;
+#endif /* EUNATCH */
+#ifdef ENOCSI
+	case ENOCSI:          result = "No CSI structure available"; break;
+#endif /* ENOCSI */
+#ifdef EL2HLT
+	case EL2HLT:          result = "Level 2 halted"; break;
+#endif /* EL2HLT */
+#ifdef EBADE
+	case EBADE:           result = "Invalid exchange"; break;
+#endif /* EBADE */
+#ifdef EBADR
+	case EBADR:           result = "Invalid request descriptor"; break;
+#endif /* EBADR */
+#ifdef EXFULL
+	case EXFULL:          result = "Exchange full"; break;
+#endif /* EXFULL */
+#ifdef ENOANO
+	case ENOANO:          result = "No anode"; break;
+#endif /* ENOANO */
+#ifdef EBADRQC
+	case EBADRQC:         result = "Invalid request code"; break;
+#endif /* EBADRQC */
+#ifdef EBADSLT
+	case EBADSLT:         result = "Invalid slot"; break;
+#endif /* EBADSLT */
+#ifdef EBFONT
+	case EBFONT:          result = "Bad font file fmt"; break;
+#endif /* EBFONT */
+#ifdef ENONET
+	case ENONET:          result = "Machine is not on the network"; break;
+#endif /* ENONET */
+#ifdef ENOPKG
+	case ENOPKG:          result = "Package not installed"; break;
+#endif /* ENOPKG */
+#ifdef EREMOTE
+	case EREMOTE:         result = "The object is remote"; break;
+#endif /* EREMOTE */
+#ifdef EADV
+	case EADV:            result = "Advertise error"; break;
+#endif /* EADV */
+#ifdef ESRMNT
+	case ESRMNT:          result = "Srmount error"; break;
+#endif /* ESRMNT */
+#ifdef ECOMM
+	case ECOMM:           result = "Communication error on send"; break;
+#endif /* ECOMM */
+#ifdef ELBIN
+	case ELBIN:           result = "Inode is remote (not really error)"; break;
+#endif /* ELBIN */
+#ifdef EDOTDOT
+	case EDOTDOT:         result = "Cross mount point (not really error)"; break;
+#endif /* EDOTDOT */
+#ifdef ENOTUNIQ
+	case ENOTUNIQ:        result = "Given log. name not unique"; break;
+#endif /* ENOTUNIQ */
+#ifdef EBADFD
+	case EBADFD:          result = "f.d. invalid for this operation"; break;
+#endif /* EBADFD */
+#ifdef EREMCHG
+	case EREMCHG:         result = "Remote address changed"; break;
+#endif /* EREMCHG */
+#ifdef ELIBACC
+	case ELIBACC:         result = "Can't access a needed shared lib"; break;
+#endif /* ELIBACC */
+#ifdef ELIBBAD
+	case ELIBBAD:         result = "Accessing a corrupted shared lib"; break;
+#endif /* ELIBBAD */
+#ifdef ELIBSCN
+	case ELIBSCN:         result = ".lib section in a.out corrupted"; break;
+#endif /* ELIBSCN */
+#ifdef ELIBMAX
+	case ELIBMAX:         result = "Attempting to link in too many libs"; break;
+#endif /* ELIBMAX */
+#ifdef ELIBEXEC
+	case ELIBEXEC:        result = "Attempting to exec a shared library"; break;
+#endif /* ELIBEXEC */
+#ifdef ESHUTDOWN
+	case ESHUTDOWN:       result = "Can't send after socket shutdown"; break;
+#endif /* ESHUTDOWN */
+#ifdef ESOCKTNOSUPPORT
+	case ESOCKTNOSUPPORT: result = "Socket type not supported"; break;
+#endif /* ESOCKTNOSUPPORT */
+#ifdef EPROCLIM
+	case EPROCLIM:        result = "Process limit reached"; break;
+#endif /* EPROCLIM */
+#ifdef EUSERS
+	case EUSERS:          result = "Too many users"; break;
+#endif /* EUSERS */
+#ifdef ENOMEDIUM
+	case ENOMEDIUM:       result = "No medium (in tape drive)"; break;
+#endif /* ENOMEDIUM */
+#ifdef ESTRPIPE
+	case ESTRPIPE:        result = "Streams pipe error"; break;
+#endif /* ESTRPIPE */
+#ifdef EMULTIHOP
+	case EMULTIHOP:       result = "Multihop attempted"; break;
+#endif /* EMULTIHOP */
+#ifdef ERESTART
+	case ERESTART:        result = "Interrupted system call should be restarted"; break;
+#endif /* ERESTART */
+#ifdef EUCLEAN
+	case EUCLEAN:         result = "Structure needs cleaning"; break;
+#endif /* EUCLEAN */
+#ifdef ENOTNAM
+	case ENOTNAM:         result = "Not a XENIX named type file"; break;
+#endif /* ENOTNAM */
+#ifdef ENAVAIL
+	case ENAVAIL:         result = "No XENIX semaphores available"; break;
+#endif /* ENAVAIL */
+#ifdef EISNAM
+	case EISNAM:          result = "Is a named type file"; break;
+#endif /* EISNAM */
+#ifdef EREMOTEIO
+	case EREMOTEIO:       result = "Remote I/O error"; break;
+#endif /* EREMOTEIO */
+#ifdef EMEDIUMTYPE
+	case EMEDIUMTYPE:     result = "Wrong medium type"; break;
+#endif /* EMEDIUMTYPE */
+#ifdef ENOKEY
+	case ENOKEY:          result = "Required key not available"; break;
+#endif /* ENOKEY */
+#ifdef EKEYEXPIRED
+	case EKEYEXPIRED:     result = "Key has expired"; break;
+#endif /* EKEYEXPIRED */
+#ifdef EKEYREVOKED
+	case EKEYREVOKED:     result = "Key has been revoked"; break;
+#endif /* EKEYREVOKED */
+#ifdef EKEYREJECTED
+	case EKEYREJECTED:    result = "Key was rejected by service"; break;
+#endif /* EKEYREJECTED */
+#ifdef ERFKILL
+	case ERFKILL:         result = "Operation not possible due to RF-kill"; break;
+#endif /* ERFKILL */
+#ifdef EHWPOISON
+	case EHWPOISON:       result = "Memory page has hardware error"; break;
+#endif /* EHWPOISON */
+#if defined(STRUNCATE) && (!defined(ERANGE) || STRUNCATE != ERANGE)
+	case STRUNCATE:       result = "Truncated"; break;
+#endif /* STRUNCATE && (!ERANGE || STRUNCATE != ERANGE) */
+#if defined(EWOULDBLOCK) && (!defined(EAGAIN) || EWOULDBLOCK != EAGAIN)
+	case EWOULDBLOCK:     result = "Operation would block"; break;
+#endif /* EWOULDBLOCK && (!EAGAIN || EWOULDBLOCK != EAGAIN) */
+#if defined(EDEADLK) && (!defined(EDEADLOCK) || EDEADLOCK != EDEADLK)
+	case EDEADLK:         result = "Resource deadlock would occur"; break;
+#endif /* EDEADLK && (!EDEADLOCK || EDEADLOCK != EDEADLK) */
 
 	default:
 		result = NULL;
@@ -3460,432 +3460,432 @@ strerrorname_s:(int errnum) -> char const * {
 	char const *result;
 	switch (errnum) {
 
-#ifdef @__EPERM@
-	case @__EPERM@:           result = "EPERM"; break;
-#endif /* __EPERM */
-#ifdef @__ENOENT@
-	case @__ENOENT@:          result = "ENOENT"; break;
-#endif /* __ENOENT */
-#ifdef @__ESRCH@
-	case @__ESRCH@:           result = "ESRCH"; break;
-#endif /* __ESRCH */
-#ifdef @__EINTR@
-	case @__EINTR@:           result = "EINTR"; break;
-#endif /* __EINTR */
-#ifdef @__EIO@
-	case @__EIO@:             result = "EIO"; break;
-#endif /* __EIO */
-#ifdef @__ENXIO@
-	case @__ENXIO@:           result = "ENXIO"; break;
-#endif /* __ENXIO */
-#ifdef @__E2BIG@
-	case @__E2BIG@:           result = "E2BIG"; break;
-#endif /* __E2BIG */
-#ifdef @__ENOEXEC@
-	case @__ENOEXEC@:         result = "ENOEXEC"; break;
-#endif /* __ENOEXEC */
-#ifdef @__EBADF@
-	case @__EBADF@:           result = "EBADF"; break;
-#endif /* __EBADF */
-#ifdef @__ECHILD@
-	case @__ECHILD@:          result = "ECHILD"; break;
-#endif /* __ECHILD */
-#ifdef @__EAGAIN@
-	case @__EAGAIN@:          result = "EAGAIN"; break;
-#endif /* __EAGAIN */
-#ifdef @__ENOMEM@
-	case @__ENOMEM@:          result = "ENOMEM"; break;
-#endif /* __ENOMEM */
-#ifdef @__EACCES@
-	case @__EACCES@:          result = "EACCES"; break;
-#endif /* __EACCES */
-#ifdef @__EFAULT@
-	case @__EFAULT@:          result = "EFAULT"; break;
-#endif /* __EFAULT */
-#ifdef @__EBUSY@
-	case @__EBUSY@:           result = "EBUSY"; break;
-#endif /* __EBUSY */
-#ifdef @__EEXIST@
-	case @__EEXIST@:          result = "EEXIST"; break;
-#endif /* __EEXIST */
-#ifdef @__EXDEV@
-	case @__EXDEV@:           result = "EXDEV"; break;
-#endif /* __EXDEV */
-#ifdef @__ENODEV@
-	case @__ENODEV@:          result = "ENODEV"; break;
-#endif /* __ENODEV */
-#ifdef @__ENOTDIR@
-	case @__ENOTDIR@:         result = "ENOTDIR"; break;
-#endif /* __ENOTDIR */
-#ifdef @__EISDIR@
-	case @__EISDIR@:          result = "EISDIR"; break;
-#endif /* __EISDIR */
-#ifdef @__ENFILE@
-	case @__ENFILE@:          result = "ENFILE"; break;
-#endif /* __ENFILE */
-#ifdef @__EMFILE@
-	case @__EMFILE@:          result = "EMFILE"; break;
-#endif /* __EMFILE */
-#ifdef @__ENOTTY@
-	case @__ENOTTY@:          result = "ENOTTY"; break;
-#endif /* __ENOTTY */
-#ifdef @__EFBIG@
-	case @__EFBIG@:           result = "EFBIG"; break;
-#endif /* __EFBIG */
-#ifdef @__ENOSPC@
-	case @__ENOSPC@:          result = "ENOSPC"; break;
-#endif /* __ENOSPC */
-#ifdef @__ESPIPE@
-	case @__ESPIPE@:          result = "ESPIPE"; break;
-#endif /* __ESPIPE */
-#ifdef @__EROFS@
-	case @__EROFS@:           result = "EROFS"; break;
-#endif /* __EROFS */
-#ifdef @__EMLINK@
-	case @__EMLINK@:          result = "EMLINK"; break;
-#endif /* __EMLINK */
-#ifdef @__EPIPE@
-	case @__EPIPE@:           result = "EPIPE"; break;
-#endif /* __EPIPE */
-#ifdef @__EDOM@
-	case @__EDOM@:            result = "EDOM"; break;
-#endif /* __EDOM */
-#ifdef @__ENAMETOOLONG@
-	case @__ENAMETOOLONG@:    result = "ENAMETOOLONG"; break;
-#endif /* __ENAMETOOLONG */
-#ifdef @__ENOLCK@
-	case @__ENOLCK@:          result = "ENOLCK"; break;
-#endif /* __ENOLCK */
-#ifdef @__ENOSYS@
-	case @__ENOSYS@:          result = "ENOSYS"; break;
-#endif /* __ENOSYS */
-#ifdef @__ENOTEMPTY@
-	case @__ENOTEMPTY@:       result = "ENOTEMPTY"; break;
-#endif /* __ENOTEMPTY */
-#ifdef @__EINVAL@
-	case @__EINVAL@:          result = "EINVAL"; break;
-#endif /* __EINVAL */
-#ifdef @__ERANGE@
-	case @__ERANGE@:          result = "ERANGE"; break;
-#endif /* __ERANGE */
-#ifdef @__EILSEQ@
-	case @__EILSEQ@:          result = "EILSEQ"; break;
-#endif /* __EILSEQ */
-#ifdef @__EDEADLOCK@
-	case @__EDEADLOCK@:       result = "EDEADLOCK"; break;
-#endif /* __EDEADLOCK */
-#ifdef @__EADDRINUSE@
-	case @__EADDRINUSE@:      result = "EADDRINUSE"; break;
-#endif /* __EADDRINUSE */
-#ifdef @__EADDRNOTAVAIL@
-	case @__EADDRNOTAVAIL@:   result = "EADDRNOTAVAIL"; break;
-#endif /* __EADDRNOTAVAIL */
-#ifdef @__EAFNOSUPPORT@
-	case @__EAFNOSUPPORT@:    result = "EAFNOSUPPORT"; break;
-#endif /* __EAFNOSUPPORT */
-#ifdef @__EALREADY@
-	case @__EALREADY@:        result = "EALREADY"; break;
-#endif /* __EALREADY */
-#ifdef @__EBADMSG@
-	case @__EBADMSG@:         result = "EBADMSG"; break;
-#endif /* __EBADMSG */
-#ifdef @__ECANCELED@
-	case @__ECANCELED@:       result = "ECANCELED"; break;
-#endif /* __ECANCELED */
-#ifdef @__ECONNABORTED@
-	case @__ECONNABORTED@:    result = "ECONNABORTED"; break;
-#endif /* __ECONNABORTED */
-#ifdef @__ECONNREFUSED@
-	case @__ECONNREFUSED@:    result = "ECONNREFUSED"; break;
-#endif /* __ECONNREFUSED */
-#ifdef @__ECONNRESET@
-	case @__ECONNRESET@:      result = "ECONNRESET"; break;
-#endif /* __ECONNRESET */
-#ifdef @__EDESTADDRREQ@
-	case @__EDESTADDRREQ@:    result = "EDESTADDRREQ"; break;
-#endif /* __EDESTADDRREQ */
-#ifdef @__EHOSTUNREACH@
-	case @__EHOSTUNREACH@:    result = "EHOSTUNREACH"; break;
-#endif /* __EHOSTUNREACH */
-#ifdef @__EIDRM@
-	case @__EIDRM@:           result = "EIDRM"; break;
-#endif /* __EIDRM */
-#ifdef @__EINPROGRESS@
-	case @__EINPROGRESS@:     result = "EINPROGRESS"; break;
-#endif /* __EINPROGRESS */
-#ifdef @__EISCONN@
-	case @__EISCONN@:         result = "EISCONN"; break;
-#endif /* __EISCONN */
-#ifdef @__ELOOP@
-	case @__ELOOP@:           result = "ELOOP"; break;
-#endif /* __ELOOP */
-#ifdef @__EMSGSIZE@
-	case @__EMSGSIZE@:        result = "EMSGSIZE"; break;
-#endif /* __EMSGSIZE */
-#ifdef @__ENETDOWN@
-	case @__ENETDOWN@:        result = "ENETDOWN"; break;
-#endif /* __ENETDOWN */
-#ifdef @__ENETRESET@
-	case @__ENETRESET@:       result = "ENETRESET"; break;
-#endif /* __ENETRESET */
-#ifdef @__ENETUNREACH@
-	case @__ENETUNREACH@:     result = "ENETUNREACH"; break;
-#endif /* __ENETUNREACH */
-#ifdef @__ENOBUFS@
-	case @__ENOBUFS@:         result = "ENOBUFS"; break;
-#endif /* __ENOBUFS */
-#ifdef @__ENODATA@
-	case @__ENODATA@:         result = "ENODATA"; break;
-#endif /* __ENODATA */
-#ifdef @__ENOLINK@
-	case @__ENOLINK@:         result = "ENOLINK"; break;
-#endif /* __ENOLINK */
-#ifdef @__ENOMSG@
-	case @__ENOMSG@:          result = "ENOMSG"; break;
-#endif /* __ENOMSG */
-#ifdef @__ENOPROTOOPT@
-	case @__ENOPROTOOPT@:     result = "ENOPROTOOPT"; break;
-#endif /* __ENOPROTOOPT */
-#ifdef @__ENOSR@
-	case @__ENOSR@:           result = "ENOSR"; break;
-#endif /* __ENOSR */
-#ifdef @__ENOSTR@
-	case @__ENOSTR@:          result = "ENOSTR"; break;
-#endif /* __ENOSTR */
-#ifdef @__ENOTCONN@
-	case @__ENOTCONN@:        result = "ENOTCONN"; break;
-#endif /* __ENOTCONN */
-#ifdef @__ENOTRECOVERABLE@
-	case @__ENOTRECOVERABLE@: result = "ENOTRECOVERABLE"; break;
-#endif /* __ENOTRECOVERABLE */
-#ifdef @__ENOTSOCK@
-	case @__ENOTSOCK@:        result = "ENOTSOCK"; break;
-#endif /* __ENOTSOCK */
-#ifdef @__ENOTSUP@
-	case @__ENOTSUP@:         result = "ENOTSUP"; break;
-#endif /* __ENOTSUP */
-#ifdef @__EOPNOTSUPP@
-	case @__EOPNOTSUPP@:      result = "EOPNOTSUPP"; break;
-#endif /* __EOPNOTSUPP */
-#ifdef @__EOTHER@
-	case @__EOTHER@:          result = "EOTHER"; break;
-#endif /* __EOTHER */
-#ifdef @__EOVERFLOW@
-	case @__EOVERFLOW@:       result = "EOVERFLOW"; break;
-#endif /* __EOVERFLOW */
-#ifdef @__EOWNERDEAD@
-	case @__EOWNERDEAD@:      result = "EOWNERDEAD"; break;
-#endif /* __EOWNERDEAD */
-#ifdef @__EPROTO@
-	case @__EPROTO@:          result = "EPROTO"; break;
-#endif /* __EPROTO */
-#ifdef @__EPROTONOSUPPORT@
-	case @__EPROTONOSUPPORT@: result = "EPROTONOSUPPORT"; break;
-#endif /* __EPROTONOSUPPORT */
-#ifdef @__EPROTOTYPE@
-	case @__EPROTOTYPE@:      result = "EPROTOTYPE"; break;
-#endif /* __EPROTOTYPE */
-#ifdef @__ETIME@
-	case @__ETIME@:           result = "ETIME"; break;
-#endif /* __ETIME */
-#ifdef @__ETIMEDOUT@
-	case @__ETIMEDOUT@:       result = "ETIMEDOUT"; break;
-#endif /* __ETIMEDOUT */
-#ifdef @__ETXTBSY@
-	case @__ETXTBSY@:         result = "ETXTBSY"; break;
-#endif /* __ETXTBSY */
-#ifdef @__EFTYPE@
-	case @__EFTYPE@:          result = "EFTYPE"; break;
-#endif /* __EFTYPE */
-#ifdef @__ENMFILE@
-	case @__ENMFILE@:         result = "ENMFILE"; break;
-#endif /* __ENMFILE */
-#ifdef @__EPFNOSUPPORT@
-	case @__EPFNOSUPPORT@:    result = "EPFNOSUPPORT"; break;
-#endif /* __EPFNOSUPPORT */
-#ifdef @__EHOSTDOWN@
-	case @__EHOSTDOWN@:       result = "EHOSTDOWN"; break;
-#endif /* __EHOSTDOWN */
-#ifdef @__ETOOMANYREFS@
-	case @__ETOOMANYREFS@:    result = "ETOOMANYREFS"; break;
-#endif /* __ETOOMANYREFS */
-#ifdef @__EDQUOT@
-	case @__EDQUOT@:          result = "EDQUOT"; break;
-#endif /* __EDQUOT */
-#ifdef @__ESTALE@
-	case @__ESTALE@:          result = "ESTALE"; break;
-#endif /* __ESTALE */
-#ifdef @__ENOSHARE@
-	case @__ENOSHARE@:        result = "ENOSHARE"; break;
-#endif /* __ENOSHARE */
-#ifdef @__ECASECLASH@
-	case @__ECASECLASH@:      result = "ECASECLASH"; break;
-#endif /* __ECASECLASH */
-#ifdef @__ENOTBLK@
-	case @__ENOTBLK@:         result = "ENOTBLK"; break;
-#endif /* __ENOTBLK */
-#ifdef @__ECHRNG@
-	case @__ECHRNG@:          result = "ECHRNG"; break;
-#endif /* __ECHRNG */
-#ifdef @__EL2NSYNC@
-	case @__EL2NSYNC@:        result = "EL2NSYNC"; break;
-#endif /* __EL2NSYNC */
-#ifdef @__EL3HLT@
-	case @__EL3HLT@:          result = "EL3HLT"; break;
-#endif /* __EL3HLT */
-#ifdef @__EL3RST@
-	case @__EL3RST@:          result = "EL3RST"; break;
-#endif /* __EL3RST */
-#ifdef @__ELNRNG@
-	case @__ELNRNG@:          result = "ELNRNG"; break;
-#endif /* __ELNRNG */
-#ifdef @__EUNATCH@
-	case @__EUNATCH@:         result = "EUNATCH"; break;
-#endif /* __EUNATCH */
-#ifdef @__ENOCSI@
-	case @__ENOCSI@:          result = "ENOCSI"; break;
-#endif /* __ENOCSI */
-#ifdef @__EL2HLT@
-	case @__EL2HLT@:          result = "EL2HLT"; break;
-#endif /* __EL2HLT */
-#ifdef @__EBADE@
-	case @__EBADE@:           result = "EBADE"; break;
-#endif /* __EBADE */
-#ifdef @__EBADR@
-	case @__EBADR@:           result = "EBADR"; break;
-#endif /* __EBADR */
-#ifdef @__EXFULL@
-	case @__EXFULL@:          result = "EXFULL"; break;
-#endif /* __EXFULL */
-#ifdef @__ENOANO@
-	case @__ENOANO@:          result = "ENOANO"; break;
-#endif /* __ENOANO */
-#ifdef @__EBADRQC@
-	case @__EBADRQC@:         result = "EBADRQC"; break;
-#endif /* __EBADRQC */
-#ifdef @__EBADSLT@
-	case @__EBADSLT@:         result = "EBADSLT"; break;
-#endif /* __EBADSLT */
-#ifdef @__EBFONT@
-	case @__EBFONT@:          result = "EBFONT"; break;
-#endif /* __EBFONT */
-#ifdef @__ENONET@
-	case @__ENONET@:          result = "ENONET"; break;
-#endif /* __ENONET */
-#ifdef @__ENOPKG@
-	case @__ENOPKG@:          result = "ENOPKG"; break;
-#endif /* __ENOPKG */
-#ifdef @__EREMOTE@
-	case @__EREMOTE@:         result = "EREMOTE"; break;
-#endif /* __EREMOTE */
-#ifdef @__EADV@
-	case @__EADV@:            result = "EADV"; break;
-#endif /* __EADV */
-#ifdef @__ESRMNT@
-	case @__ESRMNT@:          result = "ESRMNT"; break;
-#endif /* __ESRMNT */
-#ifdef @__ECOMM@
-	case @__ECOMM@:           result = "ECOMM"; break;
-#endif /* __ECOMM */
-#ifdef @__ELBIN@
-	case @__ELBIN@:           result = "ELBIN)"; break;
-#endif /* __ELBIN */
-#ifdef @__EDOTDOT@
-	case @__EDOTDOT@:         result = "EDOTDOT)"; break;
-#endif /* __EDOTDOT */
-#ifdef @__ENOTUNIQ@
-	case @__ENOTUNIQ@:        result = "ENOTUNIQ"; break;
-#endif /* __ENOTUNIQ */
-#ifdef @__EBADFD@
-	case @__EBADFD@:          result = "EBADFD"; break;
-#endif /* __EBADFD */
-#ifdef @__EREMCHG@
-	case @__EREMCHG@:         result = "EREMCHG"; break;
-#endif /* __EREMCHG */
-#ifdef @__ELIBACC@
-	case @__ELIBACC@:         result = "ELIBACC"; break;
-#endif /* __ELIBACC */
-#ifdef @__ELIBBAD@
-	case @__ELIBBAD@:         result = "ELIBBAD"; break;
-#endif /* __ELIBBAD */
-#ifdef @__ELIBSCN@
-	case @__ELIBSCN@:         result = "ELIBSCN"; break;
-#endif /* __ELIBSCN */
-#ifdef @__ELIBMAX@
-	case @__ELIBMAX@:         result = "ELIBMAX"; break;
-#endif /* __ELIBMAX */
-#ifdef @__ELIBEXEC@
-	case @__ELIBEXEC@:        result = "ELIBEXEC"; break;
-#endif /* __ELIBEXEC */
-#ifdef @__ESHUTDOWN@
-	case @__ESHUTDOWN@:       result = "ESHUTDOWN"; break;
-#endif /* __ESHUTDOWN */
-#ifdef @__ESOCKTNOSUPPORT@
-	case @__ESOCKTNOSUPPORT@: result = "ESOCKTNOSUPPORT"; break;
-#endif /* __ESOCKTNOSUPPORT */
-#ifdef @__EPROCLIM@
-	case @__EPROCLIM@:        result = "EPROCLIM"; break;
-#endif /* __EPROCLIM */
-#ifdef @__EUSERS@
-	case @__EUSERS@:          result = "EUSERS"; break;
-#endif /* __EUSERS */
-#ifdef @__ENOMEDIUM@
-	case @__ENOMEDIUM@:       result = "ENOMEDIUM)"; break;
-#endif /* __ENOMEDIUM */
-#ifdef @__ESTRPIPE@
-	case @__ESTRPIPE@:        result = "ESTRPIPE"; break;
-#endif /* __ESTRPIPE */
-#ifdef @__EMULTIHOP@
-	case @__EMULTIHOP@:       result = "EMULTIHOP"; break;
-#endif /* __EMULTIHOP */
-#ifdef @__ERESTART@
-	case @__ERESTART@:        result = "ERESTART"; break;
-#endif /* __ERESTART */
-#ifdef @__EUCLEAN@
-	case @__EUCLEAN@:         result = "EUCLEAN"; break;
-#endif /* __EUCLEAN */
-#ifdef @__ENOTNAM@
-	case @__ENOTNAM@:         result = "ENOTNAM"; break;
-#endif /* __ENOTNAM */
-#ifdef @__ENAVAIL@
-	case @__ENAVAIL@:         result = "ENAVAIL"; break;
-#endif /* __ENAVAIL */
-#ifdef @__EISNAM@
-	case @__EISNAM@:          result = "EISNAM"; break;
-#endif /* __EISNAM */
-#ifdef @__EREMOTEIO@
-	case @__EREMOTEIO@:       result = "EREMOTEIO"; break;
-#endif /* __EREMOTEIO */
-#ifdef @__EMEDIUMTYPE@
-	case @__EMEDIUMTYPE@:     result = "EMEDIUMTYPE"; break;
-#endif /* __EMEDIUMTYPE */
-#ifdef @__ENOKEY@
-	case @__ENOKEY@:          result = "ENOKEY"; break;
-#endif /* __ENOKEY */
-#ifdef @__EKEYEXPIRED@
-	case @__EKEYEXPIRED@:     result = "EKEYEXPIRED"; break;
-#endif /* __EKEYEXPIRED */
-#ifdef @__EKEYREVOKED@
-	case @__EKEYREVOKED@:     result = "EKEYREVOKED"; break;
-#endif /* __EKEYREVOKED */
-#ifdef @__EKEYREJECTED@
-	case @__EKEYREJECTED@:    result = "EKEYREJECTED"; break;
-#endif /* __EKEYREJECTED */
-#ifdef @__ERFKILL@
-	case @__ERFKILL@:         result = "ERFKILL"; break;
-#endif /* __ERFKILL */
-#ifdef @__EHWPOISON@
-	case @__EHWPOISON@:       result = "EHWPOISON"; break;
-#endif /* __EHWPOISON */
-#if defined(@__STRUNCATE@) && (!defined(@__ERANGE@) || @__STRUNCATE@ != @__ERANGE@)
-	case @__STRUNCATE@:       result = "STRUNCATE"; break;
-#endif /* __STRUNCATE && (!__ERANGE || __STRUNCATE != __ERANGE) */
-#if defined(@__EWOULDBLOCK@) && (!defined(@__EAGAIN@) || @__EWOULDBLOCK@ != @__EAGAIN@)
-	case @__EWOULDBLOCK@:     result = "EWOULDBLOCK"; break;
-#endif /* __EWOULDBLOCK && (!__EAGAIN || __EWOULDBLOCK != __EAGAIN) */
-#if defined(@__EDEADLK@) && (!defined(@__EDEADLOCK@) || @__EDEADLOCK@ != @__EDEADLK@)
-	case @__EDEADLK@:         result = "EDEADLK"; break;
-#endif /* __EDEADLK && (!__EDEADLOCK || __EDEADLOCK != __EDEADLK) */
+#ifdef EPERM
+	case EPERM:           result = "EPERM"; break;
+#endif /* EPERM */
+#ifdef ENOENT
+	case ENOENT:          result = "ENOENT"; break;
+#endif /* ENOENT */
+#ifdef ESRCH
+	case ESRCH:           result = "ESRCH"; break;
+#endif /* ESRCH */
+#ifdef EINTR
+	case EINTR:           result = "EINTR"; break;
+#endif /* EINTR */
+#ifdef EIO
+	case EIO:             result = "EIO"; break;
+#endif /* EIO */
+#ifdef ENXIO
+	case ENXIO:           result = "ENXIO"; break;
+#endif /* ENXIO */
+#ifdef E2BIG
+	case E2BIG:           result = "E2BIG"; break;
+#endif /* E2BIG */
+#ifdef ENOEXEC
+	case ENOEXEC:         result = "ENOEXEC"; break;
+#endif /* ENOEXEC */
+#ifdef EBADF
+	case EBADF:           result = "EBADF"; break;
+#endif /* EBADF */
+#ifdef ECHILD
+	case ECHILD:          result = "ECHILD"; break;
+#endif /* ECHILD */
+#ifdef EAGAIN
+	case EAGAIN:          result = "EAGAIN"; break;
+#endif /* EAGAIN */
+#ifdef ENOMEM
+	case ENOMEM:          result = "ENOMEM"; break;
+#endif /* ENOMEM */
+#ifdef EACCES
+	case EACCES:          result = "EACCES"; break;
+#endif /* EACCES */
+#ifdef EFAULT
+	case EFAULT:          result = "EFAULT"; break;
+#endif /* EFAULT */
+#ifdef EBUSY
+	case EBUSY:           result = "EBUSY"; break;
+#endif /* EBUSY */
+#ifdef EEXIST
+	case EEXIST:          result = "EEXIST"; break;
+#endif /* EEXIST */
+#ifdef EXDEV
+	case EXDEV:           result = "EXDEV"; break;
+#endif /* EXDEV */
+#ifdef ENODEV
+	case ENODEV:          result = "ENODEV"; break;
+#endif /* ENODEV */
+#ifdef ENOTDIR
+	case ENOTDIR:         result = "ENOTDIR"; break;
+#endif /* ENOTDIR */
+#ifdef EISDIR
+	case EISDIR:          result = "EISDIR"; break;
+#endif /* EISDIR */
+#ifdef ENFILE
+	case ENFILE:          result = "ENFILE"; break;
+#endif /* ENFILE */
+#ifdef EMFILE
+	case EMFILE:          result = "EMFILE"; break;
+#endif /* EMFILE */
+#ifdef ENOTTY
+	case ENOTTY:          result = "ENOTTY"; break;
+#endif /* ENOTTY */
+#ifdef EFBIG
+	case EFBIG:           result = "EFBIG"; break;
+#endif /* EFBIG */
+#ifdef ENOSPC
+	case ENOSPC:          result = "ENOSPC"; break;
+#endif /* ENOSPC */
+#ifdef ESPIPE
+	case ESPIPE:          result = "ESPIPE"; break;
+#endif /* ESPIPE */
+#ifdef EROFS
+	case EROFS:           result = "EROFS"; break;
+#endif /* EROFS */
+#ifdef EMLINK
+	case EMLINK:          result = "EMLINK"; break;
+#endif /* EMLINK */
+#ifdef EPIPE
+	case EPIPE:           result = "EPIPE"; break;
+#endif /* EPIPE */
+#ifdef EDOM
+	case EDOM:            result = "EDOM"; break;
+#endif /* EDOM */
+#ifdef ENAMETOOLONG
+	case ENAMETOOLONG:    result = "ENAMETOOLONG"; break;
+#endif /* ENAMETOOLONG */
+#ifdef ENOLCK
+	case ENOLCK:          result = "ENOLCK"; break;
+#endif /* ENOLCK */
+#ifdef ENOSYS
+	case ENOSYS:          result = "ENOSYS"; break;
+#endif /* ENOSYS */
+#ifdef ENOTEMPTY
+	case ENOTEMPTY:       result = "ENOTEMPTY"; break;
+#endif /* ENOTEMPTY */
+#ifdef EINVAL
+	case EINVAL:          result = "EINVAL"; break;
+#endif /* EINVAL */
+#ifdef ERANGE
+	case ERANGE:          result = "ERANGE"; break;
+#endif /* ERANGE */
+#ifdef EILSEQ
+	case EILSEQ:          result = "EILSEQ"; break;
+#endif /* EILSEQ */
+#ifdef EDEADLOCK
+	case EDEADLOCK:       result = "EDEADLOCK"; break;
+#endif /* EDEADLOCK */
+#ifdef EADDRINUSE
+	case EADDRINUSE:      result = "EADDRINUSE"; break;
+#endif /* EADDRINUSE */
+#ifdef EADDRNOTAVAIL
+	case EADDRNOTAVAIL:   result = "EADDRNOTAVAIL"; break;
+#endif /* EADDRNOTAVAIL */
+#ifdef EAFNOSUPPORT
+	case EAFNOSUPPORT:    result = "EAFNOSUPPORT"; break;
+#endif /* EAFNOSUPPORT */
+#ifdef EALREADY
+	case EALREADY:        result = "EALREADY"; break;
+#endif /* EALREADY */
+#ifdef EBADMSG
+	case EBADMSG:         result = "EBADMSG"; break;
+#endif /* EBADMSG */
+#ifdef ECANCELED
+	case ECANCELED:       result = "ECANCELED"; break;
+#endif /* ECANCELED */
+#ifdef ECONNABORTED
+	case ECONNABORTED:    result = "ECONNABORTED"; break;
+#endif /* ECONNABORTED */
+#ifdef ECONNREFUSED
+	case ECONNREFUSED:    result = "ECONNREFUSED"; break;
+#endif /* ECONNREFUSED */
+#ifdef ECONNRESET
+	case ECONNRESET:      result = "ECONNRESET"; break;
+#endif /* ECONNRESET */
+#ifdef EDESTADDRREQ
+	case EDESTADDRREQ:    result = "EDESTADDRREQ"; break;
+#endif /* EDESTADDRREQ */
+#ifdef EHOSTUNREACH
+	case EHOSTUNREACH:    result = "EHOSTUNREACH"; break;
+#endif /* EHOSTUNREACH */
+#ifdef EIDRM
+	case EIDRM:           result = "EIDRM"; break;
+#endif /* EIDRM */
+#ifdef EINPROGRESS
+	case EINPROGRESS:     result = "EINPROGRESS"; break;
+#endif /* EINPROGRESS */
+#ifdef EISCONN
+	case EISCONN:         result = "EISCONN"; break;
+#endif /* EISCONN */
+#ifdef ELOOP
+	case ELOOP:           result = "ELOOP"; break;
+#endif /* ELOOP */
+#ifdef EMSGSIZE
+	case EMSGSIZE:        result = "EMSGSIZE"; break;
+#endif /* EMSGSIZE */
+#ifdef ENETDOWN
+	case ENETDOWN:        result = "ENETDOWN"; break;
+#endif /* ENETDOWN */
+#ifdef ENETRESET
+	case ENETRESET:       result = "ENETRESET"; break;
+#endif /* ENETRESET */
+#ifdef ENETUNREACH
+	case ENETUNREACH:     result = "ENETUNREACH"; break;
+#endif /* ENETUNREACH */
+#ifdef ENOBUFS
+	case ENOBUFS:         result = "ENOBUFS"; break;
+#endif /* ENOBUFS */
+#ifdef ENODATA
+	case ENODATA:         result = "ENODATA"; break;
+#endif /* ENODATA */
+#ifdef ENOLINK
+	case ENOLINK:         result = "ENOLINK"; break;
+#endif /* ENOLINK */
+#ifdef ENOMSG
+	case ENOMSG:          result = "ENOMSG"; break;
+#endif /* ENOMSG */
+#ifdef ENOPROTOOPT
+	case ENOPROTOOPT:     result = "ENOPROTOOPT"; break;
+#endif /* ENOPROTOOPT */
+#ifdef ENOSR
+	case ENOSR:           result = "ENOSR"; break;
+#endif /* ENOSR */
+#ifdef ENOSTR
+	case ENOSTR:          result = "ENOSTR"; break;
+#endif /* ENOSTR */
+#ifdef ENOTCONN
+	case ENOTCONN:        result = "ENOTCONN"; break;
+#endif /* ENOTCONN */
+#ifdef ENOTRECOVERABLE
+	case ENOTRECOVERABLE: result = "ENOTRECOVERABLE"; break;
+#endif /* ENOTRECOVERABLE */
+#ifdef ENOTSOCK
+	case ENOTSOCK:        result = "ENOTSOCK"; break;
+#endif /* ENOTSOCK */
+#ifdef ENOTSUP
+	case ENOTSUP:         result = "ENOTSUP"; break;
+#endif /* ENOTSUP */
+#ifdef EOPNOTSUPP
+	case EOPNOTSUPP:      result = "EOPNOTSUPP"; break;
+#endif /* EOPNOTSUPP */
+#ifdef EOTHER
+	case EOTHER:          result = "EOTHER"; break;
+#endif /* EOTHER */
+#ifdef EOVERFLOW
+	case EOVERFLOW:       result = "EOVERFLOW"; break;
+#endif /* EOVERFLOW */
+#ifdef EOWNERDEAD
+	case EOWNERDEAD:      result = "EOWNERDEAD"; break;
+#endif /* EOWNERDEAD */
+#ifdef EPROTO
+	case EPROTO:          result = "EPROTO"; break;
+#endif /* EPROTO */
+#ifdef EPROTONOSUPPORT
+	case EPROTONOSUPPORT: result = "EPROTONOSUPPORT"; break;
+#endif /* EPROTONOSUPPORT */
+#ifdef EPROTOTYPE
+	case EPROTOTYPE:      result = "EPROTOTYPE"; break;
+#endif /* EPROTOTYPE */
+#ifdef ETIME
+	case ETIME:           result = "ETIME"; break;
+#endif /* ETIME */
+#ifdef ETIMEDOUT
+	case ETIMEDOUT:       result = "ETIMEDOUT"; break;
+#endif /* ETIMEDOUT */
+#ifdef ETXTBSY
+	case ETXTBSY:         result = "ETXTBSY"; break;
+#endif /* ETXTBSY */
+#ifdef EFTYPE
+	case EFTYPE:          result = "EFTYPE"; break;
+#endif /* EFTYPE */
+#ifdef ENMFILE
+	case ENMFILE:         result = "ENMFILE"; break;
+#endif /* ENMFILE */
+#ifdef EPFNOSUPPORT
+	case EPFNOSUPPORT:    result = "EPFNOSUPPORT"; break;
+#endif /* EPFNOSUPPORT */
+#ifdef EHOSTDOWN
+	case EHOSTDOWN:       result = "EHOSTDOWN"; break;
+#endif /* EHOSTDOWN */
+#ifdef ETOOMANYREFS
+	case ETOOMANYREFS:    result = "ETOOMANYREFS"; break;
+#endif /* ETOOMANYREFS */
+#ifdef EDQUOT
+	case EDQUOT:          result = "EDQUOT"; break;
+#endif /* EDQUOT */
+#ifdef ESTALE
+	case ESTALE:          result = "ESTALE"; break;
+#endif /* ESTALE */
+#ifdef ENOSHARE
+	case ENOSHARE:        result = "ENOSHARE"; break;
+#endif /* ENOSHARE */
+#ifdef ECASECLASH
+	case ECASECLASH:      result = "ECASECLASH"; break;
+#endif /* ECASECLASH */
+#ifdef ENOTBLK
+	case ENOTBLK:         result = "ENOTBLK"; break;
+#endif /* ENOTBLK */
+#ifdef ECHRNG
+	case ECHRNG:          result = "ECHRNG"; break;
+#endif /* ECHRNG */
+#ifdef EL2NSYNC
+	case EL2NSYNC:        result = "EL2NSYNC"; break;
+#endif /* EL2NSYNC */
+#ifdef EL3HLT
+	case EL3HLT:          result = "EL3HLT"; break;
+#endif /* EL3HLT */
+#ifdef EL3RST
+	case EL3RST:          result = "EL3RST"; break;
+#endif /* EL3RST */
+#ifdef ELNRNG
+	case ELNRNG:          result = "ELNRNG"; break;
+#endif /* ELNRNG */
+#ifdef EUNATCH
+	case EUNATCH:         result = "EUNATCH"; break;
+#endif /* EUNATCH */
+#ifdef ENOCSI
+	case ENOCSI:          result = "ENOCSI"; break;
+#endif /* ENOCSI */
+#ifdef EL2HLT
+	case EL2HLT:          result = "EL2HLT"; break;
+#endif /* EL2HLT */
+#ifdef EBADE
+	case EBADE:           result = "EBADE"; break;
+#endif /* EBADE */
+#ifdef EBADR
+	case EBADR:           result = "EBADR"; break;
+#endif /* EBADR */
+#ifdef EXFULL
+	case EXFULL:          result = "EXFULL"; break;
+#endif /* EXFULL */
+#ifdef ENOANO
+	case ENOANO:          result = "ENOANO"; break;
+#endif /* ENOANO */
+#ifdef EBADRQC
+	case EBADRQC:         result = "EBADRQC"; break;
+#endif /* EBADRQC */
+#ifdef EBADSLT
+	case EBADSLT:         result = "EBADSLT"; break;
+#endif /* EBADSLT */
+#ifdef EBFONT
+	case EBFONT:          result = "EBFONT"; break;
+#endif /* EBFONT */
+#ifdef ENONET
+	case ENONET:          result = "ENONET"; break;
+#endif /* ENONET */
+#ifdef ENOPKG
+	case ENOPKG:          result = "ENOPKG"; break;
+#endif /* ENOPKG */
+#ifdef EREMOTE
+	case EREMOTE:         result = "EREMOTE"; break;
+#endif /* EREMOTE */
+#ifdef EADV
+	case EADV:            result = "EADV"; break;
+#endif /* EADV */
+#ifdef ESRMNT
+	case ESRMNT:          result = "ESRMNT"; break;
+#endif /* ESRMNT */
+#ifdef ECOMM
+	case ECOMM:           result = "ECOMM"; break;
+#endif /* ECOMM */
+#ifdef ELBIN
+	case ELBIN:           result = "ELBIN)"; break;
+#endif /* ELBIN */
+#ifdef EDOTDOT
+	case EDOTDOT:         result = "EDOTDOT)"; break;
+#endif /* EDOTDOT */
+#ifdef ENOTUNIQ
+	case ENOTUNIQ:        result = "ENOTUNIQ"; break;
+#endif /* ENOTUNIQ */
+#ifdef EBADFD
+	case EBADFD:          result = "EBADFD"; break;
+#endif /* EBADFD */
+#ifdef EREMCHG
+	case EREMCHG:         result = "EREMCHG"; break;
+#endif /* EREMCHG */
+#ifdef ELIBACC
+	case ELIBACC:         result = "ELIBACC"; break;
+#endif /* ELIBACC */
+#ifdef ELIBBAD
+	case ELIBBAD:         result = "ELIBBAD"; break;
+#endif /* ELIBBAD */
+#ifdef ELIBSCN
+	case ELIBSCN:         result = "ELIBSCN"; break;
+#endif /* ELIBSCN */
+#ifdef ELIBMAX
+	case ELIBMAX:         result = "ELIBMAX"; break;
+#endif /* ELIBMAX */
+#ifdef ELIBEXEC
+	case ELIBEXEC:        result = "ELIBEXEC"; break;
+#endif /* ELIBEXEC */
+#ifdef ESHUTDOWN
+	case ESHUTDOWN:       result = "ESHUTDOWN"; break;
+#endif /* ESHUTDOWN */
+#ifdef ESOCKTNOSUPPORT
+	case ESOCKTNOSUPPORT: result = "ESOCKTNOSUPPORT"; break;
+#endif /* ESOCKTNOSUPPORT */
+#ifdef EPROCLIM
+	case EPROCLIM:        result = "EPROCLIM"; break;
+#endif /* EPROCLIM */
+#ifdef EUSERS
+	case EUSERS:          result = "EUSERS"; break;
+#endif /* EUSERS */
+#ifdef ENOMEDIUM
+	case ENOMEDIUM:       result = "ENOMEDIUM)"; break;
+#endif /* ENOMEDIUM */
+#ifdef ESTRPIPE
+	case ESTRPIPE:        result = "ESTRPIPE"; break;
+#endif /* ESTRPIPE */
+#ifdef EMULTIHOP
+	case EMULTIHOP:       result = "EMULTIHOP"; break;
+#endif /* EMULTIHOP */
+#ifdef ERESTART
+	case ERESTART:        result = "ERESTART"; break;
+#endif /* ERESTART */
+#ifdef EUCLEAN
+	case EUCLEAN:         result = "EUCLEAN"; break;
+#endif /* EUCLEAN */
+#ifdef ENOTNAM
+	case ENOTNAM:         result = "ENOTNAM"; break;
+#endif /* ENOTNAM */
+#ifdef ENAVAIL
+	case ENAVAIL:         result = "ENAVAIL"; break;
+#endif /* ENAVAIL */
+#ifdef EISNAM
+	case EISNAM:          result = "EISNAM"; break;
+#endif /* EISNAM */
+#ifdef EREMOTEIO
+	case EREMOTEIO:       result = "EREMOTEIO"; break;
+#endif /* EREMOTEIO */
+#ifdef EMEDIUMTYPE
+	case EMEDIUMTYPE:     result = "EMEDIUMTYPE"; break;
+#endif /* EMEDIUMTYPE */
+#ifdef ENOKEY
+	case ENOKEY:          result = "ENOKEY"; break;
+#endif /* ENOKEY */
+#ifdef EKEYEXPIRED
+	case EKEYEXPIRED:     result = "EKEYEXPIRED"; break;
+#endif /* EKEYEXPIRED */
+#ifdef EKEYREVOKED
+	case EKEYREVOKED:     result = "EKEYREVOKED"; break;
+#endif /* EKEYREVOKED */
+#ifdef EKEYREJECTED
+	case EKEYREJECTED:    result = "EKEYREJECTED"; break;
+#endif /* EKEYREJECTED */
+#ifdef ERFKILL
+	case ERFKILL:         result = "ERFKILL"; break;
+#endif /* ERFKILL */
+#ifdef EHWPOISON
+	case EHWPOISON:       result = "EHWPOISON"; break;
+#endif /* EHWPOISON */
+#if defined(STRUNCATE) && (!defined(ERANGE) || STRUNCATE != ERANGE)
+	case STRUNCATE:       result = "STRUNCATE"; break;
+#endif /* STRUNCATE && (!ERANGE || STRUNCATE != ERANGE) */
+#if defined(EWOULDBLOCK) && (!defined(EAGAIN) || EWOULDBLOCK != EAGAIN)
+	case EWOULDBLOCK:     result = "EWOULDBLOCK"; break;
+#endif /* EWOULDBLOCK && (!EAGAIN || EWOULDBLOCK != EAGAIN) */
+#if defined(EDEADLK) && (!defined(EDEADLOCK) || EDEADLOCK != EDEADLK)
+	case EDEADLK:         result = "EDEADLK"; break;
+#endif /* EDEADLK && (!EDEADLOCK || EDEADLOCK != EDEADLK) */
 
 	default:
 		result = NULL;

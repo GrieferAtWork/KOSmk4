@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa138a706 */
+/* HASH CRC-32:0xbcb7285d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_vasprintf_defined
-#if (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_aprintf_pack)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_format_aprintf_printer)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
+#if (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_format_aprintf_printer)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
 #define __local_vasprintf_defined 1
 #include <__crt.h>
 #include <kos/anno.h>
@@ -260,7 +260,7 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallp
  *                  printed to the aprintf-printer at one point.
  *                  (e.g. `format_aprintf_printer(&my_printer, "\0", 1)') */
 __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_format_aprintf_pack,(struct format_aprintf_data *__restrict __self, __SIZE_TYPE__ *__pstrlen),format_aprintf_pack,(__self,__pstrlen))
-#elif defined(__CRT_HAVE_realloc)
+#else /* LIBC: format_aprintf_pack */
 #include <local/format-printer/format_aprintf_pack.h>
 /* Pack and finalize a given aprintf format printer
  * Together with `format_aprintf_printer()', the aprintf
@@ -283,8 +283,6 @@ __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONN
  *                  printed to the aprintf-printer at one point.
  *                  (e.g. `format_aprintf_printer(&my_printer, "\0", 1)') */
 #define __localdep_format_aprintf_pack (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_aprintf_pack))
-#else /* CUSTOM: format_aprintf_pack */
-#undef ____localdep_format_aprintf_pack_defined
 #endif /* format_aprintf_pack... */
 #endif /* !____localdep_format_aprintf_pack_defined */
 
@@ -311,7 +309,7 @@ __LOCAL_LIBC(vasprintf) __ATTR_WUNUSED __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(vasprintf))(char **__restrict __pstr,
                                                        char const *__restrict __format,
                                                        __builtin_va_list __args) {
-#line 1738 "kos/src/libc/magic/stdio.c"
+#line 1740 "kos/src/libc/magic/stdio.c"
 	char *__result;
 	__SSIZE_TYPE__ __error;
 	struct format_aprintf_data __data;
@@ -331,5 +329,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(vasprintf))(char **__restrict __pstr,
 	return (__STDC_INT_AS_SSIZE_T)__error;
 }
 __NAMESPACE_LOCAL_END
-#endif /* (__CRT_HAVE_realloc || __CRT_HAVE_format_aprintf_pack) && (__CRT_HAVE_realloc || __CRT_HAVE_format_aprintf_alloc || __CRT_HAVE_format_aprintf_printer) && (__CRT_HAVE_free || __CRT_HAVE_cfree) */
+#endif /* (__CRT_HAVE_realloc || __CRT_HAVE_format_aprintf_alloc || __CRT_HAVE_format_aprintf_printer) && (__CRT_HAVE_free || __CRT_HAVE_cfree) */
 #endif /* !__local_vasprintf_defined */

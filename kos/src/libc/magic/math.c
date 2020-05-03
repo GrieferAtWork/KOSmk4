@@ -359,10 +359,10 @@ ldexp:(double x, int exponent) -> double {
 #else /* ... */
 	result = (double)__ieee854_ldexpl((__IEEE854_LONG_DOUBLE_TYPE__)x, exponent);
 #endif /* !... */
-#ifdef @__ERANGE@
+#ifdef ERANGE
 	if unlikely(!__LIBM_MATHFUN(@finite@, result) || result == 0.0)
-		__libc_seterrno(@__ERANGE@);
-#endif /* __ERANGE */
+		__libc_seterrno(ERANGE);
+#endif /* ERANGE */
 	return result;
 }
 

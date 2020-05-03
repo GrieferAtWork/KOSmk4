@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf51fc0d */
+/* HASH CRC-32:0xb1151a1e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,10 +30,13 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
-#include <bits/types.h>
-#include <bits/format-printer.h>
-#include <libc/malloc.h>
+
 #include <hybrid/__assert.h>
+
+#include <bits/format-printer.h>
+#include <bits/types.h>
+
+#include <libc/malloc.h>
 
 
 #ifdef __CC__
@@ -761,7 +764,7 @@ struct format_aprintf_data {
  *                  printed to the aprintf-printer at one point.
  *                  (e.g. `format_aprintf_printer(&my_printer, "\0", 1)') */
 __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,format_aprintf_pack,(struct format_aprintf_data *__restrict __self, __SIZE_TYPE__ *__pstrlen),(__self,__pstrlen))
-#elif defined(__CRT_HAVE_realloc)
+#else /* LIBC: format_aprintf_pack */
 #include <local/format-printer/format_aprintf_pack.h>
 /* Pack and finalize a given aprintf format printer
  * Together with `format_aprintf_printer()', the aprintf

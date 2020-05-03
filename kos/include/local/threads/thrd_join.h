@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8643b521 */
+/* HASH CRC-32:0x900f83c6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,7 @@
 #include <hybrid/typecore.h>
 
 #include <bits/threads.h>
+#include <asm/threads.h>
 /* Dependency: "pthread_join" */
 #ifndef ____localdep_pthread_join_defined
 #define ____localdep_pthread_join_defined 1
@@ -46,7 +47,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(thrd_join) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(thrd_join))(__thrd_t __thr,
                                                        int *__res) {
-#line 244 "kos/src/libc/magic/threads.c"
+#line 261 "kos/src/libc/magic/threads.c"
 	int __error;
 #if __SIZEOF_POINTER__ != __SIZEOF_INT__
 	void *__resptr;
@@ -54,14 +55,14 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(thrd_join))(__thrd_t __thr,
 	if __likely(!__error) {
 		if (__res)
 			*__res = (int)(unsigned int)(__UINTPTR_TYPE__)__resptr;
-		return 0; /* thrd_success */
+		return __thrd_success;
 	}
 #else /* __SIZEOF_POINTER__ != __SIZEOF_INT__ */
 	__error = __localdep_pthread_join((__pthread_t)__thr, (void **)__res);
 	if __likely(!__error)
-		return 0; /* thrd_success */
+		return __thrd_success;
 #endif /* __SIZEOF_POINTER__ == __SIZEOF_INT__ */
-	return 2; /* thrd_error */
+	return __thrd_error;
 }
 __NAMESPACE_LOCAL_END
 #endif /* __CRT_HAVE_pthread_join */

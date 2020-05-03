@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6bd3751e */
+/* HASH CRC-32:0xdbfc9620 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -108,32 +108,32 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pread64))(__fd_t __fd,
                                                      void *__buf,
                                                      __SIZE_TYPE__ __bufsize,
                                                      __PIO_OFFSET64 __offset) {
-#line 960 "kos/src/libc/magic/unistd.c"
+#line 969 "kos/src/libc/magic/unistd.c"
 #if defined(__CRT_HAVE_pread) && ((!defined(__CRT_HAVE__lseeki64) && !defined(__CRT_HAVE_lseek64)) || (!defined(__CRT_HAVE_read) && !defined(__CRT_HAVE__read)))
 	return __localdep_pread32(__fd, __buf, __bufsize, (__pos32_t)__offset);
 #elif defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek64)
 	/* It may not be quick, and it may not be SMP-safe, but it'll still do the job! */
 	__off64_t __oldpos;
 	__SSIZE_TYPE__ __result;
-	__oldpos = __localdep_lseek64(__fd, 0, 1);
+	__oldpos = __localdep_lseek64(__fd, 0, __SEEK_CUR);
 	if __unlikely(__oldpos < 0)
 		return -1;
-	if __unlikely(__localdep_lseek64(__fd, (__off64_t)__offset, 0) < 0)
+	if __unlikely(__localdep_lseek64(__fd, (__off64_t)__offset, __SEEK_SET) < 0)
 		return -1;
 	__result = __localdep_read(__fd, __buf, __bufsize);
-	__localdep_lseek64(__fd, __oldpos, 0);
+	__localdep_lseek64(__fd, __oldpos, __SEEK_SET);
 	return __result;
 #else
 	/* It may not be quick, and it may not be SMP-safe, but it'll still do the job! */
 	__off32_t __oldpos;
 	__SSIZE_TYPE__ __result;
-	__oldpos = __localdep_lseek32(__fd, 0, 1);
+	__oldpos = __localdep_lseek32(__fd, 0, __SEEK_CUR);
 	if __unlikely(__oldpos < 0)
 		return -1;
-	if __unlikely(__localdep_lseek32(__fd, (__off32_t)__offset, 0) < 0)
+	if __unlikely(__localdep_lseek32(__fd, (__off32_t)__offset, __SEEK_SET) < 0)
 		return -1;
 	__result = __localdep_read(__fd, __buf, __bufsize);
-	__localdep_lseek32(__fd, __oldpos, 0);
+	__localdep_lseek32(__fd, __oldpos, __SEEK_SET);
 	return __result;
 #endif
 }

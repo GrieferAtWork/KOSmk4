@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x90bf471f */
+/* HASH CRC-32:0xb023d56e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 #include <__crt.h>
 #include <kos/anno.h>
 #include <bits/format-printer.h>
+#include <asm/stdio.h>
 /* Dependency: "format_vscanf" from "format-printer" */
 #ifndef ____localdep_format_vscanf_defined
 #define ____localdep_format_vscanf_defined 1
@@ -112,25 +113,20 @@ __CREDIRECT(__ATTR_NONNULL((1)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode
 
 __NAMESPACE_LOCAL_BEGIN
 #include <hybrid/typecore.h>
-#ifndef __EOF
-#ifdef EOF
-#define __EOF  EOF
-#else /* EOF */
-#define __EOF (-1)
-#endif /* !EOF */
-#endif /* !__EOF */
 struct __vsnscanf_data {
 	char const *__ptr;
 	char const *__end;
 };
-__LOCAL_LIBC(vsnscanf_getc) __SSIZE_TYPE__ (__LIBCCALL __vsnscanf_getc)(void *__arg) {
+__LOCAL_LIBC(vsnscanf_getc) __SSIZE_TYPE__
+(__LIBCCALL __vsnscanf_getc)(void *__arg) {
 	__CHAR32_TYPE__ __result;
-	__result = __localdep_unicode_readutf8_n(
-		&((struct __vsnscanf_data *)__arg)->__ptr,
-		((struct __vsnscanf_data *)__arg)->__end);
+	__result = __localdep_unicode_readutf8_n(&((struct __vsnscanf_data *)__arg)->__ptr,
+	                              ((struct __vsnscanf_data *)__arg)->__end);
 	return __result ? __result : __EOF;
 }
-__LOCAL_LIBC(vsnscanf_ungetc) __SSIZE_TYPE__ (__LIBCCALL __vsnscanf_ungetc)(void *__arg, __CHAR32_TYPE__ __UNUSED(__ch)) {
+
+__LOCAL_LIBC(vsnscanf_ungetc) __SSIZE_TYPE__
+(__LIBCCALL __vsnscanf_ungetc)(void *__arg, __CHAR32_TYPE__ __UNUSED(__ch)) {
 	__localdep_unicode_readutf8_rev(&((struct __vsnscanf_data *)__arg)->__ptr);
 	return 0;
 }
@@ -139,7 +135,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vsnscanf))(char const *__restrict __
                                                        __SIZE_TYPE__ __inputlen,
                                                        char const *__restrict __format,
                                                        __builtin_va_list __args) {
-#line 2315 "kos/src/libc/magic/stdio.c"
+#line 2313 "kos/src/libc/magic/stdio.c"
 	struct __vsnscanf_data __data;
 	__data.__ptr = __input;
 	__data.__end = __input + __inputlen;

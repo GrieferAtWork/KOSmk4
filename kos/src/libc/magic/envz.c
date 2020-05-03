@@ -111,11 +111,11 @@ envz_add:([nonnull] char **__restrict penvz, [nonnull] size_t *__restrict penvz_
 	morelen  = namelen + 1 + valuelen + 1;
 	new_envz = (char *)realloc(*penvz, (*penvz_len + morelen) * sizeof(char));
 	if unlikely(!new_envz) {
-#ifdef __ENOMEM
-		return @__ENOMEM@;
-#else /* __ENOMEM */
+#ifdef ENOMEM
+		return ENOMEM;
+#else /* ENOMEM */
 		return 1;
-#endif /* !__ENOMEM */
+#endif /* !ENOMEM */
 	}
 	*penvz = new_envz;
 	new_envz += *penvz_len;

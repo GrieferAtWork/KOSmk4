@@ -90,9 +90,9 @@ NOTHROW_NCX(LIBCCALL libc_hcreate_r)(size_t nel,
 		ENTRY        entry;
 	} entry_type;
 	if (htab == NULL) {
-#ifdef __EINVAL
-		__libc_seterrno(__EINVAL);
-#endif /* __EINVAL */
+#ifdef EINVAL
+		__libc_seterrno(EINVAL);
+#endif /* EINVAL */
 		return 0;
 	}
 	if (htab->table != NULL)
@@ -101,9 +101,9 @@ NOTHROW_NCX(LIBCCALL libc_hcreate_r)(size_t nel,
 		nel = 3;
 	for (nel |= 1; ; nel += 2) {
 		if (__UINT_MAX__ - 2 < nel) {
-#ifdef __ENOMEM
-			__libc_seterrno(__ENOMEM);
-#endif /* __ENOMEM */
+#ifdef ENOMEM
+			__libc_seterrno(ENOMEM);
+#endif /* ENOMEM */
 			return 0;
 		}
 		if (libc_isprime(nel))
@@ -125,9 +125,9 @@ NOTHROW_NCX(LIBCCALL libc_hdestroy_r)(struct hsearch_data *htab)
 /*[[[body:hdestroy_r]]]*/
 /*AUTO*/{
 	if (htab == NULL) {
-#ifdef __EINVAL
-		__libc_seterrno(__EINVAL);
-#endif /* __EINVAL */
+#ifdef EINVAL
+		__libc_seterrno(EINVAL);
+#endif /* EINVAL */
 		return;
 	}
 	libc_free(htab->table);

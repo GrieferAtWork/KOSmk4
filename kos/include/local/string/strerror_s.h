@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3fb61b47 */
+/* HASH CRC-32:0x7890c28a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,430 +47,430 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(strerror_s))(int __errnum) {
 
 #ifdef __EPERM
 	case __EPERM:           __result = "Operation not permitted"; break;
-#endif /* __EPERM */
+#endif /* EPERM */
 #ifdef __ENOENT
 	case __ENOENT:          __result = "No such file or directory"; break;
-#endif /* __ENOENT */
+#endif /* ENOENT */
 #ifdef __ESRCH
 	case __ESRCH:           __result = "No such process"; break;
-#endif /* __ESRCH */
+#endif /* ESRCH */
 #ifdef __EINTR
 	case __EINTR:           __result = "Interrupted system call"; break;
-#endif /* __EINTR */
+#endif /* EINTR */
 #ifdef __EIO
 	case __EIO:             __result = "I/O error"; break;
-#endif /* __EIO */
+#endif /* EIO */
 #ifdef __ENXIO
 	case __ENXIO:           __result = "No such device or address"; break;
-#endif /* __ENXIO */
+#endif /* ENXIO */
 #ifdef __E2BIG
 	case __E2BIG:           __result = "Argument list too long"; break;
-#endif /* __E2BIG */
+#endif /* E2BIG */
 #ifdef __ENOEXEC
 	case __ENOEXEC:         __result = "Exec format error"; break;
-#endif /* __ENOEXEC */
+#endif /* ENOEXEC */
 #ifdef __EBADF
 	case __EBADF:           __result = "Bad file number"; break;
-#endif /* __EBADF */
+#endif /* EBADF */
 #ifdef __ECHILD
 	case __ECHILD:          __result = "No child processes"; break;
-#endif /* __ECHILD */
+#endif /* ECHILD */
 #ifdef __EAGAIN
 	case __EAGAIN:          __result = "Try again"; break;
-#endif /* __EAGAIN */
+#endif /* EAGAIN */
 #ifdef __ENOMEM
 	case __ENOMEM:          __result = "Out of memory"; break;
-#endif /* __ENOMEM */
+#endif /* ENOMEM */
 #ifdef __EACCES
 	case __EACCES:          __result = "Permission denied"; break;
-#endif /* __EACCES */
+#endif /* EACCES */
 #ifdef __EFAULT
 	case __EFAULT:          __result = "Bad address"; break;
-#endif /* __EFAULT */
+#endif /* EFAULT */
 #ifdef __EBUSY
 	case __EBUSY:           __result = "Device or resource busy"; break;
-#endif /* __EBUSY */
+#endif /* EBUSY */
 #ifdef __EEXIST
 	case __EEXIST:          __result = "File exists"; break;
-#endif /* __EEXIST */
+#endif /* EEXIST */
 #ifdef __EXDEV
 	case __EXDEV:           __result = "Cross-device link"; break;
-#endif /* __EXDEV */
+#endif /* EXDEV */
 #ifdef __ENODEV
 	case __ENODEV:          __result = "No such device"; break;
-#endif /* __ENODEV */
+#endif /* ENODEV */
 #ifdef __ENOTDIR
 	case __ENOTDIR:         __result = "Not a directory"; break;
-#endif /* __ENOTDIR */
+#endif /* ENOTDIR */
 #ifdef __EISDIR
 	case __EISDIR:          __result = "Is a directory"; break;
-#endif /* __EISDIR */
+#endif /* EISDIR */
 #ifdef __ENFILE
 	case __ENFILE:          __result = "File table overflow"; break;
-#endif /* __ENFILE */
+#endif /* ENFILE */
 #ifdef __EMFILE
 	case __EMFILE:          __result = "Too many open files"; break;
-#endif /* __EMFILE */
+#endif /* EMFILE */
 #ifdef __ENOTTY
 	case __ENOTTY:          __result = "Not a typewriter"; break;
-#endif /* __ENOTTY */
+#endif /* ENOTTY */
 #ifdef __EFBIG
 	case __EFBIG:           __result = "File too large"; break;
-#endif /* __EFBIG */
+#endif /* EFBIG */
 #ifdef __ENOSPC
 	case __ENOSPC:          __result = "No space left on device"; break;
-#endif /* __ENOSPC */
+#endif /* ENOSPC */
 #ifdef __ESPIPE
 	case __ESPIPE:          __result = "Illegal seek"; break;
-#endif /* __ESPIPE */
+#endif /* ESPIPE */
 #ifdef __EROFS
 	case __EROFS:           __result = "Read-only file system"; break;
-#endif /* __EROFS */
+#endif /* EROFS */
 #ifdef __EMLINK
 	case __EMLINK:          __result = "Too many links"; break;
-#endif /* __EMLINK */
+#endif /* EMLINK */
 #ifdef __EPIPE
 	case __EPIPE:           __result = "Broken pipe"; break;
-#endif /* __EPIPE */
+#endif /* EPIPE */
 #ifdef __EDOM
 	case __EDOM:            __result = "Math argument out of domain of func"; break;
-#endif /* __EDOM */
+#endif /* EDOM */
 #ifdef __ENAMETOOLONG
 	case __ENAMETOOLONG:    __result = "File name too long"; break;
-#endif /* __ENAMETOOLONG */
+#endif /* ENAMETOOLONG */
 #ifdef __ENOLCK
 	case __ENOLCK:          __result = "No record locks available"; break;
-#endif /* __ENOLCK */
+#endif /* ENOLCK */
 #ifdef __ENOSYS
 	case __ENOSYS:          __result = "Function not implemented"; break;
-#endif /* __ENOSYS */
+#endif /* ENOSYS */
 #ifdef __ENOTEMPTY
 	case __ENOTEMPTY:       __result = "Directory not empty"; break;
-#endif /* __ENOTEMPTY */
+#endif /* ENOTEMPTY */
 #ifdef __EINVAL
 	case __EINVAL:          __result = "Invalid argument"; break;
-#endif /* __EINVAL */
+#endif /* EINVAL */
 #ifdef __ERANGE
 	case __ERANGE:          __result = "Math result not representable"; break;
-#endif /* __ERANGE */
+#endif /* ERANGE */
 #ifdef __EILSEQ
 	case __EILSEQ:          __result = "Illegal byte sequence"; break;
-#endif /* __EILSEQ */
+#endif /* EILSEQ */
 #ifdef __EDEADLOCK
 	case __EDEADLOCK:       __result = "Resource deadlock would occur"; break;
-#endif /* __EDEADLOCK */
+#endif /* EDEADLOCK */
 #ifdef __EADDRINUSE
 	case __EADDRINUSE:      __result = "Address already in use"; break;
-#endif /* __EADDRINUSE */
+#endif /* EADDRINUSE */
 #ifdef __EADDRNOTAVAIL
 	case __EADDRNOTAVAIL:   __result = "Cannot assign requested address"; break;
-#endif /* __EADDRNOTAVAIL */
+#endif /* EADDRNOTAVAIL */
 #ifdef __EAFNOSUPPORT
 	case __EAFNOSUPPORT:    __result = "Address family not supported by protocol"; break;
-#endif /* __EAFNOSUPPORT */
+#endif /* EAFNOSUPPORT */
 #ifdef __EALREADY
 	case __EALREADY:        __result = "Operation already in progress"; break;
-#endif /* __EALREADY */
+#endif /* EALREADY */
 #ifdef __EBADMSG
 	case __EBADMSG:         __result = "Not a data message"; break;
-#endif /* __EBADMSG */
+#endif /* EBADMSG */
 #ifdef __ECANCELED
 	case __ECANCELED:       __result = "Operation Canceled"; break;
-#endif /* __ECANCELED */
+#endif /* ECANCELED */
 #ifdef __ECONNABORTED
 	case __ECONNABORTED:    __result = "Software caused connection abort"; break;
-#endif /* __ECONNABORTED */
+#endif /* ECONNABORTED */
 #ifdef __ECONNREFUSED
 	case __ECONNREFUSED:    __result = "Connection refused"; break;
-#endif /* __ECONNREFUSED */
+#endif /* ECONNREFUSED */
 #ifdef __ECONNRESET
 	case __ECONNRESET:      __result = "Connection reset by peer"; break;
-#endif /* __ECONNRESET */
+#endif /* ECONNRESET */
 #ifdef __EDESTADDRREQ
 	case __EDESTADDRREQ:    __result = "Destination address required"; break;
-#endif /* __EDESTADDRREQ */
+#endif /* EDESTADDRREQ */
 #ifdef __EHOSTUNREACH
 	case __EHOSTUNREACH:    __result = "No route to host"; break;
-#endif /* __EHOSTUNREACH */
+#endif /* EHOSTUNREACH */
 #ifdef __EIDRM
 	case __EIDRM:           __result = "Identifier removed"; break;
-#endif /* __EIDRM */
+#endif /* EIDRM */
 #ifdef __EINPROGRESS
 	case __EINPROGRESS:     __result = "Operation now in progress"; break;
-#endif /* __EINPROGRESS */
+#endif /* EINPROGRESS */
 #ifdef __EISCONN
 	case __EISCONN:         __result = "Transport endpoint is already connected"; break;
-#endif /* __EISCONN */
+#endif /* EISCONN */
 #ifdef __ELOOP
 	case __ELOOP:           __result = "Too many symbolic links encountered"; break;
-#endif /* __ELOOP */
+#endif /* ELOOP */
 #ifdef __EMSGSIZE
 	case __EMSGSIZE:        __result = "Message too long"; break;
-#endif /* __EMSGSIZE */
+#endif /* EMSGSIZE */
 #ifdef __ENETDOWN
 	case __ENETDOWN:        __result = "Network is down"; break;
-#endif /* __ENETDOWN */
+#endif /* ENETDOWN */
 #ifdef __ENETRESET
 	case __ENETRESET:       __result = "Network dropped connection because of reset"; break;
-#endif /* __ENETRESET */
+#endif /* ENETRESET */
 #ifdef __ENETUNREACH
 	case __ENETUNREACH:     __result = "Network is unreachable"; break;
-#endif /* __ENETUNREACH */
+#endif /* ENETUNREACH */
 #ifdef __ENOBUFS
 	case __ENOBUFS:         __result = "No buffer space available"; break;
-#endif /* __ENOBUFS */
+#endif /* ENOBUFS */
 #ifdef __ENODATA
 	case __ENODATA:         __result = "No data available"; break;
-#endif /* __ENODATA */
+#endif /* ENODATA */
 #ifdef __ENOLINK
 	case __ENOLINK:         __result = "Link has been severed"; break;
-#endif /* __ENOLINK */
+#endif /* ENOLINK */
 #ifdef __ENOMSG
 	case __ENOMSG:          __result = "No message of desired type"; break;
-#endif /* __ENOMSG */
+#endif /* ENOMSG */
 #ifdef __ENOPROTOOPT
 	case __ENOPROTOOPT:     __result = "Protocol not available"; break;
-#endif /* __ENOPROTOOPT */
+#endif /* ENOPROTOOPT */
 #ifdef __ENOSR
 	case __ENOSR:           __result = "Out of streams resources"; break;
-#endif /* __ENOSR */
+#endif /* ENOSR */
 #ifdef __ENOSTR
 	case __ENOSTR:          __result = "Device not a stream"; break;
-#endif /* __ENOSTR */
+#endif /* ENOSTR */
 #ifdef __ENOTCONN
 	case __ENOTCONN:        __result = "Transport endpoint is not connected"; break;
-#endif /* __ENOTCONN */
+#endif /* ENOTCONN */
 #ifdef __ENOTRECOVERABLE
 	case __ENOTRECOVERABLE: __result = "State not recoverable"; break;
-#endif /* __ENOTRECOVERABLE */
+#endif /* ENOTRECOVERABLE */
 #ifdef __ENOTSOCK
 	case __ENOTSOCK:        __result = "Socket operation on non-socket"; break;
-#endif /* __ENOTSOCK */
+#endif /* ENOTSOCK */
 #ifdef __ENOTSUP
 	case __ENOTSUP:         __result = "Not supported"; break;
-#endif /* __ENOTSUP */
+#endif /* ENOTSUP */
 #ifdef __EOPNOTSUPP
 	case __EOPNOTSUPP:      __result = "Operation not supported on transport endpoint"; break;
-#endif /* __EOPNOTSUPP */
+#endif /* EOPNOTSUPP */
 #ifdef __EOTHER
 	case __EOTHER:          __result = "Other"; break;
-#endif /* __EOTHER */
+#endif /* EOTHER */
 #ifdef __EOVERFLOW
 	case __EOVERFLOW:       __result = "Value too large for defined data type"; break;
-#endif /* __EOVERFLOW */
+#endif /* EOVERFLOW */
 #ifdef __EOWNERDEAD
 	case __EOWNERDEAD:      __result = "Owner died"; break;
-#endif /* __EOWNERDEAD */
+#endif /* EOWNERDEAD */
 #ifdef __EPROTO
 	case __EPROTO:          __result = "Protocol error"; break;
-#endif /* __EPROTO */
+#endif /* EPROTO */
 #ifdef __EPROTONOSUPPORT
 	case __EPROTONOSUPPORT: __result = "Protocol not supported"; break;
-#endif /* __EPROTONOSUPPORT */
+#endif /* EPROTONOSUPPORT */
 #ifdef __EPROTOTYPE
 	case __EPROTOTYPE:      __result = "Protocol wrong type for socket"; break;
-#endif /* __EPROTOTYPE */
+#endif /* EPROTOTYPE */
 #ifdef __ETIME
 	case __ETIME:           __result = "Timer expired"; break;
-#endif /* __ETIME */
+#endif /* ETIME */
 #ifdef __ETIMEDOUT
 	case __ETIMEDOUT:       __result = "Connection timed out"; break;
-#endif /* __ETIMEDOUT */
+#endif /* ETIMEDOUT */
 #ifdef __ETXTBSY
 	case __ETXTBSY:         __result = "Text file busy"; break;
-#endif /* __ETXTBSY */
+#endif /* ETXTBSY */
 #ifdef __EFTYPE
 	case __EFTYPE:          __result = "Inappropriate file type or format"; break;
-#endif /* __EFTYPE */
+#endif /* EFTYPE */
 #ifdef __ENMFILE
 	case __ENMFILE:         __result = "No more files"; break;
-#endif /* __ENMFILE */
+#endif /* ENMFILE */
 #ifdef __EPFNOSUPPORT
 	case __EPFNOSUPPORT:    __result = "Protocol family not supported"; break;
-#endif /* __EPFNOSUPPORT */
+#endif /* EPFNOSUPPORT */
 #ifdef __EHOSTDOWN
 	case __EHOSTDOWN:       __result = "Host is down"; break;
-#endif /* __EHOSTDOWN */
+#endif /* EHOSTDOWN */
 #ifdef __ETOOMANYREFS
 	case __ETOOMANYREFS:    __result = "Too many references: cannot splice"; break;
-#endif /* __ETOOMANYREFS */
+#endif /* ETOOMANYREFS */
 #ifdef __EDQUOT
 	case __EDQUOT:          __result = "Quota exceeded"; break;
-#endif /* __EDQUOT */
+#endif /* EDQUOT */
 #ifdef __ESTALE
 	case __ESTALE:          __result = "Stale file handle"; break;
-#endif /* __ESTALE */
+#endif /* ESTALE */
 #ifdef __ENOSHARE
 	case __ENOSHARE:        __result = "No such host or network path"; break;
-#endif /* __ENOSHARE */
+#endif /* ENOSHARE */
 #ifdef __ECASECLASH
 	case __ECASECLASH:      __result = "Filename exists with different case"; break;
-#endif /* __ECASECLASH */
+#endif /* ECASECLASH */
 #ifdef __ENOTBLK
 	case __ENOTBLK:         __result = "Block device required"; break;
-#endif /* __ENOTBLK */
+#endif /* ENOTBLK */
 #ifdef __ECHRNG
 	case __ECHRNG:          __result = "Channel number out of range"; break;
-#endif /* __ECHRNG */
+#endif /* ECHRNG */
 #ifdef __EL2NSYNC
 	case __EL2NSYNC:        __result = "Level 2 not synchronized"; break;
-#endif /* __EL2NSYNC */
+#endif /* EL2NSYNC */
 #ifdef __EL3HLT
 	case __EL3HLT:          __result = "Level 3 halted"; break;
-#endif /* __EL3HLT */
+#endif /* EL3HLT */
 #ifdef __EL3RST
 	case __EL3RST:          __result = "Level 3 reset"; break;
-#endif /* __EL3RST */
+#endif /* EL3RST */
 #ifdef __ELNRNG
 	case __ELNRNG:          __result = "Link number out of range"; break;
-#endif /* __ELNRNG */
+#endif /* ELNRNG */
 #ifdef __EUNATCH
 	case __EUNATCH:         __result = "Protocol driver not attached"; break;
-#endif /* __EUNATCH */
+#endif /* EUNATCH */
 #ifdef __ENOCSI
 	case __ENOCSI:          __result = "No CSI structure available"; break;
-#endif /* __ENOCSI */
+#endif /* ENOCSI */
 #ifdef __EL2HLT
 	case __EL2HLT:          __result = "Level 2 halted"; break;
-#endif /* __EL2HLT */
+#endif /* EL2HLT */
 #ifdef __EBADE
 	case __EBADE:           __result = "Invalid exchange"; break;
-#endif /* __EBADE */
+#endif /* EBADE */
 #ifdef __EBADR
 	case __EBADR:           __result = "Invalid request descriptor"; break;
-#endif /* __EBADR */
+#endif /* EBADR */
 #ifdef __EXFULL
 	case __EXFULL:          __result = "Exchange full"; break;
-#endif /* __EXFULL */
+#endif /* EXFULL */
 #ifdef __ENOANO
 	case __ENOANO:          __result = "No anode"; break;
-#endif /* __ENOANO */
+#endif /* ENOANO */
 #ifdef __EBADRQC
 	case __EBADRQC:         __result = "Invalid request code"; break;
-#endif /* __EBADRQC */
+#endif /* EBADRQC */
 #ifdef __EBADSLT
 	case __EBADSLT:         __result = "Invalid slot"; break;
-#endif /* __EBADSLT */
+#endif /* EBADSLT */
 #ifdef __EBFONT
 	case __EBFONT:          __result = "Bad font file fmt"; break;
-#endif /* __EBFONT */
+#endif /* EBFONT */
 #ifdef __ENONET
 	case __ENONET:          __result = "Machine is not on the network"; break;
-#endif /* __ENONET */
+#endif /* ENONET */
 #ifdef __ENOPKG
 	case __ENOPKG:          __result = "Package not installed"; break;
-#endif /* __ENOPKG */
+#endif /* ENOPKG */
 #ifdef __EREMOTE
 	case __EREMOTE:         __result = "The object is remote"; break;
-#endif /* __EREMOTE */
+#endif /* EREMOTE */
 #ifdef __EADV
 	case __EADV:            __result = "Advertise error"; break;
-#endif /* __EADV */
+#endif /* EADV */
 #ifdef __ESRMNT
 	case __ESRMNT:          __result = "Srmount error"; break;
-#endif /* __ESRMNT */
+#endif /* ESRMNT */
 #ifdef __ECOMM
 	case __ECOMM:           __result = "Communication error on send"; break;
-#endif /* __ECOMM */
+#endif /* ECOMM */
 #ifdef __ELBIN
 	case __ELBIN:           __result = "Inode is remote (not really error)"; break;
-#endif /* __ELBIN */
+#endif /* ELBIN */
 #ifdef __EDOTDOT
 	case __EDOTDOT:         __result = "Cross mount point (not really error)"; break;
-#endif /* __EDOTDOT */
+#endif /* EDOTDOT */
 #ifdef __ENOTUNIQ
 	case __ENOTUNIQ:        __result = "Given log. name not unique"; break;
-#endif /* __ENOTUNIQ */
+#endif /* ENOTUNIQ */
 #ifdef __EBADFD
 	case __EBADFD:          __result = "f.d. invalid for this operation"; break;
-#endif /* __EBADFD */
+#endif /* EBADFD */
 #ifdef __EREMCHG
 	case __EREMCHG:         __result = "Remote address changed"; break;
-#endif /* __EREMCHG */
+#endif /* EREMCHG */
 #ifdef __ELIBACC
 	case __ELIBACC:         __result = "Can't access a needed shared lib"; break;
-#endif /* __ELIBACC */
+#endif /* ELIBACC */
 #ifdef __ELIBBAD
 	case __ELIBBAD:         __result = "Accessing a corrupted shared lib"; break;
-#endif /* __ELIBBAD */
+#endif /* ELIBBAD */
 #ifdef __ELIBSCN
 	case __ELIBSCN:         __result = ".lib section in a.out corrupted"; break;
-#endif /* __ELIBSCN */
+#endif /* ELIBSCN */
 #ifdef __ELIBMAX
 	case __ELIBMAX:         __result = "Attempting to link in too many libs"; break;
-#endif /* __ELIBMAX */
+#endif /* ELIBMAX */
 #ifdef __ELIBEXEC
 	case __ELIBEXEC:        __result = "Attempting to exec a shared library"; break;
-#endif /* __ELIBEXEC */
+#endif /* ELIBEXEC */
 #ifdef __ESHUTDOWN
 	case __ESHUTDOWN:       __result = "Can't send after socket shutdown"; break;
-#endif /* __ESHUTDOWN */
+#endif /* ESHUTDOWN */
 #ifdef __ESOCKTNOSUPPORT
 	case __ESOCKTNOSUPPORT: __result = "Socket type not supported"; break;
-#endif /* __ESOCKTNOSUPPORT */
+#endif /* ESOCKTNOSUPPORT */
 #ifdef __EPROCLIM
 	case __EPROCLIM:        __result = "Process limit reached"; break;
-#endif /* __EPROCLIM */
+#endif /* EPROCLIM */
 #ifdef __EUSERS
 	case __EUSERS:          __result = "Too many users"; break;
-#endif /* __EUSERS */
+#endif /* EUSERS */
 #ifdef __ENOMEDIUM
 	case __ENOMEDIUM:       __result = "No medium (in tape drive)"; break;
-#endif /* __ENOMEDIUM */
+#endif /* ENOMEDIUM */
 #ifdef __ESTRPIPE
 	case __ESTRPIPE:        __result = "Streams pipe error"; break;
-#endif /* __ESTRPIPE */
+#endif /* ESTRPIPE */
 #ifdef __EMULTIHOP
 	case __EMULTIHOP:       __result = "Multihop attempted"; break;
-#endif /* __EMULTIHOP */
+#endif /* EMULTIHOP */
 #ifdef __ERESTART
 	case __ERESTART:        __result = "Interrupted system call should be restarted"; break;
-#endif /* __ERESTART */
+#endif /* ERESTART */
 #ifdef __EUCLEAN
 	case __EUCLEAN:         __result = "Structure needs cleaning"; break;
-#endif /* __EUCLEAN */
+#endif /* EUCLEAN */
 #ifdef __ENOTNAM
 	case __ENOTNAM:         __result = "Not a XENIX named type file"; break;
-#endif /* __ENOTNAM */
+#endif /* ENOTNAM */
 #ifdef __ENAVAIL
 	case __ENAVAIL:         __result = "No XENIX semaphores available"; break;
-#endif /* __ENAVAIL */
+#endif /* ENAVAIL */
 #ifdef __EISNAM
 	case __EISNAM:          __result = "Is a named type file"; break;
-#endif /* __EISNAM */
+#endif /* EISNAM */
 #ifdef __EREMOTEIO
 	case __EREMOTEIO:       __result = "Remote I/O error"; break;
-#endif /* __EREMOTEIO */
+#endif /* EREMOTEIO */
 #ifdef __EMEDIUMTYPE
 	case __EMEDIUMTYPE:     __result = "Wrong medium type"; break;
-#endif /* __EMEDIUMTYPE */
+#endif /* EMEDIUMTYPE */
 #ifdef __ENOKEY
 	case __ENOKEY:          __result = "Required key not available"; break;
-#endif /* __ENOKEY */
+#endif /* ENOKEY */
 #ifdef __EKEYEXPIRED
 	case __EKEYEXPIRED:     __result = "Key has expired"; break;
-#endif /* __EKEYEXPIRED */
+#endif /* EKEYEXPIRED */
 #ifdef __EKEYREVOKED
 	case __EKEYREVOKED:     __result = "Key has been revoked"; break;
-#endif /* __EKEYREVOKED */
+#endif /* EKEYREVOKED */
 #ifdef __EKEYREJECTED
 	case __EKEYREJECTED:    __result = "Key was rejected by service"; break;
-#endif /* __EKEYREJECTED */
+#endif /* EKEYREJECTED */
 #ifdef __ERFKILL
 	case __ERFKILL:         __result = "Operation not possible due to RF-kill"; break;
-#endif /* __ERFKILL */
+#endif /* ERFKILL */
 #ifdef __EHWPOISON
 	case __EHWPOISON:       __result = "Memory page has hardware error"; break;
-#endif /* __EHWPOISON */
+#endif /* EHWPOISON */
 #if defined(__STRUNCATE) && (!defined(__ERANGE) || __STRUNCATE != __ERANGE)
 	case __STRUNCATE:       __result = "Truncated"; break;
-#endif /* __STRUNCATE && (!__ERANGE || __STRUNCATE != __ERANGE) */
+#endif /* STRUNCATE && (!ERANGE || STRUNCATE != ERANGE) */
 #if defined(__EWOULDBLOCK) && (!defined(__EAGAIN) || __EWOULDBLOCK != __EAGAIN)
 	case __EWOULDBLOCK:     __result = "Operation would block"; break;
-#endif /* __EWOULDBLOCK && (!__EAGAIN || __EWOULDBLOCK != __EAGAIN) */
+#endif /* EWOULDBLOCK && (!EAGAIN || EWOULDBLOCK != EAGAIN) */
 #if defined(__EDEADLK) && (!defined(__EDEADLOCK) || __EDEADLOCK != __EDEADLK)
 	case __EDEADLK:         __result = "Resource deadlock would occur"; break;
-#endif /* __EDEADLK && (!__EDEADLOCK || __EDEADLOCK != __EDEADLK) */
+#endif /* EDEADLK && (!EDEADLOCK || EDEADLOCK != EDEADLK) */
 
 	default:
 		__result = __NULLPTR;

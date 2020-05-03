@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d04b356 */
+/* HASH CRC-32:0x93087a80 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,6 +24,8 @@
 #include <__crt.h>
 #include <kos/anno.h>
 #include <parts/errno.h>
+
+#include <asm/stdio.h>
 /* Dependency: "fgetwc" */
 #ifndef ____localdep_fgetwc_defined
 #define ____localdep_fgetwc_defined 1
@@ -75,24 +77,17 @@ __CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_ungetwc,(
 #endif /* !____localdep_ungetwc_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __WEOF
-#if __SIZEOF_WCHAR_T__ == 4
-#define __WEOF 0xffffffffu
-#else /* __SIZEOF_WCHAR_T__ == 4 */
-#define __WEOF (__CCAST(__WINT_TYPE__) 0xffff)
-#endif /* __SIZEOF_WCHAR_T__ != 4 */
-#endif /* !__WEOF */
 __LOCAL_LIBC(fgetws) __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __WCHAR_TYPE__ *
 (__LIBCCALL __LIBC_LOCAL_NAME(fgetws))(__WCHAR_TYPE__ *__restrict __buf,
                                        __STDC_INT_AS_SIZE_T __bufsize,
                                        __FILE *__restrict __stream) __THROWS(...) {
-#line 535 "kos/src/libc/magic/wchar.c"
+#line 526 "kos/src/libc/magic/wchar.c"
 	__SIZE_TYPE__ __n;
 	if __unlikely(!__buf || !__bufsize) {
 		/* The buffer cannot be empty! */
 #ifdef __ERANGE
 		__libc_seterrno(__ERANGE);
-#endif /* __ERANGE */
+#endif /* ERANGE */
 		return __NULLPTR;
 	}
 	for (__n = 0; __n < __bufsize - 1; ++__n) {

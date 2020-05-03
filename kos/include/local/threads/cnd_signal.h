@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1ed4ead8 */
+/* HASH CRC-32:0x34c7c3f2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,6 +25,7 @@
 #include <bits/threads.h>
 
 #include <bits/pthreadtypes.h>
+#include <asm/threads.h>
 /* Dependency: "pthread_cond_signal" */
 #ifndef ____localdep_pthread_cond_signal_defined
 #define ____localdep_pthread_cond_signal_defined 1
@@ -41,12 +42,12 @@ __NAMESPACE_LOCAL_BEGIN
  * s.a. `pthread_cond_signal()' */
 __LOCAL_LIBC(cnd_signal) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cnd_signal))(__cnd_t *__restrict __cond) {
-#line 417 "kos/src/libc/magic/threads.c"
+#line 442 "kos/src/libc/magic/threads.c"
 	int __error;
 	__error = __localdep_pthread_cond_signal((__pthread_cond_t *)__cond);
 	if __likely(!__error)
-		return 0; /* thrd_success */
-	return 2; /* thrd_error */
+		return __thrd_success;
+	return __thrd_error;
 }
 __NAMESPACE_LOCAL_END
 #endif /* __CRT_HAVE_pthread_cond_signal */

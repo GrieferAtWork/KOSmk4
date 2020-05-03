@@ -119,9 +119,7 @@ _commit:($fd_t fd) -> int = fsync;
 
 [section(.text.crt.dos.fs.basic_io)]
 [alias(lseek)][noexport][nouser][dos_function]
-[requires(defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64))]
-[dependency_string(defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64))]
-[decl_include(<bits/types.h>)]
+[requires($has_function(lseek64))][decl_include(<bits/types.h>)]
 _lseek:($fd_t fd, __LONG32_TYPE__ offset, int whence) -> __LONG32_TYPE__ {
 	return lseek64(fd, ($off64_t)offset, whence);
 }
@@ -187,47 +185,94 @@ _isatty:($fd_t fd) -> int = isatty;
 %[default_impl_section(.text.crt.dos.fs.dir)]
 [dos_function] _findclose:(intptr_t findfd) -> int;
 
-[cp][dos_function][ATTR_WUNUSED][export_alias(_findfirst)] _findfirst32:([nonnull] char const *__restrict filename, [nonnull] struct _finddata32_t *__restrict finddata) -> intptr_t;
-[cp][dos_function][ATTR_WUNUSED][export_alias(_findfirsti64)] _findfirst32i64:([nonnull] char const *__restrict filename, [nonnull] struct _finddata32i64_t *__restrict finddata) -> intptr_t;
-[cp][dos_function][ATTR_WUNUSED] _findfirst64:([nonnull] char const *__restrict filename, [nonnull] struct __finddata64_t *__restrict finddata) -> intptr_t;
-[cp][dos_function][ATTR_WUNUSED] _findfirst64i32:([nonnull] char const *__restrict filename, [nonnull] struct _finddata64i32_t *__restrict finddata) -> intptr_t = _findfirst64;
+[cp][dos_function][ATTR_WUNUSED][export_alias(_findfirst)]
+_findfirst32:([nonnull] char const *__restrict filename,
+              [nonnull] struct _finddata32_t *__restrict finddata)
+		-> intptr_t;
 
-[cp][dos_function][export_alias(_findnext)] _findnext32:(intptr_t findfd, [nonnull] struct _finddata32_t *__restrict finddata) -> int;
-[cp][dos_function][export_alias(_findnexti64)] _findnext32i64:(intptr_t findfd, [nonnull] struct _finddata32i64_t *__restrict finddata) -> int;
-[cp][dos_function] _findnext64:(intptr_t findfd, [nonnull] struct __finddata64_t *__restrict finddata) -> int;
-[cp][dos_function] _findnext64i32:(intptr_t findfd, [nonnull] struct _finddata64i32_t *__restrict finddata) -> int = _findnext64;
+[cp][dos_function][ATTR_WUNUSED][export_alias(_findfirsti64)]
+_findfirst32i64:([nonnull] char const *__restrict filename,
+                 [nonnull] struct _finddata32i64_t *__restrict finddata)
+		-> intptr_t;
+
+[cp][dos_function][ATTR_WUNUSED]
+_findfirst64:([nonnull] char const *__restrict filename,
+              [nonnull] struct __finddata64_t *__restrict finddata)
+		-> intptr_t;
+[cp][dos_function][ATTR_WUNUSED]
+_findfirst64i32:([nonnull] char const *__restrict filename,
+                 [nonnull] struct _finddata64i32_t *__restrict finddata)
+		-> intptr_t = _findfirst64;
+
+[cp][dos_function][export_alias(_findnext)]
+_findnext32:(intptr_t findfd, [nonnull] struct _finddata32_t *__restrict finddata) -> int;
+
+[cp][dos_function][export_alias(_findnexti64)]
+_findnext32i64:(intptr_t findfd, [nonnull] struct _finddata32i64_t *__restrict finddata) -> int;
+
+[cp][dos_function]
+_findnext64:(intptr_t findfd, [nonnull] struct __finddata64_t *__restrict finddata) -> int;
+
+[cp][dos_function]
+_findnext64i32:(intptr_t findfd, [nonnull] struct _finddata64i32_t *__restrict finddata) -> int = _findnext64;
+
 
 %[default_impl_section(.text.crt.dos.fs.io)]
 %
-[cp][dos_function][alias(_sopen_s_nolock)][decl_include(<bits/types.h>)]
-_sopen_s:([nonnull] $fd_t *fd, [nonnull] char const *filename, $oflag_t oflags, int sflags, $mode_t mode) -> errno_t;
+[cp][dos_function][alias(_sopen_s_nolock)]
+[decl_include(<bits/types.h>)][requires($has_function(sopen))]
+[dependency_include(<parts/errno.h>)]
+_sopen_s:([nonnull] $fd_t *fd,
+          [nonnull] char const *filename,
+          $oflag_t oflags, int sflags, $mode_t mode) -> errno_t {
+	fd_t result;
+	if (!fd) {
+#ifdef EINVAL
+		return EINVAL;
+#else /* EINVAL */
+		return 1;
+#endif /* !EINVAL */
+	}
+	result = sopen(filename, oflags, sflags, mode);
+	if (result < 0)
+		return __libc_geterrno();
+	*fd = result;
+	return 0;
+}
 
 [cp][dos_function][decl_include(<bits/types.h>)]
-_sopen_s_nolock:([nonnull] $fd_t *fd, [nonnull] char const *filename, $oflag_t oflags, int sflags, $mode_t mode) -> errno_t = _sopen_s;
+_sopen_s_nolock:([nonnull] $fd_t *fd,
+                 [nonnull] char const *filename,
+                 $oflag_t oflags, int sflags,
+                 $mode_t mode) -> errno_t = _sopen_s;
 
-[section(.text.crt.dos.fs.utility)]
-[dos_function] _mktemp_s:([nonnull] char *template_, size_t size) -> errno_t;
+[section(.text.crt.dos.fs.utility)][dos_function]
+_mktemp_s:([nonnull] char *template_, size_t size) -> errno_t;
 
-[section(.text.crt.dos.fs.io)]
-[cp][dos_function][vartypes($mode_t)][ATTR_WUNUSED][decl_include(<bits/types.h>)]
+[section(.text.crt.dos.fs.io)][ATTR_WUNUSED][dos_function]
+[cp][vartypes($mode_t)][decl_include(<bits/types.h>)]
 _sopen:([nonnull] char const *filename, $oflag_t oflags, int sflags, ...) -> $fd_t = sopen;
 
-[section(.text.crt.dos.fs.io)]
+[section(.text.crt.dos.fs.io)][decl_include(<bits/types.h>)]
 [dos_function][requires($has_function(pipe2))]
-[decl_include(<bits/types.h>)]
-_pipe:([nonnull] $fd_t pipedes[2], $uint32_t pipesize, $oflag_t textmode) -> int {
+_pipe:([nonnull] $fd_t pipedes[2],
+       $uint32_t pipesize, $oflag_t textmode) -> int {
 	(void)pipesize;
 	return pipe2(pipedes, textmode);
 }
 
 %[default_impl_section(.text.crt.dos.fs.utility)]
-[decl_include(<bits/types.h>)][dos_function][ATTR_WUNUSED] _eof:($fd_t fd) -> int = eof;
-[decl_include(<bits/types.h>)][dos_function][ATTR_WUNUSED] _filelength:($fd_t fd) -> __LONG32_TYPE__ = filelength;
-[decl_include(<bits/types.h>)][dos_function][ATTR_WUNUSED] _tell:($fd_t fd) -> __LONG32_TYPE__ = tell;
+[dos_function][decl_include(<bits/types.h>)][ATTR_WUNUSED]
+_eof:($fd_t fd) -> int = eof;
 
-[dos_function]
+[dos_function][decl_include(<bits/types.h>)][ATTR_WUNUSED]
+_filelength:($fd_t fd) -> __LONG32_TYPE__ = filelength;
+
+[dos_function][decl_include(<bits/types.h>)][ATTR_WUNUSED]
+_tell:($fd_t fd) -> __LONG32_TYPE__ = tell;
+
+[dos_function][decl_include(<bits/types.h>)]
 [ATTR_WUNUSED][requires($has_function(lseek64))][noexport]
-[decl_include(<bits/types.h>)]
 _filelengthi64:($fd_t fd) -> $int64_t {
 	int64_t oldpos, result;
 	oldpos = lseek64(fd, 0, SEEK_CUR);
@@ -252,8 +297,13 @@ _telli64:($fd_t fd) -> $int64_t {
 [requires($has_function(umask))]
 [decl_include(<bits/types.h>)]
 umask_s:($mode_t newmode, $mode_t *oldmode) -> errno_t {
-	if (!oldmode)
-		return __EINVAL;
+	if (!oldmode) {
+#ifdef EINVAL
+		return EINVAL;
+#else /* EINVAL */
+		return 1;
+#endif /* !EINVAL */
+	}
 	*oldmode = umask(newmode);
 	return 0;
 }

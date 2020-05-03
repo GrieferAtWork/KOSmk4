@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4feecccc */
+/* HASH CRC-32:0xdafac8a2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -68,16 +68,16 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(thrd_sleep64) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(thrd_sleep64))(struct __timespec64 const *__time_point,
                                                           struct __timespec64 *__remaining) {
-#line 190 "kos/src/libc/magic/threads.c"
+#line 205 "kos/src/libc/magic/threads.c"
 #if defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep) || defined(__CRT_HAVE_nanosleep64)
 	int __error;
 	__error = __localdep_nanosleep64(__time_point, __remaining);
 	if __likely(__error == 0)
 		return 0;
-#if defined(__errno) && defined(__EINTR)
-	if (__errno == __EINTR)
-		return -1; /* thrd_nomem */
-#endif /* __errno && __EINTR */
+#if defined(__libc_geterrno) && defined(__EINTR)
+	if (__libc_geterrno() == __EINTR)
+		return -1;
+#endif /* __libc_geterrno && EINTR */
 	return -2;
 #else /* __CRT_HAVE_nanosleep || __CRT_HAVE___nanosleep || __CRT_HAVE_nanosleep64 */
 	int __result;

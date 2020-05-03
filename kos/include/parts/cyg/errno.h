@@ -29,7 +29,7 @@
 #define __CYG_EINTR           4   /* Interrupted system call */
 #define __CYG_EIO             5   /* I/O error */
 #define __CYG_ENXIO           6   /* No such device or address */
-#define __CYG_E2BIG           7   /* Arg list too long */
+#define __CYG_E2BIG           7   /* Argument list too long */
 #define __CYG_ENOEXEC         8   /* Exec format error */
 #define __CYG_EBADF           9   /* Bad file number */
 #define __CYG_ECHILD          10  /* No children */

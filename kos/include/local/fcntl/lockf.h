@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x43f8e3a2 */
+/* HASH CRC-32:0x77b15a4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_lockf_defined
-#if defined(__CRT_HAVE_lockf64) || defined(__CRT_HAVE_lockf) || defined(__CRT_HAVE__locking) || defined(__CRT_HAVE_locking)
+#if defined(__CRT_HAVE_lockf) || defined(__CRT_HAVE__locking) || defined(__CRT_HAVE_locking) || defined(__CRT_HAVE_lockf64)
 #define __local_lockf_defined 1
 #include <__crt.h>
 #include <bits/types.h>
@@ -66,15 +66,15 @@ __LOCAL_LIBC(lockf) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(lockf))(__fd_t __fd,
                                                    int __cmd,
                                                    __FS_TYPE(off) __length) {
-#line 390 "kos/src/libc/magic/fcntl.c"
-#ifdef __CRT_HAVE_lockf64
+#line 428 "kos/src/libc/magic/fcntl.c"
+#if defined(__CRT_HAVE_lockf) || defined(__CRT_HAVE__locking) || defined(__CRT_HAVE_locking) || defined(__CRT_HAVE_lockf64)
 	return __localdep_lockf64(__fd, __cmd, (__off64_t)__length);
 #elif defined(__CRT_HAVE_lockf)
 	return __localdep_lockf32(__fd, __cmd, (__off32_t)__length);
-#else /* __CRT_HAVE_lockf64 */
+#elif defined(__CRT_HAVE__locking) || defined(__CRT_HAVE_locking)
 	return __localdep_crt_locking(__fd, __cmd, (__off32_t)__length);
-#endif
+#endif /* __CRT_HAVE__locking || __CRT_HAVE_locking */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_lockf64 || __CRT_HAVE_lockf || __CRT_HAVE__locking || __CRT_HAVE_locking */
+#endif /* __CRT_HAVE_lockf || __CRT_HAVE__locking || __CRT_HAVE_locking || __CRT_HAVE_lockf64 */
 #endif /* !__local_lockf_defined */

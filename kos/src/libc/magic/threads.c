@@ -30,10 +30,23 @@
 %[define_replacement(cnd_t = __cnd_t)]
 %[define_replacement(STATIC_ASSERT = __STATIC_ASSERT)]
 
+%[define_replacement(thrd_success  = __thrd_success)]
+%[define_replacement(thrd_busy     = __thrd_busy)]
+%[define_replacement(thrd_error    = __thrd_error)]
+%[define_replacement(thrd_nomem    = __thrd_nomem)]
+%[define_replacement(thrd_timedout = __thrd_timedout)]
+
+%[define_replacement(mtx_plain     = __mtx_plain)]
+%[define_replacement(mtx_recursive = __mtx_recursive)]
+%[define_replacement(mtx_timed     = __mtx_timed)]
+
 
 %{
 #include <features.h>
+
 #include <hybrid/typecore.h>
+
+#include <asm/threads.h>
 #include <bits/threads.h>
 #include <bits/timespec.h>
 
@@ -65,18 +78,18 @@ __SYSDECL_BEGIN
 
 /* Exit and error codes.  */
 }%[enum @undef @macro {
-	thrd_success  = 0,
-	thrd_busy     = 1,
-	thrd_error    = 2,
-	thrd_nomem    = 3,
-	thrd_timedout = 4
+	thrd_success  = __thrd_success,
+	thrd_busy     = __thrd_busy,
+	thrd_error    = __thrd_error,
+	thrd_nomem    = __thrd_nomem,
+	thrd_timedout = __thrd_timedout
 }]%{
 
 /* Mutex types.  */
 }%[enum @undef @macro {
-	mtx_plain     = 0,
-	mtx_recursive = 1,
-	mtx_timed     = 2
+	mtx_plain     = __mtx_plain,
+	mtx_recursive = __mtx_recursive,
+	mtx_timed     = __mtx_timed
 }]%{
 
 
@@ -97,8 +110,9 @@ typedef __cnd_t cnd_t;
 @@Create a new thread executing the function FUNC.  Arguments for FUNC
 @@are passed through ARG. If successful, THR is set to new thread identifier
 [same_impl][requires($has_function(pthread_create))]
+[dependency_include(<asm/threads.h>)]
+[dependency_include(<parts/errno.h>)]
 [decl_include(<bits/threads.h>)]
-[decl_include(<parts/errno.h>)]
 thrd_create:(thrd_t *thr, thrd_start_t func, void *arg) -> int {
 	int error;
 	STATIC_ASSERT(sizeof(int) <= sizeof(void *));
@@ -106,12 +120,12 @@ thrd_create:(thrd_t *thr, thrd_start_t func, void *arg) -> int {
 	                       (__pthread_start_routine_t)(void *)func,
 	                       arg);
 	if likely(!error)
-		return 0; /* thrd_success */
-#ifdef __ENOMEM
-	if (error == @__ENOMEM@)
-		return 3; /* thrd_nomem */
-#endif /* __ENOMEM */
-	return 2; /* thrd_error */
+		return thrd_success;
+#ifdef ENOMEM
+	if (error == ENOMEM)
+		return thrd_nomem;
+#endif /* ENOMEM */
+	return thrd_error;
 }
 
 @@Check if __LHS and __RHS point to the same thread
@@ -133,8 +147,9 @@ thrd_current:() -> thrd_t = pthread_self;
 [if(defined(__USE_TIME_BITS64)), preferred_alias(thrd_sleep64)]
 [if(!defined(__USE_TIME_BITS64)), preferred_alias(thrd_sleep)]
 [requires($has_function(thrd_sleep32) || $has_function(crt_thrd_sleep64) || $has_function(nanosleep))]
-[decl_include(<bits/timespec.h>)]
-[dependency_include(<parts/errno.h>)][cp]
+[dependency_include(<asm/threads.h>)]
+[dependency_include(<parts/errno.h>)]
+[decl_include(<bits/timespec.h>)][cp]
 thrd_sleep:([nonnull] struct timespec const *time_point,
             [nullable] struct timespec *remaining) -> int {
 @@if_has_function(thrd_sleep32)@@
@@ -164,10 +179,10 @@ thrd_sleep:([nonnull] struct timespec const *time_point,
 	error = nanosleep(time_point, remaining);
 	if likely(error == 0)
 		return 0;
-#if defined(__errno) && defined(__EINTR)
-	if (@__errno@ == @__EINTR@)
-		return -1; /* thrd_nomem */
-#endif /* __errno && __EINTR */
+#if defined(__libc_geterrno) && defined(EINTR)
+	if (__libc_geterrno() == EINTR)
+		return -1;
+#endif /* __libc_geterrno && EINTR */
 	return -2;
 @@endif_has_function(crt_thrd_sleep64)@@
 }
@@ -192,10 +207,10 @@ thrd_sleep64:([nonnull] struct timespec64 const *time_point,
 	error = nanosleep64(time_point, remaining);
 	if likely(error == 0)
 		return 0;
-#if defined(__errno) && defined(__EINTR)
-	if (@__errno@ == @__EINTR@)
-		return -1; /* thrd_nomem */
-#endif /* __errno && __EINTR */
+#if defined(__libc_geterrno) && defined(EINTR)
+	if (__libc_geterrno() == EINTR)
+		return -1;
+#endif /* __libc_geterrno && EINTR */
 	return -2;
 @@else_has_function(nanosleep64)@@
 	int result;
@@ -224,19 +239,21 @@ thrd_exit:(int res) {
 @@Detach the thread identified by THR from the current
 @@environment (it does not allow join or wait for it)
 @@s.a. `pthread_detach()'
+[dependency_include(<asm/threads.h>)]
 [decl_include(<bits/threads.h>)]
 [same_impl][requires($has_function(pthread_detach))]
 thrd_detach:(thrd_t thr) -> int {
 	int error;
 	error = pthread_detach((pthread_t)thr);
 	if likely(!error)
-		return 0; /* thrd_success */
-	return 2; /* thrd_error */
+		return thrd_success;
+	return thrd_error;
 }
 
 @@Block current thread until execution of THR is complete.
 @@In case that RES is not NULL, will store the return value of THR when exiting
 @@s.a. `pthread_join()'
+[dependency_include(<asm/threads.h>)]
 [decl_include(<hybrid/typecore.h>)]
 [decl_include(<bits/threads.h>)][cp]
 [same_impl][requires($has_function(pthread_join))]
@@ -248,14 +265,14 @@ thrd_join:(thrd_t thr, int *res) -> int {
 	if likely(!error) {
 		if (res)
 			*res = (int)(unsigned int)(uintptr_t)resptr;
-		return 0; /* thrd_success */
+		return thrd_success;
 	}
 #else /* __SIZEOF_POINTER__ != __SIZEOF_INT__ */
 	error = pthread_join((pthread_t)thr, (void **)res);
 	if likely(!error)
-		return 0; /* thrd_success */
+		return thrd_success;
 #endif /* __SIZEOF_POINTER__ == __SIZEOF_INT__ */
-	return 2; /* thrd_error */
+	return thrd_error;
 }
 
 @@Stop current thread execution and call the scheduler to decide which
@@ -274,13 +291,14 @@ thrd_join:(thrd_t thr, int *res) -> int {
 @@Creates a new mutex object with type TYPE.
 @@If successful the new object is pointed by MUTEX
 @@s.a. `pthread_mutex_init()'
+[dependency_include(<asm/threads.h>)]
 [decl_include(<bits/threads.h>)]
 [decl_include(<bits/pthreadvalues.h>)]
 [decl_include(<bits/pthreadtypes.h>)]
 [same_impl][requires($has_function(pthread_mutex_init))]
 mtx_init:([nonnull] mtx_t *__restrict mutex, int type) -> int {
 	int error;
-	if (type == 0 /*mtx_plain*/) {
+	if (type == mtx_plain) {
 		error = pthread_mutex_init((pthread_mutex_t *)mutex, NULL);
 	} else {
 		pthread_mutexattr_t attr;
@@ -295,13 +313,14 @@ mtx_init:([nonnull] mtx_t *__restrict mutex, int type) -> int {
 		}
 	}
 	if likely(!error)
-		return 0; /* thrd_success */
-	return 2; /* thrd_error */
+		return thrd_success;
+	return thrd_error;
 }
 
 @@Block the current thread until the mutex pointed to by MUTEX is
 @@unlocked.  In that case current thread will not be blocked
 @@s.a. `pthread_mutex_lock()'
+[dependency_include(<asm/threads.h>)]
 [decl_include(<bits/threads.h>)][cp]
 [decl_include(<bits/pthreadtypes.h>)]
 [same_impl][requires($has_function(pthread_mutex_lock))]
@@ -309,8 +328,8 @@ mtx_lock:([nonnull] mtx_t *__restrict mutex) -> int {
 	int error;
 	error = pthread_mutex_lock((pthread_mutex_t *)mutex);
 	if likely(!error)
-		return 0; /* thrd_success */
-	return 2; /* thrd_error */
+		return thrd_success;
+	return thrd_error;
 }
 
 @@Block the current thread until the mutex pointed by MUTEX
@@ -319,6 +338,7 @@ mtx_lock:([nonnull] mtx_t *__restrict mutex) -> int {
 @@s.a. `pthread_mutex_timedlock()'
 [if(defined(__USE_TIME_BITS64)), preferred_alias(mtx_timedlock64)]
 [if(!defined(__USE_TIME_BITS64)), preferred_alias(mtx_timedlock)]
+[dependency_include(<asm/threads.h>)]
 [decl_include(<bits/threads.h>)][cp]
 [decl_include(<bits/pthreadtypes.h>)]
 [same_impl][requires($has_function(pthread_mutex_timedlock))]
@@ -327,12 +347,13 @@ mtx_timedlock:([nonnull] mtx_t *__restrict mutex,
 	int error;
 	error = pthread_mutex_timedlock((pthread_mutex_t *)mutex, time_point);
 	if likely(!error)
-		return 0; /* thrd_success */
-	return 2; /* thrd_error */
+		return thrd_success;
+	return thrd_error;
 }
 
 %#ifdef __USE_TIME64
 [time64_variant_of(mtx_timedlock)]
+[dependency_include(<asm/threads.h>)]
 [decl_include(<bits/threads.h>)][cp]
 [decl_include(<bits/pthreadtypes.h>)]
 [same_impl][requires($has_function(pthread_mutex_timedlock64))]
@@ -341,8 +362,8 @@ mtx_timedlock64:([nonnull] mtx_t *__restrict mutex,
 	int error;
 	error = pthread_mutex_timedlock64((pthread_mutex_t *)mutex, time_point);
 	if likely(!error)
-		return 0; /* thrd_success */
-	return 2; /* thrd_error */
+		return thrd_success;
+	return thrd_error;
 }
 %#endif /* __USE_TIME64 */
 
@@ -351,6 +372,7 @@ mtx_timedlock64:([nonnull] mtx_t *__restrict mutex,
 @@If the mutex is free the current threads takes control of
 @@it, otherwise it returns immediately
 @@s.a. `pthread_mutex_trylock()'
+[dependency_include(<asm/threads.h>)]
 [decl_include(<bits/threads.h>)]
 [decl_include(<bits/pthreadtypes.h>)]
 [same_impl][requires($has_function(pthread_mutex_trylock))]
@@ -358,13 +380,14 @@ mtx_trylock:([nonnull] mtx_t *__restrict mutex) -> int {
 	int error;
 	error = pthread_mutex_trylock((pthread_mutex_t *)mutex);
 	if likely(!error)
-		return 0; /* thrd_success */
-	return 2; /* thrd_error */
+		return thrd_success;
+	return thrd_error;
 }
 
 @@Unlock the mutex pointed by MUTEX.
 @@It may potentially awake other threads waiting on this mutex
 @@s.a. `pthread_mutex_unlock()'
+[dependency_include(<asm/threads.h>)]
 [decl_include(<bits/threads.h>)]
 [decl_include(<bits/pthreadtypes.h>)]
 [same_impl][requires($has_function(pthread_mutex_unlock))]
@@ -372,8 +395,8 @@ mtx_unlock:([nonnull] mtx_t *__restrict mutex) -> int {
 	int error;
 	error = pthread_mutex_unlock((pthread_mutex_t *)mutex);
 	if likely(!error)
-		return 0; /* thrd_success */
-	return 2; /* thrd_error */
+		return thrd_success;
+	return thrd_error;
 }
 
 @@Destroy the mutex object pointed by MUTEX
@@ -397,6 +420,7 @@ call_once:([nonnull] once_flag *__restrict flag,
 
 @@Initialize new condition variable pointed by COND
 @@s.a. `pthread_cond_init()'
+[dependency_include(<asm/threads.h>)]
 [decl_include(<bits/threads.h>)]
 [decl_include(<bits/pthreadtypes.h>)]
 [same_impl][requires($has_function(pthread_cond_init))]
@@ -404,12 +428,13 @@ cnd_init:([nonnull] cnd_t *__restrict cond) -> int {
 	int error;
 	error = pthread_cond_init((pthread_cond_t *)cond, NULL);
 	if likely(!error)
-		return 0; /* thrd_success */
-	return 2; /* thrd_error */
+		return thrd_success;
+	return thrd_error;
 }
 
 @@Unblock one thread that currently waits on condition variable pointed by COND
 @@s.a. `pthread_cond_signal()'
+[dependency_include(<asm/threads.h>)]
 [decl_include(<bits/threads.h>)]
 [decl_include(<bits/pthreadtypes.h>)]
 [same_impl][requires($has_function(pthread_cond_signal))]
@@ -417,12 +442,13 @@ cnd_signal:([nonnull] cnd_t *__restrict cond) -> int {
 	int error;
 	error = pthread_cond_signal((pthread_cond_t *)cond);
 	if likely(!error)
-		return 0; /* thrd_success */
-	return 2; /* thrd_error */
+		return thrd_success;
+	return thrd_error;
 }
 
 @@Unblock all threads currently waiting on condition variable pointed by COND
 @@s.a. `pthread_cond_broadcast()'
+[dependency_include(<asm/threads.h>)]
 [decl_include(<bits/threads.h>)]
 [decl_include(<bits/pthreadtypes.h>)]
 [same_impl][requires($has_function(pthread_cond_broadcast))]
@@ -430,12 +456,13 @@ cnd_broadcast:([nonnull] cnd_t *__restrict cond) -> int {
 	int error;
 	error = pthread_cond_broadcast((pthread_cond_t *)cond);
 	if likely(!error)
-		return 0; /* thrd_success */
-	return 2; /* thrd_error */
+		return thrd_success;
+	return thrd_error;
 }
 
 @@Block current thread on the condition variable pointed by COND
 @@s.a. `pthread_cond_wait()'
+[dependency_include(<asm/threads.h>)]
 [decl_include(<bits/threads.h>)]
 [decl_include(<bits/pthreadtypes.h>)]
 [same_impl][requires($has_function(pthread_cond_wait))][cp]
@@ -445,8 +472,8 @@ cnd_wait:([nonnull] cnd_t *__restrict cond,
 	error = pthread_cond_wait((pthread_cond_t *)cond,
 	                          (pthread_mutex_t *)mutex);
 	if likely(!error)
-		return 0; /* thrd_success */
-	return 2; /* thrd_error */
+		return thrd_success;
+	return thrd_error;
 }
 
 @@Block current thread on the condition variable until condition variable
@@ -454,6 +481,7 @@ cnd_wait:([nonnull] cnd_t *__restrict cond,
 @@s.a. `pthread_cond_timedwait()'
 [if(defined(__USE_TIME_BITS64)), preferred_alias(cnd_timedwait64)]
 [if(!defined(__USE_TIME_BITS64)), preferred_alias(cnd_timedwait)]
+[dependency_include(<asm/threads.h>)]
 [decl_include(<bits/threads.h>)][cp]
 [decl_include(<bits/pthreadtypes.h>)]
 [decl_include(<bits/timespec.h>)]
@@ -466,14 +494,15 @@ cnd_timedwait:([nonnull] cnd_t *__restrict cond,
 	                               (pthread_mutex_t *)mutex,
 	                               time_point);
 	if likely(!error)
-		return 0; /* thrd_success */
+		return thrd_success;
 	if (error == ETIMEDOUT)
-		return 4; /* thrd_timedout */
-	return 2; /* thrd_error */
+		return thrd_timedout;
+	return thrd_error;
 }
 
 %#ifdef __USE_TIME64
 [time64_variant_of(cnd_timedwait)]
+[dependency_include(<asm/threads.h>)]
 [decl_include(<bits/threads.h>)][cp]
 [decl_include(<bits/pthreadtypes.h>)]
 [decl_include(<bits/timespec.h>)]
@@ -486,10 +515,10 @@ cnd_timedwait64:([nonnull] cnd_t *__restrict cond,
 	                                 (pthread_mutex_t *)mutex,
 	                                 time_point);
 	if likely(!error)
-		return 0; /* thrd_success */
+		return thrd_success;
 	if (error == ETIMEDOUT)
-		return 4; /* thrd_timedout */
-	return 2; /* thrd_error */
+		return thrd_timedout;
+	return thrd_error;
 }
 %#endif /* __USE_TIME64 */
 
@@ -505,6 +534,7 @@ cnd_destroy:(cnd_t *COND) = pthread_cond_destroy;
 @@Create new thread-specific storage key and stores it in the object pointed by TSS_ID.
 @@If DESTRUCTOR is not NULL, the function will be called when the thread terminates
 @@s.a. `pthread_key_create()'
+[dependency_include(<asm/threads.h>)]
 [decl_include(<bits/threads.h>)]
 [decl_include(<bits/pthreadtypes.h>)]
 [same_impl][requires($has_function(pthread_key_create))]
@@ -512,8 +542,8 @@ tss_create:(tss_t *tss_id, tss_dtor_t destructor) -> int {
 	int error;
 	error = pthread_key_create((pthread_key_t *)tss_id, destructor);
 	if likely(!error)
-		return 0; /* thrd_success */
-	return 2; /* thrd_error */
+		return thrd_success;
+	return thrd_error;
 }
 
 @@Return the value held in thread-specific storage
@@ -525,6 +555,7 @@ tss_get:(tss_t tss_id) -> void * = pthread_getspecific;
 @@Sets the value of the thread-specific storage
 @@identified by TSS_ID for the current thread to VAL
 @@s.a. `pthread_setspecific()'
+[dependency_include(<asm/threads.h>)]
 [decl_include(<bits/threads.h>)]
 [decl_include(<bits/pthreadtypes.h>)]
 [same_impl][requires($has_function(pthread_setspecific))]
@@ -532,8 +563,8 @@ tss_set:(tss_t tss_id, void *val) -> int {
 	int error;
 	error = pthread_setspecific((pthread_key_t)tss_id, val);
 	if likely(!error)
-		return 0; /* thrd_success */
-	return 2; /* thrd_error */
+		return thrd_success;
+	return thrd_error;
 }
 
 @@Destroys the thread-specific storage identified by TSS_ID.

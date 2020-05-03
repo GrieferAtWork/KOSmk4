@@ -187,7 +187,7 @@
 #define __NAMESPACE_FAST_SYM                /* nothing */
 #define __NAMESPACE_FAST_USING(x)           /* nothing */
 #define __NAMESPACE_FAST_USING_OR_IMPL(x,i) i
-#define __LIBC_FAST_NAME(x)                 __FAST_##x
+#define __LIBC_FAST_NAME(x)                 __optimized_##x
 #endif /* !__cplusplus */
 
 /* Automatic namespacing for header-local implementations of functions. */
@@ -204,7 +204,7 @@
 #define __NAMESPACE_LOCAL_SYM                /* nothing */
 #define __NAMESPACE_LOCAL_USING(x)           /* nothing */
 #define __NAMESPACE_LOCAL_USING_OR_IMPL(x,i) i
-#define __LIBC_LOCAL_NAME(x)                 __LOCAL_##x
+#define __LIBC_LOCAL_NAME(x)                 __local_##x
 #endif /* !__cplusplus */
 
 #ifndef __FCALL

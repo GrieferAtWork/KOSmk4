@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5a7f939f */
+/* HASH CRC-32:0xefbd5937 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,6 +24,8 @@
 #include <__crt.h>
 #include <bits/timespec.h>
 #include <bits/timespec.h>
+#include <asm/threads.h>
+
 #include <parts/errno.h>
 /* Dependency: "thrd_sleep32" from "threads" */
 #ifndef ____localdep_thrd_sleep32_defined
@@ -88,7 +90,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(thrd_sleep) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(thrd_sleep))(struct timespec const *__time_point,
                                                         struct timespec *__remaining) {
-#line 140 "kos/src/libc/magic/threads.c"
+#line 155 "kos/src/libc/magic/threads.c"
 #ifdef __CRT_HAVE_thrd_sleep
 	int __result;
 	struct __timespec32 __tp32, __rem32;
@@ -116,10 +118,10 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(thrd_sleep))(struct timespec const *_
 	__error = __localdep_nanosleep(__time_point, __remaining);
 	if __likely(__error == 0)
 		return 0;
-#if defined(__errno) && defined(__EINTR)
-	if (__errno == __EINTR)
-		return -1; /* thrd_nomem */
-#endif /* __errno && __EINTR */
+#if defined(__libc_geterrno) && defined(__EINTR)
+	if (__libc_geterrno() == __EINTR)
+		return -1;
+#endif /* __libc_geterrno && EINTR */
 	return -2;
 #endif /* !__CRT_HAVE_thrd_sleep64 */
 }

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc1c3a53 */
+/* HASH CRC-32:0x72db3d86 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1689,8 +1689,8 @@ __CRT_FUNCTION(pread,0,(),4,(fd_t,fd,void *,buf,size_t,bufsize,__PIO_OFFSET,offs
 __CRT_FUNCTION(pread64,1,(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__,pread),4,(fd_t,fd,void *,buf,size_t,bufsize,__PIO_OFFSET64,offset),ssize_t)
 __CRT_FUNCTION(preadall,0,(),4,(fd_t,fd,void *,buf,size_t,bufsize,__PIO_OFFSET,offset),ssize_t)
 __CRT_FUNCTION(preadall64,1,(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__,preadall),4,(fd_t,fd,void *,buf,size_t,bufsize,__PIO_OFFSET64,offset),ssize_t)
-__CRT_FUNCTION(preadv,0,(),4,(fd_t,fd,struct iovec const *,iovec,__STDC_INT_AS_SIZE_T,count,off_t,offset),ssize_t)
-__CRT_FUNCTION(preadv64,1,(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__,preadv),4,(fd_t,fd,struct iovec const *,iovec,__STDC_INT_AS_SIZE_T,count,off64_t,offset),ssize_t)
+__CRT_FUNCTION(preadv,0,(),4,(fd_t,fd,struct iovec const *,iov,__STDC_INT_AS_SIZE_T,count,off_t,offset),ssize_t)
+__CRT_FUNCTION(preadv64,1,(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__,preadv),4,(fd_t,fd,struct iovec const *,iov,__STDC_INT_AS_SIZE_T,count,off64_t,offset),ssize_t)
 __CRT_FUNCTION(printf,0,(),VA(1),(char const *__restrict,format),__STDC_INT_AS_SSIZE_T)
 __CRT_FUNCTION(printf_unlocked,0,(),VA(1),(char const *__restrict,format),__STDC_INT_AS_SSIZE_T)
 __CRT_FUNCTION(prlimit,0,(),4,(pid_t,pid,__rlimit_resource_t,resource,struct rlimit const *,new_limit,struct rlimit *,old_limit),int)
@@ -1852,8 +1852,8 @@ __CRT_FUNCTION(pwrite,0,(),4,(fd_t,fd,void const *,buf,size_t,bufsize,__PIO_OFFS
 __CRT_FUNCTION(pwrite64,1,(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__,pwrite),4,(fd_t,fd,void const *,buf,size_t,bufsize,__PIO_OFFSET64,offset),ssize_t)
 __CRT_FUNCTION(pwriteall,0,(),4,(fd_t,fd,void const *,buf,size_t,bufsize,__PIO_OFFSET,offset),ssize_t)
 __CRT_FUNCTION(pwriteall64,1,(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__,pwriteall),4,(fd_t,fd,void *,buf,size_t,bufsize,__PIO_OFFSET64,offset),ssize_t)
-__CRT_FUNCTION(pwritev,0,(),4,(fd_t,fd,struct iovec const *,iovec,__STDC_INT_AS_SIZE_T,count,off_t,offset),ssize_t)
-__CRT_FUNCTION(pwritev64,1,(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__,pwritev),4,(fd_t,fd,struct iovec const *,iovec,__STDC_INT_AS_SIZE_T,count,off64_t,offset),ssize_t)
+__CRT_FUNCTION(pwritev,0,(),4,(fd_t,fd,struct iovec const *,iov,__STDC_INT_AS_SIZE_T,count,off_t,offset),ssize_t)
+__CRT_FUNCTION(pwritev64,1,(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__,pwritev),4,(fd_t,fd,struct iovec const *,iov,__STDC_INT_AS_SIZE_T,count,off64_t,offset),ssize_t)
 __CRT_FUNCTION(qecvt,0,(),4,(__LONGDOUBLE,val,int,ndigit,int *__restrict,decptr,int *__restrict,sign),char *)
 __CRT_FUNCTION(qecvt_r,0,(),6,(__LONGDOUBLE,val,int,ndigit,int *__restrict,decptr,int *__restrict,sign,char *__restrict,buf,size_t,len),int)
 __CRT_FUNCTION(qfcvt,0,(),4,(__LONGDOUBLE,val,int,ndigit,int *__restrict,decptr,int *__restrict,sign),char *)
@@ -1918,7 +1918,7 @@ __CRT_FUNCTION(readdir64_r,1,(IS_DEFINED(_DIRENT_MATCHES_DIRENT64),readdir_r),3,
 __CRT_FUNCTION(readdir_r,0,(),3,(DIR *__restrict,dirp,struct dirent *__restrict,entry,struct dirent **__restrict,result),int)
 __CRT_FUNCTION(readlink,0,(),3,(char const *__restrict,path,char *__restrict,buf,size_t,buflen),ssize_t)
 __CRT_FUNCTION(readlinkat,0,(),4,(fd_t,dfd,char const *__restrict,path,char *__restrict,buf,size_t,buflen),ssize_t)
-__CRT_FUNCTION(readv,0,(),3,(fd_t,fd,struct iovec const *,iovec,__STDC_INT_AS_SIZE_T,count),ssize_t)
+__CRT_FUNCTION(readv,0,(),3,(fd_t,fd,struct iovec const *,iov,__STDC_INT_AS_SIZE_T,count),ssize_t)
 __CRT_FUNCTION(realloc,0,(),2,(void *,mallptr,size_t,num_bytes),void *)
 __CRT_FUNCTION(realloc_in_place,0,(),2,(void *__restrict,mallptr,size_t,n_bytes),void *)
 __CRT_FUNCTION(realpath,0,(),2,(char const *__restrict,filename,char *,resolved),char *)
@@ -2472,7 +2472,7 @@ __CRT_FUNCTION(wildstrcasecmp_l,0,(),3,(char const *,pattern,char const *,string
 __CRT_FUNCTION(wildstrcmp,0,(),2,(char const *,pattern,char const *,string),int)
 __CRT_FUNCTION(write,0,(),3,(fd_t,fd,void const *,buf,size_t,bufsize),ssize_t)
 __CRT_FUNCTION(writeall,0,(),3,(fd_t,fd,void const *,buf,size_t,bufsize),ssize_t)
-__CRT_FUNCTION(writev,0,(),3,(fd_t,fd,struct iovec const *,iovec,__STDC_INT_AS_SIZE_T,count),ssize_t)
+__CRT_FUNCTION(writev,0,(),3,(fd_t,fd,struct iovec const *,iov,__STDC_INT_AS_SIZE_T,count),ssize_t)
 __CRT_FUNCTION(y0,0,(),1,(double,x),double)
 __CRT_FUNCTION(y0f,0,(),1,(float,x),float)
 __CRT_FUNCTION(y0l,0,(),1,(__LONGDOUBLE,x),__LONGDOUBLE)

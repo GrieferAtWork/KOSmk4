@@ -52,12 +52,12 @@ NOTHROW_NCX(LIBCCALL libc_thrd_create)(thrd_t *thr,
 	                       (__pthread_start_routine_t)(void *)func,
 	                       arg);
 	if likely(!error)
-		return 0; /* thrd_success */
-#ifdef __ENOMEM
-	if (error == __ENOMEM)
-		return 3; /* thrd_nomem */
-#endif /* __ENOMEM */
-	return 2; /* thrd_error */
+		return thrd_success;
+#ifdef ENOMEM
+	if (error == ENOMEM)
+		return thrd_nomem;
+#endif /* ENOMEM */
+	return thrd_error;
 }
 /*[[[end:thrd_create]]]*/
 
@@ -148,8 +148,8 @@ NOTHROW_NCX(LIBCCALL libc_thrd_detach)(thrd_t thr)
 	int error;
 	error = libc_pthread_detach((pthread_t)thr);
 	if likely(!error)
-		return 0; /* thrd_success */
-	return 2; /* thrd_error */
+		return thrd_success;
+	return thrd_error;
 }
 /*[[[end:thrd_detach]]]*/
 
@@ -169,14 +169,14 @@ NOTHROW_RPC(LIBCCALL libc_thrd_join)(thrd_t thr,
 	if likely(!error) {
 		if (res)
 			*res = (int)(unsigned int)(uintptr_t)resptr;
-		return 0; /* thrd_success */
+		return thrd_success;
 	}
 #else /* __SIZEOF_POINTER__ != __SIZEOF_INT__ */
 	error = libc_pthread_join((pthread_t)thr, (void **)res);
 	if likely(!error)
-		return 0; /* thrd_success */
+		return thrd_success;
 #endif /* __SIZEOF_POINTER__ == __SIZEOF_INT__ */
-	return 2; /* thrd_error */
+	return thrd_error;
 }
 /*[[[end:thrd_join]]]*/
 
@@ -191,7 +191,7 @@ NOTHROW_NCX(LIBCCALL libc_mtx_init)(mtx_t *__restrict mutex,
 /*[[[body:mtx_init]]]*/
 /*AUTO*/{
 	int error;
-	if (type == 0 /*mtx_plain*/) {
+	if (type == mtx_plain) {
 		error = libc_pthread_mutex_init((pthread_mutex_t *)mutex, NULL);
 	} else {
 		pthread_mutexattr_t attr;
@@ -206,8 +206,8 @@ NOTHROW_NCX(LIBCCALL libc_mtx_init)(mtx_t *__restrict mutex,
 		}
 	}
 	if likely(!error)
-		return 0; /* thrd_success */
-	return 2; /* thrd_error */
+		return thrd_success;
+	return thrd_error;
 }
 /*[[[end:mtx_init]]]*/
 
@@ -223,8 +223,8 @@ NOTHROW_RPC(LIBCCALL libc_mtx_lock)(mtx_t *__restrict mutex)
 	int error;
 	error = libc_pthread_mutex_lock((pthread_mutex_t *)mutex);
 	if likely(!error)
-		return 0; /* thrd_success */
-	return 2; /* thrd_error */
+		return thrd_success;
+	return thrd_error;
 }
 /*[[[end:mtx_lock]]]*/
 
@@ -242,8 +242,8 @@ NOTHROW_RPC(LIBCCALL libc_mtx_timedlock)(mtx_t *__restrict mutex,
 	int error;
 	error = libc_pthread_mutex_timedlock((pthread_mutex_t *)mutex, time_point);
 	if likely(!error)
-		return 0; /* thrd_success */
-	return 2; /* thrd_error */
+		return thrd_success;
+	return thrd_error;
 }
 /*[[[end:mtx_timedlock]]]*/
 
@@ -260,8 +260,8 @@ NOTHROW_NCX(LIBCCALL libc_mtx_trylock)(mtx_t *__restrict mutex)
 	int error;
 	error = libc_pthread_mutex_trylock((pthread_mutex_t *)mutex);
 	if likely(!error)
-		return 0; /* thrd_success */
-	return 2; /* thrd_error */
+		return thrd_success;
+	return thrd_error;
 }
 /*[[[end:mtx_trylock]]]*/
 
@@ -277,8 +277,8 @@ NOTHROW_NCX(LIBCCALL libc_mtx_unlock)(mtx_t *__restrict mutex)
 	int error;
 	error = libc_pthread_mutex_unlock((pthread_mutex_t *)mutex);
 	if likely(!error)
-		return 0; /* thrd_success */
-	return 2; /* thrd_error */
+		return thrd_success;
+	return thrd_error;
 }
 /*[[[end:mtx_unlock]]]*/
 
@@ -295,8 +295,8 @@ NOTHROW_NCX(LIBCCALL libc_cnd_init)(cnd_t *__restrict cond)
 	int error;
 	error = libc_pthread_cond_init((pthread_cond_t *)cond, NULL);
 	if likely(!error)
-		return 0; /* thrd_success */
-	return 2; /* thrd_error */
+		return thrd_success;
+	return thrd_error;
 }
 /*[[[end:cnd_init]]]*/
 
@@ -311,8 +311,8 @@ NOTHROW_NCX(LIBCCALL libc_cnd_signal)(cnd_t *__restrict cond)
 	int error;
 	error = libc_pthread_cond_signal((pthread_cond_t *)cond);
 	if likely(!error)
-		return 0; /* thrd_success */
-	return 2; /* thrd_error */
+		return thrd_success;
+	return thrd_error;
 }
 /*[[[end:cnd_signal]]]*/
 
@@ -327,8 +327,8 @@ NOTHROW_NCX(LIBCCALL libc_cnd_broadcast)(cnd_t *__restrict cond)
 	int error;
 	error = libc_pthread_cond_broadcast((pthread_cond_t *)cond);
 	if likely(!error)
-		return 0; /* thrd_success */
-	return 2; /* thrd_error */
+		return thrd_success;
+	return thrd_error;
 }
 /*[[[end:cnd_broadcast]]]*/
 
@@ -345,8 +345,8 @@ NOTHROW_RPC(LIBCCALL libc_cnd_wait)(cnd_t *__restrict cond,
 	error = libc_pthread_cond_wait((pthread_cond_t *)cond,
 	                          (pthread_mutex_t *)mutex);
 	if likely(!error)
-		return 0; /* thrd_success */
-	return 2; /* thrd_error */
+		return thrd_success;
+	return thrd_error;
 }
 /*[[[end:cnd_wait]]]*/
 
@@ -366,10 +366,10 @@ NOTHROW_RPC(LIBCCALL libc_cnd_timedwait)(cnd_t *__restrict cond,
 	                               (pthread_mutex_t *)mutex,
 	                               time_point);
 	if likely(!error)
-		return 0; /* thrd_success */
+		return thrd_success;
 	if (error == ETIMEDOUT)
-		return 4; /* thrd_timedout */
-	return 2; /* thrd_error */
+		return thrd_timedout;
+	return thrd_error;
 }
 /*[[[end:cnd_timedwait]]]*/
 
@@ -386,8 +386,8 @@ NOTHROW_NCX(LIBCCALL libc_tss_create)(tss_t *tss_id,
 	int error;
 	error = libc_pthread_key_create((pthread_key_t *)tss_id, destructor);
 	if likely(!error)
-		return 0; /* thrd_success */
-	return 2; /* thrd_error */
+		return thrd_success;
+	return thrd_error;
 }
 /*[[[end:tss_create]]]*/
 
@@ -404,8 +404,8 @@ NOTHROW_NCX(LIBCCALL libc_tss_set)(tss_t tss_id,
 	int error;
 	error = libc_pthread_setspecific((pthread_key_t)tss_id, val);
 	if likely(!error)
-		return 0; /* thrd_success */
-	return 2; /* thrd_error */
+		return thrd_success;
+	return thrd_error;
 }
 /*[[[end:tss_set]]]*/
 
@@ -427,8 +427,8 @@ NOTHROW_RPC(LIBCCALL libc_mtx_timedlock64)(mtx_t *__restrict mutex,
 	int error;
 	error = libc_pthread_mutex_timedlock64((pthread_mutex_t *)mutex, time_point);
 	if likely(!error)
-		return 0; /* thrd_success */
-	return 2; /* thrd_error */
+		return thrd_success;
+	return thrd_error;
 }
 #endif /* MAGIC:alias */
 /*[[[end:mtx_timedlock64]]]*/
@@ -452,10 +452,10 @@ NOTHROW_RPC(LIBCCALL libc_cnd_timedwait64)(cnd_t *__restrict cond,
 	                                 (pthread_mutex_t *)mutex,
 	                                 time_point);
 	if likely(!error)
-		return 0; /* thrd_success */
+		return thrd_success;
 	if (error == ETIMEDOUT)
-		return 4; /* thrd_timedout */
-	return 2; /* thrd_error */
+		return thrd_timedout;
+	return thrd_error;
 }
 #endif /* MAGIC:alias */
 /*[[[end:cnd_timedwait64]]]*/

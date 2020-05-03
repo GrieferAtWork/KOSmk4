@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1a68b7cf */
+/* HASH CRC-32:0x3e98209d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,7 @@ __CREDIRECT(,int,,__localdep_fflush_unlocked,(__FILE *__stream),_IO_fflush,(__st
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(flushall_unlocked) int
 (__LIBCCALL __LIBC_LOCAL_NAME(flushall_unlocked))(void) __THROWS(...) {
-#line 1828 "kos/src/libc/magic/stdio.c"
+#line 1830 "kos/src/libc/magic/stdio.c"
 	return __localdep_fflush_unlocked(__NULLPTR);
 }
 __NAMESPACE_LOCAL_END

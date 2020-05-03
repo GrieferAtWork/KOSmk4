@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x14d0754d */
+/* HASH CRC-32:0x5d59003c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -112,9 +112,9 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fsetpos) __ATTR_NONNULL((1, 2)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fsetpos))(__FILE *__restrict __stream,
                                         __FS_TYPE(pos) const *__restrict __pos) __THROWS(...) {
-#line 790 "kos/src/libc/magic/stdio.c"
+#line 798 "kos/src/libc/magic/stdio.c"
 #if defined(__USE_FILE_OFFSET64) && (defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock) || defined(__CRT_HAVE__fseeki64))
-	return __localdep_crt_fseeko64(__stream, (__off64_t)*__pos, 0);
+	return __localdep_crt_fseeko64(__stream, (__off64_t)*__pos, __SEEK_SET);
 #elif defined(__CRT_HAVE_fsetpos) || defined(__CRT_HAVE__IO_fsetpos) || defined(__CRT_HAVE_fsetpos_unlocked)
 	__pos32_t __pos32 = (__pos32_t)*__pos;
 	return __localdep_crt_fsetpos(__stream, &__pos32);
@@ -122,11 +122,11 @@ __LOCAL_LIBC(fsetpos) __ATTR_NONNULL((1, 2)) int
 	__pos64_t __pos64 = (__pos64_t)*__pos;
 	return __localdep_crt_fsetpos64(__stream, &__pos64);
 #elif defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock) || defined(__CRT_HAVE__fseeki64)
-	return __localdep_crt_fseeko64(__stream, (__off64_t)*__pos, 0);
+	return __localdep_crt_fseeko64(__stream, (__off64_t)*__pos, __SEEK_SET);
 #elif defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked)
-	return __localdep_crt_fseeko(__stream, (__off32_t)*__pos, 0);
+	return __localdep_crt_fseeko(__stream, (__off32_t)*__pos, __SEEK_SET);
 #else
-	return __localdep_crt_fseek(__stream, (long int)*__pos, 0);
+	return __localdep_crt_fseek(__stream, (long int)*__pos, __SEEK_SET);
 #endif
 }
 __NAMESPACE_LOCAL_END

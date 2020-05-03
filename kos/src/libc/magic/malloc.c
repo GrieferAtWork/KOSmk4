@@ -103,11 +103,21 @@ posix_memalign:([nonnull] void **__restrict pp, $size_t alignment, $size_t n_byt
 	void *result;
 	size_t d = alignment / sizeof(void *);
 	size_t r = alignment % sizeof(void *);
-	if (r != 0 || !d || (d & (d - 1)) != 0)
-		return @__EINVAL@;
+	if (r != 0 || !d || (d & (d - 1)) != 0) {
+#ifdef EINVAL
+		return EINVAL;
+#else /* EINVAL */
+		return 1;
+#endif /* !EINVAL */
+	}
 	result = memalign(alignment, n_bytes);
-	if (!result)
-		return @__ENOMEM@;
+	if (!result) {
+#ifdef ENOMEM
+		return ENOMEM;
+#else /* ENOMEM */
+		return 1;
+#endif /* !ENOMEM */
+	}
 	*pp = result;
 	return 0;
 }
@@ -128,15 +138,15 @@ _heapmin:() -> int;
 	(void)pad;
 	return 0;
 })] malloc_trim:(size_t pad) -> int {
-#ifdef __CRT_HAVE__heapmin
+@@if_has_function(_heapmin)@@
 	(void)pad;
 	return _heapmin() ? 1 : 0;
-#else
+@@else_has_function(_heapmin)@@
 	/* NO-OP (indicate failure to release memory) */
 	COMPILER_IMPURE();
 	(void)pad;
 	return 0;
-#endif
+@@endif_has_function(_heapmin)@@
 }
 
 %

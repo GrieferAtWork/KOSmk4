@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xba72e998 */
+/* HASH CRC-32:0x8a1639d6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,14 +36,14 @@ __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),cha
 
 __NAMESPACE_LOCAL_BEGIN
 /* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
- * are no more.  If entry is NULL, then the first entry is returned.  This
+ * are no more. If entry is NULL, then the first entry is returned. This
  * behavior allows two convenient iteration styles:
- * >> char *entry = 0;
+ * >> char *entry = NULL;
  * >> while ((entry = argz_next(argz, argz_len, entry)) != NULL)
  * >>     ...;
  * or
  * >> char *entry;
- * >> for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))
+ * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
  * >>     ...; */
 __LOCAL_LIBC(argz_next) __ATTR_PURE __ATTR_WUNUSED char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_next))(char const *__restrict __argz,

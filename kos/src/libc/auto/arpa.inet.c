@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd5db193d */
+/* HASH CRC-32:0x436256e4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -372,12 +372,12 @@ NOTHROW_NCX(LIBCCALL libc_inet_neta)(uint32_t net,
 		goto too_small;
 	return buf;
 too_small:
-#ifdef __EMSGSIZE
-	__libc_seterrno(__EMSGSIZE);
-#elif defined(__ERANGE)
-	__libc_seterrno(__ERANGE);
-#elif defined(__EINVAL)
-	__libc_seterrno(__EINVAL);
+#ifdef EMSGSIZE
+	__libc_seterrno(EMSGSIZE);
+#elif defined(ERANGE)
+	__libc_seterrno(ERANGE);
+#elif defined(EINVAL)
+	__libc_seterrno(EINVAL);
 #endif
 	return NULL;
 }

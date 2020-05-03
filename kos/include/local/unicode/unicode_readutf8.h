@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc88c817f */
+/* HASH CRC-32:0xa897a513 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Read a single Unicode character from a given UTF-8 string */
 __LOCAL_LIBC(unicode_readutf8) __ATTR_NONNULL((1)) __CHAR32_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_readutf8))(/*utf-8*/ char const **__restrict __ptext) {
-#line 116 "kos/src/libc/magic/unicode.c"
+#line 134 "kos/src/libc/magic/unicode.c"
 	__CHAR32_TYPE__ __result;
 	char const *__iter = *__ptext;
 	__result = (__CHAR32_TYPE__)(__UINT8_TYPE__)*__iter++;

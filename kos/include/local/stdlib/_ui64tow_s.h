@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd494ec0b */
+/* HASH CRC-32:0x4af1353 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ui64tow_s))(__UINT64_TYPE__ __val,
                                                         __WCHAR_TYPE__ *__buf,
                                                         __SIZE_TYPE__ __buflen,
                                                         int __radix) {
-#line 2389 "kos/src/libc/magic/stdlib.c"
+#line 2424 "kos/src/libc/magic/stdlib.c"
 	__WCHAR_TYPE__ *__p;
 	__UINT64_TYPE__ __temp;
 	if (__radix < 2)
@@ -37,8 +37,13 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ui64tow_s))(__UINT64_TYPE__ __val,
 	__temp = __val;
 	do ++__p;
 	while ((__temp /= (unsigned int)__radix) != 0);
-	if (__buflen <= (__SIZE_TYPE__)(__p - __buf))
+	if (__buflen <= (__SIZE_TYPE__)(__p - __buf)) {
+#ifdef __ERANGE
 		return __ERANGE;
+#else /* ERANGE */
+		return 1;
+#endif /* !ERANGE */
+	}
 	__temp = __val;
 	*__p = '\0';
 	do {

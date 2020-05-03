@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa8c39cfc */
+/* HASH CRC-32:0xe4d91d5b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fopendirat_defined
-#if defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_openat64) || (defined(__CRT_HAVE_openat) && !defined(__USE_FILE_OFFSET64)))
+#if defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_openat) || defined(__CRT_HAVE_openat64))
 #define __local_fopendirat_defined 1
 #include <__crt.h>
 #include <bits/types.h>
@@ -32,7 +32,7 @@ struct __dirstream;
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__NOTHROW_RPC,__localdep_openat,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),openat64,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_openat) && !defined(__USE_FILE_OFFSET64)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__NOTHROW_RPC,__localdep_openat,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),openat,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
-#elif defined(__CRT_HAVE_openat64)
+#elif defined(__CRT_HAVE_openat) || defined(__CRT_HAVE_openat64)
 #include <local/fcntl/openat.h>
 #define __localdep_openat (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(openat))
 #else /* CUSTOM: openat */
@@ -90,5 +90,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fopendirat))(__fd_t __dirfd,
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_fdopendir && (__CRT_HAVE_openat64 || (__CRT_HAVE_openat && !__USE_FILE_OFFSET64)) */
+#endif /* __CRT_HAVE_fdopendir && (__CRT_HAVE_openat || __CRT_HAVE_openat64) */
 #endif /* !__local_fopendirat_defined */

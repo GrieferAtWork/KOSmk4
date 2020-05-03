@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f2703c5 */
+/* HASH CRC-32:0xc3d7f4c3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_filelength_defined
-#if defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64)
+#if defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)
 #define __local_filelength_defined 1
 #include <__crt.h>
 #include <bits/types.h>
@@ -31,7 +31,7 @@
 __CREDIRECT(,__LONG32_TYPE__,__NOTHROW_NCX,__localdep__lseek,(__fd_t __fd, __LONG32_TYPE__ __offset, int __whence),_lseek,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE_lseek)
 __CREDIRECT(,__LONG32_TYPE__,__NOTHROW_NCX,__localdep__lseek,(__fd_t __fd, __LONG32_TYPE__ __offset, int __whence),lseek,(__fd,__offset,__whence))
-#elif defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64)
+#elif defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)
 #include <local/io/_lseek.h>
 #define __localdep__lseek (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_lseek))
 #else /* CUSTOM: _lseek */
@@ -42,16 +42,16 @@ __CREDIRECT(,__LONG32_TYPE__,__NOTHROW_NCX,__localdep__lseek,(__fd_t __fd, __LON
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(filelength) __ATTR_WUNUSED __LONG32_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(filelength))(__fd_t __fd) {
-#line 340 "kos/src/libc/magic/io.c"
+#line 390 "kos/src/libc/magic/io.c"
 	__LONG32_TYPE__ __oldpos, __result;
-	__oldpos = __localdep__lseek(__fd, 0, 1);
+	__oldpos = __localdep__lseek(__fd, 0, __SEEK_CUR);
 	if __unlikely(__oldpos < 0)
 		return -1;
-	__result = __localdep__lseek(__fd, 0, 2);
+	__result = __localdep__lseek(__fd, 0, __SEEK_END);
 	if __likely(__result >= 0)
-		__localdep__lseek(__fd, __oldpos, 0);
+		__localdep__lseek(__fd, __oldpos, __SEEK_SET);
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE__lseek || __CRT_HAVE_lseek || __CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 */
+#endif /* __CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek */
 #endif /* !__local_filelength_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8dd33fc0 */
+/* HASH CRC-32:0x4a000da1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Same as `fflush()', but performs I/O without acquiring a lock to `STREAM' */
 __LOCAL_LIBC(fflush_unlocked) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fflush_unlocked))(__FILE *__stream) __THROWS(...) {
-#line 1124 "kos/src/libc/magic/stdio.c"
+#line 1126 "kos/src/libc/magic/stdio.c"
 	/* NO-OP (When not implemented by the CRT, assume no
 	 * buffering being done, meaning this function isn't needed) */
 #if defined(__CRT_HAVE__flushall) || defined(__CRT_HAVE__IO_flush_all)

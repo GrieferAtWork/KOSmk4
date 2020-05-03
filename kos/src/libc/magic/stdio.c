@@ -55,24 +55,52 @@
 %[define_replacement(fpos64_t = __pos64_t)]
 %[define_replacement(pos32_t  = __pos32_t)]
 %[define_replacement(pos64_t  = __pos64_t)]
-%[define_replacement(SEEK_SET = 0)]
-%[define_replacement(SEEK_CUR = 1)]
-%[define_replacement(SEEK_END = 2)]
 %[define_replacement(cookie_io_functions_t = _IO_cookie_io_functions_t)]
 %[define_replacement(locale_t = __locale_t)]
 
+/* These are defined in <local/stdstreams.h> */
+%[define_replacement(stdin  = __LOCAL_stdin)]
+%[define_replacement(stdout = __LOCAL_stdout)]
+%[define_replacement(stderr = __LOCAL_stderr)]
+
+%[define_replacement(SEEK_SET = __SEEK_SET)]
+%[define_replacement(SEEK_CUR = __SEEK_CUR)]
+%[define_replacement(SEEK_END = __SEEK_END)]
+%[define_replacement(SEEK_DATA = __SEEK_DATA)]
+%[define_replacement(SEEK_HOLE = __SEEK_HOLE)]
+
+%[define_replacement(STDIN_FILENO = __STDIN_FILENO)]
+%[define_replacement(STDOUT_FILENO = __STDOUT_FILENO)]
+%[define_replacement(STDERR_FILENO = __STDERR_FILENO)]
+%[define_replacement(F_OK = __F_OK)]
+%[define_replacement(X_OK = __X_OK)]
+%[define_replacement(W_OK = __W_OK)]
+%[define_replacement(R_OK = __R_OK)]
+%[define_replacement(_IOFBF = ___IOFBF)]
+%[define_replacement(_IOLBF = ___IOLBF)]
+%[define_replacement(_IONBF = ___IONBF)]
+%[define_replacement(BUFSIZ = __BUFSIZ)]
+%[define_replacement(EOF = __EOF)]
+
+
 %{
 #include <features.h>
-#include <bits/types.h>
-#include <bits/stdio_lim.h>
-#include <libio.h>
+
 #include <asm/oflags.h>
+#include <asm/stdio.h>
+#include <bits/stdio_lim.h>
+#include <bits/types.h>
+
+#include <libio.h>
+
 #ifdef __USE_DOS
 #include <xlocale.h>
 #endif /* __USE_DOS */
+
 #ifdef __CRT_CYG_PRIMARY
 #include <sys/reent.h>
 #endif /* __CRT_CYG_PRIMARY */
+
 #ifdef __CRT_DOS_PRIMARY
 #include <bits/io-file.h>
 #endif /* __CRT_DOS_PRIMARY */
@@ -80,41 +108,37 @@
 __SYSDECL_BEGIN
 
 /* The possibilities for the third argument to `setvbuf()'. */
-#ifdef __CRT_DOS_PRIMARY
-#define _IOFBF 0x0000 /* Fully buffered. */
-#define _IOLBF 0x0040 /* Line buffered. */
-#define _IONBF 0x0004 /* No buffering. */
-#else /* __CRT_DOS_PRIMARY */
-#define _IOFBF 0      /* Fully buffered. */
-#define _IOLBF 1      /* Line buffered. */
-#define _IONBF 2      /* No buffering. */
-#endif /* !__CRT_DOS_PRIMARY */
+#ifdef ___IOFBF
+#define _IOFBF ___IOFBF /* Fully buffered. */
+#endif /* ___IOFBF */
+#ifdef ___IOLBF
+#define _IOLBF ___IOLBF /* Line buffered. */
+#endif /* ___IOLBF */
+#ifdef ___IONBF
+#define _IONBF ___IONBF /* No buffering. */
+#endif /* ___IONBF */
 
 /* Default buffer size.  */
 #ifndef BUFSIZ
-#ifdef __USE_DOS
-#define BUFSIZ 512
-#else /* __USE_DOS */
-#define BUFSIZ 8192
-#endif /* !__USE_DOS */
+#define BUFSIZ __BUFSIZ
 #endif /* !BUFSIZ */
 
 #ifndef EOF
-#ifdef __EOF
 #define EOF __EOF
-#else /* __EOF */
-#define EOF (-1)
-#endif /* !__EOF */
 #endif /* !EOF */
 
 #ifndef SEEK_SET
-#   define SEEK_SET  0 /* Seek from beginning of file.  */
-#   define SEEK_CUR  1 /* Seek from current position.  */
-#   define SEEK_END  2 /* Seek from end of file.  */
-#if defined(__USE_GNU) && (defined(__CRT_KOS) || defined(__CRT_GLC))
-#   define SEEK_DATA 3 /* Seek to next data.  */
-#   define SEEK_HOLE 4 /* Seek to next hole.  */
-#endif /* __USE_GNU && (__CRT_KOS || __CRT_GLC) */
+#define SEEK_SET __SEEK_SET /* Seek from beginning of file. */
+#define SEEK_CUR __SEEK_CUR /* Seek from current position. */
+#define SEEK_END __SEEK_END /* Seek from end of file. */
+#ifdef __USE_GNU
+#ifdef __SEEK_DATA
+#define SEEK_DATA __SEEK_DATA /* Seek to next data. */
+#endif /* __SEEK_DATA */
+#ifdef __SEEK_HOLE
+#define SEEK_HOLE __SEEK_HOLE /* Seek to next hole. */
+#endif /* __SEEK_HOLE */
+#endif /* __USE_GNU */
 #endif /* !SEEK_SET */
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN)
@@ -124,6 +148,10 @@ __SYSDECL_BEGIN
 #define P_tmpdir "/tmp"
 #endif /* !__USE_DOS */
 #endif /* __USE_MISC || __USE_XOPEN */
+
+#ifndef NULL
+#define NULL __NULLPTR
+#endif /* !NULL */
 
 
 #ifdef __CC__
@@ -141,10 +169,6 @@ __NAMESPACE_STD_USING(size_t)
 #endif /* !__size_t_defined */
 }%{
 #endif /* !__CXX_SYSTEM_HEADER */
-
-#ifndef NULL
-#define NULL __NULLPTR
-#endif
 
 #ifdef __USE_XOPEN2K8
 #ifndef __off_t_defined
@@ -401,24 +425,8 @@ fclose:([nonnull] FILE *__restrict stream) -> int;
 %[default_impl_section(.text.crt.FILE.locked.read.utility)]
 
 @@Alias for `setvbuf(STREAM, buf, _IOFBF, BUFSIZ)'
-[std][impl_prefix(
-#ifndef __BUFSIZ
-#ifdef __USE_DOS
-#define __BUFSIZ 512
-#else /* __USE_DOS */
-#define __BUFSIZ 8192
-#endif /* !__USE_DOS */
-#endif /* !__BUFSIZ */
-#ifdef __CRT_DOS_PRIMARY
-#define ___IOFBF 0x0000 /* Fully buffered. */
-#define ___IOLBF 0x0040 /* Line buffered. */
-#define ___IONBF 0x0004 /* No buffering. */
-#else /* __CRT_DOS_PRIMARY */
-#define ___IOFBF 0      /* Fully buffered. */
-#define ___IOLBF 1      /* Line buffered. */
-#define ___IONBF 2      /* No buffering. */
-#endif /* !__CRT_DOS_PRIMARY */
-)][requires($has_function(setvbuf))][same_impl]
+[std][dependency_include(<asm/stdio.h>)]
+[requires($has_function(setvbuf))][same_impl]
 setbuf:([nonnull] FILE *__restrict stream, char *__restrict buf) {
 	setvbuf(stream, buf,
 	        buf ? @___IOFBF@ : @___IONBF@,
@@ -464,7 +472,7 @@ fgetc:([nonnull] FILE *__restrict stream) -> int {
 [alias(_fgetchar)][same_impl]
 [requires(!defined(__NO_STDSTREAMS) && $has_function(fgetc))]
 getchar:() -> int {
-	return fgetc(@__LOCAL_stdin@);
+	return fgetc(stdin);
 }
 
 %[default_impl_section(.text.crt.FILE.locked.write.putc)]
@@ -494,7 +502,7 @@ fputc:(int ch, [nonnull] FILE *__restrict stream) -> int {
 [if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(putchar_unlocked)]
 [alias(_fputchar, putchar_unlocked)][crtbuiltin]
 putchar:(int ch) -> int {
-	return fputc(ch, @__LOCAL_stdout@);
+	return fputc(ch, stdout);
 }
 
 %[default_impl_section(.text.crt.FILE.locked.read.read)]
@@ -512,9 +520,9 @@ fgets:([outp(min(strlen(return),bufsize))] char *__restrict buf,
 	size_t n;
 	if unlikely(!buf || !bufsize) {
 		/* The buffer cannot be empty! */
-#ifdef @__ERANGE@
-		__libc_seterrno(@__ERANGE@);
-#endif /* __ERANGE */
+#ifdef ERANGE
+		__libc_seterrno(ERANGE);
+#endif /* ERANGE */
 		return NULL;
 	}
 	for (n = 0; n < bufsize - 1; ++n) {
@@ -570,9 +578,9 @@ fputs:([nonnull] char const *__restrict str,
 [dependency_include(<local/stdstreams.h>)][crtbuiltin]
 puts:([nonnull] char const *__restrict string) -> __STDC_INT_AS_SSIZE_T {
 	__STDC_INT_AS_SSIZE_T result, temp;
-	result = fputs(string, @__LOCAL_stdout@);
+	result = fputs(string, stdout);
 	if (result >= 0) {
-		temp = fputc('\n', @__LOCAL_stdout@);
+		temp = fputc('\n', stdout);
 		if (temp <= 0)
 			result = temp;
 		else
@@ -839,7 +847,7 @@ fprintf:([nonnull] FILE *__restrict stream, [nonnull] char const *__restrict for
 [requires(!defined(__NO_STDSTREAMS) && $has_function(vfprintf))]
 [section(.text.crt.FILE.locked.write.printf)][crtbuiltin]
 vprintf:([nonnull] char const *__restrict format, $va_list args) -> __STDC_INT_AS_SSIZE_T {
-	return vfprintf(@__LOCAL_stdout@, format, args);
+	return vfprintf(stdout, format, args);
 }
 
 @@Print data to `stdout', following `FORMAT'
@@ -883,7 +891,7 @@ vfscanf:([nonnull] FILE *__restrict stream, [nonnull] char const *__restrict for
 [if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(vscanf_unlocked)]
 [section(.text.crt.FILE.locked.read.scanf)][crtbuiltin]
 vscanf:([nonnull] char const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T {
-	return vfscanf(@__LOCAL_stdin@, format, args);
+	return vfscanf(stdin, format, args);
 }
 %(std)#endif /* __USE_ISOC99 || __USE_DOS */
 
@@ -921,7 +929,7 @@ scanf:([nonnull] char const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T
 [dependency_include(<hybrid/typecore.h>)]
 [ATTR_DEPRECATED("No buffer size checks (use `fgets' instead)")]
 gets:([nonnull] char *__restrict buf) -> char * {
-	return fgets(buf, @__INT_MAX__@, @__LOCAL_stdin@);
+	return fgets(buf, @__INT_MAX__@, stdin);
 }
 %(std)#endif /* !__USE_ISOC11 || __cplusplus <= 201103L */
 
@@ -932,17 +940,11 @@ gets:([nonnull] char *__restrict buf) -> char * {
 @@Scan data from a given `INPUT' string, following `FORMAT'
 @@Return the number of successfully scanned data items
 [guard][std][std_guard]
+[dependency_include(<asm/stdio.h>)]
 [dependency(unicode_readutf8)]
 [dependency(unicode_readutf8_rev)]
 [impl_prefix(
 #include <hybrid/typecore.h>
-#ifndef __EOF
-#ifdef EOF
-#define __EOF  EOF
-#else
-#define __EOF (-1)
-#endif
-#endif
 __LOCAL_LIBC(@vsscanf_getc@) __SSIZE_TYPE__ (__LIBCCALL __vsscanf_getc)(void *__arg) {
 	__CHAR32_TYPE__ __result = unicode_readutf8((char const **)__arg);
 	return __result ? __result : __EOF;
@@ -1341,7 +1343,7 @@ putc_unlocked:(int ch, [nonnull] $FILE *__restrict stream) -> int = fputc_unlock
 [cp_stdio][dependency_include(<local/stdstreams.h>)]
 [same_impl][requires(!defined(__NO_STDSTREAMS) && $has_function(fgetc_unlocked))]
 getchar_unlocked:() -> int {
-	return fgetc_unlocked(@__LOCAL_stdin@);
+	return fgetc_unlocked(stdin);
 }
 
 %[default_impl_section(.text.crt.FILE.unlocked.write.putc)]
@@ -1350,7 +1352,7 @@ getchar_unlocked:() -> int {
 [cp_stdio][dependency_include(<local/stdstreams.h>)][crtbuiltin]
 [same_impl][requires(!defined(__NO_STDSTREAMS) && $has_function(fputc_unlocked))]
 putchar_unlocked:(int ch) -> int {
-	return fputc_unlocked(ch, @__LOCAL_stdout@);
+	return fputc_unlocked(ch, stdout);
 }
 
 %[default_impl_section(.text.crt.FILE.locked.utility)]
@@ -1452,9 +1454,9 @@ fgets_unlocked:([outp(min(strlen(return),bufsize))] char *__restrict buf,
 	$size_t n;
 	if unlikely(!buf || !bufsize) {
 		/* The buffer cannot be empty! */
-#ifdef @__ERANGE@
-		__libc_seterrno(@__ERANGE@);
-#endif /* __ERANGE */
+#ifdef ERANGE
+		__libc_seterrno(ERANGE);
+#endif /* ERANGE */
 		return NULL;
 	}
 	for (n = 0; n < bufsize - 1; ++n) {
@@ -1984,9 +1986,9 @@ fftruncate_unlocked:([nonnull] $FILE *__restrict stream, __PIO_OFFSET length) ->
 [requires(!defined(__NO_STDSTREAMS) && $has_function(fputs_unlocked))]
 puts_unlocked:([nonnull] char const *__restrict string) -> __STDC_INT_AS_SSIZE_T {
 	__STDC_INT_AS_SSIZE_T result, temp;
-	result = fputs_unlocked(string, @__LOCAL_stdout@);
+	result = fputs_unlocked(string, stdout);
 	if (result >= 0) {
-		temp = fputc_unlocked('\n', @__LOCAL_stdout@);
+		temp = fputc_unlocked('\n', stdout);
 		if (temp <= 0)
 			result = temp;
 		else
@@ -2283,29 +2285,25 @@ _vsscanf_s_l:([nonnull] char const *__restrict input, [nonnull] char const *__re
 
 %[default_impl_section(.text.crt.dos.unicode.static.format.scanf)]
 [ignore][alias(_vsnscanf_s)]
+[dependency_include(<asm/stdio.h>)]
 [dependency(unicode_readutf8_n)]
 [dependency(unicode_readutf8_rev)]
 [impl_prefix(
 #include <hybrid/typecore.h>
-#ifndef __EOF
-#ifdef EOF
-#define __EOF  EOF
-#else /* EOF */
-#define __EOF (-1)
-#endif /* !EOF */
-#endif /* !__EOF */
 struct __vsnscanf_data {
 	char const *__ptr;
 	char const *__end;
 };
-__LOCAL_LIBC(@vsnscanf_getc@) __SSIZE_TYPE__ (__LIBCCALL __vsnscanf_getc)(void *__arg) {
+__LOCAL_LIBC(@vsnscanf_getc@) __SSIZE_TYPE__
+(__LIBCCALL __vsnscanf_getc)(void *__arg) {
 	__CHAR32_TYPE__ __result;
-	__result = unicode_readutf8_n(
-		&((struct __vsnscanf_data *)__arg)->__ptr,
-		((struct __vsnscanf_data *)__arg)->__end);
+	__result = unicode_readutf8_n(&((struct __vsnscanf_data *)__arg)->__ptr,
+	                              ((struct __vsnscanf_data *)__arg)->__end);
 	return __result ? __result : __EOF;
 }
-__LOCAL_LIBC(@vsnscanf_ungetc@) __SSIZE_TYPE__ (__LIBCCALL __vsnscanf_ungetc)(void *__arg, __CHAR32_TYPE__ __UNUSED(__ch)) {
+
+__LOCAL_LIBC(@vsnscanf_ungetc@) __SSIZE_TYPE__
+(__LIBCCALL __vsnscanf_ungetc)(void *__arg, __CHAR32_TYPE__ __UNUSED(__ch)) {
 	unicode_readutf8_rev(&((struct __vsnscanf_data *)__arg)->__ptr);
 	return 0;
 }
@@ -2544,7 +2542,7 @@ _vprintf_s_l:([nonnull] char const *__restrict format, $locale_t locale, $va_lis
 [same_impl][requires(!defined(__NO_STDSTREAMS) && $has_function(_vfprintf_p))]
 [dependency_include(<local/stdstreams.h>)]
 _vprintf_p:([nonnull] char const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T {
-	return _vfprintf_p(@__LOCAL_stdout@, format, args);
+	return _vfprintf_p(stdout, format, args);
 }
 
 %[default_impl_section(.text.crt.dos.unicode.locale.format.printf)]
@@ -2656,11 +2654,21 @@ clearerr_s:([nonnull] $FILE *__restrict stream) -> errno_t {
 [same_impl][requires($has_function(tmpfile))]
 [section(.text.crt.dos.FILE.locked.access)]
 tmpfile_s:([nonnull] $FILE **pstream) -> errno_t {
-	if (!pstream)
-		return @__EINVAL@;
+	if (!pstream) {
+#ifdef EINVAL
+		return EINVAL;
+#else /* EINVAL */
+		return 1;
+#endif /* !EINVAL */
+	}
 	*pstream = tmpfile();
-	if (!*pstream)
-		return @__libc_geterrno_or@(@__ENOMEM@);
+	if (!*pstream) {
+#ifdef ENOMEM
+		return __libc_geterrno_or(ENOMEM);
+#else /* ENOMEM */
+		return __libc_geterrno_or(1);
+#endif /* !ENOMEM */
+	}
 	return 0;
 }
 
@@ -2680,7 +2688,7 @@ fread_s:([outp(min(return*elemsize,elemcount*elemsize,bufsize))] void *__restric
 [same_impl][requires(!defined(__NO_STDSTREAMS) && $has_function(fgets))]
 [dependency_include(<local/stdstreams.h>)]
 gets_s:([outp(min(strlen(return),bufsize))] char *__restrict buf, rsize_t bufsize) -> char * {
-	return fgets(buf, (int)(unsigned int)bufsize, @__LOCAL_stdin@);
+	return fgets(buf, (int)(unsigned int)bufsize, stdin);
 }
 
 /* TODO: Header implementations of all of these printf functions */
@@ -2767,11 +2775,7 @@ _fread_nolock_s:([outp(min(return*elemsize,elemcount*elemsize,bufsize))] void *_
 
 %{
 #ifndef WEOF
-#if __SIZEOF_WCHAR_T__ == 4
-#define WEOF (__CCAST(__WINT_TYPE__)0xffffffffu)
-#else /* __SIZEOF_WCHAR_T__ == 4 */
-#define WEOF (__CCAST(__WINT_TYPE__)0xffff)
-#endif /* __SIZEOF_WCHAR_T__ != 4 */
+#define WEOF __WEOF
 #endif /* !WEOF */
 
 /* Define 'wchar_t' */

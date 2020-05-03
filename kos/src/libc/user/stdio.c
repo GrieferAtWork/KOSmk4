@@ -2898,9 +2898,9 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.write.write.puts") __STDC_INT_AS_S
 /*[[[body:puts]]]*/
 /*AUTO*/{
 	__STDC_INT_AS_SSIZE_T result, temp;
-	result = libc_fputs(string, __LOCAL_stdout);
+	result = libc_fputs(string, stdout);
 	if (result >= 0) {
-		temp = libc_fputc('\n', __LOCAL_stdout);
+		temp = libc_fputc('\n', stdout);
 		if (temp <= 0)
 			result = temp;
 		else
@@ -2918,9 +2918,9 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.write.write.puts_unlocked") __ST
 /*[[[body:puts_unlocked]]]*/
 /*AUTO*/{
 	__STDC_INT_AS_SSIZE_T result, temp;
-	result = libc_fputs_unlocked(string, __LOCAL_stdout);
+	result = libc_fputs_unlocked(string, stdout);
 	if (result >= 0) {
-		temp = libc_fputc_unlocked('\n', __LOCAL_stdout);
+		temp = libc_fputc_unlocked('\n', stdout);
 		if (temp <= 0)
 			result = temp;
 		else
@@ -3064,7 +3064,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.read.getc.getchar") int
 		__THROWS(...)
 /*[[[body:getchar]]]*/
 /*AUTO*/{
-	return libc_fgetc(__LOCAL_stdin);
+	return libc_fgetc(stdin);
 }
 /*[[[end:getchar]]]*/
 
@@ -3075,7 +3075,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.read.getc.getchar_unlocke
 		__THROWS(...)
 /*[[[body:getchar_unlocked]]]*/
 /*AUTO*/{
-	return libc_fgetc_unlocked(__LOCAL_stdin);
+	return libc_fgetc_unlocked(stdin);
 }
 /*[[[end:getchar_unlocked]]]*/
 
@@ -3086,7 +3086,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.write.putc.putchar") int
 		__THROWS(...)
 /*[[[body:putchar]]]*/
 /*AUTO*/{
-	return libc_fputc(ch, __LOCAL_stdout);
+	return libc_fputc(ch, stdout);
 }
 /*[[[end:putchar]]]*/
 
@@ -3097,7 +3097,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.write.putc.putchar_unlock
 		__THROWS(...)
 /*[[[body:putchar_unlocked]]]*/
 /*AUTO*/{
-	return libc_fputc_unlocked(ch, __LOCAL_stdout);
+	return libc_fputc_unlocked(ch, stdout);
 }
 /*[[[end:putchar_unlocked]]]*/
 
@@ -3334,9 +3334,9 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.read.read.fgets") char *
 	size_t n;
 	if unlikely(!buf || !bufsize) {
 		/* The buffer cannot be empty! */
-#ifdef __ERANGE
-		__libc_seterrno(__ERANGE);
-#endif /* __ERANGE */
+#ifdef ERANGE
+		__libc_seterrno(ERANGE);
+#endif /* ERANGE */
 		return NULL;
 	}
 	for (n = 0; n < bufsize - 1; ++n) {
@@ -3382,9 +3382,9 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.read.read.fgets_unlocked") char 
 	size_t n;
 	if unlikely(!buf || !bufsize) {
 		/* The buffer cannot be empty! */
-#ifdef __ERANGE
-		__libc_seterrno(__ERANGE);
-#endif /* __ERANGE */
+#ifdef ERANGE
+		__libc_seterrno(ERANGE);
+#endif /* ERANGE */
 		return NULL;
 	}
 	for (n = 0; n < bufsize - 1; ++n) {
@@ -4153,7 +4153,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.read.read.gets") char *
 		__THROWS(...)
 /*[[[body:gets]]]*/
 /*AUTO*/{
-	return libc_fgets(buf, __INT_MAX__, __LOCAL_stdin);
+	return libc_fgets(buf, __INT_MAX__, stdin);
 }
 /*[[[end:gets]]]*/
 

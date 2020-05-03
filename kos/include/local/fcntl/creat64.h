@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x586c3213 */
+/* HASH CRC-32:0xb708490f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_creat64_defined
-#if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open)
+#if defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64)
 #define __local_creat64_defined 1
 #include <__crt.h>
 #include <bits/types.h>
@@ -36,7 +36,7 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open64,(char const *__filename, __oflag_t __oflags),open,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE__open) && (!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open64,(char const *__filename, __oflag_t __oflags),_open,(__filename,__oflags),__oflags,1,(__mode_t))
-#elif defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open)
+#elif defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)
 #include <local/fcntl/open64.h>
 #define __localdep_open64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(open64))
 #else /* CUSTOM: open64 */
@@ -48,9 +48,9 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(creat64) __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(creat64))(char const *__filename,
                                                      __mode_t __mode) {
-#line 247 "kos/src/libc/magic/fcntl.c"
-	return __localdep_open64(__filename, O_CREAT|O_WRONLY|O_TRUNC, __mode);
+#line 286 "kos/src/libc/magic/fcntl.c"
+	return __localdep_open64(__filename, __O_CREAT | __O_WRONLY | __O_TRUNC, __mode);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_open64 || __CRT_HAVE_open || __CRT_HAVE__open */
+#endif /* __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || __CRT_HAVE_open64 || __CRT_HAVE___open64 */
 #endif /* !__local_creat64_defined */

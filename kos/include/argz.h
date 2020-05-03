@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab1091df */
+/* HASH CRC-32:0xd7acd991 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -504,50 +504,50 @@ __FORCELOCAL __ATTR_NONNULL((1, 2, 4)) error_t __NOTHROW_NCX(__LIBCCALL __argz_r
 #ifdef __CRT_HAVE_argz_next
 extern "C++" {
 /* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
- * are no more.  If entry is NULL, then the first entry is returned.  This
+ * are no more. If entry is NULL, then the first entry is returned. This
  * behavior allows two convenient iteration styles:
- * >> char *entry = 0;
+ * >> char *entry = NULL;
  * >> while ((entry = argz_next(argz, argz_len, entry)) != NULL)
  * >>     ...;
  * or
  * >> char *entry;
- * >> for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))
+ * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
  * >>     ...; */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,char *,__NOTHROW_NCX,argz_next,(char *__restrict __argz, size_t __argz_len, char *__restrict __entry),argz_next,(__argz, __argz_len, __entry))
 /* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
- * are no more.  If entry is NULL, then the first entry is returned.  This
+ * are no more. If entry is NULL, then the first entry is returned. This
  * behavior allows two convenient iteration styles:
- * >> char *entry = 0;
+ * >> char *entry = NULL;
  * >> while ((entry = argz_next(argz, argz_len, entry)) != NULL)
  * >>     ...;
  * or
  * >> char *entry;
- * >> for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))
+ * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
  * >>     ...; */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,char const *,__NOTHROW_NCX,argz_next,(char const *__restrict __argz, size_t __argz_len, char const *__restrict __entry),argz_next,(__argz, __argz_len, __entry))
 }
 #elif defined(__CRT_HAVE___argz_next)
 extern "C++" {
 /* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
- * are no more.  If entry is NULL, then the first entry is returned.  This
+ * are no more. If entry is NULL, then the first entry is returned. This
  * behavior allows two convenient iteration styles:
- * >> char *entry = 0;
+ * >> char *entry = NULL;
  * >> while ((entry = argz_next(argz, argz_len, entry)) != NULL)
  * >>     ...;
  * or
  * >> char *entry;
- * >> for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))
+ * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
  * >>     ...; */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,char *,__NOTHROW_NCX,argz_next,(char *__restrict __argz, size_t __argz_len, char *__restrict __entry),__argz_next,(__argz, __argz_len, __entry))
 /* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
- * are no more.  If entry is NULL, then the first entry is returned.  This
+ * are no more. If entry is NULL, then the first entry is returned. This
  * behavior allows two convenient iteration styles:
- * >> char *entry = 0;
+ * >> char *entry = NULL;
  * >> while ((entry = argz_next(argz, argz_len, entry)) != NULL)
  * >>     ...;
  * or
  * >> char *entry;
- * >> for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))
+ * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
  * >>     ...; */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,char const *,__NOTHROW_NCX,argz_next,(char const *__restrict __argz, size_t __argz_len, char const *__restrict __entry),__argz_next,(__argz, __argz_len, __entry))
 }
@@ -555,25 +555,25 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,char const *,__NOTHROW_NCX,argz_next,(cha
 #include <local/argz/argz_next.h>
 extern "C++" {
 /* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
- * are no more.  If entry is NULL, then the first entry is returned.  This
+ * are no more. If entry is NULL, then the first entry is returned. This
  * behavior allows two convenient iteration styles:
- * >> char *entry = 0;
+ * >> char *entry = NULL;
  * >> while ((entry = argz_next(argz, argz_len, entry)) != NULL)
  * >>     ...;
  * or
  * >> char *entry;
- * >> for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))
+ * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
  * >>     ...; */
 __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL argz_next)(char *__restrict __argz, size_t __argz_len, char *__restrict __entry) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_next))(__argz, __argz_len, __entry); }
 /* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
- * are no more.  If entry is NULL, then the first entry is returned.  This
+ * are no more. If entry is NULL, then the first entry is returned. This
  * behavior allows two convenient iteration styles:
- * >> char *entry = 0;
+ * >> char *entry = NULL;
  * >> while ((entry = argz_next(argz, argz_len, entry)) != NULL)
  * >>     ...;
  * or
  * >> char *entry;
- * >> for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))
+ * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
  * >>     ...; */
 __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED char const *__NOTHROW_NCX(__LIBCCALL argz_next)(char const *__restrict __argz, size_t __argz_len, char const *__restrict __entry) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_next))(__argz, __argz_len, __entry); }
 }
@@ -581,39 +581,39 @@ __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED char const *__NOTHROW_NCX(__LIBCCALL arg
 #else /* __cplusplus && __CORRECT_ISO_CPP_ARGZ_H_PROTO */
 #ifdef __CRT_HAVE_argz_next
 /* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
- * are no more.  If entry is NULL, then the first entry is returned.  This
+ * are no more. If entry is NULL, then the first entry is returned. This
  * behavior allows two convenient iteration styles:
- * >> char *entry = 0;
+ * >> char *entry = NULL;
  * >> while ((entry = argz_next(argz, argz_len, entry)) != NULL)
  * >>     ...;
  * or
  * >> char *entry;
- * >> for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))
+ * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
  * >>     ...; */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,char *,__NOTHROW_NCX,argz_next,(char const *__restrict __argz, size_t __argz_len, char const *__restrict __entry),(__argz,__argz_len,__entry))
 #elif defined(__CRT_HAVE___argz_next)
 /* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
- * are no more.  If entry is NULL, then the first entry is returned.  This
+ * are no more. If entry is NULL, then the first entry is returned. This
  * behavior allows two convenient iteration styles:
- * >> char *entry = 0;
+ * >> char *entry = NULL;
  * >> while ((entry = argz_next(argz, argz_len, entry)) != NULL)
  * >>     ...;
  * or
  * >> char *entry;
- * >> for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))
+ * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
  * >>     ...; */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,char *,__NOTHROW_NCX,argz_next,(char const *__restrict __argz, size_t __argz_len, char const *__restrict __entry),__argz_next,(__argz,__argz_len,__entry))
 #else /* LIBC: argz_next */
 #include <local/argz/argz_next.h>
 /* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
- * are no more.  If entry is NULL, then the first entry is returned.  This
+ * are no more. If entry is NULL, then the first entry is returned. This
  * behavior allows two convenient iteration styles:
- * >> char *entry = 0;
+ * >> char *entry = NULL;
  * >> while ((entry = argz_next(argz, argz_len, entry)) != NULL)
  * >>     ...;
  * or
  * >> char *entry;
- * >> for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))
+ * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
  * >>     ...; */
 __NAMESPACE_LOCAL_USING_OR_IMPL(argz_next, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL argz_next)(char const *__restrict __argz, size_t __argz_len, char const *__restrict __entry) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_next))(__argz, __argz_len, __entry); })
 #endif /* argz_next... */
@@ -622,50 +622,50 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(argz_next, __FORCELOCAL __ATTR_PURE __ATTR_WUNUS
 #ifdef __CRT_HAVE_argz_next
 extern "C++" {
 /* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
- * are no more.  If entry is NULL, then the first entry is returned.  This
+ * are no more. If entry is NULL, then the first entry is returned. This
  * behavior allows two convenient iteration styles:
- * >> char *entry = 0;
+ * >> char *entry = NULL;
  * >> while ((entry = argz_next(argz, argz_len, entry)) != NULL)
  * >>     ...;
  * or
  * >> char *entry;
- * >> for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))
+ * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
  * >>     ...; */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,char *,__NOTHROW_NCX,__argz_next,(char *__restrict __argz, size_t __argz_len, char *__restrict __entry),argz_next,(__argz, __argz_len, __entry))
 /* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
- * are no more.  If entry is NULL, then the first entry is returned.  This
+ * are no more. If entry is NULL, then the first entry is returned. This
  * behavior allows two convenient iteration styles:
- * >> char *entry = 0;
+ * >> char *entry = NULL;
  * >> while ((entry = argz_next(argz, argz_len, entry)) != NULL)
  * >>     ...;
  * or
  * >> char *entry;
- * >> for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))
+ * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
  * >>     ...; */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,char const *,__NOTHROW_NCX,__argz_next,(char const *__restrict __argz, size_t __argz_len, char const *__restrict __entry),argz_next,(__argz, __argz_len, __entry))
 }
 #elif defined(__CRT_HAVE___argz_next)
 extern "C++" {
 /* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
- * are no more.  If entry is NULL, then the first entry is returned.  This
+ * are no more. If entry is NULL, then the first entry is returned. This
  * behavior allows two convenient iteration styles:
- * >> char *entry = 0;
+ * >> char *entry = NULL;
  * >> while ((entry = argz_next(argz, argz_len, entry)) != NULL)
  * >>     ...;
  * or
  * >> char *entry;
- * >> for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))
+ * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
  * >>     ...; */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,char *,__NOTHROW_NCX,__argz_next,(char *__restrict __argz, size_t __argz_len, char *__restrict __entry),__argz_next,(__argz, __argz_len, __entry))
 /* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
- * are no more.  If entry is NULL, then the first entry is returned.  This
+ * are no more. If entry is NULL, then the first entry is returned. This
  * behavior allows two convenient iteration styles:
- * >> char *entry = 0;
+ * >> char *entry = NULL;
  * >> while ((entry = argz_next(argz, argz_len, entry)) != NULL)
  * >>     ...;
  * or
  * >> char *entry;
- * >> for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))
+ * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
  * >>     ...; */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,char const *,__NOTHROW_NCX,__argz_next,(char const *__restrict __argz, size_t __argz_len, char const *__restrict __entry),__argz_next,(__argz, __argz_len, __entry))
 }
@@ -673,25 +673,25 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,char const *,__NOTHROW_NCX,__argz_next,(c
 #include <local/argz/argz_next.h>
 extern "C++" {
 /* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
- * are no more.  If entry is NULL, then the first entry is returned.  This
+ * are no more. If entry is NULL, then the first entry is returned. This
  * behavior allows two convenient iteration styles:
- * >> char *entry = 0;
+ * >> char *entry = NULL;
  * >> while ((entry = argz_next(argz, argz_len, entry)) != NULL)
  * >>     ...;
  * or
  * >> char *entry;
- * >> for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))
+ * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
  * >>     ...; */
 __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL __argz_next)(char *__restrict __argz, size_t __argz_len, char *__restrict __entry) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_next))(__argz, __argz_len, __entry); }
 /* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
- * are no more.  If entry is NULL, then the first entry is returned.  This
+ * are no more. If entry is NULL, then the first entry is returned. This
  * behavior allows two convenient iteration styles:
- * >> char *entry = 0;
+ * >> char *entry = NULL;
  * >> while ((entry = argz_next(argz, argz_len, entry)) != NULL)
  * >>     ...;
  * or
  * >> char *entry;
- * >> for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))
+ * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
  * >>     ...; */
 __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED char const *__NOTHROW_NCX(__LIBCCALL __argz_next)(char const *__restrict __argz, size_t __argz_len, char const *__restrict __entry) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_next))(__argz, __argz_len, __entry); }
 }
@@ -699,39 +699,39 @@ __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED char const *__NOTHROW_NCX(__LIBCCALL __a
 #else /* __cplusplus && __CORRECT_ISO_CPP_ARGZ_H_PROTO */
 #ifdef __CRT_HAVE_argz_next
 /* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
- * are no more.  If entry is NULL, then the first entry is returned.  This
+ * are no more. If entry is NULL, then the first entry is returned. This
  * behavior allows two convenient iteration styles:
- * >> char *entry = 0;
+ * >> char *entry = NULL;
  * >> while ((entry = argz_next(argz, argz_len, entry)) != NULL)
  * >>     ...;
  * or
  * >> char *entry;
- * >> for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))
+ * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
  * >>     ...; */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,char *,__NOTHROW_NCX,__argz_next,(char const *__restrict __argz, size_t __argz_len, char const *__restrict __entry),argz_next,(__argz,__argz_len,__entry))
 #elif defined(__CRT_HAVE___argz_next)
 /* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
- * are no more.  If entry is NULL, then the first entry is returned.  This
+ * are no more. If entry is NULL, then the first entry is returned. This
  * behavior allows two convenient iteration styles:
- * >> char *entry = 0;
+ * >> char *entry = NULL;
  * >> while ((entry = argz_next(argz, argz_len, entry)) != NULL)
  * >>     ...;
  * or
  * >> char *entry;
- * >> for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))
+ * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
  * >>     ...; */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,char *,__NOTHROW_NCX,__argz_next,(char const *__restrict __argz, size_t __argz_len, char const *__restrict __entry),(__argz,__argz_len,__entry))
 #else /* LIBC: argz_next */
 #include <local/argz/argz_next.h>
 /* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
- * are no more.  If entry is NULL, then the first entry is returned.  This
+ * are no more. If entry is NULL, then the first entry is returned. This
  * behavior allows two convenient iteration styles:
- * >> char *entry = 0;
+ * >> char *entry = NULL;
  * >> while ((entry = argz_next(argz, argz_len, entry)) != NULL)
  * >>     ...;
  * or
  * >> char *entry;
- * >> for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))
+ * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
  * >>     ...; */
 __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL __argz_next)(char const *__restrict __argz, size_t __argz_len, char const *__restrict __entry) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_next))(__argz, __argz_len, __entry); }
 #endif /* __argz_next... */

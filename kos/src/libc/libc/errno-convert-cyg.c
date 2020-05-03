@@ -50,7 +50,7 @@ NOBLOCK /*kos*/ errno_t NOTHROW(LIBDCALL libd_errno_cyg2kos)(/*cyg*/ errno_t val
 	case __CYG_EINTR:           result = EINTR;           break; /* Interrupted system call */
 	case __CYG_EIO:             result = EIO;             break; /* I/O error */
 	case __CYG_ENXIO:           result = ENXIO;           break; /* No such device or address */
-	case __CYG_E2BIG:           result = E2BIG;           break; /* Arg list too long */
+	case __CYG_E2BIG:           result = E2BIG;           break; /* Argument list too long */
 	case __CYG_ENOEXEC:         result = ENOEXEC;         break; /* Exec format error */
 	case __CYG_EBADF:           result = EBADF;           break; /* Bad file number */
 	case __CYG_ECHILD:          result = ECHILD;          break; /* No children */
@@ -188,7 +188,7 @@ NOBLOCK /*cyg*/ errno_t NOTHROW(LIBDCALL libd_errno_kos2cyg)(/*kos*/ errno_t val
 	case EINTR:           result = __CYG_EINTR;           break; /* Interrupted system call */
 	case EIO:             result = __CYG_EIO;             break; /* I/O error */
 	case ENXIO:           result = __CYG_ENXIO;           break; /* No such device or address */
-	case E2BIG:           result = __CYG_E2BIG;           break; /* Arg list too long */
+	case E2BIG:           result = __CYG_E2BIG;           break; /* Argument list too long */
 	case ENOEXEC:         result = __CYG_ENOEXEC;         break; /* Exec format error */
 	case EBADF:           result = __CYG_EBADF;           break; /* Bad file number */
 	case ECHILD:          result = __CYG_ECHILD;          break; /* No children */

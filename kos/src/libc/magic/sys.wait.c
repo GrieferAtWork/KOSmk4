@@ -156,6 +156,7 @@ wait3:([nullable] __WAIT_STATUS stat_loc, int options, [nullable] struct rusage 
 @@endif_has_function(wait3_32)@@
 	return result;
 }
+
 %#ifdef __USE_TIME64
 %struct rusage64;
 [time64_variant_of(wait3)]
@@ -202,6 +203,7 @@ wait4:($pid_t pid, [nullable] __WAIT_STATUS stat_loc, int options, [nullable] st
 @@endif_has_function(wait4_32)@@
 	return result;
 }
+
 %#ifdef __USE_TIME64
 %struct rusage64;
 [time64_variant_of(wait4)]

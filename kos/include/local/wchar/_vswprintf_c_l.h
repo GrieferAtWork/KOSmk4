@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x10e2e26e */
+/* HASH CRC-32:0xc96935f3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vswprintf_c_l))(__WCHAR_TYPE__ *__ds
                                                             __WCHAR_TYPE__ const *__format,
                                                             __locale_t __locale,
                                                             __builtin_va_list __args) {
-#line 2060 "kos/src/libc/magic/wchar.c"
+#line 2034 "kos/src/libc/magic/wchar.c"
 	(void)__locale;
 	return __localdep__vswprintf_c(__dst, __bufsize, __format, __args);
 }

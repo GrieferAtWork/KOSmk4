@@ -20,6 +20,7 @@
 
 %[define_replacement(char16_t = __CHAR16_TYPE__)]
 %[define_replacement(char32_t = __CHAR32_TYPE__)]
+%[define_replacement(COMPILER_ENDOF = __COMPILER_ENDOF)]
 %[default_impl_section(.text.crt.unicode.UTF)]
 
 %[crt_feature(__unicode_asciiflags)]
@@ -49,11 +50,11 @@ __NAMESPACE_LOCAL_USING(unicode_utf8seqlen)
 #else /* __cplusplus */
 #define unicode_utf8seqlen    (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_utf8seqlen))
 #endif /* !__cplusplus */
-#else
+#else /* ... */
 __LOCAL_LIBC_CONST_DATA(unicode_utf8seqlen) __UINT8_TYPE__ const unicode_utf8seqlen[256] =
 #include "local/utf8-seqlen.h"
 ;
-#endif
+#endif /* !... */
 #define __utf8_seqlen_defined 1
 
 /* The max length of any UTF-8 byte sequence describing a single unicode character. */
@@ -87,9 +88,11 @@ __LOCAL_LIBC_CONST_DATA(unicode_utf8seqlen) __UINT8_TYPE__ const unicode_utf8seq
  * returning non-zero if it can, and zero if not.
  * The below function `unicode_writeutf16()' will cause weak undefined
  * behavior if the passed character does not fulfill this requirement. */
-#define UNICODE_ISVALIDUTF16(ch) \
-	(sizeof(ch) == 1 ? 1 : ((sizeof(ch) == 2 || (ch) <= 0x10ffff)) && \
-	((ch) < 0xd800 || (ch) > 0xdfff))
+#define UNICODE_ISVALIDUTF16(ch)                  \
+	(sizeof(ch) == 1                              \
+	 ? 1                                          \
+	 : ((sizeof(ch) == 2 || (ch) <= 0x10ffff)) && \
+	   ((ch) < 0xd800 || (ch) > 0xdfff))
 
 /* The (currently) greatest unicode character */
 #define UNICODE_MAXCHAR  0x10ffff
@@ -105,10 +108,25 @@ __LOCAL_LIBC_CONST_DATA(unicode_utf8seqlen) __UINT8_TYPE__ const unicode_utf8seq
 #define UNICODE_32TO16_MAXBUF(num_chars) ((num_chars) * 2)
 }
 
+
+%[define(UNICODE_UTF8_MAXLEN      = 8)]
+%[define(UNICODE_UTF8_CURLEN      = 7)]
+%[define(UNICODE_UTF16_MAXLEN     = 2)]
+%[define(UNICODE_UTF16_CURLEN     = 2)]
+%[define(UNICODE_UTF32_MAXLEN     = 1)]
+%[define(UNICODE_UTF32_CURLEN     = 1)]
+%[define(UTF16_HIGH_SURROGATE_MIN = 0xd800)]
+%[define(UTF16_HIGH_SURROGATE_MAX = 0xdbff)]
+%[define(UTF16_LOW_SURROGATE_MIN  = 0xdc00)]
+%[define(UTF16_LOW_SURROGATE_MAX  = 0xdfff)]
+%[define(UTF16_SURROGATE_SHIFT    = 0x10000)]
+%[define(UNICODE_MAXCHAR          = 0x10ffff)]
+
+
+
 %
 @@Read a single Unicode character from a given UTF-8 string
-[libc][kernel]
-[dependency_include(<local/unicode_utf8seqlen.h>)]
+[libc][kernel][dependency_include(<local/unicode_utf8seqlen.h>)]
 unicode_readutf8:([nonnull] /*utf-8*/ char const **__restrict ptext) -> $char32_t
 	[([nonnull] /*utf-8*/ char const **__restrict ptext) -> $char32_t]
 	[([nonnull] /*utf-8*/ char **__restrict ptext) -> $char32_t]
@@ -283,8 +301,7 @@ unicode_readutf8_rev:([nonnull] /*utf-8*/ char const **__restrict ptext) -> $cha
 
 %
 @@Same as `unicode_readutf8()', but don't read past `text_end'
-[libc][kernel]
-[dependency_include(<local/unicode_utf8seqlen.h>)]
+[libc][kernel][dependency_include(<local/unicode_utf8seqlen.h>)]
 unicode_readutf8_n:([nonnull] /*utf-8*/ char const **__restrict ptext, [nonnull] char const *text_end) -> $char32_t
 	[([nonnull] /*utf-8*/ char const **__restrict ptext, [nonnull] char const *text_end) -> $char32_t]
 	[([nonnull] /*utf-8*/ char **__restrict ptext, [nonnull] char const *text_end) -> $char32_t]
@@ -707,12 +724,6 @@ unicode_writeutf8:([nonnull] /*utf-8*/ char *__restrict dst, $char32_t ch) -> ch
 	}
 	return dst;
 }
-
-%[define(UTF16_HIGH_SURROGATE_MIN = 0xd800)]
-%[define(UTF16_HIGH_SURROGATE_MAX = 0xdbff)]
-%[define(UTF16_LOW_SURROGATE_MIN  = 0xdc00)]
-%[define(UTF16_LOW_SURROGATE_MAX  = 0xdfff)]
-%[define(UTF16_SURROGATE_SHIFT    = 0x10000)]
 
 %
 @@Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
@@ -1383,7 +1394,7 @@ format_8to16:(/*struct format_8to16_data **/ void *arg,
 			data += error;
 			datalen -= error;
 			++dst;
-		} while (dst < __COMPILER_ENDOF(buf) && datalen);
+		} while (dst < COMPILER_ENDOF(buf) && datalen);
 		temp = (*closure->fd_printer)(closure->fd_arg, buf, (size_t)(dst - buf));
 		if unlikely(temp < 0)
 			goto err;
@@ -1435,7 +1446,7 @@ format_8to32:(/*struct format_8to32_data **/ void *arg,
 			data += error;
 			datalen -= error;
 			++dst;
-		} while (dst < __COMPILER_ENDOF(buf) && datalen);
+		} while (dst < COMPILER_ENDOF(buf) && datalen);
 		temp = (*closure->fd_printer)(closure->fd_arg, buf, (size_t)(dst - buf));
 		if unlikely(temp < 0)
 			goto err;
@@ -1501,7 +1512,7 @@ format_wto8:(/*struct format_wto8_data **/ void *arg,
 			dst = unicode_writeutf8(dst, ch);
 after_dst_write:
 			;
-		} while ((dst + 4) < __COMPILER_ENDOF(buf) && i < datalen);
+		} while ((dst + 4) < COMPILER_ENDOF(buf) && i < datalen);
 		temp = (*closure->fd_printer)(closure->fd_arg, buf, (size_t)(dst - buf));
 		if unlikely(temp < 0)
 			goto err;
@@ -1525,7 +1536,7 @@ err:
 		char *dst = buf;
 		do {
 			dst = unicode_writeutf8(dst, ((char32_t const *)data)[i++]);
-		} while ((dst + 7) < __COMPILER_ENDOF(buf) && i < datalen);
+		} while ((dst + 7) < COMPILER_ENDOF(buf) && i < datalen);
 		temp = (*closure->fd_printer)(closure->fd_arg, buf, (size_t)(dst - buf));
 		if unlikely(temp < 0)
 			goto err;
@@ -1625,7 +1636,7 @@ format_wto32:(/*struct format_wto32_data **/ void *arg,
 			*dst++ = ch;
 after_dst_write:
 			;
-		} while (dst < __COMPILER_ENDOF(buf) && i < datalen);
+		} while (dst < COMPILER_ENDOF(buf) && i < datalen);
 		temp = (*closure->fd_printer)(closure->fd_arg, buf, (size_t)(dst - buf));
 		if unlikely(temp < 0)
 			goto err;
@@ -1635,7 +1646,7 @@ after_dst_write:
 	return result;
 err:
 	return temp;
-#else
+#else /* __SIZEOF_WCHAR_T__ == 2 */
 	struct __local_format_32to32_data {
 		__pc32formatprinter fd_printer;   /* [1..1] Inner printer */
 		void               *fd_arg;       /* Argument for `fd_printer' */
@@ -1643,7 +1654,7 @@ err:
 	struct __local_format_32to32_data *closure;
 	closure = (struct __local_format_32to32_data *)arg;
 	return (*closure->fd_printer)(closure->fd_arg, (char32_t const *)data, datalen);
-#endif
+#endif /* __SIZEOF_WCHAR_T__ != 2 */
 }
 
 
@@ -1689,7 +1700,7 @@ format_wto16:(/*struct format_wto16_data **/ void *arg,
 		char16_t *dst = buf;
 		do {
 			dst = unicode_writeutf16(dst, data[i++]);
-		} while ((dst + 2) < __COMPILER_ENDOF(buf) && i < datalen);
+		} while ((dst + 2) < COMPILER_ENDOF(buf) && i < datalen);
 		temp = (*closure->fd_printer)(closure->fd_arg, buf, (size_t)(dst - buf));
 		if unlikely(temp < 0)
 			goto err;
@@ -1698,7 +1709,7 @@ format_wto16:(/*struct format_wto16_data **/ void *arg,
 	return result;
 err:
 	return temp;
-#else
+#else /* __SIZEOF_WCHAR_T__ == 4 */
 	struct __local_format_16to16_data {
 		__pc16formatprinter fd_printer;   /* [1..1] Inner printer */
 		void               *fd_arg;       /* Argument for `fd_printer' */
@@ -1706,7 +1717,7 @@ err:
 	struct __local_format_16to16_data *closure;
 	closure = (struct __local_format_16to16_data *)arg;
 	return (*closure->fd_printer)(closure->fd_arg, (char16_t const *)data, datalen);
-#endif
+#endif /* __SIZEOF_WCHAR_T__ != 4 */
 }
 
 
@@ -1813,15 +1824,15 @@ __LIBC __UINT16_TYPE__ const __unicode_asciiflags[256];
 #define unicode_isalpha(ch)        (__unicode_flags(ch) & __UNICODE_FALPHA)
 #define unicode_islower(ch)        (__unicode_flags(ch) & __UNICODE_FLOWER)
 #define unicode_isupper(ch)        (__unicode_flags(ch) & __UNICODE_FUPPER)
-#define unicode_isalnum(ch)        (__unicode_flags(ch) & (__UNICODE_FALPHA|__UNICODE_FDECIMAL))
+#define unicode_isalnum(ch)        (__unicode_flags(ch) & (__UNICODE_FALPHA | __UNICODE_FDECIMAL))
 #define unicode_isspace(ch)        (__unicode_flags(ch) & __UNICODE_FSPACE)
 #define unicode_istab(ch)          ((ch) == 9)
 #define unicode_islf(ch)           (__unicode_flags(ch) & __UNICODE_FLF)
 #define unicode_isprint(ch)        (__unicode_flags(ch) & __UNICODE_FPRINT)
 #define unicode_isdigit(ch)        (__unicode_flags(ch) & __UNICODE_FDIGIT)
 #define unicode_isdecimal(ch)      (__unicode_flags(ch) & __UNICODE_FDECIMAL)
-#define unicode_isnumeric(ch)      (__unicode_flags(ch) & (__UNICODE_FDIGIT|__UNICODE_FDECIMAL))
-#define unicode_istitle(ch)        (__unicode_flags(ch) & (__UNICODE_FTITLE|__UNICODE_FUPPER))
+#define unicode_isnumeric(ch)      (__unicode_flags(ch) & (__UNICODE_FDIGIT | __UNICODE_FDECIMAL))
+#define unicode_istitle(ch)        (__unicode_flags(ch) & (__UNICODE_FTITLE | __UNICODE_FUPPER))
 #define unicode_issymstrt(ch)      (__unicode_flags(ch) & __UNICODE_FSYMSTRT)
 #define unicode_issymcont(ch)      (__unicode_flags(ch) & __UNICODE_FSYMCONT)
 #define unicode_iscntrl(ch)        (__unicode_flags(ch) & __UNICODE_FCNTRL)
@@ -1944,23 +1955,23 @@ __LIBC __UINT16_TYPE__ const __unicode_asciiflags[256];
 #define __libc_unicode_asdigit(ch)      (sizeof(ch) == 1 ? __libc_unicode_asciiasdigit(ch) : __unicode_descriptor(ch)->__ut_digit)
 #else /* __CRT_HAVE___unicode_asciiflags */
 #define __libc_unicode_flags(ch)        (__unicode_descriptor(ch)->__ut_flags)
-#define __libc_unicode_tolower(ch)      (__CHAR32_TYPE__)((ch)+__unicode_descriptor(ch)->__ut_lower)
-#define __libc_unicode_toupper(ch)      (__CHAR32_TYPE__)((ch)+__unicode_descriptor(ch)->__ut_upper)
-#define __libc_unicode_totitle(ch)      (__CHAR32_TYPE__)((ch)+__unicode_descriptor(ch)->__ut_title)
+#define __libc_unicode_tolower(ch)      (__CHAR32_TYPE__)((ch) + __unicode_descriptor(ch)->__ut_lower)
+#define __libc_unicode_toupper(ch)      (__CHAR32_TYPE__)((ch) + __unicode_descriptor(ch)->__ut_upper)
+#define __libc_unicode_totitle(ch)      (__CHAR32_TYPE__)((ch) + __unicode_descriptor(ch)->__ut_title)
 #define __libc_unicode_asdigit(ch)      (__unicode_descriptor(ch)->__ut_digit)
 #endif /* !__CRT_HAVE___unicode_asciiflags */
 #define __libc_unicode_isalpha(ch)      (__libc_unicode_flags(ch) & __UNICODE_FALPHA)
 #define __libc_unicode_islower(ch)      (__libc_unicode_flags(ch) & __UNICODE_FLOWER)
 #define __libc_unicode_isupper(ch)      (__libc_unicode_flags(ch) & __UNICODE_FUPPER)
-#define __libc_unicode_isalnum(ch)      (__libc_unicode_flags(ch) & (__UNICODE_FALPHA|__UNICODE_FDECIMAL))
+#define __libc_unicode_isalnum(ch)      (__libc_unicode_flags(ch) & (__UNICODE_FALPHA | __UNICODE_FDECIMAL))
 #define __libc_unicode_isspace(ch)      (__libc_unicode_flags(ch) & __UNICODE_FSPACE)
 #define __libc_unicode_istab(ch)        ((ch) == 9)
 #define __libc_unicode_islf(ch)         (__libc_unicode_flags(ch) & __UNICODE_FLF)
 #define __libc_unicode_isprint(ch)      (__libc_unicode_flags(ch) & __UNICODE_FPRINT)
 #define __libc_unicode_isdigit(ch)      (__libc_unicode_flags(ch) & __UNICODE_FDIGIT)
 #define __libc_unicode_isdecimal(ch)    (__libc_unicode_flags(ch) & __UNICODE_FDECIMAL)
-#define __libc_unicode_isnumeric(ch)    (__libc_unicode_flags(ch) & (__UNICODE_FDIGIT|__UNICODE_FDECIMAL))
-#define __libc_unicode_istitle(ch)      (__libc_unicode_flags(ch) & (__UNICODE_FTITLE|__UNICODE_FUPPER))
+#define __libc_unicode_isnumeric(ch)    (__libc_unicode_flags(ch) & (__UNICODE_FDIGIT | __UNICODE_FDECIMAL))
+#define __libc_unicode_istitle(ch)      (__libc_unicode_flags(ch) & (__UNICODE_FTITLE | __UNICODE_FUPPER))
 #define __libc_unicode_issymstrt(ch)    (__libc_unicode_flags(ch) & __UNICODE_FSYMSTRT)
 #define __libc_unicode_issymcont(ch)    (__libc_unicode_flags(ch) & __UNICODE_FSYMCONT)
 #define __libc_unicode_iscntrl(ch)      (__libc_unicode_flags(ch) & __UNICODE_FCNTRL)

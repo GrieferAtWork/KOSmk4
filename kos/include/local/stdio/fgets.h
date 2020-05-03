@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x550b497c */
+/* HASH CRC-32:0x9f98ed0f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -127,13 +127,13 @@ __LOCAL_LIBC(fgets) __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) char *
 (__LIBCCALL __LIBC_LOCAL_NAME(fgets))(char *__restrict __buf,
                                       __STDC_INT_AS_SIZE_T __bufsize,
                                       __FILE *__restrict __stream) __THROWS(...) {
-#line 512 "kos/src/libc/magic/stdio.c"
+#line 520 "kos/src/libc/magic/stdio.c"
 	__SIZE_TYPE__ __n;
 	if __unlikely(!__buf || !__bufsize) {
 		/* The buffer cannot be empty! */
 #ifdef __ERANGE
 		__libc_seterrno(__ERANGE);
-#endif /* __ERANGE */
+#endif /* ERANGE */
 		return __NULLPTR;
 	}
 	for (__n = 0; __n < __bufsize - 1; ++__n) {

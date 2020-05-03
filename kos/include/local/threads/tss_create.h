@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x14f9a5a2 */
+/* HASH CRC-32:0x3405462b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,7 @@ typedef void (__LIBCCALL *__pthread_destr_function_t)(void *);
 #include <bits/threads.h>
 
 #include <bits/pthreadtypes.h>
+#include <asm/threads.h>
 /* Dependency: "pthread_key_create" */
 #ifndef ____localdep_pthread_key_create_defined
 #define ____localdep_pthread_key_create_defined 1
@@ -52,12 +53,12 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(tss_create) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tss_create))(__tss_t *__tss_id,
                                                         __tss_dtor_t __destructor) {
-#line 512 "kos/src/libc/magic/threads.c"
+#line 542 "kos/src/libc/magic/threads.c"
 	int __error;
 	__error = __localdep_pthread_key_create((__pthread_key_t *)__tss_id, __destructor);
 	if __likely(!__error)
-		return 0; /* thrd_success */
-	return 2; /* thrd_error */
+		return __thrd_success;
+	return __thrd_error;
 }
 __NAMESPACE_LOCAL_END
 #endif /* __CRT_HAVE_pthread_key_create */

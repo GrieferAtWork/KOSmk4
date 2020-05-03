@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeb143f58 */
+/* HASH CRC-32:0xa4c4bde2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,7 @@
 #include <bits/pthreadtypes.h>
 
 #include <bits/timespec.h>
+#include <asm/threads.h>
 /* Dependency: "pthread_cond_timedwait" from "pthread" */
 #ifndef ____localdep_pthread_cond_timedwait_defined
 #define ____localdep_pthread_cond_timedwait_defined 1
@@ -64,16 +65,16 @@ __LOCAL_LIBC(cnd_timedwait) __ATTR_NONNULL((1, 2, 3)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(cnd_timedwait))(__cnd_t *__restrict __cond,
                                                            __mtx_t *__restrict __mutex,
                                                            struct timespec const *__restrict __time_point) {
-#line 464 "kos/src/libc/magic/threads.c"
+#line 492 "kos/src/libc/magic/threads.c"
 	int __error;
 	__error = __localdep_pthread_cond_timedwait((__pthread_cond_t *)__cond,
 	                               (__pthread_mutex_t *)__mutex,
 	                               __time_point);
 	if __likely(!__error)
-		return 0; /* thrd_success */
+		return __thrd_success;
 	if (__error == __ETIMEDOUT)
-		return 4; /* thrd_timedout */
-	return 2; /* thrd_error */
+		return __thrd_timedout;
+	return __thrd_error;
 }
 __NAMESPACE_LOCAL_END
 #endif /* __CRT_HAVE_pthread_cond_timedwait || __CRT_HAVE_pthread_cond_timedwait64 */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x17ffcb67 */
+/* HASH CRC-32:0xd7ad735e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -117,23 +117,23 @@ __LIBC __UINT16_TYPE__ const __unicode_asciiflags[256];
 #define __libc_unicode_asdigit(ch)      (sizeof(ch) == 1 ? __libc_unicode_asciiasdigit(ch) : __unicode_descriptor(ch)->__ut_digit)
 #else /* __CRT_HAVE___unicode_asciiflags */
 #define __libc_unicode_flags(ch)        (__unicode_descriptor(ch)->__ut_flags)
-#define __libc_unicode_tolower(ch)      (__CHAR32_TYPE__)((ch)+__unicode_descriptor(ch)->__ut_lower)
-#define __libc_unicode_toupper(ch)      (__CHAR32_TYPE__)((ch)+__unicode_descriptor(ch)->__ut_upper)
-#define __libc_unicode_totitle(ch)      (__CHAR32_TYPE__)((ch)+__unicode_descriptor(ch)->__ut_title)
+#define __libc_unicode_tolower(ch)      (__CHAR32_TYPE__)((ch) + __unicode_descriptor(ch)->__ut_lower)
+#define __libc_unicode_toupper(ch)      (__CHAR32_TYPE__)((ch) + __unicode_descriptor(ch)->__ut_upper)
+#define __libc_unicode_totitle(ch)      (__CHAR32_TYPE__)((ch) + __unicode_descriptor(ch)->__ut_title)
 #define __libc_unicode_asdigit(ch)      (__unicode_descriptor(ch)->__ut_digit)
 #endif /* !__CRT_HAVE___unicode_asciiflags */
 #define __libc_unicode_isalpha(ch)      (__libc_unicode_flags(ch) & __UNICODE_FALPHA)
 #define __libc_unicode_islower(ch)      (__libc_unicode_flags(ch) & __UNICODE_FLOWER)
 #define __libc_unicode_isupper(ch)      (__libc_unicode_flags(ch) & __UNICODE_FUPPER)
-#define __libc_unicode_isalnum(ch)      (__libc_unicode_flags(ch) & (__UNICODE_FALPHA|__UNICODE_FDECIMAL))
+#define __libc_unicode_isalnum(ch)      (__libc_unicode_flags(ch) & (__UNICODE_FALPHA | __UNICODE_FDECIMAL))
 #define __libc_unicode_isspace(ch)      (__libc_unicode_flags(ch) & __UNICODE_FSPACE)
 #define __libc_unicode_istab(ch)        ((ch) == 9)
 #define __libc_unicode_islf(ch)         (__libc_unicode_flags(ch) & __UNICODE_FLF)
 #define __libc_unicode_isprint(ch)      (__libc_unicode_flags(ch) & __UNICODE_FPRINT)
 #define __libc_unicode_isdigit(ch)      (__libc_unicode_flags(ch) & __UNICODE_FDIGIT)
 #define __libc_unicode_isdecimal(ch)    (__libc_unicode_flags(ch) & __UNICODE_FDECIMAL)
-#define __libc_unicode_isnumeric(ch)    (__libc_unicode_flags(ch) & (__UNICODE_FDIGIT|__UNICODE_FDECIMAL))
-#define __libc_unicode_istitle(ch)      (__libc_unicode_flags(ch) & (__UNICODE_FTITLE|__UNICODE_FUPPER))
+#define __libc_unicode_isnumeric(ch)    (__libc_unicode_flags(ch) & (__UNICODE_FDIGIT | __UNICODE_FDECIMAL))
+#define __libc_unicode_istitle(ch)      (__libc_unicode_flags(ch) & (__UNICODE_FTITLE | __UNICODE_FUPPER))
 #define __libc_unicode_issymstrt(ch)    (__libc_unicode_flags(ch) & __UNICODE_FSYMSTRT)
 #define __libc_unicode_issymcont(ch)    (__libc_unicode_flags(ch) & __UNICODE_FSYMCONT)
 #define __libc_unicode_iscntrl(ch)      (__libc_unicode_flags(ch) & __UNICODE_FCNTRL)

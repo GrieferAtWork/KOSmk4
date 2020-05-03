@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x22263b69 */
+/* HASH CRC-32:0xc9a906f3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 #define __local_thrd_detach_defined 1
 #include <__crt.h>
 #include <bits/threads.h>
+#include <asm/threads.h>
 /* Dependency: "pthread_detach" */
 #ifndef ____localdep_pthread_detach_defined
 #define ____localdep_pthread_detach_defined 1
@@ -42,12 +43,12 @@ __NAMESPACE_LOCAL_BEGIN
  * s.a. `pthread_detach()' */
 __LOCAL_LIBC(thrd_detach) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(thrd_detach))(__thrd_t __thr) {
-#line 230 "kos/src/libc/magic/threads.c"
+#line 246 "kos/src/libc/magic/threads.c"
 	int __error;
 	__error = __localdep_pthread_detach((__pthread_t)__thr);
 	if __likely(!__error)
-		return 0; /* thrd_success */
-	return 2; /* thrd_error */
+		return __thrd_success;
+	return __thrd_error;
 }
 __NAMESPACE_LOCAL_END
 #endif /* __CRT_HAVE_pthread_detach */

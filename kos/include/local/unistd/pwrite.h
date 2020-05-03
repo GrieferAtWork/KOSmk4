@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f1c33de */
+/* HASH CRC-32:0x81d45d37 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -111,13 +111,13 @@ __NAMESPACE_LOCAL_BEGIN
 #endif
 #endif /* !__PIO_OFFSET */
 
-#ifndef 0
-#   define 0  0 /* Seek from beginning of file.  */
-#   define 1  1 /* Seek from current position.  */
-#   define 2  2 /* Seek from end of file.  */
+#ifndef __SEEK_SET
+#   define __SEEK_SET  0 /* Seek from beginning of file.  */
+#   define __SEEK_CUR  1 /* Seek from current position.  */
+#   define __SEEK_END  2 /* Seek from end of file.  */
 #if defined(__USE_GNU) && (defined(__CRT_KOS) || defined(__CRT_GLC))
-#   define SEEK_DATA 3 /* Seek to next data.  */
-#   define SEEK_HOLE 4 /* Seek to next hole.  */
+#   define __SEEK_DATA 3 /* Seek to next data.  */
+#   define __SEEK_HOLE 4 /* Seek to next hole.  */
 #endif /* __USE_GNU && (__CRT_KOS || __CRT_GLC) */
 #endif
 /* >> pwrite(2)
@@ -127,20 +127,20 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pwrite))(__fd_t __fd,
                                                     void const *__buf,
                                                     __SIZE_TYPE__ __bufsize,
                                                     __PIO_OFFSET __offset) {
-#line 902 "kos/src/libc/magic/unistd.c"
+#line 911 "kos/src/libc/magic/unistd.c"
 #ifdef __CRT_HAVE_pwrite64
 	return __localdep_pwrite64(__fd, __buf, __bufsize, (__PIO_OFFSET64)__offset);
 #else
 	/* It may not be quick, and it may not be SMP-safe, but it'll still do the job! */
 	__FS_TYPE(off) __oldpos;
 	__SSIZE_TYPE__ __result;
-	__oldpos = __localdep_lseek(__fd, 0, 1);
+	__oldpos = __localdep_lseek(__fd, 0, __SEEK_CUR);
 	if __unlikely(__oldpos < 0)
 		return -1;
-	if __unlikely(__localdep_lseek(__fd, (__FS_TYPE(off))__offset, 0) < 0)
+	if __unlikely(__localdep_lseek(__fd, (__FS_TYPE(off))__offset, __SEEK_SET) < 0)
 		return -1;
 	__result = __localdep_write(__fd, __buf, __bufsize);
-	__localdep_lseek(__fd, __oldpos, 0);
+	__localdep_lseek(__fd, __oldpos, __SEEK_SET);
 	return __result;
 #endif
 }

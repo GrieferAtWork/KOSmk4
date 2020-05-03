@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3328594f */
+/* HASH CRC-32:0xa475fb3c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sync_file_range))(__fd_t __fd,
                                                              __off64_t __offset,
                                                              __off64_t __count,
                                                              unsigned int __flags) {
-#line 124 "kos/src/libc/magic/fcntl.c"
+#line 159 "kos/src/libc/magic/fcntl.c"
 	(void)__fd;
 	(void)__offset;
 	(void)__count;

@@ -74,97 +74,97 @@ NOTHROW_RPC(LIBCCALL libc_process_vm_writev)(pid_t pid,
 }
 /*[[[end:process_vm_writev]]]*/
 
-/*[[[head:readv,hash:CRC-32=0x5f7cbecc]]]*/
+/*[[[head:readv,hash:CRC-32=0x6ee8bfb7]]]*/
 INTERN WUNUSED NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.readv") ssize_t
 NOTHROW_RPC(LIBCCALL libc_readv)(fd_t fd,
-                                 struct iovec const *iovec,
+                                 struct iovec const *iov,
                                  __STDC_INT_AS_SIZE_T count)
 /*[[[body:readv]]]*/
 {
 	ssize_t result;
-	result = sys_readv(fd, iovec, (size_t)count);
+	result = sys_readv(fd, iov, (size_t)count);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:readv]]]*/
 
-/*[[[head:writev,hash:CRC-32=0xa3de15d4]]]*/
+/*[[[head:writev,hash:CRC-32=0xb863f233]]]*/
 INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.writev") ssize_t
 NOTHROW_RPC(LIBCCALL libc_writev)(fd_t fd,
-                                  struct iovec const *iovec,
+                                  struct iovec const *iov,
                                   __STDC_INT_AS_SIZE_T count)
 /*[[[body:writev]]]*/
 {
 	ssize_t result;
-	result = sys_writev(fd, iovec, (size_t)count);
+	result = sys_writev(fd, iov, (size_t)count);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:writev]]]*/
 
-/*[[[head:preadv,hash:CRC-32=0xab3c71dc]]]*/
+/*[[[head:preadv,hash:CRC-32=0xb149e47]]]*/
 INTERN WUNUSED NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.preadv") ssize_t
 NOTHROW_RPC(LIBCCALL libc_preadv)(fd_t fd,
-                                  struct iovec const *iovec,
+                                  struct iovec const *iov,
                                   __STDC_INT_AS_SIZE_T count,
                                   off_t offset)
 /*[[[body:preadv]]]*/
 {
 	ssize_t result;
-	result = sys_preadv(fd, iovec, (size_t)count, (uint64_t)(pos_t)offset);
+	result = sys_preadv(fd, iov, (size_t)count, (uint64_t)(pos_t)offset);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:preadv]]]*/
 
-/*[[[head:pwritev,hash:CRC-32=0xcd111123]]]*/
+/*[[[head:pwritev,hash:CRC-32=0xb5b4f3c]]]*/
 INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.pwritev") ssize_t
 NOTHROW_RPC(LIBCCALL libc_pwritev)(fd_t fd,
-                                   struct iovec const *iovec,
+                                   struct iovec const *iov,
                                    __STDC_INT_AS_SIZE_T count,
                                    off_t offset)
 /*[[[body:pwritev]]]*/
 {
 	ssize_t result;
-	result = sys_pwritev(fd, iovec, (size_t)count, (uint64_t)(pos_t)offset);
+	result = sys_pwritev(fd, iov, (size_t)count, (uint64_t)(pos_t)offset);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:pwritev]]]*/
 
-/*[[[head:preadv64,hash:CRC-32=0x4329cfea]]]*/
+/*[[[head:preadv64,hash:CRC-32=0xf9f05abc]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_preadv64, libc_preadv);
 #else
 INTERN WUNUSED NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.preadv64") ssize_t
 NOTHROW_RPC(LIBCCALL libc_preadv64)(fd_t fd,
-                                    struct iovec const *iovec,
+                                    struct iovec const *iov,
                                     __STDC_INT_AS_SIZE_T count,
                                     off64_t offset)
 /*[[[body:preadv64]]]*/
 {
 	ssize_t result;
-	result = sys_preadv(fd, iovec, (size_t)count, (uint64_t)(pos64_t)offset);
+	result = sys_preadv(fd, iov, (size_t)count, (uint64_t)(pos64_t)offset);
 	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */
 /*[[[end:preadv64]]]*/
 
-/*[[[head:pwritev64,hash:CRC-32=0x3b0cd27b]]]*/
+/*[[[head:pwritev64,hash:CRC-32=0x439a375d]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_pwritev64, libc_pwritev);
 #else
 INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.pwritev64") ssize_t
 NOTHROW_RPC(LIBCCALL libc_pwritev64)(fd_t fd,
-                                     struct iovec const *iovec,
+                                     struct iovec const *iov,
                                      __STDC_INT_AS_SIZE_T count,
                                      off64_t offset)
 /*[[[body:pwritev64]]]*/
 {
 	ssize_t result;
-	result = sys_pwritev(fd, iovec, (size_t)count, (uint64_t)(pos64_t)offset);
+	result = sys_pwritev(fd, iov, (size_t)count, (uint64_t)(pos64_t)offset);
 	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x926de1f2 */
+/* HASH CRC-32:0x76a59efb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,7 +50,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(utime) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(utime))(char const *__filename,
                                                    struct utimbuf const *__file_times) {
-#line 78 "kos/src/libc/magic/utime.c"
+#line 77 "kos/src/libc/magic/utime.c"
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma push_macro("actime")
 #pragma push_macro("modtime")

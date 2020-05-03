@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa4f9d252 */
+/* HASH CRC-32:0xc846d0bf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -80,7 +80,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_add_sep))(char **__restrict __pa
 	if __unlikely(!__slen)
 		return 0;
 	__oldlen = *__pargz_len;
-	/* Note that GLibc actually has a bug here that causes it write `NULL'
+	/* Note that GLibc actually has a bug here that causes it to write `NULL'
 	 * into the given `*pargz' pointer when the allocation fails, instead
 	 * of leaving that pointer in its original state (allowing the caller
 	 * to cleanup the ARGZ array, instead of forcing the array to become
@@ -91,7 +91,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_add_sep))(char **__restrict __pa
 	 * >> if (*argz == NULL)
 	 * >>   return ENOMEM;
 	 * As reference that the intended behavior in the ENOMEM-branch is an
-	 * unmodified `*pargz' pointer (or at the very least, a simultanious
+	 * unmodified `*pargz' pointer (or at the very least, a simultaneous
 	 * setting of the `*pargz_len' pointer to ZERO(0)), you may look at
 	 * Glibc's version of `argz_append()', which handles that case as
 	 * leaving all pointers unmodified (just as one should)
@@ -100,9 +100,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_add_sep))(char **__restrict __pa
 	if __unlikely(!__result_string) {
 #ifdef __ENOMEM
 		return __ENOMEM;
-#else /* __ENOMEM */
+#else /* ENOMEM */
 		return 1;
-#endif /* !__ENOMEM */
+#endif /* !ENOMEM */
 	}
 	*__pargz = __result_string;
 	__dst    = __result_string + __oldlen;

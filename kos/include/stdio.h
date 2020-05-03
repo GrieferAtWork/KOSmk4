@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x862e412c */
+/* HASH CRC-32:0xc8c660ec */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -228,16 +228,22 @@ __NAMESPACE_STD_USING(snprintf)
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
-#include <bits/types.h>
-#include <bits/stdio_lim.h>
-#include <libio.h>
+
 #include <asm/oflags.h>
+#include <asm/stdio.h>
+#include <bits/stdio_lim.h>
+#include <bits/types.h>
+
+#include <libio.h>
+
 #ifdef __USE_DOS
 #include <xlocale.h>
 #endif /* __USE_DOS */
+
 #ifdef __CRT_CYG_PRIMARY
 #include <sys/reent.h>
 #endif /* __CRT_CYG_PRIMARY */
+
 #ifdef __CRT_DOS_PRIMARY
 #include <bits/io-file.h>
 #endif /* __CRT_DOS_PRIMARY */
@@ -245,41 +251,37 @@ __NAMESPACE_STD_USING(snprintf)
 __SYSDECL_BEGIN
 
 /* The possibilities for the third argument to `setvbuf()'. */
-#ifdef __CRT_DOS_PRIMARY
-#define _IOFBF 0x0000 /* Fully buffered. */
-#define _IOLBF 0x0040 /* Line buffered. */
-#define _IONBF 0x0004 /* No buffering. */
-#else /* __CRT_DOS_PRIMARY */
-#define _IOFBF 0      /* Fully buffered. */
-#define _IOLBF 1      /* Line buffered. */
-#define _IONBF 2      /* No buffering. */
-#endif /* !__CRT_DOS_PRIMARY */
+#ifdef ___IOFBF
+#define _IOFBF ___IOFBF /* Fully buffered. */
+#endif /* ___IOFBF */
+#ifdef ___IOLBF
+#define _IOLBF ___IOLBF /* Line buffered. */
+#endif /* ___IOLBF */
+#ifdef ___IONBF
+#define _IONBF ___IONBF /* No buffering. */
+#endif /* ___IONBF */
 
 /* Default buffer size.  */
 #ifndef BUFSIZ
-#ifdef __USE_DOS
-#define BUFSIZ 512
-#else /* __USE_DOS */
-#define BUFSIZ 8192
-#endif /* !__USE_DOS */
+#define BUFSIZ __BUFSIZ
 #endif /* !BUFSIZ */
 
 #ifndef EOF
-#ifdef __EOF
 #define EOF __EOF
-#else /* __EOF */
-#define EOF (-1)
-#endif /* !__EOF */
 #endif /* !EOF */
 
 #ifndef SEEK_SET
-#   define SEEK_SET  0 /* Seek from beginning of file.  */
-#   define SEEK_CUR  1 /* Seek from current position.  */
-#   define SEEK_END  2 /* Seek from end of file.  */
-#if defined(__USE_GNU) && (defined(__CRT_KOS) || defined(__CRT_GLC))
-#   define SEEK_DATA 3 /* Seek to next data.  */
-#   define SEEK_HOLE 4 /* Seek to next hole.  */
-#endif /* __USE_GNU && (__CRT_KOS || __CRT_GLC) */
+#define SEEK_SET __SEEK_SET /* Seek from beginning of file. */
+#define SEEK_CUR __SEEK_CUR /* Seek from current position. */
+#define SEEK_END __SEEK_END /* Seek from end of file. */
+#ifdef __USE_GNU
+#ifdef __SEEK_DATA
+#define SEEK_DATA __SEEK_DATA /* Seek to next data. */
+#endif /* __SEEK_DATA */
+#ifdef __SEEK_HOLE
+#define SEEK_HOLE __SEEK_HOLE /* Seek to next hole. */
+#endif /* __SEEK_HOLE */
+#endif /* __USE_GNU */
 #endif /* !SEEK_SET */
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN)
@@ -289,6 +291,10 @@ __SYSDECL_BEGIN
 #define P_tmpdir "/tmp"
 #endif /* !__USE_DOS */
 #endif /* __USE_MISC || __USE_XOPEN */
+
+#ifndef NULL
+#define NULL __NULLPTR
+#endif /* !NULL */
 
 
 #ifdef __CC__
@@ -304,10 +310,6 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_USING(size_t)
 #endif /* !__size_t_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
-
-#ifndef NULL
-#define NULL __NULLPTR
-#endif
 
 #ifdef __USE_XOPEN2K8
 #ifndef __off_t_defined
@@ -2593,7 +2595,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(file_printer_unlocked, __FORCELOCAL __ATTR_NONNU
 #ifdef __CRT_HAVE_vasprintf
 /* Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR' */
 __CDECLARE(__ATTR_WUNUSED __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,vasprintf,(char **__restrict __pstr, char const *__restrict __format, __builtin_va_list __args),(__pstr,__format,__args))
-#elif (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_aprintf_pack)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_format_aprintf_printer)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
+#elif (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_format_aprintf_printer)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
 #include <local/stdio/vasprintf.h>
 /* Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(vasprintf, __FORCELOCAL __ATTR_WUNUSED __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__LIBCCALL vasprintf)(char **__restrict __pstr, char const *__restrict __format, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vasprintf))(__pstr, __format, __args); })
@@ -2604,7 +2606,7 @@ __LIBC __ATTR_WUNUSED __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT
 #elif defined(__CRT_HAVE___asprintf) && !defined(__NO_ASMNAME)
 /* Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR' */
 __LIBC __ATTR_WUNUSED __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL asprintf)(char **__restrict __pstr, char const *__restrict __format, ...) __CASMNAME("__asprintf");
-#elif ((defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_aprintf_pack)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_format_aprintf_printer)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))) || defined(__CRT_HAVE_vasprintf)
+#elif ((defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_format_aprintf_printer)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))) || defined(__CRT_HAVE_vasprintf)
 #include <local/stdio/asprintf.h>
 #ifdef __cplusplus
 __NAMESPACE_LOCAL_USING(asprintf)
@@ -2619,7 +2621,7 @@ __LIBC __ATTR_WUNUSED __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT
 #elif defined(__CRT_HAVE_asprintf) && !defined(__NO_ASMNAME)
 /* Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR' */
 __LIBC __ATTR_WUNUSED __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL __asprintf)(char **__restrict __pstr, char const *__restrict __format, ...) __CASMNAME("asprintf");
-#elif ((defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_aprintf_pack)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_format_aprintf_printer)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))) || defined(__CRT_HAVE_vasprintf)
+#elif ((defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_format_aprintf_printer)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))) || defined(__CRT_HAVE_vasprintf)
 #include <local/stdio/asprintf.h>
 /* Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR' */
 #define __asprintf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(asprintf))
@@ -4749,11 +4751,7 @@ __CREDIRECT(,int,__NOTHROW_RPC,rmtmp,(void),_rmtmp,())
 #ifndef _WSTDIO_DEFINED
 #define _WSTDIO_DEFINED 1
 #ifndef WEOF
-#if __SIZEOF_WCHAR_T__ == 4
-#define WEOF (__CCAST(__WINT_TYPE__)0xffffffffu)
-#else /* __SIZEOF_WCHAR_T__ == 4 */
-#define WEOF (__CCAST(__WINT_TYPE__)0xffff)
-#endif /* __SIZEOF_WCHAR_T__ != 4 */
+#define WEOF __WEOF
 #endif /* !WEOF */
 
 /* Define 'wchar_t' */

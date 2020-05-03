@@ -223,7 +223,7 @@ struct usb_interrupt {
 FUNDEF NOBLOCK void NOTHROW(KCALL usb_interrupt_destroy)(struct usb_interrupt *__restrict self);
 DEFINE_REFCOUNT_FUNCTIONS(struct usb_interrupt, ui_refcnt, usb_interrupt_destroy)
 
-/* Similar to `decref()', but simultaniously prevent the interrupt for ever firing again.
+/* Similar to `decref()', but simultaneously prevent the interrupt for ever firing again.
  * Note that a USB interrupt will stop firing and be removed from the controller's chain
  * of registered interrupts under 3 circumstances:
  *   - When the `USB_INTERRUPT_FLAG_DELETED' flag was set.

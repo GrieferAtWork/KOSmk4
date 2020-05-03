@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x32f648ea */
+/* HASH CRC-32:0xadac6189 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,18 +52,18 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_fadvise))(__fd_t __fd,
                                                            __FS_TYPE(off) __offset,
                                                            __FS_TYPE(off) __length,
                                                            int __advise) {
-#line 302 "kos/src/libc/magic/fcntl.c"
-#ifdef __CRT_HAVE_posix_fadvise64
+#line 340 "kos/src/libc/magic/fcntl.c"
+#if 1
 	return __localdep_posix_fadvise64(__fd, (__off64_t)__offset, (__off64_t)__length, __advise);
 #elif defined(__CRT_HAVE_posix_fadvise)
 	return __localdep_posix_fadvise32(__fd, (__off32_t)__offset, (__off32_t)__length, __advise);
-#else /* __CRT_HAVE_posix_fadvise64 */
+#else /* __CRT_HAVE_posix_fadvise */
 	(void)__fd;
 	(void)__offset;
 	(void)__length;
 	(void)__advise;
 	return 0;
-#endif /* !__CRT_HAVE_posix_fadvise64 */
+#endif /* !__CRT_HAVE_posix_fadvise */
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_posix_fadvise_defined */

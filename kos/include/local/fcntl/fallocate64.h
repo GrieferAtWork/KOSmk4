@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf9853c19 */
+/* HASH CRC-32:0x27d30abb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,18 +23,15 @@
 #include <__crt.h>
 #include <bits/types.h>
 #include <bits/types.h>
-/* Dependency: "fallocate" from "fcntl" */
-#ifndef ____localdep_fallocate_defined
-#define ____localdep_fallocate_defined 1
-#if defined(__CRT_HAVE_fallocate64) && defined(__USE_FILE_OFFSET64)
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_fallocate,(__fd_t __fd, int __mode, __off64_t __offset, __off64_t __length),fallocate64,(__fd,__mode,__offset,__length))
-#elif defined(__CRT_HAVE_fallocate) && !defined(__USE_FILE_OFFSET64)
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_fallocate,(__fd_t __fd, int __mode, __off32_t __offset, __off32_t __length),fallocate,(__fd,__mode,__offset,__length))
+/* Dependency: "fallocate32" from "fcntl" */
+#ifndef ____localdep_fallocate32_defined
+#define ____localdep_fallocate32_defined 1
+#ifdef __CRT_HAVE_fallocate
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_fallocate32,(__fd_t __fd, int __mode, __off64_t __offset, __off64_t __length),fallocate,(__fd,__mode,__offset,__length))
 #else /* LIBC: fallocate */
-#include <local/fcntl/fallocate.h>
-#define __localdep_fallocate (*(int(__LIBCCALL*)(__fd_t, int, __off32_t, __off32_t))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fallocate)))
-#endif /* fallocate... */
-#endif /* !____localdep_fallocate_defined */
+#undef ____localdep_fallocate32_defined
+#endif /* fallocate32... */
+#endif /* !____localdep_fallocate32_defined */
 
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fallocate64) int
@@ -42,9 +39,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fallocate64))(__fd_t __fd,
                                                          int __mode,
                                                          __off64_t __offset,
                                                          __off64_t __length) {
-#line 170 "kos/src/libc/magic/fcntl.c"
+#line 205 "kos/src/libc/magic/fcntl.c"
 #ifdef __CRT_HAVE_fallocate
-	return __localdep_fallocate(__fd, __mode, (__off32_t)__offset, (__off32_t)__length);
+	return __localdep_fallocate32(__fd, __mode, (__off32_t)__offset, (__off32_t)__length);
 #else /* __CRT_HAVE_fallocate */
 	(void)__fd;
 	(void)__mode;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9eda54fa */
+/* HASH CRC-32:0xccc5b597 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,9 +40,14 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(umask_s) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(umask_s))(__mode_t __newmode,
                                                      __mode_t *__oldmode) {
-#line 255 "kos/src/libc/magic/io.c"
-	if (!__oldmode)
+#line 300 "kos/src/libc/magic/io.c"
+	if (!__oldmode) {
+#ifdef __EINVAL
 		return __EINVAL;
+#else /* EINVAL */
+		return 1;
+#endif /* !EINVAL */
+	}
 	*__oldmode = __localdep_umask(__newmode);
 	return 0;
 }

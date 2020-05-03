@@ -59,11 +59,11 @@ NOTHROW_NCX(LIBCCALL libc_argz_create)(char *const argv[],
 		if unlikely(!argz_string) {
 			*pargz = NULL;
 			*pargz_len  = 0;
-#ifdef __ENOMEM
-			return __ENOMEM;
-#else /* __ENOMEM */
+#ifdef ENOMEM
+			return ENOMEM;
+#else /* ENOMEM */
 			return 1;
-#endif /* !__ENOMEM */
+#endif /* !ENOMEM */
 		}
 		*pargz = argz_string;
 		for (i = 0; i < argc; ++i) {
@@ -101,11 +101,11 @@ empty_argz:
 	*pargz = result_string;
 	if unlikely(!result_string) {
 		*pargz_len = 0;
-#ifdef __ENOMEM
-		return __ENOMEM;
-#else /* __ENOMEM */
+#ifdef ENOMEM
+		return ENOMEM;
+#else /* ENOMEM */
 		return 1;
-#endif /* !__ENOMEM */
+#endif /* !ENOMEM */
 	}
 	dst = result_string;
 	for (;;) {
@@ -153,11 +153,11 @@ NOTHROW_NCX(LIBCCALL libc_argz_append)(char **__restrict pargz,
 	size_t newlen = oldlen + buf_len;
 	char *newargz = (char *)libc_realloc(*pargz, newlen * sizeof(char));
 	if unlikely(!newargz) {
-#ifdef __ENOMEM
-		return __ENOMEM;
-#else /* __ENOMEM */
+#ifdef ENOMEM
+		return ENOMEM;
+#else /* ENOMEM */
 		return 1;
-#endif /* !__ENOMEM */
+#endif /* !ENOMEM */
 	}
 	memcpyc(newargz + oldlen, buf, buf_len, sizeof(char));
 	*pargz     = newargz;
@@ -195,7 +195,7 @@ NOTHROW_NCX(LIBCCALL libc_argz_add_sep)(char **__restrict pargz,
 	if unlikely(!slen)
 		return 0;
 	oldlen = *pargz_len;
-	/* Note that GLibc actually has a bug here that causes it write `NULL'
+	/* Note that GLibc actually has a bug here that causes it to write `NULL'
 	 * into the given `*pargz' pointer when the allocation fails, instead
 	 * of leaving that pointer in its original state (allowing the caller
 	 * to cleanup the ARGZ array, instead of forcing the array to become
@@ -206,18 +206,18 @@ NOTHROW_NCX(LIBCCALL libc_argz_add_sep)(char **__restrict pargz,
 	 * >> if (*argz == NULL)
 	 * >>   return ENOMEM;
 	 * As reference that the intended behavior in the ENOMEM-branch is an
-	 * unmodified `*pargz' pointer (or at the very least, a simultanious
+	 * unmodified `*pargz' pointer (or at the very least, a simultaneous
 	 * setting of the `*pargz_len' pointer to ZERO(0)), you may look at
 	 * Glibc's version of `argz_append()', which handles that case as
 	 * leaving all pointers unmodified (just as one should)
 	 */
 	result_string = (char *)libc_realloc(*pargz, (oldlen + (slen + 1)) * sizeof(char));
 	if unlikely(!result_string) {
-#ifdef __ENOMEM
-		return __ENOMEM;
-#else /* __ENOMEM */
+#ifdef ENOMEM
+		return ENOMEM;
+#else /* ENOMEM */
 		return 1;
-#endif /* !__ENOMEM */
+#endif /* !ENOMEM */
 	}
 	*pargz = result_string;
 	dst    = result_string + oldlen;
@@ -309,11 +309,11 @@ NOTHROW_NCX(LIBCCALL libc_argz_insert)(char **__restrict pargz,
 	argz     = *pargz;
 	argz_len = *pargz_len;
 	if (before < argz || before >= argz + argz_len) {
-#ifdef __EINVAL
-		return __EINVAL;
-#else /* __EINVAL */
+#ifdef EINVAL
+		return EINVAL;
+#else /* EINVAL */
 		return 1;
-#endif /* !__EINVAL */
+#endif /* !EINVAL */
 	}
 	/* Adjust `before' to point to the start of an entry
 	 * Note that GLibc has a bug here that causes it to accessed
@@ -334,11 +334,11 @@ NOTHROW_NCX(LIBCCALL libc_argz_insert)(char **__restrict pargz,
 	insert_offset = (size_t)(before - argz);
 	argz = (char *)libc_realloc(argz, argz_len * sizeof(char));
 	if unlikely(!argz) {
-#ifdef __ENOMEM
-		return __ENOMEM;
-#else /* __ENOMEM */
+#ifdef ENOMEM
+		return ENOMEM;
+#else /* ENOMEM */
 		return 1;
-#endif /* !__ENOMEM */
+#endif /* !ENOMEM */
 	}
 	/* Update ARGZ pointers. */
 	*pargz     = argz;
@@ -425,11 +425,11 @@ NOTHROW_NCX(LIBCCALL libc_argz_replace)(char **__restrict pargz,
 			old_argz = *pargz;
 			new_argz = (char *)libc_realloc(old_argz, new_argzlen * sizeof(char));
 			if unlikely(!new_argz) {
-#ifdef __ENOMEM
-				return __ENOMEM;
-#else /* __ENOMEM */
+#ifdef ENOMEM
+				return ENOMEM;
+#else /* ENOMEM */
 				return 1;
-#endif /* !__ENOMEM */
+#endif /* !ENOMEM */
 			}
 			pos = new_argz + (pos - old_argz);
 			/* Make space for extra data */

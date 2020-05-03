@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4e5b12c1 */
+/* HASH CRC-32:0x70a50179 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_strdupf_defined
-#if ((defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_aprintf_pack)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_format_aprintf_printer)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))) || defined(__CRT_HAVE_vasprintf) || defined(__CRT_HAVE_vstrdupf)
+#if ((defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_format_aprintf_printer)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))) || defined(__CRT_HAVE_vasprintf) || defined(__CRT_HAVE_vstrdupf)
 #define __local_strdupf_defined 1
 #include <__crt.h>
 /* Dependency: "vstrdupf" from "string" */
@@ -28,7 +28,7 @@
 #ifdef __CRT_HAVE_vstrdupf
 /* Print the given `FORMAT' into a newly allocated, heap-allocated string */
 __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_LIBC_PRINTF(1, 0),char *,__NOTHROW_NCX,__localdep_vstrdupf,(char const *__restrict __format, __builtin_va_list __args),vstrdupf,(__format,__args))
-#elif ((defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_aprintf_pack)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_format_aprintf_printer)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))) || defined(__CRT_HAVE_vasprintf)
+#elif ((defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_format_aprintf_printer)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))) || defined(__CRT_HAVE_vasprintf)
 #include <local/string/vstrdupf.h>
 /* Print the given `FORMAT' into a newly allocated, heap-allocated string */
 #define __localdep_vstrdupf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vstrdupf))
@@ -51,5 +51,5 @@ __NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(strdupf))(char const *__restrict __f
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((__CRT_HAVE_realloc || __CRT_HAVE_format_aprintf_pack) && (__CRT_HAVE_realloc || __CRT_HAVE_format_aprintf_alloc || __CRT_HAVE_format_aprintf_printer) && (__CRT_HAVE_free || __CRT_HAVE_cfree)) || __CRT_HAVE_vasprintf || __CRT_HAVE_vstrdupf */
+#endif /* ((__CRT_HAVE_realloc || __CRT_HAVE_format_aprintf_alloc || __CRT_HAVE_format_aprintf_printer) && (__CRT_HAVE_free || __CRT_HAVE_cfree)) || __CRT_HAVE_vasprintf || __CRT_HAVE_vstrdupf */
 #endif /* !__local_strdupf_defined */

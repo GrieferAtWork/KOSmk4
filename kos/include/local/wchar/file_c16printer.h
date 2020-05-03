@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9c22e3c8 */
+/* HASH CRC-32:0xd774055f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 #define __local_file_c16printer_defined 1
 #include <__crt.h>
 #include <kos/anno.h>
+#include <asm/stdio.h>
 /* Dependency: "fputwc" */
 #ifndef ____localdep_fputc16_defined
 #define ____localdep_fputc16_defined 1
@@ -40,22 +41,15 @@ __CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_fputc
 #endif /* !____localdep_fputc16_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __WEOF
-#if 2 == 4
-#define __WEOF 0xffffffffu
-#else /* __SIZEOF_WCHAR_T__ == 4 */
-#define __WEOF (__CCAST(__WINT_TYPE__) 0xffff)
-#endif /* __SIZEOF_WCHAR_T__ != 4 */
-#endif /* !__WEOF */
 /* For use with `format_printf()' and friends: Prints to a `FILE *' closure argument */
 __LOCAL_LIBC(file_c16printer) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
 (__LIBDCALL __LIBC_LOCAL_NAME(file_c16printer))(void *__arg,
                                                 __CHAR16_TYPE__ const *__restrict __data,
                                                 __SIZE_TYPE__ __datalen) __THROWS(...) {
-#line 1182 "kos/src/libc/magic/wchar.c"
+#line 1158 "kos/src/libc/magic/wchar.c"
 	__SIZE_TYPE__ __i;
 	for (__i = 0; __i < __datalen; ++__i) {
-		if (__localdep_fputc16(__data[__i], (__FILE *)__arg) == __WEOF)
+		if (__localdep_fputc16(__data[__i], (__FILE *)__arg) == __WEOF16)
 			break;
 	}
 	return (__SSIZE_TYPE__)__i;

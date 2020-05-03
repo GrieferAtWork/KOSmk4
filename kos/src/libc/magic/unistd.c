@@ -35,13 +35,18 @@
 
 %{
 #include <features.h>
-#include <bits/types.h>
+
+#include <hybrid/typecore.h>
+
+#include <asm/stdio.h>
 #include <bits/confname.h>
 #include <bits/posix_opt.h>
-#include <hybrid/typecore.h>
+#include <bits/types.h>
+
 #if defined(__CRT_GLC) || defined(__CRT_KOS) || defined(__CRT_KOS_KERNEL)
 #include <asm/unistd.h>
 #endif /* __CRT_GLC || __CRT_KOS || __CRT_KOS_KERNEL */
+
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K)
 #include <bits/environments.h>
 #endif /* __USE_UNIX98 || __USE_XOPEN2K */
@@ -49,26 +54,26 @@
 __SYSDECL_BEGIN
 
 #ifdef __USE_XOPEN2K8
-#   define _POSIX_VERSION    200809L
+#define _POSIX_VERSION 200809L
 #elif defined(__USE_XOPEN2K)
-#   define _POSIX_VERSION    200112L
+#define _POSIX_VERSION 200112L
 #elif defined(__USE_POSIX199506)
-#   define _POSIX_VERSION    199506L
+#define _POSIX_VERSION 199506L
 #elif defined(__USE_POSIX199309)
-#   define _POSIX_VERSION    199309L
-#else
-#   define _POSIX_VERSION    199009L
-#endif
+#define _POSIX_VERSION 199309L
+#else /* ... */
+#define _POSIX_VERSION 199009L
+#endif /* !... */
 
 #ifdef __USE_XOPEN2K8
-#   define __POSIX2_THIS_VERSION    200809L
+#define __POSIX2_THIS_VERSION 200809L
 #elif defined(__USE_XOPEN2K)
-#   define __POSIX2_THIS_VERSION    200112L
+#define __POSIX2_THIS_VERSION 200112L
 #elif defined(__USE_POSIX199506)
-#   define __POSIX2_THIS_VERSION    199506L
-#else
-#   define __POSIX2_THIS_VERSION    199209L
-#endif
+#define __POSIX2_THIS_VERSION 199506L
+#else /* ... */
+#define __POSIX2_THIS_VERSION 199209L
+#endif /* !... */
 
 #define _POSIX2_VERSION   __POSIX2_THIS_VERSION
 #define _POSIX2_C_VERSION __POSIX2_THIS_VERSION
@@ -78,48 +83,52 @@ __SYSDECL_BEGIN
 #define _POSIX2_LOCALEDEF __POSIX2_THIS_VERSION
 
 #ifdef __USE_XOPEN2K8
-#   define _XOPEN_VERSION    700
+#define _XOPEN_VERSION 700
 #elif defined(__USE_XOPEN2K)
-#   define _XOPEN_VERSION    600
+#define _XOPEN_VERSION 600
 #elif defined(__USE_UNIX98)
-#   define _XOPEN_VERSION    500
-#else
-#   define _XOPEN_VERSION    4
-#endif
-#define _XOPEN_XCU_VERSION   4
-#define _XOPEN_XPG2          1
-#define _XOPEN_XPG3          1
-#define _XOPEN_XPG4          1
-#define _XOPEN_UNIX          1
-#define _XOPEN_CRYPT         1
-#define _XOPEN_ENH_I18N      1
-#define _XOPEN_LEGACY        1
+#define _XOPEN_VERSION 500
+#else /* ... */
+#define _XOPEN_VERSION 4
+#endif /* !... */
+#define _XOPEN_XCU_VERSION 4
+#define _XOPEN_XPG2        1
+#define _XOPEN_XPG3        1
+#define _XOPEN_XPG4        1
+#define _XOPEN_UNIX        1
+#define _XOPEN_CRYPT       1
+#define _XOPEN_ENH_I18N    1
+#define _XOPEN_LEGACY      1
 
-#define STDIN_FILENO  0 /* Standard input.  */
-#define STDOUT_FILENO 1 /* Standard output.  */
-#define STDERR_FILENO 2 /* Standard error output.  */
+#define STDIN_FILENO  __STDIN_FILENO  /* Standard input. */
+#define STDOUT_FILENO __STDOUT_FILENO /* Standard output. */
+#define STDERR_FILENO __STDERR_FILENO /* Standard error output. */
 
-#define F_OK 0 /* Test for existence.  */
-#define X_OK 1 /* Test for execute permission.  */
-#define W_OK 2 /* Test for write permission.  */
-#define R_OK 4 /* Test for read permission.  */
+#define F_OK __F_OK /* Test for existence. */
+#define X_OK __X_OK /* Test for execute permission. */
+#define W_OK __W_OK /* Test for write permission. */
+#define R_OK __R_OK /* Test for read permission. */
 
 #ifndef SEEK_SET
-#   define SEEK_SET  0 /* Seek from beginning of file.  */
-#   define SEEK_CUR  1 /* Seek from current position.  */
-#   define SEEK_END  2 /* Seek from end of file.  */
-#if defined(__USE_GNU) && (defined(__CRT_KOS) || defined(__CRT_GLC))
-#   define SEEK_DATA 3 /* Seek to next data.  */
-#   define SEEK_HOLE 4 /* Seek to next hole.  */
-#endif /* __USE_GNU && (__CRT_KOS || __CRT_GLC) */
+#define SEEK_SET __SEEK_SET /* Seek from beginning of file. */
+#define SEEK_CUR __SEEK_CUR /* Seek from current position. */
+#define SEEK_END __SEEK_END /* Seek from end of file. */
+#ifdef __USE_GNU
+#ifdef __SEEK_DATA
+#define SEEK_DATA __SEEK_DATA /* Seek to next data. */
+#endif /* __SEEK_DATA */
+#ifdef __SEEK_HOLE
+#define SEEK_HOLE __SEEK_HOLE /* Seek to next hole. */
+#endif /* __SEEK_HOLE */
+#endif /* __USE_GNU */
 #endif /* !SEEK_SET */
 
 #ifdef __USE_MISC
 #ifndef L_SET
-#   define L_SET  SEEK_SET
-#   define L_CURR SEEK_CUR
-#   define L_INCR SEEK_CUR
-#   define L_XTND SEEK_END
+#define L_SET  SEEK_SET
+#define L_CURR SEEK_CUR
+#define L_INCR SEEK_CUR
+#define L_XTND SEEK_END
 #endif /* !L_SET */
 #endif /* __USE_MISC */
 

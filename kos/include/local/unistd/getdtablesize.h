@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd12150e6 */
+/* HASH CRC-32:0x3348dc41 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(getdtablesize) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getdtablesize))(void) {
-#line 1429 "kos/src/libc/magic/unistd.c"
+#line 1438 "kos/src/libc/magic/unistd.c"
 #if defined(__KOS__)
 	return 0x7fffffff; /* INT_MAX */
 #elif defined(__linux__) || defined(__linux) || defined(__linux)

@@ -50,7 +50,7 @@ typedef __TM_TYPE(time) time_t;
 #ifdef __USE_DOS
 #ifndef _UTIMBUF_DEFINED
 #define _UTIMBUF_DEFINED 1
-#define _utimbuf   utimbuf
+#define _utimbuf utimbuf
 #endif /* !_UTIMBUF_DEFINED */
 #endif /* __USE_DOS */
 
@@ -69,11 +69,10 @@ typedef __TM_TYPE(time) time_t;
 [cp][ignore][alias(_futime32)] crt_futime32:($fd_t fd, [nullable] struct __utimbuf32 const *file_times) -> int = futime?;
 [cp][ignore][alias(_futime64)] crt_futime64:($fd_t fd, [nullable] struct __utimbuf64 const *file_times) -> int = futime64?;
 
-[cp]
 [if(defined(__USE_TIME_BITS64)), preferred_alias(utime64,_utime64)]
 [if(!defined(__USE_TIME_BITS64)), preferred_alias(utime,_utime32)]
 [requires($has_function(crt_utime32) || $has_function(crt_utime64))]
-[alternate_names(_utime32)]
+[cp][alternate_names(_utime32)]
 utime:([nonnull] char const *filename, [nullable] struct utimbuf const *file_times) -> int {
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma @push_macro@("actime")

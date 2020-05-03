@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x695cc4c6 */
+/* HASH CRC-32:0x4591d897 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Sleep for `mill' milliseconds (1/1.000 seconds) */
 __LOCAL_LIBC(delay) void
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(delay))(unsigned int __mill) {
-#line 81 "kos/src/libc/magic/dos.c"
+#line 87 "kos/src/libc/magic/dos.c"
 	__localdep_usleep((__useconds_t)__mill * 1000);
 }
 __NAMESPACE_LOCAL_END

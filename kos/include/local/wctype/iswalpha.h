@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd1b0ccf7 */
+/* HASH CRC-32:0xa04df440 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isalpha,(int __
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(iswalpha) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(iswalpha))(__WINT_TYPE__ __wc) {
-#line 124 "kos/src/libc/magic/wctype.c"
+#line 122 "kos/src/libc/magic/wctype.c"
 	return __localdep_isalpha((int)__wc);
 }
 __NAMESPACE_LOCAL_END

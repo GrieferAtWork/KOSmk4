@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x12cffd1d */
+/* HASH CRC-32:0xa8585694 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hdestroy_r))(struct hsearch_data *__h
 	if (__htab == __NULLPTR) {
 #ifdef __EINVAL
 		__libc_seterrno(__EINVAL);
-#endif /* __EINVAL */
+#endif /* EINVAL */
 		return;
 	}
 	__localdep_free(__htab->table);

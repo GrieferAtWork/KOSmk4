@@ -49,30 +49,36 @@ typedef __pid_t pid_t;
 }
 
 [ATTR_WUNUSED][ATTR_PURE]
+[decl_include(<bits/termios.h>)]
 cfgetospeed:([nonnull] struct termios const *__restrict termios_p) -> speed_t {
 	return termios_p->@c_ospeed@;
 }
 
 [ATTR_WUNUSED][ATTR_PURE]
+[decl_include(<bits/termios.h>)]
 cfgetispeed:([nonnull] struct termios const *__restrict termios_p) -> speed_t {
 	return termios_p->@c_ispeed@;
 }
 
+[decl_include(<bits/termios.h>)]
 cfsetospeed:([nonnull] struct termios *__restrict termios_p, speed_t speed) -> int {
 	termios_p->@c_ospeed@ = speed;
 	return 0;
 }
 
+[decl_include(<bits/termios.h>)]
 cfsetispeed:([nonnull] struct termios *__restrict termios_p, speed_t speed) -> int {
 	termios_p->@c_ispeed@ = speed;
 	return 0;
 }
 
 @@Get terminal attributes
+[decl_include(<bits/termios.h>)]
 tcgetattr:($fd_t fd, [nonnull] struct termios *__restrict termios_p) -> int;
 
 @@Set terminal attributes
 @@@param: optional_actions: One of `TCSANOW', `TCSADRAIN' or `TCSAFLUSH'
+[decl_include(<bits/termios.h>)]
 tcsetattr:($fd_t fd, int optional_actions, [nonnull] struct termios const *__restrict termios_p) -> int;
 
 tcsendbreak:($fd_t fd, int duration) -> int;
@@ -92,6 +98,7 @@ tcsetsid:($fd_t fd, $pid_t pid) -> int;
 
 %
 %#ifdef __USE_MISC
+[decl_include(<bits/termios.h>)]
 cfsetspeed:([nonnull] struct termios *__restrict termios_p, speed_t speed) -> int {
 	termios_p->@c_ospeed@ = speed;
 	termios_p->@c_ispeed@ = speed;
@@ -101,6 +108,7 @@ cfsetspeed:([nonnull] struct termios *__restrict termios_p, speed_t speed) -> in
 @@Set ~raw~ mode for the given `termios_p' (in/out; meaning that `termios_p' must already be initialized)
 @@This entails the CANON and all control characters being disabled, as well as
 @@any sort of input/output text processing no longer taking place.
+[decl_include(<bits/termios.h>)]
 cfmakeraw:([nonnull] struct termios *__restrict termios_p) {
 	/* As documented here: http://man7.org/linux/man-pages/man3/termios.3.html
 	 * Note that the following additions were made:
@@ -121,6 +129,7 @@ cfmakeraw:([nonnull] struct termios *__restrict termios_p) {
 %#if defined(__USE_KOS) || defined(__USE_BSD)
 @@Set ~sane~ mode for the given `termios_p' (out-only; meaning that `termios_p' gets initialized by this function)
 @@Sane here refers to setting all values to their defaults, as they are defined in <sys/ttydefaults.h>
+[decl_include(<bits/termios.h>)]
 [dependency_include(<sys/ttydefaults.h>)][kernel]
 cfmakesane:([nonnull] struct termios *__restrict termios_p) {
 	/* Set sane values. */

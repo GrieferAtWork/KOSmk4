@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f2344d4 */
+/* HASH CRC-32:0x350e2591 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,7 @@
 typedef void *(*__pthread_start_routine_t)(void *);
 #endif /* !____pthread_start_routine_t_defined */
 #include <bits/threads.h>
+#include <asm/threads.h>
 
 #include <parts/errno.h>
 /* Dependency: "pthread_create" */
@@ -50,19 +51,19 @@ __LOCAL_LIBC(thrd_create) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(thrd_create))(__thrd_t *__thr,
                                                          __thrd_start_t __func,
                                                          void *__arg) {
-#line 103 "kos/src/libc/magic/threads.c"
+#line 117 "kos/src/libc/magic/threads.c"
 	int __error;
 	__STATIC_ASSERT(sizeof(int) <= sizeof(void *));
 	__error = __localdep_pthread_create((__pthread_t *)__thr, __NULLPTR,
 	                       (__pthread_start_routine_t)(void *)__func,
 	                       __arg);
 	if __likely(!__error)
-		return 0; /* thrd_success */
+		return __thrd_success;
 #ifdef __ENOMEM
 	if (__error == __ENOMEM)
-		return 3; /* thrd_nomem */
-#endif /* __ENOMEM */
-	return 2; /* thrd_error */
+		return __thrd_nomem;
+#endif /* ENOMEM */
+	return __thrd_error;
 }
 __NAMESPACE_LOCAL_END
 #endif /* __CRT_HAVE_pthread_create */

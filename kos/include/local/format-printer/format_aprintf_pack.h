@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b6ee95b */
+/* HASH CRC-32:0x4fe7ecb4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,6 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_format_aprintf_pack_defined
-#ifdef __CRT_HAVE_realloc
 #define __local_format_aprintf_pack_defined 1
 #include <__crt.h>
 #include <hybrid/__assert.h>
@@ -89,26 +88,33 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(format_aprintf_pack) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_aprintf_pack))(struct format_aprintf_data *__restrict __self,
                                                                  __SIZE_TYPE__ *__pstrlen) {
-#line 1142 "kos/src/libc/magic/format-printer.c"
+#line 1147 "kos/src/libc/magic/format-printer.c"
 	/* Free unused buffer memory. */
 	char *__result;
 	if (__self->ap_avail != 0) {
+#ifdef __CRT_HAVE_realloc
 		char *__newbuf;
 		__newbuf = (char *)__localdep_realloc(__self->ap_base,
-		                         (__self->ap_used + 1) * sizeof(char));
+		                         (__self->ap_used + 1) *
+		                         sizeof(char));
 		if __likely(__newbuf)
 			__self->ap_base = __newbuf;
+#endif /* __CRT_HAVE_realloc */
 	} else {
 		if __unlikely(!__self->ap_used) {
 			/* Special case: Nothing was printed. */
 			__hybrid_assert(!__self->ap_base);
-#ifdef __CRT_HAVE_malloc
+#if defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_malloc)
 			__self->ap_base = (char *)__localdep_malloc(1 * sizeof(char));
-#else /* __CRT_HAVE_malloc */
-			__self->ap_base = (char *)__localdep_realloc(__NULLPTR, 1 * sizeof(char));
-#endif /* !__CRT_HAVE_malloc */
 			if __unlikely(!__self->ap_base)
 				return __NULLPTR;
+#elif defined(__CRT_HAVE_realloc)
+			__self->ap_base = (char *)__localdep_realloc(__NULLPTR, 1 * sizeof(char));
+			if __unlikely(!__self->ap_base)
+				return __NULLPTR;
+#else /* __CRT_HAVE_realloc */
+			return __NULLPTR;
+#endif /* !__CRT_HAVE_realloc */
 		}
 	}
 	__result = __self->ap_base;
@@ -130,5 +136,4 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_aprintf_pack))(struct format_a
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_realloc */
 #endif /* !__local_format_aprintf_pack_defined */

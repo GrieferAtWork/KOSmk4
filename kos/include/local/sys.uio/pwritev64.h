@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1d30d882 */
+/* HASH CRC-32:0xce62821d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,11 +22,12 @@
 #ifdef __CRT_HAVE_pwritev
 #define __local_pwritev64_defined 1
 #include <__crt.h>
+#include <bits/uio.h>
 /* Dependency: "pwritev32" from "sys.uio" */
 #ifndef ____localdep_pwritev32_defined
 #define ____localdep_pwritev32_defined 1
 #ifdef __CRT_HAVE_pwritev
-__CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_pwritev32,(__fd_t __fd, struct iovec const *__iovec, __STDC_INT_AS_SIZE_T __count, __off32_t __offset),pwritev,(__fd,__iovec,__count,__offset))
+__CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_pwritev32,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off32_t __offset),pwritev,(__fd,__iov,__count,__offset))
 #else /* LIBC: pwritev */
 #undef ____localdep_pwritev32_defined
 #endif /* pwritev32... */
@@ -35,11 +36,11 @@ __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_pwritev3
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(pwritev64) __ATTR_NONNULL((2)) __SSIZE_TYPE__
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pwritev64))(__fd_t __fd,
-                                                       struct iovec const *__iovec,
+                                                       struct iovec const *__iov,
                                                        __STDC_INT_AS_SIZE_T __count,
                                                        __off64_t __offset) {
-#line 104 "kos/src/libc/magic/sys.uio.c"
-	return __localdep_pwritev32(__fd, __iovec, __count, (__off32_t)__offset);
+#line 112 "kos/src/libc/magic/sys.uio.c"
+	return __localdep_pwritev32(__fd, __iov, __count, (__off32_t)__offset);
 }
 __NAMESPACE_LOCAL_END
 #endif /* __CRT_HAVE_pwritev */

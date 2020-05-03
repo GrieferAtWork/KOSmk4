@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7709c592 */
+/* HASH CRC-32:0x4ac028c9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_get_osfhandle) __ATTR_PURE __ATTR_WUNUSED __INTPTR_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_get_osfhandle))(__fd_t __fd) {
-#line 272 "kos/src/libc/magic/io.c"
+#line 322 "kos/src/libc/magic/io.c"
 	__COMPILER_IMPURE();
 	return (__INTPTR_TYPE__)__fd;
 }

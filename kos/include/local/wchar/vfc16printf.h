@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9fc2bf25 */
+/* HASH CRC-32:0xfc4917aa */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,12 +60,12 @@
  *             - `%$[hex]' / `%$[hex:lLoOpPaAhH]'
  *                 - Invoke `format_c16hexdump(..., va_arg(args, void *))'
  *                 - Integer-length (`%$I32[hex]') flags affect `FORMAT_HEXDUMP_(BYTES|WORDS|DWORDS|QWORDS)'
- *                 - The argument string affect flags (defaults to `FORMAT_HEXDUMP_FNORMAL')
- *                    - `FORMAT_HEXDUMP_FHEXLOWER':  yes:l, no:L
- *                    - `FORMAT_HEXDUMP_FOFFSETS':   yes:o, no:O
- *                    - `FORMAT_HEXDUMP_FNOADDRESS': yes:P, no:p
- *                    - `FORMAT_HEXDUMP_FNOASCII':   yes:A, no:a
- *                    - `FORMAT_HEXDUMP_FNOHEX':     yes:H, no:h
+ *                 - The argument string affect flags (defaults to `0x0000')
+ *                    - `0x0001':  yes:l, no:L
+ *                    - `0x0004':   yes:o, no:O
+ *                    - `0x0002': yes:P, no:p
+ *                    - `0x0010':   yes:A, no:a
+ *                    - `0x0008':     yes:H, no:h
  *             - `%[gen]'
  *                 - Invoke a custom format printer function pointer passed through args
  *                   >> typedef ssize_t (*PGEN)(pwformatprinter printer, void *arg);
@@ -149,12 +149,12 @@ __CREDIRECT(__ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,__NOT
  *             - `%$[hex]' / `%$[hex:lLoOpPaAhH]'
  *                 - Invoke `format_c16hexdump(..., va_arg(args, void *))'
  *                 - Integer-length (`%$I32[hex]') flags affect `FORMAT_HEXDUMP_(BYTES|WORDS|DWORDS|QWORDS)'
- *                 - The argument string affect flags (defaults to `FORMAT_HEXDUMP_FNORMAL')
- *                    - `FORMAT_HEXDUMP_FHEXLOWER':  yes:l, no:L
- *                    - `FORMAT_HEXDUMP_FOFFSETS':   yes:o, no:O
- *                    - `FORMAT_HEXDUMP_FNOADDRESS': yes:P, no:p
- *                    - `FORMAT_HEXDUMP_FNOASCII':   yes:A, no:a
- *                    - `FORMAT_HEXDUMP_FNOHEX':     yes:H, no:h
+ *                 - The argument string affect flags (defaults to `0x0000')
+ *                    - `0x0001':  yes:l, no:L
+ *                    - `0x0004':   yes:o, no:O
+ *                    - `0x0002': yes:P, no:p
+ *                    - `0x0010':   yes:A, no:a
+ *                    - `0x0008':     yes:H, no:h
  *             - `%[gen]'
  *                 - Invoke a custom format printer function pointer passed through args
  *                   >> typedef ssize_t (*PGEN)(pwformatprinter printer, void *arg);
@@ -239,12 +239,12 @@ __CREDIRECT_DOS(__ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,_
  *             - `%$[hex]' / `%$[hex:lLoOpPaAhH]'
  *                 - Invoke `format_c16hexdump(..., va_arg(args, void *))'
  *                 - Integer-length (`%$I32[hex]') flags affect `FORMAT_HEXDUMP_(BYTES|WORDS|DWORDS|QWORDS)'
- *                 - The argument string affect flags (defaults to `FORMAT_HEXDUMP_FNORMAL')
- *                    - `FORMAT_HEXDUMP_FHEXLOWER':  yes:l, no:L
- *                    - `FORMAT_HEXDUMP_FOFFSETS':   yes:o, no:O
- *                    - `FORMAT_HEXDUMP_FNOADDRESS': yes:P, no:p
- *                    - `FORMAT_HEXDUMP_FNOASCII':   yes:A, no:a
- *                    - `FORMAT_HEXDUMP_FNOHEX':     yes:H, no:h
+ *                 - The argument string affect flags (defaults to `0x0000')
+ *                    - `0x0001':  yes:l, no:L
+ *                    - `0x0004':   yes:o, no:O
+ *                    - `0x0002': yes:P, no:p
+ *                    - `0x0010':   yes:A, no:a
+ *                    - `0x0008':     yes:H, no:h
  *             - `%[gen]'
  *                 - Invoke a custom format printer function pointer passed through args
  *                   >> typedef ssize_t (*PGEN)(pwformatprinter printer, void *arg);
@@ -329,12 +329,12 @@ __CREDIRECT_DOS(__ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,_
  *             - `%$[hex]' / `%$[hex:lLoOpPaAhH]'
  *                 - Invoke `format_c16hexdump(..., va_arg(args, void *))'
  *                 - Integer-length (`%$I32[hex]') flags affect `FORMAT_HEXDUMP_(BYTES|WORDS|DWORDS|QWORDS)'
- *                 - The argument string affect flags (defaults to `FORMAT_HEXDUMP_FNORMAL')
- *                    - `FORMAT_HEXDUMP_FHEXLOWER':  yes:l, no:L
- *                    - `FORMAT_HEXDUMP_FOFFSETS':   yes:o, no:O
- *                    - `FORMAT_HEXDUMP_FNOADDRESS': yes:P, no:p
- *                    - `FORMAT_HEXDUMP_FNOASCII':   yes:A, no:a
- *                    - `FORMAT_HEXDUMP_FNOHEX':     yes:H, no:h
+ *                 - The argument string affect flags (defaults to `0x0000')
+ *                    - `0x0001':  yes:l, no:L
+ *                    - `0x0004':   yes:o, no:O
+ *                    - `0x0002': yes:P, no:p
+ *                    - `0x0010':   yes:A, no:a
+ *                    - `0x0008':     yes:H, no:h
  *             - `%[gen]'
  *                 - Invoke a custom format printer function pointer passed through args
  *                   >> typedef ssize_t (*PGEN)(pwformatprinter printer, void *arg);
@@ -430,7 +430,7 @@ __LOCAL_LIBC(vfc16printf) __ATTR_LIBC_WPRINTF(2, 0) __ATTR_NONNULL((1, 2)) __STD
 (__LIBDCALL __LIBC_LOCAL_NAME(vfc16printf))(__FILE *__restrict __stream,
                                             __CHAR16_TYPE__ const *__restrict __format,
                                             __builtin_va_list __args) __THROWS(...) {
-#line 682 "kos/src/libc/magic/wchar.c"
+#line 673 "kos/src/libc/magic/wchar.c"
 	return (__STDC_INT_AS_SSIZE_T)__localdep_format_vc16printf(&__localdep_file_c16printer, __stream, __format, __args);
 }
 __NAMESPACE_LOCAL_END

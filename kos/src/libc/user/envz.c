@@ -59,11 +59,11 @@ NOTHROW_NCX(LIBCCALL libc_envz_add)(char **__restrict penvz,
 	morelen  = namelen + 1 + valuelen + 1;
 	new_envz = (char *)libc_realloc(*penvz, (*penvz_len + morelen) * sizeof(char));
 	if unlikely(!new_envz) {
-#ifdef __ENOMEM
-		return __ENOMEM;
-#else /* __ENOMEM */
+#ifdef ENOMEM
+		return ENOMEM;
+#else /* ENOMEM */
 		return 1;
-#endif /* !__ENOMEM */
+#endif /* !ENOMEM */
 	}
 	*penvz = new_envz;
 	new_envz += *penvz_len;

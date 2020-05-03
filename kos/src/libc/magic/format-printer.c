@@ -65,10 +65,13 @@
 
 %{
 #include <features.h>
-#include <bits/types.h>
-#include <bits/format-printer.h>
-#include <libc/malloc.h>
+
 #include <hybrid/__assert.h>
+
+#include <bits/format-printer.h>
+#include <bits/types.h>
+
+#include <libc/malloc.h>
 
 
 #ifdef __CC__
@@ -169,6 +172,13 @@ err:
 
 
 
+%[define(FORMAT_ESCAPE_FNORMAL   = 0x0000)] /* Normal quote flags. */
+%[define(FORMAT_ESCAPE_FPRINTRAW = 0x0001)] /* Don't surround the quoted text with "..."; */
+%[define(FORMAT_ESCAPE_FFORCEHEX = 0x0002)] /* Force hex encoding of all control characters without special strings (`"\n"', etc.). */
+%[define(FORMAT_ESCAPE_FFORCEOCT = 0x0004)] /* Force octal encoding of all non-ascii characters. */
+%[define(FORMAT_ESCAPE_FNOCTRL   = 0x0008)] /* Disable special encoding strings such as `"\r"', `"\n"' or `"\e"' */
+%[define(FORMAT_ESCAPE_FNOASCII  = 0x0010)] /* Disable regular ascii-characters and print everything using special encodings. */
+%[define(FORMAT_ESCAPE_FUPPERHEX = 0x0020)] /* Use uppercase characters for hex (e.g.: `"\xAB"'). */
 
 %{
 
@@ -206,16 +216,7 @@ err:
 format_escape:([nonnull] pformatprinter printer, void *arg,
                /*utf-8*/ char const *__restrict text,
                $size_t textlen, unsigned int flags) -> $ssize_t {
-#ifndef FORMAT_ESCAPE_FNORMAL
-#define FORMAT_ESCAPE_FNORMAL   0x0000 /* Normal quote flags. */
-#define FORMAT_ESCAPE_FPRINTRAW 0x0001 /* Don't surround the quoted text with "..."; */
-#define FORMAT_ESCAPE_FFORCEHEX 0x0002 /* Force hex encoding of all control characters without special strings (`"\n"', etc.). */
-#define FORMAT_ESCAPE_FFORCEOCT 0x0004 /* Force octal encoding of all non-ascii characters. */
-#define FORMAT_ESCAPE_FNOCTRL   0x0008 /* Disable special encoding strings such as `"\r"', `"\n"' or `"\e"' */
-#define FORMAT_ESCAPE_FNOASCII  0x0010 /* Disable regular ascii-characters and print everything using special encodings. */
-#define FORMAT_ESCAPE_FUPPERHEX 0x0020 /* Use uppercase characters for hex (e.g.: `"\xAB"'). */
-#endif /* !FORMAT_ESCAPE_FNORMAL */
-#define escape_tooct(c) ('0'+(char)(unsigned char)(c))
+#define escape_tooct(c) ('0' + (char)(unsigned char)(c))
 #ifndef DECIMALS_SELECTOR
 #define LOCAL_DECIMALS_SELECTOR_DEFINED 1
 #define DECIMALS_SELECTOR  decimals
@@ -408,9 +409,9 @@ encode_hex:
 @@if $wchar_function@@
 #if __SIZEOF_WCHAR_T__ == 2
 					uint32_t next_ch = unicode_readutf16_n((char16_t const **)&new_text, textend);
-#else
+#else /* __SIZEOF_WCHAR_T__ == 2 */
 					uint32_t next_ch = (uint32_t)*new_text++;
-#endif
+#endif /* __SIZEOF_WCHAR_T__ != 2 */
 @@else@@
 					uint32_t next_ch = unicode_readutf8_n((char const **)&new_text, textend);
 @@endif@@
@@ -483,6 +484,20 @@ err:
 }
 
 
+
+
+%[define(FORMAT_HEXDUMP_FNORMAL    = 0x0000)] /* Normal hexdump flags. */
+%[define(FORMAT_HEXDUMP_FHEXLOWER  = 0x0001)] /* Print hex text of the dump in lowercase (does not affect address/offset). */
+%[define(FORMAT_HEXDUMP_FNOADDRESS = 0x0002)] /* Don't include the absolute address at the start of every line. */
+%[define(FORMAT_HEXDUMP_FOFFSETS   = 0x0004)] /* Include offsets from the base address at the start of every line (after the address when also shown). */
+%[define(FORMAT_HEXDUMP_FNOHEX     = 0x0008)] /* Don't print the actual hex dump (hex data representation). */
+%[define(FORMAT_HEXDUMP_FNOASCII   = 0x0010)] /* Don't print ascii representation of printable characters at the end of lines. */
+%[define(FORMAT_HEXDUMP_BYTES      = 0x0000)] /* Dump data as bytes. */
+%[define(FORMAT_HEXDUMP_WORDS      = 0x1000)] /* Dump data as words (uint16_t). */
+%[define(FORMAT_HEXDUMP_DWORDS     = 0x2000)] /* Dump data as dwords (uint32_t). */
+%[define(FORMAT_HEXDUMP_QWORDS     = 0x3000)] /* Dump data as qwords (uint64_t). */
+%[define(FORMAT_HEXDUMP_SIZEMASK   = 0x3000)] /* Mask for the dump size. */
+
 %{
 #define FORMAT_HEXDUMP_FNORMAL    0x0000 /* Normal hexdump flags. */
 #define FORMAT_HEXDUMP_FHEXLOWER  0x0001 /* Print hex text of the dump in lowercase (does not affect address/offset). */
@@ -522,19 +537,6 @@ err:
 format_hexdump:([nonnull] pformatprinter printer, void *arg,
                 void const *__restrict data, $size_t size,
                 $size_t linesize, unsigned int flags) -> $ssize_t {
-#ifndef FORMAT_HEXDUMP_FNORMAL
-#define FORMAT_HEXDUMP_FNORMAL    0x0000 /* Normal hexdump flags. */
-#define FORMAT_HEXDUMP_FHEXLOWER  0x0001 /* Print hex text of the dump in lowercase (does not affect address/offset). */
-#define FORMAT_HEXDUMP_FNOADDRESS 0x0002 /* Don't include the absolute address at the start of every line. */
-#define FORMAT_HEXDUMP_FOFFSETS   0x0004 /* Include offsets from the base address at the start of every line (after the address when also shown). */
-#define FORMAT_HEXDUMP_FNOHEX     0x0008 /* Don't print the actual hex dump (hex data representation). */
-#define FORMAT_HEXDUMP_FNOASCII   0x0010 /* Don't print ascii representation of printable characters at the end of lines. */
-#define FORMAT_HEXDUMP_BYTES      0x0000 /* Dump data as bytes. */
-#define FORMAT_HEXDUMP_WORDS      0x1000 /* Dump data as words (uint16_t). */
-#define FORMAT_HEXDUMP_DWORDS     0x2000 /* Dump data as dwords (uint32_t). */
-#define FORMAT_HEXDUMP_QWORDS     0x3000 /* Dump data as qwords (uint64_t). */
-#define FORMAT_HEXDUMP_SIZEMASK   0x3000 /* Mask for the dump size. */
-#endif /* !FORMAT_HEXDUMP_FNORMAL */
 #ifndef DECIMALS_SELECTOR
 #define LOCAL_DECIMALS_SELECTOR_DEFINED 1
 #define DECIMALS_SELECTOR  decimals
@@ -596,9 +598,11 @@ format_hexdump:([nonnull] pformatprinter printer, void *arg,
 			size_t i = 0;
 			size_t tailspace_count;
 			switch (flags & FORMAT_HEXDUMP_SIZEMASK) {
+
 			default:
 				tailspace_count = linesize * 3;
 				break;
+
 			case FORMAT_HEXDUMP_WORDS:
 				tailspace_count = (linesize / 2) * 5 + (linesize % 2) * 3;
 				buffer[4] = ' ';
@@ -616,6 +620,7 @@ format_hexdump:([nonnull] pformatprinter printer, void *arg,
 					tailspace_count -= 5;
 				}
 				break;
+
 			case FORMAT_HEXDUMP_DWORDS:
 				tailspace_count = (linesize / 4) * 9 + (linesize % 4) * 3;
 				buffer[8] = ' ';
@@ -633,6 +638,7 @@ format_hexdump:([nonnull] pformatprinter printer, void *arg,
 					tailspace_count -= 9;
 				}
 				break;
+
 			case FORMAT_HEXDUMP_QWORDS:
 				tailspace_count = (linesize / 8) * 17 + (linesize % 8) * 3;
 				buffer[16] = ' ';
@@ -858,13 +864,13 @@ format_vprintf:([nonnull] pformatprinter printer, void *arg,
 #define @__FORMAT_UNICODE_WRITECHAR@  unicode_writeutf16
 #define @__FORMAT_UNICODE_FORMAT8@    format_8to16
 #define @__FORMAT_UNICODE_FORMAT32@   format_32to16
-#else
+#else /* __SIZEOF_WCHAR_T__ == 2 */
 #define @__FORMAT_WIDTH16@            format_c16width
 #define @__FORMAT_ESCAPE16@           format_c16escape
 #define @__FORMAT_UNICODE_WRITECHAR@(dst, ch) ((dst)[0] = (ch), (dst) + 1)
 #define @__FORMAT_UNICODE_FORMAT8@    format_8to32
 #define @__FORMAT_UNICODE_FORMAT16@   format_16to32
-#endif
+#endif /* __SIZEOF_WCHAR_T__ != 2 */
 @@else@@
 #define @__FORMAT_WIDTH@              format_width
 #define @__FORMAT_WIDTH16@            format_c16width
@@ -985,7 +991,7 @@ format_sprintf_printer:([nonnull] /*char ***/ void *arg,
 @@if $wchar_function@@
 	*(wchar_t **)arg = (wchar_t *)wmempcpy(*(wchar_t **)arg, data, datalen);
 @@else@@
-	*(char **)arg = (char *)mempcpy(*(char **)arg, data, datalen * sizeof(char));
+	*(char **)arg = (char *)mempcpyc(*(char **)arg, data, datalen, sizeof(char));
 @@endif@@
 	return (ssize_t)datalen;
 }
@@ -1132,9 +1138,8 @@ struct format_aprintf_data {
 @@                 but may differ from `strlen(return)' when NUL characters were
 @@                 printed to the aprintf-printer at one point.
 @@                 (e.g. `format_aprintf_printer(&my_printer, "\0", 1)')
-[requires($has_function(realloc))][same_impl]
 [dependency_include(<hybrid/__assert.h>)]
-[dependency_include(<hybrid/typecore.h>)]
+[dependency_include(<hybrid/typecore.h>)][userimpl]
 [ATTR_WUNUSED][ATTR_MALL_DEFAULT_ALIGNED][ATTR_MALLOC]
 [dependency_prefix(DEFINE_FORMAT_APRINTF_DATA)]
 format_aprintf_pack:([nonnull] struct format_aprintf_data *__restrict self,
@@ -1142,22 +1147,29 @@ format_aprintf_pack:([nonnull] struct format_aprintf_data *__restrict self,
 	/* Free unused buffer memory. */
 	char *result;
 	if (self->@ap_avail@ != 0) {
+@@if_has_function(realloc)@@
 		char *newbuf;
 		newbuf = (char *)realloc(self->@ap_base@,
-		                         (self->@ap_used@ + 1) * sizeof(char));
+		                         (self->@ap_used@ + 1) *
+		                         sizeof(char));
 		if likely(newbuf)
 			self->@ap_base@ = newbuf;
+@@endif_has_function(realloc)@@
 	} else {
 		if unlikely(!self->@ap_used@) {
 			/* Special case: Nothing was printed. */
 			__hybrid_assert(!self->@ap_base@);
-#ifdef __CRT_HAVE_malloc
+@@if_has_function(malloc)@@
 			self->@ap_base@ = (char *)malloc(1 * sizeof(char));
-#else /* __CRT_HAVE_malloc */
-			self->@ap_base@ = (char *)realloc(NULL, 1 * sizeof(char));
-#endif /* !__CRT_HAVE_malloc */
 			if unlikely(!self->@ap_base@)
 				return NULL;
+@@elif_has_function(realloc)@@
+			self->@ap_base@ = (char *)realloc(NULL, 1 * sizeof(char));
+			if unlikely(!self->@ap_base@)
+				return NULL;
+@@else_has_function(realloc)@@
+			return NULL;
+@@endif_has_function(realloc)@@
 		}
 	}
 	result = self->@ap_base@;
@@ -1178,6 +1190,8 @@ format_aprintf_pack:([nonnull] struct format_aprintf_data *__restrict self,
 #endif /* !NDEBUG */
 	return result;
 }
+
+
 
 @@Allocate a buffer of `num_chars' characters at the end of `self'
 @@The returned pointer remains valid until the next time this function is called,

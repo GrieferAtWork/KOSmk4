@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4ec966ca */
+/* HASH CRC-32:0x76a58a5b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 #include <__crt.h>
 #include <kos/anno.h>
 #include <bits/format-printer.h>
+#include <asm/stdio.h>
 /* Dependency: "format_vscanf" from "format-printer" */
 #ifndef ____localdep_format_vscanf_defined
 #define ____localdep_format_vscanf_defined 1
@@ -112,13 +113,6 @@ __CREDIRECT(__ATTR_NONNULL((1)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode
 
 __NAMESPACE_LOCAL_BEGIN
 #include <hybrid/typecore.h>
-#ifndef __EOF
-#ifdef EOF
-#define __EOF  EOF
-#else
-#define __EOF (-1)
-#endif
-#endif
 __LOCAL_LIBC(vsscanf_getc) __SSIZE_TYPE__ (__LIBCCALL __vsscanf_getc)(void *__arg) {
 	__CHAR32_TYPE__ __result = __localdep_unicode_readutf8((char const **)__arg);
 	return __result ? __result : __EOF;
@@ -133,7 +127,7 @@ __LOCAL_LIBC(vsscanf) __ATTR_WUNUSED __ATTR_LIBC_SCANF(2, 0) __ATTR_NONNULL((1, 
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(vsscanf))(char const *__restrict __input,
                                                      char const *__restrict __format,
                                                      __builtin_va_list __args) {
-#line 958 "kos/src/libc/magic/stdio.c"
+#line 960 "kos/src/libc/magic/stdio.c"
 	char const *__input_pointer = __input;
 	return __localdep_format_vscanf(&__vsscanf_getc, &__vsscanf_ungetc,
 	                     (void *)&__input_pointer, __format, __args);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1d6b604c */
+/* HASH CRC-32:0x2f4495ee */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Flush any unwritten data from `STREAM' to the underlying filesystem/TTY */
 __LOCAL_LIBC(fflush) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fflush))(__FILE *__stream) __THROWS(...) {
-#line 391 "kos/src/libc/magic/stdio.c"
+#line 415 "kos/src/libc/magic/stdio.c"
 	/* NO-OP (When not implemented by the CRT, assume no
 	 * buffering being done, meaning this function isn't needed) */
 #if defined(__CRT_HAVE__flushall) || defined(__CRT_HAVE__IO_flush_all)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3a577905 */
+/* HASH CRC-32:0x74ea4396 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,6 +27,7 @@
 #include <bits/threads.h>
 
 #include <bits/pthreadtypes.h>
+#include <asm/threads.h>
 /* Dependency: "pthread_mutex_timedlock" from "pthread" */
 #ifndef ____localdep_pthread_mutex_timedlock_defined
 #define ____localdep_pthread_mutex_timedlock_defined 1
@@ -53,12 +54,12 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(mtx_timedlock) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(mtx_timedlock))(__mtx_t *__restrict __mutex,
                                                            struct timespec const *__restrict __time_point) {
-#line 327 "kos/src/libc/magic/threads.c"
+#line 347 "kos/src/libc/magic/threads.c"
 	int __error;
 	__error = __localdep_pthread_mutex_timedlock((__pthread_mutex_t *)__mutex, __time_point);
 	if __likely(!__error)
-		return 0; /* thrd_success */
-	return 2; /* thrd_error */
+		return __thrd_success;
+	return __thrd_error;
 }
 __NAMESPACE_LOCAL_END
 #endif /* __CRT_HAVE_pthread_mutex_timedlock || __CRT_HAVE_pthread_mutex_timedlock64 */

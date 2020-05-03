@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa7d9e7a2 */
+/* HASH CRC-32:0xa68b8a6d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(_sprintf_p))(char *__restrict __buf,
                                                          __SIZE_TYPE__ __bufsize,
                                                          char const *__restrict __format,
                                                          ...) {
-#line 2418 "kos/src/libc/magic/stdio.c"
+#line 2416 "kos/src/libc/magic/stdio.c"
 	__STDC_INT_AS_SIZE_T __result;
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __format);

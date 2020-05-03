@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x64eb7656 */
+/* HASH CRC-32:0x3ebda691 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,7 +62,7 @@ NOTHROW_NCX(LIBCCALL libc_format_wrepeat)(pc32formatprinter printer,
                                           void *arg,
                                           char32_t ch,
                                           size_t num_repetitions) {
-#line 116 "kos/src/libc/magic/format-printer.c"
+#line 119 "kos/src/libc/magic/format-printer.c"
 #ifndef FORMAT_REPEAT_BUFSIZE
 #define FORMAT_REPEAT_BUFSIZE 64
 #endif /* !FORMAT_REPEAT_BUFSIZE */
@@ -131,7 +131,7 @@ NOTHROW_NCX(LIBDCALL libd_format_wrepeat)(pc16formatprinter printer,
                                           void *arg,
                                           char16_t ch,
                                           size_t num_repetitions) {
-#line 116 "kos/src/libc/magic/format-printer.c"
+#line 119 "kos/src/libc/magic/format-printer.c"
 #ifndef FORMAT_REPEAT_BUFSIZE
 #define FORMAT_REPEAT_BUFSIZE 64
 #endif /* !FORMAT_REPEAT_BUFSIZE */
@@ -197,7 +197,7 @@ err:
  * >> hat a great day.
  * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
  * Output #2: >> Hello \"World\" W\nhat a great day
- * NOTE: Output #2 is generated if the `FORMAT_ESCAPE_FPRINTRAW' is set
+ * NOTE: Output #2 is generated if the `0x0001' is set
  * This function escapes all control and non-ascii characters,
  * preferring octal encoding for control characters and hex-encoding
  * for other non-ascii characters, a behavior that may be modified
@@ -211,17 +211,8 @@ NOTHROW_NCX(LIBCCALL libc_format_wescape)(pc32formatprinter printer,
                                           /*utf-8*/ char32_t const *__restrict text,
                                           size_t textlen,
                                           unsigned int flags) {
-#line 209 "kos/src/libc/magic/format-printer.c"
-#ifndef FORMAT_ESCAPE_FNORMAL
-#define FORMAT_ESCAPE_FNORMAL   0x0000 /* Normal quote flags. */
-#define FORMAT_ESCAPE_FPRINTRAW 0x0001 /* Don't surround the quoted text with "..."; */
-#define FORMAT_ESCAPE_FFORCEHEX 0x0002 /* Force hex encoding of all control characters without special strings (`"\n"', etc.). */
-#define FORMAT_ESCAPE_FFORCEOCT 0x0004 /* Force octal encoding of all non-ascii characters. */
-#define FORMAT_ESCAPE_FNOCTRL   0x0008 /* Disable special encoding strings such as `"\r"', `"\n"' or `"\e"' */
-#define FORMAT_ESCAPE_FNOASCII  0x0010 /* Disable regular ascii-characters and print everything using special encodings. */
-#define FORMAT_ESCAPE_FUPPERHEX 0x0020 /* Use uppercase characters for hex (e.g.: `"\xAB"'). */
-#endif /* !FORMAT_ESCAPE_FNORMAL */
-#define escape_tooct(c) ('0'+(char32_t)(char32_t)(c))
+#line 219 "kos/src/libc/magic/format-printer.c"
+#define escape_tooct(c) ('0' + (char32_t)(char32_t)(c))
 #ifndef DECIMALS_SELECTOR
 #define LOCAL_DECIMALS_SELECTOR_DEFINED 1
 #define DECIMALS_SELECTOR  decimals
@@ -235,9 +226,9 @@ NOTHROW_NCX(LIBCCALL libc_format_wescape)(pc32formatprinter printer,
 	ssize_t result = 0, temp; char const *c_hex;
 	char32_t const *textend = text + textlen;
 	char32_t const *flush_start = text;
-	c_hex = DECIMALS_SELECTOR[!(flags & FORMAT_ESCAPE_FUPPERHEX)];
+	c_hex = DECIMALS_SELECTOR[!(flags & 0x0020)];
 	encoded_text[0] = '\\';
-	if __likely(!(flags & FORMAT_ESCAPE_FPRINTRAW)) {
+	if __likely(!(flags & 0x0001)) {
 		temp = (*printer)(arg, quote, 1);
 		if __unlikely(temp < 0)
 		goto err;
@@ -246,7 +237,7 @@ NOTHROW_NCX(LIBCCALL libc_format_wescape)(pc32formatprinter printer,
 	while (text < textend) {
 		char32_t const *old_text = text;
 
-#if 4 == 2
+#if __SIZEOF_WCHAR_T__ == 2
 		uint32_t ch = libc_unicode_readutf16_n((char16_t const **)&text, textend);
 #else /* __SIZEOF_WCHAR_T__ == 2 */
 		uint32_t ch = (uint32_t)*text++;
@@ -256,7 +247,7 @@ NOTHROW_NCX(LIBCCALL libc_format_wescape)(pc32formatprinter printer,
 
 		if __unlikely(ch < 32 || ch >= 127  || ch == '\'' ||
 		              ch == '\"' || ch == '\\' ||
-		             (flags & FORMAT_ESCAPE_FNOASCII)) {
+		             (flags & 0x0010)) {
 			/* Flush unwritten direct-copy text. */
 			if (flush_start < old_text) {
 				temp = (*printer)(arg, flush_start, (size_t)(old_text - flush_start));
@@ -267,15 +258,15 @@ NOTHROW_NCX(LIBCCALL libc_format_wescape)(pc32formatprinter printer,
 			/* Character requires special encoding. */
 			if (ch < 32) {
 				/* Control character. */
-				if (flags & FORMAT_ESCAPE_FNOCTRL) {
+				if (flags & 0x0008) {
 default_ctrl:
-					if (flags & FORMAT_ESCAPE_FFORCEHEX)
+					if (flags & 0x0002)
 						goto encode_hex;
 encode_oct:
 					if (text < textend) {
 						char32_t const *new_text = text;
 
-#if 4 == 2
+#if __SIZEOF_WCHAR_T__ == 2
 						uint32_t next_ch = libc_unicode_readutf16_n((char16_t const **)&new_text, textend);
 #else
 						uint32_t next_ch = (uint32_t)*new_text++;
@@ -401,22 +392,22 @@ special_control:
 				encoded_text_size = 2;
 				goto print_encoded;
 			} else if ((ch == '\\' || ch == '\'' || ch == '\"') &&
-			          !(flags & FORMAT_ESCAPE_FNOCTRL)) {
+			          !(flags & 0x0008)) {
 				goto special_control;
 			} else {
 				/* Non-ascii character. */
 /*default_nonascii:*/
-				if (flags & FORMAT_ESCAPE_FFORCEOCT)
+				if (flags & 0x0004)
 					goto encode_oct;
 encode_hex:
 				if (text < textend) {
 					char32_t const *new_text = text;
 
-#if 4 == 2
+#if __SIZEOF_WCHAR_T__ == 2
 					uint32_t next_ch = libc_unicode_readutf16_n((char16_t const **)&new_text, textend);
-#else
+#else /* __SIZEOF_WCHAR_T__ == 2 */
 					uint32_t next_ch = (uint32_t)*new_text++;
-#endif
+#endif /* __SIZEOF_WCHAR_T__ != 2 */
 
 
 
@@ -472,7 +463,7 @@ print_encoded:
 			goto err;
 		result += temp;
 	}
-	if __likely(!(flags & FORMAT_ESCAPE_FPRINTRAW)) {
+	if __likely(!(flags & 0x0001)) {
 		temp = (*printer)(arg, quote, 1);
 		if __unlikely(temp < 0)
 			goto err;
@@ -499,7 +490,7 @@ err:
  * >> hat a great day.
  * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
  * Output #2: >> Hello \"World\" W\nhat a great day
- * NOTE: Output #2 is generated if the `FORMAT_ESCAPE_FPRINTRAW' is set
+ * NOTE: Output #2 is generated if the `0x0001' is set
  * This function escapes all control and non-ascii characters,
  * preferring octal encoding for control characters and hex-encoding
  * for other non-ascii characters, a behavior that may be modified
@@ -513,17 +504,8 @@ NOTHROW_NCX(LIBDCALL libd_format_wescape)(pc16formatprinter printer,
                                           /*utf-8*/ char16_t const *__restrict text,
                                           size_t textlen,
                                           unsigned int flags) {
-#line 209 "kos/src/libc/magic/format-printer.c"
-#ifndef FORMAT_ESCAPE_FNORMAL
-#define FORMAT_ESCAPE_FNORMAL   0x0000 /* Normal quote flags. */
-#define FORMAT_ESCAPE_FPRINTRAW 0x0001 /* Don't surround the quoted text with "..."; */
-#define FORMAT_ESCAPE_FFORCEHEX 0x0002 /* Force hex encoding of all control characters without special strings (`"\n"', etc.). */
-#define FORMAT_ESCAPE_FFORCEOCT 0x0004 /* Force octal encoding of all non-ascii characters. */
-#define FORMAT_ESCAPE_FNOCTRL   0x0008 /* Disable special encoding strings such as `"\r"', `"\n"' or `"\e"' */
-#define FORMAT_ESCAPE_FNOASCII  0x0010 /* Disable regular ascii-characters and print everything using special encodings. */
-#define FORMAT_ESCAPE_FUPPERHEX 0x0020 /* Use uppercase characters for hex (e.g.: `"\xAB"'). */
-#endif /* !FORMAT_ESCAPE_FNORMAL */
-#define escape_tooct(c) ('0'+(char16_t)(char16_t)(c))
+#line 219 "kos/src/libc/magic/format-printer.c"
+#define escape_tooct(c) ('0' + (char16_t)(char16_t)(c))
 #ifndef DECIMALS_SELECTOR
 #define LOCAL_DECIMALS_SELECTOR_DEFINED 1
 #define DECIMALS_SELECTOR  decimals
@@ -537,9 +519,9 @@ NOTHROW_NCX(LIBDCALL libd_format_wescape)(pc16formatprinter printer,
 	ssize_t result = 0, temp; char const *c_hex;
 	char16_t const *textend = text + textlen;
 	char16_t const *flush_start = text;
-	c_hex = DECIMALS_SELECTOR[!(flags & FORMAT_ESCAPE_FUPPERHEX)];
+	c_hex = DECIMALS_SELECTOR[!(flags & 0x0020)];
 	encoded_text[0] = '\\';
-	if __likely(!(flags & FORMAT_ESCAPE_FPRINTRAW)) {
+	if __likely(!(flags & 0x0001)) {
 		temp = (*printer)(arg, quote, 1);
 		if __unlikely(temp < 0)
 		goto err;
@@ -548,7 +530,7 @@ NOTHROW_NCX(LIBDCALL libd_format_wescape)(pc16formatprinter printer,
 	while (text < textend) {
 		char16_t const *old_text = text;
 
-#if 2 == 2
+#if __SIZEOF_WCHAR_T__ == 2
 		uint32_t ch = libc_unicode_readutf16_n((char16_t const **)&text, textend);
 #else /* __SIZEOF_WCHAR_T__ == 2 */
 		uint32_t ch = (uint32_t)*text++;
@@ -558,7 +540,7 @@ NOTHROW_NCX(LIBDCALL libd_format_wescape)(pc16formatprinter printer,
 
 		if __unlikely(ch < 32 || ch >= 127  || ch == '\'' ||
 		              ch == '\"' || ch == '\\' ||
-		             (flags & FORMAT_ESCAPE_FNOASCII)) {
+		             (flags & 0x0010)) {
 			/* Flush unwritten direct-copy text. */
 			if (flush_start < old_text) {
 				temp = (*printer)(arg, flush_start, (size_t)(old_text - flush_start));
@@ -569,15 +551,15 @@ NOTHROW_NCX(LIBDCALL libd_format_wescape)(pc16formatprinter printer,
 			/* Character requires special encoding. */
 			if (ch < 32) {
 				/* Control character. */
-				if (flags & FORMAT_ESCAPE_FNOCTRL) {
+				if (flags & 0x0008) {
 default_ctrl:
-					if (flags & FORMAT_ESCAPE_FFORCEHEX)
+					if (flags & 0x0002)
 						goto encode_hex;
 encode_oct:
 					if (text < textend) {
 						char16_t const *new_text = text;
 
-#if 2 == 2
+#if __SIZEOF_WCHAR_T__ == 2
 						uint32_t next_ch = libc_unicode_readutf16_n((char16_t const **)&new_text, textend);
 #else
 						uint32_t next_ch = (uint32_t)*new_text++;
@@ -703,22 +685,22 @@ special_control:
 				encoded_text_size = 2;
 				goto print_encoded;
 			} else if ((ch == '\\' || ch == '\'' || ch == '\"') &&
-			          !(flags & FORMAT_ESCAPE_FNOCTRL)) {
+			          !(flags & 0x0008)) {
 				goto special_control;
 			} else {
 				/* Non-ascii character. */
 /*default_nonascii:*/
-				if (flags & FORMAT_ESCAPE_FFORCEOCT)
+				if (flags & 0x0004)
 					goto encode_oct;
 encode_hex:
 				if (text < textend) {
 					char16_t const *new_text = text;
 
-#if 2 == 2
+#if __SIZEOF_WCHAR_T__ == 2
 					uint32_t next_ch = libc_unicode_readutf16_n((char16_t const **)&new_text, textend);
-#else
+#else /* __SIZEOF_WCHAR_T__ == 2 */
 					uint32_t next_ch = (uint32_t)*new_text++;
-#endif
+#endif /* __SIZEOF_WCHAR_T__ != 2 */
 
 
 
@@ -774,7 +756,7 @@ print_encoded:
 			goto err;
 		result += temp;
 	}
-	if __likely(!(flags & FORMAT_ESCAPE_FPRINTRAW)) {
+	if __likely(!(flags & 0x0001)) {
 		temp = (*printer)(arg, quote, 1);
 		if __unlikely(temp < 0)
 			goto err;
@@ -818,20 +800,7 @@ NOTHROW_NCX(LIBCCALL libc_format_whexdump)(pc32formatprinter printer,
                                            size_t size,
                                            size_t linesize,
                                            unsigned int flags) {
-#line 525 "kos/src/libc/magic/format-printer.c"
-#ifndef FORMAT_HEXDUMP_FNORMAL
-#define FORMAT_HEXDUMP_FNORMAL    0x0000 /* Normal hexdump flags. */
-#define FORMAT_HEXDUMP_FHEXLOWER  0x0001 /* Print hex text of the dump in lowercase (does not affect address/offset). */
-#define FORMAT_HEXDUMP_FNOADDRESS 0x0002 /* Don't include the absolute address at the start of every line. */
-#define FORMAT_HEXDUMP_FOFFSETS   0x0004 /* Include offsets from the base address at the start of every line (after the address when also shown). */
-#define FORMAT_HEXDUMP_FNOHEX     0x0008 /* Don't print the actual hex dump (hex data representation). */
-#define FORMAT_HEXDUMP_FNOASCII   0x0010 /* Don't print ascii representation of printable characters at the end of lines. */
-#define FORMAT_HEXDUMP_BYTES      0x0000 /* Dump data as bytes. */
-#define FORMAT_HEXDUMP_WORDS      0x1000 /* Dump data as words (uint16_t). */
-#define FORMAT_HEXDUMP_DWORDS     0x2000 /* Dump data as dwords (uint32_t). */
-#define FORMAT_HEXDUMP_QWORDS     0x3000 /* Dump data as qwords (uint64_t). */
-#define FORMAT_HEXDUMP_SIZEMASK   0x3000 /* Mask for the dump size. */
-#endif /* !FORMAT_HEXDUMP_FNORMAL */
+#line 540 "kos/src/libc/magic/format-printer.c"
 #ifndef DECIMALS_SELECTOR
 #define LOCAL_DECIMALS_SELECTOR_DEFINED 1
 #define DECIMALS_SELECTOR  decimals
@@ -851,8 +820,8 @@ NOTHROW_NCX(LIBCCALL libc_format_whexdump)(pc32formatprinter printer,
 	unsigned int offset_digits = 0;
 	if (!size) goto done;
 	if (!linesize) linesize = 16;
-	dec = DECIMALS_SELECTOR[!(flags & FORMAT_HEXDUMP_FHEXLOWER)];
-	if (flags & FORMAT_HEXDUMP_FOFFSETS) {
+	dec = DECIMALS_SELECTOR[!(flags & 0x0001)];
+	if (flags & 0x0004) {
 		value = size;
 		do ++offset_digits;
 		while ((value >>= 4) != 0);
@@ -862,7 +831,7 @@ NOTHROW_NCX(LIBCCALL libc_format_whexdump)(pc32formatprinter printer,
 		size_t line_len = linesize;
 		if (line_len > size)
 			line_len = size;
-		if (!(flags & FORMAT_HEXDUMP_FNOADDRESS)) {
+		if (!(flags & 0x0002)) {
 			value = (uintptr_t)line_data;
 			dst = buffer + sizeof(void *) * 2;
 			*dst = ' ';
@@ -875,7 +844,7 @@ NOTHROW_NCX(LIBCCALL libc_format_whexdump)(pc32formatprinter printer,
 				goto err;
 			result += temp;
 		}
-		if (flags & FORMAT_HEXDUMP_FOFFSETS) {
+		if (flags & 0x0004) {
 			dst = buffer + 1 + offset_digits;
 			*dst = ' ';
 			value = (line_data - (byte_t const *)data);
@@ -889,14 +858,16 @@ NOTHROW_NCX(LIBCCALL libc_format_whexdump)(pc32formatprinter printer,
 				goto err;
 			result += temp;
 		}
-		if (!(flags & FORMAT_HEXDUMP_FNOHEX)) {
+		if (!(flags & 0x0008)) {
 			size_t i = 0;
 			size_t tailspace_count;
-			switch (flags & FORMAT_HEXDUMP_SIZEMASK) {
+			switch (flags & 0x3000) {
+
 			default:
 				tailspace_count = linesize * 3;
 				break;
-			case FORMAT_HEXDUMP_WORDS:
+
+			case 0x1000:
 				tailspace_count = (linesize / 2) * 5 + (linesize % 2) * 3;
 				buffer[4] = ' ';
 				for (; i + 2 <= line_len; i += 2) {
@@ -913,7 +884,8 @@ NOTHROW_NCX(LIBCCALL libc_format_whexdump)(pc32formatprinter printer,
 					tailspace_count -= 5;
 				}
 				break;
-			case FORMAT_HEXDUMP_DWORDS:
+
+			case 0x2000:
 				tailspace_count = (linesize / 4) * 9 + (linesize % 4) * 3;
 				buffer[8] = ' ';
 				for (; i + 4 <= line_len; i += 4) {
@@ -930,7 +902,8 @@ NOTHROW_NCX(LIBCCALL libc_format_whexdump)(pc32formatprinter printer,
 					tailspace_count -= 9;
 				}
 				break;
-			case FORMAT_HEXDUMP_QWORDS:
+
+			case 0x3000:
 				tailspace_count = (linesize / 8) * 17 + (linesize % 8) * 3;
 				buffer[16] = ' ';
 				for (; i + 8 <= line_len; i += 8) {
@@ -985,7 +958,7 @@ NOTHROW_NCX(LIBCCALL libc_format_whexdump)(pc32formatprinter printer,
 				result += temp;
 			}
 		}
-		if (!(flags & FORMAT_HEXDUMP_FNOASCII)) {
+		if (!(flags & 0x0010)) {
 			for (i = 0; i < line_len; ++i) {
 				byte_t b = line_data[i];
 				if (!libc_iswprint(b))
@@ -1042,20 +1015,7 @@ NOTHROW_NCX(LIBDCALL libd_format_whexdump)(pc16formatprinter printer,
                                            size_t size,
                                            size_t linesize,
                                            unsigned int flags) {
-#line 525 "kos/src/libc/magic/format-printer.c"
-#ifndef FORMAT_HEXDUMP_FNORMAL
-#define FORMAT_HEXDUMP_FNORMAL    0x0000 /* Normal hexdump flags. */
-#define FORMAT_HEXDUMP_FHEXLOWER  0x0001 /* Print hex text of the dump in lowercase (does not affect address/offset). */
-#define FORMAT_HEXDUMP_FNOADDRESS 0x0002 /* Don't include the absolute address at the start of every line. */
-#define FORMAT_HEXDUMP_FOFFSETS   0x0004 /* Include offsets from the base address at the start of every line (after the address when also shown). */
-#define FORMAT_HEXDUMP_FNOHEX     0x0008 /* Don't print the actual hex dump (hex data representation). */
-#define FORMAT_HEXDUMP_FNOASCII   0x0010 /* Don't print ascii representation of printable characters at the end of lines. */
-#define FORMAT_HEXDUMP_BYTES      0x0000 /* Dump data as bytes. */
-#define FORMAT_HEXDUMP_WORDS      0x1000 /* Dump data as words (uint16_t). */
-#define FORMAT_HEXDUMP_DWORDS     0x2000 /* Dump data as dwords (uint32_t). */
-#define FORMAT_HEXDUMP_QWORDS     0x3000 /* Dump data as qwords (uint64_t). */
-#define FORMAT_HEXDUMP_SIZEMASK   0x3000 /* Mask for the dump size. */
-#endif /* !FORMAT_HEXDUMP_FNORMAL */
+#line 540 "kos/src/libc/magic/format-printer.c"
 #ifndef DECIMALS_SELECTOR
 #define LOCAL_DECIMALS_SELECTOR_DEFINED 1
 #define DECIMALS_SELECTOR  decimals
@@ -1075,8 +1035,8 @@ NOTHROW_NCX(LIBDCALL libd_format_whexdump)(pc16formatprinter printer,
 	unsigned int offset_digits = 0;
 	if (!size) goto done;
 	if (!linesize) linesize = 16;
-	dec = DECIMALS_SELECTOR[!(flags & FORMAT_HEXDUMP_FHEXLOWER)];
-	if (flags & FORMAT_HEXDUMP_FOFFSETS) {
+	dec = DECIMALS_SELECTOR[!(flags & 0x0001)];
+	if (flags & 0x0004) {
 		value = size;
 		do ++offset_digits;
 		while ((value >>= 4) != 0);
@@ -1086,7 +1046,7 @@ NOTHROW_NCX(LIBDCALL libd_format_whexdump)(pc16formatprinter printer,
 		size_t line_len = linesize;
 		if (line_len > size)
 			line_len = size;
-		if (!(flags & FORMAT_HEXDUMP_FNOADDRESS)) {
+		if (!(flags & 0x0002)) {
 			value = (uintptr_t)line_data;
 			dst = buffer + sizeof(void *) * 2;
 			*dst = ' ';
@@ -1099,7 +1059,7 @@ NOTHROW_NCX(LIBDCALL libd_format_whexdump)(pc16formatprinter printer,
 				goto err;
 			result += temp;
 		}
-		if (flags & FORMAT_HEXDUMP_FOFFSETS) {
+		if (flags & 0x0004) {
 			dst = buffer + 1 + offset_digits;
 			*dst = ' ';
 			value = (line_data - (byte_t const *)data);
@@ -1113,14 +1073,16 @@ NOTHROW_NCX(LIBDCALL libd_format_whexdump)(pc16formatprinter printer,
 				goto err;
 			result += temp;
 		}
-		if (!(flags & FORMAT_HEXDUMP_FNOHEX)) {
+		if (!(flags & 0x0008)) {
 			size_t i = 0;
 			size_t tailspace_count;
-			switch (flags & FORMAT_HEXDUMP_SIZEMASK) {
+			switch (flags & 0x3000) {
+
 			default:
 				tailspace_count = linesize * 3;
 				break;
-			case FORMAT_HEXDUMP_WORDS:
+
+			case 0x1000:
 				tailspace_count = (linesize / 2) * 5 + (linesize % 2) * 3;
 				buffer[4] = ' ';
 				for (; i + 2 <= line_len; i += 2) {
@@ -1137,7 +1099,8 @@ NOTHROW_NCX(LIBDCALL libd_format_whexdump)(pc16formatprinter printer,
 					tailspace_count -= 5;
 				}
 				break;
-			case FORMAT_HEXDUMP_DWORDS:
+
+			case 0x2000:
 				tailspace_count = (linesize / 4) * 9 + (linesize % 4) * 3;
 				buffer[8] = ' ';
 				for (; i + 4 <= line_len; i += 4) {
@@ -1154,7 +1117,8 @@ NOTHROW_NCX(LIBDCALL libd_format_whexdump)(pc16formatprinter printer,
 					tailspace_count -= 9;
 				}
 				break;
-			case FORMAT_HEXDUMP_QWORDS:
+
+			case 0x3000:
 				tailspace_count = (linesize / 8) * 17 + (linesize % 8) * 3;
 				buffer[16] = ' ';
 				for (; i + 8 <= line_len; i += 8) {
@@ -1209,7 +1173,7 @@ NOTHROW_NCX(LIBDCALL libd_format_whexdump)(pc16formatprinter printer,
 				result += temp;
 			}
 		}
-		if (!(flags & FORMAT_HEXDUMP_FNOASCII)) {
+		if (!(flags & 0x0010)) {
 			for (i = 0; i < line_len; ++i) {
 				byte_t b = line_data[i];
 				if (!libc_iswprint(b))
@@ -1296,12 +1260,12 @@ err:
  *             - `%$[hex]' / `%$[hex:lLoOpPaAhH]'
  *                 - Invoke `format_whexdump(..., va_arg(args, void *))'
  *                 - Integer-length (`%$I32[hex]') flags affect `FORMAT_HEXDUMP_(BYTES|WORDS|DWORDS|QWORDS)'
- *                 - The argument string affect flags (defaults to `FORMAT_HEXDUMP_FNORMAL')
- *                    - `FORMAT_HEXDUMP_FHEXLOWER':  yes:l, no:L
- *                    - `FORMAT_HEXDUMP_FOFFSETS':   yes:o, no:O
- *                    - `FORMAT_HEXDUMP_FNOADDRESS': yes:P, no:p
- *                    - `FORMAT_HEXDUMP_FNOASCII':   yes:A, no:a
- *                    - `FORMAT_HEXDUMP_FNOHEX':     yes:H, no:h
+ *                 - The argument string affect flags (defaults to `0x0000')
+ *                    - `0x0001':  yes:l, no:L
+ *                    - `0x0004':   yes:o, no:O
+ *                    - `0x0002': yes:P, no:p
+ *                    - `0x0010':   yes:A, no:a
+ *                    - `0x0008':     yes:H, no:h
  *             - `%[gen]'
  *                 - Invoke a custom format printer function pointer passed through args
  *                   >> typedef ssize_t (*PGEN)(pwformatprinter printer, void *arg);
@@ -1358,10 +1322,10 @@ NOTHROW_NCX(LIBCCALL libc_format_vwprintf)(pc32formatprinter printer,
                                            void *arg,
                                            char32_t const *__restrict format,
                                            __builtin_va_list args) {
-#line 845 "kos/src/libc/magic/format-printer.c"
+#line 851 "kos/src/libc/magic/format-printer.c"
 #ifndef __INTELLISENSE__
 #define __CHAR_TYPE                 char32_t
-#define __CHAR_SIZE                 4
+#define __CHAR_SIZE                 __SIZEOF_WCHAR_T__
 #define __FORMAT_REPEAT             libc_format_wrepeat
 #define __FORMAT_HEXDUMP            libc_format_whexdump
 
@@ -1369,19 +1333,19 @@ NOTHROW_NCX(LIBCCALL libc_format_vwprintf)(pc32formatprinter printer,
 #define __FORMAT_ESCAPE             libc_format_wescape
 #define __FORMAT_WIDTH8             libc_format_width
 #define __FORMAT_ESCAPE8            libc_format_escape
-#if 4 == 2
+#if __SIZEOF_WCHAR_T__ == 2
 #define __FORMAT_WIDTH32            libc_format_c32width
 #define __FORMAT_ESCAPE32           libc_format_c32escape
 #define __FORMAT_UNICODE_WRITECHAR  libc_unicode_writeutf16
 #define __FORMAT_UNICODE_FORMAT8    libc_format_8to16
 #define __FORMAT_UNICODE_FORMAT32   libc_format_32to16
-#else
+#else /* __SIZEOF_WCHAR_T__ == 2 */
 #define __FORMAT_WIDTH16            libc_format_c16width
 #define __FORMAT_ESCAPE16           libc_format_c16escape
 #define __FORMAT_UNICODE_WRITECHAR(dst, ch) ((dst)[0] = (ch), (dst) + 1)
 #define __FORMAT_UNICODE_FORMAT8    libc_format_8to32
 #define __FORMAT_UNICODE_FORMAT16   libc_format_16to32
-#endif
+#endif /* __SIZEOF_WCHAR_T__ != 2 */
 
 
 
@@ -1457,12 +1421,12 @@ NOTHROW_NCX(LIBCCALL libc_format_vwprintf)(pc32formatprinter printer,
  *             - `%$[hex]' / `%$[hex:lLoOpPaAhH]'
  *                 - Invoke `format_whexdump(..., va_arg(args, void *))'
  *                 - Integer-length (`%$I32[hex]') flags affect `FORMAT_HEXDUMP_(BYTES|WORDS|DWORDS|QWORDS)'
- *                 - The argument string affect flags (defaults to `FORMAT_HEXDUMP_FNORMAL')
- *                    - `FORMAT_HEXDUMP_FHEXLOWER':  yes:l, no:L
- *                    - `FORMAT_HEXDUMP_FOFFSETS':   yes:o, no:O
- *                    - `FORMAT_HEXDUMP_FNOADDRESS': yes:P, no:p
- *                    - `FORMAT_HEXDUMP_FNOASCII':   yes:A, no:a
- *                    - `FORMAT_HEXDUMP_FNOHEX':     yes:H, no:h
+ *                 - The argument string affect flags (defaults to `0x0000')
+ *                    - `0x0001':  yes:l, no:L
+ *                    - `0x0004':   yes:o, no:O
+ *                    - `0x0002': yes:P, no:p
+ *                    - `0x0010':   yes:A, no:a
+ *                    - `0x0008':     yes:H, no:h
  *             - `%[gen]'
  *                 - Invoke a custom format printer function pointer passed through args
  *                   >> typedef ssize_t (*PGEN)(pwformatprinter printer, void *arg);
@@ -1519,10 +1483,10 @@ NOTHROW_NCX(LIBDCALL libd_format_vwprintf)(pc16formatprinter printer,
                                            void *arg,
                                            char16_t const *__restrict format,
                                            __builtin_va_list args) {
-#line 845 "kos/src/libc/magic/format-printer.c"
+#line 851 "kos/src/libc/magic/format-printer.c"
 #ifndef __INTELLISENSE__
 #define __CHAR_TYPE                 char16_t
-#define __CHAR_SIZE                 2
+#define __CHAR_SIZE                 __SIZEOF_WCHAR_T__
 #define __FORMAT_REPEAT             libd_format_wrepeat
 #define __FORMAT_HEXDUMP            libd_format_whexdump
 
@@ -1530,19 +1494,19 @@ NOTHROW_NCX(LIBDCALL libd_format_vwprintf)(pc16formatprinter printer,
 #define __FORMAT_ESCAPE             libd_format_wescape
 #define __FORMAT_WIDTH8             libc_format_width
 #define __FORMAT_ESCAPE8            libc_format_escape
-#if 2 == 2
+#if __SIZEOF_WCHAR_T__ == 2
 #define __FORMAT_WIDTH32            libc_format_c32width
 #define __FORMAT_ESCAPE32           libc_format_c32escape
 #define __FORMAT_UNICODE_WRITECHAR  libc_unicode_writeutf16
 #define __FORMAT_UNICODE_FORMAT8    libc_format_8to16
 #define __FORMAT_UNICODE_FORMAT32   libc_format_32to16
-#else
+#else /* __SIZEOF_WCHAR_T__ == 2 */
 #define __FORMAT_WIDTH16            libc_format_c16width
 #define __FORMAT_ESCAPE16           libc_format_c16escape
 #define __FORMAT_UNICODE_WRITECHAR(dst, ch) ((dst)[0] = (ch), (dst) + 1)
 #define __FORMAT_UNICODE_FORMAT8    libc_format_8to32
 #define __FORMAT_UNICODE_FORMAT16   libc_format_16to32
-#endif
+#endif /* __SIZEOF_WCHAR_T__ != 2 */
 
 
 
@@ -1599,12 +1563,12 @@ NOTHROW_NCX(LIBDCALL libd_format_vwprintf)(pc16formatprinter printer,
  *             - `%$[hex]' / `%$[hex:lLoOpPaAhH]'
  *                 - Invoke `format_whexdump(..., va_arg(args, void *))'
  *                 - Integer-length (`%$I32[hex]') flags affect `FORMAT_HEXDUMP_(BYTES|WORDS|DWORDS|QWORDS)'
- *                 - The argument string affect flags (defaults to `FORMAT_HEXDUMP_FNORMAL')
- *                    - `FORMAT_HEXDUMP_FHEXLOWER':  yes:l, no:L
- *                    - `FORMAT_HEXDUMP_FOFFSETS':   yes:o, no:O
- *                    - `FORMAT_HEXDUMP_FNOADDRESS': yes:P, no:p
- *                    - `FORMAT_HEXDUMP_FNOASCII':   yes:A, no:a
- *                    - `FORMAT_HEXDUMP_FNOHEX':     yes:H, no:h
+ *                 - The argument string affect flags (defaults to `0x0000')
+ *                    - `0x0001':  yes:l, no:L
+ *                    - `0x0004':   yes:o, no:O
+ *                    - `0x0002': yes:P, no:p
+ *                    - `0x0010':   yes:A, no:a
+ *                    - `0x0008':     yes:H, no:h
  *             - `%[gen]'
  *                 - Invoke a custom format printer function pointer passed through args
  *                   >> typedef ssize_t (*PGEN)(pwformatprinter printer, void *arg);
@@ -1661,7 +1625,7 @@ NOTHROW_NCX(VLIBCCALL libc_format_wprintf)(pc32formatprinter printer,
                                            void *arg,
                                            char32_t const *__restrict format,
                                            ...) {
-#line 898 "kos/src/libc/magic/format-printer.c"
+#line 904 "kos/src/libc/magic/format-printer.c"
 	ssize_t result;
 	va_list args;
 	va_start(args, format);
@@ -1706,12 +1670,12 @@ NOTHROW_NCX(VLIBCCALL libc_format_wprintf)(pc32formatprinter printer,
  *             - `%$[hex]' / `%$[hex:lLoOpPaAhH]'
  *                 - Invoke `format_whexdump(..., va_arg(args, void *))'
  *                 - Integer-length (`%$I32[hex]') flags affect `FORMAT_HEXDUMP_(BYTES|WORDS|DWORDS|QWORDS)'
- *                 - The argument string affect flags (defaults to `FORMAT_HEXDUMP_FNORMAL')
- *                    - `FORMAT_HEXDUMP_FHEXLOWER':  yes:l, no:L
- *                    - `FORMAT_HEXDUMP_FOFFSETS':   yes:o, no:O
- *                    - `FORMAT_HEXDUMP_FNOADDRESS': yes:P, no:p
- *                    - `FORMAT_HEXDUMP_FNOASCII':   yes:A, no:a
- *                    - `FORMAT_HEXDUMP_FNOHEX':     yes:H, no:h
+ *                 - The argument string affect flags (defaults to `0x0000')
+ *                    - `0x0001':  yes:l, no:L
+ *                    - `0x0004':   yes:o, no:O
+ *                    - `0x0002': yes:P, no:p
+ *                    - `0x0010':   yes:A, no:a
+ *                    - `0x0008':     yes:H, no:h
  *             - `%[gen]'
  *                 - Invoke a custom format printer function pointer passed through args
  *                   >> typedef ssize_t (*PGEN)(pwformatprinter printer, void *arg);
@@ -1768,7 +1732,7 @@ NOTHROW_NCX(VLIBDCALL libd_format_wprintf)(pc16formatprinter printer,
                                            void *arg,
                                            char16_t const *__restrict format,
                                            ...) {
-#line 898 "kos/src/libc/magic/format-printer.c"
+#line 904 "kos/src/libc/magic/format-printer.c"
 	ssize_t result;
 	va_list args;
 	va_start(args, format);
@@ -1784,7 +1748,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.wchar.string.format.format_wsprintf_printer") 
 NOTHROW_NCX(LIBCCALL libc_format_wsprintf_printer)(/*wchar_t ***/ void *arg,
                                                    char32_t const *__restrict data,
                                                    size_t datalen) {
-#line 985 "kos/src/libc/magic/format-printer.c"
+#line 991 "kos/src/libc/magic/format-printer.c"
 
 	*(char32_t **)arg = (char32_t *)libc_wmempcpy(*(char32_t **)arg, data, datalen);
 
@@ -1799,7 +1763,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.string.format.format_wsprintf_printe
 NOTHROW_NCX(LIBDCALL libd_format_wsprintf_printer)(/*wchar_t ***/ void *arg,
                                                    char16_t const *__restrict data,
                                                    size_t datalen) {
-#line 985 "kos/src/libc/magic/format-printer.c"
+#line 991 "kos/src/libc/magic/format-printer.c"
 
 	*(char16_t **)arg = (char16_t *)libd_wmempcpy(*(char16_t **)arg, data, datalen);
 
@@ -1818,7 +1782,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.wchar.string.format.format_wsnprintf_printer")
 NOTHROW_NCX(LIBCCALL libc_format_wsnprintf_printer)(/*struct format_wsnprintf_data**/ void *arg,
                                                     char32_t const *__restrict data,
                                                     size_t datalen) {
-#line 1017 "kos/src/libc/magic/format-printer.c"
+#line 1023 "kos/src/libc/magic/format-printer.c"
 	struct format_snprintf_data_ {
 		char32_t         *sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
 		__SIZE_TYPE__ sd_bufsiz; /* Remaining buffer size. */
@@ -1847,7 +1811,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.string.format.format_wsnprintf_print
 NOTHROW_NCX(LIBDCALL libd_format_wsnprintf_printer)(/*struct format_wsnprintf_data**/ void *arg,
                                                     char16_t const *__restrict data,
                                                     size_t datalen) {
-#line 1017 "kos/src/libc/magic/format-printer.c"
+#line 1023 "kos/src/libc/magic/format-printer.c"
 	struct format_snprintf_data_ {
 		char16_t         *sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
 		__SIZE_TYPE__ sd_bufsiz; /* Remaining buffer size. */
@@ -1874,7 +1838,7 @@ NOTHROW_NCX(LIBCCALL libc_format_wwidth)(void *arg,
                                          char32_t const *__restrict data,
                                          size_t datalen) {
 #line 141 "kos/src/libc/magic/parts.wchar.format-printer.c"
-#if 4 == 2
+#if __SIZEOF_WCHAR_T__ == 2
 	size_t result = 0;
 	char32_t const *iter, *end;
 	(void)arg;
@@ -1908,7 +1872,7 @@ NOTHROW_NCX(LIBDCALL libd_format_wwidth)(void *arg,
                                          char16_t const *__restrict data,
                                          size_t datalen) {
 #line 141 "kos/src/libc/magic/parts.wchar.format-printer.c"
-#if 2 == 2
+#if __SIZEOF_WCHAR_T__ == 2
 	size_t result = 0;
 	char16_t const *iter, *end;
 	(void)arg;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa613f8aa */
+/* HASH CRC-32:0x954f01c9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,6 +55,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(c16rtomb))(char *__restrict __s,
 	if (!__mbs)
 		__mbs = &__c16rtomb_mbs;
 	switch (__mbs->__word & __MBSTATE_TYPE_MASK) {
+
 	case __MBSTATE_TYPE_EMPTY:
 		if (__c16 >= 0xd800 && __c16 <= 0xdbff) {
 			/* High surrogate (set the MBS to accept a low surrogate as the next character) */
@@ -63,6 +64,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(c16rtomb))(char *__restrict __s,
 		}
 		__ch32 = (__CHAR32_TYPE__)__c16;
 		break;
+
 	case __MBSTATE_TYPE_UTF16_LO:
 		/* c16 should be a low surrogate */
 		if __unlikely(!(__c16 >= 0xdc00 && __c16 <= 0xdfff))
@@ -75,7 +77,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(c16rtomb))(char *__restrict __s,
 __error_ilseq:
 #ifdef __EILSEQ
 		__libc_seterrno(__EILSEQ);
-#endif /* __EILSEQ */
+#endif /* EILSEQ */
 		return (__SIZE_TYPE__)-1;
 	}
 	/* Write a utf-8 sequence */

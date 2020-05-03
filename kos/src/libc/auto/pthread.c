@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2fe94a66 */
+/* HASH CRC-32:0x2938bdea */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -95,12 +95,12 @@ NOTHROW_NCX(LIBCCALL libc_pthread_spin_trylock)(pthread_spinlock_t *lock) {
 #line 1281 "kos/src/libc/magic/pthread.c"
 	if (__hybrid_atomic_xch(*lock, 1, __ATOMIC_ACQUIRE) == 0)
 		return 0;
-#ifdef __EBUSY
-	return __EBUSY;
-#elif defined(__EWOULDBLOCK)
-	return __EWOULDBLOCK;
-#elif defined(__EAGAIN)
-	return __EAGAIN;
+#ifdef EBUSY
+	return EBUSY;
+#elif defined(EWOULDBLOCK)
+	return EWOULDBLOCK;
+#elif defined(EAGAIN)
+	return EAGAIN;
 #else /* ... */
 	return 1;
 #endif /* !... */

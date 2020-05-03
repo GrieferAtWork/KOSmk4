@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8c285c4c */
+/* HASH CRC-32:0x838267f1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -79,9 +79,11 @@ __NAMESPACE_STD_USING(towupper)
 
 #include <features.h>
 
-#include <bits/types.h>
-#include <hybrid/typecore.h>
 #include <hybrid/byteorder.h>
+#include <hybrid/typecore.h>
+
+#include <asm/stdio.h> /* __WEOF */
+#include <bits/types.h>
 
 #if defined(__USE_XOPEN2K8) || defined(__USE_DOS)
 #include <xlocale.h>
@@ -90,11 +92,7 @@ __NAMESPACE_STD_USING(towupper)
 __SYSDECL_BEGIN
 
 #ifndef WEOF
-#if __SIZEOF_WCHAR_T__ == 4
-#define WEOF (__CCAST(__WINT_TYPE__)0xffffffffu)
-#else /* __SIZEOF_WCHAR_T__ == 4 */
-#define WEOF (__CCAST(__WINT_TYPE__)0xffff)
-#endif /* __SIZEOF_WCHAR_T__ != 4 */
+#define WEOF __WEOF
 #endif /* !WEOF */
 
 #ifdef __CC__

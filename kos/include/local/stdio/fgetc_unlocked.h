@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc55919a2 */
+/* HASH CRC-32:0xaf6e4f40 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,7 +53,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Same as `fgetc()', but performs I/O without acquiring a lock to `STREAM' */
 __LOCAL_LIBC(fgetc_unlocked) __ATTR_NONNULL((1)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fgetc_unlocked))(__FILE *__restrict __stream) __THROWS(...) {
-#line 1200 "kos/src/libc/magic/stdio.c"
+#line 1202 "kos/src/libc/magic/stdio.c"
 #if defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)
 	return --__stream->__f_cnt >= 0 ? (int)((__UINT8_TYPE__)*__stream->__f_ptr++) : __localdep__filbuf(__stream);
 #else

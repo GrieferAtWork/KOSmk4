@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9ce77897 */
+/* HASH CRC-32:0x85c50940 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,29 +37,22 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.match.fnmatch") int
 NOTHROW_NCX(LIBCCALL libc_fnmatch)(char const *pattern,
                                    char const *name,
                                    int match_flags) {
-#line 68 "kos/src/libc/magic/fnmatch.c"
-#define __FNM_PATHNAME    (1 << 0) /* No wildcard can ever match '/'. */
-#define __FNM_NOESCAPE    (1 << 1) /* Backslashes don't quote special chars. */
-#define __FNM_PERIOD      (1 << 2) /* Leading '.' is matched only explicitly. */
-#define __FNM_LEADING_DIR (1 << 3) /* Ignore '/...' after a match. */
-#define __FNM_CASEFOLD    (1 << 4) /* Compare without regard to case. */
-#define __FNM_EXTMATCH    (1 << 5) /* Use ksh-like extended matching. */
-#define __FNM_NOMATCH      1       /* Value returned by 'fnmatch' if STRING does not match PATTERN. */
+#line 77 "kos/src/libc/magic/fnmatch.c"
 	char card_post;
 	for (;;) {
 		if (!*name) {
 			/* End of name (if the patter is empty, or only contains '*', we have a match) */
 			while (*pattern == '*')
 				++pattern;
-			return __FNM_NOMATCH;
+			goto nomatch;
 		}
 		if (!*pattern)
-			return __FNM_NOMATCH; /* Pattern end doesn't match */
+			goto nomatch; /* Pattern end doesn't match */
 		if (*pattern == '*') {
-			/* Skip starts */
-			do
+			/* Skip leading asterisks */
+			do {
 				++pattern;
-			while (*pattern == '*');
+			} while (*pattern == '*');
 			if ((card_post = *pattern++) == '\0')
 				return 0; /* Pattern ends with '*' (matches everything) */
 			if (card_post == '?')
@@ -67,17 +60,19 @@ NOTHROW_NCX(LIBCCALL libc_fnmatch)(char const *pattern,
 			for (;;) {
 				char ch = *name++;
 				if (ch == card_post ||
-				    ((match_flags & __FNM_CASEFOLD) && libc_tolower(ch) == libc_tolower(card_post))) {
+				    ((match_flags & 0x10) &&
+				     libc_tolower(ch) == libc_tolower(card_post))) {
 					/* Recursively check if the rest of the name and pattern match */
 					if (!libc_fnmatch(name, pattern, match_flags))
 						return 0;
 				} else if (!ch) {
-					return __FNM_NOMATCH; /* Wildcard suffix not found */
+					goto nomatch; /* Wildcard suffix not found */
 				} else if (ch == '/') {
-					if ((match_flags & __FNM_PATHNAME))
-						return __FNM_NOMATCH;
-					if ((match_flags & __FNM_PERIOD) && name[0] == '.' && card_post != '.')
-						return __FNM_NOMATCH;
+					if ((match_flags & 0x01))
+						goto nomatch;
+					if ((match_flags & 0x04) &&
+					    name[0] == '.' && card_post != '.')
+						goto nomatch;
 				}
 			}
 		}
@@ -89,16 +84,18 @@ next:
 		}
 		if (*pattern == '?') {
 			if (*name == '/') {
-				if (match_flags & __FNM_PATHNAME)
-					return __FNM_NOMATCH;
-				if ((match_flags & __FNM_PERIOD) && name[1] == '.' && pattern[1] != '.')
-					return __FNM_NOMATCH;
+				if (match_flags & 0x01)
+					goto nomatch;
+				if ((match_flags & 0x04) &&
+				    name[1] == '.' && pattern[1] != '.')
+					goto nomatch;
 			}
 			goto next;
 		}
 		break; /* mismatch */
 	}
-	return __FNM_NOMATCH;
+nomatch:
+	return 1;
 }
 
 #endif /* !__KERNEL__ */

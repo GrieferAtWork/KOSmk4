@@ -2258,16 +2258,26 @@ _itoa_s:(int val, [nonnull] char *buf, $size_t buflen, int radix) -> errno_t {
 		radix = 10;
 	p = buf;
 	if (val < 0) {
-		if (!buflen--)
-			return @__ERANGE@;
+		if (!buflen--) {
+#ifdef ERANGE
+			return ERANGE;
+#else /* ERANGE */
+			return 1;
+#endif /* !ERANGE */
+		}
 		*p++ = '-';
 		val = -val;
 	}
 	temp = val;
 	do ++p;
 	while ((temp /= (unsigned int)radix) != 0);
-	if (buflen <= ($size_t)(p - buf))
-		return @__ERANGE@;
+	if (buflen <= ($size_t)(p - buf)) {
+#ifdef ERANGE
+		return ERANGE;
+#else /* ERANGE */
+		return 1;
+#endif /* !ERANGE */
+	}
 	temp = val;
 	*p = '\0';
 	do {
@@ -2289,16 +2299,26 @@ _ltoa_s:(long val, [nonnull] char *buf, $size_t buflen, int radix) -> errno_t {
 		radix = 10;
 	p = buf;
 	if (val < 0) {
-		if (!buflen--)
-			return @__ERANGE@;
+		if (!buflen--) {
+#ifdef ERANGE
+			return ERANGE;
+#else /* ERANGE */
+			return 1;
+#endif /* !ERANGE */
+		}
 		*p++ = '-';
 		val = -val;
 	}
 	temp = val;
 	do ++p;
 	while ((temp /= (unsigned int)radix) != 0);
-	if (buflen <= ($size_t)(p - buf))
-		return @__ERANGE@;
+	if (buflen <= ($size_t)(p - buf)) {
+#ifdef ERANGE
+		return ERANGE;
+#else /* ERANGE */
+		return 1;
+#endif /* !ERANGE */
+	}
 	temp = val;
 	*p = '\0';
 	do {
@@ -2321,8 +2341,13 @@ _ultoa_s:(unsigned long val, [nonnull] char *buf, $size_t buflen, int radix) -> 
 	temp = val;
 	do ++p;
 	while ((temp /= (unsigned int)radix) != 0);
-	if (buflen <= ($size_t)(p - buf))
-		return @__ERANGE@;
+	if (buflen <= ($size_t)(p - buf)) {
+#ifdef ERANGE
+		return ERANGE;
+#else /* ERANGE */
+		return 1;
+#endif /* !ERANGE */
+	}
 	temp = val;
 	*p = '\0';
 	do {
@@ -2363,16 +2388,26 @@ _i64toa_s:($s64 val, [nonnull] char *buf, $size_t buflen, int radix) -> errno_t 
 		radix = 10;
 	p = buf;
 	if (val < 0) {
-		if (!buflen--)
-			return @__ERANGE@;
+		if (!buflen--) {
+#ifdef ERANGE
+			return ERANGE;
+#else /* ERANGE */
+			return 1;
+#endif /* !ERANGE */
+		}
 		*p++ = '-';
 		val = -val;
 	}
 	temp = val;
 	do ++p;
 	while ((temp /= (unsigned int)radix) != 0);
-	if (buflen <= ($size_t)(p - buf))
-		return @__ERANGE@;
+	if (buflen <= ($size_t)(p - buf)) {
+#ifdef ERANGE
+		return ERANGE;
+#else /* ERANGE */
+		return 1;
+#endif /* !ERANGE */
+	}
 	temp = val;
 	*p = '\0';
 	do {
@@ -2394,8 +2429,13 @@ _ui64toa_s:($u64 val, [nonnull] char *buf, $size_t buflen, int radix) -> errno_t
 	temp = val;
 	do ++p;
 	while ((temp /= (unsigned int)radix) != 0);
-	if (buflen <= ($size_t)(p - buf))
-		return @__ERANGE@;
+	if (buflen <= ($size_t)(p - buf)) {
+#ifdef ERANGE
+		return ERANGE;
+#else /* ERANGE */
+		return 1;
+#endif /* !ERANGE */
+	}
 	temp = val;
 	*p = '\0';
 	do {
@@ -2495,9 +2535,9 @@ _mbstowcs_s:($size_t *presult,
 	error = mbstowcs(dst, src, dstlen);
 	if (presult)
 		*presult = error;
-#ifdef @__EILSEQ@
+#ifdef EILSEQ
 	if (error == (size_t)-1)
-		return @__EILSEQ@;
+		return EILSEQ;
 #endif /* EILSEQ */
 	return 0;
 }
@@ -2516,9 +2556,9 @@ _mbstowcs_s_l:($size_t *presult,
 	error = _mbstowcs_l(dst, src, dstlen, locale);
 	if (presult)
 		*presult = error;
-#ifdef @__EILSEQ@
+#ifdef EILSEQ
 	if (error == (size_t)-1)
-		return @__EILSEQ@;
+		return EILSEQ;
 #endif /* EILSEQ */
 	return 0;
 }
@@ -2527,8 +2567,13 @@ _mbstowcs_s_l:($size_t *presult,
 [dependency_include(<parts/errno.h>)]
 [user][same_impl][dos_variant]
 rand_s:([nonnull] unsigned int *__restrict randval) -> errno_t{
-	if (!randval)
-		return @__EINVAL@;
+	if (!randval) {
+#ifdef EINVAL
+		return EINVAL;
+#else /* EINVAL */
+		return 1;
+#endif /* !EINVAL */
+	}
 	*randval = rand();
 	return 0;
 }
@@ -2566,10 +2611,20 @@ _wctomb_l:(char *buf, wchar_t wc, $locale_t locale) -> int {
 [dependency_include(<parts/errno.h>)]
 wctomb_s:([nonnull] int *presult, [nonnull] char *buf,
           rsize_t buflen, wchar_t wc) -> errno_t {
-	if (!presult || !buf)
-		return __EINVAL;
-	if (buflen < @MB_CUR_MAX@)
-		return @__ERANGE@;
+	if (!presult || !buf) {
+#ifdef EINVAL
+		return EINVAL;
+#else /* EINVAL */
+		return 1;
+#endif /* !EINVAL */
+	}
+	if (buflen < @MB_CUR_MAX@) {
+#ifdef ERANGE
+		return ERANGE;
+#else /* ERANGE */
+		return 1;
+#endif /* !ERANGE */
+	}
 	*presult = wctomb(buf, wc);
 	return 0;
 }
@@ -2600,10 +2655,20 @@ _wcstombs_l:([nonnull] char *dst, [nonnull] wchar_t const *src,
 wcstombs_s:([nonnull] $size_t *presult,
             [nonnull] char *buf, $size_t buflen,
             [nonnull] wchar_t const *src, $size_t maxlen) -> errno_t {
-	if (!presult || !buf || !src)
-		return __EINVAL;
-	if (buflen < wcstombs(NULL, src, maxlen))
-		return @__ERANGE@;
+	if (!presult || !buf || !src) {
+#ifdef EINVAL
+		return EINVAL;
+#else /* EINVAL */
+		return 1;
+#endif /* !EINVAL */
+	}
+	if (buflen < wcstombs(NULL, src, maxlen)) {
+#ifdef ERANGE
+		return ERANGE;
+#else /* ERANGE */
+		return 1;
+#endif /* !ERANGE */
+	}
 	*presult = wcstombs(buf, src, maxlen);
 	return 0;
 }
@@ -2980,11 +3045,11 @@ _makepath_s:([nonnull] char *buf, $size_t buflen,
 	path_putc('\0');
 	return 0;
 err_buflen:
-#ifdef @__EINVAL@
-	return @__EINVAL@;
-#else /* __EINVAL */
-	return -1;
-#endif /* !__EINVAL */
+#ifdef EINVAL
+	return EINVAL;
+#else /* EINVAL */
+	return 1;
+#endif /* !EINVAL */
 #undef path_putn
 #undef path_putc
 }
@@ -3065,18 +3130,18 @@ got_drive:
 	}
 	return 0;
 err_inval:
-#ifdef @__EINVAL@
-	return @__EINVAL@;
-#else /* __EINVAL */
-	return -1;
-#endif /* !__EINVAL */
+#ifdef EINVAL
+	return EINVAL;
+#else /* EINVAL */
+	return 1;
+#endif /* !EINVAL */
 err_range:
-#ifdef @__ERANGE@
-	@__libc_seterrno@(@__ERANGE@);
-	return @__ERANGE@;
-#else /* __ERANGE */
-	return -1;
-#endif /* !__ERANGE */
+#ifdef ERANGE
+	__libc_seterrno(ERANGE);
+	return ERANGE;
+#else /* ERANGE */
+	return 1;
+#endif /* !ERANGE */
 }
 
 %[default_impl_section(.text.crt.dos.errno)]

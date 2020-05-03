@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x10acdfe3 */
+/* HASH CRC-32:0x2fd6b402 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -72,7 +72,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_repeat") ssize_t
                               void *arg,
                               char ch,
                               size_t num_repetitions) __THROWS(...) {
-#line 116 "kos/src/libc/magic/format-printer.c"
+#line 119 "kos/src/libc/magic/format-printer.c"
 #ifndef FORMAT_REPEAT_BUFSIZE
 #define FORMAT_REPEAT_BUFSIZE 64
 #endif /* !FORMAT_REPEAT_BUFSIZE */
@@ -152,17 +152,8 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_escape") ssize_t
                               /*utf-8*/ char const *__restrict text,
                               size_t textlen,
                               unsigned int flags) __THROWS(...) {
-#line 209 "kos/src/libc/magic/format-printer.c"
-#ifndef FORMAT_ESCAPE_FNORMAL
-#define FORMAT_ESCAPE_FNORMAL   0x0000 /* Normal quote flags. */
-#define FORMAT_ESCAPE_FPRINTRAW 0x0001 /* Don't surround the quoted text with "..."; */
-#define FORMAT_ESCAPE_FFORCEHEX 0x0002 /* Force hex encoding of all control characters without special strings (`"\n"', etc.). */
-#define FORMAT_ESCAPE_FFORCEOCT 0x0004 /* Force octal encoding of all non-ascii characters. */
-#define FORMAT_ESCAPE_FNOCTRL   0x0008 /* Disable special encoding strings such as `"\r"', `"\n"' or `"\e"' */
-#define FORMAT_ESCAPE_FNOASCII  0x0010 /* Disable regular ascii-characters and print everything using special encodings. */
-#define FORMAT_ESCAPE_FUPPERHEX 0x0020 /* Use uppercase characters for hex (e.g.: `"\xAB"'). */
-#endif /* !FORMAT_ESCAPE_FNORMAL */
-#define escape_tooct(c) ('0'+(char)(unsigned char)(c))
+#line 219 "kos/src/libc/magic/format-printer.c"
+#define escape_tooct(c) ('0' + (char)(unsigned char)(c))
 #ifndef DECIMALS_SELECTOR
 #define LOCAL_DECIMALS_SELECTOR_DEFINED 1
 #define DECIMALS_SELECTOR  decimals
@@ -176,9 +167,9 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_escape") ssize_t
 	ssize_t result = 0, temp; char const *c_hex;
 	char const *textend = text + textlen;
 	char const *flush_start = text;
-	c_hex = DECIMALS_SELECTOR[!(flags & FORMAT_ESCAPE_FUPPERHEX)];
+	c_hex = DECIMALS_SELECTOR[!(flags & 0x0020)];
 	encoded_text[0] = '\\';
-	if __likely(!(flags & FORMAT_ESCAPE_FPRINTRAW)) {
+	if __likely(!(flags & 0x0001)) {
 		temp = (*printer)(arg, quote, 1);
 		if __unlikely(temp < 0)
 		goto err;
@@ -197,7 +188,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_escape") ssize_t
 
 		if __unlikely(ch < 32 || ch >= 127  || ch == '\'' ||
 		              ch == '\"' || ch == '\\' ||
-		             (flags & FORMAT_ESCAPE_FNOASCII)) {
+		             (flags & 0x0010)) {
 			/* Flush unwritten direct-copy text. */
 			if (flush_start < old_text) {
 				temp = (*printer)(arg, flush_start, (size_t)(old_text - flush_start));
@@ -208,9 +199,9 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_escape") ssize_t
 			/* Character requires special encoding. */
 			if (ch < 32) {
 				/* Control character. */
-				if (flags & FORMAT_ESCAPE_FNOCTRL) {
+				if (flags & 0x0008) {
 default_ctrl:
-					if (flags & FORMAT_ESCAPE_FFORCEHEX)
+					if (flags & 0x0002)
 						goto encode_hex;
 encode_oct:
 					if (text < textend) {
@@ -342,12 +333,12 @@ special_control:
 				encoded_text_size = 2;
 				goto print_encoded;
 			} else if ((ch == '\\' || ch == '\'' || ch == '\"') &&
-			          !(flags & FORMAT_ESCAPE_FNOCTRL)) {
+			          !(flags & 0x0008)) {
 				goto special_control;
 			} else {
 				/* Non-ascii character. */
 /*default_nonascii:*/
-				if (flags & FORMAT_ESCAPE_FFORCEOCT)
+				if (flags & 0x0004)
 					goto encode_oct;
 encode_hex:
 				if (text < textend) {
@@ -413,7 +404,7 @@ print_encoded:
 			goto err;
 		result += temp;
 	}
-	if __likely(!(flags & FORMAT_ESCAPE_FPRINTRAW)) {
+	if __likely(!(flags & 0x0001)) {
 		temp = (*printer)(arg, quote, 1);
 		if __unlikely(temp < 0)
 			goto err;
@@ -457,20 +448,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_hexdump") ssize_t
                                size_t size,
                                size_t linesize,
                                unsigned int flags) __THROWS(...) {
-#line 525 "kos/src/libc/magic/format-printer.c"
-#ifndef FORMAT_HEXDUMP_FNORMAL
-#define FORMAT_HEXDUMP_FNORMAL    0x0000 /* Normal hexdump flags. */
-#define FORMAT_HEXDUMP_FHEXLOWER  0x0001 /* Print hex text of the dump in lowercase (does not affect address/offset). */
-#define FORMAT_HEXDUMP_FNOADDRESS 0x0002 /* Don't include the absolute address at the start of every line. */
-#define FORMAT_HEXDUMP_FOFFSETS   0x0004 /* Include offsets from the base address at the start of every line (after the address when also shown). */
-#define FORMAT_HEXDUMP_FNOHEX     0x0008 /* Don't print the actual hex dump (hex data representation). */
-#define FORMAT_HEXDUMP_FNOASCII   0x0010 /* Don't print ascii representation of printable characters at the end of lines. */
-#define FORMAT_HEXDUMP_BYTES      0x0000 /* Dump data as bytes. */
-#define FORMAT_HEXDUMP_WORDS      0x1000 /* Dump data as words (uint16_t). */
-#define FORMAT_HEXDUMP_DWORDS     0x2000 /* Dump data as dwords (uint32_t). */
-#define FORMAT_HEXDUMP_QWORDS     0x3000 /* Dump data as qwords (uint64_t). */
-#define FORMAT_HEXDUMP_SIZEMASK   0x3000 /* Mask for the dump size. */
-#endif /* !FORMAT_HEXDUMP_FNORMAL */
+#line 540 "kos/src/libc/magic/format-printer.c"
 #ifndef DECIMALS_SELECTOR
 #define LOCAL_DECIMALS_SELECTOR_DEFINED 1
 #define DECIMALS_SELECTOR  decimals
@@ -490,8 +468,8 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_hexdump") ssize_t
 	unsigned int offset_digits = 0;
 	if (!size) goto done;
 	if (!linesize) linesize = 16;
-	dec = DECIMALS_SELECTOR[!(flags & FORMAT_HEXDUMP_FHEXLOWER)];
-	if (flags & FORMAT_HEXDUMP_FOFFSETS) {
+	dec = DECIMALS_SELECTOR[!(flags & 0x0001)];
+	if (flags & 0x0004) {
 		value = size;
 		do ++offset_digits;
 		while ((value >>= 4) != 0);
@@ -501,7 +479,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_hexdump") ssize_t
 		size_t line_len = linesize;
 		if (line_len > size)
 			line_len = size;
-		if (!(flags & FORMAT_HEXDUMP_FNOADDRESS)) {
+		if (!(flags & 0x0002)) {
 			value = (uintptr_t)line_data;
 			dst = buffer + sizeof(void *) * 2;
 			*dst = ' ';
@@ -514,7 +492,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_hexdump") ssize_t
 				goto err;
 			result += temp;
 		}
-		if (flags & FORMAT_HEXDUMP_FOFFSETS) {
+		if (flags & 0x0004) {
 			dst = buffer + 1 + offset_digits;
 			*dst = ' ';
 			value = (line_data - (byte_t const *)data);
@@ -528,14 +506,16 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_hexdump") ssize_t
 				goto err;
 			result += temp;
 		}
-		if (!(flags & FORMAT_HEXDUMP_FNOHEX)) {
+		if (!(flags & 0x0008)) {
 			size_t i = 0;
 			size_t tailspace_count;
-			switch (flags & FORMAT_HEXDUMP_SIZEMASK) {
+			switch (flags & 0x3000) {
+
 			default:
 				tailspace_count = linesize * 3;
 				break;
-			case FORMAT_HEXDUMP_WORDS:
+
+			case 0x1000:
 				tailspace_count = (linesize / 2) * 5 + (linesize % 2) * 3;
 				buffer[4] = ' ';
 				for (; i + 2 <= line_len; i += 2) {
@@ -552,7 +532,8 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_hexdump") ssize_t
 					tailspace_count -= 5;
 				}
 				break;
-			case FORMAT_HEXDUMP_DWORDS:
+
+			case 0x2000:
 				tailspace_count = (linesize / 4) * 9 + (linesize % 4) * 3;
 				buffer[8] = ' ';
 				for (; i + 4 <= line_len; i += 4) {
@@ -569,7 +550,8 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_hexdump") ssize_t
 					tailspace_count -= 9;
 				}
 				break;
-			case FORMAT_HEXDUMP_QWORDS:
+
+			case 0x3000:
 				tailspace_count = (linesize / 8) * 17 + (linesize % 8) * 3;
 				buffer[16] = ' ';
 				for (; i + 8 <= line_len; i += 8) {
@@ -624,7 +606,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_hexdump") ssize_t
 				result += temp;
 			}
 		}
-		if (!(flags & FORMAT_HEXDUMP_FNOASCII)) {
+		if (!(flags & 0x0010)) {
 			for (i = 0; i < line_len; ++i) {
 				byte_t b = line_data[i];
 				if (!libc_isprint(b))
@@ -773,7 +755,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_vprintf") ssize_t
                                void *arg,
                                char const *__restrict format,
                                __builtin_va_list args) __THROWS(...) {
-#line 845 "kos/src/libc/magic/format-printer.c"
+#line 851 "kos/src/libc/magic/format-printer.c"
 #ifndef __INTELLISENSE__
 #define __CHAR_TYPE                 char
 #define __CHAR_SIZE                 __SIZEOF_CHAR__
@@ -915,7 +897,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_printf") ssize_t
                                void *arg,
                                char const *__restrict format,
                                ...) __THROWS(...) {
-#line 898 "kos/src/libc/magic/format-printer.c"
+#line 904 "kos/src/libc/magic/format-printer.c"
 	ssize_t result;
 	va_list args;
 	va_start(args, format);
@@ -963,7 +945,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_vscanf") ssize_t
                               void *arg,
                               char const *__restrict format,
                               va_list args) __THROWS(...) {
-#line 946 "kos/src/libc/magic/format-printer.c"
+#line 952 "kos/src/libc/magic/format-printer.c"
 #define __CHAR_TYPE       char
 #define __CHAR_SIZE       __SIZEOF_CHAR__
 #define __FORMAT_PGETC    pgetc
@@ -1010,7 +992,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_scanf") ssize_t
                               void *arg,
                               char const *__restrict format,
                               ...) __THROWS(...) {
-#line 968 "kos/src/libc/magic/format-printer.c"
+#line 974 "kos/src/libc/magic/format-printer.c"
 	ssize_t result;
 	va_list args;
 	va_start(args, format);
@@ -1026,11 +1008,11 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_sprintf_printer") ssize_t
 NOTHROW_NCX(LIBCCALL libc_format_sprintf_printer)(/*char ***/ void *arg,
                                                   /*utf-8*/ char const *__restrict data,
                                                   size_t datalen) {
-#line 985 "kos/src/libc/magic/format-printer.c"
+#line 991 "kos/src/libc/magic/format-printer.c"
 
 
 
-	*(char **)arg = (char *)mempcpy(*(char **)arg, data, datalen * sizeof(char));
+	*(char **)arg = (char *)mempcpyc(*(char **)arg, data, datalen, sizeof(char));
 
 	return (ssize_t)datalen;
 }
@@ -1045,7 +1027,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_snprintf_printer") ssize_
 NOTHROW_NCX(LIBCCALL libc_format_snprintf_printer)(/*struct format_snprintf_data**/ void *arg,
                                                    /*utf-8*/ char const *__restrict data,
                                                    size_t datalen) {
-#line 1017 "kos/src/libc/magic/format-printer.c"
+#line 1023 "kos/src/libc/magic/format-printer.c"
 	struct format_snprintf_data_ {
 		char         *sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
 		__SIZE_TYPE__ sd_bufsiz; /* Remaining buffer size. */
@@ -1072,7 +1054,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_width") ssize_t
 NOTHROW_NCX(LIBCCALL libc_format_width)(void *arg,
                                         /*utf-8*/ char const *__restrict data,
                                         size_t datalen) {
-#line 1040 "kos/src/libc/magic/format-printer.c"
+#line 1046 "kos/src/libc/magic/format-printer.c"
 	size_t result = 0;
 	char const *iter, *end;
 	(void)arg;
@@ -1095,7 +1077,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_length") ssize_t
 NOTHROW_NCX(LIBCCALL libc_format_length)(void *arg,
                                          /*utf-8*/ char const *__restrict data,
                                          size_t datalen) {
-#line 1058 "kos/src/libc/magic/format-printer.c"
+#line 1064 "kos/src/libc/magic/format-printer.c"
 	(void)arg;
 	(void)data;
 	return (ssize_t)datalen;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xed393a91 */
+/* HASH CRC-32:0xf69248d7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,7 +70,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ldexpf))(float __x,
 #ifdef __ERANGE
 	if __unlikely(!__LIBM_MATHFUNF(finite, __result) || __result == 0.0f)
 		__libc_seterrno(__ERANGE);
-#endif /* __ERANGE */
+#endif /* ERANGE */
 	return __result;
 #else /* __LIBM_MATHFUN2F */
 	return (float)__localdep_ldexp((double)__x, __exponent);

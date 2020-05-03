@@ -23,25 +23,27 @@
 #include "../api.h"
 /**/
 
-#include <bits/mbstate.h>
 #include <hybrid/atomic.h>
 #include <hybrid/sequence/list.h>
 #include <hybrid/sync/atomic-owner-rwlock.h>
 
+#include <asm/stdio.h>
 #include <bits/io-file.h>
+#include <bits/mbstate.h>
 #include <kos/types.h>
 
-#include <libio.h>
 #include <assert.h>
 #include <stdint.h>
+
+#include <libio.h>
 
 DECL_BEGIN
 
 #undef EOF
 #undef WEOF
-#define EOF   (-1)
-#define EOF16 ((char16_t)UINT16_C(0xffff))
-#define EOF32 ((char32_t)UINT32_C(0xffffffff))
+#define EOF   __EOF
+#define EOF16 ((char16_t)__WEOF16)
+#define EOF32 ((char32_t)__WEOF32)
 
 
 
@@ -53,19 +55,9 @@ typedef __mbstate_t mbstate_t;
 #undef __LOCAL_stdin
 #undef __LOCAL_stdout
 #undef __LOCAL_stderr
-#define __LOCAL_stdin        stdin
-#define __LOCAL_stdout       stdout
-#define __LOCAL_stderr       stderr
-
-#undef ___IOFBF
-#undef ___IOLBF
-#undef ___IONBF
-#undef __BUFSIZ
-#define ___IOFBF _IOFBF
-#define ___IOLBF _IOLBF
-#define ___IONBF _IONBF
-#define __BUFSIZ BUFSIZ
-
+#define __LOCAL_stdin  stdin
+#define __LOCAL_stdout stdout
+#define __LOCAL_stderr stderr
 
 #define IO_RW           __IO_FILE_IORW      /* The file was opened for read+write permissions ('+' flag) */
 #define IO_MALLBUF      __IO_FILE_IOMALLBUF /* The buffer was allocated internally. */

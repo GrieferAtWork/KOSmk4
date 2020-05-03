@@ -89,15 +89,15 @@ ATTR_WEAK ATTR_SECTION(".text.crt.error.vwarn") void
 /*[[[body:vwarn]]]*/
 /*AUTO*/{
 	int errval = __libc_geterrno_or(0);
-	libc_flockfile(__LOCAL_stderr);
-	libc_fprintf(__LOCAL_stderr, "%s: ", __LOCAL_program_invocation_short_name);
+	libc_flockfile(stderr);
+	libc_fprintf(stderr, "%s: ", __LOCAL_program_invocation_short_name);
 	if (format) {
-		libc_vfprintf(__LOCAL_stderr, format, args);
-		libc_fprintf(__LOCAL_stderr, ": %s\n", libc_strerror(errval));
+		libc_vfprintf(stderr, format, args);
+		libc_fprintf(stderr, ": %s\n", libc_strerror(errval));
 	} else {
-		libc_fprintf(__LOCAL_stderr, "%s\n", libc_strerror(errval));
+		libc_fprintf(stderr, "%s\n", libc_strerror(errval));
 	}
-	libc_funlockfile(__LOCAL_stderr);
+	libc_funlockfile(stderr);
 }
 /*[[[end:vwarn]]]*/
 
@@ -126,12 +126,12 @@ ATTR_WEAK ATTR_SECTION(".text.crt.error.vwarnx") void
 		__THROWS(...)
 /*[[[body:vwarnx]]]*/
 /*AUTO*/{
-	libc_flockfile(__LOCAL_stderr);
-	libc_fprintf(__LOCAL_stderr, "%s: ", __LOCAL_program_invocation_short_name);
+	libc_flockfile(stderr);
+	libc_fprintf(stderr, "%s: ", __LOCAL_program_invocation_short_name);
 	if (format)
-		libc_vfprintf(__LOCAL_stderr, format, args);
-	libc_fputc('\n', __LOCAL_stderr);
-	libc_funlockfile(__LOCAL_stderr);
+		libc_vfprintf(stderr, format, args);
+	libc_fputc('\n', stderr);
+	libc_funlockfile(stderr);
 }
 /*[[[end:vwarnx]]]*/
 

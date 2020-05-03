@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x91bef99d */
+/* HASH CRC-32:0x2b8b7213 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,12 +60,12 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsrtombs))(char *__dst,
                                                        __WCHAR_TYPE__ const **__restrict __psrc,
                                                        __SIZE_TYPE__ __dstlen,
                                                        __mbstate_t *__mbs) {
-#line 336 "kos/src/libc/magic/wchar.c"
+#line 332 "kos/src/libc/magic/wchar.c"
 	__SIZE_TYPE__ __result = 0;
 	__WCHAR_TYPE__ const *__src = *__psrc;
 	while (__dstlen) {
 		__SIZE_TYPE__ __error;
-		char __buf[8]; /* 8 == UNICODE_UTF8_MAXLEN */
+		char __buf[8];
 		__error = __localdep_wcrtomb(__buf, *__src, __mbs);
 		if (!__error)
 			break;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4fa9bc6f */
+/* HASH CRC-32:0xe5ea53da */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,7 +62,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_makepath_s))(char *__buf,
                                                          char const *__dir,
                                                          char const *__file,
                                                          char const *__ext) {
-#line 2948 "kos/src/libc/magic/stdlib.c"
+#line 3013 "kos/src/libc/magic/stdlib.c"
 #define __path_putn(__p, __n)                                  \
 	do {                                                 \
 		if __unlikely(__buflen < __n)                          \
@@ -100,9 +100,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_makepath_s))(char *__buf,
 __err_buflen:
 #ifdef __EINVAL
 	return __EINVAL;
-#else /* __EINVAL */
-	return -1;
-#endif /* !__EINVAL */
+#else /* EINVAL */
+	return 1;
+#endif /* !EINVAL */
 #undef __path_putn
 #undef __path_putc
 }

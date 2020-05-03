@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6cb77767 */
+/* HASH CRC-32:0xd3c523ad */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_wcrtomb_defined
 #define __local_wcrtomb_defined 1
 #include <__crt.h>
+#include <parts/errno.h>
 /* Dependency: "unicode_writeutf8" from "unicode" */
 #ifndef ____localdep_unicode_writeutf8_defined
 #define ____localdep_unicode_writeutf8_defined 1
@@ -47,7 +48,7 @@ __LOCAL_LIBC(wcrtomb) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcrtomb))(char *__restrict __str,
                                                      __WCHAR_TYPE__ __wc,
                                                      __mbstate_t *__mbs) {
-#line 259 "kos/src/libc/magic/wchar.c"
+#line 255 "kos/src/libc/magic/wchar.c"
 	char *__endptr;
 	__SIZE_TYPE__ __result;
 #if __SIZEOF_WCHAR_T__ == 2

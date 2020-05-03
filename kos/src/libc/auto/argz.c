@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x339f54f9 */
+/* HASH CRC-32:0xde3d4601 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -96,14 +96,14 @@ NOTHROW_NCX(LIBCCALL libc_argz_stringify)(char *argz,
 }
 
 /* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
- * are no more.  If entry is NULL, then the first entry is returned.  This
+ * are no more. If entry is NULL, then the first entry is returned. This
  * behavior allows two convenient iteration styles:
- * >> char *entry = 0;
+ * >> char *entry = NULL;
  * >> while ((entry = argz_next(argz, argz_len, entry)) != NULL)
  * >>     ...;
  * or
  * >> char *entry;
- * >> for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))
+ * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
  * >>     ...; */
 INTERN ATTR_PURE WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.string.argz.argz_next") char *

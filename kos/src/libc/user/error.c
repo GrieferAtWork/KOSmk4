@@ -107,21 +107,21 @@ ATTR_WEAK ATTR_SECTION(".text.crt.error.error") void
 	} else
 #endif /* __LOCAL_error_print_progname */
 	{
-		libc_fflush(__LOCAL_stdout);
-		libc_fprintf(__LOCAL_stderr, "%s: ", __LOCAL_program_invocation_short_name);
+		libc_fflush(stdout);
+		libc_fprintf(stderr, "%s: ", __LOCAL_program_invocation_short_name);
 	}
 	if (format) {
 		va_list args;
 		va_start(args, format);
-		libc_vfprintf(__LOCAL_stderr, format, args);
+		libc_vfprintf(stderr, format, args);
 		va_end(args);
 	}
 #ifdef __LOCAL_error_message_count
 	++__LOCAL_error_message_count;
 #endif /* __LOCAL_error_message_count */
 	if (errnum != 0)
-		libc_fprintf(__LOCAL_stderr, ": %s", libc_strerror(errnum));
-	libc_fputc('\n', __LOCAL_stderr);
+		libc_fprintf(stderr, ": %s", libc_strerror(errnum));
+	libc_fputc('\n', stderr);
 	if (status != 0)
 		libc_exit(status);
 }
@@ -164,22 +164,22 @@ ATTR_WEAK ATTR_SECTION(".text.crt.error.error_at_line") void
 		} else
 #endif /* __LOCAL_error_print_progname */
 		{
-			libc_fflush(__LOCAL_stdout);
-			libc_fprintf(__LOCAL_stderr, "%s:", __LOCAL_program_invocation_short_name);
+			libc_fflush(stdout);
+			libc_fprintf(stderr, "%s:", __LOCAL_program_invocation_short_name);
 		}
-		libc_fprintf(__LOCAL_stderr, "%s:%u: ", filename, line);
+		libc_fprintf(stderr, "%s:%u: ", filename, line);
 		if (format) {
 			va_list args;
 			va_start(args, format);
-			libc_vfprintf(__LOCAL_stderr, format, args);
+			libc_vfprintf(stderr, format, args);
 			va_end(args);
 		}
 #ifdef __LOCAL_error_message_count
 		++__LOCAL_error_message_count;
 #endif /* __LOCAL_error_message_count */
 		if (errnum != 0)
-			libc_fprintf(__LOCAL_stderr, ": %s", libc_strerror(errnum));
-		libc_fputc('\n', __LOCAL_stderr);
+			libc_fprintf(stderr, ": %s", libc_strerror(errnum));
+		libc_fputc('\n', stderr);
 		if (status != 0)
 			libc_exit(status);
 	}

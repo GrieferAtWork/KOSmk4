@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x169356fe */
+/* HASH CRC-32:0xd0567a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -92,20 +92,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(format_c16hexdump))(__pc16formatprint
                                                                __SIZE_TYPE__ __size,
                                                                __SIZE_TYPE__ __linesize,
                                                                unsigned int __flags) {
-#line 525 "kos/src/libc/magic/format-printer.c"
-#ifndef __FORMAT_HEXDUMP_FNORMAL
-#define __FORMAT_HEXDUMP_FNORMAL    0x0000 /* Normal hexdump flags. */
-#define __FORMAT_HEXDUMP_FHEXLOWER  0x0001 /* Print hex text of the dump in lowercase (does not affect address/offset). */
-#define __FORMAT_HEXDUMP_FNOADDRESS 0x0002 /* Don't include the absolute address at the start of every line. */
-#define __FORMAT_HEXDUMP_FOFFSETS   0x0004 /* Include offsets from the base address at the start of every line (after the address when also shown). */
-#define __FORMAT_HEXDUMP_FNOHEX     0x0008 /* Don't print the actual hex dump (hex data representation). */
-#define __FORMAT_HEXDUMP_FNOASCII   0x0010 /* Don't print ascii representation of printable characters at the end of lines. */
-#define __FORMAT_HEXDUMP_BYTES      0x0000 /* Dump data as bytes. */
-#define __FORMAT_HEXDUMP_WORDS      0x1000 /* Dump data as words (uint16_t). */
-#define __FORMAT_HEXDUMP_DWORDS     0x2000 /* Dump data as dwords (uint32_t). */
-#define __FORMAT_HEXDUMP_QWORDS     0x3000 /* Dump data as qwords (uint64_t). */
-#define __FORMAT_HEXDUMP_SIZEMASK   0x3000 /* Mask for the dump size. */
-#endif /* !FORMAT_HEXDUMP_FNORMAL */
+#line 540 "kos/src/libc/magic/format-printer.c"
 #ifndef __DECIMALS_SELECTOR
 #define __LOCAL_DECIMALS_SELECTOR_DEFINED 1
 #define __DECIMALS_SELECTOR  __decimals
@@ -125,8 +112,8 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(format_c16hexdump))(__pc16formatprint
 	unsigned int __offset_digits = 0;
 	if (!__size) goto __done;
 	if (!__linesize) __linesize = 16;
-	__dec = __DECIMALS_SELECTOR[!(__flags & __FORMAT_HEXDUMP_FHEXLOWER)];
-	if (__flags & __FORMAT_HEXDUMP_FOFFSETS) {
+	__dec = __DECIMALS_SELECTOR[!(__flags & 0x0001)];
+	if (__flags & 0x0004) {
 		__value = __size;
 		do ++__offset_digits;
 		while ((__value >>= 4) != 0);
@@ -136,7 +123,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(format_c16hexdump))(__pc16formatprint
 		__SIZE_TYPE__ __line_len = __linesize;
 		if (__line_len > __size)
 			__line_len = __size;
-		if (!(__flags & __FORMAT_HEXDUMP_FNOADDRESS)) {
+		if (!(__flags & 0x0002)) {
 			__value = (__UINTPTR_TYPE__)__line_data;
 			__dst = __buffer + sizeof(void *) * 2;
 			*__dst = ' ';
@@ -149,7 +136,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(format_c16hexdump))(__pc16formatprint
 				goto __err;
 			__result += __temp;
 		}
-		if (__flags & __FORMAT_HEXDUMP_FOFFSETS) {
+		if (__flags & 0x0004) {
 			__dst = __buffer + 1 + __offset_digits;
 			*__dst = ' ';
 			__value = (__line_data - (__BYTE_TYPE__ const *)__data);
@@ -163,14 +150,16 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(format_c16hexdump))(__pc16formatprint
 				goto __err;
 			__result += __temp;
 		}
-		if (!(__flags & __FORMAT_HEXDUMP_FNOHEX)) {
+		if (!(__flags & 0x0008)) {
 			__SIZE_TYPE__ __i = 0;
 			__SIZE_TYPE__ __tailspace_count;
-			switch (__flags & __FORMAT_HEXDUMP_SIZEMASK) {
+			switch (__flags & 0x3000) {
+
 			default:
 				__tailspace_count = __linesize * 3;
 				break;
-			case __FORMAT_HEXDUMP_WORDS:
+
+			case 0x1000:
 				__tailspace_count = (__linesize / 2) * 5 + (__linesize % 2) * 3;
 				__buffer[4] = ' ';
 				for (; __i + 2 <= __line_len; __i += 2) {
@@ -187,7 +176,8 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(format_c16hexdump))(__pc16formatprint
 					__tailspace_count -= 5;
 				}
 				break;
-			case __FORMAT_HEXDUMP_DWORDS:
+
+			case 0x2000:
 				__tailspace_count = (__linesize / 4) * 9 + (__linesize % 4) * 3;
 				__buffer[8] = ' ';
 				for (; __i + 4 <= __line_len; __i += 4) {
@@ -204,7 +194,8 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(format_c16hexdump))(__pc16formatprint
 					__tailspace_count -= 9;
 				}
 				break;
-			case __FORMAT_HEXDUMP_QWORDS:
+
+			case 0x3000:
 				__tailspace_count = (__linesize / 8) * 17 + (__linesize % 8) * 3;
 				__buffer[16] = ' ';
 				for (; __i + 8 <= __line_len; __i += 8) {
@@ -259,7 +250,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(format_c16hexdump))(__pc16formatprint
 				__result += __temp;
 			}
 		}
-		if (!(__flags & __FORMAT_HEXDUMP_FNOASCII)) {
+		if (!(__flags & 0x0010)) {
 			for (__i = 0; __i < __line_len; ++__i) {
 				__BYTE_TYPE__ __b = __line_data[__i];
 				if (!__localdep_iswprint(__b))

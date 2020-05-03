@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa36459ba */
+/* HASH CRC-32:0x65d58908 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __NAMESPACE_LOCAL_BEGIN
  * s.a. `pthread_exit()' */
 __LOCAL_LIBC(thrd_exit) __ATTR_NORETURN void
 (__LIBCCALL __LIBC_LOCAL_NAME(thrd_exit))(int __res) {
-#line 221 "kos/src/libc/magic/threads.c"
+#line 236 "kos/src/libc/magic/threads.c"
 	__localdep_pthread_exit((void *)(__UINTPTR_TYPE__)(unsigned int)__res);
 }
 __NAMESPACE_LOCAL_END

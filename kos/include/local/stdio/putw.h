@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x742d4dd2 */
+/* HASH CRC-32:0xff4b8a92 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,7 +58,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(putw) __ATTR_NONNULL((2)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(putw))(int __w,
                                      __FILE *__restrict __stream) __THROWS(...) {
-#line 1420 "kos/src/libc/magic/stdio.c"
+#line 1422 "kos/src/libc/magic/stdio.c"
 	__UINT16_TYPE__ __word = (__UINT16_TYPE__)(unsigned int)__w;
 	if (!__localdep_fwrite(&__word, 2, 1, __stream))
 		return __EOF;

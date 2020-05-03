@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x35ae6115 */
+/* HASH CRC-32:0x60c0141c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,25 +53,25 @@ INTDEF void NOTHROW_NCX(LIBCCALL libc_argz_stringify)(char *argz, size_t len, in
  * of the elements... (took me a while to realize this one) */
 #define libc___argz_delete libc_argz_delete
 /* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
- * are no more.  If entry is NULL, then the first entry is returned.  This
+ * are no more. If entry is NULL, then the first entry is returned. This
  * behavior allows two convenient iteration styles:
- * >> char *entry = 0;
+ * >> char *entry = NULL;
  * >> while ((entry = argz_next(argz, argz_len, entry)) != NULL)
  * >>     ...;
  * or
  * >> char *entry;
- * >> for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))
+ * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
  * >>     ...; */
 INTDEF ATTR_PURE WUNUSED char *NOTHROW_NCX(LIBCCALL libc_argz_next)(char const *__restrict argz, size_t argz_len, char const *__restrict entry);
 /* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
- * are no more.  If entry is NULL, then the first entry is returned.  This
+ * are no more. If entry is NULL, then the first entry is returned. This
  * behavior allows two convenient iteration styles:
- * >> char *entry = 0;
+ * >> char *entry = NULL;
  * >> while ((entry = argz_next(argz, argz_len, entry)) != NULL)
  * >>     ...;
  * or
  * >> char *entry;
- * >> for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))
+ * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
  * >>     ...; */
 #define libc___argz_next libc_argz_next
 #endif /* !__KERNEL__ */

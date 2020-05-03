@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5501ca17 */
+/* HASH CRC-32:0xcd42fe23 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,17 +61,8 @@ __LOCAL_LIBC(format_escape) __ATTR_NONNULL((1)) __SSIZE_TYPE__
                                               /*utf-8*/ char const *__restrict __text,
                                               __SIZE_TYPE__ __textlen,
                                               unsigned int __flags) __THROWS(...) {
-#line 209 "kos/src/libc/magic/format-printer.c"
-#ifndef __FORMAT_ESCAPE_FNORMAL
-#define __FORMAT_ESCAPE_FNORMAL   0x0000 /* Normal quote flags. */
-#define __FORMAT_ESCAPE_FPRINTRAW 0x0001 /* Don't surround the quoted text with "..."; */
-#define __FORMAT_ESCAPE_FFORCEHEX 0x0002 /* Force hex encoding of all control characters without special strings (`"\n"', etc.). */
-#define __FORMAT_ESCAPE_FFORCEOCT 0x0004 /* Force octal encoding of all non-ascii characters. */
-#define __FORMAT_ESCAPE_FNOCTRL   0x0008 /* Disable special encoding strings such as `"\r"', `"\n"' or `"\e"' */
-#define __FORMAT_ESCAPE_FNOASCII  0x0010 /* Disable regular ascii-characters and print everything using special encodings. */
-#define __FORMAT_ESCAPE_FUPPERHEX 0x0020 /* Use uppercase characters for hex (e.g.: `"\xAB"'). */
-#endif /* !FORMAT_ESCAPE_FNORMAL */
-#define __escape_tooct(__c) ('0'+(char)(unsigned char)(__c))
+#line 219 "kos/src/libc/magic/format-printer.c"
+#define __escape_tooct(__c) ('0' + (char)(unsigned char)(__c))
 #ifndef __DECIMALS_SELECTOR
 #define __LOCAL_DECIMALS_SELECTOR_DEFINED 1
 #define __DECIMALS_SELECTOR  __decimals
@@ -85,9 +76,9 @@ __LOCAL_LIBC(format_escape) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 	__SSIZE_TYPE__ __result = 0, __temp; char const *__c_hex;
 	char const *__textend = __text + __textlen;
 	char const *__flush_start = __text;
-	__c_hex = __DECIMALS_SELECTOR[!(__flags & __FORMAT_ESCAPE_FUPPERHEX)];
+	__c_hex = __DECIMALS_SELECTOR[!(__flags & 0x0020)];
 	__encoded_text[0] = '\\';
-	if __likely(!(__flags & __FORMAT_ESCAPE_FPRINTRAW)) {
+	if __likely(!(__flags & 0x0001)) {
 		__temp = (*__printer)(__arg, __quote, 1);
 		if __unlikely(__temp < 0)
 		goto __err;
@@ -106,7 +97,7 @@ __LOCAL_LIBC(format_escape) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 
 		if __unlikely(__ch < 32 || __ch >= 127  || __ch == '\'' ||
 		              __ch == '\"' || __ch == '\\' ||
-		             (__flags & __FORMAT_ESCAPE_FNOASCII)) {
+		             (__flags & 0x0010)) {
 			/* Flush unwritten direct-copy text. */
 			if (__flush_start < __old_text) {
 				__temp = (*__printer)(__arg, __flush_start, (__SIZE_TYPE__)(__old_text - __flush_start));
@@ -117,9 +108,9 @@ __LOCAL_LIBC(format_escape) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 			/* Character requires special encoding. */
 			if (__ch < 32) {
 				/* Control character. */
-				if (__flags & __FORMAT_ESCAPE_FNOCTRL) {
+				if (__flags & 0x0008) {
 __default_ctrl:
-					if (__flags & __FORMAT_ESCAPE_FFORCEHEX)
+					if (__flags & 0x0002)
 						goto __encode_hex;
 __encode_oct:
 					if (__text < __textend) {
@@ -251,12 +242,12 @@ __special_control:
 				__encoded_text_size = 2;
 				goto __print_encoded;
 			} else if ((__ch == '\\' || __ch == '\'' || __ch == '\"') &&
-			          !(__flags & __FORMAT_ESCAPE_FNOCTRL)) {
+			          !(__flags & 0x0008)) {
 				goto __special_control;
 			} else {
 				/* Non-ascii character. */
 /*default_nonascii:*/
-				if (__flags & __FORMAT_ESCAPE_FFORCEOCT)
+				if (__flags & 0x0004)
 					goto __encode_oct;
 __encode_hex:
 				if (__text < __textend) {
@@ -322,7 +313,7 @@ __print_encoded:
 			goto __err;
 		__result += __temp;
 	}
-	if __likely(!(__flags & __FORMAT_ESCAPE_FPRINTRAW)) {
+	if __likely(!(__flags & 0x0001)) {
 		__temp = (*__printer)(__arg, __quote, 1);
 		if __unlikely(__temp < 0)
 			goto __err;

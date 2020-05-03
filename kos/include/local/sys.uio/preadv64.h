@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbff5b0c0 */
+/* HASH CRC-32:0xd1eefc8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,11 +22,12 @@
 #ifdef __CRT_HAVE_preadv
 #define __local_preadv64_defined 1
 #include <__crt.h>
+#include <bits/uio.h>
 /* Dependency: "preadv32" from "sys.uio" */
 #ifndef ____localdep_preadv32_defined
 #define ____localdep_preadv32_defined 1
 #ifdef __CRT_HAVE_preadv
-__CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_preadv32,(__fd_t __fd, struct iovec const *__iovec, __STDC_INT_AS_SIZE_T __count, __off32_t __offset),preadv,(__fd,__iovec,__count,__offset))
+__CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_preadv32,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off32_t __offset),preadv,(__fd,__iov,__count,__offset))
 #else /* LIBC: preadv */
 #undef ____localdep_preadv32_defined
 #endif /* preadv32... */
@@ -35,11 +36,11 @@ __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_preadv32
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(preadv64) __ATTR_WUNUSED __ATTR_NONNULL((2)) __SSIZE_TYPE__
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(preadv64))(__fd_t __fd,
-                                                      struct iovec const *__iovec,
+                                                      struct iovec const *__iov,
                                                       __STDC_INT_AS_SIZE_T __count,
                                                       __off64_t __offset) {
-#line 99 "kos/src/libc/magic/sys.uio.c"
-	return __localdep_preadv32(__fd, __iovec, __count, (__off32_t)__offset);
+#line 106 "kos/src/libc/magic/sys.uio.c"
+	return __localdep_preadv32(__fd, __iov, __count, (__off32_t)__offset);
 }
 __NAMESPACE_LOCAL_END
 #endif /* __CRT_HAVE_preadv */

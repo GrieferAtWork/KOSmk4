@@ -1280,12 +1280,12 @@ pthread_spin_lock:([nonnull] pthread_spinlock_t *lock) -> int {
 pthread_spin_trylock:([nonnull] pthread_spinlock_t *lock) -> int {
 	if (__hybrid_atomic_xch(*lock, 1, __ATOMIC_ACQUIRE) == 0)
 		return 0;
-#ifdef @__EBUSY@
-	return @__EBUSY@;
-#elif defined(@__EWOULDBLOCK@)
-	return @__EWOULDBLOCK@;
-#elif defined(@__EAGAIN@)
-	return @__EAGAIN@;
+#ifdef EBUSY
+	return EBUSY;
+#elif defined(EWOULDBLOCK)
+	return EWOULDBLOCK;
+#elif defined(EAGAIN)
+	return EAGAIN;
 #else /* ... */
 	return 1;
 #endif /* !... */
@@ -1423,11 +1423,11 @@ pthread_set_num_processors_np:(int n) -> int {
 	int i, result;
 	cpu_set_t cset;
 	if (n < 1) {
-#ifdef @__EINVAL@
-		return @__EINVAL@;
-#else /* __EINVAL */
+#ifdef EINVAL
+		return EINVAL;
+#else /* EINVAL */
 		return 1;
-#endif /* !__EINVAL */
+#endif /* !EINVAL */
 	}
 	__CPU_ZERO_S(sizeof(cset), &cset);
 	for (i = 0; i < n; ++i) {

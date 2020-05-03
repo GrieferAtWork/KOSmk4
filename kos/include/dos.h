@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x41da3dca */
+/* HASH CRC-32:0x4f107dac */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,11 +28,17 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
-#include <features.h>
-#include <hybrid/host.h>
+#include <features.h> /* __USE_OLD_DOS */
+
+#include <hybrid/host.h> /* __i386__, __x86_64__ */
+
 #ifdef __USE_OLD_DOS
 #include <bits/types.h>
+#ifndef SEEK_SET
+#include <asm/stdio.h> /* __SEEK_SET, __SEEK_... */
+#endif /* !SEEK_SET */
 #endif /* __USE_OLD_DOS */
+
 #if defined(__i386__) || defined(__x86_64__)
 #include <asm/intrin.h>
 #endif /* __i386__ || __x86_64__ */
@@ -151,9 +157,9 @@ __LOCAL void (__LIBCCALL outport)(__UINT16_TYPE__ __port, __UINT16_TYPE__ __val)
 #define FA_ARCH   _A_ARCH
 #endif /* !FA_NORMAL */
 #ifndef SEEK_SET
-#define SEEK_SET  0
-#define SEEK_CUR  1
-#define SEEK_END  2
+#define SEEK_SET __SEEK_SET /* Seek from beginning of file. */
+#define SEEK_CUR __SEEK_CUR /* Seek from current position. */
+#define SEEK_END __SEEK_END /* Seek from end of file. */
 #endif /* !SEEK_SET */
 #endif /* __USE_OLD_DOS */
 

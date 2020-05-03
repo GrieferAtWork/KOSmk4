@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x53ab77aa */
+/* HASH CRC-32:0x51b00ee6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #if defined(__CRT_HAVE_setvbuf) || defined(__CRT_HAVE__IO_setvbuf) || defined(__CRT_HAVE_setvbuf_unlocked)
 #define __local_setbuf_defined 1
 #include <__crt.h>
+#include <asm/stdio.h>
 /* Dependency: "setvbuf" */
 #ifndef ____localdep_setvbuf_defined
 #define ____localdep_setvbuf_defined 1
@@ -47,27 +48,11 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_setvbuf,(__FILE *__
 #endif /* !____localdep_setvbuf_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __BUFSIZ
-#ifdef __USE_DOS
-#define __BUFSIZ 512
-#else /* __USE_DOS */
-#define __BUFSIZ 8192
-#endif /* !__USE_DOS */
-#endif /* !__BUFSIZ */
-#ifdef __CRT_DOS_PRIMARY
-#define ___IOFBF 0x0000 /* Fully buffered. */
-#define ___IOLBF 0x0040 /* Line buffered. */
-#define ___IONBF 0x0004 /* No buffering. */
-#else /* __CRT_DOS_PRIMARY */
-#define ___IOFBF 0      /* Fully buffered. */
-#define ___IOLBF 1      /* Line buffered. */
-#define ___IONBF 2      /* No buffering. */
-#endif /* !__CRT_DOS_PRIMARY */
 /* Alias for `setvbuf(STREAM, buf, _IOFBF, BUFSIZ)' */
 __LOCAL_LIBC(setbuf) __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(setbuf))(__FILE *__restrict __stream,
                                                     char *__restrict __buf) {
-#line 423 "kos/src/libc/magic/stdio.c"
+#line 431 "kos/src/libc/magic/stdio.c"
 	__localdep_setvbuf(__stream, __buf,
 	        __buf ? ___IOFBF : ___IONBF,
 	        __buf ? __BUFSIZ : 0);

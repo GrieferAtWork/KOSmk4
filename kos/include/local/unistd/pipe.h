@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf14c4852 */
+/* HASH CRC-32:0x52b51e49 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ __NAMESPACE_LOCAL_BEGIN
  * Create a new pair of connected pipes ([0] = reader, [1] = writer) */
 __LOCAL_LIBC(pipe) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pipe))(__fd_t __pipedes[2]) {
-#line 333 "kos/src/libc/magic/unistd.c"
+#line 342 "kos/src/libc/magic/unistd.c"
 	return __localdep_dos_pipe(__pipedes, 4096, 0x8000); /* O_BINARY */
 }
 __NAMESPACE_LOCAL_END

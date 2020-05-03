@@ -266,8 +266,13 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.random.rand_s") errno_t
 NOTHROW_NCX(LIBCCALL libc_rand_s)(unsigned int *__restrict randval)
 /*[[[body:rand_s]]]*/
 /*AUTO*/{
-	if (!randval)
-		return __EINVAL;
+	if (!randval) {
+#ifdef EINVAL
+		return EINVAL;
+#else /* EINVAL */
+		return 1;
+#endif /* !EINVAL */
+	}
 	*randval = libc_rand();
 	return 0;
 }

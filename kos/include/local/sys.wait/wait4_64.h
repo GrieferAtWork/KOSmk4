@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe3bf7bb4 */
+/* HASH CRC-32:0x9780d962 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,7 +45,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wait4_64))(__pid_t __pid,
                                                       __WAIT_STATUS __stat_loc,
                                                       int __options,
                                                       struct __rusage64 *__usage) {
-#line 212 "kos/src/libc/magic/sys.wait.c"
+#line 214 "kos/src/libc/magic/sys.wait.c"
 	__pid_t __result;
 	struct __rusage32 __ru32;
 	__result = __localdep_wait4_32(__pid, __stat_loc, __options, __usage ? &__ru32 : __NULLPTR);

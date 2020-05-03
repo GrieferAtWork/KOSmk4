@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x331ab1b8 */
+/* HASH CRC-32:0xaf938f2d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,7 @@ typedef __TM_TYPE(time) time_t;
 #ifdef __USE_DOS
 #ifndef _UTIMBUF_DEFINED
 #define _UTIMBUF_DEFINED 1
-#define _utimbuf   utimbuf
+#define _utimbuf utimbuf
 #endif /* !_UTIMBUF_DEFINED */
 #endif /* __USE_DOS */
 

@@ -145,13 +145,6 @@ __DEFINE_SHIFT(sal)
 #undef __DEFINE_ARTH_BINARY
 
 
-
-__FORCELOCAL __ATTR_CONST __UINT32_TYPE__ (__andnl)(__UINT32_TYPE__ __lhs, __UINT32_TYPE__ __rhs) { __UINT32_TYPE__ __res; __asm_ncx_memop__("andnl %k2, %k1, %k0" : "=r" (__res) : "r" (__lhs), "rm" (__rhs) : "cc"); return __res; }
-#ifdef __x86_64__
-__FORCELOCAL __ATTR_CONST __UINT64_TYPE__ (__andnq)(__UINT64_TYPE__ __lhs, __UINT64_TYPE__ __rhs) { __UINT64_TYPE__ __res; __asm_ncx_memop__("andnq %q2, %q1, %q0" : "=r" (__res) : "r" (__lhs), "rm" (__rhs) : "cc"); return __res; }
-#endif /* __x86_64__ */
-
-
 /* Byte-order instructions */
 __FORCELOCAL __ATTR_CONST __UINT16_TYPE__ (__bswapw)(__UINT16_TYPE__ __val) { __UINT16_TYPE__ __res; __asm_ncx_memop__("xchgb %b0, %h0" : "=q" (__res) : "0" (__val)); return __res; }
 __FORCELOCAL __ATTR_CONST __UINT32_TYPE__ (__bswapl)(__UINT32_TYPE__ __val) { __UINT32_TYPE__ __res; __asm_ncx_memop__("bswapl %k0" : "=r" (__res) : "0" (__val)); return __res; }

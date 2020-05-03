@@ -58,10 +58,10 @@ NOTHROW_RPC(LIBCCALL libc_eventfd_read)(fd_t fd,
 	error = libc_read(fd, value, sizeof(eventfd_t));
 	if (error == sizeof(eventfd_t))
 		return 0;
-#ifdef __EINVAL
+#ifdef EINVAL
 	if (error >= 0)
-		__libc_seterrno(__EINVAL);
-#endif /* __EINVAL */
+		__libc_seterrno(EINVAL);
+#endif /* EINVAL */
 	return -1;
 }
 /*[[[end:eventfd_read]]]*/
@@ -77,10 +77,10 @@ NOTHROW_RPC(LIBCCALL libc_eventfd_write)(fd_t fd,
 	error = libc_write(fd, &value, sizeof(eventfd_t));
 	if (error == sizeof(eventfd_t))
 		return 0;
-#ifdef __EINVAL
+#ifdef EINVAL
 	if (error >= 0)
-		__libc_seterrno(__EINVAL);
-#endif /* __EINVAL */
+		__libc_seterrno(EINVAL);
+#endif /* EINVAL */
 	return -1;
 }
 /*[[[end:eventfd_write]]]*/

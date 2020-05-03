@@ -303,9 +303,9 @@ hsearch_r:(ENTRY item, ACTION action, ENTRY **retval, struct hsearch_data *htab)
 	}
 	if (action == @ENTER@) {
 		if (htab->@filled@ == htab->@size@) {
-#ifdef @__ENOMEM@
-			@__libc_seterrno@(@__ENOMEM@);
-#endif /* __ENOMEM */
+#ifdef ENOMEM
+			__libc_seterrno(ENOMEM);
+#endif /* ENOMEM */
 			*retval = NULL;
 			return 0;
 		}
@@ -315,9 +315,9 @@ hsearch_r:(ENTRY item, ACTION action, ENTRY **retval, struct hsearch_data *htab)
 		*retval = &((entry_type *)htab->@table@)[idx].entry;
 		return 1;
 	}
-#ifdef @__ESRCH@
-	@__libc_seterrno@(@__ESRCH@);
-#endif /* __ESRCH */
+#ifdef ESRCH
+	__libc_seterrno(ESRCH);
+#endif /* ESRCH */
 	*retval = NULL;
 	return 0;
 }
@@ -332,9 +332,9 @@ hcreate_r:(size_t nel, struct hsearch_data *htab) -> int {
 		@ENTRY@        entry;
 	} entry_type;
 	if (htab == NULL) {
-#ifdef @__EINVAL@
-		@__libc_seterrno@(@__EINVAL@);
-#endif /* __EINVAL */
+#ifdef EINVAL
+		__libc_seterrno(EINVAL);
+#endif /* EINVAL */
 		return 0;
 	}
 	if (htab->@table@ != NULL)
@@ -343,9 +343,9 @@ hcreate_r:(size_t nel, struct hsearch_data *htab) -> int {
 		nel = 3;
 	for (nel |= 1; ; nel += 2) {
 		if (@__UINT_MAX__@ - 2 < nel) {
-#ifdef @__ENOMEM@
-			@__libc_seterrno@(@__ENOMEM@);
-#endif /* __ENOMEM */
+#ifdef ENOMEM
+			__libc_seterrno(ENOMEM);
+#endif /* ENOMEM */
 			return 0;
 		}
 		if (isprime(nel))
@@ -363,9 +363,9 @@ hcreate_r:(size_t nel, struct hsearch_data *htab) -> int {
 [dependency_include(<parts/errno.h>)]
 hdestroy_r:(struct hsearch_data *htab) {
 	if (htab == NULL) {
-#ifdef @__EINVAL@
-		@__libc_seterrno@(@__EINVAL@);
-#endif /* __EINVAL */
+#ifdef EINVAL
+		__libc_seterrno(EINVAL);
+#endif /* EINVAL */
 		return;
 	}
 	free(htab->@table@);

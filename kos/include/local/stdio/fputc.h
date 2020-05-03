@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x431edb4b */
+/* HASH CRC-32:0xfac517eb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,7 +62,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fputc) __ATTR_NONNULL((2)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fputc))(int __ch,
                                       __FILE *__restrict __stream) __THROWS(...) {
-#line 476 "kos/src/libc/magic/stdio.c"
+#line 484 "kos/src/libc/magic/stdio.c"
 #if defined(__CRT_DOS) && (defined(__CRT_HAVE__flsbuf)) && \
   (!defined(__USE_STDIO_UNLOCKED) || !(defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite)))
 	return --__stream->__f_cnt >= 0 ? (int)((__UINT8_TYPE__)(*__stream->__f_ptr++ = (char)__ch)) : __localdep__flsbuf(__ch, __stream);

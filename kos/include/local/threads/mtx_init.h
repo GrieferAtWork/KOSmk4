@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x96df945f */
+/* HASH CRC-32:0xd3ace74c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,6 +27,7 @@
 #include <bits/pthreadvalues.h>
 
 #include <bits/pthreadtypes.h>
+#include <asm/threads.h>
 /* Dependency: "pthread_mutex_init" */
 #ifndef ____localdep_pthread_mutex_init_defined
 #define ____localdep_pthread_mutex_init_defined 1
@@ -79,9 +80,9 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(mtx_init) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mtx_init))(__mtx_t *__restrict __mutex,
                                                       int __type) {
-#line 282 "kos/src/libc/magic/threads.c"
+#line 300 "kos/src/libc/magic/threads.c"
 	int __error;
-	if (__type == 0 /*mtx_plain*/) {
+	if (__type == __mtx_plain) {
 		__error = __localdep_pthread_mutex_init((__pthread_mutex_t *)__mutex, __NULLPTR);
 	} else {
 		__pthread_mutexattr_t __attr;
@@ -96,8 +97,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mtx_init))(__mtx_t *__restrict __mute
 		}
 	}
 	if __likely(!__error)
-		return 0; /* thrd_success */
-	return 2; /* thrd_error */
+		return __thrd_success;
+	return __thrd_error;
 }
 __NAMESPACE_LOCAL_END
 #endif /* __CRT_HAVE_pthread_mutex_init */

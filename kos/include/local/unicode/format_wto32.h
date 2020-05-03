@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x45e2a845 */
+/* HASH CRC-32:0xee1ad29c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@ __LOCAL_LIBC(format_wto32) __SSIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_wto32))(/*struct format_wto32_data **/ void *__arg,
                                                           __WCHAR_TYPE__ const *__data,
                                                           __SIZE_TYPE__ __datalen) {
-#line 1588 "kos/src/libc/magic/unicode.c"
+#line 1599 "kos/src/libc/magic/unicode.c"
 #if __SIZEOF_WCHAR_T__ == 2
 	struct __local_format_16to32_data {
 		__pc32formatprinter __fd_printer;   /* [1..1] Inner printer */
@@ -80,7 +80,7 @@ __after_dst_write:
 	return __result;
 __err:
 	return __temp;
-#else
+#else /* __SIZEOF_WCHAR_T__ == 2 */
 	struct __local_format_32to32_data {
 		__pc32formatprinter __fd_printer;   /* [1..1] Inner printer */
 		void               *__fd_arg;       /* Argument for `fd_printer' */
@@ -88,7 +88,7 @@ __err:
 	struct __local_format_32to32_data *__closure;
 	__closure = (struct __local_format_32to32_data *)__arg;
 	return (*__closure->__fd_printer)(__closure->__fd_arg, (__CHAR32_TYPE__ const *)__data, __datalen);
-#endif
+#endif /* __SIZEOF_WCHAR_T__ != 2 */
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_format_wto32_defined */

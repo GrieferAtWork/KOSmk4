@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe52d11b1 */
+/* HASH CRC-32:0x10060f7e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -267,6 +267,7 @@ __NAMESPACE_STD_USING(wmempmove)
 
 #include <features.h>
 
+#include <asm/stdio.h> /* __WEOF */
 #include <bits/mbstate.h>
 
 #ifdef __USE_KOS
@@ -285,19 +286,15 @@ __SYSDECL_BEGIN
 /* Define `NULL' */
 #ifndef NULL
 #define NULL __NULLPTR
-#endif
+#endif /* !NULL */
 
 #ifndef WCHAR_MIN
 #define WCHAR_MIN __WCHAR_MIN__
 #define WCHAR_MAX __WCHAR_MAX__
-#endif
+#endif /* !WCHAR_MIN */
 
 #ifndef WEOF
-#if __SIZEOF_WCHAR_T__ == 4
-#define WEOF (__CCAST(__WINT_TYPE__)0xffffffffu)
-#else /* __SIZEOF_WCHAR_T__ == 4 */
-#define WEOF (__CCAST(__WINT_TYPE__)0xffff)
-#endif /* __SIZEOF_WCHAR_T__ != 4 */
+#define WEOF __WEOF
 #endif /* !WEOF */
 
 #ifdef __CC__
@@ -1618,25 +1615,23 @@ __NAMESPACE_STD_BEGIN
 __CDECLARE(__ATTR_NONNULL((2)),wchar_t *,__NOTHROW_NCX,wcstok,(wchar_t *__string,wchar_t const *__restrict __delim),(__string,__delim))
 __NAMESPACE_STD_END
 #else /* __CRT_DOS_PRIMARY && __CRT_HAVE_wcstok */
+__NAMESPACE_INT_BEGIN
 #ifdef __CRT_HAVE_wcstok_s
 __CREDIRECT(__ATTR_NONNULL((2,3)),wchar_t *,__NOTHROW_NCX,__crt_wcstok,(wchar_t *__string,wchar_t const *__restrict __delim,wchar_t **__restrict __save_ptr),wcstok_s,(__string,__delim,__save_ptr))
 #elif defined(__CRT_HAVE_wcstok)
 __CREDIRECT(__ATTR_NONNULL((2,3)),wchar_t *,__NOTHROW_NCX,__crt_wcstok,(wchar_t *__string,wchar_t const *__restrict __delim,wchar_t **__restrict __save_ptr),wcstok,(__string,__delim,__save_ptr))
-#else
+#else /* ... */
+__NAMESPACE_INT_END
 #include <local/wchar/wcstok.h>
+__NAMESPACE_INT_BEGIN
 #define __crt_wcstok(string, delim, save_ptr) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstok))(string, delim, save_ptr)
-#endif
-#ifndef __NO_ATTR_WEAK
-__INTERN __ATTR_UNUSED __ATTR_WEAK wchar_t *__wcstok_save_ptr = __NULLPTR;
-#elif !defined(__NO_ATTR_SELECTANY)
-__INTERN __ATTR_UNUSED __ATTR_SELECTANY wchar_t *__wcstok_save_ptr = __NULLPTR;
-#else
-__PRIVATE __ATTR_UNUSED wchar_t *__wcstok_save_ptr = __NULLPTR;
-#endif
+#endif /* !... */
+__LOCAL_LIBC_DATA(__wcstok_save_ptr) char *__wcstok_save_ptr = __NULLPTR;
+__NAMESPACE_INT_END
 __NAMESPACE_STD_BEGIN
 __LOCAL_LIBC(wcstok) __ATTR_NONNULL((2)) wchar_t *
 __NOTHROW_NCX(__LIBCCALL wcstok)(wchar_t *__string, wchar_t const *__restrict __delim) {
-	return __crt_wcstok(__string, __delim, &__wcstok_save_ptr);
+	return __NAMESPACE_LOCAL_SYM __crt_wcstok(__string, __delim, &__NAMESPACE_LOCAL_SYM __wcstok_save_ptr);
 }
 __NAMESPACE_STD_END
 #endif /* !__CRT_DOS_PRIMARY || !__CRT_HAVE_wcstok */

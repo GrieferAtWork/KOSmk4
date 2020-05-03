@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0e60769 */
+/* HASH CRC-32:0x39818bb6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__lseek_defined
-#if defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64)
+#if defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)
 #define __local__lseek_defined 1
 #include <__crt.h>
 #include <bits/types.h>
@@ -53,9 +53,9 @@ __LOCAL_LIBC(_lseek) __LONG32_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_lseek))(__fd_t __fd,
                                                     __LONG32_TYPE__ __offset,
                                                     int __whence) {
-#line 126 "kos/src/libc/magic/io.c"
+#line 124 "kos/src/libc/magic/io.c"
 	return __localdep_lseek64(__fd, (__off64_t)__offset, __whence);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 */
+#endif /* __CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek */
 #endif /* !__local__lseek_defined */

@@ -2694,11 +2694,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_set_num_processors_np)(int n)
 	int i, result;
 	cpu_set_t cset;
 	if (n < 1) {
-#ifdef __EINVAL
-		return __EINVAL;
-#else /* __EINVAL */
+#ifdef EINVAL
+		return EINVAL;
+#else /* EINVAL */
 		return 1;
-#endif /* !__EINVAL */
+#endif /* !EINVAL */
 	}
 	__CPU_ZERO_S(sizeof(cset), &cset);
 	for (i = 0; i < n; ++i) {

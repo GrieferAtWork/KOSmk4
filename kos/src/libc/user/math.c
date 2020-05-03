@@ -637,10 +637,10 @@ NOTHROW(LIBCCALL libc_ldexp)(double x,
 #else /* ... */
 	result = (double)__ieee854_ldexpl((__IEEE854_LONG_DOUBLE_TYPE__)x, exponent);
 #endif /* !... */
-#ifdef __ERANGE
+#ifdef ERANGE
 	if unlikely(!__LIBM_MATHFUN(finite, result) || result == 0.0)
-		__libc_seterrno(__ERANGE);
-#endif /* __ERANGE */
+		__libc_seterrno(ERANGE);
+#endif /* ERANGE */
 	return result;
 }
 /*[[[end:ldexp]]]*/
@@ -755,10 +755,10 @@ NOTHROW(LIBCCALL libc_ldexpf)(float x,
 #else /* ... */
 	result = (float)__ieee854_ldexpl((__IEEE854_LONG_DOUBLE_TYPE__)x, exponent);
 #endif /* !... */
-#ifdef __ERANGE
+#ifdef ERANGE
 	if unlikely(!__LIBM_MATHFUNF(finite, result) || result == 0.0f)
-		__libc_seterrno(__ERANGE);
-#endif /* __ERANGE */
+		__libc_seterrno(ERANGE);
+#endif /* ERANGE */
 	return result;
 #else /* __LIBM_MATHFUN2F */
 	return (float)libc_ldexp((double)x, exponent);
@@ -874,10 +874,10 @@ NOTHROW(LIBCCALL libc_ldexpl)(__LONGDOUBLE x,
 #else /* ... */
 	result = (__LONGDOUBLE)__ieee854_ldexpl((__IEEE854_LONG_DOUBLE_TYPE__)x, exponent);
 #endif /* !... */
-#ifdef __ERANGE
+#ifdef ERANGE
 	if unlikely(!__LIBM_MATHFUNL(finite, result) || result == 0.0L)
-		__libc_seterrno(__ERANGE);
-#endif /* __ERANGE */
+		__libc_seterrno(ERANGE);
+#endif /* ERANGE */
 	return result;
 #else /* __LIBM_MATHFUN2L */
 	return (__LONGDOUBLE)libc_ldexp((double)x, exponent);

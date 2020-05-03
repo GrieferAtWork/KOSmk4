@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc4432745 */
+/* HASH CRC-32:0x8c092a7d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -210,7 +210,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,,__localdep_format_escape,(__pfor
  * >> hat a great day.
  * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
  * Output #2: >> Hello \"World\" W\nhat a great day
- * NOTE: Output #2 is generated if the `FORMAT_ESCAPE_FPRINTRAW' is set
+ * NOTE: Output #2 is generated if the `0x0001' is set
  * This function escapes all control and non-ascii characters,
  * preferring octal encoding for control characters and hex-encoding
  * for other non-ascii characters, a behavior that may be modified
@@ -225,7 +225,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_c
  * >> hat a great day.
  * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
  * Output #2: >> Hello \"World\" W\nhat a great day
- * NOTE: Output #2 is generated if the `FORMAT_ESCAPE_FPRINTRAW' is set
+ * NOTE: Output #2 is generated if the `0x0001' is set
  * This function escapes all control and non-ascii characters,
  * preferring octal encoding for control characters and hex-encoding
  * for other non-ascii characters, a behavior that may be modified
@@ -241,7 +241,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_form
  * >> hat a great day.
  * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
  * Output #2: >> Hello \"World\" W\nhat a great day
- * NOTE: Output #2 is generated if the `FORMAT_ESCAPE_FPRINTRAW' is set
+ * NOTE: Output #2 is generated if the `0x0001' is set
  * This function escapes all control and non-ascii characters,
  * preferring octal encoding for control characters and hex-encoding
  * for other non-ascii characters, a behavior that may be modified
@@ -257,7 +257,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_form
  * >> hat a great day.
  * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
  * Output #2: >> Hello \"World\" W\nhat a great day
- * NOTE: Output #2 is generated if the `FORMAT_ESCAPE_FPRINTRAW' is set
+ * NOTE: Output #2 is generated if the `0x0001' is set
  * This function escapes all control and non-ascii characters,
  * preferring octal encoding for control characters and hex-encoding
  * for other non-ascii characters, a behavior that may be modified
@@ -278,7 +278,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_form
  * >> hat a great day.
  * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
  * Output #2: >> Hello \"World\" W\nhat a great day
- * NOTE: Output #2 is generated if the `FORMAT_ESCAPE_FPRINTRAW' is set
+ * NOTE: Output #2 is generated if the `0x0001' is set
  * This function escapes all control and non-ascii characters,
  * preferring octal encoding for control characters and hex-encoding
  * for other non-ascii characters, a behavior that may be modified
@@ -294,7 +294,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_c
  * >> hat a great day.
  * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
  * Output #2: >> Hello \"World\" W\nhat a great day
- * NOTE: Output #2 is generated if the `FORMAT_ESCAPE_FPRINTRAW' is set
+ * NOTE: Output #2 is generated if the `0x0001' is set
  * This function escapes all control and non-ascii characters,
  * preferring octal encoding for control characters and hex-encoding
  * for other non-ascii characters, a behavior that may be modified
@@ -310,7 +310,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_c
  * >> hat a great day.
  * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
  * Output #2: >> Hello \"World\" W\nhat a great day
- * NOTE: Output #2 is generated if the `FORMAT_ESCAPE_FPRINTRAW' is set
+ * NOTE: Output #2 is generated if the `0x0001' is set
  * This function escapes all control and non-ascii characters,
  * preferring octal encoding for control characters and hex-encoding
  * for other non-ascii characters, a behavior that may be modified
@@ -473,7 +473,7 @@ __LOCAL_LIBC(format_vprintf) __ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1, 3)) __S
                                                void *__arg,
                                                char const *__restrict __format,
                                                __builtin_va_list __args) __THROWS(...) {
-#line 845 "kos/src/libc/magic/format-printer.c"
+#line 851 "kos/src/libc/magic/format-printer.c"
 #ifndef __INTELLISENSE__
 #define __CHAR_TYPE                 char
 #define __CHAR_SIZE                 __SIZEOF_CHAR__

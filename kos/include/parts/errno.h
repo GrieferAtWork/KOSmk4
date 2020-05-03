@@ -115,7 +115,7 @@
 #define __EINTR           __CYG_EINTR           /* Interrupted system call */
 #define __EIO             __CYG_EIO             /* I/O error */
 #define __ENXIO           __CYG_ENXIO           /* No such device or address */
-#define __E2BIG           __CYG_E2BIG           /* Arg list too long */
+#define __E2BIG           __CYG_E2BIG           /* Argument list too long */
 #define __ENOEXEC         __CYG_ENOEXEC         /* Exec format error */
 #define __EBADF           __CYG_EBADF           /* Bad file number */
 #define __ECHILD          __CYG_ECHILD          /* No children */

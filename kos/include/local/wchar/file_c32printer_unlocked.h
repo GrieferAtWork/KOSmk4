@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe7ea7386 */
+/* HASH CRC-32:0x220ea2a2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 #define __local_file_c32printer_unlocked_defined 1
 #include <__crt.h>
 #include <kos/anno.h>
+#include <asm/stdio.h>
 /* Dependency: "fputwc_unlocked" */
 #ifndef ____localdep_fputc32_unlocked_defined
 #define ____localdep_fputc32_unlocked_defined 1
@@ -36,22 +37,15 @@ __CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_fputc32_u
 #endif /* !____localdep_fputc32_unlocked_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __WEOF
-#if 4 == 4
-#define __WEOF 0xffffffffu
-#else /* __SIZEOF_WCHAR_T__ == 4 */
-#define __WEOF (__CCAST(__WINT_TYPE__) 0xffff)
-#endif /* __SIZEOF_WCHAR_T__ != 4 */
-#endif /* !__WEOF */
 /* Same as `file_c32printer()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
 __LOCAL_LIBC(file_c32printer_unlocked) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(file_c32printer_unlocked))(void *__arg,
                                                          __CHAR32_TYPE__ const *__restrict __data,
                                                          __SIZE_TYPE__ __datalen) __THROWS(...) {
-#line 1204 "kos/src/libc/magic/wchar.c"
+#line 1174 "kos/src/libc/magic/wchar.c"
 	__SIZE_TYPE__ __i;
 	for (__i = 0; __i < __datalen; ++__i) {
-		if (__localdep_fputc32_unlocked(__data[__i], (__FILE *)__arg) == __WEOF)
+		if (__localdep_fputc32_unlocked(__data[__i], (__FILE *)__arg) == __WEOF32)
 			break;
 	}
 	return (__SSIZE_TYPE__)__i;

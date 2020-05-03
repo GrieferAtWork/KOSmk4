@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xadb4baff */
+/* HASH CRC-32:0x1d33cb0c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -79,7 +79,7 @@ __LOCAL_LIBC(fread) __ATTR_WUNUSED __ATTR_NONNULL((1, 4)) __SIZE_TYPE__
                                       __SIZE_TYPE__ __elemsize,
                                       __SIZE_TYPE__ __elemcount,
                                       __FILE *__restrict __stream) __THROWS(...) {
-#line 597 "kos/src/libc/magic/stdio.c"
+#line 605 "kos/src/libc/magic/stdio.c"
 	__SIZE_TYPE__ __i, __result = 0;
 	for (; __elemcount; --__elemcount, ++__result) {
 		for (__i = 0; __i < __elemsize; ++__i) {

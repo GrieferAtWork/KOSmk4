@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x11009700 */
+/* HASH CRC-32:0xae3fe9b8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,10 +50,10 @@ NOTHROW_NCX(LIBCCALL libc_mbrtoc16)(char16_t *__restrict pc16,
 	if (!pc16)
 		pc16 = &c16;
 	result = libc_unicode_c8toc16(pc16, s, n, mbs);
-#ifdef __EILSEQ
+#ifdef EILSEQ
 	if unlikely(result == (size_t)-1)
-		__libc_seterrno(__EILSEQ);
-#endif /* __EILSEQ */
+		__libc_seterrno(EILSEQ);
+#endif /* EILSEQ */
 	return result;
 }
 
@@ -79,10 +79,10 @@ NOTHROW_NCX(LIBCCALL libc_mbrtoc32)(char32_t *__restrict pc32,
 	if (!pc32)
 		pc32 = &c32;
 	result = libc_unicode_c8toc32(pc32, s, n, mbs);
-#ifdef __EILSEQ
+#ifdef EILSEQ
 	if unlikely(result == (size_t)-1)
-		__libc_seterrno(__EILSEQ);
-#endif /* __EILSEQ */
+		__libc_seterrno(EILSEQ);
+#endif /* EILSEQ */
 	return result;
 }
 
@@ -104,6 +104,7 @@ NOTHROW_NCX(LIBCCALL libc_c16rtomb)(char *__restrict s,
 	if (!mbs)
 		mbs = &c16rtomb_mbs;
 	switch (mbs->__word & __MBSTATE_TYPE_MASK) {
+
 	case __MBSTATE_TYPE_EMPTY:
 		if (c16 >= 0xd800 && c16 <= 0xdbff) {
 			/* High surrogate (set the MBS to accept a low surrogate as the next character) */
@@ -112,6 +113,7 @@ NOTHROW_NCX(LIBCCALL libc_c16rtomb)(char *__restrict s,
 		}
 		ch32 = (char32_t)c16;
 		break;
+
 	case __MBSTATE_TYPE_UTF16_LO:
 		/* c16 should be a low surrogate */
 		if unlikely(!(c16 >= 0xdc00 && c16 <= 0xdfff))
@@ -122,9 +124,9 @@ NOTHROW_NCX(LIBCCALL libc_c16rtomb)(char *__restrict s,
 
 	default:
 error_ilseq:
-#ifdef __EILSEQ
-		__libc_seterrno(__EILSEQ);
-#endif /* __EILSEQ */
+#ifdef EILSEQ
+		__libc_seterrno(EILSEQ);
+#endif /* EILSEQ */
 		return (size_t)-1;
 	}
 	/* Write a utf-8 sequence */
@@ -138,16 +140,17 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unicode.mbr.c32rtomb") size_t
 NOTHROW_NCX(LIBCCALL libc_c32rtomb)(char *__restrict s,
                                     char32_t c32,
                                     __mbstate_t *__restrict mbs) {
-#line 192 "kos/src/libc/magic/uchar.c"
+#line 194 "kos/src/libc/magic/uchar.c"
 	if (!s) {
 		if (mbs)
 			mbs->__word = __MBSTATE_TYPE_EMPTY;
 		return 1;
 	}
-	if unlikely((c32 > 0x10ffff) || (mbs && (mbs->__word & __MBSTATE_TYPE_MASK) != __MBSTATE_TYPE_EMPTY)) {
-#ifdef __EILSEQ
-		__libc_seterrno(__EILSEQ);
-#endif /* __EILSEQ */
+	if unlikely((c32 > 0x10ffff) ||
+	            (mbs && (mbs->__word & __MBSTATE_TYPE_MASK) != __MBSTATE_TYPE_EMPTY)) {
+#ifdef EILSEQ
+		__libc_seterrno(EILSEQ);
+#endif /* EILSEQ */
 		return (size_t)-1;
 	}
 	/* Write a utf-8 sequence */
