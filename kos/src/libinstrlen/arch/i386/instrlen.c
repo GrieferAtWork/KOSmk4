@@ -202,14 +202,14 @@ NOTHROW_NCX(CC libil_instruction_succ)(void const *pc,
 		if (opcode <= 0x2ff) {
 			/* All 0x0f3800-0x0f38ff opcodes encode to either
 			 * I_RM or I_UD (always use I_RM for these!) */
-			type = I_RM;
+			type = COMMON_OPCODE_TYPE_0f38xx;
 		} else
 #endif /* NUMBER_OF_EXPLICITLY_DEFINED_OPCODES <= 0x2ff */
 #if NUMBER_OF_EXPLICITLY_DEFINED_OPCODES <= 0x3ff
 		if (opcode <= 0x3ff) {
 			/* All 0x0f3a00-0x0f3aff opcodes encode to either
 			 * I_RM1 or I_UD (always use I_RM1 for these!) */
-			type = I_RM1;
+			type = COMMON_OPCODE_TYPE_0f3axx;
 		} else
 #endif /* NUMBER_OF_EXPLICITLY_DEFINED_OPCODES <= 0x3ff */
 		{

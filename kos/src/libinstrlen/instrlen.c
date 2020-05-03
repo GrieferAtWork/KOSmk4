@@ -41,6 +41,12 @@
 #include <kernel/except.h>
 #endif /* __KERNEL__ */
 
+#ifndef __INTELLISENSE__
+#ifdef ARCH_INSTRLEN_SOURCE_FILE
+#include ARCH_INSTRLEN_SOURCE_FILE
+#endif /* ARCH_INSTRLEN_SOURCE_FILE */
+#endif /* !__INTELLISENSE__ */
+
 DECL_BEGIN
 
 #ifdef __KERNEL__
@@ -53,20 +59,20 @@ DECL_BEGIN
 #endif /* !__KERNEL__ */
 
 
-/* #define LIBINSTRLEN_ARCH_HAVE_INSTRUCTION_LENGTH 1 */
-/* #define LIBINSTRLEN_ARCH_HAVE_INSTRUCTION_SUCC 1 */
-/* #define LIBINSTRLEN_ARCH_HAVE_INSTRUCTION_PRED 1 */
-/* #define LIBINSTRLEN_ARCH_HAVE_INSTRUCTION_TRYSUCC 1 */
-/* #define LIBINSTRLEN_ARCH_HAVE_INSTRUCTION_TRYPRED 1 */
+/* #define ARCH_HAVE_INSTRUCTION_LENGTH 1 */
+/* #define ARCH_HAVE_INSTRUCTION_SUCC 1 */
+/* #define ARCH_HAVE_INSTRUCTION_PRED 1 */
+/* #define ARCH_HAVE_INSTRUCTION_TRYSUCC 1 */
+/* #define ARCH_HAVE_INSTRUCTION_TRYPRED 1 */
 
 
 /* Return the length of an instruction that starts at `pc'
  * WARNING: This function may trigger a segmentation fault when `pc' is an invalid pointer.
  * @return: 0 : The pointed-to instruction wasn't recognized. */
-#ifndef LIBINSTRLEN_ARCH_HAVE_INSTRUCTION_LENGTH
+#ifndef ARCH_HAVE_INSTRUCTION_LENGTH
 INTERN ATTR_PURE WUNUSED size_t
 NOTHROW_NCX(CC libil_instruction_length)(void const *pc, instrlen_isa_t isa) {
-#ifdef LIBINSTRLEN_ARCH_HAVE_INSTRUCTION_SUCC
+#ifdef ARCH_HAVE_INSTRUCTION_SUCC
 	byte_t *next_pc;
 	next_pc = libil_instruction_succ(pc, isa);
 	if unlikely(!next_pc)
@@ -80,17 +86,17 @@ NOTHROW_NCX(CC libil_instruction_length)(void const *pc, instrlen_isa_t isa) {
 #error "No way to implement `libil_instruction_length()'"
 #endif /* !... */
 }
-#endif /* !LIBINSTRLEN_ARCH_HAVE_INSTRUCTION_LENGTH */
+#endif /* !ARCH_HAVE_INSTRUCTION_LENGTH */
 
 /* Return a pointer to the successor/predecessor instruction of `pc',
  * assuming that `pc' points to the start of another instruction.
  * WARNING: These functions may trigger a segmentation fault when `pc' is an invalid pointer.
  * @param: isa: The ISA type (s.a. `instrlen_isa_from_Xcpustate()' or `INSTRLEN_ISA_DEFAULT')
  * @return: NULL: The pointed-to instruction wasn't recognized. */
-#ifndef LIBINSTRLEN_ARCH_HAVE_INSTRUCTION_SUCC
+#ifndef ARCH_HAVE_INSTRUCTION_SUCC
 INTDEF ATTR_PURE WUNUSED byte_t *
 NOTHROW_NCX(CC libil_instruction_succ)(void const *pc, instrlen_isa_t isa) {
-#ifdef LIBINSTRLEN_ARCH_HAVE_INSTRUCTION_LENGTH
+#ifdef ARCH_HAVE_INSTRUCTION_LENGTH
 	size_t length;
 	length = libil_instruction_length(pc, isa);
 	if unlikely(!length)
@@ -103,16 +109,16 @@ NOTHROW_NCX(CC libil_instruction_succ)(void const *pc, instrlen_isa_t isa) {
 #error "No way to implement `libil_instruction_succ()'"
 #endif /* !... */
 }
-#endif /* !LIBINSTRLEN_ARCH_HAVE_INSTRUCTION_SUCC */
+#endif /* !ARCH_HAVE_INSTRUCTION_SUCC */
 
-#ifndef LIBINSTRLEN_ARCH_HAVE_INSTRUCTION_PRED
+#ifndef ARCH_HAVE_INSTRUCTION_PRED
 #ifdef LIBINSTRLEN_FIXED_INSTRUCTION_LENGTH
 INTDEF ATTR_PURE WUNUSED byte_t *
 NOTHROW_NCX(CC libil_instruction_pred)(void const *pc, instrlen_isa_t isa) {
 	(void)isa;
 	return (byte_t *)pc - LIBINSTRLEN_FIXED_INSTRUCTION_LENGTH(isa);
 }
-#elif defined(LIBINSTRLEN_ARCH_INSTRUCTION_MAXLENGTH)
+#elif defined(ARCH_INSTRUCTION_MAXLENGTH)
 /* # of instructions to back-track in order to verify that
  * some given instruction point fits into the instruction
  * stream described by surrounding instructions. */
@@ -125,7 +131,7 @@ NOTHROW_NCX(CC libil_instruction_pred)(void const *pc, instrlen_isa_t isa) {
 PRIVATE ATTR_PURE WUNUSED byte_t *
 NOTHROW_NCX(CC predmaxone)(void const *pc, instrlen_isa_t isa) {
 	byte_t *result;
-	result = (byte_t *)pc - LIBINSTRLEN_ARCH_INSTRUCTION_MAXLENGTH;
+	result = (byte_t *)pc - ARCH_INSTRUCTION_MAXLENGTH;
 #ifdef __NON_CALL_EXCEPTIONS
 	TRY
 #endif /* __NON_CALL_EXCEPTIONS */
@@ -152,7 +158,7 @@ NOTHROW_NCX(CC libil_instruction_pred)(void const *pc, instrlen_isa_t isa) {
 	byte_t *rev_iter_next;
 	unsigned int i;
 	rev_iter_curr = (byte_t *)pc;
-	for (i = 0; i < LIBINSTRLEN_ARCH_INSTRUCTION_MAXLENGTH; ++i) {
+	for (i = 0; i < ARCH_INSTRUCTION_MAXLENGTH; ++i) {
 		rev_iter_next = predmaxone(rev_iter_curr, isa);
 		if (!rev_iter_next)
 			break;
@@ -173,14 +179,14 @@ NOTHROW_NCX(CC libil_instruction_pred)(void const *pc, instrlen_isa_t isa) {
 #else /* ... */
 #error "No way to implement `libil_instruction_pred()'"
 #endif /* !... */
-#endif /* !LIBINSTRLEN_ARCH_HAVE_INSTRUCTION_PRED */
+#endif /* !ARCH_HAVE_INSTRUCTION_PRED */
 
 
 /* Same as above, but return pc +/- 1, and discard a SEGFAULT and restore any old
  * exception when `pc' is invalid invalid pointer, or when `arch_instruction_(curr|pred)'
  * would have returned `NULL'.
  * @param: isa: The ISA type (s.a. `instrlen_isa_from_Xcpustate()' or `INSTRLEN_ISA_DEFAULT') */
-#ifndef LIBINSTRLEN_ARCH_HAVE_INSTRUCTION_TRYSUCC
+#ifndef ARCH_HAVE_INSTRUCTION_TRYSUCC
 INTDEF ATTR_PURE WUNUSED byte_t *
 NOTHROW_NCX(CC libil_instruction_trysucc)(void const *pc, instrlen_isa_t isa) {
 	byte_t *result;
@@ -206,9 +212,9 @@ NOTHROW_NCX(CC libil_instruction_trysucc)(void const *pc, instrlen_isa_t isa) {
 		result = (byte_t *)pc + 1;
 	return result;
 }
-#endif /* !LIBINSTRLEN_ARCH_HAVE_INSTRUCTION_TRYSUCC */
+#endif /* !ARCH_HAVE_INSTRUCTION_TRYSUCC */
 
-#ifndef LIBINSTRLEN_ARCH_HAVE_INSTRUCTION_TRYPRED
+#ifndef ARCH_HAVE_INSTRUCTION_TRYPRED
 INTDEF ATTR_PURE WUNUSED byte_t *
 NOTHROW_NCX(CC libil_instruction_trypred)(void const *pc, instrlen_isa_t isa) {
 	byte_t *result;
@@ -234,29 +240,29 @@ NOTHROW_NCX(CC libil_instruction_trypred)(void const *pc, instrlen_isa_t isa) {
 		result = (byte_t *)pc + 1;
 	return result;
 }
-#endif /* !LIBINSTRLEN_ARCH_HAVE_INSTRUCTION_TRYPRED */
+#endif /* !ARCH_HAVE_INSTRUCTION_TRYPRED */
 
 
 
-#ifndef LIBINSTRLEN_ARCH_HAVE_INSTRUCTION_LENGTH
+#ifndef ARCH_HAVE_INSTRUCTION_LENGTH
 DEFINE_PUBLIC_ALIAS(instruction_length, libil_instruction_length);
-#endif /* !LIBINSTRLEN_ARCH_HAVE_INSTRUCTION_LENGTH */
+#endif /* !ARCH_HAVE_INSTRUCTION_LENGTH */
 
-#ifndef LIBINSTRLEN_ARCH_HAVE_INSTRUCTION_SUCC
+#ifndef ARCH_HAVE_INSTRUCTION_SUCC
 DEFINE_PUBLIC_ALIAS(instruction_succ, libil_instruction_succ);
-#endif /* !LIBINSTRLEN_ARCH_HAVE_INSTRUCTION_SUCC */
+#endif /* !ARCH_HAVE_INSTRUCTION_SUCC */
 
-#ifndef LIBINSTRLEN_ARCH_HAVE_INSTRUCTION_PRED
+#ifndef ARCH_HAVE_INSTRUCTION_PRED
 DEFINE_PUBLIC_ALIAS(instruction_pred, libil_instruction_pred);
-#endif /* !LIBINSTRLEN_ARCH_HAVE_INSTRUCTION_PRED */
+#endif /* !ARCH_HAVE_INSTRUCTION_PRED */
 
-#ifndef LIBINSTRLEN_ARCH_HAVE_INSTRUCTION_TRYSUCC
+#ifndef ARCH_HAVE_INSTRUCTION_TRYSUCC
 DEFINE_PUBLIC_ALIAS(instruction_trysucc, libil_instruction_trysucc);
-#endif /* !LIBINSTRLEN_ARCH_HAVE_INSTRUCTION_TRYSUCC */
+#endif /* !ARCH_HAVE_INSTRUCTION_TRYSUCC */
 
-#ifndef LIBINSTRLEN_ARCH_HAVE_INSTRUCTION_TRYPRED
+#ifndef ARCH_HAVE_INSTRUCTION_TRYPRED
 DEFINE_PUBLIC_ALIAS(instruction_trypred, libil_instruction_trypred);
-#endif /* !LIBINSTRLEN_ARCH_HAVE_INSTRUCTION_TRYPRED */
+#endif /* !ARCH_HAVE_INSTRUCTION_TRYPRED */
 
 DECL_END
 

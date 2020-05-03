@@ -20,7 +20,12 @@
 #ifndef GUARD_LIBINSTRLEN_ARCH_I386_CONFIG_H
 #define GUARD_LIBINSTRLEN_ARCH_I386_CONFIG_H 1
 
-#define LIBINSTRLEN_ARCH_HAVE_INSTRUCTION_SUCC 1
-#define LIBINSTRLEN_ARCH_INSTRUCTION_MAXLENGTH 15
+/* Define source files */
+#define ARCH_INSTRLEN_SOURCE_FILE "arch/i386/instrlen.c"
+#define ARCH_INSTRLEN_TEST_FILE   "arch/i386/instrlen.ctest"
+
+/* Define features defined in source files */
+#define ARCH_HAVE_INSTRUCTION_SUCC 1  /* Defined in arch/i386/instrlen.c */
+#define ARCH_INSTRUCTION_MAXLENGTH 15 /* x86 has a max instruction length of 15 bytes. */
 
 #endif /* !GUARD_LIBINSTRLEN_ARCH_I386_CONFIG_H */

@@ -21,70 +21,12 @@
 #define GUARD_LIBINSTRLEN_INSTRLEN_CTEST 1
 #define _KOS_SOURCE 1
 
-#include <hybrid/host.h>
+#include "api.h"
 
-#if defined(__i386__) || defined(__x86_64__)
-#include <hybrid/compiler.h>
-
-#include <kos/except.h>
-#include <kos/types.h>
-#include <system-test/ctest.h>
-
-#include <assert.h>
-#include <dlfcn.h>
-#include <stdlib.h>
-
-#include <libinstrlen/instrlen.h>
-
-DECL_BEGIN
-
-DEFINE_TEST(instrlen_x86_prevent_jcc_regression) {
-	PRIVATE byte_t const code[] = {
-		0x74, 0x01,       /* je    . + 1 */
-		0xa4,             /* movsb */
-		0x5e,             /* popl  %esi */
-		0x5f,             /* popl  %edi */
-		0xc2, 0x0c, 0x00, /* ret   $0xc */
-	};
-	void *libinstrlen;
-	PINSTRUCTION_SUCC instruction_succ;
-	libinstrlen = dlopen(LIBINSTRLEN_LIBRARY_NAME, RTLD_LOCAL);
-	assertf(libinstrlen, "dlerror(): %s", dlerror());
-	*(void **)&instruction_succ = dlsym(libinstrlen, "instruction_succ");
-	assertf(instruction_succ, "dlerror(): %s", dlerror());
-
-#define ASSERT_EQ(a, b)                           \
-	do {                                          \
-		void const *_a = (a), *_b = (b);          \
-		assertf(_a == _b, "%p(+%Iu) == %p(+%Iu)", \
-		        _a, (byte_t *)_a - code,          \
-		        _b, (byte_t *)_b - code);         \
-	} __WHILE0
-	ASSERT_EQ(instruction_succ(code + 0, INSTRLEN_ISA_I386), code + 2); /* je    . + 1 */
-	ASSERT_EQ(instruction_succ(code + 2, INSTRLEN_ISA_I386), code + 3); /* movsb */
-	ASSERT_EQ(instruction_succ(code + 3, INSTRLEN_ISA_I386), code + 4); /* popl  %esi */
-	ASSERT_EQ(instruction_succ(code + 4, INSTRLEN_ISA_I386), code + 5); /* popl  %edi */
-	ASSERT_EQ(instruction_succ(code + 5, INSTRLEN_ISA_I386), code + 8); /* ret   $0xc */
-
-#ifdef __x86_64__
-	ASSERT_EQ(instruction_succ(code + 0, INSTRLEN_ISA_X86_64), code + 2); /* je    . + 1 */
-	ASSERT_EQ(instruction_succ(code + 2, INSTRLEN_ISA_X86_64), code + 3); /* movsb */
-	ASSERT_EQ(instruction_succ(code + 3, INSTRLEN_ISA_X86_64), code + 4); /* popl  %esi */
-	ASSERT_EQ(instruction_succ(code + 4, INSTRLEN_ISA_X86_64), code + 5); /* popl  %edi */
-	ASSERT_EQ(instruction_succ(code + 5, INSTRLEN_ISA_X86_64), code + 8); /* ret   $0xc */
-#else /* __x86_64__ */
-	ASSERT_EQ(instruction_succ(code + 0, INSTRLEN_ISA_8086), code + 2); /* je    . + 1 */
-	ASSERT_EQ(instruction_succ(code + 2, INSTRLEN_ISA_8086), code + 3); /* movsb */
-	ASSERT_EQ(instruction_succ(code + 3, INSTRLEN_ISA_8086), code + 4); /* popl  %esi */
-	ASSERT_EQ(instruction_succ(code + 4, INSTRLEN_ISA_8086), code + 5); /* popl  %edi */
-	ASSERT_EQ(instruction_succ(code + 5, INSTRLEN_ISA_8086), code + 8); /* ret   $0xc */
-#endif /* !__x86_64__ */
-#undef ASSERT_EQ
-
-	dlclose(libinstrlen);
-}
-
-DECL_END
-#endif /* __i386__ || __x86_64__ */
+#ifndef __INTELLISENSE__
+#ifdef ARCH_INSTRLEN_TEST_FILE
+#include ARCH_INSTRLEN_TEST_FILE
+#endif /* ARCH_INSTRLEN_TEST_FILE */
+#endif /* !__INTELLISENSE__ */
 
 #endif /* !GUARD_LIBINSTRLEN_INSTRLEN_CTEST */

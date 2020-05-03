@@ -65,7 +65,7 @@ DECL_BEGIN
 	((opcode) == 0x8f /* AMD XOP */)
 
 
-#define PAIR(a, b) ((a) | (b) << 4)
+#define PAIR(a, b) (a) | (b) << 4
 #define LINE(_0, _1, _2, _3, _4, _5, _6, _7) \
 	PAIR(_0, _1), PAIR(_2, _3), PAIR(_4, _5), PAIR(_6, _7)
 
@@ -445,6 +445,10 @@ if (numberOfExplicitlyDefinedOpcodes >= 0x400) {
 
 print "#define SPECIAL_INSTRUCTION_COUNT", specialOpcodeCount, "/" "* # of instructions that use `I_SPEC' *" "/";
 print "#define NUMBER_OF_EXPLICITLY_DEFINED_OPCODES", numberOfExplicitlyDefinedOpcodes.hex();
+if (common_0f38 !is none)
+	print "#define COMMON_OPCODE_TYPE_0f38xx ", common_0f38;
+if (common_0f3a !is none)
+	print "#define COMMON_OPCODE_TYPE_0f3axx ", common_0f3a;
 
 ]]]*/
 	/* 000000-0000ff */
@@ -517,9 +521,14 @@ print "#define NUMBER_OF_EXPLICITLY_DEFINED_OPCODES", numberOfExplicitlyDefinedO
 
 #define SPECIAL_INSTRUCTION_COUNT 1 /* # of instructions that use `I_SPEC' */
 #define NUMBER_OF_EXPLICITLY_DEFINED_OPCODES 0x200
+#define COMMON_OPCODE_TYPE_0f38xx  I_RM
+#define COMMON_OPCODE_TYPE_0f3axx  I_RM1
 //[[[end]]]
 };
 /* clang-format on */
+
+#undef LINE
+#undef PAIR
 
 /* Make sure that the correct # of opcodes have been defined */
 STATIC_ASSERT(sizeof(optypes) * 2 == NUMBER_OF_EXPLICITLY_DEFINED_OPCODES);
