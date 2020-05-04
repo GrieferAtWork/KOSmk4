@@ -50,16 +50,17 @@ if (gcc_opt.remove("-O3"))
 
 DECL_BEGIN
 
-#define PAGEFAULT_F_PRESENT 0x0001    /* FLAG: The accessed page is present (Check for LOA) */
-#define PAGEFAULT_F_WRITING 0x0002    /* FLAG: The fault happened as a result of a memory write (Check for COW) */
-#define PAGEFAULT_F_USERSPACE 0x0004  /* FLAG: The fault occurred while in user-space */
-#define PAGEFAULT_F_RESBIT 0x0008     /* FLAG: A reserved page bit is set */
-#define PAGEFAULT_F_INSTRFETCH 0x0010 /* FLAG: The fault happened while fetching instructions.     \
-	                                   * NOTE: This flag isn't guarantied to be set, though an     \
-	                                   *       instruction-fetch fault can also easily be detected \
-	                                   *       by comparing `%eip' with `%cr2' */
+#define PAGEFAULT_F_PRESENT     0x0001 /* FLAG: The accessed page is present (Check for LOA) */
+#define PAGEFAULT_F_WRITING     0x0002 /* FLAG: The fault happened as a result of a memory write (Check for COW) */
+#define PAGEFAULT_F_USERSPACE   0x0004 /* FLAG: The fault occurred while in user-space */
+#define PAGEFAULT_F_RESBIT      0x0008 /* FLAG: A reserved page bit is set */
+#define PAGEFAULT_F_INSTRFETCH  0x0010 /* FLAG: The fault happened while fetching instructions.
+                                        * NOTE: This flag isn't guarantied to be set, though an
+                                        *       instruction-fetch fault can also easily be detected
+                                        *       by comparing `%eip' with `%cr2' */
 
-INTERN ATTR_DBGTEXT ATTR_RETNONNULL NONNULL((1)) struct icpustate *NOTHROW(FCALL x86_handle_dbg_pagefault)(struct icpustate *__restrict state, uintptr_t ecode) {
+INTERN ATTR_DBGTEXT ATTR_RETNONNULL NONNULL((1)) struct icpustate *
+NOTHROW(FCALL x86_handle_dbg_pagefault)(struct icpustate *__restrict state, uintptr_t ecode) {
 	/* Use a dedicated #PF handler for the debugger, so-as to prevent crashes arising when
 	 * the debugger is invoked for some kind of problem related to page initialization.
 	 * Also: This way, the debugger accessing memory will never cause disk activity, or
@@ -67,9 +68,7 @@ INTERN ATTR_DBGTEXT ATTR_RETNONNULL NONNULL((1)) struct icpustate *NOTHROW(FCALL
 	uintptr_t pc;
 	void *addr;
 	/* Check for `memcpy_nopf()' */
-	if
-		unlikely(x86_nopf_check(state->ics_irregs.ir_pip))
-	{
+	if unlikely(x86_nopf_check(state->ics_irregs.ir_pip)) {
 		state->ics_irregs.ir_pip = x86_nopf_retof(state->ics_irregs.ir_pip);
 		return state;
 	}
@@ -91,8 +90,7 @@ INTERN ATTR_DBGTEXT ATTR_RETNONNULL NONNULL((1)) struct icpustate *NOTHROW(FCALL
 			goto not_a_badcall;
 		TRY {
 			old_pip = *(uintptr_t *)sp;
-		}
-		EXCEPT {
+		} EXCEPT {
 			if (!was_thrown(E_SEGFAULT))
 				RETHROW();
 			goto not_a_badcall;
@@ -102,7 +100,7 @@ INTERN ATTR_DBGTEXT ATTR_RETNONNULL NONNULL((1)) struct icpustate *NOTHROW(FCALL
 			goto not_a_badcall;
 		icpustate_setpc(state, old_pip);
 		icpustate_setsp(state, sp + 8);
-#else  /* __x86_64__ */
+#else /* __x86_64__ */
 		if (sp != (uintptr_t)(&state->ics_irregs_k + 1) || IS_USER()) {
 			if (old_pip >= KERNELSPACE_BASE)
 				goto not_a_badcall;
@@ -112,16 +110,16 @@ INTERN ATTR_DBGTEXT ATTR_RETNONNULL NONNULL((1)) struct icpustate *NOTHROW(FCALL
 			if (old_pip < KERNELSPACE_BASE)
 				goto not_a_badcall;
 			state->ics_irregs_k.ir_eip = old_pip;
-			state                      = (struct icpustate *)memmoveup((byte_t *)state + sizeof(void *), state,
-                                                  OFFSET_ICPUSTATE_IRREGS +
-                                                  SIZEOF_IRREGS_KERNEL);
+			state = (struct icpustate *)memmoveup((byte_t *)state + sizeof(void *), state,
+			                                      OFFSET_ICPUSTATE_IRREGS +
+			                                      SIZEOF_IRREGS_KERNEL);
 		}
 #endif /* !__x86_64__ */
 		PERTASK_SET(this_exception_faultaddr, (void *)old_pip);
 		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_NOTEXECUTABLE));
 		PERTASK_SET(this_exception_pointers[0], (uintptr_t)addr);
 #if PAGEFAULT_F_USERSPACE == E_SEGFAULT_CONTEXT_USERCODE && \
-PAGEFAULT_F_WRITING == E_SEGFAULT_CONTEXT_WRITING
+    PAGEFAULT_F_WRITING == E_SEGFAULT_CONTEXT_WRITING
 		PERTASK_SET(this_exception_pointers[1],
 		            (uintptr_t)(E_SEGFAULT_CONTEXT_FAULT) |
 		            (uintptr_t)(ecode & (PAGEFAULT_F_USERSPACE | PAGEFAULT_F_WRITING)));
@@ -149,7 +147,7 @@ not_a_badcall:
 	/*set_exception_pointers:*/
 	PERTASK_SET(this_exception_pointers[0], (uintptr_t)addr);
 #if PAGEFAULT_F_USERSPACE == E_SEGFAULT_CONTEXT_USERCODE && \
-PAGEFAULT_F_WRITING == E_SEGFAULT_CONTEXT_WRITING
+    PAGEFAULT_F_WRITING == E_SEGFAULT_CONTEXT_WRITING
 	PERTASK_SET(this_exception_pointers[1],
 	            (uintptr_t)(E_SEGFAULT_CONTEXT_FAULT) |
 	            (uintptr_t)(ecode & (PAGEFAULT_F_USERSPACE | PAGEFAULT_F_WRITING)));
