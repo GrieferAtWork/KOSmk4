@@ -159,6 +159,12 @@ typedef struct __qtime {
 	__CXX_CLASSMEMBER __NOBLOCK void add_seconds64(__uint64_t __n) __THROWS(E_DIVIDE_BY_ZERO) {
 		this->q_jtime += (__uint64_t)__n * HZ;
 	}
+	__CXX_CLASSMEMBER __NOBLOCK void sub_seconds(__uintptr_t __n) __THROWS(E_DIVIDE_BY_ZERO) {
+		this->q_jtime -= (__uint64_t)__n * HZ;
+	}
+	__CXX_CLASSMEMBER __NOBLOCK void sub_seconds64(__uint64_t __n) __THROWS(E_DIVIDE_BY_ZERO) {
+		this->q_jtime -= (__uint64_t)__n * HZ;
+	}
 
 	/* Add milliseconds (1/1_000 seconds) */
 	__CXX_CLASSMEMBER __NOBLOCK void add_milliseconds(__uintptr_t __n) __THROWS(E_DIVIDE_BY_ZERO) {
@@ -166,6 +172,12 @@ typedef struct __qtime {
 		this->q_jtime += __hz_adjusted / 1000;
 		__hz_adjusted %= 1000;
 		this->add_quantum((quantum_diff_t)(__hz_adjusted * this->q_qsize) / 1000);
+	}
+	__CXX_CLASSMEMBER __NOBLOCK void sub_milliseconds(__uintptr_t __n) __THROWS(E_DIVIDE_BY_ZERO) {
+		__uint64_t __hz_adjusted = (__uint64_t)__n * HZ;
+		this->q_jtime -= __hz_adjusted / 1000;
+		__hz_adjusted %= 1000;
+		this->sub_quantum((quantum_diff_t)(__hz_adjusted * this->q_qsize) / 1000);
 	}
 
 	/* Add microseconds (1/1_000_000 seconds) */
@@ -175,6 +187,12 @@ typedef struct __qtime {
 		__hz_adjusted %= 1000000;
 		this->add_quantum((quantum_diff_t)(__hz_adjusted * this->q_qsize) / 1000000);
 	}
+	__CXX_CLASSMEMBER __NOBLOCK void sub_microseconds(__uintptr_t __n) __THROWS(E_DIVIDE_BY_ZERO) {
+		__uint64_t __hz_adjusted = (__uint64_t)__n * HZ;
+		this->q_jtime -= __hz_adjusted / 1000000;
+		__hz_adjusted %= 1000000;
+		this->sub_quantum((quantum_diff_t)(__hz_adjusted * this->q_qsize) / 1000000);
+	}
 
 	/* Add nanoseconds (1/1_000_000_000 seconds) */
 	__CXX_CLASSMEMBER __NOBLOCK void add_nanoseconds(__uintptr_t __n) __THROWS(E_DIVIDE_BY_ZERO) {
@@ -182,6 +200,12 @@ typedef struct __qtime {
 		this->q_jtime += __hz_adjusted / 1000000000;
 		__hz_adjusted %= 1000000000;
 		this->add_quantum((quantum_diff_t)(__hz_adjusted * this->q_qsize) / 1000000000);
+	}
+	__CXX_CLASSMEMBER __NOBLOCK void sub_nanoseconds(__uintptr_t __n) __THROWS(E_DIVIDE_BY_ZERO) {
+		__uint64_t __hz_adjusted = (__uint64_t)__n * HZ;
+		this->q_jtime -= __hz_adjusted / 1000000000;
+		__hz_adjusted %= 1000000000;
+		this->sub_quantum((quantum_diff_t)(__hz_adjusted * this->q_qsize) / 1000000000);
 	}
 
 	__CXX_CLASSMEMBER __NOBLOCK __qtime &operator+=(__qtime const &__other) __CXX_NOEXCEPT {
@@ -207,22 +231,38 @@ typedef struct __qtime {
 		return __res;
 	}
 	__CXX_CLASSMEMBER __NOBLOCK bool operator==(__qtime const &__other) __CXX_NOEXCEPT {
-		return (this->q_jtime == __other.q_jtime) && (((__uint64_t)this->q_qtime * this->q_qsize) == ((__uint64_t)__other.q_qtime * __other.q_qsize));
+		return (this->q_jtime == __other.q_jtime) &&
+		       (((__uint64_t)this->q_qtime * this->q_qsize) ==
+		        ((__uint64_t)__other.q_qtime * __other.q_qsize));
 	}
 	__CXX_CLASSMEMBER __NOBLOCK bool operator!=(__qtime const &__other) __CXX_NOEXCEPT {
-		return (this->q_jtime != __other.q_jtime) || (((__uint64_t)this->q_qtime * this->q_qsize) != ((__uint64_t)__other.q_qtime * __other.q_qsize));
+		return (this->q_jtime != __other.q_jtime) ||
+		       (((__uint64_t)this->q_qtime * this->q_qsize) !=
+		        ((__uint64_t)__other.q_qtime * __other.q_qsize));
 	}
 	__CXX_CLASSMEMBER __NOBLOCK bool operator<(__qtime const &__other) __CXX_NOEXCEPT {
-		return (this->q_jtime < __other.q_jtime) || ((this->q_jtime == __other.q_jtime) && (((__uint64_t)this->q_qtime * this->q_qsize) < ((__uint64_t)__other.q_qtime * __other.q_qsize)));
+		return (this->q_jtime < __other.q_jtime) ||
+		       ((this->q_jtime == __other.q_jtime) &&
+		        (((__uint64_t)this->q_qtime * this->q_qsize) <
+		         ((__uint64_t)__other.q_qtime * __other.q_qsize)));
 	}
 	__CXX_CLASSMEMBER __NOBLOCK bool operator<=(__qtime const &__other) __CXX_NOEXCEPT {
-		return (this->q_jtime < __other.q_jtime) || ((this->q_jtime == __other.q_jtime) && (((__uint64_t)this->q_qtime * this->q_qsize) <= ((__uint64_t)__other.q_qtime * __other.q_qsize)));
+		return (this->q_jtime < __other.q_jtime) ||
+		       ((this->q_jtime == __other.q_jtime) &&
+		        (((__uint64_t)this->q_qtime * this->q_qsize) <=
+		         ((__uint64_t)__other.q_qtime * __other.q_qsize)));
 	}
 	__CXX_CLASSMEMBER __NOBLOCK bool operator>(__qtime const &__other) __CXX_NOEXCEPT {
-		return (this->q_jtime > __other.q_jtime) || ((this->q_jtime == __other.q_jtime) && (((__uint64_t)this->q_qtime * this->q_qsize) > ((__uint64_t)__other.q_qtime * __other.q_qsize)));
+		return (this->q_jtime > __other.q_jtime) ||
+		       ((this->q_jtime == __other.q_jtime) &&
+		        (((__uint64_t)this->q_qtime * this->q_qsize) >
+		         ((__uint64_t)__other.q_qtime * __other.q_qsize)));
 	}
 	__CXX_CLASSMEMBER __NOBLOCK bool operator>=(__qtime const &__other) __CXX_NOEXCEPT {
-		return (this->q_jtime > __other.q_jtime) || ((this->q_jtime == __other.q_jtime) && (((__uint64_t)this->q_qtime * this->q_qsize) >= ((__uint64_t)__other.q_qtime * __other.q_qsize)));
+		return (this->q_jtime > __other.q_jtime) ||
+		       ((this->q_jtime == __other.q_jtime) &&
+		        (((__uint64_t)this->q_qtime * this->q_qsize) >=
+		         ((__uint64_t)__other.q_qtime * __other.q_qsize)));
 	}
 #endif /* __cplusplus && __USE_KOS */
 } qtime_t;

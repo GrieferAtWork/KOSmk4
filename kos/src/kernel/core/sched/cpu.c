@@ -553,7 +553,6 @@ done_wakeup:
 }
 
 
-
 /* Enter a sleeping state and return once being woken (true),
  * or once the given `abs_timeout' (which must be global) expires (false)
  * WARNING: Even if the caller has disabled preemption prior to the call,
@@ -592,19 +591,29 @@ PUBLIC bool NOTHROW(FCALL task_sleep)(struct timespec const *abs_timeout) {
 	struct cpu *mycpu;
 	cpu_assert_integrity();
 	if (abs_timeout) {
-		qtime_t now;
+		struct timespec now;
+		struct timespec offset_from_now;
+		qtime_t quantum_timeout, now_qtime;
 		/* Check if we should immediately time out. */
 		if (!abs_timeout->tv_sec && !abs_timeout->tv_nsec)
 			goto do_return_false;
 		PREEMPTION_DISABLE();
-		me->t_sched.s_asleep.ss_timeout = realtime_to_cpu_quantum_time_nopr(abs_timeout);
-		now = cpu_quantum_time();
+		now       = realtime();
+		now_qtime = cpu_quantum_time();
+		if (*abs_timeout <= now)
+			goto do_return_false;
+		offset_from_now = *abs_timeout - now;
+		quantum_timeout = now_qtime;
+		quantum_timeout.add_seconds(offset_from_now.tv_sec);
+		quantum_timeout.add_nanoseconds(offset_from_now.tv_nsec);
 		/* Check if the given timeout has already expired. */
-		if (now >= me->t_sched.s_asleep.ss_timeout) {
+		if (now_qtime >= quantum_timeout) {
 do_return_false:
 			PREEMPTION_ENABLE();
 			return false;
 		}
+		/* Save the timeout to-be used. */
+		me->t_sched.s_asleep.ss_timeout = quantum_timeout;
 	} else {
 		me->t_sched.s_asleep.ss_timeout.q_jtime = (jtime_t)-1;
 		me->t_sched.s_asleep.ss_timeout.q_qtime = 0;

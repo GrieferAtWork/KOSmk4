@@ -274,16 +274,22 @@ NOTHROW(FCALL cpu_quantum_time_to_realtime_nopr)(qtime_t const *__restrict qtime
 
 PUBLIC NOBLOCK NOPREEMPT WUNUSED ATTR_PURE qtime_t
 NOTHROW(FCALL realtime_to_cpu_quantum_time_nopr)(struct timespec const *__restrict tms) {
-	/* XXX: This is very imprecise, but this function will go away once qtime_t gets removed! */
 	struct timespec now;
-	struct timespec offset_from_now;
 	qtime_t result, now_qtime;
-	now             = realtime();
-	now_qtime       = cpu_quantum_time();
-	offset_from_now = *tms - now;
-	result          = now_qtime;
-	result.add_seconds(offset_from_now.tv_sec);
-	result.add_nanoseconds(offset_from_now.tv_nsec);
+	now       = realtime();
+	now_qtime = cpu_quantum_time();
+	result    = now_qtime;
+	if (*tms <= now) {
+		struct timespec offset_to_now;
+		offset_to_now = now - *tms;
+		result.sub_seconds(offset_to_now.tv_sec);
+		result.sub_nanoseconds(offset_to_now.tv_nsec);
+	} else {
+		struct timespec offset_from_now;
+		offset_from_now = *tms - now;
+		result.add_seconds(offset_from_now.tv_sec);
+		result.add_nanoseconds(offset_from_now.tv_nsec);
+	}
 	return result;
 }
 
