@@ -323,7 +323,8 @@ DEFINE_DEBUG_FUNCTION(
 	uintptr_t addr, current_pc, count;
 	struct disassembler da;
 	current_pc = dbg_getpcreg(DBG_REGLEVEL_VIEW);
-	current_pc = (uintptr_t)instruction_trypred((void const *)current_pc);
+	current_pc = (uintptr_t)instruction_trypred((void const *)current_pc,
+	                                            dbg_instrlen_isa(DBG_REGLEVEL_VIEW));
 	addr = current_pc;
 	if (argc >= 2) {
 		if (!dbg_evaladdr(argv[1], &addr))
@@ -351,13 +352,14 @@ DEFINE_DEBUG_FUNCTION(
 		argc, argv) {
 	uintptr_t addr, current_pc, length;
 	current_pc = dbg_getpcreg(DBG_REGLEVEL_VIEW);
-	current_pc = (uintptr_t)instruction_trypred((void const *)current_pc);
+	current_pc = (uintptr_t)instruction_trypred((void const *)current_pc,
+	                                            dbg_instrlen_isa(DBG_REGLEVEL_VIEW));
 	addr = current_pc;
 	if (argc >= 2) {
 		if (!dbg_evaladdr(argv[1], &addr))
 			return DBG_FUNCTION_INVALID_ARGUMENTS;
 	}
-	length = instruction_length((void *)addr);
+	length = instruction_length((void *)addr, INSTRLEN_ISA_DEFAULT);
 	dbg_printf(DBGSTR("%Iu\n"), length);
 	return 0;
 }
@@ -388,7 +390,8 @@ DEFINE_DEBUG_FUNCTION_EX(
 #ifdef LOG_STACK_REMAINDER
 	last_good_sp = fcpustate_getsp(&state);
 #endif /* LOG_STACK_REMAINDER */
-	dbg_addr2line_printf((uintptr_t)instruction_trypred((void const *)fcpustate_getpc(&state)),
+	dbg_addr2line_printf((uintptr_t)instruction_trypred((void const *)fcpustate_getpc(&state),
+	                                                    instrlen_isa_from_fcpustate(&state)),
 	                     (uintptr_t)fcpustate_getpc(&state),
 	                     DBGSTR("sp=%p"), (void *)fcpustate_getsp(&state));
 	for (;;) {
@@ -399,7 +402,8 @@ DEFINE_DEBUG_FUNCTION_EX(
 		               &unwind_setreg_fcpustate, &state);
 		if (error != UNWIND_SUCCESS)
 			break;
-		dbg_addr2line_printf((uintptr_t)instruction_trypred((void const *)fcpustate_getpc(&state)),
+		dbg_addr2line_printf((uintptr_t)instruction_trypred((void const *)fcpustate_getpc(&state),
+		                                                    instrlen_isa_from_fcpustate(&state)),
 		                     (uintptr_t)fcpustate_getpc(&state), DBGSTR("sp=%p"),
 		                     (void *)fcpustate_getsp(&state));
 #ifdef LOG_STACK_REMAINDER
@@ -440,7 +444,7 @@ DEFINE_DEBUG_FUNCTION_EX(
 					dbg_printf(DBGSTR("Analyzing remainder of stack:\n"));
 					is_first = false;
 				}
-				dbg_addr2line_printf((uintptr_t)instruction_trypred(pc),
+				dbg_addr2line_printf((uintptr_t)instruction_trypred(pc, instrlen_isa_from_fcpustate(&state)),
 				                     (uintptr_t)pc, DBGSTR("pc@%p"),
 				                     iter);
 			}
@@ -468,12 +472,12 @@ DEFINE_DEBUG_FUNCTION_EX(
 	               &unwind_setreg_fcpustate, &newstate);
 	if (error != UNWIND_SUCCESS) {
 		dbg_printf(DBGSTR("Unwind failure: %u\n"), error);
-		final_pc = (void *)fcpustate_getpc(&oldstate);
+		memcpy(&newstate, &oldstate, sizeof(struct fcpustate));
 	} else {
 		dbg_setallregs(DBG_REGLEVEL_VIEW, &newstate);
-		final_pc = (void *)fcpustate_getpc(&newstate);
 	}
-	dbg_addr2line_printf((uintptr_t)instruction_trypred(final_pc),
+	final_pc = (void *)fcpustate_getpc(&newstate);
+	dbg_addr2line_printf((uintptr_t)instruction_trypred(final_pc, instrlen_isa_from_fcpustate(&newstate)),
 	                     (uintptr_t)final_pc,
 	                     DBGSTR("sp=%p"),
 	                     (void *)final_pc);
@@ -488,16 +492,18 @@ DEFINE_DEBUG_FUNCTION(
 		"\tPrint the source location name for the given ADDR\n",
 		argc, argv) {
 	uintptr_t addr, current_pc;
+	instrlen_isa_t isa;
+	isa = dbg_instrlen_isa(DBG_REGLEVEL_VIEW);
 again:
 	--argc;
 	++argv;
 	current_pc = dbg_getpcreg(DBG_REGLEVEL_VIEW);
-	current_pc = (uintptr_t)instruction_trypred((void const *)current_pc);
+	current_pc = (uintptr_t)instruction_trypred((void const *)current_pc, isa);
 	addr = current_pc;
 	if (argc >= 1) {
 		if (!dbg_evaladdr(argv[0], &addr))
 			return DBG_FUNCTION_INVALID_ARGUMENTS;
-		current_pc = (uintptr_t)instruction_trysucc((void const *)addr);
+		current_pc = (uintptr_t)instruction_trysucc((void const *)addr, isa);
 	}
 	dbg_addr2line_printf((uintptr_t)addr, (uintptr_t)current_pc, NULL);
 	if (argc > 1)

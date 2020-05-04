@@ -21,8 +21,12 @@
 #define _I386_KOS_LIBREGDUMP_X86_H 1
 
 #include <libregdump/api.h>
-#include <libregdump/printer.h>
+/**/
+
 #include <bits/types.h>
+
+#include <libinstrlen/bits/isa.h>
+#include <libregdump/printer.h>
 
 /* Print a human-readable dump of all of the registers within the given cpu-state/context. */
 
@@ -128,7 +132,7 @@ LIBREGDUMP_DECL __ATTR_NONNULL((1)) __ssize_t LIBREGDUMP_CC regdump_sreg(struct 
 /* Print the eflags/rflags register */
 LIBREGDUMP_DECL __ATTR_NONNULL((1)) __ssize_t LIBREGDUMP_CC regdump_flags(struct regdump_printer *__restrict __self, __uintptr_t __flags);
 /* Print the InstructionPointer register. */
-LIBREGDUMP_DECL __ATTR_NONNULL((1)) __ssize_t LIBREGDUMP_CC regdump_ip(struct regdump_printer *__restrict __self, __uintptr_t __ip);
+LIBREGDUMP_DECL __ATTR_NONNULL((1)) __ssize_t LIBREGDUMP_CC regdump_ip(struct regdump_printer *__restrict __self, __uintptr_t __ip, instrlen_isa_t __isa);
 LIBREGDUMP_DECL __ATTR_NONNULL((1, 2)) __ssize_t LIBREGDUMP_CC regdump_gdt(struct regdump_printer *__restrict __self, struct desctab const *__restrict __gdt);
 LIBREGDUMP_DECL __ATTR_NONNULL((1, 2)) __ssize_t LIBREGDUMP_CC regdump_idt(struct regdump_printer *__restrict __self, struct desctab const *__restrict __idt);
 

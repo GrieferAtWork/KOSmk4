@@ -423,7 +423,8 @@ NOTHROW(KCALL print_unhandled_exception)(pformatprinter printer, void *arg,
 	rd_printer.rdp_printer_arg = arg;
 	rd_printer.rdp_format      = &indent_regdump_print_format;
 	regdump_gpregs(&rd_printer, &info->ei_state.kcs_gpregs);
-	regdump_ip(&rd_printer, kcpustate_getpc(&info->ei_state));
+	regdump_ip(&rd_printer, kcpustate_getpc(&info->ei_state),
+	           instrlen_isa_from_kcpustate(&info->ei_state));
 	regdump_flags(&rd_printer, kcpustate_getpflags(&info->ei_state));
 	(*printer)(arg, "\n", 1);
 	is_first_pointer = true;
@@ -440,14 +441,16 @@ NOTHROW(KCALL print_unhandled_exception)(pformatprinter printer, void *arg,
 		              info->ei_data.e_pointers[i]);
 	}
 	addr2line_printf(tb_printer, tb_arg,
-	                 (uintptr_t)instruction_trypred((void const *)kcpustate_getpc(&info->ei_state)),
+	                 (uintptr_t)instruction_trypred((void const *)kcpustate_getpc(&info->ei_state),
+	                                                instrlen_isa_from_kcpustate(&info->ei_state)),
 	                 kcpustate_getpc(&info->ei_state), "Thrown here");
 #if EXCEPT_BACKTRACE_SIZE != 0
 	for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i) {
 		if (!info->ei_trace[i])
 			break;
 		addr2line_printf(tb_printer, tb_arg,
-		                 (uintptr_t)instruction_trypred(info->ei_trace[i]),
+		                 (uintptr_t)instruction_trypred(info->ei_trace[i],
+		                                                instrlen_isa_from_kcpustate(&info->ei_state)),
 		                 (uintptr_t)info->ei_trace[i], "Called here");
 	}
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
@@ -486,6 +489,7 @@ panic_uhe_dbg_main(unsigned int unwind_error,
 	unsigned int i;
 	bool is_first_pointer;
 	char const *name;
+	instrlen_isa_t isa;
 	dbg_printf(DBGSTR(DF_COLOR(DBG_COLOR_WHITE, DBG_COLOR_MAROON, "Unhandled exception") " "
 	                  DF_WHITE("%.4I16X") " " DF_WHITE("%.4I16X")),
 	           info->ei_class, info->ei_subclass);
@@ -510,14 +514,15 @@ panic_uhe_dbg_main(unsigned int unwind_error,
 		           info->ei_data.e_pointers[i],
 		           info->ei_data.e_pointers[i]);
 	}
-	dbg_addr2line_printf((uintptr_t)instruction_trypred((void const *)kcpustate_getpc(&info->ei_state)),
+	isa = instrlen_isa_from_kcpustate(&info->ei_state);
+	dbg_addr2line_printf((uintptr_t)instruction_trypred((void const *)kcpustate_getpc(&info->ei_state), isa),
 	                     kcpustate_getpc(&info->ei_state),
 	                     DBGSTR("Thrown here"));
 #if EXCEPT_BACKTRACE_SIZE != 0
 	for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i) {
 		if (!info->ei_trace[i])
 			break;
-		dbg_addr2line_printf((uintptr_t)instruction_trypred(info->ei_trace[i]),
+		dbg_addr2line_printf((uintptr_t)instruction_trypred(info->ei_trace[i], isa),
 		                     (uintptr_t)info->ei_trace[i],
 		                     DBGSTR("Called here"));
 	}
@@ -530,13 +535,14 @@ panic_uhe_dbg_main(unsigned int unwind_error,
 			if (!info->ei_trace[i])
 				break;
 		}
-		prev_last_pc = i ? (uintptr_t)info->ei_trace[i - 1] : kcpustate_getpc(&info->ei_state);
+		prev_last_pc = i ? (uintptr_t)info->ei_trace[i - 1]
+		                 : kcpustate_getpc(&info->ei_state);
 		if (!my_last_pc) {
 			my_last_pc = prev_last_pc;
 		} else if (my_last_pc != prev_last_pc) {
 			dbg_print(DBGSTR("...\n"));
 			addr2line_printf(&syslog_printer, SYSLOG_LEVEL_RAW,
-			                 (uintptr_t)instruction_trypred((void const *)my_last_pc),
+			                 (uintptr_t)instruction_trypred((void const *)my_last_pc, isa),
 			                 my_last_pc,
 			                 DBGSTR("Traceback ends here"));
 		}
@@ -545,7 +551,7 @@ panic_uhe_dbg_main(unsigned int unwind_error,
 	if (unwind_error == UNWIND_SUCCESS) {
 		dbg_printf(DBGSTR("Unwinding stopped when " DF_FGCOLOR(DBG_COLOR_PURPLE, "NOTHROW")
 		                  "() function " "%[vinfo:" DF_WHITE("%n") "] was reached\n"),
-		           instruction_trypred((void const *)last_pc));
+		           instruction_trypred((void const *)last_pc, isa));
 	} else if (unwind_error != UNWIND_NO_FRAME) {
 		dbg_printf(DBGSTR(DF_COLOR(DBG_COLOR_WHITE, DBG_COLOR_MAROON, "Unwinding failed")
 		                  ": " DF_WHITE("%u") "\n"),
@@ -565,7 +571,10 @@ INTERN ATTR_COLD void FCALL
 halt_unhandled_exception(unsigned int unwind_error,
                          struct kcpustate *__restrict unwind_state) {
 	struct exception_info *info;
-	uintptr_t last_pc = kcpustate_getpc(unwind_state);
+	uintptr_t last_pc;
+	instrlen_isa_t isa;
+	last_pc = kcpustate_getpc(unwind_state);
+	isa     = instrlen_isa_from_kcpustate(unwind_state);
 	printk(KERN_RAW "\n\n\n");
 	print_unhandled_exception(&syslog_printer, SYSLOG_LEVEL_EMERG,
 	                          &syslog_printer, SYSLOG_LEVEL_RAW,
@@ -587,7 +596,7 @@ halt_unhandled_exception(unsigned int unwind_error,
 		else if (my_last_pc != prev_last_pc) {
 			printk(KERN_RAW "...\n");
 			addr2line_printf(&syslog_printer, SYSLOG_LEVEL_RAW,
-			                 (uintptr_t)instruction_trypred((void const *)my_last_pc),
+			                 (uintptr_t)instruction_trypred((void const *)my_last_pc, isa),
 			                 my_last_pc, "Traceback ends here");
 		}
 	}
@@ -596,7 +605,7 @@ halt_unhandled_exception(unsigned int unwind_error,
 		printk(KERN_EMERG
 		       "Unwinding stopped when NOTHROW() function "
 		       "`%[vinfo:%n:%p]:%p' was reached (see last traceback entry)\n",
-		       instruction_trypred((void const *)last_pc), last_pc);
+		       instruction_trypred((void const *)last_pc, isa), last_pc);
 	} else if (unwind_error != UNWIND_NO_FRAME) {
 		printk(KERN_EMERG "Unwinding failed: %u\n", unwind_error);
 	}

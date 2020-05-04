@@ -94,7 +94,7 @@ NOTHROW_NCX(CC libil_instruction_length)(void const *pc, instrlen_isa_t isa) {
  * @param: isa: The ISA type (s.a. `instrlen_isa_from_Xcpustate()' or `INSTRLEN_ISA_DEFAULT')
  * @return: NULL: The pointed-to instruction wasn't recognized. */
 #ifndef ARCH_HAVE_INSTRUCTION_SUCC
-INTDEF ATTR_PURE WUNUSED byte_t *
+INTERN ATTR_PURE WUNUSED byte_t *
 NOTHROW_NCX(CC libil_instruction_succ)(void const *pc, instrlen_isa_t isa) {
 #ifdef ARCH_HAVE_INSTRUCTION_LENGTH
 	size_t length;
@@ -113,7 +113,7 @@ NOTHROW_NCX(CC libil_instruction_succ)(void const *pc, instrlen_isa_t isa) {
 
 #ifndef ARCH_HAVE_INSTRUCTION_PRED
 #ifdef LIBINSTRLEN_FIXED_INSTRUCTION_LENGTH
-INTDEF ATTR_PURE WUNUSED byte_t *
+INTERN ATTR_PURE WUNUSED byte_t *
 NOTHROW_NCX(CC libil_instruction_pred)(void const *pc, instrlen_isa_t isa) {
 	(void)isa;
 	return (byte_t *)pc - LIBINSTRLEN_FIXED_INSTRUCTION_LENGTH(isa);
@@ -152,7 +152,7 @@ NOTHROW_NCX(CC predmaxone)(void const *pc, instrlen_isa_t isa) {
 	return NULL;
 }
 
-INTDEF ATTR_PURE WUNUSED byte_t *
+INTERN ATTR_PURE WUNUSED byte_t *
 NOTHROW_NCX(CC libil_instruction_pred)(void const *pc, instrlen_isa_t isa) {
 	byte_t *rev_iter_curr;
 	byte_t *rev_iter_next;
@@ -182,13 +182,13 @@ NOTHROW_NCX(CC libil_instruction_pred)(void const *pc, instrlen_isa_t isa) {
 #endif /* !ARCH_HAVE_INSTRUCTION_PRED */
 
 
-/* Same as above, but return pc +/- 1, and discard a SEGFAULT and restore any old
- * exception when `pc' is invalid invalid pointer, or when `arch_instruction_(curr|pred)'
- * would have returned `NULL'.
+
+/* Same as above, but handle E_SEGFAULT (and E_WOULDBLOCK in kernel-space) by returning `NULL'
+ * Other exceptions are propagated normally (which could happen due to VIO access emulation)
  * @param: isa: The ISA type (s.a. `instrlen_isa_from_Xcpustate()' or `INSTRLEN_ISA_DEFAULT') */
-#ifndef ARCH_HAVE_INSTRUCTION_TRYSUCC
-INTDEF ATTR_PURE WUNUSED byte_t *
-NOTHROW_NCX(CC libil_instruction_trysucc)(void const *pc, instrlen_isa_t isa) {
+#ifndef ARCH_HAVE_INSTRUCTION_SUCC_NX
+INTERN ATTR_PURE WUNUSED byte_t *
+NOTHROW_NCX(CC libil_instruction_succ_nx)(void const *pc, instrlen_isa_t isa) {
 	byte_t *result;
 #ifdef __NON_CALL_EXCEPTIONS
 	struct exception_info old_info;
@@ -208,15 +208,13 @@ NOTHROW_NCX(CC libil_instruction_trysucc)(void const *pc, instrlen_isa_t isa) {
 	/* Restore old exception */
 	memcpy(error_info(), &old_info, sizeof(struct exception_info));
 #endif /* __NON_CALL_EXCEPTIONS */
-	if unlikely(!result)
-		result = (byte_t *)pc + 1;
 	return result;
 }
-#endif /* !ARCH_HAVE_INSTRUCTION_TRYSUCC */
+#endif /* !ARCH_HAVE_INSTRUCTION_SUCC_NX */
 
-#ifndef ARCH_HAVE_INSTRUCTION_TRYPRED
-INTDEF ATTR_PURE WUNUSED byte_t *
-NOTHROW_NCX(CC libil_instruction_trypred)(void const *pc, instrlen_isa_t isa) {
+#ifndef ARCH_HAVE_INSTRUCTION_PRED_NX
+INTERN ATTR_PURE WUNUSED byte_t *
+NOTHROW_NCX(CC libil_instruction_pred_nx)(void const *pc, instrlen_isa_t isa) {
 	byte_t *result;
 #ifdef __NON_CALL_EXCEPTIONS
 	struct exception_info old_info;
@@ -236,6 +234,30 @@ NOTHROW_NCX(CC libil_instruction_trypred)(void const *pc, instrlen_isa_t isa) {
 	/* Restore old exception */
 	memcpy(error_info(), &old_info, sizeof(struct exception_info));
 #endif /* __NON_CALL_EXCEPTIONS */
+	return result;
+}
+#endif /* !ARCH_HAVE_INSTRUCTION_PRED_NX */
+
+
+
+/* Same as `instruction_(succ|pred)_nx', but return pc +/- 1 instead of NULL.
+ * @param: isa: The ISA type (s.a. `instrlen_isa_from_Xcpustate()' or `INSTRLEN_ISA_DEFAULT') */
+#ifndef ARCH_HAVE_INSTRUCTION_TRYSUCC
+INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED byte_t *
+NOTHROW_NCX(CC libil_instruction_trysucc)(void const *pc, instrlen_isa_t isa) {
+	byte_t *result;
+	result = libil_instruction_succ_nx(pc, isa);
+	if unlikely(!result)
+		result = (byte_t *)pc + 1;
+	return result;
+}
+#endif /* !ARCH_HAVE_INSTRUCTION_TRYSUCC */
+
+#ifndef ARCH_HAVE_INSTRUCTION_TRYPRED
+INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED byte_t *
+NOTHROW_NCX(CC libil_instruction_trypred)(void const *pc, instrlen_isa_t isa) {
+	byte_t *result;
+	result = libil_instruction_pred_nx(pc, isa);
 	if unlikely(!result)
 		result = (byte_t *)pc + 1;
 	return result;
@@ -255,6 +277,14 @@ DEFINE_PUBLIC_ALIAS(instruction_succ, libil_instruction_succ);
 #ifndef ARCH_HAVE_INSTRUCTION_PRED
 DEFINE_PUBLIC_ALIAS(instruction_pred, libil_instruction_pred);
 #endif /* !ARCH_HAVE_INSTRUCTION_PRED */
+
+#ifndef ARCH_HAVE_INSTRUCTION_SUCC_NX
+DEFINE_PUBLIC_ALIAS(instruction_succ_nx, libil_instruction_succ_nx);
+#endif /* !ARCH_HAVE_INSTRUCTION_SUCC_NX */
+
+#ifndef ARCH_HAVE_INSTRUCTION_PRED_NX
+DEFINE_PUBLIC_ALIAS(instruction_pred_nx, libil_instruction_pred_nx);
+#endif /* !ARCH_HAVE_INSTRUCTION_PRED_NX */
 
 #ifndef ARCH_HAVE_INSTRUCTION_TRYSUCC
 DEFINE_PUBLIC_ALIAS(instruction_trysucc, libil_instruction_trysucc);

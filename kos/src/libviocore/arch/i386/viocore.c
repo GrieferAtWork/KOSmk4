@@ -132,9 +132,9 @@ libviocore_complete_except(struct vio_emulate_args *__restrict self,
 	}
 	/* Fix-up the PC register and fill in the fault address */
 	{
-		void const *pc, *next_pc;
-		pc      = (void const *)CS(getpc)(self->vea_args.va_state);
-		next_pc = instruction_succ(pc);
+		byte_t *pc, *next_pc;
+		pc      = (byte_t *)CS(getpc)(self->vea_args.va_state);
+		next_pc = instruction_succ_nx(pc, _CS(instrlen_isa_from)(self->vea_args.va_state));
 		data->e_faultaddr = (void *)pc;
 		if (next_pc)
 			CS(setpc)(self->vea_args.va_state, (uintptr_t)next_pc);
@@ -1913,10 +1913,10 @@ libviocore_throw_unknown_instruction(struct vio_emulate_args *__restrict self,
                                      uintptr_t ptr3, uintptr_t ptr4,
                                      uintptr_t ptr5, uintptr_t ptr6) {
 	struct exception_data *data;
-	void const *pc, *next_pc;
+	byte_t *pc, *next_pc;
 	unsigned int i;
-	pc      = (void const *)CS(getpc)(self->vea_args.va_state);
-	next_pc = instruction_succ(pc);
+	pc      = (byte_t *)CS(getpc)(self->vea_args.va_state);
+	next_pc = instruction_succ_nx(pc, _CS(instrlen_isa_from)(self->vea_args.va_state));
 	if (next_pc)
 		CS(setpc)(self->vea_args.va_state, (uintptr_t)next_pc);
 #ifdef __KERNEL__
@@ -1949,10 +1949,10 @@ libviocore_throw_exception(struct vio_emulate_args *__restrict self,
                            error_code_t code, uintptr_t ptr0,
                            uintptr_t ptr1, uintptr_t ptr2) {
 	struct exception_data *data;
-	void const *pc, *next_pc;
+	byte_t *pc, *next_pc;
 	unsigned int i;
-	pc      = (void const *)CS(getpc)(self->vea_args.va_state);
-	next_pc = instruction_succ(pc);
+	pc      = (byte_t *)CS(getpc)(self->vea_args.va_state);
+	next_pc = instruction_succ_nx(pc, _CS(instrlen_isa_from)(self->vea_args.va_state));
 	if (next_pc)
 		CS(setpc)(self->vea_args.va_state, (uintptr_t)next_pc);
 	data                = error_data();

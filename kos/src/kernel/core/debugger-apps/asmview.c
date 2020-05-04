@@ -194,14 +194,13 @@ NOTHROW(FCALL av_instr_pred_n)(void *addr, unsigned int n) {
 
 #else /* CONFIG_ASMVIEW_INSTRLEN_USE_DISASM_PRINTER */
 
-#define av_instr_succ(addr) ((void *)instruction_trysucc(addr))
-#define av_instr_pred(addr) ((void *)instruction_trypred(addr))
+#define av_instr_succ(addr) ((void *)instruction_trysucc(addr, INSTRLEN_ISA_DEFAULT))
+#define av_instr_pred(addr) ((void *)instruction_trypred(addr, INSTRLEN_ISA_DEFAULT))
 
 PRIVATE ATTR_DBGTEXT void *
 NOTHROW(FCALL av_instr_pred_n)(void *addr, unsigned int n) {
-	while (n--) {
-		addr = (void *)instruction_trypred(addr);
-	}
+	while (n--)
+		addr = (void *)instruction_trypred(addr, INSTRLEN_ISA_DEFAULT);
 	return addr;
 }
 

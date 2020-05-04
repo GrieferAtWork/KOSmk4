@@ -41,15 +41,25 @@ INTDEF ATTR_PURE WUNUSED size_t NOTHROW_NCX(CC libil_instruction_length)(void co
  * WARNING: These functions may trigger a segmentation fault when `pc' is an invalid pointer.
  * @param: isa: The ISA type (s.a. `instrlen_isa_from_Xcpustate()' or `INSTRLEN_ISA_DEFAULT')
  * @return: NULL: The pointed-to instruction wasn't recognized. */
-INTDEF ATTR_PURE WUNUSED byte_t *NOTHROW_NCX(CC libil_instruction_succ)(void const *pc, instrlen_isa_t isa);
-INTDEF ATTR_PURE WUNUSED byte_t *NOTHROW_NCX(CC libil_instruction_pred)(void const *pc, instrlen_isa_t isa);
+INTDEF ATTR_PURE WUNUSED byte_t *
+NOTHROW_NCX(CC libil_instruction_succ)(void const *pc, instrlen_isa_t isa);
+INTDEF ATTR_PURE WUNUSED byte_t *
+NOTHROW_NCX(CC libil_instruction_pred)(void const *pc, instrlen_isa_t isa);
 
-/* Same as above, but return pc +/- 1, and discard a SEGFAULT and restore any old
- * exception when `pc' is invalid invalid pointer, or when `arch_instruction_(curr|pred)'
- * would have returned `NULL'.
+/* Same as above, but handle E_SEGFAULT (and E_WOULDBLOCK in kernel-space) by returning `NULL'
+ * Other exceptions are propagated normally (which could happen due to VIO access emulation)
  * @param: isa: The ISA type (s.a. `instrlen_isa_from_Xcpustate()' or `INSTRLEN_ISA_DEFAULT') */
-INTDEF ATTR_PURE WUNUSED byte_t *NOTHROW_NCX(CC libil_instruction_trysucc)(void const *pc, instrlen_isa_t isa);
-INTDEF ATTR_PURE WUNUSED byte_t *NOTHROW_NCX(CC libil_instruction_trypred)(void const *pc, instrlen_isa_t isa);
+INTDEF ATTR_PURE WUNUSED byte_t *
+NOTHROW_NCX(CC libil_instruction_succ_nx)(void const *pc, instrlen_isa_t isa);
+INTDEF ATTR_PURE WUNUSED byte_t *
+NOTHROW_NCX(CC libil_instruction_pred_nx)(void const *pc, instrlen_isa_t isa);
+
+/* Same as `instruction_(succ|pred)_nx', but return pc +/- 1 instead of NULL.
+ * @param: isa: The ISA type (s.a. `instrlen_isa_from_Xcpustate()' or `INSTRLEN_ISA_DEFAULT') */
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED byte_t *
+NOTHROW_NCX(CC libil_instruction_trysucc)(void const *pc, instrlen_isa_t isa);
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED byte_t *
+NOTHROW_NCX(CC libil_instruction_trypred)(void const *pc, instrlen_isa_t isa);
 
 
 DECL_END

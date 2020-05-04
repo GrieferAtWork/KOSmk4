@@ -1096,26 +1096,26 @@ DEFINE_LIBRARY_OPEN(open_libdisasm, pdyn_libdisasm, LIBDISASM_LIBRARY_NAME)
 PRIVATE PDEBUG_DLLOCKSECTIONS     pdyn_debug_dllocksections     = NULL;
 PRIVATE PDEBUG_DLUNLOCKSECTIONS   pdyn_debug_dlunlocksections   = NULL;
 PRIVATE PDEBUG_SECTIONS_ADDR2LINE pdyn_debug_sections_addr2line = NULL;
-PRIVATE PINSTRUCTION_PRED         pdyn_instruction_pred         = NULL;
+PRIVATE PINSTRUCTION_PRED_NX      pdyn_instruction_pred_nx      = NULL;
 PRIVATE PDISASM_SINGLE            pdyn_disasm_single            = NULL;
 #define debug_dllocksections     (*pdyn_debug_dllocksections)
 #define debug_dlunlocksections   (*pdyn_debug_dlunlocksections)
 #define debug_sections_addr2line (*pdyn_debug_sections_addr2line)
-#define instruction_pred         (*pdyn_instruction_pred)
+#define instruction_pred_nx      (*pdyn_instruction_pred_nx)
 #define disasm_single            (*pdyn_disasm_single)
 
 #define ENSURE_LIBINSTRLEN() ensure_libinstrlen()
 PRIVATE bool CC ensure_libinstrlen(void) {
 	void *libinstrlen;
-	if (pdyn_instruction_pred)
+	if (pdyn_instruction_pred_nx)
 		return true;
 	libinstrlen = open_libinstrlen();
 	if unlikely(!libinstrlen)
 		return false;
 	COMPILER_WRITE_BARRIER();
-	*(void **)&pdyn_instruction_pred = dlsym(libinstrlen, "instruction_pred");
+	*(void **)&pdyn_instruction_pred_nx = dlsym(libinstrlen, "instruction_pred_nx");
 	COMPILER_WRITE_BARRIER();
-	return pdyn_instruction_pred != NULL;
+	return pdyn_instruction_pred_nx != NULL;
 }
 
 #define ENSURE_LIBDEBUGINFO() ensure_libdebuginfo()
@@ -1206,7 +1206,7 @@ libregdump_do_ip_addr2line_info(struct regdump_printer *__restrict self,
 /* Print the InstructionPointer register. */
 INTERN NONNULL((1)) ssize_t CC
 libregdump_ip(struct regdump_printer *__restrict self,
-              uintptr_t ip) {
+              uintptr_t ip, instrlen_isa_t isa) {
 	BEGIN;
 	format(REGDUMP_FORMAT_INDENT);
 	format(REGDUMP_FORMAT_REGISTER_PREFIX);
@@ -1217,25 +1217,12 @@ libregdump_ip(struct regdump_printer *__restrict self,
 	printf("%p", ip);
 	format(REGDUMP_FORMAT_VALUE_SUFFIX);
 	{
-		uintptr_t prev_ip;
+		uintptr_t prev_ip = 0;
 		bool did_lf_after_eip = false;
-		if (ENSURE_LIBINSTRLEN()) {
-			struct exception_info saved_except;
-			memcpy(&saved_except, error_info(), sizeof(saved_except));
-			TRY {
-				prev_ip = (uintptr_t)instruction_pred((void const *)ip);
-			} EXCEPT {
-				prev_ip = ip;
-				/* Restore the previous exception state. */
-				goto restore_old_except_after_instruction_pred;
-			}
-			__IF0 {
-restore_old_except_after_instruction_pred:
-				memcpy(error_info(), &saved_except, sizeof(saved_except));
-			}
-		} else {
+		if (ENSURE_LIBINSTRLEN())
+			prev_ip = (uintptr_t)instruction_pred_nx((void const *)ip, isa);
+		if (!prev_ip)
 			prev_ip = ip;
-		}
 		if (prev_ip == ip) {
 			--prev_ip;
 		} else {

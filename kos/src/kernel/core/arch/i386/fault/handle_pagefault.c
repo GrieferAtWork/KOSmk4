@@ -1329,7 +1329,8 @@ throw_segfault:
 #endif /* !__x86_64__ */
 		TRY {
 			void const *call_instr;
-			call_instr = instruction_pred((void *)callsite_pc);
+			call_instr = instruction_pred_nx((void *)callsite_pc,
+			                                 instrlen_isa_from_icpustate(state));
 			if likely(call_instr)
 				callsite_pc = (uintptr_t)call_instr;
 		} EXCEPT {
@@ -1389,7 +1390,7 @@ set_exception_pointers:
 	}
 	/* Always make the state point to the instruction _after_ the one causing the problem. */
 	PERTASK_SET(this_exception_faultaddr, (void *)pc);
-	pc = (uintptr_t)instruction_trysucc((void const *)pc);
+	pc = (uintptr_t)instruction_trysucc((void const *)pc, instrlen_isa_from_icpustate(state));
 	printk(KERN_DEBUG "[segfault] Fault at %p (page %p) [pc=%p,%p] [ecode=%#x] [tid=%u]\n",
 	       addr, pageaddr, icpustate_getpc(state), pc,
 	       ecode, (unsigned int)task_getroottid_s());

@@ -29,6 +29,12 @@
 
 #include <libemu86/emu86.h>
 #include <libinstrlen/api.h>
+#include <libunwind/api.h>
+#ifdef __x86_64__
+#include <libunwind/cfi/x86_64.h>
+#else /* __x86_64__ */
+#include <libunwind/cfi/i386.h>
+#endif /* !__x86_64__ */
 
 /* ISA codes. */
 #ifdef __x86_64__
@@ -110,6 +116,9 @@
 
 
 
+#ifdef __CC__
+__DECL_BEGIN
+
 /* Return the ISA type, given a CPU state structure. */
 #ifdef __x86_64__
 #define instrlen_isa_from_icpustate(s) (likely(icpustate_is64bit(s)) ? INSTRLEN_ISA_X86_64 : INSTRLEN_ISA_I386)
@@ -118,6 +127,19 @@
 #define instrlen_isa_from_kcpustate(s) INSTRLEN_ISA_X86_64
 #define instrlen_isa_from_lcpustate(s) INSTRLEN_ISA_X86_64
 #define instrlen_isa_from_fcpustate(s) (likely(fcpustate_is64bit(s)) ? INSTRLEN_ISA_X86_64 : INSTRLEN_ISA_I386)
+#define instrlen_isa_from_unwind_getreg(reg_getter, state)                                 \
+	(likely(__KOS64_IS_CS64BIT(_instrlen_isa_getcs_from_unwind_getreg(reg_getter, state))) \
+	 ? INSTRLEN_ISA_X86_64                                                                 \
+	 : INSTRLEN_ISA_I386)
+__LOCAL __uintptr_t
+_instrlen_isa_getcs_from_unwind_getreg(__BOOL (LIBUNWIND_CC *__reg_getter)(void const *__arg,
+                                                                           __UINTPTR_HALF_TYPE__ __dw_regno,
+                                                                           void *__restrict __dst),
+                                       void *__state) {
+	__uintptr_t __result;
+	(*__reg_getter)(__state, CFI_X86_64_UNWIND_REGISTER_CS, &__result);
+	return __result;
+}
 #else /* __x86_64__ */
 #define instrlen_isa_from_icpustate(s) (likely(!icpustate_isvm86(s)) ? INSTRLEN_ISA_I386 : INSTRLEN_ISA_8086)
 #define instrlen_isa_from_scpustate(s) (likely(!scpustate_isvm86(s)) ? INSTRLEN_ISA_I386 : INSTRLEN_ISA_8086)
@@ -125,10 +147,20 @@
 #define instrlen_isa_from_kcpustate(s) INSTRLEN_ISA_I386
 #define instrlen_isa_from_lcpustate(s) INSTRLEN_ISA_I386
 #define instrlen_isa_from_fcpustate(s) (likely(!fcpustate_isvm86(s)) ? INSTRLEN_ISA_I386 : INSTRLEN_ISA_8086)
+#define instrlen_isa_from_unwind_getreg(reg_getter, state)                                                             \
+	(likely(!(_instrlen_isa_geteflags_from_unwind_getreg(reg_getter, state) & __UINT32_C(0x00020000) /* EFLAGS_VM */)) \
+	 ? INSTRLEN_ISA_I386                                                                                               \
+	 : INSTRLEN_ISA_8086)
+__LOCAL __uintptr_t
+_instrlen_isa_geteflags_from_unwind_getreg(__BOOL (LIBUNWIND_CC *__reg_getter)(void const *__arg,
+                                                                               __UINTPTR_HALF_TYPE__ __dw_regno,
+                                                                               void *__restrict __dst),
+                                           void *__state) {
+	__uintptr_t __result;
+	(*__reg_getter)(__state, CFI_386_UNWIND_REGISTER_EFLAGS, &__result);
+	return __result;
+}
 #endif /* !__x86_64__ */
-
-#ifdef __CC__
-__DECL_BEGIN
 
 typedef __uint8_t instrlen_isa_t;
 

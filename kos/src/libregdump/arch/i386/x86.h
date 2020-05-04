@@ -21,14 +21,16 @@
 #define GUARD_LIBREGDUMP_ARCH_I386_X86_H 1
 
 #include "../../api.h"
+/**/
 
 #include <hybrid/compiler.h>
 
 #include <kos/types.h>
 
-#include <libregdump/x86.h>
-
 #include <format-printer.h>
+
+#include <libinstrlen/bits/isa.h>
+#include <libregdump/x86.h>
 
 DECL_BEGIN
 
@@ -59,7 +61,7 @@ INTDEF NONNULL((1)) ssize_t CC libregdump_sreg(struct regdump_printer *__restric
 /* Print the eflags/rflags register */
 INTDEF NONNULL((1)) ssize_t CC libregdump_flags(struct regdump_printer *__restrict self, uintptr_t flags);
 /* Print the InstructionPointer register. */
-INTDEF NONNULL((1)) ssize_t CC libregdump_ip(struct regdump_printer *__restrict self, uintptr_t ip);
+INTDEF NONNULL((1)) ssize_t CC libregdump_ip(struct regdump_printer *__restrict self, uintptr_t ip, instrlen_isa_t isa);
 INTDEF NONNULL((1, 2)) ssize_t CC libregdump_gdt(struct regdump_printer *__restrict self, struct desctab const *__restrict gdt);
 INTDEF NONNULL((1, 2)) ssize_t CC libregdump_idt(struct regdump_printer *__restrict self, struct desctab const *__restrict idt);
 

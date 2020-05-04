@@ -432,8 +432,8 @@ NOTHROW(FCALL unwind)(struct icpustate *__restrict self) {
 	}
 
 /* Fill in missing exception pointer. */
-PRIVATE ATTR_NORETURN NOBLOCK void
-NOTHROW(FCALL complete_except)(struct icpustate *__restrict self) {
+PRIVATE ATTR_NORETURN NOBLOCK void FCALL
+complete_except(struct icpustate *__restrict self) {
 	error_class_t cls = PERTASK_GET(this_exception_class);
 	if (cls == E_SEGFAULT) {
 		uintptr_t flags;
@@ -456,7 +456,7 @@ NOTHROW(FCALL complete_except)(struct icpustate *__restrict self) {
 	{
 		void const *pc, *next_pc;
 		pc      = (void const *)icpustate_getpc(self);
-		next_pc = instruction_succ(pc);
+		next_pc = instruction_succ_nx(pc, instrlen_isa_from_icpustate(self));
 		if (next_pc)
 			icpustate_setpc(self, (uintptr_t)next_pc);
 		PERTASK_SET(this_exception_faultaddr, (void *)pc);
@@ -465,9 +465,9 @@ NOTHROW(FCALL complete_except)(struct icpustate *__restrict self) {
 }
 
 /* Fill in missing exception pointer. */
-PRIVATE ATTR_NORETURN NOBLOCK void
-NOTHROW(FCALL complete_except_switch)(struct icpustate *__restrict self,
-                                      uintptr_t opcode, uintptr_t op_flags) {
+PRIVATE ATTR_NORETURN NOBLOCK void FCALL
+complete_except_switch(struct icpustate *__restrict self,
+                       uintptr_t opcode, uintptr_t op_flags) {
 	error_class_t cls = PERTASK_GET(this_exception_class);
 	if (cls == E_ILLEGAL_INSTRUCTION) {
 		if (!PERTASK_GET(this_exception_pointers[0]))
@@ -487,7 +487,7 @@ throw_illegal_instruction_exception(struct icpustate *__restrict state,
 	unsigned int i;
 	void const *pc, *next_pc;
 	pc      = (void const *)icpustate_getpc(state);
-	next_pc = instruction_succ(pc);
+	next_pc = instruction_succ_nx(pc, instrlen_isa_from_icpustate(state));
 	if (next_pc)
 		icpustate_setpc(state, (uintptr_t)next_pc);
 	PERTASK_SET(this_exception_code, code);
@@ -513,7 +513,7 @@ throw_exception(struct icpustate *__restrict state,
 	unsigned int i;
 	void const *pc, *next_pc;
 	pc      = (void const *)icpustate_getpc(state);
-	next_pc = instruction_succ(pc);
+	next_pc = instruction_succ_nx(pc, instrlen_isa_from_icpustate(state));
 	if (next_pc)
 		icpustate_setpc(state, (uintptr_t)next_pc);
 	PERTASK_SET(this_exception_code, code);
@@ -1071,7 +1071,8 @@ assert_canonical_pc(struct icpustate *__restrict state,
 		icpustate_setsp(state, is_compat ? sp + 4 : sp + 8);
 		{
 			void const *call_instr;
-			call_instr = instruction_pred((void *)callsite_pc);
+			call_instr = instruction_pred_nx((void *)callsite_pc,
+			                                 instrlen_isa_from_icpustate(state));
 			if likely(call_instr)
 				callsite_pc = (uintptr_t)call_instr;
 		}

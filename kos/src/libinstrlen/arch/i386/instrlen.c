@@ -148,7 +148,7 @@ NOTHROW_NCX(CC succ_8f)(byte_t *pc_after_8f, emu86_opflags_t op_flags) {
 
 	case 0x8 << EMU86_VEX3B_MMMMM_S:
 		if (opcode >= 0xc0)
-			result += 1; /* All (defined) opcodes of this table have an "Ib"-operand (e.g. `vprotb') */
+			result += 1; /* All (defined) opcodes of this table+range have an "Ib"-operand (e.g. `vprotb') */
 		break;
 
 	case 0x9 << EMU86_VEX3B_MMMMM_S:

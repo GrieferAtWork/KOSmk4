@@ -429,7 +429,7 @@ if (common_0f38 !is none)
 if (common_0f3a !is none)
 	setCommonOpcodeTypeForRange(0x0f3a00, 0x0f3aff, common_0f3a);
 
-// Figure out how many opcodes we want (must) to define explicitly.
+// Figure out how many opcodes we want to (must) define explicitly.
 local numberOfExplicitlyDefinedOpcodes = 0x200;
 if (common_0f3a is none)
 	numberOfExplicitlyDefinedOpcodes = 0x400;

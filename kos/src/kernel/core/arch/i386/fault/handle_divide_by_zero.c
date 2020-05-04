@@ -51,7 +51,7 @@ x86_handle_divide_by_zero(struct icpustate *__restrict state) {
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 	pc = (byte_t *)icpustate_getpc(state);
 	PERTASK_SET(this_exception_faultaddr, (void *)pc);
-	next_pc = (byte_t *)instruction_succ(pc);
+	next_pc = instruction_succ_nx(pc, instrlen_isa_from_icpustate(state));
 	if (next_pc)
 		icpustate_setpc(state, (uintptr_t)next_pc);
 	x86_userexcept_unwind_interrupt(state);

@@ -127,6 +127,7 @@ kernel_halt_dump_traceback(pformatprinter printer, void *arg,
 	unsigned int error;
 	struct ucpustate state;
 	struct exception_info saved_info;
+	instrlen_isa_t isa;
 #ifdef LOG_STACK_REMAINDER
 	uintptr_t last_good_sp;
 #endif /* LOG_STACK_REMAINDER */
@@ -136,8 +137,9 @@ kernel_halt_dump_traceback(pformatprinter printer, void *arg,
 #ifdef LOG_STACK_REMAINDER
 	last_good_sp = ucpustate_getsp(&state);
 #endif /* LOG_STACK_REMAINDER */
+	isa = instrlen_isa_from_ucpustate(&state);
 	addr2line_printf(printer, arg,
-	                 (uintptr_t)instruction_trypred((void const *)ucpustate_getpc(&state)),
+	                 (uintptr_t)instruction_trypred((void const *)ucpustate_getpc(&state), isa),
 	                 ucpustate_getpc(&state),
 	                 "Caused here [sp=%p]",
 	                 (void *)ucpustate_getsp(&state));
@@ -150,7 +152,8 @@ kernel_halt_dump_traceback(pformatprinter printer, void *arg,
 		if (error != UNWIND_SUCCESS)
 			break;
 		addr2line_printf(printer, arg,
-		                 (uintptr_t)instruction_trypred((void const *)ucpustate_getpc(&state)),
+		                 (uintptr_t)instruction_trypred((void const *)ucpustate_getpc(&state),
+		                                                instrlen_isa_from_ucpustate(&state)),
 		                 ucpustate_getpc(&state),
 		                 "Called here [sp=%p]",
 		                 (void *)ucpustate_getsp(&state));
@@ -193,7 +196,7 @@ kernel_halt_dump_traceback(pformatprinter printer, void *arg,
 					is_first = false;
 				}
 				addr2line_printf(printer, arg,
-				                 (uintptr_t)instruction_trypred(pc),
+				                 (uintptr_t)instruction_trypred(pc, isa),
 				                 (uintptr_t)pc,
 				                 "Return address from [sp=%p]",
 				                 iter);
@@ -439,8 +442,10 @@ libc_assertion_check_core(struct assert_args *__restrict args) {
 PRIVATE ATTR_DBGTEXT void KCALL
 panic_genfail_dbg_main(/*char const **/ void *message) {
 	uintptr_t pc, prev_pc;
+	instrlen_isa_t isa;
 	pc      = dbg_getpcreg(DBG_REGLEVEL_TRAP);
-	prev_pc = (uintptr_t)instruction_trypred((void const *)pc);
+	isa     = dbg_instrlen_isa(DBG_REGLEVEL_TRAP);
+	prev_pc = (uintptr_t)instruction_trypred((void const *)pc, isa);
 	dbg_printf(DBGSTR(DF_SETCOLOR(DBG_COLOR_WHITE, DBG_COLOR_MAROON) "%s" DF_DEFCOLOR "%[vinfo:"
 	                  "file: " DF_WHITE("%f") " (line " DF_WHITE("%l") ", column " DF_WHITE("%c") ")\n"
 	                  "func: " DF_WHITE("%n") "\n]"
@@ -514,9 +519,11 @@ PRIVATE ATTR_DBGTEXT void KCALL
 panic_kernel_dbg_main(void *arg) {
 	struct panic_args *args;
 	uintptr_t pc, prev_pc;
+	instrlen_isa_t isa;
 	args = (struct panic_args *)arg;
 	pc      = dbg_getpcreg(DBG_REGLEVEL_TRAP);
-	prev_pc = (uintptr_t)instruction_trypred((void const *)pc);
+	isa     = dbg_instrlen_isa(DBG_REGLEVEL_TRAP);
+	prev_pc = (uintptr_t)instruction_trypred((void const *)pc, isa);
 	dbg_printf(DBGSTR("Kernel Panic\n"
 	                  "%[vinfo:" "file: " DF_WHITE("%f") " (line " DF_WHITE("%l") ", column " DF_WHITE("%c") ")\n"
 	                             "func: " DF_WHITE("%n") "\n"

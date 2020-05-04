@@ -1433,38 +1433,38 @@ PRIVATE struct instruction const ops[] = {
 
 	I(0xda, IF_MODRM|IF_RMM|IF_REG7, "fidivrl\t" OP_RM32 OP_VERBOSE_ST0),
 
-	/*0xda, IF_BYTE2,           "\xe0" ???            * 0xea: [mod=3,reg=4,rm=0] */
-	/*0xda, IF_BYTE2,           "\xe1" ???            * 0xea: [mod=3,reg=4,rm=1] */
-	/*0xda, IF_BYTE2,           "\xe2" ???            * 0xea: [mod=3,reg=4,rm=2] */
-	/*0xda, IF_BYTE2,           "\xe3" ???            * 0xea: [mod=3,reg=4,rm=3] */
-	/*0xda, IF_BYTE2,           "\xe4" ???            * 0xea: [mod=3,reg=4,rm=4] */
-	/*0xda, IF_BYTE2,           "\xe5" ???            * 0xea: [mod=3,reg=4,rm=5] */
-	/*0xda, IF_BYTE2,           "\xe6" ???            * 0xea: [mod=3,reg=4,rm=6] */
-	/*0xda, IF_BYTE2,           "\xe7" ???            * 0xea: [mod=3,reg=4,rm=7] */
-	/*0xda, IF_BYTE2,           "\xe8" ???            * 0xea: [mod=3,reg=5,rm=0] */
+	/*0xda, IF_BYTE2,           "\xe0" ???            * 0xe0: [mod=3,reg=4,rm=0] */
+	/*0xda, IF_BYTE2,           "\xe1" ???            * 0xe1: [mod=3,reg=4,rm=1] */
+	/*0xda, IF_BYTE2,           "\xe2" ???            * 0xe2: [mod=3,reg=4,rm=2] */
+	/*0xda, IF_BYTE2,           "\xe3" ???            * 0xe3: [mod=3,reg=4,rm=3] */
+	/*0xda, IF_BYTE2,           "\xe4" ???            * 0xe4: [mod=3,reg=4,rm=4] */
+	/*0xda, IF_BYTE2,           "\xe5" ???            * 0xe5: [mod=3,reg=4,rm=5] */
+	/*0xda, IF_BYTE2,           "\xe6" ???            * 0xe6: [mod=3,reg=4,rm=6] */
+	/*0xda, IF_BYTE2,           "\xe7" ???            * 0xe7: [mod=3,reg=4,rm=7] */
+	/*0xda, IF_BYTE2,           "\xe8" ???            * 0xe8: [mod=3,reg=5,rm=0] */
 	I(0xda, IF_BYTE2, LONGREPR_B(0xe9, LO_FUCOMPP)), /* 0xe9: [mod=3,reg=5,rm=1] */ /* fucompp %st(1), %st(0) */
 	/*0xda, IF_BYTE2,           "\xea" ???            * 0xea: [mod=3,reg=5,rm=2] */
-	/*0xda, IF_BYTE2,           "\xeb" ???            * 0xea: [mod=3,reg=5,rm=3] */
-	/*0xda, IF_BYTE2,           "\xec" ???            * 0xea: [mod=3,reg=5,rm=4] */
-	/*0xda, IF_BYTE2,           "\xed" ???            * 0xea: [mod=3,reg=5,rm=5] */
-	/*0xda, IF_BYTE2,           "\xee" ???            * 0xea: [mod=3,reg=5,rm=6] */
-	/*0xda, IF_BYTE2,           "\xef" ???            * 0xea: [mod=3,reg=5,rm=7] */
-	/*0xda, IF_BYTE2,           "\xf0" ???            * 0xea: [mod=3,reg=6,rm=0] */
-	/*0xda, IF_BYTE2,           "\xf1" ???            * 0xea: [mod=3,reg=6,rm=1] */
-	/*0xda, IF_BYTE2,           "\xf2" ???            * 0xea: [mod=3,reg=6,rm=2] */
-	/*0xda, IF_BYTE2,           "\xf3" ???            * 0xea: [mod=3,reg=6,rm=3] */
-	/*0xda, IF_BYTE2,           "\xf4" ???            * 0xea: [mod=3,reg=6,rm=4] */
-	/*0xda, IF_BYTE2,           "\xf5" ???            * 0xea: [mod=3,reg=6,rm=5] */
-	/*0xda, IF_BYTE2,           "\xf6" ???            * 0xea: [mod=3,reg=6,rm=6] */
-	/*0xda, IF_BYTE2,           "\xf7" ???            * 0xea: [mod=3,reg=6,rm=7] */
-	/*0xda, IF_BYTE2,           "\xf8" ???            * 0xea: [mod=3,reg=7,rm=0] */
-	/*0xda, IF_BYTE2,           "\xf9" ???            * 0xea: [mod=3,reg=7,rm=1] */
-	/*0xda, IF_BYTE2,           "\xfa" ???            * 0xea: [mod=3,reg=7,rm=2] */
-	/*0xda, IF_BYTE2,           "\xfb" ???            * 0xea: [mod=3,reg=7,rm=3] */
-	/*0xda, IF_BYTE2,           "\xfc" ???            * 0xea: [mod=3,reg=7,rm=4] */
-	/*0xda, IF_BYTE2,           "\xfd" ???            * 0xea: [mod=3,reg=7,rm=5] */
-	/*0xda, IF_BYTE2,           "\xfe" ???            * 0xea: [mod=3,reg=7,rm=6] */
-	/*0xda, IF_BYTE2,           "\xff" ???            * 0xea: [mod=3,reg=7,rm=7] */
+	/*0xda, IF_BYTE2,           "\xeb" ???            * 0xeb: [mod=3,reg=5,rm=3] */
+	/*0xda, IF_BYTE2,           "\xec" ???            * 0xec: [mod=3,reg=5,rm=4] */
+	/*0xda, IF_BYTE2,           "\xed" ???            * 0xed: [mod=3,reg=5,rm=5] */
+	/*0xda, IF_BYTE2,           "\xee" ???            * 0xee: [mod=3,reg=5,rm=6] */
+	/*0xda, IF_BYTE2,           "\xef" ???            * 0xef: [mod=3,reg=5,rm=7] */
+	/*0xda, IF_BYTE2,           "\xf0" ???            * 0xf0: [mod=3,reg=6,rm=0] */
+	/*0xda, IF_BYTE2,           "\xf1" ???            * 0xf1: [mod=3,reg=6,rm=1] */
+	/*0xda, IF_BYTE2,           "\xf2" ???            * 0xf2: [mod=3,reg=6,rm=2] */
+	/*0xda, IF_BYTE2,           "\xf3" ???            * 0xf3: [mod=3,reg=6,rm=3] */
+	/*0xda, IF_BYTE2,           "\xf4" ???            * 0xf4: [mod=3,reg=6,rm=4] */
+	/*0xda, IF_BYTE2,           "\xf5" ???            * 0xf5: [mod=3,reg=6,rm=5] */
+	/*0xda, IF_BYTE2,           "\xf6" ???            * 0xf6: [mod=3,reg=6,rm=6] */
+	/*0xda, IF_BYTE2,           "\xf7" ???            * 0xf7: [mod=3,reg=6,rm=7] */
+	/*0xda, IF_BYTE2,           "\xf8" ???            * 0xf8: [mod=3,reg=7,rm=0] */
+	/*0xda, IF_BYTE2,           "\xf9" ???            * 0xf9: [mod=3,reg=7,rm=1] */
+	/*0xda, IF_BYTE2,           "\xfa" ???            * 0xfa: [mod=3,reg=7,rm=2] */
+	/*0xda, IF_BYTE2,           "\xfb" ???            * 0xfb: [mod=3,reg=7,rm=3] */
+	/*0xda, IF_BYTE2,           "\xfc" ???            * 0xfc: [mod=3,reg=7,rm=4] */
+	/*0xda, IF_BYTE2,           "\xfd" ???            * 0xfd: [mod=3,reg=7,rm=5] */
+	/*0xda, IF_BYTE2,           "\xfe" ???            * 0xfe: [mod=3,reg=7,rm=6] */
+	/*0xda, IF_BYTE2,           "\xff" ???            * 0xff: [mod=3,reg=7,rm=7] */
 
 
 	I(0xdb, IF_MODRM|IF_RMM|IF_REG0, "fildl\t" OP_RM32),

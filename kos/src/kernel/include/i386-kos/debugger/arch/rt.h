@@ -49,12 +49,10 @@ DECL_BEGIN
  *                All general purpose registers can be used just like usual
  *  - %psp:       Points somewhere into `dbg_stack'.
  *                If this stack should ever overflow, the debugger will reset itself.
- *  - %pflags.IF: Always enabled.
- *
+ *  - %pflags.IF: Normally enabled. (but can be disabled temporarily)
  *  - %idtr:      Always points to `x86_dbgidt', where `x86_dbgidt' is pretty much
  *                a carbon copy of `x86_idt', though with a couple of changes made
  *                to allow the handling of HID-related interrupts.
- *
  *  - %gdtr:      Always points to `x86_dbggdt', where `x86_dbggdt' is a carbon
  *                copy of the unmodified base-state of the original GDT.
  *  - %ds:        Always `SEGMENT_USER_DATA_RPL'
@@ -70,7 +68,7 @@ DECL_BEGIN
  *
  *  - THIS_TASK:  Points to the task-structure of the thread that originally entered the
  *                debugger. If during debugger entry, it is found that this pointer is
- *                invalid, or unset, this will instead point to `FORCPU(THIS_CPU, thiscpu_idle)'
+ *                invalid, or unset, this will point to `FORCPU(THIS_CPU, thiscpu_idle)'
  *                instead.
  *
  *  - THIS_TASK->t_cpu->c_override: Set to `THIS_TASK'
@@ -86,11 +84,15 @@ DECL_BEGIN
  *  - While in debugger mode, `dbg_active' is non-zero.
  *    Care is taken that no secondary CPU will see this value being
  *    non-zero while debugger mode is being entered on another CPU.
+ *    As such, any code can check this global, where a non-zero value
+ *    means that the kernel is in debugger mode, and that the checking
+ *    thread is the one and only debugger control thread.
  *
  *  - Exiting debugger mode:
  *    To exit debugger mode, `dbg_exit()' should be called, which will proceed to:
  *     - Call `x86_dbg_fini()'
  *     - Restore saved data fields from `x86_dbg_exitstate'
+ *     - Signal other CPUs to resume execution as described in `x86_dbg_hostbackup.dhs_cpus'
  *     - Resume execution with the CPU state described by `x86_dbg_exitstate'
  *
  */

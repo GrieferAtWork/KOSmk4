@@ -1168,13 +1168,13 @@ again:
 		/* This node wasn't reached. */
 		if (node->m_flags & MALLNODE_FUSERNODE) {
 			addr2line_printf(&syslog_printer, SYSLOG_LEVEL_RAW,
-			                 (uintptr_t)instruction_trypred(node->m_trace[0]),
+			                 (uintptr_t)instruction_trypred(node->m_trace[0], INSTRLEN_ISA_DEFAULT),
 			                 (uintptr_t)node->m_trace[0],
 			                 "Leaked %Iu bytes of heap-memory at %p...%p",
 			                 MALLNODE_SIZE(node), MALLNODE_MIN(node), MALLNODE_MAX(node));
 		} else {
 			addr2line_printf(&syslog_printer, SYSLOG_LEVEL_RAW,
-			                 (uintptr_t)instruction_trypred(node->m_trace[0]),
+			                 (uintptr_t)instruction_trypred(node->m_trace[0], INSTRLEN_ISA_DEFAULT),
 			                 (uintptr_t)node->m_trace[0],
 			                 "Leaked %Iu bytes of kmalloc-memory at %p...%p",
 			                 MALLNODE_SIZE(node) - (CONFIG_MALL_PREFIX_SIZE + CONFIG_MALL_HEAD_SIZE + CONFIG_MALL_TAIL_SIZE),
@@ -1186,7 +1186,7 @@ again:
 			if (!node->m_trace[i])
 				break;
 			addr2line_printf(&syslog_printer, SYSLOG_LEVEL_RAW,
-			                 (uintptr_t)instruction_trypred(node->m_trace[i]),
+			                 (uintptr_t)instruction_trypred(node->m_trace[i], INSTRLEN_ISA_DEFAULT),
 			                 (uintptr_t)node->m_trace[i],
 			                 "Called here");
 		}
@@ -1407,10 +1407,8 @@ NOTHROW(KCALL mallnode_print_traceback)(struct mallnode *__restrict self,
 		if (!pc)
 			break;
 		addr2line_printf(printer, arg,
-		                 (uintptr_t)instruction_trypred((void const *)pc),
-		                 pc,
-		                 i ? "Called here"
-		                   : "Allocated from here");
+		                 (uintptr_t)instruction_trypred((void const *)pc, INSTRLEN_ISA_DEFAULT),
+		                 pc, i ? "Called here" : "Allocated from here");
 	}
 }
 

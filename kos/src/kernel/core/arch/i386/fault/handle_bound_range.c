@@ -89,11 +89,11 @@ x86_handle_bound_range(struct icpustate *__restrict state) {
 			return state;
 		}
 	} else {
-		uintptr_t next_pc;
-		next_pc = icpustate_getpc(state);
-		next_pc = (uintptr_t)instruction_succ((void const *)next_pc);
+		byte_t *next_pc;
+		next_pc = (byte_t *)icpustate_getpc(state);
+		next_pc = instruction_succ_nx(next_pc, instrlen_isa_from_icpustate(state));
 		if (next_pc)
-			pc = (byte_t *)next_pc;
+			pc = next_pc;
 	}
 	PERTASK_SET(this_exception_code,
 	            ERROR_CODEOF(E_INDEX_ERROR_OUT_OF_BOUNDS));

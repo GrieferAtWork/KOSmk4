@@ -63,16 +63,30 @@ LIBINSTRLEN_DECL __ATTR_PURE __ATTR_WUNUSED __byte_t *
 __NOTHROW_NCX(LIBINSTRLEN_CC instruction_pred)(void const *pc, instrlen_isa_t isa __DFL(INSTRLEN_ISA_DEFAULT));
 #endif /* LIBINSTRLEN_WANT_PROTOTYPES */
 
-/* Same as above, but return pc +/- 1, and discard a SEGFAULT and restore any old
- * exception when `pc' is invalid invalid pointer, or when `arch_instruction_(curr|pred)'
- * would have returned `NULL'.
+/* Same as above, but handle E_SEGFAULT (and E_WOULDBLOCK in kernel-space) by returning `NULL'
+ * Other exceptions are propagated normally (which could happen due to VIO access emulation)
  * @param: isa: The ISA type (s.a. `instrlen_isa_from_Xcpustate()' or `INSTRLEN_ISA_DEFAULT') */
-typedef /*__ATTR_PURE*/ __ATTR_WUNUSED __byte_t * /*__NOTHROW_NCX*/ (LIBINSTRLEN_CC *PINSTRUCTION_TRYSUCC)(void const *pc, instrlen_isa_t isa);
-typedef /*__ATTR_PURE*/ __ATTR_WUNUSED __byte_t * /*__NOTHROW_NCX*/ (LIBINSTRLEN_CC *PINSTRUCTION_TRYPRED)(void const *pc, instrlen_isa_t isa);
+typedef /*__ATTR_PURE*/ __ATTR_WUNUSED __byte_t *
+(LIBINSTRLEN_CC *PINSTRUCTION_SUCC_NX)(void const *pc, instrlen_isa_t isa);
+typedef /*__ATTR_PURE*/ __ATTR_WUNUSED __byte_t *
+(LIBINSTRLEN_CC *PINSTRUCTION_PRED_NX)(void const *pc, instrlen_isa_t isa);
 #ifdef LIBINSTRLEN_WANT_PROTOTYPES
 LIBINSTRLEN_DECL __ATTR_PURE __ATTR_WUNUSED __byte_t *
-__NOTHROW_NCX(LIBINSTRLEN_CC instruction_trysucc)(void const *pc, instrlen_isa_t isa __DFL(INSTRLEN_ISA_DEFAULT));
+__NOTHROW_NCX(LIBINSTRLEN_CC instruction_succ_nx)(void const *pc, instrlen_isa_t isa __DFL(INSTRLEN_ISA_DEFAULT));
 LIBINSTRLEN_DECL __ATTR_PURE __ATTR_WUNUSED __byte_t *
+__NOTHROW_NCX(LIBINSTRLEN_CC instruction_pred_nx)(void const *pc, instrlen_isa_t isa __DFL(INSTRLEN_ISA_DEFAULT));
+#endif /* LIBINSTRLEN_WANT_PROTOTYPES */
+
+/* Same as `instruction_(succ|pred)_nx', but return pc +/- 1 instead of NULL.
+ * @param: isa: The ISA type (s.a. `instrlen_isa_from_Xcpustate()' or `INSTRLEN_ISA_DEFAULT') */
+typedef /*__ATTR_PURE*/ __ATTR_RETNONNULL __ATTR_WUNUSED __byte_t *
+/*__NOTHROW_NCX*/ (LIBINSTRLEN_CC *PINSTRUCTION_TRYSUCC)(void const *pc, instrlen_isa_t isa);
+typedef /*__ATTR_PURE*/ __ATTR_RETNONNULL __ATTR_WUNUSED __byte_t *
+/*__NOTHROW_NCX*/ (LIBINSTRLEN_CC *PINSTRUCTION_TRYPRED)(void const *pc, instrlen_isa_t isa);
+#ifdef LIBINSTRLEN_WANT_PROTOTYPES
+LIBINSTRLEN_DECL __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __byte_t *
+__NOTHROW_NCX(LIBINSTRLEN_CC instruction_trysucc)(void const *pc, instrlen_isa_t isa __DFL(INSTRLEN_ISA_DEFAULT));
+LIBINSTRLEN_DECL __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __byte_t *
 __NOTHROW_NCX(LIBINSTRLEN_CC instruction_trypred)(void const *pc, instrlen_isa_t isa __DFL(INSTRLEN_ISA_DEFAULT));
 #endif /* LIBINSTRLEN_WANT_PROTOTYPES */
 

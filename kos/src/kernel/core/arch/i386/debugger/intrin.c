@@ -350,7 +350,8 @@ DEFINE_DEBUG_FUNCTION_EX(
 		struct sgregs sg;
 		u64 kgsbase;
 		regdump_gpregs(&re_printer, &fst.fcs_gpregs);
-		regdump_ip(&re_printer, fcpustate_getpc(&fst));
+		regdump_ip(&re_printer, fcpustate_getpc(&fst),
+		           instrlen_isa_from_fcpustate(&fst));
 		sg.sg_gs = fst.fcs_sgregs.sg_gs16;
 		sg.sg_fs = fst.fcs_sgregs.sg_fs16;
 		sg.sg_es = fst.fcs_sgregs.sg_es16;

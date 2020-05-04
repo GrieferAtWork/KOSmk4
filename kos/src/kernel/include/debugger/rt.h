@@ -35,6 +35,7 @@
 
 #include <stdbool.h>
 
+#include <libinstrlen/bits/isa.h>
 #include <libunwind/api.h>
 #include <libunwind/cfi.h>
 
@@ -68,9 +69,8 @@ DATDEF struct task *dbg_current;
  *                        DBG_REGLEVEL_VIEW
  */
 #define DBG_REGLEVEL_EXIT 0 /* The register state to-be loaded when exiting debugger mode.
-                             * When `dbg_current != THIS_TASK', same as `DBG_REGLEVEL_ORIG' */
-#define DBG_REGLEVEL_TRAP 1 /* The register state passed to `dbg_enter_r()', or `DBG_REGLEVEL_EXIT'.
-                             * When `dbg_current != THIS_TASK', same as `DBG_REGLEVEL_ORIG' */
+                             * When `dbg_current == THIS_TASK', same as `DBG_REGLEVEL_ORIG' */
+#define DBG_REGLEVEL_TRAP 1 /* The register state passed to `dbg_enter_r()', or `DBG_REGLEVEL_EXIT'. */
 #define DBG_REGLEVEL_ORIG 2 /* The register state loaded by `dbg_current' when it resumes. */
 #define DBG_REGLEVEL_VIEW 3 /* The register state currently being viewed (for the purpose of unwinding) */
 
@@ -128,6 +128,18 @@ struct ucpustate;
 /* Get/set all registers. */
 FUNDEF void NOTHROW(KCALL dbg_getallregs)(unsigned int level, struct fcpustate *__restrict state);
 FUNDEF void NOTHROW(KCALL dbg_setallregs)(unsigned int level, struct fcpustate const *__restrict state);
+
+/* Return the ISA code for use with libinstrlen */
+#ifndef ARCH_DEBUGGER_RT_HAVE_DBG_INSTRLEN_ISA
+LOCAL WUNUSED ATTR_PURE instrlen_isa_t
+NOTHROW(KCALL dbg_instrlen_isa)(unsigned int level) {
+	instrlen_isa_t result;
+	struct fcpustate cs;
+	dbg_getallregs(level, &cs);
+	result = instrlen_isa_from_fcpustate(&cs);
+	return result;
+}
+#endif /* !ARCH_DEBUGGER_RT_HAVE_DBG_INSTRLEN_ISA */
 
 /* Return the page directory of `dbg_current' */
 FUNDEF ATTR_PURE WUNUSED PAGEDIR_P_SELFTYPE NOTHROW(KCALL dbg_getpagedir)(void);

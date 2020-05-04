@@ -32,6 +32,7 @@
 #define instrlen_isa_from_kcpustate(s) INSTRLEN_ISA_DEFAULT
 #define instrlen_isa_from_lcpustate(s) INSTRLEN_ISA_DEFAULT
 #define instrlen_isa_from_fcpustate(s) INSTRLEN_ISA_DEFAULT
+#define instrlen_isa_from_unwind_getreg(/*unwind_getreg_t*/ reg_getter, /*void **/state) INSTRLEN_ISA_DEFAULT
 
 #ifdef __CC__
 __DECL_BEGIN

@@ -50,23 +50,16 @@ if (gcc_opt.remove("-O3"))
 
 DECL_BEGIN
 
-#define PAGEFAULT_F_PRESENT     0x0001 /* FLAG: The accessed page is present (Check for LOA) */
-#define PAGEFAULT_F_WRITING     0x0002 /* FLAG: The fault happened as a result of a memory write (Check for COW) */
-#define PAGEFAULT_F_USERSPACE   0x0004 /* FLAG: The fault occurred while in user-space */
-#define PAGEFAULT_F_RESBIT      0x0008 /* FLAG: A reserved page bit is set */
-#define PAGEFAULT_F_INSTRFETCH  0x0010 /* FLAG: The fault happened while fetching instructions.
-                                        * NOTE: This flag isn't guarantied to be set, though an
-                                        *       instruction-fetch fault can also easily be detected
-                                        *       by comparing `%eip' with `%cr2' */
+#define PAGEFAULT_F_PRESENT 0x0001    /* FLAG: The accessed page is present (Check for LOA) */
+#define PAGEFAULT_F_WRITING 0x0002    /* FLAG: The fault happened as a result of a memory write (Check for COW) */
+#define PAGEFAULT_F_USERSPACE 0x0004  /* FLAG: The fault occurred while in user-space */
+#define PAGEFAULT_F_RESBIT 0x0008     /* FLAG: A reserved page bit is set */
+#define PAGEFAULT_F_INSTRFETCH 0x0010 /* FLAG: The fault happened while fetching instructions.     \
+	                                   * NOTE: This flag isn't guarantied to be set, though an     \
+	                                   *       instruction-fetch fault can also easily be detected \
+	                                   *       by comparing `%eip' with `%cr2' */
 
-#ifdef __x86_64__
-#define ir_pip ir_rip
-#else /* __x86_64__ */
-#define ir_pip ir_eip
-#endif /* !__x86_64__ */
-
-INTERN ATTR_DBGTEXT ATTR_RETNONNULL NONNULL((1)) struct icpustate *
-NOTHROW(FCALL x86_handle_dbg_pagefault)(struct icpustate *__restrict state, uintptr_t ecode) {
+INTERN ATTR_DBGTEXT ATTR_RETNONNULL NONNULL((1)) struct icpustate *NOTHROW(FCALL x86_handle_dbg_pagefault)(struct icpustate *__restrict state, uintptr_t ecode) {
 	/* Use a dedicated #PF handler for the debugger, so-as to prevent crashes arising when
 	 * the debugger is invoked for some kind of problem related to page initialization.
 	 * Also: This way, the debugger accessing memory will never cause disk activity, or
@@ -74,7 +67,9 @@ NOTHROW(FCALL x86_handle_dbg_pagefault)(struct icpustate *__restrict state, uint
 	uintptr_t pc;
 	void *addr;
 	/* Check for `memcpy_nopf()' */
-	if unlikely(x86_nopf_check(state->ics_irregs.ir_pip)) {
+	if
+		unlikely(x86_nopf_check(state->ics_irregs.ir_pip))
+	{
 		state->ics_irregs.ir_pip = x86_nopf_retof(state->ics_irregs.ir_pip);
 		return state;
 	}
@@ -96,7 +91,8 @@ NOTHROW(FCALL x86_handle_dbg_pagefault)(struct icpustate *__restrict state, uint
 			goto not_a_badcall;
 		TRY {
 			old_pip = *(uintptr_t *)sp;
-		} EXCEPT {
+		}
+		EXCEPT {
 			if (!was_thrown(E_SEGFAULT))
 				RETHROW();
 			goto not_a_badcall;
@@ -104,29 +100,28 @@ NOTHROW(FCALL x86_handle_dbg_pagefault)(struct icpustate *__restrict state, uint
 #ifdef __x86_64__
 		if (IS_USER() != (old_pip >= KERNELSPACE_BASE))
 			goto not_a_badcall;
-		irregs_wrip(&state->ics_irregs, old_pip);
-		irregs_wrsp(&state->ics_irregs, sp + 8);
-#else /* __x86_64__ */
-		if (sp != (uintptr_t)(&state->ics_irregs_k + 1) ||
-		    IS_USER()) {
+		icpustate_setpc(state, old_pip);
+		icpustate_setsp(state, sp + 8);
+#else  /* __x86_64__ */
+		if (sp != (uintptr_t)(&state->ics_irregs_k + 1) || IS_USER()) {
 			if (old_pip >= KERNELSPACE_BASE)
 				goto not_a_badcall;
-			irregs_wrip(&state->ics_irregs_k, old_pip);
+			icpustate_setpc(state, old_pip);
 			state->ics_irregs_u.ir_esp += 4;
 		} else {
 			if (old_pip < KERNELSPACE_BASE)
 				goto not_a_badcall;
 			state->ics_irregs_k.ir_eip = old_pip;
-			state = (struct icpustate *)memmoveup((byte_t *)state + sizeof(void *), state,
-			                                      OFFSET_ICPUSTATE_IRREGS +
-			                                      SIZEOF_IRREGS_KERNEL);
+			state                      = (struct icpustate *)memmoveup((byte_t *)state + sizeof(void *), state,
+                                                  OFFSET_ICPUSTATE_IRREGS +
+                                                  SIZEOF_IRREGS_KERNEL);
 		}
 #endif /* !__x86_64__ */
 		PERTASK_SET(this_exception_faultaddr, (void *)old_pip);
 		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_NOTEXECUTABLE));
 		PERTASK_SET(this_exception_pointers[0], (uintptr_t)addr);
 #if PAGEFAULT_F_USERSPACE == E_SEGFAULT_CONTEXT_USERCODE && \
-    PAGEFAULT_F_WRITING == E_SEGFAULT_CONTEXT_WRITING
+PAGEFAULT_F_WRITING == E_SEGFAULT_CONTEXT_WRITING
 		PERTASK_SET(this_exception_pointers[1],
 		            (uintptr_t)(E_SEGFAULT_CONTEXT_FAULT) |
 		            (uintptr_t)(ecode & (PAGEFAULT_F_USERSPACE | PAGEFAULT_F_WRITING)));
@@ -154,7 +149,7 @@ not_a_badcall:
 	/*set_exception_pointers:*/
 	PERTASK_SET(this_exception_pointers[0], (uintptr_t)addr);
 #if PAGEFAULT_F_USERSPACE == E_SEGFAULT_CONTEXT_USERCODE && \
-    PAGEFAULT_F_WRITING == E_SEGFAULT_CONTEXT_WRITING
+PAGEFAULT_F_WRITING == E_SEGFAULT_CONTEXT_WRITING
 	PERTASK_SET(this_exception_pointers[1],
 	            (uintptr_t)(E_SEGFAULT_CONTEXT_FAULT) |
 	            (uintptr_t)(ecode & (PAGEFAULT_F_USERSPACE | PAGEFAULT_F_WRITING)));
@@ -174,7 +169,13 @@ not_a_badcall:
 #endif
 	}
 	/* Always make the state point to the instruction _after_ the one causing the problem. */
-	irregs_wrip(&state->ics_irregs, (uintptr_t)instruction_trysucc((void const *)pc));
+	{
+		void *nextpc;
+		instrlen_isa_t isa;
+		isa    = instrlen_isa_from_icpustate(state);
+		nextpc = instruction_trysucc((void *)pc, isa);
+		icpustate_setpc(state, (uintptr_t)nextpc);
+	}
 	PERTASK_SET(this_exception_faultaddr, (void *)pc);
 do_unwind_state:
 	x86_userexcept_unwind_interrupt(state);

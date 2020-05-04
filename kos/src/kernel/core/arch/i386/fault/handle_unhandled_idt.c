@@ -134,7 +134,8 @@ x86_dump_ucpustate_register_state(struct ucpustate *__restrict ustate,
 	rd_printer.rdp_printer_arg = SYSLOG_LEVEL_EMERG;
 	rd_printer.rdp_format      = &indent_regdump_print_format;
 	regdump_gpregs(&rd_printer, &ustate->ucs_gpregs);
-	regdump_ip(&rd_printer, ucpustate_getpc(ustate));
+	regdump_ip(&rd_printer, ucpustate_getpc(ustate),
+	           instrlen_isa_from_ucpustate(ustate));
 	regdump_flags(&rd_printer, ustate->ucs_pflags);
 	printk(KERN_EMERG "\n");
 	regdump_sgregs_with_cs_ss_tr_ldt(&rd_printer, &ustate->ucs_sgregs,
@@ -150,7 +151,8 @@ x86_dump_ucpustate_register_state(struct ucpustate *__restrict ustate,
 	printk(KERN_EMERG "    %%cr3 %p\n", (void *)cr3);
 	addr2line_printf(&syslog_printer, SYSLOG_LEVEL_RAW,
 	                 ucpustate_getpc(ustate),
-	                 (uintptr_t)instruction_trysucc((void const *)ucpustate_getpc(ustate)),
+	                 (uintptr_t)instruction_trysucc((void const *)ucpustate_getpc(ustate),
+	                                                instrlen_isa_from_ucpustate(ustate)),
 	                 "Caused here [sp=%p]",
 	                 ucpustate_getsp(ustate));
 	is_first = true;
@@ -166,7 +168,8 @@ x86_dump_ucpustate_register_state(struct ucpustate *__restrict ustate,
 			break;
 		is_first = false;
 		addr2line_printf(&syslog_printer, SYSLOG_LEVEL_RAW,
-		                 (uintptr_t)instruction_trypred((void const *)ucpustate_getpc(ustate)),
+		                 (uintptr_t)instruction_trypred((void const *)ucpustate_getpc(ustate),
+		                                                instrlen_isa_from_ucpustate(ustate)),
 		                 ucpustate_getpc(ustate), "Called here [sp=%p]",
 		                 ucpustate_getsp(ustate));
 	}

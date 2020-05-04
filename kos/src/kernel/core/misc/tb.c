@@ -103,8 +103,10 @@ do_print_traceback(pformatprinter printer, void *arg,
 		--n_skip;
 		result = 0;
 	} else {
+		instrlen_isa_t isa;
+		isa = instrlen_isa_from_unwind_getreg(reg_getter, state);
 		result = addr2line_printf(printer, arg,
-		                          (uintptr_t)instruction_trypred(pc),
+		                          (uintptr_t)instruction_trypred(pc, isa),
 		                          (uintptr_t)pc,
 		                          "sp=%p", sp);
 		if unlikely(result < 0)
@@ -122,8 +124,10 @@ do_print_traceback(pformatprinter printer, void *arg,
 		if (n_skip) {
 			--n_skip;
 		} else {
+			instrlen_isa_t isa;
+			isa = instrlen_isa_from_unwind_getreg(reg_getter, state);
 			temp = addr2line_printf(printer, arg,
-			                        (uintptr_t)instruction_trypred(pc),
+			                        (uintptr_t)instruction_trypred(pc, isa),
 			                        (uintptr_t)pc, "sp=%p", sp);
 			if unlikely(temp < 0)
 				goto err;
@@ -145,6 +149,8 @@ do_print_traceback(pformatprinter printer, void *arg,
 		if ((byte_t *)last_good_sp >= (byte_t *)minaddr &&
 		    (byte_t *)last_good_sp < (byte_t *)endaddr) {
 			bool is_first = true;
+			instrlen_isa_t isa;
+			isa = instrlen_isa_from_unwind_getreg(reg_getter, state);
 #ifdef __ARCH_STACK_GROWS_DOWNWARDS
 			uintptr_t iter;
 			iter = FLOOR_ALIGN((uintptr_t)last_good_sp, sizeof(void *));
@@ -176,7 +182,7 @@ do_print_traceback(pformatprinter printer, void *arg,
 					--n_skip;
 				} else {
 					temp = addr2line_printf(printer, arg,
-					                        (uintptr_t)instruction_trypred(pc),
+					                        (uintptr_t)instruction_trypred(pc, isa),
 					                        (uintptr_t)pc, "pc@%p", iter);
 					if unlikely(temp < 0)
 						goto err;
