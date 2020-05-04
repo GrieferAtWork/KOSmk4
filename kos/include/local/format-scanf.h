@@ -39,6 +39,12 @@
 #ifndef __FORMAT_ARGS
 #define __FORMAT_ARGS     args
 #endif /* !__FORMAT_ARGS */
+#ifndef __FORMAT_UNICODE_WRITEUTF8
+#define __FORMAT_UNICODE_WRITEUTF8 unicode_writeutf8
+#endif /* !__FORMAT_UNICODE_WRITEUTF8 */
+#ifndef __FORMAT_UNICODE_WRITEUTF16
+#define __FORMAT_UNICODE_WRITEUTF16 unicode_writeutf16
+#endif /* !__FORMAT_UNICODE_WRITEUTF16 */
 
 #include <hybrid/typecore.h>
 
@@ -203,7 +209,7 @@ __next_mod_curr:
 			++__result;
 			if (__flags & __SCANF_FLAG_IGNORED)
 				break;
-			__dest = __builtin_va_arg(__FORMAT_ARGS,void *);
+			__dest = __builtin_va_arg(__FORMAT_ARGS, void *);
 			switch (__type_size) {
 #if __SIZEOF_INT__ != 1
 			case 1:
@@ -368,7 +374,7 @@ __read_chr_after_radix_prefix:
 				goto __end_unget;
 __store_integer_val:
 			if (!(__flags & __SCANF_FLAG_IGNORED)) {
-				void *__dest = __builtin_va_arg(__FORMAT_ARGS,void *);
+				void *__dest = __builtin_va_arg(__FORMAT_ARGS, void *);
 				switch (__type_size) {
 #if __SIZEOF_INT__ != 1
 				case 1:
@@ -609,9 +615,50 @@ __pattern_has_char:
 
 
 		case 'c': {
+			unsigned char *__dest;
 			if (__width == (__SIZE_TYPE__)-1)
 				__width = 1;
-			/* TODO: `%c' */
+			__dest = __builtin_va_arg(__FORMAT_ARGS, unsigned char *);
+			if __unlikely(!__width)
+				break;
+			if (!__has_temp)
+				goto __read_temp_for_format_c;
+			/* TODO: If given, limit the max # of bytes written to `__dest'
+			 *       when `__type_size != 0' to at most `__bufsize' bytes!
+			 *       Stop scanning if the buffer size would be exceeded. */
+			for (;;) {
+				/* Truncate read characters */
+				if (__type_size == 0) {
+__write_temp_for_format_c:
+					*__dest++ = (unsigned char)(__CHAR32_TYPE__)__temp;
+				} else if (__type_size == 1) {
+					/* `%I8c' (store UTF-8 characters into a `uint8_t *') */
+					__dest = (unsigned char *)__FORMAT_UNICODE_WRITEUTF8((char *)__dest, (__CHAR32_TYPE__)__temp);
+				} else if (__type_size == 2) {
+					/* `%I16c' (store UTF-16 characters into a `uint16_t *') */
+					__dest = (unsigned char *)__FORMAT_UNICODE_WRITEUTF16((__CHAR16_TYPE__ *)__dest, (__CHAR32_TYPE__)__temp);
+				} else if (__type_size == 4 || __type_size == 8) {
+					/* `%I32c' (store UTF-32 characters into a `uint32_t *') */
+					/* `%I64c' (store UTF-32 characters into a `uint64_t *') */
+					*(__CHAR32_TYPE__ *)__dest = (__CHAR32_TYPE__)__temp;
+					__dest += 4;
+					if (__type_size == 8) {
+						*(__CHAR32_TYPE__ *)__dest = 0;
+						__dest += 4;
+					}
+				} else {
+					goto __write_temp_for_format_c;
+				}
+				--__width;
+				if (!__width)
+					break;
+__read_temp_for_format_c:
+				__temp = (*__FORMAT_PGETC)(__FORMAT_ARG);
+				if __unlikely(__temp < 0)
+					goto __err_or_eof;
+			}
+			__has_temp = 0;
+			++__result;
 		}	break;
 
 		default:
@@ -667,6 +714,8 @@ __err:
 }
 
 
+#undef __FORMAT_UNICODE_WRITEUTF8
+#undef __FORMAT_UNICODE_WRITEUTF16
 #undef __FORMAT_ARGS
 #undef __FORMAT_FORMAT
 #undef __FORMAT_ARG

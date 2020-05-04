@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2fd6b402 */
+/* HASH CRC-32:0x9a5c8ac6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -946,13 +946,15 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_vscanf") ssize_t
                               char const *__restrict format,
                               va_list args) __THROWS(...) {
 #line 952 "kos/src/libc/magic/format-printer.c"
-#define __CHAR_TYPE       char
-#define __CHAR_SIZE       __SIZEOF_CHAR__
-#define __FORMAT_PGETC    pgetc
-#define __FORMAT_PUNGETC  pungetc
-#define __FORMAT_ARG      arg
-#define __FORMAT_FORMAT   format
-#define __FORMAT_ARGS     args
+#define __CHAR_TYPE                 char
+#define __CHAR_SIZE                 __SIZEOF_CHAR__
+#define __FORMAT_PGETC              pgetc
+#define __FORMAT_PUNGETC            pungetc
+#define __FORMAT_ARG                arg
+#define __FORMAT_FORMAT             format
+#define __FORMAT_ARGS               args
+#define __FORMAT_UNICODE_WRITEUTF8  libc_unicode_writeutf8
+#define __FORMAT_UNICODE_WRITEUTF16 libc_unicode_writeutf16
 #include <local/format-scanf.h>
 }
 
@@ -992,7 +994,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_scanf") ssize_t
                               void *arg,
                               char const *__restrict format,
                               ...) __THROWS(...) {
-#line 974 "kos/src/libc/magic/format-printer.c"
+#line 976 "kos/src/libc/magic/format-printer.c"
 	ssize_t result;
 	va_list args;
 	va_start(args, format);
@@ -1008,7 +1010,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_sprintf_printer") ssize_t
 NOTHROW_NCX(LIBCCALL libc_format_sprintf_printer)(/*char ***/ void *arg,
                                                   /*utf-8*/ char const *__restrict data,
                                                   size_t datalen) {
-#line 991 "kos/src/libc/magic/format-printer.c"
+#line 993 "kos/src/libc/magic/format-printer.c"
 
 
 
@@ -1027,7 +1029,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_snprintf_printer") ssize_
 NOTHROW_NCX(LIBCCALL libc_format_snprintf_printer)(/*struct format_snprintf_data**/ void *arg,
                                                    /*utf-8*/ char const *__restrict data,
                                                    size_t datalen) {
-#line 1023 "kos/src/libc/magic/format-printer.c"
+#line 1025 "kos/src/libc/magic/format-printer.c"
 	struct format_snprintf_data_ {
 		char         *sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
 		__SIZE_TYPE__ sd_bufsiz; /* Remaining buffer size. */
@@ -1054,7 +1056,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_width") ssize_t
 NOTHROW_NCX(LIBCCALL libc_format_width)(void *arg,
                                         /*utf-8*/ char const *__restrict data,
                                         size_t datalen) {
-#line 1046 "kos/src/libc/magic/format-printer.c"
+#line 1048 "kos/src/libc/magic/format-printer.c"
 	size_t result = 0;
 	char const *iter, *end;
 	(void)arg;
@@ -1077,7 +1079,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_length") ssize_t
 NOTHROW_NCX(LIBCCALL libc_format_length)(void *arg,
                                          /*utf-8*/ char const *__restrict data,
                                          size_t datalen) {
-#line 1064 "kos/src/libc/magic/format-printer.c"
+#line 1066 "kos/src/libc/magic/format-printer.c"
 	(void)arg;
 	(void)data;
 	return (ssize_t)datalen;
