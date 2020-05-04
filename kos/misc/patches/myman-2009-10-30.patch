@@ -1,0 +1,251 @@
+diff -Naur myman-2009-10-30-orig/src/myman.c myman-2009-10-30/src/myman.c
+--- myman-2009-10-30-orig/src/myman.c	2009-10-30 19:08:26.000000000 +0100
++++ myman-2009-10-30/src/myman.c	2020-05-04 15:39:18.494359100 +0200
+@@ -1804,49 +1804,6 @@
+ 
+ #endif /* ! USE_WIDEC_SUPPORT */
+ 
+-#ifdef BUILTIN_SIZE
+-extern const char *builtin_size;
+-#undef MYMANSIZE
+-#define MYMANSIZE builtin_size
+-#else
+-#ifndef MYMANSIZE
+-#define MYMANSIZE "big"
+-#endif
+-static const char *MYMANSIZE_str = MYMANSIZE;
+-#undef MYMANSIZE
+-#define MYMANSIZE MYMANSIZE_str
+-#endif
+-
+-#ifndef TILEFILE
+-#define TILEFILE "chr/chr5x2.txt"
+-#endif
+-
+-#ifdef BUILTIN_TILE
+-#undef TILEFILE
+-#define TILEFILE 0
+-extern const char *builtin_tilefile;
+-#else
+-static const char TILEFILE_str[] = TILEFILE;
+-#undef TILEFILE
+-#define TILEFILE TILEFILE_str
+-#define builtin_tilefile TILEFILE
+-#endif
+-
+-#ifndef SPRITEFILE
+-#define SPRITEFILE "spr/spr7x3.txt"
+-#endif
+-
+-#ifdef BUILTIN_SPRITE
+-#undef SPRITEFILE
+-#define SPRITEFILE 0
+-extern const char *builtin_spritefile;
+-#else
+-static const char SPRITEFILE_str[] = SPRITEFILE;
+-#undef SPRITEFILE
+-#define SPRITEFILE SPRITEFILE_str
+-#define builtin_spritefile SPRITEFILE
+-#endif
+-
+ #ifndef HAVE_CHTYPE
+ #define HAVE_CHTYPE 1
+ #endif
+@@ -2651,37 +2608,6 @@
+ 
+ #define MY_COLS (COLS / (use_fullwidth ? 2 : 1))
+ 
+-#ifdef BUILTIN_VARIANT
+-extern const char *builtin_variant;
+-#undef MYMANVARIANT
+-#define MYMANVARIANT builtin_variant
+-#else
+-#ifndef MYMANVARIANT
+-#define MYMANVARIANT "myman"
+-#endif
+-static const char *MYMANVARIANT_str = MYMANVARIANT;
+-#undef MYMANVARIANT
+-#define MYMANVARIANT MYMANVARIANT_str
+-#endif
+-
+-
+-#ifndef MAZEFILE
+-#define MAZEFILE "lvl/maze.txt"
+-#endif
+-
+-#ifdef BUILTIN_MAZE
+-extern const char *maze_data;
+-extern const char *maze_color_data;
+-extern const char *builtin_mazefile;
+-#undef MAZEFILE
+-#define MAZEFILE 0
+-#else
+-static char MAZEFILE_str[] = MAZEFILE;
+-#undef MAZEFILE
+-#define MAZEFILE MAZEFILE_str
+-#define builtin_mazefile MAZEFILE
+-#endif
+-
+ unsigned short *inside_wall = NULL;
+ 
+ /*
+@@ -7423,8 +7349,6 @@
+     const char *spritefile = SPRITEFILE;
+     const char *mazefile = MAZEFILE;
+     int option_index;
+-    const char *defvariant = MYMANVARIANT;
+-    const char *defsize = MYMANSIZE;
+     unsigned long uli;
+ 
+     while ((i = getopt_long(argc, argv, short_options,
+@@ -7432,19 +7356,11 @@
+            != -1)
+         switch (i) {
+         case 'V':
+-            printf("%s-%s (%s) %s\n%s\n",
+-                   MYMANVARIANT,
+-                   MYMANSIZE,
++            printf("%s %s\n%s\n",
+                    MYMAN,
+                    MYMANVERSION,
+                    MYMANCOPYRIGHT);
+             fflush(stdout), fflush(stderr), exit(0);
+-        case 'v':
+-            defvariant = optarg;
+-            break;
+-        case 'z':
+-            defsize = optarg;
+-            break;
+         case 'b':
+             use_sound = 1;
+             break;
+@@ -7601,15 +7517,6 @@
+             nogame = 1;
+             break;
+         case 'm':
+-#ifdef BUILTIN_MAZE
+-            if ((*optarg == '(') &&
+-                (strlen(optarg) == (strlen(builtin_mazefile) + 2)) &&
+-                (optarg[strlen(optarg) - 1] == ')') &&
+-                ! strncmp(optarg + 1, builtin_mazefile, strlen(builtin_mazefile))) {
+-                mazefile = 0;
+-                break;
+-            }
+-#endif
+             mazefile = optarg;
+             break;
+         case 'n':
+@@ -7643,27 +7550,9 @@
+             use_dim_and_bright_p = 1;
+             break;
+         case 't':
+-#ifdef BUILTIN_TILE
+-            if ((*optarg == '(') &&
+-                (strlen(optarg) == (strlen(builtin_tilefile) + 2)) &&
+-                (optarg[strlen(optarg) - 1] == ')') &&
+-                ! strncmp(optarg + 1, builtin_tilefile, strlen(builtin_tilefile))) {
+-                tilefile = 0;
+-                break;
+-            }
+-#endif
+             tilefile = optarg;
+             break;
+         case 's':
+-#ifdef BUILTIN_SPRITE
+-            if ((*optarg == '(') &&
+-                (strlen(optarg) == (strlen(builtin_spritefile) + 2)) &&
+-                (optarg[strlen(optarg) - 1] == ')') &&
+-                ! strncmp(optarg + 1, builtin_spritefile, strlen(builtin_spritefile))) {
+-                spritefile = 0;
+-                break;
+-            }
+-#endif
+             spritefile = optarg;
+             break;
+         case 'f':
+@@ -7708,22 +7597,6 @@
+         fflush(stderr), exit(2);
+     }
+ #endif
+-    if (strcmp(defvariant, MYMANVARIANT))
+-    {
+-        fprintf(stderr,
+-                "%s: game variant `%s' not included in this binary\n",
+-                progname,
+-                defvariant);
+-        exit(2);
+-    }
+-    if (strcmp(defsize, MYMANSIZE))
+-    {
+-        fprintf(stderr,
+-                "%s: game size `%s' not included in this binary\n",
+-                progname,
+-                defsize);
+-        exit(2);
+-    }
+ 
+ #if ! USE_ATTR
+     if (use_underline)
+@@ -7776,29 +7649,6 @@
+     mindelay = mymandelay / 2;
+ #endif
+ 
+-#ifdef BUILTIN_MAZE
+-    if (! mazefile)
+-    {
+-        maze = (char *) malloc(maze_n * maze_h * (maze_w + 1) * sizeof(*maze));
+-        if (! maze)
+-        {
+-            perror("malloc");
+-            exit(1);
+-        }
+-        memcpy((void *) maze,
+-               (void *) maze_data,
+-               maze_n * maze_h * (maze_w + 1));
+-        maze_color = (char *) malloc(maze_n * maze_h * (maze_w + 1) * sizeof(*maze_color));
+-        if (! maze_color)
+-        {
+-            perror("malloc");
+-            exit(1);
+-        }
+-        memcpy((void *) maze_color,
+-               (void *) maze_color_data,
+-               maze_n * maze_h * (maze_w + 1));
+-    }
+-#endif /* defined(BUILTIN_MAZE) */
+     if (mazefile && readmaze(mazefile, &maze_n, &maze_w, &maze_h, &maze, &maze_flags, &maze_color, &maze_args))
+     {
+         exit(1);
+@@ -7955,12 +7805,8 @@
+         sprite_register_color[i] = 0x7;
+     }
+     for (i = 0; i < 256; i ++) {
+-#ifndef BUILTIN_TILE
+         tile_color[i] = 0x7;
+-#endif
+-#ifndef BUILTIN_SPRITE
+         sprite_color[i] = 0x7;
+-#endif
+     }
+     parse_myman_args(argc, argv);
+ 
+diff -Naur myman-2009-10-30-orig/src/utils.c myman-2009-10-30/src/utils.c
+--- myman-2009-10-30-orig/src/utils.c	2009-10-30 19:08:09.000000000 +0100
++++ myman-2009-10-30/src/utils.c	2020-05-04 15:42:46.987059000 +0200
+@@ -221,15 +221,13 @@
+ 
+ const char *DONEMESSAGE = "[Space: OK, Q: quit]";
+ 
+-const char *short_options = "Vv:z:bcd:D:g:l:Lhkm:noprqs:t:uUMRSTf:F:aAeEBNiI12xX";
++const char *short_options = "Vv:bcd:D:g:l:Lhkm:noprqs:t:uUMRSTf:F:aAeEBNiI12xX";
+ static struct option long_options_static[] =
+ {
+     {"version", 0, 0, 'V'},
+     {"help", 0, 0, 'h'},
+     {"keys", 0, 0, 'k'},
+     {"legal", 0, 0, 'L'},
+-    {"variant", 1, 0, 'v'},
+-    {"size", 1, 0, 'z'},
+     {0, 0, 0, 0}
+ };
+ struct option *long_options = long_options_static;
