@@ -1,4 +1,23 @@
 #!/bin/bash
+# Copyright (c) 2019-2020 Griefer@Work
+#
+# This software is provided 'as-is', without any express or implied
+# warranty. In no event will the authors be held liable for any damages
+# arising from the use of this software.
+#
+# Permission is granted to anyone to use this software for any purpose,
+# including commercial applications, and to alter it and redistribute it
+# freely, subject to the following restrictions:
+#
+# 1. The origin of this software must not be misrepresented; you must not
+#    claim that you wrote the original software. If you use this software
+#    in a product, an acknowledgement (see the following) in the product
+#    documentation is required:
+#    Portions Copyright (c) 2019-2020 Griefer@Work
+# 2. Altered source versions must be plainly marked as such, and must not be
+#    misrepresented as being the original software.
+# 3. This notice may not be removed or altered from any source distribution.
+
 
 cmd() {
 	$* || {
@@ -77,18 +96,18 @@ apply_patch() {
 case $TOOL_NAME in
 
 	bochs | bochs-2.6.11)
-		BOCHS_VERISON="2.6.11"
+		BOCHS_VERSION="2.6.11"
 		cmd mkdir -p "$KOS_BINUTILS/src"
-		BOCHS_BUILDPATH="$KOS_BINUTILS/build-bochs-$BOCHS_VERISON"
-		BOCHS_SRCPATH="$KOS_BINUTILS/src/bochs-$BOCHS_VERISON"
+		BOCHS_BUILDPATH="$KOS_BINUTILS/build-bochs-$BOCHS_VERSION"
+		BOCHS_SRCPATH="$KOS_BINUTILS/src/bochs-$BOCHS_VERSION"
 		if [ "$MODE_FORCE_MAKE" == yes ] || (! [ -f "$BOCHS_BUILDPATH/bochs" ] && ! [ -f "$BOCHS_BUILDPATH/bochs.exe" ]); then
 			if [ "$MODE_FORCE_CONF" == yes ] || ! [ -f "$BOCHS_BUILDPATH/Makefile" ]; then
 				if ! [ -f "$BOCHS_SRCPATH/configure" ]; then
 					cmd cd "$KOS_BINUTILS/src"
 					download_file \
-						"bochs-$BOCHS_VERISON.tar.gz" \
-						"https://downloads.sourceforge.net/project/bochs/bochs/$BOCHS_VERISON/bochs-$BOCHS_VERISON.tar.gz"
-					cmd tar xvf "bochs-$BOCHS_VERISON.tar.gz"
+						"bochs-$BOCHS_VERSION.tar.gz" \
+						"https://downloads.sourceforge.net/project/bochs/bochs/$BOCHS_VERSION/bochs-$BOCHS_VERSION.tar.gz"
+					cmd tar xvf "bochs-$BOCHS_VERSION.tar.gz"
 				fi
 				cmd mkdir -p "$BOCHS_BUILDPATH"
 				cmd cd "$BOCHS_BUILDPATH"
@@ -109,7 +128,7 @@ case $TOOL_NAME in
 				#                     one for i386 and one for x86_64 (and
 				#                     we sadly can't use the same for both)
 				# --enable-protection-keys  (requires --enable-x86-64)
-				cmd bash "../src/bochs-$BOCHS_VERISON/configure" \
+				cmd bash "../src/bochs-$BOCHS_VERSION/configure" \
 					--enable-cpu-level=6 \
 					--enable-a20-pin \
 					--enable-gdb-stub \
@@ -135,7 +154,7 @@ case $TOOL_NAME in
 			fi
 			apply_patch \
 				"${BOCHS_SRCPATH}" \
-				"$KOS_MISC/patches/bochs-$BOCHS_VERISON.patch"
+				"$KOS_MISC/patches/bochs-$BOCHS_VERSION.patch"
 			cmd cd "$BOCHS_BUILDPATH"
 			cmd make -j $MAKE_PARALLEL_COUNT
 		fi
