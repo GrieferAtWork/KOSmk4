@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x561e17bd */
+/* HASH CRC-32:0x12c21099 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __LOCAL_LIBC(unicode_writeutf16) __ATTR_RETNONNULL __ATTR_NONNULL((1)) __CHAR16_
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_writeutf16))(/*utf-16*/ __CHAR16_TYPE__ *__restrict __dst,
                                                                 __CHAR32_TYPE__ __ch) {
 #line 733 "kos/src/libc/magic/unicode.c"
-	if (__ch <= 0xffff && (__ch < 0xd800 || __ch > 0xdfff)) {
+	if __likely(__ch <= 0xffff && (__ch < 0xd800 || __ch > 0xdfff)) {
 		*__dst++ = (__CHAR16_TYPE__)__ch;
 	} else {
 		__ch -= 0x10000;

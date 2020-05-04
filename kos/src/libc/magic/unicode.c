@@ -686,7 +686,7 @@ unicode_readutf16_swap_rev_n:([nonnull] /*utf-16*/ $char16_t const **__restrict 
 @@This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst'
 [ATTR_RETNONNULL][kernel][libc]
 unicode_writeutf8:([nonnull] /*utf-8*/ char *__restrict dst, $char32_t ch) -> char * {
-	if (ch <= UTF8_1BYTE_MAX) {
+	if likely(ch <= UTF8_1BYTE_MAX) {
 		*dst++ = (char)(u8)ch;
 	} else if (ch <= UTF8_2BYTE_MAX) {
 		*dst++ = (char)(0xc0 | (u8)((ch >> 6)/* & 0x1f*/));
@@ -728,9 +728,9 @@ unicode_writeutf8:([nonnull] /*utf-8*/ char *__restrict dst, $char32_t ch) -> ch
 %
 @@Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
 @@This function will write at most `UNICODE_UTF16_CURLEN' bytes to `dst'
-[ATTR_RETNONNULL][kernel]
+[ATTR_RETNONNULL][kernel][libc]
 unicode_writeutf16:([nonnull] /*utf-16*/ $char16_t *__restrict dst, $char32_t ch) -> $char16_t * {
-	if (ch <= 0xffff && (ch < 0xd800 || ch > 0xdfff)) {
+	if likely(ch <= 0xffff && (ch < 0xd800 || ch > 0xdfff)) {
 		*dst++ = (char16_t)ch;
 	} else {
 		ch -= UTF16_SURROGATE_SHIFT;
@@ -744,9 +744,9 @@ unicode_writeutf16:([nonnull] /*utf-16*/ $char16_t *__restrict dst, $char32_t ch
 @@Same as `unicode_writeutf16()', but return `NULL' when `UNICODE_ISVALIDUTF16(ch)' is false
 [ATTR_WUNUSED]
 unicode_writeutf16_chk:([nonnull] /*utf-16*/ $char16_t *__restrict dst, $char32_t ch) -> $char16_t * {
-	if (ch > 0x10ffff)
+	if unlikely(ch > 0x10ffff)
 		return NULL;
-	if (ch <= 0xffff && (ch < 0xd800 || ch > 0xdfff)) {
+	if likely(ch <= 0xffff && (ch < 0xd800 || ch > 0xdfff)) {
 		*dst++ = (char16_t)ch;
 	} else {
 		ch -= UTF16_SURROGATE_SHIFT;

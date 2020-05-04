@@ -39,12 +39,6 @@
 #ifndef __FORMAT_ARGS
 #define __FORMAT_ARGS     args
 #endif /* !__FORMAT_ARGS */
-#ifndef __FORMAT_UNICODE_WRITEUTF8
-#define __FORMAT_UNICODE_WRITEUTF8 unicode_writeutf8
-#endif /* !__FORMAT_UNICODE_WRITEUTF8 */
-#ifndef __FORMAT_UNICODE_WRITEUTF16
-#define __FORMAT_UNICODE_WRITEUTF16 unicode_writeutf16
-#endif /* !__FORMAT_UNICODE_WRITEUTF16 */
 
 #include <hybrid/typecore.h>
 
@@ -278,10 +272,13 @@ __do_scanf_integer:
 				goto __store_integer_val;
 			}
 			if (!__has_temp) {
+__do_scanf_integer_read_initial:
 				__temp = (*__FORMAT_PGETC)(__FORMAT_ARG);
 				if __unlikely(__temp < 0)
 					goto __err_or_eof;
 			}
+			if (__libc_unicode_isspace((__CHAR32_TYPE__)__temp))
+				goto __do_scanf_integer_read_initial; /* Skip leading space */
 			if (!(__flags & __SCANF_FLAG_UNSIGNED)) {
 				__flags &= ~__SCANF_FLAG_SIGNED;
 				/* Process sign prefixes. */
@@ -431,20 +428,23 @@ __store_integer_val:
 			char *__dst;
 			/* [OPT] bufsize = va_arg(size_t)
 			 * READ_NON_WHITESPACE(maxchars: __width)
-			 * WRITE_UTF8(dst: va_arg(char *),maxbytes: bufsize)
+			 * WRITE_UTF8(dst: va_arg(char *), maxbytes: bufsize)
 			 * >> char buf[128];
 			 * >> char const *data = "name = foobar";
-			 * >> sscanf(data,"name = %$s",sizeof(buf),buf);
-			 * >> printf("buf = %s\n",buf);
+			 * >> sscanf(data, "name = %$s", sizeof(buf), buf);
+			 * >> printf("buf = %s\n", buf);
 			 * NOTE: If the given buffer is of insufficient size, a match failure is indicated!
 			 * NOTE: We also NUL-terminate the given buffer (with the given bufsize including memory required for that) */
 			if (__flags & __SCANF_FLAG_IGNORED) {
 				if (__width) {
 					if (!__has_temp) {
+__do_scanf_string_ignored_read_initial:
 						__temp = (*__FORMAT_PGETC)(__FORMAT_ARG);
 						if __unlikely(__temp < 0)
 							goto __err_or_eof;
 					}
+					if (__libc_unicode_isspace((__CHAR32_TYPE__)__temp))
+						goto __do_scanf_string_ignored_read_initial; /* Skip leading space */
 					for (;;) {
 						if (!__width)
 							break;
@@ -459,13 +459,14 @@ __store_integer_val:
 					__has_temp = 1;
 				}
 			} else {
-				/* XXX: `%$I16s' --> Store into a utf-16 target buffer */
-				/* XXX: `%$I32s' --> Store into a utf-32 target buffer */
+				/* TODO: `%$I16s' --> Store into a utf-16 target buffer */
+				/* TODO: `%$I32s' --> Store into a utf-32 target buffer */
 				__dst = __builtin_va_arg(__FORMAT_ARGS,char *);
 				if (!__bufsize)
 					break;
 				if (__width) {
 					if (!__has_temp) {
+__do_scanf_string_read_initial:
 						__temp = (*__FORMAT_PGETC)(__FORMAT_ARG);
 						if __unlikely(__temp < 0) {
 							if (__temp != __EOF)
@@ -476,6 +477,8 @@ __done_string_terminate_eof:
 							goto __end;
 						}
 					}
+					if (__libc_unicode_isspace((__CHAR32_TYPE__)__temp))
+						goto __do_scanf_string_read_initial; /* Skip leading space */
 					for (;;) {
 						char __buf[__LIBC_UNICODE_UTF8_CURLEN];
 						__SIZE_TYPE__ __cnt;
@@ -512,7 +515,7 @@ __done_string_terminate_eof:
 			__CHAR32_TYPE__ __pat_ch,__pat_ch2;
 			/* [OPT] bufsize = va_arg(size_t)
 			 * READ_MATCHING_CHARACTERS(maxchars: __width)
-			 * WRITE_UTF8(dst: va_arg(char *),maxbytes: bufsize) */
+			 * WRITE_UTF8(dst: va_arg(char *), maxbytes: bufsize) */
 			while (*__FORMAT_FORMAT == '^') {
 				__flags ^= __SCANF_FLAG_INVERT;
 				++__FORMAT_FORMAT;
@@ -554,9 +557,9 @@ __pattern_skip_has_char:
 					__has_temp = 1;
 				}
 			} else {
-				/* XXX: `%$I16s' --> Store into a utf-16 target buffer */
-				/* XXX: `%$I32s' --> Store into a utf-32 target buffer */
-				__dst = __builtin_va_arg(__FORMAT_ARGS,char *);
+				/* TODO: `%$I16s' --> Store into a utf-16 target buffer */
+				/* TODO: `%$I32s' --> Store into a utf-32 target buffer */
+				__dst = __builtin_va_arg(__FORMAT_ARGS, char *);
 				if (!__bufsize)
 					break;
 				if (__width) {
@@ -615,47 +618,63 @@ __pattern_has_char:
 
 
 		case 'c': {
-			unsigned char *__dest;
 			if (__width == (__SIZE_TYPE__)-1)
 				__width = 1;
-			__dest = __builtin_va_arg(__FORMAT_ARGS, unsigned char *);
-			if __unlikely(!__width)
-				break;
-			if (!__has_temp)
-				goto __read_temp_for_format_c;
-			/* TODO: If given, limit the max # of bytes written to `__dest'
-			 *       when `__type_size != 0' to at most `__bufsize' bytes!
-			 *       Stop scanning if the buffer size would be exceeded. */
-			for (;;) {
-				/* Truncate read characters */
-				if (__type_size == 0) {
-__write_temp_for_format_c:
-					*__dest++ = (unsigned char)(__CHAR32_TYPE__)__temp;
-				} else if (__type_size == 1) {
-					/* `%I8c' (store UTF-8 characters into a `uint8_t *') */
-					__dest = (unsigned char *)__FORMAT_UNICODE_WRITEUTF8((char *)__dest, (__CHAR32_TYPE__)__temp);
-				} else if (__type_size == 2) {
-					/* `%I16c' (store UTF-16 characters into a `uint16_t *') */
-					__dest = (unsigned char *)__FORMAT_UNICODE_WRITEUTF16((__CHAR16_TYPE__ *)__dest, (__CHAR32_TYPE__)__temp);
-				} else if (__type_size == 4 || __type_size == 8) {
-					/* `%I32c' (store UTF-32 characters into a `uint32_t *') */
-					/* `%I64c' (store UTF-32 characters into a `uint64_t *') */
-					*(__CHAR32_TYPE__ *)__dest = (__CHAR32_TYPE__)__temp;
-					__dest += 4;
-					if (__type_size == 8) {
-						*(__CHAR32_TYPE__ *)__dest = 0;
-						__dest += 4;
-					}
-				} else {
-					goto __write_temp_for_format_c;
-				}
-				--__width;
-				if (!__width)
+			if (__flags & __SCANF_FLAG_IGNORED) {
+				if __unlikely(!__width)
 					break;
+				if (!__has_temp)
+					goto __read_temp_for_ignored_format_c;
+				for (;;) {
+					--__width;
+					if (!__width)
+						break;
+__read_temp_for_ignored_format_c:
+					__temp = (*__FORMAT_PGETC)(__FORMAT_ARG);
+					if __unlikely(__temp < 0)
+						goto __err_or_eof;
+				}
+			} else {
+				unsigned char *__dest;
+				__dest = __builtin_va_arg(__FORMAT_ARGS, unsigned char *);
+				if __unlikely(!__width)
+					break;
+				if (!__has_temp)
+					goto __read_temp_for_format_c;
+				/* TODO: If given, limit the max # of bytes written to `__dest'
+				 *       when `__type_size != 0' to at most `__bufsize' bytes!
+				 *       Stop scanning if the buffer size would be exceeded. */
+				for (;;) {
+					/* Truncate read characters */
+					if (__type_size == 0) {
+__write_temp_for_format_c:
+						*__dest++ = (unsigned char)(__CHAR32_TYPE__)__temp;
+					} else if (__type_size == 1) {
+						/* `%I8c' (store UTF-8 characters into a `uint8_t *') */
+						__dest = (unsigned char *)__libc_unicode_writeutf8((char *)__dest, (__CHAR32_TYPE__)__temp);
+					} else if (__type_size == 2) {
+						/* `%I16c' (store UTF-16 characters into a `uint16_t *') */
+						__dest = (unsigned char *)__libc_unicode_writeutf16((__CHAR16_TYPE__ *)__dest, (__CHAR32_TYPE__)__temp);
+					} else if (__type_size == 4 || __type_size == 8) {
+						/* `%I32c' (store UTF-32 characters into a `uint32_t *') */
+						/* `%I64c' (store UTF-32 characters into a `uint64_t *') */
+						*(__CHAR32_TYPE__ *)__dest = (__CHAR32_TYPE__)__temp;
+						__dest += 4;
+						if (__type_size == 8) {
+							*(__CHAR32_TYPE__ *)__dest = 0;
+							__dest += 4;
+						}
+					} else {
+						goto __write_temp_for_format_c;
+					}
+					--__width;
+					if (!__width)
+						break;
 __read_temp_for_format_c:
-				__temp = (*__FORMAT_PGETC)(__FORMAT_ARG);
-				if __unlikely(__temp < 0)
-					goto __err_or_eof;
+					__temp = (*__FORMAT_PGETC)(__FORMAT_ARG);
+					if __unlikely(__temp < 0)
+						goto __err_or_eof;
+				}
 			}
 			__has_temp = 0;
 			++__result;
@@ -714,8 +733,6 @@ __err:
 }
 
 
-#undef __FORMAT_UNICODE_WRITEUTF8
-#undef __FORMAT_UNICODE_WRITEUTF16
 #undef __FORMAT_ARGS
 #undef __FORMAT_FORMAT
 #undef __FORMAT_ARG

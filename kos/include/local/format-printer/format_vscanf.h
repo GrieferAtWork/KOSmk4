@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe84186f5 */
+/* HASH CRC-32:0x955cbfd5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,36 +31,6 @@
 #include <libc/unicode.h>
 
 #include <libc/string.h>
-/* Dependency: "unicode_writeutf8" from "unicode" */
-#ifndef ____localdep_unicode_writeutf8_defined
-#define ____localdep_unicode_writeutf8_defined 1
-#ifdef __CRT_HAVE_unicode_writeutf8
-/* Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
- * This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst' */
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_unicode_writeutf8,(/*utf-8*/ char *__restrict __dst, __CHAR32_TYPE__ __ch),unicode_writeutf8,(__dst,__ch))
-#else /* LIBC: unicode_writeutf8 */
-#include <local/unicode/unicode_writeutf8.h>
-/* Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
- * This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst' */
-#define __localdep_unicode_writeutf8 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_writeutf8))
-#endif /* unicode_writeutf8... */
-#endif /* !____localdep_unicode_writeutf8_defined */
-
-/* Dependency: "unicode_writeutf16" from "unicode" */
-#ifndef ____localdep_unicode_writeutf16_defined
-#define ____localdep_unicode_writeutf16_defined 1
-#ifdef __CRT_HAVE_unicode_writeutf16
-/* Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
- * This function will write at most `UNICODE_UTF16_CURLEN' bytes to `dst' */
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_unicode_writeutf16,(/*utf-16*/ __CHAR16_TYPE__ *__restrict __dst, __CHAR32_TYPE__ __ch),unicode_writeutf16,(__dst,__ch))
-#else /* LIBC: unicode_writeutf16 */
-#include <local/unicode/unicode_writeutf16.h>
-/* Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
- * This function will write at most `UNICODE_UTF16_CURLEN' bytes to `dst' */
-#define __localdep_unicode_writeutf16 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_writeutf16))
-#endif /* unicode_writeutf16... */
-#endif /* !____localdep_unicode_writeutf16_defined */
-
 __NAMESPACE_LOCAL_BEGIN
 /* Generic scanf implementation
  * Taking a regular scanf-style format string and argument, these
@@ -92,15 +62,13 @@ __LOCAL_LIBC(format_vscanf) __ATTR_LIBC_SCANF(4, 0) __ATTR_NONNULL((1, 2, 4)) __
                                               char const *__restrict __format,
                                               __builtin_va_list __args) __THROWS(...) {
 #line 952 "kos/src/libc/magic/format-printer.c"
-#define __CHAR_TYPE                 char
-#define __CHAR_SIZE                 __SIZEOF_CHAR__
-#define __FORMAT_PGETC              __pgetc
-#define __FORMAT_PUNGETC            __pungetc
-#define __FORMAT_ARG                __arg
-#define __FORMAT_FORMAT             __format
-#define __FORMAT_ARGS               __args
-#define __FORMAT_UNICODE_WRITEUTF8  __localdep_unicode_writeutf8
-#define __FORMAT_UNICODE_WRITEUTF16 __localdep_unicode_writeutf16
+#define __CHAR_TYPE      char
+#define __CHAR_SIZE      __SIZEOF_CHAR__
+#define __FORMAT_PGETC   __pgetc
+#define __FORMAT_PUNGETC __pungetc
+#define __FORMAT_ARG     __arg
+#define __FORMAT_FORMAT  __format
+#define __FORMAT_ARGS    __args
 #include <local/format-scanf.h>
 }
 __NAMESPACE_LOCAL_END

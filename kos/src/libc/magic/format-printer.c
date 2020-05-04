@@ -949,15 +949,13 @@ format_printf:([nonnull] pformatprinter printer, void *arg,
 format_vscanf:([nonnull] pformatgetc pgetc,
                [nonnull] pformatungetc pungetc, void *arg,
                [nonnull] char const *__restrict format, $va_list args) -> $ssize_t {
-#define @__CHAR_TYPE@                 char
-#define @__CHAR_SIZE@                 __SIZEOF_CHAR__
-#define @__FORMAT_PGETC@              pgetc
-#define @__FORMAT_PUNGETC@            pungetc
-#define @__FORMAT_ARG@                arg
-#define @__FORMAT_FORMAT@             format
-#define @__FORMAT_ARGS@               args
-#define @__FORMAT_UNICODE_WRITEUTF8@  unicode_writeutf8
-#define @__FORMAT_UNICODE_WRITEUTF16@ unicode_writeutf16
+#define @__CHAR_TYPE@      char
+#define @__CHAR_SIZE@      __SIZEOF_CHAR__
+#define @__FORMAT_PGETC@   pgetc
+#define @__FORMAT_PUNGETC@ pungetc
+#define @__FORMAT_ARG@     arg
+#define @__FORMAT_FORMAT@  format
+#define @__FORMAT_ARGS@    args
 #include @<local/format-scanf.h>@
 }
 

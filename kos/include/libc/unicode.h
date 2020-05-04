@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd7ad735e */
+/* HASH CRC-32:0x7e3642e8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,6 +40,9 @@
 /* Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
  * This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst' */
 #define __libc_unicode_writeutf8 __libc_core_unicode_writeutf8
+/* Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
+ * This function will write at most `UNICODE_UTF16_CURLEN' bytes to `dst' */
+#define __libc_unicode_writeutf16 __libc_core_unicode_writeutf16
 #define __LIBC_UNICODE_UTF8_MAXLEN              8
 #define __LIBC_UNICODE_UTF8_CURLEN              7
 #define __LIBC_UNICODE_UTF16_MAXLEN             2

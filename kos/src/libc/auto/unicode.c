@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa27d6bb8 */
+/* HASH CRC-32:0x74429096 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -569,7 +569,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_writeutf8") char *
 NOTHROW_NCX(LIBCCALL libc_unicode_writeutf8)(/*utf-8*/ char *__restrict dst,
                                              char32_t ch) {
 #line 689 "kos/src/libc/magic/unicode.c"
-	if (ch <= ((uint32_t)1 << 7)-1) {
+	if likely(ch <= ((uint32_t)1 << 7)-1) {
 		*dst++ = (char)(u8)ch;
 	} else if (ch <= ((uint32_t)1 << 11)-1) {
 		*dst++ = (char)(0xc0 | (u8)((ch >> 6)/* & 0x1f*/));
@@ -615,7 +615,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_writeutf16") char16_t *
 NOTHROW_NCX(LIBCCALL libc_unicode_writeutf16)(/*utf-16*/ char16_t *__restrict dst,
                                               char32_t ch) {
 #line 733 "kos/src/libc/magic/unicode.c"
-	if (ch <= 0xffff && (ch < 0xd800 || ch > 0xdfff)) {
+	if likely(ch <= 0xffff && (ch < 0xd800 || ch > 0xdfff)) {
 		*dst++ = (char16_t)ch;
 	} else {
 		ch -= 0x10000;
@@ -747,9 +747,9 @@ ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_writeutf16_chk") char16_t 
 NOTHROW_NCX(LIBCCALL libc_unicode_writeutf16_chk)(/*utf-16*/ char16_t *__restrict dst,
                                                   char32_t ch) {
 #line 747 "kos/src/libc/magic/unicode.c"
-	if (ch > 0x10ffff)
+	if unlikely(ch > 0x10ffff)
 		return NULL;
-	if (ch <= 0xffff && (ch < 0xd800 || ch > 0xdfff)) {
+	if likely(ch <= 0xffff && (ch < 0xd800 || ch > 0xdfff)) {
 		*dst++ = (char16_t)ch;
 	} else {
 		ch -= 0x10000;
