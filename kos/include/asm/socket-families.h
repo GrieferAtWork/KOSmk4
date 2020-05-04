@@ -42,7 +42,7 @@
 #define AF_SECURITY     14 /* Security callback pseudo AF. */
 #define AF_KEY          15 /* PF_KEY key management API. */
 #define AF_NETLINK      16 /* ... */
-#define AF_ROUTE        AF_NETLINK /* Alias to emulate 4.4BSD. */
+#define AF_ROUTE        16 /* Alias to emulate 4.4BSD. */
 #define AF_PACKET       17 /* Packet family. */
 #define AF_ASH          18 /* Ash. */
 #define AF_ECONET       19 /* Acorn Econet. */
