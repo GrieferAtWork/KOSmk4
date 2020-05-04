@@ -62,19 +62,27 @@ NOTHROW(KCALL realtime_clock_destroy)(struct realtime_clock_struct *__restrict s
 
 struct cpu_timestamp {
 	struct timespec ct_real; /* Realtime */
-	struct timespec ct_prec; /* Realtime precision */
 	jtime_t         ct_cpuj; /* CPU time jiffies */
 	quantum_diff_t  ct_cpuq; /* CPU time quantum */
 };
 
 /* Timestamp for the last realtime re-sync made by the CPU */
-PRIVATE ATTR_PERCPU struct cpu_timestamp thiscpu_last_resync = {};
+PRIVATE ATTR_PERCPU struct cpu_timestamp thiscpu_last_resync = {
+	/* .ct_real = */ {
+		/* .tv_sec  = */ 0,
+		/* .tv_nsec = */ (syscall_ulong_t)-1
+	}
+};
 
 INTERN NOBLOCK NOPREEMPT void
 NOTHROW(FCALL cpu_resync_realtime)(struct cpu *__restrict self) {
+#if 0
+	(void)self;
+#else
 	REF struct realtime_clock_struct *rt;
 	struct cpu_timestamp *cts;
 	struct cpu_timestamp nts;
+	struct timespec precision;
 	quantum_diff_t elapsed, cpus;
 	assert(!PREEMPTION_ENABLED());
 	rt = realtime_clock.get_nopr();
@@ -85,7 +93,7 @@ NOTHROW(FCALL cpu_resync_realtime)(struct cpu *__restrict self) {
 	nts.ct_real = (*rt->rc_gettime)(rt);
 	elapsed     = cpu_quantum_elapsed_nopr(self, &nts.ct_cpuj);
 	COMPILER_BARRIER();
-	nts.ct_prec = rt->rc_precision;
+	precision = rt->rc_precision;
 	decref_unlikely(rt);
 	cpus = FORCPU(self, thiscpu_quantum_length);
 	nts.ct_cpuq = FORCPU(self, thiscpu_quantum_offset);
@@ -98,7 +106,7 @@ NOTHROW(FCALL cpu_resync_realtime)(struct cpu *__restrict self) {
 		nts.ct_cpuj += nts.ct_cpuq / cpus;
 		nts.ct_cpuq = nts.ct_cpuq % cpus;
 	}
-	if (!cts->ct_prec.tv_nsec && !cts->ct_prec.tv_sec) {
+	if (cts->ct_real.tv_nsec == (syscall_ulong_t)-1) {
 		/* First time. */
 		*cts = nts;
 	} else {
@@ -130,10 +138,10 @@ NOTHROW(FCALL cpu_resync_realtime)(struct cpu *__restrict self) {
 			elapsed_error      = rt_elapsed - cpu_elapsed;
 			cpu_clock_too_fast = false;
 		}
-		if (elapsed_error > nts.ct_prec) {
+		if (elapsed_error > precision) {
 			u64 elapsed_error_nano, cpu_elapsed_nano;
 			quantum_diff_t adjust, new_quantum_length;
-			elapsed_error -= nts.ct_prec;
+			elapsed_error -= precision;
 			/* Adjust the quantum length to fix a precision error:
 			 *    Over the last `cpu_elapsed' seconds, our CPU has accumulated
 			 *    an error of approximately `elapsed_error' seconds.
@@ -157,6 +165,7 @@ NOTHROW(FCALL cpu_resync_realtime)(struct cpu *__restrict self) {
 			}
 		}
 	}
+#endif
 }
 
 INTERN NOBLOCK NOPREEMPT void
@@ -186,8 +195,7 @@ PUBLIC NOBLOCK WUNUSED struct timespec NOTHROW(KCALL realtime)(void) {
 	was = PREEMPTION_PUSHOFF();
 	me  = THIS_CPU;
 	/* Make sure that a timestamp was loaded at some point. */
-	if (!FORCPU(me, thiscpu_last_resync.ct_prec.tv_sec) &&
-	    !FORCPU(me, thiscpu_last_resync.ct_prec.tv_nsec))
+	if (FORCPU(me, thiscpu_last_resync.ct_real.tv_nsec) == (syscall_ulong_t)-1)
 		cpu_resync_realtime(me);
 	result      = FORCPU(me, thiscpu_last_resync.ct_real);
 	resync_cpuj = FORCPU(me, thiscpu_last_resync.ct_cpuj);
@@ -238,8 +246,7 @@ NOTHROW(FCALL cpu_quantum_time_to_realtime_nopr)(qtime_t const *__restrict qtime
 	was = PREEMPTION_PUSHOFF();
 	me  = THIS_CPU;
 	/* Make sure that a timestamp was loaded at some point. */
-	if (!FORCPU(me, thiscpu_last_resync.ct_prec.tv_sec) &&
-	    !FORCPU(me, thiscpu_last_resync.ct_prec.tv_nsec))
+	if (FORCPU(me, thiscpu_last_resync.ct_real.tv_nsec) == (syscall_ulong_t)-1)
 		cpu_resync_realtime(me);
 	result               = FORCPU(me, thiscpu_last_resync.ct_real);
 	resync_qtime.q_jtime = FORCPU(me, thiscpu_jiffies);
@@ -268,10 +275,13 @@ NOTHROW(FCALL cpu_quantum_time_to_realtime_nopr)(qtime_t const *__restrict qtime
 PUBLIC NOBLOCK NOPREEMPT WUNUSED ATTR_PURE qtime_t
 NOTHROW(FCALL realtime_to_cpu_quantum_time_nopr)(struct timespec const *__restrict tms) {
 	/* XXX: This is very imprecise, but this function will go away once qtime_t gets removed! */
+	struct timespec now;
 	struct timespec offset_from_now;
-	qtime_t result;
-	offset_from_now = *tms - realtime();
-	result = cpu_quantum_time();
+	qtime_t result, now_qtime;
+	now             = realtime();
+	now_qtime       = cpu_quantum_time();
+	offset_from_now = *tms - now;
+	result          = now_qtime;
 	result.add_seconds(offset_from_now.tv_sec);
 	result.add_nanoseconds(offset_from_now.tv_nsec);
 	return result;
@@ -367,7 +377,6 @@ NOTHROW(KCALL cpu_enable_preemptive_interrupts_nopr)(void) {
 		struct timespec now;
 		struct cpu *me = THIS_CPU;
 		now = (*rt->rc_gettime)(rt);
-		FORCPU(me, thiscpu_last_resync.ct_prec) = rt->rc_precision;
 		decref_unlikely(rt);
 		FORCPU(me, thiscpu_last_resync.ct_real) = now;
 		FORCPU(me, thiscpu_last_resync.ct_cpuj) = FORCPU(me, thiscpu_jiffies);

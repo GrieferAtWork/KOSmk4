@@ -34,6 +34,10 @@
 #define __NSECS_PER_SEC __UINTPTR_C(1000000000)
 #endif /* !__NSECS_PER_SEC */
 
+#ifndef __NSECS_OVERFLOW
+#define __NSECS_OVERFLOW(TV_NSEC_TYPE) (((TV_NSEC_TYPE)-1) / __NSECS_PER_SEC)
+#endif /* !__NSECS_OVERFLOW */
+
 #define __TIMESPEC_CXX_DECL_BEGIN extern "C++" {
 #define __TIMESPEC_CXX_DECL_END }
 #define __TIMESPEC_CXX_SUPPORT(T, TV_SEC_TYPE, TV_NSEC_TYPE)               \
@@ -41,12 +45,11 @@
 	__CXX_CLASSMEMBER __NOBLOCK void                                       \
 	(add_nanoseconds)(TV_NSEC_TYPE __n) __CXX_NOEXCEPT {                   \
 		if (__hybrid_overflow_uadd(tv_nsec, __n, &tv_nsec)) {              \
-			tv_sec  += ((TV_NSEC_TYPE)-1) / __NSECS_PER_SEC;               \
-			tv_nsec += __n;                                                \
-			tv_nsec -= (TV_NSEC_TYPE)-1;                                   \
+			tv_sec  += __NSECS_OVERFLOW(TV_NSEC_TYPE);                     \
+			tv_nsec -= __NSECS_OVERFLOW(TV_NSEC_TYPE) * __NSECS_PER_SEC;   \
 		}                                                                  \
-		if (tv_nsec > __NSECS_PER_SEC) {                                   \
-			tv_sec += tv_nsec / __NSECS_PER_SEC;                           \
+		if (tv_nsec >= __NSECS_PER_SEC) {                                  \
+			tv_sec  += tv_nsec / __NSECS_PER_SEC;                          \
 			tv_nsec %= __NSECS_PER_SEC;                                    \
 		}                                                                  \
 	}                                                                      \
@@ -54,12 +57,11 @@
 	__CXX_CLASSMEMBER __NOBLOCK void                                       \
 	(sub_nanoseconds)(TV_NSEC_TYPE __n) __CXX_NOEXCEPT {                   \
 		if (__hybrid_overflow_usub(tv_nsec, __n, &tv_nsec)) {              \
-			tv_sec  -= ((TV_NSEC_TYPE)-1) / __NSECS_PER_SEC;               \
-			tv_nsec += (TV_NSEC_TYPE)-1;                                   \
-			tv_nsec -= __n;                                                \
+			tv_sec  -= __NSECS_OVERFLOW(TV_NSEC_TYPE);                     \
+			tv_nsec += __NSECS_OVERFLOW(TV_NSEC_TYPE) * __NSECS_PER_SEC;   \
 		}                                                                  \
-		if (tv_nsec > __NSECS_PER_SEC) {                                   \
-			tv_sec += tv_nsec / __NSECS_PER_SEC;                           \
+		if (tv_nsec >= __NSECS_PER_SEC) {                                  \
+			tv_sec  += tv_nsec / __NSECS_PER_SEC;                          \
 			tv_nsec %= __NSECS_PER_SEC;                                    \
 		}                                                                  \
 	}                                                                      \
@@ -85,31 +87,21 @@
 	}                                                                      \
 	__CXX_CLASSMEMBER __NOBLOCK T &                                        \
 	operator+=(T const &__other) __CXX_NOEXCEPT {                          \
-		tv_nsec += __other.tv_nsec;                                        \
-		if (tv_nsec > __NSECS_PER_SEC) {                                   \
-			tv_sec += tv_nsec / __NSECS_PER_SEC;                           \
-			tv_nsec %= __NSECS_PER_SEC;                                    \
-		}                                                                  \
+		(add_nanoseconds)(__other.tv_nsec);                                \
 		tv_sec += __other.tv_sec;                                          \
 		return *this;                                                      \
 	}                                                                      \
 	__CXX_CLASSMEMBER __NOBLOCK T &                                        \
 	operator-=(T const &__other) __CXX_NOEXCEPT {                          \
-		bool __is_negative;                                                \
 		tv_sec -= __other.tv_sec;                                          \
-		__is_negative = tv_nsec < __other.tv_nsec;                         \
-		tv_nsec -= __other.tv_nsec;                                        \
-		if (__is_negative) {                                               \
-			tv_sec -= (__UINTPTR_C(0) - tv_nsec) / __NSECS_PER_SEC;        \
-			tv_nsec = (__UINTPTR_C(0) - tv_nsec) % __NSECS_PER_SEC;        \
-		}                                                                  \
+		(sub_nanoseconds)(__other.tv_nsec);                                \
 		return *this;                                                      \
 	}                                                                      \
 	__CXX_CLASSMEMBER __NOBLOCK T &                                        \
 	operator*=(unsigned int __n) __CXX_NOEXCEPT {                          \
 		tv_sec *= __n;                                                     \
 		tv_nsec *= __n;                                                    \
-		if (tv_nsec > __NSECS_PER_SEC) {                                   \
+		if (tv_nsec >= __NSECS_PER_SEC) {                                  \
 			tv_sec += tv_nsec / __NSECS_PER_SEC;                           \
 			tv_nsec %= __NSECS_PER_SEC;                                    \
 		}                                                                  \

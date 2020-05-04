@@ -272,8 +272,7 @@ int main_prognam(int argc, char *argv[], char *envp[]) {
 int main_logtime(int argc, char *argv[], char *envp[]) {
 	(void)argc, (void)argv, (void)envp;
 	for (;;) {
-		syslog(LOG_DEBUG, "Entry!\n");
-		sleep(1);
+		usleep(500000);
 	}
 	return 0;
 }
