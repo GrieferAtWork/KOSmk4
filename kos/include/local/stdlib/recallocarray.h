@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f03f815 */
+/* HASH CRC-32:0x7465bbec */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -149,7 +149,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(recallocarray))(void *__mallptr,
                                                            __SIZE_TYPE__ __old_elem_count,
                                                            __SIZE_TYPE__ __new_elem_count,
                                                            __SIZE_TYPE__ __elem_size) {
-#line 1783 "kos/src/libc/magic/stdlib.c"
+#line 1850 "kos/src/libc/magic/stdlib.c"
 	if (__mallptr != __NULLPTR && __old_elem_count != 0) {
 		void *__result;
 		__SIZE_TYPE__ __oldusable, __newneeded;

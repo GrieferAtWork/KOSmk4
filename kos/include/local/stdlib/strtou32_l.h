@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x34e65d02 */
+/* HASH CRC-32:0x454fd52e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtou32_l))(char const *__restrict _
                                                         char **__endptr,
                                                         int __base,
                                                         __locale_t __locale) {
-#line 1085 "kos/src/libc/magic/stdlib.c"
+#line 1088 "kos/src/libc/magic/stdlib.c"
 	(void)__locale;
 	return __localdep_strtou32(__nptr, __endptr, __base);
 }

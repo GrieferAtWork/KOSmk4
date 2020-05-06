@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9bfce2a2 */
+/* HASH CRC-32:0xa0dd7a53 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_fcvt_s))(char *__buf,
                                                      int __ndigit,
                                                      int *__restrict __decptr,
                                                      int *__restrict __sign) {
-#line 2896 "kos/src/libc/magic/stdlib.c"
+#line 2963 "kos/src/libc/magic/stdlib.c"
 	if (!__buf || !__decptr || !__sign)
 		return __EINVAL;
 	__localdep_fcvt_r(__val, __ndigit, __decptr, __sign, __buf, __buflen);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf2b2c0a6 */
+/* HASH CRC-32:0x1d1bb509 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __LOCAL_LIBC(wcstou32) __ATTR_LEAF __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_T
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcstou32))(__WCHAR_TYPE__ const *__restrict __nptr,
                                                       __WCHAR_TYPE__ **__endptr,
                                                       int __base) {
-#line 964 "kos/src/libc/magic/stdlib.c"
+#line 967 "kos/src/libc/magic/stdlib.c"
 	__UINT32_TYPE__ __result, __temp;
 	if (!__base) {
 		if (*__nptr == '0') {

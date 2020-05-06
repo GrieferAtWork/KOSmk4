@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb723abc2 */
+/* HASH CRC-32:0x4addb5ed */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -89,7 +89,7 @@ __LOCAL_LIBC(getsubopt) __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getsubopt))(char **__restrict __optionp,
                                                        char *const *__restrict __tokens,
                                                        char **__restrict __valuep) {
-#line 1576 "kos/src/libc/magic/stdlib.c"
+#line 1579 "kos/src/libc/magic/stdlib.c"
 	unsigned int __i;
 	char *__option, *__nextopt;
 	__SIZE_TYPE__ __option_len;

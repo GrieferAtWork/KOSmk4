@@ -62,7 +62,7 @@
  * must be handled explicitly so-as to already expose the required
  * symbols during the libstdc++ configure phase), or when one of the
  * headers specific to libstdc++ are apart of the include-path (thus
- * also supporting compilers other than g++ as well).
+ * also supporting compilers other than g++).
  */
 #undef _GNU_SOURCE
 #define _GNU_SOURCE 1

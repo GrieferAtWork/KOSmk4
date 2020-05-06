@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x70769406 */
+/* HASH CRC-32:0x165112cd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,7 +66,7 @@ __LOCAL_LIBC(wcstoul) __ATTR_NONNULL((1)) unsigned long
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcstoul))(__WCHAR_TYPE__ const *__restrict __nptr,
                                                      __WCHAR_TYPE__ **__endptr,
                                                      int __base) {
-#line 852 "kos/src/libc/magic/stdlib.c"
+#line 855 "kos/src/libc/magic/stdlib.c"
 #if __SIZEOF_LONG__ <= 4
 	return (unsigned long)__localdep_wcstou32(__nptr, __endptr, __base);
 #else /* __SIZEOF_LONG__ <= 4 */

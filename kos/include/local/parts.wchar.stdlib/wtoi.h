@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf4bacd44 */
+/* HASH CRC-32:0x5d77beb0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,7 +64,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_WUNUSED __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTH
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wtoi) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wtoi))(__WCHAR_TYPE__ const *__nptr) {
-#line 815 "kos/src/libc/magic/stdlib.c"
+#line 818 "kos/src/libc/magic/stdlib.c"
 #if __SIZEOF_INT__ <= 4
 	return (int)__localdep_wcsto32(__nptr, __NULLPTR, 10);
 #else /* __SIZEOF_INT__ <= 4 */

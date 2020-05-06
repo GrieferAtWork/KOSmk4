@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x52da5a40 */
+/* HASH CRC-32:0x7a78640e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -74,7 +74,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(recalloc) __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(recalloc))(void *__mallptr,
                                                       __SIZE_TYPE__ __num_bytes) {
-#line 220 "kos/src/libc/magic/malloc.c"
+#line 226 "kos/src/libc/magic/malloc.c"
 	void *__result;
 	__SIZE_TYPE__ __oldsize;
 	__oldsize = __localdep_malloc_usable_size(__mallptr);

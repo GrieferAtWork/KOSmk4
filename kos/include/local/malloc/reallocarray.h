@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x177cb879 */
+/* HASH CRC-32:0x8c365326 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __LOCAL_LIBC(reallocarray) __ATTR_MALL_DEFAULT_ALIGNED __ATTR_MALL_DEFAULT_ALIGN
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(reallocarray))(void *__ptr,
                                                           __SIZE_TYPE__ __elem_count,
                                                           __SIZE_TYPE__ __elem_size) {
-#line 206 "kos/src/libc/magic/malloc.c"
+#line 212 "kos/src/libc/magic/malloc.c"
 	__SIZE_TYPE__ __total_bytes;
 	if (__hybrid_overflow_umul(__elem_count, __elem_size, &__total_bytes))
 		__total_bytes = (__SIZE_TYPE__)-1; /* Force down-stream failure */

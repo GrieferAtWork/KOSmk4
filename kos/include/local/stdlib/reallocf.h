@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6fc3d5aa */
+/* HASH CRC-32:0xffd20631 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,7 +56,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(reallocf) __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(reallocf))(void *__mallptr,
                                                       __SIZE_TYPE__ __num_bytes) {
-#line 1769 "kos/src/libc/magic/stdlib.c"
+#line 1836 "kos/src/libc/magic/stdlib.c"
 	void *__result;
 	__result = __localdep_realloc(__mallptr, __num_bytes);
 	if __unlikely(!__result)

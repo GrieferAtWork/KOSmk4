@@ -29,6 +29,12 @@
 
 %{
 #include <features.h>
+#if defined(__USE_KOS) && defined(__USE_STRING_OVERLOADS)
+#include <hybrid/__overflow.h>
+#ifndef __cplusplus
+#include <hybrid/pp/__va_nargs.h>
+#endif /* !__cplusplus */
+#endif /* __USE_KOS && __USE_STRING_OVERLOADS */
 
 __SYSDECL_BEGIN
 
@@ -248,6 +254,69 @@ recallocv:(void *mallptr, $size_t elem_count, $size_t elem_size)
 }
 
 
+%
+%
+%#ifdef __USE_STRING_OVERLOADS
+%#ifndef __MALLOC_OVERLOADS_DEFINED
+%#define __MALLOC_OVERLOADS_DEFINED 1
+%{
+#ifdef __malloc_defined
+__NAMESPACE_LOCAL_BEGIN
+__FORCELOCAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1, 2))
+void *__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mallocv))(size_t __elem_count, size_t __elem_size) {
+	size_t __total_size;
+	if (__hybrid_overflow_umul(__elem_count, __elem_size, &__total_size))
+		__total_size = (size_t)-1; /* Force down-stream failure */
+	return (malloc)(__total_size);
+}
+__NAMESPACE_LOCAL_END
+#endif /* __malloc_defined */
+}
+%#ifdef __cplusplus
+%extern "C++" {
+%{
+#ifdef __malloc_defined
+__FORCELOCAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1, 2))
+void *__NOTHROW_NCX(__LIBCCALL malloc)(size_t __elem_count, size_t __elem_size) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mallocv)(__elem_count, __elem_size); }
+#endif /* __malloc_defined */
+#ifdef __calloc_defined
+__FORCELOCAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1))
+void *__NOTHROW_NCX(__LIBCCALL calloc)(size_t __num_bytes) { return (calloc)(1, __num_bytes); }
+#endif /* __calloc_defined */
+}
+[overload_alias] realloc:(*) = reallocarray;
+[overload_alias] recalloc:(*) = recallocv;
+%}
+%#else /* __cplusplus */
+%{
+#ifdef __malloc_defined
+#define __PRIVATE_malloc_1 (malloc)
+#define __PRIVATE_malloc_2 __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mallocv)
+#undef malloc
+#define malloc(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_malloc_, (__VA_ARGS__))(__VA_ARGS__)
+#endif /* __malloc_defined */
+#ifdef __calloc_defined
+#define __PRIVATE_calloc_1(num_bytes) (calloc)(1, num_bytes)
+#define __PRIVATE_calloc_2            (calloc)
+#undef calloc
+#define calloc(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_calloc_, (__VA_ARGS__))(__VA_ARGS__)
+#endif /* __calloc_defined */
+#if defined(__realloc_defined) && defined(__reallocarray_defined)
+#define __PRIVATE_realloc_2 (realloc)
+#define __PRIVATE_realloc_3 (reallocarray)
+#undef realloc
+#define realloc(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_realloc_, (__VA_ARGS__))(__VA_ARGS__)
+#endif /* __realloc_defined && __reallocarray_defined */
+#if defined(__recalloc_defined) && defined(__recallocv_defined)
+#define __PRIVATE_recalloc_2 (recalloc)
+#define __PRIVATE_recalloc_3 (recallocv)
+#undef recalloc
+#define recalloc(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_recalloc_, (__VA_ARGS__))(__VA_ARGS__)
+#endif /* __recalloc_defined && __recallocv_defined */
+}
+%#endif /* !__cplusplus */
+%#endif /* !__MALLOC_OVERLOADS_DEFINED */
+%#endif /* __USE_STRING_OVERLOADS */
 %#endif /* __USE_KOS */
 
 

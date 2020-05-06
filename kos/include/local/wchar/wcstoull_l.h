@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2950b232 */
+/* HASH CRC-32:0xc83ee8cf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,7 +52,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcstoull_l))(__WCHAR_TYPE__ const *__
                                                         __WCHAR_TYPE__ **__endptr,
                                                         int __base,
                                                         __locale_t __locale) {
-#line 1686 "kos/src/libc/magic/stdlib.c"
+#line 1689 "kos/src/libc/magic/stdlib.c"
 	(void)__locale;
 	return __localdep_wcstoull(__nptr, __endptr, __base);
 }

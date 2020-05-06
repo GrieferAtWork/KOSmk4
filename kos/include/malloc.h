@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x33075cb3 */
+/* HASH CRC-32:0x19412dbd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,12 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
+#if defined(__USE_KOS) && defined(__USE_STRING_OVERLOADS)
+#include <hybrid/__overflow.h>
+#ifndef __cplusplus
+#include <hybrid/pp/__va_nargs.h>
+#endif /* !__cplusplus */
+#endif /* __USE_KOS && __USE_STRING_OVERLOADS */
 
 __SYSDECL_BEGIN
 
@@ -269,6 +275,79 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(recallocv, __FORCELOCAL __ATTR_MALL_DEFAULT_ALIG
 #undef __recallocv_defined
 #endif /* recallocv... */
 #endif /* !__recallocv_defined */
+
+
+#ifdef __USE_STRING_OVERLOADS
+#ifndef __MALLOC_OVERLOADS_DEFINED
+#define __MALLOC_OVERLOADS_DEFINED 1
+#ifdef __malloc_defined
+__NAMESPACE_LOCAL_BEGIN
+__FORCELOCAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1, 2))
+void *__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mallocv))(size_t __elem_count, size_t __elem_size) {
+	size_t __total_size;
+	if (__hybrid_overflow_umul(__elem_count, __elem_size, &__total_size))
+		__total_size = (size_t)-1; /* Force down-stream failure */
+	return (malloc)(__total_size);
+}
+__NAMESPACE_LOCAL_END
+#endif /* __malloc_defined */
+#ifdef __cplusplus
+extern "C++" {
+#ifdef __malloc_defined
+__FORCELOCAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1, 2))
+void *__NOTHROW_NCX(__LIBCCALL malloc)(size_t __elem_count, size_t __elem_size) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mallocv)(__elem_count, __elem_size); }
+#endif /* __malloc_defined */
+#ifdef __calloc_defined
+__FORCELOCAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1))
+void *__NOTHROW_NCX(__LIBCCALL calloc)(size_t __num_bytes) { return (calloc)(1, __num_bytes); }
+#endif /* __calloc_defined */
+#ifdef __CRT_HAVE_reallocarray
+__CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,realloc,(void *__ptr, size_t __elem_count, size_t __elem_size),reallocarray,(__ptr,__elem_count,__elem_size))
+#elif defined(__CRT_HAVE_realloc)
+} /* extern "C++" { */
+#include <local/malloc/reallocarray.h>
+extern "C++" {
+__FORCELOCAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBCCALL realloc)(void *__ptr, size_t __elem_count, size_t __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(reallocarray))(__ptr, __elem_count, __elem_size); }
+#endif /* realloc... */
+#ifdef __CRT_HAVE_recallocv
+__CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,recalloc,(void *__mallptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),recallocv,(__mallptr,__elem_count,__elem_size))
+#elif defined(__CRT_HAVE__recalloc)
+__CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,recalloc,(void *__mallptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),_recalloc,(__mallptr,__elem_count,__elem_size))
+#elif defined(__CRT_HAVE_realloc) && (defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize))
+} /* extern "C++" { */
+#include <local/malloc/recallocv.h>
+extern "C++" {
+__FORCELOCAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBCCALL recalloc)(void *__mallptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(recallocv))(__mallptr, __elem_count, __elem_size); }
+#endif /* recalloc... */
+}
+#else /* __cplusplus */
+#ifdef __malloc_defined
+#define __PRIVATE_malloc_1 (malloc)
+#define __PRIVATE_malloc_2 __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mallocv)
+#undef malloc
+#define malloc(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_malloc_, (__VA_ARGS__))(__VA_ARGS__)
+#endif /* __malloc_defined */
+#ifdef __calloc_defined
+#define __PRIVATE_calloc_1(num_bytes) (calloc)(1, num_bytes)
+#define __PRIVATE_calloc_2            (calloc)
+#undef calloc
+#define calloc(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_calloc_, (__VA_ARGS__))(__VA_ARGS__)
+#endif /* __calloc_defined */
+#if defined(__realloc_defined) && defined(__reallocarray_defined)
+#define __PRIVATE_realloc_2 (realloc)
+#define __PRIVATE_realloc_3 (reallocarray)
+#undef realloc
+#define realloc(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_realloc_, (__VA_ARGS__))(__VA_ARGS__)
+#endif /* __realloc_defined && __reallocarray_defined */
+#if defined(__recalloc_defined) && defined(__recallocv_defined)
+#define __PRIVATE_recalloc_2 (recalloc)
+#define __PRIVATE_recalloc_3 (recallocv)
+#undef recalloc
+#define recalloc(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_recalloc_, (__VA_ARGS__))(__VA_ARGS__)
+#endif /* __recalloc_defined && __recallocv_defined */
+#endif /* !__cplusplus */
+#endif /* !__MALLOC_OVERLOADS_DEFINED */
+#endif /* __USE_STRING_OVERLOADS */
 #endif /* __USE_KOS */
 #ifdef __USE_DOS
 #ifdef __CRT_HAVE__msize
