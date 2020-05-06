@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa3490fdf */
+/* HASH CRC-32:0xbd6d4bc7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -916,9 +916,9 @@ ATTR_WEAK ATTR_SECTION(".text.crt.wchar.string.memory.wcspbrk") char32_t *
 NOTHROW_NCX(LIBCCALL libc_wcspbrk)(char32_t const *haystack,
                                    char32_t const *accept) {
 #line 395 "kos/src/libc/magic/string.c"
-	char32_t const *ned_iter;
 	char32_t haych, ch;
 	while ((haych = *haystack++) != '\0') {
+		char32_t const *ned_iter;
 		ned_iter = accept;
 		while ((ch = *ned_iter++) != '\0') {
 			if (haych == ch)
@@ -932,9 +932,9 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.string.memory.wcspbrk") char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcspbrk)(char16_t const *haystack,
                                    char16_t const *accept) {
 #line 395 "kos/src/libc/magic/string.c"
-	char16_t const *ned_iter;
 	char16_t haych, ch;
 	while ((haych = *haystack++) != '\0') {
+		char16_t const *ned_iter;
 		ned_iter = accept;
 		while ((ch = *ned_iter++) != '\0') {
 			if (haych == ch)
@@ -951,17 +951,17 @@ ATTR_WEAK ATTR_SECTION(".text.crt.wchar.string.memory.wcsstr") char32_t *
 NOTHROW_NCX(LIBCCALL libc_wcsstr)(char32_t const *haystack,
                                   char32_t const *needle) {
 #line 320 "kos/src/libc/magic/string.c"
-	char32_t const *hay2, *ned_iter;
 	char32_t ch, needle_start = *needle++;
 	while ((ch = *haystack++) != '\0') {
 		if (ch == needle_start) {
-			hay2 = haystack;
+			char32_t const *hay2, *ned_iter;
+			hay2     = haystack;
 			ned_iter = needle;
 			while ((ch = *ned_iter++) != '\0') {
 				if (*hay2++ != ch)
 					goto miss;
 			}
-			return (char32_t *)haystack-1;
+			return (char32_t *)haystack - 1;
 		}
 miss:
 		;
@@ -975,17 +975,17 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.string.memory.wcsstr") char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsstr)(char16_t const *haystack,
                                   char16_t const *needle) {
 #line 320 "kos/src/libc/magic/string.c"
-	char16_t const *hay2, *ned_iter;
 	char16_t ch, needle_start = *needle++;
 	while ((ch = *haystack++) != '\0') {
 		if (ch == needle_start) {
-			hay2 = haystack;
+			char16_t const *hay2, *ned_iter;
+			hay2     = haystack;
 			ned_iter = needle;
 			while ((ch = *ned_iter++) != '\0') {
 				if (*hay2++ != ch)
 					goto miss;
 			}
-			return (char16_t *)haystack-1;
+			return (char16_t *)haystack - 1;
 		}
 miss:
 		;

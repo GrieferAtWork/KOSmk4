@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9774b733 */
+/* HASH CRC-32:0xc41c12fd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,27 +18,31 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_c32str_defined
-#define __local_c32str_defined 1
+#ifndef __local_strnstr_defined
+#define __local_strnstr_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Search for a given `NEEDLE' appearing as a sub-string within `HAYSTACK'
- * If no such needle exists, return `NULL' */
-__LOCAL_LIBC(c32str) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(c32str))(__CHAR32_TYPE__ const *__haystack,
-                                                    __CHAR32_TYPE__ const *__needle) {
-#line 320 "kos/src/libc/magic/string.c"
-	__CHAR32_TYPE__ __ch, __needle_start = *__needle++;
-	while ((__ch = *__haystack++) != '\0') {
+/* Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
+ * If found, return a pointer to its location within `str', else return `NULL'
+ * This function originates from BSD, but is also provided as a KOS extension */
+__LOCAL_LIBC(strnstr) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char *
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strnstr))(char const *__haystack,
+                                                     char const *__needle,
+                                                     __SIZE_TYPE__ __haystack_maxlen) {
+#line 5430 "kos/src/libc/magic/string.c"
+	char __ch, __needle_start = *__needle++;
+	while (__haystack_maxlen-- && (__ch = *__haystack++) != '\0') {
 		if (__ch == __needle_start) {
-			__CHAR32_TYPE__ const *__hay2, *__ned_iter;
+			char const *__hay2, *__ned_iter;
+			__SIZE_TYPE__ __maxlen2;
 			__hay2     = __haystack;
 			__ned_iter = __needle;
+			__maxlen2  = __haystack_maxlen;
 			while ((__ch = *__ned_iter++) != '\0') {
-				if (*__hay2++ != __ch)
+				if (!__maxlen2-- || *__hay2++ != __ch)
 					goto __miss;
 			}
-			return (__CHAR32_TYPE__ *)__haystack - 1;
+			return (char *)__haystack - 1;
 		}
 __miss:
 		;
@@ -46,4 +50,4 @@ __miss:
 	return __NULLPTR;
 }
 __NAMESPACE_LOCAL_END
-#endif /* !__local_c32str_defined */
+#endif /* !__local_strnstr_defined */

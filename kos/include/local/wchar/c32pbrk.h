@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x554c89cd */
+/* HASH CRC-32:0xeeb5d179 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,9 +26,9 @@ __LOCAL_LIBC(c32pbrk) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __CHAR32
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(c32pbrk))(__CHAR32_TYPE__ const *__haystack,
                                                      __CHAR32_TYPE__ const *__accept) {
 #line 395 "kos/src/libc/magic/string.c"
-	__CHAR32_TYPE__ const *__ned_iter;
 	__CHAR32_TYPE__ __haych, __ch;
 	while ((__haych = *__haystack++) != '\0') {
+		__CHAR32_TYPE__ const *__ned_iter;
 		__ned_iter = __accept;
 		while ((__ch = *__ned_iter++) != '\0') {
 			if (__haych == __ch)

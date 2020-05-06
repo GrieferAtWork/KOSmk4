@@ -3633,6 +3633,7 @@
 #define __CRT_HAVE_strnrev 1
 #define __CRT_HAVE_strnroff 1
 #define __CRT_HAVE_strnset 1
+#define __CRT_HAVE_strnstr 1
 #define __CRT_HAVE_strnupr 1
 #define __CRT_HAVE_strnupr_l 1
 #define __CRT_HAVE_stroff 1

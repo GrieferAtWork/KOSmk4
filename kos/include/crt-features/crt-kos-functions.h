@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x72db3d86 */
+/* HASH CRC-32:0x605fffb2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2222,6 +2222,7 @@ __CRT_FUNCTION(strnrchrnul,0,(),3,(char const *__restrict,haystack,int,needle,si
 __CRT_FUNCTION(strnrev,0,(),2,(char *__restrict,str,size_t,maxlen),char *)
 __CRT_FUNCTION(strnroff,0,(),3,(char const *__restrict,haystack,int,needle,size_t,maxlen),size_t)
 __CRT_FUNCTION(strnset,0,(),3,(char *__restrict,str,int,ch,size_t,maxlen),char *)
+__CRT_FUNCTION(strnstr,0,(),3,(char const *,haystack,char const *,needle,size_t,haystack_maxlen),char *)
 __CRT_FUNCTION(strnupr,0,(),2,(char *__restrict,str,size_t,maxlen),char *)
 __CRT_FUNCTION(strnupr_l,0,(),3,(char *__restrict,str,size_t,maxlen,locale_t,locale),char *)
 __CRT_FUNCTION(stroff,0,(),2,(char const *__restrict,haystack,int,needle),size_t)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f92bfab */
+/* HASH CRC-32:0x67cc43e8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2873,6 +2873,7 @@
 #define __CRT_ATTR_NOTHROW_NCX_strnrev 1
 #define __CRT_ATTR_NOTHROW_NCX_strnroff 1
 #define __CRT_ATTR_NOTHROW_NCX_strnset 1
+#define __CRT_ATTR_NOTHROW_NCX_strnstr 1
 #define __CRT_ATTR_NOTHROW_NCX_strnupr 1
 #define __CRT_ATTR_NOTHROW_NCX_strnupr_l 1
 #define __CRT_ATTR_NOTHROW_NCX_stroff 1
@@ -4533,6 +4534,7 @@
 #define __CRT_ATTR_PURE_strnrchr 1
 #define __CRT_ATTR_PURE_strnrchrnul 1
 #define __CRT_ATTR_PURE_strnroff 1
+#define __CRT_ATTR_PURE_strnstr 1
 #define __CRT_ATTR_PURE_stroff 1
 #define __CRT_ATTR_PURE_strpbrk 1
 #define __CRT_ATTR_PURE_strrchr 1

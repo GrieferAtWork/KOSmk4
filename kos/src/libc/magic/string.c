@@ -317,17 +317,17 @@ strstr:([nonnull] char const *haystack, [nonnull] char const *needle) -> char *
 	[([nonnull] char *haystack, [nonnull] char *needle) -> char *]
 	[([nonnull] char const *haystack, [nonnull] char const *needle) -> char const *]
 {
-	char const *hay2, *ned_iter;
 	char ch, needle_start = *needle++;
 	while ((ch = *haystack++) != '\0') {
 		if (ch == needle_start) {
-			hay2 = haystack;
+			char const *hay2, *ned_iter;
+			hay2     = haystack;
 			ned_iter = needle;
 			while ((ch = *ned_iter++) != '\0') {
 				if (*hay2++ != ch)
 					goto miss;
 			}
-			return (char *)haystack-1;
+			return (char *)haystack - 1;
 		}
 miss:
 		;
@@ -392,9 +392,9 @@ strpbrk:([nonnull] char const *haystack, [nonnull] char const *accept) -> char *
 	[([nonnull] char *haystack, [nonnull] char const *accept) -> char *]
 	[([nonnull] char const *haystack, [nonnull] char const *accept) -> char const *]
 {
-	char const *ned_iter;
 	char haych, ch;
 	while ((haych = *haystack++) != '\0') {
+		char const *ned_iter;
 		ned_iter = accept;
 		while ((ch = *ned_iter++) != '\0') {
 			if (haych == ch)
@@ -5415,6 +5415,41 @@ __SYSDECL_BEGIN
 #endif /* __USE_KOS */
 #endif /* !__cplusplus && __USE_STRING_OVERLOADS */
 
+
+}
+%#if defined(__USE_BSD) || defined(__USE_KOS)
+
+@@Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
+@@If found, return a pointer to its location within `str', else return `NULL'
+@@This function originates from BSD, but is also provided as a KOS extension
+[ATTR_WUNUSED][ATTR_PURE]
+strnstr:([nonnull] char const *haystack, [nonnull] char const *needle, size_t haystack_maxlen) -> char *
+	[([nonnull] char *haystack, [nonnull] char *needle, size_t haystack_maxlen) -> char *]
+	[([nonnull] char const *haystack, [nonnull] char const *needle, size_t haystack_maxlen) -> char const *]
+{
+	char ch, needle_start = *needle++;
+	while (haystack_maxlen-- && (ch = *haystack++) != '\0') {
+		if (ch == needle_start) {
+			char const *hay2, *ned_iter;
+			size_t maxlen2;
+			hay2     = haystack;
+			ned_iter = needle;
+			maxlen2  = haystack_maxlen;
+			while ((ch = *ned_iter++) != '\0') {
+				if (!maxlen2-- || *hay2++ != ch)
+					goto miss;
+			}
+			return (char *)haystack - 1;
+		}
+miss:
+		;
+	}
+	return NULL;
+}
+
+
+%#endif /* __USE_BSD || __USE_KOS */
+%{
 
 #endif /* __CC__ */
 

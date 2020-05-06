@@ -61,9 +61,6 @@ Add support for *_chk variants (using __builtin_object_size())
 
 
 <string.h>:
-	#if __USE_BSD || __USE_KOS
-	char *strnstr(const char *str, const char *find, size_t str_len);
-	#endif
 	#if __USE_BSD
 	void strmode(mode_t mode, char *str);
 	#endif

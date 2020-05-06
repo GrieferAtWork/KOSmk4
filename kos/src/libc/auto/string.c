@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaa846a48 */
+/* HASH CRC-32:0xa0e8ba5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1370,17 +1370,17 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.strstr") char *
 NOTHROW_NCX(LIBCCALL libc_strstr)(char const *haystack,
                                   char const *needle) {
 #line 320 "kos/src/libc/magic/string.c"
-	char const *hay2, *ned_iter;
 	char ch, needle_start = *needle++;
 	while ((ch = *haystack++) != '\0') {
 		if (ch == needle_start) {
-			hay2 = haystack;
+			char const *hay2, *ned_iter;
+			hay2     = haystack;
 			ned_iter = needle;
 			while ((ch = *ned_iter++) != '\0') {
 				if (*hay2++ != ch)
 					goto miss;
 			}
-			return (char *)haystack-1;
+			return (char *)haystack - 1;
 		}
 miss:
 		;
@@ -1457,9 +1457,9 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.strpbrk") char *
 NOTHROW_NCX(LIBCCALL libc_strpbrk)(char const *haystack,
                                    char const *accept) {
 #line 395 "kos/src/libc/magic/string.c"
-	char const *ned_iter;
 	char haych, ch;
 	while ((haych = *haystack++) != '\0') {
+		char const *ned_iter;
 		ned_iter = accept;
 		while ((ch = *ned_iter++) != '\0') {
 			if (haych == ch)
@@ -4076,6 +4076,35 @@ NOTHROW_NCX(LIBCCALL libc__strnset_s)(char *__restrict buf,
 	return 0;
 }
 
+/* Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
+ * If found, return a pointer to its location within `str', else return `NULL'
+ * This function originates from BSD, but is also provided as a KOS extension */
+INTERN ATTR_PURE WUNUSED NONNULL((1, 2))
+ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.strnstr") char *
+NOTHROW_NCX(LIBCCALL libc_strnstr)(char const *haystack,
+                                   char const *needle,
+                                   size_t haystack_maxlen) {
+#line 5430 "kos/src/libc/magic/string.c"
+	char ch, needle_start = *needle++;
+	while (haystack_maxlen-- && (ch = *haystack++) != '\0') {
+		if (ch == needle_start) {
+			char const *hay2, *ned_iter;
+			size_t maxlen2;
+			hay2     = haystack;
+			ned_iter = needle;
+			maxlen2  = haystack_maxlen;
+			while ((ch = *ned_iter++) != '\0') {
+				if (!maxlen2-- || *hay2++ != ch)
+					goto miss;
+			}
+			return (char *)haystack - 1;
+		}
+miss:
+		;
+	}
+	return NULL;
+}
+
 #endif /* !__KERNEL__ */
 DEFINE_PUBLIC_WEAK_ALIAS(memcpy, libc_memcpy);
 DEFINE_PUBLIC_WEAK_ALIAS(memmove, libc_memmove);
@@ -4364,6 +4393,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(_strupr_s, libc__strupr_s);
 DEFINE_PUBLIC_WEAK_ALIAS(_strlwr_s_l, libc__strlwr_s_l);
 DEFINE_PUBLIC_WEAK_ALIAS(_strupr_s_l, libc__strupr_s_l);
 DEFINE_PUBLIC_WEAK_ALIAS(_strnset_s, libc__strnset_s);
+DEFINE_PUBLIC_WEAK_ALIAS(strnstr, libc_strnstr);
 #endif /* !__KERNEL__ */
 
 DECL_END

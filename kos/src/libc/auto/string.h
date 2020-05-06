@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xda71499c */
+/* HASH CRC-32:0x2a681638 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -518,6 +518,10 @@ INTDEF ATTR_LEAF errno_t NOTHROW_NCX(LIBCCALL libc__strnset_s)(char *__restrict 
 #define libc__strncmpi libc_strncasecmp
 #define libc__strncmpi_l libc_strncasecmp_l
 #define libc_strncmpi libc_strncasecmp
+/* Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
+ * If found, return a pointer to its location within `str', else return `NULL'
+ * This function originates from BSD, but is also provided as a KOS extension */
+INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc_strnstr)(char const *haystack, char const *needle, size_t haystack_maxlen);
 #endif /* !__KERNEL__ */
 
 DECL_END
