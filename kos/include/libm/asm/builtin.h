@@ -26,7 +26,6 @@
 /*[[[deemon
 local functions = {
 	"fabs",
-	"nan",
 	"inf",
 };
 
@@ -88,42 +87,6 @@ for (local n: functions)
 #define __ieee854_fabsl __builtin_fabsl
 #endif /* !__ieee854_fabsl && __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 #endif /* __LIBM_HAVE_BUILTIN_ASM_FABSL && __has_builtin(__builtin_fabsl) */
-
-#if defined(__LIBM_HAVE_BUILTIN_ASM_NAN) && __has_builtin(__builtin_nan)
-#if !defined(__ieee754_nan) && defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__)
-#define __ieee754_nan __builtin_nan
-#endif /* !__ieee754_nan && __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
-#if !defined(__ieee754_nanf) && defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-#define __ieee754_nanf __builtin_nan
-#endif /* !__ieee754_nanf && __IEEE754_FLOAT_TYPE_IS_DOUBLE__ */
-#if !defined(__ieee854_nanl) && defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-#define __ieee854_nanl __builtin_nan
-#endif /* !__ieee854_nanl && __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#endif /* __LIBM_HAVE_BUILTIN_ASM_NAN && __has_builtin(__builtin_nan) */
-
-#if defined(__LIBM_HAVE_BUILTIN_ASM_NANF) && __has_builtin(__builtin_nanf)
-#if !defined(__ieee754_nan) && defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
-#define __ieee754_nan __builtin_nanf
-#endif /* !__ieee754_nan && __IEEE754_DOUBLE_TYPE_IS_FLOAT__ */
-#if !defined(__ieee754_nanf) && defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__)
-#define __ieee754_nanf __builtin_nanf
-#endif /* !__ieee754_nanf && __IEEE754_FLOAT_TYPE_IS_FLOAT__ */
-#if !defined(__ieee854_nanl) && defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
-#define __ieee854_nanl __builtin_nanf
-#endif /* !__ieee854_nanl && __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-#endif /* __LIBM_HAVE_BUILTIN_ASM_NANF && __has_builtin(__builtin_nanf) */
-
-#if defined(__LIBM_HAVE_BUILTIN_ASM_NANL) && __has_builtin(__builtin_nanl)
-#if !defined(__ieee754_nan) && defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
-#define __ieee754_nan __builtin_nanl
-#endif /* !__ieee754_nan && __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-#if !defined(__ieee754_nanf) && defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
-#define __ieee754_nanf __builtin_nanl
-#endif /* !__ieee754_nanf && __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ */
-#if !defined(__ieee854_nanl) && defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
-#define __ieee854_nanl __builtin_nanl
-#endif /* !__ieee854_nanl && __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-#endif /* __LIBM_HAVE_BUILTIN_ASM_NANL && __has_builtin(__builtin_nanl) */
 
 #if defined(__LIBM_HAVE_BUILTIN_ASM_INF) && __has_builtin(__builtin_inf)
 #if !defined(__ieee754_inf) && defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__)

@@ -39,9 +39,6 @@
 #define __LIBM_HAVE_BUILTIN_ASM_FABS           1
 #define __LIBM_HAVE_BUILTIN_ASM_FABSF          1
 #define __LIBM_HAVE_BUILTIN_ASM_FABSL          1
-#define __LIBM_HAVE_BUILTIN_ASM_NAN            1
-#define __LIBM_HAVE_BUILTIN_ASM_NANF           1
-#define __LIBM_HAVE_BUILTIN_ASM_NANL           1
 #define __LIBM_HAVE_BUILTIN_ASM_INF            1
 #define __LIBM_HAVE_BUILTIN_ASM_INFF           1
 #define __LIBM_HAVE_BUILTIN_ASM_INFL           1
