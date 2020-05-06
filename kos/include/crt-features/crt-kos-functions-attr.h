@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x67cc43e8 */
+/* HASH CRC-32:0xee578054 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1869,6 +1869,7 @@
 #define __CRT_ATTR_NOTHROW_NCX_ether_paton_r 1
 #define __CRT_ATTR_NOTHROW_NCX_eventfd 1
 #define __CRT_ATTR_NOTHROW_NCX_exit_thread 1
+#define __CRT_ATTR_NOTHROW_NCX_explicit_bzero 1
 #define __CRT_ATTR_NOTHROW_NCX_fallocate 1
 #define __CRT_ATTR_NOTHROW_NCX_fallocate32 1
 #define __CRT_ATTR_NOTHROW_NCX_fallocate64 1

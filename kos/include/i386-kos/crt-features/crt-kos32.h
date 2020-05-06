@@ -2002,6 +2002,7 @@
 #define __CRT_HAVE_exp2l 1
 #define __CRT_HAVE_expf 1
 #define __CRT_HAVE_expl 1
+#define __CRT_HAVE_explicit_bzero 1
 #define __CRT_HAVE_expm1 1
 #define __CRT_HAVE_expm1f 1
 #define __CRT_HAVE_expm1l 1

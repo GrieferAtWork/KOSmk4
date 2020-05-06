@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x605fffb2 */
+/* HASH CRC-32:0x9f5f1c2c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3296,6 +3296,7 @@ __CRT_FAKE_FUNCTION(drem,0,(),2,(double,x,double,p),double)
 __CRT_FAKE_FUNCTION(dremf,0,(),2,(float,x,float,p),float)
 __CRT_FAKE_FUNCTION(dreml,0,(),2,(__LONGDOUBLE,x,__LONGDOUBLE,p),__LONGDOUBLE)
 __CRT_FAKE_FUNCTION(eaccess,0,(),2,(char const *,file,int,type),int)
+__CRT_FAKE_FUNCTION(explicit_bzero,0,(),2,(void *,buf,size_t,len),void)
 __CRT_FAKE_FUNCTION(fc16printf,0,(),VA(2),(FILE *__restrict,stream,char16_t const *__restrict,format),__STDC_INT_AS_SIZE_T)
 __CRT_FAKE_FUNCTION(fc16printf_unlocked,0,(),VA(2),(FILE *__restrict,stream,char16_t const *__restrict,format),__STDC_INT_AS_SIZE_T)
 __CRT_FAKE_FUNCTION(fc16scanf,0,(),VA(2),(FILE *__restrict,stream,char16_t const *__restrict,format),__STDC_INT_AS_SIZE_T)

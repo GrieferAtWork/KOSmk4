@@ -64,9 +64,6 @@ Add support for *_chk variants (using __builtin_object_size())
 	#if __USE_BSD
 	void strmode(mode_t mode, char *str);
 	#endif
-	#if __USE_KOS || __USE_GNU || __USE_BSD
-	void explicit_bzero(void *buf, size_t len);  // void *volatile pbuf = buf; bzero(pbuf, len);
-	#endif
 <stdlib.h>:
 	#if __USE_KOS || __USE_GNU || __USE_BSD
 	void *reallocarray(void *ptr, size_t elem_count, size_t elem_size);   // realloc(ptr, elem_count * elem_size)

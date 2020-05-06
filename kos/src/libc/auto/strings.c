@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9706a6fc */
+/* HASH CRC-32:0x4a129175 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -81,6 +81,7 @@ NOTHROW_NCX(LIBCCALL libc_rindex)(char const *__restrict haystack,
 DEFINE_PUBLIC_WEAK_ALIAS(bcopy, libc_bcopy);
 DEFINE_PUBLIC_WEAK_ALIAS(bzero, libc_bzero);
 DEFINE_PUBLIC_WEAK_ALIAS(__bzero, libc_bzero);
+DEFINE_PUBLIC_WEAK_ALIAS(explicit_bzero, libc_bzero);
 DEFINE_PUBLIC_WEAK_ALIAS(index, libc_index);
 DEFINE_PUBLIC_WEAK_ALIAS(rindex, libc_rindex);
 #endif /* !__KERNEL__ */

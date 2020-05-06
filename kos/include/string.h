@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f66594d */
+/* HASH CRC-32:0x98082521 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1190,6 +1190,8 @@ __CEIDECLARE(__ATTR_NONNULL((1)),void,__NOTHROW_NCX,bzero,(void *__restrict __ds
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,bzero,(void *__restrict __dst, __SIZE_TYPE__ __num_bytes),(__dst,__num_bytes))
 #elif defined(__CRT_HAVE___bzero)
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,bzero,(void *__restrict __dst, __SIZE_TYPE__ __num_bytes),__bzero,(__dst,__num_bytes))
+#elif defined(__CRT_HAVE_explicit_bzero)
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,bzero,(void *__restrict __dst, __SIZE_TYPE__ __num_bytes),explicit_bzero,(__dst,__num_bytes))
 #else /* LIBC: bzero */
 #include <local/strings/bzero.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(bzero, __FORCELOCAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL bzero)(void *__restrict __dst, __SIZE_TYPE__ __num_bytes) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bzero))(__dst, __num_bytes); })
@@ -1402,6 +1404,8 @@ __CEIREDIRECT(__ATTR_NONNULL((1)),void,__NOTHROW_NCX,__bzero,(void *__restrict _
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__bzero,(void *__restrict __dst, __SIZE_TYPE__ __num_bytes),bzero,(__dst,__num_bytes))
 #elif defined(__CRT_HAVE___bzero)
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__bzero,(void *__restrict __dst, __SIZE_TYPE__ __num_bytes),(__dst,__num_bytes))
+#elif defined(__CRT_HAVE_explicit_bzero)
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__bzero,(void *__restrict __dst, __SIZE_TYPE__ __num_bytes),explicit_bzero,(__dst,__num_bytes))
 #else /* LIBC: bzero */
 #include <local/strings/bzero.h>
 __FORCELOCAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL __bzero)(void *__restrict __dst, __SIZE_TYPE__ __num_bytes) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bzero))(__dst, __num_bytes); }

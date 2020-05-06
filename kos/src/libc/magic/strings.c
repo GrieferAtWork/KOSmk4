@@ -41,7 +41,7 @@ bcopy:([nonnull] void const *src,
 	memmove(dst, src, num_bytes);
 }
 
-[guard][crtbuiltin][export_alias(__bzero)]
+[guard][crtbuiltin][export_alias(__bzero, explicit_bzero)]
 bzero:([nonnull] void *__restrict dst, $size_t num_bytes) {
 	memset(dst, 0, num_bytes);
 }
@@ -91,6 +91,22 @@ rindex:([nonnull] char const *__restrict haystack, int needle) -> char *
 %[insert:extern(strncasecmp_l)]
 %#endif /* __USE_XOPEN2K8 */
 %
+
+%
+%#if defined(__USE_KOS) || defined(__USE_GNU) || defined(__USE_BSD)
+@@Same as `bzero(buf, len)', however compilers will not optimize away
+@@uses of this function when they (think) that clearing the memory
+@@wouldn't have any visible side-effects (though those side-effects
+@@may be a security-concious application trying to wipe sensitive data)
+[nocrt][noexport][nouser]
+[preferred_alias(bzero, explicit_bzero)][alias(__bzero)]
+explicit_bzero:(void *buf, size_t len) {
+	void *volatile vbuf = buf;
+	bzero(buf, len);
+}
+%#endif /* __USE_KOS || __USE_GNU || __USE_BSD */
+
+
 %{
 #endif /* __CC__ */
 

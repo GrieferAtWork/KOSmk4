@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6f8c4967 */
+/* HASH CRC-32:0xa2f6689f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,6 +61,8 @@ __CEIDECLARE(__ATTR_NONNULL((1)),void,__NOTHROW_NCX,bzero,(void *__restrict __ds
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,bzero,(void *__restrict __dst, __SIZE_TYPE__ __num_bytes),(__dst,__num_bytes))
 #elif defined(__CRT_HAVE___bzero)
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,bzero,(void *__restrict __dst, __SIZE_TYPE__ __num_bytes),__bzero,(__dst,__num_bytes))
+#elif defined(__CRT_HAVE_explicit_bzero)
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,bzero,(void *__restrict __dst, __SIZE_TYPE__ __num_bytes),explicit_bzero,(__dst,__num_bytes))
 #else /* LIBC: bzero */
 #include <local/strings/bzero.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(bzero, __FORCELOCAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL bzero)(void *__restrict __dst, __SIZE_TYPE__ __num_bytes) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bzero))(__dst, __num_bytes); })
@@ -237,6 +239,35 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strncasecmp_l, __FORCELOCAL __ATTR_PURE __ATTR_W
 #endif /* !__strncasecmp_l_defined */
 #endif /* __USE_XOPEN2K8 */
 
+
+#if defined(__USE_KOS) || defined(__USE_GNU) || defined(__USE_BSD)
+#ifdef __CRT_HAVE_bzero
+/* Same as `bzero(buf, len)', however compilers will not optimize away
+ * uses of this function when they (think) that clearing the memory
+ * wouldn't have any visible side-effects (though those side-effects
+ * may be a security-concious application trying to wipe sensitive data) */
+__CREDIRECT_VOID(,__NOTHROW_NCX,explicit_bzero,(void *__buf, size_t __len),bzero,(__buf,__len))
+#elif defined(__CRT_HAVE_explicit_bzero)
+/* Same as `bzero(buf, len)', however compilers will not optimize away
+ * uses of this function when they (think) that clearing the memory
+ * wouldn't have any visible side-effects (though those side-effects
+ * may be a security-concious application trying to wipe sensitive data) */
+__CDECLARE_VOID(,__NOTHROW_NCX,explicit_bzero,(void *__buf, size_t __len),(__buf,__len))
+#elif defined(__CRT_HAVE___bzero)
+/* Same as `bzero(buf, len)', however compilers will not optimize away
+ * uses of this function when they (think) that clearing the memory
+ * wouldn't have any visible side-effects (though those side-effects
+ * may be a security-concious application trying to wipe sensitive data) */
+__CREDIRECT_VOID(,__NOTHROW_NCX,explicit_bzero,(void *__buf, size_t __len),__bzero,(__buf,__len))
+#else /* LIBC: explicit_bzero */
+#include <local/strings/explicit_bzero.h>
+/* Same as `bzero(buf, len)', however compilers will not optimize away
+ * uses of this function when they (think) that clearing the memory
+ * wouldn't have any visible side-effects (though those side-effects
+ * may be a security-concious application trying to wipe sensitive data) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(explicit_bzero, __FORCELOCAL void __NOTHROW_NCX(__LIBCCALL explicit_bzero)(void *__buf, size_t __len) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(explicit_bzero))(__buf, __len); })
+#endif /* explicit_bzero... */
+#endif /* __USE_KOS || __USE_GNU || __USE_BSD */
 #endif /* __CC__ */
 
 __SYSDECL_END
