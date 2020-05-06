@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa0e8ba5 */
+/* HASH CRC-32:0x89af1f7a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1331,6 +1331,7 @@ NOTHROW_NCX(LIBCCALL libc_mempatq)(void *__restrict dst,
 	return dst;
 }
 
+#include <sys/stat.h>
 #ifndef __KERNEL__
 /* Return the pointer of the last instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
 INTERN ATTR_PURE WUNUSED NONNULL((1))
@@ -4105,6 +4106,159 @@ miss:
 	return NULL;
 }
 
+#include <asm/stat.h>
+/* Generate a file mode representation similar to what's printed by `ls -l'
+ * The representation is written to `p', and `mode' is the value as returned
+ * by `stat(2)' in `struct stat::st_mode'
+ * The format written is:
+ *    p[0]  = <mode & S_IFMT>: { S_IFDIR: 'd', S_IFCHR: 'c', S_IFBLK:  'b',
+ *                               S_IFREG: '-', S_IFLNK: 'l', S_IFSOCK: 's',
+ *                               S_IFIFO: 'p' }, else: '?';
+ *    p[1]  = mode & S_IRUSR ? 'r' : '-';
+ *    p[2]  = mode & S_IWUSR ? 'w' : '-';
+ *    p[3]  = <mode & S_IXUSR | S_ISUID>: { 0: '-', S_IXUSR: 'x', S_ISUID: 'S',
+ *                                          S_IXUSR | S_ISUID: 's' };
+ *    p[4]  = mode & S_IRGRP ? 'r' : '-';
+ *    p[5]  = mode & S_IWGRP ? 'w' : '-';
+ *    p[6]  = <mode & S_IXGRP | S_ISGID>: { 0: '-', S_IXGRP: 'x', S_ISGID: 'S',
+ *                                          S_IXGRP | S_ISGID: 's' };
+ *    p[7]  = mode & S_IROTH ? 'r' : '-';
+ *    p[8]  = mode & S_IWOTH ? 'w' : '-';
+ *    p[9]  = <mode & S_IXOTH | S_ISVTX>: { 0: '-', S_IXOTH: 'x', S_ISVTX: 'T',
+ *                                          S_IXOTH | S_ISVTX: 't' };
+ *    p[10] = ' '; // '+', if "alternate or additional access control
+ *                 //          methods associated with the inode"
+ *    p[11] = '\0'; */
+INTERN NONNULL((2))
+ATTR_WEAK ATTR_SECTION(".text.crt.bsd.strstat.strmode") void
+NOTHROW_NCX(LIBCCALL libc_strmode)(mode_t mode,
+                                   char p[12]) {
+#line 5482 "kos/src/libc/magic/string.c"
+	char ch;
+	/* First character: File type */
+	ch = '?';
+#ifdef S_IFMT
+	switch (mode & S_IFMT) {
+#ifdef S_IFDIR
+	case S_IFDIR:  ch = 'd'; break;
+#endif /* S_IFDIR */
+#ifdef S_IFCHR
+	case S_IFCHR:  ch = 'c'; break;
+#endif /* S_IFCHR */
+#ifdef S_IFBLK
+	case S_IFBLK:  ch = 'b'; break;
+#endif /* S_IFBLK */
+#ifdef S_IFREG
+	case S_IFREG:  ch = '-'; break;
+#endif /* S_IFREG */
+#ifdef S_IFLNK
+	case S_IFLNK:  ch = 'l'; break;
+#endif /* S_IFLNK */
+#ifdef S_IFSOCK
+	case S_IFSOCK: ch = 's'; break;
+#endif /* S_IFSOCK */
+#ifdef S_IFIFO
+	case S_IFIFO:  ch = 'p'; break; /* p=pipe */
+#endif /* S_IFIFO */
+	default: break;
+	}
+#endif /* S_IFMT */
+	*p++ = ch;
+
+#ifdef S_IRUSR
+	*p++ = mode & S_IRUSR ? 'r' : '-';
+#else /* S_IRUSR */
+	*p++ = '-';
+#endif /* !S_IRUSR */
+
+#ifdef S_IWUSR
+	*p++ = mode & S_IWUSR ? 'w' : '-';
+#else /* S_IWUSR */
+	*p++ = '-';
+#endif /* !S_IWUSR */
+
+#if defined(S_IXUSR) && defined(S_ISUID)
+	switch (mode & (S_IXUSR | S_ISUID)) {
+	case 0:                 ch = '-'; break;
+	case S_IXUSR:           ch = 'x'; break;
+	case S_ISUID:           ch = 'S'; break;
+	case S_IXUSR | S_ISUID: ch = 's'; break;
+	default: __builtin_unreachable();
+	}
+#elif defined(S_IXUSR)
+	ch = mode & S_IXUSR ? 'x' : '-';
+#elif defined(S_ISUID)
+	ch = mode & S_ISUID ? 'S' : '-';
+#else /* S_IWUSR */
+	ch = '-';
+#endif /* !S_IWUSR */
+	*p++ = ch;
+
+#ifdef S_IRGRP
+	*p++ = mode & S_IRGRP ? 'r' : '-';
+#else /* S_IRGRP */
+	*p++ = '-';
+#endif /* !S_IRGRP */
+
+#ifdef S_IWGRP
+	*p++ = mode & S_IWGRP ? 'w' : '-';
+#else /* S_IWGRP */
+	*p++ = '-';
+#endif /* !S_IWGRP */
+
+#if defined(S_IXGRP) && defined(S_ISGID)
+	switch (mode & (S_IXGRP | S_ISGID)) {
+	case 0:                 ch = '-'; break;
+	case S_IXGRP:           ch = 'x'; break;
+	case S_ISGID:           ch = 'S'; break;
+	case S_IXGRP | S_ISGID: ch = 's'; break;
+	default: __builtin_unreachable();
+	}
+#elif defined(S_IXGRP)
+	ch = mode & S_IXGRP ? 'x' : '-';
+#elif defined(S_ISGID)
+	ch = mode & S_ISGID ? 'S' : '-';
+#else /* S_IWUSR */
+	ch = '-';
+#endif /* !S_IWUSR */
+	*p++ = ch;
+
+#ifdef S_IROTH
+	*p++ = mode & S_IROTH ? 'r' : '-';
+#else /* S_IROTH */
+	*p++ = '-';
+#endif /* !S_IROTH */
+
+#ifdef S_IWOTH
+	*p++ = mode & S_IWOTH ? 'w' : '-';
+#else /* S_IWOTH */
+	*p++ = '-';
+#endif /* !S_IWOTH */
+
+#if defined(S_IXOTH) && defined(S_ISVTX)
+	switch (mode & (S_IXOTH | S_ISVTX)) {
+	case 0:                 ch = '-'; break;
+	case S_IXOTH:           ch = 'x'; break;
+	case S_ISVTX:           ch = 'T'; break;
+	case S_IXOTH | S_ISVTX: ch = 't'; break;
+	default: __builtin_unreachable();
+	}
+#elif defined(S_IXOTH)
+	ch = mode & S_IXOTH ? 'x' : '-';
+#elif defined(S_ISVTX)
+	ch = mode & S_ISVTX ? 'T' : '-';
+#else /* S_IWUSR */
+	ch = '-';
+#endif /* !S_IWUSR */
+	*p++ = ch;
+
+	/* Always space in this implementation */
+	*p++ = ' ';
+
+	/* NUL-terminate */
+	*p = '\0';
+}
+
 #endif /* !__KERNEL__ */
 DEFINE_PUBLIC_WEAK_ALIAS(memcpy, libc_memcpy);
 DEFINE_PUBLIC_WEAK_ALIAS(memmove, libc_memmove);
@@ -4394,6 +4548,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(_strlwr_s_l, libc__strlwr_s_l);
 DEFINE_PUBLIC_WEAK_ALIAS(_strupr_s_l, libc__strupr_s_l);
 DEFINE_PUBLIC_WEAK_ALIAS(_strnset_s, libc__strnset_s);
 DEFINE_PUBLIC_WEAK_ALIAS(strnstr, libc_strnstr);
+DEFINE_PUBLIC_WEAK_ALIAS(strmode, libc_strmode);
 #endif /* !__KERNEL__ */
 
 DECL_END

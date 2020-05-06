@@ -1794,7 +1794,7 @@ void *__NOTHROW_NCX(__LIBCCALL calloc)(__SIZE_TYPE__ __num_bytes) { return (call
 }
 [overload_alias] realloc:(*) = reallocarray;
 [overload_alias] recalloc:(*) = recallocv;
-%}
+%} /* extern "C++" */
 %#else /* __cplusplus */
 %{
 #ifdef __malloc_defined

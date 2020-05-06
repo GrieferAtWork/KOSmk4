@@ -59,10 +59,3 @@ Add support for *_chk variants (using __builtin_object_size())
 
 <gnu/libc-version.h>
 
-
-<string.h>:
-	#if __USE_BSD
-	void strmode(mode_t mode, char *str);
-	#endif
-
-

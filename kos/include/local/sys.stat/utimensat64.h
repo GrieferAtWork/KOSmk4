@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6b9b001d */
+/* HASH CRC-32:0xa51c7d9f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(utimensat64))(__fd_t __dirfd,
                                                          char const *__filename,
                                                          struct __timespec64 const __times[2 /*or:3*/],
                                                          __atflag_t __flags) {
-#line 607 "kos/src/libc/magic/sys.stat.c"
+#line 636 "kos/src/libc/magic/sys.stat.c"
 #if defined(__KOS__) && __KOS_VERSION__ >= 300
 	struct __timespec32 __tms[3];
 	if (!__times)

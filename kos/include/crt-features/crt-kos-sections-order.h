@@ -179,6 +179,7 @@
 	.sched.pthread_ext*               # Pthread extensions
 	.glibc*                           # GLibc-specific stuff
 	.bsd.stringlist*                  # BSD's <stringlist.h> header
+	.bsd.*                            # Misc BSD functions
 	.unsorted*                        # Everything else...
 
 ]]]*/
@@ -287,6 +288,7 @@
 	CB(PREFIX.sched.pthread_ext.*) \
 	CB(PREFIX.glibc.*) \
 	CB(PREFIX.bsd.stringlist.*) \
+	CB(PREFIX.bsd.strstat.*) \
 	CB(PREFIX.unsorted.*) \
 	CB(PREFIX.wchar.fs.exec.exec.*) \
 	CB(PREFIX.wchar.heap.strdup.*) \

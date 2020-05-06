@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x98082521 */
+/* HASH CRC-32:0x9abc78f7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -6819,6 +6819,60 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strnstr, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED
 #endif /* strnstr... */
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRING_H_PROTO */
 #endif /* __USE_BSD || __USE_KOS */
+
+
+#ifdef __USE_BSD
+#ifdef __CRT_HAVE_strmode
+/* Generate a file mode representation similar to what's printed by `ls -l'
+ * The representation is written to `p', and `mode' is the value as returned
+ * by `stat(2)' in `struct stat::st_mode'
+ * The format written is:
+ *    p[0]  = <mode & S_IFMT>: { S_IFDIR: 'd', S_IFCHR: 'c', S_IFBLK:  'b',
+ *                               S_IFREG: '-', S_IFLNK: 'l', S_IFSOCK: 's',
+ *                               S_IFIFO: 'p' }, else: '?';
+ *    p[1]  = mode & S_IRUSR ? 'r' : '-';
+ *    p[2]  = mode & S_IWUSR ? 'w' : '-';
+ *    p[3]  = <mode & S_IXUSR | S_ISUID>: { 0: '-', S_IXUSR: 'x', S_ISUID: 'S',
+ *                                          S_IXUSR | S_ISUID: 's' };
+ *    p[4]  = mode & S_IRGRP ? 'r' : '-';
+ *    p[5]  = mode & S_IWGRP ? 'w' : '-';
+ *    p[6]  = <mode & S_IXGRP | S_ISGID>: { 0: '-', S_IXGRP: 'x', S_ISGID: 'S',
+ *                                          S_IXGRP | S_ISGID: 's' };
+ *    p[7]  = mode & S_IROTH ? 'r' : '-';
+ *    p[8]  = mode & S_IWOTH ? 'w' : '-';
+ *    p[9]  = <mode & S_IXOTH | S_ISVTX>: { 0: '-', S_IXOTH: 'x', S_ISVTX: 'T',
+ *                                          S_IXOTH | S_ISVTX: 't' };
+ *    p[10] = ' '; // '+', if "alternate or additional access control
+ *                 //          methods associated with the inode"
+ *    p[11] = '\0'; */
+__CDECLARE_VOID(__ATTR_NONNULL((2)),__NOTHROW_NCX,strmode,(__mode_t __mode, char __p[12]),(__mode,__p))
+#else /* LIBC: strmode */
+#include <local/string/strmode.h>
+/* Generate a file mode representation similar to what's printed by `ls -l'
+ * The representation is written to `p', and `mode' is the value as returned
+ * by `stat(2)' in `struct stat::st_mode'
+ * The format written is:
+ *    p[0]  = <mode & S_IFMT>: { S_IFDIR: 'd', S_IFCHR: 'c', S_IFBLK:  'b',
+ *                               S_IFREG: '-', S_IFLNK: 'l', S_IFSOCK: 's',
+ *                               S_IFIFO: 'p' }, else: '?';
+ *    p[1]  = mode & S_IRUSR ? 'r' : '-';
+ *    p[2]  = mode & S_IWUSR ? 'w' : '-';
+ *    p[3]  = <mode & S_IXUSR | S_ISUID>: { 0: '-', S_IXUSR: 'x', S_ISUID: 'S',
+ *                                          S_IXUSR | S_ISUID: 's' };
+ *    p[4]  = mode & S_IRGRP ? 'r' : '-';
+ *    p[5]  = mode & S_IWGRP ? 'w' : '-';
+ *    p[6]  = <mode & S_IXGRP | S_ISGID>: { 0: '-', S_IXGRP: 'x', S_ISGID: 'S',
+ *                                          S_IXGRP | S_ISGID: 's' };
+ *    p[7]  = mode & S_IROTH ? 'r' : '-';
+ *    p[8]  = mode & S_IWOTH ? 'w' : '-';
+ *    p[9]  = <mode & S_IXOTH | S_ISVTX>: { 0: '-', S_IXOTH: 'x', S_ISVTX: 'T',
+ *                                          S_IXOTH | S_ISVTX: 't' };
+ *    p[10] = ' '; // '+', if "alternate or additional access control
+ *                 //          methods associated with the inode"
+ *    p[11] = '\0'; */
+__NAMESPACE_LOCAL_USING_OR_IMPL(strmode, __FORCELOCAL __ATTR_NONNULL((2)) void __NOTHROW_NCX(__LIBCCALL strmode)(__mode_t __mode, char __p[12]) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strmode))(__mode, __p); })
+#endif /* strmode... */
+#endif /* __USE_BSD */
 
 #endif /* __CC__ */
 

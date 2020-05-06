@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x154ce6f6 */
+/* HASH CRC-32:0x59cc0e82 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2203,6 +2203,7 @@ __CRT_FUNCTION(strlcpy,0,(),3,(char *__restrict,dst,char const *__restrict,src,s
 __CRT_FUNCTION(strlen,0,(),1,(char const *__restrict,string),size_t)
 __CRT_FUNCTION(strlwr,0,(),1,(char *__restrict,str),char *)
 __CRT_FUNCTION(strlwr_l,0,(),2,(char *__restrict,str,locale_t,locale),char *)
+__CRT_FUNCTION(strmode,0,(),2,(mode_t,mode,char[12],p),void)
 __CRT_FUNCTION(strncasecmp,0,(),3,(char const *,s1,char const *,s2,size_t,maxlen),int)
 __CRT_FUNCTION(strncasecmp_l,0,(),4,(char const *,s1,char const *,s2,size_t,maxlen,locale_t,locale),int)
 __CRT_FUNCTION(strncasecoll,0,(),3,(char const *,s1,char const *,s2,size_t,maxlen),int)

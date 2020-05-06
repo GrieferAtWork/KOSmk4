@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe2719ef9 */
+/* HASH CRC-32:0x83acd5bb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2155,7 +2155,7 @@ __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3))
 extern "C++" {
 __FORCELOCAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBCCALL recalloc)(void *__mallptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(recallocv))(__mallptr, __elem_count, __elem_size); }
 #endif /* recalloc... */
-}
+} /* extern "C++" */
 #else /* __cplusplus */
 #ifdef __malloc_defined
 #define __PRIVATE_malloc_1 (malloc)

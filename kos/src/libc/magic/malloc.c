@@ -286,7 +286,7 @@ void *__NOTHROW_NCX(__LIBCCALL calloc)(size_t __num_bytes) { return (calloc)(1, 
 }
 [overload_alias] realloc:(*) = reallocarray;
 [overload_alias] recalloc:(*) = recallocv;
-%}
+%} /* extern "C++" */
 %#else /* __cplusplus */
 %{
 #ifdef __malloc_defined

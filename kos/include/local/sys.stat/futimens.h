@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd0a9809c */
+/* HASH CRC-32:0x5037edeb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,7 +51,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(futimens) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futimens))(__fd_t __fd,
                                                       struct timespec const __times[2 /*or:3*/]) {
-#line 643 "kos/src/libc/magic/sys.stat.c"
+#line 672 "kos/src/libc/magic/sys.stat.c"
 #ifdef __CRT_HAVE_utimensat64
 	struct __timespec64 __tms[2];
 	if (!__times)

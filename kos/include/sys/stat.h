@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd0a8560a */
+/* HASH CRC-32:0x733aaeec */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,9 +29,11 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
-#include <bits/types.h>
+
+#include <asm/stat.h>
 #include <bits/stat.h>
 #include <bits/timespec.h>
+#include <bits/types.h>
 
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K)
 #include <time.h>

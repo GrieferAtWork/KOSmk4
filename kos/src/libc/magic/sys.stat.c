@@ -18,24 +18,53 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
-%[define_replacement(fd_t = __fd_t)]
-%[define_replacement(atflag_t = __atflag_t)]
-%[define_replacement(mode_t = __mode_t)]
-%[define_replacement(dev_t = __dev_t)]
+%[define_replacement(fd_t       = __fd_t)]
+%[define_replacement(atflag_t   = __atflag_t)]
+%[define_replacement(mode_t     = __mode_t)]
+%[define_replacement(dev_t      = __dev_t)]
 %[define_replacement(timespec32 = __timespec32)]
 %[define_replacement(timespec64 = __timespec64)]
-%[define_replacement(time_t = __TM_TYPE(time))]
-%[define_replacement(time32_t = __time32_t)]
-%[define_replacement(time64_t = __time64_t)]
+%[define_replacement(time_t     = __TM_TYPE(time))]
+%[define_replacement(time32_t   = __time32_t)]
+%[define_replacement(time64_t   = __time64_t)]
+
+%[define_replacement(S_IFMT      = __S_IFMT)]
+%[define_replacement(S_IFDIR     = __S_IFDIR)]
+%[define_replacement(S_IFCHR     = __S_IFCHR)]
+%[define_replacement(S_IFBLK     = __S_IFBLK)]
+%[define_replacement(S_IFREG     = __S_IFREG)]
+%[define_replacement(S_IFIFO     = __S_IFIFO)]
+%[define_replacement(S_IFLNK     = __S_IFLNK)]
+%[define_replacement(S_IFSOCK    = __S_IFSOCK)]
+%[define_replacement(S_ISDIR     = __S_ISDIR)]
+%[define_replacement(S_ISCHR     = __S_ISCHR)]
+%[define_replacement(S_ISBLK     = __S_ISBLK)]
+%[define_replacement(S_ISREG     = __S_ISREG)]
+%[define_replacement(S_ISFIFO    = __S_ISFIFO)]
+%[define_replacement(S_ISLNK     = __S_ISLNK)]
+%[define_replacement(S_ISDEV     = __S_ISDEV)]
+%[define_replacement(S_TYPEISMQ  = __S_TYPEISMQ)]
+%[define_replacement(S_TYPEISSEM = __S_TYPEISSEM)]
+%[define_replacement(S_TYPEISSHM = __S_TYPEISSHM)]
+%[define_replacement(S_ISUID     = __S_ISUID)]
+%[define_replacement(S_ISGID     = __S_ISGID)]
+%[define_replacement(S_ISVTX     = __S_ISVTX)]
+%[define_replacement(S_IREAD     = __S_IREAD)]
+%[define_replacement(S_IWRITE    = __S_IWRITE)]
+%[define_replacement(S_IEXEC     = __S_IEXEC)]
+%[define_replacement(UTIME_NOW   = __UTIME_NOW)]
+%[define_replacement(UTIME_OMIT  = __UTIME_OMIT)]
 
 %[declare_known_section(.text.crt.fs.stat)]
 %[declare_known_section(.text.crt.fs.stat_glc)]
 
 %{
 #include <features.h>
-#include <bits/types.h>
+
+#include <asm/stat.h>
 #include <bits/stat.h>
 #include <bits/timespec.h>
+#include <bits/types.h>
 
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K)
 #include <time.h>

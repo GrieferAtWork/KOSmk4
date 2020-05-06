@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2a681638 */
+/* HASH CRC-32:0xd0472154 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -522,6 +522,29 @@ INTDEF ATTR_LEAF errno_t NOTHROW_NCX(LIBCCALL libc__strnset_s)(char *__restrict 
  * If found, return a pointer to its location within `str', else return `NULL'
  * This function originates from BSD, but is also provided as a KOS extension */
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc_strnstr)(char const *haystack, char const *needle, size_t haystack_maxlen);
+/* Generate a file mode representation similar to what's printed by `ls -l'
+ * The representation is written to `p', and `mode' is the value as returned
+ * by `stat(2)' in `struct stat::st_mode'
+ * The format written is:
+ *    p[0]  = <mode & S_IFMT>: { S_IFDIR: 'd', S_IFCHR: 'c', S_IFBLK:  'b',
+ *                               S_IFREG: '-', S_IFLNK: 'l', S_IFSOCK: 's',
+ *                               S_IFIFO: 'p' }, else: '?';
+ *    p[1]  = mode & S_IRUSR ? 'r' : '-';
+ *    p[2]  = mode & S_IWUSR ? 'w' : '-';
+ *    p[3]  = <mode & S_IXUSR | S_ISUID>: { 0: '-', S_IXUSR: 'x', S_ISUID: 'S',
+ *                                          S_IXUSR | S_ISUID: 's' };
+ *    p[4]  = mode & S_IRGRP ? 'r' : '-';
+ *    p[5]  = mode & S_IWGRP ? 'w' : '-';
+ *    p[6]  = <mode & S_IXGRP | S_ISGID>: { 0: '-', S_IXGRP: 'x', S_ISGID: 'S',
+ *                                          S_IXGRP | S_ISGID: 's' };
+ *    p[7]  = mode & S_IROTH ? 'r' : '-';
+ *    p[8]  = mode & S_IWOTH ? 'w' : '-';
+ *    p[9]  = <mode & S_IXOTH | S_ISVTX>: { 0: '-', S_IXOTH: 'x', S_ISVTX: 'T',
+ *                                          S_IXOTH | S_ISVTX: 't' };
+ *    p[10] = ' '; // '+', if "alternate or additional access control
+ *                 //          methods associated with the inode"
+ *    p[11] = '\0'; */
+INTDEF NONNULL((2)) void NOTHROW_NCX(LIBCCALL libc_strmode)(mode_t mode, char p[12]);
 #endif /* !__KERNEL__ */
 
 DECL_END

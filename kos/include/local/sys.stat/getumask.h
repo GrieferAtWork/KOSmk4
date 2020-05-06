@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdd65690a */
+/* HASH CRC-32:0x67eb0174 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __NAMESPACE_LOCAL_BEGIN
  * WARNING: This function isn't thread-safe */
 __LOCAL_LIBC(getumask) __mode_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getumask))(void) {
-#line 494 "kos/src/libc/magic/sys.stat.c"
+#line 523 "kos/src/libc/magic/sys.stat.c"
 	__mode_t __result;
 	__result = __localdep_umask(0);
 	__localdep_umask(__result);

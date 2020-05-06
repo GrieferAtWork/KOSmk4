@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x65ee1122 */
+/* HASH CRC-32:0x6032b601 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,7 +58,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(utimensat))(__fd_t __dirfd,
                                                        char const *__filename,
                                                        struct timespec const __times[2 /*or:3*/],
                                                        __atflag_t __flags) {
-#line 551 "kos/src/libc/magic/sys.stat.c"
+#line 580 "kos/src/libc/magic/sys.stat.c"
 #ifdef __CRT_HAVE_utimensat64
 #if defined(__KOS__) && __KOS_VERSION__ >= 300
 	struct __timespec64 __tms[3];

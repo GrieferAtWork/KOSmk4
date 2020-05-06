@@ -2335,6 +2335,7 @@
 #define __CRT_HAVE_DOS$strlen 1
 #define __CRT_HAVE_DOS$strlwr 1
 #define __CRT_HAVE_DOS$strlwr_l 1
+#define __CRT_HAVE_DOS$strmode 1
 #define __CRT_HAVE_DOS$strncasecmp 1
 #define __CRT_HAVE_DOS$strncasecmp_l 1
 #define __CRT_HAVE_DOS$strncasecoll 1
@@ -5973,6 +5974,7 @@
 #define __CRT_HAVE_strlen 1
 #define __CRT_HAVE_strlwr 1
 #define __CRT_HAVE_strlwr_l 1
+#define __CRT_HAVE_strmode 1
 #define __CRT_HAVE_strncasecmp 1
 #define __CRT_HAVE_strncasecmp_l 1
 #define __CRT_HAVE_strncasecoll 1
