@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1858238 */
+/* HASH CRC-32:0x64fc1de0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wctomb_s))(int *__presult,
                                                       char *__buf,
                                                       __SIZE_TYPE__ __buflen,
                                                       __WCHAR_TYPE__ __wc) {
-#line 2614 "kos/src/libc/magic/stdlib.c"
+#line 2689 "kos/src/libc/magic/stdlib.c"
 	if (!__presult || !__buf) {
 #ifdef __EINVAL
 		return __EINVAL;

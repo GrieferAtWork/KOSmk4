@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe2b3135c */
+/* HASH CRC-32:0x95345079 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ __LOCAL_LIBC(_searchenv) __ATTR_NONNULL((1, 2, 3)) void
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_searchenv))(char const *__file,
                                                         char const *__envvar,
                                                         char *__restrict __resultpath) {
-#line 2983 "kos/src/libc/magic/stdlib.c"
+#line 3043 "kos/src/libc/magic/stdlib.c"
 	__localdep__searchenv_s(__file, __envvar, __resultpath, (__SIZE_TYPE__)-1);
 }
 __NAMESPACE_LOCAL_END

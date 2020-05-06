@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xee578054 */
+/* HASH CRC-32:0xd2b7f3f3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1986,6 +1986,7 @@
 #define __CRT_ATTR_NOTHROW_NCX_freeaddrinfo 1
 #define __CRT_ATTR_NOTHROW_NCX_freeifaddrs 1
 #define __CRT_ATTR_NOTHROW_NCX_freelocale 1
+#define __CRT_ATTR_NOTHROW_NCX_freezero 1
 #define __CRT_ATTR_NOTHROW_NCX_frexp 1
 #define __CRT_ATTR_NOTHROW_NCX_frexpf 1
 #define __CRT_ATTR_NOTHROW_NCX_frexpl 1
@@ -2666,7 +2667,13 @@
 #define __CRT_ATTR_NOTHROW_NCX_readahead 1
 #define __CRT_ATTR_NOTHROW_NCX_realloc 1
 #define __CRT_ATTR_NOTHROW_NCX_realloc_in_place 1
+#define __CRT_ATTR_NOTHROW_NCX_reallocarray 1
+#define __CRT_ATTR_NOTHROW_NCX_reallocf 1
+#define __CRT_ATTR_NOTHROW_NCX_reallocv 1
 #define __CRT_ATTR_NOTHROW_NCX_reboot 1
+#define __CRT_ATTR_NOTHROW_NCX_recalloc 1
+#define __CRT_ATTR_NOTHROW_NCX_recallocarray 1
+#define __CRT_ATTR_NOTHROW_NCX_recallocv 1
 #define __CRT_ATTR_NOTHROW_NCX_regcomp 1
 #define __CRT_ATTR_NOTHROW_NCX_regerror 1
 #define __CRT_ATTR_NOTHROW_NCX_regexec 1

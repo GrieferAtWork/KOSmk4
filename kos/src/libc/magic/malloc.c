@@ -128,11 +128,11 @@ cfree:(void *__restrict mallptr);
 
 %
 [section(.text.crt.dos.heap)][ignore]
-[section(.text.crt.heap.utility)]
+[section(.text.crt.heap.utility)][userimpl]
 _heapmin:() -> int;
 
 [section(.text.crt.heap.utility)]
-[libc_impl({
+[userimpl][user_impl({
 	/* NO-OP (indicate failure to release memory) */
 	COMPILER_IMPURE();
 	(void)pad;
@@ -151,10 +151,10 @@ _heapmin:() -> int;
 
 %
 [ATTR_PURE][ATTR_WUNUSED][alias(_msize)]
-[section(.text.crt.heap.helpers)]
+[section(.text.crt.heap.helpers)][userimpl]
 malloc_usable_size:(void *__restrict mallptr) -> size_t;
 
-[section(.text.crt.heap.utility)]
+[section(.text.crt.heap.utility)][userimpl]
 mallopt:(int parameter_number, int parameter_value) -> int {
 	/* NO-OP */
 	COMPILER_IMPURE();
@@ -175,7 +175,7 @@ __memcdup:([nonnull] void const *__restrict ptr, int needle, size_t n_bytes) -> 
 %#ifdef __USE_KOS
 [ATTR_WUNUSED][ATTR_MALL_DEFAULT_ALIGNED][ATTR_ALLOC_SIZE((2))]
 [ATTR_MALLOC][alias(__memdup)][requires($has_function(malloc))]
-[section(.text.crt.heap.rare_helpers)]
+[section(.text.crt.heap.rare_helpers)][userimpl]
 memdup:([nonnull] void const *__restrict ptr, size_t n_bytes) -> void * {
 	void *result;
 	result = malloc(n_bytes);
@@ -186,7 +186,7 @@ memdup:([nonnull] void const *__restrict ptr, size_t n_bytes) -> void * {
 
 [ATTR_WUNUSED][ATTR_MALL_DEFAULT_ALIGNED][ATTR_ALLOC_SIZE((2))]
 [ATTR_MALLOC][alias(__memcdup)][requires($has_function(memdup))]
-[section(.text.crt.heap.rare_helpers)]
+[section(.text.crt.heap.rare_helpers)][userimpl]
 memcdup:([nonnull] void const *__restrict ptr, int needle, size_t n_bytes) -> void * {
 	if likely(n_bytes) {
 		void const *endaddr;
@@ -196,6 +196,58 @@ memcdup:([nonnull] void const *__restrict ptr, int needle, size_t n_bytes) -> vo
 	}
 	return memdup(ptr, n_bytes);
 }
+
+[ATTR_WUNUSED][ATTR_MALL_DEFAULT_ALIGNED][ATTR_ALLOC_SIZE((2))]
+[section(.text.crt.heap.rare_helpers)]
+[requires($has_function(realloc))][guard]
+[dependency_include(<hybrid/__overflow.h>)][userimpl]
+reallocarray:(void *ptr, size_t elem_count, size_t elem_size)
+		-> [realloc(mallptr, elem_count * elem_size)] void * {
+	size_t total_bytes;
+	if (__hybrid_overflow_umul(elem_count, elem_size, &total_bytes))
+		total_bytes = (size_t)-1; /* Force down-stream failure */
+	return realloc(ptr, total_bytes);
+}
+
+[section(.text.crt.heap.rare_helpers)]
+[attribute(*)][guard][nocrt]
+reallocv:(*) = reallocarray;
+
+[userimpl][guard][section(.text.crt.heap.rare_helpers)]
+[requires($has_function(realloc) && $has_function(malloc_usable_size))]
+recalloc:(void *mallptr, $size_t num_bytes)
+		-> [realloc(mallptr, num_bytes)] void * {
+	void *result;
+	size_t oldsize;
+	oldsize = malloc_usable_size(mallptr);
+	result  = realloc(mallptr, num_bytes);
+	if likely(result) {
+		if (num_bytes > oldsize)
+			memset((byte_t *)result + oldsize, 0, num_bytes - oldsize);
+	}
+	return result;
+}
+
+
+[section(.text.crt.heap.rare_helpers)]
+[requires($has_function(realloc) && $has_function(malloc_usable_size))][guard]
+[dependency_include(<hybrid/__overflow.h>)][userimpl][export_alias(_recalloc)]
+recallocv:(void *mallptr, $size_t elem_count, $size_t elem_size)
+		-> [realloc(mallptr, elem_count * elem_size)] void * {
+	void *result;
+	size_t total_bytes, oldsize;
+	oldsize = malloc_usable_size(mallptr);
+	if unlikely(__hybrid_overflow_umul(elem_count, elem_size, &total_bytes))
+		total_bytes = (size_t)-1; /* Force down-stream failure */
+	result = realloc(mallptr, total_bytes);
+	if likely(result) {
+		if (total_bytes > oldsize)
+			memset((byte_t *)result + oldsize, 0, total_bytes - oldsize);
+	}
+	return result;
+}
+
+
 %#endif /* __USE_KOS */
 
 

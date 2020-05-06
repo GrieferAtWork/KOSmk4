@@ -1748,6 +1748,81 @@ mkostemps64:([nonnull] char *template_, int suffixlen, int flags) -> int;
 %#endif /* __USE_LARGEFILE64 */
 %#endif /* __USE_GNU */
 
+%
+%#if defined(__USE_KOS) || defined(__USE_MISC) || defined(__USE_BSD)
+%[insert:extern(reallocarray)]
+%#endif /* __USE_KOS || __USE_MISC || __USE_BSD */
+
+%
+%#ifdef __USE_KOS
+%[insert:extern(recalloc)]
+%[insert:extern(reallocv)]
+%[insert:extern(recallocv)]
+%#endif /* __USE_KOS */
+
+%
+%#ifdef __USE_BSD
+[section(.text.crt.heap.rare_helpers)][userimpl]
+[requires($has_function(realloc) && $has_function(free))]
+[ATTR_WUNUSED][ATTR_MALL_DEFAULT_ALIGNED][ATTR_ALLOC_SIZE((2))]
+reallocf:(void *mallptr, size_t num_bytes) -> void * {
+	void *result;
+	result = realloc(mallptr, num_bytes);
+	if unlikely(!result)
+		free(mallptr);
+	return result;
+}
+
+@@Same as `recallocv(mallptr, new_elem_count, elem_size)', but also ensure that
+@@when `mallptr != NULL', memory pointed to by the old `mallptr...+=old_elem_count*elem_size'
+@@is explicitly freed to zero (s.a. `freezero()') when reallocation must move the memory block
+[section(.text.crt.heap.rare_helpers)][userimpl]
+[requires($has_function(recallocv) && $has_function(calloc) && $has_function(malloc_usable_size))]
+[ATTR_WUNUSED][ATTR_MALL_DEFAULT_ALIGNED][ATTR_ALLOC_SIZE((3, 4))]
+recallocarray:(void *mallptr, size_t old_elem_count, size_t new_elem_count, size_t elem_size) -> void * {
+	if (mallptr != NULL && old_elem_count != 0) {
+		void *result;
+		size_t oldusable, newneeded;
+		oldusable = malloc_usable_size(mallptr);
+		newneeded = new_elem_count * elem_size;
+		if (oldusable >= newneeded) {
+			if (old_elem_count > new_elem_count) {
+				size_t zero_bytes;
+				zero_bytes = (old_elem_count - new_elem_count) * elem_size;
+				explicit_bzero((byte_t *)mallptr + newneeded, zero_bytes);
+			}
+			return mallptr;
+		}
+		/* Allocate a new block so we can ensure that an
+		 * existing block gets freezero()'ed in all cases */
+		result = calloc(new_elem_count, elem_size);
+		if (result) {
+			if (oldusable > newneeded)
+				oldusable = newneeded;
+			memcpy(result, mallptr, oldusable);
+			freezero(mallptr, old_elem_count * elem_size);
+		}
+		return result;
+	}
+	return recallocv(mallptr, new_elem_count, elem_size);
+}
+
+@@Same as `free(mallptr)', but also ensure that the memory region
+@@described by `mallptr...+=size' is explicitly freed to zero, or
+@@immediately returned to the OS, rather than being left in cache
+@@while still containing its previous contents.
+[section(.text.crt.heap.rare_helpers)]
+[requires($has_function(free))][userimpl]
+freezero:(void *mallptr, size_t size) {
+	if likely(mallptr) {
+		explicit_bzero(mallptr, size);
+		free(mallptr);
+	}
+}
+
+%#endif /* __USE_BSD */
+
+
 %{
 
 #endif /* __CC__ */
@@ -2677,22 +2752,7 @@ wcstombs_s:([nonnull] $size_t *presult,
 %/* DOS malloc extensions */
 %[default_impl_section(.text.crt.dos.heap)]
 
-[requires($has_function(realloc) && $has_function(malloc_usable_size))]
-[dependency_include(<hybrid/__overflow.h>)][same_impl]
-_recalloc:(void *mallptr, $size_t count, $size_t num_bytes)
-		-> [realloc(mallptr, count * num_bytes)] void * {
-	void *result;
-	size_t total_bytes, oldsize = malloc_usable_size(mallptr);
-	if unlikely(__hybrid_overflow_umul(count, num_bytes, &total_bytes))
-		total_bytes = (size_t)-1; /* Force down-stream failure */
-	result = realloc(mallptr, total_bytes);
-	if likely(result) {
-		if (total_bytes > oldsize)
-			memset((byte_t *)result + oldsize, 0, total_bytes - oldsize);
-	}
-	return result;
-
-}
+[attribute(*)] _recalloc:(*) = recallocv;
 
 [requires($has_function(malloc))][same_impl]
 _aligned_malloc:($size_t num_bytes, $size_t min_alignment)

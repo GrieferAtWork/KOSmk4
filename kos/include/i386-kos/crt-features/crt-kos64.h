@@ -436,7 +436,6 @@
 #define __CRT_HAVE_DOS$_putenv_s 1
 #define __CRT_HAVE_DOS$_putws 1
 #define __CRT_HAVE_DOS$_realloc_dbg 1
-#define __CRT_HAVE_DOS$_recalloc 1
 #define __CRT_HAVE_DOS$_recalloc_dbg 1
 #define __CRT_HAVE_DOS$_rmtmp 1
 #define __CRT_HAVE_DOS$_rotl 1
@@ -998,6 +997,7 @@
 #define __CRT_HAVE_DOS$freeaddrinfo 1
 #define __CRT_HAVE_DOS$freeifaddrs 1
 #define __CRT_HAVE_DOS$freelocale 1
+#define __CRT_HAVE_DOS$freezero 1
 #define __CRT_HAVE_DOS$fremovexattr 1
 #define __CRT_HAVE_DOS$frenameat 1
 #define __CRT_HAVE_DOS$freopen 1
@@ -2065,8 +2065,13 @@
 #define __CRT_HAVE_DOS$readv 1
 #define __CRT_HAVE_DOS$realloc 1
 #define __CRT_HAVE_DOS$realloc_in_place 1
+#define __CRT_HAVE_DOS$reallocarray 1
+#define __CRT_HAVE_DOS$reallocf 1
 #define __CRT_HAVE_DOS$realpath 1
 #define __CRT_HAVE_DOS$reboot 1
+#define __CRT_HAVE_DOS$recalloc 1
+#define __CRT_HAVE_DOS$recallocarray 1
+#define __CRT_HAVE_DOS$recallocv 1
 #define __CRT_HAVE_DOS$recv 1
 #define __CRT_HAVE_DOS$recvfrom 1
 #define __CRT_HAVE_DOS$recvmmsg 1
@@ -2354,6 +2359,7 @@
 #define __CRT_HAVE_DOS$strnrev 1
 #define __CRT_HAVE_DOS$strnroff 1
 #define __CRT_HAVE_DOS$strnset 1
+#define __CRT_HAVE_DOS$strnstr 1
 #define __CRT_HAVE_DOS$strnupr 1
 #define __CRT_HAVE_DOS$strnupr_l 1
 #define __CRT_HAVE_DOS$stroff 1
@@ -3684,6 +3690,7 @@
 #define __CRT_HAVE__getw 1
 #define __CRT_HAVE__getwc_nolock 1
 #define __CRT_HAVE__getws_s 1
+#define __CRT_HAVE__heapmin 1
 #define __CRT_HAVE__i64toa 1
 #define __CRT_HAVE__i64toa_s 1
 #define __CRT_HAVE__i64tow 1
@@ -4354,6 +4361,7 @@
 #define __CRT_HAVE_exp2l 1
 #define __CRT_HAVE_expf 1
 #define __CRT_HAVE_expl 1
+#define __CRT_HAVE_explicit_bzero 1
 #define __CRT_HAVE_expm1 1
 #define __CRT_HAVE_expm1f 1
 #define __CRT_HAVE_expm1l 1
@@ -4530,6 +4538,7 @@
 #define __CRT_HAVE_freeaddrinfo 1
 #define __CRT_HAVE_freeifaddrs 1
 #define __CRT_HAVE_freelocale 1
+#define __CRT_HAVE_freezero 1
 #define __CRT_HAVE_fremovexattr 1
 #define __CRT_HAVE_frenameat 1
 #define __CRT_HAVE_freopen 1
@@ -5664,8 +5673,13 @@
 #define __CRT_HAVE_readv 1
 #define __CRT_HAVE_realloc 1
 #define __CRT_HAVE_realloc_in_place 1
+#define __CRT_HAVE_reallocarray 1
+#define __CRT_HAVE_reallocf 1
 #define __CRT_HAVE_realpath 1
 #define __CRT_HAVE_reboot 1
+#define __CRT_HAVE_recalloc 1
+#define __CRT_HAVE_recallocarray 1
+#define __CRT_HAVE_recallocv 1
 #define __CRT_HAVE_recv 1
 #define __CRT_HAVE_recvfrom 1
 #define __CRT_HAVE_recvmmsg 1
@@ -5985,6 +5999,7 @@
 #define __CRT_HAVE_strnrev 1
 #define __CRT_HAVE_strnroff 1
 #define __CRT_HAVE_strnset 1
+#define __CRT_HAVE_strnstr 1
 #define __CRT_HAVE_strnupr 1
 #define __CRT_HAVE_strnupr_l 1
 #define __CRT_HAVE_stroff 1

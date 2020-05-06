@@ -310,13 +310,13 @@ _realloc_dbg:([nullable] void *ptr, $size_t num_bytes,
 }
 
 [ATTR_ALLOC_SIZE((2, 3))]
-[guard][ATTR_WUNUSED][same_impl][requires($has_function(_recalloc))]
+[guard][ATTR_WUNUSED][same_impl][requires($has_function(recallocv))]
 _recalloc_dbg:([nullable] void *ptr, $size_t count, $size_t num_bytes,
                int block_type, char const *filename, int line) -> void * {
 	(void)block_type;
 	(void)filename;
 	(void)line;
-	return _recalloc(ptr, count, num_bytes);
+	return recallocv(ptr, count, num_bytes);
 }
 
 [ATTR_ALLOC_SIZE((2))]

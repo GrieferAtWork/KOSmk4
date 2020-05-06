@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e3d912d */
+/* HASH CRC-32:0xb4b91510 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1048,7 +1048,6 @@
 #define __CRT_SECTION__aligned_offset_recalloc              __CRT_SECTINFO_dos_heap                                 /* .text.crt.dos.heap._aligned_offset_recalloc */
 #define __CRT_SECTION__aligned_realloc                      __CRT_SECTINFO_dos_heap                                 /* .text.crt.dos.heap._aligned_realloc */
 #define __CRT_SECTION__aligned_recalloc                     __CRT_SECTINFO_dos_heap                                 /* .text.crt.dos.heap._aligned_recalloc */
-#define __CRT_SECTION__recalloc                             __CRT_SECTINFO_dos_heap                                 /* .text.crt.dos.heap._recalloc */
 
 /* .text.crt.dos.heap.debug_malloc.* */
 #define __CRT_SECTION__CrtCheckMemory                       __CRT_SECTINFO_dos_heap_debug_malloc                    /* .text.crt.dos.heap.debug_malloc._CrtCheckMemory */
@@ -2171,10 +2170,16 @@
 
 /* .text.crt.heap.rare_helpers.* */
 #define __CRT_SECTION_cfree                                 __CRT_SECTINFO_heap_rare_helpers                        /* .text.crt.heap.rare_helpers.cfree */
+#define __CRT_SECTION_freezero                              __CRT_SECTINFO_heap_rare_helpers                        /* .text.crt.heap.rare_helpers.freezero */
 #define __CRT_SECTION_memcdup                               __CRT_SECTINFO_heap_rare_helpers                        /* .text.crt.heap.rare_helpers.memcdup */
 #define __CRT_SECTION_memdup                                __CRT_SECTINFO_heap_rare_helpers                        /* .text.crt.heap.rare_helpers.memdup */
 #define __CRT_SECTION_posix_memalign                        __CRT_SECTINFO_heap_rare_helpers                        /* .text.crt.heap.rare_helpers.posix_memalign */
 #define __CRT_SECTION_pvalloc                               __CRT_SECTINFO_heap_rare_helpers                        /* .text.crt.heap.rare_helpers.pvalloc */
+#define __CRT_SECTION_reallocarray                          __CRT_SECTINFO_heap_rare_helpers                        /* .text.crt.heap.rare_helpers.reallocarray */
+#define __CRT_SECTION_reallocf                              __CRT_SECTINFO_heap_rare_helpers                        /* .text.crt.heap.rare_helpers.reallocf */
+#define __CRT_SECTION_recalloc                              __CRT_SECTINFO_heap_rare_helpers                        /* .text.crt.heap.rare_helpers.recalloc */
+#define __CRT_SECTION_recallocarray                         __CRT_SECTINFO_heap_rare_helpers                        /* .text.crt.heap.rare_helpers.recallocarray */
+#define __CRT_SECTION_recallocv                             __CRT_SECTINFO_heap_rare_helpers                        /* .text.crt.heap.rare_helpers.recallocv */
 #define __CRT_SECTION_valloc                                __CRT_SECTINFO_heap_rare_helpers                        /* .text.crt.heap.rare_helpers.valloc */
 
 /* .text.crt.heap.strdup.* */

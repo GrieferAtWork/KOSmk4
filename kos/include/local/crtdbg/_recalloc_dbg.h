@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x180d4ca8 */
+/* HASH CRC-32:0x46833db9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,21 +19,23 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__recalloc_dbg_defined
-#if (defined(__CRT_HAVE_realloc) && (defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize))) || defined(__CRT_HAVE__recalloc)
+#if (defined(__CRT_HAVE_realloc) && (defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize))) || defined(__CRT_HAVE_recallocv) || defined(__CRT_HAVE__recalloc)
 #define __local__recalloc_dbg_defined 1
 #include <__crt.h>
-/* Dependency: "_recalloc" from "stdlib" */
-#ifndef ____localdep__recalloc_defined
-#define ____localdep__recalloc_defined 1
-#ifdef __CRT_HAVE__recalloc
-__CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,__localdep__recalloc,(void *__mallptr, __SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes),_recalloc,(__mallptr,__count,__num_bytes))
+/* Dependency: "recallocv" from "malloc" */
+#ifndef ____localdep_recallocv_defined
+#define ____localdep_recallocv_defined 1
+#ifdef __CRT_HAVE_recallocv
+__CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,__localdep_recallocv,(void *__mallptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),recallocv,(__mallptr,__elem_count,__elem_size))
+#elif defined(__CRT_HAVE__recalloc)
+__CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,__localdep_recallocv,(void *__mallptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),_recalloc,(__mallptr,__elem_count,__elem_size))
 #elif defined(__CRT_HAVE_realloc) && (defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize))
-#include <local/stdlib/_recalloc.h>
-#define __localdep__recalloc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_recalloc))
-#else /* CUSTOM: _recalloc */
-#undef ____localdep__recalloc_defined
-#endif /* _recalloc... */
-#endif /* !____localdep__recalloc_defined */
+#include <local/malloc/recallocv.h>
+#define __localdep_recallocv (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(recallocv))
+#else /* CUSTOM: recallocv */
+#undef ____localdep_recallocv_defined
+#endif /* recallocv... */
+#endif /* !____localdep_recallocv_defined */
 
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_recalloc_dbg) __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)) void *
@@ -47,8 +49,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_recalloc_dbg))(void *__ptr,
 	(void)__block_type;
 	(void)__filename;
 	(void)__line;
-	return __localdep__recalloc(__ptr, __count, __num_bytes);
+	return __localdep_recallocv(__ptr, __count, __num_bytes);
 }
 __NAMESPACE_LOCAL_END
-#endif /* (__CRT_HAVE_realloc && (__CRT_HAVE_malloc_usable_size || __CRT_HAVE__msize)) || __CRT_HAVE__recalloc */
+#endif /* (__CRT_HAVE_realloc && (__CRT_HAVE_malloc_usable_size || __CRT_HAVE__msize)) || __CRT_HAVE_recallocv || __CRT_HAVE__recalloc */
 #endif /* !__local__recalloc_dbg_defined */

@@ -41,6 +41,7 @@
 #include <malloc.h>
 #include <sched.h>
 #include <string.h>
+#include <strings.h>
 #include <unistd.h>
 
 #include "../libc/dl.h"
@@ -48,8 +49,11 @@
 #include "malloc.h"
 #include "stdlib.h"
 
+
 DECL_BEGIN
 
+#undef libc_explicit_bzero
+#define libc_explicit_bzero explicit_bzero
 #undef __libc_geterrno_or
 #define __libc_geterrno_or(alt) libc_geterrno()
 
@@ -59,15 +63,15 @@ DECL_BEGIN
 extern char **environ;
 #endif /* !__environ_defined */
 DECLARE_NOREL_GLOBAL_META(char **, environ);
-#define environ  GET_NOREL_GLOBAL(environ)
+#define environ GET_NOREL_GLOBAL(environ)
 INTDEF struct atomic_rwlock libc_environ_lock;
 
 /* Since `environ' can easily contain strings that weren't allocated
- * using `malloc()' and friends, as well as since `putenv()' exists,
- * which can be used to directly inject user-provided strings into
- * the environ map, we run into a problem when it comes to preventing
- * memory leaks in regards of strings that _were_ injected dynamically
- * through use of functions such as `setenv()'
+ * using `malloc()' and friends, and since `putenv()' is a thing that
+ * exists to directly inject user-provided strings into the environ
+ * map, we run into a problem when it comes to preventing memory leaks
+ * in regards of strings that _were_ injected dynamically through use
+ * of functions such as `setenv()'
  * The solution is to keep track of a singly-linked list of all environ
  * strings that _were_ allocated through use of `malloc()', and simply
  * `free()' only strings apart of this list when functions such as
@@ -2143,26 +2147,6 @@ NOTHROW_NCX(LIBCCALL libc__aligned_offset_recalloc)(void *aligned_mallptr,
 }
 /*[[[end:_aligned_offset_recalloc]]]*/
 
-/*[[[head:_recalloc,hash:CRC-32=0x844ba1af]]]*/
-INTERN ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap._recalloc") void *
-NOTHROW_NCX(LIBCCALL libc__recalloc)(void *mallptr,
-                                     size_t count,
-                                     size_t num_bytes)
-/*[[[body:_recalloc]]]*/
-/*AUTO*/{
-	void *result;
-	size_t total_bytes, oldsize = libc_malloc_usable_size(mallptr);
-	if unlikely(__hybrid_overflow_umul(count, num_bytes, &total_bytes))
-		total_bytes = (size_t)-1; /* Force down-stream failure */
-	result = libc_realloc(mallptr, total_bytes);
-	if likely(result) {
-		if (total_bytes > oldsize)
-			memset((byte_t *)result + oldsize, 0, total_bytes - oldsize);
-	}
-	return result;
-}
-/*[[[end:_recalloc]]]*/
 
 /*[[[head:_aligned_realloc,hash:CRC-32=0x1c92aa6c]]]*/
 INTERN WUNUSED ATTR_ALLOC_ALIGN(3) ATTR_ALLOC_SIZE((2))
@@ -2422,11 +2406,83 @@ NOTHROW_NCX(LIBDCALL libd__wdupenv_s)(char16_t **pbuf,
 }
 /*[[[end:DOS$_wdupenv_s]]]*/
 
+/*[[[head:reallocf,hash:CRC-32=0x8a28cd59]]]*/
+INTERN ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2))
+ATTR_WEAK ATTR_SECTION(".text.crt.heap.rare_helpers.reallocf") void *
+NOTHROW_NCX(LIBCCALL libc_reallocf)(void *mallptr,
+                                    size_t num_bytes)
+/*[[[body:reallocf]]]*/
+/*AUTO*/{
+	void *result;
+	result = libc_realloc(mallptr, num_bytes);
+	if unlikely(!result)
+		libc_free(mallptr);
+	return result;
+}
+/*[[[end:reallocf]]]*/
+
+/*[[[head:recallocarray,hash:CRC-32=0xd3b1231b]]]*/
+/* Same as `recallocv(mallptr, new_elem_count, elem_size)', but also ensure that
+ * when `mallptr != NULL', memory pointed to by the old `mallptr...+=old_elem_count*elem_size'
+ * is explicitly freed to zero (s.a. `freezero()') when reallocation must move the memory block */
+INTERN ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((3, 4))
+ATTR_WEAK ATTR_SECTION(".text.crt.heap.rare_helpers.recallocarray") void *
+NOTHROW_NCX(LIBCCALL libc_recallocarray)(void *mallptr,
+                                         size_t old_elem_count,
+                                         size_t new_elem_count,
+                                         size_t elem_size)
+/*[[[body:recallocarray]]]*/
+/*AUTO*/{
+	if (mallptr != NULL && old_elem_count != 0) {
+		void *result;
+		size_t oldusable, newneeded;
+		oldusable = libc_malloc_usable_size(mallptr);
+		newneeded = new_elem_count * elem_size;
+		if (oldusable >= newneeded) {
+			if (old_elem_count > new_elem_count) {
+				size_t zero_bytes;
+				zero_bytes = (old_elem_count - new_elem_count) * elem_size;
+				libc_explicit_bzero((byte_t *)mallptr + newneeded, zero_bytes);
+			}
+			return mallptr;
+		}
+		/* Allocate a new block so we can ensure that an
+		 * existing block gets freezero()'ed in all cases */
+		result = libc_calloc(new_elem_count, elem_size);
+		if (result) {
+			if (oldusable > newneeded)
+				oldusable = newneeded;
+			memcpy(result, mallptr, oldusable);
+			libc_freezero(mallptr, old_elem_count * elem_size);
+		}
+		return result;
+	}
+	return libc_recallocv(mallptr, new_elem_count, elem_size);
+}
+/*[[[end:recallocarray]]]*/
+
+/*[[[head:freezero,hash:CRC-32=0x9639e1e8]]]*/
+/* Same as `free(mallptr)', but also ensure that the memory region
+ * described by `mallptr...+=size' is explicitly freed to zero, or
+ * immediately returned to the OS, rather than being left in cache
+ * while still containing its previous contents. */
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.heap.rare_helpers.freezero") void
+NOTHROW_NCX(LIBCCALL libc_freezero)(void *mallptr,
+                                    size_t size)
+/*[[[body:freezero]]]*/
+/*AUTO*/{
+	if likely(mallptr) {
+		libc_explicit_bzero(mallptr, size);
+		libc_free(mallptr);
+	}
+}
+/*[[[end:freezero]]]*/
+
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x92d521a9]]]*/
+/*[[[start:exports,hash:CRC-32=0xa8f7694c]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(getenv, libc_getenv);
 DEFINE_PUBLIC_WEAK_ALIAS(system, libc_system);
 DEFINE_PUBLIC_WEAK_ALIAS(abort, libc_abort);
@@ -2501,6 +2557,9 @@ DEFINE_PUBLIC_WEAK_ALIAS(mkostemp, libc_mkostemp);
 DEFINE_PUBLIC_WEAK_ALIAS(mkostemps, libc_mkostemps);
 DEFINE_PUBLIC_WEAK_ALIAS(mkostemp64, libc_mkostemp64);
 DEFINE_PUBLIC_WEAK_ALIAS(mkostemps64, libc_mkostemps64);
+DEFINE_PUBLIC_WEAK_ALIAS(reallocf, libc_reallocf);
+DEFINE_PUBLIC_WEAK_ALIAS(recallocarray, libc_recallocarray);
+DEFINE_PUBLIC_WEAK_ALIAS(freezero, libc_freezero);
 DEFINE_PUBLIC_WEAK_ALIAS(__p___argc, libc___p___argc);
 DEFINE_PUBLIC_WEAK_ALIAS(__p___argv, libc___p___argv);
 DEFINE_PUBLIC_WEAK_ALIAS(__p___wargv, libc___p___wargv);
@@ -2529,7 +2588,6 @@ DEFINE_PUBLIC_WEAK_ALIAS(getenv_s, libc_getenv_s);
 DEFINE_PUBLIC_WEAK_ALIAS(_dupenv_s, libc__dupenv_s);
 DEFINE_PUBLIC_WEAK_ALIAS(rand_s, libc_rand_s);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$rand_s, libd_rand_s);
-DEFINE_PUBLIC_WEAK_ALIAS(_recalloc, libc__recalloc);
 DEFINE_PUBLIC_WEAK_ALIAS(_aligned_malloc, libc__aligned_malloc);
 DEFINE_PUBLIC_WEAK_ALIAS(_aligned_offset_malloc, libc__aligned_offset_malloc);
 DEFINE_PUBLIC_WEAK_ALIAS(_aligned_realloc, libc__aligned_realloc);

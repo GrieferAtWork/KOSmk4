@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1cc20153 */
+/* HASH CRC-32:0x8d66993d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -129,6 +129,16 @@ INTDEF WUNUSED NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_mkostemp)(char *templa
 INTDEF WUNUSED NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_mkostemps)(char *template_, int suffixlen, int flags);
 INTDEF WUNUSED NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_mkostemp64)(char *template_, int flags);
 INTDEF WUNUSED NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_mkostemps64)(char *template_, int suffixlen, int flags);
+INTDEF ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) void *NOTHROW_NCX(LIBCCALL libc_reallocf)(void *mallptr, size_t num_bytes);
+/* Same as `recallocv(mallptr, new_elem_count, elem_size)', but also ensure that
+ * when `mallptr != NULL', memory pointed to by the old `mallptr...+=old_elem_count*elem_size'
+ * is explicitly freed to zero (s.a. `freezero()') when reallocation must move the memory block */
+INTDEF ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((3, 4)) void *NOTHROW_NCX(LIBCCALL libc_recallocarray)(void *mallptr, size_t old_elem_count, size_t new_elem_count, size_t elem_size);
+/* Same as `free(mallptr)', but also ensure that the memory region
+ * described by `mallptr...+=size' is explicitly freed to zero, or
+ * immediately returned to the OS, rather than being left in cache
+ * while still containing its previous contents. */
+INTDEF void NOTHROW_NCX(LIBCCALL libc_freezero)(void *mallptr, size_t size);
 INTDEF ATTR_CONST WUNUSED errno_t *NOTHROW_NCX(LIBCCALL libc___errno_location)(void);
 INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__get_errno)(errno_t *perr);
 INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__set_errno)(errno_t err);
@@ -166,7 +176,6 @@ INTDEF NONNULL((1, 2, 4)) errno_t NOTHROW_NCX(LIBCCALL libc_getenv_s)(size_t *ps
 INTDEF NONNULL((1, 2, 3)) errno_t NOTHROW_NCX(LIBCCALL libc__dupenv_s)(char **__restrict pbuf, size_t *pbuflen, char const *varname);
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_rand_s)(unsigned int *__restrict randval);
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd_rand_s)(unsigned int *__restrict randval);
-INTDEF ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2, 3)) void *NOTHROW_NCX(LIBCCALL libc__recalloc)(void *mallptr, size_t count, size_t num_bytes);
 INTDEF ATTR_MALLOC WUNUSED ATTR_ALLOC_ALIGN(2) ATTR_ALLOC_SIZE((1)) void *NOTHROW_NCX(LIBCCALL libc__aligned_malloc)(size_t num_bytes, size_t min_alignment);
 INTDEF ATTR_MALLOC WUNUSED ATTR_ALLOC_SIZE((1)) void *NOTHROW_NCX(LIBCCALL libc__aligned_offset_malloc)(size_t num_bytes, size_t min_alignment, size_t offset);
 INTDEF WUNUSED ATTR_ALLOC_ALIGN(3) ATTR_ALLOC_SIZE((2)) void *NOTHROW_NCX(LIBCCALL libc__aligned_realloc)(void *aligned_mallptr, size_t newsize, size_t min_alignment);

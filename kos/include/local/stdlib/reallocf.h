@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5572d6ab */
+/* HASH CRC-32:0x6fc3d5aa */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,10 +18,24 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local__aligned_free_defined
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
-#define __local__aligned_free_defined 1
+#ifndef __local_reallocf_defined
+#if defined(__CRT_HAVE_realloc) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
+#define __local_reallocf_defined 1
 #include <__crt.h>
+/* Dependency: "realloc" */
+#ifndef ____localdep_realloc_defined
+#define ____localdep_realloc_defined 1
+#ifdef __std___localdep_realloc_defined
+__NAMESPACE_STD_USING(__localdep_realloc)
+#elif __has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_realloc)
+__CEIREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_realloc,(void *__mallptr, __SIZE_TYPE__ __num_bytes),realloc,{ return __builtin_realloc(__mallptr, __num_bytes); })
+#elif defined(__CRT_HAVE_realloc)
+__CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_realloc,(void *__mallptr, __SIZE_TYPE__ __num_bytes),realloc,(__mallptr,__num_bytes))
+#else /* LIBC: realloc */
+#undef ____localdep_realloc_defined
+#endif /* realloc... */
+#endif /* !____localdep_realloc_defined */
+
 /* Dependency: "free" */
 #ifndef ____localdep_free_defined
 #define ____localdep_free_defined 1
@@ -39,12 +53,16 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallp
 #endif /* !____localdep_free_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_aligned_free) void
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_aligned_free))(void *__aligned_mallptr) {
-#line 2870 "kos/src/libc/magic/stdlib.c"
-	if (__aligned_mallptr)
-		__localdep_free(((void **)__aligned_mallptr)[-1]);
+__LOCAL_LIBC(reallocf) __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) void *
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(reallocf))(void *__mallptr,
+                                                      __SIZE_TYPE__ __num_bytes) {
+#line 1769 "kos/src/libc/magic/stdlib.c"
+	void *__result;
+	__result = __localdep_realloc(__mallptr, __num_bytes);
+	if __unlikely(!__result)
+		__localdep_free(__mallptr);
+	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
-#endif /* !__local__aligned_free_defined */
+#endif /* __CRT_HAVE_realloc && (__CRT_HAVE_free || __CRT_HAVE_cfree) */
+#endif /* !__local_reallocf_defined */

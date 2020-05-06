@@ -343,7 +343,7 @@ NOTHROW_NCX(LIBCCALL libc__recalloc_dbg)(void *ptr,
 	(void)block_type;
 	(void)filename;
 	(void)line;
-	return libc__recalloc(ptr, count, num_bytes);
+	return libc_recallocv(ptr, count, num_bytes);
 }
 /*[[[end:_recalloc_dbg]]]*/
 

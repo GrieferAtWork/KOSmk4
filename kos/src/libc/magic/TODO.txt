@@ -64,26 +64,13 @@ Add support for *_chk variants (using __builtin_object_size())
 	#if __USE_BSD
 	void strmode(mode_t mode, char *str);
 	#endif
-<stdlib.h>:
-	#if __USE_KOS || __USE_GNU || __USE_BSD
-	void *reallocarray(void *ptr, size_t elem_count, size_t elem_size);   // realloc(ptr, elem_count * elem_size)
-	#endif
-	#if __USE_KOS || __USE_BSD
-	void *recallocarray(void *ptr, size_t elem_count, size_t elem_size);  // Same as MSVC's `_recalloc'
-	void *reallocf(void *ptr, size_t num_bytes); // newptr = realloc(ptr, num_bytes); if (!newptr) free(ptr); return newptr;
-	#endif
-	#if __USE_KOS
-	void *recalloc(void *ptr, size_t num_bytes);
-	#endif
 
 <stdlib.h>: /* All of the following should also be defined in <malloc.h> */
 	#if __USE_KOS
 	void *malloc(size_t elem_count, size_t elem_size);                          (OVERLOAD)
 	void *calloc(size_t num_bytes);                                             (OVERLOAD)
 	void *realloc(void *ptr, size_t elem_count, size_t elem_size);              (OVERLOAD)
-	void *reallocf(void *ptr, size_t elem_count, size_t elem_size);             (OVERLOAD)
 	void *recalloc(void *ptr, size_t elem_count, size_t elem_size);             (OVERLOAD)
-	void *aligned_alloc(size_t alignment, size_t elem_count, size_t elem_size); (OVERLOAD)
 	#endif
 
 

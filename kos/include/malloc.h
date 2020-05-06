@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3bee6abf */
+/* HASH CRC-32:0x33075cb3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -223,6 +223,52 @@ __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLO
 #include <local/malloc/memcdup.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(memcdup, __FORCELOCAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_NONNULL((1)) void *__NOTHROW_NCX(__LIBCCALL memcdup)(void const *__restrict __ptr, int __needle, size_t __n_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcdup))(__ptr, __needle, __n_bytes); })
 #endif /* memcdup... */
+#ifndef __reallocarray_defined
+#define __reallocarray_defined 1
+#ifdef __CRT_HAVE_reallocarray
+__CDECLARE(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,reallocarray,(void *__ptr, size_t __elem_count, size_t __elem_size),(__ptr,__elem_count,__elem_size))
+#elif defined(__CRT_HAVE_realloc)
+#include <local/malloc/reallocarray.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(reallocarray, __FORCELOCAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBCCALL reallocarray)(void *__ptr, size_t __elem_count, size_t __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(reallocarray))(__ptr, __elem_count, __elem_size); })
+#else /* CUSTOM: reallocarray */
+#undef __reallocarray_defined
+#endif /* reallocarray... */
+#endif /* !__reallocarray_defined */
+#ifndef __reallocv_defined
+#define __reallocv_defined 1
+#ifdef __CRT_HAVE_reallocarray
+__CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,reallocv,(void *__ptr, size_t __elem_count, size_t __elem_size),reallocarray,(__ptr,__elem_count,__elem_size))
+#elif defined(__CRT_HAVE_realloc)
+#include <local/malloc/reallocarray.h>
+__FORCELOCAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBCCALL reallocv)(void *__ptr, size_t __elem_count, size_t __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(reallocarray))(__ptr, __elem_count, __elem_size); }
+#else /* CUSTOM: reallocarray */
+#undef __reallocv_defined
+#endif /* reallocv... */
+#endif /* !__reallocv_defined */
+#ifndef __recalloc_defined
+#define __recalloc_defined 1
+#ifdef __CRT_HAVE_recalloc
+__CDECLARE(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,recalloc,(void *__mallptr, __SIZE_TYPE__ __num_bytes),(__mallptr,__num_bytes))
+#elif defined(__CRT_HAVE_realloc) && (defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize))
+#include <local/malloc/recalloc.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(recalloc, __FORCELOCAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBCCALL recalloc)(void *__mallptr, __SIZE_TYPE__ __num_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(recalloc))(__mallptr, __num_bytes); })
+#else /* CUSTOM: recalloc */
+#undef __recalloc_defined
+#endif /* recalloc... */
+#endif /* !__recalloc_defined */
+#ifndef __recallocv_defined
+#define __recallocv_defined 1
+#ifdef __CRT_HAVE_recallocv
+__CDECLARE(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,recallocv,(void *__mallptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),(__mallptr,__elem_count,__elem_size))
+#elif defined(__CRT_HAVE__recalloc)
+__CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,recallocv,(void *__mallptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),_recalloc,(__mallptr,__elem_count,__elem_size))
+#elif defined(__CRT_HAVE_realloc) && (defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize))
+#include <local/malloc/recallocv.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(recallocv, __FORCELOCAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBCCALL recallocv)(void *__mallptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(recallocv))(__mallptr, __elem_count, __elem_size); })
+#else /* CUSTOM: recallocv */
+#undef __recallocv_defined
+#endif /* recallocv... */
+#endif /* !__recallocv_defined */
 #endif /* __USE_KOS */
 #ifdef __USE_DOS
 #ifdef __CRT_HAVE__msize

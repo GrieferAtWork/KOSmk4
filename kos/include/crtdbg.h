@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcdfd57fa */
+/* HASH CRC-32:0x150f2cd9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -373,7 +373,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_realloc_dbg, __FORCELOCAL __ATTR_WUNUSED __ATTR
 #define ___recalloc_dbg_defined 1
 #ifdef __CRT_HAVE__recalloc_dbg
 __CDECLARE(__ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,_recalloc_dbg,(void *__ptr, __SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, int __block_type, char const *__filename, int __line),(__ptr,__count,__num_bytes,__block_type,__filename,__line))
-#elif (defined(__CRT_HAVE_realloc) && (defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize))) || defined(__CRT_HAVE__recalloc)
+#elif (defined(__CRT_HAVE_realloc) && (defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize))) || defined(__CRT_HAVE_recallocv) || defined(__CRT_HAVE__recalloc)
 #include <local/crtdbg/_recalloc_dbg.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_recalloc_dbg, __FORCELOCAL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBCCALL _recalloc_dbg)(void *__ptr, __SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_recalloc_dbg))(__ptr, __count, __num_bytes, __block_type, __filename, __line); })
 #else /* CUSTOM: _recalloc_dbg */

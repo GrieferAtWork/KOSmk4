@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x36f163bd */
+/* HASH CRC-32:0xe82ed70e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,7 +55,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_splitpath_s))(char const *__restrict
                                                           __SIZE_TYPE__ __filelen,
                                                           char *__ext,
                                                           __SIZE_TYPE__ __extlen) {
-#line 3063 "kos/src/libc/magic/stdlib.c"
+#line 3123 "kos/src/libc/magic/stdlib.c"
 	__SIZE_TYPE__ __len, __last_slash, __last_dot;
 	if __unlikely(!__abspath)
 		goto __err_inval;

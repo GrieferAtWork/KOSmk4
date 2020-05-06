@@ -1332,6 +1332,7 @@
 #define __CRT_HAVE__getw 1
 #define __CRT_HAVE__getwc_nolock 1
 #define __CRT_HAVE__getws_s 1
+#define __CRT_HAVE__heapmin 1
 #define __CRT_HAVE__i64toa 1
 #define __CRT_HAVE__i64toa_s 1
 #define __CRT_HAVE__i64tow 1
@@ -2179,6 +2180,7 @@
 #define __CRT_HAVE_freeaddrinfo 1
 #define __CRT_HAVE_freeifaddrs 1
 #define __CRT_HAVE_freelocale 1
+#define __CRT_HAVE_freezero 1
 #define __CRT_HAVE_fremovexattr 1
 #define __CRT_HAVE_frenameat 1
 #define __CRT_HAVE_freopen 1
@@ -3313,8 +3315,13 @@
 #define __CRT_HAVE_readv 1
 #define __CRT_HAVE_realloc 1
 #define __CRT_HAVE_realloc_in_place 1
+#define __CRT_HAVE_reallocarray 1
+#define __CRT_HAVE_reallocf 1
 #define __CRT_HAVE_realpath 1
 #define __CRT_HAVE_reboot 1
+#define __CRT_HAVE_recalloc 1
+#define __CRT_HAVE_recallocarray 1
+#define __CRT_HAVE_recallocv 1
 #define __CRT_HAVE_recv 1
 #define __CRT_HAVE_recvfrom 1
 #define __CRT_HAVE_recvmmsg 1

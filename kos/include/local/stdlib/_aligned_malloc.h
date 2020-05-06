@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x93d1ef7d */
+/* HASH CRC-32:0x3a95cc0f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_aligned_malloc) __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(2) __ATTR_ALLOC_SIZE((1)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_aligned_malloc))(__SIZE_TYPE__ __num_bytes,
                                                              __SIZE_TYPE__ __min_alignment) {
-#line 2701 "kos/src/libc/magic/stdlib.c"
+#line 2761 "kos/src/libc/magic/stdlib.c"
 	void *__result = __localdep_malloc(__num_bytes + 2 * sizeof(void *) + __min_alignment - 1);
 	if (__result) {
 		void *__base = (void *)(((__UINTPTR_TYPE__)__result + (__min_alignment - 1)) & ~(__min_alignment - 1));

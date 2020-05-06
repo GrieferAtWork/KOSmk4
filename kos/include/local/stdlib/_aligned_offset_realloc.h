@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe223bc28 */
+/* HASH CRC-32:0x894ceb9e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -87,7 +87,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_aligned_offset_realloc))(void *__ali
                                                                      __SIZE_TYPE__ __newsize,
                                                                      __SIZE_TYPE__ __min_alignment,
                                                                      __SIZE_TYPE__ __offset) {
-#line 2768 "kos/src/libc/magic/stdlib.c"
+#line 2828 "kos/src/libc/magic/stdlib.c"
 	void *__result;
 	__result = __localdep__aligned_offset_malloc(__newsize, __min_alignment, __offset);
 	if (__result) {
