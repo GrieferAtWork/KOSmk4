@@ -489,70 +489,6 @@ NOTHROW(KCALL cpu_quantum_time)(void) {
 
 
 
-/* Increment `thiscpu_quantum_offset' by `diff' incrementing the `thiscpu_jiffies' counter
- * when the resulting value turns out to be greater than `thiscpu_quantum_length',
- * in which case the value will also be truncated.
- * When `thiscpu_jiffies' is incremented, also check if this causes additional
- * tasks to time out, and if so, re-schedule them for execution. */
-PUBLIC NOBLOCK NOPREEMPT quantum_diff_t
-NOTHROW(FCALL cpu_add_quantum_offset_nopr)(quantum_diff_t diff) {
-	struct cpu *me = THIS_CPU;
-	quantum_diff_t new_diff, more_jiffies = 0;
-	quantum_diff_t length = FORCPU(me, thiscpu_quantum_length);
-	assert(!PREEMPTION_ENABLED());
-	if (OVERFLOW_UADD(FORCPU(me, thiscpu_quantum_offset), diff, &new_diff)) {
-		more_jiffies = ((quantum_diff_t)-1 / length);
-		new_diff     = (FORCPU(me, thiscpu_quantum_offset) + diff) - ((quantum_diff_t)-1);
-	}
-	if (new_diff >= length) {
-		more_jiffies += new_diff / length;
-		new_diff = new_diff % length;
-	}
-	FORCPU(me, thiscpu_quantum_offset) = new_diff;
-	if (more_jiffies) {
-		struct task *sleeper, *last_sleeper, *next;
-		jtime_t new_jiffies;
-		new_jiffies = FORCPU(me, thiscpu_jiffies) + more_jiffies;
-		FORCPU(me, thiscpu_jiffies) = new_jiffies;
-		if ((sleeper = me->c_sleeping) != NULL) {
-			if (sleeper->t_sched.s_asleep.ss_timeout.q_jtime > new_jiffies)
-				goto done_wakeup;
-			if (((u64)sleeper->t_sched.s_asleep.ss_timeout.q_qtime *
-			     sleeper->t_sched.s_asleep.ss_timeout.q_qsize) >
-			    ((u64)new_diff * length))
-				goto done_wakeup;
-			last_sleeper = sleeper;
-			ATOMIC_FETCHOR(sleeper->t_flags, TASK_FTIMEOUT | TASK_FRUNNING);
-			while ((next = last_sleeper->t_sched.s_asleep.ss_tmonxt) != NULL) {
-				STATIC_ASSERT(offsetof(struct task, t_sched.s_running.sr_runprv) !=
-				              offsetof(struct task, t_sched.s_asleep.ss_tmonxt));
-				if (next->t_sched.s_asleep.ss_timeout.q_jtime > new_jiffies)
-					break;
-				if (((u64)next->t_sched.s_asleep.ss_timeout.q_qtime *
-				     next->t_sched.s_asleep.ss_timeout.q_qsize) >
-				    ((u64)new_diff * length))
-					break;
-				ATOMIC_FETCHOR(next->t_flags, TASK_FTIMEOUT | TASK_FRUNNING);
-				last_sleeper->t_sched.s_running.sr_runnxt = next;
-				next->t_sched.s_running.sr_runprv         = last_sleeper;
-				last_sleeper                              = next;
-			}
-			me->c_sleeping = next;
-			if (next)
-				next->t_sched.s_asleep.ss_pself = &me->c_sleeping;
-			/* Re-schedule all of the sleepers. */
-			next = me->c_current->t_sched.s_running.sr_runnxt;
-			sleeper->t_sched.s_running.sr_runprv       = me->c_current;
-			last_sleeper->t_sched.s_running.sr_runnxt  = next;
-			next->t_sched.s_running.sr_runprv          = last_sleeper;
-			me->c_current->t_sched.s_running.sr_runnxt = sleeper;
-		}
-	}
-done_wakeup:
-	return length;
-}
-
-
 /* Enter a sleeping state and return once being woken (true),
  * or once the given `abs_timeout' (which must be global) expires (false)
  * WARNING: Even if the caller has disabled preemption prior to the call,
@@ -598,6 +534,7 @@ PUBLIC bool NOTHROW(FCALL task_sleep)(struct timespec const *abs_timeout) {
 		if (!abs_timeout->tv_sec && !abs_timeout->tv_nsec)
 			goto do_return_false;
 		PREEMPTION_DISABLE();
+		/* TODO: This time conversion should be done better! */
 		now       = realtime();
 		now_qtime = cpu_quantum_time();
 		if (*abs_timeout <= now)

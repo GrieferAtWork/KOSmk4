@@ -544,6 +544,10 @@ INTERN_FUNCTION(x86_apic_cpu_quantum_elapsed_nopr)
 	EXTERN(thiscpu_quantum_length)
 	movzlq thiscpu_quantum_length(%rax), %rax
 	subq   %rcx, %rax
+	.byte  0x70 /* jo8 1f */  /* Shouldn't happen, but has been seen to happen */
+	.byte  0x01
+	.byte  0xc3 /* ret; 1: */
+	xorq   %rax, %rax
 	ret
 INTERN_CONST(x86_apic_cpu_quantum_elapsed_nopr_size, . - x86_apic_cpu_quantum_elapsed_nopr)
 END(x86_apic_cpu_quantum_elapsed_nopr)
@@ -585,8 +589,8 @@ INTERN_FUNCTION(x86_apic_cpu_quantum_reset_nopr)
 	movq   x86_lapicbase, %rcx
 	EXTERN(thiscpu_quantum_length)
 	movl   thiscpu_quantum_length(%rax), %eax
-	/* lapic_write(APIC_TIMER_CURRENT, PERCPU(thiscpu_quantum_length)); */
-	movl   %eax, APIC_TIMER_CURRENT(%rcx)
+	/* lapic_write(APIC_TIMER_INITIAL, PERCPU(thiscpu_quantum_length)); */
+	movl   %eax, APIC_TIMER_INITIAL(%rcx)
 	ret
 INTERN_CONST(x86_apic_cpu_quantum_reset_nopr_size, . - x86_apic_cpu_quantum_reset_nopr)
 END(x86_apic_cpu_quantum_reset_nopr)

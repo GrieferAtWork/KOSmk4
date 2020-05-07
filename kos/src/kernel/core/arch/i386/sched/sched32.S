@@ -37,6 +37,7 @@
 
 #include <asm/cfi.h>
 #include <asm/cpu-flags.h>
+#include <asm/instr/jccN.h>
 #include <asm/param.h>
 #include <kos/kernel/cpu-state.h>
 
@@ -564,6 +565,9 @@ INTERN_FUNCTION(x86_apic_cpu_quantum_elapsed_nopr)
 	EXTERN(thiscpu_quantum_length)
 	movl   thiscpu_quantum_length(%eax), %eax
 	subl   %ecx, %eax
+	jo8    1f /* Shouldn't happen, but has been seen to happen */
+	ret
+1:	xorl   %eax, %eax
 	ret
 INTERN_CONST(x86_apic_cpu_quantum_elapsed_nopr_size, . - x86_apic_cpu_quantum_elapsed_nopr)
 END(x86_apic_cpu_quantum_elapsed_nopr)
@@ -605,8 +609,8 @@ INTERN_FUNCTION(x86_apic_cpu_quantum_reset_nopr)
 	movl   x86_lapicbase, %ecx
 	EXTERN(thiscpu_quantum_length)
 	movl   thiscpu_quantum_length(%eax), %eax
-	/* lapic_write(APIC_TIMER_CURRENT, PERCPU(thiscpu_quantum_length)); */
-	movl   %eax, APIC_TIMER_CURRENT(%ecx)
+	/* lapic_write(APIC_TIMER_INITIAL, PERCPU(thiscpu_quantum_length)); */
+	movl   %eax, APIC_TIMER_INITIAL(%ecx)
 	ret
 INTERN_CONST(x86_apic_cpu_quantum_reset_nopr_size, . - x86_apic_cpu_quantum_reset_nopr)
 END(x86_apic_cpu_quantum_reset_nopr)

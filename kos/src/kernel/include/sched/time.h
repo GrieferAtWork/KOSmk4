@@ -40,10 +40,13 @@ struct realtime_clock_struct {
 	REF struct driver *rc_driver;    /* [const][1..1] Realtime clock driver. */
 	struct timespec    rc_precision; /* [const] Clock precision. */
 	/* [1..1] Get the current realtime.
+	 * NOTE: Due to imprecision, the actual current time at the time of this function
+	 *       being called is somewhere inside of `X >= return && X < return + rc_precision'
 	 * NOTE: This function is only ever called with preemption disabled! */
 	NOPREEMPT NOBLOCK WUNUSED struct timespec
 	/*NOTHROW*/(KCALL *rc_gettime)(struct realtime_clock_struct *__restrict self);
 	/* [0..1] Set the current realtime.
+	 * The actual time set is equal to `*abs_time - (*abs_time % rc_precision)'
 	 * NOTE: This function is only ever called with preemption disabled! */
 	NOPREEMPT void
 	(KCALL *rc_settime)(struct realtime_clock_struct *__restrict self,

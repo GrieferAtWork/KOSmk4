@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x38eec419 */
+/* HASH CRC-32:0x13c1341a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ DECL_BEGIN
 INTDEF ATTR_CONST WUNUSED double NOTHROW_NCX(LIBCCALL libc_difftime)(time_t time1, time_t time0);
 /* Return the `time_t' representation of TP and normalize TP */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) time_t NOTHROW_NCX(LIBCCALL libc_mktime)(__STRUCT_TM __KOS_FIXED_CONST *tp);
-/* Equivalent to `asctime (localtime (timer))' */
+/* Equivalent to `asctime(localtime(timer))' */
 INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_ctime)(time_t const *timer);
 /* Return the `struct tm' representation of *TIMER
  * in Universal Coordinated Time (aka Greenwich Mean Time) */
@@ -52,7 +52,7 @@ INTDEF NONNULL((1, 3)) errno_t NOTHROW_NCX(LIBCCALL libc_asctime_s)(char *__rest
 INTDEF ATTR_CONST WUNUSED double NOTHROW_NCX(LIBCCALL libc_difftime64)(time64_t time1, time64_t time0);
 /* Return the `time_t' representation of TP and normalize TP */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) time64_t NOTHROW_NCX(LIBCCALL libc_mktime64)(__STRUCT_TM __KOS_FIXED_CONST *tp);
-/* Equivalent to `asctime (localtime (timer))' */
+/* Equivalent to `asctime(localtime(timer))' */
 INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_ctime64)(time64_t const *timer);
 /* Return the `struct tm' representation of *TIMER
  * in Universal Coordinated Time (aka Greenwich Mean Time) */
@@ -83,13 +83,13 @@ INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_getdate_r)(char const *__re
 INTDEF NONNULL((1, 2)) __STRUCT_TM *NOTHROW_NCX(LIBCCALL libc_gmtime_r)(time_t const *__restrict timer, __STRUCT_TM *__restrict tp);
 /* Return the `struct tm' representation of *TIMER in local time, using *TP to store the result */
 INTDEF NONNULL((1, 2)) __STRUCT_TM *NOTHROW_NCX(LIBCCALL libc_localtime_r)(time_t const *__restrict timer, __STRUCT_TM *__restrict tp);
-/* Equivalent to `asctime_r (localtime_r (timer, *TMP*), buf)' */
+/* Equivalent to `asctime_r(localtime_r(timer, *TMP*), buf)' */
 INTDEF NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc_ctime_r)(time_t const *__restrict timer, char buf[26]);
 /* Return the `struct tm' representation of *TIMER in UTC, using *TP to store the result */
 INTDEF NONNULL((1, 2)) __STRUCT_TM *NOTHROW_NCX(LIBCCALL libc_gmtime64_r)(time64_t const *__restrict timer, __STRUCT_TM *__restrict tp);
 /* Return the `struct tm' representation of *TIMER in local time, using *TP to store the result */
 INTDEF NONNULL((1, 2)) __STRUCT_TM *NOTHROW_NCX(LIBCCALL libc_localtime64_r)(time64_t const *__restrict timer, __STRUCT_TM *__restrict tp);
-/* Equivalent to `asctime_r (localtime_r (timer, *TMP*), buf)' */
+/* Equivalent to `asctime_r(localtime_r(timer, *TMP*), buf)' */
 INTDEF NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc_ctime64_r)(time64_t const *__restrict timer, char buf[26]);
 /* Return in BUF a string of the form "Day Mon dd hh:mm:ss yyyy\n"
  * that is the representation of TP in this format */

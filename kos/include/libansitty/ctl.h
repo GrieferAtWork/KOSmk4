@@ -183,7 +183,7 @@
 #define AC_SD(lines) _AC_ESC "[" lines "T"
 
 /* Same as `AC_VPA(cury) AC_CHA(cury)' */
-#define AC_CUP(cury, curx) _AC_ESC "[" cury ";" curx "b"
+#define AC_CUP(cury, curx) _AC_ESC "[" cury ";" curx "H"
 
 /* Same as `AC_VPA("1") AC_CHA("1")' */
 #define AC_CUP0   _AC_ESC "[b"

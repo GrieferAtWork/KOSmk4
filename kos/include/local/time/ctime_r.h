@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe6fee2df */
+/* HASH CRC-32:0x3e5de574 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,14 +57,14 @@ __NAMESPACE_STD_END
 #ifndef ____localdep_dos_ctime_s_defined
 #define ____localdep_dos_ctime_s_defined 1
 #if defined(__CRT_HAVE__ctime32_s) && defined(__USE_TIME_BITS64)
-/* Equivalent to `asctime_r (localtime_r (timer, *TMP*), buf)' */
+/* Equivalent to `asctime_r(localtime_r(timer, *TMP*), buf)' */
 __CREDIRECT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,__localdep_dos_ctime_s,(char __buf[26], __SIZE_TYPE__ __bufsize, __TM_TYPE(time) const *__restrict __timer),_ctime32_s,(__buf,__bufsize,__timer))
 #elif defined(__CRT_HAVE__ctime64_s) && !defined(__USE_TIME_BITS64)
-/* Equivalent to `asctime_r (localtime_r (timer, *TMP*), buf)' */
+/* Equivalent to `asctime_r(localtime_r(timer, *TMP*), buf)' */
 __CREDIRECT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,__localdep_dos_ctime_s,(char __buf[26], __SIZE_TYPE__ __bufsize, __TM_TYPE(time) const *__restrict __timer),_ctime64_s,(__buf,__bufsize,__timer))
 #elif defined(__CRT_HAVE__ctime32_s) || defined(__CRT_HAVE__ctime64_s)
 #include <local/time/dos_ctime_s.h>
-/* Equivalent to `asctime_r (localtime_r (timer, *TMP*), buf)' */
+/* Equivalent to `asctime_r(localtime_r(timer, *TMP*), buf)' */
 #define __localdep_dos_ctime_s (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dos_ctime_s))
 #else /* CUSTOM: dos_ctime_s */
 #undef ____localdep_dos_ctime_s_defined
@@ -100,7 +100,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),__STRUCT_TM *,__NOTHROW_NCX,__localdep_localt
 #endif /* !____localdep_localtime_r_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-/* Equivalent to `asctime_r (localtime_r (timer, *TMP*), buf)' */
+/* Equivalent to `asctime_r(localtime_r(timer, *TMP*), buf)' */
 __LOCAL_LIBC(ctime_r) __ATTR_NONNULL((1, 2)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ctime_r))(__TM_TYPE(time) const *__restrict __timer,
                                                      char __buf[26]) {

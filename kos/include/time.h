@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe71df6cb */
+/* HASH CRC-32:0xca423dc7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -351,22 +351,22 @@ __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(mktime, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) time_t __NOTHROW_NCX(__LIBCCALL mktime)(__STRUCT_TM __KOS_FIXED_CONST *__tp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mktime))(__tp); })
 #endif /* mktime... */
 #if defined(__CRT_HAVE_ctime64) && defined(__USE_TIME_BITS64)
-/* Equivalent to `asctime (localtime (timer))' */
+/* Equivalent to `asctime(localtime(timer))' */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,ctime,(time_t const *__timer),ctime64,(__timer))
 #elif defined(__CRT_HAVE__ctime64) && defined(__USE_TIME_BITS64)
-/* Equivalent to `asctime (localtime (timer))' */
+/* Equivalent to `asctime(localtime(timer))' */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,ctime,(time_t const *__timer),_ctime64,(__timer))
 #elif defined(__CRT_HAVE_ctime) && !defined(__USE_TIME_BITS64)
-/* Equivalent to `asctime (localtime (timer))' */
+/* Equivalent to `asctime(localtime(timer))' */
 __CDECLARE(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,ctime,(time_t const *__timer),(__timer))
 #elif defined(__CRT_HAVE__ctime32) && !defined(__USE_TIME_BITS64)
-/* Equivalent to `asctime (localtime (timer))' */
+/* Equivalent to `asctime(localtime(timer))' */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,ctime,(time_t const *__timer),_ctime32,(__timer))
 #else /* LIBC: ctime */
 __NAMESPACE_STD_END
 #include <local/time/ctime.h>
 __NAMESPACE_STD_BEGIN
-/* Equivalent to `asctime (localtime (timer))' */
+/* Equivalent to `asctime(localtime(timer))' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(ctime, __FORCELOCAL __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL ctime)(time_t const *__timer) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ctime))(__timer); })
 #endif /* ctime... */
 #if defined(__CRT_HAVE_gmtime64) && defined(__USE_TIME_BITS64)
@@ -556,17 +556,17 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time64_t,__NOTHROW_
 __NAMESPACE_LOCAL_USING_OR_IMPL(mktime64, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __time64_t __NOTHROW_NCX(__LIBCCALL mktime64)(__STRUCT_TM __KOS_FIXED_CONST *__tp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mktime64))(__tp); })
 #endif /* mktime64... */
 #ifdef __CRT_HAVE_ctime64
-/* Equivalent to `asctime (localtime (timer))' */
+/* Equivalent to `asctime(localtime(timer))' */
 __CDECLARE(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,ctime64,(__time64_t const *__timer),(__timer))
 #elif defined(__CRT_HAVE_ctime) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-/* Equivalent to `asctime (localtime (timer))' */
+/* Equivalent to `asctime(localtime(timer))' */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,ctime64,(__time64_t const *__timer),ctime,(__timer))
 #elif defined(__CRT_HAVE__ctime64)
-/* Equivalent to `asctime (localtime (timer))' */
+/* Equivalent to `asctime(localtime(timer))' */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,ctime64,(__time64_t const *__timer),_ctime64,(__timer))
 #else /* LIBC: ctime64 */
 #include <local/time/ctime64.h>
-/* Equivalent to `asctime (localtime (timer))' */
+/* Equivalent to `asctime(localtime(timer))' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(ctime64, __FORCELOCAL __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL ctime64)(__time64_t const *__timer) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ctime64))(__timer); })
 #endif /* ctime64... */
 #ifdef __CRT_HAVE_gmtime64
@@ -1149,11 +1149,11 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),__STRUCT_TM *,__NOTHROW_NCX,localtime_r,(__TM_
 __NAMESPACE_LOCAL_USING_OR_IMPL(localtime_r, __FORCELOCAL __ATTR_NONNULL((1, 2)) __STRUCT_TM *__NOTHROW_NCX(__LIBCCALL localtime_r)(__TM_TYPE(time) const *__restrict __timer, __STRUCT_TM *__restrict __tp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(localtime_r))(__timer, __tp); })
 #endif /* localtime_r... */
 #ifdef __CRT_HAVE_ctime_r
-/* Equivalent to `asctime_r (localtime_r (timer, *TMP*), buf)' */
+/* Equivalent to `asctime_r(localtime_r(timer, *TMP*), buf)' */
 __CDECLARE(__ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,ctime_r,(__TM_TYPE(time) const *__restrict __timer, char __buf[26]),(__timer,__buf))
 #else /* LIBC: ctime_r */
 #include <local/time/ctime_r.h>
-/* Equivalent to `asctime_r (localtime_r (timer, *TMP*), buf)' */
+/* Equivalent to `asctime_r(localtime_r(timer, *TMP*), buf)' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(ctime_r, __FORCELOCAL __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL ctime_r)(__TM_TYPE(time) const *__restrict __timer, char __buf[26]) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ctime_r))(__timer, __buf); })
 #endif /* ctime_r... */
 
@@ -1181,14 +1181,14 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),__STRUCT_TM *,__NOTHROW_NCX,localtime64_r,(__
 __NAMESPACE_LOCAL_USING_OR_IMPL(localtime64_r, __FORCELOCAL __ATTR_NONNULL((1, 2)) __STRUCT_TM *__NOTHROW_NCX(__LIBCCALL localtime64_r)(__time64_t const *__restrict __timer, __STRUCT_TM *__restrict __tp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(localtime64_r))(__timer, __tp); })
 #endif /* localtime64_r... */
 #ifdef __CRT_HAVE_ctime64_r
-/* Equivalent to `asctime_r (localtime_r (timer, *TMP*), buf)' */
+/* Equivalent to `asctime_r(localtime_r(timer, *TMP*), buf)' */
 __CDECLARE(__ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,ctime64_r,(__time64_t const *__restrict __timer, char __buf[26]),(__timer,__buf))
 #elif defined(__CRT_HAVE_ctime_r) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-/* Equivalent to `asctime_r (localtime_r (timer, *TMP*), buf)' */
+/* Equivalent to `asctime_r(localtime_r(timer, *TMP*), buf)' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,ctime64_r,(__time64_t const *__restrict __timer, char __buf[26]),ctime_r,(__timer,__buf))
 #else /* LIBC: ctime64_r */
 #include <local/time/ctime64_r.h>
-/* Equivalent to `asctime_r (localtime_r (timer, *TMP*), buf)' */
+/* Equivalent to `asctime_r(localtime_r(timer, *TMP*), buf)' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(ctime64_r, __FORCELOCAL __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL ctime64_r)(__time64_t const *__restrict __timer, char __buf[26]) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ctime64_r))(__timer, __buf); })
 #endif /* ctime64_r... */
 #endif /* __USE_TIME64 */

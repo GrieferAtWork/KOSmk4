@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x71a0cf9f */
+/* HASH CRC-32:0x2448a56f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -114,7 +114,7 @@ __INTERN __ATTR_UNUSED __ATTR_SELECTANY char __ctime_buf[26] = {0};
 __PRIVATE __ATTR_UNUSED char __ctime_buf[26] = {0};
 #endif
 __NAMESPACE_LOCAL_END
-#endif /* !__LIBC_CTIME_BUFFER_DEFINED *//* Equivalent to `asctime (localtime (timer))' */
+#endif /* !__LIBC_CTIME_BUFFER_DEFINED *//* Equivalent to `asctime(localtime(timer))' */
 INTERN ATTR_RETNONNULL WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.time.ctime") char *
 NOTHROW_NCX(LIBCCALL libc_ctime)(time_t const *timer) {
@@ -432,7 +432,7 @@ __INTERN __ATTR_UNUSED __ATTR_SELECTANY char __ctime_buf[26] = {0};
 __PRIVATE __ATTR_UNUSED char __ctime_buf[26] = {0};
 #endif
 __NAMESPACE_LOCAL_END
-#endif /* !__LIBC_CTIME_BUFFER_DEFINED *//* Equivalent to `asctime (localtime (timer))' */
+#endif /* !__LIBC_CTIME_BUFFER_DEFINED *//* Equivalent to `asctime(localtime(timer))' */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_ctime64, libc_ctime);
 #else
@@ -1043,7 +1043,7 @@ __NAMESPACE_STD_END
 #endif /* !__std_tm_defined */
 #endif /* !__tm_defined */
 #endif /* !__STRUCT_TM */
-/* Equivalent to `asctime_r (localtime_r (timer, *TMP*), buf)' */
+/* Equivalent to `asctime_r(localtime_r(timer, *TMP*), buf)' */
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.time.ctime_r") char *
 NOTHROW_NCX(LIBCCALL libc_ctime_r)(time_t const *__restrict timer,
@@ -1269,7 +1269,7 @@ __NAMESPACE_STD_END
 #endif /* !__std_tm_defined */
 #endif /* !__tm_defined */
 #endif /* !__STRUCT_TM */
-/* Equivalent to `asctime_r (localtime_r (timer, *TMP*), buf)' */
+/* Equivalent to `asctime_r(localtime_r(timer, *TMP*), buf)' */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_ctime64_r, libc_ctime_r);
 #else

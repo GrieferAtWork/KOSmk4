@@ -154,16 +154,28 @@ FUNDEF NOBLOCK WUNUSED qtime_t NOTHROW(KCALL cpu_quantum_time)(void);
  * As it stands right now, `cpu_quantum_time()' can't account for time spans
  * during which the boot cpu's clock is halted. */
 
-/* Returns the highly precise current real time derived from the current CPU time.
- * If no realtime hardware clock is available, this clock may stop when the CPU is
- * idle and will not indicate the actual current time. */
-FUNDEF NOBLOCK WUNUSED struct timespec NOTHROW(KCALL realtime)(void);
+/* TODO: realtime() may change arbitrarily due to use of settimeofday()
+ *       As such, KOS really needs some sort of `CLOCK_MONOTONIC' timer, which
+ *       could easily be implemented in terms of the underlying implementation
+ *       of `realtime()', with timeouts passed to the low-level `task_sleep()'
+ *       function then relative to that clock! */
 
-/* Convert to/from cpu-local quantum time and realtime */
-FUNDEF NOBLOCK NOPREEMPT WUNUSED ATTR_PURE struct timespec
-NOTHROW(FCALL cpu_quantum_time_to_realtime_nopr)(qtime_t const *__restrict qtime);
-FUNDEF NOBLOCK NOPREEMPT WUNUSED ATTR_PURE qtime_t
-NOTHROW(FCALL realtime_to_cpu_quantum_time_nopr)(struct timespec const *__restrict tms);
+
+
+/* Returns the current real time derived from the current CPU time.
+ * If no realtime hardware is available, this clock may stop when
+ * the CPU is idle and will not indicate the actual current time.
+ * WARNING: KOS only gives a best-effort guaranty for this function
+ *          in terms of consistency when it comes to the calling
+ *          thread being moved to a different CPU.
+ *          There is a chance that minor inconsistencies in terms
+ *          of exact nano-second values returned by this function
+ *          when the calling thread is moved.
+ * However, it is guarantied that (so long as `settimeofday()' isn't
+ * called), calling this function repeatedly from the threads hosted
+ * by the same CPU will _always_ return values such that later values
+ * are >= earlier values. */
+FUNDEF NOBLOCK WUNUSED struct timespec NOTHROW(KCALL realtime)(void);
 
 /* Increment `thiscpu_quantum_offset' by `diff' incrementing the `thiscpu_jiffies' counter
  * when the resulting value turns out to be greater than `thiscpu_quantum_length',

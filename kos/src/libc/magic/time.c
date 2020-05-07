@@ -441,7 +441,7 @@ mktime:([nonnull] __STRUCT_TM __KOS_FIXED_CONST *tp) -> time_t {
 [ignore] gmtime32:([nonnull] $time32_t const *timer) -> __STRUCT_TM * = gmtime?;
 
 
-@@Equivalent to `asctime (localtime (timer))'
+@@Equivalent to `asctime(localtime(timer))'
 [dependency_prefix(
 @@if_has_function(ctime32, ctime64)@@
 DEFINE_CTIME_BUFFER
@@ -1536,7 +1536,7 @@ getdate_r:([nonnull] char const *__restrict string,
 #endif
 }
 
-@@Equivalent to `asctime_r (localtime_r (timer, *TMP*), buf)'
+@@Equivalent to `asctime_r(localtime_r(timer, *TMP*), buf)'
 [dependency_prefix(DEFINE_STRUCT_TM)][libc_impl({
 	struct tm ltm;
 	return asctime_r(localtime_r(timer, &ltm), buf);

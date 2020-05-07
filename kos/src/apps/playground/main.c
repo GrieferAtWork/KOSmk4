@@ -52,6 +52,7 @@
 #include <sys/stat.h>
 #include <sys/syscall-proto.h>
 #include <sys/syscall.h>
+#include <sys/time.h>
 #include <sys/wait.h>
 
 #include <assert.h>
@@ -73,6 +74,7 @@
 #include <termios.h>
 #include <unistd.h>
 
+#include <libansitty/ctl.h>
 #include <libvio/vio.h>
 
 DECL_BEGIN
@@ -271,8 +273,39 @@ int main_prognam(int argc, char *argv[], char *envp[]) {
 /************************************************************************/
 int main_logtime(int argc, char *argv[], char *envp[]) {
 	(void)argc, (void)argv, (void)envp;
+	struct timeval prev = { 0, 0 };
 	for (;;) {
-		usleep(500000);
+		struct timeval next;
+		gettimeofday(&next, NULL);
+		if (next.tv_sec != prev.tv_sec) {
+			char buf[26];
+			ctime_r(&next.tv_sec, buf);
+			while (*buf && isspace(strend(buf)[-1]))
+				strend(buf)[-1] = '\0';
+			printf(AC_CUP("", "") "%s" AC_EL(""), buf);
+			fflush(stdout);
+		}
+		if (next >= prev) {
+			prev = next;
+//			if ((rand() % 300) >= 250) {
+//				int ms;
+//				ms = rand() % 100000;
+//				prev.add_microseconds(ms);
+//				usleep(ms);
+//			}
+			continue;
+		}
+		{
+			char buf_prev[26], buf_next[26];
+			syslog(LOG_ERR,
+			       "ERROR:\n"
+			       "\tprev: {%I64d, %Iu} (%q)\n"
+			       "\tnext: {%I64d, %Iu} (%q)\n",
+			       (s64)prev.tv_sec, (uintptr_t)prev.tv_usec, ctime_r(&prev.tv_sec, buf_prev),
+			       (s64)next.tv_sec, (uintptr_t)next.tv_usec, ctime_r(&next.tv_sec, buf_next));
+		}
+		prev = next;
+		getchar();
 	}
 	return 0;
 }

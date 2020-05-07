@@ -21,9 +21,13 @@
 #define GUARD_LIBC_USER_TIME_C 1
 
 #include "../api.h"
-#include "time.h"
+/**/
+
 #include <kos/syscalls.h>
 
+#include <syscall.h>
+
+#include "time.h"
 
 DECL_BEGIN
 
@@ -157,9 +161,22 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.time.time") time_t
 NOTHROW_NCX(LIBCCALL libc_time)(time_t *timer)
 /*[[[body:time]]]*/
 {
+#ifdef SYS_time
 	time_t result;
 	result = sys_time(timer);
 	return libc_seterrno_syserr(result);
+#else /* SYS_time */
+	struct timeval tv;
+	errno_t error;
+	error = sys_gettimeofday(&tv, NULL);
+	if (E_ISERR(error)) {
+		libc_seterrno(-error);
+		return -1;
+	}
+	if (timer)
+		*timer = tv.tv_sec;
+	return tv.tv_sec;
+#endif /* !SYS_time */
 }
 /*[[[end:time]]]*/
 
@@ -172,9 +189,22 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.time.time64") time64_t
 NOTHROW_NCX(LIBCCALL libc_time64)(time64_t *timer)
 /*[[[body:time64]]]*/
 {
+#ifdef SYS_time64
 	time_t result;
 	result = sys_time64(timer);
 	return libc_seterrno_syserr(result);
+#else /* SYS_time64 */
+	struct timeval64 tv;
+	errno_t error;
+	error = sys_gettimeofday64(&tv, NULL);
+	if (E_ISERR(error)) {
+		libc_seterrno(-error);
+		return -1;
+	}
+	if (timer)
+		*timer = tv.tv_sec;
+	return tv.tv_sec;
+#endif /* !SYS_time64 */
 }
 #endif /* MAGIC:alias */
 /*[[[end:time64]]]*/
