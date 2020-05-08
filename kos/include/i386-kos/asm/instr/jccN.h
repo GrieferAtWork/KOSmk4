@@ -47,10 +47,23 @@
  * known early on during assembly
  */
 
+
 #ifdef __x86_64__
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma push_macro("R_X86_64_PC8")
+#pragma push_macro("R_X86_64_PC32")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef R_X86_64_PC8
+#undef R_X86_64_PC32
 #define __X86_R_PC8  R_X86_64_PC8
 #define __X86_R_PC32 R_X86_64_PC32
 #else /* __x86_64__ */
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma push_macro("R_386_PC8")
+#pragma push_macro("R_386_PC32")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef R_386_PC8
+#undef R_386_PC32
 #define __X86_R_PC8  R_386_PC8
 #define __X86_R_PC32 R_386_PC32
 #endif /* !__x86_64__ */
@@ -127,6 +140,15 @@ __ASM_END
 
 #undef __X86_R_PC32
 #undef __X86_R_PC8
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#ifdef __x86_64__
+#pragma pop_macro("R_X86_64_PC32")
+#pragma pop_macro("R_X86_64_PC8")
+#else /* __x86_64__ */
+#pragma pop_macro("R_386_PC32")
+#pragma pop_macro("R_386_PC8")
+#endif /* !__x86_64__ */
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
 
 #endif /* !_I386_KOS_ASM_INSTR_JCCN_H */

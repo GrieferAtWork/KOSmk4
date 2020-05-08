@@ -218,21 +218,25 @@ struct pending_ipi {
 };
 
 /* Vector of pending IPI. */
-PRIVATE ATTR_PERCPU struct pending_ipi thiscpu_x86_ipi_pending[CPU_IPI_BUFFER_SIZE];
+PRIVATE ATTR_PERCPU struct pending_ipi
+thiscpu_x86_ipi_pending[CPU_IPI_BUFFER_SIZE];
 
-/* [lock(SET(ATOMIC,IF_SET_IN(thiscpu_x86_ipi_alloc)),CLEAR(ATOMIC,THIS_CPU))] Bitset of fully initialized IPIs. */
-INTERN ATTR_PERCPU WEAK uintptr_t thiscpu_x86_ipi_inuse[CEILDIV(CPU_IPI_BUFFER_SIZE, BITS_PER_POINTER)] = { 0, };
+/* [lock(SET(ATOMIC, IF_SET_IN(thiscpu_x86_ipi_alloc)),
+ *       CLEAR(ATOMIC, THIS_CPU))]
+ * Bitset of fully initialized IPIs. */
+INTERN ATTR_PERCPU WEAK uintptr_t
+thiscpu_x86_ipi_inuse[CEILDIV(CPU_IPI_BUFFER_SIZE, BITS_PER_POINTER)] = { 0, };
 
 /* [lock(SET(ATOMIC),CLEAR(ATOMIC,THIS_CPU))] Bitset of allocated IPIs. */
-PRIVATE ATTR_PERCPU WEAK uintptr_t thiscpu_x86_ipi_alloc[CEILDIV(CPU_IPI_BUFFER_SIZE, BITS_PER_POINTER)] = { 0, };
+PRIVATE ATTR_PERCPU WEAK uintptr_t
+thiscpu_x86_ipi_alloc[CEILDIV(CPU_IPI_BUFFER_SIZE, BITS_PER_POINTER)] = { 0, };
 
 
 /* Check if there are any non-interrupting software-based IPIs pending.
  * If some are present, these must be serviced by calling `cpu_ipi_service_nopr()' */
 PUBLIC NOBLOCK WUNUSED NOPREEMPT bool
-NOTHROW(KCALL arch_cpu_swipi_pending_nopr)(void) {
+NOTHROW(FCALL arch_cpu_swipi_pending_nopr)(struct cpu *__restrict me) {
 	unsigned int i;
-	struct cpu *me = THIS_CPU;
 	assert(!PREEMPTION_ENABLED());
 	for (i = 0; i < CEILDIV(CPU_IPI_BUFFER_SIZE, BITS_PER_POINTER); ++i) {
 		if (ATOMIC_READ(FORCPU(me, thiscpu_x86_ipi_inuse[i])) != 0)

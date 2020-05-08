@@ -39,17 +39,13 @@
 #include <kos/jiffies.h>
 
 #include <assert.h>
+#include <inttypes.h>
 
 /*TODO:REMOVE_ME:BEGIN*/
-#include <stdio.h>
 #include <time.h>
 /*TODO:REMOVE_ME:END*/
 
 DECL_BEGIN
-
-/*TODO:REMOVE_ME:BEGIN*/
-INTDEF port_t x86_syslog_port;
-/*TODO:REMOVE_ME:END*/
 
 #ifndef ARCH_DEFAULT_REALTIME_CLOCK
 #define ARCH_DEFAULT_REALTIME_CLOCK NULL
@@ -58,6 +54,9 @@ INTDEF port_t x86_syslog_port;
 /* [0..1] The used realtime system clock */
 PUBLIC XATOMIC_REF(struct realtime_clock_struct)
 realtime_clock = XATOMIC_REF_INIT(ARCH_DEFAULT_REALTIME_CLOCK);
+
+/* Set to true/false by `arch_cpu_(enable|disable)_preemptive_interrupts_nopr()' */
+PUBLIC ATTR_PERCPU bool arch_cpu_preemptive_interrupts_disabled = true;
 
 
 /* Destroy the given realtime clock. */
@@ -72,11 +71,6 @@ NOTHROW(KCALL realtime_clock_destroy)(struct realtime_clock_struct *__restrict s
 
 
 
-#undef CONFIG_USE_NEW_REALTIME
-#define CONFIG_USE_NEW_REALTIME 1
-
-
-#ifdef CONFIG_USE_NEW_REALTIME
 
 struct cpu_timestamp {
 	struct timespec               ct_real; /* Realtime */
@@ -85,6 +79,18 @@ struct cpu_timestamp {
 	struct realtime_clock_struct *ct_rtc;  /* [weak][0..1] The RPC used for the re-sync. */
 };
 
+
+/* Per-cpu time keeping variables */
+PUBLIC ATTR_PERCPU jtime_t volatile thiscpu_jiffies = 0;
+PUBLIC ATTR_PERCPU quantum_diff_t volatile thiscpu_quantum_offset = 0;
+PUBLIC ATTR_PERCPU quantum_diff_t volatile thiscpu_quantum_length = (quantum_diff_t)-1;
+
+/* prevent issues hardware timer roll-over happening
+ * before we've able to read the timestamp counter. */
+PRIVATE ATTR_PERCPU jtime_t        thiscpu_last_qtime_j = 0;
+PRIVATE ATTR_PERCPU quantum_diff_t thiscpu_last_qtime_q = 0;
+PRIVATE ATTR_PERCPU bool thiscpu_jiffi_pending = false;
+
 /* Timestamp for the last realtime re-sync made by the CPU */
 PRIVATE ATTR_PERCPU struct cpu_timestamp thiscpu_last_resync = {
 	/* .ct_real = */ {
@@ -92,20 +98,117 @@ PRIVATE ATTR_PERCPU struct cpu_timestamp thiscpu_last_resync = {
 		/* .tv_nsec = */ 0
 	},
 	/* .ct_cpuj = */ 0,
-	/* .ct_cpuq = */ 0
+	/* .ct_cpuq = */ 0,
+	/* .ct_rtc  = */ NULL
 };
 
-/* How many seconds to wait before performing another realtime re-sync */
-#ifndef CPU_RESYNC_DELAY_IN_SECONDS
-#define CPU_RESYNC_DELAY_IN_SECONDS 3
-#endif /* !CPU_RESYNC_DELAY_IN_SECONDS */
+/* How many ticks to wait before performing another realtime re-sync */
+#ifndef CPU_RESYNC_DELAY_IN_TICKS
+#define CPU_RESYNC_DELAY_IN_TICKS 1
+#endif /* !CPU_RESYNC_DELAY_IN_TICKS */
 
-typedef __CRT_PRIVATE_UINT(__SIZEOF_JTIME_T__) signed_jtime_t;
+typedef __CRT_PRIVATE_SINT(__SIZEOF_JTIME_T__) signed_jtime_t;
 
 
 
+/* Call `arch_cpu_update_quantum_length_nopr()' and add its return value to
+ * the offset in `FORCPU(self, thiscpu_quantum_offset)' */
 PRIVATE NOBLOCK NOPREEMPT void
-NOTHROW(FCALL cpu_resync_realtime)(struct cpu *__restrict self) {
+NOTHROW(FCALL cpu_update_quantum_length_and_increment_offset)(struct cpu *__restrict me) {
+	jtime_t /*  */ cpu_jtime;
+	quantum_diff_t cpu_qelps;
+	quantum_diff_t cpu_qsize;
+	quantum_diff_t elapsed;
+	elapsed   = arch_cpu_update_quantum_length_nopr(me);
+	cpu_jtime = FORCPU(me, thiscpu_jiffies);
+	cpu_qelps = FORCPU(me, thiscpu_quantum_offset);
+	cpu_qsize = FORCPU(me, thiscpu_quantum_length);
+	if unlikely(OVERFLOW_UADD(cpu_qelps, elapsed, &cpu_qelps)) {
+		quantum_diff_t num_jiffies;
+		num_jiffies = ((quantum_diff_t)-1) / cpu_qsize;
+		cpu_jtime += num_jiffies;
+		cpu_qelps -= num_jiffies * cpu_qsize;
+	}
+	if (cpu_qelps >= cpu_qsize) {
+		cpu_jtime += cpu_qelps / cpu_qsize;
+		cpu_qelps = (cpu_qelps % cpu_qsize);
+	}
+	/* Save the new jtime/quantum offset values. */
+	FORCPU(me, thiscpu_jiffies)        = cpu_jtime;
+	FORCPU(me, thiscpu_quantum_offset) = cpu_qelps;
+	COMPILER_BARRIER();
+}
+
+
+
+/* Return the result of `(a * b + c) / d' such that overflow errors are handled by reducing the precision */
+PRIVATE NOBLOCK NOPREEMPT quantum_diff_t
+NOTHROW(FCALL rescale_qsize)(u64 a, quantum_diff_t b, u64 c, u64 d) {
+	u64 temp;
+	u64 oldd = d;
+	assert(d != 0);
+	/* Divide operands by 2 until the multiplication doesn't overflow.
+	 * NOTE: Doing this _does_ cause a loss in precision, but that's OK. */
+	while (OVERFLOW_UMUL(a, b, &temp)) {
+reduce_precision:
+		a >>= 1;
+		d >>= 1;
+	}
+	if (OVERFLOW_UADD(temp, c, &temp))
+		goto reduce_precision;
+	if likely(d != 0)
+		return (quantum_diff_t)(temp / d);
+	while (oldd) {
+		temp <<= 1;
+		oldd >>= 1;
+	}
+	if (temp > (quantum_diff_t)-1)
+		temp = (quantum_diff_t)-1; /* Shouldn't happen... */
+	return (quantum_diff_t)temp;
+}
+
+/* Calculate the new quantum length, where
+ *  - old_qsize: The old quantum length
+ *  - pfc_qsize: The perfect quantum length with which no error would have
+ *               occurred over the course of the previous quantum.
+ * @param: realtime_elapsed:   The elapsed realtime (according to RTC)
+ * @param: realtime_precision: The precision of the realtime clock.
+ * @param: min_error:          The smallest error between CPU and RTC time. */
+PRIVATE NOBLOCK NOPREEMPT quantum_diff_t
+NOTHROW(FCALL calculate_new_qsize)(quantum_diff_t old_qsize,
+                                   quantum_diff_t pfc_qsize,
+                                   struct timespec const *__restrict realtime_elapsed,
+                                   struct timespec const *__restrict realtime_precision,
+                                   struct timespec const *__restrict min_error) {
+	/* TODO: Take the # of realtime elapsed, vs. the realtime precision into
+	 *       account, where:
+	 *       A large (realtime_elapsed / realtime_precision) ratio should cause our
+	 *       return value to lean more towards `old_qsize', while a small ratio should
+	 *       cause our return value to lean more towards `pfc_qsize' (though with a
+	 *       max ratio such that we end up with a 50-50 ratio at most):
+	 * >> ratio = realtime_elapsed / realtime_precision
+	 */
+	(void)realtime_elapsed;
+	(void)realtime_precision;
+	(void)min_error;
+
+	if (pfc_qsize <= old_qsize) {
+		/* Must round down */
+		return (quantum_diff_t)(((u64)pfc_qsize + old_qsize) / 2);
+	} else {
+		/* Must round up */
+		return (quantum_diff_t)(((u64)pfc_qsize + old_qsize + 1) / 2);
+	}
+}
+
+
+/* WARNING: This function may reset the current quantum! */
+PRIVATE NOBLOCK NOPREEMPT void
+NOTHROW(FCALL cpu_resync_realtime)(struct cpu *__restrict me,
+                                   struct timespec const *__restrict nts_realtime,
+                                   struct realtime_clock_struct *__restrict nts_rtc,
+                                   jtime_t nts_jtime, quantum_diff_t nts_qelapsed,
+                                   bool log_messages) {
 	/* Try to perform a realtime re-sync. */
 	struct cpu_timestamp nts; /* NewTimeStamp */
 	struct cpu_timestamp ots; /* OldTimeStamp */
@@ -114,31 +217,21 @@ NOTHROW(FCALL cpu_resync_realtime)(struct cpu *__restrict self) {
 	quantum_diff_t cpu_qsize; /* CPU time quantum size */
 	jtime_t /*  */ cpu_resyncrel_jtime; /* Relative CPU jiffies since last re-sync */
 	quantum_diff_t cpu_resyncrel_qtime; /* Relative CPU quantum since last re-sync */
-#ifndef NDEBUG
-	struct timespec before;
-	struct timespec after;
-	before = realtime();
-#endif /* !NDEBUG */
-	assert(!PREEMPTION_ENABLED());
 
-	nts.ct_rtc = realtime_clock.get_nopr();
-	if unlikely(nts.ct_rtc == NULL)
-		return;
-
-	/* Create snapshots of the RTC and CPU clock counters. */
-	COMPILER_BARRIER();
-	nts.ct_real = (*nts.ct_rtc->rc_gettime)(nts.ct_rtc);
-	nts.ct_cpuq = cpu_quantum_elapsed_nopr(self, &nts.ct_cpuj);
-	COMPILER_BARRIER();
+	/* Fill in timestamp information. */
+	nts.ct_rtc  = nts_rtc;
+	nts.ct_real = *nts_realtime;
+	nts.ct_cpuj = nts_jtime;
+	nts.ct_cpuq = nts_qelapsed;
 
 	/* Calculate the realtime for our current CPU, as it would be returned by
 	 * `realtime()' for the values we received from `cpu_quantum_elapsed_nopr()'
 	 * That timestamp is the compared against what the RTC has given us, so that
 	 * was may determine the relative clock error. */
 	COMPILER_BARRIER();
-	ots       = FORCPU(self, thiscpu_last_resync);
-	cpu_qoffs = FORCPU(self, thiscpu_quantum_offset);
-	cpu_qsize = FORCPU(self, thiscpu_quantum_length);
+	ots       = FORCPU(me, thiscpu_last_resync);
+	cpu_qoffs = FORCPU(me, thiscpu_quantum_offset);
+	cpu_qsize = FORCPU(me, thiscpu_quantum_length);
 	COMPILER_BARRIER();
 
 	/* Calculate the whole quantum offset:
@@ -153,20 +246,6 @@ NOTHROW(FCALL cpu_resync_realtime)(struct cpu *__restrict self) {
 	if unlikely(nts.ct_cpuq >= cpu_qsize) {
 		nts.ct_cpuj += nts.ct_cpuq / cpu_qsize;
 		nts.ct_cpuq = (nts.ct_cpuq % cpu_qsize);
-	}
-	if unlikely(nts.ct_rtc != ots.ct_rtc) {
-		/* Real-time clock changed (or was installed)
-		 * If it got freshly installed, then we may lazily start using it.
-		 * If it got changed, then whoever changed it must manually update
-		 * CPU clocks, and we must no longer re-sync periodically until
-		 * they do! */
-		if (ots.ct_rtc != NULL)
-			goto done_decref_rtc;
-		/* Lazily start using the new RTC by setting the new RTC */
-		COMPILER_BARRIER();
-		FORCPU(self, thiscpu_last_resync) = nts;
-		COMPILER_BARRIER();
-		goto done_decref_rtc;
 	}
 
 	/* Right now, our cpu's quantum time is:
@@ -186,7 +265,6 @@ NOTHROW(FCALL cpu_resync_realtime)(struct cpu *__restrict self) {
 		cpu_resyncrel_jtime += cpu_resyncrel_qtime / cpu_qsize;
 		cpu_resyncrel_qtime = (cpu_resyncrel_qtime % cpu_qsize);
 	}
-
 
 	/* The current realtime is now described by:
 	 * >> cpu_realtime + QUANTUM_TO_SECONDS(cpu_resyncrel_jtime * cpu_qsize + cpu_resyncrel_qtime);
@@ -220,6 +298,22 @@ NOTHROW(FCALL cpu_resync_realtime)(struct cpu *__restrict self) {
 		cpu_realtime.tv_nsec = (syscall_ulong_t)nsecs;
 	}
 
+	if unlikely(nts.ct_rtc != ots.ct_rtc) {
+		/* Real-time clock changed (or was installed)
+		 * If it got freshly installed, then we may lazily start using it.
+		 * If it got changed, then whoever changed it must manually update
+		 * CPU clocks, and we must no longer re-sync periodically until
+		 * they do! */
+		if (ots.ct_rtc != NULL)
+			goto done;
+		/* Lazily start using the new RTC */
+		if (nts.ct_real > cpu_realtime) {
+			/* Make the clock jump into the future to catch up with realtime */
+			FORCPU(me, thiscpu_last_resync) = nts;
+			goto done;
+		}
+	}
+
 	/* Figure out what kind of time error we're dealing with. */
 	if (nts.ct_real > cpu_realtime) {
 		/* The CPU's tick counter is running too slow */
@@ -233,6 +327,7 @@ NOTHROW(FCALL cpu_resync_realtime)(struct cpu *__restrict self) {
 		if likely(quantum_rtc_elapsed > quantum_cpu_elapsed) {
 			quantum_diff_t perfect_cpu_qsize;
 			quantum_diff_t new_cpu_qsize;
+			struct timespec min_clock_error;
 			/* Over the duration of the last `quantum_cpu_elapsed' quantum units, a total
 			 * error of (at least, as true RTC may be even `nts.ct_rtc->rc_precision'
 			 * seconds greater due to clock precision) `quantum_rtc_elapsed -
@@ -266,28 +361,33 @@ NOTHROW(FCALL cpu_resync_realtime)(struct cpu *__restrict self) {
 			 *
 			 *  nts.ct_real  = { 5, 0 }
 			 *  cpu_realtime = { 4, 0 } */
-			perfect_cpu_qsize = (quantum_diff_t)((quantum_cpu_elapsed *
-			                                      cpu_qsize) /
-			                                     quantum_rtc_elapsed);
-			assertf(perfect_cpu_qsize <= cpu_qsize,
-			        "The formula must be wrong. We were running too slow, so "
-			        "our perfect quantum length should be lower than our current!");
+			perfect_cpu_qsize = rescale_qsize(quantum_cpu_elapsed,
+			                                  cpu_qsize, 0,
+			                                  quantum_rtc_elapsed);
+			if unlikely(perfect_cpu_qsize > cpu_qsize)
+				goto done; /* Shouldn't happen... (but could due to overflow...) */
 			/* With the perfect quantum length calculated, don't go all in about
 			 * using it, but rather use the average between the old quantum length,
 			 * and the new one! (once again: round downwards) */
-			new_cpu_qsize = (perfect_cpu_qsize + cpu_qsize) / 2;
+			min_clock_error = nts.ct_real - cpu_realtime;
+			new_cpu_qsize = calculate_new_qsize(cpu_qsize,
+			                                    perfect_cpu_qsize,
+			                                    &rtc_elapsed,
+			                                    &nts_rtc->rc_precision,
+			                                    &min_clock_error);
 			assert(new_cpu_qsize <= cpu_qsize);
 			if (new_cpu_qsize < cpu_qsize) {
-				printk(KERN_INFO "[cpu#%u][-] Adjust quantum length %I32u -> %I32u (CPU clock was running too slow)\n",
-				       self->c_id, cpu_qsize, new_cpu_qsize);
+				if (log_messages) {
+					printk(KERN_INFO "[cpu#%u][-] Adjust quantum length %I32u -> %I32u "
+					                 "(cpu clock was running too slow)\n",
+					       me->c_id, cpu_qsize, new_cpu_qsize);
+				}
 				/* Make the clock jump into the future to catch up with realtime */
-				nts.ct_cpuj = FORCPU(self, thiscpu_jiffies);
-				nts.ct_cpuq = 0;
 				COMPILER_BARRIER();
-				FORCPU(self, thiscpu_last_resync)    = nts;
-				FORCPU(self, thiscpu_quantum_length) = new_cpu_qsize;
+				FORCPU(me, thiscpu_last_resync)    = nts;
+				FORCPU(me, thiscpu_quantum_length) = new_cpu_qsize;
 				COMPILER_BARRIER();
-				arch_cpu_update_quantum_length_nopr();
+				cpu_update_quantum_length_and_increment_offset(me);
 				COMPILER_BARRIER();
 			}
 		}
@@ -303,9 +403,10 @@ NOTHROW(FCALL cpu_resync_realtime)(struct cpu *__restrict self) {
 			rtc_elapsed         = nts.ct_real - ots.ct_real;
 			quantum_rtc_elapsed = (u64)rtc_elapsed.tv_sec * HZ * cpu_qsize;
 			quantum_rtc_elapsed += ((u64)rtc_elapsed.tv_nsec * cpu_qsize) / (__NSECS_PER_SEC / HZ);
-			if likely(quantum_rtc_elapsed < quantum_cpu_elapsed) {
+			if likely(quantum_rtc_elapsed < quantum_cpu_elapsed && quantum_rtc_elapsed != 0) {
 				quantum_diff_t perfect_cpu_qsize;
 				quantum_diff_t new_cpu_qsize;
+				struct timespec min_clock_error;
 				/* Same as above, but round downwards (thus causing the final quantum length
 				 * to be a tiny bit shorter than what would be the perfect length)
 				 *
@@ -321,20 +422,27 @@ NOTHROW(FCALL cpu_resync_realtime)(struct cpu *__restrict self) {
 				 *
 				 *  nts.ct_real  = { 3, 0 }
 				 *  cpu_realtime = { 4, 0 } */
-				perfect_cpu_qsize = (quantum_diff_t)(((quantum_cpu_elapsed *
-				                                       cpu_qsize) +
-				                                      (quantum_rtc_elapsed - 1)) /
-				                                     quantum_rtc_elapsed);
-				assertf(perfect_cpu_qsize >= cpu_qsize,
-				        "The formula must be wrong. We were running too fast, so "
-				        "our perfect quantum length should be greater than our current!");
+				perfect_cpu_qsize = rescale_qsize(quantum_cpu_elapsed, cpu_qsize,
+				                                  quantum_rtc_elapsed - 1,
+				                                  quantum_rtc_elapsed);
+				if unlikely(perfect_cpu_qsize < cpu_qsize)
+					goto done; /* Shouldn't happen... (but could due to overflow...) */
 				new_cpu_qsize = (perfect_cpu_qsize + cpu_qsize) / 2;
+				min_clock_error = cpu_realtime - upper_error;
+				new_cpu_qsize = calculate_new_qsize(cpu_qsize,
+				                                    perfect_cpu_qsize,
+				                                    &rtc_elapsed,
+				                                    &nts_rtc->rc_precision,
+				                                    &min_clock_error);
 				assert(new_cpu_qsize >= cpu_qsize);
 				if (new_cpu_qsize > cpu_qsize) {
 					struct timespec cputime_since_nts;
 					u64 quantum_since_nts;
-					printk(KERN_INFO "[cpu#%u][+] Adjust quantum length %I32u -> %I32u (CPU clock was running too fast)\n",
-					       self->c_id, cpu_qsize, new_cpu_qsize);
+					if (log_messages) {
+						printk(KERN_INFO "[cpu#%u][+] Adjust quantum length %I32u -> %I32u "
+						                 "(cpu clock was running too fast)\n",
+						       me->c_id, cpu_qsize, new_cpu_qsize);
+					}
 					/* Modify `nts.ct_cpuj' and `nts.ct_cpuq', such that a call to realtime()
 					 * performed after we're done here produces `cpu_realtime' as result.
 					 * This must be done in order to prevent the clock from jumping backwards,
@@ -348,11 +456,10 @@ NOTHROW(FCALL cpu_resync_realtime)(struct cpu *__restrict self) {
 					 *                  (QUANTUM_TIME() - PERCPU(thiscpu_last_resync).ct_cpu(j|q))
 					 * By inserting values here, we get:
 					 *    cpu_realtime == nts.ct_real +
-					 *                    (PERCPU(thiscpu_jiffies) - nts.ct_cpu(j|q))
-					 *                            ^
-					 *                            No quantum offset, because `thiscpu_quantum_offset' is set to 0
-					 * Re-arranging this (so we end up with `nts.ct_cpu(j|q)' on one side):
-					 *    nts.ct_cpu(j|q) == (nts.ct_real - cpu_realtime) + PERCPU(thiscpu_jiffies)
+					 *                    (OLD(nts.ct_cpu(j|q)) - NEW(nts.ct_cpu(j|q)))
+					 * Re-arranging this (so we end up with `NEW(nts.ct_cpu(j|q))' on one side):
+					 *    NEW(nts.ct_cpu(j|q)) == (nts.ct_real - cpu_realtime) + OLD(nts.ct_cpu(j|q))
+					 *    NEW(nts.ct_cpu(j|q)) == OLD(nts.ct_cpu(j|q)) - (cpu_realtime - nts.ct_real)
 					 */
 					cputime_since_nts = cpu_realtime - nts.ct_real;
 					quantum_since_nts = (u64)cputime_since_nts.tv_sec * HZ * new_cpu_qsize;
@@ -367,59 +474,90 @@ NOTHROW(FCALL cpu_resync_realtime)(struct cpu *__restrict self) {
 					 * the "The CPU's tick counter is running too slow" branch will correct
 					 * timings once again, and to the point where everything should once again
 					 * line up properly! */
-					nts.ct_cpuj = FORCPU(self, thiscpu_jiffies);
 					nts.ct_cpuj -= quantum_since_nts / new_cpu_qsize;
-					nts.ct_cpuq = (quantum_since_nts % new_cpu_qsize);
-					if (nts.ct_cpuq) {
-						--nts.ct_cpuj;
-						nts.ct_cpuq = new_cpu_qsize - nts.ct_cpuq;
+					quantum_since_nts %= new_cpu_qsize;
+					if (OVERFLOW_USUB(nts.ct_cpuq, quantum_since_nts, &nts.ct_cpuq)) {
+						quantum_diff_t num_jiffies;
+						num_jiffies = ((quantum_diff_t)-1) / new_cpu_qsize;
+						nts.ct_cpuj -= num_jiffies;
+						nts.ct_cpuq += num_jiffies * new_cpu_qsize;
+					}
+					if (nts.ct_cpuq > new_cpu_qsize) {
+						nts.ct_cpuj += nts.ct_cpuq / new_cpu_qsize;
+						nts.ct_cpuq = (nts.ct_cpuq % new_cpu_qsize);
 					}
 					COMPILER_BARRIER();
-					FORCPU(self, thiscpu_last_resync)    = nts;
-					FORCPU(self, thiscpu_quantum_length) = new_cpu_qsize;
+					FORCPU(me, thiscpu_last_resync)    = nts;
+					FORCPU(me, thiscpu_quantum_length) = new_cpu_qsize;
 					COMPILER_BARRIER();
-					arch_cpu_update_quantum_length_nopr();
+					cpu_update_quantum_length_and_increment_offset(me);
 					COMPILER_BARRIER();
+					goto done;
 				}
 			}
 		}
+		/* Lazily start using the new RTC */
+		if unlikely(nts.ct_rtc != ots.ct_rtc) {
+			struct timespec cputime_since_nts;
+			u64 quantum_since_nts;
+			cputime_since_nts = cpu_realtime - nts.ct_real;
+			quantum_since_nts = (u64)cputime_since_nts.tv_sec * HZ * cpu_qsize;
+			quantum_since_nts += ((u64)cputime_since_nts.tv_nsec * cpu_qsize +
+			                      (__NSECS_PER_SEC / HZ) - 1) / /* ceil-div */
+			                     (__NSECS_PER_SEC / HZ);
+			/* Fill in the proper timestamp for when this resync took (takes)
+			 * places, such that the realtime() clock won't jump backwards. */
+			nts.ct_cpuj -= quantum_since_nts / cpu_qsize;
+			quantum_since_nts %= cpu_qsize;
+			if (OVERFLOW_USUB(nts.ct_cpuq, quantum_since_nts, &nts.ct_cpuq)) {
+				quantum_diff_t num_jiffies;
+				num_jiffies = ((quantum_diff_t)-1) / cpu_qsize;
+				nts.ct_cpuj -= num_jiffies;
+				nts.ct_cpuq += num_jiffies * cpu_qsize;
+			}
+			if (nts.ct_cpuq >= cpu_qsize) {
+				nts.ct_cpuj += nts.ct_cpuq / cpu_qsize;
+				nts.ct_cpuq = (nts.ct_cpuq % cpu_qsize);
+			}
+			COMPILER_BARRIER();
+			FORCPU(me, thiscpu_last_resync) = nts;
+			COMPILER_BARRIER();
+			goto done;
+		}
 	}
-done_decref_rtc:
-	decref_unlikely(nts.ct_rtc);
-#ifndef NDEBUG
-	if (!kernel_poisoned()) {
-		after = realtime();
-		assertf(before <= after,
-		        "Backwards realtime: { { %I64d, %Iu }, { %I64d, %Iu } } (diff: { %I64d, %Iu })\n",
-		        (s64)before.tv_sec, (uintptr_t)before.tv_nsec,
-		        (s64)after.tv_sec, (uintptr_t)after.tv_nsec,
-		        (s64)(before - after).tv_sec,
-		        (uintptr_t)(before - after).tv_nsec);
-	}
+done:
+	;
+}
+
+
+#ifdef NDEBUG
+#define cpu_resync_realtime_chk cpu_resync_realtime
+#else /* NDEBUG */
+PRIVATE NOBLOCK NOPREEMPT void
+NOTHROW(FCALL cpu_resync_realtime_chk)(struct cpu *__restrict me,
+                                       struct timespec const *__restrict nts_realtime,
+                                       struct realtime_clock_struct *__restrict nts_rtc,
+                                       jtime_t nts_jtime, quantum_diff_t nts_qelapsed,
+                                       bool log_messages) {
+	struct timespec before;
+	struct timespec after;
+	before = realtime();
+	cpu_resync_realtime(me,
+	                    nts_realtime,
+	                    nts_rtc,
+	                    nts_jtime,
+	                    nts_qelapsed,
+	                    log_messages);
+	after = realtime();
+	assertf(before <= after || kernel_poisoned(),
+	        "Backwards realtime: { { %I64d, %Iu }, { %I64d, %Iu } } (diff: { %I64d, %Iu })\n",
+	        (s64)before.tv_sec, (uintptr_t)before.tv_nsec,
+	        (s64)after.tv_sec, (uintptr_t)after.tv_nsec,
+	        (s64)(before - after).tv_sec,
+	        (uintptr_t)(before - after).tv_nsec);
+}
 #endif /* !NDEBUG */
-}
 
-
-/* prevent issues hardware timer roll-over happening
- * before we've able to read the timestamp counter. */
-PRIVATE ATTR_PERCPU jtime_t        thiscpu_last_qtime_j = 0;
-PRIVATE ATTR_PERCPU quantum_diff_t thiscpu_last_qtime_q = 0;
-PRIVATE ATTR_PERCPU bool thiscpu_jiffi_pending = false;
-
-
-INTERN NOBLOCK NOPREEMPT void
-NOTHROW(FCALL cpu_inc_jiffies)(struct cpu *__restrict self) {
-	jtime_t newtime;
-	/* Check if this interrupt was already noticed as being pending */
-	if (FORCPU(self, thiscpu_jiffi_pending)) {
-		FORCPU(self, thiscpu_jiffi_pending) = false;
-	} else {
-		++FORCPU(self, thiscpu_jiffies);
-	}
-	newtime = FORCPU(self, thiscpu_jiffies);
-	if ((newtime % JIFFIES_FROM_SECONDS(CPU_RESYNC_DELAY_IN_SECONDS)) == 0)
-		cpu_resync_realtime(self);
-}
 
 /* Returns the number of ticks that have passed since the start
  * of the current quantum. - The true current CPU-local time
@@ -427,37 +565,180 @@ NOTHROW(FCALL cpu_inc_jiffies)(struct cpu *__restrict self) {
  * >> (thiscpu_jiffies * PERCPU(thiscpu_quantum_length)) + PERCPU(thiscpu_quantum_offset) + cpu_quantum_elapsed_nopr();
  * NOTE: The `*_nopr' variants may only be called when preemption is disabled! */
 PUBLIC NOBLOCK NOPREEMPT WUNUSED NONNULL((1, 2)) quantum_diff_t
-NOTHROW(FCALL cpu_quantum_elapsed_nopr)(struct cpu *__restrict mycpu,
+NOTHROW(FCALL cpu_quantum_elapsed_nopr)(struct cpu *__restrict me,
                                         jtime_t *__restrict preal_jtime) {
 	quantum_diff_t qtime;
 	jtime_t jtime;
-	qtime = arch_cpu_quantum_elapsed_nopr();
-	jtime = FORCPU(mycpu, thiscpu_jiffies);
-	if (qtime < FORCPU(mycpu, thiscpu_last_qtime_q) &&
-		jtime == FORCPU(mycpu, thiscpu_last_qtime_j)) {
+	qtime = arch_cpu_quantum_elapsed_nopr(me);
+	jtime = FORCPU(me, thiscpu_jiffies);
+	if (qtime < FORCPU(me, thiscpu_last_qtime_q) &&
+		jtime == FORCPU(me, thiscpu_last_qtime_j)) {
 		/* Roll-over prior to actual interrupt / roll-over with lost interrupt.
 		 * In either case, increment the jiffies counter now, and set the flag
 		 * to indicate that the next scheduler interrupt shouldn't increment
 		 * the counter (since we already did so for it) */
-		FORCPU(mycpu, thiscpu_jiffi_pending) = true;
-		++FORCPU(mycpu, thiscpu_jiffies);
+		FORCPU(me, thiscpu_jiffi_pending) = true;
+		++FORCPU(me, thiscpu_jiffies);
 		++jtime;
 	}
-	FORCPU(mycpu, thiscpu_last_qtime_q) = qtime;
-	FORCPU(mycpu, thiscpu_last_qtime_j) = jtime;
+	FORCPU(me, thiscpu_last_qtime_q) = qtime;
+	FORCPU(me, thiscpu_last_qtime_j) = jtime;
 	*preal_jtime = jtime;
 	return qtime;
+}
+
+
+/* Wake-up all timeout-sleeping threads from `me' who's
+ * timeout has expired, or will expire over the course
+ * of the next CPU tick.
+ * >> timeout <= (cpu_jtime + 1) * cpu_qsize +
+ * >>            thiscpu_quantum_offset +
+ * >>            cpu_qelapsed; */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL cpu_timeout_sleeping_threads)(struct cpu *__restrict me,
+                                            jtime_t cpu_jtime,
+                                            quantum_diff_t cpu_qelapsed) {
+	/* Check for sleeping threads that should be woken. */
+	if (me->c_sleeping != NULL) {
+		qtime_t cpu_now;
+		struct task *next;
+		struct task *lsleeper; /* First sleeping thread to wake up */
+		struct task *rsleeper; /* Last sleeping thread to wake up */
+		lsleeper = me->c_sleeping;
+#ifndef __OPTIMIZE_SIZE__
+		/* Check for simple case: None of the waiting threads use any timeouts */
+		if (lsleeper->t_sched.s_asleep.ss_timeout.q_jtime == (jtime_t)-1)
+			return;
+#endif /* !__OPTIMIZE_SIZE__ */
+		/* Calculate the exact timestamp for the current CPU time,
+		 * by adding the current quantum offset to `cpu_now.q_qtime'
+		 * Note that we also add (quantum_length - elapsed) onto
+		 * this, so-as to wake threads that may be sleeping with
+		 * small offsets earlier than necessary, rather than to
+		 * keep them sleeping longer than requested (after all:
+		 * in the worst case, we can only ever check for threads
+		 * timing out every `FORCPU(me, thiscpu_quantum_length)'
+		 * quantum units, or once every tick) */
+		cpu_now.q_jtime = cpu_jtime;
+		cpu_now.q_qtime = cpu_qelapsed;
+		cpu_now.q_qsize = FORCPU(me, thiscpu_quantum_length);
+		/* Essentially the same as `cpu_now.q_qtime += cpu_now.q_qsize'
+		 * XXX: Maybe add a special case where we temporarily change the
+		 *      quantum length such that it perfectly matching the wake-up
+		 *      time of the next sleeping thread? */
+		++cpu_now.q_jtime;
+		if (OVERFLOW_UADD(cpu_now.q_qtime, FORCPU(me, thiscpu_quantum_offset), &cpu_now.q_qtime)) {
+			quantum_diff_t num_jiffies;
+			num_jiffies = ((quantum_diff_t)-1) / cpu_now.q_qsize;
+			cpu_now.q_jtime += num_jiffies;
+			cpu_now.q_qtime -= num_jiffies * cpu_now.q_qsize;
+		}
+		if (cpu_now.q_qtime >= cpu_now.q_qsize) {
+			cpu_now.q_jtime += cpu_now.q_qtime / cpu_now.q_qsize;
+			cpu_now.q_qtime = (cpu_now.q_qtime % cpu_now.q_qsize);
+		}
+		/* Wake up all threads with a `timeout < (cpu_now.q_jtime * cpu_now.q_qsize + cpu_now.q_qtime)'
+		 * NOTE: Sleeping threads are sorted such that the next thread to time-out appears first. */
+		if (lsleeper->t_sched.s_asleep.ss_timeout >= cpu_now)
+			return; /* Special (and simple) case: All thread timeouts are still in the future. */
+		for (rsleeper = lsleeper;;) {
+			STATIC_ASSERT(offsetof(struct task, t_sched.s_running.sr_runprv) !=
+			              offsetof(struct task, t_sched.s_asleep.ss_tmonxt));
+			ATOMIC_FETCHOR(rsleeper->t_flags, TASK_FTIMEOUT | TASK_FRUNNING);
+			next = rsleeper->t_sched.s_asleep.ss_tmonxt;
+			if (!next)
+				break; /* No more threads to wake up. */
+			if (next->t_sched.s_asleep.ss_timeout >= cpu_now)
+				break; /* This thread shouldn't be woken up, yet. */
+			rsleeper->t_sched.s_running.sr_runnxt = next;
+			next->t_sched.s_running.sr_runprv     = rsleeper;
+			rsleeper                              = next;
+		}
+		me->c_sleeping = next;
+		if (next)
+			next->t_sched.s_asleep.ss_pself = &me->c_sleeping;
+		/* Re-schedule all of the sleepers. */
+		next = me->c_current->t_sched.s_running.sr_runnxt;
+		lsleeper->t_sched.s_running.sr_runprv      = me->c_current;
+		rsleeper->t_sched.s_running.sr_runnxt      = next;
+		next->t_sched.s_running.sr_runprv          = rsleeper;
+		me->c_current->t_sched.s_running.sr_runnxt = lsleeper;
+		cpu_assert_integrity();
+	}
+}
+
+
+/* The C-level implementation of the scheduling interrupt
+ * that is fired periodically for the purposes of preemption. */
+INTERN NOBLOCK NONNULL((1, 2)) struct task *
+NOTHROW(FCALL cpu_scheduler_interrupt)(struct cpu *__restrict me,
+                                       struct task *__restrict thread) {
+	/* NOTE: Preemption is disabled while we're in here! */
+	struct task *next;
+	jtime_t /*  */ cpu_jtime;   /* J-time */
+	quantum_diff_t cpu_qelps; /* Quantum-elapsed */
+
+	assertf(thread == me->c_current,
+	        "thread        = %p\n"
+	        "me            = %p\n"
+	        "me->c_id      = %u\n"
+	        "me->c_current = %p\n",
+	        thread, me,
+	        (unsigned int)me->c_id,
+	        me->c_current);
+	cpu_assert_running(thread);
+
+	/* Check if this interrupt was already noticed as being pending */
+	if (FORCPU(me, thiscpu_jiffi_pending)) {
+		FORCPU(me, thiscpu_jiffi_pending) = false;
+		/* Query the current quantum-elapsed value (which should be quite small) */
+		cpu_qelps = cpu_quantum_elapsed_nopr(me, &cpu_jtime);
+		if ((cpu_jtime % CPU_RESYNC_DELAY_IN_TICKS) == 0)
+			goto do_resync_rtc;
+	} else {
+		cpu_jtime = ++FORCPU(me, thiscpu_jiffies);
+		if ((cpu_jtime % CPU_RESYNC_DELAY_IN_TICKS) == 0) {
+			/* Try to re-sync the CPU timer with the realtime clock. */
+			REF struct realtime_clock_struct *rtc;
+do_resync_rtc:
+			rtc = realtime_clock.get_nopr();
+			if likely(rtc != NULL) {
+				struct timespec rtc_now;
+				COMPILER_BARRIER();
+				rtc_now   = (*rtc->rc_gettime)(rtc);
+				cpu_qelps = arch_cpu_quantum_elapsed_nopr(me);
+				COMPILER_BARRIER();
+				/* Try to re-sync the CPU clock with the realtime clock. */
+				cpu_resync_realtime_chk(me,
+				                        &rtc_now,
+				                        rtc,
+				                        cpu_jtime,
+				                        cpu_qelps,
+				                        true);
+				decref_unlikely(rtc);
+			}
+		}
+		cpu_qelps = arch_cpu_quantum_elapsed_nopr(me);
+	}
+
+	/* Check for a scheduling override */
+	if unlikely((next = me->c_override) != NULL) {
+		assert(thread == next);
+		return next;
+	}
+
+	/* Check for sleeping threads that should be woken. */
+	cpu_timeout_sleeping_threads(me, cpu_jtime, cpu_qelps);
+
+	/* Round-robbin-style next-thread select */
+	next = thread->t_sched.s_running.sr_runnxt;
+	return next;
 }
 
 
 #undef ASSERT_REALTIME_INCREMENTING
 #if !defined(NDEBUG) && 1
 #define ASSERT_REALTIME_INCREMENTING 1
-#endif /* !NDEBUG */
-
-#undef LOG_REALTIME_TIMESTAMPS
-#if !defined(NDEBUG) && 0
-#define LOG_REALTIME_TIMESTAMPS 1
 #endif /* !NDEBUG */
 
 
@@ -500,40 +781,40 @@ PUBLIC NOBLOCK WUNUSED struct timespec NOTHROW(KCALL realtime)(void) {
 		struct cpu *me;
 		pflag_t was;
 #endif /* !ASSERT_REALTIME_INCREMENTING */
-#ifdef LOG_REALTIME_TIMESTAMPS
-		jtime_t last_jtime;
-		jtime_t last_qtime_j;
-		quantum_diff_t last_qtime_q;
-#endif /* LOG_REALTIME_TIMESTAMPS */
 		me  = THIS_CPU;
 		was = PREEMPTION_PUSHOFF();
-#ifdef LOG_REALTIME_TIMESTAMPS
-		last_jtime    = FORCPU(me, thiscpu_jiffies);
-		last_qtime_j  = FORCPU(me, thiscpu_last_qtime_j);
-		last_qtime_q  = FORCPU(me, thiscpu_last_qtime_q);
-#endif /* LOG_REALTIME_TIMESTAMPS */
+		cpu_qtime = cpu_quantum_elapsed_nopr(me, &cpu_jtime);
+		/* Check if the CPU clock was ever synced... */
+#if 1
+		if unlikely(FORCPU(me, thiscpu_last_resync.ct_rtc) == NULL) {
+			/* Force an RTC re-sync. upon first access */
+			REF struct realtime_clock_struct *rtc;
+			rtc = realtime_clock.get_nopr();
+			if likely(rtc != NULL) {
+				/* Create snapshots of the RTC. */
+				COMPILER_BARRIER();
+				resync_real = (*rtc->rc_gettime)(rtc);
+				COMPILER_BARRIER();
+				decref_unlikely(rtc);
+				cpu_resync_realtime(me,
+				                    &resync_real,
+				                    rtc,
+				                    cpu_jtime,
+				                    cpu_qtime,
+				                    false);
+				cpu_qtime = cpu_quantum_elapsed_nopr(me, &cpu_jtime);
+			}
+		}
+#endif
 		resync_real = FORCPU(me, thiscpu_last_resync.ct_real);
 		resync_cpuj = FORCPU(me, thiscpu_last_resync.ct_cpuj);
 		resync_cpuq = FORCPU(me, thiscpu_last_resync.ct_cpuq);
 		cpu_qoffs   = FORCPU(me, thiscpu_quantum_offset);
 		cpu_qsize   = FORCPU(me, thiscpu_quantum_length);
-		cpu_qtime   = cpu_quantum_elapsed_nopr(me, &cpu_jtime);
-#ifdef LOG_REALTIME_TIMESTAMPS
-		if (me == &_bootcpu) {
-			char buf[128];
-			size_t len;
-			len = sprintf(buf, "[c:%I64u,t:{%I64u,%7I32u+%I32u},l:{%I64u,%7I32u},r:{%I64u,%I32u},s:%I32u]\n",
-			              last_jtime, cpu_jtime, cpu_qtime, cpu_qoffs,
-			              last_qtime_j, last_qtime_q,
-			              resync_cpuj, resync_cpuq, cpu_qsize);
-			__outsb((u16)x86_syslog_port, buf, len);
-		}
-#endif /* LOG_REALTIME_TIMESTAMPS */
 #ifndef ASSERT_REALTIME_INCREMENTING
 		PREEMPTION_POP(was);
 #endif /* !ASSERT_REALTIME_INCREMENTING */
 	}
-
 
 	/* Calculate the whole quantum offset:
 	 *   - cpu_qoffs: Addend
@@ -593,7 +874,7 @@ PUBLIC NOBLOCK WUNUSED struct timespec NOTHROW(KCALL realtime)(void) {
 		resync_real.tv_nsec = (syscall_ulong_t)nsecs;
 	}
 #ifdef ASSERT_REALTIME_INCREMENTING
-	if (!kernel_poisoned()/* && me == &_bootcpu*/) {
+	if (!kernel_poisoned() /* && me == &_bootcpu*/) {
 		struct timespec before;
 		before = FORCPU(me, last_realtime);
 		assertf(before <= resync_real,
@@ -609,335 +890,59 @@ PUBLIC NOBLOCK WUNUSED struct timespec NOTHROW(KCALL realtime)(void) {
 	return resync_real;
 }
 
-#else /* CONFIG_USE_NEW_REALTIME */
-
-struct cpu_timestamp {
-	struct timespec ct_real; /* Realtime */
-	jtime_t         ct_cpuj; /* CPU time jiffies */
-	quantum_diff_t  ct_cpuq; /* CPU time quantum */
-};
-
-/* Timestamp for the last realtime re-sync made by the CPU */
-PRIVATE ATTR_PERCPU struct cpu_timestamp thiscpu_last_resync = {
-	/* .ct_real = */ {
-		/* .tv_sec  = */ 0,
-		/* .tv_nsec = */ (syscall_ulong_t)-1
-	}
-};
-
-
-PRIVATE NOBLOCK NOPREEMPT void
-NOTHROW(FCALL cpu_resync_realtime)(struct cpu *__restrict self) {
-#if 0
-	(void)self;
-#else
-	REF struct realtime_clock_struct *rt;
-	struct cpu_timestamp *cts;
-	struct cpu_timestamp nts;
-	struct timespec precision;
-	quantum_diff_t elapsed, cpu_qsize;
-#ifndef NDEBUG
-	struct timespec before;
-#endif /* !NDEBUG */
-	assert(!PREEMPTION_ENABLED());
-	rt = realtime_clock.get_nopr();
-	if (!rt)
-		return;
-#ifndef NDEBUG
-	/* For the assertion below, `before' must be a timestamp that
-	 * happens prior to our call to `cpu_quantum_elapsed_nopr()'! */
-	if (FORCPU(self, thiscpu_last_resync.ct_real.tv_nsec) != (syscall_ulong_t)-1) {
-		before = realtime();
-	} else {
-		before.tv_sec  = 0;
-		before.tv_nsec = 0;
-	}
-	COMPILER_BARRIER();
-#endif /* !NDEBUG */
-	cts = &FORCPU(self, thiscpu_last_resync);
-	COMPILER_BARRIER();
-	nts.ct_real = (*rt->rc_gettime)(rt);
-	elapsed     = cpu_quantum_elapsed_nopr(self, &nts.ct_cpuj);
-	COMPILER_BARRIER();
-	precision = rt->rc_precision;
-	decref_unlikely(rt);
-	cpu_qsize   = FORCPU(self, thiscpu_quantum_length);
-	nts.ct_cpuq = FORCPU(self, thiscpu_quantum_offset);
-	if (OVERFLOW_UADD(nts.ct_cpuq, elapsed, &nts.ct_cpuq)) {
-		quantum_diff_t num_jiffies;
-		num_jiffies = ((quantum_diff_t)-1) / cpu_qsize;
-		nts.ct_cpuj += num_jiffies;
-		nts.ct_cpuq -= num_jiffies * cpu_qsize;
-	}
-	if unlikely(nts.ct_cpuq >= cpu_qsize) {
-		nts.ct_cpuj += nts.ct_cpuq / cpu_qsize;
-		nts.ct_cpuq = nts.ct_cpuq % cpu_qsize;
-	}
-	if (cts->ct_real.tv_nsec == (syscall_ulong_t)-1) {
-		/* First time. */
-		*cts = nts;
-	} else {
-		/* Check for drift.
-		 * If the drift is larger than the realtime clock's precision,
-		 * then we need to adjust `thiscpu_quantum_length' */
-		jtime_t cputime_diff_j;
-		quantum_diff_t cputime_diff_q;
-		struct timespec cpu_elapsed, elapsed_error;
-		struct timespec rt_elapsed;
-		bool cpu_clock_too_fast;
-		if unlikely(cts->ct_real > nts.ct_real)
-			return; /* Shouldn't happen (the hardware clock moved backwards?) */
-		cputime_diff_j = nts.ct_cpuj - cts->ct_cpuj;
-		if (nts.ct_cpuq < cts->ct_cpuq) {
-			assert(cputime_diff_j);
-			--cputime_diff_j;
-			cputime_diff_q = nts.ct_cpuq + (cpu_qsize - cts->ct_cpuq);
-		} else {
-			cputime_diff_q = nts.ct_cpuq - cts->ct_cpuq;
-		}
-		cpu_elapsed.tv_sec  = cputime_diff_j / HZ;
-		cpu_elapsed.tv_nsec = ((cputime_diff_j % HZ) * (__NSECS_PER_SEC / HZ)) +
-		                      (syscall_ulong_t)((u64)((u64)cputime_diff_q *
-		                                              (__NSECS_PER_SEC / HZ)) /
-		                                        cpu_qsize);
-		rt_elapsed = nts.ct_real - cts->ct_real;
-		if (cpu_elapsed > rt_elapsed) {
-			elapsed_error      = cpu_elapsed - rt_elapsed;
-			cpu_clock_too_fast = true;
-		} else {
-			elapsed_error      = rt_elapsed - cpu_elapsed;
-			cpu_clock_too_fast = false;
-		}
-		if (elapsed_error > precision) {
-			u64 elapsed_error_nano, cpu_elapsed_nano;
-			quantum_diff_t adjust, new_quantum_length;
-			elapsed_error -= precision;
-			/* Adjust the quantum length to fix a precision error:
-			 *    Over the last `cpu_elapsed' seconds, our CPU has accumulated
-			 *    an error of approximately `elapsed_error' seconds.
-			 * This we will fix by adjusting the quantum length:
-			 *    thiscpu_quantum_length = cpu_clock_too_fast
-			 *        ? thiscpu_quantum_length + (TONANO(elapsed_error) / TONANO(cpu_elapsed))
-			 *        : thiscpu_quantum_length - (TONANO(elapsed_error) / TONANO(cpu_elapsed));
-			 */
-			elapsed_error_nano = ((u64)elapsed_error.tv_sec * __NSECS_PER_SEC) + elapsed_error.tv_nsec;
-			cpu_elapsed_nano   = ((u64)cpu_elapsed.tv_sec * __NSECS_PER_SEC) + cpu_elapsed.tv_nsec;
-			if unlikely(!cpu_elapsed_nano)
-				return;
-			adjust = (quantum_diff_t)(((u64)elapsed_error_nano *
-			                           (cpu_qsize / JIFFIES_FROM_SECONDS(3))) /
-			                          cpu_elapsed_nano);
-			if (adjust != 0) {
-				u64 cpu_elapsed_quantum;
-				u64 rtc_elapsed_quantum;
-				if (cpu_clock_too_fast) {
-					new_quantum_length = cpu_qsize + adjust;
-					/* When reducing the quantum length, we must decrease the
-					 * timestamp of the last re-sync in order to prevent the realtime()
-					 * clock for ever decreasing (i.e. because our previous value for realtime()
-					 * was too high, we must decrease `QUANTUM_TIME_SINCE_LAST_RESYNC()' in
-					 * order to fake a slower running realtime clock that can slowly catch
-					 * up without ever stopping to run forward at any point):
-					 * >> realtime() ==
-					 * >>    LAST_RESYNC_REALTIME +
-					 * >>    QUANTUM_TIME_SINCE_LAST_RESYNC()
-					 * The about of time we have to subtract is equal to:
-					 *      >> (PREV_LAST_RESYNC_REALTIME - RTC_CURRENT) +
-					 *      >>  QUANTUM_TIME_FROM_PREV_LAST_RESYNC_TO_CURRENT_RESYNC;
-					 *
-					 * <==> >> QUANTUM_TIME_FROM_PREV_LAST_RESYNC_TO_CURRENT_RESYNC -
-					 *      >>  (RTC_CURRENT - PREV_LAST_RESYNC_REALTIME);
-					 *
-					 * <==> >> cpu_elapsed - rt_elapsed;
-					 */
-					cpu_elapsed_quantum = (u64)cputime_diff_j * cpu_qsize + cputime_diff_q;
-					rtc_elapsed_quantum = (((u64)rt_elapsed.tv_sec * HZ) * cpu_qsize) +
-					                      (((u64)rt_elapsed.tv_nsec * cpu_qsize) / (1000000000 / HZ));
-					assertf(cpu_elapsed_quantum >= rtc_elapsed_quantum,
-					        "If this wasn't the case, then `cpu_clock_too_fast' "
-					        "should have been false!");
-					cpu_elapsed_quantum -= rtc_elapsed_quantum;
-					/* Convert the offset. (NOTE: Use ceil-divide here to prevent a small rounding
-					 *                            error from resulting in the clock moving backwards) */
-					cpu_elapsed_quantum = ((cpu_elapsed_quantum * cpu_qsize) + (new_quantum_length - 1)) /
-					                      new_quantum_length;
-					/* Subtract the offset. */
-#if 1
-					{
-						u64 diff_jif = ((u64)cpu_elapsed_quantum * 100000000) / new_quantum_length;
-						printk(KERN_DEBUG "Subtract ticks: %I64u.%.8I64u\n",
-						       (u64)(diff_jif / 100000000),
-						       (u64)(diff_jif % 100000000));
-					}
-#endif
-					nts.ct_cpuj -= cpu_elapsed_quantum / new_quantum_length;
-					if (OVERFLOW_USUB(nts.ct_cpuq, cpu_elapsed_quantum % new_quantum_length, &nts.ct_cpuq)) {
-						--nts.ct_cpuj;
-						nts.ct_cpuq += new_quantum_length;
-					}
-				} else {
-					new_quantum_length = cpu_qsize - adjust;
-					/* When reducing the quantum length, the worst that can happen is the
-					 * system clock jumping forward, which it's allowed to do irregardless! */
-				}
-				printk(KERN_INFO "[cpu#%u] Adjust quantum length %I32u%c%I32u -> %I32u\n",
-				       self->c_id, cpu_qsize, cpu_clock_too_fast ? '+' : '-',
-				       adjust, new_quantum_length);
-				/* Apply the new quantum configuration */
-				COMPILER_BARRIER();
-				FORCPU(self, thiscpu_quantum_offset) = 0;
-				FORCPU(self, thiscpu_quantum_length) = new_quantum_length;
-				arch_cpu_update_quantum_length_nopr();
-				*cts = nts;
-				COMPILER_BARRIER();
-#ifndef NDEBUG
-				{
-					struct timespec after;
-					after = realtime();
-					if (after < before) {
-						printk(KERN_ERR "Backwards realtime: { { %I64d, %Iu }, { %I64d, %Iu } } (diff: { %I64d, %Iu })\n",
-						       (s64)before.tv_sec, (uintptr_t)before.tv_nsec,
-						       (s64)after.tv_sec, (uintptr_t)after.tv_nsec,
-						       (s64)(before - after).tv_sec,
-						       (uintptr_t)(before - after).tv_nsec);
-					}
-				}
-#endif /* !NDEBUG */
-			}
-		}
-	}
-#endif
-}
-
-INTERN NOBLOCK NOPREEMPT void
-NOTHROW(FCALL cpu_inc_jiffies)(struct cpu *__restrict self) {
-	jtime_t newtime;
-	newtime = ++FORCPU(self, thiscpu_jiffies);
-	/* Try to re-sync CPU time with RTC time around every 3 seconds. */
-	if ((newtime % JIFFIES_FROM_SECONDS(3)) == 0)
-		cpu_resync_realtime(self);
-}
-
-
-/* Returns the current real time derived from the current CPU time.
- * If no realtime hardware is available, this clock may stop when
- * the CPU is idle and will not indicate the actual current time. */
-PUBLIC NOBLOCK WUNUSED struct timespec NOTHROW(KCALL realtime)(void) {
-	/* realtime() ==
-	 *    PERCPU(LAST_RESYNC_REALTIME) +
-	 *    QUANTUM_TIME_SINCE_LAST_RESYNC()
-	 */
-
-	struct timespec result;
-	jtime_t         resync_cpuj; /* Resync CPU time jiffies */
-	quantum_diff_t  resync_cpuq; /* Resync CPU time quantum */
-	jtime_t         cpu_jtime;   /* CPU jiffies */
-	quantum_diff_t  cpu_qoffs;   /* CPU quantum offset */
-	quantum_diff_t  cpu_qtime;   /* CPU quantum time */
-	quantum_diff_t  cpu_qsize;   /* CPU time quantum size */
-	struct cpu *me;
-	pflag_t was;
-	u64 total_nsec;
-	was = PREEMPTION_PUSHOFF();
-	me  = THIS_CPU;
-	/* Make sure that a timestamp was loaded at some point. */
-	if (FORCPU(me, thiscpu_last_resync.ct_real.tv_nsec) == (syscall_ulong_t)-1)
-		cpu_resync_realtime(me);
-	result      = FORCPU(me, thiscpu_last_resync.ct_real);
-	resync_cpuj = FORCPU(me, thiscpu_last_resync.ct_cpuj);
-	resync_cpuq = FORCPU(me, thiscpu_last_resync.ct_cpuq);
-	cpu_qoffs   = FORCPU(me, thiscpu_quantum_offset);
-	cpu_qsize   = FORCPU(me, thiscpu_quantum_length);
-	cpu_qtime   = cpu_quantum_elapsed_nopr(me, &cpu_jtime);
-	PREEMPTION_POP(was);
-	/* Calculate the elapsed CPU time since the last RTC resync */
-	cpu_jtime -= resync_cpuj;
-	if (OVERFLOW_UADD(cpu_qtime, cpu_qoffs, &cpu_qtime)) {
+/* Add the given `elapsed' to the quantum counter of the calling CPU
+ * While doing this, wake up all timeout-sleeping threads that have
+ * a timeout greater than a qtime_t that uses `elapsed' as the number
+ * of quantum units elapsed since the start of the current quantum.
+ * NOTE: This function does _not_ call `cpu_quantum_elapsed_nopr()'
+ *       in order to determine the current time, but uses `elapsed'
+ *       instead! */
+PRIVATE NOBLOCK NOPREEMPT NONNULL((1)) void
+NOTHROW(FCALL cpu_add_quantum_offset)(struct cpu *__restrict me,
+                                      quantum_diff_t elapsed) {
+	jtime_t /*  */ cpu_jtime;
+	quantum_diff_t cpu_qelps;
+	quantum_diff_t cpu_qsize;
+	cpu_jtime = FORCPU(me, thiscpu_jiffies);
+	cpu_qelps = FORCPU(me, thiscpu_quantum_offset);
+	cpu_qsize = FORCPU(me, thiscpu_quantum_length);
+	if unlikely(OVERFLOW_UADD(cpu_qelps, elapsed, &cpu_qelps)) {
 		quantum_diff_t num_jiffies;
 		num_jiffies = ((quantum_diff_t)-1) / cpu_qsize;
 		cpu_jtime += num_jiffies;
-		cpu_qtime -= num_jiffies * cpu_qsize;
+		cpu_qelps -= num_jiffies * cpu_qsize;
 	}
-	if (OVERFLOW_USUB(cpu_qtime, resync_cpuq, &cpu_qtime)) {
-		quantum_diff_t num_jiffies;
-		num_jiffies = ((quantum_diff_t)-1) / cpu_qsize;
-		cpu_jtime -= num_jiffies;
-		cpu_qtime += num_jiffies * cpu_qsize;
+	if (cpu_qelps >= cpu_qsize) {
+		cpu_jtime += cpu_qelps / cpu_qsize;
+		cpu_qelps = (cpu_qelps % cpu_qsize);
 	}
-	if (cpu_qtime >= cpu_qsize) {
-		cpu_jtime += cpu_qtime / cpu_qsize;
-		cpu_qtime = cpu_qtime % cpu_qsize;
-	}
-	/* We're now `(cpu_jtime + (cpu_qtime / cpu_qsize)) * HZ' seconds after `result'
-	 * Adjust `result' accordingly to be a timestamp that's as precise as possible. */
-	result.tv_sec += cpu_jtime / HZ;
-	total_nsec = result.tv_nsec;
-	total_nsec += (cpu_jtime % HZ) * (__NSECS_PER_SEC / HZ);
-	total_nsec += (u64)((u64)cpu_qtime * (__NSECS_PER_SEC / HZ)) / cpu_qsize;
-	result.tv_nsec = (syscall_ulong_t)total_nsec;
-	if (total_nsec > __NSECS_PER_SEC) {
-		result.tv_sec += (time_t)(total_nsec / __NSECS_PER_SEC);
-		result.tv_nsec = (syscall_ulong_t)(total_nsec % __NSECS_PER_SEC);
-	}
-	if (result.tv_sec >= INT64_C(0x0ccccccc00000000))
-		BREAKPOINT();
-	return result;
+	/* Save the new jtime/quantum offset values. */
+	FORCPU(me, thiscpu_jiffies)        = cpu_jtime;
+	FORCPU(me, thiscpu_quantum_offset) = cpu_qelps;
+	COMPILER_BARRIER();
+	/* Wake up all sleeping threads
+	 * NOTE: For this purpose, use a quantum-elapsed value of 0,
+	 *       since the actual time that has already elapsed according
+	 *       to our caller was already added to the general quantum
+	 *       offset of the CPU. */
+	cpu_timeout_sleeping_threads(me, cpu_jtime, 0);
+	COMPILER_BARRIER();
 }
 
-/* prevent issues hardware timer roll-over happening
- * before we've able to read the timestamp counter. */
-PRIVATE ATTR_PERCPU jtime_t thiscpu_last_qtime_j = 0;
-PRIVATE ATTR_PERCPU quantum_diff_t thiscpu_last_qtime_q = 0;
 
-/* Returns the number of ticks that have passed since the start
- * of the current quantum. - The true current CPU-local time
- * (in ticks) can then be calculated as:
- * >> (thiscpu_jiffies * PERCPU(thiscpu_quantum_length)) + PERCPU(thiscpu_quantum_offset) + cpu_quantum_elapsed_nopr();
- * NOTE: The `*_nopr' variants may only be called when preemption is disabled! */
-PUBLIC NOBLOCK NOPREEMPT WUNUSED NONNULL((1, 2)) quantum_diff_t
-NOTHROW(FCALL cpu_quantum_elapsed_nopr)(struct cpu *__restrict mycpu,
-                                        jtime_t *__restrict preal_jtime) {
-	quantum_diff_t result;
-	result = arch_cpu_quantum_elapsed_nopr();
-	*preal_jtime = FORCPU(mycpu, thiscpu_jiffies);
-	if (result < FORCPU(mycpu, thiscpu_last_qtime_q) &&
-	    *preal_jtime <= FORCPU(mycpu, thiscpu_last_qtime_j)) {
-		FORCPU(mycpu, thiscpu_last_qtime_q) = (quantum_diff_t)-1;
-		++*preal_jtime;
-	} else {
-		FORCPU(mycpu, thiscpu_last_qtime_j) = *preal_jtime;
-		FORCPU(mycpu, thiscpu_last_qtime_q) = result;
-	}
-	return result;
-}
-
-#endif /* !CONFIG_USE_NEW_REALTIME */
-
-
-/* Adjust quantum time to track the calling thread's quantum about to end prematurely. */
+/* Prematurely end the current quantum, accounting its elapsed
+ * time to `THIS_TASK', and starting a new quantum such that
+ * the next scheduler interrupt will happen after a full quantum. */
 PUBLIC NOBLOCK NOPREEMPT void
 NOTHROW(KCALL cpu_quantum_end_nopr)(void) {
-#ifdef CONFIG_USE_NEW_REALTIME
-#else /* CONFIG_USE_NEW_REALTIME */
-	quantum_diff_t elapsed, length;
-	struct cpu *mycpu = THIS_CPU;
-	assert(!PREEMPTION_ENABLED());
-	elapsed = arch_cpu_quantum_elapsed_nopr();
-	if (elapsed < FORCPU(mycpu, thiscpu_last_qtime_q) &&
-	    FORCPU(mycpu, thiscpu_jiffies) <= FORCPU(mycpu, thiscpu_last_qtime_j)) {
-		FORCPU(mycpu, thiscpu_last_qtime_q) = (quantum_diff_t)-1;
-		elapsed += FORCPU(mycpu, thiscpu_quantum_length);
-	} else {
-		FORCPU(mycpu, thiscpu_last_qtime_j) = FORCPU(mycpu, thiscpu_jiffies);
-		FORCPU(mycpu, thiscpu_last_qtime_q) = elapsed;
-	}
-	arch_cpu_quantum_reset_nopr();
-	length = cpu_add_quantum_offset_nopr(elapsed);
-	THIS_TASK->t_atime.add_quantum(elapsed, length);
-#endif /* !CONFIG_USE_NEW_REALTIME */
+	quantum_diff_t elapsed;
+	struct cpu *me = THIS_CPU;
+	/* Atomically (or near atomically) figure out how much
+	 * time has already elapsed, and reset the quantum. */
+	elapsed = arch_cpu_quantum_elapsed_and_reset_nopr(me);
+	/* Account for the  */
+	cpu_add_quantum_offset(me, elapsed);
 }
-
-
 
 
 /* Disable / re-enable preemptive interrupts on the calling CPU.
@@ -948,130 +953,298 @@ NOTHROW(KCALL cpu_quantum_end_nopr)(void) {
  * NOTE: In case preemptive interrupts cannot be disabled,
  *       all of these these functions are no-ops.
  * NOTE: The `*_nopr' variants may only be called when preemption is disabled! */
-PUBLIC NOBLOCK void
+PUBLIC NOPREEMPT NOBLOCK void
 NOTHROW(KCALL cpu_disable_preemptive_interrupts_nopr)(void) {
-#ifdef CONFIG_USE_NEW_REALTIME
-	assert(!PREEMPTION_ENABLED());
-	/* XXX: Accounting? */
-	arch_cpu_disable_preemptive_interrupts_nopr();
-#else /* CONFIG_USE_NEW_REALTIME */
-	quantum_diff_t elapsed, length;
-	struct cpu *mycpu = THIS_CPU;
-	assert(!PREEMPTION_ENABLED());
-	elapsed = arch_cpu_quantum_elapsed_nopr();
-	arch_cpu_disable_preemptive_interrupts_nopr();
-	if (elapsed < FORCPU(mycpu, thiscpu_last_qtime_q) &&
-	    FORCPU(mycpu, thiscpu_jiffies) <= FORCPU(mycpu, thiscpu_last_qtime_j)) {
-		FORCPU(mycpu, thiscpu_last_qtime_q) = (quantum_diff_t)-1;
-		elapsed += FORCPU(mycpu, thiscpu_quantum_length);
-	} else {
-		FORCPU(mycpu, thiscpu_last_qtime_j) = FORCPU(mycpu, thiscpu_jiffies);
-		FORCPU(mycpu, thiscpu_last_qtime_q) = elapsed;
+	quantum_diff_t elapsed;
+	struct cpu *me;
+#ifndef NDEBUG
+	struct timespec before;
+	struct timespec after;
+	before = realtime();
+#endif /* !NDEBUG */
+	assert(!PREEMPTION_ENABLED() || kernel_poisoned());
+	me = THIS_CPU;
+	/* Figure out how much of the current quantum has already elapsed. */
+	elapsed = arch_cpu_quantum_elapsed_nopr(me);
+
+	/* Deal with quantum roll-over */
+	if (elapsed < FORCPU(me, thiscpu_last_qtime_q) &&
+		FORCPU(me, thiscpu_jiffies) == FORCPU(me, thiscpu_last_qtime_j)) {
+		FORCPU(me, thiscpu_jiffi_pending) = true;
+		++FORCPU(me, thiscpu_jiffies);
 	}
-	length = cpu_add_quantum_offset_nopr(elapsed);
-	THIS_TASK->t_atime.add_quantum(elapsed, length);
-#endif /* !CONFIG_USE_NEW_REALTIME */
+	FORCPU(me, thiscpu_last_qtime_q) = 0;
+	FORCPU(me, thiscpu_last_qtime_j) = 0;
+
+	/* Disable preemptive interrupts. */
+	arch_cpu_disable_preemptive_interrupts_nopr(me);
+#ifndef NDEBUG
+	if (!kernel_poisoned()) {
+		quantum_diff_t new_elapsed;
+		new_elapsed = arch_cpu_quantum_elapsed_nopr(me);
+		assertf(new_elapsed == 0,
+		        "So-long as preemptive interrupts are disabled, this must be 0!\n"
+		        "elapsed                                 = %I32u\n"
+		        "new_elapsed                             = %I32u\n"
+		        "arch_cpu_preemptive_interrupts_disabled = %d\n",
+		        elapsed, new_elapsed,
+		        (int)FORCPU(me, arch_cpu_preemptive_interrupts_disabled));
+	}
+#endif /* !NDEBUG */
+	/* Account for the elapsed time. */
+	cpu_add_quantum_offset(me, elapsed);
+#ifndef NDEBUG
+	after = realtime();
+	assertf(before <= after || kernel_poisoned(),
+	        "Backwards realtime: { { %I64d, %Iu }, { %I64d, %Iu } } (diff: { %I64d, %Iu })\n",
+	        (s64)before.tv_sec, (uintptr_t)before.tv_nsec,
+	        (s64)after.tv_sec, (uintptr_t)after.tv_nsec,
+	        (s64)(before - after).tv_sec,
+	        (uintptr_t)(before - after).tv_nsec);
+#endif /* !NDEBUG */
 }
 
 
-PUBLIC NOBLOCK void
+PUBLIC NOPREEMPT NOBLOCK void
 NOTHROW(KCALL cpu_enable_preemptive_interrupts_nopr)(void) {
-#ifdef CONFIG_USE_NEW_REALTIME
-	/* TODO (Without this, realtime() won't update whenever preemptive interrupts
-	 *       are disabled, which they are whenever all threads are sleeping, and
-	 *       none of them have specified any timeouts (as is the case when KOS
-	 *       is hosting busybox's commandline prompt))
-	 * A good solution here would be to simply mark the realtime clock as not being
-	 * synced at all, and re-add the ability to automatically re-sync an entirely
-	 * un-synced cpu clock from within `realtime()'! */
-#else /* CONFIG_USE_NEW_REALTIME */
+	struct cpu *me;
+#ifndef NDEBUG
+	struct timespec before;
+	struct timespec after;
+	before = realtime();
+#endif /* !NDEBUG */
+	assert(!PREEMPTION_ENABLED() || kernel_poisoned());
+	/* Mark the last RTC re-sync timestamp as invalid, since
+	 * with preemptive interrupts being re-enabled, we have
+	 * no idea how much realtime has passed since they've
+	 * been disabled (and as such: we must force a re-sync
+	 * the next time a call to `realtime()' is made) */
+	me                                     = THIS_CPU;
+	FORCPU(me, thiscpu_last_resync.ct_rtc) = NULL;
+	/* Actually re-enable preemptive interrupts. */
+	arch_cpu_enable_preemptive_interrupts_nopr(me);
+#ifndef NDEBUG
+	after = realtime();
+	assertf(before <= after || kernel_poisoned(),
+	        "Backwards realtime: { { %I64d, %Iu }, { %I64d, %Iu } } (diff: { %I64d, %Iu })\n",
+	        (s64)before.tv_sec, (uintptr_t)before.tv_nsec,
+	        (s64)after.tv_sec, (uintptr_t)after.tv_nsec,
+	        (s64)(before - after).tv_sec,
+	        (uintptr_t)(before - after).tv_nsec);
+#endif /* !NDEBUG */
+}
+
+
+/* Explicitly set the quantum length value for the calling CPU, and do an RTC
+ * re-sync such that the given `cpu_qsize' appears to fit perfectly (at least
+ * for the time being)
+ * NOTE: This function does _NOT_ call `arch_cpu_update_quantum_length_nopr()'! */
+PUBLIC NOBLOCK NOPREEMPT void
+NOTHROW(KCALL cpu_set_quantum_length)(quantum_diff_t cpu_qsize) {
+	struct cpu *me;
 	REF struct realtime_clock_struct *rtc;
 	assert(!PREEMPTION_ENABLED());
+	me  = THIS_CPU;
 	rtc = realtime_clock.get_nopr();
-	if (rtc) {
-		/* Load RT information to make it look like
-		 * our CPU is perfectly in sync with the RTC */
-		struct timespec now;
-		struct cpu *me = THIS_CPU;
-		now = (*rtc->rc_gettime)(rtc);
+	if likely(rtc) {
+		jtime_t /*  */ cpu_jtime;
+		quantum_diff_t cpu_qtime;
+		quantum_diff_t cpu_qoffs;
+		struct timespec rtc_now;
+		cpu_qoffs = FORCPU(me, thiscpu_quantum_offset);
+		COMPILER_BARRIER();
+		cpu_qtime = cpu_quantum_elapsed_nopr(me, &cpu_jtime);
+		rtc_now   = (*rtc->rc_gettime)(rtc);
+		COMPILER_BARRIER();
 		decref_unlikely(rtc);
-		if (now > FORCPU(me, thiscpu_last_resync.ct_real)) {
-			FORCPU(me, thiscpu_last_resync.ct_real) = now;
-			FORCPU(me, thiscpu_last_resync.ct_cpuj) = FORCPU(me, thiscpu_jiffies);
-			FORCPU(me, thiscpu_last_resync.ct_cpuq) = 0;
-			FORCPU(me, thiscpu_last_resync.ct_rtc)  = rtc;
+		if unlikely(OVERFLOW_UADD(cpu_qtime, cpu_qoffs, &cpu_qtime)) {
+			quantum_diff_t num_jiffies;
+			num_jiffies = ((quantum_diff_t)-1) / cpu_qsize;
+			cpu_jtime  += num_jiffies;
+			cpu_qtime  -= num_jiffies * cpu_qsize;
 		}
+		if (cpu_qtime >= cpu_qsize) {
+			cpu_jtime += cpu_qtime / cpu_qsize;
+			cpu_qtime = (cpu_qtime % cpu_qsize);
+		}
+		FORCPU(me, thiscpu_last_resync.ct_cpuj) = cpu_jtime;
+		FORCPU(me, thiscpu_last_resync.ct_cpuq) = cpu_qtime;
+		FORCPU(me, thiscpu_last_resync.ct_real) = rtc_now;
+		FORCPU(me, thiscpu_last_resync.ct_rtc)  = rtc;
+		COMPILER_BARRIER();
 	}
-#endif /* !CONFIG_USE_NEW_REALTIME */
-	arch_cpu_enable_preemptive_interrupts_nopr();
+	COMPILER_BARRIER();
+	FORCPU(me, thiscpu_quantum_length) = cpu_qsize;
+	FORCPU(me, thiscpu_last_qtime_j)   = 0;
+	FORCPU(me, thiscpu_last_qtime_q)   = 0;
+	FORCPU(me, thiscpu_jiffi_pending)  = false;
+	COMPILER_BARRIER();
 }
 
-/* Increment `thiscpu_quantum_offset' by `diff' incrementing the `thiscpu_jiffies' counter
- * when the resulting value turns out to be greater than `thiscpu_quantum_length',
- * in which case the value will also be truncated.
- * When `thiscpu_jiffies' is incremented, also check if this causes additional
- * tasks to time out, and if so, re-schedule them for execution. */
-PUBLIC NOBLOCK NOPREEMPT quantum_diff_t
-NOTHROW(FCALL cpu_add_quantum_offset_nopr)(quantum_diff_t diff) {
-#if 1
-	(void)diff;
-	return PERCPU(thiscpu_quantum_length);
-#else
-	struct cpu *me = THIS_CPU;
-	quantum_diff_t new_diff, more_jiffies = 0;
-	quantum_diff_t length = FORCPU(me, thiscpu_quantum_length);
-	assert(!PREEMPTION_ENABLED());
-	if (OVERFLOW_UADD(FORCPU(me, thiscpu_quantum_offset), diff, &new_diff)) {
-		more_jiffies = ((quantum_diff_t)-1 / length);
-		new_diff     = (FORCPU(me, thiscpu_quantum_offset) + diff) - ((quantum_diff_t)-1);
+
+
+
+PUBLIC NOBLOCK WUNUSED qtime_t
+NOTHROW(KCALL cpu_quantum_time)(void) {
+	qtime_t result;
+	struct cpu *me;
+	pflag_t was;
+	quantum_diff_t elapsed;
+	was = PREEMPTION_PUSHOFF();
+	me             = THIS_CPU;
+	result.q_qtime = FORCPU(me, thiscpu_quantum_offset);
+	result.q_qsize = FORCPU(me, thiscpu_quantum_length);
+	elapsed        = cpu_quantum_elapsed_nopr(me, &result.q_jtime);
+	PREEMPTION_POP(was);
+	if (OVERFLOW_UADD(result.q_qtime, elapsed, &result.q_qtime)) {
+		result.q_jtime += ((quantum_diff_t)-1) / result.q_qsize;
+		result.q_qtime += elapsed;
+		result.q_qtime -= (quantum_diff_t)-1;
 	}
-	if (new_diff >= length) {
-		more_jiffies += new_diff / length;
-		new_diff = new_diff % length;
+	if (result.q_qtime >= result.q_qsize) {
+		result.q_jtime += result.q_qtime / result.q_qsize;
+		result.q_qtime = result.q_qtime % result.q_qsize;
 	}
-	FORCPU(me, thiscpu_quantum_offset) = new_diff;
-	if (more_jiffies) {
-		struct task *sleeper, *last_sleeper, *next;
-		jtime_t new_jiffies;
-		new_jiffies = FORCPU(me, thiscpu_jiffies) + more_jiffies;
-		FORCPU(me, thiscpu_jiffies) = new_jiffies;
-		if ((sleeper = me->c_sleeping) != NULL) {
-			if (sleeper->t_sched.s_asleep.ss_timeout.q_jtime > new_jiffies)
-				goto done_wakeup;
-			if (((u64)sleeper->t_sched.s_asleep.ss_timeout.q_qtime *
-			     sleeper->t_sched.s_asleep.ss_timeout.q_qsize) >
-			    ((u64)new_diff * length))
-				goto done_wakeup;
-			last_sleeper = sleeper;
-			ATOMIC_FETCHOR(sleeper->t_flags, TASK_FTIMEOUT | TASK_FRUNNING);
-			while ((next = last_sleeper->t_sched.s_asleep.ss_tmonxt) != NULL) {
-				STATIC_ASSERT(offsetof(struct task, t_sched.s_running.sr_runprv) !=
-				              offsetof(struct task, t_sched.s_asleep.ss_tmonxt));
-				if (next->t_sched.s_asleep.ss_timeout.q_jtime > new_jiffies)
-					break;
-				if (((u64)next->t_sched.s_asleep.ss_timeout.q_qtime *
-				     next->t_sched.s_asleep.ss_timeout.q_qsize) >
-				    ((u64)new_diff * length))
-					break;
-				ATOMIC_FETCHOR(next->t_flags, TASK_FTIMEOUT | TASK_FRUNNING);
-				last_sleeper->t_sched.s_running.sr_runnxt = next;
-				next->t_sched.s_running.sr_runprv         = last_sleeper;
-				last_sleeper                              = next;
-			}
-			me->c_sleeping = next;
-			if (next)
-				next->t_sched.s_asleep.ss_pself = &me->c_sleeping;
-			/* Re-schedule all of the sleepers. */
-			next = me->c_current->t_sched.s_running.sr_runnxt;
-			sleeper->t_sched.s_running.sr_runprv       = me->c_current;
-			last_sleeper->t_sched.s_running.sr_runnxt  = next;
-			next->t_sched.s_running.sr_runprv          = last_sleeper;
-			me->c_current->t_sched.s_running.sr_runnxt = sleeper;
+	return result;
+}
+
+
+
+
+/* Enter a sleeping state and return once being woken (true),
+ * or once the given `abs_timeout' (which must be global) expires (false)
+ * WARNING: Even if the caller has disabled preemption prior to the call,
+ *          it will be re-enabled once this function returns.
+ * NOTE: This function is the bottom-most (and still task-level) API
+ *       for conserving CPU cycles using preemption, in that this
+ *       function is even used to implement `task_wait()'.
+ *       The functions used to implement this one no longer work on tasks, but on CPUs!
+ * NOTE: If the thread is transferred to a different CPU while sleeping, a
+ *       sporadic wakeup will be triggered, causing `task_sleep()' to return
+ *      `true'.
+ * The proper way of using this function is as follows:
+ * >> while (SHOULD_WAIT()) { // Test some condition for which to wait
+ * >>     PREEMPTION_DISABLE();
+ * >>     // Test again now that interrupts are disabled
+ * >>     // This test is required to prevent a race condition
+ * >>     // where the condition is signaled between it being
+ * >>     // changed and interrupts being disabled.
+ * >>     COMPILER_READ_BARRIER();
+ * >>     if (!SHOULD_WAIT()) {
+ * >>         PREEMPTION_ENABLE();
+ * >>         break;
+ * >>     }
+ * >>     // Serve RPC functions (when TRUE is returned, preemption was re-enabled)
+ * >>     if (task_serve()) continue;
+ * >>     // Do the actual sleep.
+ * >>     if (!task_sleep(TIMEOUT))
+ * >>         return DID_TIME_OUT;
+ * >> }
+ * >> return WAS_SIGNALED;
+ * The sleeping thread should then be woken as follows:
+ * >> SET_SHOULD_WAIT(false);
+ * >> task_wake(waiting_thread); */
+PUBLIC bool NOTHROW(FCALL task_sleep)(struct timespec const *abs_timeout) {
+	struct task *me = THIS_TASK;
+	struct cpu *mycpu;
+	cpu_assert_integrity();
+	if (abs_timeout) {
+		struct timespec now;
+		struct timespec offset_from_now;
+		qtime_t quantum_timeout, now_qtime;
+		/* Check if we should immediately time out. */
+		if (!abs_timeout->tv_sec && !abs_timeout->tv_nsec)
+			goto do_return_false;
+		PREEMPTION_DISABLE();
+		/* TODO: This time conversion should be done better! */
+		now       = realtime();
+		now_qtime = cpu_quantum_time();
+		if (*abs_timeout <= now)
+			goto do_return_false;
+		offset_from_now = *abs_timeout - now;
+		quantum_timeout = now_qtime;
+		quantum_timeout.add_seconds(offset_from_now.tv_sec);
+		quantum_timeout.add_nanoseconds(offset_from_now.tv_nsec);
+		/* Check if the given timeout has already expired. */
+		if (now_qtime >= quantum_timeout) {
+do_return_false:
+			PREEMPTION_ENABLE();
+			return false;
 		}
+		/* Save the timeout to-be used. */
+		me->t_sched.s_asleep.ss_timeout = quantum_timeout;
+	} else {
+		me->t_sched.s_asleep.ss_timeout.q_jtime = (jtime_t)-1;
+		me->t_sched.s_asleep.ss_timeout.q_qtime = 0;
+		me->t_sched.s_asleep.ss_timeout.q_qsize = 1;
+		PREEMPTION_DISABLE();
 	}
-done_wakeup:
-	return length;
-#endif
+	/* End the current quantum prematurely. */
+	cpu_quantum_end_nopr();
+
+	mycpu = me->t_cpu;
+	cpu_assert_running(me);
+	if unlikely(me == mycpu->c_override)
+		goto wait_a_bit;
+
+	/* The caller is the only thread hosted by this cpu. */
+	if likely(me->t_sched.s_running.sr_runnxt == me) {
+		struct task *idle;
+		/* Special case: blocking call made by the IDLE thread. */
+		if unlikely(me == &FORCPU(mycpu, thiscpu_idle)) {
+wait_a_bit:
+			/* Wait for the next interrupt. */
+			PREEMPTION_ENABLE_WAIT();
+			/* Indicate a sporadic wake-up. */
+			return false;
+		}
+		/* Check if the IDLE thread had been sleeping. */
+		idle = &FORCPU(mycpu, thiscpu_idle);
+		if (idle->t_sched.s_asleep.ss_pself) {
+			/* The IDLE thread had been sleeping (time it out) */
+			ATOMIC_FETCHOR(idle->t_flags, TASK_FTIMEOUT);
+			if ((*idle->t_sched.s_asleep.ss_pself = idle->t_sched.s_asleep.ss_tmonxt) != NULL)
+				idle->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = idle->t_sched.s_asleep.ss_pself;
+		}
+		/* Unschedule the caller, and instead schedule the IDLE thread. */
+		idle->t_sched.s_running.sr_runprv = idle;
+		idle->t_sched.s_running.sr_runnxt = idle;
+		ATOMIC_FETCHOR(idle->t_flags, TASK_FRUNNING);
+		mycpu->c_current = idle;
+	} else {
+		/* Schedule the next task. */
+		struct task *prev = me->t_sched.s_running.sr_runprv;
+		struct task *next = me->t_sched.s_running.sr_runnxt;
+		assert(prev->t_sched.s_running.sr_runnxt == me);
+		assert(next->t_sched.s_running.sr_runprv == me);
+		assert(prev != me);
+		assert(next != me);
+		mycpu->c_current = next;
+		next->t_sched.s_running.sr_runprv = prev;
+		prev->t_sched.s_running.sr_runnxt = next;
+	}
+	assert(mycpu->c_current->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv == mycpu->c_current);
+	assert(mycpu->c_current->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt == mycpu->c_current);
+	me->t_sched.s_running.sr_runprv = NULL;
+	me->t_sched.s_running.sr_runnxt = NULL;
+	assert(me->t_flags & TASK_FRUNNING);
+	ATOMIC_FETCHAND(me->t_flags, ~TASK_FRUNNING);
+
+	/* Register the calling task as a sleeper within the CPU. */
+	cpu_addsleepingtask_nopr(me);
+
+	/* Continue execution in the next thread. */
+	cpu_run_current_and_remember_nopr(me);
+
+	/* HINT: If your debugger break here, it means that your
+	 *       thread is probably waiting on some kind of signal. */
+	cpu_assert_running(me);
+
+	/* Check if we got timed out. */
+	if (ATOMIC_FETCHAND(me->t_flags, ~TASK_FTIMEOUT) & TASK_FTIMEOUT)
+		return false; /* Timeout... */
+
+	return true;
 }
 
 

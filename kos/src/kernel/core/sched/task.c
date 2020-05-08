@@ -84,16 +84,6 @@ struct task task_header = {
 	/* .t_heapsz   = */ (size_t)__kernel_pertask_size,
 	/* .t_sched    = */ {
 		/* .s_state = */ NULL
-	},
-	/* .t_ctime = */ {
-		/* .q_jtime = */ 0,
-		/* .q_qtime = */ 0,
-		/* .q_qsize = */ 1
-	},
-	/* .t_atime = */ {
-		/* .q_jtime = */ 0,
-		/* .q_qtime = */ 0,
-		/* .q_qsize = */ 1
 	}
 };
 

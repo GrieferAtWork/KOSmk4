@@ -182,7 +182,7 @@ PRIVATE /*ATTR_FREETEXT*/ void KCALL x86_altcore_entry(void) {
 	 *    -> This is something I've seen happening a couple of times, leaving
 	 *       secondary cores to arbitrarily have tick counters off by _a_ _lot_. */
 
-	FORCPU(me, _thiscpu_quantum_length) = num_ticks;
+	cpu_set_quantum_length(num_ticks);
 
 	/* Enable the LAPIC for real this time. */
 	lapic_write(APIC_TIMER_DIVIDE, APIC_TIMER_DIVIDE_F16);
@@ -722,20 +722,23 @@ i386_allocate_secondary_cores(void) {
 
 
 /* Alternate implementation for `arch_cpu_quantum_elapsed_nopr()' for when APIC is available. */
-INTDEF FREE byte_t x86_apic_cpu_quantum_elapsed_nopr[];
-INTDEF byte_t x86_apic_cpu_quantum_elapsed_nopr_size[];
+INTDEF FREE byte_t apic86_arch_cpu_quantum_elapsed_nopr[];
+INTDEF byte_t apic86_arch_cpu_quantum_elapsed_nopr_size[];
 
-INTDEF FREE byte_t x86_apic_cpu_disable_preemptive_interrupts_nopr[];
-INTDEF byte_t x86_apic_cpu_disable_preemptive_interrupts_nopr_size[];
+INTDEF FREE byte_t apic86_arch_cpu_enable_preemptive_interrupts_nopr[];
+INTDEF byte_t apic86_arch_cpu_enable_preemptive_interrupts_nopr_size[];
 
-INTDEF FREE byte_t x86_apic_cpu_enable_preemptive_interrupts_nopr[];
-INTDEF byte_t x86_apic_cpu_enable_preemptive_interrupts_nopr_size[];
+INTDEF FREE byte_t apic86_arch_cpu_disable_preemptive_interrupts_nopr[];
+INTDEF byte_t apic86_arch_cpu_disable_preemptive_interrupts_nopr_size[];
 
-INTDEF FREE byte_t x86_apic_cpu_quantum_reset_nopr[];
-INTDEF byte_t x86_apic_cpu_quantum_reset_nopr_size[];
+INTDEF FREE byte_t apic86_arch_cpu_quantum_elapsed_and_reset_nopr[];
+INTDEF byte_t apic86_arch_cpu_quantum_elapsed_and_reset_nopr_size[];
 
-INTDEF FREE byte_t x86_apic_cpu_hwipi_pending_nopr[];
-INTDEF byte_t x86_apic_cpu_hwipi_pending_nopr_size[];
+INTDEF FREE byte_t apic86_arch_cpu_update_quantum_length_nopr[];
+INTDEF byte_t apic86_arch_cpu_update_quantum_length_nopr_size[];
+
+INTDEF FREE byte_t apic86_arch_cpu_hwipi_pending_nopr[];
+INTDEF byte_t apic86_arch_cpu_hwipi_pending_nopr_size[];
 
 #ifdef __HAVE_CPUSET_FULL_MASK
 DATDEF cpuset_t ___cpuset_full_mask ASMNAME("__cpuset_full_mask");
@@ -837,20 +840,23 @@ done_early_altcore_init:
 
 		/* Re-write text for the quantum accessor functions to use the APIC reload counter. */
 		memcpy((void *)&arch_cpu_quantum_elapsed_nopr,
-		       (void *)x86_apic_cpu_quantum_elapsed_nopr,
-		       (size_t)x86_apic_cpu_quantum_elapsed_nopr_size);
-		memcpy((void *)&arch_cpu_disable_preemptive_interrupts_nopr,
-		       (void *)x86_apic_cpu_disable_preemptive_interrupts_nopr,
-		       (size_t)x86_apic_cpu_disable_preemptive_interrupts_nopr_size);
+		       (void *)apic86_arch_cpu_quantum_elapsed_nopr,
+		       (size_t)apic86_arch_cpu_quantum_elapsed_nopr_size);
 		memcpy((void *)&arch_cpu_enable_preemptive_interrupts_nopr,
-		       (void *)x86_apic_cpu_enable_preemptive_interrupts_nopr,
-		       (size_t)x86_apic_cpu_enable_preemptive_interrupts_nopr_size);
-		memcpy((void *)&arch_cpu_quantum_reset_nopr,
-		       (void *)x86_apic_cpu_quantum_reset_nopr,
-		       (size_t)x86_apic_cpu_quantum_reset_nopr_size);
+		       (void *)apic86_arch_cpu_enable_preemptive_interrupts_nopr,
+		       (size_t)apic86_arch_cpu_enable_preemptive_interrupts_nopr_size);
+		memcpy((void *)&arch_cpu_disable_preemptive_interrupts_nopr,
+		       (void *)apic86_arch_cpu_disable_preemptive_interrupts_nopr,
+		       (size_t)apic86_arch_cpu_disable_preemptive_interrupts_nopr_size);
+		memcpy((void *)&arch_cpu_quantum_elapsed_and_reset_nopr,
+		       (void *)apic86_arch_cpu_quantum_elapsed_and_reset_nopr,
+		       (size_t)apic86_arch_cpu_quantum_elapsed_and_reset_nopr_size);
+		memcpy((void *)&arch_cpu_update_quantum_length_nopr,
+		       (void *)apic86_arch_cpu_update_quantum_length_nopr,
+		       (size_t)apic86_arch_cpu_update_quantum_length_nopr_size);
 		memcpy((void *)&arch_cpu_hwipi_pending_nopr,
-		       (void *)x86_apic_cpu_hwipi_pending_nopr,
-		       (size_t)x86_apic_cpu_hwipi_pending_nopr_size);
+		       (void *)apic86_arch_cpu_hwipi_pending_nopr,
+		       (size_t)apic86_arch_cpu_hwipi_pending_nopr_size);
 
 		/* Re-write scheduler interrupt handlers to ACK APIC interrupts, rather than the PIC ones. */
 		memcpy((void *)x86_pic_acknowledge,
@@ -925,7 +931,7 @@ done_early_altcore_init:
 		            X86_INTNO_PIC1_PIT |
 		            APIC_TIMER_MODE_FPERIODIC);
 		lapic_write(APIC_TIMER_INITIAL, num_ticks);
-		FORCPU(&_bootcpu, _thiscpu_quantum_length) = num_ticks;
+		cpu_set_quantum_length(num_ticks);
 		PREEMPTION_ENABLE();
 
 #ifndef CONFIG_NO_SMP
@@ -933,7 +939,7 @@ done_early_altcore_init:
 		if (!CPU_ALL_ONLINE) {
 			unsigned int timeout;
 			PREEMPTION_DISABLE();
-			arch_cpu_quantum_reset_nopr();
+			arch_cpu_quantum_elapsed_and_reset_nopr(&_bootcpu);
 			PREEMPTION_ENABLE();
 #if HZ >= 100
 			/* Wait for more than a single jiffi. */
@@ -1015,7 +1021,7 @@ all_online:
 		memcpy(x86_debug_pic_acknowledge, x86_ack_pic, (size_t)x86_ack_apic_size);
 #endif /* !CONFIG_NO_DEBUGGER */
 
-		FORCPU(&_bootcpu, _thiscpu_quantum_length) = PIT_HZ_DIV(HZ);
+		cpu_set_quantum_length(PIT_HZ_DIV(HZ));
 
 		/* Set the PIC speed. */
 		outb(PIT_COMMAND,

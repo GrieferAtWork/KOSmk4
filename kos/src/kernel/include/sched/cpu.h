@@ -177,16 +177,6 @@ FUNDEF NOBLOCK WUNUSED qtime_t NOTHROW(KCALL cpu_quantum_time)(void);
  * are >= earlier values. */
 FUNDEF NOBLOCK WUNUSED struct timespec NOTHROW(KCALL realtime)(void);
 
-/* Increment `thiscpu_quantum_offset' by `diff' incrementing the `thiscpu_jiffies' counter
- * when the resulting value turns out to be greater than `thiscpu_quantum_length',
- * in which case the value will also be truncated.
- * When `thiscpu_jiffies' is incremented, also check if this causes additional
- * tasks to time out, and if so, re-schedule them for execution.
- * WARNING: This function may only be called when preemption is disabled!
- * @return: * : Always returns `PERCPU(thiscpu_quantum_length)' */
-FUNDEF NOBLOCK NOPREEMPT quantum_diff_t
-NOTHROW(FCALL cpu_add_quantum_offset_nopr)(quantum_diff_t diff);
-
 /* [!0][<= CONFIG_MAX_CPU_COUNT][const] The total number of known CPUs. */
 DATDEF cpuid_t const cpu_count;
 
@@ -418,12 +408,6 @@ FUNDEF NOBLOCK NOPREEMPT WUNUSED NONNULL((1, 2)) quantum_diff_t
 NOTHROW(FCALL cpu_quantum_elapsed_nopr)(struct cpu *__restrict mycpu,
                                         jtime_t *__restrict preal_jtime);
 
-/* Same as the function above, however don't
- * account for lazy/delayed interrupt handling. */
-FUNDEF NOBLOCK NOPREEMPT WUNUSED quantum_diff_t
-NOTHROW(KCALL arch_cpu_quantum_elapsed_nopr)(void);
-
-
 /* Disable / re-enable preemptive interrupts on the calling CPU.
  * When `cpu_enable_preemptive_interrupts_nopr()' is called, any time that has
  * passed between then and a prior call to `cpu_disable_preemptive_interrupts_nopr()'
@@ -435,30 +419,70 @@ NOTHROW(KCALL arch_cpu_quantum_elapsed_nopr)(void);
 FUNDEF NOBLOCK NOPREEMPT void NOTHROW(KCALL cpu_disable_preemptive_interrupts_nopr)(void);
 FUNDEF NOBLOCK NOPREEMPT void NOTHROW(KCALL cpu_enable_preemptive_interrupts_nopr)(void);
 
+/* Prematurely end the current quantum, accounting its elapsed
+ * time to `THIS_TASK', and starting a new quantum such that
+ * the next scheduler interrupt will happen after a full quantum. */
+FUNDEF NOBLOCK NOPREEMPT void NOTHROW(KCALL cpu_quantum_end_nopr)(void);
+
+/* Explicitly set the quantum length value for the calling CPU, and do an RTC
+ * re-sync such that the given `cpu_qsize' appears to fit perfectly (at least
+ * for the time being)
+ * NOTE: This function does _NOT_ call `arch_cpu_update_quantum_length_nopr()'! */
+FUNDEF NOBLOCK NOPREEMPT void
+NOTHROW(KCALL cpu_set_quantum_length)(quantum_diff_t cpu_qsize);
+
+
+/* Same as the function above, however don't
+ * account for lazy/delayed interrupt handling. */
+FUNDEF NOBLOCK NOPREEMPT WUNUSED NONNULL((1)) quantum_diff_t
+NOTHROW(FCALL arch_cpu_quantum_elapsed_nopr)(struct cpu *__restrict me);
+
 /* Same as the functions above, but don't adjust the CPU time afterwards.
  * WARNING: Keeping preemptive interrupts disabled without time loss accounting
  *          for longer periods of time will cause `thiscpu_quantum_length' to
- *          go nuts once they actually get turned back on. */
-FUNDEF NOBLOCK NOPREEMPT void NOTHROW(KCALL arch_cpu_disable_preemptive_interrupts_nopr)(void);
-FUNDEF NOBLOCK NOPREEMPT void NOTHROW(KCALL arch_cpu_enable_preemptive_interrupts_nopr)(void);
+ *          go nuts once they actually get turned back on.
+ * NOTE:    As long as preemptive interrupts are disabled, `arch_cpu_quantum_elapsed_nopr()'
+ *          and `arch_cpu_quantum_elapsed_and_reset_nopr()' always return 0.
+ * NOTE:    When `arch_cpu_enable_preemptive_interrupts_nopr()' always also
+ *          does the same as `arch_cpu_update_quantum_length_nopr()'. */
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) void
+NOTHROW(FCALL arch_cpu_disable_preemptive_interrupts_nopr)(struct cpu *__restrict me);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) void
+NOTHROW(FCALL arch_cpu_enable_preemptive_interrupts_nopr)(struct cpu *__restrict me);
 
-/* Update hardware following a change made to `thiscpu_quantum_length' */
-FUNDEF NOBLOCK NOPREEMPT void NOTHROW(KCALL arch_cpu_update_quantum_length_nopr)(void);
+/* Set to true/false by `arch_cpu_(enable|disable)_preemptive_interrupts_nopr()' */
+DATDEF ATTR_PERCPU bool arch_cpu_preemptive_interrupts_disabled;
 
-/* Adjust quantum time to track the calling thread's quantum about to end prematurely. */
-FUNDEF NOBLOCK NOPREEMPT void NOTHROW(KCALL cpu_quantum_end_nopr)(void);
+/* Update hardware following a change made to `thiscpu_quantum_length'
+ * NOTE: If `thiscpu_quantum_length' is greater than the implementation limit,
+ *       it will be clamped to the max possible value. Note however that the
+ *       implementation limit is always defined such that properly functioning
+ *       hardware is always able to provide a quantum length suitable to
+ *       perfectly match `HZ' ticks per second (even when the perfect quantum
+ *       length needed to reach this goal changes over time)
+ * @return: * : The number of quantum units already elapsed (updating the hardware
+ *              tick counter has the same effect of resetting its current tick value
+ *              to 0 as a call to `arch_cpu_quantum_elapsed_and_reset_nopr()' has). */
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) quantum_diff_t
+NOTHROW(FCALL arch_cpu_update_quantum_length_nopr)(struct cpu *__restrict me);
 
-/* Reset the amount of remaining time for the current quantum. */
-FUNDEF NOBLOCK NOPREEMPT void NOTHROW(KCALL arch_cpu_quantum_reset_nopr)(void);
+/* Return the # of elapsed quantum units from the current CPU tick,
+ * before resetting the # of elapsed units (as well as the # of units
+ * left before a scheduler interrupt is fired) to their max values. */
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) quantum_diff_t
+NOTHROW(FCALL arch_cpu_quantum_elapsed_and_reset_nopr)(struct cpu *__restrict me);
 
 #ifndef CONFIG_NO_SMP
 /* Check if IPIs are pending to be executed by the calling CPU,
  * returning `true' if this is the case, or `false' it not.
  * In order to serve any pending IPIs, preemption must be enabled. */
-FUNDEF NOBLOCK WUNUSED NOPREEMPT bool NOTHROW(KCALL arch_cpu_hwipi_pending_nopr)(void);
+FUNDEF NOBLOCK WUNUSED NOPREEMPT NONNULL((1)) bool
+NOTHROW(FCALL arch_cpu_hwipi_pending_nopr)(struct cpu *__restrict me);
+
 /* Check if there are any non-interrupting software-based IPIs pending.
  * If some are present, these must be serviced by calling `cpu_ipi_service_nopr()' */
-FUNDEF NOBLOCK WUNUSED NOPREEMPT bool NOTHROW(KCALL arch_cpu_swipi_pending_nopr)(void);
+FUNDEF NOBLOCK WUNUSED NOPREEMPT NONNULL((1)) bool
+NOTHROW(FCALL arch_cpu_swipi_pending_nopr)(struct cpu *__restrict me);
 #endif /* !CONFIG_NO_SMP */
 
 
@@ -529,7 +553,7 @@ NOTHROW(KCALL cpu_wake)(struct cpu *__restrict target);
  * >>    // Check for hardware IPIs which may have been delivered after `PREEMPTION_DISABLE()'
  * >>    // was called, but bfore `CPU_STATE_FALLING_ASLEEP' got set (letting other CPUs think
  * >>    // that our CPU would be able to service IPIs)
- * >>    if (arch_cpu_hwipi_pending_nopr()) {
+ * >>    if (arch_cpu_hwipi_pending_nopr(me)) {
  * >>        ATOMIC_WRITE(me->c_state, CPU_STATE_RUNNING);
  * >>        cpu_ipi_service_nopr();
  * >>        PREEMPTION_ENABLE_P();
@@ -539,8 +563,8 @@ NOTHROW(KCALL cpu_wake)(struct cpu *__restrict target);
  * >>    // Some other code
  * >>    ...
  * >>
- * >>    ATOMIC_WRITE(THIS_CPU->c_state, CPU_STATE_RUNNING);
- * >>    if (arch_cpu_swipi_pending_nopr()) {
+ * >>    ATOMIC_WRITE(me->c_state, CPU_STATE_RUNNING);
+ * >>    if (arch_cpu_swipi_pending_nopr(me)) {
  * >>        cpu_ipi_service_nopr();
  * >>        PREEMPTION_ENABLE();
  * >>        goto again;

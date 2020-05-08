@@ -273,14 +273,8 @@ nofproc:
 	if ((*printer)(arg, "0 ", 2) < 0)
 		goto done; /* itrealvalue */
 	/* starttimes */
-	if (thread) {
-		if (format_printf(printer, arg, "%I64u ",
-		                  (u64)thread->t_ctime.q_jtime) < 0)
-			goto done;
-	} else {
-		if ((*printer)(arg, "0 ", 2) < 0)
-			goto done;
-	}
+	if ((*printer)(arg, "0 ", 2) < 0)
+		goto done;
 	if (v) {
 		size_t vsize = 0;
 		struct vm_node *iter;

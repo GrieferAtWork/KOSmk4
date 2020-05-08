@@ -104,7 +104,7 @@ PRIVATE_FUNCTION(x86_boot0_sector)
 	jc8    .La20_keyboard_begin /* Unsupported */
 	cmpb   $0, %ah
 	jnz8   .La20_keyboard_begin /* Unsupported */
-	mov    $0x2401, %ax /* Enable-A20 */
+	mov    $(0x2401), %ax /* Enable-A20 */
 	int    $(0x15)
 
 	/* Step #3: Check if A20 is enabled now. */

@@ -287,12 +287,7 @@ int main_logtime(int argc, char *argv[], char *envp[]) {
 		}
 		if (next >= prev) {
 			prev = next;
-//			if ((rand() % 300) >= 250) {
-//				int ms;
-//				ms = rand() % 100000;
-//				prev.add_microseconds(ms);
-//				usleep(ms);
-//			}
+			/*sleep(1);*/
 			continue;
 		}
 		{

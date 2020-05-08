@@ -602,7 +602,7 @@ again_already_disabled:
 #ifndef CONFIG_NO_SMP
 	/* Check if there are IPIs that are pending
 	 * execution, as send from other cores. */
-	if (arch_cpu_hwipi_pending_nopr()) {
+	if (arch_cpu_hwipi_pending_nopr(me)) {
 		ATOMIC_WRITE(me->c_state, CPU_STATE_RUNNING);
 		cpu_ipi_service_nopr();
 #ifdef PREEMPTION_ENABLE_P
@@ -636,7 +636,7 @@ again_already_disabled:
 				continue;
 			/* There are sleeping threads with the KEEPCORE flag set... */
 			ATOMIC_WRITE(me->c_state, CPU_STATE_RUNNING);
-			if (arch_cpu_swipi_pending_nopr()) {
+			if (arch_cpu_swipi_pending_nopr(me)) {
 				cpu_ipi_service_nopr();
 				PREEMPTION_ENABLE();
 				goto again;
@@ -693,7 +693,7 @@ again_already_disabled:
 #endif /* !CONFIG_NO_SMP */
 	/* We're the boot CPU, which means we're not allowed to go to sleep. */
 	ATOMIC_WRITE(me->c_state, CPU_STATE_RUNNING);
-	if (arch_cpu_swipi_pending_nopr()) {
+	if (arch_cpu_swipi_pending_nopr(me)) {
 		cpu_ipi_service_nopr();
 		PREEMPTION_ENABLE();
 		goto again;
@@ -772,7 +772,7 @@ do_idle_wait:
 yield_and_return:
 	/* Switch back to a running state. */
 	ATOMIC_WRITE(me->c_state, CPU_STATE_RUNNING);
-	if (arch_cpu_swipi_pending_nopr()) {
+	if (arch_cpu_swipi_pending_nopr(me)) {
 		cpu_ipi_service_nopr();
 		PREEMPTION_ENABLE();
 		goto again;
@@ -867,7 +867,7 @@ NOTHROW(FCALL task_start)(struct task *__restrict thread, unsigned int flags) {
 		printk(KERN_TRACE "[sched:cpu#%u] Starting thread %p [tid=%u]\n",
 		       (unsigned int)target_cpu->c_id, thread,
 		       (unsigned int)task_getroottid_of_s(thread));
-		thread->t_ctime = cpu_quantum_time();
+		/*thread->t_ctime = cpu_quantum_time();*/
 #ifndef NDEBUG
 		{
 			bool ok = cpu_addpendingtask(target_cpu, thread);
@@ -905,7 +905,7 @@ done_pop_preemption:
 		printk(KERN_TRACE "[sched:cpu#%u] Starting thread %p [tid=%u]\n",
 		       (unsigned int)target_cpu->c_id, thread,
 		       (unsigned int)task_getroottid_of_s(thread));
-		thread->t_ctime = cpu_quantum_time();
+		/*thread->t_ctime = cpu_quantum_time();*/
 		caller = THIS_TASK;
 		next   = caller->t_sched.s_running.sr_runnxt;
 		caller->t_sched.s_running.sr_runnxt = thread;
