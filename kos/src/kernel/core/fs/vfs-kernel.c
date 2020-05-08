@@ -60,6 +60,7 @@ PUBLIC struct vfs vfs_kernel = {
 	.v_drives_lock  = ATOMIC_RWLOCK_INIT,
 	.v_drives       = { NULL, }
 };
+
 PUBLIC struct fs fs_kernel = {
 	.f_refcnt   = 3, /* GLOBAL, BOOT_IDLE, BOOT_TASK */
 	.f_heapsize = sizeof(struct fs),

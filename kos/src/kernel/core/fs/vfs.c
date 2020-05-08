@@ -1582,7 +1582,10 @@ PUBLIC NOBLOCK void
 NOTHROW(KCALL path_destroy)(struct path *__restrict self) {
 	struct path *parent;
 	path_lock_do_service(self);
-	assert(self->p_cldsize == 0);
+	assertf(self->p_recent.ln_pself == NULL,
+	        "The recently-used cache should have kept us alive!");
+	assertf(self->p_cldsize == 0,
+	        "Child path nodes should have kept us alive!");
 	kfree(self->p_cldlist);
 	xdecref(self->p_inode);
 	if ((parent = self->p_parent) != NULL) {
@@ -1655,6 +1658,26 @@ NOTHROW(KCALL vfs_clearmounts)(struct vfs *__restrict self) {
 	path_recent_clear(self);
 }
 
+#if defined(NDEBUG) || 1
+#define vfs_assert_recent_integrity(self) (void)0
+#else /* NDEBUG */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL vfs_assert_recent_integrity)(struct vfs *__restrict self) {
+	size_t i;
+	struct path *iter, **piter;
+	assert((self->v_recent_list != NULL) == (self->v_recent_size != 0));
+	assert((self->v_recent_list != NULL) == (self->v_recent_back != NULL));
+	if (!self->v_recent_size)
+		return;
+	for (piter = &self->v_recent_list, i = 0;
+	     (iter = *piter) != NULL;
+	     piter = &iter->p_recent.ln_next, ++i) {
+		assert(i < self->v_recent_size);
+		assert(piter == iter->p_recent.ln_pself);
+	}
+	assert(i == self->v_recent_size);
+}
+#endif /* !NDEBUG */
 
 /* Indicate that `self' has been used recently, allowing the path to be cached
  * such that it will remain allocated for a while, even when not referenced elsewhere.
@@ -1671,12 +1694,17 @@ NOTHROW(KCALL path_recent)(struct path *__restrict self) {
 		goto done;
 	if (sync_trywrite(&v->v_recent_lock)) {
 		COMPILER_READ_BARRIER();
+		vfs_assert_recent_integrity(v);
 		if (self->p_recent.ln_pself == NULL) {
+			incref(self);
 			if (v->v_recent_size < v->v_recent_limit) {
+				assert((v->v_recent_list != NULL) ==
+				       (v->v_recent_back != NULL));
 				LLIST_INSERT(v->v_recent_list, self, p_recent);
-				if (!v->v_recent_back)
+				if (!v->v_recent_back) {
+					assert(!v->v_recent_size);
 					v->v_recent_back = self;
-				incref(self);
+				}
 				++v->v_recent_size;
 			} else {
 				struct path *oldest_path;
@@ -1685,25 +1713,58 @@ NOTHROW(KCALL path_recent)(struct path *__restrict self) {
 				assert(oldest_path != NULL);
 				if unlikely(v->v_recent_back == v->v_recent_list) {
 					assert(v->v_recent_limit == 1);
-					v->v_recent_list = v->v_recent_back = self;
-					self->p_recent.ln_pself             = &v->v_recent_list;
-					self->p_recent.ln_next              = NULL;
+					v->v_recent_list        = self;
+					v->v_recent_back        = self;
+					self->p_recent.ln_pself = &v->v_recent_list;
+					self->p_recent.ln_next  = NULL;
 				} else {
-					v->v_recent_back = COMPILER_CONTAINER_OF(oldest_path->p_recent.ln_pself,
-					                                         struct path, p_recent.ln_next);
-					assert(v->v_recent_back->p_recent.ln_next == oldest_path);
-					v->v_recent_back->p_recent.ln_next = NULL;
+					struct path *prev;
+					assert(oldest_path->p_recent.ln_pself != &v->v_recent_list);
+					prev = COMPILER_CONTAINER_OF(oldest_path->p_recent.ln_pself,
+					                             struct path, p_recent.ln_next);
+					v->v_recent_back = prev;
+					assert(prev->p_recent.ln_next == oldest_path);
+					prev->p_recent.ln_next = NULL;
 					LLIST_INSERT(v->v_recent_list, self, p_recent);
 				}
+				oldest_path->p_recent.ln_pself = NULL;
+#ifndef NDEBUG
+				memset(&oldest_path->p_recent.ln_next, 0xcc,
+				       sizeof(oldest_path->p_recent.ln_next));
+#endif /* !NDEBUG */
+				vfs_assert_recent_integrity(v);
 				sync_endwrite(&v->v_recent_lock);
 				decref(oldest_path);
 				goto done;
 			}
 		} else {
+			assertf(getrefcnt(self) >= 2,
+			        "+1: Reference held by the caller\n"
+			        "+1: Reference stored in the recent cache");
 			/* Bring this path back to the front. */
+			if unlikely(self == v->v_recent_back) {
+				/* Handle the special case where the path
+				 * was at the back of the recent-cache. */
+				struct path *prev;
+				assert(self->p_recent.ln_next == NULL);
+				assert((self == v->v_recent_list) ==
+				       (self->p_recent.ln_pself == &v->v_recent_list));
+				if unlikely(self == v->v_recent_list)
+					goto done_bring_to_front;
+				/* Make the predecessor the last element.
+				 * NOTE: The next-link of the predecessor will be
+				 *       cleared by the call to `LLIST_REMOVE()'! */
+				assert(self->p_recent.ln_pself != &v->v_recent_list);
+				prev = COMPILER_CONTAINER_OF(self->p_recent.ln_pself,
+				                             struct path, p_recent.ln_next);
+				assert(prev != self);
+				v->v_recent_back = prev;
+			}
 			LLIST_REMOVE(self, p_recent);
 			LLIST_INSERT(v->v_recent_list, self, p_recent);
 		}
+done_bring_to_front:
+		vfs_assert_recent_integrity(v);
 		sync_endwrite(&v->v_recent_lock);
 	}
 done:
@@ -1717,6 +1778,7 @@ NOTHROW(KCALL path_recent_clear)(struct vfs *__restrict v) {
 		REF struct path *p;
 		if (!sync_trywrite(&v->v_recent_lock))
 			break;
+		vfs_assert_recent_integrity(v);
 		p = v->v_recent_list;
 		if (!p) {
 			assert(!v->v_recent_back);
@@ -1726,14 +1788,23 @@ NOTHROW(KCALL path_recent_clear)(struct vfs *__restrict v) {
 		}
 		/* Remove the path from the recent-path cache. */
 		v->v_recent_list = p->p_recent.ln_next;
-		if (!v->v_recent_list)
+		if (!v->v_recent_list) {
+			assert(v->v_recent_back == p);
 			v->v_recent_back = NULL;
+		} else {
+			assert(v->v_recent_back != p);
+			v->v_recent_list->p_recent.ln_pself = &v->v_recent_list;
+		}
 		assert(v->v_recent_size);
 		--v->v_recent_size;
 		assert((v->v_recent_size != 0) == (v->v_recent_list != NULL));
 		assert((v->v_recent_size != 0) == (v->v_recent_back != NULL));
-		p->p_recent.ln_next  = NULL;
 		p->p_recent.ln_pself = NULL;
+#ifndef NDEBUG
+		memset(&p->p_recent.ln_next, 0xcc,
+		       sizeof(p->p_recent.ln_next));
+#endif /* !NDEBUG */
+		vfs_assert_recent_integrity(v);
 		sync_endwrite(&v->v_recent_lock);
 		decref(p);
 	}
