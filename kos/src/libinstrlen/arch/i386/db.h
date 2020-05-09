@@ -105,19 +105,25 @@ local opcodes: {int: string | HashSet with string} = Dict();
 		final local SUFFIX = "]]]*" "/";
 		l = l.strip();
 		if (l.startswith(PREFIX) && l.endswith(SUFFIX)) {
-			l = l[#PREFIX:-#SUFFIX];
+			l = l[#PREFIX:-#SUFFIX].strip();
 			if (opbase is none) {
 				if (!l.startswith("start:"))
 					continue;
 				l = l[6:];
 				opbase = markers.get(l);
 			} else {
+				final local PREFIX_VIRTUAL = "virtual:";
+				if (l.startswith(PREFIX_VIRTUAL)) {
+					l = l[#PREFIX_VIRTUAL:].lstrip();
+					goto got_line;
+				}
 				if (!l.startswith("end:"))
 					continue;
 				opbase = none;
 			}
 			continue;
 		}
+got_line:
 		if (opbase is none)
 			continue;
 		local opcode, decl;
@@ -491,7 +497,7 @@ if (common_0f3a !is none)
 
 	/* 000f00-000fff */
 	/*00*/ LINE(I_RM,  I_RM,  I_RM,  I_RM,  I_UD,  I_0,   I_0,   I_0),
-	/*08*/ LINE(I_0,   I_0,   I_0,   I_0,   I_UD,  I_RM,  I_0,   I_UD),
+	/*08*/ LINE(I_0,   I_0,   I_0,   I_0,   I_UD,  I_RM,  I_0,   I_RM1),
 	/*10*/ LINE(I_RM,  I_RM,  I_RM,  I_RM,  I_RM,  I_RM,  I_RM,  I_RM),
 	/*18*/ LINE(I_RM,  I_UD,  I_RM,  I_RM,  I_RM,  I_UD,  I_RM,  I_RM),
 	/*20*/ LINE(I_RM,  I_RM,  I_RM,  I_RM,  I_RM,  I_UD,  I_RM,  I_UD),

@@ -1942,6 +1942,8 @@ PRIVATE struct instruction const ops_0f[] = {
 
 	I(0x0e, 0,                "femms"), /* https://sandpile.org/x86/opc_k3d.htm */
 
+	/*[[[virtual:I(0x0f, IF_MODRM, "3dnow\t" OP_U8 OP_RMxx OP_Rxx)]]]*/
+
 	/* TODO: 0x0f0f is an instruction:
 	 * >> I(0x0f, IF_MODRM, "3dnow\t" OP_U8 OP_RMxx OP_Rxx),
 	 * Where OP_U8 is the actual opcode byte.
