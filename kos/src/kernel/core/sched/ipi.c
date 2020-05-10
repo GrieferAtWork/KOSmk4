@@ -556,7 +556,7 @@ unset_waking:
 			if ((flags & TASK_WAKE_FHIGHPRIO) &&
 			    mycpu->c_override != caller) {
 				/* End the current quantum prematurely. */
-				cpu_quantum_end_nopr();
+				cpu_quantum_end_nopr(caller, thread);
 				/* Directly switch execution to the thread in question,
 				 * immediately allowing it to resume executing. */
 				mycpu->c_current = thread;
@@ -730,10 +730,12 @@ again_already_disabled:
 				 * is doing is serving a call to something like `nanosleep()',
 				 * while no other threads are running anywhere on the system. */
 				cpu_disable_preemptive_interrupts_nopr();
+				me->c_override = &FORCPU(me, thiscpu_idle);
 				PREEMPTION_ENABLE();
 				did_time_out = (*rtc->rc_waitfor)(rtc, &timeout);
 				decref_unlikely(rtc);
 				PREEMPTION_DISABLE();
+				me->c_override = NULL;
 				cpu_enable_preemptive_interrupts_nopr();
 				PREEMPTION_ENABLE();
 				if (!did_time_out)
@@ -764,8 +766,14 @@ do_idle_wait:
 #endif /* !CONFIG_NO_SMP */
 	{
 		cpu_disable_preemptive_interrupts_nopr();
+		/* Prevent execution to yield to anyone other than us!
+		 * We can't have the system accidentally switch to a
+		 * user-space thread with preemptive interrupts disabled */
+		me->c_override = &FORCPU(me, thiscpu_idle);
 		/* Wait for a single interrupt */
 		PREEMPTION_ENABLE_WAIT_DISABLE();
+		assert(me->c_override == &FORCPU(me, thiscpu_idle));
+		me->c_override = NULL;
 		cpu_enable_preemptive_interrupts_nopr();
 	}
 	goto again_already_disabled;
@@ -778,7 +786,8 @@ yield_and_return:
 		goto again;
 	}
 	/* End the current quantum prematurely. */
-	cpu_quantum_end_nopr();
+	cpu_quantum_end_nopr(&FORCPU(me, thiscpu_idle),
+	                     FORCPU(me, thiscpu_idle).t_sched.s_running.sr_runnxt);
 	/* Remove the IDLE thread from the running-ring. */
 	cpu_assert_integrity();
 	me->c_current = FORCPU(me, thiscpu_idle).t_sched.s_running.sr_runnxt;
@@ -918,7 +927,7 @@ done_pop_preemption:
 			if ((flags & TASK_START_FHIGHPRIO) &&
 			    mycpu->c_override != caller) {
 				/* End the current quantum prematurely. */
-				cpu_quantum_end_nopr();
+				cpu_quantum_end_nopr(caller, thread);
 				/* Directly switch execution to the new thread,
 				 * immediately allowing it to start executing. */
 				mycpu->c_current = thread;

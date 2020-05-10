@@ -302,6 +302,8 @@ INTERN_FUNCTION(X86_ASMSYSCALL64(sched_yield))
 	movq   %rsp, this_sched_state(%rbx)
 
 	/* Prematurely end the current quantum */
+	movq   %rbx, %rdi /* current */
+	movq   %rbp, %rsi /* next */
 	EXTERN(cpu_quantum_end_nopr)
 	call   cpu_quantum_end_nopr
 

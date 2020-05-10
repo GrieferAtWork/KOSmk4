@@ -106,6 +106,14 @@ PRIVATE ATTR_PERCPU struct cpu_timestamp thiscpu_last_resync = {
 
 typedef __CRT_PRIVATE_SINT(__SIZEOF_JTIME_T__) signed_jtime_t;
 
+/* Perform for task activity by logging a switch from
+ * `oldthread' to `newthread' taking place at the specified time. */
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(KCALL cpu_account_activity)(struct task *__restrict oldthread,
+                                    struct task *__restrict newthread,
+                                    jtime_t switch_jtime,
+                                    quantum_diff_t switch_qtime,
+                                    quantum_diff_t switch_qsize);
 
 
 /* Call `arch_cpu_update_quantum_length_nopr()' and add its return value to
@@ -199,14 +207,14 @@ NOTHROW(FCALL calculate_new_qsize)(quantum_diff_t old_qsize,
 }
 
 
-/* WARNING: This function may reset the current quantum! */
+/* Perform a realtime re-sync.
+ * WARNING: This function may reset the current quantum! */
 PRIVATE NOBLOCK NOPREEMPT void
 NOTHROW(FCALL cpu_resync_realtime)(struct cpu *__restrict me,
                                    struct timespec const *__restrict nts_realtime,
                                    struct realtime_clock_struct *__restrict nts_rtc,
                                    jtime_t nts_jtime, quantum_diff_t nts_qelapsed,
                                    bool log_messages) {
-	/* Try to perform a realtime re-sync. */
 	struct cpu_timestamp nts; /* NewTimeStamp */
 	struct cpu_timestamp ots; /* OldTimeStamp */
 	struct timespec cpu_realtime;
@@ -555,6 +563,50 @@ NOTHROW(FCALL cpu_resync_realtime_chk)(struct cpu *__restrict me,
 }
 #endif /* !NDEBUG */
 
+PRIVATE NOBLOCK NOPREEMPT void
+NOTHROW(FCALL cpu_resync_realtime_at)(struct cpu *__restrict me,
+                                      jtime_t nts_jtime,
+                                      quantum_diff_t nts_qelapsed,
+                                      bool log_messages) {
+	REF struct realtime_clock_struct *rtc;
+	rtc = realtime_clock.get_nopr();
+	if likely(rtc) {
+		struct timespec rtc_now;
+		rtc_now = (*rtc->rc_gettime)(rtc);
+		cpu_resync_realtime(me,
+		                    &rtc_now,
+		                    rtc,
+		                    nts_jtime,
+		                    nts_qelapsed,
+		                    log_messages);
+		decref_unlikely(rtc);
+	}
+}
+
+#ifdef NDEBUG
+#define cpu_resync_realtime_chk_at cpu_resync_realtime_at
+#else /* NDEBUG */
+PRIVATE NOBLOCK NOPREEMPT void
+NOTHROW(FCALL cpu_resync_realtime_chk_at)(struct cpu *__restrict me,
+                                          jtime_t nts_jtime,
+                                          quantum_diff_t nts_qelapsed,
+                                          bool log_messages) {
+	REF struct realtime_clock_struct *rtc;
+	rtc = realtime_clock.get_nopr();
+	if likely(rtc) {
+		struct timespec rtc_now;
+		rtc_now = (*rtc->rc_gettime)(rtc);
+		cpu_resync_realtime_chk(me,
+		                        &rtc_now,
+		                        rtc,
+		                        nts_jtime,
+		                        nts_qelapsed,
+		                        log_messages);
+		decref_unlikely(rtc);
+	}
+}
+#endif /* !NDEBUG */
+
 
 /* Returns the number of ticks that have passed since the start
  * of the current quantum. - The true current CPU-local time
@@ -577,6 +629,20 @@ NOTHROW(FCALL cpu_quantum_elapsed_nopr)(struct cpu *__restrict me,
 		FORCPU(me, thiscpu_jiffi_pending) = true;
 		++FORCPU(me, thiscpu_jiffies);
 		++jtime;
+		if ((jtime % CPU_RESYNC_DELAY_IN_TICKS) == 0) {
+			/* Can't call `cpu_resync_realtime_chk_at()' here, because that
+			 * would form a loop:
+			 *    cpu_quantum_elapsed_nopr() calls:
+			 *    cpu_resync_realtime_at()   calls:
+			 *    realtime()                 calls:
+			 *    cpu_quantum_elapsed_nopr() calls:
+			 *    ...
+			 */
+			cpu_resync_realtime_at(me,
+			                       jtime,
+			                       qtime,
+			                       false);
+		}
 	}
 	FORCPU(me, thiscpu_last_qtime_q) = qtime;
 	FORCPU(me, thiscpu_last_qtime_j) = jtime;
@@ -591,7 +657,7 @@ NOTHROW(FCALL cpu_quantum_elapsed_nopr)(struct cpu *__restrict me,
  * >> timeout <= (cpu_jtime + 1) * cpu_qsize +
  * >>            thiscpu_quantum_offset +
  * >>            cpu_qelapsed; */
-PRIVATE NOBLOCK NONNULL((1)) void
+PRIVATE NOPREEMPT NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL cpu_timeout_sleeping_threads)(struct cpu *__restrict me,
                                             jtime_t cpu_jtime,
                                             quantum_diff_t cpu_qelapsed) {
@@ -672,8 +738,13 @@ NOTHROW(FCALL cpu_scheduler_interrupt)(struct cpu *__restrict me,
                                        struct task *__restrict thread) {
 	/* NOTE: Preemption is disabled while we're in here! */
 	struct task *next;
-	jtime_t /*  */ cpu_jtime;   /* J-time */
+	jtime_t /*  */ cpu_jtime; /* J-time */
 	quantum_diff_t cpu_qelps; /* Quantum-elapsed */
+#ifndef NDEBUG
+	struct timespec before;
+	struct timespec after;
+	before = realtime();
+#endif /* !NDEBUG */
 
 	assertf(thread == me->c_current,
 	        "thread        = %p\n"
@@ -717,6 +788,15 @@ do_resync_rtc:
 		}
 		cpu_qelps = arch_cpu_quantum_elapsed_nopr(me);
 	}
+#ifndef NDEBUG
+	after = realtime();
+	assertf(before <= after || kernel_poisoned(),
+	        "Backwards realtime: { { %I64d, %Iu }, { %I64d, %Iu } } (diff: { %I64d, %Iu })\n",
+	        (s64)before.tv_sec, (uintptr_t)before.tv_nsec,
+	        (s64)after.tv_sec, (uintptr_t)after.tv_nsec,
+	        (s64)(before - after).tv_sec,
+	        (uintptr_t)(before - after).tv_nsec);
+#endif /* !NDEBUG */
 
 	/* Check for a scheduling override */
 	if unlikely((next = me->c_override) != NULL) {
@@ -729,6 +809,39 @@ do_resync_rtc:
 
 	/* Round-robbin-style next-thread select */
 	next = thread->t_sched.s_running.sr_runnxt;
+	
+	/* Account for time spent executing on behalf of `thread' */
+	if (next != thread->t_sched.s_running.sr_runnxt) {
+		quantum_diff_t cpu_qtime;
+		quantum_diff_t cpu_qoffs;
+		quantum_diff_t cpu_qsize;
+		cpu_qoffs = FORCPU(me, thiscpu_quantum_offset);
+		cpu_qsize = FORCPU(me, thiscpu_quantum_length);
+		if unlikely(OVERFLOW_UADD(cpu_qelps, cpu_qoffs, &cpu_qtime)) {
+			quantum_diff_t num_jiffies;
+			num_jiffies = ((quantum_diff_t)-1) / cpu_qsize;
+			cpu_jtime  += num_jiffies;
+			cpu_qtime  -= num_jiffies * cpu_qsize;
+		}
+		if (cpu_qtime >= cpu_qsize) {
+			cpu_jtime += cpu_qtime / cpu_qsize;
+			cpu_qtime = (cpu_qtime % cpu_qsize);
+		}
+		cpu_account_activity(thread, next,
+		                     cpu_jtime,
+		                     cpu_qtime,
+		                     cpu_qsize);
+	}
+#ifndef NDEBUG
+	before = after;
+	after = realtime();
+	assertf(before <= after || kernel_poisoned(),
+	        "Backwards realtime: { { %I64d, %Iu }, { %I64d, %Iu } } (diff: { %I64d, %Iu })\n",
+	        (s64)before.tv_sec, (uintptr_t)before.tv_nsec,
+	        (s64)after.tv_sec, (uintptr_t)after.tv_nsec,
+	        (s64)(before - after).tv_sec,
+	        (uintptr_t)(before - after).tv_nsec);
+#endif /* !NDEBUG */
 	return next;
 }
 
@@ -896,13 +1009,17 @@ PUBLIC NOBLOCK WUNUSED struct timespec NOTHROW(KCALL realtime)(void) {
  *       instead! */
 PRIVATE NOBLOCK NOPREEMPT NONNULL((1)) void
 NOTHROW(FCALL cpu_add_quantum_offset)(struct cpu *__restrict me,
-                                      quantum_diff_t elapsed) {
+                                      quantum_diff_t elapsed,
+                                      bool wakeup_threads /* TODO: Remove this argument */) {
+	jtime_t /*  */ old_jtime;
 	jtime_t /*  */ cpu_jtime;
 	quantum_diff_t cpu_qoffs;
 	quantum_diff_t cpu_qsize;
-	cpu_jtime = FORCPU(me, thiscpu_jiffies);
+	assert(!PREEMPTION_ENABLED());
+	old_jtime = FORCPU(me, thiscpu_jiffies);
 	cpu_qoffs = FORCPU(me, thiscpu_quantum_offset);
 	cpu_qsize = FORCPU(me, thiscpu_quantum_length);
+	cpu_jtime = old_jtime;
 	if unlikely(OVERFLOW_UADD(cpu_qoffs, elapsed, &cpu_qoffs)) {
 		quantum_diff_t num_jiffies;
 		num_jiffies = ((quantum_diff_t)-1) / cpu_qsize;
@@ -913,42 +1030,90 @@ NOTHROW(FCALL cpu_add_quantum_offset)(struct cpu *__restrict me,
 		cpu_jtime += cpu_qoffs / cpu_qsize;
 		cpu_qoffs = (cpu_qoffs % cpu_qsize);
 	}
+
 	/* Save the new jtime/quantum offset values. */
 	FORCPU(me, thiscpu_jiffies)        = cpu_jtime;
 	FORCPU(me, thiscpu_quantum_offset) = cpu_qoffs;
 	COMPILER_BARRIER();
+
+	/* If the jiffies counter got incremented, check if a realtime
+	 * re-sync was meant to take place during the time that passed.
+	 * If so, perform that re-sync now. */
+	if unlikely(cpu_jtime > old_jtime) {
+		if ((cpu_jtime / CPU_RESYNC_DELAY_IN_TICKS) !=
+		    (old_jtime / CPU_RESYNC_DELAY_IN_TICKS)) {
+			cpu_resync_realtime_chk_at(me,
+			                           cpu_jtime,
+			                           0,
+			                           false);
+		}
+	}
+
 	/* Wake up all sleeping threads
 	 * NOTE: For this purpose, use a quantum-elapsed value of 0,
 	 *       since the actual time that has already elapsed according
 	 *       to our caller was already added to the general quantum
 	 *       offset of the CPU. */
-	cpu_timeout_sleeping_threads(me, cpu_jtime, 0);
+	if (wakeup_threads)
+		cpu_timeout_sleeping_threads(me, cpu_jtime, 0);
 	COMPILER_BARRIER();
 }
 
 
 /* Prematurely end the current quantum, accounting its elapsed
- * time to `THIS_TASK', and starting a new quantum such that
- * the next scheduler interrupt will happen after a full quantum. */
-PUBLIC NOBLOCK NOPREEMPT void
-NOTHROW(KCALL cpu_quantum_end_nopr)(void) {
+ * time to `prev', and starting a new quantum such that the
+ * next scheduler interrupt will happen after a full quantum. */
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) void
+NOTHROW(FCALL cpu_quantum_end_nopr)(struct task *__restrict prev,
+                                    struct task *__restrict next) {
 	quantum_diff_t elapsed;
-	struct cpu *me = THIS_CPU;
+	struct cpu *me;
+#ifndef NDEBUG
+	struct timespec after;
+	struct timespec before;
+	before = realtime();
+#endif /* !NDEBUG */
+	me = prev->t_cpu;
+	assert(prev != next);
+	assert(me == THIS_CPU);
+	assert(me == next->t_cpu);
 
 	/* Atomically (or near atomically) figure out how much
 	 * time has already elapsed, and reset the quantum. */
 	elapsed = arch_cpu_quantum_elapsed_and_reset_nopr(me);
-
-	/* Account for the time spend in the previous quantum.
-	 * Must be done to ensure proper time-keeping, as well
-	 * as prevent the realtime() clock from running backwards! */
-	cpu_add_quantum_offset(me, elapsed);
 
 	/* Reset the last-quantum cache to prevent an incorrect overrun
 	 * from being detected when the quantum-elapsed counter was in
 	 * fact only lowered because the quantum got reset manually. */
 	FORCPU(me, thiscpu_last_qtime_q) = 0;
 	FORCPU(me, thiscpu_last_qtime_j) = 0;
+
+	/* Account for the time spend in the previous quantum.
+	 * Must be done to ensure proper time-keeping, as well
+	 * as prevent the realtime() clock from running backwards! */
+	/* TODO: Allow this call to wake up threads, and change `cpu_quantum_end_nopr()'
+	 *       to be the function to select the next thread to-be executed in case of
+	 *       a yield-style preemption:
+	 * >> ATTR_RETNONNULL NONNULL((1)) WUNUSED struct task *
+	 * >> NOTHROW(FCALL cpu_quantum_end_nopr)(struct task *__restrict caller); */
+	cpu_add_quantum_offset(me, elapsed, false);
+
+	/* Account for time spent executing in `prev',
+	 * and remember when execution began in `next' */
+	cpu_account_activity(prev, next,
+	                     FORCPU(me, thiscpu_jiffies),
+	                     FORCPU(me, thiscpu_quantum_offset),
+	                     FORCPU(me, thiscpu_quantum_length));
+
+#ifndef NDEBUG
+	after = realtime();
+	assertf(before <= after || kernel_poisoned(),
+	        "Backwards realtime: { { %I64d, %Iu }, { %I64d, %Iu } } (diff: { %I64d, %Iu })\n",
+	        (s64)before.tv_sec, (uintptr_t)before.tv_nsec,
+	        (s64)after.tv_sec, (uintptr_t)after.tv_nsec,
+	        (s64)(before - after).tv_sec,
+	        (uintptr_t)(before - after).tv_nsec);
+#endif /* !NDEBUG */
 }
 
 
@@ -975,22 +1140,35 @@ NOTHROW(KCALL cpu_disable_preemptive_interrupts_nopr)(void) {
 	/* Figure out how much of the current quantum has already elapsed. */
 	elapsed = arch_cpu_quantum_elapsed_nopr(me);
 
+	/* Disable preemptive interrupts. */
+	arch_cpu_disable_preemptive_interrupts_nopr(me);
+
 	/* Deal with quantum roll-over */
 	if (elapsed < FORCPU(me, thiscpu_last_qtime_q) &&
 		FORCPU(me, thiscpu_jiffies) == FORCPU(me, thiscpu_last_qtime_j)) {
+		jtime_t cpu_jtime;
 		FORCPU(me, thiscpu_jiffi_pending) = true;
-		++FORCPU(me, thiscpu_jiffies);
+		cpu_jtime = ++FORCPU(me, thiscpu_jiffies);
+		if ((cpu_jtime % CPU_RESYNC_DELAY_IN_TICKS) == 0) {
+			/* Can't call `cpu_resync_realtime_chk_at()', because
+			 * the current realtime is inconsistent until we've
+			 * cleared the last-quantum cache fields below.
+			 * Additionally, there's no need to use the chk-variant,
+			 * since we do our own realtime-consistency assertion! */
+			cpu_resync_realtime_at(me,
+			                       cpu_jtime,
+			                       elapsed,
+			                       false);
+		}
 	}
 
-	/* Once preemptive interrupts are disabled, `arch_cpu_quantum_elapsed_nopr()'
+	/* When preemptive interrupts are disabled, `arch_cpu_quantum_elapsed_nopr()'
 	 * will always return 0. - Reset the last-quantum cache to prevent an incorrect
 	 * quantum overrun from being detected as the result of the elapsed counter
 	 * being (permanently, at least for the time being) reset to 0. */
 	FORCPU(me, thiscpu_last_qtime_q) = 0;
 	FORCPU(me, thiscpu_last_qtime_j) = 0;
 
-	/* Disable preemptive interrupts. */
-	arch_cpu_disable_preemptive_interrupts_nopr(me);
 #ifndef NDEBUG
 	if (!kernel_poisoned()) {
 		quantum_diff_t new_elapsed;
@@ -1004,8 +1182,10 @@ NOTHROW(KCALL cpu_disable_preemptive_interrupts_nopr)(void) {
 		        (int)FORCPU(me, arch_cpu_preemptive_interrupts_disabled));
 	}
 #endif /* !NDEBUG */
+
 	/* Account for the elapsed time. */
-	cpu_add_quantum_offset(me, elapsed);
+	cpu_add_quantum_offset(me, elapsed, true);
+
 #ifndef NDEBUG
 	after = realtime();
 	assertf(before <= after || kernel_poisoned(),
@@ -1027,13 +1207,14 @@ NOTHROW(KCALL cpu_enable_preemptive_interrupts_nopr)(void) {
 	before = realtime();
 #endif /* !NDEBUG */
 	assert(!PREEMPTION_ENABLED() || kernel_poisoned());
+	me = THIS_CPU;
 	/* Mark the last RTC re-sync timestamp as invalid, since
 	 * with preemptive interrupts being re-enabled, we have
 	 * no idea how much realtime has passed since they've
 	 * been disabled (and as such: we must force a re-sync
 	 * the next time a call to `realtime()' is made) */
-	me                                     = THIS_CPU;
 	FORCPU(me, thiscpu_last_resync.ct_rtc) = NULL;
+
 	/* Actually re-enable preemptive interrupts. */
 	arch_cpu_enable_preemptive_interrupts_nopr(me);
 #ifndef NDEBUG
@@ -1066,8 +1247,8 @@ NOTHROW(KCALL cpu_set_quantum_length)(quantum_diff_t cpu_qsize) {
 		struct timespec rtc_now;
 		cpu_qoffs = FORCPU(me, thiscpu_quantum_offset);
 		COMPILER_BARRIER();
-		cpu_qtime = cpu_quantum_elapsed_nopr(me, &cpu_jtime);
 		rtc_now   = (*rtc->rc_gettime)(rtc);
+		cpu_qtime = cpu_quantum_elapsed_nopr(me, &cpu_jtime);
 		COMPILER_BARRIER();
 		decref_unlikely(rtc);
 		if unlikely(OVERFLOW_UADD(cpu_qtime, cpu_qoffs, &cpu_qtime)) {
@@ -1097,7 +1278,8 @@ NOTHROW(KCALL cpu_set_quantum_length)(quantum_diff_t cpu_qsize) {
 
 
 
-PUBLIC NOBLOCK WUNUSED qtime_t
+/* Returns the cpu-local quantum time. */
+PUBLIC NOBLOCK WUNUSED qtime_t /* TODO: Remove this function */
 NOTHROW(KCALL cpu_quantum_time)(void) {
 	qtime_t result;
 	struct cpu *me;
@@ -1160,7 +1342,6 @@ NOTHROW(KCALL cpu_quantum_time)(void) {
 PUBLIC bool NOTHROW(FCALL task_sleep)(struct timespec const *abs_timeout) {
 	struct task *me = THIS_TASK;
 	struct cpu *mycpu;
-	cpu_assert_integrity();
 	if (abs_timeout) {
 		struct timespec now;
 		struct timespec offset_from_now;
@@ -1169,7 +1350,14 @@ PUBLIC bool NOTHROW(FCALL task_sleep)(struct timespec const *abs_timeout) {
 		if (!abs_timeout->tv_sec && !abs_timeout->tv_nsec)
 			goto do_return_false;
 		PREEMPTION_DISABLE();
-		/* TODO: This time conversion should be done better! */
+		/* TODO: This time conversion should be done better!
+		 *       Also: Why not make it so that thread timeouts
+		 *             are stored as actual timespec structures?
+		 *             That way, we don't have to convert anything here,
+		 *             and timeouts wouldn't be affected by preemptive
+		 *             interrupts getting disabled in the mean time, or
+		 *             even more importantly: the thread being off-loaded
+		 *             to a different CPU! */
 		now       = realtime();
 		now_qtime = cpu_quantum_time();
 		if (*abs_timeout <= now)
@@ -1192,8 +1380,6 @@ do_return_false:
 		me->t_sched.s_asleep.ss_timeout.q_qsize = 1;
 		PREEMPTION_DISABLE();
 	}
-	/* End the current quantum prematurely. */
-	cpu_quantum_end_nopr();
 
 	mycpu = me->t_cpu;
 	cpu_assert_running(me);
@@ -1203,6 +1389,8 @@ do_return_false:
 	/* The caller is the only thread hosted by this cpu. */
 	if likely(me->t_sched.s_running.sr_runnxt == me) {
 		struct task *idle;
+		assert(me->t_sched.s_running.sr_runprv == me);
+
 		/* Special case: blocking call made by the IDLE thread. */
 		if unlikely(me == &FORCPU(mycpu, thiscpu_idle)) {
 wait_a_bit:
@@ -1211,8 +1399,12 @@ wait_a_bit:
 			/* Indicate a sporadic wake-up. */
 			return false;
 		}
-		/* Check if the IDLE thread had been sleeping. */
 		idle = &FORCPU(mycpu, thiscpu_idle);
+		/* End the current quantum prematurely. */
+		cpu_quantum_end_nopr(me, idle);
+		assert(me->t_sched.s_running.sr_runnxt == me);
+		assert(me->t_sched.s_running.sr_runprv == me);
+		/* Check if the IDLE thread had been sleeping. */
 		if (idle->t_sched.s_asleep.ss_pself) {
 			/* The IDLE thread had been sleeping (time it out) */
 			ATOMIC_FETCHOR(idle->t_flags, TASK_FTIMEOUT);
@@ -1232,6 +1424,10 @@ wait_a_bit:
 		assert(next->t_sched.s_running.sr_runprv == me);
 		assert(prev != me);
 		assert(next != me);
+
+		/* End the current quantum prematurely. */
+		cpu_quantum_end_nopr(me, next);
+
 		mycpu->c_current = next;
 		next->t_sched.s_running.sr_runprv = prev;
 		prev->t_sched.s_running.sr_runnxt = next;
@@ -1260,6 +1456,148 @@ wait_a_bit:
 	return true;
 }
 
+
+
+/* Return the current quantum tick for the calling CPU
+ * This quantum tick is the most precise unit of measurement available
+ * within the KOS kernel, being at least as precise than `realtime()'.
+ * Quantum ticks increase all the time so-long as preemptive interrupts
+ * as enabled (i.e. the quantum tick doesn't change after a call to
+ * `cpu_disable_preemptive_interrupts_nopr()')
+ * Note that the actual point in time to which a quantum tick is the
+ * result of the division of `return.qt_tick / return.qt_freq', as done
+ * with infinite-precision floating point arithmetic.
+ * Note that this function returns a value that is per-cpu, and as such
+ * prone to inconsistencies when the calling thread is moved between
+ * different CPUs. A similar, thread-consistent counter can be accessed
+ * through `task_quantum_tick()', which returns a thread-local quantum
+ * tick representing the # of time spent executing code in the context
+ * of that thread. */
+PUBLIC NOBLOCK WUNUSED ATTR_PURE struct qtick
+NOTHROW(KCALL cpu_quantum_tick)(void) {
+	struct qtick result;
+	pflag_t was;
+	was    = PREEMPTION_PUSHOFF();
+	result = cpu_quantum_tick_nopr();
+	PREEMPTION_POP(was);
+	return result;
+}
+
+PUBLIC NOBLOCK NOPREEMPT WUNUSED ATTR_PURE struct qtick
+NOTHROW(KCALL cpu_quantum_tick_nopr)(void) {
+	struct qtick result;
+	struct cpu *me;
+	jtime_t /*  */ cpu_jtime;
+	quantum_diff_t cpu_qtime;
+	assert(!PREEMPTION_ENABLED());
+	me = THIS_CPU;
+	COMPILER_BARRIER();
+	result.qt_freq = FORCPU(me, thiscpu_quantum_length);
+	result.qt_tick = FORCPU(me, thiscpu_quantum_offset);
+	cpu_qtime      = cpu_quantum_elapsed_nopr(me, &cpu_jtime);
+	COMPILER_BARRIER();
+	result.qt_tick += cpu_qtime;
+	result.qt_tick += cpu_jtime * result.qt_freq;
+	return result;
+}
+
+
+/* Amount of time spent executing code in the context of the calling thread. */
+PRIVATE ATTR_PERTASK struct qtick this_quantum_spent = { 0, 1 };
+
+/* Quantum time at the start of the calling thread's current quantum. */
+PRIVATE ATTR_PERTASK struct qtick this_quantum_start = { 0, 1 };
+
+
+/* Perform for task activity by logging a switch from
+ * `oldthread' to `newthread' taking place at the specified time. */
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(KCALL cpu_account_activity)(struct task *__restrict oldthread,
+                                    struct task *__restrict newthread,
+                                    jtime_t switch_jtime,
+                                    quantum_diff_t switch_qtime,
+                                    quantum_diff_t switch_qsize) {
+	struct qtick now;
+	struct qtick start;
+	struct qtick passed;
+	now.qt_tick = (u64)switch_jtime * switch_qsize + switch_qtime;
+	now.qt_freq = switch_qsize;
+	FORTASK(newthread, this_quantum_start) = now;
+	start = FORTASK(oldthread, this_quantum_start);
+	/* Figure out how much time was spent in `oldthread'. */
+	passed = now - start;
+	FORTASK(oldthread, this_quantum_spent) += passed;
+}
+
+/* Return the amount of time that has been spent executing code in the
+ * context of the calling thread. */
+PUBLIC NOBLOCK WUNUSED ATTR_PURE struct qtick
+NOTHROW(KCALL task_quantum_tick)(void) {
+	pflag_t was;
+	struct task *mythread;
+	struct qtick start, spent, now;
+	mythread = THIS_TASK;
+	was = PREEMPTION_PUSHOFF();
+	COMPILER_BARRIER();
+	now   = cpu_quantum_tick_nopr();
+	start = FORTASK(mythread, this_quantum_spent);
+	spent = FORTASK(mythread, this_quantum_start);
+	COMPILER_BARRIER();
+	PREEMPTION_POP(was);
+	/* Simply return: SPENT + (NOW - START) */
+	now -= start;
+	spent += now;
+	return spent;
+}
+
+/* Return the amount of time that has been spent executing code in the
+ * context of the given thread. */
+PUBLIC NOBLOCK WUNUSED ATTR_PURE struct qtick
+NOTHROW(KCALL task_quantum_tick_of)(struct task const *__restrict thread) {
+	struct qtick result;
+	if (thread == THIS_TASK) {
+		/* Special case: Calling thread */
+		result = task_quantum_tick();
+	} else {
+		/* XXX: This read isn't atomic, but even disabling preemption
+		 *      doesn't guaranty a consistent value when `thread' is
+		 *      hosted by a different CPU...
+		 * -> There needs to be some sort of per-cpu counter that is
+		 *    incremented every time that `this_quantum_start' field
+		 *    of a hosted thread was modified.
+		 *    With such a field, we could:
+		 *      1: Disable preemption
+		 *      2: Check if `thread' is hosted by a different cpu:
+		 *         no.1: Simply read the `this_quantum_start' field
+		 *         no.2: Re-enable preemption
+		 *        yes.1: Atomically read the quantum-start-version field
+		 *        yes.2: Read the thread's `this_quantum_start' field
+		 *        yes.3: Memory barrier
+		 *        yes.4: Atomically re-read the quantum-start-version field
+		 *               If version changed: Go to set #yes.1
+		 *               If unchanged changed: Go to set #no.2
+		 */
+		result = FORTASK(thread, this_quantum_start);
+	}
+	return result;
+}
+
+
+/* Return the result of `(a * b) / c' */
+PUBLIC NOBLOCK ATTR_CONST u64
+NOTHROW(KCALL __umuldiv64)(u64 a, u32 b, u32 c) {
+	u64 result;
+	/* Simplify: (a * 4) / 2 == (b * 2) / 1 */
+	assert(c != 0);
+	while ((b & 1) == 0 &&
+	       (c & 1) == 0) {
+		b >>= 1;
+		c >>= 1;
+	}
+	if (!OVERFLOW_UMUL(a, b, &result))
+		return result / c;
+	assert_failed("TODO");
+}
 
 
 DECL_END

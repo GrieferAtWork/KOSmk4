@@ -108,6 +108,7 @@ struct task {
 			struct {
 				struct task    **ss_pself;   /* [lock(PRIVATE(t_cpu == THIS_CPU))][1..1][1..1] Timeout self-pointer. */
 				REF struct task *ss_tmonxt;  /* [lock(PRIVATE(t_cpu == THIS_CPU))][0..1] Sleeping task with the next greater timeout. */
+				/* TODO: Use a `struct timespec' for `ss_timeout' and finally get rid of `qtime_t'! */
 				qtime_t          ss_timeout; /* Absolute timeout when this task should resume execution, regardless of being re-scheduled as running.
 				                              * NOTE: This point in time refers to the cpu-local jiffi counter. */
 			} s_asleep;                      /* [valid_if(THIS_TASK in t_cpu->c_sleeping)] Sleeping-task chain */

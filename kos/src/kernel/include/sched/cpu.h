@@ -30,6 +30,7 @@
 
 #include <kos/jiffies.h>
 #include <kos/kernel/types.h>
+#include <hybrid/__overflow.h>
 
 #include <stdbool.h>
 
@@ -147,20 +148,118 @@ DATDEF ATTR_PERCPU quantum_diff_t volatile thiscpu_quantum_offset;
 DATDEF ATTR_PERCPU quantum_diff_t volatile thiscpu_quantum_length;
 
 /* Returns the cpu-local quantum time. */
-FUNDEF NOBLOCK WUNUSED qtime_t NOTHROW(KCALL cpu_quantum_time)(void);
+FUNDEF NOBLOCK WUNUSED qtime_t NOTHROW(KCALL cpu_quantum_time)(void); /* TODO: Remove this function */
 
-/* TODO: Instead of using `qtime_t' as timeout type in system APIs, make
- *       use of `realtime()' instead. Then, get rid of `cpu_quantum_time()'
- * As it stands right now, `cpu_quantum_time()' can't account for time spans
- * during which the boot cpu's clock is halted. */
+
+/* Return the result of `(a * b) / c' */
+FUNDEF NOBLOCK ATTR_CONST u64
+NOTHROW(KCALL __umuldiv64)(u64 a, u32 b, u32 c);
+LOCAL NOBLOCK ATTR_CONST u64
+NOTHROW(KCALL umuldiv64)(u64 a, u32 b, u32 c) {
+	u64 result;
+	if (!__hybrid_overflow_umul(a, b, &result))
+		return result / c;
+	return __umuldiv64(a, b, c);
+}
+
+
+struct qtick {
+	u64 qt_tick; /* # of quantum units of active execution time since system boot. */
+	u32 qt_freq; /* [!0] # of quantum units per 1/HZ second. */
+#ifdef __cplusplus
+	inline NOBLOCK struct qtick &KCALL
+	operator-=(struct qtick const &other) noexcept {
+		if likely(qt_freq == other.qt_freq) {
+			qt_tick -= other.qt_tick;
+		} else if (other.qt_tick != 0) {
+			u32 common_freq;
+			common_freq = (u32)(((u64)qt_freq + other.qt_freq) / 2);
+			qt_tick  = umuldiv64(qt_tick, common_freq, qt_freq);
+			qt_tick -= umuldiv64(other.qt_tick, common_freq, other.qt_freq);
+			qt_freq  = common_freq;
+		}
+		return *this;
+	}
+	inline NOBLOCK struct qtick &KCALL
+	operator+=(struct qtick const &other) noexcept {
+		if likely(qt_freq == other.qt_freq) {
+			qt_tick += other.qt_tick;
+		} else if (other.qt_tick != 0) {
+			u32 common_freq;
+			common_freq = (u32)(((u64)qt_freq + other.qt_freq) / 2);
+			qt_tick  = umuldiv64(qt_tick, common_freq, qt_freq);
+			qt_tick += umuldiv64(other.qt_tick, common_freq, other.qt_freq);
+			qt_freq  = common_freq;
+		}
+		return *this;
+	}
+	inline NOBLOCK WUNUSED struct qtick KCALL
+	operator-(struct qtick const &other) const noexcept {
+		struct qtick result = *this;
+		result -= other;
+		return result;
+	}
+	inline NOBLOCK WUNUSED struct qtick KCALL
+	operator+(struct qtick const &other) const noexcept {
+		struct qtick result = *this;
+		result += other;
+		return result;
+	}
+#endif /* __cplusplus */
+};
+
+/* Return the current quantum tick for the calling CPU
+ * This quantum tick is the most precise unit of measurement available
+ * within the KOS kernel, being at least as precise than `realtime()'.
+ * Quantum ticks increase all the time so-long as preemptive interrupts
+ * as enabled (i.e. the quantum tick doesn't change after a call to
+ * `cpu_disable_preemptive_interrupts_nopr()')
+ * Note that the actual point in time to which a quantum tick is the
+ * result of the division of `return.qt_tick / return.qt_freq', as done
+ * with infinite-precision floating point arithmetic.
+ * Note that this function returns a value that is per-cpu, and as such
+ * prone to inconsistencies when the calling thread is moved between
+ * different CPUs. A similar, thread-consistent counter can be accessed
+ * through `task_quantum_tick()', which returns a thread-local quantum
+ * tick representing the # of time spent executing code in the context
+ * of that thread. */
+FUNDEF NOBLOCK WUNUSED ATTR_PURE struct qtick
+NOTHROW(KCALL cpu_quantum_tick)(void);
+FUNDEF NOBLOCK NOPREEMPT WUNUSED ATTR_PURE struct qtick
+NOTHROW(KCALL cpu_quantum_tick_nopr)(void);
+
+/* Return the amount of time that has been spent executing code in the
+ * context of the calling thread. */
+FUNDEF NOBLOCK WUNUSED ATTR_PURE struct qtick
+NOTHROW(KCALL task_quantum_tick)(void);
+
+/* Return the amount of time that has been spent executing code in the
+ * context of the given thread. */
+FUNDEF NOBLOCK WUNUSED ATTR_PURE struct qtick
+NOTHROW(KCALL task_quantum_tick_of)(struct task const *__restrict thread);
+
 
 /* TODO: realtime() may change arbitrarily due to use of settimeofday()
  *       As such, KOS really needs some sort of `CLOCK_MONOTONIC' timer, which
  *       could easily be implemented in terms of the underlying implementation
  *       of `realtime()', with timeouts passed to the low-level `task_sleep()'
- *       function then relative to that clock! */
-
-
+ *       function then relative to that clock!
+ * Instead, there should be two functions:
+ *   - realtime(): Same as realtime() is right now, though doesn't
+ *                 necessarily have to match the actual current time,
+ *                 though will still increase at the same speed at
+ *                 all times, such that walltime() - realtime() remains
+ *                 consistent (so-long as both timestamps are read at
+ *                 exactly the same offset from each other)
+ *           Also: This kind of timer would not be (too) prone to timing
+ *                 differences between multiple CPUs (unlike `cpu_quantum_tick()'),
+ *                 in that the common base-line for realtime() is likely going
+ *                 to be time-since-boot
+ *   - walltime(): Return the actual, current wall-clock time.
+ *                 Pretty much exact what realtime() is right now:
+ *                 The actual, current time, as shown by a clock you
+ *                 may have hanging on some >>wall<<.
+ */
 
 /* Returns the current real time derived from the current CPU time.
  * If no realtime hardware is available, this clock may stop when
@@ -420,9 +519,11 @@ FUNDEF NOBLOCK NOPREEMPT void NOTHROW(KCALL cpu_disable_preemptive_interrupts_no
 FUNDEF NOBLOCK NOPREEMPT void NOTHROW(KCALL cpu_enable_preemptive_interrupts_nopr)(void);
 
 /* Prematurely end the current quantum, accounting its elapsed
- * time to `THIS_TASK', and starting a new quantum such that
- * the next scheduler interrupt will happen after a full quantum. */
-FUNDEF NOBLOCK NOPREEMPT void NOTHROW(KCALL cpu_quantum_end_nopr)(void);
+ * time to `prev', and starting a new quantum such that the
+ * next scheduler interrupt will happen after a full quantum. */
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) void
+NOTHROW(FCALL cpu_quantum_end_nopr)(struct task *__restrict prev,
+                                    struct task *__restrict next);
 
 /* Explicitly set the quantum length value for the calling CPU, and do an RTC
  * re-sync such that the given `cpu_qsize' appears to fit perfectly (at least

@@ -155,13 +155,15 @@ INTERN_FUNCTION(x86_idt_apic_ipi)
 
 	pushal_cfi_r
 
-	movl   %fs:0, %esi
+	movl   %fs:0, %ecx
 	EXTERN(this_cpu)
-	movl   this_cpu(%esi), %ebx
+	movl   this_cpu(%ecx), %ebx
 	EXTERN(this_sched_state)
-	movl   %esp, this_sched_state(%esi)
+	movl   %esp, this_sched_state(%ecx)
 
 	/* Prematurely end the current quantum */
+	EXTERN(this_sched_runnxt)
+	movl   this_sched_runnxt(%ecx), %edx
 	EXTERN(cpu_quantum_end_nopr)
 	call   cpu_quantum_end_nopr
 

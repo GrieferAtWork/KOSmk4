@@ -790,12 +790,12 @@ emulate_rdtscp(u32 *__restrict p_tsc_aux) {
 
 
 
-/* Emulation of the `rdtsc' instruction (cpu quantum time is the best we've got for this...) */
+/* Emulation of the `rdtsc' instruction */
 #if EMU86_EMULATE_CONFIG_WANT_RDTSC
 #define EMU86_EMULATE_RDTSC() emulate_rdtsc()
 PRIVATE u64 KCALL emulate_rdtsc(void) {
-	qtime_t now = cpu_quantum_time();
-	return (u64)((u64)now.q_jtime * now.q_qsize) + now.q_qtime;
+	struct timespec now = realtime();
+	return ((u64)now.tv_sec * __NSECS_PER_SEC) + now.tv_nsec;
 }
 #else /* EMU86_EMULATE_CONFIG_WANT_RDTSC */
 #define EMU86_EMULATE_RDTSC() DONT_USE

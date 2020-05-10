@@ -147,7 +147,7 @@ NOTHROW(KCALL task_redirect_usercode_rpc)(struct task *__restrict target, uintpt
 				target->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt = target->t_sched.s_running.sr_runnxt;
 				target->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv = target->t_sched.s_running.sr_runprv;
 insert_target_after_caller:
-				next   = caller->t_sched.s_running.sr_runnxt;
+				next = caller->t_sched.s_running.sr_runnxt;
 				target->t_sched.s_running.sr_runprv = caller;
 				target->t_sched.s_running.sr_runnxt = next;
 				caller->t_sched.s_running.sr_runnxt = target;
@@ -158,7 +158,7 @@ insert_target_after_caller:
 					if ((mode & TASK_RPC_FHIGHPRIO) &&
 					    IFELSE_SMP((*mycpu), _bootcpu).c_override != caller) {
 						/* End the current quantum prematurely. */
-						cpu_quantum_end_nopr();
+						cpu_quantum_end_nopr(caller, target);
 						/* Immediately switch to the next target thread. */
 						IFELSE_SMP((*mycpu), _bootcpu).c_current = target;
 						cpu_run_current_and_remember_nopr(caller);
@@ -266,7 +266,7 @@ insert_target_after_caller:
 					if ((mode & TASK_RPC_FHIGHPRIO) &&
 					    IFELSE_SMP((*mycpu), _bootcpu).c_override != caller) {
 						/* End the current quantum prematurely. */
-						cpu_quantum_end_nopr();
+						cpu_quantum_end_nopr(caller, target);
 						/* Immediately switch to the next target thread. */
 						IFELSE_SMP((*mycpu), _bootcpu).c_current = target;
 						cpu_run_current_and_remember_nopr(caller);
@@ -478,7 +478,7 @@ insert_target_after_caller:
 					if ((mode & TASK_RPC_FHIGHPRIO) &&
 					    mycpu->c_override != caller) {
 						/* End the current quantum prematurely. */
-						cpu_quantum_end_nopr();
+						cpu_quantum_end_nopr(caller, target);
 						/* Immediately switch to the next target thread. */
 						mycpu->c_current = target;
 						cpu_run_current_and_remember_nopr(caller);
@@ -702,7 +702,7 @@ insert_target_after_caller:
 					if ((mode & TASK_RPC_FHIGHPRIO) &&
 					    IFELSE_SMP((*mycpu), _bootcpu).c_override != caller) {
 						/* End the current quantum prematurely. */
-						cpu_quantum_end_nopr();
+						cpu_quantum_end_nopr(caller, target);
 						/* Immediately switch to the next target thread. */
 						IFELSE_SMP((*mycpu), _bootcpu).c_current = target;
 						cpu_run_current_and_remember_nopr(caller);

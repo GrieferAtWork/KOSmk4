@@ -526,7 +526,10 @@ NOTHROW(FCALL task_exit)(int w_status) {
 	cpu_assert_integrity();
 
 	/* Indicate the end of the current quantum. */
-	cpu_quantum_end_nopr();
+	cpu_quantum_end_nopr(caller,
+	                     caller->t_sched.s_running.sr_runnxt != caller
+	                     ? caller->t_sched.s_running.sr_runnxt
+	                     : &FORCPU(mycpu, thiscpu_idle));
 
 	if (caller->t_sched.s_running.sr_runnxt == caller) {
 		/* Last caller (load the IDLE caller now). */

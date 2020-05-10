@@ -63,6 +63,7 @@
 #include <format-printer.h>
 #include <malloc.h>
 #include <math.h>
+#include <pthread.h>
 #include <pty.h>
 #include <sched.h>
 #include <signal.h>
@@ -530,6 +531,28 @@ int main_dprint(int argc, char *argv[], char *envp[]) {
 
 
 /************************************************************************/
+PRIVATE void *main_yield_thread(void *UNUSED(arg)) {
+	for (;;)
+		pthread_yield();
+}
+
+int main_yield(int argc, char *argv[], char *envp[]) {
+	pthread_t pt;
+	(void)argc, (void)argv, (void)envp;
+	pthread_create(&pt, NULL, &main_yield_thread, NULL);
+	pthread_create(&pt, NULL, &main_yield_thread, NULL);
+	pthread_create(&pt, NULL, &main_yield_thread, NULL);
+	/* FIXME: CTRL+C killing this program won't kill the child threads :(
+	 * But on the bright side: realtime() timings are working correctly :D */
+	for (;;)
+		pthread_yield();
+	return 0;
+}
+/************************************************************************/
+
+
+
+/************************************************************************/
 static volatile u32 viovalue = 0;
 PRIVATE NONNULL((1)) u32 LIBVIO_CC
 myvio_readl(struct vio_args *__restrict args, vio_addr_t addr) {
@@ -614,6 +637,7 @@ PRIVATE DEF defs[] = {
 #ifdef HAVE_MAIN_SGBASE
 	{ "sgbase", &main_sgbase },
 #endif /* HAVE_MAIN_SGBASE */
+	{ "yield", &main_yield },
 	{ "vio", &main_vio },
 	{ NULL, NULL }
 };

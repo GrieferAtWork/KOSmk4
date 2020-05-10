@@ -59,15 +59,16 @@ NOTHROW(FCALL x86_syslog_sink_impl)(struct syslog_sink *__restrict UNUSED(self),
                                     unsigned int level) {
 	/* Write to a debug port. */
 	if (level < COMPILER_LENOF(level_prefix)) {
-		char ch, buf[64], *ptr;
+		char ch, buf[64];
 		struct tm t;
+		size_t len;
 		localtime_r(&packet->sp_time, &t);
 		/* Use ISO-8601-derived format (without the timezone; plus nanoseconds) */
-		ptr = buf + sprintf(buf, "[%.4u-%.2u-%.2uT%.2u:%.2u:%.2u.%.9" PRIu32 ":",
-		                    t.tm_year + 1900, t.tm_mon + 1, t.tm_mday,
-		                    t.tm_hour, t.tm_min, t.tm_sec,
-		                    packet->sp_nsec);
-		log_write(buf, (size_t)(ptr - buf));
+		len = sprintf(buf, "[%.4u-%.2u-%.2uT%.2u:%.2u:%.2u.%.9" PRIu32 ":",
+		              t.tm_year + 1900, t.tm_mon + 1, t.tm_mday,
+		              t.tm_hour, t.tm_min, t.tm_sec,
+		              packet->sp_nsec);
+		log_write(buf, len);
 		ch = packet->sp_msg[0];
 		log_write(level_prefix[level], ch == '[' ? 7 : 8);
 	}

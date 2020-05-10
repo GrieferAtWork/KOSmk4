@@ -165,12 +165,15 @@ INTERN_FUNCTION(x86_idt_apic_ipi)
 	ASM_PUSH_SGBASE_CFI_R
 	ASM_PUSH_SGREGS_CFI_R(%rax)
 
+	movq   %fs:0, %rdi
 	EXTERN(this_cpu)
-	movq   %gs:this_cpu, %rbx
+	movq   this_cpu(%rdi), %rbx
 	EXTERN(this_sched_state)
-	movq   %rsp, this_sched_state(%rsi)
+	movq   %rsp, this_sched_state(%rdi)
 
 	/* Prematurely end the current quantum */
+	EXTERN(this_sched_runnxt)
+	movq   this_sched_runnxt(%rdi), %rsi
 	EXTERN(cpu_quantum_end_nopr)
 	call   cpu_quantum_end_nopr
 

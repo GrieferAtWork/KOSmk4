@@ -344,6 +344,9 @@ PUBLIC_FUNCTION(task_yield)
 	movl   %esp, this_sched_state(%esi)
 
 	/* Prematurely end the current quantum */
+	movl   %esi, %ecx /* current */
+	movl   %edi, %edx /* next */
+	EXTERN(cpu_quantum_end_nopr)
 	call   cpu_quantum_end_nopr
 
 	/* Load the new CPU state */
