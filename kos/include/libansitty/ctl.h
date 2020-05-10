@@ -255,14 +255,16 @@
 
 
 /* Extended control options enable/disable */
-#define AC_DECCKM_ON  _AC_ESC "[?1h"  /* Cursor Keys Mode, send ESC O A for cursor up */
-#define AC_DECCKM_OFF _AC_ESC "[?1l"  /* Cursor keys send ANSI cursor position commands */
+#define AC_DECCKM_ON  _AC_ESC "[?1h"  /* Cursor Keys Mode, send ESC O A for cursor up (applicator cursor keys mode) */
+#define AC_DECCKM_OFF _AC_ESC "[?1l"  /* Cursor keys send ANSI cursor position commands (normal cursor keys mode) */
 #define AC_DECANM_ON  _AC_ESC "[?2h"  /* Disable `VT52' compatibility mode */
 #define AC_DECANM_OFF _AC_ESC "[?2l"  /* Enable `VT52' compatibility mode */
 #define AC_DECAWM_ON  _AC_ESC "[?7h"  /* Automatic line-feed once right side of terminal is reached */
 #define AC_DECAWM_OFF _AC_ESC "[?7l"  /* Cursor remains at end of line after right side of terminal is reached */
 #define AC_SHOWCURSOR _AC_ESC "[?25h" /* Show text mode cursor */
 #define AC_HIDECURSOR _AC_ESC "[?25l" /* Hide text mode cursor */
+#define AC_DECNKM_ON  _AC_ESC "[?66h" /* Application keypad (DECNKM), VT320 */
+#define AC_DECNKM_OFF _AC_ESC "[?66l" /* Numeric keypad (DECNKM), VT320 */
 #define AC_CRM_ON     _AC_ESC "[3h"   /* Control Representation Mode, show all control chars (use U+2400..U+2426 for display) */
 #define AC_CRM_OFF    _AC_ESC "[3l"   /* Control characters are not displayable characters CRM */
 #define AC_IRM_ON     _AC_ESC "[4h"   /* Insertion/Replacement Mode, set insert mode (behaves as though any printable character was preceded by `AC_ICH("1")') */

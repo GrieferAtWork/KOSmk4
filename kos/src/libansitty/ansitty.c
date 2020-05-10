@@ -3413,6 +3413,86 @@ do_encode_utf8:
 	return result;
 }
 
+/* NOTE: Meta=Gui
+ *            Normal  Shft      Ctrl      Shft+Ctrl Meta      Meta+Shft  Meta+Ctrl  Meta+Ctrl+Shft
+ *  KEY_F1    \eOP    \e[1;2P~  \e[1;5P~  \e[1;6P~  \e[1;9P~  \e[1;10P~  \e[1;13P~  \e[1;14P~
+ *  KEY_F2    \eOQ    \e[1;2Q~  \e[1;5Q~  \e[1;6Q~  \e[1;9Q~  \e[1;10Q~  \e[1;13Q~  \e[1;14Q~
+ *  KEY_F3    \eOR    \e[1;2R~  \e[1;5R~  \e[1;6R~  \e[1;9R~  \e[1;10R~  \e[1;13R~  \e[1;14R~
+ *  KEY_F4    \eOS    \e[1;2S~  \e[1;5S~  \e[1;6S~  \e[1;9S~  \e[1;10S~  \e[1;13S~  \e[1;14S~
+ *  KEY_F5    \e[15~  \e[15;2~  \e[15;5~  \e[15;6~  \e[15;9~  \e[15;10~  \e[15;13~  \e[15;14~
+ *  KEY_F6    \e[17~  \e[17;2~  \e[17;5~  \e[17;6~  \e[17;9~  \e[17;10~  \e[17;13~  \e[17;14~
+ *  KEY_F7    \e[18~  \e[18;2~  \e[18;5~  \e[18;6~  \e[18;9~  \e[18;10~  \e[18;13~  \e[18;14~
+ *  KEY_F8    \e[19~  \e[19;2~  \e[19;5~  \e[19;6~  \e[19;9~  \e[19;10~  \e[19;13~  \e[19;14~
+ *  KEY_F9    \e[20~  \e[20;2~  \e[20;5~  \e[20;6~  \e[20;9~  \e[20;10~  \e[20;13~  \e[20;14~
+ *  KEY_F10   \e[21~  \e[21;2~  \e[21;5~  \e[21;6~  \e[21;9~  \e[21;10~  \e[21;13~  \e[21;14~
+ *  KEY_F11   \e[23~  \e[23;2~  \e[23;5~  \e[23;6~  \e[23;9~  \e[23;10~  \e[23;13~  \e[23;14~
+ *  KEY_F12   \e[24~  \e[24;2~  \e[24;5~  \e[24;6~  \e[24;9~  \e[24;10~  \e[24;13~  \e[24;14~
+ * NOTE: KEY_F{13-24} are the same as KEY_F{1-12} with inverted shift-modifiers
+ * @param: fn: Function key ID (0-based; aka. for KEY_F1, pass `0')
+ */
+PRIVATE NONNULL((1)) size_t
+NOTHROW_NCX(CC encode_function_key)(char *__restrict buf, uint8_t fn, uint16_t mod) {
+	size_t result;
+	unsigned int keycode;
+	unsigned int modcode;
+	char endch;
+	bool has_shift;
+	has_shift = KEYMOD_HASSHIFT(mod);
+	if (fn >= 12) {
+		/* Extended function keys */
+		fn -= 12;
+		has_shift = !has_shift;
+	}
+	if (has_shift) {
+		if (KEYMOD_HASGUI(mod)) {
+			if (KEYMOD_HASCTRL(mod)) {
+				modcode = 14; /* Meta + Ctrl + Shift */
+			} else {
+				modcode = 10; /* Meta + Shift */
+			}
+		} else if (KEYMOD_HASCTRL(mod)) {
+			modcode = 6; /* Shift + Control */
+		} else {
+			modcode = 2; /* Shift */
+		}
+	} else {
+		if (KEYMOD_HASGUI(mod)) {
+			if (KEYMOD_HASCTRL(mod)) {
+				modcode = 13; /* Meta + Ctrl */
+			} else {
+				modcode = 9; /* Meta */
+			}
+		} else if (KEYMOD_HASCTRL(mod)) {
+			modcode = 5; /* Control */
+		} else {
+			modcode = 0;
+		}
+	}
+	if (fn < 4) {
+		/* F1...F4 */
+		endch   = 'P' + fn;
+		keycode = 1;
+	} else {
+		endch = '~';
+		if (fn == (5 - 1)) {
+			keycode = 15; /* F5 */
+		} else if (fn <= (10 - 1)) {
+			keycode = 17 + fn - (6 - 1); /* F6...F10 */
+		} else {
+			keycode = 23 + fn - (11 - 1); /* F11...F12 */
+		}
+	}
+	/* Encode the function key code. */
+	if (modcode != 0) {
+		result = sprintf(buf, CC_SESC "[%u;%u%c", keycode, modcode, endch);
+	} else if (keycode != 1) {
+		result = sprintf(buf, CC_SESC "[%u%c", keycode, endch);
+	} else {
+		result = sprintf(buf, CC_SESC "O%c", endch);
+	}
+	return result;
+}
+
 
 
 /* Encode the representation of a misc. keyboard key `key' with `mod',
@@ -3474,11 +3554,21 @@ NOTHROW_NCX(CC libansitty_translate_misc)(struct ansitty *self,
 			}
 			break;
 
+		case KEY_ENTER:
+		case KEY_SPACE:
+		case KEY_TAB:
+			/* Force special encoding for these keys under certain conditions */
+			if (KEYMOD_HASSHIFT(mod) || KEYMOD_HASCTRL(mod) ||
+			    KEYMOD_HASALT(mod) || ENABLE_APP_KEYPAD())
+				goto do_handle_key;
+			break;
+
 		default:
 			break;
 		}
 		return len;
 	}
+do_handle_key:
 	addend = 0;
 	/* Prefix with 0x1b (ESC; aka. `\e') */
 	if (KEYMOD_HASALT(mod)) {
@@ -3487,13 +3577,52 @@ NOTHROW_NCX(CC libansitty_translate_misc)(struct ansitty *self,
 	}
 	switch (key) {
 
+	case KEY_ENTER:
+		if (ENABLE_APP_KEYPAD()) {
+			buf[2] = 'M';
+			if (IS_VT52()) {
+				/* ESC ? M */
+set_buf_escape_qmark_3:
+				buf[1] = '?';
+set_buf_escape_3:
+				result = 3;
+				goto set_buf_escape;
+			}
+			goto set_buf_escape_O_3; /* ESC O M */
+		}
+		buf[0] = '\r';
+		goto set_result_1;
+
+	case KEY_SPACE:
+#if 0 /* Although documented in xterm, nurses doesn't understand this,
+       * and terminfo contains no entry (or even definition) for this! */
+		if (ENABLE_APP_KEYPAD()) {
+			buf[2] = ' ';
+			if (IS_VT52())
+				goto set_buf_escape_qmark_3; /* ESC ? SP */
+			goto set_buf_escape_O_3; /* ESC O SP */
+		}
+#endif
+		buf[0] = ' ';
+		goto set_result_1;
+
 	case KEY_TAB:
+		if (ENABLE_APP_KEYPAD()) {
+			buf[2] = 'I';
+			if (IS_VT52())
+				goto set_buf_escape_qmark_3; /* ESC ? I */
+			/* ESC O I */
+set_buf_escape_O_3:
+			buf[1] = 'O';
+			goto set_buf_escape_3;
+		}
 		if (KEYMOD_HASSHIFT(mod)) {
 			/* Cursor Backward Tabulation */
 			buf[2] = 'Z';
 			goto set_buf_escape_lbracket_3;
 		}
 		buf[0] = '\t';
+set_result_1:
 		result = 1;
 		break;
 
@@ -3555,7 +3684,7 @@ handle_app_keypad:
 			case KEY_KP2:         buf[2] = 'r'; break;
 			case KEY_KP3:         buf[2] = 's'; break;
 			case KEY_KP4:         buf[2] = 't'; break;
-			case KEY_KP5:         buf[2] = 'u'; break;
+			case KEY_KP5:         buf[2] = 'E'; break; /* 'u'? */
 			case KEY_KP6:         buf[2] = 'v'; break;
 			case KEY_KP7:         buf[2] = 'w'; break;
 			case KEY_KP8:         buf[2] = 'x'; break;
@@ -3598,66 +3727,137 @@ handle_app_keypad:
 		goto set_buf_escape_O_3;
 #endif
 
-	case KEY_F1 ... KEY_F4:
-		/* KEY_F1: \eOP
-		 * KEY_F2: \eOQ
-		 * KEY_F3: \eOR
-		 * KEY_F4: \eOS */
-		buf[2] = 'P' + (key - KEY_F1);
-set_buf_escape_O_3:
-		result = 3;
-		goto set_buf_escape_O;
 
-	case KEY_F5:
-		key = 15;
-		goto do_f_xx_key;
-	case KEY_F6 ... KEY_F10:
-		key = 17 + (key - KEY_F6);
-		goto do_f_xx_key;
+
+	case KEY_F1 ... KEY_F10:
+		result = encode_function_key(buf, key - KEY_F1, mod);
+		break;
 	case KEY_F11 ... KEY_F12:
-		key = 23 + (key - KEY_F11);
-		goto do_f_xx_key;
+		result = encode_function_key(buf, key - KEY_F11 + (11 - 1), mod);
+		break;
+
 	case KEY_F13 ... KEY_F24:
-		key = 25 + (key - KEY_F13);
-do_f_xx_key:
-		buf[2] = '0' + (key / 10);
-		buf[3] = '0' + (key % 10);
-		buf[4] = '~';
-/*set_buf_escape_lbracket_5:*/
-		result = 5;
-		goto set_buf_escape_lbracket;
+		result = encode_function_key(buf, key - KEY_F13 + (13 - 1), mod);
+		break;
 
 	case KEY_HOME:
 	case KEY_FIND:
-		buf[2] = '1';
-		goto set_buf_escape_lbracket_4_tilde_3;
-
-	case KEY_INSERT:
-		buf[2] = '2';
-		goto set_buf_escape_lbracket_4_tilde_3;
-
-	case KEY_DELETE:
-		buf[2] = '3';
-		goto set_buf_escape_lbracket_4_tilde_3;
+		buf[2] = 'H';
+		/* With modifiers, HOME/END are encoded as:
+		 * \e[1;<mod>(H|F) */
+set_buf_escape_O_3_or_lbracket_1_semicolon_mod_buf2:
+		if (KEYMOD_HASSHIFT(mod)) {
+			buf[5] = buf[2];
+			buf[2] = '1';
+			buf[3] = ';';
+			if (KEYMOD_HASGUI(mod)) {
+				buf[4] = '1';
+				buf[6] = buf[2];
+				if (KEYMOD_HASCTRL(mod)) {
+					buf[5] = '4'; /* Meta + Ctrl + Shift */
+set_buf_escape_lbracket_7:
+					result = 7;
+					goto set_buf_escape_lbracket;
+				}
+				buf[5] = '0'; /* Meta + Shift */
+				goto set_buf_escape_lbracket_7;
+			} else if (KEYMOD_HASCTRL(mod)) {
+				buf[4] = '6'; /* Shift + Control */
+set_buf_escape_lbracket_6:
+				result = 6;
+				goto set_buf_escape_lbracket;
+			}
+			buf[4] = '2'; /* Shift */
+			goto set_buf_escape_lbracket_6;
+		} else {
+			if (KEYMOD_HASGUI(mod)) {
+				buf[5] = buf[2];
+				buf[2] = '1';
+				buf[3] = ';';
+				if (KEYMOD_HASCTRL(mod)) {
+					buf[6] = buf[5];
+					buf[4] = '1';
+					buf[5] = '3'; /* Meta + Ctrl */
+					goto set_buf_escape_lbracket_7;
+				}
+				buf[4] = '9'; /* Meta */
+				goto set_buf_escape_lbracket_6;
+			} else if (KEYMOD_HASCTRL(mod)) {
+				buf[5] = buf[2];
+				buf[2] = '1';
+				buf[3] = ';';
+				buf[4] = '5'; /* Control */
+				goto set_buf_escape_lbracket_6;
+			}
+		}
+		goto set_buf_escape_O_3;
 
 	case KEY_SELECT:
 	case KEY_END:
-		buf[2] = '4';
-		goto set_buf_escape_lbracket_4_tilde_3;
+		buf[2] = 'F'; /* PC-Style */
+		goto set_buf_escape_O_3_or_lbracket_1_semicolon_mod_buf2;
+
+	case KEY_INSERT:
+		key = 2;
+		goto do_1char_tilde_code;
+
+	case KEY_DELETE:
+		key = 3;
+		goto do_1char_tilde_code;
 
 	case KEY_PREVIOUS:
 	case KEY_PAGEUP:
-		buf[2] = '5';
-		goto set_buf_escape_lbracket_4_tilde_3;
+		key = 5;
+		goto do_1char_tilde_code;
 
 	case KEY_NEXT:
 	case KEY_PAGEDOWN:
-		buf[2] = '6';
-set_buf_escape_lbracket_4_tilde_3:
+		key = 6;
+do_1char_tilde_code:
+		buf[2] = '0' + key;
+		if (KEYMOD_HASSHIFT(mod)) {
+			buf[3] = ';';
+			if (KEYMOD_HASGUI(mod)) {
+				buf[4] = '1';
+				if (KEYMOD_HASCTRL(mod)) {
+					buf[5] = '4'; /* Meta + Ctrl + Shift */
+set_buf_escape_lbracket_7_tilde_6:
+					buf[6] = '~';
+					goto set_buf_escape_lbracket_7;
+				}
+				buf[5] = '0'; /* Meta + Shift */
+				goto set_buf_escape_lbracket_7_tilde_6;
+			} else if (KEYMOD_HASCTRL(mod)) {
+				buf[4] = '6'; /* Shift + Control */
+set_buf_escape_lbracket_6_tilde_5:
+				buf[5] = '~';
+				goto set_buf_escape_lbracket_6;
+			}
+			buf[4] = '2'; /* Shift */
+			goto set_buf_escape_lbracket_6_tilde_5;
+		} else {
+			if (KEYMOD_HASGUI(mod)) {
+				buf[3] = ';';
+				if (KEYMOD_HASCTRL(mod)) {
+					buf[4] = '1';
+					buf[5] = '3'; /* Meta + Ctrl */
+					buf[6] = '~';
+					goto set_buf_escape_lbracket_7;
+				}
+				buf[4] = '9'; /* Meta */
+				goto set_buf_escape_lbracket_6_tilde_5;
+			} else if (KEYMOD_HASCTRL(mod)) {
+				buf[3] = ';';
+				buf[4] = '5'; /* Control */
+				goto set_buf_escape_lbracket_6_tilde_5;
+			}
+		}
+/*set_buf_escape_lbracket_4_tilde_3:*/
 		buf[3] = '~';
 /*set_buf_escape_lbracket_4:*/
 		result = 4;
 		goto set_buf_escape_lbracket;
+
 
 	case KEY_MACRO:
 		buf[2] = 'M';
@@ -3689,7 +3889,6 @@ set_buf_escape_lbracket_3:
 	case KEY_LEFT:
 		buf[2] = 'D';
 handle_cursor_key:
-		result = 3;
 		if (IS_VT52()) {
 			/* VT52-specific cursor key encoding */
 			buf[1] = buf[2];
@@ -3697,11 +3896,12 @@ handle_cursor_key:
 			result = 2;
 			goto set_buf_escape;
 		} else if (ENABLE_APP_CURSOR()) {
-			/* Application cursor key mode. */
-set_buf_escape_O:
-			buf[1] = 'O';
-			goto set_buf_escape;
+			/* Application cursor key mode.
+			 * NOTE: When modifiers are present, then the
+			 *       key is encoded as \e[1;<mod>(A|B|C|D) */
+			goto set_buf_escape_O_3_or_lbracket_1_semicolon_mod_buf2;
 		}
+		result = 3;
 set_buf_escape_lbracket:
 		buf[1] = '[';
 set_buf_escape:

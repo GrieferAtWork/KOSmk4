@@ -109,36 +109,77 @@ DECL_BEGIN
 
 /************************************************************************/
 int main_rawterm(int argc, char *argv[], char *envp[]) {
+#define PRINTSTR(s) write(STDOUT_FILENO, s, sizeof(s) - sizeof(char))
 	struct termios oios, nios;
 	char buf[8];
+	bool appkeypad = false;
+	bool appcursor = false;
 	(void)argc, (void)argv, (void)envp;
 	tcgetattr(STDIN_FILENO, &oios);
 	nios = oios;
 	cfmakeraw(&nios);
 	tcsetattr(STDIN_FILENO, TCSADRAIN, &nios);
-	printf("type 'q' to exit\n");
+	setvbuf(stdout, NULL, _IOFBF, 0); /* Fully buffered */
+	printf("type 'q' to exit\n"
+	       "type 'a' to toggle Application-keypad mode\n"
+	       "type 'c' to toggle Application-cursor mode\n");
 	for (;;) {
 		ssize_t i, buflen;
+		struct winsize ws;
+		ioctl(STDIN_FILENO, TIOCGWINSZ, &ws);
+		printf(AC_HIDECURSOR
+		       AC_SAVECURSOR
+		       AC_DECAWM_OFF
+		       AC_CUP("%u", "%u")
+		       AC_COLOR(ANSITTY_CL_LIGHT_GRAY,
+		                ANSITTY_CL_DARK_GRAY)
+		       "k:%s%c" AC_FG_LIGHT_GRAY ","
+		       "c:%s%c"
+		       AC_DEFATTR
+		       AC_DECAWM_ON
+		       AC_LOADCURSOR
+		       AC_SHOWCURSOR,
+		       ws.ws_row,
+		       ws.ws_col - 6,
+		       appkeypad ? AC_FG_GREEN : "",
+		       appkeypad ? 'y' : 'n',
+		       appcursor ? AC_FG_GREEN : "",
+		       appcursor ? 'y' : 'n');
+		fflush(stdout);
 		buflen = read(STDIN_FILENO, buf, sizeof(buf));
 		if (buflen <= 0)
 			break;
-		if (buflen == 1 && buf[0] == 'q')
-			break;
+		if (buflen == 1) {
+			if (buf[0] == 'q')
+				break;
+			if (buf[0] == 'a') {
+				appkeypad = !appkeypad;
+				printf("%s", appkeypad ? AC_DECNKM_ON : AC_DECNKM_OFF);
+				continue;
+			} else if (buf[0] == 'c') {
+				appcursor = !appcursor;
+				printf("%s", appcursor ? AC_DECCKM_ON : AC_DECCKM_OFF);
+				continue;
+			}
+		}
 		for (i = 0; i < buflen; ++i) {
 			printf("%s%.2x", i ? " " : "",
 			       (unsigned int)(u8)buf[i]);
 		}
-		for (; i < (ssize_t)sizeof(buf); ++i) {
+		for (; i < (ssize_t)sizeof(buf); ++i)
 			printf("   ");
-		}
 		for (i = 0; i < buflen; ++i) {
 			char c = buf[i];
 			if (!isprint(c))
 				c = '.';
-			printf("%c", c);
+			putchar(c);
 		}
-		printf("\n");
+		printf(AC_EL("") "\n");
 	}
+	if (appkeypad)
+		PRINTSTR(AC_DECNKM_OFF);
+	if (appcursor)
+		PRINTSTR(AC_DECCKM_OFF);
 	tcsetattr(STDIN_FILENO, TCSADRAIN, &oios);
 	return 0;
 }

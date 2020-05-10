@@ -70,7 +70,6 @@ PRIVATE struct basic_key const basic_keys_en_US[128] = {
 	DEF(KEY_P, 'p', 'P'),
 	DEF(KEY_LBRACKET, '[', '{'),
 	DEF(KEY_RBRACKET, ']', '}'),
-	DEF(KEY_ENTER, '\r', '\r'),
 
 	DEF(KEY_A, 'a', 'A'),
 	DEF(KEY_S, 's', 'S'),
@@ -94,8 +93,6 @@ PRIVATE struct basic_key const basic_keys_en_US[128] = {
 	DEF(KEY_COMMA, ',', '<'),
 	DEF(KEY_DOT, '.', '>'),
 	DEF(KEY_SLASH, '/', '?'),
-
-	DEF(KEY_SPACE, ' ', ' '),
 #undef DEF
 };
 

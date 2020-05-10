@@ -78,8 +78,6 @@ KEY_LBRACKET:shift:'Ü'
 KEY_RBRACKET:'+'
 KEY_RBRACKET:shift:'*'
 KEY_RBRACKET:altgr:'~'
-KEY_ENTER:'\r'
-KEY_ENTER:shift:'\r'
 
 KEY_A:'a'
 KEY_A:shift:'A'
@@ -129,8 +127,5 @@ KEY_DOT:'.'
 KEY_DOT:shift:':'
 KEY_SLASH:'-'
 KEY_SLASH:shift:'_'
-
-KEY_SPACE:' '
-KEY_SPACE:shift:' '
 
 KEY_KP_DOT:','
