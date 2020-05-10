@@ -1680,8 +1680,8 @@ PRIVATE struct instruction const ops[] = {
 	/*0xdf, IF_BYTE2, "\xff" ???               * 0xff: [mod=3,reg=7,rm=7] */
 
 
-	I(0xe0, 0,                "loopnz\t" OP_DISP8),
-	I(0xe1, 0,                "loopz\t" OP_DISP8),
+	I(0xe0, 0,                "loop" NAME_jc5 "\t" OP_DISP8), /* loopnz */
+	I(0xe1, 0,                "loop" NAME_jc4 "\t" OP_DISP8), /* loopz */
 	I(0xe2, 0,                "loop\t" OP_DISP8),
 	I(0xe3, IF_66,            "jcxz\t" OP_DISP8),
 	I(0xe3, 0,                "jecxz\t" OP_DISP8),
@@ -1824,7 +1824,9 @@ PRIVATE struct instruction const ops_0f[] = {
 	I(0x00, IF_MODRM|IF_REG3, "ltr\t"  OP_RM16),
 	I(0x00, IF_MODRM|IF_REG4, "verr\t" OP_RM16),
 	I(0x00, IF_MODRM|IF_REG5, "verw\t" OP_RM16),
-	/* IF_REG6: jmpe (IA-64) */
+	I(0x00, IF_66|IF_MODRM|IF_REG6,   "jmpew\t" OP_RM32), /* IA-64 (https://sandpile.org/x86/opc_grp.htm) */
+	I(0x00, IF_MODRM|IF_REG6,         "jmpel\t" OP_RM32), /* IA-64 */
+	I(0x00, IF_REXW|IF_MODRM|IF_REG6, "jmpeq\t" OP_RM64), /* IA-64 */
 
 	I(0x01, IF_X32|IF_MODRM|IF_RMM|IF_REG0,  "sgdtl\t" OP_MEM),
 	I(0x01, IF_X64|IF_MODRM|IF_RMM|IF_REG0,  "sgdtq\t" OP_MEM),
@@ -1851,7 +1853,7 @@ PRIVATE struct instruction const ops_0f[] = {
 	I(0x01, IF_BYTE2,                 "\xc2" "vmlaunch"),                 /* 0xc2: [mod=3,reg=0,rm=2] */
 	I(0x01, IF_BYTE2,                 "\xc3" "vmresume"),                 /* 0xc3: [mod=3,reg=0,rm=3] */
 	I(0x01, IF_BYTE2,                 "\xc4" "vmxoff"),                   /* 0xc4: [mod=3,reg=0,rm=4] */
-	/*0x01, IF_BYTE2,                 "\xc5"  ???                          * 0xc5: [mod=3,reg=0,rm=5] */
+	I(0x01, IF_BYTE2,                 "\xc5" "pconfig"),                  /* 0xc5: [mod=3,reg=0,rm=5] (https://sandpile.org/x86/opc_grp.htm) */
 	/*0x01, IF_BYTE2,                 "\xc6"  ???                          * 0xc6: [mod=3,reg=0,rm=6] */
 	/*0x01, IF_BYTE2,                 "\xc7"  ???                          * 0xc7: [mod=3,reg=0,rm=7] */
 	I(0x01, IF_BYTE2,                 "\xc8" "monitor\t" OP_PAX_PCX_PDX), /* 0xc8: [mod=3,reg=1,rm=0] */
@@ -1872,6 +1874,8 @@ PRIVATE struct instruction const ops_0f[] = {
 	I(0x01, IF_BYTE2,                 "\xd7" "enclu"),                    /* 0xd7: [mod=3,reg=2,rm=7] */
 	I(0x01, IF_BYTE2,                 "\xd8" "vmrun" OP_PAX),             /* 0xd8: [mod=3,reg=3,rm=0] */
 	I(0x01, IF_BYTE2,                 "\xd9" "vmmcall"),                  /* 0xd9: [mod=3,reg=3,rm=1] */
+	I(0x01, IF_F2|IF_BYTE2,           "\xd9" "vmgexit"),                  /* 0xd9: [mod=3,reg=3,rm=1] (https://sandpile.org/x86/opc_grp.htm) */
+	I(0x01, IF_F3|IF_BYTE2,           "\xd9" "vmgexit"),                  /* 0xd9: [mod=3,reg=3,rm=1] (https://sandpile.org/x86/opc_grp.htm) */
 	I(0x01, IF_BYTE2,                 "\xda" "vmload"),                   /* 0xda: [mod=3,reg=3,rm=2] */
 	I(0x01, IF_BYTE2,                 "\xdb" "vmsave"),                   /* 0xdb: [mod=3,reg=3,rm=3] */
 	I(0x01, IF_BYTE2,                 "\xdc" "stgi"),                     /* 0xdc: [mod=3,reg=3,rm=4] */
@@ -1887,13 +1891,13 @@ PRIVATE struct instruction const ops_0f[] = {
 	/*0x01, IF_BYTE2,                 "\xe6" "smsw %esi"                   * 0xe6: [mod=3,reg=4,rm=6] */
 	/*0x01, IF_BYTE2,                 "\xe7" "smsw %edi"                   * 0xe7: [mod=3,reg=4,rm=7] */
 	/*0x01, IF_BYTE2,                 "\xe8" ???                           * 0xe8: [mod=3,reg=5,rm=0] */
-	/*0x01, IF_BYTE2,                 "\xe9" ???                           * 0xe9: [mod=3,reg=5,rm=1] */
-	/*0x01, IF_BYTE2,                 "\xea" ???                           * 0xea: [mod=3,reg=5,rm=2] */
+	I(0x01, IF_F3|IF_BYTE2,           "\xe9" "incssp"),                   /* 0xe9: [mod=3,reg=5,rm=1] (https://sandpile.org/x86/opc_grp.htm) */
+	I(0x01, IF_F3|IF_BYTE2,           "\xea" "savessp"),                  /* 0xea: [mod=3,reg=5,rm=2] (https://sandpile.org/x86/opc_grp.htm) */
 	/*0x01, IF_BYTE2,                 "\xeb" ???                           * 0xeb: [mod=3,reg=5,rm=3] */
 	/*0x01, IF_BYTE2,                 "\xec" ???                           * 0xec: [mod=3,reg=5,rm=4] */
 	/*0x01, IF_BYTE2,                 "\xed" ???                           * 0xed: [mod=3,reg=5,rm=5] */
-	/*0x01, IF_BYTE2,                 "\xee" ???                           * 0xee: [mod=3,reg=5,rm=6] */
-	/*0x01, IF_BYTE2,                 "\xef" ???                           * 0xef: [mod=3,reg=5,rm=7] */
+	I(0x01, IF_F3|IF_BYTE2,           "\xee" "rdpkru"),                   /* 0xee: [mod=3,reg=5,rm=6] (https://sandpile.org/x86/opc_grp.htm) */
+	I(0x01, IF_F3|IF_BYTE2,           "\xef" "wrpkru"),                   /* 0xef: [mod=3,reg=5,rm=7] (https://sandpile.org/x86/opc_grp.htm) */
 	/*0x01, IF_BYTE2,                 "\xf0" "lmsw %ax"                    * 0xf0: [mod=3,reg=6,rm=0] */
 	/*0x01, IF_BYTE2,                 "\xf1" "lmsw %cx"                    * 0xf1: [mod=3,reg=6,rm=1] */
 	/*0x01, IF_BYTE2,                 "\xf2" "lmsw %dx"                    * 0xf2: [mod=3,reg=6,rm=2] */
@@ -1904,8 +1908,8 @@ PRIVATE struct instruction const ops_0f[] = {
 	/*0x01, IF_BYTE2,                 "\xf7" "lmsw %di"                    * 0xf7: [mod=3,reg=6,rm=7] */
 	I(0x01, IF_BYTE2,                 "\xf8" "swapgs"),                   /* 0xf8: [mod=3,reg=7,rm=0] */
 	I(0x01, IF_BYTE2,                 "\xf9" "rdtscp"),                   /* 0xf9: [mod=3,reg=7,rm=1] */
-	I(0x01, IF_F3|IF_BYTE2,           "\xfa" "mcommit"),                  /* 0xfa: [mod=3,reg=7,rm=2] */
 	I(0x01, IF_BYTE2,                 "\xfa" "monitorx" OP_PAX_PCX_PDX),  /* 0xfa: [mod=3,reg=7,rm=2] */
+	I(0x01, IF_F3|IF_BYTE2,           "\xfa" "mcommit"),                  /* 0xfa: [mod=3,reg=7,rm=2] */
 	I(0x01, IF_BYTE2,                 "\xfb" "mwaitx" OP_PAX_PCX),        /* 0xfb: [mod=3,reg=7,rm=3] */
 	I(0x01, IF_BYTE2,                 "\xfc" "clzero" OP_PAX),            /* 0xfc: [mod=3,reg=7,rm=4] */
 	I(0x01, IF_BYTE2,                 "\xfd" "rdpru"),                    /* 0xfd: [mod=3,reg=7,rm=5] */
@@ -1926,17 +1930,19 @@ PRIVATE struct instruction const ops_0f[] = {
 	I(0x07, IF_X32,           "loadall\t" OP_PSI), /* http://www.geoffchappell.com/notes/windows/archive/linkcpu.htm */
 	I(0x07, IF_X64,           "sysret"),
 
-	I(0x08, 0,                "invd"),
+	I(0x08, 0,                "invd"), /* 80486+ */
 
 	I(0x09, IF_F3,            "wbnoinvd"),
 	I(0x09, 0,                "wbinvd"),
 
-	I(0x0a, 0,                "cflsh"), /* http://www.geoffchappell.com/notes/windows/archive/linkcpu.htm */
+	I(0x0a, 0,                "cl1invmb"), /* https://sandpile.org/x86/opc_2.htm */
+	/*0x0a, 0,                "cflsh"),     * http://www.geoffchappell.com/notes/windows/archive/linkcpu.htm */
 
 	I(0x0b, 0,                "ud2"),
 
 	/*0x0c, 0,                ??? */
 
+	I(0x0d, IF_MODRM|IF_REG0|IF_RMM, "prefetch\t" OP_MEM), /* https://sandpile.org/x86/opc_k3d.htm */
 	I(0x0d, IF_MODRM|IF_REG1|IF_RMM, "prefetchw\t" OP_MEM),
 	I(0x0d, IF_MODRM|IF_REG2|IF_RMM, LONGREPR(LO_PREFETCHWT1)),
 
@@ -5423,24 +5429,24 @@ PRIVATE u16 const ops_offsets[256] = {
 };
 
 #define HAVE_OPS_0F_OFFSETS 1
-STATIC_ASSERT(COMPILER_LENOF(ops_0f) == 1160);
+STATIC_ASSERT(COMPILER_LENOF(ops_0f) == 1171);
 PRIVATE u16 const ops_0f_offsets[256] = {
-	0, 6, 49, 50, 1159, 53, 55, 56, 58, 59, 61, 62, 1159, 63, 65, 1159,
-	66, 84, 100, 115, 121, 127, 133, 145, 151, 1159, 155, 161, 166, 1159, 167, 171,
-	173, 175, 177, 179, 181, 1159, 182, 1159, 183, 189, 195, 205, 211, 221, 231, 237,
-	243, 244, 245, 246, 247, 248, 249, 250, 1159, 1159, 1159, 1159, 1159, 1159, 1159, 251,
-	252, 255, 262, 269, 272, 279, 286, 293, 300, 303, 306, 313, 319, 322, 325, 328,
-	331, 343, 355, 359, 363, 369, 375, 381, 387, 399, 411, 427, 445, 457, 469, 481,
-	493, 496, 499, 503, 506, 509, 512, 517, 520, 523, 526, 530, 533, 536, 539, 545,
-	555, 563, 572, 589, 601, 604, 607, 611, 614, 626, 640, 650, 656, 660, 664, 670,
-	680, 682, 684, 686, 688, 690, 692, 694, 696, 698, 700, 702, 704, 706, 708, 710,
-	712, 717, 722, 727, 732, 733, 734, 735, 736, 741, 746, 747, 748, 749, 750, 751,
-	752, 755, 758, 759, 762, 765, 768, 771, 777, 780, 783, 784, 787, 790, 793, 825,
-	828, 829, 832, 835, 838, 841, 844, 847, 849, 852, 854, 866, 869, 875, 881, 884,
-	886, 887, 890, 906, 908, 912, 920, 926, 946, 950, 954, 958, 962, 966, 970, 974,
-	978, 982, 985, 989, 993, 997, 1000, 1002, 1010, 1013, 1016, 1019, 1025, 1028, 1031, 1034,
-	1039, 1042, 1045, 1050, 1053, 1056, 1059, 1075, 1079, 1082, 1085, 1088, 1093, 1096, 1099, 1102,
-	1107, 1110, 1113, 1117, 1121, 1125, 1128, 1131, 1134, 1137, 1140, 1144, 1148, 1151, 1154, 1158
+	0, 9, 59, 60, 1170, 63, 65, 66, 68, 69, 71, 72, 1170, 73, 76, 1170,
+	77, 95, 111, 126, 132, 138, 144, 156, 162, 1170, 166, 172, 177, 1170, 178, 182,
+	184, 186, 188, 190, 192, 1170, 193, 1170, 194, 200, 206, 216, 222, 232, 242, 248,
+	254, 255, 256, 257, 258, 259, 260, 261, 1170, 1170, 1170, 1170, 1170, 1170, 1170, 262,
+	263, 266, 273, 280, 283, 290, 297, 304, 311, 314, 317, 324, 330, 333, 336, 339,
+	342, 354, 366, 370, 374, 380, 386, 392, 398, 410, 422, 438, 456, 468, 480, 492,
+	504, 507, 510, 514, 517, 520, 523, 528, 531, 534, 537, 541, 544, 547, 550, 556,
+	566, 574, 583, 600, 612, 615, 618, 622, 625, 637, 651, 661, 667, 671, 675, 681,
+	691, 693, 695, 697, 699, 701, 703, 705, 707, 709, 711, 713, 715, 717, 719, 721,
+	723, 728, 733, 738, 743, 744, 745, 746, 747, 752, 757, 758, 759, 760, 761, 762,
+	763, 766, 769, 770, 773, 776, 779, 782, 788, 791, 794, 795, 798, 801, 804, 836,
+	839, 840, 843, 846, 849, 852, 855, 858, 860, 863, 865, 877, 880, 886, 892, 895,
+	897, 898, 901, 917, 919, 923, 931, 937, 957, 961, 965, 969, 973, 977, 981, 985,
+	989, 993, 996, 1000, 1004, 1008, 1011, 1013, 1021, 1024, 1027, 1030, 1036, 1039, 1042, 1045,
+	1050, 1053, 1056, 1061, 1064, 1067, 1070, 1086, 1090, 1093, 1096, 1099, 1104, 1107, 1110, 1113,
+	1118, 1121, 1124, 1128, 1132, 1136, 1139, 1142, 1145, 1148, 1151, 1155, 1159, 1162, 1165, 1169
 };
 
 #define HAVE_OPS_0F38_OFFSETS 1
