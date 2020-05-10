@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x14488e57 */
+/* HASH CRC-32:0x25ce2dde */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,11 +50,17 @@ INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_wchown)(char32_t const *file, 
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_wchown)(char16_t const *file, uid_t owner, gid_t group);
 /* >> wpathconf(2)
  * @param: NAME: One of `_PC_*' from <bits/confname.h>
- * Return a path configuration value associated with `NAME' for `PATH' */
+ * Return a path configuration value associated with `NAME' for `PATH'
+ * return: * : The configuration limit associated with `NAME' for `PATH'
+ * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
+ * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
 INTDEF NONNULL((1)) long int NOTHROW_RPC(LIBCCALL libc_wpathconf)(char32_t const *path, int name);
 /* >> wpathconf(2)
  * @param: NAME: One of `_PC_*' from <bits/confname.h>
- * Return a path configuration value associated with `NAME' for `PATH' */
+ * Return a path configuration value associated with `NAME' for `PATH'
+ * return: * : The configuration limit associated with `NAME' for `PATH'
+ * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
+ * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
 INTDEF NONNULL((1)) long int NOTHROW_RPC(LIBDCALL libd_wpathconf)(char16_t const *path, int name);
 /* >> wlink(2)
  * Create a hard link from `FROM', leading to `TO' */

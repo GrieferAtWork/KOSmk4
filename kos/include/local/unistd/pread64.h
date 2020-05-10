@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdbfc9620 */
+/* HASH CRC-32:0x2264715 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -108,7 +108,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pread64))(__fd_t __fd,
                                                      void *__buf,
                                                      __SIZE_TYPE__ __bufsize,
                                                      __PIO_OFFSET64 __offset) {
-#line 969 "kos/src/libc/magic/unistd.c"
+#line 975 "kos/src/libc/magic/unistd.c"
 #if defined(__CRT_HAVE_pread) && ((!defined(__CRT_HAVE__lseeki64) && !defined(__CRT_HAVE_lseek64)) || (!defined(__CRT_HAVE_read) && !defined(__CRT_HAVE__read)))
 	return __localdep_pread32(__fd, __buf, __bufsize, (__pos32_t)__offset);
 #elif defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek64)

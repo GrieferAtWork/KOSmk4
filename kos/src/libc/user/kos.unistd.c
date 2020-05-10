@@ -262,10 +262,13 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.Execlpe") void
 }
 /*[[[end:Execlpe]]]*/
 
-/*[[[head:FPathConf,hash:CRC-32=0xcf0e4dee]]]*/
+/*[[[head:FPathConf,hash:CRC-32=0x5faeff12]]]*/
 /* >> fpathconf(2)
  * @param: NAME: One of `_PC_*' from <bits/confname.h>
- * Return a path configuration value associated with `NAME' for `FD' */
+ * Return a path configuration value associated with `NAME' for `FD'
+ * return: * : The configuration limit associated with `NAME' for `FD'
+ * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `FD'
+ * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.property.FPathConf") long int
 (LIBCCALL libc_FPathConf)(fd_t fd,
@@ -281,10 +284,13 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.property.FPathConf") long int
 }
 /*[[[end:FPathConf]]]*/
 
-/*[[[head:PathConf,hash:CRC-32=0xc2013534]]]*/
+/*[[[head:PathConf,hash:CRC-32=0xf7fe9fe2]]]*/
 /* >> pathconf(2)
  * @param: NAME: One of `_PC_*' from <bits/confname.h>
- * Return a path configuration value associated with `NAME' for `PATH' */
+ * Return a path configuration value associated with `NAME' for `PATH'
+ * return: * : The configuration limit associated with `NAME' for `PATH'
+ * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
+ * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.property.PathConf") long int
 (LIBCCALL libc_PathConf)(char const *path,

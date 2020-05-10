@@ -136,10 +136,13 @@ NOTHROW_NCX(LIBDCALL libd_wgetlogin)(void)
 }
 /*[[[end:DOS$wgetlogin]]]*/
 
-/*[[[head:wpathconf,hash:CRC-32=0xc1986438]]]*/
+/*[[[head:wpathconf,hash:CRC-32=0xa8a91835]]]*/
 /* >> wpathconf(2)
  * @param: NAME: One of `_PC_*' from <bits/confname.h>
- * Return a path configuration value associated with `NAME' for `PATH' */
+ * Return a path configuration value associated with `NAME' for `PATH'
+ * return: * : The configuration limit associated with `NAME' for `PATH'
+ * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
+ * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wpathconf") long int
 NOTHROW_RPC(LIBCCALL libc_wpathconf)(char32_t const *path,
@@ -157,10 +160,13 @@ NOTHROW_RPC(LIBCCALL libc_wpathconf)(char32_t const *path,
 }
 /*[[[end:wpathconf]]]*/
 
-/*[[[head:DOS$wpathconf,hash:CRC-32=0xd3ac54f]]]*/
+/*[[[head:DOS$wpathconf,hash:CRC-32=0x508852e8]]]*/
 /* >> wpathconf(2)
  * @param: NAME: One of `_PC_*' from <bits/confname.h>
- * Return a path configuration value associated with `NAME' for `PATH' */
+ * Return a path configuration value associated with `NAME' for `PATH'
+ * return: * : The configuration limit associated with `NAME' for `PATH'
+ * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
+ * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.wpathconf") long int
 NOTHROW_RPC(LIBDCALL libd_wpathconf)(char16_t const *path,

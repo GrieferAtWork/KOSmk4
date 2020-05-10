@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e360869 */
+/* HASH CRC-32:0xb1ae64db */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -150,7 +150,10 @@ INTDEF unsigned int NOTHROW_NCX(LIBCCALL libc_alarm)(unsigned int seconds);
 INTDEF int NOTHROW_RPC(LIBCCALL libc_pause)(void);
 /* >> fpathconf(2)
  * @param: NAME: One of `_PC_*' from <bits/confname.h>
- * Return a path configuration value associated with `NAME' for `FD' */
+ * Return a path configuration value associated with `NAME' for `FD'
+ * return: * : The configuration limit associated with `NAME' for `FD'
+ * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `FD'
+ * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
 INTDEF WUNUSED long int NOTHROW_RPC(LIBCCALL libc_fpathconf)(fd_t fd, int name);
 /* >> ttyname(3)
  * Return the name of a TTY given its file descriptor */
@@ -170,7 +173,10 @@ INTDEF WUNUSED char *NOTHROW_NCX(LIBCCALL libc_getlogin)(void);
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_chown)(char const *file, uid_t owner, gid_t group);
 /* >> pathconf(2)
  * @param: NAME: One of `_PC_*' from <bits/confname.h>
- * Return a path configuration value associated with `NAME' for `PATH' */
+ * Return a path configuration value associated with `NAME' for `PATH'
+ * return: * : The configuration limit associated with `NAME' for `PATH'
+ * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
+ * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
 INTDEF NONNULL((1)) long int NOTHROW_RPC(LIBCCALL libc_pathconf)(char const *path, int name);
 /* >> link(2)
  * Create a hard link from `FROM', leading to `TO' */
@@ -341,6 +347,13 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_truncate64)(char const *file, 
  * execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
 INTDEF NONNULL((2, 3)) int NOTHROW_RPC(LIBCCALL libc_fexecve)(fd_t fd, __TARGV, __TENVP);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_nice)(int inc);
+/* Retrieve a system configuration string specified by `name'
+ * @param: name:   One of `_CS_*' from <bits/confname.h>
+ * @param: buf:    Target buffer
+ * @param: buflen: Available buffer size (including a trailing \0-character)
+ * @return: * :    Required buffer size (including a trailing \0-character)
+ * @return: 1 :    Empty configuration string.
+ * @return: 0 :    [errno=EINVAL] Bad configuration `name'. */
 INTDEF size_t NOTHROW_NCX(LIBCCALL libc_confstr)(int name, char *buf, size_t buflen);
 /* >> sync(2)
  * Synchronize all disk operations of all mounted file systems and flush
@@ -435,8 +448,12 @@ INTDEF char *NOTHROW_NCX(LIBCCALL libc_ctermid)(char *s);
 INTDEF char *NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s);
 /* >> sysconf(2)
  * @param: NAME: One of `_SC_*' from <bits/confname.h>
- * Return a system configuration value `NAME' */
-INTDEF WUNUSED long int NOTHROW_NCX(LIBCCALL libc_sysconf)(int name);
+ * Return a system configuration value `NAME'
+ * return: * : The configuration limit associated with `NAME' for `PATH'
+ * return: -1: [errno=<unchanged>] `NAME' referrs to a maximum or minimum
+ *                                 limit, and that limit is indeterminate
+ * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
+INTDEF WUNUSED long int NOTHROW_RPC(LIBCCALL libc_sysconf)(int name);
 
 DECL_END
 

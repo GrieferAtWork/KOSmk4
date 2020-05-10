@@ -483,6 +483,9 @@ alarm:(unsigned int seconds) -> unsigned int;
 @@>> fpathconf(2)
 @@@param: NAME: One of `_PC_*' from <bits/confname.h>
 @@Return a path configuration value associated with `NAME' for `FD'
+@@return: * : The configuration limit associated with `NAME' for `FD'
+@@return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `FD'
+@@return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option
 [section(.text.crt.fs.property)]
 [cp][ATTR_WUNUSED] fpathconf:($fd_t fd, int name) -> long int;
 
@@ -526,6 +529,9 @@ chown:([notnull] char const *file, $uid_t owner, $gid_t group) -> int {
 @@>> pathconf(2)
 @@@param: NAME: One of `_PC_*' from <bits/confname.h>
 @@Return a path configuration value associated with `NAME' for `PATH'
+@@return: * : The configuration limit associated with `NAME' for `PATH'
+@@return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
+@@return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option
 [cp][section(.text.crt.fs.property)]
 pathconf:([notnull] char const *path, int name) -> long int;
 
@@ -1357,6 +1363,14 @@ nice:(int inc) -> int {
 
 %
 %#ifdef __USE_POSIX2
+
+@@Retrieve a system configuration string specified by `name'
+@@@param: name:   One of `_CS_*' from <bits/confname.h>
+@@@param: buf:    Target buffer
+@@@param: buflen: Available buffer size (including a trailing \0-character)
+@@@return: * :    Required buffer size (including a trailing \0-character)
+@@@return: 1 :    Empty configuration string.
+@@@return: 0 :    [errno=EINVAL] Bad configuration `name'.
 [section(.text.crt.system.configuration)]
 confstr:(int name, char *buf, size_t buflen) -> size_t;
 
@@ -1731,6 +1745,11 @@ ctermid_r:([nullable] char *s) -> char * {
 @@>> sysconf(2)
 @@@param: NAME: One of `_SC_*' from <bits/confname.h>
 @@Return a system configuration value `NAME'
+@@return: * : The configuration limit associated with `NAME' for `PATH'
+@@return: -1: [errno=<unchanged>] `NAME' referrs to a maximum or minimum
+@@                                limit, and that limit is indeterminate
+@@return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option
+[cp][section(.text.crt.fs.property)]
 [section(.text.crt.system.configuration)]
 [ATTR_WUNUSED][export_alias(_sysconf,__sysconf)]
 sysconf:(int name) -> long int;

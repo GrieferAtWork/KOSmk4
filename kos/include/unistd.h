@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd9f612f */
+/* HASH CRC-32:0x665b15c7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -680,7 +680,10 @@ __CDECLARE(,int,__NOTHROW_RPC,pause,(void),())
 #ifdef __CRT_HAVE_fpathconf
 /* >> fpathconf(2)
  * @param: NAME: One of `_PC_*' from <bits/confname.h>
- * Return a path configuration value associated with `NAME' for `FD' */
+ * Return a path configuration value associated with `NAME' for `FD'
+ * return: * : The configuration limit associated with `NAME' for `FD'
+ * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `FD'
+ * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
 __CDECLARE(__ATTR_WUNUSED,long int,__NOTHROW_RPC,fpathconf,(__fd_t __fd, int __name),(__fd,__name))
 #endif /* fpathconf... */
 
@@ -726,7 +729,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(chown, __FORCELOCAL __ATTR_NONNULL((1)) int __NO
 #ifdef __CRT_HAVE_pathconf
 /* >> pathconf(2)
  * @param: NAME: One of `_PC_*' from <bits/confname.h>
- * Return a path configuration value associated with `NAME' for `PATH' */
+ * Return a path configuration value associated with `NAME' for `PATH'
+ * return: * : The configuration limit associated with `NAME' for `PATH'
+ * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
+ * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
 __CDECLARE(__ATTR_NONNULL((1)),long int,__NOTHROW_RPC,pathconf,(char const *__path, int __name),(__path,__name))
 #endif /* pathconf... */
 
@@ -1567,6 +1573,13 @@ __CREDIRECT_VOID(__ATTR_NORETURN,,_exit,(int __status),_Exit,(__status))
 
 #ifdef __USE_POSIX2
 #ifdef __CRT_HAVE_confstr
+/* Retrieve a system configuration string specified by `name'
+ * @param: name:   One of `_CS_*' from <bits/confname.h>
+ * @param: buf:    Target buffer
+ * @param: buflen: Available buffer size (including a trailing \0-character)
+ * @return: * :    Required buffer size (including a trailing \0-character)
+ * @return: 1 :    Empty configuration string.
+ * @return: 0 :    [errno=EINVAL] Bad configuration `name'. */
 __CDECLARE(,size_t,__NOTHROW_NCX,confstr,(int __name, char *__buf, size_t __buflen),(__name,__buf,__buflen))
 #endif /* confstr... */
 
@@ -2015,18 +2028,30 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ctermid_r, __FORCELOCAL char *__NOTHROW_NCX(__LI
 #ifdef __CRT_HAVE_sysconf
 /* >> sysconf(2)
  * @param: NAME: One of `_SC_*' from <bits/confname.h>
- * Return a system configuration value `NAME' */
-__CDECLARE(__ATTR_WUNUSED,long int,__NOTHROW_NCX,sysconf,(int __name),(__name))
+ * Return a system configuration value `NAME'
+ * return: * : The configuration limit associated with `NAME' for `PATH'
+ * return: -1: [errno=<unchanged>] `NAME' referrs to a maximum or minimum
+ *                                 limit, and that limit is indeterminate
+ * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
+__CDECLARE(__ATTR_WUNUSED,long int,__NOTHROW_RPC,sysconf,(int __name),(__name))
 #elif defined(__CRT_HAVE__sysconf)
 /* >> sysconf(2)
  * @param: NAME: One of `_SC_*' from <bits/confname.h>
- * Return a system configuration value `NAME' */
-__CREDIRECT(__ATTR_WUNUSED,long int,__NOTHROW_NCX,sysconf,(int __name),_sysconf,(__name))
+ * Return a system configuration value `NAME'
+ * return: * : The configuration limit associated with `NAME' for `PATH'
+ * return: -1: [errno=<unchanged>] `NAME' referrs to a maximum or minimum
+ *                                 limit, and that limit is indeterminate
+ * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
+__CREDIRECT(__ATTR_WUNUSED,long int,__NOTHROW_RPC,sysconf,(int __name),_sysconf,(__name))
 #elif defined(__CRT_HAVE___sysconf)
 /* >> sysconf(2)
  * @param: NAME: One of `_SC_*' from <bits/confname.h>
- * Return a system configuration value `NAME' */
-__CREDIRECT(__ATTR_WUNUSED,long int,__NOTHROW_NCX,sysconf,(int __name),__sysconf,(__name))
+ * Return a system configuration value `NAME'
+ * return: * : The configuration limit associated with `NAME' for `PATH'
+ * return: -1: [errno=<unchanged>] `NAME' referrs to a maximum or minimum
+ *                                 limit, and that limit is indeterminate
+ * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
+__CREDIRECT(__ATTR_WUNUSED,long int,__NOTHROW_RPC,sysconf,(int __name),__sysconf,(__name))
 #endif /* sysconf... */
 #if defined(__USE_MISC) || (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_POSIX))
 #ifndef F_LOCK

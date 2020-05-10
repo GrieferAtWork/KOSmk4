@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x372ca8cf */
+/* HASH CRC-32:0xc2992c84 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2942,7 +2942,6 @@
 #define __CRT_ATTR_NOTHROW_NCX_swscanf 1
 #define __CRT_ATTR_NOTHROW_NCX_swscanf_s 1
 #define __CRT_ATTR_NOTHROW_NCX_sync_file_range 1
-#define __CRT_ATTR_NOTHROW_NCX_sysconf 1
 #define __CRT_ATTR_NOTHROW_NCX_sysv_signal 1
 #define __CRT_ATTR_NOTHROW_NCX_tcflow 1
 #define __CRT_ATTR_NOTHROW_NCX_tcflush 1
@@ -3934,6 +3933,7 @@
 #define __CRT_ATTR_NOTHROW_RPC_syncfs 1
 #define __CRT_ATTR_NOTHROW_RPC_syscall 1
 #define __CRT_ATTR_NOTHROW_RPC_syscall64 1
+#define __CRT_ATTR_NOTHROW_RPC_sysconf 1
 #define __CRT_ATTR_NOTHROW_RPC_sysinfo 1
 #define __CRT_ATTR_NOTHROW_RPC_syslog 1
 #define __CRT_ATTR_NOTHROW_RPC_syslog_printer 1

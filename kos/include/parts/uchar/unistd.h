@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbfe9862c */
+/* HASH CRC-32:0x4997bcf8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -120,18 +120,27 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32chown, __FORCELOCAL __ATTR_NONNULL((1)) int _
 #if defined(__CRT_HAVE_wpathconf) && (__SIZEOF_WCHAR_T__ == 2)
 /* >> c16pathconf(2)
  * @param: NAME: One of `_PC_*' from <bits/confname.h>
- * Return a path configuration value associated with `NAME' for `PATH' */
+ * Return a path configuration value associated with `NAME' for `PATH'
+ * return: * : The configuration limit associated with `NAME' for `PATH'
+ * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
+ * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
 __CREDIRECT(__ATTR_NONNULL((1)),long int,__NOTHROW_RPC,c16pathconf,(char16_t const *__path, int __name),wpathconf,(__path,__name))
 #elif defined(__CRT_HAVE_DOS$wpathconf)
 /* >> c16pathconf(2)
  * @param: NAME: One of `_PC_*' from <bits/confname.h>
- * Return a path configuration value associated with `NAME' for `PATH' */
+ * Return a path configuration value associated with `NAME' for `PATH'
+ * return: * : The configuration limit associated with `NAME' for `PATH'
+ * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
+ * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
 __CREDIRECT_DOS(__ATTR_NONNULL((1)),long int,__NOTHROW_RPC,c16pathconf,(char16_t const *__path, int __name),wpathconf,(__path,__name))
 #endif /* c16pathconf... */
 #if defined(__CRT_HAVE_wpathconf) && (__SIZEOF_WCHAR_T__ == 4)
 /* >> c32pathconf(2)
  * @param: NAME: One of `_PC_*' from <bits/confname.h>
- * Return a path configuration value associated with `NAME' for `PATH' */
+ * Return a path configuration value associated with `NAME' for `PATH'
+ * return: * : The configuration limit associated with `NAME' for `PATH'
+ * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
+ * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
 __CREDIRECT(__ATTR_NONNULL((1)),long int,__NOTHROW_RPC,c32pathconf,(char32_t const *__path, int __name),wpathconf,(__path,__name))
 #endif /* c32pathconf... */
 #if defined(__CRT_HAVE_wlink) && (__SIZEOF_WCHAR_T__ == 2)

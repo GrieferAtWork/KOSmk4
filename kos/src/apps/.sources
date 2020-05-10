@@ -19,40 +19,35 @@
  */
 
 if (!CONFIG_ONLY_BUILD_LIBRARIES) {
-BEGIN GROUP("apps.init") { COMPILE, LINK, MCOPY };
-	SET_LANGUAGE("c")
-	SET_OUTPUT("/bin/init")
-	SOURCE({ "init/*.c" })
-END
 
-BEGIN GROUP("apps.playground") { COMPILE, LINK, MCOPY };
-	SET_OUTPUT("/bin/playground")
-	SOURCE({ "playground/*.c" })
-END
+#define DEFINE_SIMPLE_C_APPLICATION(name, ...)          \
+	BEGIN GROUP("apps." name) { COMPILE, LINK, MCOPY }; \
+		SET_LANGUAGE("c")                               \
+		SET_OUTPUT("/bin/" name)                        \
+		SOURCE({ name "/*.c" })                         \
+		__VA_ARGS__                                     \
+	END
 
-BEGIN GROUP("apps.rpc-service") { COMPILE, LINK, MCOPY };
-	SET_LANGUAGE("c")
-	SET_OUTPUT("/bin/rpc-service")
-	SOURCE({ "rpc-service/*.c" })
-END
+#define DEFINE_SIMPLE_CXX_APPLICATION(name, ...)        \
+	BEGIN GROUP("apps." name) { COMPILE, LINK, MCOPY }; \
+		SET_OUTPUT("/bin/" name)                        \
+		SOURCE({ name "/*.c" })                         \
+		__VA_ARGS__                                     \
+	END
 
-BEGIN GROUP("apps.keymap") { COMPILE, LINK, MCOPY };
-	SET_LANGUAGE("c")
-	SET_OUTPUT("/bin/keymap")
-	USELIB("libkeymap")
-	SOURCE({ "keymap/*.c" })
-END
 
+DEFINE_SIMPLE_C_APPLICATION("init")
+DEFINE_SIMPLE_CXX_APPLICATION("playground")
+DEFINE_SIMPLE_C_APPLICATION("rpc-service")
+DEFINE_SIMPLE_C_APPLICATION("keymap", USELIB("libkeymap"))
+DEFINE_SIMPLE_C_APPLICATION("getconf")
 
 BEGIN GROUP("apps.insmod") { COMPILE, LINK, MCOPY }; SET_OUTPUT("/bin/insmod") SOURCE({ "insmod/insmod.c" }) END
 BEGIN GROUP("apps.lsmod") { COMPILE, LINK, MCOPY }; SET_OUTPUT("/bin/lsmod") SOURCE({ "insmod/lsmod.c" }) END
 BEGIN GROUP("apps.rmmod") { COMPILE, LINK, MCOPY }; SET_OUTPUT("/bin/rmmod") SOURCE({ "insmod/rmmod.c" }) END
 
-BEGIN GROUP("apps.gfx") { COMPILE, LINK, MCOPY };
-	SET_OUTPUT("/bin/gfx")
-	USELIB("libvideo-gfx")
-	SOURCE({ "gfx/*.c" })
-END
+DEFINE_SIMPLE_CXX_APPLICATION("gfx", USELIB("libvideo-gfx"))
+
 }
 
 BEGIN GROUP("apps.system-test") { COMPILE, LINK, MCOPY };

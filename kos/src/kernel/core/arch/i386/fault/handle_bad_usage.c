@@ -1673,6 +1673,12 @@ done:
 
 DECL_END
 
+/* TODO: call, jmp and jcc (also: loop[cc]) instruction can cause #GP
+ *       on x86_64 when TARGET_PC isn't a canonical address.
+ *       -> This should be result in an `E_SEGFAULT_NOTEXECUTABLE'
+ *          exception with its fault address set to `TARGET_PC'
+ */
+
 #ifndef __INTELLISENSE__
 #include "../../../../../../include/libemu86/emulate.c.inl"
 #endif /* !__INTELLISENSE__ */

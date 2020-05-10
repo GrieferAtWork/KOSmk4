@@ -2274,10 +2274,13 @@ NOTHROW_NCX(LIBCCALL libc_ctermid)(char *s)
 }
 /*[[[end:ctermid]]]*/
 
-/*[[[head:fpathconf,hash:CRC-32=0xb3cb9f05]]]*/
+/*[[[head:fpathconf,hash:CRC-32=0xac64f20a]]]*/
 /* >> fpathconf(2)
  * @param: NAME: One of `_PC_*' from <bits/confname.h>
- * Return a path configuration value associated with `NAME' for `FD' */
+ * Return a path configuration value associated with `NAME' for `FD'
+ * return: * : The configuration limit associated with `NAME' for `FD'
+ * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `FD'
+ * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.property.fpathconf") long int
 NOTHROW_RPC(LIBCCALL libc_fpathconf)(fd_t fd,
@@ -2293,10 +2296,13 @@ NOTHROW_RPC(LIBCCALL libc_fpathconf)(fd_t fd,
 /*[[[end:fpathconf]]]*/
 
 
-/*[[[head:pathconf,hash:CRC-32=0x2e2e544a]]]*/
+/*[[[head:pathconf,hash:CRC-32=0x642c7862]]]*/
 /* >> pathconf(2)
  * @param: NAME: One of `_PC_*' from <bits/confname.h>
- * Return a path configuration value associated with `NAME' for `PATH' */
+ * Return a path configuration value associated with `NAME' for `PATH'
+ * return: * : The configuration limit associated with `NAME' for `PATH'
+ * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
+ * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.property.pathconf") long int
 NOTHROW_RPC(LIBCCALL libc_pathconf)(char const *path,
@@ -2311,7 +2317,14 @@ NOTHROW_RPC(LIBCCALL libc_pathconf)(char const *path,
 }
 /*[[[end:pathconf]]]*/
 
-/*[[[head:confstr,hash:CRC-32=0x2c8a57db]]]*/
+/*[[[head:confstr,hash:CRC-32=0x1426d61b]]]*/
+/* Retrieve a system configuration string specified by `name'
+ * @param: name:   One of `_CS_*' from <bits/confname.h>
+ * @param: buf:    Target buffer
+ * @param: buflen: Available buffer size (including a trailing \0-character)
+ * @return: * :    Required buffer size (including a trailing \0-character)
+ * @return: 1 :    Empty configuration string.
+ * @return: 0 :    [errno=EINVAL] Bad configuration `name'. */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.configuration.confstr") size_t
 NOTHROW_NCX(LIBCCALL libc_confstr)(int name,
                                    char *buf,
@@ -2330,29 +2343,31 @@ NOTHROW_NCX(LIBCCALL libc_confstr)(int name,
 		result_string = cs_path;
 	}	break;
 
-//#define _CS_GNU_LIBC_VERSION                     2
-//#define _CS_GNU_LIBPTHREAD_VERSION               3
-//#define _CS_V6_WIDTH_RESTRICTED_ENVS             1
-//#define _CS_V5_WIDTH_RESTRICTED_ENVS             4
-//#define _CS_V7_WIDTH_RESTRICTED_ENVS             5
-//#define _CS_XBS5_ILP32_OFF32_CFLAGS              1100
-//#define _CS_XBS5_ILP32_OFF32_LDFLAGS             1101
-//#define _CS_XBS5_ILP32_OFFBIG_CFLAGS             1104
-//#define _CS_XBS5_ILP32_OFFBIG_LDFLAGS            1105
-//#define _CS_XBS5_LP64_OFF64_CFLAGS               1108
-//#define _CS_XBS5_LP64_OFF64_LDFLAGS              1109
-//#define _CS_POSIX_V6_ILP32_OFF32_CFLAGS          1116
-//#define _CS_POSIX_V6_ILP32_OFF32_LDFLAGS         1117
-//#define _CS_POSIX_V6_ILP32_OFFBIG_CFLAGS         1120
-//#define _CS_POSIX_V6_ILP32_OFFBIG_LDFLAGS        1121
-//#define _CS_POSIX_V6_LP64_OFF64_CFLAGS           1124
-//#define _CS_POSIX_V6_LP64_OFF64_LDFLAGS          1125
-//#define _CS_POSIX_V7_ILP32_OFF32_CFLAGS          1132
-//#define _CS_POSIX_V7_ILP32_OFF32_LDFLAGS         1133
-//#define _CS_POSIX_V7_ILP32_OFFBIG_CFLAGS         1136
-//#define _CS_POSIX_V7_ILP32_OFFBIG_LDFLAGS        1137
-//#define _CS_POSIX_V7_LP64_OFF64_CFLAGS           1140
-//#define _CS_POSIX_V7_LP64_OFF64_LDFLAGS          1141
+	case _CS_GNU_LIBC_VERSION:
+	case _CS_GNU_LIBPTHREAD_VERSION:
+	case _CS_V6_WIDTH_RESTRICTED_ENVS:
+	case _CS_V5_WIDTH_RESTRICTED_ENVS:
+	case _CS_V7_WIDTH_RESTRICTED_ENVS:
+	case _CS_XBS5_ILP32_OFF32_CFLAGS:
+	case _CS_XBS5_ILP32_OFF32_LDFLAGS:
+	case _CS_XBS5_ILP32_OFFBIG_CFLAGS:
+	case _CS_XBS5_ILP32_OFFBIG_LDFLAGS:
+	case _CS_XBS5_LP64_OFF64_CFLAGS:
+	case _CS_XBS5_LP64_OFF64_LDFLAGS:
+	case _CS_POSIX_V6_ILP32_OFF32_CFLAGS:
+	case _CS_POSIX_V6_ILP32_OFF32_LDFLAGS:
+	case _CS_POSIX_V6_ILP32_OFFBIG_CFLAGS:
+	case _CS_POSIX_V6_ILP32_OFFBIG_LDFLAGS:
+	case _CS_POSIX_V6_LP64_OFF64_CFLAGS:
+	case _CS_POSIX_V6_LP64_OFF64_LDFLAGS:
+	case _CS_POSIX_V7_ILP32_OFF32_CFLAGS:
+	case _CS_POSIX_V7_ILP32_OFF32_LDFLAGS:
+	case _CS_POSIX_V7_ILP32_OFFBIG_CFLAGS:
+	case _CS_POSIX_V7_ILP32_OFFBIG_LDFLAGS:
+	case _CS_POSIX_V7_LP64_OFF64_CFLAGS:
+	case _CS_POSIX_V7_LP64_OFF64_LDFLAGS:
+		/* TODO? */
+		break;
 
 	case _CS_LFS_CFLAGS:
 	case _CS_LFS_LINTFLAGS: {
@@ -2425,13 +2440,17 @@ NOTHROW_NCX(LIBCCALL libc_confstr)(int name,
 }
 /*[[[end:confstr]]]*/
 
-/*[[[head:sysconf,hash:CRC-32=0xb223b994]]]*/
+/*[[[head:sysconf,hash:CRC-32=0xdae3cb53]]]*/
 /* >> sysconf(2)
  * @param: NAME: One of `_SC_*' from <bits/confname.h>
- * Return a system configuration value `NAME' */
+ * Return a system configuration value `NAME'
+ * return: * : The configuration limit associated with `NAME' for `PATH'
+ * return: -1: [errno=<unchanged>] `NAME' referrs to a maximum or minimum
+ *                                 limit, and that limit is indeterminate
+ * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.system.configuration.sysconf") long int
-NOTHROW_NCX(LIBCCALL libc_sysconf)(int name)
+NOTHROW_RPC(LIBCCALL libc_sysconf)(int name)
 /*[[[body:sysconf]]]*/
 {
 	long int result;
