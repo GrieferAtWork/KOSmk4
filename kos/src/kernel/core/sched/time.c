@@ -41,9 +41,11 @@
 #include <assert.h>
 #include <inttypes.h>
 
-/*TODO:REMOVE_ME:BEGIN*/
-#include <time.h>
-/*TODO:REMOVE_ME:END*/
+/* How many ticks to wait before performing another realtime re-sync */
+#ifndef CPU_RESYNC_DELAY_IN_TICKS
+#define CPU_RESYNC_DELAY_IN_TICKS (HZ / 2) /* twice per second */
+#endif /* !CPU_RESYNC_DELAY_IN_TICKS */
+
 
 DECL_BEGIN
 
@@ -101,11 +103,6 @@ PRIVATE ATTR_PERCPU struct cpu_timestamp thiscpu_last_resync = {
 	/* .ct_cpuq = */ 0,
 	/* .ct_rtc  = */ NULL
 };
-
-/* How many ticks to wait before performing another realtime re-sync */
-#ifndef CPU_RESYNC_DELAY_IN_TICKS
-#define CPU_RESYNC_DELAY_IN_TICKS 1
-#endif /* !CPU_RESYNC_DELAY_IN_TICKS */
 
 typedef __CRT_PRIVATE_SINT(__SIZEOF_JTIME_T__) signed_jtime_t;
 
@@ -901,24 +898,24 @@ PRIVATE NOBLOCK NOPREEMPT NONNULL((1)) void
 NOTHROW(FCALL cpu_add_quantum_offset)(struct cpu *__restrict me,
                                       quantum_diff_t elapsed) {
 	jtime_t /*  */ cpu_jtime;
-	quantum_diff_t cpu_qelps;
+	quantum_diff_t cpu_qoffs;
 	quantum_diff_t cpu_qsize;
 	cpu_jtime = FORCPU(me, thiscpu_jiffies);
-	cpu_qelps = FORCPU(me, thiscpu_quantum_offset);
+	cpu_qoffs = FORCPU(me, thiscpu_quantum_offset);
 	cpu_qsize = FORCPU(me, thiscpu_quantum_length);
-	if unlikely(OVERFLOW_UADD(cpu_qelps, elapsed, &cpu_qelps)) {
+	if unlikely(OVERFLOW_UADD(cpu_qoffs, elapsed, &cpu_qoffs)) {
 		quantum_diff_t num_jiffies;
 		num_jiffies = ((quantum_diff_t)-1) / cpu_qsize;
 		cpu_jtime += num_jiffies;
-		cpu_qelps -= num_jiffies * cpu_qsize;
+		cpu_qoffs -= num_jiffies * cpu_qsize;
 	}
-	if (cpu_qelps >= cpu_qsize) {
-		cpu_jtime += cpu_qelps / cpu_qsize;
-		cpu_qelps = (cpu_qelps % cpu_qsize);
+	if (cpu_qoffs >= cpu_qsize) {
+		cpu_jtime += cpu_qoffs / cpu_qsize;
+		cpu_qoffs = (cpu_qoffs % cpu_qsize);
 	}
 	/* Save the new jtime/quantum offset values. */
 	FORCPU(me, thiscpu_jiffies)        = cpu_jtime;
-	FORCPU(me, thiscpu_quantum_offset) = cpu_qelps;
+	FORCPU(me, thiscpu_quantum_offset) = cpu_qoffs;
 	COMPILER_BARRIER();
 	/* Wake up all sleeping threads
 	 * NOTE: For this purpose, use a quantum-elapsed value of 0,
@@ -937,11 +934,21 @@ PUBLIC NOBLOCK NOPREEMPT void
 NOTHROW(KCALL cpu_quantum_end_nopr)(void) {
 	quantum_diff_t elapsed;
 	struct cpu *me = THIS_CPU;
+
 	/* Atomically (or near atomically) figure out how much
 	 * time has already elapsed, and reset the quantum. */
 	elapsed = arch_cpu_quantum_elapsed_and_reset_nopr(me);
-	/* Account for the  */
+
+	/* Account for the time spend in the previous quantum.
+	 * Must be done to ensure proper time-keeping, as well
+	 * as prevent the realtime() clock from running backwards! */
 	cpu_add_quantum_offset(me, elapsed);
+
+	/* Reset the last-quantum cache to prevent an incorrect overrun
+	 * from being detected when the quantum-elapsed counter was in
+	 * fact only lowered because the quantum got reset manually. */
+	FORCPU(me, thiscpu_last_qtime_q) = 0;
+	FORCPU(me, thiscpu_last_qtime_j) = 0;
 }
 
 
@@ -964,6 +971,7 @@ NOTHROW(KCALL cpu_disable_preemptive_interrupts_nopr)(void) {
 #endif /* !NDEBUG */
 	assert(!PREEMPTION_ENABLED() || kernel_poisoned());
 	me = THIS_CPU;
+
 	/* Figure out how much of the current quantum has already elapsed. */
 	elapsed = arch_cpu_quantum_elapsed_nopr(me);
 
@@ -973,6 +981,11 @@ NOTHROW(KCALL cpu_disable_preemptive_interrupts_nopr)(void) {
 		FORCPU(me, thiscpu_jiffi_pending) = true;
 		++FORCPU(me, thiscpu_jiffies);
 	}
+
+	/* Once preemptive interrupts are disabled, `arch_cpu_quantum_elapsed_nopr()'
+	 * will always return 0. - Reset the last-quantum cache to prevent an incorrect
+	 * quantum overrun from being detected as the result of the elapsed counter
+	 * being (permanently, at least for the time being) reset to 0. */
 	FORCPU(me, thiscpu_last_qtime_q) = 0;
 	FORCPU(me, thiscpu_last_qtime_j) = 0;
 

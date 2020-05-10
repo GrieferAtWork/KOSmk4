@@ -37,16 +37,15 @@ if (!CONFIG_ONLY_BUILD_LIBRARIES) {
 
 
 DEFINE_SIMPLE_C_APPLICATION("init")
-DEFINE_SIMPLE_CXX_APPLICATION("playground")
 DEFINE_SIMPLE_C_APPLICATION("rpc-service")
 DEFINE_SIMPLE_C_APPLICATION("keymap", USELIB("libkeymap"))
 DEFINE_SIMPLE_C_APPLICATION("getconf")
+DEFINE_SIMPLE_CXX_APPLICATION("playground")
+DEFINE_SIMPLE_CXX_APPLICATION("gfx", USELIB("libvideo-gfx"))
 
 BEGIN GROUP("apps.insmod") { COMPILE, LINK, MCOPY }; SET_OUTPUT("/bin/insmod") SOURCE({ "insmod/insmod.c" }) END
 BEGIN GROUP("apps.lsmod") { COMPILE, LINK, MCOPY }; SET_OUTPUT("/bin/lsmod") SOURCE({ "insmod/lsmod.c" }) END
 BEGIN GROUP("apps.rmmod") { COMPILE, LINK, MCOPY }; SET_OUTPUT("/bin/rmmod") SOURCE({ "insmod/rmmod.c" }) END
-
-DEFINE_SIMPLE_CXX_APPLICATION("gfx", USELIB("libvideo-gfx"))
 
 }
 

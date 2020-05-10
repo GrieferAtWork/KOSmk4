@@ -169,11 +169,11 @@ PRIVATE /*ATTR_FREETEXT*/ void KCALL x86_altcore_entry(void) {
 	sync_endwrite(&x86_pit_lock);
 	num_ticks = lapic_read(APIC_TIMER_CURRENT);
 	num_ticks = (((u32)-1) - num_ticks) * 100;
-	printk(/*FREESTR*/ (KERN_INFO "[smp] CPU #%u uses a LAPIC timing of %u ticks per second\n"),
-	       id, num_ticks);
 	num_ticks /= HZ;
 	if unlikely(!num_ticks)
 		num_ticks = 1;
+	printk(/*FREESTR*/ (KERN_INFO "[apic] CPU #%u has a quantum length of %I32u units\n"),
+	       me->c_id, num_ticks);
 	/* TODO: If `num_ticks' differs from `FORCPU(&_bootcpu,_thiscpu_quantum_length)'
 	 *       by more than 1%, re-try the calibration up to 2 more times.
 	 *    -> Mainly affects emulators when the bus-clock is based on real
@@ -190,6 +190,7 @@ PRIVATE /*ATTR_FREETEXT*/ void KCALL x86_altcore_entry(void) {
 	            X86_INTNO_PIC1_PIT |
 	            APIC_TIMER_MODE_FPERIODIC);
 	lapic_write(APIC_TIMER_INITIAL, num_ticks);
+	FORCPU(me, arch_cpu_preemptive_interrupts_disabled) = false;
 }
 
 INTERN NOBLOCK void
@@ -920,10 +921,10 @@ done_early_altcore_init:
 		}
 #endif /* !CONFIG_NO_SMP */
 		num_ticks = (((u32)-1) - num_ticks) * 100;
-		printk(FREESTR(KERN_INFO "[apic] Boot CPU uses a LAPIC timing of %u ticks per second\n"), num_ticks);
 		num_ticks /= HZ;
 		if unlikely(!num_ticks)
 			num_ticks = 1;
+		printk(FREESTR(KERN_INFO "[apic] Boot CPU has a quantum length of %I32u units\n"), num_ticks);
 
 		lapic_write(APIC_TIMER_DIVIDE, APIC_TIMER_DIVIDE_F16);
 		lapic_write(APIC_TIMER,
@@ -932,6 +933,7 @@ done_early_altcore_init:
 		            APIC_TIMER_MODE_FPERIODIC);
 		lapic_write(APIC_TIMER_INITIAL, num_ticks);
 		cpu_set_quantum_length(num_ticks);
+		FORCPU(&_bootcpu, arch_cpu_preemptive_interrupts_disabled) = false;
 		PREEMPTION_ENABLE();
 
 #ifndef CONFIG_NO_SMP
@@ -1032,6 +1034,7 @@ all_online:
 		outb_p(PIT_DATA0, PIT_HZ_DIV(HZ) & 0xff);
 		outb(PIT_DATA0, PIT_HZ_DIV(HZ) >> 8);
 
+		FORCPU(&_bootcpu, arch_cpu_preemptive_interrupts_disabled) = false;
 		PREEMPTION_ENABLE();
 	}
 }
