@@ -262,6 +262,7 @@ NOTHROW(KCALL setup_loglevel_from_name)(char const *__restrict name,
 			return (uintptr_t)1 << i;
 	}
 	kernel_panic(FREESTR("Unknown syslog level: %q"), name);
+	return 0;
 }
 
 

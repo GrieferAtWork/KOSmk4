@@ -1483,6 +1483,7 @@ fail:
 	printk(KERN_CRIT "\n");
 	mallnode_print_traceback(self, &syslog_printer, SYSLOG_LEVEL_CRIT);
 	kernel_panic("Corrupt MALL header or tail");
+	return false;
 }
 
 PRIVATE NOBLOCK bool

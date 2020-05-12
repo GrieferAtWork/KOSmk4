@@ -722,6 +722,7 @@ NOTHROW(KCALL __os_slab_malloc)(size_t num_bytes, gfp_t flags) {
 #endif /* !__INTELLISENSE__ */
 #ifndef NDEBUG
 	kernel_panic("Invalid slab size %Iu", num_bytes);
+	return NULL;
 #else /* !NDEBUG */
 	__builtin_unreachable();
 #endif /* NDEBUG */
@@ -738,6 +739,7 @@ __os_slab_kmalloc(size_t num_bytes, gfp_t flags) {
 #endif /* !__INTELLISENSE__ */
 #ifndef NDEBUG
 	kernel_panic("Invalid slab size %Iu", num_bytes);
+	return NULL;
 #else /* !NDEBUG */
 	__builtin_unreachable();
 #endif /* NDEBUG */
@@ -754,6 +756,7 @@ NOTHROW(KCALL __os_slab_kmalloc_nx)(size_t num_bytes, gfp_t flags) {
 #endif /* !__INTELLISENSE__ */
 #ifndef NDEBUG
 	kernel_panic("Invalid slab size %Iu", num_bytes);
+	return NULL;
 #else /* !NDEBUG */
 	__builtin_unreachable();
 #endif /* NDEBUG */

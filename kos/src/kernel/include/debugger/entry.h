@@ -43,8 +43,9 @@ struct kcpustate;
 struct icpustate;
 struct scpustate;
 
-typedef void (KCALL *dbg_entry_t)();
+typedef void (KCALL *dbg_entry_t)(/*...*/);
 typedef void (KCALL *dbg_entry_c_t)(void *arg);
+
 struct dbg_entry_info {
 	dbg_entry_t                     ei_entry; /* [1..1] Debugger entry point */
 	size_t                          ei_argc;  /* Number of pointer-arguments taken by `ei_entry' */

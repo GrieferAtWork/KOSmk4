@@ -21,6 +21,7 @@
 #define GUARD_KERNEL_INCLUDE_KERNEL_PANIC_H 1
 
 #include <kernel/compiler.h>
+#include <debugger/config.h>
 
 DECL_BEGIN
 
@@ -39,17 +40,23 @@ struct fcpustate;
 #define kernel_poisoned() _kernel_poisoned
 DATDEF bool const _kernel_poisoned;
 
+#ifdef CONFIG_HAVE_DEBUGGER
+#define ATTR_KERNEL_PANIC_NORETURN /* nothing */
+#else /* CONFIG_HAVE_DEBUGGER */
+#define ATTR_KERNEL_PANIC_NORETURN ATTR_NORETURN
+#endif /* !CONFIG_HAVE_DEBUGGER */
+
 
 /* Cause kernel panic. */
-FUNDEF ATTR_NORETURN ATTR_COLD void KCALL kernel_panic_here(void);
-FUNDEF ATTR_NORETURN ATTR_COLD void VCALL kernel_panic(char const *format, ...);
+FUNDEF ATTR_KERNEL_PANIC_NORETURN ATTR_COLD void KCALL kernel_panic_here(void);
+FUNDEF ATTR_KERNEL_PANIC_NORETURN ATTR_COLD void VCALL kernel_panic(char const *format, ...);
 FUNDEF ATTR_NORETURN ATTR_COLD void VCALL kernel_panic_ucpustate(struct ucpustate *__restrict state, char const *format, ...);
 FUNDEF ATTR_NORETURN ATTR_COLD void VCALL kernel_panic_lcpustate(struct lcpustate *__restrict state, char const *format, ...);
 FUNDEF ATTR_NORETURN ATTR_COLD void VCALL kernel_panic_kcpustate(struct kcpustate *__restrict state, char const *format, ...);
 FUNDEF ATTR_NORETURN ATTR_COLD void VCALL kernel_panic_icpustate(struct icpustate *__restrict state, char const *format, ...);
 FUNDEF ATTR_NORETURN ATTR_COLD void VCALL kernel_panic_scpustate(struct scpustate *__restrict state, char const *format, ...);
 FUNDEF ATTR_NORETURN ATTR_COLD void VCALL kernel_panic_fcpustate(struct fcpustate *__restrict state, char const *format, ...);
-FUNDEF ATTR_NORETURN ATTR_COLD void FCALL kernel_vpanic(char const *format, __builtin_va_list args);
+FUNDEF ATTR_KERNEL_PANIC_NORETURN ATTR_COLD void FCALL kernel_vpanic(char const *format, __builtin_va_list args);
 FUNDEF ATTR_NORETURN ATTR_COLD void FCALL kernel_vpanic_ucpustate(struct ucpustate *__restrict state, char const *format, __builtin_va_list args);
 FUNDEF ATTR_NORETURN ATTR_COLD void FCALL kernel_vpanic_lcpustate(struct lcpustate *__restrict state, char const *format, __builtin_va_list args);
 FUNDEF ATTR_NORETURN ATTR_COLD void FCALL kernel_vpanic_kcpustate(struct kcpustate *__restrict state, char const *format, __builtin_va_list args);
@@ -59,7 +66,7 @@ FUNDEF ATTR_NORETURN ATTR_COLD void FCALL kernel_vpanic_fcpustate(struct fcpusta
 
 #ifdef __cplusplus
 extern "C++" {
-FUNDEF ATTR_NORETURN ATTR_COLD void KCALL kernel_panic(void) ASMNAME("kernel_panic_here");
+FUNDEF ATTR_KERNEL_PANIC_NORETURN ATTR_COLD void KCALL kernel_panic(void) ASMNAME("kernel_panic_here");
 FUNDEF ATTR_NORETURN ATTR_COLD void VCALL kernel_panic(struct ucpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_ucpustate");
 FUNDEF ATTR_NORETURN ATTR_COLD void VCALL kernel_panic(struct lcpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_lcpustate");
 FUNDEF ATTR_NORETURN ATTR_COLD void VCALL kernel_panic(struct kcpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_kcpustate");
