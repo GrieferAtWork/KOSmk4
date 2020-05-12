@@ -129,6 +129,7 @@ PUBLIC ATTR_PERCPU struct vm_node _thiscpu_x86_dfstacknode ASMNAME("thiscpu_x86_
 #ifndef __x86_64__
 INTDEF void ASMCALL x86_idt_double_fault(void);
 INTDEF byte_t __x86_bootcpu_df_stack[KERNEL_DF_STACKSIZE];
+INTDEF byte_t _bootcpu_thiscpu_x86_tss[];
 
 PUBLIC ATTR_PERCPU struct tss thiscpu_x86_tssdf = {
 	.t_link       = 0,
@@ -142,18 +143,16 @@ PUBLIC ATTR_PERCPU struct tss thiscpu_x86_tssdf = {
 	.t_esp2       = (uintptr_t)COMPILER_ENDOF(__x86_bootcpu_df_stack),
 	.t_ss2        = SEGMENT_KERNEL_DATA,
 	.__t_zero3    = 0,
-	.t_cr3        = (u32)(uintptr_t)&pagedir_kernel_phys,
-	.t_eip        = (u32)(uintptr_t)&x86_idt_double_fault,
+	.t_cr3        = (u32)&pagedir_kernel_phys,
+	.t_eip        = (u32)&x86_idt_double_fault,
 	.t_eflags     = 0,
 	.t_eax        = 0,
 	.t_ecx        = 0,
-	.t_edx        = 0, /* Incremented upon DF entry; decremented upon exit.
-	                    * Non-zero means the CPU is currently processing a #DF,
-	                    * Greater than 1 means #DF recursion (a ___very___ bad thing) */
-	.t_ebx        = 0,
+	.t_edx        = 0,
+	.t_ebx        = (u32)&_bootcpu,                 /* Used by the implementation. */
 	.t_esp        = (uintptr_t)COMPILER_ENDOF(__x86_bootcpu_df_stack),
-	.t_ebp        = (uintptr_t)COMPILER_ENDOF(__x86_bootcpu_df_stack),
-	.t_esi        = (u32)(uintptr_t)&_bootcpu, /* Used by the implementation. */
+	.t_ebp        = (u32)&_bootcpu_thiscpu_x86_tss, /* Used by the implementation. */
+	.t_esi        = 0,
 	.t_edi        = 0,
 	.t_es         = SEGMENT_USER_DATA_RPL,
 	.__t_zero4    = 0,
@@ -174,13 +173,6 @@ PUBLIC ATTR_PERCPU struct tss thiscpu_x86_tssdf = {
 	},
 	.t_iomap      = 0
 };
-
-/* Prevent `get_current_stack()' from thinking that we're running on
- * the #DF stack by ensuing that thiscpu_x86_tssdf.t_ecx is set to 0
- * Separately, note we set override the temporarily override the
- * pointers inside of `THIS_KERNEL_STACK' whilst in debug-mode,
- * to instead refer to the start/end of the debugger stack. */
-DEFINE_DBG_BZERO(&PERCPU(thiscpu_x86_tssdf).t_ecx, sizeof(thiscpu_x86_tssdf.t_ecx));
 #endif /* !__x86_64__ */
 
 

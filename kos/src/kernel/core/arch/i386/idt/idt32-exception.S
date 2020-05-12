@@ -19,7 +19,7 @@
  */
 #ifdef __INTELLISENSE__
 #include "idt32.S"
-#define IDT_VECTOR 0e
+#define IDT_VECTOR 08
 #endif /* __INTELLISENSE__ */
 
 
@@ -33,208 +33,101 @@ IDT_HANDLER_BEGIN
 	/* Double Fault */
 	.cfi_signal_frame
 	.cfi_def_cfa %ebp, 0
-/*[[[deemon
-import compileExpression from ......misc.libgen.cfi.compiler;
-function restoreRegister(reg, offset) {
-	compileExpression('i386', reg, r'
-		.cfi_escape $@DW_OP_addr
-		.cfi_escape $@__x86_cputss_b0
-		.cfi_escape $@__x86_cputss_b1
-		.cfi_escape $@__x86_cputss_b2
-		.cfi_escape $@__x86_cputss_b3
-		plus $@(' + offset + r')
-		push %esi
-		plus
-	', deref_after: true);
-}
-//restoreRegister('%cr3', 'OFFSET_TSS_CR3');
-restoreRegister('%eip', 'OFFSET_TSS_EIP');
-restoreRegister('%eflags', 'OFFSET_TSS_EFLAGS');
-restoreRegister('%eax', 'OFFSET_TSS_EAX');
-restoreRegister('%ecx', 'OFFSET_TSS_ECX');
-restoreRegister('%edx', 'OFFSET_TSS_EDX');
-restoreRegister('%ebx', 'OFFSET_TSS_EBX');
-restoreRegister('%esp', 'OFFSET_TSS_ESP');
-restoreRegister('%ebp', 'OFFSET_TSS_EBP');
-restoreRegister('%esi', 'OFFSET_TSS_ESI');
-restoreRegister('%edi', 'OFFSET_TSS_EDI');
-restoreRegister('%es', 'OFFSET_TSS_ES');
-restoreRegister('%cs', 'OFFSET_TSS_CS');
-restoreRegister('%ss', 'OFFSET_TSS_SS');
-restoreRegister('%ds', 'OFFSET_TSS_DS');
-restoreRegister('%fs', 'OFFSET_TSS_FS');
-restoreRegister('%gs', 'OFFSET_TSS_GS');
-restoreRegister('%ldtr', 'OFFSET_TSS_LDTR');
-]]]*/
-__ASM_L(	.cfi_escape 0x10,0x08,0x09,DW_OP_addr,__x86_cputss_b0,__x86_cputss_b1,__x86_cputss_b2,__x86_cputss_b3)
-__ASM_L(	.cfi_escape 0x23,(OFFSET_TSS_EIP),0x56,0x22)
-__ASM_L(	.cfi_escape 0x10,0x09,0x09,DW_OP_addr,__x86_cputss_b0,__x86_cputss_b1,__x86_cputss_b2,__x86_cputss_b3)
-__ASM_L(	.cfi_escape 0x23,(OFFSET_TSS_EFLAGS),0x56,0x22)
-__ASM_L(	.cfi_escape 0x10,0x00,0x09,DW_OP_addr,__x86_cputss_b0,__x86_cputss_b1,__x86_cputss_b2,__x86_cputss_b3)
-__ASM_L(	.cfi_escape 0x23,(OFFSET_TSS_EAX),0x56,0x22)
-__ASM_L(	.cfi_escape 0x10,0x01,0x09,DW_OP_addr,__x86_cputss_b0,__x86_cputss_b1,__x86_cputss_b2,__x86_cputss_b3)
-__ASM_L(	.cfi_escape 0x23,(OFFSET_TSS_ECX),0x56,0x22)
-__ASM_L(	.cfi_escape 0x10,0x02,0x09,DW_OP_addr,__x86_cputss_b0,__x86_cputss_b1,__x86_cputss_b2,__x86_cputss_b3)
-__ASM_L(	.cfi_escape 0x23,(OFFSET_TSS_EDX),0x56,0x22)
-__ASM_L(	.cfi_escape 0x10,0x03,0x09,DW_OP_addr,__x86_cputss_b0,__x86_cputss_b1,__x86_cputss_b2,__x86_cputss_b3)
-__ASM_L(	.cfi_escape 0x23,(OFFSET_TSS_EBX),0x56,0x22)
-__ASM_L(	.cfi_escape 0x10,0x04,0x09,DW_OP_addr,__x86_cputss_b0,__x86_cputss_b1,__x86_cputss_b2,__x86_cputss_b3)
-__ASM_L(	.cfi_escape 0x23,(OFFSET_TSS_ESP),0x56,0x22)
-__ASM_L(	.cfi_escape 0x10,0x05,0x09,DW_OP_addr,__x86_cputss_b0,__x86_cputss_b1,__x86_cputss_b2,__x86_cputss_b3)
-__ASM_L(	.cfi_escape 0x23,(OFFSET_TSS_EBP),0x56,0x22)
-__ASM_L(	.cfi_escape 0x10,0x06,0x09,DW_OP_addr,__x86_cputss_b0,__x86_cputss_b1,__x86_cputss_b2,__x86_cputss_b3)
-__ASM_L(	.cfi_escape 0x23,(OFFSET_TSS_ESI),0x56,0x22)
-__ASM_L(	.cfi_escape 0x10,0x07,0x09,DW_OP_addr,__x86_cputss_b0,__x86_cputss_b1,__x86_cputss_b2,__x86_cputss_b3)
-__ASM_L(	.cfi_escape 0x23,(OFFSET_TSS_EDI),0x56,0x22)
-__ASM_L(	.cfi_escape 0x10,0x28,0x09,DW_OP_addr,__x86_cputss_b0,__x86_cputss_b1,__x86_cputss_b2,__x86_cputss_b3)
-__ASM_L(	.cfi_escape 0x23,(OFFSET_TSS_ES),0x56,0x22)
-__ASM_L(	.cfi_escape 0x10,0x29,0x09,DW_OP_addr,__x86_cputss_b0,__x86_cputss_b1,__x86_cputss_b2,__x86_cputss_b3)
-__ASM_L(	.cfi_escape 0x23,(OFFSET_TSS_CS),0x56,0x22)
-__ASM_L(	.cfi_escape 0x10,0x2a,0x09,DW_OP_addr,__x86_cputss_b0,__x86_cputss_b1,__x86_cputss_b2,__x86_cputss_b3)
-__ASM_L(	.cfi_escape 0x23,(OFFSET_TSS_SS),0x56,0x22)
-__ASM_L(	.cfi_escape 0x10,0x2b,0x09,DW_OP_addr,__x86_cputss_b0,__x86_cputss_b1,__x86_cputss_b2,__x86_cputss_b3)
-__ASM_L(	.cfi_escape 0x23,(OFFSET_TSS_DS),0x56,0x22)
-__ASM_L(	.cfi_escape 0x10,0x2c,0x09,DW_OP_addr,__x86_cputss_b0,__x86_cputss_b1,__x86_cputss_b2,__x86_cputss_b3)
-__ASM_L(	.cfi_escape 0x23,(OFFSET_TSS_FS),0x56,0x22)
-__ASM_L(	.cfi_escape 0x10,0x2d,0x09,DW_OP_addr,__x86_cputss_b0,__x86_cputss_b1,__x86_cputss_b2,__x86_cputss_b3)
-__ASM_L(	.cfi_escape 0x23,(OFFSET_TSS_GS),0x56,0x22)
-__ASM_L(	.cfi_escape 0x10,0x31,0x09,DW_OP_addr,__x86_cputss_b0,__x86_cputss_b1,__x86_cputss_b2,__x86_cputss_b3)
-__ASM_L(	.cfi_escape 0x23,(OFFSET_TSS_LDTR),0x56,0x22)
-//[[[end]]]
-
+	.cfi_rel_offset %eip, OFFSET_TSS_EIP
+	.cfi_rel_offset %eflags, OFFSET_TSS_EFLAGS
+	.cfi_rel_offset %eax, OFFSET_TSS_EAX
+	.cfi_rel_offset %ecx, OFFSET_TSS_ECX
+	.cfi_rel_offset %edx, OFFSET_TSS_EDX
+	.cfi_rel_offset %ebx, OFFSET_TSS_EBX
+	.cfi_rel_offset %esp, OFFSET_TSS_ESP
+	.cfi_rel_offset %ebp, OFFSET_TSS_EBP
+	.cfi_rel_offset %esi, OFFSET_TSS_ESI
+	.cfi_rel_offset %edi, OFFSET_TSS_EDI
+	.cfi_rel_offset %es, OFFSET_TSS_ES
+	.cfi_rel_offset %cs, OFFSET_TSS_CS
+	.cfi_rel_offset %ss, OFFSET_TSS_SS
+	.cfi_rel_offset %ds, OFFSET_TSS_DS
+	.cfi_rel_offset %fs, OFFSET_TSS_FS
+	.cfi_rel_offset %gs, OFFSET_TSS_GS
+	.cfi_rel_offset %ldtr, OFFSET_TSS_LDTR
 	/* Our current register state:
-	 *   - ESI -- Base address of the current CPU descriptor (THIS_CPU)
+	 *   - EBX -- Base address of the current CPU descriptor (THIS_CPU)
 	 *   - ESP -- A complete, dedicated stack only for DF exceptions.
-	 *   - EBP -- Identical to ESP */
+	 *   - EBP -- A pointer akin to `leal thiscpu_x86_tss(%ebx), %edi'
+	 *      HINT: The pointed-to TSS contains information about where
+	 *            the double-fault happened! */
 
 	/* Make sure that our own TSS keep on containing valid values. */
-	movl   %esi, thiscpu_x86_tssdf + OFFSET_TSS_ESI(%esi)
-	movl   %esp, thiscpu_x86_tssdf + OFFSET_TSS_ESP(%esi)
-	movl   %ebp, thiscpu_x86_tssdf + OFFSET_TSS_EBP(%esi)
-	movl   $(PP_CAT2(x86_idt_, IDT_VECTOR_NAME)), thiscpu_x86_tssdf + OFFSET_TSS_EIP(%esi)
-
-	movl   %ebp, %esp
-
-	PUBLIC(thiscpu_x86_tss)
-	pushl  thiscpu_x86_tss + OFFSET_TSS_EIP(%esi)    /* state->dcs_regs.ucs_eip */
-	pushl  thiscpu_x86_tss + OFFSET_TSS_EFLAGS(%esi) /* state->dcs_regs.ucs_eflags */
-	pushl  thiscpu_x86_tss + OFFSET_TSS_SS(%esi)     /* state->dcs_regs.ucs_ss */
-	pushl  thiscpu_x86_tss + OFFSET_TSS_CS(%esi)     /* state->dcs_regs.ucs_cs */
-	pushl  thiscpu_x86_tss + OFFSET_TSS_DS(%esi)     /* state->dcs_regs.ucs_sgregs.sg_ds */
-	pushl  thiscpu_x86_tss + OFFSET_TSS_ES(%esi)     /* state->dcs_regs.ucs_sgregs.sg_es */
-	pushl  thiscpu_x86_tss + OFFSET_TSS_FS(%esi)     /* state->dcs_regs.ucs_sgregs.sg_fs */
-	pushl  thiscpu_x86_tss + OFFSET_TSS_GS(%esi)     /* state->dcs_regs.ucs_sgregs.sg_gs */
-	pushl  thiscpu_x86_tss + OFFSET_TSS_EAX(%esi)    /* state->dcs_regs.ucs_gpregs.gp_eax */
-	pushl  thiscpu_x86_tss + OFFSET_TSS_ECX(%esi)    /* state->dcs_regs.ucs_gpregs.gp_ecx */
-	pushl  thiscpu_x86_tss + OFFSET_TSS_EDX(%esi)    /* state->dcs_regs.ucs_gpregs.gp_edx */
-	pushl  thiscpu_x86_tss + OFFSET_TSS_EBX(%esi)    /* state->dcs_regs.ucs_gpregs.gp_ebx */
-	pushl  thiscpu_x86_tss + OFFSET_TSS_ESP(%esi)    /* state->dcs_regs.ucs_gpregs.gp_esp */
-	pushl  thiscpu_x86_tss + OFFSET_TSS_EBP(%esi)    /* state->dcs_regs.ucs_gpregs.gp_ebp */
-	pushl  thiscpu_x86_tss + OFFSET_TSS_ESI(%esi)    /* state->dcs_regs.ucs_gpregs.gp_esi */
-	pushl  thiscpu_x86_tss + OFFSET_TSS_EDI(%esi)    /* state->dcs_regs.ucs_gpregs.gp_edi */
-	pushl  thiscpu_x86_tss + OFFSET_TSS_CR3(%esi)    /* state->dcs_cr3 */
-
-#define OFFSET_DF_CPUSTATE_REGS 4
-
-	.cfi_def_cfa %esp, OFFSET_DF_CPUSTATE_REGS+SIZEOF_UCPUSTATE
-	.cfi_rel_offset %eip, OFFSET_DF_CPUSTATE_REGS+OFFSET_UCPUSTATE_EIP
-	.cfi_rel_offset %eflags, OFFSET_DF_CPUSTATE_REGS+OFFSET_UCPUSTATE_EFLAGS
-	.cfi_rel_offset %ss, OFFSET_DF_CPUSTATE_REGS+OFFSET_UCPUSTATE_SS
-	.cfi_rel_offset %cs, OFFSET_DF_CPUSTATE_REGS+OFFSET_UCPUSTATE_CS
-	.cfi_rel_offset %ds, OFFSET_DF_CPUSTATE_REGS+OFFSET_UCPUSTATE_SGREGS+OFFSET_SGREGS_DS
-	.cfi_rel_offset %es, OFFSET_DF_CPUSTATE_REGS+OFFSET_UCPUSTATE_SGREGS+OFFSET_SGREGS_ES
-	.cfi_rel_offset %fs, OFFSET_DF_CPUSTATE_REGS+OFFSET_UCPUSTATE_SGREGS+OFFSET_SGREGS_FS
-	.cfi_rel_offset %gs, OFFSET_DF_CPUSTATE_REGS+OFFSET_UCPUSTATE_SGREGS+OFFSET_SGREGS_GS
-	.cfi_rel_offset %eax, OFFSET_DF_CPUSTATE_REGS+OFFSET_UCPUSTATE_GPREGS+OFFSET_GPREGS_EAX
-	.cfi_rel_offset %ecx, OFFSET_DF_CPUSTATE_REGS+OFFSET_UCPUSTATE_GPREGS+OFFSET_GPREGS_ECX
-	.cfi_rel_offset %edx, OFFSET_DF_CPUSTATE_REGS+OFFSET_UCPUSTATE_GPREGS+OFFSET_GPREGS_EDX
-	.cfi_rel_offset %ebx, OFFSET_DF_CPUSTATE_REGS+OFFSET_UCPUSTATE_GPREGS+OFFSET_GPREGS_EBX
-	.cfi_rel_offset %esp, OFFSET_DF_CPUSTATE_REGS+OFFSET_UCPUSTATE_GPREGS+OFFSET_GPREGS_ESP
-	.cfi_rel_offset %ebp, OFFSET_DF_CPUSTATE_REGS+OFFSET_UCPUSTATE_GPREGS+OFFSET_GPREGS_EBP
-	.cfi_rel_offset %esi, OFFSET_DF_CPUSTATE_REGS+OFFSET_UCPUSTATE_GPREGS+OFFSET_GPREGS_ESI
-	.cfi_rel_offset %edi, OFFSET_DF_CPUSTATE_REGS+OFFSET_UCPUSTATE_GPREGS+OFFSET_GPREGS_EDI
+	EXTERN(thiscpu_x86_tssdf)
+	movl   %ebx, thiscpu_x86_tssdf + OFFSET_TSS_ESI(%ebx)
+	movl   %esp, thiscpu_x86_tssdf + OFFSET_TSS_ESP(%ebx)
+	movl   %ebp, thiscpu_x86_tssdf + OFFSET_TSS_EBP(%ebx)
+	movl   $(PP_CAT2(x86_idt_, IDT_VECTOR_NAME)), thiscpu_x86_tssdf + OFFSET_TSS_EIP(%ebx)
 
 	/* Unwind LTR to allow for recursive DF handling. */
 	xorl   %eax, %eax
-	movl   %eax, thiscpu_x86_tss + OFFSET_TSS_LINK(%esi)
-	movl   %eax, thiscpu_x86_tssdf + OFFSET_TSS_LINK(%esi)
-	andb   $(0b11111101), thiscpu_x86_gdt + SEGMENT_CPU_TSS + 5(%esi)
-	andb   $(0b11111101), thiscpu_x86_gdt + SEGMENT_CPU_TSS_DF + 5(%esi)
+	movl   %eax, OFFSET_TSS_LINK(%ebp) /* Clear the link-pointer of the normal TSS */
+	movl   %eax, thiscpu_x86_tssdf + OFFSET_TSS_LINK(%ebx)
+	EXTERN(thiscpu_x86_gdt)
+	andb   $(0b11111101), thiscpu_x86_gdt + SEGMENT_CPU_TSS + 5(%ebx)
+	andb   $(0b11111101), thiscpu_x86_gdt + SEGMENT_CPU_TSS_DF + 5(%ebx)
 	movw   $(SEGMENT_CPU_TSS), %ax
 	ltrw   %ax
-	pushfl_cfi
+	pushfl
 	andl   $(~EFLAGS_NT), 0(%esp)
-	popfl_cfi
+	popfl
+
+	/* Construct the cpu-state structure that'll get passed to the #DF handler. */
+	pushl  OFFSET_TSS_EIP(%ebp)    /* state->dcs_regs.ucs_eip */
+	pushl  OFFSET_TSS_EFLAGS(%ebp) /* state->dcs_regs.ucs_eflags */
+	pushl  OFFSET_TSS_SS(%ebp)     /* state->dcs_regs.ucs_ss */
+	pushl  OFFSET_TSS_CS(%ebp)     /* state->dcs_regs.ucs_cs */
+	pushl  OFFSET_TSS_DS(%ebp)     /* state->dcs_regs.ucs_sgregs.sg_ds */
+	pushl  OFFSET_TSS_ES(%ebp)     /* state->dcs_regs.ucs_sgregs.sg_es */
+	pushl  OFFSET_TSS_FS(%ebp)     /* state->dcs_regs.ucs_sgregs.sg_fs */
+	pushl  OFFSET_TSS_GS(%ebp)     /* state->dcs_regs.ucs_sgregs.sg_gs */
+	pushl  OFFSET_TSS_EAX(%ebp)    /* state->dcs_regs.ucs_gpregs.gp_eax */
+	pushl  OFFSET_TSS_ECX(%ebp)    /* state->dcs_regs.ucs_gpregs.gp_ecx */
+	pushl  OFFSET_TSS_EDX(%ebp)    /* state->dcs_regs.ucs_gpregs.gp_edx */
+	pushl  OFFSET_TSS_EBX(%ebp)    /* state->dcs_regs.ucs_gpregs.gp_ebx */
+	pushl  OFFSET_TSS_ESP(%ebp)    /* state->dcs_regs.ucs_gpregs.gp_esp */
+	pushl  OFFSET_TSS_EBP(%ebp)    /* state->dcs_regs.ucs_gpregs.gp_ebp */
+	pushl  OFFSET_TSS_ESI(%ebp)    /* state->dcs_regs.ucs_gpregs.gp_esi */
+	pushl  OFFSET_TSS_EDI(%ebp)    /* state->dcs_regs.ucs_gpregs.gp_edi */
+	pushl  OFFSET_TSS_CR3(%ebp)    /* state->dcs_cr3 */
+
+	.cfi_def_cfa %esp, 4 + SIZEOF_UCPUSTATE
+	.cfi_rel_offset %eip, 4 + OFFSET_UCPUSTATE_EIP
+	.cfi_rel_offset %eflags, 4 + OFFSET_UCPUSTATE_EFLAGS
+	.cfi_rel_offset %ss, 4 + OFFSET_UCPUSTATE_SS
+	.cfi_rel_offset %cs, 4 + OFFSET_UCPUSTATE_CS
+	.cfi_rel_offset %ds, 4 + OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_DS
+	.cfi_rel_offset %es, 4 + OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_ES
+	.cfi_rel_offset %fs, 4 + OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_FS
+	.cfi_rel_offset %gs, 4 + OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_GS
+	.cfi_rel_offset %eax, 4 + OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_EAX
+	.cfi_rel_offset %ecx, 4 + OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_ECX
+	.cfi_rel_offset %edx, 4 + OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_EDX
+	.cfi_rel_offset %ebx, 4 + OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_EBX
+	.cfi_rel_offset %esp, 4 + OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_ESP
+	.cfi_rel_offset %ebp, 4 + OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_EBP
+	.cfi_rel_offset %esi, 4 + OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_ESI
+	.cfi_rel_offset %edi, 4 + OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_EDI
 
 	/* Invoke the C-level double-fault handler. */
 	movl   %esp, %ecx
 	EXTERN(PP_CAT2(x86_handle_, IDT_VECTOR_NAME))
 	call   PP_CAT2(x86_handle_, IDT_VECTOR_NAME)
-
 	cli
-	.cfi_def_cfa_register %eax
+	movl   %eax, %esp
+	/* Load %cr3 */
+	popl_cfi %eax
+	movl   %eax, %cr3
 
-	/* Unwind to where the DF handler wants to return. */
-	movl   0(%eax), %ecx
-	movl   %ecx, %cr3
-
-	testl  $(EFLAGS_VM), OFFSET_DF_CPUSTATE_REGS+OFFSET_UCPUSTATE_EFLAGS(%eax)
-	jz     1f
-	pushl  OFFSET_DF_CPUSTATE_REGS+OFFSET_UCPUSTATE_SGREGS+OFFSET_SGREGS_GS(%eax) /* ir_es */
-	pushl  OFFSET_DF_CPUSTATE_REGS+OFFSET_UCPUSTATE_SGREGS+OFFSET_SGREGS_FS(%eax) /* ir_ds */
-	pushl  OFFSET_DF_CPUSTATE_REGS+OFFSET_UCPUSTATE_SGREGS+OFFSET_SGREGS_ES(%eax) /* ir_fs */
-	pushl  OFFSET_DF_CPUSTATE_REGS+OFFSET_UCPUSTATE_SGREGS+OFFSET_SGREGS_DS(%eax) /* ir_gs */
-	jmp    2f
-1:	movw   %ss:OFFSET_DF_CPUSTATE_REGS+OFFSET_UCPUSTATE_SGREGS+OFFSET_SGREGS_DS(%eax), %cx
-	movw   %cx, %ds
-	movw   %ss:OFFSET_DF_CPUSTATE_REGS+OFFSET_UCPUSTATE_SGREGS+OFFSET_SGREGS_ES(%eax), %cx
-	movw   %cx, %es
-	movw   %ss:OFFSET_DF_CPUSTATE_REGS+OFFSET_UCPUSTATE_SGREGS+OFFSET_SGREGS_FS(%eax), %cx
-	movw   %cx, %fs
-	movw   %ss:OFFSET_DF_CPUSTATE_REGS+OFFSET_UCPUSTATE_SGREGS+OFFSET_SGREGS_GS(%eax), %cx
-	movw   %cx, %gs
-	testl  $(3), %ss:OFFSET_DF_CPUSTATE_REGS+OFFSET_UCPUSTATE_CS(%eax)
-	jz     1f
-2:	pushl  %ss:OFFSET_DF_CPUSTATE_REGS+OFFSET_UCPUSTATE_SS(%eax) /* ir_ss */
-	pushl  %ss:OFFSET_DF_CPUSTATE_REGS+OFFSET_UCPUSTATE_GPREGS+OFFSET_GPREGS_ESP(%eax) /* ir_esp */
-	jmp    3f
-1:	movw   %ss:OFFSET_DF_CPUSTATE_REGS+OFFSET_UCPUSTATE_SS(%eax), %cx
-	movw   %cx, %ss
-	movl   %ss:OFFSET_DF_CPUSTATE_REGS+OFFSET_UCPUSTATE_GPREGS+OFFSET_GPREGS_ESP(%eax), %esp
-3:	pushl  %ss:OFFSET_DF_CPUSTATE_REGS+OFFSET_UCPUSTATE_EFLAGS(%eax) /* ir_eflags */
-	pushl  %ss:OFFSET_DF_CPUSTATE_REGS+OFFSET_UCPUSTATE_CS(%eax)     /* ir_cs */
-	pushl  %ss:OFFSET_DF_CPUSTATE_REGS+OFFSET_UCPUSTATE_EIP(%eax)    /* ir_eip */
-
-	/* Restore registers from the iret tail from this point forward. */
-	.cfi_def_cfa %esp, 0
-	.cfi_restore_iret_eip
-	.cfi_restore_iret_cs
-	.cfi_restore_iret_eflags
-	.cfi_restore_iret_esp
-	.cfi_restore_iret_ss
-	.cfi_restore_iret_es
-	.cfi_restore_iret_ds
-	.cfi_restore_iret_fs
-	.cfi_restore_iret_gs
-
-	/* Restore all of the general-purpose registers. */
-	movl   %ss:OFFSET_DF_CPUSTATE_REGS+OFFSET_UCPUSTATE_GPREGS+OFFSET_GPREGS_EDI(%eax), %edi
-	.cfi_same_value %edi
-	movl   %ss:OFFSET_DF_CPUSTATE_REGS+OFFSET_UCPUSTATE_GPREGS+OFFSET_GPREGS_ESI(%eax), %esi
-	.cfi_same_value %esi
-	movl   %ss:OFFSET_DF_CPUSTATE_REGS+OFFSET_UCPUSTATE_GPREGS+OFFSET_GPREGS_EBP(%eax), %ebp
-	.cfi_same_value %ebp
-	movl   %ss:OFFSET_DF_CPUSTATE_REGS+OFFSET_UCPUSTATE_GPREGS+OFFSET_GPREGS_EBX(%eax), %ebx
-	.cfi_same_value %ebx
-	movl   %ss:OFFSET_DF_CPUSTATE_REGS+OFFSET_UCPUSTATE_GPREGS+OFFSET_GPREGS_EDX(%eax), %edx
-	.cfi_same_value %edx
-	movl   %ss:OFFSET_DF_CPUSTATE_REGS+OFFSET_UCPUSTATE_GPREGS+OFFSET_GPREGS_ECX(%eax), %ecx
-	.cfi_same_value %ecx
-	movl   %ss:OFFSET_DF_CPUSTATE_REGS+OFFSET_UCPUSTATE_GPREGS+OFFSET_GPREGS_EAX(%eax), %eax
-	.cfi_same_value %eax
-
-	/* Resume execution. */
-	iret
+	/* Load the remainder of as a `struct ucpustate' */
+	movl   %esp, %ecx
+	EXTERN(cpu_apply_ucpustate)
+	jmp    cpu_apply_ucpustate
 #undef OFFSET_DF_CPUSTATE_REGS
 #else /* IDT_VECTOR_ID == 0x08 */
 	.cfi_iret_signal_frame

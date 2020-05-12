@@ -600,12 +600,8 @@ SECTIONS {
 	PROVIDE_HIDDEN(x86_dbg_exitstate_b7 = (ABSOLUTE(x86_dbg_exitstate) & 0xff00000000000000) >> 56);
 #endif /* __x86_64__ */
 
-
 #ifndef __x86_64__
-	PROVIDE_HIDDEN(__x86_cputss_b0 = (ABSOLUTE(thiscpu_x86_tss) & 0x000000ff) >> 0);
-	PROVIDE_HIDDEN(__x86_cputss_b1 = (ABSOLUTE(thiscpu_x86_tss) & 0x0000ff00) >> 8);
-	PROVIDE_HIDDEN(__x86_cputss_b2 = (ABSOLUTE(thiscpu_x86_tss) & 0x00ff0000) >> 16);
-	PROVIDE_HIDDEN(__x86_cputss_b3 = (ABSOLUTE(thiscpu_x86_tss) & 0xff000000) >> 24);
+	PROVIDE_HIDDEN(_bootcpu_thiscpu_x86_tss = ABSOLUTE(_bootcpu + thiscpu_x86_tss));
 #endif /* !__x86_64__ */
 
 #ifndef __x86_64__

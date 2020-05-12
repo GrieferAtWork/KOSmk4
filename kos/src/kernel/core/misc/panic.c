@@ -553,7 +553,7 @@ kernel_vpanic_ucpustate(struct ucpustate *__restrict state,
 	if (format) {
 		va_list cargs;
 		va_copy(cargs, args);
-		format_vprintf(&syslog_printer, SYSLOG_LEVEL_RAW, format, cargs);
+		format_vprintf(&syslog_printer, SYSLOG_LEVEL_EMERG, format, cargs);
 		va_end(cargs);
 		printk(KERN_EMERG "\n");
 	}

@@ -251,6 +251,8 @@ NOTHROW(KCALL x86_dbg_hostbackup_cpu_suspended_count)(void) {
 	return result;
 }
 
+INTDEF ATTR_PERCPU uintptr_t thiscpu_idle_x86_kernel_psp0;
+
 PRIVATE NOBLOCK ATTR_DBGTEXT NONNULL((1, 2)) cpuid_t
 NOTHROW(KCALL cpu_broadcastipi_notthis_early_boot_aware)(cpu_ipi_t func,
                                                          void *args[CPU_IPI_ARGCOUNT],
@@ -263,6 +265,7 @@ NOTHROW(KCALL cpu_broadcastipi_notthis_early_boot_aware)(cpu_ipi_t func,
 		target = cpu_vector[i];
 		if (target == calling_cpu)
 			continue;
+
 		/* At one point during early boot, the entires of the `cpu_vector'
 		 * are used to carry a 16-bit block of information about the how
 		 * the associated CPU will be addressed physically.
@@ -272,6 +275,19 @@ NOTHROW(KCALL cpu_broadcastipi_notthis_early_boot_aware)(cpu_ipi_t func,
 		 * or `0xffff800000000000' on x86_64 isn't an initialized CPU pointer. */
 		if ((uintptr_t)target < KERNELSPACE_BASE)
 			continue;
+
+		/* One of the last things done during init is setting TTS.PSP0
+		 * Check if that field has already been initialized */
+#ifdef __x86_64__
+		if (!FORCPU(target, thiscpu_x86_tss).t_rsp0 ||
+		    (FORCPU(target, thiscpu_x86_tss).t_rsp0 != FORCPU(target, thiscpu_idle_x86_kernel_psp0)))
+			continue;
+#else /* __x86_64__ */
+		if (!FORCPU(target, thiscpu_x86_tss).t_esp0 ||
+		    (FORCPU(target, thiscpu_x86_tss).t_esp0 != FORCPU(target, thiscpu_idle_x86_kernel_psp0)))
+			continue;
+#endif /* !__x86_64__ */
+
 		if (cpu_sendipi(target, func, args, flags))
 			++result;
 	}
@@ -416,7 +432,7 @@ x86_init_psp0_thread(struct task *__restrict thread, size_t stack_size) {
 	                                                         CEILDIV(stack_size, PAGESIZE) - 1;
 	FORTASK(thread, this_kernel_stackpart_).dp_tree.a_vmax = FORTASK(thread, this_kernel_stackpart_).dp_tree.a_vmin +
 	                                                         CEILDIV(stack_size, PAGESIZE) - 1;
-	FORTASK(thread, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_size  = CEILDIV(stack_size, PAGESIZE);
+	FORTASK(thread, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_size = CEILDIV(stack_size, PAGESIZE);
 	init_this_x86_kernel_psp0(thread);
 }
 
@@ -530,7 +546,7 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_init(void) {
 		                                                  CPU_IPI_FWAITFOR, mycpu);
 		if (count) {
 			/* Wait for other CPUs to ACK becoming suspended. */
-			while (count < x86_dbg_hostbackup_cpu_suspended_count())
+			while (x86_dbg_hostbackup_cpu_suspended_count() < count)
 				__pause();
 		}
 	}

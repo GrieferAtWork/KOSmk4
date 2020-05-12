@@ -154,6 +154,18 @@ TEXT_SECTION
 	.cfi_rel_offset %eip, OFFSET_UCPUSTATE_EIP
 BEGIN_TRAP(kernel_debugtrap_ucpustate)
 INTERN_FUNCTION(libcpu_apply_ucpustate)
+	/* Immediatly load registers that won't be needed further below! */
+	movl   (OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_EDI)(%ecx), %edi
+	.cfi_same_value %edi
+	movl   (OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_ESI)(%ecx), %esi
+	.cfi_same_value %esi
+	movl   (OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_EBP)(%ecx), %ebp
+	.cfi_same_value %ebp
+	movl   (OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_EBX)(%ecx), %ebx
+	.cfi_same_value %ebx
+	movl   (OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_EDX)(%ecx), %edx
+	.cfi_same_value %edx
+	/* Check if we need to construct a vm86 IRET tail. */
 	testl  $(EFLAGS_VM), OFFSET_UCPUSTATE_EFLAGS(%ecx)
 	jz     1f
 	pushl  (OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_GS)(%ecx)
@@ -161,7 +173,8 @@ INTERN_FUNCTION(libcpu_apply_ucpustate)
 	pushl  (OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_DS)(%ecx)
 	pushl  (OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_ES)(%ecx)
 	jmp    2f
-1:	movl   (OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_GS)(%ecx), %eax
+1:	/* Load segment registers normally. */
+	movl   (OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_GS)(%ecx), %eax
 	movl   %eax, %gs
 	movl   (OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_FS)(%ecx), %eax
 	movl   %eax, %fs
@@ -169,27 +182,36 @@ INTERN_FUNCTION(libcpu_apply_ucpustate)
 	movl   %eax, %es
 	movl   (OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_DS)(%ecx), %eax
 	movl   %eax, %ds
+	/* Check if this leads into ring that is different from ours. */
 	testl  $(3), %ss:OFFSET_UCPUSTATE_CS(%ecx)
 #ifdef __KERNEL__
 	jz     1f
 #else /* __KERNEL__ */
 	jnz    1f
 #endif /* !__KERNEL__ */
+	/* Push what is required for a USER-IRET tail. */
 	pushl  %ss:OFFSET_UCPUSTATE_SS(%ecx)
 	pushl  %ss:(OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_ESP)(%ecx)
 	jmp    2f
-1:	movl   (OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_ESP)(%ecx), %esp
-2:	pushl  %ss:OFFSET_UCPUSTATE_EFLAGS(%ecx)
+1:	movl   %ss:(OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_ESP)(%ecx), %esp
+2:	/* Push registers that already need to appear */
+	pushl  %ss:OFFSET_UCPUSTATE_EFLAGS(%ecx)
 	pushl  %ss:OFFSET_UCPUSTATE_CS(%ecx)
 	pushl  %ss:OFFSET_UCPUSTATE_EIP(%ecx)
-	movl   (OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_EDI)(%ecx), %edi
-	movl   (OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_ESI)(%ecx), %esi
-	movl   (OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_EBP)(%ecx), %ebp
-	movl   (OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_ESP)(%ecx), %esp
-	movl   (OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_EBX)(%ecx), %ebx
-	movl   (OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_EDX)(%ecx), %edx
-	movl   (OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_EAX)(%ecx), %eax
-	movl   (OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_ECX)(%ecx), %ecx
+	/* With the IRET tail fully constructed, set-up CFI to restore registers from there. */
+	.cfi_restore_iret_eip
+	.cfi_restore_iret_cs
+	.cfi_restore_iret_eflags
+	.cfi_restore_iret_esp
+	.cfi_restore_iret_ss
+	.cfi_restore_iret_es
+	.cfi_restore_iret_ds
+	.cfi_restore_iret_fs
+	.cfi_restore_iret_gs
+	movl   %ss:(OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_EAX)(%ecx), %eax
+	.cfi_same_value %eax
+	movl   %ss:(OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_ECX)(%ecx), %ecx
+	.cfi_same_value %ecx
 	iret
 	.cfi_endproc
 END(libcpu_apply_ucpustate)

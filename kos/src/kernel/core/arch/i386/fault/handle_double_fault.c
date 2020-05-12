@@ -104,21 +104,13 @@ panic_df_dbg_main(void *cr3)
 /* Double fault handler. */
 INTERN struct df_cpustate *FCALL
 x86_handle_double_fault(struct df_cpustate *__restrict state) {
-	void *orig_pc, *next_pc;
+	void *pc;
 #ifdef __x86_64__
-	orig_pc = (void *)state->dcs_regs.ics_irregs.ir_rip;
-	next_pc = instruction_trysucc(orig_pc, instrlen_isa_from_icpustate(&state->dcs_regs));
+	pc = (void *)state->dcs_regs.ics_irregs.ir_rip;
 #else /* __x86_64__ */
-	orig_pc = (void *)state->dcs_regs.ucs_eip;
-	next_pc = instruction_trysucc(orig_pc, instrlen_isa_from_ucpustate(&state->dcs_regs));
+	pc = (void *)state->dcs_regs.ucs_eip;
 #endif /* !__x86_64__ */
-	printk(KERN_EMERG "Double fault at %p [nextpc:%p]\n",
-	       orig_pc, next_pc);
-#ifdef __x86_64__
-	state->dcs_regs.ics_irregs.ir_rip = (uintptr_t)next_pc;
-#else /* __x86_64__ */
-	state->dcs_regs.ucs_eip = (uintptr_t)next_pc;
-#endif /* !__x86_64__ */
+	printk(KERN_EMERG "Double fault at %p [nextpc:%p]\n", pc);
 	{
 		struct ucpustate ustate;
 #ifdef __x86_64__

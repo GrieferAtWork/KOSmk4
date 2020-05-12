@@ -527,7 +527,7 @@ INTERN_FUNCTION(_start)
 	 *       have to remain identity-mapped in physical memory during paging initialization
 	 *       above. - To accomodate for this, take note that the mov to cr0 and jmp take
 	 *       up a total of 8 bytes (which is very helpful since we need to use some power-of-2
-	 *       number that is at least as large, meaning we can use 8 for this)
+	 *       number that is at least as large, meaning we can just use that same 8 for this)
 	 *       We then align this piece of code such that it stored on an 8-byte boundary,
 	 *       thus also ensuring that there isn't a page-split anywhere inside, meaning we
 	 *       can get the management above to only have to ensure a single page of identity-

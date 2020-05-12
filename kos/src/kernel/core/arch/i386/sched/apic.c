@@ -607,6 +607,25 @@ i386_allocate_secondary_cores(void) {
 			                    addr,
 			                    PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
 			vm_node_insert(&FORCPU(altcore, thiscpu_x86_dfstacknode_));
+			addr = (byte_t *)addr + KERNEL_DF_STACKSIZE;
+			/* Store the DF stack pointer in internal CPU structures. */
+#ifdef __x86_64__
+			FORCPU(altcore, __kernel_percpu_tss).t_ist1 = (u64)addr;
+			FORCPU(altcore, __kernel_percpu_tss).t_ist2 = (u64)addr;
+			FORCPU(altcore, __kernel_percpu_tss).t_ist3 = (u64)addr;
+			FORCPU(altcore, __kernel_percpu_tss).t_ist4 = (u64)addr;
+			FORCPU(altcore, __kernel_percpu_tss).t_ist5 = (u64)addr;
+			FORCPU(altcore, __kernel_percpu_tss).t_ist6 = (u64)addr;
+			FORCPU(altcore, __kernel_percpu_tss).t_ist7 = (u64)addr;
+#else /* __x86_64__ */
+			FORCPU(altcore, thiscpu_x86_tssdf).t_esp0 = (u32)addr;
+			FORCPU(altcore, thiscpu_x86_tssdf).t_esp1 = (u32)addr;
+			FORCPU(altcore, thiscpu_x86_tssdf).t_esp2 = (u32)addr;
+			/* Fill in cpu-specific pointers needed by the implementation of the #DF handler! */
+			FORCPU(altcore, thiscpu_x86_tssdf).t_ebx = (u32)altcore;
+			FORCPU(altcore, thiscpu_x86_tssdf).t_esp = (u32)addr;
+			FORCPU(altcore, thiscpu_x86_tssdf).t_ebp = (u32)&FORCPU(altcore, thiscpu_x86_tss);
+#endif /* !__x86_64__ */
 		}
 
 		FORTASK(altidle, this_kernel_stackpart_).dp_tree.a_vmax = (datapage_t)(CEILDIV(KERNEL_IDLE_STACKSIZE, PAGESIZE) - 1);
