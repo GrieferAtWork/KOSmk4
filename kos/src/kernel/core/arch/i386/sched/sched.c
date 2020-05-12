@@ -287,7 +287,7 @@ NOTHROW(FCALL task_push_asynchronous_rpc_v)(struct scpustate *__restrict state,
  *       neither terminated, nor is actually set up to be a
  *       kernel-space thread.
  * @return: true:  Successfully redirected the given thread.
- * @return: false: The given thread has already been redirected. */
+ * @return: false: The given thread had already been redirected. */
 PUBLIC NOBLOCK NONNULL((1)) bool
 NOTHROW(FCALL task_enable_redirect_usercode_rpc)(struct task *__restrict self) {
 	struct irregs_user *thread_iret;
@@ -552,7 +552,7 @@ NOTHROW(FCALL x86_get_irregs)(struct task const *__restrict self) {
  *       neither terminated, nor is actually set up to be a
  *       kernel-space thread.
  * @return: true:  Successfully redirected the given thread.
- * @return: false: The given thread has already been redirected. */
+ * @return: false: The given thread had already been redirected. */
 PUBLIC NOBLOCK NONNULL((1)) bool
 NOTHROW(FCALL task_enable_redirect_usercode_rpc)(struct task *__restrict self) {
 	struct irregs_user *thread_iret;

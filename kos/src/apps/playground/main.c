@@ -542,8 +542,6 @@ int main_yield(int argc, char *argv[], char *envp[]) {
 	pthread_create(&pt, NULL, &main_yield_thread, NULL);
 	pthread_create(&pt, NULL, &main_yield_thread, NULL);
 	pthread_create(&pt, NULL, &main_yield_thread, NULL);
-	/* FIXME: CTRL+C killing this program won't kill the child threads :(
-	 * But on the bright side: realtime() timings are working correctly :D */
 	for (;;)
 		pthread_yield();
 	return 0;

@@ -296,18 +296,16 @@ NOTHROW(KCALL task_deliver_rpc)(struct task *__restrict target,
 	/* At this point our RPC has been scheduled and
 	 * can potentially be executed at any moment. */
 
-	/* Wake up the target thread by using a sporadic wake-up. */
-	if ((rpc_mode & RPC_KIND_MASK) != RPC_KIND_SYNC) {
-		/* `RPC_KIND_USER', `RPC_KIND_USER_INTR' or `RPC_KIND_USER_INTR_SYNC' */
-		task_redirect_usercode_rpc(target, priority);
+	/* Always re-direct user-space, since any kind of synchronous
+	 * interrupt must be handled immediately if `target' is currently
+	 * running from user-space! */
+	task_redirect_usercode_rpc(target, priority);
 
-		/* Throw an error to return to user-space if we're interrupting, and are sending this to ourself. */
-		if ((rpc_mode & RPC_KIND_INTERRUPT) && target == THIS_TASK)
-			return TASK_DELIVER_RPC_INTERRUPTED;
-	} else {
-		task_wake(target, priority);
-	}
-	/* Always return SUCCESS at this point, as a failed `task_wake()' / `task_redirect_usercode_rpc()'
+	/* Throw an error to return to user-space if we're interrupting, and are sending this to ourself. */
+	if ((rpc_mode & RPC_KIND_INTERRUPT) && target == THIS_TASK)
+		return TASK_DELIVER_RPC_INTERRUPTED;
+
+	/* Always return SUCCESS at this point, as a failed `task_redirect_usercode_rpc()'
 	 * still means that the RPC will be serviced, since we managed to schedule it as
 	 * pending (i.e. `this_rpcs_pending' wasn't `RPC_PENDING_TERMINATED'). */
 	return TASK_DELIVER_RPC_SUCCESS;

@@ -199,8 +199,9 @@ PUBLIC NONNULL((1, 2)) bool
 	/* At this point our RPC has been scheduled and
 	 * can potentially be executed at any moment. */
 
-	/* Wake up the target thread by using a sporadic wake-up. */
-#ifdef RPC_USER
+	/* Always re-direct user-space, since any kind of synchronous
+	 * interrupt must be handled immediately if `target' is currently
+	 * running from user-space! */
 	task_redirect_usercode_rpc(target, mode & TASK_WAKE_FMASK);
 
 	/* Throw an error to return to user-space if we're interrupting, and are sending this to ourself. */
@@ -212,18 +213,10 @@ PUBLIC NONNULL((1, 2)) bool
 #endif /* !RPC_NOEXCEPT */
 	}
 
-	/* Always return SUCCESS at this point, as a failed `task_redirect_usercode_rpc()' still
-	 * means that the RPC will be serviced, since we managed to schedule it as
+	/* Always return SUCCESS at this point, as a failed `task_redirect_usercode_rpc()'
+	 * still means that the RPC will be serviced, since we managed to schedule it as
 	 * pending (i.e. `this_rpcs_pending' wasn't `RPC_PENDING_TERMINATED'). */
 	return SUCCESS_RETURN_VALUE;
-#else /* RPC_USER */
-	task_wake(target, mode & TASK_WAKE_FMASK);
-
-	/* Always return SUCCESS at this point, as a failed `task_wake()' still means
-	 * that the RPC will be serviced, since we managed to schedule it as
-	 * pending (i.e. `this_rpcs_pending' wasn't `RPC_PENDING_TERMINATED'). */
-	return SUCCESS_RETURN_VALUE;
-#endif /* !RPC_USER */
 }
 
 

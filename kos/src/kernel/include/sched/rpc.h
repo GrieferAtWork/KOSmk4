@@ -373,7 +373,7 @@ NOTHROW(FCALL task_push_asynchronous_rpc_v)(struct scpustate *__restrict state,
  *       neither terminated, nor is actually set up to be a
  *       kernel-space thread.
  * @return: true:  Successfully redirected the given thread.
- * @return: false: The given thread has already been redirected. */
+ * @return: false: The given thread had already been redirected. */
 FUNDEF NOBLOCK NONNULL((1)) bool
 NOTHROW(FCALL task_enable_redirect_usercode_rpc)(struct task *__restrict self);
 
@@ -381,9 +381,13 @@ NOTHROW(FCALL task_enable_redirect_usercode_rpc)(struct task *__restrict self);
  * This function automatically performs all of the necessary locking, checks and IPIs
  * in order to execute `task_enable_redirect_usercode_rpc()' for `target' within the
  * proper context.
- * @return: true:  Successfully redirected the given thread (though it may have already been redirected before).
+ * NOTE: This function also causes a sporadic wakeup for `target', irregardless of
+ *       usercode already having been redirected, having the same effect as a call
+ *       to `task_wake()'.
+ * @return: true:  Successfully redirected the given thread (though it may have
+ *                 already been redirected before).
  * @return: false: The RPC could not be scheduled because `target' has terminated.
- *        WARNING: The target may still terminate before the RPC can be servied,
+ *        WARNING: The target may still terminate before the RPC can be serviced,
  *                 though this has to be detected in some different manner. */
 FUNDEF NOBLOCK NONNULL((1)) bool
 NOTHROW(KCALL task_redirect_usercode_rpc)(struct task *__restrict target, uintptr_t mode);
