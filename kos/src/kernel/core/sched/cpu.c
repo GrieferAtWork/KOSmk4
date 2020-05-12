@@ -461,6 +461,12 @@ NOTHROW(FCALL task_decref_for_exit)(void *arg,
 	return state;
 }
 
+PRIVATE ATTR_KERNEL_PANIC_NORETURN ATTR_COLD ATTR_NOINLINE void
+NOTHROW(FCALL panic_critical_thread_exited)(void) {
+	struct task *me = THIS_TASK;
+	kernel_panic("Critical thread %p [tid=%u] has exited",
+	             me, task_getroottid_of_s(me));
+}
 
 /* Terminate the calling thread immediately.
  * WARNING: Do not call this function to terminate a thread.
@@ -484,8 +490,8 @@ NOTHROW(FCALL task_exit)(int w_status) {
 	caller = THIS_TASK;
 	assert(caller->t_flags & TASK_FRUNNING);
 	if unlikely(caller->t_flags & TASK_FCRITICAL) {
-		kernel_panic("Critical thread %p [tid=%u] has exited",
-		             caller, task_getroottid_of_s(caller));
+		panic_critical_thread_exited();
+		ATOMIC_FETCHAND(caller->t_flags, ~TASK_FCRITICAL);
 	}
 	/* Fill in the exit status */
 	if (pid)
@@ -556,14 +562,53 @@ NOTHROW(FCALL task_exit)(int w_status) {
 	                                                   &task_decref_for_exit,
 	                                                   caller);
 
-	/* Set the flag to indicate that we've been fully terminated.
-	 * NOTE: Also ensure that a couple of other flags are set/cleared correctly. */
-	ATOMIC_FETCHOR(caller->t_flags, TASK_FTERMINATING | TASK_FTERMINATED | TASK_FSTARTED);
+	/* Update thread status flags. */
+	{
+		uintptr_t old_flags;
+		uintptr_t new_flags;
+		do {
+			/* Set the flag to indicate that we've been fully terminated.
+			 * NOTE: Also ensure that a couple of other flags are set/cleared correctly,
+			 *       though most of these flags should already have the proper status */
+			enum {
+				set = (/* Set the terminated flags */
+				       TASK_FTERMINATING | TASK_FTERMINATED |
+				       /* Ensure that the thread's status indicates that it was started */
+				       TASK_FSTARTED | TASK_FSTARTING |
+				       /* Once dead, there'd be no point in being moved to a different core */
+				       TASK_FKEEPCORE |
+				       0),
+				del = (/* We're no longer running */
+				       TASK_FRUNNING |
+				       /* Any pending wakeup request will never come though, so if anyone is
+				        * listening for this flag, act as though their request was served. */
+				       TASK_FWAKING |
+				       /* This flag really shouldn't be set, so clearing simply ensures
+				        * some consistency */
+				       TASK_FTIMEOUT |
+				       /* Once dead, we can no longer be resumed (so we're also no longer suspended) */
+				       TASK_FSUSPENDED | TASK_FGDB_STOPPED |
 #ifndef CONFIG_NO_SMP
-	ATOMIC_FETCHAND(caller->t_flags, ~(TASK_FRUNNING | TASK_FWAKING | TASK_FTIMEOUT | TASK_FSUSPENDED | TASK_FPENDING));
-#else /* !CONFIG_NO_SMP */
-	ATOMIC_FETCHAND(caller->t_flags, ~(TASK_FRUNNING | TASK_FWAKING | TASK_FTIMEOUT | TASK_FSUSPENDED));
-#endif /* CONFIG_NO_SMP */
+				       /* Once dead, we can no longer be pending in some kind of CPU-transfer */
+				       TASK_FPENDING |
+#endif /* !CONFIG_NO_SMP */
+				       0)
+			};
+			old_flags = ATOMIC_READ(caller->t_flags);
+			new_flags = old_flags;
+			/* While this was already checked for above, some other thread may have set this
+			 * flag in the mean time (though doing something like that would be really bad
+			 * practice). In any case: properly handle the CRITICAL-flag until the very end,
+			 * so that other code can guaranty that setting the flag at any point when the
+			 * TERMINATED flag hasn't also been set will cause an intentional kernel panic. */
+			if unlikely(new_flags & TASK_FCRITICAL)
+				panic_critical_thread_exited();
+			new_flags |= set;
+			new_flags &= ~del;
+		} while (!ATOMIC_CMPXCH_WEAK(caller->t_flags,
+		                             old_flags,
+		                             new_flags));
+	}
 
 	/* Broadcast the status-changed signal _after_ setting `TASK_FTERMINATED'
 	 * That way, other thread can use `tp_changed' alongside `TASK_FTERMINATED'

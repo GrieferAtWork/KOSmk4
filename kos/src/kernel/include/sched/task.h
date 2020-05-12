@@ -65,19 +65,19 @@ DECL_BEGIN
 #define TASK_FSTARTING    0x0400 /* [lock(WRITE_ONCE)] The thread is currently starting. */
 #define TASK_FSTARTED     0x0800 /* [lock(WRITE_ONCE)] The thread has been started. */
 #define TASK_FCRITICAL    0x1000 /* The thread is critical, and any attempting to task_exit() it causes kernel panic. */
-#define TASK_FGDB_STOPPED 0x2000 /* Used by the gdbserver driver */
+#define TASK_FGDB_STOPPED 0x2000 /* Used internally by the gdbserver driver */
 #define TASK_FSUSPENDED   0x4000 /* Used internally to implement of SIGSTOP/SIGCONT */
 #define TASK_FTIMEOUT     0x8000 /* Set by the scheduler when waking a task due to a timeout. */
 
 
-#define OFFSET_TASK_SELF            0
-#define OFFSET_TASK_REFCNT          __SIZEOF_POINTER__
-#define OFFSET_TASK_FLAGS        (2*__SIZEOF_POINTER__)
-#define OFFSET_TASK_CPU          (3*__SIZEOF_POINTER__)
-#define OFFSET_TASK_VM           (4*__SIZEOF_POINTER__)
-#define OFFSET_TASK_VM_TASKS     (5*__SIZEOF_POINTER__)
-#define OFFSET_TASK_HEAPSZ       (7*__SIZEOF_POINTER__)
-#define OFFSET_TASK_SCHED_STATE  (8*__SIZEOF_POINTER__)
+#define OFFSET_TASK_SELF         0
+#define OFFSET_TASK_REFCNT       __SIZEOF_POINTER__
+#define OFFSET_TASK_FLAGS        (2 * __SIZEOF_POINTER__)
+#define OFFSET_TASK_CPU          (3 * __SIZEOF_POINTER__)
+#define OFFSET_TASK_VM           (4 * __SIZEOF_POINTER__)
+#define OFFSET_TASK_VM_TASKS     (5 * __SIZEOF_POINTER__)
+#define OFFSET_TASK_HEAPSZ       (7 * __SIZEOF_POINTER__)
+#define OFFSET_TASK_SCHED_STATE  (8 * __SIZEOF_POINTER__)
 
 #ifdef __CC__
 
@@ -408,7 +408,7 @@ FUNDEF WUNUSED ATTR_MALLOC ATTR_RETNONNULL REF struct task *
                     uintptr_t clone_flags, void *tls_val,
                     USER CHECKED pid_t *parent_tidptr,
                     USER CHECKED pid_t *child_tidptr)
-                    THROWS(E_WOULDBLOCK, E_BADALLOC);
+		THROWS(E_WOULDBLOCK, E_BADALLOC);
 #endif
 
 
