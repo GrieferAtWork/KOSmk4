@@ -284,11 +284,10 @@ evalthreadexpr(char *expr, struct task **presult) {
 }
 
 
-INTERN ATTR_DBGTEXT void DBG_CALL
-autocomplete_thread(size_t argc, char *argv[],
-                    dbg_autocomplete_cb_t cb, void *arg,
-                    char const *starts_with,
-                    size_t starts_with_len) {
+DBG_AUTOCOMPLETE(thread,
+                 /*size_t*/ argc, /*char **/ argv /*[]*/,
+                 /*dbg_autocomplete_cb_t*/ cb, /*void **/arg,
+                 /*char const **/ starts_with, /*size_t*/ starts_with_len) {
 	(void)argv;
 	if (argc == 1) {
 		if (!starts_with_len) {
@@ -333,12 +332,12 @@ autocomplete_thread(size_t argc, char *argv[],
 	}
 }
 
-DBG_COMMAND(thread, autocomplete_thread, DBG_HOOKFLAG_NORMAL,
-            "thread ADDR\n"
-            "\tSet the thread that is being debuged\n"
-            "\tWarning: Setting an invalid thread address may triple-fault the kernel\n"
-            "\t         Use " DF_WHITE("thread ADDR force") " to override security checks\n",
-            argc, argv) {
+DBG_COMMAND_AUTO(thread, DBG_HOOKFLAG_NORMAL,
+                 "thread ADDR\n"
+                 "\tSet the thread that is being debuged\n"
+                 "\tWarning: Setting an invalid thread address may triple-fault the kernel\n"
+                 "\t         Use " DF_WHITE("thread ADDR force") " to override security checks\n",
+                 argc, argv) {
 	struct task *thread;
 	if (argc < 2)
 		return DBG_STATUS_INVALID_ARGUMENTS;

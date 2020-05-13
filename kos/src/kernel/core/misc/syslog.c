@@ -318,11 +318,10 @@ dbg_loglevel_from_name(char const *__restrict name) {
 	return (unsigned int)-1;
 }
 
-INTERN ATTR_DBGTEXT void DBG_CALL
-autocomplete_loglevel(size_t argc, char *argv[],
-                      dbg_autocomplete_cb_t cb, void *arg,
-                      char const *starts_with,
-                      size_t starts_with_len) {
+DBG_AUTOCOMPLETE(loglevel,
+                 /*size_t*/ argc, /*char **/ argv /*[]*/,
+                 /*dbg_autocomplete_cb_t*/ cb, /*void **/arg,
+                 /*char const **/ starts_with, /*size_t*/ starts_with_len) {
 	(void)argv;
 	if (argc == 1) {
 		char buf[1 + COMPILER_STRLEN(syslog_level_names[0]) + 1];
@@ -340,12 +339,12 @@ autocomplete_loglevel(size_t argc, char *argv[],
 	}
 }
 
-DBG_COMMAND(loglevel, autocomplete_loglevel, DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE,
-            "loglevel [level|-level|+level]...\n"
-            "\tList currently enabled syslog levels when no arguments are given\n"
-            "\tOtherwise, enable/disable specific levels (+level|-level) or restrict\n"
-            "\tlogging to only include messages of level and greater priority\n",
-            argc, argv) {
+DBG_COMMAND_AUTO(loglevel, DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE,
+                 "loglevel [level|-level|+level]...\n"
+                 "\tList currently enabled syslog levels when no arguments are given\n"
+                 "\tOtherwise, enable/disable specific levels (+level|-level) or restrict\n"
+                 "\tlogging to only include messages of level and greater priority\n",
+                 argc, argv) {
 	unsigned int level;
 	--argc;
 	++argv;

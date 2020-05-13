@@ -34,6 +34,8 @@
 
 #include <asm/asmword.h>
 
+#include <libc/string.h>
+
 DECL_BEGIN
 
 /* General calling convention for debugger hooks. */
@@ -90,6 +92,7 @@ DECL_BEGIN
 #define DBG_HOOK_RESET   0x04 /* `struct dbg_resethook' (invoke a function during debugger reset (an initial reset always happens after init!)) */
 #define DBG_HOOK_FINI    0x05 /* `struct dbg_finihook' (invoke a function before debugger finalization) */
 #define DBG_HOOK_CLEAR   0x06 /* `struct dbg_clearhook' (specify a data block that should be bzero()-ed while inside the debugger, but restored after) */
+#define DBG_HOOK_CLEARIF 0x07 /* `struct dbg_clearifhook' (Same as `DBG_HOOK_CLEAR', but determine the object to-be cleared dynamically) */
 
 #define _DBG_PRIVATE_HOOKSTRUCT_0x01 struct dbg_morehook
 #define _DBG_PRIVATE_HOOKSTRUCT_0x02 struct dbg_commandhook
@@ -97,6 +100,7 @@ DECL_BEGIN
 #define _DBG_PRIVATE_HOOKSTRUCT_0x04 struct dbg_resethook
 #define _DBG_PRIVATE_HOOKSTRUCT_0x05 struct dbg_finihook
 #define _DBG_PRIVATE_HOOKSTRUCT_0x06 struct dbg_clearhook
+#define _DBG_PRIVATE_HOOKSTRUCT_0x07 struct dbg_clearifhook
 #define _DBG_PRIVATE_HOOKSTRUCT(type) _DBG_PRIVATE_HOOKSTRUCT_##type
 
 
@@ -113,9 +117,11 @@ DECL_BEGIN
 
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 #define _DBG_HOOK_ASMWORD_RELPTR .wordptr
+#define _DBG_HOOK_ASMWORD_RELPTRO(base, offset) .wordptr base + offset
 #define _DBG_HOOK_ASMWORD_FLAGS  0
 #else /* CONFIG_BUILDING_KERNEL_CORE */
 #define _DBG_HOOK_ASMWORD_RELPTR .wordrel
+#define _DBG_HOOK_ASMWORD_RELPTRO(base, offset) .wordrel base, offset
 #define _DBG_HOOK_ASMWORD_FLAGS  DBG_HOOKFLAG_RELATIVE
 #endif /* !CONFIG_BUILDING_KERNEL_CORE */
 
@@ -194,6 +200,25 @@ typedef void (DBG_CALL *dbg_autocomplete_t)(size_t argc, char *argv[],
                                             char const *starts_with,
                                             size_t starts_with_len);
 
+#define _DBG_PRIVATE_AUTOCOMPLETE_5(name, argc, argv, cb, arg) \
+	PRIVATE ATTR_USED void DBG_CALL                            \
+	autocomplete_##name(size_t argc, char *argv[], dbg_autocomplete_cb_t cb, void *arg)
+#define _DBG_PRIVATE_AUTOCOMPLETE_6(name, argc, argv, cb, arg, starts_with)  \
+	PRIVATE ATTR_USED void DBG_CALL                                          \
+	autocomplete_##name(size_t argc, char *argv[], dbg_autocomplete_cb_t cb, \
+	                    void *arg, void *arg, char const *starts_with)
+#define _DBG_PRIVATE_AUTOCOMPLETE_7(name, argc, argv, cb, arg, starts_with, starts_with_len) \
+	PRIVATE ATTR_USED void DBG_CALL                                                          \
+	autocomplete_##name(size_t argc, char *argv[], dbg_autocomplete_cb_t cb,                 \
+	                    void *arg, char const *starts_with, size_t starts_with_len)
+
+/* Overload:
+ * >> DBG_AUTOCOMPLETE(Symbol name, Symbol argc, Symbol argv, Symbol cb, Symbol arg) { ... }
+ * >> DBG_AUTOCOMPLETE(Symbol name, Symbol argc, Symbol argv, Symbol cb, Symbol arg, Symbol starts_with) { ... }
+ * >> DBG_AUTOCOMPLETE(Symbol name, Symbol argc, Symbol argv, Symbol cb, Symbol arg, Symbol starts_with, Symbol starts_with_len) { ... }
+ * NOTE: All arguments are the names of the parameters passed to the function. */
+#define DBG_AUTOCOMPLETE(...) __HYBRID_PP_VA_OVERLOAD(_DBG_PRIVATE_AUTOCOMPLETE_, (__VA_ARGS__))(__VA_ARGS__)
+
 struct dbg_commandhook {
 	dbg_hook_type_t    dc_type; /* == DBG_HOOK_COMMAND */
 	dbg_hook_flag_t    dc_flag; /* ... */
@@ -213,7 +238,6 @@ struct dbg_commandhook {
 	  (argc) > 1 && !dbg_commandhook_hasauto(self))             \
 	 ? DBG_STATUS_INVALID_ARGUMENTS                             \
 	 : (*(self)->dc_main)(argc, argv))
-
 
 #endif /* __CC__ */
 
@@ -260,43 +284,48 @@ struct dbg_commandhook {
 
 
 #ifdef __CC__
-#define _DBG_PRIVATE_COMMAND_1EX(flags, name)                                  \
-	INTDEF intptr_t DBG_CALL dbg_command_##name(void);                         \
-	INTERN_CONST ATTR_DBGSTRINGS char const dbg_commandname_##name[] = #name;  \
-	_DBG_PRIVATE_DEFHOOK_COMMAND_3(dbg_commandname_##name, dbg_command_##name, \
-	                               flags);                                     \
-	INTERN ATTR_DBGTEXT intptr_t DBG_CALL dbg_command_##name(void)
-#define _DBG_PRIVATE_COMMAND_2EX(flags, name, help)                            \
-	INTDEF intptr_t DBG_CALL dbg_command_##name(void);                         \
-	INTERN_CONST ATTR_DBGSTRINGS char const dbg_commandname_##name[] = #name;  \
-	INTERN_CONST ATTR_DBGSTRINGS char const dbg_commandhelp_##name[] = help;   \
-	_DBG_PRIVATE_DEFHOOK_COMMAND_4(dbg_commandname_##name, dbg_command_##name, \
-	                               flags, dbg_commandhelp_##name);             \
-	INTERN ATTR_DBGTEXT intptr_t DBG_CALL dbg_command_##name(void)
-#define _DBG_PRIVATE_COMMAND_4EX(flags, name, help, argc, argv)                \
-	INTDEF intptr_t DBG_CALL dbg_command_##name(size_t argc, char *argv[]);    \
-	INTERN_CONST ATTR_DBGSTRINGS char const dbg_commandname_##name[] = #name;  \
-	INTERN_CONST ATTR_DBGSTRINGS char const dbg_commandhelp_##name[] = help;   \
-	_DBG_PRIVATE_DEFHOOK_COMMAND_4(dbg_commandname_##name, dbg_command_##name, \
-	                               flags, dbg_commandhelp_##name);             \
-	INTERN ATTR_DBGTEXT intptr_t DBG_CALL dbg_command_##name(size_t argc, char *argv[])
-#define _DBG_PRIVATE_COMMAND_6(name, auto, flags, help, argc, argv)            \
-	INTDEF intptr_t DBG_CALL dbg_command_##name(size_t argc, char *argv[]);    \
-	INTERN_CONST ATTR_DBGSTRINGS char const dbg_commandname_##name[] = #name;  \
-	INTERN_CONST ATTR_DBGSTRINGS char const dbg_commandhelp_##name[] = help;   \
-	_DBG_PRIVATE_DEFHOOK_COMMAND_5(dbg_commandname_##name, dbg_command_##name, \
-	                               flags, dbg_commandhelp_##name, auto);       \
-	INTERN ATTR_DBGTEXT intptr_t DBG_CALL dbg_command_##name(size_t argc, char *argv[])
-#define _DBG_PRIVATE_COMMAND_1(name)                         _DBG_PRIVATE_COMMAND_1EX(DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE, name)
-#define _DBG_PRIVATE_COMMAND_2(name, help)                   _DBG_PRIVATE_COMMAND_2EX(DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE, name, help)
-#define _DBG_PRIVATE_COMMAND_4(name, help, argc, argv)       _DBG_PRIVATE_COMMAND_4EX(0, name, help, argc, argv)
-#define _DBG_PRIVATE_COMMAND_5(name, auto, help, argc, argv) _DBG_PRIVATE_COMMAND_6(0, name, auto, help, argc, argv)
+#define _DBG_PRIVATE_COMMAND_IMPL3_NOARGS(flags, name)                                                               \
+	PRIVATE intptr_t DBG_CALL dbg_command_##name(void);                                                              \
+	PRIVATE ATTR_USED ATTR_DBGSTRINGS char const dbg_commandname_##name[] ASMNAME("dbg_commandname_" #name) = #name; \
+	_DBG_PRIVATE_DEFHOOK_COMMAND_3(dbg_commandname_##name, dbg_command_##name,                                       \
+	                               flags);                                                                           \
+	PRIVATE ATTR_USED ATTR_DBGTEXT intptr_t DBG_CALL dbg_command_##name(void)
+#define _DBG_PRIVATE_COMMAND_IMPL4_NOARGS(flags, name, help)                                                         \
+	PRIVATE intptr_t DBG_CALL dbg_command_##name(void);                                                              \
+	PRIVATE ATTR_USED ATTR_DBGSTRINGS char const dbg_commandname_##name[] ASMNAME("dbg_commandname_" #name) = #name; \
+	PRIVATE ATTR_USED ATTR_DBGSTRINGS char const dbg_commandhelp_##name[] ASMNAME("dbg_commandhelp_" #name) = help;  \
+	_DBG_PRIVATE_DEFHOOK_COMMAND_4(dbg_commandname_##name, dbg_command_##name,                                       \
+	                               flags, dbg_commandhelp_##name);                                                   \
+	PRIVATE ATTR_USED ATTR_DBGTEXT intptr_t DBG_CALL dbg_command_##name(void)
+#define _DBG_PRIVATE_COMMAND_IMPL4(flags, name, help, argc, argv)                                                    \
+	PRIVATE intptr_t DBG_CALL dbg_command_##name(size_t argc, char *argv[]);                                         \
+	PRIVATE ATTR_USED ATTR_DBGSTRINGS char const dbg_commandname_##name[] ASMNAME("dbg_commandname_" #name) = #name; \
+	PRIVATE ATTR_USED ATTR_DBGSTRINGS char const dbg_commandhelp_##name[] ASMNAME("dbg_commandhelp_" #name) = help;  \
+	_DBG_PRIVATE_DEFHOOK_COMMAND_4(dbg_commandname_##name, dbg_command_##name,                                       \
+	                               flags, dbg_commandhelp_##name);                                                   \
+	PRIVATE ATTR_USED ATTR_DBGTEXT intptr_t DBG_CALL dbg_command_##name(size_t argc, char *argv[])
+#define _DBG_PRIVATE_COMMAND_IMPL5(name, auto, flags, help, argc, argv)                                              \
+	PRIVATE intptr_t DBG_CALL dbg_command_##name(size_t argc, char *argv[]);                                         \
+	PRIVATE ATTR_USED ATTR_DBGSTRINGS char const dbg_commandname_##name[] ASMNAME("dbg_commandname_" #name) = #name; \
+	PRIVATE ATTR_USED ATTR_DBGSTRINGS char const dbg_commandhelp_##name[] ASMNAME("dbg_commandhelp_" #name) = help;  \
+	_DBG_PRIVATE_DEFHOOK_COMMAND_5(dbg_commandname_##name, dbg_command_##name,                                       \
+	                               flags, dbg_commandhelp_##name, auto);                                             \
+	PRIVATE ATTR_USED ATTR_DBGTEXT intptr_t DBG_CALL dbg_command_##name(size_t argc, char *argv[])
+#define _DBG_PRIVATE_COMMAND_IMPL5_NOHELP(name, auto, flags, argc, argv)                                             \
+	PRIVATE intptr_t DBG_CALL dbg_command_##name(size_t argc, char *argv[]);                                         \
+	PRIVATE ATTR_USED ATTR_DBGSTRINGS char const dbg_commandname_##name[] ASMNAME("dbg_commandname_" #name) = #name; \
+	_DBG_PRIVATE_DEFHOOK_COMMAND_5(dbg_commandname_##name, dbg_command_##name,                                       \
+	                               flags, 0, auto);                                                                  \
+	PRIVATE ATTR_USED ATTR_DBGTEXT intptr_t DBG_CALL dbg_command_##name(size_t argc, char *argv[])
+#define _DBG_PRIVATE_COMMAND_1(name)                                _DBG_PRIVATE_COMMAND_IMPL3_NOARGS(DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE, name)
+#define _DBG_PRIVATE_COMMAND_2(name, help)                          _DBG_PRIVATE_COMMAND_IMPL4_NOARGS(DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE, name, help)
+#define _DBG_PRIVATE_COMMAND_4(name, help, argc, argv)              _DBG_PRIVATE_COMMAND_IMPL4(0, name, help, argc, argv)
+#define _DBG_PRIVATE_COMMAND_5(name, auto, help, argc, argv)        _DBG_PRIVATE_COMMAND_IMPL5(name, auto, 0, help, argc, argv)
+#define _DBG_PRIVATE_COMMAND_6(name, auto, flags, help, argc, argv) _DBG_PRIVATE_COMMAND_IMPL5(name, auto, flags, help, argc, argv)
 
-#define _DBG_PRIVATE_COMMAND_AUTOEXCL_1(name)                                _DBG_PRIVATE_COMMAND_1EX(DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE, name)
-#define _DBG_PRIVATE_COMMAND_AUTOEXCL_2(name, help)                          _DBG_PRIVATE_COMMAND_2EX(DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE, name, help)
-#define _DBG_PRIVATE_COMMAND_AUTOEXCL_4(name, help, argc, argv)              _DBG_PRIVATE_COMMAND_4EX(DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE, name, help, argc, argv)
-#define _DBG_PRIVATE_COMMAND_AUTOEXCL_5(name, auto, help, argc, argv)        _DBG_PRIVATE_COMMAND_6(name, auto, DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE, help, argc, argv)
-#define _DBG_PRIVATE_COMMAND_AUTOEXCL_6(name, auto, flags, help, argc, argv) _DBG_PRIVATE_COMMAND_6(name, auto, (flags) | DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE, help, argc, argv)
+#define _DBG_PRIVATE_COMMAND_AUTO_3(name, argc, argv)              _DBG_PRIVATE_COMMAND_IMPL5_NOHELP(name, autocomplete_##name, 0, argc, argv)
+#define _DBG_PRIVATE_COMMAND_AUTO_4(name, help, argc, argv)        _DBG_PRIVATE_COMMAND_IMPL5(name, autocomplete_##name, 0, help, argc, argv)
+#define _DBG_PRIVATE_COMMAND_AUTO_5(name, flags, help, argc, argv) _DBG_PRIVATE_COMMAND_IMPL5(name, autocomplete_##name, flags, help, argc, argv)
 
 /* Overload:
  * >> DBG_COMMAND(Keyword name) { ... }
@@ -307,12 +336,10 @@ struct dbg_commandhook {
 #define DBG_COMMAND(...) __HYBRID_PP_VA_OVERLOAD(_DBG_PRIVATE_COMMAND_, (__VA_ARGS__))(__VA_ARGS__)
 
 /* Overload:
- * >> DBG_COMMAND_AUTOEXCL(Keyword name) { ... }
- * >> DBG_COMMAND_AUTOEXCL(Keyword name, char const help[]) { ... }
- * >> DBG_COMMAND_AUTOEXCL(Keyword name, char const help[], Keyword argc, Keyword argv) { ... }
- * >> DBG_COMMAND_AUTOEXCL(Keyword name, Keyword autocomplete, char const help[], Keyword argc, Keyword argv) { ... } 
- * >> DBG_COMMAND_AUTOEXCL(Keyword name, Keyword autocomplete, unsigned int flags, char const help[], Keyword argc, Keyword argv) { ... } */
-#define DBG_COMMAND_AUTOEXCL(...) __HYBRID_PP_VA_OVERLOAD(_DBG_PRIVATE_COMMAND_AUTOEXCL_, (__VA_ARGS__))(__VA_ARGS__)
+ * >> DBG_COMMAND_AUTO(Keyword name, Keyword argc, Keyword argv) { ... }
+ * >> DBG_COMMAND_AUTO(Keyword name, char const help[], Keyword argc, Keyword argv) { ... }
+ * >> DBG_COMMAND_AUTO(Keyword name, unsigned int flags, char const help[], Keyword argc, Keyword argv) { ... } */
+#define DBG_COMMAND_AUTO(...) __HYBRID_PP_VA_OVERLOAD(_DBG_PRIVATE_COMMAND_AUTO_, (__VA_ARGS__))(__VA_ARGS__)
 
 #endif /* __CC__ */
 
@@ -342,7 +369,7 @@ struct dbg_finihook {
 	dbg_fini_t      df_func; /* [1..1][const] The function that should be invoked. */
 };
 #endif /* __CC__ */
-#define __DBG_DEFHOOK_CB(type, func) \
+#define __DBG_DEFHOOK_CB(type, func)                                           \
 	__ASM_BEGIN                                                                \
 	__ASM_L(.pushsection DBG_SECTION_HOOKS_RAW, "a")                           \
 	__ASM_L(	/*d?_type*/ _DBG_HOOK_ASMWORD_TYPE   type)                     \
@@ -356,17 +383,17 @@ struct dbg_finihook {
 #define DBG_DEFHOOK_FINI(func)  __DBG_DEFHOOK_CB(DBG_HOOK_FINI, func)
 
 #ifdef __CC__
-#define _DBG_PRIVATE_INIT(func)                 \
+#define _DBG_PRIVATE_INIT(func)                  \
 	PRIVATE void DBG_CALL dbg_init_##func(void); \
-	DBG_DEFHOOK_INIT(dbg_init_##func);          \
+	DBG_DEFHOOK_INIT(dbg_init_##func);           \
 	PRIVATE ATTR_USED ATTR_DBGTEXT void DBG_CALL dbg_init_##func(void)
-#define _DBG_PRIVATE_RESET(func)                 \
+#define _DBG_PRIVATE_RESET(func)                  \
 	PRIVATE void DBG_CALL dbg_reset_##func(void); \
-	DBG_DEFHOOK_RESET(dbg_reset_##func);         \
+	DBG_DEFHOOK_RESET(dbg_reset_##func);          \
 	PRIVATE ATTR_USED ATTR_DBGTEXT void DBG_CALL dbg_reset_##func(void)
-#define _DBG_PRIVATE_FINI(func)                 \
+#define _DBG_PRIVATE_FINI(func)                  \
 	PRIVATE void DBG_CALL dbg_fini_##func(void); \
-	DBG_DEFHOOK_FINI(dbg_fini_##func);          \
+	DBG_DEFHOOK_FINI(dbg_fini_##func);           \
 	PRIVATE ATTR_USED ATTR_DBGTEXT void DBG_CALL dbg_fini_##func(void)
 /* >> void KCALL func(void);
  * Define a debug initializer/reset/finalizer function
@@ -396,16 +423,29 @@ struct dbg_clearhook {
 };
 #endif /* __CC__ */
 
+#define _DBG_PRIVATE_CLEAR_2(start_symbol, size) \
+	_DBG_PRIVATE_CLEAR_3(start_symbol, 0, size)
+#define _DBG_PRIVATE_CLEAR_3(start_symbol, start_offset, size)                          \
+	__ASM_BEGIN                                                                         \
+	__ASM_L(.if (size) != 0)                                                            \
+	__ASM_L(.pushsection DBG_SECTION_HOOKS_RAW, "a")                                    \
+	__ASM_L(	/*dc_type*/ _DBG_HOOK_ASMWORD_TYPE   DBG_HOOK_CLEAR)                    \
+	__ASM_L(	/*dc_flag*/ _DBG_HOOK_ASMWORD_FLAG   _DBG_HOOK_ASMWORD_FLAGS)           \
+	__ASM_L(	/*dc_size*/ _DBG_HOOK_ASMWORD_SIZE   (size) + (2 * __SIZEOF_POINTER__)) \
+	__ASM_L(	/*dc_cobj*/ _DBG_HOOK_ASMWORD_RELPTRO(start_symbol, start_offset))      \
+	__ASM_L(	/*dc_data*/ .skip (size))                                               \
+	__ASM_L(.popsection)                                                                \
+	__ASM_L(.endif (size) != 0)                                                         \
+	__ASM_END
+
+/* Overload:
+ * >> DBG_CLEAR(Symbol start_symbol, Int size);
+ * >> DBG_CLEAR(Symbol start_symbol, Int start_offset, Int size); */
+#define DBG_CLEAR(...) __HYBRID_PP_VA_OVERLOAD(_DBG_PRIVATE_CLEAR_, (__VA_ARGS__))(__VA_ARGS__)
+
 
 
 /* TODO: Refactor the name of, and use `DBG_HOOK_CLEAR' if possible for the following */
-#if 1
-#define DEFINE_DBG_BZERO(p, size)                                                         /* TODO */
-#define DEFINE_DBG_BZERO_IF(cond, p, size)                                                /* TODO */
-#define DEFINE_DBG_BZERO_VECTOR(vector_base, element_count, element_size, element_stride) /* TODO */
-#define DEFINE_DBG_BZERO_OBJECT(obj)                                                      /* TODO */
-#else
-#include <libc/string.h>
 #define _DBG_PRIVATE_BZERO_NAME3(prefix, y) prefix##y
 #define _DBG_PRIVATE_BZERO_NAME2(prefix, y) _DBG_PRIVATE_BZERO_NAME3(prefix, y)
 #define _DBG_PRIVATE_BZERO_NAME(prefix) _DBG_PRIVATE_BZERO_NAME2(prefix, __LINE__)
@@ -471,7 +511,6 @@ struct dbg_clearhook {
 	}
 #define DEFINE_DBG_BZERO_OBJECT(obj) \
 	DEFINE_DBG_BZERO(&(obj), sizeof(obj))
-#endif
 
 
 

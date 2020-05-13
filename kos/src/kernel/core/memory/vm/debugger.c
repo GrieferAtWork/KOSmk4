@@ -52,11 +52,9 @@ DECL_BEGIN
 PRIVATE ATTR_DBGRODATA char const lsvm_str_kernel[] = "kernel";
 PRIVATE ATTR_DBGRODATA char const lsvm_str_user[] = "user";
 
-INTERN ATTR_DBGTEXT void DBG_CALL
-autocomplete_lsvm(size_t argc, char *argv[],
-                  dbg_autocomplete_cb_t cb, void *arg,
-                  char const *UNUSED(starts_with),
-                  size_t UNUSED(starts_with_len)) {
+DBG_AUTOCOMPLETE(lsvm,
+                 /*size_t*/ argc, /*char **/ argv /*[]*/,
+                 /*dbg_autocomplete_cb_t*/ cb, /*void **/arg) {
 	(void)argv;
 	if (argc == 1) {
 		(*cb)(arg, lsvm_str_kernel, COMPILER_STRLEN(lsvm_str_kernel));
@@ -64,31 +62,31 @@ autocomplete_lsvm(size_t argc, char *argv[],
 	}
 }
 
-DBG_COMMAND(lsvm, autocomplete_lsvm, DBG_HOOKFLAG_NORMAL,
-            "lsvm [NAME=kernel|user] [MINADDR=0] [MAXADDR=...]\n"
-            "\tList all VM mappings with the given VM. " DF_WHITE("NAME") " must be done of " DF_WHITE("kern")
-               ", " DF_WHITE("user") " or the hex-base address of a " DF_BLUE("struct vm") "\n"
-            "Nodes are enumerated as:\n\n"
-            "Min      Max       Prot  NodeF.   PartF. State     Target Min      Max \n"
-            "003BC000-003BCFFF [rwxs] [p---Mk] [---k] locked -> anonR @003BC000-003BCFFF\n"
-            "Prot:\n"
-            "\t" DF_WHITE("r") " Mapped as readable\n"
-            "\t" DF_WHITE("w") " Mapped as writable\n"
-            "\t" DF_WHITE("x") " Mapped as executable\n"
-            "\t" DF_WHITE("s") " Mapped as shared\n"
-            "NodeF.: (Node flags)\n"
-            "\t" DF_WHITE("p") " The page directory mapping has been prepared\n"
-            "\t" DF_WHITE("P") " The node has been partitioned (split)\n"
-            "\t" DF_WHITE("G") " The node grows up (affects the direction of guard expansion)\n"
-            "\t" DF_WHITE("h") " The node is hinted by the page directory\n"
-            "\t" DF_WHITE("M") " The node should not be merged with other nodes\n"
-            "\t" DF_WHITE("k") " The node is an intrinsic kernel mapping that cannot be unmapped normally\n"
-            "PartF.: (Data part flags)\n"
-            "\t" DF_WHITE("l") " The part will become locked once loaded into the core\n"
-            "\t" DF_WHITE("c") " The contents of the part have changed\n"
-            "\t" DF_WHITE("t") " Changes to the contents of the part are tracked\n"
-            "\t" DF_WHITE("k") " The part is an intrinsic kernel component that cannot be deleted normally\n"
-		, argc, argv) {
+DBG_COMMAND_AUTO(lsvm, DBG_HOOKFLAG_NORMAL,
+                 "lsvm [NAME=kernel|user] [MINADDR=0] [MAXADDR=...]\n"
+                 "\tList all VM mappings with the given VM. " DF_WHITE("NAME") " must be done of " DF_WHITE("kern")
+                    ", " DF_WHITE("user") " or the hex-base address of a " DF_BLUE("struct vm") "\n"
+                 "Nodes are enumerated as:\n\n"
+                 "Min      Max       Prot  NodeF.   PartF. State     Target Min      Max \n"
+                 "003BC000-003BCFFF [rwxs] [p---Mk] [---k] locked -> anonR @003BC000-003BCFFF\n"
+                 "Prot:\n"
+                 "\t" DF_WHITE("r") " Mapped as readable\n"
+                 "\t" DF_WHITE("w") " Mapped as writable\n"
+                 "\t" DF_WHITE("x") " Mapped as executable\n"
+                 "\t" DF_WHITE("s") " Mapped as shared\n"
+                 "NodeF.: (Node flags)\n"
+                 "\t" DF_WHITE("p") " The page directory mapping has been prepared\n"
+                 "\t" DF_WHITE("P") " The node has been partitioned (split)\n"
+                 "\t" DF_WHITE("G") " The node grows up (affects the direction of guard expansion)\n"
+                 "\t" DF_WHITE("h") " The node is hinted by the page directory\n"
+                 "\t" DF_WHITE("M") " The node should not be merged with other nodes\n"
+                 "\t" DF_WHITE("k") " The node is an intrinsic kernel mapping that cannot be unmapped normally\n"
+                 "PartF.: (Data part flags)\n"
+                 "\t" DF_WHITE("l") " The part will become locked once loaded into the core\n"
+                 "\t" DF_WHITE("c") " The contents of the part have changed\n"
+                 "\t" DF_WHITE("t") " Changes to the contents of the part are tracked\n"
+                 "\t" DF_WHITE("k") " The part is an intrinsic kernel component that cannot be deleted normally\n",
+                 argc, argv) {
 	struct vm *v = &vm_kernel;
 	struct vm_node *iter;
 	void *minaddr = (void *)0;
@@ -247,11 +245,9 @@ do_print_part_position:
 PRIVATE ATTR_DBGRODATA char const aslr_str_0[] = "0";
 PRIVATE ATTR_DBGRODATA char const aslr_str_1[] = "1";
 
-INTERN ATTR_DBGTEXT void DBG_CALL
-autocomplete_aslr(size_t argc, char *argv[],
-                  dbg_autocomplete_cb_t cb, void *arg,
-                  char const *UNUSED(starts_with),
-                  size_t UNUSED(starts_with_len)) {
+DBG_AUTOCOMPLETE(aslr,
+                 /*size_t*/ argc, /*char **/ argv /*[]*/,
+                 /*dbg_autocomplete_cb_t*/ cb, /*void **/arg) {
 	(void)argv;
 	if (argc == 1) {
 		(*cb)(arg, aslr_str_0, COMPILER_STRLEN(aslr_str_0));
@@ -259,10 +255,10 @@ autocomplete_aslr(size_t argc, char *argv[],
 	}
 }
 
-DBG_COMMAND(aslr, autocomplete_aslr, DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE,
-            "aslr [0|1]\n"
-            "\tView or enable/disable AddressSpaceLayoutRandomization\n",
-            argc, argv) {
+DBG_COMMAND_AUTO(aslr, DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE,
+                 "aslr [0|1]\n"
+                 "\tView or enable/disable AddressSpaceLayoutRandomization\n",
+                 argc, argv) {
 	bool enabled;
 	if (argc == 1) {
 		enabled = !vm_get_aslr_disabled();

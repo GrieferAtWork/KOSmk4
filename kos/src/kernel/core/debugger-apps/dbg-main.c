@@ -192,7 +192,7 @@ break_incomplete:
 
 
 
-PRIVATE ATTR_DBGTEXT void DBG_CALL
+PRIVATE ATTR_USED ATTR_DBGTEXT void DBG_CALL
 autocomplete_help(size_t argc, char *argv[],
                   dbg_autocomplete_cb_t cb, void *arg,
                   char const *starts_with,

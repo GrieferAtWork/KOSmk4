@@ -302,10 +302,12 @@ DEFINE_DBG_BZERO_OBJECT(block_device_lock);
 PRIVATE NOBLOCK struct icpustate *
 NOTHROW(FCALL ipi_destroy_block_device)(struct icpustate *__restrict state,
                                         void *args[CPU_IPI_ARGCOUNT]) {
-	block_device_destroy((struct basic_block_device *)args[0]);
+	struct basic_block_device *dev;
+	dev = (struct basic_block_device *)args[0];
+	block_device_destroy(dev);
 	return state;
 }
-#endif
+#endif /* !CONFIG_NO_SMP */
 
 /* Destroy a given block device. */
 PUBLIC NOBLOCK NONNULL((1)) void

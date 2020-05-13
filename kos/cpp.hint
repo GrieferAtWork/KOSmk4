@@ -550,6 +550,9 @@
 #define DBGSTR
 #define DBG_CALL
 #define DBG_COMMAND(name,...) intptr_t dbg_command_##name(size_t argc, char *argv[])
+#define DBG_INIT(func)  void dbg_init_##func(void)
+#define DBG_RESET(func) void dbg_reset_##func(void)
+#define DBG_FINI(func)  void dbg_fini_##func(void)
 
 #define __HYBRID_ALTINT(UID,allow_int_ops,...) __VA_ARGS__
 #define __HYBRID_ALTINT_UID(UID)

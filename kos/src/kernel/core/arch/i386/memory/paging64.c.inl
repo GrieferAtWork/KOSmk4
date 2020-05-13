@@ -2656,11 +2656,9 @@ PRIVATE ATTR_DBGTEXT void KCALL p64_do_ldpd(unsigned int vec4_max) {
 PRIVATE ATTR_DBGRODATA char const lspd_str_kernel[] = "kernel";
 PRIVATE ATTR_DBGRODATA char const lspd_str_user[] = "user";
 
-INTERN ATTR_DBGTEXT void DBG_CALL
-autocomplete_lspd(size_t argc, char *argv[],
-                  dbg_autocomplete_cb_t cb, void *arg,
-                  char const *UNUSED(starts_with),
-                  size_t UNUSED(starts_with_len)) {
+DBG_AUTOCOMPLETE(lspd,
+                 /*size_t*/ argc, /*char **/ argv /*[]*/,
+                 /*dbg_autocomplete_cb_t*/ cb, /*void **/arg) {
 	(void)argv;
 	if (argc == 1) {
 		(*cb)(arg, lspd_str_kernel, COMPILER_STRLEN(lspd_str_kernel));
@@ -2668,13 +2666,13 @@ autocomplete_lspd(size_t argc, char *argv[],
 	}
 }
 
-DBG_COMMAND(lspd, autocomplete_lspd, DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE,
-            "lspd [MODE:kernel|user=user]\n"
-            "\tDo a raw walk over the loaded page directory and enumerate mappings.\n"
-            "\t" DF_WHITE("mode") " can be specified as either " DF_WHITE("kernel")
-            " or " DF_WHITE("user") " to select if " DF_WHITE("vm_kernel") "\n"
-            "\tor " DF_WHITE("THIS_VM") " should be dumped\n",
-            argc, argv) {
+DBG_COMMAND_AUTO(lspd, DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE,
+                 "lspd [MODE:kernel|user=user]\n"
+                 "\tDo a raw walk over the loaded page directory and enumerate mappings.\n"
+                 "\t" DF_WHITE("mode") " can be specified as either " DF_WHITE("kernel")
+                 " or " DF_WHITE("user") " to select if " DF_WHITE("vm_kernel") "\n"
+                 "\tor " DF_WHITE("THIS_VM") " should be dumped\n",
+                 argc, argv) {
 	PAGEDIR_P_SELFTYPE pdir;
 	if (argc == 2) {
 		if (strcmp(argv[1], lspd_str_kernel) == 0)

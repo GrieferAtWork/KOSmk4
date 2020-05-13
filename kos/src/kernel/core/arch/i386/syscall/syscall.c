@@ -252,11 +252,9 @@ NOTHROW(KCALL x86_initialize_sysenter)(void) {
 PRIVATE ATTR_DBGRODATA char const sctrace_str_0[] = "0";
 PRIVATE ATTR_DBGRODATA char const sctrace_str_1[] = "1";
 
-INTERN ATTR_DBGTEXT void DBG_CALL
-autocomplete_sctrace(size_t argc, char *argv[],
-                     dbg_autocomplete_cb_t cb, void *arg,
-                     char const *UNUSED(starts_with),
-                     size_t UNUSED(starts_with_len)) {
+DBG_AUTOCOMPLETE(sctrace,
+                 /*size_t*/ argc, /*char **/ argv /*[]*/,
+                 /*dbg_autocomplete_cb_t*/ cb, /*void **/arg) {
 	(void)argv;
 	if (argc == 1) {
 		(*cb)(arg, sctrace_str_0, COMPILER_STRLEN(sctrace_str_0));
@@ -264,10 +262,10 @@ autocomplete_sctrace(size_t argc, char *argv[],
 	}
 }
 
-DBG_COMMAND(sctrace, autocomplete_sctrace, DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE,
-            "sctrace [0|1]\n"
-            "\tGet or set system call tracing\n",
-            argc, argv) {
+DBG_COMMAND_AUTO(sctrace, DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE,
+                 "sctrace [0|1]\n"
+                 "\tGet or set system call tracing\n",
+                 argc, argv) {
 	bool enabled;
 	if (argc == 1) {
 		enabled = syscall_tracing_getenabled();
