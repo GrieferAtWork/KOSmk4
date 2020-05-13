@@ -55,6 +55,8 @@ if (gcc_opt.remove("-O3"))
 #include <asm/intrin.h>
 #include <kos/kernel/cpu-state-compat.h>
 #include <kos/kernel/cpu-state.h>
+#include <kos/kernel/tss-compat.h>
+#include <kos/kernel/tss.h>
 #include <sys/io.h>
 
 #include <alloca.h>
@@ -501,13 +503,8 @@ NOTHROW(KCALL cpu_broadcastipi_notthis_early_boot_aware)(cpu_ipi_t func,
 			ppsp0 = &FORTASK(target->c_current, this_x86_kernel_psp0);
 			if ((uintptr_t)ppsp0 < KERNELSPACE_BASE)
 				continue;
-#ifdef __x86_64__
-			if (FORCPU(target, thiscpu_x86_tss).t_rsp0 != *ppsp0)
+			if (FORCPU(target, thiscpu_x86_tss).t_psp0 != *ppsp0)
 				continue;
-#else /* __x86_64__ */
-			if (FORCPU(target, thiscpu_x86_tss).t_esp0 != *ppsp0)
-				continue;
-#endif /* !__x86_64__ */
 		}
 		if (cpu_sendipi(target, func, args, flags))
 			++result;

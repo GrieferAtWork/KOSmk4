@@ -63,6 +63,8 @@
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/cpu-state32.h>
 #include <kos/kernel/gdt.h>
+#include <kos/kernel/tss-compat.h>
+#include <kos/kernel/tss.h>
 #include <sys/wait.h>
 
 #include <assert.h>
@@ -234,11 +236,7 @@ NOTHROW(KCALL x86_initialize_sysenter)(void) {
 	if (X86_HAVE_SYSENTER) {
 		/* Configure support for the `sysenter' instruction. */
 		__wrmsr(IA32_SYSENTER_CS, SEGMENT_KERNEL_CODE);
-#ifdef __x86_64__
-		__wrmsr(IA32_SYSENTER_ESP, (u64)(uintptr_t)(void *)&FORCPU(&_bootcpu, thiscpu_x86_tss).t_rsp0);
-#else /* __x86_64__ */
-		__wrmsr(IA32_SYSENTER_ESP, (u64)(uintptr_t)(void *)&FORCPU(&_bootcpu, thiscpu_x86_tss).t_esp0);
-#endif /* !__x86_64__ */
+		__wrmsr(IA32_SYSENTER_ESP, (u64)(uintptr_t)(void *)&FORCPU(&_bootcpu, thiscpu_x86_tss).t_psp0);
 		__wrmsr(IA32_SYSENTER_EIP, (u64)(uintptr_t)(void *)&x86_syscall32_sysenter);
 	}
 #ifdef __x86_64__

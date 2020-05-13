@@ -51,6 +51,8 @@
 #include <asm/intrin.h>
 #include <asm/param.h>
 #include <kos/kernel/cpu-state.h>
+#include <kos/kernel/tss-compat.h>
+#include <kos/kernel/tss.h>
 
 #include <assert.h>
 #include <stddef.h>
@@ -726,15 +728,13 @@ i386_allocate_secondary_cores(void) {
 		                (uintptr_t)&FORCPU(altcore, thiscpu_x86_tss));
 		segment_wrbaseX(&FORCPU(altcore, thiscpu_x86_gdt[SEGMENT_INDEX(SEGMENT_CPU_LDT)]),
 		                (uintptr_t)&FORCPU(altcore, thiscpu_x86_ldt));
-#ifdef __x86_64__
-		FORCPU(altcore, thiscpu_x86_tss).t_rsp0 = FORTASK(altidle, this_x86_kernel_psp0);
-#else /* __x86_64__ */
+#ifndef __x86_64__
 		segment_wrbaseX(&FORCPU(altcore, thiscpu_x86_gdt[SEGMENT_INDEX(SEGMENT_CPU_TSS_DF)]),
 		                (uintptr_t)&FORCPU(altcore, thiscpu_x86_tssdf));
 		segment_wrbaseX(&FORCPU(altcore, thiscpu_x86_gdt[SEGMENT_INDEX(SEGMENT_KERNEL_FSBASE)]),
 		                (uintptr_t)altidle);
-		FORCPU(altcore, thiscpu_x86_tss).t_esp0 = FORTASK(altidle, this_x86_kernel_psp0);
 #endif /* !__x86_64__ */
+		FORCPU(altcore, thiscpu_x86_tss).t_psp0 = FORTASK(altidle, this_x86_kernel_psp0);
 	}
 }
 

@@ -110,7 +110,7 @@ PUBLIC ATTR_PERCPU struct segment thiscpu_x86_ldt[LDT_SEGMENT_COUNT] = {
 };
 
 
-/* The per-task value written to `t_esp0' / `t_rsp0' during scheduler preemption. */
+/* The per-task value written to `t_psp0' during scheduler preemption. */
 PUBLIC ATTR_PERTASK uintptr_t _this_x86_kernel_psp0 ASMNAME("this_x86_kernel_psp0") = 0;
 
 DEFINE_PERTASK_INIT(init_this_x86_kernel_psp0);

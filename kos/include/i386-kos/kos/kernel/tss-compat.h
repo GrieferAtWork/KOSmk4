@@ -17,33 +17,21 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_COMPAT_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_COMPAT_H 1
-
-#include <kernel/compiler.h>
+#ifndef _I386_KOS_KOS_KERNEL_TSS_COMPAT_H
+#define _I386_KOS_KOS_KERNEL_TSS_COMPAT_H 1
 
 #include <hybrid/host.h>
 
-#if defined(__x86_64__) && defined(__CC__) && !defined(syscall_iscompat)
-#include <sched/pertask.h> /* PERTASK_GET() */
-#include <sched/task.h>    /* this_kernel_stacknode */
+#include "tss.h"
 
-#include <kos/kernel/cpu-state-helpers64.h> /* irregs_iscompat() */
+#ifdef __x86_64__
+#define t_psp0 t_rsp0
+#define t_psp1 t_rsp1
+#define t_psp2 t_rsp2
+#else /* __x86_64__ */
+#define t_psp0 t_esp0
+#define t_psp1 t_esp1
+#define t_psp2 t_esp2
+#endif /* !__x86_64__ */
 
-DECL_BEGIN
-
-#ifndef ___this_x86_kernel_psp0_defined
-#define ___this_x86_kernel_psp0_defined 1
-/* [== vm_node_getend(THIS_KERNEL_STACK)]
- * The per-task value written to `t_psp0' during scheduler preemption. */
-DATDEF ATTR_PERTASK uintptr_t const this_x86_kernel_psp0;
-#endif /* !___this_x86_kernel_psp0_defined */
-
-#define x86_syscall_irregs() \
-	((struct irregs64 *)PERTASK_GET(this_x86_kernel_psp0) - 1)
-#define syscall_iscompat() irregs_iscompat(x86_syscall_irregs())
-
-DECL_END
-#endif /* __x86_64__ && __CC__ && !syscall_iscompat */
-
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_COMPAT_H */
+#endif /* !_I386_KOS_KOS_KERNEL_TSS_COMPAT_H */
