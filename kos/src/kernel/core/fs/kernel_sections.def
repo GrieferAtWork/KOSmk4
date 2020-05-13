@@ -21,6 +21,11 @@
 #error "Must #define SECTION(name, type, flags, start, size, entsize, link, info) before #including this file"
 #endif /* !SECTION */
 
+#ifndef EXPORT_SECTION
+#define EXPORT_SECTION(export_name, name, type, flags, start, size, entsize, link, info) \
+	SECTION(name, type, flags, start, size, entsize, link, info)
+#endif /* !EXPORT_SECTION */
+
 #ifndef SECTION_GLOBALS_DEFINED
 #define SECTION_GLOBALS_DEFINED 1
 INTDEF byte_t __kernel_sect_text_start[];
@@ -55,6 +60,10 @@ INTDEF byte_t __kernel_sect_data_start[];
 INTDEF byte_t __kernel_sect_data_size[];
 INTDEF byte_t __kernel_sect_bss_start[];
 INTDEF byte_t __kernel_sect_bss_size[];
+#ifdef CONFIG_HAVE_DEBUGGER
+INTDEF byte_t __kernel_sect_dbg_hooks_start[];
+INTDEF byte_t __kernel_sect_dbg_hooks_size[];
+#endif /* CONFIG_HAVE_DEBUGGER */
 #endif /* !SECTION_GLOBALS_DEFINED */
 
 #if 0
@@ -62,10 +71,13 @@ INTDEF byte_t __kernel_sect_bss_size[];
 #else
 #define DEBUG_SECTION_FLAGS SHF_ALLOC
 #endif
-SECTION(".text", SHT_PROGBITS, SHF_ALLOC | SHF_EXECINSTR, __kernel_sect_text_start, __kernel_sect_text_size, 0, 0, 0)
-SECTION(".rodata", SHT_PROGBITS, SHF_ALLOC, __kernel_sect_rodata_start, __kernel_sect_rodata_size, 0, 0, 0)
-SECTION(".gcc_except_table", SHT_PROGBITS, SHF_ALLOC, __kernel_sect_gcc_except_table_start, __kernel_sect_gcc_except_table_size, 0, 0, 0)
-SECTION(".eh_frame", SHT_PROGBITS, SHF_ALLOC, __kernel_sect_eh_frame_start, __kernel_sect_eh_frame_size, 0, 0, 0)
+EXPORT_SECTION(kernel_section_text, ".text", SHT_PROGBITS, SHF_ALLOC | SHF_EXECINSTR, __kernel_sect_text_start, __kernel_sect_text_size, 0, 0, 0)
+EXPORT_SECTION(kernel_section_rodata, ".rodata", SHT_PROGBITS, SHF_ALLOC, __kernel_sect_rodata_start, __kernel_sect_rodata_size, 0, 0, 0)
+#ifdef CONFIG_HAVE_DEBUGGER
+EXPORT_SECTION(kernel_section_dbg_hooks, ".dbg.hooks", SHT_PROGBITS, SHF_ALLOC, __kernel_sect_dbg_hooks_start, __kernel_sect_dbg_hooks_size, 0, 0, 0)
+#endif /* CONFIG_HAVE_DEBUGGER */
+EXPORT_SECTION(kernel_section_gcc_except_table, ".gcc_except_table", SHT_PROGBITS, SHF_ALLOC, __kernel_sect_gcc_except_table_start, __kernel_sect_gcc_except_table_size, 0, 0, 0)
+EXPORT_SECTION(kernel_section_eh_frame, ".eh_frame", SHT_PROGBITS, SHF_ALLOC, __kernel_sect_eh_frame_start, __kernel_sect_eh_frame_size, 0, 0, 0)
 SECTION(".debug_line", SHT_PROGBITS, DEBUG_SECTION_FLAGS, __kernel_debug_line_start, __kernel_debug_line_size, 0, 0, 0)
 SECTION(".debug_info", SHT_PROGBITS, DEBUG_SECTION_FLAGS, __kernel_debug_info_start, __kernel_debug_info_size, 0, 0, 0)
 SECTION(".debug_aranges", SHT_PROGBITS, DEBUG_SECTION_FLAGS, __kernel_debug_aranges_start, __kernel_debug_aranges_size, 0, 0, 0)
@@ -76,11 +88,12 @@ SECTION(".debug_loc", SHT_PROGBITS, DEBUG_SECTION_FLAGS, __kernel_debug_loc_star
 SECTION(".pertask", SHT_PROGBITS, SHF_ALLOC | SHF_TLS, __kernel_pertask_start, __kernel_pertask_size, 0, 0, 0)
 SECTION(".pervm", SHT_PROGBITS, SHF_ALLOC | SHF_TLS, __kernel_pervm_start, __kernel_pervm_size, 0, 0, 0)
 SECTION(".percpu", SHT_PROGBITS, SHF_ALLOC | SHF_TLS, __kernel_percpu_start, __kernel_percpu_size, 0, 0, 0)
-SECTION(".data", SHT_PROGBITS, SHF_ALLOC | SHF_WRITE, __kernel_sect_data_start, __kernel_sect_data_size, 0, 0, 0)
-SECTION(".bss", SHT_NOBITS, SHF_ALLOC | SHF_WRITE, __kernel_sect_bss_start, __kernel_sect_bss_size, 0, 0, 0)
+EXPORT_SECTION(kernel_section_data, ".data", SHT_PROGBITS, SHF_ALLOC | SHF_WRITE, __kernel_sect_data_start, __kernel_sect_data_size, 0, 0, 0)
+EXPORT_SECTION(kernel_section_bss, ".bss", SHT_NOBITS, SHF_ALLOC | SHF_WRITE, __kernel_sect_bss_start, __kernel_sect_bss_size, 0, 0, 0)
 #undef DEBUG_SECTION_FLAGS
 
 /* NOTE: This section _must_ be last! */
 SECTION(".shstrtab", SHT_STRTAB, SHF_ALLOC | SHF_STRINGS, &kernel_shstrtab_data, sizeof(struct kernel_shstrtab) - 1, 0, 0, 0)
 
 #undef SECTION
+#undef EXPORT_SECTION

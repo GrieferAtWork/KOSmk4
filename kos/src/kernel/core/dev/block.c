@@ -24,7 +24,7 @@
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
-#include <debugger/function.h>
+#include <debugger/hook.h>
 #include <debugger/io.h>
 #include <dev/block.h>
 #include <fs/node.h>
@@ -1585,14 +1585,9 @@ again:
 	}
 }
 
-DEFINE_DEBUG_FUNCTION_EX(
-		"lsblk", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
-		"lsblk\n"
-		"\tList all defined block devices\n"
-		, argc, argv) {
-	if (argc != 1)
-		return DBG_FUNCTION_INVALID_ARGUMENTS;
-	(void)argv;
+DBG_COMMAND(lsblk,
+            "lsblk\n"
+            "\tList all defined block devices\n") {
 	dbg_print(DBGSTR("     name\tdevno\tdriver\tsize\tsectors\tsector-size\n"));
 	if (block_device_tree)
 		dump_block_device(block_device_tree);

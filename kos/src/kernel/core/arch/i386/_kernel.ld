@@ -150,16 +150,14 @@ SECTIONS {
 #endif /* __x86_64__ */
 		*(.rodata .rodata.kernel_symtab .rodata.cst*)
 		*(.rodata.str* .rodata.*.str* .rodata.kernel_strtab)
+
 #ifndef CONFIG_NO_DEBUGGER
-		*(.rodata.cold.debug_function_str)
 		IP_ALIGN(__SIZEOF_POINTER__);
-		PROVIDE_HIDDEN(__kernel_debug_functions_start = ABSOLUTE(.));
-		KEEP(*(.rodata.cold.debug_functions))
-		PROVIDE_HIDDEN(__kernel_debug_functions_end = ABSOLUTE(.));
-		DEFINE_CALLBACK_VECTOR(dbg_init, .rodata.cold.callback.dbg_init)
-		DEFINE_CALLBACK_VECTOR(dbg_reset, .rodata.cold.callback.dbg_reset)
-		DEFINE_CALLBACK_VECTOR(dbg_fini, .rodata.cold.callback.dbg_fini)
+		PROVIDE_HIDDEN(__kernel_sect_dbg_hooks_start = ABSOLUTE(.));
+		KEEP(*(.dbg.hooks))
+		PROVIDE_HIDDEN(__kernel_sect_dbg_hooks_size = ABSOLUTE(. - __kernel_sect_dbg_hooks_start));
 #endif /* !CONFIG_NO_DEBUGGER */
+
 		DEFINE_CALLBACK_VECTOR(system_clearcaches, .rodata.cold.callback.system_clearcaches)
 
 		DEFINE_CALLBACK_VECTOR(idle_job, .rodata.callback.idle_job)

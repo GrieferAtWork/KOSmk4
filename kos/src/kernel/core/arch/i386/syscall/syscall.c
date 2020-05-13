@@ -23,7 +23,7 @@
 
 #include <kernel/compiler.h>
 
-#include <debugger/function.h>
+#include <debugger/hook.h>
 #include <debugger/io.h>
 #include <kernel/arch/cpuid.h>
 #include <kernel/arch/isr.h>
@@ -252,9 +252,9 @@ NOTHROW(KCALL x86_initialize_sysenter)(void) {
 PRIVATE ATTR_DBGRODATA char const sctrace_str_0[] = "0";
 PRIVATE ATTR_DBGRODATA char const sctrace_str_1[] = "1";
 
-PRIVATE ATTR_DBGTEXT void DBG_CALL
+INTERN ATTR_DBGTEXT void DBG_CALL
 autocomplete_sctrace(size_t argc, char *argv[],
-                     debug_auto_cb_t cb, void *arg,
+                     dbg_autocomplete_cb_t cb, void *arg,
                      char const *UNUSED(starts_with),
                      size_t UNUSED(starts_with_len)) {
 	(void)argv;
@@ -264,11 +264,10 @@ autocomplete_sctrace(size_t argc, char *argv[],
 	}
 }
 
-DEFINE_DEBUG_FUNCTION_EX(
-		"sctrace", &autocomplete_sctrace, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
-		"sctrace [0|1]\n"
-		"\tGet or set system call tracing\n"
-		, argc, argv) {
+DBG_COMMAND(sctrace, autocomplete_sctrace, DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE,
+            "sctrace [0|1]\n"
+            "\tGet or set system call tracing\n",
+            argc, argv) {
 	bool enabled;
 	if (argc == 1) {
 		enabled = syscall_tracing_getenabled();
@@ -276,13 +275,13 @@ DEFINE_DEBUG_FUNCTION_EX(
 		return enabled ? 0 : 1;
 	}
 	if (argc != 2)
-		return DBG_FUNCTION_INVALID_ARGUMENTS;
+		return DBG_STATUS_INVALID_ARGUMENTS;
 	if (strcmp(argv[1], sctrace_str_1) == 0) {
 		enabled = true;
 	} else if (strcmp(argv[1], sctrace_str_0) == 0) {
 		enabled = false;
 	} else {
-		return DBG_FUNCTION_INVALID_ARGUMENTS;
+		return DBG_STATUS_INVALID_ARGUMENTS;
 	}
 	syscall_tracing_setenabled(enabled);
 	return 0;

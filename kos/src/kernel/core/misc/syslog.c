@@ -30,7 +30,7 @@
 
 #include <kernel/compiler.h>
 
-#include <debugger/function.h>
+#include <debugger/hook.h>
 #include <debugger/io.h>
 #include <debugger/rt.h>
 #include <kernel/arch/syslog.h> /* ARCH_DEFAULT_SYSLOG_SINK */
@@ -318,9 +318,9 @@ dbg_loglevel_from_name(char const *__restrict name) {
 	return (unsigned int)-1;
 }
 
-PRIVATE ATTR_DBGTEXT void DBG_CALL
+INTERN ATTR_DBGTEXT void DBG_CALL
 autocomplete_loglevel(size_t argc, char *argv[],
-                      debug_auto_cb_t cb, void *arg,
+                      dbg_autocomplete_cb_t cb, void *arg,
                       char const *starts_with,
                       size_t starts_with_len) {
 	(void)argv;
@@ -340,13 +340,12 @@ autocomplete_loglevel(size_t argc, char *argv[],
 	}
 }
 
-DEFINE_DEBUG_FUNCTION_EX(
-		"loglevel", &autocomplete_loglevel, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
-		"loglevel [level|-level|+level]...\n"
-		"\tList currently enabled syslog levels when no arguments are given\n"
-		"\tOtherwise, enable/disable specific levels (+level|-level) or restrict\n"
-		"\tlogging to only include messages of level and greater priority\n"
-		, argc, argv) {
+DBG_COMMAND(loglevel, autocomplete_loglevel, DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE,
+            "loglevel [level|-level|+level]...\n"
+            "\tList currently enabled syslog levels when no arguments are given\n"
+            "\tOtherwise, enable/disable specific levels (+level|-level) or restrict\n"
+            "\tlogging to only include messages of level and greater priority\n",
+            argc, argv) {
 	unsigned int level;
 	--argc;
 	++argv;
@@ -371,7 +370,7 @@ DEFINE_DEBUG_FUNCTION_EX(
 		}
 		level = dbg_loglevel_from_name(name);
 		if (level == (unsigned int)-1)
-			return DBG_FUNCTION_INVALID_ARGUMENTS;
+			return DBG_STATUS_INVALID_ARGUMENTS;
 		if (op == '-') {
 			/* Disable level */
 			syslog_levels &= ~((uintptr_t)1 << level);

@@ -33,7 +33,7 @@ if (gcc_opt.remove("-O3"))
 #ifdef CONFIG_HAVE_DEBUGGER
 
 #include <debugger/entry.h>
-#include <debugger/function.h>
+#include <debugger/hook.h>
 #include <debugger/rt.h>
 #include <kernel/apic.h>
 #include <kernel/gdt.h>
@@ -92,34 +92,22 @@ PUBLIC ATTR_DBGBSS unsigned int x86_dbg_trapstatekind = X86_DBG_STATEKIND_NONE;
  * controller of debugger mode. */
 PUBLIC ATTR_DBGBSS WEAK u16 x86_dbg_owner_lapicid = 0;
 
-
-typedef void (KCALL *dbg_callback_t)(void);
-INTDEF dbg_callback_t const __kernel_dbg_init_start[];
-INTDEF dbg_callback_t const __kernel_dbg_init_end[];
-INTDEF dbg_callback_t const __kernel_dbg_reset_start[];
-INTDEF dbg_callback_t const __kernel_dbg_reset_end[];
-INTDEF dbg_callback_t const __kernel_dbg_fini_start[];
-INTDEF dbg_callback_t const __kernel_dbg_fini_end[];
-
-#if 1
-#define CALL_FUNCTIONS(start, end)             \
-	do {                                       \
-		dbg_callback_t const *iter;            \
-		for (iter = start; iter < end; ++iter) \
-			(**iter)();                        \
-	} __WHILE0
-#define CALL_FUNCTIONS_REV(start, end)    \
-	do {                                  \
-		dbg_callback_t const *iter = end; \
-		while (iter > start) {            \
-			--iter;                       \
-			(**iter)();                   \
-		}                                 \
-	} __WHILE0
-#else
-#define CALL_FUNCTIONS(start, end)     do{}__WHILE0
-#define CALL_FUNCTIONS_REV(start, end) do{}__WHILE0
-#endif
+/* Invoke globally defined debugger hooks matching the given `type' */
+PRIVATE ATTR_DBGTEXT void FCALL dbg_runhooks(dbg_hook_type_t type) {
+	struct dbg_inithook *current;
+	struct dbg_hookiterator iter;
+	dbg_hookiterator_init(&iter);
+	for (;;) {
+		current = (struct dbg_inithook *)dbg_hookiterator_next_filtered(&iter, type);
+		if (!current)
+			break;
+		TRY {
+			(*current->di_func)();
+		} EXCEPT {
+		}
+	}
+	dbg_hookiterator_fini(&iter);
+}
 
 
 DATDEF ATTR_PERTASK uintptr_t this_x86_kernel_psp0_ ASMNAME("this_x86_kernel_psp0");
@@ -759,8 +747,7 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_init(void) {
 	x86_debug_initialize_ps2_keyboard();
 
 	/* Invoke global callbacks. */
-	CALL_FUNCTIONS(__kernel_dbg_init_start,
-	               __kernel_dbg_init_end);
+	dbg_runhooks(DBG_HOOK_INIT);
 }
 
 #ifdef __x86_64__
@@ -885,8 +872,7 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_reset(void) {
 	dbg_reset_tty();
 
 	/* Invoke global callbacks. */
-	CALL_FUNCTIONS(__kernel_dbg_reset_start,
-	               __kernel_dbg_reset_end);
+	dbg_runhooks(DBG_HOOK_RESET);
 }
 
 #ifndef CONFIG_NO_SMP
@@ -913,8 +899,7 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_fini(void) {
 	x86_dbg_initialize_segments(mycpu, mythread);
 
 	/* Invoke global callbacks. */
-	CALL_FUNCTIONS_REV(__kernel_dbg_fini_start,
-	                   __kernel_dbg_fini_end);
+	dbg_runhooks(DBG_HOOK_FINI);
 
 	x86_debug_finalize_ps2_keyboard();
 	dbg_finalize_tty();
@@ -989,7 +974,7 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_fini(void) {
 	struct dbg_entry_info *info;                                                      \
 	info = (struct dbg_entry_info *)alloca(offsetof(struct dbg_entry_info, ei_argv) + \
 	                                       48 + CEIL_ALIGN(num_bytes, 8));            \
-	memcpy(&info->ei_argv[6], data, CEIL_ALIGN(num_bytes, 8));                        \
+	memcpy(&info->ei_argv[6], data, num_bytes);                                       \
 	info->ei_entry   = (dbg_entry_t)entry;                                            \
 	info->ei_argc    = 6 + CEILDIV(num_bytes, 8);                                     \
 	info->ei_argv[0] = (dbg_stack + KERNEL_DEBUG_STACKSIZE) - CEIL_ALIGN(num_bytes, 8)
@@ -998,7 +983,7 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_fini(void) {
 	struct dbg_entry_info *info;                                                      \
 	info = (struct dbg_entry_info *)alloca(offsetof(struct dbg_entry_info, ei_argv) + \
 	                                       4 + CEIL_ALIGN(num_bytes, 4));             \
-	memcpy(&info->ei_argv[1], data, CEIL_ALIGN(num_bytes, 4));                        \
+	memcpy(&info->ei_argv[1], data, num_bytes);                                       \
 	info->ei_entry   = (dbg_entry_t)entry;                                            \
 	info->ei_argc    = 1 + CEILDIV(num_bytes, 4);                                     \
 	info->ei_argv[0] = (dbg_stack + KERNEL_DEBUG_STACKSIZE) - CEIL_ALIGN(num_bytes, 4)

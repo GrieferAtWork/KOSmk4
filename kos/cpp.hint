@@ -549,7 +549,7 @@
 #define ATTR_DBGBSS
 #define DBGSTR
 #define DBG_CALL
-#define DEFINE_DEBUG_FUNCTION(name, help, argc, argv) uintptr_t _debug_main_xxx(size_t argc, char *argv[])
+#define DBG_COMMAND(name,...) intptr_t dbg_command_##name(size_t argc, char *argv[])
 
 #define __HYBRID_ALTINT(UID,allow_int_ops,...) __VA_ARGS__
 #define __HYBRID_ALTINT_UID(UID)

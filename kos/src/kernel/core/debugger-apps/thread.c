@@ -30,7 +30,7 @@ if (gcc_opt.remove("-O3"))
 
 #include <debugger/config.h>
 #ifdef CONFIG_HAVE_DEBUGGER
-#include <debugger/function.h>
+#include <debugger/hook.h>
 #include <debugger/io.h>
 #include <debugger/rt.h>
 #include <debugger/util.h>
@@ -157,15 +157,10 @@ LOCAL bool KCALL verify_thread_address(struct task *p) {
 }
 
 
-DEFINE_DEBUG_FUNCTION_EX(
-		"lsthread", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
-		"lsthread\n"
-		"\tList all threads running on the system\n",
-		argc, argv) {
+DBG_COMMAND(lsthread,
+            "lsthread\n"
+            "\tList all threads running on the system\n") {
 	cpuid_t cpuid;
-	if (argc != 1)
-		return DBG_FUNCTION_INVALID_ARGUMENTS;
-	(void)argv;
 	dbg_printf("ID       pid\tstate\tcpu\tpc\tsp\tname\n");
 	for (cpuid = 0; cpuid < cpu_count; ++cpuid) {
 		struct task *iter;
@@ -289,9 +284,9 @@ evalthreadexpr(char *expr, struct task **presult) {
 }
 
 
-PRIVATE ATTR_DBGTEXT void DBG_CALL
+INTERN ATTR_DBGTEXT void DBG_CALL
 autocomplete_thread(size_t argc, char *argv[],
-                    debug_auto_cb_t cb, void *arg,
+                    dbg_autocomplete_cb_t cb, void *arg,
                     char const *starts_with,
                     size_t starts_with_len) {
 	(void)argv;
@@ -338,18 +333,17 @@ autocomplete_thread(size_t argc, char *argv[],
 	}
 }
 
-DEFINE_DEBUG_FUNCTION_EX(
-		"thread", &autocomplete_thread, DBG_FUNCTION_FLAG_NORMAL,
-		"thread ADDR\n"
-		"\tSet the thread that is being debuged\n"
-		"\tWarning: Setting an invalid thread address may triple-fault the kernel\n"
-		"\t         Use " DF_WHITE("thread ADDR force") " to override security checks\n",
-		argc, argv) {
+DBG_COMMAND(thread, autocomplete_thread, DBG_HOOKFLAG_NORMAL,
+            "thread ADDR\n"
+            "\tSet the thread that is being debuged\n"
+            "\tWarning: Setting an invalid thread address may triple-fault the kernel\n"
+            "\t         Use " DF_WHITE("thread ADDR force") " to override security checks\n",
+            argc, argv) {
 	struct task *thread;
 	if (argc < 2)
-		return DBG_FUNCTION_INVALID_ARGUMENTS;
+		return DBG_STATUS_INVALID_ARGUMENTS;
 	if (!evalthreadexpr(argv[1], &thread))
-		return DBG_FUNCTION_INVALID_ARGUMENTS;
+		return DBG_STATUS_INVALID_ARGUMENTS;
 	if (argc >= 3 && strcmp(argv[2], DBGSTR("force")) == 0) {
 		/* Accept any thread as valid. */
 	} else if (!verify_thread_address(thread)) {

@@ -33,7 +33,7 @@ if (gcc_opt.remove("-O3"))
 
 #ifdef CONFIG_HAVE_DEBUGGER
 #include <debugger/entry.h>
-#include <debugger/function.h>
+#include <debugger/hook.h>
 #include <debugger/io.h>
 #include <debugger/rt.h>
 #include <kernel/panic.h>

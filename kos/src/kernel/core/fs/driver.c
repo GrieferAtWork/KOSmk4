@@ -25,7 +25,7 @@
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
-#include <debugger/function.h>
+#include <debugger/hook.h>
 #include <debugger/io.h>
 #include <fs/node.h>
 #include <fs/vfs.h>
@@ -4412,16 +4412,11 @@ again_init_drivers:
 
 
 #ifdef CONFIG_HAVE_DEBUGGER
-DEFINE_DEBUG_FUNCTION_EX(
-		"lsmod", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
-		"lsmod\n"
-		"\tList all currently loaded drivers\n"
-		, argc, argv) {
+DBG_COMMAND(lsmod,
+            "lsmod\n"
+            "\tList all currently loaded drivers\n") {
 	size_t i, longest_name, longest_cmdl;
 	REF struct driver_state *ds;
-	if (argc != 1)
-		return DBG_FUNCTION_INVALID_ARGUMENTS;
-	(void)argv;
 	ds = driver_get_state();
 	longest_name = 4;
 	longest_cmdl = 7;

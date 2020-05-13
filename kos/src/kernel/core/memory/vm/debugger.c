@@ -32,7 +32,7 @@ if (gcc_opt.remove("-O3"))
 #include <debugger/config.h>
 
 #ifdef CONFIG_HAVE_DEBUGGER
-#include <debugger/function.h>
+#include <debugger/hook.h>
 #include <debugger/io.h>
 #include <debugger/rt.h>
 #include <fs/node.h>
@@ -52,9 +52,9 @@ DECL_BEGIN
 PRIVATE ATTR_DBGRODATA char const lsvm_str_kernel[] = "kernel";
 PRIVATE ATTR_DBGRODATA char const lsvm_str_user[] = "user";
 
-PRIVATE ATTR_DBGTEXT void DBG_CALL
+INTERN ATTR_DBGTEXT void DBG_CALL
 autocomplete_lsvm(size_t argc, char *argv[],
-                  debug_auto_cb_t cb, void *arg,
+                  dbg_autocomplete_cb_t cb, void *arg,
                   char const *UNUSED(starts_with),
                   size_t UNUSED(starts_with_len)) {
 	(void)argv;
@@ -64,31 +64,30 @@ autocomplete_lsvm(size_t argc, char *argv[],
 	}
 }
 
-DEFINE_DEBUG_FUNCTION_EX(
-		"lsvm", &autocomplete_lsvm, DBG_FUNCTION_FLAG_NORMAL,
-		"lsvm [NAME=kernel|user] [MINADDR=0] [MAXADDR=...]\n"
-		"\tList all VM mappings with the given VM. " DF_WHITE("NAME") " must be done of " DF_WHITE("kern")
-			", " DF_WHITE("user") " or the hex-base address of a " DF_BLUE("struct vm") "\n"
-		"Nodes are enumerated as:\n\n"
-		"Min      Max       Prot  NodeF.   PartF. State     Target Min      Max \n"
-		"003BC000-003BCFFF [rwxs] [p---Mk] [---k] locked -> anonR @003BC000-003BCFFF\n"
-		"Prot:\n"
-		"\t" DF_WHITE("r") " Mapped as readable\n"
-		"\t" DF_WHITE("w") " Mapped as writable\n"
-		"\t" DF_WHITE("x") " Mapped as executable\n"
-		"\t" DF_WHITE("s") " Mapped as shared\n"
-		"NodeF.: (Node flags)\n"
-		"\t" DF_WHITE("p") " The page directory mapping has been prepared\n"
-		"\t" DF_WHITE("P") " The node has been partitioned (split)\n"
-		"\t" DF_WHITE("G") " The node grows up (affects the direction of guard expansion)\n"
-		"\t" DF_WHITE("h") " The node is hinted by the page directory\n"
-		"\t" DF_WHITE("M") " The node should not be merged with other nodes\n"
-		"\t" DF_WHITE("k") " The node is an intrinsic kernel mapping that cannot be unmapped normally\n"
-		"PartF.: (Data part flags)\n"
-		"\t" DF_WHITE("l") " The part will become locked once loaded into the core\n"
-		"\t" DF_WHITE("c") " The contents of the part have changed\n"
-		"\t" DF_WHITE("t") " Changes to the contents of the part are tracked\n"
-		"\t" DF_WHITE("k") " The part is an intrinsic kernel component that cannot be deleted normally\n"
+DBG_COMMAND(lsvm, autocomplete_lsvm, DBG_HOOKFLAG_NORMAL,
+            "lsvm [NAME=kernel|user] [MINADDR=0] [MAXADDR=...]\n"
+            "\tList all VM mappings with the given VM. " DF_WHITE("NAME") " must be done of " DF_WHITE("kern")
+               ", " DF_WHITE("user") " or the hex-base address of a " DF_BLUE("struct vm") "\n"
+            "Nodes are enumerated as:\n\n"
+            "Min      Max       Prot  NodeF.   PartF. State     Target Min      Max \n"
+            "003BC000-003BCFFF [rwxs] [p---Mk] [---k] locked -> anonR @003BC000-003BCFFF\n"
+            "Prot:\n"
+            "\t" DF_WHITE("r") " Mapped as readable\n"
+            "\t" DF_WHITE("w") " Mapped as writable\n"
+            "\t" DF_WHITE("x") " Mapped as executable\n"
+            "\t" DF_WHITE("s") " Mapped as shared\n"
+            "NodeF.: (Node flags)\n"
+            "\t" DF_WHITE("p") " The page directory mapping has been prepared\n"
+            "\t" DF_WHITE("P") " The node has been partitioned (split)\n"
+            "\t" DF_WHITE("G") " The node grows up (affects the direction of guard expansion)\n"
+            "\t" DF_WHITE("h") " The node is hinted by the page directory\n"
+            "\t" DF_WHITE("M") " The node should not be merged with other nodes\n"
+            "\t" DF_WHITE("k") " The node is an intrinsic kernel mapping that cannot be unmapped normally\n"
+            "PartF.: (Data part flags)\n"
+            "\t" DF_WHITE("l") " The part will become locked once loaded into the core\n"
+            "\t" DF_WHITE("c") " The contents of the part have changed\n"
+            "\t" DF_WHITE("t") " Changes to the contents of the part are tracked\n"
+            "\t" DF_WHITE("k") " The part is an intrinsic kernel component that cannot be deleted normally\n"
 		, argc, argv) {
 	struct vm *v = &vm_kernel;
 	struct vm_node *iter;
@@ -102,18 +101,18 @@ DEFINE_DEBUG_FUNCTION_EX(
 		else if (strcmp(argv[0], lsvm_str_user) == 0)
 			v = dbg_current->t_vm;
 		else if (!sscanf(argv[0], DBGSTR("%p"), &v))
-			return DBG_FUNCTION_INVALID_ARGUMENTS;
+			return DBG_STATUS_INVALID_ARGUMENTS;
 		--argc, ++argv;
 	}
 	if (argc) {
 		if (!sscanf(argv[0], DBGSTR("%p"), &minaddr))
-			return DBG_FUNCTION_INVALID_ARGUMENTS;
+			return DBG_STATUS_INVALID_ARGUMENTS;
 		--argc, ++argv;
 		maxaddr = minaddr;
 	}
 	if (argc) {
 		if (!sscanf(argv[0], DBGSTR("%p"), &maxaddr))
-			return DBG_FUNCTION_INVALID_ARGUMENTS;
+			return DBG_STATUS_INVALID_ARGUMENTS;
 		--argc, ++argv;
 	}
 
@@ -248,9 +247,9 @@ do_print_part_position:
 PRIVATE ATTR_DBGRODATA char const aslr_str_0[] = "0";
 PRIVATE ATTR_DBGRODATA char const aslr_str_1[] = "1";
 
-PRIVATE ATTR_DBGTEXT void DBG_CALL
+INTERN ATTR_DBGTEXT void DBG_CALL
 autocomplete_aslr(size_t argc, char *argv[],
-                  debug_auto_cb_t cb, void *arg,
+                  dbg_autocomplete_cb_t cb, void *arg,
                   char const *UNUSED(starts_with),
                   size_t UNUSED(starts_with_len)) {
 	(void)argv;
@@ -260,11 +259,10 @@ autocomplete_aslr(size_t argc, char *argv[],
 	}
 }
 
-DEFINE_DEBUG_FUNCTION_EX(
-		"aslr", &autocomplete_aslr, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
-		"aslr [0|1]\n"
-		"\tView or enable/disable AddressSpaceLayoutRandomization\n"
-		, argc, argv) {
+DBG_COMMAND(aslr, autocomplete_aslr, DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE,
+            "aslr [0|1]\n"
+            "\tView or enable/disable AddressSpaceLayoutRandomization\n",
+            argc, argv) {
 	bool enabled;
 	if (argc == 1) {
 		enabled = !vm_get_aslr_disabled();
@@ -272,13 +270,13 @@ DEFINE_DEBUG_FUNCTION_EX(
 		return enabled ? 0 : 1;
 	}
 	if (argc != 2)
-		return DBG_FUNCTION_INVALID_ARGUMENTS;
+		return DBG_STATUS_INVALID_ARGUMENTS;
 	if (strcmp(argv[1], aslr_str_1) == 0) {
 		enabled = true;
 	} else if (strcmp(argv[1], aslr_str_0) == 0) {
 		enabled = false;
 	} else {
-		return DBG_FUNCTION_INVALID_ARGUMENTS;
+		return DBG_STATUS_INVALID_ARGUMENTS;
 	}
 	vm_set_aslr_disabled(!enabled);
 	return 0;

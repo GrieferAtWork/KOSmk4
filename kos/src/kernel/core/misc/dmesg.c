@@ -31,7 +31,7 @@
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
-#include <debugger/function.h>
+#include <debugger/hook.h>
 #include <kernel/dmesg.h>
 #include <sched/task.h>
 
@@ -504,17 +504,12 @@ dmesg_print_packet(struct syslog_packet *__restrict packet,
 	           (size_t)packet->sp_msg);
 }
 
-DEFINE_DEBUG_FUNCTION_EX(
-		"dmesg", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
-		"dmesg\n"
-		"\tEnumerate most recent system log messages\n",
-		argc, argv) {
+DBG_COMMAND(dmesg,
+            "dmesg\n"
+            "\tEnumerate most recent system log messages\n") {
 	unsigned int nth;
 	struct syslog_packet packet;
 	/* TODO: Options to filter the log, etc... */
-	if (argc != 1)
-		return DBG_FUNCTION_INVALID_ARGUMENTS;
-	(void)argv;
 	for (nth = 0;; ++nth) {
 		if (dmesg_getpacket(&packet, NULL, 0, nth) < 0)
 			break;

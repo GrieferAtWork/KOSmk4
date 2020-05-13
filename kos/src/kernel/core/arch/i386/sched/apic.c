@@ -152,6 +152,7 @@ PRIVATE /*ATTR_FREETEXT*/ void KCALL x86_altcore_entry(void) {
 	u32 num_ticks;
 	struct cpu *me = THIS_CPU;
 	cpuid_t id     = me->c_id;
+
 	/* Disable the APIC timer again, which had already
 	 * been enabled by `x86_altcore_initapic()' */
 	lapic_write(APIC_TIMER, APIC_TIMER_FDISABLED);

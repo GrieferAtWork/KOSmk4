@@ -177,7 +177,7 @@ NOTHROW(KCALL pagedir_unwrite_p)(PAGEDIR_P_SELFTYPE self,
 
 PUBLIC NOBLOCK ATTR_WEAK ATTR_SECTION(".text.kernel.pagedir_p.pagedir_ismapped_p") WUNUSED bool
 NOTHROW(KCALL pagedir_ismapped_p)(PAGEDIR_P_SELFTYPE self,
-                                  VIRT void *addr) {
+                                  VIRT void const *addr) {
 	bool result;
 	PAGEDIR_P_BEGINUSE(self) {
 		result = pagedir_ismapped(addr);
@@ -199,7 +199,7 @@ NOTHROW(KCALL pagedir_iswritable_p)(PAGEDIR_P_SELFTYPE self,
 
 PUBLIC NOBLOCK ATTR_WEAK ATTR_SECTION(".text.kernel.pagedir_p.pagedir_isuseraccessible_p") WUNUSED bool
 NOTHROW(KCALL pagedir_isuseraccessible_p)(PAGEDIR_P_SELFTYPE self,
-                                          VIRT void *addr) {
+                                          VIRT void const *addr) {
 	bool result;
 	PAGEDIR_P_BEGINUSE(self) {
 		result = pagedir_isuseraccessible(addr);

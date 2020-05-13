@@ -30,7 +30,7 @@ if (gcc_opt.remove("-O3"))
 
 #include <debugger/config.h>
 #ifdef CONFIG_HAVE_DEBUGGER
-#include <debugger/function.h>
+#include <debugger/hook.h>
 #include <debugger/io.h>
 #include <debugger/rt.h>
 #include <kernel/printk.h>
@@ -259,14 +259,9 @@ again:
 
 
 
-DEFINE_DEBUG_FUNCTION_EX(
-		"locals", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
-		"locals\n"
-		"List the names, types and values of locally defined C variables at the current source location\n"
-		, argc, argv) {
-	if (argc != 1)
-		return DBG_FUNCTION_INVALID_ARGUMENTS;
-	(void)argv;
+DBG_COMMAND(locals,
+            "locals\n"
+            "List the names, types and values of locally defined C variables at the current source location\n") {
 	/* Enumerate location variables. */
 	debuginfo_enum_locals(&kernel_enum_locals_sections,
 	                      dbg_getpcreg(DBG_REGLEVEL_VIEW),
@@ -294,17 +289,12 @@ locals_maxlen(void *arg,
 	return 0;
 }
 
-DEFINE_DEBUG_FUNCTION_EX(
-		"l", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
-		"l\n"
-		"\tSimilar to " DF_WHITE("locals") ", however the presentation layout is somewhat "
-		"different, in that instead of following C syntax, variable names are written "
-		"first, and are also aligned alongside each other\n"
-		, argc, argv) {
+DBG_COMMAND(l,
+            "l\n"
+            "\tSimilar to " DF_WHITE("locals") ", however the presentation layout is somewhat "
+            "different, in that instead of following C syntax, variable names are written "
+            "first, and are also aligned alongside each other\n") {
 	size_t maxlen = 0;
-	if (argc != 1)
-		return DBG_FUNCTION_INVALID_ARGUMENTS;
-	(void)argv;
 	/* Enumerate location variables. */
 	debuginfo_enum_locals(&kernel_enum_locals_sections,
 	                      dbg_getpcreg(DBG_REGLEVEL_VIEW),

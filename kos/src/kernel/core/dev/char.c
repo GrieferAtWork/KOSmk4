@@ -25,7 +25,7 @@
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
-#include <debugger/function.h>
+#include <debugger/hook.h>
 #include <debugger/io.h>
 #include <dev/char.h>
 #include <dev/keyboard.h>
@@ -837,14 +837,9 @@ again:
 	}
 }
 
-DEFINE_DEBUG_FUNCTION_EX(
-		"lschr", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
-		"lschr\n"
-		"\tList all defined character devices\n"
-		, argc, argv) {
-	if (argc != 1)
-		return DBG_FUNCTION_INVALID_ARGUMENTS;
-	(void)argv;
+DBG_COMMAND(lschr,
+            "lschr\n"
+            "\tList all defined character devices\n") {
 	dbg_print(DBGSTR("     name\tdevno\tdriver\tkind\tfeatures\n"));
 	if (character_device_tree)
 		dump_character_device(character_device_tree);

@@ -32,7 +32,7 @@ if (gcc_opt.remove("-O3"))
 #include <debugger/config.h>
 
 #ifdef CONFIG_HAVE_DEBUGGER
-#include <debugger/function.h>
+#include <debugger/hook.h>
 #include <debugger/io.h>
 #include <debugger/rt.h>
 #include <kernel/addr2line.h>
@@ -66,19 +66,18 @@ print_cpuid_reg(u32 leaf, char reg_acdb, u32 reg_value) {
 	           leaf, reg_acdb, reg_value, 4, &reg_value, reg_value);
 }
 
-DEFINE_DEBUG_FUNCTION(
-		"cpuid",
-		"cpuid LEAF [SUBLEAF]\n"
-		"\tInvoke the " DF_COLOR(DBG_COLOR_DARK_GRAY, DBG_COLOR_LIGHT_GRAY, "cpuid") " instruction "
-		  "for the given LEAF and display its returned values\n"
-		, argc, argv) {
+DBG_COMMAND(cpuid,
+            "cpuid LEAF [SUBLEAF]\n"
+            "\tInvoke the " DF_COLOR(DBG_COLOR_DARK_GRAY, DBG_COLOR_LIGHT_GRAY, "cpuid") " instruction "
+            "for the given LEAF and display its returned values\n",
+            argc, argv) {
 	u32 leaf, a, c, d, b;
 	if (argc <= 1 || sscanf(argv[1], DBGSTR("%I32U"), &leaf) != 1)
-		return DBG_FUNCTION_INVALID_ARGUMENTS;
+		return DBG_STATUS_INVALID_ARGUMENTS;
 	if (argc >= 3) {
 		u32 leaf2;
 		if (sscanf(argv[2], DBGSTR("%I32U"), &leaf2) != 1)
-			return DBG_FUNCTION_INVALID_ARGUMENTS;
+			return DBG_STATUS_INVALID_ARGUMENTS;
 		__cpuid2(leaf, leaf2, &a, &c, &d, &b);
 	} else {
 		__cpuid(leaf, &a, &c, &d, &b);
@@ -98,15 +97,10 @@ DEFINE_DEBUG_FUNCTION(
 #endif /* !__x86_64__ */
 
 
-DEFINE_DEBUG_FUNCTION_EX(
-		"cli", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
-		"cli\n"
-		"\tSet " DF_COLOR(DBG_COLOR_DARK_GRAY, DBG_COLOR_LIGHT_GRAY, "EFLAGS.IF = 0") "\n"
-		, argc, argv) {
+DBG_COMMAND(cli,
+            "cli\n"
+            "\tSet " DF_COLOR(DBG_COLOR_DARK_GRAY, DBG_COLOR_LIGHT_GRAY, "EFLAGS.IF = 0") "\n") {
 	uintptr_t pflags;
-	if (argc != 1)
-		return DBG_FUNCTION_INVALID_ARGUMENTS;
-	(void)argv;
 	pflags = dbg_getregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS);
 	dbg_printf(DBGSTR("cli EFLAGS.IF = 0 (was %u)\n"),
 	           pflags & EFLAGS_IF ? 1 : 0);
@@ -115,15 +109,10 @@ DEFINE_DEBUG_FUNCTION_EX(
 	return 0;
 }
 
-DEFINE_DEBUG_FUNCTION_EX(
-		"sti", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
-		"sti\n"
-		"\tSet " DF_COLOR(DBG_COLOR_DARK_GRAY, DBG_COLOR_LIGHT_GRAY, "EFLAGS.IF = 1") "\n"
-		, argc, argv) {
+DBG_COMMAND(sti,
+            "sti\n"
+            "\tSet " DF_COLOR(DBG_COLOR_DARK_GRAY, DBG_COLOR_LIGHT_GRAY, "EFLAGS.IF = 1") "\n") {
 	uintptr_t pflags;
-	if (argc != 1)
-		return DBG_FUNCTION_INVALID_ARGUMENTS;
-	(void)argv;
 	pflags = dbg_getregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS);
 	dbg_printf(DBGSTR("sti EFLAGS.IF = 1 (was %u)\n"),
 	           pflags & EFLAGS_IF ? 1 : 0);
@@ -132,15 +121,10 @@ DEFINE_DEBUG_FUNCTION_EX(
 	return 0;
 }
 
-DEFINE_DEBUG_FUNCTION_EX(
-		"cld", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
-		"cld\n"
-		"\tSet " DF_COLOR(DBG_COLOR_DARK_GRAY, DBG_COLOR_LIGHT_GRAY, "EFLAGS.DF = 0") "\n"
-		, argc, argv) {
+DBG_COMMAND(cld,
+            "cld\n"
+            "\tSet " DF_COLOR(DBG_COLOR_DARK_GRAY, DBG_COLOR_LIGHT_GRAY, "EFLAGS.DF = 0") "\n") {
 	uintptr_t pflags;
-	if (argc != 1)
-		return DBG_FUNCTION_INVALID_ARGUMENTS;
-	(void)argv;
 	pflags = dbg_getregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS);
 	dbg_printf(DBGSTR("cld EFLAGS.DF = 0 (was %u)\n"),
 	           pflags & EFLAGS_DF ? 1 : 0);
@@ -149,15 +133,10 @@ DEFINE_DEBUG_FUNCTION_EX(
 	return 0;
 }
 
-DEFINE_DEBUG_FUNCTION_EX(
-		"std", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
-		"std\n"
-		"\tSet " DF_COLOR(DBG_COLOR_DARK_GRAY, DBG_COLOR_LIGHT_GRAY, "EFLAGS.DF = 1") "\n"
-		, argc, argv) {
+DBG_COMMAND(std,
+            "std\n"
+            "\tSet " DF_COLOR(DBG_COLOR_DARK_GRAY, DBG_COLOR_LIGHT_GRAY, "EFLAGS.DF = 1") "\n") {
 	uintptr_t pflags;
-	if (argc != 1)
-		return DBG_FUNCTION_INVALID_ARGUMENTS;
-	(void)argv;
 	pflags = dbg_getregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS);
 	dbg_printf(DBGSTR("std EFLAGS.DF = 1 (was %u)\n"),
 	           pflags & EFLAGS_DF ? 1 : 0);
@@ -166,15 +145,10 @@ DEFINE_DEBUG_FUNCTION_EX(
 	return 0;
 }
 
-DEFINE_DEBUG_FUNCTION_EX(
-		"clc", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
-		"clc\n"
-		"\tSet " DF_COLOR(DBG_COLOR_DARK_GRAY, DBG_COLOR_LIGHT_GRAY, "EFLAGS.CF = 0") "\n"
-		, argc, argv) {
+DBG_COMMAND(clc,
+            "clc\n"
+            "\tSet " DF_COLOR(DBG_COLOR_DARK_GRAY, DBG_COLOR_LIGHT_GRAY, "EFLAGS.CF = 0") "\n") {
 	uintptr_t pflags;
-	if (argc != 1)
-		return DBG_FUNCTION_INVALID_ARGUMENTS;
-	(void)argv;
 	pflags = dbg_getregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS);
 	dbg_printf(DBGSTR("clc EFLAGS.CF = 0 (was %u)\n"),
 	           pflags & EFLAGS_CF ? 1 : 0);
@@ -183,15 +157,10 @@ DEFINE_DEBUG_FUNCTION_EX(
 	return 0;
 }
 
-DEFINE_DEBUG_FUNCTION_EX(
-		"stc", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
-		"stc\n"
-		"\tSet " DF_COLOR(DBG_COLOR_DARK_GRAY, DBG_COLOR_LIGHT_GRAY, "EFLAGS.CF = 1") "\n"
-		, argc, argv) {
+DBG_COMMAND(stc,
+            "stc\n"
+            "\tSet " DF_COLOR(DBG_COLOR_DARK_GRAY, DBG_COLOR_LIGHT_GRAY, "EFLAGS.CF = 1") "\n") {
 	uintptr_t pflags;
-	if (argc != 1)
-		return DBG_FUNCTION_INVALID_ARGUMENTS;
-	(void)argv;
 	pflags = dbg_getregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS);
 	dbg_printf(DBGSTR("stc EFLAGS.CF = 1 (was %u)\n"),
 	           pflags & EFLAGS_CF ? 1 : 0);
@@ -200,15 +169,10 @@ DEFINE_DEBUG_FUNCTION_EX(
 	return 0;
 }
 
-DEFINE_DEBUG_FUNCTION_EX(
-		"cmc", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
-		"cmc\n"
-		"\tSet " DF_COLOR(DBG_COLOR_DARK_GRAY, DBG_COLOR_LIGHT_GRAY, "EFLAGS.CF = -EFLAGS.CF") "\n"
-		, argc, argv) {
+DBG_COMMAND(cmc,
+            "cmc\n"
+            "\tSet " DF_COLOR(DBG_COLOR_DARK_GRAY, DBG_COLOR_LIGHT_GRAY, "EFLAGS.CF = -EFLAGS.CF") "\n") {
 	uintptr_t pflags;
-	if (argc != 1)
-		return DBG_FUNCTION_INVALID_ARGUMENTS;
-	(void)argv;
 	pflags = dbg_getregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS);
 	dbg_printf(DBGSTR("stc EFLAGS.CF = %u (was %u)\n"),
 	           pflags & EFLAGS_CF ? 0 : 1,
@@ -218,18 +182,17 @@ DEFINE_DEBUG_FUNCTION_EX(
 	return 0;
 }
 
-DEFINE_DEBUG_FUNCTION(
-		"lgdt",
-		"lgdt LIMIT BASE\n"
-		"\tSet a new Global Descriptor Table\n"
-		, argc, argv) {
+DBG_COMMAND(lgdt,
+            "lgdt LIMIT BASE\n"
+            "\tSet a new Global Descriptor Table\n",
+            argc, argv) {
 	u16 limit;
 	uintptr_t base;
 	struct fcpustate fst;
 	if (argc != 3 ||
 	    sscanf(argv[1], DBGSTR("%I16U"), &limit) != 1 ||
 	    sscanf(argv[2], DBGSTR("%Ix"), &base) != 1)
-		return DBG_FUNCTION_INVALID_ARGUMENTS;
+		return DBG_STATUS_INVALID_ARGUMENTS;
 	dbg_printf("lgdt #%.4I16x (%I16u), %p\n", limit, limit, base);
 	dbg_getallregs(DBG_REGLEVEL_VIEW, &fst);
 	fst.fcs_gdt.dt_limit = limit;
@@ -238,15 +201,10 @@ DEFINE_DEBUG_FUNCTION(
 	return 0;
 }
 
-DEFINE_DEBUG_FUNCTION_EX(
-		"sgdt", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
-		"sgdt\n"
-		"\tPrint the base and limit of the current Global Descriptor Table\n"
-		, argc, argv) {
+DBG_COMMAND(sgdt,
+            "sgdt\n"
+            "\tPrint the base and limit of the current Global Descriptor Table\n") {
 	struct fcpustate fst;
-	if (argc != 1)
-		return DBG_FUNCTION_INVALID_ARGUMENTS;
-	(void)argv;
 	dbg_getallregs(DBG_REGLEVEL_VIEW, &fst);
 	dbg_printf(DBGSTR("sgdt %#.4I16x (%I16u), %p\n"),
 	           fst.fcs_gdt.dt_limit,
@@ -255,18 +213,17 @@ DEFINE_DEBUG_FUNCTION_EX(
 	return 0;
 }
 
-DEFINE_DEBUG_FUNCTION(
-		"lidt",
-		"lidt LIMIT BASE\n"
-		"\tSet a new Interrupt Descriptor Table\n"
-		, argc, argv) {
+DBG_COMMAND(lidt,
+            "lidt LIMIT BASE\n"
+            "\tSet a new Interrupt Descriptor Table\n",
+            argc, argv) {
 	u16 limit;
 	uintptr_t base;
 	struct fcpustate fst;
 	if (argc != 3 ||
 	    sscanf(argv[1], "%I16U", &limit) != 1 ||
 	    sscanf(argv[2], "%Ix", &base) != 1)
-		return DBG_FUNCTION_INVALID_ARGUMENTS;
+		return DBG_STATUS_INVALID_ARGUMENTS;
 	dbg_printf(DBGSTR("lidt %#.4I16x (%I16u), %p\n"),
 	           limit, limit, base);
 	dbg_getallregs(DBG_REGLEVEL_VIEW, &fst);
@@ -276,15 +233,10 @@ DEFINE_DEBUG_FUNCTION(
 	return 0;
 }
 
-DEFINE_DEBUG_FUNCTION_EX(
-		"sidt", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
-		"sidt\n"
-		"\tPrint the base and limit of the current Interrupt Descriptor Table\n"
-		, argc, argv) {
+DBG_COMMAND(sidt,
+            "sidt\n"
+            "\tPrint the base and limit of the current Interrupt Descriptor Table\n") {
 	struct fcpustate fst;
-	if (argc != 1)
-		return DBG_FUNCTION_INVALID_ARGUMENTS;
-	(void)argv;
 	dbg_getallregs(DBG_REGLEVEL_VIEW, &fst);
 	dbg_printf(DBGSTR("sidt %#.4I16x (%I16u), %p\n"),
 	           fst.fcs_idt.dt_limit,
@@ -328,16 +280,11 @@ debug_regdump_print_format(struct regdump_printer *__restrict self,
 }
 
 
-DEFINE_DEBUG_FUNCTION_EX(
-		"r", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
-		"r\n"
-		"\tDisplay a dump of the current register state\n"
-		, argc, argv) {
+DBG_COMMAND(r,
+            "r\n"
+            "\tDisplay a dump of the current register state\n") {
 	struct regdump_printer re_printer;
 	struct fcpustate fst;
-	if (argc != 1)
-		return DBG_FUNCTION_INVALID_ARGUMENTS;
-	(void)argv;
 	re_printer.rdp_printer     = &dbg_printer;
 	re_printer.rdp_printer_arg = NULL;
 	re_printer.rdp_format      = &debug_regdump_print_format;
@@ -405,15 +352,14 @@ DEFINE_DEBUG_FUNCTION_EX(
 	return 0;
 }
 
-DEFINE_DEBUG_FUNCTION(
-		"rdmsr",
-		"rdmsr ID\n"
-		"\tRead and display the current value of the msr referred to by ID\n"
-		, argc, argv) {
+DBG_COMMAND(rdmsr,
+            "rdmsr ID\n"
+            "\tRead and display the current value of the msr referred to by ID\n",
+            argc, argv) {
 	u32 id; u64 val;
 	if (argc != 2 ||
 	    sscanf(argv[1], DBGSTR("%I32x"), &id) != 1)
-		return DBG_FUNCTION_INVALID_ARGUMENTS;
+		return DBG_STATUS_INVALID_ARGUMENTS;
 	val = __rdmsr(id);
 	dbg_printf(DBGSTR("rdmsr " DF_WHITE("%#.8I32x") " (" DF_WHITE("%I32u") "): "
 	                  DF_WHITE("%#.16I64x") " (" DF_WHITE("%I64u") ")\n"),
@@ -421,16 +367,15 @@ DEFINE_DEBUG_FUNCTION(
 	return 0;
 }
 
-DEFINE_DEBUG_FUNCTION(
-		"wrmsr",
-		"wrmsr ID VAL\n"
-		"\tWrite the given VAL into the msr referred to by ID\n"
-		, argc, argv) {
+DBG_COMMAND(wrmsr,
+            "wrmsr ID VAL\n"
+            "\tWrite the given VAL into the msr referred to by ID\n",
+            argc, argv) {
 	u32 id; u64 val;
 	if (argc != 3 ||
 	    sscanf(argv[1], DBGSTR("%I32x"), &id) != 1 ||
 	    sscanf(argv[2], DBGSTR("%I64U"), &val) != 1)
-		return DBG_FUNCTION_INVALID_ARGUMENTS;
+		return DBG_STATUS_INVALID_ARGUMENTS;
 	dbg_printf(DBGSTR("wrmsr " DF_WHITE("%#.8I32x") " (" DF_WHITE("%I32u") "): "
 	                  DF_WHITE("%#.16I64x") " (" DF_WHITE("%I64u") ")\n"),
 	           id, id, val, val);

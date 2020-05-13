@@ -25,7 +25,7 @@
 
 #include <debugger/config.h>
 #include <debugger/entry.h>
-#include <debugger/function.h>
+#include <debugger/hook.h>
 #include <debugger/io.h>
 #include <debugger/util.h>
 #include <kernel/addr2line.h>

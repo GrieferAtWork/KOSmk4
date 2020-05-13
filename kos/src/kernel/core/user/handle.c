@@ -25,7 +25,7 @@
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
-#include <debugger/function.h>
+#include <debugger/hook.h>
 #include <dev/block.h>
 #include <dev/char.h>
 #include <fs/file.h>

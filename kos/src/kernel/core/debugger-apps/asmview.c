@@ -31,7 +31,7 @@ if (gcc_opt.remove("-O3"))
 
 #include <debugger/config.h>
 #ifdef CONFIG_HAVE_DEBUGGER
-#include <debugger/function.h>
+#include <debugger/hook.h>
 #include <debugger/io.h>
 #include <debugger/rt.h>
 #include <debugger/util.h>
@@ -262,8 +262,7 @@ struct av_sections_lock {
 PRIVATE struct av_symbol av_symbol_cache[128];
 PRIVATE struct av_sections_lock av_sections_cache[8];
 
-DEFINE_DBG_FINI(finalize_av_symbol_cache);
-INTERN ATTR_DBGTEXT void NOTHROW(KCALL finalize_av_symbol_cache)(void) {
+DBG_FINI(finalize_av_symbol_cache) {
 	unsigned int i;
 	for (i = 0; i < COMPILER_LENOF(av_sections_cache); ++i) {
 		if (!av_sections_cache[i].sl_driver)
@@ -715,15 +714,14 @@ PUBLIC void *NOTHROW(FCALL dbg_asmview)(void *addr) {
 }
 
 
-DEFINE_DEBUG_FUNCTION(
-		"a",
-		"a [ADDR=pc]\n"
-		"\tOpen an interactive assembly view at ADDR\n",
-		argc, argv) {
+DBG_COMMAND(a,
+            "a [ADDR=pc]\n"
+            "\tOpen an interactive assembly view at ADDR\n",
+            argc, argv) {
 	void *addr = (void *)dbg_getpcreg(DBG_REGLEVEL_VIEW);
 	if (argc >= 2) {
 		if (!dbg_evaladdr(argv[1], (uintptr_t *)&addr))
-			return DBG_FUNCTION_INVALID_ARGUMENTS;
+			return DBG_STATUS_INVALID_ARGUMENTS;
 	}
 	dbg_asmview(addr);
 	return 0;

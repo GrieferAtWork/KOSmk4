@@ -38,7 +38,7 @@
 
 #ifdef CONFIG_DEBUG_MALLOC
 #include <debugger/config.h>
-#include <debugger/function.h>
+#include <debugger/hook.h>
 #include <kernel/addr2line.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>

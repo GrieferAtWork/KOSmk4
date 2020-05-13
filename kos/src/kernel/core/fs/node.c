@@ -25,7 +25,7 @@
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
-#include <debugger/function.h>
+#include <debugger/hook.h>
 #include <fs/node.h>
 #include <fs/vfs.h>
 #include <kernel/aio.h>

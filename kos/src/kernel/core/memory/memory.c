@@ -25,7 +25,7 @@
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
-#include <debugger/function.h>
+#include <debugger/hook.h>
 #include <debugger/io.h>
 #include <kernel/driver.h>
 #include <kernel/memory.h>
@@ -1129,16 +1129,11 @@ NOTHROW(KCALL page_ismapped)(pageptr_t page, pagecnt_t num_pages) {
 }
 
 #ifdef CONFIG_HAVE_DEBUGGER
-DEFINE_DEBUG_FUNCTION_EX(
-		"lsram", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
-		"lsram\n"
-		"\tList page allocation zones, as well as the amount of available ram\n"
-		"\tZones are listed as <id start-end 1.23456% used (used_pages/total_pages)>\n",
-		argc, argv) {
+DBG_COMMAND(lsram,
+            "lsram\n"
+            "\tList page allocation zones, as well as the amount of available ram\n"
+            "\tZones are listed as <id start-end 1.23456% used (used_pages/total_pages)>\n") {
 	size_t i;
-	if (argc != 1)
-		return DBG_FUNCTION_INVALID_ARGUMENTS;
-	(void)argv;
 #if __SIZEOF_POINTER__ >= 8
 	dbg_print(DBGSTR("# Start            End                   Usage (used/total)\n"));
 #else /* __SIZEOF_POINTER__ >= 8 */

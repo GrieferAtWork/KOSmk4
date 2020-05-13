@@ -31,7 +31,7 @@ if (gcc_opt.remove("-O3"))
 
 #include <debugger/config.h>
 #ifdef CONFIG_HAVE_DEBUGGER
-#include <debugger/function.h>
+#include <debugger/hook.h>
 #include <kernel/arch/vm.h>
 #include <kernel/except.h>
 #include <kernel/paging.h>

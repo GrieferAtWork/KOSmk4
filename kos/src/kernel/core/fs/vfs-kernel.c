@@ -24,7 +24,7 @@
 
 #include <kernel/compiler.h>
 
-#include <debugger/function.h>
+#include <debugger/hook.h>
 #include <fs/vfs.h>
 
 #include <bits/param.h>

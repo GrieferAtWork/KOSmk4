@@ -1334,7 +1334,7 @@ NOTHROW(FCALL pae_pagedir_translate)(VIRT void *addr) {
 
 /* Check if the given page is mapped. */
 INTERN NOBLOCK ATTR_PURE WUNUSED bool
-NOTHROW(FCALL pae_pagedir_ismapped)(VIRT void *addr) {
+NOTHROW(FCALL pae_pagedir_ismapped)(VIRT void const *addr) {
 	u64 word;
 	unsigned int vec3, vec2, vec1;
 	vec3 = PAE_PDIR_VEC3INDEX(addr);
@@ -1369,7 +1369,7 @@ NOTHROW(FCALL pae_pagedir_iswritable)(VIRT void *addr) {
 }
 
 INTERN NOBLOCK ATTR_PURE WUNUSED bool
-NOTHROW(FCALL pae_pagedir_isuseraccessible)(VIRT void *addr) {
+NOTHROW(FCALL pae_pagedir_isuseraccessible)(VIRT void const *addr) {
 	u64 word;
 	unsigned int vec3, vec2, vec1;
 	vec3 = PAE_PDIR_VEC3INDEX(addr);

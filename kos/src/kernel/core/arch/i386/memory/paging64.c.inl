@@ -26,7 +26,7 @@
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
-#include <debugger/function.h>
+#include <debugger/hook.h>
 #include <debugger/io.h>
 #include <debugger/rt.h>
 #include <kernel/arch/cpuid.h>
@@ -2058,7 +2058,7 @@ NOTHROW(FCALL p64_pagedir_translate)(VIRT void *addr) {
 
 /* Check if the given page is mapped. */
 INTERN NOBLOCK ATTR_PURE WUNUSED bool
-NOTHROW(FCALL p64_pagedir_ismapped)(VIRT void *addr) {
+NOTHROW(FCALL p64_pagedir_ismapped)(VIRT void const *addr) {
 	u64 word;
 	unsigned int vec4, vec3, vec2, vec1;
 	vec4 = P64_PDIR_VEC4INDEX(addr);
@@ -2109,7 +2109,7 @@ NOTHROW(FCALL p64_pagedir_iswritable)(VIRT void *addr) {
 }
 
 INTERN NOBLOCK ATTR_PURE WUNUSED bool
-NOTHROW(FCALL p64_pagedir_isuseraccessible)(VIRT void *addr) {
+NOTHROW(FCALL p64_pagedir_isuseraccessible)(VIRT void const *addr) {
 	u64 word;
 	unsigned int vec4, vec3, vec2, vec1;
 	vec4 = P64_PDIR_VEC4INDEX(addr);
@@ -2656,9 +2656,9 @@ PRIVATE ATTR_DBGTEXT void KCALL p64_do_ldpd(unsigned int vec4_max) {
 PRIVATE ATTR_DBGRODATA char const lspd_str_kernel[] = "kernel";
 PRIVATE ATTR_DBGRODATA char const lspd_str_user[] = "user";
 
-PRIVATE ATTR_DBGTEXT void DBG_CALL
+INTERN ATTR_DBGTEXT void DBG_CALL
 autocomplete_lspd(size_t argc, char *argv[],
-                  debug_auto_cb_t cb, void *arg,
+                  dbg_autocomplete_cb_t cb, void *arg,
                   char const *UNUSED(starts_with),
                   size_t UNUSED(starts_with_len)) {
 	(void)argv;
@@ -2668,22 +2668,22 @@ autocomplete_lspd(size_t argc, char *argv[],
 	}
 }
 
-DEFINE_DEBUG_FUNCTION_EX(
-		"lspd", &autocomplete_lspd, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
-		"lspd [MODE:kernel|user=user]\n"
-		"\tDo a raw walk over the loaded page directory and enumerate mappings.\n"
-		"\t" DF_WHITE("mode") " can be specified as either " DF_WHITE("kernel") " or " DF_WHITE("user") " to select if " DF_WHITE("vm_kernel") "\n"
-		"\tor " DF_WHITE("THIS_VM") " should be dumped\n",
-		argc, argv) {
+DBG_COMMAND(lspd, autocomplete_lspd, DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE,
+            "lspd [MODE:kernel|user=user]\n"
+            "\tDo a raw walk over the loaded page directory and enumerate mappings.\n"
+            "\t" DF_WHITE("mode") " can be specified as either " DF_WHITE("kernel")
+            " or " DF_WHITE("user") " to select if " DF_WHITE("vm_kernel") "\n"
+            "\tor " DF_WHITE("THIS_VM") " should be dumped\n",
+            argc, argv) {
 	PAGEDIR_P_SELFTYPE pdir;
 	if (argc == 2) {
 		if (strcmp(argv[1], lspd_str_kernel) == 0)
 			goto do_ls_kernel;
 		if (strcmp(argv[1], lspd_str_user) != 0)
-			return DBG_FUNCTION_INVALID_ARGUMENTS;
+			return DBG_STATUS_INVALID_ARGUMENTS;
 	} else {
 		if (argc != 1)
-			return DBG_FUNCTION_INVALID_ARGUMENTS;
+			return DBG_STATUS_INVALID_ARGUMENTS;
 	}
 	pdir = dbg_getpagedir();
 	if (PAGEDIR_P_ISKERNEL(pdir)) {

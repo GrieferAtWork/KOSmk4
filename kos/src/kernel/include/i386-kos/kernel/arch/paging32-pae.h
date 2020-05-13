@@ -417,9 +417,9 @@ INTDEF NOBLOCK void NOTHROW(FCALL pae_pagedir_unmap_userspace_nosync)(void);
 INTDEF NOBLOCK WUNUSED PHYS vm_phys_t NOTHROW(FCALL pae_pagedir_translate)(VIRT void *addr);
 
 /* Check if the given page is mapped. */
-INTDEF NOBLOCK WUNUSED bool NOTHROW(FCALL pae_pagedir_ismapped)(VIRT void *addr);
+INTDEF NOBLOCK WUNUSED bool NOTHROW(FCALL pae_pagedir_ismapped)(VIRT void const *addr);
 INTDEF NOBLOCK WUNUSED bool NOTHROW(FCALL pae_pagedir_iswritable)(VIRT void *addr);
-INTDEF NOBLOCK WUNUSED bool NOTHROW(FCALL pae_pagedir_isuseraccessible)(VIRT void *addr);
+INTDEF NOBLOCK WUNUSED bool NOTHROW(FCALL pae_pagedir_isuseraccessible)(VIRT void const *addr);
 INTDEF NOBLOCK WUNUSED bool NOTHROW(FCALL pae_pagedir_isuserwritable)(VIRT void *addr);
 
 /* TODO: Figure out a better design for these functions

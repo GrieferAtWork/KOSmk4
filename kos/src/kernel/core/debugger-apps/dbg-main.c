@@ -30,13 +30,9 @@ if (gcc_opt.remove("-O3"))
 
 #include <kernel/compiler.h>
 
-#include <debugger/config.h>
+#include <debugger.h>
+
 #ifdef CONFIG_HAVE_DEBUGGER
-#include <debugger/entry.h>
-#include <debugger/function.h>
-#include <debugger/io.h>
-#include <debugger/rt.h>
-#include <debugger/util.h>
 #include <kernel/except.h>
 
 #include <hybrid/align.h>
@@ -196,91 +192,38 @@ break_incomplete:
 
 
 
-INTDEF struct debug_function const __kernel_debug_functions_start[];
-INTDEF struct debug_function const __kernel_debug_functions_end[];
-
-/* Search for a debug function matching the given name.
- * @return: NULL: No function exists that matches `name' */
-PUBLIC ATTR_DBGTEXT WUNUSED ATTR_PURE NONNULL((1))
-struct debug_function const *KCALL
-dbg_getfunc(char const *__restrict name) {
-	struct debug_function const *iter;
-	/* XXX: Maybe use a hash table? */
-	for (iter = __kernel_debug_functions_start;
-	     iter < __kernel_debug_functions_end; ++iter) {
-		if (strcmp(iter->df_name, name) == 0)
-			return iter;
-	}
-	return NULL;
-}
-
-/* Search for a debug function matching the given name most closely. */
-PUBLIC ATTR_DBGTEXT WUNUSED ATTR_PURE NONNULL((1)) struct debug_function const *KCALL
-dbg_getfunc_fuzzy(char const *__restrict name) {
-	struct debug_function const *result = __kernel_debug_functions_start;
-	struct debug_function const *iter;
-	size_t score = (size_t)-1;
-	for (iter = __kernel_debug_functions_start;
-	     iter < __kernel_debug_functions_end; ++iter) {
-		size_t new_score;
-		new_score = fuzzy_strcasecmp(iter->df_name, name);
-		if (new_score < score) {
-			score  = new_score;
-			result = iter;
-		}
-	}
-	return result;
-}
-
-/* Search for a debug function who's name starts with `name'. */
-PUBLIC ATTR_DBGTEXT WUNUSED ATTR_PURE NONNULL((1)) struct debug_function const *KCALL
-dbg_getfunc_start(char const *__restrict name) {
-	struct debug_function const *result = NULL;
-	struct debug_function const *iter;
-	size_t name_len = strlen(name);
-	for (iter = __kernel_debug_functions_start;
-	     iter < __kernel_debug_functions_end; ++iter) {
-		size_t funclen = strlen(iter->df_name);
-		if (funclen < name_len)
-			continue;
-		if (memcmp(iter->df_name, name, name_len * sizeof(char)) != 0)
-			continue;
-		if (result)
-			return NULL; /* Ambiguous */
-		result = iter;
-	}
-	return result;
-}
-
-
 PRIVATE ATTR_DBGTEXT void DBG_CALL
 autocomplete_help(size_t argc, char *argv[],
-                  debug_auto_cb_t cb, void *arg,
+                  dbg_autocomplete_cb_t cb, void *arg,
                   char const *starts_with,
                   size_t starts_with_len) {
-	struct debug_function const *iter;
+	struct dbg_commandhook const *current;
+	struct dbg_hookiterator iter;
 	(void)argc;
 	(void)argv;
-	for (iter = __kernel_debug_functions_start;
-	     iter < __kernel_debug_functions_end; ++iter) {
-		if (memcmp(iter->df_name, starts_with,
-		           starts_with_len * sizeof(char)) != 0)
+	dbg_hookiterator_init(&iter);
+	for (;;) {
+		current = DBG_HOOKITERATOR_NEXT_FILTERED(&iter, DBG_HOOK_COMMAND);
+		if (!current)
+			break;
+		if (memcmp(current->dc_name, starts_with, starts_with_len * sizeof(char)) != 0)
 			continue; /* Skip this one */
-		(*cb)(arg, iter->df_name, strlen(iter->df_name));
+		(*cb)(arg, current->dc_name, strlen(current->dc_name));
 	}
+	dbg_hookiterator_fini(&iter);
 }
 
-DEFINE_DEBUG_FUNCTION_EX(
-		"help", &autocomplete_help, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
-		"help\n"
-		"\tDisplay a list of available commands\n"
-		"help command\n"
-		"\tDisplay help specific to " DF_WHITE("command") "\n"
-		, argc, argv) {
+DBG_COMMAND(help, autocomplete_help, DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE,
+            "help\n"
+            "\tDisplay a list of available commands\n"
+            "help command\n"
+            "\tDisplay help specific to " DF_WHITE("command") "\n",
+            argc, argv) {
 	--argc;
 	++argv;
 	if (!argc) {
-		struct debug_function const *iter;
+		struct dbg_commandhook const *current;
+		struct dbg_hookiterator iter;
 		size_t max_name_length;
 		unsigned int i, commands_per_line = 1;
 		dbg_print(DBGSTR("Available commands (type "
@@ -288,45 +231,55 @@ DEFINE_DEBUG_FUNCTION_EX(
 		                 "help <command>" DF_DEFFGCOLOR
 		                 " for more details)\n"));
 		max_name_length = 1;
-		for (iter = __kernel_debug_functions_start;
-		     iter < __kernel_debug_functions_end; ++iter) {
-			size_t temp = strlen(iter->df_name);
-			if (max_name_length < temp)
-				max_name_length = temp;
+		dbg_hookiterator_init(&iter);
+		for (;;) {
+			size_t hooknamelen;
+			current = DBG_HOOKITERATOR_NEXT_FILTERED(&iter, DBG_HOOK_COMMAND);
+			if (!current)
+				break;
+			hooknamelen = strlen(current->dc_name);
+			if (max_name_length < hooknamelen)
+				max_name_length = hooknamelen;
 		}
+		dbg_hookiterator_fini(&iter);
 		commands_per_line = dbg_screen_width / (max_name_length + 1);
 		if unlikely(!commands_per_line) {
 			commands_per_line = 1;
 		}
-		max_name_length   = dbg_screen_width / commands_per_line;
-		i                 = 0;
-		for (iter = __kernel_debug_functions_start;
-		     iter < __kernel_debug_functions_end; ++iter) {
+		max_name_length = dbg_screen_width / commands_per_line;
+		dbg_hookiterator_init(&iter);
+		for (i = 0;;) {
+			current = DBG_HOOKITERATOR_NEXT_FILTERED(&iter, DBG_HOOK_COMMAND);
+			if (!current)
+				break;
 			/* TODO: It would be nice if we printed commands in alphabetical order here... */
-			dbg_printf(DBGSTR(DF_WHITE("%?-s")), max_name_length, iter->df_name);
+			dbg_printf(DBGSTR(DF_WHITE("%?-s")), max_name_length, current->dc_name);
 			if ((i % commands_per_line) == (commands_per_line - 1))
 				dbg_putc('\n');
 			++i;
 		}
+		dbg_hookiterator_fini(&iter);
 		if (((i - 1) % commands_per_line) != (commands_per_line - 1))
 			dbg_putc('\n');
 	} else {
 		while (argc) {
-			struct debug_function const *func;
-			func = dbg_getfunc(*argv);
-			if (!func) {
-				func = dbg_getfunc_fuzzy(*argv);
+			struct dbg_commandhook const *command;
+			command  = dbg_lookup_command(*argv);
+			if (!command) {
+				command = dbg_lookup_command_fuzzy(*argv);
 				dbg_printf(DBGSTR("Unknown command " DF_SETCOLOR(DBG_COLOR_LIGHT_GRAY, DBG_COLOR_MAROON) "%#q" DF_DEFCOLOR
 				                  " (Did you mean " DF_SETFGCOLOR(DBG_COLOR_WHITE) "%s" DF_DEFFGCOLOR "?)\n"),
-				           *argv, func->df_name);
+				           *argv, command->dc_name);
 			} else {
+				char const *hookhelp;
+				hookhelp = NULL;
+				if (dbg_commandhook_hashelp(command))
+					hookhelp = command->dc_help;
 				dbg_printf(DF_SETFGCOLOR(DBG_COLOR_WHITE) "%s" DF_DEFFGCOLOR ":\n",
-				           func->df_name);
-				if (func->df_help) {
-					dbg_print(func->df_help);
-				} else {
-					dbg_print(DBGSTR("\tNo help available\n"));
-				}
+				           command->dc_name);
+				if (!hookhelp)
+					hookhelp = DBGSTR("\tNo help available\n");
+				dbg_print(hookhelp);
 			}
 			--argc;
 			++argv;
@@ -517,7 +470,7 @@ NOTHROW(KCALL dbg_autocomplete)(size_t cursor,
 #endif /* CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE */
                                 ) {
 	size_t argc, effective_argc;
-	debug_auto_t autofun;
+	dbg_autocomplete_t autofun;
 	uintptr_t func_flags;
 	char *cmdline_copy;
 	union {
@@ -554,12 +507,12 @@ do_autocomplete:
 		/* Auto-complete the name of a command
 		 * -> Same as the auto-completion for `help' */
 		autofun    = &autocomplete_help;
-		func_flags = DBG_FUNCTION_FLAG_AUTOEXCLUSIVE;
+		func_flags = DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE;
 	} else {
 		/* Auto-complete arguments for a command `argv[0]' */
-		struct debug_function const *func;
-		func = dbg_getfunc(argv[0]);
-		if unlikely(!func) {
+		struct dbg_commandhook const *command;
+		command = dbg_lookup_command(argv[0]);
+		if unlikely(!command) {
 			/* No such command (can't auto-complete).
 			 * -> Re-print the command name in red */
 setcolor_badcmd:
@@ -569,14 +522,14 @@ setcolor_badcmd:
 #endif /* CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE */
 			goto done;
 		}
-		if (!func->df_auto) {
+		if (!dbg_commandhook_hasauto(command)) {
 			if ((argc >= 2 || incomplete_word) &&
-			    (func->df_flag & DBG_FUNCTION_FLAG_AUTOEXCLUSIVE))
+			    (command->dc_flag & DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE))
 				goto setcolor_badcmd;
 			goto done; /* No auto-completion for this function... */
 		}
-		autofun    = func->df_auto;
-		func_flags = func->df_flag;
+		autofun    = command->dc_auto;
+		func_flags = command->dc_flag;
 	}
 	effective_argc   = argc;
 	if (incomplete_word) {
@@ -597,7 +550,7 @@ set_starts_empty_string:
 	           &dbg_autocomplete_countmatches, &cookie.cnt,
 	           cookie.cnt.acc_starts, cookie.cnt.acc_startslen);
 	if (cookie.cnt.acc_count == 0) {
-		if (func_flags & DBG_FUNCTION_FLAG_AUTOEXCLUSIVE)
+		if (func_flags & DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE)
 			goto setcolor_badcmd;
 		goto done; /* Nothing to do here! */
 	}
@@ -747,16 +700,10 @@ done:
 
 
 
-DEFINE_DEBUG_FUNCTION_EX(
-		"exit", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
-		"exit\n"
-		"\tExit debugger mode and resume execution (same as pressing CTRL+D)\n"
-		, argc, argv) {
-	if (argc != 1)
-		return DBG_FUNCTION_INVALID_ARGUMENTS;
-	(void)argv;
+DBG_COMMAND(exit,
+            "exit\n"
+            "\tExit debugger mode and resume execution (same as pressing CTRL+D)\n") {
 	dbg_exit();
-	return 0;
 }
 
 /* Debug commandline backlog (entries are separated by \0) */
@@ -878,8 +825,8 @@ dbg_main(uintptr_t show_welcome) {
 	for (;;) {
 		dbg_attr_t attr;
 		size_t argc;
-		uintptr_t errorcode;
-		struct debug_function const *cmd;
+		intptr_t errorcode;
+		struct dbg_commandhook const *cmd;
 		/* Force-enable render-to-screen. */
 again_readline:
 		dbg_endupdate(true);
@@ -1025,9 +972,9 @@ continue_readline_noauto:
 		argc = split_cmdline(cmdline, argv, DBG_ARGC_MAX, NULL);
 		if (!argc)
 			continue;
-		cmd = dbg_getfunc(argv[0]);
+		cmd = dbg_lookup_command(argv[0]);
 		if unlikely(!cmd) {
-			cmd = dbg_getfunc_fuzzy(argv[0]);
+			cmd = dbg_lookup_command_fuzzy(argv[0]);
 			dbg_print(DBGSTR("Unknown command "));
 			attr = dbg_attr;
 			dbg_setcolor(DBG_COLOR_LIGHT_GRAY, DBG_COLOR_MAROON);
@@ -1036,18 +983,18 @@ continue_readline_noauto:
 			dbg_print(DBGSTR(" (did you mean "));
 			attr = dbg_attr;
 			dbg_setfgcolor(DBG_COLOR_WHITE);
-			dbg_print(cmd->df_name);
+			dbg_print(cmd->dc_name);
 			dbg_attr = attr;
 			dbg_print(DBGSTR("?)\n"));
 			continue;
 		}
 		TRY {
-			errorcode = (*cmd->df_main)(argc, argv);
+			errorcode = dbg_commandhook_exec(cmd, argc, argv);
 		} EXCEPT {
 			error_print_into(&dbg_printer, NULL);
 			errorcode = 1;
 		}
-		if (errorcode == DBG_FUNCTION_INVALID_ARGUMENTS) {
+		if (errorcode == DBG_STATUS_INVALID_ARGUMENTS) {
 			dbg_print(DBGSTR(DF_SETCOLOR(DBG_COLOR_MAROON, DBG_COLOR_LIGHT_GRAY)
 			                 "Invalid arguments" DF_RESETATTR "\n"));
 		}

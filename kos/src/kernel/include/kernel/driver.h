@@ -22,6 +22,7 @@
 
 #include <kernel/compiler.h>
 
+#include <debugger/config.h>
 #include <kernel/arch/driver.h>
 #include <kernel/driver-callbacks.h>
 #include <kernel/malloc.h>
@@ -354,6 +355,19 @@ struct driver {
 
 /* The driver descriptor for the kernel core */
 DATDEF struct driver kernel_driver;
+
+/* Kernel core sections. */
+DATDEF struct driver_section kernel_section_text;
+DATDEF struct driver_section kernel_section_rodata;
+DATDEF struct driver_section kernel_section_gcc_except_table;
+DATDEF struct driver_section kernel_section_eh_frame;
+DATDEF struct driver_section kernel_section_data;
+DATDEF struct driver_section kernel_section_bss;
+#ifdef CONFIG_HAVE_DEBUGGER
+DATDEF struct driver_section kernel_section_dbg_hooks;
+#endif /* CONFIG_HAVE_DEBUGGER */
+
+
 
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL driver_section_destroy)(struct driver_section *__restrict self);
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL driver_destroy)(struct driver *__restrict self);
@@ -722,7 +736,7 @@ driver_local_symbol(struct driver *__restrict self,
 #define DRIVER_SECTION_LOCK_FNORMAL   0x0000 /* Normal section locking flags. */
 #define DRIVER_SECTION_LOCK_FINDEX    0x0001 /* The given `NAME' is actually the `(uintptr_t)NAME' index of the section */
 #define DRIVER_SECTION_LOCK_FNODATA   0x0002 /* Do not lock section data into memory, though if the section had already
-                                                  * been loaded, then this flag is simply ignored. */
+                                              * been loaded, then this flag is simply ignored. */
 /* Lock a named section of a given driver into
  * memory and return a descriptor for that section.
  * @throws: E_SEGFAULT: Only here because `name' is USER

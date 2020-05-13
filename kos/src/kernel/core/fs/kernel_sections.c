@@ -101,6 +101,20 @@ INTERN_CONST ATTR_COLDRODATA ElfW(Shdr) const kernel_shdr[KERNEL_SECTIONS_COUNT]
 		/* .ds_sectflags = */ DRIVER_DLSECTION_FNORMAL,              \
 		/* .ds_index     = */ SECTION_DESCRIPTOR_INDEX               \
 	};
+#define EXPORT_SECTION(export_name, name, type, flags, start, size, entsize, link, info) \
+	PUBLIC struct driver_section export_name = {                                         \
+		/* .ds_refcnt    = */ 2,                                                         \
+		/* .ds_data      = */ (void *)(start),                                           \
+		/* .ds_size      = */ (size_t)(size),                                            \
+		/* .ds_entsize   = */ (size_t)(entsize),                                         \
+		/* .ds_link      = */ (link),                                                    \
+		/* .ds_info      = */ (info),                                                    \
+		/* .ds_flags     = */ (flags),                                                   \
+		/* .ds_module    = */ &kernel_driver,                                            \
+		/* .ds_dangling  = */ NULL,                                                      \
+		/* .ds_sectflags = */ DRIVER_DLSECTION_FNORMAL,                                  \
+		/* .ds_index     = */ SECTION_DESCRIPTOR_INDEX                                   \
+	};
 #include "kernel_sections.def"
 
 
@@ -108,6 +122,8 @@ INTERN_CONST ATTR_COLDRODATA ElfW(Shdr) const kernel_shdr[KERNEL_SECTIONS_COUNT]
 INTERN_CONST struct driver_section *const kernel_sections[KERNEL_SECTIONS_COUNT] = {
 #define SECTION(name, type, flags, start, size, entsize, link, info) \
 	/* [SECTION_DESCRIPTOR_INDEX] = */ &SECTION_DESCRIPTOR_NAME,
+#define EXPORT_SECTION(export_name, name, type, flags, start, size, entsize, link, info) \
+	/* [SECTION_DESCRIPTOR_INDEX] = */ &export_name,
 #include "kernel_sections.def"
 };
 

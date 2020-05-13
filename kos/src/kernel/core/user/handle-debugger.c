@@ -32,7 +32,7 @@ if (gcc_opt.remove("-O3"))
 #include <debugger/config.h>
 
 #ifdef CONFIG_HAVE_DEBUGGER
-#include <debugger/function.h>
+#include <debugger/hook.h>
 #include <debugger/io.h>
 #include <debugger/rt.h>
 #include <kernel/handle.h>
@@ -57,23 +57,17 @@ printhandle(unsigned int fd, struct handle const *__restrict hand) {
 	dbg_putc('\n');
 }
 
-DEFINE_DEBUG_FUNCTION_EX(
-		"lsfd", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
-		"lsfd\n"
-		"Enumate open file descriptors within the current thread\n"
-		"The " DF_WHITE("flags") " field consists of:\n"
-		"\t" DF_WHITE("r") ": Read-access is permitted\n"
-		"\t" DF_WHITE("w") ": Write-access is permitted\n"
-		"\t" DF_WHITE("e") ": The " DF_FGCOLOR(DBG_COLOR_PURPLE, "CLOEXEC") " flag is set\n"
-		"\t" DF_WHITE("f") ": The " DF_FGCOLOR(DBG_COLOR_PURPLE, "CLOFORK") " flag is set\n"
-		"\t" DF_WHITE("a") ": Writes append to the end of the file\n"
-		"\t" DF_WHITE("n") ": Reading/writing does not block\n"
-		"",
-		argc, argv) {
+DBG_COMMAND(lsfd,
+            "lsfd\n"
+            "Enumate open file descriptors within the current thread\n"
+            "The " DF_WHITE("flags") " field consists of:\n"
+            "\t" DF_WHITE("r") ": Read-access is permitted\n"
+            "\t" DF_WHITE("w") ": Write-access is permitted\n"
+            "\t" DF_WHITE("e") ": The " DF_FGCOLOR(DBG_COLOR_PURPLE, "CLOEXEC") " flag is set\n"
+            "\t" DF_WHITE("f") ": The " DF_FGCOLOR(DBG_COLOR_PURPLE, "CLOFORK") " flag is set\n"
+            "\t" DF_WHITE("a") ": Writes append to the end of the file\n"
+            "\t" DF_WHITE("n") ": Reading/writing does not block\n") {
 	struct handle_manager *self;
-	if (argc != 1)
-		return DBG_FUNCTION_INVALID_ARGUMENTS;
-	(void)argv;
 	self = FORTASK(dbg_current, this_handle_manager);
 	dbg_printf(DBGSTR("fd\tflags type             repr\n"));
 	if (self->hm_mode == HANDLE_MANAGER_MODE_LINEAR) {

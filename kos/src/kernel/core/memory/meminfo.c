@@ -25,7 +25,7 @@
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
-#include <debugger/function.h>
+#include <debugger/hook.h>
 #include <debugger/io.h>
 #include <kernel/driver-param.h>
 #include <kernel/memory.h>
@@ -901,16 +901,11 @@ PRIVATE char const pmembank_type_colors[PMEMBANK_TYPE_COUNT][6] = {
 	/* [PMEMBANK_TYPE_BADRAM]    = */ DF_SETFGCOLOR(DBG_COLOR_MAROON),
 };
 
-DEFINE_DEBUG_FUNCTION_EX(
-		"lsmem", NULL, DBG_FUNCTION_FLAG_AUTOEXCLUSIVE,
-		"lsmem\n"
-		"\tList known memory banks, as well as their typing\n"
-		"\tBanks are listed as <start-end type bytes>\n",
-		argc, argv) {
+DBG_COMMAND(lsmem,
+            "lsmem\n"
+            "\tList known memory banks, as well as their typing\n"
+            "\tBanks are listed as <start-end type bytes>\n") {
 	size_t i;
-	if (argc != 1)
-		return DBG_FUNCTION_INVALID_ARGUMENTS;
-	(void)argv;
 	for (i = 0; i < minfo.mb_bankc; ++i) {
 		struct pmembank *bank;
 		bank = &minfo.mb_banks[i];

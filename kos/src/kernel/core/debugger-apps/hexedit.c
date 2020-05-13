@@ -31,7 +31,7 @@ if (gcc_opt.remove("-O3"))
 
 #include <debugger/config.h>
 #ifdef CONFIG_HAVE_DEBUGGER
-#include <debugger/function.h>
+#include <debugger/hook.h>
 #include <debugger/io.h>
 #include <debugger/rt.h>
 #include <debugger/util.h>
@@ -929,15 +929,14 @@ NOTHROW(FCALL dbg_hexedit)(void *addr, bool is_readonly) {
 }
 
 
-DEFINE_DEBUG_FUNCTION(
-		"h",
-		"h [ADDR=pc]\n"
-		"\tOpen an interactive hex editor at ADDR\n",
-		argc, argv) {
+DBG_COMMAND(h,
+            "h [ADDR=pc]\n"
+            "\tOpen an interactive hex editor at ADDR\n",
+            argc, argv) {
 	void *addr = (void *)dbg_getpcreg(DBG_REGLEVEL_VIEW);
 	if (argc >= 2) {
 		if (!dbg_evaladdr(argv[1], (uintptr_t *)&addr))
-			return DBG_FUNCTION_INVALID_ARGUMENTS;
+			return DBG_STATUS_INVALID_ARGUMENTS;
 	}
 	dbg_hexedit(addr, true);
 	return 0;
