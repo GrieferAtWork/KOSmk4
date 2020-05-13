@@ -37,6 +37,8 @@ if (gcc_opt.remove("-O3"))
 #include <debugger/rt.h>
 #include <kernel/apic.h>
 #include <kernel/gdt.h>
+#include <kernel/idt.h>
+#include <kernel/pic.h>
 #include <kernel/types.h>
 #include <kernel/vm.h>
 #include <kernel/vm/phys.h>
@@ -53,6 +55,7 @@ if (gcc_opt.remove("-O3"))
 #include <asm/intrin.h>
 #include <kos/kernel/cpu-state-compat.h>
 #include <kos/kernel/cpu-state.h>
+#include <sys/io.h>
 
 #include <alloca.h>
 #include <stddef.h>
@@ -62,6 +65,12 @@ if (gcc_opt.remove("-O3"))
 #include <libcpustate/apply.h>
 
 DECL_BEGIN
+
+/* [1..1] The cpu that is hosting the debugger (== THIS_TASK->t_cpu).
+ *        Set to non-NULL before `dbg_active' becomes `true', and set
+ *        to `NULL' before `dbg_active' becomes `false' */
+DATDEF ATTR_DBGBSS struct cpu *dbg_cpu_ ASMNAME("dbg_cpu");
+
 
 /* Host-thread special-state backup data. (saved/restored by `dbg_init()' and `dbg_fini()') */
 PUBLIC ATTR_DBGBSS struct x86_dbg_hoststate x86_dbg_hostbackup = {};
@@ -119,23 +128,201 @@ INTDEF NOBLOCK void NOTHROW(KCALL init_this_x86_kernel_psp0)(struct task *__rest
 
 /* Check if preemptive interrupts are enabled on the calling CPU */
 PRIVATE NOBLOCK ATTR_DBGTEXT WUNUSED ATTR_PURE bool
-NOTHROW(KCALL are_preemptive_interrupts_enabled)(void) {
-	COMPILER_IMPURE();
-	/* TODO */
-	return true;
+NOTHROW(KCALL are_preemptive_interrupts_enabled)(struct cpu *__restrict me) {
+	return !FORCPU(me, arch_cpu_preemptive_interrupts_disabled);
 }
 
 
+#ifdef CONFIG_NO_SMP
+#define x86_dbg_get_hostcpu() &_bootcpu
+#else /* CONFIG_NO_SMP */
+PRIVATE ATTR_DBGTEXT struct cpu *
+NOTHROW(KCALL x86_dbg_get_hostcpu)(void) {
+	struct cpu *result;
+	/* Try to figure out which task we are (but
+	 * don't do anything that could break stuff...) */
+	if (cpu_count <= 1) {
+		/* Simple case: There's only 1 CPU, so that has to be us! */
+		result = &_bootcpu;
+	} else if (X86_HAVE_LAPIC) {
+		/* Use the LAPIC id to determine the current CPU. */
+		cpuid_t i;
+		u8 id = (u8)(lapic_read(APIC_ID) >> APIC_ID_FSHIFT);
+		result = &_bootcpu;
+		for (i = 0; i < cpu_count; ++i) {
+			if unlikely((uintptr_t)cpu_vector[i] < KERNELSPACE_BASE)
+				continue; /* At one point during booting, `cpu_vector' contains LAPIC IDs. */
+			if (FORCPU(cpu_vector[i], thiscpu_x86_lapicid) == id) {
+				result = cpu_vector[i];
+				break;
+			}
+		}
+	} else {
+		/* XXX: Use pointers from `x86_dbg_exitstate' to determine the calling CPU */
+		result = &_bootcpu;
+	}
+	return result;
+}
+#endif /* !CONFIG_NO_SMP */
+
+
+
+
 #ifndef CONFIG_NO_SMP
-PRIVATE NOBLOCK ATTR_DBGTEXT NONNULL((1, 2)) struct icpustate *
+union ac_int { /* AltCore_Interrupt */
+	struct {
+		u8 ai_sender; /* [valid_if(!0)]
+		               * [lock(SET(ATOMIC(!dbg_cpu)), CLEAR(dbg_cpu))]
+		               * The sending CPU id +1 */
+		u8 ai_vector; /* The interrupt that was triggered. */
+	};
+	u16    ai_word;    /* Control word. */
+};
+
+#ifndef CONFIG_DBG_ALTCORE_MAX_INTERRUPTS
+#define CONFIG_DBG_ALTCORE_MAX_INTERRUPTS 2
+#endif /* !CONFIG_DBG_ALTCORE_MAX_INTERRUPTS */
+
+/* Pending interrupt from a secondary CPU. */
+PRIVATE ATTR_DBGBSS union ac_int
+ac_ints[CONFIG_DBG_ALTCORE_MAX_INTERRUPTS] = { };
+
+/* Handle an interrupt happening on a CPU that isn't `dbg_cpu'
+ * while the debugger is active. When this function is called,
+ * we know that our caller is the `PREEMPTION_ENABLE_WAIT_DISABLE()'
+ * statement inside of `debugger_wait_for_done()', and our job
+ * is to filter out `vector == 0xf1' */
+INTERN ATTR_DBGTEXT NOBLOCK void
+NOTHROW(FCALL x86_dbg_altcore_interrupt)(u8 vector) {
+	struct cpu *mycpu = x86_dbg_get_hostcpu();
+	union ac_int aint;
+	if ((uintptr_t)mycpu < KERNELSPACE_BASE)
+		return;
+	aint.ai_sender = (mycpu->c_id % CONFIG_MAX_CPU_COUNT) + 1;
+	aint.ai_vector = vector;
+	for (;;) {
+		unsigned int i;
+		for (i = 0; i < CONFIG_DBG_ALTCORE_MAX_INTERRUPTS; ++i) {
+			union ac_int existing;
+again_index_i:
+			existing.ai_word = ATOMIC_READ(ac_ints[i].ai_word);
+			if (existing.ai_sender != 0)
+				continue; /* Already in use. */
+			if (!ATOMIC_CMPXCH_WEAK(ac_ints[i].ai_word,
+			                        existing.ai_word,
+			                        aint.ai_word))
+				goto again_index_i;
+			/* Marked as pending! */
+			if (i == 0 && X86_HAVE_LAPIC) {
+				/* First pending interrupt -> Send an IPI to `dbg_cpu' */
+				struct cpu *target = ATOMIC_READ(dbg_cpu);
+				if ((uintptr_t)target >= KERNELSPACE_BASE) {
+					while (lapic_read(APIC_ICR0) & APIC_ICR0_FPENDING)
+						__pause();
+					lapic_write(APIC_ICR1, APIC_ICR1_MKDEST(FORCPU(target, thiscpu_x86_lapicid)));
+					lapic_write(APIC_ICR0,
+					            X86_INTERRUPT_APIC_IPI |
+					            APIC_ICR0_TYPE_FNORMAL |
+					            APIC_ICR0_DEST_PHYSICAL |
+					            APIC_ICR0_FASSERT |
+					            APIC_ICR0_TARGET_FICR1);
+					while (lapic_read(APIC_ICR0) & APIC_ICR0_FPENDING)
+						__pause();
+				}
+			}
+			return;
+		}
+		__pause();
+	}
+}
+
+INTDEF NOBLOCK void NOTHROW(KCALL x86_handle_dbg_ps2_interrupt)(void);
+
+/* High-level function for handling an AltCoreInterrupt
+ * originating from `sender', and having been caused by `vector'
+ * @return: true:  Successfully handled the interrupt.
+ * @return: false: Interrupt cannot be handled in debug-mode.
+ *                 Mark the interrupt as pending, and have the sending
+ *                 CPU execute the vector's normal handler once debug-
+ *                 mode is left. */
+PRIVATE ATTR_DBGTEXT NOBLOCK bool
+NOTHROW(FCALL x86_dbg_handle_aci)(struct cpu *__restrict sender,
+                                  u8 vector) {
+	(void)sender;
+	if (vector == 0xf1) {
+		/* Keyboard interrupt! */
+		x86_handle_dbg_ps2_interrupt();
+		outb(X86_PIC1_CMD, X86_PIC_CMD_EOI);
+		return true;
+	}
+	/* XXX: Handle other interrupts? */
+	return false;
+}
+
+
+/* Called by the APIC-IPI interrupt handler in the context of `dbg_cpu' */
+INTERN ATTR_DBGTEXT NOBLOCK void
+NOTHROW(FCALL x86_dbg_handle_altcore_interrupt)(void) {
+	bool did_something;
+	unsigned int i;
+again:
+	did_something = false;
+	/* Look for something to do. */
+	for (i = 0; i < CONFIG_DBG_ALTCORE_MAX_INTERRUPTS; ++i) {
+		union ac_int job;
+		struct cpu *sender_cpu;
+		struct x86_dbg_cpuammend *sender_ammend;
+		bool handled;
+		job.ai_word = ATOMIC_XCH(ac_ints[i].ai_word, 0);
+		if (job.ai_sender == 0)
+			continue; /* Unused */
+		--job.ai_sender;
+		if unlikely(job.ai_sender >= CONFIG_MAX_CPU_COUNT)
+			continue; /* Shouldn't happen. */
+		sender_cpu = cpu_vector[job.ai_sender];
+		if unlikely((uintptr_t)sender_cpu < KERNELSPACE_BASE)
+			continue; /* Shouldn't happen. */
+		if unlikely(sender_cpu->c_id != job.ai_sender)
+			continue; /* Shouldn't happen. */
+		if unlikely(!x86_dbg_hostbackup.dhs_cpus[job.ai_sender].dcs_istate)
+			continue; /* Shouldn't happen. */
+		sender_ammend = x86_dbg_hostbackup.dhs_cpus[job.ai_sender].dcs_iammend;
+		if unlikely(!sender_ammend)
+			continue; /* Shouldn't happen. */
+		/* Try to handle the interrupt in the context of the debugger. */
+		handled = x86_dbg_handle_aci(sender_cpu, job.ai_vector);
+		if (!handled) {
+			/* Enqueue the interrupt for execution by `sender_cpu'
+			 * once debugger mode is exited. */
+			u8 mask;
+			unsigned int index;
+			mask  = (u8)1 << (job.ai_vector % 8);
+			index = job.ai_vector / 8;
+			ATOMIC_FETCHOR(sender_ammend->dca_intr[index], mask);
+		}
+		did_something = true;
+	}
+	if (did_something)
+		goto again;
+}
+
+
+PRIVATE ATTR_DBGTEXT NOBLOCK NONNULL((1, 2)) struct icpustate *
 NOTHROW(FCALL debugger_wait_for_done)(struct icpustate *__restrict state,
                                       void *args[CPU_IPI_ARGCOUNT]) {
 	struct x86_dbg_cpuammend ammend;
 	cpuid_t mycpuid;
+	PREEMPTION_DISABLE();
 	(void)args;
-	ammend.dca_thread = THIS_TASK;
-	ammend.dca_cpu    = ammend.dca_thread->t_cpu;
-	mycpuid           = ammend.dca_cpu->c_id;
+	/* Figure out the calling CPU. */
+	ammend.dca_cpu = x86_dbg_get_hostcpu();
+
+	/* Load the calling thread pointer. */
+	ammend.dca_thread = ammend.dca_cpu->c_current;
+	if (!ammend.dca_thread)
+		ammend.dca_thread = &FORCPU(ammend.dca_cpu, thiscpu_idle);
+
+	mycpuid = ammend.dca_cpu->c_id % CONFIG_MAX_CPU_COUNT;
 
 	/* Set the KEEPCORE flag for our current thread. */
 	ammend.dca_taskflags = ATOMIC_FETCHOR(ammend.dca_thread->t_flags, TASK_FKEEPCORE);
@@ -172,19 +359,47 @@ NOTHROW(FCALL debugger_wait_for_done)(struct icpustate *__restrict state,
 	ammend.dca_ss = __rdss();
 #endif /* !__x86_64__ */
 
+	/* Clear the set of pending interrupts. */
+	memset(ammend.dca_intr, 0, sizeof(ammend.dca_intr));
+
 	/* Disable preemptive interrupts. */
-	ammend.dca_pint = are_preemptive_interrupts_enabled();
+	ammend.dca_pint = are_preemptive_interrupts_enabled(ammend.dca_cpu);
 	if (ammend.dca_pint)
 		cpu_disable_preemptive_interrupts_nopr();
+
+	/* TODO: Load an alternate IDT that saves all of the interrupts that happened
+	 *       while we're in here, such that once we return from inside here, those
+	 *       interrupts will all get serviced. */
 
 	/* Fill in the host-backup area of our CPU, thus
 	 * ACK-ing the fact that we're now supposed to sleep. */
 	ATOMIC_WRITE(x86_dbg_hostbackup.dhs_cpus[mycpuid].dcs_iammend, &ammend);
 	ATOMIC_WRITE(x86_dbg_hostbackup.dhs_cpus[mycpuid].dcs_istate, state);
 
+	/* Load the IDT for use by secondary CPUs while one specific CPU is hosting the debugger.
+	 * WARNING: INTERRUPT HANDLERS OF THIS IDT _DONT_ PRESERVE THE (R|E)AX REGISTER! */
+	__lidt_p(&x86_dbgaltcoreidt_ptr);
+
 	/* While for the debugger to become inactive. */
-	while (dbg_active)
-		PREEMPTION_ENABLE_WAIT_DISABLE();
+	while (ATOMIC_READ(dbg_cpu_) != NULL) {
+		COMPILER_BARRIER();
+		/* NOTE: Mark (R|E)AX as clobbered, since the interrupt handlers (which may only be
+		 *       executed during the `hlt' instruction in this inline assembly statement)
+		 *       may override that register during execution! */
+		__asm__ __volatile__("sti\n\t"
+		                     "hlt\n\t"
+		                     "cli"
+		                     :
+		                     :
+		                     : "memory"
+#ifdef __x86_64__
+		                     , "%rax"
+#else /* __x86_64__ */
+		                     , "%eax"
+#endif /* !__x86_64__ */
+		                     );
+		COMPILER_BARRIER();
+	}
 
 	/* Re-load the saved return state. */
 	state = ATOMIC_XCH(x86_dbg_hostbackup.dhs_cpus[mycpuid].dcs_istate, NULL);
@@ -233,6 +448,8 @@ NOTHROW(FCALL debugger_wait_for_done)(struct icpustate *__restrict state,
 	if (ammend.dca_pint)
 		cpu_enable_preemptive_interrupts_nopr();
 
+	/* TODO: Service interrupts for all 1-bits in `ammend.dca_intr' */
+
 	return state;
 }
 #endif /* !CONFIG_NO_SMP */
@@ -265,7 +482,6 @@ NOTHROW(KCALL cpu_broadcastipi_notthis_early_boot_aware)(cpu_ipi_t func,
 		target = cpu_vector[i];
 		if (target == calling_cpu)
 			continue;
-
 		/* At one point during early boot, the entires of the `cpu_vector'
 		 * are used to carry a 16-bit block of information about the how
 		 * the associated CPU will be addressed physically.
@@ -278,16 +494,21 @@ NOTHROW(KCALL cpu_broadcastipi_notthis_early_boot_aware)(cpu_ipi_t func,
 
 		/* One of the last things done during init is setting TTS.PSP0
 		 * Check if that field has already been initialized */
+		if ((uintptr_t)target->c_current < KERNELSPACE_BASE)
+			continue;
+		{
+			uintptr_t const *ppsp0;
+			ppsp0 = &FORTASK(target->c_current, this_x86_kernel_psp0);
+			if ((uintptr_t)ppsp0 < KERNELSPACE_BASE)
+				continue;
 #ifdef __x86_64__
-		if (!FORCPU(target, thiscpu_x86_tss).t_rsp0 ||
-		    (FORCPU(target, thiscpu_x86_tss).t_rsp0 != FORCPU(target, thiscpu_idle_x86_kernel_psp0)))
-			continue;
+			if (FORCPU(target, thiscpu_x86_tss).t_rsp0 != *ppsp0)
+				continue;
 #else /* __x86_64__ */
-		if (!FORCPU(target, thiscpu_x86_tss).t_esp0 ||
-		    (FORCPU(target, thiscpu_x86_tss).t_esp0 != FORCPU(target, thiscpu_idle_x86_kernel_psp0)))
-			continue;
+			if (FORCPU(target, thiscpu_x86_tss).t_esp0 != *ppsp0)
+				continue;
 #endif /* !__x86_64__ */
-
+		}
 		if (cpu_sendipi(target, func, args, flags))
 			++result;
 	}
@@ -295,37 +516,6 @@ NOTHROW(KCALL cpu_broadcastipi_notthis_early_boot_aware)(cpu_ipi_t func,
 	return result;
 }
 #endif /* !CONFIG_NO_SMP */
-
-
-PRIVATE ATTR_DBGTEXT struct cpu *
-NOTHROW(KCALL x86_dbg_get_hostcpu)(void) {
-	struct cpu *result;
-#ifndef CONFIG_NO_SMP
-	/* Try to figure out which task we are (but
-	 * don't do anything that could break stuff...) */
-	if (cpu_count <= 1) {
-		/* Simple case: There's only 1 CPU, so that has to be us! */
-		result = &_bootcpu;
-	} else if (X86_HAVE_LAPIC) {
-		/* Use the LAPIC id to determine the current CPU. */
-		cpuid_t i;
-		u8 id = (u8)(lapic_read(APIC_ID) >> APIC_ID_FSHIFT);
-		result = &_bootcpu;
-		for (i = 0; i < cpu_count; ++i) {
-			if unlikely((uintptr_t)cpu_vector[i] < KERNELSPACE_BASE)
-				continue; /* At one point during booting, `cpu_vector' contains LAPIC IDs. */
-			if (FORCPU(cpu_vector[i], thiscpu_x86_lapicid) == id) {
-				result = cpu_vector[i];
-				break;
-			}
-		}
-	} else {
-		/* XXX: Use pointers from `x86_dbg_exitstate' to determine the calling CPU */
-		result = &_bootcpu;
-	}
-#endif /* !CONFIG_NO_SMP */
-	return result;
-}
 
 
 PRIVATE ATTR_DBGTEXT void KCALL
@@ -462,7 +652,7 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_init(void) {
 	struct cpu *mycpu;
 	struct task *mythread;
 	/* Figure out which one's our own CPU. */
-	mycpu = x86_dbg_get_hostcpu();
+	mycpu    = x86_dbg_get_hostcpu();
 
 	mythread = mycpu->c_current;
 	if unlikely(!mythread) /* Shouldn't happen, but better be safe! */
@@ -529,11 +719,18 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_init(void) {
 		}
 	}
 	if (!(initok & INITOK_PREEMPTIVE_INTERRUPTS)) {
-		x86_dbg_hostbackup.dhs_pint = are_preemptive_interrupts_enabled();
+		x86_dbg_hostbackup.dhs_pint = are_preemptive_interrupts_enabled(mycpu);
 		if (x86_dbg_hostbackup.dhs_pint)
 			cpu_disable_preemptive_interrupts_nopr();
 		initok |= INITOK_PREEMPTIVE_INTERRUPTS;
 	}
+
+	/* NOTE: Clear `dbg_cpu_' _BEFORE_ sending the IPI to stop execution
+	 *       on other CPUs. - This field being non-NULL is the trigger
+	 *       that causes other CPUs to stay suspended! */
+	COMPILER_BARRIER();
+	dbg_cpu_ = mycpu;
+	COMPILER_BARRIER();
 
 	/* Suspend execution on all other CPUs. */
 #ifndef CONFIG_NO_SMP
@@ -622,7 +819,7 @@ PRIVATE ATTR_DBGTEXT void KCALL
 reset_pdir(struct task *mythread) {
 	struct vm *myvm;
 	myvm = mythread->t_vm;
-	if unlikely(!myvm)
+	if unlikely((uintptr_t)myvm < KERNELSPACE_BASE)
 		return;
 	if unlikely((vm_phys_t)myvm->v_pdir_phys_ptr != pagedir_translate(&myvm->v_pagedir))
 		return;
@@ -658,7 +855,8 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_reset(void) {
 	struct cpu *mycpu;
 	struct task *mythread;
 	/* Figure out which one's our own CPU. */
-	mycpu = x86_dbg_get_hostcpu();
+	mycpu    = x86_dbg_get_hostcpu();
+	dbg_cpu_ = mycpu;
 
 	mythread = mycpu->c_current;
 	if unlikely(!mythread) /* Shouldn't happen, but better be safe! */
@@ -723,6 +921,13 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_fini(void) {
 
 	x86_debug_finalize_ps2_keyboard();
 	dbg_finalize_tty();
+
+	/* NOTE: Clear `dbg_cpu_' _BEFORE_ sending the IPI to resume execution
+	 *       on other CPUs. - This field being NULL is the trigger that
+	 *       causes other CPUs to resume! */
+	COMPILER_BARRIER();
+	dbg_cpu_ = NULL;
+	COMPILER_BARRIER();
 
 	/* Wake-up other CPUs */
 #ifndef CONFIG_NO_SMP

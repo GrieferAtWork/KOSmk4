@@ -46,10 +46,17 @@ PUBLIC ATTR_DBGBSS byte_t dbg_stack[KERNEL_DEBUG_STACKSIZE] = {};
 
 /* Set to true while the debugger is currently active.
  * NOTE: This variable may be used to test if the system is being debugged. */
-PUBLIC ATTR_DBGBSS bool dbg_active = false;
+DATDEF ATTR_DBGBSS bool dbg_active_ ASMNAME("dbg_active");
+PUBLIC ATTR_DBGBSS bool dbg_active_ = false;
 
 /* [1..1] The thread that is currently being viewed. */
 PUBLIC ATTR_DBGBSS struct task *dbg_current = NULL;
+
+/* [1..1] The cpu that is hosting the debugger (== THIS_TASK->t_cpu).
+ *        Set to non-NULL before `dbg_active' becomes `true', and set
+ *        to `NULL' before `dbg_active' becomes `false' */
+DATDEF ATTR_DBGBSS struct cpu *dbg_cpu_ ASMNAME("dbg_cpu");
+PUBLIC ATTR_DBGBSS struct cpu *dbg_cpu_ = NULL;
 
 /* Apply changes made to `DBG_REGLEVEL_VIEW' onto `DBG_REGLEVEL_ORIG'. */
 PUBLIC ATTR_WEAK ATTR_DBGTEXT_S("dbg_applyview")

@@ -457,6 +457,16 @@ struct syslog_buffer {
 };
 
 #ifdef WANT_SYSLOG_LOCK
+LOCAL NOBLOCK ATTR_CONST WUNUSED bool
+NOTHROW(FCALL is_a_valid_cpu)(struct cpu *c) {
+	cpuid_t i;
+	for (i = 0; i < cpu_count; ++i) {
+		if (cpu_vector[i] == c)
+			return true;
+	}
+	return false;
+}
+
 LOCAL NOBLOCK struct cpu *
 NOTHROW(FCALL syslog_buffer_lock)(struct syslog_buffer *__restrict self,
                                   pflag_t preemption_was_enabled) {
@@ -469,6 +479,16 @@ again:
 		return me; /* Non-recursive, normal lock */
 	if (oldcpu == me)
 		return NULL; /* Recursive lock */
+	/* Syslog printing must remain functional, even if some other CPU
+	 * crashed fatally during CPU initialization while holding this lock. */
+	if unlikely(!is_a_valid_cpu(oldcpu)) {
+		struct cpu *real_oldcpu;
+		real_oldcpu = ATOMIC_CMPXCH_VAL(self->sb_writer, oldcpu, me);
+		if (oldcpu != real_oldcpu)
+			goto again;
+		return me; /* Non-recursive, normal lock */
+	}
+
 	/* Another CPU is holding the lock. ~try~ to yield. */
 	if (PREEMPTION_WASENABLED(preemption_was_enabled)) {
 		PREEMPTION_ENABLE();

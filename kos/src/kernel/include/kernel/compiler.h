@@ -131,7 +131,7 @@
 #define ATTR_DATA_S(x)   ATTR_SECTION(".data." s)
 #define ATTR_BSS_S(x)    ATTR_SECTION(".bss." s)
 
-#define FREESTR(s) XBLOCK({ PRIVATE ATTR_FREERODATA char const _free_str[] = s; XRETURN _free_str; })
+#define FREESTR(s) XBLOCK({ PRIVATE ATTR_FREERODATA ATTR_ALIGNED(1) char const _free_str[] = s; XRETURN _free_str; })
 
 #define ATTR_PERCPU      ATTR_SECTION(".data.percpu")  /* Per-cpu template data. */
 #define ATTR_PERVM       ATTR_SECTION(".data.pervm")   /* Per-virtual-memory template data. */

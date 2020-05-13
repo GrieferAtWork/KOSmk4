@@ -610,13 +610,13 @@ i386_allocate_secondary_cores(void) {
 			addr = (byte_t *)addr + KERNEL_DF_STACKSIZE;
 			/* Store the DF stack pointer in internal CPU structures. */
 #ifdef __x86_64__
-			FORCPU(altcore, __kernel_percpu_tss).t_ist1 = (u64)addr;
-			FORCPU(altcore, __kernel_percpu_tss).t_ist2 = (u64)addr;
-			FORCPU(altcore, __kernel_percpu_tss).t_ist3 = (u64)addr;
-			FORCPU(altcore, __kernel_percpu_tss).t_ist4 = (u64)addr;
-			FORCPU(altcore, __kernel_percpu_tss).t_ist5 = (u64)addr;
-			FORCPU(altcore, __kernel_percpu_tss).t_ist6 = (u64)addr;
-			FORCPU(altcore, __kernel_percpu_tss).t_ist7 = (u64)addr;
+			FORCPU(altcore, thiscpu_x86_tss).t_ist1 = (u64)addr;
+			FORCPU(altcore, thiscpu_x86_tss).t_ist2 = (u64)addr;
+			FORCPU(altcore, thiscpu_x86_tss).t_ist3 = (u64)addr;
+			FORCPU(altcore, thiscpu_x86_tss).t_ist4 = (u64)addr;
+			FORCPU(altcore, thiscpu_x86_tss).t_ist5 = (u64)addr;
+			FORCPU(altcore, thiscpu_x86_tss).t_ist6 = (u64)addr;
+			FORCPU(altcore, thiscpu_x86_tss).t_ist7 = (u64)addr;
 #else /* __x86_64__ */
 			FORCPU(altcore, thiscpu_x86_tssdf).t_esp0 = (u32)addr;
 			FORCPU(altcore, thiscpu_x86_tssdf).t_esp1 = (u32)addr;

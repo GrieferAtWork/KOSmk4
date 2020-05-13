@@ -612,10 +612,20 @@ SECTIONS {
 #endif /* !CONFIG_NO_PAGING_P32 */
 #endif /* !__x86_64__ */
 
+	/* The main IDT used during normal operations */
 #include "idt/idt.ld"
+
 #ifndef CONFIG_NO_DEBUGGER
+
+	/* The IDT active for `dbg_cpu' while the debugger is in use */
 #define PREFIX x86_dbg
 #include "idt/idt.ld"
+
+#ifndef CONFIG_NO_SMP
+	/* The IDT active for all CPUs other than `dbg_cpu' while the debugger is in use */
+#define PREFIX x86_dbgaltcore
+#include "idt/idt.ld"
+#endif /* !CONFIG_NO_SMP */
 #endif /* !CONFIG_NO_DEBUGGER */
 
 	/DISCARD/ : {

@@ -50,11 +50,16 @@ DATDEF byte_t dbg_stack[KERNEL_DEBUG_STACKSIZE];
 #define __dbg_active_defined 1
 /* Set to true while the debugger is currently active.
  * NOTE: This variable may be used to test if the system is being debugged. */
-DATDEF bool dbg_active;
+DATDEF bool const dbg_active;
 #endif /* !__dbg_active_defined */
 
 /* [1..1] The thread that is currently being viewed. */
 DATDEF struct task *dbg_current;
+
+/* [1..1] The cpu that is hosting the debugger (== THIS_TASK->t_cpu).
+ *        Set to non-NULL before `dbg_active' becomes `true', and set
+ *        to `NULL' before `dbg_active' becomes `false' */
+DATDEF struct cpu *const dbg_cpu;
 
 /* DBG register access level:
  * dbg_enter()        --> DBG_REGLEVEL_EXIT

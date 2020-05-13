@@ -57,7 +57,7 @@ NOTHROW(KCALL smp_memsum)(void const *__restrict p, size_t n_bytes) {
 }
 
 PRIVATE ATTR_FREETEXT MpFloatingPointerStructure *
-NOTHROW(KCALL Mp_LocateFloatingPointStructureInAddressRange)(VIRT uintptr_t base, size_t bytes) {
+NOTHROW(KCALL Mp_LocateFloatingPointerStructureInAddressRange)(VIRT uintptr_t base, size_t bytes) {
 	uintptr_t iter, end;
 	/* Make sure not to search unmapped memory! */
 	if (base < KERNEL_CORE_BASE) {
@@ -89,21 +89,21 @@ NOTHROW(KCALL Mp_LocateFloatingPointStructureInAddressRange)(VIRT uintptr_t base
 
 
 PRIVATE ATTR_FREETEXT MpFloatingPointerStructure *
-NOTHROW(KCALL Mp_LocateFloatingPointStructure)(void) {
+NOTHROW(KCALL Mp_LocateFloatingPointerStructure)(void) {
 	MpFloatingPointerStructure *result;
 	uintptr_t base;
 	/* NOTE: No need to identity-map these, as they're all part of the
 	 *       first 1Gb of physical memory, which is fully mapped at this
 	 *       point, both in 32-bit and 64-bit mode. */
 	base   = (uintptr_t)*(u16 volatile *)(KERNEL_CORE_BASE + 0x40E);
-	result = Mp_LocateFloatingPointStructureInAddressRange(KERNEL_CORE_BASE + base, 1024);
+	result = Mp_LocateFloatingPointerStructureInAddressRange(KERNEL_CORE_BASE + base, 1024);
 	if (result)
 		goto done;
 	base   = (uintptr_t)*(u16 volatile *)(KERNEL_CORE_BASE + 0x413);
-	result = Mp_LocateFloatingPointStructureInAddressRange(KERNEL_CORE_BASE + base * 1024, 1024);
+	result = Mp_LocateFloatingPointerStructureInAddressRange(KERNEL_CORE_BASE + base * 1024, 1024);
 	if (result)
 		goto done;
-	result = Mp_LocateFloatingPointStructureInAddressRange(KERNEL_CORE_BASE + 0x0f0000, 64 * 1024);
+	result = Mp_LocateFloatingPointerStructureInAddressRange(KERNEL_CORE_BASE + 0x0f0000, 64 * 1024);
 done:
 	return result;
 }
@@ -131,7 +131,7 @@ NOTHROW(KCALL x86_initialize_smp)(void) {
 	MpConfigurationTable *table;
 	/* TODO: Commandline option to override address of this structure */
 	/* TODO: Commandline option to disable detection of this structure */
-	fps = Mp_LocateFloatingPointStructure();
+	fps = Mp_LocateFloatingPointerStructure();
 	if unlikely(!fps) {
 		printk(FREESTR(KERN_DEBUG "[smp] MpFloatingPointerStructure not found\n"));
 		return;
@@ -179,6 +179,7 @@ NOTHROW(KCALL x86_initialize_smp)(void) {
 		end   = (MpConfigurationEntry *)((uintptr_t)table + table->tab_length);
 		count = table->tab_entryc;
 		for (i = 0; i < count && entry < end; ++i) {
+			size_t entsize = 8;
 			switch (entry->mp_type) {
 
 			case MPCFG_PROCESSOR:
@@ -207,13 +208,22 @@ NOTHROW(KCALL x86_initialize_smp)(void) {
 					}
 #endif /* !CONFIG_NO_SMP */
 				}
-				entry = (MpConfigurationEntry *)((byte_t *)entry + 20);
+				entsize = 20;
+				break;
+
+			case MPCFG_IOAPIC:
+				if (entry->mp_ioapic.io_flags & MP_IOAPIC_FENABLED) {
+					printk(FREESTR(KERN_INFO "[smp] IoApic %#.2I8x:%#.2I8x found at %#.8I32x\n"),
+					       entry->mp_ioapic.io_apicid,
+					       entry->mp_ioapic.io_apicver,
+					       entry->mp_ioapic.io_apicaddr);
+				}
 				break;
 
 			default:
-				entry = (MpConfigurationEntry *)((byte_t *)entry + 8);
 				break;
 			}
+			entry = (MpConfigurationEntry *)((byte_t *)entry + entsize);
 		}
 	}
 }

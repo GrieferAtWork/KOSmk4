@@ -56,6 +56,49 @@ END(x86_dbgidt_pagefault)
 
 
 .section .text.cold
+INTERN_FUNCTION(x86_dbgidt_apic_ipi)
+	.cfi_startproc simple
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	intr_enter INTR
+
+	/* Save scratch registers */
+	pushq_cfi_r %r11
+	pushq_cfi_r %r10
+	pushq_cfi_r %r9
+	pushq_cfi_r %r8
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %rax
+
+	/* Achnowledge the IPI. */
+	EXTERN(x86_lapicbase)
+	movq   x86_lapicbase, %rax
+	movl   $(APIC_EOI_FSIGNAL), APIC_EOI(%rax)
+
+	/* Deal with the interrupt */
+	EXTERN(x86_dbg_handle_altcore_interrupt)
+	call   x86_dbg_handle_altcore_interrupt
+
+	/* Restore scratch registers */
+	popq_cfi_r %rax
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	popq_cfi_r %r8
+	popq_cfi_r %r9
+	popq_cfi_r %r10
+	popq_cfi_r %r11
+
+	intr_exit
+	.cfi_endproc
+END(x86_dbgidt_apic_ipi)
+
+
+.section .text.cold
 INTERN_FUNCTION(x86_dbgidt_specific_00h) /* ISR_X86_f1 */
 	.cfi_startproc simple
 	.cfi_iret_signal_frame
@@ -94,6 +137,10 @@ INTERN_FUNCTION(x86_dbgidt_specific_00h) /* ISR_X86_f1 */
 	intr_exit
 	.cfi_endproc
 END(x86_dbgidt_specific_00h)
+
+#ifndef __INTELLISENSE__
+#include "isr.S"
+#endif /* !__INTELLISENSE__ */
 
 #endif /* CONFIG_HAVE_DEBUGGER */
 

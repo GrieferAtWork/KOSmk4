@@ -21,7 +21,10 @@
 #define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_IDT_H 1
 
 #include <kernel/compiler.h>
+
+#include <debugger/config.h>
 #include <kernel/types.h>
+
 #include <kos/kernel/segment.h>
 
 DECL_BEGIN
@@ -62,13 +65,18 @@ struct desctab;     /* From <kos/kernel/cpu-state.h> */
 DATDEF struct idt_segment x86_idt[256];
 DATDEF struct desctab const x86_idt_ptr;
 
-#ifndef CONFIG_NO_DEBUGGER
+#ifdef CONFIG_HAVE_DEBUGGER
 #ifndef __x86_dbgidt_defined
 #define __x86_dbgidt_defined 1
 DATDEF struct idt_segment x86_dbgidt[256];
 DATDEF struct desctab const x86_dbgidt_ptr;
+#ifndef CONFIG_NO_SMP
+DATDEF struct idt_segment x86_dbgaltcoreidt[256];
+DATDEF struct desctab const x86_dbgaltcoreidt_ptr;
+#endif /* !CONFIG_NO_SMP */
 #endif /* !__x86_dbgidt_defined */
-#endif /* !CONFIG_NO_DEBUGGER */
+
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 /* Start modifying `x86_idt'
  * This function must be called prior to making modifications to `x86_idt'.

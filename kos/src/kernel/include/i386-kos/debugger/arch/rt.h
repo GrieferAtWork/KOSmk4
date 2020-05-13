@@ -66,16 +66,15 @@ DECL_BEGIN
  *  - %cr0:       1:CR0_PE, CR0_PG; 0:CR0_TS
  *  - %cr3:       Always points to `pagedir_kernel_phys'
  *
- *  - THIS_TASK:  Points to the task-structure of the thread that originally entered the
- *                debugger. If during debugger entry, it is found that this pointer is
- *                invalid, or unset, this will point to `FORCPU(THIS_CPU, thiscpu_idle)'
- *                instead.
+ *  - THIS_TASK:  Points to the task-structure of the thread that running on the CPU
+ *                chosen to host the debugger. If during debugger entry, it is found
+ *                that this pointer would be invalid, or unset, this will point to
+ *                `FORCPU(THIS_CPU, thiscpu_idle)' instead.
  *
  *  - THIS_TASK->t_cpu->c_override: Set to `THIS_TASK'
  *
  *  - Hosting CPU:
- *    The hosting CPU in general is undefined, but currently the boot
- *    is always being used (though this may change in the future)
+ *    The hosting CPU is always the CPU that caused the debugger to be entered.
  *
  *  - Other CPUs:
  *    All other CPUs are suspended and will resume execution when
@@ -125,6 +124,7 @@ struct x86_dbg_cpuammend {
 	struct task   *dca_override;  /* [0..1] Saved `c_override' of this CPU */
 	uintptr_t      dca_taskflags; /* Saved `dca_thread->t_flags' */
 	bool           dca_pint;      /* Set to true if preemptive interrupts were enabled */
+	u8             dca_intr[256 / 8]; /* Bitset of pending interrupts */
 };
 struct x86_dbg_cpustate {
 	struct icpustate         *dcs_istate;   /* [0..1] Saved `icpustate' of this CPU */
@@ -206,6 +206,10 @@ DATDEF struct desctab const x86_dbggdt_ptr;
 #define __x86_dbgidt_defined 1
 DATDEF struct idt_segment x86_dbgidt[256];
 DATDEF struct desctab const x86_dbgidt_ptr;
+#ifndef CONFIG_NO_SMP
+DATDEF struct idt_segment x86_dbgaltcoreidt[256];
+DATDEF struct desctab const x86_dbgaltcoreidt_ptr;
+#endif /* !CONFIG_NO_SMP */
 #endif /* !__x86_dbgidt_defined */
 
 

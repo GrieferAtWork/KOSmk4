@@ -51,12 +51,20 @@ DECL_BEGIN
 #define ISR_DEFINE_HILO(id)           \
 	INTDEF byte_t __x86_idtlo_##id[]; \
 	INTDEF byte_t __x86_idthi_##id[];
-#else /* CONFIG_NO_DEBUGGER */
+#elif defined(CONFIG_NO_SMP)
 #define ISR_DEFINE_HILO(id)              \
 	INTDEF byte_t __x86_idtlo_##id[];    \
 	INTDEF byte_t __x86_idthi_##id[];    \
 	INTDEF byte_t __x86_dbgidtlo_##id[]; \
 	INTDEF byte_t __x86_dbgidthi_##id[];
+#else /* CONFIG_NO_DEBUGGER */
+#define ISR_DEFINE_HILO(id)                     \
+	INTDEF byte_t __x86_idtlo_##id[];           \
+	INTDEF byte_t __x86_idthi_##id[];           \
+	INTDEF byte_t __x86_dbgidtlo_##id[];        \
+	INTDEF byte_t __x86_dbgidthi_##id[];        \
+	INTDEF byte_t __x86_dbgaltcoreidtlo_##id[]; \
+	INTDEF byte_t __x86_dbgaltcoreidthi_##id[];
 #endif /* !CONFIG_NO_DEBUGGER */
 IDT_X86_FOREACH(ISR_DEFINE_HILO)
 #undef ISR_DEFINE_HILO
@@ -110,6 +118,19 @@ PUBLIC_CONST ATTR_COLDRODATA struct desctab const x86_dbgidt_ptr = {
 	/* .dt_limit = */ sizeof(x86_dbgidt) - 1,
 	/* .dt_base  = */ (uintptr_t)x86_dbgidt
 };
+
+#ifndef CONFIG_NO_SMP
+PUBLIC ATTR_COLDDATA struct idt_segment x86_dbgaltcoreidt[256] = {
+#define ISR_DEFINE(id) ISR_DEFINE_HILO(__x86_dbgaltcoreidt, id)
+	IDT_X86_FOREACH(ISR_DEFINE)
+#undef ISR_DEFINE
+};
+
+PUBLIC_CONST ATTR_COLDRODATA struct desctab const x86_dbgaltcoreidt_ptr = {
+	/* .dt_limit = */ sizeof(x86_dbgaltcoreidt) - 1,
+	/* .dt_base  = */ (uintptr_t)x86_dbgaltcoreidt
+};
+#endif /* !CONFIG_NO_SMP */
 #endif /* !CONFIG_NO_DEBUGGER */
 
 /* Lock used to guard against multiple threads modifying the IDT */
