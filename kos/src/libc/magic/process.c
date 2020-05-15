@@ -257,7 +257,7 @@ spawnle:(int mode, [nonnull] char const *__restrict path, char const *args, ... 
 }
 
 [cp][guard][dependency_include(<parts/redirect-exec.h>)]
-[requires_dependency(spawnvpe)][ATTR_SENTINEL_O(1)][alias(_spawnle)][allow_macros]
+[requires_dependency(spawnvpe)][ATTR_SENTINEL_O(1)][alias(_spawnlpe)][allow_macros]
 spawnlpe:(int mode, [nonnull] char const *__restrict file, char const *args, ... /*, (char *)NULL, char **environ*/) -> $pid_t {
 	__REDIRECT_SPAWNLPE(char, spawnvpe, mode, file, args)
 }

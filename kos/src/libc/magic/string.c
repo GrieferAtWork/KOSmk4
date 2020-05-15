@@ -443,12 +443,12 @@ strerror:(int errnum) -> [nonnull] char * {
 	return result;
 }
 
-%(std, c)#if defined(__cplusplus) && defined(__USE_STRING_OVERLOADS)
-%(std, c)extern "C++" {
+%(std)#if defined(__cplusplus) && defined(__USE_STRING_OVERLOADS)
+%(std)extern "C++" {
 [std][overload_alias] memcpy:(*) = memcpyc;
 [std][overload_alias] memmove:(*) = memmovec;
-%(std, c)} /* extern "C++" */
-%(std, c)#endif /* __cplusplus && __USE_STRING_OVERLOADS */
+%(std)} /* extern "C++" */
+%(std)#endif /* __cplusplus && __USE_STRING_OVERLOADS */
 
 
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa36f805e */
+/* HASH CRC-32:0xf737d70a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -358,12 +358,10 @@ __LIBC __ATTR_NONNULL((2)) __ATTR_SENTINEL_O(1) intptr_t __NOTHROW_RPC(__VLIBCCA
 #include <local/process/spawnle.h>
 #define _spawnle (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spawnle))
 #endif /* _spawnle... */
-#ifdef __CRT_HAVE__spawnlpe
-__LIBC __ATTR_NONNULL((2)) __ATTR_SENTINEL_O(1) intptr_t __NOTHROW_RPC(__VLIBCCALL _spawnlpe)(int __mode, char const *__restrict __file, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __CASMNAME_SAME("_spawnlpe");
-#elif defined(__CRT_HAVE_spawnlpe) && !defined(__NO_ASMNAME)
+#if defined(__CRT_HAVE_spawnlpe) && !defined(__NO_ASMNAME)
 __LIBC __ATTR_NONNULL((2)) __ATTR_SENTINEL_O(1) intptr_t __NOTHROW_RPC(__VLIBCCALL _spawnlpe)(int __mode, char const *__restrict __file, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __CASMNAME("spawnlpe");
-#elif defined(__CRT_HAVE__spawnle) && !defined(__NO_ASMNAME)
-__LIBC __ATTR_NONNULL((2)) __ATTR_SENTINEL_O(1) intptr_t __NOTHROW_RPC(__VLIBCCALL _spawnlpe)(int __mode, char const *__restrict __file, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __CASMNAME("_spawnle");
+#elif defined(__CRT_HAVE__spawnlpe)
+__LIBC __ATTR_NONNULL((2)) __ATTR_SENTINEL_O(1) intptr_t __NOTHROW_RPC(__VLIBCCALL _spawnlpe)(int __mode, char const *__restrict __file, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __CASMNAME_SAME("_spawnlpe");
 #elif defined(__CRT_HAVE_spawnvpe) || defined(__CRT_HAVE__spawnvpe)
 #include <local/process/spawnlpe.h>
 #define _spawnlpe (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spawnlpe))
@@ -864,8 +862,8 @@ __NAMESPACE_LOCAL_USING(spawnle)
 #define __spawnlpe_defined 1
 #ifdef __CRT_HAVE_spawnlpe
 __LIBC __ATTR_NONNULL((2)) __ATTR_SENTINEL_O(1) __pid_t __NOTHROW_RPC(__VLIBCCALL spawnlpe)(int __mode, char const *__restrict __file, char const *__args, ... /*, (char *)NULL, char **environ*/) __CASMNAME_SAME("spawnlpe");
-#elif defined(__CRT_HAVE__spawnle) && !defined(__NO_ASMNAME)
-__LIBC __ATTR_NONNULL((2)) __ATTR_SENTINEL_O(1) __pid_t __NOTHROW_RPC(__VLIBCCALL spawnlpe)(int __mode, char const *__restrict __file, char const *__args, ... /*, (char *)NULL, char **environ*/) __CASMNAME("_spawnle");
+#elif defined(__CRT_HAVE__spawnlpe) && !defined(__NO_ASMNAME)
+__LIBC __ATTR_NONNULL((2)) __ATTR_SENTINEL_O(1) __pid_t __NOTHROW_RPC(__VLIBCCALL spawnlpe)(int __mode, char const *__restrict __file, char const *__args, ... /*, (char *)NULL, char **environ*/) __CASMNAME("_spawnlpe");
 #elif defined(__CRT_HAVE_spawnvpe) || defined(__CRT_HAVE__spawnvpe)
 #include <local/process/spawnlpe.h>
 #ifdef __cplusplus

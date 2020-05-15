@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9abc78f7 */
+/* HASH CRC-32:0xde13932d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -668,10 +668,6 @@ __NAMESPACE_STD_USING(strcoll)
 __NAMESPACE_STD_USING(strxfrm)
 __NAMESPACE_STD_USING(strerror)
 #endif /* !__CXX_SYSTEM_HEADER */
-#if defined(__cplusplus) && defined(__USE_STRING_OVERLOADS)
-extern "C++" {
-} /* extern "C++" */
-#endif /* __cplusplus && __USE_STRING_OVERLOADS */
 
 #ifdef _MSC_VER
 __NAMESPACE_STD_BEGIN

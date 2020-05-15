@@ -21,27 +21,70 @@
 #define _ASM_SOCKIOS_H 1
 
 #include <features.h>
+#include <asm/ioctl.h>
 
 /* Socket-level I/O control calls. */
-#define FIOSETOWN      0x8901
-#define SIOCSPGRP      0x8902
-#define FIOGETOWN      0x8903
-#define SIOCGPGRP      0x8904
-#define SIOCATMARK     0x8905
+#if defined(__KOS__) || defined(__linux__) || defined(__CRT_KOS) || defined(__CRT_KOS_KERNEL) || defined(__CRT_GLC)
+#define __FIOSETOWN          _IO(0x89, 0x01)
+#define __SIOCSPGRP          _IO(0x89, 0x02)
+#define __FIOGETOWN          _IO(0x89, 0x03)
+#define __SIOCGPGRP          _IO(0x89, 0x04)
+#define __SIOCATMARK         _IO(0x89, 0x05)
+#define __SIOCGSTAMP32       _IO(0x89, 0x06) /* [struct timeval32 *arg] Get stamp */
+#define __SIOCGSTAMP64   _IO_KOS(0x89, 0x06) /* [struct timeval64 *arg] Get stamp */
+#define __SIOCGSTAMPNS32     _IO(0x89, 0x07) /* [struct timespec32 *arg] Get stamp */
+#define __SIOCGSTAMPNS64 _IO_KOS(0x89, 0x07) /* [struct timespec64 *arg] Get stamp */
+#endif /* __KOS__ || __linux__ || __CRT_KOS || __CRT_KOS_KERNEL || __CRT_GLC */
+
+#ifdef __FIOSETOWN
+#define FIOSETOWN __FIOSETOWN
+#endif /* __FIOSETOWN */
+#ifdef __SIOCSPGRP
+#define SIOCSPGRP __SIOCSPGRP
+#endif /* __SIOCSPGRP */
+#ifdef __FIOGETOWN
+#define FIOGETOWN __FIOGETOWN
+#endif /* __FIOGETOWN */
+#ifdef __SIOCGPGRP
+#define SIOCGPGRP __SIOCGPGRP
+#endif /* __SIOCGPGRP */
+#ifdef __SIOCATMARK
+#define SIOCATMARK __SIOCATMARK
+#endif /* __SIOCATMARK */
+
 #ifdef __USE_TIME_BITS64
-#define SIOCGSTAMP     0x8908 /* Get stamp (timeval) */
-#define SIOCGSTAMPNS   0x8909 /* Get stamp (timespec) */
+#ifdef __SIOCGSTAMP64
+#define SIOCGSTAMP     __SIOCGSTAMP64   /* [struct timeval *arg] Get stamp */
+#endif /* __SIOCGSTAMP64 */
+#ifdef __SIOCGSTAMPNS64
+#define SIOCGSTAMPNS   __SIOCGSTAMPNS64 /* [struct timespec *arg] Get stamp */
+#endif /* __SIOCGSTAMPNS64 */
 #else /* __USE_TIME_BITS64 */
-#define SIOCGSTAMP     0x8906 /* Get stamp (timeval) */
-#define SIOCGSTAMPNS   0x8907 /* Get stamp (timespec) */
+#ifdef __SIOCGSTAMP64
+#define SIOCGSTAMP     __SIOCGSTAMP64   /* [struct timeval *arg] Get stamp */
+#endif /* __SIOCGSTAMP64 */
+#ifdef __SIOCGSTAMPNS64
+#define SIOCGSTAMPNS   __SIOCGSTAMPNS64 /* [struct timespec *arg] Get stamp */
+#endif /* __SIOCGSTAMPNS64 */
 #endif /* !__USE_TIME_BITS64 */
+
 #ifdef __USE_KOS
-#define SIOCGSTAMP32   0x8906 /* Get stamp (timeval32) */
-#define SIOCGSTAMPNS32 0x8907 /* Get stamp (timespec32) */
+#ifdef __SIOCGSTAMP32
+#define SIOCGSTAMP32   __SIOCGSTAMP32   /* [struct timeval32 *arg] Get stamp */
+#endif /* __SIOCGSTAMP32 */
+#ifdef __SIOCGSTAMPNS32
+#define SIOCGSTAMPNS32 __SIOCGSTAMPNS32 /* [struct timespec32 *arg] Get stamp */
+#endif /* __SIOCGSTAMPNS32 */
 #endif /* __USE_KOS */
+
 #ifdef __USE_TIME64
-#define SIOCGSTAMP64   0x8908 /* Get stamp (timeval64) */
-#define SIOCGSTAMPNS64 0x8909 /* Get stamp (timespec64) */
+#ifdef __SIOCGSTAMP64
+#define SIOCGSTAMP64   __SIOCGSTAMP64   /* [struct timeval64 *arg] Get stamp */
+#endif /* __SIOCGSTAMP64 */
+#ifdef __SIOCGSTAMPNS64
+#define SIOCGSTAMPNS64 __SIOCGSTAMPNS64 /* [struct timespec64 *arg] Get stamp */
+#endif /* __SIOCGSTAMPNS64 */
 #endif /* __USE_TIME64 */
+
 
 #endif /* !_ASM_SOCKIOS_H */

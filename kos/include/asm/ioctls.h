@@ -1,8 +1,24 @@
+/* Copyright (c) 2019-2020 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
 #ifndef _ASM_IOCTLS_H
 #define _ASM_IOCTLS_H 1
-
-/* DISCLAIMER: _STRONGLY_ Based on '/usr/include/asm-generic/ioctls.h'
- * NOTE: Do not add a license header to this file! */
 
 #include <linux/ioctl.h>
 
@@ -20,7 +36,7 @@
 
 #define TIOCEXCL            _IO('T', 0x0c)
 #define TIOCNXCL            _IO('T', 0x0d)
-#define TIOCSCTTY           _IO('T', 0x0e) /* [int steal_if_necessary]
+#define TIOCSCTTY           _IO('T', 0x0e) /* [int steal_if_necessary] Make this terminal the controlling terminal of the calling process
                                             * @throws: E_INVALID_CONTEXT_NOT_SESSION_LEADER:    The calling process isn't the session leader
                                             * @throws: E_INVALID_CONTEXT_CTTY_ALREADY_ASSIGNED: The calling session already has a different CTTY assigned (use `TIOCNOTTY' to disconnect from it)
                                             * @throws: E_INSUFFICIENT_RIGHTS_CTTY_STEALING:     `steal_if_necessary' was zero, or the calling thread doesn't have `CAP_SYS_ADMIN' */
@@ -59,9 +75,7 @@
 #define TCSETSW2           _IOW('T', 0x2c, struct termios2)
 #define TCSETSF2           _IOW('T', 0x2d, struct termios2)
 #define TIOCGRS485          _IO('T', 0x2e)
-#ifndef TIOCSRS485
 #define TIOCSRS485          _IO('T', 0x2f)
-#endif /* !TIOCSRS485 */
 #define TIOCGPTN           _IOR('T', 0x30, unsigned int) /* Get Pty Number (of pty-mux device) */
 #define TIOCSPTLCK         _IOW('T', 0x31, int)  /* Lock/unlock Pty */
 #define TIOCGDEV           _IOR('T', 0x32, unsigned int) /* Get primary device node of /dev/console */
@@ -89,9 +103,7 @@
 #define TIOCSERSETMULTI     _IO('T', 0x5b) /* Set multiport config */
 #define TIOCMIWAIT          _IO('T', 0x5c) /* wait for a change on serial input line(s) */
 #define TIOCGICOUNT         _IO('T', 0x5d) /* read serial port inline interrupt counts */
-#ifndef FIOQSIZE
 #define FIOQSIZE            _IO('T', 0x60) /* [loff_t *arg] Return object data-size */
-#endif /* !FIOQSIZE */
 
 /* Used for packet mode */
 #define TIOCPKT_DATA       0x0000
