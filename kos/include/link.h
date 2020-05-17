@@ -24,6 +24,7 @@
 #include <__stdinc.h>
 #include <features.h>
 
+#include <asm/dlfcn.h>     /* __CRT_HAVE_dl_iterate_phdr */
 #include <bits/elfclass.h> /* Defines __ELF_NATIVE_CLASS.  */
 #include <bits/types.h>
 #include <kos/exec/elf.h> /* ElfW() */
@@ -60,13 +61,13 @@ struct dl_phdr_info {
 	ElfW(Phdr) const *dlpi_phdr;  /* [1..dlpi_phnum] Vector of program headers. */
 	ElfW(Half)        dlpi_phnum; /* # of program headers. */
 	/* NOTE: Everything that follows may only be available if `size' passed by
-	 *       `dl_iterate_phdr()' to the given callback is >= offsetafter(...) */
-	__uint64_t dlpi_adds;      /* Incremented when a new object may have been added.  */
-	__uint64_t dlpi_subs;      /* Incremented when an object may have been removed.  */
-	__size_t   dlpi_tls_modid; /* If there is a PT_TLS segment, its module ID as used in TLS relocations, else zero.  */
-	void      *dlpi_tls_data;  /* [0..1] The address of the calling thread's instance of this module's
-	                            *        PT_TLS segment, if it has one and it has been allocated in the
-	                            *        calling thread, otherwise a null pointer.  */
+	 *      `dl_iterate_phdr()' to the given callback is >= offsetafter(...) */
+	__uint64_t        dlpi_adds;      /* Incremented when a new object may have been added.  */
+	__uint64_t        dlpi_subs;      /* Incremented when an object may have been removed.  */
+	__size_t          dlpi_tls_modid; /* If there is a PT_TLS segment, its module ID as used in TLS relocations, else zero.  */
+	void             *dlpi_tls_data;  /* [0..1] The address of the calling thread's instance of this module's
+	                                   *        PT_TLS segment, if it has one and it has been allocated in the
+	                                   *        calling thread, otherwise a null pointer.  */
 };
 
 #ifndef ____dl_iterator_callback_defined
@@ -80,11 +81,16 @@ typedef int (__LIBCCALL *__dl_iterator_callback)(struct dl_phdr_info *__info,
  * Enumeration stops when `*CALLBACK' returns a non-zero value, which
  * will then also be returned by this function. Otherwise, `0' will
  * be returned after all modules have been enumerated. */
-__IMPDEF int __DLFCN_CALL
-dl_iterate_phdr(__dl_iterator_callback __callback, void *__arg);
+#ifdef __CRT_HAVE_dl_iterate_phdr
+__IMPDEF __ATTR_NONNULL((1)) int
+__NOTHROW_NCX(__DLFCN_CC dl_iterate_phdr)(__dl_iterator_callback __callback,
+                                          void *__arg);
+#endif /* __CRT_HAVE_dl_iterate_phdr */
 
 /* The .dynamic section of the calling module. */
+#ifdef __ELF__
 extern ElfW(Dyn) _DYNAMIC[];
+#endif /* __ELF__ */
 
 #endif /* __CC__ */
 

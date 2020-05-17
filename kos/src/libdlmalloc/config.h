@@ -191,11 +191,11 @@ DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlpvalloc") void *dlpvalloc(size_t);
 DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlmalloc_trim") int dlmalloc_trim(size_t);
 DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlmalloc_usable_size") size_t dlmalloc_usable_size(void *);
 
-#ifndef __NO_DL_REGISTER_CACHE
+#ifdef DL_REGISTER_CACHE
 DL_REGISTER_CACHE(dl_clear_caches) {
 	return dlmalloc_trim(0);
 }
-#endif /* !__NO_DL_REGISTER_CACHE */
+#endif /* DL_REGISTER_CACHE */
 
 /* Create public exports (without weak linkage, thus overruling `libc's) */
 #ifndef DEFINE_DL_EXPORT_ALIAS

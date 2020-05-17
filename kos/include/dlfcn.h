@@ -20,43 +20,167 @@
 #ifndef _DLFCN_H
 #define _DLFCN_H 1
 
-#include <__stdinc.h>
+#include "__crt.h"
+#include "__stdinc.h"
+
+#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
+#pragma GCC system_header
+#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
+
 #include <features.h>
+
+#include <asm/dlfcn.h>
 #include <bits/dlfcn.h>
 #include <bits/types.h>
 
-/* NOTE: To use anything from this file, you must link with '-ldl' */
+/* NOTE: To use anything from this file, you must link with '-ldl',
+ *       Though also note that then using the gcc from the KOS toolchain,
+ *       -ldl will be included as one of the default libraries to link
+ *       against, the same way that -lc is also one of those default
+ *       libraries. */
 
-#if (!defined(__DL_REGISTER_CACHE) && \
-     !defined(__NO_DL_REGISTER_CACHE)) || \
-     (defined(__KERNEL__) && defined(__KOS__))
-#define __NO_DL_REGISTER_CACHE   1
-#endif
+
+#if (defined(__USE_KOS) && defined(__DLCACHES_SECTION_NAME) && \
+     defined(__ELF__) && !defined(__KERNEL__))
+#include <hybrid/__asm.h>
+#include <hybrid/typecore.h>
+
+#include <asm/asmword.h> /* .wordrel */
+
+/* Register a cache-clear function to-be invoked
+ * when system/application memory starts to run out.
+ * The prototype of such a function looks like:
+ * >> DECL_BEGIN // Needs to be declared with `extern "C"' in c++-mode
+ * >> DL_REGISTER_CACHE(my_cache_clear_function);
+ * >> PRIVATE int my_cache_clear_function(void) {
+ * >>     if (clear_my_caches() != NO_CACHES_CLEARED)
+ * >>         return 1; // Hint that memory may have become available.
+ * >>     return 0;     // Hint that no additional memory became available.
+ * >> }
+ * >> DECL_END
+ * Functions registered like this from all loaded modules will be executed
+ * when `dlclearcaches()' is called (which is called when mmap() fails due
+ * to lack of memory, which itself is called when malloc() needs to allocate
+ * more memory, where failure to acquire some would normally result in it
+ * returning NULL. - So long as any one of the DL-cache functions returns
+ * non-zero, the mmap() operation will be re-attempted a limited number of
+ * times) */
+#define DL_REGISTER_CACHE(func)                       \
+	__ASM_BEGIN                                       \
+	__ASM_L(.pushsection __DLCACHES_SECTION_NAME, "") \
+	__ASM_L(	.align __SIZEOF_POINTER__)            \
+	__ASM_L(	.wordrel func)                        \
+	__ASM_L(.popsection)                              \
+	__ASM_END                                         \
+	__PRIVATE __ATTR_USED int (func)(void)
+#endif /* __USE_KOS && __DLCACHES_SECTION_NAME && __ELF__ && !__KERNEL__ */
+
+#ifndef __DLFCN_CC
+#define __DLFCN_CC  __LIBCCALL
+#define __DLFCN_VCC __VLIBCCALL
+#endif /* !__DLFCN_CC */
+
+/* The MODE argument to `dlopen(3)' must contain one of the following: */
+#ifdef __RTLD_LAZY
+#define RTLD_LAZY __RTLD_LAZY /* Lazy function call binding. */
+#endif /* __RTLD_LAZY */
+#ifdef __RTLD_NOW
+#define RTLD_NOW __RTLD_NOW /* Immediate function call binding. */
+#endif /* __RTLD_NOW */
+#ifdef __RTLD_BINDING_MASK
+#define RTLD_BINDING_MASK __RTLD_BINDING_MASK /* Mask of binding time value. */
+#endif /* __RTLD_BINDING_MASK */
+
+
+/* The MODE argument to `dlopen(3)' must contain one of the following: */
+#ifdef __RTLD_GLOBAL
+#define RTLD_GLOBAL __RTLD_GLOBAL /* If the following bit is set in the MODE argument to `dlopen',
+                                   * the symbols of the loaded object and its dependencies are made
+                                   * visible as if the object were linked directly into the program. */
+#endif /* __RTLD_GLOBAL */
+#ifdef __RTLD_LOCAL
+#define RTLD_LOCAL __RTLD_LOCAL /* Unix98 demands the following flag which is the inverse to RTLD_GLOBAL. */
+#endif /* __RTLD_LOCAL */
+
+
+
+/* The MODE argument to `dlopen(3)' may optionally contain any of the following: */
+#ifdef __RTLD_NOLOAD
+#define RTLD_NOLOAD __RTLD_NOLOAD /* Do not load the object. */
+#endif /* __RTLD_NOLOAD */
+
+/* If the associated library uses a symbol that it itself also defines,
+ * the the library will use its own symbol, rather than go through the
+ * global scope to find the first (primary) definition of some symbol.
+ * e.g.:
+ *    - libfoo: (linked against `libc.so')
+ *       >> PUBLIC void *memcpy(void *dst, void const *src, size_t num_bytes) { ... }
+ *       >> PUBLIC void foo() {
+ *       >>     memcpy(a, b, 42);
+ *       >> }
+ *    - libc:
+ *       >> PUBLIC void *memcpy(void *dst, void const *src, size_t num_bytes) { ... }
+ * - When `libfoo' is loaded without `RTLD_DEEPBIND', its function
+ *   `foo' will be using the memcpy() function provided by libc.so
+ * - When `libfoo' is loaded with `RTLD_DEEPBIND', its function
+ *   `foo' will be using the memcpy() function it defines itself.
+ * NOTE: This is the same as the ELF tag `DF_SYMBOLIC' */
+#ifdef __RTLD_DEEPBIND
+#define RTLD_DEEPBIND __RTLD_DEEPBIND /* Use deep binding. */
+#endif /* __RTLD_DEEPBIND */
+
+#ifdef __RTLD_NODELETE
+#define RTLD_NODELETE __RTLD_NODELETE /* Do not delete object when closed. */
+#endif /* __RTLD_NODELETE */
+
+#ifdef __USE_KOS
+#ifdef __RTLD_NOINIT
+#define RTLD_NOINIT __RTLD_NOINIT /* KOS Extension: Don't run module initializers, and consequently
+                                   *                skip running finalizers as well.
+                                   * When set, `dlopen()' will immeditaly return to the caller upon success,
+                                   * rather than running initializers of all affected libraries first.
+                                   * HINT: You may run initializers (and finalizers during exit()) at a
+                                   *       later time by calling `dlopen()' again without passing this flag.
+                                   * WARNING: Initializers of newly loaded dependencies will not be executed either! */
+#endif /* __RTLD_NOINIT */
+#endif /* __USE_KOS */
+
+
+#ifdef __USE_GNU
+/* If the first argument of `dlsym' or `dlvsym' is set to RTLD_NEXT
+ * the run-time address of the symbol called NAME in the next shared
+ * object is returned. The "next" relation is defined by the order
+ * the shared objects were loaded.
+ * Or for the C-savvy:
+ *     `RTLD_DEFAULT' <==> `#include'
+ *     `RTLD_NEXT'    <==> `#include_next' */
+#ifdef __RTLD_NEXT
+#define RTLD_NEXT __RTLD_NEXT
+#endif /* __RTLD_NEXT */
+
+/* If the first argument to `dlsym' or `dlvsym' is set to RTLD_DEFAULT
+ * the run-time address of the symbol called NAME in the global scope
+ * is returned.
+ * HINT: The global scope is the same as that of the root executable, as seen
+ *       under /proc/PID/exe (or as returned by `dlmodulename(dlopen(NULL, 0))'. */
+#ifdef __RTLD_DEFAULT
+#define RTLD_DEFAULT __RTLD_DEFAULT
+#endif /* __RTLD_DEFAULT */
+
+/* Special namespace ID values. */
+#ifdef __LM_ID_BASE
+#define LM_ID_BASE __LM_ID_BASE /* Initial namespace. */
+#endif /* __LM_ID_BASE */
+#ifdef __LM_ID_NEWLM
+#define LM_ID_NEWLM __LM_ID_NEWLM /* For dlmopen: request new namespace. */
+#endif /* __LM_ID_NEWLM */
+#endif /* __USE_GNU */
+
+
 
 __SYSDECL_BEGIN
 
-#ifndef __DLFCN_CALL
-#define __DLFCN_CALL __LIBCCALL
-#define __DLFCN_VCALL __VLIBCCALL
-#endif /* !__DLFCN_CALL */
-
-/* User functions for run-time dynamic loading.
-   Copyright (C) 1995-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
+#ifdef __CC__
 
 #ifndef __size_t_defined
 #define __size_t_defined 1
@@ -64,78 +188,198 @@ typedef __SIZE_TYPE__ size_t;
 #endif /* !__size_t_defined */
 
 #ifdef __USE_GNU
-/* If the first argument of `dlsym' or `dlvsym' is set to RTLD_NEXT
- * the run-time address of the symbol called NAME in the next shared
- * object is returned.  The "next" relation is defined by the order
- * the shared objects were loaded. */
-#define RTLD_NEXT    ((void *)-1)
-
-/* If the first argument to `dlsym' or `dlvsym' is set to RTLD_DEFAULT
- * the run-time address of the symbol called NAME in the global scope
- * is returned.
- * HINT: The global scope is the same as that of the root executable,
- *       as seen under /proc/PID/exe. */
-#define RTLD_DEFAULT  ((void *)0)
-
 /* Type for namespace indices. */
-typedef long int Lmid_t;
-
-/* Special namespace ID values. */
-#define LM_ID_BASE    0  /* Initial namespace.  */
-#define LM_ID_NEWLM (-1) /* For dlmopen: request new namespace.  */
+#ifdef __Lmid_t
+typedef __Lmid_t Lmid_t;
+#endif /* __Lmid_t */
 #endif /* __USE_GNU */
 
-#ifdef __CC__
 
-#ifndef __KERNEL__
-/* @param: MODE: Set of `RTLD_*' */
-__IMPDEF __ATTR_WUNUSED void *__NOTHROW_NCX(__DLFCN_CALL dlopen)(char const *__filename, int __mode);
-__IMPDEF __ATTR_NONNULL((1)) int __NOTHROW_NCX(__DLFCN_CALL dlclose)(void *__handle);
-__IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((2)) void *__NOTHROW_NCX(__DLFCN_CALL dlsym)(void *__handle, char const *__restrict __symbol_name);
-__IMPDEF __ATTR_WUNUSED char *__NOTHROW_NCX(__DLFCN_CALL dlerror)(void);
+/* Lazily load a shared library file, and return a handle to said file.
+ * @param: FILENAME: The filename of the shared library.
+ *                   If this string contains at least 1 '/'-character,
+ *                   the string will be interpreted as a raw filename,
+ *                   such that passing it to open(2) would return a file
+ *                   handle for the named library file.
+ *                   In this case, `FILENAME' may either be an absolute path,
+ *                   or a path relative to the current working directory, as
+ *                   set by `chdir(2)'
+ *                   If `FILENAME' doesn't contain any '/'-characters, the string
+ *                   is the filename of the library (e.g. "libc.so"), and will be
+ *                   searched for in the set of system library locations, as specified
+ *                   by a ':'-separated string read from `getenv("LD_LIBRARY_PATH")'
+ *                   at the time of the process having been started, or defaulting to
+ *                   a set of paths that include at least "/usr/lib:/lib" in that order.
+ *                   When `NULL' is passed for this argument, a handle for the main
+ *                   executable module (i.e. the `readlink /proc/self/exe` binary) is
+ *                   returned.
+ * @param: MODE:     Exactly one of [RTLD_LAZY, RTLD_NOW], or'd with
+ *                   exactly one of [RTLD_GLOBAL, RTLD_LOCAL], optionally
+ *                   or'd with any of the other `RTLD_*' flags.
+ * @return: * :   A handle to the library that got loaded.
+ * @return: NULL: Failed to load the library. - Call `dlerror()' to get an error message. */
+#ifdef __CRT_HAVE_dlopen
+__IMPDEF __ATTR_WUNUSED void *__NOTHROW_NCX(__DLFCN_CC dlopen)(char const *__filename, int __mode);
+#endif /* __CRT_HAVE_dlopen */
+
+/* Close a previously opened dynamic module handle, as returned by
+ * `dlopen()', and some of the other functions found in this file.
+ * Note that this call is implemented as a decref() operation, since
+ * multiple calls to `dlopen()' for the same library will try to ensure
+ * that only a single instance of some unique library is ever loaded
+ * at the same time. However, every call to `dlopen()' should eventually
+ * be followed by a call to `dlclose()' with that same handle, such that
+ * once some specific handle is closed for the last time, the library can
+ * be unloaded.
+ * Note also that if this function does actually unload a library, user-
+ * defined callbacks may be invoked, including `__attribute__((destructor))'
+ * callbacks, as well as callbacks registered dynamically through use of
+ * `DLAUXCTRL_ADD_FINALIZER' (which in turn is used by `__cxa_atexit()')
+ * @return: 0 : Successfully closed the given HANDLE.
+ * @return: * : Failed to close the handle (which is likely to simply be
+ *              invalid; s.a. `dlerror()') Warning: Don't just willy-nilly
+ *              pass invalid handles to this function. Depending on how
+ *              libdl was configured, only minimal validation may be
+ *              performed. The only guaranty made is that NULL-handles
+ *              are always handled as fail-safe! */
+#ifdef __CRT_HAVE_dlclose
+__IMPDEF __ATTR_NONNULL((1)) int
+__NOTHROW_NCX(__DLFCN_CC dlclose)(void *__handle);
+#endif /* __CRT_HAVE_dlclose */
+
+/* Lookup the load address of a symbol within a shared library `HANDLE',
+ * given its `SYMBOL_NAME'. If no such symbol exists, `NULL' is returned,
+ * and `dlerror()' is modified to return a human-readable error message.
+ * WARNING: If the actual address of the symbol is `NULL', then this
+ *          function will still return `NULL', though will not modify
+ *          the return value of `dlerror()'.
+ *          In normal applications, this would normally never be the case,
+ *          as libdl, as well as `ld' will take care not to link object
+ *          files such that symbols could end up overlapping with `NULL'.
+ *          However, with the existence of `STT_GNU_IFUNC' (as usable
+ *          via `__attribute__((ifunc("resolver")))'), it is easily possible
+ *          to force some symbol to overlap with NULL.
+ *          Also note that upon success, `dlerror()' will not have been
+ *          modified, meaning that if a prior error has yet to be consumed,
+ *          a NULL return value, and a non-NULL `dlerror()' may still not
+ *          guaranty that the symbol really doesn't exist. To be absolutely
+ *          certain that NULL would be correct, use the following:
+ *          >> void *result;
+ *          >> dlerror();
+ *          >> result = dlsym(handle, symbol_name);
+ *          >> if (result == NULL) {
+ *          >>     char *message = dlerror();
+ *          >>     if (message != NULL) // Symbol lookup really failed.
+ *          >>         fprintf(stderr, "dlerror: %s\n", message);
+ *          >> }
+ * @param: HANDLE: The dynamic library handle of the library which should be
+ *                 search for the specified `SYMBOL_NAME', before moving on
+ *                 to also search all of that libraries dependencies for the
+ *                 same `SYMBOL_NAME', and moving on to search those libraries
+ *                 dependencies, following a breadth-first search approach.
+ *                 Alternatively, you may also pass `RTLD_DEFAULT' or `RTLD_NEXT'
+ *                 to make use of special symbol lookup resolutions documented
+ *                 more extensively alongside these constants.
+ * @return: * :    The address of the symbol in question.
+ * @return: NULL:  No such symbol (dlerror() != NULL), or the symbol has been
+ *                 linked to be loaded at the address `NULL' (dlerror() == NULL) */
+#ifdef __CRT_HAVE_dlsym
+__IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((2)) void *
+__NOTHROW_NCX(__DLFCN_CC dlsym)(void *__handle, char const *__restrict __symbol_name);
+#elif defined(__CRT_HAVE_dlfunc)
+__REDIRECT(__IMPDEF,__ATTR_WUNUSED __ATTR_NONNULL((2)),void *,__NOTHROW_NCX,__DLFCN_CC,
+           dlsym,(void *__handle, char const *__restrict __symbol_name),dlfunc,(__handle,__symbol_name))
+#endif /* ... */
+
+/* Return and clear the current libdl error message string, such that for
+ * any error that occurs, this function will only returns non-NULL once.
+ * The returned string has a human-readable format and is generated dynamically,
+ * meaning that it may contain information that is more specific than a simple
+ * `File or directory not found' message, but rather something along the lines
+ * of `Symbol "foo" could not be found in library "libfoo.so"'.
+ * The implementation of this function looks like:
+ * >> return ATOMIC_XCH(error_message_pointer, NULL);
+ * Where internally, libdl will set `error_message_pointer' to a non-NULL pointer
+ * when an error happens.
+ * @return: * :   A pointer to a volatile (as in: the same memory area may be
+ *                overwritten once the next dl-error happens in either the calling,
+ *                !_or any other thread_!), human-readable description of the last
+ *                error that happened during execution of any of the functions
+ *                exported from libdl.
+ * @return: NULL: No error happened, or the last error has already been consumed. */
+#ifdef __CRT_HAVE_dlerror
+__IMPDEF __ATTR_WUNUSED char *__NOTHROW_NCX(__DLFCN_CC dlerror)(void);
+#endif /* __CRT_HAVE_dlerror */
+
 
 #ifdef __USE_BSD
 struct __dlfunc_arg { int __dlfunc_dummy; };
 typedef void (*dlfunc_t)(struct __dlfunc_arg);
-/* Alias for `dlsym()' that allows the return value to be cast to a function prototype. */
-__REDIRECT(__IMPDEF,__ATTR_WUNUSED,dlfunc_t,__NOTHROW_NCX,__DLFCN_CALL,
-           dlfunc,(void *__handle, char const *__restrict __symbol_name),dlsym,(__handle, __symbol_name))
+
+/* Alias for `dlsym()' that allows the return value to be cast to a function
+ * prototype without resulting in a compiler warning due to a non-compliance
+ * with official C standards (since C says that casting between a function
+ * pointer and a data-pointer (such as `void *') results in undefined behavior,
+ * though also note that the POSIX standard (due to this exact short-coming)
+ * extends upon this by specifying that no data is lost when such a cast is
+ * performed) */
+#ifdef __CRT_HAVE_dlsym
+__REDIRECT(__IMPDEF,__ATTR_WUNUSED __ATTR_NONNULL((2)),dlfunc_t,__NOTHROW_NCX,__DLFCN_CC,
+           dlfunc,(void *__handle, char const *__restrict __symbol_name),dlsym,(__handle,__symbol_name))
+#elif defined(__CRT_HAVE_dlfunc)
+__IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((2)) dlfunc_t
+__NOTHROW_NCX(__DLFCN_CC dlfunc)(void *__handle, char const *__restrict __symbol_name);
+#endif /* ... */
 #endif /* __USE_BSD */
 
 /* BSD also has a function `fdlopen()' that does the same as our's does. */
-#if (defined(__USE_KOS) || defined(__USE_BSD)) && defined(__KOS__)
-#if __KOS_VERSION__ >= 400
+#if defined(__USE_KOS) || defined(__USE_BSD)
 /* Open a library, given a file descriptor previously acquired by `open()'
  * NOTE: This function will inherit the given `FD' on success.
- * @param: MODE: Set of `RTLD_*' */
-__REDIRECT(__IMPDEF,__ATTR_WUNUSED,void *,__NOTHROW_NCX,__DLFCN_CALL,fdlopen,(/*inherit(on_success)*/ __fd_t __fd, int __mode),dlfopen,(__fd,__mode))
-#endif /* __KOS_VERSION__ >= 400 */
-#endif /* (__USE_KOS || __USE_BSD) && __KOS__ */
+ * @param: FD:   The file descriptor to use & inhert for the shared library
+ * @param: MODE: Exactly one of [RTLD_LAZY, RTLD_NOW], or'd with
+ *               exactly one of [RTLD_GLOBAL, RTLD_LOCAL], optionally
+ *               or'd with any of the other `RTLD_*' flags. */
+#ifdef __CRT_HAVE_dlfopen
+__REDIRECT(__IMPDEF,__ATTR_WUNUSED,void *,__NOTHROW_NCX,__DLFCN_CC,
+           fdlopen,(/*inherit(on_success)*/ __fd_t __fd, int __mode),dlfopen,(__fd,__mode))
+#elif defined(__CRT_HAVE_fdlopen)
+__IMPDEF __ATTR_WUNUSED void *__NOTHROW_NCX(__DLFCN_CC fdlopen)(/*inherit(on_success)*/ __fd_t __fd, int __mode);
+#endif /* ... */
+#endif /* __USE_KOS || __USE_BSD */
 
 
-#if defined(__USE_KOS) && defined(__KOS__)
-#if __KOS_VERSION__ >= 400
+#ifdef __USE_KOS
 /* New DL Functions added with KOSmk4 */
 
 /* Check if a given module is exception aware.
  * TODO: Figure out how we want to detect this condition...
  * @param: HANDLE: The module to check
- * @return: 1:  The given module is exception aware
- * @return: 0:  The given module isn't exception aware
- * @return: -1: The given module handler is invalid (s.a. `dlerror()') */
+ * @return: 1 : The given module is exception aware
+ * @return: 0 : The given module isn't exception aware
+ * @return: * : The given module handler is invalid (s.a. `dlerror()') */
+#ifdef __CRT_HAVE_dlexceptaware
 __IMPDEF __ATTR_WUNUSED int
-__NOTHROW_NCX(__DLFCN_CALL dlexceptaware)(void *__handle);
+__NOTHROW_NCX(__DLFCN_CC dlexceptaware)(void *__handle);
+#endif /* __CRT_HAVE_dlexceptaware */
 
 
+#if (defined(__CRT_HAVE_dlgethandle) || defined(__CRT_HAVE_dlgetmodule) || \
+     defined(__CRT_HAVE_dlsectionmodule))
 #define DLGETHANDLE_FNORMAL 0x0000 /* Return weak pointer to a module handle */
 #define DLGETHANDLE_FINCREF 0x0001 /* Return a new reference, that must be closed by `dlclose(return)' */
+#ifdef __CRT_HAVE_dlgetmodule
 #define DLGETHANDLE_FNOCASE 0x0002 /* For `dlgetmodule()': Ignore casing when comparing module names. */
+#endif /* __CRT_HAVE_dlgetmodule */
+#endif /* ... */
 
 /* Return the handle of an already loaded library, given a static data/text pointer
  * @param: FLAGS: Set of `DLGETHANDLE_F*' */
+#ifdef __CRT_HAVE_dlgethandle
 __IMPDEF __ATTR_WUNUSED void *
-__NOTHROW_NCX(__DLFCN_CALL dlgethandle)(void const *__static_pointer,
-                                        unsigned int __flags __DFL(DLGETHANDLE_FNORMAL));
+__NOTHROW_NCX(__DLFCN_CC dlgethandle)(void const *__static_pointer,
+                                      unsigned int __flags __DFL(DLGETHANDLE_FNORMAL));
+#endif /* __CRT_HAVE_dlgethandle */
 
 /* Return the handle of an already loaded library, given its name
  * @param: NAME:  One of the following (checked in this order):
@@ -149,9 +393,11 @@ __NOTHROW_NCX(__DLFCN_CALL dlgethandle)(void const *__static_pointer,
  *                 - "C"             (requires `DLGETHANDLE_FNOCASE')
  *                Alternatively, `NULL' can be passed to return a handle for the caller's module.
  * @param: FLAGS: Set of `DLGETHANDLE_F*' */
+#ifdef __CRT_HAVE_dlgetmodule
 __IMPDEF __ATTR_WUNUSED void *
-__NOTHROW_NCX(__DLFCN_CALL dlgetmodule)(char const *__name,
-                                        unsigned int __flags __DFL(DLGETHANDLE_FNORMAL));
+__NOTHROW_NCX(__DLFCN_CC dlgetmodule)(char const *__name,
+                                      unsigned int __flags __DFL(DLGETHANDLE_FNORMAL));
+#endif /* __CRT_HAVE_dlgetmodule */
 
 /* Return the internally used file descriptor for the given module `HANDLE'
  * Note however that this descriptor is usually only opened for reading!
@@ -159,17 +405,25 @@ __NOTHROW_NCX(__DLFCN_CALL dlgetmodule)(char const *__name,
  * @return: * : An open file descriptor for the given module `HANDLE'
  *              WARNING: Attempting to close() this handle may cause future
  *                       operations performed with the associated module to fail!
- * @return: -1: Error (s.a. `dlerror()') */
+ *                       Additionally, using dlclose() to close `HANDLE' after the
+ *                       module's FD was already closed will attempt to re-close
+ *                       that same FD, possibly closing some other handle if the
+ *                       same slot was re-used in the mean time.
+ * @return: * : Error (s.a. `dlerror()') */
+#ifdef __CRT_HAVE_dlmodulefd
 __IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t
-__NOTHROW_NCX(__DLFCN_CALL dlmodulefd)(void *__handle);
+__NOTHROW_NCX(__DLFCN_CC dlmodulefd)(void *__handle);
+#endif /* __CRT_HAVE_dlmodulefd */
 
 /* Return the internally used filename for the given module `HANDLE'
  * Note that this path is an absolute, canonical (realpath()) filename.
  * @param: HANDLE: A handle returned by `dlopen()'.
  * @return: * :    The absolute, unambiguous filename for the given module `HANDLE'
  * @return: NULL:  Error (s.a. `dlerror()') */
+#ifdef __CRT_HAVE_dlmodulename
 __IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) char const *
-__NOTHROW_NCX(__DLFCN_CALL dlmodulename)(void *__handle);
+__NOTHROW_NCX(__DLFCN_CC dlmodulename)(void *__handle);
+#endif /* __CRT_HAVE_dlmodulename */
 
 /* Return the base address offset chosen by ASLR, which is added to addresses of the given module `HANDLE'.
  * WARNING: This function usually returns `NULL' for the root executable, in which case dlerror()
@@ -182,10 +436,18 @@ __NOTHROW_NCX(__DLFCN_CALL dlmodulename)(void *__handle);
  * @param: HANDLE: A handle returned by `dlopen()'.
  * @return: * :    The load address / module base for the given `HANDLE'.
  * @return: NULL:  Error (s.a. `dlerror()') */
+#ifdef __CRT_HAVE_dlmodulebase
 __IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) void *
-__NOTHROW_NCX(__DLFCN_CALL dlmodulebase)(void *__handle);
+__NOTHROW_NCX(__DLFCN_CC dlmodulebase)(void *__handle);
+#endif /* __CRT_HAVE_dlmodulebase */
 
 
+
+#if (defined(__CRT_HAVE_dllocksection) || defined(__CRT_HAVE_dlunlocksection) || \
+     defined(__CRT_HAVE_dlsectionname) || defined(__CRT_HAVE_dlsectionindex) ||  \
+     defined(__CRT_HAVE_dlsectionmodule))
+#ifndef __dl_section_defined
+#define __dl_section_defined 1
 struct dl_section {
 	void       *const ds_data;    /* [0..ds_size][const] Memory mapping for the section's contents. */
 	__size_t    const ds_size;    /* [const] Size of the section (in bytes) */
@@ -194,7 +456,10 @@ struct dl_section {
 	__uintptr_t const ds_info;    /* [const] Index of another section that is linked by this one (or `0' if unused) */
 	__uintptr_t const ds_flags;   /* [const] Section flags (set of `SHF_*') */
 };
+#endif /* !__dl_section_defined */
 
+
+#ifdef __CRT_HAVE_dllocksection
 #define DLLOCKSECTION_FNORMAL   0x0000 /* Normal section locking flags. */
 #define DLLOCKSECTION_FINDEX    0x0001 /* The given `NAME' is actually the `(uintptr_t)NAME' index of the section */
 #define DLLOCKSECTION_FNODATA   0x0002 /* Do not lock section data into memory, though if the section had already
@@ -208,17 +473,20 @@ struct dl_section {
  *                 Note however that the actual section data is usually mapped as read-only!
  * @return: NULL:  Error (s.a. `dlerror()'; usually: unknown section) */
 __IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) /*REF*/ struct dl_section *
-__NOTHROW_NCX(__DLFCN_CALL dllocksection)(void *__handle,
-                                          char const *__restrict __name,
-                                          unsigned int __flags __DFL(DLLOCKSECTION_FNORMAL));
+__NOTHROW_NCX(__DLFCN_CC dllocksection)(void *__handle,
+                                        char const *__restrict __name,
+                                        unsigned int __flags __DFL(DLLOCKSECTION_FNORMAL));
+#endif /* __CRT_HAVE_dllocksection */
 
 /* Unlock a locked section, as previously returned by `dllocksection()'
  * HINT: Think of this function as a decref(), where `dllocksection()'
  *       returns a reference you inherit as the caller
  * @return: 0 : Successfully unlocked the given section `SECT'
- * @return: -1: Error (s.a. `dlerror()') */
+ * @return: * : Error (s.a. `dlerror()') */
+#ifdef __CRT_HAVE_dlunlocksection
 __IMPDEF __ATTR_NONNULL((1)) int
-__NOTHROW_NCX(__DLFCN_CALL dlunlocksection)(/*REF*/ struct dl_section *__sect);
+__NOTHROW_NCX(__DLFCN_CC dlunlocksection)(/*REF*/ struct dl_section *__sect);
+#endif /* __CRT_HAVE_dlunlocksection */
 
 /* Return the name of a given section, or NULL on error
  * WARNING: The name of a section can no longer be queried after the associated
@@ -234,20 +502,28 @@ __NOTHROW_NCX(__DLFCN_CALL dlunlocksection)(/*REF*/ struct dl_section *__sect);
  *          >> // will probably also be NULL if the module had already been unloaded)
  *          >> ...
  *          >> dlclose(mod); */
+#ifdef __CRT_HAVE_dlsectionname
 __IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) char const *
-__NOTHROW_NCX(__DLFCN_CALL dlsectionname)(struct dl_section *__sect);
+__NOTHROW_NCX(__DLFCN_CC dlsectionname)(struct dl_section *__sect);
+#endif /* __CRT_HAVE_dlsectionname */
 
 /* Returns the index of a given section, or (size_t)-1 on error. */
+#ifdef __CRT_HAVE_dlsectionindex
 __IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) __size_t
-__NOTHROW_NCX(__DLFCN_CALL dlsectionindex)(struct dl_section *__sect);
+__NOTHROW_NCX(__DLFCN_CC dlsectionindex)(struct dl_section *__sect);
+#endif /* __CRT_HAVE_dlsectionindex */
 
 /* Return the module associated with a given section, or NULL on error.
  * @param: FLAGS: Set of `DLGETHANDLE_F*' 
  * @return: * :   A pointer, or reference to the module handle (when `DLGETHANDLE_FINCREF' was given)
  * @return: NULL: Error (s.a. `dlerror()'; usually, the module was already unloaded) */
+#ifdef __CRT_HAVE_dlsectionmodule
 __IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) void *
-__NOTHROW_NCX(__DLFCN_CALL dlsectionmodule)(struct dl_section *__sect,
-                                            unsigned int __flags __DFL(DLGETHANDLE_FNORMAL));
+__NOTHROW_NCX(__DLFCN_CC dlsectionmodule)(struct dl_section *__sect,
+                                          unsigned int __flags __DFL(DLGETHANDLE_FNORMAL));
+#endif /* __CRT_HAVE_dlsectionmodule */
+#endif /* ... */
+
 
 /* Clear internal caches used by loaded modules in order to free up available memory.
  * This function is automatically called by libc when mmap() fails due to lack
@@ -255,7 +531,9 @@ __NOTHROW_NCX(__DLFCN_CALL dlsectionmodule)(struct dl_section *__sect,
  * For more information, see `DL_REGISTER_CACHE()'
  * @return: 0: No optional memory could be released.
  * @return: 1: Some optional memory was released. */
-__IMPDEF int __NOTHROW_NCX(__DLFCN_CALL dlclearcaches)(void);
+#ifdef __CRT_HAVE_dlclearcaches
+__IMPDEF int __NOTHROW_NCX(__DLFCN_CC dlclearcaches)(void);
+#endif /* __CRT_HAVE_dlclearcaches */
 
 /* Allocate/Free a static TLS segment
  * These functions are called by by libc in order to safely create a new thread, such that
@@ -263,11 +541,15 @@ __IMPDEF int __NOTHROW_NCX(__DLFCN_CALL dlclearcaches)(void);
  * NOTE: The caller is responsible to store the returned segment to the appropriate TLS register.
  * @return: * :   Pointer to the newly allocated TLS segment.
  * @return: NULL: Error (s.a. dlerror()) */
-__IMPDEF void *__NOTHROW_NCX(__DLFCN_CALL dltlsallocseg)(void);
+#ifdef __CRT_HAVE_dltlsallocseg
+__IMPDEF void *__NOTHROW_NCX(__DLFCN_CC dltlsallocseg)(void);
+#endif /* __CRT_HAVE_dltlsallocseg */
 
 /* Free a previously allocated static TLS segment (usually called by `pthread_exit()' and friends). */
+#ifdef __CRT_HAVE_dltlsfreeseg
 __IMPDEF __ATTR_NONNULL((1)) int
-__NOTHROW_NCX(__DLFCN_CALL dltlsfreeseg)(void *__ptr);
+__NOTHROW_NCX(__DLFCN_CC dltlsfreeseg)(void *__ptr);
+#endif /* __CRT_HAVE_dltlsfreeseg */
 
 /* DL-based TLS memory management API.
  * These functions may be used to dynamically allocate TLS memory that works everywhere where
@@ -310,16 +592,20 @@ __NOTHROW_NCX(__DLFCN_CALL dltlsfreeseg)(void *__ptr);
  *                         segment to delete it and optionally invoke finalizer callbacks) by
  *                         passing it to `dltlsfree()'
  * @return: NULL:          Failed to allocate the TLS segment (s.a. `dlerror()') */
+#ifdef __CRT_HAVE_dltlsalloc
 __IMPDEF __ATTR_WUNUSED void *
-__NOTHROW_NCX(__DLFCN_CALL dltlsalloc)(__size_t __num_bytes, __size_t __min_alignment,
+__NOTHROW_NCX(__DLFCN_CC dltlsalloc)(__size_t __num_bytes, __size_t __min_alignment,
                                        void const *__template_data, __size_t __template_size,
                                        void (__LIBCCALL *__perthread_init)(void *__arg, void *__base),
                                        void (__LIBCCALL *__perthread_fini)(void *__arg, void *__base),
                                        void *__perthread_callback_arg);
+#endif /* __CRT_HAVE_dltlsalloc */
 
 /* Free a TLS segment previously allocated with `dltlsalloc' */
+#ifdef __CRT_HAVE_dltlsfree
 __IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) int
-__NOTHROW_NCX(__DLFCN_CALL dltlsfree)(void *__tls_handle);
+__NOTHROW_NCX(__DLFCN_CC dltlsfree)(void *__tls_handle);
+#endif /* __CRT_HAVE_dltlsfree */
 
 /* Return the calling thread's base address of the TLS segment associated with `TLS_HANDLE'
  * NOTE: TLS Segments are allocated and initialized lazily, meaning that the initializer
@@ -332,8 +618,10 @@ __NOTHROW_NCX(__DLFCN_CALL dltlsfree)(void *__tls_handle);
  *       the calling thread (e.g.: Such a pointer is needed by `unwind_emulator_t::sm_tlsbase')
  * @return: * :   Pointer to the base of the TLS segment associated with `TLS_HANDLE' within the calling thread.
  * @return: NULL: Invalid `TLS_HANDLE', or allocation/initialization failed. (s.a. `dlerror()') */
+#ifdef __CRT_HAVE_dltlsaddr
 __IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) void *
-__NOTHROW_NCX(__DLFCN_CALL dltlsaddr)(void *__tls_handle);
+__NOTHROW_NCX(__DLFCN_CC dltlsaddr)(void *__tls_handle);
+#endif /* __CRT_HAVE_dltlsaddr */
 
 
 /* Perform an auxiliary control command about a given module `HANDLE'
@@ -347,12 +635,17 @@ __NOTHROW_NCX(__DLFCN_CALL dltlsaddr)(void *__tls_handle);
  * @return: NULL: No information available, or no buffer was provided (depending on `CMD')
  * @return: NULL: Error: Unknown `CMD' (s.a. dlerror())
  * @return: NULL: Error: Invalid `HANDLE' (s.a. dlerror()) */
-__IMPDEF void *__NOTHROW_NCX(__DLFCN_VCALL dlauxctrl)(void *__handle, unsigned int __cmd, ...);
-#define DLAUXCTRL_RUNFINI            0xd101 /* Run library finalizers. `HANDLE' should be any valid module handle, or `NULL', and
-                                             * all other arguments are ignored; always returns `NULL', but doesn't set an error */
+#ifdef __CRT_HAVE_dlauxctrl
+__IMPDEF void *
+__NOTHROW_NCX(__DLFCN_VCC dlauxctrl)(void *__handle,
+                                     unsigned int __cmd,
+                                     ...);
+
+#define DLAUXCTRL_RUNFINI            0xd101 /* Run all library finalizers. `HANDLE' should be any valid module handle, or `NULL',
+                                             * and all other arguments are ignored; always returns `NULL', but doesn't set an error */
 #define DLAUXCTRL_RUNTLSFINI         0xd102 /* Run TLS library finalizers for the calling thread. `HANDLE' should be any valid
-                                             * module handle, or `NULL', and all other arguments are ignored; always returns
-                                             * `NULL', but doesn't set an error */
+                                             * module handle, or alternatively `NULL' for the root application, and all other
+                                             * arguments are ignored. Always returns `NULL', but doesn't set an error */
 #define DLAUXCTRL_ADD_FINALIZER      0xd103 /* Register a dynamic finalizer callback for `HANDLE':
                                              * >> CALLBACK = va_arg(void(__LIBCCALL *)(void *));
                                              * >> ARG      = va_arg(void *);
@@ -385,58 +678,54 @@ __IMPDEF void *__NOTHROW_NCX(__DLFCN_VCALL dlauxctrl)(void *__handle, unsigned i
                                              * If the number of symbols is unknown, `(size_t)-1' written to `*pcount'. */
 #define DLAUXCTRL_ELF_GET_DYNSTR     0xef05 /* Returns the module's dynamic string table (`char const *') */
 #define DLAUXCTRL_ELF_GET_SHSTRTAB   0xef06 /* Returns the module's section header name string table (`char const *') */
+#endif /* __CRT_HAVE_dlauxctrl */
+
+#endif /* __USE_KOS */
 
 
-/* Register a cache-clear function to-be invoked
- * when system/application memory starts to run out.
- * The prototype of such a function looks like:
- * >> DECL_BEGIN // Needs to be declared with `extern "C"' in c++-mode
- * >> DL_REGISTER_CACHE(my_cache_clear_function);
- * >> PRIVATE int my_cache_clear_function(void) {
- * >>     if (clear_my_caches() != NO_CACHES_CLEARED)
- * >>         return 1; // Hint that memory may have become available.
- * >>     return 0;     // Hint that no additional memory became available.
- * >> }
- * >> DECL_END
- * Functions registered like this from all loaded modules will be executed
- * when `dlclearcaches()' is called (which is called when mmap() fails due
- * to lack of memory, which itself is called when malloc() needs to allocate
- * more memory, where failure to acquire some would normally result in it
- * returning NULL. - So long as any one of the DL-cache functions returns
- * non-zero, the mmap() operation will be re-attempted a limited number of
- * times) */
-#ifndef DL_REGISTER_CACHE
-#ifndef __NO_DL_REGISTER_CACHE
-#   define DL_REGISTER_CACHE(func)  __DL_REGISTER_CACHE(func)
-#else /* !__NO_DL_REGISTER_CACHE */
-#   define DL_REGISTER_CACHE(func)  __PRIVATE __ATTR_USED int (func)(void)
-#endif /* __NO_DL_REGISTER_CACHE */
-#endif /* !DL_REGISTER_CACHE */
 
-#else /* __KOS_VERSION__ >= 400 */
-/* WARNING: In KOS v300, `fdlopen()' didn't inherit the given `FD' on success! */
-__IMPDEF __ATTR_WUNUSED void *__NOTHROW_NCX(__DLFCN_CALL fdlopen)(__fd_t __fd, int __mode);
-#endif /* __KOS_VERSION__ < 400 */
-#endif /* __USE_KOS || __KOS__ */
-#endif /* !__KERNEL__ */
+
 
 #ifdef __USE_GNU
 
-typedef struct __dl_info_struct {
-#ifdef __CRT_CYG_PRIMARY
-	char        dli_fname[4096]; /* File name of defining object. */
-#else /* __CRT_CYG_PRIMARY */
-	char const *dli_fname; /* File name of defining object. */
-#endif /* !__CRT_CYG_PRIMARY */
-	void       *dli_fbase; /* Load address of that object. */
-	char const *dli_sname; /* Name of nearest symbol. */
-	void       *dli_saddr; /* Exact value of nearest symbol. */
-} Dl_info;
+#ifdef __CRT_HAVE_dladdr
+#ifndef __Dl_info_defined
+#define __Dl_info_defined 1
+typedef struct __dl_info_struct Dl_info;
+#endif /* !__Dl_info_defined */
 
+__IMPDEF __ATTR_NONNULL((2)) int
+__NOTHROW_NCX(__DLFCN_CC dladdr)(void const *__address,
+                                 Dl_info *__info);
+#endif /* __CRT_HAVE_dladdr */
+
+#if defined(__CRT_HAVE_dlmopen) && defined(__Lmid_t)
+__IMPDEF void *(__DLFCN_CC dlmopen)(__Lmid_t __nsid, char const *__file, int __mode);
+#endif /* __CRT_HAVE_dlmopen && __Lmid_t */
+
+#ifdef __CRT_HAVE_dlvsym
+__IMPDEF __ATTR_NONNULL((2, 3)) void *
+__NOTHROW_NCX(__DLFCN_CC dlvsym)(void *__restrict __handle,
+                                 char const *__name,
+                                 char const *__version);
+#endif /* __CRT_HAVE_dlvsym */
+
+#ifdef __CRT_HAVE_dladdr1
 enum {
 	RTLD_DL_SYMENT  = 1,
 	RTLD_DL_LINKMAP = 2
 };
+#ifndef __Dl_info_defined
+#define __Dl_info_defined 1
+typedef struct __dl_info_struct Dl_info;
+#endif /* !__Dl_info_defined */
+
+__IMPDEF __ATTR_NONNULL((2)) int
+__NOTHROW_NCX(__DLFCN_CC dladdr1)(void const *__address, Dl_info *__info,
+                                  void **__extra_info, int __flags);
+#endif /* __CRT_HAVE_dladdr1 */
+
+#ifdef __CRT_HAVE_dlinfo
 enum {
 	RTLD_DI_LMID        = 1,
 	RTLD_DI_LINKMAP     = 2,
@@ -457,21 +746,37 @@ typedef struct {
 } Dl_serpath;
 
 typedef struct {
-	size_t       dls_size;
-	unsigned int dls_cnt;
-	Dl_serpath   dls_serpath[1];
+	size_t          dls_size;
+	__UINT32_TYPE__ dls_cnt;
+	Dl_serpath      dls_serpath[1];
 } Dl_serinfo;
 
-#ifndef __KERNEL__
-__IMPDEF __ATTR_NONNULL((2)) int (__DLFCN_CALL dladdr)(void const *__address, Dl_info *__info);
-#ifdef __CRT_GLC
-__IMPDEF void *(__DLFCN_CALL dlmopen)(Lmid_t __nsid, char const *__file, int __mode);
-__IMPDEF __ATTR_NONNULL((2,3)) void *(__DLFCN_CALL dlvsym)(void *__restrict __handle, char const *__restrict __name, char const *__restrict __version);
-__IMPDEF __ATTR_NONNULL((2)) int (__DLFCN_CALL dladdr1)(void const *__address, Dl_info *__info, void **__extra_info, int __flags);
-__IMPDEF __ATTR_NONNULL((1,3)) int (__DLFCN_CALL dlinfo)(void *__restrict __handle, int __request, void *__restrict __arg);
-#endif /* __CRT_GLC */
-#endif /* !__KERNEL__ */
+__IMPDEF __ATTR_NONNULL((1, 3)) int
+__NOTHROW_NCX(__DLFCN_CC dlinfo)(void *__restrict __handle,
+                                 int __request,
+                                 void *__arg);
+#endif /* __CRT_HAVE_dlinfo */
 
+
+#ifndef DL_CALL_FCT
+/* To support profiling of shared objects it is a good idea to call
+ * the function found using `dlsym' using the following macro since
+ * these calls do not use the PLT. But this would mean the dynamic
+ * loader has no chance to find out when the function is called. The
+ * macro applies the necessary magic so that profiling is possible.
+ * Rewrite
+ *  foo = (*fctp)(arg1, arg2);
+ * into
+ *      foo = DL_CALL_FCT(fctp, (arg1, arg2));
+ */
+#ifdef __CRT_HAVE__dl_mcount_wrapper_check
+#define DL_CALL_FCT(fctp, args) \
+	(_dl_mcount_wrapper_check((void *)(fctp)), (*(fctp))args)
+__IMPDEF void __NOTHROW_NCX(__DLFCN_CC _dl_mcount_wrapper_check)(void *__selfpc);
+#else /* __CRT_HAVE__dl_mcount_wrapper_check */
+#define DL_CALL_FCT(fctp, args) (*(fctp)) args)
+#endif /* !__CRT_HAVE__dl_mcount_wrapper_check */
+#endif /* !DL_CALL_FCT */
 #endif /* __USE_GNU */
 
 #endif /* __CC__ */

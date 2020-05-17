@@ -126,13 +126,13 @@ function incdir(prefix, path) {
 				full = "<" + prefix + x + ">";
 			}
 			if (x in chk_include || x.startswith("ncursesw/")) {
-				print "#if defined(__cpluslus) && __has_include(" + full + ")";
-				print "#include",full;
-				print "#endif /" "* __cpluslus && __has_include(" + full + ") *" "/";
+				print("#if defined(__cpluslus) && __has_include(", full, ")");
+				print("#include ", full);
+				print("#endif /" "* __cpluslus && __has_include(", full, ") *" "/");
 			} else {
-				print "#ifdef __cpluslus";
-				print "#include",full;
-				print "#endif /" "* __cpluslus *" "/";
+				print("#ifdef __cpluslus");
+				print("#include ", full);
+				print("#endif /" "* __cpluslus *" "/");
 			}
 		} else if (x !in [
 			"atree-abi.h", "__atomic-gasm.h", "__atomic-msvc.h",
@@ -146,11 +146,11 @@ function incdir(prefix, path) {
 					full = "<" + prefix + x + ">";
 				}
 				if (x in chk_include || x.startswith("ncursesw/")) {
-					print "#if __has_include(" + full + ")";
-					print "#include",full;
-					print "#endif /" "* __has_include(" + full + ") *" "/";
+					print("#if __has_include(", full, ")");
+					print("#include ", full);
+					print("#endif /" "* __has_include(", full, ") *" "/");
 				} else {
-					print "#include",full;
+					print("#include ", full);
 				}
 			}
 		}
@@ -182,6 +182,7 @@ incdir("", "../../include");
 #include <asm/byteswap.h>
 #include <asm/cacheline.h>
 #include <asm/dirent.h>
+#include <asm/dlfcn.h>
 #include <asm/fcntl.h>
 #include <asm/int-l64.h>
 #include <asm/int-ll64.h>
@@ -202,11 +203,13 @@ incdir("", "../../include");
 #include <asm/socket.h>
 #include <asm/sockios.h>
 #include <asm/stat.h>
+#include <asm/stdio.h>
 #include <asm/syscalls-proto.h>
 #include <asm/syscalls-trace.h>
 #include <asm/syscalls.h>
 #include <asm/termbits.h>
 #include <asm/termios.h>
+#include <asm/threads.h>
 #include <asm/types.h>
 #include <asm/unistd.h>
 #include <assert.h>
@@ -612,6 +615,7 @@ incdir("", "../../include");
 #include <lastlog.h>
 #include <libansitty/ansitty.h>
 #include <libansitty/api.h>
+#include <libansitty/ctl.h>
 #include <libbuffer/api.h>
 #include <libbuffer/linebuffer.h>
 #include <libbuffer/ringbuffer.h>
@@ -659,6 +663,7 @@ incdir("", "../../include");
 #include <libemu86/helpers.h>
 #include <libgen.h>
 #include <libinstrlen/api.h>
+#include <libinstrlen/bits/isa.h>
 #include <libinstrlen/instrlen.h>
 #include <libio.h>
 #include <libjson/api.h>

@@ -80,17 +80,17 @@ DECL_BEGIN
 #define LIBC_DLMODULEBASE_SECTION  ".crt.system.auxv"   /* Used by `getauxval()' */
 #define LIBC_DLEXCEPTAWARE_SECTION ".crt.except"        /* Used by `except_handler4()' */
 
-typedef WUNUSED void * /*NOTHROW_NCX*/ (__DLFCN_CALL *PDLOPEN)(char const *filename, int mode);
-typedef NONNULL((1)) int /*NOTHROW_NCX*/ (__DLFCN_CALL *PDLCLOSE)(void *handle);
-typedef WUNUSED void * /*NOTHROW_NCX*/ (__DLFCN_CALL *PDLTLSALLOCSEG)(void);
-typedef NONNULL((1)) int /*NOTHROW_NCX*/ (__DLFCN_CALL *PDLTLSFREESEG)(void *ptr);
-typedef WUNUSED void * /*NOTHROW_NCX*/ (__DLFCN_CALL *PDLGETHANDLE)(void const *static_pointer, unsigned int flags);
-typedef WUNUSED void * /*NOTHROW_NCX*/ (__DLFCN_CALL *PDLGETMODULE)(char const *name, unsigned int flags);
-typedef WUNUSED NONNULL((1)) fd_t /*NOTHROW_NCX*/ (__DLFCN_CALL *PDLMODULEFD)(void *handle);
-typedef void * /*NOTHROW_NCX*/ (__DLFCN_VCALL *PDLAUXCTRL)(void *handle, unsigned int cmd, ...);
-typedef WUNUSED char * /*NOTHROW_NCX*/ (__DLFCN_CALL *PDLERROR)(void);
-typedef WUNUSED NONNULL((1)) void * /*NOTHROW_NCX*/ (__DLFCN_CALL *PDLMODULEBASE)(void *handle);
-typedef WUNUSED NONNULL((1)) int /*NOTHROW_NCX*/ (__DLFCN_CALL *PDLEXCEPTAWARE)(void *handle);
+typedef WUNUSED void * /*NOTHROW_NCX*/ (__DLFCN_CC *PDLOPEN)(char const *filename, int mode);
+typedef NONNULL((1)) int /*NOTHROW_NCX*/ (__DLFCN_CC *PDLCLOSE)(void *handle);
+typedef WUNUSED void * /*NOTHROW_NCX*/ (__DLFCN_CC *PDLTLSALLOCSEG)(void);
+typedef NONNULL((1)) int /*NOTHROW_NCX*/ (__DLFCN_CC *PDLTLSFREESEG)(void *ptr);
+typedef WUNUSED void * /*NOTHROW_NCX*/ (__DLFCN_CC *PDLGETHANDLE)(void const *static_pointer, unsigned int flags);
+typedef WUNUSED void * /*NOTHROW_NCX*/ (__DLFCN_CC *PDLGETMODULE)(char const *name, unsigned int flags);
+typedef WUNUSED NONNULL((1)) fd_t /*NOTHROW_NCX*/ (__DLFCN_CC *PDLMODULEFD)(void *handle);
+typedef void * /*NOTHROW_NCX*/ (__DLFCN_VCC *PDLAUXCTRL)(void *handle, unsigned int cmd, ...);
+typedef WUNUSED char * /*NOTHROW_NCX*/ (__DLFCN_CC *PDLERROR)(void);
+typedef WUNUSED NONNULL((1)) void * /*NOTHROW_NCX*/ (__DLFCN_CC *PDLMODULEBASE)(void *handle);
+typedef WUNUSED NONNULL((1)) int /*NOTHROW_NCX*/ (__DLFCN_CC *PDLEXCEPTAWARE)(void *handle);
 
 INTDEF WUNUSED ATTR_RETNONNULL PDLOPEN NOTHROW_NCX(LIBCCALL libc_get_dlopen)(void);
 INTDEF WUNUSED ATTR_RETNONNULL PDLCLOSE NOTHROW_NCX(LIBCCALL libc_get_dlclose)(void);

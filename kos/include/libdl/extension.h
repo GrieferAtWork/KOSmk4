@@ -109,7 +109,10 @@ typedef struct dlmodule DlModule;
  * A pointer to this structure is stored by the libdl core in extension
  * module-type ops descriptors during initialization of such extensions.
  * This table contains internal callbacks which may be used by libdl
- * extensions to call back into the libdl core. */
+ * extensions to call back into the libdl core.
+ * Essentially, this is a reverse V-Table to expose internal libdl functions
+ * to loader extensions (and loader extensions only), without clobbering the
+ * actual export namespace (i.e. functions such as `dlopen()') */
 struct dlcore_ops {
 #define DL_COREOP(attr, return, cc, name, args) attr return (cc *name) args;
 #define DL_COREFIELD(type, name)                type *name;
@@ -155,9 +158,9 @@ struct dlmodule_format {
 	NONNULL((1, 2)) __REF DlModule *(LIBDL_CC *df_open_hdrs)(/*inherit(on_success,HEAP)*/ char *__restrict filename,
 	                                                         void *__restrict info, uintptr_t loadaddr);
 #define DLMODULE_FORMAT_OPEN_BAD_MAGIC ((DlModule *)-1) /* Special return value for `df_open' to instruct libdl to continue
-	                                                     * searching for a matching module format (to-be used module formats
-	                                                     * that store additional magic bytes somewhere else than at the start
-	                                                     * of some given file). */
+	                                                     * searching for a matching module format (to-be used for module
+	                                                     * formats that store additional magic bytes somewhere else than
+	                                                     * at the start of some given file). */
 
 	/* [1..1] Finalizer callback, to-be invoked when the module is destroyed.
 	 * NOTE: This callback is also responsible for calling `sys_unmap()' on
