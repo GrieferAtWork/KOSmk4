@@ -26,10 +26,8 @@
  *       This header only mirrors what GLibC does for API compatibility. */
 
 #ifdef __CC__
-typedef __INT64_TYPE__   __kernel_long_t;
-#define __kernel_long_t  __kernel_long_t
-typedef __UINT64_TYPE__  __kernel_ulong_t;
-#define __kernel_ulong_t __kernel_ulong_t
+#define __kernel_long_t  __INT64_TYPE__
+#define __kernel_ulong_t __UINT64_TYPE__
 #endif /* __CC__ */
 
 #include "../../asm/posix_types.h"

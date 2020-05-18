@@ -21,8 +21,9 @@
 #define _I386_KOS_ASM_INTRIN_SEGARITH_H 1
 
 #include <__stdinc.h>
-#include <hybrid/host.h>
+
 #include <hybrid/__atomic.h>
+#include <hybrid/host.h>
 #include <hybrid/typecore.h>
 
 /* Segment-relative arithmetic */

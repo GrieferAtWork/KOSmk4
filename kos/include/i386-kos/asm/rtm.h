@@ -45,6 +45,13 @@
 #ifdef __CC__
 __DECL_BEGIN
 
+#if ((__has_builtin(__builtin_ia32_xbegin) || __has_builtin(__builtin_ia32_xend) ||   \
+      __has_builtin(__builtin_ia32_xabort) || __has_builtin(__builtin_ia32_xtest)) && \
+     (defined(__GNUC__) || defined(__COMPILER_HAVE_PRAGMA_GCC_TARGET)))
+#pragma GCC push_options
+#pragma GCC target("rtm")
+#endif /* ... */
+
 /* Start a transaction
  * @return: _XBEGIN_STARTED: Transaction started.
  * @return: _XABORT_* :      Transaction failed. */
@@ -85,7 +92,7 @@ __FORCELOCAL void(__xend)(void)
 /* Abort the current transaction by having `__xbegin()'
  * return with `_XABORT_EXPLICIT | ((code & 0xff) << _XABORT_CODE_S)'
  * If no transaction was in progress, behave as a no-op */
-#if __has_builtin(__builtin_ia32_xend)
+#if __has_builtin(__builtin_ia32_xabort)
 #define __xabort(code) __builtin_ia32_xabort(code)
 #elif !defined(__NO_XBLOCK)
 #define __xabort(code) __XBLOCK({ __asm__ __volatile__("xabort %0" : : "N" (code)); (void)0; })
@@ -111,6 +118,12 @@ __FORCELOCAL __BOOL(__xtest)(void)
 	return __result;
 }
 #endif /* !__has_builtin(__builtin_ia32_xtest) */
+
+#if ((__has_builtin(__builtin_ia32_xbegin) || __has_builtin(__builtin_ia32_xend) ||   \
+      __has_builtin(__builtin_ia32_xabort) || __has_builtin(__builtin_ia32_xtest)) && \
+     (defined(__GNUC__) || defined(__COMPILER_HAVE_PRAGMA_GCC_TARGET)))
+#pragma GCC pop_options
+#endif /* ... */
 
 __DECL_END
 #endif /* __CC__ */

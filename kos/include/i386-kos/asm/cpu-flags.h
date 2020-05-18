@@ -43,15 +43,16 @@
 #define EFLAGS_GTIOPL(flags) (((flags) >> 12) & 3)
 
 /* Mask of bits that user-space may assume to always be modifiable
- * There are a couple of instructions in here that I wish weren't available
- * to ring#3, however ring#3 already has implicit access to them since these
- * are the bits that `popf[l|q]' allows to be modified.
+ * There are a couple of bits in here that I wish weren't available to
+ * ring#3, however ring#3 already has implicit access to them since these
+ * are the bits that `popf[l|q]' allows to be modified, so there'd be no
+ * point in restricting this set in any form.
  * The only thing that I don't understand about this is `EFLAGS.AC', because
  * there are 2 dedicated instructions `stac' and `clac' that can be used to
  * set/clear that bit. However attempting to do so (normally) causes a #GP
  * if done so from ring#3 (and there is no way to disable this other than
  * emulating these instructions for ring#3 from kernel-space, as done by
- * the KOS kernel). So it doesn't actually make sense to lock these instructions
+ * the KOS kernel). So it doesn't actually make sense to lock those instructions
  * as being privileged when in fact everything they might be useful for can
  * already be done via the `popf' instruction (which isn't privileged for
  * `EFLAGS.AC' and cannot be made to be privileged, either...) */
@@ -150,8 +151,8 @@
 #define DR7_S2_SHIFT       26
 #define DR7_C3_SHIFT       28
 #define DR7_S3_SHIFT       30
-#define DR7_CN_SHIFT(n)   (16+(4*(n)))
-#define DR7_SN_SHIFT(n)   (18+(4*(n)))
+#define DR7_CN_SHIFT(n)    (16 + (4 * (n)))
+#define DR7_SN_SHIFT(n)    (18 + (4 * (n)))
 #define DR_S1              __UINT32_C(0x0) /* Break within a 1-byte range */
 #define DR_S2              __UINT32_C(0x1) /* Break within a 2-byte range */
 #define DR_S4              __UINT32_C(0x3) /* Break within a 4-byte range */

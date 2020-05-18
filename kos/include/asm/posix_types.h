@@ -20,66 +20,95 @@
 #ifndef _ASM_POSIX_TYPES_H
 #define _ASM_POSIX_TYPES_H 1
 
-#include <asm/bitsperlong.h>
 #include <hybrid/typecore.h>
+
+#include <asm/bitsperlong.h>
 #include <bits/types.h>
 
 #ifdef __CC__
 #ifndef __kernel_long_t
-typedef long          __kernel_long_t;
-typedef unsigned long __kernel_ulong_t;
-#endif
+#define __kernel_long_t __LONGPTR_TYPE__
+#endif /* !__kernel_long_t */
+#ifndef __kernel_ulong_t
+#define __kernel_ulong_t __ULONGPTR_TYPE__
+#endif /* !__kernel_ulong_t */
 #ifndef __kernel_ino_t
-typedef __ino64_t __kernel_ino_t;
-#endif
+#define __kernel_ino_t __ino64_t
+#endif /* !__kernel_ino_t */
 #ifndef __kernel_mode_t
-typedef __mode_t __kernel_mode_t;
-#endif
+#define __kernel_mode_t __mode_t
+#endif /* !__kernel_mode_t */
 #ifndef __kernel_pid_t
-typedef __pid_t __kernel_pid_t;
-#endif
+#define __kernel_pid_t __pid_t
+#endif /* !__kernel_pid_t */
 #ifndef __kernel_ipc_pid_t
-typedef __pid_t __kernel_ipc_pid_t;
-#endif
+#define __kernel_ipc_pid_t __pid_t
+#endif /* !__kernel_ipc_pid_t */
 #ifndef __kernel_uid_t
-typedef __uid_t __kernel_uid_t;
-typedef __gid_t __kernel_gid_t;
-#endif
+#define __kernel_uid_t __uid_t
+#define __kernel_gid_t __gid_t
+#endif /* !__kernel_uid_t */
 #ifndef __kernel_suseconds_t
-typedef __suseconds_t __kernel_suseconds_t;
-#endif
+#define __kernel_suseconds_t __suseconds_t
+#endif /* !__kernel_suseconds_t */
 #ifndef __kernel_daddr_t
-typedef __daddr_t __kernel_daddr_t;
-#endif
+#define __kernel_daddr_t __daddr_t
+#endif /* !__kernel_daddr_t */
 #ifndef __kernel_uid32_t
-typedef __UINT32_TYPE__ __kernel_uid32_t;
-typedef __UINT32_TYPE__ __kernel_gid32_t;
-#endif
+#define __kernel_uid32_t __UINT32_TYPE__
+#endif /* !__kernel_uid32_t */
+#ifndef __kernel_gid32_t
+#define __kernel_gid32_t __UINT32_TYPE__
+#endif /* !__kernel_gid32_t */
 #ifndef __kernel_old_uid_t
-typedef __kernel_uid_t __kernel_old_uid_t;
-typedef __kernel_gid_t __kernel_old_gid_t;
-#endif
+#define __kernel_old_uid_t __kernel_uid_t
+#endif /* !__kernel_old_uid_t */
+#ifndef __kernel_old_gid_t
+#define __kernel_old_gid_t __kernel_gid_t
+#endif /* !__kernel_old_gid_t */
 #ifndef __kernel_old_dev_t
-typedef __UINT32_TYPE__ __kernel_old_dev_t;
-#endif
+#define __kernel_old_dev_t __UINT32_TYPE__
+#endif /* !__kernel_old_dev_t */
 #ifndef __kernel_size_t
-typedef __SIZE_TYPE__    __kernel_size_t;
-typedef __SSIZE_TYPE__   __kernel_ssize_t;
-typedef __PTRDIFF_TYPE__ __kernel_ptrdiff_t;
-#endif
+#define __kernel_size_t __SIZE_TYPE__
+#endif /* !__kernel_size_t */
+#ifndef __kernel_ssize_t
+#define __kernel_ssize_t __SSIZE_TYPE__
+#endif /* !__kernel_ssize_t */
+#ifndef __kernel_ptrdiff_t
+#define __kernel_ptrdiff_t __PTRDIFF_TYPE__
+#endif /* !__kernel_ptrdiff_t */
 #ifndef __kernel_fsid_t
-typedef __fsid_t __kernel_fsid_t;
-#endif
+#define __kernel_fsid_t __fsid_t
+#endif /* !__kernel_fsid_t */
 
-typedef __off64_t __kernel_off_t;
-typedef __loff_t __kernel_loff_t;
-typedef __time64_t __kernel_time_t;
-typedef __clock_t __kernel_clock_t;
-typedef __timer_t __kernel_timer_t;
-typedef __clockid_t __kernel_clockid_t;
-typedef __caddr_t __kernel_caddr_t;
-typedef __UINT16_TYPE__ __kernel_uid16_t;
-typedef __UINT16_TYPE__ __kernel_gid16_t;
+#ifndef __kernel_off_t
+#define __kernel_off_t __off64_t
+#endif /* !__kernel_off_t */
+#ifndef __kernel_loff_t
+#define __kernel_loff_t __loff_t
+#endif /* !__kernel_loff_t */
+#ifndef __kernel_time_t
+#define __kernel_time_t __time64_t
+#endif /* !__kernel_time_t */
+#ifndef __kernel_clock_t
+#define __kernel_clock_t __clock_t
+#endif /* !__kernel_clock_t */
+#ifndef __kernel_timer_t
+#define __kernel_timer_t __timer_t
+#endif /* !__kernel_timer_t */
+#ifndef __kernel_clockid_t
+#define __kernel_clockid_t __clockid_t
+#endif /* !__kernel_clockid_t */
+#ifndef __kernel_caddr_t
+#define __kernel_caddr_t __caddr_t
+#endif /* !__kernel_caddr_t */
+#ifndef __kernel_uid16_t
+#define __kernel_uid16_t __UINT16_TYPE__
+#endif /* !__kernel_uid16_t */
+#ifndef __kernel_gid16_t
+#define __kernel_gid16_t __UINT16_TYPE__
+#endif /* !__kernel_gid16_t */
 #endif /* __CC__ */
 
 #endif /* !_ASM_POSIX_TYPES_H */

@@ -415,7 +415,7 @@ __FORCELOCAL void (__outsw)(__UINT16_TYPE__ __port, void const *__restrict __src
 __FORCELOCAL void (__outsl)(__UINT16_TYPE__ __port, void const *__restrict __src, __SIZE_TYPE__ __n_dwords) { __asm__ __volatile__(__PRIVATE_PREFIX_REP_CLD "rep; outsl" : "=S" (__src), "=c" (__n_dwords) : "d" (__port), "0" (__src), "1" (__n_dwords) , "m" (__COMPILER_ASM_BUFFER(__UINT32_TYPE__,__n_dwords,__src))); }
 
 
-/* FS/GS-base registers. */
+/* Read/write the FS/GS-base registers. */
 #ifdef __x86_64__
 #ifdef __KERNEL__
 #include <kernel/arch/fsgsbase.h>
@@ -468,11 +468,11 @@ void (__wrgsbase)(void *__val);
 
 /* The KOS kernel emulates the `(wr|rd)(fs|gs)base' instructions in 32-bit mode!
  * As a matter of fact, this is the preferred way for user-space to change them!
- * NOTE: The byte sequences below are be what the `(wr|rd)(fs|gs)base' instructions
+ * NOTE: The byte sequences below are what the `(wr|rd)(fs|gs)base' instructions
  *       would assembly to if they were valid for 32-bit code. However since Intel
- *       states that these instructions are not available in protected mode (32-bit mode),
- *       let's just be safe and encode them manually, rather than relying on the assembler
- *       to already provide them as an extension.
+ *       states that these instructions are not available in protected mode (32-bit
+ *       mode), let's just be safe and encode them manually, rather than relying on
+ *       the assembler to be natively providing them as an extension.
  * s.a.: https://www.felixcloutier.com/x86/rdfsbase:rdgsbase */
 __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __UINT32_TYPE__ (__rdfsbasel)(void) {
 	/* HINT: modrm.mi_reg = 0 */
@@ -550,7 +550,7 @@ void (__wrgsbase)(void *__val);
 #define __wrfsbase(val) __wrfsbasel((__UINT32_TYPE__)(void *)(val))
 #define __wrgsbase(val) __wrgsbasel((__UINT32_TYPE__)(void *)(val))
 #endif /* !__INTELLISENSE__ */
-#endif
+#endif /* ... */
 
 
 #ifdef __x86_64__
@@ -588,10 +588,23 @@ __FORCELOCAL void (__wrgs_keepbase)(__UINT16_TYPE__ __val) {
 	__wrgsbaseq(__gsbase);
 #endif /* !__KERNEL__ */
 }
-#endif /* __x86_64__ */
+#else /* __x86_64__ */
+/* Set the %fs or %gs register index, but also preserve the segment base address values.
+ * In 32-bit mode, this is the same as regular reads/writes to/from the %fs or %gs register,
+ * since due to fs/gs.base emulation, the actual segment base address is stored within the
+ * GDT, meaning that segment reloads will not clobber the base register so-long as the
+ * segment being re-loaded doesn't have a different base address. */
+#ifdef __INTELLISENSE__
+__FORCELOCAL void (__wrfs_keepbase)(__UINT16_TYPE__ __val);
+__FORCELOCAL void (__wrgs_keepbase)(__UINT16_TYPE__ __val);
+#else /* __INTELLISENSE__ */
+#define __wrfs_keepbase(__val) __wrfs(__val)
+#define __wrgs_keepbase(__val) __wrgs(__val)
+#endif /* !__INTELLISENSE__ */
+#endif /* !__x86_64__ */
 
 
-/* MachineSpecificRegisters (MSRs) */
+/* (Machine|Model)SpecificRegisters (MSRs) */
 #ifdef __x86_64__
 __FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdpid)(void) { __UINT64_TYPE__ __res; __asm__ __volatile__("rdpid %q0" : "=r" (__res)); return (__UINT32_TYPE__)__res; }
 __FORCELOCAL __ATTR_WUNUSED __UINT64_TYPE__ (__rdmsr)(__UINT32_TYPE__ __id) { union __ATTR_PACKED { __UINT32_TYPE__ __lohi[2]; __UINT64_TYPE__ __result; } __res; __asm__ __volatile__("rdmsr" : "=a" (__res.__lohi[0]), "=d" (__res.__lohi[1]) : "c" (__id)); return __res.__result; }
@@ -627,6 +640,7 @@ __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL (__rdseedq)(__UINT64_TYPE
 #endif /* __x86_64__ */
 
 
+/* Extended process state save/restore */
 #ifdef __x86_64__
 __FORCELOCAL __ATTR_NONNULL((1)) void (__xsave)(void *__restrict __buf, __UINT64_TYPE__ __mask) { union __ATTR_PACKED { __UINT32_TYPE__ __lohi[2]; __UINT64_TYPE__ __val; } __umask; __umask.__val = __mask; __asm__ __volatile__("xsave %0" : "=m" (*(__UINT8_TYPE__ *)__buf) : "a" (__umask.__lohi[0]), "d" (__umask.__lohi[1]) : "memory"); }
 __FORCELOCAL __ATTR_NONNULL((1)) void (__xsave64)(void *__restrict __buf, __UINT64_TYPE__ __mask) { union __ATTR_PACKED { __UINT32_TYPE__ __lohi[2]; __UINT64_TYPE__ __val; } __umask; __umask.__val = __mask; __asm__ __volatile__("xsave64 %0" : "=m" (*(__UINT8_TYPE__ *)__buf) : "a" (__umask.__lohi[0]), "d" (__umask.__lohi[1]) : "memory"); }
@@ -651,6 +665,7 @@ __FORCELOCAL __ATTR_NONNULL((1)) void (__xrstors)(void const *__restrict __buf, 
 
 
 
+/* 128-bit atomic compare-exchange */
 #ifdef __x86_64__
 __FORCELOCAL __ATTR_WUNUSED __hybrid_uint128_t
 (__lock_cmpxchg16b)(__hybrid_uint128_t *__ptr, __hybrid_uint128_t __oldval, __hybrid_uint128_t __newval) {
@@ -671,6 +686,7 @@ __FORCELOCAL __ATTR_WUNUSED __hybrid_uint128_t
 }
 #endif /* __x86_64__ */
 
+/* 64-bit atomic compare-exchange (through use of `lock cmpxchg8b') */
 __FORCELOCAL __ATTR_WUNUSED __UINT64_TYPE__
 (__lock_cmpxchg8b)(__UINT64_TYPE__ *__ptr, __UINT64_TYPE__ __oldval, __UINT64_TYPE__ __newval) {
 #ifdef __x86_64__
@@ -701,7 +717,7 @@ __FORCELOCAL __ATTR_WUNUSED __UINT64_TYPE__
 #endif /* !__x86_64__ */
 }
 
-/* Flush the instruction cache. */
+/* Flush the instruction cache by executing a fencing instruction. */
 __FORCELOCAL void (__flush_instruction_cache)(void) {
 #ifdef __x86_64__
 	__asm__ __volatile__("cpuid" : : : "%rax", "%rcx", "%rdx", "%rbx");
