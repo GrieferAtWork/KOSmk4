@@ -19,7 +19,6 @@
  */
 #ifndef _I386_KOS_SYS_IO_H
 #define _I386_KOS_SYS_IO_H 1
-#define _SYS_IO_H 1
 
 #include <__stdinc.h>
 #include <__crt.h>

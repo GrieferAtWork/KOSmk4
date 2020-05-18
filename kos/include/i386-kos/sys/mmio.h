@@ -19,7 +19,6 @@
  */
 #ifndef _I386_KOS_SYS_MMIO_H
 #define _I386_KOS_SYS_MMIO_H 1
-#define _SYS_IO_H 1
 
 #include <__stdinc.h>
 #include <__crt.h>
@@ -74,12 +73,12 @@ __ATTR_NONNULL((2)) void __NOTHROW(__LIBCCALL peeksl)(__MEMPORT_T __addr, void *
 __ATTR_NONNULL((2)) void __NOTHROW(__LIBCCALL pokesb)(__MEMPORT_T __addr, void const *__buf, __SIZE_TYPE__ __n_bytes);
 __ATTR_NONNULL((2)) void __NOTHROW(__LIBCCALL pokesw)(__MEMPORT_T __addr, void const *__buf, __SIZE_TYPE__ __n_words);
 __ATTR_NONNULL((2)) void __NOTHROW(__LIBCCALL pokesl)(__MEMPORT_T __addr, void const *__buf, __SIZE_TYPE__ __n_dwords);
-#ifdef __x86_64__
+#if defined(__x86_64__) && defined(__UINT64_TYPE__)
 __UINT64_TYPE__ __NOTHROW(__LIBCCALL peekq)(__MEMPORT_T __addr);
 __ATTR_NONNULL((2)) void __NOTHROW(__LIBCCALL peeksq)(__MEMPORT_T __addr, void *__buf, __SIZE_TYPE__ __n_qword);
 void __NOTHROW(__LIBCCALL pokeq)(__MEMPORT_T __addr, __UINT64_TYPE__ __val);
 __ATTR_NONNULL((2)) void __NOTHROW(__LIBCCALL pokesq)(__MEMPORT_T __addr, void const *__buf, __SIZE_TYPE__ __n_qword);
-#endif /* __x86_64__ */
+#endif /* __x86_64__ && __UINT64_TYPE__ */
 
 #elif defined(__COMPILER_HAVE_GCC_ASM)
 
@@ -263,7 +262,7 @@ __NOTHROW_NCX(__LIBCCALL pokesl)(__MEMPORT_T __addr,
 	}
 }
 
-#ifdef __x86_64__
+#if defined(__x86_64__) && defined(__UINT64_TYPE__)
 #define peekq(port) peekq((__MEMPORT_T)(port))
 __FORCELOCAL __UINT64_TYPE__
 __NOTHROW_NCX(__LIBCCALL peekq)(__MEMPORT_T __addr) {
@@ -323,7 +322,7 @@ __NOTHROW_NCX(__LIBCCALL pokesq)(__MEMPORT_T __addr,
 		__COMPILER_WRITE_BARRIER();
 	}
 }
-#endif /* __x86_64__ */
+#endif /* __x86_64__ && __UINT64_TYPE__ */
 
 #else /* __COMPILER_HAVE_GCC_ASM */
 
@@ -435,7 +434,7 @@ __NOTHROW_NCX(__LIBCCALL pokesl)(__MEMPORT_T __addr,
 	__COMPILER_WRITE_BARRIER();
 }
 
-#ifdef __x86_64__
+#if defined(__x86_64__) && defined(__UINT64_TYPE__)
 #define peekq(port) peekq((__MEMPORT_T)(port))
 __FORCELOCAL __UINT64_TYPE__
 __NOTHROW_NCX(__LIBCCALL peekq)(__MEMPORT_T __addr) {
@@ -471,7 +470,7 @@ __NOTHROW_NCX(__LIBCCALL pokesq)(__MEMPORT_T __addr,
 	}
 	__COMPILER_WRITE_BARRIER();
 }
-#endif /* __x86_64__ */
+#endif /* __x86_64__ && __UINT64_TYPE__ */
 
 #endif /* !__COMPILER_HAVE_GCC_ASM */
 
