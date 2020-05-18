@@ -262,22 +262,22 @@ uhci_controller_addqueue(struct uhci_controller *__restrict self,
 #define uhci_controller_uses_mmio(self) \
 	((self)->uc_flags & UHCI_CONTROLLER_FLAG_USESMMIO)
 #define uhci_rdb(self, reg)                                                     \
-	(uhci_controller_uses_mmio(self) ? readb((self)->uc_base.uc_mmbase + (reg)) \
+	(uhci_controller_uses_mmio(self) ? peekb((self)->uc_base.uc_mmbase + (reg)) \
 	                                 : inb((self)->uc_base.uc_iobase + (reg)))
 #define uhci_rdw(self, reg)                                                     \
-	(uhci_controller_uses_mmio(self) ? readw((self)->uc_base.uc_mmbase + (reg)) \
+	(uhci_controller_uses_mmio(self) ? peekw((self)->uc_base.uc_mmbase + (reg)) \
 	                                 : inw((self)->uc_base.uc_iobase + (reg)))
 #define uhci_rdl(self, reg)                                                     \
-	(uhci_controller_uses_mmio(self) ? readl((self)->uc_base.uc_mmbase + (reg)) \
+	(uhci_controller_uses_mmio(self) ? peekl((self)->uc_base.uc_mmbase + (reg)) \
 	                                 : inl((self)->uc_base.uc_iobase + (reg)))
-#define uhci_wrb(self, reg, val)                                                      \
-	(uhci_controller_uses_mmio(self) ? writeb((self)->uc_base.uc_mmbase + (reg), val) \
+#define uhci_wrb(self, reg, val)                                                     \
+	(uhci_controller_uses_mmio(self) ? pokeb((self)->uc_base.uc_mmbase + (reg), val) \
 	                                 : outb((self)->uc_base.uc_iobase + (reg), val))
-#define uhci_wrw(self, reg, val)                                                      \
-	(uhci_controller_uses_mmio(self) ? writew((self)->uc_base.uc_mmbase + (reg), val) \
+#define uhci_wrw(self, reg, val)                                                     \
+	(uhci_controller_uses_mmio(self) ? pokew((self)->uc_base.uc_mmbase + (reg), val) \
 	                                 : outw((self)->uc_base.uc_iobase + (reg), val))
-#define uhci_wrl(self, reg, val)                                                      \
-	(uhci_controller_uses_mmio(self) ? writel((self)->uc_base.uc_mmbase + (reg), val) \
+#define uhci_wrl(self, reg, val)                                                     \
+	(uhci_controller_uses_mmio(self) ? pokel((self)->uc_base.uc_mmbase + (reg), val) \
 	                                 : outl((self)->uc_base.uc_iobase + (reg), val))
 
 

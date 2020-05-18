@@ -529,9 +529,9 @@ again:
 			assert(tail_size >= 1);
 			do {
 #if __SIZEOF_POINTER__ >= 8
-				readq(tail_start);
+				peekq(tail_start);
 #else /* __SIZEOF_POINTER__ >= 8 */
-				readl(tail_start);
+				peekl(tail_start);
 #endif /* __SIZEOF_POINTER__ < 8 */
 				tail_start = (byte_t *)tail_start + PAGESIZE;
 			} while (--tail_size);

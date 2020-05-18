@@ -406,10 +406,10 @@ test_addr_op(unsigned int op, void *addr, bool is_canon, bool is_vio) {
 			 * max # number of bytes on the data-bus minus 1 */
 			assert_range(error_data()->e_pointers[0], addr, WORDMASK);
 			/* VIO writes may first perform reads in order to then write-back
-			 * a larger data word (i.e. `writeb(addr, v)' may be dispatched as:
-			 * >> a.word = readw(addr & ~1);
+			 * a larger data word (i.e. `pokeb(addr, v)' may be dispatched as:
+			 * >> a.word = peekw(addr & ~1);
 			 * >> a.bytes[addr & 1] = v;
-			 * >> writew(addr & ~1, a.word);
+			 * >> pokew(addr & ~1, a.word);
 			 * As such, the first operation can be a read, even when a write is
 			 * being dispatched, so we can't assert that the faulting operation
 			 * was actually a write! */

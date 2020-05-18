@@ -551,10 +551,10 @@ int main_yield(int argc, char *argv[], char *envp[]) {
 
 
 /************************************************************************/
-static volatile u32 viovalue = 0;
+static u32 volatile viovalue = 0;
 PRIVATE NONNULL((1)) u32 LIBVIO_CC
 myvio_readl(struct vio_args *__restrict args, vio_addr_t addr) {
-	/* This function is called every time our VIO region is read from! */
+	/* This function is called synchronously every time our VIO region is read from! */
 	printf("VIO:readl(%p)\n", vio_args_faultaddr(args, addr));
 	return viovalue++;
 }
@@ -568,7 +568,7 @@ int main_vio(int argc, char *argv[], char *envp[]) {
 	PVIO_CREATE vio_create;
 	PVIO_DESTROY vio_destroy;
 	fd_t uviofd;
-	volatile u32 *baseaddr;
+	u32 volatile *baseaddr;
 	(void)argc, (void)argv, (void)envp;
 
 	libvio = dlopen(LIBVIO_LIBRARY_NAME, RTLD_LOCAL);
@@ -584,7 +584,7 @@ int main_vio(int argc, char *argv[], char *envp[]) {
 	if (uviofd < 0)
 		err(1, "vio_create failed");
 	printf("uviofd = %d\n", uviofd);
-	baseaddr = (volatile u32 *)mmap(NULL, 0x1000,
+	baseaddr = (u32 volatile *)mmap(NULL, 0x1000,
 	                                PROT_READ | PROT_WRITE,
 	                                MAP_FILE | MAP_SHARED,
 	                                uviofd, 0);
