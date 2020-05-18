@@ -140,10 +140,11 @@ __NAMESPACE_INT_END
 #endif /* __SIZEOF_POINTER__ == 8 */
 
 __CXXDECL_END
-#else
+#else /* ... */
 
-/* Fallback: Just replace references to pointer with sizes
- *           that aren't matching the host with integer types. */
+/* Fallback: Just replace references to fixed-length pointers with
+ *           lengths that don't match the host's with integer types
+ *           of proper width. */
 #include "typecore.h"
 
 #if __SIZEOF_POINTER__ == 4
@@ -156,14 +157,14 @@ __CXXDECL_END
 #define __HYBRID_FUNCPTR64(return, cc, name, args) return (cc *name)args
 #define __HYBRID_PTR32(T) __ULONG32_TYPE__
 #define __HYBRID_PTR64(T) T *
-#else
+#else /* __SIZEOF_POINTER__ == ... */
 #define __HYBRID_FUNCPTR32(return, cc, name, args) __ULONG32_TYPE__ name
-#define __HYBRID_FUNCPTR32(return, cc, name, args) __ULONG64_TYPE__ name
+#define __HYBRID_FUNCPTR64(return, cc, name, args) __ULONG64_TYPE__ name
 #define __HYBRID_PTR32(T) __ULONG32_TYPE__
 #define __HYBRID_PTR64(T) __ULONG64_TYPE__
-#endif
+#endif /* __SIZEOF_POINTER__ != ... */
 
-#endif
+#endif /* !... */
 
 
 #endif /* !__GUARD_HYBRID___POINTER_H */

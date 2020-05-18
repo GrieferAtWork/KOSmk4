@@ -192,12 +192,12 @@ template<class __T1, class __T2> struct pair {
 	    , second(__other.second)
 	{}
 
-#ifdef __CXX_HAVE_DEFAULT_FUNCTIONS
+#ifdef __COMPILER_HAVE_CXX_DEFAULT_FUNCTIONS
 #ifdef __COMPILER_HAVE_CXX_RVALUE_REFERENCE
 	__CXX11_CONSTEXPR pair(pair &&__other) = default;
 #endif /* __COMPILER_HAVE_CXX_RVALUE_REFERENCE */
 	__CXX11_CONSTEXPR pair(pair const &__other) = default;
-#endif /* __CXX_HAVE_DEFAULT_FUNCTIONS */
+#endif /* __COMPILER_HAVE_CXX_DEFAULT_FUNCTIONS */
 
 #ifdef __COMPILER_HAVE_CXX_RVALUE_REFERENCE
 	template<class __U1,

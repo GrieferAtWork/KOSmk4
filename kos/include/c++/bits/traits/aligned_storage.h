@@ -86,10 +86,10 @@ public:
 	__CXX_STATIC_CONST(__SIZE_TYPE__, alignment_value = __strictest::__max_alignment);
 	typedef typename aligned_storage<__max_size, alignment_value>::type type;
 };
-#ifdef __CXX_HAVE_STATIC_CONST
+#ifdef __COMPILER_HAVE_CXX_STATIC_CONST
 template<__SIZE_TYPE__ __StorageSize, class... __Types>
 __CXX11_CONSTEXPR_OR_CONST __SIZE_TYPE__ aligned_union<__StorageSize, __Types...>::alignment_value;
-#endif /* __CXX_HAVE_STATIC_CONST */
+#endif /* __COMPILER_HAVE_CXX_STATIC_CONST */
 #endif /* __COMPILER_HAVE_CXX_VARIABLE_TEMPLATES */
 #endif /* !__std_aligned_union_defined */
 

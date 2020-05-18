@@ -26,7 +26,6 @@
 #error "A C++ compiler is required"
 #endif /* !__cplusplus */
 
-//#define __COMPILER_HAVE_CXX_TEMPLATE_CONSTEXPR 1
 #define __COMPILER_HAVE_CXX_TEMPLATE_CONSTEXPR 1 /* TODO */
 #define __COMPILER_HAVE_CXX_PARTIAL_TPL_SPEC 1
 #define __CXX_DEDUCE_TYPENAME typename
@@ -95,46 +94,58 @@
 #define __CXX_INLINE_CONSTEXPR __CXX11_CONSTEXPR
 #elif !defined(__NO_ATTR_FORCEINLINE)
 #define __CXX_INLINE_CONSTEXPR __ATTR_FORCEINLINE
-#else
+#else /* ... */
 #define __CXX_INLINE_CONSTEXPR __CXX_CLASSMEMBER
-#endif
+#endif /* !... */
 #endif /* !__CXX_INLINE_CONSTEXPR */
 
 #if (__has_feature(defaulted_functions) ||                     \
      (defined(_MSC_FULL_VER) && _MSC_FULL_VER >= 180020827) || \
      (__GCC_VERSION_NUM >= 40400 && (defined(__GXX_EXPERIMENTAL_CXX0X__) || __cplusplus >= 201103L)))
-#define __CXX_HAVE_DEFAULT_FUNCTIONS 1
+#define __COMPILER_HAVE_CXX_DEFAULT_FUNCTIONS 1
 #define __CXX_DEFAULT_CTOR(T)                      T() = default
 #define __CXX_DEFAULT_DTOR(T)                      ~T() = default
 #define __CXX_DEFAULT_COPY(T, other, ...)          T(T const &) = default
+#define __CXX_DEFAULT_COPY_ASSIGN(T, other, ...)   T &operator = (T const &) = default
 #ifdef __COMPILER_HAVE_CXX11_NOEXCEPT
-#define __CXX_DEFAULT_CTOR_NOEXCEPT(T)             T() __CXX_NOEXCEPT = default
-#define __CXX_DEFAULT_DTOR_NOEXCEPT(T)             ~T() __CXX_NOEXCEPT = default
-#define __CXX_DEFAULT_COPY_NOEXCEPT(T, other, ...) T(T const &) __CXX_NOEXCEPT = default
+#define __CXX_DEFAULT_CTOR_NOEXCEPT(T)                    T() __CXX_NOEXCEPT = default
+#define __CXX_DEFAULT_DTOR_NOEXCEPT(T)                    ~T() __CXX_NOEXCEPT = default
+#define __CXX_DEFAULT_COPY_NOEXCEPT(T, other, ...)        T(T const &) __CXX_NOEXCEPT = default
+#define __CXX_DEFAULT_COPY_ASSIGN_NOEXCEPT(T, other, ...) T &operator = (T const &) __CXX_NOEXCEPT = default
 #else /* __COMPILER_HAVE_CXX11_NOEXCEPT */
-#define __CXX_DEFAULT_CTOR_NOEXCEPT(T)             T() = default
-#define __CXX_DEFAULT_DTOR_NOEXCEPT(T)             ~T() = default
-#define __CXX_DEFAULT_COPY_NOEXCEPT(T, other, ...) T(T const &) = default
+#define __CXX_DEFAULT_CTOR_NOEXCEPT(T)                    T() = default
+#define __CXX_DEFAULT_DTOR_NOEXCEPT(T)                    ~T() = default
+#define __CXX_DEFAULT_COPY_NOEXCEPT(T, other, ...)        T(T const &) = default
+#define __CXX_DEFAULT_COPY_ASSIGN_NOEXCEPT(T, other, ...) T &operator = (T const &) = default
 #endif /* !__COMPILER_HAVE_CXX11_NOEXCEPT */
-#else
-#define __CXX_DEFAULT_CTOR(T)                      T() {}
-#define __CXX_DEFAULT_DTOR(T)                      ~T() {}
-#define __CXX_DEFAULT_COPY(T, other, ...)          T(T const &other) __VA_ARGS__
-#define __CXX_DEFAULT_CTOR_NOEXCEPT(T)             T() __CXX_NOEXCEPT {}
-#define __CXX_DEFAULT_DTOR_NOEXCEPT(T)             ~T() __CXX_NOEXCEPT {}
-#define __CXX_DEFAULT_COPY_NOEXCEPT(T, other, ...) T(T const &other) __CXX_NOEXCEPT __VA_ARGS__
-#endif
+#else /* ... */
+#define __CXX_DEFAULT_CTOR(T)                             T() {}
+#define __CXX_DEFAULT_DTOR(T)                             ~T() {}
+#define __CXX_DEFAULT_COPY(T, other, ...)                 T(T const &other) __VA_ARGS__
+#define __CXX_DEFAULT_COPY_ASSIGN(T, other, ...)          T &operator = (T const &other) __VA_ARGS__
+#define __CXX_DEFAULT_CTOR_NOEXCEPT(T)                    T() __CXX_NOEXCEPT {}
+#define __CXX_DEFAULT_DTOR_NOEXCEPT(T)                    ~T() __CXX_NOEXCEPT {}
+#define __CXX_DEFAULT_COPY_NOEXCEPT(T, other, ...)        T(T const &other) __CXX_NOEXCEPT __VA_ARGS__
+#define __CXX_DEFAULT_COPY_ASSIGN_NOEXCEPT(T, other, ...) T &operator = (T const &other) __CXX_NOEXCEPT __VA_ARGS__
+#endif /* !... */
+#define __CXX_DEFAULT_COPY_CTOR_AND_ASSIGN(decl, T, other, ...) \
+	decl __CXX_DEFAULT_COPY(T, other, __VA_ARGS__);             \
+	decl __CXX_DEFAULT_COPY_ASSIGN(T, other, { __VA_ARGS__ return *this; })
+#define __CXX_DEFAULT_COPY_CTOR_AND_ASSIGN_NOEXCEPT(decl, T, other, ...) \
+	decl __CXX_DEFAULT_COPY_NOEXCEPT(T, other, __VA_ARGS__);             \
+	decl __CXX_DEFAULT_COPY_ASSIGN_NOEXCEPT(T, other, { __VA_ARGS__ return *this; })
+
 
 #ifndef __CXX_STATIC_CONST
 #ifdef __COMPILER_HAVE_CXX11_CONSTEXPR
-#define __CXX_HAVE_STATIC_CONST 1
+#define __COMPILER_HAVE_CXX_STATIC_CONST 1
 #define __CXX_STATIC_CONST(T,decl)   static __CXX11_CONSTEXPR T decl
 #elif 1 /* XXX: What compilers support this? */
-#define __CXX_HAVE_STATIC_CONST 1
+#define __COMPILER_HAVE_CXX_STATIC_CONST 1
 #define __CXX_STATIC_CONST(T,decl)   static T const decl
-#else
+#else /* ... */
 #define __CXX_STATIC_CONST(T,decl)   enum{decl}
-#endif
+#endif /* !... */
 #endif /* !__CXX_STATIC_CONST */
 
 
@@ -151,13 +162,13 @@
 #else /* _MSC_VER */
 #define __CXX_DELETE_VOLATILE_COPY_ASSIGN(T) T &operator = (T const&) volatile = delete
 #endif /* !_MSC_VER */
-#else
+#else /* ... */
 #define __CXX_DELETE_CTOR(T)                 private: T()
 #define __CXX_DELETE_DTOR(T)                 private: ~T()
 #define __CXX_DELETE_COPY(T)                 private: T(T const&)
 #define __CXX_DELETE_COPY_ASSIGN(T)          private: T &operator = (T const&)
 #define __CXX_DELETE_VOLATILE_COPY_ASSIGN(T) private: T &operator = (T const&) volatile
-#endif
+#endif /* !... */
 
 #ifdef _MSC_VER
 /* 4522: Incorrect warning about multiple assignment
@@ -173,9 +184,9 @@
 #define __CXX_THROWS(...) /* Nothing */
 #elif defined(_MSC_VER) && !defined(__INTELLISENSE__)
 #define __CXX_THROWS(...) /* Nothing */
-#else
+#else /* ... */
 #define __CXX_THROWS(...) throw(__VA_ARGS__)
-#endif
+#endif /* !... */
 
 #ifndef __CXXDECL_BEGIN
 #define __CXXDECL_BEGIN  extern "C++" {

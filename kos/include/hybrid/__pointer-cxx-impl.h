@@ -51,21 +51,21 @@ public:
 	__CXX_CLASSMEMBER __CXX_DEFAULT_CTOR_NOEXCEPT(__hybrid_ptr);
 
 	/* Default copy/move constructor/assign */
-#ifdef __CXX_HAVE_DEFAULT_FUNCTIONS
+#ifdef __COMPILER_HAVE_CXX_DEFAULT_FUNCTIONS
 	__CXX_CLASSMEMBER __hybrid_ptr(__hybrid_ptr const &__val) __CXX_NOEXCEPT = default;
 	__CXX_CLASSMEMBER __hybrid_ptr &operator=(__hybrid_ptr const &__val) __CXX_NOEXCEPT = default;
 #ifdef __COMPILER_HAVE_CXX_RVALUE_REFERENCE
 	__CXX_CLASSMEMBER __hybrid_ptr(__hybrid_ptr &&__val) __CXX_NOEXCEPT = default;
 	__CXX_CLASSMEMBER __hybrid_ptr &operator=(__hybrid_ptr &&__val) __CXX_NOEXCEPT = default;
 #endif /* __COMPILER_HAVE_CXX_RVALUE_REFERENCE */
-#else /* __CXX_HAVE_DEFAULT_FUNCTIONS */
+#else /* __COMPILER_HAVE_CXX_DEFAULT_FUNCTIONS */
 	__CXX_CLASSMEMBER __hybrid_ptr(__hybrid_ptr const &__val) __CXX_NOEXCEPT: __m_ptr(__val.__m_ptr) {}
 	__CXX_CLASSMEMBER __hybrid_ptr &operator=(__hybrid_ptr const &__val) __CXX_NOEXCEPT { __m_ptr = __val.__m_ptr; return *this; }
 #ifdef __COMPILER_HAVE_CXX_RVALUE_REFERENCE
 	__CXX_CLASSMEMBER __hybrid_ptr(__hybrid_ptr &&__val) __CXX_NOEXCEPT: __m_ptr(__val.__m_ptr) {}
 	__CXX_CLASSMEMBER __hybrid_ptr &operator=(__hybrid_ptr &&__val) __CXX_NOEXCEPT { __m_ptr = __val.__m_ptr; return *this; }
 #endif /* __COMPILER_HAVE_CXX_RVALUE_REFERENCE */
-#endif /* !__CXX_HAVE_DEFAULT_FUNCTIONS */
+#endif /* !__COMPILER_HAVE_CXX_DEFAULT_FUNCTIONS */
 
 	/* Construct from integer (explicit) */
 	__CXX_CLASSMEMBER explicit __hybrid_ptr(signed char __val) __CXX_NOEXCEPT: __m_ptr((__I)__val) {}

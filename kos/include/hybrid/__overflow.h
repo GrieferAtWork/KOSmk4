@@ -40,8 +40,8 @@ __DECL_BEGIN
 #define __hybrid_overflow_ssub  __intern::__intellisense_overflow_ssub
 #define __hybrid_overflow_umul  __intern::__intellisense_overflow_umul
 #define __hybrid_overflow_smul  __intern::__intellisense_overflow_smul
-#elif (__has_builtin(__builtin_add_overflow) && !defined(__ibmxl__)) || \
-      (defined(__GNUC__) && (__GNUC__ >= 5) && !defined(__INTEL_COMPILER))
+#elif ((__has_builtin(__builtin_add_overflow) && !defined(__ibmxl__)) || \
+       (defined(__GNUC__) && (__GNUC__ >= 5) && !defined(__INTEL_COMPILER)))
 /* @return: true:  Overflow occurred (unlikely; `*res' remains unmodified)
  *                 Overflow here means that the finite result stored
  *                 in `*res' doesn't match a value that would have
@@ -406,6 +406,38 @@ __IMPL_HYBRID_DEFINE_OVERFLOW_MATH(128, 128)
 #define __hybrid_overflow_smul(x, y, res) __builtin_expect(__IMPL_HYBRID_OVERFLOW_SELECT(__impl_hybrid_overflow_smul, __INT, x, y, res), 0)
 #endif /* !__NO_builtin_expect */
 #endif /* End:Fallback */
+
+
+/* Optional variants that may compile faster when operand sizes are known to be fixed.
+ * e.g.: `__hybrid_overflow_uadd8(__UINT8_TYPE__ a, __UINT8_TYPE__ b, __UINT8_TYPE__ *c)'
+ *       `__hybrid_overflow_sadd8(__INT8_TYPE__ a, __INT8_TYPE__ b, __INT8_TYPE__ *c)'
+ * etc... */
+#define __hybrid_overflow_uadd8  __hybrid_overflow_uadd
+#define __hybrid_overflow_sadd8  __hybrid_overflow_sadd
+#define __hybrid_overflow_usub8  __hybrid_overflow_usub
+#define __hybrid_overflow_ssub8  __hybrid_overflow_ssub
+#define __hybrid_overflow_umul8  __hybrid_overflow_umul
+#define __hybrid_overflow_smul8  __hybrid_overflow_smul
+#define __hybrid_overflow_uadd16 __hybrid_overflow_uadd
+#define __hybrid_overflow_sadd16 __hybrid_overflow_sadd
+#define __hybrid_overflow_usub16 __hybrid_overflow_usub
+#define __hybrid_overflow_ssub16 __hybrid_overflow_ssub
+#define __hybrid_overflow_umul16 __hybrid_overflow_umul
+#define __hybrid_overflow_smul16 __hybrid_overflow_smul
+#define __hybrid_overflow_uadd32 __hybrid_overflow_uadd
+#define __hybrid_overflow_sadd32 __hybrid_overflow_sadd
+#define __hybrid_overflow_usub32 __hybrid_overflow_usub
+#define __hybrid_overflow_ssub32 __hybrid_overflow_ssub
+#define __hybrid_overflow_umul32 __hybrid_overflow_umul
+#define __hybrid_overflow_smul32 __hybrid_overflow_smul
+#ifdef __INT64_TYPE__
+#define __hybrid_overflow_uadd64 __hybrid_overflow_uadd
+#define __hybrid_overflow_sadd64 __hybrid_overflow_sadd
+#define __hybrid_overflow_usub64 __hybrid_overflow_usub
+#define __hybrid_overflow_ssub64 __hybrid_overflow_ssub
+#define __hybrid_overflow_umul64 __hybrid_overflow_umul
+#define __hybrid_overflow_smul64 __hybrid_overflow_smul
+#endif /* __INT64_TYPE__ */
 
 
 __DECL_END

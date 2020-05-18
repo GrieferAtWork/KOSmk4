@@ -41,10 +41,10 @@ struct integral_constant {
 #endif /* __USE_ISOCXX11 */
 };
 
-#ifdef __CXX_HAVE_STATIC_CONST
+#ifdef __COMPILER_HAVE_CXX_STATIC_CONST
 template<class __T, __T __v>
 __CXX11_CONSTEXPR __T integral_constant<__T, __v>::value;
-#endif /* __CXX_HAVE_STATIC_CONST */
+#endif /* __COMPILER_HAVE_CXX_STATIC_CONST */
 
 typedef integral_constant<bool, true> true_type;
 typedef integral_constant<bool, false> false_type;
