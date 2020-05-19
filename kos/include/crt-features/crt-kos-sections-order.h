@@ -177,6 +177,7 @@
 	.string.match*                    # String matching functions
 	.string.argz*  .string.envz*      # <argz.h> and <envz.h>
 	.sched.pthread_ext*               # Pthread extensions
+	.system.random*                   # <sys/random.h>
 	.glibc*                           # GLibc-specific stuff
 	.bsd.stringlist*                  # BSD's <stringlist.h> header
 	.bsd.*                            # Misc BSD functions
@@ -286,6 +287,7 @@
 	CB(PREFIX.string.match.*) \
 	CB(PREFIX.string.argz.* PREFIX.string.envz.*) \
 	CB(PREFIX.sched.pthread_ext.*) \
+	CB(PREFIX.system.random.*) \
 	CB(PREFIX.glibc.*) \
 	CB(PREFIX.bsd.stringlist.*) \
 	CB(PREFIX.bsd.strstat.*) \

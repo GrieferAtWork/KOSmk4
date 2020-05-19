@@ -31,7 +31,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:getrandom,hash:CRC-32=0x74a83e94]]]*/
+/*[[[head:getrandom,hash:CRC-32=0x8b2e1e8c]]]*/
 /* Ask the kernel for up to `NUM_BYTES' bytes of random data, which
  * should then be written to `BUFFER'.
  * @param: FLAGS: Set of `GRND_NONBLOCK | GRND_RANDOM'
@@ -43,7 +43,7 @@ DECL_BEGIN
  *                if no random data had already been retrieved from
  *                the kernel's random data sink. */
 INTERN WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.getrandom") ssize_t
+ATTR_WEAK ATTR_SECTION(".text.crt.system.random.getrandom") ssize_t
 NOTHROW_NCX(LIBCCALL libc_getrandom)(void *buf,
                                      size_t num_bytes,
                                      unsigned int flags)
@@ -58,7 +58,7 @@ NOTHROW_NCX(LIBCCALL libc_getrandom)(void *buf,
 }
 /*[[[end:getrandom]]]*/
 
-/*[[[head:getentropy,hash:CRC-32=0xce5ea20e]]]*/
+/*[[[head:getentropy,hash:CRC-32=0x1ff663ce]]]*/
 /* Similar to `getrandom(BUF, NUM_BYTES, GRND_RANDOM)', however
  * the case where the calling thread is interrupted, causing an
  * less than `NUM_BYTES' of data to be read is handled by reading
@@ -70,7 +70,7 @@ NOTHROW_NCX(LIBCCALL libc_getrandom)(void *buf,
  * @return:  0: Success
  * @return: -1: Error (see `errno') */
 INTERN WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.getentropy") int
+ATTR_WEAK ATTR_SECTION(".text.crt.system.random.getentropy") int
 NOTHROW_NCX(LIBCCALL libc_getentropy)(void *buf,
                                       size_t num_bytes)
 /*[[[body:getentropy]]]*/
