@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x44c45d2e */
+/* HASH CRC-32:0x472b4333 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_getaffinity,(__pid_t __pid, __SI
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(pthread_num_processors_np) __STDC_INT_AS_SIZE_T
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_num_processors_np))(void) {
-#line 1413 "kos/src/libc/magic/pthread.c"
+#line 1417 "kos/src/libc/magic/pthread.c"
 	__cpu_set_t __cset;
 	if __unlikely(__localdep_sched_getaffinity(0, sizeof(__cset), &__cset) != 0)
 		return 1;

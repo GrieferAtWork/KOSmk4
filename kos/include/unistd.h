@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x665b15c7 */
+/* HASH CRC-32:0xdcd032f8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2001,6 +2001,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(swab, __FORCELOCAL __ATTR_NONNULL((1, 2)) void _
 #endif /* !__swab_defined */
 #endif /* __USE_XOPEN */
 
+
 #if (defined(_EVERY_SOURCE) || \
      (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K)))
 /* ... */
@@ -2012,9 +2013,50 @@ __CDECLARE(,char *,__NOTHROW_NCX,ctermid,(char *__s),(__s))
 #undef __ctermid_defined
 #endif /* ctermid... */
 #endif /* !__ctermid_defined */
+#ifndef __cuserid_defined
+#define __cuserid_defined 1
+#ifdef __CRT_HAVE_cuserid
+/* Return the name of the current user (`getpwuid(geteuid())'), storing
+ * that name in `S'. When `S' is NULL, a static buffer is used instead */
+__CDECLARE(,char *,__NOTHROW_NCX,cuserid,(char *__s),(__s))
+#else /* LIBC: cuserid */
+#undef __cuserid_defined
+#endif /* cuserid... */
+#endif /* !__cuserid_defined */
 #endif /* _EVERY_SOURCE || (__USE_XOPEN && !__USE_XOPEN2K) */
 
-#if defined(__USE_REENTRANT)
+
+#if (defined(_EVERY_SOURCE) || \
+     (defined(__USE_UNIX98) && !defined(__USE_XOPEN2K)))
+#ifndef ____pthread_atfork_func_t_defined
+#define ____pthread_atfork_func_t_defined 1
+typedef void (__LIBCCALL *__pthread_atfork_func_t)(void);
+#endif /* !____pthread_atfork_func_t_defined */
+
+#ifndef __pthread_atfork_defined
+#define __pthread_atfork_defined 1
+#ifdef __CRT_HAVE_pthread_atfork
+/* Install handlers to be called when a new process is created with FORK.
+ * The PREPARE handler is called in the parent process just before performing
+ * FORK. The PARENT handler is called in the parent process just after FORK.
+ * The CHILD handler is called in the child process. Each of the three
+ * handlers can be NULL, meaning that no handler needs to be called at that
+ * point.
+ * PTHREAD_ATFORK can be called several times, in which case the PREPARE
+ * handlers are called in LIFO order (last added with PTHREAD_ATFORK,
+ * first called before FORK), and the PARENT and CHILD handlers are called
+ * in FIFO (first added, first called) */
+__CDECLARE(,int,__NOTHROW_NCX,pthread_atfork,(__pthread_atfork_func_t __prepare, __pthread_atfork_func_t __parent, __pthread_atfork_func_t __child),(__prepare,__parent,__child))
+#else /* LIBC: pthread_atfork */
+#undef __pthread_atfork_defined
+#endif /* pthread_atfork... */
+#endif /* !__pthread_atfork_defined */
+#endif /* _EVERY_SOURCE || (__USE_UNIX98 && !__USE_XOPEN2K) */
+
+
+#ifdef __USE_REENTRANT
+#ifndef __ctermid_r_defined
+#define __ctermid_r_defined 1
 #ifdef __CRT_HAVE_ctermid_r
 /* Same as `ctermid', but return `NULL' when `S' is `NULL' */
 __CDECLARE(,char *,__NOTHROW_NCX,ctermid_r,(char *__s),(__s))
@@ -2022,8 +2064,12 @@ __CDECLARE(,char *,__NOTHROW_NCX,ctermid_r,(char *__s),(__s))
 #include <local/unistd/ctermid_r.h>
 /* Same as `ctermid', but return `NULL' when `S' is `NULL' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(ctermid_r, __FORCELOCAL char *__NOTHROW_NCX(__LIBCCALL ctermid_r)(char *__s) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ctermid_r))(__s); })
+#else /* CUSTOM: ctermid_r */
+#undef __ctermid_r_defined
 #endif /* ctermid_r... */
+#endif /* !__ctermid_r_defined */
 #endif /* __USE_REENTRANT */
+
 
 #ifdef __CRT_HAVE_sysconf
 /* >> sysconf(2)
@@ -2053,6 +2099,8 @@ __CREDIRECT(__ATTR_WUNUSED,long int,__NOTHROW_RPC,sysconf,(int __name),_sysconf,
  * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
 __CREDIRECT(__ATTR_WUNUSED,long int,__NOTHROW_RPC,sysconf,(int __name),__sysconf,(__name))
 #endif /* sysconf... */
+
+
 #if defined(__USE_MISC) || (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_POSIX))
 #ifndef F_LOCK
 #define F_ULOCK 0 /* Unlock a previously locked region. */

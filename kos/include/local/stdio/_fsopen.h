@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb08981d7 */
+/* HASH CRC-32:0x69fc9258 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,7 @@ __LOCAL_LIBC(_fsopen) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __FILE *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_fsopen))(char const *__filename,
                                                      char const *__modes,
                                                      int __sflag) {
-#line 2192 "kos/src/libc/magic/stdio.c"
+#line 2199 "kos/src/libc/magic/stdio.c"
 	(void)__sflag;
 	return __localdep_fopen(__filename, __modes);
 }

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1a3ab5f9 */
+/* HASH CRC-32:0x9d9dce02 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1478,8 +1478,13 @@ __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,pthread_getcpuclockid,(pthread_
 #endif /* pthread_getcpuclockid... */
 #endif /* __USE_XOPEN2K */
 
+#ifndef ____pthread_atfork_func_t_defined
+#define ____pthread_atfork_func_t_defined 1
 typedef void (__LIBCCALL *__pthread_atfork_func_t)(void);
+#endif /* !____pthread_atfork_func_t_defined */
 
+#ifndef __pthread_atfork_defined
+#define __pthread_atfork_defined 1
 #ifdef __CRT_HAVE_pthread_atfork
 /* Install handlers to be called when a new process is created with FORK.
  * The PREPARE handler is called in the parent process just before performing
@@ -1492,7 +1497,10 @@ typedef void (__LIBCCALL *__pthread_atfork_func_t)(void);
  * first called before FORK), and the PARENT and CHILD handlers are called
  * in FIFO (first added, first called) */
 __CDECLARE(,int,__NOTHROW_NCX,pthread_atfork,(__pthread_atfork_func_t __prepare, __pthread_atfork_func_t __parent, __pthread_atfork_func_t __child),(__prepare,__parent,__child))
+#else /* LIBC: pthread_atfork */
+#undef __pthread_atfork_defined
 #endif /* pthread_atfork... */
+#endif /* !__pthread_atfork_defined */
 
 
 /* Some more functions from winpthread. */

@@ -1370,14 +1370,21 @@ ftrylockfile:([nonnull] $FILE *__restrict stream) -> int;
 
 %[default_impl_section(.text.crt.io.tty)]
 %[insert:extern(ctermid)]
+
+%#ifdef __USE_REENTRANT
+%[insert:extern(ctermid_r)] /* NOTE: The feature-check for `ctermid_r()' here is guessed! */
+%#endif /* __USE_REENTRANT */
 %#endif /* __USE_POSIX */
 
 %
 %#ifdef __USE_XOPEN
 @@Return the name of the current user (`getpwuid(geteuid())'), storing
 @@that name in `S'. When `S' is NULL, a static buffer is used instead
-cuserid:(char *s) -> char *;
+[guard] cuserid:(char *s) -> char *;
 %#endif /* Use X/Open, but not issue 6.  */
+
+
+
 
 %
 %#ifdef __USE_POSIX2

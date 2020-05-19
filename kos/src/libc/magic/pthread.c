@@ -1385,7 +1385,10 @@ pthread_getcpuclockid:(pthread_t pthread_id, [nonnull] $clockid_t *clock_id) -> 
 %#endif /* __USE_XOPEN2K */
 
 %
+%#ifndef ____pthread_atfork_func_t_defined
+%#define ____pthread_atfork_func_t_defined 1
 %typedef void (__LIBCCALL *__pthread_atfork_func_t)(void);
+%#endif /* !____pthread_atfork_func_t_defined */
 
 %
 @@Install handlers to be called when a new process is created with FORK.
@@ -1398,6 +1401,7 @@ pthread_getcpuclockid:(pthread_t pthread_id, [nonnull] $clockid_t *clock_id) -> 
 @@handlers are called in LIFO order (last added with PTHREAD_ATFORK,
 @@first called before FORK), and the PARENT and CHILD handlers are called
 @@in FIFO (first added, first called)
+[guard]
 pthread_atfork:([nullable] __pthread_atfork_func_t prepare,
                 [nullable] __pthread_atfork_func_t parent,
                 [nullable] __pthread_atfork_func_t child) -> int;

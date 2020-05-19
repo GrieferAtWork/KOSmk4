@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc8c660ec */
+/* HASH CRC-32:0x9fcc8208 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2228,14 +2228,34 @@ __CDECLARE(,char *,__NOTHROW_NCX,ctermid,(char *__s),(__s))
 #undef __ctermid_defined
 #endif /* ctermid... */
 #endif /* !__ctermid_defined */
+#ifdef __USE_REENTRANT
+#ifndef __ctermid_r_defined
+#define __ctermid_r_defined 1
+#ifdef __CRT_HAVE_ctermid_r
+/* Same as `ctermid', but return `NULL' when `S' is `NULL' */
+__CDECLARE(,char *,__NOTHROW_NCX,ctermid_r,(char *__s),(__s))
+#elif defined(__CRT_HAVE_ctermid)
+#include <local/unistd/ctermid_r.h>
+/* Same as `ctermid', but return `NULL' when `S' is `NULL' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(ctermid_r, __FORCELOCAL char *__NOTHROW_NCX(__LIBCCALL ctermid_r)(char *__s) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ctermid_r))(__s); })
+#else /* CUSTOM: ctermid_r */
+#undef __ctermid_r_defined
+#endif /* ctermid_r... */
+#endif /* !__ctermid_r_defined */
+#endif /* __USE_REENTRANT */
 #endif /* __USE_POSIX */
 
 #ifdef __USE_XOPEN
+#ifndef __cuserid_defined
+#define __cuserid_defined 1
 #ifdef __CRT_HAVE_cuserid
 /* Return the name of the current user (`getpwuid(geteuid())'), storing
  * that name in `S'. When `S' is NULL, a static buffer is used instead */
 __CDECLARE(,char *,__NOTHROW_NCX,cuserid,(char *__s),(__s))
+#else /* LIBC: cuserid */
+#undef __cuserid_defined
 #endif /* cuserid... */
+#endif /* !__cuserid_defined */
 #endif /* Use X/Open, but not issue 6.  */
 
 #ifdef __USE_POSIX2

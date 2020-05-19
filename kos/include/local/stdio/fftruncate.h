@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1a15df5 */
+/* HASH CRC-32:0xd8c0ee8a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -95,7 +95,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fftruncate) __ATTR_NONNULL((1)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fftruncate))(__FILE *__restrict __stream,
                                            __PIO_OFFSET __length) __THROWS(...) {
-#line 1960 "kos/src/libc/magic/stdio.c"
+#line 1967 "kos/src/libc/magic/stdio.c"
 	int __result = -1;
 	__fd_t __fd = __localdep_fileno(__stream);
 	if __likely(__fd >= 0)

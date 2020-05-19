@@ -1724,23 +1724,41 @@ swab:([nonnull] void const *__restrict from,
 %#endif /* __USE_XOPEN */
 
 %
+%
 %#if (defined(_EVERY_SOURCE) || \
 %     (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K)))
 %/* ... */
 [section(.text.crt.io.tty)]
 [guard] ctermid:(char *s) -> char *;
+%[insert:extern(cuserid)]
 %#endif /* _EVERY_SOURCE || (__USE_XOPEN && !__USE_XOPEN2K) */
 
+
 %
-%#if defined(__USE_REENTRANT)
+%
+%#if (defined(_EVERY_SOURCE) || \
+%     (defined(__USE_UNIX98) && !defined(__USE_XOPEN2K)))
+%#ifndef ____pthread_atfork_func_t_defined
+%#define ____pthread_atfork_func_t_defined 1
+%typedef void (__LIBCCALL *__pthread_atfork_func_t)(void);
+%#endif /* !____pthread_atfork_func_t_defined */
+%
+%[insert:extern(pthread_atfork)]
+%#endif /* _EVERY_SOURCE || (__USE_UNIX98 && !__USE_XOPEN2K) */
+
+
+%
+%
+%#ifdef __USE_REENTRANT
 @@Same as `ctermid', but return `NULL' when `S' is `NULL'
-[section(.text.crt.io.tty)]
+[section(.text.crt.io.tty)][guard]
 [requires($has_function(ctermid))][noexport][user][same_impl]
 ctermid_r:([nullable] char *s) -> char * {
 	return s ? ctermid(s) : NULL;
 }
 %#endif /* __USE_REENTRANT */
 
+%
 %
 @@>> sysconf(2)
 @@@param: NAME: One of `_SC_*' from <bits/confname.h>
@@ -1755,6 +1773,8 @@ ctermid_r:([nullable] char *s) -> char * {
 sysconf:(int name) -> long int;
 
 
+%
+%
 %#if defined(__USE_MISC) || (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_POSIX))
 %#ifndef F_LOCK
 %#define F_ULOCK 0 /* Unlock a previously locked region. */
