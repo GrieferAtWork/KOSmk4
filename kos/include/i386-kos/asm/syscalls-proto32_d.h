@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf6b5561c */
+/* HASH CRC-32:0xd3d1d445 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -389,7 +389,7 @@
 #define __NR32AC_sched_getattr           1
 #define __NR32AC_renameat2               5
 #define __NR32AC_seccomp                 1
-#define __NR32AC_getrandom               1
+#define __NR32AC_getrandom               3
 #define __NR32AC_memfd_create            2
 #define __NR32AC_bpf                     1
 #define __NR32AC_execveat                5
@@ -850,7 +850,7 @@
 #define __NR32RT_sched_getattr           (errno_t, __errno_t)
 #define __NR32RT_renameat2               (errno_t, __errno_t)
 #define __NR32RT_seccomp                 (errno_t, __errno_t)
-#define __NR32RT_getrandom               (errno_t, __errno_t)
+#define __NR32RT_getrandom               (ssize_t, __ssize_t)
 #define __NR32RT_memfd_create            (fd_t, __fd_t)
 #define __NR32RT_bpf                     (errno_t, __errno_t)
 #define __NR32RT_execveat                (errno_t, __errno_t)
@@ -1716,7 +1716,9 @@
 #define __NR32AT3_renameat2               (char const *, char const *)
 #define __NR32AT4_renameat2               (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT0_seccomp                 (int, int)
-#define __NR32AT0_getrandom               (int, int)
+#define __NR32AT0_getrandom               (void *, void *)
+#define __NR32AT1_getrandom               (size_t, __size_t)
+#define __NR32AT2_getrandom               (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT0_memfd_create            (char const *, char const *)
 #define __NR32AT1_memfd_create            (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT0_bpf                     (int, int)
@@ -2410,7 +2412,7 @@
 #define __NR32AM_sched_getattr(a, b, c, d, e, f)           (int)a
 #define __NR32AM_renameat2(a, b, c, d, e, f)               (__fd_t)a, (char const *)b, (__fd_t)c, (char const *)d, (__syscall_ulong_t)e
 #define __NR32AM_seccomp(a, b, c, d, e, f)                 (int)a
-#define __NR32AM_getrandom(a, b, c, d, e, f)               (int)a
+#define __NR32AM_getrandom(a, b, c, d, e, f)               (void *)a, (__size_t)b, (__syscall_ulong_t)c
 #define __NR32AM_memfd_create(a, b, c, d, e, f)            (char const *)a, (__syscall_ulong_t)b
 #define __NR32AM_bpf(a, b, c, d, e, f)                     (int)a
 #define __NR32AM_execveat(a, b, c, d, e, f)                (__fd_t)a, (char const *)b, (__HYBRID_PTR32(char const) const *)c, (__HYBRID_PTR32(char const) const *)d, (__atflag_t)e
@@ -2871,7 +2873,7 @@
 #define __NR32AP_sched_getattr(a)                          (__syscall_ulong_t)a
 #define __NR32AP_renameat2(a, b, c, d, e)                  (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NR32AP_seccomp(a)                                (__syscall_ulong_t)a
-#define __NR32AP_getrandom(a)                              (__syscall_ulong_t)a
+#define __NR32AP_getrandom(a, b, c)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR32AP_memfd_create(a, b)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AP_bpf(a)                                    (__syscall_ulong_t)a
 #define __NR32AP_execveat(a, b, c, d, e)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e

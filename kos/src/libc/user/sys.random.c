@@ -21,13 +21,18 @@
 #define GUARD_LIBC_USER_SYS_RANDOM_C 1
 
 #include "../api.h"
+/**/
+
+#include <kos/syscalls.h>
+
+#include <errno.h>
+#include <fcntl.h>
+#include <syscall.h>
+#include <unistd.h>
+
 #include "sys.random.h"
 
 DECL_BEGIN
-
-
-
-
 
 /*[[[start:implementation]]]*/
 
@@ -49,12 +54,31 @@ NOTHROW_NCX(LIBCCALL libc_getrandom)(void *buf,
                                      unsigned int flags)
 /*[[[body:getrandom]]]*/
 {
-	(void)buf;
-	(void)num_bytes;
-	(void)flags;
-	CRT_UNIMPLEMENTED("getrandom"); /* TODO */
-	libc_seterrno(ENOSYS);
+#ifdef SYS_getrandom
+	ssize_t result;
+	result = sys_getrandom(buf, num_bytes, (syscall_ulong_t)flags);
+	return libc_seterrno_syserr(result);
+#else /* SYS_getrandom */
+	ssize_t result;
+	fd_t fd;
+	PRIVATE ATTR_SECTION(".rodata.crt.system.random.str_dev_random") char const str_dev_random[] = "/dev/random";
+	PRIVATE ATTR_SECTION(".rodata.crt.system.random.str_dev_urandom") char const str_dev_urandom[] = "/dev/urandom";
+	if ((flags & ~(GRND_NONBLOCK | GRND_RANDOM)) != 0) {
+		libc_seterrno(EINVAL);
+		goto err;
+	}
+	fd = open((flags & GRND_RANDOM) ? str_dev_random
+	                                : str_dev_urandom,
+	          (flags & GRND_NONBLOCK) ? (O_RDONLY | O_NONBLOCK)
+	                                  : (O_RDONLY));
+	if unlikely(fd < 0)
+		goto err;
+	result = read(fd, buf, num_bytes);
+	sys_close(fd);
+	return result;
+err:
 	return -1;
+#endif /* !SYS_getrandom */
 }
 /*[[[end:getrandom]]]*/
 

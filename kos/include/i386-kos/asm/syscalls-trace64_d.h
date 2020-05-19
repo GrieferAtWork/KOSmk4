@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb6e76117 */
+/* HASH CRC-32:0x8d74ec52 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -746,7 +746,9 @@
 #define __NR64AN3_renameat2              newpath
 #define __NR64AN4_renameat2              flags
 #define __NR64AN0_seccomp                TODO_PROTOTYPE
-#define __NR64AN0_getrandom              TODO_PROTOTYPE
+#define __NR64AN0_getrandom              buf
+#define __NR64AN1_getrandom              num_bytes
+#define __NR64AN2_getrandom              flags
 #define __NR64AN0_memfd_create           name
 #define __NR64AN1_memfd_create           flags
 #define __NR64AN0_kexec_file_load        TODO_PROTOTYPE
@@ -2580,8 +2582,12 @@
 #define __NR64ATRA4_renameat2(olddirfd, oldpath, newdirfd, newpath, flags) , (uintptr_t)(flags)
 #define __NR64ATRF0_seccomp                "%d"
 #define __NR64ATRA0_seccomp(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NR64ATRF0_getrandom              "%d"
-#define __NR64ATRA0_getrandom(TODO_PROTOTYPE) , TODO_PROTOTYPE
+#define __NR64ATRF0_getrandom              "%p"
+#define __NR64ATRA0_getrandom(buf, num_bytes, flags) , buf
+#define __NR64ATRF1_getrandom              "%" PRIuSIZ
+#define __NR64ATRA1_getrandom(buf, num_bytes, flags) , num_bytes
+#define __NR64ATRF2_getrandom              "%#" PRIxSIZ
+#define __NR64ATRA2_getrandom(buf, num_bytes, flags) , (uintptr_t)(flags)
 #define __NR64ATRF0_memfd_create           "%q"
 #define __NR64ATRA0_memfd_create(name, flags) , (validate_readable_opt(name,1),name)
 #define __NR64ATRF1_memfd_create           "%#" PRIxSIZ "=%s%s%s"

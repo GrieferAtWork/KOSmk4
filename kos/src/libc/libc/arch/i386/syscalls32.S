@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbb3e6d9e */
+/* HASH CRC-32:0x912ace9a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -6200,19 +6200,19 @@ INTERN_FUNCTION(libc_sys_Xseccomp)
 END(libc_sys_Xseccomp)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xseccomp, libc_sys_Xseccomp)
 
-/* errno_t getrandom(int TODO_PROTOTYPE) */
+/* ssize_t getrandom(void *buf, size_t num_bytes, syscall_ulong_t flags) */
 .section .text.crt.syscall.getrandom
 INTERN_FUNCTION(libc_sys_getrandom)
 	movl   $(0x163), %eax
-	jmp    libc_x86_exec_syscall1
+	jmp    libc_x86_exec_syscall3
 END(libc_sys_getrandom)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_getrandom, libc_sys_getrandom)
 
-/* errno_t getrandom(int TODO_PROTOTYPE) */
+/* ssize_t getrandom(void *buf, size_t num_bytes, syscall_ulong_t flags) */
 .section .text.crt.syscall.Xgetrandom
 INTERN_FUNCTION(libc_sys_Xgetrandom)
 	movl   $(0x163), %eax
-	jmp    libc_x86_exec_Xsyscall1
+	jmp    libc_x86_exec_Xsyscall3
 END(libc_sys_Xgetrandom)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xgetrandom, libc_sys_Xgetrandom)
 

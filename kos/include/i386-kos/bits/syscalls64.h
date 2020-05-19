@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa8f7189e */
+/* HASH CRC-32:0xcb709aa2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -424,7 +424,7 @@
 /* @param: flags: Set of `RENAME_EXCHANGE,RENAME_NOREPLACE,RENAME_WHITEOUT' */
 #define SYS_renameat2              __NR_renameat2              /* errno_t renameat2(fd_t olddirfd, char const *oldpath, fd_t newdirfd, char const *newpath, syscall_ulong_t flags) */
 #define SYS_seccomp                __NR_seccomp                /* errno_t seccomp(int TODO_PROTOTYPE) */
-#define SYS_getrandom              __NR_getrandom              /* errno_t getrandom(int TODO_PROTOTYPE) */
+#define SYS_getrandom              __NR_getrandom              /* ssize_t getrandom(void *buf, size_t num_bytes, syscall_ulong_t flags) */
 #define SYS_memfd_create           __NR_memfd_create           /* fd_t memfd_create(char const *name, syscall_ulong_t flags) */
 #define SYS_kexec_file_load        __NR_kexec_file_load        /* errno_t kexec_file_load(int TODO_PROTOTYPE) */
 #define SYS_bpf                    __NR_bpf                    /* errno_t bpf(int TODO_PROTOTYPE) */

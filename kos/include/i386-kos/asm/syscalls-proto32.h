@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x22a0a28d */
+/* HASH CRC-32:0x2b4ed47f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -389,7 +389,7 @@
 #define __NRAC_sched_getattr           1
 #define __NRAC_renameat2               5
 #define __NRAC_seccomp                 1
-#define __NRAC_getrandom               1
+#define __NRAC_getrandom               3
 #define __NRAC_memfd_create            2
 #define __NRAC_bpf                     1
 #define __NRAC_execveat                5
@@ -850,7 +850,7 @@
 #define __NRRT_sched_getattr           (errno_t, __errno_t)
 #define __NRRT_renameat2               (errno_t, __errno_t)
 #define __NRRT_seccomp                 (errno_t, __errno_t)
-#define __NRRT_getrandom               (errno_t, __errno_t)
+#define __NRRT_getrandom               (ssize_t, __ssize_t)
 #define __NRRT_memfd_create            (fd_t, __fd_t)
 #define __NRRT_bpf                     (errno_t, __errno_t)
 #define __NRRT_execveat                (errno_t, __errno_t)
@@ -1716,7 +1716,9 @@
 #define __NRAT3_renameat2               (char const *, char const *)
 #define __NRAT4_renameat2               (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_seccomp                 (int, int)
-#define __NRAT0_getrandom               (int, int)
+#define __NRAT0_getrandom               (void *, void *)
+#define __NRAT1_getrandom               (size_t, __size_t)
+#define __NRAT2_getrandom               (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_memfd_create            (char const *, char const *)
 #define __NRAT1_memfd_create            (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_bpf                     (int, int)
@@ -2410,7 +2412,7 @@
 #define __NRAM_sched_getattr(a, b, c, d, e, f)           (int)a
 #define __NRAM_renameat2(a, b, c, d, e, f)               (__fd_t)a, (char const *)b, (__fd_t)c, (char const *)d, (__syscall_ulong_t)e
 #define __NRAM_seccomp(a, b, c, d, e, f)                 (int)a
-#define __NRAM_getrandom(a, b, c, d, e, f)               (int)a
+#define __NRAM_getrandom(a, b, c, d, e, f)               (void *)a, (__size_t)b, (__syscall_ulong_t)c
 #define __NRAM_memfd_create(a, b, c, d, e, f)            (char const *)a, (__syscall_ulong_t)b
 #define __NRAM_bpf(a, b, c, d, e, f)                     (int)a
 #define __NRAM_execveat(a, b, c, d, e, f)                (__fd_t)a, (char const *)b, (__HYBRID_PTR32(char const) const *)c, (__HYBRID_PTR32(char const) const *)d, (__atflag_t)e
@@ -2871,7 +2873,7 @@
 #define __NRAP_sched_getattr(a)                          (__syscall_ulong_t)a
 #define __NRAP_renameat2(a, b, c, d, e)                  (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NRAP_seccomp(a)                                (__syscall_ulong_t)a
-#define __NRAP_getrandom(a)                              (__syscall_ulong_t)a
+#define __NRAP_getrandom(a, b, c)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_memfd_create(a, b)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_bpf(a)                                    (__syscall_ulong_t)a
 #define __NRAP_execveat(a, b, c, d, e)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x94de34b2 */
+/* HASH CRC-32:0xcbf0f613 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -688,7 +688,7 @@ __CDECLARE_SC(,__pid_t,getppid,(void),())
 __CDECLARE_SC(,__syscall_slong_t,getpriority,(__syscall_ulong_t __which, __id_t __who),(__which,__who))
 #endif /* __CRT_HAVE_SC(getpriority) */
 #if __CRT_HAVE_SC(getrandom)
-__CDECLARE_SC(,__errno_t,getrandom,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_SC(,__ssize_t,getrandom,(void *__buf, __size_t __num_bytes, __syscall_ulong_t __flags),(__buf,__num_bytes,__flags))
 #endif /* __CRT_HAVE_SC(getrandom) */
 #if __CRT_HAVE_SC(getresgid)
 __CDECLARE_SC(,__errno_t,getresgid,(__uint16_t *__rgid, __uint16_t *__egid, __uint16_t *__sgid),(__rgid,__egid,__sgid))
@@ -2415,7 +2415,7 @@ __CDECLARE_XSC(,__pid_t,getppid,(void),())
 __CDECLARE_XSC(,__syscall_slong_t,getpriority,(__syscall_ulong_t __which, __id_t __who),(__which,__who))
 #endif /* __CRT_HAVE_XSC(getpriority) */
 #if __CRT_HAVE_XSC(getrandom)
-__CDECLARE_XSC(,__errno_t,getrandom,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_XSC(,__ssize_t,getrandom,(void *__buf, __size_t __num_bytes, __syscall_ulong_t __flags),(__buf,__num_bytes,__flags))
 #endif /* __CRT_HAVE_XSC(getrandom) */
 #if __CRT_HAVE_XSC(getresgid)
 __CDECLARE_XSC(,__errno_t,getresgid,(__uint16_t *__rgid, __uint16_t *__egid, __uint16_t *__sgid),(__rgid,__egid,__sgid))

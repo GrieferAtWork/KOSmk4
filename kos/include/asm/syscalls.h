@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa8026735 */
+/* HASH CRC-32:0x71e110d1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -334,7 +334,7 @@
 /* @param: flags: Set of `RENAME_EXCHANGE,RENAME_NOREPLACE,RENAME_WHITEOUT' */
 #define __NR_renameat2              0x114 /* errno_t renameat2(fd_t olddirfd, char const *oldpath, fd_t newdirfd, char const *newpath, syscall_ulong_t flags) */
 #define __NR_seccomp                0x115 /* errno_t seccomp(int TODO_PROTOTYPE) */
-#define __NR_getrandom              0x116 /* errno_t getrandom(int TODO_PROTOTYPE) */
+#define __NR_getrandom              0x116 /* ssize_t getrandom(void *buf, size_t num_bytes, syscall_ulong_t flags) */
 #define __NR_memfd_create           0x117 /* fd_t memfd_create(char const *name, syscall_ulong_t flags) */
 #define __NR_bpf                    0x118 /* errno_t bpf(int TODO_PROTOTYPE) */
 /* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
@@ -1155,7 +1155,7 @@
 #define __NRRC_sched_getattr          1
 #define __NRRC_renameat2              5
 #define __NRRC_seccomp                1
-#define __NRRC_getrandom              1
+#define __NRRC_getrandom              3
 #define __NRRC_memfd_create           2
 #define __NRRC_bpf                    1
 #define __NRRC_execveat               5

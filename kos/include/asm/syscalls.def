@@ -1390,7 +1390,7 @@ sched_getattr:(int TODO_PROTOTYPE) -> errno_t;
 [cp] renameat2:(fd_t olddirfd, char const *oldpath, fd_t newdirfd, char const *newpath, syscall_ulong_t flags) -> errno_t;
 
 seccomp:(int TODO_PROTOTYPE) -> errno_t;
-getrandom:(int TODO_PROTOTYPE) -> errno_t;
+getrandom:(void *buf, size_t num_bytes, syscall_ulong_t flags) -> ssize_t;
 memfd_create:(char const *name, [tostr(flagset(MFD_CLOEXEC, MFD_ALLOW_SEALING))] syscall_ulong_t flags) -> fd_t;
 bpf:(int TODO_PROTOTYPE) -> errno_t;
 

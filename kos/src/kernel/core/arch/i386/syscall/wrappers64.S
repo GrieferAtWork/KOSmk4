@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3ce05fa5 */
+/* HASH CRC-32:0x32b7ef93 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -9725,7 +9725,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_seccomp)
 	.cfi_endproc
 END(__x86_asm64_syscall_seccomp)
 
-/* errno_t getrandom(int TODO_PROTOTYPE) */
+/* ssize_t getrandom(void *buf, size_t num_bytes, syscall_ulong_t flags) */
 .section .text.x86.asm64_syscall.getrandom
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getrandom)
 	.cfi_startproc simple
@@ -23071,7 +23071,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_seccomp)
 	.cfi_endproc
 END(__x86_asm32_int80_seccomp)
 
-/* errno_t getrandom(int TODO_PROTOTYPE) */
+/* ssize_t getrandom(void *buf, size_t num_bytes, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.getrandom
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_getrandom)
 	.cfi_startproc simple
@@ -23088,6 +23088,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getrandom)
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_getrandom)
 	call   sys32_getrandom
 	popq_cfi_r %r11
@@ -29066,7 +29068,7 @@ END(__x86_asm32_sysenter_renameat2)
 /* errno_t seccomp(int TODO_PROTOTYPE) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_seccomp, __x86_asm32_int80_seccomp)
 
-/* errno_t getrandom(int TODO_PROTOTYPE) */
+/* ssize_t getrandom(void *buf, size_t num_bytes, syscall_ulong_t flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getrandom, __x86_asm32_int80_getrandom)
 
 /* fd_t memfd_create(char const *name, syscall_ulong_t flags) */
@@ -34523,10 +34525,12 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_seccomp)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_seccomp)
 
-/* errno_t getrandom(int TODO_PROTOTYPE) */
+/* ssize_t getrandom(void *buf, size_t num_bytes, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysrun32.getrandom
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getrandom)
 	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
 	movzlq 0(%rdi), %rdi
 	EXTERN(sys32_getrandom)
 	jmp    sys32_getrandom

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x47b195b1 */
+/* HASH CRC-32:0xe9e3444d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -13199,7 +13199,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_seccomp)
 	.cfi_endproc
 END(__x86_asm32_int80_seccomp)
 
-/* errno_t getrandom(int TODO_PROTOTYPE) */
+/* ssize_t getrandom(void *buf, size_t num_bytes, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.getrandom
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_getrandom)
 	.cfi_startproc simple
@@ -13218,14 +13218,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getrandom)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ecx
-	pushl_cfi_r %edx
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_getrandom)
 	call   sys_getrandom
 	popl_cfi_r %ebx
-	popl_cfi_r %edx
 	popl_cfi_r %ecx
+	popl_cfi_r %edx
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -30621,7 +30621,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_seccomp)
 	.cfi_endproc
 END(__x86_asm32_sysenter_seccomp)
 
-/* errno_t getrandom(int TODO_PROTOTYPE) */
+/* ssize_t getrandom(void *buf, size_t num_bytes, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysenter.getrandom
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getrandom)
 	.cfi_startproc simple
@@ -30640,14 +30640,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getrandom)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ecx
-	pushl_cfi_r %edx
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_getrandom)
 	call   sys_getrandom
 	popl_cfi_r %ebx
-	popl_cfi_r %edx
 	popl_cfi_r %ecx
+	popl_cfi_r %edx
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es

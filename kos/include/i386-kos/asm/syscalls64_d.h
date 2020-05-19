@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x249bdaa0 */
+/* HASH CRC-32:0x322a66a6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -421,7 +421,7 @@
 /* @param: flags: Set of `RENAME_EXCHANGE,RENAME_NOREPLACE,RENAME_WHITEOUT' */
 #define __NR64_renameat2              0x13c                          /* errno_t renameat2(fd_t olddirfd, char const *oldpath, fd_t newdirfd, char const *newpath, syscall_ulong_t flags) */
 #define __NR64_seccomp                0x13d                          /* errno_t seccomp(int TODO_PROTOTYPE) */
-#define __NR64_getrandom              0x13e                          /* errno_t getrandom(int TODO_PROTOTYPE) */
+#define __NR64_getrandom              0x13e                          /* ssize_t getrandom(void *buf, size_t num_bytes, syscall_ulong_t flags) */
 #define __NR64_memfd_create           0x13f                          /* fd_t memfd_create(char const *name, syscall_ulong_t flags) */
 #define __NR64_kexec_file_load        0x140                          /* errno_t kexec_file_load(int TODO_PROTOTYPE) */
 #define __NR64_bpf                    0x141                          /* errno_t bpf(int TODO_PROTOTYPE) */
@@ -1668,7 +1668,7 @@
 #define __NR64RC_sched_getattr          1
 #define __NR64RC_renameat2              5
 #define __NR64RC_seccomp                1
-#define __NR64RC_getrandom              1
+#define __NR64RC_getrandom              3
 #define __NR64RC_memfd_create           2
 #define __NR64RC_kexec_file_load        1
 #define __NR64RC_bpf                    1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd648f2bd */
+/* HASH CRC-32:0x7b9c1d77 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -781,7 +781,9 @@
 #define __NRAN3_renameat2               newpath
 #define __NRAN4_renameat2               flags
 #define __NRAN0_seccomp                 TODO_PROTOTYPE
-#define __NRAN0_getrandom               TODO_PROTOTYPE
+#define __NRAN0_getrandom               buf
+#define __NRAN1_getrandom               num_bytes
+#define __NRAN2_getrandom               flags
 #define __NRAN0_memfd_create            name
 #define __NRAN1_memfd_create            flags
 #define __NRAN0_bpf                     TODO_PROTOTYPE
@@ -2818,8 +2820,12 @@
 #define __NRATRA4_renameat2(olddirfd, oldpath, newdirfd, newpath, flags) , (uintptr_t)(flags)
 #define __NRATRF0_seccomp                 "%d"
 #define __NRATRA0_seccomp(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_getrandom               "%d"
-#define __NRATRA0_getrandom(TODO_PROTOTYPE) , TODO_PROTOTYPE
+#define __NRATRF0_getrandom               "%p"
+#define __NRATRA0_getrandom(buf, num_bytes, flags) , buf
+#define __NRATRF1_getrandom               "%" PRIuSIZ
+#define __NRATRA1_getrandom(buf, num_bytes, flags) , num_bytes
+#define __NRATRF2_getrandom               "%#" PRIxSIZ
+#define __NRATRA2_getrandom(buf, num_bytes, flags) , (uintptr_t)(flags)
 #define __NRATRF0_memfd_create            "%q"
 #define __NRATRA0_memfd_create(name, flags) , (validate_readable_opt(name,1),name)
 #define __NRATRF1_memfd_create            "%#" PRIxSIZ "=%s%s%s"
