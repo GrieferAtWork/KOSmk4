@@ -164,6 +164,7 @@
 
 
 #include <errno.h>
+#include <parts/errno.h>
 #define libc_seterrno_syserr(e)       (likely(!E_ISERR(e)) ? (e) : libc_seterrno((errno_t)-(syscall_slong_t)(syscall_ulong_t)(e)))
 #define libc_seterrno_syserr2(e, ERR) (likely(!E_ISERR(e)) ? (e) : (libc_seterrno((errno_t) - (syscall_slong_t)(syscall_ulong_t)(e)), (ERR)))
 #define ISSEP(x)           ((x) == '/') /* TODO: In DOS-mode, `\\' must also be accepted */
@@ -178,10 +179,22 @@
 #define ATTR_READMOSTLY   ATTR_SECTION(".data.read_mostly")
 #endif /* !ATTR_READMOSTLY */
 
+
+/* Re-bind errno memory locations. */
+#undef errno
+#undef __errno
 #undef __libc_geterrno
+#undef __libc_geterrno_or
 #undef __libc_seterrno
-#define __libc_geterrno   libc_geterrno
-#define __libc_seterrno   libc_seterrno
+#define errno                   (*libc_errno_p())
+#define __errno                 (*libc_errno_p())
+#define __libc_geterrno         libc_geterrno
+#define __libc_geterrno_or(alt) libc_geterrno()
+#define __libc_seterrno         libc_seterrno
+
+#undef ____errno_location_defined
+#define ____errno_location_defined 1
+#define __errno_location() libc_errno_p()
 
 #ifdef __CC__
 DECL_BEGIN
@@ -196,6 +209,7 @@ typedef __locale_t locale_t;
 typedef __errno_t errno_t;
 #endif /* !errno_t_defined */
 
+#ifndef __KERNEL__
 INTDEF NOBLOCK ATTR_CONST errno_t *NOTHROW(LIBCCALL libc_errno_p)(void);
 INTDEF NOBLOCK ATTR_PURE errno_t NOTHROW(LIBCCALL libc_geterrno)(void);
 INTDEF NOBLOCK ATTR_PURE errno_t NOTHROW(LIBCCALL libc_geterrno_safe)(void);
@@ -209,6 +223,19 @@ INTDEF void LIBCCALL libc_unimplemented(char const *__restrict name);
 #else
 #define CRT_UNIMPLEMENTED(name) (void)0
 #endif
+#else /* !__KERNEL__ */
+/* The kernel doesn't have an ERRNO binding */
+#undef libc_seterrno_syserr
+#undef libc_seterrno_syserr2
+#undef errno
+#undef __errno
+#undef __libc_geterrno
+#undef __libc_geterrno_or
+#undef __libc_seterrno
+#undef __errno_location
+#define __libc_geterrno_or(alt) alt
+#define __libc_seterrno(v) (void)0
+#endif /* __KERNEL__ */
 
 
 DECL_END

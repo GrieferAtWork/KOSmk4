@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e5f4e3c */
+/* HASH CRC-32:0xd4cd3e2a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,7 +50,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.swab") void
 NOTHROW_NCX(LIBCCALL libc_swab)(void const *__restrict from,
                                 void *__restrict to,
                                 __STDC_INT_AS_SSIZE_T n_bytes) {
-#line 1714 "kos/src/libc/magic/unistd.c"
+#line 1717 "kos/src/libc/magic/unistd.c"
 	n_bytes &= ~1;
 	while (n_bytes >= 2) {
 		byte_t a, b;

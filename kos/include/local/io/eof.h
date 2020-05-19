@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3ca5e770 */
+/* HASH CRC-32:0x5ff93ded */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,7 +51,7 @@ __CREDIRECT(,__off64_t,__NOTHROW_NCX,__localdep_lseek64,(__fd_t __fd, __off64_t 
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(eof) __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(eof))(__fd_t __fd) {
-#line 413 "kos/src/libc/magic/io.c"
+#line 418 "kos/src/libc/magic/io.c"
 	__INT64_TYPE__ __oldpos, __endpos;
 	__oldpos = __localdep_lseek64(__fd, 0, __SEEK_CUR);
 	if __unlikely(__oldpos < 0)

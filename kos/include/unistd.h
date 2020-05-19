@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdcd032f8 */
+/* HASH CRC-32:0x299f2def */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1846,6 +1846,7 @@ __CDECLARE(,int,__NOTHROW_RPC,acct,(char const *__name),(__name))
 #ifdef __CRT_HAVE_syscall
 __LIBC long int __NOTHROW_RPC(__VLIBCCALL syscall)(long int __sysno, ...) __CASMNAME_SAME("syscall");
 #endif /* syscall... */
+
 #ifdef __USE_KOS
 #if defined(__CRT_HAVE_syscall) && !defined(__NO_ASMNAME)
 __LIBC __LONG64_TYPE__ __NOTHROW_RPC(__VLIBCCALL syscall64)(__syscall_ulong_t __sysno, ...) __CASMNAME("syscall");
@@ -1853,6 +1854,41 @@ __LIBC __LONG64_TYPE__ __NOTHROW_RPC(__VLIBCCALL syscall64)(__syscall_ulong_t __
 __LIBC __LONG64_TYPE__ __NOTHROW_RPC(__VLIBCCALL syscall64)(__syscall_ulong_t __sysno, ...) __CASMNAME_SAME("syscall64");
 #endif /* syscall64... */
 #endif /* __USE_KOS */
+
+#ifndef __getentropy_defined
+#define __getentropy_defined 1
+#ifdef __CRT_HAVE_getentropy
+/* Similar to `getrandom(BUF, NUM_BYTES, GRND_RANDOM)', however
+ * the case where the calling thread is interrupted, causing an
+ * less than `NUM_BYTES' of data to be read is handled by reading
+ * more random data until all of `NUM_BYTES' have been read.
+ * Note that portable applications should be aware that certain
+ * implementations of this function disallow calls where `NUM_BYTES'
+ * is larger than `256'
+ * Also note that any other than `EFAULT' and `ENOSYS' are translated into `EIO'
+ * @return:  0: Success
+ * @return: -1: Error (see `errno') */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,getentropy,(void *__buf, size_t __num_bytes),(__buf,__num_bytes))
+#else /* LIBC: getentropy */
+#include <asm/random.h>
+#if defined(__GRND_RANDOM) && defined(__CRT_HAVE_getrandom)
+#include <local/sys.random/getentropy.h>
+/* Similar to `getrandom(BUF, NUM_BYTES, GRND_RANDOM)', however
+ * the case where the calling thread is interrupted, causing an
+ * less than `NUM_BYTES' of data to be read is handled by reading
+ * more random data until all of `NUM_BYTES' have been read.
+ * Note that portable applications should be aware that certain
+ * implementations of this function disallow calls where `NUM_BYTES'
+ * is larger than `256'
+ * Also note that any other than `EFAULT' and `ENOSYS' are translated into `EIO'
+ * @return:  0: Success
+ * @return: -1: Error (see `errno') */
+__NAMESPACE_LOCAL_USING_OR_IMPL(getentropy, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL getentropy)(void *__buf, size_t __num_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getentropy))(__buf, __num_bytes); })
+#else /* CUSTOM: getentropy */
+#undef __getentropy_defined
+#endif /* getentropy... */
+#endif /* getentropy... */
+#endif /* !__getentropy_defined */
 #endif /* __USE_MISC */
 
 #if defined(__USE_MISC) || \

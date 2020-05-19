@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x59cc0e82 */
+/* HASH CRC-32:0xfbb0a14c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1055,6 +1055,7 @@ __CRT_FUNCTION(getdirentries64,1,(IS_DEFINED(_DIRENT_MATCHES_DIRENT64),getdirent
 __CRT_FUNCTION(getdomainname,0,(),2,(char *,name,size_t,buflen),int)
 __CRT_FUNCTION(getdtablesize,0,(),0,(),int)
 __CRT_FUNCTION(getegid,0,(),0,(),gid_t)
+__CRT_FUNCTION(getentropy,0,(),2,(void *,buf,size_t,num_bytes),int)
 __CRT_FUNCTION(getenv,0,(),1,(char const *,varname),char *)
 __CRT_FUNCTION(getenv_s,0,(),4,(size_t *,psize,char *,buf,rsize_t,buflen,char const *,varname),errno_t)
 __CRT_FUNCTION(geteuid,0,(),0,(),uid_t)
@@ -1123,6 +1124,7 @@ __CRT_FUNCTION(getpwnam,0,(),1,(const char *,name),struct passwd *)
 __CRT_FUNCTION(getpwnam_r,0,(),5,(const char *__restrict,name,struct passwd *__restrict,resultbuf,char *__restrict,buffer,size_t,buflen,struct passwd **__restrict,result),int)
 __CRT_FUNCTION(getpwuid,0,(),1,(uid_t,uid),struct passwd *)
 __CRT_FUNCTION(getpwuid_r,0,(),5,(__uid_t,__uid,struct passwd *__restrict,resultbuf,char *__restrict,buffer,size_t,buflen,struct passwd **__restrict,result),int)
+__CRT_FUNCTION(getrandom,0,(),3,(void *,buf,size_t,num_bytes,unsigned int,flags),ssize_t)
 __CRT_FUNCTION(getresgid,0,(),3,(gid_t *,rgid,gid_t *,egid,gid_t *,sgid),int)
 __CRT_FUNCTION(getresuid,0,(),3,(uid_t *,ruid,uid_t *,euid,uid_t *,suid),int)
 __CRT_FUNCTION(getrlimit,0,(),2,(__rlimit_resource_t,resource,struct rlimit *,rlimits),int)

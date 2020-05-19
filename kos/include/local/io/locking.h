@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcb210e7c */
+/* HASH CRC-32:0x645485a1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,7 +44,7 @@ __LOCAL_LIBC(locking) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(locking))(__fd_t __fd,
                                                      int __lockmode,
                                                      __LONG32_TYPE__ __numofbytes) {
-#line 367 "kos/src/libc/magic/io.c"
+#line 372 "kos/src/libc/magic/io.c"
 	return __localdep_lockf64(__fd, __lockmode, (__off64_t)__length);
 }
 __NAMESPACE_LOCAL_END

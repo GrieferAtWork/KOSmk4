@@ -234,8 +234,13 @@ _sopen_s:([nonnull] $fd_t *fd,
 #endif /* !EINVAL */
 	}
 	result = sopen(filename, oflags, sflags, mode);
-	if (result < 0)
+	if (result < 0) {
+#ifdef __libc_geterrno
 		return __libc_geterrno();
+#else /* __libc_geterrno */
+		return 1;
+#endif /* !__libc_geterrno */
+	}
 	*fd = result;
 	return 0;
 }

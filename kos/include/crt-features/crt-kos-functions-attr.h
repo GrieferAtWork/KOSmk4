@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc2992c84 */
+/* HASH CRC-32:0x48708019 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2078,6 +2078,7 @@
 #define __CRT_ATTR_NOTHROW_NCX_getdomainname 1
 #define __CRT_ATTR_NOTHROW_NCX_getdtablesize 1
 #define __CRT_ATTR_NOTHROW_NCX_getegid 1
+#define __CRT_ATTR_NOTHROW_NCX_getentropy 1
 #define __CRT_ATTR_NOTHROW_NCX_getenv 1
 #define __CRT_ATTR_NOTHROW_NCX_getenv_s 1
 #define __CRT_ATTR_NOTHROW_NCX_geteuid 1
@@ -2100,6 +2101,7 @@
 #define __CRT_ATTR_NOTHROW_NCX_getpid 1
 #define __CRT_ATTR_NOTHROW_NCX_getppid 1
 #define __CRT_ATTR_NOTHROW_NCX_getpriority 1
+#define __CRT_ATTR_NOTHROW_NCX_getrandom 1
 #define __CRT_ATTR_NOTHROW_NCX_getresgid 1
 #define __CRT_ATTR_NOTHROW_NCX_getresuid 1
 #define __CRT_ATTR_NOTHROW_NCX_getrlimit 1

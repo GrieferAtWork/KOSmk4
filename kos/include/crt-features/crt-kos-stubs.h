@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa4f259ef */
+/* HASH CRC-32:0x4f31d846 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -221,6 +221,7 @@
 #define __CRT_STUB_getpwnam_r 1
 #define __CRT_STUB_getpwuid 1
 #define __CRT_STUB_getpwuid_r 1
+#define __CRT_STUB_getrandom 1
 #define __CRT_STUB_getrlimit64 1
 #define __CRT_STUB_getrpcbyname 1
 #define __CRT_STUB_getrpcbyname_r 1

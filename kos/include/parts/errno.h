@@ -550,6 +550,10 @@ __LIBC __ATTR_THREAD int errno;
 #endif
 #endif /* !__errno */
 
+#if !defined(__libc_geterrno) && defined(__errno)
+#define __libc_geterrno() __errno
+#endif /* !__libc_geterrno && __errno */
+
 #ifndef __libc_geterrno_or
 #ifdef __errno
 #define __libc_geterrno_or(alt) __errno

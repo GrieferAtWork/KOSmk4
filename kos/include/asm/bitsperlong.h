@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _ASM_BITS_PER_LONG
-#define _ASM_BITS_PER_LONG 1
+#ifndef _ASM_BITS_PER_LONG_H
+#define _ASM_BITS_PER_LONG_H 1
 
 #ifndef __BITS_PER_LONG
 #include <hybrid/typecore.h>
@@ -35,4 +35,4 @@
 #endif
 #endif /* !__BITS_PER_LONG */
 
-#endif /* !_ASM_BITS_PER_LONG */
+#endif /* !_ASM_BITS_PER_LONG_H */

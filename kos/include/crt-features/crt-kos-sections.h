@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f8f3b98 */
+/* HASH CRC-32:0x26d50465 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3895,7 +3895,9 @@
 #define __CRT_SECTION_ftok                                  __CRT_SECTINFO_unsorted                                 /* .text.crt.unsorted.ftok */
 #define __CRT_SECTION_get_exception_handler                 __CRT_SECTINFO_unsorted                                 /* .text.crt.unsorted.get_exception_handler */
 #define __CRT_SECTION_getcontext                            __CRT_SECTINFO_unsorted                                 /* .text.crt.unsorted.getcontext */
+#define __CRT_SECTION_getentropy                            __CRT_SECTINFO_unsorted                                 /* .text.crt.unsorted.getentropy */
 #define __CRT_SECTION_getifaddrs                            __CRT_SECTINFO_unsorted                                 /* .text.crt.unsorted.getifaddrs */
+#define __CRT_SECTION_getrandom                             __CRT_SECTINFO_unsorted                                 /* .text.crt.unsorted.getrandom */
 #define __CRT_SECTION_getxattr                              __CRT_SECTINFO_unsorted                                 /* .text.crt.unsorted.getxattr */
 #define __CRT_SECTION_index                                 __CRT_SECTINFO_unsorted                                 /* .text.crt.unsorted.index */
 #define __CRT_SECTION_lgetxattr                             __CRT_SECTINFO_unsorted                                 /* .text.crt.unsorted.lgetxattr */

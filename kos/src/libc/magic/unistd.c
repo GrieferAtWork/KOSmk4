@@ -1613,11 +1613,14 @@ endusershell:();
 [cp][section(.text.crt.system.utility)]
 syscall:(long int sysno, ...) -> long int;
 
+%
 %#ifdef __USE_KOS
 [cp][section(.text.crt.system.utility)][preferred_alias(syscall)]
 syscall64:(__syscall_ulong_t sysno, ...) -> __LONG64_TYPE__;
 %#endif /* __USE_KOS */
+%
 
+%[insert:extern(getentropy)]
 %#endif /* __USE_MISC */
 
 %

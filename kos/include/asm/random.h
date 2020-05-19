@@ -1,4 +1,3 @@
-/* HASH CRC-32:0x45d7e252 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,18 +17,16 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local__get_osfhandle_defined
-#ifndef __CRT_DOS
-#define __local__get_osfhandle_defined 1
+#ifndef _ASM_RANDOM_H
+#define _ASM_RANDOM_H 1
+
 #include <__crt.h>
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_get_osfhandle) __ATTR_PURE __ATTR_WUNUSED __INTPTR_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_get_osfhandle))(__fd_t __fd) {
-#line 327 "kos/src/libc/magic/io.c"
-	__COMPILER_IMPURE();
-	return (__INTPTR_TYPE__)__fd;
-}
-__NAMESPACE_LOCAL_END
-#endif /* !__CRT_DOS */
-#endif /* !__local__get_osfhandle_defined */
+
+/* Flags accepted by `getrandom(2)' */
+#if defined(__KOS__) || defined(__linux__) || defined(__CRT_KOS) || defined(__CRT_KOS_KERNEL) || defined(__CRT_GLC)
+#define __GRND_NONBLOCK 0x01 /* Don't block if no random data is available (right now) */
+#define __GRND_RANDOM   0x02 /* Use /dev/random, rather than /dev/urandom */
+#endif /* __KOS__ || __linux__ || __CRT_KOS || __CRT_KOS_KERNEL || __CRT_GLC */
+
+
+#endif /* !_ASM_RANDOM_H */

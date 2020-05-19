@@ -2387,6 +2387,7 @@
 #define __CRT_HAVE_getdomainname 1
 #define __CRT_HAVE_getdtablesize 1
 #define __CRT_HAVE_getegid 1
+#define __CRT_HAVE_getentropy 1
 #define __CRT_HAVE_getenv 1
 #define __CRT_HAVE_getenv_s 1
 #define __CRT_HAVE_geteuid 1
@@ -2456,6 +2457,7 @@
 #define __CRT_HAVE_getpwnam_r 1
 #define __CRT_HAVE_getpwuid 1
 #define __CRT_HAVE_getpwuid_r 1
+#define __CRT_HAVE_getrandom 1
 #define __CRT_HAVE_getresgid 1
 #define __CRT_HAVE_getresuid 1
 #define __CRT_HAVE_getrlimit 1
