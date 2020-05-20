@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x365c0873 */
+/* HASH CRC-32:0x3cbd55a3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -211,7 +211,7 @@
 #define __NRAC_setresgid               3
 #define __NRAC_getresgid               3
 #define __NRAC_prctl                   1
-#define __NRAC_rt_sigreturn            4
+#define __NRAC_rt_sigreturn            6
 #define __NRAC_rt_sigaction            4
 #define __NRAC_rt_sigprocmask          4
 #define __NRAC_rt_sigpending           2
@@ -1257,10 +1257,12 @@
 #define __NRAT1_getresgid               (uint16_t *, __uint16_t *)
 #define __NRAT2_getresgid               (uint16_t *, __uint16_t *)
 #define __NRAT0_prctl                   (int, int)
-#define __NRAT0_rt_sigreturn            (struct fpustate const *, struct fpustate const *)
-#define __NRAT1_rt_sigreturn            (struct __sigset_struct const *, struct __sigset_struct const *)
-#define __NRAT2_rt_sigreturn            (struct rpc_syscall_info const *, struct rpc_syscall_info const *)
-#define __NRAT3_rt_sigreturn            (struct ucpustate const *, struct ucpustate const *)
+#define __NRAT0_rt_sigreturn            (struct fpustate32 const *, struct fpustate32 const *)
+#define __NRAT1_rt_sigreturn            (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT2_rt_sigreturn            (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT3_rt_sigreturn            (struct __sigset_struct const *, struct __sigset_struct const *)
+#define __NRAT4_rt_sigreturn            (struct rpc_syscall_info32 const *, struct rpc_syscall_info32 const *)
+#define __NRAT5_rt_sigreturn            (struct ucpustate32 const *, struct ucpustate32 const *)
 #define __NRAT0_rt_sigaction            (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT1_rt_sigaction            (struct sigactionx32 const *, struct __sigactionx32 const *)
 #define __NRAT2_rt_sigaction            (struct sigactionx32 *, struct __sigactionx32 *)
@@ -2234,7 +2236,7 @@
 #define __NRAM_setresgid(a, b, c, d, e, f)               (__uint16_t)a, (__uint16_t)b, (__uint16_t)c
 #define __NRAM_getresgid(a, b, c, d, e, f)               (__uint16_t *)a, (__uint16_t *)b, (__uint16_t *)c
 #define __NRAM_prctl(a, b, c, d, e, f)                   (int)a
-#define __NRAM_rt_sigreturn(a, b, c, d, e, f)            (struct fpustate const *)a, (struct __sigset_struct const *)b, (struct rpc_syscall_info const *)c, (struct ucpustate const *)d
+#define __NRAM_rt_sigreturn(a, b, c, d, e, f)            (struct fpustate32 const *)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (struct __sigset_struct const *)d, (struct rpc_syscall_info32 const *)e, (struct ucpustate32 const *)f
 #define __NRAM_rt_sigaction(a, b, c, d, e, f)            (__syscall_ulong_t)a, (struct __sigactionx32 const *)b, (struct __sigactionx32 *)c, (__size_t)d
 #define __NRAM_rt_sigprocmask(a, b, c, d, e, f)          (__syscall_ulong_t)a, (struct __sigset_struct const *)b, (struct __sigset_struct *)c, (__size_t)d
 #define __NRAM_rt_sigpending(a, b, c, d, e, f)           (struct __sigset_struct *)a, (__size_t)b
@@ -2695,7 +2697,7 @@
 #define __NRAP_setresgid(a, b, c)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_getresgid(a, b, c)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_prctl(a)                                  (__syscall_ulong_t)a
-#define __NRAP_rt_sigreturn(a, b, c, d)                  (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NRAP_rt_sigreturn(a, b, c, d, e, f)            (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
 #define __NRAP_rt_sigaction(a, b, c, d)                  (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NRAP_rt_sigprocmask(a, b, c, d)                (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NRAP_rt_sigpending(a, b)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b

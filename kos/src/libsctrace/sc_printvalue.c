@@ -846,6 +846,39 @@ err:
 	return temp;
 }
 
+PRIVATE ATTR_UNUSED ssize_t CC
+print_timeval(pformatprinter printer, void *arg,
+              struct timeval const *__restrict ts) {
+	ssize_t result;
+	result = format_printf(printer, arg,
+	                       "{" SYNSPACE SYNFIELD("tv_sec") "%" PRIdN(__SIZEOF_TIME64_T__)
+	                       "," SYNSPACE SYNFIELD("tv_usec") "%" PRIuN(__SIZEOF_SYSCALL_LONG_T__)
+	                       SYNSPACE "}",
+	                       ts->tv_sec, ts->tv_usec);
+	return result;
+}
+
+PRIVATE ATTR_UNUSED ssize_t CC
+print_timeval_vector(pformatprinter printer, void *arg,
+                     struct timeval const *__restrict tsv,
+                     size_t count) {
+	size_t i;
+	ssize_t temp, result;
+	result = DOPRINT("[");
+	if unlikely(result < 0)
+		goto done;
+	for (i = 0; i < count; ++i) {
+		if (i != 0)
+			PRINT("," SYNSPACE2);
+		DO(print_timeval(printer, arg, &tsv[i]));
+	}
+	PRINT("]");
+done:
+	return result;
+err:
+	return temp;
+}
+
 
 
 
@@ -982,12 +1015,6 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	// TODO: #define HAVE_SC_REPR_STRUCT_SPAWN_ACTIONSX32 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_SPAWN_ACTIONSX64 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_TERMIOS 1
-	// TODO: #define HAVE_SC_REPR_STRUCT_TIMEVALX32 1
-	// TODO: #define HAVE_SC_REPR_STRUCT_TIMEVALX32_64 1
-	// TODO: #define HAVE_SC_REPR_STRUCT_TIMEVALX32_64_VEC2 1
-	// TODO: #define HAVE_SC_REPR_STRUCT_TIMEVALX32_VEC2 1
-	// TODO: #define HAVE_SC_REPR_STRUCT_TIMEVALX64 1
-	// TODO: #define HAVE_SC_REPR_STRUCT_TIMEVALX64_VEC2 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_TIMEZONE 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_UCPUSTATE 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_UCPUSTATE32 1
@@ -1010,6 +1037,144 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	// TODO: #define HAVE_SC_REPR_WAITFLAG 1
 	// TODO: #define HAVE_SC_REPR_WAITID_OPTIONS 1
 	// TODO: #define HAVE_SC_REPR_XATTR_FLAGS 1
+
+
+#define DO_REPR_STRUCT_TIMEVAL_VEC2(struct_timeval_typecode)                      \
+	do {                                                                          \
+		struct timeval tsv[2];                                                    \
+		USER UNCHECKED struct_timeval_typecode *utms;                             \
+		utms = (USER UNCHECKED struct_timeval_typecode *)(uintptr_t)value.sv_u64; \
+		if unlikely(!utms)                                                        \
+			goto do_null_pointer;                                                 \
+		validate_readable(utms, 2 * sizeof(struct_timeval_typecode));             \
+		COMPILER_READ_BARRIER();                                                  \
+		tsv[0].tv_sec  = (time_t)utms[0].tv_sec;                                  \
+		tsv[0].tv_usec = (syscall_ulong_t)utms[0].tv_usec;                        \
+		tsv[1].tv_sec  = (time_t)utms[1].tv_sec;                                  \
+		tsv[1].tv_usec = (syscall_ulong_t)utms[1].tv_usec;                        \
+		COMPILER_READ_BARRIER();                                                  \
+		result = print_timeval_vector(printer, arg, tsv, 2);                      \
+	} __WHILE0
+#ifdef HAVE_SC_REPR_STRUCT_TIMEVAL_VEC2
+	case SC_REPR_STRUCT_TIMEVAL_VEC2:
+		DO_REPR_STRUCT_TIMEVAL_VEC2(struct timeval);
+		break;
+#endif /* HAVE_SC_REPR_STRUCT_TIMEVAL_VEC2 */
+
+#ifdef HAVE_SC_REPR_STRUCT_TIMEVAL32_VEC2
+	case SC_REPR_STRUCT_TIMEVAL32_VEC2:
+		DO_REPR_STRUCT_TIMEVAL_VEC2(struct timeval32);
+		break;
+#endif /* HAVE_SC_REPR_STRUCT_TIMEVAL32_VEC2 */
+
+#ifdef HAVE_SC_REPR_STRUCT_TIMEVAL64_VEC2
+	case SC_REPR_STRUCT_TIMEVAL64_VEC2:
+		DO_REPR_STRUCT_TIMEVAL_VEC2(struct timeval64);
+		break;
+#endif /* HAVE_SC_REPR_STRUCT_TIMEVAL64_VEC2 */
+
+#ifdef HAVE_SC_REPR_STRUCT_TIMEVALX32_VEC2
+	case SC_REPR_STRUCT_TIMEVALX32_VEC2:
+		DO_REPR_STRUCT_TIMEVAL_VEC2(struct timevalx32);
+		break;
+#endif /* HAVE_SC_REPR_STRUCT_TIMEVALX32_VEC2 */
+
+#ifdef HAVE_SC_REPR_STRUCT_TIMEVALX32_64_VEC2
+	case SC_REPR_STRUCT_TIMEVALX32_64_VEC2:
+		DO_REPR_STRUCT_TIMEVAL_VEC2(struct timevalx32_64);
+		break;
+#endif /* HAVE_SC_REPR_STRUCT_TIMEVALX32_64_VEC2 */
+
+#ifdef HAVE_SC_REPR_STRUCT_TIMEVALX64_VEC2
+	case SC_REPR_STRUCT_TIMEVALX64_VEC2:
+		DO_REPR_STRUCT_TIMEVAL_VEC2(struct timevalx64);
+		break;
+#endif /* HAVE_SC_REPR_STRUCT_TIMEVALX64_VEC2 */
+#undef DO_REPR_STRUCT_TIMEVAL_VEC2
+
+
+#define DO_REPR_STRUCT_TIMEVAL(struct_timeval_typecode)                           \
+	do {                                                                          \
+		struct timeval ts;                                                        \
+		USER UNCHECKED struct_timeval_typecode *utms;                             \
+		utms = (USER UNCHECKED struct_timeval_typecode *)(uintptr_t)value.sv_u64; \
+		if unlikely(!utms)                                                        \
+			goto do_null_pointer;                                                 \
+		validate_readable(utms, sizeof(struct_timeval_typecode));                 \
+		COMPILER_READ_BARRIER();                                                  \
+		ts.tv_sec  = (time_t)utms->tv_sec;                                        \
+		ts.tv_usec = (syscall_ulong_t)utms->tv_usec;                              \
+		COMPILER_READ_BARRIER();                                                  \
+		result = print_timeval(printer, arg, &ts);                                \
+	} __WHILE0
+
+#if defined(HAVE_SC_REPR_STRUCT_TIMEVAL) || defined(NEED_do_struct_timeval)
+#ifdef HAVE_SC_REPR_STRUCT_TIMEVAL
+	case SC_REPR_STRUCT_TIMEVAL:
+#endif /* HAVE_SC_REPR_STRUCT_TIMEVAL */
+#ifdef NEED_do_struct_timeval
+do_struct_timeval:
+#endif /* NEED_do_struct_timeval */
+		DO_REPR_STRUCT_TIMEVAL(struct timeval);
+		break;
+#endif /* HAVE_SC_REPR_STRUCT_TIMEVAL || NEED_do_struct_timeval */
+
+#if defined(HAVE_SC_REPR_STRUCT_TIMEVAL32) || defined(NEED_do_struct_timeval32)
+#ifdef HAVE_SC_REPR_STRUCT_TIMEVAL32
+	case SC_REPR_STRUCT_TIMEVAL32:
+#endif /* HAVE_SC_REPR_STRUCT_TIMEVAL32 */
+#ifdef NEED_do_struct_timeval32
+do_struct_timeval32:
+#endif /* NEED_do_struct_timeval32 */
+		DO_REPR_STRUCT_TIMEVAL(struct timeval32);
+		break;
+#endif /* HAVE_SC_REPR_STRUCT_TIMEVAL32 || NEED_do_struct_timeval32 */
+
+#if defined(HAVE_SC_REPR_STRUCT_TIMEVAL64) || defined(NEED_do_struct_timeval64)
+#ifdef HAVE_SC_REPR_STRUCT_TIMEVAL64
+	case SC_REPR_STRUCT_TIMEVAL64:
+#endif /* HAVE_SC_REPR_STRUCT_TIMEVAL64 */
+#ifdef NEED_do_struct_timeval64
+do_struct_timeval64:
+#endif /* NEED_do_struct_timeval64 */
+		DO_REPR_STRUCT_TIMEVAL(struct timeval64);
+		break;
+#endif /* HAVE_SC_REPR_STRUCT_TIMEVAL64 || NEED_do_struct_timeval64 */
+
+#if defined(HAVE_SC_REPR_STRUCT_TIMEVALX32) || defined(NEED_do_struct_timevalx32)
+#ifdef HAVE_SC_REPR_STRUCT_TIMEVALX32
+	case SC_REPR_STRUCT_TIMEVALX32:
+#endif /* HAVE_SC_REPR_STRUCT_TIMEVALX32 */
+#ifdef NEED_do_struct_timevalx32
+do_struct_timevalx32:
+#endif /* NEED_do_struct_timevalx32 */
+		DO_REPR_STRUCT_TIMEVAL(struct timevalx32);
+		break;
+#endif /* HAVE_SC_REPR_STRUCT_TIMEVALX32 || NEED_do_struct_timevalx32 */
+
+#if defined(HAVE_SC_REPR_STRUCT_TIMEVALX32_64) || defined(NEED_do_struct_timevalx32_64)
+#ifdef HAVE_SC_REPR_STRUCT_TIMEVALX32_64
+	case SC_REPR_STRUCT_TIMEVALX32_64:
+#endif /* HAVE_SC_REPR_STRUCT_TIMEVALX32_64 */
+#ifdef NEED_do_struct_timevalx32_64
+do_struct_timevalx32_64:
+#endif /* NEED_do_struct_timevalx32_64 */
+		DO_REPR_STRUCT_TIMEVAL(struct timevalx32_64);
+		break;
+#endif /* HAVE_SC_REPR_STRUCT_TIMEVALX32_64 || NEED_do_struct_timevalx32_64 */
+
+#if defined(HAVE_SC_REPR_STRUCT_TIMEVALX64) || defined(NEED_do_struct_timevalx64)
+#ifdef HAVE_SC_REPR_STRUCT_TIMEVALX64
+	case SC_REPR_STRUCT_TIMEVALX64:
+#endif /* HAVE_SC_REPR_STRUCT_TIMEVALX64 */
+#ifdef NEED_do_struct_timevalx64
+do_struct_timevalx64:
+#endif /* NEED_do_struct_timevalx64 */
+		DO_REPR_STRUCT_TIMEVAL(struct timevalx64);
+		break;
+#endif /* HAVE_SC_REPR_STRUCT_TIMEVALX64 || NEED_do_struct_timevalx64 */
+#undef DO_REPR_STRUCT_TIMEVAL
+
 
 
 #define DO_REPR_STRUCT_TIMESPEC_VEC2_OR_3(struct_timespec_typecode)                \
@@ -1135,7 +1300,7 @@ libsc_printvalue(pformatprinter printer, void *arg,
 #if defined(HAVE_SC_REPR_STRUCT_TIMESPEC) || defined(NEED_do_struct_timespec)
 #ifdef HAVE_SC_REPR_STRUCT_TIMESPEC
 	case SC_REPR_STRUCT_TIMESPEC:
-#endif /* defined(HAVE_SC_REPR_STRUCT_TIMESPEC) || defined(NEED_do_struct_timespec#ifdef HAVE_SC_REPR_STRUCT_TIMESPEC */
+#endif /* HAVE_SC_REPR_STRUCT_TIMESPEC */
 #ifdef NEED_do_struct_timespec
 do_struct_timespec:
 #endif /* NEED_do_struct_timespec */

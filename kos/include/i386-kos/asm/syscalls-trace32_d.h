@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc3a894e7 */
+/* HASH CRC-32:0x82ac6bfb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -324,9 +324,11 @@
 #define __NR32AN2_getresgid               sgid
 #define __NR32AN0_prctl                   TODO_PROTOTYPE
 #define __NR32AN0_rt_sigreturn            restore_fpu
-#define __NR32AN1_rt_sigreturn            restore_sigmask
-#define __NR32AN2_rt_sigreturn            sc_info
-#define __NR32AN3_rt_sigreturn            restore_cpu
+#define __NR32AN1_rt_sigreturn            unused1
+#define __NR32AN2_rt_sigreturn            unused2
+#define __NR32AN3_rt_sigreturn            restore_sigmask
+#define __NR32AN4_rt_sigreturn            sc_info
+#define __NR32AN5_rt_sigreturn            restore_cpu
 #define __NR32AN0_rt_sigaction            signo
 #define __NR32AN1_rt_sigaction            act
 #define __NR32AN2_rt_sigaction            oact
@@ -1615,10 +1617,12 @@
 #define __NR32RTR_getresgid                SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_prctl                   SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NR32RTR_prctl                    SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_rt_sigreturn            SC_REPR_STRUCT_FPUSTATE                                              /* restore_fpu */ 
-#define __NR32ATR1_rt_sigreturn            SC_REPR_STRUCT_SIGSET                                                /* restore_sigmask */ 
-#define __NR32ATR2_rt_sigreturn            SC_REPR_STRUCT_RPC_SYSCALL_INFO                                      /* sc_info */ 
-#define __NR32ATR3_rt_sigreturn            SC_REPR_STRUCT_UCPUSTATE                                             /* restore_cpu */ 
+#define __NR32ATR0_rt_sigreturn            SC_REPR_STRUCT_FPUSTATE32                                            /* restore_fpu */ 
+#define __NR32ATR1_rt_sigreturn            SC_REPR_SYSCALL_ULONG_T                                              /* unused1 */ 
+#define __NR32ATR2_rt_sigreturn            SC_REPR_SYSCALL_ULONG_T                                              /* unused2 */ 
+#define __NR32ATR3_rt_sigreturn            SC_REPR_STRUCT_SIGSET                                                /* restore_sigmask */ 
+#define __NR32ATR4_rt_sigreturn            SC_REPR_STRUCT_RPC_SYSCALL_INFO32                                    /* sc_info */ 
+#define __NR32ATR5_rt_sigreturn            SC_REPR_STRUCT_UCPUSTATE32                                           /* restore_cpu */ 
 #define __NR32RTR_rt_sigreturn             SC_REPR_INT                                                          /* return */
 #define __NR32ATR0_rt_sigaction            SC_REPR_SIGNO                                                        /* signo */ 
 #define __NR32ATR1_rt_sigaction            SC_REPR_STRUCT_SIGACTIONX32                                          /* act */ 

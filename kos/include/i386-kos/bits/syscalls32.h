@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xef36d338 */
+/* HASH CRC-32:0x658450ca */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -238,7 +238,13 @@
 #define SYS_setresgid               __NR_setresgid               /* errno_t setresgid(uint16_t rgid, uint16_t egid, uint16_t sgid) */
 #define SYS_getresgid               __NR_getresgid               /* errno_t getresgid(uint16_t *rgid, uint16_t *egid, uint16_t *sgid) */
 #define SYS_prctl                   __NR_prctl                   /* errno_t prctl(int TODO_PROTOTYPE) */
-#define SYS_rt_sigreturn            __NR_rt_sigreturn            /* void rt_sigreturn(struct fpustate const *restore_fpu, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info const *sc_info, struct ucpustate const *restore_cpu) */
+/* Restore the specified register state when returning from a signal handler
+ * Note that the order and locations of arguments taken by this system call
+ * are of great importance, as they must match what is encoded by the kernel
+ * within `sighand_raise_signal()'
+ * The order chosen is also important, as it is selected such that arguments
+ * are only passed through registers that are preserved by CDECL */
+#define SYS_rt_sigreturn            __NR_rt_sigreturn            /* void rt_sigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info32 const *sc_info, struct ucpustate32 const *restore_cpu) */
 #define SYS_rt_sigaction            __NR_rt_sigaction            /* errno_t rt_sigaction(syscall_ulong_t signo, struct sigactionx32 const *act, struct sigactionx32 *oact, size_t sigsetsize) */
 /* @param: how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
 #define SYS_rt_sigprocmask          __NR_rt_sigprocmask          /* errno_t rt_sigprocmask(syscall_ulong_t how, struct __sigset_struct const *set, struct __sigset_struct *oset, size_t sigsetsize) */

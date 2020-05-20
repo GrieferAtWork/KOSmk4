@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x65eb0009 */
+/* HASH CRC-32:0x1e7d4964 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -324,9 +324,11 @@
 #define __NRAN2_getresgid               sgid
 #define __NRAN0_prctl                   TODO_PROTOTYPE
 #define __NRAN0_rt_sigreturn            restore_fpu
-#define __NRAN1_rt_sigreturn            restore_sigmask
-#define __NRAN2_rt_sigreturn            sc_info
-#define __NRAN3_rt_sigreturn            restore_cpu
+#define __NRAN1_rt_sigreturn            unused1
+#define __NRAN2_rt_sigreturn            unused2
+#define __NRAN3_rt_sigreturn            restore_sigmask
+#define __NRAN4_rt_sigreturn            sc_info
+#define __NRAN5_rt_sigreturn            restore_cpu
 #define __NRAN0_rt_sigaction            signo
 #define __NRAN1_rt_sigaction            act
 #define __NRAN2_rt_sigaction            oact
@@ -1615,10 +1617,12 @@
 #define __NRRTR_getresgid                SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_prctl                   SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NRRTR_prctl                    SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_rt_sigreturn            SC_REPR_STRUCT_FPUSTATE                                              /* restore_fpu */ 
-#define __NRATR1_rt_sigreturn            SC_REPR_STRUCT_SIGSET                                                /* restore_sigmask */ 
-#define __NRATR2_rt_sigreturn            SC_REPR_STRUCT_RPC_SYSCALL_INFO                                      /* sc_info */ 
-#define __NRATR3_rt_sigreturn            SC_REPR_STRUCT_UCPUSTATE                                             /* restore_cpu */ 
+#define __NRATR0_rt_sigreturn            SC_REPR_STRUCT_FPUSTATE32                                            /* restore_fpu */ 
+#define __NRATR1_rt_sigreturn            SC_REPR_SYSCALL_ULONG_T                                              /* unused1 */ 
+#define __NRATR2_rt_sigreturn            SC_REPR_SYSCALL_ULONG_T                                              /* unused2 */ 
+#define __NRATR3_rt_sigreturn            SC_REPR_STRUCT_SIGSET                                                /* restore_sigmask */ 
+#define __NRATR4_rt_sigreturn            SC_REPR_STRUCT_RPC_SYSCALL_INFO32                                    /* sc_info */ 
+#define __NRATR5_rt_sigreturn            SC_REPR_STRUCT_UCPUSTATE32                                           /* restore_cpu */ 
 #define __NRRTR_rt_sigreturn             SC_REPR_INT                                                          /* return */
 #define __NRATR0_rt_sigaction            SC_REPR_SIGNO                                                        /* signo */ 
 #define __NRATR1_rt_sigaction            SC_REPR_STRUCT_SIGACTIONX32                                          /* act */ 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x74a124a2 */
+/* HASH CRC-32:0xd92110c2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3338,11 +3338,17 @@ INTERN_FUNCTION(libc_sys_Xprctl)
 END(libc_sys_Xprctl)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xprctl, libc_sys_Xprctl)
 
-/* void rt_sigreturn(struct fpustate const *restore_fpu, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info const *sc_info, struct ucpustate const *restore_cpu) */
+/* Restore the specified register state when returning from a signal handler
+ * Note that the order and locations of arguments taken by this system call
+ * are of great importance, as they must match what is encoded by the kernel
+ * within `sighand_raise_signal()'
+ * The order chosen is also important, as it is selected such that arguments
+ * are only passed through registers that are preserved by CDECL */
+/* void rt_sigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info32 const *sc_info, struct ucpustate32 const *restore_cpu) */
 .section .text.crt.syscall.rt_sigreturn
 INTERN_FUNCTION(libc_sys_rt_sigreturn)
 	movl   $(0xad), %eax
-	jmp    libc_x86_exec_syscall4
+	jmp    libc_x86_exec_syscall6
 END(libc_sys_rt_sigreturn)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_rt_sigreturn, libc_sys_rt_sigreturn)
 

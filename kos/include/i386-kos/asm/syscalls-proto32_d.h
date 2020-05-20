@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6c35d1d0 */
+/* HASH CRC-32:0x174ab3bb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -211,7 +211,7 @@
 #define __NR32AC_setresgid               3
 #define __NR32AC_getresgid               3
 #define __NR32AC_prctl                   1
-#define __NR32AC_rt_sigreturn            4
+#define __NR32AC_rt_sigreturn            6
 #define __NR32AC_rt_sigaction            4
 #define __NR32AC_rt_sigprocmask          4
 #define __NR32AC_rt_sigpending           2
@@ -1257,10 +1257,12 @@
 #define __NR32AT1_getresgid               (uint16_t *, __uint16_t *)
 #define __NR32AT2_getresgid               (uint16_t *, __uint16_t *)
 #define __NR32AT0_prctl                   (int, int)
-#define __NR32AT0_rt_sigreturn            (struct fpustate const *, struct fpustate const *)
-#define __NR32AT1_rt_sigreturn            (struct __sigset_struct const *, struct __sigset_struct const *)
-#define __NR32AT2_rt_sigreturn            (struct rpc_syscall_info const *, struct rpc_syscall_info const *)
-#define __NR32AT3_rt_sigreturn            (struct ucpustate const *, struct ucpustate const *)
+#define __NR32AT0_rt_sigreturn            (struct fpustate32 const *, struct fpustate32 const *)
+#define __NR32AT1_rt_sigreturn            (syscall_ulong_t, __syscall_ulong_t)
+#define __NR32AT2_rt_sigreturn            (syscall_ulong_t, __syscall_ulong_t)
+#define __NR32AT3_rt_sigreturn            (struct __sigset_struct const *, struct __sigset_struct const *)
+#define __NR32AT4_rt_sigreturn            (struct rpc_syscall_info32 const *, struct rpc_syscall_info32 const *)
+#define __NR32AT5_rt_sigreturn            (struct ucpustate32 const *, struct ucpustate32 const *)
 #define __NR32AT0_rt_sigaction            (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT1_rt_sigaction            (struct sigactionx32 const *, struct __sigactionx32 const *)
 #define __NR32AT2_rt_sigaction            (struct sigactionx32 *, struct __sigactionx32 *)
@@ -2234,7 +2236,7 @@
 #define __NR32AM_setresgid(a, b, c, d, e, f)               (__uint16_t)a, (__uint16_t)b, (__uint16_t)c
 #define __NR32AM_getresgid(a, b, c, d, e, f)               (__uint16_t *)a, (__uint16_t *)b, (__uint16_t *)c
 #define __NR32AM_prctl(a, b, c, d, e, f)                   (int)a
-#define __NR32AM_rt_sigreturn(a, b, c, d, e, f)            (struct fpustate const *)a, (struct __sigset_struct const *)b, (struct rpc_syscall_info const *)c, (struct ucpustate const *)d
+#define __NR32AM_rt_sigreturn(a, b, c, d, e, f)            (struct fpustate32 const *)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (struct __sigset_struct const *)d, (struct rpc_syscall_info32 const *)e, (struct ucpustate32 const *)f
 #define __NR32AM_rt_sigaction(a, b, c, d, e, f)            (__syscall_ulong_t)a, (struct __sigactionx32 const *)b, (struct __sigactionx32 *)c, (__size_t)d
 #define __NR32AM_rt_sigprocmask(a, b, c, d, e, f)          (__syscall_ulong_t)a, (struct __sigset_struct const *)b, (struct __sigset_struct *)c, (__size_t)d
 #define __NR32AM_rt_sigpending(a, b, c, d, e, f)           (struct __sigset_struct *)a, (__size_t)b
@@ -2695,7 +2697,7 @@
 #define __NR32AP_setresgid(a, b, c)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR32AP_getresgid(a, b, c)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR32AP_prctl(a)                                  (__syscall_ulong_t)a
-#define __NR32AP_rt_sigreturn(a, b, c, d)                  (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NR32AP_rt_sigreturn(a, b, c, d, e, f)            (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
 #define __NR32AP_rt_sigaction(a, b, c, d)                  (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NR32AP_rt_sigprocmask(a, b, c, d)                (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NR32AP_rt_sigpending(a, b)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b

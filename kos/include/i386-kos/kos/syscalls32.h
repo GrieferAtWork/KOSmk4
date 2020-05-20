@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5d8e76eb */
+/* HASH CRC-32:0xbd037ae */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,11 +52,8 @@
 #include <kos/bits/spawn-action32.h>
 #include <kos/compat/linux-stat.h>
 #include <kos/exec/bits/library-listdef32.h>
-#include <kos/kernel/cpu-state.h>
 #include <kos/kernel/cpu-state32.h>
-#include <kos/kernel/fpu-state.h>
 #include <kos/kernel/fpu-state32.h>
-#include <librpc/bits/syscall-info.h>
 #include <librpc/bits/syscall-info32.h>
 #include <librt/bits/mqueue.h>
 
@@ -124,7 +121,6 @@ struct elf32_phdr;
 struct epoll_event;
 struct exception_data32;
 struct file_handle;
-struct fpustate;
 struct fpustate32;
 struct getcpu_cache;
 struct lfutexexprx32;
@@ -141,7 +137,6 @@ struct old_linux_dirent;
 struct pollfd;
 struct rlimit;
 struct rlimit64;
-struct rpc_syscall_info;
 struct rpc_syscall_info32;
 struct sched_param;
 struct sigevent;
@@ -151,7 +146,6 @@ struct sysinfo;
 struct termios;
 struct timezone;
 struct tms;
-struct ucpustate;
 struct ucpustate32;
 struct ustat;
 struct utsname;
@@ -1394,7 +1388,13 @@ __CDECLARE_SC(,__errno_t,rt_sigprocmask,(__syscall_ulong_t __how, struct __sigse
 __CDECLARE_SC(,__errno_t,rt_sigqueueinfo,(__pid_t __tgid, __syscall_ulong_t __signo, struct __siginfox32_struct const *__uinfo),(__tgid,__signo,__uinfo))
 #endif /* __CRT_HAVE_SC(rt_sigqueueinfo) */
 #if __CRT_HAVE_SC(rt_sigreturn)
-__CDECLARE_VOID_SC(,rt_sigreturn,(struct fpustate const *__restore_fpu, struct __sigset_struct const *__restore_sigmask, struct rpc_syscall_info const *__sc_info, struct ucpustate const *__restore_cpu),(__restore_fpu,__restore_sigmask,__sc_info,__restore_cpu))
+/* Restore the specified register state when returning from a signal handler
+ * Note that the order and locations of arguments taken by this system call
+ * are of great importance, as they must match what is encoded by the kernel
+ * within `sighand_raise_signal()'
+ * The order chosen is also important, as it is selected such that arguments
+ * are only passed through registers that are preserved by CDECL */
+__CDECLARE_VOID_SC(,rt_sigreturn,(struct fpustate32 const *__restore_fpu, __syscall_ulong_t __unused1, __syscall_ulong_t __unused2, struct __sigset_struct const *__restore_sigmask, struct rpc_syscall_info32 const *__sc_info, struct ucpustate32 const *__restore_cpu),(__restore_fpu,__unused1,__unused2,__restore_sigmask,__sc_info,__restore_cpu))
 #endif /* __CRT_HAVE_SC(rt_sigreturn) */
 #if __CRT_HAVE_SC(rt_sigsuspend)
 __CDECLARE_SC(,__errno_t,rt_sigsuspend,(struct __sigset_struct const *__set, __size_t __sigsetsize),(__set,__sigsetsize))

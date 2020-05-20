@@ -195,6 +195,7 @@ mq_timedsend = mq_timedsendx32;
 mq_timedsend64 = mq_timedsendx32_64;
 mq_timedreceive = mq_timedreceivex32;
 mq_timedreceive64 = mq_timedreceivex32_64;
+rt_sigreturn = sigreturn;
 
 
 /* Syscall definition syntax
