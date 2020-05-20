@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4f1e7625 */
+/* HASH CRC-32:0xc8559986 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -671,7 +671,7 @@
 #define __NR64RT_request_key            (errno_t, __errno_t)
 #define __NR64RT_keyctl                 (errno_t, __errno_t)
 #define __NR64RT_ioprio_set             (errno_t, __errno_t)
-#define __NR64RT_ioprio_get             (errno_t, __errno_t)
+#define __NR64RT_ioprio_get             (syscall_slong_t, __syscall_slong_t)
 #define __NR64RT_inotify_init           (errno_t, __errno_t)
 #define __NR64RT_inotify_add_watch      (errno_t, __errno_t)
 #define __NR64RT_inotify_rm_watch       (errno_t, __errno_t)
@@ -1206,7 +1206,7 @@
 #define __NR64AT1_removexattr            (char const *, char const *)
 #define __NR64AT0_lremovexattr           (char const *, char const *)
 #define __NR64AT1_lremovexattr           (char const *, char const *)
-#define __NR64AT0_fremovexattr           (int, int)
+#define __NR64AT0_fremovexattr           (fd_t, __fd_t)
 #define __NR64AT1_fremovexattr           (char const *, char const *)
 #define __NR64AT0_tkill                  (pid_t, __pid_t)
 #define __NR64AT1_tkill                  (syscall_ulong_t, __syscall_ulong_t)
@@ -1480,10 +1480,10 @@
 #define __NR64AT1_name_to_handle_at      (char const *, char const *)
 #define __NR64AT2_name_to_handle_at      (struct file_handle *, struct file_handle *)
 #define __NR64AT3_name_to_handle_at      (int32_t *, __int32_t *)
-#define __NR64AT4_name_to_handle_at      (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT4_name_to_handle_at      (atflag_t, __atflag_t)
 #define __NR64AT0_open_by_handle_at      (fd_t, __fd_t)
-#define __NR64AT1_open_by_handle_at      (struct file_handle *, struct file_handle *)
-#define __NR64AT2_open_by_handle_at      (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT1_open_by_handle_at      (struct file_handle const *, struct file_handle const *)
+#define __NR64AT2_open_by_handle_at      (oflag_t, __oflag_t)
 #define __NR64AT0_clock_adjtime          (int, int)
 #define __NR64AT0_syncfs                 (fd_t, __fd_t)
 #define __NR64AT0_sendmmsg               (fd_t, __fd_t)
@@ -1578,7 +1578,7 @@
 #define __NR64AT0_maplibrary             (void *, void *)
 #define __NR64AT1_maplibrary             (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT2_maplibrary             (fd_t, __fd_t)
-#define __NR64AT3_maplibrary             (struct elf64_phdr *, struct elf64_phdr *)
+#define __NR64AT3_maplibrary             (struct elf64_phdr const *, struct elf64_phdr const *)
 #define __NR64AT4_maplibrary             (size_t, __size_t)
 #define __NR64AT0_fsmode                 (uint64_t, __uint64_t)
 #define __NR64AT0_fchdirat               (fd_t, __fd_t)
@@ -1909,7 +1909,7 @@
 #define __NR64AM_flistxattr(a, b, c, d, e, f)             (__fd_t)a, (char *)b, (__size_t)c
 #define __NR64AM_removexattr(a, b, c, d, e, f)            (char const *)a, (char const *)b
 #define __NR64AM_lremovexattr(a, b, c, d, e, f)           (char const *)a, (char const *)b
-#define __NR64AM_fremovexattr(a, b, c, d, e, f)           (int)a, (char const *)b
+#define __NR64AM_fremovexattr(a, b, c, d, e, f)           (__fd_t)a, (char const *)b
 #define __NR64AM_tkill(a, b, c, d, e, f)                  (__pid_t)a, (__syscall_ulong_t)b
 #define __NR64AM_time(a, b, c, d, e, f)                   (__time32_t *)a
 #define __NR64AM_futex(a, b, c, d, e, f)                  (__uint32_t *)a, (__syscall_ulong_t)b, (__uint32_t)c, (struct __timespecx64 const *)d, (__uint32_t *)e, (__uint32_t)f
@@ -2013,8 +2013,8 @@
 #define __NR64AM_fanotify_init(a, b, c, d, e, f)          (int)a
 #define __NR64AM_fanotify_mark(a, b, c, d, e, f)          (int)a
 #define __NR64AM_prlimit64(a, b, c, d, e, f)              (__pid_t)a, (__syscall_ulong_t)b, (struct rlimit64 const *)c, (struct rlimit64 *)d
-#define __NR64AM_name_to_handle_at(a, b, c, d, e, f)      (__fd_t)a, (char const *)b, (struct file_handle *)c, (__int32_t *)d, (__syscall_ulong_t)e
-#define __NR64AM_open_by_handle_at(a, b, c, d, e, f)      (__fd_t)a, (struct file_handle *)b, (__syscall_ulong_t)c
+#define __NR64AM_name_to_handle_at(a, b, c, d, e, f)      (__fd_t)a, (char const *)b, (struct file_handle *)c, (__int32_t *)d, (__atflag_t)e
+#define __NR64AM_open_by_handle_at(a, b, c, d, e, f)      (__fd_t)a, (struct file_handle const *)b, (__oflag_t)c
 #define __NR64AM_clock_adjtime(a, b, c, d, e, f)          (int)a
 #define __NR64AM_syncfs(a, b, c, d, e, f)                 (__fd_t)a
 #define __NR64AM_sendmmsg(a, b, c, d, e, f)               (__fd_t)a, (struct __mmsghdrx64 *)b, (__size_t)c, (__syscall_ulong_t)d
@@ -2045,7 +2045,7 @@
 #define __NR64AM_fmknodat(a, b, c, d, e, f)               (__fd_t)a, (char const *)b, (__mode_t)c, (__dev_t)d, (__atflag_t)e
 #define __NR64AM_fmkdirat(a, b, c, d, e, f)               (__fd_t)a, (char const *)b, (__mode_t)c, (__atflag_t)d
 #define __NR64AM_ksysctl(a, b, c, d, e, f)                (__syscall_ulong_t)a, (void *)b
-#define __NR64AM_maplibrary(a, b, c, d, e, f)             (void *)a, (__syscall_ulong_t)b, (__fd_t)c, (struct elf64_phdr *)d, (__size_t)e
+#define __NR64AM_maplibrary(a, b, c, d, e, f)             (void *)a, (__syscall_ulong_t)b, (__fd_t)c, (struct elf64_phdr const *)d, (__size_t)e
 #define __NR64AM_fsmode(a, b, c, d, e, f)                 (__uint64_t)a
 #define __NR64AM_fchdirat(a, b, c, d, e, f)               (__fd_t)a, (char const *)b, (__atflag_t)c
 #define __NR64AM_kreaddirf(a, b, c, d, e, f)              (__fd_t)a, (struct dirent *)b, (__size_t)c, (__syscall_ulong_t)d, (__iomode_t)e

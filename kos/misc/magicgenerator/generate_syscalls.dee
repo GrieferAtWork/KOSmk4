@@ -617,6 +617,8 @@ function parseTypeExpression(
 						if (":" !in directive_args)
 							err(name_start, "Bad tostr() attribute: {!r}".format({ directive_args }));
 						local a, none, b = directive_args.partition(":")...;
+						if (a == "out")
+							break; /* output-argument (ignored for how) */
 						if (!a.strip().issymbol() || !b.strip().issymbol())
 							err(name_start, "Bad tostr() attribute: {!r}".format({ directive_args }));
 					}

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xba3bbe7 */
+/* HASH CRC-32:0xc3a894e7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -102,10 +102,10 @@
 #define __NR32AN0_umount2                 special_file
 #define __NR32AN1_umount2                 flags
 #define __NR32AN0_ioctl                   fd
-#define __NR32AN1_ioctl                   request
+#define __NR32AN1_ioctl                   command
 #define __NR32AN2_ioctl                   arg
 #define __NR32AN0_fcntl                   fd
-#define __NR32AN1_fcntl                   cmd
+#define __NR32AN1_fcntl                   command
 #define __NR32AN2_fcntl                   arg
 #define __NR32AN0_setpgid                 pid
 #define __NR32AN1_setpgid                 pgid
@@ -138,7 +138,7 @@
 #define __NR32AN1_gettimeofday            tz
 #define __NR32AN0_settimeofday            tv
 #define __NR32AN1_settimeofday            tz
-#define __NR32AN0_getgroups               size
+#define __NR32AN0_getgroups               count
 #define __NR32AN1_getgroups               list
 #define __NR32AN0_setgroups               count
 #define __NR32AN1_setgroups               groups
@@ -393,7 +393,7 @@
 #define __NR32AN1_setreuid32              euid
 #define __NR32AN0_setregid32              rgid
 #define __NR32AN1_setregid32              egid
-#define __NR32AN0_getgroups32             size
+#define __NR32AN0_getgroups32             count
 #define __NR32AN1_getgroups32             list
 #define __NR32AN0_setgroups32             count
 #define __NR32AN1_setgroups32             groups
@@ -583,11 +583,11 @@
 #define __NR32AN0_add_key                 TODO_PROTOTYPE
 #define __NR32AN0_request_key             TODO_PROTOTYPE
 #define __NR32AN0_keyctl                  TODO_PROTOTYPE
-#define __NR32AN0_ioprio_set              which
-#define __NR32AN1_ioprio_set              who
+#define __NR32AN0_ioprio_set              who
+#define __NR32AN1_ioprio_set              id
 #define __NR32AN2_ioprio_set              ioprio
-#define __NR32AN0_ioprio_get              which
-#define __NR32AN1_ioprio_get              who
+#define __NR32AN0_ioprio_get              who
+#define __NR32AN1_ioprio_get              id
 #define __NR32AN0_inotify_init            TODO_PROTOTYPE
 #define __NR32AN0_inotify_add_watch       TODO_PROTOTYPE
 #define __NR32AN0_inotify_rm_watch        TODO_PROTOTYPE
@@ -697,11 +697,11 @@
 #define __NR32AN1_fallocate               mode
 #define __NR32AN2_fallocate               offset
 #define __NR32AN3_fallocate               length
-#define __NR32AN0_timerfd_settime         ufd
+#define __NR32AN0_timerfd_settime         timerfd
 #define __NR32AN1_timerfd_settime         flags
 #define __NR32AN2_timerfd_settime         utmr
 #define __NR32AN3_timerfd_settime         otmr
-#define __NR32AN0_timerfd_gettime         ufd
+#define __NR32AN0_timerfd_gettime         timerfd
 #define __NR32AN1_timerfd_gettime         otmr
 #define __NR32AN0_signalfd4               fd
 #define __NR32AN1_signalfd4               sigmask
@@ -732,7 +732,7 @@
 #define __NR32AN0_recvmmsg                sockfd
 #define __NR32AN1_recvmmsg                vmessages
 #define __NR32AN2_recvmmsg                vlen
-#define __NR32AN3_recvmmsg                flags
+#define __NR32AN3_recvmmsg                msg_flags
 #define __NR32AN4_recvmmsg                tmo
 #define __NR32AN0_fanotify_init           TODO_PROTOTYPE
 #define __NR32AN0_fanotify_mark           TODO_PROTOTYPE
@@ -753,7 +753,7 @@
 #define __NR32AN0_sendmmsg                sockfd
 #define __NR32AN1_sendmmsg                vmessages
 #define __NR32AN2_sendmmsg                vlen
-#define __NR32AN3_sendmmsg                flags
+#define __NR32AN3_sendmmsg                msg_flags
 #define __NR32AN0_setns                   fd
 #define __NR32AN1_setns                   nstype
 #define __NR32AN0_process_vm_readv        pid
@@ -854,7 +854,7 @@
 #define __NR32AN0_recvmmsg64              sockfd
 #define __NR32AN1_recvmmsg64              vmessages
 #define __NR32AN2_recvmmsg64              vlen
-#define __NR32AN3_recvmmsg64              flags
+#define __NR32AN3_recvmmsg64              msg_flags
 #define __NR32AN4_recvmmsg64              tmo
 #define __NR32AN0_pwritevf                fd
 #define __NR32AN1_pwritevf                iovec
@@ -866,9 +866,9 @@
 #define __NR32AN2_preadvf                 count
 #define __NR32AN3_preadvf                 offset
 #define __NR32AN4_preadvf                 mode
-#define __NR32AN0_timerfd_gettime64       ufd
+#define __NR32AN0_timerfd_gettime64       timerfd
 #define __NR32AN1_timerfd_gettime64       otmr
-#define __NR32AN0_timerfd_settime64       ufd
+#define __NR32AN0_timerfd_settime64       timerfd
 #define __NR32AN1_timerfd_settime64       flags
 #define __NR32AN2_timerfd_settime64       utmr
 #define __NR32AN3_timerfd_settime64       otmr
@@ -1135,12 +1135,11 @@
 #define __NR32RTR_exit                     SC_REPR_INT                                                          /* return */
 #define __NR32RTR_fork                     SC_REPR_PID_T                                                        /* return */
 #define __NR32ATR0_read                    SC_REPR_FD_T                                                         /* fd */ 
-#define __NR32ATR1_read                    SC_REPR_OUTBUF                                                       /* buf */ 
-#define __NR32ATL1_read                    2                                                                    /* buf -> bufsize */ 
+#define __NR32ATR1_read                    SC_REPR_POINTER                                                      /* buf */ 
 #define __NR32ATR2_read                    SC_REPR_SIZE_T                                                       /* bufsize */ 
 #define __NR32RTR_read                     SC_REPR_SSIZE_T                                                      /* return */
 #define __NR32ATR0_write                   SC_REPR_FD_T                                                         /* fd */ 
-#define __NR32ATR1_write                   SC_REPR_INBUF                                                        /* buf */ 
+#define __NR32ATR1_write                   SC_REPR_BUFFER                                                       /* buf */ 
 #define __NR32ATL1_write                   2                                                                    /* buf -> bufsize */ 
 #define __NR32ATR2_write                   SC_REPR_SIZE_T                                                       /* bufsize */ 
 #define __NR32RTR_write                    SC_REPR_SSIZE_T                                                      /* return */
@@ -1195,14 +1194,14 @@
 #define __NR32ATR1_mount                   SC_REPR_FILENAME                                                     /* dir */ 
 #define __NR32ATR2_mount                   SC_REPR_STRING                                                       /* fstype */ 
 #define __NR32ATR3_mount                   SC_REPR_MOUNT_FLAGS                                                  /* mountflags */ 
-#define __NR32ATR4_mount                   SC_REPR_POINTER                                                      /* data */ 
+#define __NR32ATR4_mount                   SC_REPR_STRING                                                       /* data */ 
 #define __NR32RTR_mount                    SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_umount                  SC_REPR_STRING                                                       /* special_file */ 
+#define __NR32ATR0_umount                  SC_REPR_FILENAME                                                     /* special_file */ 
 #define __NR32RTR_umount                   SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_setuid                  SC_REPR_UID_T                                                        /* uid */ 
 #define __NR32RTR_setuid                   SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32RTR_getuid                   SC_REPR_UINT16_T                                                     /* return */
-#define __NR32ATR0_stime                   SC_REPR_POINTER                                                      /* t */ 
+#define __NR32RTR_getuid                   SC_REPR_UID_T                                                        /* return */
+#define __NR32ATR0_stime                   SC_REPR_TIME32_T_PTR                                                 /* t */ 
 #define __NR32RTR_stime                    SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_ptrace                  SC_REPR_SYSCALL_ULONG_T                                              /* request */ 
 #define __NR32ATR1_ptrace                  SC_REPR_PID_T                                                        /* pid */ 
@@ -1231,10 +1230,10 @@
 #define __NR32ATR0_kill                    SC_REPR_PID_T                                                        /* pid */ 
 #define __NR32ATR1_kill                    SC_REPR_SIGNO                                                        /* signo */ 
 #define __NR32RTR_kill                     SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_rename                  SC_REPR_STRING                                                       /* oldname */ 
-#define __NR32ATR1_rename                  SC_REPR_STRING                                                       /* newname_or_path */ 
+#define __NR32ATR0_rename                  SC_REPR_FILENAME                                                     /* oldname */ 
+#define __NR32ATR1_rename                  SC_REPR_FILENAME                                                     /* newname_or_path */ 
 #define __NR32RTR_rename                   SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_mkdir                   SC_REPR_STRING                                                       /* pathname */ 
+#define __NR32ATR0_mkdir                   SC_REPR_FILENAME                                                     /* pathname */ 
 #define __NR32ATR1_mkdir                   SC_REPR_MODE_T                                                       /* mode */ 
 #define __NR32RTR_mkdir                    SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_rmdir                   SC_REPR_STRING                                                       /* path */ 
@@ -1250,12 +1249,12 @@
 #define __NR32RTR_brk                      SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_setgid                  SC_REPR_GID_T                                                        /* gid */ 
 #define __NR32RTR_setgid                   SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32RTR_getgid                   SC_REPR_UINT16_T                                                     /* return */
+#define __NR32RTR_getgid                   SC_REPR_GID_T                                                        /* return */
 #define __NR32ATR0_signal                  SC_REPR_SIGNO                                                        /* signo */ 
 #define __NR32ATR1_signal                  SC_REPR_SIGHANDLER_T                                                 /* handler */ 
 #define __NR32RTR_signal                   SC_REPR_SIGHANDLER_T                                                 /* return */
-#define __NR32RTR_geteuid                  SC_REPR_UINT16_T                                                     /* return */
-#define __NR32RTR_getegid                  SC_REPR_UINT16_T                                                     /* return */
+#define __NR32RTR_geteuid                  SC_REPR_UID_T                                                        /* return */
+#define __NR32RTR_getegid                  SC_REPR_GID_T                                                        /* return */
 #define __NR32ATR0_acct                    SC_REPR_FILENAME                                                     /* filename */ 
 #define __NR32RTR_acct                     SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_umount2                 SC_REPR_STRING                                                       /* special_file */ 
@@ -1263,12 +1262,14 @@
 #define __NR32RTR_umount2                  SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32RTR_lock                     SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_ioctl                   SC_REPR_FD_T                                                         /* fd */ 
-#define __NR32ATR1_ioctl                   SC_REPR_SYSCALL_ULONG_T                                              /* request */ 
-#define __NR32ATR2_ioctl                   SC_REPR_POINTER                                                      /* arg */ 
+#define __NR32ATR1_ioctl                   SC_REPR_IOCTL_COMMAND                                                /* command */ 
+#define __NR32ATR2_ioctl                   SC_REPR_IOCTL_ARG                                                    /* arg */ 
+#define __NR32ATL2_ioctl                   1                                                                    /* arg -> command */ 
 #define __NR32RTR_ioctl                    SC_REPR_SYSCALL_SLONG_T                                              /* return */
 #define __NR32ATR0_fcntl                   SC_REPR_FD_T                                                         /* fd */ 
-#define __NR32ATR1_fcntl                   SC_REPR_SYSCALL_ULONG_T                                              /* cmd */ 
-#define __NR32ATR2_fcntl                   SC_REPR_POINTER                                                      /* arg */ 
+#define __NR32ATR1_fcntl                   SC_REPR_FCNTL_COMMAND                                                /* command */ 
+#define __NR32ATR2_fcntl                   SC_REPR_FCNTL_ARG                                                    /* arg */ 
+#define __NR32ATL2_fcntl                   1                                                                    /* arg -> command */ 
 #define __NR32RTR_fcntl                    SC_REPR_SYSCALL_SLONG_T                                              /* return */
 #define __NR32RTR_mpx                      SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_setpgid                 SC_REPR_PID_T                                                        /* pid */ 
@@ -1279,7 +1280,7 @@
 #define __NR32RTR_oldolduname              SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_umask                   SC_REPR_MODE_T                                                       /* mode */ 
 #define __NR32RTR_umask                    SC_REPR_MODE_T                                                       /* return */
-#define __NR32ATR0_chroot                  SC_REPR_STRING                                                       /* path */ 
+#define __NR32ATR0_chroot                  SC_REPR_FILENAME                                                     /* path */ 
 #define __NR32RTR_chroot                   SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_ustat                   SC_REPR_DEV_BLK                                                      /* dev */ 
 #define __NR32ATR1_ustat                   SC_REPR_POINTER                                                      /* ubuf */ 
@@ -1294,9 +1295,9 @@
 #define __NR32ATR1_sigaction               SC_REPR_STRUCT_SIGACTIONX32                                          /* act */ 
 #define __NR32ATR2_sigaction               SC_REPR_POINTER                                                      /* oact */ 
 #define __NR32RTR_sigaction                SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32RTR_sgetmask                 SC_REPR_SYSCALL_ULONG_T                                              /* return */
-#define __NR32ATR0_ssetmask                SC_REPR_SYSCALL_ULONG_T                                              /* sigmask */ 
-#define __NR32RTR_ssetmask                 SC_REPR_SYSCALL_ULONG_T                                              /* return */
+#define __NR32RTR_sgetmask                 SC_REPR_SIGMASK                                                      /* return */
+#define __NR32ATR0_ssetmask                SC_REPR_SIGMASK                                                      /* sigmask */ 
+#define __NR32RTR_ssetmask                 SC_REPR_SIGMASK                                                      /* return */
 #define __NR32ATR0_setreuid                SC_REPR_UID_T                                                        /* ruid */ 
 #define __NR32ATR1_setreuid                SC_REPR_UID_T                                                        /* euid */ 
 #define __NR32RTR_setreuid                 SC_REPR_ERRNO_T                                                      /* return */
@@ -1326,7 +1327,7 @@
 #define __NR32ATR0_settimeofday            SC_REPR_STRUCT_TIMEVALX32                                            /* tv */ 
 #define __NR32ATR1_settimeofday            SC_REPR_STRUCT_TIMEZONE                                              /* tz */ 
 #define __NR32RTR_settimeofday             SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_getgroups               SC_REPR_SIZE_T                                                       /* size */ 
+#define __NR32ATR0_getgroups               SC_REPR_SIZE_T                                                       /* count */ 
 #define __NR32ATR1_getgroups               SC_REPR_POINTER                                                      /* list */ 
 #define __NR32RTR_getgroups                SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_setgroups               SC_REPR_SIZE_T                                                       /* count */ 
@@ -1340,21 +1341,21 @@
 #define __NR32ATL2_select                  0                                                                    /* writefds -> nfds */ 
 #define __NR32ATR3_select                  SC_REPR_STRUCT_FDSET                                                 /* exceptfds */ 
 #define __NR32ATL3_select                  0                                                                    /* exceptfds -> nfds */ 
-#define __NR32ATR4_select                  SC_REPR_POINTER                                                      /* timeout */ 
+#define __NR32ATR4_select                  SC_REPR_STRUCT_TIMEVALX32                                            /* timeout */ 
 #define __NR32RTR_select                   SC_REPR_SSIZE_T                                                      /* return */
 #define __NR32ATR0_symlink                 SC_REPR_STRING                                                       /* link_text */ 
-#define __NR32ATR1_symlink                 SC_REPR_STRING                                                       /* target_path */ 
+#define __NR32ATR1_symlink                 SC_REPR_FILENAME                                                     /* target_path */ 
 #define __NR32RTR_symlink                  SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_linux_oldlstat          SC_REPR_FILENAME                                                     /* filename */ 
 #define __NR32ATR1_linux_oldlstat          SC_REPR_POINTER                                                      /* statbuf */ 
 #define __NR32RTR_linux_oldlstat           SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_readlink                SC_REPR_STRING                                                       /* path */ 
+#define __NR32ATR0_readlink                SC_REPR_FILENAME                                                     /* path */ 
 #define __NR32ATR1_readlink                SC_REPR_POINTER                                                      /* buf */ 
 #define __NR32ATR2_readlink                SC_REPR_SIZE_T                                                       /* buflen */ 
 #define __NR32RTR_readlink                 SC_REPR_SSIZE_T                                                      /* return */
-#define __NR32ATR0_uselib                  SC_REPR_STRING                                                       /* library */ 
+#define __NR32ATR0_uselib                  SC_REPR_FILENAME                                                     /* library */ 
 #define __NR32RTR_uselib                   SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_swapon                  SC_REPR_STRING                                                       /* pathname */ 
+#define __NR32ATR0_swapon                  SC_REPR_FILENAME                                                     /* pathname */ 
 #define __NR32ATR1_swapon                  SC_REPR_SWAPFLAGS                                                    /* swapflags */ 
 #define __NR32RTR_swapon                   SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_reboot                  SC_REPR_REBOOT_HOW                                                   /* how */ 
@@ -1386,10 +1387,10 @@
 #define __NR32ATR1_fchown                  SC_REPR_UID_T                                                        /* owner */ 
 #define __NR32ATR2_fchown                  SC_REPR_GID_T                                                        /* group */ 
 #define __NR32RTR_fchown                   SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_getpriority             SC_REPR_SYSCALL_ULONG_T                                              /* which */ 
+#define __NR32ATR0_getpriority             SC_REPR_SCHED_PRIORITY_WHICH                                         /* which */ 
 #define __NR32ATR1_getpriority             SC_REPR_ID_T                                                         /* who */ 
 #define __NR32RTR_getpriority              SC_REPR_SYSCALL_SLONG_T                                              /* return */
-#define __NR32ATR0_setpriority             SC_REPR_SYSCALL_ULONG_T                                              /* which */ 
+#define __NR32ATR0_setpriority             SC_REPR_SCHED_PRIORITY_WHICH                                         /* which */ 
 #define __NR32ATR1_setpriority             SC_REPR_ID_T                                                         /* who */ 
 #define __NR32ATR2_setpriority             SC_REPR_SYSCALL_ULONG_T                                              /* value */ 
 #define __NR32RTR_setpriority              SC_REPR_ERRNO_T                                                      /* return */
@@ -1408,19 +1409,20 @@
 #define __NR32ATR1_ioperm                  SC_REPR_SYSCALL_ULONG_T                                              /* num */ 
 #define __NR32ATR2_ioperm                  SC_REPR_SYSCALL_ULONG_T                                              /* turn_on */ 
 #define __NR32RTR_ioperm                   SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_socketcall              SC_REPR_INT                                                          /* call */ 
-#define __NR32ATR1_socketcall              SC_REPR_POINTER                                                      /* args */ 
+#define __NR32ATR0_socketcall              SC_REPR_SOCKETCALL_CALL                                              /* call */ 
+#define __NR32ATR1_socketcall              SC_REPR_SOCKETCALL_ARGS                                              /* args */ 
+#define __NR32ATL1_socketcall              0                                                                    /* args -> call */ 
 #define __NR32RTR_socketcall               SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_syslog                  SC_REPR_SYSLOG_LEVEL                                                 /* level */ 
 #define __NR32ATR1_syslog                  SC_REPR_STRING                                                       /* str */ 
 #define __NR32ATL1_syslog                  2                                                                    /* str -> len */ 
 #define __NR32ATR2_syslog                  SC_REPR_SIZE_T                                                       /* len */ 
 #define __NR32RTR_syslog                   SC_REPR_SSIZE_T                                                      /* return */
-#define __NR32ATR0_setitimer               SC_REPR_SYSCALL_ULONG_T                                              /* which */ 
+#define __NR32ATR0_setitimer               SC_REPR_ITIMER_WHICH                                                 /* which */ 
 #define __NR32ATR1_setitimer               SC_REPR_STRUCT_ITIMERVALX32                                          /* newval */ 
 #define __NR32ATR2_setitimer               SC_REPR_POINTER                                                      /* oldval */ 
 #define __NR32RTR_setitimer                SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_getitimer               SC_REPR_SYSCALL_ULONG_T                                              /* which */ 
+#define __NR32ATR0_getitimer               SC_REPR_ITIMER_WHICH                                                 /* which */ 
 #define __NR32ATR1_getitimer               SC_REPR_POINTER                                                      /* curr_value */ 
 #define __NR32RTR_getitimer                SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_linux_stat              SC_REPR_FILENAME                                                     /* filename */ 
@@ -1445,7 +1447,7 @@
 #define __NR32ATR2_wait4                   SC_REPR_WAITFLAG                                                     /* options */ 
 #define __NR32ATR3_wait4                   SC_REPR_POINTER                                                      /* usage */ 
 #define __NR32RTR_wait4                    SC_REPR_PID_T                                                        /* return */
-#define __NR32ATR0_swapoff                 SC_REPR_STRING                                                       /* pathname */ 
+#define __NR32ATR0_swapoff                 SC_REPR_FILENAME                                                     /* pathname */ 
 #define __NR32RTR_swapoff                  SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_sysinfo                 SC_REPR_POINTER                                                      /* info */ 
 #define __NR32RTR_sysinfo                  SC_REPR_ERRNO_T                                                      /* return */
@@ -1467,6 +1469,7 @@
 #define __NR32ATR4_clone                   SC_REPR_POINTER                                                      /* ctid */ 
 #define __NR32RTR_clone                    SC_REPR_PID_T                                                        /* return */
 #define __NR32ATR0_setdomainname           SC_REPR_STRING                                                       /* name */ 
+#define __NR32ATL0_setdomainname           1                                                                    /* name -> len */ 
 #define __NR32ATR1_setdomainname           SC_REPR_SIZE_T                                                       /* len */ 
 #define __NR32RTR_setdomainname            SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_uname                   SC_REPR_POINTER                                                      /* name */ 
@@ -1551,25 +1554,25 @@
 #define __NR32ATR0_munlock                 SC_REPR_POINTER                                                      /* addr */ 
 #define __NR32ATR1_munlock                 SC_REPR_SIZE_T                                                       /* len */ 
 #define __NR32RTR_munlock                  SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_mlockall                SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NR32ATR0_mlockall                SC_REPR_MLOCKALL_FLAGS                                               /* flags */ 
 #define __NR32RTR_mlockall                 SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32RTR_munlockall               SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_sched_setparam          SC_REPR_PID_T                                                        /* pid */ 
-#define __NR32ATR1_sched_setparam          SC_REPR_POINTER                                                      /* param */ 
+#define __NR32ATR1_sched_setparam          SC_REPR_STRUCT_SCHED_PARAM                                           /* param */ 
 #define __NR32RTR_sched_setparam           SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_sched_getparam          SC_REPR_PID_T                                                        /* pid */ 
 #define __NR32ATR1_sched_getparam          SC_REPR_POINTER                                                      /* param */ 
 #define __NR32RTR_sched_getparam           SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_sched_setscheduler      SC_REPR_PID_T                                                        /* pid */ 
-#define __NR32ATR1_sched_setscheduler      SC_REPR_SYSCALL_ULONG_T                                              /* policy */ 
-#define __NR32ATR2_sched_setscheduler      SC_REPR_POINTER                                                      /* param */ 
+#define __NR32ATR1_sched_setscheduler      SC_REPR_SCHED_POLICY                                                 /* policy */ 
+#define __NR32ATR2_sched_setscheduler      SC_REPR_STRUCT_SCHED_PARAM                                           /* param */ 
 #define __NR32RTR_sched_setscheduler       SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_sched_getscheduler      SC_REPR_PID_T                                                        /* pid */ 
-#define __NR32RTR_sched_getscheduler       SC_REPR_SYSCALL_SLONG_T                                              /* return */
+#define __NR32RTR_sched_getscheduler       SC_REPR_SCHED_POLICY                                                 /* return */
 #define __NR32RTR_sched_yield              SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_sched_get_priority_max  SC_REPR_SYSCALL_ULONG_T                                              /* algorithm */ 
+#define __NR32ATR0_sched_get_priority_max  SC_REPR_SCHED_POLICY                                                 /* algorithm */ 
 #define __NR32RTR_sched_get_priority_max   SC_REPR_SYSCALL_SLONG_T                                              /* return */
-#define __NR32ATR0_sched_get_priority_min  SC_REPR_SYSCALL_ULONG_T                                              /* algorithm */ 
+#define __NR32ATR0_sched_get_priority_min  SC_REPR_SCHED_POLICY                                                 /* algorithm */ 
 #define __NR32RTR_sched_get_priority_min   SC_REPR_SYSCALL_SLONG_T                                              /* return */
 #define __NR32ATR0_sched_rr_get_interval   SC_REPR_PID_T                                                        /* pid */ 
 #define __NR32ATR1_sched_rr_get_interval   SC_REPR_POINTER                                                      /* tms */ 
@@ -1640,9 +1643,10 @@
 #define __NR32RTR_rt_sigtimedwait          SC_REPR_SYSCALL_SLONG_T                                              /* return */
 #define __NR32ATR0_rt_sigqueueinfo         SC_REPR_PID_T                                                        /* tgid */ 
 #define __NR32ATR1_rt_sigqueueinfo         SC_REPR_SIGNO                                                        /* signo */ 
-#define __NR32ATR2_rt_sigqueueinfo         SC_REPR_POINTER                                                      /* uinfo */ 
+#define __NR32ATR2_rt_sigqueueinfo         SC_REPR_STRUCT_SIGINFOX32                                            /* uinfo */ 
 #define __NR32RTR_rt_sigqueueinfo          SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_rt_sigsuspend           SC_REPR_POINTER                                                      /* set */ 
+#define __NR32ATR0_rt_sigsuspend           SC_REPR_STRUCT_SIGSET                                                /* set */ 
+#define __NR32ATL0_rt_sigsuspend           1                                                                    /* set -> sigsetsize */ 
 #define __NR32ATR1_rt_sigsuspend           SC_REPR_SIZE_T                                                       /* sigsetsize */ 
 #define __NR32RTR_rt_sigsuspend            SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_pread64                 SC_REPR_FD_T                                                         /* fd */ 
@@ -1651,7 +1655,8 @@
 #define __NR32ATR3_pread64                 SC_REPR_UINT64_T                                                     /* offset */ 
 #define __NR32RTR_pread64                  SC_REPR_SSIZE_T                                                      /* return */
 #define __NR32ATR0_pwrite64                SC_REPR_FD_T                                                         /* fd */ 
-#define __NR32ATR1_pwrite64                SC_REPR_POINTER                                                      /* buf */ 
+#define __NR32ATR1_pwrite64                SC_REPR_BUFFER                                                       /* buf */ 
+#define __NR32ATL1_pwrite64                2                                                                    /* buf -> bufsize */ 
 #define __NR32ATR2_pwrite64                SC_REPR_SIZE_T                                                       /* bufsize */ 
 #define __NR32ATR3_pwrite64                SC_REPR_UINT64_T                                                     /* offset */ 
 #define __NR32RTR_pwrite64                 SC_REPR_SSIZE_T                                                      /* return */
@@ -1666,7 +1671,7 @@
 #define __NR32RTR_capget                   SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_capset                  SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NR32RTR_capset                   SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_sigaltstack             SC_REPR_POINTER                                                      /* ss */ 
+#define __NR32ATR0_sigaltstack             SC_REPR_STRUCT_SIGALTSTACKX32                                        /* ss */ 
 #define __NR32ATR1_sigaltstack             SC_REPR_POINTER                                                      /* oss */ 
 #define __NR32RTR_sigaltstack              SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_sendfile                SC_REPR_FD_T                                                         /* out_fd */ 
@@ -1683,8 +1688,8 @@
 #define __NR32RTR_ugetrlimit               SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_mmap2                   SC_REPR_POINTER                                                      /* addr */ 
 #define __NR32ATR1_mmap2                   SC_REPR_SIZE_T                                                       /* len */ 
-#define __NR32ATR2_mmap2                   SC_REPR_SYSCALL_ULONG_T                                              /* prot */ 
-#define __NR32ATR3_mmap2                   SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NR32ATR2_mmap2                   SC_REPR_MMAP_PROT                                                    /* prot */ 
+#define __NR32ATR3_mmap2                   SC_REPR_MMAP_FLAGS                                                   /* flags */ 
 #define __NR32ATR4_mmap2                   SC_REPR_FD_T                                                         /* fd */ 
 #define __NR32ATR5_mmap2                   SC_REPR_SYSCALL_ULONG_T                                              /* pgoffset */ 
 #define __NR32RTR_mmap2                    SC_REPR_POINTER                                                      /* return */
@@ -1707,17 +1712,17 @@
 #define __NR32ATR1_lchown32                SC_REPR_UID_T                                                        /* owner */ 
 #define __NR32ATR2_lchown32                SC_REPR_GID_T                                                        /* group */ 
 #define __NR32RTR_lchown32                 SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32RTR_getuid32                 SC_REPR_UINT32_T                                                     /* return */
-#define __NR32RTR_getgid32                 SC_REPR_UINT32_T                                                     /* return */
-#define __NR32RTR_geteuid32                SC_REPR_UINT32_T                                                     /* return */
-#define __NR32RTR_getegid32                SC_REPR_UINT32_T                                                     /* return */
+#define __NR32RTR_getuid32                 SC_REPR_UID_T                                                        /* return */
+#define __NR32RTR_getgid32                 SC_REPR_GID_T                                                        /* return */
+#define __NR32RTR_geteuid32                SC_REPR_UID_T                                                        /* return */
+#define __NR32RTR_getegid32                SC_REPR_GID_T                                                        /* return */
 #define __NR32ATR0_setreuid32              SC_REPR_UID_T                                                        /* ruid */ 
 #define __NR32ATR1_setreuid32              SC_REPR_UID_T                                                        /* euid */ 
 #define __NR32RTR_setreuid32               SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_setregid32              SC_REPR_GID_T                                                        /* rgid */ 
 #define __NR32ATR1_setregid32              SC_REPR_GID_T                                                        /* egid */ 
 #define __NR32RTR_setregid32               SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_getgroups32             SC_REPR_SIZE_T                                                       /* size */ 
+#define __NR32ATR0_getgroups32             SC_REPR_SIZE_T                                                       /* count */ 
 #define __NR32ATR1_getgroups32             SC_REPR_POINTER                                                      /* list */ 
 #define __NR32RTR_getgroups32              SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_setgroups32             SC_REPR_SIZE_T                                                       /* count */ 
@@ -1771,38 +1776,42 @@
 #define __NR32ATR2_getdents64              SC_REPR_SIZE_T                                                       /* count */ 
 #define __NR32RTR_getdents64               SC_REPR_SSIZE_T                                                      /* return */
 #define __NR32ATR0_fcntl64                 SC_REPR_FD_T                                                         /* fd */ 
-#define __NR32ATR1_fcntl64                 SC_REPR_SYSCALL_ULONG_T                                              /* command */ 
-#define __NR32ATR2_fcntl64                 SC_REPR_POINTER                                                      /* arg */ 
+#define __NR32ATR1_fcntl64                 SC_REPR_FCNTL64_COMMAND                                              /* command */ 
+#define __NR32ATR2_fcntl64                 SC_REPR_FCNTL64_ARG                                                  /* arg */ 
+#define __NR32ATL2_fcntl64                 1                                                                    /* arg -> command */ 
 #define __NR32RTR_fcntl64                  SC_REPR_SYSCALL_SLONG_T                                              /* return */
 #define __NR32RTR_gettid                   SC_REPR_PID_T                                                        /* return */
 #define __NR32ATR0_readahead               SC_REPR_FD_T                                                         /* fd */ 
 #define __NR32ATR1_readahead               SC_REPR_UINT64_T                                                     /* offset */ 
 #define __NR32ATR2_readahead               SC_REPR_SIZE_T                                                       /* count */ 
 #define __NR32RTR_readahead                SC_REPR_SSIZE_T                                                      /* return */
-#define __NR32ATR0_setxattr                SC_REPR_STRING                                                       /* path */ 
+#define __NR32ATR0_setxattr                SC_REPR_FILENAME                                                     /* path */ 
 #define __NR32ATR1_setxattr                SC_REPR_STRING                                                       /* name */ 
-#define __NR32ATR2_setxattr                SC_REPR_POINTER                                                      /* buf */ 
+#define __NR32ATR2_setxattr                SC_REPR_BUFFER                                                       /* buf */ 
+#define __NR32ATL2_setxattr                3                                                                    /* buf -> bufsize */ 
 #define __NR32ATR3_setxattr                SC_REPR_SIZE_T                                                       /* bufsize */ 
-#define __NR32ATR4_setxattr                SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NR32ATR4_setxattr                SC_REPR_XATTR_FLAGS                                                  /* flags */ 
 #define __NR32RTR_setxattr                 SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_lsetxattr               SC_REPR_STRING                                                       /* path */ 
+#define __NR32ATR0_lsetxattr               SC_REPR_FILENAME                                                     /* path */ 
 #define __NR32ATR1_lsetxattr               SC_REPR_STRING                                                       /* name */ 
-#define __NR32ATR2_lsetxattr               SC_REPR_POINTER                                                      /* buf */ 
+#define __NR32ATR2_lsetxattr               SC_REPR_BUFFER                                                       /* buf */ 
+#define __NR32ATL2_lsetxattr               3                                                                    /* buf -> bufsize */ 
 #define __NR32ATR3_lsetxattr               SC_REPR_SIZE_T                                                       /* bufsize */ 
-#define __NR32ATR4_lsetxattr               SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NR32ATR4_lsetxattr               SC_REPR_XATTR_FLAGS                                                  /* flags */ 
 #define __NR32RTR_lsetxattr                SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_fsetxattr               SC_REPR_FD_T                                                         /* fd */ 
 #define __NR32ATR1_fsetxattr               SC_REPR_STRING                                                       /* name */ 
-#define __NR32ATR2_fsetxattr               SC_REPR_POINTER                                                      /* buf */ 
+#define __NR32ATR2_fsetxattr               SC_REPR_BUFFER                                                       /* buf */ 
+#define __NR32ATL2_fsetxattr               3                                                                    /* buf -> bufsize */ 
 #define __NR32ATR3_fsetxattr               SC_REPR_SIZE_T                                                       /* bufsize */ 
-#define __NR32ATR4_fsetxattr               SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NR32ATR4_fsetxattr               SC_REPR_XATTR_FLAGS                                                  /* flags */ 
 #define __NR32RTR_fsetxattr                SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_getxattr                SC_REPR_STRING                                                       /* path */ 
+#define __NR32ATR0_getxattr                SC_REPR_FILENAME                                                     /* path */ 
 #define __NR32ATR1_getxattr                SC_REPR_STRING                                                       /* name */ 
 #define __NR32ATR2_getxattr                SC_REPR_POINTER                                                      /* buf */ 
 #define __NR32ATR3_getxattr                SC_REPR_SIZE_T                                                       /* bufsize */ 
 #define __NR32RTR_getxattr                 SC_REPR_SSIZE_T                                                      /* return */
-#define __NR32ATR0_lgetxattr               SC_REPR_STRING                                                       /* path */ 
+#define __NR32ATR0_lgetxattr               SC_REPR_FILENAME                                                     /* path */ 
 #define __NR32ATR1_lgetxattr               SC_REPR_STRING                                                       /* name */ 
 #define __NR32ATR2_lgetxattr               SC_REPR_POINTER                                                      /* buf */ 
 #define __NR32ATR3_lgetxattr               SC_REPR_SIZE_T                                                       /* bufsize */ 
@@ -1812,11 +1821,11 @@
 #define __NR32ATR2_fgetxattr               SC_REPR_POINTER                                                      /* buf */ 
 #define __NR32ATR3_fgetxattr               SC_REPR_SIZE_T                                                       /* bufsize */ 
 #define __NR32RTR_fgetxattr                SC_REPR_SSIZE_T                                                      /* return */
-#define __NR32ATR0_listxattr               SC_REPR_STRING                                                       /* path */ 
+#define __NR32ATR0_listxattr               SC_REPR_FILENAME                                                     /* path */ 
 #define __NR32ATR1_listxattr               SC_REPR_POINTER                                                      /* listbuf */ 
 #define __NR32ATR2_listxattr               SC_REPR_SIZE_T                                                       /* listbufsize */ 
 #define __NR32RTR_listxattr                SC_REPR_SSIZE_T                                                      /* return */
-#define __NR32ATR0_llistxattr              SC_REPR_STRING                                                       /* path */ 
+#define __NR32ATR0_llistxattr              SC_REPR_FILENAME                                                     /* path */ 
 #define __NR32ATR1_llistxattr              SC_REPR_POINTER                                                      /* listbuf */ 
 #define __NR32ATR2_llistxattr              SC_REPR_SIZE_T                                                       /* listbufsize */ 
 #define __NR32RTR_llistxattr               SC_REPR_SSIZE_T                                                      /* return */
@@ -1824,13 +1833,13 @@
 #define __NR32ATR1_flistxattr              SC_REPR_POINTER                                                      /* listbuf */ 
 #define __NR32ATR2_flistxattr              SC_REPR_SIZE_T                                                       /* listbufsize */ 
 #define __NR32RTR_flistxattr               SC_REPR_SSIZE_T                                                      /* return */
-#define __NR32ATR0_removexattr             SC_REPR_STRING                                                       /* path */ 
+#define __NR32ATR0_removexattr             SC_REPR_FILENAME                                                     /* path */ 
 #define __NR32ATR1_removexattr             SC_REPR_STRING                                                       /* name */ 
 #define __NR32RTR_removexattr              SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_lremovexattr            SC_REPR_STRING                                                       /* path */ 
+#define __NR32ATR0_lremovexattr            SC_REPR_FILENAME                                                     /* path */ 
 #define __NR32ATR1_lremovexattr            SC_REPR_STRING                                                       /* name */ 
 #define __NR32RTR_lremovexattr             SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_fremovexattr            SC_REPR_INT                                                          /* fd */ 
+#define __NR32ATR0_fremovexattr            SC_REPR_FD_T                                                         /* fd */ 
 #define __NR32ATR1_fremovexattr            SC_REPR_STRING                                                       /* name */ 
 #define __NR32RTR_fremovexattr             SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_tkill                   SC_REPR_PID_T                                                        /* tid */ 
@@ -1842,15 +1851,17 @@
 #define __NR32ATR3_sendfile64              SC_REPR_SIZE_T                                                       /* num_bytes */ 
 #define __NR32RTR_sendfile64               SC_REPR_SSIZE_T                                                      /* return */
 #define __NR32ATR0_futex                   SC_REPR_POINTER                                                      /* uaddr */ 
-#define __NR32ATR1_futex                   SC_REPR_SYSCALL_ULONG_T                                              /* futex_op */ 
+#define __NR32ATR1_futex                   SC_REPR_FUTEX_OP                                                     /* futex_op */ 
 #define __NR32ATR2_futex                   SC_REPR_UINT32_T                                                     /* val */ 
-#define __NR32ATR3_futex                   SC_REPR_STRUCT_TIMESPECX32                                           /* timeout_or_val2 */ 
+#define __NR32ATR3_futex                   SC_REPR_STRUCT_TIMESPECX32_OR_UINT32                                 /* timeout_or_val2 */ 
+#define __NR32ATL3_futex                   1                                                                    /* timeout_or_val2 -> futex_op */ 
 #define __NR32ATR4_futex                   SC_REPR_POINTER                                                      /* uaddr2 */ 
 #define __NR32ATR5_futex                   SC_REPR_UINT32_T                                                     /* val3 */ 
 #define __NR32RTR_futex                    SC_REPR_SYSCALL_SLONG_T                                              /* return */
 #define __NR32ATR0_sched_setaffinity       SC_REPR_PID_T                                                        /* pid */ 
 #define __NR32ATR1_sched_setaffinity       SC_REPR_SIZE_T                                                       /* cpusetsize */ 
-#define __NR32ATR2_sched_setaffinity       SC_REPR_POINTER                                                      /* cpuset */ 
+#define __NR32ATR2_sched_setaffinity       SC_REPR_CPUSET                                                       /* cpuset */ 
+#define __NR32ATL2_sched_setaffinity       1                                                                    /* cpuset -> cpusetsize */ 
 #define __NR32RTR_sched_setaffinity        SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_sched_getaffinity       SC_REPR_PID_T                                                        /* pid */ 
 #define __NR32ATR1_sched_getaffinity       SC_REPR_SIZE_T                                                       /* cpusetsize */ 
@@ -1890,7 +1901,7 @@
 #define __NR32RTR_epoll_wait               SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_remap_file_pages        SC_REPR_POINTER                                                      /* start */ 
 #define __NR32ATR1_remap_file_pages        SC_REPR_SIZE_T                                                       /* size */ 
-#define __NR32ATR2_remap_file_pages        SC_REPR_SYSCALL_ULONG_T                                              /* prot */ 
+#define __NR32ATR2_remap_file_pages        SC_REPR_MMAP_PROT                                                    /* prot */ 
 #define __NR32ATR3_remap_file_pages        SC_REPR_SIZE_T                                                       /* pgoff */ 
 #define __NR32ATR4_remap_file_pages        SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
 #define __NR32RTR_remap_file_pages         SC_REPR_ERRNO_T                                                      /* return */
@@ -1901,8 +1912,8 @@
 #define __NR32ATR2_timer_create            SC_REPR_POINTER                                                      /* timerid */ 
 #define __NR32RTR_timer_create             SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_timer_settime           SC_REPR_TIMER_T                                                      /* timerid */ 
-#define __NR32ATR1_timer_settime           SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
-#define __NR32ATR2_timer_settime           SC_REPR_POINTER                                                      /* value */ 
+#define __NR32ATR1_timer_settime           SC_REPR_TIMER_FLAGS                                                  /* flags */ 
+#define __NR32ATR2_timer_settime           SC_REPR_STRUCT_ITIMERSPECX32                                         /* value */ 
 #define __NR32ATR3_timer_settime           SC_REPR_POINTER                                                      /* ovalue */ 
 #define __NR32RTR_timer_settime            SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_timer_gettime           SC_REPR_TIMER_T                                                      /* timerid */ 
@@ -1922,7 +1933,7 @@
 #define __NR32ATR1_clock_getres            SC_REPR_POINTER                                                      /* res */ 
 #define __NR32RTR_clock_getres             SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_clock_nanosleep         SC_REPR_CLOCKID_T                                                    /* clock_id */ 
-#define __NR32ATR1_clock_nanosleep         SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NR32ATR1_clock_nanosleep         SC_REPR_TIMER_FLAGS                                                  /* flags */ 
 #define __NR32ATR2_clock_nanosleep         SC_REPR_STRUCT_TIMESPECX32                                           /* requested_time */ 
 #define __NR32ATR3_clock_nanosleep         SC_REPR_POINTER                                                      /* remaining */ 
 #define __NR32RTR_clock_nanosleep          SC_REPR_ERRNO_T                                                      /* return */
@@ -1937,7 +1948,7 @@
 #define __NR32ATR2_tgkill                  SC_REPR_SIGNO                                                        /* signo */ 
 #define __NR32RTR_tgkill                   SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_utimes                  SC_REPR_FILENAME                                                     /* filename */ 
-#define __NR32ATR1_utimes                  SC_REPR_POINTER                                                      /* times */ 
+#define __NR32ATR1_utimes                  SC_REPR_STRUCT_TIMEVALX32_VEC2                                       /* times */ 
 #define __NR32RTR_utimes                   SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_fadvise64_64            SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NR32RTR_fadvise64_64             SC_REPR_ERRNO_T                                                      /* return */
@@ -1956,7 +1967,8 @@
 #define __NR32ATR0_mq_unlink               SC_REPR_STRING                                                       /* name */ 
 #define __NR32RTR_mq_unlink                SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_mq_timedsend            SC_REPR_FD_T                                                         /* mqdes */ 
-#define __NR32ATR1_mq_timedsend            SC_REPR_STRING                                                       /* msg_ptr */ 
+#define __NR32ATR1_mq_timedsend            SC_REPR_BUFFER                                                       /* msg_ptr */ 
+#define __NR32ATL1_mq_timedsend            2                                                                    /* msg_ptr -> msg_len */ 
 #define __NR32ATR2_mq_timedsend            SC_REPR_SIZE_T                                                       /* msg_len */ 
 #define __NR32ATR3_mq_timedsend            SC_REPR_UINT32_T                                                     /* msg_prio */ 
 #define __NR32ATR4_mq_timedsend            SC_REPR_STRUCT_TIMESPECX32                                           /* abs_timeout */ 
@@ -1968,10 +1980,10 @@
 #define __NR32ATR4_mq_timedreceive         SC_REPR_STRUCT_TIMESPECX32                                           /* abs_timeout */ 
 #define __NR32RTR_mq_timedreceive          SC_REPR_SSIZE_T                                                      /* return */
 #define __NR32ATR0_mq_notify               SC_REPR_FD_T                                                         /* mqdes */ 
-#define __NR32ATR1_mq_notify               SC_REPR_POINTER                                                      /* notification */ 
+#define __NR32ATR1_mq_notify               SC_REPR_STRUCT_SIGEVENT                                              /* notification */ 
 #define __NR32RTR_mq_notify                SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_mq_getsetattr           SC_REPR_FD_T                                                         /* mqdes */ 
-#define __NR32ATR1_mq_getsetattr           SC_REPR_POINTER                                                      /* newattr */ 
+#define __NR32ATR1_mq_getsetattr           SC_REPR_STRUCT_MQ_ATTR                                               /* newattr */ 
 #define __NR32ATR2_mq_getsetattr           SC_REPR_POINTER                                                      /* oldattr */ 
 #define __NR32RTR_mq_getsetattr            SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_kexec_load              SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
@@ -1989,13 +2001,15 @@
 #define __NR32RTR_request_key              SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_keyctl                  SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NR32RTR_keyctl                   SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_ioprio_set              SC_REPR_SYSCALL_ULONG_T                                              /* which */ 
-#define __NR32ATR1_ioprio_set              SC_REPR_SYSCALL_ULONG_T                                              /* who */ 
-#define __NR32ATR2_ioprio_set              SC_REPR_SYSCALL_ULONG_T                                              /* ioprio */ 
+#define __NR32ATR0_ioprio_set              SC_REPR_IOPRIO_WHO                                                   /* who */ 
+#define __NR32ATR1_ioprio_set              SC_REPR_IOPRIO_ID                                                    /* id */ 
+#define __NR32ATL1_ioprio_set              0                                                                    /* id -> who */ 
+#define __NR32ATR2_ioprio_set              SC_REPR_IOPRIO_VALUE                                                 /* ioprio */ 
 #define __NR32RTR_ioprio_set               SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_ioprio_get              SC_REPR_SYSCALL_ULONG_T                                              /* which */ 
-#define __NR32ATR1_ioprio_get              SC_REPR_SYSCALL_ULONG_T                                              /* who */ 
-#define __NR32RTR_ioprio_get               SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_ioprio_get              SC_REPR_IOPRIO_WHO                                                   /* who */ 
+#define __NR32ATR1_ioprio_get              SC_REPR_IOPRIO_ID                                                    /* id */ 
+#define __NR32ATL1_ioprio_get              0                                                                    /* id -> who */ 
+#define __NR32RTR_ioprio_get               SC_REPR_IOPRIO_VALUE                                                 /* return */
 #define __NR32ATR0_inotify_init            SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NR32RTR_inotify_init             SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_inotify_add_watch       SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
@@ -2032,7 +2046,7 @@
 #define __NR32ATR0_futimesat               SC_REPR_FD_T                                                         /* dirfd */ 
 #define __NR32ATR1_futimesat               SC_REPR_FILENAME                                                     /* filename */ 
 #define __NR32ATL1_futimesat               0                                                                    /* filename -> dirfd */ 
-#define __NR32ATR2_futimesat               SC_REPR_TIMEVALX32_VEC2                                              /* times */ 
+#define __NR32ATR2_futimesat               SC_REPR_STRUCT_TIMEVALX32_VEC2                                       /* times */ 
 #define __NR32RTR_futimesat                SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_linux_fstatat64         SC_REPR_FD_T                                                         /* dirfd */ 
 #define __NR32ATR1_linux_fstatat64         SC_REPR_FILENAME                                                     /* filename */ 
@@ -2053,14 +2067,17 @@
 #define __NR32ATL3_renameat                2                                                                    /* newname_or_path -> newfd */ 
 #define __NR32RTR_renameat                 SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_linkat                  SC_REPR_FD_T                                                         /* fromfd */ 
-#define __NR32ATR1_linkat                  SC_REPR_STRING                                                       /* existing_file */ 
+#define __NR32ATR1_linkat                  SC_REPR_FILENAME                                                     /* existing_file */ 
+#define __NR32ATL1_linkat                  0                                                                    /* existing_file -> fromfd */ 
 #define __NR32ATR2_linkat                  SC_REPR_FD_T                                                         /* tofd */ 
-#define __NR32ATR3_linkat                  SC_REPR_STRING                                                       /* target_path */ 
+#define __NR32ATR3_linkat                  SC_REPR_FILENAME                                                     /* target_path */ 
+#define __NR32ATL3_linkat                  2                                                                    /* target_path -> tofd */ 
 #define __NR32ATR4_linkat                  SC_REPR_ATFLAG__EMPTY_PATH__SYMLINK_FOLLOW__DOSPATH                  /* flags */ 
 #define __NR32RTR_linkat                   SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_symlinkat               SC_REPR_STRING                                                       /* link_text */ 
 #define __NR32ATR1_symlinkat               SC_REPR_FD_T                                                         /* tofd */ 
-#define __NR32ATR2_symlinkat               SC_REPR_STRING                                                       /* target_path */ 
+#define __NR32ATR2_symlinkat               SC_REPR_FILENAME                                                     /* target_path */ 
+#define __NR32ATL2_symlinkat               1                                                                    /* target_path -> tofd */ 
 #define __NR32RTR_symlinkat                SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_readlinkat              SC_REPR_FD_T                                                         /* dirfd */ 
 #define __NR32ATR1_readlinkat              SC_REPR_FILENAME                                                     /* path */ 
@@ -2094,7 +2111,8 @@
 #define __NR32ATL0_ppoll                   1                                                                    /* fds -> nfds */ 
 #define __NR32ATR1_ppoll                   SC_REPR_SIZE_T                                                       /* nfds */ 
 #define __NR32ATR2_ppoll                   SC_REPR_STRUCT_TIMESPECX32                                           /* timeout_ts */ 
-#define __NR32ATR3_ppoll                   SC_REPR_POINTER                                                      /* sigmask */ 
+#define __NR32ATR3_ppoll                   SC_REPR_STRUCT_SIGSET                                                /* sigmask */ 
+#define __NR32ATL3_ppoll                   4                                                                    /* sigmask -> sigsetsize */ 
 #define __NR32ATR4_ppoll                   SC_REPR_SIZE_T                                                       /* sigsetsize */ 
 #define __NR32RTR_ppoll                    SC_REPR_SSIZE_T                                                      /* return */
 #define __NR32ATR0_unshare                 SC_REPR_CLONE_FLAGS_UNSHARE                                          /* flags */ 
@@ -2108,23 +2126,23 @@
 #define __NR32ATR2_splice                  SC_REPR_FD_T                                                         /* fdout */ 
 #define __NR32ATR3_splice                  SC_REPR_POINTER                                                      /* offout */ 
 #define __NR32ATR4_splice                  SC_REPR_SIZE_T                                                       /* length */ 
-#define __NR32ATR5_splice                  SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NR32ATR5_splice                  SC_REPR_SPLICE_FLAGS                                                 /* flags */ 
 #define __NR32RTR_splice                   SC_REPR_SSIZE_T                                                      /* return */
 #define __NR32ATR0_sync_file_range         SC_REPR_FD_T                                                         /* fd */ 
 #define __NR32ATR1_sync_file_range         SC_REPR_UINT64_T                                                     /* offset */ 
 #define __NR32ATR2_sync_file_range         SC_REPR_UINT64_T                                                     /* count */ 
-#define __NR32ATR3_sync_file_range         SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NR32ATR3_sync_file_range         SC_REPR_SYNC_FILE_RANGE_FLAGS                                        /* flags */ 
 #define __NR32RTR_sync_file_range          SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_tee                     SC_REPR_FD_T                                                         /* fdin */ 
 #define __NR32ATR1_tee                     SC_REPR_FD_T                                                         /* fdout */ 
 #define __NR32ATR2_tee                     SC_REPR_SIZE_T                                                       /* length */ 
-#define __NR32ATR3_tee                     SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NR32ATR3_tee                     SC_REPR_SPLICE_FLAGS                                                 /* flags */ 
 #define __NR32RTR_tee                      SC_REPR_SSIZE_T                                                      /* return */
 #define __NR32ATR0_vmsplice                SC_REPR_FD_T                                                         /* fdout */ 
 #define __NR32ATR1_vmsplice                SC_REPR_STRUCT_IOVECX32                                              /* iov */ 
 #define __NR32ATL1_vmsplice                2                                                                    /* iov -> count */ 
 #define __NR32ATR2_vmsplice                SC_REPR_SIZE_T                                                       /* count */ 
-#define __NR32ATR3_vmsplice                SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NR32ATR3_vmsplice                SC_REPR_SPLICE_FLAGS                                                 /* flags */ 
 #define __NR32RTR_vmsplice                 SC_REPR_SSIZE_T                                                      /* return */
 #define __NR32ATR0_move_pages              SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NR32RTR_move_pages               SC_REPR_ERRNO_T                                                      /* return */
@@ -2141,33 +2159,36 @@
 #define __NR32ATR0_utimensat               SC_REPR_FD_T                                                         /* dirfd */ 
 #define __NR32ATR1_utimensat               SC_REPR_FILENAME                                                     /* filename */ 
 #define __NR32ATL1_utimensat               0                                                                    /* filename -> dirfd */ 
-#define __NR32ATR2_utimensat               SC_REPR_POINTER                                                      /* times */ 
+#define __NR32ATR2_utimensat               SC_REPR_STRUCT_TIMESPECX32_VEC2_OR_3                                 /* times */ 
+#define __NR32ATL2_utimensat               3                                                                    /* times -> flags */ 
 #define __NR32ATR3_utimensat               SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__CHANGE_CTIME__DOSPATH              /* flags */ 
 #define __NR32RTR_utimensat                SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_signalfd                SC_REPR_FD_T                                                         /* fd */ 
-#define __NR32ATR1_signalfd                SC_REPR_POINTER                                                      /* sigmask */ 
+#define __NR32ATR1_signalfd                SC_REPR_STRUCT_SIGSET                                                /* sigmask */ 
+#define __NR32ATL1_signalfd                2                                                                    /* sigmask -> sigsetsize */ 
 #define __NR32ATR2_signalfd                SC_REPR_SIZE_T                                                       /* sigsetsize */ 
 #define __NR32RTR_signalfd                 SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_timerfd_create          SC_REPR_CLOCKID_T                                                    /* clock_id */ 
-#define __NR32ATR1_timerfd_create          SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NR32ATR1_timerfd_create          SC_REPR_TIMERFD_FLAGS                                                /* flags */ 
 #define __NR32RTR_timerfd_create           SC_REPR_FD_T                                                         /* return */
 #define __NR32ATR0_eventfd                 SC_REPR_SYSCALL_ULONG_T                                              /* initval */ 
 #define __NR32RTR_eventfd                  SC_REPR_FD_T                                                         /* return */
 #define __NR32ATR0_fallocate               SC_REPR_FD_T                                                         /* fd */ 
-#define __NR32ATR1_fallocate               SC_REPR_SYSCALL_ULONG_T                                              /* mode */ 
+#define __NR32ATR1_fallocate               SC_REPR_FALLOCATE_MODE                                               /* mode */ 
 #define __NR32ATR2_fallocate               SC_REPR_SYSCALL_ULONG_T                                              /* offset */ 
 #define __NR32ATR3_fallocate               SC_REPR_SYSCALL_ULONG_T                                              /* length */ 
 #define __NR32RTR_fallocate                SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_timerfd_settime         SC_REPR_FD_T                                                         /* ufd */ 
-#define __NR32ATR1_timerfd_settime         SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NR32ATR0_timerfd_settime         SC_REPR_FD_T                                                         /* timerfd */ 
+#define __NR32ATR1_timerfd_settime         SC_REPR_TIMERFD_TIMER_FLAGS                                          /* flags */ 
 #define __NR32ATR2_timerfd_settime         SC_REPR_STRUCT_ITIMERSPECX32                                         /* utmr */ 
 #define __NR32ATR3_timerfd_settime         SC_REPR_POINTER                                                      /* otmr */ 
 #define __NR32RTR_timerfd_settime          SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_timerfd_gettime         SC_REPR_FD_T                                                         /* ufd */ 
+#define __NR32ATR0_timerfd_gettime         SC_REPR_FD_T                                                         /* timerfd */ 
 #define __NR32ATR1_timerfd_gettime         SC_REPR_POINTER                                                      /* otmr */ 
 #define __NR32RTR_timerfd_gettime          SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_signalfd4               SC_REPR_FD_T                                                         /* fd */ 
-#define __NR32ATR1_signalfd4               SC_REPR_POINTER                                                      /* sigmask */ 
+#define __NR32ATR1_signalfd4               SC_REPR_STRUCT_SIGSET                                                /* sigmask */ 
+#define __NR32ATL1_signalfd4               2                                                                    /* sigmask -> sigsetsize */ 
 #define __NR32ATR2_signalfd4               SC_REPR_SIZE_T                                                       /* sigsetsize */ 
 #define __NR32ATR3_signalfd4               SC_REPR_SIGNALFD4_FLAGS                                              /* flags */ 
 #define __NR32RTR_signalfd4                SC_REPR_ERRNO_T                                                      /* return */
@@ -2207,7 +2228,7 @@
 #define __NR32ATR0_recvmmsg                SC_REPR_FD_T                                                         /* sockfd */ 
 #define __NR32ATR1_recvmmsg                SC_REPR_POINTER                                                      /* vmessages */ 
 #define __NR32ATR2_recvmmsg                SC_REPR_SIZE_T                                                       /* vlen */ 
-#define __NR32ATR3_recvmmsg                SC_REPR_SOCKET_RECVMSG_FLAGS2                                        /* flags */ 
+#define __NR32ATR3_recvmmsg                SC_REPR_SOCKET_RECVMSG_FLAGS2                                        /* msg_flags */ 
 #define __NR32ATR4_recvmmsg                SC_REPR_STRUCT_TIMESPECX32                                           /* tmo */ 
 #define __NR32RTR_recvmmsg                 SC_REPR_SSIZE_T                                                      /* return */
 #define __NR32ATR0_fanotify_init           SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
@@ -2224,11 +2245,11 @@
 #define __NR32ATL1_name_to_handle_at       0                                                                    /* filename -> dirfd */ 
 #define __NR32ATR2_name_to_handle_at       SC_REPR_POINTER                                                      /* handle */ 
 #define __NR32ATR3_name_to_handle_at       SC_REPR_POINTER                                                      /* mnt_id */ 
-#define __NR32ATR4_name_to_handle_at       SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NR32ATR4_name_to_handle_at       SC_REPR_ATFLAG__EMPTY_PATH__SYMLINK_FOLLOW__DOSPATH                  /* flags */ 
 #define __NR32RTR_name_to_handle_at        SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_open_by_handle_at       SC_REPR_FD_T                                                         /* mountdirfd */ 
-#define __NR32ATR1_open_by_handle_at       SC_REPR_POINTER                                                      /* handle */ 
-#define __NR32ATR2_open_by_handle_at       SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NR32ATR1_open_by_handle_at       SC_REPR_STRUCT_FILE_HANDLE                                           /* handle */ 
+#define __NR32ATR2_open_by_handle_at       SC_REPR_OFLAG_T                                                      /* flags */ 
 #define __NR32RTR_open_by_handle_at        SC_REPR_FD_T                                                         /* return */
 #define __NR32ATR0_clock_adjtime           SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NR32RTR_clock_adjtime            SC_REPR_ERRNO_T                                                      /* return */
@@ -2236,11 +2257,12 @@
 #define __NR32RTR_syncfs                   SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_sendmmsg                SC_REPR_FD_T                                                         /* sockfd */ 
 #define __NR32ATR1_sendmmsg                SC_REPR_STRUCT_MMSGHDRX32                                            /* vmessages */ 
+#define __NR32ATL1_sendmmsg                2                                                                    /* vmessages -> vlen */ 
 #define __NR32ATR2_sendmmsg                SC_REPR_SIZE_T                                                       /* vlen */ 
-#define __NR32ATR3_sendmmsg                SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NR32ATR3_sendmmsg                SC_REPR_SOCKET_SENDMSG_FLAGS                                         /* msg_flags */ 
 #define __NR32RTR_sendmmsg                 SC_REPR_SSIZE_T                                                      /* return */
 #define __NR32ATR0_setns                   SC_REPR_FD_T                                                         /* fd */ 
-#define __NR32ATR1_setns                   SC_REPR_SYSCALL_ULONG_T                                              /* nstype */ 
+#define __NR32ATR1_setns                   SC_REPR_CLONE_FLAGS_SETNS                                            /* nstype */ 
 #define __NR32RTR_setns                    SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_process_vm_readv        SC_REPR_PID_T                                                        /* pid */ 
 #define __NR32ATR1_process_vm_readv        SC_REPR_STRUCT_IOVEC                                                 /* local_iov */ 
@@ -2262,7 +2284,7 @@
 #define __NR32RTR_process_vm_writev        SC_REPR_SSIZE_T                                                      /* return */
 #define __NR32ATR0_kcmp                    SC_REPR_PID_T                                                        /* pid1 */ 
 #define __NR32ATR1_kcmp                    SC_REPR_PID_T                                                        /* pid2 */ 
-#define __NR32ATR2_kcmp                    SC_REPR_SYSCALL_ULONG_T                                              /* type */ 
+#define __NR32ATR2_kcmp                    SC_REPR_KCMP_TYPE                                                    /* type */ 
 #define __NR32ATR3_kcmp                    SC_REPR_SYSCALL_ULONG_T                                              /* idx1 */ 
 #define __NR32ATR4_kcmp                    SC_REPR_SYSCALL_ULONG_T                                              /* idx2 */ 
 #define __NR32RTR_kcmp                     SC_REPR_SYSCALL_SLONG_T                                              /* return */
@@ -2284,7 +2306,7 @@
 #define __NR32RTR_seccomp                  SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_getrandom               SC_REPR_POINTER                                                      /* buf */ 
 #define __NR32ATR1_getrandom               SC_REPR_SIZE_T                                                       /* num_bytes */ 
-#define __NR32ATR2_getrandom               SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NR32ATR2_getrandom               SC_REPR_GETRANDOM_FLAGS                                              /* flags */ 
 #define __NR32RTR_getrandom                SC_REPR_SSIZE_T                                                      /* return */
 #define __NR32ATR0_memfd_create            SC_REPR_STRING                                                       /* name */ 
 #define __NR32ATR1_memfd_create            SC_REPR_MEMFD_CREATE_FLAGS                                           /* flags */ 
@@ -2351,7 +2373,8 @@
 #define __NR32ATR2_getpeername             SC_REPR_POINTER                                                      /* addr_len */ 
 #define __NR32RTR_getpeername              SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_sendto                  SC_REPR_FD_T                                                         /* sockfd */ 
-#define __NR32ATR1_sendto                  SC_REPR_POINTER                                                      /* buf */ 
+#define __NR32ATR1_sendto                  SC_REPR_BUFFER                                                       /* buf */ 
+#define __NR32ATL1_sendto                  2                                                                    /* buf -> bufsize */ 
 #define __NR32ATR2_sendto                  SC_REPR_SIZE_T                                                       /* bufsize */ 
 #define __NR32ATR3_sendto                  SC_REPR_SOCKET_SENDMSG_FLAGS                                         /* msg_flags */ 
 #define __NR32ATR4_sendto                  SC_REPR_STRUCT_SOCKADDR                                              /* addr */ 
@@ -2385,7 +2408,7 @@
 #define __NR32ATR0_recvmmsg64              SC_REPR_FD_T                                                         /* sockfd */ 
 #define __NR32ATR1_recvmmsg64              SC_REPR_POINTER                                                      /* vmessages */ 
 #define __NR32ATR2_recvmmsg64              SC_REPR_SIZE_T                                                       /* vlen */ 
-#define __NR32ATR3_recvmmsg64              SC_REPR_SOCKET_RECVMSG_FLAGS2                                        /* flags */ 
+#define __NR32ATR3_recvmmsg64              SC_REPR_SOCKET_RECVMSG_FLAGS2                                        /* msg_flags */ 
 #define __NR32ATR4_recvmmsg64              SC_REPR_STRUCT_TIMESPECX32_64                                        /* tmo */ 
 #define __NR32RTR_recvmmsg64               SC_REPR_SSIZE_T                                                      /* return */
 #define __NR32ATR0_pwritevf                SC_REPR_FD_T                                                         /* fd */ 
@@ -2402,30 +2425,32 @@
 #define __NR32ATR3_preadvf                 SC_REPR_UINT64_T                                                     /* offset */ 
 #define __NR32ATR4_preadvf                 SC_REPR_IOMODE_T                                                     /* mode */ 
 #define __NR32RTR_preadvf                  SC_REPR_SSIZE_T                                                      /* return */
-#define __NR32ATR0_timerfd_gettime64       SC_REPR_FD_T                                                         /* ufd */ 
+#define __NR32ATR0_timerfd_gettime64       SC_REPR_FD_T                                                         /* timerfd */ 
 #define __NR32ATR1_timerfd_gettime64       SC_REPR_POINTER                                                      /* otmr */ 
 #define __NR32RTR_timerfd_gettime64        SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_timerfd_settime64       SC_REPR_FD_T                                                         /* ufd */ 
-#define __NR32ATR1_timerfd_settime64       SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NR32ATR0_timerfd_settime64       SC_REPR_FD_T                                                         /* timerfd */ 
+#define __NR32ATR1_timerfd_settime64       SC_REPR_TIMERFD_TIMER_FLAGS                                          /* flags */ 
 #define __NR32ATR2_timerfd_settime64       SC_REPR_STRUCT_ITIMERSPECX32_64                                      /* utmr */ 
 #define __NR32ATR3_timerfd_settime64       SC_REPR_POINTER                                                      /* otmr */ 
 #define __NR32RTR_timerfd_settime64        SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_fallocate64             SC_REPR_FD_T                                                         /* fd */ 
-#define __NR32ATR1_fallocate64             SC_REPR_SYSCALL_ULONG_T                                              /* mode */ 
+#define __NR32ATR1_fallocate64             SC_REPR_FALLOCATE_MODE                                               /* mode */ 
 #define __NR32ATR2_fallocate64             SC_REPR_UINT64_T                                                     /* offset */ 
 #define __NR32ATR3_fallocate64             SC_REPR_UINT64_T                                                     /* length */ 
 #define __NR32RTR_fallocate64              SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_utimensat64             SC_REPR_FD_T                                                         /* dirfd */ 
 #define __NR32ATR1_utimensat64             SC_REPR_FILENAME                                                     /* filename */ 
 #define __NR32ATL1_utimensat64             0                                                                    /* filename -> dirfd */ 
-#define __NR32ATR2_utimensat64             SC_REPR_POINTER                                                      /* times */ 
+#define __NR32ATR2_utimensat64             SC_REPR_STRUCT_TIMESPECX32_64_VEC2_OR_3                              /* times */ 
+#define __NR32ATL2_utimensat64             3                                                                    /* times -> flags */ 
 #define __NR32ATR3_utimensat64             SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__CHANGE_CTIME__DOSPATH              /* flags */ 
 #define __NR32RTR_utimensat64              SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_ppoll64                 SC_REPR_STRUCT_POLLFD                                                /* fds */ 
 #define __NR32ATL0_ppoll64                 1                                                                    /* fds -> nfds */ 
 #define __NR32ATR1_ppoll64                 SC_REPR_SIZE_T                                                       /* nfds */ 
 #define __NR32ATR2_ppoll64                 SC_REPR_STRUCT_TIMESPECX32_64                                        /* timeout_ts */ 
-#define __NR32ATR3_ppoll64                 SC_REPR_POINTER                                                      /* sigmask */ 
+#define __NR32ATR3_ppoll64                 SC_REPR_STRUCT_SIGSET                                                /* sigmask */ 
+#define __NR32ATL3_ppoll64                 4                                                                    /* sigmask -> sigsetsize */ 
 #define __NR32ATR4_ppoll64                 SC_REPR_SIZE_T                                                       /* sigsetsize */ 
 #define __NR32RTR_ppoll64                  SC_REPR_SSIZE_T                                                      /* return */
 #define __NR32ATR0_pselect6_64             SC_REPR_SIZE_T                                                       /* nfds */ 
@@ -2447,7 +2472,8 @@
 #define __NR32RTR_freadlinkat              SC_REPR_SSIZE_T                                                      /* return */
 #define __NR32ATR0_fsymlinkat              SC_REPR_STRING                                                       /* link_text */ 
 #define __NR32ATR1_fsymlinkat              SC_REPR_FD_T                                                         /* tofd */ 
-#define __NR32ATR2_fsymlinkat              SC_REPR_STRING                                                       /* target_path */ 
+#define __NR32ATR2_fsymlinkat              SC_REPR_FILENAME                                                     /* target_path */ 
+#define __NR32ATL2_fsymlinkat              1                                                                    /* target_path -> tofd */ 
 #define __NR32ATR3_fsymlinkat              SC_REPR_ATFLAG__DOSPATH                                              /* flags */ 
 #define __NR32RTR_fsymlinkat               SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_frenameat               SC_REPR_FD_T                                                         /* oldfd */ 
@@ -2467,7 +2493,7 @@
 #define __NR32ATR0_futimesat64             SC_REPR_FD_T                                                         /* dirfd */ 
 #define __NR32ATR1_futimesat64             SC_REPR_FILENAME                                                     /* filename */ 
 #define __NR32ATL1_futimesat64             0                                                                    /* filename -> dirfd */ 
-#define __NR32ATR2_futimesat64             SC_REPR_TIMEVALX32_64_VEC2                                           /* times */ 
+#define __NR32ATR2_futimesat64             SC_REPR_STRUCT_TIMEVALX32_64_VEC2                                    /* times */ 
 #define __NR32RTR_futimesat64              SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_fmknodat                SC_REPR_FD_T                                                         /* dirfd */ 
 #define __NR32ATR1_fmknodat                SC_REPR_FILENAME                                                     /* nodename */ 
@@ -2497,16 +2523,17 @@
 #define __NR32ATR4_mq_timedreceive64       SC_REPR_STRUCT_TIMESPECX32_64                                        /* abs_timeout */ 
 #define __NR32RTR_mq_timedreceive64        SC_REPR_SSIZE_T                                                      /* return */
 #define __NR32ATR0_mq_timedsend64          SC_REPR_FD_T                                                         /* mqdes */ 
-#define __NR32ATR1_mq_timedsend64          SC_REPR_STRING                                                       /* msg_ptr */ 
+#define __NR32ATR1_mq_timedsend64          SC_REPR_BUFFER                                                       /* msg_ptr */ 
+#define __NR32ATL1_mq_timedsend64          2                                                                    /* msg_ptr -> msg_len */ 
 #define __NR32ATR2_mq_timedsend64          SC_REPR_SIZE_T                                                       /* msg_len */ 
 #define __NR32ATR3_mq_timedsend64          SC_REPR_UINT32_T                                                     /* msg_prio */ 
 #define __NR32ATR4_mq_timedsend64          SC_REPR_STRUCT_TIMESPECX32_64                                        /* abs_timeout */ 
 #define __NR32RTR_mq_timedsend64           SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_utimes64                SC_REPR_FILENAME                                                     /* filename */ 
-#define __NR32ATR1_utimes64                SC_REPR_POINTER                                                      /* times */ 
+#define __NR32ATR1_utimes64                SC_REPR_STRUCT_TIMEVALX32_64_VEC2                                    /* times */ 
 #define __NR32RTR_utimes64                 SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_clock_nanosleep64       SC_REPR_CLOCKID_T                                                    /* clock_id */ 
-#define __NR32ATR1_clock_nanosleep64       SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NR32ATR1_clock_nanosleep64       SC_REPR_TIMER_FLAGS                                                  /* flags */ 
 #define __NR32ATR2_clock_nanosleep64       SC_REPR_STRUCT_TIMESPECX32_64                                        /* requested_time */ 
 #define __NR32ATR3_clock_nanosleep64       SC_REPR_POINTER                                                      /* remaining */ 
 #define __NR32RTR_clock_nanosleep64        SC_REPR_ERRNO_T                                                      /* return */
@@ -2523,8 +2550,8 @@
 #define __NR32ATR1_timer_gettime64         SC_REPR_POINTER                                                      /* value */ 
 #define __NR32RTR_timer_gettime64          SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_timer_settime64         SC_REPR_TIMER_T                                                      /* timerid */ 
-#define __NR32ATR1_timer_settime64         SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
-#define __NR32ATR2_timer_settime64         SC_REPR_POINTER                                                      /* value */ 
+#define __NR32ATR1_timer_settime64         SC_REPR_TIMER_FLAGS                                                  /* flags */ 
+#define __NR32ATR2_timer_settime64         SC_REPR_STRUCT_ITIMERSPECX32_64                                      /* value */ 
 #define __NR32ATR3_timer_settime64         SC_REPR_POINTER                                                      /* ovalue */ 
 #define __NR32RTR_timer_settime64          SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_kreaddirf               SC_REPR_FD_T                                                         /* fd */ 
@@ -2543,7 +2570,8 @@
 #define __NR32ATR1_kstat                   SC_REPR_POINTER                                                      /* statbuf */ 
 #define __NR32RTR_kstat                    SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_pwrite64f               SC_REPR_FD_T                                                         /* fd */ 
-#define __NR32ATR1_pwrite64f               SC_REPR_POINTER                                                      /* buf */ 
+#define __NR32ATR1_pwrite64f               SC_REPR_BUFFER                                                       /* buf */ 
+#define __NR32ATL1_pwrite64f               2                                                                    /* buf -> bufsize */ 
 #define __NR32ATR2_pwrite64f               SC_REPR_SIZE_T                                                       /* bufsize */ 
 #define __NR32ATR3_pwrite64f               SC_REPR_UINT64_T                                                     /* offset */ 
 #define __NR32ATR4_pwrite64f               SC_REPR_IOMODE_T                                                     /* mode */ 
@@ -2567,8 +2595,9 @@
 #define __NR32ATR1_sched_rr_get_interval64 SC_REPR_POINTER                                                      /* tms */ 
 #define __NR32RTR_sched_rr_get_interval64  SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32RTR_rpc_service              SC_REPR_SYSCALL_SLONG_T                                              /* return */
-#define __NR32ATR0_ksysctl                 SC_REPR_SYSCALL_ULONG_T                                              /* command */ 
-#define __NR32ATR1_ksysctl                 SC_REPR_POINTER                                                      /* arg */ 
+#define __NR32ATR0_ksysctl                 SC_REPR_KSYSCTL_COMMAND                                              /* command */ 
+#define __NR32ATR1_ksysctl                 SC_REPR_KSYSCTL_ARG                                                  /* arg */ 
+#define __NR32ATL1_ksysctl                 0                                                                    /* arg -> command */ 
 #define __NR32RTR_ksysctl                  SC_REPR_SYSCALL_SLONG_T                                              /* return */
 #define __NR32ATR0_writevf                 SC_REPR_FD_T                                                         /* fd */ 
 #define __NR32ATR1_writevf                 SC_REPR_STRUCT_IOVECX32                                              /* iovec */ 
@@ -2592,10 +2621,10 @@
 #define __NR32ATR2_wait4_64                SC_REPR_WAITFLAG                                                     /* options */ 
 #define __NR32ATR3_wait4_64                SC_REPR_POINTER                                                      /* usage */ 
 #define __NR32RTR_wait4_64                 SC_REPR_PID_T                                                        /* return */
-#define __NR32ATR0_getitimer64             SC_REPR_SYSCALL_ULONG_T                                              /* which */ 
+#define __NR32ATR0_getitimer64             SC_REPR_ITIMER_WHICH                                                 /* which */ 
 #define __NR32ATR1_getitimer64             SC_REPR_POINTER                                                      /* curr_value */ 
 #define __NR32RTR_getitimer64              SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_setitimer64             SC_REPR_SYSCALL_ULONG_T                                              /* which */ 
+#define __NR32ATR0_setitimer64             SC_REPR_ITIMER_WHICH                                                 /* which */ 
 #define __NR32ATR1_setitimer64             SC_REPR_STRUCT_ITIMERVALX64                                          /* newval */ 
 #define __NR32ATR2_setitimer64             SC_REPR_POINTER                                                      /* oldval */ 
 #define __NR32RTR_setitimer64              SC_REPR_ERRNO_T                                                      /* return */
@@ -2613,7 +2642,7 @@
 #define __NR32ATL2_select64                0                                                                    /* writefds -> nfds */ 
 #define __NR32ATR3_select64                SC_REPR_STRUCT_FDSET                                                 /* exceptfds */ 
 #define __NR32ATL3_select64                0                                                                    /* exceptfds -> nfds */ 
-#define __NR32ATR4_select64                SC_REPR_POINTER                                                      /* timeout */ 
+#define __NR32ATR4_select64                SC_REPR_STRUCT_TIMEVALX32_64                                         /* timeout */ 
 #define __NR32RTR_select64                 SC_REPR_SSIZE_T                                                      /* return */
 #define __NR32ATR0_settimeofday64          SC_REPR_STRUCT_TIMEVALX32_64                                         /* tv */ 
 #define __NR32ATR1_settimeofday64          SC_REPR_STRUCT_TIMEZONE                                              /* tz */ 
@@ -2624,12 +2653,13 @@
 #define __NR32ATR0_getrusage64             SC_REPR_GETRUSAGE_WHO                                                /* who */ 
 #define __NR32ATR1_getrusage64             SC_REPR_POINTER                                                      /* tv */ 
 #define __NR32RTR_getrusage64              SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_fsmode                  SC_REPR_UINT64_T                                                     /* mode */ 
-#define __NR32RTR_fsmode                   SC_REPR_UINT64_T                                                     /* return */
+#define __NR32ATR0_fsmode                  SC_REPR_FSMODE                                                       /* mode */ 
+#define __NR32RTR_fsmode                   SC_REPR_FSMODE                                                       /* return */
 #define __NR32ATR0_ioctlf                  SC_REPR_FD_T                                                         /* fd */ 
-#define __NR32ATR1_ioctlf                  SC_REPR_SYSCALL_ULONG_T                                              /* command */ 
+#define __NR32ATR1_ioctlf                  SC_REPR_IOCTL_COMMAND                                                /* command */ 
 #define __NR32ATR2_ioctlf                  SC_REPR_IOMODE_T                                                     /* mode */ 
-#define __NR32ATR3_ioctlf                  SC_REPR_POINTER                                                      /* arg */ 
+#define __NR32ATR3_ioctlf                  SC_REPR_IOCTL_ARG                                                    /* arg */ 
+#define __NR32ATL3_ioctlf                  1                                                                    /* arg -> command */ 
 #define __NR32RTR_ioctlf                   SC_REPR_SYSCALL_SLONG_T                                              /* return */
 #define __NR32ATR0_ftime64                 SC_REPR_POINTER                                                      /* tp */ 
 #define __NR32RTR_ftime64                  SC_REPR_ERRNO_T                                                      /* return */
@@ -2647,7 +2677,7 @@
 #define __NR32ATR4_process_spawnveat       SC_REPR_ATFLAG__EMPTY_PATH__SYMLINK_NOFOLLOW__DOSPATH                /* flags */ 
 #define __NR32ATR5_process_spawnveat       SC_REPR_STRUCT_SPAWN_ACTIONSX32                                      /* actions */ 
 #define __NR32RTR_process_spawnveat        SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_stime64                 SC_REPR_POINTER                                                      /* t */ 
+#define __NR32ATR0_stime64                 SC_REPR_TIME64_T_PTR                                                 /* t */ 
 #define __NR32RTR_stime64                  SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_coredump                SC_REPR_STRUCT_UCPUSTATE32                                           /* curr_state */ 
 #define __NR32ATR1_coredump                SC_REPR_STRUCT_UCPUSTATE32                                           /* orig_state */ 
@@ -2671,14 +2701,14 @@
 #define __NR32ATR3_lfutexlockexpr          SC_REPR_STRUCT_LFUTEXEXPRX32_VECTOR                                  /* exprv */ 
 #define __NR32ATL3_lfutexlockexpr          2                                                                    /* exprv -> exprc */ 
 #define __NR32ATR4_lfutexlockexpr          SC_REPR_STRUCT_TIMESPECX32_64                                        /* timeout */ 
-#define __NR32ATR5_lfutexlockexpr          SC_REPR_SYSCALL_ULONG_T                                              /* timeout_flags */ 
+#define __NR32ATR5_lfutexlockexpr          SC_REPR_LFUTEX_TIMEOUT_FLAGS                                         /* timeout_flags */ 
 #define __NR32RTR_lfutexlockexpr           SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_lfutexexpr              SC_REPR_POINTER                                                      /* base */ 
 #define __NR32ATR1_lfutexexpr              SC_REPR_SIZE_T                                                       /* exprc */ 
 #define __NR32ATR2_lfutexexpr              SC_REPR_STRUCT_LFUTEXEXPRX32_VECTOR                                  /* exprv */ 
 #define __NR32ATL2_lfutexexpr              1                                                                    /* exprv -> exprc */ 
 #define __NR32ATR3_lfutexexpr              SC_REPR_STRUCT_TIMESPECX32_64                                        /* timeout */ 
-#define __NR32ATR4_lfutexexpr              SC_REPR_SYSCALL_ULONG_T                                              /* timeout_flags */ 
+#define __NR32ATR4_lfutexexpr              SC_REPR_LFUTEX_TIMEOUT_FLAGS                                         /* timeout_flags */ 
 #define __NR32RTR_lfutexexpr               SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_lseek64                 SC_REPR_FD_T                                                         /* fd */ 
 #define __NR32ATR1_lseek64                 SC_REPR_INT64_T                                                      /* offset */ 
@@ -2699,7 +2729,7 @@
 #define __NR32ATR1_get_exception_handler   SC_REPR_POINTER                                                      /* phandler */ 
 #define __NR32ATR2_get_exception_handler   SC_REPR_POINTER                                                      /* phandler_sp */ 
 #define __NR32RTR_get_exception_handler    SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_set_exception_handler   SC_REPR_SET_EXCEPTION_HANDLER_MODE                                   /* mode */ 
+#define __NR32ATR0_set_exception_handler   SC_REPR_EXCEPTION_HANDLER_MODE                                       /* mode */ 
 #define __NR32ATR1_set_exception_handler   SC_REPR_EXCEPT_HANDLER_T                                             /* handler */ 
 #define __NR32ATR2_set_exception_handler   SC_REPR_POINTER                                                      /* handler_sp */ 
 #define __NR32RTR_set_exception_handler    SC_REPR_ERRNO_T                                                      /* return */
@@ -2737,14 +2767,13 @@
 #define __NR32ATR0_detach                  SC_REPR_PID_T                                                        /* pid */ 
 #define __NR32RTR_detach                   SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_writef                  SC_REPR_FD_T                                                         /* fd */ 
-#define __NR32ATR1_writef                  SC_REPR_INBUF                                                        /* buf */ 
+#define __NR32ATR1_writef                  SC_REPR_BUFFER                                                       /* buf */ 
 #define __NR32ATL1_writef                  2                                                                    /* buf -> bufsize */ 
 #define __NR32ATR2_writef                  SC_REPR_SIZE_T                                                       /* bufsize */ 
 #define __NR32ATR3_writef                  SC_REPR_IOMODE_T                                                     /* mode */ 
 #define __NR32RTR_writef                   SC_REPR_SSIZE_T                                                      /* return */
 #define __NR32ATR0_readf                   SC_REPR_FD_T                                                         /* fd */ 
-#define __NR32ATR1_readf                   SC_REPR_OUTBUF                                                       /* buf */ 
-#define __NR32ATL1_readf                   2                                                                    /* buf -> bufsize */ 
+#define __NR32ATR1_readf                   SC_REPR_POINTER                                                      /* buf */ 
 #define __NR32ATR2_readf                   SC_REPR_SIZE_T                                                       /* bufsize */ 
 #define __NR32ATR3_readf                   SC_REPR_IOMODE_T                                                     /* mode */ 
 #define __NR32RTR_readf                    SC_REPR_SSIZE_T                                                      /* return */

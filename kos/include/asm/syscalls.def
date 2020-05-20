@@ -295,12 +295,18 @@ ulimit:() -> errno_t;
 idle:() -> errno_t;
 
 [restart(must)][noreturn] exit:([tostr(EXIT_STATUS)] syscall_ulong_t status);
+[restart(must)][noreturn] exit_group:([tostr(EXIT_STATUS)] syscall_ulong_t exit_code);
+
 [restart(must)] fork:() -> pid_t;
-[cp] read:(fd_t fd, [tostr(OUTBUF:bufsize)] void *buf, size_t bufsize) -> ssize_t;
-[cp] readf:(fd_t fd, [tostr(OUTBUF:bufsize)] void *buf, size_t bufsize, iomode_t mode) -> ssize_t;
-[cp] write:(fd_t fd, [tostr(INBUF:bufsize)] void const *buf, size_t bufsize) -> ssize_t;
-[cp] writef:(fd_t fd, [tostr(INBUF:bufsize)] void const *buf, size_t bufsize, iomode_t mode) -> ssize_t;
+[restart(must)] vfork:() -> pid_t;
+
+[cp] read:(fd_t fd, [tostr(out:BUFFER:bufsize:return)] void *buf, size_t bufsize) -> ssize_t;
+[cp] readf:(fd_t fd, [tostr(out:BUFFER:bufsize:return)] void *buf, size_t bufsize, iomode_t mode) -> ssize_t;
+[cp] write:(fd_t fd, [tostr(BUFFER:bufsize)] void const *buf, size_t bufsize) -> ssize_t;
+[cp] writef:(fd_t fd, [tostr(BUFFER:bufsize)] void const *buf, size_t bufsize, iomode_t mode) -> ssize_t;
 [cp] open:([tostr(FILENAME)] char const *filename, oflag_t oflags, mode_t mode) -> fd_t;
+[cp] openat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, oflag_t oflags, mode_t mode) -> fd_t;
+
 
 @@Close a given file descriptor/handle `FD'
 //[cp] /* Even though pthread allows this, I thing this would be a _really_ bad idea... */
@@ -380,15 +386,16 @@ timex64:(int64_t *timer) -> [reg64][tostr(TIME_T)] int64_t;
 [cp] mount:([tostr(FILENAME)] char const *special_file,
             [tostr(FILENAME)] char const *dir,
             [tostr(STRING)] char const *fstype,
-            [tostr(MOUNT_FLAGS)] syscall_ulong_t mountflags, void const *data) -> errno_t;
-[cp] umount:(char const *special_file) -> errno_t;
+            [tostr(MOUNT_FLAGS)] syscall_ulong_t mountflags,
+            [tostr(STRING)] void const *data) -> errno_t;
+[cp] umount:([tostr(FILENAME)] char const *special_file) -> errno_t;
 
 
 
 %[startgroup]
 [restart(must)] getuid:() -> uid_t;
-[restart(must)] getuid16:() -> uint16_t;
-[restart(must)] getuid32:() -> uint32_t;
+[restart(must)] getuid16:() -> [tostr(UID_T)] uint16_t;
+[restart(must)] getuid32:() -> [tostr(UID_T)] uint32_t;
 %[endgroup]
 
 %[startgroup]
@@ -399,8 +406,8 @@ timex64:(int64_t *timer) -> [reg64][tostr(TIME_T)] int64_t;
 
 %[startgroup]
 [restart(must)] getgid:() -> gid_t;
-[restart(must)] getgid16:() -> uint16_t;
-[restart(must)] getgid32:() -> uint32_t;
+[restart(must)] getgid16:() -> [tostr(GID_T)] uint16_t;
+[restart(must)] getgid32:() -> [tostr(GID_T)] uint32_t;
 %[endgroup]
 
 %[startgroup]
@@ -411,8 +418,8 @@ timex64:(int64_t *timer) -> [reg64][tostr(TIME_T)] int64_t;
 
 %[startgroup]
 [restart(must)] geteuid:() -> uid_t;
-[restart(must)] geteuid16:() -> uint16_t;
-[restart(must)] geteuid32:() -> uint32_t;
+[restart(must)] geteuid16:() -> [tostr(UID_T)] uint16_t;
+[restart(must)] geteuid32:() -> [tostr(UID_T)] uint32_t;
 %[endgroup]
 
 %[startgroup]
@@ -423,8 +430,8 @@ timex64:(int64_t *timer) -> [reg64][tostr(TIME_T)] int64_t;
 
 %[startgroup]
 [restart(must)] getegid:() -> gid_t;
-[restart(must)] getegid16:() -> uint16_t;
-[restart(must)] getegid32:() -> uint32_t;
+[restart(must)] getegid16:() -> [tostr(GID_T)] uint16_t;
+[restart(must)] getegid32:() -> [tostr(GID_T)] uint32_t;
 %[endgroup]
 
 %[startgroup]
@@ -434,9 +441,9 @@ timex64:(int64_t *timer) -> [reg64][tostr(TIME_T)] int64_t;
 %[endgroup]
 
 %[startgroup]
-[restart(must)] getresuid:(uid_t *ruid, uid_t *euid, uid_t *suid) -> errno_t;
-[restart(must)] getresuid16:(uint16_t *ruid, uint16_t *euid, uint16_t *suid) -> errno_t;
-[restart(must)] getresuid32:(uint32_t *ruid, uint32_t *euid, uint32_t *suid) -> errno_t;
+[restart(must)] getresuid:([tostr(out:UID_T)] uid_t *ruid, [tostr(out:UID_T)] uid_t *euid, [tostr(out:UID_T)] uid_t *suid) -> errno_t;
+[restart(must)] getresuid16:([tostr(out:UID16_T)] uint16_t *ruid, [tostr(out:UID16_T)] uint16_t *euid, [tostr(out:UID16_T)] uint16_t *suid) -> errno_t;
+[restart(must)] getresuid32:([tostr(out:UID32_T)] uint32_t *ruid, [tostr(out:UID32_T)] uint32_t *euid, [tostr(out:UID32_T)] uint32_t *suid) -> errno_t;
 %[endgroup]
 
 %[startgroup]
@@ -446,9 +453,9 @@ timex64:(int64_t *timer) -> [reg64][tostr(TIME_T)] int64_t;
 %[endgroup]
 
 %[startgroup]
-[restart(must)] getresgid:(gid_t *rgid, gid_t *egid, gid_t *sgid) -> errno_t;
-[restart(must)] getresgid16:(uint16_t *rgid, uint16_t *egid, uint16_t *sgid) -> errno_t;
-[restart(must)] getresgid32:(uint32_t *rgid, uint32_t *egid, uint32_t *sgid) -> errno_t;
+[restart(must)] getresgid:([tostr(out:GID_T)] gid_t *rgid, [tostr(out:GID_T)] gid_t *egid, [tostr(out:GID_T)] gid_t *sgid) -> errno_t;
+[restart(must)] getresgid16:([tostr(out:GID16_T)] uint16_t *rgid, [tostr(out:GID16_T)] uint16_t *egid, [tostr(out:GID16_T)] uint16_t *sgid) -> errno_t;
+[restart(must)] getresgid32:([tostr(out:GID32_T)] uint32_t *rgid, [tostr(out:GID32_T)] uint32_t *egid, [tostr(out:GID32_T)] uint32_t *sgid) -> errno_t;
 %[endgroup]
 
 %[startgroup]
@@ -458,9 +465,9 @@ timex64:(int64_t *timer) -> [reg64][tostr(TIME_T)] int64_t;
 %[endgroup]
 
 %[startgroup]
-[restart(must)] getgroups:(size_t size, gid_t list[]) -> errno_t;
-[restart(must)] getgroups16:(size_t size, uint16_t list[]) -> errno_t;
-[restart(must)] getgroups32:(size_t size, uint32_t list[]) -> errno_t;
+[restart(must)] getgroups:(size_t count, [tostr(out:GID_VECTOR:count)] gid_t list[]) -> errno_t;
+[restart(must)] getgroups16:(size_t count, [tostr(out:GID_VECTOR16:count)] uint16_t list[]) -> errno_t;
+[restart(must)] getgroups32:(size_t count, [tostr(out:GID_VECTOR32:count)] uint32_t list[]) -> errno_t;
 %[endgroup]
 
 %[startgroup]
@@ -483,8 +490,8 @@ timex64:(int64_t *timer) -> [reg64][tostr(TIME_T)] int64_t;
 
 
 %[startgroup]
-stime:(time32_t const *t) -> errno_t;
-stime64:(time64_t const *t) -> errno_t;
+stime:([tostr(TIME32_T_PTR)] time32_t const *t) -> errno_t;
+stime64:([tostr(TIME64_T_PTR)] time64_t const *t) -> errno_t;
 %[endgroup]
 
 ptrace:(syscall_ulong_t request, pid_t pid, void *addr, void *data) -> syscall_slong_t;
@@ -501,17 +508,18 @@ alarm:(syscall_ulong_t seconds) -> syscall_ulong_t;
 %[endgroup]
 
 @@@param: type: Set of `R_OK|W_OK|X_OK' or `F_OK'
-[cp] access:([tostr(FILENAME)] char const *filename, [tostr(ACCESS_TYPE)] syscall_ulong_t type) -> errno_t;
+[cp] access:([tostr(FILENAME)] char const *filename,
+             [tostr(ACCESS_TYPE)] syscall_ulong_t type) -> errno_t;
 
 nice:(syscall_slong_t inc) -> errno_t;
 
 %[startgroup]
-ftime:(struct timeb *tp) -> errno_t;
-ftime32:(struct timeb32 *tp) -> errno_t;
-ftime64:(struct timeb64 *tp) -> errno_t;
-ftimex32:(struct timebx32 *tp) -> errno_t;
-ftimex32_64:(struct timebx32_64 *tp) -> errno_t;
-ftimex64:(struct timebx64 *tp) -> errno_t;
+ftime:([tostr(out:STRUCT_TIMEB)] struct timeb *tp) -> errno_t;
+ftime32:([tostr(out:STRUCT_TIMEB32)] struct timeb32 *tp) -> errno_t;
+ftime64:([tostr(out:STRUCT_TIMEB64)] struct timeb64 *tp) -> errno_t;
+ftimex32:([tostr(out:STRUCT_TIMEBX32)] struct timebx32 *tp) -> errno_t;
+ftimex32_64:([tostr(out:STRUCT_TIMEBX32_64)] struct timebx32_64 *tp) -> errno_t;
+ftimex64:([tostr(out:STRUCT_TIMEBX64)] struct timebx64 *tp) -> errno_t;
 %[endgroup]
 
 [cp] sync:() -> errno_t;
@@ -519,7 +527,15 @@ ftimex64:(struct timebx64 *tp) -> errno_t;
 @@@param: signo: One of `SIG*'
 kill:(pid_t pid, [tostr(SIGNO)] syscall_ulong_t signo) -> errno_t;
 
-[cp] rename:(char const *oldname, char const *newname_or_path) -> errno_t;
+@@@param: signo: One of `SIG*'
+tkill:(pid_t tid, [tostr(SIGNO)] syscall_ulong_t signo) -> errno_t;
+
+@@@param: signo: One of `SIG*'
+tgkill:(pid_t tgid, pid_t tid, [tostr(SIGNO)] syscall_ulong_t signo) -> errno_t;
+
+
+[cp] rename:([tostr(FILENAME)] char const *oldname,
+             [tostr(FILENAME)] char const *newname_or_path) -> errno_t;
 [cp] renameat:(fd_t oldfd, [tostr(FILENAME:oldfd)] char const *oldname,
                fd_t newfd, [tostr(FILENAME:newfd)] char const *newname_or_path) -> errno_t;
 @@@param: flags: Set of `0 | AT_DOSPATH'
@@ -531,59 +547,68 @@ kill:(pid_t pid, [tostr(SIGNO)] syscall_ulong_t signo) -> errno_t;
                 fd_t newdirfd, [tostr(FILENAME:newdirfd)] char const *newpath,
                 [tostr(RENAMEAT2_FLAGS)] syscall_ulong_t flags) -> errno_t;
 
-[cp] mkdir:(char const *pathname, mode_t mode) -> errno_t;
+[cp] mkdir:([tostr(FILENAME)] char const *pathname, mode_t mode) -> errno_t;
 [cp] mkdirat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *pathname, mode_t mode) -> errno_t;
 @@@param: flags: Set of `0 | AT_DOSPATH'
-[cp] fmkdirat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *pathname, mode_t mode, [tostr(ATFLAG__DOSPATH)] atflag_t flags) -> errno_t;
+[cp] fmkdirat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *pathname, mode_t mode,
+               [tostr(ATFLAG__DOSPATH)] atflag_t flags) -> errno_t;
 
+
+pipe:([tostr(out:FD_VECTOR2)] fd_t pipedes[2]) -> errno_t;
+pipe2:([tostr(out:FD_VECTOR2)] fd_t pipedes[2],
+       [tostr(OFLAG__CLOEXEC__CLOFORK__NONBLOCK__DIRECT)] oflag_t flags) -> errno_t;
 
 dup:(fd_t fd) -> fd_t;
-pipe:(fd_t pipedes[2]) -> errno_t;
-times:(struct tms *buf) -> clock_t;
+dup2:(fd_t oldfd, fd_t newfd) -> fd_t;
+@@@param: flags:  Set of `O_CLOEXEC | O_CLOFORK'
+dup3:(fd_t oldfd, fd_t newfd, [tostr(OFLAG__CLOEXEC__CLOFORK)] oflag_t flags) -> fd_t;
+
+times:([tostr(out:STRUCT_TMS)] struct tms *buf) -> clock_t;
 
 brk:(void *addr) -> errno_t;
 
 @@@param: signo: One of `SIG*'
-signal:([tostr(SIGNO)] syscall_ulong_t signo, sighandler_t handler) -> sighandler_t;
+signal:([tostr(SIGNO)] syscall_ulong_t signo,
+        sighandler_t handler) -> sighandler_t;
 
 acct:([tostr(FILENAME)] char const *filename) -> errno_t;
 
 [cp][restart(must)] umount2:(char const *special_file, syscall_ulong_t flags) -> errno_t;
-[cp] ioctl:(fd_t fd, syscall_ulong_t request, void *arg) -> syscall_slong_t;
-[cp] ioctlf:(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) -> syscall_slong_t;
-[cp] fcntl:(fd_t fd, syscall_ulong_t cmd, void *arg) -> syscall_slong_t;
+[cp] ioctl:(fd_t fd, [tostr(IOCTL_COMMAND)] syscall_ulong_t command, [tostr(IOCTL_ARG:command)] void *arg) -> syscall_slong_t;
+[cp] ioctlf:(fd_t fd, [tostr(IOCTL_COMMAND)] syscall_ulong_t command, iomode_t mode, [tostr(IOCTL_ARG:command)] void *arg) -> syscall_slong_t;
+[cp] fcntl:(fd_t fd, [tostr(FCNTL_COMMAND)] syscall_ulong_t command, [tostr(FCNTL_ARG:command)] void *arg) -> syscall_slong_t;
+[cp] fcntl64:(fd_t fd, [tostr(FCNTL64_COMMAND)] syscall_ulong_t command, [tostr(FCNTL64_ARG:command)] void *arg) -> syscall_slong_t;
 
 [restart(must)] setpgid:(pid_t pid, pid_t pgid) -> errno_t;
 [restart(must)] umask:(mode_t mode) -> mode_t;
-[restart(must)] fsmode:([reg64] uint64_t mode) -> [reg64] uint64_t;
-chroot:(char const *path) -> errno_t;
-ustat:([tostr(DEV_BLK)] dev_t dev, struct ustat *ubuf) -> errno_t;
-dup2:(fd_t oldfd, fd_t newfd) -> fd_t;
+[restart(must)] fsmode:([reg64][tostr(FSMODE)] uint64_t mode) -> [reg64][tostr(FSMODE)] uint64_t;
+chroot:([tostr(FILENAME)] char const *path) -> errno_t;
+ustat:([tostr(DEV_BLK)] dev_t dev, [tostr(out:STRUCT_USTAT)] struct ustat *ubuf) -> errno_t;
 [restart(must)] getppid:() -> pid_t;
 [restart(must)] getpgrp:() -> pid_t;
 [restart(must)] setsid:() -> pid_t;
 
-oldolduname:(struct linux_oldolduname *name) -> errno_t;
-olduname:(struct linux_olduname *name) -> errno_t;
-uname:(struct utsname *name) -> errno_t;
+oldolduname:([tostr(out:STRUCT_LINUX_OLDOLDUNAME)] struct linux_oldolduname *name) -> errno_t;
+olduname:([tostr(out:STRUCT_LINUX_OLDUNAME)] struct linux_olduname *name) -> errno_t;
+uname:([tostr(out:STRUCT_UTSNAME)] struct utsname *name) -> errno_t;
 
 %[startgroup]
 @@@param: signo: One of `SIG*'
-sigaction:([tostr(SIGNO)] syscall_ulong_t signo, [tostr(STRUCT_SIGACTION)] struct sigaction const *act, struct sigaction *oact) -> errno_t;
-sigactionx32:([tostr(SIGNO)] syscall_ulong_t signo, [tostr(STRUCT_SIGACTIONX32)] struct sigactionx32 const *act, struct sigactionx32 *oact) -> errno_t;
-sigactionx64:([tostr(SIGNO)] syscall_ulong_t signo, [tostr(STRUCT_SIGACTIONX64)] struct sigactionx64 const *act, struct sigactionx64 *oact) -> errno_t;
+sigaction:([tostr(SIGNO)] syscall_ulong_t signo, [tostr(STRUCT_SIGACTION)] struct sigaction const *act, [tostr(out:STRUCT_SIGACTION)] struct sigaction *oact) -> errno_t;
+sigactionx32:([tostr(SIGNO)] syscall_ulong_t signo, [tostr(STRUCT_SIGACTIONX32)] struct sigactionx32 const *act, [tostr(out:STRUCT_SIGACTIONX32)] struct sigactionx32 *oact) -> errno_t;
+sigactionx64:([tostr(SIGNO)] syscall_ulong_t signo, [tostr(STRUCT_SIGACTIONX64)] struct sigactionx64 const *act, [tostr(out:STRUCT_SIGACTIONX64)] struct sigactionx64 *oact) -> errno_t;
 %[endgroup]
 
 %[startgroup]
 @@@param: signo: One of `SIG*'
-rt_sigaction:([tostr(SIGNO)] syscall_ulong_t signo, [tostr(STRUCT_SIGACTION:sigsetsize)] struct sigaction const *act, struct sigaction *oact, size_t sigsetsize) -> errno_t;
-rt_sigactionx32:([tostr(SIGNO)] syscall_ulong_t signo, [tostr(STRUCT_SIGACTIONX32:sigsetsize)] struct sigactionx32 const *act, struct sigactionx32 *oact, size_t sigsetsize) -> errno_t;
-rt_sigactionx64:([tostr(SIGNO)] syscall_ulong_t signo, [tostr(STRUCT_SIGACTIONX64:sigsetsize)] struct sigactionx64 const *act, struct sigactionx64 *oact, size_t sigsetsize) -> errno_t;
+rt_sigaction:([tostr(SIGNO)] syscall_ulong_t signo, [tostr(STRUCT_SIGACTION:sigsetsize)] struct sigaction const *act, [tostr(out:STRUCT_SIGACTION:sigsetsize)] struct sigaction *oact, size_t sigsetsize) -> errno_t;
+rt_sigactionx32:([tostr(SIGNO)] syscall_ulong_t signo, [tostr(STRUCT_SIGACTIONX32:sigsetsize)] struct sigactionx32 const *act, [tostr(out:STRUCT_SIGACTIONX32:sigsetsize)] struct sigactionx32 *oact, size_t sigsetsize) -> errno_t;
+rt_sigactionx64:([tostr(SIGNO)] syscall_ulong_t signo, [tostr(STRUCT_SIGACTIONX64:sigsetsize)] struct sigactionx64 const *act, [tostr(out:STRUCT_SIGACTIONX64:sigsetsize)] struct sigactionx64 *oact, size_t sigsetsize) -> errno_t;
 %[endgroup]
 
 
-sgetmask:() -> syscall_ulong_t;
-ssetmask:(syscall_ulong_t sigmask) -> syscall_ulong_t;
+sgetmask:() -> [tostr(SIGMASK)] syscall_ulong_t;
+ssetmask:([tostr(SIGMASK)] syscall_ulong_t sigmask) -> [tostr(SIGMASK)] syscall_ulong_t;
 
 [restart(dont)][cp]
 sigsuspend:([tostr(STRUCT_SIGSET)] struct __sigset_struct const *set) -> errno_t;
@@ -597,24 +622,25 @@ setrlimit:([tostr(RLIMIT_RESOURCE)] syscall_ulong_t resource,
 
 @@@param: resource: One of `RLIMIT_*' from <bits/resource.h>
 getrlimit:([tostr(RLIMIT_RESOURCE)] syscall_ulong_t resource,
-           struct rlimit *rlimits) -> errno_t;
+           [tostr(out:STRUCT_RLIMIT)] struct rlimit *rlimits) -> errno_t;
 
 %[startgroup]
-getrusage:([tostr(GETRUSAGE_WHO)] syscall_slong_t who, struct rusage *usage) -> errno_t;
-getrusage32:([tostr(GETRUSAGE_WHO)] syscall_slong_t who, struct rusage32 *tv) -> errno_t;
-getrusage64:([tostr(GETRUSAGE_WHO)] syscall_slong_t who, struct rusage64 *tv) -> errno_t;
-getrusagex32:([tostr(GETRUSAGE_WHO)] syscall_slong_t who, struct rusagex32 *tv) -> errno_t;
-getrusagex32_64:([tostr(GETRUSAGE_WHO)] syscall_slong_t who, struct rusagex32_64 *tv) -> errno_t;
-getrusagex64:([tostr(GETRUSAGE_WHO)] syscall_slong_t who, struct rusagex64 *tv) -> errno_t;
+@@@param: who: One of `RUSAGE_SELF', `RUSAGE_CHILDREN' or `RUSAGE_THREAD'
+getrusage:([tostr(GETRUSAGE_WHO)] syscall_slong_t who, [tostr(out:STRUCT_RUSAGE)] struct rusage *usage) -> errno_t;
+[doc_alias(getrusage)] getrusage32:([tostr(GETRUSAGE_WHO)] syscall_slong_t who, [tostr(out:STRUCT_RUSAGE32)] struct rusage32 *tv) -> errno_t;
+[doc_alias(getrusage)] getrusage64:([tostr(GETRUSAGE_WHO)] syscall_slong_t who, [tostr(out:STRUCT_RUSAGE64)] struct rusage64 *tv) -> errno_t;
+[doc_alias(getrusage)] getrusagex32:([tostr(GETRUSAGE_WHO)] syscall_slong_t who, [tostr(out:STRUCT_RUSAGEX32)] struct rusagex32 *tv) -> errno_t;
+[doc_alias(getrusage)] getrusagex32_64:([tostr(GETRUSAGE_WHO)] syscall_slong_t who, [tostr(out:STRUCT_RUSAGEX32_64)] struct rusagex32_64 *tv) -> errno_t;
+[doc_alias(getrusage)] getrusagex64:([tostr(GETRUSAGE_WHO)] syscall_slong_t who, [tostr(out:STRUCT_RUSAGEX64)] struct rusagex64 *tv) -> errno_t;
 %[endgroup]
 
 %[startgroup]
-gettimeofday:(struct timeval *tv, struct timezone *tz) -> errno_t;
-gettimeofday32:(struct timeval32 *tv, struct timezone *tz) -> errno_t;
-gettimeofday64:(struct timeval64 *tv, struct timezone *tz) -> errno_t;
-gettimeofdayx32:(struct timevalx32 *tv, struct timezone *tz) -> errno_t;
-gettimeofdayx32_64:(struct timevalx32_64 *tv, struct timezone *tz) -> errno_t;
-gettimeofdayx64:(struct timevalx64 *tv, struct timezone *tz) -> errno_t;
+gettimeofday:([tostr(out:STRUCT_TIMEVAL)] struct timeval *tv, [tostr(out:STRUCT_TIMEZONE)] struct timezone *tz) -> errno_t;
+gettimeofday32:([tostr(out:STRUCT_TIMEVAL32)] struct timeval32 *tv, [tostr(out:STRUCT_TIMEZONE)] struct timezone *tz) -> errno_t;
+gettimeofday64:([tostr(out:STRUCT_TIMEVAL64)] struct timeval64 *tv, [tostr(out:STRUCT_TIMEZONE)] struct timezone *tz) -> errno_t;
+gettimeofdayx32:([tostr(out:STRUCT_TIMEVALX32)] struct timevalx32 *tv, [tostr(out:STRUCT_TIMEZONE)] struct timezone *tz) -> errno_t;
+gettimeofdayx32_64:([tostr(out:STRUCT_TIMEVALX32_64)] struct timevalx32_64 *tv, [tostr(out:STRUCT_TIMEZONE)] struct timezone *tz) -> errno_t;
+gettimeofdayx64:([tostr(out:STRUCT_TIMEVALX64)] struct timevalx64 *tv, [tostr(out:STRUCT_TIMEZONE)] struct timezone *tz) -> errno_t;
 %[endgroup]
 
 %[startgroup]
@@ -627,21 +653,19 @@ settimeofdayx64:([tostr(STRUCT_TIMEVALX64)] struct timevalx64 const *tv, [tostr(
 %[endgroup]
 
 %[startgroup]
-[restart(dont)][cp] select:(size_t nfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *readfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *writefds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *exceptfds, struct timeval *timeout) -> ssize_t;
-[restart(dont)][cp] select32:(size_t nfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *readfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *writefds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *exceptfds, struct timeval32 *timeout) -> ssize_t;
-[restart(dont)][cp] select64:(size_t nfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *readfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *writefds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *exceptfds, struct timeval64 *timeout) -> ssize_t;
-[restart(dont)][cp] selectx32:(size_t nfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *readfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *writefds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *exceptfds, struct timevalx32 *timeout) -> ssize_t;
-[restart(dont)][cp] selectx32_64:(size_t nfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *readfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *writefds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *exceptfds, struct timevalx32_64 *timeout) -> ssize_t;
-[restart(dont)][cp] selectx64:(size_t nfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *readfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *writefds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *exceptfds, struct timevalx64 *timeout) -> ssize_t;
+[restart(dont)][cp] select:(size_t nfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *readfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *writefds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *exceptfds, [tostr(STRUCT_TIMEVAL)] struct timeval *timeout) -> ssize_t;
+[restart(dont)][cp] select32:(size_t nfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *readfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *writefds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *exceptfds, [tostr(STRUCT_TIMEVAL32)] struct timeval32 *timeout) -> ssize_t;
+[restart(dont)][cp] select64:(size_t nfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *readfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *writefds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *exceptfds, [tostr(STRUCT_TIMEVAL64)] struct timeval64 *timeout) -> ssize_t;
+[restart(dont)][cp] selectx32:(size_t nfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *readfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *writefds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *exceptfds, [tostr(STRUCT_TIMEVALX32)] struct timevalx32 *timeout) -> ssize_t;
+[restart(dont)][cp] selectx32_64:(size_t nfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *readfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *writefds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *exceptfds, [tostr(STRUCT_TIMEVALX32_64)] struct timevalx32_64 *timeout) -> ssize_t;
+[restart(dont)][cp] selectx64:(size_t nfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *readfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *writefds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *exceptfds, [tostr(STRUCT_TIMEVALX64)] struct timevalx64 *timeout) -> ssize_t;
 %[endgroup]
 
 _newselect:(int TODO_PROTOTYPE) -> errno_t;
 
-
-
-[cp] symlink:(char const *link_text, char const *target_path) -> errno_t;
-[cp] readlink:(char const *path, char *buf, size_t buflen) -> ssize_t;
-uselib:(char const *library) -> errno_t;
+[cp] symlink:(char const *link_text, [tostr(FILENAME)] char const *target_path) -> errno_t;
+[cp] readlink:([tostr(FILENAME)] char const *path, [tostr(out:BUFFER:buflen)] char *buf, size_t buflen) -> ssize_t;
+uselib:([tostr(FILENAME)] char const *library) -> errno_t;
 
 %[startgroup]
 @@Map the segments of a given library into memory
@@ -656,20 +680,20 @@ uselib:(char const *library) -> errno_t;
 @@@param: hdrc:  The number of program headers
 maplibrary:(void *addr,
 	[tostr(MAPLIBRARY_FLAGS)] syscall_ulong_t flags, fd_t fd,
-	[tostr(STRUCT_ELF_PHDR_VECTOR:hdrc)] ElfW(Phdr) *hdrv, size_t hdrc) -> void *;
-[doc_alias(maplibrary)] maplibraryx32:(void *addr, [tostr(MAPLIBRARY_FLAGS)] syscall_ulong_t flags, fd_t fd, [tostr(STRUCT_ELF_PHDR32_VECTOR:hdrc)] struct elf32_phdr *hdrv, size_t hdrc) -> void *;
-[doc_alias(maplibrary)] maplibraryx64:(void *addr, [tostr(MAPLIBRARY_FLAGS)] syscall_ulong_t flags, fd_t fd, [tostr(STRUCT_ELF_PHDR64_VECTOR:hdrc)] struct elf64_phdr *hdrv, size_t hdrc) -> void *;
+	[tostr(STRUCT_ELF_PHDR_VECTOR:hdrc)] ElfW(Phdr) const *hdrv, size_t hdrc) -> void *;
+[doc_alias(maplibrary)] maplibraryx32:(void *addr, [tostr(MAPLIBRARY_FLAGS)] syscall_ulong_t flags, fd_t fd, [tostr(STRUCT_ELF_PHDR32_VECTOR:hdrc)] struct elf32_phdr const *hdrv, size_t hdrc) -> void *;
+[doc_alias(maplibrary)] maplibraryx64:(void *addr, [tostr(MAPLIBRARY_FLAGS)] syscall_ulong_t flags, fd_t fd, [tostr(STRUCT_ELF_PHDR64_VECTOR:hdrc)] struct elf64_phdr const *hdrv, size_t hdrc) -> void *;
 %[endgroup]
 
 @@@param: swapflags: Set of `SWAP_FLAG_*'
-swapon:(char const *pathname, [tostr(SWAPFLAGS)] syscall_ulong_t swapflags) -> errno_t;
-swapoff:(char const *pathname) -> errno_t;
+swapon:([tostr(FILENAME)] char const *pathname, [tostr(SWAPFLAGS)] syscall_ulong_t swapflags) -> errno_t;
+swapoff:([tostr(FILENAME)] char const *pathname) -> errno_t;
 
 @@@param: how: One of the `RB_*' constants from <sys/reboot.h>
 reboot:([tostr(REBOOT_HOW)] syscall_ulong_t how) -> errno_t;
 
 @@Returns `0' to indicate end-of-directory; 1 to to indicate success
-readdir:(fd_t fd, struct old_linux_dirent *dirp, size_t count) -> errno_t;
+readdir:(fd_t fd, [tostr(out:STRUCT_OLD_LINUX_DIRENT:count)] struct old_linux_dirent *dirp, size_t count) -> errno_t;
 
 @@@param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
 @@@param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
@@ -680,6 +704,9 @@ mmap:(void *addr, size_t len,
 	[tostr(MMAP_PROT)] syscall_ulong_t prot,
 	[tostr(MMAP_FLAGS)] syscall_ulong_t flags,
 	fd_t fd, syscall_ulong_t offset) -> void *;
+mmap2:(void *addr, size_t len, [tostr(MMAP_PROT)] syscall_ulong_t prot,
+       [tostr(MMAP_FLAGS)] syscall_ulong_t flags, fd_t fd,
+       syscall_ulong_t pgoffset) -> void *;
 
 [restart(must)] munmap:(void *addr, size_t len) -> errno_t;
 
@@ -691,6 +718,19 @@ mremap:(void *addr, size_t old_len, size_t new_len,
         [tostr(MREMAP_FLAGS)] syscall_ulong_t flags,
         void *new_address) -> void *;
 
+remap_file_pages:(void *start, size_t size,
+                  [tostr(MMAP_PROT)] syscall_ulong_t prot,
+                  size_t pgoff, syscall_ulong_t flags) -> errno_t;
+
+mincore:(void *start, size_t len, uint8_t *vec) -> errno_t;
+madvise:(void *addr, size_t len, syscall_ulong_t advice) -> errno_t;
+
+mlock:(void const *addr, size_t len) -> errno_t;
+munlock:(void const *addr, size_t len) -> errno_t;
+
+@@@param: flags: Set of `MCL_CURRENT | MCL_FUTURE | MCL_ONFAULT'
+mlockall:([tostr(MLOCKALL_FLAGS)] syscall_ulong_t flags) -> errno_t;
+munlockall:() -> errno_t;
 
 %[startgroup]
 truncate:([tostr(FILENAME)] char const *filename, syscall_ulong_t length) -> errno_t;
@@ -703,50 +743,59 @@ ftruncate64:(fd_t fd, [reg64] uint64_t length) -> errno_t;
 %[endgroup]
 
 [cp] fchmod:(fd_t fd, mode_t mode) -> errno_t;
-getpriority:(syscall_ulong_t which, id_t who) -> syscall_slong_t;
-setpriority:(syscall_ulong_t which, id_t who, syscall_ulong_t value) -> errno_t;
+
+@@@param: which: One of `PRIO_PROCESS', `PRIO_PGRP' or `PRIO_USER'
+getpriority:([tostr(SCHED_PRIORITY_WHICH)] syscall_ulong_t which, id_t who) -> syscall_slong_t;
+
+@@@param: which: One of `PRIO_PROCESS', `PRIO_PGRP' or `PRIO_USER'
+setpriority:([tostr(SCHED_PRIORITY_WHICH)] syscall_ulong_t which, id_t who, syscall_ulong_t value) -> errno_t;
+
 profil:(uint16_t *sample_buffer, size_t size, size_t offset, syscall_ulong_t scale) -> errno_t;
 
 %[startgroup]
-statfs:([tostr(FILENAME)] char const *file, struct statfs *buf) -> errno_t;
-statfs32:([tostr(FILENAME)] char const *file, struct __statfs32 *buf) -> errno_t;
-statfs64:([tostr(FILENAME)] char const *file, struct __statfs64 *buf) -> errno_t;
-statfsx32:([tostr(FILENAME)] char const *file, struct __statfsx32 *buf) -> errno_t;
-statfsx32_64:([tostr(FILENAME)] char const *file, struct __statfsx32_64 *buf) -> errno_t;
-statfsx64:([tostr(FILENAME)] char const *file, struct __statfsx64 *buf) -> errno_t;
+statfs:([tostr(FILENAME)] char const *file, [tostr(out:STRUCT_STATFS)] struct statfs *buf) -> errno_t;
+statfs32:([tostr(FILENAME)] char const *file, [tostr(out:STRUCT_STATFS32)] struct __statfs32 *buf) -> errno_t;
+statfs64:([tostr(FILENAME)] char const *file, [tostr(out:STRUCT_STATFS64)] struct __statfs64 *buf) -> errno_t;
+statfsx32:([tostr(FILENAME)] char const *file, [tostr(out:STRUCT_STATFSX32)] struct __statfsx32 *buf) -> errno_t;
+statfsx32_64:([tostr(FILENAME)] char const *file, [tostr(out:STRUCT_STATFSX32_64)] struct __statfsx32_64 *buf) -> errno_t;
+statfsx64:([tostr(FILENAME)] char const *file, [tostr(out:STRUCT_STATFSX64)] struct __statfsx64 *buf) -> errno_t;
 %[endgroup]
 
 %[startgroup]
-fstatfs:(fd_t file, struct statfs *buf) -> errno_t;
-fstatfs32:(fd_t file, struct __statfs32 *buf) -> errno_t;
-fstatfs64:(fd_t file, struct __statfs64 *buf) -> errno_t;
-fstatfsx32:(fd_t file, struct __statfsx32 *buf) -> errno_t;
-fstatfsx32_64:(fd_t file, struct __statfsx32_64 *buf) -> errno_t;
-fstatfsx64:(fd_t file, struct __statfsx64 *buf) -> errno_t;
+fstatfs:(fd_t file, [tostr(out:STRUCT_STATFS)] struct statfs *buf) -> errno_t;
+fstatfs32:(fd_t file, [tostr(out:STRUCT_STATFS32)] struct __statfs32 *buf) -> errno_t;
+fstatfs64:(fd_t file, [tostr(out:STRUCT_STATFS64)] struct __statfs64 *buf) -> errno_t;
+fstatfsx32:(fd_t file, [tostr(out:STRUCT_STATFSX32)] struct __statfsx32 *buf) -> errno_t;
+fstatfsx32_64:(fd_t file, [tostr(out:STRUCT_STATFSX32_64)] struct __statfsx32_64 *buf) -> errno_t;
+fstatfsx64:(fd_t file, [tostr(out:STRUCT_STATFSX64)] struct __statfsx64 *buf) -> errno_t;
 %[endgroup]
 
 ioperm:(syscall_ulong_t from, syscall_ulong_t num, syscall_ulong_t turn_on) -> errno_t;
-socketcall:(int call, unsigned long *args) -> errno_t;
+socketcall:([tostr(SOCKETCALL_CALL)] syscall_ulong_t call,
+            [tostr(SOCKETCALL_ARGS:call)] syscall_ulong_t *args) -> errno_t;
+
 [restart(must)][cp]
 syslog:([tostr(SYSLOG_LEVEL)] syscall_ulong_t level,
         [tostr(STRING:len)] char const *str, size_t len) -> ssize_t;
 
 %[startgroup]
-setitimer:(syscall_ulong_t which, [tostr(STRUCT_ITIMERVAL)] struct itimerval const *newval, struct itimerval *oldval) -> errno_t;
-setitimer32:(syscall_ulong_t which, [tostr(STRUCT_ITIMERVAL32)] struct __itimerval32 const *newval, struct __itimerval32 *oldval) -> errno_t;
-setitimer64:(syscall_ulong_t which, [tostr(STRUCT_ITIMERVAL64)] struct __itimerval64 const *newval, struct __itimerval64 *oldval) -> errno_t;
-setitimerx32:(syscall_ulong_t which, [tostr(STRUCT_ITIMERVALX32)] struct __itimervalx32 const *newval, struct __itimervalx32 *oldval) -> errno_t;
-setitimerx64:(syscall_ulong_t which, [tostr(STRUCT_ITIMERVALX32_64)] struct __itimervalx64 const *newval, struct __itimervalx64 *oldval) -> errno_t;
-setitimerx32_64:(syscall_ulong_t which, [tostr(STRUCT_ITIMERVALX64)] struct __itimervalx32_64 const *newval, struct __itimervalx32_64 *oldval) -> errno_t;
+@@@param: which: One of `ITIMER_REAL', `ITIMER_VIRTUAL' or `ITIMER_PROF'
+setitimer:([tostr(ITIMER_WHICH)] syscall_ulong_t which, [tostr(STRUCT_ITIMERVAL)] struct itimerval const *newval, struct itimerval *oldval) -> errno_t;
+[doc_alias(setitimer)] setitimer32:([tostr(ITIMER_WHICH)] syscall_ulong_t which, [tostr(STRUCT_ITIMERVAL32)] struct __itimerval32 const *newval, struct __itimerval32 *oldval) -> errno_t;
+[doc_alias(setitimer)] setitimer64:([tostr(ITIMER_WHICH)] syscall_ulong_t which, [tostr(STRUCT_ITIMERVAL64)] struct __itimerval64 const *newval, struct __itimerval64 *oldval) -> errno_t;
+[doc_alias(setitimer)] setitimerx32:([tostr(ITIMER_WHICH)] syscall_ulong_t which, [tostr(STRUCT_ITIMERVALX32)] struct __itimervalx32 const *newval, struct __itimervalx32 *oldval) -> errno_t;
+[doc_alias(setitimer)] setitimerx64:([tostr(ITIMER_WHICH)] syscall_ulong_t which, [tostr(STRUCT_ITIMERVALX32_64)] struct __itimervalx64 const *newval, struct __itimervalx64 *oldval) -> errno_t;
+[doc_alias(setitimer)] setitimerx32_64:([tostr(ITIMER_WHICH)] syscall_ulong_t which, [tostr(STRUCT_ITIMERVALX64)] struct __itimervalx32_64 const *newval, struct __itimervalx32_64 *oldval) -> errno_t;
 %[endgroup]
 
 %[startgroup]
-getitimer:(syscall_ulong_t which, struct itimerval *curr_value) -> errno_t;
-getitimer32:(syscall_ulong_t which, struct __itimerval32 *curr_value) -> errno_t;
-getitimer64:(syscall_ulong_t which, struct __itimerval64 *curr_value) -> errno_t;
-getitimerx32:(syscall_ulong_t which, struct __itimervalx32 *curr_value) -> errno_t;
-getitimerx32_64:(syscall_ulong_t which, struct __itimervalx32_64 *curr_value) -> errno_t;
-getitimerx64:(syscall_ulong_t which, struct __itimervalx64 *curr_value) -> errno_t;
+@@@param: which: One of `ITIMER_REAL', `ITIMER_VIRTUAL' or `ITIMER_PROF'
+getitimer:([tostr(ITIMER_WHICH)] syscall_ulong_t which, [tostr(out:STRUCT_ITIMERVAL)] struct itimerval *curr_value) -> errno_t;
+[doc_alias(getitimer)] getitimer32:([tostr(ITIMER_WHICH)] syscall_ulong_t which, [tostr(out:STRUCT_ITIMERVAL32)] struct __itimerval32 *curr_value) -> errno_t;
+[doc_alias(getitimer)] getitimer64:([tostr(ITIMER_WHICH)] syscall_ulong_t which, [tostr(out:STRUCT_ITIMERVAL64)] struct __itimerval64 *curr_value) -> errno_t;
+[doc_alias(getitimer)] getitimerx32:([tostr(ITIMER_WHICH)] syscall_ulong_t which, [tostr(out:STRUCT_ITIMERVALX32)] struct __itimervalx32 *curr_value) -> errno_t;
+[doc_alias(getitimer)] getitimerx32_64:([tostr(ITIMER_WHICH)] syscall_ulong_t which, [tostr(out:STRUCT_ITIMERVALX32_64)] struct __itimervalx32_64 *curr_value) -> errno_t;
+[doc_alias(getitimer)] getitimerx64:([tostr(ITIMER_WHICH)] syscall_ulong_t which, [tostr(out:STRUCT_ITIMERVALX64)] struct __itimervalx64 *curr_value) -> errno_t;
 %[endgroup]
 
 iopl:(syscall_ulong_t level) -> errno_t;
@@ -754,49 +803,50 @@ vhangup:() -> errno_t;
 vm86old:(int TODO_PROTOTYPE) -> errno_t;
 
 %[startgroup]
-@@Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
+@@Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
 @@@param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted)
-[restart(dont)][cp] wait4:(pid_t pid, int32_t *stat_loc, [tostr(WAITFLAG)] syscall_ulong_t options, struct rusage *usage) -> pid_t;
-[doc_alias(wait4)][restart(dont)][cp] wait4_32:(pid_t pid, int32_t *stat_loc, [tostr(WAITFLAG)] syscall_ulong_t options, struct rusage32 *usage) -> pid_t;
-[doc_alias(wait4)][restart(dont)][cp] wait4_64:(pid_t pid, int32_t *stat_loc, [tostr(WAITFLAG)] syscall_ulong_t options, struct rusage64 *usage) -> pid_t;
-[doc_alias(wait4)][restart(dont)][cp] wait4_x32:(pid_t pid, int32_t *stat_loc, [tostr(WAITFLAG)] syscall_ulong_t options, struct rusagex32 *usage) -> pid_t;
-[doc_alias(wait4)][restart(dont)][cp] wait4_x32_64:(pid_t pid, int32_t *stat_loc, [tostr(WAITFLAG)] syscall_ulong_t options, struct rusagex32_64 *usage) -> pid_t;
-[doc_alias(wait4)][restart(dont)][cp] wait4_x64:(pid_t pid, int32_t *stat_loc, [tostr(WAITFLAG)] syscall_ulong_t options, struct rusagex64 *usage) -> pid_t;
+[restart(dont)][cp] wait4:(pid_t pid, [tostr(out:UNION_WAIT)] int32_t *stat_loc, [tostr(WAITFLAG)] syscall_ulong_t options, [tostr(out:STRUCT_RUSAGE)] struct rusage *usage) -> pid_t;
+[doc_alias(wait4)][restart(dont)][cp] wait4_32:(pid_t pid, [tostr(out:UNION_WAIT)] int32_t *stat_loc, [tostr(WAITFLAG)] syscall_ulong_t options, [tostr(out:STRUCT_RUSAGE32)] struct rusage32 *usage) -> pid_t;
+[doc_alias(wait4)][restart(dont)][cp] wait4_64:(pid_t pid, [tostr(out:UNION_WAIT)] int32_t *stat_loc, [tostr(WAITFLAG)] syscall_ulong_t options, [tostr(out:STRUCT_RUSAGE64)] struct rusage64 *usage) -> pid_t;
+[doc_alias(wait4)][restart(dont)][cp] wait4_x32:(pid_t pid, [tostr(out:UNION_WAIT)] int32_t *stat_loc, [tostr(WAITFLAG)] syscall_ulong_t options, [tostr(out:STRUCT_RUSAGEX32)] struct rusagex32 *usage) -> pid_t;
+[doc_alias(wait4)][restart(dont)][cp] wait4_x32_64:(pid_t pid, [tostr(out:UNION_WAIT)] int32_t *stat_loc, [tostr(WAITFLAG)] syscall_ulong_t options, [tostr(out:STRUCT_RUSAGEX32_64)] struct rusagex32_64 *usage) -> pid_t;
+[doc_alias(wait4)][restart(dont)][cp] wait4_x64:(pid_t pid, [tostr(out:UNION_WAIT)] int32_t *stat_loc, [tostr(WAITFLAG)] syscall_ulong_t options, [tostr(out:STRUCT_RUSAGEX64)] struct rusagex64 *usage) -> pid_t;
 %[endgroup]
 
 %[startgroup]
-[restart(dont)][cp] oldwait4:(pid_t pid, int32_t *stat_loc, [tostr(WAITFLAG)] syscall_ulong_t options, struct rusage *usage) -> pid_t;
-[restart(dont)][cp] oldwait4_32:(pid_t pid, int32_t *stat_loc, [tostr(WAITFLAG)] syscall_ulong_t options, struct rusage32 *usage) -> pid_t;
-[restart(dont)][cp] oldwait4_64:(pid_t pid, int32_t *stat_loc, [tostr(WAITFLAG)] syscall_ulong_t options, struct rusage64 *usage) -> pid_t;
-[restart(dont)][cp] oldwait4_x32:(pid_t pid, int32_t *stat_loc, [tostr(WAITFLAG)] syscall_ulong_t options, struct rusagex32 *usage) -> pid_t;
-[restart(dont)][cp] oldwait4_x32_64:(pid_t pid, int32_t *stat_loc, [tostr(WAITFLAG)] syscall_ulong_t options, struct rusagex32_64 *usage) -> pid_t;
-[restart(dont)][cp] oldwait4_x64:(pid_t pid, int32_t *stat_loc, [tostr(WAITFLAG)] syscall_ulong_t options, struct rusagex64 *usage) -> pid_t;
+@@@param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED'
+[restart(dont)][cp] oldwait4:(pid_t pid, [tostr(out:UNION_WAIT)] int32_t *stat_loc, [tostr(WAITFLAG)] syscall_ulong_t options, [tostr(out:STRUCT_RUSAGE)] struct rusage *usage) -> pid_t;
+[doc_alias(oldwait4)][restart(dont)][cp] oldwait4_32:(pid_t pid, [tostr(out:UNION_WAIT)] int32_t *stat_loc, [tostr(WAITFLAG)] syscall_ulong_t options, [tostr(out:STRUCT_RUSAGE32)] struct rusage32 *usage) -> pid_t;
+[doc_alias(oldwait4)][restart(dont)][cp] oldwait4_64:(pid_t pid, [tostr(out:UNION_WAIT)] int32_t *stat_loc, [tostr(WAITFLAG)] syscall_ulong_t options, [tostr(out:STRUCT_RUSAGE64)] struct rusage64 *usage) -> pid_t;
+[doc_alias(oldwait4)][restart(dont)][cp] oldwait4_x32:(pid_t pid, [tostr(out:UNION_WAIT)] int32_t *stat_loc, [tostr(WAITFLAG)] syscall_ulong_t options, [tostr(out:STRUCT_RUSAGEX32)] struct rusagex32 *usage) -> pid_t;
+[doc_alias(oldwait4)][restart(dont)][cp] oldwait4_x32_64:(pid_t pid, [tostr(out:UNION_WAIT)] int32_t *stat_loc, [tostr(WAITFLAG)] syscall_ulong_t options, [tostr(out:STRUCT_RUSAGEX32_64)] struct rusagex32_64 *usage) -> pid_t;
+[doc_alias(oldwait4)][restart(dont)][cp] oldwait4_x64:(pid_t pid, [tostr(out:UNION_WAIT)] int32_t *stat_loc, [tostr(WAITFLAG)] syscall_ulong_t options, [tostr(out:STRUCT_RUSAGEX64)] struct rusagex64 *usage) -> pid_t;
 %[endgroup]
 
-[cp] sysinfo:(struct sysinfo *info) -> errno_t;
+[cp] sysinfo:([tostr(out:STRUCT_SYSINFO)] struct sysinfo *info) -> errno_t;
 ipc:(int TODO_PROTOTYPE) -> errno_t;
 [cp] fsync:(fd_t fd) -> errno_t;
 
 %[startgroup]
-[restart(must)][noexcept] sigreturn:([tostr(STRUCT_FPUSTATE)] struct fpustate const *restore_fpu, [tostr(STRUCT_SIGSET)] struct __sigset_struct const *restore_sigmask, [tostr(STRUCT_RPC_SYSCALL_INFO)] struct rpc_syscall_info *sc_info, [tostr(STRUCT_UCPUSTATE)] struct ucpustate const *restore_cpu);
-[restart(must)][noexcept] sigreturn32:([tostr(STRUCT_FPUSTATE32)] struct fpustate32 const *restore_fpu, [tostr(STRUCT_SIGSET)] struct __sigset_struct const *restore_sigmask, [tostr(STRUCT_RPC_SYSCALL_INFO32)] struct rpc_syscall_info32 *sc_info, [tostr(STRUCT_UCPUSTATE32)] struct ucpustate32 const *restore_cpu);
-[restart(must)][noexcept] sigreturn64:([tostr(STRUCT_FPUSTATE64)] struct fpustate64 const *restore_fpu, [tostr(STRUCT_SIGSET)] struct __sigset_struct const *restore_sigmask, [tostr(STRUCT_RPC_SYSCALL_INFO64)] struct rpc_syscall_info64 *sc_info, [tostr(STRUCT_UCPUSTATE64)] struct ucpustate64 const *restore_cpu);
-[restart(must)][noexcept] rt_sigreturn:([tostr(STRUCT_FPUSTATE)] struct fpustate const *restore_fpu, [tostr(STRUCT_SIGSET)] struct __sigset_struct const *restore_sigmask, [tostr(STRUCT_RPC_SYSCALL_INFO)] struct rpc_syscall_info *sc_info, [tostr(STRUCT_UCPUSTATE)] struct ucpustate const *restore_cpu);
-[restart(must)][noexcept] rt_sigreturn32:([tostr(STRUCT_FPUSTATE32)] struct fpustate32 const *restore_fpu, [tostr(STRUCT_SIGSET)] struct __sigset_struct const *restore_sigmask, [tostr(STRUCT_RPC_SYSCALL_INFO32)] struct rpc_syscall_info32 *sc_info, [tostr(STRUCT_UCPUSTATE32)] struct ucpustate32 const *restore_cpu);
-[restart(must)][noexcept] rt_sigreturn64:([tostr(STRUCT_FPUSTATE64)] struct fpustate64 const *restore_fpu, [tostr(STRUCT_SIGSET)] struct __sigset_struct const *restore_sigmask, [tostr(STRUCT_RPC_SYSCALL_INFO64)] struct rpc_syscall_info64 *sc_info, [tostr(STRUCT_UCPUSTATE64)] struct ucpustate64 const *restore_cpu);
+[restart(must)][noexcept] sigreturn:([tostr(STRUCT_FPUSTATE)] struct fpustate const *restore_fpu, [tostr(STRUCT_SIGSET)] struct __sigset_struct const *restore_sigmask, [tostr(STRUCT_RPC_SYSCALL_INFO)] struct rpc_syscall_info const *sc_info, [tostr(STRUCT_UCPUSTATE)] struct ucpustate const *restore_cpu);
+[restart(must)][noexcept] sigreturn32:([tostr(STRUCT_FPUSTATE32)] struct fpustate32 const *restore_fpu, [tostr(STRUCT_SIGSET)] struct __sigset_struct const *restore_sigmask, [tostr(STRUCT_RPC_SYSCALL_INFO32)] struct rpc_syscall_info32 const *sc_info, [tostr(STRUCT_UCPUSTATE32)] struct ucpustate32 const *restore_cpu);
+[restart(must)][noexcept] sigreturn64:([tostr(STRUCT_FPUSTATE64)] struct fpustate64 const *restore_fpu, [tostr(STRUCT_SIGSET)] struct __sigset_struct const *restore_sigmask, [tostr(STRUCT_RPC_SYSCALL_INFO64)] struct rpc_syscall_info64 const *sc_info, [tostr(STRUCT_UCPUSTATE64)] struct ucpustate64 const *restore_cpu);
+[restart(must)][noexcept] rt_sigreturn:([tostr(STRUCT_FPUSTATE)] struct fpustate const *restore_fpu, [tostr(STRUCT_SIGSET)] struct __sigset_struct const *restore_sigmask, [tostr(STRUCT_RPC_SYSCALL_INFO)] struct rpc_syscall_info const *sc_info, [tostr(STRUCT_UCPUSTATE)] struct ucpustate const *restore_cpu);
+[restart(must)][noexcept] rt_sigreturn32:([tostr(STRUCT_FPUSTATE32)] struct fpustate32 const *restore_fpu, [tostr(STRUCT_SIGSET)] struct __sigset_struct const *restore_sigmask, [tostr(STRUCT_RPC_SYSCALL_INFO32)] struct rpc_syscall_info32 const *sc_info, [tostr(STRUCT_UCPUSTATE32)] struct ucpustate32 const *restore_cpu);
+[restart(must)][noexcept] rt_sigreturn64:([tostr(STRUCT_FPUSTATE64)] struct fpustate64 const *restore_fpu, [tostr(STRUCT_SIGSET)] struct __sigset_struct const *restore_sigmask, [tostr(STRUCT_RPC_SYSCALL_INFO64)] struct rpc_syscall_info64 const *sc_info, [tostr(STRUCT_UCPUSTATE64)] struct ucpustate64 const *restore_cpu);
 %[endgroup]
 
-clone:([tostr(CLONE_FLAGS)] syscall_ulong_t flags, void *child_stack, pid_t *ptid,
-       [tostr(POINTER)] uintptr_t newtls, pid_t *ctid) -> pid_t;
+clone:([tostr(CLONE_FLAGS)] syscall_ulong_t flags, void *child_stack, [tostr(out:PID_T)] pid_t *ptid,
+       [tostr(POINTER)] uintptr_t newtls, [tostr(out:PID_T)] pid_t *ctid) -> pid_t;
 
-setdomainname:(char const *name, size_t len) -> errno_t;
+setdomainname:([tostr(STRING:len)] char const *name, size_t len) -> errno_t;
 modify_ldt:(syscall_ulong_t func, void *ptr, syscall_ulong_t bytecount) -> syscall_slong_t;
 adjtimex:(int TODO_PROTOTYPE) -> errno_t;
 
 @@@param: how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK'
 sigprocmask:([tostr(SIGPROCMASK_HOW)] syscall_ulong_t how,
              [tostr(STRUCT_SIGSET)] struct __sigset_struct const *set,
-             struct __sigset_struct *oset) -> errno_t;
+             [tostr(out:STRUCT_SIGSET)] struct __sigset_struct *oset) -> errno_t;
 
 create_module:(int TODO_PROTOTYPE) -> errno_t;
 init_module:(int TODO_PROTOTYPE) -> errno_t;
@@ -811,20 +861,19 @@ afs_syscall:(int TODO_PROTOTYPE) -> errno_t;
 
 [restart(must)] getpgid:(pid_t pid) -> pid_t;
 
-[cp] _llseek:(fd_t fd, [reg64] int64_t offset, uint64_t *result, [tostr(SEEK_WHENCE)] syscall_ulong_t whence) -> errno_t;
-[cp] getdents:(fd_t fd, struct linux_dirent *dirp, size_t count) -> ssize_t;
-[cp] getdents64:(fd_t fd, struct linux_dirent64 *dirp, size_t count) -> ssize_t;
+[cp] _llseek:(fd_t fd, [reg64] int64_t offset, [tostr(out:UINT64_T)] uint64_t *result, [tostr(SEEK_WHENCE)] syscall_ulong_t whence) -> errno_t;
+[cp] getdents:(fd_t fd, [tostr(out:STRUCT_LINUX_DIRENT:count:return)] struct linux_dirent *dirp, size_t count) -> ssize_t;
+[cp] getdents64:(fd_t fd, [tostr(out:STRUCT_LINUX_DIRENT64:count:return)] struct linux_dirent64 *dirp, size_t count) -> ssize_t;
 
 @@@param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
 @@              optionally or'd with any of `READDIR_SKIPREL | READDIR_WANTEOF'
-[cp] kreaddir:(fd_t fd, struct dirent *buf, size_t bufsize,
+[cp] kreaddir:(fd_t fd, [tostr(out:STRUCT_DIRENT:bufsize:return)] struct dirent *buf, size_t bufsize,
                [tostr(KREADDIR_MODE)] syscall_ulong_t mode) -> ssize_t;
 
 @@@param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
 @@              optionally or'd with any of `READDIR_SKIPREL | READDIR_WANTEOF'
-[cp] kreaddirf:(fd_t fd, struct dirent *buf, size_t bufsize,
-                [tostr(KREADDIR_MODE)] syscall_ulong_t mode,
-                iomode_t iomode) -> ssize_t;
+[cp] kreaddirf:(fd_t fd, [tostr(out:STRUCT_DIRENT:bufsize:return)] struct dirent *buf, size_t bufsize,
+                [tostr(KREADDIR_MODE)] syscall_ulong_t mode, iomode_t iomode) -> ssize_t;
 
 
 [cp] flock:(fd_t fd, syscall_ulong_t operation) -> errno_t;
@@ -857,35 +906,38 @@ afs_syscall:(int TODO_PROTOTYPE) -> errno_t;
 [restart(must)] getsid:(pid_t pid) -> pid_t;
 [cp] fdatasync:(fd_t fd) -> errno_t;
 _sysctl:(int TODO_PROTOTYPE) -> errno_t;
-mlock:(void const *addr, size_t len) -> errno_t;
-munlock:(void const *addr, size_t len) -> errno_t;
-mlockall:(syscall_ulong_t flags) -> errno_t;
-munlockall:() -> errno_t;
-sched_setparam:(pid_t pid, struct sched_param const *param) -> errno_t;
-sched_getparam:(pid_t pid, struct sched_param *param) -> errno_t;
-sched_setscheduler:(pid_t pid, syscall_ulong_t policy, struct sched_param const *param) -> errno_t;
-sched_getscheduler:(pid_t pid) -> syscall_slong_t;
+
+sched_setparam:(pid_t pid, [tostr(STRUCT_SCHED_PARAM)] struct sched_param const *param) -> errno_t;
+sched_getparam:(pid_t pid, [tostr(out:STRUCT_SCHED_PARAM)] struct sched_param *param) -> errno_t;
+
+
+@@@param: policy: One of `SCHED_OTHER', `SCHED_FIFO', `SCHED_RR', `SCHED_BATCH',
+@@                `SCHED_IDLE', optionally or'd with `SCHED_RESET_ON_FORK'
+sched_setscheduler:(pid_t pid, [tostr(SCHED_POLICY)] syscall_ulong_t policy,
+                    [tostr(STRUCT_SCHED_PARAM)] struct sched_param const *param) -> errno_t;
+sched_getscheduler:(pid_t pid) -> [tostr(SCHED_POLICY)] syscall_slong_t;
+
 [restart(dont)] sched_yield:() -> errno_t;
 [restart(dont)][cp] rpc_service:() -> syscall_slong_t;
-sched_get_priority_max:(syscall_ulong_t algorithm) -> syscall_slong_t;
-sched_get_priority_min:(syscall_ulong_t algorithm) -> syscall_slong_t;
+sched_get_priority_max:([tostr(SCHED_POLICY)] syscall_ulong_t algorithm) -> syscall_slong_t;
+sched_get_priority_min:([tostr(SCHED_POLICY)] syscall_ulong_t algorithm) -> syscall_slong_t;
 
 %[startgroup]
-sched_rr_get_interval:(pid_t pid, struct timespec *tms) -> errno_t;
-sched_rr_get_interval32:(pid_t pid, struct timespec32 *tms) -> errno_t;
-sched_rr_get_interval64:(pid_t pid, struct timespec64 *tms) -> errno_t;
-sched_rr_get_intervalx32:(pid_t pid, struct timespecx32 *tms) -> errno_t;
-sched_rr_get_intervalx32_64:(pid_t pid, struct timespecx32_64 *tms) -> errno_t;
-sched_rr_get_intervalx64:(pid_t pid, struct timespecx64 *tms) -> errno_t;
+sched_rr_get_interval:(pid_t pid, [tostr(out:STRUCT_TIMESPEC)] struct timespec *tms) -> errno_t;
+sched_rr_get_interval32:(pid_t pid, [tostr(out:STRUCT_TIMESPEC32)] struct timespec32 *tms) -> errno_t;
+sched_rr_get_interval64:(pid_t pid, [tostr(out:STRUCT_TIMESPEC64)] struct timespec64 *tms) -> errno_t;
+sched_rr_get_intervalx32:(pid_t pid, [tostr(out:STRUCT_TIMESPECX32)] struct timespecx32 *tms) -> errno_t;
+sched_rr_get_intervalx32_64:(pid_t pid, [tostr(out:STRUCT_TIMESPECX32_64)] struct timespecx32_64 *tms) -> errno_t;
+sched_rr_get_intervalx64:(pid_t pid, [tostr(out:STRUCT_TIMESPECX64)] struct timespecx64 *tms) -> errno_t;
 %[endgroup]
 
 %[startgroup]
-[restart(dont)][cp] nanosleep:([tostr(STRUCT_TIMESPEC)] struct timespec const *req, struct timespec *rem) -> errno_t;
-[restart(dont)][cp] nanosleep32:([tostr(STRUCT_TIMESPEC32)] struct timespec32 const *req, struct timespec32 *rem) -> errno_t;
-[restart(dont)][cp] nanosleep64:([tostr(STRUCT_TIMESPEC64)] struct timespec64 const *req, struct timespec64 *rem) -> errno_t;
-[restart(dont)][cp] nanosleepx32:([tostr(STRUCT_TIMESPECX32)] struct timespecx32 const *req, struct timespecx32 *rem) -> errno_t;
-[restart(dont)][cp] nanosleepx32_64:([tostr(STRUCT_TIMESPECX32_64)] struct timespecx32_64 const *req, struct timespecx32_64 *rem) -> errno_t;
-[restart(dont)][cp] nanosleepx64:([tostr(STRUCT_TIMESPECX64)] struct timespecx64 const *req, struct timespecx64 *rem) -> errno_t;
+[restart(dont)][cp] nanosleep:([tostr(STRUCT_TIMESPEC)] struct timespec const *req, [tostr(out:STRUCT_TIMESPEC)] struct timespec *rem) -> errno_t;
+[restart(dont)][cp] nanosleep32:([tostr(STRUCT_TIMESPEC32)] struct timespec32 const *req, [tostr(out:STRUCT_TIMESPEC32)] struct timespec32 *rem) -> errno_t;
+[restart(dont)][cp] nanosleep64:([tostr(STRUCT_TIMESPEC64)] struct timespec64 const *req, [tostr(out:STRUCT_TIMESPEC64)] struct timespec64 *rem) -> errno_t;
+[restart(dont)][cp] nanosleepx32:([tostr(STRUCT_TIMESPECX32)] struct timespecx32 const *req, [tostr(out:STRUCT_TIMESPECX32)] struct timespecx32 *rem) -> errno_t;
+[restart(dont)][cp] nanosleepx32_64:([tostr(STRUCT_TIMESPECX32_64)] struct timespecx32_64 const *req, [tostr(out:STRUCT_TIMESPECX32_64)] struct timespecx32_64 *rem) -> errno_t;
+[restart(dont)][cp] nanosleepx64:([tostr(STRUCT_TIMESPECX64)] struct timespecx64 const *req, [tostr(out:STRUCT_TIMESPECX64)] struct timespecx64 *rem) -> errno_t;
 %[endgroup]
 
 vm86:(int TODO_PROTOTYPE) -> errno_t;
@@ -901,42 +953,45 @@ prctl:(int TODO_PROTOTYPE) -> errno_t;
 @@@param: how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK'
 rt_sigprocmask:([tostr(SIGPROCMASK_HOW)] syscall_ulong_t how,
                 [tostr(STRUCT_SIGSET:sigsetsize)] struct __sigset_struct const *set,
-                struct __sigset_struct *oset, size_t sigsetsize) -> errno_t;
+                [tostr(out:STRUCT_SIGSET:sigsetsize)] struct __sigset_struct *oset,
+                size_t sigsetsize) -> errno_t;
 
-rt_sigpending:(struct __sigset_struct *set, size_t sigsetsize) -> errno_t;
+rt_sigpending:([tostr(out:STRUCT_SIGSET:sigsetsize)] struct __sigset_struct *set,
+               size_t sigsetsize) -> errno_t;
 
 %[startgroup]
-[restart(dont)][cp] rt_sigtimedwait:([tostr(STRUCT_SIGSET:sigsetsize)] struct __sigset_struct const *set, struct __siginfo_struct *info, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, size_t sigsetsize) -> syscall_slong_t;
-[restart(dont)][cp] rt_sigtimedwait32:([tostr(STRUCT_SIGSET:sigsetsize)] struct __sigset_struct const *set, struct __siginfo_struct *info, [tostr(STRUCT_TIMESPEC32)] struct timespec32 const *timeout, size_t sigsetsize) -> syscall_slong_t;
-[restart(dont)][cp] rt_sigtimedwait64:([tostr(STRUCT_SIGSET:sigsetsize)] struct __sigset_struct const *set, struct __siginfo_struct *info, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *timeout, size_t sigsetsize) -> syscall_slong_t;
-[restart(dont)][cp] rt_sigtimedwaitx32:([tostr(STRUCT_SIGSET:sigsetsize)] struct __sigset_struct const *set, struct __siginfox32_struct *info, [tostr(STRUCT_TIMESPECX32)] struct timespecx32 const *timeout, size_t sigsetsize) -> syscall_slong_t;
-[restart(dont)][cp] rt_sigtimedwaitx32_64:([tostr(STRUCT_SIGSET:sigsetsize)] struct __sigset_struct const *set, struct __siginfox32_struct *info, [tostr(STRUCT_TIMESPECX32_64)] struct timespecx32_64 const *timeout, size_t sigsetsize) -> syscall_slong_t;
-[restart(dont)][cp] rt_sigtimedwaitx64:([tostr(STRUCT_SIGSET:sigsetsize)] struct __sigset_struct const *set, struct __siginfox64_struct *info, [tostr(STRUCT_TIMESPECX64)] struct timespecx64 const *timeout, size_t sigsetsize) -> syscall_slong_t;
+[restart(dont)][cp] rt_sigtimedwait:([tostr(STRUCT_SIGSET:sigsetsize)] struct __sigset_struct const *set, [tostr(out:STRUCT_SIGINFO)] struct __siginfo_struct *info, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, size_t sigsetsize) -> syscall_slong_t;
+[restart(dont)][cp] rt_sigtimedwait32:([tostr(STRUCT_SIGSET:sigsetsize)] struct __sigset_struct const *set, [tostr(out:STRUCT_SIGINFO)] struct __siginfo_struct *info, [tostr(STRUCT_TIMESPEC32)] struct timespec32 const *timeout, size_t sigsetsize) -> syscall_slong_t;
+[restart(dont)][cp] rt_sigtimedwait64:([tostr(STRUCT_SIGSET:sigsetsize)] struct __sigset_struct const *set, [tostr(out:STRUCT_SIGINFO)] struct __siginfo_struct *info, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *timeout, size_t sigsetsize) -> syscall_slong_t;
+[restart(dont)][cp] rt_sigtimedwaitx32:([tostr(STRUCT_SIGSET:sigsetsize)] struct __sigset_struct const *set[tostr(out:STRUCT_SIGINFOX32)] , struct __siginfox32_struct *info, [tostr(STRUCT_TIMESPECX32)] struct timespecx32 const *timeout, size_t sigsetsize) -> syscall_slong_t;
+[restart(dont)][cp] rt_sigtimedwaitx32_64:([tostr(STRUCT_SIGSET:sigsetsize)] struct __sigset_struct const *set, [tostr(out:STRUCT_SIGINFOX32)] struct __siginfox32_struct *info, [tostr(STRUCT_TIMESPECX32_64)] struct timespecx32_64 const *timeout, size_t sigsetsize) -> syscall_slong_t;
+[restart(dont)][cp] rt_sigtimedwaitx64:([tostr(STRUCT_SIGSET:sigsetsize)] struct __sigset_struct const *set, [tostr(out:STRUCT_SIGINFOX64)] struct __siginfox64_struct *info, [tostr(STRUCT_TIMESPECX64)] struct timespecx64 const *timeout, size_t sigsetsize) -> syscall_slong_t;
 %[endgroup]
 
 %[startgroup]
 @@@param: signo: One of `SIG*'
-rt_sigqueueinfo:(pid_t tgid, [tostr(SIGNO)] syscall_ulong_t signo, struct __siginfo_struct const *uinfo) -> errno_t;
-[doc_alias(rt_sigqueueinfo)] rt_sigqueueinfox32:(pid_t tgid, [tostr(SIGNO)] syscall_ulong_t signo, struct __siginfox32_struct const *uinfo) -> errno_t;
-[doc_alias(rt_sigqueueinfo)] rt_sigqueueinfox64:(pid_t tgid, [tostr(SIGNO)] syscall_ulong_t signo, struct __siginfox64_struct const *uinfo) -> errno_t;
+rt_sigqueueinfo:(pid_t tgid, [tostr(SIGNO)] syscall_ulong_t signo, [tostr(STRUCT_SIGINFO)] struct __siginfo_struct const *uinfo) -> errno_t;
+[doc_alias(rt_sigqueueinfo)] rt_sigqueueinfox32:(pid_t tgid, [tostr(SIGNO)] syscall_ulong_t signo, [tostr(STRUCT_SIGINFOX32)] struct __siginfox32_struct const *uinfo) -> errno_t;
+[doc_alias(rt_sigqueueinfo)] rt_sigqueueinfox64:(pid_t tgid, [tostr(SIGNO)] syscall_ulong_t signo, [tostr(STRUCT_SIGINFOX64)] struct __siginfox64_struct const *uinfo) -> errno_t;
 %[endgroup]
 
-rt_sigsuspend:(struct __sigset_struct const *set, size_t sigsetsize) -> errno_t;
+rt_sigsuspend:([tostr(STRUCT_SIGSET:sigsetsize)] struct __sigset_struct const *set,
+               size_t sigsetsize) -> errno_t;
 
-[cp] pread64:(fd_t fd, void *buf, size_t bufsize, [reg64] uint64_t offset) -> ssize_t;
-[cp] pread64f:(fd_t fd, void *buf, size_t bufsize, [reg64] uint64_t offset, iomode_t mode) -> ssize_t;
-[cp] pwrite64:(fd_t fd, void const *buf, size_t bufsize, [reg64] uint64_t offset) -> ssize_t;
-[cp] pwrite64f:(fd_t fd, void const *buf, size_t bufsize, [reg64] uint64_t offset, iomode_t mode) -> ssize_t;
+[cp] pread64:(fd_t fd, [tostr(out:BUFFER:bufsize:return)] void *buf, size_t bufsize, [reg64] uint64_t offset) -> ssize_t;
+[cp] pread64f:(fd_t fd, [tostr(out:BUFFER:bufsize:return)] void *buf, size_t bufsize, [reg64] uint64_t offset, iomode_t mode) -> ssize_t;
+[cp] pwrite64:(fd_t fd, [tostr(BUFFER:bufsize)] void const *buf, size_t bufsize, [reg64] uint64_t offset) -> ssize_t;
+[cp] pwrite64f:(fd_t fd, [tostr(BUFFER:bufsize)] void const *buf, size_t bufsize, [reg64] uint64_t offset, iomode_t mode) -> ssize_t;
 
 
-[cp] getcwd:(char *buf, size_t size) -> ssize_t;
+[cp] getcwd:([tostr(out:BUFFER:size:return)] char *buf, size_t size) -> ssize_t;
 capget:(int TODO_PROTOTYPE) -> errno_t;
 capset:(int TODO_PROTOTYPE) -> errno_t;
 
 %[startgroup]
-sigaltstack:(struct sigaltstack const *ss, struct sigaltstack *oss) -> errno_t;
-sigaltstackx32:(struct sigaltstackx32 const *ss, struct sigaltstackx32 *oss) -> errno_t;
-sigaltstackx64:(struct sigaltstackx64 const *ss, struct sigaltstackx64 *oss) -> errno_t;
+sigaltstack:([tostr(STRUCT_SIGALTSTACK)] struct sigaltstack const *ss, [tostr(out:STRUCT_SIGALTSTACK)] struct sigaltstack *oss) -> errno_t;
+sigaltstackx32:([tostr(STRUCT_SIGALTSTACKX32)] struct sigaltstackx32 const *ss, [tostr(out:STRUCT_SIGALTSTACKX32)] struct sigaltstackx32 *oss) -> errno_t;
+sigaltstackx64:([tostr(STRUCT_SIGALTSTACKX64)] struct sigaltstackx64 const *ss, [tostr(out:STRUCT_SIGALTSTACKX64)] struct sigaltstackx64 *oss) -> errno_t;
 %[endgroup]
 
 %[startgroup]
@@ -947,129 +1002,157 @@ sigaltstackx64:(struct sigaltstackx64 const *ss, struct sigaltstackx64 *oss) -> 
 
 [cp] getpmsg:(int TODO_PROTOTYPE) -> errno_t;
 [cp] putpmsg:(int TODO_PROTOTYPE) -> errno_t;
-vfork:() -> pid_t;
 ugetrlimit:(int TODO_PROTOTYPE) -> errno_t;
-mmap2:(void *addr, size_t len, syscall_ulong_t prot, syscall_ulong_t flags, fd_t fd, syscall_ulong_t pgoffset) -> void *;
 
 %[typeorg(<kos/compat/linux-stat.h>: linux_oldstat)]
 %[typeorg(<kos/compat/linux-stat.h>: linux_stat, linux_stat32, linux_stat64)]
 %[typeorg(<kos/compat/linux-stat.h>: linux_statx32, linux_statx64, linux_statx32_64)]
 
-[cp] linux_oldfstatat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, struct linux_oldstat *statbuf, [tostr(ATFLAG__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
-[cp] linux_oldfstat:(fd_t fd, struct linux_oldstat *statbuf) -> errno_t;
-[cp] linux_oldlstat:([tostr(FILENAME)] char const *filename, struct linux_oldstat *statbuf) -> errno_t;
-[cp] linux_oldstat:([tostr(FILENAME)] char const *filename, struct linux_oldstat *statbuf) -> errno_t;
+[cp] linux_oldfstatat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename,
+                       [tostr(out:STRUCT_LINUX_OLDSTAT)] struct linux_oldstat *statbuf,
+                       [tostr(ATFLAG__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
+[cp] linux_oldfstat:(fd_t fd, [tostr(out:STRUCT_LINUX_OLDSTAT)] struct linux_oldstat *statbuf) -> errno_t;
+[cp] linux_oldlstat:([tostr(FILENAME)] char const *filename,
+                     [tostr(out:STRUCT_LINUX_OLDSTAT)] struct linux_oldstat *statbuf) -> errno_t;
+[cp] linux_oldstat:([tostr(FILENAME)] char const *filename,
+                    [tostr(out:STRUCT_LINUX_OLDSTAT)] struct linux_oldstat *statbuf) -> errno_t;
 
 %[startgroup]
 @@@param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
-[cp] linux_fstatat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, struct linux_stat *statbuf, [tostr(ATFLAG__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
-[doc_alias(linux_fstatat)][cp] linux_fstatat32:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, struct linux_stat32 *statbuf, [tostr(ATFLAG__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
-[doc_alias(linux_fstatat)][cp] linux_fstatat64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, struct linux_stat64 *statbuf, [tostr(ATFLAG__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
-[doc_alias(linux_fstatat)][cp] linux_fstatatx32:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, struct linux_statx32 *statbuf, [tostr(ATFLAG__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
-[doc_alias(linux_fstatat)][cp] linux_fstatatx32_64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, struct linux_statx32_64 *statbuf, [tostr(ATFLAG__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
-[doc_alias(linux_fstatat)][cp] linux_fstatatx64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, struct linux_statx64 *statbuf, [tostr(ATFLAG__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
+[cp] linux_fstatat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(out:STRUCT_LINUX_STAT)] struct linux_stat *statbuf, [tostr(ATFLAG__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
+[doc_alias(linux_fstatat)][cp] linux_fstatat32:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(out:STRUCT_LINUX_STAT32)] struct linux_stat32 *statbuf, [tostr(ATFLAG__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
+[doc_alias(linux_fstatat)][cp] linux_fstatat64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(out:STRUCT_LINUX_STAT64)] struct linux_stat64 *statbuf, [tostr(ATFLAG__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
+[doc_alias(linux_fstatat)][cp] linux_fstatatx32:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(out:STRUCT_LINUX_STATX32)] struct linux_statx32 *statbuf, [tostr(ATFLAG__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
+[doc_alias(linux_fstatat)][cp] linux_fstatatx32_64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(out:STRUCT_LINUX_STATX32_64)] struct linux_statx32_64 *statbuf, [tostr(ATFLAG__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
+[doc_alias(linux_fstatat)][cp] linux_fstatatx64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(out:STRUCT_LINUX_STATX64)] struct linux_statx64 *statbuf, [tostr(ATFLAG__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
 %[endgroup]
 
 %[startgroup]
-[cp] linux_fstat:(fd_t fd, struct linux_stat *statbuf) -> errno_t;
-[cp] linux_fstat32:(fd_t fd, struct linux_stat32 *statbuf) -> errno_t;
-[cp] linux_fstat64:(fd_t fd, struct linux_stat64 *statbuf) -> errno_t;
-[cp] linux_fstatx32:(fd_t fd, struct linux_statx32 *statbuf) -> errno_t;
-[cp] linux_fstatx32_64:(fd_t fd, struct linux_statx32_64 *statbuf) -> errno_t;
-[cp] linux_fstatx64:(fd_t fd, struct linux_statx64 *statbuf) -> errno_t;
+[cp] linux_fstat:(fd_t fd, [tostr(out:STRUCT_LINUX_STAT)] struct linux_stat *statbuf) -> errno_t;
+[cp] linux_fstat32:(fd_t fd, [tostr(out:STRUCT_LINUX_STAT32)] struct linux_stat32 *statbuf) -> errno_t;
+[cp] linux_fstat64:(fd_t fd, [tostr(out:STRUCT_LINUX_STAT64)] struct linux_stat64 *statbuf) -> errno_t;
+[cp] linux_fstatx32:(fd_t fd, [tostr(out:STRUCT_LINUX_STATX32)] struct linux_statx32 *statbuf) -> errno_t;
+[cp] linux_fstatx32_64:(fd_t fd, [tostr(out:STRUCT_LINUX_STATX32_64)] struct linux_statx32_64 *statbuf) -> errno_t;
+[cp] linux_fstatx64:(fd_t fd, [tostr(out:STRUCT_LINUX_STATX64)] struct linux_statx64 *statbuf) -> errno_t;
 %[endgroup]
 
 %[startgroup]
-[cp] linux_lstat:([tostr(FILENAME)] char const *filename, struct linux_stat *statbuf) -> errno_t;
-[cp] linux_lstat32:([tostr(FILENAME)] char const *filename, struct linux_stat32 *statbuf) -> errno_t;
-[cp] linux_lstat64:([tostr(FILENAME)] char const *filename, struct linux_stat64 *statbuf) -> errno_t;
-[cp] linux_lstatx32:([tostr(FILENAME)] char const *filename, struct linux_statx32 *statbuf) -> errno_t;
-[cp] linux_lstatx32_64:([tostr(FILENAME)] char const *filename, struct linux_statx32_64 *statbuf) -> errno_t;
-[cp] linux_lstatx64:([tostr(FILENAME)] char const *filename, struct linux_statx64 *statbuf) -> errno_t;
+[cp] linux_lstat:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_LINUX_STAT)] struct linux_stat *statbuf) -> errno_t;
+[cp] linux_lstat32:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_LINUX_STAT32)] struct linux_stat32 *statbuf) -> errno_t;
+[cp] linux_lstat64:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_LINUX_STAT64)] struct linux_stat64 *statbuf) -> errno_t;
+[cp] linux_lstatx32:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_LINUX_STATX32)] struct linux_statx32 *statbuf) -> errno_t;
+[cp] linux_lstatx32_64:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_LINUX_STATX32_64)] struct linux_statx32_64 *statbuf) -> errno_t;
+[cp] linux_lstatx64:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_LINUX_STATX64)] struct linux_statx64 *statbuf) -> errno_t;
 %[endgroup]
 
 %[startgroup]
-[cp] linux_stat:([tostr(FILENAME)] char const *filename, struct linux_stat *statbuf) -> errno_t;
-[cp] linux_stat32:([tostr(FILENAME)] char const *filename, struct linux_stat32 *statbuf) -> errno_t;
-[cp] linux_stat64:([tostr(FILENAME)] char const *filename, struct linux_stat64 *statbuf) -> errno_t;
-[cp] linux_statx32:([tostr(FILENAME)] char const *filename, struct linux_statx32 *statbuf) -> errno_t;
-[cp] linux_statx32_64:([tostr(FILENAME)] char const *filename, struct linux_statx32_64 *statbuf) -> errno_t;
-[cp] linux_statx64:([tostr(FILENAME)] char const *filename, struct linux_statx64 *statbuf) -> errno_t;
+[cp] linux_stat:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_LINUX_STAT)] struct linux_stat *statbuf) -> errno_t;
+[cp] linux_stat32:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_LINUX_STAT32)] struct linux_stat32 *statbuf) -> errno_t;
+[cp] linux_stat64:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_LINUX_STAT64)] struct linux_stat64 *statbuf) -> errno_t;
+[cp] linux_statx32:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_LINUX_STATX32)] struct linux_statx32 *statbuf) -> errno_t;
+[cp] linux_statx32_64:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_LINUX_STATX32_64)] struct linux_statx32_64 *statbuf) -> errno_t;
+[cp] linux_statx64:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_LINUX_STATX64)] struct linux_statx64 *statbuf) -> errno_t;
 %[endgroup]
 
 
 %[startgroup]
 @@@param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
-[cp] kfstatat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, struct __kos_stat *statbuf,
+[cp] kfstatat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename,
+               [tostr(out:STRUCT_KOS_STAT)] struct __kos_stat *statbuf,
                [tostr(ATFLAG__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
-[doc_alias(kfstatat)][cp] kfstatatx32:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, struct __kos_statx32 *statbuf, [tostr(ATFLAG__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
-[doc_alias(kfstatat)][cp] kfstatatx64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, struct __kos_statx64 *statbuf, [tostr(ATFLAG__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
+[doc_alias(kfstatat)][cp] kfstatatx32:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename,
+                                       [tostr(out:STRUCT_KOS_STATX32)] struct __kos_statx32 *statbuf,
+                                       [tostr(ATFLAG__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
+[doc_alias(kfstatat)][cp] kfstatatx64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename,
+                                       [tostr(out:STRUCT_KOS_STATX64)] struct __kos_statx64 *statbuf,
+                                       [tostr(ATFLAG__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
 %[endgroup]
 
-[cp] linux_newfstatat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, struct linux64_stat32 *statbuf, [tostr(ATFLAG__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
+[cp] linux_newfstatat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename,
+                       [tostr(out:STRUCT_LINUX64_STAT32)] struct linux64_stat32 *statbuf,
+                       [tostr(ATFLAG__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
 
 %[startgroup]
-[cp] kfstat:(fd_t fd, struct __kos_stat *statbuf) -> errno_t;
-[cp] kfstatx32:(fd_t fd, struct __kos_statx32 *statbuf) -> errno_t;
-[cp] kfstatx64:(fd_t fd, struct __kos_statx64 *statbuf) -> errno_t;
+[cp] kfstat:(fd_t fd, [tostr(out:STRUCT_KOS_STAT)] struct __kos_stat *statbuf) -> errno_t;
+[cp] kfstatx32:(fd_t fd, [tostr(out:STRUCT_KOS_STATX32)] struct __kos_statx32 *statbuf) -> errno_t;
+[cp] kfstatx64:(fd_t fd, [tostr(out:STRUCT_KOS_STATX64)] struct __kos_statx64 *statbuf) -> errno_t;
 %[endgroup]
 
 %[startgroup]
-[cp] klstat:([tostr(FILENAME)] char const *filename, struct __kos_stat *statbuf) -> errno_t;
-[cp] klstatx32:([tostr(FILENAME)] char const *filename, struct __kos_statx32 *statbuf) -> errno_t;
-[cp] klstatx64:([tostr(FILENAME)] char const *filename, struct __kos_statx64 *statbuf) -> errno_t;
+[cp] klstat:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_KOS_STAT)] struct __kos_stat *statbuf) -> errno_t;
+[cp] klstatx32:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_KOS_STATX32)] struct __kos_statx32 *statbuf) -> errno_t;
+[cp] klstatx64:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_KOS_STATX64)] struct __kos_statx64 *statbuf) -> errno_t;
 %[endgroup]
 
 %[startgroup]
-[cp] kstat:([tostr(FILENAME)] char const *filename, struct __kos_stat *statbuf) -> errno_t;
-[cp] kstatx32:([tostr(FILENAME)] char const *filename, struct __kos_statx32 *statbuf) -> errno_t;
-[cp] kstatx64:([tostr(FILENAME)] char const *filename, struct __kos_statx64 *statbuf) -> errno_t;
+[cp] kstat:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_KOS_STAT)] struct __kos_stat *statbuf) -> errno_t;
+[cp] kstatx32:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_KOS_STATX32)] struct __kos_statx32 *statbuf) -> errno_t;
+[cp] kstatx64:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_KOS_STATX64)] struct __kos_statx64 *statbuf) -> errno_t;
 %[endgroup]
 
 pivot_root:(int TODO_PROTOTYPE) -> errno_t;
-mincore:(void *start, size_t len, uint8_t *vec) -> errno_t;
-madvise:(void *addr, size_t len, syscall_ulong_t advice) -> errno_t;
 
-[cp] fcntl64:(fd_t fd, syscall_ulong_t command, void *arg) -> syscall_slong_t;
 [restart(must)] gettid:() -> pid_t;
 readahead:(fd_t fd, [reg64] uint64_t offset, size_t count) -> ssize_t;
 
-[cp] setxattr:(char const *path, char const *name, void const *buf, size_t bufsize, syscall_ulong_t flags) -> errno_t;
-[cp] lsetxattr:(char const *path, char const *name, void const *buf, size_t bufsize, syscall_ulong_t flags) -> errno_t;
-[cp] fsetxattr:(fd_t fd, char const *name, void const *buf, size_t bufsize, syscall_ulong_t flags) -> errno_t;
-[cp] getxattr:(char const *path, char const *name, void *buf, size_t bufsize) -> ssize_t;
-[cp] lgetxattr:(char const *path, char const *name, void *buf, size_t bufsize) -> ssize_t;
-[cp] fgetxattr:(fd_t fd, char const *name, void *buf, size_t bufsize) -> ssize_t;
-[cp] listxattr:(char const *path, char *listbuf, size_t listbufsize) -> ssize_t;
-[cp] llistxattr:(char const *path, char *listbuf, size_t listbufsize) -> ssize_t;
-[cp] flistxattr:(fd_t fd, char *listbuf, size_t listbufsize) -> ssize_t;
-[cp] removexattr:(char const *path, char const *name) -> errno_t;
-[cp] lremovexattr:(char const *path, char const *name) -> errno_t;
-[cp] fremovexattr:(int fd, char const *name) -> errno_t;
+@@@param: flags: One of `0', `XATTR_CREATE' or `XATTR_REPLACE'
+[cp] setxattr:([tostr(FILENAME)] char const *path,
+               [tostr(STRING)] char const *name,
+               [tostr(BUFFER:bufsize)] void const *buf, size_t bufsize,
+               [tostr(XATTR_FLAGS)] syscall_ulong_t flags) -> errno_t;
 
-tkill:(pid_t tid, [tostr(SIGNO)] syscall_ulong_t signo) -> errno_t;
+@@@param: flags: One of `0', `XATTR_CREATE' or `XATTR_REPLACE'
+[cp] lsetxattr:([tostr(FILENAME)] char const *path,
+                [tostr(STRING)] char const *name,
+                [tostr(BUFFER:bufsize)] void const *buf, size_t bufsize,
+                [tostr(XATTR_FLAGS)] syscall_ulong_t flags) -> errno_t;
+
+@@@param: flags: One of `0', `XATTR_CREATE' or `XATTR_REPLACE'
+[cp] fsetxattr:(fd_t fd, [tostr(STRING)] char const *name,
+                [tostr(BUFFER:bufsize)] void const *buf, size_t bufsize,
+                [tostr(XATTR_FLAGS)] syscall_ulong_t flags) -> errno_t;
+
+[cp] getxattr:([tostr(FILENAME)] char const *path,
+               [tostr(STRING)] char const *name,
+               [tostr(out:BUFFER:bufsize:return)] void *buf, size_t bufsize) -> ssize_t;
+[cp] lgetxattr:([tostr(FILENAME)] char const *path,
+                [tostr(STRING)] char const *name,
+                [tostr(out:BUFFER:bufsize:return)] void *buf, size_t bufsize) -> ssize_t;
+[cp] fgetxattr:(fd_t fd, [tostr(STRING)] char const *name,
+                [tostr(out:BUFFER:bufsize:return)] void *buf, size_t bufsize) -> ssize_t;
+[cp] listxattr:([tostr(FILENAME)] char const *path,
+                [tostr(out:BUFFER:listbufsize:return)] char *listbuf, size_t listbufsize) -> ssize_t;
+[cp] llistxattr:([tostr(FILENAME)] char const *path,
+                 [tostr(out:BUFFER:listbufsize:return)] char *listbuf, size_t listbufsize) -> ssize_t;
+[cp] flistxattr:(fd_t fd, [tostr(out:BUFFER:listbufsize:return)] char *listbuf, size_t listbufsize) -> ssize_t;
+[cp] removexattr:([tostr(FILENAME)] char const *path, [tostr(STRING)] char const *name) -> errno_t;
+[cp] lremovexattr:([tostr(FILENAME)] char const *path, [tostr(STRING)] char const *name) -> errno_t;
+[cp] fremovexattr:(fd_t fd, [tostr(STRING)] char const *name) -> errno_t;
 
 %[startgroup]
-[cp] futex:(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) -> syscall_slong_t;
-[cp] futex32:(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, [tostr(STRUCT_TIMESPEC32)] struct timespec32 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) -> syscall_slong_t;
-[cp] futex64:(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) -> syscall_slong_t;
-[cp] futexx32:(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, [tostr(STRUCT_TIMESPECX32)] struct timespecx32 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) -> syscall_slong_t;
-[cp] futexx32_64:(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, [tostr(STRUCT_TIMESPECX32_64)] struct timespecx32_64 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) -> syscall_slong_t;
-[cp] futexx64:(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, [tostr(STRUCT_TIMESPECX64)] struct timespecx64 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) -> syscall_slong_t;
+@@@param: futex_op: One of `FUTEX_*' from <linux/futex.h>
+[cp] futex:(uint32_t *uaddr, [tostr(FUTEX_OP)] syscall_ulong_t futex_op, uint32_t val, [tostr(STRUCT_TIMESPEC_OR_UINT32:futex_op)] struct timespec const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) -> syscall_slong_t;
+[doc_alias(futex)][cp] futex32:(uint32_t *uaddr, [tostr(FUTEX_OP)] syscall_ulong_t futex_op, uint32_t val, [tostr(STRUCT_TIMESPEC32_OR_UINT32:futex_op)] struct timespec32 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) -> syscall_slong_t;
+[doc_alias(futex)][cp] futex64:(uint32_t *uaddr, [tostr(FUTEX_OP)] syscall_ulong_t futex_op, uint32_t val, [tostr(STRUCT_TIMESPEC64_OR_UINT32:futex_op)] struct timespec64 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) -> syscall_slong_t;
+[doc_alias(futex)][cp] futexx32:(uint32_t *uaddr, [tostr(FUTEX_OP)] syscall_ulong_t futex_op, uint32_t val, [tostr(STRUCT_TIMESPECX32_OR_UINT32:futex_op)] struct timespecx32 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) -> syscall_slong_t;
+[doc_alias(futex)][cp] futexx32_64:(uint32_t *uaddr, [tostr(FUTEX_OP)] syscall_ulong_t futex_op, uint32_t val, [tostr(STRUCT_TIMESPECX32_64_OR_UINT32:futex_op)] struct timespecx32_64 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) -> syscall_slong_t;
+[doc_alias(futex)][cp] futexx64:(uint32_t *uaddr, [tostr(FUTEX_OP)] syscall_ulong_t futex_op, uint32_t val, [tostr(STRUCT_TIMESPECX64_OR_UINT32:futex_op)] struct timespecx64 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) -> syscall_slong_t;
 %[endgroup]
 
-sched_setaffinity:(pid_t pid, size_t cpusetsize, struct __cpu_set_struct const *cpuset) -> errno_t;
-sched_getaffinity:(pid_t pid, size_t cpusetsize, struct __cpu_set_struct *cpuset) -> errno_t;
+sched_setaffinity:(pid_t pid, size_t cpusetsize, [tostr(CPUSET:cpusetsize)] struct __cpu_set_struct const *cpuset) -> errno_t;
+sched_getaffinity:(pid_t pid, size_t cpusetsize, [tostr(out:CPUSET:cpusetsize)] struct __cpu_set_struct *cpuset) -> errno_t;
+
 set_thread_area:(int TODO_PROTOTYPE) -> errno_t;
 get_thread_area:(int TODO_PROTOTYPE) -> errno_t;
+
 io_setup:(int TODO_PROTOTYPE) -> errno_t;
 io_destroy:(int TODO_PROTOTYPE) -> errno_t;
 [restart(dont)] io_getevents:(int TODO_PROTOTYPE) -> errno_t;
 io_submit:(int TODO_PROTOTYPE) -> errno_t;
 io_cancel:(int TODO_PROTOTYPE) -> errno_t;
+
 fadvise64:(int TODO_PROTOTYPE) -> errno_t;
 fadvise64_64:(int TODO_PROTOTYPE) -> errno_t;
-[restart(must)] [noreturn] exit_group:([tostr(EXIT_STATUS)] syscall_ulong_t exit_code);
 lookup_dcookie:(int TODO_PROTOTYPE) -> errno_t;
 
 epoll_create:(syscall_ulong_t size) -> fd_t;
@@ -1077,39 +1160,49 @@ epoll_create1:(syscall_ulong_t flags) -> fd_t; /* TODO: flags:tostr(...) */
 
 @@@param: op: One of `EPOLL_CTL_ADD', `EPOLL_CTL_DEL', `EPOLL_CTL_MOD'
 epoll_ctl:(fd_t epfd, [tostr(EPOLL_OP)] syscall_ulong_t op, fd_t fd, struct epoll_event *event) -> errno_t;
+
 @@@param: op: One of `EPOLL_CTL_ADD', `EPOLL_CTL_DEL', `EPOLL_CTL_MOD'
 epoll_ctl_old:(fd_t epfd, [tostr(EPOLL_OP)] syscall_ulong_t op, fd_t fd, struct epoll_event *event) -> errno_t;
 
-[restart(dont)][cp] epoll_wait:(fd_t epfd, struct epoll_event *events, syscall_ulong_t maxevents, syscall_slong_t timeout) -> errno_t;
-[restart(dont)][cp] epoll_wait_old:(fd_t epfd, struct epoll_event *events, syscall_ulong_t maxevents, syscall_slong_t timeout) -> errno_t;
 [restart(dont)][cp]
-epoll_pwait:(fd_t epfd, struct epoll_event *events, syscall_ulong_t maxevents,
+epoll_wait:(fd_t epfd, [tostr(out:STRUCT_EPOLL_EVENTS:maxevents)] struct epoll_event *events,
+            syscall_ulong_t maxevents, syscall_slong_t timeout) -> errno_t;
+[restart(dont)][cp]
+epoll_wait_old:(fd_t epfd, [tostr(out:STRUCT_EPOLL_EVENTS:maxevents)] struct epoll_event *events,
+                syscall_ulong_t maxevents, syscall_slong_t timeout) -> errno_t;
+
+[restart(dont)][cp]
+epoll_pwait:(fd_t epfd, [tostr(out:STRUCT_EPOLL_EVENTS:maxevents)] struct epoll_event *events, syscall_ulong_t maxevents,
              syscall_slong_t timeout, [tostr(STRUCT_SIGSET)] struct __sigset_struct const *ss) -> errno_t;
 
+
+eventfd:(syscall_ulong_t initval) -> fd_t;
 @@@param: flags: Set of `EFD_SEMAPHORE | EFD_NONBLOCK | EFD_CLOEXEC'
 eventfd2:(syscall_ulong_t initval, [tostr(EVENTFD2_FLAGS)] syscall_ulong_t flags) -> fd_t;
 
 
-remap_file_pages:(void *start, size_t size, syscall_ulong_t prot, size_t pgoff, syscall_ulong_t flags) -> errno_t;
 set_tid_address:(pid_t *tidptr) -> pid_t;
-timer_create:(clockid_t clock_id, struct sigevent *evp, timer_t *timerid) -> errno_t;
+timer_create:(clockid_t clock_id,
+              [tostr(out:STRUCT_SIGEVENT)] struct sigevent *evp,
+              [tostr(out:TIMER_T)] timer_t *timerid) -> errno_t;
 
 %[startgroup]
-timer_settime:(timer_t timerid, syscall_ulong_t flags, struct itimerspec const *value, struct itimerspec *ovalue) -> errno_t;
-timer_settime32:(timer_t timerid, syscall_ulong_t flags, struct itimerspec32 const *value, struct itimerspec32 *ovalue) -> errno_t;
-timer_settime64:(timer_t timerid, syscall_ulong_t flags, struct itimerspec64 const *value, struct itimerspec64 *ovalue) -> errno_t;
-timer_settimex32:(timer_t timerid, syscall_ulong_t flags, struct itimerspecx32 const *value, struct itimerspecx32 *ovalue) -> errno_t;
-timer_settimex32_64:(timer_t timerid, syscall_ulong_t flags, struct itimerspecx32_64 const *value, struct itimerspecx32_64 *ovalue) -> errno_t;
-timer_settimex64:(timer_t timerid, syscall_ulong_t flags, struct itimerspecx64 const *value, struct itimerspecx64 *ovalue) -> errno_t;
+@@@param: flags: Set of `0 | TIMER_ABSTIME'
+timer_settime:(timer_t timerid, [tostr(TIMER_FLAGS)] syscall_ulong_t flags, [tostr(STRUCT_ITIMERSPEC)] struct itimerspec const *value, [tostr(out:STRUCT_ITIMERSPEC)] struct itimerspec *ovalue) -> errno_t;
+[doc_alias(timer_settime)] timer_settime32:(timer_t timerid, [tostr(TIMER_FLAGS)] syscall_ulong_t flags, [tostr(STRUCT_ITIMERSPEC32)] struct itimerspec32 const *value, [tostr(out:STRUCT_ITIMERSPEC32)] struct itimerspec32 *ovalue) -> errno_t;
+[doc_alias(timer_settime)] timer_settime64:(timer_t timerid, [tostr(TIMER_FLAGS)] syscall_ulong_t flags, [tostr(STRUCT_ITIMERSPEC64)] struct itimerspec64 const *value, [tostr(out:STRUCT_ITIMERSPEC64)] struct itimerspec64 *ovalue) -> errno_t;
+[doc_alias(timer_settime)] timer_settimex32:(timer_t timerid, [tostr(TIMER_FLAGS)] syscall_ulong_t flags, [tostr(STRUCT_ITIMERSPECX32)] struct itimerspecx32 const *value, [tostr(out:STRUCT_ITIMERSPECX32)] struct itimerspecx32 *ovalue) -> errno_t;
+[doc_alias(timer_settime)] timer_settimex32_64:(timer_t timerid, [tostr(TIMER_FLAGS)] syscall_ulong_t flags, [tostr(STRUCT_ITIMERSPECX32_64)] struct itimerspecx32_64 const *value, [tostr(out:STRUCT_ITIMERSPECX32_64)] struct itimerspecx32_64 *ovalue) -> errno_t;
+[doc_alias(timer_settime)] timer_settimex64:(timer_t timerid, [tostr(TIMER_FLAGS)] syscall_ulong_t flags, [tostr(STRUCT_ITIMERSPECX64)] struct itimerspecx64 const *value, [tostr(out:STRUCT_ITIMERSPECX64)] struct itimerspecx64 *ovalue) -> errno_t;
 %[endgroup]
 
 %[startgroup]
-timer_gettime:(timer_t timerid, struct itimerspec *value) -> errno_t;
-timer_gettime32:(timer_t timerid, struct itimerspec32 *value) -> errno_t;
-timer_gettime64:(timer_t timerid, struct itimerspec64 *value) -> errno_t;
-timer_gettimex32:(timer_t timerid, struct itimerspecx32 *value) -> errno_t;
-timer_gettimex32_64:(timer_t timerid, struct itimerspecx32_64 *value) -> errno_t;
-timer_gettimex64:(timer_t timerid, struct itimerspecx64 *value) -> errno_t;
+timer_gettime:(timer_t timerid, [tostr(out:STRUCT_ITIMERSPEC)] struct itimerspec *value) -> errno_t;
+timer_gettime32:(timer_t timerid, [tostr(out:STRUCT_ITIMERSPEC32)] struct itimerspec32 *value) -> errno_t;
+timer_gettime64:(timer_t timerid, [tostr(out:STRUCT_ITIMERSPEC64)] struct itimerspec64 *value) -> errno_t;
+timer_gettimex32:(timer_t timerid, [tostr(out:STRUCT_ITIMERSPECX32)] struct itimerspecx32 *value) -> errno_t;
+timer_gettimex32_64:(timer_t timerid, [tostr(out:STRUCT_ITIMERSPECX32_64)] struct itimerspecx32_64 *value) -> errno_t;
+timer_gettimex64:(timer_t timerid, [tostr(out:STRUCT_ITIMERSPECX64)] struct itimerspecx64 *value) -> errno_t;
 %[endgroup]
 
 timer_getoverrun:(timer_t timerid) -> syscall_slong_t;
@@ -1125,41 +1218,40 @@ clock_settimex64:(clockid_t clock_id, [tostr(STRUCT_TIMESPECX64)] struct timespe
 %[endgroup]
 
 %[startgroup]
-clock_gettime:(clockid_t clock_id, struct timespec *tp) -> errno_t;
-clock_gettime32:(clockid_t clock_id, struct timespec32 *tp) -> errno_t;
-clock_gettime64:(clockid_t clock_id, struct timespec64 *tp) -> errno_t;
-clock_gettimex32:(clockid_t clock_id, struct timespecx32 *tp) -> errno_t;
-clock_gettimex32_64:(clockid_t clock_id, struct timespecx32_64 *tp) -> errno_t;
-clock_gettimex64:(clockid_t clock_id, struct timespecx64 *tp) -> errno_t;
+clock_gettime:(clockid_t clock_id, [tostr(out:STRUCT_TIMESPEC)] struct timespec *tp) -> errno_t;
+clock_gettime32:(clockid_t clock_id, [tostr(out:STRUCT_TIMESPEC32)] struct timespec32 *tp) -> errno_t;
+clock_gettime64:(clockid_t clock_id, [tostr(out:STRUCT_TIMESPEC64)] struct timespec64 *tp) -> errno_t;
+clock_gettimex32:(clockid_t clock_id, [tostr(out:STRUCT_TIMESPECX32)] struct timespecx32 *tp) -> errno_t;
+clock_gettimex32_64:(clockid_t clock_id, [tostr(out:STRUCT_TIMESPECX32_64)] struct timespecx32_64 *tp) -> errno_t;
+clock_gettimex64:(clockid_t clock_id, [tostr(out:STRUCT_TIMESPECX64)] struct timespecx64 *tp) -> errno_t;
 %[endgroup]
 
 %[startgroup]
-clock_getres:(clockid_t clock_id, struct timespec *res) -> errno_t;
-clock_getres32:(clockid_t clock_id, struct timespec32 *res) -> errno_t;
-clock_getres64:(clockid_t clock_id, struct timespec64 *res) -> errno_t;
-clock_getresx32:(clockid_t clock_id, struct timespecx32 *res) -> errno_t;
-clock_getresx32_64:(clockid_t clock_id, struct timespecx32_64 *res) -> errno_t;
-clock_getresx64:(clockid_t clock_id, struct timespecx64 *res) -> errno_t;
+clock_getres:(clockid_t clock_id, [tostr(out:STRUCT_TIMESPEC)] struct timespec *res) -> errno_t;
+clock_getres32:(clockid_t clock_id, [tostr(out:STRUCT_TIMESPEC32)] struct timespec32 *res) -> errno_t;
+clock_getres64:(clockid_t clock_id, [tostr(out:STRUCT_TIMESPEC64)] struct timespec64 *res) -> errno_t;
+clock_getresx32:(clockid_t clock_id, [tostr(out:STRUCT_TIMESPECX32)] struct timespecx32 *res) -> errno_t;
+clock_getresx32_64:(clockid_t clock_id, [tostr(out:STRUCT_TIMESPECX32_64)] struct timespecx32_64 *res) -> errno_t;
+clock_getresx64:(clockid_t clock_id, [tostr(out:STRUCT_TIMESPECX64)] struct timespecx64 *res) -> errno_t;
 %[endgroup]
 
 %[startgroup]
-[restart(dont)][cp] clock_nanosleep:(clockid_t clock_id, syscall_ulong_t flags, [tostr(STRUCT_TIMESPEC)] struct timespec const *requested_time, struct timespec *remaining) -> errno_t;
-[restart(dont)][cp] clock_nanosleep32:(clockid_t clock_id, syscall_ulong_t flags, [tostr(STRUCT_TIMESPEC32)] struct timespec32 const *requested_time, struct timespec32 *remaining) -> errno_t;
-[restart(dont)][cp] clock_nanosleep64:(clockid_t clock_id, syscall_ulong_t flags, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *requested_time, struct timespec64 *remaining) -> errno_t;
-[restart(dont)][cp] clock_nanosleepx32:(clockid_t clock_id, syscall_ulong_t flags, [tostr(STRUCT_TIMESPECX32)] struct timespecx32 const *requested_time, struct timespecx32 *remaining) -> errno_t;
-[restart(dont)][cp] clock_nanosleepx32_64:(clockid_t clock_id, syscall_ulong_t flags, [tostr(STRUCT_TIMESPECX32_64)] struct timespecx32_64 const *requested_time, struct timespecx32_64 *remaining) -> errno_t;
-[restart(dont)][cp] clock_nanosleepx64:(clockid_t clock_id, syscall_ulong_t flags, [tostr(STRUCT_TIMESPECX64)] struct timespecx64 const *requested_time, struct timespecx64 *remaining) -> errno_t;
+@@@param: flags: Set of `0 | TIMER_ABSTIME'
+[restart(dont)][cp] clock_nanosleep:(clockid_t clock_id, [tostr(TIMER_FLAGS)] syscall_ulong_t flags, [tostr(STRUCT_TIMESPEC)] struct timespec const *requested_time, [tostr(out:STRUCT_TIMESPEC)] struct timespec *remaining) -> errno_t;
+[restart(dont)][cp] clock_nanosleep32:(clockid_t clock_id, [tostr(TIMER_FLAGS)] syscall_ulong_t flags, [tostr(STRUCT_TIMESPEC32)] struct timespec32 const *requested_time, [tostr(out:STRUCT_TIMESPEC32)] struct timespec32 *remaining) -> errno_t;
+[restart(dont)][cp] clock_nanosleep64:(clockid_t clock_id, [tostr(TIMER_FLAGS)] syscall_ulong_t flags, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *requested_time, [tostr(out:STRUCT_TIMESPEC64)] struct timespec64 *remaining) -> errno_t;
+[restart(dont)][cp] clock_nanosleepx32:(clockid_t clock_id, [tostr(TIMER_FLAGS)] syscall_ulong_t flags, [tostr(STRUCT_TIMESPECX32)] struct timespecx32 const *requested_time, [tostr(out:STRUCT_TIMESPECX32)] struct timespecx32 *remaining) -> errno_t;
+[restart(dont)][cp] clock_nanosleepx32_64:(clockid_t clock_id, [tostr(TIMER_FLAGS)] syscall_ulong_t flags, [tostr(STRUCT_TIMESPECX32_64)] struct timespecx32_64 const *requested_time, [tostr(out:STRUCT_TIMESPECX32_64)] struct timespecx32_64 *remaining) -> errno_t;
+[restart(dont)][cp] clock_nanosleepx64:(clockid_t clock_id, [tostr(TIMER_FLAGS)] syscall_ulong_t flags, [tostr(STRUCT_TIMESPECX64)] struct timespecx64 const *requested_time, [tostr(out:STRUCT_TIMESPECX64)] struct timespecx64 *remaining) -> errno_t;
 %[endgroup]
 
-tgkill:(pid_t tgid, pid_t tid, [tostr(SIGNO)] syscall_ulong_t signo) -> errno_t;
-
 %[startgroup]
-[cp] utimes:([tostr(FILENAME)] char const *filename, struct timeval const times[2]) -> errno_t;
-[cp] utimes32:([tostr(FILENAME)] char const *filename, struct timeval32 const times[2]) -> errno_t;
-[cp] utimes64:([tostr(FILENAME)] char const *filename, struct timeval64 const times[2]) -> errno_t;
-[cp] utimesx32:([tostr(FILENAME)] char const *filename, struct timevalx32 const times[2]) -> errno_t;
-[cp] utimesx32_64:([tostr(FILENAME)] char const *filename, struct timevalx32_64 const times[2]) -> errno_t;
-[cp] utimesx64:([tostr(FILENAME)] char const *filename, struct timevalx64 const times[2]) -> errno_t;
+[cp] utimes:([tostr(FILENAME)] char const *filename, [tostr(STRUCT_TIMEVAL_VEC2)] struct timeval const times[2]) -> errno_t;
+[cp] utimes32:([tostr(FILENAME)] char const *filename, [tostr(STRUCT_TIMEVAL32_VEC2)] struct timeval32 const times[2]) -> errno_t;
+[cp] utimes64:([tostr(FILENAME)] char const *filename, [tostr(STRUCT_TIMEVAL64_VEC2)] struct timeval64 const times[2]) -> errno_t;
+[cp] utimesx32:([tostr(FILENAME)] char const *filename, [tostr(STRUCT_TIMEVALX32_VEC2)] struct timevalx32 const times[2]) -> errno_t;
+[cp] utimesx32_64:([tostr(FILENAME)] char const *filename, [tostr(STRUCT_TIMEVALX32_64_VEC2)] struct timevalx32_64 const times[2]) -> errno_t;
+[cp] utimesx64:([tostr(FILENAME)] char const *filename, [tostr(STRUCT_TIMEVALX64_VEC2)] struct timevalx64 const times[2]) -> errno_t;
 %[endgroup]
 
 vserver:(int TODO_PROTOTYPE) -> errno_t;
@@ -1172,77 +1264,87 @@ mq_open:(char const *name, oflag_t oflags, mode_t mode) -> fd_t;
 mq_unlink:(char const *name) -> errno_t;
 
 %[startgroup]
-[cp] mq_timedsend:(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, [tostr(STRUCT_TIMESPEC)] struct timespec const *abs_timeout) -> errno_t;
-[cp] mq_timedsend32:(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, [tostr(STRUCT_TIMESPEC32)] struct timespec32 const *abs_timeout) -> errno_t;
-[cp] mq_timedsend64:(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *abs_timeout) -> errno_t;
-[cp] mq_timedsendx32:(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, [tostr(STRUCT_TIMESPECX32)] struct timespecx32 const *abs_timeout) -> errno_t;
-[cp] mq_timedsendx32_64:(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, [tostr(STRUCT_TIMESPECX32_64)] struct timespecx32_64 const *abs_timeout) -> errno_t;
-[cp] mq_timedsendx64:(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, [tostr(STRUCT_TIMESPECX64)] struct timespecx64 const *abs_timeout) -> errno_t;
+[cp] mq_timedsend:(fd_t mqdes, [tostr(BUFFER:msg_len)] char const *msg_ptr, size_t msg_len, uint32_t msg_prio, [tostr(STRUCT_TIMESPEC)] struct timespec const *abs_timeout) -> errno_t;
+[cp] mq_timedsend32:(fd_t mqdes, [tostr(BUFFER:msg_len)] char const *msg_ptr, size_t msg_len, uint32_t msg_prio, [tostr(STRUCT_TIMESPEC32)] struct timespec32 const *abs_timeout) -> errno_t;
+[cp] mq_timedsend64:(fd_t mqdes, [tostr(BUFFER:msg_len)] char const *msg_ptr, size_t msg_len, uint32_t msg_prio, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *abs_timeout) -> errno_t;
+[cp] mq_timedsendx32:(fd_t mqdes, [tostr(BUFFER:msg_len)] char const *msg_ptr, size_t msg_len, uint32_t msg_prio, [tostr(STRUCT_TIMESPECX32)] struct timespecx32 const *abs_timeout) -> errno_t;
+[cp] mq_timedsendx32_64:(fd_t mqdes, [tostr(BUFFER:msg_len)] char const *msg_ptr, size_t msg_len, uint32_t msg_prio, [tostr(STRUCT_TIMESPECX32_64)] struct timespecx32_64 const *abs_timeout) -> errno_t;
+[cp] mq_timedsendx64:(fd_t mqdes, [tostr(BUFFER:msg_len)] char const *msg_ptr, size_t msg_len, uint32_t msg_prio, [tostr(STRUCT_TIMESPECX64)] struct timespecx64 const *abs_timeout) -> errno_t;
 %[endgroup]
 
 %[startgroup]
-[cp] mq_timedreceive:(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, [tostr(STRUCT_TIMESPEC)] struct timespec const *abs_timeout) -> ssize_t;
-[cp] mq_timedreceive32:(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, [tostr(STRUCT_TIMESPEC32)] struct timespec32 const *abs_timeout) -> ssize_t;
-[cp] mq_timedreceive64:(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *abs_timeout) -> ssize_t;
-[cp] mq_timedreceivex32:(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, [tostr(STRUCT_TIMESPECX32)] struct timespecx32 const *abs_timeout) -> ssize_t;
-[cp] mq_timedreceivex32_64:(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, [tostr(STRUCT_TIMESPECX32_64)] struct timespecx32_64 const *abs_timeout) -> ssize_t;
-[cp] mq_timedreceivex64:(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, [tostr(STRUCT_TIMESPECX64)] struct timespecx64 const *abs_timeout) -> ssize_t;
+[cp] mq_timedreceive:(fd_t mqdes, [tostr(out:BUFFER:msg_len:return)] char *msg_ptr, size_t msg_len, [tostr(out:UINT32_T)] uint32_t *pmsg_prio, [tostr(STRUCT_TIMESPEC)] struct timespec const *abs_timeout) -> ssize_t;
+[cp] mq_timedreceive32:(fd_t mqdes, [tostr(out:BUFFER:msg_len:return)] char *msg_ptr, size_t msg_len, [tostr(out:UINT32_T)] uint32_t *pmsg_prio, [tostr(STRUCT_TIMESPEC32)] struct timespec32 const *abs_timeout) -> ssize_t;
+[cp] mq_timedreceive64:(fd_t mqdes, [tostr(out:BUFFER:msg_len:return)] char *msg_ptr, size_t msg_len, [tostr(out:UINT32_T)] uint32_t *pmsg_prio, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *abs_timeout) -> ssize_t;
+[cp] mq_timedreceivex32:(fd_t mqdes, [tostr(out:BUFFER:msg_len:return)] char *msg_ptr, size_t msg_len, [tostr(out:UINT32_T)] uint32_t *pmsg_prio, [tostr(STRUCT_TIMESPECX32)] struct timespecx32 const *abs_timeout) -> ssize_t;
+[cp] mq_timedreceivex32_64:(fd_t mqdes, [tostr(out:BUFFER:msg_len:return)] char *msg_ptr, size_t msg_len, [tostr(out:UINT32_T)] uint32_t *pmsg_prio, [tostr(STRUCT_TIMESPECX32_64)] struct timespecx32_64 const *abs_timeout) -> ssize_t;
+[cp] mq_timedreceivex64:(fd_t mqdes, [tostr(out:BUFFER:msg_len:return)] char *msg_ptr, size_t msg_len, [tostr(out:UINT32_T)] uint32_t *pmsg_prio, [tostr(STRUCT_TIMESPECX64)] struct timespecx64 const *abs_timeout) -> ssize_t;
 %[endgroup]
 
-mq_notify:(fd_t mqdes, struct sigevent const *notification) -> errno_t;
-mq_getsetattr:(fd_t mqdes, struct mq_attr const *newattr, struct mq_attr *oldattr) -> errno_t;
+mq_notify:(fd_t mqdes, [tostr(STRUCT_SIGEVENT)] struct sigevent const *notification) -> errno_t;
+mq_getsetattr:(fd_t mqdes, [tostr(STRUCT_MQ_ATTR)] struct mq_attr const *newattr, [tostr(out:STRUCT_MQ_ATTR)] struct mq_attr *oldattr) -> errno_t;
 
 %[startgroup]
 @@@param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
 @@@param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT'
 [restart(dont)][cp]
 waitid:([tostr(IDTYPE_T)] syscall_ulong_t idtype, [tostr(ID_T:idtype)] id_t id, struct __siginfo_struct *infop,
-        [tostr(WAITID_OPTIONS)] syscall_ulong_t options,
-        struct rusage *ru) -> errno_t;
-[restart(dont)][cp][doc_alias(waitid)] waitid32:([tostr(IDTYPE_T)] syscall_ulong_t idtype, [tostr(ID_T:idtype)] id_t id, struct __siginfo_struct *infop, [tostr(WAITID_OPTIONS)] syscall_ulong_t options, struct rusage32 *ru) -> errno_t;
-[restart(dont)][cp][doc_alias(waitid)] waitid64:([tostr(IDTYPE_T)] syscall_ulong_t idtype, [tostr(ID_T:idtype)] id_t id, struct __siginfo_struct *infop, [tostr(WAITID_OPTIONS)] syscall_ulong_t options, struct rusage64 *ru) -> errno_t;
-[restart(dont)][cp][doc_alias(waitid)] waitidx32:([tostr(IDTYPE_T)] syscall_ulong_t idtype, [tostr(ID_T:idtype)] id_t id, struct __siginfox32_struct *infop, [tostr(WAITID_OPTIONS)] syscall_ulong_t options, struct rusagex32 *ru) -> errno_t;
-[restart(dont)][cp][doc_alias(waitid)] waitidx32_64:([tostr(IDTYPE_T)] syscall_ulong_t idtype, [tostr(ID_T:idtype)] id_t id, struct __siginfox32_struct *infop, [tostr(WAITID_OPTIONS)] syscall_ulong_t options, struct rusagex32_64 *ru) -> errno_t;
-[restart(dont)][cp][doc_alias(waitid)] waitidx64:([tostr(IDTYPE_T)] syscall_ulong_t idtype, [tostr(ID_T:idtype)] id_t id, struct __siginfox64_struct *infop, [tostr(WAITID_OPTIONS)] syscall_ulong_t options, struct rusagex64 *ru) -> errno_t;
+        [tostr(WAITID_OPTIONS)] syscall_ulong_t options, [tostr(out:STRUCT_RUSAGE)] struct rusage *ru) -> errno_t;
+[restart(dont)][cp][doc_alias(waitid)] waitid32:([tostr(IDTYPE_T)] syscall_ulong_t idtype, [tostr(ID_T:idtype)] id_t id, [tostr(out:STRUCT_SIGINFO)] struct __siginfo_struct *infop, [tostr(WAITID_OPTIONS)] syscall_ulong_t options, [tostr(out:STRUCT_RUSAGE32)] struct rusage32 *ru) -> errno_t;
+[restart(dont)][cp][doc_alias(waitid)] waitid64:([tostr(IDTYPE_T)] syscall_ulong_t idtype, [tostr(ID_T:idtype)] id_t id, [tostr(out:STRUCT_SIGINFO)] struct __siginfo_struct *infop, [tostr(WAITID_OPTIONS)] syscall_ulong_t options, [tostr(out:STRUCT_RUSAGE64)] struct rusage64 *ru) -> errno_t;
+[restart(dont)][cp][doc_alias(waitid)] waitidx32:([tostr(IDTYPE_T)] syscall_ulong_t idtype, [tostr(ID_T:idtype)] id_t id, [tostr(out:STRUCT_SIGINFOX32)] struct __siginfox32_struct *infop, [tostr(WAITID_OPTIONS)] syscall_ulong_t options, [tostr(out:STRUCT_RUSAGEX32)] struct rusagex32 *ru) -> errno_t;
+[restart(dont)][cp][doc_alias(waitid)] waitidx32_64:([tostr(IDTYPE_T)] syscall_ulong_t idtype, [tostr(ID_T:idtype)] id_t id, [tostr(out:STRUCT_SIGINFOX32)] struct __siginfox32_struct *infop, [tostr(WAITID_OPTIONS)] syscall_ulong_t options, [tostr(out:STRUCT_RUSAGEX32_64)] struct rusagex32_64 *ru) -> errno_t;
+[restart(dont)][cp][doc_alias(waitid)] waitidx64:([tostr(IDTYPE_T)] syscall_ulong_t idtype, [tostr(ID_T:idtype)] id_t id, [tostr(out:STRUCT_SIGINFOX64)] struct __siginfox64_struct *infop, [tostr(WAITID_OPTIONS)] syscall_ulong_t options, [tostr(out:STRUCT_RUSAGEX64)] struct rusagex64 *ru) -> errno_t;
 %[endgroup]
 
 add_key:(int TODO_PROTOTYPE) -> errno_t;
 request_key:(int TODO_PROTOTYPE) -> errno_t;
 keyctl:(int TODO_PROTOTYPE) -> errno_t;
 
-ioprio_set:(syscall_ulong_t which, syscall_ulong_t who, syscall_ulong_t ioprio) -> errno_t;
-ioprio_get:(syscall_ulong_t which, syscall_ulong_t who) -> errno_t;
+@@NOTE: Linux calls `who' `which', and `id' `who' (refactored to prevent confusion)
+@@@param: who: One of `IOPRIO_WHO_PROCESS', `IOPRIO_WHO_PGRP' or `IOPRIO_WHO_USER'
+ioprio_set:([tostr(IOPRIO_WHO)] syscall_ulong_t who,
+            [tostr(IOPRIO_ID:who)] syscall_ulong_t id,
+            [tostr(IOPRIO_VALUE)] syscall_ulong_t ioprio) -> errno_t;
+
+@@NOTE: Linux calls `who' `which', and `id' `who' (refactored to prevent confusion)
+@@@param: who: One of `IOPRIO_WHO_PROCESS', `IOPRIO_WHO_PGRP' or `IOPRIO_WHO_USER'
+ioprio_get:([tostr(IOPRIO_WHO)] syscall_ulong_t who,
+            [tostr(IOPRIO_ID:who)] syscall_ulong_t id) -> [tostr(IOPRIO_VALUE)] syscall_slong_t;
 
 inotify_init:(int TODO_PROTOTYPE) -> errno_t;
 inotify_add_watch:(int TODO_PROTOTYPE) -> errno_t;
 inotify_rm_watch:(int TODO_PROTOTYPE) -> errno_t;
 migrate_pages:(int TODO_PROTOTYPE) -> errno_t;
 
-[cp] openat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, oflag_t oflags, mode_t mode) -> fd_t;
-
 %[startgroup]
-[cp] futimesat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(TIMEVAL_VEC2)] struct timeval const times[2]) -> errno_t;
-[cp] futimesat32:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(TIMEVAL32_VEC2)] struct timeval32 const times[2]) -> errno_t;
-[cp] futimesat64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(TIMEVAL64_VEC2)] struct timeval64 const times[2]) -> errno_t;
-[cp] futimesatx32:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(TIMEVALX32_VEC2)] struct timevalx32 const times[2]) -> errno_t;
-[cp] futimesatx32_64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(TIMEVALX32_64_VEC2)] struct timevalx32_64 const times[2]) -> errno_t;
-[cp] futimesatx64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(TIMEVALX64_VEC2)] struct timevalx64 const times[2]) -> errno_t;
+[cp] futimesat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(STRUCT_TIMEVAL_VEC2)] struct timeval const times[2]) -> errno_t;
+[cp] futimesat32:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(STRUCT_TIMEVAL32_VEC2)] struct timeval32 const times[2]) -> errno_t;
+[cp] futimesat64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(STRUCT_TIMEVAL64_VEC2)] struct timeval64 const times[2]) -> errno_t;
+[cp] futimesatx32:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(STRUCT_TIMEVALX32_VEC2)] struct timevalx32 const times[2]) -> errno_t;
+[cp] futimesatx32_64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(STRUCT_TIMEVALX32_64_VEC2)] struct timevalx32_64 const times[2]) -> errno_t;
+[cp] futimesatx64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(STRUCT_TIMEVALX64_VEC2)] struct timevalx64 const times[2]) -> errno_t;
 %[endgroup]
 
 @@@param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_FOLLOW | AT_DOSPATH'
-[cp] linkat:(fd_t fromfd, char const *existing_file, fd_t tofd, char const *target_path,
+[cp] linkat:(fd_t fromfd, [tostr(FILENAME:fromfd)] char const *existing_file,
+             fd_t tofd, [tostr(FILENAME:tofd)] char const *target_path,
              [tostr(ATFLAG__EMPTY_PATH__SYMLINK_FOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
 
-[cp] symlinkat:(char const *link_text, fd_t tofd, char const *target_path) -> errno_t;
+[cp] symlinkat:([tostr(STRING)] char const *link_text, fd_t tofd,
+                [tostr(FILENAME:tofd)] char const *target_path) -> errno_t;
 
 @@@param: flags: Set of `0 | AT_DOSPATH'
-[cp] fsymlinkat:(char const *link_text, fd_t tofd, char const *target_path,
+[cp] fsymlinkat:([tostr(STRING)] char const *link_text, fd_t tofd,
+                 [tostr(FILENAME:tofd)] char const *target_path,
                  [tostr(ATFLAG__DOSPATH)] atflag_t flags) -> errno_t;
 
-[cp] readlinkat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *path, char *buf, size_t buflen) -> ssize_t;
+[cp] readlinkat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *path,
+                 [tostr(out:BUFFER:buflen:return)] char *buf, size_t buflen) -> ssize_t;
 
 @@@param: flags: Set of `0 | AT_READLINK_REQSIZE | AT_DOSPATH'
-[cp] freadlinkat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *path, char *buf, size_t buflen,
+[cp] freadlinkat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *path,
+                  [tostr(out:BUFFER:buflen:return)] char *buf, size_t buflen,
                   [tostr(ATFLAG__READLINK_REQSIZE__DOSPATH)] atflag_t flags) -> ssize_t;
 
 @@@param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
@@ -1265,12 +1367,12 @@ migrate_pages:(int TODO_PROTOTYPE) -> errno_t;
 %[endgroup]
 
 %[startgroup]
-[restart(dont)][cp] ppoll:([tostr(STRUCT_POLLFD:nfds)] struct pollfd *fds, size_t nfds, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) -> ssize_t;
-[restart(dont)][cp] ppoll32:([tostr(STRUCT_POLLFD:nfds)] struct pollfd *fds, size_t nfds, [tostr(STRUCT_TIMESPEC32)] struct timespec32 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) -> ssize_t;
-[restart(dont)][cp] ppoll64:([tostr(STRUCT_POLLFD:nfds)] struct pollfd *fds, size_t nfds, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) -> ssize_t;
-[restart(dont)][cp] ppollx32:([tostr(STRUCT_POLLFD:nfds)] struct pollfd *fds, size_t nfds, [tostr(STRUCT_TIMESPECX32)] struct timespecx32 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) -> ssize_t;
-[restart(dont)][cp] ppollx32_64:([tostr(STRUCT_POLLFD:nfds)] struct pollfd *fds, size_t nfds, [tostr(STRUCT_TIMESPECX32_64)] struct timespecx32_64 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) -> ssize_t;
-[restart(dont)][cp] ppollx64:([tostr(STRUCT_POLLFD:nfds)] struct pollfd *fds, size_t nfds, [tostr(STRUCT_TIMESPECX64)] struct timespecx64 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) -> ssize_t;
+[restart(dont)][cp] ppoll:([tostr(STRUCT_POLLFD:nfds)] struct pollfd *fds, size_t nfds, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout_ts, [tostr(STRUCT_SIGSET:sigsetsize)] struct __sigset_struct const *sigmask, size_t sigsetsize) -> ssize_t;
+[restart(dont)][cp] ppoll32:([tostr(STRUCT_POLLFD:nfds)] struct pollfd *fds, size_t nfds, [tostr(STRUCT_TIMESPEC32)] struct timespec32 const *timeout_ts, [tostr(STRUCT_SIGSET:sigsetsize)] struct __sigset_struct const *sigmask, size_t sigsetsize) -> ssize_t;
+[restart(dont)][cp] ppoll64:([tostr(STRUCT_POLLFD:nfds)] struct pollfd *fds, size_t nfds, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *timeout_ts, [tostr(STRUCT_SIGSET:sigsetsize)] struct __sigset_struct const *sigmask, size_t sigsetsize) -> ssize_t;
+[restart(dont)][cp] ppollx32:([tostr(STRUCT_POLLFD:nfds)] struct pollfd *fds, size_t nfds, [tostr(STRUCT_TIMESPECX32)] struct timespecx32 const *timeout_ts, [tostr(STRUCT_SIGSET:sigsetsize)] struct __sigset_struct const *sigmask, size_t sigsetsize) -> ssize_t;
+[restart(dont)][cp] ppollx32_64:([tostr(STRUCT_POLLFD:nfds)] struct pollfd *fds, size_t nfds, [tostr(STRUCT_TIMESPECX32_64)] struct timespecx32_64 const *timeout_ts, [tostr(STRUCT_SIGSET:sigsetsize)] struct __sigset_struct const *sigmask, size_t sigsetsize) -> ssize_t;
+[restart(dont)][cp] ppollx64:([tostr(STRUCT_POLLFD:nfds)] struct pollfd *fds, size_t nfds, [tostr(STRUCT_TIMESPECX64)] struct timespecx64 const *timeout_ts, [tostr(STRUCT_SIGSET:sigsetsize)] struct __sigset_struct const *sigmask, size_t sigsetsize) -> ssize_t;
 %[endgroup]
 
 @@param flags: Set of `CLONE_*'
@@ -1279,70 +1381,79 @@ unshare:([tostr(CLONE_FLAGS_UNSHARE)] syscall_ulong_t flags) -> errno_t;
 set_robust_list:(int TODO_PROTOTYPE) -> errno_t;
 get_robust_list:(int TODO_PROTOTYPE) -> errno_t;
 
-[cp] splice:(fd_t fdin, uint64_t *offin, fd_t fdout, uint64_t *offout, size_t length, syscall_ulong_t flags) -> ssize_t;
-[cp] sync_file_range:(fd_t fd, [reg64] uint64_t offset, [reg64] uint64_t count, syscall_ulong_t flags) -> errno_t;
-[cp] tee:(fd_t fdin, fd_t fdout, size_t length, syscall_ulong_t flags) -> ssize_t;
+@@@param: flags: Set of `SPLICE_F_MOVE | SPLICE_F_NONBLOCK | SPLICE_F_MORE | SPLICE_F_GIFT'
+[cp] splice:(fd_t fdin, uint64_t *offin, fd_t fdout, uint64_t *offout,
+             size_t length, [tostr(SPLICE_FLAGS)] syscall_ulong_t flags) -> ssize_t;
 
 %[startgroup]
-[cp] vmsplice:(fd_t fdout, [tostr(STRUCT_IOVEC:count)] struct iovec const *iov, size_t count, syscall_ulong_t flags) -> ssize_t;
-[cp] vmsplicex32:(fd_t fdout, [tostr(STRUCT_IOVECX32:count)] struct iovecx32 const *iov, size_t count, syscall_ulong_t flags) -> ssize_t;
-[cp] vmsplicex64:(fd_t fdout, [tostr(STRUCT_IOVECX64:count)] struct iovecx64 const *iov, size_t count, syscall_ulong_t flags) -> ssize_t;
+@@@param: flags: Set of `SPLICE_F_MOVE | SPLICE_F_NONBLOCK | SPLICE_F_MORE | SPLICE_F_GIFT'
+[cp] vmsplice:(fd_t fdout, [tostr(STRUCT_IOVEC:count)] struct iovec const *iov, size_t count, [tostr(SPLICE_FLAGS)] syscall_ulong_t flags) -> ssize_t;
+[doc_alias(vmsplice)][cp] vmsplicex32:(fd_t fdout, [tostr(STRUCT_IOVECX32:count)] struct iovecx32 const *iov, size_t count, [tostr(SPLICE_FLAGS)] syscall_ulong_t flags) -> ssize_t;
+[doc_alias(vmsplice)][cp] vmsplicex64:(fd_t fdout, [tostr(STRUCT_IOVECX64:count)] struct iovecx64 const *iov, size_t count, [tostr(SPLICE_FLAGS)] syscall_ulong_t flags) -> ssize_t;
 %[endgroup]
 
+@@@param: flags: Set of `SPLICE_F_MOVE | SPLICE_F_NONBLOCK | SPLICE_F_MORE | SPLICE_F_GIFT'
+[cp] tee:(fd_t fdin, fd_t fdout, size_t length,
+          [tostr(SPLICE_FLAGS)] syscall_ulong_t flags) -> ssize_t;
+
+@@@param: flags: Set of `SYNC_FILE_RANGE_WAIT_BEFORE | SYNC_FILE_RANGE_WRITE | SYNC_FILE_RANGE_WAIT_AFTER'
+[cp] sync_file_range:(fd_t fd, [reg64] uint64_t offset, [reg64] uint64_t count,
+                      [tostr(SYNC_FILE_RANGE_FLAGS)] syscall_ulong_t flags) -> errno_t;
+
 move_pages:(int TODO_PROTOTYPE) -> errno_t;
-getcpu:(uint32_t *cpu, uint32_t *node, struct getcpu_cache *tcache) -> errno_t;
+getcpu:([tostr(out:UINT32_T)] uint32_t *cpu,
+        [tostr(out:UINT32_T)] uint32_t *node,
+        [tostr(out:STRUCT_GETCPU_CACHE)] struct getcpu_cache *tcache) -> errno_t;
 
 %[startgroup]
 @@@param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH'
-[cp] utimensat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, struct timespec const times[2], [tostr(ATFLAG__SYMLINK_NOFOLLOW__CHANGE_CTIME__DOSPATH)] atflag_t flags) -> errno_t;
-[doc_alias(utimensat)][cp] utimensat32:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, struct timespec32 const times[2], [tostr(ATFLAG__SYMLINK_NOFOLLOW__CHANGE_CTIME__DOSPATH)] atflag_t flags) -> errno_t;
-[doc_alias(utimensat)][cp] utimensat64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, struct timespec64 const times[2], [tostr(ATFLAG__SYMLINK_NOFOLLOW__CHANGE_CTIME__DOSPATH)] atflag_t flags) -> errno_t;
-[doc_alias(utimensat)][cp] utimensatx32:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, struct timespecx32 const times[2], [tostr(ATFLAG__SYMLINK_NOFOLLOW__CHANGE_CTIME__DOSPATH)] atflag_t flags) -> errno_t;
-[doc_alias(utimensat)][cp] utimensatx32_64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, struct timespecx32_64 const times[2], [tostr(ATFLAG__SYMLINK_NOFOLLOW__CHANGE_CTIME__DOSPATH)] atflag_t flags) -> errno_t;
-[doc_alias(utimensat)][cp] utimensatx64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, struct timespecx64 const times[2], [tostr(ATFLAG__SYMLINK_NOFOLLOW__CHANGE_CTIME__DOSPATH)] atflag_t flags) -> errno_t;
+[cp] utimensat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(STRUCT_TIMESPEC_VEC2_OR_3:flags)] struct timespec const times[2], [tostr(ATFLAG__SYMLINK_NOFOLLOW__CHANGE_CTIME__DOSPATH)] atflag_t flags) -> errno_t;
+[doc_alias(utimensat)][cp] utimensat32:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(STRUCT_TIMESPEC32_VEC2_OR_3:flags)] struct timespec32 const times[2], [tostr(ATFLAG__SYMLINK_NOFOLLOW__CHANGE_CTIME__DOSPATH)] atflag_t flags) -> errno_t;
+[doc_alias(utimensat)][cp] utimensat64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(STRUCT_TIMESPEC64_VEC2_OR_3:flags)] struct timespec64 const times[2], [tostr(ATFLAG__SYMLINK_NOFOLLOW__CHANGE_CTIME__DOSPATH)] atflag_t flags) -> errno_t;
+[doc_alias(utimensat)][cp] utimensatx32:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(STRUCT_TIMESPECX32_VEC2_OR_3:flags)] struct timespecx32 const times[2], [tostr(ATFLAG__SYMLINK_NOFOLLOW__CHANGE_CTIME__DOSPATH)] atflag_t flags) -> errno_t;
+[doc_alias(utimensat)][cp] utimensatx32_64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(STRUCT_TIMESPECX32_64_VEC2_OR_3:flags)] struct timespecx32_64 const times[2], [tostr(ATFLAG__SYMLINK_NOFOLLOW__CHANGE_CTIME__DOSPATH)] atflag_t flags) -> errno_t;
+[doc_alias(utimensat)][cp] utimensatx64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(STRUCT_TIMESPECX64_VEC2_OR_3:flags)] struct timespecx64 const times[2], [tostr(ATFLAG__SYMLINK_NOFOLLOW__CHANGE_CTIME__DOSPATH)] atflag_t flags) -> errno_t;
 %[endgroup]
 
-signalfd:(fd_t fd, struct __sigset_struct const *sigmask, size_t sigsetsize) -> errno_t;
+signalfd:(fd_t fd, [tostr(STRUCT_SIGSET:sigsetsize)] struct __sigset_struct const *sigmask, size_t sigsetsize) -> errno_t;
+
+%[startgroup]
+@@@param: mode: Set of `0 | FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE | FALLOC_FL_COLLAPSE_RANGE | FALLOC_FL_ZERO_RANGE'
+fallocate:(fd_t fd, [tostr(FALLOCATE_MODE)] syscall_ulong_t mode, syscall_ulong_t offset, syscall_ulong_t length) -> errno_t;
+fallocate64:(fd_t fd, [tostr(FALLOCATE_MODE)] syscall_ulong_t mode, [reg64] uint64_t offset, [reg64] uint64_t length) -> errno_t;
+%[endgroup]
 
 @@Return file descriptor for new interval timer source
-timerfd_create:(clockid_t clock_id, syscall_ulong_t flags) -> fd_t;
-
-eventfd:(syscall_ulong_t initval) -> fd_t;
-
-%[startgroup]
-fallocate:(fd_t fd, syscall_ulong_t mode, syscall_ulong_t offset, syscall_ulong_t length) -> errno_t;
-fallocate64:(fd_t fd, syscall_ulong_t mode, [reg64] uint64_t offset, [reg64] uint64_t length) -> errno_t;
-%[endgroup]
+@@@param: flags: Set of `0 | TFD_NONBLOCK | TFD_CLOEXEC | TFD_CLOFORK'
+timerfd_create:(clockid_t clock_id, [tostr(TIMERFD_FLAGS)] syscall_ulong_t flags) -> fd_t;
 
 %[startgroup]
-@@Set next expiration time of interval timer source UFD to UTMR.
-@@If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout value
-@@is absolute. Optionally return the old expiration time in OTMR
-timerfd_settime:(fd_t ufd, syscall_ulong_t flags, [tostr(STRUCT_ITIMERSPEC)] struct itimerspec const *utmr, struct itimerspec *otmr) -> errno_t;
-[doc_alias(timerfd_settime)] timerfd_settime32:(fd_t ufd, syscall_ulong_t flags, [tostr(STRUCT_ITIMERSPEC32)] struct itimerspec32 const *utmr, struct itimerspec32 *otmr) -> errno_t;
-[doc_alias(timerfd_settime)] timerfd_settime64:(fd_t ufd, syscall_ulong_t flags, [tostr(STRUCT_ITIMERSPEC64)] struct itimerspec64 const *utmr, struct itimerspec64 *otmr) -> errno_t;
-[doc_alias(timerfd_settime)] timerfd_settimex32:(fd_t ufd, syscall_ulong_t flags, [tostr(STRUCT_ITIMERSPECX32)] struct itimerspecx32 const *utmr, struct itimerspecx32 *otmr) -> errno_t;
-[doc_alias(timerfd_settime)] timerfd_settimex32_64:(fd_t ufd, syscall_ulong_t flags, [tostr(STRUCT_ITIMERSPECX32_64)] struct itimerspecx32_64 const *utmr, struct itimerspecx32_64 *otmr) -> errno_t;
-[doc_alias(timerfd_settime)] timerfd_settimex64:(fd_t ufd, syscall_ulong_t flags, [tostr(STRUCT_ITIMERSPECX64)] struct itimerspecx64 const *utmr, struct itimerspecx64 *otmr) -> errno_t;
+@@Set next expiration time of interval timer source `timerfd' to `utmr'.
+@@If `flags' has the `TFD_TIMER_ABSTIME' flag set the timeout value
+@@is absolute. Optionally return the old expiration time in `otmr''
+@@@param: flags: Set of `0 | TFD_TIMER_ABSTIME'
+timerfd_settime:(fd_t timerfd, [tostr(TIMERFD_TIMER_FLAGS)] syscall_ulong_t flags, [tostr(STRUCT_ITIMERSPEC)] struct itimerspec const *utmr, [tostr(out:STRUCT_ITIMERSPEC)] struct itimerspec *otmr) -> errno_t;
+[doc_alias(timerfd_settime)] timerfd_settime32:(fd_t timerfd, [tostr(TIMERFD_TIMER_FLAGS)] syscall_ulong_t flags, [tostr(STRUCT_ITIMERSPEC32)] struct itimerspec32 const *utmr, [tostr(out:STRUCT_ITIMERSPEC32)] struct itimerspec32 *otmr) -> errno_t;
+[doc_alias(timerfd_settime)] timerfd_settime64:(fd_t timerfd, [tostr(TIMERFD_TIMER_FLAGS)] syscall_ulong_t flags, [tostr(STRUCT_ITIMERSPEC64)] struct itimerspec64 const *utmr, [tostr(out:STRUCT_ITIMERSPEC64)] struct itimerspec64 *otmr) -> errno_t;
+[doc_alias(timerfd_settime)] timerfd_settimex32:(fd_t timerfd, [tostr(TIMERFD_TIMER_FLAGS)] syscall_ulong_t flags, [tostr(STRUCT_ITIMERSPECX32)] struct itimerspecx32 const *utmr, [tostr(out:STRUCT_ITIMERSPECX32)] struct itimerspecx32 *otmr) -> errno_t;
+[doc_alias(timerfd_settime)] timerfd_settimex32_64:(fd_t timerfd, [tostr(TIMERFD_TIMER_FLAGS)] syscall_ulong_t flags, [tostr(STRUCT_ITIMERSPECX32_64)] struct itimerspecx32_64 const *utmr, [tostr(out:STRUCT_ITIMERSPECX32_64)] struct itimerspecx32_64 *otmr) -> errno_t;
+[doc_alias(timerfd_settime)] timerfd_settimex64:(fd_t timerfd, [tostr(TIMERFD_TIMER_FLAGS)] syscall_ulong_t flags, [tostr(STRUCT_ITIMERSPECX64)] struct itimerspecx64 const *utmr, [tostr(out:STRUCT_ITIMERSPECX64)] struct itimerspecx64 *otmr) -> errno_t;
 %[endgroup]
 
 %[startgroup]
 @@Return the next expiration time of UFD
-timerfd_gettime:(fd_t ufd, struct itimerspec *otmr) -> errno_t;
-[doc_alias(timerfd_gettime)] timerfd_gettime32:(fd_t ufd, struct itimerspec32 *otmr) -> errno_t;
-[doc_alias(timerfd_gettime)] timerfd_gettime64:(fd_t ufd, struct itimerspec64 *otmr) -> errno_t;
-[doc_alias(timerfd_gettime)] timerfd_gettimex32:(fd_t ufd, struct itimerspecx32 *otmr) -> errno_t;
-[doc_alias(timerfd_gettime)] timerfd_gettimex32_64:(fd_t ufd, struct itimerspecx32_64 *otmr) -> errno_t;
-[doc_alias(timerfd_gettime)] timerfd_gettimex64:(fd_t ufd, struct itimerspecx64 *otmr) -> errno_t;
+timerfd_gettime:(fd_t timerfd, [tostr(out:STRUCT_ITIMERSPEC)] struct itimerspec *otmr) -> errno_t;
+[doc_alias(timerfd_gettime)] timerfd_gettime32:(fd_t timerfd, [tostr(out:STRUCT_ITIMERSPEC32)] struct itimerspec32 *otmr) -> errno_t;
+[doc_alias(timerfd_gettime)] timerfd_gettime64:(fd_t timerfd, [tostr(out:STRUCT_ITIMERSPEC64)] struct itimerspec64 *otmr) -> errno_t;
+[doc_alias(timerfd_gettime)] timerfd_gettimex32:(fd_t timerfd, [tostr(out:STRUCT_ITIMERSPECX32)] struct itimerspecx32 *otmr) -> errno_t;
+[doc_alias(timerfd_gettime)] timerfd_gettimex32_64:(fd_t timerfd, [tostr(out:STRUCT_ITIMERSPECX32_64)] struct itimerspecx32_64 *otmr) -> errno_t;
+[doc_alias(timerfd_gettime)] timerfd_gettimex64:(fd_t timerfd, [tostr(out:STRUCT_ITIMERSPECX64)] struct itimerspecx64 *otmr) -> errno_t;
 %[endgroup]
 
 @@@param: flags: Set of `SFD_NONBLOCK | SFD_CLOEXEC'
-signalfd4:(fd_t fd, struct __sigset_struct const *sigmask, size_t sigsetsize,
-           [tostr(SIGNALFD4_FLAGS)] syscall_ulong_t flags) -> errno_t;
+signalfd4:(fd_t fd, [tostr(STRUCT_SIGSET:sigsetsize)] struct __sigset_struct const *sigmask,
+           size_t sigsetsize, [tostr(SIGNALFD4_FLAGS)] syscall_ulong_t flags) -> errno_t;
 
-@@@param: flags:  Set of `O_CLOEXEC | O_CLOFORK'
-dup3:(fd_t oldfd, fd_t newfd, [tostr(OFLAG__CLOEXEC__CLOFORK)] oflag_t flags) -> fd_t;
-pipe2:(fd_t pipedes[2], [tostr(OFLAG__CLOEXEC__CLOFORK__NONBLOCK__DIRECT)] oflag_t flags) -> errno_t;
 inotify_init1:(int TODO_PROTOTYPE) -> errno_t;
 
 %[startgroup]
@@ -1378,48 +1489,63 @@ fanotify_mark:(int TODO_PROTOTYPE) -> errno_t;
 @@@param: resource: One of `RLIMIT_*' from <bits/resource.h>
 prlimit64:(pid_t pid, [tostr(RLIMIT_RESOURCE)] syscall_ulong_t resource,
            [tostr(STRUCT_RLIMIT64)] struct rlimit64 const *new_limit,
-           struct rlimit64 *old_limit) -> errno_t;
+           [tostr(out:STRUCT_RLIMIT64)] struct rlimit64 *old_limit) -> errno_t;
 
+@@@param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_FOLLOW | AT_DOSPATH'
 [cp]
 name_to_handle_at:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename,
-                   struct file_handle *handle, int32_t *mnt_id, syscall_ulong_t flags) -> errno_t;
-[cp] open_by_handle_at:(fd_t mountdirfd, struct file_handle *handle, syscall_ulong_t flags) -> fd_t;
+                   [tostr(out:STRUCT_FILE_HANDLE)] struct file_handle *handle,
+                   [tostr(out:INT32_T)] int32_t *mnt_id,
+                   [tostr(ATFLAG__EMPTY_PATH__SYMLINK_FOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
+[cp]
+open_by_handle_at:(fd_t mountdirfd, [tostr(STRUCT_FILE_HANDLE)] struct file_handle const *handle,
+                   oflag_t flags) -> fd_t;
+
 clock_adjtime:(int TODO_PROTOTYPE) -> errno_t;
+
 [cp] syncfs:(fd_t fd) -> errno_t;
-setns:(fd_t fd, syscall_ulong_t nstype) -> errno_t;
+
+setns:(fd_t fd, [tostr(CLONE_FLAGS_SETNS)] syscall_ulong_t nstype) -> errno_t;
 
 %[startgroup]
+@@@param: flags: Must be `0'
 process_vm_readv:(pid_t pid,
                   [tostr(STRUCT_IOVEC:liovcnt)] struct iovec const *local_iov, size_t liovcnt,
                   [tostr(STRUCT_IOVEC:riovcnt)] struct iovec const *remote_iov, size_t riovcnt,
-                  syscall_ulong_t flags) -> ssize_t; /* TODO: flags:tostr() */
+                  syscall_ulong_t flags) -> ssize_t;
+[doc_alias(process_vm_readv)]
 process_vm_readvx32:(pid_t pid,
                      [tostr(STRUCT_IOVEC:liovcnt)] struct iovecx32 const *local_iov, size_t liovcnt,
                      [tostr(STRUCT_IOVEC:riovcnt)] struct iovecx32 const *remote_iov, size_t riovcnt,
-                     syscall_ulong_t flags) -> ssize_t; /* TODO: flags:tostr() */
+                     syscall_ulong_t flags) -> ssize_t;
+[doc_alias(process_vm_readv)]
 process_vm_readvx64:(pid_t pid,
                      [tostr(STRUCT_IOVEC:liovcnt)] struct iovecx64 const *local_iov, size_t liovcnt,
                      [tostr(STRUCT_IOVEC:riovcnt)] struct iovecx64 const *remote_iov, size_t riovcnt,
-                     syscall_ulong_t flags) -> ssize_t; /* TODO: flags:tostr() */
+                     syscall_ulong_t flags) -> ssize_t;
 %[endgroup]
 
 %[startgroup]
+@@@param: flags: Must be `0'
 process_vm_writev:(pid_t pid,
                    [tostr(STRUCT_IOVEC:liovcnt)] struct iovec const *local_iov, size_t liovcnt,
                    [tostr(STRUCT_IOVEC:riovcnt)] struct iovec const *remote_iov, size_t riovcnt,
-                   syscall_ulong_t flags) -> ssize_t; /* TODO: flags:tostr() */
+                   syscall_ulong_t flags) -> ssize_t;
+[doc_alias(process_vm_writev)]
 process_vm_writevx32:(pid_t pid,
                       [tostr(STRUCT_IOVEC:liovcnt)] struct iovecx32 const *local_iov, size_t liovcnt,
                       [tostr(STRUCT_IOVEC:riovcnt)] struct iovecx32 const *remote_iov, size_t riovcnt,
-                      syscall_ulong_t flags) -> ssize_t; /* TODO: flags:tostr() */
+                      syscall_ulong_t flags) -> ssize_t;
+[doc_alias(process_vm_writev)]
 process_vm_writevx64:(pid_t pid,
                       [tostr(STRUCT_IOVEC:liovcnt)] struct iovecx64 const *local_iov, size_t liovcnt,
                       [tostr(STRUCT_IOVEC:riovcnt)] struct iovecx64 const *remote_iov, size_t riovcnt,
-                      syscall_ulong_t flags) -> ssize_t; /* TODO: flags:tostr() */
+                      syscall_ulong_t flags) -> ssize_t;
 %[endgroup]
 
-/* TODO: type:tostr() */
-kcmp:(pid_t pid1, pid_t pid2, syscall_ulong_t type,
+@@@param: type: One of `KCMP_FILE', `KCMP_FILES', `KCMP_FS', `KCMP_IO',
+@@              `KCMP_SIGHAND', `KCMP_SYSVSEM', `KCMP_VM', `KCMP_EPOLL_TFD'
+kcmp:(pid_t pid1, pid_t pid2, [tostr(KCMP_TYPE)] syscall_ulong_t type,
       syscall_ulong_t idx1, syscall_ulong_t idx2) -> syscall_slong_t;
 
 finit_module:(int TODO_PROTOTYPE) -> errno_t;
@@ -1427,7 +1553,9 @@ sched_setattr:(int TODO_PROTOTYPE) -> errno_t;
 sched_getattr:(int TODO_PROTOTYPE) -> errno_t;
 
 seccomp:(int TODO_PROTOTYPE) -> errno_t;
-getrandom:(void *buf, size_t num_bytes, syscall_ulong_t flags) -> ssize_t;
+
+@@@param: flags: Set of `0 | GRND_RANDOM | GRND_NONBLOCK'
+getrandom:(void *buf, size_t num_bytes, [tostr(GETRANDOM_FLAGS)] syscall_ulong_t flags) -> ssize_t;
 
 @@@param: flags: Set of `MFD_CLOEXEC | MFD_ALLOW_SEALING'
 memfd_create:(char const *name, [tostr(MEMFD_CREATE_FLAGS)] syscall_ulong_t flags) -> fd_t;
@@ -1448,7 +1576,9 @@ bpf:(int TODO_PROTOTYPE) -> errno_t;
 
 %[startgroup]
 @@@param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
-[cp] execveat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *pathname, char const *const *argv, char const *const *envp,
+[cp] execveat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *pathname,
+               [tostr(STRING_VECTOR)] char const *const *argv,
+               [tostr(STRING_VECTOR)] char const *const *envp,
                [tostr(ATFLAG__EMPTY_PATH__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
 [doc_alias(execveat)][cp]
 execveatx32:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *pathname,
@@ -1487,17 +1617,23 @@ listen:(fd_t sockfd, syscall_ulong_t max_backlog) -> errno_t;
 
 @@@param: sock_flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK'
 [restart(dont)][cp]
-accept4:(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len,
+accept4:(fd_t sockfd,
+         [tostr(out:STRUCT_SOCKADDR:*addr_len)] struct sockaddr *addr,
+         [tostr(out:SOCKLEN_T)] socklen_t *addr_len,
          [tostr(ACCEPT4_FLAGS)] syscall_ulong_t sock_flags) -> fd_t;
+
 [restart(dont)][cp]
-accept:(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len) -> fd_t;
+accept:(fd_t sockfd,
+        [tostr(out:STRUCT_SOCKADDR:*addr_len)] struct sockaddr *addr,
+        [tostr(out:SOCKLEN_T)] socklen_t *addr_len) -> fd_t;
 
 @@@param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
 @@@param: optname: Dependent on `level'
 getsockopt:(fd_t sockfd,
             [tostr(SOCKOPT_LEVEL)] syscall_ulong_t level,
             [tostr(SOCKOPT_OPTNAME:level)] syscall_ulong_t optname,
-            void *optval, socklen_t *optlen) -> errno_t;
+            [tostr(out:BUFFER:*optlen)] void *optval,
+            [tostr(out:SOCKLEN_T)] socklen_t *optlen) -> errno_t;
 
 @@@param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
 @@@param: optname: Dependent on `level'
@@ -1505,21 +1641,26 @@ getsockopt:(fd_t sockfd,
 setsockopt:(fd_t sockfd,
             [tostr(SOCKOPT_LEVEL)] syscall_ulong_t level,
             [tostr(SOCKOPT_OPTNAME:level)] syscall_ulong_t optname,
-            [tostr(SOCKOPT_OPTVAL:optlen)] void const *optval, socklen_t optlen) -> errno_t;
+            [tostr(SOCKOPT_OPTVAL:optlen)] void const *optval,
+            socklen_t optlen) -> errno_t;
 
-getsockname:(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len) -> errno_t;
-getpeername:(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len) -> errno_t;
+getsockname:(fd_t sockfd,
+             [tostr(out:STRUCT_SOCKADDR:*addr_len)] struct sockaddr *addr,
+             [tostr(out:SOCKLEN_T)] socklen_t *addr_len) -> errno_t;
+getpeername:(fd_t sockfd,
+             [tostr(out:STRUCT_SOCKADDR:*addr_len)] struct sockaddr *addr,
+             [tostr(out:SOCKLEN_T)] socklen_t *addr_len) -> errno_t;
 
 @@@param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
 @@                           MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
 [restart(dont)][cp]
-send:(fd_t sockfd, void const *buf, size_t bufsize,
+send:(fd_t sockfd, [tostr(BUFFER:bufsize)] void const *buf, size_t bufsize,
       [tostr(SOCKET_SENDMSG_FLAGS)] syscall_ulong_t msg_flags) -> ssize_t;
 
 @@@param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
 @@                           MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
 [restart(dont)][cp]
-sendto:(fd_t sockfd, void const *buf, size_t bufsize,
+sendto:(fd_t sockfd, [tostr(BUFFER:bufsize)] void const *buf, size_t bufsize,
         [tostr(SOCKET_SENDMSG_FLAGS)] syscall_ulong_t msg_flags,
         [tostr(STRUCT_SOCKADDR:addr_len)] struct sockaddr const *addr, socklen_t addr_len) -> ssize_t;
 
@@ -1532,23 +1673,26 @@ sendto:(fd_t sockfd, void const *buf, size_t bufsize,
 %[endgroup]
 
 %[startgroup]
-[restart(dont)][cp] sendmmsg:(fd_t sockfd, [tostr(STRUCT_MMSGHDR)] struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t flags) -> ssize_t;
-[restart(dont)][cp] sendmmsgx32:(fd_t sockfd, [tostr(STRUCT_MMSGHDRX32)] struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t flags) -> ssize_t;
-[restart(dont)][cp] sendmmsgx64:(fd_t sockfd, [tostr(STRUCT_MMSGHDRX64)] struct mmsghdrx64 *vmessages, size_t vlen, syscall_ulong_t flags) -> ssize_t;
+@@@param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+@@                           MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
+[restart(dont)][cp] sendmmsg:(fd_t sockfd, [tostr(STRUCT_MMSGHDR:vlen)] struct mmsghdr *vmessages, size_t vlen, [tostr(SOCKET_SENDMSG_FLAGS)] syscall_ulong_t msg_flags) -> ssize_t;
+[doc_alias(sendmmsg)][restart(dont)][cp] sendmmsgx32:(fd_t sockfd, [tostr(STRUCT_MMSGHDRX32:vlen)] struct mmsghdrx32 *vmessages, size_t vlen, [tostr(SOCKET_SENDMSG_FLAGS)] syscall_ulong_t msg_flags) -> ssize_t;
+[doc_alias(sendmmsg)][restart(dont)][cp] sendmmsgx64:(fd_t sockfd, [tostr(STRUCT_MMSGHDRX64:vlen)] struct mmsghdrx64 *vmessages, size_t vlen, [tostr(SOCKET_SENDMSG_FLAGS)] syscall_ulong_t msg_flags) -> ssize_t;
 %[endgroup]
 
 @@@param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
 @@                           MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
 [restart(dont)][cp]
-recv:(fd_t sockfd, void *buf, size_t bufsize,
+recv:(fd_t sockfd, [tostr(out:BUFFER:bufsize:return)] void *buf, size_t bufsize,
       [tostr(SOCKET_RECVMSG_FLAGS)] syscall_ulong_t msg_flags) -> ssize_t;
 
 @@@param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
 @@                           MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
 [restart(dont)][cp]
-recvfrom:(fd_t sockfd, void *buf, size_t bufsize,
+recvfrom:(fd_t sockfd, [tostr(out:BUFFER:bufsize:return)] void *buf, size_t bufsize,
           [tostr(SOCKET_RECVMSG_FLAGS)] syscall_ulong_t msg_flags,
-          struct sockaddr *addr, socklen_t *addr_len) -> ssize_t;
+          [tostr(out:STRUCT_SOCKADDR:*addr_len)] struct sockaddr *addr,
+          [tostr(out:SOCKLEN_T)] socklen_t *addr_len) -> ssize_t;
 
 %[startgroup]
 @@@param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
@@ -1566,12 +1710,15 @@ recvmsgx64:(fd_t sockfd, struct msghdrx64 *message,
 %[endgroup]
 
 %[startgroup]
-[restart(dont)][cp] recvmmsg:(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, [tostr(SOCKET_RECVMSG_FLAGS2)] syscall_ulong_t flags, [tostr(STRUCT_TIMESPEC)] struct timespec const *tmo) -> ssize_t;
-[restart(dont)][cp] recvmmsg32:(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, [tostr(SOCKET_RECVMSG_FLAGS2)] syscall_ulong_t flags, [tostr(STRUCT_TIMESPEC32)] struct timespec32 const *tmo) -> ssize_t;
-[restart(dont)][cp] recvmmsg64:(fd_t sockfd, struct mmsghdrx64 *vmessages, size_t vlen, [tostr(SOCKET_RECVMSG_FLAGS2)] syscall_ulong_t flags, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *tmo) -> ssize_t;
-[restart(dont)][cp] recvmmsgx32:(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, [tostr(SOCKET_RECVMSG_FLAGS2)] syscall_ulong_t flags, [tostr(STRUCT_TIMESPECX32)] struct timespecx32 const *tmo) -> ssize_t;
-[restart(dont)][cp] recvmmsgx32_64:(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, [tostr(SOCKET_RECVMSG_FLAGS2)] syscall_ulong_t flags, [tostr(STRUCT_TIMESPECX32_64)] struct timespecx32_64 const *tmo) -> ssize_t;
-[restart(dont)][cp] recvmmsgx64:(fd_t sockfd, struct mmsghdrx64 *vmessages, size_t vlen, [tostr(SOCKET_RECVMSG_FLAGS2)] syscall_ulong_t flags, [tostr(STRUCT_TIMESPECX64)] struct timespecx64 const *tmo) -> ssize_t;
+@@@param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+@@                           MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+@@                           MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
+[restart(dont)][cp] recvmmsg:(fd_t sockfd, [tostr(out:STRUCT_MMSGHDR:vlen:return)] struct mmsghdr *vmessages, size_t vlen, [tostr(SOCKET_RECVMSG_FLAGS2)] syscall_ulong_t msg_flags, [tostr(STRUCT_TIMESPEC)] struct timespec const *tmo) -> ssize_t;
+[doc_alias(recvmmsg)][restart(dont)][cp] recvmmsg32:(fd_t sockfd, [tostr(out:STRUCT_MMSGHDRX32:vlen:return)] struct mmsghdrx32 *vmessages, size_t vlen, [tostr(SOCKET_RECVMSG_FLAGS2)] syscall_ulong_t msg_flags, [tostr(STRUCT_TIMESPEC32)] struct timespec32 const *tmo) -> ssize_t;
+[doc_alias(recvmmsg)][restart(dont)][cp] recvmmsg64:(fd_t sockfd, [tostr(out:STRUCT_MMSGHDRX64:vlen:return)] struct mmsghdrx64 *vmessages, size_t vlen, [tostr(SOCKET_RECVMSG_FLAGS2)] syscall_ulong_t msg_flags, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *tmo) -> ssize_t;
+[doc_alias(recvmmsg)][restart(dont)][cp] recvmmsgx32:(fd_t sockfd, [tostr(out:STRUCT_MMSGHDRX32:vlen:return)] struct mmsghdrx32 *vmessages, size_t vlen, [tostr(SOCKET_RECVMSG_FLAGS2)] syscall_ulong_t msg_flags, [tostr(STRUCT_TIMESPECX32)] struct timespecx32 const *tmo) -> ssize_t;
+[doc_alias(recvmmsg)][restart(dont)][cp] recvmmsgx32_64:(fd_t sockfd, [tostr(out:STRUCT_MMSGHDRX32:vlen:return)] struct mmsghdrx32 *vmessages, size_t vlen, [tostr(SOCKET_RECVMSG_FLAGS2)] syscall_ulong_t msg_flags, [tostr(STRUCT_TIMESPECX32_64)] struct timespecx32_64 const *tmo) -> ssize_t;
+[doc_alias(recvmmsg)][restart(dont)][cp] recvmmsgx64:(fd_t sockfd, [tostr(out:STRUCT_MMSGHDRX64:vlen:return)] struct mmsghdrx64 *vmessages, size_t vlen, [tostr(SOCKET_RECVMSG_FLAGS2)] syscall_ulong_t msg_flags, [tostr(STRUCT_TIMESPECX64)] struct timespecx64 const *tmo) -> ssize_t;
 %[endgroup]
 
 @@@param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR'
@@ -1697,7 +1844,7 @@ kexec_file_load:(int TODO_PROTOTYPE) -> errno_t;
 @@You may pass `AT_READLINK_REQSIZE' to always have the function return
 @@the required buffer size, rather than the used size.
 @@@param: flags: Set of `0 | AT_ALTPATH | AT_READLINK_REQSIZE | AT_DOSPATH'
-[cp] frealpath4:(fd_t fd, char *resolved, size_t buflen,
+[cp] frealpath4:(fd_t fd, [tostr(out:BUFFER:buflen:return)] char *resolved, size_t buflen,
                  [tostr(ATFLAG__ALTPATH__READLINK_REQSIZE__DOSPATH)] atflag_t flags) -> ssize_t;
 
 @@Returns the absolute filesystem path for the specified file
@@ -1726,10 +1873,13 @@ rpc_schedule:(pid_t target, [tostr(RPC_SCHEDULE_FLAGS)] syscall_ulong_t flags, u
 [doc_alias(rpc_schedule)] rpc_schedulex64:(pid_t target, [tostr(RPC_SCHEDULE_FLAGS)] syscall_ulong_t flags, uint8_t const *program, __HYBRID_PTR64(void) *arguments) -> syscall_slong_t;
 %[endgroup]
 
-[cp] ksysctl:(syscall_ulong_t command, void *arg) -> syscall_slong_t;
+[cp] ksysctl:([tostr(KSYSCTL_COMMAND)] syscall_ulong_t command,
+              [tostr(KSYSCTL_ARG:command)] void *arg) -> syscall_slong_t;
 
 @@Create a new pseudo-terminal driver and store handles to both the master and slave ends of the connection in the given pointers.
-openpty:(fd_t *amaster, fd_t *aslave, char *name,
+openpty:([tostr(out:FD_T)] fd_t *amaster,
+         [tostr(out:FD_T)] fd_t *aslave,
+         [tostr(out:STRING)] char *name,
          [tostr(STRUCT_TERMIOS)] struct termios const *termp,
          [tostr(STRUCT_WINSIZE)] struct winsize const *winp) -> errno_t;
 
@@ -1743,7 +1893,7 @@ openpty:(fd_t *amaster, fd_t *aslave, char *name,
 @@@return: 0 :        Success.
 @@@return: -1:EINVAL: The given MODE is invalid
 [restart(must)]
-set_exception_handler:([tostr(SET_EXCEPTION_HANDLER_MODE)] syscall_ulong_t mode,
+set_exception_handler:([tostr(EXCEPTION_HANDLER_MODE)] syscall_ulong_t mode,
                        except_handler_t handler, void *handler_sp) -> errno_t;
 
 %[startgroup]
@@ -1760,14 +1910,23 @@ set_exception_handler:([tostr(SET_EXCEPTION_HANDLER_MODE)] syscall_ulong_t mode,
 @@                     then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
 @@@return: 0 :         Success.
 @@@return: -1:EFAULT:  One of the given pointers is non-NULL and faulty
-[restart(must)] get_exception_handler:(syscall_ulong_t *pmode, except_handler_t *phandler, void **phandler_sp) -> errno_t;
-[doc_alias(get_exception_handler)][restart(must)] get_exception_handlerx32:(__ULONG32_TYPE__ *pmode, __except_handler32_t *phandler, __HYBRID_PTR32(void) *phandler_sp) -> errno_t;
-[doc_alias(get_exception_handler)][restart(must)] get_exception_handlerx64:(__ULONG64_TYPE__ *pmode, __except_handler64_t *phandler, __HYBRID_PTR64(void) *phandler_sp) -> errno_t;
+[restart(must)]
+get_exception_handler:([tostr(out:EXCEPTION_HANDLER_MODE)] syscall_ulong_t *pmode,
+                       [tostr(out:EXCEPT_HANDLER_T)] except_handler_t *phandler,
+                       [tostr(out:POINTER)] void **phandler_sp) -> errno_t;
+[doc_alias(get_exception_handler)][restart(must)]
+get_exception_handlerx32:([tostr(out:EXCEPTION_HANDLER_MODE32)] __ULONG32_TYPE__ *pmode,
+                          [tostr(out:EXCEPT_HANDLER32_T)] __except_handler32_t *phandler,
+                          [tostr(out:POINTER32)] __HYBRID_PTR32(void) *phandler_sp) -> errno_t;
+[doc_alias(get_exception_handler)][restart(must)]
+get_exception_handlerx64:([tostr(out:EXCEPTION_HANDLER_MODE64)] __ULONG64_TYPE__ *pmode,
+                          [tostr(out:EXCEPT_HANDLER64_T)] __except_handler64_t *phandler,
+                          [tostr(out:POINTER64)] __HYBRID_PTR64(void) *phandler_sp) -> errno_t;
 %[endgroup]
 
 %[startgroup]
 @@Set per-vm meta-data for allowing the kernel to enumerate loaded code modules
-[restart(must)] set_library_listdef:([tostr(STRUCT_LIBRARY_LISTDEF)] syscall_ulong_t mode, struct library_listdef const *listdef) -> errno_t;
+[restart(must)] set_library_listdef:([tostr(STRUCT_LIBRARY_LISTDEF)] struct library_listdef const *listdef) -> errno_t;
 [restart(must)][doc_alias(set_library_listdef)] set_library_listdefx32:([tostr(STRUCT_LIBRARY_LISTDEF32)] struct library_listdef32 const *listdef) -> errno_t;
 [restart(must)][doc_alias(set_library_listdef)] set_library_listdefx64:([tostr(STRUCT_LIBRARY_LISTDEF64)] struct library_listdef64 const *listdef) -> errno_t;
 %[endgroup]
@@ -1847,12 +2006,12 @@ debugtrap:([tostr(STRUCT_UCPUSTATE)] struct ucpustate const *state, [tostr(STRUC
 @@@return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
 @@@return: -1:EINTR:     A blocking futex-wait operation was interrupted
 @@@return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out
-[restart(dont)][cp] lfutexexpr:(void *base, size_t exprc, [tostr(STRUCT_LFUTEXEXPR_VECTOR:exprc)] struct lfutexexpr const *exprv, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
-[restart(dont)][cp][doc_alias(lfutexexpr)] lfutexexpr32:(void *base, size_t exprc, [tostr(STRUCT_LFUTEXEXPR_VECTOR:exprc)] struct lfutexexpr const *exprv, [tostr(STRUCT_TIMESPEC32)] struct timespec32 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
-[restart(dont)][cp][doc_alias(lfutexexpr)] lfutexexpr64:(void *base, size_t exprc, [tostr(STRUCT_LFUTEXEXPR_VECTOR:exprc)] struct lfutexexpr const *exprv, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
-[restart(dont)][cp][doc_alias(lfutexexpr)] lfutexexprx32:(void *base, size_t exprc, [tostr(STRUCT_LFUTEXEXPRX32_VECTOR:exprc)] struct lfutexexprx32 const *exprv, [tostr(STRUCT_TIMESPECX32)] struct timespecx32 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
-[restart(dont)][cp][doc_alias(lfutexexpr)] lfutexexprx32_64:(void *base, size_t exprc, [tostr(STRUCT_LFUTEXEXPRX32_VECTOR:exprc)] struct lfutexexprx32 const *exprv, [tostr(STRUCT_TIMESPECX32_64)] struct timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
-[restart(dont)][cp][doc_alias(lfutexexpr)] lfutexexprx64:(void *base, size_t exprc, [tostr(STRUCT_LFUTEXEXPRX64_VECTOR:exprc)] struct lfutexexprx64 const *exprv, [tostr(STRUCT_TIMESPECX64)] struct timespecx64 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
+[restart(dont)][cp] lfutexexpr:(void *base, size_t exprc, [tostr(STRUCT_LFUTEXEXPR_VECTOR:exprc)] struct lfutexexpr const *exprv, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, [tostr(LFUTEX_TIMEOUT_FLAGS)] syscall_ulong_t timeout_flags) -> errno_t;
+[restart(dont)][cp][doc_alias(lfutexexpr)] lfutexexpr32:(void *base, size_t exprc, [tostr(STRUCT_LFUTEXEXPR_VECTOR:exprc)] struct lfutexexpr const *exprv, [tostr(STRUCT_TIMESPEC32)] struct timespec32 const *timeout, [tostr(LFUTEX_TIMEOUT_FLAGS)] syscall_ulong_t timeout_flags) -> errno_t;
+[restart(dont)][cp][doc_alias(lfutexexpr)] lfutexexpr64:(void *base, size_t exprc, [tostr(STRUCT_LFUTEXEXPR_VECTOR:exprc)] struct lfutexexpr const *exprv, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *timeout, [tostr(LFUTEX_TIMEOUT_FLAGS)] syscall_ulong_t timeout_flags) -> errno_t;
+[restart(dont)][cp][doc_alias(lfutexexpr)] lfutexexprx32:(void *base, size_t exprc, [tostr(STRUCT_LFUTEXEXPRX32_VECTOR:exprc)] struct lfutexexprx32 const *exprv, [tostr(STRUCT_TIMESPECX32)] struct timespecx32 const *timeout, [tostr(LFUTEX_TIMEOUT_FLAGS)] syscall_ulong_t timeout_flags) -> errno_t;
+[restart(dont)][cp][doc_alias(lfutexexpr)] lfutexexprx32_64:(void *base, size_t exprc, [tostr(STRUCT_LFUTEXEXPRX32_VECTOR:exprc)] struct lfutexexprx32 const *exprv, [tostr(STRUCT_TIMESPECX32_64)] struct timespecx32_64 const *timeout, [tostr(LFUTEX_TIMEOUT_FLAGS)] syscall_ulong_t timeout_flags) -> errno_t;
+[restart(dont)][cp][doc_alias(lfutexexpr)] lfutexexprx64:(void *base, size_t exprc, [tostr(STRUCT_LFUTEXEXPRX64_VECTOR:exprc)] struct lfutexexprx64 const *exprv, [tostr(STRUCT_TIMESPECX64)] struct timespecx64 const *timeout, [tostr(LFUTEX_TIMEOUT_FLAGS)] syscall_ulong_t timeout_flags) -> errno_t;
 %[endgroup]
 
 
@@ -1886,19 +2045,19 @@ debugtrap:([tostr(STRUCT_UCPUSTATE)] struct ucpustate const *state, [tostr(STRUC
 @@@return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out
 [restart(dont)][cp]
 lfutexlockexpr:(uintptr_t *ulockaddr, void *base, size_t exprc, [tostr(STRUCT_LFUTEXEXPR_VECTOR:exprc)] struct lfutexexpr const *exprv,
-                [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
-[restart(dont)][cp][doc_alias(lfutexlockexpr)] lfutexlockexpr32:(uint32_t *ulockaddr, void *base, size_t exprc, [tostr(STRUCT_LFUTEXEXPR_VECTOR:exprc)] struct lfutexexpr const *exprv, [tostr(STRUCT_TIMESPEC32)] struct timespec32 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
-[restart(dont)][cp][doc_alias(lfutexlockexpr)] lfutexlockexpr64:(uint64_t *ulockaddr, void *base, size_t exprc, [tostr(STRUCT_LFUTEXEXPR_VECTOR:exprc)] struct lfutexexpr const *exprv, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
-[restart(dont)][cp][doc_alias(lfutexlockexpr)] lfutexlockexprx32:(uint32_t *ulockaddr, void *base, size_t exprc, [tostr(STRUCT_LFUTEXEXPRX32_VECTOR:exprc)] struct lfutexexprx32 const *exprv, [tostr(STRUCT_TIMESPECX32)] struct timespecx32 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
-[restart(dont)][cp][doc_alias(lfutexlockexpr)] lfutexlockexprx32_64:(uint32_t *ulockaddr, void *base, size_t exprc, [tostr(STRUCT_LFUTEXEXPRX32_VECTOR:exprc)] struct lfutexexprx32 const *exprv, [tostr(STRUCT_TIMESPECX32_64)] struct timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
-[restart(dont)][cp][doc_alias(lfutexlockexpr)] lfutexlockexprx64:(uint64_t *ulockaddr, void *base, size_t exprc, [tostr(STRUCT_LFUTEXEXPRX64_VECTOR:exprc)] struct lfutexexprx64 const *exprv, [tostr(STRUCT_TIMESPECX64)] struct timespecx64 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
+                [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, [tostr(LFUTEX_TIMEOUT_FLAGS)] syscall_ulong_t timeout_flags) -> errno_t;
+[restart(dont)][cp][doc_alias(lfutexlockexpr)] lfutexlockexpr32:(uint32_t *ulockaddr, void *base, size_t exprc, [tostr(STRUCT_LFUTEXEXPR_VECTOR:exprc)] struct lfutexexpr const *exprv, [tostr(STRUCT_TIMESPEC32)] struct timespec32 const *timeout, [tostr(LFUTEX_TIMEOUT_FLAGS)] syscall_ulong_t timeout_flags) -> errno_t;
+[restart(dont)][cp][doc_alias(lfutexlockexpr)] lfutexlockexpr64:(uint64_t *ulockaddr, void *base, size_t exprc, [tostr(STRUCT_LFUTEXEXPR_VECTOR:exprc)] struct lfutexexpr const *exprv, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *timeout, [tostr(LFUTEX_TIMEOUT_FLAGS)] syscall_ulong_t timeout_flags) -> errno_t;
+[restart(dont)][cp][doc_alias(lfutexlockexpr)] lfutexlockexprx32:(uint32_t *ulockaddr, void *base, size_t exprc, [tostr(STRUCT_LFUTEXEXPRX32_VECTOR:exprc)] struct lfutexexprx32 const *exprv, [tostr(STRUCT_TIMESPECX32)] struct timespecx32 const *timeout, [tostr(LFUTEX_TIMEOUT_FLAGS)] syscall_ulong_t timeout_flags) -> errno_t;
+[restart(dont)][cp][doc_alias(lfutexlockexpr)] lfutexlockexprx32_64:(uint32_t *ulockaddr, void *base, size_t exprc, [tostr(STRUCT_LFUTEXEXPRX32_VECTOR:exprc)] struct lfutexexprx32 const *exprv, [tostr(STRUCT_TIMESPECX32_64)] struct timespecx32_64 const *timeout, [tostr(LFUTEX_TIMEOUT_FLAGS)] syscall_ulong_t timeout_flags) -> errno_t;
+[restart(dont)][cp][doc_alias(lfutexlockexpr)] lfutexlockexprx64:(uint64_t *ulockaddr, void *base, size_t exprc, [tostr(STRUCT_LFUTEXEXPRX64_VECTOR:exprc)] struct lfutexexprx64 const *exprv, [tostr(STRUCT_TIMESPECX64)] struct timespecx64 const *timeout, [tostr(LFUTEX_TIMEOUT_FLAGS)] syscall_ulong_t timeout_flags) -> errno_t;
 %[endgroup]
 
 @@Create and return a new tty terminal controller connected to the given keyboard and display
 @@The newly created device automatically gets assigned an arbitrary device number, before
 @@being made available under a file `/dev/${name}' (or rather: as ${name} within the devfs)
 @@@param: reserved: Reserved set of flags (Must pass `0'; for future expansion)
-mktty:(fd_t keyboard, fd_t display, char const *name, syscall_ulong_t rsvd) -> fd_t; /* TODO: Make `name' the first argument! */
+mktty:(fd_t keyboard, fd_t display, [tostr(STRING)] char const *name, syscall_ulong_t rsvd) -> fd_t; /* TODO: Make `name' the first argument! */
 
 %[startgroup]
 @@Raise a signal within the calling thread alongside the given CPU state

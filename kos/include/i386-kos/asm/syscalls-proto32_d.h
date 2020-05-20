@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x354a8f38 */
+/* HASH CRC-32:0x6c35d1d0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -785,7 +785,7 @@
 #define __NR32RT_request_key             (errno_t, __errno_t)
 #define __NR32RT_keyctl                  (errno_t, __errno_t)
 #define __NR32RT_ioprio_set              (errno_t, __errno_t)
-#define __NR32RT_ioprio_get              (errno_t, __errno_t)
+#define __NR32RT_ioprio_get              (syscall_slong_t, __syscall_slong_t)
 #define __NR32RT_inotify_init            (errno_t, __errno_t)
 #define __NR32RT_inotify_add_watch       (errno_t, __errno_t)
 #define __NR32RT_inotify_rm_watch        (errno_t, __errno_t)
@@ -1128,8 +1128,8 @@
 #define __NR32AT0_ioperm                  (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT1_ioperm                  (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT2_ioperm                  (syscall_ulong_t, __syscall_ulong_t)
-#define __NR32AT0_socketcall              (int, int)
-#define __NR32AT1_socketcall              (unsigned long *, unsigned long *)
+#define __NR32AT0_socketcall              (syscall_ulong_t, __syscall_ulong_t)
+#define __NR32AT1_socketcall              (syscall_ulong_t *, __syscall_ulong_t *)
 #define __NR32AT0_syslog                  (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT1_syslog                  (char const *, char const *)
 #define __NR32AT2_syslog                  (size_t, __size_t)
@@ -1259,7 +1259,7 @@
 #define __NR32AT0_prctl                   (int, int)
 #define __NR32AT0_rt_sigreturn            (struct fpustate const *, struct fpustate const *)
 #define __NR32AT1_rt_sigreturn            (struct __sigset_struct const *, struct __sigset_struct const *)
-#define __NR32AT2_rt_sigreturn            (struct rpc_syscall_info *, struct rpc_syscall_info *)
+#define __NR32AT2_rt_sigreturn            (struct rpc_syscall_info const *, struct rpc_syscall_info const *)
 #define __NR32AT3_rt_sigreturn            (struct ucpustate const *, struct ucpustate const *)
 #define __NR32AT0_rt_sigaction            (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT1_rt_sigaction            (struct sigactionx32 const *, struct __sigactionx32 const *)
@@ -1271,7 +1271,7 @@
 #define __NR32AT3_rt_sigprocmask          (size_t, __size_t)
 #define __NR32AT0_rt_sigpending           (struct __sigset_struct *, struct __sigset_struct *)
 #define __NR32AT1_rt_sigpending           (size_t, __size_t)
-#define __NR32AT0_rt_sigtimedwait         (struct __sigset_struct const *, struct __sigset_struct const *)
+#define __NR32AT0_rt_sigtimedwait         (struct __sigset_struct const * *, struct __sigset_struct const * *)
 #define __NR32AT1_rt_sigtimedwait         (struct __siginfox32_struct *, struct __siginfox32_struct *)
 #define __NR32AT2_rt_sigtimedwait         (struct timespecx32 const *, struct __timespecx32 const *)
 #define __NR32AT3_rt_sigtimedwait         (size_t, __size_t)
@@ -1409,7 +1409,7 @@
 #define __NR32AT1_removexattr             (char const *, char const *)
 #define __NR32AT0_lremovexattr            (char const *, char const *)
 #define __NR32AT1_lremovexattr            (char const *, char const *)
-#define __NR32AT0_fremovexattr            (int, int)
+#define __NR32AT0_fremovexattr            (fd_t, __fd_t)
 #define __NR32AT1_fremovexattr            (char const *, char const *)
 #define __NR32AT0_tkill                   (pid_t, __pid_t)
 #define __NR32AT1_tkill                   (syscall_ulong_t, __syscall_ulong_t)
@@ -1678,10 +1678,10 @@
 #define __NR32AT1_name_to_handle_at       (char const *, char const *)
 #define __NR32AT2_name_to_handle_at       (struct file_handle *, struct file_handle *)
 #define __NR32AT3_name_to_handle_at       (int32_t *, __int32_t *)
-#define __NR32AT4_name_to_handle_at       (syscall_ulong_t, __syscall_ulong_t)
+#define __NR32AT4_name_to_handle_at       (atflag_t, __atflag_t)
 #define __NR32AT0_open_by_handle_at       (fd_t, __fd_t)
-#define __NR32AT1_open_by_handle_at       (struct file_handle *, struct file_handle *)
-#define __NR32AT2_open_by_handle_at       (syscall_ulong_t, __syscall_ulong_t)
+#define __NR32AT1_open_by_handle_at       (struct file_handle const *, struct file_handle const *)
+#define __NR32AT2_open_by_handle_at       (oflag_t, __oflag_t)
 #define __NR32AT0_clock_adjtime           (int, int)
 #define __NR32AT0_syncfs                  (fd_t, __fd_t)
 #define __NR32AT0_sendmmsg                (fd_t, __fd_t)
@@ -1943,7 +1943,7 @@
 #define __NR32AT0_maplibrary              (void *, void *)
 #define __NR32AT1_maplibrary              (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT2_maplibrary              (fd_t, __fd_t)
-#define __NR32AT3_maplibrary              (struct elf32_phdr *, struct elf32_phdr *)
+#define __NR32AT3_maplibrary              (struct elf32_phdr const *, struct elf32_phdr const *)
 #define __NR32AT4_maplibrary              (size_t, __size_t)
 #define __NR32AT0_select64                (size_t, __size_t)
 #define __NR32AT1_select64                (struct __fd_set_struct *, struct __fd_set_struct *)
@@ -2163,7 +2163,7 @@
 #define __NR32AM_statfs(a, b, c, d, e, f)                  (char const *)a, (struct __statfsx32 *)b
 #define __NR32AM_fstatfs(a, b, c, d, e, f)                 (__fd_t)a, (struct __statfsx32 *)b
 #define __NR32AM_ioperm(a, b, c, d, e, f)                  (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
-#define __NR32AM_socketcall(a, b, c, d, e, f)              (int)a, (unsigned long *)b
+#define __NR32AM_socketcall(a, b, c, d, e, f)              (__syscall_ulong_t)a, (__syscall_ulong_t *)b
 #define __NR32AM_syslog(a, b, c, d, e, f)                  (__syscall_ulong_t)a, (char const *)b, (__size_t)c
 #define __NR32AM_setitimer(a, b, c, d, e, f)               (__syscall_ulong_t)a, (struct __itimervalx32 const *)b, (struct __itimervalx32 *)c
 #define __NR32AM_getitimer(a, b, c, d, e, f)               (__syscall_ulong_t)a, (struct __itimervalx32 *)b
@@ -2234,11 +2234,11 @@
 #define __NR32AM_setresgid(a, b, c, d, e, f)               (__uint16_t)a, (__uint16_t)b, (__uint16_t)c
 #define __NR32AM_getresgid(a, b, c, d, e, f)               (__uint16_t *)a, (__uint16_t *)b, (__uint16_t *)c
 #define __NR32AM_prctl(a, b, c, d, e, f)                   (int)a
-#define __NR32AM_rt_sigreturn(a, b, c, d, e, f)            (struct fpustate const *)a, (struct __sigset_struct const *)b, (struct rpc_syscall_info *)c, (struct ucpustate const *)d
+#define __NR32AM_rt_sigreturn(a, b, c, d, e, f)            (struct fpustate const *)a, (struct __sigset_struct const *)b, (struct rpc_syscall_info const *)c, (struct ucpustate const *)d
 #define __NR32AM_rt_sigaction(a, b, c, d, e, f)            (__syscall_ulong_t)a, (struct __sigactionx32 const *)b, (struct __sigactionx32 *)c, (__size_t)d
 #define __NR32AM_rt_sigprocmask(a, b, c, d, e, f)          (__syscall_ulong_t)a, (struct __sigset_struct const *)b, (struct __sigset_struct *)c, (__size_t)d
 #define __NR32AM_rt_sigpending(a, b, c, d, e, f)           (struct __sigset_struct *)a, (__size_t)b
-#define __NR32AM_rt_sigtimedwait(a, b, c, d, e, f)         (struct __sigset_struct const *)a, (struct __siginfox32_struct *)b, (struct __timespecx32 const *)c, (__size_t)d
+#define __NR32AM_rt_sigtimedwait(a, b, c, d, e, f)         (struct __sigset_struct const * *)a, (struct __siginfox32_struct *)b, (struct __timespecx32 const *)c, (__size_t)d
 #define __NR32AM_rt_sigqueueinfo(a, b, c, d, e, f)         (__pid_t)a, (__syscall_ulong_t)b, (struct __siginfox32_struct const *)c
 #define __NR32AM_rt_sigsuspend(a, b, c, d, e, f)           (struct __sigset_struct const *)a, (__size_t)b
 #define __NR32AM_pread64(a, b, c, d, e, f)                 (__fd_t)a, (void *)b, (__size_t)c, (__uint64_t)((__uint64_t)d | (__uint64_t)e << 32)
@@ -2296,7 +2296,7 @@
 #define __NR32AM_flistxattr(a, b, c, d, e, f)              (__fd_t)a, (char *)b, (__size_t)c
 #define __NR32AM_removexattr(a, b, c, d, e, f)             (char const *)a, (char const *)b
 #define __NR32AM_lremovexattr(a, b, c, d, e, f)            (char const *)a, (char const *)b
-#define __NR32AM_fremovexattr(a, b, c, d, e, f)            (int)a, (char const *)b
+#define __NR32AM_fremovexattr(a, b, c, d, e, f)            (__fd_t)a, (char const *)b
 #define __NR32AM_tkill(a, b, c, d, e, f)                   (__pid_t)a, (__syscall_ulong_t)b
 #define __NR32AM_sendfile64(a, b, c, d, e, f)              (__fd_t)a, (__fd_t)b, (__ULONG64_TYPE__ *)c, (__size_t)d
 #define __NR32AM_futex(a, b, c, d, e, f)                   (__uint32_t *)a, (__syscall_ulong_t)b, (__uint32_t)c, (struct __timespecx32 const *)d, (__uint32_t *)e, (__uint32_t)f
@@ -2398,8 +2398,8 @@
 #define __NR32AM_fanotify_init(a, b, c, d, e, f)           (int)a
 #define __NR32AM_fanotify_mark(a, b, c, d, e, f)           (int)a
 #define __NR32AM_prlimit64(a, b, c, d, e, f)               (__pid_t)a, (__syscall_ulong_t)b, (struct rlimit64 const *)c, (struct rlimit64 *)d
-#define __NR32AM_name_to_handle_at(a, b, c, d, e, f)       (__fd_t)a, (char const *)b, (struct file_handle *)c, (__int32_t *)d, (__syscall_ulong_t)e
-#define __NR32AM_open_by_handle_at(a, b, c, d, e, f)       (__fd_t)a, (struct file_handle *)b, (__syscall_ulong_t)c
+#define __NR32AM_name_to_handle_at(a, b, c, d, e, f)       (__fd_t)a, (char const *)b, (struct file_handle *)c, (__int32_t *)d, (__atflag_t)e
+#define __NR32AM_open_by_handle_at(a, b, c, d, e, f)       (__fd_t)a, (struct file_handle const *)b, (__oflag_t)c
 #define __NR32AM_clock_adjtime(a, b, c, d, e, f)           (int)a
 #define __NR32AM_syncfs(a, b, c, d, e, f)                  (__fd_t)a
 #define __NR32AM_sendmmsg(a, b, c, d, e, f)                (__fd_t)a, (struct __mmsghdrx32 *)b, (__size_t)c, (__syscall_ulong_t)d
@@ -2477,7 +2477,7 @@
 #define __NR32AM_wait4_64(a, b, c, d, e, f)                (__pid_t)a, (__int32_t *)b, (__syscall_ulong_t)c, (struct __rusagex32_64 *)d
 #define __NR32AM_getitimer64(a, b, c, d, e, f)             (__syscall_ulong_t)a, (struct __itimervalx32_64 *)b
 #define __NR32AM_setitimer64(a, b, c, d, e, f)             (__syscall_ulong_t)a, (struct __itimervalx32_64 const *)b, (struct __itimervalx32_64 *)c
-#define __NR32AM_maplibrary(a, b, c, d, e, f)              (void *)a, (__syscall_ulong_t)b, (__fd_t)c, (struct elf32_phdr *)d, (__size_t)e
+#define __NR32AM_maplibrary(a, b, c, d, e, f)              (void *)a, (__syscall_ulong_t)b, (__fd_t)c, (struct elf32_phdr const *)d, (__size_t)e
 #define __NR32AM_select64(a, b, c, d, e, f)                (__size_t)a, (struct __fd_set_struct *)b, (struct __fd_set_struct *)c, (struct __fd_set_struct *)d, (struct __timevalx32_64 *)e
 #define __NR32AM_settimeofday64(a, b, c, d, e, f)          (struct __timevalx32_64 const *)a, (struct timezone const *)b
 #define __NR32AM_gettimeofday64(a, b, c, d, e, f)          (struct __timevalx32_64 *)a, (struct timezone *)b

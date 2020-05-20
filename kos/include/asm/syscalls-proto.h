@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4bab7ffc */
+/* HASH CRC-32:0x82ba434e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -390,7 +390,7 @@
 #define __NRRT_inotify_rm_watch       (errno_t, __errno_t)
 #define __NRRT_ioctl                  (syscall_slong_t, __syscall_slong_t)
 #define __NRRT_ioprio_set             (errno_t, __errno_t)
-#define __NRRT_ioprio_get             (errno_t, __errno_t)
+#define __NRRT_ioprio_get             (syscall_slong_t, __syscall_slong_t)
 #define __NRRT_flock                  (errno_t, __errno_t)
 #define __NRRT_mknodat                (errno_t, __errno_t)
 #define __NRRT_mkdirat                (errno_t, __errno_t)
@@ -727,7 +727,7 @@
 #define __NRAT1_removexattr            (char const *, char const *)
 #define __NRAT0_lremovexattr           (char const *, char const *)
 #define __NRAT1_lremovexattr           (char const *, char const *)
-#define __NRAT0_fremovexattr           (int, int)
+#define __NRAT0_fremovexattr           (fd_t, __fd_t)
 #define __NRAT1_fremovexattr           (char const *, char const *)
 #define __NRAT0_getcwd                 (char *, char *)
 #define __NRAT1_getcwd                 (size_t, __size_t)
@@ -1014,7 +1014,7 @@
 #define __NRAT2_rt_sigqueueinfo        (struct __siginfo_struct const *, struct __siginfo_struct const *)
 #define __NRAT0_rt_sigreturn           (struct fpustate const *, struct fpustate const *)
 #define __NRAT1_rt_sigreturn           (struct __sigset_struct const *, struct __sigset_struct const *)
-#define __NRAT2_rt_sigreturn           (struct rpc_syscall_info *, struct rpc_syscall_info *)
+#define __NRAT2_rt_sigreturn           (struct rpc_syscall_info const *, struct rpc_syscall_info const *)
 #define __NRAT3_rt_sigreturn           (struct ucpustate const *, struct ucpustate const *)
 #define __NRAT0_setpriority            (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT1_setpriority            (id_t, __id_t)
@@ -1238,10 +1238,10 @@
 #define __NRAT1_name_to_handle_at      (char const *, char const *)
 #define __NRAT2_name_to_handle_at      (struct file_handle *, struct file_handle *)
 #define __NRAT3_name_to_handle_at      (int32_t *, __int32_t *)
-#define __NRAT4_name_to_handle_at      (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT4_name_to_handle_at      (atflag_t, __atflag_t)
 #define __NRAT0_open_by_handle_at      (fd_t, __fd_t)
-#define __NRAT1_open_by_handle_at      (struct file_handle *, struct file_handle *)
-#define __NRAT2_open_by_handle_at      (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT1_open_by_handle_at      (struct file_handle const *, struct file_handle const *)
+#define __NRAT2_open_by_handle_at      (oflag_t, __oflag_t)
 #define __NRAT0_clock_adjtime          (int, int)
 #define __NRAT0_syncfs                 (fd_t, __fd_t)
 #define __NRAT0_setns                  (fd_t, __fd_t)
@@ -1433,7 +1433,7 @@
 #define __NRAM_flistxattr(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)             (__fd_t)a, (char *)b, (__size_t)c
 #define __NRAM_removexattr(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)            (char const *)a, (char const *)b
 #define __NRAM_lremovexattr(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)           (char const *)a, (char const *)b
-#define __NRAM_fremovexattr(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)           (int)a, (char const *)b
+#define __NRAM_fremovexattr(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)           (__fd_t)a, (char const *)b
 #define __NRAM_getcwd(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 (char *)a, (__size_t)b
 #define __NRAM_lookup_dcookie(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)         (int)a
 #define __NRAM_eventfd2(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)               (__syscall_ulong_t)a, (__syscall_ulong_t)b
@@ -1547,7 +1547,7 @@
 #define __NRAM_rt_sigpending(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)          (struct __sigset_struct *)a, (__size_t)b
 #define __NRAM_rt_sigtimedwait(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)        (struct __sigset_struct const *)a, (struct __siginfo_struct *)b, (struct timespec const *)c, (__size_t)d
 #define __NRAM_rt_sigqueueinfo(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)        (__pid_t)a, (__syscall_ulong_t)b, (struct __siginfo_struct const *)c
-#define __NRAM_rt_sigreturn(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)           (struct fpustate const *)a, (struct __sigset_struct const *)b, (struct rpc_syscall_info *)c, (struct ucpustate const *)d
+#define __NRAM_rt_sigreturn(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)           (struct fpustate const *)a, (struct __sigset_struct const *)b, (struct rpc_syscall_info const *)c, (struct ucpustate const *)d
 #define __NRAM_setpriority(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)            (__syscall_ulong_t)a, (__id_t)b, (__syscall_ulong_t)c
 #define __NRAM_getpriority(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)            (__syscall_ulong_t)a, (__id_t)b
 #define __NRAM_reboot(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 (__syscall_ulong_t)a
@@ -1654,8 +1654,8 @@
 #define __NRAM_prlimit64(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (__pid_t)a, (__syscall_ulong_t)b, (struct rlimit64 const *)c, (struct rlimit64 *)d
 #define __NRAM_fanotify_init(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)          (int)a
 #define __NRAM_fanotify_mark(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)          (int)a
-#define __NRAM_name_to_handle_at(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)      (__fd_t)a, (char const *)b, (struct file_handle *)c, (__int32_t *)d, (__syscall_ulong_t)e
-#define __NRAM_open_by_handle_at(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)      (__fd_t)a, (struct file_handle *)b, (__syscall_ulong_t)c
+#define __NRAM_name_to_handle_at(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)      (__fd_t)a, (char const *)b, (struct file_handle *)c, (__int32_t *)d, (__atflag_t)e
+#define __NRAM_open_by_handle_at(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)      (__fd_t)a, (struct file_handle const *)b, (__oflag_t)c
 #define __NRAM_clock_adjtime(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)          (int)a
 #define __NRAM_syncfs(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 (__fd_t)a
 #define __NRAM_setns(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  (__fd_t)a, (__syscall_ulong_t)b

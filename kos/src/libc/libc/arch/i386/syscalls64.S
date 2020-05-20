@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf8dbe78a */
+/* HASH CRC-32:0x83ec30ba */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -432,7 +432,7 @@ INTERN_FUNCTION(libc_sys_rt_sigreturn)
 END(libc_sys_rt_sigreturn)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_rt_sigreturn, libc_sys_rt_sigreturn)
 
-/* syscall_slong_t ioctl(fd_t fd, syscall_ulong_t request, void *arg) */
+/* syscall_slong_t ioctl(fd_t fd, syscall_ulong_t command, void *arg) */
 .section .text.crt.syscall.ioctl
 INTERN_FUNCTION(libc_sys_ioctl)
 	.cfi_startproc
@@ -444,7 +444,7 @@ INTERN_FUNCTION(libc_sys_ioctl)
 END(libc_sys_ioctl)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_ioctl, libc_sys_ioctl)
 
-/* syscall_slong_t ioctl(fd_t fd, syscall_ulong_t request, void *arg) */
+/* syscall_slong_t ioctl(fd_t fd, syscall_ulong_t command, void *arg) */
 .section .text.crt.syscall.Xioctl
 INTERN_FUNCTION(libc_sys_Xioctl)
 	.cfi_startproc
@@ -924,6 +924,7 @@ INTERN_FUNCTION(libc_sys_Xnanosleep)
 END(libc_sys_Xnanosleep)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xnanosleep, libc_sys_Xnanosleep)
 
+/* @param: which: One of `ITIMER_REAL', `ITIMER_VIRTUAL' or `ITIMER_PROF' */
 /* errno_t getitimer(syscall_ulong_t which, struct __itimervalx64 *curr_value) */
 .section .text.crt.syscall.getitimer
 INTERN_FUNCTION(libc_sys_getitimer)
@@ -936,6 +937,7 @@ INTERN_FUNCTION(libc_sys_getitimer)
 END(libc_sys_getitimer)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_getitimer, libc_sys_getitimer)
 
+/* @param: which: One of `ITIMER_REAL', `ITIMER_VIRTUAL' or `ITIMER_PROF' */
 /* errno_t getitimer(syscall_ulong_t which, struct __itimervalx64 *curr_value) */
 .section .text.crt.syscall.Xgetitimer
 INTERN_FUNCTION(libc_sys_Xgetitimer)
@@ -972,6 +974,7 @@ INTERN_FUNCTION(libc_sys_Xalarm)
 END(libc_sys_Xalarm)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xalarm, libc_sys_Xalarm)
 
+/* @param: which: One of `ITIMER_REAL', `ITIMER_VIRTUAL' or `ITIMER_PROF' */
 /* errno_t setitimer(syscall_ulong_t which, struct __itimervalx64 const *newval, struct __itimervalx64 *oldval) */
 .section .text.crt.syscall.setitimer
 INTERN_FUNCTION(libc_sys_setitimer)
@@ -984,6 +987,7 @@ INTERN_FUNCTION(libc_sys_setitimer)
 END(libc_sys_setitimer)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_setitimer, libc_sys_setitimer)
 
+/* @param: which: One of `ITIMER_REAL', `ITIMER_VIRTUAL' or `ITIMER_PROF' */
 /* errno_t setitimer(syscall_ulong_t which, struct __itimervalx64 const *newval, struct __itimervalx64 *oldval) */
 .section .text.crt.syscall.Xsetitimer
 INTERN_FUNCTION(libc_sys_Xsetitimer)
@@ -1598,7 +1602,7 @@ INTERN_FUNCTION(libc_sys_Xexit)
 END(libc_sys_Xexit)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xexit, libc_sys_Xexit)
 
-/* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
+/* Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 /* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusagex64 *usage) */
 .section .text.crt.syscall.wait4
@@ -1613,7 +1617,7 @@ INTERN_FUNCTION(libc_sys_wait4)
 END(libc_sys_wait4)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_wait4, libc_sys_wait4)
 
-/* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
+/* Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 /* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusagex64 *usage) */
 .section .text.crt.syscall.Xwait4
@@ -1870,7 +1874,7 @@ INTERN_FUNCTION(libc_sys_Xmsgctl)
 END(libc_sys_Xmsgctl)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xmsgctl, libc_sys_Xmsgctl)
 
-/* syscall_slong_t fcntl(fd_t fd, syscall_ulong_t cmd, void *arg) */
+/* syscall_slong_t fcntl(fd_t fd, syscall_ulong_t command, void *arg) */
 .section .text.crt.syscall.fcntl
 INTERN_FUNCTION(libc_sys_fcntl)
 	.cfi_startproc
@@ -1882,7 +1886,7 @@ INTERN_FUNCTION(libc_sys_fcntl)
 END(libc_sys_fcntl)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_fcntl, libc_sys_fcntl)
 
-/* syscall_slong_t fcntl(fd_t fd, syscall_ulong_t cmd, void *arg) */
+/* syscall_slong_t fcntl(fd_t fd, syscall_ulong_t command, void *arg) */
 .section .text.crt.syscall.Xfcntl
 INTERN_FUNCTION(libc_sys_Xfcntl)
 	.cfi_startproc
@@ -2496,6 +2500,7 @@ INTERN_FUNCTION(libc_sys_Xgetrlimit)
 END(libc_sys_Xgetrlimit)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xgetrlimit, libc_sys_Xgetrlimit)
 
+/* @param: who: One of `RUSAGE_SELF', `RUSAGE_CHILDREN' or `RUSAGE_THREAD' */
 /* errno_t getrusage(syscall_slong_t who, struct rusagex64 *tv) */
 .section .text.crt.syscall.getrusage
 INTERN_FUNCTION(libc_sys_getrusage)
@@ -2508,6 +2513,7 @@ INTERN_FUNCTION(libc_sys_getrusage)
 END(libc_sys_getrusage)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_getrusage, libc_sys_getrusage)
 
+/* @param: who: One of `RUSAGE_SELF', `RUSAGE_CHILDREN' or `RUSAGE_THREAD' */
 /* errno_t getrusage(syscall_slong_t who, struct rusagex64 *tv) */
 .section .text.crt.syscall.Xgetrusage
 INTERN_FUNCTION(libc_sys_Xgetrusage)
@@ -2906,7 +2912,7 @@ INTERN_FUNCTION(libc_sys_Xsetregid)
 END(libc_sys_Xsetregid)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xsetregid, libc_sys_Xsetregid)
 
-/* errno_t getgroups(size_t size, gid_t[] list) */
+/* errno_t getgroups(size_t count, gid_t[] list) */
 .section .text.crt.syscall.getgroups
 INTERN_FUNCTION(libc_sys_getgroups)
 	.cfi_startproc
@@ -2918,7 +2924,7 @@ INTERN_FUNCTION(libc_sys_getgroups)
 END(libc_sys_getgroups)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_getgroups, libc_sys_getgroups)
 
-/* errno_t getgroups(size_t size, gid_t[] list) */
+/* errno_t getgroups(size_t count, gid_t[] list) */
 .section .text.crt.syscall.Xgetgroups
 INTERN_FUNCTION(libc_sys_Xgetgroups)
 	.cfi_startproc
@@ -3510,6 +3516,7 @@ INTERN_FUNCTION(libc_sys_Xsysfs)
 END(libc_sys_Xsysfs)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xsysfs, libc_sys_Xsysfs)
 
+/* @param: which: One of `PRIO_PROCESS', `PRIO_PGRP' or `PRIO_USER' */
 /* syscall_slong_t getpriority(syscall_ulong_t which, id_t who) */
 .section .text.crt.syscall.getpriority
 INTERN_FUNCTION(libc_sys_getpriority)
@@ -3522,6 +3529,7 @@ INTERN_FUNCTION(libc_sys_getpriority)
 END(libc_sys_getpriority)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_getpriority, libc_sys_getpriority)
 
+/* @param: which: One of `PRIO_PROCESS', `PRIO_PGRP' or `PRIO_USER' */
 /* syscall_slong_t getpriority(syscall_ulong_t which, id_t who) */
 .section .text.crt.syscall.Xgetpriority
 INTERN_FUNCTION(libc_sys_Xgetpriority)
@@ -3534,6 +3542,7 @@ INTERN_FUNCTION(libc_sys_Xgetpriority)
 END(libc_sys_Xgetpriority)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xgetpriority, libc_sys_Xgetpriority)
 
+/* @param: which: One of `PRIO_PROCESS', `PRIO_PGRP' or `PRIO_USER' */
 /* errno_t setpriority(syscall_ulong_t which, id_t who, syscall_ulong_t value) */
 .section .text.crt.syscall.setpriority
 INTERN_FUNCTION(libc_sys_setpriority)
@@ -3546,6 +3555,7 @@ INTERN_FUNCTION(libc_sys_setpriority)
 END(libc_sys_setpriority)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_setpriority, libc_sys_setpriority)
 
+/* @param: which: One of `PRIO_PROCESS', `PRIO_PGRP' or `PRIO_USER' */
 /* errno_t setpriority(syscall_ulong_t which, id_t who, syscall_ulong_t value) */
 .section .text.crt.syscall.Xsetpriority
 INTERN_FUNCTION(libc_sys_Xsetpriority)
@@ -3606,6 +3616,8 @@ INTERN_FUNCTION(libc_sys_Xsched_getparam)
 END(libc_sys_Xsched_getparam)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xsched_getparam, libc_sys_Xsched_getparam)
 
+/* @param: policy: One of `SCHED_OTHER', `SCHED_FIFO', `SCHED_RR', `SCHED_BATCH',
+ *                 `SCHED_IDLE', optionally or'd with `SCHED_RESET_ON_FORK' */
 /* errno_t sched_setscheduler(pid_t pid, syscall_ulong_t policy, struct sched_param const *param) */
 .section .text.crt.syscall.sched_setscheduler
 INTERN_FUNCTION(libc_sys_sched_setscheduler)
@@ -3618,6 +3630,8 @@ INTERN_FUNCTION(libc_sys_sched_setscheduler)
 END(libc_sys_sched_setscheduler)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_sched_setscheduler, libc_sys_sched_setscheduler)
 
+/* @param: policy: One of `SCHED_OTHER', `SCHED_FIFO', `SCHED_RR', `SCHED_BATCH',
+ *                 `SCHED_IDLE', optionally or'd with `SCHED_RESET_ON_FORK' */
 /* errno_t sched_setscheduler(pid_t pid, syscall_ulong_t policy, struct sched_param const *param) */
 .section .text.crt.syscall.Xsched_setscheduler
 INTERN_FUNCTION(libc_sys_Xsched_setscheduler)
@@ -3774,6 +3788,7 @@ INTERN_FUNCTION(libc_sys_Xmunlock)
 END(libc_sys_Xmunlock)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xmunlock, libc_sys_Xmunlock)
 
+/* @param: flags: Set of `MCL_CURRENT | MCL_FUTURE | MCL_ONFAULT' */
 /* errno_t mlockall(syscall_ulong_t flags) */
 .section .text.crt.syscall.mlockall
 INTERN_FUNCTION(libc_sys_mlockall)
@@ -3786,6 +3801,7 @@ INTERN_FUNCTION(libc_sys_mlockall)
 END(libc_sys_mlockall)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_mlockall, libc_sys_mlockall)
 
+/* @param: flags: Set of `MCL_CURRENT | MCL_FUTURE | MCL_ONFAULT' */
 /* errno_t mlockall(syscall_ulong_t flags) */
 .section .text.crt.syscall.Xmlockall
 INTERN_FUNCTION(libc_sys_Xmlockall)
@@ -4670,6 +4686,7 @@ INTERN_FUNCTION(libc_sys_Xreadahead)
 END(libc_sys_Xreadahead)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xreadahead, libc_sys_Xreadahead)
 
+/* @param: flags: One of `0', `XATTR_CREATE' or `XATTR_REPLACE' */
 /* errno_t setxattr(char const *path, char const *name, void const *buf, size_t bufsize, syscall_ulong_t flags) */
 .section .text.crt.syscall.setxattr
 INTERN_FUNCTION(libc_sys_setxattr)
@@ -4683,6 +4700,7 @@ INTERN_FUNCTION(libc_sys_setxattr)
 END(libc_sys_setxattr)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_setxattr, libc_sys_setxattr)
 
+/* @param: flags: One of `0', `XATTR_CREATE' or `XATTR_REPLACE' */
 /* errno_t setxattr(char const *path, char const *name, void const *buf, size_t bufsize, syscall_ulong_t flags) */
 .section .text.crt.syscall.Xsetxattr
 INTERN_FUNCTION(libc_sys_Xsetxattr)
@@ -4696,6 +4714,7 @@ INTERN_FUNCTION(libc_sys_Xsetxattr)
 END(libc_sys_Xsetxattr)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xsetxattr, libc_sys_Xsetxattr)
 
+/* @param: flags: One of `0', `XATTR_CREATE' or `XATTR_REPLACE' */
 /* errno_t lsetxattr(char const *path, char const *name, void const *buf, size_t bufsize, syscall_ulong_t flags) */
 .section .text.crt.syscall.lsetxattr
 INTERN_FUNCTION(libc_sys_lsetxattr)
@@ -4709,6 +4728,7 @@ INTERN_FUNCTION(libc_sys_lsetxattr)
 END(libc_sys_lsetxattr)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_lsetxattr, libc_sys_lsetxattr)
 
+/* @param: flags: One of `0', `XATTR_CREATE' or `XATTR_REPLACE' */
 /* errno_t lsetxattr(char const *path, char const *name, void const *buf, size_t bufsize, syscall_ulong_t flags) */
 .section .text.crt.syscall.Xlsetxattr
 INTERN_FUNCTION(libc_sys_Xlsetxattr)
@@ -4722,6 +4742,7 @@ INTERN_FUNCTION(libc_sys_Xlsetxattr)
 END(libc_sys_Xlsetxattr)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xlsetxattr, libc_sys_Xlsetxattr)
 
+/* @param: flags: One of `0', `XATTR_CREATE' or `XATTR_REPLACE' */
 /* errno_t fsetxattr(fd_t fd, char const *name, void const *buf, size_t bufsize, syscall_ulong_t flags) */
 .section .text.crt.syscall.fsetxattr
 INTERN_FUNCTION(libc_sys_fsetxattr)
@@ -4735,6 +4756,7 @@ INTERN_FUNCTION(libc_sys_fsetxattr)
 END(libc_sys_fsetxattr)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_fsetxattr, libc_sys_fsetxattr)
 
+/* @param: flags: One of `0', `XATTR_CREATE' or `XATTR_REPLACE' */
 /* errno_t fsetxattr(fd_t fd, char const *name, void const *buf, size_t bufsize, syscall_ulong_t flags) */
 .section .text.crt.syscall.Xfsetxattr
 INTERN_FUNCTION(libc_sys_Xfsetxattr)
@@ -4946,7 +4968,7 @@ INTERN_FUNCTION(libc_sys_Xlremovexattr)
 END(libc_sys_Xlremovexattr)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xlremovexattr, libc_sys_Xlremovexattr)
 
-/* errno_t fremovexattr(int fd, char const *name) */
+/* errno_t fremovexattr(fd_t fd, char const *name) */
 .section .text.crt.syscall.fremovexattr
 INTERN_FUNCTION(libc_sys_fremovexattr)
 	.cfi_startproc
@@ -4958,7 +4980,7 @@ INTERN_FUNCTION(libc_sys_fremovexattr)
 END(libc_sys_fremovexattr)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_fremovexattr, libc_sys_fremovexattr)
 
-/* errno_t fremovexattr(int fd, char const *name) */
+/* errno_t fremovexattr(fd_t fd, char const *name) */
 .section .text.crt.syscall.Xfremovexattr
 INTERN_FUNCTION(libc_sys_Xfremovexattr)
 	.cfi_startproc
@@ -4970,6 +4992,7 @@ INTERN_FUNCTION(libc_sys_Xfremovexattr)
 END(libc_sys_Xfremovexattr)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xfremovexattr, libc_sys_Xfremovexattr)
 
+/* @param: signo: One of `SIG*' */
 /* errno_t tkill(pid_t tid, syscall_ulong_t signo) */
 .section .text.crt.syscall.tkill
 INTERN_FUNCTION(libc_sys_tkill)
@@ -4982,6 +5005,7 @@ INTERN_FUNCTION(libc_sys_tkill)
 END(libc_sys_tkill)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_tkill, libc_sys_tkill)
 
+/* @param: signo: One of `SIG*' */
 /* errno_t tkill(pid_t tid, syscall_ulong_t signo) */
 .section .text.crt.syscall.Xtkill
 INTERN_FUNCTION(libc_sys_Xtkill)
@@ -5018,6 +5042,7 @@ INTERN_FUNCTION(libc_sys_Xtime)
 END(libc_sys_Xtime)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xtime, libc_sys_Xtime)
 
+/* @param: futex_op: One of `FUTEX_*' from <linux/futex.h> */
 /* syscall_slong_t futex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct timespecx64 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) */
 .section .text.crt.syscall.futex
 INTERN_FUNCTION(libc_sys_futex)
@@ -5031,6 +5056,7 @@ INTERN_FUNCTION(libc_sys_futex)
 END(libc_sys_futex)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_futex, libc_sys_futex)
 
+/* @param: futex_op: One of `FUTEX_*' from <linux/futex.h> */
 /* syscall_slong_t futex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct timespecx64 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) */
 .section .text.crt.syscall.Xfutex
 INTERN_FUNCTION(libc_sys_Xfutex)
@@ -5532,6 +5558,7 @@ INTERN_FUNCTION(libc_sys_Xtimer_create)
 END(libc_sys_Xtimer_create)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xtimer_create, libc_sys_Xtimer_create)
 
+/* @param: flags: Set of `0 | TIMER_ABSTIME' */
 /* errno_t timer_settime(timer_t timerid, syscall_ulong_t flags, struct itimerspecx64 const *value, struct itimerspecx64 *ovalue) */
 .section .text.crt.syscall.timer_settime
 INTERN_FUNCTION(libc_sys_timer_settime)
@@ -5545,6 +5572,7 @@ INTERN_FUNCTION(libc_sys_timer_settime)
 END(libc_sys_timer_settime)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_timer_settime, libc_sys_timer_settime)
 
+/* @param: flags: Set of `0 | TIMER_ABSTIME' */
 /* errno_t timer_settime(timer_t timerid, syscall_ulong_t flags, struct itimerspecx64 const *value, struct itimerspecx64 *ovalue) */
 .section .text.crt.syscall.Xtimer_settime
 INTERN_FUNCTION(libc_sys_Xtimer_settime)
@@ -5806,6 +5834,7 @@ INTERN_FUNCTION(libc_sys_Xepoll_ctl)
 END(libc_sys_Xepoll_ctl)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xepoll_ctl, libc_sys_Xepoll_ctl)
 
+/* @param: signo: One of `SIG*' */
 /* errno_t tgkill(pid_t tgid, pid_t tid, syscall_ulong_t signo) */
 .section .text.crt.syscall.tgkill
 INTERN_FUNCTION(libc_sys_tgkill)
@@ -5818,6 +5847,7 @@ INTERN_FUNCTION(libc_sys_tgkill)
 END(libc_sys_tgkill)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_tgkill, libc_sys_tgkill)
 
+/* @param: signo: One of `SIG*' */
 /* errno_t tgkill(pid_t tgid, pid_t tid, syscall_ulong_t signo) */
 .section .text.crt.syscall.Xtgkill
 INTERN_FUNCTION(libc_sys_Xtgkill)
@@ -6224,7 +6254,9 @@ INTERN_FUNCTION(libc_sys_Xkeyctl)
 END(libc_sys_Xkeyctl)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xkeyctl, libc_sys_Xkeyctl)
 
-/* errno_t ioprio_set(syscall_ulong_t which, syscall_ulong_t who, syscall_ulong_t ioprio) */
+/* NOTE: Linux calls `who' `which', and `id' `who' (refactored to prevent confusion)
+ * @param: who: One of `IOPRIO_WHO_PROCESS', `IOPRIO_WHO_PGRP' or `IOPRIO_WHO_USER' */
+/* errno_t ioprio_set(syscall_ulong_t who, syscall_ulong_t id, syscall_ulong_t ioprio) */
 .section .text.crt.syscall.ioprio_set
 INTERN_FUNCTION(libc_sys_ioprio_set)
 	.cfi_startproc
@@ -6236,7 +6268,9 @@ INTERN_FUNCTION(libc_sys_ioprio_set)
 END(libc_sys_ioprio_set)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_ioprio_set, libc_sys_ioprio_set)
 
-/* errno_t ioprio_set(syscall_ulong_t which, syscall_ulong_t who, syscall_ulong_t ioprio) */
+/* NOTE: Linux calls `who' `which', and `id' `who' (refactored to prevent confusion)
+ * @param: who: One of `IOPRIO_WHO_PROCESS', `IOPRIO_WHO_PGRP' or `IOPRIO_WHO_USER' */
+/* errno_t ioprio_set(syscall_ulong_t who, syscall_ulong_t id, syscall_ulong_t ioprio) */
 .section .text.crt.syscall.Xioprio_set
 INTERN_FUNCTION(libc_sys_Xioprio_set)
 	.cfi_startproc
@@ -6248,7 +6282,9 @@ INTERN_FUNCTION(libc_sys_Xioprio_set)
 END(libc_sys_Xioprio_set)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xioprio_set, libc_sys_Xioprio_set)
 
-/* errno_t ioprio_get(syscall_ulong_t which, syscall_ulong_t who) */
+/* NOTE: Linux calls `who' `which', and `id' `who' (refactored to prevent confusion)
+ * @param: who: One of `IOPRIO_WHO_PROCESS', `IOPRIO_WHO_PGRP' or `IOPRIO_WHO_USER' */
+/* syscall_slong_t ioprio_get(syscall_ulong_t who, syscall_ulong_t id) */
 .section .text.crt.syscall.ioprio_get
 INTERN_FUNCTION(libc_sys_ioprio_get)
 	.cfi_startproc
@@ -6260,7 +6296,9 @@ INTERN_FUNCTION(libc_sys_ioprio_get)
 END(libc_sys_ioprio_get)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_ioprio_get, libc_sys_ioprio_get)
 
-/* errno_t ioprio_get(syscall_ulong_t which, syscall_ulong_t who) */
+/* NOTE: Linux calls `who' `which', and `id' `who' (refactored to prevent confusion)
+ * @param: who: One of `IOPRIO_WHO_PROCESS', `IOPRIO_WHO_PGRP' or `IOPRIO_WHO_USER' */
+/* syscall_slong_t ioprio_get(syscall_ulong_t who, syscall_ulong_t id) */
 .section .text.crt.syscall.Xioprio_get
 INTERN_FUNCTION(libc_sys_Xioprio_get)
 	.cfi_startproc
@@ -6838,6 +6876,7 @@ INTERN_FUNCTION(libc_sys_Xget_robust_list)
 END(libc_sys_Xget_robust_list)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xget_robust_list, libc_sys_Xget_robust_list)
 
+/* @param: flags: Set of `SPLICE_F_MOVE | SPLICE_F_NONBLOCK | SPLICE_F_MORE | SPLICE_F_GIFT' */
 /* ssize_t splice(fd_t fdin, uint64_t *offin, fd_t fdout, uint64_t *offout, size_t length, syscall_ulong_t flags) */
 .section .text.crt.syscall.splice
 INTERN_FUNCTION(libc_sys_splice)
@@ -6851,6 +6890,7 @@ INTERN_FUNCTION(libc_sys_splice)
 END(libc_sys_splice)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_splice, libc_sys_splice)
 
+/* @param: flags: Set of `SPLICE_F_MOVE | SPLICE_F_NONBLOCK | SPLICE_F_MORE | SPLICE_F_GIFT' */
 /* ssize_t splice(fd_t fdin, uint64_t *offin, fd_t fdout, uint64_t *offout, size_t length, syscall_ulong_t flags) */
 .section .text.crt.syscall.Xsplice
 INTERN_FUNCTION(libc_sys_Xsplice)
@@ -6864,6 +6904,7 @@ INTERN_FUNCTION(libc_sys_Xsplice)
 END(libc_sys_Xsplice)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xsplice, libc_sys_Xsplice)
 
+/* @param: flags: Set of `SPLICE_F_MOVE | SPLICE_F_NONBLOCK | SPLICE_F_MORE | SPLICE_F_GIFT' */
 /* ssize_t tee(fd_t fdin, fd_t fdout, size_t length, syscall_ulong_t flags) */
 .section .text.crt.syscall.tee
 INTERN_FUNCTION(libc_sys_tee)
@@ -6877,6 +6918,7 @@ INTERN_FUNCTION(libc_sys_tee)
 END(libc_sys_tee)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_tee, libc_sys_tee)
 
+/* @param: flags: Set of `SPLICE_F_MOVE | SPLICE_F_NONBLOCK | SPLICE_F_MORE | SPLICE_F_GIFT' */
 /* ssize_t tee(fd_t fdin, fd_t fdout, size_t length, syscall_ulong_t flags) */
 .section .text.crt.syscall.Xtee
 INTERN_FUNCTION(libc_sys_Xtee)
@@ -6890,6 +6932,7 @@ INTERN_FUNCTION(libc_sys_Xtee)
 END(libc_sys_Xtee)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xtee, libc_sys_Xtee)
 
+/* @param: flags: Set of `SYNC_FILE_RANGE_WAIT_BEFORE | SYNC_FILE_RANGE_WRITE | SYNC_FILE_RANGE_WAIT_AFTER' */
 /* errno_t sync_file_range(fd_t fd, uint64_t offset, uint64_t count, syscall_ulong_t flags) */
 .section .text.crt.syscall.sync_file_range
 INTERN_FUNCTION(libc_sys_sync_file_range)
@@ -6903,6 +6946,7 @@ INTERN_FUNCTION(libc_sys_sync_file_range)
 END(libc_sys_sync_file_range)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_sync_file_range, libc_sys_sync_file_range)
 
+/* @param: flags: Set of `SYNC_FILE_RANGE_WAIT_BEFORE | SYNC_FILE_RANGE_WRITE | SYNC_FILE_RANGE_WAIT_AFTER' */
 /* errno_t sync_file_range(fd_t fd, uint64_t offset, uint64_t count, syscall_ulong_t flags) */
 .section .text.crt.syscall.Xsync_file_range
 INTERN_FUNCTION(libc_sys_Xsync_file_range)
@@ -6916,6 +6960,7 @@ INTERN_FUNCTION(libc_sys_Xsync_file_range)
 END(libc_sys_Xsync_file_range)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xsync_file_range, libc_sys_Xsync_file_range)
 
+/* @param: flags: Set of `SPLICE_F_MOVE | SPLICE_F_NONBLOCK | SPLICE_F_MORE | SPLICE_F_GIFT' */
 /* ssize_t vmsplice(fd_t fdout, struct iovecx64 const *iov, size_t count, syscall_ulong_t flags) */
 .section .text.crt.syscall.vmsplice
 INTERN_FUNCTION(libc_sys_vmsplice)
@@ -6929,6 +6974,7 @@ INTERN_FUNCTION(libc_sys_vmsplice)
 END(libc_sys_vmsplice)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_vmsplice, libc_sys_vmsplice)
 
+/* @param: flags: Set of `SPLICE_F_MOVE | SPLICE_F_NONBLOCK | SPLICE_F_MORE | SPLICE_F_GIFT' */
 /* ssize_t vmsplice(fd_t fdout, struct iovecx64 const *iov, size_t count, syscall_ulong_t flags) */
 .section .text.crt.syscall.Xvmsplice
 INTERN_FUNCTION(libc_sys_Xvmsplice)
@@ -7044,7 +7090,8 @@ INTERN_FUNCTION(libc_sys_Xsignalfd)
 END(libc_sys_Xsignalfd)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xsignalfd, libc_sys_Xsignalfd)
 
-/* Return file descriptor for new interval timer source */
+/* Return file descriptor for new interval timer source
+ * @param: flags: Set of `0 | TFD_NONBLOCK | TFD_CLOEXEC | TFD_CLOFORK' */
 /* fd_t timerfd_create(clockid_t clock_id, syscall_ulong_t flags) */
 .section .text.crt.syscall.timerfd_create
 INTERN_FUNCTION(libc_sys_timerfd_create)
@@ -7057,7 +7104,8 @@ INTERN_FUNCTION(libc_sys_timerfd_create)
 END(libc_sys_timerfd_create)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_timerfd_create, libc_sys_timerfd_create)
 
-/* Return file descriptor for new interval timer source */
+/* Return file descriptor for new interval timer source
+ * @param: flags: Set of `0 | TFD_NONBLOCK | TFD_CLOEXEC | TFD_CLOFORK' */
 /* fd_t timerfd_create(clockid_t clock_id, syscall_ulong_t flags) */
 .section .text.crt.syscall.Xtimerfd_create
 INTERN_FUNCTION(libc_sys_Xtimerfd_create)
@@ -7094,6 +7142,7 @@ INTERN_FUNCTION(libc_sys_Xeventfd)
 END(libc_sys_Xeventfd)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xeventfd, libc_sys_Xeventfd)
 
+/* @param: mode: Set of `0 | FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE | FALLOC_FL_COLLAPSE_RANGE | FALLOC_FL_ZERO_RANGE' */
 /* errno_t fallocate(fd_t fd, syscall_ulong_t mode, syscall_ulong_t offset, syscall_ulong_t length) */
 .section .text.crt.syscall.fallocate
 INTERN_FUNCTION(libc_sys_fallocate)
@@ -7107,6 +7156,7 @@ INTERN_FUNCTION(libc_sys_fallocate)
 END(libc_sys_fallocate)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_fallocate, libc_sys_fallocate)
 
+/* @param: mode: Set of `0 | FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE | FALLOC_FL_COLLAPSE_RANGE | FALLOC_FL_ZERO_RANGE' */
 /* errno_t fallocate(fd_t fd, syscall_ulong_t mode, syscall_ulong_t offset, syscall_ulong_t length) */
 .section .text.crt.syscall.Xfallocate
 INTERN_FUNCTION(libc_sys_Xfallocate)
@@ -7120,10 +7170,11 @@ INTERN_FUNCTION(libc_sys_Xfallocate)
 END(libc_sys_Xfallocate)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xfallocate, libc_sys_Xfallocate)
 
-/* Set next expiration time of interval timer source UFD to UTMR.
- * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout value
- * is absolute. Optionally return the old expiration time in OTMR */
-/* errno_t timerfd_settime(fd_t ufd, syscall_ulong_t flags, struct itimerspecx64 const *utmr, struct itimerspecx64 *otmr) */
+/* Set next expiration time of interval timer source `timerfd' to `utmr'.
+ * If `flags' has the `TFD_TIMER_ABSTIME' flag set the timeout value
+ * is absolute. Optionally return the old expiration time in `otmr''
+ * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
+/* errno_t timerfd_settime(fd_t timerfd, syscall_ulong_t flags, struct itimerspecx64 const *utmr, struct itimerspecx64 *otmr) */
 .section .text.crt.syscall.timerfd_settime
 INTERN_FUNCTION(libc_sys_timerfd_settime)
 	.cfi_startproc
@@ -7136,10 +7187,11 @@ INTERN_FUNCTION(libc_sys_timerfd_settime)
 END(libc_sys_timerfd_settime)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_timerfd_settime, libc_sys_timerfd_settime)
 
-/* Set next expiration time of interval timer source UFD to UTMR.
- * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout value
- * is absolute. Optionally return the old expiration time in OTMR */
-/* errno_t timerfd_settime(fd_t ufd, syscall_ulong_t flags, struct itimerspecx64 const *utmr, struct itimerspecx64 *otmr) */
+/* Set next expiration time of interval timer source `timerfd' to `utmr'.
+ * If `flags' has the `TFD_TIMER_ABSTIME' flag set the timeout value
+ * is absolute. Optionally return the old expiration time in `otmr''
+ * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
+/* errno_t timerfd_settime(fd_t timerfd, syscall_ulong_t flags, struct itimerspecx64 const *utmr, struct itimerspecx64 *otmr) */
 .section .text.crt.syscall.Xtimerfd_settime
 INTERN_FUNCTION(libc_sys_Xtimerfd_settime)
 	.cfi_startproc
@@ -7153,7 +7205,7 @@ END(libc_sys_Xtimerfd_settime)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xtimerfd_settime, libc_sys_Xtimerfd_settime)
 
 /* Return the next expiration time of UFD */
-/* errno_t timerfd_gettime(fd_t ufd, struct itimerspecx64 *otmr) */
+/* errno_t timerfd_gettime(fd_t timerfd, struct itimerspecx64 *otmr) */
 .section .text.crt.syscall.timerfd_gettime
 INTERN_FUNCTION(libc_sys_timerfd_gettime)
 	.cfi_startproc
@@ -7166,7 +7218,7 @@ END(libc_sys_timerfd_gettime)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_timerfd_gettime, libc_sys_timerfd_gettime)
 
 /* Return the next expiration time of UFD */
-/* errno_t timerfd_gettime(fd_t ufd, struct itimerspecx64 *otmr) */
+/* errno_t timerfd_gettime(fd_t timerfd, struct itimerspecx64 *otmr) */
 .section .text.crt.syscall.Xtimerfd_gettime
 INTERN_FUNCTION(libc_sys_Xtimerfd_gettime)
 	.cfi_startproc
@@ -7462,7 +7514,10 @@ INTERN_FUNCTION(libc_sys_Xperf_event_open)
 END(libc_sys_Xperf_event_open)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xperf_event_open, libc_sys_Xperf_event_open)
 
-/* ssize_t recvmmsg(fd_t sockfd, struct mmsghdrx64 *vmessages, size_t vlen, syscall_ulong_t flags, struct timespecx64 const *tmo) */
+/* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+ *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+/* ssize_t recvmmsg(fd_t sockfd, struct mmsghdrx64 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx64 const *tmo) */
 .section .text.crt.syscall.recvmmsg
 INTERN_FUNCTION(libc_sys_recvmmsg)
 	.cfi_startproc
@@ -7475,7 +7530,10 @@ INTERN_FUNCTION(libc_sys_recvmmsg)
 END(libc_sys_recvmmsg)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_recvmmsg, libc_sys_recvmmsg)
 
-/* ssize_t recvmmsg(fd_t sockfd, struct mmsghdrx64 *vmessages, size_t vlen, syscall_ulong_t flags, struct timespecx64 const *tmo) */
+/* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+ *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+/* ssize_t recvmmsg(fd_t sockfd, struct mmsghdrx64 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx64 const *tmo) */
 .section .text.crt.syscall.Xrecvmmsg
 INTERN_FUNCTION(libc_sys_Xrecvmmsg)
 	.cfi_startproc
@@ -7564,7 +7622,8 @@ INTERN_FUNCTION(libc_sys_Xprlimit64)
 END(libc_sys_Xprlimit64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xprlimit64, libc_sys_Xprlimit64)
 
-/* errno_t name_to_handle_at(fd_t dirfd, char const *filename, struct file_handle *handle, int32_t *mnt_id, syscall_ulong_t flags) */
+/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_FOLLOW | AT_DOSPATH' */
+/* errno_t name_to_handle_at(fd_t dirfd, char const *filename, struct file_handle *handle, int32_t *mnt_id, atflag_t flags) */
 .section .text.crt.syscall.name_to_handle_at
 INTERN_FUNCTION(libc_sys_name_to_handle_at)
 	.cfi_startproc
@@ -7577,7 +7636,8 @@ INTERN_FUNCTION(libc_sys_name_to_handle_at)
 END(libc_sys_name_to_handle_at)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_name_to_handle_at, libc_sys_name_to_handle_at)
 
-/* errno_t name_to_handle_at(fd_t dirfd, char const *filename, struct file_handle *handle, int32_t *mnt_id, syscall_ulong_t flags) */
+/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_FOLLOW | AT_DOSPATH' */
+/* errno_t name_to_handle_at(fd_t dirfd, char const *filename, struct file_handle *handle, int32_t *mnt_id, atflag_t flags) */
 .section .text.crt.syscall.Xname_to_handle_at
 INTERN_FUNCTION(libc_sys_Xname_to_handle_at)
 	.cfi_startproc
@@ -7590,7 +7650,7 @@ INTERN_FUNCTION(libc_sys_Xname_to_handle_at)
 END(libc_sys_Xname_to_handle_at)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xname_to_handle_at, libc_sys_Xname_to_handle_at)
 
-/* fd_t open_by_handle_at(fd_t mountdirfd, struct file_handle *handle, syscall_ulong_t flags) */
+/* fd_t open_by_handle_at(fd_t mountdirfd, struct file_handle const *handle, oflag_t flags) */
 .section .text.crt.syscall.open_by_handle_at
 INTERN_FUNCTION(libc_sys_open_by_handle_at)
 	.cfi_startproc
@@ -7602,7 +7662,7 @@ INTERN_FUNCTION(libc_sys_open_by_handle_at)
 END(libc_sys_open_by_handle_at)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_open_by_handle_at, libc_sys_open_by_handle_at)
 
-/* fd_t open_by_handle_at(fd_t mountdirfd, struct file_handle *handle, syscall_ulong_t flags) */
+/* fd_t open_by_handle_at(fd_t mountdirfd, struct file_handle const *handle, oflag_t flags) */
 .section .text.crt.syscall.Xopen_by_handle_at
 INTERN_FUNCTION(libc_sys_Xopen_by_handle_at)
 	.cfi_startproc
@@ -7662,7 +7722,9 @@ INTERN_FUNCTION(libc_sys_Xsyncfs)
 END(libc_sys_Xsyncfs)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xsyncfs, libc_sys_Xsyncfs)
 
-/* ssize_t sendmmsg(fd_t sockfd, struct mmsghdrx64 *vmessages, size_t vlen, syscall_ulong_t flags) */
+/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* ssize_t sendmmsg(fd_t sockfd, struct mmsghdrx64 *vmessages, size_t vlen, syscall_ulong_t msg_flags) */
 .section .text.crt.syscall.sendmmsg
 INTERN_FUNCTION(libc_sys_sendmmsg)
 	.cfi_startproc
@@ -7675,7 +7737,9 @@ INTERN_FUNCTION(libc_sys_sendmmsg)
 END(libc_sys_sendmmsg)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_sendmmsg, libc_sys_sendmmsg)
 
-/* ssize_t sendmmsg(fd_t sockfd, struct mmsghdrx64 *vmessages, size_t vlen, syscall_ulong_t flags) */
+/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* ssize_t sendmmsg(fd_t sockfd, struct mmsghdrx64 *vmessages, size_t vlen, syscall_ulong_t msg_flags) */
 .section .text.crt.syscall.Xsendmmsg
 INTERN_FUNCTION(libc_sys_Xsendmmsg)
 	.cfi_startproc
@@ -7736,6 +7800,7 @@ INTERN_FUNCTION(libc_sys_Xgetcpu)
 END(libc_sys_Xgetcpu)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xgetcpu, libc_sys_Xgetcpu)
 
+/* @param: flags: Must be `0' */
 /* ssize_t process_vm_readv(pid_t pid, struct iovecx64 const *local_iov, size_t liovcnt, struct iovecx64 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.crt.syscall.process_vm_readv
 INTERN_FUNCTION(libc_sys_process_vm_readv)
@@ -7749,6 +7814,7 @@ INTERN_FUNCTION(libc_sys_process_vm_readv)
 END(libc_sys_process_vm_readv)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_process_vm_readv, libc_sys_process_vm_readv)
 
+/* @param: flags: Must be `0' */
 /* ssize_t process_vm_readv(pid_t pid, struct iovecx64 const *local_iov, size_t liovcnt, struct iovecx64 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.crt.syscall.Xprocess_vm_readv
 INTERN_FUNCTION(libc_sys_Xprocess_vm_readv)
@@ -7762,6 +7828,7 @@ INTERN_FUNCTION(libc_sys_Xprocess_vm_readv)
 END(libc_sys_Xprocess_vm_readv)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xprocess_vm_readv, libc_sys_Xprocess_vm_readv)
 
+/* @param: flags: Must be `0' */
 /* ssize_t process_vm_writev(pid_t pid, struct iovecx64 const *local_iov, size_t liovcnt, struct iovecx64 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.crt.syscall.process_vm_writev
 INTERN_FUNCTION(libc_sys_process_vm_writev)
@@ -7775,6 +7842,7 @@ INTERN_FUNCTION(libc_sys_process_vm_writev)
 END(libc_sys_process_vm_writev)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_process_vm_writev, libc_sys_process_vm_writev)
 
+/* @param: flags: Must be `0' */
 /* ssize_t process_vm_writev(pid_t pid, struct iovecx64 const *local_iov, size_t liovcnt, struct iovecx64 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.crt.syscall.Xprocess_vm_writev
 INTERN_FUNCTION(libc_sys_Xprocess_vm_writev)
@@ -7788,6 +7856,8 @@ INTERN_FUNCTION(libc_sys_Xprocess_vm_writev)
 END(libc_sys_Xprocess_vm_writev)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xprocess_vm_writev, libc_sys_Xprocess_vm_writev)
 
+/* @param: type: One of `KCMP_FILE', `KCMP_FILES', `KCMP_FS', `KCMP_IO',
+ *               `KCMP_SIGHAND', `KCMP_SYSVSEM', `KCMP_VM', `KCMP_EPOLL_TFD' */
 /* syscall_slong_t kcmp(pid_t pid1, pid_t pid2, syscall_ulong_t type, syscall_ulong_t idx1, syscall_ulong_t idx2) */
 .section .text.crt.syscall.kcmp
 INTERN_FUNCTION(libc_sys_kcmp)
@@ -7801,6 +7871,8 @@ INTERN_FUNCTION(libc_sys_kcmp)
 END(libc_sys_kcmp)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_kcmp, libc_sys_kcmp)
 
+/* @param: type: One of `KCMP_FILE', `KCMP_FILES', `KCMP_FS', `KCMP_IO',
+ *               `KCMP_SIGHAND', `KCMP_SYSVSEM', `KCMP_VM', `KCMP_EPOLL_TFD' */
 /* syscall_slong_t kcmp(pid_t pid1, pid_t pid2, syscall_ulong_t type, syscall_ulong_t idx1, syscall_ulong_t idx2) */
 .section .text.crt.syscall.Xkcmp
 INTERN_FUNCTION(libc_sys_Xkcmp)
@@ -7938,6 +8010,7 @@ INTERN_FUNCTION(libc_sys_Xseccomp)
 END(libc_sys_Xseccomp)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xseccomp, libc_sys_Xseccomp)
 
+/* @param: flags: Set of `0 | GRND_RANDOM | GRND_NONBLOCK' */
 /* ssize_t getrandom(void *buf, size_t num_bytes, syscall_ulong_t flags) */
 .section .text.crt.syscall.getrandom
 INTERN_FUNCTION(libc_sys_getrandom)
@@ -7950,6 +8023,7 @@ INTERN_FUNCTION(libc_sys_getrandom)
 END(libc_sys_getrandom)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_getrandom, libc_sys_getrandom)
 
+/* @param: flags: Set of `0 | GRND_RANDOM | GRND_NONBLOCK' */
 /* ssize_t getrandom(void *buf, size_t num_bytes, syscall_ulong_t flags) */
 .section .text.crt.syscall.Xgetrandom
 INTERN_FUNCTION(libc_sys_Xgetrandom)
@@ -8390,7 +8464,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_Xksysctl, libc_sys_Xksysctl)
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
  *                (depending on the caller running in 32- or 64-bit mode)
  * @param: hdrc:  The number of program headers */
-/* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, struct elf64_phdr *hdrv, size_t hdrc) */
+/* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, struct elf64_phdr const *hdrv, size_t hdrc) */
 .section .text.crt.syscall.maplibrary
 INTERN_FUNCTION(libc_sys_maplibrary)
 	.cfi_startproc
@@ -8413,7 +8487,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_maplibrary, libc_sys_maplibrary)
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
  *                (depending on the caller running in 32- or 64-bit mode)
  * @param: hdrc:  The number of program headers */
-/* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, struct elf64_phdr *hdrv, size_t hdrc) */
+/* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, struct elf64_phdr const *hdrv, size_t hdrc) */
 .section .text.crt.syscall.Xmaplibrary
 INTERN_FUNCTION(libc_sys_Xmaplibrary)
 	.cfi_startproc

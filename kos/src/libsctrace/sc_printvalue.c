@@ -21,6 +21,7 @@
 #define GUARD_LIBSCTRACE_SC_REPR_PRINTVALUE_C 1
 #define _KOS_SOURCE 1
 #define _GNU_SOURCE 1
+#define _DOS_SOURCE 1
 
 #include "api.h"
 /**/
@@ -39,6 +40,7 @@
 #include <fcntl.h>
 #include <format-printer.h>
 #include <inttypes.h>
+#include <signal.h>
 #include <string.h>
 
 #include "sctrace.h"
@@ -69,6 +71,7 @@ DECL_BEGIN
 
 /* Ensure that `PIPESTR' doesn't get allocated multiple times. */
 PRIVATE ATTR_UNUSED char const PIPESTR_[] = PIPESTR;
+PRIVATE ATTR_UNUSED char const NULLSTR[] = "NULL";
 #undef PIPESTR
 #define PIPESTR PIPESTR_
 
@@ -575,16 +578,61 @@ done:
 }
 
 PRIVATE ATTR_UNUSED ssize_t CC
-print_string(pformatprinter printer, void *arg, char const *str) {
+print_string(pformatprinter printer, void *arg, char const *str,
+             struct sc_argument *length_link) {
 	ssize_t result;
 	if (!str) {
-		result = (*printer)(arg, "NULL", 4);
+		result = (*printer)(arg, NULLSTR, COMPILER_STRLEN(NULLSTR));
 	} else {
 		size_t len;
-		validate_readable(str, 1);
-		len    = strlen(str);
-		result = format_printf(printer, arg, "%$q", len, str);
+		if (length_link) {
+			len = (size_t)length_link->sa_value.sv_u64;
+			validate_readable(str, len);
+		} else {
+			validate_readable(str, 1);
+			len = strlen(str);
+		}
+		if (len > 512) {
+			result = format_printf(printer, arg, "%$q[...]", 512, str);
+		} else {
+			result = format_printf(printer, arg, "%$q", len, str);
+		}
 	}
+	return result;
+}
+
+PRIVATE struct {
+	sighandler_t sn_hand;    /* Signal handler constant */
+	char         sn_name[8]; /* Signal handler name. */
+} const sighandler_names[] = {
+	{ SIG_ERR,  "ERR" },
+	{ SIG_DFL,  "DFL" },
+	{ SIG_IGN,  "IGN" },
+	{ SIG_HOLD, "HOLD" },
+	{ SIG_TERM, "TERM" },
+	{ SIG_EXIT, "EXIT" },
+	{ SIG_CONT, "CONT" },
+	{ SIG_STOP, "STOP" },
+	{ SIG_CORE, "CORE" },
+	{ SIG_GET,  "GET" }
+};
+
+PRIVATE ATTR_UNUSED ssize_t CC
+print_sighandler_t(pformatprinter printer, void *arg,
+                   sighandler_t hand) {
+	ssize_t result;
+	unsigned int i;
+	for (i = 0; i < COMPILER_LENOF(sighandler_names); ++i) {
+		if (sighandler_names[i].sn_hand == hand) {
+			char const *name;
+			name   = sighandler_names[i].sn_name;
+			result = format_printf(printer, arg, "SIG_%s", name);
+			goto done;
+		}
+	}
+	result = format_printf(printer, arg, "%#" PRIxPTR,
+	                       *(void **)&hand);
+done:
 	return result;
 }
 
@@ -608,11 +656,23 @@ libsc_printvalue(pformatprinter printer, void *arg,
 
 	// TODO: #define HAVE_SC_REPR_ACCEPT4_FLAGS 1
 	// TODO: #define HAVE_SC_REPR_ACCESS_TYPE 1
+	// TODO: #define HAVE_SC_REPR_BUFFER 1
 	// TODO: #define HAVE_SC_REPR_CLONE_FLAGS 1
+	// TODO: #define HAVE_SC_REPR_CLONE_FLAGS_SETNS 1
 	// TODO: #define HAVE_SC_REPR_CLONE_FLAGS_UNSHARE 1
+	// TODO: #define HAVE_SC_REPR_CPUSET 1
 	// TODO: #define HAVE_SC_REPR_EPOLL_OP 1
 	// TODO: #define HAVE_SC_REPR_EVENTFD2_FLAGS 1
+	// TODO: #define HAVE_SC_REPR_EXCEPTION_HANDLER_MODE 1
 	// TODO: #define HAVE_SC_REPR_EXIT_STATUS 1
+	// TODO: #define HAVE_SC_REPR_FALLOCATE_MODE 1
+	// TODO: #define HAVE_SC_REPR_FCNTL64_ARG 1
+	// TODO: #define HAVE_SC_REPR_FCNTL64_COMMAND 1
+	// TODO: #define HAVE_SC_REPR_FCNTL_ARG 1
+	// TODO: #define HAVE_SC_REPR_FCNTL_COMMAND 1
+	// TODO: #define HAVE_SC_REPR_FSMODE 1
+	// TODO: #define HAVE_SC_REPR_FUTEX_OP 1
+	// TODO: #define HAVE_SC_REPR_GETRANDOM_FLAGS 1
 	// TODO: #define HAVE_SC_REPR_GETRUSAGE_WHO 1
 	// TODO: #define HAVE_SC_REPR_GID_VECTOR 1
 	// TODO: #define HAVE_SC_REPR_GID_VECTOR16 1
@@ -621,25 +681,38 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	// TODO: #define HAVE_SC_REPR_HOP_COMMAND 1
 	// TODO: #define HAVE_SC_REPR_IDTYPE_T 1
 	// TODO: #define HAVE_SC_REPR_ID_T 1
-	// TODO: #define HAVE_SC_REPR_INBUF 1
+	// TODO: #define HAVE_SC_REPR_IOCTL_ARG 1
+	// TODO: #define HAVE_SC_REPR_IOCTL_COMMAND 1
+	// TODO: #define HAVE_SC_REPR_IOPRIO_ID 1
+	// TODO: #define HAVE_SC_REPR_IOPRIO_VALUE 1
+	// TODO: #define HAVE_SC_REPR_IOPRIO_WHO 1
+	// TODO: #define HAVE_SC_REPR_ITIMER_WHICH 1
+	// TODO: #define HAVE_SC_REPR_KCMP_TYPE 1
 	// TODO: #define HAVE_SC_REPR_KREADDIR_MODE 1
+	// TODO: #define HAVE_SC_REPR_KSYSCTL_ARG 1
+	// TODO: #define HAVE_SC_REPR_KSYSCTL_COMMAND 1
 	// TODO: #define HAVE_SC_REPR_LFUTEX_OP 1
+	// TODO: #define HAVE_SC_REPR_LFUTEX_TIMEOUT_FLAGS 1
 	// TODO: #define HAVE_SC_REPR_MAPLIBRARY_FLAGS 1
 	// TODO: #define HAVE_SC_REPR_MEMFD_CREATE_FLAGS 1
+	// TODO: #define HAVE_SC_REPR_MLOCKALL_FLAGS 1
 	// TODO: #define HAVE_SC_REPR_MMAP_FLAGS 1
 	// TODO: #define HAVE_SC_REPR_MMAP_PROT 1
 	// TODO: #define HAVE_SC_REPR_MOUNT_FLAGS 1
 	// TODO: #define HAVE_SC_REPR_MREMAP_FLAGS 1
-	// TODO: #define HAVE_SC_REPR_OUTBUF 1
 	// TODO: #define HAVE_SC_REPR_REBOOT_HOW 1
 	// TODO: #define HAVE_SC_REPR_RENAMEAT2_FLAGS 1
 	// TODO: #define HAVE_SC_REPR_RLIMIT_RESOURCE 1
 	// TODO: #define HAVE_SC_REPR_RPC_SCHEDULE_FLAGS 1
+	// TODO: #define HAVE_SC_REPR_SCHED_POLICY 1
+	// TODO: #define HAVE_SC_REPR_SCHED_PRIORITY_WHICH 1
 	// TODO: #define HAVE_SC_REPR_SEEK_WHENCE 1
-	// TODO: #define HAVE_SC_REPR_SET_EXCEPTION_HANDLER_MODE 1
+	// TODO: #define HAVE_SC_REPR_SIGMASK 1
 	// TODO: #define HAVE_SC_REPR_SIGNALFD4_FLAGS 1
 	// TODO: #define HAVE_SC_REPR_SIGNO 1
 	// TODO: #define HAVE_SC_REPR_SIGPROCMASK_HOW 1
+	// TODO: #define HAVE_SC_REPR_SOCKETCALL_ARGS 1
+	// TODO: #define HAVE_SC_REPR_SOCKETCALL_CALL 1
 	// TODO: #define HAVE_SC_REPR_SOCKET_DOMAIN 1
 	// TODO: #define HAVE_SC_REPR_SOCKET_PROTOCOL 1
 	// TODO: #define HAVE_SC_REPR_SOCKET_RECVMSG_FLAGS 1
@@ -650,6 +723,7 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	// TODO: #define HAVE_SC_REPR_SOCKOPT_LEVEL 1
 	// TODO: #define HAVE_SC_REPR_SOCKOPT_OPTNAME 1
 	// TODO: #define HAVE_SC_REPR_SOCKOPT_OPTVAL 1
+	// TODO: #define HAVE_SC_REPR_SPLICE_FLAGS 1
 	// TODO: #define HAVE_SC_REPR_STRING_VECTOR32 1
 	// TODO: #define HAVE_SC_REPR_STRING_VECTOR64 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_DEBUGTRAP_REASON32 1
@@ -659,6 +733,7 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	// TODO: #define HAVE_SC_REPR_STRUCT_EXCEPTION_DATA32 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_EXCEPTION_DATA64 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_FDSET 1
+	// TODO: #define HAVE_SC_REPR_STRUCT_FILE_HANDLE 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_FPUSTATE 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_FPUSTATE32 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_IOVEC 1
@@ -676,6 +751,7 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	// TODO: #define HAVE_SC_REPR_STRUCT_LIBRARY_LISTDEF64 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_MMSGHDRX32 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_MMSGHDRX64 1
+	// TODO: #define HAVE_SC_REPR_STRUCT_MQ_ATTR 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_MSGHDRX32 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_MSGHDRX64 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_POLLFD 1
@@ -683,8 +759,12 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	// TODO: #define HAVE_SC_REPR_STRUCT_RLIMIT64 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_RPC_SYSCALL_INFO 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_RPC_SYSCALL_INFO32 1
+	// TODO: #define HAVE_SC_REPR_STRUCT_SCHED_PARAM 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_SIGACTIONX32 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_SIGACTIONX64 1
+	// TODO: #define HAVE_SC_REPR_STRUCT_SIGALTSTACKX32 1
+	// TODO: #define HAVE_SC_REPR_STRUCT_SIGALTSTACKX64 1
+	// TODO: #define HAVE_SC_REPR_STRUCT_SIGEVENT 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_SIGINFOX32 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_SIGINFOX64 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN 1
@@ -695,10 +775,18 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	// TODO: #define HAVE_SC_REPR_STRUCT_TERMIOS 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_TIMESPECX32 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_TIMESPECX32_64 1
+	// TODO: #define HAVE_SC_REPR_STRUCT_TIMESPECX32_64_VEC2_OR_3 1
+	// TODO: #define HAVE_SC_REPR_STRUCT_TIMESPECX32_OR_UINT32 1
+	// TODO: #define HAVE_SC_REPR_STRUCT_TIMESPECX32_VEC2_OR_3 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_TIMESPECX64 1
+	// TODO: #define HAVE_SC_REPR_STRUCT_TIMESPECX64_OR_UINT32 1
+	// TODO: #define HAVE_SC_REPR_STRUCT_TIMESPECX64_VEC2_OR_3 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_TIMEVALX32 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_TIMEVALX32_64 1
+	// TODO: #define HAVE_SC_REPR_STRUCT_TIMEVALX32_64_VEC2 1
+	// TODO: #define HAVE_SC_REPR_STRUCT_TIMEVALX32_VEC2 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_TIMEVALX64 1
+	// TODO: #define HAVE_SC_REPR_STRUCT_TIMEVALX64_VEC2 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_TIMEZONE 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_UCPUSTATE 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_UCPUSTATE32 1
@@ -708,26 +796,44 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	// TODO: #define HAVE_SC_REPR_STRUCT_UTIMBUFX64 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_WINSIZE 1
 	// TODO: #define HAVE_SC_REPR_SWAPFLAGS 1
+	// TODO: #define HAVE_SC_REPR_SYNC_FILE_RANGE_FLAGS 1
 	// TODO: #define HAVE_SC_REPR_SYSLOG_LEVEL 1
-	// TODO: #define HAVE_SC_REPR_TIMEVALX32_64_VEC2 1
-	// TODO: #define HAVE_SC_REPR_TIMEVALX32_VEC2 1
-	// TODO: #define HAVE_SC_REPR_TIMEVALX64_VEC2 1
+	// TODO: #define HAVE_SC_REPR_TIME32_T_PTR 1
+	// TODO: #define HAVE_SC_REPR_TIME64_T_PTR 1
+	// TODO: #define HAVE_SC_REPR_TIMERFD_FLAGS 1
+	// TODO: #define HAVE_SC_REPR_TIMERFD_TIMER_FLAGS 1
+	// TODO: #define HAVE_SC_REPR_TIMER_FLAGS 1
 	// TODO: #define HAVE_SC_REPR_UNWIND_ERROR 1
 	// TODO: #define HAVE_SC_REPR_VOID_VECTOR32 1
 	// TODO: #define HAVE_SC_REPR_VOID_VECTOR64 1
 	// TODO: #define HAVE_SC_REPR_WAITFLAG 1
 	// TODO: #define HAVE_SC_REPR_WAITID_OPTIONS 1
+	// TODO: #define HAVE_SC_REPR_XATTR_FLAGS 1
 
+
+#ifdef HAVE_SC_REPR_SIGHANDLER_T
+	case SC_REPR_SIGHANDLER_T: {
+		sighandler_t hand;
+		*(void **)&hand = (void *)(uintptr_t)value.sv_u64;
+		result = print_sighandler_t(printer, arg, hand);
+	}	break;
+#endif /* HAVE_SC_REPR_SIGHANDLER_T */
+
+#ifdef HAVE_SC_REPR_EXCEPT_HANDLER_T
+	case SC_REPR_EXCEPT_HANDLER_T:
+		goto do_pointer;
+#define NEED_do_pointer
+#endif /* HAVE_SC_REPR_EXCEPT_HANDLER_T */
 
 #ifdef HAVE_SC_REPR_FILENAME
 	case SC_REPR_FILENAME:
-		result = print_string(printer, arg, (char const *)(uintptr_t)value.sv_u64);
+		result = print_string(printer, arg, (char const *)(uintptr_t)value.sv_u64, NULL);
 		break;
 #endif /* HAVE_SC_REPR_FILENAME */
 
 #ifdef HAVE_SC_REPR_STRING
 	case SC_REPR_STRING:
-		result = print_string(printer, arg, (char const *)(uintptr_t)value.sv_u64);
+		result = print_string(printer, arg, (char const *)(uintptr_t)value.sv_u64, link);
 		break;
 #endif /* HAVE_SC_REPR_STRING */
 
@@ -1026,41 +1132,76 @@ libsc_printvalue(pformatprinter printer, void *arg,
 #endif /* __SIZEOF_PID_T__ != ... */
 #endif /* HAVE_SC_REPR_PID_T */
 
-#ifdef HAVE_SC_REPR_SIGHANDLER_T
-	case SC_REPR_SIGHANDLER_T:
-		goto do_syscall_ulong_t;
-#define NEED_do_syscall_ulong_t
-#endif /* HAVE_SC_REPR_SIGHANDLER_T */
-
-#ifdef HAVE_SC_REPR_EXCEPT_HANDLER_T
-	case SC_REPR_EXCEPT_HANDLER_T:
-		goto do_syscall_ulong_t;
-#define NEED_do_syscall_ulong_t
-#endif /* HAVE_SC_REPR_EXCEPT_HANDLER_T */
-
 #ifdef HAVE_SC_REPR_TIMER_T
 	case SC_REPR_TIMER_T:
-		goto do_syscall_ulong_t;
-#define NEED_do_syscall_ulong_t
+		goto do_uintptr_t;
+#define NEED_do_uintptr_t
 #endif /* HAVE_SC_REPR_TIMER_T */
 
+#if defined(HAVE_SC_REPR_POINTER) || defined(NEED_do_pointer)
 #ifdef HAVE_SC_REPR_POINTER
 	case SC_REPR_POINTER:
-		goto do_syscall_ulong_t;
-#define NEED_do_syscall_ulong_t
 #endif /* HAVE_SC_REPR_POINTER */
+#ifdef NEED_do_pointer
+do_pointer:
+#endif /* NEED_do_pointer */
+		if (value.sv_u64 == 0) {
+			result = (*printer)(arg, NULLSTR, COMPILER_STRLEN(NULLSTR));
+			break;
+		}
+		goto do_uintptr_t;
+#define NEED_do_uintptr_t
+#endif /* HAVE_SC_REPR_POINTER || NEED_do_pointer */
 
+#if defined(HAVE_SC_REPR_INTPTR_T) || defined(NEED_do_intptr_t)
 #ifdef HAVE_SC_REPR_INTPTR_T
 	case SC_REPR_INTPTR_T:
-		goto do_syscall_slong_t;
-#define NEED_do_syscall_slong_t
 #endif /* HAVE_SC_REPR_INTPTR_T */
+#ifdef NEED_do_intptr_t
+do_intptr_t:
+#endif /* NEED_do_intptr_t */
+		format = "%#tx"; /* Signed, ptrdiff_t-sized printf */
+#if __SIZEOF_POINTER__ == 4
+#define NEED_do_format32
+		goto do_format32;
+#elif __SIZEOF_POINTER__ == 8
+#define NEED_do_format64
+		goto do_format64;
+#elif __SIZEOF_POINTER__ == 2
+#define NEED_do_format16
+		goto do_format16;
+#elif __SIZEOF_POINTER__ == 1
+#define NEED_do_format8
+		goto do_format8;
+#else /* __SIZEOF_POINTER__ == ... */
+#error "Unsupported `__SIZEOF_POINTER__'"
+#endif /* __SIZEOF_POINTER__ != ... */
+#endif /* HAVE_SC_REPR_INTPTR_T || NEED_do_intptr_t */
 
+#if defined(HAVE_SC_REPR_UINTPTR_T) || defined(NEED_do_uintptr_t)
 #ifdef HAVE_SC_REPR_UINTPTR_T
 	case SC_REPR_UINTPTR_T:
-		goto do_syscall_ulong_t;
-#define NEED_do_syscall_ulong_t
 #endif /* HAVE_SC_REPR_UINTPTR_T */
+#ifdef NEED_do_uintptr_t
+do_uintptr_t:
+#endif /* NEED_do_uintptr_t */
+		format = "%#" PRIxPTR;
+#if __SIZEOF_POINTER__ == 4
+#define NEED_do_format32
+		goto do_format32;
+#elif __SIZEOF_POINTER__ == 8
+#define NEED_do_format64
+		goto do_format64;
+#elif __SIZEOF_POINTER__ == 2
+#define NEED_do_format16
+		goto do_format16;
+#elif __SIZEOF_POINTER__ == 1
+#define NEED_do_format8
+		goto do_format8;
+#else /* __SIZEOF_POINTER__ == ... */
+#error "Unsupported `__SIZEOF_POINTER__'"
+#endif /* __SIZEOF_POINTER__ != ... */
+#endif /* HAVE_SC_REPR_UINTPTR_T || NEED_do_uintptr_t */
 
 #if defined(HAVE_SC_REPR_SYSCALL_SLONG_T) || defined(NEED_do_syscall_slong_t)
 #ifdef HAVE_SC_REPR_SYSCALL_SLONG_T
@@ -1069,7 +1210,7 @@ libsc_printvalue(pformatprinter printer, void *arg,
 #ifdef NEED_do_syscall_slong_t
 do_syscall_slong_t:
 #endif /* NEED_do_syscall_slong_t */
-		format = "%#tx"; /* Signed, ptrdiff_t-sized printf */
+		format = "%" PRIdPTR;
 #if __SIZEOF_POINTER__ == 4
 #define NEED_do_format32
 		goto do_format32;
@@ -1094,7 +1235,7 @@ do_syscall_slong_t:
 #ifdef NEED_do_syscall_ulong_t
 do_syscall_ulong_t:
 #endif /* NEED_do_syscall_ulong_t */
-		format = "%#" PRIxPTR;
+		format = "%" PRIuPTR;
 #if __SIZEOF_POINTER__ == 4
 #define NEED_do_format32
 		goto do_format32;

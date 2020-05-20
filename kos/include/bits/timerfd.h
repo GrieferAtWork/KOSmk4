@@ -26,17 +26,26 @@
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
-	TFD_CLOEXEC  = 02000000,
-	TFD_NONBLOCK = 00004000
+	TFD_NONBLOCK = 0x00800,
+	TFD_CLOEXEC  = 0x80000,
+#if defined(__KOS__) || defined(__CRT_KOS) || defined(__CRT_KOS_KERNEL)
+	TFD_CLOFORK  = 0x0100000
+#endif /* __KOS__ || __CRT_KOS || __CRT_KOS_KERNEL */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
-#define TFD_CLOEXEC  TFD_CLOEXEC
 #define TFD_NONBLOCK TFD_NONBLOCK
+#define TFD_CLOEXEC  TFD_CLOEXEC
+#if defined(__KOS__) || defined(__CRT_KOS) || defined(__CRT_KOS_KERNEL)
+#define TFD_CLOFORK  TFD_CLOFORK
+#endif /* __KOS__ || __CRT_KOS || __CRT_KOS_KERNEL */
 #else /* __COMPILER_PREFERR_ENUMS */
-#define TFD_CLOEXEC  02000000
-#define TFD_NONBLOCK 00004000
+#define TFD_NONBLOCK 0x00800
+#define TFD_CLOEXEC  0x80000
+#if defined(__KOS__) || defined(__CRT_KOS) || defined(__CRT_KOS_KERNEL)
+#define TFD_CLOFORK  0x0100000
+#endif /* __KOS__ || __CRT_KOS || __CRT_KOS_KERNEL */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

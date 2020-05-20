@@ -45,7 +45,7 @@ DECL_BEGIN
 PRIVATE void KCALL
 FUNC(unmap_range)(struct vm *__restrict v,
                   PAGEDIR_PAGEALIGNED UNCHECKED void *loadaddr,
-                  USER CHECKED MY_ElfW(Phdr) * headers,
+                  USER CHECKED MY_ElfW(Phdr) const *headers,
                   size_t count) {
 	MY_ElfW(Addr) addr;
 	MY_ElfW(Off) offset;
@@ -75,7 +75,7 @@ FUNC(unmap_range)(struct vm *__restrict v,
 }
 
 PRIVATE bool KCALL
-FUNC(contains_illegal_overlap)(USER CHECKED MY_ElfW(Phdr) *headers,
+FUNC(contains_illegal_overlap)(USER CHECKED MY_ElfW(Phdr) const *headers,
                                size_t count) {
 	size_t i, j;
 	uintptr_t addr_page_offset = 0;
@@ -171,11 +171,11 @@ yes:
 #ifdef DEFINE_COMPAT_MAPLIBRARY
 DEFINE_COMPAT_SYSCALL5(void *, maplibrary,
                        void *, addr, syscall_ulong_t, flags, fd_t, fd,
-                       USER UNCHECKED COMPAT_ElfW(Phdr) *, hdrv, size_t, hdrc)
+                       USER UNCHECKED COMPAT_ElfW(Phdr) const *, hdrv, size_t, hdrc)
 #else /* DEFINE_COMPAT_MAPLIBRARY */
 DEFINE_SYSCALL5(void *, maplibrary,
                 void *, addr, syscall_ulong_t, flags, fd_t, fd,
-                USER UNCHECKED ElfW(Phdr) *, hdrv, size_t, hdrc)
+                USER UNCHECKED ElfW(Phdr) const *, hdrv, size_t, hdrc)
 #endif /* !DEFINE_COMPAT_MAPLIBRARY */
 {
 	byte_t *result;

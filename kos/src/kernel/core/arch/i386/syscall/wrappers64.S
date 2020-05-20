@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd7e065a0 */
+/* HASH CRC-32:0xe43034cf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -543,7 +543,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rt_sigreturn)
 	.cfi_endproc
 END(__x86_asm64_syscall_rt_sigreturn)
 
-/* syscall_slong_t ioctl(fd_t fd, syscall_ulong_t request, void *arg) */
+/* syscall_slong_t ioctl(fd_t fd, syscall_ulong_t command, void *arg) */
 .section .text.x86.asm64_syscall.ioctl
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_ioctl)
 	.cfi_startproc simple
@@ -1149,6 +1149,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_nanosleep)
 	.cfi_endproc
 END(__x86_asm64_syscall_nanosleep)
 
+/* @param: which: One of `ITIMER_REAL', `ITIMER_VIRTUAL' or `ITIMER_PROF' */
 /* errno_t getitimer(syscall_ulong_t which, struct __itimervalx64 *curr_value) */
 .section .text.x86.asm64_syscall.getitimer
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getitimer)
@@ -1209,6 +1210,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_alarm)
 	.cfi_endproc
 END(__x86_asm64_syscall_alarm)
 
+/* @param: which: One of `ITIMER_REAL', `ITIMER_VIRTUAL' or `ITIMER_PROF' */
 /* errno_t setitimer(syscall_ulong_t which, struct __itimervalx64 const *newval, struct __itimervalx64 *oldval) */
 .section .text.x86.asm64_syscall.setitimer
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_setitimer)
@@ -1936,7 +1938,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_exit)
 	.cfi_endproc
 END(__x86_asm64_syscall_exit)
 
-/* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
+/* Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 /* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusagex64 *usage) */
 .section .text.x86.asm64_syscall.wait4
@@ -2270,7 +2272,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_msgctl)
 	.cfi_endproc
 END(__x86_asm64_syscall_msgctl)
 
-/* syscall_slong_t fcntl(fd_t fd, syscall_ulong_t cmd, void *arg) */
+/* syscall_slong_t fcntl(fd_t fd, syscall_ulong_t command, void *arg) */
 .section .text.x86.asm64_syscall.fcntl
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fcntl)
 	.cfi_startproc simple
@@ -3051,6 +3053,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getrlimit)
 	.cfi_endproc
 END(__x86_asm64_syscall_getrlimit)
 
+/* @param: who: One of `RUSAGE_SELF', `RUSAGE_CHILDREN' or `RUSAGE_THREAD' */
 /* errno_t getrusage(syscall_slong_t who, struct rusagex64 *tv) */
 .section .text.x86.asm64_syscall.getrusage
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getrusage)
@@ -3562,7 +3565,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_setregid)
 	.cfi_endproc
 END(__x86_asm64_syscall_setregid)
 
-/* errno_t getgroups(size_t size, gid_t[] list) */
+/* errno_t getgroups(size_t count, gid_t[] list) */
 .section .text.x86.asm64_syscall.getgroups
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getgroups)
 	.cfi_startproc simple
@@ -4314,6 +4317,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sysfs)
 	.cfi_endproc
 END(__x86_asm64_syscall_sysfs)
 
+/* @param: which: One of `PRIO_PROCESS', `PRIO_PGRP' or `PRIO_USER' */
 /* syscall_slong_t getpriority(syscall_ulong_t which, id_t who) */
 .section .text.x86.asm64_syscall.getpriority
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getpriority)
@@ -4344,6 +4348,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getpriority)
 	.cfi_endproc
 END(__x86_asm64_syscall_getpriority)
 
+/* @param: which: One of `PRIO_PROCESS', `PRIO_PGRP' or `PRIO_USER' */
 /* errno_t setpriority(syscall_ulong_t which, id_t who, syscall_ulong_t value) */
 .section .text.x86.asm64_syscall.setpriority
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_setpriority)
@@ -4434,6 +4439,8 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sched_getparam)
 	.cfi_endproc
 END(__x86_asm64_syscall_sched_getparam)
 
+/* @param: policy: One of `SCHED_OTHER', `SCHED_FIFO', `SCHED_RR', `SCHED_BATCH',
+ *                 `SCHED_IDLE', optionally or'd with `SCHED_RESET_ON_FORK' */
 /* errno_t sched_setscheduler(pid_t pid, syscall_ulong_t policy, struct sched_param const *param) */
 .section .text.x86.asm64_syscall.sched_setscheduler
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sched_setscheduler)
@@ -4644,6 +4651,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_munlock)
 	.cfi_endproc
 END(__x86_asm64_syscall_munlock)
 
+/* @param: flags: Set of `MCL_CURRENT | MCL_FUTURE | MCL_ONFAULT' */
 /* errno_t mlockall(syscall_ulong_t flags) */
 .section .text.x86.asm64_syscall.mlockall
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mlockall)
@@ -5758,6 +5766,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_readahead)
 	.cfi_endproc
 END(__x86_asm64_syscall_readahead)
 
+/* @param: flags: One of `0', `XATTR_CREATE' or `XATTR_REPLACE' */
 /* errno_t setxattr(char const *path, char const *name, void const *buf, size_t bufsize, syscall_ulong_t flags) */
 .section .text.x86.asm64_syscall.setxattr
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_setxattr)
@@ -5789,6 +5798,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_setxattr)
 	.cfi_endproc
 END(__x86_asm64_syscall_setxattr)
 
+/* @param: flags: One of `0', `XATTR_CREATE' or `XATTR_REPLACE' */
 /* errno_t lsetxattr(char const *path, char const *name, void const *buf, size_t bufsize, syscall_ulong_t flags) */
 .section .text.x86.asm64_syscall.lsetxattr
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_lsetxattr)
@@ -5820,6 +5830,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_lsetxattr)
 	.cfi_endproc
 END(__x86_asm64_syscall_lsetxattr)
 
+/* @param: flags: One of `0', `XATTR_CREATE' or `XATTR_REPLACE' */
 /* errno_t fsetxattr(fd_t fd, char const *name, void const *buf, size_t bufsize, syscall_ulong_t flags) */
 .section .text.x86.asm64_syscall.fsetxattr
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fsetxattr)
@@ -6094,7 +6105,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_lremovexattr)
 	.cfi_endproc
 END(__x86_asm64_syscall_lremovexattr)
 
-/* errno_t fremovexattr(int fd, char const *name) */
+/* errno_t fremovexattr(fd_t fd, char const *name) */
 .section .text.x86.asm64_syscall.fremovexattr
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fremovexattr)
 	.cfi_startproc simple
@@ -6124,6 +6135,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fremovexattr)
 	.cfi_endproc
 END(__x86_asm64_syscall_fremovexattr)
 
+/* @param: signo: One of `SIG*' */
 /* errno_t tkill(pid_t tid, syscall_ulong_t signo) */
 .section .text.x86.asm64_syscall.tkill
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_tkill)
@@ -6184,6 +6196,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_time)
 	.cfi_endproc
 END(__x86_asm64_syscall_time)
 
+/* @param: futex_op: One of `FUTEX_*' from <linux/futex.h> */
 /* syscall_slong_t futex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct timespecx64 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) */
 .section .text.x86.asm64_syscall.futex
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_futex)
@@ -6819,6 +6832,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_timer_create)
 	.cfi_endproc
 END(__x86_asm64_syscall_timer_create)
 
+/* @param: flags: Set of `0 | TIMER_ABSTIME' */
 /* errno_t timer_settime(timer_t timerid, syscall_ulong_t flags, struct itimerspecx64 const *value, struct itimerspecx64 *ovalue) */
 .section .text.x86.asm64_syscall.timer_settime
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_timer_settime)
@@ -7154,6 +7168,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_epoll_ctl)
 	.cfi_endproc
 END(__x86_asm64_syscall_epoll_ctl)
 
+/* @param: signo: One of `SIG*' */
 /* errno_t tgkill(pid_t tgid, pid_t tid, syscall_ulong_t signo) */
 .section .text.x86.asm64_syscall.tgkill
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_tgkill)
@@ -7669,7 +7684,9 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_keyctl)
 	.cfi_endproc
 END(__x86_asm64_syscall_keyctl)
 
-/* errno_t ioprio_set(syscall_ulong_t which, syscall_ulong_t who, syscall_ulong_t ioprio) */
+/* NOTE: Linux calls `who' `which', and `id' `who' (refactored to prevent confusion)
+ * @param: who: One of `IOPRIO_WHO_PROCESS', `IOPRIO_WHO_PGRP' or `IOPRIO_WHO_USER' */
+/* errno_t ioprio_set(syscall_ulong_t who, syscall_ulong_t id, syscall_ulong_t ioprio) */
 .section .text.x86.asm64_syscall.ioprio_set
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_ioprio_set)
 	.cfi_startproc simple
@@ -7699,7 +7716,9 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_ioprio_set)
 	.cfi_endproc
 END(__x86_asm64_syscall_ioprio_set)
 
-/* errno_t ioprio_get(syscall_ulong_t which, syscall_ulong_t who) */
+/* NOTE: Linux calls `who' `which', and `id' `who' (refactored to prevent confusion)
+ * @param: who: One of `IOPRIO_WHO_PROCESS', `IOPRIO_WHO_PGRP' or `IOPRIO_WHO_USER' */
+/* syscall_slong_t ioprio_get(syscall_ulong_t who, syscall_ulong_t id) */
 .section .text.x86.asm64_syscall.ioprio_get
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_ioprio_get)
 	.cfi_startproc simple
@@ -8408,6 +8427,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_get_robust_list)
 	.cfi_endproc
 END(__x86_asm64_syscall_get_robust_list)
 
+/* @param: flags: Set of `SPLICE_F_MOVE | SPLICE_F_NONBLOCK | SPLICE_F_MORE | SPLICE_F_GIFT' */
 /* ssize_t splice(fd_t fdin, uint64_t *offin, fd_t fdout, uint64_t *offout, size_t length, syscall_ulong_t flags) */
 .section .text.x86.asm64_syscall.splice
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_splice)
@@ -8439,6 +8459,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_splice)
 	.cfi_endproc
 END(__x86_asm64_syscall_splice)
 
+/* @param: flags: Set of `SPLICE_F_MOVE | SPLICE_F_NONBLOCK | SPLICE_F_MORE | SPLICE_F_GIFT' */
 /* ssize_t tee(fd_t fdin, fd_t fdout, size_t length, syscall_ulong_t flags) */
 .section .text.x86.asm64_syscall.tee
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_tee)
@@ -8470,6 +8491,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_tee)
 	.cfi_endproc
 END(__x86_asm64_syscall_tee)
 
+/* @param: flags: Set of `SYNC_FILE_RANGE_WAIT_BEFORE | SYNC_FILE_RANGE_WRITE | SYNC_FILE_RANGE_WAIT_AFTER' */
 /* errno_t sync_file_range(fd_t fd, uint64_t offset, uint64_t count, syscall_ulong_t flags) */
 .section .text.x86.asm64_syscall.sync_file_range
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sync_file_range)
@@ -8501,6 +8523,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sync_file_range)
 	.cfi_endproc
 END(__x86_asm64_syscall_sync_file_range)
 
+/* @param: flags: Set of `SPLICE_F_MOVE | SPLICE_F_NONBLOCK | SPLICE_F_MORE | SPLICE_F_GIFT' */
 /* ssize_t vmsplice(fd_t fdout, struct iovecx64 const *iov, size_t count, syscall_ulong_t flags) */
 .section .text.x86.asm64_syscall.vmsplice
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_vmsplice)
@@ -8655,7 +8678,8 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_signalfd)
 	.cfi_endproc
 END(__x86_asm64_syscall_signalfd)
 
-/* Return file descriptor for new interval timer source */
+/* Return file descriptor for new interval timer source
+ * @param: flags: Set of `0 | TFD_NONBLOCK | TFD_CLOEXEC | TFD_CLOFORK' */
 /* fd_t timerfd_create(clockid_t clock_id, syscall_ulong_t flags) */
 .section .text.x86.asm64_syscall.timerfd_create
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_timerfd_create)
@@ -8716,6 +8740,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_eventfd)
 	.cfi_endproc
 END(__x86_asm64_syscall_eventfd)
 
+/* @param: mode: Set of `0 | FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE | FALLOC_FL_COLLAPSE_RANGE | FALLOC_FL_ZERO_RANGE' */
 /* errno_t fallocate(fd_t fd, syscall_ulong_t mode, syscall_ulong_t offset, syscall_ulong_t length) */
 .section .text.x86.asm64_syscall.fallocate
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fallocate)
@@ -8747,10 +8772,11 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fallocate)
 	.cfi_endproc
 END(__x86_asm64_syscall_fallocate)
 
-/* Set next expiration time of interval timer source UFD to UTMR.
- * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout value
- * is absolute. Optionally return the old expiration time in OTMR */
-/* errno_t timerfd_settime(fd_t ufd, syscall_ulong_t flags, struct itimerspecx64 const *utmr, struct itimerspecx64 *otmr) */
+/* Set next expiration time of interval timer source `timerfd' to `utmr'.
+ * If `flags' has the `TFD_TIMER_ABSTIME' flag set the timeout value
+ * is absolute. Optionally return the old expiration time in `otmr''
+ * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
+/* errno_t timerfd_settime(fd_t timerfd, syscall_ulong_t flags, struct itimerspecx64 const *utmr, struct itimerspecx64 *otmr) */
 .section .text.x86.asm64_syscall.timerfd_settime
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_timerfd_settime)
 	.cfi_startproc simple
@@ -8782,7 +8808,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_timerfd_settime)
 END(__x86_asm64_syscall_timerfd_settime)
 
 /* Return the next expiration time of UFD */
-/* errno_t timerfd_gettime(fd_t ufd, struct itimerspecx64 *otmr) */
+/* errno_t timerfd_gettime(fd_t timerfd, struct itimerspecx64 *otmr) */
 .section .text.x86.asm64_syscall.timerfd_gettime
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_timerfd_gettime)
 	.cfi_startproc simple
@@ -9152,7 +9178,10 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_perf_event_open)
 	.cfi_endproc
 END(__x86_asm64_syscall_perf_event_open)
 
-/* ssize_t recvmmsg(fd_t sockfd, struct mmsghdrx64 *vmessages, size_t vlen, syscall_ulong_t flags, struct timespecx64 const *tmo) */
+/* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+ *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+/* ssize_t recvmmsg(fd_t sockfd, struct mmsghdrx64 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx64 const *tmo) */
 .section .text.x86.asm64_syscall.recvmmsg
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_recvmmsg)
 	.cfi_startproc simple
@@ -9275,7 +9304,8 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_prlimit64)
 	.cfi_endproc
 END(__x86_asm64_syscall_prlimit64)
 
-/* errno_t name_to_handle_at(fd_t dirfd, char const *filename, struct file_handle *handle, int32_t *mnt_id, syscall_ulong_t flags) */
+/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_FOLLOW | AT_DOSPATH' */
+/* errno_t name_to_handle_at(fd_t dirfd, char const *filename, struct file_handle *handle, int32_t *mnt_id, atflag_t flags) */
 .section .text.x86.asm64_syscall.name_to_handle_at
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_name_to_handle_at)
 	.cfi_startproc simple
@@ -9306,7 +9336,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_name_to_handle_at)
 	.cfi_endproc
 END(__x86_asm64_syscall_name_to_handle_at)
 
-/* fd_t open_by_handle_at(fd_t mountdirfd, struct file_handle *handle, syscall_ulong_t flags) */
+/* fd_t open_by_handle_at(fd_t mountdirfd, struct file_handle const *handle, oflag_t flags) */
 .section .text.x86.asm64_syscall.open_by_handle_at
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_open_by_handle_at)
 	.cfi_startproc simple
@@ -9396,7 +9426,9 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_syncfs)
 	.cfi_endproc
 END(__x86_asm64_syscall_syncfs)
 
-/* ssize_t sendmmsg(fd_t sockfd, struct mmsghdrx64 *vmessages, size_t vlen, syscall_ulong_t flags) */
+/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* ssize_t sendmmsg(fd_t sockfd, struct mmsghdrx64 *vmessages, size_t vlen, syscall_ulong_t msg_flags) */
 .section .text.x86.asm64_syscall.sendmmsg
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sendmmsg)
 	.cfi_startproc simple
@@ -9487,6 +9519,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getcpu)
 	.cfi_endproc
 END(__x86_asm64_syscall_getcpu)
 
+/* @param: flags: Must be `0' */
 /* ssize_t process_vm_readv(pid_t pid, struct iovecx64 const *local_iov, size_t liovcnt, struct iovecx64 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.x86.asm64_syscall.process_vm_readv
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_process_vm_readv)
@@ -9518,6 +9551,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_process_vm_readv)
 	.cfi_endproc
 END(__x86_asm64_syscall_process_vm_readv)
 
+/* @param: flags: Must be `0' */
 /* ssize_t process_vm_writev(pid_t pid, struct iovecx64 const *local_iov, size_t liovcnt, struct iovecx64 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.x86.asm64_syscall.process_vm_writev
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_process_vm_writev)
@@ -9549,6 +9583,8 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_process_vm_writev)
 	.cfi_endproc
 END(__x86_asm64_syscall_process_vm_writev)
 
+/* @param: type: One of `KCMP_FILE', `KCMP_FILES', `KCMP_FS', `KCMP_IO',
+ *               `KCMP_SIGHAND', `KCMP_SYSVSEM', `KCMP_VM', `KCMP_EPOLL_TFD' */
 /* syscall_slong_t kcmp(pid_t pid1, pid_t pid2, syscall_ulong_t type, syscall_ulong_t idx1, syscall_ulong_t idx2) */
 .section .text.x86.asm64_syscall.kcmp
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kcmp)
@@ -9732,6 +9768,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_seccomp)
 	.cfi_endproc
 END(__x86_asm64_syscall_seccomp)
 
+/* @param: flags: Set of `0 | GRND_RANDOM | GRND_NONBLOCK' */
 /* ssize_t getrandom(void *buf, size_t num_bytes, syscall_ulong_t flags) */
 .section .text.x86.asm64_syscall.getrandom
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getrandom)
@@ -10269,7 +10306,7 @@ END(__x86_asm64_syscall_ksysctl)
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
  *                (depending on the caller running in 32- or 64-bit mode)
  * @param: hdrc:  The number of program headers */
-/* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, struct elf64_phdr *hdrv, size_t hdrc) */
+/* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, struct elf64_phdr const *hdrv, size_t hdrc) */
 .section .text.x86.asm64_syscall.maplibrary
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_maplibrary)
 	.cfi_startproc simple
@@ -13358,7 +13395,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lock)
 	.cfi_endproc
 END(__x86_asm32_int80_lock)
 
-/* syscall_slong_t ioctl(fd_t fd, syscall_ulong_t request, void *arg) */
+/* syscall_slong_t ioctl(fd_t fd, syscall_ulong_t command, void *arg) */
 .section .text.x86.asm32_syscall_int80.ioctl
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_ioctl)
 	.cfi_startproc simple
@@ -13391,7 +13428,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ioctl)
 	.cfi_endproc
 END(__x86_asm32_int80_ioctl)
 
-/* syscall_slong_t fcntl(fd_t fd, syscall_ulong_t cmd, void *arg) */
+/* syscall_slong_t fcntl(fd_t fd, syscall_ulong_t command, void *arg) */
 .section .text.x86.asm32_syscall_int80.fcntl
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_fcntl)
 	.cfi_startproc simple
@@ -14081,6 +14118,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getrlimit)
 	.cfi_endproc
 END(__x86_asm32_int80_getrlimit)
 
+/* @param: who: One of `RUSAGE_SELF', `RUSAGE_CHILDREN' or `RUSAGE_THREAD' */
 /* errno_t getrusage(syscall_slong_t who, struct rusagex32 *tv) */
 .section .text.x86.asm32_syscall_int80.getrusage
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_getrusage)
@@ -14177,7 +14215,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_settimeofday)
 	.cfi_endproc
 END(__x86_asm32_int80_settimeofday)
 
-/* errno_t getgroups(size_t size, uint16_t[] list) */
+/* errno_t getgroups(size_t count, uint16_t[] list) */
 .section .text.x86.asm32_syscall_int80.getgroups
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_getgroups)
 	.cfi_startproc simple
@@ -14707,6 +14745,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fchown)
 	.cfi_endproc
 END(__x86_asm32_int80_fchown)
 
+/* @param: which: One of `PRIO_PROCESS', `PRIO_PGRP' or `PRIO_USER' */
 /* syscall_slong_t getpriority(syscall_ulong_t which, id_t who) */
 .section .text.x86.asm32_syscall_int80.getpriority
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_getpriority)
@@ -14739,6 +14778,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getpriority)
 	.cfi_endproc
 END(__x86_asm32_int80_getpriority)
 
+/* @param: which: One of `PRIO_PROCESS', `PRIO_PGRP' or `PRIO_USER' */
 /* errno_t setpriority(syscall_ulong_t which, id_t who, syscall_ulong_t value) */
 .section .text.x86.asm32_syscall_int80.setpriority
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_setpriority)
@@ -14904,7 +14944,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ioperm)
 	.cfi_endproc
 END(__x86_asm32_int80_ioperm)
 
-/* errno_t socketcall(int call, unsigned long *args) */
+/* errno_t socketcall(syscall_ulong_t call, syscall_ulong_t *args) */
 .section .text.x86.asm32_syscall_int80.socketcall
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_socketcall)
 	.cfi_startproc simple
@@ -14969,6 +15009,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_syslog)
 	.cfi_endproc
 END(__x86_asm32_int80_syslog)
 
+/* @param: which: One of `ITIMER_REAL', `ITIMER_VIRTUAL' or `ITIMER_PROF' */
 /* errno_t setitimer(syscall_ulong_t which, struct __itimervalx32 const *newval, struct __itimervalx32 *oldval) */
 .section .text.x86.asm32_syscall_int80.setitimer
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_setitimer)
@@ -15002,6 +15043,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setitimer)
 	.cfi_endproc
 END(__x86_asm32_int80_setitimer)
 
+/* @param: which: One of `ITIMER_REAL', `ITIMER_VIRTUAL' or `ITIMER_PROF' */
 /* errno_t getitimer(syscall_ulong_t which, struct __itimervalx32 *curr_value) */
 .section .text.x86.asm32_syscall_int80.getitimer
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_getitimer)
@@ -15283,7 +15325,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_vm86old)
 	.cfi_endproc
 END(__x86_asm32_int80_vm86old)
 
-/* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
+/* Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 /* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusagex32 *usage) */
 .section .text.x86.asm32_syscall_int80.wait4
@@ -16511,6 +16553,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_munlock)
 	.cfi_endproc
 END(__x86_asm32_int80_munlock)
 
+/* @param: flags: Set of `MCL_CURRENT | MCL_FUTURE | MCL_ONFAULT' */
 /* errno_t mlockall(syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.mlockall
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_mlockall)
@@ -16636,6 +16679,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_getparam)
 	.cfi_endproc
 END(__x86_asm32_int80_sched_getparam)
 
+/* @param: policy: One of `SCHED_OTHER', `SCHED_FIFO', `SCHED_RR', `SCHED_BATCH',
+ *                 `SCHED_IDLE', optionally or'd with `SCHED_RESET_ON_FORK' */
 /* errno_t sched_setscheduler(pid_t pid, syscall_ulong_t policy, struct sched_param const *param) */
 .section .text.x86.asm32_syscall_int80.sched_setscheduler
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_setscheduler)
@@ -17182,7 +17227,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_prctl)
 	.cfi_endproc
 END(__x86_asm32_int80_prctl)
 
-/* void rt_sigreturn(struct fpustate const *restore_fpu, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info *sc_info, struct ucpustate const *restore_cpu) */
+/* void rt_sigreturn(struct fpustate const *restore_fpu, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info const *sc_info, struct ucpustate const *restore_cpu) */
 .section .text.x86.asm32_syscall_int80.rt_sigreturn
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigreturn)
 	.cfi_startproc simple
@@ -17320,7 +17365,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigpending)
 	.cfi_endproc
 END(__x86_asm32_int80_rt_sigpending)
 
-/* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *set, struct __siginfox32_struct *info, struct timespecx32 const *timeout, size_t sigsetsize) */
+/* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *[tostr(out:STRUCT_SIGINFOX32)] set, struct __siginfox32_struct *info, struct timespecx32 const *timeout, size_t sigsetsize) */
 .section .text.x86.asm32_syscall_int80.rt_sigtimedwait
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigtimedwait)
 	.cfi_startproc simple
@@ -18234,7 +18279,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setregid32)
 	.cfi_endproc
 END(__x86_asm32_int80_setregid32)
 
-/* errno_t getgroups32(size_t size, uint32_t[] list) */
+/* errno_t getgroups32(size_t count, uint32_t[] list) */
 .section .text.x86.asm32_syscall_int80.getgroups32
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_getgroups32)
 	.cfi_startproc simple
@@ -18850,6 +18895,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readahead)
 	.cfi_endproc
 END(__x86_asm32_int80_readahead)
 
+/* @param: flags: One of `0', `XATTR_CREATE' or `XATTR_REPLACE' */
 /* errno_t setxattr(char const *path, char const *name, void const *buf, size_t bufsize, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.setxattr
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_setxattr)
@@ -18886,6 +18932,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setxattr)
 	.cfi_endproc
 END(__x86_asm32_int80_setxattr)
 
+/* @param: flags: One of `0', `XATTR_CREATE' or `XATTR_REPLACE' */
 /* errno_t lsetxattr(char const *path, char const *name, void const *buf, size_t bufsize, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.lsetxattr
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_lsetxattr)
@@ -18922,6 +18969,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lsetxattr)
 	.cfi_endproc
 END(__x86_asm32_int80_lsetxattr)
 
+/* @param: flags: One of `0', `XATTR_CREATE' or `XATTR_REPLACE' */
 /* errno_t fsetxattr(fd_t fd, char const *name, void const *buf, size_t bufsize, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.fsetxattr
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_fsetxattr)
@@ -19226,7 +19274,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lremovexattr)
 	.cfi_endproc
 END(__x86_asm32_int80_lremovexattr)
 
-/* errno_t fremovexattr(int fd, char const *name) */
+/* errno_t fremovexattr(fd_t fd, char const *name) */
 .section .text.x86.asm32_syscall_int80.fremovexattr
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_fremovexattr)
 	.cfi_startproc simple
@@ -19258,6 +19306,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fremovexattr)
 	.cfi_endproc
 END(__x86_asm32_int80_fremovexattr)
 
+/* @param: signo: One of `SIG*' */
 /* errno_t tkill(pid_t tid, syscall_ulong_t signo) */
 .section .text.x86.asm32_syscall_int80.tkill
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_tkill)
@@ -19325,6 +19374,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sendfile64)
 	.cfi_endproc
 END(__x86_asm32_int80_sendfile64)
 
+/* @param: futex_op: One of `FUTEX_*' from <linux/futex.h> */
 /* syscall_slong_t futex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct timespecx32 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) */
 .section .text.x86.asm32_syscall_int80.futex
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_futex)
@@ -19940,6 +19990,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_create)
 	.cfi_endproc
 END(__x86_asm32_int80_timer_create)
 
+/* @param: flags: Set of `0 | TIMER_ABSTIME' */
 /* errno_t timer_settime(timer_t timerid, syscall_ulong_t flags, struct itimerspecx32 const *value, struct itimerspecx32 *ovalue) */
 .section .text.x86.asm32_syscall_int80.timer_settime
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_settime)
@@ -20264,6 +20315,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fstatfs64)
 	.cfi_endproc
 END(__x86_asm32_int80_fstatfs64)
 
+/* @param: signo: One of `SIG*' */
 /* errno_t tgkill(pid_t tgid, pid_t tid, syscall_ulong_t signo) */
 .section .text.x86.asm32_syscall_int80.tgkill
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_tgkill)
@@ -20847,7 +20899,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_keyctl)
 	.cfi_endproc
 END(__x86_asm32_int80_keyctl)
 
-/* errno_t ioprio_set(syscall_ulong_t which, syscall_ulong_t who, syscall_ulong_t ioprio) */
+/* NOTE: Linux calls `who' `which', and `id' `who' (refactored to prevent confusion)
+ * @param: who: One of `IOPRIO_WHO_PROCESS', `IOPRIO_WHO_PGRP' or `IOPRIO_WHO_USER' */
+/* errno_t ioprio_set(syscall_ulong_t who, syscall_ulong_t id, syscall_ulong_t ioprio) */
 .section .text.x86.asm32_syscall_int80.ioprio_set
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_ioprio_set)
 	.cfi_startproc simple
@@ -20880,7 +20934,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ioprio_set)
 	.cfi_endproc
 END(__x86_asm32_int80_ioprio_set)
 
-/* errno_t ioprio_get(syscall_ulong_t which, syscall_ulong_t who) */
+/* NOTE: Linux calls `who' `which', and `id' `who' (refactored to prevent confusion)
+ * @param: who: One of `IOPRIO_WHO_PROCESS', `IOPRIO_WHO_PGRP' or `IOPRIO_WHO_USER' */
+/* syscall_slong_t ioprio_get(syscall_ulong_t who, syscall_ulong_t id) */
 .section .text.x86.asm32_syscall_int80.ioprio_get
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_ioprio_get)
 	.cfi_startproc simple
@@ -21659,6 +21715,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_get_robust_list)
 	.cfi_endproc
 END(__x86_asm32_int80_get_robust_list)
 
+/* @param: flags: Set of `SPLICE_F_MOVE | SPLICE_F_NONBLOCK | SPLICE_F_MORE | SPLICE_F_GIFT' */
 /* ssize_t splice(fd_t fdin, uint64_t *offin, fd_t fdout, uint64_t *offout, size_t length, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.splice
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_splice)
@@ -21696,6 +21753,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_splice)
 	.cfi_endproc
 END(__x86_asm32_int80_splice)
 
+/* @param: flags: Set of `SYNC_FILE_RANGE_WAIT_BEFORE | SYNC_FILE_RANGE_WRITE | SYNC_FILE_RANGE_WAIT_AFTER' */
 /* errno_t sync_file_range(fd_t fd, uint64_t offset, uint64_t count, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.sync_file_range
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_sync_file_range)
@@ -21737,6 +21795,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sync_file_range)
 	.cfi_endproc
 END(__x86_asm32_int80_sync_file_range)
 
+/* @param: flags: Set of `SPLICE_F_MOVE | SPLICE_F_NONBLOCK | SPLICE_F_MORE | SPLICE_F_GIFT' */
 /* ssize_t tee(fd_t fdin, fd_t fdout, size_t length, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.tee
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_tee)
@@ -21772,6 +21831,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_tee)
 	.cfi_endproc
 END(__x86_asm32_int80_tee)
 
+/* @param: flags: Set of `SPLICE_F_MOVE | SPLICE_F_NONBLOCK | SPLICE_F_MORE | SPLICE_F_GIFT' */
 /* ssize_t vmsplice(fd_t fdout, struct iovecx32 const *iov, size_t count, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.vmsplice
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_vmsplice)
@@ -21976,7 +22036,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_signalfd)
 	.cfi_endproc
 END(__x86_asm32_int80_signalfd)
 
-/* Return file descriptor for new interval timer source */
+/* Return file descriptor for new interval timer source
+ * @param: flags: Set of `0 | TFD_NONBLOCK | TFD_CLOEXEC | TFD_CLOFORK' */
 /* fd_t timerfd_create(clockid_t clock_id, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.timerfd_create
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_timerfd_create)
@@ -22040,6 +22101,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_eventfd)
 	.cfi_endproc
 END(__x86_asm32_int80_eventfd)
 
+/* @param: mode: Set of `0 | FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE | FALLOC_FL_COLLAPSE_RANGE | FALLOC_FL_ZERO_RANGE' */
 /* errno_t fallocate(fd_t fd, syscall_ulong_t mode, syscall_ulong_t offset, syscall_ulong_t length) */
 .section .text.x86.asm32_syscall_int80.fallocate
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_fallocate)
@@ -22075,10 +22137,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fallocate)
 	.cfi_endproc
 END(__x86_asm32_int80_fallocate)
 
-/* Set next expiration time of interval timer source UFD to UTMR.
- * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout value
- * is absolute. Optionally return the old expiration time in OTMR */
-/* errno_t timerfd_settime(fd_t ufd, syscall_ulong_t flags, struct itimerspecx32 const *utmr, struct itimerspecx32 *otmr) */
+/* Set next expiration time of interval timer source `timerfd' to `utmr'.
+ * If `flags' has the `TFD_TIMER_ABSTIME' flag set the timeout value
+ * is absolute. Optionally return the old expiration time in `otmr''
+ * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
+/* errno_t timerfd_settime(fd_t timerfd, syscall_ulong_t flags, struct itimerspecx32 const *utmr, struct itimerspecx32 *otmr) */
 .section .text.x86.asm32_syscall_int80.timerfd_settime
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_timerfd_settime)
 	.cfi_startproc simple
@@ -22114,7 +22177,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timerfd_settime)
 END(__x86_asm32_int80_timerfd_settime)
 
 /* Return the next expiration time of UFD */
-/* errno_t timerfd_gettime(fd_t ufd, struct itimerspecx32 *otmr) */
+/* errno_t timerfd_gettime(fd_t timerfd, struct itimerspecx32 *otmr) */
 .section .text.x86.asm32_syscall_int80.timerfd_gettime
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_timerfd_gettime)
 	.cfi_startproc simple
@@ -22486,7 +22549,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_perf_event_open)
 	.cfi_endproc
 END(__x86_asm32_int80_perf_event_open)
 
-/* ssize_t recvmmsg(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t flags, struct timespecx32 const *tmo) */
+/* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+ *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+/* ssize_t recvmmsg(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx32 const *tmo) */
 .section .text.x86.asm32_syscall_int80.recvmmsg
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_recvmmsg)
 	.cfi_startproc simple
@@ -22620,7 +22686,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_prlimit64)
 	.cfi_endproc
 END(__x86_asm32_int80_prlimit64)
 
-/* errno_t name_to_handle_at(fd_t dirfd, char const *filename, struct file_handle *handle, int32_t *mnt_id, syscall_ulong_t flags) */
+/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_FOLLOW | AT_DOSPATH' */
+/* errno_t name_to_handle_at(fd_t dirfd, char const *filename, struct file_handle *handle, int32_t *mnt_id, atflag_t flags) */
 .section .text.x86.asm32_syscall_int80.name_to_handle_at
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_name_to_handle_at)
 	.cfi_startproc simple
@@ -22656,7 +22723,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_name_to_handle_at)
 	.cfi_endproc
 END(__x86_asm32_int80_name_to_handle_at)
 
-/* fd_t open_by_handle_at(fd_t mountdirfd, struct file_handle *handle, syscall_ulong_t flags) */
+/* fd_t open_by_handle_at(fd_t mountdirfd, struct file_handle const *handle, oflag_t flags) */
 .section .text.x86.asm32_syscall_int80.open_by_handle_at
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_open_by_handle_at)
 	.cfi_startproc simple
@@ -22751,7 +22818,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_syncfs)
 	.cfi_endproc
 END(__x86_asm32_int80_syncfs)
 
-/* ssize_t sendmmsg(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t flags) */
+/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* ssize_t sendmmsg(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags) */
 .section .text.x86.asm32_syscall_int80.sendmmsg
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_sendmmsg)
 	.cfi_startproc simple
@@ -22818,6 +22887,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setns)
 	.cfi_endproc
 END(__x86_asm32_int80_setns)
 
+/* @param: flags: Must be `0' */
 /* ssize_t process_vm_readv(pid_t pid, struct iovecx32 const *local_iov, size_t liovcnt, struct iovecx32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.process_vm_readv
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_process_vm_readv)
@@ -22855,6 +22925,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_process_vm_readv)
 	.cfi_endproc
 END(__x86_asm32_int80_process_vm_readv)
 
+/* @param: flags: Must be `0' */
 /* ssize_t process_vm_writev(pid_t pid, struct iovecx32 const *local_iov, size_t liovcnt, struct iovecx32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.process_vm_writev
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_process_vm_writev)
@@ -22892,6 +22963,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_process_vm_writev)
 	.cfi_endproc
 END(__x86_asm32_int80_process_vm_writev)
 
+/* @param: type: One of `KCMP_FILE', `KCMP_FILES', `KCMP_FS', `KCMP_IO',
+ *               `KCMP_SIGHAND', `KCMP_SYSVSEM', `KCMP_VM', `KCMP_EPOLL_TFD' */
 /* syscall_slong_t kcmp(pid_t pid1, pid_t pid2, syscall_ulong_t type, syscall_ulong_t idx1, syscall_ulong_t idx2) */
 .section .text.x86.asm32_syscall_int80.kcmp
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_kcmp)
@@ -23089,6 +23162,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_seccomp)
 	.cfi_endproc
 END(__x86_asm32_int80_seccomp)
 
+/* @param: flags: Set of `0 | GRND_RANDOM | GRND_NONBLOCK' */
 /* ssize_t getrandom(void *buf, size_t num_bytes, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.getrandom
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_getrandom)
@@ -23858,7 +23932,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mlock2)
 	.cfi_endproc
 END(__x86_asm32_int80_mlock2)
 
-/* ssize_t recvmmsg64(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t flags, struct timespecx32_64 const *tmo) */
+/* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+ *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+/* ssize_t recvmmsg64(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx32_64 const *tmo) */
 .section .text.x86.asm32_syscall_int80.recvmmsg64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_recvmmsg64)
 	.cfi_startproc simple
@@ -23973,7 +24050,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_preadvf)
 END(__x86_asm32_int80_preadvf)
 
 /* Return the next expiration time of UFD */
-/* errno_t timerfd_gettime64(fd_t ufd, struct itimerspecx32_64 *otmr) */
+/* errno_t timerfd_gettime64(fd_t timerfd, struct itimerspecx32_64 *otmr) */
 .section .text.x86.asm32_syscall_int80.timerfd_gettime64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_timerfd_gettime64)
 	.cfi_startproc simple
@@ -24005,10 +24082,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timerfd_gettime64)
 	.cfi_endproc
 END(__x86_asm32_int80_timerfd_gettime64)
 
-/* Set next expiration time of interval timer source UFD to UTMR.
- * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout value
- * is absolute. Optionally return the old expiration time in OTMR */
-/* errno_t timerfd_settime64(fd_t ufd, syscall_ulong_t flags, struct itimerspecx32_64 const *utmr, struct itimerspecx32_64 *otmr) */
+/* Set next expiration time of interval timer source `timerfd' to `utmr'.
+ * If `flags' has the `TFD_TIMER_ABSTIME' flag set the timeout value
+ * is absolute. Optionally return the old expiration time in `otmr''
+ * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
+/* errno_t timerfd_settime64(fd_t timerfd, syscall_ulong_t flags, struct itimerspecx32_64 const *utmr, struct itimerspecx32_64 *otmr) */
 .section .text.x86.asm32_syscall_int80.timerfd_settime64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_timerfd_settime64)
 	.cfi_startproc simple
@@ -24750,6 +24828,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_gettime64)
 	.cfi_endproc
 END(__x86_asm32_int80_timer_gettime64)
 
+/* @param: flags: Set of `0 | TIMER_ABSTIME' */
 /* errno_t timer_settime64(timer_t timerid, syscall_ulong_t flags, struct itimerspecx32_64 const *value, struct itimerspecx32_64 *ovalue) */
 .section .text.x86.asm32_syscall_int80.timer_settime64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_settime64)
@@ -25265,7 +25344,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kreaddir)
 	.cfi_endproc
 END(__x86_asm32_int80_kreaddir)
 
-/* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
+/* Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 /* pid_t wait4_64(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusagex32_64 *usage) */
 .section .text.x86.asm32_syscall_int80.wait4_64
@@ -25302,6 +25381,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_wait4_64)
 	.cfi_endproc
 END(__x86_asm32_int80_wait4_64)
 
+/* @param: which: One of `ITIMER_REAL', `ITIMER_VIRTUAL' or `ITIMER_PROF' */
 /* errno_t getitimer64(syscall_ulong_t which, struct __itimervalx32_64 *curr_value) */
 .section .text.x86.asm32_syscall_int80.getitimer64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_getitimer64)
@@ -25334,6 +25414,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getitimer64)
 	.cfi_endproc
 END(__x86_asm32_int80_getitimer64)
 
+/* @param: which: One of `ITIMER_REAL', `ITIMER_VIRTUAL' or `ITIMER_PROF' */
 /* errno_t setitimer64(syscall_ulong_t which, struct __itimervalx32_64 const *newval, struct __itimervalx32_64 *oldval) */
 .section .text.x86.asm32_syscall_int80.setitimer64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_setitimer64)
@@ -25377,7 +25458,7 @@ END(__x86_asm32_int80_setitimer64)
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
  *                (depending on the caller running in 32- or 64-bit mode)
  * @param: hdrc:  The number of program headers */
-/* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, struct elf32_phdr *hdrv, size_t hdrc) */
+/* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, struct elf32_phdr const *hdrv, size_t hdrc) */
 .section .text.x86.asm32_syscall_int80.maplibrary
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_maplibrary)
 	.cfi_startproc simple
@@ -25513,6 +25594,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_gettimeofday64)
 	.cfi_endproc
 END(__x86_asm32_int80_gettimeofday64)
 
+/* @param: who: One of `RUSAGE_SELF', `RUSAGE_CHILDREN' or `RUSAGE_THREAD' */
 /* errno_t getrusage64(syscall_slong_t who, struct rusagex32_64 *tv) */
 .section .text.x86.asm32_syscall_int80.getrusage64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_getrusage64)
@@ -27050,10 +27132,10 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_umount2, __x86_asm32_int80_umount2
 /* errno_t lock(void) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_lock, __x86_asm32_int80_lock)
 
-/* syscall_slong_t ioctl(fd_t fd, syscall_ulong_t request, void *arg) */
+/* syscall_slong_t ioctl(fd_t fd, syscall_ulong_t command, void *arg) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_ioctl, __x86_asm32_int80_ioctl)
 
-/* syscall_slong_t fcntl(fd_t fd, syscall_ulong_t cmd, void *arg) */
+/* syscall_slong_t fcntl(fd_t fd, syscall_ulong_t command, void *arg) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fcntl, __x86_asm32_int80_fcntl)
 
 /* errno_t mpx(void) */
@@ -27121,6 +27203,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_setrlimit, __x86_asm32_int80_setrl
 /* errno_t getrlimit(syscall_ulong_t resource, struct rlimit *rlimits) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getrlimit, __x86_asm32_int80_getrlimit)
 
+/* @param: who: One of `RUSAGE_SELF', `RUSAGE_CHILDREN' or `RUSAGE_THREAD' */
 /* errno_t getrusage(syscall_slong_t who, struct rusagex32 *tv) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getrusage, __x86_asm32_int80_getrusage)
 
@@ -27130,7 +27213,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_gettimeofday, __x86_asm32_int80_ge
 /* errno_t settimeofday(struct timevalx32 const *tv, struct timezone const *tz) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_settimeofday, __x86_asm32_int80_settimeofday)
 
-/* errno_t getgroups(size_t size, uint16_t[] list) */
+/* errno_t getgroups(size_t count, uint16_t[] list) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getgroups, __x86_asm32_int80_getgroups)
 
 /* errno_t setgroups(size_t count, uint16_t const *groups) */
@@ -27255,9 +27338,11 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fchmod, __x86_asm32_int80_fchmod)
 /* errno_t fchown(fd_t fd, uint16_t owner, uint16_t group) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fchown, __x86_asm32_int80_fchown)
 
+/* @param: which: One of `PRIO_PROCESS', `PRIO_PGRP' or `PRIO_USER' */
 /* syscall_slong_t getpriority(syscall_ulong_t which, id_t who) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getpriority, __x86_asm32_int80_getpriority)
 
+/* @param: which: One of `PRIO_PROCESS', `PRIO_PGRP' or `PRIO_USER' */
 /* errno_t setpriority(syscall_ulong_t which, id_t who, syscall_ulong_t value) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_setpriority, __x86_asm32_int80_setpriority)
 
@@ -27273,15 +27358,17 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fstatfs, __x86_asm32_int80_fstatfs
 /* errno_t ioperm(syscall_ulong_t from, syscall_ulong_t num, syscall_ulong_t turn_on) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_ioperm, __x86_asm32_int80_ioperm)
 
-/* errno_t socketcall(int call, unsigned long *args) */
+/* errno_t socketcall(syscall_ulong_t call, syscall_ulong_t *args) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_socketcall, __x86_asm32_int80_socketcall)
 
 /* ssize_t syslog(syscall_ulong_t level, char const *str, size_t len) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_syslog, __x86_asm32_int80_syslog)
 
+/* @param: which: One of `ITIMER_REAL', `ITIMER_VIRTUAL' or `ITIMER_PROF' */
 /* errno_t setitimer(syscall_ulong_t which, struct __itimervalx32 const *newval, struct __itimervalx32 *oldval) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_setitimer, __x86_asm32_int80_setitimer)
 
+/* @param: which: One of `ITIMER_REAL', `ITIMER_VIRTUAL' or `ITIMER_PROF' */
 /* errno_t getitimer(syscall_ulong_t which, struct __itimervalx32 *curr_value) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getitimer, __x86_asm32_int80_getitimer)
 
@@ -27309,7 +27396,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_idle, __x86_asm32_int80_idle)
 /* errno_t vm86old(int TODO_PROTOTYPE) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_vm86old, __x86_asm32_int80_vm86old)
 
-/* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
+/* Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 /* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusagex32 *usage) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_wait4, __x86_asm32_int80_wait4)
@@ -27538,6 +27625,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_mlock, __x86_asm32_int80_mlock)
 /* errno_t munlock(void const *addr, size_t len) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_munlock, __x86_asm32_int80_munlock)
 
+/* @param: flags: Set of `MCL_CURRENT | MCL_FUTURE | MCL_ONFAULT' */
 /* errno_t mlockall(syscall_ulong_t flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_mlockall, __x86_asm32_int80_mlockall)
 
@@ -27550,6 +27638,8 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_sched_setparam, __x86_asm32_int80_
 /* errno_t sched_getparam(pid_t pid, struct sched_param *param) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_sched_getparam, __x86_asm32_int80_sched_getparam)
 
+/* @param: policy: One of `SCHED_OTHER', `SCHED_FIFO', `SCHED_RR', `SCHED_BATCH',
+ *                 `SCHED_IDLE', optionally or'd with `SCHED_RESET_ON_FORK' */
 /* errno_t sched_setscheduler(pid_t pid, syscall_ulong_t policy, struct sched_param const *param) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_sched_setscheduler, __x86_asm32_int80_sched_setscheduler)
 
@@ -27636,7 +27726,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getresgid, __x86_asm32_int80_getre
 /* errno_t prctl(int TODO_PROTOTYPE) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_prctl, __x86_asm32_int80_prctl)
 
-/* void rt_sigreturn(struct fpustate const *restore_fpu, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info *sc_info, struct ucpustate const *restore_cpu) */
+/* void rt_sigreturn(struct fpustate const *restore_fpu, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info const *sc_info, struct ucpustate const *restore_cpu) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rt_sigreturn, __x86_asm32_int80_rt_sigreturn)
 
 /* errno_t rt_sigaction(syscall_ulong_t signo, struct sigactionx32 const *act, struct sigactionx32 *oact, size_t sigsetsize) */
@@ -27649,7 +27739,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rt_sigprocmask, __x86_asm32_int80_
 /* errno_t rt_sigpending(struct __sigset_struct *set, size_t sigsetsize) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rt_sigpending, __x86_asm32_int80_rt_sigpending)
 
-/* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *set, struct __siginfox32_struct *info, struct timespecx32 const *timeout, size_t sigsetsize) */
+/* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *[tostr(out:STRUCT_SIGINFOX32)] set, struct __siginfox32_struct *info, struct timespecx32 const *timeout, size_t sigsetsize) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rt_sigtimedwait, __x86_asm32_int80_rt_sigtimedwait)
 
 /* @param: signo: One of `SIG*' */
@@ -27841,7 +27931,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_setreuid32, __x86_asm32_int80_setr
 /* errno_t setregid32(uint32_t rgid, uint32_t egid) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_setregid32, __x86_asm32_int80_setregid32)
 
-/* errno_t getgroups32(size_t size, uint32_t[] list) */
+/* errno_t getgroups32(size_t count, uint32_t[] list) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getgroups32, __x86_asm32_int80_getgroups32)
 
 /* errno_t setgroups32(size_t count, uint32_t const *groups) */
@@ -27898,6 +27988,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_gettid, __x86_asm32_int80_gettid)
 /* ssize_t readahead(fd_t fd, uint64_t offset, size_t count) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_readahead, __x86_asm32_int80_readahead)
 
+/* @param: flags: One of `0', `XATTR_CREATE' or `XATTR_REPLACE' */
 /* errno_t setxattr(char const *path, char const *name, void const *buf, size_t bufsize, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysenter.setxattr
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setxattr)
@@ -27935,6 +28026,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setxattr)
 	.cfi_endproc
 END(__x86_asm32_sysenter_setxattr)
 
+/* @param: flags: One of `0', `XATTR_CREATE' or `XATTR_REPLACE' */
 /* errno_t lsetxattr(char const *path, char const *name, void const *buf, size_t bufsize, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysenter.lsetxattr
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lsetxattr)
@@ -27972,6 +28064,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lsetxattr)
 	.cfi_endproc
 END(__x86_asm32_sysenter_lsetxattr)
 
+/* @param: flags: One of `0', `XATTR_CREATE' or `XATTR_REPLACE' */
 /* errno_t fsetxattr(fd_t fd, char const *name, void const *buf, size_t bufsize, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysenter.fsetxattr
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fsetxattr)
@@ -28033,15 +28126,17 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_removexattr, __x86_asm32_int80_rem
 /* errno_t lremovexattr(char const *path, char const *name) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_lremovexattr, __x86_asm32_int80_lremovexattr)
 
-/* errno_t fremovexattr(int fd, char const *name) */
+/* errno_t fremovexattr(fd_t fd, char const *name) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fremovexattr, __x86_asm32_int80_fremovexattr)
 
+/* @param: signo: One of `SIG*' */
 /* errno_t tkill(pid_t tid, syscall_ulong_t signo) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_tkill, __x86_asm32_int80_tkill)
 
 /* ssize_t sendfile64(fd_t out_fd, fd_t in_fd, __ULONG64_TYPE__ *pin_offset, size_t num_bytes) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_sendfile64, __x86_asm32_int80_sendfile64)
 
+/* @param: futex_op: One of `FUTEX_*' from <linux/futex.h> */
 /* syscall_slong_t futex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct timespecx32 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) */
 .section .text.x86.asm32_syscall_sysenter.futex
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_futex)
@@ -28169,6 +28264,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_set_tid_address, __x86_asm32_int80
 /* errno_t timer_create(clockid_t clock_id, struct sigevent *evp, timer_t *timerid) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_timer_create, __x86_asm32_int80_timer_create)
 
+/* @param: flags: Set of `0 | TIMER_ABSTIME' */
 /* errno_t timer_settime(timer_t timerid, syscall_ulong_t flags, struct itimerspecx32 const *value, struct itimerspecx32 *ovalue) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_timer_settime, __x86_asm32_int80_timer_settime)
 
@@ -28199,6 +28295,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_statfs64, __x86_asm32_int80_statfs
 /* errno_t fstatfs64(fd_t file, struct __statfsx32_64 *buf) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fstatfs64, __x86_asm32_int80_fstatfs64)
 
+/* @param: signo: One of `SIG*' */
 /* errno_t tgkill(pid_t tgid, pid_t tid, syscall_ulong_t signo) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_tgkill, __x86_asm32_int80_tgkill)
 
@@ -28357,10 +28454,14 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_request_key, __x86_asm32_int80_req
 /* errno_t keyctl(int TODO_PROTOTYPE) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_keyctl, __x86_asm32_int80_keyctl)
 
-/* errno_t ioprio_set(syscall_ulong_t which, syscall_ulong_t who, syscall_ulong_t ioprio) */
+/* NOTE: Linux calls `who' `which', and `id' `who' (refactored to prevent confusion)
+ * @param: who: One of `IOPRIO_WHO_PROCESS', `IOPRIO_WHO_PGRP' or `IOPRIO_WHO_USER' */
+/* errno_t ioprio_set(syscall_ulong_t who, syscall_ulong_t id, syscall_ulong_t ioprio) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_ioprio_set, __x86_asm32_int80_ioprio_set)
 
-/* errno_t ioprio_get(syscall_ulong_t which, syscall_ulong_t who) */
+/* NOTE: Linux calls `who' `which', and `id' `who' (refactored to prevent confusion)
+ * @param: who: One of `IOPRIO_WHO_PROCESS', `IOPRIO_WHO_PGRP' or `IOPRIO_WHO_USER' */
+/* syscall_slong_t ioprio_get(syscall_ulong_t who, syscall_ulong_t id) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_ioprio_get, __x86_asm32_int80_ioprio_get)
 
 /* errno_t inotify_init(int TODO_PROTOTYPE) */
@@ -28574,6 +28675,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_set_robust_list, __x86_asm32_int80
 /* errno_t get_robust_list(int TODO_PROTOTYPE) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_get_robust_list, __x86_asm32_int80_get_robust_list)
 
+/* @param: flags: Set of `SPLICE_F_MOVE | SPLICE_F_NONBLOCK | SPLICE_F_MORE | SPLICE_F_GIFT' */
 /* ssize_t splice(fd_t fdin, uint64_t *offin, fd_t fdout, uint64_t *offout, size_t length, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysenter.splice
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_splice)
@@ -28612,6 +28714,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_splice)
 	.cfi_endproc
 END(__x86_asm32_sysenter_splice)
 
+/* @param: flags: Set of `SYNC_FILE_RANGE_WAIT_BEFORE | SYNC_FILE_RANGE_WRITE | SYNC_FILE_RANGE_WAIT_AFTER' */
 /* errno_t sync_file_range(fd_t fd, uint64_t offset, uint64_t count, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysenter.sync_file_range
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sync_file_range)
@@ -28654,9 +28757,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sync_file_range)
 	.cfi_endproc
 END(__x86_asm32_sysenter_sync_file_range)
 
+/* @param: flags: Set of `SPLICE_F_MOVE | SPLICE_F_NONBLOCK | SPLICE_F_MORE | SPLICE_F_GIFT' */
 /* ssize_t tee(fd_t fdin, fd_t fdout, size_t length, syscall_ulong_t flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_tee, __x86_asm32_int80_tee)
 
+/* @param: flags: Set of `SPLICE_F_MOVE | SPLICE_F_NONBLOCK | SPLICE_F_MORE | SPLICE_F_GIFT' */
 /* ssize_t vmsplice(fd_t fdout, struct iovecx32 const *iov, size_t count, syscall_ulong_t flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_vmsplice, __x86_asm32_int80_vmsplice)
 
@@ -28710,24 +28815,27 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_utimensat, __x86_asm32_int80_utime
 /* errno_t signalfd(fd_t fd, struct __sigset_struct const *sigmask, size_t sigsetsize) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_signalfd, __x86_asm32_int80_signalfd)
 
-/* Return file descriptor for new interval timer source */
+/* Return file descriptor for new interval timer source
+ * @param: flags: Set of `0 | TFD_NONBLOCK | TFD_CLOEXEC | TFD_CLOFORK' */
 /* fd_t timerfd_create(clockid_t clock_id, syscall_ulong_t flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_timerfd_create, __x86_asm32_int80_timerfd_create)
 
 /* fd_t eventfd(syscall_ulong_t initval) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_eventfd, __x86_asm32_int80_eventfd)
 
+/* @param: mode: Set of `0 | FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE | FALLOC_FL_COLLAPSE_RANGE | FALLOC_FL_ZERO_RANGE' */
 /* errno_t fallocate(fd_t fd, syscall_ulong_t mode, syscall_ulong_t offset, syscall_ulong_t length) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fallocate, __x86_asm32_int80_fallocate)
 
-/* Set next expiration time of interval timer source UFD to UTMR.
- * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout value
- * is absolute. Optionally return the old expiration time in OTMR */
-/* errno_t timerfd_settime(fd_t ufd, syscall_ulong_t flags, struct itimerspecx32 const *utmr, struct itimerspecx32 *otmr) */
+/* Set next expiration time of interval timer source `timerfd' to `utmr'.
+ * If `flags' has the `TFD_TIMER_ABSTIME' flag set the timeout value
+ * is absolute. Optionally return the old expiration time in `otmr''
+ * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
+/* errno_t timerfd_settime(fd_t timerfd, syscall_ulong_t flags, struct itimerspecx32 const *utmr, struct itimerspecx32 *otmr) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_timerfd_settime, __x86_asm32_int80_timerfd_settime)
 
 /* Return the next expiration time of UFD */
-/* errno_t timerfd_gettime(fd_t ufd, struct itimerspecx32 *otmr) */
+/* errno_t timerfd_gettime(fd_t timerfd, struct itimerspecx32 *otmr) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_timerfd_gettime, __x86_asm32_int80_timerfd_gettime)
 
 /* @param: flags: Set of `SFD_NONBLOCK | SFD_CLOEXEC' */
@@ -28836,7 +28944,10 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rt_tgsigqueueinfo, __x86_asm32_int
 /* errno_t perf_event_open(int TODO_PROTOTYPE) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_perf_event_open, __x86_asm32_int80_perf_event_open)
 
-/* ssize_t recvmmsg(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t flags, struct timespecx32 const *tmo) */
+/* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+ *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+/* ssize_t recvmmsg(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx32 const *tmo) */
 .section .text.x86.asm32_syscall_sysenter.recvmmsg
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_recvmmsg)
 	.cfi_startproc simple
@@ -28883,7 +28994,8 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fanotify_mark, __x86_asm32_int80_f
 /* errno_t prlimit64(pid_t pid, syscall_ulong_t resource, struct rlimit64 const *new_limit, struct rlimit64 *old_limit) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_prlimit64, __x86_asm32_int80_prlimit64)
 
-/* errno_t name_to_handle_at(fd_t dirfd, char const *filename, struct file_handle *handle, int32_t *mnt_id, syscall_ulong_t flags) */
+/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_FOLLOW | AT_DOSPATH' */
+/* errno_t name_to_handle_at(fd_t dirfd, char const *filename, struct file_handle *handle, int32_t *mnt_id, atflag_t flags) */
 .section .text.x86.asm32_syscall_sysenter.name_to_handle_at
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_name_to_handle_at)
 	.cfi_startproc simple
@@ -28920,7 +29032,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_name_to_handle_at)
 	.cfi_endproc
 END(__x86_asm32_sysenter_name_to_handle_at)
 
-/* fd_t open_by_handle_at(fd_t mountdirfd, struct file_handle *handle, syscall_ulong_t flags) */
+/* fd_t open_by_handle_at(fd_t mountdirfd, struct file_handle const *handle, oflag_t flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_open_by_handle_at, __x86_asm32_int80_open_by_handle_at)
 
 /* errno_t clock_adjtime(int TODO_PROTOTYPE) */
@@ -28929,12 +29041,15 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_clock_adjtime, __x86_asm32_int80_c
 /* errno_t syncfs(fd_t fd) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_syncfs, __x86_asm32_int80_syncfs)
 
-/* ssize_t sendmmsg(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t flags) */
+/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* ssize_t sendmmsg(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_sendmmsg, __x86_asm32_int80_sendmmsg)
 
 /* errno_t setns(fd_t fd, syscall_ulong_t nstype) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_setns, __x86_asm32_int80_setns)
 
+/* @param: flags: Must be `0' */
 /* ssize_t process_vm_readv(pid_t pid, struct iovecx32 const *local_iov, size_t liovcnt, struct iovecx32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysenter.process_vm_readv
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_process_vm_readv)
@@ -28973,6 +29088,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_process_vm_readv)
 	.cfi_endproc
 END(__x86_asm32_sysenter_process_vm_readv)
 
+/* @param: flags: Must be `0' */
 /* ssize_t process_vm_writev(pid_t pid, struct iovecx32 const *local_iov, size_t liovcnt, struct iovecx32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysenter.process_vm_writev
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_process_vm_writev)
@@ -29011,6 +29127,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_process_vm_writev)
 	.cfi_endproc
 END(__x86_asm32_sysenter_process_vm_writev)
 
+/* @param: type: One of `KCMP_FILE', `KCMP_FILES', `KCMP_FS', `KCMP_IO',
+ *               `KCMP_SIGHAND', `KCMP_SYSVSEM', `KCMP_VM', `KCMP_EPOLL_TFD' */
 /* syscall_slong_t kcmp(pid_t pid1, pid_t pid2, syscall_ulong_t type, syscall_ulong_t idx1, syscall_ulong_t idx2) */
 .section .text.x86.asm32_syscall_sysenter.kcmp
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_kcmp)
@@ -29098,6 +29216,7 @@ END(__x86_asm32_sysenter_renameat2)
 /* errno_t seccomp(int TODO_PROTOTYPE) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_seccomp, __x86_asm32_int80_seccomp)
 
+/* @param: flags: Set of `0 | GRND_RANDOM | GRND_NONBLOCK' */
 /* ssize_t getrandom(void *buf, size_t num_bytes, syscall_ulong_t flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getrandom, __x86_asm32_int80_getrandom)
 
@@ -29369,7 +29488,10 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_membarrier, __x86_asm32_int80_memb
 /* errno_t mlock2(int TODO_PROTOTYPE) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_mlock2, __x86_asm32_int80_mlock2)
 
-/* ssize_t recvmmsg64(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t flags, struct timespecx32_64 const *tmo) */
+/* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+ *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+/* ssize_t recvmmsg64(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx32_64 const *tmo) */
 .section .text.x86.asm32_syscall_sysenter.recvmmsg64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_recvmmsg64)
 	.cfi_startproc simple
@@ -29487,13 +29609,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_preadvf)
 END(__x86_asm32_sysenter_preadvf)
 
 /* Return the next expiration time of UFD */
-/* errno_t timerfd_gettime64(fd_t ufd, struct itimerspecx32_64 *otmr) */
+/* errno_t timerfd_gettime64(fd_t timerfd, struct itimerspecx32_64 *otmr) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_timerfd_gettime64, __x86_asm32_int80_timerfd_gettime64)
 
-/* Set next expiration time of interval timer source UFD to UTMR.
- * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout value
- * is absolute. Optionally return the old expiration time in OTMR */
-/* errno_t timerfd_settime64(fd_t ufd, syscall_ulong_t flags, struct itimerspecx32_64 const *utmr, struct itimerspecx32_64 *otmr) */
+/* Set next expiration time of interval timer source `timerfd' to `utmr'.
+ * If `flags' has the `TFD_TIMER_ABSTIME' flag set the timeout value
+ * is absolute. Optionally return the old expiration time in `otmr''
+ * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
+/* errno_t timerfd_settime64(fd_t timerfd, syscall_ulong_t flags, struct itimerspecx32_64 const *utmr, struct itimerspecx32_64 *otmr) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_timerfd_settime64, __x86_asm32_int80_timerfd_settime64)
 
 /* errno_t fallocate64(fd_t fd, syscall_ulong_t mode, uint64_t offset, uint64_t length) */
@@ -29877,6 +30000,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_clock_settime64, __x86_asm32_int80
 /* errno_t timer_gettime64(timer_t timerid, struct itimerspecx32_64 *value) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_timer_gettime64, __x86_asm32_int80_timer_gettime64)
 
+/* @param: flags: Set of `0 | TIMER_ABSTIME' */
 /* errno_t timer_settime64(timer_t timerid, syscall_ulong_t flags, struct itimerspecx32_64 const *value, struct itimerspecx32_64 *ovalue) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_timer_settime64, __x86_asm32_int80_timer_settime64)
 
@@ -30034,14 +30158,16 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_readvf, __x86_asm32_int80_readvf)
 /* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_kreaddir, __x86_asm32_int80_kreaddir)
 
-/* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
+/* Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 /* pid_t wait4_64(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusagex32_64 *usage) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_wait4_64, __x86_asm32_int80_wait4_64)
 
+/* @param: which: One of `ITIMER_REAL', `ITIMER_VIRTUAL' or `ITIMER_PROF' */
 /* errno_t getitimer64(syscall_ulong_t which, struct __itimervalx32_64 *curr_value) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getitimer64, __x86_asm32_int80_getitimer64)
 
+/* @param: which: One of `ITIMER_REAL', `ITIMER_VIRTUAL' or `ITIMER_PROF' */
 /* errno_t setitimer64(syscall_ulong_t which, struct __itimervalx32_64 const *newval, struct __itimervalx32_64 *oldval) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_setitimer64, __x86_asm32_int80_setitimer64)
 
@@ -30055,7 +30181,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_setitimer64, __x86_asm32_int80_set
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
  *                (depending on the caller running in 32- or 64-bit mode)
  * @param: hdrc:  The number of program headers */
-/* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, struct elf32_phdr *hdrv, size_t hdrc) */
+/* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, struct elf32_phdr const *hdrv, size_t hdrc) */
 .section .text.x86.asm32_syscall_sysenter.maplibrary
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_maplibrary)
 	.cfi_startproc simple
@@ -30135,6 +30261,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_settimeofday64, __x86_asm32_int80_
 /* errno_t gettimeofday64(struct timevalx32_64 *tv, struct timezone *tz) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_gettimeofday64, __x86_asm32_int80_gettimeofday64)
 
+/* @param: who: One of `RUSAGE_SELF', `RUSAGE_CHILDREN' or `RUSAGE_THREAD' */
 /* errno_t getrusage64(syscall_slong_t who, struct rusagex32_64 *tv) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getrusage64, __x86_asm32_int80_getrusage64)
 
@@ -31233,7 +31360,7 @@ END(__x86_asm32_sysrun32_umount2)
 /* errno_t lock(void) */
 /* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_lock, sys32_lock); */
 
-/* syscall_slong_t ioctl(fd_t fd, syscall_ulong_t request, void *arg) */
+/* syscall_slong_t ioctl(fd_t fd, syscall_ulong_t command, void *arg) */
 .section .text.x86.asm32_syscall_sysrun32.ioctl
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ioctl)
 	.cfi_startproc
@@ -31245,7 +31372,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ioctl)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_ioctl)
 
-/* syscall_slong_t fcntl(fd_t fd, syscall_ulong_t cmd, void *arg) */
+/* syscall_slong_t fcntl(fd_t fd, syscall_ulong_t command, void *arg) */
 .section .text.x86.asm32_syscall_sysrun32.fcntl
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fcntl)
 	.cfi_startproc
@@ -31437,6 +31564,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getrlimit)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_getrlimit)
 
+/* @param: who: One of `RUSAGE_SELF', `RUSAGE_CHILDREN' or `RUSAGE_THREAD' */
 /* errno_t getrusage(syscall_slong_t who, struct rusagex32 *tv) */
 .section .text.x86.asm32_syscall_sysrun32.getrusage
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getrusage)
@@ -31470,7 +31598,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_settimeofday)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_settimeofday)
 
-/* errno_t getgroups(size_t size, uint16_t[] list) */
+/* errno_t getgroups(size_t count, uint16_t[] list) */
 .section .text.x86.asm32_syscall_sysrun32.getgroups
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getgroups)
 	.cfi_startproc
@@ -31662,6 +31790,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fchown)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_fchown)
 
+/* @param: which: One of `PRIO_PROCESS', `PRIO_PGRP' or `PRIO_USER' */
 /* syscall_slong_t getpriority(syscall_ulong_t which, id_t who) */
 .section .text.x86.asm32_syscall_sysrun32.getpriority
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getpriority)
@@ -31673,6 +31802,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getpriority)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_getpriority)
 
+/* @param: which: One of `PRIO_PROCESS', `PRIO_PGRP' or `PRIO_USER' */
 /* errno_t setpriority(syscall_ulong_t which, id_t who, syscall_ulong_t value) */
 .section .text.x86.asm32_syscall_sysrun32.setpriority
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setpriority)
@@ -31732,7 +31862,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ioperm)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_ioperm)
 
-/* errno_t socketcall(int call, unsigned long *args) */
+/* errno_t socketcall(syscall_ulong_t call, syscall_ulong_t *args) */
 .section .text.x86.asm32_syscall_sysrun32.socketcall
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_socketcall)
 	.cfi_startproc
@@ -31755,6 +31885,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_syslog)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_syslog)
 
+/* @param: which: One of `ITIMER_REAL', `ITIMER_VIRTUAL' or `ITIMER_PROF' */
 /* errno_t setitimer(syscall_ulong_t which, struct __itimervalx32 const *newval, struct __itimervalx32 *oldval) */
 .section .text.x86.asm32_syscall_sysrun32.setitimer
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setitimer)
@@ -31767,6 +31898,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setitimer)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_setitimer)
 
+/* @param: which: One of `ITIMER_REAL', `ITIMER_VIRTUAL' or `ITIMER_PROF' */
 /* errno_t getitimer(syscall_ulong_t which, struct __itimervalx32 *curr_value) */
 .section .text.x86.asm32_syscall_sysrun32.getitimer
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getitimer)
@@ -31847,7 +31979,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_vm86old)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_vm86old)
 
-/* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
+/* Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 /* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusagex32 *usage) */
 .section .text.x86.asm32_syscall_sysrun32.wait4
@@ -32273,6 +32405,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_munlock)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_munlock)
 
+/* @param: flags: Set of `MCL_CURRENT | MCL_FUTURE | MCL_ONFAULT' */
 /* errno_t mlockall(syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysrun32.mlockall
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_mlockall)
@@ -32308,6 +32441,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sched_getparam)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_sched_getparam)
 
+/* @param: policy: One of `SCHED_OTHER', `SCHED_FIFO', `SCHED_RR', `SCHED_BATCH',
+ *                 `SCHED_IDLE', optionally or'd with `SCHED_RESET_ON_FORK' */
 /* errno_t sched_setscheduler(pid_t pid, syscall_ulong_t policy, struct sched_param const *param) */
 .section .text.x86.asm32_syscall_sysrun32.sched_setscheduler
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sched_setscheduler)
@@ -32490,7 +32625,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_prctl)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_prctl)
 
-/* void rt_sigreturn(struct fpustate const *restore_fpu, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info *sc_info, struct ucpustate const *restore_cpu) */
+/* void rt_sigreturn(struct fpustate const *restore_fpu, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info const *sc_info, struct ucpustate const *restore_cpu) */
 .section .text.x86.asm32_syscall_sysrun32.rt_sigreturn
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_rt_sigreturn)
 	.cfi_startproc
@@ -32541,7 +32676,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_rt_sigpending)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_rt_sigpending)
 
-/* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *set, struct __siginfox32_struct *info, struct timespecx32 const *timeout, size_t sigsetsize) */
+/* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *[tostr(out:STRUCT_SIGINFOX32)] set, struct __siginfox32_struct *info, struct timespecx32 const *timeout, size_t sigsetsize) */
 .section .text.x86.asm32_syscall_sysrun32.rt_sigtimedwait
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_rt_sigtimedwait)
 	.cfi_startproc
@@ -32832,7 +32967,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setregid32)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_setregid32)
 
-/* errno_t getgroups32(size_t size, uint32_t[] list) */
+/* errno_t getgroups32(size_t count, uint32_t[] list) */
 .section .text.x86.asm32_syscall_sysrun32.getgroups32
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getgroups32)
 	.cfi_startproc
@@ -33042,6 +33177,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_readahead)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_readahead)
 
+/* @param: flags: One of `0', `XATTR_CREATE' or `XATTR_REPLACE' */
 /* errno_t setxattr(char const *path, char const *name, void const *buf, size_t bufsize, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysrun32.setxattr
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setxattr)
@@ -33056,6 +33192,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setxattr)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_setxattr)
 
+/* @param: flags: One of `0', `XATTR_CREATE' or `XATTR_REPLACE' */
 /* errno_t lsetxattr(char const *path, char const *name, void const *buf, size_t bufsize, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysrun32.lsetxattr
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_lsetxattr)
@@ -33070,6 +33207,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_lsetxattr)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_lsetxattr)
 
+/* @param: flags: One of `0', `XATTR_CREATE' or `XATTR_REPLACE' */
 /* errno_t fsetxattr(fd_t fd, char const *name, void const *buf, size_t bufsize, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysrun32.fsetxattr
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fsetxattr)
@@ -33181,7 +33319,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_lremovexattr)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_lremovexattr)
 
-/* errno_t fremovexattr(int fd, char const *name) */
+/* errno_t fremovexattr(fd_t fd, char const *name) */
 .section .text.x86.asm32_syscall_sysrun32.fremovexattr
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fremovexattr)
 	.cfi_startproc
@@ -33192,6 +33330,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fremovexattr)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_fremovexattr)
 
+/* @param: signo: One of `SIG*' */
 /* errno_t tkill(pid_t tid, syscall_ulong_t signo) */
 .section .text.x86.asm32_syscall_sysrun32.tkill
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_tkill)
@@ -33216,6 +33355,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sendfile64)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_sendfile64)
 
+/* @param: futex_op: One of `FUTEX_*' from <linux/futex.h> */
 /* syscall_slong_t futex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct timespecx32 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) */
 .section .text.x86.asm32_syscall_sysrun32.futex
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_futex)
@@ -33428,6 +33568,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_timer_create)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_timer_create)
 
+/* @param: flags: Set of `0 | TIMER_ABSTIME' */
 /* errno_t timer_settime(timer_t timerid, syscall_ulong_t flags, struct itimerspecx32 const *value, struct itimerspecx32 *ovalue) */
 .section .text.x86.asm32_syscall_sysrun32.timer_settime
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_timer_settime)
@@ -33540,6 +33681,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fstatfs64)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_fstatfs64)
 
+/* @param: signo: One of `SIG*' */
 /* errno_t tgkill(pid_t tgid, pid_t tid, syscall_ulong_t signo) */
 .section .text.x86.asm32_syscall_sysrun32.tgkill
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_tgkill)
@@ -33742,7 +33884,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_keyctl)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_keyctl)
 
-/* errno_t ioprio_set(syscall_ulong_t which, syscall_ulong_t who, syscall_ulong_t ioprio) */
+/* NOTE: Linux calls `who' `which', and `id' `who' (refactored to prevent confusion)
+ * @param: who: One of `IOPRIO_WHO_PROCESS', `IOPRIO_WHO_PGRP' or `IOPRIO_WHO_USER' */
+/* errno_t ioprio_set(syscall_ulong_t who, syscall_ulong_t id, syscall_ulong_t ioprio) */
 .section .text.x86.asm32_syscall_sysrun32.ioprio_set
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ioprio_set)
 	.cfi_startproc
@@ -33754,7 +33898,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ioprio_set)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_ioprio_set)
 
-/* errno_t ioprio_get(syscall_ulong_t which, syscall_ulong_t who) */
+/* NOTE: Linux calls `who' `which', and `id' `who' (refactored to prevent confusion)
+ * @param: who: One of `IOPRIO_WHO_PROCESS', `IOPRIO_WHO_PGRP' or `IOPRIO_WHO_USER' */
+/* syscall_slong_t ioprio_get(syscall_ulong_t who, syscall_ulong_t id) */
 .section .text.x86.asm32_syscall_sysrun32.ioprio_get
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ioprio_get)
 	.cfi_startproc
@@ -34039,6 +34185,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_get_robust_list)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_get_robust_list)
 
+/* @param: flags: Set of `SPLICE_F_MOVE | SPLICE_F_NONBLOCK | SPLICE_F_MORE | SPLICE_F_GIFT' */
 /* ssize_t splice(fd_t fdin, uint64_t *offin, fd_t fdout, uint64_t *offout, size_t length, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysrun32.splice
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_splice)
@@ -34054,6 +34201,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_splice)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_splice)
 
+/* @param: flags: Set of `SYNC_FILE_RANGE_WAIT_BEFORE | SYNC_FILE_RANGE_WRITE | SYNC_FILE_RANGE_WAIT_AFTER' */
 /* errno_t sync_file_range(fd_t fd, uint64_t offset, uint64_t count, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysrun32.sync_file_range
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sync_file_range)
@@ -34073,6 +34221,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sync_file_range)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_sync_file_range)
 
+/* @param: flags: Set of `SPLICE_F_MOVE | SPLICE_F_NONBLOCK | SPLICE_F_MORE | SPLICE_F_GIFT' */
 /* ssize_t tee(fd_t fdin, fd_t fdout, size_t length, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysrun32.tee
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_tee)
@@ -34086,6 +34235,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_tee)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_tee)
 
+/* @param: flags: Set of `SPLICE_F_MOVE | SPLICE_F_NONBLOCK | SPLICE_F_MORE | SPLICE_F_GIFT' */
 /* ssize_t vmsplice(fd_t fdout, struct iovecx32 const *iov, size_t count, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysrun32.vmsplice
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_vmsplice)
@@ -34161,7 +34311,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_signalfd)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_signalfd)
 
-/* Return file descriptor for new interval timer source */
+/* Return file descriptor for new interval timer source
+ * @param: flags: Set of `0 | TFD_NONBLOCK | TFD_CLOEXEC | TFD_CLOFORK' */
 /* fd_t timerfd_create(clockid_t clock_id, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysrun32.timerfd_create
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_timerfd_create)
@@ -34183,6 +34334,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_eventfd)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_eventfd)
 
+/* @param: mode: Set of `0 | FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE | FALLOC_FL_COLLAPSE_RANGE | FALLOC_FL_ZERO_RANGE' */
 /* errno_t fallocate(fd_t fd, syscall_ulong_t mode, syscall_ulong_t offset, syscall_ulong_t length) */
 .section .text.x86.asm32_syscall_sysrun32.fallocate
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fallocate)
@@ -34196,10 +34348,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fallocate)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_fallocate)
 
-/* Set next expiration time of interval timer source UFD to UTMR.
- * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout value
- * is absolute. Optionally return the old expiration time in OTMR */
-/* errno_t timerfd_settime(fd_t ufd, syscall_ulong_t flags, struct itimerspecx32 const *utmr, struct itimerspecx32 *otmr) */
+/* Set next expiration time of interval timer source `timerfd' to `utmr'.
+ * If `flags' has the `TFD_TIMER_ABSTIME' flag set the timeout value
+ * is absolute. Optionally return the old expiration time in `otmr''
+ * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
+/* errno_t timerfd_settime(fd_t timerfd, syscall_ulong_t flags, struct itimerspecx32 const *utmr, struct itimerspecx32 *otmr) */
 .section .text.x86.asm32_syscall_sysrun32.timerfd_settime
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_timerfd_settime)
 	.cfi_startproc
@@ -34213,7 +34366,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_timerfd_settime)
 END(__x86_asm32_sysrun32_timerfd_settime)
 
 /* Return the next expiration time of UFD */
-/* errno_t timerfd_gettime(fd_t ufd, struct itimerspecx32 *otmr) */
+/* errno_t timerfd_gettime(fd_t timerfd, struct itimerspecx32 *otmr) */
 .section .text.x86.asm32_syscall_sysrun32.timerfd_gettime
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_timerfd_gettime)
 	.cfi_startproc
@@ -34350,7 +34503,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_perf_event_open)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_perf_event_open)
 
-/* ssize_t recvmmsg(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t flags, struct timespecx32 const *tmo) */
+/* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+ *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+/* ssize_t recvmmsg(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx32 const *tmo) */
 .section .text.x86.asm32_syscall_sysrun32.recvmmsg
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_recvmmsg)
 	.cfi_startproc
@@ -34398,7 +34554,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_prlimit64)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_prlimit64)
 
-/* errno_t name_to_handle_at(fd_t dirfd, char const *filename, struct file_handle *handle, int32_t *mnt_id, syscall_ulong_t flags) */
+/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_FOLLOW | AT_DOSPATH' */
+/* errno_t name_to_handle_at(fd_t dirfd, char const *filename, struct file_handle *handle, int32_t *mnt_id, atflag_t flags) */
 .section .text.x86.asm32_syscall_sysrun32.name_to_handle_at
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_name_to_handle_at)
 	.cfi_startproc
@@ -34412,7 +34569,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_name_to_handle_at)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_name_to_handle_at)
 
-/* fd_t open_by_handle_at(fd_t mountdirfd, struct file_handle *handle, syscall_ulong_t flags) */
+/* fd_t open_by_handle_at(fd_t mountdirfd, struct file_handle const *handle, oflag_t flags) */
 .section .text.x86.asm32_syscall_sysrun32.open_by_handle_at
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_open_by_handle_at)
 	.cfi_startproc
@@ -34444,7 +34601,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_syncfs)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_syncfs)
 
-/* ssize_t sendmmsg(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t flags) */
+/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* ssize_t sendmmsg(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags) */
 .section .text.x86.asm32_syscall_sysrun32.sendmmsg
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sendmmsg)
 	.cfi_startproc
@@ -34468,6 +34627,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setns)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_setns)
 
+/* @param: flags: Must be `0' */
 /* ssize_t process_vm_readv(pid_t pid, struct iovecx32 const *local_iov, size_t liovcnt, struct iovecx32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysrun32.process_vm_readv
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_process_vm_readv)
@@ -34483,6 +34643,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_process_vm_readv)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_process_vm_readv)
 
+/* @param: flags: Must be `0' */
 /* ssize_t process_vm_writev(pid_t pid, struct iovecx32 const *local_iov, size_t liovcnt, struct iovecx32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysrun32.process_vm_writev
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_process_vm_writev)
@@ -34498,6 +34659,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_process_vm_writev)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_process_vm_writev)
 
+/* @param: type: One of `KCMP_FILE', `KCMP_FILES', `KCMP_FS', `KCMP_IO',
+ *               `KCMP_SIGHAND', `KCMP_SYSVSEM', `KCMP_VM', `KCMP_EPOLL_TFD' */
 /* syscall_slong_t kcmp(pid_t pid1, pid_t pid2, syscall_ulong_t type, syscall_ulong_t idx1, syscall_ulong_t idx2) */
 .section .text.x86.asm32_syscall_sysrun32.kcmp
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_kcmp)
@@ -34567,6 +34730,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_seccomp)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_seccomp)
 
+/* @param: flags: Set of `0 | GRND_RANDOM | GRND_NONBLOCK' */
 /* ssize_t getrandom(void *buf, size_t num_bytes, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysrun32.getrandom
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getrandom)
@@ -34867,7 +35031,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_mlock2)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_mlock2)
 
-/* ssize_t recvmmsg64(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t flags, struct timespecx32_64 const *tmo) */
+/* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+ *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+/* ssize_t recvmmsg64(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx32_64 const *tmo) */
 .section .text.x86.asm32_syscall_sysrun32.recvmmsg64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_recvmmsg64)
 	.cfi_startproc
@@ -34916,7 +35083,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_preadvf)
 END(__x86_asm32_sysrun32_preadvf)
 
 /* Return the next expiration time of UFD */
-/* errno_t timerfd_gettime64(fd_t ufd, struct itimerspecx32_64 *otmr) */
+/* errno_t timerfd_gettime64(fd_t timerfd, struct itimerspecx32_64 *otmr) */
 .section .text.x86.asm32_syscall_sysrun32.timerfd_gettime64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_timerfd_gettime64)
 	.cfi_startproc
@@ -34927,10 +35094,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_timerfd_gettime64)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_timerfd_gettime64)
 
-/* Set next expiration time of interval timer source UFD to UTMR.
- * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout value
- * is absolute. Optionally return the old expiration time in OTMR */
-/* errno_t timerfd_settime64(fd_t ufd, syscall_ulong_t flags, struct itimerspecx32_64 const *utmr, struct itimerspecx32_64 *otmr) */
+/* Set next expiration time of interval timer source `timerfd' to `utmr'.
+ * If `flags' has the `TFD_TIMER_ABSTIME' flag set the timeout value
+ * is absolute. Optionally return the old expiration time in `otmr''
+ * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
+/* errno_t timerfd_settime64(fd_t timerfd, syscall_ulong_t flags, struct itimerspecx32_64 const *utmr, struct itimerspecx32_64 *otmr) */
 .section .text.x86.asm32_syscall_sysrun32.timerfd_settime64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_timerfd_settime64)
 	.cfi_startproc
@@ -35216,6 +35384,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_timer_gettime64)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_timer_gettime64)
 
+/* @param: flags: Set of `0 | TIMER_ABSTIME' */
 /* errno_t timer_settime64(timer_t timerid, syscall_ulong_t flags, struct itimerspecx32_64 const *value, struct itimerspecx32_64 *ovalue) */
 .section .text.x86.asm32_syscall_sysrun32.timer_settime64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_timer_settime64)
@@ -35402,7 +35571,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_kreaddir)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_kreaddir)
 
-/* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
+/* Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 /* pid_t wait4_64(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusagex32_64 *usage) */
 .section .text.x86.asm32_syscall_sysrun32.wait4_64
@@ -35417,6 +35586,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_wait4_64)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_wait4_64)
 
+/* @param: which: One of `ITIMER_REAL', `ITIMER_VIRTUAL' or `ITIMER_PROF' */
 /* errno_t getitimer64(syscall_ulong_t which, struct __itimervalx32_64 *curr_value) */
 .section .text.x86.asm32_syscall_sysrun32.getitimer64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getitimer64)
@@ -35428,6 +35598,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getitimer64)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_getitimer64)
 
+/* @param: which: One of `ITIMER_REAL', `ITIMER_VIRTUAL' or `ITIMER_PROF' */
 /* errno_t setitimer64(syscall_ulong_t which, struct __itimervalx32_64 const *newval, struct __itimervalx32_64 *oldval) */
 .section .text.x86.asm32_syscall_sysrun32.setitimer64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setitimer64)
@@ -35450,7 +35621,7 @@ END(__x86_asm32_sysrun32_setitimer64)
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
  *                (depending on the caller running in 32- or 64-bit mode)
  * @param: hdrc:  The number of program headers */
-/* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, struct elf32_phdr *hdrv, size_t hdrc) */
+/* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, struct elf32_phdr const *hdrv, size_t hdrc) */
 .section .text.x86.asm32_syscall_sysrun32.maplibrary
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_maplibrary)
 	.cfi_startproc
@@ -35500,6 +35671,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_gettimeofday64)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_gettimeofday64)
 
+/* @param: who: One of `RUSAGE_SELF', `RUSAGE_CHILDREN' or `RUSAGE_THREAD' */
 /* errno_t getrusage64(syscall_slong_t who, struct rusagex32_64 *tv) */
 .section .text.x86.asm32_syscall_sysrun32.getrusage64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getrusage64)
