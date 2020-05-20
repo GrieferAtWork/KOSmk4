@@ -40,7 +40,6 @@
 
 
 #ifdef __x86_64__
-#define RPC_SYSCALL_INFO_METHOD_SYSCALL     RPC_X86_64_SYSCALL_INFO_METHOD_SYSCALL
 #define RPC_REGISTER_COUNT                  RPC_X86_64_REGISTER_COUNT
 #define RPC_REGISTER_PC                     RPC_X86_64_REGISTER_PC
 #define RPC_REGISTER_SP                     RPC_X86_64_REGISTER_SP
@@ -60,8 +59,6 @@
 
 
 __DECL_BEGIN
-
-#define RPC_X86_64_SYSCALL_INFO_METHOD_SYSCALL   0x05 /* sysenter */
 
 /* [P]: Preserve  /  [C]: Clobber */
 #define RPC_X86_64_REGISTER_RAX     0x00 /* [C] Accumulator. */

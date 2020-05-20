@@ -19,238 +19,431 @@
  */
 #ifndef GUARD_KERNEL_SRC_MISC_SYSCALL_TRACE_C
 #define GUARD_KERNEL_SRC_MISC_SYSCALL_TRACE_C 1
-#define __WANT_SYSCALL_ARGUMENT_COUNT 1
-#define __WANT_SYSCALL_ARGUMENT_FORMAT 1
-#define __WANT_SYSCALL_ARGUMENT_NAMES 1
-#define __WANT_SYSCALL_ARGUMENT_LIST_MAKER 1
-#define _GNU_SOURCE 1
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
-#ifndef CONFIG_NO_SYSCALL_TRACING
+#include <debugger/debugger.h>
 #include <kernel/driver-param.h>
-#include <kernel/driver.h>
-#include <kernel/printk.h>
+#include <kernel/handle.h>
+#include <kernel/heap.h>
+#include <kernel/malloc.h>
+#include <kernel/syscall-trace.h>
 #include <kernel/syscall.h>
-#include <kernel/syslog.h>
-#include <kernel/types.h>
-#include <kernel/user.h>
-#include <sched/pid.h>
-#include <sched/signal.h>
-#include <sched/task.h>
+#include <misc/atomic-ref.h>
 
-#include <kos/bits/except-handler.h>
-#include <kos/dev.h>           /* MAJOR(), MINOR() */
-#include <kos/io.h>            /* IO_* */
-#include <sys/epoll.h>         /* EPOLL* */
-#include <sys/eventfd.h>       /* EFD_* */
-#include <sys/mman.h>          /* PROT_*, MAP_* */
-#include <sys/signalfd.h>      /* SFD_* */
-#include <sys/socket.h>        /* SHUT_*, SOL_*, SOCK_*, MSG_* */
-#include <sys/swap.h>          /* SWAP_FLAG_* */
-#include <sys/syscall-trace.h> /* SYSCALL_TRACE_* */
-#include <sys/syscall.h>       /* SYS_* */
-#include <sys/wait.h>          /* W* */
+#include <hybrid/atomic.h>
 
 #include <assert.h>
-#include <fcntl.h>          /* O_* */
-#include <format-printer.h> /* pformatprinter */
-#include <inttypes.h>       /* PRI* */
-#include <sched.h>          /* CLONE_* */
-#include <unistd.h>         /* SEEK_* */
+#include <format-printer.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <string.h>
 
-#include <librpc/rpc.h> /* RPC_SCHEDULE_FLAG_* */
-
-#ifdef __ARCH_HAVE_COMPAT
-#if __ARCH_COMPAT_SIZEOF_POINTER == 4
-#include <kos/bits/except-handler32.h>
-#include <asm/syscalls32_d.h>
-#include <sys/syscall-trace32.h>
-#define COMPAT_NR(x)       __NR32##x
-#define COMPAT_SYSCALL(x)  SYSCALL32_##x
-#define COMPAT_LS_SYSCALLS <asm/ls-syscalls32.h>
-#else /* __ARCH_COMPAT_SIZEOF_POINTER == 4 */
-#include <kos/bits/except-handler64.h>
-#include <asm/syscalls64_d.h>
-#include <sys/syscall-trace64.h>
-#define COMPAT_NR(x)       __NR64##x
-#define COMPAT_SYSCALL(x)  SYSCALL64_##x
-#define COMPAT_LS_SYSCALLS <asm/ls-syscalls64.h>
-#endif /* __ARCH_COMPAT_SIZEOF_POINTER != 4 */
-#endif /* __ARCH_HAVE_COMPAT */
-
+#ifndef CONFIG_NO_SYSCALL_TRACING
 DECL_BEGIN
 
-PUBLIC void FCALL
-syscall_trace(struct rpc_syscall_info const *__restrict info) {
-#if 1
-#ifdef __ARCH_HAVE_COMPAT
-	if (RPC_SYSCALL_INFO_METHOD_ISCOMPAT(info->rsi_flags)
-	    ? info->rsi_sysno == COMPAT_NR(_syslog)
-	    : info->rsi_sysno == SYS_syslog)
-		return; /* Don't trace this one! */
-#else /* __ARCH_HAVE_COMPAT */
-	if (info->rsi_sysno == SYS_syslog)
-		return; /* Don't trace this one! */
-#endif /* !__ARCH_HAVE_COMPAT */
-#endif
-	syscall_printtrace(info, &syslog_printer, SYSLOG_LEVEL_TRACE);
-	assert(!task_isconnected());
+#ifndef CONFIG_NO_SMP
+#define IF_SMP(...) __VA_ARGS__
+#else /* !CONFIG_NO_SMP */
+#define IF_SMP(...) /* nothing */
+#endif /* CONFIG_NO_SMP */
+
+/* SCT == SysCallTrace */
+struct sct_entry {
+	WEAK refcnt_t            te_refcnt;   /* Reference counter */
+	syscall_trace_callback_t te_callback; /* [1..1][const] Callback. */
+	void                    *te_object;   /* [1..1][lock(CLEAR_ONCE && SMP(te_inuse))] Associated object. */
+	uintptr_half_t           te_obtype;   /* [const] Associated object type. */
+#ifndef CONFIG_NO_SMP
+	uintptr_half_t           te_inuse;    /* # of CPUs using `te_object' right now. */
+#endif /* !CONFIG_NO_SMP */
+};
+DEFINE_REFCOUNT_FUNCTIONS(struct sct_entry, te_refcnt, kfree)
+
+
+LOCAL NOBLOCK bool
+NOTHROW(FCALL sct_entry_clearobj)(struct sct_entry *__restrict self) {
+	void *old_value;
+#ifdef CONFIG_NO_SMP
+	pflag_t was = PREEMPTION_PUSHOFF();
+#endif /* CONFIG_NO_SMP */
+	old_value = ATOMIC_XCH(self->te_object, NULL);
+#ifndef CONFIG_NO_SMP
+	while (ATOMIC_READ(self->te_inuse))
+		task_tryyield_or_pause();
+#else /* !CONFIG_NO_SMP */
+	PREEMPTION_POP(was);
+#endif /* CONFIG_NO_SMP */
+	return old_value != NULL;
+}
+
+#define sct_entry_decref_obj(self, obj) \
+	(*handle_type_db.h_decref[(self)->te_obtype])(obj);
+
+LOCAL WUNUSED NONNULL((1)) /*nullable*/ REF void *
+NOTHROW(FCALL sct_entry_getref)(struct sct_entry *__restrict self) {
+	REF void *result;
+	PREEMPTION_DISABLE();
+	IF_SMP(ATOMIC_FETCHINC(self->te_inuse));
+	COMPILER_READ_BARRIER();
+	result = self->te_object;
+	COMPILER_READ_BARRIER();
+	/* Try to acquire a reference. */
+	if (likely(result) && unlikely(!(*handle_type_db.h_tryincref[self->te_obtype])(result)))
+		result = NULL;
+	IF_SMP(ATOMIC_FETCHDEC(self->te_inuse));
+	PREEMPTION_ENABLE();
+	return result;
 }
 
 
-#undef statfs
-#undef statfs32
-#undef statfs64
-#undef stat
-#undef stat32
-#undef stat64
-#undef linux_stat
-#undef linux_stat32
-#undef linux_stat64
-#undef linux_oldstat
 
-/* TODO: This function needs to be moved into a driver!
- *       It's .text size is already almost 100K bytes, and
- *       that's not even counting all of the strings (sheesh...) */
-PUBLIC ssize_t FCALL
-syscall_printtrace(struct rpc_syscall_info const *__restrict info,
-                   pformatprinter printer, void *arg) {
-	ssize_t result, temp;
-	/* Trace system calls. */
-#ifdef __ARCH_HAVE_COMPAT
-	if (RPC_SYSCALL_INFO_METHOD_ISCOMPAT(info->rsi_flags)) {
-#if __ARCH_COMPAT_SIZEOF_POINTER == 4
-		result = format_printf(printer, arg, "task[%u].sys32_", task_gettid_s());
-#else /* __ARCH_COMPAT_SIZEOF_POINTER == 4 */
-		result = format_printf(printer, arg, "task[%u].sys64_", task_gettid_s());
-#endif /* __ARCH_COMPAT_SIZEOF_POINTER != 4 */
-		if unlikely(result < 0)
-			goto done;
-		if (info->rsi_flags & RPC_SYSCALL_INFO_FEXCEPT) {
-			temp = (*printer)(arg, "X", 1);
-			if unlikely(temp < 0)
-				goto err;
-			result += temp;
+struct sct_table_struct {
+	WEAK refcnt_t                                   tt_refcnt; /* Reference counter */
+	size_t                                          tt_count;  /* [const] # of registered trace-entries. */
+	COMPILER_FLEXIBLE_ARRAY(REF struct sct_entry *, tt_table); /* [1..1][const][tt_count] Table of trace-entries. */
+};
+#define sizeof_sct_table(count) \
+	(offsetof(struct sct_table_struct, tt_table) + (count) * sizeof(REF struct sct_entry *))
+
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL sct_table_destroy)(struct sct_table_struct *__restrict self) {
+	size_t i;
+	/* Drop references from trace entries. */
+	for (i = 0; i < self->tt_count; ++i)
+		decref_unlikely(self->tt_table[i]);
+	/* Free the table itself. */
+	kfree(self);
+}
+
+DEFINE_REFCOUNT_FUNCTIONS(struct sct_table_struct, tt_refcnt, sct_table_destroy)
+
+/* Define the empty SCT Table. */
+PRIVATE struct sct_table_struct empty_sct_table = {
+	/* .tt_refcnt = */ 2, /* +1: sct_table, +1: empty_sct_table */
+	/* .tt_count  = */ 0
+};
+
+/* [1..1] The global SCT callback table. */
+PRIVATE ATOMIC_REF(struct sct_table_struct)
+sct_table = ATOMIC_REF_INIT(&empty_sct_table);
+
+
+
+/* Start/stop the tracing of system calls by installing/deleting callbacks
+ * that are invoked for every system call invoked after `syscall_trace_start()'
+ * returns, and before `syscall_trace_stop()' returns.
+ * NOTE: The internal structures related to these functions don't keep a permanent
+ *       reference to the given `ob_pointer' object, meaning that so-long as you
+ *       make sure to call `syscall_trace_stop()' from the object's finalizer, you
+ *       can safely use these functions with arbitrary kernel objects.
+ * @param: cb:         The callback to-be invoked when a system call is performed.
+ * @param: ob_pointer: A pointer to an object of type `ob_type'
+ * @param: ob_type:    One of `HANDLE_TYPE_*' that describes the type of object that `ob_pointer' is.
+ * @return: true:      Successfully registered/deleted the given callback/object pair.
+ * @return: false:     The same callback/object pair was already registered/was never registered at all. */
+PUBLIC NONNULL((1, 2)) bool FCALL
+syscall_trace_start(syscall_trace_callback_t cb,
+                    void *__restrict ob_pointer,
+                    uintptr_half_t ob_type)  {
+	REF struct sct_entry *entry;
+	bool old_table_was_empty;
+	assert(cb);
+	assert(ob_pointer);
+	assert(ob_type < HANDLE_TYPE_COUNT);
+
+	/* Allocate the SCT entry for this tracing sink. */
+	entry = (REF struct sct_entry *)kmalloc(sizeof(struct sct_entry), GFP_NORMAL);
+	/* Fill in the new SCT entry. */
+	entry->te_refcnt   = 1;
+	entry->te_callback = cb;
+	entry->te_object   = ob_pointer;
+	entry->te_obtype   = ob_type;
+#ifndef CONFIG_NO_SMP
+	entry->te_inuse = 0;
+#endif /* !CONFIG_NO_SMP */
+
+	TRY {
+		size_t i, new_count;
+		REF struct sct_table_struct *old_table;
+		REF struct sct_table_struct *new_table;
+		/* Insert the entry into the SCT table. */
+again_insert:
+		old_table = sct_table.get();
+		/* Check for an existing match for `entry' */
+		for (i = 0, new_count = 0; i < old_table->tt_count; ++i) {
+			struct sct_entry *old_entry;
+			void *obj;
+			old_entry = old_table->tt_table[i];
+			obj       = ATOMIC_READ(old_entry->te_object);
+			if (obj != NULL)
+				++new_count;
+			if (old_entry->te_obtype != ob_type)
+				continue; /* Wrong object type */
+			if (old_entry->te_callback != cb)
+				continue; /* Wrong callback */
+			if (obj != ob_pointer)
+				continue; /* Wrong object */
+			/* Already registered! */
+			destroy(entry);
+			return false;
 		}
-		switch (info->rsi_sysno) {
-	
-#define __SYSCALL(name)                                                              \
-		case COMPAT_NR(_##name):                                                     \
-			temp = format_printf(printer,                                            \
-			                     arg,                                                \
-			                     #name "(" COMPAT_SYSCALL(TRACE_ARGS_FORMAT_L)(name) \
-			                     COMPAT_SYSCALL(TRACE_ARGS_ARGS)(name,               \
-			                         (COMPAT_NR(AM_##name)(info->rsi_regs[0],        \
-			                                               info->rsi_regs[1],        \
-			                                               info->rsi_regs[2],        \
-			                                               info->rsi_regs[3],        \
-			                                               info->rsi_regs[4],        \
-			                                               info->rsi_regs[5]))       \
-			                     ));                                                 \
-			break;
-#ifndef __INTELLISENSE__
-#include COMPAT_LS_SYSCALLS
-#endif /* !__INTELLISENSE__ */
-#undef __SYSCALL
-	
-		default:
-			/* Unknown system call... */
-			goto done_unknown_system_call;
+		/* Construct the new table. */
+		++new_count; /* +1 for the new trace callback. */
+		new_table = (struct sct_table_struct *)kmalloc(sizeof_sct_table(new_count),
+		                                               GFP_NORMAL);
+		new_table->tt_refcnt = 1;
+		new_table->tt_count  = new_count;
+		/* Copy over existing entries. */
+		for (i = 0, new_count = 0; i < old_table->tt_count; ++i) {
+			struct sct_entry *old_entry;
+			old_entry = old_table->tt_table[i];
+			if (!ATOMIC_READ(old_entry->te_object))
+				continue; /* Deleted */
+			assert(new_count < new_table->tt_count);
+			new_table->tt_table[new_count] = incref(old_entry);
+			++new_count;
 		}
-	} else
-#endif /* __ARCH_HAVE_COMPAT */
-	{
-		result = format_printf(printer, arg, "task[%u].sys_", task_gettid_s());
-		if unlikely(result < 0)
-			goto done;
-		if (info->rsi_flags & RPC_SYSCALL_INFO_FEXCEPT) {
-			temp = (*printer)(arg, "X", 1);
-			if unlikely(temp < 0)
-				goto err;
-			result += temp;
+		assert(new_count < new_table->tt_count);
+		new_table->tt_table[new_count] = entry; /* Inherit reference */
+		++new_count;
+		assert(new_count <= new_table->tt_count);
+		if unlikely(new_count < new_table->tt_count) {
+			/* More entries got deleted. -> Try to truncate our object futher. */
+			struct sct_table_struct *new_table2;
+			new_table2 = (struct sct_table_struct *)krealloc_nx(new_table,
+			                                                    sizeof_sct_table(new_count),
+			                                                    GFP_ATOMIC);
+			if likely(new_table2)
+				new_table = new_table2;
+			new_table->tt_count = new_count;
 		}
-		switch (info->rsi_sysno) {
-	
-#define __SYSCALL(name)                                                      \
-		case SYS_##name:                                                     \
-			temp = format_printf(printer,                                    \
-			                     arg,                                        \
-			                     #name "(" SYSCALL_TRACE_ARGS_FORMAT_L(name) \
-			                     SYSCALL_TRACE_ARGS_ARGS(name,               \
-			                         (__NRAM_##name(info->rsi_regs[0],       \
-			                                        info->rsi_regs[1],       \
-			                                        info->rsi_regs[2],       \
-			                                        info->rsi_regs[3],       \
-			                                        info->rsi_regs[4],       \
-			                                        info->rsi_regs[5]))      \
-			                     ));                                         \
-			break;
-#ifndef __INTELLISENSE__
-#include <asm/ls-syscalls.h>
-#endif /* !__INTELLISENSE__ */
-#undef __SYSCALL
-	
-		default:
-			/* Unknown system call... */
-#ifdef __ARCH_HAVE_COMPAT
-done_unknown_system_call:
-#endif /* __ARCH_HAVE_COMPAT */
-			temp = format_printf(printer, arg, "break:%#Ix?", info->rsi_sysno);
-			if unlikely(temp < 0)
-				goto err;
-			result += temp;
-			if (info->rsi_flags & RPC_SYSCALL_INFO_FREGVALID_MASK) {
-				size_t i;
-				bool is_first = true;
-				temp = (*printer)(arg, " [", 2);
-				if unlikely(temp < 0)
-					goto err;
-				result += temp;
-				for (i = 0; i < COMPILER_LENOF(info->rsi_regs); ++i) {
-					if (!(info->rsi_flags & RPC_SYSCALL_INFO_FREGVALID(i)))
-						continue;
-					temp = format_printf(printer, arg,
-					                     "%sarg%Iu: %#Ix",
-					                     is_first ? "" : ", ",
-					                     i,
-					                     info->rsi_regs[i]);
-					if unlikely(temp < 0)
-						goto err;
-					result += temp;
-					is_first = false;
-				}
-				temp = (*printer)(arg, "]\n", 2);
-			} else {
-				temp = (*printer)(arg, "\n", 1);
-			}
-			goto done_check_and_account_temp;
+		/* Try to replace the existing table with our new one. */
+		if unlikely(!sct_table.cmpxch_inherit_new(old_table, new_table)) {
+			/* The global SCT table has changed.
+			 * -> Must load the new table and try again! */
+			assert(new_table->tt_table[new_count - 1] == entry);
+			/* Hide our new entry, so it doesn't get destroyed alongside `new_table' */
+			new_table->tt_count = new_count - 1;
+			destroy(new_table);
+			decref(old_table);
+			goto again_insert;
+		}
+		old_table_was_empty = old_table->tt_count == 0;
+		decref_likely(old_table);
+	} EXCEPT {
+		destroy(entry);
+		RETHROW();
+	}
+	/* Handle special case: if the old table was empty, then we
+	 *                      must enable system call tracing. */
+	if (old_table_was_empty) {
+		TRY {
+			/* Enable system call tracing */
+			arch_syscall_tracing_setenabled(true, false);
+		} EXCEPT {
+			/* Handle an exception during arch-level tracing enable
+			 * by deleting the freshly installed tracing hook before
+			 * re-throwing the exception. */
+			syscall_trace_stop(cb, ob_pointer, ob_type);
+			RETHROW();
 		}
 	}
-	if unlikely(temp < 0)
-		goto err;
-	result += temp;
-	temp = (*printer)(arg, ")\n", 2);
-done_check_and_account_temp:
-	if unlikely(temp < 0)
-		goto err;
-	result += temp;
+	return true;
+}
+
+
+
+PRIVATE ATTR_NOINLINE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL sct_table_truncate)(struct sct_table_struct *old_table)  {
+	size_t i, new_count;
+	struct sct_table_struct *new_table;
+	bool has_old_table_ref;
+	has_old_table_ref = false;
+again:
+	/* Figure out how many entries will be required. */
+	for (i = 0, new_count = 0; i < old_table->tt_count; ++i) {
+		if (ATOMIC_READ(old_table->tt_table[i]->te_object) != NULL)
+			++new_count;
+	}
+	assert(new_count <= old_table->tt_count);
+	if unlikely(new_count >= old_table->tt_count)
+		goto done; /* Nothing to delete! */
+	if (new_count == 0) {
+		/* Special case: All tables are empty! */
+		new_table = incref(&empty_sct_table);
+		goto set_new_table;
+	}
+	new_table = (struct sct_table_struct *)kmalloc_nx(sizeof_sct_table(new_count),
+	                                                  GFP_ATOMIC);
+	if unlikely(!new_table)
+		goto done; /* Failed to truncate the table... */
+	/* Fill in the new table. */
+	new_table->tt_refcnt = 1;
+	new_table->tt_count  = new_count;
+	for (i = 0, new_count = 0; i < old_table->tt_count; ++i) {
+		struct sct_entry *entry;
+		entry = old_table->tt_table[i];
+		if (ATOMIC_READ(entry->te_object) == NULL)
+			continue;
+		new_table->tt_table[new_count] = incref(entry);
+		++new_count;
+	}
+	assert(new_count <= new_table->tt_count);
+	if unlikely(new_count < new_table->tt_count) {
+		/* More object were deleted in the mean time.
+		 * -> We may be able to truncate the new table further! */
+		struct sct_table_struct *new_table2;
+		new_table2 = (struct sct_table_struct *)krealloc_nx(new_table,
+		                                                    sizeof_sct_table(new_count),
+		                                                    GFP_ATOMIC);
+		if likely(new_table2)
+			new_table = new_table2;
+		new_table->tt_count = new_count;
+	}
+set_new_table:
+	if (!sct_table.cmpxch_inherit_new(old_table, new_table)) {
+		/* The table has changed in the meantime.
+		 * -> Try again! */
+		if (has_old_table_ref)
+			decref(old_table);
+		old_table = sct_table.get();
+		has_old_table_ref = true;
+		goto again;
+	}
+	assert(new_table->tt_count < old_table->tt_count);
+	/* Check for special case: The new table is empty.
+	 * In this case, we must disable system call tracing. */
+	if (new_table->tt_count == 0)
+		arch_syscall_tracing_setenabled(false, true);
 done:
-	return result;
-err:
-	return temp;
+	if (has_old_table_ref)
+		decref(old_table);
+}
+
+PUBLIC NOBLOCK NONNULL((1, 2)) bool
+NOTHROW(FCALL syscall_trace_stop)(syscall_trace_callback_t cb,
+                                  void *__restrict ob_pointer,
+                                  uintptr_half_t ob_type)  {
+	size_t i;
+	REF struct sct_table_struct *table;
+again:
+	table = sct_table.get();
+	/* Find the entry in question. */
+	for (i = 0; i < table->tt_count; ++i) {
+		struct sct_entry *entry;
+		entry = table->tt_table[i];
+		if (entry->te_obtype != ob_type)
+			continue; /* Wrong object type */
+		if (entry->te_callback != cb)
+			continue; /* Wrong callback */
+		if (ATOMIC_READ(entry->te_object) != ob_pointer)
+			continue; /* Wrong object */
+		/* Clear this callback entry, thus nullifying it. */
+		if (!sct_entry_clearobj(entry))
+			goto again;
+		/* Try to allocate a new tracing table that no
+		 * longer contains an entry for our component. */
+		sct_table_truncate(table);
+		/* Drop our reference to the table. */
+		decref_likely(table);
+		/* Indicate success */
+		return true;
+	}
+	/* Failed to find the caller's entry within the table. */
+	decref_unlikely(table);
+	return false;
 }
 
 
-/* Provide a kernel commandline option to enable system call tracing. */
-INTERN ATTR_FREETEXT void KCALL
-kernel_initialize_commandline_syscall_tracing_enabled(void) {
-	syscall_tracing_setenabled(true);
+
+
+/* Trace a given system call.
+ * This function is called at the start of any user-level system
+ * call so-long as `arch_syscall_tracing_getenabled() == true'
+ * Custom system call invocation mechanisms that directly call into
+ * the underlying system call tables, rather than going through the
+ * provided `syscall_emulate()' family of functions must manually
+ * invoke this callback */
+PUBLIC void FCALL
+syscall_trace(struct rpc_syscall_info const *__restrict info) {
+	size_t i;
+	REF struct sct_table_struct *table;
+	table = sct_table.get();
+	FINALLY_DECREF_UNLIKELY(table);
+	if unlikely(!table->tt_count) {
+		/* Try to disable system call tracing.
+		 * This may have failed before, since we only ever try
+		 * to disable tracing in NX-mode, meaning that it may
+		 * fail arbitrarily! */
+		if (arch_syscall_tracing_getenabled())
+			arch_syscall_tracing_setenabled(false, true);
+		return;
+	}
+	/* Invoke all registered callbacks. */
+	for (i = 0; i < table->tt_count; ++i) {
+		struct sct_entry *entry;
+		REF void *obj;
+		entry = table->tt_table[i];
+		/* Try to acquire a reference to the bound object. */
+		obj = sct_entry_getref(entry);
+		if likely(obj) {
+			/* Invoke the callback. */
+			TRY {
+				(*entry->te_callback)(obj, info);
+			} EXCEPT {
+				sct_entry_decref_obj(entry, obj);
+				RETHROW();
+			}
+			sct_entry_decref_obj(entry, obj);
+		} else if (ATOMIC_READ(entry->te_object) == NULL) {
+			/* Try to truncate the table to get rid of unused entries. */
+			sct_table_truncate(table);
+		}
+	}
 }
-DEFINE_LATE_KERNEL_COMMANDLINE_OPTION(kernel_initialize_commandline_syscall_tracing_enabled,
-                                      KERNEL_COMMANDLINE_OPTION_TYPE_PRESENT,
-                                      "trace-syscalls");
+
+
+
+#ifdef CONFIG_HAVE_DEBUGGER
+PRIVATE ATTR_DBGRODATA char const sctrace_str_0[] = "0";
+PRIVATE ATTR_DBGRODATA char const sctrace_str_1[] = "1";
+
+DBG_AUTOCOMPLETE(sctrace,
+                 /*size_t*/ argc, /*char **/ argv /*[]*/,
+                 /*dbg_autocomplete_cb_t*/ cb, /*void **/arg) {
+	(void)argv;
+	if (argc == 1) {
+		(*cb)(arg, sctrace_str_0, COMPILER_STRLEN(sctrace_str_0));
+		(*cb)(arg, sctrace_str_1, COMPILER_STRLEN(sctrace_str_1));
+	}
+}
+
+DBG_COMMAND_AUTO(sctrace, DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE,
+                 "sctrace [0|1]\n"
+                 "\tGet or set system call tracing\n",
+                 argc, argv) {
+	bool enabled;
+	if (argc == 1) {
+		enabled = arch_syscall_tracing_getenabled();
+		dbg_print(enabled ? DBGSTR("enabled\n") : DBGSTR("disabled\n"));
+		return enabled ? 0 : 1;
+	}
+	if (argc != 2)
+		return DBG_STATUS_INVALID_ARGUMENTS;
+	if (strcmp(argv[1], sctrace_str_1) == 0) {
+		enabled = true;
+	} else if (strcmp(argv[1], sctrace_str_0) == 0) {
+		enabled = false;
+	} else {
+		return DBG_STATUS_INVALID_ARGUMENTS;
+	}
+	arch_syscall_tracing_setenabled(enabled, false);
+	return 0;
+}
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 DECL_END
 #endif /* !CONFIG_NO_SYSCALL_TRACING */

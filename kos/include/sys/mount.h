@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbef45bec */
+/* HASH CRC-32:0xd32b2a0d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -216,7 +216,7 @@ __SYSDECL_BEGIN
 
 #ifdef __CC__
 #ifdef __CRT_HAVE_mount
-__CDECLARE(,int,__NOTHROW_RPC,mount,(char const *__special_file, char const *__dir, char const *__fstype, unsigned long int __rwflag, void const *__data),(__special_file,__dir,__fstype,__rwflag,__data))
+__CDECLARE(,int,__NOTHROW_RPC,mount,(char const *__special_file, char const *__dir, char const *__fstype, unsigned long int __mountflags, void const *__data),(__special_file,__dir,__fstype,__mountflags,__data))
 #endif /* mount... */
 #ifdef __CRT_HAVE_umount
 __CDECLARE(,int,__NOTHROW_RPC,umount,(char const *__special_file),(__special_file))

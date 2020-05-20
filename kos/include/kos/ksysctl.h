@@ -272,10 +272,6 @@ struct ksysctl_driver_set_library_path /*[PREFIX(slp_)]*/ {
 #define KSYSCTL_SYSCALL_GET_PERSONALITY        0x005f0001 /* [int kp << 1] Return 0/1 if the given personality code `kp' (one of `KP_*' from `<kos/personality>') is enabled or not. */
 #define KSYSCTL_SYSCALL_SET_PERSONALITY        0x005f0002 /* [int kp << 1 | (enabled & 1)] Enable/Disable the given personality `kp'. (return 0/1 indicative of the old state) */
 
-/* Syscall related */
-#define KSYSCTL_SYSCALL_GET_TRACING_ENABLED    0x000c0001 /* Return 0/1 if system call tracing is enabled. */
-#define KSYSCTL_SYSCALL_SET_TRACING_ENABLED    0x000c0002 /* [int arg] Set if system call tracing is enabled (return 1 if tracing state changed; 0 otherwise) */
-
 /* Driver related */
 #define KSYSCTL_DRIVER_LSMOD                   0x000d0001 /* [struct hop_openfd *result] Capture a snapshot of all currently loaded kernel
                                                            * drivers, and return a `HANDLE_TYPE_DRIVER_STATE' handle for that snapshot.

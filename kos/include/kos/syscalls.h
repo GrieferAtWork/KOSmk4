@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcbe0e08f */
+/* HASH CRC-32:0x6d8d848c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -206,7 +206,7 @@ __CDECLARE_SC(,__fd_t,dup,(__fd_t __fd),(__fd))
 __CDECLARE_SC(,__fd_t,dup2,(__fd_t __oldfd, __fd_t __newfd),(__oldfd,__newfd))
 #endif /* __CRT_HAVE_SC(dup2) */
 #if __CRT_HAVE_SC(dup3)
-/* @param: flags:  Set of `O_CLOEXEC|O_CLOFORK' */
+/* @param: flags:  Set of `O_CLOEXEC | O_CLOFORK' */
 __CDECLARE_SC(,__fd_t,dup3,(__fd_t __oldfd, __fd_t __newfd, __oflag_t __flags),(__oldfd,__newfd,__flags))
 #endif /* __CRT_HAVE_SC(dup3) */
 #if __CRT_HAVE_SC(epoll_create)
@@ -216,6 +216,7 @@ __CDECLARE_SC(,__fd_t,epoll_create,(__syscall_ulong_t __size),(__size))
 __CDECLARE_SC(,__fd_t,epoll_create1,(__syscall_ulong_t __flags),(__flags))
 #endif /* __CRT_HAVE_SC(epoll_create1) */
 #if __CRT_HAVE_SC(epoll_ctl)
+/* @param: op: One of `EPOLL_CTL_ADD', `EPOLL_CTL_DEL', `EPOLL_CTL_MOD' */
 __CDECLARE_SC(,__errno_t,epoll_ctl,(__fd_t __epfd, __syscall_ulong_t __op, __fd_t __fd, struct epoll_event *__event),(__epfd,__op,__fd,__event))
 #endif /* __CRT_HAVE_SC(epoll_ctl) */
 #if __CRT_HAVE_SC(epoll_pwait)
@@ -228,6 +229,7 @@ __CDECLARE_SC(,__errno_t,epoll_wait,(__fd_t __epfd, struct epoll_event *__events
 __CDECLARE_SC(,__fd_t,eventfd,(__syscall_ulong_t __initval),(__initval))
 #endif /* __CRT_HAVE_SC(eventfd) */
 #if __CRT_HAVE_SC(eventfd2)
+/* @param: flags: Set of `EFD_SEMAPHORE | EFD_NONBLOCK | EFD_CLOEXEC' */
 __CDECLARE_SC(,__fd_t,eventfd2,(__syscall_ulong_t __initval, __syscall_ulong_t __flags),(__initval,__flags))
 #endif /* __CRT_HAVE_SC(eventfd2) */
 #if __CRT_HAVE_SC(execve)
@@ -244,8 +246,8 @@ __CDECLARE_VOID_SC(__ATTR_NORETURN,exit,(__syscall_ulong_t __status),(__status))
 __CDECLARE_VOID_SC(__ATTR_NORETURN,exit_group,(__syscall_ulong_t __exit_code),(__exit_code))
 #endif /* __CRT_HAVE_SC(exit_group) */
 #if __CRT_HAVE_SC(faccessat)
-/* @param: type: Set of `R_OK|W_OK|X_OK' or `F_OK'
- * @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW|AT_EACCESS | AT_DOSPATH' */
+/* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK'
+ * @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_EACCESS | AT_DOSPATH' */
 __CDECLARE_SC(,__errno_t,faccessat,(__fd_t __dirfd, char const *__filename, __syscall_ulong_t __type, __atflag_t __flags),(__dirfd,__filename,__type,__flags))
 #endif /* __CRT_HAVE_SC(faccessat) */
 #if __CRT_HAVE_SC(fadvise64)
@@ -317,7 +319,7 @@ __CDECLARE_SC(,__errno_t,ftruncate,(__fd_t __fd, __syscall_ulong_t __length),(__
 __CDECLARE_SC(,__syscall_slong_t,futex,(__uint32_t *__uaddr, __syscall_ulong_t __futex_op, __uint32_t __val, struct timespec const *__timeout_or_val2, __uint32_t *__uaddr2, __uint32_t __val3),(__uaddr,__futex_op,__val,__timeout_or_val2,__uaddr2,__val3))
 #endif /* __CRT_HAVE_SC(futex) */
 #if __CRT_HAVE_SC(futimesat)
-__CDECLARE_SC(,__errno_t,futimesat,(__fd_t __dirfd, __const char *__filename, struct timeval const *__times),(__dirfd,__filename,__times))
+__CDECLARE_SC(,__errno_t,futimesat,(__fd_t __dirfd, char const *__filename, struct timeval const *__times),(__dirfd,__filename,__times))
 #endif /* __CRT_HAVE_SC(futimesat) */
 #if __CRT_HAVE_SC(get_mempolicy)
 __CDECLARE_SC(,__errno_t,get_mempolicy,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
@@ -380,6 +382,7 @@ __CDECLARE_SC(,__errno_t,getresgid,(__gid_t *__rgid, __gid_t *__egid, __gid_t *_
 __CDECLARE_SC(,__errno_t,getresuid,(__uid_t *__ruid, __uid_t *__euid, __uid_t *__suid),(__ruid,__euid,__suid))
 #endif /* __CRT_HAVE_SC(getresuid) */
 #if __CRT_HAVE_SC(getrlimit)
+/* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
 __CDECLARE_SC(,__errno_t,getrlimit,(__syscall_ulong_t __resource, struct rlimit *__rlimits),(__resource,__rlimits))
 #endif /* __CRT_HAVE_SC(getrlimit) */
 #if __CRT_HAVE_SC(getrusage)
@@ -470,7 +473,7 @@ __CDECLARE_SC(,__ssize_t,lgetxattr,(char const *__path, char const *__name, void
 __CDECLARE_SC(,__errno_t,link,(char const *__existing_file, char const *__link_file),(__existing_file,__link_file))
 #endif /* __CRT_HAVE_SC(link) */
 #if __CRT_HAVE_SC(linkat)
-/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_FOLLOW | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_FOLLOW | AT_DOSPATH' */
 __CDECLARE_SC(,__errno_t,linkat,(__fd_t __fromfd, char const *__existing_file, __fd_t __tofd, char const *__target_path, __atflag_t __flags),(__fromfd,__existing_file,__tofd,__target_path,__flags))
 #endif /* __CRT_HAVE_SC(linkat) */
 #if __CRT_HAVE_SC(linux_fstat)
@@ -516,6 +519,7 @@ __CDECLARE_SC(,__errno_t,mbind,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_SC(,__errno_t,membarrier,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(membarrier) */
 #if __CRT_HAVE_SC(memfd_create)
+/* @param: flags: Set of `MFD_CLOEXEC | MFD_ALLOW_SEALING' */
 __CDECLARE_SC(,__fd_t,memfd_create,(char const *__name, __syscall_ulong_t __flags),(__name,__flags))
 #endif /* __CRT_HAVE_SC(memfd_create) */
 #if __CRT_HAVE_SC(migrate_pages)
@@ -546,7 +550,7 @@ __CDECLARE_SC(,__errno_t,mlock2,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_SC(,__errno_t,mlockall,(__syscall_ulong_t __flags),(__flags))
 #endif /* __CRT_HAVE_SC(mlockall) */
 #if __CRT_HAVE_SC(mmap)
-/* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
+/* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
  *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
@@ -554,13 +558,13 @@ __CDECLARE_SC(,__errno_t,mlockall,(__syscall_ulong_t __flags),(__flags))
 __CDECLARE_SC(,void *,mmap,(void *__addr, __size_t __len, __syscall_ulong_t __prot, __syscall_ulong_t __flags, __fd_t __fd, __syscall_ulong_t __offset),(__addr,__len,__prot,__flags,__fd,__offset))
 #endif /* __CRT_HAVE_SC(mmap) */
 #if __CRT_HAVE_SC(mount)
-__CDECLARE_SC(,__errno_t,mount,(char const *__special_file, char const *__dir, char const *__fstype, __syscall_ulong_t __rwflag, void const *__data),(__special_file,__dir,__fstype,__rwflag,__data))
+__CDECLARE_SC(,__errno_t,mount,(char const *__special_file, char const *__dir, char const *__fstype, __syscall_ulong_t __mountflags, void const *__data),(__special_file,__dir,__fstype,__mountflags,__data))
 #endif /* __CRT_HAVE_SC(mount) */
 #if __CRT_HAVE_SC(move_pages)
 __CDECLARE_SC(,__errno_t,move_pages,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(move_pages) */
 #if __CRT_HAVE_SC(mprotect)
-/* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED' */
+/* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED' */
 __CDECLARE_SC(,__errno_t,mprotect,(void *__addr, __size_t __len, __syscall_ulong_t __prot),(__addr,__len,__prot))
 #endif /* __CRT_HAVE_SC(mprotect) */
 #if __CRT_HAVE_SC(mq_getsetattr)
@@ -582,7 +586,7 @@ __CDECLARE_SC(,__errno_t,mq_timedsend,(__fd_t __mqdes, char const *__msg_ptr, __
 __CDECLARE_SC(,__errno_t,mq_unlink,(char const *__name),(__name))
 #endif /* __CRT_HAVE_SC(mq_unlink) */
 #if __CRT_HAVE_SC(mremap)
-/* @param: flags: Set of `MREMAP_MAYMOVE|MREMAP_FIXED' */
+/* @param: flags: Set of `MREMAP_MAYMOVE | MREMAP_FIXED' */
 __CDECLARE_SC(,void *,mremap,(void *__addr, __size_t __old_len, __size_t __new_len, __syscall_ulong_t __flags, void *__new_address),(__addr,__old_len,__new_len,__flags,__new_address))
 #endif /* __CRT_HAVE_SC(mremap) */
 #if __CRT_HAVE_SC(msgctl)
@@ -610,7 +614,7 @@ __CDECLARE_SC(,__errno_t,munlockall,(void),())
 __CDECLARE_SC(,__errno_t,munmap,(void *__addr, __size_t __len),(__addr,__len))
 #endif /* __CRT_HAVE_SC(munmap) */
 #if __CRT_HAVE_SC(name_to_handle_at)
-__CDECLARE_SC(,__errno_t,name_to_handle_at,(__fd_t __dirfd, char const *__name, struct file_handle *__handle, __int32_t *__mnt_id, __syscall_ulong_t __flags),(__dirfd,__name,__handle,__mnt_id,__flags))
+__CDECLARE_SC(,__errno_t,name_to_handle_at,(__fd_t __dirfd, char const *__filename, struct file_handle *__handle, __int32_t *__mnt_id, __syscall_ulong_t __flags),(__dirfd,__filename,__handle,__mnt_id,__flags))
 #endif /* __CRT_HAVE_SC(name_to_handle_at) */
 #if __CRT_HAVE_SC(nanosleep)
 __CDECLARE_SC(,__errno_t,nanosleep,(struct timespec const *__req, struct timespec *__rem),(__req,__rem))
@@ -739,7 +743,7 @@ __CDECLARE_SC(,__errno_t,rename,(char const *__oldname, char const *__newname_or
 __CDECLARE_SC(,__errno_t,renameat,(__fd_t __oldfd, char const *__oldname, __fd_t __newfd, char const *__newname_or_path),(__oldfd,__oldname,__newfd,__newname_or_path))
 #endif /* __CRT_HAVE_SC(renameat) */
 #if __CRT_HAVE_SC(renameat2)
-/* @param: flags: Set of `RENAME_EXCHANGE,RENAME_NOREPLACE,RENAME_WHITEOUT' */
+/* @param: flags: Set of `RENAME_EXCHANGE | RENAME_NOREPLACE | RENAME_WHITEOUT' */
 __CDECLARE_SC(,__errno_t,renameat2,(__fd_t __olddirfd, char const *__oldpath, __fd_t __newdirfd, char const *__newpath, __syscall_ulong_t __flags),(__olddirfd,__oldpath,__newdirfd,__newpath,__flags))
 #endif /* __CRT_HAVE_SC(renameat2) */
 #if __CRT_HAVE_SC(request_key)
@@ -906,6 +910,7 @@ __CDECLARE_SC(,__errno_t,setresuid,(__uid_t __ruid, __uid_t __euid, __uid_t __su
 __CDECLARE_SC(,__errno_t,setreuid,(__uid_t __ruid, __uid_t __euid),(__ruid,__euid))
 #endif /* __CRT_HAVE_SC(setreuid) */
 #if __CRT_HAVE_SC(setrlimit)
+/* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
 __CDECLARE_SC(,__errno_t,setrlimit,(__syscall_ulong_t __resource, struct rlimit const *__rlimits),(__resource,__rlimits))
 #endif /* __CRT_HAVE_SC(setrlimit) */
 #if __CRT_HAVE_SC(setsid)
@@ -948,6 +953,7 @@ __CDECLARE_SC(,__errno_t,sigaltstack,(struct sigaltstack const *__ss, struct sig
 __CDECLARE_SC(,__errno_t,signalfd,(__fd_t __fd, struct __sigset_struct const *__sigmask, __size_t __sigsetsize),(__fd,__sigmask,__sigsetsize))
 #endif /* __CRT_HAVE_SC(signalfd) */
 #if __CRT_HAVE_SC(signalfd4)
+/* @param: flags: Set of `SFD_NONBLOCK | SFD_CLOEXEC' */
 __CDECLARE_SC(,__errno_t,signalfd4,(__fd_t __fd, struct __sigset_struct const *__sigmask, __size_t __sigsetsize, __syscall_ulong_t __flags),(__fd,__sigmask,__sigsetsize,__flags))
 #endif /* __CRT_HAVE_SC(signalfd4) */
 #if __CRT_HAVE_SC(socket)
@@ -1069,7 +1075,7 @@ __CDECLARE_SC(,__errno_t,uname,(struct utsname *__name),(__name))
 __CDECLARE_SC(,__errno_t,unlink,(char const *__filename),(__filename))
 #endif /* __CRT_HAVE_SC(unlink) */
 #if __CRT_HAVE_SC(unlinkat)
-/* @param: flags: Set of `0 | AT_REMOVEDIR|AT_REMOVEREG | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_REMOVEDIR | AT_REMOVEREG | AT_DOSPATH' */
 __CDECLARE_SC(,__errno_t,unlinkat,(__fd_t __dirfd, char const *__name, __atflag_t __flags),(__dirfd,__name,__flags))
 #endif /* __CRT_HAVE_SC(unlinkat) */
 #if __CRT_HAVE_SC(unshare)
@@ -1106,11 +1112,12 @@ __CDECLARE_SC(,__ssize_t,vmsplice,(__fd_t __fdout, struct iovec const *__iov, __
 #endif /* __CRT_HAVE_SC(vmsplice) */
 #if __CRT_HAVE_SC(wait4)
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
- * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+ * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 __CDECLARE_SC(,__pid_t,wait4,(__pid_t __pid, __int32_t *__stat_loc, __syscall_ulong_t __options, struct rusage *__usage),(__pid,__stat_loc,__options,__usage))
 #endif /* __CRT_HAVE_SC(wait4) */
 #if __CRT_HAVE_SC(waitid)
-/* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
+/* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
+ * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
 __CDECLARE_SC(,__errno_t,waitid,(__syscall_ulong_t __idtype, __id_t __id, struct __siginfo_struct *__infop, __syscall_ulong_t __options, struct rusage *__ru),(__idtype,__id,__infop,__options,__ru))
 #endif /* __CRT_HAVE_SC(waitid) */
 #if __CRT_HAVE_SC(write)
@@ -1213,7 +1220,7 @@ __CDECLARE_XSC(,__fd_t,dup,(__fd_t __fd),(__fd))
 __CDECLARE_XSC(,__fd_t,dup2,(__fd_t __oldfd, __fd_t __newfd),(__oldfd,__newfd))
 #endif /* __CRT_HAVE_XSC(dup2) */
 #if __CRT_HAVE_XSC(dup3)
-/* @param: flags:  Set of `O_CLOEXEC|O_CLOFORK' */
+/* @param: flags:  Set of `O_CLOEXEC | O_CLOFORK' */
 __CDECLARE_XSC(,__fd_t,dup3,(__fd_t __oldfd, __fd_t __newfd, __oflag_t __flags),(__oldfd,__newfd,__flags))
 #endif /* __CRT_HAVE_XSC(dup3) */
 #if __CRT_HAVE_XSC(epoll_create)
@@ -1223,6 +1230,7 @@ __CDECLARE_XSC(,__fd_t,epoll_create,(__syscall_ulong_t __size),(__size))
 __CDECLARE_XSC(,__fd_t,epoll_create1,(__syscall_ulong_t __flags),(__flags))
 #endif /* __CRT_HAVE_XSC(epoll_create1) */
 #if __CRT_HAVE_XSC(epoll_ctl)
+/* @param: op: One of `EPOLL_CTL_ADD', `EPOLL_CTL_DEL', `EPOLL_CTL_MOD' */
 __CDECLARE_XSC(,__errno_t,epoll_ctl,(__fd_t __epfd, __syscall_ulong_t __op, __fd_t __fd, struct epoll_event *__event),(__epfd,__op,__fd,__event))
 #endif /* __CRT_HAVE_XSC(epoll_ctl) */
 #if __CRT_HAVE_XSC(epoll_pwait)
@@ -1235,6 +1243,7 @@ __CDECLARE_XSC(,__errno_t,epoll_wait,(__fd_t __epfd, struct epoll_event *__event
 __CDECLARE_XSC(,__fd_t,eventfd,(__syscall_ulong_t __initval),(__initval))
 #endif /* __CRT_HAVE_XSC(eventfd) */
 #if __CRT_HAVE_XSC(eventfd2)
+/* @param: flags: Set of `EFD_SEMAPHORE | EFD_NONBLOCK | EFD_CLOEXEC' */
 __CDECLARE_XSC(,__fd_t,eventfd2,(__syscall_ulong_t __initval, __syscall_ulong_t __flags),(__initval,__flags))
 #endif /* __CRT_HAVE_XSC(eventfd2) */
 #if __CRT_HAVE_XSC(execve)
@@ -1251,8 +1260,8 @@ __CDECLARE_VOID_XSC(__ATTR_NORETURN,exit,(__syscall_ulong_t __status),(__status)
 __CDECLARE_VOID_XSC(__ATTR_NORETURN,exit_group,(__syscall_ulong_t __exit_code),(__exit_code))
 #endif /* __CRT_HAVE_XSC(exit_group) */
 #if __CRT_HAVE_XSC(faccessat)
-/* @param: type: Set of `R_OK|W_OK|X_OK' or `F_OK'
- * @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW|AT_EACCESS | AT_DOSPATH' */
+/* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK'
+ * @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_EACCESS | AT_DOSPATH' */
 __CDECLARE_XSC(,__errno_t,faccessat,(__fd_t __dirfd, char const *__filename, __syscall_ulong_t __type, __atflag_t __flags),(__dirfd,__filename,__type,__flags))
 #endif /* __CRT_HAVE_XSC(faccessat) */
 #if __CRT_HAVE_XSC(fadvise64)
@@ -1324,7 +1333,7 @@ __CDECLARE_XSC(,__errno_t,ftruncate,(__fd_t __fd, __syscall_ulong_t __length),(_
 __CDECLARE_XSC(,__syscall_slong_t,futex,(__uint32_t *__uaddr, __syscall_ulong_t __futex_op, __uint32_t __val, struct timespec const *__timeout_or_val2, __uint32_t *__uaddr2, __uint32_t __val3),(__uaddr,__futex_op,__val,__timeout_or_val2,__uaddr2,__val3))
 #endif /* __CRT_HAVE_XSC(futex) */
 #if __CRT_HAVE_XSC(futimesat)
-__CDECLARE_XSC(,__errno_t,futimesat,(__fd_t __dirfd, __const char *__filename, struct timeval const *__times),(__dirfd,__filename,__times))
+__CDECLARE_XSC(,__errno_t,futimesat,(__fd_t __dirfd, char const *__filename, struct timeval const *__times),(__dirfd,__filename,__times))
 #endif /* __CRT_HAVE_XSC(futimesat) */
 #if __CRT_HAVE_XSC(get_mempolicy)
 __CDECLARE_XSC(,__errno_t,get_mempolicy,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
@@ -1387,6 +1396,7 @@ __CDECLARE_XSC(,__errno_t,getresgid,(__gid_t *__rgid, __gid_t *__egid, __gid_t *
 __CDECLARE_XSC(,__errno_t,getresuid,(__uid_t *__ruid, __uid_t *__euid, __uid_t *__suid),(__ruid,__euid,__suid))
 #endif /* __CRT_HAVE_XSC(getresuid) */
 #if __CRT_HAVE_XSC(getrlimit)
+/* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
 __CDECLARE_XSC(,__errno_t,getrlimit,(__syscall_ulong_t __resource, struct rlimit *__rlimits),(__resource,__rlimits))
 #endif /* __CRT_HAVE_XSC(getrlimit) */
 #if __CRT_HAVE_XSC(getrusage)
@@ -1477,7 +1487,7 @@ __CDECLARE_XSC(,__ssize_t,lgetxattr,(char const *__path, char const *__name, voi
 __CDECLARE_XSC(,__errno_t,link,(char const *__existing_file, char const *__link_file),(__existing_file,__link_file))
 #endif /* __CRT_HAVE_XSC(link) */
 #if __CRT_HAVE_XSC(linkat)
-/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_FOLLOW | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_FOLLOW | AT_DOSPATH' */
 __CDECLARE_XSC(,__errno_t,linkat,(__fd_t __fromfd, char const *__existing_file, __fd_t __tofd, char const *__target_path, __atflag_t __flags),(__fromfd,__existing_file,__tofd,__target_path,__flags))
 #endif /* __CRT_HAVE_XSC(linkat) */
 #if __CRT_HAVE_XSC(linux_fstat)
@@ -1523,6 +1533,7 @@ __CDECLARE_XSC(,__errno_t,mbind,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_XSC(,__errno_t,membarrier,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(membarrier) */
 #if __CRT_HAVE_XSC(memfd_create)
+/* @param: flags: Set of `MFD_CLOEXEC | MFD_ALLOW_SEALING' */
 __CDECLARE_XSC(,__fd_t,memfd_create,(char const *__name, __syscall_ulong_t __flags),(__name,__flags))
 #endif /* __CRT_HAVE_XSC(memfd_create) */
 #if __CRT_HAVE_XSC(migrate_pages)
@@ -1553,7 +1564,7 @@ __CDECLARE_XSC(,__errno_t,mlock2,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_XSC(,__errno_t,mlockall,(__syscall_ulong_t __flags),(__flags))
 #endif /* __CRT_HAVE_XSC(mlockall) */
 #if __CRT_HAVE_XSC(mmap)
-/* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
+/* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
  *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
@@ -1561,13 +1572,13 @@ __CDECLARE_XSC(,__errno_t,mlockall,(__syscall_ulong_t __flags),(__flags))
 __CDECLARE_XSC(,void *,mmap,(void *__addr, __size_t __len, __syscall_ulong_t __prot, __syscall_ulong_t __flags, __fd_t __fd, __syscall_ulong_t __offset),(__addr,__len,__prot,__flags,__fd,__offset))
 #endif /* __CRT_HAVE_XSC(mmap) */
 #if __CRT_HAVE_XSC(mount)
-__CDECLARE_XSC(,__errno_t,mount,(char const *__special_file, char const *__dir, char const *__fstype, __syscall_ulong_t __rwflag, void const *__data),(__special_file,__dir,__fstype,__rwflag,__data))
+__CDECLARE_XSC(,__errno_t,mount,(char const *__special_file, char const *__dir, char const *__fstype, __syscall_ulong_t __mountflags, void const *__data),(__special_file,__dir,__fstype,__mountflags,__data))
 #endif /* __CRT_HAVE_XSC(mount) */
 #if __CRT_HAVE_XSC(move_pages)
 __CDECLARE_XSC(,__errno_t,move_pages,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(move_pages) */
 #if __CRT_HAVE_XSC(mprotect)
-/* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED' */
+/* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED' */
 __CDECLARE_XSC(,__errno_t,mprotect,(void *__addr, __size_t __len, __syscall_ulong_t __prot),(__addr,__len,__prot))
 #endif /* __CRT_HAVE_XSC(mprotect) */
 #if __CRT_HAVE_XSC(mq_getsetattr)
@@ -1589,7 +1600,7 @@ __CDECLARE_XSC(,__errno_t,mq_timedsend,(__fd_t __mqdes, char const *__msg_ptr, _
 __CDECLARE_XSC(,__errno_t,mq_unlink,(char const *__name),(__name))
 #endif /* __CRT_HAVE_XSC(mq_unlink) */
 #if __CRT_HAVE_XSC(mremap)
-/* @param: flags: Set of `MREMAP_MAYMOVE|MREMAP_FIXED' */
+/* @param: flags: Set of `MREMAP_MAYMOVE | MREMAP_FIXED' */
 __CDECLARE_XSC(,void *,mremap,(void *__addr, __size_t __old_len, __size_t __new_len, __syscall_ulong_t __flags, void *__new_address),(__addr,__old_len,__new_len,__flags,__new_address))
 #endif /* __CRT_HAVE_XSC(mremap) */
 #if __CRT_HAVE_XSC(msgctl)
@@ -1617,7 +1628,7 @@ __CDECLARE_XSC(,__errno_t,munlockall,(void),())
 __CDECLARE_XSC(,__errno_t,munmap,(void *__addr, __size_t __len),(__addr,__len))
 #endif /* __CRT_HAVE_XSC(munmap) */
 #if __CRT_HAVE_XSC(name_to_handle_at)
-__CDECLARE_XSC(,__errno_t,name_to_handle_at,(__fd_t __dirfd, char const *__name, struct file_handle *__handle, __int32_t *__mnt_id, __syscall_ulong_t __flags),(__dirfd,__name,__handle,__mnt_id,__flags))
+__CDECLARE_XSC(,__errno_t,name_to_handle_at,(__fd_t __dirfd, char const *__filename, struct file_handle *__handle, __int32_t *__mnt_id, __syscall_ulong_t __flags),(__dirfd,__filename,__handle,__mnt_id,__flags))
 #endif /* __CRT_HAVE_XSC(name_to_handle_at) */
 #if __CRT_HAVE_XSC(nanosleep)
 __CDECLARE_XSC(,__errno_t,nanosleep,(struct timespec const *__req, struct timespec *__rem),(__req,__rem))
@@ -1746,7 +1757,7 @@ __CDECLARE_XSC(,__errno_t,rename,(char const *__oldname, char const *__newname_o
 __CDECLARE_XSC(,__errno_t,renameat,(__fd_t __oldfd, char const *__oldname, __fd_t __newfd, char const *__newname_or_path),(__oldfd,__oldname,__newfd,__newname_or_path))
 #endif /* __CRT_HAVE_XSC(renameat) */
 #if __CRT_HAVE_XSC(renameat2)
-/* @param: flags: Set of `RENAME_EXCHANGE,RENAME_NOREPLACE,RENAME_WHITEOUT' */
+/* @param: flags: Set of `RENAME_EXCHANGE | RENAME_NOREPLACE | RENAME_WHITEOUT' */
 __CDECLARE_XSC(,__errno_t,renameat2,(__fd_t __olddirfd, char const *__oldpath, __fd_t __newdirfd, char const *__newpath, __syscall_ulong_t __flags),(__olddirfd,__oldpath,__newdirfd,__newpath,__flags))
 #endif /* __CRT_HAVE_XSC(renameat2) */
 #if __CRT_HAVE_XSC(request_key)
@@ -1910,6 +1921,7 @@ __CDECLARE_XSC(,__errno_t,setresuid,(__uid_t __ruid, __uid_t __euid, __uid_t __s
 __CDECLARE_XSC(,__errno_t,setreuid,(__uid_t __ruid, __uid_t __euid),(__ruid,__euid))
 #endif /* __CRT_HAVE_XSC(setreuid) */
 #if __CRT_HAVE_XSC(setrlimit)
+/* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
 __CDECLARE_XSC(,__errno_t,setrlimit,(__syscall_ulong_t __resource, struct rlimit const *__rlimits),(__resource,__rlimits))
 #endif /* __CRT_HAVE_XSC(setrlimit) */
 #if __CRT_HAVE_XSC(setsid)
@@ -1952,6 +1964,7 @@ __CDECLARE_XSC(,__errno_t,sigaltstack,(struct sigaltstack const *__ss, struct si
 __CDECLARE_XSC(,__errno_t,signalfd,(__fd_t __fd, struct __sigset_struct const *__sigmask, __size_t __sigsetsize),(__fd,__sigmask,__sigsetsize))
 #endif /* __CRT_HAVE_XSC(signalfd) */
 #if __CRT_HAVE_XSC(signalfd4)
+/* @param: flags: Set of `SFD_NONBLOCK | SFD_CLOEXEC' */
 __CDECLARE_XSC(,__errno_t,signalfd4,(__fd_t __fd, struct __sigset_struct const *__sigmask, __size_t __sigsetsize, __syscall_ulong_t __flags),(__fd,__sigmask,__sigsetsize,__flags))
 #endif /* __CRT_HAVE_XSC(signalfd4) */
 #if __CRT_HAVE_XSC(socket)
@@ -2073,7 +2086,7 @@ __CDECLARE_XSC(,__errno_t,uname,(struct utsname *__name),(__name))
 __CDECLARE_XSC(,__errno_t,unlink,(char const *__filename),(__filename))
 #endif /* __CRT_HAVE_XSC(unlink) */
 #if __CRT_HAVE_XSC(unlinkat)
-/* @param: flags: Set of `0 | AT_REMOVEDIR|AT_REMOVEREG | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_REMOVEDIR | AT_REMOVEREG | AT_DOSPATH' */
 __CDECLARE_XSC(,__errno_t,unlinkat,(__fd_t __dirfd, char const *__name, __atflag_t __flags),(__dirfd,__name,__flags))
 #endif /* __CRT_HAVE_XSC(unlinkat) */
 #if __CRT_HAVE_XSC(unshare)
@@ -2110,11 +2123,12 @@ __CDECLARE_XSC(,__ssize_t,vmsplice,(__fd_t __fdout, struct iovec const *__iov, _
 #endif /* __CRT_HAVE_XSC(vmsplice) */
 #if __CRT_HAVE_XSC(wait4)
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
- * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+ * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 __CDECLARE_XSC(,__pid_t,wait4,(__pid_t __pid, __int32_t *__stat_loc, __syscall_ulong_t __options, struct rusage *__usage),(__pid,__stat_loc,__options,__usage))
 #endif /* __CRT_HAVE_XSC(wait4) */
 #if __CRT_HAVE_XSC(waitid)
-/* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
+/* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
+ * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
 __CDECLARE_XSC(,__errno_t,waitid,(__syscall_ulong_t __idtype, __id_t __id, struct __siginfo_struct *__infop, __syscall_ulong_t __options, struct rusage *__ru),(__idtype,__id,__infop,__options,__ru))
 #endif /* __CRT_HAVE_XSC(waitid) */
 #if __CRT_HAVE_XSC(write)

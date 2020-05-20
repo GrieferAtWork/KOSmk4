@@ -27,6 +27,7 @@
 #include <kernel/arch/syscall-tables.h>
 #include <kernel/except.h>
 #include <kernel/syscall-properties.h>
+#include <kernel/syscall-trace.h>
 #include <kernel/syscall.h>
 #include <kernel/user.h>
 #include <sched/except-handler.h>

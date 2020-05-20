@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xac24e9cf */
+/* HASH CRC-32:0xf8dbe78a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -242,7 +242,7 @@ INTERN_FUNCTION(libc_sys_Xlseek)
 END(libc_sys_Xlseek)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xlseek, libc_sys_Xlseek)
 
-/* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
+/* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
  *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
@@ -260,7 +260,7 @@ INTERN_FUNCTION(libc_sys_mmap)
 END(libc_sys_mmap)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_mmap, libc_sys_mmap)
 
-/* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
+/* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
  *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
@@ -278,7 +278,7 @@ INTERN_FUNCTION(libc_sys_Xmmap)
 END(libc_sys_Xmmap)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xmmap, libc_sys_Xmmap)
 
-/* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED' */
+/* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED' */
 /* errno_t mprotect(void *addr, size_t len, syscall_ulong_t prot) */
 .section .text.crt.syscall.mprotect
 INTERN_FUNCTION(libc_sys_mprotect)
@@ -291,7 +291,7 @@ INTERN_FUNCTION(libc_sys_mprotect)
 END(libc_sys_mprotect)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_mprotect, libc_sys_mprotect)
 
-/* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED' */
+/* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED' */
 /* errno_t mprotect(void *addr, size_t len, syscall_ulong_t prot) */
 .section .text.crt.syscall.Xmprotect
 INTERN_FUNCTION(libc_sys_Xmprotect)
@@ -656,7 +656,7 @@ INTERN_FUNCTION(libc_sys_Xsched_yield)
 END(libc_sys_Xsched_yield)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xsched_yield, libc_sys_Xsched_yield)
 
-/* @param: flags: Set of `MREMAP_MAYMOVE|MREMAP_FIXED' */
+/* @param: flags: Set of `MREMAP_MAYMOVE | MREMAP_FIXED' */
 /* void *mremap(void *addr, size_t old_len, size_t new_len, syscall_ulong_t flags, void *new_address) */
 .section .text.crt.syscall.mremap
 INTERN_FUNCTION(libc_sys_mremap)
@@ -670,7 +670,7 @@ INTERN_FUNCTION(libc_sys_mremap)
 END(libc_sys_mremap)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_mremap, libc_sys_mremap)
 
-/* @param: flags: Set of `MREMAP_MAYMOVE|MREMAP_FIXED' */
+/* @param: flags: Set of `MREMAP_MAYMOVE | MREMAP_FIXED' */
 /* void *mremap(void *addr, size_t old_len, size_t new_len, syscall_ulong_t flags, void *new_address) */
 .section .text.crt.syscall.Xmremap
 INTERN_FUNCTION(libc_sys_Xmremap)
@@ -1599,7 +1599,7 @@ END(libc_sys_Xexit)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xexit, libc_sys_Xexit)
 
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
- * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+ * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 /* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusagex64 *usage) */
 .section .text.crt.syscall.wait4
 INTERN_FUNCTION(libc_sys_wait4)
@@ -1614,7 +1614,7 @@ END(libc_sys_wait4)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_wait4, libc_sys_wait4)
 
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
- * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+ * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 /* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusagex64 *usage) */
 .section .text.crt.syscall.Xwait4
 INTERN_FUNCTION(libc_sys_Xwait4)
@@ -2470,6 +2470,7 @@ INTERN_FUNCTION(libc_sys_Xgettimeofday)
 END(libc_sys_Xgettimeofday)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xgettimeofday, libc_sys_Xgettimeofday)
 
+/* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
 /* errno_t getrlimit(syscall_ulong_t resource, struct rlimit *rlimits) */
 .section .text.crt.syscall.getrlimit
 INTERN_FUNCTION(libc_sys_getrlimit)
@@ -2482,6 +2483,7 @@ INTERN_FUNCTION(libc_sys_getrlimit)
 END(libc_sys_getrlimit)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_getrlimit, libc_sys_getrlimit)
 
+/* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
 /* errno_t getrlimit(syscall_ulong_t resource, struct rlimit *rlimits) */
 .section .text.crt.syscall.Xgetrlimit
 INTERN_FUNCTION(libc_sys_Xgetrlimit)
@@ -3988,6 +3990,7 @@ INTERN_FUNCTION(libc_sys_Xadjtimex)
 END(libc_sys_Xadjtimex)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xadjtimex, libc_sys_Xadjtimex)
 
+/* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
 /* errno_t setrlimit(syscall_ulong_t resource, struct rlimit const *rlimits) */
 .section .text.crt.syscall.setrlimit
 INTERN_FUNCTION(libc_sys_setrlimit)
@@ -4000,6 +4003,7 @@ INTERN_FUNCTION(libc_sys_setrlimit)
 END(libc_sys_setrlimit)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_setrlimit, libc_sys_setrlimit)
 
+/* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
 /* errno_t setrlimit(syscall_ulong_t resource, struct rlimit const *rlimits) */
 .section .text.crt.syscall.Xsetrlimit
 INTERN_FUNCTION(libc_sys_Xsetrlimit)
@@ -4108,7 +4112,7 @@ INTERN_FUNCTION(libc_sys_Xsettimeofday)
 END(libc_sys_Xsettimeofday)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xsettimeofday, libc_sys_Xsettimeofday)
 
-/* errno_t mount(char const *special_file, char const *dir, char const *fstype, syscall_ulong_t rwflag, void const *data) */
+/* errno_t mount(char const *special_file, char const *dir, char const *fstype, syscall_ulong_t mountflags, void const *data) */
 .section .text.crt.syscall.mount
 INTERN_FUNCTION(libc_sys_mount)
 	.cfi_startproc
@@ -4121,7 +4125,7 @@ INTERN_FUNCTION(libc_sys_mount)
 END(libc_sys_mount)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_mount, libc_sys_mount)
 
-/* errno_t mount(char const *special_file, char const *dir, char const *fstype, syscall_ulong_t rwflag, void const *data) */
+/* errno_t mount(char const *special_file, char const *dir, char const *fstype, syscall_ulong_t mountflags, void const *data) */
 .section .text.crt.syscall.Xmount
 INTERN_FUNCTION(libc_sys_Xmount)
 	.cfi_startproc
@@ -5304,6 +5308,7 @@ INTERN_FUNCTION(libc_sys_Xepoll_create)
 END(libc_sys_Xepoll_create)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xepoll_create, libc_sys_Xepoll_create)
 
+/* @param: op: One of `EPOLL_CTL_ADD', `EPOLL_CTL_DEL', `EPOLL_CTL_MOD' */
 /* errno_t epoll_ctl_old(fd_t epfd, syscall_ulong_t op, fd_t fd, struct epoll_event *event) */
 .section .text.crt.syscall.epoll_ctl_old
 INTERN_FUNCTION(libc_sys_epoll_ctl_old)
@@ -5317,6 +5322,7 @@ INTERN_FUNCTION(libc_sys_epoll_ctl_old)
 END(libc_sys_epoll_ctl_old)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_epoll_ctl_old, libc_sys_epoll_ctl_old)
 
+/* @param: op: One of `EPOLL_CTL_ADD', `EPOLL_CTL_DEL', `EPOLL_CTL_MOD' */
 /* errno_t epoll_ctl_old(fd_t epfd, syscall_ulong_t op, fd_t fd, struct epoll_event *event) */
 .section .text.crt.syscall.Xepoll_ctl_old
 INTERN_FUNCTION(libc_sys_Xepoll_ctl_old)
@@ -5772,6 +5778,7 @@ INTERN_FUNCTION(libc_sys_Xepoll_wait)
 END(libc_sys_Xepoll_wait)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xepoll_wait, libc_sys_Xepoll_wait)
 
+/* @param: op: One of `EPOLL_CTL_ADD', `EPOLL_CTL_DEL', `EPOLL_CTL_MOD' */
 /* errno_t epoll_ctl(fd_t epfd, syscall_ulong_t op, fd_t fd, struct epoll_event *event) */
 .section .text.crt.syscall.epoll_ctl
 INTERN_FUNCTION(libc_sys_epoll_ctl)
@@ -5785,6 +5792,7 @@ INTERN_FUNCTION(libc_sys_epoll_ctl)
 END(libc_sys_epoll_ctl)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_epoll_ctl, libc_sys_epoll_ctl)
 
+/* @param: op: One of `EPOLL_CTL_ADD', `EPOLL_CTL_DEL', `EPOLL_CTL_MOD' */
 /* errno_t epoll_ctl(fd_t epfd, syscall_ulong_t op, fd_t fd, struct epoll_event *event) */
 .section .text.crt.syscall.Xepoll_ctl
 INTERN_FUNCTION(libc_sys_Xepoll_ctl)
@@ -6114,7 +6122,8 @@ INTERN_FUNCTION(libc_sys_Xkexec_load)
 END(libc_sys_Xkexec_load)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xkexec_load, libc_sys_Xkexec_load)
 
-/* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
+/* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
+ * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
 /* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfox64_struct *infop, syscall_ulong_t options, struct rusagex64 *ru) */
 .section .text.crt.syscall.waitid
 INTERN_FUNCTION(libc_sys_waitid)
@@ -6128,7 +6137,8 @@ INTERN_FUNCTION(libc_sys_waitid)
 END(libc_sys_waitid)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_waitid, libc_sys_waitid)
 
-/* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
+/* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
+ * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
 /* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfox64_struct *infop, syscall_ulong_t options, struct rusagex64 *ru) */
 .section .text.crt.syscall.Xwaitid
 INTERN_FUNCTION(libc_sys_Xwaitid)
@@ -6462,7 +6472,7 @@ INTERN_FUNCTION(libc_sys_Xfchownat)
 END(libc_sys_Xfchownat)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xfchownat, libc_sys_Xfchownat)
 
-/* errno_t futimesat(fd_t dirfd, const char *filename, struct timevalx64 const[2] times) */
+/* errno_t futimesat(fd_t dirfd, char const *filename, struct timevalx64 const[2] times) */
 .section .text.crt.syscall.futimesat
 INTERN_FUNCTION(libc_sys_futimesat)
 	.cfi_startproc
@@ -6474,7 +6484,7 @@ INTERN_FUNCTION(libc_sys_futimesat)
 END(libc_sys_futimesat)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_futimesat, libc_sys_futimesat)
 
-/* errno_t futimesat(fd_t dirfd, const char *filename, struct timevalx64 const[2] times) */
+/* errno_t futimesat(fd_t dirfd, char const *filename, struct timevalx64 const[2] times) */
 .section .text.crt.syscall.Xfutimesat
 INTERN_FUNCTION(libc_sys_Xfutimesat)
 	.cfi_startproc
@@ -6514,7 +6524,7 @@ INTERN_FUNCTION(libc_sys_Xlinux_fstatat)
 END(libc_sys_Xlinux_fstatat)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xlinux_fstatat, libc_sys_Xlinux_fstatat)
 
-/* @param: flags: Set of `0 | AT_REMOVEDIR|AT_REMOVEREG | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_REMOVEDIR | AT_REMOVEREG | AT_DOSPATH' */
 /* errno_t unlinkat(fd_t dirfd, char const *name, atflag_t flags) */
 .section .text.crt.syscall.unlinkat
 INTERN_FUNCTION(libc_sys_unlinkat)
@@ -6527,7 +6537,7 @@ INTERN_FUNCTION(libc_sys_unlinkat)
 END(libc_sys_unlinkat)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_unlinkat, libc_sys_unlinkat)
 
-/* @param: flags: Set of `0 | AT_REMOVEDIR|AT_REMOVEREG | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_REMOVEDIR | AT_REMOVEREG | AT_DOSPATH' */
 /* errno_t unlinkat(fd_t dirfd, char const *name, atflag_t flags) */
 .section .text.crt.syscall.Xunlinkat
 INTERN_FUNCTION(libc_sys_Xunlinkat)
@@ -6566,7 +6576,7 @@ INTERN_FUNCTION(libc_sys_Xrenameat)
 END(libc_sys_Xrenameat)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xrenameat, libc_sys_Xrenameat)
 
-/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_FOLLOW | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_FOLLOW | AT_DOSPATH' */
 /* errno_t linkat(fd_t fromfd, char const *existing_file, fd_t tofd, char const *target_path, atflag_t flags) */
 .section .text.crt.syscall.linkat
 INTERN_FUNCTION(libc_sys_linkat)
@@ -6580,7 +6590,7 @@ INTERN_FUNCTION(libc_sys_linkat)
 END(libc_sys_linkat)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_linkat, libc_sys_linkat)
 
-/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_FOLLOW | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_FOLLOW | AT_DOSPATH' */
 /* errno_t linkat(fd_t fromfd, char const *existing_file, fd_t tofd, char const *target_path, atflag_t flags) */
 .section .text.crt.syscall.Xlinkat
 INTERN_FUNCTION(libc_sys_Xlinkat)
@@ -6672,8 +6682,8 @@ INTERN_FUNCTION(libc_sys_Xfchmodat)
 END(libc_sys_Xfchmodat)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xfchmodat, libc_sys_Xfchmodat)
 
-/* @param: type: Set of `R_OK|W_OK|X_OK' or `F_OK'
- * @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW|AT_EACCESS | AT_DOSPATH' */
+/* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK'
+ * @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_EACCESS | AT_DOSPATH' */
 /* errno_t faccessat(fd_t dirfd, char const *filename, syscall_ulong_t type, atflag_t flags) */
 .section .text.crt.syscall.faccessat
 INTERN_FUNCTION(libc_sys_faccessat)
@@ -6687,8 +6697,8 @@ INTERN_FUNCTION(libc_sys_faccessat)
 END(libc_sys_faccessat)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_faccessat, libc_sys_faccessat)
 
-/* @param: type: Set of `R_OK|W_OK|X_OK' or `F_OK'
- * @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW|AT_EACCESS | AT_DOSPATH' */
+/* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK'
+ * @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_EACCESS | AT_DOSPATH' */
 /* errno_t faccessat(fd_t dirfd, char const *filename, syscall_ulong_t type, atflag_t flags) */
 .section .text.crt.syscall.Xfaccessat
 INTERN_FUNCTION(libc_sys_Xfaccessat)
@@ -7196,6 +7206,7 @@ INTERN_FUNCTION(libc_sys_Xaccept4)
 END(libc_sys_Xaccept4)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xaccept4, libc_sys_Xaccept4)
 
+/* @param: flags: Set of `SFD_NONBLOCK | SFD_CLOEXEC' */
 /* errno_t signalfd4(fd_t fd, struct __sigset_struct const *sigmask, size_t sigsetsize, syscall_ulong_t flags) */
 .section .text.crt.syscall.signalfd4
 INTERN_FUNCTION(libc_sys_signalfd4)
@@ -7209,6 +7220,7 @@ INTERN_FUNCTION(libc_sys_signalfd4)
 END(libc_sys_signalfd4)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_signalfd4, libc_sys_signalfd4)
 
+/* @param: flags: Set of `SFD_NONBLOCK | SFD_CLOEXEC' */
 /* errno_t signalfd4(fd_t fd, struct __sigset_struct const *sigmask, size_t sigsetsize, syscall_ulong_t flags) */
 .section .text.crt.syscall.Xsignalfd4
 INTERN_FUNCTION(libc_sys_Xsignalfd4)
@@ -7222,6 +7234,7 @@ INTERN_FUNCTION(libc_sys_Xsignalfd4)
 END(libc_sys_Xsignalfd4)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xsignalfd4, libc_sys_Xsignalfd4)
 
+/* @param: flags: Set of `EFD_SEMAPHORE | EFD_NONBLOCK | EFD_CLOEXEC' */
 /* fd_t eventfd2(syscall_ulong_t initval, syscall_ulong_t flags) */
 .section .text.crt.syscall.eventfd2
 INTERN_FUNCTION(libc_sys_eventfd2)
@@ -7234,6 +7247,7 @@ INTERN_FUNCTION(libc_sys_eventfd2)
 END(libc_sys_eventfd2)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_eventfd2, libc_sys_eventfd2)
 
+/* @param: flags: Set of `EFD_SEMAPHORE | EFD_NONBLOCK | EFD_CLOEXEC' */
 /* fd_t eventfd2(syscall_ulong_t initval, syscall_ulong_t flags) */
 .section .text.crt.syscall.Xeventfd2
 INTERN_FUNCTION(libc_sys_Xeventfd2)
@@ -7270,7 +7284,7 @@ INTERN_FUNCTION(libc_sys_Xepoll_create1)
 END(libc_sys_Xepoll_create1)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xepoll_create1, libc_sys_Xepoll_create1)
 
-/* @param: flags:  Set of `O_CLOEXEC|O_CLOFORK' */
+/* @param: flags:  Set of `O_CLOEXEC | O_CLOFORK' */
 /* fd_t dup3(fd_t oldfd, fd_t newfd, oflag_t flags) */
 .section .text.crt.syscall.dup3
 INTERN_FUNCTION(libc_sys_dup3)
@@ -7283,7 +7297,7 @@ INTERN_FUNCTION(libc_sys_dup3)
 END(libc_sys_dup3)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_dup3, libc_sys_dup3)
 
-/* @param: flags:  Set of `O_CLOEXEC|O_CLOFORK' */
+/* @param: flags:  Set of `O_CLOEXEC | O_CLOFORK' */
 /* fd_t dup3(fd_t oldfd, fd_t newfd, oflag_t flags) */
 .section .text.crt.syscall.Xdup3
 INTERN_FUNCTION(libc_sys_Xdup3)
@@ -7550,7 +7564,7 @@ INTERN_FUNCTION(libc_sys_Xprlimit64)
 END(libc_sys_Xprlimit64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xprlimit64, libc_sys_Xprlimit64)
 
-/* errno_t name_to_handle_at(fd_t dirfd, char const *name, struct file_handle *handle, int32_t *mnt_id, syscall_ulong_t flags) */
+/* errno_t name_to_handle_at(fd_t dirfd, char const *filename, struct file_handle *handle, int32_t *mnt_id, syscall_ulong_t flags) */
 .section .text.crt.syscall.name_to_handle_at
 INTERN_FUNCTION(libc_sys_name_to_handle_at)
 	.cfi_startproc
@@ -7563,7 +7577,7 @@ INTERN_FUNCTION(libc_sys_name_to_handle_at)
 END(libc_sys_name_to_handle_at)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_name_to_handle_at, libc_sys_name_to_handle_at)
 
-/* errno_t name_to_handle_at(fd_t dirfd, char const *name, struct file_handle *handle, int32_t *mnt_id, syscall_ulong_t flags) */
+/* errno_t name_to_handle_at(fd_t dirfd, char const *filename, struct file_handle *handle, int32_t *mnt_id, syscall_ulong_t flags) */
 .section .text.crt.syscall.Xname_to_handle_at
 INTERN_FUNCTION(libc_sys_Xname_to_handle_at)
 	.cfi_startproc
@@ -7872,7 +7886,7 @@ INTERN_FUNCTION(libc_sys_Xsched_getattr)
 END(libc_sys_Xsched_getattr)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xsched_getattr, libc_sys_Xsched_getattr)
 
-/* @param: flags: Set of `RENAME_EXCHANGE,RENAME_NOREPLACE,RENAME_WHITEOUT' */
+/* @param: flags: Set of `RENAME_EXCHANGE | RENAME_NOREPLACE | RENAME_WHITEOUT' */
 /* errno_t renameat2(fd_t olddirfd, char const *oldpath, fd_t newdirfd, char const *newpath, syscall_ulong_t flags) */
 .section .text.crt.syscall.renameat2
 INTERN_FUNCTION(libc_sys_renameat2)
@@ -7886,7 +7900,7 @@ INTERN_FUNCTION(libc_sys_renameat2)
 END(libc_sys_renameat2)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_renameat2, libc_sys_renameat2)
 
-/* @param: flags: Set of `RENAME_EXCHANGE,RENAME_NOREPLACE,RENAME_WHITEOUT' */
+/* @param: flags: Set of `RENAME_EXCHANGE | RENAME_NOREPLACE | RENAME_WHITEOUT' */
 /* errno_t renameat2(fd_t olddirfd, char const *oldpath, fd_t newdirfd, char const *newpath, syscall_ulong_t flags) */
 .section .text.crt.syscall.Xrenameat2
 INTERN_FUNCTION(libc_sys_Xrenameat2)
@@ -7948,6 +7962,7 @@ INTERN_FUNCTION(libc_sys_Xgetrandom)
 END(libc_sys_Xgetrandom)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xgetrandom, libc_sys_Xgetrandom)
 
+/* @param: flags: Set of `MFD_CLOEXEC | MFD_ALLOW_SEALING' */
 /* fd_t memfd_create(char const *name, syscall_ulong_t flags) */
 .section .text.crt.syscall.memfd_create
 INTERN_FUNCTION(libc_sys_memfd_create)
@@ -7960,6 +7975,7 @@ INTERN_FUNCTION(libc_sys_memfd_create)
 END(libc_sys_memfd_create)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_memfd_create, libc_sys_memfd_create)
 
+/* @param: flags: Set of `MFD_CLOEXEC | MFD_ALLOW_SEALING' */
 /* fd_t memfd_create(char const *name, syscall_ulong_t flags) */
 .section .text.crt.syscall.Xmemfd_create
 INTERN_FUNCTION(libc_sys_Xmemfd_create)
@@ -8460,6 +8476,8 @@ INTERN_FUNCTION(libc_sys_Xfchdirat)
 END(libc_sys_Xfchdirat)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xfchdirat, libc_sys_Xfchdirat)
 
+/* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
+ *               optionally or'd with any of `READDIR_SKIPREL | READDIR_WANTEOF' */
 /* ssize_t kreaddirf(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode, iomode_t iomode) */
 .section .text.crt.syscall.kreaddirf
 INTERN_FUNCTION(libc_sys_kreaddirf)
@@ -8473,6 +8491,8 @@ INTERN_FUNCTION(libc_sys_kreaddirf)
 END(libc_sys_kreaddirf)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_kreaddirf, libc_sys_kreaddirf)
 
+/* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
+ *               optionally or'd with any of `READDIR_SKIPREL | READDIR_WANTEOF' */
 /* ssize_t kreaddirf(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode, iomode_t iomode) */
 .section .text.crt.syscall.Xkreaddirf
 INTERN_FUNCTION(libc_sys_Xkreaddirf)
@@ -8486,6 +8506,8 @@ INTERN_FUNCTION(libc_sys_Xkreaddirf)
 END(libc_sys_Xkreaddirf)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xkreaddirf, libc_sys_Xkreaddirf)
 
+/* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
+ *               optionally or'd with any of `READDIR_SKIPREL | READDIR_WANTEOF' */
 /* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
 .section .text.crt.syscall.kreaddir
 INTERN_FUNCTION(libc_sys_kreaddir)
@@ -8499,6 +8521,8 @@ INTERN_FUNCTION(libc_sys_kreaddir)
 END(libc_sys_kreaddir)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_kreaddir, libc_sys_kreaddir)
 
+/* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
+ *               optionally or'd with any of `READDIR_SKIPREL | READDIR_WANTEOF' */
 /* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
 .section .text.crt.syscall.Xkreaddir
 INTERN_FUNCTION(libc_sys_Xkreaddir)
@@ -8524,7 +8548,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_Xkreaddir, libc_sys_Xkreaddir)
  * @param: initial_size: The initial mmap(2)able size of the returned handle.
  *                       This size may be altered at a later point in time
  *                       through use of `ftruncate(return)'
- * @param: flags:        Set of `0 | O_NONBLOCK | O_CLOEXEC | O_CLOFORK' */
+ * @param: flags:        Set of `0 | O_CLOEXEC | O_CLOFORK | O_NONBLOCK' */
 /* fd_t userviofd(size_t initial_size, syscall_ulong_t flags) */
 .section .text.crt.syscall.userviofd
 INTERN_FUNCTION(libc_sys_userviofd)
@@ -8549,7 +8573,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_userviofd, libc_sys_userviofd)
  * @param: initial_size: The initial mmap(2)able size of the returned handle.
  *                       This size may be altered at a later point in time
  *                       through use of `ftruncate(return)'
- * @param: flags:        Set of `0 | O_NONBLOCK | O_CLOEXEC | O_CLOFORK' */
+ * @param: flags:        Set of `0 | O_CLOEXEC | O_CLOFORK | O_NONBLOCK' */
 /* fd_t userviofd(size_t initial_size, syscall_ulong_t flags) */
 .section .text.crt.syscall.Xuserviofd
 INTERN_FUNCTION(libc_sys_Xuserviofd)
@@ -8898,18 +8922,18 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_Xlfutexexpr, libc_sys_Xlfutexexpr)
  * Provide the bottom-most API for implementing user-space synchronization on KOS
  * @param: futex_op: One of:
  *    - LFUTEX_WAKE:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKE, size_t val = count)
- *    - LFUTEX_WAKEMASK:           (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKEMASK, size_t val = count, struct timespec64 const *timeout = mask_and, uintptr_t val2 = mask_or)
+ *    - LFUTEX_WAKEMASK:           (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKEMASK, size_t val = count, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *timeout = mask_and, uintptr_t val2 = mask_or)
  *    - LFUTEX_NOP:                (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_NOP)
- *    - LFUTEX_WAIT:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT, uintptr_t val = ignored, struct timespec const *timeout)
- *    - LFUTEX_WAIT_LOCK:          (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_LOCK, uintptr_t val = lock_value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE, uintptr_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_UNTIL:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL, uintptr_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_ABOVE:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_ABOVE, uintptr_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BELOW:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BELOW, uintptr_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
- *    - LFUTEX_WAIT_UNTIL_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
- *    - LFUTEX_WAIT_WHILE_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
- *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
+ *    - LFUTEX_WAIT:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT, uintptr_t val = ignored, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
+ *    - LFUTEX_WAIT_LOCK:          (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_LOCK, uintptr_t val = lock_value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE, uintptr_t val = value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
+ *    - LFUTEX_WAIT_UNTIL:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL, uintptr_t val = value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_ABOVE:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_ABOVE, uintptr_t val = value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BELOW:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BELOW, uintptr_t val = value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BITMASK, uintptr_t val = bitmask, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, uintptr_t val2 = setmask)
+ *    - LFUTEX_WAIT_UNTIL_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_BITMASK, uintptr_t val = bitmask, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, uintptr_t val2 = setmask)
+ *    - LFUTEX_WAIT_WHILE_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_CMPXCH, uintptr_t val = oldval, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, uintptr_t val2 = newval)
+ *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_CMPXCH, uintptr_t val = oldval, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, uintptr_t val2 = newval)
  * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
  * @return: * : Depending on `futex_op'
  * @return: -1:EFAULT:    A faulty pointer was given
@@ -8933,18 +8957,18 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_lfutex, libc_sys_lfutex)
  * Provide the bottom-most API for implementing user-space synchronization on KOS
  * @param: futex_op: One of:
  *    - LFUTEX_WAKE:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKE, size_t val = count)
- *    - LFUTEX_WAKEMASK:           (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKEMASK, size_t val = count, struct timespec64 const *timeout = mask_and, uintptr_t val2 = mask_or)
+ *    - LFUTEX_WAKEMASK:           (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKEMASK, size_t val = count, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *timeout = mask_and, uintptr_t val2 = mask_or)
  *    - LFUTEX_NOP:                (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_NOP)
- *    - LFUTEX_WAIT:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT, uintptr_t val = ignored, struct timespec const *timeout)
- *    - LFUTEX_WAIT_LOCK:          (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_LOCK, uintptr_t val = lock_value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE, uintptr_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_UNTIL:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL, uintptr_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_ABOVE:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_ABOVE, uintptr_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BELOW:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BELOW, uintptr_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
- *    - LFUTEX_WAIT_UNTIL_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
- *    - LFUTEX_WAIT_WHILE_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
- *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
+ *    - LFUTEX_WAIT:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT, uintptr_t val = ignored, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
+ *    - LFUTEX_WAIT_LOCK:          (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_LOCK, uintptr_t val = lock_value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE, uintptr_t val = value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
+ *    - LFUTEX_WAIT_UNTIL:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL, uintptr_t val = value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_ABOVE:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_ABOVE, uintptr_t val = value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BELOW:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BELOW, uintptr_t val = value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BITMASK, uintptr_t val = bitmask, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, uintptr_t val2 = setmask)
+ *    - LFUTEX_WAIT_UNTIL_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_BITMASK, uintptr_t val = bitmask, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, uintptr_t val2 = setmask)
+ *    - LFUTEX_WAIT_WHILE_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_CMPXCH, uintptr_t val = oldval, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, uintptr_t val2 = newval)
+ *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_CMPXCH, uintptr_t val = oldval, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, uintptr_t val2 = newval)
  * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
  * @return: * : Depending on `futex_op'
  * @return: -1:EFAULT:    A faulty pointer was given

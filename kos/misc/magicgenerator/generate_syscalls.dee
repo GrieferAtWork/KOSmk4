@@ -88,6 +88,7 @@ import optimizePrintf from ..libgen.optiprintf;
 
 global final HASHFUNCNAME = "CRC-32";
 global final ABC = "abcdefghijklmnopqrstuvwxyz";
+global final SC_REPR_PREFIX = "SC_REPR_";
 
 function getFilenameForLog(filename: string): string {
 	return fs.abspath(filename);
@@ -611,7 +612,16 @@ function parseTypeExpression(
 				switch (directive_name) {
 				case "reg64": returnType.isReg64 = argsToBool(); break;
 				case "reg128": returnType.isReg128 = argsToBool(); break;
-				case "tostr": returnType.tostrMethod = directive_args; break;
+				case "tostr":
+					if (!directive_args || !directive_args.issymbol()) {
+						if (":" !in directive_args)
+							err(name_start, "Bad tostr() attribute: {!r}".format({ directive_args }));
+						local a, none, b = directive_args.partition(":")...;
+						if (!a.strip().issymbol() || !b.strip().issymbol())
+							err(name_start, "Bad tostr() attribute: {!r}".format({ directive_args }));
+					}
+					returnType.tostrMethod = directive_args;
+					break;
 				default:
 					err(name_start, "Unknown attribute {!r}".format({ directive_name }));
 				}
@@ -769,7 +779,7 @@ again:
 function areXArchTypesCompatibile(
 		aArchName: string, aArchTypename: string,
 		bArchName: string, bArchTypename: string) {
-	if (aArchName > bArchName) {
+	if (bArchName !is none && aArchName > bArchName) {
 		local temp = bArchName;
 		bArchName = aArchName;
 		aArchName = temp;
@@ -923,7 +933,7 @@ function areFunctionsBinaryCompatible(
 		local bArgType: CType = bArgs[i][0];
 		if (!areCTypesCompatible(aArgType, aContext, aArch, aArchName,
 		                         bArgType, bContext, bArch, bArchName)) {
-			PRINT_COMPAT("No: arg",i,":",repr aArgType.typename,"!=",repr bArgType.typename);
+			PRINT_COMPAT("No: arg", i, ":", repr aArgType.typename, "!=", repr bArgType.typename);
 			return false;
 		}
 	}
@@ -1688,8 +1698,11 @@ function printSyscallDeclarations(
 
 function printMessageBox(fp: File, message: string) {
 	fp << "/************************************************************************/\n";
-	fp << "/* " << message;
-	fp << "                                                                     */\n"[#message:];
+	message = message.strip();
+	for (local l: message.splitlines(false)) {
+		fp << "/* " << l;
+		fp << "                                                                     */\n"[#l:];
+	}
 	fp << "/************************************************************************/\n";
 }
 
@@ -2194,109 +2207,31 @@ function generateAsmSyscallsProtoHeader(
 	fp << "\n";
 }
 
-function unpackTrace(cType: CType): (string, string) {
+@@Return the representation codec to-be used for the given @cType
+function getReprTypeForCType(cType: CType, context: ParserContext, arch/*: SyscallArch*/, archName: string): string {
 	local x = cType.tostrMethod;
-	if (x is none)
-		x = syscallTostrExpressions.get(cType.typename);
-	if (x is none) {
-		if (cType.typename.endswith("*") || cType.typename.endswith("]"))
-			return ("\"%p\"", ", {me}");
-		print "Warning: Missing tostr() for", repr cType.typename;
-		return none;
+	if (x !is none)
+		return x;
+	x = syscallTostrExpressions.get(cType.typename);
+	if (x !is none)
+		return x;
+	local mySimpleTypename = simpifyTypeName(cType.typename);
+	for (local typename, repr_name: syscallTostrExpressions) {
+		if (areCTypeNamesCompatible(mySimpleTypename, context, arch, archName,
+			                        simpifyTypeName(typename), none, none, none))
+			return repr_name;
 	}
-	if (x.startswith("select")) {
-		local basevalue = "?";
-		x = x[#"select":].lstrip();
-		assert x.startswith("(");
-		assert x.endswith(")");
-		x = x[1:-1].strip();
-		if (":" in x) {
-			basevalue, none, x = x.partition(":")...;
-			assert "," !in basevalue;
-			basevalue = basevalue.strip();
-			x = x.strip();
-		}
-		File.Writer args_writer;
-		args_writer << ", ({me}),";
-		for (local f: x.split(",")) {
-			f = f.strip();
-			local fval = f;
-			if ("=" in f) {
-				f, none, fval = f.partition("=")...;
-				f = f.strip();
-				fval = fval.strip();
-			}
-			args_writer
-				<< " ({me}) == " << fval
-				<< " ? " << repr(f)
-				<< " :";
-		}
-		args_writer << " " << repr(basevalue);
-		return ("\"%#Ix=%s\"", args_writer.string);
-	}
-	if (x.startswith("flagset")) {
-		local baseflag = none;
-		x = x[#"flagset":].lstrip();
-		assert "|" !in x, "x = " + repr(x);
-		assert x.startswith("(");
-		assert x.endswith(")");
-		x = x[1:-1].strip();
-		if (":" in x) {
-			baseflag, none, x = x.partition(":")...;
-			assert "," !in baseflag;
-			baseflag = baseflag.strip();
-			x = x.strip();
-		}
-		local flags = List(for (local f: x.split(",")) f.strip());
-		assert flags;
-		local format_string = "%s" * ((#flags * 2) - 1);
-		format_string = "%#Ix=" + format_string;
-		File.Writer args_writer;
-		args_writer << ", (uintptr_t)({me})";
-		for (local i = 0; i < #flags; ++i) {
-			local f = flags[i];
-			local fval = f;
-			if ("=" in f) {
-				f, none, fval = f.partition("=")...;
-				f = f.strip();
-				fval = fval.strip();
-			}
-			if (i) {
-				args_writer
-					<< ", (({me}) & " << fval << ") && (({me}) & ("
-					<< " | ".join(
-						for (local r: flags[:i])
-							"=" in r
-								? r.partition("=")[2].lstrip()
-								: r)
-					<< ")) ? \"|\" : \"\"";
-			}
-			if (i == 0 && baseflag) {
-				args_writer << ", ({me}) & " << fval << " ? " << repr(f) << " : ({me}) ? \"\" : " << repr(baseflag) << "\n";
-			} else {
-				args_writer << ", ({me}) & " << fval << " ? " << repr(f) << " : \"\"\n";
-			}
-		}
-		return (optimizePrintf(format_string), args_writer.string.rstrip());
-	}
-	assert x.startswith("\"");
-	local i = 1;
-	while (i < #x && (x[i] != "\"" || x[i-1] == "\\"))
-		++i;
-	if (i < #x)
-		++i;
-	local format_string = x[:i];
-	x = x[i:].lstrip();
-	assert x.startswith(",");
-	x = x[1:].lstrip();
-	format_string = optimizePrintf(format_string.decode("c-escape"));
-	return (format_string, ", " + x);
+	if (cType.typename.endswith("*") || cType.typename.endswith("]"))
+		return "POINTER";
+	print "Warning: Missing tostr() for", repr cType.typename;
+	return "UNKNOWN";
 }
 
 @@Generate include/asm/syscalls-trace.h
 function generateAsmSyscallsTraceHeader(
 		fp: File, context: ParserContext,
-		arch/*: SyscallArch*/, prefix: string = "__NR") {
+		arch/*: SyscallArch*/, archName: string,
+		prefix: string = "__NR") {
 	local ids = context.sysidMappings.keys.sorted();
 	if (!ids)
 		return;
@@ -2307,7 +2242,10 @@ function generateAsmSyscallsTraceHeader(
 			longestNameLen = temp;
 	}
 	fp << copyright << "\n\n";
-	printMessageBox(fp, "SYSCALL ARGUMENT NAMES");
+	printMessageBox(fp,
+		"SYSCALL ARGUMENT NAMES\n"
+		" - {prefix}AN<argI>_<name> : ArgumentName\n"
+		.format({ "prefix" : prefix }));
 	fp << "#ifdef __WANT_SYSCALL_ARGUMENT_NAMES\n";
 	fp << "#ifndef " << prefix << "FEAT_DEFINED_SYSCALL_ARGUMENT_NAMES\n";
 	fp << "#define " << prefix << "FEAT_DEFINED_SYSCALL_ARGUMENT_NAMES 1\n";
@@ -2322,10 +2260,31 @@ function generateAsmSyscallsTraceHeader(
 	fp << "#endif /* !" << prefix << "FEAT_DEFINED_SYSCALL_ARGUMENT_NAMES */\n";
 	fp << "#endif /* __WANT_SYSCALL_ARGUMENT_NAMES */\n";
 	fp << "\n\n";
-	printMessageBox(fp, "SYSCALL ARGUMENT FORMAT");
+	printMessageBox(fp,
+		"SYSCALL ARGUMENT FORMAT\n"
+		" - {prefix}RTR_<name>       : ReturnTypeRepresentation\n"
+		" - {prefix}ATR<argI>_<name> : ArgumentTypeRepresentation\n"
+		" - {prefix}ATL<argI>_<name> : ArgumentTypeLink\n"
+		.format({ "prefix" : prefix }));
 	fp << "#ifdef __WANT_SYSCALL_ARGUMENT_FORMAT\n";
 	fp << "#ifndef " << prefix << "FEAT_DEFINED_SYSCALL_ARGUMENT_FORMAT\n";
 	fp << "#define " << prefix << "FEAT_DEFINED_SYSCALL_ARGUMENT_FORMAT 1\n";
+	local longestReprTypeLen = 0;
+	for (local sysno: ids) {
+		local f: Function = context.functions[context.sysidMappings[sysno][2]];
+		for (local t, n: f.args) {
+			local reprType = getReprTypeForCType(t, context, arch, archName);
+			if (":" in reprType) /* Special case: Linked argument. */
+				reprType = reprType.partition(":")[0].strip();
+			local temp = #reprType;
+			if (longestReprTypeLen < temp)
+				longestReprTypeLen = temp;
+		}
+		local reprType = getReprTypeForCType(f.returnType, context, arch, archName);
+		local temp = #reprType;
+		if (longestReprTypeLen < temp)
+			longestReprTypeLen = temp;
+	}
 	for (local sysno: ids) {
 		local f: Function = context.functions[context.sysidMappings[sysno][2]];
 		local args = ", ".join(for (local none, n: f.args) n);
@@ -2335,50 +2294,133 @@ function generateAsmSyscallsTraceHeader(
 			spc = " " * (longestNameLen - indent);
 		local i = 0;
 		for (local t, n: f.args) {
-			local fmt, arg = unpackTrace(t)...;
-			if (fmt is none)
-				fmt = "\"?\"";
-			if (arg is none)
-				arg = "/* nothing */";
-			fp << "#define " << prefix << "ATRF" << i << "_"
+			local reprType = getReprTypeForCType(t, context, arch, archName);
+			local linkedName = none;
+			if (":" in reprType) {
+				/* Special case: Linked argument. */
+				reprType, none, linkedName = reprType.partition(":")...;
+				reprType = reprType.strip();
+				linkedName = linkedName.strip();
+			}
+			if (!reprType.issymbol())
+				throw Error("Bad representation name: {!r}".format({ reprType }));
+			fp << "#define " << prefix << "ATR" << i << "_"
 				<< f.name
 				<< (" " * (longestNameLen - #f.name))
-				<< " "
-				<< fmt
-				<< "\n";
-			arg = arg.format({ "me" : n });
-			if ("\n" in arg) {
-				File.Writer fprefix;
-				fprefix << "#define " << prefix << "ATRA" << i << "_"
-					<< f.name
-					<< "("
-					<< args
-					<< ") "
-					<< spc;
-				fprefix = fprefix.string;
-				local lines = List(arg.splitlines(false));
-				for (local i = 0; i < #lines; ++i) {
-					fp << fprefix << lines[i];
-					if (i != #lines - 1)
-						fp << " \\";
-					fp << "\n";
-					fprefix = " " * #fprefix;
+				<< " " << SC_REPR_PREFIX << reprType
+				<< (" " * (longestReprTypeLen - #reprType))
+				<< " /* " << n << " */ \n";
+			if (linkedName !is none) {
+				local j = 0;
+				for (local none, n: f.args) {
+					if (n == linkedName)
+						break;
+					++j;
 				}
-			} else {
-				fp << "#define " << prefix << "ATRA" << i << "_"
+				if (j >= #f.args)
+					throw Error("Unknown linked argument: {!r}".format({ linkedName }));
+				fp << "#define " << prefix << "ATL" << i << "_"
 					<< f.name
-					<< "("
-					<< args
-					<< ") "
-					<< spc
-					<< arg
-					<< "\n";
+					<< (" " * (longestNameLen - #f.name))
+					<< " " << j
+					<< (" " * ((longestReprTypeLen + #SC_REPR_PREFIX) - 1))
+					<< " /* " << n << " -> " << linkedName << " */ \n";
+			}
+			++i;
+		}
+		local reprType = getReprTypeForCType(f.returnType, context, arch, archName);
+		fp << "#define " << prefix << "RTR_"
+			<< f.name
+			<< (" " * (longestNameLen - #f.name))
+			<< "  " << SC_REPR_PREFIX << reprType
+			<< (" " * (longestReprTypeLen - #reprType))
+			<< " /* return */\n";
+	}
+	fp << "#endif /* !" << prefix << "FEAT_DEFINED_SYSCALL_ARGUMENT_FORMAT */\n";
+	fp << "#endif /* __WANT_SYSCALL_ARGUMENT_FORMAT */\n";
+	fp << "\n\n";
+	printMessageBox(fp, "SYSCALL ARGUMENT DOUBLE WIDE");
+	fp << "#ifdef __WANT_SYSCALL_ARGUMENT_DOUBLE_WIDE\n";
+	fp << "#ifndef " << prefix << "FEAT_DEFINED_SYSCALL_ARGUMENT_DOUBLE_WIDE\n";
+	fp << "#define " << prefix << "FEAT_DEFINED_SYSCALL_ARGUMENT_DOUBLE_WIDE 1\n";
+	local doubleWideMacros = List();
+	for (local sysno: ids) {
+		local f: Function = context.functions[context.sysidMappings[sysno][2]];
+		local i = 0;
+		for (local t, none: f.args) {
+			if ((t.isReg128 && arch.platformGpRegisterSizeInBits && arch.platformGpRegisterSizeInBits < 128) ||
+			    (t.isReg64 && arch.platformGpRegisterSizeInBits && arch.platformGpRegisterSizeInBits < 64)) {
+				doubleWideMacros.append("{}DW{}_{}".format({ prefix, i, f.name }));
 			}
 			++i;
 		}
 	}
-	fp << "#endif /* !" << prefix << "FEAT_DEFINED_SYSCALL_ARGUMENT_FORMAT */\n";
-	fp << "#endif /* __WANT_SYSCALL_ARGUMENT_FORMAT */\n";
+	local longestDoubleWideName = doubleWideMacros.each.length > ...;
+	for (local x: doubleWideMacros)
+		fp << "#define " << x << (" " * (longestDoubleWideName - #x)) << " 1\n";
+	fp << "#endif /* !" << prefix << "FEAT_DEFINED_SYSCALL_ARGUMENT_DOUBLE_WIDE */\n";
+	fp << "#endif /* __WANT_SYSCALL_ARGUMENT_DOUBLE_WIDE */\n";
+	fp << "\n";
+}
+
+@@Generate include/asm/syscalls-types.h
+function generateAsmSyscallsTypesHeader(
+		fp: File, contextTriples: (ParserContext, Object/*SyscallArch*/, string)) {
+	fp << copyright << "\n\n";
+	local usedReprTypes = HashSet();
+	local usedReturnReprTypes = HashSet();
+	for (local context, arch, archName: contextTriples) {
+		local ids = context.sysidMappings.keys.sorted();
+		if (!ids)
+			return;
+		for (local sysno: ids) {
+			local f: Function = context.functions[context.sysidMappings[sysno][2]];
+			for (local t, n: f.args) {
+				local reprType = getReprTypeForCType(t, context, arch, archName);
+				if (":" in reprType) /* Special case: Linked argument. */
+					reprType = reprType.partition(":")[0];
+				usedReturnReprTypes.remove(reprType);
+				usedReprTypes.insert(reprType);
+			}
+			local reprType = getReprTypeForCType(f.returnType, context, arch, archName);
+			if (reprType !in usedReprTypes)
+				usedReturnReprTypes.insert(reprType);
+		}
+	}
+	fp << "#ifndef __SYSCALL_REPR\n";
+	fp << "#define __SYSCALL_REPR(id) /* nothing */\n";
+	fp << "#endif /* !__SYSCALL_REPR */\n";
+	fp << "\n";
+
+	if (usedReprTypes) {
+		fp << "#ifdef __WANT_HAVE_SYSCALL_ARGUMENT_REPR_TYPES\n";
+		for (local typ: usedReprTypes.sorted())
+			fp << "#define HAVE_" << SC_REPR_PREFIX << typ << " 1\n";
+		fp << "#endif /* __WANT_HAVE_SYSCALL_ARGUMENT_REPR_TYPES */\n";
+		fp << "\n";
+	}
+	if (usedReturnReprTypes) {
+		fp << "#ifdef __WANT_HAVE_SYSCALL_RETURN_REPR_TYPES\n";
+		for (local typ: usedReturnReprTypes.sorted())
+			fp << "#define HAVE_" << SC_REPR_PREFIX << typ << " 1\n";
+		fp << "#endif /* __WANT_HAVE_SYSCALL_RETURN_REPR_TYPES */\n";
+		fp << "\n";
+	}
+	if (usedReprTypes) {
+		fp << "#ifdef __WANT_SYSCALL_ARGUMENT_REPR_TYPES\n";
+		for (local typ: usedReprTypes.sorted())
+			fp << "__SYSCALL_REPR(" << SC_REPR_PREFIX << typ << ")\n";
+		fp << "#endif /* __WANT_SYSCALL_ARGUMENT_REPR_TYPES */\n";
+		fp << "\n";
+	}
+	if (usedReturnReprTypes) {
+		fp << "#ifdef __WANT_SYSCALL_RETURN_REPR_TYPES\n";
+		for (local typ: usedReturnReprTypes.sorted())
+			fp << "__SYSCALL_REPR(" << SC_REPR_PREFIX << typ << ")\n";
+		fp << "#endif /* __WANT_SYSCALL_RETURN_REPR_TYPES */\n";
+		fp << "\n";
+	}
+	fp << "#undef __SYSCALL_REPR\n";
 	fp << "\n";
 }
 
@@ -2870,7 +2912,12 @@ function main(archNames: {string...}) {
 		writeHashedFile(a.formatPath(
 			"include/{name}/asm/syscalls-trace{suffix}.h"
 		), [](fp){
-			generateAsmSyscallsTraceHeader(fp, c, a);
+			generateAsmSyscallsTraceHeader(fp, c, a, name);
+		});
+		writeHashedFile(a.formatPath(
+			"include/{name}/asm/syscalls-types{suffix}.h"
+		), [](fp){
+			generateAsmSyscallsTypesHeader(fp, { (c, a, name) });
 		});
 		if (a.platformSuffix) {
 			writeHashedFile(a.formatPath(
@@ -2886,7 +2933,12 @@ function main(archNames: {string...}) {
 			writeHashedFile(a.formatPath(
 				"include/{name}/asm/syscalls-trace{suffix}_d.h"
 			), [](fp){
-				generateAsmSyscallsTraceHeader(fp, c, a, "__NR" + a.platformSuffix);
+				generateAsmSyscallsTraceHeader(fp, c, a, name, "__NR" + a.platformSuffix);
+			});
+			writeHashedFile(a.formatPath(
+				"include/{name}/asm/syscalls-types{suffix}_d.h"
+			), [](fp){
+				generateAsmSyscallsTypesHeader(fp, { (c, a, name) });
 			});
 		}
 	}
@@ -2897,7 +2949,10 @@ function main(archNames: {string...}) {
 		generateAsmSyscallsProtoHeader(fp, baseContext, none);
 	});
 	writeHashedFile("include/asm/syscalls-trace.h", [](fp){
-		generateAsmSyscallsTraceHeader(fp, baseContext, none);
+		generateAsmSyscallsTraceHeader(fp, baseContext, none, none);
+	});
+	writeHashedFile("include/asm/syscalls-types.h", [](fp){
+		generateAsmSyscallsTypesHeader(fp, { (baseContext, none, none) });
 	});
 
 	for (local name, a: ARCH) {
@@ -2962,6 +3017,31 @@ function main(archNames: {string...}) {
 					fp, prefix,
 					archContext, a, name,
 					compatContext, compatArch, compatArchName);
+			});
+		}
+	}
+
+	for (local name, a: ARCH) {
+		if (!a.platformSyscallCompatTypes)
+			continue;
+		local archContext = archContexts[name];
+		for (local headerName, compatArchName:
+				a.platformSyscallCompatTypes) {
+			local compatArch = ALL_ARCH[compatArchName];
+			if (compatArchName !in archContexts) {
+				/* Lazily load definitions for compatibility-mode architectures */
+				local a = ALL_ARCH[compatArchName];
+				local c = copy baseContext;
+				parseSyscallDefsFile(c, a.formatPath(
+					"include/{name}/asm/syscalls{suffix}.def"), a);
+				archContexts[compatArchName] = c;
+			}
+			local compatContext = archContexts[compatArchName];
+			writeHashedFile(headerName, [](fp){
+				generateAsmSyscallsTypesHeader(fp, {
+					(archContext, a, name),
+					(compatContext, compatArch, compatArchName),
+				});
 			});
 		}
 	}

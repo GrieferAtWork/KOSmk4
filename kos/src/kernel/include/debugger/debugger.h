@@ -17,18 +17,17 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_DEBUGGER_H
-#define GUARD_KERNEL_INCLUDE_DEBUGGER_H 1
+#ifndef GUARD_KERNEL_INCLUDE_DEBUGGER_DEBUGGER_H
+#define GUARD_KERNEL_INCLUDE_DEBUGGER_DEBUGGER_H 1
 
 #include <kernel/compiler.h>
 
-#include <debugger/config.h>
-#include <debugger/entry.h>
-#include <debugger/hook.h>
-#include <debugger/hook.h>
-#include <debugger/input.h>
-#include <debugger/output.h>
-#include <debugger/rt.h>
-#include <debugger/util.h>
+#include "config.h"
+#include "entry.h"
+#include "hook.h"
+#include "input.h"
+#include "output.h"
+#include "rt.h"
+#include "util.h"
 
-#endif /* !GUARD_KERNEL_INCLUDE_DEBUGGER_H */
+#endif /* !GUARD_KERNEL_INCLUDE_DEBUGGER_DEBUGGER_H */

@@ -35,6 +35,7 @@
 #include <kernel/panic.h>
 #include <kernel/printk.h>
 #include <kernel/syscall-properties.h>
+#include <kernel/syscall-trace.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
@@ -80,8 +81,10 @@ DECL_BEGIN
 
 
 #ifndef CONFIG_NO_SYSCALL_TRACING
-PRIVATE ATTR_COLDBSS struct mutex syscall_tracing_lock = MUTEX_INIT;
 INTERN ATTR_COLDBSS bool syscall_tracing_enabled = false;
+PRIVATE ATTR_COLDBSS struct mutex syscall_tracing_lock = MUTEX_INIT;
+DEFINE_DBG_BZERO_OBJECT(syscall_tracing_lock);
+
 
 #ifndef CONFIG_NO_SMP
 PRIVATE NOBLOCK NONNULL((1, 2)) struct icpustate *
@@ -126,14 +129,32 @@ NOTHROW(FCALL setpcrel32)(s32 *pcrel, void *dest) {
 }
 
 
-/* Enable/disable system call tracing.
+/* Low-level, arch-specific enable/disable system call tracing.
+ * NOTE: Don't call `arch_syscall_tracing_setenabled()' directly.
+ *       Low-level system call tracing is enabled/disabled automatically
+ *       when tracing callbacks are installed/deleted as the result of
+ *       calls to `syscall_trace_start()' and `syscall_trace_stop()'.
+ *       Manually enabling/disable tracing will work, however attempting
+ *       to start/stop tracing via installation of dynamic tracing
+ *       callbacks may break, since those functions may only call this
+ *       one when the first callback is registered, or the last callback
+ *       is deleted.
+ * NOTE: A user can manually invoke this function from the builtin debugger
+ *       through use of the `sctrace 0|1' command.
+ * @param: nx:     When true, don't throw an exception or block.
  * @return: true:  Successfully changed the current tracing state.
- * @return: false: Tracing was already enabled/disabled. */
-PUBLIC bool KCALL syscall_tracing_setenabled(bool enable) {
+ * @return: false: Tracing was already enabled/disabled, or could
+ *                 not be enabled/disabled when `nx == true'. */
+PUBLIC bool KCALL arch_syscall_tracing_setenabled(bool enable, bool nx) {
 	bool result;
 	struct idt_segment newsyscall;
 	void *addr;
-	SCOPED_WRITELOCK(&syscall_tracing_lock);
+	if (!sync_trywrite(&syscall_tracing_lock)) {
+		if (nx)
+			return false;
+		sync_write(&syscall_tracing_lock);
+	}
+	FINALLY_ENDWRITE(&syscall_tracing_lock);
 
 	addr = enable ? (void *)&x86_syscall32_int80_traced
 	              : (void *)&x86_syscall32_int80;
@@ -149,7 +170,8 @@ PUBLIC bool KCALL syscall_tracing_setenabled(bool enable) {
 #endif /* !__x86_64__ */
 	/* WARNING: This call right here can throw an exception!
 	 *          As such, it has to be kept near the top of this function. */
-	x86_idt_modify_begin();
+	if (!x86_idt_modify_begin(nx))
+		return false;
 	x86_idt[0x80] = newsyscall;
 	x86_idt_modify_end();
 
@@ -215,12 +237,16 @@ PUBLIC bool KCALL syscall_tracing_setenabled(bool enable) {
 		               : (u64)&x86_syscall64_syscall);
 	}
 #endif /* __x86_64__ */
+
+	/* Since we modified various bits of program text,
+	 * we must also flush the instruction cache. */
+	__flush_instruction_cache();
 	return result;
 }
 
 /* Check if system call tracing is enabled. */
 PUBLIC WUNUSED bool
-NOTHROW(KCALL syscall_tracing_getenabled)(void) {
+NOTHROW(KCALL arch_syscall_tracing_getenabled)(void) {
 	return ATOMIC_READ(syscall_tracing_enabled);
 }
 #endif /* !CONFIG_NO_SYSCALL_TRACING */
@@ -247,45 +273,6 @@ NOTHROW(KCALL x86_initialize_sysenter)(void) {
 	}
 #endif /* __x86_64__ */
 }
-
-#ifdef CONFIG_HAVE_DEBUGGER
-PRIVATE ATTR_DBGRODATA char const sctrace_str_0[] = "0";
-PRIVATE ATTR_DBGRODATA char const sctrace_str_1[] = "1";
-
-DBG_AUTOCOMPLETE(sctrace,
-                 /*size_t*/ argc, /*char **/ argv /*[]*/,
-                 /*dbg_autocomplete_cb_t*/ cb, /*void **/arg) {
-	(void)argv;
-	if (argc == 1) {
-		(*cb)(arg, sctrace_str_0, COMPILER_STRLEN(sctrace_str_0));
-		(*cb)(arg, sctrace_str_1, COMPILER_STRLEN(sctrace_str_1));
-	}
-}
-
-DBG_COMMAND_AUTO(sctrace, DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE,
-                 "sctrace [0|1]\n"
-                 "\tGet or set system call tracing\n",
-                 argc, argv) {
-	bool enabled;
-	if (argc == 1) {
-		enabled = syscall_tracing_getenabled();
-		dbg_print(enabled ? DBGSTR("enabled\n") : DBGSTR("disabled\n"));
-		return enabled ? 0 : 1;
-	}
-	if (argc != 2)
-		return DBG_STATUS_INVALID_ARGUMENTS;
-	if (strcmp(argv[1], sctrace_str_1) == 0) {
-		enabled = true;
-	} else if (strcmp(argv[1], sctrace_str_0) == 0) {
-		enabled = false;
-	} else {
-		return DBG_STATUS_INVALID_ARGUMENTS;
-	}
-	syscall_tracing_setenabled(enabled);
-	return 0;
-}
-#endif /* CONFIG_HAVE_DEBUGGER */
-
 
 DECL_END
 

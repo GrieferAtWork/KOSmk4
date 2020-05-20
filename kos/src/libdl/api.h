@@ -131,7 +131,7 @@
  * sections, which are required for allowing exceptions to work
  * properly when being propagated through the callbacks invoked
  * by the RTLD driver.
- * NOTE: Each search has 2 symbols defined by the linker script:
+ * NOTE: Each section has 2 symbols defined by the linker script:
  *       `__rtld_<name>_start' and `__rtld_<name>_end', that are
  *       used to lazily fill in section information as-per the
  *       request of a call to `dllocksection()' when given a handle

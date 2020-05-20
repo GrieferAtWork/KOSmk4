@@ -213,7 +213,7 @@ __SYSDECL_BEGIN
 /* Mount a filesystem. */
 [cp]
 mount:([nullable] char const *special_file, [nullable] char const *dir,
-       [nullable] char const *fstype, unsigned long int rwflag,
+       [nullable] char const *fstype, unsigned long int mountflags,
        [nullable] void const *data) -> int;
 
 [cp][noexport][crt_requires(umount2)]

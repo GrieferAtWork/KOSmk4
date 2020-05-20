@@ -104,8 +104,11 @@ DATDEF struct desctab const x86_dbgaltcoreidt_ptr;
  * call to `x86_idt_modify_end()'
  * Also note that these functions must not be called recursively from the same
  * thread. - A call to `x86_idt_modify_begin()' must _NOT_ be followed by another
- * call to `x86_idt_modify_begin()' from the same thread! */
-FUNDEF void FCALL x86_idt_modify_begin(void)
+ * call to `x86_idt_modify_begin()' from the same thread!
+ * @param: nx:     When true, don't do anything that could throw an exception, or block.
+ * @return: true:  Success (always returned when `nx == false')
+ * @return: false: Failure (only ever returned when `nx == true') */
+FUNDEF bool FCALL x86_idt_modify_begin(bool nx)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INTERRUPT);
 FUNDEF NOBLOCK void
 NOTHROW(FCALL x86_idt_modify_end)(bool discard_changes DFL(false));

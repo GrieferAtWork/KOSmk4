@@ -68,13 +68,8 @@
 @@exist, requiring the use of a custom protocol.
 [restart(must)][noexcept] rt_sigreturn:();
 
-clone:([tostr(flagset(CLONE_VM, CLONE_FS, CLONE_FILES, CLONE_SIGHAND, CLONE_PTRACE,
-                      CLONE_VFORK, CLONE_PARENT, CLONE_THREAD, CLONE_NEWNS, CLONE_SYSVSEM,
-                      CLONE_SETTLS, CLONE_PARENT_SETTID, CLONE_CHILD_CLEARTID, CLONE_DETACHED,
-                      CLONE_UNTRACED, CLONE_CHILD_SETTID, CLONE_NEWUTS, CLONE_NEWIPC,
-                      CLONE_NEWUSER, CLONE_NEWPID, CLONE_NEWNET, CLONE_IO))]
-       syscall_ulong_t flags, void *child_stack, pid_t *ptid,
-       pid_t *ctid, uintptr_t newtls) -> pid_t;
+clone:([tostr(CLONE_FLAGS)] syscall_ulong_t flags, void *child_stack,
+       pid_t *ptid, pid_t *ctid, [tostr(POINTER)] uintptr_t newtls) -> pid_t;
 
 /* Configure binding of multi-arch types in system calls. */
 utime = utimex64;

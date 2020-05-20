@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe9e3444d */
+/* HASH CRC-32:0x64f90214 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -803,7 +803,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getpid)
 	.cfi_endproc
 END(__x86_asm32_int80_getpid)
 
-/* errno_t mount(char const *special_file, char const *dir, char const *fstype, syscall_ulong_t rwflag, void const *data) */
+/* errno_t mount(char const *special_file, char const *dir, char const *fstype, syscall_ulong_t mountflags, void const *data) */
 .section .text.x86.asm32_syscall_int80.mount
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_mount)
 	.cfi_startproc simple
@@ -2778,6 +2778,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sethostname)
 	.cfi_endproc
 END(__x86_asm32_int80_sethostname)
 
+/* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
 /* errno_t setrlimit(syscall_ulong_t resource, struct rlimit const *rlimits) */
 .section .text.x86.asm32_syscall_int80.setrlimit
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_setrlimit)
@@ -2815,6 +2816,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setrlimit)
 	.cfi_endproc
 END(__x86_asm32_int80_setrlimit)
 
+/* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
 /* errno_t getrlimit(syscall_ulong_t resource, struct rlimit *rlimits) */
 .section .text.x86.asm32_syscall_int80.getrlimit
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_getrlimit)
@@ -3340,7 +3342,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readdir)
 	.cfi_endproc
 END(__x86_asm32_int80_readdir)
 
-/* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
+/* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
  *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
@@ -4237,7 +4239,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_vm86old)
 END(__x86_asm32_int80_vm86old)
 
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
- * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+ * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 /* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusagex32 *usage) */
 .section .text.x86.asm32_syscall_int80.wait4
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_wait4)
@@ -4662,7 +4664,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_adjtimex)
 	.cfi_endproc
 END(__x86_asm32_int80_adjtimex)
 
-/* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED' */
+/* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED' */
 /* errno_t mprotect(void *addr, size_t len, syscall_ulong_t prot) */
 .section .text.x86.asm32_syscall_int80.mprotect
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_mprotect)
@@ -6070,7 +6072,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_nanosleep)
 	.cfi_endproc
 END(__x86_asm32_int80_nanosleep)
 
-/* @param: flags: Set of `MREMAP_MAYMOVE|MREMAP_FIXED' */
+/* @param: flags: Set of `MREMAP_MAYMOVE | MREMAP_FIXED' */
 /* void *mremap(void *addr, size_t old_len, size_t new_len, syscall_ulong_t flags, void *new_address) */
 .section .text.x86.asm32_syscall_int80.mremap
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_mremap)
@@ -9396,6 +9398,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_epoll_create)
 	.cfi_endproc
 END(__x86_asm32_int80_epoll_create)
 
+/* @param: op: One of `EPOLL_CTL_ADD', `EPOLL_CTL_DEL', `EPOLL_CTL_MOD' */
 /* errno_t epoll_ctl(fd_t epfd, syscall_ulong_t op, fd_t fd, struct epoll_event *event) */
 .section .text.x86.asm32_syscall_int80.epoll_ctl
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_epoll_ctl)
@@ -10489,7 +10492,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kexec_load)
 	.cfi_endproc
 END(__x86_asm32_int80_kexec_load)
 
-/* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
+/* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
+ * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
 /* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfox32_struct *infop, syscall_ulong_t options, struct rusagex32 *ru) */
 .section .text.x86.asm32_syscall_int80.waitid
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_waitid)
@@ -11021,7 +11025,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fchownat)
 	.cfi_endproc
 END(__x86_asm32_int80_fchownat)
 
-/* errno_t futimesat(fd_t dirfd, const char *filename, struct timevalx32 const[2] times) */
+/* errno_t futimesat(fd_t dirfd, char const *filename, struct timevalx32 const[2] times) */
 .section .text.x86.asm32_syscall_int80.futimesat
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_futimesat)
 	.cfi_startproc simple
@@ -11098,7 +11102,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_fstatat64)
 	.cfi_endproc
 END(__x86_asm32_int80_linux_fstatat64)
 
-/* @param: flags: Set of `0 | AT_REMOVEDIR|AT_REMOVEREG | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_REMOVEDIR | AT_REMOVEREG | AT_DOSPATH' */
 /* errno_t unlinkat(fd_t dirfd, char const *name, atflag_t flags) */
 .section .text.x86.asm32_syscall_int80.unlinkat
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_unlinkat)
@@ -11175,7 +11179,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_renameat)
 	.cfi_endproc
 END(__x86_asm32_int80_renameat)
 
-/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_FOLLOW | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_FOLLOW | AT_DOSPATH' */
 /* errno_t linkat(fd_t fromfd, char const *existing_file, fd_t tofd, char const *target_path, atflag_t flags) */
 .section .text.x86.asm32_syscall_int80.linkat
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_linkat)
@@ -11333,8 +11337,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fchmodat)
 	.cfi_endproc
 END(__x86_asm32_int80_fchmodat)
 
-/* @param: type: Set of `R_OK|W_OK|X_OK' or `F_OK'
- * @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW|AT_EACCESS | AT_DOSPATH' */
+/* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK'
+ * @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_EACCESS | AT_DOSPATH' */
 /* errno_t faccessat(fd_t dirfd, char const *filename, syscall_ulong_t type, atflag_t flags) */
 .section .text.x86.asm32_syscall_int80.faccessat
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_faccessat)
@@ -12117,6 +12121,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timerfd_gettime)
 	.cfi_endproc
 END(__x86_asm32_int80_timerfd_gettime)
 
+/* @param: flags: Set of `SFD_NONBLOCK | SFD_CLOEXEC' */
 /* errno_t signalfd4(fd_t fd, struct __sigset_struct const *sigmask, size_t sigsetsize, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.signalfd4
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_signalfd4)
@@ -12156,6 +12161,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_signalfd4)
 	.cfi_endproc
 END(__x86_asm32_int80_signalfd4)
 
+/* @param: flags: Set of `EFD_SEMAPHORE | EFD_NONBLOCK | EFD_CLOEXEC' */
 /* fd_t eventfd2(syscall_ulong_t initval, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.eventfd2
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_eventfd2)
@@ -12230,7 +12236,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_epoll_create1)
 	.cfi_endproc
 END(__x86_asm32_int80_epoll_create1)
 
-/* @param: flags:  Set of `O_CLOEXEC|O_CLOFORK' */
+/* @param: flags:  Set of `O_CLOEXEC | O_CLOFORK' */
 /* fd_t dup3(fd_t oldfd, fd_t newfd, oflag_t flags) */
 .section .text.x86.asm32_syscall_int80.dup3
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_dup3)
@@ -12656,7 +12662,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_prlimit64)
 	.cfi_endproc
 END(__x86_asm32_int80_prlimit64)
 
-/* errno_t name_to_handle_at(fd_t dirfd, char const *name, struct file_handle *handle, int32_t *mnt_id, syscall_ulong_t flags) */
+/* errno_t name_to_handle_at(fd_t dirfd, char const *filename, struct file_handle *handle, int32_t *mnt_id, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.name_to_handle_at
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_name_to_handle_at)
 	.cfi_startproc simple
@@ -13120,7 +13126,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_getattr)
 	.cfi_endproc
 END(__x86_asm32_int80_sched_getattr)
 
-/* @param: flags: Set of `RENAME_EXCHANGE,RENAME_NOREPLACE,RENAME_WHITEOUT' */
+/* @param: flags: Set of `RENAME_EXCHANGE | RENAME_NOREPLACE | RENAME_WHITEOUT' */
 /* errno_t renameat2(fd_t olddirfd, char const *oldpath, fd_t newdirfd, char const *newpath, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.renameat2
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_renameat2)
@@ -13236,6 +13242,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getrandom)
 	.cfi_endproc
 END(__x86_asm32_int80_getrandom)
 
+/* @param: flags: Set of `MFD_CLOEXEC | MFD_ALLOW_SEALING' */
 /* fd_t memfd_create(char const *name, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.memfd_create
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_memfd_create)
@@ -14605,7 +14612,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kfstatat)
 	.cfi_endproc
 END(__x86_asm32_int80_kfstatat)
 
-/* errno_t futimesat64(fd_t dirfd, const char *filename, struct timevalx32_64 const[2] times) */
+/* errno_t futimesat64(fd_t dirfd, char const *filename, struct timevalx32_64 const[2] times) */
 .section .text.x86.asm32_syscall_int80.futimesat64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_futimesat64)
 	.cfi_startproc simple
@@ -14724,7 +14731,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fmkdirat)
 	.cfi_endproc
 END(__x86_asm32_int80_fmkdirat)
 
-/* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
+/* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
+ * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
 /* errno_t waitid64(syscall_ulong_t idtype, id_t id, struct __siginfox32_struct *infop, syscall_ulong_t options, struct rusagex32_64 *ru) */
 .section .text.x86.asm32_syscall_int80.waitid64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_waitid64)
@@ -15111,6 +15119,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_settime64)
 	.cfi_endproc
 END(__x86_asm32_int80_timer_settime64)
 
+/* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
+ *               optionally or'd with any of `READDIR_SKIPREL | READDIR_WANTEOF' */
 /* ssize_t kreaddirf(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode, iomode_t iomode) */
 .section .text.x86.asm32_syscall_int80.kreaddirf
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_kreaddirf)
@@ -15610,6 +15620,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readvf)
 	.cfi_endproc
 END(__x86_asm32_int80_readvf)
 
+/* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
+ *               optionally or'd with any of `READDIR_SKIPREL | READDIR_WANTEOF' */
 /* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
 .section .text.x86.asm32_syscall_int80.kreaddir
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_kreaddir)
@@ -15650,7 +15662,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kreaddir)
 END(__x86_asm32_int80_kreaddir)
 
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
- * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+ * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 /* pid_t wait4_64(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusagex32_64 *usage) */
 .section .text.x86.asm32_syscall_int80.wait4_64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_wait4_64)
@@ -16127,7 +16139,7 @@ END(__x86_asm32_int80_utime64)
  * @param: initial_size: The initial mmap(2)able size of the returned handle.
  *                       This size may be altered at a later point in time
  *                       through use of `ftruncate(return)'
- * @param: flags:        Set of `0 | O_NONBLOCK | O_CLOEXEC | O_CLOFORK' */
+ * @param: flags:        Set of `0 | O_CLOEXEC | O_CLOFORK | O_NONBLOCK' */
 /* fd_t userviofd(size_t initial_size, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.userviofd
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_userviofd)
@@ -16577,18 +16589,18 @@ END(__x86_asm32_int80_lseek64)
  * Provide the bottom-most API for implementing user-space synchronization on KOS
  * @param: futex_op: One of:
  *    - LFUTEX_WAKE:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKE, size_t val = count)
- *    - LFUTEX_WAKEMASK:           (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKEMASK, size_t val = count, struct timespec64 const *timeout = mask_and, uintptr_t val2 = mask_or)
+ *    - LFUTEX_WAKEMASK:           (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKEMASK, size_t val = count, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *timeout = mask_and, uintptr_t val2 = mask_or)
  *    - LFUTEX_NOP:                (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_NOP)
- *    - LFUTEX_WAIT:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT, uintptr_t val = ignored, struct timespec const *timeout)
- *    - LFUTEX_WAIT_LOCK:          (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_LOCK, uintptr_t val = lock_value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE, uintptr_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_UNTIL:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL, uintptr_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_ABOVE:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_ABOVE, uintptr_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BELOW:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BELOW, uintptr_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
- *    - LFUTEX_WAIT_UNTIL_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
- *    - LFUTEX_WAIT_WHILE_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
- *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
+ *    - LFUTEX_WAIT:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT, uintptr_t val = ignored, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
+ *    - LFUTEX_WAIT_LOCK:          (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_LOCK, uintptr_t val = lock_value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE, uintptr_t val = value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
+ *    - LFUTEX_WAIT_UNTIL:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL, uintptr_t val = value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_ABOVE:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_ABOVE, uintptr_t val = value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BELOW:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BELOW, uintptr_t val = value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BITMASK, uintptr_t val = bitmask, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, uintptr_t val2 = setmask)
+ *    - LFUTEX_WAIT_UNTIL_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_BITMASK, uintptr_t val = bitmask, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, uintptr_t val2 = setmask)
+ *    - LFUTEX_WAIT_WHILE_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_CMPXCH, uintptr_t val = oldval, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, uintptr_t val2 = newval)
+ *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_CMPXCH, uintptr_t val = oldval, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, uintptr_t val2 = newval)
  * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
  * @return: * : Depending on `futex_op'
  * @return: -1:EFAULT:    A faulty pointer was given
@@ -18159,7 +18171,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getpid)
 	.cfi_endproc
 END(__x86_asm32_sysenter_getpid)
 
-/* errno_t mount(char const *special_file, char const *dir, char const *fstype, syscall_ulong_t rwflag, void const *data) */
+/* errno_t mount(char const *special_file, char const *dir, char const *fstype, syscall_ulong_t mountflags, void const *data) */
 .section .text.x86.asm32_syscall_sysenter.mount
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mount)
 	.cfi_startproc simple
@@ -20136,6 +20148,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sethostname)
 	.cfi_endproc
 END(__x86_asm32_sysenter_sethostname)
 
+/* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
 /* errno_t setrlimit(syscall_ulong_t resource, struct rlimit const *rlimits) */
 .section .text.x86.asm32_syscall_sysenter.setrlimit
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setrlimit)
@@ -20173,6 +20186,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setrlimit)
 	.cfi_endproc
 END(__x86_asm32_sysenter_setrlimit)
 
+/* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
 /* errno_t getrlimit(syscall_ulong_t resource, struct rlimit *rlimits) */
 .section .text.x86.asm32_syscall_sysenter.getrlimit
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getrlimit)
@@ -20700,7 +20714,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_readdir)
 	.cfi_endproc
 END(__x86_asm32_sysenter_readdir)
 
-/* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
+/* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
  *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
@@ -21599,7 +21613,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_vm86old)
 END(__x86_asm32_sysenter_vm86old)
 
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
- * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+ * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 /* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusagex32 *usage) */
 .section .text.x86.asm32_syscall_sysenter.wait4
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_wait4)
@@ -22028,7 +22042,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_adjtimex)
 	.cfi_endproc
 END(__x86_asm32_sysenter_adjtimex)
 
-/* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED' */
+/* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED' */
 /* errno_t mprotect(void *addr, size_t len, syscall_ulong_t prot) */
 .section .text.x86.asm32_syscall_sysenter.mprotect
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mprotect)
@@ -23438,7 +23452,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_nanosleep)
 	.cfi_endproc
 END(__x86_asm32_sysenter_nanosleep)
 
-/* @param: flags: Set of `MREMAP_MAYMOVE|MREMAP_FIXED' */
+/* @param: flags: Set of `MREMAP_MAYMOVE | MREMAP_FIXED' */
 /* void *mremap(void *addr, size_t old_len, size_t new_len, syscall_ulong_t flags, void *new_address) */
 .section .text.x86.asm32_syscall_sysenter.mremap
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mremap)
@@ -26780,6 +26794,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_epoll_create)
 	.cfi_endproc
 END(__x86_asm32_sysenter_epoll_create)
 
+/* @param: op: One of `EPOLL_CTL_ADD', `EPOLL_CTL_DEL', `EPOLL_CTL_MOD' */
 /* errno_t epoll_ctl(fd_t epfd, syscall_ulong_t op, fd_t fd, struct epoll_event *event) */
 .section .text.x86.asm32_syscall_sysenter.epoll_ctl
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_epoll_ctl)
@@ -27879,7 +27894,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_kexec_load)
 	.cfi_endproc
 END(__x86_asm32_sysenter_kexec_load)
 
-/* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
+/* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
+ * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
 /* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfox32_struct *infop, syscall_ulong_t options, struct rusagex32 *ru) */
 .section .text.x86.asm32_syscall_sysenter.waitid
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_waitid)
@@ -28415,7 +28431,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fchownat)
 	.cfi_endproc
 END(__x86_asm32_sysenter_fchownat)
 
-/* errno_t futimesat(fd_t dirfd, const char *filename, struct timevalx32 const[2] times) */
+/* errno_t futimesat(fd_t dirfd, char const *filename, struct timevalx32 const[2] times) */
 .section .text.x86.asm32_syscall_sysenter.futimesat
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_futimesat)
 	.cfi_startproc simple
@@ -28492,7 +28508,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_linux_fstatat64)
 	.cfi_endproc
 END(__x86_asm32_sysenter_linux_fstatat64)
 
-/* @param: flags: Set of `0 | AT_REMOVEDIR|AT_REMOVEREG | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_REMOVEDIR | AT_REMOVEREG | AT_DOSPATH' */
 /* errno_t unlinkat(fd_t dirfd, char const *name, atflag_t flags) */
 .section .text.x86.asm32_syscall_sysenter.unlinkat
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_unlinkat)
@@ -28569,7 +28585,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_renameat)
 	.cfi_endproc
 END(__x86_asm32_sysenter_renameat)
 
-/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_FOLLOW | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_FOLLOW | AT_DOSPATH' */
 /* errno_t linkat(fd_t fromfd, char const *existing_file, fd_t tofd, char const *target_path, atflag_t flags) */
 .section .text.x86.asm32_syscall_sysenter.linkat
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_linkat)
@@ -28729,8 +28745,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fchmodat)
 	.cfi_endproc
 END(__x86_asm32_sysenter_fchmodat)
 
-/* @param: type: Set of `R_OK|W_OK|X_OK' or `F_OK'
- * @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW|AT_EACCESS | AT_DOSPATH' */
+/* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK'
+ * @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_EACCESS | AT_DOSPATH' */
 /* errno_t faccessat(fd_t dirfd, char const *filename, syscall_ulong_t type, atflag_t flags) */
 .section .text.x86.asm32_syscall_sysenter.faccessat
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_faccessat)
@@ -29523,6 +29539,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_timerfd_gettime)
 	.cfi_endproc
 END(__x86_asm32_sysenter_timerfd_gettime)
 
+/* @param: flags: Set of `SFD_NONBLOCK | SFD_CLOEXEC' */
 /* errno_t signalfd4(fd_t fd, struct __sigset_struct const *sigmask, size_t sigsetsize, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysenter.signalfd4
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_signalfd4)
@@ -29562,6 +29579,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_signalfd4)
 	.cfi_endproc
 END(__x86_asm32_sysenter_signalfd4)
 
+/* @param: flags: Set of `EFD_SEMAPHORE | EFD_NONBLOCK | EFD_CLOEXEC' */
 /* fd_t eventfd2(syscall_ulong_t initval, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysenter.eventfd2
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_eventfd2)
@@ -29636,7 +29654,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_epoll_create1)
 	.cfi_endproc
 END(__x86_asm32_sysenter_epoll_create1)
 
-/* @param: flags:  Set of `O_CLOEXEC|O_CLOFORK' */
+/* @param: flags:  Set of `O_CLOEXEC | O_CLOFORK' */
 /* fd_t dup3(fd_t oldfd, fd_t newfd, oflag_t flags) */
 .section .text.x86.asm32_syscall_sysenter.dup3
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_dup3)
@@ -30068,7 +30086,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_prlimit64)
 	.cfi_endproc
 END(__x86_asm32_sysenter_prlimit64)
 
-/* errno_t name_to_handle_at(fd_t dirfd, char const *name, struct file_handle *handle, int32_t *mnt_id, syscall_ulong_t flags) */
+/* errno_t name_to_handle_at(fd_t dirfd, char const *filename, struct file_handle *handle, int32_t *mnt_id, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysenter.name_to_handle_at
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_name_to_handle_at)
 	.cfi_startproc simple
@@ -30540,7 +30558,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sched_getattr)
 	.cfi_endproc
 END(__x86_asm32_sysenter_sched_getattr)
 
-/* @param: flags: Set of `RENAME_EXCHANGE,RENAME_NOREPLACE,RENAME_WHITEOUT' */
+/* @param: flags: Set of `RENAME_EXCHANGE | RENAME_NOREPLACE | RENAME_WHITEOUT' */
 /* errno_t renameat2(fd_t olddirfd, char const *oldpath, fd_t newdirfd, char const *newpath, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysenter.renameat2
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_renameat2)
@@ -30658,6 +30676,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getrandom)
 	.cfi_endproc
 END(__x86_asm32_sysenter_getrandom)
 
+/* @param: flags: Set of `MFD_CLOEXEC | MFD_ALLOW_SEALING' */
 /* fd_t memfd_create(char const *name, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysenter.memfd_create
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_memfd_create)
@@ -32053,7 +32072,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_kfstatat)
 	.cfi_endproc
 END(__x86_asm32_sysenter_kfstatat)
 
-/* errno_t futimesat64(fd_t dirfd, const char *filename, struct timevalx32_64 const[2] times) */
+/* errno_t futimesat64(fd_t dirfd, char const *filename, struct timevalx32_64 const[2] times) */
 .section .text.x86.asm32_syscall_sysenter.futimesat64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_futimesat64)
 	.cfi_startproc simple
@@ -32174,7 +32193,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fmkdirat)
 	.cfi_endproc
 END(__x86_asm32_sysenter_fmkdirat)
 
-/* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
+/* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
+ * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
 /* errno_t waitid64(syscall_ulong_t idtype, id_t id, struct __siginfox32_struct *infop, syscall_ulong_t options, struct rusagex32_64 *ru) */
 .section .text.x86.asm32_syscall_sysenter.waitid64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_waitid64)
@@ -32567,6 +32587,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_timer_settime64)
 	.cfi_endproc
 END(__x86_asm32_sysenter_timer_settime64)
 
+/* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
+ *               optionally or'd with any of `READDIR_SKIPREL | READDIR_WANTEOF' */
 /* ssize_t kreaddirf(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode, iomode_t iomode) */
 .section .text.x86.asm32_syscall_sysenter.kreaddirf
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_kreaddirf)
@@ -33072,6 +33094,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_readvf)
 	.cfi_endproc
 END(__x86_asm32_sysenter_readvf)
 
+/* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
+ *               optionally or'd with any of `READDIR_SKIPREL | READDIR_WANTEOF' */
 /* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
 .section .text.x86.asm32_syscall_sysenter.kreaddir
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_kreaddir)
@@ -33112,7 +33136,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_kreaddir)
 END(__x86_asm32_sysenter_kreaddir)
 
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
- * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+ * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 /* pid_t wait4_64(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusagex32_64 *usage) */
 .section .text.x86.asm32_syscall_sysenter.wait4_64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_wait4_64)
@@ -33593,7 +33617,7 @@ END(__x86_asm32_sysenter_utime64)
  * @param: initial_size: The initial mmap(2)able size of the returned handle.
  *                       This size may be altered at a later point in time
  *                       through use of `ftruncate(return)'
- * @param: flags:        Set of `0 | O_NONBLOCK | O_CLOEXEC | O_CLOFORK' */
+ * @param: flags:        Set of `0 | O_CLOEXEC | O_CLOFORK | O_NONBLOCK' */
 /* fd_t userviofd(size_t initial_size, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysenter.userviofd
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_userviofd)
@@ -34051,18 +34075,18 @@ END(__x86_asm32_sysenter_lseek64)
  * Provide the bottom-most API for implementing user-space synchronization on KOS
  * @param: futex_op: One of:
  *    - LFUTEX_WAKE:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKE, size_t val = count)
- *    - LFUTEX_WAKEMASK:           (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKEMASK, size_t val = count, struct timespec64 const *timeout = mask_and, uintptr_t val2 = mask_or)
+ *    - LFUTEX_WAKEMASK:           (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKEMASK, size_t val = count, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *timeout = mask_and, uintptr_t val2 = mask_or)
  *    - LFUTEX_NOP:                (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_NOP)
- *    - LFUTEX_WAIT:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT, uintptr_t val = ignored, struct timespec const *timeout)
- *    - LFUTEX_WAIT_LOCK:          (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_LOCK, uintptr_t val = lock_value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE, uintptr_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_UNTIL:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL, uintptr_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_ABOVE:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_ABOVE, uintptr_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BELOW:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BELOW, uintptr_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
- *    - LFUTEX_WAIT_UNTIL_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
- *    - LFUTEX_WAIT_WHILE_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
- *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
+ *    - LFUTEX_WAIT:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT, uintptr_t val = ignored, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
+ *    - LFUTEX_WAIT_LOCK:          (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_LOCK, uintptr_t val = lock_value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE, uintptr_t val = value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
+ *    - LFUTEX_WAIT_UNTIL:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL, uintptr_t val = value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_ABOVE:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_ABOVE, uintptr_t val = value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BELOW:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BELOW, uintptr_t val = value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BITMASK, uintptr_t val = bitmask, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, uintptr_t val2 = setmask)
+ *    - LFUTEX_WAIT_UNTIL_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_BITMASK, uintptr_t val = bitmask, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, uintptr_t val2 = setmask)
+ *    - LFUTEX_WAIT_WHILE_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_CMPXCH, uintptr_t val = oldval, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, uintptr_t val2 = newval)
+ *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_CMPXCH, uintptr_t val = oldval, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, uintptr_t val2 = newval)
  * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
  * @return: * : Depending on `futex_op'
  * @return: -1:EFAULT:    A faulty pointer was given

@@ -382,7 +382,7 @@ usb_controller_interrupt_create(struct usb_controller *__restrict self, struct u
 	REF struct usb_interrupt *result;
 	__hybrid_assert(self->uc_interrupt);
 	result = (*self->uc_interrupt)(self, endp, handler, character_or_block_device,
-	                                      buflen, flags, poll_interval_in_milliseconds);
+	                               buflen, flags, poll_interval_in_milliseconds);
 	return result;
 }
 
@@ -405,6 +405,7 @@ usb_controller_interrupt_create(struct usb_controller *__restrict self,
 	                                         poll_interval_in_milliseconds);
 	return result;
 }
+
 LOCAL WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3)) REF struct usb_interrupt *KCALL
 usb_controller_interrupt_create(struct usb_controller *__restrict self,
                                 struct usb_endpoint *__restrict endp,

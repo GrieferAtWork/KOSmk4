@@ -42,7 +42,6 @@ int main(int argc, char *argv[]) {
 	 *    different CPUs)
 	 * (To exit the program, send SIGQUIT using CTRL+\ (or its alias: CTRL+4)) */
 	signal(SIGINT, SIG_IGN);
-	ksysctl(KSYSCTL_SYSCALL_SET_TRACING_ENABLED, 0); /* Prevent log spam of tracing methods */
 	for (;;) {
 		sys_rpc_service();
 	}

@@ -39,9 +39,6 @@
 #include <kos/kernel/cpu-state.h>
 
 /**/
-#include <kernel/syscall.h> /* TODO: Remove me; Only used for `syscall_tracing_setenabled()' */
-
-/**/
 #include <dev/block.h>    /* TODO: Remove me; Only used for boot_partition-init */
 #include <fs/node.h>      /* TODO: Remove me; Only used for boot_partition-init */
 #include <fs/vfs.h>       /* TODO: Remove me; Only used for boot_partition-init */
@@ -330,9 +327,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	mall_dump_leaks(GFP_NORMAL);
 
-	/* Enable system call tracing. */
-	syscall_tracing_setenabled(true); /* TODO: Remove me */
-
 #if 0
 	decref(driver_insmod("iso9660", "a b foobar bazbaz"));
 	{
@@ -363,6 +357,35 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	       icpustate_getpc(state),
 	       icpustate_getsp(state));
 
+	/* TODO: deemon's module system appears somewhat broken on KOS.
+	 *       Fix stuff both in KOS, and DEEMON itself until the following works from within KOS:
+	 *       $ deemon --help /deemon/string
+	 *
+	 *       >> IllegalInstruction: Illegal instruction at <anonymous>+001A
+	 *       /usr/lib/deemon/doctext.dee(148,1) : <anonymous>+001A
+	 *       /usr/lib/deemon/doc.dee(2537,34) : __str__+0002
+	 *       /usr/lib/deemon/doc.dee(3823,33) : __str__+0051
+	 *       Also: In certain cases, this causes both the doc and doctext module's dec
+	 *             files to constantly get re-compiled (though in other cases, these
+	 *             exact dec files also get accepted as valid, possibly related to how
+	 *             they've been imported, implying a problem within the deemon core)
+	 *       NOTE: I'm assuming that the IllegalInstruction is caused by some discrepancy
+	 *             between the hand-written assembly RT engine, and the one written in C
+	 *
+	 *       >> UnicodeDecodeError: Invalid utf-8 character byte 0x85
+	 *       /usr/lib/deemon/doc.dee(2537,34) : __str__+0002
+	 *       /usr/lib/deemon/doc.dee(3823,33) : __str__+0051
+	 *       When the dec files already exist, this error is thrown instead.
+	 *
+	 * TODO: Deemon's SystemFile.size() function always uses lseek64()
+	         Change this to where it first attempts to use fstat() (if available)
+	 * TODO: Deemon's main() function should try to re-configure mallopt() during
+	 *       init in order to optimize itself for using large amounts of memory.
+	 *       Currently, running deemon cases the system log to be spammed with
+	 *       calls to mmap() (an overallocation of 32768 bytes might work well...)
+	 * TODO: When opening a dec file, use mmap() (if available) and malloc()+read()
+	 *       as fall-back, rather than always using malloc()+read() */
+
 	/* TODO: HOP_HANDLE_CREATE_STREAM
 	 *       Constructs a wrapper for another handle object that includes a `pos_t'
 	 *       file offset to implement read(), write() and lseek() by dispatching these
@@ -370,6 +393,13 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       with lseek(SEEK_END))
 	 *       -> Useful for turning UVIO objects into file-like objects.
 	 */
+
+	/* TODO: Play around with `no_caller_saved_registers'
+	 *       It may be possible to cut down on boiler-plate assembly needed to wrap
+	 *       simple C-level interrupt handlers and/or system calls, by not needing
+	 *       to save registers that would be used in any case! */
+
+	/* TODO: renameat2() is missing from <stdio.h> */
 
 	return state;
 }

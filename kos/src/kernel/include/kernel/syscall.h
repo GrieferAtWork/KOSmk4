@@ -139,25 +139,6 @@ DECL_BEGIN
 	PUBLIC ATTR_SECTION_SYSCALL(#name) return_type __ARCH_SYSCALLCC impl_sys_##name(T0 N0, T1 N1, T2 N2, T3 N3, T4 N4, T5 N5)
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 
-
-#ifndef CONFIG_NO_SYSCALL_TRACING
-/* Enable/disable system call tracing.
- * @return: true:  Successfully changed the current tracing state.
- * @return: false: Tracing was already enabled/disabled. */
-FUNDEF bool (KCALL syscall_tracing_setenabled)(bool enable);
-
-/* Check if system call tracing is enabled. */
-FUNDEF WUNUSED bool NOTHROW(KCALL syscall_tracing_getenabled)(void);
-
-struct rpc_syscall_info;
-FUNDEF void FCALL syscall_trace(struct rpc_syscall_info const *__restrict info);
-FUNDEF ssize_t FCALL syscall_printtrace(struct rpc_syscall_info const *__restrict info, __pformatprinter printer, void *arg);
-
-#else /* !CONFIG_NO_SYSCALL_TRACING */
-#define syscall_tracing_getenabled()  false
-#endif /* CONFIG_NO_SYSCALL_TRACING */
-
-
 /* Emulate the execution of a system call.
  * NOTE: `syscall_emulate_r()' is the same as `syscall_emulate()', however
  *       will reset the kernel-space stack to `state', and immediately return

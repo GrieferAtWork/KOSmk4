@@ -108,7 +108,7 @@ INTERN_OBJECT(x86_syscall_emulate_r_redirection)
 .if (. - x86_syscall_emulate_traced_r) > 0x7f
 .error "Offset to `x86_syscall_emulate_traced_r' would be large"
 .endif
-	/* NOTE: `x86_syscall_emulate_r_redirection_jmp' are the little-enable 2-bytes for an instruction:
+	/* NOTE: `x86_syscall_emulate_r_redirection_jmp' are the little-endian 2-bytes for an instruction:
 	 *       `jmp8 x86_syscall_emulate_traced_r' */
 INTERN_CONST(x86_syscall_emulate_r_redirection_jmp, 0xeb | (((x86_syscall_emulate_traced_r - .) & 0xff) << 8))
 END(x86_syscall_emulate_r_redirection)

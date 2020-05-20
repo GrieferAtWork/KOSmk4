@@ -33,12 +33,12 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:mount,hash:CRC-32=0x7bf6e968]]]*/
+/*[[[head:mount,hash:CRC-32=0x6309402e]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.fs.mount.mount") int
 NOTHROW_RPC(LIBCCALL libc_mount)(char const *special_file,
                                  char const *dir,
                                  char const *fstype,
-                                 unsigned long int rwflag,
+                                 unsigned long int mountflags,
                                  void const *data)
 /*[[[body:mount]]]*/
 {
@@ -46,7 +46,7 @@ NOTHROW_RPC(LIBCCALL libc_mount)(char const *special_file,
 	result = sys_mount(special_file,
 	                   dir,
 	                   fstype,
-	                   (syscall_ulong_t)rwflag,
+	                   (syscall_ulong_t)mountflags,
 	                   data);
 	return libc_seterrno_syserr(result);
 }

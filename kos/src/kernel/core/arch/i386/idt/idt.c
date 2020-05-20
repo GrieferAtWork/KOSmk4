@@ -201,7 +201,7 @@ NOTHROW(FCALL x86_idt_setcurrent)(struct desctab const *__restrict ptr) {
  * This function must be called prior to making modifications to `x86_idt'.
  * Doing this is required to prevent other CPUs/threads from servicing
  * interrupts with IDT segments that aren't fully initialized.
- * As such, any modifications made to `x86_dbgidt' after this function
+ * As such, any modifications made to `x86_idt' after this function
  * is called will only come into effect once `x86_idt_modify_end()' is
  * called. These functions are implemented as:
  *   x86_idt_modify_begin():
@@ -223,22 +223,36 @@ NOTHROW(FCALL x86_idt_setcurrent)(struct desctab const *__restrict ptr) {
  * call to `x86_idt_modify_end()'
  * Also note that these functions must not be called recursively from the same
  * thread. - A call to `x86_idt_modify_begin()' must _NOT_ be followed by another
- * call to `x86_idt_modify_begin()' from the same thread! */
-PUBLIC ATTR_COLDTEXT void FCALL x86_idt_modify_begin(void)
+ * call to `x86_idt_modify_begin()' from the same thread!
+ * @param: nx:     When true, don't do anything that could throw an exception, or block.
+ * @return: true:  Success (always returned when `nx == false')
+ * @return: false: Failure (only ever returned when `nx == true') */
+PUBLIC ATTR_COLDTEXT bool FCALL x86_idt_modify_begin(bool nx)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INTERRUPT) {
 	struct idt_segment *copy;
 	struct desctab dt;
 #ifdef CONFIG_HAVE_DEBUGGER
 	if unlikely(dbg_active)
-		return; /* no-op */
+		return true; /* no-op */
 #endif /* CONFIG_HAVE_DEBUGGER */
-	copy = (struct idt_segment *)kmalloc(256 * sizeof(struct idt_segment),
-	                                     GFP_LOCKED | GFP_PREFLT);
-	TRY {
-		sync_write(&x86_idt_modify_lock);
-	} EXCEPT {
-		kfree(copy);
-		RETHROW();
+	if (nx) {
+		copy = (struct idt_segment *)kmalloc_nx(256 * sizeof(struct idt_segment),
+		                                        GFP_LOCKED | GFP_PREFLT | GFP_ATOMIC);
+		if unlikely(!copy)
+			return false;
+	} else {
+		copy = (struct idt_segment *)kmalloc(256 * sizeof(struct idt_segment),
+		                                     GFP_LOCKED | GFP_PREFLT);
+	}
+	if (!sync_trywrite(&x86_idt_modify_lock)) {
+		if (nx)
+			return false;
+		TRY {
+			sync_write(&x86_idt_modify_lock);
+		} EXCEPT {
+			kfree(copy);
+			RETHROW();
+		}
 	}
 	assert(!x86_idt_modify_copy);
 	/* Fill in the IDT copy. */
@@ -248,6 +262,7 @@ PUBLIC ATTR_COLDTEXT void FCALL x86_idt_modify_begin(void)
 	dt.dt_base  = (uintptr_t)copy;
 	dt.dt_limit = (256 * sizeof(struct idt_segment)) - 1;
 	x86_idt_setcurrent(&dt);
+	return true;
 }
 
 PUBLIC ATTR_COLDTEXT NOBLOCK void

@@ -35,7 +35,7 @@
 #include "router32.S"
 
 
-/* Define the default break function for the runc32 routing table. */
+/* Define the default break function for the run32 routing table. */
 .section .text.cold
 INTERN_FUNCTION(__x86_asm32_sysrun32_break)
 	.cfi_startproc

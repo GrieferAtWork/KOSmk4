@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7b9c1d77 */
+/* HASH CRC-32:0xc5f69353 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 
 /************************************************************************/
 /* SYSCALL ARGUMENT NAMES                                               */
+/*  - __NRAN<argI>_<name> : ArgumentName                                */
 /************************************************************************/
 #ifdef __WANT_SYSCALL_ARGUMENT_NAMES
 #ifndef __NRFEAT_DEFINED_SYSCALL_ARGUMENT_NAMES
@@ -65,7 +66,7 @@
 #define __NRAN0_mount                   special_file
 #define __NRAN1_mount                   dir
 #define __NRAN2_mount                   fstype
-#define __NRAN3_mount                   rwflag
+#define __NRAN3_mount                   mountflags
 #define __NRAN4_mount                   data
 #define __NRAN0_umount                  special_file
 #define __NRAN0_setuid                  uid
@@ -740,7 +741,7 @@
 #define __NRAN2_prlimit64               new_limit
 #define __NRAN3_prlimit64               old_limit
 #define __NRAN0_name_to_handle_at       dirfd
-#define __NRAN1_name_to_handle_at       name
+#define __NRAN1_name_to_handle_at       filename
 #define __NRAN2_name_to_handle_at       handle
 #define __NRAN3_name_to_handle_at       mnt_id
 #define __NRAN4_name_to_handle_at       flags
@@ -1122,2531 +1123,1667 @@
 
 /************************************************************************/
 /* SYSCALL ARGUMENT FORMAT                                              */
+/*  - __NRRTR_<name>       : ReturnTypeRepresentation                   */
+/*  - __NRATR<argI>_<name> : ArgumentTypeRepresentation                 */
+/*  - __NRATL<argI>_<name> : ArgumentTypeLink                           */
 /************************************************************************/
 #ifdef __WANT_SYSCALL_ARGUMENT_FORMAT
 #ifndef __NRFEAT_DEFINED_SYSCALL_ARGUMENT_FORMAT
 #define __NRFEAT_DEFINED_SYSCALL_ARGUMENT_FORMAT 1
-#define __NRATRF0_exit                    "%" PRIuSIZ
-#define __NRATRA0_exit(status)            , (uintptr_t)(status)
-#define __NRATRF0_read                    "%d"
-#define __NRATRA0_read(fd, buf, bufsize)  , (int)(fd)
-#define __NRATRF1_read                    "%p"
-#define __NRATRA1_read(fd, buf, bufsize)  , buf
-#define __NRATRF2_read                    "%" PRIuSIZ
-#define __NRATRA2_read(fd, buf, bufsize)  , bufsize
-#define __NRATRF0_write                   "%d"
-#define __NRATRA0_write(fd, buf, bufsize) , (int)(fd)
-#define __NRATRF1_write                   "%p"
-#define __NRATRA1_write(fd, buf, bufsize) , buf
-#define __NRATRF2_write                   "%" PRIuSIZ
-#define __NRATRA2_write(fd, buf, bufsize) , bufsize
-#define __NRATRF0_open                    "%q"
-#define __NRATRA0_open(filename, oflags, mode) , (validate_readable_opt(filename,1),filename)
-#define __NRATRF1_open                    "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NRATRA1_open(filename, oflags, mode) , (uintptr_t)(oflags), (oflags) & O_WRONLY ? "O_WRONLY" : (oflags) ? "" : "O_RDONLY" \
-                                               , ((oflags) & O_RDWR) && ((oflags) & (O_WRONLY)) ? "|" : "", (oflags) & O_RDWR ? "O_RDWR" : "" \
-                                               , ((oflags) & O_CREAT) && ((oflags) & (O_WRONLY | O_RDWR)) ? "|" : "", (oflags) & O_CREAT ? "O_CREAT" : "" \
-                                               , ((oflags) & O_EXCL) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT)) ? "|" : "", (oflags) & O_EXCL ? "O_EXCL" : "" \
-                                               , ((oflags) & O_NOCTTY) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL)) ? "|" : "", (oflags) & O_NOCTTY ? "O_NOCTTY" : "" \
-                                               , ((oflags) & O_TRUNC) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY)) ? "|" : "", (oflags) & O_TRUNC ? "O_TRUNC" : "" \
-                                               , ((oflags) & O_APPEND) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC)) ? "|" : "", (oflags) & O_APPEND ? "O_APPEND" : "" \
-                                               , ((oflags) & O_NONBLOCK) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND)) ? "|" : "", (oflags) & O_NONBLOCK ? "O_NONBLOCK" : "" \
-                                               , ((oflags) & O_SYNC) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK)) ? "|" : "", (oflags) & O_SYNC ? "O_SYNC" : "" \
-                                               , ((oflags) & O_DSYNC) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC)) ? "|" : "", (oflags) & O_DSYNC ? "O_DSYNC" : "" \
-                                               , ((oflags) & O_ASYNC) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC)) ? "|" : "", (oflags) & O_ASYNC ? "O_ASYNC" : "" \
-                                               , ((oflags) & O_DIRECT) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC)) ? "|" : "", (oflags) & O_DIRECT ? "O_DIRECT" : "" \
-                                               , ((oflags) & O_LARGEFILE) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC | O_DIRECT)) ? "|" : "", (oflags) & O_LARGEFILE ? "O_LARGEFILE" : "" \
-                                               , ((oflags) & O_DIRECTORY) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE)) ? "|" : "", (oflags) & O_DIRECTORY ? "O_DIRECTORY" : "" \
-                                               , ((oflags) & O_NOFOLLOW) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE | O_DIRECTORY)) ? "|" : "", (oflags) & O_NOFOLLOW ? "O_NOFOLLOW" : "" \
-                                               , ((oflags) & O_NOATIME) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE | O_DIRECTORY | O_NOFOLLOW)) ? "|" : "", (oflags) & O_NOATIME ? "O_NOATIME" : "" \
-                                               , ((oflags) & O_CLOEXEC) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE | O_DIRECTORY | O_NOFOLLOW | O_NOATIME)) ? "|" : "", (oflags) & O_CLOEXEC ? "O_CLOEXEC" : "" \
-                                               , ((oflags) & O_CLOFORK) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE | O_DIRECTORY | O_NOFOLLOW | O_NOATIME | O_CLOEXEC)) ? "|" : "", (oflags) & O_CLOFORK ? "O_CLOFORK" : "" \
-                                               , ((oflags) & O_PATH) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE | O_DIRECTORY | O_NOFOLLOW | O_NOATIME | O_CLOEXEC | O_CLOFORK)) ? "|" : "", (oflags) & O_PATH ? "O_PATH" : "" \
-                                               , ((oflags) & 0x0400000) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE | O_DIRECTORY | O_NOFOLLOW | O_NOATIME | O_CLOEXEC | O_CLOFORK | O_PATH)) ? "|" : "", (oflags) & 0x0400000 ? "O_TMPFILE" : "" \
-                                               , ((oflags) & O_SYMLINK) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE | O_DIRECTORY | O_NOFOLLOW | O_NOATIME | O_CLOEXEC | O_CLOFORK | O_PATH | 0x0400000)) ? "|" : "", (oflags) & O_SYMLINK ? "O_SYMLINK" : "" \
-                                               , ((oflags) & O_DOSPATH) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE | O_DIRECTORY | O_NOFOLLOW | O_NOATIME | O_CLOEXEC | O_CLOFORK | O_PATH | 0x0400000 | O_SYMLINK)) ? "|" : "", (oflags) & O_DOSPATH ? "O_DOSPATH" : ""
-#define __NRATRF2_open                    "%#" PRIoSIZ
-#define __NRATRA2_open(filename, oflags, mode) , (uintptr_t)(mode)
-#define __NRATRF0_close                   "%d"
-#define __NRATRA0_close(fd)               , (int)(fd)
-#define __NRATRF0_waitpid                 "%" PRIdSIZ
-#define __NRATRA0_waitpid(pid, stat_loc, options) , (intptr_t)(pid)
-#define __NRATRF1_waitpid                 "%p"
-#define __NRATRA1_waitpid(pid, stat_loc, options) , stat_loc
-#define __NRATRF2_waitpid                 "%#" PRIxSIZ "=%s%s%s%s%s%s%s"
-#define __NRATRA2_waitpid(pid, stat_loc, options) , (uintptr_t)(options), (options) & WNOHANG ? "WNOHANG" : "" \
-                                                  , ((options) & WUNTRACED) && ((options) & (WNOHANG)) ? "|" : "", (options) & WUNTRACED ? "WUNTRACED" : "" \
-                                                  , ((options) & WCONTINUED) && ((options) & (WNOHANG | WUNTRACED)) ? "|" : "", (options) & WCONTINUED ? "WCONTINUED" : "" \
-                                                  , ((options) & WNOWAIT) && ((options) & (WNOHANG | WUNTRACED | WCONTINUED)) ? "|" : "", (options) & WNOWAIT ? "WNOWAIT" : ""
-#define __NRATRF0_creat                   "%q"
-#define __NRATRA0_creat(filename, mode)   , (validate_readable_opt(filename,1),filename)
-#define __NRATRF1_creat                   "%#" PRIoSIZ
-#define __NRATRA1_creat(filename, mode)   , (uintptr_t)(mode)
-#define __NRATRF0_link                    "%q"
-#define __NRATRA0_link(existing_file, link_file) , (validate_readable_opt(existing_file,1),existing_file)
-#define __NRATRF1_link                    "%q"
-#define __NRATRA1_link(existing_file, link_file) , (validate_readable_opt(link_file,1),link_file)
-#define __NRATRF0_unlink                  "%q"
-#define __NRATRA0_unlink(filename)        , (validate_readable_opt(filename,1),filename)
-#define __NRATRF0_execve                  "%q"
-#define __NRATRA0_execve(path, argv, envp) , (validate_readable_opt(path,1),path)
-#define __NRATRF1_execve                  "%p"
-#define __NRATRA1_execve(path, argv, envp) , argv
-#define __NRATRF2_execve                  "%p"
-#define __NRATRA2_execve(path, argv, envp) , envp
-#define __NRATRF0_chdir                   "%q"
-#define __NRATRA0_chdir(path)             , (validate_readable_opt(path,1),path)
-#define __NRATRF0_time                    "%p"
-#define __NRATRA0_time(timer)             , timer
-#define __NRATRF0_mknod                   "%q"
-#define __NRATRA0_mknod(nodename, mode, dev) , (validate_readable_opt(nodename,1),nodename)
-#define __NRATRF1_mknod                   "%#" PRIoSIZ
-#define __NRATRA1_mknod(nodename, mode, dev) , (uintptr_t)(mode)
-#define __NRATRF2_mknod                   "%.2x:%.2x"
-#define __NRATRA2_mknod(nodename, mode, dev) , (unsigned int)MAJOR(dev),(unsigned int)MINOR(dev)
-#define __NRATRF0_chmod                   "%q"
-#define __NRATRA0_chmod(filename, mode)   , (validate_readable_opt(filename,1),filename)
-#define __NRATRF1_chmod                   "%#" PRIoSIZ
-#define __NRATRA1_chmod(filename, mode)   , (uintptr_t)(mode)
-#define __NRATRF0_lchown                  "%q"
-#define __NRATRA0_lchown(filename, owner, group) , (validate_readable_opt(filename,1),filename)
-#define __NRATRF1_lchown                  "%" PRIu16
-#define __NRATRA1_lchown(filename, owner, group) , owner
-#define __NRATRF2_lchown                  "%" PRIu16
-#define __NRATRA2_lchown(filename, owner, group) , group
-#define __NRATRF0_linux_oldstat           "%q"
-#define __NRATRA0_linux_oldstat(filename, statbuf) , (validate_readable_opt(filename,1),filename)
-#define __NRATRF1_linux_oldstat           "%p"
-#define __NRATRA1_linux_oldstat(filename, statbuf) , statbuf
-#define __NRATRF0_lseek                   "%d"
-#define __NRATRA0_lseek(fd, offset, whence) , (int)(fd)
-#define __NRATRF1_lseek                   "%" PRIdSIZ
-#define __NRATRA1_lseek(fd, offset, whence) , (intptr_t)(offset)
-#define __NRATRF2_lseek                   "%#Ix=%s"
-#define __NRATRA2_lseek(fd, offset, whence) , (whence), (whence) == SEEK_SET ? "SEEK_SET" : (whence) == SEEK_CUR ? "SEEK_CUR" : (whence) == SEEK_END ? "SEEK_END" : (whence) == SEEK_DATA ? "SEEK_DATA" : (whence) == SEEK_HOLE ? "SEEK_HOLE" : "?"
-#define __NRATRF0_mount                   "%q"
-#define __NRATRA0_mount(special_file, dir, fstype, rwflag, data) , (validate_readable_opt(special_file,1),special_file)
-#define __NRATRF1_mount                   "%q"
-#define __NRATRA1_mount(special_file, dir, fstype, rwflag, data) , (validate_readable_opt(dir,1),dir)
-#define __NRATRF2_mount                   "%q"
-#define __NRATRA2_mount(special_file, dir, fstype, rwflag, data) , (validate_readable_opt(fstype,1),fstype)
-#define __NRATRF3_mount                   "%#" PRIxSIZ
-#define __NRATRA3_mount(special_file, dir, fstype, rwflag, data) , (uintptr_t)(rwflag)
-#define __NRATRF4_mount                   "%p"
-#define __NRATRA4_mount(special_file, dir, fstype, rwflag, data) , data
-#define __NRATRF0_umount                  "%q"
-#define __NRATRA0_umount(special_file)    , (validate_readable_opt(special_file,1),special_file)
-#define __NRATRF0_setuid                  "%" PRIu16
-#define __NRATRA0_setuid(uid)             , uid
-#define __NRATRF0_stime                   "%p"
-#define __NRATRA0_stime(t)                , t
-#define __NRATRF0_ptrace                  "%#" PRIxSIZ
-#define __NRATRA0_ptrace(request, pid, addr, data) , (uintptr_t)(request)
-#define __NRATRF1_ptrace                  "%" PRIdSIZ
-#define __NRATRA1_ptrace(request, pid, addr, data) , (intptr_t)(pid)
-#define __NRATRF2_ptrace                  "%p"
-#define __NRATRA2_ptrace(request, pid, addr, data) , addr
-#define __NRATRF3_ptrace                  "%p"
-#define __NRATRA3_ptrace(request, pid, addr, data) , data
-#define __NRATRF0_alarm                   "%#" PRIxSIZ
-#define __NRATRA0_alarm(seconds)          , (uintptr_t)(seconds)
-#define __NRATRF0_linux_oldfstat          "%d"
-#define __NRATRA0_linux_oldfstat(fd, statbuf) , (int)(fd)
-#define __NRATRF1_linux_oldfstat          "%p"
-#define __NRATRA1_linux_oldfstat(fd, statbuf) , statbuf
-#define __NRATRF0_utime                   "%q"
-#define __NRATRA0_utime(filename, times)  , (validate_readable_opt(filename,1),filename)
-#define __NRATRF1_utime                   "%p"
-#define __NRATRA1_utime(filename, times)  , times
-#define __NRATRF0_access                  "%q"
-#define __NRATRA0_access(filename, type)  , (validate_readable_opt(filename,1),filename)
-#define __NRATRF1_access                  "%#" PRIxSIZ "=%s%s%s%s%s"
-#define __NRATRA1_access(filename, type)  , (uintptr_t)(type), (type) & R_OK ? "R_OK" : (type) ? "" : "F_OK" \
-                                          , ((type) & W_OK) && ((type) & (R_OK)) ? "|" : "", (type) & W_OK ? "W_OK" : "" \
-                                          , ((type) & X_OK) && ((type) & (R_OK | W_OK)) ? "|" : "", (type) & X_OK ? "X_OK" : ""
-#define __NRATRF0_nice                    "%" PRIdSIZ
-#define __NRATRA0_nice(inc)               , (intptr_t)(inc)
-#define __NRATRF0_ftime                   "%p"
-#define __NRATRA0_ftime(tp)               , tp
-#define __NRATRF0_kill                    "%" PRIdSIZ
-#define __NRATRA0_kill(pid, signo)        , (intptr_t)(pid)
-#define __NRATRF1_kill                    "%#" PRIxSIZ
-#define __NRATRA1_kill(pid, signo)        , (uintptr_t)(signo)
-#define __NRATRF0_rename                  "%q"
-#define __NRATRA0_rename(oldname, newname_or_path) , (validate_readable_opt(oldname,1),oldname)
-#define __NRATRF1_rename                  "%q"
-#define __NRATRA1_rename(oldname, newname_or_path) , (validate_readable_opt(newname_or_path,1),newname_or_path)
-#define __NRATRF0_mkdir                   "%q"
-#define __NRATRA0_mkdir(pathname, mode)   , (validate_readable_opt(pathname,1),pathname)
-#define __NRATRF1_mkdir                   "%#" PRIoSIZ
-#define __NRATRA1_mkdir(pathname, mode)   , (uintptr_t)(mode)
-#define __NRATRF0_rmdir                   "%q"
-#define __NRATRA0_rmdir(path)             , (validate_readable_opt(path,1),path)
-#define __NRATRF0_dup                     "%d"
-#define __NRATRA0_dup(fd)                 , (int)(fd)
-#define __NRATRF0_pipe                    "%p"
-#define __NRATRA0_pipe(pipedes)           , pipedes
-#define __NRATRF0_times                   "%p"
-#define __NRATRA0_times(buf)              , buf
-#define __NRATRF0_brk                     "%p"
-#define __NRATRA0_brk(addr)               , addr
-#define __NRATRF0_setgid                  "%" PRIu16
-#define __NRATRA0_setgid(gid)             , gid
-#define __NRATRF0_signal                  "%#" PRIxSIZ
-#define __NRATRA0_signal(signo, handler)  , (uintptr_t)(signo)
-#define __NRATRF1_signal                  "%p"
-#define __NRATRA1_signal(signo, handler)  , handler
-#define __NRATRF0_acct                    "%q"
-#define __NRATRA0_acct(filename)          , (validate_readable_opt(filename,1),filename)
-#define __NRATRF0_umount2                 "%q"
-#define __NRATRA0_umount2(special_file, flags) , (validate_readable_opt(special_file,1),special_file)
-#define __NRATRF1_umount2                 "%#" PRIxSIZ
-#define __NRATRA1_umount2(special_file, flags) , (uintptr_t)(flags)
-#define __NRATRF0_ioctl                   "%d"
-#define __NRATRA0_ioctl(fd, request, arg) , (int)(fd)
-#define __NRATRF1_ioctl                   "%#" PRIxSIZ
-#define __NRATRA1_ioctl(fd, request, arg) , (uintptr_t)(request)
-#define __NRATRF2_ioctl                   "%p"
-#define __NRATRA2_ioctl(fd, request, arg) , arg
-#define __NRATRF0_fcntl                   "%d"
-#define __NRATRA0_fcntl(fd, cmd, arg)     , (int)(fd)
-#define __NRATRF1_fcntl                   "%#" PRIxSIZ
-#define __NRATRA1_fcntl(fd, cmd, arg)     , (uintptr_t)(cmd)
-#define __NRATRF2_fcntl                   "%p"
-#define __NRATRA2_fcntl(fd, cmd, arg)     , arg
-#define __NRATRF0_setpgid                 "%" PRIdSIZ
-#define __NRATRA0_setpgid(pid, pgid)      , (intptr_t)(pid)
-#define __NRATRF1_setpgid                 "%" PRIdSIZ
-#define __NRATRA1_setpgid(pid, pgid)      , (intptr_t)(pgid)
-#define __NRATRF0_oldolduname             "%p"
-#define __NRATRA0_oldolduname(name)       , name
-#define __NRATRF0_umask                   "%#" PRIoSIZ
-#define __NRATRA0_umask(mode)             , (uintptr_t)(mode)
-#define __NRATRF0_chroot                  "%q"
-#define __NRATRA0_chroot(path)            , (validate_readable_opt(path,1),path)
-#define __NRATRF0_ustat                   "%.2x:%.2x"
-#define __NRATRA0_ustat(dev, ubuf)        , (unsigned int)MAJOR(dev),(unsigned int)MINOR(dev)
-#define __NRATRF1_ustat                   "%p"
-#define __NRATRA1_ustat(dev, ubuf)        , ubuf
-#define __NRATRF0_dup2                    "%d"
-#define __NRATRA0_dup2(oldfd, newfd)      , (int)(oldfd)
-#define __NRATRF1_dup2                    "%d"
-#define __NRATRA1_dup2(oldfd, newfd)      , (int)(newfd)
-#define __NRATRF0_sigaction               "%#" PRIxSIZ
-#define __NRATRA0_sigaction(signo, act, oact) , (uintptr_t)(signo)
-#define __NRATRF1_sigaction               "%p"
-#define __NRATRA1_sigaction(signo, act, oact) , act
-#define __NRATRF2_sigaction               "%p"
-#define __NRATRA2_sigaction(signo, act, oact) , oact
-#define __NRATRF0_ssetmask                "%#" PRIxSIZ
-#define __NRATRA0_ssetmask(sigmask)       , (uintptr_t)(sigmask)
-#define __NRATRF0_setreuid                "%" PRIu16
-#define __NRATRA0_setreuid(ruid, euid)    , ruid
-#define __NRATRF1_setreuid                "%" PRIu16
-#define __NRATRA1_setreuid(ruid, euid)    , euid
-#define __NRATRF0_setregid                "%" PRIu16
-#define __NRATRA0_setregid(rgid, egid)    , rgid
-#define __NRATRF1_setregid                "%" PRIu16
-#define __NRATRA1_setregid(rgid, egid)    , egid
-#define __NRATRF0_sigsuspend              "%p"
-#define __NRATRA0_sigsuspend(set)         , set
-#define __NRATRF0_sigpending              "%p"
-#define __NRATRA0_sigpending(set)         , set
-#define __NRATRF0_sethostname             "%q"
-#define __NRATRA0_sethostname(name, len)  , (validate_readable_opt(name,1),name)
-#define __NRATRF1_sethostname             "%" PRIuSIZ
-#define __NRATRA1_sethostname(name, len)  , len
-#define __NRATRF0_setrlimit               "%#" PRIxSIZ
-#define __NRATRA0_setrlimit(resource, rlimits) , (uintptr_t)(resource)
-#define __NRATRF1_setrlimit               "%p"
-#define __NRATRA1_setrlimit(resource, rlimits) , rlimits
-#define __NRATRF0_getrlimit               "%#" PRIxSIZ
-#define __NRATRA0_getrlimit(resource, rlimits) , (uintptr_t)(resource)
-#define __NRATRF1_getrlimit               "%p"
-#define __NRATRA1_getrlimit(resource, rlimits) , rlimits
-#define __NRATRF0_getrusage               "%" PRIdSIZ
-#define __NRATRA0_getrusage(who, tv)      , (intptr_t)(who)
-#define __NRATRF1_getrusage               "%p"
-#define __NRATRA1_getrusage(who, tv)      , tv
-#define __NRATRF0_gettimeofday            "%p"
-#define __NRATRA0_gettimeofday(tv, tz)    , tv
-#define __NRATRF1_gettimeofday            "%p"
-#define __NRATRA1_gettimeofday(tv, tz)    , tz
-#define __NRATRF0_settimeofday            "%p"
-#define __NRATRA0_settimeofday(tv, tz)    , tv
-#define __NRATRF1_settimeofday            "%p"
-#define __NRATRA1_settimeofday(tv, tz)    , tz
-#define __NRATRF0_getgroups               "%" PRIuSIZ
-#define __NRATRA0_getgroups(size, list)   , size
-#define __NRATRF1_getgroups               "%p"
-#define __NRATRA1_getgroups(size, list)   , list
-#define __NRATRF0_setgroups               "%" PRIuSIZ
-#define __NRATRA0_setgroups(count, groups) , count
-#define __NRATRF1_setgroups               "%p"
-#define __NRATRA1_setgroups(count, groups) , groups
-#define __NRATRF0_select                  "%" PRIuSIZ
-#define __NRATRA0_select(nfds, readfds, writefds, exceptfds, timeout) , nfds
-#define __NRATRF1_select                  "%p"
-#define __NRATRA1_select(nfds, readfds, writefds, exceptfds, timeout) , readfds
-#define __NRATRF2_select                  "%p"
-#define __NRATRA2_select(nfds, readfds, writefds, exceptfds, timeout) , writefds
-#define __NRATRF3_select                  "%p"
-#define __NRATRA3_select(nfds, readfds, writefds, exceptfds, timeout) , exceptfds
-#define __NRATRF4_select                  "%p"
-#define __NRATRA4_select(nfds, readfds, writefds, exceptfds, timeout) , timeout
-#define __NRATRF0_symlink                 "%q"
-#define __NRATRA0_symlink(link_text, target_path) , (validate_readable_opt(link_text,1),link_text)
-#define __NRATRF1_symlink                 "%q"
-#define __NRATRA1_symlink(link_text, target_path) , (validate_readable_opt(target_path,1),target_path)
-#define __NRATRF0_linux_oldlstat          "%q"
-#define __NRATRA0_linux_oldlstat(filename, statbuf) , (validate_readable_opt(filename,1),filename)
-#define __NRATRF1_linux_oldlstat          "%p"
-#define __NRATRA1_linux_oldlstat(filename, statbuf) , statbuf
-#define __NRATRF0_readlink                "%q"
-#define __NRATRA0_readlink(path, buf, buflen) , (validate_readable_opt(path,1),path)
-#define __NRATRF1_readlink                "%p"
-#define __NRATRA1_readlink(path, buf, buflen) , buf
-#define __NRATRF2_readlink                "%" PRIuSIZ
-#define __NRATRA2_readlink(path, buf, buflen) , buflen
-#define __NRATRF0_uselib                  "%q"
-#define __NRATRA0_uselib(library)         , (validate_readable_opt(library,1),library)
-#define __NRATRF0_swapon                  "%q"
-#define __NRATRA0_swapon(pathname, swapflags) , (validate_readable_opt(pathname,1),pathname)
-#define __NRATRF1_swapon                  "%#" PRIxSIZ "=%s%s%s"
-#define __NRATRA1_swapon(pathname, swapflags) , (uintptr_t)(swapflags), (swapflags) & SWAP_FLAG_PREFER ? "SWAP_FLAG_PREFER" : "" \
-                                              , ((swapflags) & SWAP_FLAG_DISCARD) && ((swapflags) & (SWAP_FLAG_PREFER)) ? "|" : "", (swapflags) & SWAP_FLAG_DISCARD ? "SWAP_FLAG_DISCARD" : ""
-#define __NRATRF0_reboot                  "%#" PRIxSIZ
-#define __NRATRA0_reboot(how)             , (uintptr_t)(how)
-#define __NRATRF0_readdir                 "%d"
-#define __NRATRA0_readdir(fd, dirp, count) , (int)(fd)
-#define __NRATRF1_readdir                 "%p"
-#define __NRATRA1_readdir(fd, dirp, count) , dirp
-#define __NRATRF2_readdir                 "%" PRIuSIZ
-#define __NRATRA2_readdir(fd, dirp, count) , count
-#define __NRATRF0_mmap                    "%p"
-#define __NRATRA0_mmap(addr, len, prot, flags, fd, offset) , addr
-#define __NRATRF1_mmap                    "%" PRIuSIZ
-#define __NRATRA1_mmap(addr, len, prot, flags, fd, offset) , len
-#define __NRATRF2_mmap                    "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s"
-#define __NRATRA2_mmap(addr, len, prot, flags, fd, offset) , (uintptr_t)(prot), (prot) & PROT_EXEC ? "PROT_EXEC" : (prot) ? "" : "PROT_NONE" \
-                                                           , ((prot) & PROT_WRITE) && ((prot) & (PROT_EXEC)) ? "|" : "", (prot) & PROT_WRITE ? "PROT_WRITE" : "" \
-                                                           , ((prot) & PROT_READ) && ((prot) & (PROT_EXEC | PROT_WRITE)) ? "|" : "", (prot) & PROT_READ ? "PROT_READ" : "" \
-                                                           , ((prot) & PROT_SEM) && ((prot) & (PROT_EXEC | PROT_WRITE | PROT_READ)) ? "|" : "", (prot) & PROT_SEM ? "PROT_SEM" : "" \
-                                                           , ((prot) & PROT_LOOSE) && ((prot) & (PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM)) ? "|" : "", (prot) & PROT_LOOSE ? "PROT_LOOSE" : "" \
-                                                           , ((prot) & PROT_SHARED) && ((prot) & (PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE)) ? "|" : "", (prot) & PROT_SHARED ? "PROT_SHARED" : ""
-#define __NRATRF3_mmap                    "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NRATRA3_mmap(addr, len, prot, flags, fd, offset) , (uintptr_t)(flags), (flags) & MAP_SHARED ? "MAP_SHARED" : (flags) ? "" : "MAP_AUTOMATIC" \
-                                                           , ((flags) & MAP_PRIVATE) && ((flags) & (MAP_SHARED)) ? "|" : "", (flags) & MAP_PRIVATE ? "MAP_PRIVATE" : "" \
-                                                           , ((flags) & MAP_FIXED) && ((flags) & (MAP_SHARED | MAP_PRIVATE)) ? "|" : "", (flags) & MAP_FIXED ? "MAP_FIXED" : "" \
-                                                           , ((flags) & MAP_ANON) && ((flags) & (MAP_SHARED | MAP_PRIVATE | MAP_FIXED)) ? "|" : "", (flags) & MAP_ANON ? "MAP_ANON" : "" \
-                                                           , ((flags) & MAP_32BIT) && ((flags) & (MAP_SHARED | MAP_PRIVATE | MAP_FIXED | MAP_ANON)) ? "|" : "", (flags) & MAP_32BIT ? "MAP_32BIT" : "" \
-                                                           , ((flags) & MAP_GROWSDOWN) && ((flags) & (MAP_SHARED | MAP_PRIVATE | MAP_FIXED | MAP_ANON | MAP_32BIT)) ? "|" : "", (flags) & MAP_GROWSDOWN ? "MAP_GROWSDOWN" : "" \
-                                                           , ((flags) & MAP_GROWSUP) && ((flags) & (MAP_SHARED | MAP_PRIVATE | MAP_FIXED | MAP_ANON | MAP_32BIT | MAP_GROWSDOWN)) ? "|" : "", (flags) & MAP_GROWSUP ? "MAP_GROWSUP" : "" \
-                                                           , ((flags) & MAP_LOCKED) && ((flags) & (MAP_SHARED | MAP_PRIVATE | MAP_FIXED | MAP_ANON | MAP_32BIT | MAP_GROWSDOWN | MAP_GROWSUP)) ? "|" : "", (flags) & MAP_LOCKED ? "MAP_LOCKED" : "" \
-                                                           , ((flags) & MAP_NORESERVE) && ((flags) & (MAP_SHARED | MAP_PRIVATE | MAP_FIXED | MAP_ANON | MAP_32BIT | MAP_GROWSDOWN | MAP_GROWSUP | MAP_LOCKED)) ? "|" : "", (flags) & MAP_NORESERVE ? "MAP_NORESERVE" : "" \
-                                                           , ((flags) & MAP_POPULATE) && ((flags) & (MAP_SHARED | MAP_PRIVATE | MAP_FIXED | MAP_ANON | MAP_32BIT | MAP_GROWSDOWN | MAP_GROWSUP | MAP_LOCKED | MAP_NORESERVE)) ? "|" : "", (flags) & MAP_POPULATE ? "MAP_POPULATE" : "" \
-                                                           , ((flags) & MAP_NONBLOCK) && ((flags) & (MAP_SHARED | MAP_PRIVATE | MAP_FIXED | MAP_ANON | MAP_32BIT | MAP_GROWSDOWN | MAP_GROWSUP | MAP_LOCKED | MAP_NORESERVE | MAP_POPULATE)) ? "|" : "", (flags) & MAP_NONBLOCK ? "MAP_NONBLOCK" : "" \
-                                                           , ((flags) & MAP_STACK) && ((flags) & (MAP_SHARED | MAP_PRIVATE | MAP_FIXED | MAP_ANON | MAP_32BIT | MAP_GROWSDOWN | MAP_GROWSUP | MAP_LOCKED | MAP_NORESERVE | MAP_POPULATE | MAP_NONBLOCK)) ? "|" : "", (flags) & MAP_STACK ? "MAP_STACK" : "" \
-                                                           , ((flags) & MAP_UNINITIALIZED) && ((flags) & (MAP_SHARED | MAP_PRIVATE | MAP_FIXED | MAP_ANON | MAP_32BIT | MAP_GROWSDOWN | MAP_GROWSUP | MAP_LOCKED | MAP_NORESERVE | MAP_POPULATE | MAP_NONBLOCK | MAP_STACK)) ? "|" : "", (flags) & MAP_UNINITIALIZED ? "MAP_UNINITIALIZED" : "" \
-                                                           , ((flags) & MAP_DONT_MAP) && ((flags) & (MAP_SHARED | MAP_PRIVATE | MAP_FIXED | MAP_ANON | MAP_32BIT | MAP_GROWSDOWN | MAP_GROWSUP | MAP_LOCKED | MAP_NORESERVE | MAP_POPULATE | MAP_NONBLOCK | MAP_STACK | MAP_UNINITIALIZED)) ? "|" : "", (flags) & MAP_DONT_MAP ? "MAP_DONT_MAP" : "" \
-                                                           , ((flags) & MAP_DONT_OVERRIDE) && ((flags) & (MAP_SHARED | MAP_PRIVATE | MAP_FIXED | MAP_ANON | MAP_32BIT | MAP_GROWSDOWN | MAP_GROWSUP | MAP_LOCKED | MAP_NORESERVE | MAP_POPULATE | MAP_NONBLOCK | MAP_STACK | MAP_UNINITIALIZED | MAP_DONT_MAP)) ? "|" : "", (flags) & MAP_DONT_OVERRIDE ? "MAP_DONT_OVERRIDE" : "" \
-                                                           , ((flags) & MAP_OFFSET64_POINTER) && ((flags) & (MAP_SHARED | MAP_PRIVATE | MAP_FIXED | MAP_ANON | MAP_32BIT | MAP_GROWSDOWN | MAP_GROWSUP | MAP_LOCKED | MAP_NORESERVE | MAP_POPULATE | MAP_NONBLOCK | MAP_STACK | MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_DONT_OVERRIDE)) ? "|" : "", (flags) & MAP_OFFSET64_POINTER ? "MAP_OFFSET64_POINTER" : ""
-#define __NRATRF4_mmap                    "%d"
-#define __NRATRA4_mmap(addr, len, prot, flags, fd, offset) , (int)(fd)
-#define __NRATRF5_mmap                    "%#" PRIxSIZ
-#define __NRATRA5_mmap(addr, len, prot, flags, fd, offset) , (uintptr_t)(offset)
-#define __NRATRF0_munmap                  "%p"
-#define __NRATRA0_munmap(addr, len)       , addr
-#define __NRATRF1_munmap                  "%" PRIuSIZ
-#define __NRATRA1_munmap(addr, len)       , len
-#define __NRATRF0_truncate                "%q"
-#define __NRATRA0_truncate(filename, length) , (validate_readable_opt(filename,1),filename)
-#define __NRATRF1_truncate                "%#" PRIxSIZ
-#define __NRATRA1_truncate(filename, length) , (uintptr_t)(length)
-#define __NRATRF0_ftruncate               "%d"
-#define __NRATRA0_ftruncate(fd, length)   , (int)(fd)
-#define __NRATRF1_ftruncate               "%#" PRIxSIZ
-#define __NRATRA1_ftruncate(fd, length)   , (uintptr_t)(length)
-#define __NRATRF0_fchmod                  "%d"
-#define __NRATRA0_fchmod(fd, mode)        , (int)(fd)
-#define __NRATRF1_fchmod                  "%#" PRIoSIZ
-#define __NRATRA1_fchmod(fd, mode)        , (uintptr_t)(mode)
-#define __NRATRF0_fchown                  "%d"
-#define __NRATRA0_fchown(fd, owner, group) , (int)(fd)
-#define __NRATRF1_fchown                  "%" PRIu16
-#define __NRATRA1_fchown(fd, owner, group) , owner
-#define __NRATRF2_fchown                  "%" PRIu16
-#define __NRATRA2_fchown(fd, owner, group) , group
-#define __NRATRF0_getpriority             "%#" PRIxSIZ
-#define __NRATRA0_getpriority(which, who) , (uintptr_t)(which)
-#define __NRATRF1_getpriority             "%" PRIuSIZ
-#define __NRATRA1_getpriority(which, who) , (uintptr_t)(who)
-#define __NRATRF0_setpriority             "%#" PRIxSIZ
-#define __NRATRA0_setpriority(which, who, value) , (uintptr_t)(which)
-#define __NRATRF1_setpriority             "%" PRIuSIZ
-#define __NRATRA1_setpriority(which, who, value) , (uintptr_t)(who)
-#define __NRATRF2_setpriority             "%#" PRIxSIZ
-#define __NRATRA2_setpriority(which, who, value) , (uintptr_t)(value)
-#define __NRATRF0_profil                  "%p"
-#define __NRATRA0_profil(sample_buffer, size, offset, scale) , sample_buffer
-#define __NRATRF1_profil                  "%" PRIuSIZ
-#define __NRATRA1_profil(sample_buffer, size, offset, scale) , size
-#define __NRATRF2_profil                  "%" PRIuSIZ
-#define __NRATRA2_profil(sample_buffer, size, offset, scale) , offset
-#define __NRATRF3_profil                  "%#" PRIxSIZ
-#define __NRATRA3_profil(sample_buffer, size, offset, scale) , (uintptr_t)(scale)
-#define __NRATRF0_statfs                  "%q"
-#define __NRATRA0_statfs(file, buf)       , (validate_readable_opt(file,1),file)
-#define __NRATRF1_statfs                  "%p"
-#define __NRATRA1_statfs(file, buf)       , buf
-#define __NRATRF0_fstatfs                 "%d"
-#define __NRATRA0_fstatfs(file, buf)      , (int)(file)
-#define __NRATRF1_fstatfs                 "%p"
-#define __NRATRA1_fstatfs(file, buf)      , buf
-#define __NRATRF0_ioperm                  "%#" PRIxSIZ
-#define __NRATRA0_ioperm(from, num, turn_on) , (uintptr_t)(from)
-#define __NRATRF1_ioperm                  "%#" PRIxSIZ
-#define __NRATRA1_ioperm(from, num, turn_on) , (uintptr_t)(num)
-#define __NRATRF2_ioperm                  "%#" PRIxSIZ
-#define __NRATRA2_ioperm(from, num, turn_on) , (uintptr_t)(turn_on)
-#define __NRATRF0_socketcall              "%d"
-#define __NRATRA0_socketcall(call, args)  , call
-#define __NRATRF1_socketcall              "%p"
-#define __NRATRA1_socketcall(call, args)  , args
-#define __NRATRF0_syslog                  "%" PRIuSIZ
-#define __NRATRA0_syslog(level, str, len) , (uintptr_t)(level)
-#define __NRATRF1_syslog                  "%$q"
-#define __NRATRA1_syslog(level, str, len) , len,(validate_readable(str,len),str)
-#define __NRATRF2_syslog                  "%" PRIuSIZ
-#define __NRATRA2_syslog(level, str, len) , len
-#define __NRATRF0_setitimer               "%#" PRIxSIZ
-#define __NRATRA0_setitimer(which, newval, oldval) , (uintptr_t)(which)
-#define __NRATRF1_setitimer               "%p"
-#define __NRATRA1_setitimer(which, newval, oldval) , newval
-#define __NRATRF2_setitimer               "%p"
-#define __NRATRA2_setitimer(which, newval, oldval) , oldval
-#define __NRATRF0_getitimer               "%#" PRIxSIZ
-#define __NRATRA0_getitimer(which, curr_value) , (uintptr_t)(which)
-#define __NRATRF1_getitimer               "%p"
-#define __NRATRA1_getitimer(which, curr_value) , curr_value
-#define __NRATRF0_linux_stat              "%q"
-#define __NRATRA0_linux_stat(filename, statbuf) , (validate_readable_opt(filename,1),filename)
-#define __NRATRF1_linux_stat              "%p"
-#define __NRATRA1_linux_stat(filename, statbuf) , statbuf
-#define __NRATRF0_linux_lstat             "%q"
-#define __NRATRA0_linux_lstat(filename, statbuf) , (validate_readable_opt(filename,1),filename)
-#define __NRATRF1_linux_lstat             "%p"
-#define __NRATRA1_linux_lstat(filename, statbuf) , statbuf
-#define __NRATRF0_linux_fstat             "%d"
-#define __NRATRA0_linux_fstat(fd, statbuf) , (int)(fd)
-#define __NRATRF1_linux_fstat             "%p"
-#define __NRATRA1_linux_fstat(fd, statbuf) , statbuf
-#define __NRATRF0_olduname                "%p"
-#define __NRATRA0_olduname(name)          , name
-#define __NRATRF0_iopl                    "%#" PRIxSIZ
-#define __NRATRA0_iopl(level)             , (uintptr_t)(level)
-#define __NRATRF0_vm86old                 "%d"
-#define __NRATRA0_vm86old(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_wait4                   "%" PRIdSIZ
-#define __NRATRA0_wait4(pid, stat_loc, options, usage) , (intptr_t)(pid)
-#define __NRATRF1_wait4                   "%p"
-#define __NRATRA1_wait4(pid, stat_loc, options, usage) , stat_loc
-#define __NRATRF2_wait4                   "%#" PRIxSIZ "=%s%s%s%s%s%s%s"
-#define __NRATRA2_wait4(pid, stat_loc, options, usage) , (uintptr_t)(options), (options) & WNOHANG ? "WNOHANG" : "" \
-                                                       , ((options) & WUNTRACED) && ((options) & (WNOHANG)) ? "|" : "", (options) & WUNTRACED ? "WUNTRACED" : "" \
-                                                       , ((options) & WCONTINUED) && ((options) & (WNOHANG | WUNTRACED)) ? "|" : "", (options) & WCONTINUED ? "WCONTINUED" : "" \
-                                                       , ((options) & WNOWAIT) && ((options) & (WNOHANG | WUNTRACED | WCONTINUED)) ? "|" : "", (options) & WNOWAIT ? "WNOWAIT" : ""
-#define __NRATRF3_wait4                   "%p"
-#define __NRATRA3_wait4(pid, stat_loc, options, usage) , usage
-#define __NRATRF0_swapoff                 "%q"
-#define __NRATRA0_swapoff(pathname)       , (validate_readable_opt(pathname,1),pathname)
-#define __NRATRF0_sysinfo                 "%p"
-#define __NRATRA0_sysinfo(info)           , info
-#define __NRATRF0_ipc                     "%d"
-#define __NRATRA0_ipc(TODO_PROTOTYPE)     , TODO_PROTOTYPE
-#define __NRATRF0_fsync                   "%d"
-#define __NRATRA0_fsync(fd)               , (int)(fd)
-#define __NRATRF0_sigreturn               "%p"
-#define __NRATRA0_sigreturn(restore_fpu, unused1, unused2, restore_sigmask, sc_info, restore_cpu) , restore_fpu
-#define __NRATRF1_sigreturn               "%#" PRIxSIZ
-#define __NRATRA1_sigreturn(restore_fpu, unused1, unused2, restore_sigmask, sc_info, restore_cpu) , (uintptr_t)(unused1)
-#define __NRATRF2_sigreturn               "%#" PRIxSIZ
-#define __NRATRA2_sigreturn(restore_fpu, unused1, unused2, restore_sigmask, sc_info, restore_cpu) , (uintptr_t)(unused2)
-#define __NRATRF3_sigreturn               "%p"
-#define __NRATRA3_sigreturn(restore_fpu, unused1, unused2, restore_sigmask, sc_info, restore_cpu) , restore_sigmask
-#define __NRATRF4_sigreturn               "%p"
-#define __NRATRA4_sigreturn(restore_fpu, unused1, unused2, restore_sigmask, sc_info, restore_cpu) , sc_info
-#define __NRATRF5_sigreturn               "%p"
-#define __NRATRA5_sigreturn(restore_fpu, unused1, unused2, restore_sigmask, sc_info, restore_cpu) , restore_cpu
-#define __NRATRF0_clone                   "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NRATRA0_clone(flags, child_stack, ptid, newtls, ctid) , (uintptr_t)(flags), (flags) & CLONE_VM ? "CLONE_VM" : "" \
-                                                                , ((flags) & CLONE_FS) && ((flags) & (CLONE_VM)) ? "|" : "", (flags) & CLONE_FS ? "CLONE_FS" : "" \
-                                                                , ((flags) & CLONE_FILES) && ((flags) & (CLONE_VM | CLONE_FS)) ? "|" : "", (flags) & CLONE_FILES ? "CLONE_FILES" : "" \
-                                                                , ((flags) & CLONE_SIGHAND) && ((flags) & (CLONE_VM | CLONE_FS | CLONE_FILES)) ? "|" : "", (flags) & CLONE_SIGHAND ? "CLONE_SIGHAND" : "" \
-                                                                , ((flags) & CLONE_PTRACE) && ((flags) & (CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND)) ? "|" : "", (flags) & CLONE_PTRACE ? "CLONE_PTRACE" : "" \
-                                                                , ((flags) & CLONE_VFORK) && ((flags) & (CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_PTRACE)) ? "|" : "", (flags) & CLONE_VFORK ? "CLONE_VFORK" : "" \
-                                                                , ((flags) & CLONE_PARENT) && ((flags) & (CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_PTRACE | CLONE_VFORK)) ? "|" : "", (flags) & CLONE_PARENT ? "CLONE_PARENT" : "" \
-                                                                , ((flags) & CLONE_THREAD) && ((flags) & (CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_PTRACE | CLONE_VFORK | CLONE_PARENT)) ? "|" : "", (flags) & CLONE_THREAD ? "CLONE_THREAD" : "" \
-                                                                , ((flags) & CLONE_NEWNS) && ((flags) & (CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_PTRACE | CLONE_VFORK | CLONE_PARENT | CLONE_THREAD)) ? "|" : "", (flags) & CLONE_NEWNS ? "CLONE_NEWNS" : "" \
-                                                                , ((flags) & CLONE_SYSVSEM) && ((flags) & (CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_PTRACE | CLONE_VFORK | CLONE_PARENT | CLONE_THREAD | CLONE_NEWNS)) ? "|" : "", (flags) & CLONE_SYSVSEM ? "CLONE_SYSVSEM" : "" \
-                                                                , ((flags) & CLONE_SETTLS) && ((flags) & (CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_PTRACE | CLONE_VFORK | CLONE_PARENT | CLONE_THREAD | CLONE_NEWNS | CLONE_SYSVSEM)) ? "|" : "", (flags) & CLONE_SETTLS ? "CLONE_SETTLS" : "" \
-                                                                , ((flags) & CLONE_PARENT_SETTID) && ((flags) & (CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_PTRACE | CLONE_VFORK | CLONE_PARENT | CLONE_THREAD | CLONE_NEWNS | CLONE_SYSVSEM | CLONE_SETTLS)) ? "|" : "", (flags) & CLONE_PARENT_SETTID ? "CLONE_PARENT_SETTID" : "" \
-                                                                , ((flags) & CLONE_CHILD_CLEARTID) && ((flags) & (CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_PTRACE | CLONE_VFORK | CLONE_PARENT | CLONE_THREAD | CLONE_NEWNS | CLONE_SYSVSEM | CLONE_SETTLS | CLONE_PARENT_SETTID)) ? "|" : "", (flags) & CLONE_CHILD_CLEARTID ? "CLONE_CHILD_CLEARTID" : "" \
-                                                                , ((flags) & CLONE_DETACHED) && ((flags) & (CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_PTRACE | CLONE_VFORK | CLONE_PARENT | CLONE_THREAD | CLONE_NEWNS | CLONE_SYSVSEM | CLONE_SETTLS | CLONE_PARENT_SETTID | CLONE_CHILD_CLEARTID)) ? "|" : "", (flags) & CLONE_DETACHED ? "CLONE_DETACHED" : "" \
-                                                                , ((flags) & CLONE_UNTRACED) && ((flags) & (CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_PTRACE | CLONE_VFORK | CLONE_PARENT | CLONE_THREAD | CLONE_NEWNS | CLONE_SYSVSEM | CLONE_SETTLS | CLONE_PARENT_SETTID | CLONE_CHILD_CLEARTID | CLONE_DETACHED)) ? "|" : "", (flags) & CLONE_UNTRACED ? "CLONE_UNTRACED" : "" \
-                                                                , ((flags) & CLONE_CHILD_SETTID) && ((flags) & (CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_PTRACE | CLONE_VFORK | CLONE_PARENT | CLONE_THREAD | CLONE_NEWNS | CLONE_SYSVSEM | CLONE_SETTLS | CLONE_PARENT_SETTID | CLONE_CHILD_CLEARTID | CLONE_DETACHED | CLONE_UNTRACED)) ? "|" : "", (flags) & CLONE_CHILD_SETTID ? "CLONE_CHILD_SETTID" : "" \
-                                                                , ((flags) & CLONE_NEWUTS) && ((flags) & (CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_PTRACE | CLONE_VFORK | CLONE_PARENT | CLONE_THREAD | CLONE_NEWNS | CLONE_SYSVSEM | CLONE_SETTLS | CLONE_PARENT_SETTID | CLONE_CHILD_CLEARTID | CLONE_DETACHED | CLONE_UNTRACED | CLONE_CHILD_SETTID)) ? "|" : "", (flags) & CLONE_NEWUTS ? "CLONE_NEWUTS" : "" \
-                                                                , ((flags) & CLONE_NEWIPC) && ((flags) & (CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_PTRACE | CLONE_VFORK | CLONE_PARENT | CLONE_THREAD | CLONE_NEWNS | CLONE_SYSVSEM | CLONE_SETTLS | CLONE_PARENT_SETTID | CLONE_CHILD_CLEARTID | CLONE_DETACHED | CLONE_UNTRACED | CLONE_CHILD_SETTID | CLONE_NEWUTS)) ? "|" : "", (flags) & CLONE_NEWIPC ? "CLONE_NEWIPC" : "" \
-                                                                , ((flags) & CLONE_NEWUSER) && ((flags) & (CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_PTRACE | CLONE_VFORK | CLONE_PARENT | CLONE_THREAD | CLONE_NEWNS | CLONE_SYSVSEM | CLONE_SETTLS | CLONE_PARENT_SETTID | CLONE_CHILD_CLEARTID | CLONE_DETACHED | CLONE_UNTRACED | CLONE_CHILD_SETTID | CLONE_NEWUTS | CLONE_NEWIPC)) ? "|" : "", (flags) & CLONE_NEWUSER ? "CLONE_NEWUSER" : "" \
-                                                                , ((flags) & CLONE_NEWPID) && ((flags) & (CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_PTRACE | CLONE_VFORK | CLONE_PARENT | CLONE_THREAD | CLONE_NEWNS | CLONE_SYSVSEM | CLONE_SETTLS | CLONE_PARENT_SETTID | CLONE_CHILD_CLEARTID | CLONE_DETACHED | CLONE_UNTRACED | CLONE_CHILD_SETTID | CLONE_NEWUTS | CLONE_NEWIPC | CLONE_NEWUSER)) ? "|" : "", (flags) & CLONE_NEWPID ? "CLONE_NEWPID" : "" \
-                                                                , ((flags) & CLONE_NEWNET) && ((flags) & (CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_PTRACE | CLONE_VFORK | CLONE_PARENT | CLONE_THREAD | CLONE_NEWNS | CLONE_SYSVSEM | CLONE_SETTLS | CLONE_PARENT_SETTID | CLONE_CHILD_CLEARTID | CLONE_DETACHED | CLONE_UNTRACED | CLONE_CHILD_SETTID | CLONE_NEWUTS | CLONE_NEWIPC | CLONE_NEWUSER | CLONE_NEWPID)) ? "|" : "", (flags) & CLONE_NEWNET ? "CLONE_NEWNET" : "" \
-                                                                , ((flags) & CLONE_IO) && ((flags) & (CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_PTRACE | CLONE_VFORK | CLONE_PARENT | CLONE_THREAD | CLONE_NEWNS | CLONE_SYSVSEM | CLONE_SETTLS | CLONE_PARENT_SETTID | CLONE_CHILD_CLEARTID | CLONE_DETACHED | CLONE_UNTRACED | CLONE_CHILD_SETTID | CLONE_NEWUTS | CLONE_NEWIPC | CLONE_NEWUSER | CLONE_NEWPID | CLONE_NEWNET)) ? "|" : "", (flags) & CLONE_IO ? "CLONE_IO" : ""
-#define __NRATRF1_clone                   "%p"
-#define __NRATRA1_clone(flags, child_stack, ptid, newtls, ctid) , child_stack
-#define __NRATRF2_clone                   "%p"
-#define __NRATRA2_clone(flags, child_stack, ptid, newtls, ctid) , ptid
-#define __NRATRF3_clone                   "%p"
-#define __NRATRA3_clone(flags, child_stack, ptid, newtls, ctid) , newtls
-#define __NRATRF4_clone                   "%p"
-#define __NRATRA4_clone(flags, child_stack, ptid, newtls, ctid) , ctid
-#define __NRATRF0_setdomainname           "%q"
-#define __NRATRA0_setdomainname(name, len) , (validate_readable_opt(name,1),name)
-#define __NRATRF1_setdomainname           "%" PRIuSIZ
-#define __NRATRA1_setdomainname(name, len) , len
-#define __NRATRF0_uname                   "%p"
-#define __NRATRA0_uname(name)             , name
-#define __NRATRF0_modify_ldt              "%#" PRIxSIZ
-#define __NRATRA0_modify_ldt(func, ptr, bytecount) , (uintptr_t)(func)
-#define __NRATRF1_modify_ldt              "%p"
-#define __NRATRA1_modify_ldt(func, ptr, bytecount) , ptr
-#define __NRATRF2_modify_ldt              "%#" PRIxSIZ
-#define __NRATRA2_modify_ldt(func, ptr, bytecount) , (uintptr_t)(bytecount)
-#define __NRATRF0_adjtimex                "%d"
-#define __NRATRA0_adjtimex(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_mprotect                "%p"
-#define __NRATRA0_mprotect(addr, len, prot) , addr
-#define __NRATRF1_mprotect                "%" PRIuSIZ
-#define __NRATRA1_mprotect(addr, len, prot) , len
-#define __NRATRF2_mprotect                "%#" PRIxSIZ "=%s%s%s%s%s%s%s"
-#define __NRATRA2_mprotect(addr, len, prot) , (uintptr_t)(prot), (prot) & PROT_EXEC ? "PROT_EXEC" : (prot) ? "" : "PROT_NONE" \
-                                            , ((prot) & PROT_WRITE) && ((prot) & (PROT_EXEC)) ? "|" : "", (prot) & PROT_WRITE ? "PROT_WRITE" : "" \
-                                            , ((prot) & PROT_READ) && ((prot) & (PROT_EXEC | PROT_WRITE)) ? "|" : "", (prot) & PROT_READ ? "PROT_READ" : "" \
-                                            , ((prot) & PROT_SEM) && ((prot) & (PROT_EXEC | PROT_WRITE | PROT_READ)) ? "|" : "", (prot) & PROT_SEM ? "PROT_SEM" : ""
-#define __NRATRF0_sigprocmask             "%#" PRIxSIZ
-#define __NRATRA0_sigprocmask(how, set, oset) , (uintptr_t)(how)
-#define __NRATRF1_sigprocmask             "%p"
-#define __NRATRA1_sigprocmask(how, set, oset) , set
-#define __NRATRF2_sigprocmask             "%p"
-#define __NRATRA2_sigprocmask(how, set, oset) , oset
-#define __NRATRF0_create_module           "%d"
-#define __NRATRA0_create_module(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_init_module             "%d"
-#define __NRATRA0_init_module(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_delete_module           "%d"
-#define __NRATRA0_delete_module(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_get_kernel_syms         "%d"
-#define __NRATRA0_get_kernel_syms(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_quotactl                "%d"
-#define __NRATRA0_quotactl(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_getpgid                 "%" PRIdSIZ
-#define __NRATRA0_getpgid(pid)            , (intptr_t)(pid)
-#define __NRATRF0_fchdir                  "%d"
-#define __NRATRA0_fchdir(fd)              , (int)(fd)
-#define __NRATRF0_bdflush                 "%d"
-#define __NRATRA0_bdflush(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_sysfs                   "%d"
-#define __NRATRA0_sysfs(TODO_PROTOTYPE)   , TODO_PROTOTYPE
-#define __NRATRF0_personality             "%d"
-#define __NRATRA0_personality(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_afs_syscall             "%d"
-#define __NRATRA0_afs_syscall(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_setfsuid                "%" PRIu16
-#define __NRATRA0_setfsuid(uid)           , uid
-#define __NRATRF0_setfsgid                "%" PRIu16
-#define __NRATRA0_setfsgid(gid)           , gid
-#define __NRATRF0__llseek                 "%d"
-#define __NRATRA0__llseek(fd, offset, result, whence) , (int)(fd)
-#define __NRATRF1__llseek                 "%" PRId64
-#define __NRATRA1__llseek(fd, offset, result, whence) , offset
-#define __NRATRF2__llseek                 "%p"
-#define __NRATRA2__llseek(fd, offset, result, whence) , result
-#define __NRATRF3__llseek                 "%#Ix=%s"
-#define __NRATRA3__llseek(fd, offset, result, whence) , (whence), (whence) == SEEK_SET ? "SEEK_SET" : (whence) == SEEK_CUR ? "SEEK_CUR" : (whence) == SEEK_END ? "SEEK_END" : (whence) == SEEK_DATA ? "SEEK_DATA" : (whence) == SEEK_HOLE ? "SEEK_HOLE" : "?"
-#define __NRATRF0_getdents                "%d"
-#define __NRATRA0_getdents(fd, dirp, count) , (int)(fd)
-#define __NRATRF1_getdents                "%p"
-#define __NRATRA1_getdents(fd, dirp, count) , dirp
-#define __NRATRF2_getdents                "%" PRIuSIZ
-#define __NRATRA2_getdents(fd, dirp, count) , count
-#define __NRATRF0__newselect              "%d"
-#define __NRATRA0__newselect(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_flock                   "%d"
-#define __NRATRA0_flock(fd, operation)    , (int)(fd)
-#define __NRATRF1_flock                   "%#" PRIxSIZ
-#define __NRATRA1_flock(fd, operation)    , (uintptr_t)(operation)
-#define __NRATRF0_msync                   "%p"
-#define __NRATRA0_msync(addr, len, flags) , addr
-#define __NRATRF1_msync                   "%" PRIuSIZ
-#define __NRATRA1_msync(addr, len, flags) , len
-#define __NRATRF2_msync                   "%#" PRIxSIZ
-#define __NRATRA2_msync(addr, len, flags) , (uintptr_t)(flags)
-#define __NRATRF0_readv                   "%d"
-#define __NRATRA0_readv(fd, iovec, count) , (int)(fd)
-#define __NRATRF1_readv                   "%p"
-#define __NRATRA1_readv(fd, iovec, count) , iovec
-#define __NRATRF2_readv                   "%" PRIuSIZ
-#define __NRATRA2_readv(fd, iovec, count) , count
-#define __NRATRF0_writev                  "%d"
-#define __NRATRA0_writev(fd, iovec, count) , (int)(fd)
-#define __NRATRF1_writev                  "%p"
-#define __NRATRA1_writev(fd, iovec, count) , iovec
-#define __NRATRF2_writev                  "%" PRIuSIZ
-#define __NRATRA2_writev(fd, iovec, count) , count
-#define __NRATRF0_getsid                  "%" PRIdSIZ
-#define __NRATRA0_getsid(pid)             , (intptr_t)(pid)
-#define __NRATRF0_fdatasync               "%d"
-#define __NRATRA0_fdatasync(fd)           , (int)(fd)
-#define __NRATRF0__sysctl                 "%d"
-#define __NRATRA0__sysctl(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_mlock                   "%p"
-#define __NRATRA0_mlock(addr, len)        , addr
-#define __NRATRF1_mlock                   "%" PRIuSIZ
-#define __NRATRA1_mlock(addr, len)        , len
-#define __NRATRF0_munlock                 "%p"
-#define __NRATRA0_munlock(addr, len)      , addr
-#define __NRATRF1_munlock                 "%" PRIuSIZ
-#define __NRATRA1_munlock(addr, len)      , len
-#define __NRATRF0_mlockall                "%#" PRIxSIZ
-#define __NRATRA0_mlockall(flags)         , (uintptr_t)(flags)
-#define __NRATRF0_sched_setparam          "%" PRIdSIZ
-#define __NRATRA0_sched_setparam(pid, param) , (intptr_t)(pid)
-#define __NRATRF1_sched_setparam          "%p"
-#define __NRATRA1_sched_setparam(pid, param) , param
-#define __NRATRF0_sched_getparam          "%" PRIdSIZ
-#define __NRATRA0_sched_getparam(pid, param) , (intptr_t)(pid)
-#define __NRATRF1_sched_getparam          "%p"
-#define __NRATRA1_sched_getparam(pid, param) , param
-#define __NRATRF0_sched_setscheduler      "%" PRIdSIZ
-#define __NRATRA0_sched_setscheduler(pid, policy, param) , (intptr_t)(pid)
-#define __NRATRF1_sched_setscheduler      "%#" PRIxSIZ
-#define __NRATRA1_sched_setscheduler(pid, policy, param) , (uintptr_t)(policy)
-#define __NRATRF2_sched_setscheduler      "%p"
-#define __NRATRA2_sched_setscheduler(pid, policy, param) , param
-#define __NRATRF0_sched_getscheduler      "%" PRIdSIZ
-#define __NRATRA0_sched_getscheduler(pid) , (intptr_t)(pid)
-#define __NRATRF0_sched_get_priority_max  "%#" PRIxSIZ
-#define __NRATRA0_sched_get_priority_max(algorithm) , (uintptr_t)(algorithm)
-#define __NRATRF0_sched_get_priority_min  "%#" PRIxSIZ
-#define __NRATRA0_sched_get_priority_min(algorithm) , (uintptr_t)(algorithm)
-#define __NRATRF0_sched_rr_get_interval   "%" PRIdSIZ
-#define __NRATRA0_sched_rr_get_interval(pid, tms) , (intptr_t)(pid)
-#define __NRATRF1_sched_rr_get_interval   "%p"
-#define __NRATRA1_sched_rr_get_interval(pid, tms) , tms
-#define __NRATRF0_nanosleep               "%p"
-#define __NRATRA0_nanosleep(req, rem)     , req
-#define __NRATRF1_nanosleep               "%p"
-#define __NRATRA1_nanosleep(req, rem)     , rem
-#define __NRATRF0_mremap                  "%p"
-#define __NRATRA0_mremap(addr, old_len, new_len, flags, new_address) , addr
-#define __NRATRF1_mremap                  "%" PRIuSIZ
-#define __NRATRA1_mremap(addr, old_len, new_len, flags, new_address) , old_len
-#define __NRATRF2_mremap                  "%" PRIuSIZ
-#define __NRATRA2_mremap(addr, old_len, new_len, flags, new_address) , new_len
-#define __NRATRF3_mremap                  "%#" PRIxSIZ "=%s%s%s"
-#define __NRATRA3_mremap(addr, old_len, new_len, flags, new_address) , (uintptr_t)(flags), (flags) & MREMAP_MAYMOVE ? "MREMAP_MAYMOVE" : "" \
-                                                                     , ((flags) & MREMAP_FIXED) && ((flags) & (MREMAP_MAYMOVE)) ? "|" : "", (flags) & MREMAP_FIXED ? "MREMAP_FIXED" : ""
-#define __NRATRF4_mremap                  "%p"
-#define __NRATRA4_mremap(addr, old_len, new_len, flags, new_address) , new_address
-#define __NRATRF0_setresuid               "%" PRIu16
-#define __NRATRA0_setresuid(ruid, euid, suid) , ruid
-#define __NRATRF1_setresuid               "%" PRIu16
-#define __NRATRA1_setresuid(ruid, euid, suid) , euid
-#define __NRATRF2_setresuid               "%" PRIu16
-#define __NRATRA2_setresuid(ruid, euid, suid) , suid
-#define __NRATRF0_getresuid               "%p"
-#define __NRATRA0_getresuid(ruid, euid, suid) , ruid
-#define __NRATRF1_getresuid               "%p"
-#define __NRATRA1_getresuid(ruid, euid, suid) , euid
-#define __NRATRF2_getresuid               "%p"
-#define __NRATRA2_getresuid(ruid, euid, suid) , suid
-#define __NRATRF0_vm86                    "%d"
-#define __NRATRA0_vm86(TODO_PROTOTYPE)    , TODO_PROTOTYPE
-#define __NRATRF0_query_module            "%d"
-#define __NRATRA0_query_module(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_poll                    "%p"
-#define __NRATRA0_poll(fds, nfds, timeout) , fds
-#define __NRATRF1_poll                    "%" PRIuSIZ
-#define __NRATRA1_poll(fds, nfds, timeout) , nfds
-#define __NRATRF2_poll                    "%" PRIdSIZ
-#define __NRATRA2_poll(fds, nfds, timeout) , (intptr_t)(timeout)
-#define __NRATRF0_nfsservctl              "%d"
-#define __NRATRA0_nfsservctl(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_setresgid               "%" PRIu16
-#define __NRATRA0_setresgid(rgid, egid, sgid) , rgid
-#define __NRATRF1_setresgid               "%" PRIu16
-#define __NRATRA1_setresgid(rgid, egid, sgid) , egid
-#define __NRATRF2_setresgid               "%" PRIu16
-#define __NRATRA2_setresgid(rgid, egid, sgid) , sgid
-#define __NRATRF0_getresgid               "%p"
-#define __NRATRA0_getresgid(rgid, egid, sgid) , rgid
-#define __NRATRF1_getresgid               "%p"
-#define __NRATRA1_getresgid(rgid, egid, sgid) , egid
-#define __NRATRF2_getresgid               "%p"
-#define __NRATRA2_getresgid(rgid, egid, sgid) , sgid
-#define __NRATRF0_prctl                   "%d"
-#define __NRATRA0_prctl(TODO_PROTOTYPE)   , TODO_PROTOTYPE
-#define __NRATRF0_rt_sigreturn            "%p"
-#define __NRATRA0_rt_sigreturn(restore_fpu, restore_sigmask, sc_info, restore_cpu) , restore_fpu
-#define __NRATRF1_rt_sigreturn            "%p"
-#define __NRATRA1_rt_sigreturn(restore_fpu, restore_sigmask, sc_info, restore_cpu) , restore_sigmask
-#define __NRATRF2_rt_sigreturn            "%p"
-#define __NRATRA2_rt_sigreturn(restore_fpu, restore_sigmask, sc_info, restore_cpu) , sc_info
-#define __NRATRF3_rt_sigreturn            "%p"
-#define __NRATRA3_rt_sigreturn(restore_fpu, restore_sigmask, sc_info, restore_cpu) , restore_cpu
-#define __NRATRF0_rt_sigaction            "%#" PRIxSIZ
-#define __NRATRA0_rt_sigaction(signo, act, oact, sigsetsize) , (uintptr_t)(signo)
-#define __NRATRF1_rt_sigaction            "%p"
-#define __NRATRA1_rt_sigaction(signo, act, oact, sigsetsize) , act
-#define __NRATRF2_rt_sigaction            "%p"
-#define __NRATRA2_rt_sigaction(signo, act, oact, sigsetsize) , oact
-#define __NRATRF3_rt_sigaction            "%" PRIuSIZ
-#define __NRATRA3_rt_sigaction(signo, act, oact, sigsetsize) , sigsetsize
-#define __NRATRF0_rt_sigprocmask          "%#" PRIxSIZ
-#define __NRATRA0_rt_sigprocmask(how, set, oset, sigsetsize) , (uintptr_t)(how)
-#define __NRATRF1_rt_sigprocmask          "%p"
-#define __NRATRA1_rt_sigprocmask(how, set, oset, sigsetsize) , set
-#define __NRATRF2_rt_sigprocmask          "%p"
-#define __NRATRA2_rt_sigprocmask(how, set, oset, sigsetsize) , oset
-#define __NRATRF3_rt_sigprocmask          "%" PRIuSIZ
-#define __NRATRA3_rt_sigprocmask(how, set, oset, sigsetsize) , sigsetsize
-#define __NRATRF0_rt_sigpending           "%p"
-#define __NRATRA0_rt_sigpending(set, sigsetsize) , set
-#define __NRATRF1_rt_sigpending           "%" PRIuSIZ
-#define __NRATRA1_rt_sigpending(set, sigsetsize) , sigsetsize
-#define __NRATRF0_rt_sigtimedwait         "%p"
-#define __NRATRA0_rt_sigtimedwait(set, info, timeout, sigsetsize) , set
-#define __NRATRF1_rt_sigtimedwait         "%p"
-#define __NRATRA1_rt_sigtimedwait(set, info, timeout, sigsetsize) , info
-#define __NRATRF2_rt_sigtimedwait         "%p"
-#define __NRATRA2_rt_sigtimedwait(set, info, timeout, sigsetsize) , timeout
-#define __NRATRF3_rt_sigtimedwait         "%" PRIuSIZ
-#define __NRATRA3_rt_sigtimedwait(set, info, timeout, sigsetsize) , sigsetsize
-#define __NRATRF0_rt_sigqueueinfo         "%" PRIdSIZ
-#define __NRATRA0_rt_sigqueueinfo(tgid, signo, uinfo) , (intptr_t)(tgid)
-#define __NRATRF1_rt_sigqueueinfo         "%#" PRIxSIZ
-#define __NRATRA1_rt_sigqueueinfo(tgid, signo, uinfo) , (uintptr_t)(signo)
-#define __NRATRF2_rt_sigqueueinfo         "%p"
-#define __NRATRA2_rt_sigqueueinfo(tgid, signo, uinfo) , uinfo
-#define __NRATRF0_rt_sigsuspend           "%p"
-#define __NRATRA0_rt_sigsuspend(set, sigsetsize) , set
-#define __NRATRF1_rt_sigsuspend           "%" PRIuSIZ
-#define __NRATRA1_rt_sigsuspend(set, sigsetsize) , sigsetsize
-#define __NRATRF0_pread64                 "%d"
-#define __NRATRA0_pread64(fd, buf, bufsize, offset) , (int)(fd)
-#define __NRATRF1_pread64                 "%p"
-#define __NRATRA1_pread64(fd, buf, bufsize, offset) , buf
-#define __NRATRF2_pread64                 "%" PRIuSIZ
-#define __NRATRA2_pread64(fd, buf, bufsize, offset) , bufsize
-#define __NRATRF3_pread64                 "%" PRIu64
-#define __NRATRA3_pread64(fd, buf, bufsize, offset) , offset
-#define __NRATRF0_pwrite64                "%d"
-#define __NRATRA0_pwrite64(fd, buf, bufsize, offset) , (int)(fd)
-#define __NRATRF1_pwrite64                "%p"
-#define __NRATRA1_pwrite64(fd, buf, bufsize, offset) , buf
-#define __NRATRF2_pwrite64                "%" PRIuSIZ
-#define __NRATRA2_pwrite64(fd, buf, bufsize, offset) , bufsize
-#define __NRATRF3_pwrite64                "%" PRIu64
-#define __NRATRA3_pwrite64(fd, buf, bufsize, offset) , offset
-#define __NRATRF0_chown                   "%q"
-#define __NRATRA0_chown(filename, owner, group) , (validate_readable_opt(filename,1),filename)
-#define __NRATRF1_chown                   "%" PRIu16
-#define __NRATRA1_chown(filename, owner, group) , owner
-#define __NRATRF2_chown                   "%" PRIu16
-#define __NRATRA2_chown(filename, owner, group) , group
-#define __NRATRF0_getcwd                  "%p"
-#define __NRATRA0_getcwd(buf, size)       , buf
-#define __NRATRF1_getcwd                  "%" PRIuSIZ
-#define __NRATRA1_getcwd(buf, size)       , size
-#define __NRATRF0_capget                  "%d"
-#define __NRATRA0_capget(TODO_PROTOTYPE)  , TODO_PROTOTYPE
-#define __NRATRF0_capset                  "%d"
-#define __NRATRA0_capset(TODO_PROTOTYPE)  , TODO_PROTOTYPE
-#define __NRATRF0_sigaltstack             "%p"
-#define __NRATRA0_sigaltstack(ss, oss)    , ss
-#define __NRATRF1_sigaltstack             "%p"
-#define __NRATRA1_sigaltstack(ss, oss)    , oss
-#define __NRATRF0_sendfile                "%d"
-#define __NRATRA0_sendfile(out_fd, in_fd, pin_offset, num_bytes) , (int)(out_fd)
-#define __NRATRF1_sendfile                "%d"
-#define __NRATRA1_sendfile(out_fd, in_fd, pin_offset, num_bytes) , (int)(in_fd)
-#define __NRATRF2_sendfile                "%p"
-#define __NRATRA2_sendfile(out_fd, in_fd, pin_offset, num_bytes) , pin_offset
-#define __NRATRF3_sendfile                "%" PRIuSIZ
-#define __NRATRA3_sendfile(out_fd, in_fd, pin_offset, num_bytes) , num_bytes
-#define __NRATRF0_getpmsg                 "%d"
-#define __NRATRA0_getpmsg(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_putpmsg                 "%d"
-#define __NRATRA0_putpmsg(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_ugetrlimit              "%d"
-#define __NRATRA0_ugetrlimit(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_mmap2                   "%p"
-#define __NRATRA0_mmap2(addr, len, prot, flags, fd, pgoffset) , addr
-#define __NRATRF1_mmap2                   "%" PRIuSIZ
-#define __NRATRA1_mmap2(addr, len, prot, flags, fd, pgoffset) , len
-#define __NRATRF2_mmap2                   "%#" PRIxSIZ
-#define __NRATRA2_mmap2(addr, len, prot, flags, fd, pgoffset) , (uintptr_t)(prot)
-#define __NRATRF3_mmap2                   "%#" PRIxSIZ
-#define __NRATRA3_mmap2(addr, len, prot, flags, fd, pgoffset) , (uintptr_t)(flags)
-#define __NRATRF4_mmap2                   "%d"
-#define __NRATRA4_mmap2(addr, len, prot, flags, fd, pgoffset) , (int)(fd)
-#define __NRATRF5_mmap2                   "%#" PRIxSIZ
-#define __NRATRA5_mmap2(addr, len, prot, flags, fd, pgoffset) , (uintptr_t)(pgoffset)
-#define __NRATRF0_truncate64              "%q"
-#define __NRATRA0_truncate64(filename, length) , (validate_readable_opt(filename,1),filename)
-#define __NRATRF1_truncate64              "%" PRIu64
-#define __NRATRA1_truncate64(filename, length) , length
-#define __NRATRF0_ftruncate64             "%d"
-#define __NRATRA0_ftruncate64(fd, length) , (int)(fd)
-#define __NRATRF1_ftruncate64             "%" PRIu64
-#define __NRATRA1_ftruncate64(fd, length) , length
-#define __NRATRF0_linux_stat64            "%q"
-#define __NRATRA0_linux_stat64(filename, statbuf) , (validate_readable_opt(filename,1),filename)
-#define __NRATRF1_linux_stat64            "%p"
-#define __NRATRA1_linux_stat64(filename, statbuf) , statbuf
-#define __NRATRF0_linux_lstat64           "%q"
-#define __NRATRA0_linux_lstat64(filename, statbuf) , (validate_readable_opt(filename,1),filename)
-#define __NRATRF1_linux_lstat64           "%p"
-#define __NRATRA1_linux_lstat64(filename, statbuf) , statbuf
-#define __NRATRF0_linux_fstat64           "%d"
-#define __NRATRA0_linux_fstat64(fd, statbuf) , (int)(fd)
-#define __NRATRF1_linux_fstat64           "%p"
-#define __NRATRA1_linux_fstat64(fd, statbuf) , statbuf
-#define __NRATRF0_lchown32                "%q"
-#define __NRATRA0_lchown32(filename, owner, group) , (validate_readable_opt(filename,1),filename)
-#define __NRATRF1_lchown32                "%" PRIu32
-#define __NRATRA1_lchown32(filename, owner, group) , owner
-#define __NRATRF2_lchown32                "%" PRIu32
-#define __NRATRA2_lchown32(filename, owner, group) , group
-#define __NRATRF0_setreuid32              "%" PRIu32
-#define __NRATRA0_setreuid32(ruid, euid)  , ruid
-#define __NRATRF1_setreuid32              "%" PRIu32
-#define __NRATRA1_setreuid32(ruid, euid)  , euid
-#define __NRATRF0_setregid32              "%" PRIu32
-#define __NRATRA0_setregid32(rgid, egid)  , rgid
-#define __NRATRF1_setregid32              "%" PRIu32
-#define __NRATRA1_setregid32(rgid, egid)  , egid
-#define __NRATRF0_getgroups32             "%" PRIuSIZ
-#define __NRATRA0_getgroups32(size, list) , size
-#define __NRATRF1_getgroups32             "%p"
-#define __NRATRA1_getgroups32(size, list) , list
-#define __NRATRF0_setgroups32             "%" PRIuSIZ
-#define __NRATRA0_setgroups32(count, groups) , count
-#define __NRATRF1_setgroups32             "%p"
-#define __NRATRA1_setgroups32(count, groups) , groups
-#define __NRATRF0_fchown32                "%d"
-#define __NRATRA0_fchown32(fd, owner, group) , (int)(fd)
-#define __NRATRF1_fchown32                "%" PRIu32
-#define __NRATRA1_fchown32(fd, owner, group) , owner
-#define __NRATRF2_fchown32                "%" PRIu32
-#define __NRATRA2_fchown32(fd, owner, group) , group
-#define __NRATRF0_setresuid32             "%" PRIu32
-#define __NRATRA0_setresuid32(ruid, euid, suid) , ruid
-#define __NRATRF1_setresuid32             "%" PRIu32
-#define __NRATRA1_setresuid32(ruid, euid, suid) , euid
-#define __NRATRF2_setresuid32             "%" PRIu32
-#define __NRATRA2_setresuid32(ruid, euid, suid) , suid
-#define __NRATRF0_getresuid32             "%p"
-#define __NRATRA0_getresuid32(ruid, euid, suid) , ruid
-#define __NRATRF1_getresuid32             "%p"
-#define __NRATRA1_getresuid32(ruid, euid, suid) , euid
-#define __NRATRF2_getresuid32             "%p"
-#define __NRATRA2_getresuid32(ruid, euid, suid) , suid
-#define __NRATRF0_setresgid32             "%" PRIu32
-#define __NRATRA0_setresgid32(rgid, egid, sgid) , rgid
-#define __NRATRF1_setresgid32             "%" PRIu32
-#define __NRATRA1_setresgid32(rgid, egid, sgid) , egid
-#define __NRATRF2_setresgid32             "%" PRIu32
-#define __NRATRA2_setresgid32(rgid, egid, sgid) , sgid
-#define __NRATRF0_getresgid32             "%p"
-#define __NRATRA0_getresgid32(rgid, egid, sgid) , rgid
-#define __NRATRF1_getresgid32             "%p"
-#define __NRATRA1_getresgid32(rgid, egid, sgid) , egid
-#define __NRATRF2_getresgid32             "%p"
-#define __NRATRA2_getresgid32(rgid, egid, sgid) , sgid
-#define __NRATRF0_chown32                 "%q"
-#define __NRATRA0_chown32(filename, owner, group) , (validate_readable_opt(filename,1),filename)
-#define __NRATRF1_chown32                 "%" PRIu32
-#define __NRATRA1_chown32(filename, owner, group) , owner
-#define __NRATRF2_chown32                 "%" PRIu32
-#define __NRATRA2_chown32(filename, owner, group) , group
-#define __NRATRF0_setuid32                "%" PRIu32
-#define __NRATRA0_setuid32(uid)           , uid
-#define __NRATRF0_setgid32                "%" PRIu32
-#define __NRATRA0_setgid32(gid)           , gid
-#define __NRATRF0_setfsuid32              "%" PRIu32
-#define __NRATRA0_setfsuid32(uid)         , uid
-#define __NRATRF0_setfsgid32              "%" PRIu32
-#define __NRATRA0_setfsgid32(gid)         , gid
-#define __NRATRF0_pivot_root              "%d"
-#define __NRATRA0_pivot_root(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_mincore                 "%p"
-#define __NRATRA0_mincore(start, len, vec) , start
-#define __NRATRF1_mincore                 "%" PRIuSIZ
-#define __NRATRA1_mincore(start, len, vec) , len
-#define __NRATRF2_mincore                 "%p"
-#define __NRATRA2_mincore(start, len, vec) , vec
-#define __NRATRF0_madvise                 "%p"
-#define __NRATRA0_madvise(addr, len, advice) , addr
-#define __NRATRF1_madvise                 "%" PRIuSIZ
-#define __NRATRA1_madvise(addr, len, advice) , len
-#define __NRATRF2_madvise                 "%#" PRIxSIZ
-#define __NRATRA2_madvise(addr, len, advice) , (uintptr_t)(advice)
-#define __NRATRF0_getdents64              "%d"
-#define __NRATRA0_getdents64(fd, dirp, count) , (int)(fd)
-#define __NRATRF1_getdents64              "%p"
-#define __NRATRA1_getdents64(fd, dirp, count) , dirp
-#define __NRATRF2_getdents64              "%" PRIuSIZ
-#define __NRATRA2_getdents64(fd, dirp, count) , count
-#define __NRATRF0_fcntl64                 "%d"
-#define __NRATRA0_fcntl64(fd, command, arg) , (int)(fd)
-#define __NRATRF1_fcntl64                 "%#" PRIxSIZ
-#define __NRATRA1_fcntl64(fd, command, arg) , (uintptr_t)(command)
-#define __NRATRF2_fcntl64                 "%p"
-#define __NRATRA2_fcntl64(fd, command, arg) , arg
-#define __NRATRF0_readahead               "%d"
-#define __NRATRA0_readahead(fd, offset, count) , (int)(fd)
-#define __NRATRF1_readahead               "%" PRIu64
-#define __NRATRA1_readahead(fd, offset, count) , offset
-#define __NRATRF2_readahead               "%" PRIuSIZ
-#define __NRATRA2_readahead(fd, offset, count) , count
-#define __NRATRF0_setxattr                "%q"
-#define __NRATRA0_setxattr(path, name, buf, bufsize, flags) , (validate_readable_opt(path,1),path)
-#define __NRATRF1_setxattr                "%q"
-#define __NRATRA1_setxattr(path, name, buf, bufsize, flags) , (validate_readable_opt(name,1),name)
-#define __NRATRF2_setxattr                "%p"
-#define __NRATRA2_setxattr(path, name, buf, bufsize, flags) , buf
-#define __NRATRF3_setxattr                "%" PRIuSIZ
-#define __NRATRA3_setxattr(path, name, buf, bufsize, flags) , bufsize
-#define __NRATRF4_setxattr                "%#" PRIxSIZ
-#define __NRATRA4_setxattr(path, name, buf, bufsize, flags) , (uintptr_t)(flags)
-#define __NRATRF0_lsetxattr               "%q"
-#define __NRATRA0_lsetxattr(path, name, buf, bufsize, flags) , (validate_readable_opt(path,1),path)
-#define __NRATRF1_lsetxattr               "%q"
-#define __NRATRA1_lsetxattr(path, name, buf, bufsize, flags) , (validate_readable_opt(name,1),name)
-#define __NRATRF2_lsetxattr               "%p"
-#define __NRATRA2_lsetxattr(path, name, buf, bufsize, flags) , buf
-#define __NRATRF3_lsetxattr               "%" PRIuSIZ
-#define __NRATRA3_lsetxattr(path, name, buf, bufsize, flags) , bufsize
-#define __NRATRF4_lsetxattr               "%#" PRIxSIZ
-#define __NRATRA4_lsetxattr(path, name, buf, bufsize, flags) , (uintptr_t)(flags)
-#define __NRATRF0_fsetxattr               "%d"
-#define __NRATRA0_fsetxattr(fd, name, buf, bufsize, flags) , (int)(fd)
-#define __NRATRF1_fsetxattr               "%q"
-#define __NRATRA1_fsetxattr(fd, name, buf, bufsize, flags) , (validate_readable_opt(name,1),name)
-#define __NRATRF2_fsetxattr               "%p"
-#define __NRATRA2_fsetxattr(fd, name, buf, bufsize, flags) , buf
-#define __NRATRF3_fsetxattr               "%" PRIuSIZ
-#define __NRATRA3_fsetxattr(fd, name, buf, bufsize, flags) , bufsize
-#define __NRATRF4_fsetxattr               "%#" PRIxSIZ
-#define __NRATRA4_fsetxattr(fd, name, buf, bufsize, flags) , (uintptr_t)(flags)
-#define __NRATRF0_getxattr                "%q"
-#define __NRATRA0_getxattr(path, name, buf, bufsize) , (validate_readable_opt(path,1),path)
-#define __NRATRF1_getxattr                "%q"
-#define __NRATRA1_getxattr(path, name, buf, bufsize) , (validate_readable_opt(name,1),name)
-#define __NRATRF2_getxattr                "%p"
-#define __NRATRA2_getxattr(path, name, buf, bufsize) , buf
-#define __NRATRF3_getxattr                "%" PRIuSIZ
-#define __NRATRA3_getxattr(path, name, buf, bufsize) , bufsize
-#define __NRATRF0_lgetxattr               "%q"
-#define __NRATRA0_lgetxattr(path, name, buf, bufsize) , (validate_readable_opt(path,1),path)
-#define __NRATRF1_lgetxattr               "%q"
-#define __NRATRA1_lgetxattr(path, name, buf, bufsize) , (validate_readable_opt(name,1),name)
-#define __NRATRF2_lgetxattr               "%p"
-#define __NRATRA2_lgetxattr(path, name, buf, bufsize) , buf
-#define __NRATRF3_lgetxattr               "%" PRIuSIZ
-#define __NRATRA3_lgetxattr(path, name, buf, bufsize) , bufsize
-#define __NRATRF0_fgetxattr               "%d"
-#define __NRATRA0_fgetxattr(fd, name, buf, bufsize) , (int)(fd)
-#define __NRATRF1_fgetxattr               "%q"
-#define __NRATRA1_fgetxattr(fd, name, buf, bufsize) , (validate_readable_opt(name,1),name)
-#define __NRATRF2_fgetxattr               "%p"
-#define __NRATRA2_fgetxattr(fd, name, buf, bufsize) , buf
-#define __NRATRF3_fgetxattr               "%" PRIuSIZ
-#define __NRATRA3_fgetxattr(fd, name, buf, bufsize) , bufsize
-#define __NRATRF0_listxattr               "%q"
-#define __NRATRA0_listxattr(path, listbuf, listbufsize) , (validate_readable_opt(path,1),path)
-#define __NRATRF1_listxattr               "%p"
-#define __NRATRA1_listxattr(path, listbuf, listbufsize) , listbuf
-#define __NRATRF2_listxattr               "%" PRIuSIZ
-#define __NRATRA2_listxattr(path, listbuf, listbufsize) , listbufsize
-#define __NRATRF0_llistxattr              "%q"
-#define __NRATRA0_llistxattr(path, listbuf, listbufsize) , (validate_readable_opt(path,1),path)
-#define __NRATRF1_llistxattr              "%p"
-#define __NRATRA1_llistxattr(path, listbuf, listbufsize) , listbuf
-#define __NRATRF2_llistxattr              "%" PRIuSIZ
-#define __NRATRA2_llistxattr(path, listbuf, listbufsize) , listbufsize
-#define __NRATRF0_flistxattr              "%d"
-#define __NRATRA0_flistxattr(fd, listbuf, listbufsize) , (int)(fd)
-#define __NRATRF1_flistxattr              "%p"
-#define __NRATRA1_flistxattr(fd, listbuf, listbufsize) , listbuf
-#define __NRATRF2_flistxattr              "%" PRIuSIZ
-#define __NRATRA2_flistxattr(fd, listbuf, listbufsize) , listbufsize
-#define __NRATRF0_removexattr             "%q"
-#define __NRATRA0_removexattr(path, name) , (validate_readable_opt(path,1),path)
-#define __NRATRF1_removexattr             "%q"
-#define __NRATRA1_removexattr(path, name) , (validate_readable_opt(name,1),name)
-#define __NRATRF0_lremovexattr            "%q"
-#define __NRATRA0_lremovexattr(path, name) , (validate_readable_opt(path,1),path)
-#define __NRATRF1_lremovexattr            "%q"
-#define __NRATRA1_lremovexattr(path, name) , (validate_readable_opt(name,1),name)
-#define __NRATRF0_fremovexattr            "%d"
-#define __NRATRA0_fremovexattr(fd, name)  , fd
-#define __NRATRF1_fremovexattr            "%q"
-#define __NRATRA1_fremovexattr(fd, name)  , (validate_readable_opt(name,1),name)
-#define __NRATRF0_tkill                   "%" PRIdSIZ
-#define __NRATRA0_tkill(tid, signo)       , (intptr_t)(tid)
-#define __NRATRF1_tkill                   "%#" PRIxSIZ
-#define __NRATRA1_tkill(tid, signo)       , (uintptr_t)(signo)
-#define __NRATRF0_sendfile64              "%d"
-#define __NRATRA0_sendfile64(out_fd, in_fd, pin_offset, num_bytes) , (int)(out_fd)
-#define __NRATRF1_sendfile64              "%d"
-#define __NRATRA1_sendfile64(out_fd, in_fd, pin_offset, num_bytes) , (int)(in_fd)
-#define __NRATRF2_sendfile64              "%p"
-#define __NRATRA2_sendfile64(out_fd, in_fd, pin_offset, num_bytes) , pin_offset
-#define __NRATRF3_sendfile64              "%" PRIuSIZ
-#define __NRATRA3_sendfile64(out_fd, in_fd, pin_offset, num_bytes) , num_bytes
-#define __NRATRF0_futex                   "%p"
-#define __NRATRA0_futex(uaddr, futex_op, val, timeout_or_val2, uaddr2, val3) , uaddr
-#define __NRATRF1_futex                   "%#" PRIxSIZ
-#define __NRATRA1_futex(uaddr, futex_op, val, timeout_or_val2, uaddr2, val3) , (uintptr_t)(futex_op)
-#define __NRATRF2_futex                   "%" PRIu32
-#define __NRATRA2_futex(uaddr, futex_op, val, timeout_or_val2, uaddr2, val3) , val
-#define __NRATRF3_futex                   "%p"
-#define __NRATRA3_futex(uaddr, futex_op, val, timeout_or_val2, uaddr2, val3) , timeout_or_val2
-#define __NRATRF4_futex                   "%p"
-#define __NRATRA4_futex(uaddr, futex_op, val, timeout_or_val2, uaddr2, val3) , uaddr2
-#define __NRATRF5_futex                   "%" PRIu32
-#define __NRATRA5_futex(uaddr, futex_op, val, timeout_or_val2, uaddr2, val3) , val3
-#define __NRATRF0_sched_setaffinity       "%" PRIdSIZ
-#define __NRATRA0_sched_setaffinity(pid, cpusetsize, cpuset) , (intptr_t)(pid)
-#define __NRATRF1_sched_setaffinity       "%" PRIuSIZ
-#define __NRATRA1_sched_setaffinity(pid, cpusetsize, cpuset) , cpusetsize
-#define __NRATRF2_sched_setaffinity       "%p"
-#define __NRATRA2_sched_setaffinity(pid, cpusetsize, cpuset) , cpuset
-#define __NRATRF0_sched_getaffinity       "%" PRIdSIZ
-#define __NRATRA0_sched_getaffinity(pid, cpusetsize, cpuset) , (intptr_t)(pid)
-#define __NRATRF1_sched_getaffinity       "%" PRIuSIZ
-#define __NRATRA1_sched_getaffinity(pid, cpusetsize, cpuset) , cpusetsize
-#define __NRATRF2_sched_getaffinity       "%p"
-#define __NRATRA2_sched_getaffinity(pid, cpusetsize, cpuset) , cpuset
-#define __NRATRF0_set_thread_area         "%d"
-#define __NRATRA0_set_thread_area(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_get_thread_area         "%d"
-#define __NRATRA0_get_thread_area(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_io_setup                "%d"
-#define __NRATRA0_io_setup(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_io_destroy              "%d"
-#define __NRATRA0_io_destroy(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_io_getevents            "%d"
-#define __NRATRA0_io_getevents(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_io_submit               "%d"
-#define __NRATRA0_io_submit(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_io_cancel               "%d"
-#define __NRATRA0_io_cancel(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_fadvise64               "%d"
-#define __NRATRA0_fadvise64(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_exit_group              "%" PRIuSIZ
-#define __NRATRA0_exit_group(exit_code)   , (uintptr_t)(exit_code)
-#define __NRATRF0_lookup_dcookie          "%d"
-#define __NRATRA0_lookup_dcookie(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_epoll_create            "%#" PRIxSIZ
-#define __NRATRA0_epoll_create(size)      , (uintptr_t)(size)
-#define __NRATRF0_epoll_ctl               "%d"
-#define __NRATRA0_epoll_ctl(epfd, op, fd, event) , (int)(epfd)
-#define __NRATRF1_epoll_ctl               "%#Ix=%s"
-#define __NRATRA1_epoll_ctl(epfd, op, fd, event) , (op), (op) == EPOLL_CTL_ADD ? "EPOLL_CTL_ADD" : (op) == EPOLL_CTL_DEL ? "EPOLL_CTL_DEL" : (op) == EPOLL_CTL_MOD ? "EPOLL_CTL_MOD" : "?"
-#define __NRATRF2_epoll_ctl               "%d"
-#define __NRATRA2_epoll_ctl(epfd, op, fd, event) , (int)(fd)
-#define __NRATRF3_epoll_ctl               "%p"
-#define __NRATRA3_epoll_ctl(epfd, op, fd, event) , event
-#define __NRATRF0_epoll_wait              "%d"
-#define __NRATRA0_epoll_wait(epfd, events, maxevents, timeout) , (int)(epfd)
-#define __NRATRF1_epoll_wait              "%p"
-#define __NRATRA1_epoll_wait(epfd, events, maxevents, timeout) , events
-#define __NRATRF2_epoll_wait              "%#" PRIxSIZ
-#define __NRATRA2_epoll_wait(epfd, events, maxevents, timeout) , (uintptr_t)(maxevents)
-#define __NRATRF3_epoll_wait              "%" PRIdSIZ
-#define __NRATRA3_epoll_wait(epfd, events, maxevents, timeout) , (intptr_t)(timeout)
-#define __NRATRF0_remap_file_pages        "%p"
-#define __NRATRA0_remap_file_pages(start, size, prot, pgoff, flags) , start
-#define __NRATRF1_remap_file_pages        "%" PRIuSIZ
-#define __NRATRA1_remap_file_pages(start, size, prot, pgoff, flags) , size
-#define __NRATRF2_remap_file_pages        "%#" PRIxSIZ
-#define __NRATRA2_remap_file_pages(start, size, prot, pgoff, flags) , (uintptr_t)(prot)
-#define __NRATRF3_remap_file_pages        "%" PRIuSIZ
-#define __NRATRA3_remap_file_pages(start, size, prot, pgoff, flags) , pgoff
-#define __NRATRF4_remap_file_pages        "%#" PRIxSIZ
-#define __NRATRA4_remap_file_pages(start, size, prot, pgoff, flags) , (uintptr_t)(flags)
-#define __NRATRF0_set_tid_address         "%p"
-#define __NRATRA0_set_tid_address(tidptr) , tidptr
-#define __NRATRF0_timer_create            "%#" PRIxSIZ
-#define __NRATRA0_timer_create(clock_id, evp, timerid) , (uintptr_t)(clock_id)
-#define __NRATRF1_timer_create            "%p"
-#define __NRATRA1_timer_create(clock_id, evp, timerid) , evp
-#define __NRATRF2_timer_create            "%p"
-#define __NRATRA2_timer_create(clock_id, evp, timerid) , timerid
-#define __NRATRF0_timer_settime           "%p"
-#define __NRATRA0_timer_settime(timerid, flags, value, ovalue) , timerid
-#define __NRATRF1_timer_settime           "%#" PRIxSIZ
-#define __NRATRA1_timer_settime(timerid, flags, value, ovalue) , (uintptr_t)(flags)
-#define __NRATRF2_timer_settime           "%p"
-#define __NRATRA2_timer_settime(timerid, flags, value, ovalue) , value
-#define __NRATRF3_timer_settime           "%p"
-#define __NRATRA3_timer_settime(timerid, flags, value, ovalue) , ovalue
-#define __NRATRF0_timer_gettime           "%p"
-#define __NRATRA0_timer_gettime(timerid, value) , timerid
-#define __NRATRF1_timer_gettime           "%p"
-#define __NRATRA1_timer_gettime(timerid, value) , value
-#define __NRATRF0_timer_getoverrun        "%p"
-#define __NRATRA0_timer_getoverrun(timerid) , timerid
-#define __NRATRF0_timer_delete            "%p"
-#define __NRATRA0_timer_delete(timerid)   , timerid
-#define __NRATRF0_clock_settime           "%#" PRIxSIZ
-#define __NRATRA0_clock_settime(clock_id, tp) , (uintptr_t)(clock_id)
-#define __NRATRF1_clock_settime           "%p"
-#define __NRATRA1_clock_settime(clock_id, tp) , tp
-#define __NRATRF0_clock_gettime           "%#" PRIxSIZ
-#define __NRATRA0_clock_gettime(clock_id, tp) , (uintptr_t)(clock_id)
-#define __NRATRF1_clock_gettime           "%p"
-#define __NRATRA1_clock_gettime(clock_id, tp) , tp
-#define __NRATRF0_clock_getres            "%#" PRIxSIZ
-#define __NRATRA0_clock_getres(clock_id, res) , (uintptr_t)(clock_id)
-#define __NRATRF1_clock_getres            "%p"
-#define __NRATRA1_clock_getres(clock_id, res) , res
-#define __NRATRF0_clock_nanosleep         "%#" PRIxSIZ
-#define __NRATRA0_clock_nanosleep(clock_id, flags, requested_time, remaining) , (uintptr_t)(clock_id)
-#define __NRATRF1_clock_nanosleep         "%#" PRIxSIZ
-#define __NRATRA1_clock_nanosleep(clock_id, flags, requested_time, remaining) , (uintptr_t)(flags)
-#define __NRATRF2_clock_nanosleep         "%p"
-#define __NRATRA2_clock_nanosleep(clock_id, flags, requested_time, remaining) , requested_time
-#define __NRATRF3_clock_nanosleep         "%p"
-#define __NRATRA3_clock_nanosleep(clock_id, flags, requested_time, remaining) , remaining
-#define __NRATRF0_statfs64                "%q"
-#define __NRATRA0_statfs64(file, buf)     , (validate_readable_opt(file,1),file)
-#define __NRATRF1_statfs64                "%p"
-#define __NRATRA1_statfs64(file, buf)     , buf
-#define __NRATRF0_fstatfs64               "%d"
-#define __NRATRA0_fstatfs64(file, buf)    , (int)(file)
-#define __NRATRF1_fstatfs64               "%p"
-#define __NRATRA1_fstatfs64(file, buf)    , buf
-#define __NRATRF0_tgkill                  "%" PRIdSIZ
-#define __NRATRA0_tgkill(tgid, tid, signo) , (intptr_t)(tgid)
-#define __NRATRF1_tgkill                  "%" PRIdSIZ
-#define __NRATRA1_tgkill(tgid, tid, signo) , (intptr_t)(tid)
-#define __NRATRF2_tgkill                  "%#" PRIxSIZ
-#define __NRATRA2_tgkill(tgid, tid, signo) , (uintptr_t)(signo)
-#define __NRATRF0_utimes                  "%q"
-#define __NRATRA0_utimes(filename, times) , (validate_readable_opt(filename,1),filename)
-#define __NRATRF1_utimes                  "%p"
-#define __NRATRA1_utimes(filename, times) , times
-#define __NRATRF0_fadvise64_64            "%d"
-#define __NRATRA0_fadvise64_64(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_vserver                 "%d"
-#define __NRATRA0_vserver(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_mbind                   "%d"
-#define __NRATRA0_mbind(TODO_PROTOTYPE)   , TODO_PROTOTYPE
-#define __NRATRF0_get_mempolicy           "%d"
-#define __NRATRA0_get_mempolicy(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_set_mempolicy           "%d"
-#define __NRATRA0_set_mempolicy(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_mq_open                 "%q"
-#define __NRATRA0_mq_open(name, oflags, mode) , (validate_readable_opt(name,1),name)
-#define __NRATRF1_mq_open                 "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NRATRA1_mq_open(name, oflags, mode) , (uintptr_t)(oflags), (oflags) & O_WRONLY ? "O_WRONLY" : (oflags) ? "" : "O_RDONLY" \
-                                              , ((oflags) & O_RDWR) && ((oflags) & (O_WRONLY)) ? "|" : "", (oflags) & O_RDWR ? "O_RDWR" : "" \
-                                              , ((oflags) & O_CREAT) && ((oflags) & (O_WRONLY | O_RDWR)) ? "|" : "", (oflags) & O_CREAT ? "O_CREAT" : "" \
-                                              , ((oflags) & O_EXCL) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT)) ? "|" : "", (oflags) & O_EXCL ? "O_EXCL" : "" \
-                                              , ((oflags) & O_NOCTTY) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL)) ? "|" : "", (oflags) & O_NOCTTY ? "O_NOCTTY" : "" \
-                                              , ((oflags) & O_TRUNC) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY)) ? "|" : "", (oflags) & O_TRUNC ? "O_TRUNC" : "" \
-                                              , ((oflags) & O_APPEND) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC)) ? "|" : "", (oflags) & O_APPEND ? "O_APPEND" : "" \
-                                              , ((oflags) & O_NONBLOCK) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND)) ? "|" : "", (oflags) & O_NONBLOCK ? "O_NONBLOCK" : "" \
-                                              , ((oflags) & O_SYNC) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK)) ? "|" : "", (oflags) & O_SYNC ? "O_SYNC" : "" \
-                                              , ((oflags) & O_DSYNC) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC)) ? "|" : "", (oflags) & O_DSYNC ? "O_DSYNC" : "" \
-                                              , ((oflags) & O_ASYNC) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC)) ? "|" : "", (oflags) & O_ASYNC ? "O_ASYNC" : "" \
-                                              , ((oflags) & O_DIRECT) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC)) ? "|" : "", (oflags) & O_DIRECT ? "O_DIRECT" : "" \
-                                              , ((oflags) & O_LARGEFILE) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC | O_DIRECT)) ? "|" : "", (oflags) & O_LARGEFILE ? "O_LARGEFILE" : "" \
-                                              , ((oflags) & O_DIRECTORY) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE)) ? "|" : "", (oflags) & O_DIRECTORY ? "O_DIRECTORY" : "" \
-                                              , ((oflags) & O_NOFOLLOW) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE | O_DIRECTORY)) ? "|" : "", (oflags) & O_NOFOLLOW ? "O_NOFOLLOW" : "" \
-                                              , ((oflags) & O_NOATIME) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE | O_DIRECTORY | O_NOFOLLOW)) ? "|" : "", (oflags) & O_NOATIME ? "O_NOATIME" : "" \
-                                              , ((oflags) & O_CLOEXEC) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE | O_DIRECTORY | O_NOFOLLOW | O_NOATIME)) ? "|" : "", (oflags) & O_CLOEXEC ? "O_CLOEXEC" : "" \
-                                              , ((oflags) & O_CLOFORK) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE | O_DIRECTORY | O_NOFOLLOW | O_NOATIME | O_CLOEXEC)) ? "|" : "", (oflags) & O_CLOFORK ? "O_CLOFORK" : "" \
-                                              , ((oflags) & O_PATH) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE | O_DIRECTORY | O_NOFOLLOW | O_NOATIME | O_CLOEXEC | O_CLOFORK)) ? "|" : "", (oflags) & O_PATH ? "O_PATH" : "" \
-                                              , ((oflags) & 0x0400000) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE | O_DIRECTORY | O_NOFOLLOW | O_NOATIME | O_CLOEXEC | O_CLOFORK | O_PATH)) ? "|" : "", (oflags) & 0x0400000 ? "O_TMPFILE" : "" \
-                                              , ((oflags) & O_SYMLINK) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE | O_DIRECTORY | O_NOFOLLOW | O_NOATIME | O_CLOEXEC | O_CLOFORK | O_PATH | 0x0400000)) ? "|" : "", (oflags) & O_SYMLINK ? "O_SYMLINK" : "" \
-                                              , ((oflags) & O_DOSPATH) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE | O_DIRECTORY | O_NOFOLLOW | O_NOATIME | O_CLOEXEC | O_CLOFORK | O_PATH | 0x0400000 | O_SYMLINK)) ? "|" : "", (oflags) & O_DOSPATH ? "O_DOSPATH" : ""
-#define __NRATRF2_mq_open                 "%#" PRIoSIZ
-#define __NRATRA2_mq_open(name, oflags, mode) , (uintptr_t)(mode)
-#define __NRATRF0_mq_unlink               "%q"
-#define __NRATRA0_mq_unlink(name)         , (validate_readable_opt(name,1),name)
-#define __NRATRF0_mq_timedsend            "%d"
-#define __NRATRA0_mq_timedsend(mqdes, msg_ptr, msg_len, msg_prio, abs_timeout) , (int)(mqdes)
-#define __NRATRF1_mq_timedsend            "%q"
-#define __NRATRA1_mq_timedsend(mqdes, msg_ptr, msg_len, msg_prio, abs_timeout) , (validate_readable_opt(msg_ptr,1),msg_ptr)
-#define __NRATRF2_mq_timedsend            "%" PRIuSIZ
-#define __NRATRA2_mq_timedsend(mqdes, msg_ptr, msg_len, msg_prio, abs_timeout) , msg_len
-#define __NRATRF3_mq_timedsend            "%" PRIu32
-#define __NRATRA3_mq_timedsend(mqdes, msg_ptr, msg_len, msg_prio, abs_timeout) , msg_prio
-#define __NRATRF4_mq_timedsend            "%p"
-#define __NRATRA4_mq_timedsend(mqdes, msg_ptr, msg_len, msg_prio, abs_timeout) , abs_timeout
-#define __NRATRF0_mq_timedreceive         "%d"
-#define __NRATRA0_mq_timedreceive(mqdes, msg_ptr, msg_len, pmsg_prio, abs_timeout) , (int)(mqdes)
-#define __NRATRF1_mq_timedreceive         "%p"
-#define __NRATRA1_mq_timedreceive(mqdes, msg_ptr, msg_len, pmsg_prio, abs_timeout) , msg_ptr
-#define __NRATRF2_mq_timedreceive         "%" PRIuSIZ
-#define __NRATRA2_mq_timedreceive(mqdes, msg_ptr, msg_len, pmsg_prio, abs_timeout) , msg_len
-#define __NRATRF3_mq_timedreceive         "%p"
-#define __NRATRA3_mq_timedreceive(mqdes, msg_ptr, msg_len, pmsg_prio, abs_timeout) , pmsg_prio
-#define __NRATRF4_mq_timedreceive         "%p"
-#define __NRATRA4_mq_timedreceive(mqdes, msg_ptr, msg_len, pmsg_prio, abs_timeout) , abs_timeout
-#define __NRATRF0_mq_notify               "%d"
-#define __NRATRA0_mq_notify(mqdes, notification) , (int)(mqdes)
-#define __NRATRF1_mq_notify               "%p"
-#define __NRATRA1_mq_notify(mqdes, notification) , notification
-#define __NRATRF0_mq_getsetattr           "%d"
-#define __NRATRA0_mq_getsetattr(mqdes, newattr, oldattr) , (int)(mqdes)
-#define __NRATRF1_mq_getsetattr           "%p"
-#define __NRATRA1_mq_getsetattr(mqdes, newattr, oldattr) , newattr
-#define __NRATRF2_mq_getsetattr           "%p"
-#define __NRATRA2_mq_getsetattr(mqdes, newattr, oldattr) , oldattr
-#define __NRATRF0_kexec_load              "%d"
-#define __NRATRA0_kexec_load(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_waitid                  "%#Ix=%s"
-#define __NRATRA0_waitid(idtype, id, infop, options, ru) , (idtype), (idtype) == P_ALL ? "P_ALL" : (idtype) == P_PID ? "P_PID" : (idtype) == P_PGID ? "P_PGID" : "?"
-#define __NRATRF1_waitid                  "%" PRIuSIZ
-#define __NRATRA1_waitid(idtype, id, infop, options, ru) , (uintptr_t)(id)
-#define __NRATRF2_waitid                  "%p"
-#define __NRATRA2_waitid(idtype, id, infop, options, ru) , infop
-#define __NRATRF3_waitid                  "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s"
-#define __NRATRA3_waitid(idtype, id, infop, options, ru) , (uintptr_t)(options), (options) & WEXITED ? "WEXITED" : "" \
-                                                         , ((options) & WSTOPPED) && ((options) & (WEXITED)) ? "|" : "", (options) & WSTOPPED ? "WSTOPPED" : "" \
-                                                         , ((options) & WCONTINUED) && ((options) & (WEXITED | WSTOPPED)) ? "|" : "", (options) & WCONTINUED ? "WCONTINUED" : "" \
-                                                         , ((options) & WNOHANG) && ((options) & (WEXITED | WSTOPPED | WCONTINUED)) ? "|" : "", (options) & WNOHANG ? "WNOHANG" : "" \
-                                                         , ((options) & WNOWAIT) && ((options) & (WEXITED | WSTOPPED | WCONTINUED | WNOHANG)) ? "|" : "", (options) & WNOWAIT ? "WNOWAIT" : ""
-#define __NRATRF4_waitid                  "%p"
-#define __NRATRA4_waitid(idtype, id, infop, options, ru) , ru
-#define __NRATRF0_add_key                 "%d"
-#define __NRATRA0_add_key(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_request_key             "%d"
-#define __NRATRA0_request_key(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_keyctl                  "%d"
-#define __NRATRA0_keyctl(TODO_PROTOTYPE)  , TODO_PROTOTYPE
-#define __NRATRF0_ioprio_set              "%#" PRIxSIZ
-#define __NRATRA0_ioprio_set(which, who, ioprio) , (uintptr_t)(which)
-#define __NRATRF1_ioprio_set              "%#" PRIxSIZ
-#define __NRATRA1_ioprio_set(which, who, ioprio) , (uintptr_t)(who)
-#define __NRATRF2_ioprio_set              "%#" PRIxSIZ
-#define __NRATRA2_ioprio_set(which, who, ioprio) , (uintptr_t)(ioprio)
-#define __NRATRF0_ioprio_get              "%#" PRIxSIZ
-#define __NRATRA0_ioprio_get(which, who)  , (uintptr_t)(which)
-#define __NRATRF1_ioprio_get              "%#" PRIxSIZ
-#define __NRATRA1_ioprio_get(which, who)  , (uintptr_t)(who)
-#define __NRATRF0_inotify_init            "%d"
-#define __NRATRA0_inotify_init(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_inotify_add_watch       "%d"
-#define __NRATRA0_inotify_add_watch(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_inotify_rm_watch        "%d"
-#define __NRATRA0_inotify_rm_watch(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_migrate_pages           "%d"
-#define __NRATRA0_migrate_pages(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_openat                  "%d"
-#define __NRATRA0_openat(dirfd, filename, oflags, mode) , (int)(dirfd)
-#define __NRATRF1_openat                  "%q"
-#define __NRATRA1_openat(dirfd, filename, oflags, mode) , (validate_readable_opt(filename,1),filename)
-#define __NRATRF2_openat                  "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NRATRA2_openat(dirfd, filename, oflags, mode) , (uintptr_t)(oflags), (oflags) & O_WRONLY ? "O_WRONLY" : (oflags) ? "" : "O_RDONLY" \
-                                                        , ((oflags) & O_RDWR) && ((oflags) & (O_WRONLY)) ? "|" : "", (oflags) & O_RDWR ? "O_RDWR" : "" \
-                                                        , ((oflags) & O_CREAT) && ((oflags) & (O_WRONLY | O_RDWR)) ? "|" : "", (oflags) & O_CREAT ? "O_CREAT" : "" \
-                                                        , ((oflags) & O_EXCL) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT)) ? "|" : "", (oflags) & O_EXCL ? "O_EXCL" : "" \
-                                                        , ((oflags) & O_NOCTTY) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL)) ? "|" : "", (oflags) & O_NOCTTY ? "O_NOCTTY" : "" \
-                                                        , ((oflags) & O_TRUNC) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY)) ? "|" : "", (oflags) & O_TRUNC ? "O_TRUNC" : "" \
-                                                        , ((oflags) & O_APPEND) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC)) ? "|" : "", (oflags) & O_APPEND ? "O_APPEND" : "" \
-                                                        , ((oflags) & O_NONBLOCK) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND)) ? "|" : "", (oflags) & O_NONBLOCK ? "O_NONBLOCK" : "" \
-                                                        , ((oflags) & O_SYNC) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK)) ? "|" : "", (oflags) & O_SYNC ? "O_SYNC" : "" \
-                                                        , ((oflags) & O_DSYNC) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC)) ? "|" : "", (oflags) & O_DSYNC ? "O_DSYNC" : "" \
-                                                        , ((oflags) & O_ASYNC) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC)) ? "|" : "", (oflags) & O_ASYNC ? "O_ASYNC" : "" \
-                                                        , ((oflags) & O_DIRECT) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC)) ? "|" : "", (oflags) & O_DIRECT ? "O_DIRECT" : "" \
-                                                        , ((oflags) & O_LARGEFILE) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC | O_DIRECT)) ? "|" : "", (oflags) & O_LARGEFILE ? "O_LARGEFILE" : "" \
-                                                        , ((oflags) & O_DIRECTORY) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE)) ? "|" : "", (oflags) & O_DIRECTORY ? "O_DIRECTORY" : "" \
-                                                        , ((oflags) & O_NOFOLLOW) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE | O_DIRECTORY)) ? "|" : "", (oflags) & O_NOFOLLOW ? "O_NOFOLLOW" : "" \
-                                                        , ((oflags) & O_NOATIME) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE | O_DIRECTORY | O_NOFOLLOW)) ? "|" : "", (oflags) & O_NOATIME ? "O_NOATIME" : "" \
-                                                        , ((oflags) & O_CLOEXEC) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE | O_DIRECTORY | O_NOFOLLOW | O_NOATIME)) ? "|" : "", (oflags) & O_CLOEXEC ? "O_CLOEXEC" : "" \
-                                                        , ((oflags) & O_CLOFORK) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE | O_DIRECTORY | O_NOFOLLOW | O_NOATIME | O_CLOEXEC)) ? "|" : "", (oflags) & O_CLOFORK ? "O_CLOFORK" : "" \
-                                                        , ((oflags) & O_PATH) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE | O_DIRECTORY | O_NOFOLLOW | O_NOATIME | O_CLOEXEC | O_CLOFORK)) ? "|" : "", (oflags) & O_PATH ? "O_PATH" : "" \
-                                                        , ((oflags) & 0x0400000) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE | O_DIRECTORY | O_NOFOLLOW | O_NOATIME | O_CLOEXEC | O_CLOFORK | O_PATH)) ? "|" : "", (oflags) & 0x0400000 ? "O_TMPFILE" : "" \
-                                                        , ((oflags) & O_SYMLINK) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE | O_DIRECTORY | O_NOFOLLOW | O_NOATIME | O_CLOEXEC | O_CLOFORK | O_PATH | 0x0400000)) ? "|" : "", (oflags) & O_SYMLINK ? "O_SYMLINK" : "" \
-                                                        , ((oflags) & O_DOSPATH) && ((oflags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE | O_DIRECTORY | O_NOFOLLOW | O_NOATIME | O_CLOEXEC | O_CLOFORK | O_PATH | 0x0400000 | O_SYMLINK)) ? "|" : "", (oflags) & O_DOSPATH ? "O_DOSPATH" : ""
-#define __NRATRF3_openat                  "%#" PRIoSIZ
-#define __NRATRA3_openat(dirfd, filename, oflags, mode) , (uintptr_t)(mode)
-#define __NRATRF0_mkdirat                 "%d"
-#define __NRATRA0_mkdirat(dirfd, pathname, mode) , (int)(dirfd)
-#define __NRATRF1_mkdirat                 "%q"
-#define __NRATRA1_mkdirat(dirfd, pathname, mode) , (validate_readable_opt(pathname,1),pathname)
-#define __NRATRF2_mkdirat                 "%#" PRIoSIZ
-#define __NRATRA2_mkdirat(dirfd, pathname, mode) , (uintptr_t)(mode)
-#define __NRATRF0_mknodat                 "%d"
-#define __NRATRA0_mknodat(dirfd, nodename, mode, dev) , (int)(dirfd)
-#define __NRATRF1_mknodat                 "%q"
-#define __NRATRA1_mknodat(dirfd, nodename, mode, dev) , (validate_readable_opt(nodename,1),nodename)
-#define __NRATRF2_mknodat                 "%#" PRIoSIZ
-#define __NRATRA2_mknodat(dirfd, nodename, mode, dev) , (uintptr_t)(mode)
-#define __NRATRF3_mknodat                 "%.2x:%.2x"
-#define __NRATRA3_mknodat(dirfd, nodename, mode, dev) , (unsigned int)MAJOR(dev),(unsigned int)MINOR(dev)
-#define __NRATRF0_fchownat                "%d"
-#define __NRATRA0_fchownat(dirfd, filename, owner, group, flags) , (int)(dirfd)
-#define __NRATRF1_fchownat                "%q"
-#define __NRATRA1_fchownat(dirfd, filename, owner, group, flags) , (validate_readable_opt(filename,1),filename)
-#define __NRATRF2_fchownat                "%" PRIu32
-#define __NRATRA2_fchownat(dirfd, filename, owner, group, flags) , (uint32_t)(owner)
-#define __NRATRF3_fchownat                "%" PRIu32
-#define __NRATRA3_fchownat(dirfd, filename, owner, group, flags) , (uint32_t)(group)
-#define __NRATRF4_fchownat                "%#" PRIxSIZ "=%s%s%s"
-#define __NRATRA4_fchownat(dirfd, filename, owner, group, flags) , (uintptr_t)(flags), (flags) & AT_SYMLINK_NOFOLLOW ? "AT_SYMLINK_NOFOLLOW" : "" \
-                                                                 , ((flags) & AT_DOSPATH) && ((flags) & (AT_SYMLINK_NOFOLLOW)) ? "|" : "", (flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
-#define __NRATRF0_futimesat               "%d"
-#define __NRATRA0_futimesat(dirfd, filename, times) , (int)(dirfd)
-#define __NRATRF1_futimesat               "%p"
-#define __NRATRA1_futimesat(dirfd, filename, times) , filename
-#define __NRATRF2_futimesat               "%p"
-#define __NRATRA2_futimesat(dirfd, filename, times) , times
-#define __NRATRF0_linux_fstatat64         "%d"
-#define __NRATRA0_linux_fstatat64(dirfd, filename, statbuf, flags) , (int)(dirfd)
-#define __NRATRF1_linux_fstatat64         "%q"
-#define __NRATRA1_linux_fstatat64(dirfd, filename, statbuf, flags) , (validate_readable_opt(filename,1),filename)
-#define __NRATRF2_linux_fstatat64         "%p"
-#define __NRATRA2_linux_fstatat64(dirfd, filename, statbuf, flags) , statbuf
-#define __NRATRF3_linux_fstatat64         "%#" PRIxSIZ "=%s%s%s"
-#define __NRATRA3_linux_fstatat64(dirfd, filename, statbuf, flags) , (uintptr_t)(flags), (flags) & AT_SYMLINK_NOFOLLOW ? "AT_SYMLINK_NOFOLLOW" : "" \
-                                                                   , ((flags) & AT_DOSPATH) && ((flags) & (AT_SYMLINK_NOFOLLOW)) ? "|" : "", (flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
-#define __NRATRF0_unlinkat                "%d"
-#define __NRATRA0_unlinkat(dirfd, name, flags) , (int)(dirfd)
-#define __NRATRF1_unlinkat                "%q"
-#define __NRATRA1_unlinkat(dirfd, name, flags) , (validate_readable_opt(name,1),name)
-#define __NRATRF2_unlinkat                "%#" PRIxSIZ "=%s%s%s%s%s"
-#define __NRATRA2_unlinkat(dirfd, name, flags) , (uintptr_t)(flags), (flags) & AT_REMOVEDIR ? "AT_REMOVEDIR" : "" \
-                                               , ((flags) & AT_REMOVEREG) && ((flags) & (AT_REMOVEDIR)) ? "|" : "", (flags) & AT_REMOVEREG ? "AT_REMOVEREG" : "" \
-                                               , ((flags) & AT_DOSPATH) && ((flags) & (AT_REMOVEDIR | AT_REMOVEREG)) ? "|" : "", (flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
-#define __NRATRF0_renameat                "%d"
-#define __NRATRA0_renameat(oldfd, oldname, newfd, newname_or_path) , (int)(oldfd)
-#define __NRATRF1_renameat                "%q"
-#define __NRATRA1_renameat(oldfd, oldname, newfd, newname_or_path) , (validate_readable_opt(oldname,1),oldname)
-#define __NRATRF2_renameat                "%d"
-#define __NRATRA2_renameat(oldfd, oldname, newfd, newname_or_path) , (int)(newfd)
-#define __NRATRF3_renameat                "%q"
-#define __NRATRA3_renameat(oldfd, oldname, newfd, newname_or_path) , (validate_readable_opt(newname_or_path,1),newname_or_path)
-#define __NRATRF0_linkat                  "%d"
-#define __NRATRA0_linkat(fromfd, existing_file, tofd, target_path, flags) , (int)(fromfd)
-#define __NRATRF1_linkat                  "%q"
-#define __NRATRA1_linkat(fromfd, existing_file, tofd, target_path, flags) , (validate_readable_opt(existing_file,1),existing_file)
-#define __NRATRF2_linkat                  "%d"
-#define __NRATRA2_linkat(fromfd, existing_file, tofd, target_path, flags) , (int)(tofd)
-#define __NRATRF3_linkat                  "%q"
-#define __NRATRA3_linkat(fromfd, existing_file, tofd, target_path, flags) , (validate_readable_opt(target_path,1),target_path)
-#define __NRATRF4_linkat                  "%#" PRIxSIZ "=%s%s%s%s%s"
-#define __NRATRA4_linkat(fromfd, existing_file, tofd, target_path, flags) , (uintptr_t)(flags), (flags) & AT_EMPTY_PATH ? "AT_EMPTY_PATH" : "" \
-                                                                          , ((flags) & AT_SYMLINK_FOLLOW) && ((flags) & (AT_EMPTY_PATH)) ? "|" : "", (flags) & AT_SYMLINK_FOLLOW ? "AT_SYMLINK_FOLLOW" : "" \
-                                                                          , ((flags) & AT_DOSPATH) && ((flags) & (AT_EMPTY_PATH | AT_SYMLINK_FOLLOW)) ? "|" : "", (flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
-#define __NRATRF0_symlinkat               "%q"
-#define __NRATRA0_symlinkat(link_text, tofd, target_path) , (validate_readable_opt(link_text,1),link_text)
-#define __NRATRF1_symlinkat               "%d"
-#define __NRATRA1_symlinkat(link_text, tofd, target_path) , (int)(tofd)
-#define __NRATRF2_symlinkat               "%q"
-#define __NRATRA2_symlinkat(link_text, tofd, target_path) , (validate_readable_opt(target_path,1),target_path)
-#define __NRATRF0_readlinkat              "%d"
-#define __NRATRA0_readlinkat(dirfd, path, buf, buflen) , (int)(dirfd)
-#define __NRATRF1_readlinkat              "%q"
-#define __NRATRA1_readlinkat(dirfd, path, buf, buflen) , (validate_readable_opt(path,1),path)
-#define __NRATRF2_readlinkat              "%p"
-#define __NRATRA2_readlinkat(dirfd, path, buf, buflen) , buf
-#define __NRATRF3_readlinkat              "%" PRIuSIZ
-#define __NRATRA3_readlinkat(dirfd, path, buf, buflen) , buflen
-#define __NRATRF0_fchmodat                "%d"
-#define __NRATRA0_fchmodat(dirfd, filename, mode, flags) , (int)(dirfd)
-#define __NRATRF1_fchmodat                "%q"
-#define __NRATRA1_fchmodat(dirfd, filename, mode, flags) , (validate_readable_opt(filename,1),filename)
-#define __NRATRF2_fchmodat                "%#" PRIoSIZ
-#define __NRATRA2_fchmodat(dirfd, filename, mode, flags) , (uintptr_t)(mode)
-#define __NRATRF3_fchmodat                "%#" PRIxSIZ "=%s%s%s"
-#define __NRATRA3_fchmodat(dirfd, filename, mode, flags) , (uintptr_t)(flags), (flags) & AT_SYMLINK_NOFOLLOW ? "AT_SYMLINK_NOFOLLOW" : "" \
-                                                         , ((flags) & AT_DOSPATH) && ((flags) & (AT_SYMLINK_NOFOLLOW)) ? "|" : "", (flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
-#define __NRATRF0_faccessat               "%d"
-#define __NRATRA0_faccessat(dirfd, filename, type, flags) , (int)(dirfd)
-#define __NRATRF1_faccessat               "%q"
-#define __NRATRA1_faccessat(dirfd, filename, type, flags) , (validate_readable_opt(filename,1),filename)
-#define __NRATRF2_faccessat               "%#" PRIxSIZ "=%s%s%s%s%s"
-#define __NRATRA2_faccessat(dirfd, filename, type, flags) , (uintptr_t)(type), (type) & R_OK ? "R_OK" : (type) ? "" : "F_OK" \
-                                                          , ((type) & W_OK) && ((type) & (R_OK)) ? "|" : "", (type) & W_OK ? "W_OK" : "" \
-                                                          , ((type) & X_OK) && ((type) & (R_OK | W_OK)) ? "|" : "", (type) & X_OK ? "X_OK" : ""
-#define __NRATRF3_faccessat               "%#" PRIxSIZ "=%s%s%s%s%s"
-#define __NRATRA3_faccessat(dirfd, filename, type, flags) , (uintptr_t)(flags), (flags) & AT_SYMLINK_NOFOLLOW ? "AT_SYMLINK_NOFOLLOW" : "" \
-                                                          , ((flags) & AT_EACCESS) && ((flags) & (AT_SYMLINK_NOFOLLOW)) ? "|" : "", (flags) & AT_EACCESS ? "AT_EACCESS" : "" \
-                                                          , ((flags) & AT_DOSPATH) && ((flags) & (AT_SYMLINK_NOFOLLOW | AT_EACCESS)) ? "|" : "", (flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
-#define __NRATRF0_pselect6                "%" PRIuSIZ
-#define __NRATRA0_pselect6(nfds, readfds, writefds, exceptfds, timeout, sigmask_sigset_and_len) , nfds
-#define __NRATRF1_pselect6                "%p"
-#define __NRATRA1_pselect6(nfds, readfds, writefds, exceptfds, timeout, sigmask_sigset_and_len) , readfds
-#define __NRATRF2_pselect6                "%p"
-#define __NRATRA2_pselect6(nfds, readfds, writefds, exceptfds, timeout, sigmask_sigset_and_len) , writefds
-#define __NRATRF3_pselect6                "%p"
-#define __NRATRA3_pselect6(nfds, readfds, writefds, exceptfds, timeout, sigmask_sigset_and_len) , exceptfds
-#define __NRATRF4_pselect6                "%p"
-#define __NRATRA4_pselect6(nfds, readfds, writefds, exceptfds, timeout, sigmask_sigset_and_len) , timeout
-#define __NRATRF5_pselect6                "%p"
-#define __NRATRA5_pselect6(nfds, readfds, writefds, exceptfds, timeout, sigmask_sigset_and_len) , sigmask_sigset_and_len
-#define __NRATRF0_ppoll                   "%p"
-#define __NRATRA0_ppoll(fds, nfds, timeout_ts, sigmask, sigsetsize) , fds
-#define __NRATRF1_ppoll                   "%" PRIuSIZ
-#define __NRATRA1_ppoll(fds, nfds, timeout_ts, sigmask, sigsetsize) , nfds
-#define __NRATRF2_ppoll                   "%p"
-#define __NRATRA2_ppoll(fds, nfds, timeout_ts, sigmask, sigsetsize) , timeout_ts
-#define __NRATRF3_ppoll                   "%p"
-#define __NRATRA3_ppoll(fds, nfds, timeout_ts, sigmask, sigsetsize) , sigmask
-#define __NRATRF4_ppoll                   "%" PRIuSIZ
-#define __NRATRA4_ppoll(fds, nfds, timeout_ts, sigmask, sigsetsize) , sigsetsize
-#define __NRATRF0_unshare                 "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NRATRA0_unshare(flags)          , (uintptr_t)(flags), (flags) & CLONE_VM ? "CLONE_VM" : "" \
-                                          , ((flags) & CLONE_FS) && ((flags) & (CLONE_VM)) ? "|" : "", (flags) & CLONE_FS ? "CLONE_FS" : "" \
-                                          , ((flags) & CLONE_FILES) && ((flags) & (CLONE_VM | CLONE_FS)) ? "|" : "", (flags) & CLONE_FILES ? "CLONE_FILES" : "" \
-                                          , ((flags) & CLONE_SIGHAND) && ((flags) & (CLONE_VM | CLONE_FS | CLONE_FILES)) ? "|" : "", (flags) & CLONE_SIGHAND ? "CLONE_SIGHAND" : "" \
-                                          , ((flags) & CLONE_PTRACE) && ((flags) & (CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND)) ? "|" : "", (flags) & CLONE_PTRACE ? "CLONE_PTRACE" : "" \
-                                          , ((flags) & CLONE_VFORK) && ((flags) & (CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_PTRACE)) ? "|" : "", (flags) & CLONE_VFORK ? "CLONE_VFORK" : "" \
-                                          , ((flags) & CLONE_PARENT) && ((flags) & (CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_PTRACE | CLONE_VFORK)) ? "|" : "", (flags) & CLONE_PARENT ? "CLONE_PARENT" : "" \
-                                          , ((flags) & CLONE_THREAD) && ((flags) & (CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_PTRACE | CLONE_VFORK | CLONE_PARENT)) ? "|" : "", (flags) & CLONE_THREAD ? "CLONE_THREAD" : "" \
-                                          , ((flags) & CLONE_NEWNS) && ((flags) & (CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_PTRACE | CLONE_VFORK | CLONE_PARENT | CLONE_THREAD)) ? "|" : "", (flags) & CLONE_NEWNS ? "CLONE_NEWNS" : "" \
-                                          , ((flags) & CLONE_SYSVSEM) && ((flags) & (CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_PTRACE | CLONE_VFORK | CLONE_PARENT | CLONE_THREAD | CLONE_NEWNS)) ? "|" : "", (flags) & CLONE_SYSVSEM ? "CLONE_SYSVSEM" : "" \
-                                          , ((flags) & CLONE_SETTLS) && ((flags) & (CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_PTRACE | CLONE_VFORK | CLONE_PARENT | CLONE_THREAD | CLONE_NEWNS | CLONE_SYSVSEM)) ? "|" : "", (flags) & CLONE_SETTLS ? "CLONE_SETTLS" : "" \
-                                          , ((flags) & CLONE_PARENT_SETTID) && ((flags) & (CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_PTRACE | CLONE_VFORK | CLONE_PARENT | CLONE_THREAD | CLONE_NEWNS | CLONE_SYSVSEM | CLONE_SETTLS)) ? "|" : "", (flags) & CLONE_PARENT_SETTID ? "CLONE_PARENT_SETTID" : "" \
-                                          , ((flags) & CLONE_CHILD_CLEARTID) && ((flags) & (CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_PTRACE | CLONE_VFORK | CLONE_PARENT | CLONE_THREAD | CLONE_NEWNS | CLONE_SYSVSEM | CLONE_SETTLS | CLONE_PARENT_SETTID)) ? "|" : "", (flags) & CLONE_CHILD_CLEARTID ? "CLONE_CHILD_CLEARTID" : "" \
-                                          , ((flags) & CLONE_DETACHED) && ((flags) & (CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_PTRACE | CLONE_VFORK | CLONE_PARENT | CLONE_THREAD | CLONE_NEWNS | CLONE_SYSVSEM | CLONE_SETTLS | CLONE_PARENT_SETTID | CLONE_CHILD_CLEARTID)) ? "|" : "", (flags) & CLONE_DETACHED ? "CLONE_DETACHED" : "" \
-                                          , ((flags) & CLONE_UNTRACED) && ((flags) & (CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_PTRACE | CLONE_VFORK | CLONE_PARENT | CLONE_THREAD | CLONE_NEWNS | CLONE_SYSVSEM | CLONE_SETTLS | CLONE_PARENT_SETTID | CLONE_CHILD_CLEARTID | CLONE_DETACHED)) ? "|" : "", (flags) & CLONE_UNTRACED ? "CLONE_UNTRACED" : "" \
-                                          , ((flags) & CLONE_CHILD_SETTID) && ((flags) & (CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_PTRACE | CLONE_VFORK | CLONE_PARENT | CLONE_THREAD | CLONE_NEWNS | CLONE_SYSVSEM | CLONE_SETTLS | CLONE_PARENT_SETTID | CLONE_CHILD_CLEARTID | CLONE_DETACHED | CLONE_UNTRACED)) ? "|" : "", (flags) & CLONE_CHILD_SETTID ? "CLONE_CHILD_SETTID" : "" \
-                                          , ((flags) & CLONE_NEWUTS) && ((flags) & (CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_PTRACE | CLONE_VFORK | CLONE_PARENT | CLONE_THREAD | CLONE_NEWNS | CLONE_SYSVSEM | CLONE_SETTLS | CLONE_PARENT_SETTID | CLONE_CHILD_CLEARTID | CLONE_DETACHED | CLONE_UNTRACED | CLONE_CHILD_SETTID)) ? "|" : "", (flags) & CLONE_NEWUTS ? "CLONE_NEWUTS" : "" \
-                                          , ((flags) & CLONE_NEWIPC) && ((flags) & (CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_PTRACE | CLONE_VFORK | CLONE_PARENT | CLONE_THREAD | CLONE_NEWNS | CLONE_SYSVSEM | CLONE_SETTLS | CLONE_PARENT_SETTID | CLONE_CHILD_CLEARTID | CLONE_DETACHED | CLONE_UNTRACED | CLONE_CHILD_SETTID | CLONE_NEWUTS)) ? "|" : "", (flags) & CLONE_NEWIPC ? "CLONE_NEWIPC" : "" \
-                                          , ((flags) & CLONE_NEWUSER) && ((flags) & (CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_PTRACE | CLONE_VFORK | CLONE_PARENT | CLONE_THREAD | CLONE_NEWNS | CLONE_SYSVSEM | CLONE_SETTLS | CLONE_PARENT_SETTID | CLONE_CHILD_CLEARTID | CLONE_DETACHED | CLONE_UNTRACED | CLONE_CHILD_SETTID | CLONE_NEWUTS | CLONE_NEWIPC)) ? "|" : "", (flags) & CLONE_NEWUSER ? "CLONE_NEWUSER" : "" \
-                                          , ((flags) & CLONE_NEWPID) && ((flags) & (CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_PTRACE | CLONE_VFORK | CLONE_PARENT | CLONE_THREAD | CLONE_NEWNS | CLONE_SYSVSEM | CLONE_SETTLS | CLONE_PARENT_SETTID | CLONE_CHILD_CLEARTID | CLONE_DETACHED | CLONE_UNTRACED | CLONE_CHILD_SETTID | CLONE_NEWUTS | CLONE_NEWIPC | CLONE_NEWUSER)) ? "|" : "", (flags) & CLONE_NEWPID ? "CLONE_NEWPID" : "" \
-                                          , ((flags) & CLONE_NEWNET) && ((flags) & (CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_PTRACE | CLONE_VFORK | CLONE_PARENT | CLONE_THREAD | CLONE_NEWNS | CLONE_SYSVSEM | CLONE_SETTLS | CLONE_PARENT_SETTID | CLONE_CHILD_CLEARTID | CLONE_DETACHED | CLONE_UNTRACED | CLONE_CHILD_SETTID | CLONE_NEWUTS | CLONE_NEWIPC | CLONE_NEWUSER | CLONE_NEWPID)) ? "|" : "", (flags) & CLONE_NEWNET ? "CLONE_NEWNET" : "" \
-                                          , ((flags) & CLONE_IO) && ((flags) & (CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_PTRACE | CLONE_VFORK | CLONE_PARENT | CLONE_THREAD | CLONE_NEWNS | CLONE_SYSVSEM | CLONE_SETTLS | CLONE_PARENT_SETTID | CLONE_CHILD_CLEARTID | CLONE_DETACHED | CLONE_UNTRACED | CLONE_CHILD_SETTID | CLONE_NEWUTS | CLONE_NEWIPC | CLONE_NEWUSER | CLONE_NEWPID | CLONE_NEWNET)) ? "|" : "", (flags) & CLONE_IO ? "CLONE_IO" : ""
-#define __NRATRF0_set_robust_list         "%d"
-#define __NRATRA0_set_robust_list(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_get_robust_list         "%d"
-#define __NRATRA0_get_robust_list(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_splice                  "%d"
-#define __NRATRA0_splice(fdin, offin, fdout, offout, length, flags) , (int)(fdin)
-#define __NRATRF1_splice                  "%p"
-#define __NRATRA1_splice(fdin, offin, fdout, offout, length, flags) , offin
-#define __NRATRF2_splice                  "%d"
-#define __NRATRA2_splice(fdin, offin, fdout, offout, length, flags) , (int)(fdout)
-#define __NRATRF3_splice                  "%p"
-#define __NRATRA3_splice(fdin, offin, fdout, offout, length, flags) , offout
-#define __NRATRF4_splice                  "%" PRIuSIZ
-#define __NRATRA4_splice(fdin, offin, fdout, offout, length, flags) , length
-#define __NRATRF5_splice                  "%#" PRIxSIZ
-#define __NRATRA5_splice(fdin, offin, fdout, offout, length, flags) , (uintptr_t)(flags)
-#define __NRATRF0_sync_file_range         "%d"
-#define __NRATRA0_sync_file_range(fd, offset, count, flags) , (int)(fd)
-#define __NRATRF1_sync_file_range         "%" PRIu64
-#define __NRATRA1_sync_file_range(fd, offset, count, flags) , offset
-#define __NRATRF2_sync_file_range         "%" PRIu64
-#define __NRATRA2_sync_file_range(fd, offset, count, flags) , count
-#define __NRATRF3_sync_file_range         "%#" PRIxSIZ
-#define __NRATRA3_sync_file_range(fd, offset, count, flags) , (uintptr_t)(flags)
-#define __NRATRF0_tee                     "%d"
-#define __NRATRA0_tee(fdin, fdout, length, flags) , (int)(fdin)
-#define __NRATRF1_tee                     "%d"
-#define __NRATRA1_tee(fdin, fdout, length, flags) , (int)(fdout)
-#define __NRATRF2_tee                     "%" PRIuSIZ
-#define __NRATRA2_tee(fdin, fdout, length, flags) , length
-#define __NRATRF3_tee                     "%#" PRIxSIZ
-#define __NRATRA3_tee(fdin, fdout, length, flags) , (uintptr_t)(flags)
-#define __NRATRF0_vmsplice                "%d"
-#define __NRATRA0_vmsplice(fdout, iov, count, flags) , (int)(fdout)
-#define __NRATRF1_vmsplice                "%p"
-#define __NRATRA1_vmsplice(fdout, iov, count, flags) , iov
-#define __NRATRF2_vmsplice                "%" PRIuSIZ
-#define __NRATRA2_vmsplice(fdout, iov, count, flags) , count
-#define __NRATRF3_vmsplice                "%#" PRIxSIZ
-#define __NRATRA3_vmsplice(fdout, iov, count, flags) , (uintptr_t)(flags)
-#define __NRATRF0_move_pages              "%d"
-#define __NRATRA0_move_pages(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_getcpu                  "%p"
-#define __NRATRA0_getcpu(cpu, node, tcache) , cpu
-#define __NRATRF1_getcpu                  "%p"
-#define __NRATRA1_getcpu(cpu, node, tcache) , node
-#define __NRATRF2_getcpu                  "%p"
-#define __NRATRA2_getcpu(cpu, node, tcache) , tcache
-#define __NRATRF0_epoll_pwait             "%d"
-#define __NRATRA0_epoll_pwait(epfd, events, maxevents, timeout, ss) , (int)(epfd)
-#define __NRATRF1_epoll_pwait             "%p"
-#define __NRATRA1_epoll_pwait(epfd, events, maxevents, timeout, ss) , events
-#define __NRATRF2_epoll_pwait             "%#" PRIxSIZ
-#define __NRATRA2_epoll_pwait(epfd, events, maxevents, timeout, ss) , (uintptr_t)(maxevents)
-#define __NRATRF3_epoll_pwait             "%" PRIdSIZ
-#define __NRATRA3_epoll_pwait(epfd, events, maxevents, timeout, ss) , (intptr_t)(timeout)
-#define __NRATRF4_epoll_pwait             "%p"
-#define __NRATRA4_epoll_pwait(epfd, events, maxevents, timeout, ss) , ss
-#define __NRATRF0_utimensat               "%d"
-#define __NRATRA0_utimensat(dirfd, filename, times, flags) , (int)(dirfd)
-#define __NRATRF1_utimensat               "%q"
-#define __NRATRA1_utimensat(dirfd, filename, times, flags) , (validate_readable_opt(filename,1),filename)
-#define __NRATRF2_utimensat               "%p"
-#define __NRATRA2_utimensat(dirfd, filename, times, flags) , times
-#define __NRATRF3_utimensat               "%#" PRIxSIZ "=%s%s%s%s%s"
-#define __NRATRA3_utimensat(dirfd, filename, times, flags) , (uintptr_t)(flags), (flags) & AT_SYMLINK_NOFOLLOW ? "AT_SYMLINK_NOFOLLOW" : "" \
-                                                           , ((flags) & AT_CHANGE_CTIME) && ((flags) & (AT_SYMLINK_NOFOLLOW)) ? "|" : "", (flags) & AT_CHANGE_CTIME ? "AT_CHANGE_CTIME" : "" \
-                                                           , ((flags) & AT_DOSPATH) && ((flags) & (AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME)) ? "|" : "", (flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
-#define __NRATRF0_signalfd                "%d"
-#define __NRATRA0_signalfd(fd, sigmask, sigsetsize) , (int)(fd)
-#define __NRATRF1_signalfd                "%p"
-#define __NRATRA1_signalfd(fd, sigmask, sigsetsize) , sigmask
-#define __NRATRF2_signalfd                "%" PRIuSIZ
-#define __NRATRA2_signalfd(fd, sigmask, sigsetsize) , sigsetsize
-#define __NRATRF0_timerfd_create          "%#" PRIxSIZ
-#define __NRATRA0_timerfd_create(clock_id, flags) , (uintptr_t)(clock_id)
-#define __NRATRF1_timerfd_create          "%#" PRIxSIZ
-#define __NRATRA1_timerfd_create(clock_id, flags) , (uintptr_t)(flags)
-#define __NRATRF0_eventfd                 "%#" PRIxSIZ
-#define __NRATRA0_eventfd(initval)        , (uintptr_t)(initval)
-#define __NRATRF0_fallocate               "%d"
-#define __NRATRA0_fallocate(fd, mode, offset, length) , (int)(fd)
-#define __NRATRF1_fallocate               "%#" PRIxSIZ
-#define __NRATRA1_fallocate(fd, mode, offset, length) , (uintptr_t)(mode)
-#define __NRATRF2_fallocate               "%#" PRIxSIZ
-#define __NRATRA2_fallocate(fd, mode, offset, length) , (uintptr_t)(offset)
-#define __NRATRF3_fallocate               "%#" PRIxSIZ
-#define __NRATRA3_fallocate(fd, mode, offset, length) , (uintptr_t)(length)
-#define __NRATRF0_timerfd_settime         "%d"
-#define __NRATRA0_timerfd_settime(ufd, flags, utmr, otmr) , (int)(ufd)
-#define __NRATRF1_timerfd_settime         "%#" PRIxSIZ
-#define __NRATRA1_timerfd_settime(ufd, flags, utmr, otmr) , (uintptr_t)(flags)
-#define __NRATRF2_timerfd_settime         "%p"
-#define __NRATRA2_timerfd_settime(ufd, flags, utmr, otmr) , utmr
-#define __NRATRF3_timerfd_settime         "%p"
-#define __NRATRA3_timerfd_settime(ufd, flags, utmr, otmr) , otmr
-#define __NRATRF0_timerfd_gettime         "%d"
-#define __NRATRA0_timerfd_gettime(ufd, otmr) , (int)(ufd)
-#define __NRATRF1_timerfd_gettime         "%p"
-#define __NRATRA1_timerfd_gettime(ufd, otmr) , otmr
-#define __NRATRF0_signalfd4               "%d"
-#define __NRATRA0_signalfd4(fd, sigmask, sigsetsize, flags) , (int)(fd)
-#define __NRATRF1_signalfd4               "%p"
-#define __NRATRA1_signalfd4(fd, sigmask, sigsetsize, flags) , sigmask
-#define __NRATRF2_signalfd4               "%" PRIuSIZ
-#define __NRATRA2_signalfd4(fd, sigmask, sigsetsize, flags) , sigsetsize
-#define __NRATRF3_signalfd4               "%#" PRIxSIZ "=%s%s%s"
-#define __NRATRA3_signalfd4(fd, sigmask, sigsetsize, flags) , (uintptr_t)(flags), (flags) & SFD_NONBLOCK ? "SFD_NONBLOCK" : "" \
-                                                            , ((flags) & SFD_CLOEXEC) && ((flags) & (SFD_NONBLOCK)) ? "|" : "", (flags) & SFD_CLOEXEC ? "SFD_CLOEXEC" : ""
-#define __NRATRF0_eventfd2                "%#" PRIxSIZ
-#define __NRATRA0_eventfd2(initval, flags) , (uintptr_t)(initval)
-#define __NRATRF1_eventfd2                "%#" PRIxSIZ "=%s%s%s%s%s"
-#define __NRATRA1_eventfd2(initval, flags) , (uintptr_t)(flags), (flags) & EFD_SEMAPHORE ? "EFD_SEMAPHORE" : "" \
-                                           , ((flags) & EFD_NONBLOCK) && ((flags) & (EFD_SEMAPHORE)) ? "|" : "", (flags) & EFD_NONBLOCK ? "EFD_NONBLOCK" : "" \
-                                           , ((flags) & EFD_CLOEXEC) && ((flags) & (EFD_SEMAPHORE | EFD_NONBLOCK)) ? "|" : "", (flags) & EFD_CLOEXEC ? "EFD_CLOEXEC" : ""
-#define __NRATRF0_epoll_create1           "%#" PRIxSIZ
-#define __NRATRA0_epoll_create1(flags)    , (uintptr_t)(flags)
-#define __NRATRF0_dup3                    "%d"
-#define __NRATRA0_dup3(oldfd, newfd, flags) , (int)(oldfd)
-#define __NRATRF1_dup3                    "%d"
-#define __NRATRA1_dup3(oldfd, newfd, flags) , (int)(newfd)
-#define __NRATRF2_dup3                    "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NRATRA2_dup3(oldfd, newfd, flags) , (uintptr_t)(flags), (flags) & O_WRONLY ? "O_WRONLY" : (flags) ? "" : "O_RDONLY" \
-                                            , ((flags) & O_RDWR) && ((flags) & (O_WRONLY)) ? "|" : "", (flags) & O_RDWR ? "O_RDWR" : "" \
-                                            , ((flags) & O_CREAT) && ((flags) & (O_WRONLY | O_RDWR)) ? "|" : "", (flags) & O_CREAT ? "O_CREAT" : "" \
-                                            , ((flags) & O_EXCL) && ((flags) & (O_WRONLY | O_RDWR | O_CREAT)) ? "|" : "", (flags) & O_EXCL ? "O_EXCL" : "" \
-                                            , ((flags) & O_NOCTTY) && ((flags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL)) ? "|" : "", (flags) & O_NOCTTY ? "O_NOCTTY" : "" \
-                                            , ((flags) & O_TRUNC) && ((flags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY)) ? "|" : "", (flags) & O_TRUNC ? "O_TRUNC" : "" \
-                                            , ((flags) & O_APPEND) && ((flags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC)) ? "|" : "", (flags) & O_APPEND ? "O_APPEND" : "" \
-                                            , ((flags) & O_NONBLOCK) && ((flags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND)) ? "|" : "", (flags) & O_NONBLOCK ? "O_NONBLOCK" : "" \
-                                            , ((flags) & O_SYNC) && ((flags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK)) ? "|" : "", (flags) & O_SYNC ? "O_SYNC" : "" \
-                                            , ((flags) & O_DSYNC) && ((flags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC)) ? "|" : "", (flags) & O_DSYNC ? "O_DSYNC" : "" \
-                                            , ((flags) & O_ASYNC) && ((flags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC)) ? "|" : "", (flags) & O_ASYNC ? "O_ASYNC" : "" \
-                                            , ((flags) & O_DIRECT) && ((flags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC)) ? "|" : "", (flags) & O_DIRECT ? "O_DIRECT" : "" \
-                                            , ((flags) & O_LARGEFILE) && ((flags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC | O_DIRECT)) ? "|" : "", (flags) & O_LARGEFILE ? "O_LARGEFILE" : "" \
-                                            , ((flags) & O_DIRECTORY) && ((flags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE)) ? "|" : "", (flags) & O_DIRECTORY ? "O_DIRECTORY" : "" \
-                                            , ((flags) & O_NOFOLLOW) && ((flags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE | O_DIRECTORY)) ? "|" : "", (flags) & O_NOFOLLOW ? "O_NOFOLLOW" : "" \
-                                            , ((flags) & O_NOATIME) && ((flags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE | O_DIRECTORY | O_NOFOLLOW)) ? "|" : "", (flags) & O_NOATIME ? "O_NOATIME" : "" \
-                                            , ((flags) & O_CLOEXEC) && ((flags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE | O_DIRECTORY | O_NOFOLLOW | O_NOATIME)) ? "|" : "", (flags) & O_CLOEXEC ? "O_CLOEXEC" : "" \
-                                            , ((flags) & O_CLOFORK) && ((flags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE | O_DIRECTORY | O_NOFOLLOW | O_NOATIME | O_CLOEXEC)) ? "|" : "", (flags) & O_CLOFORK ? "O_CLOFORK" : "" \
-                                            , ((flags) & O_PATH) && ((flags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE | O_DIRECTORY | O_NOFOLLOW | O_NOATIME | O_CLOEXEC | O_CLOFORK)) ? "|" : "", (flags) & O_PATH ? "O_PATH" : "" \
-                                            , ((flags) & 0x0400000) && ((flags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE | O_DIRECTORY | O_NOFOLLOW | O_NOATIME | O_CLOEXEC | O_CLOFORK | O_PATH)) ? "|" : "", (flags) & 0x0400000 ? "O_TMPFILE" : "" \
-                                            , ((flags) & O_SYMLINK) && ((flags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE | O_DIRECTORY | O_NOFOLLOW | O_NOATIME | O_CLOEXEC | O_CLOFORK | O_PATH | 0x0400000)) ? "|" : "", (flags) & O_SYMLINK ? "O_SYMLINK" : "" \
-                                            , ((flags) & O_DOSPATH) && ((flags) & (O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE | O_DIRECTORY | O_NOFOLLOW | O_NOATIME | O_CLOEXEC | O_CLOFORK | O_PATH | 0x0400000 | O_SYMLINK)) ? "|" : "", (flags) & O_DOSPATH ? "O_DOSPATH" : ""
-#define __NRATRF0_pipe2                   "%p"
-#define __NRATRA0_pipe2(pipedes, flags)   , pipedes
-#define __NRATRF1_pipe2                   "%#" PRIxSIZ "=%s%s%s%s%s%s%s"
-#define __NRATRA1_pipe2(pipedes, flags)   , (uintptr_t)(flags), (flags) & O_CLOEXEC ? "O_CLOEXEC" : "" \
-                                          , ((flags) & O_CLOFORK) && ((flags) & (O_CLOEXEC)) ? "|" : "", (flags) & O_CLOFORK ? "O_CLOFORK" : "" \
-                                          , ((flags) & O_NONBLOCK) && ((flags) & (O_CLOEXEC | O_CLOFORK)) ? "|" : "", (flags) & O_NONBLOCK ? "O_NONBLOCK" : "" \
-                                          , ((flags) & O_DIRECT) && ((flags) & (O_CLOEXEC | O_CLOFORK | O_NONBLOCK)) ? "|" : "", (flags) & O_DIRECT ? "O_DIRECT" : ""
-#define __NRATRF0_inotify_init1           "%d"
-#define __NRATRA0_inotify_init1(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_preadv                  "%d"
-#define __NRATRA0_preadv(fd, iovec, count, offset) , (int)(fd)
-#define __NRATRF1_preadv                  "%p"
-#define __NRATRA1_preadv(fd, iovec, count, offset) , iovec
-#define __NRATRF2_preadv                  "%" PRIuSIZ
-#define __NRATRA2_preadv(fd, iovec, count, offset) , count
-#define __NRATRF3_preadv                  "%" PRIu64
-#define __NRATRA3_preadv(fd, iovec, count, offset) , offset
-#define __NRATRF0_pwritev                 "%d"
-#define __NRATRA0_pwritev(fd, iovec, count, offset) , (int)(fd)
-#define __NRATRF1_pwritev                 "%p"
-#define __NRATRA1_pwritev(fd, iovec, count, offset) , iovec
-#define __NRATRF2_pwritev                 "%" PRIuSIZ
-#define __NRATRA2_pwritev(fd, iovec, count, offset) , count
-#define __NRATRF3_pwritev                 "%" PRIu64
-#define __NRATRA3_pwritev(fd, iovec, count, offset) , offset
-#define __NRATRF0_rt_tgsigqueueinfo       "%" PRIdSIZ
-#define __NRATRA0_rt_tgsigqueueinfo(tgid, tid, signo, uinfo) , (intptr_t)(tgid)
-#define __NRATRF1_rt_tgsigqueueinfo       "%" PRIdSIZ
-#define __NRATRA1_rt_tgsigqueueinfo(tgid, tid, signo, uinfo) , (intptr_t)(tid)
-#define __NRATRF2_rt_tgsigqueueinfo       "%#" PRIxSIZ
-#define __NRATRA2_rt_tgsigqueueinfo(tgid, tid, signo, uinfo) , (uintptr_t)(signo)
-#define __NRATRF3_rt_tgsigqueueinfo       "%p"
-#define __NRATRA3_rt_tgsigqueueinfo(tgid, tid, signo, uinfo) , uinfo
-#define __NRATRF0_perf_event_open         "%d"
-#define __NRATRA0_perf_event_open(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_recvmmsg                "%d"
-#define __NRATRA0_recvmmsg(sockfd, vmessages, vlen, flags, tmo) , (int)(sockfd)
-#define __NRATRF1_recvmmsg                "%p"
-#define __NRATRA1_recvmmsg(sockfd, vmessages, vlen, flags, tmo) , vmessages
-#define __NRATRF2_recvmmsg                "%" PRIuSIZ
-#define __NRATRA2_recvmmsg(sockfd, vmessages, vlen, flags, tmo) , vlen
-#define __NRATRF3_recvmmsg                "%#" PRIxSIZ
-#define __NRATRA3_recvmmsg(sockfd, vmessages, vlen, flags, tmo) , (uintptr_t)(flags)
-#define __NRATRF4_recvmmsg                "%p"
-#define __NRATRA4_recvmmsg(sockfd, vmessages, vlen, flags, tmo) , tmo
-#define __NRATRF0_fanotify_init           "%d"
-#define __NRATRA0_fanotify_init(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_fanotify_mark           "%d"
-#define __NRATRA0_fanotify_mark(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_prlimit64               "%" PRIdSIZ
-#define __NRATRA0_prlimit64(pid, resource, new_limit, old_limit) , (intptr_t)(pid)
-#define __NRATRF1_prlimit64               "%#" PRIxSIZ
-#define __NRATRA1_prlimit64(pid, resource, new_limit, old_limit) , (uintptr_t)(resource)
-#define __NRATRF2_prlimit64               "%p"
-#define __NRATRA2_prlimit64(pid, resource, new_limit, old_limit) , new_limit
-#define __NRATRF3_prlimit64               "%p"
-#define __NRATRA3_prlimit64(pid, resource, new_limit, old_limit) , old_limit
-#define __NRATRF0_name_to_handle_at       "%d"
-#define __NRATRA0_name_to_handle_at(dirfd, name, handle, mnt_id, flags) , (int)(dirfd)
-#define __NRATRF1_name_to_handle_at       "%q"
-#define __NRATRA1_name_to_handle_at(dirfd, name, handle, mnt_id, flags) , (validate_readable_opt(name,1),name)
-#define __NRATRF2_name_to_handle_at       "%p"
-#define __NRATRA2_name_to_handle_at(dirfd, name, handle, mnt_id, flags) , handle
-#define __NRATRF3_name_to_handle_at       "%p"
-#define __NRATRA3_name_to_handle_at(dirfd, name, handle, mnt_id, flags) , mnt_id
-#define __NRATRF4_name_to_handle_at       "%#" PRIxSIZ
-#define __NRATRA4_name_to_handle_at(dirfd, name, handle, mnt_id, flags) , (uintptr_t)(flags)
-#define __NRATRF0_open_by_handle_at       "%d"
-#define __NRATRA0_open_by_handle_at(mountdirfd, handle, flags) , (int)(mountdirfd)
-#define __NRATRF1_open_by_handle_at       "%p"
-#define __NRATRA1_open_by_handle_at(mountdirfd, handle, flags) , handle
-#define __NRATRF2_open_by_handle_at       "%#" PRIxSIZ
-#define __NRATRA2_open_by_handle_at(mountdirfd, handle, flags) , (uintptr_t)(flags)
-#define __NRATRF0_clock_adjtime           "%d"
-#define __NRATRA0_clock_adjtime(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_syncfs                  "%d"
-#define __NRATRA0_syncfs(fd)              , (int)(fd)
-#define __NRATRF0_sendmmsg                "%d"
-#define __NRATRA0_sendmmsg(sockfd, vmessages, vlen, flags) , (int)(sockfd)
-#define __NRATRF1_sendmmsg                "%p"
-#define __NRATRA1_sendmmsg(sockfd, vmessages, vlen, flags) , vmessages
-#define __NRATRF2_sendmmsg                "%" PRIuSIZ
-#define __NRATRA2_sendmmsg(sockfd, vmessages, vlen, flags) , vlen
-#define __NRATRF3_sendmmsg                "%#" PRIxSIZ
-#define __NRATRA3_sendmmsg(sockfd, vmessages, vlen, flags) , (uintptr_t)(flags)
-#define __NRATRF0_setns                   "%d"
-#define __NRATRA0_setns(fd, nstype)       , (int)(fd)
-#define __NRATRF1_setns                   "%#" PRIxSIZ
-#define __NRATRA1_setns(fd, nstype)       , (uintptr_t)(nstype)
-#define __NRATRF0_process_vm_readv        "%" PRIdSIZ
-#define __NRATRA0_process_vm_readv(pid, local_iov, liovcnt, remote_iov, riovcnt, flags) , (intptr_t)(pid)
-#define __NRATRF1_process_vm_readv        "%p"
-#define __NRATRA1_process_vm_readv(pid, local_iov, liovcnt, remote_iov, riovcnt, flags) , local_iov
-#define __NRATRF2_process_vm_readv        "%" PRIuSIZ
-#define __NRATRA2_process_vm_readv(pid, local_iov, liovcnt, remote_iov, riovcnt, flags) , liovcnt
-#define __NRATRF3_process_vm_readv        "%p"
-#define __NRATRA3_process_vm_readv(pid, local_iov, liovcnt, remote_iov, riovcnt, flags) , remote_iov
-#define __NRATRF4_process_vm_readv        "%" PRIuSIZ
-#define __NRATRA4_process_vm_readv(pid, local_iov, liovcnt, remote_iov, riovcnt, flags) , riovcnt
-#define __NRATRF5_process_vm_readv        "%#" PRIxSIZ
-#define __NRATRA5_process_vm_readv(pid, local_iov, liovcnt, remote_iov, riovcnt, flags) , (uintptr_t)(flags)
-#define __NRATRF0_process_vm_writev       "%" PRIdSIZ
-#define __NRATRA0_process_vm_writev(pid, local_iov, liovcnt, remote_iov, riovcnt, flags) , (intptr_t)(pid)
-#define __NRATRF1_process_vm_writev       "%p"
-#define __NRATRA1_process_vm_writev(pid, local_iov, liovcnt, remote_iov, riovcnt, flags) , local_iov
-#define __NRATRF2_process_vm_writev       "%" PRIuSIZ
-#define __NRATRA2_process_vm_writev(pid, local_iov, liovcnt, remote_iov, riovcnt, flags) , liovcnt
-#define __NRATRF3_process_vm_writev       "%p"
-#define __NRATRA3_process_vm_writev(pid, local_iov, liovcnt, remote_iov, riovcnt, flags) , remote_iov
-#define __NRATRF4_process_vm_writev       "%" PRIuSIZ
-#define __NRATRA4_process_vm_writev(pid, local_iov, liovcnt, remote_iov, riovcnt, flags) , riovcnt
-#define __NRATRF5_process_vm_writev       "%#" PRIxSIZ
-#define __NRATRA5_process_vm_writev(pid, local_iov, liovcnt, remote_iov, riovcnt, flags) , (uintptr_t)(flags)
-#define __NRATRF0_kcmp                    "%" PRIdSIZ
-#define __NRATRA0_kcmp(pid1, pid2, type, idx1, idx2) , (intptr_t)(pid1)
-#define __NRATRF1_kcmp                    "%" PRIdSIZ
-#define __NRATRA1_kcmp(pid1, pid2, type, idx1, idx2) , (intptr_t)(pid2)
-#define __NRATRF2_kcmp                    "%#" PRIxSIZ
-#define __NRATRA2_kcmp(pid1, pid2, type, idx1, idx2) , (uintptr_t)(type)
-#define __NRATRF3_kcmp                    "%#" PRIxSIZ
-#define __NRATRA3_kcmp(pid1, pid2, type, idx1, idx2) , (uintptr_t)(idx1)
-#define __NRATRF4_kcmp                    "%#" PRIxSIZ
-#define __NRATRA4_kcmp(pid1, pid2, type, idx1, idx2) , (uintptr_t)(idx2)
-#define __NRATRF0_finit_module            "%d"
-#define __NRATRA0_finit_module(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_sched_setattr           "%d"
-#define __NRATRA0_sched_setattr(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_sched_getattr           "%d"
-#define __NRATRA0_sched_getattr(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_renameat2               "%d"
-#define __NRATRA0_renameat2(olddirfd, oldpath, newdirfd, newpath, flags) , (int)(olddirfd)
-#define __NRATRF1_renameat2               "%q"
-#define __NRATRA1_renameat2(olddirfd, oldpath, newdirfd, newpath, flags) , (validate_readable_opt(oldpath,1),oldpath)
-#define __NRATRF2_renameat2               "%d"
-#define __NRATRA2_renameat2(olddirfd, oldpath, newdirfd, newpath, flags) , (int)(newdirfd)
-#define __NRATRF3_renameat2               "%q"
-#define __NRATRA3_renameat2(olddirfd, oldpath, newdirfd, newpath, flags) , (validate_readable_opt(newpath,1),newpath)
-#define __NRATRF4_renameat2               "%#" PRIxSIZ
-#define __NRATRA4_renameat2(olddirfd, oldpath, newdirfd, newpath, flags) , (uintptr_t)(flags)
-#define __NRATRF0_seccomp                 "%d"
-#define __NRATRA0_seccomp(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_getrandom               "%p"
-#define __NRATRA0_getrandom(buf, num_bytes, flags) , buf
-#define __NRATRF1_getrandom               "%" PRIuSIZ
-#define __NRATRA1_getrandom(buf, num_bytes, flags) , num_bytes
-#define __NRATRF2_getrandom               "%#" PRIxSIZ
-#define __NRATRA2_getrandom(buf, num_bytes, flags) , (uintptr_t)(flags)
-#define __NRATRF0_memfd_create            "%q"
-#define __NRATRA0_memfd_create(name, flags) , (validate_readable_opt(name,1),name)
-#define __NRATRF1_memfd_create            "%#" PRIxSIZ "=%s%s%s"
-#define __NRATRA1_memfd_create(name, flags) , (uintptr_t)(flags), (flags) & MFD_CLOEXEC ? "MFD_CLOEXEC" : "" \
-                                            , ((flags) & MFD_ALLOW_SEALING) && ((flags) & (MFD_CLOEXEC)) ? "|" : "", (flags) & MFD_ALLOW_SEALING ? "MFD_ALLOW_SEALING" : ""
-#define __NRATRF0_bpf                     "%d"
-#define __NRATRA0_bpf(TODO_PROTOTYPE)     , TODO_PROTOTYPE
-#define __NRATRF0_execveat                "%d"
-#define __NRATRA0_execveat(dirfd, pathname, argv, envp, flags) , (int)(dirfd)
-#define __NRATRF1_execveat                "%q"
-#define __NRATRA1_execveat(dirfd, pathname, argv, envp, flags) , (validate_readable_opt(pathname,1),pathname)
-#define __NRATRF2_execveat                "%p"
-#define __NRATRA2_execveat(dirfd, pathname, argv, envp, flags) , argv
-#define __NRATRF3_execveat                "%p"
-#define __NRATRA3_execveat(dirfd, pathname, argv, envp, flags) , envp
-#define __NRATRF4_execveat                "%#" PRIxSIZ "=%s%s%s%s%s"
-#define __NRATRA4_execveat(dirfd, pathname, argv, envp, flags) , (uintptr_t)(flags), (flags) & AT_EMPTY_PATH ? "AT_EMPTY_PATH" : "" \
-                                                               , ((flags) & AT_SYMLINK_NOFOLLOW) && ((flags) & (AT_EMPTY_PATH)) ? "|" : "", (flags) & AT_SYMLINK_NOFOLLOW ? "AT_SYMLINK_NOFOLLOW" : "" \
-                                                               , ((flags) & AT_DOSPATH) && ((flags) & (AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW)) ? "|" : "", (flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
-#define __NRATRF0_socket                  "%#" PRIxSIZ
-#define __NRATRA0_socket(domain, type, protocol) , (uintptr_t)(domain)
-#define __NRATRF1_socket                  "%#" PRIxSIZ
-#define __NRATRA1_socket(domain, type, protocol) , (uintptr_t)(type)
-#define __NRATRF2_socket                  "%#" PRIxSIZ
-#define __NRATRA2_socket(domain, type, protocol) , (uintptr_t)(protocol)
-#define __NRATRF0_socketpair              "%#" PRIxSIZ
-#define __NRATRA0_socketpair(domain, type, protocol, fds) , (uintptr_t)(domain)
-#define __NRATRF1_socketpair              "%#" PRIxSIZ
-#define __NRATRA1_socketpair(domain, type, protocol, fds) , (uintptr_t)(type)
-#define __NRATRF2_socketpair              "%#" PRIxSIZ
-#define __NRATRA2_socketpair(domain, type, protocol, fds) , (uintptr_t)(protocol)
-#define __NRATRF3_socketpair              "%p"
-#define __NRATRA3_socketpair(domain, type, protocol, fds) , fds
-#define __NRATRF0_bind                    "%d"
-#define __NRATRA0_bind(sockfd, addr, addr_len) , (int)(sockfd)
-#define __NRATRF1_bind                    "%p"
-#define __NRATRA1_bind(sockfd, addr, addr_len) , addr
-#define __NRATRF2_bind                    "%" PRIuSIZ
-#define __NRATRA2_bind(sockfd, addr, addr_len) , (uintptr_t)(addr_len)
-#define __NRATRF0_connect                 "%d"
-#define __NRATRA0_connect(sockfd, addr, addr_len) , (int)(sockfd)
-#define __NRATRF1_connect                 "%p"
-#define __NRATRA1_connect(sockfd, addr, addr_len) , addr
-#define __NRATRF2_connect                 "%" PRIuSIZ
-#define __NRATRA2_connect(sockfd, addr, addr_len) , (uintptr_t)(addr_len)
-#define __NRATRF0_listen                  "%d"
-#define __NRATRA0_listen(sockfd, max_backlog) , (int)(sockfd)
-#define __NRATRF1_listen                  "%#" PRIxSIZ
-#define __NRATRA1_listen(sockfd, max_backlog) , (uintptr_t)(max_backlog)
-#define __NRATRF0_accept4                 "%d"
-#define __NRATRA0_accept4(sockfd, addr, addr_len, sock_flags) , (int)(sockfd)
-#define __NRATRF1_accept4                 "%p"
-#define __NRATRA1_accept4(sockfd, addr, addr_len, sock_flags) , addr
-#define __NRATRF2_accept4                 "%p"
-#define __NRATRA2_accept4(sockfd, addr, addr_len, sock_flags) , addr_len
-#define __NRATRF3_accept4                 "%#" PRIxSIZ "=%s%s%s%s%s"
-#define __NRATRA3_accept4(sockfd, addr, addr_len, sock_flags) , (uintptr_t)(sock_flags), (sock_flags) & SOCK_NONBLOCK ? "SOCK_NONBLOCK" : "" \
-                                                              , ((sock_flags) & SOCK_CLOEXEC) && ((sock_flags) & (SOCK_NONBLOCK)) ? "|" : "", (sock_flags) & SOCK_CLOEXEC ? "SOCK_CLOEXEC" : "" \
-                                                              , ((sock_flags) & SOCK_CLOFORK) && ((sock_flags) & (SOCK_NONBLOCK | SOCK_CLOEXEC)) ? "|" : "", (sock_flags) & SOCK_CLOFORK ? "SOCK_CLOFORK" : ""
-#define __NRATRF0_getsockopt              "%d"
-#define __NRATRA0_getsockopt(sockfd, level, optname, optval, optlen) , (int)(sockfd)
-#define __NRATRF1_getsockopt              "%#Ix=%s"
-#define __NRATRA1_getsockopt(sockfd, level, optname, optval, optlen) , (level), (level) == SOL_SOCKET ? "SOL_SOCKET" : "?"
-#define __NRATRF2_getsockopt              "%#" PRIxSIZ
-#define __NRATRA2_getsockopt(sockfd, level, optname, optval, optlen) , (uintptr_t)(optname)
-#define __NRATRF3_getsockopt              "%p"
-#define __NRATRA3_getsockopt(sockfd, level, optname, optval, optlen) , optval
-#define __NRATRF4_getsockopt              "%p"
-#define __NRATRA4_getsockopt(sockfd, level, optname, optval, optlen) , optlen
-#define __NRATRF0_setsockopt              "%d"
-#define __NRATRA0_setsockopt(sockfd, level, optname, optval, optlen) , (int)(sockfd)
-#define __NRATRF1_setsockopt              "%#Ix=%s"
-#define __NRATRA1_setsockopt(sockfd, level, optname, optval, optlen) , (level), (level) == SOL_SOCKET ? "SOL_SOCKET" : "?"
-#define __NRATRF2_setsockopt              "%#" PRIxSIZ
-#define __NRATRA2_setsockopt(sockfd, level, optname, optval, optlen) , (uintptr_t)(optname)
-#define __NRATRF3_setsockopt              "%p"
-#define __NRATRA3_setsockopt(sockfd, level, optname, optval, optlen) , optval
-#define __NRATRF4_setsockopt              "%" PRIuSIZ
-#define __NRATRA4_setsockopt(sockfd, level, optname, optval, optlen) , (uintptr_t)(optlen)
-#define __NRATRF0_getsockname             "%d"
-#define __NRATRA0_getsockname(sockfd, addr, addr_len) , (int)(sockfd)
-#define __NRATRF1_getsockname             "%p"
-#define __NRATRA1_getsockname(sockfd, addr, addr_len) , addr
-#define __NRATRF2_getsockname             "%p"
-#define __NRATRA2_getsockname(sockfd, addr, addr_len) , addr_len
-#define __NRATRF0_getpeername             "%d"
-#define __NRATRA0_getpeername(sockfd, addr, addr_len) , (int)(sockfd)
-#define __NRATRF1_getpeername             "%p"
-#define __NRATRA1_getpeername(sockfd, addr, addr_len) , addr
-#define __NRATRF2_getpeername             "%p"
-#define __NRATRA2_getpeername(sockfd, addr, addr_len) , addr_len
-#define __NRATRF0_sendto                  "%d"
-#define __NRATRA0_sendto(sockfd, buf, bufsize, msg_flags, addr, addr_len) , (int)(sockfd)
-#define __NRATRF1_sendto                  "%p"
-#define __NRATRA1_sendto(sockfd, buf, bufsize, msg_flags, addr, addr_len) , buf
-#define __NRATRF2_sendto                  "%" PRIuSIZ
-#define __NRATRA2_sendto(sockfd, buf, bufsize, msg_flags, addr, addr_len) , bufsize
-#define __NRATRF3_sendto                  "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NRATRA3_sendto(sockfd, buf, bufsize, msg_flags, addr, addr_len) , (uintptr_t)(msg_flags), (msg_flags) & MSG_CONFIRM ? "MSG_CONFIRM" : "" \
-                                                                          , ((msg_flags) & MSG_DONTROUTE) && ((msg_flags) & (MSG_CONFIRM)) ? "|" : "", (msg_flags) & MSG_DONTROUTE ? "MSG_DONTROUTE" : "" \
-                                                                          , ((msg_flags) & MSG_DONTWAIT) && ((msg_flags) & (MSG_CONFIRM | MSG_DONTROUTE)) ? "|" : "", (msg_flags) & MSG_DONTWAIT ? "MSG_DONTWAIT" : "" \
-                                                                          , ((msg_flags) & MSG_EOR) && ((msg_flags) & (MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT)) ? "|" : "", (msg_flags) & MSG_EOR ? "MSG_EOR" : "" \
-                                                                          , ((msg_flags) & MSG_MORE) && ((msg_flags) & (MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT | MSG_EOR)) ? "|" : "", (msg_flags) & MSG_MORE ? "MSG_MORE" : "" \
-                                                                          , ((msg_flags) & MSG_NOSIGNAL) && ((msg_flags) & (MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT | MSG_EOR | MSG_MORE)) ? "|" : "", (msg_flags) & MSG_NOSIGNAL ? "MSG_NOSIGNAL" : "" \
-                                                                          , ((msg_flags) & MSG_OOB) && ((msg_flags) & (MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT | MSG_EOR | MSG_MORE | MSG_NOSIGNAL)) ? "|" : "", (msg_flags) & MSG_OOB ? "MSG_OOB" : ""
-#define __NRATRF4_sendto                  "%p"
-#define __NRATRA4_sendto(sockfd, buf, bufsize, msg_flags, addr, addr_len) , addr
-#define __NRATRF5_sendto                  "%" PRIuSIZ
-#define __NRATRA5_sendto(sockfd, buf, bufsize, msg_flags, addr, addr_len) , (uintptr_t)(addr_len)
-#define __NRATRF0_sendmsg                 "%d"
-#define __NRATRA0_sendmsg(sockfd, message, msg_flags) , (int)(sockfd)
-#define __NRATRF1_sendmsg                 "%p"
-#define __NRATRA1_sendmsg(sockfd, message, msg_flags) , message
-#define __NRATRF2_sendmsg                 "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NRATRA2_sendmsg(sockfd, message, msg_flags) , (uintptr_t)(msg_flags), (msg_flags) & MSG_CONFIRM ? "MSG_CONFIRM" : "" \
-                                                      , ((msg_flags) & MSG_DONTROUTE) && ((msg_flags) & (MSG_CONFIRM)) ? "|" : "", (msg_flags) & MSG_DONTROUTE ? "MSG_DONTROUTE" : "" \
-                                                      , ((msg_flags) & MSG_DONTWAIT) && ((msg_flags) & (MSG_CONFIRM | MSG_DONTROUTE)) ? "|" : "", (msg_flags) & MSG_DONTWAIT ? "MSG_DONTWAIT" : "" \
-                                                      , ((msg_flags) & MSG_EOR) && ((msg_flags) & (MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT)) ? "|" : "", (msg_flags) & MSG_EOR ? "MSG_EOR" : "" \
-                                                      , ((msg_flags) & MSG_MORE) && ((msg_flags) & (MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT | MSG_EOR)) ? "|" : "", (msg_flags) & MSG_MORE ? "MSG_MORE" : "" \
-                                                      , ((msg_flags) & MSG_NOSIGNAL) && ((msg_flags) & (MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT | MSG_EOR | MSG_MORE)) ? "|" : "", (msg_flags) & MSG_NOSIGNAL ? "MSG_NOSIGNAL" : "" \
-                                                      , ((msg_flags) & MSG_OOB) && ((msg_flags) & (MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT | MSG_EOR | MSG_MORE | MSG_NOSIGNAL)) ? "|" : "", (msg_flags) & MSG_OOB ? "MSG_OOB" : ""
-#define __NRATRF0_recvfrom                "%d"
-#define __NRATRA0_recvfrom(sockfd, buf, bufsize, msg_flags, addr, addr_len) , (int)(sockfd)
-#define __NRATRF1_recvfrom                "%p"
-#define __NRATRA1_recvfrom(sockfd, buf, bufsize, msg_flags, addr, addr_len) , buf
-#define __NRATRF2_recvfrom                "%" PRIuSIZ
-#define __NRATRA2_recvfrom(sockfd, buf, bufsize, msg_flags, addr, addr_len) , bufsize
-#define __NRATRF3_recvfrom                "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s"
-#define __NRATRA3_recvfrom(sockfd, buf, bufsize, msg_flags, addr, addr_len) , (uintptr_t)(msg_flags), (msg_flags) & MSG_DONTWAIT ? "MSG_DONTWAIT" : "" \
-                                                                            , ((msg_flags) & MSG_ERRQUEUE) && ((msg_flags) & (MSG_DONTWAIT)) ? "|" : "", (msg_flags) & MSG_ERRQUEUE ? "MSG_ERRQUEUE" : "" \
-                                                                            , ((msg_flags) & MSG_OOB) && ((msg_flags) & (MSG_DONTWAIT | MSG_ERRQUEUE)) ? "|" : "", (msg_flags) & MSG_OOB ? "MSG_OOB" : "" \
-                                                                            , ((msg_flags) & MSG_PEEK) && ((msg_flags) & (MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB)) ? "|" : "", (msg_flags) & MSG_PEEK ? "MSG_PEEK" : "" \
-                                                                            , ((msg_flags) & MSG_TRUNC) && ((msg_flags) & (MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB | MSG_PEEK)) ? "|" : "", (msg_flags) & MSG_TRUNC ? "MSG_TRUNC" : "" \
-                                                                            , ((msg_flags) & MSG_WAITALL) && ((msg_flags) & (MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB | MSG_PEEK | MSG_TRUNC)) ? "|" : "", (msg_flags) & MSG_WAITALL ? "MSG_WAITALL" : ""
-#define __NRATRF4_recvfrom                "%p"
-#define __NRATRA4_recvfrom(sockfd, buf, bufsize, msg_flags, addr, addr_len) , addr
-#define __NRATRF5_recvfrom                "%p"
-#define __NRATRA5_recvfrom(sockfd, buf, bufsize, msg_flags, addr, addr_len) , addr_len
-#define __NRATRF0_recvmsg                 "%d"
-#define __NRATRA0_recvmsg(sockfd, message, msg_flags) , (int)(sockfd)
-#define __NRATRF1_recvmsg                 "%p"
-#define __NRATRA1_recvmsg(sockfd, message, msg_flags) , message
-#define __NRATRF2_recvmsg                 "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NRATRA2_recvmsg(sockfd, message, msg_flags) , (uintptr_t)(msg_flags), (msg_flags) & MSG_CMSG_CLOEXEC ? "MSG_CMSG_CLOEXEC" : "" \
-                                                      , ((msg_flags) & MSG_CMSG_CLOFORK) && ((msg_flags) & (MSG_CMSG_CLOEXEC)) ? "|" : "", (msg_flags) & MSG_CMSG_CLOFORK ? "MSG_CMSG_CLOFORK" : "" \
-                                                      , ((msg_flags) & MSG_DONTWAIT) && ((msg_flags) & (MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK)) ? "|" : "", (msg_flags) & MSG_DONTWAIT ? "MSG_DONTWAIT" : "" \
-                                                      , ((msg_flags) & MSG_ERRQUEUE) && ((msg_flags) & (MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK | MSG_DONTWAIT)) ? "|" : "", (msg_flags) & MSG_ERRQUEUE ? "MSG_ERRQUEUE" : "" \
-                                                      , ((msg_flags) & MSG_OOB) && ((msg_flags) & (MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK | MSG_DONTWAIT | MSG_ERRQUEUE)) ? "|" : "", (msg_flags) & MSG_OOB ? "MSG_OOB" : "" \
-                                                      , ((msg_flags) & MSG_PEEK) && ((msg_flags) & (MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK | MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB)) ? "|" : "", (msg_flags) & MSG_PEEK ? "MSG_PEEK" : "" \
-                                                      , ((msg_flags) & MSG_TRUNC) && ((msg_flags) & (MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK | MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB | MSG_PEEK)) ? "|" : "", (msg_flags) & MSG_TRUNC ? "MSG_TRUNC" : "" \
-                                                      , ((msg_flags) & MSG_WAITALL) && ((msg_flags) & (MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK | MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB | MSG_PEEK | MSG_TRUNC)) ? "|" : "", (msg_flags) & MSG_WAITALL ? "MSG_WAITALL" : ""
-#define __NRATRF0_shutdown                "%d"
-#define __NRATRA0_shutdown(sockfd, how)   , (int)(sockfd)
-#define __NRATRF1_shutdown                "%#Ix=%s"
-#define __NRATRA1_shutdown(sockfd, how)   , (how), (how) == SHUT_RD ? "SHUT_RD" : (how) == SHUT_WR ? "SHUT_WR" : (how) == SHUT_RDWR ? "SHUT_RDWR" : "?"
-#define __NRATRF0_userfaultfd             "%d"
-#define __NRATRA0_userfaultfd(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_membarrier              "%d"
-#define __NRATRA0_membarrier(TODO_PROTOTYPE) , TODO_PROTOTYPE
-#define __NRATRF0_mlock2                  "%d"
-#define __NRATRA0_mlock2(TODO_PROTOTYPE)  , TODO_PROTOTYPE
-#define __NRATRF0_recvmmsg64              "%d"
-#define __NRATRA0_recvmmsg64(sockfd, vmessages, vlen, flags, tmo) , (int)(sockfd)
-#define __NRATRF1_recvmmsg64              "%p"
-#define __NRATRA1_recvmmsg64(sockfd, vmessages, vlen, flags, tmo) , vmessages
-#define __NRATRF2_recvmmsg64              "%" PRIuSIZ
-#define __NRATRA2_recvmmsg64(sockfd, vmessages, vlen, flags, tmo) , vlen
-#define __NRATRF3_recvmmsg64              "%#" PRIxSIZ
-#define __NRATRA3_recvmmsg64(sockfd, vmessages, vlen, flags, tmo) , (uintptr_t)(flags)
-#define __NRATRF4_recvmmsg64              "%p"
-#define __NRATRA4_recvmmsg64(sockfd, vmessages, vlen, flags, tmo) , tmo
-#define __NRATRF0_pwritevf                "%d"
-#define __NRATRA0_pwritevf(fd, iovec, count, offset, mode) , (int)(fd)
-#define __NRATRF1_pwritevf                "%p"
-#define __NRATRA1_pwritevf(fd, iovec, count, offset, mode) , iovec
-#define __NRATRF2_pwritevf                "%" PRIuSIZ
-#define __NRATRA2_pwritevf(fd, iovec, count, offset, mode) , count
-#define __NRATRF3_pwritevf                "%" PRIu64
-#define __NRATRA3_pwritevf(fd, iovec, count, offset, mode) , offset
-#define __NRATRF4_pwritevf                "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NRATRA4_pwritevf(fd, iovec, count, offset, mode) , (uintptr_t)(mode), (mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
-                                                           , ((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "", (mode) & IO_RDWR ? "IO_RDWR" : "" \
-                                                           , ((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY | IO_RDWR)) ? "|" : "", (mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
-                                                           , ((mode) & IO_CLOFORK) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC)) ? "|" : "", (mode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
-                                                           , ((mode) & IO_APPEND) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK)) ? "|" : "", (mode) & IO_APPEND ? "IO_APPEND" : "" \
-                                                           , ((mode) & IO_NONBLOCK) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK | IO_APPEND)) ? "|" : "", (mode) & IO_NONBLOCK ? "IO_NONBLOCK" : "" \
-                                                           , ((mode) & IO_SYNC) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK | IO_APPEND | IO_NONBLOCK)) ? "|" : "", (mode) & IO_SYNC ? "IO_SYNC" : "" \
-                                                           , ((mode) & IO_ASYNC) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK | IO_APPEND | IO_NONBLOCK | IO_SYNC)) ? "|" : "", (mode) & IO_ASYNC ? "IO_ASYNC" : "" \
-                                                           , ((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK | IO_APPEND | IO_NONBLOCK | IO_SYNC | IO_ASYNC)) ? "|" : "", (mode) & IO_DIRECT ? "IO_DIRECT" : ""
-#define __NRATRF0_preadvf                 "%d"
-#define __NRATRA0_preadvf(fd, iovec, count, offset, mode) , (int)(fd)
-#define __NRATRF1_preadvf                 "%p"
-#define __NRATRA1_preadvf(fd, iovec, count, offset, mode) , iovec
-#define __NRATRF2_preadvf                 "%" PRIuSIZ
-#define __NRATRA2_preadvf(fd, iovec, count, offset, mode) , count
-#define __NRATRF3_preadvf                 "%" PRIu64
-#define __NRATRA3_preadvf(fd, iovec, count, offset, mode) , offset
-#define __NRATRF4_preadvf                 "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NRATRA4_preadvf(fd, iovec, count, offset, mode) , (uintptr_t)(mode), (mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
-                                                          , ((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "", (mode) & IO_RDWR ? "IO_RDWR" : "" \
-                                                          , ((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY | IO_RDWR)) ? "|" : "", (mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
-                                                          , ((mode) & IO_CLOFORK) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC)) ? "|" : "", (mode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
-                                                          , ((mode) & IO_APPEND) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK)) ? "|" : "", (mode) & IO_APPEND ? "IO_APPEND" : "" \
-                                                          , ((mode) & IO_NONBLOCK) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK | IO_APPEND)) ? "|" : "", (mode) & IO_NONBLOCK ? "IO_NONBLOCK" : "" \
-                                                          , ((mode) & IO_SYNC) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK | IO_APPEND | IO_NONBLOCK)) ? "|" : "", (mode) & IO_SYNC ? "IO_SYNC" : "" \
-                                                          , ((mode) & IO_ASYNC) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK | IO_APPEND | IO_NONBLOCK | IO_SYNC)) ? "|" : "", (mode) & IO_ASYNC ? "IO_ASYNC" : "" \
-                                                          , ((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK | IO_APPEND | IO_NONBLOCK | IO_SYNC | IO_ASYNC)) ? "|" : "", (mode) & IO_DIRECT ? "IO_DIRECT" : ""
-#define __NRATRF0_timerfd_gettime64       "%d"
-#define __NRATRA0_timerfd_gettime64(ufd, otmr) , (int)(ufd)
-#define __NRATRF1_timerfd_gettime64       "%p"
-#define __NRATRA1_timerfd_gettime64(ufd, otmr) , otmr
-#define __NRATRF0_timerfd_settime64       "%d"
-#define __NRATRA0_timerfd_settime64(ufd, flags, utmr, otmr) , (int)(ufd)
-#define __NRATRF1_timerfd_settime64       "%#" PRIxSIZ
-#define __NRATRA1_timerfd_settime64(ufd, flags, utmr, otmr) , (uintptr_t)(flags)
-#define __NRATRF2_timerfd_settime64       "%p"
-#define __NRATRA2_timerfd_settime64(ufd, flags, utmr, otmr) , utmr
-#define __NRATRF3_timerfd_settime64       "%p"
-#define __NRATRA3_timerfd_settime64(ufd, flags, utmr, otmr) , otmr
-#define __NRATRF0_fallocate64             "%d"
-#define __NRATRA0_fallocate64(fd, mode, offset, length) , (int)(fd)
-#define __NRATRF1_fallocate64             "%#" PRIxSIZ
-#define __NRATRA1_fallocate64(fd, mode, offset, length) , (uintptr_t)(mode)
-#define __NRATRF2_fallocate64             "%" PRIu64
-#define __NRATRA2_fallocate64(fd, mode, offset, length) , offset
-#define __NRATRF3_fallocate64             "%" PRIu64
-#define __NRATRA3_fallocate64(fd, mode, offset, length) , length
-#define __NRATRF0_utimensat64             "%d"
-#define __NRATRA0_utimensat64(dirfd, filename, times, flags) , (int)(dirfd)
-#define __NRATRF1_utimensat64             "%q"
-#define __NRATRA1_utimensat64(dirfd, filename, times, flags) , (validate_readable_opt(filename,1),filename)
-#define __NRATRF2_utimensat64             "%p"
-#define __NRATRA2_utimensat64(dirfd, filename, times, flags) , times
-#define __NRATRF3_utimensat64             "%#" PRIxSIZ "=%s%s%s%s%s"
-#define __NRATRA3_utimensat64(dirfd, filename, times, flags) , (uintptr_t)(flags), (flags) & AT_SYMLINK_NOFOLLOW ? "AT_SYMLINK_NOFOLLOW" : "" \
-                                                             , ((flags) & AT_CHANGE_CTIME) && ((flags) & (AT_SYMLINK_NOFOLLOW)) ? "|" : "", (flags) & AT_CHANGE_CTIME ? "AT_CHANGE_CTIME" : "" \
-                                                             , ((flags) & AT_DOSPATH) && ((flags) & (AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME)) ? "|" : "", (flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
-#define __NRATRF0_ppoll64                 "%p"
-#define __NRATRA0_ppoll64(fds, nfds, timeout_ts, sigmask, sigsetsize) , fds
-#define __NRATRF1_ppoll64                 "%" PRIuSIZ
-#define __NRATRA1_ppoll64(fds, nfds, timeout_ts, sigmask, sigsetsize) , nfds
-#define __NRATRF2_ppoll64                 "%p"
-#define __NRATRA2_ppoll64(fds, nfds, timeout_ts, sigmask, sigsetsize) , timeout_ts
-#define __NRATRF3_ppoll64                 "%p"
-#define __NRATRA3_ppoll64(fds, nfds, timeout_ts, sigmask, sigsetsize) , sigmask
-#define __NRATRF4_ppoll64                 "%" PRIuSIZ
-#define __NRATRA4_ppoll64(fds, nfds, timeout_ts, sigmask, sigsetsize) , sigsetsize
-#define __NRATRF0_pselect6_64             "%" PRIuSIZ
-#define __NRATRA0_pselect6_64(nfds, readfds, writefds, exceptfds, timeout, sigmask_sigset_and_len) , nfds
-#define __NRATRF1_pselect6_64             "%p"
-#define __NRATRA1_pselect6_64(nfds, readfds, writefds, exceptfds, timeout, sigmask_sigset_and_len) , readfds
-#define __NRATRF2_pselect6_64             "%p"
-#define __NRATRA2_pselect6_64(nfds, readfds, writefds, exceptfds, timeout, sigmask_sigset_and_len) , writefds
-#define __NRATRF3_pselect6_64             "%p"
-#define __NRATRA3_pselect6_64(nfds, readfds, writefds, exceptfds, timeout, sigmask_sigset_and_len) , exceptfds
-#define __NRATRF4_pselect6_64             "%p"
-#define __NRATRA4_pselect6_64(nfds, readfds, writefds, exceptfds, timeout, sigmask_sigset_and_len) , timeout
-#define __NRATRF5_pselect6_64             "%p"
-#define __NRATRA5_pselect6_64(nfds, readfds, writefds, exceptfds, timeout, sigmask_sigset_and_len) , sigmask_sigset_and_len
-#define __NRATRF0_freadlinkat             "%d"
-#define __NRATRA0_freadlinkat(dirfd, path, buf, buflen, flags) , (int)(dirfd)
-#define __NRATRF1_freadlinkat             "%q"
-#define __NRATRA1_freadlinkat(dirfd, path, buf, buflen, flags) , (validate_readable_opt(path,1),path)
-#define __NRATRF2_freadlinkat             "%p"
-#define __NRATRA2_freadlinkat(dirfd, path, buf, buflen, flags) , buf
-#define __NRATRF3_freadlinkat             "%" PRIuSIZ
-#define __NRATRA3_freadlinkat(dirfd, path, buf, buflen, flags) , buflen
-#define __NRATRF4_freadlinkat             "%#" PRIxSIZ "=%s%s%s"
-#define __NRATRA4_freadlinkat(dirfd, path, buf, buflen, flags) , (uintptr_t)(flags), (flags) & AT_READLINK_REQSIZE ? "AT_READLINK_REQSIZE" : "" \
-                                                               , ((flags) & AT_DOSPATH) && ((flags) & (AT_READLINK_REQSIZE)) ? "|" : "", (flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
-#define __NRATRF0_fsymlinkat              "%q"
-#define __NRATRA0_fsymlinkat(link_text, tofd, target_path, flags) , (validate_readable_opt(link_text,1),link_text)
-#define __NRATRF1_fsymlinkat              "%d"
-#define __NRATRA1_fsymlinkat(link_text, tofd, target_path, flags) , (int)(tofd)
-#define __NRATRF2_fsymlinkat              "%q"
-#define __NRATRA2_fsymlinkat(link_text, tofd, target_path, flags) , (validate_readable_opt(target_path,1),target_path)
-#define __NRATRF3_fsymlinkat              "%#" PRIxSIZ "=%s"
-#define __NRATRA3_fsymlinkat(link_text, tofd, target_path, flags) , (uintptr_t)(flags), (flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
-#define __NRATRF0_frenameat               "%d"
-#define __NRATRA0_frenameat(oldfd, oldname, newfd, newname_or_path, flags) , (int)(oldfd)
-#define __NRATRF1_frenameat               "%q"
-#define __NRATRA1_frenameat(oldfd, oldname, newfd, newname_or_path, flags) , (validate_readable_opt(oldname,1),oldname)
-#define __NRATRF2_frenameat               "%d"
-#define __NRATRA2_frenameat(oldfd, oldname, newfd, newname_or_path, flags) , (int)(newfd)
-#define __NRATRF3_frenameat               "%q"
-#define __NRATRA3_frenameat(oldfd, oldname, newfd, newname_or_path, flags) , (validate_readable_opt(newname_or_path,1),newname_or_path)
-#define __NRATRF4_frenameat               "%#" PRIxSIZ "=%s"
-#define __NRATRA4_frenameat(oldfd, oldname, newfd, newname_or_path, flags) , (uintptr_t)(flags), (flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
-#define __NRATRF0_kfstatat                "%d"
-#define __NRATRA0_kfstatat(dirfd, filename, statbuf, flags) , (int)(dirfd)
-#define __NRATRF1_kfstatat                "%q"
-#define __NRATRA1_kfstatat(dirfd, filename, statbuf, flags) , (validate_readable_opt(filename,1),filename)
-#define __NRATRF2_kfstatat                "%p"
-#define __NRATRA2_kfstatat(dirfd, filename, statbuf, flags) , statbuf
-#define __NRATRF3_kfstatat                "%#" PRIxSIZ "=%s%s%s"
-#define __NRATRA3_kfstatat(dirfd, filename, statbuf, flags) , (uintptr_t)(flags), (flags) & AT_SYMLINK_NOFOLLOW ? "AT_SYMLINK_NOFOLLOW" : "" \
-                                                            , ((flags) & AT_DOSPATH) && ((flags) & (AT_SYMLINK_NOFOLLOW)) ? "|" : "", (flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
-#define __NRATRF0_futimesat64             "%d"
-#define __NRATRA0_futimesat64(dirfd, filename, times) , (int)(dirfd)
-#define __NRATRF1_futimesat64             "%p"
-#define __NRATRA1_futimesat64(dirfd, filename, times) , filename
-#define __NRATRF2_futimesat64             "%p"
-#define __NRATRA2_futimesat64(dirfd, filename, times) , times
-#define __NRATRF0_fmknodat                "%d"
-#define __NRATRA0_fmknodat(dirfd, nodename, mode, dev, flags) , (int)(dirfd)
-#define __NRATRF1_fmknodat                "%q"
-#define __NRATRA1_fmknodat(dirfd, nodename, mode, dev, flags) , (validate_readable_opt(nodename,1),nodename)
-#define __NRATRF2_fmknodat                "%#" PRIoSIZ
-#define __NRATRA2_fmknodat(dirfd, nodename, mode, dev, flags) , (uintptr_t)(mode)
-#define __NRATRF3_fmknodat                "%.2x:%.2x"
-#define __NRATRA3_fmknodat(dirfd, nodename, mode, dev, flags) , (unsigned int)MAJOR(dev),(unsigned int)MINOR(dev)
-#define __NRATRF4_fmknodat                "%#" PRIxSIZ "=%s"
-#define __NRATRA4_fmknodat(dirfd, nodename, mode, dev, flags) , (uintptr_t)(flags), (flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
-#define __NRATRF0_fmkdirat                "%d"
-#define __NRATRA0_fmkdirat(dirfd, pathname, mode, flags) , (int)(dirfd)
-#define __NRATRF1_fmkdirat                "%q"
-#define __NRATRA1_fmkdirat(dirfd, pathname, mode, flags) , (validate_readable_opt(pathname,1),pathname)
-#define __NRATRF2_fmkdirat                "%#" PRIoSIZ
-#define __NRATRA2_fmkdirat(dirfd, pathname, mode, flags) , (uintptr_t)(mode)
-#define __NRATRF3_fmkdirat                "%#" PRIxSIZ "=%s"
-#define __NRATRA3_fmkdirat(dirfd, pathname, mode, flags) , (uintptr_t)(flags), (flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
-#define __NRATRF0_waitid64                "%#Ix=%s"
-#define __NRATRA0_waitid64(idtype, id, infop, options, ru) , (idtype), (idtype) == P_ALL ? "P_ALL" : (idtype) == P_PID ? "P_PID" : (idtype) == P_PGID ? "P_PGID" : "?"
-#define __NRATRF1_waitid64                "%" PRIuSIZ
-#define __NRATRA1_waitid64(idtype, id, infop, options, ru) , (uintptr_t)(id)
-#define __NRATRF2_waitid64                "%p"
-#define __NRATRA2_waitid64(idtype, id, infop, options, ru) , infop
-#define __NRATRF3_waitid64                "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s"
-#define __NRATRA3_waitid64(idtype, id, infop, options, ru) , (uintptr_t)(options), (options) & WEXITED ? "WEXITED" : "" \
-                                                           , ((options) & WSTOPPED) && ((options) & (WEXITED)) ? "|" : "", (options) & WSTOPPED ? "WSTOPPED" : "" \
-                                                           , ((options) & WCONTINUED) && ((options) & (WEXITED | WSTOPPED)) ? "|" : "", (options) & WCONTINUED ? "WCONTINUED" : "" \
-                                                           , ((options) & WNOHANG) && ((options) & (WEXITED | WSTOPPED | WCONTINUED)) ? "|" : "", (options) & WNOHANG ? "WNOHANG" : "" \
-                                                           , ((options) & WNOWAIT) && ((options) & (WEXITED | WSTOPPED | WCONTINUED | WNOHANG)) ? "|" : "", (options) & WNOWAIT ? "WNOWAIT" : ""
-#define __NRATRF4_waitid64                "%p"
-#define __NRATRA4_waitid64(idtype, id, infop, options, ru) , ru
-#define __NRATRF0_mq_timedreceive64       "%d"
-#define __NRATRA0_mq_timedreceive64(mqdes, msg_ptr, msg_len, pmsg_prio, abs_timeout) , (int)(mqdes)
-#define __NRATRF1_mq_timedreceive64       "%p"
-#define __NRATRA1_mq_timedreceive64(mqdes, msg_ptr, msg_len, pmsg_prio, abs_timeout) , msg_ptr
-#define __NRATRF2_mq_timedreceive64       "%" PRIuSIZ
-#define __NRATRA2_mq_timedreceive64(mqdes, msg_ptr, msg_len, pmsg_prio, abs_timeout) , msg_len
-#define __NRATRF3_mq_timedreceive64       "%p"
-#define __NRATRA3_mq_timedreceive64(mqdes, msg_ptr, msg_len, pmsg_prio, abs_timeout) , pmsg_prio
-#define __NRATRF4_mq_timedreceive64       "%p"
-#define __NRATRA4_mq_timedreceive64(mqdes, msg_ptr, msg_len, pmsg_prio, abs_timeout) , abs_timeout
-#define __NRATRF0_mq_timedsend64          "%d"
-#define __NRATRA0_mq_timedsend64(mqdes, msg_ptr, msg_len, msg_prio, abs_timeout) , (int)(mqdes)
-#define __NRATRF1_mq_timedsend64          "%q"
-#define __NRATRA1_mq_timedsend64(mqdes, msg_ptr, msg_len, msg_prio, abs_timeout) , (validate_readable_opt(msg_ptr,1),msg_ptr)
-#define __NRATRF2_mq_timedsend64          "%" PRIuSIZ
-#define __NRATRA2_mq_timedsend64(mqdes, msg_ptr, msg_len, msg_prio, abs_timeout) , msg_len
-#define __NRATRF3_mq_timedsend64          "%" PRIu32
-#define __NRATRA3_mq_timedsend64(mqdes, msg_ptr, msg_len, msg_prio, abs_timeout) , msg_prio
-#define __NRATRF4_mq_timedsend64          "%p"
-#define __NRATRA4_mq_timedsend64(mqdes, msg_ptr, msg_len, msg_prio, abs_timeout) , abs_timeout
-#define __NRATRF0_utimes64                "%q"
-#define __NRATRA0_utimes64(filename, times) , (validate_readable_opt(filename,1),filename)
-#define __NRATRF1_utimes64                "%p"
-#define __NRATRA1_utimes64(filename, times) , times
-#define __NRATRF0_clock_nanosleep64       "%#" PRIxSIZ
-#define __NRATRA0_clock_nanosleep64(clock_id, flags, requested_time, remaining) , (uintptr_t)(clock_id)
-#define __NRATRF1_clock_nanosleep64       "%#" PRIxSIZ
-#define __NRATRA1_clock_nanosleep64(clock_id, flags, requested_time, remaining) , (uintptr_t)(flags)
-#define __NRATRF2_clock_nanosleep64       "%p"
-#define __NRATRA2_clock_nanosleep64(clock_id, flags, requested_time, remaining) , requested_time
-#define __NRATRF3_clock_nanosleep64       "%p"
-#define __NRATRA3_clock_nanosleep64(clock_id, flags, requested_time, remaining) , remaining
-#define __NRATRF0_clock_getres64          "%#" PRIxSIZ
-#define __NRATRA0_clock_getres64(clock_id, res) , (uintptr_t)(clock_id)
-#define __NRATRF1_clock_getres64          "%p"
-#define __NRATRA1_clock_getres64(clock_id, res) , res
-#define __NRATRF0_clock_gettime64         "%#" PRIxSIZ
-#define __NRATRA0_clock_gettime64(clock_id, tp) , (uintptr_t)(clock_id)
-#define __NRATRF1_clock_gettime64         "%p"
-#define __NRATRA1_clock_gettime64(clock_id, tp) , tp
-#define __NRATRF0_clock_settime64         "%#" PRIxSIZ
-#define __NRATRA0_clock_settime64(clock_id, tp) , (uintptr_t)(clock_id)
-#define __NRATRF1_clock_settime64         "%p"
-#define __NRATRA1_clock_settime64(clock_id, tp) , tp
-#define __NRATRF0_timer_gettime64         "%p"
-#define __NRATRA0_timer_gettime64(timerid, value) , timerid
-#define __NRATRF1_timer_gettime64         "%p"
-#define __NRATRA1_timer_gettime64(timerid, value) , value
-#define __NRATRF0_timer_settime64         "%p"
-#define __NRATRA0_timer_settime64(timerid, flags, value, ovalue) , timerid
-#define __NRATRF1_timer_settime64         "%#" PRIxSIZ
-#define __NRATRA1_timer_settime64(timerid, flags, value, ovalue) , (uintptr_t)(flags)
-#define __NRATRF2_timer_settime64         "%p"
-#define __NRATRA2_timer_settime64(timerid, flags, value, ovalue) , value
-#define __NRATRF3_timer_settime64         "%p"
-#define __NRATRA3_timer_settime64(timerid, flags, value, ovalue) , ovalue
-#define __NRATRF0_kreaddirf               "%d"
-#define __NRATRA0_kreaddirf(fd, buf, bufsize, mode, iomode) , (int)(fd)
-#define __NRATRF1_kreaddirf               "%p"
-#define __NRATRA1_kreaddirf(fd, buf, bufsize, mode, iomode) , buf
-#define __NRATRF2_kreaddirf               "%" PRIuSIZ
-#define __NRATRA2_kreaddirf(fd, buf, bufsize, mode, iomode) , bufsize
-#define __NRATRF3_kreaddirf               "%#" PRIxSIZ "=%s%s%s%s%s%s%s"
-#define __NRATRA3_kreaddirf(fd, buf, bufsize, mode, iomode) , (uintptr_t)(mode), (mode) & READDIR_CONTINUE ? "READDIR_CONTINUE" : (mode) ? "" : "READDIR_DEFAULT" \
-                                                            , ((mode) & READDIR_PEEK) && ((mode) & (READDIR_CONTINUE)) ? "|" : "", (mode) & READDIR_PEEK ? "READDIR_PEEK" : "" \
-                                                            , ((mode) & READDIR_SKIPREL) && ((mode) & (READDIR_CONTINUE | READDIR_PEEK)) ? "|" : "", (mode) & READDIR_SKIPREL ? "READDIR_SKIPREL" : "" \
-                                                            , ((mode) & READDIR_WANTEOF) && ((mode) & (READDIR_CONTINUE | READDIR_PEEK | READDIR_SKIPREL)) ? "|" : "", (mode) & READDIR_WANTEOF ? "READDIR_WANTEOF" : ""
-#define __NRATRF4_kreaddirf               "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NRATRA4_kreaddirf(fd, buf, bufsize, mode, iomode) , (uintptr_t)(iomode), (iomode) & IO_WRONLY ? "IO_WRONLY" : (iomode) ? "" : "IO_RDONLY" \
-                                                            , ((iomode) & IO_RDWR) && ((iomode) & (IO_WRONLY)) ? "|" : "", (iomode) & IO_RDWR ? "IO_RDWR" : "" \
-                                                            , ((iomode) & IO_CLOEXEC) && ((iomode) & (IO_WRONLY | IO_RDWR)) ? "|" : "", (iomode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
-                                                            , ((iomode) & IO_CLOFORK) && ((iomode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC)) ? "|" : "", (iomode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
-                                                            , ((iomode) & IO_APPEND) && ((iomode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK)) ? "|" : "", (iomode) & IO_APPEND ? "IO_APPEND" : "" \
-                                                            , ((iomode) & IO_NONBLOCK) && ((iomode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK | IO_APPEND)) ? "|" : "", (iomode) & IO_NONBLOCK ? "IO_NONBLOCK" : "" \
-                                                            , ((iomode) & IO_SYNC) && ((iomode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK | IO_APPEND | IO_NONBLOCK)) ? "|" : "", (iomode) & IO_SYNC ? "IO_SYNC" : "" \
-                                                            , ((iomode) & IO_ASYNC) && ((iomode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK | IO_APPEND | IO_NONBLOCK | IO_SYNC)) ? "|" : "", (iomode) & IO_ASYNC ? "IO_ASYNC" : "" \
-                                                            , ((iomode) & IO_DIRECT) && ((iomode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK | IO_APPEND | IO_NONBLOCK | IO_SYNC | IO_ASYNC)) ? "|" : "", (iomode) & IO_DIRECT ? "IO_DIRECT" : ""
-#define __NRATRF0_kfstat                  "%d"
-#define __NRATRA0_kfstat(fd, statbuf)     , (int)(fd)
-#define __NRATRF1_kfstat                  "%p"
-#define __NRATRA1_kfstat(fd, statbuf)     , statbuf
-#define __NRATRF0_klstat                  "%q"
-#define __NRATRA0_klstat(filename, statbuf) , (validate_readable_opt(filename,1),filename)
-#define __NRATRF1_klstat                  "%p"
-#define __NRATRA1_klstat(filename, statbuf) , statbuf
-#define __NRATRF0_kstat                   "%q"
-#define __NRATRA0_kstat(filename, statbuf) , (validate_readable_opt(filename,1),filename)
-#define __NRATRF1_kstat                   "%p"
-#define __NRATRA1_kstat(filename, statbuf) , statbuf
-#define __NRATRF0_pwrite64f               "%d"
-#define __NRATRA0_pwrite64f(fd, buf, bufsize, offset, mode) , (int)(fd)
-#define __NRATRF1_pwrite64f               "%p"
-#define __NRATRA1_pwrite64f(fd, buf, bufsize, offset, mode) , buf
-#define __NRATRF2_pwrite64f               "%" PRIuSIZ
-#define __NRATRA2_pwrite64f(fd, buf, bufsize, offset, mode) , bufsize
-#define __NRATRF3_pwrite64f               "%" PRIu64
-#define __NRATRA3_pwrite64f(fd, buf, bufsize, offset, mode) , offset
-#define __NRATRF4_pwrite64f               "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NRATRA4_pwrite64f(fd, buf, bufsize, offset, mode) , (uintptr_t)(mode), (mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
-                                                            , ((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "", (mode) & IO_RDWR ? "IO_RDWR" : "" \
-                                                            , ((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY | IO_RDWR)) ? "|" : "", (mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
-                                                            , ((mode) & IO_CLOFORK) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC)) ? "|" : "", (mode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
-                                                            , ((mode) & IO_APPEND) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK)) ? "|" : "", (mode) & IO_APPEND ? "IO_APPEND" : "" \
-                                                            , ((mode) & IO_NONBLOCK) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK | IO_APPEND)) ? "|" : "", (mode) & IO_NONBLOCK ? "IO_NONBLOCK" : "" \
-                                                            , ((mode) & IO_SYNC) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK | IO_APPEND | IO_NONBLOCK)) ? "|" : "", (mode) & IO_SYNC ? "IO_SYNC" : "" \
-                                                            , ((mode) & IO_ASYNC) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK | IO_APPEND | IO_NONBLOCK | IO_SYNC)) ? "|" : "", (mode) & IO_ASYNC ? "IO_ASYNC" : "" \
-                                                            , ((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK | IO_APPEND | IO_NONBLOCK | IO_SYNC | IO_ASYNC)) ? "|" : "", (mode) & IO_DIRECT ? "IO_DIRECT" : ""
-#define __NRATRF0_pread64f                "%d"
-#define __NRATRA0_pread64f(fd, buf, bufsize, offset, mode) , (int)(fd)
-#define __NRATRF1_pread64f                "%p"
-#define __NRATRA1_pread64f(fd, buf, bufsize, offset, mode) , buf
-#define __NRATRF2_pread64f                "%" PRIuSIZ
-#define __NRATRA2_pread64f(fd, buf, bufsize, offset, mode) , bufsize
-#define __NRATRF3_pread64f                "%" PRIu64
-#define __NRATRA3_pread64f(fd, buf, bufsize, offset, mode) , offset
-#define __NRATRF4_pread64f                "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NRATRA4_pread64f(fd, buf, bufsize, offset, mode) , (uintptr_t)(mode), (mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
-                                                           , ((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "", (mode) & IO_RDWR ? "IO_RDWR" : "" \
-                                                           , ((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY | IO_RDWR)) ? "|" : "", (mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
-                                                           , ((mode) & IO_CLOFORK) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC)) ? "|" : "", (mode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
-                                                           , ((mode) & IO_APPEND) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK)) ? "|" : "", (mode) & IO_APPEND ? "IO_APPEND" : "" \
-                                                           , ((mode) & IO_NONBLOCK) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK | IO_APPEND)) ? "|" : "", (mode) & IO_NONBLOCK ? "IO_NONBLOCK" : "" \
-                                                           , ((mode) & IO_SYNC) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK | IO_APPEND | IO_NONBLOCK)) ? "|" : "", (mode) & IO_SYNC ? "IO_SYNC" : "" \
-                                                           , ((mode) & IO_ASYNC) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK | IO_APPEND | IO_NONBLOCK | IO_SYNC)) ? "|" : "", (mode) & IO_ASYNC ? "IO_ASYNC" : "" \
-                                                           , ((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK | IO_APPEND | IO_NONBLOCK | IO_SYNC | IO_ASYNC)) ? "|" : "", (mode) & IO_DIRECT ? "IO_DIRECT" : ""
-#define __NRATRF0_rt_sigtimedwait64       "%p"
-#define __NRATRA0_rt_sigtimedwait64(set, info, timeout, sigsetsize) , set
-#define __NRATRF1_rt_sigtimedwait64       "%p"
-#define __NRATRA1_rt_sigtimedwait64(set, info, timeout, sigsetsize) , info
-#define __NRATRF2_rt_sigtimedwait64       "%p"
-#define __NRATRA2_rt_sigtimedwait64(set, info, timeout, sigsetsize) , timeout
-#define __NRATRF3_rt_sigtimedwait64       "%" PRIuSIZ
-#define __NRATRA3_rt_sigtimedwait64(set, info, timeout, sigsetsize) , sigsetsize
-#define __NRATRF0_nanosleep64             "%p"
-#define __NRATRA0_nanosleep64(req, rem)   , req
-#define __NRATRF1_nanosleep64             "%p"
-#define __NRATRA1_nanosleep64(req, rem)   , rem
-#define __NRATRF0_sched_rr_get_interval64 "%" PRIdSIZ
-#define __NRATRA0_sched_rr_get_interval64(pid, tms) , (intptr_t)(pid)
-#define __NRATRF1_sched_rr_get_interval64 "%p"
-#define __NRATRA1_sched_rr_get_interval64(pid, tms) , tms
-#define __NRATRF0_ksysctl                 "%#" PRIxSIZ
-#define __NRATRA0_ksysctl(command, arg)   , (uintptr_t)(command)
-#define __NRATRF1_ksysctl                 "%p"
-#define __NRATRA1_ksysctl(command, arg)   , arg
-#define __NRATRF0_writevf                 "%d"
-#define __NRATRA0_writevf(fd, iovec, count, mode) , (int)(fd)
-#define __NRATRF1_writevf                 "%p"
-#define __NRATRA1_writevf(fd, iovec, count, mode) , iovec
-#define __NRATRF2_writevf                 "%" PRIuSIZ
-#define __NRATRA2_writevf(fd, iovec, count, mode) , count
-#define __NRATRF3_writevf                 "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NRATRA3_writevf(fd, iovec, count, mode) , (uintptr_t)(mode), (mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
-                                                  , ((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "", (mode) & IO_RDWR ? "IO_RDWR" : "" \
-                                                  , ((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY | IO_RDWR)) ? "|" : "", (mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
-                                                  , ((mode) & IO_CLOFORK) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC)) ? "|" : "", (mode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
-                                                  , ((mode) & IO_APPEND) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK)) ? "|" : "", (mode) & IO_APPEND ? "IO_APPEND" : "" \
-                                                  , ((mode) & IO_NONBLOCK) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK | IO_APPEND)) ? "|" : "", (mode) & IO_NONBLOCK ? "IO_NONBLOCK" : "" \
-                                                  , ((mode) & IO_SYNC) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK | IO_APPEND | IO_NONBLOCK)) ? "|" : "", (mode) & IO_SYNC ? "IO_SYNC" : "" \
-                                                  , ((mode) & IO_ASYNC) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK | IO_APPEND | IO_NONBLOCK | IO_SYNC)) ? "|" : "", (mode) & IO_ASYNC ? "IO_ASYNC" : "" \
-                                                  , ((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK | IO_APPEND | IO_NONBLOCK | IO_SYNC | IO_ASYNC)) ? "|" : "", (mode) & IO_DIRECT ? "IO_DIRECT" : ""
-#define __NRATRF0_readvf                  "%d"
-#define __NRATRA0_readvf(fd, iovec, count, mode) , (int)(fd)
-#define __NRATRF1_readvf                  "%p"
-#define __NRATRA1_readvf(fd, iovec, count, mode) , iovec
-#define __NRATRF2_readvf                  "%" PRIuSIZ
-#define __NRATRA2_readvf(fd, iovec, count, mode) , count
-#define __NRATRF3_readvf                  "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NRATRA3_readvf(fd, iovec, count, mode) , (uintptr_t)(mode), (mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
-                                                 , ((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "", (mode) & IO_RDWR ? "IO_RDWR" : "" \
-                                                 , ((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY | IO_RDWR)) ? "|" : "", (mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
-                                                 , ((mode) & IO_CLOFORK) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC)) ? "|" : "", (mode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
-                                                 , ((mode) & IO_APPEND) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK)) ? "|" : "", (mode) & IO_APPEND ? "IO_APPEND" : "" \
-                                                 , ((mode) & IO_NONBLOCK) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK | IO_APPEND)) ? "|" : "", (mode) & IO_NONBLOCK ? "IO_NONBLOCK" : "" \
-                                                 , ((mode) & IO_SYNC) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK | IO_APPEND | IO_NONBLOCK)) ? "|" : "", (mode) & IO_SYNC ? "IO_SYNC" : "" \
-                                                 , ((mode) & IO_ASYNC) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK | IO_APPEND | IO_NONBLOCK | IO_SYNC)) ? "|" : "", (mode) & IO_ASYNC ? "IO_ASYNC" : "" \
-                                                 , ((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK | IO_APPEND | IO_NONBLOCK | IO_SYNC | IO_ASYNC)) ? "|" : "", (mode) & IO_DIRECT ? "IO_DIRECT" : ""
-#define __NRATRF0_kreaddir                "%d"
-#define __NRATRA0_kreaddir(fd, buf, bufsize, mode) , (int)(fd)
-#define __NRATRF1_kreaddir                "%p"
-#define __NRATRA1_kreaddir(fd, buf, bufsize, mode) , buf
-#define __NRATRF2_kreaddir                "%" PRIuSIZ
-#define __NRATRA2_kreaddir(fd, buf, bufsize, mode) , bufsize
-#define __NRATRF3_kreaddir                "%#" PRIxSIZ "=%s%s%s%s%s%s%s"
-#define __NRATRA3_kreaddir(fd, buf, bufsize, mode) , (uintptr_t)(mode), (mode) & READDIR_CONTINUE ? "READDIR_CONTINUE" : (mode) ? "" : "READDIR_DEFAULT" \
-                                                   , ((mode) & READDIR_PEEK) && ((mode) & (READDIR_CONTINUE)) ? "|" : "", (mode) & READDIR_PEEK ? "READDIR_PEEK" : "" \
-                                                   , ((mode) & READDIR_SKIPREL) && ((mode) & (READDIR_CONTINUE | READDIR_PEEK)) ? "|" : "", (mode) & READDIR_SKIPREL ? "READDIR_SKIPREL" : "" \
-                                                   , ((mode) & READDIR_WANTEOF) && ((mode) & (READDIR_CONTINUE | READDIR_PEEK | READDIR_SKIPREL)) ? "|" : "", (mode) & READDIR_WANTEOF ? "READDIR_WANTEOF" : ""
-#define __NRATRF0_wait4_64                "%" PRIdSIZ
-#define __NRATRA0_wait4_64(pid, stat_loc, options, usage) , (intptr_t)(pid)
-#define __NRATRF1_wait4_64                "%p"
-#define __NRATRA1_wait4_64(pid, stat_loc, options, usage) , stat_loc
-#define __NRATRF2_wait4_64                "%#" PRIxSIZ "=%s%s%s%s%s%s%s"
-#define __NRATRA2_wait4_64(pid, stat_loc, options, usage) , (uintptr_t)(options), (options) & WNOHANG ? "WNOHANG" : "" \
-                                                          , ((options) & WUNTRACED) && ((options) & (WNOHANG)) ? "|" : "", (options) & WUNTRACED ? "WUNTRACED" : "" \
-                                                          , ((options) & WCONTINUED) && ((options) & (WNOHANG | WUNTRACED)) ? "|" : "", (options) & WCONTINUED ? "WCONTINUED" : "" \
-                                                          , ((options) & WNOWAIT) && ((options) & (WNOHANG | WUNTRACED | WCONTINUED)) ? "|" : "", (options) & WNOWAIT ? "WNOWAIT" : ""
-#define __NRATRF3_wait4_64                "%p"
-#define __NRATRA3_wait4_64(pid, stat_loc, options, usage) , usage
-#define __NRATRF0_getitimer64             "%#" PRIxSIZ
-#define __NRATRA0_getitimer64(which, curr_value) , (uintptr_t)(which)
-#define __NRATRF1_getitimer64             "%p"
-#define __NRATRA1_getitimer64(which, curr_value) , curr_value
-#define __NRATRF0_setitimer64             "%#" PRIxSIZ
-#define __NRATRA0_setitimer64(which, newval, oldval) , (uintptr_t)(which)
-#define __NRATRF1_setitimer64             "%p"
-#define __NRATRA1_setitimer64(which, newval, oldval) , newval
-#define __NRATRF2_setitimer64             "%p"
-#define __NRATRA2_setitimer64(which, newval, oldval) , oldval
-#define __NRATRF0_maplibrary              "%p"
-#define __NRATRA0_maplibrary(addr, flags, fd, hdrv, hdrc) , addr
-#define __NRATRF1_maplibrary              "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NRATRA1_maplibrary(addr, flags, fd, hdrv, hdrc) , (uintptr_t)(flags), (flags) & MAP_FIXED ? "MAP_FIXED" : "" \
-                                                          , ((flags) & MAP_LOCKED) && ((flags) & (MAP_FIXED)) ? "|" : "", (flags) & MAP_LOCKED ? "MAP_LOCKED" : "" \
-                                                          , ((flags) & MAP_NONBLOCK) && ((flags) & (MAP_FIXED | MAP_LOCKED)) ? "|" : "", (flags) & MAP_NONBLOCK ? "MAP_NONBLOCK" : "" \
-                                                          , ((flags) & MAP_NORESERVE) && ((flags) & (MAP_FIXED | MAP_LOCKED | MAP_NONBLOCK)) ? "|" : "", (flags) & MAP_NORESERVE ? "MAP_NORESERVE" : "" \
-                                                          , ((flags) & MAP_POPULATE) && ((flags) & (MAP_FIXED | MAP_LOCKED | MAP_NONBLOCK | MAP_NORESERVE)) ? "|" : "", (flags) & MAP_POPULATE ? "MAP_POPULATE" : "" \
-                                                          , ((flags) & MAP_SYNC) && ((flags) & (MAP_FIXED | MAP_LOCKED | MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE)) ? "|" : "", (flags) & MAP_SYNC ? "MAP_SYNC" : "" \
-                                                          , ((flags) & MAP_DONT_MAP) && ((flags) & (MAP_FIXED | MAP_LOCKED | MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE | MAP_SYNC)) ? "|" : "", (flags) & MAP_DONT_MAP ? "MAP_DONT_MAP" : "" \
-                                                          , ((flags) & MAP_DONT_OVERRIDE) && ((flags) & (MAP_FIXED | MAP_LOCKED | MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE | MAP_SYNC | MAP_DONT_MAP)) ? "|" : "", (flags) & MAP_DONT_OVERRIDE ? "MAP_DONT_OVERRIDE" : ""
-#define __NRATRF2_maplibrary              "%d"
-#define __NRATRA2_maplibrary(addr, flags, fd, hdrv, hdrc) , (int)(fd)
-#define __NRATRF3_maplibrary              "%p"
-#define __NRATRA3_maplibrary(addr, flags, fd, hdrv, hdrc) , hdrv
-#define __NRATRF4_maplibrary              "%" PRIuSIZ
-#define __NRATRA4_maplibrary(addr, flags, fd, hdrv, hdrc) , hdrc
-#define __NRATRF0_select64                "%" PRIuSIZ
-#define __NRATRA0_select64(nfds, readfds, writefds, exceptfds, timeout) , nfds
-#define __NRATRF1_select64                "%p"
-#define __NRATRA1_select64(nfds, readfds, writefds, exceptfds, timeout) , readfds
-#define __NRATRF2_select64                "%p"
-#define __NRATRA2_select64(nfds, readfds, writefds, exceptfds, timeout) , writefds
-#define __NRATRF3_select64                "%p"
-#define __NRATRA3_select64(nfds, readfds, writefds, exceptfds, timeout) , exceptfds
-#define __NRATRF4_select64                "%p"
-#define __NRATRA4_select64(nfds, readfds, writefds, exceptfds, timeout) , timeout
-#define __NRATRF0_settimeofday64          "%p"
-#define __NRATRA0_settimeofday64(tv, tz)  , tv
-#define __NRATRF1_settimeofday64          "%p"
-#define __NRATRA1_settimeofday64(tv, tz)  , tz
-#define __NRATRF0_gettimeofday64          "%p"
-#define __NRATRA0_gettimeofday64(tv, tz)  , tv
-#define __NRATRF1_gettimeofday64          "%p"
-#define __NRATRA1_gettimeofday64(tv, tz)  , tz
-#define __NRATRF0_getrusage64             "%" PRIdSIZ
-#define __NRATRA0_getrusage64(who, tv)    , (intptr_t)(who)
-#define __NRATRF1_getrusage64             "%p"
-#define __NRATRA1_getrusage64(who, tv)    , tv
-#define __NRATRF0_fsmode                  "%" PRIu64
-#define __NRATRA0_fsmode(mode)            , mode
-#define __NRATRF0_ioctlf                  "%d"
-#define __NRATRA0_ioctlf(fd, command, mode, arg) , (int)(fd)
-#define __NRATRF1_ioctlf                  "%#" PRIxSIZ
-#define __NRATRA1_ioctlf(fd, command, mode, arg) , (uintptr_t)(command)
-#define __NRATRF2_ioctlf                  "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NRATRA2_ioctlf(fd, command, mode, arg) , (uintptr_t)(mode), (mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
-                                                 , ((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "", (mode) & IO_RDWR ? "IO_RDWR" : "" \
-                                                 , ((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY | IO_RDWR)) ? "|" : "", (mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
-                                                 , ((mode) & IO_CLOFORK) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC)) ? "|" : "", (mode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
-                                                 , ((mode) & IO_APPEND) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK)) ? "|" : "", (mode) & IO_APPEND ? "IO_APPEND" : "" \
-                                                 , ((mode) & IO_NONBLOCK) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK | IO_APPEND)) ? "|" : "", (mode) & IO_NONBLOCK ? "IO_NONBLOCK" : "" \
-                                                 , ((mode) & IO_SYNC) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK | IO_APPEND | IO_NONBLOCK)) ? "|" : "", (mode) & IO_SYNC ? "IO_SYNC" : "" \
-                                                 , ((mode) & IO_ASYNC) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK | IO_APPEND | IO_NONBLOCK | IO_SYNC)) ? "|" : "", (mode) & IO_ASYNC ? "IO_ASYNC" : "" \
-                                                 , ((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK | IO_APPEND | IO_NONBLOCK | IO_SYNC | IO_ASYNC)) ? "|" : "", (mode) & IO_DIRECT ? "IO_DIRECT" : ""
-#define __NRATRF3_ioctlf                  "%p"
-#define __NRATRA3_ioctlf(fd, command, mode, arg) , arg
-#define __NRATRF0_ftime64                 "%p"
-#define __NRATRA0_ftime64(tp)             , tp
-#define __NRATRF0_utime64                 "%q"
-#define __NRATRA0_utime64(filename, times) , (validate_readable_opt(filename,1),filename)
-#define __NRATRF1_utime64                 "%p"
-#define __NRATRA1_utime64(filename, times) , times
-#define __NRATRF0_userviofd               "%" PRIuSIZ
-#define __NRATRA0_userviofd(initial_size, flags) , initial_size
-#define __NRATRF1_userviofd               "%#" PRIxSIZ
-#define __NRATRA1_userviofd(initial_size, flags) , (uintptr_t)(flags)
-#define __NRATRF0_process_spawnveat       "%d"
-#define __NRATRA0_process_spawnveat(dirfd, pathname, argv, envp, flags, actions) , (int)(dirfd)
-#define __NRATRF1_process_spawnveat       "%q"
-#define __NRATRA1_process_spawnveat(dirfd, pathname, argv, envp, flags, actions) , (validate_readable_opt(pathname,1),pathname)
-#define __NRATRF2_process_spawnveat       "%p"
-#define __NRATRA2_process_spawnveat(dirfd, pathname, argv, envp, flags, actions) , argv
-#define __NRATRF3_process_spawnveat       "%p"
-#define __NRATRA3_process_spawnveat(dirfd, pathname, argv, envp, flags, actions) , envp
-#define __NRATRF4_process_spawnveat       "%#" PRIxSIZ "=%s%s%s%s%s"
-#define __NRATRA4_process_spawnveat(dirfd, pathname, argv, envp, flags, actions) , (uintptr_t)(flags), (flags) & AT_EMPTY_PATH ? "AT_EMPTY_PATH" : "" \
-                                                                                 , ((flags) & AT_SYMLINK_NOFOLLOW) && ((flags) & (AT_EMPTY_PATH)) ? "|" : "", (flags) & AT_SYMLINK_NOFOLLOW ? "AT_SYMLINK_NOFOLLOW" : "" \
-                                                                                 , ((flags) & AT_DOSPATH) && ((flags) & (AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW)) ? "|" : "", (flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
-#define __NRATRF5_process_spawnveat       "%p"
-#define __NRATRA5_process_spawnveat(dirfd, pathname, argv, envp, flags, actions) , actions
-#define __NRATRF0_stime64                 "%p"
-#define __NRATRA0_stime64(t)              , t
-#define __NRATRF0_coredump                "%p"
-#define __NRATRA0_coredump(curr_state, orig_state, traceback_vector, traceback_length, exception, unwind_error) , curr_state
-#define __NRATRF1_coredump                "%p"
-#define __NRATRA1_coredump(curr_state, orig_state, traceback_vector, traceback_length, exception, unwind_error) , orig_state
-#define __NRATRF2_coredump                "%p"
-#define __NRATRA2_coredump(curr_state, orig_state, traceback_vector, traceback_length, exception, unwind_error) , traceback_vector
-#define __NRATRF3_coredump                "%" PRIuSIZ
-#define __NRATRA3_coredump(curr_state, orig_state, traceback_vector, traceback_length, exception, unwind_error) , traceback_length
-#define __NRATRF4_coredump                "%p"
-#define __NRATRA4_coredump(curr_state, orig_state, traceback_vector, traceback_length, exception, unwind_error) , exception
-#define __NRATRF5_coredump                "%#" PRIxSIZ
-#define __NRATRA5_coredump(curr_state, orig_state, traceback_vector, traceback_length, exception, unwind_error) , (uintptr_t)(unwind_error)
-#define __NRATRF0_raiseat                 "%p"
-#define __NRATRA0_raiseat(state, si)      , state
-#define __NRATRF1_raiseat                 "%p"
-#define __NRATRA1_raiseat(state, si)      , si
-#define __NRATRF0_mktty                   "%d"
-#define __NRATRA0_mktty(keyboard, display, name, rsvd) , (int)(keyboard)
-#define __NRATRF1_mktty                   "%d"
-#define __NRATRA1_mktty(keyboard, display, name, rsvd) , (int)(display)
-#define __NRATRF2_mktty                   "%q"
-#define __NRATRA2_mktty(keyboard, display, name, rsvd) , (validate_readable_opt(name,1),name)
-#define __NRATRF3_mktty                   "%#" PRIxSIZ
-#define __NRATRA3_mktty(keyboard, display, name, rsvd) , (uintptr_t)(rsvd)
-#define __NRATRF0_lfutexlockexpr          "%p"
-#define __NRATRA0_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) , ulockaddr
-#define __NRATRF1_lfutexlockexpr          "%p"
-#define __NRATRA1_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) , base
-#define __NRATRF2_lfutexlockexpr          "%" PRIuSIZ
-#define __NRATRA2_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) , exprc
-#define __NRATRF3_lfutexlockexpr          "%p"
-#define __NRATRA3_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) , exprv
-#define __NRATRF4_lfutexlockexpr          "%p"
-#define __NRATRA4_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) , timeout
-#define __NRATRF5_lfutexlockexpr          "%#" PRIxSIZ
-#define __NRATRA5_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) , (uintptr_t)(timeout_flags)
-#define __NRATRF0_lfutexexpr              "%p"
-#define __NRATRA0_lfutexexpr(base, exprc, exprv, timeout, timeout_flags) , base
-#define __NRATRF1_lfutexexpr              "%" PRIuSIZ
-#define __NRATRA1_lfutexexpr(base, exprc, exprv, timeout, timeout_flags) , exprc
-#define __NRATRF2_lfutexexpr              "%p"
-#define __NRATRA2_lfutexexpr(base, exprc, exprv, timeout, timeout_flags) , exprv
-#define __NRATRF3_lfutexexpr              "%p"
-#define __NRATRA3_lfutexexpr(base, exprc, exprv, timeout, timeout_flags) , timeout
-#define __NRATRF4_lfutexexpr              "%#" PRIxSIZ
-#define __NRATRA4_lfutexexpr(base, exprc, exprv, timeout, timeout_flags) , (uintptr_t)(timeout_flags)
-#define __NRATRF0_lseek64                 "%d"
-#define __NRATRA0_lseek64(fd, offset, whence) , (int)(fd)
-#define __NRATRF1_lseek64                 "%" PRId64
-#define __NRATRA1_lseek64(fd, offset, whence) , offset
-#define __NRATRF2_lseek64                 "%#Ix=%s"
-#define __NRATRA2_lseek64(fd, offset, whence) , (whence), (whence) == SEEK_SET ? "SEEK_SET" : (whence) == SEEK_CUR ? "SEEK_CUR" : (whence) == SEEK_END ? "SEEK_END" : (whence) == SEEK_DATA ? "SEEK_DATA" : (whence) == SEEK_HOLE ? "SEEK_HOLE" : "?"
-#define __NRATRF0_lfutex                  "%p"
-#define __NRATRA0_lfutex(uaddr, futex_op, val, timeout, val2) , uaddr
-#define __NRATRF1_lfutex                  "%#" PRIxSIZ
-#define __NRATRA1_lfutex(uaddr, futex_op, val, timeout, val2) , (uintptr_t)(futex_op)
-#define __NRATRF2_lfutex                  "%" PRIu32
-#define __NRATRA2_lfutex(uaddr, futex_op, val, timeout, val2) , val
-#define __NRATRF3_lfutex                  "%p"
-#define __NRATRA3_lfutex(uaddr, futex_op, val, timeout, val2) , timeout
-#define __NRATRF4_lfutex                  "%" PRIu32
-#define __NRATRA4_lfutex(uaddr, futex_op, val, timeout, val2) , val2
-#define __NRATRF0_debugtrap               "%p"
-#define __NRATRA0_debugtrap(state, reason) , state
-#define __NRATRF1_debugtrap               "%p"
-#define __NRATRA1_debugtrap(state, reason) , reason
-#define __NRATRF0_set_library_listdef     "%p"
-#define __NRATRA0_set_library_listdef(listdef) , listdef
-#define __NRATRF0_get_exception_handler   "%p"
-#define __NRATRA0_get_exception_handler(pmode, phandler, phandler_sp) , pmode
-#define __NRATRF1_get_exception_handler   "%p"
-#define __NRATRA1_get_exception_handler(pmode, phandler, phandler_sp) , phandler
-#define __NRATRF2_get_exception_handler   "%p"
-#define __NRATRA2_get_exception_handler(pmode, phandler, phandler_sp) , phandler_sp
-#define __NRATRF0_set_exception_handler   "%#" PRIxSIZ
-#define __NRATRA0_set_exception_handler(mode, handler, handler_sp) , (uintptr_t)(mode)
-#define __NRATRF1_set_exception_handler   "%p"
-#define __NRATRA1_set_exception_handler(mode, handler, handler_sp) , handler
-#define __NRATRF2_set_exception_handler   "%p"
-#define __NRATRA2_set_exception_handler(mode, handler, handler_sp) , handler_sp
-#define __NRATRF0_time64                  "%p"
-#define __NRATRA0_time64(timer)           , timer
-#define __NRATRF0_fchdirat                "%d"
-#define __NRATRA0_fchdirat(dirfd, path, flags) , (int)(dirfd)
-#define __NRATRF1_fchdirat                "%q"
-#define __NRATRA1_fchdirat(dirfd, path, flags) , (validate_readable_opt(path,1),path)
-#define __NRATRF2_fchdirat                "%#" PRIxSIZ "=%s"
-#define __NRATRA2_fchdirat(dirfd, path, flags) , (uintptr_t)(flags), (flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
-#define __NRATRF0_openpty                 "%p"
-#define __NRATRA0_openpty(amaster, aslave, name, termp, winp) , amaster
-#define __NRATRF1_openpty                 "%p"
-#define __NRATRA1_openpty(amaster, aslave, name, termp, winp) , aslave
-#define __NRATRF2_openpty                 "%p"
-#define __NRATRA2_openpty(amaster, aslave, name, termp, winp) , name
-#define __NRATRF3_openpty                 "%p"
-#define __NRATRA3_openpty(amaster, aslave, name, termp, winp) , termp
-#define __NRATRF4_openpty                 "%p"
-#define __NRATRA4_openpty(amaster, aslave, name, termp, winp) , winp
-#define __NRATRF0_rpc_schedule            "%" PRIdSIZ
-#define __NRATRA0_rpc_schedule(target, flags, program, arguments) , (intptr_t)(target)
-#define __NRATRF1_rpc_schedule            "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NRATRA1_rpc_schedule(target, flags, program, arguments) , (uintptr_t)(flags), (flags) & RPC_SCHEDULE_ASYNC ? "RPC_SCHEDULE_ASYNC" : (flags) ? "" : "RPC_SCHEDULE_SYNC" \
-                                                                  , ((flags) & RPC_SCHEDULE_FLAG_NONSYSCALL) && ((flags) & (RPC_SCHEDULE_ASYNC)) ? "|" : "", (flags) & RPC_SCHEDULE_FLAG_NONSYSCALL ? "RPC_SCHEDULE_FLAG_NONSYSCALL" : "" \
-                                                                  , ((flags) & RPC_SCHEDULE_FLAG_WAITFORSTART) && ((flags) & (RPC_SCHEDULE_ASYNC | RPC_SCHEDULE_FLAG_NONSYSCALL)) ? "|" : "", (flags) & RPC_SCHEDULE_FLAG_WAITFORSTART ? "RPC_SCHEDULE_FLAG_WAITFORSTART" : "" \
-                                                                  , ((flags) & RPC_SCHEDULE_FLAG_STATUSFUTEX) && ((flags) & (RPC_SCHEDULE_ASYNC | RPC_SCHEDULE_FLAG_NONSYSCALL | RPC_SCHEDULE_FLAG_WAITFORSTART)) ? "|" : "", (flags) & RPC_SCHEDULE_FLAG_STATUSFUTEX ? "RPC_SCHEDULE_FLAG_STATUSFUTEX" : "" \
-                                                                  , ((flags) & RPC_SCHEDULE_FLAG_SYSRESTART) && ((flags) & (RPC_SCHEDULE_ASYNC | RPC_SCHEDULE_FLAG_NONSYSCALL | RPC_SCHEDULE_FLAG_WAITFORSTART | RPC_SCHEDULE_FLAG_STATUSFUTEX)) ? "|" : "", (flags) & RPC_SCHEDULE_FLAG_SYSRESTART ? "RPC_SCHEDULE_FLAG_SYSRESTART" : "" \
-                                                                  , ((flags) & RPC_SCHEDULE_FLAG_NOSYSRESTART) && ((flags) & (RPC_SCHEDULE_ASYNC | RPC_SCHEDULE_FLAG_NONSYSCALL | RPC_SCHEDULE_FLAG_WAITFORSTART | RPC_SCHEDULE_FLAG_STATUSFUTEX | RPC_SCHEDULE_FLAG_SYSRESTART)) ? "|" : "", (flags) & RPC_SCHEDULE_FLAG_NOSYSRESTART ? "RPC_SCHEDULE_FLAG_NOSYSRESTART" : "" \
-                                                                  , ((flags) & RPC_SCHEDULE_FLAG_WAITSMPACK) && ((flags) & (RPC_SCHEDULE_ASYNC | RPC_SCHEDULE_FLAG_NONSYSCALL | RPC_SCHEDULE_FLAG_WAITFORSTART | RPC_SCHEDULE_FLAG_STATUSFUTEX | RPC_SCHEDULE_FLAG_SYSRESTART | RPC_SCHEDULE_FLAG_NOSYSRESTART)) ? "|" : "", (flags) & RPC_SCHEDULE_FLAG_WAITSMPACK ? "RPC_SCHEDULE_FLAG_WAITSMPACK" : "" \
-                                                                  , ((flags) & RPC_SCHEDULE_FLAG_DONTWAKE) && ((flags) & (RPC_SCHEDULE_ASYNC | RPC_SCHEDULE_FLAG_NONSYSCALL | RPC_SCHEDULE_FLAG_WAITFORSTART | RPC_SCHEDULE_FLAG_STATUSFUTEX | RPC_SCHEDULE_FLAG_SYSRESTART | RPC_SCHEDULE_FLAG_NOSYSRESTART | RPC_SCHEDULE_FLAG_WAITSMPACK)) ? "|" : "", (flags) & RPC_SCHEDULE_FLAG_DONTWAKE ? "RPC_SCHEDULE_FLAG_DONTWAKE" : "" \
-                                                                  , ((flags) & RPC_SCHEDULE_FLAG_HIGHPRIO) && ((flags) & (RPC_SCHEDULE_ASYNC | RPC_SCHEDULE_FLAG_NONSYSCALL | RPC_SCHEDULE_FLAG_WAITFORSTART | RPC_SCHEDULE_FLAG_STATUSFUTEX | RPC_SCHEDULE_FLAG_SYSRESTART | RPC_SCHEDULE_FLAG_NOSYSRESTART | RPC_SCHEDULE_FLAG_WAITSMPACK | RPC_SCHEDULE_FLAG_DONTWAKE)) ? "|" : "", (flags) & RPC_SCHEDULE_FLAG_HIGHPRIO ? "RPC_SCHEDULE_FLAG_HIGHPRIO" : "" \
-                                                                  , ((flags) & RPC_SCHEDULE_FLAG_LOWPRIO) && ((flags) & (RPC_SCHEDULE_ASYNC | RPC_SCHEDULE_FLAG_NONSYSCALL | RPC_SCHEDULE_FLAG_WAITFORSTART | RPC_SCHEDULE_FLAG_STATUSFUTEX | RPC_SCHEDULE_FLAG_SYSRESTART | RPC_SCHEDULE_FLAG_NOSYSRESTART | RPC_SCHEDULE_FLAG_WAITSMPACK | RPC_SCHEDULE_FLAG_DONTWAKE | RPC_SCHEDULE_FLAG_HIGHPRIO)) ? "|" : "", (flags) & RPC_SCHEDULE_FLAG_LOWPRIO ? "RPC_SCHEDULE_FLAG_LOWPRIO" : ""
-#define __NRATRF2_rpc_schedule            "%p"
-#define __NRATRA2_rpc_schedule(target, flags, program, arguments) , program
-#define __NRATRF3_rpc_schedule            "%p"
-#define __NRATRA3_rpc_schedule(target, flags, program, arguments) , arguments
-#define __NRATRF0_frealpathat             "%d"
-#define __NRATRA0_frealpathat(dirfd, filename, buf, buflen, flags) , (int)(dirfd)
-#define __NRATRF1_frealpathat             "%q"
-#define __NRATRA1_frealpathat(dirfd, filename, buf, buflen, flags) , (validate_readable_opt(filename,1),filename)
-#define __NRATRF2_frealpathat             "%p"
-#define __NRATRA2_frealpathat(dirfd, filename, buf, buflen, flags) , buf
-#define __NRATRF3_frealpathat             "%" PRIuSIZ
-#define __NRATRA3_frealpathat(dirfd, filename, buf, buflen, flags) , buflen
-#define __NRATRF4_frealpathat             "%#" PRIxSIZ "=%s%s%s%s%s%s%s"
-#define __NRATRA4_frealpathat(dirfd, filename, buf, buflen, flags) , (uintptr_t)(flags), (flags) & AT_ALTPATH ? "AT_ALTPATH" : "" \
-                                                                   , ((flags) & AT_SYMLINK_NOFOLLOW) && ((flags) & (AT_ALTPATH)) ? "|" : "", (flags) & AT_SYMLINK_NOFOLLOW ? "AT_SYMLINK_NOFOLLOW" : "" \
-                                                                   , ((flags) & AT_READLINK_REQSIZE) && ((flags) & (AT_ALTPATH | AT_SYMLINK_NOFOLLOW)) ? "|" : "", (flags) & AT_READLINK_REQSIZE ? "AT_READLINK_REQSIZE" : "" \
-                                                                   , ((flags) & AT_DOSPATH) && ((flags) & (AT_ALTPATH | AT_SYMLINK_NOFOLLOW | AT_READLINK_REQSIZE)) ? "|" : "", (flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
-#define __NRATRF0_frealpath4              "%d"
-#define __NRATRA0_frealpath4(fd, resolved, buflen, flags) , (int)(fd)
-#define __NRATRF1_frealpath4              "%p"
-#define __NRATRA1_frealpath4(fd, resolved, buflen, flags) , resolved
-#define __NRATRF2_frealpath4              "%" PRIuSIZ
-#define __NRATRA2_frealpath4(fd, resolved, buflen, flags) , buflen
-#define __NRATRF3_frealpath4              "%#" PRIxSIZ "=%s%s%s%s%s"
-#define __NRATRA3_frealpath4(fd, resolved, buflen, flags) , (uintptr_t)(flags), (flags) & AT_ALTPATH ? "AT_ALTPATH" : "" \
-                                                          , ((flags) & AT_READLINK_REQSIZE) && ((flags) & (AT_ALTPATH)) ? "|" : "", (flags) & AT_READLINK_REQSIZE ? "AT_READLINK_REQSIZE" : "" \
-                                                          , ((flags) & AT_DOSPATH) && ((flags) & (AT_ALTPATH | AT_READLINK_REQSIZE)) ? "|" : "", (flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
-#define __NRATRF0_detach                  "%" PRIdSIZ
-#define __NRATRA0_detach(pid)             , (intptr_t)(pid)
-#define __NRATRF0_writef                  "%d"
-#define __NRATRA0_writef(fd, buf, bufsize, mode) , (int)(fd)
-#define __NRATRF1_writef                  "%p"
-#define __NRATRA1_writef(fd, buf, bufsize, mode) , buf
-#define __NRATRF2_writef                  "%" PRIuSIZ
-#define __NRATRA2_writef(fd, buf, bufsize, mode) , bufsize
-#define __NRATRF3_writef                  "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NRATRA3_writef(fd, buf, bufsize, mode) , (uintptr_t)(mode), (mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
-                                                 , ((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "", (mode) & IO_RDWR ? "IO_RDWR" : "" \
-                                                 , ((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY | IO_RDWR)) ? "|" : "", (mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
-                                                 , ((mode) & IO_CLOFORK) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC)) ? "|" : "", (mode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
-                                                 , ((mode) & IO_APPEND) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK)) ? "|" : "", (mode) & IO_APPEND ? "IO_APPEND" : "" \
-                                                 , ((mode) & IO_NONBLOCK) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK | IO_APPEND)) ? "|" : "", (mode) & IO_NONBLOCK ? "IO_NONBLOCK" : "" \
-                                                 , ((mode) & IO_SYNC) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK | IO_APPEND | IO_NONBLOCK)) ? "|" : "", (mode) & IO_SYNC ? "IO_SYNC" : "" \
-                                                 , ((mode) & IO_ASYNC) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK | IO_APPEND | IO_NONBLOCK | IO_SYNC)) ? "|" : "", (mode) & IO_ASYNC ? "IO_ASYNC" : "" \
-                                                 , ((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK | IO_APPEND | IO_NONBLOCK | IO_SYNC | IO_ASYNC)) ? "|" : "", (mode) & IO_DIRECT ? "IO_DIRECT" : ""
-#define __NRATRF0_readf                   "%d"
-#define __NRATRA0_readf(fd, buf, bufsize, mode) , (int)(fd)
-#define __NRATRF1_readf                   "%p"
-#define __NRATRA1_readf(fd, buf, bufsize, mode) , buf
-#define __NRATRF2_readf                   "%" PRIuSIZ
-#define __NRATRA2_readf(fd, buf, bufsize, mode) , bufsize
-#define __NRATRF3_readf                   "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NRATRA3_readf(fd, buf, bufsize, mode) , (uintptr_t)(mode), (mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
-                                                , ((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "", (mode) & IO_RDWR ? "IO_RDWR" : "" \
-                                                , ((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY | IO_RDWR)) ? "|" : "", (mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
-                                                , ((mode) & IO_CLOFORK) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC)) ? "|" : "", (mode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
-                                                , ((mode) & IO_APPEND) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK)) ? "|" : "", (mode) & IO_APPEND ? "IO_APPEND" : "" \
-                                                , ((mode) & IO_NONBLOCK) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK | IO_APPEND)) ? "|" : "", (mode) & IO_NONBLOCK ? "IO_NONBLOCK" : "" \
-                                                , ((mode) & IO_SYNC) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK | IO_APPEND | IO_NONBLOCK)) ? "|" : "", (mode) & IO_SYNC ? "IO_SYNC" : "" \
-                                                , ((mode) & IO_ASYNC) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK | IO_APPEND | IO_NONBLOCK | IO_SYNC)) ? "|" : "", (mode) & IO_ASYNC ? "IO_ASYNC" : "" \
-                                                , ((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK | IO_APPEND | IO_NONBLOCK | IO_SYNC | IO_ASYNC)) ? "|" : "", (mode) & IO_DIRECT ? "IO_DIRECT" : ""
-#define __NRATRF0_hopf                    "%d"
-#define __NRATRA0_hopf(fd, command, mode, arg) , (int)(fd)
-#define __NRATRF1_hopf                    "%#" PRIxSIZ
-#define __NRATRA1_hopf(fd, command, mode, arg) , (uintptr_t)(command)
-#define __NRATRF2_hopf                    "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NRATRA2_hopf(fd, command, mode, arg) , (uintptr_t)(mode), (mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
-                                               , ((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "", (mode) & IO_RDWR ? "IO_RDWR" : "" \
-                                               , ((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY | IO_RDWR)) ? "|" : "", (mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
-                                               , ((mode) & IO_CLOFORK) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC)) ? "|" : "", (mode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
-                                               , ((mode) & IO_APPEND) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK)) ? "|" : "", (mode) & IO_APPEND ? "IO_APPEND" : "" \
-                                               , ((mode) & IO_NONBLOCK) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK | IO_APPEND)) ? "|" : "", (mode) & IO_NONBLOCK ? "IO_NONBLOCK" : "" \
-                                               , ((mode) & IO_SYNC) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK | IO_APPEND | IO_NONBLOCK)) ? "|" : "", (mode) & IO_SYNC ? "IO_SYNC" : "" \
-                                               , ((mode) & IO_ASYNC) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK | IO_APPEND | IO_NONBLOCK | IO_SYNC)) ? "|" : "", (mode) & IO_ASYNC ? "IO_ASYNC" : "" \
-                                               , ((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY | IO_RDWR | IO_CLOEXEC | IO_CLOFORK | IO_APPEND | IO_NONBLOCK | IO_SYNC | IO_ASYNC)) ? "|" : "", (mode) & IO_DIRECT ? "IO_DIRECT" : ""
-#define __NRATRF3_hopf                    "%p"
-#define __NRATRA3_hopf(fd, command, mode, arg) , arg
-#define __NRATRF0_hop                     "%d"
-#define __NRATRA0_hop(fd, command, arg)   , (int)(fd)
-#define __NRATRF1_hop                     "%#" PRIxSIZ
-#define __NRATRA1_hop(fd, command, arg)   , (uintptr_t)(command)
-#define __NRATRF2_hop                     "%p"
-#define __NRATRA2_hop(fd, command, arg)   , arg
+#define __NRRTR_restart_syscall          SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_exit                    SC_REPR_EXIT_STATUS                                                  /* status */ 
+#define __NRRTR_exit                     SC_REPR_INT                                                          /* return */
+#define __NRRTR_fork                     SC_REPR_PID_T                                                        /* return */
+#define __NRATR0_read                    SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_read                    SC_REPR_OUTBUF                                                       /* buf */ 
+#define __NRATL1_read                    2                                                                    /* buf -> bufsize */ 
+#define __NRATR2_read                    SC_REPR_SIZE_T                                                       /* bufsize */ 
+#define __NRRTR_read                     SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_write                   SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_write                   SC_REPR_INBUF                                                        /* buf */ 
+#define __NRATL1_write                   2                                                                    /* buf -> bufsize */ 
+#define __NRATR2_write                   SC_REPR_SIZE_T                                                       /* bufsize */ 
+#define __NRRTR_write                    SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_open                    SC_REPR_FILENAME                                                     /* filename */ 
+#define __NRATR1_open                    SC_REPR_OFLAG_T                                                      /* oflags */ 
+#define __NRATR2_open                    SC_REPR_MODE_T                                                       /* mode */ 
+#define __NRRTR_open                     SC_REPR_FD_T                                                         /* return */
+#define __NRATR0_close                   SC_REPR_FD_T                                                         /* fd */ 
+#define __NRRTR_close                    SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_waitpid                 SC_REPR_PID_T                                                        /* pid */ 
+#define __NRATR1_waitpid                 SC_REPR_POINTER                                                      /* stat_loc */ 
+#define __NRATR2_waitpid                 SC_REPR_WAITFLAG                                                     /* options */ 
+#define __NRRTR_waitpid                  SC_REPR_PID_T                                                        /* return */
+#define __NRATR0_creat                   SC_REPR_FILENAME                                                     /* filename */ 
+#define __NRATR1_creat                   SC_REPR_MODE_T                                                       /* mode */ 
+#define __NRRTR_creat                    SC_REPR_FD_T                                                         /* return */
+#define __NRATR0_link                    SC_REPR_FILENAME                                                     /* existing_file */ 
+#define __NRATR1_link                    SC_REPR_FILENAME                                                     /* link_file */ 
+#define __NRRTR_link                     SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_unlink                  SC_REPR_FILENAME                                                     /* filename */ 
+#define __NRRTR_unlink                   SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_execve                  SC_REPR_STRING                                                       /* path */ 
+#define __NRATR1_execve                  SC_REPR_STRING_VECTOR32                                              /* argv */ 
+#define __NRATR2_execve                  SC_REPR_STRING_VECTOR32                                              /* envp */ 
+#define __NRRTR_execve                   SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_chdir                   SC_REPR_FILENAME                                                     /* path */ 
+#define __NRRTR_chdir                    SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_time                    SC_REPR_POINTER                                                      /* timer */ 
+#define __NRRTR_time                     SC_REPR_TIME                                                         /* return */
+#define __NRATR0_mknod                   SC_REPR_FILENAME                                                     /* nodename */ 
+#define __NRATR1_mknod                   SC_REPR_MODE_T                                                       /* mode */ 
+#define __NRATR2_mknod                   SC_REPR_DEV_T                                                        /* dev */ 
+#define __NRRTR_mknod                    SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_chmod                   SC_REPR_FILENAME                                                     /* filename */ 
+#define __NRATR1_chmod                   SC_REPR_MODE_T                                                       /* mode */ 
+#define __NRRTR_chmod                    SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_lchown                  SC_REPR_FILENAME                                                     /* filename */ 
+#define __NRATR1_lchown                  SC_REPR_UID_T                                                        /* owner */ 
+#define __NRATR2_lchown                  SC_REPR_GID_T                                                        /* group */ 
+#define __NRRTR_lchown                   SC_REPR_ERRNO_T                                                      /* return */
+#define __NRRTR_break                    SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_linux_oldstat           SC_REPR_FILENAME                                                     /* filename */ 
+#define __NRATR1_linux_oldstat           SC_REPR_POINTER                                                      /* statbuf */ 
+#define __NRRTR_linux_oldstat            SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_lseek                   SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_lseek                   SC_REPR_SYSCALL_SLONG_T                                              /* offset */ 
+#define __NRATR2_lseek                   SC_REPR_SEEK_WHENCE                                                  /* whence */ 
+#define __NRRTR_lseek                    SC_REPR_SYSCALL_SLONG_T                                              /* return */
+#define __NRRTR_getpid                   SC_REPR_PID_T                                                        /* return */
+#define __NRATR0_mount                   SC_REPR_FILENAME                                                     /* special_file */ 
+#define __NRATR1_mount                   SC_REPR_FILENAME                                                     /* dir */ 
+#define __NRATR2_mount                   SC_REPR_STRING                                                       /* fstype */ 
+#define __NRATR3_mount                   SC_REPR_MOUNT_FLAGS                                                  /* mountflags */ 
+#define __NRATR4_mount                   SC_REPR_POINTER                                                      /* data */ 
+#define __NRRTR_mount                    SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_umount                  SC_REPR_STRING                                                       /* special_file */ 
+#define __NRRTR_umount                   SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_setuid                  SC_REPR_UID_T                                                        /* uid */ 
+#define __NRRTR_setuid                   SC_REPR_ERRNO_T                                                      /* return */
+#define __NRRTR_getuid                   SC_REPR_UINT16_T                                                     /* return */
+#define __NRATR0_stime                   SC_REPR_POINTER                                                      /* t */ 
+#define __NRRTR_stime                    SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_ptrace                  SC_REPR_SYSCALL_ULONG_T                                              /* request */ 
+#define __NRATR1_ptrace                  SC_REPR_PID_T                                                        /* pid */ 
+#define __NRATR2_ptrace                  SC_REPR_POINTER                                                      /* addr */ 
+#define __NRATR3_ptrace                  SC_REPR_POINTER                                                      /* data */ 
+#define __NRRTR_ptrace                   SC_REPR_SYSCALL_SLONG_T                                              /* return */
+#define __NRATR0_alarm                   SC_REPR_SYSCALL_ULONG_T                                              /* seconds */ 
+#define __NRRTR_alarm                    SC_REPR_SYSCALL_ULONG_T                                              /* return */
+#define __NRATR0_linux_oldfstat          SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_linux_oldfstat          SC_REPR_POINTER                                                      /* statbuf */ 
+#define __NRRTR_linux_oldfstat           SC_REPR_ERRNO_T                                                      /* return */
+#define __NRRTR_pause                    SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_utime                   SC_REPR_FILENAME                                                     /* filename */ 
+#define __NRATR1_utime                   SC_REPR_STRUCT_UTIMBUFX32                                            /* times */ 
+#define __NRRTR_utime                    SC_REPR_ERRNO_T                                                      /* return */
+#define __NRRTR_stty                     SC_REPR_ERRNO_T                                                      /* return */
+#define __NRRTR_gtty                     SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_access                  SC_REPR_FILENAME                                                     /* filename */ 
+#define __NRATR1_access                  SC_REPR_ACCESS_TYPE                                                  /* type */ 
+#define __NRRTR_access                   SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_nice                    SC_REPR_SYSCALL_SLONG_T                                              /* inc */ 
+#define __NRRTR_nice                     SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_ftime                   SC_REPR_POINTER                                                      /* tp */ 
+#define __NRRTR_ftime                    SC_REPR_ERRNO_T                                                      /* return */
+#define __NRRTR_sync                     SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_kill                    SC_REPR_PID_T                                                        /* pid */ 
+#define __NRATR1_kill                    SC_REPR_SIGNO                                                        /* signo */ 
+#define __NRRTR_kill                     SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_rename                  SC_REPR_STRING                                                       /* oldname */ 
+#define __NRATR1_rename                  SC_REPR_STRING                                                       /* newname_or_path */ 
+#define __NRRTR_rename                   SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_mkdir                   SC_REPR_STRING                                                       /* pathname */ 
+#define __NRATR1_mkdir                   SC_REPR_MODE_T                                                       /* mode */ 
+#define __NRRTR_mkdir                    SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_rmdir                   SC_REPR_STRING                                                       /* path */ 
+#define __NRRTR_rmdir                    SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_dup                     SC_REPR_FD_T                                                         /* fd */ 
+#define __NRRTR_dup                      SC_REPR_FD_T                                                         /* return */
+#define __NRATR0_pipe                    SC_REPR_POINTER                                                      /* pipedes */ 
+#define __NRRTR_pipe                     SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_times                   SC_REPR_POINTER                                                      /* buf */ 
+#define __NRRTR_times                    SC_REPR_INT                                                          /* return */
+#define __NRRTR_prof                     SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_brk                     SC_REPR_POINTER                                                      /* addr */ 
+#define __NRRTR_brk                      SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_setgid                  SC_REPR_GID_T                                                        /* gid */ 
+#define __NRRTR_setgid                   SC_REPR_ERRNO_T                                                      /* return */
+#define __NRRTR_getgid                   SC_REPR_UINT16_T                                                     /* return */
+#define __NRATR0_signal                  SC_REPR_SIGNO                                                        /* signo */ 
+#define __NRATR1_signal                  SC_REPR_SIGHANDLER_T                                                 /* handler */ 
+#define __NRRTR_signal                   SC_REPR_SIGHANDLER_T                                                 /* return */
+#define __NRRTR_geteuid                  SC_REPR_UINT16_T                                                     /* return */
+#define __NRRTR_getegid                  SC_REPR_UINT16_T                                                     /* return */
+#define __NRATR0_acct                    SC_REPR_FILENAME                                                     /* filename */ 
+#define __NRRTR_acct                     SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_umount2                 SC_REPR_STRING                                                       /* special_file */ 
+#define __NRATR1_umount2                 SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NRRTR_umount2                  SC_REPR_ERRNO_T                                                      /* return */
+#define __NRRTR_lock                     SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_ioctl                   SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_ioctl                   SC_REPR_SYSCALL_ULONG_T                                              /* request */ 
+#define __NRATR2_ioctl                   SC_REPR_POINTER                                                      /* arg */ 
+#define __NRRTR_ioctl                    SC_REPR_SYSCALL_SLONG_T                                              /* return */
+#define __NRATR0_fcntl                   SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_fcntl                   SC_REPR_SYSCALL_ULONG_T                                              /* cmd */ 
+#define __NRATR2_fcntl                   SC_REPR_POINTER                                                      /* arg */ 
+#define __NRRTR_fcntl                    SC_REPR_SYSCALL_SLONG_T                                              /* return */
+#define __NRRTR_mpx                      SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_setpgid                 SC_REPR_PID_T                                                        /* pid */ 
+#define __NRATR1_setpgid                 SC_REPR_PID_T                                                        /* pgid */ 
+#define __NRRTR_setpgid                  SC_REPR_ERRNO_T                                                      /* return */
+#define __NRRTR_ulimit                   SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_oldolduname             SC_REPR_POINTER                                                      /* name */ 
+#define __NRRTR_oldolduname              SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_umask                   SC_REPR_MODE_T                                                       /* mode */ 
+#define __NRRTR_umask                    SC_REPR_MODE_T                                                       /* return */
+#define __NRATR0_chroot                  SC_REPR_STRING                                                       /* path */ 
+#define __NRRTR_chroot                   SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_ustat                   SC_REPR_DEV_T                                                        /* dev */ 
+#define __NRATR1_ustat                   SC_REPR_POINTER                                                      /* ubuf */ 
+#define __NRRTR_ustat                    SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_dup2                    SC_REPR_FD_T                                                         /* oldfd */ 
+#define __NRATR1_dup2                    SC_REPR_FD_T                                                         /* newfd */ 
+#define __NRRTR_dup2                     SC_REPR_FD_T                                                         /* return */
+#define __NRRTR_getppid                  SC_REPR_PID_T                                                        /* return */
+#define __NRRTR_getpgrp                  SC_REPR_PID_T                                                        /* return */
+#define __NRRTR_setsid                   SC_REPR_PID_T                                                        /* return */
+#define __NRATR0_sigaction               SC_REPR_SIGNO                                                        /* signo */ 
+#define __NRATR1_sigaction               SC_REPR_STRUCT_SIGACTIONX32                                          /* act */ 
+#define __NRATR2_sigaction               SC_REPR_POINTER                                                      /* oact */ 
+#define __NRRTR_sigaction                SC_REPR_ERRNO_T                                                      /* return */
+#define __NRRTR_sgetmask                 SC_REPR_SYSCALL_ULONG_T                                              /* return */
+#define __NRATR0_ssetmask                SC_REPR_SYSCALL_ULONG_T                                              /* sigmask */ 
+#define __NRRTR_ssetmask                 SC_REPR_SYSCALL_ULONG_T                                              /* return */
+#define __NRATR0_setreuid                SC_REPR_UID_T                                                        /* ruid */ 
+#define __NRATR1_setreuid                SC_REPR_UID_T                                                        /* euid */ 
+#define __NRRTR_setreuid                 SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_setregid                SC_REPR_GID_T                                                        /* rgid */ 
+#define __NRATR1_setregid                SC_REPR_GID_T                                                        /* egid */ 
+#define __NRRTR_setregid                 SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_sigsuspend              SC_REPR_STRUCT_SIGSET                                                /* set */ 
+#define __NRRTR_sigsuspend               SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_sigpending              SC_REPR_POINTER                                                      /* set */ 
+#define __NRRTR_sigpending               SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_sethostname             SC_REPR_STRING                                                       /* name */ 
+#define __NRATL0_sethostname             1                                                                    /* name -> len */ 
+#define __NRATR1_sethostname             SC_REPR_SIZE_T                                                       /* len */ 
+#define __NRRTR_sethostname              SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_setrlimit               SC_REPR_RLIMIT_RESOURCE                                              /* resource */ 
+#define __NRATR1_setrlimit               SC_REPR_STRUCT_RLIMIT                                                /* rlimits */ 
+#define __NRRTR_setrlimit                SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_getrlimit               SC_REPR_RLIMIT_RESOURCE                                              /* resource */ 
+#define __NRATR1_getrlimit               SC_REPR_POINTER                                                      /* rlimits */ 
+#define __NRRTR_getrlimit                SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_getrusage               SC_REPR_GETRUSAGE_WHO                                                /* who */ 
+#define __NRATR1_getrusage               SC_REPR_POINTER                                                      /* tv */ 
+#define __NRRTR_getrusage                SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_gettimeofday            SC_REPR_POINTER                                                      /* tv */ 
+#define __NRATR1_gettimeofday            SC_REPR_POINTER                                                      /* tz */ 
+#define __NRRTR_gettimeofday             SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_settimeofday            SC_REPR_STRUCT_TIMEVALX32                                            /* tv */ 
+#define __NRATR1_settimeofday            SC_REPR_STRUCT_TIMEZONE                                              /* tz */ 
+#define __NRRTR_settimeofday             SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_getgroups               SC_REPR_SIZE_T                                                       /* size */ 
+#define __NRATR1_getgroups               SC_REPR_POINTER                                                      /* list */ 
+#define __NRRTR_getgroups                SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_setgroups               SC_REPR_SIZE_T                                                       /* count */ 
+#define __NRATR1_setgroups               SC_REPR_GID_VECTOR16                                                 /* groups */ 
+#define __NRATL1_setgroups               0                                                                    /* groups -> count */ 
+#define __NRRTR_setgroups                SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_select                  SC_REPR_SIZE_T                                                       /* nfds */ 
+#define __NRATR1_select                  SC_REPR_STRUCT_FDSET                                                 /* readfds */ 
+#define __NRATL1_select                  0                                                                    /* readfds -> nfds */ 
+#define __NRATR2_select                  SC_REPR_STRUCT_FDSET                                                 /* writefds */ 
+#define __NRATL2_select                  0                                                                    /* writefds -> nfds */ 
+#define __NRATR3_select                  SC_REPR_STRUCT_FDSET                                                 /* exceptfds */ 
+#define __NRATL3_select                  0                                                                    /* exceptfds -> nfds */ 
+#define __NRATR4_select                  SC_REPR_POINTER                                                      /* timeout */ 
+#define __NRRTR_select                   SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_symlink                 SC_REPR_STRING                                                       /* link_text */ 
+#define __NRATR1_symlink                 SC_REPR_STRING                                                       /* target_path */ 
+#define __NRRTR_symlink                  SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_linux_oldlstat          SC_REPR_FILENAME                                                     /* filename */ 
+#define __NRATR1_linux_oldlstat          SC_REPR_POINTER                                                      /* statbuf */ 
+#define __NRRTR_linux_oldlstat           SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_readlink                SC_REPR_STRING                                                       /* path */ 
+#define __NRATR1_readlink                SC_REPR_POINTER                                                      /* buf */ 
+#define __NRATR2_readlink                SC_REPR_SIZE_T                                                       /* buflen */ 
+#define __NRRTR_readlink                 SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_uselib                  SC_REPR_STRING                                                       /* library */ 
+#define __NRRTR_uselib                   SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_swapon                  SC_REPR_STRING                                                       /* pathname */ 
+#define __NRATR1_swapon                  SC_REPR_SWAPFLAGS                                                    /* swapflags */ 
+#define __NRRTR_swapon                   SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_reboot                  SC_REPR_REBOOT_HOW                                                   /* how */ 
+#define __NRRTR_reboot                   SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_readdir                 SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_readdir                 SC_REPR_POINTER                                                      /* dirp */ 
+#define __NRATR2_readdir                 SC_REPR_SIZE_T                                                       /* count */ 
+#define __NRRTR_readdir                  SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_mmap                    SC_REPR_POINTER                                                      /* addr */ 
+#define __NRATR1_mmap                    SC_REPR_SIZE_T                                                       /* len */ 
+#define __NRATR2_mmap                    SC_REPR_MMAP_PROT                                                    /* prot */ 
+#define __NRATR3_mmap                    SC_REPR_MMAP_FLAGS                                                   /* flags */ 
+#define __NRATR4_mmap                    SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR5_mmap                    SC_REPR_SYSCALL_ULONG_T                                              /* offset */ 
+#define __NRRTR_mmap                     SC_REPR_POINTER                                                      /* return */
+#define __NRATR0_munmap                  SC_REPR_POINTER                                                      /* addr */ 
+#define __NRATR1_munmap                  SC_REPR_SIZE_T                                                       /* len */ 
+#define __NRRTR_munmap                   SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_truncate                SC_REPR_FILENAME                                                     /* filename */ 
+#define __NRATR1_truncate                SC_REPR_SYSCALL_ULONG_T                                              /* length */ 
+#define __NRRTR_truncate                 SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_ftruncate               SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_ftruncate               SC_REPR_SYSCALL_ULONG_T                                              /* length */ 
+#define __NRRTR_ftruncate                SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_fchmod                  SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_fchmod                  SC_REPR_MODE_T                                                       /* mode */ 
+#define __NRRTR_fchmod                   SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_fchown                  SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_fchown                  SC_REPR_UID_T                                                        /* owner */ 
+#define __NRATR2_fchown                  SC_REPR_GID_T                                                        /* group */ 
+#define __NRRTR_fchown                   SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_getpriority             SC_REPR_SYSCALL_ULONG_T                                              /* which */ 
+#define __NRATR1_getpriority             SC_REPR_ID_T                                                         /* who */ 
+#define __NRRTR_getpriority              SC_REPR_SYSCALL_SLONG_T                                              /* return */
+#define __NRATR0_setpriority             SC_REPR_SYSCALL_ULONG_T                                              /* which */ 
+#define __NRATR1_setpriority             SC_REPR_ID_T                                                         /* who */ 
+#define __NRATR2_setpriority             SC_REPR_SYSCALL_ULONG_T                                              /* value */ 
+#define __NRRTR_setpriority              SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_profil                  SC_REPR_POINTER                                                      /* sample_buffer */ 
+#define __NRATR1_profil                  SC_REPR_SIZE_T                                                       /* size */ 
+#define __NRATR2_profil                  SC_REPR_SIZE_T                                                       /* offset */ 
+#define __NRATR3_profil                  SC_REPR_SYSCALL_ULONG_T                                              /* scale */ 
+#define __NRRTR_profil                   SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_statfs                  SC_REPR_FILENAME                                                     /* file */ 
+#define __NRATR1_statfs                  SC_REPR_POINTER                                                      /* buf */ 
+#define __NRRTR_statfs                   SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_fstatfs                 SC_REPR_FD_T                                                         /* file */ 
+#define __NRATR1_fstatfs                 SC_REPR_POINTER                                                      /* buf */ 
+#define __NRRTR_fstatfs                  SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_ioperm                  SC_REPR_SYSCALL_ULONG_T                                              /* from */ 
+#define __NRATR1_ioperm                  SC_REPR_SYSCALL_ULONG_T                                              /* num */ 
+#define __NRATR2_ioperm                  SC_REPR_SYSCALL_ULONG_T                                              /* turn_on */ 
+#define __NRRTR_ioperm                   SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_socketcall              SC_REPR_INT                                                          /* call */ 
+#define __NRATR1_socketcall              SC_REPR_POINTER                                                      /* args */ 
+#define __NRRTR_socketcall               SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_syslog                  SC_REPR_SYSLOG_LEVEL                                                 /* level */ 
+#define __NRATR1_syslog                  SC_REPR_STRING                                                       /* str */ 
+#define __NRATL1_syslog                  2                                                                    /* str -> len */ 
+#define __NRATR2_syslog                  SC_REPR_SIZE_T                                                       /* len */ 
+#define __NRRTR_syslog                   SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_setitimer               SC_REPR_SYSCALL_ULONG_T                                              /* which */ 
+#define __NRATR1_setitimer               SC_REPR_STRUCT_ITIMERVALX32                                          /* newval */ 
+#define __NRATR2_setitimer               SC_REPR_POINTER                                                      /* oldval */ 
+#define __NRRTR_setitimer                SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_getitimer               SC_REPR_SYSCALL_ULONG_T                                              /* which */ 
+#define __NRATR1_getitimer               SC_REPR_POINTER                                                      /* curr_value */ 
+#define __NRRTR_getitimer                SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_linux_stat              SC_REPR_FILENAME                                                     /* filename */ 
+#define __NRATR1_linux_stat              SC_REPR_POINTER                                                      /* statbuf */ 
+#define __NRRTR_linux_stat               SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_linux_lstat             SC_REPR_FILENAME                                                     /* filename */ 
+#define __NRATR1_linux_lstat             SC_REPR_POINTER                                                      /* statbuf */ 
+#define __NRRTR_linux_lstat              SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_linux_fstat             SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_linux_fstat             SC_REPR_POINTER                                                      /* statbuf */ 
+#define __NRRTR_linux_fstat              SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_olduname                SC_REPR_POINTER                                                      /* name */ 
+#define __NRRTR_olduname                 SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_iopl                    SC_REPR_SYSCALL_ULONG_T                                              /* level */ 
+#define __NRRTR_iopl                     SC_REPR_ERRNO_T                                                      /* return */
+#define __NRRTR_vhangup                  SC_REPR_ERRNO_T                                                      /* return */
+#define __NRRTR_idle                     SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_vm86old                 SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_vm86old                  SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_wait4                   SC_REPR_PID_T                                                        /* pid */ 
+#define __NRATR1_wait4                   SC_REPR_POINTER                                                      /* stat_loc */ 
+#define __NRATR2_wait4                   SC_REPR_WAITFLAG                                                     /* options */ 
+#define __NRATR3_wait4                   SC_REPR_POINTER                                                      /* usage */ 
+#define __NRRTR_wait4                    SC_REPR_PID_T                                                        /* return */
+#define __NRATR0_swapoff                 SC_REPR_STRING                                                       /* pathname */ 
+#define __NRRTR_swapoff                  SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_sysinfo                 SC_REPR_POINTER                                                      /* info */ 
+#define __NRRTR_sysinfo                  SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_ipc                     SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_ipc                      SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_fsync                   SC_REPR_FD_T                                                         /* fd */ 
+#define __NRRTR_fsync                    SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_sigreturn               SC_REPR_STRUCT_FPUSTATE32                                            /* restore_fpu */ 
+#define __NRATR1_sigreturn               SC_REPR_SYSCALL_ULONG_T                                              /* unused1 */ 
+#define __NRATR2_sigreturn               SC_REPR_SYSCALL_ULONG_T                                              /* unused2 */ 
+#define __NRATR3_sigreturn               SC_REPR_STRUCT_SIGSET                                                /* restore_sigmask */ 
+#define __NRATR4_sigreturn               SC_REPR_STRUCT_RPC_SYSCALL_INFO32                                    /* sc_info */ 
+#define __NRATR5_sigreturn               SC_REPR_STRUCT_UCPUSTATE32                                           /* restore_cpu */ 
+#define __NRRTR_sigreturn                SC_REPR_INT                                                          /* return */
+#define __NRATR0_clone                   SC_REPR_CLONE_FLAGS                                                  /* flags */ 
+#define __NRATR1_clone                   SC_REPR_POINTER                                                      /* child_stack */ 
+#define __NRATR2_clone                   SC_REPR_POINTER                                                      /* ptid */ 
+#define __NRATR3_clone                   SC_REPR_POINTER                                                      /* newtls */ 
+#define __NRATR4_clone                   SC_REPR_POINTER                                                      /* ctid */ 
+#define __NRRTR_clone                    SC_REPR_PID_T                                                        /* return */
+#define __NRATR0_setdomainname           SC_REPR_STRING                                                       /* name */ 
+#define __NRATR1_setdomainname           SC_REPR_SIZE_T                                                       /* len */ 
+#define __NRRTR_setdomainname            SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_uname                   SC_REPR_POINTER                                                      /* name */ 
+#define __NRRTR_uname                    SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_modify_ldt              SC_REPR_SYSCALL_ULONG_T                                              /* func */ 
+#define __NRATR1_modify_ldt              SC_REPR_POINTER                                                      /* ptr */ 
+#define __NRATR2_modify_ldt              SC_REPR_SYSCALL_ULONG_T                                              /* bytecount */ 
+#define __NRRTR_modify_ldt               SC_REPR_SYSCALL_SLONG_T                                              /* return */
+#define __NRATR0_adjtimex                SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_adjtimex                 SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_mprotect                SC_REPR_POINTER                                                      /* addr */ 
+#define __NRATR1_mprotect                SC_REPR_SIZE_T                                                       /* len */ 
+#define __NRATR2_mprotect                SC_REPR_MMAP_PROT                                                    /* prot */ 
+#define __NRRTR_mprotect                 SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_sigprocmask             SC_REPR_SIGPROCMASK_HOW                                              /* how */ 
+#define __NRATR1_sigprocmask             SC_REPR_STRUCT_SIGSET                                                /* set */ 
+#define __NRATR2_sigprocmask             SC_REPR_POINTER                                                      /* oset */ 
+#define __NRRTR_sigprocmask              SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_create_module           SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_create_module            SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_init_module             SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_init_module              SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_delete_module           SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_delete_module            SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_get_kernel_syms         SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_get_kernel_syms          SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_quotactl                SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_quotactl                 SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_getpgid                 SC_REPR_PID_T                                                        /* pid */ 
+#define __NRRTR_getpgid                  SC_REPR_PID_T                                                        /* return */
+#define __NRATR0_fchdir                  SC_REPR_FD_T                                                         /* fd */ 
+#define __NRRTR_fchdir                   SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_bdflush                 SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_bdflush                  SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_sysfs                   SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_sysfs                    SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_personality             SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_personality              SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_afs_syscall             SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_afs_syscall              SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_setfsuid                SC_REPR_UID_T                                                        /* uid */ 
+#define __NRRTR_setfsuid                 SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_setfsgid                SC_REPR_GID_T                                                        /* gid */ 
+#define __NRRTR_setfsgid                 SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0__llseek                 SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1__llseek                 SC_REPR_INT64_T                                                      /* offset */ 
+#define __NRATR2__llseek                 SC_REPR_POINTER                                                      /* result */ 
+#define __NRATR3__llseek                 SC_REPR_SEEK_WHENCE                                                  /* whence */ 
+#define __NRRTR__llseek                  SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_getdents                SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_getdents                SC_REPR_POINTER                                                      /* dirp */ 
+#define __NRATR2_getdents                SC_REPR_SIZE_T                                                       /* count */ 
+#define __NRRTR_getdents                 SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0__newselect              SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR__newselect               SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_flock                   SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_flock                   SC_REPR_SYSCALL_ULONG_T                                              /* operation */ 
+#define __NRRTR_flock                    SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_msync                   SC_REPR_POINTER                                                      /* addr */ 
+#define __NRATR1_msync                   SC_REPR_SIZE_T                                                       /* len */ 
+#define __NRATR2_msync                   SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NRRTR_msync                    SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_readv                   SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_readv                   SC_REPR_STRUCT_IOVECX32                                              /* iovec */ 
+#define __NRATL1_readv                   2                                                                    /* iovec -> count */ 
+#define __NRATR2_readv                   SC_REPR_SIZE_T                                                       /* count */ 
+#define __NRRTR_readv                    SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_writev                  SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_writev                  SC_REPR_STRUCT_IOVECX32                                              /* iovec */ 
+#define __NRATL1_writev                  2                                                                    /* iovec -> count */ 
+#define __NRATR2_writev                  SC_REPR_SIZE_T                                                       /* count */ 
+#define __NRRTR_writev                   SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_getsid                  SC_REPR_PID_T                                                        /* pid */ 
+#define __NRRTR_getsid                   SC_REPR_PID_T                                                        /* return */
+#define __NRATR0_fdatasync               SC_REPR_FD_T                                                         /* fd */ 
+#define __NRRTR_fdatasync                SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0__sysctl                 SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR__sysctl                  SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_mlock                   SC_REPR_POINTER                                                      /* addr */ 
+#define __NRATR1_mlock                   SC_REPR_SIZE_T                                                       /* len */ 
+#define __NRRTR_mlock                    SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_munlock                 SC_REPR_POINTER                                                      /* addr */ 
+#define __NRATR1_munlock                 SC_REPR_SIZE_T                                                       /* len */ 
+#define __NRRTR_munlock                  SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_mlockall                SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NRRTR_mlockall                 SC_REPR_ERRNO_T                                                      /* return */
+#define __NRRTR_munlockall               SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_sched_setparam          SC_REPR_PID_T                                                        /* pid */ 
+#define __NRATR1_sched_setparam          SC_REPR_POINTER                                                      /* param */ 
+#define __NRRTR_sched_setparam           SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_sched_getparam          SC_REPR_PID_T                                                        /* pid */ 
+#define __NRATR1_sched_getparam          SC_REPR_POINTER                                                      /* param */ 
+#define __NRRTR_sched_getparam           SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_sched_setscheduler      SC_REPR_PID_T                                                        /* pid */ 
+#define __NRATR1_sched_setscheduler      SC_REPR_SYSCALL_ULONG_T                                              /* policy */ 
+#define __NRATR2_sched_setscheduler      SC_REPR_POINTER                                                      /* param */ 
+#define __NRRTR_sched_setscheduler       SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_sched_getscheduler      SC_REPR_PID_T                                                        /* pid */ 
+#define __NRRTR_sched_getscheduler       SC_REPR_SYSCALL_SLONG_T                                              /* return */
+#define __NRRTR_sched_yield              SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_sched_get_priority_max  SC_REPR_SYSCALL_ULONG_T                                              /* algorithm */ 
+#define __NRRTR_sched_get_priority_max   SC_REPR_SYSCALL_SLONG_T                                              /* return */
+#define __NRATR0_sched_get_priority_min  SC_REPR_SYSCALL_ULONG_T                                              /* algorithm */ 
+#define __NRRTR_sched_get_priority_min   SC_REPR_SYSCALL_SLONG_T                                              /* return */
+#define __NRATR0_sched_rr_get_interval   SC_REPR_PID_T                                                        /* pid */ 
+#define __NRATR1_sched_rr_get_interval   SC_REPR_POINTER                                                      /* tms */ 
+#define __NRRTR_sched_rr_get_interval    SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_nanosleep               SC_REPR_STRUCT_TIMESPECX32                                           /* req */ 
+#define __NRATR1_nanosleep               SC_REPR_POINTER                                                      /* rem */ 
+#define __NRRTR_nanosleep                SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_mremap                  SC_REPR_POINTER                                                      /* addr */ 
+#define __NRATR1_mremap                  SC_REPR_SIZE_T                                                       /* old_len */ 
+#define __NRATR2_mremap                  SC_REPR_SIZE_T                                                       /* new_len */ 
+#define __NRATR3_mremap                  SC_REPR_MREMAP_FLAGS                                                 /* flags */ 
+#define __NRATR4_mremap                  SC_REPR_POINTER                                                      /* new_address */ 
+#define __NRRTR_mremap                   SC_REPR_POINTER                                                      /* return */
+#define __NRATR0_setresuid               SC_REPR_UID_T                                                        /* ruid */ 
+#define __NRATR1_setresuid               SC_REPR_UID_T                                                        /* euid */ 
+#define __NRATR2_setresuid               SC_REPR_UID_T                                                        /* suid */ 
+#define __NRRTR_setresuid                SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_getresuid               SC_REPR_POINTER                                                      /* ruid */ 
+#define __NRATR1_getresuid               SC_REPR_POINTER                                                      /* euid */ 
+#define __NRATR2_getresuid               SC_REPR_POINTER                                                      /* suid */ 
+#define __NRRTR_getresuid                SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_vm86                    SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_vm86                     SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_query_module            SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_query_module             SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_poll                    SC_REPR_STRUCT_POLLFD                                                /* fds */ 
+#define __NRATL0_poll                    1                                                                    /* fds -> nfds */ 
+#define __NRATR1_poll                    SC_REPR_SIZE_T                                                       /* nfds */ 
+#define __NRATR2_poll                    SC_REPR_SYSCALL_SLONG_T                                              /* timeout */ 
+#define __NRRTR_poll                     SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_nfsservctl              SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_nfsservctl               SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_setresgid               SC_REPR_GID_T                                                        /* rgid */ 
+#define __NRATR1_setresgid               SC_REPR_GID_T                                                        /* egid */ 
+#define __NRATR2_setresgid               SC_REPR_GID_T                                                        /* sgid */ 
+#define __NRRTR_setresgid                SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_getresgid               SC_REPR_POINTER                                                      /* rgid */ 
+#define __NRATR1_getresgid               SC_REPR_POINTER                                                      /* egid */ 
+#define __NRATR2_getresgid               SC_REPR_POINTER                                                      /* sgid */ 
+#define __NRRTR_getresgid                SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_prctl                   SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_prctl                    SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_rt_sigreturn            SC_REPR_STRUCT_FPUSTATE                                              /* restore_fpu */ 
+#define __NRATR1_rt_sigreturn            SC_REPR_STRUCT_SIGSET                                                /* restore_sigmask */ 
+#define __NRATR2_rt_sigreturn            SC_REPR_STRUCT_RPC_SYSCALL_INFO                                      /* sc_info */ 
+#define __NRATR3_rt_sigreturn            SC_REPR_STRUCT_UCPUSTATE                                             /* restore_cpu */ 
+#define __NRRTR_rt_sigreturn             SC_REPR_INT                                                          /* return */
+#define __NRATR0_rt_sigaction            SC_REPR_SIGNO                                                        /* signo */ 
+#define __NRATR1_rt_sigaction            SC_REPR_STRUCT_SIGACTIONX32                                          /* act */ 
+#define __NRATL1_rt_sigaction            3                                                                    /* act -> sigsetsize */ 
+#define __NRATR2_rt_sigaction            SC_REPR_POINTER                                                      /* oact */ 
+#define __NRATR3_rt_sigaction            SC_REPR_SIZE_T                                                       /* sigsetsize */ 
+#define __NRRTR_rt_sigaction             SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_rt_sigprocmask          SC_REPR_SIGPROCMASK_HOW                                              /* how */ 
+#define __NRATR1_rt_sigprocmask          SC_REPR_STRUCT_SIGSET                                                /* set */ 
+#define __NRATL1_rt_sigprocmask          3                                                                    /* set -> sigsetsize */ 
+#define __NRATR2_rt_sigprocmask          SC_REPR_POINTER                                                      /* oset */ 
+#define __NRATR3_rt_sigprocmask          SC_REPR_SIZE_T                                                       /* sigsetsize */ 
+#define __NRRTR_rt_sigprocmask           SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_rt_sigpending           SC_REPR_POINTER                                                      /* set */ 
+#define __NRATR1_rt_sigpending           SC_REPR_SIZE_T                                                       /* sigsetsize */ 
+#define __NRRTR_rt_sigpending            SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_rt_sigtimedwait         SC_REPR_STRUCT_SIGSET                                                /* set */ 
+#define __NRATL0_rt_sigtimedwait         3                                                                    /* set -> sigsetsize */ 
+#define __NRATR1_rt_sigtimedwait         SC_REPR_POINTER                                                      /* info */ 
+#define __NRATR2_rt_sigtimedwait         SC_REPR_STRUCT_TIMESPECX32                                           /* timeout */ 
+#define __NRATR3_rt_sigtimedwait         SC_REPR_SIZE_T                                                       /* sigsetsize */ 
+#define __NRRTR_rt_sigtimedwait          SC_REPR_SYSCALL_SLONG_T                                              /* return */
+#define __NRATR0_rt_sigqueueinfo         SC_REPR_PID_T                                                        /* tgid */ 
+#define __NRATR1_rt_sigqueueinfo         SC_REPR_SIGNO                                                        /* signo */ 
+#define __NRATR2_rt_sigqueueinfo         SC_REPR_POINTER                                                      /* uinfo */ 
+#define __NRRTR_rt_sigqueueinfo          SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_rt_sigsuspend           SC_REPR_POINTER                                                      /* set */ 
+#define __NRATR1_rt_sigsuspend           SC_REPR_SIZE_T                                                       /* sigsetsize */ 
+#define __NRRTR_rt_sigsuspend            SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_pread64                 SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_pread64                 SC_REPR_POINTER                                                      /* buf */ 
+#define __NRATR2_pread64                 SC_REPR_SIZE_T                                                       /* bufsize */ 
+#define __NRATR3_pread64                 SC_REPR_UINT64_T                                                     /* offset */ 
+#define __NRRTR_pread64                  SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_pwrite64                SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_pwrite64                SC_REPR_POINTER                                                      /* buf */ 
+#define __NRATR2_pwrite64                SC_REPR_SIZE_T                                                       /* bufsize */ 
+#define __NRATR3_pwrite64                SC_REPR_UINT64_T                                                     /* offset */ 
+#define __NRRTR_pwrite64                 SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_chown                   SC_REPR_FILENAME                                                     /* filename */ 
+#define __NRATR1_chown                   SC_REPR_UID_T                                                        /* owner */ 
+#define __NRATR2_chown                   SC_REPR_GID_T                                                        /* group */ 
+#define __NRRTR_chown                    SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_getcwd                  SC_REPR_POINTER                                                      /* buf */ 
+#define __NRATR1_getcwd                  SC_REPR_SIZE_T                                                       /* size */ 
+#define __NRRTR_getcwd                   SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_capget                  SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_capget                   SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_capset                  SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_capset                   SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_sigaltstack             SC_REPR_POINTER                                                      /* ss */ 
+#define __NRATR1_sigaltstack             SC_REPR_POINTER                                                      /* oss */ 
+#define __NRRTR_sigaltstack              SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_sendfile                SC_REPR_FD_T                                                         /* out_fd */ 
+#define __NRATR1_sendfile                SC_REPR_FD_T                                                         /* in_fd */ 
+#define __NRATR2_sendfile                SC_REPR_POINTER                                                      /* pin_offset */ 
+#define __NRATR3_sendfile                SC_REPR_SIZE_T                                                       /* num_bytes */ 
+#define __NRRTR_sendfile                 SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_getpmsg                 SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_getpmsg                  SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_putpmsg                 SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_putpmsg                  SC_REPR_ERRNO_T                                                      /* return */
+#define __NRRTR_vfork                    SC_REPR_PID_T                                                        /* return */
+#define __NRATR0_ugetrlimit              SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_ugetrlimit               SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_mmap2                   SC_REPR_POINTER                                                      /* addr */ 
+#define __NRATR1_mmap2                   SC_REPR_SIZE_T                                                       /* len */ 
+#define __NRATR2_mmap2                   SC_REPR_SYSCALL_ULONG_T                                              /* prot */ 
+#define __NRATR3_mmap2                   SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NRATR4_mmap2                   SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR5_mmap2                   SC_REPR_SYSCALL_ULONG_T                                              /* pgoffset */ 
+#define __NRRTR_mmap2                    SC_REPR_POINTER                                                      /* return */
+#define __NRATR0_truncate64              SC_REPR_FILENAME                                                     /* filename */ 
+#define __NRATR1_truncate64              SC_REPR_UINT64_T                                                     /* length */ 
+#define __NRRTR_truncate64               SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_ftruncate64             SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_ftruncate64             SC_REPR_UINT64_T                                                     /* length */ 
+#define __NRRTR_ftruncate64              SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_linux_stat64            SC_REPR_FILENAME                                                     /* filename */ 
+#define __NRATR1_linux_stat64            SC_REPR_POINTER                                                      /* statbuf */ 
+#define __NRRTR_linux_stat64             SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_linux_lstat64           SC_REPR_FILENAME                                                     /* filename */ 
+#define __NRATR1_linux_lstat64           SC_REPR_POINTER                                                      /* statbuf */ 
+#define __NRRTR_linux_lstat64            SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_linux_fstat64           SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_linux_fstat64           SC_REPR_POINTER                                                      /* statbuf */ 
+#define __NRRTR_linux_fstat64            SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_lchown32                SC_REPR_FILENAME                                                     /* filename */ 
+#define __NRATR1_lchown32                SC_REPR_UID_T                                                        /* owner */ 
+#define __NRATR2_lchown32                SC_REPR_GID_T                                                        /* group */ 
+#define __NRRTR_lchown32                 SC_REPR_ERRNO_T                                                      /* return */
+#define __NRRTR_getuid32                 SC_REPR_UINT32_T                                                     /* return */
+#define __NRRTR_getgid32                 SC_REPR_UINT32_T                                                     /* return */
+#define __NRRTR_geteuid32                SC_REPR_UINT32_T                                                     /* return */
+#define __NRRTR_getegid32                SC_REPR_UINT32_T                                                     /* return */
+#define __NRATR0_setreuid32              SC_REPR_UID_T                                                        /* ruid */ 
+#define __NRATR1_setreuid32              SC_REPR_UID_T                                                        /* euid */ 
+#define __NRRTR_setreuid32               SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_setregid32              SC_REPR_GID_T                                                        /* rgid */ 
+#define __NRATR1_setregid32              SC_REPR_GID_T                                                        /* egid */ 
+#define __NRRTR_setregid32               SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_getgroups32             SC_REPR_SIZE_T                                                       /* size */ 
+#define __NRATR1_getgroups32             SC_REPR_POINTER                                                      /* list */ 
+#define __NRRTR_getgroups32              SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_setgroups32             SC_REPR_SIZE_T                                                       /* count */ 
+#define __NRATR1_setgroups32             SC_REPR_GID_VECTOR32                                                 /* groups */ 
+#define __NRATL1_setgroups32             0                                                                    /* groups -> count */ 
+#define __NRRTR_setgroups32              SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_fchown32                SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_fchown32                SC_REPR_UID_T                                                        /* owner */ 
+#define __NRATR2_fchown32                SC_REPR_GID_T                                                        /* group */ 
+#define __NRRTR_fchown32                 SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_setresuid32             SC_REPR_UID_T                                                        /* ruid */ 
+#define __NRATR1_setresuid32             SC_REPR_UID_T                                                        /* euid */ 
+#define __NRATR2_setresuid32             SC_REPR_UID_T                                                        /* suid */ 
+#define __NRRTR_setresuid32              SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_getresuid32             SC_REPR_POINTER                                                      /* ruid */ 
+#define __NRATR1_getresuid32             SC_REPR_POINTER                                                      /* euid */ 
+#define __NRATR2_getresuid32             SC_REPR_POINTER                                                      /* suid */ 
+#define __NRRTR_getresuid32              SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_setresgid32             SC_REPR_GID_T                                                        /* rgid */ 
+#define __NRATR1_setresgid32             SC_REPR_GID_T                                                        /* egid */ 
+#define __NRATR2_setresgid32             SC_REPR_GID_T                                                        /* sgid */ 
+#define __NRRTR_setresgid32              SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_getresgid32             SC_REPR_POINTER                                                      /* rgid */ 
+#define __NRATR1_getresgid32             SC_REPR_POINTER                                                      /* egid */ 
+#define __NRATR2_getresgid32             SC_REPR_POINTER                                                      /* sgid */ 
+#define __NRRTR_getresgid32              SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_chown32                 SC_REPR_FILENAME                                                     /* filename */ 
+#define __NRATR1_chown32                 SC_REPR_UID_T                                                        /* owner */ 
+#define __NRATR2_chown32                 SC_REPR_GID_T                                                        /* group */ 
+#define __NRRTR_chown32                  SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_setuid32                SC_REPR_UID_T                                                        /* uid */ 
+#define __NRRTR_setuid32                 SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_setgid32                SC_REPR_GID_T                                                        /* gid */ 
+#define __NRRTR_setgid32                 SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_setfsuid32              SC_REPR_UID_T                                                        /* uid */ 
+#define __NRRTR_setfsuid32               SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_setfsgid32              SC_REPR_GID_T                                                        /* gid */ 
+#define __NRRTR_setfsgid32               SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_pivot_root              SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_pivot_root               SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_mincore                 SC_REPR_POINTER                                                      /* start */ 
+#define __NRATR1_mincore                 SC_REPR_SIZE_T                                                       /* len */ 
+#define __NRATR2_mincore                 SC_REPR_POINTER                                                      /* vec */ 
+#define __NRRTR_mincore                  SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_madvise                 SC_REPR_POINTER                                                      /* addr */ 
+#define __NRATR1_madvise                 SC_REPR_SIZE_T                                                       /* len */ 
+#define __NRATR2_madvise                 SC_REPR_SYSCALL_ULONG_T                                              /* advice */ 
+#define __NRRTR_madvise                  SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_getdents64              SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_getdents64              SC_REPR_POINTER                                                      /* dirp */ 
+#define __NRATR2_getdents64              SC_REPR_SIZE_T                                                       /* count */ 
+#define __NRRTR_getdents64               SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_fcntl64                 SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_fcntl64                 SC_REPR_SYSCALL_ULONG_T                                              /* command */ 
+#define __NRATR2_fcntl64                 SC_REPR_POINTER                                                      /* arg */ 
+#define __NRRTR_fcntl64                  SC_REPR_SYSCALL_SLONG_T                                              /* return */
+#define __NRRTR_gettid                   SC_REPR_PID_T                                                        /* return */
+#define __NRATR0_readahead               SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_readahead               SC_REPR_UINT64_T                                                     /* offset */ 
+#define __NRATR2_readahead               SC_REPR_SIZE_T                                                       /* count */ 
+#define __NRRTR_readahead                SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_setxattr                SC_REPR_STRING                                                       /* path */ 
+#define __NRATR1_setxattr                SC_REPR_STRING                                                       /* name */ 
+#define __NRATR2_setxattr                SC_REPR_POINTER                                                      /* buf */ 
+#define __NRATR3_setxattr                SC_REPR_SIZE_T                                                       /* bufsize */ 
+#define __NRATR4_setxattr                SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NRRTR_setxattr                 SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_lsetxattr               SC_REPR_STRING                                                       /* path */ 
+#define __NRATR1_lsetxattr               SC_REPR_STRING                                                       /* name */ 
+#define __NRATR2_lsetxattr               SC_REPR_POINTER                                                      /* buf */ 
+#define __NRATR3_lsetxattr               SC_REPR_SIZE_T                                                       /* bufsize */ 
+#define __NRATR4_lsetxattr               SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NRRTR_lsetxattr                SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_fsetxattr               SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_fsetxattr               SC_REPR_STRING                                                       /* name */ 
+#define __NRATR2_fsetxattr               SC_REPR_POINTER                                                      /* buf */ 
+#define __NRATR3_fsetxattr               SC_REPR_SIZE_T                                                       /* bufsize */ 
+#define __NRATR4_fsetxattr               SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NRRTR_fsetxattr                SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_getxattr                SC_REPR_STRING                                                       /* path */ 
+#define __NRATR1_getxattr                SC_REPR_STRING                                                       /* name */ 
+#define __NRATR2_getxattr                SC_REPR_POINTER                                                      /* buf */ 
+#define __NRATR3_getxattr                SC_REPR_SIZE_T                                                       /* bufsize */ 
+#define __NRRTR_getxattr                 SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_lgetxattr               SC_REPR_STRING                                                       /* path */ 
+#define __NRATR1_lgetxattr               SC_REPR_STRING                                                       /* name */ 
+#define __NRATR2_lgetxattr               SC_REPR_POINTER                                                      /* buf */ 
+#define __NRATR3_lgetxattr               SC_REPR_SIZE_T                                                       /* bufsize */ 
+#define __NRRTR_lgetxattr                SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_fgetxattr               SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_fgetxattr               SC_REPR_STRING                                                       /* name */ 
+#define __NRATR2_fgetxattr               SC_REPR_POINTER                                                      /* buf */ 
+#define __NRATR3_fgetxattr               SC_REPR_SIZE_T                                                       /* bufsize */ 
+#define __NRRTR_fgetxattr                SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_listxattr               SC_REPR_STRING                                                       /* path */ 
+#define __NRATR1_listxattr               SC_REPR_POINTER                                                      /* listbuf */ 
+#define __NRATR2_listxattr               SC_REPR_SIZE_T                                                       /* listbufsize */ 
+#define __NRRTR_listxattr                SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_llistxattr              SC_REPR_STRING                                                       /* path */ 
+#define __NRATR1_llistxattr              SC_REPR_POINTER                                                      /* listbuf */ 
+#define __NRATR2_llistxattr              SC_REPR_SIZE_T                                                       /* listbufsize */ 
+#define __NRRTR_llistxattr               SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_flistxattr              SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_flistxattr              SC_REPR_POINTER                                                      /* listbuf */ 
+#define __NRATR2_flistxattr              SC_REPR_SIZE_T                                                       /* listbufsize */ 
+#define __NRRTR_flistxattr               SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_removexattr             SC_REPR_STRING                                                       /* path */ 
+#define __NRATR1_removexattr             SC_REPR_STRING                                                       /* name */ 
+#define __NRRTR_removexattr              SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_lremovexattr            SC_REPR_STRING                                                       /* path */ 
+#define __NRATR1_lremovexattr            SC_REPR_STRING                                                       /* name */ 
+#define __NRRTR_lremovexattr             SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_fremovexattr            SC_REPR_INT                                                          /* fd */ 
+#define __NRATR1_fremovexattr            SC_REPR_STRING                                                       /* name */ 
+#define __NRRTR_fremovexattr             SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_tkill                   SC_REPR_PID_T                                                        /* tid */ 
+#define __NRATR1_tkill                   SC_REPR_SIGNO                                                        /* signo */ 
+#define __NRRTR_tkill                    SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_sendfile64              SC_REPR_FD_T                                                         /* out_fd */ 
+#define __NRATR1_sendfile64              SC_REPR_FD_T                                                         /* in_fd */ 
+#define __NRATR2_sendfile64              SC_REPR_POINTER                                                      /* pin_offset */ 
+#define __NRATR3_sendfile64              SC_REPR_SIZE_T                                                       /* num_bytes */ 
+#define __NRRTR_sendfile64               SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_futex                   SC_REPR_POINTER                                                      /* uaddr */ 
+#define __NRATR1_futex                   SC_REPR_SYSCALL_ULONG_T                                              /* futex_op */ 
+#define __NRATR2_futex                   SC_REPR_UINT32_T                                                     /* val */ 
+#define __NRATR3_futex                   SC_REPR_STRUCT_TIMESPECX32                                           /* timeout_or_val2 */ 
+#define __NRATR4_futex                   SC_REPR_POINTER                                                      /* uaddr2 */ 
+#define __NRATR5_futex                   SC_REPR_UINT32_T                                                     /* val3 */ 
+#define __NRRTR_futex                    SC_REPR_SYSCALL_SLONG_T                                              /* return */
+#define __NRATR0_sched_setaffinity       SC_REPR_PID_T                                                        /* pid */ 
+#define __NRATR1_sched_setaffinity       SC_REPR_SIZE_T                                                       /* cpusetsize */ 
+#define __NRATR2_sched_setaffinity       SC_REPR_POINTER                                                      /* cpuset */ 
+#define __NRRTR_sched_setaffinity        SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_sched_getaffinity       SC_REPR_PID_T                                                        /* pid */ 
+#define __NRATR1_sched_getaffinity       SC_REPR_SIZE_T                                                       /* cpusetsize */ 
+#define __NRATR2_sched_getaffinity       SC_REPR_POINTER                                                      /* cpuset */ 
+#define __NRRTR_sched_getaffinity        SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_set_thread_area         SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_set_thread_area          SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_get_thread_area         SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_get_thread_area          SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_io_setup                SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_io_setup                 SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_io_destroy              SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_io_destroy               SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_io_getevents            SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_io_getevents             SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_io_submit               SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_io_submit                SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_io_cancel               SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_io_cancel                SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_fadvise64               SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_fadvise64                SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_exit_group              SC_REPR_EXIT_STATUS                                                  /* exit_code */ 
+#define __NRRTR_exit_group               SC_REPR_INT                                                          /* return */
+#define __NRATR0_lookup_dcookie          SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_lookup_dcookie           SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_epoll_create            SC_REPR_SYSCALL_ULONG_T                                              /* size */ 
+#define __NRRTR_epoll_create             SC_REPR_FD_T                                                         /* return */
+#define __NRATR0_epoll_ctl               SC_REPR_FD_T                                                         /* epfd */ 
+#define __NRATR1_epoll_ctl               SC_REPR_EPOLL_OP                                                     /* op */ 
+#define __NRATR2_epoll_ctl               SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR3_epoll_ctl               SC_REPR_POINTER                                                      /* event */ 
+#define __NRRTR_epoll_ctl                SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_epoll_wait              SC_REPR_FD_T                                                         /* epfd */ 
+#define __NRATR1_epoll_wait              SC_REPR_POINTER                                                      /* events */ 
+#define __NRATR2_epoll_wait              SC_REPR_SYSCALL_ULONG_T                                              /* maxevents */ 
+#define __NRATR3_epoll_wait              SC_REPR_SYSCALL_SLONG_T                                              /* timeout */ 
+#define __NRRTR_epoll_wait               SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_remap_file_pages        SC_REPR_POINTER                                                      /* start */ 
+#define __NRATR1_remap_file_pages        SC_REPR_SIZE_T                                                       /* size */ 
+#define __NRATR2_remap_file_pages        SC_REPR_SYSCALL_ULONG_T                                              /* prot */ 
+#define __NRATR3_remap_file_pages        SC_REPR_SIZE_T                                                       /* pgoff */ 
+#define __NRATR4_remap_file_pages        SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NRRTR_remap_file_pages         SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_set_tid_address         SC_REPR_POINTER                                                      /* tidptr */ 
+#define __NRRTR_set_tid_address          SC_REPR_PID_T                                                        /* return */
+#define __NRATR0_timer_create            SC_REPR_CLOCKID_T                                                    /* clock_id */ 
+#define __NRATR1_timer_create            SC_REPR_POINTER                                                      /* evp */ 
+#define __NRATR2_timer_create            SC_REPR_POINTER                                                      /* timerid */ 
+#define __NRRTR_timer_create             SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_timer_settime           SC_REPR_TIMER_T                                                      /* timerid */ 
+#define __NRATR1_timer_settime           SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NRATR2_timer_settime           SC_REPR_POINTER                                                      /* value */ 
+#define __NRATR3_timer_settime           SC_REPR_POINTER                                                      /* ovalue */ 
+#define __NRRTR_timer_settime            SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_timer_gettime           SC_REPR_TIMER_T                                                      /* timerid */ 
+#define __NRATR1_timer_gettime           SC_REPR_POINTER                                                      /* value */ 
+#define __NRRTR_timer_gettime            SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_timer_getoverrun        SC_REPR_TIMER_T                                                      /* timerid */ 
+#define __NRRTR_timer_getoverrun         SC_REPR_SYSCALL_SLONG_T                                              /* return */
+#define __NRATR0_timer_delete            SC_REPR_TIMER_T                                                      /* timerid */ 
+#define __NRRTR_timer_delete             SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_clock_settime           SC_REPR_CLOCKID_T                                                    /* clock_id */ 
+#define __NRATR1_clock_settime           SC_REPR_STRUCT_TIMESPECX32                                           /* tp */ 
+#define __NRRTR_clock_settime            SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_clock_gettime           SC_REPR_CLOCKID_T                                                    /* clock_id */ 
+#define __NRATR1_clock_gettime           SC_REPR_POINTER                                                      /* tp */ 
+#define __NRRTR_clock_gettime            SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_clock_getres            SC_REPR_CLOCKID_T                                                    /* clock_id */ 
+#define __NRATR1_clock_getres            SC_REPR_POINTER                                                      /* res */ 
+#define __NRRTR_clock_getres             SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_clock_nanosleep         SC_REPR_CLOCKID_T                                                    /* clock_id */ 
+#define __NRATR1_clock_nanosleep         SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NRATR2_clock_nanosleep         SC_REPR_STRUCT_TIMESPECX32                                           /* requested_time */ 
+#define __NRATR3_clock_nanosleep         SC_REPR_POINTER                                                      /* remaining */ 
+#define __NRRTR_clock_nanosleep          SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_statfs64                SC_REPR_FILENAME                                                     /* file */ 
+#define __NRATR1_statfs64                SC_REPR_POINTER                                                      /* buf */ 
+#define __NRRTR_statfs64                 SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_fstatfs64               SC_REPR_FD_T                                                         /* file */ 
+#define __NRATR1_fstatfs64               SC_REPR_POINTER                                                      /* buf */ 
+#define __NRRTR_fstatfs64                SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_tgkill                  SC_REPR_PID_T                                                        /* tgid */ 
+#define __NRATR1_tgkill                  SC_REPR_PID_T                                                        /* tid */ 
+#define __NRATR2_tgkill                  SC_REPR_SIGNO                                                        /* signo */ 
+#define __NRRTR_tgkill                   SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_utimes                  SC_REPR_FILENAME                                                     /* filename */ 
+#define __NRATR1_utimes                  SC_REPR_POINTER                                                      /* times */ 
+#define __NRRTR_utimes                   SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_fadvise64_64            SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_fadvise64_64             SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_vserver                 SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_vserver                  SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_mbind                   SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_mbind                    SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_get_mempolicy           SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_get_mempolicy            SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_set_mempolicy           SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_set_mempolicy            SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_mq_open                 SC_REPR_STRING                                                       /* name */ 
+#define __NRATR1_mq_open                 SC_REPR_OFLAG_T                                                      /* oflags */ 
+#define __NRATR2_mq_open                 SC_REPR_MODE_T                                                       /* mode */ 
+#define __NRRTR_mq_open                  SC_REPR_FD_T                                                         /* return */
+#define __NRATR0_mq_unlink               SC_REPR_STRING                                                       /* name */ 
+#define __NRRTR_mq_unlink                SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_mq_timedsend            SC_REPR_FD_T                                                         /* mqdes */ 
+#define __NRATR1_mq_timedsend            SC_REPR_STRING                                                       /* msg_ptr */ 
+#define __NRATR2_mq_timedsend            SC_REPR_SIZE_T                                                       /* msg_len */ 
+#define __NRATR3_mq_timedsend            SC_REPR_UINT32_T                                                     /* msg_prio */ 
+#define __NRATR4_mq_timedsend            SC_REPR_STRUCT_TIMESPECX32                                           /* abs_timeout */ 
+#define __NRRTR_mq_timedsend             SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_mq_timedreceive         SC_REPR_FD_T                                                         /* mqdes */ 
+#define __NRATR1_mq_timedreceive         SC_REPR_POINTER                                                      /* msg_ptr */ 
+#define __NRATR2_mq_timedreceive         SC_REPR_SIZE_T                                                       /* msg_len */ 
+#define __NRATR3_mq_timedreceive         SC_REPR_POINTER                                                      /* pmsg_prio */ 
+#define __NRATR4_mq_timedreceive         SC_REPR_STRUCT_TIMESPECX32                                           /* abs_timeout */ 
+#define __NRRTR_mq_timedreceive          SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_mq_notify               SC_REPR_FD_T                                                         /* mqdes */ 
+#define __NRATR1_mq_notify               SC_REPR_POINTER                                                      /* notification */ 
+#define __NRRTR_mq_notify                SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_mq_getsetattr           SC_REPR_FD_T                                                         /* mqdes */ 
+#define __NRATR1_mq_getsetattr           SC_REPR_POINTER                                                      /* newattr */ 
+#define __NRATR2_mq_getsetattr           SC_REPR_POINTER                                                      /* oldattr */ 
+#define __NRRTR_mq_getsetattr            SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_kexec_load              SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_kexec_load               SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_waitid                  SC_REPR_IDTYPE_T                                                     /* idtype */ 
+#define __NRATR1_waitid                  SC_REPR_ID_T                                                         /* id */ 
+#define __NRATL1_waitid                  0                                                                    /* id -> idtype */ 
+#define __NRATR2_waitid                  SC_REPR_POINTER                                                      /* infop */ 
+#define __NRATR3_waitid                  SC_REPR_WAITID_OPTIONS                                               /* options */ 
+#define __NRATR4_waitid                  SC_REPR_POINTER                                                      /* ru */ 
+#define __NRRTR_waitid                   SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_add_key                 SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_add_key                  SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_request_key             SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_request_key              SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_keyctl                  SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_keyctl                   SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_ioprio_set              SC_REPR_SYSCALL_ULONG_T                                              /* which */ 
+#define __NRATR1_ioprio_set              SC_REPR_SYSCALL_ULONG_T                                              /* who */ 
+#define __NRATR2_ioprio_set              SC_REPR_SYSCALL_ULONG_T                                              /* ioprio */ 
+#define __NRRTR_ioprio_set               SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_ioprio_get              SC_REPR_SYSCALL_ULONG_T                                              /* which */ 
+#define __NRATR1_ioprio_get              SC_REPR_SYSCALL_ULONG_T                                              /* who */ 
+#define __NRRTR_ioprio_get               SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_inotify_init            SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_inotify_init             SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_inotify_add_watch       SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_inotify_add_watch        SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_inotify_rm_watch        SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_inotify_rm_watch         SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_migrate_pages           SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_migrate_pages            SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_openat                  SC_REPR_FD_T                                                         /* dirfd */ 
+#define __NRATR1_openat                  SC_REPR_FILENAME                                                     /* filename */ 
+#define __NRATL1_openat                  0                                                                    /* filename -> dirfd */ 
+#define __NRATR2_openat                  SC_REPR_OFLAG_T                                                      /* oflags */ 
+#define __NRATR3_openat                  SC_REPR_MODE_T                                                       /* mode */ 
+#define __NRRTR_openat                   SC_REPR_FD_T                                                         /* return */
+#define __NRATR0_mkdirat                 SC_REPR_FD_T                                                         /* dirfd */ 
+#define __NRATR1_mkdirat                 SC_REPR_FILENAME                                                     /* pathname */ 
+#define __NRATL1_mkdirat                 0                                                                    /* pathname -> dirfd */ 
+#define __NRATR2_mkdirat                 SC_REPR_MODE_T                                                       /* mode */ 
+#define __NRRTR_mkdirat                  SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_mknodat                 SC_REPR_FD_T                                                         /* dirfd */ 
+#define __NRATR1_mknodat                 SC_REPR_FILENAME                                                     /* nodename */ 
+#define __NRATL1_mknodat                 0                                                                    /* nodename -> dirfd */ 
+#define __NRATR2_mknodat                 SC_REPR_MODE_T                                                       /* mode */ 
+#define __NRATR3_mknodat                 SC_REPR_DEV_T                                                        /* dev */ 
+#define __NRRTR_mknodat                  SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_fchownat                SC_REPR_FD_T                                                         /* dirfd */ 
+#define __NRATR1_fchownat                SC_REPR_FILENAME                                                     /* filename */ 
+#define __NRATL1_fchownat                0                                                                    /* filename -> dirfd */ 
+#define __NRATR2_fchownat                SC_REPR_UID_T                                                        /* owner */ 
+#define __NRATR3_fchownat                SC_REPR_GID_T                                                        /* group */ 
+#define __NRATR4_fchownat                SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__DOSPATH                            /* flags */ 
+#define __NRRTR_fchownat                 SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_futimesat               SC_REPR_FD_T                                                         /* dirfd */ 
+#define __NRATR1_futimesat               SC_REPR_FILENAME                                                     /* filename */ 
+#define __NRATL1_futimesat               0                                                                    /* filename -> dirfd */ 
+#define __NRATR2_futimesat               SC_REPR_TIMEVALX32_VEC2                                              /* times */ 
+#define __NRRTR_futimesat                SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_linux_fstatat64         SC_REPR_FD_T                                                         /* dirfd */ 
+#define __NRATR1_linux_fstatat64         SC_REPR_FILENAME                                                     /* filename */ 
+#define __NRATL1_linux_fstatat64         0                                                                    /* filename -> dirfd */ 
+#define __NRATR2_linux_fstatat64         SC_REPR_POINTER                                                      /* statbuf */ 
+#define __NRATR3_linux_fstatat64         SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__DOSPATH                            /* flags */ 
+#define __NRRTR_linux_fstatat64          SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_unlinkat                SC_REPR_FD_T                                                         /* dirfd */ 
+#define __NRATR1_unlinkat                SC_REPR_FILENAME                                                     /* name */ 
+#define __NRATL1_unlinkat                0                                                                    /* name -> dirfd */ 
+#define __NRATR2_unlinkat                SC_REPR_ATFLAG__REMOVEDIR__REMOVEREG__DOSPATH                        /* flags */ 
+#define __NRRTR_unlinkat                 SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_renameat                SC_REPR_FD_T                                                         /* oldfd */ 
+#define __NRATR1_renameat                SC_REPR_FILENAME                                                     /* oldname */ 
+#define __NRATL1_renameat                0                                                                    /* oldname -> oldfd */ 
+#define __NRATR2_renameat                SC_REPR_FD_T                                                         /* newfd */ 
+#define __NRATR3_renameat                SC_REPR_FILENAME                                                     /* newname_or_path */ 
+#define __NRATL3_renameat                2                                                                    /* newname_or_path -> newfd */ 
+#define __NRRTR_renameat                 SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_linkat                  SC_REPR_FD_T                                                         /* fromfd */ 
+#define __NRATR1_linkat                  SC_REPR_STRING                                                       /* existing_file */ 
+#define __NRATR2_linkat                  SC_REPR_FD_T                                                         /* tofd */ 
+#define __NRATR3_linkat                  SC_REPR_STRING                                                       /* target_path */ 
+#define __NRATR4_linkat                  SC_REPR_ATFLAG__EMPTY_PATH__SYMLINK_FOLLOW__DOSPATH                  /* flags */ 
+#define __NRRTR_linkat                   SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_symlinkat               SC_REPR_STRING                                                       /* link_text */ 
+#define __NRATR1_symlinkat               SC_REPR_FD_T                                                         /* tofd */ 
+#define __NRATR2_symlinkat               SC_REPR_STRING                                                       /* target_path */ 
+#define __NRRTR_symlinkat                SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_readlinkat              SC_REPR_FD_T                                                         /* dirfd */ 
+#define __NRATR1_readlinkat              SC_REPR_FILENAME                                                     /* path */ 
+#define __NRATL1_readlinkat              0                                                                    /* path -> dirfd */ 
+#define __NRATR2_readlinkat              SC_REPR_POINTER                                                      /* buf */ 
+#define __NRATR3_readlinkat              SC_REPR_SIZE_T                                                       /* buflen */ 
+#define __NRRTR_readlinkat               SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_fchmodat                SC_REPR_FD_T                                                         /* dirfd */ 
+#define __NRATR1_fchmodat                SC_REPR_FILENAME                                                     /* filename */ 
+#define __NRATL1_fchmodat                0                                                                    /* filename -> dirfd */ 
+#define __NRATR2_fchmodat                SC_REPR_MODE_T                                                       /* mode */ 
+#define __NRATR3_fchmodat                SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__DOSPATH                            /* flags */ 
+#define __NRRTR_fchmodat                 SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_faccessat               SC_REPR_FD_T                                                         /* dirfd */ 
+#define __NRATR1_faccessat               SC_REPR_FILENAME                                                     /* filename */ 
+#define __NRATL1_faccessat               0                                                                    /* filename -> dirfd */ 
+#define __NRATR2_faccessat               SC_REPR_ACCESS_TYPE                                                  /* type */ 
+#define __NRATR3_faccessat               SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__EACCESS__DOSPATH                   /* flags */ 
+#define __NRRTR_faccessat                SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_pselect6                SC_REPR_SIZE_T                                                       /* nfds */ 
+#define __NRATR1_pselect6                SC_REPR_STRUCT_FDSET                                                 /* readfds */ 
+#define __NRATL1_pselect6                0                                                                    /* readfds -> nfds */ 
+#define __NRATR2_pselect6                SC_REPR_STRUCT_FDSET                                                 /* writefds */ 
+#define __NRATL2_pselect6                0                                                                    /* writefds -> nfds */ 
+#define __NRATR3_pselect6                SC_REPR_STRUCT_FDSET                                                 /* exceptfds */ 
+#define __NRATL3_pselect6                0                                                                    /* exceptfds -> nfds */ 
+#define __NRATR4_pselect6                SC_REPR_STRUCT_TIMESPECX32                                           /* timeout */ 
+#define __NRATR5_pselect6                SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN                                /* sigmask_sigset_and_len */ 
+#define __NRRTR_pselect6                 SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_ppoll                   SC_REPR_STRUCT_POLLFD                                                /* fds */ 
+#define __NRATL0_ppoll                   1                                                                    /* fds -> nfds */ 
+#define __NRATR1_ppoll                   SC_REPR_SIZE_T                                                       /* nfds */ 
+#define __NRATR2_ppoll                   SC_REPR_STRUCT_TIMESPECX32                                           /* timeout_ts */ 
+#define __NRATR3_ppoll                   SC_REPR_POINTER                                                      /* sigmask */ 
+#define __NRATR4_ppoll                   SC_REPR_SIZE_T                                                       /* sigsetsize */ 
+#define __NRRTR_ppoll                    SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_unshare                 SC_REPR_CLONE_FLAGS_UNSHARE                                          /* flags */ 
+#define __NRRTR_unshare                  SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_set_robust_list         SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_set_robust_list          SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_get_robust_list         SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_get_robust_list          SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_splice                  SC_REPR_FD_T                                                         /* fdin */ 
+#define __NRATR1_splice                  SC_REPR_POINTER                                                      /* offin */ 
+#define __NRATR2_splice                  SC_REPR_FD_T                                                         /* fdout */ 
+#define __NRATR3_splice                  SC_REPR_POINTER                                                      /* offout */ 
+#define __NRATR4_splice                  SC_REPR_SIZE_T                                                       /* length */ 
+#define __NRATR5_splice                  SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NRRTR_splice                   SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_sync_file_range         SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_sync_file_range         SC_REPR_UINT64_T                                                     /* offset */ 
+#define __NRATR2_sync_file_range         SC_REPR_UINT64_T                                                     /* count */ 
+#define __NRATR3_sync_file_range         SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NRRTR_sync_file_range          SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_tee                     SC_REPR_FD_T                                                         /* fdin */ 
+#define __NRATR1_tee                     SC_REPR_FD_T                                                         /* fdout */ 
+#define __NRATR2_tee                     SC_REPR_SIZE_T                                                       /* length */ 
+#define __NRATR3_tee                     SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NRRTR_tee                      SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_vmsplice                SC_REPR_FD_T                                                         /* fdout */ 
+#define __NRATR1_vmsplice                SC_REPR_STRUCT_IOVECX32                                              /* iov */ 
+#define __NRATL1_vmsplice                2                                                                    /* iov -> count */ 
+#define __NRATR2_vmsplice                SC_REPR_SIZE_T                                                       /* count */ 
+#define __NRATR3_vmsplice                SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NRRTR_vmsplice                 SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_move_pages              SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_move_pages               SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_getcpu                  SC_REPR_POINTER                                                      /* cpu */ 
+#define __NRATR1_getcpu                  SC_REPR_POINTER                                                      /* node */ 
+#define __NRATR2_getcpu                  SC_REPR_POINTER                                                      /* tcache */ 
+#define __NRRTR_getcpu                   SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_epoll_pwait             SC_REPR_FD_T                                                         /* epfd */ 
+#define __NRATR1_epoll_pwait             SC_REPR_POINTER                                                      /* events */ 
+#define __NRATR2_epoll_pwait             SC_REPR_SYSCALL_ULONG_T                                              /* maxevents */ 
+#define __NRATR3_epoll_pwait             SC_REPR_SYSCALL_SLONG_T                                              /* timeout */ 
+#define __NRATR4_epoll_pwait             SC_REPR_STRUCT_SIGSET                                                /* ss */ 
+#define __NRRTR_epoll_pwait              SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_utimensat               SC_REPR_FD_T                                                         /* dirfd */ 
+#define __NRATR1_utimensat               SC_REPR_FILENAME                                                     /* filename */ 
+#define __NRATL1_utimensat               0                                                                    /* filename -> dirfd */ 
+#define __NRATR2_utimensat               SC_REPR_POINTER                                                      /* times */ 
+#define __NRATR3_utimensat               SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__CHANGE_CTIME__DOSPATH              /* flags */ 
+#define __NRRTR_utimensat                SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_signalfd                SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_signalfd                SC_REPR_POINTER                                                      /* sigmask */ 
+#define __NRATR2_signalfd                SC_REPR_SIZE_T                                                       /* sigsetsize */ 
+#define __NRRTR_signalfd                 SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_timerfd_create          SC_REPR_CLOCKID_T                                                    /* clock_id */ 
+#define __NRATR1_timerfd_create          SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NRRTR_timerfd_create           SC_REPR_FD_T                                                         /* return */
+#define __NRATR0_eventfd                 SC_REPR_SYSCALL_ULONG_T                                              /* initval */ 
+#define __NRRTR_eventfd                  SC_REPR_FD_T                                                         /* return */
+#define __NRATR0_fallocate               SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_fallocate               SC_REPR_SYSCALL_ULONG_T                                              /* mode */ 
+#define __NRATR2_fallocate               SC_REPR_SYSCALL_ULONG_T                                              /* offset */ 
+#define __NRATR3_fallocate               SC_REPR_SYSCALL_ULONG_T                                              /* length */ 
+#define __NRRTR_fallocate                SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_timerfd_settime         SC_REPR_FD_T                                                         /* ufd */ 
+#define __NRATR1_timerfd_settime         SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NRATR2_timerfd_settime         SC_REPR_STRUCT_ITIMERSPECX32                                         /* utmr */ 
+#define __NRATR3_timerfd_settime         SC_REPR_POINTER                                                      /* otmr */ 
+#define __NRRTR_timerfd_settime          SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_timerfd_gettime         SC_REPR_FD_T                                                         /* ufd */ 
+#define __NRATR1_timerfd_gettime         SC_REPR_POINTER                                                      /* otmr */ 
+#define __NRRTR_timerfd_gettime          SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_signalfd4               SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_signalfd4               SC_REPR_POINTER                                                      /* sigmask */ 
+#define __NRATR2_signalfd4               SC_REPR_SIZE_T                                                       /* sigsetsize */ 
+#define __NRATR3_signalfd4               SC_REPR_SIGNALFD4_FLAGS                                              /* flags */ 
+#define __NRRTR_signalfd4                SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_eventfd2                SC_REPR_SYSCALL_ULONG_T                                              /* initval */ 
+#define __NRATR1_eventfd2                SC_REPR_EVENTFD2_FLAGS                                               /* flags */ 
+#define __NRRTR_eventfd2                 SC_REPR_FD_T                                                         /* return */
+#define __NRATR0_epoll_create1           SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NRRTR_epoll_create1            SC_REPR_FD_T                                                         /* return */
+#define __NRATR0_dup3                    SC_REPR_FD_T                                                         /* oldfd */ 
+#define __NRATR1_dup3                    SC_REPR_FD_T                                                         /* newfd */ 
+#define __NRATR2_dup3                    SC_REPR_OFLAG__CLOEXEC__CLOFORK                                      /* flags */ 
+#define __NRRTR_dup3                     SC_REPR_FD_T                                                         /* return */
+#define __NRATR0_pipe2                   SC_REPR_POINTER                                                      /* pipedes */ 
+#define __NRATR1_pipe2                   SC_REPR_OFLAG__CLOEXEC__CLOFORK__NONBLOCK__DIRECT                    /* flags */ 
+#define __NRRTR_pipe2                    SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_inotify_init1           SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_inotify_init1            SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_preadv                  SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_preadv                  SC_REPR_STRUCT_IOVECX32                                              /* iovec */ 
+#define __NRATL1_preadv                  2                                                                    /* iovec -> count */ 
+#define __NRATR2_preadv                  SC_REPR_SIZE_T                                                       /* count */ 
+#define __NRATR3_preadv                  SC_REPR_UINT64_T                                                     /* offset */ 
+#define __NRRTR_preadv                   SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_pwritev                 SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_pwritev                 SC_REPR_STRUCT_IOVECX32                                              /* iovec */ 
+#define __NRATL1_pwritev                 2                                                                    /* iovec -> count */ 
+#define __NRATR2_pwritev                 SC_REPR_SIZE_T                                                       /* count */ 
+#define __NRATR3_pwritev                 SC_REPR_UINT64_T                                                     /* offset */ 
+#define __NRRTR_pwritev                  SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_rt_tgsigqueueinfo       SC_REPR_PID_T                                                        /* tgid */ 
+#define __NRATR1_rt_tgsigqueueinfo       SC_REPR_PID_T                                                        /* tid */ 
+#define __NRATR2_rt_tgsigqueueinfo       SC_REPR_SIGNO                                                        /* signo */ 
+#define __NRATR3_rt_tgsigqueueinfo       SC_REPR_STRUCT_SIGINFOX32                                            /* uinfo */ 
+#define __NRRTR_rt_tgsigqueueinfo        SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_perf_event_open         SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_perf_event_open          SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_recvmmsg                SC_REPR_FD_T                                                         /* sockfd */ 
+#define __NRATR1_recvmmsg                SC_REPR_POINTER                                                      /* vmessages */ 
+#define __NRATR2_recvmmsg                SC_REPR_SIZE_T                                                       /* vlen */ 
+#define __NRATR3_recvmmsg                SC_REPR_SOCKET_RECVMSG_FLAGS2                                        /* flags */ 
+#define __NRATR4_recvmmsg                SC_REPR_STRUCT_TIMESPECX32                                           /* tmo */ 
+#define __NRRTR_recvmmsg                 SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_fanotify_init           SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_fanotify_init            SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_fanotify_mark           SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_fanotify_mark            SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_prlimit64               SC_REPR_PID_T                                                        /* pid */ 
+#define __NRATR1_prlimit64               SC_REPR_RLIMIT_RESOURCE                                              /* resource */ 
+#define __NRATR2_prlimit64               SC_REPR_STRUCT_RLIMIT64                                              /* new_limit */ 
+#define __NRATR3_prlimit64               SC_REPR_POINTER                                                      /* old_limit */ 
+#define __NRRTR_prlimit64                SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_name_to_handle_at       SC_REPR_FD_T                                                         /* dirfd */ 
+#define __NRATR1_name_to_handle_at       SC_REPR_FILENAME                                                     /* filename */ 
+#define __NRATL1_name_to_handle_at       0                                                                    /* filename -> dirfd */ 
+#define __NRATR2_name_to_handle_at       SC_REPR_POINTER                                                      /* handle */ 
+#define __NRATR3_name_to_handle_at       SC_REPR_POINTER                                                      /* mnt_id */ 
+#define __NRATR4_name_to_handle_at       SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NRRTR_name_to_handle_at        SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_open_by_handle_at       SC_REPR_FD_T                                                         /* mountdirfd */ 
+#define __NRATR1_open_by_handle_at       SC_REPR_POINTER                                                      /* handle */ 
+#define __NRATR2_open_by_handle_at       SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NRRTR_open_by_handle_at        SC_REPR_FD_T                                                         /* return */
+#define __NRATR0_clock_adjtime           SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_clock_adjtime            SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_syncfs                  SC_REPR_FD_T                                                         /* fd */ 
+#define __NRRTR_syncfs                   SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_sendmmsg                SC_REPR_FD_T                                                         /* sockfd */ 
+#define __NRATR1_sendmmsg                SC_REPR_STRUCT_MMSGHDRX32                                            /* vmessages */ 
+#define __NRATR2_sendmmsg                SC_REPR_SIZE_T                                                       /* vlen */ 
+#define __NRATR3_sendmmsg                SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NRRTR_sendmmsg                 SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_setns                   SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_setns                   SC_REPR_SYSCALL_ULONG_T                                              /* nstype */ 
+#define __NRRTR_setns                    SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_process_vm_readv        SC_REPR_PID_T                                                        /* pid */ 
+#define __NRATR1_process_vm_readv        SC_REPR_STRUCT_IOVEC                                                 /* local_iov */ 
+#define __NRATL1_process_vm_readv        2                                                                    /* local_iov -> liovcnt */ 
+#define __NRATR2_process_vm_readv        SC_REPR_SIZE_T                                                       /* liovcnt */ 
+#define __NRATR3_process_vm_readv        SC_REPR_STRUCT_IOVEC                                                 /* remote_iov */ 
+#define __NRATL3_process_vm_readv        4                                                                    /* remote_iov -> riovcnt */ 
+#define __NRATR4_process_vm_readv        SC_REPR_SIZE_T                                                       /* riovcnt */ 
+#define __NRATR5_process_vm_readv        SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NRRTR_process_vm_readv         SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_process_vm_writev       SC_REPR_PID_T                                                        /* pid */ 
+#define __NRATR1_process_vm_writev       SC_REPR_STRUCT_IOVEC                                                 /* local_iov */ 
+#define __NRATL1_process_vm_writev       2                                                                    /* local_iov -> liovcnt */ 
+#define __NRATR2_process_vm_writev       SC_REPR_SIZE_T                                                       /* liovcnt */ 
+#define __NRATR3_process_vm_writev       SC_REPR_STRUCT_IOVEC                                                 /* remote_iov */ 
+#define __NRATL3_process_vm_writev       4                                                                    /* remote_iov -> riovcnt */ 
+#define __NRATR4_process_vm_writev       SC_REPR_SIZE_T                                                       /* riovcnt */ 
+#define __NRATR5_process_vm_writev       SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NRRTR_process_vm_writev        SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_kcmp                    SC_REPR_PID_T                                                        /* pid1 */ 
+#define __NRATR1_kcmp                    SC_REPR_PID_T                                                        /* pid2 */ 
+#define __NRATR2_kcmp                    SC_REPR_SYSCALL_ULONG_T                                              /* type */ 
+#define __NRATR3_kcmp                    SC_REPR_SYSCALL_ULONG_T                                              /* idx1 */ 
+#define __NRATR4_kcmp                    SC_REPR_SYSCALL_ULONG_T                                              /* idx2 */ 
+#define __NRRTR_kcmp                     SC_REPR_SYSCALL_SLONG_T                                              /* return */
+#define __NRATR0_finit_module            SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_finit_module             SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_sched_setattr           SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_sched_setattr            SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_sched_getattr           SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_sched_getattr            SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_renameat2               SC_REPR_FD_T                                                         /* olddirfd */ 
+#define __NRATR1_renameat2               SC_REPR_FILENAME                                                     /* oldpath */ 
+#define __NRATL1_renameat2               0                                                                    /* oldpath -> olddirfd */ 
+#define __NRATR2_renameat2               SC_REPR_FD_T                                                         /* newdirfd */ 
+#define __NRATR3_renameat2               SC_REPR_FILENAME                                                     /* newpath */ 
+#define __NRATL3_renameat2               2                                                                    /* newpath -> newdirfd */ 
+#define __NRATR4_renameat2               SC_REPR_RENAMEAT2_FLAGS                                              /* flags */ 
+#define __NRRTR_renameat2                SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_seccomp                 SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_seccomp                  SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_getrandom               SC_REPR_POINTER                                                      /* buf */ 
+#define __NRATR1_getrandom               SC_REPR_SIZE_T                                                       /* num_bytes */ 
+#define __NRATR2_getrandom               SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NRRTR_getrandom                SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_memfd_create            SC_REPR_STRING                                                       /* name */ 
+#define __NRATR1_memfd_create            SC_REPR_MEMFD_CREATE_FLAGS                                           /* flags */ 
+#define __NRRTR_memfd_create             SC_REPR_FD_T                                                         /* return */
+#define __NRATR0_bpf                     SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_bpf                      SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_execveat                SC_REPR_FD_T                                                         /* dirfd */ 
+#define __NRATR1_execveat                SC_REPR_FILENAME                                                     /* pathname */ 
+#define __NRATL1_execveat                0                                                                    /* pathname -> dirfd */ 
+#define __NRATR2_execveat                SC_REPR_STRING_VECTOR32                                              /* argv */ 
+#define __NRATR3_execveat                SC_REPR_STRING_VECTOR32                                              /* envp */ 
+#define __NRATR4_execveat                SC_REPR_ATFLAG__EMPTY_PATH__SYMLINK_NOFOLLOW__DOSPATH                /* flags */ 
+#define __NRRTR_execveat                 SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_socket                  SC_REPR_SOCKET_DOMAIN                                                /* domain */ 
+#define __NRATR1_socket                  SC_REPR_SOCKET_TYPE                                                  /* type */ 
+#define __NRATR2_socket                  SC_REPR_SOCKET_PROTOCOL                                              /* protocol */ 
+#define __NRATL2_socket                  0                                                                    /* protocol -> domain */ 
+#define __NRRTR_socket                   SC_REPR_FD_T                                                         /* return */
+#define __NRATR0_socketpair              SC_REPR_SOCKET_DOMAIN                                                /* domain */ 
+#define __NRATR1_socketpair              SC_REPR_SOCKET_TYPE                                                  /* type */ 
+#define __NRATR2_socketpair              SC_REPR_SOCKET_PROTOCOL                                              /* protocol */ 
+#define __NRATL2_socketpair              0                                                                    /* protocol -> domain */ 
+#define __NRATR3_socketpair              SC_REPR_POINTER                                                      /* fds */ 
+#define __NRRTR_socketpair               SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_bind                    SC_REPR_FD_T                                                         /* sockfd */ 
+#define __NRATR1_bind                    SC_REPR_STRUCT_SOCKADDR                                              /* addr */ 
+#define __NRATL1_bind                    2                                                                    /* addr -> addr_len */ 
+#define __NRATR2_bind                    SC_REPR_SOCKLEN_T                                                    /* addr_len */ 
+#define __NRRTR_bind                     SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_connect                 SC_REPR_FD_T                                                         /* sockfd */ 
+#define __NRATR1_connect                 SC_REPR_STRUCT_SOCKADDR                                              /* addr */ 
+#define __NRATL1_connect                 2                                                                    /* addr -> addr_len */ 
+#define __NRATR2_connect                 SC_REPR_SOCKLEN_T                                                    /* addr_len */ 
+#define __NRRTR_connect                  SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_listen                  SC_REPR_FD_T                                                         /* sockfd */ 
+#define __NRATR1_listen                  SC_REPR_SYSCALL_ULONG_T                                              /* max_backlog */ 
+#define __NRRTR_listen                   SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_accept4                 SC_REPR_FD_T                                                         /* sockfd */ 
+#define __NRATR1_accept4                 SC_REPR_POINTER                                                      /* addr */ 
+#define __NRATR2_accept4                 SC_REPR_POINTER                                                      /* addr_len */ 
+#define __NRATR3_accept4                 SC_REPR_ACCEPT4_FLAGS                                                /* sock_flags */ 
+#define __NRRTR_accept4                  SC_REPR_FD_T                                                         /* return */
+#define __NRATR0_getsockopt              SC_REPR_FD_T                                                         /* sockfd */ 
+#define __NRATR1_getsockopt              SC_REPR_SOCKOPT_LEVEL                                                /* level */ 
+#define __NRATR2_getsockopt              SC_REPR_SOCKOPT_OPTNAME                                              /* optname */ 
+#define __NRATL2_getsockopt              1                                                                    /* optname -> level */ 
+#define __NRATR3_getsockopt              SC_REPR_POINTER                                                      /* optval */ 
+#define __NRATR4_getsockopt              SC_REPR_POINTER                                                      /* optlen */ 
+#define __NRRTR_getsockopt               SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_setsockopt              SC_REPR_FD_T                                                         /* sockfd */ 
+#define __NRATR1_setsockopt              SC_REPR_SOCKOPT_LEVEL                                                /* level */ 
+#define __NRATR2_setsockopt              SC_REPR_SOCKOPT_OPTNAME                                              /* optname */ 
+#define __NRATL2_setsockopt              1                                                                    /* optname -> level */ 
+#define __NRATR3_setsockopt              SC_REPR_SOCKOPT_OPTVAL                                               /* optval */ 
+#define __NRATL3_setsockopt              4                                                                    /* optval -> optlen */ 
+#define __NRATR4_setsockopt              SC_REPR_SOCKLEN_T                                                    /* optlen */ 
+#define __NRRTR_setsockopt               SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_getsockname             SC_REPR_FD_T                                                         /* sockfd */ 
+#define __NRATR1_getsockname             SC_REPR_POINTER                                                      /* addr */ 
+#define __NRATR2_getsockname             SC_REPR_POINTER                                                      /* addr_len */ 
+#define __NRRTR_getsockname              SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_getpeername             SC_REPR_FD_T                                                         /* sockfd */ 
+#define __NRATR1_getpeername             SC_REPR_POINTER                                                      /* addr */ 
+#define __NRATR2_getpeername             SC_REPR_POINTER                                                      /* addr_len */ 
+#define __NRRTR_getpeername              SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_sendto                  SC_REPR_FD_T                                                         /* sockfd */ 
+#define __NRATR1_sendto                  SC_REPR_POINTER                                                      /* buf */ 
+#define __NRATR2_sendto                  SC_REPR_SIZE_T                                                       /* bufsize */ 
+#define __NRATR3_sendto                  SC_REPR_SOCKET_SENDMSG_FLAGS                                         /* msg_flags */ 
+#define __NRATR4_sendto                  SC_REPR_STRUCT_SOCKADDR                                              /* addr */ 
+#define __NRATL4_sendto                  5                                                                    /* addr -> addr_len */ 
+#define __NRATR5_sendto                  SC_REPR_SOCKLEN_T                                                    /* addr_len */ 
+#define __NRRTR_sendto                   SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_sendmsg                 SC_REPR_FD_T                                                         /* sockfd */ 
+#define __NRATR1_sendmsg                 SC_REPR_STRUCT_MSGHDRX32                                             /* message */ 
+#define __NRATR2_sendmsg                 SC_REPR_SOCKET_SENDMSG_FLAGS                                         /* msg_flags */ 
+#define __NRRTR_sendmsg                  SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_recvfrom                SC_REPR_FD_T                                                         /* sockfd */ 
+#define __NRATR1_recvfrom                SC_REPR_POINTER                                                      /* buf */ 
+#define __NRATR2_recvfrom                SC_REPR_SIZE_T                                                       /* bufsize */ 
+#define __NRATR3_recvfrom                SC_REPR_SOCKET_RECVMSG_FLAGS                                         /* msg_flags */ 
+#define __NRATR4_recvfrom                SC_REPR_POINTER                                                      /* addr */ 
+#define __NRATR5_recvfrom                SC_REPR_POINTER                                                      /* addr_len */ 
+#define __NRRTR_recvfrom                 SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_recvmsg                 SC_REPR_FD_T                                                         /* sockfd */ 
+#define __NRATR1_recvmsg                 SC_REPR_POINTER                                                      /* message */ 
+#define __NRATR2_recvmsg                 SC_REPR_SOCKET_RECVMSG_FLAGS2                                        /* msg_flags */ 
+#define __NRRTR_recvmsg                  SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_shutdown                SC_REPR_FD_T                                                         /* sockfd */ 
+#define __NRATR1_shutdown                SC_REPR_SOCKET_SHUTDOWN_HOW                                          /* how */ 
+#define __NRRTR_shutdown                 SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_userfaultfd             SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_userfaultfd              SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_membarrier              SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_membarrier               SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_mlock2                  SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_mlock2                   SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_recvmmsg64              SC_REPR_FD_T                                                         /* sockfd */ 
+#define __NRATR1_recvmmsg64              SC_REPR_POINTER                                                      /* vmessages */ 
+#define __NRATR2_recvmmsg64              SC_REPR_SIZE_T                                                       /* vlen */ 
+#define __NRATR3_recvmmsg64              SC_REPR_SOCKET_RECVMSG_FLAGS2                                        /* flags */ 
+#define __NRATR4_recvmmsg64              SC_REPR_STRUCT_TIMESPECX32_64                                        /* tmo */ 
+#define __NRRTR_recvmmsg64               SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_pwritevf                SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_pwritevf                SC_REPR_STRUCT_IOVECX32                                              /* iovec */ 
+#define __NRATL1_pwritevf                2                                                                    /* iovec -> count */ 
+#define __NRATR2_pwritevf                SC_REPR_SIZE_T                                                       /* count */ 
+#define __NRATR3_pwritevf                SC_REPR_UINT64_T                                                     /* offset */ 
+#define __NRATR4_pwritevf                SC_REPR_IOMODE_T                                                     /* mode */ 
+#define __NRRTR_pwritevf                 SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_preadvf                 SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_preadvf                 SC_REPR_STRUCT_IOVECX32                                              /* iovec */ 
+#define __NRATL1_preadvf                 2                                                                    /* iovec -> count */ 
+#define __NRATR2_preadvf                 SC_REPR_SIZE_T                                                       /* count */ 
+#define __NRATR3_preadvf                 SC_REPR_UINT64_T                                                     /* offset */ 
+#define __NRATR4_preadvf                 SC_REPR_IOMODE_T                                                     /* mode */ 
+#define __NRRTR_preadvf                  SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_timerfd_gettime64       SC_REPR_FD_T                                                         /* ufd */ 
+#define __NRATR1_timerfd_gettime64       SC_REPR_POINTER                                                      /* otmr */ 
+#define __NRRTR_timerfd_gettime64        SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_timerfd_settime64       SC_REPR_FD_T                                                         /* ufd */ 
+#define __NRATR1_timerfd_settime64       SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NRATR2_timerfd_settime64       SC_REPR_STRUCT_ITIMERSPECX32_64                                      /* utmr */ 
+#define __NRATR3_timerfd_settime64       SC_REPR_POINTER                                                      /* otmr */ 
+#define __NRRTR_timerfd_settime64        SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_fallocate64             SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_fallocate64             SC_REPR_SYSCALL_ULONG_T                                              /* mode */ 
+#define __NRATR2_fallocate64             SC_REPR_UINT64_T                                                     /* offset */ 
+#define __NRATR3_fallocate64             SC_REPR_UINT64_T                                                     /* length */ 
+#define __NRRTR_fallocate64              SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_utimensat64             SC_REPR_FD_T                                                         /* dirfd */ 
+#define __NRATR1_utimensat64             SC_REPR_FILENAME                                                     /* filename */ 
+#define __NRATL1_utimensat64             0                                                                    /* filename -> dirfd */ 
+#define __NRATR2_utimensat64             SC_REPR_POINTER                                                      /* times */ 
+#define __NRATR3_utimensat64             SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__CHANGE_CTIME__DOSPATH              /* flags */ 
+#define __NRRTR_utimensat64              SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_ppoll64                 SC_REPR_STRUCT_POLLFD                                                /* fds */ 
+#define __NRATL0_ppoll64                 1                                                                    /* fds -> nfds */ 
+#define __NRATR1_ppoll64                 SC_REPR_SIZE_T                                                       /* nfds */ 
+#define __NRATR2_ppoll64                 SC_REPR_STRUCT_TIMESPECX32_64                                        /* timeout_ts */ 
+#define __NRATR3_ppoll64                 SC_REPR_POINTER                                                      /* sigmask */ 
+#define __NRATR4_ppoll64                 SC_REPR_SIZE_T                                                       /* sigsetsize */ 
+#define __NRRTR_ppoll64                  SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_pselect6_64             SC_REPR_SIZE_T                                                       /* nfds */ 
+#define __NRATR1_pselect6_64             SC_REPR_STRUCT_FDSET                                                 /* readfds */ 
+#define __NRATL1_pselect6_64             0                                                                    /* readfds -> nfds */ 
+#define __NRATR2_pselect6_64             SC_REPR_STRUCT_FDSET                                                 /* writefds */ 
+#define __NRATL2_pselect6_64             0                                                                    /* writefds -> nfds */ 
+#define __NRATR3_pselect6_64             SC_REPR_STRUCT_FDSET                                                 /* exceptfds */ 
+#define __NRATL3_pselect6_64             0                                                                    /* exceptfds -> nfds */ 
+#define __NRATR4_pselect6_64             SC_REPR_STRUCT_TIMESPECX32_64                                        /* timeout */ 
+#define __NRATR5_pselect6_64             SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN                                /* sigmask_sigset_and_len */ 
+#define __NRRTR_pselect6_64              SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_freadlinkat             SC_REPR_FD_T                                                         /* dirfd */ 
+#define __NRATR1_freadlinkat             SC_REPR_FILENAME                                                     /* path */ 
+#define __NRATL1_freadlinkat             0                                                                    /* path -> dirfd */ 
+#define __NRATR2_freadlinkat             SC_REPR_POINTER                                                      /* buf */ 
+#define __NRATR3_freadlinkat             SC_REPR_SIZE_T                                                       /* buflen */ 
+#define __NRATR4_freadlinkat             SC_REPR_ATFLAG__READLINK_REQSIZE__DOSPATH                            /* flags */ 
+#define __NRRTR_freadlinkat              SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_fsymlinkat              SC_REPR_STRING                                                       /* link_text */ 
+#define __NRATR1_fsymlinkat              SC_REPR_FD_T                                                         /* tofd */ 
+#define __NRATR2_fsymlinkat              SC_REPR_STRING                                                       /* target_path */ 
+#define __NRATR3_fsymlinkat              SC_REPR_ATFLAG__DOSPATH                                              /* flags */ 
+#define __NRRTR_fsymlinkat               SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_frenameat               SC_REPR_FD_T                                                         /* oldfd */ 
+#define __NRATR1_frenameat               SC_REPR_FILENAME                                                     /* oldname */ 
+#define __NRATL1_frenameat               0                                                                    /* oldname -> oldfd */ 
+#define __NRATR2_frenameat               SC_REPR_FD_T                                                         /* newfd */ 
+#define __NRATR3_frenameat               SC_REPR_FILENAME                                                     /* newname_or_path */ 
+#define __NRATL3_frenameat               2                                                                    /* newname_or_path -> newfd */ 
+#define __NRATR4_frenameat               SC_REPR_ATFLAG__DOSPATH                                              /* flags */ 
+#define __NRRTR_frenameat                SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_kfstatat                SC_REPR_FD_T                                                         /* dirfd */ 
+#define __NRATR1_kfstatat                SC_REPR_FILENAME                                                     /* filename */ 
+#define __NRATL1_kfstatat                0                                                                    /* filename -> dirfd */ 
+#define __NRATR2_kfstatat                SC_REPR_POINTER                                                      /* statbuf */ 
+#define __NRATR3_kfstatat                SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__DOSPATH                            /* flags */ 
+#define __NRRTR_kfstatat                 SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_futimesat64             SC_REPR_FD_T                                                         /* dirfd */ 
+#define __NRATR1_futimesat64             SC_REPR_FILENAME                                                     /* filename */ 
+#define __NRATL1_futimesat64             0                                                                    /* filename -> dirfd */ 
+#define __NRATR2_futimesat64             SC_REPR_TIMEVALX32_64_VEC2                                           /* times */ 
+#define __NRRTR_futimesat64              SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_fmknodat                SC_REPR_FD_T                                                         /* dirfd */ 
+#define __NRATR1_fmknodat                SC_REPR_FILENAME                                                     /* nodename */ 
+#define __NRATL1_fmknodat                0                                                                    /* nodename -> dirfd */ 
+#define __NRATR2_fmknodat                SC_REPR_MODE_T                                                       /* mode */ 
+#define __NRATR3_fmknodat                SC_REPR_DEV_T                                                        /* dev */ 
+#define __NRATR4_fmknodat                SC_REPR_ATFLAG__DOSPATH                                              /* flags */ 
+#define __NRRTR_fmknodat                 SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_fmkdirat                SC_REPR_FD_T                                                         /* dirfd */ 
+#define __NRATR1_fmkdirat                SC_REPR_FILENAME                                                     /* pathname */ 
+#define __NRATL1_fmkdirat                0                                                                    /* pathname -> dirfd */ 
+#define __NRATR2_fmkdirat                SC_REPR_MODE_T                                                       /* mode */ 
+#define __NRATR3_fmkdirat                SC_REPR_ATFLAG__DOSPATH                                              /* flags */ 
+#define __NRRTR_fmkdirat                 SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_waitid64                SC_REPR_IDTYPE_T                                                     /* idtype */ 
+#define __NRATR1_waitid64                SC_REPR_ID_T                                                         /* id */ 
+#define __NRATL1_waitid64                0                                                                    /* id -> idtype */ 
+#define __NRATR2_waitid64                SC_REPR_POINTER                                                      /* infop */ 
+#define __NRATR3_waitid64                SC_REPR_WAITID_OPTIONS                                               /* options */ 
+#define __NRATR4_waitid64                SC_REPR_POINTER                                                      /* ru */ 
+#define __NRRTR_waitid64                 SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_mq_timedreceive64       SC_REPR_FD_T                                                         /* mqdes */ 
+#define __NRATR1_mq_timedreceive64       SC_REPR_POINTER                                                      /* msg_ptr */ 
+#define __NRATR2_mq_timedreceive64       SC_REPR_SIZE_T                                                       /* msg_len */ 
+#define __NRATR3_mq_timedreceive64       SC_REPR_POINTER                                                      /* pmsg_prio */ 
+#define __NRATR4_mq_timedreceive64       SC_REPR_STRUCT_TIMESPECX32_64                                        /* abs_timeout */ 
+#define __NRRTR_mq_timedreceive64        SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_mq_timedsend64          SC_REPR_FD_T                                                         /* mqdes */ 
+#define __NRATR1_mq_timedsend64          SC_REPR_STRING                                                       /* msg_ptr */ 
+#define __NRATR2_mq_timedsend64          SC_REPR_SIZE_T                                                       /* msg_len */ 
+#define __NRATR3_mq_timedsend64          SC_REPR_UINT32_T                                                     /* msg_prio */ 
+#define __NRATR4_mq_timedsend64          SC_REPR_STRUCT_TIMESPECX32_64                                        /* abs_timeout */ 
+#define __NRRTR_mq_timedsend64           SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_utimes64                SC_REPR_FILENAME                                                     /* filename */ 
+#define __NRATR1_utimes64                SC_REPR_POINTER                                                      /* times */ 
+#define __NRRTR_utimes64                 SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_clock_nanosleep64       SC_REPR_CLOCKID_T                                                    /* clock_id */ 
+#define __NRATR1_clock_nanosleep64       SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NRATR2_clock_nanosleep64       SC_REPR_STRUCT_TIMESPECX32_64                                        /* requested_time */ 
+#define __NRATR3_clock_nanosleep64       SC_REPR_POINTER                                                      /* remaining */ 
+#define __NRRTR_clock_nanosleep64        SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_clock_getres64          SC_REPR_CLOCKID_T                                                    /* clock_id */ 
+#define __NRATR1_clock_getres64          SC_REPR_POINTER                                                      /* res */ 
+#define __NRRTR_clock_getres64           SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_clock_gettime64         SC_REPR_CLOCKID_T                                                    /* clock_id */ 
+#define __NRATR1_clock_gettime64         SC_REPR_POINTER                                                      /* tp */ 
+#define __NRRTR_clock_gettime64          SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_clock_settime64         SC_REPR_CLOCKID_T                                                    /* clock_id */ 
+#define __NRATR1_clock_settime64         SC_REPR_STRUCT_TIMESPECX32_64                                        /* tp */ 
+#define __NRRTR_clock_settime64          SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_timer_gettime64         SC_REPR_TIMER_T                                                      /* timerid */ 
+#define __NRATR1_timer_gettime64         SC_REPR_POINTER                                                      /* value */ 
+#define __NRRTR_timer_gettime64          SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_timer_settime64         SC_REPR_TIMER_T                                                      /* timerid */ 
+#define __NRATR1_timer_settime64         SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NRATR2_timer_settime64         SC_REPR_POINTER                                                      /* value */ 
+#define __NRATR3_timer_settime64         SC_REPR_POINTER                                                      /* ovalue */ 
+#define __NRRTR_timer_settime64          SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_kreaddirf               SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_kreaddirf               SC_REPR_POINTER                                                      /* buf */ 
+#define __NRATR2_kreaddirf               SC_REPR_SIZE_T                                                       /* bufsize */ 
+#define __NRATR3_kreaddirf               SC_REPR_KREADDIR_MODE                                                /* mode */ 
+#define __NRATR4_kreaddirf               SC_REPR_IOMODE_T                                                     /* iomode */ 
+#define __NRRTR_kreaddirf                SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_kfstat                  SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_kfstat                  SC_REPR_POINTER                                                      /* statbuf */ 
+#define __NRRTR_kfstat                   SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_klstat                  SC_REPR_FILENAME                                                     /* filename */ 
+#define __NRATR1_klstat                  SC_REPR_POINTER                                                      /* statbuf */ 
+#define __NRRTR_klstat                   SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_kstat                   SC_REPR_FILENAME                                                     /* filename */ 
+#define __NRATR1_kstat                   SC_REPR_POINTER                                                      /* statbuf */ 
+#define __NRRTR_kstat                    SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_pwrite64f               SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_pwrite64f               SC_REPR_POINTER                                                      /* buf */ 
+#define __NRATR2_pwrite64f               SC_REPR_SIZE_T                                                       /* bufsize */ 
+#define __NRATR3_pwrite64f               SC_REPR_UINT64_T                                                     /* offset */ 
+#define __NRATR4_pwrite64f               SC_REPR_IOMODE_T                                                     /* mode */ 
+#define __NRRTR_pwrite64f                SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_pread64f                SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_pread64f                SC_REPR_POINTER                                                      /* buf */ 
+#define __NRATR2_pread64f                SC_REPR_SIZE_T                                                       /* bufsize */ 
+#define __NRATR3_pread64f                SC_REPR_UINT64_T                                                     /* offset */ 
+#define __NRATR4_pread64f                SC_REPR_IOMODE_T                                                     /* mode */ 
+#define __NRRTR_pread64f                 SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_rt_sigtimedwait64       SC_REPR_STRUCT_SIGSET                                                /* set */ 
+#define __NRATL0_rt_sigtimedwait64       3                                                                    /* set -> sigsetsize */ 
+#define __NRATR1_rt_sigtimedwait64       SC_REPR_POINTER                                                      /* info */ 
+#define __NRATR2_rt_sigtimedwait64       SC_REPR_STRUCT_TIMESPECX32_64                                        /* timeout */ 
+#define __NRATR3_rt_sigtimedwait64       SC_REPR_SIZE_T                                                       /* sigsetsize */ 
+#define __NRRTR_rt_sigtimedwait64        SC_REPR_SYSCALL_SLONG_T                                              /* return */
+#define __NRATR0_nanosleep64             SC_REPR_STRUCT_TIMESPECX32_64                                        /* req */ 
+#define __NRATR1_nanosleep64             SC_REPR_POINTER                                                      /* rem */ 
+#define __NRRTR_nanosleep64              SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_sched_rr_get_interval64 SC_REPR_PID_T                                                        /* pid */ 
+#define __NRATR1_sched_rr_get_interval64 SC_REPR_POINTER                                                      /* tms */ 
+#define __NRRTR_sched_rr_get_interval64  SC_REPR_ERRNO_T                                                      /* return */
+#define __NRRTR_rpc_service              SC_REPR_SYSCALL_SLONG_T                                              /* return */
+#define __NRATR0_ksysctl                 SC_REPR_SYSCALL_ULONG_T                                              /* command */ 
+#define __NRATR1_ksysctl                 SC_REPR_POINTER                                                      /* arg */ 
+#define __NRRTR_ksysctl                  SC_REPR_SYSCALL_SLONG_T                                              /* return */
+#define __NRATR0_writevf                 SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_writevf                 SC_REPR_STRUCT_IOVECX32                                              /* iovec */ 
+#define __NRATL1_writevf                 2                                                                    /* iovec -> count */ 
+#define __NRATR2_writevf                 SC_REPR_SIZE_T                                                       /* count */ 
+#define __NRATR3_writevf                 SC_REPR_IOMODE_T                                                     /* mode */ 
+#define __NRRTR_writevf                  SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_readvf                  SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_readvf                  SC_REPR_STRUCT_IOVECX32                                              /* iovec */ 
+#define __NRATL1_readvf                  2                                                                    /* iovec -> count */ 
+#define __NRATR2_readvf                  SC_REPR_SIZE_T                                                       /* count */ 
+#define __NRATR3_readvf                  SC_REPR_IOMODE_T                                                     /* mode */ 
+#define __NRRTR_readvf                   SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_kreaddir                SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_kreaddir                SC_REPR_POINTER                                                      /* buf */ 
+#define __NRATR2_kreaddir                SC_REPR_SIZE_T                                                       /* bufsize */ 
+#define __NRATR3_kreaddir                SC_REPR_KREADDIR_MODE                                                /* mode */ 
+#define __NRRTR_kreaddir                 SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_wait4_64                SC_REPR_PID_T                                                        /* pid */ 
+#define __NRATR1_wait4_64                SC_REPR_POINTER                                                      /* stat_loc */ 
+#define __NRATR2_wait4_64                SC_REPR_WAITFLAG                                                     /* options */ 
+#define __NRATR3_wait4_64                SC_REPR_POINTER                                                      /* usage */ 
+#define __NRRTR_wait4_64                 SC_REPR_PID_T                                                        /* return */
+#define __NRATR0_getitimer64             SC_REPR_SYSCALL_ULONG_T                                              /* which */ 
+#define __NRATR1_getitimer64             SC_REPR_POINTER                                                      /* curr_value */ 
+#define __NRRTR_getitimer64              SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_setitimer64             SC_REPR_SYSCALL_ULONG_T                                              /* which */ 
+#define __NRATR1_setitimer64             SC_REPR_STRUCT_ITIMERVALX64                                          /* newval */ 
+#define __NRATR2_setitimer64             SC_REPR_POINTER                                                      /* oldval */ 
+#define __NRRTR_setitimer64              SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_maplibrary              SC_REPR_POINTER                                                      /* addr */ 
+#define __NRATR1_maplibrary              SC_REPR_MAPLIBRARY_FLAGS                                             /* flags */ 
+#define __NRATR2_maplibrary              SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR3_maplibrary              SC_REPR_STRUCT_ELF_PHDR32_VECTOR                                     /* hdrv */ 
+#define __NRATL3_maplibrary              4                                                                    /* hdrv -> hdrc */ 
+#define __NRATR4_maplibrary              SC_REPR_SIZE_T                                                       /* hdrc */ 
+#define __NRRTR_maplibrary               SC_REPR_POINTER                                                      /* return */
+#define __NRATR0_select64                SC_REPR_SIZE_T                                                       /* nfds */ 
+#define __NRATR1_select64                SC_REPR_STRUCT_FDSET                                                 /* readfds */ 
+#define __NRATL1_select64                0                                                                    /* readfds -> nfds */ 
+#define __NRATR2_select64                SC_REPR_STRUCT_FDSET                                                 /* writefds */ 
+#define __NRATL2_select64                0                                                                    /* writefds -> nfds */ 
+#define __NRATR3_select64                SC_REPR_STRUCT_FDSET                                                 /* exceptfds */ 
+#define __NRATL3_select64                0                                                                    /* exceptfds -> nfds */ 
+#define __NRATR4_select64                SC_REPR_POINTER                                                      /* timeout */ 
+#define __NRRTR_select64                 SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_settimeofday64          SC_REPR_STRUCT_TIMEVALX32_64                                         /* tv */ 
+#define __NRATR1_settimeofday64          SC_REPR_STRUCT_TIMEZONE                                              /* tz */ 
+#define __NRRTR_settimeofday64           SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_gettimeofday64          SC_REPR_POINTER                                                      /* tv */ 
+#define __NRATR1_gettimeofday64          SC_REPR_POINTER                                                      /* tz */ 
+#define __NRRTR_gettimeofday64           SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_getrusage64             SC_REPR_GETRUSAGE_WHO                                                /* who */ 
+#define __NRATR1_getrusage64             SC_REPR_POINTER                                                      /* tv */ 
+#define __NRRTR_getrusage64              SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_fsmode                  SC_REPR_UINT64_T                                                     /* mode */ 
+#define __NRRTR_fsmode                   SC_REPR_UINT64_T                                                     /* return */
+#define __NRATR0_ioctlf                  SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_ioctlf                  SC_REPR_SYSCALL_ULONG_T                                              /* command */ 
+#define __NRATR2_ioctlf                  SC_REPR_IOMODE_T                                                     /* mode */ 
+#define __NRATR3_ioctlf                  SC_REPR_POINTER                                                      /* arg */ 
+#define __NRRTR_ioctlf                   SC_REPR_SYSCALL_SLONG_T                                              /* return */
+#define __NRATR0_ftime64                 SC_REPR_POINTER                                                      /* tp */ 
+#define __NRRTR_ftime64                  SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_utime64                 SC_REPR_FILENAME                                                     /* filename */ 
+#define __NRATR1_utime64                 SC_REPR_STRUCT_UTIMBUFX32_64                                         /* times */ 
+#define __NRRTR_utime64                  SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_userviofd               SC_REPR_SIZE_T                                                       /* initial_size */ 
+#define __NRATR1_userviofd               SC_REPR_OFLAG__CLOEXEC__CLOFORK__NONBLOCK                            /* flags */ 
+#define __NRRTR_userviofd                SC_REPR_FD_T                                                         /* return */
+#define __NRATR0_process_spawnveat       SC_REPR_FD_T                                                         /* dirfd */ 
+#define __NRATR1_process_spawnveat       SC_REPR_FILENAME                                                     /* pathname */ 
+#define __NRATL1_process_spawnveat       0                                                                    /* pathname -> dirfd */ 
+#define __NRATR2_process_spawnveat       SC_REPR_STRING_VECTOR64                                              /* argv */ 
+#define __NRATR3_process_spawnveat       SC_REPR_STRING_VECTOR32                                              /* envp */ 
+#define __NRATR4_process_spawnveat       SC_REPR_ATFLAG__EMPTY_PATH__SYMLINK_NOFOLLOW__DOSPATH                /* flags */ 
+#define __NRATR5_process_spawnveat       SC_REPR_STRUCT_SPAWN_ACTIONSX32                                      /* actions */ 
+#define __NRRTR_process_spawnveat        SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_stime64                 SC_REPR_POINTER                                                      /* t */ 
+#define __NRRTR_stime64                  SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_coredump                SC_REPR_STRUCT_UCPUSTATE32                                           /* curr_state */ 
+#define __NRATR1_coredump                SC_REPR_STRUCT_UCPUSTATE32                                           /* orig_state */ 
+#define __NRATR2_coredump                SC_REPR_VOID_VECTOR32                                                /* traceback_vector */ 
+#define __NRATL2_coredump                3                                                                    /* traceback_vector -> traceback_length */ 
+#define __NRATR3_coredump                SC_REPR_SIZE_T                                                       /* traceback_length */ 
+#define __NRATR4_coredump                SC_REPR_STRUCT_EXCEPTION_DATA32                                      /* exception */ 
+#define __NRATR5_coredump                SC_REPR_UNWIND_ERROR                                                 /* unwind_error */ 
+#define __NRRTR_coredump                 SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_raiseat                 SC_REPR_STRUCT_UCPUSTATE32                                           /* state */ 
+#define __NRATR1_raiseat                 SC_REPR_STRUCT_SIGINFOX32                                            /* si */ 
+#define __NRRTR_raiseat                  SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_mktty                   SC_REPR_FD_T                                                         /* keyboard */ 
+#define __NRATR1_mktty                   SC_REPR_FD_T                                                         /* display */ 
+#define __NRATR2_mktty                   SC_REPR_STRING                                                       /* name */ 
+#define __NRATR3_mktty                   SC_REPR_SYSCALL_ULONG_T                                              /* rsvd */ 
+#define __NRRTR_mktty                    SC_REPR_FD_T                                                         /* return */
+#define __NRATR0_lfutexlockexpr          SC_REPR_POINTER                                                      /* ulockaddr */ 
+#define __NRATR1_lfutexlockexpr          SC_REPR_POINTER                                                      /* base */ 
+#define __NRATR2_lfutexlockexpr          SC_REPR_SIZE_T                                                       /* exprc */ 
+#define __NRATR3_lfutexlockexpr          SC_REPR_STRUCT_LFUTEXEXPRX32_VECTOR                                  /* exprv */ 
+#define __NRATL3_lfutexlockexpr          2                                                                    /* exprv -> exprc */ 
+#define __NRATR4_lfutexlockexpr          SC_REPR_STRUCT_TIMESPECX32_64                                        /* timeout */ 
+#define __NRATR5_lfutexlockexpr          SC_REPR_SYSCALL_ULONG_T                                              /* timeout_flags */ 
+#define __NRRTR_lfutexlockexpr           SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_lfutexexpr              SC_REPR_POINTER                                                      /* base */ 
+#define __NRATR1_lfutexexpr              SC_REPR_SIZE_T                                                       /* exprc */ 
+#define __NRATR2_lfutexexpr              SC_REPR_STRUCT_LFUTEXEXPRX32_VECTOR                                  /* exprv */ 
+#define __NRATL2_lfutexexpr              1                                                                    /* exprv -> exprc */ 
+#define __NRATR3_lfutexexpr              SC_REPR_STRUCT_TIMESPECX32_64                                        /* timeout */ 
+#define __NRATR4_lfutexexpr              SC_REPR_SYSCALL_ULONG_T                                              /* timeout_flags */ 
+#define __NRRTR_lfutexexpr               SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_lseek64                 SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_lseek64                 SC_REPR_INT64_T                                                      /* offset */ 
+#define __NRATR2_lseek64                 SC_REPR_SEEK_WHENCE                                                  /* whence */ 
+#define __NRRTR_lseek64                  SC_REPR_INT64_T                                                      /* return */
+#define __NRATR0_lfutex                  SC_REPR_POINTER                                                      /* uaddr */ 
+#define __NRATR1_lfutex                  SC_REPR_LFUTEX_OP                                                    /* futex_op */ 
+#define __NRATR2_lfutex                  SC_REPR_UINT32_T                                                     /* val */ 
+#define __NRATR3_lfutex                  SC_REPR_STRUCT_TIMESPECX32_64                                        /* timeout */ 
+#define __NRATR4_lfutex                  SC_REPR_UINT32_T                                                     /* val2 */ 
+#define __NRRTR_lfutex                   SC_REPR_SYSCALL_SLONG_T                                              /* return */
+#define __NRATR0_debugtrap               SC_REPR_STRUCT_UCPUSTATE32                                           /* state */ 
+#define __NRATR1_debugtrap               SC_REPR_STRUCT_DEBUGTRAP_REASON32                                    /* reason */ 
+#define __NRRTR_debugtrap                SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_set_library_listdef     SC_REPR_STRUCT_LIBRARY_LISTDEF32                                     /* listdef */ 
+#define __NRRTR_set_library_listdef      SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_get_exception_handler   SC_REPR_POINTER                                                      /* pmode */ 
+#define __NRATR1_get_exception_handler   SC_REPR_POINTER                                                      /* phandler */ 
+#define __NRATR2_get_exception_handler   SC_REPR_POINTER                                                      /* phandler_sp */ 
+#define __NRRTR_get_exception_handler    SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_set_exception_handler   SC_REPR_SET_EXCEPTION_HANDLER_MODE                                   /* mode */ 
+#define __NRATR1_set_exception_handler   SC_REPR_EXCEPT_HANDLER_T                                             /* handler */ 
+#define __NRATR2_set_exception_handler   SC_REPR_POINTER                                                      /* handler_sp */ 
+#define __NRRTR_set_exception_handler    SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_time64                  SC_REPR_POINTER                                                      /* timer */ 
+#define __NRRTR_time64                   SC_REPR_TIME                                                         /* return */
+#define __NRATR0_fchdirat                SC_REPR_FD_T                                                         /* dirfd */ 
+#define __NRATR1_fchdirat                SC_REPR_FILENAME                                                     /* path */ 
+#define __NRATL1_fchdirat                0                                                                    /* path -> dirfd */ 
+#define __NRATR2_fchdirat                SC_REPR_ATFLAG__DOSPATH                                              /* flags */ 
+#define __NRRTR_fchdirat                 SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_openpty                 SC_REPR_POINTER                                                      /* amaster */ 
+#define __NRATR1_openpty                 SC_REPR_POINTER                                                      /* aslave */ 
+#define __NRATR2_openpty                 SC_REPR_POINTER                                                      /* name */ 
+#define __NRATR3_openpty                 SC_REPR_STRUCT_TERMIOS                                               /* termp */ 
+#define __NRATR4_openpty                 SC_REPR_STRUCT_WINSIZE                                               /* winp */ 
+#define __NRRTR_openpty                  SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_rpc_schedule            SC_REPR_PID_T                                                        /* target */ 
+#define __NRATR1_rpc_schedule            SC_REPR_RPC_SCHEDULE_FLAGS                                           /* flags */ 
+#define __NRATR2_rpc_schedule            SC_REPR_POINTER                                                      /* program */ 
+#define __NRATR3_rpc_schedule            SC_REPR_POINTER                                                      /* arguments */ 
+#define __NRRTR_rpc_schedule             SC_REPR_SYSCALL_SLONG_T                                              /* return */
+#define __NRATR0_frealpathat             SC_REPR_FD_T                                                         /* dirfd */ 
+#define __NRATR1_frealpathat             SC_REPR_FILENAME                                                     /* filename */ 
+#define __NRATL1_frealpathat             0                                                                    /* filename -> dirfd */ 
+#define __NRATR2_frealpathat             SC_REPR_POINTER                                                      /* buf */ 
+#define __NRATR3_frealpathat             SC_REPR_SIZE_T                                                       /* buflen */ 
+#define __NRATR4_frealpathat             SC_REPR_ATFLAG__ALTPATH__SYMLINK_NOFOLLOW__READLINK_REQSIZE__DOSPATH /* flags */ 
+#define __NRRTR_frealpathat              SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_frealpath4              SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_frealpath4              SC_REPR_POINTER                                                      /* resolved */ 
+#define __NRATR2_frealpath4              SC_REPR_SIZE_T                                                       /* buflen */ 
+#define __NRATR3_frealpath4              SC_REPR_ATFLAG__ALTPATH__READLINK_REQSIZE__DOSPATH                   /* flags */ 
+#define __NRRTR_frealpath4               SC_REPR_SSIZE_T                                                      /* return */
+#define __NRRTR_getdrives                SC_REPR_SYSCALL_SLONG_T                                              /* return */
+#define __NRATR0_detach                  SC_REPR_PID_T                                                        /* pid */ 
+#define __NRRTR_detach                   SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_writef                  SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_writef                  SC_REPR_INBUF                                                        /* buf */ 
+#define __NRATL1_writef                  2                                                                    /* buf -> bufsize */ 
+#define __NRATR2_writef                  SC_REPR_SIZE_T                                                       /* bufsize */ 
+#define __NRATR3_writef                  SC_REPR_IOMODE_T                                                     /* mode */ 
+#define __NRRTR_writef                   SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_readf                   SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_readf                   SC_REPR_OUTBUF                                                       /* buf */ 
+#define __NRATL1_readf                   2                                                                    /* buf -> bufsize */ 
+#define __NRATR2_readf                   SC_REPR_SIZE_T                                                       /* bufsize */ 
+#define __NRATR3_readf                   SC_REPR_IOMODE_T                                                     /* mode */ 
+#define __NRRTR_readf                    SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_hopf                    SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_hopf                    SC_REPR_HOP_COMMAND                                                  /* command */ 
+#define __NRATR2_hopf                    SC_REPR_IOMODE_T                                                     /* mode */ 
+#define __NRATR3_hopf                    SC_REPR_HOP_ARG                                                      /* arg */ 
+#define __NRATL3_hopf                    1                                                                    /* arg -> command */ 
+#define __NRRTR_hopf                     SC_REPR_SYSCALL_SLONG_T                                              /* return */
+#define __NRATR0_hop                     SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_hop                     SC_REPR_HOP_COMMAND                                                  /* command */ 
+#define __NRATR2_hop                     SC_REPR_HOP_ARG                                                      /* arg */ 
+#define __NRATL2_hop                     1                                                                    /* arg -> command */ 
+#define __NRRTR_hop                      SC_REPR_SYSCALL_SLONG_T                                              /* return */
 #endif /* !__NRFEAT_DEFINED_SYSCALL_ARGUMENT_FORMAT */
 #endif /* __WANT_SYSCALL_ARGUMENT_FORMAT */
+
+
+/************************************************************************/
+/* SYSCALL ARGUMENT DOUBLE WIDE                                         */
+/************************************************************************/
+#ifdef __WANT_SYSCALL_ARGUMENT_DOUBLE_WIDE
+#ifndef __NRFEAT_DEFINED_SYSCALL_ARGUMENT_DOUBLE_WIDE
+#define __NRFEAT_DEFINED_SYSCALL_ARGUMENT_DOUBLE_WIDE 1
+#define __NRDW1__llseek         1
+#define __NRDW3_pread64         1
+#define __NRDW3_pwrite64        1
+#define __NRDW1_truncate64      1
+#define __NRDW1_ftruncate64     1
+#define __NRDW1_readahead       1
+#define __NRDW1_sync_file_range 1
+#define __NRDW2_sync_file_range 1
+#define __NRDW3_preadv          1
+#define __NRDW3_pwritev         1
+#define __NRDW3_pwritevf        1
+#define __NRDW3_preadvf         1
+#define __NRDW2_fallocate64     1
+#define __NRDW3_fallocate64     1
+#define __NRDW3_pwrite64f       1
+#define __NRDW3_pread64f        1
+#define __NRDW0_fsmode          1
+#define __NRDW1_lseek64         1
+#endif /* !__NRFEAT_DEFINED_SYSCALL_ARGUMENT_DOUBLE_WIDE */
+#endif /* __WANT_SYSCALL_ARGUMENT_DOUBLE_WIDE */
 

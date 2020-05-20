@@ -86,6 +86,9 @@ int main(int argc, char *argv[], char *envp[]) {
 	/* Make sure there aren't any memory leaks. */
 	assert(!KSysctl(KSYSCTL_SYSTEM_MEMORY_DUMP_LEAKS));
 
+	/* Enable system call tracing by loading the sctrace driver. */
+	ksysctl_insmod("sctrace", NULL);
+
 	/* Mount the /dev filesystem. */
 	if (mount(NULL, "/dev", "devfs", 0, NULL) < 0) {
 		if (errno == ENOENT) {

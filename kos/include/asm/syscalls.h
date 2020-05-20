@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x71e110d1 */
+/* HASH CRC-32:0xaa7d0c1e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,12 +42,14 @@
 #define __NR_fremovexattr           0x10  /* errno_t fremovexattr(int fd, char const *name) */
 #define __NR_getcwd                 0x11  /* ssize_t getcwd(char *buf, size_t size) */
 #define __NR_lookup_dcookie         0x12  /* errno_t lookup_dcookie(int TODO_PROTOTYPE) */
+/* @param: flags: Set of `EFD_SEMAPHORE | EFD_NONBLOCK | EFD_CLOEXEC' */
 #define __NR_eventfd2               0x13  /* fd_t eventfd2(syscall_ulong_t initval, syscall_ulong_t flags) */
 #define __NR_epoll_create1          0x14  /* fd_t epoll_create1(syscall_ulong_t flags) */
+/* @param: op: One of `EPOLL_CTL_ADD', `EPOLL_CTL_DEL', `EPOLL_CTL_MOD' */
 #define __NR_epoll_ctl              0x15  /* errno_t epoll_ctl(fd_t epfd, syscall_ulong_t op, fd_t fd, struct epoll_event *event) */
 #define __NR_epoll_pwait            0x16  /* errno_t epoll_pwait(fd_t epfd, struct epoll_event *events, syscall_ulong_t maxevents, syscall_slong_t timeout, struct __sigset_struct const *ss) */
 #define __NR_dup                    0x17  /* fd_t dup(fd_t fd) */
-/* @param: flags:  Set of `O_CLOEXEC|O_CLOFORK' */
+/* @param: flags:  Set of `O_CLOEXEC | O_CLOFORK' */
 #define __NR_dup3                   0x18  /* fd_t dup3(fd_t oldfd, fd_t newfd, oflag_t flags) */
 #define __NR_inotify_init1          0x1a  /* errno_t inotify_init1(int TODO_PROTOTYPE) */
 #define __NR_inotify_add_watch      0x1b  /* errno_t inotify_add_watch(int TODO_PROTOTYPE) */
@@ -58,19 +60,19 @@
 #define __NR_flock                  0x20  /* errno_t flock(fd_t fd, syscall_ulong_t operation) */
 #define __NR_mknodat                0x21  /* errno_t mknodat(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev) */
 #define __NR_mkdirat                0x22  /* errno_t mkdirat(fd_t dirfd, char const *pathname, mode_t mode) */
-/* @param: flags: Set of `0 | AT_REMOVEDIR|AT_REMOVEREG | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_REMOVEDIR | AT_REMOVEREG | AT_DOSPATH' */
 #define __NR_unlinkat               0x23  /* errno_t unlinkat(fd_t dirfd, char const *name, atflag_t flags) */
 #define __NR_symlinkat              0x24  /* errno_t symlinkat(char const *link_text, fd_t tofd, char const *target_path) */
-/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_FOLLOW | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_FOLLOW | AT_DOSPATH' */
 #define __NR_linkat                 0x25  /* errno_t linkat(fd_t fromfd, char const *existing_file, fd_t tofd, char const *target_path, atflag_t flags) */
 #define __NR_renameat               0x26  /* errno_t renameat(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path) */
 #define __NR_umount2                0x27  /* errno_t umount2(char const *special_file, syscall_ulong_t flags) */
-#define __NR_mount                  0x28  /* errno_t mount(char const *special_file, char const *dir, char const *fstype, syscall_ulong_t rwflag, void const *data) */
+#define __NR_mount                  0x28  /* errno_t mount(char const *special_file, char const *dir, char const *fstype, syscall_ulong_t mountflags, void const *data) */
 #define __NR_pivot_root             0x29  /* errno_t pivot_root(int TODO_PROTOTYPE) */
 #define __NR_nfsservctl             0x2a  /* errno_t nfsservctl(int TODO_PROTOTYPE) */
 #define __NR_fallocate              0x2f  /* errno_t fallocate(fd_t fd, syscall_ulong_t mode, syscall_ulong_t offset, syscall_ulong_t length) */
-/* @param: type: Set of `R_OK|W_OK|X_OK' or `F_OK'
- * @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW|AT_EACCESS | AT_DOSPATH' */
+/* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK'
+ * @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_EACCESS | AT_DOSPATH' */
 #define __NR_faccessat              0x30  /* errno_t faccessat(fd_t dirfd, char const *filename, syscall_ulong_t type, atflag_t flags) */
 #define __NR_chdir                  0x31  /* errno_t chdir(char const *path) */
 #define __NR_fchdir                 0x32  /* errno_t fchdir(fd_t fd) */
@@ -98,6 +100,7 @@
 #define __NR_pwritev                0x46  /* ssize_t pwritev(fd_t fd, struct iovec const *iovec, size_t count, uint64_t offset) */
 #define __NR_pselect6               0x48  /* ssize_t pselect6(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespec const *timeout, void const *sigmask_sigset_and_len) */
 #define __NR_ppoll                  0x49  /* ssize_t ppoll(struct pollfd *fds, size_t nfds, struct timespec const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
+/* @param: flags: Set of `SFD_NONBLOCK | SFD_CLOEXEC' */
 #define __NR_signalfd4              0x4a  /* errno_t signalfd4(fd_t fd, struct __sigset_struct const *sigmask, size_t sigsetsize, syscall_ulong_t flags) */
 #define __NR_vmsplice               0x4b  /* ssize_t vmsplice(fd_t fdout, struct iovec const *iov, size_t count, syscall_ulong_t flags) */
 #define __NR_splice                 0x4c  /* ssize_t splice(fd_t fdin, uint64_t *offin, fd_t fdout, uint64_t *offout, size_t length, syscall_ulong_t flags) */
@@ -123,7 +126,8 @@
 #define __NR_personality            0x5c  /* errno_t personality(int TODO_PROTOTYPE) */
 #define __NR_exit                   0x5d  /* void exit(syscall_ulong_t status) */
 #define __NR_exit_group             0x5e  /* void exit_group(syscall_ulong_t exit_code) */
-/* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
+/* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
+ * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
 #define __NR_waitid                 0x5f  /* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo_struct *infop, syscall_ulong_t options, struct rusage *ru) */
 #define __NR_set_tid_address        0x60  /* pid_t set_tid_address(pid_t *tidptr) */
 /* param flags: Set of `CLONE_*' */
@@ -198,7 +202,9 @@
 #define __NR_uname                  0xa0  /* errno_t uname(struct utsname *name) */
 #define __NR_sethostname            0xa1  /* errno_t sethostname(char const *name, size_t len) */
 #define __NR_setdomainname          0xa2  /* errno_t setdomainname(char const *name, size_t len) */
+/* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
 #define __NR_getrlimit              0xa3  /* errno_t getrlimit(syscall_ulong_t resource, struct rlimit *rlimits) */
+/* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
 #define __NR_setrlimit              0xa4  /* errno_t setrlimit(syscall_ulong_t resource, struct rlimit const *rlimits) */
 #define __NR_getrusage              0xa5  /* errno_t getrusage(syscall_slong_t who, struct rusage *usage) */
 #define __NR_umask                  0xa6  /* mode_t umask(mode_t mode) */
@@ -281,7 +287,7 @@
 #define __NR_readahead              0xd5  /* ssize_t readahead(fd_t fd, uint64_t offset, size_t count) */
 #define __NR_brk                    0xd6  /* errno_t brk(void *addr) */
 #define __NR_munmap                 0xd7  /* errno_t munmap(void *addr, size_t len) */
-/* @param: flags: Set of `MREMAP_MAYMOVE|MREMAP_FIXED' */
+/* @param: flags: Set of `MREMAP_MAYMOVE | MREMAP_FIXED' */
 #define __NR_mremap                 0xd8  /* void *mremap(void *addr, size_t old_len, size_t new_len, syscall_ulong_t flags, void *new_address) */
 #define __NR_add_key                0xd9  /* errno_t add_key(int TODO_PROTOTYPE) */
 #define __NR_request_key            0xda  /* errno_t request_key(int TODO_PROTOTYPE) */
@@ -291,7 +297,7 @@
 /* @param: swapflags: Set of `SWAP_FLAG_*' */
 #define __NR_swapon                 0xe0  /* errno_t swapon(char const *pathname, syscall_ulong_t swapflags) */
 #define __NR_swapoff                0xe1  /* errno_t swapoff(char const *pathname) */
-/* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED' */
+/* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED' */
 #define __NR_mprotect               0xe2  /* errno_t mprotect(void *addr, size_t len, syscall_ulong_t prot) */
 #define __NR_msync                  0xe3  /* errno_t msync(void *addr, size_t len, syscall_ulong_t flags) */
 #define __NR_mlock                  0xe4  /* errno_t mlock(void const *addr, size_t len) */
@@ -313,13 +319,13 @@
 #define __NR_accept4                0xf2  /* fd_t accept4(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len, syscall_ulong_t sock_flags) */
 #define __NR_recvmmsg               0xf3  /* ssize_t recvmmsg(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t flags, struct timespec const *tmo) */
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
- * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+ * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 #define __NR_wait4                  0x104 /* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusage *usage) */
 /* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
 #define __NR_prlimit64              0x105 /* errno_t prlimit64(pid_t pid, syscall_ulong_t resource, struct rlimit64 const *new_limit, struct rlimit64 *old_limit) */
 #define __NR_fanotify_init          0x106 /* errno_t fanotify_init(int TODO_PROTOTYPE) */
 #define __NR_fanotify_mark          0x107 /* errno_t fanotify_mark(int TODO_PROTOTYPE) */
-#define __NR_name_to_handle_at      0x108 /* errno_t name_to_handle_at(fd_t dirfd, char const *name, struct file_handle *handle, int32_t *mnt_id, syscall_ulong_t flags) */
+#define __NR_name_to_handle_at      0x108 /* errno_t name_to_handle_at(fd_t dirfd, char const *filename, struct file_handle *handle, int32_t *mnt_id, syscall_ulong_t flags) */
 #define __NR_open_by_handle_at      0x109 /* fd_t open_by_handle_at(fd_t mountdirfd, struct file_handle *handle, syscall_ulong_t flags) */
 #define __NR_clock_adjtime          0x10a /* errno_t clock_adjtime(int TODO_PROTOTYPE) */
 #define __NR_syncfs                 0x10b /* errno_t syncfs(fd_t fd) */
@@ -331,10 +337,11 @@
 #define __NR_finit_module           0x111 /* errno_t finit_module(int TODO_PROTOTYPE) */
 #define __NR_sched_setattr          0x112 /* errno_t sched_setattr(int TODO_PROTOTYPE) */
 #define __NR_sched_getattr          0x113 /* errno_t sched_getattr(int TODO_PROTOTYPE) */
-/* @param: flags: Set of `RENAME_EXCHANGE,RENAME_NOREPLACE,RENAME_WHITEOUT' */
+/* @param: flags: Set of `RENAME_EXCHANGE | RENAME_NOREPLACE | RENAME_WHITEOUT' */
 #define __NR_renameat2              0x114 /* errno_t renameat2(fd_t olddirfd, char const *oldpath, fd_t newdirfd, char const *newpath, syscall_ulong_t flags) */
 #define __NR_seccomp                0x115 /* errno_t seccomp(int TODO_PROTOTYPE) */
 #define __NR_getrandom              0x116 /* ssize_t getrandom(void *buf, size_t num_bytes, syscall_ulong_t flags) */
+/* @param: flags: Set of `MFD_CLOEXEC | MFD_ALLOW_SEALING' */
 #define __NR_memfd_create           0x117 /* fd_t memfd_create(char const *name, syscall_ulong_t flags) */
 #define __NR_bpf                    0x118 /* errno_t bpf(int TODO_PROTOTYPE) */
 /* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
@@ -375,7 +382,7 @@
 #define __NR_fstatfs                0x41f /* errno_t fstatfs(fd_t file, struct statfs *buf) */
 #define __NR_statfs                 0x420 /* errno_t statfs(char const *file, struct statfs *buf) */
 #define __NR_lseek                  0x421 /* syscall_slong_t lseek(fd_t fd, syscall_slong_t offset, syscall_ulong_t whence) */
-/* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
+/* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
  *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
@@ -388,7 +395,7 @@
 #define __NR_utime                  0x427 /* errno_t utime(char const *filename, struct utimbuf const *times) */
 #define __NR_creat                  0x428 /* fd_t creat(char const *filename, mode_t mode) */
 #define __NR_getdents               0x429 /* ssize_t getdents(fd_t fd, struct linux_dirent *dirp, size_t count) */
-#define __NR_futimesat              0x42a /* errno_t futimesat(fd_t dirfd, const char *filename, struct timeval const[2] times) */
+#define __NR_futimesat              0x42a /* errno_t futimesat(fd_t dirfd, char const *filename, struct timeval const[2] times) */
 #define __NR_select                 0x42b /* ssize_t select(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timeval *timeout) */
 #define __NR_poll                   0x42c /* ssize_t poll(struct pollfd *fds, size_t nfds, syscall_slong_t timeout) */
 #define __NR_epoll_wait             0x42d /* errno_t epoll_wait(fd_t epfd, struct epoll_event *events, syscall_ulong_t maxevents, syscall_slong_t timeout) */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf68d5351 */
+/* HASH CRC-32:0x76bfbdad */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@
 
 DECL_BEGIN
 
-INTDEF int NOTHROW_RPC(LIBCCALL libc_mount)(char const *special_file, char const *dir, char const *fstype, unsigned long int rwflag, void const *data);
+INTDEF int NOTHROW_RPC(LIBCCALL libc_mount)(char const *special_file, char const *dir, char const *fstype, unsigned long int mountflags, void const *data);
 INTDEF int NOTHROW_RPC(LIBCCALL libc_umount)(char const *special_file);
 INTDEF int NOTHROW_RPC(LIBCCALL libc_umount2)(char const *special_file, int flags);
 

@@ -54,17 +54,13 @@
 @@The order chosen is also important, as it is selected such that arguments
 @@are only passed through registers that are preserved by CDECL
 [restart(must)][noexcept]
-sigreturn:(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1,
-           syscall_ulong_t unused2, struct __sigset_struct const *restore_sigmask,
-           struct rpc_syscall_info32 const *sc_info, struct ucpustate32 const *restore_cpu);
+sigreturn:([tostr(STRUCT_FPUSTATE32)] struct fpustate32 const *restore_fpu, syscall_ulong_t unused1,
+           syscall_ulong_t unused2, [tostr(STRUCT_SIGSET)] struct __sigset_struct const *restore_sigmask,
+           [tostr(STRUCT_RPC_SYSCALL_INFO32)] struct rpc_syscall_info32 const *sc_info,
+           [tostr(STRUCT_UCPUSTATE32)] struct ucpustate32 const *restore_cpu);
 
-clone:([tostr(flagset(CLONE_VM, CLONE_FS, CLONE_FILES, CLONE_SIGHAND, CLONE_PTRACE,
-                      CLONE_VFORK, CLONE_PARENT, CLONE_THREAD, CLONE_NEWNS, CLONE_SYSVSEM,
-                      CLONE_SETTLS, CLONE_PARENT_SETTID, CLONE_CHILD_CLEARTID, CLONE_DETACHED,
-                      CLONE_UNTRACED, CLONE_CHILD_SETTID, CLONE_NEWUTS, CLONE_NEWIPC,
-                      CLONE_NEWUSER, CLONE_NEWPID, CLONE_NEWNET, CLONE_IO))]
-       syscall_ulong_t flags, void *child_stack,
-       pid_t *ptid, uintptr_t newtls, pid_t *ctid) -> pid_t;
+clone:([tostr(CLONE_FLAGS)] syscall_ulong_t flags, void *child_stack,
+       pid_t *ptid, [tostr(POINTER)] uintptr_t newtls, pid_t *ctid) -> pid_t;
 
 /* For historical reasons, the uid_t and gid_t size used by normal system calls in 16-bit */
 lchown = lchown16;

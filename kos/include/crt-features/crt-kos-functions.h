@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfbb0a14c */
+/* HASH CRC-32:0xa2ef4f79 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1583,7 +1583,7 @@ __CRT_FUNCTION(mmap64,1,(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__,mmap),6,(void 
 __CRT_FUNCTION(modf,0,(),2,(double,x,double *,iptr),double)
 __CRT_FUNCTION(modff,0,(),2,(float,x,float *,iptr),float)
 __CRT_FUNCTION(modfl,0,(),2,(__LONGDOUBLE,x,__LONGDOUBLE *,iptr),__LONGDOUBLE)
-__CRT_FUNCTION(mount,0,(),5,(char const *,special_file,char const *,dir,char const *,fstype,unsigned long int,rwflag,void const *,data),int)
+__CRT_FUNCTION(mount,0,(),5,(char const *,special_file,char const *,dir,char const *,fstype,unsigned long int,mountflags,void const *,data),int)
 __CRT_FUNCTION(mprotect,0,(),3,(void *,addr,size_t,len,int,prot),int)
 __CRT_FUNCTION(mrand48,0,(),0,(),long)
 __CRT_FUNCTION(mrand48_r,0,(),2,(struct drand48_data *__restrict,buffer,long *__restrict,result),int)

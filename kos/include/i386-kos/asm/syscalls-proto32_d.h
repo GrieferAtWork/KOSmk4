@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd3d1d445 */
+/* HASH CRC-32:0x354a8f38 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1543,7 +1543,7 @@
 #define __NR32AT3_fchownat                (gid_t, __gid_t)
 #define __NR32AT4_fchownat                (atflag_t, __atflag_t)
 #define __NR32AT0_futimesat               (fd_t, __fd_t)
-#define __NR32AT1_futimesat               (const char *, __const char *)
+#define __NR32AT1_futimesat               (char const *, char const *)
 #define __NR32AT2_futimesat               (struct timevalx32 const *, struct __timevalx32 const *)
 #define __NR32AT0_linux_fstatat64         (fd_t, __fd_t)
 #define __NR32AT1_linux_fstatat64         (char const *, char const *)
@@ -1844,7 +1844,7 @@
 #define __NR32AT2_kfstatat                (struct __kos_statx32 *, struct __kos_statx32 *)
 #define __NR32AT3_kfstatat                (atflag_t, __atflag_t)
 #define __NR32AT0_futimesat64             (fd_t, __fd_t)
-#define __NR32AT1_futimesat64             (const char *, __const char *)
+#define __NR32AT1_futimesat64             (char const *, char const *)
 #define __NR32AT2_futimesat64             (struct timevalx32_64 const *, struct __timevalx32_64 const *)
 #define __NR32AT0_fmknodat                (fd_t, __fd_t)
 #define __NR32AT1_fmknodat                (char const *, char const *)
@@ -2356,7 +2356,7 @@
 #define __NR32AM_mkdirat(a, b, c, d, e, f)                 (__fd_t)a, (char const *)b, (__mode_t)c
 #define __NR32AM_mknodat(a, b, c, d, e, f)                 (__fd_t)a, (char const *)b, (__mode_t)c, (__dev_t)d
 #define __NR32AM_fchownat(a, b, c, d, e, f)                (__fd_t)a, (char const *)b, (__uid_t)c, (__gid_t)d, (__atflag_t)e
-#define __NR32AM_futimesat(a, b, c, d, e, f)               (__fd_t)a, (__const char *)b, (struct __timevalx32 const *)c
+#define __NR32AM_futimesat(a, b, c, d, e, f)               (__fd_t)a, (char const *)b, (struct __timevalx32 const *)c
 #define __NR32AM_linux_fstatat64(a, b, c, d, e, f)         (__fd_t)a, (char const *)b, (struct linux_statx32_64 *)c, (__atflag_t)d
 #define __NR32AM_unlinkat(a, b, c, d, e, f)                (__fd_t)a, (char const *)b, (__atflag_t)c
 #define __NR32AM_renameat(a, b, c, d, e, f)                (__fd_t)a, (char const *)b, (__fd_t)c, (char const *)d
@@ -2447,7 +2447,7 @@
 #define __NR32AM_fsymlinkat(a, b, c, d, e, f)              (char const *)a, (__fd_t)b, (char const *)c, (__atflag_t)d
 #define __NR32AM_frenameat(a, b, c, d, e, f)               (__fd_t)a, (char const *)b, (__fd_t)c, (char const *)d, (__atflag_t)e
 #define __NR32AM_kfstatat(a, b, c, d, e, f)                (__fd_t)a, (char const *)b, (struct __kos_statx32 *)c, (__atflag_t)d
-#define __NR32AM_futimesat64(a, b, c, d, e, f)             (__fd_t)a, (__const char *)b, (struct __timevalx32_64 const *)c
+#define __NR32AM_futimesat64(a, b, c, d, e, f)             (__fd_t)a, (char const *)b, (struct __timevalx32_64 const *)c
 #define __NR32AM_fmknodat(a, b, c, d, e, f)                (__fd_t)a, (char const *)b, (__mode_t)c, (__dev_t)d, (__atflag_t)e
 #define __NR32AM_fmkdirat(a, b, c, d, e, f)                (__fd_t)a, (char const *)b, (__mode_t)c, (__atflag_t)d
 #define __NR32AM_waitid64(a, b, c, d, e, f)                (__syscall_ulong_t)a, (__id_t)b, (struct __siginfox32_struct *)c, (__syscall_ulong_t)d, (struct __rusagex32_64 *)e

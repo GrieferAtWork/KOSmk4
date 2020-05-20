@@ -88,14 +88,6 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 		dump_branch_stats();
 		return 0;
 
-	case KSYSCTL_SYSCALL_GET_TRACING_ENABLED:
-		cred_require_sysadmin();
-		return syscall_tracing_getenabled() ? 1 : 0;
-
-	case KSYSCTL_SYSCALL_SET_TRACING_ENABLED:
-		cred_require_sysadmin();
-		return syscall_tracing_setenabled(arg != 0) ? 1 : 0;
-
 	case KSYSCTL_SYSCALL_GET_PERSONALITY: {
 		uintptr_t kp;
 		if unlikely((uintptr_t)arg & 1) {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb095dacf */
+/* HASH CRC-32:0x4bab7ffc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1375,7 +1375,7 @@
 #define __NRAT1_getdents               (struct linux_dirent *, struct linux_dirent *)
 #define __NRAT2_getdents               (size_t, __size_t)
 #define __NRAT0_futimesat              (fd_t, __fd_t)
-#define __NRAT1_futimesat              (const char *, __const char *)
+#define __NRAT1_futimesat              (char const *, char const *)
 #define __NRAT2_futimesat              (struct timeval const *, struct timeval const *)
 #define __NRAT0_select                 (size_t, __size_t)
 #define __NRAT1_select                 (struct __fd_set_struct *, struct __fd_set_struct *)
@@ -1715,7 +1715,7 @@
 #define __NRAM_utime(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  (char const *)a, (struct utimbuf const *)b
 #define __NRAM_creat(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  (char const *)a, (__mode_t)b
 #define __NRAM_getdents(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)               (__fd_t)a, (struct linux_dirent *)b, (__size_t)c
-#define __NRAM_futimesat(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (__fd_t)a, (__const char *)b, (struct timeval const *)c
+#define __NRAM_futimesat(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (__fd_t)a, (char const *)b, (struct timeval const *)c
 #define __NRAM_select(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 (__size_t)a, (struct __fd_set_struct *)b, (struct __fd_set_struct *)c, (struct __fd_set_struct *)d, (struct timeval *)e
 #define __NRAM_poll(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                   (struct pollfd *)a, (__size_t)b, (__syscall_slong_t)c
 #define __NRAM_epoll_wait(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)             (__fd_t)a, (struct epoll_event *)b, (__syscall_ulong_t)c, (__syscall_slong_t)d

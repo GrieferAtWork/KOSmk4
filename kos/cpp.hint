@@ -190,6 +190,19 @@
 #define ATTR_EXTERNALLY_VISIBLE
 #define __ATTR_EXTERNALLY_VISIBLE
 
+#define PRIVATE_FUNCTION(sym)      ;int sym() {}
+#define INTERN_FUNCTION(sym)       ;int sym() {}
+#define PUBLIC_FUNCTION(sym)       ;int sym() {}
+#define PRIVATE_WEAK_FUNCTION(sym) ;int sym() {}
+#define INTERN_WEAK_FUNCTION(sym)  ;int sym() {}
+#define PUBLIC_WEAK_FUNCTION(sym)  ;int sym() {}
+#define PRIVATE_OBJECT(sym)        ;int sym;
+#define INTERN_OBJECT(sym)         ;int sym;
+#define PUBLIC_OBJECT(sym)         ;int sym;
+#define PRIVATE_WEAK_OBJECT(sym)   ;int sym;
+#define INTERN_WEAK_OBJECT(sym)    ;int sym;
+#define PUBLIC_WEAK_OBJECT(sym)    ;int sym;
+
 #define __CXX_DEDUCE_TYPENAME typename
 #define __CXX_FORCEINLINE
 #define __CXX_CLASSMEMBER

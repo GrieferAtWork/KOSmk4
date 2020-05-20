@@ -198,6 +198,7 @@ incdir("", "../../include");
 #include <asm/param.h>
 #include <asm/poll.h>
 #include <asm/posix_types.h>
+#include <asm/random.h>
 #include <asm/sched.h>
 #include <asm/socket-families.h>
 #include <asm/socket.h>
@@ -1035,6 +1036,7 @@ incdir("", "../../include");
 #include <sys/kd.h>
 #include <sys/klog.h>
 #include <sys/mman.h>
+#include <sys/mmio.h>
 #include <sys/mount.h>
 #include <sys/msg.h>
 #include <sys/param.h>
@@ -1043,6 +1045,7 @@ incdir("", "../../include");
 #include <sys/poll.h>
 #include <sys/procfs.h>
 #include <sys/ptrace.h>
+#include <sys/random.h>
 #include <sys/reboot.h>
 #include <sys/resource.h>
 #include <sys/select.h>
@@ -1059,7 +1062,6 @@ incdir("", "../../include");
 #include <sys/stropts.h>
 #include <sys/swap.h>
 #include <sys/syscall-proto.h>
-#include <sys/syscall-trace.h>
 #include <sys/syscall.h>
 #include <sys/sysinfo.h>
 #include <sys/syslog.h>

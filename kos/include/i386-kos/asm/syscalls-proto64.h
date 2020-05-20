@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x75f21de */
+/* HASH CRC-32:0xf4487fd8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1344,7 +1344,7 @@
 #define __NRAT3_fchownat               (gid_t, __gid_t)
 #define __NRAT4_fchownat               (atflag_t, __atflag_t)
 #define __NRAT0_futimesat              (fd_t, __fd_t)
-#define __NRAT1_futimesat              (const char *, __const char *)
+#define __NRAT1_futimesat              (char const *, char const *)
 #define __NRAT2_futimesat              (struct timevalx64 const *, struct __timevalx64 const *)
 #define __NRAT0_linux_fstatat          (fd_t, __fd_t)
 #define __NRAT1_linux_fstatat          (char const *, char const *)
@@ -1971,7 +1971,7 @@
 #define __NRAM_mkdirat(a, b, c, d, e, f)                (__fd_t)a, (char const *)b, (__mode_t)c
 #define __NRAM_mknodat(a, b, c, d, e, f)                (__fd_t)a, (char const *)b, (__mode_t)c, (__dev_t)d
 #define __NRAM_fchownat(a, b, c, d, e, f)               (__fd_t)a, (char const *)b, (__uid_t)c, (__gid_t)d, (__atflag_t)e
-#define __NRAM_futimesat(a, b, c, d, e, f)              (__fd_t)a, (__const char *)b, (struct __timevalx64 const *)c
+#define __NRAM_futimesat(a, b, c, d, e, f)              (__fd_t)a, (char const *)b, (struct __timevalx64 const *)c
 #define __NRAM_linux_fstatat(a, b, c, d, e, f)          (__fd_t)a, (char const *)b, (struct linux_statx64 *)c, (__atflag_t)d
 #define __NRAM_unlinkat(a, b, c, d, e, f)               (__fd_t)a, (char const *)b, (__atflag_t)c
 #define __NRAM_renameat(a, b, c, d, e, f)               (__fd_t)a, (char const *)b, (__fd_t)c, (char const *)d
