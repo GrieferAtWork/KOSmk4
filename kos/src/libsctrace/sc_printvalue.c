@@ -1,3 +1,8 @@
+/*[[[magic
+local gcc_opt = options.setdefault("GCC.options", []);
+if (gcc_opt.remove("-O3"))
+	gcc_opt.append("-Os");
+]]]*/
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +28,7 @@
 #define _KOS_KERNEL_SOURCE 1
 #define _GNU_SOURCE 1
 #define _DOS_SOURCE 1
+#define _TIME64_SOURCE 1
 
 #include "api.h"
 /**/
@@ -32,6 +38,10 @@
 #include <hybrid/__va_size.h>
 #include <hybrid/typecore.h>
 
+#include <asm/ioctl.h>
+#include <asm/ioctls.h>
+#include <asm/sockios.h>
+#include <bits/ioctls.h>
 #include <bits/itimerspec.h>
 #include <bits/itimerval.h>
 #include <bits/timespec.h>
@@ -43,12 +53,19 @@
 #include <kos/io.h>
 #include <kos/kernel/types.h>
 #include <kos/syscalls.h>
+#include <linux/fd.h>
+#include <linux/fs.h>
 #include <linux/futex.h>
+#include <linux/hdreg.h>
+#include <linux/kd.h>
 #include <sys/ioctl.h>
+#include <sys/mount.h>
 #include <sys/poll.h>
+#include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/time.h>
 
+#include <ctype.h>
 #include <fcntl.h>
 #include <format-printer.h>
 #include <inttypes.h>
@@ -208,7 +225,7 @@ print_dev_chr(pformatprinter printer, void *arg, dev_t devno) {
 }
 
 
-PRIVATE struct {
+PRIVATE ATTR_UNUSED struct {
 	mode_t mn_mode;    /* Flag value */
 	char   mn_name[8]; /* Flag name */
 } const mode_names[] = {
@@ -280,7 +297,7 @@ err:
 }
 
 
-PRIVATE struct {
+PRIVATE ATTR_UNUSED struct {
 	oflag_t on_flag;     /* Flag value */
 	char    on_name[12]; /* Flag name */
 } const oflag_names[] = {
@@ -387,7 +404,7 @@ err:
 
 
 
-PRIVATE struct {
+PRIVATE ATTR_UNUSED struct {
 	atflag_t an_flag;     /* Flag value */
 	char     an_name[20]; /* Flag name */
 } const atflag_names[] = {
@@ -470,7 +487,7 @@ err:
 }
 
 
-PRIVATE struct {
+PRIVATE ATTR_UNUSED struct {
 	iomode_t on_flag;     /* Flag value */
 	char    on_name[12]; /* Flag name */
 } const iomode_names[] = {
@@ -598,7 +615,7 @@ done:
 }
 
 
-PRIVATE struct {
+PRIVATE ATTR_UNUSED struct {
 	clockid_t cn_clid;     /* Clock ID */
 	char      cn_name[20]; /* Clock ID name. */
 } const clockid_names[] = {
@@ -659,7 +676,7 @@ print_string(pformatprinter printer, void *arg,
 	return result;
 }
 
-PRIVATE struct {
+PRIVATE ATTR_UNUSED struct {
 	sighandler_t sn_hand;    /* Signal handler constant */
 	char         sn_name[8]; /* Signal handler name. */
 } const sighandler_names[] = {
@@ -707,7 +724,7 @@ done:
 #define POLLWRBAND __POLLWRBAND /* Priority data may be written. */
 #endif /* !POLLWRBAND */
 
-PRIVATE struct {
+PRIVATE ATTR_UNUSED struct {
 	uint16_t   pn_flag;
 	char const pn_name[8];
 } const poll_event_flag_names[] = {
@@ -881,6 +898,376 @@ err:
 
 
 
+PRIVATE ATTR_UNUSED struct {
+	uint16_t ic_cmd;      /* IOCTL command. */
+	char     ic_name[10]; /* IOCTL command name. */
+} const ioctl_commands[] = {
+#define IOCTL(id) { (id) & 0xffff, #id }
+	IOCTL(TCGETS),
+	IOCTL(TCSETS),
+	IOCTL(TCSETSW),
+	IOCTL(TCSETSF),
+	IOCTL(TCGETA),
+	IOCTL(TCSETA),
+	IOCTL(TCSETAW),
+	IOCTL(TCSETAF),
+	IOCTL(TCSBRK),
+	IOCTL(TCXONC),
+	IOCTL(TCFLSH),
+	IOCTL(TIOCEXCL),
+	IOCTL(TIOCNXCL),
+	IOCTL(TIOCSCTTY),
+	IOCTL(TIOCGPGRP),
+	IOCTL(TIOCSPGRP),
+	IOCTL(TIOCOUTQ),
+	IOCTL(TIOCSTI),
+	IOCTL(TIOCMGET),
+	IOCTL(TIOCMBIS),
+	IOCTL(TIOCMBIC),
+	IOCTL(TIOCMSET),
+	IOCTL(TIOCINQ),
+	IOCTL(TIOCLINUX),
+	IOCTL(TIOCCONS),
+	IOCTL(TIOCPKT),
+	IOCTL(FIONBIO),
+	IOCTL(TIOCNOTTY),
+	IOCTL(TIOCSETD),
+	IOCTL(TIOCGETD),
+	IOCTL(TCSBRKP),
+	IOCTL(TIOCSBRK),
+	IOCTL(TIOCCBRK),
+	IOCTL(TIOCGSID),
+	IOCTL(TCGETS2),
+	IOCTL(TCSETS2),
+	IOCTL(TCSETSW2),
+	IOCTL(TCSETSF2),
+	IOCTL(TIOCGPTN),
+	IOCTL(TIOCGDEV),
+	IOCTL(TCGETX),
+	IOCTL(TCSETX),
+	IOCTL(TCSETXF),
+	IOCTL(TCSETXW),
+	IOCTL(TIOCSIG),
+	IOCTL(TIOCGPKT),
+	IOCTL(TIOCGEXCL),
+	IOCTL(FIONCLEX),
+	IOCTL(FIOCLEX),
+	IOCTL(FIOASYNC),
+	IOCTL(FIOQSIZE),
+	IOCTL(FIOSETOWN),
+	IOCTL(SIOCSPGRP),
+	IOCTL(FIOGETOWN),
+	IOCTL(SIOCGPGRP),
+
+	IOCTL(FDCLRPRM),
+	IOCTL(FDSETPRM),
+	IOCTL(FDDEFPRM),
+	IOCTL(FDGETPRM),
+	IOCTL(FDMSGON),
+	IOCTL(FDMSGOFF),
+	IOCTL(FDFMTBEG),
+	IOCTL(FDFMTTRK),
+	IOCTL(FDFMTEND),
+	IOCTL(FDFLUSH),
+	IOCTL(FDRESET),
+	IOCTL(FDRAWCMD),
+	IOCTL(FDTWADDLE),
+	IOCTL(FDEJECT),
+	IOCTL(BLKROSET),
+	IOCTL(BLKROGET),
+	IOCTL(BLKRRPART),
+	IOCTL(BLKFLSBUF),
+	IOCTL(BLKRASET),
+	IOCTL(BLKRAGET),
+	IOCTL(BLKFRASET),
+	IOCTL(BLKFRAGET),
+	IOCTL(BLKSSZGET),
+	IOCTL(BLKBSZGET),
+	IOCTL(BLKBSZSET),
+	IOCTL(BLKIOMIN),
+	IOCTL(BLKIOOPT),
+#ifdef FIBMAP
+	IOCTL(FIBMAP),
+#endif /* FIBMAP */
+	IOCTL(FIGETBSZ),
+	IOCTL(FIFREEZE),
+	IOCTL(FITHAW),
+	IOCTL(FITRIM),
+	IOCTL(GIO_FONT),
+	IOCTL(PIO_FONT),
+	IOCTL(GIO_FONTX),
+	IOCTL(PIO_FONTX),
+	IOCTL(GIO_CMAP),
+	IOCTL(PIO_CMAP),
+	IOCTL(KIOCSOUND),
+	IOCTL(KDMKTONE),
+	IOCTL(KDGETLED),
+	IOCTL(KDSETLED),
+	IOCTL(KDGKBTYPE),
+	IOCTL(KDADDIO),
+	IOCTL(KDDELIO),
+	IOCTL(KDENABIO),
+	IOCTL(KDDISABIO),
+	IOCTL(KDSETMODE),
+	IOCTL(KDGETMODE),
+	IOCTL(KDMAPDISP),
+	IOCTL(KDGKBMODE),
+	IOCTL(KDSKBMODE),
+	IOCTL(KDGKBMETA),
+	IOCTL(KDSKBMETA),
+	IOCTL(KDGKBLED),
+	IOCTL(KDSKBLED),
+	IOCTL(KDGKBENT),
+	IOCTL(KDSKBENT),
+	IOCTL(KDGKBSENT),
+	IOCTL(KDSKBSENT),
+	IOCTL(KDKBDREP),
+	IOCTL(KDFONTOP),
+#undef IOCTL
+};
+
+PRIVATE ATTR_UNUSED struct {
+	uint16_t ic_cmd;      /* IOCTL command. */
+	char     ic_name[18]; /* IOCTL command name. */
+} const ioctl_commands_long[] = {
+#define IOCTL(id) { (id) & 0xffff, #id }
+	IOCTL(TIOCGWINSZ),
+	IOCTL(TIOCSWINSZ),
+	IOCTL(TIOCGSOFTCAR),
+	IOCTL(TIOCSSOFTCAR),
+	IOCTL(TIOCGSERIAL),
+	IOCTL(TIOCSSERIAL),
+	IOCTL(TIOCGRS485),
+	IOCTL(TIOCSRS485),
+	IOCTL(TIOCSPTLCK),
+	IOCTL(TIOCVHANGUP),
+	IOCTL(TIOCGPTLCK),
+	IOCTL(TIOCSERCONFIG),
+	IOCTL(TIOCSERGWILD),
+	IOCTL(TIOCSERSWILD),
+	IOCTL(TIOCGLCKTRMIOS),
+	IOCTL(TIOCSLCKTRMIOS),
+	IOCTL(TIOCSERGSTRUCT),
+	IOCTL(TIOCSERGETLSR),
+	IOCTL(TIOCSERGETMULTI),
+	IOCTL(TIOCSERSETMULTI),
+	IOCTL(TIOCMIWAIT),
+	IOCTL(TIOCGICOUNT),
+	IOCTL(FDSETEMSGTRESH),
+	IOCTL(FDSETMAXERRS),
+	IOCTL(FDGETMAXERRS),
+	IOCTL(FDGETDRVTYP),
+	IOCTL(FDSETDRVPRM),
+	IOCTL(FDGETDRVPRM),
+	IOCTL(FDGETDRVSTAT),
+	IOCTL(FDPOLLDRVSTAT),
+	IOCTL(FDGETFDCSTAT),
+	IOCTL(FDWERRORCLR),
+	IOCTL(FDWERRORGET),
+	IOCTL(BLKGETSIZE),
+	IOCTL(BLKGETSIZE64),
+	IOCTL(BLKSECTSET),
+	IOCTL(BLKSECTGET),
+	/*IOCTL(BLKTRACESETUP),*/
+	IOCTL(BLKTRACESTART),
+	IOCTL(BLKTRACESTOP),
+	IOCTL(BLKTRACETEARDOWN),
+	IOCTL(BLKDISCARD),
+	IOCTL(BLKALIGNOFF),
+	IOCTL(BLKPBSZGET),
+	IOCTL(BLKDISCARDZEROES),
+	IOCTL(BLKSECDISCARD),
+	IOCTL(BLKROTATIONAL),
+	IOCTL(BLKZEROOUT),
+	IOCTL(SIOCATMARK),
+	IOCTL(SIOCGSTAMP32),
+	IOCTL(SIOCGSTAMP64),
+	IOCTL(SIOCGSTAMPNS32),
+	IOCTL(SIOCGSTAMPNS64),
+	IOCTL(HDIO_GETGEO),
+	IOCTL(HDIO_GET_DMA),
+	IOCTL(HDIO_GET_IDENTITY),
+	IOCTL(HDIO_GET_WCACHE),
+	IOCTL(HDIO_DRIVE_RESET),
+	IOCTL(HDIO_GET_BUSSTATE),
+	IOCTL(HDIO_SET_WCACHE),
+	IOCTL(PIO_FONTRESET),
+	IOCTL(KDUNMAPDISP),
+	IOCTL(GIO_SCRNMAP),
+	IOCTL(PIO_SCRNMAP),
+	IOCTL(GIO_UNISCRNMAP),
+	IOCTL(PIO_UNISCRNMAP),
+	IOCTL(GIO_UNIMAP),
+	IOCTL(PIO_UNIMAP),
+	IOCTL(PIO_UNIMAPCLR),
+#ifdef FS_IOC_GETFLAGS
+	IOCTL(FS_IOC_GETFLAGS),
+#endif /* FS_IOC_GETFLAGS */
+#ifdef FS_IOC_SETFLAGS
+	IOCTL(FS_IOC_SETFLAGS),
+#endif /* FS_IOC_SETFLAGS */
+#ifdef FS_IOC_GETVERSION
+	IOCTL(FS_IOC_GETVERSION),
+#endif /* FS_IOC_GETVERSION */
+#ifdef FS_IOC_SETVERSION
+	IOCTL(FS_IOC_SETVERSION),
+#endif /* FS_IOC_SETVERSION */
+#ifdef FS_IOC_FIEMAP
+	IOCTL(FS_IOC_FIEMAP),
+#endif /* FS_IOC_FIEMAP */
+#ifdef FS_IOC32_GETFLAGS
+	IOCTL(FS_IOC32_GETFLAGS),
+#endif /* FS_IOC32_GETFLAGS */
+#ifdef FS_IOC32_SETFLAGS
+	IOCTL(FS_IOC32_SETFLAGS),
+#endif /* FS_IOC32_SETFLAGS */
+#ifdef FS_IOC32_GETVERSION
+	IOCTL(FS_IOC32_GETVERSION),
+#endif /* FS_IOC32_GETVERSION */
+#ifdef FS_IOC32_SETVERSION
+	IOCTL(FS_IOC32_SETVERSION),
+#endif /* FS_IOC32_SETVERSION */
+	IOCTL(KDGKBDIACR),
+	IOCTL(KDSKBDIACR),
+	IOCTL(KDGKBDIACRUC),
+	IOCTL(KDSKBDIACRUC),
+	IOCTL(KDGETKEYCODE),
+	IOCTL(KDSETKEYCODE),
+	IOCTL(KDSIGACCEPT),
+#undef IOCTL
+};
+
+PRIVATE ATTR_UNUSED WUNUSED char const *CC
+get_ioctl_command_name(syscall_ulong_t command) {
+	unsigned int i;
+	char const *result;
+	command &= 0xffff;
+	for (i = 0; i < COMPILER_LENOF(ioctl_commands); ++i) {
+		if (ioctl_commands[i].ic_cmd == command) {
+			result = ioctl_commands[i].ic_name;
+			goto done;
+		}
+	}
+	for (i = 0; i < COMPILER_LENOF(ioctl_commands_long); ++i) {
+		if (ioctl_commands_long[i].ic_cmd == command) {
+			result = ioctl_commands_long[i].ic_name;
+			goto done;
+		}
+	}
+	result = NULL;
+done:
+	return result;
+}
+
+PRIVATE ATTR_UNUSED ssize_t CC
+print_ioctl_command_size(pformatprinter printer, void *arg, size_t size) {
+	ssize_t result;
+	char const *name;
+	switch (size) {
+	case 1:  name = "uint8_t"; break;
+	case 2:  name = "uint16_t"; break;
+	case 4:  name = "uint32_t"; break;
+	case 8:  name = "uint64_t"; break;
+	default: name = NULL; break;
+	}
+	if (name) {
+		result = (*printer)(arg, name, strlen(name));
+	} else {
+		result = format_printf(printer, arg, "byte_t[%" PRIuSIZ "]", size);
+	}
+	return result;
+}
+
+PRIVATE ATTR_UNUSED ssize_t CC
+print_ioctl_type(pformatprinter printer, void *arg,
+                 syscall_ulong_t type) {
+	ssize_t result;
+	if (type <= 0x7f && isprint((int)(unsigned int)type)) {
+		result = format_printf(printer, arg, "'%c'",
+		                       (int)(unsigned int)type);
+	} else {
+		result = format_printf(printer, arg, "%#" PRIxN(__SIZEOF_SYSCALL_LONG_T__),
+		                       type);
+	}
+	return result;
+}
+
+PRIVATE ATTR_UNUSED ssize_t CC
+print_ioctl_command(pformatprinter printer, void *arg,
+                    syscall_ulong_t command) {
+	char const *name;
+	ssize_t temp, result;
+	name = get_ioctl_command_name(command);
+	if (name) {
+		result = (*printer)(arg, name, strlen(name));
+#if __SIZEOF_SYSCALL_LONG_T__ > 4
+	} else if (command > UINT32_MAX) {
+		goto do_print_hex_repr;
+#endif /* __SIZEOF_SYSCALL_LONG_T__ > 4 */
+	} else {
+		syscall_ulong_t nr, type, size, kos, dir;
+		nr   = _IOC_NR(command);
+		type = _IOC_TYPE(command);
+		size = _IOC_SIZE(command);
+		kos  = _IOC_ISKOS(command);
+		dir  = _IOC_DIR(command);
+		if (dir || kos || size || type) {
+			result = DOPRINT("_IO");
+			if unlikely(result < 0)
+				goto done;
+			if (dir == _IOC_NONE) {
+				if (size != 0) {
+					PRINT("C");
+					if (kos)
+						PRINT("_KOS");
+					PRINT("(_IOC_NONE," SYNSPACE);
+					DO(print_ioctl_type(printer, arg, type));
+					DO(format_printf(printer, arg,
+					                 "," SYNSPACE "%#" PRIxN(__SIZEOF_SYSCALL_LONG_T__)
+					                 "," SYNSPACE "%#" PRIxN(__SIZEOF_SYSCALL_LONG_T__) ")",
+					                 nr, size));
+					goto done;
+				}
+				temp = 0;
+			} else if (dir == _IOC_READ) {
+				temp = DOPRINT("R");
+			} else if (dir == _IOC_WRITE) {
+				temp = DOPRINT("W");
+			} else if (dir == (_IOC_WRITE | _IOC_READ)) {
+				temp = DOPRINT("WR");
+			}
+			if unlikely(temp < 0)
+				goto err;
+			result += temp;
+			if (kos)
+				PRINT("_KOS");
+			PRINT("(");
+			DO(print_ioctl_type(printer, arg, type));
+			DO(format_printf(printer, arg, "," SYNSPACE "%#" PRIxN(__SIZEOF_SYSCALL_LONG_T__), nr));
+			if (dir != _IOC_NONE) {
+				PRINT("," SYNSPACE);
+				DO(print_ioctl_command_size(printer, arg, size));
+			}
+			PRINT(")");
+		} else {
+#if __SIZEOF_SYSCALL_LONG_T__ > 4
+do_print_hex_repr:
+#endif /* __SIZEOF_SYSCALL_LONG_T__ > 4 */
+			result = format_printf(printer, arg,
+			                       "%#" PRIxN(__SIZEOF_SYSCALL_LONG_T__),
+			                       command);
+		}
+	}
+done:
+	return result;
+err:
+	return temp;
+}
+
+
+
+
+
 
 /* Print the representation of a given system call argument
  * value, given both its `argtype' (one of `*'), and `value'
@@ -909,10 +1296,6 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	// TODO: #define HAVE_SC_REPR_EXCEPTION_HANDLER_MODE 1
 	// TODO: #define HAVE_SC_REPR_EXIT_STATUS 1
 	// TODO: #define HAVE_SC_REPR_FALLOCATE_MODE 1
-	// TODO: #define HAVE_SC_REPR_FCNTL64_ARG 1
-	// TODO: #define HAVE_SC_REPR_FCNTL64_COMMAND 1
-	// TODO: #define HAVE_SC_REPR_FCNTL_ARG 1
-	// TODO: #define HAVE_SC_REPR_FCNTL_COMMAND 1
 	// TODO: #define HAVE_SC_REPR_FSMODE 1
 	// TODO: #define HAVE_SC_REPR_FUTEX_OP 1
 	// TODO: #define HAVE_SC_REPR_GETRANDOM_FLAGS 1
@@ -920,12 +1303,8 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	// TODO: #define HAVE_SC_REPR_GID_VECTOR 1
 	// TODO: #define HAVE_SC_REPR_GID_VECTOR16 1
 	// TODO: #define HAVE_SC_REPR_GID_VECTOR32 1
-	// TODO: #define HAVE_SC_REPR_HOP_ARG 1
-	// TODO: #define HAVE_SC_REPR_HOP_COMMAND 1
 	// TODO: #define HAVE_SC_REPR_IDTYPE_T 1
 	// TODO: #define HAVE_SC_REPR_ID_T 1
-	// TODO: #define HAVE_SC_REPR_IOCTL_ARG 1
-	// TODO: #define HAVE_SC_REPR_IOCTL_COMMAND 1
 	// TODO: #define HAVE_SC_REPR_IOPRIO_ID 1
 	// TODO: #define HAVE_SC_REPR_IOPRIO_VALUE 1
 	// TODO: #define HAVE_SC_REPR_IOPRIO_WHO 1
@@ -1038,6 +1417,21 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	// TODO: #define HAVE_SC_REPR_WAITID_OPTIONS 1
 	// TODO: #define HAVE_SC_REPR_XATTR_FLAGS 1
 
+
+#ifdef HAVE_SC_REPR_IOCTL_COMMAND
+	case SC_REPR_IOCTL_COMMAND:
+		result = print_ioctl_command(printer, arg,
+		                             (syscall_ulong_t)value.sv_u64);
+		break;
+#endif /* HAVE_SC_REPR_IOCTL_COMMAND */
+
+	// TODO: #define HAVE_SC_REPR_IOCTL_ARG 1
+	// TODO: #define HAVE_SC_REPR_FCNTL64_ARG 1
+	// TODO: #define HAVE_SC_REPR_FCNTL64_COMMAND 1
+	// TODO: #define HAVE_SC_REPR_FCNTL_ARG 1
+	// TODO: #define HAVE_SC_REPR_FCNTL_COMMAND 1
+	// TODO: #define HAVE_SC_REPR_HOP_ARG 1
+	// TODO: #define HAVE_SC_REPR_HOP_COMMAND 1
 
 #define DO_REPR_STRUCT_TIMEVAL_VEC2(struct_timeval_typecode)                      \
 	do {                                                                          \
@@ -2227,7 +2621,12 @@ do_format8:
 #endif /* NEED_do_format8 */
 
 	default:
+#if 1
+		result = format_printf(printer, arg, "%p",
+		                       (uintptr_t)value.sv_u64);
+#else
 		result = DOPRINT("?");
+#endif
 		break;
 	}
 done: ATTR_UNUSED;
