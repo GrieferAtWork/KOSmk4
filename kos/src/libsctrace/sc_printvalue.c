@@ -72,6 +72,7 @@ if (gcc_opt.remove("-O3"))
 #include <signal.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h>
 
 #include "sctrace.h"
 
@@ -591,6 +592,12 @@ print_fd_t(pformatprinter printer, void *arg, fd_t fd) {
 	case AT_PARENT_PROCESS: name = "AT_PARENT_PROCESS"; break;
 	case AT_GROUP_LEADER:   name = "AT_GROUP_LEADER"; break;
 	case AT_SESSION_LEADER: name = "AT_SESSION_LEADER"; break;
+
+#if 1 /* <unistd.h> names for certain file handles. */
+	case STDIN_FILENO:  name = "STDIN_FILENO"; break;
+	case STDOUT_FILENO: name = "STDOUT_FILENO"; break;
+	case STDERR_FILENO: name = "STDERR_FILENO"; break;
+#endif
 
 	default:
 		/* Deal with DOS drive file handles. */
