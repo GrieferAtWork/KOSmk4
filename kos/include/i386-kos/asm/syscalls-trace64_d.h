@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x82208fab */
+/* HASH CRC-32:0xf7751e65 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1380,12 +1380,13 @@
 #define __NR64ATR0_mknod                  SC_REPR_FILENAME                                                     /* nodename */ 
 #define __NR64ATR1_mknod                  SC_REPR_MODE_T                                                       /* mode */ 
 #define __NR64ATR2_mknod                  SC_REPR_DEV_T                                                        /* dev */ 
+#define __NR64ATL2_mknod                  1                                                                    /* dev -> mode */ 
 #define __NR64RTR_mknod                   SC_REPR_ERRNO_T                                                      /* return */
 #define __NR64ATR0_uselib                 SC_REPR_STRING                                                       /* library */ 
 #define __NR64RTR_uselib                  SC_REPR_ERRNO_T                                                      /* return */
 #define __NR64ATR0_personality            SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NR64RTR_personality             SC_REPR_ERRNO_T                                                      /* return */
-#define __NR64ATR0_ustat                  SC_REPR_DEV_T                                                        /* dev */ 
+#define __NR64ATR0_ustat                  SC_REPR_DEV_BLK                                                      /* dev */ 
 #define __NR64ATR1_ustat                  SC_REPR_POINTER                                                      /* ubuf */ 
 #define __NR64RTR_ustat                   SC_REPR_ERRNO_T                                                      /* return */
 #define __NR64ATR0_statfs                 SC_REPR_FILENAME                                                     /* file */ 
@@ -1572,7 +1573,7 @@
 #define __NR64ATR0_tkill                  SC_REPR_PID_T                                                        /* tid */ 
 #define __NR64ATR1_tkill                  SC_REPR_SIGNO                                                        /* signo */ 
 #define __NR64RTR_tkill                   SC_REPR_ERRNO_T                                                      /* return */
-#define __NR64ATR0_time                   SC_REPR_TIME                                                         /* timer */ 
+#define __NR64ATR0_time                   SC_REPR_POINTER                                                      /* timer */ 
 #define __NR64RTR_time                    SC_REPR_TIME_T                                                       /* return */
 #define __NR64ATR0_futex                  SC_REPR_POINTER                                                      /* uaddr */ 
 #define __NR64ATR1_futex                  SC_REPR_SYSCALL_ULONG_T                                              /* futex_op */ 
@@ -1762,6 +1763,7 @@
 #define __NR64ATL1_mknodat                0                                                                    /* nodename -> dirfd */ 
 #define __NR64ATR2_mknodat                SC_REPR_MODE_T                                                       /* mode */ 
 #define __NR64ATR3_mknodat                SC_REPR_DEV_T                                                        /* dev */ 
+#define __NR64ATL3_mknodat                2                                                                    /* dev -> mode */ 
 #define __NR64RTR_mknodat                 SC_REPR_ERRNO_T                                                      /* return */
 #define __NR64ATR0_fchownat               SC_REPR_FD_T                                                         /* dirfd */ 
 #define __NR64ATR1_fchownat               SC_REPR_FILENAME                                                     /* filename */ 
@@ -2097,6 +2099,7 @@
 #define __NR64ATL1_fmknodat               0                                                                    /* nodename -> dirfd */ 
 #define __NR64ATR2_fmknodat               SC_REPR_MODE_T                                                       /* mode */ 
 #define __NR64ATR3_fmknodat               SC_REPR_DEV_T                                                        /* dev */ 
+#define __NR64ATL3_fmknodat               2                                                                    /* dev -> mode */ 
 #define __NR64ATR4_fmknodat               SC_REPR_ATFLAG__DOSPATH                                              /* flags */ 
 #define __NR64RTR_fmknodat                SC_REPR_ERRNO_T                                                      /* return */
 #define __NR64ATR0_fmkdirat               SC_REPR_FD_T                                                         /* dirfd */ 

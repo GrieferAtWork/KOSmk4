@@ -440,9 +440,13 @@ again:
  * Alternatively, the given `name' may also be in the form of `MAJOR:MINOR',
  * an encoding that is always attempted first by attempting to decode the
  * given name using `scanf("%u:%u")'
- * >> block_device_lookup_name("3:64");      // MKDEV(3,64)
- * >> block_device_lookup_name("hda2");      // MKDEV(3,0)  + 2
- * >> block_device_lookup_name("/dev/hdc1"); // MKDEV(22,0) + 1
+ * >> block_device_lookup_name("3:64");      // MKDEV(3, 64)
+ * >> block_device_lookup_name("/dev/hdc1"); // MKDEV(22, 0) + 1
+ * >> block_device_lookup_name("hda2");      // MKDEV(3, 0)  + 2
+ * This function is mainly intended for decoding device names from commandline
+ * arguments, such as the kernel's `boot=<NAME>' option which overrides the
+ * kernel's boot partition (in case the kernel can't auto-detect its partition
+ * properly).
  * @return: NULL: No device matching `name' exists. */
 PUBLIC WUNUSED REF struct basic_block_device *KCALL
 block_device_lookup_name(USER CHECKED char const *name)

@@ -317,23 +317,35 @@ waitpid:(pid_t pid, int32_t *stat_loc, [tostr(WAITFLAG)] syscall_ulong_t options
 
 [cp] creat:([tostr(FILENAME)] char const *filename, mode_t mode) -> fd_t;
 [cp] link:([tostr(FILENAME)] char const *existing_file, [tostr(FILENAME)] char const *link_file) -> errno_t;
-[cp] unlink:([tostr(FILENAME)] char const *filename) -> errno_t;
-[cp] chdir:([tostr(FILENAME)] char const *path) -> errno_t;
 
+[cp] unlink:([tostr(FILENAME)] char const *filename) -> errno_t;
+@@@param: flags: Set of `0 | AT_REMOVEDIR | AT_REMOVEREG | AT_DOSPATH'
+[cp] unlinkat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *name,
+               [tostr(ATFLAG__REMOVEDIR__REMOVEREG__DOSPATH)] atflag_t flags) -> errno_t;
+rmdir:(char const *path) -> errno_t;
+
+[cp] chdir:([tostr(FILENAME)] char const *path) -> errno_t;
+[cp] fchdir:(fd_t fd) -> errno_t;
 @@@param: flags: Set of `0 | AT_DOSPATH'
-[cp]
-fchdirat:(fd_t dirfd,
-          [tostr(FILENAME:dirfd)] char const *path,
-          [tostr(ATFLAG__DOSPATH)] atflag_t flags) -> errno_t;
+[cp] fchdirat:(fd_t dirfd,
+               [tostr(FILENAME:dirfd)] char const *path,
+               [tostr(ATFLAG__DOSPATH)] atflag_t flags) -> errno_t;
 
 %[startgroup]
-time:([tostr(TIME)] time32_t *timer) -> time32_t;
+time:(time32_t *timer) -> time32_t;
 time64:(time64_t *timer) -> [reg64] time64_t;
-timex32:(int32_t *timer) -> [tostr(TIME)] int32_t;
-timex64:(int64_t *timer) -> [reg64][tostr(TIME)] int64_t;
+timex32:(int32_t *timer) -> [tostr(TIME_T)] int32_t;
+timex64:(int64_t *timer) -> [reg64][tostr(TIME_T)] int64_t;
 %[endgroup]
 
-[cp] mknod:([tostr(FILENAME)] char const *nodename, mode_t mode, dev_t dev) -> errno_t;
+[cp] mknod:([tostr(FILENAME)] char const *nodename, mode_t mode, [tostr(DEV_T:mode)] dev_t dev) -> errno_t;
+[cp] mknodat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *nodename,
+              mode_t mode, [tostr(DEV_T:mode)] dev_t dev) -> errno_t;
+@@@param: flags: Set of `0 | AT_DOSPATH'
+[cp] fmknodat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *nodename,
+               mode_t mode, [tostr(DEV_T:mode)] dev_t dev,
+               [tostr(ATFLAG__DOSPATH)] atflag_t flags) -> errno_t;
+
 [cp] chmod:([tostr(FILENAME)] char const *filename, mode_t mode) -> errno_t;
 
 %[startgroup]
@@ -508,8 +520,23 @@ ftimex64:(struct timebx64 *tp) -> errno_t;
 kill:(pid_t pid, [tostr(SIGNO)] syscall_ulong_t signo) -> errno_t;
 
 [cp] rename:(char const *oldname, char const *newname_or_path) -> errno_t;
+[cp] renameat:(fd_t oldfd, [tostr(FILENAME:oldfd)] char const *oldname,
+               fd_t newfd, [tostr(FILENAME:newfd)] char const *newname_or_path) -> errno_t;
+@@@param: flags: Set of `0 | AT_DOSPATH'
+[cp] frenameat:(fd_t oldfd, [tostr(FILENAME:oldfd)] char const *oldname,
+                fd_t newfd, [tostr(FILENAME:newfd)] char const *newname_or_path,
+                [tostr(ATFLAG__DOSPATH)] atflag_t flags) -> errno_t;
+@@@param: flags: Set of `RENAME_EXCHANGE | RENAME_NOREPLACE | RENAME_WHITEOUT'
+[cp] renameat2:(fd_t olddirfd, [tostr(FILENAME:olddirfd)] char const *oldpath,
+                fd_t newdirfd, [tostr(FILENAME:newdirfd)] char const *newpath,
+                [tostr(RENAMEAT2_FLAGS)] syscall_ulong_t flags) -> errno_t;
+
 [cp] mkdir:(char const *pathname, mode_t mode) -> errno_t;
-rmdir:(char const *path) -> errno_t;
+[cp] mkdirat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *pathname, mode_t mode) -> errno_t;
+@@@param: flags: Set of `0 | AT_DOSPATH'
+[cp] fmkdirat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *pathname, mode_t mode, [tostr(ATFLAG__DOSPATH)] atflag_t flags) -> errno_t;
+
+
 dup:(fd_t fd) -> fd_t;
 pipe:(fd_t pipedes[2]) -> errno_t;
 times:(struct tms *buf) -> clock_t;
@@ -530,7 +557,7 @@ acct:([tostr(FILENAME)] char const *filename) -> errno_t;
 [restart(must)] umask:(mode_t mode) -> mode_t;
 [restart(must)] fsmode:([reg64] uint64_t mode) -> [reg64] uint64_t;
 chroot:(char const *path) -> errno_t;
-ustat:(dev_t dev, struct ustat *ubuf) -> errno_t;
+ustat:([tostr(DEV_BLK)] dev_t dev, struct ustat *ubuf) -> errno_t;
 dup2:(fd_t oldfd, fd_t newfd) -> fd_t;
 [restart(must)] getppid:() -> pid_t;
 [restart(must)] getpgrp:() -> pid_t;
@@ -783,7 +810,6 @@ personality:(int TODO_PROTOTYPE) -> errno_t;
 afs_syscall:(int TODO_PROTOTYPE) -> errno_t;
 
 [restart(must)] getpgid:(pid_t pid) -> pid_t;
-[cp] fchdir:(fd_t fd) -> errno_t;
 
 [cp] _llseek:(fd_t fd, [reg64] int64_t offset, uint64_t *result, [tostr(SEEK_WHENCE)] syscall_ulong_t whence) -> errno_t;
 [cp] getdents:(fd_t fd, struct linux_dirent *dirp, size_t count) -> ssize_t;
@@ -1193,15 +1219,6 @@ inotify_rm_watch:(int TODO_PROTOTYPE) -> errno_t;
 migrate_pages:(int TODO_PROTOTYPE) -> errno_t;
 
 [cp] openat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, oflag_t oflags, mode_t mode) -> fd_t;
-[cp] mkdirat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *pathname, mode_t mode) -> errno_t;
-
-@@@param: flags: Set of `0 | AT_DOSPATH'
-[cp] fmkdirat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *pathname, mode_t mode, [tostr(ATFLAG__DOSPATH)] atflag_t flags) -> errno_t;
-
-[cp] mknodat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *nodename, mode_t mode, dev_t dev) -> errno_t;
-
-@@@param: flags: Set of `0 | AT_DOSPATH'
-[cp] fmknodat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *nodename, mode_t mode, dev_t dev, [tostr(ATFLAG__DOSPATH)] atflag_t flags) -> errno_t;
 
 %[startgroup]
 [cp] futimesat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(TIMEVAL_VEC2)] struct timeval const times[2]) -> errno_t;
@@ -1211,20 +1228,6 @@ migrate_pages:(int TODO_PROTOTYPE) -> errno_t;
 [cp] futimesatx32_64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(TIMEVALX32_64_VEC2)] struct timevalx32_64 const times[2]) -> errno_t;
 [cp] futimesatx64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(TIMEVALX64_VEC2)] struct timevalx64 const times[2]) -> errno_t;
 %[endgroup]
-
-@@@param: flags: Set of `0 | AT_REMOVEDIR | AT_REMOVEREG | AT_DOSPATH'
-[cp] unlinkat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *name,
-               [tostr(ATFLAG__REMOVEDIR__REMOVEREG__DOSPATH)] atflag_t flags) -> errno_t;
-
-[cp]
-renameat:(fd_t oldfd, [tostr(FILENAME:oldfd)] char const *oldname,
-          fd_t newfd, [tostr(FILENAME:newfd)] char const *newname_or_path) -> errno_t;
-
-@@@param: flags: Set of `0 | AT_DOSPATH'
-[cp]
-frenameat:(fd_t oldfd, [tostr(FILENAME:oldfd)] char const *oldname,
-           fd_t newfd, [tostr(FILENAME:newfd)] char const *newname_or_path,
-           [tostr(ATFLAG__DOSPATH)] atflag_t flags) -> errno_t;
 
 @@@param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_FOLLOW | AT_DOSPATH'
 [cp] linkat:(fd_t fromfd, char const *existing_file, fd_t tofd, char const *target_path,
@@ -1422,12 +1425,6 @@ kcmp:(pid_t pid1, pid_t pid2, syscall_ulong_t type,
 finit_module:(int TODO_PROTOTYPE) -> errno_t;
 sched_setattr:(int TODO_PROTOTYPE) -> errno_t;
 sched_getattr:(int TODO_PROTOTYPE) -> errno_t;
-
-@@@param: flags: Set of `RENAME_EXCHANGE | RENAME_NOREPLACE | RENAME_WHITEOUT'
-[cp]
-renameat2:(fd_t olddirfd, [tostr(FILENAME:olddirfd)] char const *oldpath,
-           fd_t newdirfd, [tostr(FILENAME:newdirfd)] char const *newpath,
-           [tostr(RENAMEAT2_FLAGS)] syscall_ulong_t flags) -> errno_t;
 
 seccomp:(int TODO_PROTOTYPE) -> errno_t;
 getrandom:(void *buf, size_t num_bytes, syscall_ulong_t flags) -> ssize_t;

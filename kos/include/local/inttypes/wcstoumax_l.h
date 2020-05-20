@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfa1de07 */
+/* HASH CRC-32:0xa092b6bd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,7 +50,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcstoumax_l))(__WCHAR_TYPE__ const *_
                                                          __WCHAR_TYPE__ **__endptr,
                                                          int __base,
                                                          __locale_t __locale) {
-#line 579 "kos/src/libc/magic/inttypes.c"
+#line 625 "kos/src/libc/magic/inttypes.c"
 	(void)__locale;
 	return __localdep_wcstoumax(__nptr, __endptr, __base);
 }

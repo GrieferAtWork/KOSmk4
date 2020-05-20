@@ -241,7 +241,7 @@ typedef ino_t ino64_t; /* INode number */
 __HYBRID_ALTINT_TYPEDEF(__ino64_t, ino64_t, false); /* INode number */
 #endif /* __FS_SIZEOF(INO) != 8 */
 #else /* __KERNEL__ */
-typedef __ino64_t ino64_t;                   /* INode number */
+typedef __ino64_t ino64_t; /* INode number */
 #endif /* !__KERNEL__ */
 #endif /* !__ino64_t_defined */
 
@@ -252,7 +252,7 @@ typedef __oflag_t oflag_t; /* File-open flags (Set of `O_*'). */
 
 #ifndef __mode_t_defined
 #define __mode_t_defined 1
-typedef __mode_t mode_t; /* INode type */
+typedef __mode_t mode_t; /* INode type (Set of `S_*' from `<fcntl.h>' or `<sys/stat.h>') */
 #endif /* !__mode_t_defined */
 
 #ifndef __nlink_t_defined

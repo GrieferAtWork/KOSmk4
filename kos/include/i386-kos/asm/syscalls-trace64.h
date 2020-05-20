@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd439e75d */
+/* HASH CRC-32:0x95eda27e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1380,12 +1380,13 @@
 #define __NRATR0_mknod                  SC_REPR_FILENAME                                                     /* nodename */ 
 #define __NRATR1_mknod                  SC_REPR_MODE_T                                                       /* mode */ 
 #define __NRATR2_mknod                  SC_REPR_DEV_T                                                        /* dev */ 
+#define __NRATL2_mknod                  1                                                                    /* dev -> mode */ 
 #define __NRRTR_mknod                   SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_uselib                 SC_REPR_STRING                                                       /* library */ 
 #define __NRRTR_uselib                  SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_personality            SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NRRTR_personality             SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_ustat                  SC_REPR_DEV_T                                                        /* dev */ 
+#define __NRATR0_ustat                  SC_REPR_DEV_BLK                                                      /* dev */ 
 #define __NRATR1_ustat                  SC_REPR_POINTER                                                      /* ubuf */ 
 #define __NRRTR_ustat                   SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_statfs                 SC_REPR_FILENAME                                                     /* file */ 
@@ -1572,7 +1573,7 @@
 #define __NRATR0_tkill                  SC_REPR_PID_T                                                        /* tid */ 
 #define __NRATR1_tkill                  SC_REPR_SIGNO                                                        /* signo */ 
 #define __NRRTR_tkill                   SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_time                   SC_REPR_TIME                                                         /* timer */ 
+#define __NRATR0_time                   SC_REPR_POINTER                                                      /* timer */ 
 #define __NRRTR_time                    SC_REPR_TIME_T                                                       /* return */
 #define __NRATR0_futex                  SC_REPR_POINTER                                                      /* uaddr */ 
 #define __NRATR1_futex                  SC_REPR_SYSCALL_ULONG_T                                              /* futex_op */ 
@@ -1762,6 +1763,7 @@
 #define __NRATL1_mknodat                0                                                                    /* nodename -> dirfd */ 
 #define __NRATR2_mknodat                SC_REPR_MODE_T                                                       /* mode */ 
 #define __NRATR3_mknodat                SC_REPR_DEV_T                                                        /* dev */ 
+#define __NRATL3_mknodat                2                                                                    /* dev -> mode */ 
 #define __NRRTR_mknodat                 SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_fchownat               SC_REPR_FD_T                                                         /* dirfd */ 
 #define __NRATR1_fchownat               SC_REPR_FILENAME                                                     /* filename */ 
@@ -2097,6 +2099,7 @@
 #define __NRATL1_fmknodat               0                                                                    /* nodename -> dirfd */ 
 #define __NRATR2_fmknodat               SC_REPR_MODE_T                                                       /* mode */ 
 #define __NRATR3_fmknodat               SC_REPR_DEV_T                                                        /* dev */ 
+#define __NRATL3_fmknodat               2                                                                    /* dev -> mode */ 
 #define __NRATR4_fmknodat               SC_REPR_ATFLAG__DOSPATH                                              /* flags */ 
 #define __NRRTR_fmknodat                SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_fmkdirat               SC_REPR_FD_T                                                         /* dirfd */ 

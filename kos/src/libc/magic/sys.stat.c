@@ -87,12 +87,12 @@ typedef __gid_t gid_t;
 
 #ifndef __ino_t_defined
 #define __ino_t_defined 1
-typedef __typedef_ino_t ino_t;
+typedef __typedef_ino_t ino_t;  /* INode number */
 #endif /* __ino_t_defined */
 
 #ifndef __mode_t_defined
 #define __mode_t_defined 1
-typedef __mode_t mode_t;
+typedef __mode_t mode_t; /* INode type (Set of `S_*' from `<fcntl.h>' or `<sys/stat.h>') */
 #endif /* __mode_t_defined */
 
 #ifndef __nlink_t_defined
@@ -125,46 +125,46 @@ typedef __blksize_t blksize_t;
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN)
 #ifndef S_IFMT
-#define S_IFMT     __S_IFMT
-#define S_IFDIR    __S_IFDIR
-#define S_IFCHR    __S_IFCHR
-#define S_IFBLK    __S_IFBLK
-#define S_IFREG    __S_IFREG
+#define S_IFMT  __S_IFMT
+#define S_IFDIR __S_IFDIR
+#define S_IFCHR __S_IFCHR
+#define S_IFBLK __S_IFBLK
+#define S_IFREG __S_IFREG
 #endif /* !S_IFMT */
 #if !defined(S_IFIFO) && defined(__S_IFIFO)
-#define S_IFIFO    __S_IFIFO
-#endif
+#define S_IFIFO __S_IFIFO
+#endif /* !S_IFIFO && __S_IFIFO */
 #if !defined(S_IFLNK) && defined(__S_IFLNK)
-#define S_IFLNK    __S_IFLNK
-#endif
-#if (defined(__USE_MISC) || defined(__USE_UNIX98)) && \
-    !defined(S_IFSOCK) && defined(__S_IFSOCK)
-#define S_IFSOCK   __S_IFSOCK
-#endif
+#define S_IFLNK __S_IFLNK
+#endif /* !S_IFLNK && __S_IFLNK */
+#if ((defined(__USE_MISC) || defined(__USE_UNIX98)) && \
+     !defined(S_IFSOCK) && defined(__S_IFSOCK))
+#define S_IFSOCK __S_IFSOCK
+#endif /* ... */
 #endif /* __USE_MISC || __USE_XOPEN */
 
 #ifndef __S_ISTYPE
-#define __S_ISTYPE(mode, mask)   (((mode)&__S_IFMT)==(mask))
+#define __S_ISTYPE(mode, mask) (((mode) & __S_IFMT) == (mask))
 #endif /* !__S_ISTYPE */
 
 #ifndef S_ISDIR
-#define S_ISDIR(mode)  __S_ISTYPE((mode), __S_IFDIR)
-#define S_ISCHR(mode)  __S_ISTYPE((mode), __S_IFCHR)
-#define S_ISBLK(mode)  __S_ISTYPE((mode), __S_IFBLK)
-#define S_ISREG(mode)  __S_ISTYPE((mode), __S_IFREG)
+#define S_ISDIR(mode) __S_ISTYPE((mode), __S_IFDIR)
+#define S_ISCHR(mode) __S_ISTYPE((mode), __S_IFCHR)
+#define S_ISBLK(mode) __S_ISTYPE((mode), __S_IFBLK)
+#define S_ISREG(mode) __S_ISTYPE((mode), __S_IFREG)
 #endif /* !S_ISDIR */
 
 #if defined(__USE_KOS) && !defined(S_ISDEV)
-#define S_ISDEV(mode)  __S_ISDEV(mode)
+#define S_ISDEV(mode) __S_ISDEV(mode)
 #endif /* __USE_KOS && !S_ISDEV */
 #if defined(__S_IFIFO) && !defined(S_ISFIFO)
 #define S_ISFIFO(mode) __S_ISTYPE((mode), __S_IFIFO)
 #endif /* __S_IFIFO && !S_ISFIFO */
 #if defined(__S_IFLNK) && !defined(S_ISLNK)
-#define S_ISLNK(mode)  __S_ISTYPE((mode), __S_IFLNK)
+#define S_ISLNK(mode) __S_ISTYPE((mode), __S_IFLNK)
 #endif /* __S_IFLNK && !S_ISLNK */
 #if defined(__USE_MISC) && !defined(S_ISLNK)
-#define S_ISLNK(mode)  0
+#define S_ISLNK(mode) 0
 #endif /* __USE_MISC && !S_ISLNK */
 
 #ifndef S_ISSOCK
@@ -178,94 +178,94 @@ typedef __blksize_t blksize_t;
 
 #ifdef __USE_POSIX199309
 #ifndef S_TYPEISMQ
-#define S_TYPEISMQ(buf)  __S_TYPEISMQ(buf)
-#endif
+#define S_TYPEISMQ(buf) __S_TYPEISMQ(buf)
+#endif /* !S_TYPEISMQ */
 #ifndef S_TYPEISSEM
 #define S_TYPEISSEM(buf) __S_TYPEISSEM(buf)
-#endif
+#endif /* !S_TYPEISSEM */
 #ifndef S_TYPEISSHM
 #define S_TYPEISSHM(buf) __S_TYPEISSHM(buf)
-#endif
+#endif /* !S_TYPEISSHM */
 #endif /* __USE_POSIX199309 */
 
 #ifndef S_ISUID
 #define S_ISUID __S_ISUID /* Set user ID on execution. */
 #define S_ISGID __S_ISGID /* Set group ID on execution. */
-#endif
+#endif /* !S_ISUID */
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN)
 #ifndef S_ISVTX
 #define S_ISVTX __S_ISVTX
-#endif
-#endif
+#endif /* !S_ISVTX */
+#endif /* __USE_MISC || __USE_XOPEN */
 
 #ifndef S_IRUSR
-#define S_IRUSR  __S_IREAD  /* Read by owner. */
-#define S_IWUSR  __S_IWRITE /* Write by owner. */
-#define S_IXUSR  __S_IEXEC  /* Execute by owner. */
-#endif
+#define S_IRUSR __S_IREAD  /* Read by owner. */
+#define S_IWUSR __S_IWRITE /* Write by owner. */
+#define S_IXUSR __S_IEXEC  /* Execute by owner. */
+#endif /* !S_IRUSR */
 #ifndef S_IRWXU
-#define S_IRWXU (__S_IREAD|__S_IWRITE|__S_IEXEC)
-#endif
+#define S_IRWXU (__S_IREAD | __S_IWRITE | __S_IEXEC)
+#endif /* !S_IRWXU */
 
 #ifdef __USE_MISC
 #ifndef S_IREAD
 #define S_IREAD  S_IRUSR
 #define S_IWRITE S_IWUSR
 #define S_IEXEC  S_IXUSR
-#endif
+#endif /* !S_IREAD */
 #endif /* __USE_MISC */
 
 #ifndef S_IRGRP
 #define S_IRGRP (S_IRUSR >> 3) /* Read by group. */
 #define S_IWGRP (S_IWUSR >> 3) /* Write by group. */
 #define S_IXGRP (S_IXUSR >> 3) /* Execute by group. */
-#endif
+#endif /* !S_IRGRP */
 #ifndef S_IRWXG
 #define S_IRWXG (S_IRWXU >> 3)
-#endif
+#endif /* !S_IRWXG */
 #ifndef S_IROTH
 #define S_IROTH (S_IRGRP >> 3) /* Read by others. */
 #define S_IWOTH (S_IWGRP >> 3) /* Write by others. */
 #define S_IXOTH (S_IXGRP >> 3) /* Execute by others. */
-#endif
+#endif /* !S_IROTH */
 #ifndef S_IRWXO
 #define S_IRWXO (S_IRWXG >> 3)
-#endif
+#endif /* !S_IRWXO */
 
 
 
 #ifdef __USE_KOS
 /* As also seen in the linux kernel headers. */
 #ifndef S_IRWXUGO
-#define S_IRWXUGO (S_IRWXU|S_IRWXG|S_IRWXO)
+#define S_IRWXUGO (S_IRWXU | S_IRWXG | S_IRWXO)
 #endif /* !S_IRWXUGO */
 #ifndef S_IALLUGO
-#define S_IALLUGO (S_ISUID|S_ISGID|S_ISVTX|S_IRWXUGO)
+#define S_IALLUGO (S_ISUID | S_ISGID | S_ISVTX | S_IRWXUGO)
 #endif /* !S_IALLUGO */
 #ifndef S_IRUGO
-#define S_IRUGO   (S_IRUSR|S_IRGRP|S_IROTH)
+#define S_IRUGO (S_IRUSR | S_IRGRP | S_IROTH)
 #endif /* !S_IRUGO */
 #ifndef S_IWUGO
-#define S_IWUGO   (S_IWUSR|S_IWGRP|S_IWOTH)
+#define S_IWUGO (S_IWUSR | S_IWGRP | S_IWOTH)
 #endif /* !S_IWUGO */
 #ifndef S_IXUGO
-#define S_IXUGO   (S_IXUSR|S_IXGRP|S_IXOTH)
+#define S_IXUGO (S_IXUSR | S_IXGRP | S_IXOTH)
 #endif /* !S_IXUGO */
 #endif /* __USE_KOS */
 
 #ifdef __USE_MISC
 #ifndef ACCESSPERMS
-#define ACCESSPERMS (S_IRWXU|S_IRWXG|S_IRWXO) /* 0777 */
+#define ACCESSPERMS (S_IRWXU | S_IRWXG | S_IRWXO) /* 0777 */
 #endif /* !ACCESSPERMS */
 #ifndef ALLPERMS
-#define ALLPERMS    (S_ISUID|S_ISGID|S_ISVTX|S_IRWXU|S_IRWXG|S_IRWXO)/* 07777 */
+#define ALLPERMS (S_ISUID | S_ISGID | S_ISVTX | S_IRWXU | S_IRWXG | S_IRWXO) /* 07777 */
 #endif /* !ALLPERMS */
 #ifndef DEFFILEMODE
-#define DEFFILEMODE (S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH)/* 0666*/
+#define DEFFILEMODE (S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH) /* 0666*/
 #endif /* !DEFFILEMODE */
 #ifndef S_BLKSIZE
-#define S_BLKSIZE    512 /* Block size for `st_blocks'. */
+#define S_BLKSIZE 512 /* Block size for `st_blocks'. */
 #endif /* !S_BLKSIZE */
 #endif /* __USE_MISC */
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x444baea */
+/* HASH CRC-32:0xba3bbe7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1169,10 +1169,11 @@
 #define __NR32ATR0_chdir                   SC_REPR_FILENAME                                                     /* path */ 
 #define __NR32RTR_chdir                    SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_time                    SC_REPR_POINTER                                                      /* timer */ 
-#define __NR32RTR_time                     SC_REPR_TIME                                                         /* return */
+#define __NR32RTR_time                     SC_REPR_TIME_T                                                       /* return */
 #define __NR32ATR0_mknod                   SC_REPR_FILENAME                                                     /* nodename */ 
 #define __NR32ATR1_mknod                   SC_REPR_MODE_T                                                       /* mode */ 
 #define __NR32ATR2_mknod                   SC_REPR_DEV_T                                                        /* dev */ 
+#define __NR32ATL2_mknod                   1                                                                    /* dev -> mode */ 
 #define __NR32RTR_mknod                    SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_chmod                   SC_REPR_FILENAME                                                     /* filename */ 
 #define __NR32ATR1_chmod                   SC_REPR_MODE_T                                                       /* mode */ 
@@ -1280,7 +1281,7 @@
 #define __NR32RTR_umask                    SC_REPR_MODE_T                                                       /* return */
 #define __NR32ATR0_chroot                  SC_REPR_STRING                                                       /* path */ 
 #define __NR32RTR_chroot                   SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_ustat                   SC_REPR_DEV_T                                                        /* dev */ 
+#define __NR32ATR0_ustat                   SC_REPR_DEV_BLK                                                      /* dev */ 
 #define __NR32ATR1_ustat                   SC_REPR_POINTER                                                      /* ubuf */ 
 #define __NR32RTR_ustat                    SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_dup2                    SC_REPR_FD_T                                                         /* oldfd */ 
@@ -2019,6 +2020,7 @@
 #define __NR32ATL1_mknodat                 0                                                                    /* nodename -> dirfd */ 
 #define __NR32ATR2_mknodat                 SC_REPR_MODE_T                                                       /* mode */ 
 #define __NR32ATR3_mknodat                 SC_REPR_DEV_T                                                        /* dev */ 
+#define __NR32ATL3_mknodat                 2                                                                    /* dev -> mode */ 
 #define __NR32RTR_mknodat                  SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_fchownat                SC_REPR_FD_T                                                         /* dirfd */ 
 #define __NR32ATR1_fchownat                SC_REPR_FILENAME                                                     /* filename */ 
@@ -2472,6 +2474,7 @@
 #define __NR32ATL1_fmknodat                0                                                                    /* nodename -> dirfd */ 
 #define __NR32ATR2_fmknodat                SC_REPR_MODE_T                                                       /* mode */ 
 #define __NR32ATR3_fmknodat                SC_REPR_DEV_T                                                        /* dev */ 
+#define __NR32ATL3_fmknodat                2                                                                    /* dev -> mode */ 
 #define __NR32ATR4_fmknodat                SC_REPR_ATFLAG__DOSPATH                                              /* flags */ 
 #define __NR32RTR_fmknodat                 SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_fmkdirat                SC_REPR_FD_T                                                         /* dirfd */ 
@@ -2701,7 +2704,7 @@
 #define __NR32ATR2_set_exception_handler   SC_REPR_POINTER                                                      /* handler_sp */ 
 #define __NR32RTR_set_exception_handler    SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_time64                  SC_REPR_POINTER                                                      /* timer */ 
-#define __NR32RTR_time64                   SC_REPR_TIME                                                         /* return */
+#define __NR32RTR_time64                   SC_REPR_TIME_T                                                       /* return */
 #define __NR32ATR0_fchdirat                SC_REPR_FD_T                                                         /* dirfd */ 
 #define __NR32ATR1_fchdirat                SC_REPR_FILENAME                                                     /* path */ 
 #define __NR32ATL1_fchdirat                0                                                                    /* path -> dirfd */ 

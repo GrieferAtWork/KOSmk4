@@ -82,12 +82,12 @@ typedef unsigned int       uint;
 
 #ifndef __loff_t_defined
 #define __loff_t_defined 1
-typedef __loff_t loff_t;
+typedef __loff_t loff_t; /* Large file/device offset */
 #endif /* !__loff_t_defined */
 
 #ifndef __ino_t_defined
 #define __ino_t_defined 1
-typedef __typedef_ino_t ino_t;
+typedef __typedef_ino_t ino_t;  /* INode number */
 #endif /* !__ino_t_defined */
 
 #ifdef __USE_LARGEFILE64
@@ -114,7 +114,7 @@ typedef __gid_t gid_t;
 
 #ifndef __mode_t_defined
 #define __mode_t_defined 1
-typedef __mode_t mode_t;
+typedef __mode_t mode_t; /* INode type (Set of `S_*' from `<fcntl.h>' or `<sys/stat.h>') */
 #endif /* !__mode_t_defined */
 
 #ifndef __nlink_t_defined

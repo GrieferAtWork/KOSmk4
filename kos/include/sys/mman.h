@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb924e1c0 */
+/* HASH CRC-32:0x42a76838 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,7 +49,7 @@ typedef __size_t size_t;
 
 #ifndef __mode_t_defined
 #define __mode_t_defined 1
-typedef __mode_t mode_t;
+typedef __mode_t mode_t; /* INode type (Set of `S_*' from `<fcntl.h>' or `<sys/stat.h>') */
 #endif /* !__mode_t_defined */
 #endif /* __CC__ */
 

@@ -40,7 +40,7 @@ typedef __gid_t gid_t;
 
 #ifndef __mode_t_defined
 #define __mode_t_defined 1
-typedef __mode_t mode_t;
+typedef __mode_t mode_t; /* INode type (Set of `S_*' from `<fcntl.h>' or `<sys/stat.h>') */
 #endif /* !__mode_t_defined */
 
 #ifndef __key_t_defined

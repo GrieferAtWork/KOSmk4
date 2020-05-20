@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x11985cc1 */
+/* HASH CRC-32:0x907afaf2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -880,6 +880,7 @@
 #define __NRATL1_mknodat                0                                                       /* nodename -> dirfd */ 
 #define __NRATR2_mknodat                SC_REPR_MODE_T                                          /* mode */ 
 #define __NRATR3_mknodat                SC_REPR_DEV_T                                           /* dev */ 
+#define __NRATL3_mknodat                2                                                       /* dev -> mode */ 
 #define __NRRTR_mknodat                 SC_REPR_ERRNO_T                                         /* return */
 #define __NRATR0_mkdirat                SC_REPR_FD_T                                            /* dirfd */ 
 #define __NRATR1_mkdirat                SC_REPR_FILENAME                                        /* pathname */ 
@@ -1687,6 +1688,7 @@
 #define __NRATR0_mknod                  SC_REPR_FILENAME                                        /* nodename */ 
 #define __NRATR1_mknod                  SC_REPR_MODE_T                                          /* mode */ 
 #define __NRATR2_mknod                  SC_REPR_DEV_T                                           /* dev */ 
+#define __NRATL2_mknod                  1                                                       /* dev -> mode */ 
 #define __NRRTR_mknod                   SC_REPR_ERRNO_T                                         /* return */
 #define __NRATR0_chmod                  SC_REPR_FILENAME                                        /* filename */ 
 #define __NRATR1_chmod                  SC_REPR_MODE_T                                          /* mode */ 
@@ -1788,7 +1790,7 @@
 #define __NRRTR_alarm                   SC_REPR_SYSCALL_ULONG_T                                 /* return */
 #define __NRRTR_getpgrp                 SC_REPR_PID_T                                           /* return */
 #define __NRRTR_pause                   SC_REPR_ERRNO_T                                         /* return */
-#define __NRATR0_time                   SC_REPR_TIME                                            /* timer */ 
+#define __NRATR0_time                   SC_REPR_POINTER                                         /* timer */ 
 #define __NRRTR_time                    SC_REPR_TIME_T                                          /* return */
 #define __NRATR0_utime                  SC_REPR_FILENAME                                        /* filename */ 
 #define __NRATR1_utime                  SC_REPR_STRUCT_UTIMBUF                                  /* times */ 
@@ -1824,7 +1826,7 @@
 #define __NRATR2_epoll_wait             SC_REPR_SYSCALL_ULONG_T                                 /* maxevents */ 
 #define __NRATR3_epoll_wait             SC_REPR_SYSCALL_SLONG_T                                 /* timeout */ 
 #define __NRRTR_epoll_wait              SC_REPR_ERRNO_T                                         /* return */
-#define __NRATR0_ustat                  SC_REPR_DEV_T                                           /* dev */ 
+#define __NRATR0_ustat                  SC_REPR_DEV_BLK                                         /* dev */ 
 #define __NRATR1_ustat                  SC_REPR_POINTER                                         /* ubuf */ 
 #define __NRRTR_ustat                   SC_REPR_ERRNO_T                                         /* return */
 #define __NRRTR_vfork                   SC_REPR_PID_T                                           /* return */

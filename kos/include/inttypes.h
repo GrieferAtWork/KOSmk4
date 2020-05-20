@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xac0183e3 */
+/* HASH CRC-32:0xec5a74bb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -74,13 +74,16 @@ __SYSDECL_BEGIN
 #define __PRI2_PREFIX /* nothing */
 #elif __SIZEOF_LONG__ == 2
 #define __PRI2_PREFIX "l"
-#elif __SIZEOF_POINTER__ == 2 && \
-     (defined(__CRT_KOS) || defined(__CRT_DOS))
+#elif __SIZEOF_SHORT__ == 2
+#define __PRI2_PREFIX "h"
+#elif (__SIZEOF_POINTER__ == 2 && (defined(__CRT_KOS) || defined(__CRT_DOS)))
 #define __PRI2_PREFIX "I"
+#elif __SIZEOF_CHAR__ == 2
+#define __PRI2_PREFIX "hh"
 #elif __SIZEOF_LONG_LONG__ == 2
 #define __PRI2_PREFIX "ll"
 #else
-#define __PRI2_PREFIX "I16"
+#define __PRI2_PREFIX "I16" /* XXX: non-portable */
 #endif
 #endif /* !__PRI2_PREFIX */
 
@@ -89,13 +92,16 @@ __SYSDECL_BEGIN
 #define __PRI4_PREFIX /* nothing */
 #elif __SIZEOF_LONG__ == 4
 #define __PRI4_PREFIX "l"
-#elif __SIZEOF_POINTER__ == 4 && \
-     (defined(__CRT_KOS) || defined(__CRT_DOS))
+#elif __SIZEOF_SHORT__ == 4
+#define __PRI4_PREFIX "h"
+#elif (__SIZEOF_POINTER__ == 4 && (defined(__CRT_KOS) || defined(__CRT_DOS)))
 #define __PRI4_PREFIX "I"
+#elif __SIZEOF_CHAR__ == 4
+#define __PRI4_PREFIX "hh"
 #elif __SIZEOF_LONG_LONG__ == 4
 #define __PRI4_PREFIX "ll"
 #else
-#define __PRI4_PREFIX "I32"
+#define __PRI4_PREFIX "I32" /* XXX: non-portable */
 #endif
 #endif /* !__PRI4_PREFIX */
 
@@ -106,13 +112,12 @@ __SYSDECL_BEGIN
 #define __PRI8_PREFIX "l"
 #elif __SIZEOF_INTMAX_T__ == 8
 #define __PRI8_PREFIX "j"
-#elif __SIZEOF_POINTER__ == 8 && \
-     (defined(__CRT_KOS) || defined(__CRT_DOS))
+#elif (__SIZEOF_POINTER__ == 8 && (defined(__CRT_KOS) || defined(__CRT_DOS)))
 #define __PRI8_PREFIX "I"
 #elif __SIZEOF_LONG_LONG__ == 8
 #define __PRI8_PREFIX "ll"
 #else
-#define __PRI8_PREFIX "I64"
+#define __PRI8_PREFIX "I64" /* XXX: non-portable */
 #endif
 #endif /* !__PRI8_PREFIX */
 
@@ -123,7 +128,7 @@ __SYSDECL_BEGIN
 #define __PRIP_PREFIX "l"
 #elif __SIZEOF_INTMAX_T__ == __SIZEOF_POINTER__
 #define __PRIP_PREFIX "j"
-#else
+#elif defined(__CRT_KOS) || defined(__CRT_DOS)
 #define __PRIP_PREFIX "I"
 #endif
 #endif /* !__PRIP_PREFIX */
@@ -330,21 +335,47 @@ __SYSDECL_BEGIN
 #define PRIXMAX        __PRI8_PREFIX "X"
 
 /* printf(): (u)intptr_t / void * */
+#ifdef __PRIP_PREFIX
 #define PRIdPTR        __PRIP_PREFIX "d" /* Id */
 #define PRIiPTR        __PRIP_PREFIX "i" /* Ii */
 #define PRIoPTR        __PRIP_PREFIX "o" /* Io */
 #define PRIuPTR        __PRIP_PREFIX "u" /* Iu */
 #define PRIxPTR        __PRIP_PREFIX "x" /* Ix */
 #define PRIXPTR        __PRIP_PREFIX "X" /* IX */
+#else /* __PRIP_PREFIX */
+#define PRIdPTR        "td" /* ptrdiff_t */
+#define PRIiPTR        "ti" /* ptrdiff_t */
+#define PRIoPTR        "zo" /* size_t */
+#define PRIuPTR        "zu" /* size_t */
+#define PRIxPTR        "zx" /* size_t */
+#define PRIXPTR        "zX" /* size_t */
+#endif /* !__PRIP_PREFIX */
 
 #ifdef __USE_KOS
 /* printf(): (s)size_t */
+#ifdef __PRIP_PREFIX
 #define PRIdSIZ        __PRIP_PREFIX "d" /* Id */
 #define PRIiSIZ        __PRIP_PREFIX "i" /* Ii */
 #define PRIoSIZ        __PRIP_PREFIX "o" /* Io */
 #define PRIuSIZ        __PRIP_PREFIX "u" /* Iu */
 #define PRIxSIZ        __PRIP_PREFIX "x" /* Ix */
 #define PRIXSIZ        __PRIP_PREFIX "X" /* IX */
+#else /* __PRIP_PREFIX */
+#define PRIdSIZ        "td" /* ptrdiff_t */
+#define PRIiSIZ        "ti" /* ptrdiff_t */
+#define PRIoSIZ        "zo" /* size_t */
+#define PRIuSIZ        "zu" /* size_t */
+#define PRIxSIZ        "zx" /* size_t */
+#define PRIXSIZ        "zX" /* size_t */
+#endif /* !__PRIP_PREFIX */
+
+/* printf(): Custom size (use __SIZEOF_xxx__ macros with these) */
+#define PRIdN(sizeof)  __PRIN_PREFIX(sizeof) "d"
+#define PRIiN(sizeof)  __PRIN_PREFIX(sizeof) "i"
+#define PRIoN(sizeof)  __PRIN_PREFIX(sizeof) "o"
+#define PRIuN(sizeof)  __PRIN_PREFIX(sizeof) "u"
+#define PRIxN(sizeof)  __PRIN_PREFIX(sizeof) "x"
+#define PRIXN(sizeof)  __PRIN_PREFIX(sizeof) "X"
 #endif /* __USE_KOS */
 
 
@@ -456,6 +487,20 @@ __SYSDECL_BEGIN
 #define SCNoSIZ        __SCAP_PREFIX "o"
 #define SCNxSIZ        __SCAP_PREFIX "x"
 
+/* scanf(): Custom size (use __SIZEOF_xxx__ macros with these) */
+#define SCNdN(sizeof)  __SCAN_PREFIX(sizeof) "d"
+#define SCNiN(sizeof)  __SCAN_PREFIX(sizeof) "i"
+#define SCNuN(sizeof)  __SCAN_PREFIX(sizeof) "u"
+#define SCNoN(sizeof)  __SCAN_PREFIX(sizeof) "o"
+#define SCNxN(sizeof)  __SCAN_PREFIX(sizeof) "x"
+
+/* U-scan command:
+ *    Unsigned integer, where the radix is automatically detected,
+ *    using the same syntax as a C compiler would accept:
+ *       "1234":      Decimal
+ *       "0777":      Octal
+ *       "0xDEAD":    Hex    (casing is ignored)
+ *       "0b010011":  Binary (extension; casing is ignored) */
 #define SCNU8          __SCA1_PREFIX "U"
 #define SCNU16         __SCA2_PREFIX "U"
 #define SCNU32         __SCA4_PREFIX "U"
@@ -471,6 +516,7 @@ __SYSDECL_BEGIN
 #define SCNUMAX        __SCA8_PREFIX "U"
 #define SCNUPTR        __SCAP_PREFIX "U"
 #define SCNUSIZ        __SCAP_PREFIX "U"
+#define SCNUN(sizeof)  __SCAN_PREFIX(sizeof) "U"
 #endif /* __USE_KOS */
 
 
