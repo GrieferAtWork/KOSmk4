@@ -74,10 +74,13 @@ PUBLIC struct atomic64 x86_exec_eflags_mask = ATOMIC64_INIT(WORD64(~(EFLAGS_DF |
 
 
 #ifdef __x86_64__
-#define SYSCALL_VECTOR_SIGRETURN64 __NR_rt_sigreturn
-#define SYSCALL_VECTOR_SIGRETURN32 __NR32_sigreturn
+#define SYSCALL_VECTOR_SIGRETURN64          __NR_rt_sigreturn
+#define SYSCALL_VECTOR_SIGRETURN32          __NR32_sigreturn
+#define SYSCALL_VECTOR_ISSIGRETURN64(vecno) ((vecno) == __NR_rt_sigreturn)
+#define SYSCALL_VECTOR_ISSIGRETURN32(vecno) ((vecno) == __NR32_sigreturn || (vecno) == __NR32_rt_sigreturn)
 #else /* __x86_64__ */
-#define SYSCALL_VECTOR_SIGRETURN32 __NR_sigreturn
+#define SYSCALL_VECTOR_SIGRETURN32          __NR_sigreturn
+#define SYSCALL_VECTOR_ISSIGRETURN32(vecno) ((vecno) == __NR_sigreturn || (vecno) == __NR_rt_sigreturn)
 #endif /* !__x86_64__ */
 
 #ifdef __x86_64__
@@ -242,7 +245,7 @@ again:
 				if (!(sc.rsi_flags & RPC_SYSCALL_INFO_FREGVALID(i)))
 					sc.rsi_regs[i] = 0;
 			}
-			if unlikely(sc.rsi_sysno == SYSCALL_VECTOR_SIGRETURN32) {
+			if unlikely(SYSCALL_VECTOR_ISSIGRETURN32(sc.rsi_sysno)) {
 				/* Special case: Return to sigreturn.
 				 * -> To prevent recursion, restart this system call immediately
 				 *    by looping back to the start of our function!
@@ -312,6 +315,18 @@ sigreturn32_rpc(void *UNUSED(arg),
 	                        (USER UNCHECKED sigset_t const *)sc_info->rsi_regs[SIGRETURN_386_ARGID_RESTORE_SIGMASK],
 	                        (USER UNCHECKED struct rpc_syscall_info32 const *)sc_info->rsi_regs[SIGRETURN_386_ARGID_SC_INFO]);
 }
+
+
+/* Define `rt_sigreturn()' as an alias for `sigreturn()' */
+#ifdef __x86_64__
+#ifdef __NR32_rt_sigreturn
+DEFINE_PUBLIC_ALIAS(sys32_rt_sigreturn, sys32_sigreturn);
+#endif /* __NR32_rt_sigreturn */
+#else /* __x86_64__ */
+#ifdef __NR_rt_sigreturn
+DEFINE_PUBLIC_ALIAS(sys_rt_sigreturn, sys_sigreturn);
+#endif /* __NR_rt_sigreturn */
+#endif /* !__x86_64__ */
 
 DEFINE_SYSCALL32_6(void, sigreturn,
                    USER UNCHECKED struct fpustate32 const *, restore_fpu,
@@ -434,7 +449,7 @@ again:
 				if (!(sc.rsi_flags & RPC_SYSCALL_INFO_FREGVALID(i)))
 					sc.rsi_regs[i] = 0;
 			}
-			if unlikely(sc.rsi_sysno == SYSCALL_VECTOR_SIGRETURN64) {
+			if unlikely(SYSCALL_VECTOR_ISSIGRETURN64(sc.rsi_sysno)) {
 				/* Special case: Return to sigreturn.
 				 * -> To prevent recursion, restart this system call immediately
 				 *    by looping back to the start of our function!

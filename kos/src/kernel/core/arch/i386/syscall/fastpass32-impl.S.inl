@@ -247,7 +247,7 @@ DEFINE_INTERN_ALIAS(FUNC(iopl), X86_ASMSYSCALL32_INT80(iopl))
 #endif /* !SYSCALL_DEFMODE_INT80 */
 
 
-/* TODO: sigreturn() */
+/* TODO: sigreturn() / rt_sigreturn() */
 /* TODO: clone() */
 /* TODO: fork() */
 /* TODO: raiseat() */

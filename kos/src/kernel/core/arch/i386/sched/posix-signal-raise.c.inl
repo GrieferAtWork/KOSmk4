@@ -307,12 +307,12 @@ sighand_raise_signal(struct icpustate *__restrict state,
 		user_rstor = (NAME(u))(uintptr_t)action->sa_restore;
 	} else {
 		/* Must push assembly onto the user-stack:
-		 * >>     movl  $SYS_sigreturn, %eax
+		 * >>     movl  $SYS_rt_sigreturn, %eax
 		 * >>     int   $(0x80)
 		 */
 		/* NOTE: This assembly block's size must be pointer-aligned! */
-		PRIVATE byte_t const sigreturn_invoke_assembly[] = {
-			/* movl  $SYS_sigreturn, %eax */
+		PRIVATE byte_t const sigreturn_invoke_assembly[8] = {
+			/* movl  $SYS_rt_sigreturn, %eax */
 			0xb8,
 			(NAME(SYSCALL_VECTOR_SIGRETURN) >> 0) & 0xff,
 			(NAME(SYSCALL_VECTOR_SIGRETURN) >> 8) & 0xff,
@@ -326,7 +326,7 @@ sighand_raise_signal(struct icpustate *__restrict state,
 			0xcd, 0x80,
 #endif /* !DEFINE_RAISE64 || !__x86_64__ */
 			/* Pad to 8 bytes */
-			0x00
+			0xcc
 		};
 		usp -= sizeof(sigreturn_invoke_assembly);
 		validate_writable(usp, sizeof(sigreturn_invoke_assembly));
