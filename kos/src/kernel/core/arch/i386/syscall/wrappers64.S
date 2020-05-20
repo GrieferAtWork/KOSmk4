@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe43034cf */
+/* HASH CRC-32:0xd03240f6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17227,7 +17227,13 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_prctl)
 	.cfi_endproc
 END(__x86_asm32_int80_prctl)
 
-/* void rt_sigreturn(struct fpustate const *restore_fpu, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info const *sc_info, struct ucpustate const *restore_cpu) */
+/* Restore the specified register state when returning from a signal handler
+ * Note that the order and locations of arguments taken by this system call
+ * are of great importance, as they must match what is encoded by the kernel
+ * within `sighand_raise_signal()'
+ * The order chosen is also important, as it is selected such that arguments
+ * are only passed through registers that are preserved by CDECL */
+/* void rt_sigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info32 const *sc_info, struct ucpustate32 const *restore_cpu) */
 .section .text.x86.asm32_syscall_int80.rt_sigreturn
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigreturn)
 	.cfi_startproc simple
@@ -17243,11 +17249,13 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigreturn)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %edi, %r8 /* ARG4 = REG4 */
+	movzlq %ebp, %r9 /* ARG5 = REG5 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
 	movzlq %ecx, %rcx /* ARG3 = REG1 */
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_rt_sigreturn)
 	call   sys32_rt_sigreturn
 	popq_cfi_r %r11
@@ -17365,7 +17373,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigpending)
 	.cfi_endproc
 END(__x86_asm32_int80_rt_sigpending)
 
-/* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *[tostr(out:STRUCT_SIGINFOX32)] set, struct __siginfox32_struct *info, struct timespecx32 const *timeout, size_t sigsetsize) */
+/* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *set, struct __siginfox32_struct *info, struct timespecx32 const *timeout, size_t sigsetsize) */
 .section .text.x86.asm32_syscall_int80.rt_sigtimedwait
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigtimedwait)
 	.cfi_startproc simple
@@ -27726,8 +27734,49 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getresgid, __x86_asm32_int80_getre
 /* errno_t prctl(int TODO_PROTOTYPE) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_prctl, __x86_asm32_int80_prctl)
 
-/* void rt_sigreturn(struct fpustate const *restore_fpu, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info const *sc_info, struct ucpustate const *restore_cpu) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rt_sigreturn, __x86_asm32_int80_rt_sigreturn)
+/* Restore the specified register state when returning from a signal handler
+ * Note that the order and locations of arguments taken by this system call
+ * are of great importance, as they must match what is encoded by the kernel
+ * within `sighand_raise_signal()'
+ * The order chosen is also important, as it is selected such that arguments
+ * are only passed through registers that are preserved by CDECL */
+/* void rt_sigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info32 const *sc_info, struct ucpustate32 const *restore_cpu) */
+.section .text.x86.asm32_syscall_sysenter.rt_sigreturn
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_rt_sigreturn)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0xad
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebp, %rbp
+	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
+	movzlq 4(%ebp), %r9 /* ARG5 = 4(%ebp) */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_rt_sigreturn)
+	call   sys32_rt_sigreturn
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_sysenter_rt_sigreturn)
 
 /* errno_t rt_sigaction(syscall_ulong_t signo, struct sigactionx32 const *act, struct sigactionx32 *oact, size_t sigsetsize) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rt_sigaction, __x86_asm32_int80_rt_sigaction)
@@ -27739,7 +27788,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rt_sigprocmask, __x86_asm32_int80_
 /* errno_t rt_sigpending(struct __sigset_struct *set, size_t sigsetsize) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rt_sigpending, __x86_asm32_int80_rt_sigpending)
 
-/* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *[tostr(out:STRUCT_SIGINFOX32)] set, struct __siginfox32_struct *info, struct timespecx32 const *timeout, size_t sigsetsize) */
+/* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *set, struct __siginfox32_struct *info, struct timespecx32 const *timeout, size_t sigsetsize) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rt_sigtimedwait, __x86_asm32_int80_rt_sigtimedwait)
 
 /* @param: signo: One of `SIG*' */
@@ -32625,10 +32674,18 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_prctl)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_prctl)
 
-/* void rt_sigreturn(struct fpustate const *restore_fpu, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info const *sc_info, struct ucpustate const *restore_cpu) */
+/* Restore the specified register state when returning from a signal handler
+ * Note that the order and locations of arguments taken by this system call
+ * are of great importance, as they must match what is encoded by the kernel
+ * within `sighand_raise_signal()'
+ * The order chosen is also important, as it is selected such that arguments
+ * are only passed through registers that are preserved by CDECL */
+/* void rt_sigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info32 const *sc_info, struct ucpustate32 const *restore_cpu) */
 .section .text.x86.asm32_syscall_sysrun32.rt_sigreturn
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_rt_sigreturn)
 	.cfi_startproc
+	movzlq 40(%rdi), %r9
+	movzlq 32(%rdi), %r8
 	movzlq 24(%rdi), %rcx
 	movzlq 16(%rdi), %rdx
 	movzlq 8(%rdi), %rsi
@@ -32676,7 +32733,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_rt_sigpending)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_rt_sigpending)
 
-/* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *[tostr(out:STRUCT_SIGINFOX32)] set, struct __siginfox32_struct *info, struct timespecx32 const *timeout, size_t sigsetsize) */
+/* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *set, struct __siginfox32_struct *info, struct timespecx32 const *timeout, size_t sigsetsize) */
 .section .text.x86.asm32_syscall_sysrun32.rt_sigtimedwait
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_rt_sigtimedwait)
 	.cfi_startproc

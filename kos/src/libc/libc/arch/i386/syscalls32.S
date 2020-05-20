@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd92110c2 */
+/* HASH CRC-32:0xd16de2a0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3402,7 +3402,7 @@ INTERN_FUNCTION(libc_sys_Xrt_sigpending)
 END(libc_sys_Xrt_sigpending)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xrt_sigpending, libc_sys_Xrt_sigpending)
 
-/* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *[tostr(out:STRUCT_SIGINFOX32)] set, struct __siginfox32_struct *info, struct timespecx32 const *timeout, size_t sigsetsize) */
+/* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *set, struct __siginfox32_struct *info, struct timespecx32 const *timeout, size_t sigsetsize) */
 .section .text.crt.syscall.rt_sigtimedwait
 INTERN_FUNCTION(libc_sys_rt_sigtimedwait)
 	movl   $(0xb1), %eax
@@ -3410,7 +3410,7 @@ INTERN_FUNCTION(libc_sys_rt_sigtimedwait)
 END(libc_sys_rt_sigtimedwait)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_rt_sigtimedwait, libc_sys_rt_sigtimedwait)
 
-/* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *[tostr(out:STRUCT_SIGINFOX32)] set, struct __siginfox32_struct *info, struct timespecx32 const *timeout, size_t sigsetsize) */
+/* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *set, struct __siginfox32_struct *info, struct timespecx32 const *timeout, size_t sigsetsize) */
 .section .text.crt.syscall.Xrt_sigtimedwait
 INTERN_FUNCTION(libc_sys_Xrt_sigtimedwait)
 	movl   $(0xb1), %eax

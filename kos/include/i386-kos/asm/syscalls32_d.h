@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x452d9b71 */
+/* HASH CRC-32:0x26cca40d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -246,7 +246,7 @@
 /* @param: how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
 #define __NR32_rt_sigprocmask          0xaf                   /* errno_t rt_sigprocmask(syscall_ulong_t how, struct __sigset_struct const *set, struct __sigset_struct *oset, size_t sigsetsize) */
 #define __NR32_rt_sigpending           0xb0                   /* errno_t rt_sigpending(struct __sigset_struct *set, size_t sigsetsize) */
-#define __NR32_rt_sigtimedwait         0xb1                   /* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *[tostr(out:STRUCT_SIGINFOX32)] set, struct __siginfox32_struct *info, struct timespecx32 const *timeout, size_t sigsetsize) */
+#define __NR32_rt_sigtimedwait         0xb1                   /* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *set, struct __siginfox32_struct *info, struct timespecx32 const *timeout, size_t sigsetsize) */
 /* @param: signo: One of `SIG*' */
 #define __NR32_rt_sigqueueinfo         0xb2                   /* errno_t rt_sigqueueinfo(pid_t tgid, syscall_ulong_t signo, struct __siginfox32_struct const *uinfo) */
 #define __NR32_rt_sigsuspend           0xb3                   /* errno_t rt_sigsuspend(struct __sigset_struct const *set, size_t sigsetsize) */

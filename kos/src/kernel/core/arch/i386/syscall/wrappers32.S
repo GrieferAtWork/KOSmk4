@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7a5bdd6 */
+/* HASH CRC-32:0xa46d557c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -6619,7 +6619,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigpending)
 	.cfi_endproc
 END(__x86_asm32_int80_rt_sigpending)
 
-/* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *[tostr(out:STRUCT_SIGINFOX32)] set, struct __siginfox32_struct *info, struct timespecx32 const *timeout, size_t sigsetsize) */
+/* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *set, struct __siginfox32_struct *info, struct timespecx32 const *timeout, size_t sigsetsize) */
 .section .text.x86.asm32_syscall_int80.rt_sigtimedwait
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigtimedwait)
 	.cfi_startproc simple
@@ -24057,7 +24057,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_rt_sigpending)
 	.cfi_endproc
 END(__x86_asm32_sysenter_rt_sigpending)
 
-/* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *[tostr(out:STRUCT_SIGINFOX32)] set, struct __siginfox32_struct *info, struct timespecx32 const *timeout, size_t sigsetsize) */
+/* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *set, struct __siginfox32_struct *info, struct timespecx32 const *timeout, size_t sigsetsize) */
 .section .text.x86.asm32_syscall_sysenter.rt_sigtimedwait
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_rt_sigtimedwait)
 	.cfi_startproc simple

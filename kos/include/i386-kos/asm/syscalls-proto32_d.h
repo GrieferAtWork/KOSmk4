@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x174ab3bb */
+/* HASH CRC-32:0x851e1267 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1273,7 +1273,7 @@
 #define __NR32AT3_rt_sigprocmask          (size_t, __size_t)
 #define __NR32AT0_rt_sigpending           (struct __sigset_struct *, struct __sigset_struct *)
 #define __NR32AT1_rt_sigpending           (size_t, __size_t)
-#define __NR32AT0_rt_sigtimedwait         (struct __sigset_struct const * *, struct __sigset_struct const * *)
+#define __NR32AT0_rt_sigtimedwait         (struct __sigset_struct const *, struct __sigset_struct const *)
 #define __NR32AT1_rt_sigtimedwait         (struct __siginfox32_struct *, struct __siginfox32_struct *)
 #define __NR32AT2_rt_sigtimedwait         (struct timespecx32 const *, struct __timespecx32 const *)
 #define __NR32AT3_rt_sigtimedwait         (size_t, __size_t)
@@ -2240,7 +2240,7 @@
 #define __NR32AM_rt_sigaction(a, b, c, d, e, f)            (__syscall_ulong_t)a, (struct __sigactionx32 const *)b, (struct __sigactionx32 *)c, (__size_t)d
 #define __NR32AM_rt_sigprocmask(a, b, c, d, e, f)          (__syscall_ulong_t)a, (struct __sigset_struct const *)b, (struct __sigset_struct *)c, (__size_t)d
 #define __NR32AM_rt_sigpending(a, b, c, d, e, f)           (struct __sigset_struct *)a, (__size_t)b
-#define __NR32AM_rt_sigtimedwait(a, b, c, d, e, f)         (struct __sigset_struct const * *)a, (struct __siginfox32_struct *)b, (struct __timespecx32 const *)c, (__size_t)d
+#define __NR32AM_rt_sigtimedwait(a, b, c, d, e, f)         (struct __sigset_struct const *)a, (struct __siginfox32_struct *)b, (struct __timespecx32 const *)c, (__size_t)d
 #define __NR32AM_rt_sigqueueinfo(a, b, c, d, e, f)         (__pid_t)a, (__syscall_ulong_t)b, (struct __siginfox32_struct const *)c
 #define __NR32AM_rt_sigsuspend(a, b, c, d, e, f)           (struct __sigset_struct const *)a, (__size_t)b
 #define __NR32AM_pread64(a, b, c, d, e, f)                 (__fd_t)a, (void *)b, (__size_t)c, (__uint64_t)((__uint64_t)d | (__uint64_t)e << 32)
