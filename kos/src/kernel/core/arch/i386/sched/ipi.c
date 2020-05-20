@@ -227,7 +227,9 @@ thiscpu_x86_ipi_pending[CPU_IPI_BUFFER_SIZE];
 INTERN ATTR_PERCPU WEAK uintptr_t
 thiscpu_x86_ipi_inuse[CEILDIV(CPU_IPI_BUFFER_SIZE, BITS_PER_POINTER)] = { 0, };
 
-/* [lock(SET(ATOMIC),CLEAR(ATOMIC,THIS_CPU))] Bitset of allocated IPIs. */
+/* [lock(SET(ATOMIC), CLEAR(ATOMIC, THIS_CPU, IF_SET_IN(thiscpu_x86_ipi_alloc))
+ *                    CLEAR(ATOMIC, <OWNER>, !IF_SET_IN(thiscpu_x86_ipi_alloc)))]
+ * Bitset of allocated IPIs. */
 PRIVATE ATTR_PERCPU WEAK uintptr_t
 thiscpu_x86_ipi_alloc[CEILDIV(CPU_IPI_BUFFER_SIZE, BITS_PER_POINTER)] = { 0, };
 
@@ -350,7 +352,7 @@ again_i:
 		 * to send an IPI to the cpu in order to get it to serve the new command.
 		 * Otherwise, we can just hi-jack whatever previous IPIs had already been there. */
 		if (i == 0 && word == 0) {
-			if (target->c_state == CPU_STATE_RUNNING) {
+			if (ATOMIC_READ(target->c_state) == CPU_STATE_RUNNING) {
 				/* Indicate that the IPI is now ready for handling by the core. */
 				ATOMIC_FETCHOR(FORCPU(target, thiscpu_x86_ipi_inuse[i]), mask);
 do_send_ipi:
@@ -387,7 +389,7 @@ do_wake_target:
 			ATOMIC_FETCHOR(FORCPU(target, thiscpu_x86_ipi_inuse[i]), mask);
 			if (flags & CPU_IPI_FWAITFOR) {
 				/* Must still synchronize with the target CPU's reception of the IPI... */
-				if (target->c_state == CPU_STATE_RUNNING)
+				if (ATOMIC_READ(target->c_state) == CPU_STATE_RUNNING)
 					goto do_send_ipi;
 				goto do_wake_target;
 			}

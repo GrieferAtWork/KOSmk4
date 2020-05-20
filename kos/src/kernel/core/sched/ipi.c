@@ -285,7 +285,7 @@ NOTHROW(FCALL cpu_addpendingtask)(struct cpu *__restrict target,
 		assert(next != NULL);
 		ATOMIC_WRITE(thread->t_sched.s_pending.ss_pennxt, next);
 	}
-	cpu_assert_integrity();
+	cpu_assert_integrity(NULL);
 	return true;
 }
 #endif /* !CONFIG_NO_SMP */
@@ -589,7 +589,7 @@ again:
 	PREEMPTION_DISABLE();
 again_already_disabled:
 	ATOMIC_WRITE(me->c_state, CPU_STATE_FALLING_ASLEEP);
-	cpu_assert_integrity();
+	cpu_assert_integrity(NULL);
 #ifndef CONFIG_NO_SMP
 	assert(!PREEMPTION_ENABLED());
 	if (cpu_loadpending_nopr())
@@ -600,9 +600,34 @@ again_already_disabled:
 	if (FORCPU(me, thiscpu_idle).t_sched.s_running.sr_runnxt != &FORCPU(me, thiscpu_idle))
 		goto yield_and_return; /* There are other threads that are pending. */
 #ifndef CONFIG_NO_SMP
-	/* Check if there are IPIs that are pending
-	 * execution, as send from other cores. */
-	if (arch_cpu_hwipi_pending_nopr(me)) {
+	/* Check if there are IPIs that are pending execution, as send from other cores.
+	 * For this, check for both hardware (interrupting), as well as software (pending) IPIs.
+	 * NOTE: Software IPIs must be checked to prevent the following race condition:
+	 *
+	 *  #1  CPU#0: cpu_sendipi:     SCHEDULE_SW_IPI();
+	 *  #2  CPU#0: cpu_sendipi:     ATOMIC_READ(CPU[1].c_state) == CPU_STATE_RUNNING;
+	 *  #3  CPU#1: cpu_deepsleep:   PREEMPTION_DISABLE();
+	 *  #4  CPU#1: cpu_deepsleep:   ATOMIC_WRITE(me->c_state, CPU_STATE_FALLING_ASLEEP);
+	 *  #5  CPU#1: cpu_deepsleep:   arch_cpu_hwipi_pending_nopr(me) == false;
+	 *  #6  CPU#1: cpu_deepsleep:   cpu_enter_deepsleep(me);
+	 *  #7  CPU#1: cpu_deepsleep:   ATOMIC_WRITE(me->c_state, CPU_STATE_DREAMING);
+	 *  #8  CPU#0: cpu_sendipi:     SCHEDULE_HW_IPI();
+	 *  #9  CPU#1: cpu_sendipi:     ---                    The hardware IPI never arrives, because we've gone into deep sleep
+	 *  #10 CPU#0: cpu_sendipi:     return true;           As far as CPU#0 can tell, everything worked.
+	 *
+	 * -> The IPI never arrives because CPU#1 doesn't get woken up.
+	 *
+	 * The solution is to simply check for `arch_cpu_swipi_pending_nopr()' in
+	 * step #5, since those types of interrupts will have already become visible
+	 * following step #1!
+	 *
+	 * As such, the SWIPI check forms an interlocked check for pending IPIs in
+	 * situations where a software-IPI was already scheduled, but a hardware
+	 * IPI hasn't been generated yet, would get generated at a later point in
+	 * time (i.e. after this call to `arch_cpu_hwipi_pending_nopr()' already
+	 * returned `false'), or would not get generated at all.
+	 */
+	if (arch_cpu_hwipi_pending_nopr(me) || arch_cpu_swipi_pending_nopr(me)) {
 		ATOMIC_WRITE(me->c_state, CPU_STATE_RUNNING);
 		cpu_ipi_service_nopr();
 #ifdef PREEMPTION_ENABLE_P
@@ -616,8 +641,6 @@ again_already_disabled:
 #endif /* !PREEMPTION_ENABLE_P */
 		goto again;
 	}
-	/* TODO: Check `thiscpu_x86_ipi_inuse' for allocated, but  */
-
 #endif /* !CONFIG_NO_SMP */
 
 	/* Check if there are any sleeping tasks with the FKEEPCORE flag set.
@@ -683,7 +706,7 @@ again_already_disabled:
 			/* Wake the target CPU, so it can continue working on our sleeping tasks. */
 			cpu_wake(transfer_target);
 		}
-		cpu_assert_integrity();
+		cpu_assert_integrity(NULL);
 		/* Enter deep-sleep mode. */
 		printk(KERN_INFO "[sched:cpu#%u][+] Enter deep-sleep\n", (unsigned int)me->c_id);
 		cpu_enter_deepsleep(me);
@@ -789,7 +812,7 @@ yield_and_return:
 	cpu_quantum_end_nopr(&FORCPU(me, thiscpu_idle),
 	                     FORCPU(me, thiscpu_idle).t_sched.s_running.sr_runnxt);
 	/* Remove the IDLE thread from the running-ring. */
-	cpu_assert_integrity();
+	cpu_assert_integrity(NULL);
 	me->c_current = FORCPU(me, thiscpu_idle).t_sched.s_running.sr_runnxt;
 	assert(FORCPU(me, thiscpu_idle).t_flags & TASK_FRUNNING);
 	ATOMIC_FETCHAND(FORCPU(me, thiscpu_idle).t_flags, ~TASK_FRUNNING);

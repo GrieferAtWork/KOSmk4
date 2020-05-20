@@ -639,10 +639,13 @@ INTERN_FUNCTION(x86_smp_entry32)
 	call   cpu_loadpending_chain_nopr
 1:
 
-	/* Enable preemptive interrupts. */
+	/* Enable preemptive interrupts.
+	 * TODO: Inline this call! */
 	movl   R_CPU, %ecx
 	EXTERN(x86_altcore_initapic)
 	call   x86_altcore_initapic
+
+	/* TODO: re-sync the realtime() clock! */
 
 //	EXTERN(this_sched_state)
 //	movl   this_sched_state(R_TASK), %esp

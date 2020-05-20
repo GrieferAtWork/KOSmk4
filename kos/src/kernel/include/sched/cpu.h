@@ -483,7 +483,7 @@ DATDEF ATTR_PERCPU struct task *thiscpu_pending; /* ALIAS:THIS_CPU->c_pending */
 FUNDEF void NOTHROW(KCALL cpu_deepsleep)(void);
 
 #ifndef CONFIG_NO_SMP
-/* MUST ONLY BE CALLED FROM AN IDLE TAST!
+/* MUST ONLY BE CALLED FROM AN IDLE TASK!
  * This function does the following:
  * >> FORCPU(me, thiscpu_idle).t_sched.s_state = PUSH_CPU_STATE_FOR_RETURNING_TO_CALLER();
  * >> ATOMIC_WRITE(caller->c_state, CPU_STATE_DREAMING);
@@ -493,8 +493,8 @@ FUNDEF void NOTHROW(KCALL cpu_deepsleep)(void);
  * NOTE: When this function returns, preemption will have been re-enabled
  *       as the result of another CPU calling `cpu_wake()' on `caller'
  * NOTE: This function must not be called by the BOOT CPU!
- * With this, it is the arch-dependent portion of `cpu_deepsleep()' that performs
- * the actual deep-sleep on a multi-core system. */
+ * With this, it is the arch-dependent portion of `cpu_deepsleep()'
+ * that performs the actual deep-sleep on a multi-core system. */
 FUNDEF NOPREEMPT void NOTHROW(FCALL cpu_enter_deepsleep)(struct cpu *__restrict caller);
 #endif /* !CONFIG_NO_SMP */
 
