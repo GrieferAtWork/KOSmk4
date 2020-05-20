@@ -39,7 +39,7 @@
 /* INT 80H ENTRY                                                        */
 /************************************************************************/
 .section .text.hot
-INTERN_CONST(__x86_idtdpl_syscall, 3)
+INTERN_CONST(x86_idtdpl_syscall, 3)
 PUBLIC_FUNCTION(x86_idt_syscall)
 	.cfi_startproc simple
 	.cfi_iret_signal_frame
