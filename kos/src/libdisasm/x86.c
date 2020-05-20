@@ -740,34 +740,28 @@ libda_single_x86(struct disassembler *__restrict self) {
 	/* Print the instruction. */
 	if (opcode < EMU86_OPCODE_BASE0f) {
 #if EMU86_OPCODE_BASE0 != 0
-		opcode -= EMU86_OPCODE_BASE0;
+		opcode &= 0xff;
 #endif /* EMU86_OPCODE_BASE0 != 0 */
 		chain = ops;
 #ifdef HAVE_OPS_OFFSETS
 		chain += ops_offsets[opcode];
 #endif /* HAVE_OPS_OFFSETS */
 	} else if (opcode < EMU86_OPCODE_BASE0f38) {
-		opcode -= EMU86_OPCODE_BASE0f;
-#if EMU86_OPCODE_BASE0f + 0x100 != EMU86_OPCODE_BASE0f38
 		opcode &= 0xff;
-#endif /* EMU86_OPCODE_BASE0f + 0x100 != EMU86_OPCODE_BASE0f38 */
 		chain = ops_0f;
 #ifdef HAVE_OPS_0F_OFFSETS
 		chain += ops_0f_offsets[opcode];
 #endif /* HAVE_OPS_0F_OFFSETS */
 	} else if (opcode < EMU86_OPCODE_BASE0f3a) {
-		opcode -= EMU86_OPCODE_BASE0f38;
-#if EMU86_OPCODE_BASE0f38 + 0x100 != EMU86_OPCODE_BASE0f3a
 		opcode &= 0xff;
-#endif /* EMU86_OPCODE_BASE0f38 + 0x100 != EMU86_OPCODE_BASE0f3a */
 		chain = ops_0f38;
 #ifdef HAVE_OPS_0F38_OFFSETS
 		chain += ops_0f38_offsets[opcode];
 #endif /* HAVE_OPS_0F38_OFFSETS */
 	} else {
-		opcode -= EMU86_OPCODE_BASE0f3a;
-		if unlikely(opcode >= 0x100)
+		if unlikely(opcode >= EMU86_OPCODE_BASE0f3a + 0x100)
 			goto unknown_opcode;
+		opcode &= 0xff;
 		chain = ops_0f3a;
 #ifdef HAVE_OPS_0F3A_OFFSETS
 		chain += ops_0f3a_offsets[opcode];
@@ -782,6 +776,8 @@ search_chain:
 				 * past what we were looking for. */
 				break;
 			}
+			if (!chain->i_opcode)
+				break; /* End-of-chain reached. */
 			continue;
 		}
 		if (((chain->i_flags & IF_REXW) != 0) !=
