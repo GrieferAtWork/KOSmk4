@@ -652,6 +652,20 @@ settimeofdayx32_64:([tostr(STRUCT_TIMEVALX32_64)] struct timevalx32_64 const *tv
 settimeofdayx64:([tostr(STRUCT_TIMEVALX64)] struct timevalx64 const *tv, [tostr(STRUCT_TIMEZONE)] struct timezone const *tz) -> errno_t;
 %[endgroup]
 
+
+[restart(dont)][cp]
+poll:([tostr(STRUCT_POLLFD:nfds)] struct pollfd *fds,
+      size_t nfds, syscall_slong_t timeout) -> ssize_t;
+
+%[startgroup]
+[restart(dont)][cp] ppoll:([tostr(STRUCT_POLLFD:nfds)] struct pollfd *fds, size_t nfds, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout_ts, [tostr(STRUCT_SIGSET:sigsetsize)] struct __sigset_struct const *sigmask, size_t sigsetsize) -> ssize_t;
+[restart(dont)][cp] ppoll32:([tostr(STRUCT_POLLFD:nfds)] struct pollfd *fds, size_t nfds, [tostr(STRUCT_TIMESPEC32)] struct timespec32 const *timeout_ts, [tostr(STRUCT_SIGSET:sigsetsize)] struct __sigset_struct const *sigmask, size_t sigsetsize) -> ssize_t;
+[restart(dont)][cp] ppoll64:([tostr(STRUCT_POLLFD:nfds)] struct pollfd *fds, size_t nfds, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *timeout_ts, [tostr(STRUCT_SIGSET:sigsetsize)] struct __sigset_struct const *sigmask, size_t sigsetsize) -> ssize_t;
+[restart(dont)][cp] ppollx32:([tostr(STRUCT_POLLFD:nfds)] struct pollfd *fds, size_t nfds, [tostr(STRUCT_TIMESPECX32)] struct timespecx32 const *timeout_ts, [tostr(STRUCT_SIGSET:sigsetsize)] struct __sigset_struct const *sigmask, size_t sigsetsize) -> ssize_t;
+[restart(dont)][cp] ppollx32_64:([tostr(STRUCT_POLLFD:nfds)] struct pollfd *fds, size_t nfds, [tostr(STRUCT_TIMESPECX32_64)] struct timespecx32_64 const *timeout_ts, [tostr(STRUCT_SIGSET:sigsetsize)] struct __sigset_struct const *sigmask, size_t sigsetsize) -> ssize_t;
+[restart(dont)][cp] ppollx64:([tostr(STRUCT_POLLFD:nfds)] struct pollfd *fds, size_t nfds, [tostr(STRUCT_TIMESPECX64)] struct timespecx64 const *timeout_ts, [tostr(STRUCT_SIGSET:sigsetsize)] struct __sigset_struct const *sigmask, size_t sigsetsize) -> ssize_t;
+%[endgroup]
+
 %[startgroup]
 [restart(dont)][cp] select:(size_t nfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *readfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *writefds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *exceptfds, [tostr(STRUCT_TIMEVAL)] struct timeval *timeout) -> ssize_t;
 [restart(dont)][cp] select32:(size_t nfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *readfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *writefds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *exceptfds, [tostr(STRUCT_TIMEVAL32)] struct timeval32 *timeout) -> ssize_t;
@@ -659,6 +673,15 @@ settimeofdayx64:([tostr(STRUCT_TIMEVALX64)] struct timevalx64 const *tv, [tostr(
 [restart(dont)][cp] selectx32:(size_t nfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *readfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *writefds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *exceptfds, [tostr(STRUCT_TIMEVALX32)] struct timevalx32 *timeout) -> ssize_t;
 [restart(dont)][cp] selectx32_64:(size_t nfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *readfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *writefds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *exceptfds, [tostr(STRUCT_TIMEVALX32_64)] struct timevalx32_64 *timeout) -> ssize_t;
 [restart(dont)][cp] selectx64:(size_t nfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *readfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *writefds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *exceptfds, [tostr(STRUCT_TIMEVALX64)] struct timevalx64 *timeout) -> ssize_t;
+%[endgroup]
+
+%[startgroup]
+[restart(dont)][cp] pselect6:(size_t nfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *readfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *writefds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *exceptfds, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, [tostr(STRUCT_SIGMASK_SIGSET_AND_LEN)] void const *sigmask_sigset_and_len) -> ssize_t;
+[restart(dont)][cp] pselect6_32:(size_t nfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *readfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *writefds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *exceptfds, [tostr(STRUCT_TIMESPEC32)] struct timespec32 const *timeout, [tostr(STRUCT_SIGMASK_SIGSET_AND_LEN)] void const *sigmask_sigset_and_len) -> ssize_t;
+[restart(dont)][cp] pselect6_64:(size_t nfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *readfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *writefds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *exceptfds, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *timeout, [tostr(STRUCT_SIGMASK_SIGSET_AND_LEN)] void const *sigmask_sigset_and_len) -> ssize_t;
+[restart(dont)][cp] pselect6_x32:(size_t nfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *readfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *writefds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *exceptfds, [tostr(STRUCT_TIMESPECX32)] struct timespecx32 const *timeout, [tostr(STRUCT_SIGMASK_SIGSET_AND_LEN)] void const *sigmask_sigset_and_len) -> ssize_t;
+[restart(dont)][cp] pselect6_x32_64:(size_t nfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *readfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *writefds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *exceptfds, [tostr(STRUCT_TIMESPECX32_64)] struct timespecx32_64 const *timeout, [tostr(STRUCT_SIGMASK_SIGSET_AND_LEN)] void const *sigmask_sigset_and_len) -> ssize_t;
+[restart(dont)][cp] pselect6_x64:(size_t nfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *readfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *writefds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *exceptfds, [tostr(STRUCT_TIMESPECX64)] struct timespecx64 const *timeout, [tostr(STRUCT_SIGMASK_SIGSET_AND_LEN)] void const *sigmask_sigset_and_len) -> ssize_t;
 %[endgroup]
 
 _newselect:(int TODO_PROTOTYPE) -> errno_t;
@@ -942,10 +965,6 @@ sched_rr_get_intervalx64:(pid_t pid, [tostr(out:STRUCT_TIMESPECX64)] struct time
 
 vm86:(int TODO_PROTOTYPE) -> errno_t;
 query_module:(int TODO_PROTOTYPE) -> errno_t;
-
-[restart(dont)][cp]
-poll:([tostr(STRUCT_POLLFD:nfds)] struct pollfd *fds,
-      size_t nfds, syscall_slong_t timeout) -> ssize_t;
 
 nfsservctl:(int TODO_PROTOTYPE) -> errno_t;
 prctl:(int TODO_PROTOTYPE) -> errno_t;
@@ -1356,24 +1375,6 @@ migrate_pages:(int TODO_PROTOTYPE) -> errno_t;
 [cp] faccessat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename,
                 [tostr(ACCESS_TYPE)] syscall_ulong_t type,
                 [tostr(ATFLAG__SYMLINK_NOFOLLOW__EACCESS__DOSPATH)] atflag_t flags) -> errno_t;
-
-%[startgroup]
-[restart(dont)][cp] pselect6:(size_t nfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *readfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *writefds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *exceptfds, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, [tostr(STRUCT_SIGMASK_SIGSET_AND_LEN)] void const *sigmask_sigset_and_len) -> ssize_t;
-[restart(dont)][cp] pselect6_32:(size_t nfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *readfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *writefds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *exceptfds, [tostr(STRUCT_TIMESPEC32)] struct timespec32 const *timeout, [tostr(STRUCT_SIGMASK_SIGSET_AND_LEN)] void const *sigmask_sigset_and_len) -> ssize_t;
-[restart(dont)][cp] pselect6_64:(size_t nfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *readfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *writefds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *exceptfds, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *timeout, [tostr(STRUCT_SIGMASK_SIGSET_AND_LEN)] void const *sigmask_sigset_and_len) -> ssize_t;
-[restart(dont)][cp] pselect6_x32:(size_t nfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *readfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *writefds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *exceptfds, [tostr(STRUCT_TIMESPECX32)] struct timespecx32 const *timeout, [tostr(STRUCT_SIGMASK_SIGSET_AND_LEN)] void const *sigmask_sigset_and_len) -> ssize_t;
-[restart(dont)][cp] pselect6_x32_64:(size_t nfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *readfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *writefds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *exceptfds, [tostr(STRUCT_TIMESPECX32_64)] struct timespecx32_64 const *timeout, [tostr(STRUCT_SIGMASK_SIGSET_AND_LEN)] void const *sigmask_sigset_and_len) -> ssize_t;
-[restart(dont)][cp] pselect6_x64:(size_t nfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *readfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *writefds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *exceptfds, [tostr(STRUCT_TIMESPECX64)] struct timespecx64 const *timeout, [tostr(STRUCT_SIGMASK_SIGSET_AND_LEN)] void const *sigmask_sigset_and_len) -> ssize_t;
-%[endgroup]
-
-%[startgroup]
-[restart(dont)][cp] ppoll:([tostr(STRUCT_POLLFD:nfds)] struct pollfd *fds, size_t nfds, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout_ts, [tostr(STRUCT_SIGSET:sigsetsize)] struct __sigset_struct const *sigmask, size_t sigsetsize) -> ssize_t;
-[restart(dont)][cp] ppoll32:([tostr(STRUCT_POLLFD:nfds)] struct pollfd *fds, size_t nfds, [tostr(STRUCT_TIMESPEC32)] struct timespec32 const *timeout_ts, [tostr(STRUCT_SIGSET:sigsetsize)] struct __sigset_struct const *sigmask, size_t sigsetsize) -> ssize_t;
-[restart(dont)][cp] ppoll64:([tostr(STRUCT_POLLFD:nfds)] struct pollfd *fds, size_t nfds, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *timeout_ts, [tostr(STRUCT_SIGSET:sigsetsize)] struct __sigset_struct const *sigmask, size_t sigsetsize) -> ssize_t;
-[restart(dont)][cp] ppollx32:([tostr(STRUCT_POLLFD:nfds)] struct pollfd *fds, size_t nfds, [tostr(STRUCT_TIMESPECX32)] struct timespecx32 const *timeout_ts, [tostr(STRUCT_SIGSET:sigsetsize)] struct __sigset_struct const *sigmask, size_t sigsetsize) -> ssize_t;
-[restart(dont)][cp] ppollx32_64:([tostr(STRUCT_POLLFD:nfds)] struct pollfd *fds, size_t nfds, [tostr(STRUCT_TIMESPECX32_64)] struct timespecx32_64 const *timeout_ts, [tostr(STRUCT_SIGSET:sigsetsize)] struct __sigset_struct const *sigmask, size_t sigsetsize) -> ssize_t;
-[restart(dont)][cp] ppollx64:([tostr(STRUCT_POLLFD:nfds)] struct pollfd *fds, size_t nfds, [tostr(STRUCT_TIMESPECX64)] struct timespecx64 const *timeout_ts, [tostr(STRUCT_SIGSET:sigsetsize)] struct __sigset_struct const *sigmask, size_t sigsetsize) -> ssize_t;
-%[endgroup]
 
 @@param flags: Set of `CLONE_*'
 unshare:([tostr(CLONE_FLAGS_UNSHARE)] syscall_ulong_t flags) -> errno_t;

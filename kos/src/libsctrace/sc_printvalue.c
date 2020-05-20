@@ -31,10 +31,13 @@
 #include <hybrid/__va_size.h>
 #include <hybrid/typecore.h>
 
+#include <kos/anno.h>
 #include <kos/dev.h>
+#include <kos/except.h>
 #include <kos/io.h>
 #include <kos/kernel/types.h>
 #include <sys/ioctl.h>
+#include <sys/poll.h>
 #include <sys/stat.h>
 
 #include <fcntl.h>
@@ -49,6 +52,7 @@
 #include <dev/block.h>
 #include <dev/char.h>
 #include <kernel/user.h>
+#include <kernel/except.h>
 #else /* __KERNEL__ */
 #define validate_readable(base, num_bytes)                          (void)0
 #define validate_readablem(base, num_items, item_size_in_bytes)     (void)0
@@ -56,22 +60,42 @@
 #define validate_readablem_opt(base, num_items, item_size_in_bytes) (void)0
 #endif /* !__KERNEL__ */
 
+#ifndef USER
+#define USER __USER
+#endif /* !USER */
+
+#ifndef CHECKED
+#define CHECKED __CHECKED
+#endif /* !CHECKED */
+
+#ifndef UNCHECKED
+#define UNCHECKED __UNCHECKED
+#endif /* !UNCHECKED */
+
 DECL_BEGIN
 
 
 
 
-/* The representation of bit-wide OR in flagsets */
-#if 1
-#define PIPESTR "|"
+/* Spacing strings inserted in places to prettify representations. */
+#if 0
+#define SYNSPACE  ""
+#define SYNSPACE2 ""
+#elif 1
+#define SYNSPACE  ""
+#define SYNSPACE2 " "
 #else
-#define PIPESTR " | "
+#define SYNSPACE  " "
+#define SYNSPACE2 " "
 #endif
+
+/* The representation of bit-wide OR in flagsets */
+#define PIPESTR SYNSPACE "|" SYNSPACE
 
 
 /* Ensure that `PIPESTR' doesn't get allocated multiple times. */
 PRIVATE ATTR_UNUSED char const PIPESTR_[] = PIPESTR;
-PRIVATE ATTR_UNUSED char const NULLSTR[] = "NULL";
+PRIVATE ATTR_UNUSED char const NULLSTR[]  = "NULL";
 #undef PIPESTR
 #define PIPESTR PIPESTR_
 
@@ -578,7 +602,8 @@ done:
 }
 
 PRIVATE ATTR_UNUSED ssize_t CC
-print_string(pformatprinter printer, void *arg, char const *str,
+print_string(pformatprinter printer, void *arg,
+             USER UNCHECKED char const *str,
              struct sc_argument *length_link) {
 	ssize_t result;
 	if (!str) {
@@ -634,6 +659,124 @@ print_sighandler_t(pformatprinter printer, void *arg,
 	                       *(void **)&hand);
 done:
 	return result;
+}
+
+#ifndef POLLRDNORM
+#define POLLRDNORM __POLLRDNORM /* 100% identical to `POLLIN' (Normal data may be read). */
+#endif /* !POLLRDNORM */
+#ifndef POLLRDBAND
+#define POLLRDBAND __POLLRDBAND /* Priority data may be read. */
+#endif /* !POLLRDBAND */
+#ifndef POLLWRNORM
+#define POLLWRNORM __POLLWRNORM /* 100% identical to `POLLOUT' (Writing now will not block). */
+#endif /* !POLLWRNORM */
+#ifndef POLLWRBAND
+#define POLLWRBAND __POLLWRBAND /* Priority data may be written. */
+#endif /* !POLLWRBAND */
+
+PRIVATE struct {
+	uint16_t   pn_flag;
+	char const pn_name[8];
+} const poll_event_flag_names[] = {
+	{ POLLIN,     "IN" },
+	{ POLLPRI,    "PRI" },
+	{ POLLOUT,    "OUT" },
+	{ POLLRDNORM, "RDNORM" },
+	{ POLLRDBAND, "RDBAND" },
+	{ POLLWRNORM, "WRNORM" },
+	{ POLLWRBAND, "WRBAND" },
+	{ POLLMSG,    "MSG" },
+	{ POLLREMOVE, "REMOVE" },
+	{ POLLRDHUP,  "RDHUP" },
+	{ POLLERR,    "ERR" },
+	{ POLLHUP,    "HUP" },
+	{ POLLNVAL,   "NVAL" }
+};
+
+PRIVATE ATTR_UNUSED ssize_t CC
+print_poll_events(pformatprinter printer, void *arg, uint16_t events) {
+	enum {
+		VALID_MASK = (POLLIN | POLLPRI | POLLOUT | POLLRDNORM |
+		              POLLRDBAND | POLLWRNORM | POLLWRBAND |
+		              POLLMSG | POLLREMOVE | POLLRDHUP |
+		              POLLERR | POLLHUP | POLLNVAL)
+	};
+	ssize_t temp, result = 0;
+	unsigned int i;
+	bool is_first = true;
+	for (i = 0; i < COMPILER_LENOF(poll_event_flag_names); ++i) {
+		char const *name;
+		if (!(events & poll_event_flag_names[i].pn_flag))
+			continue;
+		if (!is_first)
+			PRINT(PIPESTR);
+		name = poll_event_flag_names[i].pn_name;
+		PRINTF("POLL%s", name);
+		is_first = false;
+	}
+	if unlikely(events & ~VALID_MASK) {
+		if (!is_first)
+			PRINT(PIPESTR);
+		PRINTF("%#" PRIx16,
+		       (uint16_t)(events & ~VALID_MASK));
+		is_first = false;
+	}
+	if (is_first)
+		result = DOPRINT("0");
+	return result;
+err:
+	return temp;
+}
+
+PRIVATE ATTR_UNUSED ssize_t CC
+print_pollfd(pformatprinter printer, void *arg,
+             struct pollfd const *__restrict pfd) {
+	ssize_t temp, result;
+	result = DOPRINT("{" SYNSPACE "fd:" SYNSPACE);
+	if unlikely(result < 0)
+		goto done;
+	DO(print_fd_t(printer, arg, pfd->fd));
+	PRINT("," SYNSPACE "events:" SYNSPACE);
+	DO(print_poll_events(printer, arg, pfd->events));
+	PRINT(SYNSPACE "}");
+done:
+	return result;
+err:
+	return temp;
+}
+
+PRIVATE ATTR_UNUSED ssize_t CC
+print_pollfds(pformatprinter printer, void *arg,
+              USER CHECKED struct pollfd const *fds, size_t count) {
+	ssize_t temp, result = 0;
+	size_t i, used_count = count;
+	if (used_count > 64)
+		used_count = 64;
+	result = DOPRINT("[");
+	if unlikely(result < 0)
+		goto done;
+	for (i = 0; i < used_count; ++i) {
+		struct pollfd pfd;
+		if (i != 0)
+			PRINT("," SYNSPACE2);
+		TRY {
+			memcpy(&pfd, &fds[i], sizeof(struct pollfd));
+		} EXCEPT {
+			if (!was_thrown(E_SEGFAULT))
+				RETHROW();
+			PRINT("<segfault>");
+			goto done_rbracket;
+		}
+		DO(print_pollfd(printer, arg, &pfd));
+	}
+	if (used_count < count)
+		PRINT("," SYNSPACE2 "...");
+done_rbracket:
+	PRINT("]");
+done:
+	return result;
+err:
+	return temp;
 }
 
 
@@ -754,7 +897,6 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	// TODO: #define HAVE_SC_REPR_STRUCT_MQ_ATTR 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_MSGHDRX32 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_MSGHDRX64 1
-	// TODO: #define HAVE_SC_REPR_STRUCT_POLLFD 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_RLIMIT 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_RLIMIT64 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_RPC_SYSCALL_INFO 1
@@ -810,6 +952,18 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	// TODO: #define HAVE_SC_REPR_WAITID_OPTIONS 1
 	// TODO: #define HAVE_SC_REPR_XATTR_FLAGS 1
 
+
+#ifdef HAVE_SC_REPR_STRUCT_POLLFD
+	case SC_REPR_STRUCT_POLLFD: {
+		USER CHECKED struct pollfd *fds;
+		size_t count = 1;
+		if (link)
+			count = (size_t)link->sa_value.sv_u64;
+		fds = (USER CHECKED struct pollfd *)(uintptr_t)value.sv_u64;
+		validate_readablem(fds, count, sizeof(struct pollfd));
+		result = print_pollfds(printer, arg, fds, count);
+	}	break;
+#endif /* HAVE_SC_REPR_STRUCT_POLLFD */
 
 #ifdef HAVE_SC_REPR_SIGHANDLER_T
 	case SC_REPR_SIGHANDLER_T: {
