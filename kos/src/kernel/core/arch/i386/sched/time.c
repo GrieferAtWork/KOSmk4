@@ -33,7 +33,9 @@ macros["__DATE_YEAR__"] = str(import("time").Time.now().year)[#"Years ":];
 
 #include <hybrid/sync/atomic-rwlock.h>
 
+#include <hw/rtc/cmos.h>
 #include <sys/io.h>
+
 #include <assert.h>
 
 #ifndef __DATE_YEAR__
@@ -55,7 +57,7 @@ PUBLIC struct realtime_clock_struct x86_cmos_realtime_clock = {
 	/* .rc_precision = */ { 1, 0 }, /* 1 second */
 	/* .rc_gettime   = */ &cmos_gettime,
 	/* .rc_settime   = */ NULL, /* TODO: cmos_settime() */
-	/* .rc_waitfor   = */ NULL, /* TODO: cmos_waitfor() (yes: cmos actually supports this) */
+	/* .rc_waitfor   = */ NULL, /* TODO: cmos_waitfor() (apparently cmos supports this?) */
 	/* .rc_fini      = */ NULL,
 };
 
@@ -67,24 +69,6 @@ PRIVATE struct atomic_rwlock cmos_lock = ATOMIC_RWLOCK_INIT;
 #define CMOS_LOCK_ACQUIRE()  (void)0
 #define CMOS_LOCK_RELEASE()  (void)0
 #endif /* CONFIG_NO_SMP */
-
-#define CMOS_ADDR __IOPORT(0x70)
-#   define CMOS_ADDR_NONMI 0x80 /* Disable non-maskable interrupts. */
-#define CMOS_DATA __IOPORT(0x71)
-#define CMOS_SECOND  0x00
-#define CMOS_MINUTE  0x02
-#define CMOS_HOUR    0x04
-#define CMOS_DAY     0x07
-#define CMOS_MONTH   0x08
-#define CMOS_YEAR    0x09
-#define CMOS_STATE_A 0x0a
-#   define CMOS_A_UPDATING 0x80 /* Set while the CMOS chip is updating its time. */
-#define CMOS_STATE_B 0x0b
-#   define CMOS_B_NOBCD    0x04 /* When set, CMOS time is in decimal format. */
-#   define CMOS_B_24H      0x02 /* When set, CMOS hours uses a 24-hour format. */
-
-#define BCD_DECODE(x) (((x) & 0xf) + (((x) >> 4) * 10))
-#define BCD_ENCODE(x) (((x) % 10) | (((x) / 10) << 4))
 
 PRIVATE u8 cmos_cent_reg = 0; /* [const] CMOS century register. */
 PRIVATE u8 cmos_state_b  = 0; /* [const] Value of 'CMOS_STATE_B' */
@@ -103,7 +87,6 @@ NOTHROW(KCALL cmos_wr)(u8 reg, u8 val) {
 
 
 #define LINUX_TIME_START_YEAR  1970
-
 #define SECONDS_PER_DAY        86400
 
 #define DAYS2YEARS(n_days)  ((((n_days) + 1) * 400) / 146097)
@@ -180,13 +163,13 @@ got_time:
 	CMOS_LOCK_RELEASE();
 	/* Fix BCD time information. */
 	if (!(cmos_state_b & CMOS_B_NOBCD)) {
-		cmos_second = BCD_DECODE(cmos_second);
-		cmos_minute = BCD_DECODE(cmos_minute);
-		cmos_hour   = BCD_DECODE(cmos_hour & 0x7f) | (cmos_hour & 0x80);
-		cmos_day    = BCD_DECODE(cmos_day);
-		cmos_month  = BCD_DECODE(cmos_month);
-		cmos_year   = BCD_DECODE(cmos_year);
-		cmos_cent   = BCD_DECODE(cmos_cent);
+		cmos_second = CMOS_BCD_DECODE(cmos_second);
+		cmos_minute = CMOS_BCD_DECODE(cmos_minute);
+		cmos_hour   = CMOS_BCD_DECODE(cmos_hour & 0x7f) | (cmos_hour & 0x80);
+		cmos_day    = CMOS_BCD_DECODE(cmos_day);
+		cmos_month  = CMOS_BCD_DECODE(cmos_month);
+		cmos_year   = CMOS_BCD_DECODE(cmos_year);
+		cmos_cent   = CMOS_BCD_DECODE(cmos_cent);
 	}
 	/* Fix 12-hour time information. */
 	if (!(cmos_state_b & CMOS_B_24H) && (cmos_hour & 0x80) != 0)

@@ -24,6 +24,10 @@ net: Network adapters
 	- ne2k
 	- ...
 
+rtc: Real Time Clock
+	- cmos
+	- ...
+
 timer: Programmable clock timers
 	- pit
 	- ...
