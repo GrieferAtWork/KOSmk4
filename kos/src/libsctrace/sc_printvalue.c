@@ -107,6 +107,13 @@ if (gcc_opt.remove("-O3"))
 #define UNCHECKED __UNCHECKED
 #endif /* !UNCHECKED */
 
+
+/* Representation limits before printed data is truncated */
+#define LIMIT_STRLEN       64 /* Max # of bytes to print from user-supplied strings. */
+#define LIMIT_POLLFDS      16 /* Max # of `struct pollfd' structures to print from a vector. */
+#define LIMIT_STRINGVECTOR 32 /* Max # of strings to print from a string-vector (such as `argv' and `envp' in `sys_execve()'). */
+
+
 DECL_BEGIN
 
 #define LINUX_FUTEX_USES_TIMEOUT(futex_op)    \
@@ -674,8 +681,8 @@ print_string(pformatprinter printer, void *arg,
 			validate_readable(str, 1);
 			len = strlen(str);
 		}
-		if (len > 512) {
-			result = format_printf(printer, arg, "%$q[...]", 512, str);
+		if (len > LIMIT_STRLEN) {
+			result = format_printf(printer, arg, "%$q[...]", LIMIT_STRLEN, str);
 		} else {
 			result = format_printf(printer, arg, "%$q", len, str);
 		}
@@ -807,8 +814,8 @@ print_pollfds(pformatprinter printer, void *arg,
               USER CHECKED struct pollfd const *fds, size_t count) {
 	ssize_t temp, result = 0;
 	size_t i, used_count = count;
-	if (used_count > 64)
-		used_count = 64;
+	if (used_count > LIMIT_POLLFDS)
+		used_count = LIMIT_POLLFDS;
 	result = DOPRINT("[");
 	if unlikely(result < 0)
 		goto done;
@@ -1273,6 +1280,76 @@ err:
 
 
 
+#undef NEED_STRING_VECTOR_POINTER_SIZE
+#if ((defined(HAVE_SC_REPR_STRING_VECTOR32) && defined(HAVE_SC_REPR_STRING_VECTOR64)) ||                            \
+     (defined(HAVE_SC_REPR_STRING_VECTOR) && (defined(HAVE_SC_REPR_STRING_VECTOR32) && __SIZEOF_POINTER__ != 4)) || \
+     (defined(HAVE_SC_REPR_STRING_VECTOR) && (defined(HAVE_SC_REPR_STRING_VECTOR64) && __SIZEOF_POINTER__ != 8)))
+#define NEED_STRING_VECTOR_POINTER_SIZE 1
+#endif
+
+PRIVATE ATTR_UNUSED ssize_t CC
+print_string_vector(pformatprinter printer, void *arg,
+                    USER UNCHECKED char const *USER UNCHECKED const *vector
+#ifdef NEED_STRING_VECTOR_POINTER_SIZE
+                    ,
+                    size_t sizeof_pointer
+#endif /* NEED_STRING_VECTOR_POINTER_SIZE */
+                    ) {
+#ifndef NEED_STRING_VECTOR_POINTER_SIZE
+	enum { sizeof_pointer = sizeof(void *) };
+#endif /* !NEED_STRING_VECTOR_POINTER_SIZE */
+	ssize_t temp, result;
+	if (!vector) {
+		result = (*printer)(arg, NULLSTR, COMPILER_STRLEN(NULLSTR));
+	} else {
+		size_t i;
+		validate_readable(vector, sizeof_pointer);
+		result = (*printer)(arg, "[", 1);
+		if unlikely(result < 0)
+			goto done;
+		for (i = 0;; ++i) {
+			USER UNCHECKED char const *string;
+			TRY {
+#ifdef NEED_STRING_VECTOR_POINTER_SIZE
+				if (sizeof_pointer == 4) {
+					string = (USER UNCHECKED char const *)((uint32_t *)vector)[i];
+				} else {
+					string = (USER UNCHECKED char const *)((uint64_t *)vector)[i];
+				}
+#else /* NEED_STRING_VECTOR_POINTER_SIZE */
+				string = vector[i];
+#endif /* !NEED_STRING_VECTOR_POINTER_SIZE */
+			} EXCEPT {
+				if (!was_thrown(E_SEGFAULT))
+					RETHROW();
+				PRINT("<segfault>");
+				break;
+			}
+			if (!string)
+				break;
+			if (i != 0)
+				PRINT("," SYNSPACE2);
+			if (i >= LIMIT_STRINGVECTOR) {
+				PRINT("...");
+				break;
+			}
+			TRY {
+				DO(print_string(printer, arg, string, NULL));
+			} EXCEPT {
+				if (!was_thrown(E_SEGFAULT))
+					RETHROW();
+				PRINT("<segfault>");
+			}
+		}
+		PRINT("]");
+	}
+done:
+	return result;
+err:
+	return temp;
+}
+
+
 
 
 
@@ -1293,7 +1370,6 @@ libsc_printvalue(pformatprinter printer, void *arg,
 
 	// TODO: #define HAVE_SC_REPR_ACCEPT4_FLAGS 1
 	// TODO: #define HAVE_SC_REPR_ACCESS_TYPE 1
-	// TODO: #define HAVE_SC_REPR_BUFFER 1
 	// TODO: #define HAVE_SC_REPR_CLONE_FLAGS 1
 	// TODO: #define HAVE_SC_REPR_CLONE_FLAGS_SETNS 1
 	// TODO: #define HAVE_SC_REPR_CLONE_FLAGS_UNSHARE 1
@@ -1353,8 +1429,6 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	// TODO: #define HAVE_SC_REPR_SOCKOPT_OPTNAME 1
 	// TODO: #define HAVE_SC_REPR_SOCKOPT_OPTVAL 1
 	// TODO: #define HAVE_SC_REPR_SPLICE_FLAGS 1
-	// TODO: #define HAVE_SC_REPR_STRING_VECTOR32 1
-	// TODO: #define HAVE_SC_REPR_STRING_VECTOR64 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_DEBUGTRAP_REASON32 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_DEBUGTRAP_REASON64 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_ELF_PHDR32_VECTOR 1
@@ -1424,7 +1498,6 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	// TODO: #define HAVE_SC_REPR_WAITID_OPTIONS 1
 	// TODO: #define HAVE_SC_REPR_XATTR_FLAGS 1
 
-
 #ifdef HAVE_SC_REPR_IOCTL_COMMAND
 	case SC_REPR_IOCTL_COMMAND:
 		result = print_ioctl_command(printer, arg,
@@ -1439,6 +1512,44 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	// TODO: #define HAVE_SC_REPR_FCNTL_COMMAND 1
 	// TODO: #define HAVE_SC_REPR_HOP_ARG 1
 	// TODO: #define HAVE_SC_REPR_HOP_COMMAND 1
+
+
+#ifdef HAVE_SC_REPR_STRING_VECTOR
+	case SC_REPR_STRING_VECTOR:
+		result = print_string_vector(printer, arg,
+		                             (USER UNCHECKED char const *USER UNCHECKED const *)(uintptr_t)value.sv_u64
+#ifdef NEED_STRING_VECTOR_POINTER_SIZE
+		                             ,
+		                             sizeof(void *)
+#endif /* NEED_STRING_VECTOR_POINTER_SIZE */
+		                             );
+		break;
+#endif /* HAVE_SC_REPR_STRING_VECTOR */
+
+#ifdef HAVE_SC_REPR_STRING_VECTOR32
+	case SC_REPR_STRING_VECTOR32:
+		result = print_string_vector(printer, arg,
+		                             (USER UNCHECKED char const *USER UNCHECKED const *)(uintptr_t)value.sv_u64
+#ifdef NEED_STRING_VECTOR_POINTER_SIZE
+		                             ,
+		                             4
+#endif /* NEED_STRING_VECTOR_POINTER_SIZE */
+		                             );
+		break;
+#endif /* HAVE_SC_REPR_STRING_VECTOR32 */
+
+#ifdef HAVE_SC_REPR_STRING_VECTOR64
+	case SC_REPR_STRING_VECTOR64:
+		result = print_string_vector(printer, arg,
+		                             (USER UNCHECKED char const *USER UNCHECKED const *)(uintptr_t)value.sv_u64
+#ifdef NEED_STRING_VECTOR_POINTER_SIZE
+		                             ,
+		                             8
+#endif /* NEED_STRING_VECTOR_POINTER_SIZE */
+		                             );
+		break;
+#endif /* HAVE_SC_REPR_STRING_VECTOR64 */
+
 
 #define DO_REPR_STRUCT_TIMEVAL_VEC2(struct_timeval_typecode)                      \
 	do {                                                                          \
@@ -1799,6 +1910,14 @@ do_struct_timespecx64:
 		result = print_string(printer, arg, (char const *)(uintptr_t)value.sv_u64, NULL);
 		break;
 #endif /* HAVE_SC_REPR_FILENAME */
+
+#ifdef HAVE_SC_REPR_BUFFER
+	case SC_REPR_BUFFER:
+		if unlikely(!link)
+			goto do_pointer;
+		result = print_string(printer, arg, (char const *)(uintptr_t)value.sv_u64, link);
+		break;
+#endif /* HAVE_SC_REPR_BUFFER */
 
 #ifdef HAVE_SC_REPR_STRING
 	case SC_REPR_STRING:
