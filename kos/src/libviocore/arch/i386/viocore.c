@@ -1223,8 +1223,10 @@ libviocore_atomic_cmpxchx(struct vio_emulate_args *__restrict self,
 #define EMU86_GETGSBASE() (EMU86_ISUSER() ? (void *)__rdmsr(IA32_KERNEL_GS_BASE) : __rdgsbase())
 #else /* __x86_64__ */
 DECL_END
-#include <kernel/gdt.h>
+
+#include <kernel/arch/gdt.h> /* x86_get_user_(fs|gs)base() */
 #include <sched/task.h>
+
 DECL_BEGIN
 
 /* 32-bit mode supports non-zero bases for any segment! */

@@ -26,12 +26,12 @@
 #include <debugger/hook.h>
 #include <debugger/io.h>
 #include <kernel/arch/cpuid.h>
+#include <kernel/arch/idt.h>
 #include <kernel/arch/isr.h>
 #include <kernel/arch/syscall-tables.h>
 #include <kernel/coredump.h>
 #include <kernel/debugtrap.h>
 #include <kernel/except.h>
-#include <kernel/idt.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
 #include <kernel/syscall-properties.h>

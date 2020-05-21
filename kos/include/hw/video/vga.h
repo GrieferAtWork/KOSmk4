@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_IO_VGA_H
-#define _KOS_IO_VGA_H 1
+#ifndef _HW_VIDEO_VGA_H
+#define _HW_VIDEO_VGA_H 1
 
 #include <__stdinc.h>
 
@@ -466,10 +466,8 @@ struct __ATTR_PACKED vga_mode {
 		.vm_seq_memory_mode   = 0x02,                                                \
 	}
 
-
-
 #endif /* __CC__ */
 
 __SYSDECL_END
 
-#endif /* !_KOS_IO_VGA_H */
+#endif /* !_HW_VIDEO_VGA_H */

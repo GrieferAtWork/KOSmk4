@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_IO_SCSI_H
-#define _KOS_IO_SCSI_H 1
+#ifndef _HW_DISK_SCSI_H
+#define _HW_DISK_SCSI_H 1
 
 #include <__stdinc.h>
 
@@ -41,7 +41,7 @@ __SYSDECL_BEGIN
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 #define SCSI_CBW_SIG 0x55534243
 #define SCSI_CSW_SIG 0x55534253
-#endif
+#endif /* __BYTE_ORDER__ == ... */
 
 /* Values for `ms_scsi_cbw::cbw_dir' */
 #define SCSI_CBW_DIR_WRITE 0x00 /* Write data to the device */
@@ -97,7 +97,6 @@ struct __ATTR_PACKED scsi_capacity {
 };
 #endif /* __CC__ */
 
-
 __SYSDECL_END
 
-#endif /* !_KOS_IO_SCSI_H */
+#endif /* !_HW_DISK_SCSI_H */

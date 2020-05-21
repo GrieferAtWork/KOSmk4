@@ -22,14 +22,15 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/except.h> /* THROW() */
-#include <kernel/types.h>  /* jtime_t */
-#include <sched/cpu.h>     /* jiffies */
-#include <sched/signal.h>  /* struct sig */
-#include <sched/task.h>    /* task_tryyield_or_pause */
+#include <kernel/arch/pic.h> /* TODO: Non-portable! */
+#include <kernel/except.h>   /* THROW() */
+#include <kernel/types.h>    /* jtime_t */
+#include <sched/cpu.h>       /* jiffies */
+#include <sched/signal.h>    /* struct sig */
+#include <sched/task.h>      /* task_tryyield_or_pause */
 
-#include <kos/except/io.h> /* PS2_* */
-#include <kos/io/ps2.h>    /* PS2_* */
+#include <hw/hid/ps2.h>    /* PS2_* */
+#include <kos/except/io.h> /* E_IOERROR_SUBSYSTEM_* */
 #include <sys/io.h>        /* (in|out)(b|w|l)[_p]() */
 
 DECL_BEGIN
@@ -46,7 +47,10 @@ INTDEF unsigned int ps2_outfull_timeout; /* In milliseconds */
 INTDEF unsigned int ps2_command_timeout; /* In milliseconds */
 INTDEF unsigned int ps2_command_attempts;
 
-#define PS2_GET_ISR_FOR_PORT(portno) ((portno) == PS2_PORT1 ? X86_INTNO_PIC1_KBD : X86_INTNO_PIC2_PS2M)
+/* TODO: Non-portable! */
+#define PS2_GET_ISR_FOR_PORT(portno)            \
+	((portno) == PS2_PORT1 ? X86_INTNO_PIC1_KBD \
+	                       : X86_INTNO_PIC2_PS2M)
 
 
 #if defined(__cplusplus) && defined(__USE_KOS)

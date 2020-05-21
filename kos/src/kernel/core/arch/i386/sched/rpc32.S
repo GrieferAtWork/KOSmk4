@@ -19,16 +19,18 @@
  */
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_SCHED_RPC32_S
 #define GUARD_KERNEL_CORE_ARCH_I386_SCHED_RPC32_S 1
+#define __ASSEMBLER__ 1
 
 #include <kernel/compiler.h>
-#include <kernel/gdt.h>
+
+#include <kernel/arch/gdt.h>
 #include <kernel/except.h>
-#include <sched/task.h>
 #include <sched/rpc.h>
-#include <kos/kernel/cpu-state.h>
+#include <sched/task.h>
 
 #include <asm/cfi.h>
 #include <asm/cpu-flags.h>
+#include <kos/kernel/cpu-state.h>
 
 
 

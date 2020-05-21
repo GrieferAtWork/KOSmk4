@@ -134,6 +134,32 @@ __ASM_L(.endm)
 __ASM_END
 
 
+#ifdef __CC__
+#include <kernel/compiler.h>
+#include <hybrid/host.h>
+
+DECL_BEGIN
+
+/* Patch one of the (rd|wr)(fs|gs)base instructions at `pc' to instead
+ * become a call to one of the internal functions capable of emulating
+ * the behavior of the instruction.
+ * WARNING: Only the 64-bit variants of these instructions can be patched!
+ *          The 32-bit variants cannot.
+ * Before using this function, the caller should check that fsgsbase really
+ * isn't supported by the host CPU, as indicated by `CPUID_7B_FSGSBASE'
+ * @param: real_pc: The real PC that should be used for DISP-offsets.
+ *                  May differ from `pc' when `pc' points into an aliasing
+ *                  memory mapping with write-access
+ * @return: true:   Successfully patched the given code location.
+ * @return: false:  The given code location was already patched,
+ *                  or isn't one of the above instructions. */
+FUNDEF NOBLOCK __BOOL
+NOTHROW(FCALL x86_fsgsbase_patch)(void *pc, void const *real_pc);
+
+DECL_END
+
+#endif /* __CC__ */
+
 #endif /* __x86_64__ */
 
 #endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_FSGSBASE_H */

@@ -21,11 +21,14 @@
 #define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_GDT_H 1
 
 #include <kernel/compiler.h>
+
 #include <kernel/types.h>
+#include <sched/pertask.h>
+
 #include <hybrid/__assert.h>
+
 #include <kos/kernel/gdt.h>
 #include <kos/kernel/segment.h>
-#include <sched/pertask.h>
 
 #ifdef __x86_64__
 #include <asm/cpu-flags.h>
@@ -97,15 +100,18 @@ LOCAL void KCALL update_user_gsbase(void) {
 DATDEF ATTR_PERTASK uintptr_t this_x86_user_fsbase;
 DATDEF ATTR_PERTASK uintptr_t this_x86_user_gsbase;
 
+/* TODO: Rename to `x86_get_user_fsbase()' */
 LOCAL WUNUSED uintptr_t KCALL get_user_fsbase(void) {
 	return PERTASK_GET(this_x86_user_fsbase);
 }
 
+/* TODO: Rename to `x86_set_user_fsbase_noreload()' */
 LOCAL void KCALL set_user_fsbase_noreload(uintptr_t value) {
 	PERTASK_SET(this_x86_user_fsbase, value);
 	segment_wrbaseX(&PERCPU(thiscpu_x86_gdt[SEGMENT_INDEX(SEGMENT_USER_FSBASE)]), value);
 }
 
+/* TODO: Rename to `x86_set_user_fsbase()' */
 LOCAL void KCALL set_user_fsbase(uintptr_t value) {
 	set_user_fsbase_noreload(value);
 #ifndef SEGMENT_KERNEL_FSBASE
@@ -137,15 +143,18 @@ LOCAL void KCALL update_user_fsbase(void) {
 #endif /* !SEGMENT_KERNEL_FSBASE */
 }
 
+/* TODO: Rename to `x86_get_user_gsbase()' */
 LOCAL WUNUSED uintptr_t KCALL get_user_gsbase(void) {
 	return PERTASK_GET(this_x86_user_gsbase);
 }
 
+/* TODO: Rename to `x86_set_user_gsbase_noreload()' */
 LOCAL void KCALL set_user_gsbase_noreload(uintptr_t value) {
 	PERTASK_SET(this_x86_user_gsbase, value);
 	segment_wrbaseX(&PERCPU(thiscpu_x86_gdt[SEGMENT_INDEX(SEGMENT_USER_GSBASE)]), value);
 }
 
+/* TODO: Rename to `x86_set_user_gsbase()' */
 LOCAL void KCALL set_user_gsbase(uintptr_t value) {
 	set_user_gsbase_noreload(value);
 #ifndef SEGMENT_KERNEL_GSBASE
@@ -161,6 +170,7 @@ LOCAL void KCALL set_user_gsbase(uintptr_t value) {
 #endif /* !SEGMENT_KERNEL_GSBASE */
 }
 
+/* TODO: Rename to `x86_update_user_gsbase()' */
 LOCAL void KCALL update_user_gsbase(void) {
 	segment_wrbaseX(&PERCPU(thiscpu_x86_gdt[SEGMENT_INDEX(SEGMENT_USER_GSBASE)]),
 	                PERTASK_GET(this_x86_user_gsbase));

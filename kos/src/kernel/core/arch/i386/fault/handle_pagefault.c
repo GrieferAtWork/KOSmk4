@@ -23,14 +23,14 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/arch/fault.h>
+#include <kernel/arch/phys2virt64.h>
 #include <kernel/arch/vm.h>
 #include <kernel/debugtrap.h>
 #include <kernel/except.h>
-#include <kernel/fault.h>
 #include <kernel/malloc.h>
 #include <kernel/memory.h>
 #include <kernel/paging.h>
-#include <kernel/phys2virt64.h>
 #include <kernel/printk.h>
 #include <kernel/vm.h>
 #include <kernel/vm/phys.h>
@@ -57,7 +57,6 @@
 
 #include <libinstrlen/instrlen.h>
 #include <libvio/access.h>
-
 #include <libviocore/viocore.h>
 #ifndef __x86_64__
 #include <asm/cfi.h>

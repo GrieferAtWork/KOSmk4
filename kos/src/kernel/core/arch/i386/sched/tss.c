@@ -25,7 +25,7 @@
 #include <kernel/compiler.h>
 
 #include <debugger/hook.h>
-#include <kernel/gdt.h>
+#include <kernel/arch/gdt.h>
 #include <kernel/memory.h>
 #include <kernel/paging.h>
 #include <kernel/types.h>

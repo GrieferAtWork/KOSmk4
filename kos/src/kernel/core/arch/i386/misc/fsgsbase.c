@@ -28,12 +28,12 @@
 #ifdef __x86_64__
 
 #include <kernel/arch/cpuid.h>
-#include <kernel/fsgsbase.h>
+#include <kernel/arch/fsgsbase.h> /* x86_fsgsbase_patch() */
 #include <kernel/panic.h>
 #include <kernel/types.h>
 
-#include <hybrid/unaligned.h>
 #include <hybrid/atomic.h>
+#include <hybrid/unaligned.h>
 
 #include <asm/cpu-cpuid.h>
 

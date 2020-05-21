@@ -21,14 +21,15 @@
 #define GUARD_MODUSB_OHCI_C 1
 #define CONFIG_BUILDING_MODUSB 1
 
+#include "ohci.h"
+
 #include <kernel/compiler.h>
 
 #include <drivers/pci.h>
 #include <drivers/usb.h>
 #include <kernel/printk.h>
-#include <kos/io/ohci.h>
 
-#include "ohci.h"
+#include <hw/usb/ohci.h>
 
 DECL_BEGIN
 

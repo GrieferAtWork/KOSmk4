@@ -26,17 +26,17 @@
 
 #include <debugger/config.h>
 #include <fs/vfs.h>
-#include <kernel/apic.h>
+#include <kernel/arch/apic.h>
 #include <kernel/arch/cpuid.h>
+#include <kernel/arch/gdt.h>
+#include <kernel/arch/pic.h>
+#include <kernel/arch/pit.h>
 #include <kernel/driver-param.h>
-#include <kernel/gdt.h>
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
 #include <kernel/memory.h>
 #include <kernel/paging.h>
 #include <kernel/panic.h>
-#include <kernel/pic.h>
-#include <kernel/pit.h>
 #include <kernel/printk.h>
 #include <kernel/vm.h>
 #include <kernel/vm/phys.h>

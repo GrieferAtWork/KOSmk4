@@ -29,7 +29,7 @@
 
 #include <hybrid/host.h>
 
-#include <kos/io/serial.h>
+#include <hw/bus/serial.h>
 #include <sys/io.h>
 
 #include <inttypes.h>

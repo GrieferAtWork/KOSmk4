@@ -24,11 +24,11 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/arch/multiboot.h>
 #include <kernel/boot.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/memory.h>
-#include <kernel/multiboot.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>

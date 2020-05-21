@@ -17,13 +17,12 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_PIT_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_PIT_H 1
+#ifndef _HW_TIMER_PIT_H
+#define _HW_TIMER_PIT_H 1
 
-#include <kernel/compiler.h>
-#include <hybrid/sync/atomic-rwlock.h>
+#include <__stdinc.h>
 
-DECL_BEGIN
+#include <sys/io.h>
 
 #define PIT_DATA0                       __IOPORT(0x40) /* I/O port: Channel #0 (read/write) */
 #define PIT_DATA1                       __IOPORT(0x41) /* I/O port: Channel #1 (read/write) */
@@ -62,34 +61,12 @@ DECL_BEGIN
 #    define PIT_COMMAND_FBCD                  0x01 /* Data is accessed as four-digit BCD (no one needs this). */
 
 
-#define PIT_HZ_X3          3579545 /* 1.193182 */
-#define PIT_HZ            (PIT_HZ_X3/3)
-#if 1
-#define PIT_HZ_DIV(x)    ((((PIT_HZ_X3+(x)-1)/(x))+2)/3)
-#else
-#define PIT_HZ_DIV(x)    ((PIT_HZ_X3/(x))/3)
-#endif
-#define PIT_HZ_MUL(x)    ((PIT_HZ_X3*(x))/3)
+#define PIT_HZ_X3     3579545 /* 1.193182 */
+#define PIT_HZ        (PIT_HZ_X3 / 3)
+#define PIT_HZ_DIV(x) ((((PIT_HZ_X3 + (x) - 1) / (x)) + 2) / 3)
+#define PIT_HZ_MUL(x) ((PIT_HZ_X3 * (x)) / 3)
 
 #define PIT_RELOAD_DEFAULT 65536 /* Or `0' */
 
-#ifdef __CC__
-#ifndef CONFIG_NO_SMP
-/* Lock used to synchronize access to the PIT.
- * WARNING: When acquiring this lock, you must first disable preemption:
- * >> for (;;) {
- * >>     PREEMPTION_DISABLE();
- * >>     if (sync_trywrite(&x86_pit_lock))
- * >>         break;
- * >>     PREEMPTION_ENABLE();
- * >>     task_yield();
- * >> }
- * In single-core mode, it is sufficient to only disable preemption. */
-DATDEF struct atomic_rwlock x86_pit_lock;
-#endif /* !CONFIG_NO_SMP */
-#endif /* __CC__ */
 
-
-DECL_END
-
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_PIT_H */
+#endif /* !_HW_TIMER_PIT_H */

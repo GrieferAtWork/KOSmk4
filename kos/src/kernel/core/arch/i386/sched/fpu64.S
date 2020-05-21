@@ -22,7 +22,7 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/fpu.h>
+#include <kernel/arch/fpu.h>
 
 #include <asm/cfi.h>
 #include <asm/cpu-flags.h>

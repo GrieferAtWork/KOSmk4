@@ -23,7 +23,6 @@
 #include <kernel/compiler.h>
 
 #include <kernel/arch/isr.h>
-#include <kernel/pic.h>
 #include <kernel/types.h>
 
 #include <kos/kernel/handle.h>

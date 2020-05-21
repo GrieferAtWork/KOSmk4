@@ -23,9 +23,9 @@
 
 #include <hybrid/compiler.h>
 
-#include <kernel/idt-names.h>
-#include <kernel/idt.h>
-#include <kernel/pic.h>
+#include <kernel/arch/idt-names.h>
+#include <kernel/arch/idt.h>
+#include <kernel/arch/pic.h>
 
 #include <asm/cfi.h>
 #include <asm/cpu-flags.h>

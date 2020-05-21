@@ -22,11 +22,15 @@
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
+
+#include <kernel/arch/breakpoint.h>
 #include <kernel/types.h>
-#include <kernel/breakpoint.h>
+
 #include <hybrid/host.h>
+
 #include <asm/cpu-flags.h>
 #include <asm/intrin.h>
+
 #include <assert.h>
 
 DECL_BEGIN

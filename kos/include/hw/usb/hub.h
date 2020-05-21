@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_IO_USB_HUB_H
-#define _KOS_IO_USB_HUB_H 1
+#ifndef _HW_USB_HUB_H
+#define _HW_USB_HUB_H 1
 
 #include <__stdinc.h>
 
@@ -64,4 +64,4 @@ struct __ATTR_PACKED usb_hub_descriptor {
 
 __SYSDECL_END
 
-#endif /* !_KOS_IO_USB_HUB_H */
+#endif /* !_HW_USB_HUB_H */

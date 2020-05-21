@@ -23,10 +23,10 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/apic.h>
-#include <kernel/idt.h>
+#include <kernel/arch/apic.h>
+#include <kernel/arch/idt.h>
+#include <kernel/arch/pit.h>
 #include <kernel/panic.h>
-#include <kernel/pit.h>
 #include <kernel/printk.h>
 #include <sched/cpu.h>
 #include <sched/smp.h>

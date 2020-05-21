@@ -21,8 +21,6 @@
 #define GUARD_MODNE2K_UTIL_C 1
 #define _KOS_SOURCE 1
 
-#include "ne2k.h"
-
 #include <kernel/compiler.h>
 
 #include <drivers/pci.h>
@@ -32,12 +30,14 @@
 #include <kernel/printk.h>
 #include <sched/cpu.h>
 
+#include <hw/net/ne2k.h>
 #include <kos/except/io.h>
-#include <kos/io/ne2k.h>
 #include <sys/io.h>
 
 #include <stddef.h>
 #include <string.h>
+
+#include "ne2k.h"
 
 DECL_BEGIN
 

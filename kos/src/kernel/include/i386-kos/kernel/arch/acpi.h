@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ACPI_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ACPI_H 1
+#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_ACPI_H
+#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_ACPI_H 1
 
 #include <kernel/compiler.h>
 
@@ -28,7 +28,7 @@ DECL_BEGIN
 
 #ifdef __CC__
 
-#define RSDPDESCRIPTOR_ALIGN           16
+#define RSDPDESCRIPTOR_ALIGN 16
 
 typedef struct ATTR_PACKED {
 	char     rsdp_signature[8];
@@ -69,58 +69,58 @@ typedef struct ATTR_PACKED {
 } GAS; /* GenericAddressStructure */
 
 typedef struct ATTR_PACKED {
-    ACPISDTHeader fadt_Header;   /* Signature == "FACP" */
-    uint32_t      fadt_FirmwareCtrl;
-    uint32_t      fadt_Dsdt;
-    uint8_t       fadt_Reserved; /* field used in ACPI 1.0; no longer in use, for compatibility only */
-    uint8_t       fadt_PreferredPowerManagementProfile;
-    uint16_t      fadt_SCI_Interrupt;
-    uint32_t      fadt_SMI_CommandPort;
-    uint8_t       fadt_AcpiEnable;
-    uint8_t       fadt_AcpiDisable;
-    uint8_t       fadt_S4BIOS_REQ;
-    uint8_t       fadt_PSTATE_Control;
-    uint32_t      fadt_PM1aEventBlock;
-    uint32_t      fadt_PM1bEventBlock;
-    uint32_t      fadt_PM1aControlBlock;
-    uint32_t      fadt_PM1bControlBlock;
-    uint32_t      fadt_PM2ControlBlock;
-    uint32_t      fadt_PMTimerBlock;
-    uint32_t      fadt_GPE0Block;
-    uint32_t      fadt_GPE1Block;
-    uint8_t       fadt_PM1EventLength;
-    uint8_t       fadt_PM1ControlLength;
-    uint8_t       fadt_PM2ControlLength;
-    uint8_t       fadt_PMTimerLength;
-    uint8_t       fadt_GPE0Length;
-    uint8_t       fadt_GPE1Length;
-    uint8_t       fadt_GPE1Base;
-    uint8_t       fadt_CStateControl;
-    uint16_t      fadt_WorstC2Latency;
-    uint16_t      fadt_WorstC3Latency;
-    uint16_t      fadt_FlushSize;
-    uint16_t      fadt_FlushStride;
-    uint8_t       fadt_DutyOffset;
-    uint8_t       fadt_DutyWidth;
-    uint8_t       fadt_DayAlarm;
-    uint8_t       fadt_MonthAlarm;
-    uint8_t       fadt_Century;
-    uint16_t      fadt_BootArchitectureFlags;     /* reserved in ACPI 1.0; used since ACPI 2.0+ */
-    uint8_t       fadt_Reserved2;
-    uint32_t      fadt_Flags;
-    GAS           fadt_ResetReg;
-    uint8_t       fadt_ResetValue;
-    uint8_t       fadt_Reserved3[3];
-    uint64_t      fadt_X_FirmwareControl;    /* 64bit pointer - Available on ACPI 2.0+ */
-    uint64_t      fadt_X_Dsdt;               /* 64bit pointer - Available on ACPI 2.0+ */
-    GAS           fadt_X_PM1aEventBlock;
-    GAS           fadt_X_PM1bEventBlock;
-    GAS           fadt_X_PM1aControlBlock;
-    GAS           fadt_X_PM1bControlBlock;
-    GAS           fadt_X_PM2ControlBlock;
-    GAS           fadt_X_PMTimerBlock;
-    GAS           fadt_X_GPE0Block;
-    GAS           fadt_X_GPE1Block;
+	ACPISDTHeader fadt_Header;   /* Signature == "FACP" */
+	uint32_t      fadt_FirmwareCtrl;
+	uint32_t      fadt_Dsdt;
+	uint8_t       fadt_Reserved; /* field used in ACPI 1.0; no longer in use, for compatibility only */
+	uint8_t       fadt_PreferredPowerManagementProfile;
+	uint16_t      fadt_SCI_Interrupt;
+	uint32_t      fadt_SMI_CommandPort;
+	uint8_t       fadt_AcpiEnable;
+	uint8_t       fadt_AcpiDisable;
+	uint8_t       fadt_S4BIOS_REQ;
+	uint8_t       fadt_PSTATE_Control;
+	uint32_t      fadt_PM1aEventBlock;
+	uint32_t      fadt_PM1bEventBlock;
+	uint32_t      fadt_PM1aControlBlock;
+	uint32_t      fadt_PM1bControlBlock;
+	uint32_t      fadt_PM2ControlBlock;
+	uint32_t      fadt_PMTimerBlock;
+	uint32_t      fadt_GPE0Block;
+	uint32_t      fadt_GPE1Block;
+	uint8_t       fadt_PM1EventLength;
+	uint8_t       fadt_PM1ControlLength;
+	uint8_t       fadt_PM2ControlLength;
+	uint8_t       fadt_PMTimerLength;
+	uint8_t       fadt_GPE0Length;
+	uint8_t       fadt_GPE1Length;
+	uint8_t       fadt_GPE1Base;
+	uint8_t       fadt_CStateControl;
+	uint16_t      fadt_WorstC2Latency;
+	uint16_t      fadt_WorstC3Latency;
+	uint16_t      fadt_FlushSize;
+	uint16_t      fadt_FlushStride;
+	uint8_t       fadt_DutyOffset;
+	uint8_t       fadt_DutyWidth;
+	uint8_t       fadt_DayAlarm;
+	uint8_t       fadt_MonthAlarm;
+	uint8_t       fadt_Century;
+	uint16_t      fadt_BootArchitectureFlags;     /* reserved in ACPI 1.0; used since ACPI 2.0+ */
+	uint8_t       fadt_Reserved2;
+	uint32_t      fadt_Flags;
+	GAS           fadt_ResetReg;
+	uint8_t       fadt_ResetValue;
+	uint8_t       fadt_Reserved3[3];
+	uint64_t      fadt_X_FirmwareControl;    /* 64bit pointer - Available on ACPI 2.0+ */
+	uint64_t      fadt_X_Dsdt;               /* 64bit pointer - Available on ACPI 2.0+ */
+	GAS           fadt_X_PM1aEventBlock;
+	GAS           fadt_X_PM1bEventBlock;
+	GAS           fadt_X_PM1aControlBlock;
+	GAS           fadt_X_PM1bControlBlock;
+	GAS           fadt_X_PM2ControlBlock;
+	GAS           fadt_X_PMTimerBlock;
+	GAS           fadt_X_GPE0Block;
+	GAS           fadt_X_GPE1Block;
 } FADT;
 
 
@@ -149,10 +149,8 @@ NOTHROW(KCALL acpi_lookup)(char const signature[4],
                            void *buf, size_t buflen,
                            vm_phys_t *ptableaddr DFL(__NULLPTR));
 
-
-
 #endif /* __CC__ */
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ACPI_H */
+#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_ACPI_H */

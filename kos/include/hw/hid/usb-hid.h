@@ -17,36 +17,15 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_FSGSBASE_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_FSGSBASE_H 1
+#ifndef _HW_HID_USB_HID_H
+#define _HW_HID_USB_HID_H 1
 
-#include <kernel/compiler.h>
-#include <kernel/types.h>
-#include <hybrid/host.h>
-#include <kernel/arch/fsgsbase.h>
+#include <__stdinc.h>
 
-#ifdef __x86_64__
-DECL_BEGIN
+__SYSDECL_BEGIN
 
-#ifdef __CC__
-/* Patch one of the (rd|wr)(fs|gs)base instructions at `pc' to instead
- * become a call to one of the internal functions capable of emulating
- * the behavior of the instruction.
- * WARNING: Only the 64-bit variants of these instructions can be patched!
- *          The 32-bit variants cannot.
- * Before using this function, the caller should check that fsgsbase really
- * isn't supported by the host CPU, as indicated by `CPUID_7B_FSGSBASE'
- * @param: real_pc: The real PC that should be used for DISP-offsets.
- *                  May differ from `pc' when `pc' points into an aliasing
- *                  memory mapping with write-access
- * @return: true:   Successfully patched the given code location.
- * @return: false:  The given code location was already patched,
- *                  or isn't one of the above instructions. */
-FUNDEF NOBLOCK bool
-NOTHROW(FCALL x86_fsgsbase_patch)(void *pc, void const *real_pc);
-#endif /* __CC__ */
+#define USB_REQUEST_SET_IDLE 0x0a /* For use in `struct usb_request::ur_request' */
 
-DECL_END
-#endif /* __x86_64__ */
+__SYSDECL_END
 
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_FSGSBASE_H */
+#endif /* !_HW_HID_USB_HID_H */

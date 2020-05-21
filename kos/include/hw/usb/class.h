@@ -17,13 +17,12 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_IO_USB_CLASS_H
-#define _KOS_IO_USB_CLASS_H 1
+#ifndef _HW_USB_CLASS_H
+#define _HW_USB_CLASS_H 1
 
 #include <__stdinc.h>
 
 __SYSDECL_BEGIN
-
 
 /* https://web.archive.org/web/20130205095026/https://www.usb.org/developers/defined_class */
 #define USB_CLASS_AUDIO               0x01 /* [TYPE(Interface)] Audio */
@@ -58,9 +57,6 @@ __SYSDECL_BEGIN
 #define USB_CLASS_APPLICATION_SPEC    0xfe /* [TYPE(Interface)] Application Specific */
 #define USB_CLASS_VENDOR_SPEC         0xff /* [TYPE(Both)] Vendor Specific */
 
-
-
-
 __SYSDECL_END
 
-#endif /* !_KOS_IO_USB_CLASS_H */
+#endif /* !_HW_USB_CLASS_H */

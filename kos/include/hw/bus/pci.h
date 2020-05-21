@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_IO_PCI_H
-#define _KOS_IO_PCI_H 1
+#ifndef _HW_BUS_PCI_H
+#define _HW_BUS_PCI_H 1
 
 #include <__stdinc.h>
 
@@ -56,10 +56,10 @@ typedef __uint32_t pci_addr_t; /* PCI Address (Following configuration space mec
 	 __CCAST(pci_addr_t)(dev) << PCI_ADDR_DEVSHIFT | \
 	 __CCAST(pci_addr_t)(fun) << PCI_ADDR_FUNSHIFT | \
 	 PCI_ADDR_FENABLED)
-#define PCI_ADDR_GETBUS(x) (((x)&PCI_ADDR_BUSMASK) >> PCI_ADDR_BUSSHIFT)
-#define PCI_ADDR_GETDEV(x) (((x)&PCI_ADDR_DEVMASK) >> PCI_ADDR_DEVSHIFT)
-#define PCI_ADDR_GETFUN(x) (((x)&PCI_ADDR_FUNMASK) >> PCI_ADDR_FUNSHIFT)
-#define PCI_ADDR_GETREG(x)  ((x)&PCI_ADDR_REGMASK)
+#define PCI_ADDR_GETBUS(x) (((x) & PCI_ADDR_BUSMASK) >> PCI_ADDR_BUSSHIFT)
+#define PCI_ADDR_GETDEV(x) (((x) & PCI_ADDR_DEVMASK) >> PCI_ADDR_DEVSHIFT)
+#define PCI_ADDR_GETFUN(x) (((x) & PCI_ADDR_FUNMASK) >> PCI_ADDR_FUNSHIFT)
+#define PCI_ADDR_GETREG(x) (((x) & PCI_ADDR_REGMASK) >> PCI_ADDR_REGSHIFT)
 
 
 /* PCI Device data structure (Accessed as registers of any PCI-compliant device). */
@@ -68,8 +68,8 @@ typedef __uint32_t pci_addr_t; /* PCI Address (Following configuration space mec
 #define    PCI_DEV0_VENDORMASK         0x0000ffff
 #define    PCI_DEV0_DEVICESHIFT        16
 #define    PCI_DEV0_VENDORSHIFT        0
-#define    PCI_DEV0_DEVICE(x)       (((x)&PCI_DEV0_DEVICEMASK) >> PCI_DEV0_DEVICESHIFT)
-#define    PCI_DEV0_VENDOR(x)        ((x)&PCI_DEV0_VENDORMASK)
+#define    PCI_DEV0_DEVICE(x)          (((x) & PCI_DEV0_DEVICEMASK) >> PCI_DEV0_DEVICESHIFT)
+#define    PCI_DEV0_VENDOR(x)          ((x) & PCI_DEV0_VENDORMASK)
 #define    PCI_DEV0_VENDOR_NODEV       0xffff /* Returned by non-existent devices. */
 #define PCI_DEV4                       0x4 /* Status/Command register. */
 #define    PCI_DEV4_STATMASK           0xffff0000
@@ -102,7 +102,7 @@ typedef __uint32_t pci_addr_t; /* PCI Address (Following configuration space mec
 #define    PCI_DEV4_STATSHIFT          16
 #define    PCI_DEV4_CMDSHIFT           0
 #define PCI_DEV8                       0x8 /* Class code, subclass, Prog IF and Revision ID. */
-#define    PCI_DEV8_CLASS(x)        (((x)&PCI_DEV8_CLASSMASK) >> PCI_DEV8_CLASSSHIFT)
+#define    PCI_DEV8_CLASS(x)           (((x) & PCI_DEV8_CLASSMASK) >> PCI_DEV8_CLASSSHIFT)
 #define    PCI_DEV8_CLASSMASK          0xff000000
 #define       PCI_DEV8_CLASS_NOCLASS       0x00 /* Device was built prior definition of the class code field. */
 #define       PCI_DEV8_CLASS_STORAGE       0x01 /* Mass Storage Controller. */
@@ -123,9 +123,9 @@ typedef __uint32_t pci_addr_t; /* PCI Address (Following configuration space mec
 #define       PCI_DEV8_CLASS_ENCRYPTION    0x10 /* Encryption/Decryption Controllers. */
 #define       PCI_DEV8_CLASS_DATASIGNAL    0x11 /* Data Acquisition and Signal Processing Controllers. */
 #define       PCI_DEV8_CLASS_OTHER         0xff /* Device does not fit any defined class. */
-#define    PCI_DEV8_SUBCLASS(x)     (((x)&PCI_DEV8_SUBCLASSMASK) >> PCI_DEV8_SUBCLASSSHIFT)
+#define    PCI_DEV8_SUBCLASS(x)        (((x) & PCI_DEV8_SUBCLASSMASK) >> PCI_DEV8_SUBCLASSSHIFT)
 #define    PCI_DEV8_SUBCLASSMASK       0x00ff0000
-#define    PCI_DEV8_PROGIF(x)       (((x)&PCI_DEV8_PROGIFMASK) >> PCI_DEV8_PROGIFSHIFT)
+#define    PCI_DEV8_PROGIF(x)          (((x) & PCI_DEV8_PROGIFMASK) >> PCI_DEV8_PROGIFSHIFT)
 #define    PCI_DEV8_PROGIFMASK         0x0000ff00
 #define    PCI_DEV8_REVIDMASK          0x000000ff
 #define    PCI_DEV8_CLASSSHIFT         24
@@ -139,7 +139,7 @@ typedef __uint32_t pci_addr_t; /* PCI Address (Following configuration space mec
 #define       PCI_DEVC_BIST_EXITCODE   0x0f /* MASK: Self-test exit code. */
 #define       PCI_DEVC_BIST_EXITCODE_OK 0   /* Return value: self-test was successful. */
 #define    PCI_DEVC_HEADERMASK         0x00ff0000 /* Header type (Determines layout of register 0x10 onwards). */
-#define    PCI_DEVC_HEADER(x)       (((x)&PCI_DEVC_HEADERMASK) >> PCI_DEVC_HEADERSHIFT)
+#define    PCI_DEVC_HEADER(x)          (((x) & PCI_DEVC_HEADERMASK) >> PCI_DEVC_HEADERSHIFT)
 #define       PCI_DEVC_HEADER_GENERIC  0x00 /* General device (PCI_GDEV*). */
 #define       PCI_DEVC_HEADER_BRIDGE   0x01 /* PCI-to-PCI bridge (PCI_BDEV*). */
 #define       PCI_DEVC_HEADER_CARDBUS  0x02 /* CardBus bridge (PCI_CDEV*). */
@@ -175,7 +175,7 @@ typedef __uint32_t pci_addr_t; /* PCI Address (Following configuration space mec
 #define    PCI_GDEV3C_MAXLATENCYMASK  0xff000000 /* Specifies how often the device needs access to the PCI bus (in 1/4 microsecond units). */
 #define    PCI_GDEV3C_MINGRANTMASK    0x00ff0000 /* Specifies the burst period length, in 1/4 microsecond units, that the device needs (assuming a 33 MHz clock rate). */
 #define    PCI_GDEV3C_IRQPINMASK      0x0000ff00 /* Interrupt pin number. */
-#define    PCI_GDEV3C_IRQLINE(x)   (((x)&PCI_GDEV3C_IRQLINEMASK) >> PCI_GDEV3C_IRQLINESHIFT)
+#define    PCI_GDEV3C_IRQLINE(x)      (((x) & PCI_GDEV3C_IRQLINEMASK) >> PCI_GDEV3C_IRQLINESHIFT)
 #define    PCI_GDEV3C_IRQLINEMASK     0x000000ff /* Interrupt line number. */
 #define    PCI_GDEV3C_MAXLATENCYSHIFT 24
 #define    PCI_GDEV3C_MINGRANTSHIFT   16
@@ -186,13 +186,13 @@ typedef __uint32_t pci_addr_t; /* PCI Address (Following configuration space mec
 #define PCI_BDEV_BAR0    0x10 /* Base address #0. */
 #define PCI_BDEV_BAR1    0x14 /* Base address #1. */
 #define PCI_BDEV18       0x18
-#define    PCI_BDEV18_SECONDARY_LATENCY_TIMER(x)   (((x)&PCI_BDEV18_SECONDARY_LATENCY_TIMERMASK) >> PCI_BDEV18_SECONDARY_LATENCY_TIMERSHIFT)
+#define    PCI_BDEV18_SECONDARY_LATENCY_TIMER(x)   (((x) & PCI_BDEV18_SECONDARY_LATENCY_TIMERMASK) >> PCI_BDEV18_SECONDARY_LATENCY_TIMERSHIFT)
 #define    PCI_BDEV18_SECONDARY_LATENCY_TIMERMASK  0xff000000
-#define    PCI_BDEV18_SUBORDINATE_BUS(x)           (((x)&PCI_BDEV18_SUBORDINATE_BUSMASK) >> PCI_BDEV18_SUBORDINATE_BUSSHIFT)
+#define    PCI_BDEV18_SUBORDINATE_BUS(x)           (((x) & PCI_BDEV18_SUBORDINATE_BUSMASK) >> PCI_BDEV18_SUBORDINATE_BUSSHIFT)
 #define    PCI_BDEV18_SUBORDINATE_BUSMASK          0x00ff0000
-#define    PCI_BDEV18_SECONDARY_BUS(x)             (((x)&PCI_BDEV18_SECONDARY_BUSMASK) >> PCI_BDEV18_SECONDARY_BUSSHIFT)
+#define    PCI_BDEV18_SECONDARY_BUS(x)             (((x) & PCI_BDEV18_SECONDARY_BUSMASK) >> PCI_BDEV18_SECONDARY_BUSSHIFT)
 #define    PCI_BDEV18_SECONDARY_BUSMASK            0x0000ff00
-#define    PCI_BDEV18_PRIMARY_BUS(x)               ((x)&PCI_BDEV18_PRIMARY_BUSMASK)
+#define    PCI_BDEV18_PRIMARY_BUS(x)               ((x) & PCI_BDEV18_PRIMARY_BUSMASK)
 #define    PCI_BDEV18_PRIMARY_BUSMASK              0x000000ff
 #define    PCI_BDEV18_SECONDARY_LATENCY_TIMERSHIFT 24
 #define    PCI_BDEV18_SUBORDINATE_BUSSHIFT         16
@@ -274,4 +274,4 @@ typedef __uint32_t pci_addr_t; /* PCI Address (Following configuration space mec
 
 __SYSDECL_END
 
-#endif /* !_KOS_IO_PCI_H */
+#endif /* !_HW_BUS_PCI_H */

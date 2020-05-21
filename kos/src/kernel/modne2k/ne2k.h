@@ -32,7 +32,7 @@
 #include <hybrid/sequence/list.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
-#include <kos/io/ne2k.h>
+#include <hw/net/ne2k.h>
 #include <linux/if_ether.h>
 #include <sys/io.h>
 

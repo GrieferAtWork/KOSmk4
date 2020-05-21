@@ -22,7 +22,7 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/breakpoint.h>
+#include <kernel/arch/breakpoint.h>
 #include <kernel/except.h>
 #include <kernel/vm.h>
 

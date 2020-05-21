@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_IO_OHCI_H
-#define _KOS_IO_OHCI_H 1
+#ifndef _HW_USB_OHCI_H
+#define _HW_USB_OHCI_H 1
 
 #include <__stdinc.h>
 
@@ -26,7 +26,6 @@
 #include <bits/types.h>
 
 __SYSDECL_BEGIN
-
 
 /* Refs:
  *   - http://www.scaramanga.co.uk/stuff/qemu-usb/hcir1_0a.pdf
@@ -227,11 +226,8 @@ struct /*__ATTR_ALIGNED(OHCI_ITD_ALIGN)*/ ohci_itd_ {
 	                               *          On output: Buffer status codes (set of `OHCI_ITD_PSW_*') */
 };
 
-
-
 #endif /* __CC__ */
-
 
 __SYSDECL_END
 
-#endif /* !_KOS_IO_OHCI_H */
+#endif /* !_HW_USB_OHCI_H */

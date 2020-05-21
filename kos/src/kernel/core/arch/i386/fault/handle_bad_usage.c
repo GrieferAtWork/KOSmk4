@@ -69,10 +69,10 @@ opt.append("-Os");
 #include <kernel/compiler.h>
 
 #include <kernel/arch/cpuid.h>
+#include <kernel/arch/emulock.h>
+#include <kernel/arch/gdt.h>
 #include <kernel/debugtrap.h>
-#include <kernel/emulock.h>
 #include <kernel/except.h>
-#include <kernel/gdt.h>
 #include <kernel/printk.h>
 #include <kernel/restart-interrupt.h>
 #include <kernel/syscall.h>
@@ -107,8 +107,8 @@ opt.append("-Os");
 #endif /* !CONFIG_NO_USERKERN_SEGMENT */
 
 #ifdef __x86_64__
+#include <kernel/arch/fsgsbase.h> /* x86_fsgsbase_patch() */
 #include <kernel/driver.h>
-#include <kernel/fsgsbase.h>
 #include <kernel/vm/phys.h>
 
 #include <int128.h>

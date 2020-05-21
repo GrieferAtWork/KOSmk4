@@ -36,12 +36,12 @@ if (gcc_opt.remove("-O3"))
 #include <debugger/hook.h>
 #include <debugger/io.h>
 #include <debugger/rt.h>
+#include <kernel/arch/pic.h>
 #include <kernel/panic.h>
-#include <kernel/pic.h>
 #include <kernel/printk.h>
 
 #include <asm/intrin.h>
-#include <kos/io/ps2.h>
+#include <hw/hid/ps2.h>
 #include <kos/keyboard.h>
 #include <sys/io.h>
 

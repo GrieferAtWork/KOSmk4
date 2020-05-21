@@ -38,8 +38,8 @@
 #include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
 
+#include <hw/usb/usb.h>
 #include <kos/except/io.h>
-#include <kos/io/usb.h>
 
 #include <assert.h>
 #include <format-printer.h>

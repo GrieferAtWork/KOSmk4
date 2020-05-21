@@ -27,9 +27,9 @@
 #include <kernel/printk.h>
 #include <kernel/types.h>
 
-#include <kos/io/usb-class.h>
-#include <kos/io/usb-hid.h>
-#include <kos/io/usb.h>
+#include <hw/hid/usb-hid.h>
+#include <hw/usb/class.h>
+#include <hw/usb/usb.h>
 
 #include "usb-kbd.h"
 

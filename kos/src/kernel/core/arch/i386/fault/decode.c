@@ -25,8 +25,8 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/arch/gdt.h>
 #include <kernel/except.h>
-#include <kernel/gdt.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
@@ -35,8 +35,8 @@
 #include <asm/cpu-flags.h>
 #include <asm/intrin.h>
 #include <asm/registers.h>
-#include <kos/kernel/cpu-state.h>
 #include <kos/kernel/cpu-state-helpers.h>
+#include <kos/kernel/cpu-state.h>
 #include <kos/kernel/segment.h>
 
 #include <assert.h>

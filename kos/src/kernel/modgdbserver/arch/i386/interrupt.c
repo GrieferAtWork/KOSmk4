@@ -23,6 +23,7 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/arch/idt.h>
 #include <kernel/isr.h>
 
 #include <asm/intrin.h>

@@ -27,7 +27,7 @@
 
 #include <hybrid/sync/atomic-rwlock.h>
 
-#include <kos/io/vga.h>
+#include <hw/video/vga.h>
 #include <sys/io.h>
 
 #include <libansitty/ansitty.h>

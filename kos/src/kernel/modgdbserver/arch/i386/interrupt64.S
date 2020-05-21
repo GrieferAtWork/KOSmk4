@@ -17,15 +17,18 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_MODGDBSERVER_ARCH_I386_INTERRUPT64_S
+#define GUARD_MODGDBSERVER_ARCH_I386_INTERRUPT64_S 1
+#define __ASSEMBLER__ 1
 
 #include <kernel/compiler.h>
 
-#include <kernel/gdt.h>
+#include <kernel/arch/gdt.h>
 
 #include <asm/cfi.h>
 #include <asm/instr/interrupt.h>
-#include <kos/kernel/cpu-state.h>
 #include <kos/kernel/cpu-state-asm.h>
+#include <kos/kernel/cpu-state.h>
 
 .section .text
 INTERN_FUNCTION(GDBX86Interrupt_AsmInt1Handler)
@@ -66,4 +69,4 @@ INTERN_FUNCTION(GDBX86Interrupt_AsmInt3Handler)
 	.cfi_endproc
 END(GDBX86Interrupt_AsmInt3Handler)
 
-
+#endif /* !GUARD_MODGDBSERVER_ARCH_I386_INTERRUPT64_S */

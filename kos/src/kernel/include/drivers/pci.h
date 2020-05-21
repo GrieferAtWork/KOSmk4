@@ -31,7 +31,7 @@
 #include <hybrid/byteorder.h>
 #include <hybrid/sequence/list.h>
 
-#include <kos/io/pci.h>
+#include <hw/bus/pci.h>
 
 DECL_BEGIN
 

@@ -24,7 +24,7 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/acpi.h>
+#include <kernel/arch/acpi.h>
 #include <kernel/memory.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>

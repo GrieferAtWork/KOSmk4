@@ -33,7 +33,7 @@
 #include <sched/task.h>
 
 #include <bits/timespec.h>
-#include <kos/io/uhci.h>
+#include <hw/usb/uhci.h>
 #include <sys/io.h>
 #include <sys/mmio.h>
 

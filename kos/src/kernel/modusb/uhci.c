@@ -31,6 +31,7 @@
 #include <drivers/pci.h>
 #include <drivers/usb.h>
 #include <kernel/aio.h>
+#include <kernel/arch/pic.h> /* X86_INTERRUPT_PIC1_BASE (TODO: Non-portable) */
 #include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/heap.h>
@@ -48,9 +49,9 @@
 #include <hybrid/atomic.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
+#include <hw/usb/uhci.h>
+#include <hw/usb/usb.h>
 #include <kos/except/io.h>
-#include <kos/io/uhci.h>
-#include <kos/io/usb.h>
 
 #include <assert.h>
 #include <stddef.h>
@@ -3278,7 +3279,7 @@ usb_probe_uhci(struct pci_device *__restrict dev) {
 	uhci_wrw(result, UHCI_USBSTS, 0xffff);
 
 	/* Register the interrupt handler. */
-	hisr_register_at(X86_INTERRUPT_PIC1_BASE +
+	hisr_register_at(X86_INTERRUPT_PIC1_BASE + /* TODO: Non-portable! */
 	                 PCI_GDEV3C_IRQLINE(pci_read(dev->pd_base, PCI_GDEV3C)),
 	                 &uhci_interrupt_handler, result);
 

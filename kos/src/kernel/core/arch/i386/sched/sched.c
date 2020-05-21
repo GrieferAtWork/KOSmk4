@@ -24,15 +24,15 @@
 #include <kernel/compiler.h>
 
 #include <fs/vfs.h>
-#include <kernel/apic.h>
+#include <kernel/arch/apic.h>
+#include <kernel/arch/gdt.h>
+#include <kernel/arch/pic.h>
+#include <kernel/arch/pit.h>
 #include <kernel/arch/syscall-tables.h> /* CONFIG_X86_EMULATE_LCALL7 */
 #include <kernel/except.h>
-#include <kernel/gdt.h>
 #include <kernel/handle.h>
 #include <kernel/paging.h>
 #include <kernel/panic.h>
-#include <kernel/pic.h>
-#include <kernel/pit.h>
 #include <kernel/printk.h>
 #include <kernel/syscall.h>
 #include <kernel/user.h>

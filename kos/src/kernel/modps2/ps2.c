@@ -25,6 +25,7 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/arch/pic.h> /* TODO: Non-portable! */
 #include <kernel/driver-param.h>
 #include <kernel/isr.h>
 #include <kernel/printk.h>
@@ -299,14 +300,18 @@ init_mouse:
 
 PRIVATE ATTR_FREETEXT void KCALL
 ps2_probe_install_handlers(struct ps2_probe_data *__restrict probe_data) {
-	isr_register_at(X86_INTNO_PIC1_KBD, &ps2_probe_handle_interrupt, probe_data);
-	isr_register_at(X86_INTNO_PIC2_PS2M, &ps2_probe_handle_interrupt, probe_data);
+	isr_register_at(X86_INTNO_PIC1_KBD, /* TODO: Non-portable! */
+	                &ps2_probe_handle_interrupt, probe_data);
+	isr_register_at(X86_INTNO_PIC2_PS2M, /* TODO: Non-portable! */
+	                &ps2_probe_handle_interrupt, probe_data);
 }
 
 PRIVATE ATTR_FREETEXT void KCALL
 ps2_probe_delete_handlers(struct ps2_probe_data *__restrict probe_data) {
-	isr_unregister_at(X86_INTNO_PIC1_KBD, &ps2_probe_handle_interrupt, probe_data);
-	isr_unregister_at(X86_INTNO_PIC2_PS2M, &ps2_probe_handle_interrupt, probe_data);
+	isr_unregister_at(X86_INTNO_PIC1_KBD, /* TODO: Non-portable! */
+	                  &ps2_probe_handle_interrupt, probe_data);
+	isr_unregister_at(X86_INTNO_PIC2_PS2M, /* TODO: Non-portable! */
+	                  &ps2_probe_handle_interrupt, probe_data);
 }
 
 PRIVATE ATTR_FREEBSS struct ps2_probe_data ps2_probe_data_buffer[PS2_PORTCOUNT];

@@ -17,12 +17,18 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_IO_PS2_H
-#define _KOS_IO_PS2_H 1
+#ifndef _HW_HID_PS2_H
+#define _HW_HID_PS2_H 1
 
 #include <__stdinc.h>
 
 #include <sys/io.h>
+
+/* TODO: Split this header into:
+ *       <hw/bus/ps2.h>
+ *       <hw/hid/ps2kbd.h>
+ *       <hw/hid/ps2mouse.h>
+ */
 
 __DECL_BEGIN
 
@@ -84,8 +90,6 @@ __DECL_BEGIN
 #define PS2_KEYBOARD_CMD_SETDEFAULT       0xf6 /* RECV(PS2_RSP_ACK) */
 #define PS2_KEYBOARD_CMD_RESET            0xff /* RECV(PS2_RSP_ACK), RECV(0xaa) */
 
-
-
 __DECL_END
 
-#endif /* !_KOS_IO_PS2_H */
+#endif /* !_HW_HID_PS2_H */

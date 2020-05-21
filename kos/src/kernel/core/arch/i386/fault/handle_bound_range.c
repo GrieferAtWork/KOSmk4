@@ -23,8 +23,8 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/arch/fault.h>
 #include <kernel/except.h>
-#include <kernel/fault.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <sched/except-handler.h>

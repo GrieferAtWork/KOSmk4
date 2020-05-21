@@ -22,7 +22,7 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/gdt.h>
+#include <kernel/arch/gdt.h> /* x86_(get|set)_user_(fs|gs)base */
 
 #include <hybrid/host.h>
 

@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_IO_USB_H
-#define _KOS_IO_USB_H 1
+#ifndef _HW_USB_USB_H
+#define _HW_USB_USB_H 1
 
 #include <__stdinc.h>
 
@@ -26,7 +26,6 @@
 #include <sys/io.h>
 
 __SYSDECL_BEGIN
-
 
 #define USB_REQUEST_RETYPE_DESTM 0x1f /* Mask for selecting the destination (recipient) */
 #define    USB_REQUEST_RETYPE_DEST_DEV  0x00 /* Device destination */
@@ -178,4 +177,4 @@ struct __ATTR_PACKED usb_endpoint_descriptor {
 
 __SYSDECL_END
 
-#endif /* !_KOS_IO_USB_H */
+#endif /* !_HW_USB_USB_H */

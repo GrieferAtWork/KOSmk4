@@ -42,9 +42,9 @@
 #include <asm/intrin.h>
 #include <kos/kernel/cpu-state-compat.h>
 #include <kos/kernel/cpu-state.h>
+#include <kos/kernel/fpu-state-helpers.h>
 #include <kos/kernel/fpu-state.h>
 #include <kos/kernel/fpu-state32.h>
-#include <kos/kernel/fpu-state-helpers.h>
 
 #include <assert.h>
 #include <stddef.h>
@@ -54,7 +54,7 @@ DECL_BEGIN
 
 #define FPU_GFP  (GFP_NORMAL)
 
-#ifndef CONFIG_NO_FPU
+#ifdef CONFIG_FPU
 
 /* [const] The type of FPU state used (One of `FPU_STATE_*') */
 PUBLIC unsigned int _x86_fpustate_variant ASMNAME("x86_fpustate_variant") = FPU_STATE_XSTATE;
@@ -548,7 +548,7 @@ fpustate32_saveinto(USER CHECKED struct fpustate32 *state)
 }
 #endif /* __x86_64__ */
 
-#endif /* !CONFIG_NO_FPU */
+#endif /* CONFIG_FPU */
 
 DECL_END
 

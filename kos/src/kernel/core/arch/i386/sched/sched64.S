@@ -23,15 +23,15 @@
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
-#include <kernel/apic.h>
+#include <kernel/arch/apic.h>
+#include <kernel/arch/breakpoint.h>
+#include <kernel/arch/gdt.h>
 #include <kernel/arch/paging64.h>
+#include <kernel/arch/pic.h>
+#include <kernel/arch/pit.h>
 #include <kernel/arch/syscall-tables.h>
-#include <kernel/breakpoint.h>
 #include <kernel/except.h>
-#include <kernel/fpu.h>
-#include <kernel/gdt.h>
-#include <kernel/pic.h>
-#include <kernel/pit.h>
+#include <kernel/fpu.h> /* CONFIG_FPU */
 #include <kernel/syscall.h>
 #include <sched/task.h>
 #include <sched/tss.h>
@@ -46,6 +46,7 @@
 #include <asm/param.h>
 #include <kos/kernel/cpu-state-asm.h>
 #include <kos/kernel/cpu-state.h>
+
 
 
 .section .text
@@ -149,7 +150,7 @@ INTERN_FUNCTION(x86_load_thread_rax_cpu_rbx)
 	EXTERN(thiscpu_x86_tss)
 	movq   %rcx, thiscpu_x86_tss + OFFSET_TSS_RSP0(%rbx)
 
-#ifndef CONFIG_NO_FPU
+#ifdef CONFIG_FPU
 	/* Disable the FPU, preparing it to be loaded lazily. */
 	movq   %cr0, %rcx
 	andq   $~CR0_TS, %rcx
@@ -160,7 +161,7 @@ INTERN_FUNCTION(x86_load_thread_rax_cpu_rbx)
 	/* Only disable if the target thread isn't holding the active FPU-context */
 	orq    $(CR0_TS), %rcx
 1:	movq   %rcx, %cr0
-#endif /* !CONFIG_NO_FPU */
+#endif /* CONFIG_FPU */
 
 	/* Check if the old thread had its I/O permissions bitmap loaded. */
 	EXTERN(thiscpu_x86_ioperm_bitmap)

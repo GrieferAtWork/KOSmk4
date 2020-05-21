@@ -24,9 +24,10 @@
 #include <kernel/compiler.h>
 
 #include <debugger/rt.h>
+#include <kernel/arch/idt-foreach.h>
+#include <kernel/arch/idt.h>
+#include <kernel/arch/pic.h>
 #include <kernel/except.h>
-#include <kernel/idt-foreach.h>
-#include <kernel/idt.h>
 #include <kernel/isr.h>
 #include <kernel/malloc.h>
 #include <kernel/printk.h>

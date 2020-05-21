@@ -49,7 +49,7 @@
 
 #ifdef __KERNEL__
 #include <kernel/except.h>
-#include <kernel/gdt.h>
+#include <kernel/arch/gdt.h>
 #else /* __KERNEL__ */
 #include <hybrid/atomic.h>
 

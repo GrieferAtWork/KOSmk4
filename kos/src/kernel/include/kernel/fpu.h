@@ -17,63 +17,72 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_FPU_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_FPU_H 1
+#ifndef GUARD_KERNEL_INCLUDE_KERNEL_FPU_H
+#define GUARD_KERNEL_INCLUDE_KERNEL_FPU_H 1
 
 #include <kernel/compiler.h>
-#include <kernel/types.h>
-#include <kos/kernel/fpu-state.h>
-
-DECL_BEGIN
 
 #ifndef CONFIG_NO_FPU
+#ifdef CONFIG_FPU
+#if (CONFIG_FPU + 0) == 0
+#undef CONFIG_FPU
+#define CONFIG_NO_FPU 1
+#endif /* (CONFIG_FPU + 0) == 0 */
+#else /* CONFIG_FPU */
 #define CONFIG_FPU 1
+#endif /* CONFIG_FPU */
 #else /* !CONFIG_NO_FPU */
 #undef CONFIG_FPU
 #endif /* CONFIG_NO_FPU */
 
-#define FPU_STATE_SSTATE 0 /* `struct sfpustate' is used */
-#define FPU_STATE_XSTATE 1 /* `struct xfpustate' is used */
+#ifdef CONFIG_FPU
+#include <kernel/arch/fpu.h>
 
-#ifndef CONFIG_NO_FPU
+#ifdef CONFIG_FPU
+#include <kos/kernel/fpu-state.h>
+
+DECL_BEGIN
+
 #ifdef __CC__
 
-/* [const] The type of FPU state used (One of `FPU_STATE_*') */
-DATDEF unsigned int const x86_fpustate_variant;
+struct fpustate;
 
 /* [0..1] The task associated with the current FPU register contents, or NULL if none.
  * NOTE: When accessing this field, preemption must be disabled, as
  *       this field affects the behavior of task state switches. */
-DATDEF ATTR_PERCPU struct task *thiscpu_x86_fputhread;
+#ifndef ARCH_FPU_ARCHHEADER_DEFINES_THISCPU_FPUTHREAD
+DATDEF ATTR_PERCPU struct task *thiscpu_x86_fputhread; /* TODO: Rename to `thiscpu_fputhread' */
+#endif /* !ARCH_FPU_ARCHHEADER_DEFINES_THISCPU_FPUTHREAD */
 
 /* [0..1][lock(WRITE_ONCE)][owned]
  * The per-task FPU state (lazily allocated) */
-DATDEF ATTR_PERTASK struct fpustate *this_x86_fpustate;
-
-/* Save/Load the register state of the FPU unit.
- * NOTE: `x86_fpustate_save()' may reset the active FPU context before
- *        returning. - If this isn't intended, `x86_fpustate_save_noreset()'
- *        must be used, which will leave the current FPU state unchanged. */
-FUNDEF NOBLOCK void FCALL x86_fpustate_load(struct fpustate const *__restrict state);
-FUNDEF NOBLOCK void FCALL x86_fpustate_save(struct fpustate *__restrict state);
-FUNDEF NOBLOCK void FCALL x86_fpustate_save_noreset(struct fpustate *__restrict state);
-FUNDEF NOBLOCK void NOTHROW(FCALL x86_fpustate_init)(struct fpustate *__restrict state);
+#ifndef ARCH_FPU_ARCHHEADER_DEFINES_THIS_FPUSTATE
+DATDEF ATTR_PERTASK struct fpustate *this_x86_fpustate; /* TODO: Rename to `this_fpustate' */
+#endif /* !ARCH_FPU_ARCHHEADER_DEFINES_THIS_FPUSTATE */
 
 
 /* Allocate / free FPU state structures. */
+#ifndef ARCH_FPU_ARCHHEADER_DEFINES_FPUSTATE_ALLOC
 FUNDEF WUNUSED ATTR_RETNONNULL ATTR_MALLOC struct fpustate *KCALL fpustate_alloc(void);
 FUNDEF WUNUSED ATTR_MALLOC struct fpustate *NOTHROW(KCALL fpustate_alloc_nx)(void);
+#endif /* !ARCH_FPU_ARCHHEADER_DEFINES_FPUSTATE_ALLOC */
+#ifndef ARCH_FPU_ARCHHEADER_DEFINES_FPUSTATE_FREE
 FUNDEF NOBLOCK void NOTHROW(KCALL fpustate_free)(struct fpustate *__restrict self);
+#endif /* !ARCH_FPU_ARCHHEADER_DEFINES_FPUSTATE_FREE */
 
 /* Ensure that `this_x86_fpustate' has been allocated, allocating
  * and initializing it now if it hasn't already. */
+#ifndef ARCH_FPU_ARCHHEADER_DEFINES_FPUSTATE_INIT
 FUNDEF void KCALL fpustate_init(void) THROWS(E_BADALLOC);
-FUNDEF WUNUSED bool NOTHROW(KCALL fpustate_init_nx)(void);
+FUNDEF WUNUSED __BOOL NOTHROW(KCALL fpustate_init_nx)(void);
+#endif /* !ARCH_FPU_ARCHHEADER_DEFINES_FPUSTATE_INIT */
 
 /* Save the FPU context of the calling thread.
  * This functions are no-ops if the calling thread wasn't the
  * last one to use the FPU, or has never used the FPU at all. */
+#ifndef ARCH_FPU_ARCHHEADER_DEFINES_FPUSTATE_SAVE
 FUNDEF NOBLOCK void NOTHROW(KCALL fpustate_save)(void);
+#endif /* !ARCH_FPU_ARCHHEADER_DEFINES_FPUSTATE_SAVE */
 
 /* Similar to `fpustate_save()', but save the state of whichever thread is
  * currently holding the active FPU context. - When called, this function
@@ -84,54 +93,26 @@ FUNDEF NOBLOCK void NOTHROW(KCALL fpustate_save)(void);
  * in debuggers, where this function is called when suspending execution of
  * the associated CPU, after which the debugger can read/write FPU information
  * for any thread by simply looking at `PERTASK(thread, this_x86_fpustate)' */
+#ifndef ARCH_FPU_ARCHHEADER_DEFINES_FPUSTATE_SAVECPU
 FUNDEF NOBLOCK void NOTHROW(KCALL fpustate_savecpu)(void);
+#endif /* !ARCH_FPU_ARCHHEADER_DEFINES_FPUSTATE_SAVECPU */
 
 
 /* Load / Save the FPU context of the calling thread to/from the given `state'
  * If no FPU state had yet to be allocated when `fpustate_loadfrom()' is called,
  * a new state will be allocated before returning. */
+#ifndef ARCH_FPU_ARCHHEADER_DEFINES_FPUSTATE_LOADFROM
 FUNDEF NOBLOCK void KCALL fpustate_loadfrom(USER CHECKED struct fpustate const *state) THROWS(E_SEGFAULT, E_BADALLOC);
+#endif /* !ARCH_FPU_ARCHHEADER_DEFINES_FPUSTATE_LOADFROM */
+#ifndef ARCH_FPU_ARCHHEADER_DEFINES_FPUSTATE_SAVEINTO
 FUNDEF NOBLOCK void KCALL fpustate_saveinto(USER CHECKED struct fpustate *state) THROWS(E_SEGFAULT);
-
-
-/* Same as the instructions of the same name, but
- * emulated if those instructions aren't supported.
- * NOTE: On x86_64, `x86_fxsave()' and `x86_fxrstor()' map to the 64-bit variants of the
- *       individual instruction. - To use the 32-bit variants, use the functions below. */
-FUNDEF NOBLOCK void FCALL x86_fxsave(USER CHECKED struct xfpustate *state) THROWS(E_SEGFAULT);
-FUNDEF NOBLOCK void FCALL x86_fxrstor(USER CHECKED struct xfpustate const *state) THROWS(E_SEGFAULT);
-#ifdef __x86_64__
-struct xfpustate32;
-FUNDEF NOBLOCK void FCALL x86_fxsave32(USER CHECKED struct xfpustate32 *state) THROWS(E_SEGFAULT);
-FUNDEF NOBLOCK void FCALL x86_fxrstor32(USER CHECKED struct xfpustate32 const *state) THROWS(E_SEGFAULT);
-FUNDEF NOBLOCK void FCALL x86_fxsave64(USER CHECKED struct xfpustate *state) ASMNAME("x86_fxsave") THROWS(E_SEGFAULT);
-FUNDEF NOBLOCK void FCALL x86_fxrstor64(USER CHECKED struct xfpustate const *state) ASMNAME("x86_fxrstor") THROWS(E_SEGFAULT);
-#else /* __x86_64__ */
-FUNDEF NOBLOCK void FCALL x86_fxsave32(USER CHECKED struct xfpustate *state) ASMNAME("x86_fxsave") THROWS(E_SEGFAULT);
-FUNDEF NOBLOCK void FCALL x86_fxrstor32(USER CHECKED struct xfpustate const *state) ASMNAME("x86_fxrstor") THROWS(E_SEGFAULT);
-#endif /* !__x86_64__ */
-
-/* The value that will always be written to `struct xfpustate::fs_mxcsr_mask' */
-DATDEF u32 const x86_fxsave_mxcsr_mask;
-
-
-
-
-#ifdef __x86_64__
-struct fpustate32;
-FUNDEF NOBLOCK void KCALL fpustate32_loadfrom(USER CHECKED struct fpustate32 const *state) THROWS(E_SEGFAULT, E_BADALLOC);
-FUNDEF NOBLOCK void KCALL fpustate32_saveinto(USER CHECKED struct fpustate32 *state) THROWS(E_SEGFAULT);
-#define fpustate64_loadfrom fpustate_loadfrom
-#define fpustate64_saveinto fpustate_saveinto
-#else /* __x86_64__ */
-#define fpustate32_loadfrom fpustate_loadfrom
-#define fpustate32_saveinto fpustate_saveinto
-#endif /* !__x86_64__ */
+#endif /* !ARCH_FPU_ARCHHEADER_DEFINES_FPUSTATE_SAVEINTO */
 
 
 #endif /* __CC__ */
-#endif /* !CONFIG_NO_FPU */
 
 DECL_END
+#endif /* CONFIG_FPU */
+#endif /* CONFIG_FPU */
 
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_FPU_H */
+#endif /* !GUARD_KERNEL_INCLUDE_KERNEL_FPU_H */

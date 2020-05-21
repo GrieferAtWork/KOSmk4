@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_IO_UHCI_H
-#define _KOS_IO_UHCI_H 1
+#ifndef _HW_USB_UHCI_H
+#define _HW_USB_UHCI_H 1
 
 #include <__stdinc.h>
 
@@ -28,7 +28,6 @@
 #include <sys/io.h>
 
 __SYSDECL_BEGIN
-
 
 /* Refs:
  *   - ftp://ftp.netbsd.org/pub/NetBSD/misc/blymn/uhci11d.pdf
@@ -169,7 +168,6 @@ struct /*__ATTR_ALIGNED(16)*/ uhci_td {
 	(((((self)->td_tok & UHCI_TDTOK_MAXLENM) >> UHCI_TDTOK_MAXLENS) + 1) & \
 	 (UHCI_TDTOK_MAXLENM >> UHCI_TDTOK_MAXLENS))
 
-
 struct /*__ATTR_ALIGNED(16)*/ uhci_qh {
 	/* Queue head descriptor. */
 	__PHYS __uint32_t qh_hp;  /* [in]     Queue head link pointer (set of `UHCI_QHHP_*') */
@@ -178,7 +176,6 @@ struct /*__ATTR_ALIGNED(16)*/ uhci_qh {
 };
 #endif /* __CC__ */
 
-
 __SYSDECL_END
 
-#endif /* !_KOS_IO_UHCI_H */
+#endif /* !_HW_USB_UHCI_H */

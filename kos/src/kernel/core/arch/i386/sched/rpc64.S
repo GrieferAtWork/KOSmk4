@@ -19,11 +19,12 @@
  */
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_SCHED_RPC64_S
 #define GUARD_KERNEL_CORE_ARCH_I386_SCHED_RPC64_S 1
+#define __ASSEMBLER__ 1
 
 #include <kernel/compiler.h>
 
+#include <kernel/arch/gdt.h>
 #include <kernel/except.h>
-#include <kernel/gdt.h>
 #include <sched/rpc.h>
 #include <sched/task.h>
 

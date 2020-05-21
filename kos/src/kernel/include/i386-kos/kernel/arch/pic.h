@@ -17,13 +17,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_PIC_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_PIC_H 1
+#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_PIC_H
+#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_PIC_H 1
 
 #include <kernel/compiler.h>
 
 #include <kernel/types.h>
 
+#include <hw/ic/pic.h>
 #include <sys/io.h>
 
 #include "idt.h"
@@ -40,29 +41,6 @@ DECL_BEGIN
  * @return: * : The IRQ number. */
 #define X86_INTNO_PIC1(i) (X86_INTERRUPT_PIC1_BASE + (i))
 #define X86_INTNO_PIC2(i) (X86_INTERRUPT_PIC2_BASE + (i))
-
-
-/* PIC (Programmable Interrupt Controller) API. */
-#define X86_PIC1       __IOPORT(0x20) /* IO base address for master PIC */
-#define X86_PIC2       __IOPORT(0xa0) /* IO base address for slave PIC */
-#define X86_PIC1_CMD   X86_PIC1
-#define X86_PIC1_DATA (X86_PIC1 + 1)
-#define X86_PIC2_CMD   X86_PIC2
-#define X86_PIC2_DATA (X86_PIC2 + 1)
-
-#define X86_PIC_CMD_EOI     0x20 /* End-of-interrupt command code */
-#define X86_ICW1_ICW4       0x01 /* ICW4 (not) needed */
-#define X86_ICW1_SINGLE     0x02 /* Single (cascade) mode */
-#define X86_ICW1_INTERVAL4  0x04 /* Call address interval 4 (8) */
-#define X86_ICW1_LEVEL      0x08 /* Level triggered (edge) mode */
-#define X86_ICW1_INIT       0x10 /* Initialization - required! */
-#define X86_ICW4_8086       0x01 /* 8086/88 (MCS-80/85) mode */
-#define X86_ICW4_AUTO       0x02 /* Auto (normal) EOI */
-#define X86_ICW4_BUF_SLAVE  0x08 /* Buffered mode/slave */
-#define X86_ICW4_BUF_MASTER 0x0c /* Buffered mode/master */
-#define X86_ICW4_SFNM       0x10 /* Special fully nested (not) */
-#define X86_PIC_READ_IRR    0x0a /* OCW3 irq ready next CMD read */
-#define X86_PIC_READ_ISR    0x0b /* OCW3 irq service next CMD read */
 
 #ifdef __CC__
 #define X86_PIC1_IRR() (outb(X86_PIC1_CMD, X86_PIC_READ_IRR), inb(X86_PIC2_CMD))
@@ -101,7 +79,6 @@ DATDEF ATTR_PERCPU struct x86_spurious_interrupts thiscpu_x86_spurious_interrupt
 #define X86_PIC2_STMASK(m) outb_p(X86_PIC2_DATA, m)
 #endif /* __CC__ */
 
-
 /* Standard ISA IRQ numbers.
  * >> This is the default wireing of hardware interrupts. */
 #define X86_INTNO_PIC1_PIT   X86_INTNO_PIC1(0) /* Programmable Interrupt Timer Interrupt. */
@@ -123,4 +100,4 @@ DATDEF ATTR_PERCPU struct x86_spurious_interrupts thiscpu_x86_spurious_interrupt
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_PIC_H */
+#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_PIC_H */

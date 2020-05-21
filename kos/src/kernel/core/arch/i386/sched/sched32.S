@@ -23,14 +23,14 @@
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
-#include <kernel/apic.h>
+#include <kernel/arch/apic.h>
+#include <kernel/arch/breakpoint.h>
+#include <kernel/arch/gdt.h>
+#include <kernel/arch/pic.h>
+#include <kernel/arch/pit.h>
 #include <kernel/arch/syscall-tables.h>
-#include <kernel/breakpoint.h>
 #include <kernel/except.h>
-#include <kernel/fpu.h>
-#include <kernel/gdt.h>
-#include <kernel/pic.h>
-#include <kernel/pit.h>
+#include <kernel/fpu.h> /* CONFIG_FPU */
 #include <kernel/syscall.h>
 #include <sched/task.h>
 #include <sched/tss.h>
@@ -40,6 +40,8 @@
 #include <asm/instr/jccN.h>
 #include <asm/param.h>
 #include <kos/kernel/cpu-state.h>
+
+
 
 .section .text
 INTERN_FUNCTION(x86_idt_apic_spurious)
@@ -192,7 +194,7 @@ INTERN_FUNCTION(x86_load_thread_eax_cpu_ebx)
 	movb   %cl,           OFFSET_SEGMENT_DESCRIPTOR_BASE2 + GDT(SEGMENT_USER_GSBASE) /* Set base_hi */
 #undef GDT
 
-#ifndef CONFIG_NO_FPU
+#ifdef CONFIG_FPU
 	/* Disable the FPU, preparing it to be loaded lazily. */
 	movl   %cr0, %ecx
 	andl   $(~CR0_TS), %ecx
@@ -203,7 +205,7 @@ INTERN_FUNCTION(x86_load_thread_eax_cpu_ebx)
 	/* Only disable if the target thread isn't holding the active FPU-context */
 	orl    $(CR0_TS), %ecx
 1:	movl   %ecx, %cr0
-#endif /* !CONFIG_NO_FPU */
+#endif /* CONFIG_FPU */
 
 	/* Check if the old thread had its I/O permissions bitmap loaded. */
 	EXTERN(thiscpu_x86_ioperm_bitmap)

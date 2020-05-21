@@ -26,6 +26,7 @@
 #include <kernel/compiler.h>
 
 #include <drivers/pci.h>
+#include <kernel/arch/pic.h> /* X86_INTERRUPT_PIC1_BASE (TODO: Non-portable) */
 #include <kernel/aio.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
@@ -37,8 +38,8 @@
 
 #include <hybrid/atomic.h>
 
+#include <hw/net/ne2k.h>
 #include <kos/except/io.h>
-#include <kos/io/ne2k.h>
 #include <linux/if_ether.h>
 #include <sys/io.h>
 
@@ -1339,7 +1340,7 @@ Ne2k_ProbePciDevice(struct pci_device *__restrict dev) THROWS(...) {
 	self->nk_rx_end    = 128;
 
 	/* set-up IRQ handling. */
-	hisr_register_at(X86_INTERRUPT_PIC1_BASE +
+	hisr_register_at(X86_INTERRUPT_PIC1_BASE + /* TODO: Non-portable */
 	                 PCI_GDEV3C_IRQLINE(pci_read(dev->pd_base, PCI_GDEV3C)),
 	                 &Ne2k_InterruptHandler, self);
 

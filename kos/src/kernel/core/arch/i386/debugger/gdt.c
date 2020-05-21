@@ -30,13 +30,12 @@ if (gcc_opt.remove("-O3"))
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
-#include <kernel/gdt.h>
 
 #ifdef CONFIG_HAVE_DEBUGGER
 #include <debugger/hook.h>
+#include <kernel/arch/gdt.h>
 
 #include <kos/kernel/cpu-state.h>
-
 
 DECL_BEGIN
 

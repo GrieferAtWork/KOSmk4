@@ -24,9 +24,10 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/apic.h>
+#include <kernel/arch/apic.h>
+#include <kernel/arch/breakpoint.h>
 #include <kernel/arch/cpuid.h>
-#include <kernel/breakpoint.h>
+#include <kernel/fpu.h> /* CONFIG_FPU */
 #include <sched/cpu.h>
 
 #include <hybrid/host.h>
@@ -46,9 +47,9 @@
 
 #include <stddef.h>
 #ifdef __x86_64__
-#include <asm/instr/movzxq.h>
 #include <asm/instr/fsgsbase.h>
 #include <asm/instr/interrupt.h>
+#include <asm/instr/movzxq.h>
 #endif /* __x86_64__ */
 
 #ifndef CONFIG_NO_SMP
@@ -1047,7 +1048,7 @@ INTERN_FUNCTION(x86_smp_entry64)
 #undef GDT
 #endif /* !__x86_64__ */
 
-#ifndef CONFIG_NO_FPU
+#ifdef CONFIG_FPU
 	/* Disable the FPU, preparing it to be loaded lazily. */
 	movP   %cr0, %Pcx
 	orP    $(CR0_TS), %Pcx
@@ -1057,7 +1058,7 @@ INTERN_FUNCTION(x86_smp_entry64)
 	 *       however it's safer to unconditionally do this during initialization! */
 	EXTERN(thiscpu_x86_fputhread)
 	movP   $(0), thiscpu_x86_fputhread(R_CPU)
-#endif /* !CONFIG_NO_FPU */
+#endif /* CONFIG_FPU */
 
 	/* (Partially) load the underlying CPU state */
 #ifdef __x86_64__
@@ -1149,7 +1150,7 @@ PUBLIC_FUNCTION(cpu_enter_deepsleep)
 	pushal_cfi_r             /* gpregs */
 #endif /* !__x86_64__ */
 
-#ifndef CONFIG_NO_FPU
+#ifdef CONFIG_FPU
 	/* With the CPU about to go OFFLINE, make sure to also save the current
 	 * FPU state (if the FPU was used), so-as to not lose that information
 	 * and have it still be available when we come back online. */
@@ -1166,7 +1167,7 @@ PUBLIC_FUNCTION(cpu_enter_deepsleep)
 	call   x86_fpustate_save
 	movP   %Pbx, %R_fcall0P /* Restore THIS_CPU */
 1:
-#endif /* !CONFIG_NO_FPU */
+#endif /* CONFIG_FPU */
 
 	/* TODO: Save the current GDT/IDT/LDTR/TR in some PERCPU field.
 	 *       There are system functions that will temporarily alter these

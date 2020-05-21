@@ -24,12 +24,14 @@
 
 #ifdef CONFIG_HAVE_DEBUGGER
 #include <kernel/compiler.h>
-#include <kernel/pic.h>
-#include <kernel/apic.h>
-#include <asm/cpu-flags.h>
+
+#include <kernel/arch/apic.h>
+#include <kernel/arch/pic.h>
+
 #include <asm/cfi.h>
-#include <kos/kernel/gdt.h>
+#include <asm/cpu-flags.h>
 #include <kos/kernel/cpu-state.h>
+#include <kos/kernel/gdt.h>
 
 
 

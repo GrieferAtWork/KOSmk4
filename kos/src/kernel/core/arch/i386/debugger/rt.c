@@ -35,10 +35,10 @@ if (gcc_opt.remove("-O3"))
 #include <debugger/entry.h>
 #include <debugger/hook.h>
 #include <debugger/rt.h>
-#include <kernel/apic.h>
-#include <kernel/gdt.h>
-#include <kernel/idt.h>
-#include <kernel/pic.h>
+#include <kernel/arch/apic.h>
+#include <kernel/arch/gdt.h>
+#include <kernel/arch/idt.h>
+#include <kernel/arch/pic.h>
 #include <kernel/types.h>
 #include <kernel/vm.h>
 #include <kernel/vm/phys.h>

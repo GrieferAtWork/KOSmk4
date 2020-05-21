@@ -25,11 +25,12 @@
 #include <kernel/compiler.h>
 
 #include <kernel/arch/cpuid.h>
+#include <kernel/arch/gdt.h>
+#include <kernel/arch/multiboot.h>
 #include <kernel/boot.h>
 #include <kernel/driver-param.h>
-#include <kernel/gdt.h>
+#include <kernel/fpu.h> /* CONFIG_FPU */
 #include <kernel/memory.h>
-#include <kernel/multiboot.h>
 #include <kernel/printk.h>
 #include <kernel/rand.h>
 #include <kernel/types.h>
@@ -249,10 +250,10 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* XXX: ioapic support (ioapic is the modern equivalent of the pic) */
 
-#ifndef CONFIG_NO_FPU
+#ifdef CONFIG_FPU
 	/* Initialize the FPU sub-system. */
 	x86_initialize_fpu();
-#endif /* !CONFIG_NO_FPU */
+#endif /* CONFIG_FPU */
 
 	/* Make the kernel's .text and .rodata sections read-only. */
 	x86_initialize_kernel_vm_readonly();

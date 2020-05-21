@@ -23,7 +23,7 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/phys2virt64.h>
+#include <kernel/arch/phys2virt64.h>
 
 #ifdef CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC
 

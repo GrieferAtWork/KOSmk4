@@ -22,10 +22,11 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/phys2virt64.h>
 #include <kernel/types.h>
 #ifdef CONFIG_BUILDING_KERNEL_CORE
-#include <kernel/vboxgdb.h>
+#include <kernel/arch/phys2virt64.h> /* CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC */
+#include <kernel/fpu.h>              /* CONFIG_FPU */
+#include <kernel/vboxgdb.h>          /* CONFIG_VBOXGDB */
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 
 #include <asm/pagesize.h>
@@ -80,9 +81,9 @@ INTDEF FREE void NOTHROW(KCALL x86_initialize_rand_entropy)(void);
 #ifndef CONFIG_NO_DEBUGGER
 INTERN FREE void NOTHROW(KCALL x86_initialize_debugger_textfont)(void);
 #endif /* !CONFIG_NO_DEBUGGER */
-#ifndef CONFIG_NO_FPU
+#ifdef CONFIG_FPU
 INTDEF FREE void NOTHROW(KCALL x86_initialize_fpu)(void);
-#endif /* !CONFIG_NO_FPU */
+#endif /* CONFIG_FPU */
 #ifndef __x86_64__
 INTDEF FREE void NOTHROW(KCALL x86_initialize_atomic64)(void);
 #endif /* !__x86_64__ */

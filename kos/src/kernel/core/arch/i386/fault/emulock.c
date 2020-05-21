@@ -24,7 +24,7 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/emulock.h>
+#include <kernel/arch/emulock.h>
 #include <kernel/except.h>
 #include <kernel/types.h>
 #include <kernel/vm.h>

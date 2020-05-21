@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_IO_SERIAL_H
-#define _KOS_IO_SERIAL_H 1
+#ifndef _HW_BUS_SERIAL_H
+#define _HW_BUS_SERIAL_H 1
 
 #include <__stdinc.h>
 
@@ -119,4 +119,4 @@
 
 
 
-#endif /* !_KOS_IO_SERIAL_H */
+#endif /* !_HW_BUS_SERIAL_H */

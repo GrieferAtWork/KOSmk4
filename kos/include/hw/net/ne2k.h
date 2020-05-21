@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_IO_NE2K_H
-#define _KOS_IO_NE2K_H 1
+#ifndef _HW_NET_NE2K_H
+#define _HW_NET_NE2K_H 1
 
 #include <__stdinc.h>
 
@@ -155,4 +155,4 @@ struct e8390_pkt_hdr {
 __DECL_END
 #endif /* __CC__ */
 
-#endif /* !_KOS_IO_NE2K_H */
+#endif /* !_HW_NET_NE2K_H */

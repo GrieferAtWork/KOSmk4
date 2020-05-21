@@ -36,8 +36,8 @@
 #include <hybrid/byteswap.h>
 #include <hybrid/unaligned.h>
 
-#include <kos/io/scsi.h>
-#include <kos/io/usb.h>
+#include <hw/disk/scsi.h>
+#include <hw/usb/usb.h>
 
 #include <assert.h>
 #include <stdio.h>

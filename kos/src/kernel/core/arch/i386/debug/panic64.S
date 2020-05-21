@@ -22,10 +22,10 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/fsgsbase.h>
 #include <kernel/panic.h>
 
 #include <asm/cfi.h>
+#include <asm/instr/fsgsbase.h>
 #include <bits/va_list-struct.h>
 #include <kos/kernel/cpu-state-asm.h>
 #include <kos/kernel/cpu-state.h>

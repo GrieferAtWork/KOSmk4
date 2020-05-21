@@ -22,11 +22,12 @@
 
 #include <kernel/compiler.h>
 
+#include <dev/char.h>
 #include <drivers/pci.h>
 #include <drivers/usb.h>
-#include <dev/char.h>
 #include <kernel/printk.h>
-#include <kos/io/ohci.h>
+
+#include <hw/usb/ohci.h>
 
 DECL_BEGIN
 

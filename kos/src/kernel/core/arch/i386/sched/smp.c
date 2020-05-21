@@ -24,12 +24,12 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/apic.h>
+#include <kernel/arch/apic.h>
+#include <kernel/arch/pic.h>
+#include <kernel/driver-param.h>
 #include <kernel/paging.h>
-#include <kernel/pic.h>
 #include <kernel/printk.h>
 #include <kernel/vm.h>
-#include <kernel/driver-param.h>
 #include <sched/cpu.h>
 #include <sched/smp.h>
 #include <sched/task.h>

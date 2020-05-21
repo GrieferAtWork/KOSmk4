@@ -23,16 +23,16 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/apic.h>
-#include <kernel/pic.h>
-#include <kernel/pit.h>
+#include <kernel/arch/apic.h>
+#include <kernel/arch/pic.h>
+#include <kernel/arch/pit.h>
 
 #include <hybrid/host.h>
 
+#include <asm/instr/compat.h>
 #include <asm/instr/jccN.h>
 #include <asm/param.h>
 
-#include <asm/instr/compat.h>
 #ifdef __x86_64__
 #include <asm/instr/movzxq.h>
 #endif /* __x86_64__ */

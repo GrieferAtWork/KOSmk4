@@ -27,8 +27,8 @@
 #include <kernel/printk.h>
 #include <kernel/types.h>
 
-#include <kos/io/usb-class.h>
-#include <kos/io/usb.h>
+#include <hw/usb/class.h>
+#include <hw/usb/usb.h>
 
 #include "scsi.h"
 

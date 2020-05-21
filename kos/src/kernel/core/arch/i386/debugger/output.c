@@ -43,7 +43,7 @@ if (gcc_opt.remove("-O3"))
 #include <hybrid/minmax.h>
 #include <hybrid/overflow.h>
 
-#include <kos/io/vga.h>
+#include <hw/video/vga.h>
 #include <sys/io.h>
 
 #include <assert.h>

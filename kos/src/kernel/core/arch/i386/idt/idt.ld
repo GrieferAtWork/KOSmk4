@@ -22,9 +22,10 @@
 #endif /* __INTELLISENSE__ */
 
 #include <hybrid/compiler.h>
-#include <hybrid/host.h>
 
-#include <kernel/idt-names.h>
+#include <kernel/arch/idt-names.h>
+
+#include <hybrid/host.h>
 
 #include <kos/kernel/gdt.h>
 #include <kos/kernel/segment.h>

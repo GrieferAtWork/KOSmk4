@@ -25,7 +25,7 @@
 #ifdef CONFIG_HAVE_DEBUGGER
 #include <kernel/compiler.h>
 
-#include <kernel/idt-names.h>
+#include <kernel/arch/idt-names.h>
 
 #include <hybrid/host.h>
 #include <hybrid/typecore.h>

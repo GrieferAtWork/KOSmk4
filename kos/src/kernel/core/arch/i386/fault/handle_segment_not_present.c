@@ -24,9 +24,9 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/arch/fault.h>
 #include <kernel/arch/syscall-tables.h> /* CONFIG_X86_EMULATE_LCALL7 */
 #include <kernel/except.h>
-#include <kernel/fault.h>
 #include <kernel/syscall-properties.h>
 #include <kernel/syscall.h>
 #include <kernel/user.h>

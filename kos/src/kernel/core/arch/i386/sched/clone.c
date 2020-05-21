@@ -24,9 +24,9 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/arch/gdt.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
-#include <kernel/gdt.h>
 #include <kernel/heap.h>
 #include <kernel/malloc.h>
 #include <kernel/printk.h>

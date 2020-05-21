@@ -26,13 +26,13 @@
 #include <drivers/ata.h>
 #include <drivers/pci.h>
 #include <kernel/aio.h>
+#include <kernel/arch/pic.h> /* TODO: Non-portable! */
 #include <kernel/compat.h>
 #include <kernel/driver-param.h>
 #include <kernel/except.h>
 #include <kernel/heap.h>
 #include <kernel/iovec.h>
 #include <kernel/isr.h>
-#include <kernel/pic.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
@@ -1476,9 +1476,13 @@ NOTHROW(KCALL Ata_InitializeDrive)(struct ata_ports *__restrict ports,
 				bus->b_prdt   = NULL;
 				/* The BUS structure must be registered alongside an interrupt registration. */
 				if (is_primary_ata) {
-					isr_register_at(0xfe, (isr_function_t)&handle_ata_bus_interrupt, bus);
+					isr_register_at(X86_INTNO_PIC2_ATA1, /* TODO: Non-portable! */
+					                (isr_function_t)&handle_ata_bus_interrupt,
+					                bus);
 				} else {
-					isr_register_at(0xff, (isr_function_t)&handle_ata_bus_interrupt, bus);
+					isr_register_at(X86_INTNO_PIC2_ATA2, /* TODO: Non-portable! */
+					                (isr_function_t)&handle_ata_bus_interrupt,
+					                bus);
 				}
 			}
 			TRY {

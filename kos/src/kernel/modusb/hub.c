@@ -33,9 +33,9 @@
 #include <kernel/printk.h>
 #include <sched/cpu.h>
 
-#include <kos/io/usb-class.h>
-#include <kos/io/usb-hub.h>
-#include <kos/io/usb.h>
+#include <hw/usb/class.h>
+#include <hw/usb/hub.h>
+#include <hw/usb/usb.h>
 
 #include <stdio.h>
 
