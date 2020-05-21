@@ -48,16 +48,18 @@
 #include <unistd.h>  /* sync() */
 
 #include <libansitty/ansitty.h>
+#include <libansitty/ctl.h>
 
-#define NDEBUG 1 /* FIXME: Integrate leak detection support for kernel slab allocators! */
-#include <assert.h>  /* assert() */
+#define NDEBUG 1    /* FIXME: Integrate leak detection support for kernel slab allocators! */
+#include <assert.h> /* assert() */
 #undef NDEBUG
 
 DECL_BEGIN
 
 PRIVATE char const *init_envp[] = {
-	"PATH=/bin",
 	"HOME=/",
+	"PATH=/bin",
+	"PWD=/",
 	"TERM=xterm",
 	NULL
 };
@@ -77,6 +79,10 @@ PRIVATE void console_sane_ios(void) {
 
 
 
+/* User-space entry point for /bin/init
+ * NOTE: This program is running as PID=1 (i.e. _boottask), which carries
+ *       the `TASK_FCRITICAL' flag, meaning that if this program ever dies,
+ *       then the kernel will (intentionally) PANIC! */
 int main(int argc, char *argv[], char *envp[]) {
 	(void)argc;
 	(void)argv;
@@ -214,19 +220,21 @@ done_procfs:
 		/* Do some cleanup on the console. */
 		dprintf(STDOUT_FILENO,
 		        ANSITTY_RESET_SEQUENCE /* Reset the TTY */
-		        "\033[f" /* HVP(1,1): Place cursor at 0,0 */
-		        "\033[J" /* ED(0):    Clear screen */);
+		        AC_HVP("", "")         /* Place cursor at 0,0 */
+		        AC_ED("")              /* Clear screen */
+		        "");
 
 		/* Don't directly exec() busybox.
 		 * Instead, fork()+exec(), then keep on doing so
-		 * whenever busybox dies (such as when the user presses
-		 * CTRL+D do trigger an end-of-input event) */
+		 * whenever busybox dies (such as when the user
+		 * presses CTRL+D do trigger an end-of-input event) */
 		cpid = VFork();
 		if (cpid == 0) {
 			/* Become the foreground process of /dev/console */
 			console_set_fgproc();
 			execle("/bin/busybox", "bash", (char *)NULL, init_envp);
 			execle("/bin/sh", "sh", (char *)NULL, init_envp);
+			execle("/bin/hash", "hash", (char *)NULL, init_envp);
 			dprintf(STDOUT_FILENO, "Failed to launch shell: %s\n", strerror(errno));
 			for (;;) {
 				char buf[1];

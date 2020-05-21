@@ -67,7 +67,7 @@
 #define _AC_ESC "\033"
 
 /* <CANCEL> (aborts in-progress escape sequence) */
-#define AC_CAN "\x18"
+#define AC_CAN "\030"
 
 /* SET_CURSOR(x: 0, y: GET_CURSOR_Y()); */
 #define AC_CR "\r"
@@ -183,7 +183,8 @@
 #define AC_SD(lines) _AC_ESC "[" lines "T"
 
 /* Same as `AC_VPA(cury) AC_CHA(cury)' */
-#define AC_CUP(cury, curx) _AC_ESC "[" cury ";" curx "H"
+#define AC_CUP(cury, curx) _AC_ESC "[" cury ";" curx "H" /* CUrsorPosition */
+#define AC_HVP(cury, curx) _AC_ESC "[" cury ";" curx "f" /* HorizontalVerticalPosition (alias for CUP) */
 
 /* Same as `AC_VPA("1") AC_CHA("1")' */
 #define AC_CUP0   _AC_ESC "[b"

@@ -148,7 +148,7 @@
  *                        reset itself to accept text or the start of an escape sequence)
  *   - `\033c' -- Reset TTY (resets colors, display-attributes, tty-flags and tty-mode)
  */
-#define ANSITTY_RESET_SEQUENCE  "\030\033c"
+#define ANSITTY_RESET_SEQUENCE  "\030\033c" /* == AC_CAN AC_RIS */
 
 #define ANSITTY_CLS_AFTER    0 /* Clear everything after the cursor (including the cursor itself). */
 #define ANSITTY_CLS_BEFORE   1 /* Clear everything before the cursor (excluding the cursor itself). */
