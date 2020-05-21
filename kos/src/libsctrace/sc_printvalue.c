@@ -271,6 +271,7 @@ print_mode_t(pformatprinter printer, void *arg, mode_t mode) {
 		                       (mode_t)(mode & S_IFMT));
 		if unlikely(result < 0)
 			goto done;
+		is_first = false;
 	}
 	for (i = 0; i < COMPILER_LENOF(mode_names); ++i) {
 		char const *name;
@@ -2082,6 +2083,10 @@ do_struct_timespecx64:
 
 #ifdef HAVE_SC_REPR_MODE_T
 	case SC_REPR_MODE_T:
+		/* Handle the special case of the 3rd argument
+		 * to sys_open(), where the mode value is ignored */
+		if (link && (link->sa_value.sv_u64 & (O_CREAT | (O_TMPFILE & ~O_DIRECTORY))) != 0)
+			value.sv_u64 = 0;
 		result = print_mode_t(printer, arg, (mode_t)value.sv_u64);
 		break;
 #endif /* HAVE_SC_REPR_MODE_T */

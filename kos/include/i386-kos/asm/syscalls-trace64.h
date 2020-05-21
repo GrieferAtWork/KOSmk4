@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf5a0b9cd */
+/* HASH CRC-32:0x594f98b4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -951,6 +951,7 @@
 #define __NRATR0_open                   SC_REPR_FILENAME                                                     /* filename */ 
 #define __NRATR1_open                   SC_REPR_OFLAG_T                                                      /* oflags */ 
 #define __NRATR2_open                   SC_REPR_MODE_T                                                       /* mode */ 
+#define __NRATL2_open                   1                                                                    /* mode -> oflags */ 
 #define __NRRTR_open                    SC_REPR_FD_T                                                         /* return */
 #define __NRATR0_close                  SC_REPR_FD_T                                                         /* fd */ 
 #define __NRRTR_close                   SC_REPR_ERRNO_T                                                      /* return */
@@ -1705,6 +1706,7 @@
 #define __NRATR0_mq_open                SC_REPR_STRING                                                       /* name */ 
 #define __NRATR1_mq_open                SC_REPR_OFLAG_T                                                      /* oflags */ 
 #define __NRATR2_mq_open                SC_REPR_MODE_T                                                       /* mode */ 
+#define __NRATL2_mq_open                1                                                                    /* mode -> oflags */ 
 #define __NRRTR_mq_open                 SC_REPR_FD_T                                                         /* return */
 #define __NRATR0_mq_unlink              SC_REPR_STRING                                                       /* name */ 
 #define __NRRTR_mq_unlink               SC_REPR_ERRNO_T                                                      /* return */
@@ -1765,6 +1767,7 @@
 #define __NRATL1_openat                 0                                                                    /* filename -> dirfd */ 
 #define __NRATR2_openat                 SC_REPR_OFLAG_T                                                      /* oflags */ 
 #define __NRATR3_openat                 SC_REPR_MODE_T                                                       /* mode */ 
+#define __NRATL3_openat                 2                                                                    /* mode -> oflags */ 
 #define __NRRTR_openat                  SC_REPR_FD_T                                                         /* return */
 #define __NRATR0_mkdirat                SC_REPR_FD_T                                                         /* dirfd */ 
 #define __NRATR1_mkdirat                SC_REPR_FILENAME                                                     /* pathname */ 

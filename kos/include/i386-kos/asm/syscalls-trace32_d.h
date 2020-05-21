@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x82ac6bfb */
+/* HASH CRC-32:0x487dc1d5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1148,6 +1148,7 @@
 #define __NR32ATR0_open                    SC_REPR_FILENAME                                                     /* filename */ 
 #define __NR32ATR1_open                    SC_REPR_OFLAG_T                                                      /* oflags */ 
 #define __NR32ATR2_open                    SC_REPR_MODE_T                                                       /* mode */ 
+#define __NR32ATL2_open                    1                                                                    /* mode -> oflags */ 
 #define __NR32RTR_open                     SC_REPR_FD_T                                                         /* return */
 #define __NR32ATR0_close                   SC_REPR_FD_T                                                         /* fd */ 
 #define __NR32RTR_close                    SC_REPR_ERRNO_T                                                      /* return */
@@ -1967,6 +1968,7 @@
 #define __NR32ATR0_mq_open                 SC_REPR_STRING                                                       /* name */ 
 #define __NR32ATR1_mq_open                 SC_REPR_OFLAG_T                                                      /* oflags */ 
 #define __NR32ATR2_mq_open                 SC_REPR_MODE_T                                                       /* mode */ 
+#define __NR32ATL2_mq_open                 1                                                                    /* mode -> oflags */ 
 #define __NR32RTR_mq_open                  SC_REPR_FD_T                                                         /* return */
 #define __NR32ATR0_mq_unlink               SC_REPR_STRING                                                       /* name */ 
 #define __NR32RTR_mq_unlink                SC_REPR_ERRNO_T                                                      /* return */
@@ -2027,6 +2029,7 @@
 #define __NR32ATL1_openat                  0                                                                    /* filename -> dirfd */ 
 #define __NR32ATR2_openat                  SC_REPR_OFLAG_T                                                      /* oflags */ 
 #define __NR32ATR3_openat                  SC_REPR_MODE_T                                                       /* mode */ 
+#define __NR32ATL3_openat                  2                                                                    /* mode -> oflags */ 
 #define __NR32RTR_openat                   SC_REPR_FD_T                                                         /* return */
 #define __NR32ATR0_mkdirat                 SC_REPR_FD_T                                                         /* dirfd */ 
 #define __NR32ATR1_mkdirat                 SC_REPR_FILENAME                                                     /* pathname */ 

@@ -304,8 +304,8 @@ idle:() -> errno_t;
 [cp] readf:(fd_t fd, [tostr(out:BUFFER:bufsize:return)] void *buf, size_t bufsize, iomode_t mode) -> ssize_t;
 [cp] write:(fd_t fd, [tostr(BUFFER:bufsize)] void const *buf, size_t bufsize) -> ssize_t;
 [cp] writef:(fd_t fd, [tostr(BUFFER:bufsize)] void const *buf, size_t bufsize, iomode_t mode) -> ssize_t;
-[cp] open:([tostr(FILENAME)] char const *filename, oflag_t oflags, mode_t mode) -> fd_t;
-[cp] openat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, oflag_t oflags, mode_t mode) -> fd_t;
+[cp] open:([tostr(FILENAME)] char const *filename, oflag_t oflags, [tostr(MODE_T:oflags)] mode_t mode) -> fd_t;
+[cp] openat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, oflag_t oflags, [tostr(MODE_T:oflags)] mode_t mode) -> fd_t;
 
 
 @@Close a given file descriptor/handle `FD'
@@ -1279,7 +1279,7 @@ get_mempolicy:(int TODO_PROTOTYPE) -> errno_t;
 set_mempolicy:(int TODO_PROTOTYPE) -> errno_t;
 kexec_load:(int TODO_PROTOTYPE) -> errno_t;
 
-mq_open:(char const *name, oflag_t oflags, mode_t mode) -> fd_t;
+mq_open:(char const *name, oflag_t oflags, [tostr(MODE_T:oflags)] mode_t mode) -> fd_t;
 mq_unlink:(char const *name) -> errno_t;
 
 %[startgroup]
