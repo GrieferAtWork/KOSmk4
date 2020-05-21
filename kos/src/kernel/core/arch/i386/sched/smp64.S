@@ -44,6 +44,8 @@
 #include <kos/kernel/cpu-state.h>
 
 
+/* TODO: Merge this file with "smp32.S" into a hybrid-source-file "smp.S" */
+
 #ifndef CONFIG_NO_SMP
 
 /* Push `IA32_KERNEL_GS_BASE' onto the stack
@@ -530,10 +532,10 @@ PRIVATE_FUNCTION(x86_smp_init_cpuid)
 	movq   %rbx, %rdi
 	movl   $(1), %eax
 	cpuid
-	movl   %eax, thiscpu_x86_cpuid + OFFSET_CPUID_1A(R_CPU)
-	movl   %ebx, thiscpu_x86_cpuid + OFFSET_CPUID_1B(R_CPU)
-	movl   %edx, thiscpu_x86_cpuid + OFFSET_CPUID_1D(R_CPU)
-	movl   %ecx, thiscpu_x86_cpuid + OFFSET_CPUID_1C(R_CPU)
+	movl   %eax, (thiscpu_x86_cpuid + OFFSET_CPUID_1A)(R_CPU)
+	movl   %ebx, (thiscpu_x86_cpuid + OFFSET_CPUID_1B)(R_CPU)
+	movl   %edx, (thiscpu_x86_cpuid + OFFSET_CPUID_1D)(R_CPU)
+	movl   %ecx, (thiscpu_x86_cpuid + OFFSET_CPUID_1C)(R_CPU)
 
 	/* if (Family == 6 && Model < 3 && Stepping < 3)
 	 *     OFFSET_CPUID_1D &= ~CPUID_1D_SEP; */
@@ -558,54 +560,54 @@ PRIVATE_FUNCTION(x86_smp_init_cpuid)
 	cmpl   $(3), %ecx
 	/* if (Stepping >= 3) goto 1f; */
 	jae    1f
-	andl   $(~CPUID_1D_SEP), thiscpu_x86_cpuid + OFFSET_CPUID_1D(R_CPU)
+	andl   $(~CPUID_1D_SEP), (thiscpu_x86_cpuid + OFFSET_CPUID_1D)(R_CPU)
 1:
 
 	movl   $(0), %eax
 	cpuid
-	movl   %eax, thiscpu_x86_cpuid + OFFSET_CPUID_0A(R_CPU)
-	movl   %ebx, thiscpu_x86_cpuid + OFFSET_CPUID_0B(R_CPU)
-	movl   %edx, thiscpu_x86_cpuid + OFFSET_CPUID_0D(R_CPU)
-	movl   %ecx, thiscpu_x86_cpuid + OFFSET_CPUID_0C(R_CPU)
+	movl   %eax, (thiscpu_x86_cpuid + OFFSET_CPUID_0A)(R_CPU)
+	movl   %ebx, (thiscpu_x86_cpuid + OFFSET_CPUID_0B)(R_CPU)
+	movl   %edx, (thiscpu_x86_cpuid + OFFSET_CPUID_0D)(R_CPU)
+	movl   %ecx, (thiscpu_x86_cpuid + OFFSET_CPUID_0C)(R_CPU)
 
 	cmpl   $(7), %eax
 	jnae   1f
 	movl   $(7), %eax
 	movl   $(0), %ecx /* Sub-leaf:0 */
 	cpuid
-	movl   %edx, thiscpu_x86_cpuid + OFFSET_CPUID_7D(R_CPU)
-	movl   %ecx, thiscpu_x86_cpuid + OFFSET_CPUID_7C(R_CPU)
-	movl   %ebx, thiscpu_x86_cpuid + OFFSET_CPUID_7B(R_CPU)
+	movl   %edx, (thiscpu_x86_cpuid + OFFSET_CPUID_7D)(R_CPU)
+	movl   %ecx, (thiscpu_x86_cpuid + OFFSET_CPUID_7C)(R_CPU)
+	movl   %ebx, (thiscpu_x86_cpuid + OFFSET_CPUID_7B)(R_CPU)
 1:	movl   $(0x80000000), %eax
 	cpuid
-	movl   %eax, thiscpu_x86_cpuid + OFFSET_CPUID_80000000A(R_CPU)
+	movl   %eax, (thiscpu_x86_cpuid + OFFSET_CPUID_80000000A)(R_CPU)
 	cmpl   $(0x80000001), %eax
 	jnae   2f
 	movl   $(0x80000001), %eax
 	cpuid
-	movl   %ecx, thiscpu_x86_cpuid + OFFSET_CPUID_80000001C(R_CPU)
-	movl   %edx, thiscpu_x86_cpuid + OFFSET_CPUID_80000001D(R_CPU)
-	movl   thiscpu_x86_cpuid + OFFSET_CPUID_80000000A(R_CPU), %eax
+	movl   %ecx, (thiscpu_x86_cpuid + OFFSET_CPUID_80000001C)(R_CPU)
+	movl   %edx, (thiscpu_x86_cpuid + OFFSET_CPUID_80000001D)(R_CPU)
+	movl   (thiscpu_x86_cpuid + OFFSET_CPUID_80000000A)(R_CPU), %eax
 	cmpl   $(0x80000004), %eax
 	jnae   3f
 	movl   $(0x80000004), %eax
 	cpuid
-	movl   %eax, thiscpu_x86_cpuid + OFFSET_CPUID_80000004A(R_CPU)
-	movl   %ebx, thiscpu_x86_cpuid + OFFSET_CPUID_80000004B(R_CPU)
-	movl   %ecx, thiscpu_x86_cpuid + OFFSET_CPUID_80000004C(R_CPU)
-	movl   %edx, thiscpu_x86_cpuid + OFFSET_CPUID_80000004D(R_CPU)
+	movl   %eax, (thiscpu_x86_cpuid + OFFSET_CPUID_80000004A)(R_CPU)
+	movl   %ebx, (thiscpu_x86_cpuid + OFFSET_CPUID_80000004B)(R_CPU)
+	movl   %ecx, (thiscpu_x86_cpuid + OFFSET_CPUID_80000004C)(R_CPU)
+	movl   %edx, (thiscpu_x86_cpuid + OFFSET_CPUID_80000004D)(R_CPU)
 	movl   $(0x80000003), %eax
 	cpuid
-	movl   %eax, thiscpu_x86_cpuid + OFFSET_CPUID_80000003A(R_CPU)
-	movl   %ebx, thiscpu_x86_cpuid + OFFSET_CPUID_80000003B(R_CPU)
-	movl   %ecx, thiscpu_x86_cpuid + OFFSET_CPUID_80000003C(R_CPU)
-	movl   %edx, thiscpu_x86_cpuid + OFFSET_CPUID_80000003D(R_CPU)
+	movl   %eax, (thiscpu_x86_cpuid + OFFSET_CPUID_80000003A)(R_CPU)
+	movl   %ebx, (thiscpu_x86_cpuid + OFFSET_CPUID_80000003B)(R_CPU)
+	movl   %ecx, (thiscpu_x86_cpuid + OFFSET_CPUID_80000003C)(R_CPU)
+	movl   %edx, (thiscpu_x86_cpuid + OFFSET_CPUID_80000003D)(R_CPU)
 	movl   $(0x80000002), %eax
 	cpuid
-	movl   %eax, thiscpu_x86_cpuid + OFFSET_CPUID_80000002A(R_CPU)
-	movl   %ebx, thiscpu_x86_cpuid + OFFSET_CPUID_80000002B(R_CPU)
-	movl   %ecx, thiscpu_x86_cpuid + OFFSET_CPUID_80000002C(R_CPU)
-	movl   %edx, thiscpu_x86_cpuid + OFFSET_CPUID_80000002D(R_CPU)
+	movl   %eax, (thiscpu_x86_cpuid + OFFSET_CPUID_80000002A)(R_CPU)
+	movl   %ebx, (thiscpu_x86_cpuid + OFFSET_CPUID_80000002B)(R_CPU)
+	movl   %ecx, (thiscpu_x86_cpuid + OFFSET_CPUID_80000002C)(R_CPU)
+	movl   %edx, (thiscpu_x86_cpuid + OFFSET_CPUID_80000002D)(R_CPU)
 3:  /* ci_80000000a < 0x80000004 */
 2:  /* ci_80000000a < 0x80000001 */
 	movq   %rdi, %rbx
@@ -700,7 +702,7 @@ INTERN_FUNCTION(x86_smp_entry64)
 
 
 	/* If supported, initialize the `sysenter' instruction */
-	testl  $(CPUID_1D_SEP), OFFSET_CPUID_1D(R_CPU)
+	testl  $(CPUID_1D_SEP), (thiscpu_x86_cpuid + OFFSET_CPUID_1D)(R_CPU)
 	jz     .Ldone_sysenter
 
 	/* __wrmsr(IA32_SYSENTER_CS, SEGMENT_KERNEL_CODE); */
@@ -737,7 +739,7 @@ INTERN_FUNCTION(x86_smp_entry64)
 
 
 	/* If supported, initialize the `syscall' instruction */
-	testl  $(CPUID_80000001D_SYSCALL), OFFSET_CPUID_80000001D(R_CPU)
+	testl  $(CPUID_80000001D_SYSCALL), (thiscpu_x86_cpuid + OFFSET_CPUID_80000001D)(R_CPU)
 	jz     .Ldone_syscall
 
 	/* __wrmsr(IA32_STAR, (u64)SEGMENT_KERNEL_CODE << 32); */

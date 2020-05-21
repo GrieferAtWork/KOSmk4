@@ -41,6 +41,8 @@
 #include <kos/kernel/cpu-state.h>
 
 
+/* TODO: Merge this file with "smp64.S" into a hybrid-source-file "smp.S" */
+
 #ifndef CONFIG_NO_SMP
 
 .section .text
@@ -516,6 +518,8 @@ INTERN_FUNCTION(x86_smp_entry32)
 
 	/* Load the GDT of our new CPU */
 	EXTERN(thiscpu_x86_gdt)
+	/* TODO: Don't hardcode `thiscpu_x86_gdt' + `SEGMENT_COUNT * SIZEOF_SEGMENT_DESCRIPTOR' here.
+	 *       Instead, re-load the last value set during `cpu_enter_deepsleep()' */
 	leal   thiscpu_x86_gdt(R_CPU), %ecx
 	pushl  %ecx
 	pushw  $((SEGMENT_COUNT * SIZEOF_SEGMENT_DESCRIPTOR) - 1)
@@ -524,16 +528,20 @@ INTERN_FUNCTION(x86_smp_entry32)
 
 	/* Load the Task register. */
 	/* SEGMENTS[SEGMENT_CPU_TSS].busy = 0;  // Required for `ltr' */
-	andb   $(0b11111101), thiscpu_x86_gdt + SEGMENT_CPU_TSS + 5(R_CPU)
+	andb   $(0b11111101), (thiscpu_x86_gdt + SEGMENT_CPU_TSS + 5)(R_CPU)
+	/* TODO: Don't hardcode `SEGMENT_CPU_TSS' here.
+	 *       Instead, re-load the last value set during `cpu_enter_deepsleep()' */
 	movw   $(SEGMENT_CPU_TSS), %cx
 	ltrw   %cx
 
 	/* Load the local descriptor table. */
+	/* TODO: Don't hardcode `SEGMENT_CPU_LDT' here.
+	 *       Instead, re-load the last value set during `cpu_enter_deepsleep()' */
 	movw   $(SEGMENT_CPU_LDT), %cx
 	lldtw  %cx
 
 	/* Load basic segments. */
-	movw   $(SEGMENT_USER_DATA), %cx
+	movw   $(SEGMENT_USER_DATA_RPL), %cx
 	movw   %cx, %ds
 	movw   %cx, %es
 	movw   $(SEGMENT_KERNEL_DATA), %cx
@@ -543,6 +551,8 @@ INTERN_FUNCTION(x86_smp_entry32)
 1:
 
 	/* Load the interrupt descriptor table. */
+	/* TODO: Don't hardcode `x86_idt_ptr' here.
+	 *       Instead, re-load the last value set during `cpu_enter_deepsleep()' */
 	EXTERN(x86_idt_ptr)
 	lidtl  x86_idt_ptr
 
@@ -558,7 +568,7 @@ INTERN_FUNCTION(x86_smp_entry32)
 
 
 	/* If supported, initialize the `sysenter' instruction */
-	testl  $(CPUID_1D_SEP), OFFSET_CPUID_1D(R_CPU)
+	testl  $(CPUID_1D_SEP), (thiscpu_x86_cpuid + OFFSET_CPUID_1D)(R_CPU)
 	jz     .Ldone_sysenter
 
 	/* __wrmsr(IA32_SYSENTER_CS, SEGMENT_KERNEL_CODE); */
@@ -654,7 +664,7 @@ INTERN_FUNCTION(x86_smp_entry32)
 	EXTERN(this_x86_kernel_psp0)
 	movl   this_x86_kernel_psp0(R_TASK), %ecx
 	EXTERN(thiscpu_x86_tss)
-	movl   %ecx, thiscpu_x86_tss + OFFSET_TSS_ESP0(R_CPU)
+	movl   %ecx, (thiscpu_x86_tss + OFFSET_TSS_ESP0)(R_CPU)
 
 	EXTERN(thiscpu_x86_gdt)
 #define GDT(x) x + thiscpu_x86_gdt(R_CPU)
@@ -784,6 +794,17 @@ PUBLIC_FUNCTION(cpu_enter_deepsleep)
 	movl   %ebx, %ecx /* Restore THIS_CPU */
 1:
 #endif /* !CONFIG_NO_FPU */
+
+	/* TODO: Save the current GDT/IDT/LDTR/TR in some PERCPU field.
+	 *       There are system functions that will temporarily alter these
+	 *       registers for all CPUs on the system, (e.g. `x86_idt_modify_begin()'),
+	 *       so if these registers currently contain non-standard values, then we
+	 *       mustn't clobber them, as would happen as the result of us going to
+	 *       deep sleep, before being re-awokened, at which point we'd load the
+	 *       original (standard) values, rather than those that were set just
+	 *       prior to us going to deep-sleep.
+	 */
+
 
 	/* Decrement the cpu-online counter. */
 	EXTERN(cpu_online_count)
