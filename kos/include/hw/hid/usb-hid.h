@@ -22,10 +22,6 @@
 
 #include <__stdinc.h>
 
-__SYSDECL_BEGIN
-
 #define USB_REQUEST_SET_IDLE 0x0a /* For use in `struct usb_request::ur_request' */
-
-__SYSDECL_END
 
 #endif /* !_HW_HID_USB_HID_H */

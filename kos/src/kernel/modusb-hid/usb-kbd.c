@@ -30,6 +30,7 @@
 #include <kernel/types.h>
 
 #include <hw/hid/usb-hid.h>
+#include <hw/hid/usbkbd.h>
 #include <hw/usb/class.h>
 #include <hw/usb/usb.h>
 #include <kos/keyboard.h>
@@ -51,292 +52,273 @@ NOTHROW(FCALL usb_keyboard_post)(struct usb_keyboard_device *__restrict self, u1
 }
 
 PRIVATE u16 const usb_mod_table[8] = {
-	/* [CTZ(0x01)] = */ KEY_LEFTCTRL,
-	/* [CTZ(0x02)] = */ KEY_LEFTSHIFT,
-	/* [CTZ(0x04)] = */ KEY_LEFTALT,
-	/* [CTZ(0x08)] = */ KEY_LEFTMETA,
-	/* [CTZ(0x10)] = */ KEY_RIGHTCTRL,
-	/* [CTZ(0x20)] = */ KEY_RIGHTSHIFT,
-	/* [CTZ(0x40)] = */ KEY_RIGHTALT,
-	/* [CTZ(0x80)] = */ KEY_RIGHTMETA,
+	[USBKBD_MODSHIFT_LEFTCTRL]  = KEY_LEFTCTRL,
+	[USBKBD_MODSHIFT_LEFTSHIFT] = KEY_LEFTSHIFT,
+	[USBKBD_MODSHIFT_LEFTALT]   = KEY_LEFTALT,
+	[USBKBD_MODSHIFT_LEFTMETA]  = KEY_LEFTMETA,
+	[USBKBD_MODSHIFT_RIGHTCTRL] = KEY_RIGHTCTRL,
+	[USBKBD_MODSHIFT_RIGHTSHIF] = KEY_RIGHTSHIFT,
+	[USBKBD_MODSHIFT_RIGHTALT]  = KEY_RIGHTALT,
+	[USBKBD_MODSHIFT_RIGHTMETA] = KEY_RIGHTMETA,
 };
 
 PRIVATE u16 const usb_key_table[256] = {
-/*[[[deemon
-// Sources:
-//   - https://gist.github.com/MightyPork/6da26e382a7ad91b5496ee55fdc73db2
-//   - https://www.win.tue.nl/~aeb/linux/kbd/scancodes-14.html
-
-local keys = ["0"] * 256;
-
-keys[0x04] = "KEY_A";
-keys[0x05] = "KEY_B";
-keys[0x06] = "KEY_C";
-keys[0x07] = "KEY_D";
-keys[0x08] = "KEY_E";
-keys[0x09] = "KEY_F";
-keys[0x0a] = "KEY_G";
-keys[0x0b] = "KEY_H";
-keys[0x0c] = "KEY_I";
-keys[0x0d] = "KEY_J";
-keys[0x0e] = "KEY_K";
-keys[0x0f] = "KEY_L";
-keys[0x10] = "KEY_M";
-keys[0x11] = "KEY_N";
-keys[0x12] = "KEY_O";
-keys[0x13] = "KEY_P";
-keys[0x14] = "KEY_Q";
-keys[0x15] = "KEY_R";
-keys[0x16] = "KEY_S";
-keys[0x17] = "KEY_T";
-keys[0x18] = "KEY_U";
-keys[0x19] = "KEY_V";
-keys[0x1a] = "KEY_W";
-keys[0x1b] = "KEY_X";
-keys[0x1c] = "KEY_Y";
-keys[0x1d] = "KEY_Z";
-keys[0x1e] = "KEY_1";
-keys[0x1f] = "KEY_2";
-keys[0x20] = "KEY_3";
-keys[0x21] = "KEY_4";
-keys[0x22] = "KEY_5";
-keys[0x23] = "KEY_6";
-keys[0x24] = "KEY_7";
-keys[0x25] = "KEY_8";
-keys[0x26] = "KEY_9";
-keys[0x27] = "KEY_0";
-
-keys[0x28] = "KEY_ENTER";
-keys[0x29] = "KEY_ESC";
-keys[0x2a] = "KEY_BACKSPACE";
-keys[0x2b] = "KEY_TAB";
-keys[0x2c] = "KEY_SPACE";
-keys[0x2d] = "KEY_MINUS";
-keys[0x2e] = "KEY_EQUAL";
-keys[0x2f] = "KEY_LEFTBRACE";
-keys[0x30] = "KEY_RIGHTBRACE";
-keys[0x31] = "KEY_BACKSLASH";
-keys[0x32] = "KEY_APOSTROPHE";
-keys[0x33] = "KEY_SEMICOLON";
-keys[0x34] = "KEY_APOSTROPHE";
-keys[0x35] = "KEY_GRAVE";
-keys[0x36] = "KEY_COMMA";
-keys[0x37] = "KEY_DOT";
-keys[0x38] = "KEY_SLASH";
-keys[0x39] = "KEY_CAPSLOCK";
-keys[0x3a] = "KEY_F1";
-keys[0x3b] = "KEY_F2";
-keys[0x3c] = "KEY_F3";
-keys[0x3d] = "KEY_F4";
-keys[0x3e] = "KEY_F5";
-keys[0x3f] = "KEY_F6";
-keys[0x40] = "KEY_F7";
-keys[0x41] = "KEY_F8";
-keys[0x42] = "KEY_F9";
-keys[0x43] = "KEY_F10";
-keys[0x44] = "KEY_F11";
-keys[0x45] = "KEY_F12";
-keys[0x46] = "KEY_PRINTSCREEN";
-keys[0x47] = "KEY_SCROLLLOCK";
-keys[0x48] = "KEY_PAUSE";
-keys[0x49] = "KEY_INSERT";
-keys[0x4a] = "KEY_HOME";
-keys[0x4b] = "KEY_PAGEUP";
-keys[0x4c] = "KEY_DELETE";
-keys[0x4d] = "KEY_END";
-keys[0x4e] = "KEY_PAGEDOWN";
-keys[0x4f] = "KEY_RIGHT";
-keys[0x50] = "KEY_LEFT";
-keys[0x51] = "KEY_DOWN";
-keys[0x52] = "KEY_UP";
-keys[0x53] = "KEY_NUMLOCK";
-keys[0x54] = "KEY_KPSLASH";
-keys[0x55] = "KEY_KPASTERISK";
-keys[0x56] = "KEY_KPMINUS";
-keys[0x57] = "KEY_KPPLUS";
-keys[0x58] = "KEY_KPENTER";
-keys[0x59] = "KEY_KP1";
-keys[0x5a] = "KEY_KP2";
-keys[0x5b] = "KEY_KP3";
-keys[0x5c] = "KEY_KP4";
-keys[0x5d] = "KEY_KP5";
-keys[0x5e] = "KEY_KP6";
-keys[0x5f] = "KEY_KP7";
-keys[0x60] = "KEY_KP8";
-keys[0x61] = "KEY_KP9";
-keys[0x62] = "KEY_KP0";
-keys[0x63] = "KEY_KPDOT";
-keys[0x64] = "KEY_102ND";
-keys[0x65] = "KEY_COMPOSE";
-keys[0x66] = "KEY_POWER";
-keys[0x67] = "KEY_KPEQUAL";
-keys[0x68] = "KEY_F13";
-keys[0x69] = "KEY_F14";
-keys[0x6a] = "KEY_F15";
-keys[0x6b] = "KEY_F16";
-keys[0x6c] = "KEY_F17";
-keys[0x6d] = "KEY_F18";
-keys[0x6e] = "KEY_F19";
-keys[0x6f] = "KEY_F20";
-keys[0x70] = "KEY_F21";
-keys[0x71] = "KEY_F22";
-keys[0x72] = "KEY_F23";
-keys[0x73] = "KEY_F24";
-keys[0x74] = "KEY_OPEN";
-keys[0x75] = "KEY_HELP";
-keys[0x76] = "KEY_PROPS";
-keys[0x77] = "KEY_FRONT";
-keys[0x78] = "KEY_STOP";
-keys[0x79] = "KEY_AGAIN";
-keys[0x7a] = "KEY_UNDO";
-keys[0x7b] = "KEY_CUT";
-keys[0x7c] = "KEY_COPY";
-keys[0x7d] = "KEY_PASTE";
-keys[0x7e] = "KEY_FIND";
-keys[0x7f] = "KEY_MUTE";
-keys[0x80] = "KEY_VOLUMEUP";
-keys[0x81] = "KEY_VOLUMEDOWN";
-// 0x82  Keyboard Locking Caps Lock
-// 0x83  Keyboard Locking Num Lock
-// 0x84  Keyboard Locking Scroll Lock
-keys[0x85] = "KEY_KPCOMMA";
-keys[0x86] = "KEY_KPEQUAL";
-keys[0x87] = "KEY_RO";
-keys[0x88] = "KEY_KATAKANAHIRAGANA";
-keys[0x89] = "KEY_YEN";
-keys[0x8a] = "KEY_HENKAN";
-keys[0x8b] = "KEY_MUHENKAN";
-keys[0x8c] = "KEY_KPJPCOMMA";
-// 0x8d  Keyboard International7
-// 0x8e  Keyboard International8
-// 0x8f  Keyboard International9
-keys[0x90] = "KEY_HANGEUL";
-keys[0x91] = "KEY_HANJA";
-keys[0x92] = "KEY_KATAKANA";
-keys[0x93] = "KEY_HIRAGANA";
-keys[0x94] = "KEY_ZENKAKUHANKAKU";
-// 0x95  Keyboard LANG6
-// 0x96  Keyboard LANG7
-// 0x97  Keyboard LANG8
-// 0x98  Keyboard LANG9
-// 0x99  Keyboard Alternate Erase
-keys[0x9a] = "KEY_SYSRQ";
-keys[0x9b] = "KEY_CANCEL";
-keys[0x9c] = "KEY_CLEAR";
-keys[0x9d] = "KEY_PREVIOUS";
-// 0x9e  Keyboard Return
-// 0x9f  Keyboard Separator
-// 0xa0  Keyboard Out
-// 0xa1  Keyboard Open
-// 0xa2  Keyboard Clear/Again
-// 0xa3  Keyboard CrSel/Props
-// 0xa4  Keyboard ExSel
-
-// 0xb0  Keypad 00
-// 0xb1  Keypad 000
-// 0xb2  Thousands Separator
-// 0xb3  Decimal Separator
-// 0xb4  Currency Unit
-// 0xb5  Currency Sub-unit
-keys[0xb6] = "KEY_KPLEFTPAREN";
-keys[0xb7] = "KEY_KPRIGHTPAREN";
-// 0xb8  Keypad {
-// 0xb9  Keypad }
-// 0xba  Keypad Tab
-// 0xbb  Keypad Backspace
-// 0xbc  Keypad A
-// 0xbd  Keypad B
-// 0xbe  Keypad C
-// 0xbf  Keypad D
-// 0xc0  Keypad E
-// 0xc1  Keypad F
-// 0xc2  Keypad XOR
-// 0xc3  Keypad ^
-// 0xc4  Keypad %
-// 0xc5  Keypad <
-// 0xc6  Keypad >
-// 0xc7  Keypad &
-// 0xc8  Keypad &&
-// 0xc9  Keypad |
-// 0xca  Keypad ||
-// 0xcb  Keypad :
-// 0xcc  Keypad #
-// 0xcd  Keypad Space
-// 0xce  Keypad @
-// 0xcf  Keypad !
-// 0xd0  Keypad Memory Store
-// 0xd1  Keypad Memory Recall
-// 0xd2  Keypad Memory Clear
-// 0xd3  Keypad Memory Add
-// 0xd4  Keypad Memory Subtract
-// 0xd5  Keypad Memory Multiply
-// 0xd6  Keypad Memory Divide
-// 0xd7  Keypad +/-
-// 0xd8  Keypad Clear
-// 0xd9  Keypad Clear Entry
-// 0xda  Keypad Binary
-// 0xdb  Keypad Octal
-// 0xdc  Keypad Decimal
-// 0xdd  Keypad Hexadecimal
-
-keys[0xe0] = "KEY_LEFTCTRL";
-keys[0xe1] = "KEY_LEFTSHIFT";
-keys[0xe2] = "KEY_LEFTALT";
-keys[0xe3] = "KEY_LEFTMETA";
-keys[0xe4] = "KEY_RIGHTCTRL";
-keys[0xe5] = "KEY_RIGHTSHIFT";
-keys[0xe6] = "KEY_RIGHTALT";
-keys[0xe7] = "KEY_RIGHTMETA";
-keys[0xe8] = "KEY_MM_PLAY_PAUSE";
-keys[0xe9] = "KEY_MM_STOP";
-keys[0xea] = "KEY_MM_PREVIOUS_TRACK";
-keys[0xeb] = "KEY_MM_NEXT_TRACK";
-keys[0xec] = "KEY_EJECTCD";
-keys[0xed] = "KEY_VOLUMEUP";
-keys[0xee] = "KEY_VOLUMEDOWN";
-keys[0xef] = "KEY_MUTE";
-keys[0xf0] = "KEY_WWW";
-keys[0xf1] = "KEY_WWW_BACK";
-keys[0xf2] = "KEY_WWW_FORWARD";
-keys[0xf3] = "KEY_MM_STOP";
-keys[0xf4] = "KEY_WWW_SEARCH";
-keys[0xf5] = "KEY_SCROLLUP";
-keys[0xf6] = "KEY_SCROLLDOWN";
-keys[0xf7] = "KEY_EDIT";
-keys[0xf8] = "KEY_APIC_SLEEP";
-keys[0xf9] = "KEY_COFFEE";
-keys[0xfa] = "KEY_REFRESH";
-keys[0xfb] = "KEY_CALC";
-
-for (local i: [:256]) {
-	if ((i % 16) == 0)
-		print "\t",;
-	print keys[i],;
-	print ",",;
-	if ((i % 16) == 15)
-		print "\n",;
-	else {
-		print " ",;
-	}
-}
-]]]*/
-	0, 0, 0, 0, KEY_A, KEY_B, KEY_C, KEY_D, KEY_E, KEY_F, KEY_G, KEY_H, KEY_I, KEY_J, KEY_K, KEY_L,
-	KEY_M, KEY_N, KEY_O, KEY_P, KEY_Q, KEY_R, KEY_S, KEY_T, KEY_U, KEY_V, KEY_W, KEY_X, KEY_Y, KEY_Z, KEY_1, KEY_2,
-	KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8, KEY_9, KEY_0, KEY_ENTER, KEY_ESC, KEY_BACKSPACE, KEY_TAB, KEY_SPACE, KEY_MINUS, KEY_EQUAL, KEY_LEFTBRACE,
-	KEY_RIGHTBRACE, KEY_BACKSLASH, KEY_APOSTROPHE, KEY_SEMICOLON, KEY_APOSTROPHE, KEY_GRAVE, KEY_COMMA, KEY_DOT, KEY_SLASH, KEY_CAPSLOCK, KEY_F1, KEY_F2, KEY_F3, KEY_F4, KEY_F5, KEY_F6,
-	KEY_F7, KEY_F8, KEY_F9, KEY_F10, KEY_F11, KEY_F12, KEY_PRINTSCREEN, KEY_SCROLLLOCK, KEY_PAUSE, KEY_INSERT, KEY_HOME, KEY_PAGEUP, KEY_DELETE, KEY_END, KEY_PAGEDOWN, KEY_RIGHT,
-	KEY_LEFT, KEY_DOWN, KEY_UP, KEY_NUMLOCK, KEY_KPSLASH, KEY_KPASTERISK, KEY_KPMINUS, KEY_KPPLUS, KEY_KPENTER, KEY_KP1, KEY_KP2, KEY_KP3, KEY_KP4, KEY_KP5, KEY_KP6, KEY_KP7,
-	KEY_KP8, KEY_KP9, KEY_KP0, KEY_KPDOT, KEY_102ND, KEY_COMPOSE, KEY_POWER, KEY_KPEQUAL, KEY_F13, KEY_F14, KEY_F15, KEY_F16, KEY_F17, KEY_F18, KEY_F19, KEY_F20,
-	KEY_F21, KEY_F22, KEY_F23, KEY_F24, KEY_OPEN, KEY_HELP, KEY_PROPS, KEY_FRONT, KEY_STOP, KEY_AGAIN, KEY_UNDO, KEY_CUT, KEY_COPY, KEY_PASTE, KEY_FIND, KEY_MUTE,
-	KEY_VOLUMEUP, KEY_VOLUMEDOWN, 0, 0, 0, KEY_KPCOMMA, KEY_KPEQUAL, KEY_RO, KEY_KATAKANAHIRAGANA, KEY_YEN, KEY_HENKAN, KEY_MUHENKAN, KEY_KPJPCOMMA, 0, 0, 0,
-	KEY_HANGEUL, KEY_HANJA, KEY_KATAKANA, KEY_HIRAGANA, KEY_ZENKAKUHANKAKU, 0, 0, 0, 0, 0, KEY_SYSRQ, KEY_CANCEL, KEY_CLEAR, KEY_PREVIOUS, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, KEY_KPLEFTPAREN, KEY_KPRIGHTPAREN, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	KEY_LEFTCTRL, KEY_LEFTSHIFT, KEY_LEFTALT, KEY_LEFTMETA, KEY_RIGHTCTRL, KEY_RIGHTSHIFT, KEY_RIGHTALT, KEY_RIGHTMETA, KEY_MM_PLAY_PAUSE, KEY_MM_STOP, KEY_MM_PREVIOUS_TRACK, KEY_MM_NEXT_TRACK, KEY_EJECTCD, KEY_VOLUMEUP, KEY_VOLUMEDOWN, KEY_MUTE,
-	KEY_WWW, KEY_WWW_BACK, KEY_WWW_FORWARD, KEY_MM_STOP, KEY_WWW_SEARCH, KEY_SCROLLUP, KEY_SCROLLDOWN, KEY_EDIT, KEY_APIC_SLEEP, KEY_COFFEE, KEY_REFRESH, KEY_CALC, 0, 0, 0, 0,
-//[[[end]]]
+	[0x00]                              = KEY_NONE,
+	[0x01]                              = KEY_NONE,
+	[0x02]                              = KEY_NONE,
+	[0x03]                              = KEY_NONE,
+	[USBKBD_KEY_A]                      = KEY_A,
+	[USBKBD_KEY_B]                      = KEY_B,
+	[USBKBD_KEY_C]                      = KEY_C,
+	[USBKBD_KEY_D]                      = KEY_D,
+	[USBKBD_KEY_E]                      = KEY_E,
+	[USBKBD_KEY_F]                      = KEY_F,
+	[USBKBD_KEY_G]                      = KEY_G,
+	[USBKBD_KEY_H]                      = KEY_H,
+	[USBKBD_KEY_I]                      = KEY_I,
+	[USBKBD_KEY_J]                      = KEY_J,
+	[USBKBD_KEY_K]                      = KEY_K,
+	[USBKBD_KEY_L]                      = KEY_L,
+	[USBKBD_KEY_M]                      = KEY_M,
+	[USBKBD_KEY_N]                      = KEY_N,
+	[USBKBD_KEY_O]                      = KEY_O,
+	[USBKBD_KEY_P]                      = KEY_P,
+	[USBKBD_KEY_Q]                      = KEY_Q,
+	[USBKBD_KEY_R]                      = KEY_R,
+	[USBKBD_KEY_S]                      = KEY_S,
+	[USBKBD_KEY_T]                      = KEY_T,
+	[USBKBD_KEY_U]                      = KEY_U,
+	[USBKBD_KEY_V]                      = KEY_V,
+	[USBKBD_KEY_W]                      = KEY_W,
+	[USBKBD_KEY_X]                      = KEY_X,
+	[USBKBD_KEY_Y]                      = KEY_Y,
+	[USBKBD_KEY_Z]                      = KEY_Z,
+	[USBKBD_KEY_1]                      = KEY_1,
+	[USBKBD_KEY_2]                      = KEY_2,
+	[USBKBD_KEY_3]                      = KEY_3,
+	[USBKBD_KEY_4]                      = KEY_4,
+	[USBKBD_KEY_5]                      = KEY_5,
+	[USBKBD_KEY_6]                      = KEY_6,
+	[USBKBD_KEY_7]                      = KEY_7,
+	[USBKBD_KEY_8]                      = KEY_8,
+	[USBKBD_KEY_9]                      = KEY_9,
+	[USBKBD_KEY_0]                      = KEY_0,
+	[USBKBD_KEY_ENTER]                  = KEY_ENTER,
+	[USBKBD_KEY_ESC]                    = KEY_ESC,
+	[USBKBD_KEY_BACKSPACE]              = KEY_BACKSPACE,
+	[USBKBD_KEY_TAB]                    = KEY_TAB,
+	[USBKBD_KEY_SPACE]                  = KEY_SPACE,
+	[USBKBD_KEY_MINUS]                  = KEY_MINUS,
+	[USBKBD_KEY_EQUAL]                  = KEY_EQUAL,
+	[USBKBD_KEY_LEFTBRACE]              = KEY_LEFTBRACE,
+	[USBKBD_KEY_RIGHTBRACE]             = KEY_RIGHTBRACE,
+	[USBKBD_KEY_BACKSLASH]              = KEY_BACKSLASH,
+	[USBKBD_KEY_POUND]                  = KEY_APOSTROPHE,
+	[USBKBD_KEY_SEMICOLON]              = KEY_SEMICOLON,
+	[USBKBD_KEY_APOSTROPHE]             = KEY_APOSTROPHE,
+	[USBKBD_KEY_GRAVE]                  = KEY_GRAVE,
+	[USBKBD_KEY_COMMA]                  = KEY_COMMA,
+	[USBKBD_KEY_DOT]                    = KEY_DOT,
+	[USBKBD_KEY_SLASH]                  = KEY_SLASH,
+	[USBKBD_KEY_CAPSLOCK]               = KEY_CAPSLOCK,
+	[USBKBD_KEY_F1]                     = KEY_F1,
+	[USBKBD_KEY_F2]                     = KEY_F2,
+	[USBKBD_KEY_F3]                     = KEY_F3,
+	[USBKBD_KEY_F4]                     = KEY_F4,
+	[USBKBD_KEY_F5]                     = KEY_F5,
+	[USBKBD_KEY_F6]                     = KEY_F6,
+	[USBKBD_KEY_F7]                     = KEY_F7,
+	[USBKBD_KEY_F8]                     = KEY_F8,
+	[USBKBD_KEY_F9]                     = KEY_F9,
+	[USBKBD_KEY_F10]                    = KEY_F10,
+	[USBKBD_KEY_F11]                    = KEY_F11,
+	[USBKBD_KEY_F12]                    = KEY_F12,
+	[USBKBD_KEY_PRINTSCREEN]            = KEY_PRINTSCREEN,
+	[USBKBD_KEY_SCROLLLOCK]             = KEY_SCROLLLOCK,
+	[USBKBD_KEY_PAUSE]                  = KEY_PAUSE,
+	[USBKBD_KEY_INSERT]                 = KEY_INSERT,
+	[USBKBD_KEY_HOME]                   = KEY_HOME,
+	[USBKBD_KEY_PAGEUP]                 = KEY_PAGEUP,
+	[USBKBD_KEY_DELETE]                 = KEY_DELETE,
+	[USBKBD_KEY_END]                    = KEY_END,
+	[USBKBD_KEY_PAGEDOWN]               = KEY_PAGEDOWN,
+	[USBKBD_KEY_RIGHT]                  = KEY_RIGHT,
+	[USBKBD_KEY_LEFT]                   = KEY_LEFT,
+	[USBKBD_KEY_DOWN]                   = KEY_DOWN,
+	[USBKBD_KEY_UP]                     = KEY_UP,
+	[USBKBD_KEY_NUMLOCK]                = KEY_NUMLOCK,
+	[USBKBD_KEY_KPSLASH]                = KEY_KPSLASH,
+	[USBKBD_KEY_KPASTERISK]             = KEY_KPASTERISK,
+	[USBKBD_KEY_KPMINUS]                = KEY_KPMINUS,
+	[USBKBD_KEY_KPPLUS]                 = KEY_KPPLUS,
+	[USBKBD_KEY_KPENTER]                = KEY_KPENTER,
+	[USBKBD_KEY_KP1]                    = KEY_KP1,
+	[USBKBD_KEY_KP2]                    = KEY_KP2,
+	[USBKBD_KEY_KP3]                    = KEY_KP3,
+	[USBKBD_KEY_KP4]                    = KEY_KP4,
+	[USBKBD_KEY_KP5]                    = KEY_KP5,
+	[USBKBD_KEY_KP6]                    = KEY_KP6,
+	[USBKBD_KEY_KP7]                    = KEY_KP7,
+	[USBKBD_KEY_KP8]                    = KEY_KP8,
+	[USBKBD_KEY_KP9]                    = KEY_KP9,
+	[USBKBD_KEY_KP0]                    = KEY_KP0,
+	[USBKBD_KEY_KPDOT]                  = KEY_KPDOT,
+	[USBKBD_KEY_102ND]                  = KEY_102ND,
+	[USBKBD_KEY_COMPOSE]                = KEY_COMPOSE,
+	[USBKBD_KEY_POWER]                  = KEY_POWER,
+	[USBKBD_KEY_KPEQUAL]                = KEY_KPEQUAL,
+	[USBKBD_KEY_F13]                    = KEY_F13,
+	[USBKBD_KEY_F14]                    = KEY_F14,
+	[USBKBD_KEY_F15]                    = KEY_F15,
+	[USBKBD_KEY_F16]                    = KEY_F16,
+	[USBKBD_KEY_F17]                    = KEY_F17,
+	[USBKBD_KEY_F18]                    = KEY_F18,
+	[USBKBD_KEY_F19]                    = KEY_F19,
+	[USBKBD_KEY_F20]                    = KEY_F20,
+	[USBKBD_KEY_F21]                    = KEY_F21,
+	[USBKBD_KEY_F22]                    = KEY_F22,
+	[USBKBD_KEY_F23]                    = KEY_F23,
+	[USBKBD_KEY_F24]                    = KEY_F24,
+	[USBKBD_KEY_EXECUTE]                = KEY_OPEN,
+	[USBKBD_KEY_HELP]                   = KEY_HELP,
+	[USBKBD_KEY_PROPS]                  = KEY_PROPS,
+	[USBKBD_KEY_FRONT]                  = KEY_FRONT,
+	[USBKBD_KEY_STOP]                   = KEY_STOP,
+	[USBKBD_KEY_AGAIN]                  = KEY_AGAIN,
+	[USBKBD_KEY_UNDO]                   = KEY_UNDO,
+	[USBKBD_KEY_CUT]                    = KEY_CUT,
+	[USBKBD_KEY_COPY]                   = KEY_COPY,
+	[USBKBD_KEY_PASTE]                  = KEY_PASTE,
+	[USBKBD_KEY_FIND]                   = KEY_FIND,
+	[USBKBD_KEY_MUTE]                   = KEY_MUTE,
+	[USBKBD_KEY_VOLUMEUP]               = KEY_VOLUMEUP,
+	[USBKBD_KEY_VOLUMEDOWN]             = KEY_VOLUMEDOWN,
+	[USBKBD_KEY_LOCKING_CAPS_LOCK]      = KEY_NONE,
+	[USBKBD_KEY_LOCKING_NUM_LOCK]       = KEY_NONE,
+	[USBKBD_KEY_LOCKING_SCROLL_LOCK]    = KEY_NONE,
+	[USBKBD_KEY_KPCOMMA]                = KEY_KPCOMMA,
+	[USBKBD_KEY_KPEQUAL2]               = KEY_KPEQUAL,
+	[USBKBD_KEY_RO]                     = KEY_RO,
+	[USBKBD_KEY_KATAKANAHIRAGANA]       = KEY_KATAKANAHIRAGANA,
+	[USBKBD_KEY_YEN]                    = KEY_YEN,
+	[USBKBD_KEY_HENKAN]                 = KEY_HENKAN,
+	[USBKBD_KEY_MUHENKAN]               = KEY_MUHENKAN,
+	[USBKBD_KEY_KPJPCOMMA]              = KEY_KPJPCOMMA,
+	[USBKBD_KEY_INTERNATIONAL7]         = KEY_NONE,
+	[USBKBD_KEY_INTERNATIONAL8]         = KEY_NONE,
+	[USBKBD_KEY_INTERNATIONAL9]         = KEY_NONE,
+	[USBKBD_KEY_KEY_HANGEUL]            = KEY_HANGEUL,
+	[USBKBD_KEY_KEY_HANJA]              = KEY_HANJA,
+	[USBKBD_KEY_KEY_KATAKANA]           = KEY_KATAKANA,
+	[USBKBD_KEY_KEY_HIRAGANA]           = KEY_HIRAGANA,
+	[USBKBD_KEY_KEY_ZENKAKUHANKAKU]     = KEY_ZENKAKUHANKAKU,
+	[USBKBD_KEY_LANG6]                  = KEY_NONE,
+	[USBKBD_KEY_LANG7]                  = KEY_NONE,
+	[USBKBD_KEY_LANG8]                  = KEY_NONE,
+	[USBKBD_KEY_LANG9]                  = KEY_NONE,
+	[USBKBD_KEY_ALTERNATE_ERASE]        = KEY_NONE,
+	[USBKBD_KEY_SYSRQ]                  = KEY_SYSRQ,
+	[USBKBD_KEY_CANCEL]                 = KEY_CANCEL,
+	[USBKBD_KEY_CLEAR]                  = KEY_CLEAR,
+	[USBKBD_KEY_PREVIOUS]               = KEY_PREVIOUS,
+	[USBKBD_KEY_RETURN]                 = KEY_NONE,
+	[USBKBD_KEY_SEPARATOR]              = KEY_NONE,
+	[USBKBD_KEY_OUT]                    = KEY_NONE,
+	[USBKBD_KEY_OPEN]                   = KEY_OPEN,
+	[USBKBD_KEY_CLEAR_AGAIN]            = KEY_NONE,
+	[USBKBD_KEY_CRSEL_PROPS]            = KEY_NONE,
+	[USBKBD_KEY_EXSEL]                  = KEY_NONE,
+	[0xa5]                              = KEY_NONE,
+	[0xa6]                              = KEY_NONE,
+	[0xa7]                              = KEY_NONE,
+	[0xa8]                              = KEY_NONE,
+	[0xa9]                              = KEY_NONE,
+	[0xaa]                              = KEY_NONE,
+	[0xab]                              = KEY_NONE,
+	[0xac]                              = KEY_NONE,
+	[0xad]                              = KEY_NONE,
+	[0xae]                              = KEY_NONE,
+	[0xaf]                              = KEY_NONE,
+	[USBKBD_KEY_KP_00]                  = KEY_NONE,
+	[USBKBD_KEY_KP_000]                 = KEY_NONE,
+	[USBKBD_KEY_KP_THOUSANDS_SEPARATOR] = KEY_NONE,
+	[USBKBD_KEY_KP_DECIMAL_SEPARATOR]   = KEY_NONE,
+	[USBKBD_KEY_KP_CURRENCY_UNIT]       = KEY_NONE,
+	[USBKBD_KEY_KP_CURRENCY_SUB_UNIT]   = KEY_NONE,
+	[USBKBD_KEY_KP_LEFTPAREN]           = KEY_KPLEFTPAREN,
+	[USBKBD_KEY_KP_RIGHTPAREN]          = KEY_KPRIGHTPAREN,
+	[USBKBD_KEY_KP_LBRACE]              = KEY_NONE,
+	[USBKBD_KEY_KP_RBRACE]              = KEY_NONE,
+	[USBKBD_KEY_KP_TAB]                 = KEY_NONE,
+	[USBKBD_KEY_KP_BACKSPACE]           = KEY_NONE,
+	[USBKBD_KEY_KP_A]                   = KEY_NONE,
+	[USBKBD_KEY_KP_B]                   = KEY_NONE,
+	[USBKBD_KEY_KP_C]                   = KEY_NONE,
+	[USBKBD_KEY_KP_D]                   = KEY_NONE,
+	[USBKBD_KEY_KP_E]                   = KEY_NONE,
+	[USBKBD_KEY_KP_F]                   = KEY_NONE,
+	[USBKBD_KEY_KP_XOR]                 = KEY_NONE,
+	[USBKBD_KEY_KP_CARET]               = KEY_NONE,
+	[USBKBD_KEY_KP_PERCENT]             = KEY_NONE,
+	[USBKBD_KEY_KP_LESS]                = KEY_NONE,
+	[USBKBD_KEY_KP_MORE]                = KEY_NONE,
+	[USBKBD_KEY_KP_AND]                 = KEY_NONE,
+	[USBKBD_KEY_KP_ANDAND]              = KEY_NONE,
+	[USBKBD_KEY_KP_PIPE]                = KEY_NONE,
+	[USBKBD_KEY_KP_PIPEPIPE]            = KEY_NONE,
+	[USBKBD_KEY_KP_COLON]               = KEY_NONE,
+	[USBKBD_KEY_KP_POUND]               = KEY_NONE,
+	[USBKBD_KEY_KP_SPACE]               = KEY_NONE,
+	[USBKBD_KEY_KP_AT]                  = KEY_NONE,
+	[USBKBD_KEY_KP_EXCLAIM]             = KEY_NONE,
+	[USBKBD_KEY_KP_MEM_STORE]           = KEY_NONE,
+	[USBKBD_KEY_KP_MEM_RECALL]          = KEY_NONE,
+	[USBKBD_KEY_KP_MEM_CLEAR]           = KEY_NONE,
+	[USBKBD_KEY_KP_MEM_ADD]             = KEY_NONE,
+	[USBKBD_KEY_KP_MEM_SUBTRACT]        = KEY_NONE,
+	[USBKBD_KEY_KP_MEM_MULTIPLY]        = KEY_NONE,
+	[USBKBD_KEY_KP_MEM_DIVIDE]          = KEY_NONE,
+	[USBKBD_KEY_KP_PLUSMINUS]           = KEY_NONE,
+	[USBKBD_KEY_KP_CLEAR]               = KEY_NONE,
+	[USBKBD_KEY_KP_CLEAR_ENTRY]         = KEY_NONE,
+	[USBKBD_KEY_KP_BINARY]              = KEY_NONE,
+	[USBKBD_KEY_KP_OCTAL]               = KEY_NONE,
+	[USBKBD_KEY_KP_DECIMAL]             = KEY_NONE,
+	[USBKBD_KEY_KP_HEXADECIMAL]         = KEY_NONE,
+	[0xde]                              = KEY_NONE,
+	[0xdf]                              = KEY_NONE,
+	[USBKBD_KEY_LEFTCTRL]               = KEY_LEFTCTRL,
+	[USBKBD_KEY_LEFTSHIFT]              = KEY_LEFTSHIFT,
+	[USBKBD_KEY_LEFTALT]                = KEY_LEFTALT,
+	[USBKBD_KEY_LEFTMETA]               = KEY_LEFTMETA,
+	[USBKBD_KEY_RIGHTCTRL]              = KEY_RIGHTCTRL,
+	[USBKBD_KEY_RIGHTSHIFT]             = KEY_RIGHTSHIFT,
+	[USBKBD_KEY_RIGHTALT]               = KEY_RIGHTALT,
+	[USBKBD_KEY_RIGHTMETA]              = KEY_RIGHTMETA,
+	[USBKBD_KEY_MM_PLAY_PAUSE]          = KEY_MM_PLAY_PAUSE,
+	[USBKBD_KEY_MM_STOP]                = KEY_MM_STOP,
+	[USBKBD_KEY_MM_PREVIOUS_TRACK]      = KEY_MM_PREVIOUS_TRACK,
+	[USBKBD_KEY_MM_NEXT_TRACK]          = KEY_MM_NEXT_TRACK,
+	[USBKBD_KEY_EJECTCD]                = KEY_EJECTCD,
+	[USBKBD_KEY_VOLUMEUP2]              = KEY_VOLUMEUP,
+	[USBKBD_KEY_VOLUMEDOWN2]            = KEY_VOLUMEDOWN,
+	[USBKBD_KEY_MUTE2]                  = KEY_MUTE,
+	[USBKBD_KEY_WWW]                    = KEY_WWW,
+	[USBKBD_KEY_WWW_BACK]               = KEY_WWW_BACK,
+	[USBKBD_KEY_WWW_FORWARD]            = KEY_WWW_FORWARD,
+	[USBKBD_KEY_WWW_STOP]               = KEY_WWW_STOP,
+	[USBKBD_KEY_WWW_SEARCH]             = KEY_WWW_SEARCH,
+	[USBKBD_KEY_SCROLLUP]               = KEY_SCROLLUP,
+	[USBKBD_KEY_SCROLLDOWN]             = KEY_SCROLLDOWN,
+	[USBKBD_KEY_EDIT]                   = KEY_EDIT,
+	[USBKBD_KEY_APIC_SLEEP]             = KEY_APIC_SLEEP,
+	[USBKBD_KEY_COFFEE]                 = KEY_COFFEE,
+	[USBKBD_KEY_REFRESH]                = KEY_REFRESH,
+	[USBKBD_KEY_CALC]                   = KEY_CALC,
+	[0xfc]                              = KEY_NONE,
+	[0xfd]                              = KEY_NONE,
+	[0xfe]                              = KEY_NONE,
+	[0xff]                              = KEY_NONE
 };
 
 
