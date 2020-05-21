@@ -1757,12 +1757,6 @@ NOTHROW(KCALL initialize_ide)(struct ide_ports *__restrict self, bool is_default
 
 
 
-#define DEFAULT_PRIMARY_BUS    __CCAST(port_t)0x1f0
-#define DEFAULT_PRIMARY_CTRL   __CCAST(port_t)0x3f6
-#define DEFAULT_SECONDARY_BUS  __CCAST(port_t)0x170
-#define DEFAULT_SECONDARY_CTRL __CCAST(port_t)0x376
-
-
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 ATTR_FREEBSS
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
@@ -1775,7 +1769,7 @@ NOTHROW(KCALL kernel_load_pci_ide)(struct pci_device *__restrict dev) {
 	bool result = false;
 	struct ide_ports i;
 	if (dev->pd_res[PD_RESOURCE_BAR0].pr_flags == PCI_RESOURCE_FUNUSED) {
-		i.i_primary_bus = DEFAULT_PRIMARY_BUS;
+		i.i_primary_bus = ATA_DEFAULT_PRIMARY_BUS;
 		result          = true;
 	} else {
 		if (!(dev->pd_res[PD_RESOURCE_BAR0].pr_flags & PCI_RESOURCE_FIO)) {
@@ -1784,11 +1778,11 @@ NOTHROW(KCALL kernel_load_pci_ide)(struct pci_device *__restrict dev) {
 			return false;
 		}
 		i.i_primary_bus = (port_t)dev->pd_res[PD_RESOURCE_BAR0].pr_start;
-		if (i.i_primary_bus == DEFAULT_PRIMARY_BUS)
+		if (i.i_primary_bus == ATA_DEFAULT_PRIMARY_BUS)
 			result = true;
 	}
 	if (dev->pd_res[PD_RESOURCE_BAR1].pr_flags == PCI_RESOURCE_FUNUSED) {
-		i.i_primary_ctrl = DEFAULT_PRIMARY_CTRL;
+		i.i_primary_ctrl = ATA_DEFAULT_PRIMARY_CTRL;
 		result           = true;
 	} else {
 		if (!(dev->pd_res[PD_RESOURCE_BAR1].pr_flags & PCI_RESOURCE_FIO)) {
@@ -1797,11 +1791,11 @@ NOTHROW(KCALL kernel_load_pci_ide)(struct pci_device *__restrict dev) {
 			return false;
 		}
 		i.i_primary_ctrl = (port_t)dev->pd_res[PD_RESOURCE_BAR1].pr_start;
-		if (i.i_primary_ctrl == DEFAULT_PRIMARY_CTRL)
+		if (i.i_primary_ctrl == ATA_DEFAULT_PRIMARY_CTRL)
 			result = true;
 	}
 	if (dev->pd_res[PD_RESOURCE_BAR2].pr_flags == PCI_RESOURCE_FUNUSED) {
-		i.i_secondary_bus = DEFAULT_SECONDARY_BUS;
+		i.i_secondary_bus = ATA_DEFAULT_SECONDARY_BUS;
 		result            = true;
 	} else {
 		if (!(dev->pd_res[PD_RESOURCE_BAR2].pr_flags & PCI_RESOURCE_FIO)) {
@@ -1810,11 +1804,11 @@ NOTHROW(KCALL kernel_load_pci_ide)(struct pci_device *__restrict dev) {
 			return false;
 		}
 		i.i_secondary_bus = (port_t)dev->pd_res[PD_RESOURCE_BAR2].pr_start;
-		if (i.i_secondary_bus == DEFAULT_SECONDARY_BUS)
+		if (i.i_secondary_bus == ATA_DEFAULT_SECONDARY_BUS)
 			result = true;
 	}
 	if (dev->pd_res[PD_RESOURCE_BAR3].pr_flags == PCI_RESOURCE_FUNUSED) {
-		i.i_secondary_ctrl = DEFAULT_SECONDARY_CTRL;
+		i.i_secondary_ctrl = ATA_DEFAULT_SECONDARY_CTRL;
 		result             = true;
 	} else {
 		if (!(dev->pd_res[PD_RESOURCE_BAR3].pr_flags & PCI_RESOURCE_FIO)) {
@@ -1823,7 +1817,7 @@ NOTHROW(KCALL kernel_load_pci_ide)(struct pci_device *__restrict dev) {
 			return false;
 		}
 		i.i_secondary_ctrl = (port_t)dev->pd_res[PD_RESOURCE_BAR3].pr_start;
-		if (i.i_secondary_ctrl == DEFAULT_SECONDARY_CTRL)
+		if (i.i_secondary_ctrl == ATA_DEFAULT_SECONDARY_CTRL)
 			result = true;
 	}
 	i.i_dma_ctrl = (port_t)-1;
@@ -1855,10 +1849,10 @@ NOTHROW(KCALL kernel_initialize_ide_driver)(void) {
 	if (!has_primary) {
 		/* Check for an IDE device at the default location. */
 		struct ide_ports i;
-		i.i_primary_bus    = DEFAULT_PRIMARY_BUS;
-		i.i_primary_ctrl   = DEFAULT_PRIMARY_CTRL;
-		i.i_secondary_bus  = DEFAULT_SECONDARY_BUS;
-		i.i_secondary_ctrl = DEFAULT_SECONDARY_CTRL;
+		i.i_primary_bus    = ATA_DEFAULT_PRIMARY_BUS;
+		i.i_primary_ctrl   = ATA_DEFAULT_PRIMARY_CTRL;
+		i.i_secondary_bus  = ATA_DEFAULT_SECONDARY_BUS;
+		i.i_secondary_ctrl = ATA_DEFAULT_SECONDARY_CTRL;
 		i.i_dma_ctrl       = (port_t)-1;
 		initialize_ide(&i, true);
 	}

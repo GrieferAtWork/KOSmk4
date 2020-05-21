@@ -27,10 +27,9 @@
 #include <bits/types.h>
 #include <kos/bits/types.h>
 
-__SYSDECL_BEGIN
+__DECL_BEGIN
 
 /* Interface for SCSI-compliant, USB mass-storage devices. */
-
 
 #define SCSI_GET_MAX_LUN 0xfe /* Get max logical unit number */
 
@@ -97,6 +96,6 @@ struct __ATTR_PACKED scsi_capacity {
 };
 #endif /* __CC__ */
 
-__SYSDECL_END
+__DECL_END
 
 #endif /* !_HW_DISK_SCSI_H */

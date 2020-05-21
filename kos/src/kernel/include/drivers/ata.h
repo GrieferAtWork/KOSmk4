@@ -28,10 +28,9 @@
 #include <kernel/types.h>
 #include <kernel/vm.h>
 #include <sched/signal.h>
+#include <hw/disk/ata.h>
 
 DECL_BEGIN
-
-#define DEFAULT_ATA_SECTOR_SIZE     512
 
 #if defined(__INTELLISENSE__) || 0
 #define CONFIG_ATA_DYNAMIC_SECTOR_SIZE 1
@@ -39,123 +38,6 @@ DECL_BEGIN
 #else
 #define ATA_SECTOR_SIZE(drive) ((void)(drive), DEFAULT_ATA_SECTOR_SIZE)
 #endif
-
-
-/* Offsets for `a_bus' */
-#define ATA_DATA           __CCAST(port_t)(0) /* ATA Data port */
-#define ATA_FEATURES       __CCAST(port_t)(1)
-#define ATA_SECTOR_COUNT   __CCAST(port_t)(2)
-#define ATA_ADDRESS1       __CCAST(port_t)(3)
-#define ATA_ADDRESS2       __CCAST(port_t)(4)
-#define ATA_ADDRESS3       __CCAST(port_t)(5)
-#define ATA_DRIVE_SELECT   __CCAST(port_t)(6)
-#define ATA_STATUS         __CCAST(port_t)(7) /* [READ] ATA Status port (same values as `a_ctrl')
-                                               * NOTE: Unlike `a_ctrl', when read, pending interrupts are cleared.
-                                               *       This port should really only be used for polling-like ATA
-                                               *       operations, as only `a_ctrl' can safely be used when working
-                                               *       with interrupts enabled. */
-#define ATA_COMMAND        __CCAST(port_t)(7) /* [WRITE] ATA Command port */
-#   define ATA_COMMAND_READ_SECTORS    0x20
-#   define ATA_COMMAND_READ_PIO        0x20 /* 28-bit LBA */
-#   define ATA_COMMAND_READ_PIO_EXT    0x24 /* 48-bit LBA */
-#   define ATA_COMMAND_READ_DMA        0xc8 /* 28-bit LBA */
-#   define ATA_COMMAND_READ_DMA_EXT    0x25 /* 48-bit LBA */
-#   define ATA_COMMAND_WRITE_SECTORS   0x30
-#   define ATA_COMMAND_WRITE_PIO       0x30 /* 28-bit LBA */
-#   define ATA_COMMAND_WRITE_PIO_EXT   0x34 /* 48-bit LBA */
-#   define ATA_COMMAND_WRITE_DMA       0xca /* 28-bit LBA */
-#   define ATA_COMMAND_WRITE_DMA_EXT   0x35 /* 48-bit LBA */
-#   define ATA_COMMAND_CACHE_FLUSH     0xe7 /* 28-bit LBA */
-#   define ATA_COMMAND_CACHE_FLUSH_EXT 0xea /* 48-bit LBA */
-#   define ATA_COMMAND_PACKET          0xa0
-#   define ATA_COMMAND_IDENTIFY_PACKET 0xa1
-#   define ATA_COMMAND_IDENTIFY        0xec
-
-
-/* Bits for `a_ctrl' (DeviceControlRegister) */
-#define ATA_DCR_ERR   0x01 /* Indicates an error occurred. (Cleared when `ATA_COMMAND' is written) */
-#define ATA_DCR_IDX   0x02 /* Index??? (Always zero)*/
-#define ATA_DCR_CORR  0x04 /* Corrected data??? (Always zero) */
-#define ATA_DCR_DRQ   0x08 /* Set when the drive is ready to receive/transmit PIO data */
-#define ATA_DCR_DSC   0x10 /* Overlapped Mode Service Request??? */
-#define ATA_DCR_DF    0x20 /* Drive fault error (independent of `ATA_DCR_ERR') */
-#define ATA_DCR_DRDY  0x40 /* 0 when the drive isn't spinning, or after an error (1 otherwise) */
-#define ATA_DCR_BSY   0x80 /* Drive is preparing to receive/transmit data (wait for it to clear) */
-#define ATA_CTRL_NIEN 0x02 /* Disable interrupts */
-#define ATA_CTRL_SRST 0x04 /* Software reset bit */
-#define ATA_CTRL_HOB  0x80 /* Read back the last high-order byte of the last LBA-48 value sent */
-
-/* valid values for `drive' */
-#define ATA_DRIVE_MASTER    0x40
-#define ATA_DRIVE_SLAVE     0x50
-
-/* Offsets for `i_dma_ctrl' / `a_dma' */
-#define DMA_PRIMARY_COMMAND   __CCAST(port_t)(0x00) /* [TYPE(u8)][READ_WRITE] Primary command (Set of `DMA_COMMAND_F*') */
-#define DMA_PRIMARY_STATUS    __CCAST(port_t)(0x02) /* [TYPE(u8)][READ][WRITE(CLEAR_BITS)] Primary status (Set of `DMA_STATUS_F*')
-                                                     * NOTE: When a DMA interrupt is fired, you are _required_ to clear `DMA_STATUS_FINTERRUPTED' in this port! */
-#define DMA_PRIMARY_PRDT      __CCAST(port_t)(0x04) /* [TYPE(u32)][WRITE] Primary PRDT Address (Points to a vector of `AtaPRD') */
-#define DMA_SECONDARY_COMMAND __CCAST(port_t)(0x08) /* [TYPE(u8)][READ_WRITE] Secondary command (Set of `DMA_COMMAND_F*') */
-#define DMA_SECONDARY_STATUS  __CCAST(port_t)(0x0a) /* [TYPE(u8)] Secondary status (Set of `DMA_STATUS_F*') */
-#define DMA_SECONDARY_PRDT    __CCAST(port_t)(0x0c) /* [TYPE(u32)][WRITE] Secondary PRDT Address (Points to a vector of `AtaPRD') */
-
-
-/* Bits for `DMA_PRIMARY_COMMAND' */
-#define DMA_COMMAND_FENABLED  0x01 /* When set, DMA mode is enabled.
-                                    * NOTE: Setting this bit also resets the ATA's DMA pointer to the start
-                                    *       of the PRD vector, should that pointer have been anywhere else
-                                    *       prior to then.
-                                    * NOTE: When a transfer has been completed, this bit must be cleared
-                                    *       before it can be set again. */
-#define DMA_COMMAND_FREADMODE 0x08 /* When set, read from disk; when clear, write to disk.
-                                    * NOTE: This bit may only be modified when `DMA_COMMAND_FENABLED' has
-                                    *       been cleared. */
-
-
-/* Bits for `DMA_PRIMARY_STATUS' */
-#define DMA_STATUS_FDMARUNNING        0x01 /* When set, DMA mode is currently running and working to complete
-                                            * all provided `AtaPRD' entries. Once completed, this bit is cleared
-                                            * by the ATA device. */
-#define DMA_STATUS_FTRANSPORT_FAILURE 0x02 /* Set if any of the `AtaPRD' entries failed to be completed for whatever reason. */
-#define DMA_STATUS_FINTERRUPTED       0x04 /* Set if the associated ATA device was responsible for an IRQ being generated. */
-#define DMA_STATUS_FNO_PARALLEL_DMA   0x80 /* Indicates that the primary and secondary ATA devices can be used
-                                            * for DMA at the same time. (Not normally set on modern hardware) */
-
-
-#ifdef __CC__
-struct ata_ports {
-	port_t   a_bus;  /* I/O port for the ATA bus. */
-	port_t   a_ctrl; /* Device control register/Alternate status ports. */
-	port_t   a_dma;  /* DMA controller port (or (port_t)-1 if DMA isn't supported)
-	                  * NOTE: When initializing a secondary ATA device, this port
-	                  *       has been shifted such that `DMA_SECONDARY_COMMAND'
-	                  *       becomes `DMA_PRIMARY_COMMAND', etc. */
-};
-struct ide_ports {
-	port_t   i_primary_bus;    /* I/O port for the primary ATA bus. */
-	port_t   i_primary_ctrl;   /* Primary device control register/Alternate status ports. */
-	port_t   i_secondary_bus;  /* I/O port for the secondary ATA bus. */
-	port_t   i_secondary_ctrl; /* Secondary device control register/Alternate status ports. */
-	port_t   i_dma_ctrl;       /* DMA controller port (or (port_t)-1 if DMA isn't supported)
-	                            * NOTE: Documentation calls th(is|ese) the `Bus Master Register(s)' */
-};
-#endif /* __CC__ */
-
-
-#define SIZEOF_ATAPRD  8
-
-#ifdef __CC__
-typedef struct ATTR_PACKED ATTR_ALIGNED(4) {
-	/* AtaPRD -- Physical Region Descriptor */
-	PHYS u32   p_bufaddr;  /* Physical address of the target/source buffer */
-	u16        p_bufsize;  /* Buffer size of `p_bufaddr' (in bytes)
-	                        * NOTE: When 0, the actual size is `0x10000' */
-	u16        p_flags;    /* Set of `PRD_F*' */
-} AtaPRD;
-#endif /* __CC__ */
-
-/* Flags for `AtaPRD::p_flags' */
-#define PRD_FNORMAL 0x0000 /* Normal AtaPRD flags. */
-#define PRD_FLAST   0x8000 /* Must be set for the last AtaPRD */
 
 /* Max number of continuous PRDs allowed for a single IO operation. */
 #define ATA_PRD_MAXCOUNT (PAGESIZE / SIZEOF_ATAPRD)
@@ -234,11 +116,11 @@ INTDEF NOBLOCK NONNULL((1)) unsigned int NOTHROW(KCALL Ata_DmaHandleProgress)(st
 struct ata_drive
 #ifdef __cplusplus
 	: block_device
-#endif
+#endif /* __cplusplus */
 {
 #ifndef __cplusplus
 	struct block_device d_device;                /* The underlying block-device. */
-#endif
+#endif /* !__cplusplus */
 	struct ata_bus     *d_bus;                   /* [1..1][const] The associated ATA bus. */
 	u16                 d_chs_cylinders;         /* [const] */
 	u8                  d_chs_sectors_per_track; /* [const] */
@@ -253,11 +135,11 @@ struct ata_drive
 struct ata_dmadrive
 #ifdef __cplusplus
 	: ata_drive
-#endif
+#endif /* __cplusplus */
 {
 #ifndef __cplusplus
 	struct ata_drive    d_drive;                 /* The underlying drive. */
-#endif
+#endif /* !__cplusplus */
 	/* I/O functions for performing non-canonical I/O (i.e. I/O that cannot be performed through use of pure DMA) */
 	NONNULL((1, 5)) void (KCALL *d_noncanon_read)(struct ata_drive *__restrict self, USER CHECKED void *dst, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
 	NONNULL((1, 5)) void (KCALL *d_noncanon_read_phys)(struct ata_drive *__restrict self, vm_phys_t dst, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
