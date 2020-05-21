@@ -52,11 +52,11 @@ __ASM_L(.ifc __ASM_ARG(\expr_reg),%al; call __predict_update_al; .else)
 __ASM_L(.ifc __ASM_ARG(\expr_reg),%ax; call __predict_update_ax; .else)
 __ASM_L(.ifc __ASM_ARG(\expr_reg),%eax; call __predict_update_eax; .else)
 #endif /* !__x86_64__ */
-#ifdef __ASSEMBLY__
+#ifdef __ASSEMBLER__
 __ASM_L(.error "Invalid register used: \expr_reg")
-#else
+#else /* __ASSEMBLER__ */
 __ASM_L(.error "Invalid register used: \\expr_reg")
-#endif
+#endif /* !__ASSEMBLER__ */
 #ifdef __x86_64__
 __ASM_L(.endif;.endif;.endif;.endif;.endif;.endif;.endif;.endif)
 __ASM_L(.endif;.endif;.endif;.endif;.endif;.endif;.endif;.endif)

@@ -25,6 +25,17 @@
 #include "tss.h"
 
 #ifdef __x86_64__
+#define OFFSET_TSS_PSP0 OFFSET_TSS_RSP0
+#define OFFSET_TSS_PSP1 OFFSET_TSS_RSP1
+#define OFFSET_TSS_PSP2 OFFSET_TSS_RSP2
+#else /* __x86_64__ */
+#define OFFSET_TSS_PSP0 OFFSET_TSS_ESP0
+#define OFFSET_TSS_PSP1 OFFSET_TSS_ESP1
+#define OFFSET_TSS_PSP2 OFFSET_TSS_ESP2
+#endif /* !__x86_64__ */
+
+#ifdef __CC__
+#ifdef __x86_64__
 #define t_psp0 t_rsp0
 #define t_psp1 t_rsp1
 #define t_psp2 t_rsp2
@@ -33,5 +44,6 @@
 #define t_psp1 t_esp1
 #define t_psp2 t_esp2
 #endif /* !__x86_64__ */
+#endif /* __CC__ */
 
 #endif /* !_I386_KOS_KOS_KERNEL_TSS_COMPAT_H */

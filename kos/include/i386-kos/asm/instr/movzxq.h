@@ -70,6 +70,11 @@ __ASM_L(.macro movzlq src:req, dst:req)
 __ASM_L(	__call_with_32bit_register movl, \src, \dst)
 __ASM_L(.endm)
 __ASM_END
+#if defined(__ASSEMBLER__) && defined(_I386_KOS_ASM_INSTR_COMPAT_H)
+#define movzbP movzbq
+#define movzwP movzwq
+#define movzlP movzlq
+#endif /* __ASSEMBLER__ && _I386_KOS_ASM_INSTR_COMPAT_H */
 #endif /* __x86_64__ */
 
 #endif /* !_I386_KOS_ASM_INSTR_MOVZXQ_H */

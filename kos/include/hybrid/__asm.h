@@ -37,7 +37,12 @@
 #endif /* !__TPP_VERSION__ */
 #define __ASM_LINE2(...) #__VA_ARGS__ "\n\t"
 #define __ASM_L(...)     __ASM_LINE2(__VA_ARGS__)
-#elif defined(__ASSEMBLY__)
+#elif defined(__INTELLISENSE__)
+#define __ASM_BEGIN      /* nothing */
+#define __ASM_END        /* nothing */
+#define __ASM_ARG(x)     /* nothing */
+#define __ASM_L(...)     /* nothing */
+#elif defined(__ASSEMBLER__)
 #define __ASM_BEGIN      /* nothing */
 #define __ASM_END        /* nothing */
 #define __ASM_ARG(x)     x

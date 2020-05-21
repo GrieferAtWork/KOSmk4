@@ -32,7 +32,48 @@
 #undef END
 #undef INTERN_CONST
 #undef PUBLIC_CONST
-
+#ifdef __INTELLISENSE__
+/* Try to confuse intellisense as little as possible... */
+#define PRIVATE(sym)
+#define INTERN(sym)
+#define PUBLIC(sym)
+#define EXTERN(sym)
+#define WEAK(sym)
+#define BEGIN(sym)
+#define END(sym)
+#define FUNCTION(sym)
+#define OBJECT(sym)
+#define PRIVATE_BEGIN(sym)
+#define INTERN_BEGIN(sym)
+#define PUBLIC_BEGIN(sym)
+#define PRIVATE_WEAK_BEGIN(sym)
+#define INTERN_WEAK_BEGIN(sym)
+#define PUBLIC_WEAK_BEGIN(sym)
+#define PRIVATE_FUNCTION(sym)
+#define INTERN_FUNCTION(sym)
+#define PUBLIC_FUNCTION(sym)
+#define PRIVATE_WEAK_FUNCTION(sym)
+#define INTERN_WEAK_FUNCTION(sym)
+#define PUBLIC_WEAK_FUNCTION(sym)
+#define PRIVATE_OBJECT(sym)
+#define INTERN_OBJECT(sym)
+#define PUBLIC_OBJECT(sym)
+#define PRIVATE_WEAK_OBJECT(sym)
+#define INTERN_WEAK_OBJECT(sym)
+#define PUBLIC_WEAK_OBJECT(sym)
+#define PRIVATE_LABEL(sym)
+#define INTERN_LABEL(sym)
+#define PUBLIC_LABEL(sym)
+#define PRIVATE_WEAK_LABEL(sym)
+#define INTERN_WEAK_LABEL(sym)
+#define PUBLIC_WEAK_LABEL(sym)
+#define PRIVATE_CONST(sym, val)
+#define INTERN_CONST(sym, val)
+#define PUBLIC_CONST(sym, val)
+#define PRIVATE_WEAK_CONST(sym)
+#define INTERN_WEAK_CONST(sym)
+#define PUBLIC_WEAK_CONST(sym)
+#else /* __INTELLISENSE__ */
 #define PRIVATE(sym)  .local sym;
 #define INTERN(sym)   .global sym; .hidden sym;
 #define PUBLIC(sym)   .global sym;
@@ -78,6 +119,7 @@
 #define PRIVATE_WEAK_CONST(sym) PRIVATE(sym) WEAK(sym) .set sym, val;
 #define INTERN_WEAK_CONST(sym)  INTERN(sym) WEAK(sym) .set sym, val;
 #define PUBLIC_WEAK_CONST(sym)  PUBLIC(sym) WEAK(sym) .set sym, val;
+#endif /* !__INTELLISENSE__ */
 #endif /* __ASSEMBLER__ */
 
 

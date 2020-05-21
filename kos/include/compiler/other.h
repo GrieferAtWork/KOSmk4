@@ -96,7 +96,14 @@
 #endif /* __TPP_VERSION__ */
 
 
-#ifdef __ASSEMBLER__
+#ifdef __INTELLISENSE__
+#define __DEFINE_PRIVATE_ALIAS(new, old)      /* nothing */
+#define __DEFINE_PRIVATE_WEAK_ALIAS(new, old) /* nothing */
+#define __DEFINE_INTERN_WEAK_ALIAS(new, old)  /* nothing */
+#define __DEFINE_PUBLIC_WEAK_ALIAS(new, old)  /* nothing */
+#define __DEFINE_PUBLIC_ALIAS(new, old)       /* nothing */
+#define __DEFINE_INTERN_ALIAS(new, old)       /* nothing */
+#elif defined(__ASSEMBLER__)
 #define __DEFINE_PRIVATE_ALIAS(new, old)      .local new; .set new, old;
 #define __DEFINE_PUBLIC_ALIAS(new, old)       .global new; .set new, old;
 #define __DEFINE_INTERN_ALIAS(new, old)       .global new; .hidden new; .set new, old;
@@ -110,14 +117,14 @@
 #define __DEFINE_PUBLIC_WEAK_ALIAS(new, old)  __DEFINE_PUBLIC_ALIAS(new, old)
 #define __DEFINE_PUBLIC_ALIAS(new, old)       PROVIDE(new = ABSOLUTE(old))
 #define __DEFINE_INTERN_ALIAS(new, old)       PROVIDE_HIDDEN(new = ABSOLUTE(old))
-#else
+#else /* ... */
 #define __DEFINE_PRIVATE_ALIAS(new, old)      /* nothing */
 #define __DEFINE_PRIVATE_WEAK_ALIAS(new, old) /* nothing */
 #define __DEFINE_INTERN_WEAK_ALIAS(new, old)  /* nothing */
 #define __DEFINE_PUBLIC_WEAK_ALIAS(new, old)  /* nothing */
 #define __DEFINE_PUBLIC_ALIAS(new, old)       /* nothing */
 #define __DEFINE_INTERN_ALIAS(new, old)       /* nothing */
-#endif
+#endif /* !... */
 
 
 #define __builtin_expect(x, y) (x)

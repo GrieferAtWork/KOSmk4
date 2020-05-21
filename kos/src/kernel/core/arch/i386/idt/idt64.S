@@ -17,7 +17,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_IDT_IDT64_S
+#define GUARD_KERNEL_CORE_ARCH_I386_IDT_IDT64_S 1
 #define __ASSEMBLER__ 1
+
 #include <hybrid/compiler.h>
 
 #include <kernel/idt-names.h>
@@ -94,3 +97,4 @@ END(x86_idt_unused_common)
 #endif /* !__INTELLISENSE__ */
 .cfi_endproc
 
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_IDT_IDT64_S */

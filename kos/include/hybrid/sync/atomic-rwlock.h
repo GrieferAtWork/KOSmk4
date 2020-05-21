@@ -247,7 +247,7 @@ __LOCAL void __NOTHROW(atomic_rwlock_downgrade)(struct atomic_rwlock *__restrict
 #endif /* !__INTELLISENSE__ */
 #endif /* __CC__ */
 
-#ifdef __ASSEMBLER__
+#if defined(__ASSEMBLER__) && !defined(__INTELLISENSE__)
 #if defined(__x86_64__)
 
 #ifndef LOCK_PREFIX
@@ -383,13 +383,13 @@ __LOCAL void __NOTHROW(atomic_rwlock_downgrade)(struct atomic_rwlock *__restrict
 	movl   $(0), \__self
 .endm
 #endif
-#endif /* __ASSEMBLER__ */
+#endif /* __ASSEMBLER__ && !__INTELLISENSE__ */
 
 #if !defined(__INTELLISENSE__) && !defined(__NO_builtin_expect)
-#define atomic_rwlock_tryread(__self)    __builtin_expect(atomic_rwlock_tryread(__self), 1)
-#define atomic_rwlock_trywrite(__self)   __builtin_expect(atomic_rwlock_trywrite(__self), 1)
-#define atomic_rwlock_tryupgrade(__self) __builtin_expect(atomic_rwlock_tryupgrade(__self), 1)
-#define atomic_rwlock_upgrade(__self)    __builtin_expect(atomic_rwlock_upgrade(__self), 1)
+#define atomic_rwlock_tryread(self)    __builtin_expect(atomic_rwlock_tryread(self), 1)
+#define atomic_rwlock_trywrite(self)   __builtin_expect(atomic_rwlock_trywrite(self), 1)
+#define atomic_rwlock_tryupgrade(self) __builtin_expect(atomic_rwlock_tryupgrade(self), 1)
+#define atomic_rwlock_upgrade(self)    __builtin_expect(atomic_rwlock_upgrade(self), 1)
 #endif /* !__INTELLISENSE__ && !__NO_builtin_expect */
 
 #ifdef __DEFINE_SYNC_RWLOCK

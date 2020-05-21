@@ -32,28 +32,10 @@
 #include <asm/instr/jccN.h>
 #include <asm/param.h>
 
+#include <asm/instr/compat.h>
 #ifdef __x86_64__
 #include <asm/instr/movzxq.h>
-#define movP    movq
-#define movzlP  movzlq
-#define xorP    xorq
-#define subP    subq
-#define Pax     rax
-#define Pcx     rcx
-#define Pdx     rdx
-#define SEG_TLS gs
-#define FCALL0  rdi
-#else /* __x86_64__ */
-#define movP    movl
-#define movzlP  movl
-#define xorP    xorl
-#define subP    subl
-#define Pax     eax
-#define Pcx     ecx
-#define Pdx     edx
-#define FCALL0  ecx
-#define SEG_TLS fs
-#endif /* !__x86_64__ */
+#endif /* __x86_64__ */
 
 #define SKIPFOR(mystart, minsize)        \
 	.if minsize > (. - mystart);         \
@@ -76,10 +58,10 @@
  * Same as the function above, however don't
  * account for lazy/delayed interrupt handling.*/
 BEGIN_APIC(apic86_arch_cpu_quantum_elapsed_nopr)
-	cmpb   $(0), arch_cpu_preemptive_interrupts_disabled(%FCALL0)
+	cmpb   $(0), arch_cpu_preemptive_interrupts_disabled(%R_fcall0P)
 	jne8   1f /* Preemptive interrupts are disabled! */
 	EXTERN(thiscpu_quantum_length)
-	movzlP thiscpu_quantum_length(%FCALL0), %Pax
+	movzlP thiscpu_quantum_length(%R_fcall0P), %Pax
 	EXTERN(x86_lapicbase)
 	movP   x86_lapicbase, %Pcx
 	movl   APIC_TIMER_CURRENT(%Pcx), %ecx /* Read the current timer value */
@@ -106,9 +88,9 @@ END_APIC(apic86_arch_cpu_quantum_elapsed_nopr)
  *          does the same as `arch_cpu_update_quantum_length_nopr()'. */
 BEGIN_APIC(apic86_arch_cpu_enable_preemptive_interrupts_nopr)
 	EXTERN(arch_cpu_preemptive_interrupts_disabled)
-	movb   $(0), arch_cpu_preemptive_interrupts_disabled(%FCALL0)
+	movb   $(0), arch_cpu_preemptive_interrupts_disabled(%R_fcall0P)
 	EXTERN(thiscpu_quantum_length)
-	movl   thiscpu_quantum_length(%FCALL0), %ecx
+	movl   thiscpu_quantum_length(%R_fcall0P), %ecx
 	EXTERN(x86_lapicbase)
 	movP   x86_lapicbase, %Pax
 	/* >> lapic_write(APIC_TIMER_DIVIDE, APIC_TIMER_DIVIDE_F16); */
@@ -124,7 +106,7 @@ END_APIC(apic86_arch_cpu_enable_preemptive_interrupts_nopr)
 
 BEGIN_APIC(apic86_arch_cpu_disable_preemptive_interrupts_nopr)
 	EXTERN(arch_cpu_preemptive_interrupts_disabled)
-	movb   $(1), arch_cpu_preemptive_interrupts_disabled(%FCALL0)
+	movb   $(1), arch_cpu_preemptive_interrupts_disabled(%R_fcall0P)
 	EXTERN(x86_lapicbase)
 	movP   x86_lapicbase, %Pax
 	/* lapic_write(APIC_TIMER, APIC_TIMER_FDISABLED); */
@@ -141,12 +123,12 @@ END_APIC(apic86_arch_cpu_disable_preemptive_interrupts_nopr)
  * left before a scheduler interrupt is fired) to their max values. */
 BEGIN_APIC(apic86_arch_cpu_quantum_elapsed_and_reset_nopr)
 	EXTERN(arch_cpu_preemptive_interrupts_disabled)
-	cmpb   $(0), arch_cpu_preemptive_interrupts_disabled(%FCALL0)
+	cmpb   $(0), arch_cpu_preemptive_interrupts_disabled(%R_fcall0P)
 	jne8   1f
 	EXTERN(x86_lapicbase)
 	movP   x86_lapicbase, %Pdx
 	EXTERN(thiscpu_quantum_length)
-	movzlP thiscpu_quantum_length(%FCALL0), %Pax
+	movzlP thiscpu_quantum_length(%R_fcall0P), %Pax
 	/* >> lapic_read(APIC_TIMER_CURRENT); */
 	movzlP APIC_TIMER_CURRENT(%Pdx), %Pcx
 	/* >> lapic_write(APIC_TIMER_INITIAL, PERCPU(thiscpu_quantum_length)); */
@@ -234,7 +216,7 @@ END_APIC(apic86_arch_cpu_hwipi_pending_nopr)
  * account for lazy/delayed interrupt handling.*/
 BEGIN_PIT(arch_cpu_quantum_elapsed_nopr)
 	EXTERN(arch_cpu_preemptive_interrupts_disabled)
-	cmpb   $(0), arch_cpu_preemptive_interrupts_disabled(%FCALL0)
+	cmpb   $(0), arch_cpu_preemptive_interrupts_disabled(%R_fcall0P)
 	jne8   1f /* Preemptive interrupts are disabled! */
 	/* Read the current PIT counter position. */
 	movb   $(PIT_COMMAND_SELECT_F0 |     \
@@ -246,7 +228,7 @@ BEGIN_PIT(arch_cpu_quantum_elapsed_nopr)
 	inb    $(PIT_DATA0), %al
 	movb   %al, %dh
 	EXTERN(thiscpu_quantum_length)
-	movzlP thiscpu_quantum_length(%FCALL0), %Pax
+	movzlP thiscpu_quantum_length(%R_fcall0P), %Pax
 	subw   %dx, %ax
 	jb8    1f /* Shouldn't happen */
 	ret
@@ -271,9 +253,9 @@ END_PIT(arch_cpu_quantum_elapsed_nopr)
 BEGIN_PIT(arch_cpu_enable_preemptive_interrupts_nopr)
 	/* Mark preemptive interrupts as being enabled. */
 	EXTERN(arch_cpu_preemptive_interrupts_disabled)
-	movb   $(0), arch_cpu_preemptive_interrupts_disabled(%FCALL0)
+	movb   $(0), arch_cpu_preemptive_interrupts_disabled(%R_fcall0P)
 	EXTERN(thiscpu_quantum_length)
-	movw   thiscpu_quantum_length(%FCALL0), %dx
+	movw   thiscpu_quantum_length(%R_fcall0P), %dx
 	movb   $(PIT_COMMAND_SELECT_F0 |     \
 	         PIT_COMMAND_ACCESS_FLOHI |  \
 	         PIT_COMMAND_MODE_FRATEGEN | \
@@ -293,7 +275,7 @@ END_PIT(arch_cpu_enable_preemptive_interrupts_nopr)
 BEGIN_PIT(arch_cpu_disable_preemptive_interrupts_nopr)
 	/* Mark preemptive interrupts as being disabled. */
 	EXTERN(arch_cpu_preemptive_interrupts_disabled)
-	movb   $(1), arch_cpu_preemptive_interrupts_disabled(%FCALL0)
+	movb   $(1), arch_cpu_preemptive_interrupts_disabled(%R_fcall0P)
 	/* Disable the PIT interrupt within the PIC */
 	inb    $(X86_PIC1_DATA), %al
 	orb    $(1 << (X86_INTNO_PIC1_PIT-X86_INTERRUPT_PIC1_BASE)), %al
@@ -320,10 +302,10 @@ END_PIT(arch_cpu_disable_preemptive_interrupts_nopr)
 BEGIN_PIT(arch_cpu_quantum_elapsed_and_reset_nopr)
 	/* Re-initialize to reset the latch counter. */
 	EXTERN(thiscpu_quantum_length)
-	movl   thiscpu_quantum_length(%FCALL0), %edx
+	movl   thiscpu_quantum_length(%R_fcall0P), %edx
 .Lpit_reset_quantum_with_length_edx:
 	EXTERN(arch_cpu_preemptive_interrupts_disabled)
-	cmpb   $(0), arch_cpu_preemptive_interrupts_disabled(%FCALL0)
+	cmpb   $(0), arch_cpu_preemptive_interrupts_disabled(%R_fcall0P)
 	jne8   1f
 
 	/* %edx = thiscpu_quantum_length & 0xffff */
@@ -371,12 +353,12 @@ END_PIT(arch_cpu_quantum_elapsed_and_reset_nopr)
  *       length needed to reach this goal changes over time) */
 BEGIN_PIT(arch_cpu_update_quantum_length_nopr)
 	EXTERN(thiscpu_quantum_length)
-	movl   thiscpu_quantum_length(%FCALL0), %edx
+	movl   thiscpu_quantum_length(%R_fcall0P), %edx
 	/* Make sure that we don't exceed the max value. */
 	cmpl   $(0xffff), %edx
 	jbe8   .Lpit_reset_quantum_with_length_edx
 	movl   $(0xffff), %edx
-	movl   %edx, thiscpu_quantum_length(%FCALL0)
+	movl   %edx, thiscpu_quantum_length(%R_fcall0P)
 	jmp8   .Lpit_reset_quantum_with_length_edx
 END_PIT(arch_cpu_update_quantum_length_nopr)
 

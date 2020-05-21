@@ -25,7 +25,7 @@
 
 __DECL_BEGIN
 
-#ifdef __CC__
+#if defined(__CC__) || defined(__INTELLISENSE__)
 #define TYPEDEF(type, name)                               typedef type name;
 #define STRUCT_BEGIN(name)                                struct name {
 #define STRUCT_FIELD(struct_name, field_type, field_name) field_type field_name;
