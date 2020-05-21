@@ -41,6 +41,7 @@ if (gcc_opt.remove("-O3"))
 
 #include <compat/config.h>
 
+#include <fcntl.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
@@ -513,6 +514,69 @@ NOTHROW_NCX(CC libsc_getdesc)(struct rpc_syscall_info const *__restrict sc_info,
 		}
 		++regi;
 	}
+	/* Special handling for certain system calls. */
+#ifdef __ARCH_HAVE_COMPAT
+	if (RPC_SYSCALL_INFO_METHOD_ISCOMPAT(sc_info->rsi_flags)) {
+		switch (sc_info->rsi_sysno) {
+#if __ARCH_COMPAT_SIZEOF_POINTER == 4
+#define COMPAT_NR(x) __NR32_##x
+#elif __ARCH_COMPAT_SIZEOF_POINTER == 8
+#define COMPAT_NR(x) __NR64_##x
+#else /* __ARCH_COMPAT_SIZEOF_POINTER == ... */
+#error "Unsupported __ARCH_COMPAT_SIZEOF_POINTER"
+#endif /* __ARCH_COMPAT_SIZEOF_POINTER != ... */
+
+#if __ARCH_COMPAT_SIZEOF_POINTER == 4 ? defined(__NR32_open) : defined(__NR64_open)
+		case COMPAT_NR(open):
+			/* sys_open() ignores the 3rd argument in certain cases */
+			if (desc->sc_argc == 3 &&
+			    (desc->sc_argv[1].sa_value.sv_u64 & O_CREAT) != O_CREAT &&
+			    (desc->sc_argv[1].sa_value.sv_u64 & O_TMPFILE) != O_TMPFILE)
+				desc->sc_argc = 2;
+			break;
+#endif /* __NR(32|64)_open */
+
+#if __ARCH_COMPAT_SIZEOF_POINTER == 4 ? defined(__NR32_openat) : defined(__NR64_openat)
+		case COMPAT_NR(openat):
+			/* sys_openat() ignores the 4th argument in certain cases */
+			if (desc->sc_argc == 4 &&
+			    (desc->sc_argv[2].sa_value.sv_u64 & O_CREAT) != O_CREAT &&
+			    (desc->sc_argv[2].sa_value.sv_u64 & O_TMPFILE) != O_TMPFILE)
+				desc->sc_argc = 3;
+			break;
+#endif /* __NR(32|64)_openat */
+
+		}
+	} else
+#endif /* __ARCH_HAVE_COMPAT */
+	{
+		switch (sc_info->rsi_sysno) {
+
+#ifdef __NR_open
+		case __NR_open:
+			/* sys_open() ignores the 3rd argument in certain cases */
+			if (desc->sc_argc == 3 &&
+			    (desc->sc_argv[1].sa_value.sv_u64 & O_CREAT) != O_CREAT &&
+			    (desc->sc_argv[1].sa_value.sv_u64 & O_TMPFILE) != O_TMPFILE)
+				desc->sc_argc = 2;
+			break;
+#endif /* __NR_open */
+
+#ifdef __NR_openat
+		case __NR_openat:
+			/* sys_openat() ignores the 4th argument in certain cases */
+			if (desc->sc_argc == 4 &&
+			    (desc->sc_argv[2].sa_value.sv_u64 & O_CREAT) != O_CREAT &&
+			    (desc->sc_argv[2].sa_value.sv_u64 & O_TMPFILE) != O_TMPFILE)
+				desc->sc_argc = 3;
+			break;
+#endif /* __NR_openat */
+
+		default:
+			break;
+		}
+	}
+
 	return true;
 	/* Fallback: Fill in `desc' with stub-values */
 unknown_syscall:

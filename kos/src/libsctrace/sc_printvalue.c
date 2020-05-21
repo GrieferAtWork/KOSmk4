@@ -368,8 +368,14 @@ print_oflag_t_impl(pformatprinter printer, void *arg,
 	}
 	for (i = 0; i < COMPILER_LENOF(oflag_names); ++i) {
 		char const *name;
-		if (!(oflags & oflag_names[i].on_flag))
+		if ((oflags & oflag_names[i].on_flag) !=
+		    /*     */ oflag_names[i].on_flag)
 			continue;
+#if (O_TMPFILE & O_DIRECTORY) != 0
+		if (oflag_names[i].on_flag == O_DIRECTORY &&
+		    (oflags & O_TMPFILE) == O_TMPFILE)
+			continue;
+#endif /* (O_TMPFILE & O_DIRECTORY) != 0 */
 		if (!is_first)
 			PRINT(PIPESTR);
 		name = oflag_names[i].on_name;
@@ -1313,9 +1319,9 @@ print_string_vector(pformatprinter printer, void *arg,
 			TRY {
 #ifdef NEED_STRING_VECTOR_POINTER_SIZE
 				if (sizeof_pointer == 4) {
-					string = (USER UNCHECKED char const *)((uint32_t *)vector)[i];
+					string = (USER UNCHECKED char const *)(uintptr_t)((uint32_t *)vector)[i];
 				} else {
-					string = (USER UNCHECKED char const *)((uint64_t *)vector)[i];
+					string = (USER UNCHECKED char const *)(uintptr_t)((uint64_t *)vector)[i];
 				}
 #else /* NEED_STRING_VECTOR_POINTER_SIZE */
 				string = vector[i];
@@ -2085,7 +2091,9 @@ do_struct_timespecx64:
 	case SC_REPR_MODE_T:
 		/* Handle the special case of the 3rd argument
 		 * to sys_open(), where the mode value is ignored */
-		if (link && (link->sa_value.sv_u64 & (O_CREAT | (O_TMPFILE & ~O_DIRECTORY))) != 0)
+		if (link &&
+		    (link->sa_value.sv_u64 & O_CREAT) != O_CREAT &&
+		    (link->sa_value.sv_u64 & O_TMPFILE) != O_TMPFILE)
 			value.sv_u64 = 0;
 		result = print_mode_t(printer, arg, (mode_t)value.sv_u64);
 		break;
