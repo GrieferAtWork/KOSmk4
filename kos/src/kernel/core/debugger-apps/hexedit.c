@@ -305,19 +305,19 @@ hd_printscreen(void *start_addr, void *sel_addr,
 		                   (byte_t *)sel_addr < (byte_t *)line_addr + hd_linesize;
 		line_changed = 0;
 		line_valid   = hd_getline(line_addr, line_data, &line_changed);
-		dbg_attr     = dbg_default_attr;
+		dbg_setcolor(dbg_getdefaultcolor());
 		if (sel_region == HD_REGION_ADDR) {
 			if (is_line_selected) {
-				dbg_setcolor(DBG_COLOR_BLACK, DBG_COLOR_LIGHT_GRAY);
+				dbg_setcolor(ANSITTY_CL_BLACK, ANSITTY_CL_LIGHT_GRAY);
 			} else {
-				dbg_setbgcolor(DBG_COLOR_DARK_GRAY);
+				dbg_setbgcolor(ANSITTY_CL_DARK_GRAY);
 			}
 		} else {
-			dbg_setbgcolor(DBG_COLOR_BLACK);
+			dbg_setbgcolor(ANSITTY_CL_BLACK);
 		}
 		dbg_setcur(0, line);
 		dbg_printf(DBGSTR("%p"), line_addr);
-		dbg_attr = dbg_default_attr;
+		dbg_setcolor(dbg_getdefaultcolor());
 		for (i = 0; i < hd_hexpad; ++i)
 			dbg_putc(' ');
 		/* Print the hex representation */
@@ -336,47 +336,45 @@ hd_printscreen(void *start_addr, void *sel_addr,
 #undef VALID_BYTE
 			if (column_word != 0)
 				dbg_putc(' ');
-			dbg_attr = dbg_default_attr;
+			dbg_setcolor(dbg_getdefaultcolor());
 			if (sel_region == HD_REGION_HEX) {
 				if (column_word == sel_column || is_line_selected) {
-					dbg_setcolor(DBG_COLOR_BLACK, DBG_COLOR_LIGHT_GRAY);
+					dbg_setcolor(ANSITTY_CL_BLACK, ANSITTY_CL_LIGHT_GRAY);
 				} else {
-					dbg_setbgcolor(DBG_COLOR_DARK_GRAY);
+					dbg_setbgcolor(ANSITTY_CL_DARK_GRAY);
 				}
 			} else {
-				dbg_setbgcolor(DBG_COLOR_BLACK);
+				dbg_setbgcolor(ANSITTY_CL_BLACK);
 			}
 			if ((byte_t *)sel_addr >= ((byte_t *)line_addr + (column_word * hd_bytes_per_word)) &&
 			    (byte_t *)sel_addr < ((byte_t *)line_addr + ((column_word + 1) * hd_bytes_per_word))) {
 				/* This is the currently selected word! */
-				dbg_attr_t temp;
 				memcpy(sel_word, pb, hd_bytes_per_word);
 				sel_byte_is_valid = is_valid;
 				for (nibble_byte = 0; nibble_byte < hd_bytes_per_word; ++nibble_byte) {
 					byte_t b;
-					dbg_attr_t old_attr;
 					unsigned int nibble_byte_index = nibble_byte;
 					if (hd_hex_le)
 						nibble_byte_index = (hd_bytes_per_word - 1) - nibble_byte;
-					old_attr = dbg_attr;
+					dbg_savecolor();
 					b = pb[nibble_byte_index];
 					if (CHANGED_BYTE(column_word * hd_bytes_per_word + nibble_byte_index))
-						dbg_setfgcolor(DBG_COLOR_RED);
+						dbg_setfgcolor(ANSITTY_CL_RED);
 					if (sel_region == HD_REGION_HEX) {
 						if (nibble_byte_index == (hd_hex_nibble / 2)) {
 							if (hd_hex_nibble & 1) {
 								dbg_putc(hd_tohex(b >> 4, is_valid));
-								temp = dbg_attr;
-								dbg_setcolor(DBG_COLOR_GREEN, DBG_COLOR_BLACK);
+								dbg_savecolor();
+								dbg_setcolor(ANSITTY_CL_GREEN, ANSITTY_CL_BLACK);
 								dst_cursor_pos = dbg_getcur();
 								dbg_putc(hd_tohex(b & 0xf, is_valid));
-								dbg_attr = temp;
+								dbg_loadcolor();
 							} else {
-								temp = dbg_attr;
-								dbg_setcolor(DBG_COLOR_GREEN, DBG_COLOR_BLACK);
+								dbg_savecolor();
+								dbg_setcolor(ANSITTY_CL_GREEN, ANSITTY_CL_BLACK);
 								dst_cursor_pos = dbg_getcur();
 								dbg_putc(hd_tohex(b >> 4, is_valid));
-								dbg_attr = temp;
+								dbg_loadcolor();
 								dbg_putc(hd_tohex(b & 0xf, is_valid));
 							}
 						} else {
@@ -384,31 +382,30 @@ hd_printscreen(void *start_addr, void *sel_addr,
 							dbg_putc(hd_tohex(b & 0xf, is_valid));
 						}
 					} else {
-						dbg_setcolor(DBG_COLOR_GREEN, DBG_COLOR_BLACK);
+						dbg_setcolor(ANSITTY_CL_GREEN, ANSITTY_CL_BLACK);
 						dbg_putc(hd_tohex(b >> 4, is_valid));
 						dbg_putc(hd_tohex(b & 0xf, is_valid));
 					}
-					dbg_attr = old_attr;
+					dbg_loadcolor();
 				}
 			} else {
 				for (nibble_byte = 0; nibble_byte < hd_bytes_per_word; ++nibble_byte) {
 					byte_t b;
-					dbg_attr_t old_attr;
 					unsigned int nibble_byte_index = nibble_byte;
 					if (hd_hex_le)
 						nibble_byte_index = (hd_bytes_per_word - 1) - nibble_byte;
 					b = pb[nibble_byte_index];
-					old_attr = dbg_attr;
+					dbg_savecolor();
 					if (CHANGED_BYTE(column_word * hd_bytes_per_word + nibble_byte_index))
-						dbg_setfgcolor(DBG_COLOR_RED);
+						dbg_setfgcolor(ANSITTY_CL_RED);
 					dbg_putc(hd_tohex(b >> 4, is_valid));
 					dbg_putc(hd_tohex(b & 0xf, is_valid));
-					dbg_attr = old_attr;
+					dbg_loadcolor();
 				}
 			}
 		}
 		/* Print the ascii representation */
-		dbg_attr = dbg_default_attr;
+		dbg_setcolor(dbg_getdefaultcolor());
 		for (i = 0; i < hd_asciipad; ++i)
 			dbg_putc(' ');
 		for (i = 0; i < hd_linesize; ++i) {
@@ -416,28 +413,27 @@ hd_printscreen(void *start_addr, void *sel_addr,
 			bool is_valid = (line_valid & ((u64)1 << i)) != 0;
 			bool was_changed = (line_changed & ((u64)1 << i)) != 0;
 			char ch = is_valid && isprint(b) ? (char)b : '.';
-			dbg_attr = dbg_default_attr;
+			dbg_setcolor(dbg_getdefaultcolor());
 			if (sel_region == HD_REGION_ASCII) {
 				if (i == sel_byte || is_line_selected) {
-					dbg_setcolor(DBG_COLOR_BLACK, DBG_COLOR_LIGHT_GRAY);
+					dbg_setcolor(ANSITTY_CL_BLACK, ANSITTY_CL_LIGHT_GRAY);
 				} else {
-					dbg_setbgcolor(DBG_COLOR_DARK_GRAY);
+					dbg_setbgcolor(ANSITTY_CL_DARK_GRAY);
 				}
 			} else {
-				dbg_setbgcolor(DBG_COLOR_BLACK);
+				dbg_setbgcolor(ANSITTY_CL_BLACK);
 			}
 			if (was_changed)
-				dbg_setfgcolor(DBG_COLOR_RED);
+				dbg_setfgcolor(ANSITTY_CL_RED);
 			if (((byte_t *)line_addr + i) == (byte_t *)sel_addr + hd_hex_nibble / 2) {
 				if (sel_region == HD_REGION_ASCII) {
-					dbg_attr_t temp;
-					temp = dbg_attr;
-					dbg_setcolor(DBG_COLOR_GREEN, DBG_COLOR_BLACK);
+					dbg_savecolor();
+					dbg_setcolor(ANSITTY_CL_GREEN, ANSITTY_CL_BLACK);
 					dst_cursor_pos = dbg_getcur();
 					dbg_putc(ch);
-					dbg_attr = temp;
+					dbg_loadcolor();
 				} else {
-					dbg_setcolor(DBG_COLOR_GREEN, DBG_COLOR_BLACK);
+					dbg_setcolor(ANSITTY_CL_GREEN, ANSITTY_CL_BLACK);
 					dbg_putc(ch);
 				}
 			} else {
@@ -445,7 +441,7 @@ hd_printscreen(void *start_addr, void *sel_addr,
 			}
 		}
 	}
-	dbg_setcolor(DBG_COLOR_BLACK, DBG_COLOR_LIGHT_GRAY);
+	dbg_setcolor(ANSITTY_CL_BLACK, ANSITTY_CL_LIGHT_GRAY);
 	dbg_hline(0, dbg_screen_height - 1, dbg_screen_width, ' ');
 	dbg_setcur(0, dbg_screen_height - 1);
 	dbg_printf(DBGSTR("%p:"), sel_addr);
@@ -518,12 +514,12 @@ NOTHROW(FCALL dbg_hd_addrdiag)(uintptr_t *paddr) {
 	unsigned int edit_y      = diag_y + 2;
 	char exprbuf[256];
 	unsigned int what;
-	dbg_setcolor(DBG_COLOR_BLACK, DBG_COLOR_LIGHT_GRAY);
+	dbg_setcolor(ANSITTY_CL_BLACK, ANSITTY_CL_LIGHT_GRAY);
 	dbg_fillrect_singlestroke(diag_x, diag_y, diag_width, diag_height);
 	dbg_fillbox(diag_x + 1, diag_y + 1, diag_width - 2, diag_height - 2, ' ');
 	dbg_pprint(diag_x + (diag_width - COMPILER_STRLEN(diag_title)) / 2, diag_y, diag_title);
 	exprbuf[0] = 0;
-	dbg_setcolor(DBG_COLOR_WHITE, DBG_COLOR_BLACK);
+	dbg_setcolor(ANSITTY_CL_WHITE, ANSITTY_CL_BLACK);
 	do {
 		what = dbg_editfield(edit_x,
 		                     edit_y,
@@ -704,7 +700,7 @@ NOTHROW(FCALL hd_main)(void *addr, bool is_readonly) {
 		case KEY_ESC:
 			if (hd_has_changes()) {
 				dbg_setcur_visible(false);
-				dbg_setcolor(DBG_COLOR_BLACK, DBG_COLOR_LIGHT_GRAY);
+				dbg_setcolor(ANSITTY_CL_BLACK, ANSITTY_CL_LIGHT_GRAY);
 				dbg_messagebox(DBGSTR("Really Exit?"),
 				               DBGSTR("Unsaved changes still exist\n"
 				                      " - Press Enter to ignore and exit anyways\n"
@@ -719,7 +715,7 @@ NOTHROW(FCALL hd_main)(void *addr, bool is_readonly) {
 
 		case KEY_F1:
 			dbg_setcur_visible(false);
-			dbg_setcolor(DBG_COLOR_BLACK, DBG_COLOR_LIGHT_GRAY);
+			dbg_setcolor(ANSITTY_CL_BLACK, ANSITTY_CL_LIGHT_GRAY);
 			dbg_messagebox(DBGSTR("Help"), hd_help);
 			/* Wait until the user presses ESC or F1 */
 			do {
@@ -887,16 +883,15 @@ NOTHROW(FCALL dbg_hexedit)(void *addr, bool is_readonly) {
 	bool was_cursor_visible;
 	void *buf, *result;
 	u32 oldcur;
-	dbg_attr_t oldattr;
 	u8 old_hex_nibble;
 	u8 old_nibbles_per_word;
 	bool old_show_le;
 
 	/* Save terminal settings and display contents. */
 	was_cursor_visible = dbg_setcur_visible(false);
-	buf     = alloca(dbg_screen_width * dbg_screen_height * dbg_screen_cellsize);
-	oldcur  = dbg_getcur();
-	oldattr = dbg_attr;
+	buf      = alloca(dbg_screen_width * dbg_screen_height * dbg_screen_cellsize);
+	oldcur   = dbg_getcur();
+	dbg_savecolor();
 	dbg_getscreendata(0, 0, dbg_screen_width, dbg_screen_height, buf);
 
 	/* Configure hexedit settings */
@@ -922,7 +917,7 @@ NOTHROW(FCALL dbg_hexedit)(void *addr, bool is_readonly) {
 
 	/* Restore display contents and terminal settings. */
 	dbg_setscreendata(0, 0, dbg_screen_width, dbg_screen_height, buf);
-	dbg_attr = oldattr;
+	dbg_loadcolor();
 	dbg_setcur(DBG_GETCUR_X(oldcur), DBG_GETCUR_Y(oldcur));
 	dbg_setcur_visible(was_cursor_visible);
 	return result;

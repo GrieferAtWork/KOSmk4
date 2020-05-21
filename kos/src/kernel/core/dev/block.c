@@ -1557,7 +1557,7 @@ do_dump_block_device(struct basic_block_device *__restrict self) {
 	drv = driver_at_address(block_device_ispartition(self)
 	                        ? (void *)((struct block_device_partition *)self)->bp_master->bd_type.dt_read
 	                        : (void *)self->bd_type.dt_read);
-	dbg_printf(DBGSTR("/dev/" DF_WHITE("%s") "\t%u:%-2u\t%s\t%I64u%s\t%I64u\t%Iu\n"),
+	dbg_printf(DBGSTR("/dev/" AC_WHITE("%s") "\t%u:%-2u\t%s\t%I64u%s\t%I64u\t%Iu\n"),
 	           self->bd_name,
 	           (unsigned int)MAJOR(block_device_devno(self)),
 	           (unsigned int)MINOR(block_device_devno(self)),

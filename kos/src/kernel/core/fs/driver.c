@@ -4450,18 +4450,18 @@ DBG_COMMAND(lsmod,
 		d = ds->ds_drivers[i];
 		if (d->d_flags & DRIVER_FLAG_FINALIZED)
 			/* Already finalized */
-			dbg_print(DBGSTR(DF_SETFGCOLOR(DBG_COLOR_MAROON)));
+			dbg_print(DBGSTR(AC_FG(ANSITTY_CL_MAROON)));
 		else if (d->d_flags & DRIVER_FLAG_FINALIZING)
 			/* In the process of being finalized */
-			dbg_print(DBGSTR(DF_SETFGCOLOR(DBG_COLOR_RED)));
+			dbg_print(DBGSTR(AC_FG(ANSITTY_CL_RED)));
 		else if (!(d->d_flags & DRIVER_FLAG_INITIALIZED)) {
 			/* In the process of being initialized */
-			dbg_print(DBGSTR(DF_SETFGCOLOR(DBG_COLOR_YELLOW)));
+			dbg_print(DBGSTR(AC_FG(ANSITTY_CL_YELLOW)));
 		}
 		dbg_printf(DBGSTR("%-*s "), longest_name, d->d_name);
 		temp = (size_t)cmdline_encode(&dbg_printer, NULL, d->d_argc, d->d_argv);
 		format_repeat(&dbg_printer, NULL, ' ', longest_cmdl - temp);
-		dbg_printf(DBGSTR(" %p %p %p" DF_RESETATTR "\n"),
+		dbg_printf(DBGSTR(" %p %p %p" AC_DEFATTR "\n"),
 		           d->d_loadaddr,
 		           d->d_loadstart,
 		           d->d_loadend - 1);

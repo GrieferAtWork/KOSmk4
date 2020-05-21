@@ -490,14 +490,14 @@ panic_uhe_dbg_main(unsigned int unwind_error,
 	bool is_first_pointer;
 	char const *name;
 	instrlen_isa_t isa;
-	dbg_printf(DBGSTR(DF_COLOR(DBG_COLOR_WHITE, DBG_COLOR_MAROON, "Unhandled exception") " "
-	                  DF_WHITE("%.4I16X") " " DF_WHITE("%.4I16X")),
+	dbg_printf(DBGSTR(AC_WITHCOLOR(ANSITTY_CL_WHITE, ANSITTY_CL_MAROON, "Unhandled exception") " "
+	                  AC_WHITE("%.4I16X") " " AC_WHITE("%.4I16X")),
 	           info->ei_class, info->ei_subclass);
 
 	/* Dump the exception that occurred. */
 	name = get_exception_name(info->ei_code);
 	if (name)
-		dbg_printf(DBGSTR(" [" DF_WHITE("%s") "]"), name);
+		dbg_printf(DBGSTR(" [" AC_WHITE("%s") "]"), name);
 	print_exception_desc(&dbg_printer, NULL);
 	dbg_putc('\n');
 	is_first_pointer = true;
@@ -509,7 +509,7 @@ panic_uhe_dbg_main(unsigned int unwind_error,
 			dbg_print(DBGSTR("Exception pointers:\n"));
 			is_first_pointer = false;
 		}
-		dbg_printf(DBGSTR("    [" DF_WHITE("%u") "] = " DF_WHITE("%p") " (" DF_WHITE("%Iu") ")\n"),
+		dbg_printf(DBGSTR("    [" AC_WHITE("%u") "] = " AC_WHITE("%p") " (" AC_WHITE("%Iu") ")\n"),
 		           i,
 		           info->ei_data.e_pointers[i],
 		           info->ei_data.e_pointers[i]);
@@ -549,12 +549,12 @@ panic_uhe_dbg_main(unsigned int unwind_error,
 	}
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 	if (unwind_error == UNWIND_SUCCESS) {
-		dbg_printf(DBGSTR("Unwinding stopped when " DF_FGCOLOR(DBG_COLOR_PURPLE, "NOTHROW")
-		                  "() function " "%[vinfo:" DF_WHITE("%n") "] was reached\n"),
+		dbg_printf(DBGSTR("Unwinding stopped when " AC_WITHFG(ANSITTY_CL_PURPLE, "NOTHROW")
+		                  "() function " "%[vinfo:" AC_WHITE("%n") "] was reached\n"),
 		           instruction_trypred((void const *)last_pc, isa));
 	} else if (unwind_error != UNWIND_NO_FRAME) {
-		dbg_printf(DBGSTR(DF_COLOR(DBG_COLOR_WHITE, DBG_COLOR_MAROON, "Unwinding failed")
-		                  ": " DF_WHITE("%u") "\n"),
+		dbg_printf(DBGSTR(AC_WITHCOLOR(ANSITTY_CL_WHITE, ANSITTY_CL_MAROON, "Unwinding failed")
+		                  ": " AC_WHITE("%u") "\n"),
 		           unwind_error);
 	}
 	dbg_main(0);

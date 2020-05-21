@@ -802,7 +802,7 @@ do_dump_character_device(struct character_device *__restrict self) {
 	else {
 		kind = DBGSTR("other");
 	}
-	dbg_printf(DBGSTR("/dev/" DF_WHITE("%s") "\t%u:%-2u\t%s\t%s\t"),
+	dbg_printf(DBGSTR("/dev/" AC_WHITE("%s") "\t%u:%-2u\t%s\t%s\t"),
 	           self->cd_name,
 	           (unsigned int)MAJOR(character_device_devno(self)),
 	           (unsigned int)MINOR(character_device_devno(self)),

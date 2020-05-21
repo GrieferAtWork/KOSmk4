@@ -173,9 +173,6 @@ PUBLIC ATTR_DBGDATA unsigned int dbg_indent = 0;
 /* The ANSI TTY used for printing screen-output within the builtin debugger */
 PUBLIC ATTR_DBGBSS struct ansitty dbg_tty = {};
 
-PUBLIC ATTR_DBGBSS u16 dbg_attr         = 0; /* Color attributes. */
-PUBLIC ATTR_DBGBSS u16 dbg_default_attr = 0; /* Color attributes. */
-
 PRIVATE ATTR_DBGBSS u32  vga_vram_offset         = 0;     /* [const] Current VRAM offset */
 PRIVATE ATTR_DBGBSS u16 *vga_real_terminal_start = NULL;  /* [const] Real terminal display start */
 PRIVATE ATTR_DBGBSS u16 *vga_terminal_start      = NULL;  /* Terminal display start */
@@ -185,10 +182,10 @@ PRIVATE ATTR_DBGBSS u16 *vga_terminal_2ndln      = NULL;  /* Start of the second
 PRIVATE ATTR_DBGBSS u16 *vga_terminal_lastln     = NULL;  /* Start of the last line within the terminal display. */
 PRIVATE ATTR_DBGBSS bool vga_terminal_showcur    = false; /* True if the current cursor position should be shown. */
 
-#define VGA_SETCUR(x, y) (vga_terminal_cur = vga_terminal_start + (y)*VGA_WIDTH + (x))
+#define VGA_SETCUR(x, y) (vga_terminal_cur = vga_terminal_start + (y) * VGA_WIDTH + (x))
 #define VGA_GETCUR_X()   ((unsigned int)(vga_terminal_cur - vga_terminal_start) % VGA_WIDTH)
 #define VGA_GETCUR_Y()   ((unsigned int)(vga_terminal_cur - vga_terminal_start) / VGA_WIDTH)
-#define VGA_CHR(ch)      ((u16)(u8)(ch) | dbg_attr)
+#define VGA_CHR(ch)      ((u16)(u8)(ch) | ((u16)dbg_tty.at_color << 8))
 #define VGA_EMPTY        VGA_CHR(' ')
 
 /* Terminal display backlog */
@@ -335,8 +332,8 @@ NOTHROW(FCALL vga_backlog_setscrollpos)(unsigned int pos) {
 		                            maxpos);
 		dest = vga_terminal_end - len;
 		for (i = 0; i < len; ++i) {
-			dest[i] = (u16)(u8)buf[i] | DBG_COLOR_ATTR(DBG_COLOR_LIGHT_GRAY,
-			                                           DBG_COLOR_DARK_GRAY);
+			dest[i] = (u16)(u8)buf[i] | ANSITTY_PALETTE_INDEX(ANSITTY_CL_LIGHT_GRAY,
+			                                           ANSITTY_CL_DARK_GRAY);
 		}
 	}
 #endif
@@ -1023,13 +1020,6 @@ NOTHROW(LIBANSITTY_CC vga_tty_fillcell)(struct ansitty *__restrict UNUSED(self),
 }
 
 PRIVATE ATTR_DBGTEXT void
-NOTHROW(LIBANSITTY_CC vga_tty_setcolor)(struct ansitty *__restrict UNUSED(self),
-                                        uint8_t color) {
-	dbg_attr &= 0x00ff;
-	dbg_attr |= color << 8;
-}
-
-PRIVATE ATTR_DBGTEXT void
 NOTHROW(LIBANSITTY_CC vga_tty_output)(struct ansitty *__restrict UNUSED(self),
                                       void const *data, size_t datalen) {
 	while (datalen) {
@@ -1054,7 +1044,7 @@ PRIVATE ATTR_DBGRODATA struct ansitty_operators const vga_tty_operators = {
 	.ato_scroll       = NULL,
 	.ato_cls          = NULL,
 	.ato_el           = NULL,
-	.ato_setcolor     = &vga_tty_setcolor,
+	.ato_setcolor     = NULL,
 	.ato_setattrib    = NULL,
 	.ato_setttymode   = NULL,
 	.ato_scrollregion = NULL,
@@ -1755,8 +1745,6 @@ NOTHROW(KCALL dbg_reset_tty)(void) {
 	ansitty_init(&dbg_tty, &vga_tty_operators);
 	vga_showscreen_enabled       = false;
 	vga_terminal_backlog_cur     = vga_terminal_backlog;
-	dbg_attr                     = DBG_COLOR_ATTR(DBG_COLOR_SILVER, DBG_COLOR_BLACK);
-	dbg_default_attr             = DBG_COLOR_ATTR(DBG_COLOR_SILVER, DBG_COLOR_BLACK);
 	vga_backlog_scrollpos        = 0;
 	vga_terminal_backlog_full    = false;
 	vga_terminal_showcur         = false;
@@ -1836,8 +1824,8 @@ dbg_printer(void *UNUSED(ignored),
 
 
 /* Get/Set debug TTY screen data
- * NOTE: Reading Out-of-bound cells are read as the same value as a space-character
- *       cell when written using `dbg_putc(' ')' as the current cursor position.
+ * NOTE: Out-of-bound cells are read as the same value as a space-character
+ *       cell when written using `dbg_putc(' ')' at the current cursor position.
  * NOTE: Writing Out-of-bound cells is a no-op.
  * NOTE: These functions will read/write the SCROLL-TOP screen data, and
  *      `dbg_setscreendata()' will apply `dbg_setscroll(0)'

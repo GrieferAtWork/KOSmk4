@@ -2523,7 +2523,7 @@ struct p64_enumdat {
 
 PRIVATE ATTR_DBGTEXT void KCALL
 p64_printident(struct p64_enumdat *__restrict data) {
-	dbg_printf(DBGSTR(DF_WHITE("%p") "-" DF_WHITE("%p") ": " DF_WHITE("%Iu") " identity mappings\n"),
+	dbg_printf(DBGSTR(AC_WHITE("%p") "-" AC_WHITE("%p") ": " AC_WHITE("%Iu") " identity mappings\n"),
 	           (byte_t *)P64_VM_KERNEL_PDIR_IDENTITY_BASE,
 	           (byte_t *)P64_VM_KERNEL_PDIR_IDENTITY_BASE + P64_VM_KERNEL_PDIR_IDENTITY_SIZE - 1,
 	           data->ed_identcnt);
@@ -2536,26 +2536,26 @@ p64_doenum(struct p64_enumdat *__restrict data,
 	assert((word & P64_PAGE_FPRESENT) || (word & P64_PAGE_FISAHINT));
 	if (data->ed_identcnt)
 		p64_printident(data);
-	dbg_printf(DBGSTR(DF_WHITE("%p") "-" DF_WHITE("%p")),
+	dbg_printf(DBGSTR(AC_WHITE("%p") "-" AC_WHITE("%p")),
 	           start, (byte_t *)start + num_bytes - 1);
 	if (word & P64_PAGE_FPRESENT) {
 		size_t indent;
-		dbg_printf(DBGSTR(": " DF_WHITE("%p") "+" DF_SETWHITE),
+		dbg_printf(DBGSTR(": " AC_WHITE("%p") "+" AC_FG_WHITE),
 		           word & P64_PAGE_FADDR_4KIB);
 		if ((num_bytes >= ((u64)1024 * 1024 * 1024 * 1024)) &&
 		    (num_bytes % ((u64)1024 * 1024 * 1024 * 1024)) == 0) {
-			indent = dbg_printf(DBGSTR("%Iu" DF_RESETATTR "TiB"), (size_t)(num_bytes / ((u64)1024 * 1024 * 1024 * 1024)));
+			indent = dbg_printf(DBGSTR("%Iu" AC_DEFATTR "TiB"), (size_t)(num_bytes / ((u64)1024 * 1024 * 1024 * 1024)));
 		} else if ((num_bytes >= ((u64)1024 * 1024 * 1024)) &&
 		    (num_bytes % ((u64)1024 * 1024 * 1024)) == 0) {
-			indent = dbg_printf(DBGSTR("%Iu" DF_RESETATTR "GiB"), (size_t)(num_bytes / ((u64)1024 * 1024 * 1024)));
+			indent = dbg_printf(DBGSTR("%Iu" AC_DEFATTR "GiB"), (size_t)(num_bytes / ((u64)1024 * 1024 * 1024)));
 		} else if ((num_bytes >= ((u64)1024 * 1024)) &&
 		           (num_bytes % ((u64)1024 * 1024)) == 0) {
-			indent = dbg_printf(DBGSTR("%Iu" DF_RESETATTR "MiB"), (size_t)(num_bytes / ((u64)1024 * 1024)));
+			indent = dbg_printf(DBGSTR("%Iu" AC_DEFATTR "MiB"), (size_t)(num_bytes / ((u64)1024 * 1024)));
 		} else if ((num_bytes >= ((u64)1024)) &&
 		           (num_bytes % ((u64)1024)) == 0) {
-			indent = dbg_printf(DBGSTR("%Iu" DF_RESETATTR "KiB"), (size_t)(num_bytes / ((u64)1024)));
+			indent = dbg_printf(DBGSTR("%Iu" AC_DEFATTR "KiB"), (size_t)(num_bytes / ((u64)1024)));
 		} else {
-			indent = dbg_printf(DBGSTR("%Iu" DF_RESETATTR "B"), num_bytes);
+			indent = dbg_printf(DBGSTR("%Iu" AC_DEFATTR "B"), num_bytes);
 		}
 #define COMMON_INDENT (9 + 3)
 		if (indent < COMMON_INDENT)
@@ -2565,14 +2565,15 @@ p64_doenum(struct p64_enumdat *__restrict data,
 #define PUTMASK(_mask, on)                           \
 		do {                                         \
 			if (mask & _mask) {                      \
-				dbg_attr = oldattr;                  \
+				dbg_setcolor(oldcolor);              \
 				if (word & _mask)                    \
-					dbg_setfgcolor(DBG_COLOR_WHITE); \
+					dbg_setfgcolor(ANSITTY_CL_WHITE); \
 				dbg_putc(word & _mask ? (on) : '-'); \
 			}                                        \
 		} __WHILE0
 		{
-			dbg_attr_t oldattr = dbg_attr;
+			dbg_color_t oldcolor;
+			oldcolor = dbg_getcolor();
 			word ^= P64_PAGE_FNOEXEC;
 			PUTMASK(P64_PAGE_FNOEXEC, 'x');
 			PUTMASK(P64_PAGE_FWRITE, 'w');
@@ -2581,7 +2582,7 @@ p64_doenum(struct p64_enumdat *__restrict data,
 			PUTMASK(P64_PAGE_FACCESSED, 'a');
 			PUTMASK(P64_PAGE_FDIRTY, 'd');
 			PUTMASK(P64_PAGE_FPREPARED, 'p');
-			dbg_attr = oldattr;
+			dbg_setcolor(oldcolor);
 		}
 #undef PUTMASK
 		if (mask & (P64_PAGE_FPAT | P64_PAGE_FPWT | P64_PAGE_FPCD)) {
@@ -2592,11 +2593,11 @@ p64_doenum(struct p64_enumdat *__restrict data,
 				state |= 2;
 			if (word & P64_PAGE_FPAT)
 				state |= 4;
-			dbg_printf(DBGSTR("][" DF_SETWHITE "%x"), (unsigned int)state);
+			dbg_printf(DBGSTR("][" AC_FG_WHITE "%x"), (unsigned int)state);
 		}
-		dbg_print(DBGSTR(DF_RESETATTR "]\n"));
+		dbg_print(DBGSTR(AC_DEFATTR "]\n"));
 	} else {
-		dbg_printf(DBGSTR(":hint@" DF_WHITE("%p") "\n"),
+		dbg_printf(DBGSTR(":hint@" AC_WHITE("%p") "\n"),
 		           (void *)(word & P64_PAGE_FHINT));
 	}
 }
@@ -2669,9 +2670,9 @@ DBG_AUTOCOMPLETE(lspd,
 DBG_COMMAND_AUTO(lspd, DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE,
                  "lspd [MODE:kernel|user=user]\n"
                  "\tDo a raw walk over the loaded page directory and enumerate mappings.\n"
-                 "\t" DF_WHITE("mode") " can be specified as either " DF_WHITE("kernel")
-                 " or " DF_WHITE("user") " to select if " DF_WHITE("vm_kernel") "\n"
-                 "\tor " DF_WHITE("THIS_VM") " should be dumped\n",
+                 "\t" AC_WHITE("mode") " can be specified as either " AC_WHITE("kernel")
+                 " or " AC_WHITE("user") " to select if " AC_WHITE("vm_kernel") "\n"
+                 "\tor " AC_WHITE("THIS_VM") " should be dumped\n",
                  argc, argv) {
 	PAGEDIR_P_SELFTYPE pdir;
 	if (argc == 2) {

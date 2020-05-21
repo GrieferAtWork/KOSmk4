@@ -213,23 +213,23 @@ PRIVATE ATTR_DBGTEXT void KCALL
 panic_assert_dbg_main(void *arg) {
 	struct assert_args *args;
 	args = (struct assert_args *)arg;
-	dbg_printf(DF_COLOR(DBG_COLOR_WHITE, DBG_COLOR_MAROON, "Assertion failure") "\n"
-	           "expr: "  DF_FGCOLOR(DBG_COLOR_WHITE, "%s") "\n"
-	           "file: "  DF_FGCOLOR(DBG_COLOR_WHITE, "%s")
-	           " (line " DF_FGCOLOR(DBG_COLOR_WHITE, "%u") ")\n",
+	dbg_printf(AC_WITHCOLOR(ANSITTY_CL_WHITE, ANSITTY_CL_MAROON, "Assertion failure") "\n"
+	           "expr: "  AC_WITHFG(ANSITTY_CL_WHITE, "%s") "\n"
+	           "file: "  AC_WITHFG(ANSITTY_CL_WHITE, "%s")
+	           " (line " AC_WITHFG(ANSITTY_CL_WHITE, "%u") ")\n",
 	           args->aa_expr,
 	           args->aa_file,
 	           args->aa_line);
 	if (args->aa_func)
-		dbg_printf(DBGSTR("func: " DF_FGCOLOR(DBG_COLOR_WHITE, "%s") "\n"), args->aa_func);
+		dbg_printf(DBGSTR("func: " AC_WITHFG(ANSITTY_CL_WHITE, "%s") "\n"), args->aa_func);
 	if (args->aa_format) {
-		dbg_print(DBGSTR("mesg: " DF_SETCOLOR(DBG_COLOR_TEAL, DBG_COLOR_BLACK)));
+		dbg_print(DBGSTR("mesg: " AC_COLOR(ANSITTY_CL_TEAL, ANSITTY_CL_BLACK)));
 		dbg_indent += 6;
 		format_vprintf(&dbg_printer, NULL, args->aa_format, args->aa_args);
 		dbg_indent -= 6;
-		dbg_print(DBGSTR(DF_DEFCOLOR "\n"));
+		dbg_print(DBGSTR(AC_DEFCOLOR "\n"));
 	}
-	dbg_printf(DBGSTR("addr: " DF_FGCOLOR(DBG_COLOR_WHITE, "%p") "\n"),
+	dbg_printf(DBGSTR("addr: " AC_WITHFG(ANSITTY_CL_WHITE, "%p") "\n"),
 	           kcpustate_getpc(&args->aa_state));
 	dbg_main(0);
 }
@@ -280,25 +280,25 @@ PRIVATE ATTR_DBGTEXT void KCALL
 panic_assert_chk_print_message(void *arg) {
 	struct assert_args *args;
 	args = (struct assert_args *)arg;
-	dbg_printf(DBGSTR("expr: " DF_FGCOLOR(DBG_COLOR_WHITE, "%s") "\n"
-	                  "file: " DF_FGCOLOR(DBG_COLOR_WHITE, "%s")
-	                  " (line " DF_FGCOLOR(DBG_COLOR_WHITE, "%u") ")\n"),
+	dbg_printf(DBGSTR("expr: " AC_WITHFG(ANSITTY_CL_WHITE, "%s") "\n"
+	                  "file: " AC_WITHFG(ANSITTY_CL_WHITE, "%s")
+	                  " (line " AC_WITHFG(ANSITTY_CL_WHITE, "%u") ")\n"),
 	           args->aa_expr,
 	           args->aa_file,
 	           args->aa_line);
 	if (args->aa_func)
-		dbg_printf(DBGSTR("func: " DF_FGCOLOR(DBG_COLOR_WHITE, "%s") "\n"), args->aa_func);
+		dbg_printf(DBGSTR("func: " AC_WITHFG(ANSITTY_CL_WHITE, "%s") "\n"), args->aa_func);
 	if (args->aa_format) {
 		va_list vargs;
-		dbg_print(DBGSTR("mesg: " DF_SETCOLOR(DBG_COLOR_TEAL, DBG_COLOR_BLACK)));
+		dbg_print(DBGSTR("mesg: " AC_COLOR(ANSITTY_CL_TEAL, ANSITTY_CL_BLACK)));
 		dbg_indent += 6;
 		va_copy(vargs, args->aa_args);
 		format_vprintf(&dbg_printer, NULL, args->aa_format, vargs);
 		va_end(vargs);
 		dbg_indent -= 6;
-		dbg_print(DBGSTR(DF_DEFCOLOR "\n"));
+		dbg_print(DBGSTR(AC_DEFCOLOR "\n"));
 	}
-	dbg_printf(DBGSTR("addr: " DF_FGCOLOR(DBG_COLOR_WHITE, "%p") "\n"),
+	dbg_printf(DBGSTR("addr: " AC_WITHFG(ANSITTY_CL_WHITE, "%p") "\n"),
 	           kcpustate_getpc(&args->aa_state));
 }
 
@@ -337,8 +337,8 @@ panic_assert_chk_dbg_main(void *arg) {
 	}
 
 	/* Display a menu to let the user select what to do about the assertion... */
-	option = dbg_menuex(DF_SETCOLOR(DBG_COLOR_WHITE, DBG_COLOR_MAROON)
-	                    "Assertion failure" DF_DEFCOLOR,
+	option = dbg_menuex(AC_COLOR(ANSITTY_CL_WHITE, ANSITTY_CL_MAROON)
+	                    "Assertion failure" AC_DEFCOLOR,
 	                    assert_chk_options,
 	                    0,
 	                    &panic_assert_chk_print_message,
@@ -446,10 +446,10 @@ panic_genfail_dbg_main(/*char const **/ void *message) {
 	pc      = dbg_getpcreg(DBG_REGLEVEL_TRAP);
 	isa     = dbg_instrlen_isa(DBG_REGLEVEL_TRAP);
 	prev_pc = (uintptr_t)instruction_trypred((void const *)pc, isa);
-	dbg_printf(DBGSTR(DF_SETCOLOR(DBG_COLOR_WHITE, DBG_COLOR_MAROON) "%s" DF_DEFCOLOR "%[vinfo:"
-	                  "file: " DF_WHITE("%f") " (line " DF_WHITE("%l") ", column " DF_WHITE("%c") ")\n"
-	                  "func: " DF_WHITE("%n") "\n]"
-	                  "addr: " DF_WHITE("%p") "+" DF_WHITE("%Iu") "\n"),
+	dbg_printf(DBGSTR(AC_COLOR(ANSITTY_CL_WHITE, ANSITTY_CL_MAROON) "%s" AC_DEFCOLOR "%[vinfo:"
+	                  "file: " AC_WHITE("%f") " (line " AC_WHITE("%l") ", column " AC_WHITE("%c") ")\n"
+	                  "func: " AC_WHITE("%n") "\n]"
+	                  "addr: " AC_WHITE("%p") "+" AC_WHITE("%Iu") "\n"),
 	           message, prev_pc, prev_pc,
 	           (size_t)(pc - prev_pc));
 	dbg_main(0);
@@ -525,18 +525,18 @@ panic_kernel_dbg_main(void *arg) {
 	isa     = dbg_instrlen_isa(DBG_REGLEVEL_TRAP);
 	prev_pc = (uintptr_t)instruction_trypred((void const *)pc, isa);
 	dbg_printf(DBGSTR("Kernel Panic\n"
-	                  "%[vinfo:" "file: " DF_WHITE("%f") " (line " DF_WHITE("%l") ", column " DF_WHITE("%c") ")\n"
-	                             "func: " DF_WHITE("%n") "\n"
+	                  "%[vinfo:" "file: " AC_WHITE("%f") " (line " AC_WHITE("%l") ", column " AC_WHITE("%c") ")\n"
+	                             "func: " AC_WHITE("%n") "\n"
 	                  "]"),
 	           prev_pc);
 	if (args->format) {
-		dbg_print(DBGSTR("mesg: " DF_SETCOLOR(DBG_COLOR_TEAL, DBG_COLOR_BLACK)));
+		dbg_print(DBGSTR("mesg: " AC_COLOR(ANSITTY_CL_TEAL, ANSITTY_CL_BLACK)));
 		dbg_indent += 6;
 		format_vprintf(&dbg_printer, NULL, args->format, args->args);
 		dbg_indent -= 6;
-		dbg_print(DF_DEFCOLOR "\n");
+		dbg_print(AC_DEFCOLOR "\n");
 	}
-	dbg_printf(DBGSTR("addr: " DF_WHITE("%p") "+" DF_WHITE("%Iu") "\n"),
+	dbg_printf(DBGSTR("addr: " AC_WHITE("%p") "+" AC_WHITE("%Iu") "\n"),
 	           prev_pc, (size_t)(pc - prev_pc));
 	dbg_main(0);
 }

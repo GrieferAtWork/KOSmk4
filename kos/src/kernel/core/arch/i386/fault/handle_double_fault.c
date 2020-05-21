@@ -89,11 +89,11 @@ panic_df_dbg_main(void *cr3)
 		x86_dbg_origstate.fcs_coregs.co_cr3 = (uintptr_t)cr3;
 	}
 #endif /* !__x86_64__ */
-	dbg_printf(DBGSTR(DF_COLOR(DBG_COLOR_WHITE, DBG_COLOR_MAROON, "Double fault") "\n"
+	dbg_printf(DBGSTR(AC_WITHCOLOR(ANSITTY_CL_WHITE, ANSITTY_CL_MAROON, "Double fault") "\n"
 	                  "%[vinfo:"
-	                  "file: " DF_WHITE("%f") " (line " DF_WHITE("%l") ", column " DF_WHITE("%c") ")\n"
-	                  "func: " DF_WHITE("%n") "\n"
-	                  "addr: " DF_WHITE("%p") "\n"
+	                  "file: " AC_WHITE("%f") " (line " AC_WHITE("%l") ", column " AC_WHITE("%c") ")\n"
+	                  "func: " AC_WHITE("%n") "\n"
+	                  "addr: " AC_WHITE("%p") "\n"
 	                  "]"),
 	           dbg_getpcreg(DBG_REGLEVEL_VIEW));
 	dbg_main(0);

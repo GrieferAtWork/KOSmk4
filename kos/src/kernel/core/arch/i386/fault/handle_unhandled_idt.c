@@ -189,26 +189,26 @@ panic_uhi_dbg_main(void *arg) {
 	struct panic_args *args;
 	char const *name;
 	args = (struct panic_args *)arg;
-	dbg_printf(DBGSTR(DF_COLOR(DBG_COLOR_WHITE, DBG_COLOR_MAROON, "Unhandled interrupt")
-	                  " [int: " DF_WHITE("%#.2I8x") " (" DF_WHITE("%I8u") ")]"),
+	dbg_printf(DBGSTR(AC_WITHCOLOR(ANSITTY_CL_WHITE, ANSITTY_CL_MAROON, "Unhandled interrupt")
+	                  " [int: " AC_WHITE("%#.2I8x") " (" AC_WHITE("%I8u") ")]"),
 	           (u8)args->intno,
 	           (u8)args->intno);
 	if (args->ecode)
-		dbg_printf(DBGSTR(" [ecode=" DF_WHITE("%#.8I32x") "]"), (u32)args->ecode);
+		dbg_printf(DBGSTR(" [ecode=" AC_WHITE("%#.8I32x") "]"), (u32)args->ecode);
 	name = get_interrupt_name(args->intno);
 	if (name != NULL) {
 		char const *desc;
 		desc = get_interrupt_desc(args->intno, args->ecode);
-		dbg_printf(DBGSTR(" [" DF_WHITE("%s")), name);
+		dbg_printf(DBGSTR(" [" AC_WHITE("%s")), name);
 		if (desc)
-			dbg_printf(DBGSTR(":" DF_WHITE("%s")), desc);
+			dbg_printf(DBGSTR(":" AC_WHITE("%s")), desc);
 		dbg_putc(']');
 	}
 	dbg_printf(DBGSTR("\n"
 	                  "%[vinfo:"
-	                  "file: " DF_WHITE("%f") " (line " DF_WHITE("%l") ", column " DF_WHITE("%c") ")\n"
-	                  "func: " DF_WHITE("%n") "\n"
-	                  "addr: " DF_WHITE("%p") "\n"
+	                  "file: " AC_WHITE("%f") " (line " AC_WHITE("%l") ", column " AC_WHITE("%c") ")\n"
+	                  "func: " AC_WHITE("%n") "\n"
+	                  "addr: " AC_WHITE("%p") "\n"
 	                  "]"),
 	           fcpustate_getpc(&x86_dbg_exitstate.de_state));
 	dbg_main(0);

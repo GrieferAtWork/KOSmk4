@@ -79,7 +79,7 @@ DBG_COMMAND(freeze,
 DBG_COMMAND(apply,
             "apply\n"
             "\tApply modifications made to the currently viewed register\n"
-            "\tstate onto the return state (loaded when " DF_WHITE("exit") " is typed)\n") {
+            "\tstate onto the return state (loaded when " AC_WHITE("exit") " is typed)\n") {
 	dbg_applyview();
 	return 0;
 }
@@ -232,7 +232,7 @@ DBG_COMMAND(m,
 
 DBG_COMMAND(mp,
             "mp ADDR [COUNT=16|page]\n"
-            "\tAlias for " DF_WHITE("m -p ...") "\n",
+            "\tAlias for " AC_WHITE("m -p ...") "\n",
             argc, argv) {
 	uintptr_t count, addr;
 	if (argc <= 2)
@@ -268,16 +268,16 @@ debug_da_formater(struct disassembler *__restrict UNUSED(self),
                   unsigned int format_option) {
 	char const *string;
 	if (DISASSEMBLER_FORMAT_ISSUFFIX(format_option))
-		string = DF_RESETATTR;
+		string = AC_DEFATTR;
 	else {
 		switch (format_option) {
-		case DISASSEMBLER_FORMAT_REGISTER_PREFIX: string = DF_SETCOLOR(DBG_COLOR_BLACK, DBG_COLOR_LIGHT_GRAY); break;
+		case DISASSEMBLER_FORMAT_REGISTER_PREFIX: string = AC_COLOR(ANSITTY_CL_BLACK, ANSITTY_CL_LIGHT_GRAY); break;
 		case DISASSEMBLER_FORMAT_IMMEDIATE_PREFIX:
 		case DISASSEMBLER_FORMAT_OFFSET_PREFIX:
-		case DISASSEMBLER_FORMAT_SCALE_PREFIX: string = DF_SETFGCOLOR(DBG_COLOR_RED); break;
-		case DISASSEMBLER_FORMAT_SYMBOL_PREFIX: string = DF_SETWHITE; break;
-		case DISASSEMBLER_FORMAT_PSEUDOOP_PREFIX: string = DF_SETFGCOLOR(DBG_COLOR_DARK_GRAY); break;
-		case DISASSEMBLER_FORMAT_MNEMONIC_PREFIX: string = DF_SETFGCOLOR(DBG_COLOR_PURPLE); break;
+		case DISASSEMBLER_FORMAT_SCALE_PREFIX: string = AC_FG(ANSITTY_CL_RED); break;
+		case DISASSEMBLER_FORMAT_SYMBOL_PREFIX: string = AC_FG_WHITE; break;
+		case DISASSEMBLER_FORMAT_PSEUDOOP_PREFIX: string = AC_FG(ANSITTY_CL_DARK_GRAY); break;
+		case DISASSEMBLER_FORMAT_MNEMONIC_PREFIX: string = AC_FG(ANSITTY_CL_PURPLE); break;
 		default: return 0;
 		}
 	}
@@ -482,7 +482,7 @@ DBG_COMMAND(eval,
 		char *expr = argv[0];
 		if (!dbg_evalexpr(expr, &result))
 			return 1;
-		dbg_printf("%q: " DF_WHITE("%#Ix") " (" DF_WHITE("%Iu") ")\n",
+		dbg_printf("%q: " AC_WHITE("%#Ix") " (" AC_WHITE("%Iu") ")\n",
 		           expr, result, result);
 	}
 	return 0;
@@ -490,7 +490,7 @@ DBG_COMMAND(eval,
 
 DBG_COMMAND(rawmagic,
             "rawmagic message\n"
-            "\tOutput a given " DF_WHITE("message") " to magic\n",
+            "\tOutput a given " AC_WHITE("message") " to magic\n",
             argc, argv) {
 	if (argc != 2)
 		return DBG_STATUS_INVALID_ARGUMENTS;

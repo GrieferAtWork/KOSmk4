@@ -59,16 +59,16 @@ DECL_BEGIN
 
 PRIVATE ATTR_DBGTEXT void KCALL
 print_cpuid_reg(u32 leaf, char reg_acdb, u32 reg_value) {
-	dbg_printf(DBGSTR("cpuid "    DF_SETFGCOLOR(DBG_COLOR_WHITE) "%#.8I32x" DF_DEFFGCOLOR
-	                  ": %%e%cx=" DF_SETFGCOLOR(DBG_COLOR_WHITE) "%#.8I32x" DF_DEFFGCOLOR
-	                  " (" DF_SETFGCOLOR(DBG_COLOR_YELLOW) "%$q" DF_DEFFGCOLOR ")"
-	                  " (" DF_SETFGCOLOR(DBG_COLOR_WHITE) "%I32u" DF_DEFFGCOLOR ")" "\n"),
+	dbg_printf(DBGSTR("cpuid "    AC_FG(ANSITTY_CL_WHITE) "%#.8I32x" AC_FGDEF
+	                  ": %%e%cx=" AC_FG(ANSITTY_CL_WHITE) "%#.8I32x" AC_FGDEF
+	                  " (" AC_FG(ANSITTY_CL_YELLOW) "%$q" AC_FGDEF ")"
+	                  " (" AC_FG(ANSITTY_CL_WHITE) "%I32u" AC_FGDEF ")" "\n"),
 	           leaf, reg_acdb, reg_value, 4, &reg_value, reg_value);
 }
 
 DBG_COMMAND(cpuid,
             "cpuid LEAF [SUBLEAF]\n"
-            "\tInvoke the " DF_COLOR(DBG_COLOR_DARK_GRAY, DBG_COLOR_LIGHT_GRAY, "cpuid") " instruction "
+            "\tInvoke the " AC_WITHCOLOR(ANSITTY_CL_DARK_GRAY, ANSITTY_CL_LIGHT_GRAY, "cpuid") " instruction "
             "for the given LEAF and display its returned values\n",
             argc, argv) {
 	u32 leaf, a, c, d, b;
@@ -99,7 +99,7 @@ DBG_COMMAND(cpuid,
 
 DBG_COMMAND(cli,
             "cli\n"
-            "\tSet " DF_COLOR(DBG_COLOR_DARK_GRAY, DBG_COLOR_LIGHT_GRAY, "EFLAGS.IF = 0") "\n") {
+            "\tSet " AC_WITHCOLOR(ANSITTY_CL_DARK_GRAY, ANSITTY_CL_LIGHT_GRAY, "EFLAGS.IF = 0") "\n") {
 	uintptr_t pflags;
 	pflags = dbg_getregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS);
 	dbg_printf(DBGSTR("cli EFLAGS.IF = 0 (was %u)\n"),
@@ -111,7 +111,7 @@ DBG_COMMAND(cli,
 
 DBG_COMMAND(sti,
             "sti\n"
-            "\tSet " DF_COLOR(DBG_COLOR_DARK_GRAY, DBG_COLOR_LIGHT_GRAY, "EFLAGS.IF = 1") "\n") {
+            "\tSet " AC_WITHCOLOR(ANSITTY_CL_DARK_GRAY, ANSITTY_CL_LIGHT_GRAY, "EFLAGS.IF = 1") "\n") {
 	uintptr_t pflags;
 	pflags = dbg_getregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS);
 	dbg_printf(DBGSTR("sti EFLAGS.IF = 1 (was %u)\n"),
@@ -123,7 +123,7 @@ DBG_COMMAND(sti,
 
 DBG_COMMAND(cld,
             "cld\n"
-            "\tSet " DF_COLOR(DBG_COLOR_DARK_GRAY, DBG_COLOR_LIGHT_GRAY, "EFLAGS.DF = 0") "\n") {
+            "\tSet " AC_WITHCOLOR(ANSITTY_CL_DARK_GRAY, ANSITTY_CL_LIGHT_GRAY, "EFLAGS.DF = 0") "\n") {
 	uintptr_t pflags;
 	pflags = dbg_getregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS);
 	dbg_printf(DBGSTR("cld EFLAGS.DF = 0 (was %u)\n"),
@@ -135,7 +135,7 @@ DBG_COMMAND(cld,
 
 DBG_COMMAND(std,
             "std\n"
-            "\tSet " DF_COLOR(DBG_COLOR_DARK_GRAY, DBG_COLOR_LIGHT_GRAY, "EFLAGS.DF = 1") "\n") {
+            "\tSet " AC_WITHCOLOR(ANSITTY_CL_DARK_GRAY, ANSITTY_CL_LIGHT_GRAY, "EFLAGS.DF = 1") "\n") {
 	uintptr_t pflags;
 	pflags = dbg_getregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS);
 	dbg_printf(DBGSTR("std EFLAGS.DF = 1 (was %u)\n"),
@@ -147,7 +147,7 @@ DBG_COMMAND(std,
 
 DBG_COMMAND(clc,
             "clc\n"
-            "\tSet " DF_COLOR(DBG_COLOR_DARK_GRAY, DBG_COLOR_LIGHT_GRAY, "EFLAGS.CF = 0") "\n") {
+            "\tSet " AC_WITHCOLOR(ANSITTY_CL_DARK_GRAY, ANSITTY_CL_LIGHT_GRAY, "EFLAGS.CF = 0") "\n") {
 	uintptr_t pflags;
 	pflags = dbg_getregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS);
 	dbg_printf(DBGSTR("clc EFLAGS.CF = 0 (was %u)\n"),
@@ -159,7 +159,7 @@ DBG_COMMAND(clc,
 
 DBG_COMMAND(stc,
             "stc\n"
-            "\tSet " DF_COLOR(DBG_COLOR_DARK_GRAY, DBG_COLOR_LIGHT_GRAY, "EFLAGS.CF = 1") "\n") {
+            "\tSet " AC_WITHCOLOR(ANSITTY_CL_DARK_GRAY, ANSITTY_CL_LIGHT_GRAY, "EFLAGS.CF = 1") "\n") {
 	uintptr_t pflags;
 	pflags = dbg_getregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS);
 	dbg_printf(DBGSTR("stc EFLAGS.CF = 1 (was %u)\n"),
@@ -171,7 +171,7 @@ DBG_COMMAND(stc,
 
 DBG_COMMAND(cmc,
             "cmc\n"
-            "\tSet " DF_COLOR(DBG_COLOR_DARK_GRAY, DBG_COLOR_LIGHT_GRAY, "EFLAGS.CF = -EFLAGS.CF") "\n") {
+            "\tSet " AC_WITHCOLOR(ANSITTY_CL_DARK_GRAY, ANSITTY_CL_LIGHT_GRAY, "EFLAGS.CF = -EFLAGS.CF") "\n") {
 	uintptr_t pflags;
 	pflags = dbg_getregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS);
 	dbg_printf(DBGSTR("stc EFLAGS.CF = %u (was %u)\n"),
@@ -255,22 +255,22 @@ debug_regdump_print_format(struct regdump_printer *__restrict self,
 		return PRINT("    ");
 
 	case REGDUMP_FORMAT_REGISTER_PREFIX:
-		return PRINT(DF_SETBLUE);
+		return PRINT(AC_FG_BLUE);
 
 	case REGDUMP_FORMAT_VALUE_PREFIX:
 	case REGDUMP_FORMAT_OFFSET_PREFIX:
 	case REGDUMP_FORMAT_FLAG_PREFIX:
-		return PRINT(DF_SETWHITE);
+		return PRINT(AC_FG_WHITE);
 
 	case REGDUMP_FORMAT_ERROR_PREFIX:
-		return PRINT(DF_SETMAROON);
+		return PRINT(AC_FG_MAROON);
 
 	case REGDUMP_FORMAT_REGISTER_SUFFIX:
 	case REGDUMP_FORMAT_VALUE_SUFFIX:
 	case REGDUMP_FORMAT_OFFSET_SUFFIX:
 	case REGDUMP_FORMAT_FLAG_SUFFIX:
 	case REGDUMP_FORMAT_ERROR_SUFFIX:
-		return PRINT(DF_RESETATTR);
+		return PRINT(AC_DEFATTR);
 
 	default:
 		break;
@@ -361,8 +361,8 @@ DBG_COMMAND(rdmsr,
 	    sscanf(argv[1], DBGSTR("%I32x"), &id) != 1)
 		return DBG_STATUS_INVALID_ARGUMENTS;
 	val = __rdmsr(id);
-	dbg_printf(DBGSTR("rdmsr " DF_WHITE("%#.8I32x") " (" DF_WHITE("%I32u") "): "
-	                  DF_WHITE("%#.16I64x") " (" DF_WHITE("%I64u") ")\n"),
+	dbg_printf(DBGSTR("rdmsr " AC_WHITE("%#.8I32x") " (" AC_WHITE("%I32u") "): "
+	                  AC_WHITE("%#.16I64x") " (" AC_WHITE("%I64u") ")\n"),
 	           id, id, val, val);
 	return 0;
 }
@@ -376,8 +376,8 @@ DBG_COMMAND(wrmsr,
 	    sscanf(argv[1], DBGSTR("%I32x"), &id) != 1 ||
 	    sscanf(argv[2], DBGSTR("%I64U"), &val) != 1)
 		return DBG_STATUS_INVALID_ARGUMENTS;
-	dbg_printf(DBGSTR("wrmsr " DF_WHITE("%#.8I32x") " (" DF_WHITE("%I32u") "): "
-	                  DF_WHITE("%#.16I64x") " (" DF_WHITE("%I64u") ")\n"),
+	dbg_printf(DBGSTR("wrmsr " AC_WHITE("%#.8I32x") " (" AC_WHITE("%I32u") "): "
+	                  AC_WHITE("%#.16I64x") " (" AC_WHITE("%I64u") ")\n"),
 	           id, id, val, val);
 	__wrmsr(id, val);
 	return 0;

@@ -187,7 +187,7 @@
 #define AC_HVP(cury, curx) _AC_ESC "[" cury ";" curx "f" /* HorizontalVerticalPosition (alias for CUP) */
 
 /* Same as `AC_VPA("1") AC_CHA("1")' */
-#define AC_CUP0   _AC_ESC "[b"
+#define AC_CUP0   _AC_ESC "[H"
 
 /* Make room for <decimal:n=1> characters at current position
  * [ANSITTY_FLAG_HEDIT=0, ANSITTY_FLAG_INSDEL_SCRN=0]
@@ -410,6 +410,36 @@
 
 /* Reset foreground and background colors (same as `AC_FGDEF AC_BGDEF') */
 #define AC_DEFCOLOR _AC_SGR("39;49")
+
+/* Helper macros for displaying some given text in some custom
+ * color, before reverting the default color afterwards. */
+#define AC_WITHCOLOR(fg, bg, text) AC_COLOR(fg, bg) text AC_DEFCOLOR
+#define AC_WITHFG(color, text)     AC_FG(color) text AC_FGDEF
+#define AC_WITHBG(color, text)     AC_BG(color) text AC_BGDEF
+
+#define AC_BLACK(text)        AC_WITHFG(ANSITTY_CL_BLACK, text)
+#define AC_MAROON(text)       AC_WITHFG(ANSITTY_CL_MAROON, text)
+#define AC_GREEN(text)        AC_WITHFG(ANSITTY_CL_GREEN, text)
+#define AC_OLIVE(text)        AC_WITHFG(ANSITTY_CL_OLIVE, text)
+#define AC_NAVY(text)         AC_WITHFG(ANSITTY_CL_NAVY, text)
+#define AC_PURPLE(text)       AC_WITHFG(ANSITTY_CL_PURPLE, text)
+#define AC_TEAL(text)         AC_WITHFG(ANSITTY_CL_TEAL, text)
+#define AC_SILVER(text)       AC_WITHFG(ANSITTY_CL_SILVER, text)
+#define AC_GREY(text)         AC_WITHFG(ANSITTY_CL_GREY, text)
+#define AC_RED(text)          AC_WITHFG(ANSITTY_CL_RED, text)
+#define AC_LIME(text)         AC_WITHFG(ANSITTY_CL_LIME, text)
+#define AC_YELLOW(text)       AC_WITHFG(ANSITTY_CL_YELLOW, text)
+#define AC_BLUE(text)         AC_WITHFG(ANSITTY_CL_BLUE, text)
+#define AC_FUCHSIA(text)      AC_WITHFG(ANSITTY_CL_FUCHSIA, text)
+#define AC_AQUA(text)         AC_WITHFG(ANSITTY_CL_AQUA, text)
+#define AC_WHITE(text)        AC_WITHFG(ANSITTY_CL_WHITE, text)
+#define AC_LIGHT_GRAY(text)   AC_WITHFG(ANSITTY_CL_LIGHT_GRAY, text)
+#define AC_DARK_GRAY(text)    AC_WITHFG(ANSITTY_CL_DARK_GRAY, text)
+#define AC_MAGENTA(text)      AC_WITHFG(ANSITTY_CL_MAGENTA, text)
+#define AC_CYAN(text)         AC_WITHFG(ANSITTY_CL_CYAN, text)
+#define AC_LIGHT_GREEN(text)  AC_WITHFG(ANSITTY_CL_LIGHT_GREEN, text)
+#define AC_BRIGHT_GREEN(text) AC_WITHFG(ANSITTY_CL_BRIGHT_GREEN, text)
+#define AC_DARK_BLUE(text)    AC_WITHFG(ANSITTY_CL_DARK_BLUE, text)
 
 
 #endif /* !_LIBANSITTY_CTL_H */

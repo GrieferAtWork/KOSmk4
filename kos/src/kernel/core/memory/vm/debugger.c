@@ -64,28 +64,28 @@ DBG_AUTOCOMPLETE(lsvm,
 
 DBG_COMMAND_AUTO(lsvm, DBG_HOOKFLAG_NORMAL,
                  "lsvm [NAME=kernel|user] [MINADDR=0] [MAXADDR=...]\n"
-                 "\tList all VM mappings with the given VM. " DF_WHITE("NAME") " must be done of " DF_WHITE("kern")
-                    ", " DF_WHITE("user") " or the hex-base address of a " DF_BLUE("struct vm") "\n"
+                 "\tList all VM mappings with the given VM. " AC_WHITE("NAME") " must be done of " AC_WHITE("kern")
+                    ", " AC_WHITE("user") " or the hex-base address of a " AC_BLUE("struct vm") "\n"
                  "Nodes are enumerated as:\n\n"
                  "Min      Max       Prot  NodeF.   PartF. State     Target Min      Max \n"
                  "003BC000-003BCFFF [rwxs] [p---Mk] [---k] locked -> anonR @003BC000-003BCFFF\n"
                  "Prot:\n"
-                 "\t" DF_WHITE("r") " Mapped as readable\n"
-                 "\t" DF_WHITE("w") " Mapped as writable\n"
-                 "\t" DF_WHITE("x") " Mapped as executable\n"
-                 "\t" DF_WHITE("s") " Mapped as shared\n"
+                 "\t" AC_WHITE("r") " Mapped as readable\n"
+                 "\t" AC_WHITE("w") " Mapped as writable\n"
+                 "\t" AC_WHITE("x") " Mapped as executable\n"
+                 "\t" AC_WHITE("s") " Mapped as shared\n"
                  "NodeF.: (Node flags)\n"
-                 "\t" DF_WHITE("p") " The page directory mapping has been prepared\n"
-                 "\t" DF_WHITE("P") " The node has been partitioned (split)\n"
-                 "\t" DF_WHITE("G") " The node grows up (affects the direction of guard expansion)\n"
-                 "\t" DF_WHITE("h") " The node is hinted by the page directory\n"
-                 "\t" DF_WHITE("M") " The node should not be merged with other nodes\n"
-                 "\t" DF_WHITE("k") " The node is an intrinsic kernel mapping that cannot be unmapped normally\n"
+                 "\t" AC_WHITE("p") " The page directory mapping has been prepared\n"
+                 "\t" AC_WHITE("P") " The node has been partitioned (split)\n"
+                 "\t" AC_WHITE("G") " The node grows up (affects the direction of guard expansion)\n"
+                 "\t" AC_WHITE("h") " The node is hinted by the page directory\n"
+                 "\t" AC_WHITE("M") " The node should not be merged with other nodes\n"
+                 "\t" AC_WHITE("k") " The node is an intrinsic kernel mapping that cannot be unmapped normally\n"
                  "PartF.: (Data part flags)\n"
-                 "\t" DF_WHITE("l") " The part will become locked once loaded into the core\n"
-                 "\t" DF_WHITE("c") " The contents of the part have changed\n"
-                 "\t" DF_WHITE("t") " Changes to the contents of the part are tracked\n"
-                 "\t" DF_WHITE("k") " The part is an intrinsic kernel component that cannot be deleted normally\n",
+                 "\t" AC_WHITE("l") " The part will become locked once loaded into the core\n"
+                 "\t" AC_WHITE("c") " The contents of the part have changed\n"
+                 "\t" AC_WHITE("t") " Changes to the contents of the part are tracked\n"
+                 "\t" AC_WHITE("k") " The part is an intrinsic kernel component that cannot be deleted normally\n",
                  argc, argv) {
 	struct vm *v = &vm_kernel;
 	struct vm_node *iter;
@@ -173,7 +173,7 @@ DBG_COMMAND_AUTO(lsvm, DBG_HOOKFLAG_NORMAL,
 		if (state_name) {
 			dbg_print(state_name);
 		} else {
-			dbg_printf(DBGSTR(DF_COLOR(DBG_COLOR_LIGHT_GRAY, DBG_COLOR_MAROON, "UNKNOWN_STATE:%u")),
+			dbg_printf(DBGSTR(AC_WITHCOLOR(ANSITTY_CL_LIGHT_GRAY, ANSITTY_CL_MAROON, "UNKNOWN_STATE:%u")),
 			           part->dp_state);
 		}
 		if (vm_datablock_isinode(block)) {

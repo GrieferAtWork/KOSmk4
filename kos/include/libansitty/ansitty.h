@@ -126,29 +126,33 @@
 
 /* Color name aliases */
 #ifndef ANSITTY_CL_LIGHT_GRAY
-#define ANSITTY_CL_LIGHT_GRAY    ANSITTY_CL_SILVER
-#define ANSITTY_CL_DARK_GRAY     ANSITTY_CL_GREY
-#define ANSITTY_CL_MAGENTA       ANSITTY_CL_PURPLE
-#define ANSITTY_CL_CYAN          ANSITTY_CL_TEAL
-#define ANSITTY_CL_LIGHT_GREEN   ANSITTY_CL_LIME
-#define ANSITTY_CL_BRIGHT_GREEN  ANSITTY_CL_LIME
-#define ANSITTY_CL_DARK_BLUE     ANSITTY_CL_NAVY
+#define ANSITTY_CL_LIGHT_GRAY   ANSITTY_CL_SILVER
+#define ANSITTY_CL_DARK_GRAY    ANSITTY_CL_GREY
+#define ANSITTY_CL_MAGENTA      ANSITTY_CL_PURPLE
+#define ANSITTY_CL_CYAN         ANSITTY_CL_TEAL
+#define ANSITTY_CL_LIGHT_GREEN  ANSITTY_CL_LIME
+#define ANSITTY_CL_BRIGHT_GREEN ANSITTY_CL_LIME
+#define ANSITTY_CL_DARK_BLUE    ANSITTY_CL_NAVY
 #endif /* !ANSITTY_CL_LIGHT_GRAY */
 
 #define ANSITTY_PALETTE_INDEX(fg, bg) (((bg) << 4) | (fg))
 #define ANSITTY_PALETTE_INDEX_FG(idx) ((idx) & 0xf)
 #define ANSITTY_PALETTE_INDEX_BG(idx) ((idx) >> 4)
-#define ANSITTY_CL_DEFAULT     ANSITTY_PALETTE_INDEX(ANSITTY_CL_LIGHT_GRAY, ANSITTY_CL_BLACK)
+#define ANSITTY_CL_DEFAULT \
+	ANSITTY_PALETTE_INDEX(ANSITTY_CL_LIGHT_GRAY, ANSITTY_CL_BLACK)
 
 /* Sequence that can be printed at any time to reset the ANSI driver to its default
  * state, where it accepts regular text input for immediate display, with all attributes
  * and special coloration disabled.
  * Explanation:
- *   - `\030'  -- Cancel (forces the state machine to abort any in-progress sequence and
- *                        reset itself to accept text or the start of an escape sequence)
- *   - `\033c' -- Reset TTY (resets colors, display-attributes, tty-flags and tty-mode)
+ *   - `\030'  -- AC_CAN: Cancel (forces the state machine to abort any in-progress sequence and
+ *                                reset itself to accept text or the start of an escape sequence)
+ *   - `\033c' -- AC_RIS: Reset TTY (resets colors, display-attributes, tty-flags and tty-mode)
+ *                        However, this will not clear the screen, or reset the cursor position
+ *                        (though it will make the cursor visible). Both of this actions can be
+ *                        performed by using `AC_CUP0' and `AC_ED("")'
  */
-#define ANSITTY_RESET_SEQUENCE  "\030\033c" /* == AC_CAN AC_RIS */
+#define ANSITTY_RESET_SEQUENCE "\030\033c" /* == AC_CAN AC_RIS */
 
 #define ANSITTY_CLS_AFTER    0 /* Clear everything after the cursor (including the cursor itself). */
 #define ANSITTY_CLS_BEFORE   1 /* Clear everything before the cursor (excluding the cursor itself). */
@@ -215,7 +219,7 @@ struct ansitty_operators {
 	 *    configurable `libtermios' layer.
 	 *  - However, the kernel's builtin debugger implements LF as implying
 	 *    CURSOR.X=0, mainly since this is the expected behavior in most
-	 *    cases, and also because `dbg_printf()' doesn't free through the
+	 *    cases, and also because `dbg_printf()' doesn't feed through the
 	 *    libtermios layer that would normally translate LF->CRLF.
 	 */
 	__ATTR_NONNULL((1))
@@ -253,8 +257,8 @@ struct ansitty_operators {
 	 *        the left/right border of the screen will wrap around to the
 	 *        end/start of the prev/next line).
 	 *        The number of cells to-be copied is given by `count'
-	 *        When `count' is would overflow past the end of the display,
-	 *        it is clamped before being used. */
+	 *        When `count' would overflow past the end of the display,
+	 *        it must be clamped before being used. */
 	__ATTR_NONNULL((1))
 	void (LIBANSITTY_CC *ato_copycell)(struct ansitty *__restrict self,
 	                                   ansitty_offset_t dst_offset,
@@ -293,7 +297,7 @@ struct ansitty_operators {
 	void (LIBANSITTY_CC *ato_setcolor)(struct ansitty *__restrict self,
 	                                   __uint8_t color);
 	/* [0..1] Set the current text attributes.
-	 * Called whenever a text attribute change.
+	 * Called whenever text attributes change.
 	 * @param: new_attrib: == self->at_attrib */
 	__ATTR_NONNULL((1))
 	void (LIBANSITTY_CC *ato_setattrib)(struct ansitty *__restrict self,
@@ -304,7 +308,10 @@ struct ansitty_operators {
 	__ATTR_NONNULL((1))
 	void (LIBANSITTY_CC *ato_setttymode)(struct ansitty *__restrict self,
 	                                     __uint16_t new_ttymode);
-	/* [0..1] Set the scroll region */
+	/* [0..1] Set the scroll region (s.a. `ato_scroll()')
+	 * Called whenever the scroll region changes.
+	 * @param: start_line: == self->at_scroll_sl
+	 * @param: end_line:   == self->at_scroll_el */
 	__ATTR_NONNULL((1))
 	void (LIBANSITTY_CC *ato_scrollregion)(struct ansitty *__restrict self,
 	                                       ansitty_coord_t start_line,
@@ -313,9 +320,12 @@ struct ansitty_operators {
 	__ATTR_NONNULL((1, 2))
 	void (LIBANSITTY_CC *ato_settitle)(struct ansitty *__restrict self,
 	                                   /*utf-8*/ char const *__restrict text);
-	/* [0..1] Output `text' to the slave process (`write(amaster, text, textlen)';
+	/* [0..1] Output `data' to the slave process (`write(amaster, data, datalen)';
 	 *        amaster from <pty.h>:openpty, or alternatively identical to keyboard
-	 *        input) */
+	 *        input).
+	 *        Certain control sequences produce response strings that are then
+	 *        passed to string function in order to become readable by the issuing
+	 *        process. */
 	__ATTR_NONNULL((1))
 	void (LIBANSITTY_CC *ato_output)(struct ansitty *__restrict self,
 	                                 void const *data, __size_t datalen);
@@ -374,7 +384,7 @@ struct ansitty {
 	};
 	__byte_t                  ANSITTY_INTERNAL(at_escape)[256]; /* Escape text buffer (also used for unicode translation). */
 	__byte_t                  ANSITTY_INTERNAL(at_zero);        /* [const] Always ZERO. */
-	__CHAR32_TYPE__           at_lastch;      /* The last successfully printed character (used for `\e[<n>b'). */
+	__CHAR32_TYPE__           at_lastch;      /* The last successfully printed character (used for `\e[<n>b', aka. `AC_REP()'). */
 };
 
 #undef ANSITTY_INTERNAL

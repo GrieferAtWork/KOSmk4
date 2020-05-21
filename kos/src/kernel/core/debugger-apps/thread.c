@@ -62,11 +62,11 @@ DECL_BEGIN
 
 PRIVATE ATTR_DBGTEXT NONNULL((1)) void KCALL
 enum_thread(struct task *__restrict thread, unsigned int state) {
-	dbg_attr_t old_attr = dbg_attr;
+	dbg_savecolor();
 	if (thread == dbg_current)
-		dbg_setfgcolor(DBG_COLOR_GREEN);
+		dbg_setfgcolor(ANSITTY_CL_GREEN);
 	dbg_printf(DBGSTR("%p "), thread);
-	dbg_attr = old_attr;
+	dbg_loadcolor();
 	dbg_printf(DBGSTR("%u\t%s\t%u\t"),
 	           task_getroottid_of_s(thread),
 	           state == THREAD_STATE_RUNNING
@@ -336,7 +336,7 @@ DBG_COMMAND_AUTO(thread, DBG_HOOKFLAG_NORMAL,
                  "thread ADDR\n"
                  "\tSet the thread that is being debuged\n"
                  "\tWarning: Setting an invalid thread address may triple-fault the kernel\n"
-                 "\t         Use " DF_WHITE("thread ADDR force") " to override security checks\n",
+                 "\t         Use " AC_WHITE("thread ADDR force") " to override security checks\n",
                  argc, argv) {
 	struct task *thread;
 	if (argc < 2)

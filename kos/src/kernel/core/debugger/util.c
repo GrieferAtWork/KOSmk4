@@ -71,53 +71,52 @@ NOTHROW(KCALL do_dbg_addr2line_vprintf)(struct addr2line_buf const *__restrict a
 	addr2line_errno_t error;
 	error = addr2line(ainfo, module_relative_start_pc, &info, 0);
 	if (error != DEBUG_INFO_ERROR_SUCCESS) {
-		dbg_printf(DBGSTR(DF_SETFGCOLOR(DBG_COLOR_WHITE) "%p" DF_DEFFGCOLOR "+"
-		                  DF_SETFGCOLOR(DBG_COLOR_WHITE) "%-4Iu" DF_DEFFGCOLOR),
+		dbg_printf(DBGSTR(AC_FG(ANSITTY_CL_WHITE) "%p" AC_FGDEF "+"
+		                  AC_FG(ANSITTY_CL_WHITE) "%-4Iu" AC_FGDEF),
 		           start_pc, (size_t)(end_pc - start_pc));
 		if (message_format) {
-			dbg_print(DBGSTR("[" DF_SETFGCOLOR(DBG_COLOR_WHITE)));
+			dbg_print(DBGSTR("[" AC_FG(ANSITTY_CL_WHITE)));
 			dbg_vprintf(message_format, args);
-			dbg_print(DBGSTR(DF_DEFFGCOLOR "]"));
+			dbg_print(DBGSTR(AC_FGDEF "]"));
 		}
 		dbg_putc('\n');
 	} else {
 		uintptr_t level = 0;
-		u8 color;
-		dbg_attr_t attr;
+		u8 fgcolor;
 again_printlevel:
 		if (!info.al_rawname)
 			info.al_rawname = info.al_name;
 		if (!info.al_rawname)
 			info.al_rawname = (char *)DBGSTR("??" "?");
-		color = level < info.al_levelcnt - 1
-		        ? DBG_COLOR_AQUA
-		        : DBG_COLOR_WHITE;
-		attr  = dbg_attr;
-		dbg_setfgcolor(color);
+		fgcolor = level < info.al_levelcnt - 1
+		        ? ANSITTY_CL_AQUA
+		        : ANSITTY_CL_WHITE;
+		dbg_savecolor();
+		dbg_setfgcolor(fgcolor);
 		dbg_printf(DBGSTR("%p"),
 		           level == 0 ? start_pc
 		                      : ((start_pc - module_relative_start_pc) +
 		                         info.al_symstart));
-		dbg_attr = attr;
+		dbg_loadcolor();
 		dbg_putc('+');
-		attr = dbg_attr;
-		dbg_setfgcolor(color);
+		dbg_savecolor();
+		dbg_setfgcolor(fgcolor);
 		dbg_printf(DBGSTR("%-4Iu"),
 		           level == 0 ? (size_t)(end_pc - start_pc)
 		                      : (size_t)(info.al_lineend - info.al_linestart));
-		dbg_attr = attr;
+		dbg_loadcolor();
 		dbg_putc('[');
-		attr = dbg_attr;
-		dbg_setfgcolor(color);
+		dbg_savecolor();
+		dbg_setfgcolor(fgcolor);
 		dbg_print(info.al_rawname);
-		dbg_attr = attr;
+		dbg_loadcolor();
 		dbg_putc('+');
-		attr = dbg_attr;
-		dbg_setfgcolor(color);
+		dbg_savecolor();
+		dbg_setfgcolor(fgcolor);
 		dbg_printf(DBGSTR("%Iu"),
 		           level == 0 ? (size_t)(module_relative_start_pc - info.al_symstart)
 		                      : (size_t)(info.al_linestart - info.al_symstart));
-		dbg_attr = attr;
+		dbg_loadcolor();
 		dbg_putc(']');
 		if (info.al_srcfile) {
 			char const *p1, *p2;
@@ -132,30 +131,30 @@ again_printlevel:
 			if (!p1)
 				p1 = info.al_srcfile;
 			dbg_print(" [");
-			attr = dbg_attr;
-			dbg_setfgcolor(color);
+			dbg_savecolor();
+			dbg_setfgcolor(fgcolor);
 			dbg_print(p1);
-			dbg_attr = attr;
+			dbg_loadcolor();
 			if (info.al_srcline) {
 				dbg_putc(':');
-				attr = dbg_attr;
-				dbg_setfgcolor(color);
+				dbg_savecolor();
+				dbg_setfgcolor(fgcolor);
 				dbg_printf(DBGSTR("%Iu"), info.al_srcline);
-				dbg_attr = attr;
+				dbg_loadcolor();
 				if (info.al_srccol) {
 					dbg_putc(':');
-					attr = dbg_attr;
-					dbg_setfgcolor(color);
+					dbg_savecolor();
+					dbg_setfgcolor(fgcolor);
 					dbg_printf(DBGSTR("%Iu"), info.al_srccol);
-					dbg_attr = attr;
+					dbg_loadcolor();
 				}
 			}
 			dbg_putc(']');
 		}
 		if (message_format) {
 			dbg_print(DBGSTR(" ["));
-			attr = dbg_attr;
-			dbg_setfgcolor(color);
+			dbg_savecolor();
+			dbg_setfgcolor(fgcolor);
 #ifndef __i386__
 			if (level == info.al_levelcnt - 1) {
 				va_list copy;
@@ -167,7 +166,7 @@ again_printlevel:
 			{
 				dbg_vprintf(message_format, args);
 			}
-			dbg_attr = attr;
+			dbg_loadcolor();
 			dbg_putc(']');
 		}
 		dbg_putc('\n');
@@ -211,9 +210,9 @@ NOTHROW(KCALL dbg_menuex)(char const *__restrict title,
 	unsigned int i;
 	unsigned int message_end_y;
 	void *buf;
-	dbg_attr_t attr = dbg_attr;
 	bool was_cursor_visible;
-	dbg_setcolor(DBG_COLOR_LIGHT_GRAY, DBG_COLOR_BLACK);
+	dbg_savecolor();
+	dbg_setcolor(ANSITTY_CL_LIGHT_GRAY, ANSITTY_CL_BLACK);
 	buf = alloca(dbg_screen_width *
 	             dbg_screen_height *
 	             dbg_screen_cellsize);
@@ -245,7 +244,7 @@ NOTHROW(KCALL dbg_menuex)(char const *__restrict title,
 		dbg_setcur(1, message_end_y);
 		dbg_beginupdate();
 		for (i = 0; options[i]; ++i) {
-			dbg_setcolor(DBG_COLOR_WHITE, i == default_option ? DBG_COLOR_LIGHT_GRAY : DBG_COLOR_BLACK);
+			dbg_setcolor(ANSITTY_CL_WHITE, i == default_option ? ANSITTY_CL_LIGHT_GRAY : ANSITTY_CL_BLACK);
 			dbg_hline(1, message_end_y + i, dbg_screen_width - 2, ' ');
 			dbg_pprintf(5, message_end_y + i, DBGSTR("%s"), options[i]);
 		}
@@ -272,7 +271,7 @@ NOTHROW(KCALL dbg_menuex)(char const *__restrict title,
 done:
 	dbg_setscreendata(0, 0, dbg_screen_width, dbg_screen_height, buf);
 	dbg_setcur_visible(was_cursor_visible);
-	dbg_attr = attr;
+	dbg_loadcolor();
 	return default_option;
 }
 

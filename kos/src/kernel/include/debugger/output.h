@@ -27,6 +27,8 @@
 #ifdef CONFIG_HAVE_DEBUGGER
 #include <kernel/types.h>
 
+#include <hybrid/pp/__va_nargs.h>
+
 #include <stdbool.h>
 
 #include <libansitty/ansitty.h>
@@ -37,7 +39,7 @@ DECL_BEGIN
 
 #ifdef __CC__
 
-/* I/O within the debugger. */
+/* Basic output functions within the debugger. */
 FUNDEF void NOTHROW(FCALL dbg_bell)(void);
 FUNDEF void NOTHROW(FCALL dbg_putc)(/*utf-8*/ char ch);
 FUNDEF void NOTHROW(FCALL dbg_putuni)(/*utf-32*/ char32_t ch);
@@ -135,8 +137,8 @@ DATDEF struct ansitty dbg_tty;
 
 
 /* Get/Set debug TTY screen data
- * NOTE: Reading Out-of-bound cells are read as the same value as a space-character
- *       cell when written using `dbg_putc(' ')' as the current cursor position.
+ * NOTE: Out-of-bound cells are read as the same value as a space-character
+ *       cell when written using `dbg_putc(' ')' at the current cursor position.
  * NOTE: Writing Out-of-bound cells is a no-op.
  * NOTE: These functions will read/write the SCROLL-TOP screen data, and
  *      `dbg_setscreendata()' will apply `dbg_setscroll(0)'
@@ -155,7 +157,7 @@ FUNDEF bool NOTHROW(FCALL dbg_setcur_visible)(bool visible);
  * but instead draw to a separate buffer, thus preventing flickering in the
  * case of whole screen redraw operations.
  * NOTE: Also affects updates made to the cursor position
- * @param: force: When true, force updates to stop. */
+ * @param: force: When true, force a switch back to the screen-buffer. */
 FUNDEF void NOTHROW(FCALL dbg_beginupdate)(void);
 FUNDEF void NOTHROW(FCALL dbg_endupdate)(bool force DFL(false));
 
@@ -164,8 +166,6 @@ FUNDEF void NOTHROW(FCALL dbg_endupdate)(bool force DFL(false));
  * NOTE: This functionality of these functions is also available through the `screen' command */
 FUNDEF void NOTHROW(FCALL dbg_beginshowscreen)(void);
 FUNDEF void NOTHROW(FCALL dbg_endshowscreen)(void);
-
-
 
 /* Get/Set the current on-screen cursor position.
  * NOTE: Out-of-bounds coords are clamped to their valid ranges. */
@@ -179,66 +179,33 @@ LOCAL WUNUSED ATTR_PURE unsigned int NOTHROW(FCALL dbg_getcur_y)(void) { return 
 LOCAL u32 NOTHROW(FCALL dbg_setcur_x)(int x) { return dbg_setcur(x, dbg_getcur_y()); }
 LOCAL u32 NOTHROW(FCALL dbg_setcur_y)(int y) { return dbg_setcur(dbg_getcur_x(), y); }
 
-
-/* TTY color codes. */
-/* TODO: Get rid of this stuff and use the control codes from <libansitty/ctl.h> */
-#define DBG_COLOR_BLACK         ANSITTY_CL_BLACK   /* RGB(0x00, 0x00, 0x00) */
-#define DBG_COLOR_MAROON        ANSITTY_CL_MAROON  /* RGB(0xaa, 0x00, 0x00) */
-#define DBG_COLOR_GREEN         ANSITTY_CL_GREEN   /* RGB(0x00, 0xaa, 0x00) */
-#define DBG_COLOR_OLIVE         ANSITTY_CL_OLIVE   /* RGB(0xaa, 0x55, 0x00) */
-#define DBG_COLOR_NAVY          ANSITTY_CL_NAVY    /* RGB(0x00, 0x00, 0xaa) */
-#define DBG_COLOR_PURPLE        ANSITTY_CL_PURPLE  /* RGB(0xaa, 0x00, 0xaa) */
-#define DBG_COLOR_TEAL          ANSITTY_CL_TEAL    /* RGB(0x00, 0xaa, 0xaa) */
-#define DBG_COLOR_SILVER        ANSITTY_CL_SILVER  /* RGB(0xaa, 0xaa, 0xaa) */
-#define DBG_COLOR_GREY          ANSITTY_CL_GREY    /* RGB(0x55, 0x55, 0x55) */
-#define DBG_COLOR_RED           ANSITTY_CL_RED     /* RGB(0xff, 0x55, 0x55) */
-#define DBG_COLOR_LIME          ANSITTY_CL_LIME    /* RGB(0x55, 0xff, 0x55) */
-#define DBG_COLOR_YELLOW        ANSITTY_CL_YELLOW  /* RGB(0xff, 0xff, 0x55) */
-#define DBG_COLOR_BLUE          ANSITTY_CL_BLUE    /* RGB(0x55, 0x55, 0xff) */
-#define DBG_COLOR_FUCHSIA       ANSITTY_CL_FUCHSIA /* RGB(0xff, 0x55, 0xff) */
-#define DBG_COLOR_AQUA          ANSITTY_CL_AQUA    /* RGB(0x55, 0xff, 0xff) */
-#define DBG_COLOR_WHITE         ANSITTY_CL_WHITE   /* RGB(0xff, 0xff, 0xff) */
-#define DBG_COLOR_LIGHT_GRAY    ANSITTY_CL_LIGHT_GRAY
-#define DBG_COLOR_DARK_GRAY     ANSITTY_CL_DARK_GRAY
-#define DBG_COLOR_MAGENTA       ANSITTY_CL_MAGENTA
-#define DBG_COLOR_CYAN          ANSITTY_CL_CYAN
-#define DBG_COLOR_LIGHT_GREEN   ANSITTY_CL_LIGHT_GREEN
-#define DBG_COLOR_BRIGHT_GREEN  ANSITTY_CL_BRIGHT_GREEN
-#define DBG_COLOR_DARK_BLUE     ANSITTY_CL_DARK_BLUE
-
-/* Color escape codes for debug TTY output. */
-#define DF_SETCOLOR(fg, bg)    AC_COLOR(fg, bg)
-#define DF_SETFGCOLOR(fg)      AC_FG(fg)
-#define DF_SETBGCOLOR(bg)      AC_BG(bg)
-#define DF_DEFFGCOLOR          AC_FGDEF    /* Reset foreground color */
-#define DF_DEFBGCOLOR          AC_BGDEF    /* Reset background color */
-#define DF_DEFCOLOR            AC_DEFCOLOR /* Reset colors */
-#define DF_RESETATTR           AC_DEFATTR  /* Reset all graphics attributes */
-#define DF_SETMAROON           DF_SETFGCOLOR(DBG_COLOR_MAROON)
-#define DF_SETWHITE            DF_SETFGCOLOR(DBG_COLOR_WHITE)
-#define DF_SETBLUE             DF_SETFGCOLOR(DBG_COLOR_BLUE)
-#define DF_COLOR(fg, bg, text) DF_SETCOLOR(fg, bg) text DF_RESETATTR
-#define DF_FGCOLOR(fg, text)   DF_SETFGCOLOR(fg) text DF_RESETATTR
-#define DF_BGCOLOR(bg, text)   DF_SETBGCOLOR(bg) text DF_RESETATTR
-#define DF_WHITE(text)         DF_SETWHITE text DF_RESETATTR
-#define DF_BLUE(text)          DF_SETBLUE text DF_RESETATTR
-
-
-#define DBG_COLOR_ATTR(fg, bg) ((dbg_attr_t)(fg) << 8 | (dbg_attr_t)(bg) << 12)
-#define DBG_COLOR_FG(attr)     ((u8)(((attr) >> 8) & 0xf))
-#define DBG_COLOR_BG(attr)     ((u8)(((attr) >> 12) & 0xf))
-typedef u16 dbg_attr_t;
-
-/* Get/Set TTY text attributes. */
-DATDEF dbg_attr_t dbg_attr;         /* TODO: Get rid of me (use dbg_tty.at_color instead) */
-DATDEF dbg_attr_t dbg_default_attr; /* TODO: Get rid of me (use dbg_tty.at_defcolor instead) */ /* Attributes restored by `DF_RESETATTR' */
-
 /* Get/Set TTY colors. */
-LOCAL void NOTHROW(KCALL dbg_setcolor)(u8 fg, u8 bg) { dbg_attr = DBG_COLOR_ATTR(fg, bg); }
-LOCAL u8 NOTHROW(KCALL dbg_getfgcolor)(void) { return DBG_COLOR_FG(dbg_attr); }
-LOCAL u8 NOTHROW(KCALL dbg_getbgcolor)(void) { return DBG_COLOR_BG(dbg_attr); }
-LOCAL void NOTHROW(KCALL dbg_setfgcolor)(u8 fg) { dbg_attr = DBG_COLOR_ATTR(fg, dbg_getbgcolor()); }
-LOCAL void NOTHROW(KCALL dbg_setbgcolor)(u8 bg) { dbg_attr = DBG_COLOR_ATTR(dbg_getfgcolor(), bg); }
+typedef u8 dbg_color_t;
+#define dbg_getcolor()         (u8)dbg_tty.at_color
+#define _dbg_setcolor1(v)      (void)(dbg_tty.at_color = (v))
+#define _dbg_setcolor2(fg, bg) (void)(dbg_tty.at_color = ANSITTY_PALETTE_INDEX(fg, bg))
+#define dbg_setcolor(...)      __HYBRID_PP_VA_OVERLOAD(_dbg_setcolor, (__VA_ARGS__))(__VA_ARGS__)
+#define dbg_getfgcolor()       ANSITTY_PALETTE_INDEX_FG(dbg_tty.at_color)
+#define dbg_getbgcolor()       ANSITTY_PALETTE_INDEX_BG(dbg_tty.at_color)
+#define dbg_setfgcolor(fg)     (void)(dbg_tty.at_color = ANSITTY_PALETTE_INDEX(fg, dbg_getbgcolor()))
+#define dbg_setbgcolor(bg)     (void)(dbg_tty.at_color = ANSITTY_PALETTE_INDEX(dbg_getfgcolor(), bg))
+
+#define dbg_getdefaultcolor()         (u8)dbg_tty.at_defcolor
+#define _dbg_setdefaultcolor1(v)      (void)(dbg_tty.at_defcolor = (v))
+#define _dbg_setdefaultcolor2(fg, bg) (void)(dbg_tty.at_defcolor = ANSITTY_PALETTE_INDEX(fg, bg))
+#define dbg_setdefaultcolor(...)      __HYBRID_PP_VA_OVERLOAD(_dbg_setdefaultcolor, (__VA_ARGS__))(__VA_ARGS__)
+#define dbg_getdefaultfgcolor()       ANSITTY_PALETTE_INDEX_FG(dbg_tty.at_defcolor)
+#define dbg_getdefaultbgcolor()       ANSITTY_PALETTE_INDEX_BG(dbg_tty.at_defcolor)
+#define dbg_setdefaultfgcolor(fg)     (void)(dbg_tty.at_defcolor = ANSITTY_PALETTE_INDEX(fg, dbg_getbgcolor()))
+#define dbg_setdefaultbgcolor(bg)     (void)(dbg_tty.at_defcolor = ANSITTY_PALETTE_INDEX(dbg_getfgcolor(), bg))
+
+#define dbg_savecolor()         \
+	do {                        \
+		dbg_color_t _old_color; \
+		_old_color = dbg_getcolor()
+#define dbg_loadcolor()           \
+		dbg_setcolor(_old_color); \
+	} __WHILE0
 
 
 #endif /* __CC__ */

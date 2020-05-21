@@ -65,11 +65,11 @@ DECL_BEGIN
 
 
 /* ColorConfiguration for the auto-completion box. */
-#define AUTOCOMPLETE_CC_BADCMD     DBG_COLOR_RED              /* Text-color for unmatched commands */
-#define AUTOCOMPLETE_CC_BACKGROUND DBG_COLOR_DARK_GRAY        /* Background color for the auto-completion box */
-#define AUTOCOMPLETE_CC_MATCHFG    DBG_COLOR_WHITE            /* Foreground color for matched text */
+#define AUTOCOMPLETE_CC_BADCMD     ANSITTY_CL_RED              /* Text-color for unmatched commands */
+#define AUTOCOMPLETE_CC_BACKGROUND ANSITTY_CL_DARK_GRAY        /* Background color for the auto-completion box */
+#define AUTOCOMPLETE_CC_MATCHFG    ANSITTY_CL_WHITE            /* Foreground color for matched text */
 #define AUTOCOMPLETE_CC_MATCHBG    AUTOCOMPLETE_CC_BACKGROUND /* Background color for matched text */
-#define AUTOCOMPLETE_CC_SUGGESTFG  DBG_COLOR_LIGHT_GRAY       /* Foreground color for suggested text */
+#define AUTOCOMPLETE_CC_SUGGESTFG  ANSITTY_CL_LIGHT_GRAY       /* Foreground color for suggested text */
 #define AUTOCOMPLETE_CC_SUGGESTBG  AUTOCOMPLETE_CC_BACKGROUND /* Background color for suggested text */
 
 
@@ -217,7 +217,7 @@ DBG_COMMAND(help, autocomplete_help, DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE,
             "help\n"
             "\tDisplay a list of available commands\n"
             "help command\n"
-            "\tDisplay help specific to " DF_WHITE("command") "\n",
+            "\tDisplay help specific to " AC_WHITE("command") "\n",
             argc, argv) {
 	--argc;
 	++argv;
@@ -227,8 +227,8 @@ DBG_COMMAND(help, autocomplete_help, DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE,
 		size_t max_name_length;
 		unsigned int i, commands_per_line = 1;
 		dbg_print(DBGSTR("Available commands (type "
-		                 DF_SETFGCOLOR(DBG_COLOR_WHITE)
-		                 "help <command>" DF_DEFFGCOLOR
+		                 AC_FG(ANSITTY_CL_WHITE)
+		                 "help <command>" AC_FGDEF
 		                 " for more details)\n"));
 		max_name_length = 1;
 		dbg_hookiterator_init(&iter);
@@ -253,7 +253,7 @@ DBG_COMMAND(help, autocomplete_help, DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE,
 			if (!current)
 				break;
 			/* TODO: It would be nice if we printed commands in alphabetical order here... */
-			dbg_printf(DBGSTR(DF_WHITE("%?-s")), max_name_length, current->dc_name);
+			dbg_printf(DBGSTR(AC_WHITE("%?-s")), max_name_length, current->dc_name);
 			if ((i % commands_per_line) == (commands_per_line - 1))
 				dbg_putc('\n');
 			++i;
@@ -267,15 +267,15 @@ DBG_COMMAND(help, autocomplete_help, DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE,
 			command  = dbg_lookup_command(*argv);
 			if (!command) {
 				command = dbg_lookup_command_fuzzy(*argv);
-				dbg_printf(DBGSTR("Unknown command " DF_SETCOLOR(DBG_COLOR_LIGHT_GRAY, DBG_COLOR_MAROON) "%#q" DF_DEFCOLOR
-				                  " (Did you mean " DF_SETFGCOLOR(DBG_COLOR_WHITE) "%s" DF_DEFFGCOLOR "?)\n"),
+				dbg_printf(DBGSTR("Unknown command " AC_COLOR(ANSITTY_CL_LIGHT_GRAY, ANSITTY_CL_MAROON) "%#q" AC_DEFCOLOR
+				                  " (Did you mean " AC_FG(ANSITTY_CL_WHITE) "%s" AC_FGDEF "?)\n"),
 				           *argv, command->dc_name);
 			} else {
 				char const *hookhelp;
 				hookhelp = NULL;
 				if (dbg_commandhook_hashelp(command))
 					hookhelp = command->dc_help;
-				dbg_printf(DF_SETFGCOLOR(DBG_COLOR_WHITE) "%s" DF_DEFFGCOLOR ":\n",
+				dbg_printf(AC_FG(ANSITTY_CL_WHITE) "%s" AC_FGDEF ":\n",
 				           command->dc_name);
 				if (!hookhelp)
 					hookhelp = DBGSTR("\tNo help available\n");
@@ -596,7 +596,6 @@ do_print_options:
 		unsigned int matchlist_y, wordstart_x;
 		unsigned int matchlist_sx, matchlist_sy;
 		void *matchlist_screendata_backup;
-		dbg_attr_t orig_attr;
 
 		/* Figure out the length of the longest match. */
 		match_count = cookie.cnt.acc_count;
@@ -672,7 +671,7 @@ do_print_above:
 		}
 		/* Backup the screen-area containing the match list. */
 		matchlist_screendata_backup = alloca(matchlist_sx * matchlist_sy * dbg_screen_cellsize);
-		orig_attr = dbg_attr;
+		dbg_savecolor();
 		dbg_beginupdate();
 		dbg_getscreendata(cookie.prn.acc_matchlist_x, matchlist_y,
 		                  matchlist_sx, matchlist_sy,
@@ -691,8 +690,8 @@ do_print_above:
 		dbg_setscreendata(cookie.prn.acc_matchlist_x, matchlist_y,
 		                  matchlist_sx, matchlist_sy,
 		                  matchlist_screendata_backup);
-		/* Restore original output attributes */
-		dbg_attr = orig_attr;
+		/* Restore original output color */
+		dbg_loadcolor();
 	}
 done:
 	return cursor;
@@ -819,11 +818,9 @@ dbg_main(uintptr_t show_welcome) {
 	 * Called once the debugger context of single-core + no preemptive interrupts was set up. */
 	if (show_welcome) {
 		dbg_print(DBGSTR("Use CTRL + SHIFT + UP/DOWN/PAGE_UP/PAGE_DOWN/HOME/END to scroll\n"
-		                 "Type " DF_SETFGCOLOR(DBG_COLOR_WHITE) "help" DF_DEFFGCOLOR
-		                 " for a list of commands\n"));
+		                 "Type " AC_WHITE("help") " for a list of commands\n"));
 	}
 	for (;;) {
-		dbg_attr_t attr;
 		size_t argc;
 		intptr_t errorcode;
 		struct dbg_commandhook const *cmd;
@@ -833,12 +830,12 @@ again_readline:
 		/* Add a visual indicator for when the exit state doesn't match the currently
 		 * viewed state (thus informing the user that they need to type `apply' before
 		 * exit if they wish to return to the modified state) */
-		dbg_attr = dbg_default_attr;
+		dbg_setcolor(dbg_getdefaultcolor());
 		if (dbg_changedview())
-			dbg_print(DBGSTR(DF_COLOR(DBG_COLOR_LIME, DBG_COLOR_DARK_GRAY, "!")));
+			dbg_print(DBGSTR(AC_WITHCOLOR(ANSITTY_CL_LIME, ANSITTY_CL_DARK_GRAY, "!")));
 		dbg_print(DBGSTR("> "));
-		attr = dbg_attr;
-		dbg_setcolor(DBG_COLOR_WHITE, DBG_COLOR_DARK_GRAY);
+		dbg_savecolor();
+		dbg_setcolor(ANSITTY_CL_WHITE, ANSITTY_CL_DARK_GRAY);
 		dbg_setcur_visible(true);
 		{
 #ifdef CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE
@@ -868,14 +865,14 @@ continue_readline:
 				                              &badcmd, did_press_tab);
 				if (badcmd) {
 					dbg_beginupdate();
-					dbg_setcolor(AUTOCOMPLETE_CC_BADCMD, DBG_COLOR_DARK_GRAY);
+					dbg_setcolor(AUTOCOMPLETE_CC_BADCMD, ANSITTY_CL_DARK_GRAY);
 					dbg_draweditfield(DBG_GETCUR_X(cur), DBG_GETCUR_Y(cur),
 					                  field_width, cmdline, DBG_MAXLINE,
 					                  &cursor_pos, &screen_left);
 					dbg_endupdate();
 					/* Wait for the user to press a button. */
 					dbg_waitforinput();
-					dbg_setcolor(DBG_COLOR_WHITE, DBG_COLOR_DARK_GRAY);
+					dbg_setcolor(ANSITTY_CL_WHITE, ANSITTY_CL_DARK_GRAY);
 				}
 			}
 			did_press_tab             = false;
@@ -915,14 +912,14 @@ continue_readline:
 
 			case DBG_EDITFIELD_RETURN_CTRL_C: {
 				unsigned int curx;
-				dbg_setcolor(DBG_COLOR_WHITE, DBG_COLOR_BLACK);
+				dbg_setcolor(ANSITTY_CL_WHITE, ANSITTY_CL_BLACK);
 				dbg_draweditfield(DBG_GETCUR_X(cur), DBG_GETCUR_Y(cur),
 				                  field_width, cmdline, DBG_MAXLINE,
 				                  &cursor_pos, &screen_left);
 				dbg_setcur(DBG_GETCUR_X(cur) + cursor_pos - screen_left,
 				           DBG_GETCUR_Y(cur));
 				curx = dbg_getcur_x();
-				dbg_attr = dbg_default_attr;
+				dbg_setcolor(dbg_getdefaultcolor());
 				if (curx < dbg_screen_width - 2)
 					dbg_print(DBGSTR("^C\n"));
 				else if (curx == dbg_screen_width - 2)
@@ -961,13 +958,13 @@ continue_readline_noauto:
 				goto continue_readline;
 			}
 			dbg_setcur_visible(false);
-			dbg_setcolor(DBG_COLOR_WHITE, DBG_COLOR_BLACK);
+			dbg_setcolor(ANSITTY_CL_WHITE, ANSITTY_CL_BLACK);
 			dbg_draweditfield(DBG_GETCUR_X(cur), DBG_GETCUR_Y(cur),
 			                  field_width, cmdline, DBG_MAXLINE,
 			                  &cursor_pos, &screen_left);
 			dbg_putc('\n');
 		}
-		dbg_attr = attr;
+		dbg_loadcolor();
 		cmdline_backlog_try_appendcurrent();
 		argc = split_cmdline(cmdline, argv, DBG_ARGC_MAX, NULL);
 		if (!argc)
@@ -976,15 +973,15 @@ continue_readline_noauto:
 		if unlikely(!cmd) {
 			cmd = dbg_lookup_command_fuzzy(argv[0]);
 			dbg_print(DBGSTR("Unknown command "));
-			attr = dbg_attr;
-			dbg_setcolor(DBG_COLOR_LIGHT_GRAY, DBG_COLOR_MAROON);
+			dbg_savecolor();
+			dbg_setcolor(ANSITTY_CL_LIGHT_GRAY, ANSITTY_CL_MAROON);
 			dbg_printf(DBGSTR("%#q"), argv[0]);
-			dbg_attr = attr;
+			dbg_loadcolor();
 			dbg_print(DBGSTR(" (did you mean "));
-			attr = dbg_attr;
-			dbg_setfgcolor(DBG_COLOR_WHITE);
+			dbg_savecolor();
+			dbg_setfgcolor(ANSITTY_CL_WHITE);
 			dbg_print(cmd->dc_name);
-			dbg_attr = attr;
+			dbg_loadcolor();
 			dbg_print(DBGSTR("?)\n"));
 			continue;
 		}
@@ -995,8 +992,8 @@ continue_readline_noauto:
 			errorcode = 1;
 		}
 		if (errorcode == DBG_STATUS_INVALID_ARGUMENTS) {
-			dbg_print(DBGSTR(DF_SETCOLOR(DBG_COLOR_MAROON, DBG_COLOR_LIGHT_GRAY)
-			                 "Invalid arguments" DF_RESETATTR "\n"));
+			dbg_print(DBGSTR(AC_COLOR(ANSITTY_CL_MAROON, ANSITTY_CL_LIGHT_GRAY)
+			                 "Invalid arguments" AC_DEFATTR "\n"));
 		}
 	}
 }

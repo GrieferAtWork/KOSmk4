@@ -689,7 +689,7 @@ print_string(pformatprinter printer, void *arg,
 			len = strlen(str);
 		}
 		if (len > LIMIT_STRLEN) {
-			result = format_printf(printer, arg, "%$q[...]", LIMIT_STRLEN, str);
+			result = format_printf(printer, arg, "%$q...", LIMIT_STRLEN, str);
 		} else {
 			result = format_printf(printer, arg, "%$q", len, str);
 		}

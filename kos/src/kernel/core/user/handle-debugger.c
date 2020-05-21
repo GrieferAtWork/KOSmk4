@@ -44,7 +44,7 @@ PRIVATE ATTR_DBGTEXT void KCALL
 printhandle(unsigned int fd, struct handle const *__restrict hand) {
 	if (hand->h_type == HANDLE_TYPE_UNDEFINED)
 		return; /* Unused handle... */
-	dbg_printf(DBGSTR(DF_WHITE("%u") "\t%c%c%c%c%c%c %-16s"),
+	dbg_printf(DBGSTR(AC_WHITE("%u") "\t%c%c%c%c%c%c %-16s"),
 	           fd,
 	           (hand->h_mode & IO_ACCMODE) != IO_WRONLY ? 'r' : '-',
 	           (hand->h_mode & IO_ACCMODE) != IO_RDONLY ? 'w' : '-',
@@ -60,13 +60,13 @@ printhandle(unsigned int fd, struct handle const *__restrict hand) {
 DBG_COMMAND(lsfd,
             "lsfd\n"
             "Enumate open file descriptors within the current thread\n"
-            "The " DF_WHITE("flags") " field consists of:\n"
-            "\t" DF_WHITE("r") ": Read-access is permitted\n"
-            "\t" DF_WHITE("w") ": Write-access is permitted\n"
-            "\t" DF_WHITE("e") ": The " DF_FGCOLOR(DBG_COLOR_PURPLE, "CLOEXEC") " flag is set\n"
-            "\t" DF_WHITE("f") ": The " DF_FGCOLOR(DBG_COLOR_PURPLE, "CLOFORK") " flag is set\n"
-            "\t" DF_WHITE("a") ": Writes append to the end of the file\n"
-            "\t" DF_WHITE("n") ": Reading/writing does not block\n") {
+            "The " AC_WHITE("flags") " field consists of:\n"
+            "\t" AC_WHITE("r") ": Read-access is permitted\n"
+            "\t" AC_WHITE("w") ": Write-access is permitted\n"
+            "\t" AC_WHITE("e") ": The " AC_WITHFG(ANSITTY_CL_PURPLE, "CLOEXEC") " flag is set\n"
+            "\t" AC_WHITE("f") ": The " AC_WITHFG(ANSITTY_CL_PURPLE, "CLOFORK") " flag is set\n"
+            "\t" AC_WHITE("a") ": Writes append to the end of the file\n"
+            "\t" AC_WHITE("n") ": Reading/writing does not block\n") {
 	struct handle_manager *self;
 	self = FORTASK(dbg_current, this_handle_manager);
 	dbg_printf(DBGSTR("fd\tflags type             repr\n"));

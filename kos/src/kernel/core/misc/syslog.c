@@ -352,10 +352,10 @@ DBG_COMMAND_AUTO(loglevel, DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE,
 		for (level = 0; level < SYSLOG_LEVEL_COUNT; ++level) {
 			char const *name = syslog_level_names[level];
 			bool on = (syslog_levels & ((uintptr_t)1 << level)) != 0;
-			dbg_setfgcolor(on ? DBG_COLOR_GREEN : DBG_COLOR_RED);
+			dbg_setfgcolor(on ? ANSITTY_CL_GREEN : ANSITTY_CL_RED);
 			dbg_putc(on ? '+' : '-');
 			dbg_print(name);
-			dbg_attr = dbg_default_attr;
+			dbg_setcolor(dbg_getdefaultcolor());
 			dbg_putc('\n');
 		}
 		return 0;

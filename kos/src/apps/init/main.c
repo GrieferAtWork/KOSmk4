@@ -219,9 +219,10 @@ done_procfs:
 		pid_t cpid;
 		/* Do some cleanup on the console. */
 		dprintf(STDOUT_FILENO,
-		        ANSITTY_RESET_SEQUENCE /* Reset the TTY */
-		        AC_HVP("", "")         /* Place cursor at 0,0 */
-		        AC_ED("")              /* Clear screen */
+		        AC_CAN    /* Cancel any in-progress escape sequence */
+		        AC_CUP0   /* Place cursor at 0,0 */
+		        AC_RIS    /* Reset all terminal settings (except for cursor position and screen contents) */
+		        AC_ED("") /* Clear screen */
 		        "");
 
 		/* Don't directly exec() busybox.

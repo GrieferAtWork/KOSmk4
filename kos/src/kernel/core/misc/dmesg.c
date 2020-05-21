@@ -477,15 +477,15 @@ dmesg_getpacket(USER CHECKED struct syslog_packet *buf,
 
 #ifdef CONFIG_HAVE_DEBUGGER
 PRIVATE ATTR_DBGRODATA char const dbg_dmesg_colors[SYSLOG_LEVEL_COUNT][10] = {
-	/* [(unsigned int)SYSLOG_LEVEL_EMERG  ] */ DF_SETCOLOR(DBG_COLOR_RED, DBG_COLOR_WHITE),
-	/* [(unsigned int)SYSLOG_LEVEL_ALERT  ] */ DF_SETCOLOR(DBG_COLOR_RED, DBG_COLOR_WHITE),
-	/* [(unsigned int)SYSLOG_LEVEL_CRIT   ] */ DF_SETCOLOR(DBG_COLOR_RED, DBG_COLOR_WHITE),
-	/* [(unsigned int)SYSLOG_LEVEL_ERR    ] */ DF_SETFGCOLOR(DBG_COLOR_MAROON),
-	/* [(unsigned int)SYSLOG_LEVEL_WARNING] */ DF_SETFGCOLOR(DBG_COLOR_YELLOW),
-	/* [(unsigned int)SYSLOG_LEVEL_NOTICE ] */ DF_SETCOLOR(DBG_COLOR_NAVY, DBG_COLOR_LIGHT_GRAY),
-	/* [(unsigned int)SYSLOG_LEVEL_INFO   ] */ DF_SETCOLOR(DBG_COLOR_AQUA, DBG_COLOR_DARK_GRAY),
-	/* [(unsigned int)SYSLOG_LEVEL_TRACE  ] */ DF_SETFGCOLOR(DBG_COLOR_CYAN),
-	/* [(unsigned int)SYSLOG_LEVEL_DEBUG  ] */ DF_SETFGCOLOR(DBG_COLOR_OLIVE),
+	/* [(unsigned int)SYSLOG_LEVEL_EMERG  ] */ AC_COLOR(ANSITTY_CL_RED, ANSITTY_CL_WHITE),
+	/* [(unsigned int)SYSLOG_LEVEL_ALERT  ] */ AC_COLOR(ANSITTY_CL_RED, ANSITTY_CL_WHITE),
+	/* [(unsigned int)SYSLOG_LEVEL_CRIT   ] */ AC_COLOR(ANSITTY_CL_RED, ANSITTY_CL_WHITE),
+	/* [(unsigned int)SYSLOG_LEVEL_ERR    ] */ AC_FG(ANSITTY_CL_MAROON),
+	/* [(unsigned int)SYSLOG_LEVEL_WARNING] */ AC_FG(ANSITTY_CL_YELLOW),
+	/* [(unsigned int)SYSLOG_LEVEL_NOTICE ] */ AC_COLOR(ANSITTY_CL_NAVY, ANSITTY_CL_LIGHT_GRAY),
+	/* [(unsigned int)SYSLOG_LEVEL_INFO   ] */ AC_COLOR(ANSITTY_CL_AQUA, ANSITTY_CL_DARK_GRAY),
+	/* [(unsigned int)SYSLOG_LEVEL_TRACE  ] */ AC_FG(ANSITTY_CL_CYAN),
+	/* [(unsigned int)SYSLOG_LEVEL_DEBUG  ] */ AC_FG(ANSITTY_CL_OLIVE),
 	/* [(unsigned int)SYSLOG_LEVEL_DEFAULT] */ "",
 	/* [(unsigned int)SYSLOG_LEVEL_RAW    ] */ "",
 };
@@ -498,7 +498,7 @@ dmesg_print_packet(struct syslog_packet *__restrict packet,
 	dbg_printf(DBGSTR("%.2u:%.2u:%.2u.%.4" PRIu32 " "),
 	           tms.tm_hour, tms.tm_min, tms.tm_sec,
 	           packet->sp_nsec / 100000);
-	dbg_printf(DBGSTR("%s%$s" DF_RESETATTR "\n"),
+	dbg_printf(DBGSTR("%s%$s" AC_DEFATTR "\n"),
 	           dbg_dmesg_colors[level],
 	           (size_t)packet->sp_len,
 	           (size_t)packet->sp_msg);

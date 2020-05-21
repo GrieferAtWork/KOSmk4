@@ -1147,7 +1147,7 @@ DBG_COMMAND(lsram,
 		total_pages = (size_t)zone->mz_rmax + 1;
 		used_pages  = total_pages - (size_t)zone->mz_cfree;
 		usage_percent = (unsigned int)(((u64)used_pages * 100 * 100000) / total_pages);
-		dbg_printf(DBGSTR("%Iu " DF_WHITE(FORMAT_VM_PHYS_T) "-" DF_WHITE(FORMAT_VM_PHYS_T) " %3u.%.5u%% (%Iu/%Iu)\n"),
+		dbg_printf(DBGSTR("%Iu " AC_WHITE(FORMAT_VM_PHYS_T) "-" AC_WHITE(FORMAT_VM_PHYS_T) " %3u.%.5u%% (%Iu/%Iu)\n"),
 		           i,
 		           page2addr(zone->mz_start),
 		           page2addr(zone->mz_max + 1) - 1,

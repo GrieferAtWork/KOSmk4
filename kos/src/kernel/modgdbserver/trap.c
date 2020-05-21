@@ -100,8 +100,8 @@ NOTHROW(FCALL GDBServer_HasStopEvent)(GDBThreadStopEvent const *chain,
 
 #ifdef CONFIG_HAVE_DEBUGGER
 PRIVATE void KCALL GDBServer_RecursiveEntryDebuggerMain(void) {
-	dbg_printf(DF_SETCOLOR(DBG_COLOR_WHITE, DBG_COLOR_MAROON)
-	           "Recursive GDB trap" DF_RESETATTR "\n");
+	dbg_printf(AC_COLOR(ANSITTY_CL_WHITE, ANSITTY_CL_MAROON)
+	           "Recursive GDB trap" AC_DEFATTR "\n");
 }
 #endif /* CONFIG_HAVE_DEBUGGER */
 

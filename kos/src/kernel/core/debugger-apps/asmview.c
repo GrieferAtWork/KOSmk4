@@ -213,29 +213,29 @@ av_format(struct disassembler *__restrict UNUSED(self), unsigned int format_opti
 	switch (format_option) {
 
 	case DISASSEMBLER_FORMAT_REGISTER_PREFIX:
-		dbg_setfgcolor(DBG_COLOR_TEAL);
+		dbg_setfgcolor(ANSITTY_CL_TEAL);
 		break;
 
 	case DISASSEMBLER_FORMAT_IMMEDIATE_PREFIX:
 	case DISASSEMBLER_FORMAT_OFFSET_PREFIX:
 	case DISASSEMBLER_FORMAT_SCALE_PREFIX:
-		dbg_setfgcolor(DBG_COLOR_RED);
+		dbg_setfgcolor(ANSITTY_CL_RED);
 		break;
 
 	case DISASSEMBLER_FORMAT_SYMBOL_PREFIX:
-		dbg_setfgcolor(DBG_COLOR_WHITE);
+		dbg_setfgcolor(ANSITTY_CL_WHITE);
 		break;
 
 	case DISASSEMBLER_FORMAT_PSEUDOOP_PREFIX:
-		dbg_setfgcolor(DBG_COLOR_DARK_GRAY);
+		dbg_setfgcolor(ANSITTY_CL_DARK_GRAY);
 		break;
 
 	case DISASSEMBLER_FORMAT_MNEMONIC_PREFIX:
-		dbg_setfgcolor(DBG_COLOR_PURPLE);
+		dbg_setfgcolor(ANSITTY_CL_PURPLE);
 		break;
 
 	default:
-		dbg_attr = dbg_default_attr;
+		dbg_setcolor(dbg_getdefaultcolor());
 		break;
 	}
 	return 0;
@@ -445,23 +445,23 @@ NOTHROW(FCALL av_printscreen)(void *start_addr, void **psel_addr,
 		void *line_endaddr;
 		size_t i, ilen;
 		bool is_current_line;
-		dbg_attr_t old_default_attr;
+		dbg_color_t old_default_color;
 		byte_t *line_start = da.d_pc;
 		line_endaddr = av_instr_succ(line_start);
 		ilen = (size_t)((byte_t *)line_endaddr - line_start);
 		is_current_line = sel_addr >= line_start && sel_addr < line_endaddr;
 		if (is_current_line) /* Fix a potential address drift. */
 			*psel_addr = sel_addr = line_start;
-		old_default_attr = dbg_default_attr;
-		dbg_attr = old_default_attr;
+		old_default_color = dbg_getdefaultcolor();
+		dbg_setcolor(old_default_color);
 		if (is_current_line) {
 			current_line_base = line_start;
 			current_line_size = ilen;
-			dbg_setcolor(DBG_COLOR_BLACK, DBG_COLOR_LIGHT_GRAY);
+			dbg_setcolor(ANSITTY_CL_BLACK, ANSITTY_CL_LIGHT_GRAY);
 		} else {
-			dbg_setbgcolor(DBG_COLOR_BLACK);
+			dbg_setbgcolor(ANSITTY_CL_BLACK);
 		}
-		dbg_default_attr = dbg_attr;
+		dbg_setdefaultcolor(dbg_getcolor());
 		dbg_setcur(0, line);
 		dbg_printf(DBGSTR("%p "), line_start);
 		if (ilen > maxbytes) {
@@ -490,15 +490,15 @@ NOTHROW(FCALL av_printscreen)(void *start_addr, void **psel_addr,
 			dbg_print(DBGSTR("??"));
 			da.d_pc = (byte_t *)line_endaddr;
 		}
-		dbg_default_attr = old_default_attr;
-		dbg_attr = old_default_attr;
+		dbg_setdefaultcolor(old_default_color);
+		dbg_setcolor(old_default_color);
 		{
 			unsigned int x;
 			for (x = dbg_getcur_x(); x < dbg_screen_width; ++x)
 				dbg_putuni(' ');
 		}
 	}
-	dbg_setcolor(DBG_COLOR_BLACK, DBG_COLOR_LIGHT_GRAY);
+	dbg_setcolor(ANSITTY_CL_BLACK, ANSITTY_CL_LIGHT_GRAY);
 	dbg_hline(0, dbg_screen_height - 1, dbg_screen_width, ' ');
 	dbg_pprint(dbg_screen_width - 7, dbg_screen_height - 1, DBGSTR("F1:help"));
 	if (current_line_size) {
@@ -663,7 +663,7 @@ NOTHROW(FCALL av_main)(void *addr) {
 			break;
 
 		case KEY_F1:
-			dbg_setcolor(DBG_COLOR_BLACK, DBG_COLOR_LIGHT_GRAY);
+			dbg_setcolor(ANSITTY_CL_BLACK, ANSITTY_CL_LIGHT_GRAY);
 			dbg_messagebox(DBGSTR("Help"), av_help);
 			/* Wait until the user presses ESC or F1 */
 			do {
@@ -695,19 +695,18 @@ PUBLIC void *NOTHROW(FCALL dbg_asmview)(void *addr) {
 	bool was_cursor_visible;
 	void *buf, *result;
 	u32 oldcur;
-	dbg_attr_t oldattr;
 	/* Save terminal settings and display contents. */
 	was_cursor_visible = dbg_getcur_visible();
 	buf = alloca(dbg_screen_width * dbg_screen_height * dbg_screen_cellsize);
 	oldcur = dbg_getcur();
-	oldattr = dbg_attr;
+	dbg_savecolor();
 	dbg_getscreendata(0, 0, dbg_screen_width, dbg_screen_height, buf);
 
 	result = av_main(addr);
 
 	/* Restore display contents and terminal settings. */
 	dbg_setscreendata(0, 0, dbg_screen_width, dbg_screen_height, buf);
-	dbg_attr = oldattr;
+	dbg_loadcolor();
 	dbg_setcur(DBG_GETCUR_X(oldcur), DBG_GETCUR_Y(oldcur));
 	dbg_setcur_visible(was_cursor_visible);
 	return result;

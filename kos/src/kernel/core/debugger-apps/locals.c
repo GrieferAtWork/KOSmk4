@@ -102,34 +102,34 @@ locals_format_printer(void *UNUSED(format_arg),
                       unsigned int format_option) {
 	char const *format;
 	if (format_option & 1)
-		format = DF_RESETATTR;
+		format = AC_DEFATTR;
 	else {
 		switch (format_option) {
 
 		case DEBUGINFO_PRINT_FORMAT_KEYWORD_PREFIX:  /* Prefix for `struct', `class', `union', `enum' */
 		case DEBUGINFO_PRINT_FORMAT_MODIFIER_PREFIX: /* Prefix for `const', `volatile', `atomic', `restrict' */
 		case DEBUGINFO_PRINT_FORMAT_BOOL_PREFIX:     /* Prefix for `true' / `false' */
-			format = DF_SETFGCOLOR(DBG_COLOR_AQUA);
+			format = AC_FG(ANSITTY_CL_AQUA);
 			break;
 
 		case DEBUGINFO_PRINT_FORMAT_STRING_PREFIX:    /* Prefix for `"foobar"' */
 		case DEBUGINFO_PRINT_FORMAT_CHARACTER_PREFIX: /* Prefix for `'f'' */
-			format = DF_SETFGCOLOR(DBG_COLOR_YELLOW);
+			format = AC_FG(ANSITTY_CL_YELLOW);
 			break;
 
 		case DEBUGINFO_PRINT_FORMAT_TYPENAME_PREFIX: /* Prefix for type names */
-			format = DF_SETFGCOLOR(DBG_COLOR_GREEN);
+			format = AC_FG(ANSITTY_CL_GREEN);
 			break;
 
 		case DEBUGINFO_PRINT_FORMAT_FIELD_PREFIX:   /* Prefix for `.field_name' (in struct initializers) */
 		case DEBUGINFO_PRINT_FORMAT_VARNAME_PREFIX: /* Prefix for variable names */
 		case DEBUGINFO_PRINT_FORMAT_INTEGER_PREFIX: /* Prefix for `1234' */
 		case DEBUGINFO_PRINT_FORMAT_FLOAT_PREFIX:   /* Prefix for `1234.5678' */
-			format = DF_SETFGCOLOR(DBG_COLOR_WHITE);
+			format = AC_FG(ANSITTY_CL_WHITE);
 			break;
 
 		case DEBUGINFO_PRINT_FORMAT_UNKNOWN_PREFIX: /* Prefix for unknown (raw) data */
-			format = DF_SETCOLOR(DBG_COLOR_LIGHT_GRAY, DBG_COLOR_MAROON);
+			format = AC_COLOR(ANSITTY_CL_LIGHT_GRAY, ANSITTY_CL_MAROON);
 			break;
 
 		default: return 0;
@@ -215,7 +215,7 @@ print_local(void *arg,
 	size_t bufsize = type->t_sizeof;
 	var_fixname(var);
 	if (arg) {
-		dbg_printf(DBGSTR(DF_WHITE("%?-s") ": "), *(size_t *)arg, var->v_name);
+		dbg_printf(DBGSTR(AC_WHITE("%?-s") ": "), *(size_t *)arg, var->v_name);
 		var->v_name = NULL;
 	}
 again:
@@ -247,8 +247,8 @@ again:
 			/* `UNWIND_EMULATOR_NO_FUNCTION' means that the variable is undefined
 			 * for the current source location, which happens when the compiler
 			 * decides to optimize the variable away before its scope ends. */
-			dbg_print(DBGSTR(DF_COLOR(DBG_COLOR_LIGHT_GRAY,
-			                          DBG_COLOR_MAROON,
+			dbg_print(DBGSTR(AC_WITHCOLOR(ANSITTY_CL_LIGHT_GRAY,
+			                          ANSITTY_CL_MAROON,
 			                          "<deleted>") "\n"));
 		} else {
 			dbg_printf(DBGSTR(": Unwind error #%u\n"), error);
@@ -291,7 +291,7 @@ locals_maxlen(void *arg,
 
 DBG_COMMAND(l,
             "l\n"
-            "\tSimilar to " DF_WHITE("locals") ", however the presentation layout is somewhat "
+            "\tSimilar to " AC_WHITE("locals") ", however the presentation layout is somewhat "
             "different, in that instead of following C syntax, variable names are written "
             "first, and are also aligned alongside each other\n") {
 	size_t maxlen = 0;
