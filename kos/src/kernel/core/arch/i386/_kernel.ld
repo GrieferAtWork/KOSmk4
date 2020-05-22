@@ -342,10 +342,10 @@ SECTIONS {
 		*(.text.xdata .xdata)
 		*(.text.xdata.cold .xdata.cold .text.xdata.unlikely .xdata.unlikely)
 
-		PROVIDE_HIDDEN(__x86_bootcpu_df_stack = ABSOLUTE(.));
+		PROVIDE_HIDDEN(__bootcpu_x86_df_stack = ABSOLUTE(.));
 		KEEP(*(.text.xdata.x86.free_unloader))
 		/* Allocate the remainder for the boot cpu's #DF stack. */
-		. += (KERNEL_DF_STACKSIZE - (ABSOLUTE(.) - ABSOLUTE(__x86_bootcpu_df_stack)));
+		. += (KERNEL_DF_STACKSIZE - (ABSOLUTE(.) - ABSOLUTE(__bootcpu_x86_df_stack)));
 	}
 	PROVIDE_HIDDEN(__kernel_sect_data_size = ABSOLUTE(ABSOLUTE(.) - ABSOLUTE(__kernel_sect_data_start)));
 
@@ -519,13 +519,13 @@ SECTIONS {
 		PROVIDE_HIDDEN(__kernel_free_numpages = ABSOLUTE(ABSOLUTE(__kernel_free_endpageid) - ABSOLUTE(__kernel_free_startpageid)));
 	}
 
-	PROVIDE_HIDDEN(__x86_template_gdt = ABSOLUTE(__kernel_percpu_start + thiscpu_x86_gdt));
-	PROVIDE_HIDDEN(__x86_bootcpu_dfstack_node = ABSOLUTE(_bootcpu + thiscpu_x86_dfstacknode));
-	PROVIDE_HIDDEN(__x86_bootcpu_dfstack_part = ABSOLUTE(_bootcpu + thiscpu_x86_dfstackpart));
-	PROVIDE_HIDDEN(__x86_bootcpu_df_stackpageid = addr2pageid(ABSOLUTE(__x86_bootcpu_df_stack)));
-	PROVIDE_HIDDEN(__x86_bootcpu_df_stackpageptr = addr2pageptr(ABSOLUTE(__x86_bootcpu_df_stack)));
-	PROVIDE(x86_bootcpu_cpufeatures = ABSOLUTE(_bootcpu + thiscpu_x86_cpufeatures));
-	PROVIDE(x86_bootcpu_cpuid = ABSOLUTE(_bootcpu + thiscpu_x86_cpuid));
+	PROVIDE_HIDDEN(__templatecpu_x86_gdt = ABSOLUTE(__kernel_percpu_start + thiscpu_x86_gdt));
+	PROVIDE_HIDDEN(__bootcpu_x86_dfstack_node = ABSOLUTE(_bootcpu + thiscpu_x86_dfstacknode));
+	PROVIDE_HIDDEN(__bootcpu_x86_dfstack_part = ABSOLUTE(_bootcpu + thiscpu_x86_dfstackpart));
+	PROVIDE_HIDDEN(__bootcpu_x86_df_stackpageid = addr2pageid(ABSOLUTE(__bootcpu_x86_df_stack)));
+	PROVIDE_HIDDEN(__bootcpu_x86_df_stackpageptr = addr2pageptr(ABSOLUTE(__bootcpu_x86_df_stack)));
+	PROVIDE(bootcpu_x86_cpufeatures = ABSOLUTE(_bootcpu + thiscpu_x86_cpufeatures));
+	PROVIDE(bootcpu_x86_cpuid = ABSOLUTE(_bootcpu + thiscpu_x86_cpuid));
 	PROVIDE(bootcpu_x86_gdt = ABSOLUTE(_bootcpu + thiscpu_x86_gdt));
 
 #ifndef CONFIG_NO_BOOT0

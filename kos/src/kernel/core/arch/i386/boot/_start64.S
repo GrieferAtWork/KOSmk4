@@ -50,8 +50,8 @@
 
 EXTERN(boot_cpustate)
 EXTERN(__kernel_boottask_stack)
-EXTERN(x86_bootcpu_cpufeatures)
-EXTERN(x86_bootcpu_cpuid)
+EXTERN(bootcpu_x86_cpufeatures)
+EXTERN(bootcpu_x86_cpuid)
 
 #ifndef CONFIG_NO_BOOT0
 /* Include builtin bootloader support */
@@ -364,7 +364,7 @@ INTERN_FUNCTION(_start)
 	 * as we only want to rely on the boot loader to have set up a valid %ds and %cs */
 	.pushsection .rodata.free
 1:	.word  (SEGMENT_COUNT * 8 - 1)
-	.long  V2P(__x86_template_gdt)
+	.long  V2P(__templatecpu_x86_gdt)
 	.popsection
 	lgdtl  %ds:V2P(1b)
 	movw   $(SEGMENT_KERNEL_DATA32), %ax
@@ -388,8 +388,6 @@ INTERN_FUNCTION(_start)
 	movl   %eax, 0(%esp)
 	popfl
 
-	/* Make sure the EFLAGS.DF is cleared for the rep instructions below! */
-	cld
 
 #ifndef CONFIG_NO_SMP
 	/* memcpy(&_bootcpu, __kernel_percpu_start, (size_t)__kernel_percpu_size); */
@@ -440,7 +438,7 @@ INTERN_FUNCTION(_start)
 	rep;   movsb
 
 	/* Set the DIDINIT flag for the boot cpu's feature table. */
-	orl    $(CPU_FEATURE_FDIDINIT), V2P(x86_bootcpu_cpufeatures)
+	orl    $(CPU_FEATURE_FDIDINIT), V2P(bootcpu_x86_cpufeatures)
 
 	/* Check if CPUID is supported. */
 	pushfl
@@ -458,10 +456,10 @@ INTERN_FUNCTION(_start)
 	cpuid
 	cmpl   $(1), %eax
 	jb     boot_failure_no_cpuid_0x1
-	movl   %eax, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_0A
-	movl   %ebx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_0B
-	movl   %edx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_0D
-	movl   %ecx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_0C
+	movl   %eax, V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_0A
+	movl   %ebx, V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_0B
+	movl   %edx, V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_0D
+	movl   %ecx, V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_0C
 
 	/* Query additional CPUID features. */
 	cmpl   $(7), %eax
@@ -469,21 +467,21 @@ INTERN_FUNCTION(_start)
 	movl   $(7), %eax
 	movl   $(0), %ecx /* Sub-leaf:0 */
 	cpuid
-	movl   %edx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_7D
-	movl   %ecx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_7C
-	movl   %ebx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_7B
+	movl   %edx, V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_7D
+	movl   %ecx, V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_7C
+	movl   %ebx, V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_7B
 1:
 
 	movl   $(0x80000000), %eax
 	cpuid
-	movl   %eax, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000000A
+	movl   %eax, V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_80000000A
 	cmpl   $(0x80000001), %eax
 	jnae   boot_failure_no_cpuid_0x80000001
 
 	movl   $(0x80000001), %eax
 	cpuid
-	movl   %ecx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000001C
-	movl   %edx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000001D
+	movl   %ecx, V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_80000001C
+	movl   %edx, V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_80000001D
 
 
 #define CALL_IF_Z(func) \
@@ -514,39 +512,39 @@ INTERN_FUNCTION(_start)
 	CALL_IF_Z(boot_warning_no_fxsr)
 
 	/* Check if we can extract the brand string from cpuid */
-	movl   V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000000A, %eax
+	movl   V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_80000000A, %eax
 	cmpl   $(0x80000004), %eax
 	jnae   3f
 
 	movl   $(0x80000004), %eax
 	cpuid
-	movl   %eax, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000004A
-	movl   %ebx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000004B
-	movl   %ecx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000004C
-	movl   %edx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000004D
+	movl   %eax, V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_80000004A
+	movl   %ebx, V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_80000004B
+	movl   %ecx, V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_80000004C
+	movl   %edx, V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_80000004D
 
 	movl   $(0x80000003), %eax
 	cpuid
-	movl   %eax, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000003A
-	movl   %ebx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000003B
-	movl   %ecx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000003C
-	movl   %edx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000003D
+	movl   %eax, V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_80000003A
+	movl   %ebx, V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_80000003B
+	movl   %ecx, V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_80000003C
+	movl   %edx, V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_80000003D
 
 	movl   $(0x80000002), %eax
 	cpuid
-	movl   %eax, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000002A
-	movl   %ebx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000002B
-	movl   %ecx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000002C
-	movl   %edx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000002D
+	movl   %eax, V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_80000002A
+	movl   %ebx, V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_80000002B
+	movl   %ecx, V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_80000002C
+	movl   %edx, V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_80000002D
 3:  /* ci_80000000a < 0x80000004 */
 
 
 	movl   $(1), %eax
 	cpuid
-	movl   %eax, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_1A
-	movl   %ebx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_1B
-	movl   %edx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_1D
-	movl   %ecx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_1C
+	movl   %eax, V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_1A
+	movl   %ebx, V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_1B
+	movl   %edx, V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_1D
+	movl   %ecx, V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_1C
 
 	/* Test the MSR bit. */
 	testl  $(CPUID_1D_MSR), %edx
@@ -609,7 +607,7 @@ INTERN_FUNCTION(_start)
 	cmpl   $(3), %ecx
 	/* if (Stepping >= 3) goto 1f; */
 	jae    1f
-	andl   $~CPUID_1D_SEP, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_1D
+	andl   $~CPUID_1D_SEP, V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_1D
 1:
 
 
@@ -689,17 +687,17 @@ INTERN_FUNCTION(_start)
 	orl    $(CR4_PSE | CR4_PAE), %eax
 
 	/* Enable PGE if supported by the host (optional feature) */
-	testl  $(CPUID_1D_PGE), V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_1D
+	testl  $(CPUID_1D_PGE), V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_1D
 	jz     1f
 	orl    $(CR4_PGE), %eax
 1:
 	/* Enable SMAP if supported by the host (optional feature) */
-	testl  $(CPUID_7B_SMEP), V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_7B
+	testl  $(CPUID_7B_SMEP), V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_7B
 	jz     1f
 	orl    $(CR4_SMEP), %eax
 1:
 	/* Enable FSGSBASE if supported by the host (emulated if unsupported) */
-	testl  $(CPUID_7B_FSGSBASE), V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_7B
+	testl  $(CPUID_7B_FSGSBASE), V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_7B
 	jz     1f
 	orl    $(CR4_FSGSBASE), %eax
 1:
@@ -712,10 +710,10 @@ INTERN_FUNCTION(_start)
 	orl    $(IA32_EFER_LME), %eax /* LongModeEnabled */
 	/* Since we're already here, try to enable some other long-mode extensions,
 	 * such as the NXE bit, as well as SCE (SysCallExtensions) */
-	testl  $(CPUID_80000001D_NX), V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000001D
+	testl  $(CPUID_80000001D_NX), V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_80000001D
 	jz     1f
 	orl    $(IA32_EFER_NXE), %eax
-1:	testl  $(CPUID_80000001D_SYSCALL), V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000001D
+1:	testl  $(CPUID_80000001D_SYSCALL), V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_80000001D
 	jz     1f
 	orl    $(IA32_EFER_SCE), %eax
 1:	wrmsr  /* Save the new configuration. */

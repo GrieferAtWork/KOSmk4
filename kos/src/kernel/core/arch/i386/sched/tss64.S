@@ -35,14 +35,14 @@ INTERN_OBJECT(__kernel_percpu_tss)
 	/* u64   t_rsp2;  */ .quad (__kernel_boottask_stack + KERNEL_STACKSIZE)
 	/* u32 __t_zero1; */ .int  0
 	/* u32 __t_zero2; */ .int  0
-	EXTERN(__x86_bootcpu_df_stack)
-	/* u64   t_ist1;  */ .quad (__x86_bootcpu_df_stack + KERNEL_DF_STACKSIZE)
-	/* u64   t_ist2;  */ .quad (__x86_bootcpu_df_stack + KERNEL_DF_STACKSIZE)
-	/* u64   t_ist3;  */ .quad (__x86_bootcpu_df_stack + KERNEL_DF_STACKSIZE)
-	/* u64   t_ist4;  */ .quad (__x86_bootcpu_df_stack + KERNEL_DF_STACKSIZE)
-	/* u64   t_ist5;  */ .quad (__x86_bootcpu_df_stack + KERNEL_DF_STACKSIZE)
-	/* u64   t_ist6;  */ .quad (__x86_bootcpu_df_stack + KERNEL_DF_STACKSIZE)
-	/* u64   t_ist7;  */ .quad (__x86_bootcpu_df_stack + KERNEL_DF_STACKSIZE)
+	EXTERN(__bootcpu_x86_df_stack)
+	/* u64   t_ist1;  */ .quad (__bootcpu_x86_df_stack + KERNEL_DF_STACKSIZE)
+	/* u64   t_ist2;  */ .quad (__bootcpu_x86_df_stack + KERNEL_DF_STACKSIZE)
+	/* u64   t_ist3;  */ .quad (__bootcpu_x86_df_stack + KERNEL_DF_STACKSIZE)
+	/* u64   t_ist4;  */ .quad (__bootcpu_x86_df_stack + KERNEL_DF_STACKSIZE)
+	/* u64   t_ist5;  */ .quad (__bootcpu_x86_df_stack + KERNEL_DF_STACKSIZE)
+	/* u64   t_ist6;  */ .quad (__bootcpu_x86_df_stack + KERNEL_DF_STACKSIZE)
+	/* u64   t_ist7;  */ .quad (__bootcpu_x86_df_stack + KERNEL_DF_STACKSIZE)
 	/* u32 __t_zero3; */ .int  0
 	/* u32 __t_zero4; */ .int  0
 	/* u16 __t_zero5; */ .word 0

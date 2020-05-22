@@ -672,14 +672,14 @@ INTERN_FUNCTION(x86_smp_entry32)
 #ifndef CONFIG_NO_PAGING_PAE
 	/* Enable PAE support (if necessary for setting the page directory) */
 #ifndef CONFIG_NO_PAGING_P32
-	EXTERN(x86_bootcpu_cpuid)
-	testl  $(CPUID_1D_PAE), ((x86_bootcpu_cpuid - KERNEL_CORE_BASE) + OFFSET_CPUID_1D)
+	EXTERN(bootcpu_x86_cpuid)
+	testl  $(CPUID_1D_PAE), ((bootcpu_x86_cpuid - KERNEL_CORE_BASE) + OFFSET_CPUID_1D)
 	jz     1f
 #endif /* !CONFIG_NO_PAGING_P32 */
 	orl    $(CR4_PAE), %esp
 	/* Enable NX support (if necessary for setting the page directory) */
-	EXTERN(x86_bootcpu_cpuid)
-	testl  $(CPUID_80000001D_NX), ((x86_bootcpu_cpuid - KERNEL_CORE_BASE) + OFFSET_CPUID_80000001D)
+	EXTERN(bootcpu_x86_cpuid)
+	testl  $(CPUID_80000001D_NX), ((bootcpu_x86_cpuid - KERNEL_CORE_BASE) + OFFSET_CPUID_80000001D)
 	jz     1f
 	movl   $(IA32_EFER), %ecx
 	rdmsr
@@ -687,13 +687,13 @@ INTERN_FUNCTION(x86_smp_entry32)
 	wrmsr
 	/* With PAE + NX, try to enable its effects while
 	 * in kernel-space (if supported by the CPU) */
-	testl  $(CPUID_7B_SMEP), (x86_bootcpu_cpuid + OFFSET_CPUID_7B)
+	testl  $(CPUID_7B_SMEP), (bootcpu_x86_cpuid + OFFSET_CPUID_7B)
 	jz     1f
 	orl    $(CR4_SMEP), %esp
 1:
 #endif /* !CONFIG_NO_PAGING_PAE */
 	/* Enable PGE support (if necessary for setting the page directory) */
-	testl  $(CPUID_1D_PGE), ((x86_bootcpu_cpuid - KERNEL_CORE_BASE) + OFFSET_CPUID_1D)
+	testl  $(CPUID_1D_PGE), ((bootcpu_x86_cpuid - KERNEL_CORE_BASE) + OFFSET_CPUID_1D)
 	jz     1f
 	orl    $(CR4_PGE), %esp
 1:	movl   %esp, %cr4

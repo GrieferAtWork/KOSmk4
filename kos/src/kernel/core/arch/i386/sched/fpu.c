@@ -321,8 +321,8 @@ x86_handle_device_not_available(struct icpustate *__restrict state) {
 
 
 
-#define CPUID_FEATURES_WRITABLE x86_bootcpu_cpuid_
-DATDEF struct cpuinfo x86_bootcpu_cpuid_ ASMNAME("x86_bootcpu_cpuid");
+#define CPUID_FEATURES_WRITABLE bootcpu_x86_cpuid_
+DATDEF struct cpuinfo bootcpu_x86_cpuid_ ASMNAME("bootcpu_x86_cpuid");
 
 
 DATDEF u32 x86_fxsave_mxcsr_mask_ ASMNAME("x86_fxsave_mxcsr_mask");

@@ -106,7 +106,7 @@
 #include "paging32-pae.h"
 /**/
 
-#include <kernel/x86/cpuid.h> /* x86_bootcpu_cpuid */
+#include <kernel/x86/cpuid.h> /* bootcpu_x86_cpuid */
 
 #include <asm/cpu-cpuid.h> /* CPUID_1D_PAE */
 

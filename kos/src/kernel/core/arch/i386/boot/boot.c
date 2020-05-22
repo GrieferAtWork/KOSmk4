@@ -81,21 +81,21 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *      <cpuid: brand_string="BOCHS         Intel(R) Pentium(R) 4 CPU        ">
 	 *       in your .bxrc file
 	 */
-	if (x86_bootcpu_cpuid.ci_80000002a == MAKE_DWORD('Q', 'E', 'M', 'U'))
+	if (bootcpu_x86_cpuid.ci_80000002a == MAKE_DWORD('Q', 'E', 'M', 'U'))
 		x86_syslog_port = (port_t)0x3f8;
-	else if (x86_bootcpu_cpuid.ci_80000002a == MAKE_DWORD('B', 'O', 'C', 'H'))
+	else if (bootcpu_x86_cpuid.ci_80000002a == MAKE_DWORD('B', 'O', 'C', 'H'))
 		x86_syslog_port = (port_t)0xe9;
-	else if (x86_bootcpu_cpuid.ci_80000002a == MAKE_DWORD('V', 'B', 'o', 'x')) {
+	else if (bootcpu_x86_cpuid.ci_80000002a == MAKE_DWORD('V', 'B', 'o', 'x')) {
 		x86_syslog_port = (port_t)0x504;
 #ifdef CONFIG_VBOXGDB
-		if (x86_bootcpu_cpuid.ci_80000002b == MAKE_DWORD(' ', 'G', 'D', 'B'))
+		if (bootcpu_x86_cpuid.ci_80000002b == MAKE_DWORD(' ', 'G', 'D', 'B'))
 			x86_initialize_vboxgdb();
 #endif /* CONFIG_VBOXGDB */
 	}
 	x86_initialize_cmos();
 
 	printk(FREESTR(KERN_NOTICE "[boot] Begin kernel initialization\n"));
-	printk(FREESTR(KERN_INFO "[boot] CPU brand: %q\n"), x86_bootcpu_cpuid.ci_brand);
+	printk(FREESTR(KERN_INFO "[boot] CPU brand: %q\n"), bootcpu_x86_cpuid.ci_brand);
 
 #ifdef __x86_64__
 	/* Initialize (rd|wr)(fs|gs)base support and (if necessary)

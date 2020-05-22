@@ -824,7 +824,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_apic)(void) {
 	/* Initialize the regular PIC */
 	x86_initialize_pic();
 #define MAKE_DWORD(a, b, c, d) ((u32)(a) | ((u32)(b) << 8) | ((u32)(c) << 16) | ((u32)(d) << 24))
-	if (x86_bootcpu_cpuid.ci_80000002a == MAKE_DWORD('B', 'O', 'C', 'H'))
+	if (bootcpu_x86_cpuid.ci_80000002a == MAKE_DWORD('B', 'O', 'C', 'H'))
 		x86_config_noapic = true; /* FIXME: Work-around for weird timing... */
 
 	/* Check if we should make use of the LAPIC */

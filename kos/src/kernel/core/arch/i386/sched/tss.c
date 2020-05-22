@@ -44,13 +44,13 @@
 
 DECL_BEGIN
 
-INTDEF byte_t __x86_bootcpu_iob_startpage[] ASMNAME("__x86_iob_empty_pageid");
+INTDEF byte_t __bootcpu_x86_iob_startpage[] ASMNAME("__x86_iob_empty_pageid");
 
 /* The VM node used to represent the IOB mapping of the current CPU */
 PUBLIC ATTR_PERCPU struct vm_node thiscpu_x86_iobnode = {
 	/* .vn_node   = */ { NULL, NULL,
-	                     (pageid_t)__x86_bootcpu_iob_startpage,
-	                     (pageid_t)__x86_bootcpu_iob_startpage + 1 },
+	                     (pageid_t)__bootcpu_x86_iob_startpage,
+	                     (pageid_t)__bootcpu_x86_iob_startpage + 1 },
 	/* .vn_byaddr = */ LLIST_INITNODE,
 	/* .vn_prot   = */ VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED,
 	/* .vn_flags  = */ VM_NODE_FLAG_NOMERGE | VM_NODE_FLAG_PREPARED | VM_NODE_FLAG_KERNPRT,
@@ -66,10 +66,10 @@ INTERN ATTR_PERCPU void *thiscpu_x86_iobnode_pagedir_identity = NULL;
 
 
 
-INTDEF byte_t __x86_bootcpu_df_stackpageid[];
-INTDEF byte_t __x86_bootcpu_df_stackpageptr[];
-INTDEF struct vm_node __x86_bootcpu_dfstack_node;
-INTDEF struct vm_datapart __x86_bootcpu_dfstack_part;
+INTDEF byte_t __bootcpu_x86_df_stackpageid[];
+INTDEF byte_t __bootcpu_x86_df_stackpageptr[];
+INTDEF struct vm_node __bootcpu_x86_dfstack_node;
+INTDEF struct vm_datapart __bootcpu_x86_dfstack_part;
 
 PUBLIC ATTR_PERCPU struct vm_datapart
 _current_x86_dfstackpart ASMNAME("thiscpu_x86_dfstackpart") = {
@@ -79,7 +79,7 @@ _current_x86_dfstackpart ASMNAME("thiscpu_x86_dfstackpart") = {
 		/* .dp_tree = */ { NULL, NULL, 0, CEILDIV(KERNEL_DF_STACKSIZE, PAGESIZE) - 1 }
 	},
 	.dp_crefs = LLIST_INIT,
-	.dp_srefs = &__x86_bootcpu_dfstack_node,
+	.dp_srefs = &__bootcpu_x86_dfstack_node,
 	.dp_stale = NULL,
 	.dp_block = &vm_datablock_anonymous,
 #if CEILDIV(KERNEL_DF_STACKSIZE, PAGESIZE) > (BITS_PER_POINTER / VM_DATAPART_PPP_BITS)
@@ -90,10 +90,10 @@ _current_x86_dfstackpart ASMNAME("thiscpu_x86_dfstackpart") = {
 	.dp_state = VM_DATAPART_STATE_LOCKED,
 	{
 		.dp_ramdata = {
-			.rd_blockv = &__x86_bootcpu_dfstack_part.dp_ramdata.rd_block0,
+			.rd_blockv = &__bootcpu_x86_dfstack_part.dp_ramdata.rd_block0,
 			{
 				.rd_block0 = {
-					.rb_start = (pageptr_t)__x86_bootcpu_df_stackpageptr,
+					.rb_start = (pageptr_t)__bootcpu_x86_df_stackpageptr,
 					.rb_size  = CEILDIV(KERNEL_DF_STACKSIZE, PAGESIZE)
 				}
 			}
@@ -112,35 +112,35 @@ PUBLIC ATTR_PERCPU struct vm_node _thiscpu_x86_dfstacknode ASMNAME("thiscpu_x86_
 	.vn_node = {
 		NULL,
 		NULL,
-		(pageid_t)__x86_bootcpu_df_stackpageid,
-		(pageid_t)__x86_bootcpu_df_stackpageid + CEILDIV(KERNEL_DF_STACKSIZE, PAGESIZE) - 1
+		(pageid_t)__bootcpu_x86_df_stackpageid,
+		(pageid_t)__bootcpu_x86_df_stackpageid + CEILDIV(KERNEL_DF_STACKSIZE, PAGESIZE) - 1
 	},
 	.vn_byaddr = LLIST_INITNODE,
 	.vn_prot   = VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED,
 	.vn_flags  = VM_NODE_FLAG_NOMERGE | VM_NODE_FLAG_PREPARED,
 	.vn_vm     = &vm_kernel,
-	.vn_part   = &__x86_bootcpu_dfstack_part,
+	.vn_part   = &__bootcpu_x86_dfstack_part,
 	.vn_block  = &vm_datablock_anonymous,
-	.vn_link   = { NULL, &LLIST_HEAD(__x86_bootcpu_dfstack_part.dp_srefs) },
+	.vn_link   = { NULL, &LLIST_HEAD(__bootcpu_x86_dfstack_part.dp_srefs) },
 	.vn_guard  = 0
 };
 
 
 #ifndef __x86_64__
 INTDEF void ASMCALL x86_idt_double_fault(void);
-INTDEF byte_t __x86_bootcpu_df_stack[KERNEL_DF_STACKSIZE];
+INTDEF byte_t __bootcpu_x86_df_stack[KERNEL_DF_STACKSIZE];
 INTDEF byte_t _bootcpu_thiscpu_x86_tss[];
 
 PUBLIC ATTR_PERCPU struct tss thiscpu_x86_tssdf = {
 	.t_link       = 0,
 	.__t_zero0    = 0,
-	.t_esp0       = (uintptr_t)COMPILER_ENDOF(__x86_bootcpu_df_stack),
+	.t_esp0       = (uintptr_t)COMPILER_ENDOF(__bootcpu_x86_df_stack),
 	.t_ss0        = SEGMENT_KERNEL_DATA,
 	.__t_zero1    = 0,
-	.t_esp1       = (uintptr_t)COMPILER_ENDOF(__x86_bootcpu_df_stack),
+	.t_esp1       = (uintptr_t)COMPILER_ENDOF(__bootcpu_x86_df_stack),
 	.t_ss1        = SEGMENT_KERNEL_DATA,
 	.__t_zero2    = 0,
-	.t_esp2       = (uintptr_t)COMPILER_ENDOF(__x86_bootcpu_df_stack),
+	.t_esp2       = (uintptr_t)COMPILER_ENDOF(__bootcpu_x86_df_stack),
 	.t_ss2        = SEGMENT_KERNEL_DATA,
 	.__t_zero3    = 0,
 	.t_cr3        = (u32)&pagedir_kernel_phys,
@@ -150,7 +150,7 @@ PUBLIC ATTR_PERCPU struct tss thiscpu_x86_tssdf = {
 	.t_ecx        = 0,
 	.t_edx        = 0,
 	.t_ebx        = (u32)&_bootcpu,                 /* Used by the implementation. */
-	.t_esp        = (uintptr_t)COMPILER_ENDOF(__x86_bootcpu_df_stack),
+	.t_esp        = (uintptr_t)COMPILER_ENDOF(__bootcpu_x86_df_stack),
 	.t_ebp        = (u32)&_bootcpu_thiscpu_x86_tss, /* Used by the implementation. */
 	.t_esi        = 0,
 	.t_edi        = 0,

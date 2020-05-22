@@ -140,47 +140,47 @@ DATDEF ATTR_PERCPU struct cpuinfo const thiscpu_x86_cpuid;
 #define CURRENT_X86_CPUID PERCPU(thiscpu_x86_cpuid)
 
 
-DATDEF u16 const x86_bootcpu_cpufeatures;
-DATDEF struct cpuinfo const x86_bootcpu_cpuid;
+DATDEF u16 const bootcpu_x86_cpufeatures;
+DATDEF struct cpuinfo const bootcpu_x86_cpuid;
 
 #endif /* __CC__ */
 
 
 /* Feature test macros. */
 #ifndef __x86_64__
-#define X86_HAVE_I486                  (x86_bootcpu_cpufeatures & CPU_FEATURE_FI486)
-#define X86_HAVE_CPUID                 (x86_bootcpu_cpufeatures & CPU_FEATURE_FCPUID)
+#define X86_HAVE_I486                  (bootcpu_x86_cpufeatures & CPU_FEATURE_FI486)
+#define X86_HAVE_CPUID                 (bootcpu_x86_cpufeatures & CPU_FEATURE_FCPUID)
 #else /* !__x86_64__ */
 #define X86_HAVE_I486                  1 /* 64-bit mode _requires_ a 486+ */
 #define X86_HAVE_CPUID                 1 /* 64-bit mode _requires_ `cpuid' support */
 #define X86_ALWAYS_HAVE_CPUID          1 /* 64-bit mode _requires_ `cpuid' support */
 #endif /* __x86_64__ */
-#define X86_HAVE_FPU                   (x86_bootcpu_cpuid.ci_1d & CPUID_1D_FPU)
-#define X86_HAVE_FXSR                  (x86_bootcpu_cpuid.ci_1d & CPUID_1D_FXSR)
-#define X86_HAVE_SSE                   (x86_bootcpu_cpuid.ci_1d & CPUID_1D_SSE)
-#define X86_HAVE_PAGE_GLOBAL_BIT       (x86_bootcpu_cpuid.ci_1d & CPUID_1D_PGE)
-#define X86_HAVE_PAGE_ATTRIBUTE_TABLE  (x86_bootcpu_cpuid.ci_1d & CPUID_1D_PAT)
+#define X86_HAVE_FPU                   (bootcpu_x86_cpuid.ci_1d & CPUID_1D_FPU)
+#define X86_HAVE_FXSR                  (bootcpu_x86_cpuid.ci_1d & CPUID_1D_FXSR)
+#define X86_HAVE_SSE                   (bootcpu_x86_cpuid.ci_1d & CPUID_1D_SSE)
+#define X86_HAVE_PAGE_GLOBAL_BIT       (bootcpu_x86_cpuid.ci_1d & CPUID_1D_PGE)
+#define X86_HAVE_PAGE_ATTRIBUTE_TABLE  (bootcpu_x86_cpuid.ci_1d & CPUID_1D_PAT)
 #define X86_HAVE_INSTR_INVLPG          X86_HAVE_I486 /* ... INVLPG is an instruction available since the i486 ... */
-#define X86_HAVE_INSTR_INVPCID         (x86_bootcpu_cpuid.ci_7b & CPUID_7B_INVPCID)
-#define X86_HAVE_EXECUTE_DISABLE       (x86_bootcpu_cpuid.ci_80000001d & CPUID_80000001D_NX)
-#define X86_HAVE_SYSENTER              (x86_bootcpu_cpuid.ci_1d & CPUID_1D_SEP)
-#define X86_HAVE_CMPXCHG8B             (x86_bootcpu_cpuid.ci_1d & CPUID_1D_CX8)
+#define X86_HAVE_INSTR_INVPCID         (bootcpu_x86_cpuid.ci_7b & CPUID_7B_INVPCID)
+#define X86_HAVE_EXECUTE_DISABLE       (bootcpu_x86_cpuid.ci_80000001d & CPUID_80000001D_NX)
+#define X86_HAVE_SYSENTER              (bootcpu_x86_cpuid.ci_1d & CPUID_1D_SEP)
+#define X86_HAVE_CMPXCHG8B             (bootcpu_x86_cpuid.ci_1d & CPUID_1D_CX8)
 #ifdef __x86_64__
-#define X86_HAVE_FSGSBASE              (x86_bootcpu_cpuid.ci_7b & CPUID_7B_FSGSBASE)
-#define X86_HAVE_CMPXCHG16B            (x86_bootcpu_cpuid.ci_1c & CPUID_1C_CX16)
-#define X86_HAVE_SYSCALL               (x86_bootcpu_cpuid.ci_80000001d & CPUID_80000001D_SYSCALL)
+#define X86_HAVE_FSGSBASE              (bootcpu_x86_cpuid.ci_7b & CPUID_7B_FSGSBASE)
+#define X86_HAVE_CMPXCHG16B            (bootcpu_x86_cpuid.ci_1c & CPUID_1C_CX16)
+#define X86_HAVE_SYSCALL               (bootcpu_x86_cpuid.ci_80000001d & CPUID_80000001D_SYSCALL)
 #define X86_HAVE_2MIB_PAGES            1 /* Always available! (and also assumed to be by code below!) */
 #define X86_HAVE_4MIB_PAGES            0 /* 32-bit only feature */
-#define X86_HAVE_1GIB_PAGES            (x86_bootcpu_cpuid.ci_80000001d & CPUID_80000001D_PSE)
+#define X86_HAVE_1GIB_PAGES            (bootcpu_x86_cpuid.ci_80000001d & CPUID_80000001D_PSE)
 #define X86_HAVE_PAE                   0 /* 32-bit only feature */
 #else /* __x86_64__ */
 #define X86_HAVE_FSGSBASE              0 /* 64-bit only feature */
 #define X86_HAVE_CMPXCHG16B            0 /* 64-bit only feature */
 #define X86_HAVE_SYSCALL               0 /* 64-bit only feature */
 #define X86_HAVE_2MIB_PAGES            0 /* 64-bit only feature */
-#define X86_HAVE_4MIB_PAGES            (x86_bootcpu_cpuid.ci_1d & CPUID_1D_PSE)
+#define X86_HAVE_4MIB_PAGES            (bootcpu_x86_cpuid.ci_1d & CPUID_1D_PSE)
 #define X86_HAVE_1GIB_PAGES            0 /* 64-bit only feature */
-#define X86_HAVE_PAE                   (x86_bootcpu_cpuid.ci_1d & CPUID_1D_PAE)
+#define X86_HAVE_PAE                   (bootcpu_x86_cpuid.ci_1d & CPUID_1D_PAE)
 #endif /* !__x86_64__ */
 
 

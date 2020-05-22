@@ -85,7 +85,7 @@
 #define INTR(id) DEFINE_INTRGATE(id, SEGMENT_DESCRIPTOR_TYPE_INTRGATE)
 #define TRAP(id) DEFINE_INTRGATE(id, SEGMENT_DESCRIPTOR_TYPE_TRAPGATE)
 #define GATE(id)                                           \
-	DEFINE_INTRGATE(id, IDT_CONFIG_ISTRAP(id)              \
+	DEFINE_INTRGATE(id, IDT_CONFIG_ISTRAP(0x##id)          \
 	                    ? SEGMENT_DESCRIPTOR_TYPE_TRAPGATE \
 	                    : SEGMENT_DESCRIPTOR_TYPE_INTRGATE)
 
