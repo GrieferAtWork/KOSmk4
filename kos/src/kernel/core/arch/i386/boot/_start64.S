@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_BOOT__START64_S
 #define GUARD_KERNEL_CORE_ARCH_I386_BOOT__START64_S 1
+#define __ASSEMBLER__ 1
 
 #include <kernel/compiler.h>
 

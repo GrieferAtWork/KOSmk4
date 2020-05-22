@@ -559,9 +559,4 @@ PUBLIC_FUNCTION(cpu_run_current_nopr)
 	.cfi_endproc
 END(cpu_run_current_nopr)
 
-
-#ifndef __INTELLISENSE__
-#include "apic.S"
-#endif /* !__INTELLISENSE__ */
-
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_SCHED_SCHED32_S */
