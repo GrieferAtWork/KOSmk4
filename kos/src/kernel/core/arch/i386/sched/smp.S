@@ -797,14 +797,8 @@ INTERN_FUNCTION(x86_smp_entry64)
 	movP   this_sched_state(R_TASK), %Psp   /* stack */
 
 	/* Load the GDT of our new CPU */
-	EXTERN(thiscpu_x86_gdt)
-	/* TODO: Don't hardcode `thiscpu_x86_gdt' + `SEGMENT_COUNT * SIZEOF_SEGMENT_DESCRIPTOR' here.
-	 *       Instead, re-load the last value set during `cpu_enter_deepsleep()' */
-	leaP   thiscpu_x86_gdt(R_CPU), %Pcx
-	pushP  %Pcx
-	pushw  $((SEGMENT_COUNT * SIZEOF_SEGMENT_DESCRIPTOR) - 1)
-	lgdtP  (%Psp)
-	addP   $(2 + SIZEOF_POINTER), %Psp
+	EXTERN(thiscpu_x86_saved_gdtr)
+	lgdtP  thiscpu_x86_saved_gdtr(R_CPU)
 
 	/* Load basic segments. */
 	movw   $(SEGMENT_USER_DATA_RPL), %cx
@@ -817,17 +811,15 @@ INTERN_FUNCTION(x86_smp_entry64)
 
 	/* Load the Task register. */
 	/* SEGMENTS[SEGMENT_CPU_TSS].busy = 0;  // Required for `ltr' */
+	EXTERN(thiscpu_x86_saved_tr)
+	movzwP thiscpu_x86_saved_tr(R_CPU), %Pcx
 	EXTERN(thiscpu_x86_gdt)
-	andb   $(0b11111101), (thiscpu_x86_gdt + SEGMENT_CPU_TSS + 5)(R_CPU)
-	/* TODO: Don't hardcode `SEGMENT_CPU_TSS' here.
-	 *       Instead, re-load the last value set during `cpu_enter_deepsleep()' */
-	movw   $(SEGMENT_CPU_TSS), %cx
+	andb   $(0b11111101), (thiscpu_x86_gdt + 5)(R_CPU, %Pcx, 1)
 	ltrw   %cx
 
 	/* Load the local descriptor table. */
-	/* TODO: Don't hardcode `SEGMENT_CPU_LDT' here.
-	 *       Instead, re-load the last value set during `cpu_enter_deepsleep()' */
-	movw   $(SEGMENT_CPU_LDT), %cx
+	EXTERN(thiscpu_x86_saved_ldtr)
+	movw   thiscpu_x86_saved_ldtr(R_CPU), %cx
 	lldtw  %cx
 
 	/* Load remaining segments and jump to virtual memory. */
@@ -847,10 +839,8 @@ INTERN_FUNCTION(x86_smp_entry64)
 1:
 
 	/* Load the interrupt descriptor table. */
-	EXTERN(x86_idt_ptr)
-	/* TODO: Don't hardcode `x86_idt_ptr' here.
-	 *       Instead, re-load the last value set during `cpu_enter_deepsleep()' */
-	lidtP  x86_idt_ptr
+	EXTERN(thiscpu_x86_saved_idtr)
+	lidtP  thiscpu_x86_saved_idtr(R_CPU)
 
 	/* ============== Configure cpuid features ============== */
 	/* R_CPU:  THIS_CPU
@@ -1178,15 +1168,22 @@ PUBLIC_FUNCTION(cpu_enter_deepsleep)
 1:
 #endif /* CONFIG_FPU */
 
-	/* TODO: Save the current GDT/IDT/LDTR/TR in some PERCPU field.
-	 *       There are system functions that will temporarily alter these
-	 *       registers for all CPUs on the system, (e.g. `x86_idt_modify_begin()'),
-	 *       so if these registers currently contain non-standard values, then we
-	 *       mustn't clobber them, as would happen as the result of us going to
-	 *       deep sleep, before being re-awokened, at which point we'd load the
-	 *       original (standard) values, rather than those that were set just
-	 *       prior to us going to deep-sleep.
-	 */
+	/* Save the current RGDT/IDTR/LDTR/TR in some PERCPU field.
+	 * There are system functions that will temporarily alter these
+	 * registers for all CPUs on the system, (e.g. `x86_idt_modify_begin()'),
+	 * so if these registers currently contain non-standard values, then we
+	 * mustn't clobber them, as would happen as the result of us going to
+	 * deep sleep, before being re-awokened, at which point we'd load the
+	 * original (standard) values, rather than those that were set just
+	 * prior to us going to deep-sleep. */
+	EXTERN(thiscpu_x86_saved_gdtr)
+	sgdtP  thiscpu_x86_saved_gdtr(%R_fcall0P)
+	EXTERN(thiscpu_x86_saved_idtr)
+	sidtP  thiscpu_x86_saved_idtr(%R_fcall0P)
+	EXTERN(thiscpu_x86_saved_ldtr)
+	sldtw  thiscpu_x86_saved_ldtr(%R_fcall0P)
+	EXTERN(thiscpu_x86_saved_tr)
+	strw   thiscpu_x86_saved_tr(%R_fcall0P)
 
 
 	/* Decrement the cpu-online counter. */

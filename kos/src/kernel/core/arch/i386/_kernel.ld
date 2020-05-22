@@ -526,7 +526,7 @@ SECTIONS {
 	PROVIDE_HIDDEN(__x86_bootcpu_df_stackpageptr = addr2pageptr(ABSOLUTE(__x86_bootcpu_df_stack)));
 	PROVIDE(x86_bootcpu_cpufeatures = ABSOLUTE(_bootcpu + thiscpu_x86_cpufeatures));
 	PROVIDE(x86_bootcpu_cpuid = ABSOLUTE(_bootcpu + thiscpu_x86_cpuid));
-	PROVIDE(x86_bootcpu_gdt = ABSOLUTE(_bootcpu + thiscpu_x86_gdt));
+	PROVIDE(bootcpu_x86_gdt = ABSOLUTE(_bootcpu + thiscpu_x86_gdt));
 
 #ifndef CONFIG_NO_BOOT0
 	PROVIDE_HIDDEN(__kernel_sector_count = ABSOLUTE((__kernel_size + 511) / 512));

@@ -299,7 +299,7 @@ install_path() {
 				else
 					echo "    Conf: '$CONFIG_SYSROOT' (up to date)"
 				fi
-				echo "    Disk: '$DISKIMAGE'"
+				echo "        Disk: '$DISKIMAGE'"
 				mtools_install_path "$DISKIMAGE" "$DISPATH" "$2"
 			fi
 		fi

@@ -93,7 +93,9 @@
 #define incP         incq
 #define decP         decq
 #define lidtP        lidtq
+#define sidtP        sidtq
 #define lgdtP        lgdtq
+#define sgdtP        sgdtq
 #define xchgP        xchgq
 
 #ifdef __KERNEL__
@@ -166,7 +168,9 @@
 #define incP         incl
 #define decP         decl
 #define lidtP        lidtl
+#define sidtP        sidtl
 #define lgdtP        lgdtl
+#define sgdtP        sgdtl
 #define xchgP        xchgl
 
 #ifdef __KERNEL__

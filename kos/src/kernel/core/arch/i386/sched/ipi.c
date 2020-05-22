@@ -66,6 +66,7 @@ NOTHROW(KCALL apic_send_init)(u8 procid) {
 	while (lapic_read(APIC_ICR0) & APIC_ICR0_FPENDING)
 		__pause();
 }
+
 INTERN NOBLOCK void
 NOTHROW(KCALL apic_send_startup)(u8 procid, u8 pageno) {
 	lapic_write(APIC_ICR1, APIC_ICR1_MKDEST(procid));

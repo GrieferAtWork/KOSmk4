@@ -42,7 +42,7 @@ DECL_BEGIN
 /* The per-cpu GDT vector. */
 DATDEF ATTR_PERCPU struct segment thiscpu_x86_gdt[SEGMENT_COUNT];
 DATDEF ATTR_PERCPU struct segment thiscpu_x86_ldt[LDT_SEGMENT_COUNT];
-DATDEF struct segment x86_bootcpu_gdt[SEGMENT_COUNT];
+DATDEF struct segment bootcpu_x86_gdt[SEGMENT_COUNT];
 
 #ifndef CONFIG_NO_USERKERN_SEGMENT
 #ifdef __x86_64__

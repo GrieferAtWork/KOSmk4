@@ -42,6 +42,7 @@
 #include <kernel/x86/pit.h>
 #include <sched/cpu.h>
 #include <sched/task.h>
+#include <sched/x86/cpureg.h>
 #include <sched/x86/smp.h>
 #include <sched/x86/tss.h>
 
@@ -83,6 +84,28 @@ DATDEF struct cpu *_cpu_vector[CONFIG_MAX_CPU_COUNT] ASMNAME("cpu_vector");
 
 
 #ifndef CONFIG_NO_SMP
+
+/* Saved GDT register.
+ * usually: { (SEGMENT_COUNT * SIZEOF_SEGMENT_DESCRIPTOR) - 1, thiscpu_x86_gdt } */
+PUBLIC ATTR_PERCPU struct desctab thiscpu_x86_saved_gdtr = {
+	/* .dt_limit = */ sizeof(bootcpu_x86_gdt) - 1,
+	/* .dt_base  = */ (uintptr_t)bootcpu_x86_gdt
+};
+
+/* Saved IDT register. (usually `x86_idt_ptr') */
+PUBLIC ATTR_PERCPU struct desctab thiscpu_x86_saved_idtr = {
+	/* .dt_limit = */ sizeof(x86_idt) - 1,
+	/* .dt_base  = */ (uintptr_t)x86_idt
+};
+
+/* Saved LDT register. (usually `SEGMENT_CPU_LDT') */
+PUBLIC ATTR_PERCPU u16 thiscpu_x86_saved_ldtr = SEGMENT_CPU_LDT;
+
+/* Saved Task register. (usually `SEGMENT_CPU_TSS') */
+PUBLIC ATTR_PERCPU u16 thiscpu_x86_saved_tr = SEGMENT_CPU_TSS;
+
+
+
 INTDEF NOBLOCK void NOTHROW(KCALL apic_send_init)(u8 procid);
 INTDEF NOBLOCK void NOTHROW(KCALL apic_send_startup)(u8 procid, u8 pageno);
 
@@ -720,7 +743,12 @@ i386_allocate_secondary_cores(void) {
 		segment_wrbaseX(&FORCPU(altcore, thiscpu_x86_gdt[SEGMENT_INDEX(SEGMENT_KERNEL_FSBASE)]),
 		                (uintptr_t)altidle);
 #endif /* !__x86_64__ */
-		FORCPU(altcore, thiscpu_x86_tss).t_psp0 = FORTASK(altidle, this_x86_kernel_psp0);
+		FORCPU(altcore, thiscpu_x86_tss.t_psp0) = FORTASK(altidle, this_x86_kernel_psp0);
+
+		/* Have the CPU load the proper GDT during the initial startup.
+		 * All of the other `thiscpu_x86_saved_*' registers already have
+		 * their proper values as the result of static initialization! */
+		FORCPU(altcore, thiscpu_x86_saved_gdtr.dt_base) = (uintptr_t)FORCPU(altcore, thiscpu_x86_gdt);
 	}
 }
 

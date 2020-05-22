@@ -583,8 +583,8 @@ END(__x86_paging_init_identity_mapped_text)
 	.pushsection .rodata.free
 		.align 2
 1:		.word  (SEGMENT_COUNT * 8) - 1
-		EXTERN(x86_bootcpu_gdt)
-		.long  x86_bootcpu_gdt
+		EXTERN(bootcpu_x86_gdt)
+		.long  bootcpu_x86_gdt
 	.popsection
 	lgdtl  1b
 
