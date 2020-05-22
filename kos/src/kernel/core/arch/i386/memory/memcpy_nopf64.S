@@ -20,6 +20,8 @@
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_MEMORY_MEMCPY_NOPF64_S
 #define GUARD_KERNEL_CORE_ARCH_I386_MEMORY_MEMCPY_NOPF64_S 1
 
-#include "memcpy_nopf32.S"
+#ifndef __INTELLISENSE__
+#include "memcpy_nopf.S"
+#endif /* !__INTELLISENSE__ */
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_MEMORY_MEMCPY_NOPF64_S */
