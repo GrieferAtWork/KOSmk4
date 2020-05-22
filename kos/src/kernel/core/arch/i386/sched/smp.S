@@ -27,7 +27,9 @@
 #include <kernel/arch/apic.h>
 #include <kernel/arch/breakpoint.h>
 #include <kernel/arch/cpuid.h>
-#include <kernel/fpu.h> /* CONFIG_FPU */
+#include <kernel/arch/idt.h> /* X86_INTERRUPT_APIC_SPURIOUS */
+#include <kernel/arch/pic.h> /* X86_INTNO_PIC1_PIT */
+#include <kernel/fpu.h>      /* CONFIG_FPU */
 #include <sched/cpu.h>
 
 #include <hybrid/host.h>
@@ -999,11 +1001,18 @@ INTERN_FUNCTION(x86_smp_entry64)
 	call   cpu_loadpending_chain_nopr
 1:
 
-	/* Enable preemptive interrupts.
-	 * TODO: Inline this call! */
-	movP   R_CPU, %R_fcall0P
-	EXTERN(x86_altcore_initapic)
-	call   x86_altcore_initapic
+	/* Enable the APIC of this CPU, thus also enabling preemptive interrupts. */
+	EXTERN(x86_lapicbase)
+	movP   x86_lapicbase, %Pax
+#define lapic_write(offset, value) movl   $(value), (offset)(%Pax)
+	lapic_write(APIC_SPURIOUS,      APIC_SPURIOUS_FENABLED | X86_INTERRUPT_APIC_SPURIOUS)
+	lapic_write(APIC_TIMER_DIVIDE,  APIC_TIMER_DIVIDE_F16)
+	lapic_write(APIC_TIMER,         X86_INTNO_PIC1_PIT | APIC_TIMER_MODE_FPERIODIC) /* Set the PIT interrupt to the APIC timer. */
+/*	lapic_write(APIC_TIMER_INITIAL, FORCPU(me, _thiscpu_quantum_length)); */
+	EXTERN(thiscpu_quantum_length)
+	movl   thiscpu_quantum_length(R_CPU), %edx
+	movl   %edx, APIC_TIMER_INITIAL(%Pax)
+#undef lapic_write
 
 	/* TODO: re-sync the realtime() clock! */
 

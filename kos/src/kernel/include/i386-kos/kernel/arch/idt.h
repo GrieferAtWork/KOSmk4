@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_IDT_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_IDT_H 1
+#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_IDT_H
+#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_IDT_H 1
 
 #include <kernel/compiler.h>
 
@@ -118,4 +118,4 @@ NOTHROW(FCALL x86_idt_modify_end)(bool discard_changes DFL(false));
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_IDT_H */
+#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_IDT_H */

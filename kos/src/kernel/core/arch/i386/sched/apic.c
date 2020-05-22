@@ -154,7 +154,7 @@ PRIVATE /*ATTR_FREETEXT*/ void KCALL x86_altcore_entry(void) {
 	cpuid_t id     = me->c_id;
 
 	/* Disable the APIC timer again, which had already
-	 * been enabled by `x86_altcore_initapic()' */
+	 * been enabled during SMP bootstrapping */
 	lapic_write(APIC_TIMER, APIC_TIMER_FDISABLED);
 
 	/* C-level entry point for secondary SMP cores. */
@@ -195,21 +195,6 @@ PRIVATE /*ATTR_FREETEXT*/ void KCALL x86_altcore_entry(void) {
 	lapic_write(APIC_TIMER_INITIAL, num_ticks);
 	FORCPU(me, arch_cpu_preemptive_interrupts_disabled) = false;
 }
-
-INTERN NOBLOCK void
-NOTHROW(FCALL x86_altcore_initapic)(struct cpu *__restrict me) {
-	/* Enable the APIC of this CPU */
-	lapic_write(APIC_SPURIOUS,
-	            APIC_SPURIOUS_FENABLED |
-	            X86_INTERRUPT_APIC_SPURIOUS);
-	lapic_write(APIC_TIMER_DIVIDE, APIC_TIMER_DIVIDE_F16);
-	lapic_write(APIC_TIMER,
-	            /* Set the PIT interrupt to the APIC timer. */
-	            X86_INTNO_PIC1_PIT |
-	            APIC_TIMER_MODE_FPERIODIC);
-	lapic_write(APIC_TIMER_INITIAL, FORCPU(me, _thiscpu_quantum_length));
-}
-
 
 
 
