@@ -49,7 +49,6 @@ DECL_BEGIN
 
 
 #ifdef __CC__
-
 union keyboard_buffer_state {
 	WEAK uintptr_t bs_word; /* Atomic control word. */
 	struct {
@@ -57,6 +56,7 @@ union keyboard_buffer_state {
 		uintptr_half_t s_used;  /* Number of used keys. */
 	} bs_state;
 };
+
 struct keyboard_buffer {
 	union keyboard_buffer_state kb_bufstate; /* Buffer state */
 	WEAK u16                    kb_buffer[CONFIG_KEYBOARD_BUFFER_SIZE]; /* Buffer of unread keyboard inputs. */

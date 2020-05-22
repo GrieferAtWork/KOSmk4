@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x74429096 */
+/* HASH CRC-32:0x85e0b68 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ DECL_BEGIN
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_readutf8") char32_t
 NOTHROW_NCX(LIBCCALL libc_unicode_readutf8)(/*utf-8*/ char const **__restrict ptext) {
-#line 134 "kos/src/libc/magic/unicode.c"
+#line 135 "kos/src/libc/magic/unicode.c"
 	char32_t result;
 	char const *iter = *ptext;
 	result = (char32_t)(u8)*iter++;
@@ -119,7 +119,7 @@ NOTHROW_NCX(LIBCCALL libc_unicode_readutf8)(/*utf-8*/ char const **__restrict pt
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_readutf8_rev") char32_t
 NOTHROW_NCX(LIBCCALL libc_unicode_readutf8_rev)(/*utf-8*/ char const **__restrict ptext) {
-#line 222 "kos/src/libc/magic/unicode.c"
+#line 223 "kos/src/libc/magic/unicode.c"
 	char32_t result;
 	char const *iter = *ptext;
 	uint8_t seqlen = 1;
@@ -206,7 +206,7 @@ INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_readutf8_n") char32_t
 NOTHROW_NCX(LIBCCALL libc_unicode_readutf8_n)(/*utf-8*/ char const **__restrict ptext,
                                               char const *text_end) {
-#line 309 "kos/src/libc/magic/unicode.c"
+#line 310 "kos/src/libc/magic/unicode.c"
 	char32_t result;
 	char const *iter = *ptext;
 	if __unlikely(iter >= text_end)
@@ -297,7 +297,7 @@ INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_readutf8_rev_n") char32_t
 NOTHROW_NCX(LIBCCALL libc_unicode_readutf8_rev_n)(/*utf-8*/ char const **__restrict ptext,
                                                   char const *text_start) {
-#line 401 "kos/src/libc/magic/unicode.c"
+#line 402 "kos/src/libc/magic/unicode.c"
 	char32_t result;
 	char const *iter = *ptext;
 	uint8_t seqlen = 1;
@@ -386,7 +386,7 @@ NOTHROW_NCX(LIBCCALL libc_unicode_readutf8_rev_n)(/*utf-8*/ char const **__restr
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_readutf16") char32_t
 NOTHROW_NCX(LIBCCALL libc_unicode_readutf16)(/*utf-16*/ char16_t const **__restrict ptext) {
-#line 492 "kos/src/libc/magic/unicode.c"
+#line 493 "kos/src/libc/magic/unicode.c"
 	char32_t result;
 	char16_t const *text = *ptext;
 	result = (char32_t)(u16)*text++;
@@ -406,7 +406,7 @@ INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_readutf16_n") char32_t
 NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_n)(/*utf-16*/ char16_t const **__restrict ptext,
                                                char16_t const *text_end) {
-#line 513 "kos/src/libc/magic/unicode.c"
+#line 514 "kos/src/libc/magic/unicode.c"
 	char32_t result;
 	char16_t const *text = *ptext;
 	if (text >= text_end)
@@ -429,7 +429,7 @@ NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_n)(/*utf-16*/ char16_t const **__res
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_readutf16_swap") char32_t
 NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_swap)(/*utf-16-swap*/ char16_t const **__restrict ptext) {
-#line 538 "kos/src/libc/magic/unicode.c"
+#line 539 "kos/src/libc/magic/unicode.c"
 	char32_t result;
 	char16_t const *text = *ptext;
 	result = (char32_t)__hybrid_bswap16((u16)*text);
@@ -452,7 +452,7 @@ INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_readutf16_swap_n") char32_t
 NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_swap_n)(/*utf-16-swap*/ char16_t const **__restrict ptext,
                                                     char16_t const *text_end) {
-#line 561 "kos/src/libc/magic/unicode.c"
+#line 562 "kos/src/libc/magic/unicode.c"
 	char32_t result;
 	char16_t const *text = *ptext;
 	if (text >= text_end)
@@ -478,7 +478,7 @@ NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_swap_n)(/*utf-16-swap*/ char16_t con
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_readutf16_rev") char32_t
 NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_rev)(/*utf-16*/ char16_t const **__restrict ptext) {
-#line 589 "kos/src/libc/magic/unicode.c"
+#line 590 "kos/src/libc/magic/unicode.c"
 	char32_t result;
 	char16_t const *text = *ptext;
 	result = (char32_t)(u16)*--text;
@@ -498,7 +498,7 @@ NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_rev)(/*utf-16*/ char16_t const **__r
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_readutf16_swap_rev") char32_t
 NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_swap_rev)(/*utf-16*/ char16_t const **__restrict ptext) {
-#line 611 "kos/src/libc/magic/unicode.c"
+#line 612 "kos/src/libc/magic/unicode.c"
 	char32_t result;
 	char16_t const *text = *ptext;
 	--text;
@@ -520,7 +520,7 @@ INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_readutf16_rev_n") char32_t
 NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_rev_n)(/*utf-16*/ char16_t const **__restrict ptext,
                                                    char16_t const *text_start) {
-#line 633 "kos/src/libc/magic/unicode.c"
+#line 634 "kos/src/libc/magic/unicode.c"
 	char32_t result;
 	char16_t const *text = *ptext;
 	if (text <= text_start)
@@ -543,7 +543,7 @@ INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_readutf16_swap_rev_n") char32_t
 NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_swap_rev_n)(/*utf-16*/ char16_t const **__restrict ptext,
                                                         char16_t const *text_start) {
-#line 656 "kos/src/libc/magic/unicode.c"
+#line 657 "kos/src/libc/magic/unicode.c"
 	char32_t result;
 	char16_t const *text = *ptext;
 	if (text <= text_start)
@@ -568,7 +568,7 @@ INTERN ATTR_RETNONNULL NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_writeutf8") char *
 NOTHROW_NCX(LIBCCALL libc_unicode_writeutf8)(/*utf-8*/ char *__restrict dst,
                                              char32_t ch) {
-#line 689 "kos/src/libc/magic/unicode.c"
+#line 690 "kos/src/libc/magic/unicode.c"
 	if likely(ch <= ((uint32_t)1 << 7)-1) {
 		*dst++ = (char)(u8)ch;
 	} else if (ch <= ((uint32_t)1 << 11)-1) {
@@ -614,7 +614,7 @@ INTERN ATTR_RETNONNULL NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_writeutf16") char16_t *
 NOTHROW_NCX(LIBCCALL libc_unicode_writeutf16)(/*utf-16*/ char16_t *__restrict dst,
                                               char32_t ch) {
-#line 733 "kos/src/libc/magic/unicode.c"
+#line 734 "kos/src/libc/magic/unicode.c"
 	if likely(ch <= 0xffff && (ch < 0xd800 || ch > 0xdfff)) {
 		*dst++ = (char16_t)ch;
 	} else {
@@ -635,7 +635,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_8to16") char16_t *
 NOTHROW_NCX(LIBCCALL libc_unicode_8to16)(/*utf-16*/ char16_t *__restrict utf16_dst,
                                          /*utf-8*/ char const *__restrict utf8_text,
                                          size_t utf8_characters) {
-#line 974 "kos/src/libc/magic/unicode.c"
+#line 975 "kos/src/libc/magic/unicode.c"
 	char const *utf8_end = utf8_text + utf8_characters;
 	while (utf8_text < utf8_end) {
 		char32_t ch;
@@ -655,7 +655,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_8to32") char32_t *
 NOTHROW_NCX(LIBCCALL libc_unicode_8to32)(/*utf-32*/ char32_t *__restrict utf32_dst,
                                          /*utf-8*/ char const *__restrict utf8_text,
                                          size_t utf8_characters) {
-#line 1016 "kos/src/libc/magic/unicode.c"
+#line 1017 "kos/src/libc/magic/unicode.c"
 	char const *utf8_end = utf8_text + utf8_characters;
 	while (utf8_text < utf8_end)
 		*utf32_dst++ = libc_unicode_readutf8_n((char const **)&utf8_text,utf8_end);
@@ -672,7 +672,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_16to8") char *
 NOTHROW_NCX(LIBCCALL libc_unicode_16to8)(/*utf-8*/ char *__restrict utf8_dst,
                                          /*utf-16*/ char16_t const *__restrict utf16_text,
                                          size_t utf16_characters) {
-#line 1033 "kos/src/libc/magic/unicode.c"
+#line 1034 "kos/src/libc/magic/unicode.c"
 	char16_t const *utf16_end = utf16_text + utf16_characters;
 	while (utf16_text < utf16_end) {
 		char32_t ch;
@@ -701,7 +701,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_16to32") char32_t *
 NOTHROW_NCX(LIBCCALL libc_unicode_16to32)(/*utf-32*/ char32_t *__restrict utf32_dst,
                                           /*utf-16*/ char16_t const *__restrict utf16_text,
                                           size_t utf16_characters) {
-#line 1061 "kos/src/libc/magic/unicode.c"
+#line 1062 "kos/src/libc/magic/unicode.c"
 	char16_t const *utf16_end = utf16_text + utf16_characters;
 	while (utf16_text < utf16_end)
 		*utf32_dst++ = libc_unicode_readutf16_n((char16_t const **)&utf16_text,utf16_end);
@@ -718,7 +718,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_32to8") char *
 NOTHROW_NCX(LIBCCALL libc_unicode_32to8)(/*utf-8*/ char *__restrict utf8_dst,
                                          /*utf-32*/ char32_t const *__restrict utf32_text,
                                          size_t utf32_characters) {
-#line 1077 "kos/src/libc/magic/unicode.c"
+#line 1078 "kos/src/libc/magic/unicode.c"
 	while (utf32_characters--)
 		utf8_dst = libc_unicode_writeutf8(utf8_dst, *utf32_text++);
 	return utf8_dst;
@@ -734,7 +734,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_32to16") char16_t *
 NOTHROW_NCX(LIBCCALL libc_unicode_32to16)(/*utf-16*/ char16_t *__restrict utf16_dst,
                                           /*utf-32*/ char32_t const *__restrict utf32_text,
                                           size_t utf32_characters) {
-#line 1093 "kos/src/libc/magic/unicode.c"
+#line 1094 "kos/src/libc/magic/unicode.c"
 	while (utf32_characters--)
 		utf16_dst = libc_unicode_writeutf16(utf16_dst, *utf32_text++);
 	return utf16_dst;
@@ -746,7 +746,7 @@ INTERN WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_writeutf16_chk") char16_t *
 NOTHROW_NCX(LIBCCALL libc_unicode_writeutf16_chk)(/*utf-16*/ char16_t *__restrict dst,
                                                   char32_t ch) {
-#line 747 "kos/src/libc/magic/unicode.c"
+#line 748 "kos/src/libc/magic/unicode.c"
 	if unlikely(ch > 0x10ffff)
 		return NULL;
 	if likely(ch <= 0xffff && (ch < 0xd800 || ch > 0xdfff)) {
@@ -770,7 +770,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_8to16_chk") char16_t *
 NOTHROW_NCX(LIBCCALL libc_unicode_8to16_chk)(/*utf-16*/ char16_t *__restrict utf16_dst,
                                              /*utf-8*/ char const *__restrict utf8_text,
                                              size_t utf8_characters) {
-#line 995 "kos/src/libc/magic/unicode.c"
+#line 996 "kos/src/libc/magic/unicode.c"
 	char const *utf8_end = utf8_text + utf8_characters;
 	while (utf8_text < utf8_end) {
 		char32_t ch;
@@ -793,7 +793,7 @@ NOTHROW_NCX(LIBCCALL libc_unicode_c8toc16)(char16_t *__restrict pc16,
                                            /*utf-8*/ char const *__restrict s,
                                            size_t n,
                                            __mbstate_t *__restrict mbs) {
-#line 1109 "kos/src/libc/magic/unicode.c"
+#line 1110 "kos/src/libc/magic/unicode.c"
 	char32_t resch;
 	size_t i;
 	if ((mbs->__word & __MBSTATE_TYPE_MASK) == __MBSTATE_TYPE_WR_UTF16_LO) {
@@ -930,7 +930,7 @@ NOTHROW_NCX(LIBCCALL libc_unicode_c8toc32)(char32_t *__restrict pc32,
                                            /*utf-8*/ char const *__restrict s,
                                            size_t n,
                                            __mbstate_t *__restrict mbs) {
-#line 1243 "kos/src/libc/magic/unicode.c"
+#line 1244 "kos/src/libc/magic/unicode.c"
 	size_t i;
 	for (i = 0; i < n; ++i) {
 		uint32_t state;
@@ -1051,7 +1051,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.format_8to16") ssize_t
 NOTHROW_NCX(LIBCCALL libc_format_8to16)(/*struct format_8to16_data **/ void *arg,
                                         /*utf-8*/ char const *data,
                                         size_t datalen) {
-#line 1374 "kos/src/libc/magic/unicode.c"
+#line 1375 "kos/src/libc/magic/unicode.c"
 	struct __local_format_8to16_data {
 		__pc16formatprinter fd_printer;    /* [1..1] Inner printer */
 		void               *fd_arg;        /* Argument for `fd_printer' */
@@ -1098,7 +1098,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.format_8to32") ssize_t
 NOTHROW_NCX(LIBCCALL libc_format_8to32)(/*struct format_8to32_data **/ void *arg,
                                         /*utf-8*/ char const *data,
                                         size_t datalen) {
-#line 1426 "kos/src/libc/magic/unicode.c"
+#line 1427 "kos/src/libc/magic/unicode.c"
 	struct __local_format_8to32_data {
 		__pc32formatprinter fd_printer;    /* [1..1] Inner printer */
 		void               *fd_arg;        /* Argument for `fd_printer' */
@@ -1141,8 +1141,8 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.format_wto8") ssize_t
 NOTHROW_NCX(LIBCCALL libc_format_wto8)(/*struct format_wto8_data **/ void *arg,
                                        char32_t const *data,
                                        size_t datalen) {
-#line 1475 "kos/src/libc/magic/unicode.c"
-#if __SIZEOF_WCHAR_T__ == 2
+#line 1476 "kos/src/libc/magic/unicode.c"
+#if 4 == 2
 	struct __local_format_16to8_data {
 		__pformatprinter fd_printer;   /* [1..1] Inner printer */
 		void            *fd_arg;       /* Argument for `fd_printer' */
@@ -1224,8 +1224,8 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.format_wto8") ssize_t
 NOTHROW_NCX(LIBDCALL libd_format_wto8)(/*struct format_wto8_data **/ void *arg,
                                        char16_t const *data,
                                        size_t datalen) {
-#line 1475 "kos/src/libc/magic/unicode.c"
-#if __SIZEOF_WCHAR_T__ == 2
+#line 1476 "kos/src/libc/magic/unicode.c"
+#if 2 == 2
 	struct __local_format_16to8_data {
 		__pformatprinter fd_printer;   /* [1..1] Inner printer */
 		void            *fd_arg;       /* Argument for `fd_printer' */
@@ -1308,8 +1308,8 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.format_wto32") ssize_t
 NOTHROW_NCX(LIBCCALL libc_format_wto32)(/*struct format_wto32_data **/ void *arg,
                                         char32_t const *data,
                                         size_t datalen) {
-#line 1599 "kos/src/libc/magic/unicode.c"
-#if __SIZEOF_WCHAR_T__ == 2
+#line 1600 "kos/src/libc/magic/unicode.c"
+#if 4 == 2
 	struct __local_format_16to32_data {
 		__pc32formatprinter fd_printer;   /* [1..1] Inner printer */
 		void               *fd_arg;       /* Argument for `fd_printer' */
@@ -1376,8 +1376,8 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.format_wto32") ssize_t
 NOTHROW_NCX(LIBDCALL libd_format_wto32)(/*struct format_wto32_data **/ void *arg,
                                         char16_t const *data,
                                         size_t datalen) {
-#line 1599 "kos/src/libc/magic/unicode.c"
-#if __SIZEOF_WCHAR_T__ == 2
+#line 1600 "kos/src/libc/magic/unicode.c"
+#if 2 == 2
 	struct __local_format_16to32_data {
 		__pc32formatprinter fd_printer;   /* [1..1] Inner printer */
 		void               *fd_arg;       /* Argument for `fd_printer' */
@@ -1447,8 +1447,8 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.format_wto16") ssize_t
 NOTHROW_NCX(LIBCCALL libc_format_wto16)(/*struct format_wto16_data **/ void *arg,
                                         char32_t const *data,
                                         size_t datalen) {
-#line 1689 "kos/src/libc/magic/unicode.c"
-#if __SIZEOF_WCHAR_T__ == 4
+#line 1690 "kos/src/libc/magic/unicode.c"
+#if 4 == 4
 	struct __local_format_32to16_data {
 		__pc16formatprinter fd_printer; /* [1..1] Inner printer */
 		void               *fd_arg;     /* Argument for `fd_printer' */
@@ -1490,8 +1490,8 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.format_wto16") ssize_t
 NOTHROW_NCX(LIBDCALL libd_format_wto16)(/*struct format_wto16_data **/ void *arg,
                                         char16_t const *data,
                                         size_t datalen) {
-#line 1689 "kos/src/libc/magic/unicode.c"
-#if __SIZEOF_WCHAR_T__ == 4
+#line 1690 "kos/src/libc/magic/unicode.c"
+#if 2 == 4
 	struct __local_format_32to16_data {
 		__pc16formatprinter fd_printer; /* [1..1] Inner printer */
 		void               *fd_arg;     /* Argument for `fd_printer' */

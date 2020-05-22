@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x244d0e58 */
+/* HASH CRC-32:0x391a9615 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ NOTHROW_NCX(LIBCCALL libc_btowc)(int ch) {
 #line 194 "kos/src/libc/magic/wchar.c"
 	if (ch >= 0 && ch <= 0x7f)
 		return (wint_t)ch;
-#if __SIZEOF_WCHAR_T__ == 4
+#if 4 == 4
 	return (__CCAST(__WINT_TYPE__)0xffffffffu);
 #else /* __SIZEOF_WCHAR_T__ == 4 */
 	return (__CCAST(__WINT_TYPE__)0xffff);
@@ -52,7 +52,7 @@ NOTHROW_NCX(LIBDCALL libd_btowc)(int ch) {
 #line 194 "kos/src/libc/magic/wchar.c"
 	if (ch >= 0 && ch <= 0x7f)
 		return (wint_t)ch;
-#if __SIZEOF_WCHAR_T__ == 4
+#if 2 == 4
 	return (__CCAST(__WINT_TYPE__)0xffffffffu);
 #else /* __SIZEOF_WCHAR_T__ == 4 */
 	return (__CCAST(__WINT_TYPE__)0xffff);
@@ -89,7 +89,7 @@ NOTHROW_NCX(LIBCCALL libc_mbrtowc)(char32_t *pwc,
 	}
 	if (!maxlen || !*str)
 		return 0;
-#if __SIZEOF_WCHAR_T__ == 2
+#if 4 == 2
 	error = libc_unicode_c8toc16((char16_t *)pwc, str, maxlen, mbs);
 #else /* __SIZEOF_WCHAR_T__ == 2 */
 	error = libc_unicode_c8toc32((char32_t *)pwc, str, maxlen, mbs);
@@ -120,7 +120,7 @@ NOTHROW_NCX(LIBDCALL libd_mbrtowc)(char16_t *pwc,
 	}
 	if (!maxlen || !*str)
 		return 0;
-#if __SIZEOF_WCHAR_T__ == 2
+#if 2 == 2
 	error = libc_unicode_c8toc16((char16_t *)pwc, str, maxlen, mbs);
 #else /* __SIZEOF_WCHAR_T__ == 2 */
 	error = libc_unicode_c8toc32((char32_t *)pwc, str, maxlen, mbs);
@@ -133,7 +133,7 @@ NOTHROW_NCX(LIBDCALL libd_mbrtowc)(char16_t *pwc,
 }
 
 #include <parts/errno.h>
-#if __SIZEOF_WCHAR_T__ == 2
+#if 4 == 2
 #ifndef ____local_wcrtomb_ps_defined
 #define ____local_wcrtomb_ps_defined 1
 __LOCAL_LIBC_DATA(wcrtomb_ps) mbstate_t wcrtomb_ps = __MBSTATE_INIT;
@@ -146,7 +146,7 @@ NOTHROW_NCX(LIBCCALL libc_wcrtomb)(char *__restrict str,
 #line 255 "kos/src/libc/magic/wchar.c"
 	char *endptr;
 	size_t result;
-#if __SIZEOF_WCHAR_T__ == 2
+#if 4 == 2
 	/* unicode_c16toc8() */
 	if (!mbs)
 		mbs = &wcrtomb_ps;
@@ -187,7 +187,7 @@ NOTHROW_NCX(LIBCCALL libc_wcrtomb)(char *__restrict str,
 	return result;
 }
 #include <parts/errno.h>
-#if __SIZEOF_WCHAR_T__ == 2
+#if 2 == 2
 #ifndef ____local_wcrtomb_ps_defined
 #define ____local_wcrtomb_ps_defined 1
 __LOCAL_LIBC_DATA(wcrtomb_ps) mbstate_t wcrtomb_ps = __MBSTATE_INIT;
@@ -200,7 +200,7 @@ NOTHROW_NCX(LIBDCALL libd_wcrtomb)(char *__restrict str,
 #line 255 "kos/src/libc/magic/wchar.c"
 	char *endptr;
 	size_t result;
-#if __SIZEOF_WCHAR_T__ == 2
+#if 2 == 2
 	/* unicode_c16toc8() */
 	if (!mbs)
 		mbs = &wcrtomb_ps;
@@ -430,9 +430,9 @@ NOTHROW_NCX(LIBCCALL libc_wmemcmp)(char32_t const *s1,
                                    char32_t const *s2,
                                    size_t num_chars) {
 #line 380 "kos/src/libc/magic/wchar.c"
-#if __SIZEOF_WCHAR_T__ == 2
+#if 4 == 2
 	return memcmpw(s1, s2, num_chars);
-#elif __SIZEOF_WCHAR_T__ == 4
+#elif 4 == 4
 	return memcmpl(s1, s2, num_chars);
 #else
 	return memcmp(s1, s2, num_chars * sizeof(char32_t));
@@ -444,9 +444,9 @@ NOTHROW_NCX(LIBDCALL libd_wmemcmp)(char16_t const *s1,
                                    char16_t const *s2,
                                    size_t num_chars) {
 #line 380 "kos/src/libc/magic/wchar.c"
-#if __SIZEOF_WCHAR_T__ == 2
+#if 2 == 2
 	return libc_memcmpw(s1, s2, num_chars);
-#elif __SIZEOF_WCHAR_T__ == 4
+#elif 2 == 4
 	return libc_memcmpl(s1, s2, num_chars);
 #else
 	return libc_memcmp(s1, s2, num_chars * sizeof(char16_t));
@@ -459,9 +459,9 @@ NOTHROW_NCX(LIBCCALL libc_wmemcpy)(char32_t *__restrict dst,
                                    char32_t const *__restrict src,
                                    size_t num_chars) {
 #line 396 "kos/src/libc/magic/wchar.c"
-#if __SIZEOF_WCHAR_T__ == 2
+#if 4 == 2
 	return (char32_t *)memcpyw(dst, src, num_chars);
-#elif __SIZEOF_WCHAR_T__ == 4
+#elif 4 == 4
 	return (char32_t *)memcpyl(dst, src, num_chars);
 #else
 	return (char32_t *)memcpyc(dst, src, num_chars, sizeof(char32_t));
@@ -473,9 +473,9 @@ NOTHROW_NCX(LIBDCALL libd_wmemcpy)(char16_t *__restrict dst,
                                    char16_t const *__restrict src,
                                    size_t num_chars) {
 #line 396 "kos/src/libc/magic/wchar.c"
-#if __SIZEOF_WCHAR_T__ == 2
+#if 2 == 2
 	return (char16_t *)libc_memcpyw(dst, src, num_chars);
-#elif __SIZEOF_WCHAR_T__ == 4
+#elif 2 == 4
 	return (char16_t *)libc_memcpyl(dst, src, num_chars);
 #else
 	return (char16_t *)libc_memcpyc(dst, src, num_chars, sizeof(char16_t));
@@ -488,9 +488,9 @@ NOTHROW_NCX(LIBCCALL libc_wmemmove)(char32_t *dst,
                                     char32_t const *src,
                                     size_t num_chars) {
 #line 412 "kos/src/libc/magic/wchar.c"
-#if __SIZEOF_WCHAR_T__ == 2
+#if 4 == 2
 	return (char32_t *)memmovew(dst, src, num_chars);
-#elif __SIZEOF_WCHAR_T__ == 4
+#elif 4 == 4
 	return (char32_t *)memmovel(dst, src, num_chars);
 #else
 	return (char32_t *)memmove(dst, src, num_chars * sizeof(char32_t));
@@ -502,9 +502,9 @@ NOTHROW_NCX(LIBDCALL libd_wmemmove)(char16_t *dst,
                                     char16_t const *src,
                                     size_t num_chars) {
 #line 412 "kos/src/libc/magic/wchar.c"
-#if __SIZEOF_WCHAR_T__ == 2
+#if 2 == 2
 	return (char16_t *)libc_memmovew(dst, src, num_chars);
-#elif __SIZEOF_WCHAR_T__ == 4
+#elif 2 == 4
 	return (char16_t *)libc_memmovel(dst, src, num_chars);
 #else
 	return (char16_t *)libc_memmove(dst, src, num_chars * sizeof(char16_t));
@@ -517,9 +517,9 @@ NOTHROW_NCX(LIBCCALL libc_wmemset)(char32_t *dst,
                                    char32_t filler,
                                    size_t num_chars) {
 #line 426 "kos/src/libc/magic/wchar.c"
-#if __SIZEOF_WCHAR_T__ == 2
+#if 4 == 2
 	return (char32_t *)memsetw(dst, (u16)filler, num_chars);
-#elif __SIZEOF_WCHAR_T__ == 4
+#elif 4 == 4
 	return (char32_t *)memsetl(dst, (u32)filler, num_chars);
 #else
 	return (char32_t *)memset(dst, (int)filler, num_chars * sizeof(char32_t));
@@ -531,9 +531,9 @@ NOTHROW_NCX(LIBDCALL libd_wmemset)(char16_t *dst,
                                    char16_t filler,
                                    size_t num_chars) {
 #line 426 "kos/src/libc/magic/wchar.c"
-#if __SIZEOF_WCHAR_T__ == 2
+#if 2 == 2
 	return (char16_t *)libc_memsetw(dst, (u16)filler, num_chars);
-#elif __SIZEOF_WCHAR_T__ == 4
+#elif 2 == 4
 	return (char16_t *)libc_memsetl(dst, (u32)filler, num_chars);
 #else
 	return (char16_t *)libc_memset(dst, (int)filler, num_chars * sizeof(char16_t));
@@ -999,9 +999,9 @@ NOTHROW_NCX(LIBCCALL libc_wmemchr)(char32_t const *__restrict haystack,
                                    char32_t needle,
                                    size_t num_chars) {
 #line 643 "kos/src/libc/magic/wchar.c"
-#if __SIZEOF_WCHAR_T__ == 2
+#if 4 == 2
 	return (char32_t *)memchrw(haystack, needle, num_chars);
-#elif __SIZEOF_WCHAR_T__ == 4
+#elif 4 == 4
 	return (char32_t *)memchrl(haystack, needle, num_chars);
 #else
 	return (char32_t *)memchr(haystack, (int)needle, num_chars * sizeof(char32_t));
@@ -1013,9 +1013,9 @@ NOTHROW_NCX(LIBDCALL libd_wmemchr)(char16_t const *__restrict haystack,
                                    char16_t needle,
                                    size_t num_chars) {
 #line 643 "kos/src/libc/magic/wchar.c"
-#if __SIZEOF_WCHAR_T__ == 2
+#if 2 == 2
 	return (char16_t *)libc_memchrw(haystack, needle, num_chars);
-#elif __SIZEOF_WCHAR_T__ == 4
+#elif 2 == 4
 	return (char16_t *)libc_memchrl(haystack, needle, num_chars);
 #else
 	return (char16_t *)libc_memchr(haystack, (int)needle, num_chars * sizeof(char16_t));
@@ -1486,9 +1486,9 @@ NOTHROW_NCX(LIBCCALL libc_wmempcpy)(char32_t *__restrict dst,
                                     char32_t const *__restrict src,
                                     size_t num_chars) {
 #line 970 "kos/src/libc/magic/wchar.c"
-#if __SIZEOF_WCHAR_T__ == 2
+#if 4 == 2
 	return (char32_t *)mempcpyw(dst, src, num_chars);
-#elif __SIZEOF_WCHAR_T__ == 4
+#elif 4 == 4
 	return (char32_t *)mempcpyl(dst, src, num_chars);
 #else
 	return (char32_t *)mempcpy(dst, src, num_chars * sizeof(char32_t));
@@ -1500,9 +1500,9 @@ NOTHROW_NCX(LIBDCALL libd_wmempcpy)(char16_t *__restrict dst,
                                     char16_t const *__restrict src,
                                     size_t num_chars) {
 #line 970 "kos/src/libc/magic/wchar.c"
-#if __SIZEOF_WCHAR_T__ == 2
+#if 2 == 2
 	return (char16_t *)libc_mempcpyw(dst, src, num_chars);
-#elif __SIZEOF_WCHAR_T__ == 4
+#elif 2 == 4
 	return (char16_t *)libc_mempcpyl(dst, src, num_chars);
 #else
 	return (char16_t *)libc_mempcpy(dst, src, num_chars * sizeof(char16_t));
@@ -1515,9 +1515,9 @@ NOTHROW_NCX(LIBCCALL libc_wmempmove)(char32_t *dst,
                                      char32_t const *src,
                                      size_t num_chars) {
 #line 985 "kos/src/libc/magic/wchar.c"
-#if __SIZEOF_WCHAR_T__ == 2
+#if 4 == 2
 	return (char32_t *)mempmovew(dst, src, num_chars);
-#elif __SIZEOF_WCHAR_T__ == 4
+#elif 4 == 4
 	return (char32_t *)mempmovel(dst, src, num_chars);
 #else
 	return (char32_t *)mempmove(dst, src, num_chars * sizeof(char32_t));
@@ -1529,9 +1529,9 @@ NOTHROW_NCX(LIBDCALL libd_wmempmove)(char16_t *dst,
                                      char16_t const *src,
                                      size_t num_chars) {
 #line 985 "kos/src/libc/magic/wchar.c"
-#if __SIZEOF_WCHAR_T__ == 2
+#if 2 == 2
 	return (char16_t *)libc_mempmovew(dst, src, num_chars);
-#elif __SIZEOF_WCHAR_T__ == 4
+#elif 2 == 4
 	return (char16_t *)libc_mempmovel(dst, src, num_chars);
 #else
 	return (char16_t *)libc_mempmove(dst, src, num_chars * sizeof(char16_t));
@@ -2188,9 +2188,9 @@ ATTR_WEAK ATTR_SECTION(".text.crt.wchar.string.memory.wcsnrev") char32_t *
 NOTHROW_NCX(LIBCCALL libc_wcsnrev)(char32_t *__restrict str,
                                    size_t maxlen) {
 #line 1349 "kos/src/libc/magic/wchar.c"
-#if __SIZEOF_WCHAR_T__ == 2
+#if 4 == 2
 	return (char32_t *)libc_memrevw(str, libc_wcsnlen(str, maxlen));
-#elif __SIZEOF_WCHAR_T__ == 4
+#elif 4 == 4
 	return (char32_t *)libc_memrevl(str, libc_wcsnlen(str, maxlen));
 #else
 	return (char32_t *)libc_memrev(str, libc_wcsnlen(str, maxlen) * sizeof(char32_t));
@@ -2201,9 +2201,9 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.string.memory.wcsnrev") char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsnrev)(char16_t *__restrict str,
                                    size_t maxlen) {
 #line 1349 "kos/src/libc/magic/wchar.c"
-#if __SIZEOF_WCHAR_T__ == 2
+#if 2 == 2
 	return (char16_t *)libc_memrevw(str, libd_wcsnlen(str, maxlen));
-#elif __SIZEOF_WCHAR_T__ == 4
+#elif 2 == 4
 	return (char16_t *)libc_memrevl(str, libd_wcsnlen(str, maxlen));
 #else
 	return (char16_t *)libc_memrev(str, libd_wcsnlen(str, maxlen) * sizeof(char16_t));
@@ -2314,9 +2314,9 @@ NOTHROW_NCX(LIBCCALL libc_wmempset)(char32_t *dst,
                                     char32_t filler,
                                     size_t num_chars) {
 #line 1393 "kos/src/libc/magic/wchar.c"
-#if __SIZEOF_WCHAR_T__ == 2
+#if 4 == 2
 	return (char32_t *)mempsetw(dst, (u16)filler, num_chars);
-#elif __SIZEOF_WCHAR_T__ == 4
+#elif 4 == 4
 	return (char32_t *)mempsetl(dst, (u32)filler, num_chars);
 #else
 	return (char32_t *)mempset(dst, (int)filler, num_chars * sizeof(char32_t));
@@ -2329,9 +2329,9 @@ NOTHROW_NCX(LIBDCALL libd_wmempset)(char16_t *dst,
                                     char16_t filler,
                                     size_t num_chars) {
 #line 1393 "kos/src/libc/magic/wchar.c"
-#if __SIZEOF_WCHAR_T__ == 2
+#if 2 == 2
 	return (char16_t *)libc_mempsetw(dst, (u16)filler, num_chars);
-#elif __SIZEOF_WCHAR_T__ == 4
+#elif 2 == 4
 	return (char16_t *)libc_mempsetl(dst, (u32)filler, num_chars);
 #else
 	return (char16_t *)libc_mempset(dst, (int)filler, num_chars * sizeof(char16_t));
@@ -2617,9 +2617,9 @@ NOTHROW_NCX(LIBCCALL libc_fuzzy_wmemcmp)(char32_t const *s1,
                                          char32_t const *s2,
                                          size_t s2_chars) {
 #line 1484 "kos/src/libc/magic/wchar.c"
-#if __SIZEOF_WCHAR_T__ == 2
+#if 4 == 2
 	return libc_fuzzy_memcmpw(s1, s1_chars, s2, s2_chars);
-#elif __SIZEOF_WCHAR_T__ == 4
+#elif 4 == 4
 	return libc_fuzzy_memcmpl(s1, s1_chars, s2, s2_chars);
 #else
 	return libc_fuzzy_memcmp(s1, s1_chars * sizeof(char32_t), s2, s2_chars * sizeof(char32_t));
@@ -2633,9 +2633,9 @@ NOTHROW_NCX(LIBDCALL libd_fuzzy_wmemcmp)(char16_t const *s1,
                                          char16_t const *s2,
                                          size_t s2_chars) {
 #line 1484 "kos/src/libc/magic/wchar.c"
-#if __SIZEOF_WCHAR_T__ == 2
+#if 2 == 2
 	return libc_fuzzy_memcmpw(s1, s1_chars, s2, s2_chars);
-#elif __SIZEOF_WCHAR_T__ == 4
+#elif 2 == 4
 	return libc_fuzzy_memcmpl(s1, s1_chars, s2, s2_chars);
 #else
 	return libc_fuzzy_memcmp(s1, s1_chars * sizeof(char16_t), s2, s2_chars * sizeof(char16_t));
@@ -4201,9 +4201,9 @@ INTERN ATTR_RETNONNULL NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.string.memory.wcsrev") char32_t *
 NOTHROW_NCX(LIBCCALL libc_wcsrev)(char32_t *__restrict str) {
 #line 1791 "kos/src/libc/magic/wchar.c"
-#if __SIZEOF_WCHAR_T__ == 2
+#if 4 == 2
 	return (char32_t *)libc_memrevw(str, libc_wcslen(str));
-#elif __SIZEOF_WCHAR_T__ == 4
+#elif 4 == 4
 	return (char32_t *)libc_memrevl(str, libc_wcslen(str));
 #else
 	return (char32_t *)libc_memrev(str, libc_wcslen(str) * sizeof(char32_t));
@@ -4213,9 +4213,9 @@ INTERN ATTR_RETNONNULL NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.string.memory.wcsrev") char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsrev)(char16_t *__restrict str) {
 #line 1791 "kos/src/libc/magic/wchar.c"
-#if __SIZEOF_WCHAR_T__ == 2
+#if 2 == 2
 	return (char16_t *)libc_memrevw(str, libd_wcslen(str));
-#elif __SIZEOF_WCHAR_T__ == 4
+#elif 2 == 4
 	return (char16_t *)libc_memrevl(str, libd_wcslen(str));
 #else
 	return (char16_t *)libc_memrev(str, libd_wcslen(str) * sizeof(char16_t));

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcff81fc3 */
+/* HASH CRC-32:0x2bb91013 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -599,7 +599,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_vc32printf))(__pc32formatprint
 #line 851 "kos/src/libc/magic/format-printer.c"
 #ifndef __INTELLISENSE__
 #define __CHAR_TYPE                 __CHAR32_TYPE__
-#define __CHAR_SIZE                 __SIZEOF_WCHAR_T__
+#define __CHAR_SIZE                 4
 #define __FORMAT_REPEAT             __localdep_format_c32repeat
 #define __FORMAT_HEXDUMP            __localdep_format_c32hexdump
 
@@ -607,7 +607,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_vc32printf))(__pc32formatprint
 #define __FORMAT_ESCAPE             __localdep_format_c32escape
 #define __FORMAT_WIDTH8             __localdep_format_width
 #define __FORMAT_ESCAPE8            __localdep_format_escape
-#if __SIZEOF_WCHAR_T__ == 2
+#if 4 == 2
 #define __FORMAT_WIDTH32            __localdep_format_c32width
 #define __FORMAT_ESCAPE32           __localdep_format_c32escape
 #define __FORMAT_UNICODE_WRITECHAR  __localdep_unicode_writeutf16

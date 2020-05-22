@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb6750e8d */
+/* HASH CRC-32:0xd5561719 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,9 +69,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fuzzy_c32memcmp))(__CHAR32_TYPE__ con
                                                              __CHAR32_TYPE__ const *__s2,
                                                              __SIZE_TYPE__ __s2_chars) {
 #line 1484 "kos/src/libc/magic/wchar.c"
-#if __SIZEOF_WCHAR_T__ == 2
+#if 4 == 2
 	return __localdep_fuzzy_memcmpw(__s1, __s1_chars, __s2, __s2_chars);
-#elif __SIZEOF_WCHAR_T__ == 4
+#elif 4 == 4
 	return __localdep_fuzzy_memcmpl(__s1, __s1_chars, __s2, __s2_chars);
 #else
 	return __localdep_fuzzy_memcmp(__s1, __s1_chars * sizeof(__CHAR32_TYPE__), __s2, __s2_chars * sizeof(__CHAR32_TYPE__));

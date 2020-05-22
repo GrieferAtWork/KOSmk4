@@ -153,7 +153,7 @@ done_procfs:
 	signal(SIGTTIN, SIG_IGN);
 	signal(SIGTTOU, SIG_IGN);
 
-	/* Construct /dev/console from the VGA display, and a PS/2 keyboard. */
+	/* Construct /dev/console from the VGA display, and a keyboard. */
 	{
 		fd_t i, console, display, keyboard;
 		keyboard = open("/dev/usbkba", O_RDONLY | O_CLOEXEC, 0);

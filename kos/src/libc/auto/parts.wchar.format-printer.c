@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3ebda691 */
+/* HASH CRC-32:0xc8a29a2b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -237,7 +237,7 @@ NOTHROW_NCX(LIBCCALL libc_format_wescape)(pc32formatprinter printer,
 	while (text < textend) {
 		char32_t const *old_text = text;
 
-#if __SIZEOF_WCHAR_T__ == 2
+#if 4 == 2
 		uint32_t ch = libc_unicode_readutf16_n((char16_t const **)&text, textend);
 #else /* __SIZEOF_WCHAR_T__ == 2 */
 		uint32_t ch = (uint32_t)*text++;
@@ -266,7 +266,7 @@ encode_oct:
 					if (text < textend) {
 						char32_t const *new_text = text;
 
-#if __SIZEOF_WCHAR_T__ == 2
+#if 4 == 2
 						uint32_t next_ch = libc_unicode_readutf16_n((char16_t const **)&new_text, textend);
 #else
 						uint32_t next_ch = (uint32_t)*new_text++;
@@ -403,7 +403,7 @@ encode_hex:
 				if (text < textend) {
 					char32_t const *new_text = text;
 
-#if __SIZEOF_WCHAR_T__ == 2
+#if 4 == 2
 					uint32_t next_ch = libc_unicode_readutf16_n((char16_t const **)&new_text, textend);
 #else /* __SIZEOF_WCHAR_T__ == 2 */
 					uint32_t next_ch = (uint32_t)*new_text++;
@@ -530,7 +530,7 @@ NOTHROW_NCX(LIBDCALL libd_format_wescape)(pc16formatprinter printer,
 	while (text < textend) {
 		char16_t const *old_text = text;
 
-#if __SIZEOF_WCHAR_T__ == 2
+#if 2 == 2
 		uint32_t ch = libc_unicode_readutf16_n((char16_t const **)&text, textend);
 #else /* __SIZEOF_WCHAR_T__ == 2 */
 		uint32_t ch = (uint32_t)*text++;
@@ -559,7 +559,7 @@ encode_oct:
 					if (text < textend) {
 						char16_t const *new_text = text;
 
-#if __SIZEOF_WCHAR_T__ == 2
+#if 2 == 2
 						uint32_t next_ch = libc_unicode_readutf16_n((char16_t const **)&new_text, textend);
 #else
 						uint32_t next_ch = (uint32_t)*new_text++;
@@ -696,7 +696,7 @@ encode_hex:
 				if (text < textend) {
 					char16_t const *new_text = text;
 
-#if __SIZEOF_WCHAR_T__ == 2
+#if 2 == 2
 					uint32_t next_ch = libc_unicode_readutf16_n((char16_t const **)&new_text, textend);
 #else /* __SIZEOF_WCHAR_T__ == 2 */
 					uint32_t next_ch = (uint32_t)*new_text++;
@@ -1325,7 +1325,7 @@ NOTHROW_NCX(LIBCCALL libc_format_vwprintf)(pc32formatprinter printer,
 #line 851 "kos/src/libc/magic/format-printer.c"
 #ifndef __INTELLISENSE__
 #define __CHAR_TYPE                 char32_t
-#define __CHAR_SIZE                 __SIZEOF_WCHAR_T__
+#define __CHAR_SIZE                 4
 #define __FORMAT_REPEAT             libc_format_wrepeat
 #define __FORMAT_HEXDUMP            libc_format_whexdump
 
@@ -1333,7 +1333,7 @@ NOTHROW_NCX(LIBCCALL libc_format_vwprintf)(pc32formatprinter printer,
 #define __FORMAT_ESCAPE             libc_format_wescape
 #define __FORMAT_WIDTH8             libc_format_width
 #define __FORMAT_ESCAPE8            libc_format_escape
-#if __SIZEOF_WCHAR_T__ == 2
+#if 4 == 2
 #define __FORMAT_WIDTH32            libc_format_c32width
 #define __FORMAT_ESCAPE32           libc_format_c32escape
 #define __FORMAT_UNICODE_WRITECHAR  libc_unicode_writeutf16
@@ -1486,7 +1486,7 @@ NOTHROW_NCX(LIBDCALL libd_format_vwprintf)(pc16formatprinter printer,
 #line 851 "kos/src/libc/magic/format-printer.c"
 #ifndef __INTELLISENSE__
 #define __CHAR_TYPE                 char16_t
-#define __CHAR_SIZE                 __SIZEOF_WCHAR_T__
+#define __CHAR_SIZE                 2
 #define __FORMAT_REPEAT             libd_format_wrepeat
 #define __FORMAT_HEXDUMP            libd_format_whexdump
 
@@ -1494,7 +1494,7 @@ NOTHROW_NCX(LIBDCALL libd_format_vwprintf)(pc16formatprinter printer,
 #define __FORMAT_ESCAPE             libd_format_wescape
 #define __FORMAT_WIDTH8             libc_format_width
 #define __FORMAT_ESCAPE8            libc_format_escape
-#if __SIZEOF_WCHAR_T__ == 2
+#if 2 == 2
 #define __FORMAT_WIDTH32            libc_format_c32width
 #define __FORMAT_ESCAPE32           libc_format_c32escape
 #define __FORMAT_UNICODE_WRITECHAR  libc_unicode_writeutf16
@@ -1838,7 +1838,7 @@ NOTHROW_NCX(LIBCCALL libc_format_wwidth)(void *arg,
                                          char32_t const *__restrict data,
                                          size_t datalen) {
 #line 141 "kos/src/libc/magic/parts.wchar.format-printer.c"
-#if __SIZEOF_WCHAR_T__ == 2
+#if 4 == 2
 	size_t result = 0;
 	char32_t const *iter, *end;
 	(void)arg;
@@ -1872,7 +1872,7 @@ NOTHROW_NCX(LIBDCALL libd_format_wwidth)(void *arg,
                                          char16_t const *__restrict data,
                                          size_t datalen) {
 #line 141 "kos/src/libc/magic/parts.wchar.format-printer.c"
-#if __SIZEOF_WCHAR_T__ == 2
+#if 2 == 2
 	size_t result = 0;
 	char16_t const *iter, *end;
 	(void)arg;

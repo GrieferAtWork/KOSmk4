@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x49e4a601 */
+/* HASH CRC-32:0x7b85a1ba */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -86,7 +86,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(format_c16escape))(__pc16formatprinte
 	while (__text < __textend) {
 		__CHAR16_TYPE__ const *__old_text = __text;
 
-#if __SIZEOF_WCHAR_T__ == 2
+#if 2 == 2
 		__UINT32_TYPE__ __ch = __localdep_unicode_readutf16_n((__CHAR16_TYPE__ const **)&__text, __textend);
 #else /* __SIZEOF_WCHAR_T__ == 2 */
 		__UINT32_TYPE__ __ch = (__UINT32_TYPE__)*__text++;
@@ -115,7 +115,7 @@ __encode_oct:
 					if (__text < __textend) {
 						__CHAR16_TYPE__ const *__new_text = __text;
 
-#if __SIZEOF_WCHAR_T__ == 2
+#if 2 == 2
 						__UINT32_TYPE__ __next_ch = __localdep_unicode_readutf16_n((__CHAR16_TYPE__ const **)&__new_text, __textend);
 #else
 						__UINT32_TYPE__ __next_ch = (__UINT32_TYPE__)*__new_text++;
@@ -252,7 +252,7 @@ __encode_hex:
 				if (__text < __textend) {
 					__CHAR16_TYPE__ const *__new_text = __text;
 
-#if __SIZEOF_WCHAR_T__ == 2
+#if 2 == 2
 					__UINT32_TYPE__ __next_ch = __localdep_unicode_readutf16_n((__CHAR16_TYPE__ const **)&__new_text, __textend);
 #else /* __SIZEOF_WCHAR_T__ == 2 */
 					__UINT32_TYPE__ __next_ch = (__UINT32_TYPE__)*__new_text++;

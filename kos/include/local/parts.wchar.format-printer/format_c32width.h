@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe87526fe */
+/* HASH CRC-32:0xe3fe49ca */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_c32width))(void *__arg,
                                                              __CHAR32_TYPE__ const *__restrict __data,
                                                              __SIZE_TYPE__ __datalen) {
 #line 141 "kos/src/libc/magic/parts.wchar.format-printer.c"
-#if __SIZEOF_WCHAR_T__ == 2
+#if 4 == 2
 	__SIZE_TYPE__ __result = 0;
 	__CHAR32_TYPE__ const *__iter, *__end;
 	(void)__arg;

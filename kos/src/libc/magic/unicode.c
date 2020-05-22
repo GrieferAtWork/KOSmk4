@@ -22,6 +22,7 @@
 %[define_replacement(char32_t = __CHAR32_TYPE__)]
 %[define_replacement(COMPILER_ENDOF = __COMPILER_ENDOF)]
 %[default_impl_section(.text.crt.unicode.UTF)]
+%[define_wchar_replacement(__SIZEOF_WCHAR_T__ = 2, 4)]
 
 %[crt_feature(__unicode_asciiflags)]
 %[crt_feature(__unicode_descriptor)]

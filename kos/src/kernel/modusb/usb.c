@@ -942,13 +942,8 @@ usb_device_discovered(struct usb_controller *__restrict self,
 		FINALLY_ENDWRITE(&self->uc_disclock);
 
 		/* Create a descriptor for the device. */
-		TRY {
-			dev = (REF struct usb_device *)kmalloc(sizeof(struct usb_device),
-			                                       GFP_NORMAL | GFP_CALLOC);
-		} EXCEPT {
-			sync_endwrite(&self->uc_disclock);
-			RETHROW();
-		}
+		dev = (REF struct usb_device *)kmalloc(sizeof(struct usb_device),
+		                                       GFP_NORMAL | GFP_CALLOC);
 		dev->ue_refcnt    = 1;
 		dev->ue_interface = dev;
 		dev->ui_device    = dev;

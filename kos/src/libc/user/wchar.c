@@ -934,7 +934,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs.wcwidth") int
 NOTHROW_NCX(LIBDCALL libd_wcwidth)(char16_t ch)
 /*[[[body:DOS$wcwidth]]]*/
 /*AUTO*/{
-#if __SIZEOF_WCHAR_T__ == 2
+#if 2 == 2
 	if (ch >= 0xd800 &&
 	    ch <= 0xdfff)
 		return 0;
@@ -954,7 +954,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.wchar.unicode.static.mbs.wcwidth") int
 NOTHROW_NCX(LIBCCALL libc_wcwidth)(char32_t ch)
 /*[[[body:wcwidth]]]*/
 /*AUTO*/{
-#if __SIZEOF_WCHAR_T__ == 2
+#if 4 == 2
 	if (ch >= 0xd800 &&
 	    ch <= 0xdfff)
 		return 0;
