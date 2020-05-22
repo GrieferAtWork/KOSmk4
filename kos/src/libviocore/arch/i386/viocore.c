@@ -1224,7 +1224,8 @@ libviocore_atomic_cmpxchx(struct vio_emulate_args *__restrict self,
 #else /* __x86_64__ */
 DECL_END
 
-#include <kernel/arch/gdt.h> /* x86_get_user_(fs|gs)base() */
+#include <kernel/x86/gdt.h> /* x86_get_user_(fs|gs)base() */
+
 #include <sched/task.h>
 
 DECL_BEGIN

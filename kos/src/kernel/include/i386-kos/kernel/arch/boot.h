@@ -24,9 +24,9 @@
 
 #include <kernel/types.h>
 #ifdef CONFIG_BUILDING_KERNEL_CORE
-#include <kernel/arch/phys2virt64.h> /* CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC */
-#include <kernel/fpu.h>              /* CONFIG_FPU */
-#include <kernel/vboxgdb.h>          /* CONFIG_VBOXGDB */
+#include <kernel/x86/phys2virt64.h> /* CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC */
+#include <kernel/fpu.h>             /* CONFIG_FPU */
+#include <kernel/vboxgdb.h>         /* CONFIG_VBOXGDB */
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 
 #include <asm/pagesize.h>

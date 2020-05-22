@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_PHYS2VIRT64_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_PHYS2VIRT64_H 1
+#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_PHYS2VIRT64_H
+#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_PHYS2VIRT64_H 1
 
 #include <kernel/compiler.h>
 
@@ -86,4 +86,4 @@ DECL_END
 #undef CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC
 #endif /* !__x86_64__ || !KERNEL_PHYS2VIRT_BASE */
 
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_PHYS2VIRT64_H */
+#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_PHYS2VIRT64_H */

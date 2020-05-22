@@ -27,9 +27,9 @@
 #include <hybrid/host.h>
 
 #ifndef __x86_64__
-#include <kernel/arch/cpuid.h>
 #include <kernel/boot.h>
 #include <kernel/types.h>
+#include <kernel/x86/cpuid.h>
 #include <sched/atomic64.h>
 
 #include <asm/cpu-cpuid.h>

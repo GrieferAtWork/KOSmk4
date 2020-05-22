@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_CPUID_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_CPUID_H 1
+#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_CPUID_H
+#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_CPUID_H 1
 
 #include <kernel/compiler.h>
 
@@ -197,4 +197,4 @@ DATDEF struct cpuinfo const x86_bootcpu_cpuid;
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_CPUID_H */
+#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_CPUID_H */

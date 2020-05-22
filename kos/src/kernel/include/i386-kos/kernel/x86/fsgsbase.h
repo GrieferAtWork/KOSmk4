@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_FSGSBASE_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_FSGSBASE_H 1
+#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_FSGSBASE_H
+#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_FSGSBASE_H 1
 
 #include <hybrid/compiler.h>
 #include <hybrid/__asm.h>
@@ -162,4 +162,4 @@ DECL_END
 
 #endif /* __x86_64__ */
 
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_FSGSBASE_H */
+#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_FSGSBASE_H */

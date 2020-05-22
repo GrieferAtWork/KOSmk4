@@ -24,11 +24,6 @@
 #include <kernel/compiler.h>
 
 #include <fs/vfs.h>
-#include <kernel/arch/apic.h>
-#include <kernel/arch/gdt.h>
-#include <kernel/arch/pic.h>
-#include <kernel/arch/pit.h>
-#include <kernel/arch/syscall-tables.h> /* CONFIG_X86_EMULATE_LCALL7 */
 #include <kernel/except.h>
 #include <kernel/handle.h>
 #include <kernel/paging.h>
@@ -36,6 +31,11 @@
 #include <kernel/printk.h>
 #include <kernel/syscall.h>
 #include <kernel/user.h>
+#include <kernel/x86/apic.h>
+#include <kernel/x86/gdt.h>
+#include <kernel/x86/pic.h>
+#include <kernel/x86/pit.h>
+#include <kernel/x86/syscall-tables.h> /* CONFIG_X86_EMULATE_LCALL7 */
 #include <sched/async.h>
 #include <sched/cpu.h>
 #include <sched/rpc.h>

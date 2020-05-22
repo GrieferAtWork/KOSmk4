@@ -55,7 +55,7 @@
 #include <string.h>
 
 #if defined(__x86_64__) || defined(__i386__)
-#include <kernel/arch/gdt.h> /* this_x86_user_gsbase */
+#include <kernel/x86/gdt.h> /* this_x86_user_gsbase */
 #endif /* __x86_64__ || __i386__ */
 
 #include "fsio.h"

@@ -23,8 +23,8 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/arch/gdt.h>
 #include <kernel/except.h>
+#include <kernel/x86/gdt.h>
 #include <sched/rpc.h>
 #include <sched/task.h>
 

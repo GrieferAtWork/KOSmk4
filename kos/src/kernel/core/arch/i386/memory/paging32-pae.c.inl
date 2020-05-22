@@ -26,12 +26,12 @@
 #include <kernel/compiler.h>
 
 #include <kernel/arch/paging32-pae.h>
-#include <kernel/arch/cpuid.h>
 #include <kernel/except.h>
 #include <kernel/memory.h>
 #include <kernel/paging.h>
 #include <kernel/vm.h>
 #include <kernel/vm/phys.h>
+#include <kernel/x86/cpuid.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>

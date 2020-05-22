@@ -23,9 +23,10 @@
 #include <__stdinc.h>
 #include <hybrid/__asm.h>
 #include <hybrid/host.h>
+
 #ifdef __x86_64__
 #ifdef __KERNEL__
-#include <kernel/arch/fsgsbase.h>
+#include <kernel/x86/fsgsbase.h>
 #endif /* __KERNEL__ */
 #endif /* __x86_64__ */
 

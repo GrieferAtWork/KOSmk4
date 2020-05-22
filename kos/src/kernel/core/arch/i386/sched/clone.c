@@ -24,7 +24,6 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/arch/gdt.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/heap.h>
@@ -34,12 +33,13 @@
 #include <kernel/user.h>
 #include <kernel/vm.h>
 #include <kernel/vm/phys.h>
+#include <kernel/x86/gdt.h>
 #include <sched/cpu.h>
 #include <sched/except-handler.h>
-#include <sched/iopl.h>
 #include <sched/pid.h>
 #include <sched/rpc.h>
 #include <sched/task.h>
+#include <sched/x86/iopl.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>

@@ -25,8 +25,8 @@
 #ifdef CONFIG_HAVE_DEBUGGER
 #include <kernel/compiler.h>
 
-#include <kernel/arch/apic.h>
-#include <kernel/arch/pic.h>
+#include <kernel/x86/apic.h>
+#include <kernel/x86/pic.h>
 
 #include <asm/cfi.h>
 #include <asm/cpu-flags.h>

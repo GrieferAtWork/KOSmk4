@@ -23,13 +23,13 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/arch/syscall-info.h>
-#include <kernel/arch/syscall-tables.h>
 #include <kernel/except.h>
 #include <kernel/syscall-properties.h>
 #include <kernel/syscall-trace.h>
 #include <kernel/syscall.h>
 #include <kernel/user.h>
+#include <kernel/x86/syscall-info.h>
+#include <kernel/x86/syscall-tables.h>
 #include <sched/except-handler.h>
 #include <sched/rpc.h>
 

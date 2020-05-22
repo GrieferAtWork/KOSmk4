@@ -28,7 +28,6 @@
 #include <debugger/io.h>
 #include <debugger/rt.h>
 #include <kernel/addr2line.h>
-#include <kernel/arch/pic.h>
 #include <kernel/debugtrap.h>
 #include <kernel/except.h>
 #include <kernel/paging.h>
@@ -36,6 +35,7 @@
 #include <kernel/syslog.h>
 #include <kernel/types.h>
 #include <kernel/vm.h>
+#include <kernel/x86/pic.h>
 #include <sched/cpu.h>
 #include <sched/task.h>
 

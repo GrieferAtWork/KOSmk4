@@ -22,16 +22,15 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/arch/cpuid.h>
 #include <kernel/arch/paging32.h>
 #include <kernel/types.h>
+#include <kernel/x86/cpuid.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <asm/cpu-cpuid.h>
-
 
 #if 1 /* Not used often enough to excuse taking up precious cache space */
 #define ATTR_PAGING_READMOSTLY /* nothing */

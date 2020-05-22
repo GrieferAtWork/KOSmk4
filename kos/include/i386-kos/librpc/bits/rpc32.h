@@ -35,7 +35,7 @@
 #include <kos/kernel/gdt.h>
 #endif /* __USE_KOS_KERNEL */
 #ifdef __KERNEL__
-#include <kernel/arch/gdt.h> /* x86_(get|set)_user_(fs|gs)base() */
+#include <kernel/x86/gdt.h> /* x86_(get|set)_user_(fs|gs)base() */
 #endif /* __KERNEL__ */
 
 #ifndef __x86_64__

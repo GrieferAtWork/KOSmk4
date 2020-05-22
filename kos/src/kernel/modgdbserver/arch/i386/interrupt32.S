@@ -23,7 +23,7 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/arch/gdt.h>
+#include <kernel/x86/gdt.h>
 
 #include <asm/cfi.h>
 #include <kos/kernel/cpu-state.h>

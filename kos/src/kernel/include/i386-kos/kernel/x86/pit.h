@@ -17,34 +17,34 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_APIC_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_APIC_H 1
+#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_PIT_H
+#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_PIT_H 1
 
 #include <kernel/compiler.h>
 
-#include <bits/types.h>
-#include <hw/ic/apic.h>
-#include <sys/mmio.h>
+#include <hybrid/sync/atomic-rwlock.h>
+
+#include <hw/timer/pit.h>
 
 DECL_BEGIN
 
 #ifdef __CC__
-/* [const] Virtual base addresses of the local (per-cpu) APIC.
- * HINT: APIC stands for Advanced Programmable Interrupt Controller. */
-DATDEF VIRT volatile __byte_t *const x86_lapicbase;
-#define X86_HAVE_LAPIC             (x86_lapicbase != __NULLPTR)
-#define lapic_read(offset)         peekl(x86_lapicbase + (offset))
-#define lapic_write(offset, value) pokel(x86_lapicbase + (offset), value)
-
-/* [valid_if(X86_HAVE_LAPIC)] The LAPIC ID of the controller associated with the CPU. */
-DATDEF ATTR_PERCPU __u8 const thiscpu_x86_lapicid;
-
-/* [valid_if(X86_HAVE_LAPIC)] The LAPIC version of the controller associated with the CPU.
- *                            This is one of `APICVER_*' from `<sched/smp.h>' */
-DATDEF ATTR_PERCPU __u8 const thiscpu_x86_lapicversion;
-
+#ifndef CONFIG_NO_SMP
+/* Lock used to synchronize access to the PIT.
+ * WARNING: When acquiring this lock, you must first disable preemption:
+ * >> for (;;) {
+ * >>     PREEMPTION_DISABLE();
+ * >>     if (sync_trywrite(&x86_pit_lock))
+ * >>         break;
+ * >>     PREEMPTION_ENABLE();
+ * >>     task_yield();
+ * >> }
+ * In single-core mode, it is sufficient to only disable preemption. */
+DATDEF struct atomic_rwlock x86_pit_lock;
+#endif /* !CONFIG_NO_SMP */
 #endif /* __CC__ */
+
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_APIC_H */
+#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_PIT_H */

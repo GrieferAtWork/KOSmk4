@@ -26,11 +26,6 @@
 
 #include <debugger/config.h>
 #include <fs/vfs.h>
-#include <kernel/arch/apic.h>
-#include <kernel/arch/cpuid.h>
-#include <kernel/arch/gdt.h>
-#include <kernel/arch/pic.h>
-#include <kernel/arch/pit.h>
 #include <kernel/driver-param.h>
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
@@ -40,10 +35,15 @@
 #include <kernel/printk.h>
 #include <kernel/vm.h>
 #include <kernel/vm/phys.h>
+#include <kernel/x86/apic.h>
+#include <kernel/x86/cpuid.h>
+#include <kernel/x86/gdt.h>
+#include <kernel/x86/pic.h>
+#include <kernel/x86/pit.h>
 #include <sched/cpu.h>
-#include <sched/smp.h>
 #include <sched/task.h>
-#include <sched/tss.h>
+#include <sched/x86/smp.h>
+#include <sched/x86/tss.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>

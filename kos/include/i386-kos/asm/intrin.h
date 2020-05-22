@@ -418,7 +418,7 @@ __FORCELOCAL void (__outsl)(__UINT16_TYPE__ __port, void const *__restrict __src
 /* Read/write the FS/GS-base registers. */
 #ifdef __x86_64__
 #ifdef __KERNEL__
-#include <kernel/arch/fsgsbase.h>
+#include <kernel/x86/fsgsbase.h>
 __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __UINT32_TYPE__ (__rdfsbasel)(void) { __register __UINT64_TYPE__ __result; __asm__("safe_rdfsbase %0" : "=r" (__result)); return (__UINT32_TYPE__)__result; }
 __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __UINT32_TYPE__ (__rdgsbasel)(void) { __register __UINT64_TYPE__ __result; __asm__("safe_rdgsbase %0" : "=r" (__result)); return (__UINT32_TYPE__)__result; }
 __FORCELOCAL void (__wrfsbasel)(__UINT32_TYPE__ __val) { __asm__ __volatile__("safe_wrfsbase %0" : : "r" ((__UINT64_TYPE__)__val)); }

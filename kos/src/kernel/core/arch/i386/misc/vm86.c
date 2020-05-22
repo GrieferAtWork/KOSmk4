@@ -22,9 +22,9 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/arch/vm86.h>
 #include <kernel/except.h>
 #include <kernel/types.h>
+#include <kernel/x86/vm86.h>
 
 #include <hybrid/host.h>
 

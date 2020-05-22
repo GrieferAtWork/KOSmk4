@@ -23,8 +23,8 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/arch/breakpoint.h>
 #include <kernel/types.h>
+#include <kernel/x86/breakpoint.h>
 
 #include <hybrid/host.h>
 

@@ -24,13 +24,13 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/arch/fault.h>
-#include <kernel/arch/syscall-tables.h> /* CONFIG_X86_EMULATE_LCALL7 */
 #include <kernel/except.h>
 #include <kernel/syscall-properties.h>
 #include <kernel/syscall.h>
 #include <kernel/user.h>
-#include <sched/except-handler.h> /* x86_userexcept_unwind_interrupt() */
+#include <kernel/x86/fault.h>
+#include <kernel/x86/syscall-tables.h> /* CONFIG_X86_EMULATE_LCALL7 */
+#include <sched/except-handler.h>      /* x86_userexcept_unwind_interrupt() */
 
 #include <hybrid/atomic.h>
 #include <hybrid/byteorder.h>

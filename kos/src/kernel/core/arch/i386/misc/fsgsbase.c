@@ -27,10 +27,10 @@
 #include <hybrid/host.h>
 #ifdef __x86_64__
 
-#include <kernel/arch/cpuid.h>
-#include <kernel/arch/fsgsbase.h> /* x86_fsgsbase_patch() */
 #include <kernel/panic.h>
 #include <kernel/types.h>
+#include <kernel/x86/cpuid.h>
+#include <kernel/x86/fsgsbase.h> /* x86_fsgsbase_patch() */
 
 #include <hybrid/atomic.h>
 #include <hybrid/unaligned.h>

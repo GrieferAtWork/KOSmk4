@@ -23,7 +23,7 @@
 #include <__stdinc.h>
 
 #ifdef __KERNEL__
-#include <kernel/arch/fsgsbase.h>
+#include <kernel/x86/fsgsbase.h>
 #else /* __KERNEL__ */
 #ifdef __ASSEMBLER__
 #define rdfsbaseq  rdfsbase

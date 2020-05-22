@@ -30,9 +30,9 @@
 #include <sched/pid.h>
 #include <sched/rpc.h>
 #include <sched/signal.h>
-#include <sched/smp.h>
 #include <sched/task.h>
 #include <sched/time.h>
+#include <sched/x86/smp.h>
 
 #include <hybrid/atomic.h>
 

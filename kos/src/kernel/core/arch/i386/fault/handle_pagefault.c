@@ -23,8 +23,6 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/arch/fault.h>
-#include <kernel/arch/phys2virt64.h>
 #include <kernel/arch/vm.h>
 #include <kernel/debugtrap.h>
 #include <kernel/except.h>
@@ -34,12 +32,14 @@
 #include <kernel/printk.h>
 #include <kernel/vm.h>
 #include <kernel/vm/phys.h>
+#include <kernel/x86/fault.h>
+#include <kernel/x86/phys2virt64.h>
 #include <sched/cpu.h>
 #include <sched/except-handler.h>
-#include <sched/iobm.h>
 #include <sched/pid.h>
-#include <sched/tss.h>
 #include <sched/userkern.h>
+#include <sched/x86/iobm.h>
+#include <sched/x86/tss.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>

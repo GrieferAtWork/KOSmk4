@@ -23,9 +23,9 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/arch/fault.h>
 #include <kernel/debugtrap.h>
 #include <kernel/except.h>
+#include <kernel/x86/fault.h>
 
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>

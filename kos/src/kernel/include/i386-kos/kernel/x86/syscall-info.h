@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_SYSCALL_INFO_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_SYSCALL_INFO_H 1
+#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_SYSCALL_INFO_H
+#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_SYSCALL_INFO_H 1
 
 #include <kernel/compiler.h>
 
@@ -331,4 +331,4 @@ rpc_syscall_info_get64_sysvabi_icpustate(struct rpc_syscall_info *__restrict sel
 DECL_END
 #endif /* __CC__ */
 
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_SYSCALL_INFO_H */
+#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_SYSCALL_INFO_H */

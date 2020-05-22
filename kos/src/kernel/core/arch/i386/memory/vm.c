@@ -32,7 +32,7 @@
 #include <kernel/vm/phys.h>
 #include <sched/async.h>
 #include <sched/cpu.h>
-#include <sched/tss.h>
+#include <sched/x86/tss.h>
 
 #include <hybrid/atomic.h>
 

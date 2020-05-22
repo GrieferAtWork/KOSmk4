@@ -29,9 +29,9 @@
 #include <kernel/types.h>
 #include <sched/cpu.h>
 #include <sched/cred.h>
-#include <sched/iobm.h>
 #include <sched/task.h>
-#include <sched/tss.h>
+#include <sched/x86/iobm.h>
+#include <sched/x86/tss.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>

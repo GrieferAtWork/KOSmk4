@@ -22,7 +22,7 @@
 #define SET_REGISTER 1
 #endif /* __INTELLISENSE__ */
 
-#include <kernel/arch/gdt.h>
+#include <kernel/x86/gdt.h>
 
 #include <kos/kernel/cpu-state-helpers32.h>
 #include <kos/kernel/cpu-state32.h>

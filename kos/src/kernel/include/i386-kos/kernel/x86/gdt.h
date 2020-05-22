@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_GDT_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_GDT_H 1
+#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_GDT_H
+#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_GDT_H 1
 
 #include <kernel/compiler.h>
 
@@ -190,7 +190,6 @@ LOCAL void KCALL update_user_gsbase(void) {
 
 #endif /* __CC__ */
 
-
 DECL_END
 
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_GDT_H */
+#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_GDT_H */

@@ -24,13 +24,13 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/arch/acpi.h>
 #include <kernel/memory.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
 #include <kernel/vm.h>
 #include <kernel/vm/phys.h>
+#include <kernel/x86/acpi.h>
 
 #include <hybrid/align.h>
 #include <hybrid/minmax.h>

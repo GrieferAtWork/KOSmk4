@@ -24,9 +24,6 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/arch/cpuid.h>
-#include <kernel/arch/gdt.h>
-#include <kernel/arch/multiboot.h>
 #include <kernel/boot.h>
 #include <kernel/driver-param.h>
 #include <kernel/fpu.h> /* CONFIG_FPU */
@@ -35,6 +32,9 @@
 #include <kernel/rand.h>
 #include <kernel/types.h>
 #include <kernel/vboxgdb.h>
+#include <kernel/x86/cpuid.h>
+#include <kernel/x86/gdt.h>
+#include <kernel/x86/multiboot.h>
 
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>

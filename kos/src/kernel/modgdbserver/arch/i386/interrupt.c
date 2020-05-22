@@ -23,8 +23,8 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/arch/idt.h>
 #include <kernel/isr.h>
+#include <kernel/x86/idt.h>
 
 #include <asm/intrin.h>
 #include <kos/kernel/cpu-state.h>

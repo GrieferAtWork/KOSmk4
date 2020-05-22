@@ -23,11 +23,10 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/arch/phys2virt64.h>
+#include <kernel/x86/phys2virt64.h>
 
 #ifdef CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC
 
-#include <kernel/arch/cpuid.h>
 #include <kernel/boot.h>
 #include <kernel/except.h>
 #include <kernel/memory.h>
@@ -36,6 +35,7 @@
 #include <kernel/printk.h>
 #include <kernel/vm.h>
 #include <kernel/vm/phys.h>
+#include <kernel/x86/cpuid.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>

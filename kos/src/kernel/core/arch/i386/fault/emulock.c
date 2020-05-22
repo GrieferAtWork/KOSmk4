@@ -24,10 +24,10 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/arch/emulock.h>
 #include <kernel/except.h>
 #include <kernel/types.h>
 #include <kernel/vm.h>
+#include <kernel/x86/emulock.h>
 #include <sched/cpu.h>
 #include <sched/task.h>
 

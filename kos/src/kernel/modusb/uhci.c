@@ -31,7 +31,6 @@
 #include <drivers/pci.h>
 #include <drivers/usb.h>
 #include <kernel/aio.h>
-#include <kernel/arch/pic.h> /* X86_INTERRUPT_PIC1_BASE (TODO: Non-portable) */
 #include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/heap.h>
@@ -42,6 +41,7 @@
 #include <kernel/printk.h>
 #include <kernel/vm.h>
 #include <kernel/vm/phys.h>
+#include <kernel/x86/pic.h> /* X86_INTERRUPT_PIC1_BASE (TODO: Non-portable) */
 #include <sched/async.h>
 #include <sched/cpu.h>
 

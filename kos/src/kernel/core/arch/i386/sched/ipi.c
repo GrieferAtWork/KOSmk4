@@ -23,14 +23,14 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/arch/apic.h>
-#include <kernel/arch/idt.h>
-#include <kernel/arch/pit.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
+#include <kernel/x86/apic.h>
+#include <kernel/x86/idt.h>
+#include <kernel/x86/pit.h>
 #include <sched/cpu.h>
-#include <sched/smp.h>
 #include <sched/task.h>
+#include <sched/x86/smp.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>

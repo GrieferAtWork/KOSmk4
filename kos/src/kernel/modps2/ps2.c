@@ -25,10 +25,10 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/arch/pic.h> /* TODO: Non-portable! */
 #include <kernel/driver-param.h>
 #include <kernel/isr.h>
 #include <kernel/printk.h>
+#include <kernel/x86/pic.h> /* TODO: Non-portable! */
 
 #include <hybrid/atomic.h>
 

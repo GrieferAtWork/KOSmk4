@@ -24,15 +24,15 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/arch/apic.h>
-#include <kernel/arch/pic.h>
 #include <kernel/driver-param.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
 #include <kernel/vm.h>
+#include <kernel/x86/apic.h>
+#include <kernel/x86/pic.h>
 #include <sched/cpu.h>
-#include <sched/smp.h>
 #include <sched/task.h>
+#include <sched/x86/smp.h>
 
 #include <hybrid/align.h>
 #include <hybrid/unaligned.h>

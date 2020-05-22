@@ -24,18 +24,18 @@
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
-#include <kernel/arch/apic.h>
-#include <kernel/arch/breakpoint.h>
-#include <kernel/arch/gdt.h>
 #include <kernel/arch/paging64.h>
-#include <kernel/arch/pic.h>
-#include <kernel/arch/pit.h>
-#include <kernel/arch/syscall-tables.h>
 #include <kernel/except.h>
 #include <kernel/fpu.h> /* CONFIG_FPU */
 #include <kernel/syscall.h>
+#include <kernel/x86/apic.h>
+#include <kernel/x86/breakpoint.h>
+#include <kernel/x86/gdt.h>
+#include <kernel/x86/pic.h>
+#include <kernel/x86/pit.h>
+#include <kernel/x86/syscall-tables.h>
 #include <sched/task.h>
-#include <sched/tss.h>
+#include <sched/x86/tss.h>
 
 #include <asm/cfi.h>
 #include <asm/cpu-flags.h>

@@ -32,10 +32,10 @@
 #include <sched/arch/posix-signal.h>
 #include <sched/cpu.h>
 #include <sched/cred.h>
-#include <sched/iopl.h>
 #include <sched/private.h>
 #include <sched/rpc.h>
 #include <sched/task.h>
+#include <sched/x86/iopl.h>
 
 #include <hybrid/unaligned.h>
 #include <hybrid/wordbits.h>

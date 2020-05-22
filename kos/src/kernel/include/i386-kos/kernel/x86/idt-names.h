@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_IDT_NAMES_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_IDT_NAMES_H 1
+#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_IDT_NAMES_H
+#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_IDT_NAMES_H 1
 
 /* X86 IDT symbol assembly function names
  * These names are prefixed by either `x86_(idt|idtdpl|idtist)_' or `x86_dbg(idt|idtdpl|idtist)_'
@@ -315,4 +315,4 @@
 #define IDT_X86_fe specific_0dh
 #define IDT_X86_ff specific_0eh
 
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_IDT_NAMES_H */
+#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_IDT_NAMES_H */

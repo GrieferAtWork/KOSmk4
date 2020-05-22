@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_FPU_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_FPU_H 1
+#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_FPU_H
+#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_FPU_H 1
 
 #include <kernel/compiler.h>
 
@@ -98,4 +98,4 @@ DECL_END
 #endif /* CONFIG_FPU */
 
 
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_FPU_H */
+#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_FPU_H */

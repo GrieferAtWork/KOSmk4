@@ -38,7 +38,7 @@
 #include "gdb.h"
 
 #if defined(__i386__) || defined(__x86_64__)
-#include <kernel/arch/cpuid.h>
+#include <kernel/x86/cpuid.h>
 #endif /* __i386__ || __x86_64__ */
 
 DECL_BEGIN

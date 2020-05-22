@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_MULTIBOOT_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_MULTIBOOT_H 1
+#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_MULTIBOOT_H
+#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_MULTIBOOT_H 1
 
 #include <kernel/compiler.h>
 #include <kernel/types.h>
@@ -555,4 +555,4 @@ struct mb2_tag_load_base_addr {
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_MULTIBOOT_H */
+#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_MULTIBOOT_H */

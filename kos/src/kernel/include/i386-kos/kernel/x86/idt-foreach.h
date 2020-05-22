@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_IDT_FOREACH_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_IDT_FOREACH_H 1
+#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_IDT_FOREACH_H
+#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_IDT_FOREACH_H 1
 
 /* Invoke `callback()' with `00, 01, 02, ..., 0a, 0b, ..., ff' */
 /*[[[deemon
@@ -77,4 +77,4 @@ for (local x: [:16]) {
 	callback(f8) callback(f9) callback(fa) callback(fb) callback(fc) callback(fd) callback(fe) callback(ff)
 /*[[[end]]]*/
 
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_IDT_FOREACH_H */
+#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_IDT_FOREACH_H */

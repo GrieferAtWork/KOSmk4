@@ -24,14 +24,14 @@
 #include <kernel/compiler.h>
 
 #include <debugger/rt.h>
-#include <kernel/arch/idt-foreach.h>
-#include <kernel/arch/idt.h>
-#include <kernel/arch/pic.h>
 #include <kernel/except.h>
 #include <kernel/isr.h>
 #include <kernel/malloc.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
+#include <kernel/x86/idt-foreach.h>
+#include <kernel/x86/idt.h>
+#include <kernel/x86/pic.h>
 #include <sched/cpu.h>
 #include <sched/shared_rwlock.h>
 #include <sched/task.h>

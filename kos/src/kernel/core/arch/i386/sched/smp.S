@@ -24,12 +24,12 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/arch/apic.h>
-#include <kernel/arch/breakpoint.h>
-#include <kernel/arch/cpuid.h>
-#include <kernel/arch/idt.h> /* X86_INTERRUPT_APIC_SPURIOUS */
-#include <kernel/arch/pic.h> /* X86_INTNO_PIC1_PIT */
-#include <kernel/fpu.h>      /* CONFIG_FPU */
+#include <kernel/fpu.h> /* CONFIG_FPU */
+#include <kernel/x86/apic.h>
+#include <kernel/x86/breakpoint.h> /* reload_x86_debug_registers */
+#include <kernel/x86/cpuid.h>
+#include <kernel/x86/idt.h> /* X86_INTERRUPT_APIC_SPURIOUS */
+#include <kernel/x86/pic.h> /* X86_INTNO_PIC1_PIT */
 #include <sched/cpu.h>
 
 #include <hybrid/host.h>

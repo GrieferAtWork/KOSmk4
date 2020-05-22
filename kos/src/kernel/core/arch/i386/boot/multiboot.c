@@ -24,7 +24,6 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/arch/multiboot.h>
 #include <kernel/boot.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
@@ -34,6 +33,7 @@
 #include <kernel/types.h>
 #include <kernel/vm.h>
 #include <kernel/vm/phys.h>
+#include <kernel/x86/multiboot.h>
 
 #include <hybrid/align.h>
 

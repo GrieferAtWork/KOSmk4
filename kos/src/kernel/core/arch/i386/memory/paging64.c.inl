@@ -29,7 +29,6 @@
 #include <debugger/hook.h>
 #include <debugger/io.h>
 #include <debugger/rt.h>
-#include <kernel/arch/cpuid.h>
 #include <kernel/arch/paging64.h>
 #include <kernel/except.h>
 #include <kernel/memory.h>
@@ -38,8 +37,9 @@
 #include <kernel/printk.h>
 #include <kernel/vm.h>
 #include <kernel/vm/phys.h>
+#include <kernel/x86/cpuid.h>
 #include <sched/cpu.h>
-#include <sched/tss.h>
+#include <sched/x86/tss.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>

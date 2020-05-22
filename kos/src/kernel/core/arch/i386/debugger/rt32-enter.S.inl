@@ -24,7 +24,7 @@
 
 #include <debugger/entry.h>
 #include <debugger/rt.h>
-#include <kernel/arch/apic.h>
+#include <kernel/x86/apic.h>
 
 #include <asm/cfi.h>
 #include <asm/cpu-flags.h>

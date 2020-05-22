@@ -25,11 +25,11 @@
 
 #include <fs/node.h>
 #include <fs/vfs.h>
-#include <kernel/arch/gdt.h>
 #include <kernel/except.h>
 #include <kernel/exec.h>
 #include <kernel/types.h>
 #include <kernel/vm.h>
+#include <kernel/x86/gdt.h>
 #include <sched/arch/posix-signal.h>
 
 #include <hybrid/host.h>

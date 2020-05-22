@@ -25,10 +25,7 @@
 
 #include <debugger/hook.h>
 #include <debugger/io.h>
-#include <kernel/arch/cpuid.h>
-#include <kernel/arch/idt.h>
 #include <kernel/arch/isr.h>
-#include <kernel/arch/syscall-tables.h>
 #include <kernel/coredump.h>
 #include <kernel/debugtrap.h>
 #include <kernel/except.h>
@@ -41,6 +38,9 @@
 #include <kernel/user.h>
 #include <kernel/vm.h>
 #include <kernel/vm/phys.h>
+#include <kernel/x86/cpuid.h>
+#include <kernel/x86/idt.h>
+#include <kernel/x86/syscall-tables.h>
 #include <sched/cpu.h>
 #include <sched/except-handler.h>
 #include <sched/mutex.h>
@@ -48,7 +48,7 @@
 #include <sched/posix-signal.h>
 #include <sched/rpc.h>
 #include <sched/task.h>
-#include <sched/tss.h>
+#include <sched/x86/tss.h>
 
 #include <hybrid/atomic.h>
 #include <hybrid/host.h>

@@ -29,7 +29,7 @@
 #include <kernel/paging.h>
 #include <kernel/vm.h>
 #include <sched/cpu.h>
-#include <sched/tss.h>
+#include <sched/x86/tss.h>
 
 #include <asm/cpu-cpuid.h>
 #include <asm/cpu-flags.h>

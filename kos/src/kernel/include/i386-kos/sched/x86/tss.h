@@ -17,12 +17,15 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_SCHED_TSS_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_SCHED_TSS_H 1
+#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_SCHED_X86_TSS_H
+#define GUARD_KERNEL_INCLUDE_I386_KOS_SCHED_X86_TSS_H 1
 
 #include <kernel/compiler.h>
+
 #include <kernel/types.h>
+
 #include <hybrid/host.h>
+
 #include <kos/kernel/tss.h>
 
 DECL_BEGIN
@@ -141,4 +144,4 @@ DATDEF ATTR_PERCPU struct tss thiscpu_x86_tssdf;
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_SCHED_TSS_H */
+#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_SCHED_X86_TSS_H */

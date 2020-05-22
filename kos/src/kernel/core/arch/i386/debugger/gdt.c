@@ -33,7 +33,7 @@ if (gcc_opt.remove("-O3"))
 
 #ifdef CONFIG_HAVE_DEBUGGER
 #include <debugger/hook.h>
-#include <kernel/arch/gdt.h>
+#include <kernel/x86/gdt.h>
 
 #include <kos/kernel/cpu-state.h>
 

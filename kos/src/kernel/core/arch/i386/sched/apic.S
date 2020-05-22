@@ -23,9 +23,9 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/arch/apic.h>
-#include <kernel/arch/pic.h>
-#include <kernel/arch/pit.h>
+#include <kernel/x86/apic.h>
+#include <kernel/x86/pic.h>
+#include <kernel/x86/pit.h>
 
 #include <hybrid/host.h>
 

@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_PIC_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_PIC_H 1
+#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_PIC_H
+#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_PIC_H 1
 
 #include <kernel/compiler.h>
 
@@ -100,4 +100,4 @@ DATDEF ATTR_PERCPU struct x86_spurious_interrupts thiscpu_x86_spurious_interrupt
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_PIC_H */
+#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_PIC_H */

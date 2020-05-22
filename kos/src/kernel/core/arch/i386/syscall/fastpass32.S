@@ -23,8 +23,8 @@
 
 #include <hybrid/compiler.h>
 
-#include <kernel/arch/syscall-tables.h>
 #include <kernel/syscall.h>
+#include <kernel/x86/syscall-tables.h>
 
 #include <asm/cfi.h>
 #include <asm/cpu-flags.h>

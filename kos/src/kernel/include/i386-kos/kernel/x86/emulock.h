@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_EMULOCK_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_EMULOCK_H 1
+#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_EMULOCK_H
+#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_EMULOCK_H 1
 
 #include <kernel/compiler.h>
 #include <kernel/types.h>
@@ -100,7 +100,6 @@ x86_emulock_cmpxchx(struct icpustate **__restrict pstate,
 
 #endif /* __CC__ */
 
-
 DECL_END
 
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_EMULOCK_H */
+#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_EMULOCK_H */

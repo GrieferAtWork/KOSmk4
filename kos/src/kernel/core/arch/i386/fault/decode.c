@@ -25,11 +25,11 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/arch/gdt.h>
 #include <kernel/except.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
+#include <kernel/x86/gdt.h>
 #include <sched/task.h>
 
 #include <asm/cpu-flags.h>

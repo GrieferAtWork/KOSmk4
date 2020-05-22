@@ -23,9 +23,9 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/arch/gdt.h>
-#include <kernel/arch/syscall-tables.h> /* CONFIG_X86_EMULATE_LCALL7 */
 #include <kernel/vm.h>
+#include <kernel/x86/gdt.h>
+#include <kernel/x86/syscall-tables.h> /* CONFIG_X86_EMULATE_LCALL7 */
 #include <sched/pertask.h>
 #include <sched/task.h>
 

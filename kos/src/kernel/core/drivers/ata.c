@@ -26,7 +26,6 @@
 #include <drivers/ata.h>
 #include <drivers/pci.h>
 #include <kernel/aio.h>
-#include <kernel/arch/pic.h> /* TODO: Non-portable! */
 #include <kernel/compat.h>
 #include <kernel/driver-param.h>
 #include <kernel/except.h>
@@ -37,6 +36,7 @@
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <kernel/vm.h>
+#include <kernel/x86/pic.h> /* TODO: Non-portable! */
 #include <sched/cpu.h>
 
 #include <hybrid/align.h>

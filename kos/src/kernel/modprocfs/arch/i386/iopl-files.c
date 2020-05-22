@@ -27,8 +27,8 @@
 #include <kernel/except.h>
 #include <sched/arch/posix-signal.h>
 #include <sched/cred.h>
-#include <sched/iopl.h>
 #include <sched/pid.h>
+#include <sched/x86/iopl.h>
 
 #include <hybrid/atomic.h>
 

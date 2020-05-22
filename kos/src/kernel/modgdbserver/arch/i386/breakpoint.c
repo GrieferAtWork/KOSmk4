@@ -22,9 +22,9 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/arch/breakpoint.h>
 #include <kernel/except.h>
 #include <kernel/vm.h>
+#include <kernel/x86/breakpoint.h>
 
 #include <hybrid/atomic.h>
 

@@ -36,9 +36,9 @@ if (gcc_opt.remove("-O3"))
 #include <debugger/hook.h>
 #include <debugger/io.h>
 #include <debugger/rt.h>
-#include <kernel/arch/pic.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
+#include <kernel/x86/pic.h>
 
 #include <asm/intrin.h>
 #include <hw/hid/ps2.h>

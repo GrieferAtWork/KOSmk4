@@ -22,12 +22,12 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/arch/pic.h> /* TODO: Non-portable! */
-#include <kernel/except.h>   /* THROW() */
-#include <kernel/types.h>    /* jtime_t */
-#include <sched/cpu.h>       /* jiffies */
-#include <sched/signal.h>    /* struct sig */
-#include <sched/task.h>      /* task_tryyield_or_pause */
+#include <kernel/except.h>  /* THROW() */
+#include <kernel/types.h>   /* jtime_t */
+#include <kernel/x86/pic.h> /* TODO: Non-portable! */
+#include <sched/cpu.h>      /* jiffies */
+#include <sched/signal.h>   /* struct sig */
+#include <sched/task.h>     /* task_tryyield_or_pause */
 
 #include <hw/hid/ps2.h>    /* PS2_* */
 #include <kos/except/io.h> /* E_IOERROR_SUBSYSTEM_* */

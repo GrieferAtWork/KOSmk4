@@ -22,8 +22,8 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/arch/cpuid.h>
 #include <kernel/printk.h>
+#include <kernel/x86/cpuid.h>
 #include <sched/task.h>
 
 #include <sys/io.h>

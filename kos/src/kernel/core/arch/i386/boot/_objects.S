@@ -22,8 +22,8 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/arch/cpuid.h>
 #include <kernel/paging.h>
+#include <kernel/x86/cpuid.h>
 
 #include <kos/kernel/gdt.h>
 #include <kos/kernel/tss.h>

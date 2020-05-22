@@ -22,8 +22,9 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/x86/cpuid.h>
+
 #include <hybrid/host.h>
-#include <kernel/arch/cpuid.h>
 
 #include <stddef.h>
 

@@ -106,7 +106,8 @@
 #include "paging32-pae.h"
 /**/
 
-#include <kernel/arch/cpuid.h>  /* x86_bootcpu_cpuid */
+#include <kernel/x86/cpuid.h> /* x86_bootcpu_cpuid */
+
 #include <asm/cpu-cpuid.h> /* CPUID_1D_PAE */
 
 #undef ARCH_PAGEDIR_INIT_NEED_PHYS_SELF

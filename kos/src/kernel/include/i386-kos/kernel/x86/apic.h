@@ -17,38 +17,34 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_SCHED_IOPL_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_SCHED_IOPL_H 1
+#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_APIC_H
+#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_APIC_H 1
 
 #include <kernel/compiler.h>
 
-#include <kernel/types.h>
+#include <bits/types.h>
+#include <hw/ic/apic.h>
+#include <sys/mmio.h>
 
 DECL_BEGIN
 
 #ifdef __CC__
+/* [const] Virtual base addresses of the local (per-cpu) APIC.
+ * HINT: APIC stands for Advanced Programmable Interrupt Controller. */
+DATDEF VIRT volatile __byte_t *const x86_lapicbase;
+#define X86_HAVE_LAPIC             (x86_lapicbase != __NULLPTR)
+#define lapic_read(offset)         peekl(x86_lapicbase + (offset))
+#define lapic_write(offset, value) pokel(x86_lapicbase + (offset), value)
 
-/* When true, iopl() is kept after fork() (w/o CLONE_THREAD) */
-DATDEF bool x86_iopl_keep_after_fork;
+/* [valid_if(X86_HAVE_LAPIC)] The LAPIC ID of the controller associated with the CPU. */
+DATDEF ATTR_PERCPU __u8 const thiscpu_x86_lapicid;
 
-/* When true, iopl() is kept after clone() (w/ CLONE_THREAD) */
-DATDEF bool x86_iopl_keep_after_clone;
-
-struct task;
-
-/* Get/Set the iopl() value of the given thread.
- * @return: * : All functions return the iopl() active prior to the call being made. */
-FUNDEF unsigned int KCALL
-x86_getiopl(struct task *__restrict thread)
-		THROWS(E_WOULDBLOCK);
-FUNDEF unsigned int KCALL
-x86_setiopl(struct task *__restrict thread,
-            unsigned int new_iopl,
-            bool check_creds DFL(true))
-		THROWS(E_WOULDBLOCK, E_INSUFFICIENT_RIGHTS);
+/* [valid_if(X86_HAVE_LAPIC)] The LAPIC version of the controller associated with the CPU.
+ *                            This is one of `APICVER_*' from `<sched/smp.h>' */
+DATDEF ATTR_PERCPU __u8 const thiscpu_x86_lapicversion;
 
 #endif /* __CC__ */
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_SCHED_IOPL_H */
+#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_APIC_H */

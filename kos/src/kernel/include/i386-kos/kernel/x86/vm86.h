@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_VM86_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_VM86_H 1
+#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_VM86_H
+#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_VM86_H 1
 
 #include <kernel/compiler.h>
 #include <kernel/types.h>
@@ -46,4 +46,4 @@ FUNDEF void KCALL x86_vm86_outl(struct icpustate *__restrict state, u16 port, u3
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_VM86_H */
+#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_VM86_H */

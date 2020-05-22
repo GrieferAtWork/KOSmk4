@@ -23,7 +23,6 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/arch/cpuid.h>
 #include <kernel/driver-param.h>
 #include <kernel/except.h>
 #include <kernel/fpu.h>
@@ -31,6 +30,7 @@
 #include <kernel/malloc.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
+#include <kernel/x86/cpuid.h>
 #include <sched/pid.h>
 #include <sched/task.h>
 

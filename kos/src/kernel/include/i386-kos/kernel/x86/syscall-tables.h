@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_SYSCALL_TABLES_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_SYSCALL_TABLES_H 1
+#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_SYSCALL_TABLES_H
+#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_SYSCALL_TABLES_H 1
 
 #include <kernel/compiler.h>
 
@@ -252,4 +252,4 @@ FUNDEF void ASMCALL x86_syscall64_syscall_traced(void);
 DECL_END
 #endif /* __CC__ */
 
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_SYSCALL_TABLES_H */
+#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_SYSCALL_TABLES_H */
