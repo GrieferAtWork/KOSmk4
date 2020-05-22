@@ -339,11 +339,17 @@ INTDEF u16 x86_fpustate_init_ftw_value;
 
 #define ENCODE32(x) (x) & 0xff, ((x) & 0xff00) >> 8, ((x) & 0xff0000) >> 16, ((x) & 0xff000000) >> 24
 PRIVATE ATTR_FREERODATA byte_t const savexmm_nosse[] = {
+#ifdef __x86_64__
+	0x48, 0x8d, 0xbf, ENCODE32(OFFSET_XFPUSTATE_XMM(0)), /* leaq   OFFSET_XFPUSTATE_XMM(0)(%rdi), %rdi */
+	0x48, 0xc7, 0xc1, ENCODE32(8 * (16 / 4)),            /* movq   $(8 * (16 / 8)), %rcx               */
+	0xf3, 0x48, 0xab,                                    /* rep    stosq                               */
+#else /* __x86_64__ */
 	0x8d, 0xb9, ENCODE32(OFFSET_XFPUSTATE_XMM(0)), /* leal   OFFSET_XFPUSTATE_XMM(0)(%ecx), %edi */
 	0xb9,       ENCODE32(8 * (16 / 4)),            /* movl   $(8 * (16 / 4)), %ecx               */
 	0xf3, 0xab,                                    /* rep    stosl                               */
 	0x5e,                                          /* pop    %esi                                */
 	0x5f,                                          /* pop    %edi                                */
+#endif /* !__x86_64__ */
 	0xc3                                           /* ret                                        */
 };
 

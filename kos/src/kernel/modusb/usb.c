@@ -175,6 +175,7 @@ usb_probe_builtin_interfaces(struct usb_controller *__restrict self,
                              size_t endpc, struct usb_endpoint *const endpv[]) {
 	if (usb_hub_probe(self, intf, endpc, endpv))
 		goto ok;
+	/* Other builtin interfaces would go here... */
 	return false;
 ok:
 	return true;
@@ -968,7 +969,7 @@ usb_device_discovered(struct usb_controller *__restrict self,
 			if likely(transfer_size >= offsetafter(struct usb_device_descriptor, ud_maxpacketsize) &&
 			          desc.ud_type == (USB_REQUEST_GET_DESCRIPTOR_VALUE_DEVICE & 0xff00) >> 8)
 				dev->ue_maxpck = desc.ud_maxpacketsize;
-		
+
 			/* Assign an address to the device. */
 			usb_controller_assign_device_address(self, dev);
 		
@@ -1119,7 +1120,7 @@ strange_device_without_configs:
 			probes = probe_device.get();
 			FINALLY_DECREF_UNLIKELY(probes);
 			/* Pass the device as a whole to loaded drivers and see if they can
-			 * identify that's the deal with it, and select the configuration
+			 * identify what's the deal with it, and select the configuration
 			 * for us. */
 			for (i = 0; i < probes->upv_count; ++i) {
 #ifndef NDEBUG
@@ -1133,7 +1134,7 @@ strange_device_without_configs:
 							goto did_find_correct_config;
 					}
 					__assertion_failedf("dev->ud_config in dev->ud_configv",
-					                    "Devie config %p is not a valid configuration",
+					                    "Device config %p is not a valid configuration",
 					                    dev->ud_config);
 did_find_correct_config:
 #endif /* !NDEBUG */
@@ -1182,8 +1183,8 @@ did_find_correct_config:
 		bool has_alternates = false;
 		config = dev->ud_config->uc_config;
 again_scanconfig:
-		iter   = (byte_t *)config + config->uc_size;
-		end    = (byte_t *)config + config->uc_total_len;
+		iter = (byte_t *)config + config->uc_size;
+		end  = (byte_t *)config + config->uc_total_len;
 		while (iter + 2 < end) {
 			u8 size, type;
 			size = iter[0];
@@ -1316,7 +1317,8 @@ search_for_next_intf:
 		/* If we didn't manage to find any interface, then just consider
 		 * this to be a strange device altogether.
 		 * Note that this has nothing to do with us not finding a driver
-		 * for the endpoint, but just not being able to  */
+		 * for the endpoint, but just not being able to figure out what's
+		 * the deal with the thing. */
 		if unlikely(!interface_count) {
 			printk(KERN_WARNING "[usb] Device %q:%q:%q doesn't seem to have any interfaces when configured for %q\n",
 			       dev->ud_str_vendor, dev->ud_str_product, dev->ud_str_serial,

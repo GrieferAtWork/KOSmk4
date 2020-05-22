@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_SYSCALL_SYSCALL_INT80H_32_S
 #define GUARD_KERNEL_CORE_ARCH_I386_SYSCALL_SYSCALL_INT80H_32_S 1
+#define __ASSEMBLER__ 1
 
 #include <hybrid/compiler.h>
 
@@ -220,7 +221,7 @@ INTERN_FUNCTION(__x86_asm32_int80_break)
 	/* Check IRET.EFLAGS.CF if an exception should be thrown */
 	testl  $(EFLAGS_CF), %ss:OFFSET_IRREGS_EFLAGS(%esp)
 	jnz    1f
-	movl   $-ENOSYS, %eax
+	movl   $(-ENOSYS), %eax
 	iret
 1:
 	pushl_cfi %ds
