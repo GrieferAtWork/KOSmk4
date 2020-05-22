@@ -97,6 +97,11 @@
 #define lgdtP        lgdtq
 #define sgdtP        sgdtq
 #define xchgP        xchgq
+#define stosP        stosq
+#define lodsP        lodsq
+#define cmpsP        cmpsq
+#define movsP        movsq
+#define scasP        scasq
 
 #ifdef __KERNEL__
 #define segtls gs /* THIS_TASK */
@@ -172,6 +177,11 @@
 #define lgdtP        lgdtl
 #define sgdtP        sgdtl
 #define xchgP        xchgl
+#define stosP        stosl
+#define lodsP        lodsl
+#define cmpsP        cmpsl
+#define movsP        movsl
+#define scasP        scasl
 
 #ifdef __KERNEL__
 #define segtls fs /* THIS_TASK: SEGMENT_KERNEL_FSBASE */

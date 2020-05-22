@@ -1059,6 +1059,31 @@ NOTHROW(FCALL cpu_add_quantum_offset)(struct cpu *__restrict me,
 	COMPILER_BARRIER();
 }
 
+/* Check for quantum roll-over, and increment jiffies if a roll-over occurred. */
+PRIVATE NOBLOCK NOPREEMPT NONNULL((1)) void
+NOTHROW(FCALL cpu_check_quantum_rollover)(struct cpu *__restrict me,
+                                          quantum_diff_t elapsed) {
+	/* Deal with quantum roll-over */
+	if (elapsed < FORCPU(me, thiscpu_last_qtime_q) &&
+		FORCPU(me, thiscpu_jiffies) == FORCPU(me, thiscpu_last_qtime_j)) {
+		jtime_t cpu_jtime;
+		FORCPU(me, thiscpu_jiffi_pending) = true;
+		cpu_jtime = ++FORCPU(me, thiscpu_jiffies);
+		if ((cpu_jtime % CPU_RESYNC_DELAY_IN_TICKS) == 0) {
+			/* Can't call `cpu_resync_realtime_chk_at()', because
+			 * the current realtime is inconsistent until we've
+			 * cleared the last-quantum cache fields below.
+			 * Additionally, there's no need to use the chk-variant,
+			 * since we do our own realtime-consistency assertion! */
+			cpu_resync_realtime_at(me,
+			                       cpu_jtime,
+			                       elapsed,
+			                       false);
+		}
+	}
+
+}
+
 
 /* Prematurely end the current quantum, accounting its elapsed
  * time to `prev', and starting a new quantum such that the
@@ -1081,6 +1106,9 @@ NOTHROW(FCALL cpu_quantum_end_nopr)(struct task *__restrict prev,
 	/* Atomically (or near atomically) figure out how much
 	 * time has already elapsed, and reset the quantum. */
 	elapsed = arch_cpu_quantum_elapsed_and_reset_nopr(me);
+
+	/* Deal with quantum roll-over */
+	cpu_check_quantum_rollover(me, elapsed);
 
 	/* Reset the last-quantum cache to prevent an incorrect overrun
 	 * from being detected when the quantum-elapsed counter was in
@@ -1144,23 +1172,7 @@ NOTHROW(KCALL cpu_disable_preemptive_interrupts_nopr)(void) {
 	arch_cpu_disable_preemptive_interrupts_nopr(me);
 
 	/* Deal with quantum roll-over */
-	if (elapsed < FORCPU(me, thiscpu_last_qtime_q) &&
-		FORCPU(me, thiscpu_jiffies) == FORCPU(me, thiscpu_last_qtime_j)) {
-		jtime_t cpu_jtime;
-		FORCPU(me, thiscpu_jiffi_pending) = true;
-		cpu_jtime = ++FORCPU(me, thiscpu_jiffies);
-		if ((cpu_jtime % CPU_RESYNC_DELAY_IN_TICKS) == 0) {
-			/* Can't call `cpu_resync_realtime_chk_at()', because
-			 * the current realtime is inconsistent until we've
-			 * cleared the last-quantum cache fields below.
-			 * Additionally, there's no need to use the chk-variant,
-			 * since we do our own realtime-consistency assertion! */
-			cpu_resync_realtime_at(me,
-			                       cpu_jtime,
-			                       elapsed,
-			                       false);
-		}
-	}
+	cpu_check_quantum_rollover(me, elapsed);
 
 	/* When preemptive interrupts are disabled, `arch_cpu_quantum_elapsed_nopr()'
 	 * will always return 0. - Reset the last-quantum cache to prevent an incorrect
