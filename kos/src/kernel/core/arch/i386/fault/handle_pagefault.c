@@ -33,6 +33,7 @@
 #include <kernel/vm.h>
 #include <kernel/vm/phys.h>
 #include <kernel/x86/fault.h>
+#include <kernel/x86/idt.h> /* IDT_CONFIG_ISTRAP() */
 #include <kernel/x86/phys2virt64.h>
 #include <sched/cpu.h>
 #include <sched/except-handler.h>
@@ -309,6 +310,7 @@ nope:
 
 INTERN struct icpustate *FCALL
 x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
+	STATIC_ASSERT(!IDT_CONFIG_ISTRAP(0x0e)); /* #PF  Page Fault */
 #if (X86_PAGEFAULT_ECODE_USERSPACE == E_SEGFAULT_CONTEXT_USERCODE && \
      X86_PAGEFAULT_ECODE_WRITING == E_SEGFAULT_CONTEXT_WRITING)
 #define GET_PF_CONTEXT_UW_BITS() (uintptr_t)(ecode & (X86_PAGEFAULT_ECODE_USERSPACE | X86_PAGEFAULT_ECODE_WRITING))

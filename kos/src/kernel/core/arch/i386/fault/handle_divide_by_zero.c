@@ -25,7 +25,8 @@
 
 #include <kernel/except.h>
 #include <kernel/types.h>
-#include <kernel/x86/fault.h>
+#include <kernel/x86/fault.h> /* x86_handle_divide_by_zero() */
+#include <kernel/x86/idt.h>   /* IDT_CONFIG_ISTRAP() */
 #include <sched/except-handler.h>
 
 #include <kos/kernel/cpu-state-helpers.h>
@@ -37,6 +38,7 @@ DECL_BEGIN
 
 INTERN struct icpustate *FCALL
 x86_handle_divide_by_zero(struct icpustate *__restrict state) {
+	STATIC_ASSERT(IDT_CONFIG_ISTRAP(0x00)); /* #DE  Divide by zero */
 	byte_t *pc, *next_pc;
 	unsigned int i;
 	PERTASK_SET(this_exception_code,

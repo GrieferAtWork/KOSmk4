@@ -76,7 +76,9 @@ opt.append("-Os");
 #include <kernel/user.h>
 #include <kernel/x86/cpuid.h>
 #include <kernel/x86/emulock.h>
+#include <kernel/x86/fault.h> /* x86_handle_stackfault(), x86_handle_gpf(), x86_handle_illegal_instruction() */
 #include <kernel/x86/gdt.h>
+#include <kernel/x86/idt.h> /* IDT_CONFIG_ISTRAP */
 #include <sched/cpu.h>
 #include <sched/except-handler.h>
 #include <sched/pid.h>
@@ -1688,16 +1690,19 @@ DECL_BEGIN
 
 INTERN struct icpustate *FCALL
 x86_handle_stackfault(struct icpustate *__restrict state, uintptr_t ecode) {
+	STATIC_ASSERT(IDT_CONFIG_ISTRAP(0x0c)); /* #SS  Stack segment fault. */
 	return x86_handle_bad_usage(state, BAD_USAGE_REASON_SS | (ecode & 0xffff));
 }
 
 INTERN struct icpustate *FCALL
 x86_handle_gpf(struct icpustate *__restrict state, uintptr_t ecode) {
+	STATIC_ASSERT(IDT_CONFIG_ISTRAP(0x0d)); /* #GP  General Protection Fault. */
 	return x86_handle_bad_usage(state, BAD_USAGE_REASON_GFP | (ecode & 0xffff));
 }
 
 INTERN struct icpustate *FCALL
 x86_handle_illegal_instruction(struct icpustate *__restrict state) {
+	STATIC_ASSERT(IDT_CONFIG_ISTRAP(0x06)); /* #UD  Illegal Instruction */
 	return x86_handle_bad_usage(state, BAD_USAGE_REASON_UD);
 }
 

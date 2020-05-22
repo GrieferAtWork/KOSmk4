@@ -25,7 +25,8 @@
 
 #include <kernel/debugtrap.h>
 #include <kernel/except.h>
-#include <kernel/x86/fault.h>
+#include <kernel/x86/fault.h> /* x86_handle_ms_fastfail() */
+#include <kernel/x86/idt.h>   /* IDT_CONFIG_ISTRAP() */
 
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
@@ -41,6 +42,7 @@ DECL_BEGIN
  * It doesn't get much simpler than this... */
 INTERN struct icpustate *FCALL
 x86_handle_ms_fastfail(struct icpustate *__restrict state) {
+	STATIC_ASSERT(IDT_CONFIG_ISTRAP(0x29)); /* ms_fastfail */
 	enum { SIGNO = SIGABRT };
 	if (kernel_debugtrap_enabled())
 		kernel_debugtrap(state, SIGNO);

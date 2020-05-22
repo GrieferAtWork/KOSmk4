@@ -24,6 +24,7 @@
 #include <hybrid/compiler.h>
 
 #include <kernel/x86/idt-names.h>
+#include <kernel/x86/idt.h> /* IDT_CONFIG_ISTRAP() */
 
 #include <hybrid/host.h>
 
@@ -83,6 +84,10 @@
 
 #define INTR(id) DEFINE_INTRGATE(id, SEGMENT_DESCRIPTOR_TYPE_INTRGATE)
 #define TRAP(id) DEFINE_INTRGATE(id, SEGMENT_DESCRIPTOR_TYPE_TRAPGATE)
+#define GATE(id)                                           \
+	DEFINE_INTRGATE(id, IDT_CONFIG_ISTRAP(id)              \
+	                    ? SEGMENT_DESCRIPTOR_TYPE_TRAPGATE \
+	                    : SEGMENT_DESCRIPTOR_TYPE_INTRGATE)
 
 #ifdef __x86_64__
 /* Can't safely make use of traps on x86_64, since only entry to any
@@ -91,69 +96,78 @@
  * work properly if another interrupt could happen before then, making
  * us think that `swapgs' was already invoked when it actually wasn't */
 #undef TRAP
+#undef GATE
 #define TRAP(id) DEFINE_INTRGATE(id, SEGMENT_DESCRIPTOR_TYPE_INTRGATE)
+#define GATE(id) DEFINE_INTRGATE(id, SEGMENT_DESCRIPTOR_TYPE_INTRGATE)
 #endif /* __x86_64__ */
 
 
-/* TRAP: Leave EFLAGS.IF unchanged */
-/* INTR: Clear EFLAGS.IF to disable preemption. */
+/* TRAP: Leave EFLAGS.IF unchanged
+ * INTR: Clear EFLAGS.IF to disable preemption.
+ * GATE: Either TRAP() or INTR(), based on `IDT_CONFIG_ISTRAP()' */
 
-TRAP(00) /* #DE -- Divide by zero */
-INTR(01) /* #DB -- Debug */
-INTR(02) /* NMI -- Non-maskable Interrupt */
-INTR(03) /* #BP -- Breakpoint */
-TRAP(04) /* #OF -- Overflow */
-TRAP(05) /* #BR -- Bound Range */
-INTR(06) /* #UD -- Illegal Instruction */
-INTR(07) /* #NM -- Device not available. */
+GATE(00) /* #DE -- Divide by zero */
+GATE(01) /* #DB -- Debug */
+GATE(02) /* NMI -- Non-maskable Interrupt */
+GATE(03) /* #BP -- Breakpoint */
+GATE(04) /* #OF -- Overflow */
+GATE(05) /* #BR -- Bound Range */
+GATE(06) /* #UD -- Illegal Instruction */
+GATE(07) /* #NM -- Device not available. */
 
 #ifdef __x86_64__
-INTR(08) /* #DF -- Double Fault. */
+GATE(08) /* #DF -- Double Fault. */
 #else /* __x86_64__ */
 /* Special handling for #DF (implemented using a task gate on i386) */
 PROVIDE_DPL(08)
 DEFINE(08, TASKGATE, (SEGMENT_CPU_TSS_DF, SYMBOL(idtdpl_, 08), 1))
 #endif /* !__x86_64__ */
 
-INTR(09)
-INTR(0a) /* #TS -- Invalid TSS. */
-INTR(0b) /* #NP -- Segment not present. */
-INTR(0c) /* #SS -- Stack segment fault. */
-INTR(0d) /* #GP -- General Protection Fault. */
-INTR(0e) /* #PF -- Page Fault. */
-INTR(0f)
-INTR(10)
-INTR(11)
-INTR(12)
-INTR(13)
-INTR(14)
-INTR(15)
-INTR(16)
-INTR(17)
-INTR(18)
-INTR(19)
-INTR(1a)
-INTR(1b)
-INTR(1c)
-INTR(1d)
-INTR(1e)
-INTR(1f)
-INTR(20)
-INTR(21)
-INTR(22)
-INTR(23)
-INTR(24)
-INTR(25)
-INTR(26)
-INTR(27)
-INTR(28)
-INTR(29)
-INTR(2a)
-INTR(2b)
-INTR(2c)
-INTR(2d)
-INTR(2e)
-INTR(2f)
+GATE(09)
+GATE(0a) /* #TS -- Invalid TSS. */
+GATE(0b) /* #NP -- Segment not present. */
+GATE(0c) /* #SS -- Stack segment fault. */
+GATE(0d) /* #GP -- General Protection Fault. */
+GATE(0e) /* #PF -- Page Fault. */
+GATE(0f)
+GATE(10)
+GATE(11)
+GATE(12)
+GATE(13)
+GATE(14)
+GATE(15)
+GATE(16)
+GATE(17)
+GATE(18)
+GATE(19)
+GATE(1a)
+GATE(1b)
+GATE(1c)
+GATE(1d)
+GATE(1e)
+GATE(1f)
+
+/* MS Service interrupts. */
+GATE(20)
+GATE(21)
+GATE(22)
+GATE(23)
+GATE(24)
+GATE(25)
+GATE(26)
+GATE(27)
+GATE(28)
+GATE(29) /* ms_fastfail */
+GATE(2a)
+GATE(2b)
+GATE(2c)
+GATE(2d)
+GATE(2e)
+GATE(2f)
+
+/* Non-exception/service vectors.
+ * All of these are configured as interrupts, with the
+ * exception of 80h (which is the syscall vector) */
 INTR(30)
 INTR(31)
 INTR(32)
@@ -367,6 +381,7 @@ INTR(ff)
 #undef SYMBOL
 #undef TRAP
 #undef INTR
+#undef GATE
 #undef PROVIDE_DPL
 #undef PROVIDE_IST
 #undef PROVIDE_IDT_ADDRESS

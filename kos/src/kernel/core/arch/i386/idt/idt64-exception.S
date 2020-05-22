@@ -51,10 +51,8 @@ INTERN_LABEL(_x86_idt_breakpoint_after_enter):
 	movq   -8(%rsp), %rsi /* uintptr_t ecode */
 #endif /* IDT_CONFIG_PUSHESERRORS(IDT_VECTOR_ID) */
 
-	/* Re-enable interrupts for certain exceptions.
-	 * Every exception defined as TRAP() in `idt.ld' goes here! */
-#if IDT_VECTOR_ID == 0x00 || IDT_VECTOR_ID == 0x03 || \
-    IDT_VECTOR_ID == 0x04 || IDT_VECTOR_ID == 0x05
+	/* Re-enable interrupts for certain exceptions. */
+#if IDT_CONFIG_ISTRAP(IDT_VECTOR_ID)
 	testb  $(EFLAGS_IF >> 8), (OFFSET_ICPUSTATE64_IRREGS + OFFSET_IRREGS64_RFLAGS + 1)(%rsp)
 	jz     1f
 	sti    /* Re-enable interrupts. */

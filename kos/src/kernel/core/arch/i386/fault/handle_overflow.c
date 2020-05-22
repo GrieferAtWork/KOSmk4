@@ -26,6 +26,7 @@
 #include <kernel/except.h>
 #include <kernel/types.h>
 #include <kernel/x86/fault.h>
+#include <kernel/x86/idt.h> /* IDT_CONFIG_ISTRAP() */
 #include <sched/except-handler.h>
 
 #include <kos/kernel/cpu-state-helpers.h>
@@ -38,6 +39,7 @@ DECL_BEGIN
 INTERN struct icpustate *FCALL
 x86_handle_overflow(struct icpustate *__restrict state) {
 	unsigned int i;
+	STATIC_ASSERT(IDT_CONFIG_ISTRAP(0x04)); /* #OF  Overflow */
 	PERTASK_SET(this_exception_code, ERROR_CODEOF(E_OVERFLOW));
 	for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i)
 		PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);

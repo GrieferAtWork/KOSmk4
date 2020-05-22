@@ -29,6 +29,7 @@
 #include <kernel/syscall.h>
 #include <kernel/user.h>
 #include <kernel/x86/fault.h>
+#include <kernel/x86/idt.h>            /* IDT_CONFIG_ISTRAP() */
 #include <kernel/x86/syscall-tables.h> /* CONFIG_X86_EMULATE_LCALL7 */
 #include <sched/except-handler.h>      /* x86_userexcept_unwind_interrupt() */
 
@@ -119,18 +120,16 @@ x86_emulate_syscall64_lcall7(struct icpustate *__restrict state, u64 segment_off
 INTERN struct icpustate *FCALL
 x86_handle_segment_not_present(struct icpustate *__restrict state,
                                uintptr_t ecode) {
+	STATIC_ASSERT(IDT_CONFIG_ISTRAP(0x0b)); /* #NP  Segment not present */
 	struct emu86_modrm mod;
 	unsigned int i;
 	u32 opcode;
 	emu86_opcode_t tiny_opcode;
 	emu86_opflags_t op_flags;
 	byte_t const *pc, *orig_pc;
-	orig_pc = (byte_t *)state->ics_irregs.ir_pip;
-	COMPILER_READ_BARRIER();
-	if (state->ics_irregs.ir_pflags & EFLAGS_IF)
-		__sti();
+	orig_pc = (byte_t *)icpustate_getpc(state);
+	pc      = orig_pc;
 	/* Check: non-external event -> Analyze the faulting instruction */
-	pc = orig_pc;
 	if (ecode & 1) {
 		opcode = 0;
 	} else {

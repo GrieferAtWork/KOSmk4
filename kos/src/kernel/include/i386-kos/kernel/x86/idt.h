@@ -56,6 +56,22 @@ DECL_BEGIN
 #define IDT_CONFIG_GETDPL(vector_id) \
 	(IDT_CONFIG_ALLOWUSER(vector_id) ? 3 : 0)
 
+/* Returns non-zero if `vector_id' should behave as a TRAP, i.e.:
+ * call its C-level handler with interrupts enabled, so-long as
+ * the interrupted program location had them enabled, too.
+ * WARNING: This macro is only used for vectors 00h...2fh!
+ *          All other vectors are handled as non-trapping, with
+ *          the exception of vector 80h (which is a trap) */
+#define IDT_CONFIG_ISTRAP(vector_id)                            \
+	((vector_id) == 0x00 /* #DE  Divide by zero */ ||           \
+	 (vector_id) == 0x04 /* #OF  Overflow */ ||                 \
+	 (vector_id) == 0x05 /* #BR  Bound Range */ ||              \
+	 (vector_id) == 0x06 /* #UD  Illegal Instruction */ ||      \
+	 (vector_id) == 0x0b /* #NP  Segment not present */ ||      \
+	 (vector_id) == 0x0c /* #SS  Stack segment fault */ ||      \
+	 (vector_id) == 0x0d /* #GP  General Protection Fault */ || \
+	 ((vector_id) >= 0x20 && (vector_id) <= 0x2f) /* MS services */)
+
 
 #ifdef __CC__
 

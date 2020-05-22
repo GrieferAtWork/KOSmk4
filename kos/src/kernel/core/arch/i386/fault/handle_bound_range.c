@@ -26,7 +26,8 @@
 #include <kernel/except.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
-#include <kernel/x86/fault.h>
+#include <kernel/x86/fault.h> /* x86_handle_bound_range() */
+#include <kernel/x86/idt.h>   /* IDT_CONFIG_ISTRAP() */
 #include <sched/except-handler.h>
 #include <sched/task.h>
 
@@ -45,6 +46,7 @@ DECL_BEGIN
 
 INTERN struct icpustate *FCALL
 x86_handle_bound_range(struct icpustate *__restrict state) {
+	STATIC_ASSERT(IDT_CONFIG_ISTRAP(0x05)); /* #BR  Bound Range */
 	byte_t const *pc;
 	emu86_opcode_t opcode;
 	emu86_opflags_t flags;
