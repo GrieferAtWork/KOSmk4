@@ -2989,6 +2989,7 @@ do_connect:
 		flags = ATOMIC_READ(uc->uc_flags);
 		if unlikely(flags & UHCI_CONTROLLER_FLAG_RESDECT) {
 			decref_unlikely(uc);
+			task_disconnectall();
 			continue;
 		}
 		if (ATOMIC_READ(uc->uc_qhlast) != NULL) {

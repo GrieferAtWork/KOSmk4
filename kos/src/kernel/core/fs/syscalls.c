@@ -2085,6 +2085,7 @@ DEFINE_SYSCALL4(fd_t, openat, fd_t, dirfd,
 	struct fs *f = THIS_FS;
 	fsmode_t fsmode;
 	REF struct handle result_handle;
+	assert(!task_isconnected());
 	validate_readable(filename, 1);
 	if (oflags & O_CREAT) {
 		if (has_personality(KP_OPEN_CREAT_CHECK_MODE)) {
@@ -2484,6 +2485,7 @@ check_result_inode_for_symlink:
 		RETHROW();
 	}
 	decref(result_handle);
+	assert(!task_isconnected());
 	return (fd_t)result;
 }
 #endif /* __ARCH_WANT_SYSCALL_OPENAT */
@@ -3648,6 +3650,7 @@ kernel_execveat(struct icpustate *__restrict state,
 #endif /* __ARCH_HAVE_COMPAT */
 			sig_init(&data->er_error);
 			TRY {
+				assert(!task_isconnected());
 				task_connect(&data->er_error);
 				if (!task_schedule_synchronous_rpc(proc,
 				                                   &kernel_exec_rpc_func,
@@ -3662,6 +3665,7 @@ kernel_execveat(struct icpustate *__restrict state,
 					THROW(E_EXIT_THREAD, status.w_status);
 				}
 			} EXCEPT {
+				task_disconnectall();
 				assert(data->er_dentry == containing_dentry);
 				assert(data->er_path == containing_path);
 				assert(data->er_node == node);

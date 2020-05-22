@@ -248,14 +248,19 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 		f = vm_getfutex(THIS_VM, uaddr);
 		FINALLY_DECREF(f);
 		task_connect(&f->f_signal);
-		/* NOTE: The futex `f' must be kept alive during the wait,
-		 *       since even though semantics would allow it to be
-		 *       destroyed before being waited upon, doing so in
-		 *       practice would immediately trigger its signal, and
-		 *       any sender thread to not broadcast to the same futex,
-		 *       meaning that we wouldn't sleep at all, but instead
-		 *       instantly wake up once again! */
-		result = FUNC(task_waitfor_futex)(futex_op, timeout);
+		TRY {
+			/* NOTE: The futex `f' must be kept alive during the wait,
+			 *       since even though semantics would allow it to be
+			 *       destroyed before being waited upon, doing so in
+			 *       practice would immediately trigger its signal, and
+			 *       any sender thread to not broadcast to the same futex,
+			 *       meaning that we wouldn't sleep at all, but instead
+			 *       instantly wake up once again! */
+			result = FUNC(task_waitfor_futex)(futex_op, timeout);
+		} EXCEPT {
+			task_disconnectall();
+			RETHROW();
+		}
 	}	break;
 
 	case LFUTEX_WAIT_LOCK: {
@@ -276,38 +281,49 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 			 * is-waiting bit and sleep until it becomes available) */
 			newval = oldval | FUNC2(LFUTEX_WAIT_LOCK_WAITERS);
 			{
+
 				f = vm_getfutex(THIS_VM, uaddr);
 				FINALLY_DECREF(f);
 				task_connect(&f->f_signal);
-				if (!ATOMIC_CMPXCH_WEAK(*uaddr, oldval, newval)) {
-					/* Failed to set the locked bit (try again) */
+				TRY {
+					if (!ATOMIC_CMPXCH_WEAK(*uaddr, oldval, newval)) {
+						/* Failed to set the locked bit (try again) */
+						task_disconnectall();
+						continue;
+					}
+					/* Wait for the futex and return the resulting status code. */
+					result = FUNC(task_waitfor_futex)(futex_op, timeout);
+				} EXCEPT {
 					task_disconnectall();
-					continue;
+					RETHROW();
 				}
-				/* Wait for the futex and return the resulting status code. */
-				result = FUNC(task_waitfor_futex)(futex_op, timeout);
 				break;
 			}
 		}
 	}	break;
 
-#define DEFINE_WAIT_WHILE_OPERATOR(id, validate, should_wait)      \
-	case id: {                                                     \
-		validate(uaddr, sizeof(*uaddr));                           \
-		/* Connect to the futex first, thus performing the         \
-		 * should-wait checked in a manner that is interlocked. */ \
-		f = vm_getfutex(THIS_VM, uaddr);                           \
-		FINALLY_DECREF(f);                                         \
-		task_connect(&f->f_signal);                                \
-		/* Read the futex value. */                                \
-		if (should_wait) {                                         \
-			/* Yes, we should wait. */                             \
-			result = FUNC(task_waitfor_futex)(futex_op, timeout);  \
-			break;                                                 \
-		}                                                          \
-		/* No, we shouldn't wait. */                               \
-		task_disconnectall();                                      \
-		result = 1;                                                \
+#define DEFINE_WAIT_WHILE_OPERATOR(id, validate, should_wait)         \
+	case id: {                                                        \
+		validate(uaddr, sizeof(*uaddr));                              \
+		/* Connect to the futex first, thus performing the            \
+		 * should-wait checked in a manner that is interlocked. */    \
+		f = vm_getfutex(THIS_VM, uaddr);                              \
+		FINALLY_DECREF(f);                                            \
+		task_connect(&f->f_signal);                                   \
+		/* Read the futex value. */                                   \
+		TRY {                                                         \
+			if (should_wait) {                                        \
+				/* Yes, we should wait. */                            \
+				result = FUNC(task_waitfor_futex)(futex_op, timeout); \
+				break;                                                \
+			}                                                         \
+		} EXCEPT {                                                    \
+			task_disconnectall();                                     \
+			RETHROW();                                                \
+		}                                                             \
+		/* No, we shouldn't wait. */                                  \
+		task_disconnectall();                                         \
+		result = 1;                                                   \
 	}	break
 	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_WHILE, validate_readable, ATOMIC_READ(*uaddr) == val);
 	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_UNTIL, validate_readable, ATOMIC_READ(*uaddr) != val);

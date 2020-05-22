@@ -555,6 +555,8 @@
 #define DEFINE_CMDLINE_PARAM_UINTPTR_VAR(varname,parname,defl) uintptr_t varname;
 
 #define CASE(x) case x:
+#define FUNC(x) x
+#define NAME(x) x
 
 #define ATTR_DBGTEXT
 #define ATTR_DBGRODATA

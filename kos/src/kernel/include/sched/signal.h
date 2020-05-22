@@ -205,13 +205,14 @@ struct task_sigset {
  * `task_push_connections()' to free up that static slot before calling
  * `kmalloc()'). */
 #ifndef CONFIG_TASK_STATIC_CONNECTIONS
-#define CONFIG_TASK_STATIC_CONNECTIONS  3
+#define CONFIG_TASK_STATIC_CONNECTIONS 3
 #endif /* !CONFIG_TASK_STATIC_CONNECTIONS */
 
 struct task_connections {
 	struct task_sigset      tc_signals;                                /* Task signal set. */
 	struct task_connection  tc_static[CONFIG_TASK_STATIC_CONNECTIONS]; /* Statically allocated connections. */
-	struct task_connection *tc_static_v; /* [1..1] Pointer to the previous/current vector of statically allocated connections. */
+	struct task_connection *tc_static_v; /* [1..1] Pointer to the previous/current vector
+	                                      *        of statically allocated connections. */
 };
 
 
@@ -240,6 +241,7 @@ NOTHROW(KCALL task_popconnections)(struct task_connections *__restrict cons);
  * This is quite important, since it allows one to poll any given object without
  * have to make sure that that object is still alive when task_waitfor() is called! */
 
+
 /* Connect the calling thread to a given signal.
  * @throw: E_BADALLOC:   [task_connect[_ghost]] Insufficient memory (only when there are
  *                        at least `CONFIG_TASK_STATIC_CONNECTIONS' connections already). */
@@ -248,18 +250,30 @@ FUNDEF NONNULL((1)) void KCALL task_connect_ghost(struct sig *__restrict target)
 FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(KCALL task_connect_c)(struct task_connection *__restrict con, struct sig *__restrict target);
 FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(KCALL task_connect_ghost_c)(struct task_connection *__restrict con, struct sig *__restrict target);
 
-/* Disconnect a given connection */
-FUNDEF NONNULL((1)) void NOTHROW(KCALL task_disconnect_c)(struct task_connection *__restrict con);
+/* Disconnect a given connection
+ * WARNING: If the connected signal was already sent, causing the calling
+ *          thread to enter a signaled state, that state will not be
+ *          reverted by this call! */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL task_disconnect_c)(struct task_connection *__restrict con);
+
+/* Disconnect from a specific signal `target'
+ * No-op if the caller isn't actually connected to `target'
+ * WARNING: If the connected signal was already sent, causing the calling
+ *          thread to enter a signaled state, that state will not be
+ *          reverted by this call! */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL task_disconnect)(struct sig *__restrict target);
 
 /* Remove all active signals.
  * In case one of them got delivered, return the signal that got. Otherwise, return `NULL' */
-FUNDEF struct sig *NOTHROW(KCALL task_disconnectall)(void);
+FUNDEF NOBLOCK struct sig *NOTHROW(KCALL task_disconnectall)(void);
 
 /* Check if the calling thread is connected to any signal. */
 FUNDEF NOBLOCK WUNUSED ATTR_CONST bool NOTHROW(KCALL task_isconnected)(void);
 
-/* Check if there is a signal to was delivered, disconnecting all
- * other connected signals if this was the case.
+/* Check if there is a signal to was delivered, disconnecting
+ * all other connected signals if this was the case.
  * @return: NULL: No signal is available
  * @return: * :   The signal that was delivered. */
 FUNDEF NOBLOCK struct sig *NOTHROW(KCALL task_trywait)(void);
@@ -271,8 +285,12 @@ struct timespec;
  * NOTE: Prior to fully starting to block, this function will call `task_serve()'
  * @param: abs_timeout:  The `realtime()' timeout for the wait.
  * @throw: E_WOULDBLOCK: Preemption was disabled, and the operation would have blocked.
- * @throw: * :          [task_waitfor] An error was thrown by an RPC function.
+ * @throw: * :           [task_waitfor] An error was thrown by an RPC function.
  *                       NOTE: In this case, `task_disconnectall()' will have been called.
+ *              WARNING: In all other cases, task connections are preserved when an exception
+ *                       is thrown, meaning that if some interlocked signal check might thrown
+ *                       an exception, you are required to TRY ... EXCEPT { task_disconnectall(); }
+ *                       to prevent signal connections from being leaked!
  * @return: NULL: No signal has become available (never returned when `NULL' is passed for `abs_timeout').
  * @return: * :   The signal that was delivered. */
 FUNDEF struct sig *FCALL
@@ -327,13 +345,19 @@ FUNDEF struct sig *NOTHROW(FCALL task_waitfor_norpc_nx)(struct timespec const *a
  * >>         if (try_lock())
  * >>             return true;
  * >>     });
+ * >>     assert(!task_isconnected());
  * >>     task_connect(&lock_signal);
- * >>     if unlikely(try_lock()) {
- * >>         // Prevent a race condition:
- * >>         //     Lock became available after the last
- * >>         //     check, but before a connection was made
+ * >>     TRY {
+ * >>         if unlikely(try_lock()) {
+ * >>             // Prevent a race condition:
+ * >>             //     Lock became available after the last
+ * >>             //     check, but before a connection was made
+ * >>             task_disconnectall();
+ * >>             return true;
+ * >>         }
+ * >>     } EXCEPT {
  * >>         task_disconnectall();
- * >>         return true;
+ * >>         RETHROW();
  * >>     }
  * >>     if (!task_waitfor(TIMEOUT))
  * >>         return false;

@@ -100,15 +100,20 @@ sys_futex_impl(USER UNCHECKED uint32_t *uaddr,
 		f = vm_getfutex(THIS_VM, uaddr);
 		FINALLY_DECREF(f);
 		task_connect(&f->f_signal);
-		result = 0;
-		if (ATOMIC_READ(*uaddr) == val) {
-			/* `FUTEX_WAIT' takes a relative timeout, while `FUTEX_WAIT_BITSET' takes an absolute one. */
-			if (timeout && (futex_op & 127) == FUTEX_WAIT)
-				*timeout += realtime();
-			if (!task_waitfor(timeout))
-				result = -ETIMEDOUT;
-		} else {
+		TRY {
+			result = 0;
+			if (ATOMIC_READ(*uaddr) == val) {
+				/* `FUTEX_WAIT' takes a relative timeout, while `FUTEX_WAIT_BITSET' takes an absolute one. */
+				if (timeout && (futex_op & 127) == FUTEX_WAIT)
+					*timeout += realtime();
+				if (!task_waitfor(timeout))
+					result = -ETIMEDOUT;
+			} else {
+				task_disconnectall();
+			}
+		} EXCEPT {
 			task_disconnectall();
+			RETHROW();
 		}
 	}	break;
 

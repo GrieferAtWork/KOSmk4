@@ -128,6 +128,9 @@ DECL_BEGIN
 
 
 
+/* Connect the calling thread to a given signal.
+ * @throw: E_BADALLOC:   [task_connect[_ghost]] Insufficient memory (only when there are
+ *                        at least `CONFIG_TASK_STATIC_CONNECTIONS' connections already). */
 PUBLIC NONNULL((1)) void KCALL
 task_connect(struct sig *__restrict target) THROWS(E_BADALLOC) {
 	struct task_connection *con, *chain;
@@ -289,7 +292,7 @@ NOTHROW(KCALL task_isconnected_to)(struct sig *__restrict signal) {
 }
 #endif
 
-LOCAL NONNULL((1)) void
+PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL task_disconnect_c_impl)(struct task_connection *__restrict con) {
 	struct sig *signal;
 	struct task_connection *sigcon;
@@ -421,7 +424,11 @@ done_unlink_con:
 }
 
 
-PUBLIC NONNULL((1)) void
+/* Disconnect a given connection
+ * WARNING: If the connected signal was already sent, causing the calling
+ *          thread to enter a signaled state, that state will not be
+ *          reverted by this call! */
+PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL task_disconnect_c)(struct task_connection *__restrict con) {
 	struct task_connection **pcon, *iter;
 	/* Remove the given connection from the chain of per-task linked connections. */
@@ -439,10 +446,12 @@ NOTHROW(KCALL task_disconnect_c)(struct task_connection *__restrict con) {
 	task_disconnect_c_impl(con);
 }
 
-#if 0 /* Cannot be used without race condition, as the signal may
-       * have already been delivered, causing the connection to
-       * already be disconnected. */
-PUBLIC NONNULL((1)) void
+/* Disconnect from a specific signal `target'
+ * No-op if the caller isn't actually connected to `target'
+ * WARNING: If the connected signal was already sent, causing the calling
+ *          thread to enter a signaled state, that state will not be
+ *          reverted by this call! */
+PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL task_disconnect)(struct sig *__restrict target) {
 	struct task_connections *mycons;
 	struct task_connection **pcon, *con;
@@ -455,17 +464,15 @@ NOTHROW(KCALL task_disconnect)(struct sig *__restrict target) {
 			return;
 		}
 	}
-	COMPILER_READ_BARRIER();
-	/* If the signal wasn't found, then it must have been delivered
-	 * in the mean time, or already been delivered before. */
-	assertf(mycons->tc_signals.ts_dlvr == target,
-	        "Signal %p was never connected, or connected "
-	        "as part of a pushed connections set",
-	        target);
+	/* Failed to find `target' within our connections set.
+	 * However, there is a possibility that `target' was/is being sent,
+	 * such that its connection slot already changed state to either
+	 * `TASK_CONNECTION_DELIVERED' or `TASK_CONNECTION_DELIVERING',
+	 * meaning that the connection's gone in this case as well! */
 }
-#endif
 
-PUBLIC struct sig *
+
+PUBLIC NOBLOCK struct sig *
 NOTHROW(KCALL task_disconnectall)(void) {
 	struct sig *result;
 	struct task_connection *con, *next;
@@ -596,8 +603,8 @@ NOTHROW(KCALL task_popconnections)(struct task_connections *__restrict cons) {
 }
 #undef IF_REENTRANT
 
-/* Check if there is a signal to was delivered, disconnecting all
- * other connected signals if this was the case.
+/* Check if there is a signal to was delivered, disconnecting
+ * all other connected signals if this was the case.
  * @return: NULL: No signal is available
  * @return: * :   The signal that was delivered. */
 PUBLIC NOBLOCK struct sig *NOTHROW(KCALL task_trywait)(void) {
@@ -636,8 +643,12 @@ got_signal:
 		COMPILER_WRITE_BARRIER();
 		mycons->tc_signals.ts_dlvr = NULL;
 	} else {
-		if unlikely_untraced(!PREEMPTION_ENABLED())
+		if unlikely_untraced(!PREEMPTION_ENABLED()) {
+			result = task_disconnectall();
+			if unlikely_untraced(result)
+				goto done;
 			THROW(E_WOULDBLOCK_PREEMPTED);
+		}
 		PREEMPTION_DISABLE();
 		COMPILER_READ_BARRIER();
 		result = mycons->tc_signals.ts_dlvr;
@@ -657,6 +668,7 @@ got_signal:
 		COMPILER_READ_BARRIER();
 		goto again;
 	}
+done:
 	return result;
 }
 
@@ -749,8 +761,12 @@ got_signal:
 		COMPILER_WRITE_BARRIER();
 		mycons->tc_signals.ts_dlvr = NULL;
 	} else {
-		if unlikely_untraced(!PREEMPTION_ENABLED())
+		if unlikely_untraced(!PREEMPTION_ENABLED()) {
+			result = task_disconnectall();
+			if unlikely_untraced(result)
+				goto done;
 			THROW(E_WOULDBLOCK_PREEMPTED);
+		}
 		PREEMPTION_DISABLE();
 		COMPILER_READ_BARRIER();
 		result = mycons->tc_signals.ts_dlvr;
@@ -763,6 +779,7 @@ got_signal:
 		COMPILER_READ_BARRIER();
 		goto again;
 	}
+done:
 	return result;
 }
 

@@ -37,6 +37,8 @@
 #include <bits/timeval.h>
 #include <compat/config.h>
 #include <sys/time.h>
+#include <assert.h>
+#include <sched/signal.h>
 #include <sys/timeb.h>
 
 #include <errno.h>
@@ -237,6 +239,7 @@ DEFINE_COMPAT_SYSCALL2(errno_t, gettimeofday64,
 DEFINE_SYSCALL1(time32_t, time, USER UNCHECKED time32_t *, tmp) {
 	time32_t result;
 	struct timespec nowts;
+	assert(!task_isconnected());
 	nowts  = realtime();
 	result = (time32_t)nowts.tv_sec;
 	if (tmp) {
@@ -245,6 +248,7 @@ DEFINE_SYSCALL1(time32_t, time, USER UNCHECKED time32_t *, tmp) {
 		*tmp = result;
 		COMPILER_WRITE_BARRIER();
 	}
+	assert(!task_isconnected());
 	return result;
 }
 #endif /* __ARCH_WANT_SYSCALL_TIME */

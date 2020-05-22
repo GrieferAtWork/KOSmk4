@@ -1296,6 +1296,7 @@ do_compat_hdio_getgeo:
 		bus = self->d_bus;
 		AtaBus_LockPIO(bus);
 		TRY {
+			assert(!task_isconnected());
 			task_connect(&bus->b_piointr);
 			outb(bus->b_busio + ATA_DRIVE_SELECT,
 			     0xa0 + (self->d_drive - ATA_DRIVE_MASTER));
@@ -1511,8 +1512,10 @@ NOTHROW(KCALL Ata_InitializeDrive)(struct ata_ports *__restrict ports,
 						printk(FREESTR(KERN_INFO "[ata] No drive connected [status:0]\n"));
 						goto reset_bus_and_fail;
 					}
-					if unlikely(status & (ATA_DCR_ERR | ATA_DCR_DF))
+					if unlikely(status & (ATA_DCR_ERR | ATA_DCR_DF)) {
+						task_disconnectall();
 						goto reset_bus_and_fail;
+					}
 					{
 						struct timespec timeout;
 						timeout = realtime();

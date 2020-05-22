@@ -157,7 +157,7 @@ LOCAL errr_t
 			status = ATA_PIOINTR_ALT_DECODE(signal);
 			if (status & (ATA_DCR_ERR | ATA_DCR_DF))
 				return ATA_GetErrrForStatusRegister(status);
-			if (num_sectors != 1)
+			if (num_sectors != 1) /* Re-connect for the next sector */
 				task_connect(&bus->b_piointr);
 			Ata_WaitForDrq(bus->b_ctrlio);
 #if defined(DEFINE_IO_PHYS) && defined(DEFINE_IO_READ)

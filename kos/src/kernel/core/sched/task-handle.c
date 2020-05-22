@@ -39,6 +39,7 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 
+#include <assert.h>
 #include <errno.h>
 #include <string.h>
 
@@ -108,10 +109,13 @@ again_waitfor:
 				ATOMIC_WRITE(data->tj_status, (u32)self->tp_status.w_status);
 				break;
 			}
-			if (timeout_sec ? !task_waitfor(ptimeout) : !task_trywait()) {
+			if (timeout_sec ? !task_waitfor(ptimeout)
+			                : !task_trywait()) {
+				task_disconnectall();
 				ATOMIC_WRITE(data->tj_status, 0);
 				return -ETIMEDOUT; /* Timeout */
 			}
+			assert(!task_isconnected());
 			if (WIFEXITED(self->tp_status)) {
 				ATOMIC_WRITE(data->tj_status, (u32)self->tp_status.w_status);
 				break;

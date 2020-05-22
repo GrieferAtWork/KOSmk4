@@ -191,7 +191,13 @@ handle_signalfd_read(struct signalfd *__restrict self,
 					break;
 				THROW(E_WOULDBLOCK_WAITFORSIGNAL);
 			}
-			connect_to_my_signal_queues();
+			assert(!task_isconnected());
+			TRY {
+				connect_to_my_signal_queues();
+			} EXCEPT {
+				task_disconnectall();
+				RETHROW();
+			}
 			if (signalfd_try_read(self, &si)) {
 				task_disconnectall();
 			} else {

@@ -2622,6 +2622,7 @@ check_for_notif_or_remote_byte:
 			if (bi < 0) {
 				/* No incoming data, nor outgoing notification packets.
 				 * -> connect to both signals, and wait for either one. */
+				assert(!task_isconnected());
 				task_connect(&GDBThread_AsyncNotifStopEventsAdded);
 				task_connect(&GDBServer_RemoteDataAvailable);
 				/* Re-try the checks above, now that we've become interlocked. */

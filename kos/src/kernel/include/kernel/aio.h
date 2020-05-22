@@ -710,16 +710,19 @@ aio_multihandle_generic_connect(struct aio_multihandle_generic *__restrict self)
 		THROWS(E_BADALLOC) {
 	task_connect(&self->mg_signal);
 }
+
 LOCAL NONNULL((1)) void KCALL
 aio_multihandle_generic_connect_ghost(struct aio_multihandle_generic *__restrict self)
 		THROWS(E_BADALLOC) {
 	task_connect_ghost(&self->mg_signal);
 }
+
 LOCAL NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL aio_multihandle_generic_connect_c)(struct task_connection *__restrict con,
                                                  struct aio_multihandle_generic *__restrict self) {
 	task_connect_c(con, &self->mg_signal);
 }
+
 LOCAL NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL aio_multihandle_generic_connect_ghost_c)(struct task_connection *__restrict con,
                                                        struct aio_multihandle_generic *__restrict self) {

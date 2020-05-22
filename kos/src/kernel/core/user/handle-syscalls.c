@@ -1637,7 +1637,7 @@ PRIVATE poll_mode_t KCALL do_poll_handle(struct handle &hnd,
 		    error_data()->e_pointers[0] == E_FILESYSTEM_OPERATION_POLL)
 			result = POLLHUP; /* Poll is unsupported. */
 		else {
-			/* XXX: Are there exceptions that should yield POLLERR? */
+			/* XXX: Are there other exceptions that should yield POLLERR? */
 			RETHROW();
 		}
 	}
@@ -1691,6 +1691,9 @@ again:
 				++result; /* Got something! */
 			fds[i].revents = what;
 		} EXCEPT {
+			/* Make sure that we're disconnected
+			 * from all previous poll-signals! */
+			task_disconnectall();
 			decref(hnd);
 			RETHROW();
 		}
@@ -1759,6 +1762,9 @@ again:
 #endif /* !__OPTIMIZE_SIZE__ */
 				what = do_poll_handle(hnd, mode);
 			} EXCEPT {
+				/* Make sure that we're disconnected
+				 * from all previous poll-signals! */
+				task_disconnectall();
 				decref(hnd);
 				RETHROW();
 			}

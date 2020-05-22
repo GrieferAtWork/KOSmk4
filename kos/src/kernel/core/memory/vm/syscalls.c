@@ -148,6 +148,7 @@ sys_mmap_impl(void *addr, size_t length, syscall_ulong_t prot,
 	pos_t file_minoffset;
 	pos_t file_maxnumbytes;
 	/* Check for unknown flags. */
+	assert(!task_isconnected());
 	VALIDATE_FLAGSET(flags,
 	                 MAP_AUTOMATIC | MAP_SHARED | MAP_PRIVATE | MAP_FIXED |
 	                 MAP_FILE | MAP_ANONYMOUS | MAP_32BIT | MAP_GROWSDOWN |
@@ -355,6 +356,7 @@ again_mapat:
 		RETHROW();
 	}
 	decref(datablock);
+	assert(!task_isconnected());
 	return result + result_offset;
 }
 #endif /* WANT_MMAP */

@@ -580,6 +580,7 @@ x86_userexcept_propagate(struct icpustate *__restrict state,
                          struct rpc_syscall_info const *sc_info) {
 	struct icpustate *result;
 	error_code_t code;
+	assert(!task_isconnected());
 
 	/* Handle special exception codes */
 	code = PERTASK_GET(this_exception_code);
@@ -826,6 +827,7 @@ PUBLIC ATTR_NORETURN void FCALL
 x86_userexcept_unwind_i(struct icpustate *__restrict state,
                         struct rpc_syscall_info const *sc_info) {
 	/* Service RPCs before returning to user-space. */
+	assert(!task_isconnected());
 	if (sc_info) {
 		bool must_restart_syscall;
 		must_restart_syscall = false;

@@ -215,16 +215,21 @@ got_free_slot:
 	}
 	/* Wait for more slots to become available. */
 	task_connect(&self->uv_reqfree);
-	for (reqid = 0; reqid < CONFIG_UVIO_MAX_PARALLEL_REQUESTS; ++reqid) {
-		slot = &self->uv_req[reqid];
-		sync_write(&slot->kur_lock);
-		if (self->uv_req[reqid].kur_args) {
-			sync_endwrite(&slot->kur_lock);
-			continue; /* Already in use. */
+	TRY {
+		for (reqid = 0; reqid < CONFIG_UVIO_MAX_PARALLEL_REQUESTS; ++reqid) {
+			slot = &self->uv_req[reqid];
+			sync_write(&slot->kur_lock);
+			if (self->uv_req[reqid].kur_args) {
+				sync_endwrite(&slot->kur_lock);
+				continue; /* Already in use. */
+			}
+			/* Unlikely case: A free slot was discovered during interlocked re-check */
+			task_disconnectall();
+			goto got_free_slot;
 		}
-		/* Unlikely case: A free slot was discovered during interlocked re-check */
+	} EXCEPT {
 		task_disconnectall();
-		goto got_free_slot;
+		RETHROW();
 	}
 	/* Wait for the a slot to become free. */
 	task_waitfor();
