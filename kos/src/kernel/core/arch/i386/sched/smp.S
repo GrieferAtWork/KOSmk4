@@ -904,10 +904,12 @@ INTERN_FUNCTION(x86_smp_entry64)
 	testl  $(CPUID_80000001D_SYSCALL), (thiscpu_x86_cpuid + OFFSET_CPUID_80000001D)(R_CPU)
 	jz     .Ldone_syscall
 
-	/* __wrmsr(IA32_STAR, (u64)SEGMENT_KERNEL_CODE << 32); */
-	movl   $(SEGMENT_KERNEL_CODE), %edx
-	xorl   %eax, %eax
+	/* __wrmsr(IA32_STAR, (u64)SEGMENT_KERNEL_CODE << 32 |
+	 *                    (u64)SEGMENT_USER_CODE32_RPL << 48); */
 	movl   $(IA32_STAR), %ecx
+	rdmsr  /* Preserve the lower 32 bits! (in %eax)
+	        * Intel defines these bits as RESERVED, so they mustn't be altered.  */
+	movl   $(SEGMENT_KERNEL_CODE | SEGMENT_USER_CODE32_RPL << 16), %edx
 	wrmsr
 
 	/* __wrmsr(IA32_FMASK, EFLAGS_IF); */
@@ -932,6 +934,16 @@ INTERN_FUNCTION(x86_smp_entry64)
 	movzlq %eax, %rax
 	movl   $(IA32_LSTAR), %ecx
 	wrmsr
+
+	/* TODO: `IA32_CSTAR' must be set to some kernel-space PC location
+	 *       that is used to handle user-space using `syscall' from
+	 *       32-bit mode!
+	 *       On Intel CPUs, this MSR isn't used, and the CPU natively
+	 *       causes a #UD to be thrown, but AMD CPUs do make use of
+	 *       this MSR, so we must still program it, else the CPU might
+	 *       end up jumping to some user-space text location when a
+	 *       32-bit program makes use of `syscall'! */
+
 .Ldone_syscall:
 #endif /* __x86_64__ */
 

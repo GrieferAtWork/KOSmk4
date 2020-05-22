@@ -54,10 +54,12 @@ DATDEF ATTR_PERCPU u16 thiscpu_x86_saved_tr;
 
 
 /* Other (feature-dependent) registers exist that may be added here, such as:
+ *   - %cr0 (certain bits only)
+ *   - %cr3 (certain bits only)
  *   - IA32_SYSENTER_CS
  *   - IA32_SYSENTER_ESP
  *   - IA32_SYSENTER_EIP
- *   - x86_64-only: IA32_EFER
+ *   - x86_64-only: IA32_EFER (certain bits only)
  *   - x86_64-only: IA32_STAR
  *   - x86_64-only: IA32_FMASK
  *   - x86_64-only: IA32_LSTAR

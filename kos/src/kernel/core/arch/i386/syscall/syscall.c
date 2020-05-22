@@ -267,8 +267,20 @@ NOTHROW(KCALL x86_initialize_sysenter)(void) {
 	}
 #ifdef __x86_64__
 	if (X86_HAVE_SYSCALL) {
-		__wrmsr(IA32_STAR, (u64)SEGMENT_KERNEL_CODE << 32);
+		/* Must preserve the lower 32 bits of `IA32_STAR'!
+		 * Intel defines these bits as RESERVED, so they mustn't be altered. */
+		__wrmsr(IA32_STAR, __rdmsr32(IA32_STAR) |
+		                   (u64)SEGMENT_KERNEL_CODE << 32 |
+		                   (u64)SEGMENT_USER_CODE32_RPL << 48);
 		__wrmsr(IA32_LSTAR, (u64)&x86_syscall64_syscall);
+		/* TODO: `IA32_CSTAR' must be set to some kernel-space PC location
+		 *       that is used to handle user-space using `syscall' from
+		 *       32-bit mode!
+		 *       On Intel CPUs, this MSR isn't used, and the CPU natively
+		 *       causes a #UD to be thrown, but AMD CPUs do make use of
+		 *       this MSR, so we must still program it, else the CPU might
+		 *       end up jumping to some user-space text location when a
+		 *       32-bit program makes use of `syscall'! */
 		__wrmsr(IA32_FMASK, EFLAGS_IF);
 	}
 #endif /* __x86_64__ */

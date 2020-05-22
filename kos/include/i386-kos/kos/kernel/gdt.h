@@ -26,12 +26,57 @@
 
 __SYSDECL_BEGIN
 
+/*
+ * NOTE: Segment indices must be selected to fulfill the
+ *       following architecturally mandated requirements:
+ * >> SEGMENT_KERNEL_CODE == IA32_SYSENTER_CS       (sysenter)
+ * >> SEGMENT_KERNEL_DATA == IA32_SYSENTER_CS + 8   (sysenter)
+ * >> SEGMENT_USER_CODE32 == IA32_SYSENTER_CS + 16  (sysexit)
+ * >> SEGMENT_USER_DATA32 == IA32_SYSENTER_CS + 24  (sysexit)
+ * >> SEGMENT_KERNEL_CODE == IA32_STAR[47:32]       (syscall)
+ * >> SEGMENT_KERNEL_DATA == IA32_STAR[47:32] + 8   (syscall)
+ * >> SEGMENT_USER_CODE32 == IA32_STAR[63:48]       (sysret)
+ * >> SEGMENT_USER_DATA32 == IA32_STAR[63:48] + 8   (sysret)
+ * >> SEGMENT_USER_CODE64 == IA32_STAR[63:48] + 16  (sysret)
+ *
+ * Or simplified:
+ * >> SEGMENT_KERNEL_CODE == BASE       (sysenter)
+ * >> SEGMENT_KERNEL_DATA == BASE + 8   (sysenter)
+ * >> SEGMENT_USER_CODE32 == BASE + 16  (sysexit)
+ * >> SEGMENT_USER_DATA32 == BASE + 24  (sysexit)
+ * >> SEGMENT_USER_CODE64 == BASE + 32  (sysret)
+ * With:
+ * >> IA32_SYSENTER_CS = SEGMENT_KERNEL_CODE
+ * >> IA32_STAR[47:32] = SEGMENT_KERNEL_CODE
+ * >> IA32_STAR[63:48] = SEGMENT_USER_CODE32 | 3 (aka. `SEGMENT_USER_CODE32_RPL')
+ *
+ */
+
+
 /************************************************************************/
 /* GDT SEGMENT INDICES                                                  */
 /************************************************************************/
 #define SEGMENT_NULL            0x0000 /* NULL-segment. */
-#define SEGMENT_KERNEL_CODE     0x0008 /* Ring #0 code segment (%cs) */
-#define SEGMENT_KERNEL_DATA     0x0010 /* Ring #0 data segment (%ss)
+#define SEGMENT_CPU_TSS         0x0008 /* TSS segment of the current CPU (%tr; aka. `ltr') */
+#ifdef __x86_64__
+#define SEGMENT_CPU_TSS2        0x0010 /* On x86_64, a TSS requires two consecutive entries. */
+#else /* __x86_64__ */
+#define SEGMENT_CPU_TSS_DF      0x0010 /* TSS segment of the current CPU when handling #DF faults. */
+#endif /* !__x86_64__ */
+#define SEGMENT_CPU_LDT         0x0018 /* Local descriptor table segment */
+#ifdef __x86_64__
+#define SEGMENT_CPU_LDT2        0x0020 /* On x86_64, an LDT requires two consecutive entries. */
+#else /* __x86_64__ */
+#define SEGMENT_KERNEL_FSBASE   0x0020 /* Ring #0 fs-base (%fs; Pointers to the `struct task' of the current thread)
+                                        * NOTE: This segment's base address is updated during every task-switch,
+                                        *       and represents the linear base address of the current task. */
+#endif /* !__x86_64__ */
+#define SEGMENT_USER_FSBASE     0x0028 /* Ring #3 fs-segment (%fs by convention (user may re-assign the base address)) */
+#define SEGMENT_USER_FSBASE_RPL 0x002b /* SEGMENT_USER_FSBASE | 3 */
+#define SEGMENT_USER_GSBASE     0x0030 /* Ring #3 gs-segment (%gs by convention (user may re-assign the base address)) */
+#define SEGMENT_USER_GSBASE_RPL 0x0033 /* SEGMENT_USER_GSBASE | 3 */
+#define SEGMENT_KERNEL_CODE     0x0038 /* Ring #0 code segment (%cs) */
+#define SEGMENT_KERNEL_DATA     0x0040 /* Ring #0 data segment (%ss)
                                         * NOTE: For %ds and %es, `SEGMENT_USER_DATA' is re-used, so-as to reduce
                                         *       the number of required segment changes during interrupts/syscalls.
                                         *       However, this also means that user-space isn't allowed to change the
@@ -39,35 +84,17 @@ __SYSDECL_BEGIN
                                         *       `SEGMENT_USER_FSBASE' and `SEGMENT_USER_GSBASE', which can be done by
                                         *       use of the `wrfsbase' and `wrgsbase' instruction (which are emulated
                                         *       within a 32-bit kernel) */
-#define SEGMENT_USER_CODE32     0x0018 /* Ring #3 32-bit code segment (%cs) */
-#define SEGMENT_USER_CODE32_RPL 0x001b /* SEGMENT_USER_CODE32 | 3 */
-#define SEGMENT_USER_DATA32     0x0020 /* Ring #3 32-bit data segment (%ss, %ds, %es) */
-#define SEGMENT_USER_DATA32_RPL 0x0023 /* SEGMENT_USER_DATA32 | 3 */
-#define SEGMENT_USER_FSBASE     0x0028 /* Ring #3 fs-segment (%fs by convention (user may re-assign the base address)) */
-#define SEGMENT_USER_FSBASE_RPL 0x002b /* SEGMENT_USER_FSBASE | 3 */
-#define SEGMENT_USER_GSBASE     0x0030 /* Ring #3 gs-segment (%gs by convention (user may re-assign the base address)) */
-#define SEGMENT_USER_GSBASE_RPL 0x0033 /* SEGMENT_USER_GSBASE | 3 */
-#define SEGMENT_CPU_LDT         0x0038 /* Local descriptor table segment */
+#define SEGMENT_USER_CODE32     0x0048 /* Ring #3 32-bit code segment (%cs) */
+#define SEGMENT_USER_CODE32_RPL 0x004b /* SEGMENT_USER_CODE32 | 3 */
+#define SEGMENT_USER_DATA32     0x0050 /* Ring #3 32-bit data segment (%ss, %ds, %es) */
+#define SEGMENT_USER_DATA32_RPL 0x0053 /* SEGMENT_USER_DATA32 | 3 */
 #ifdef __x86_64__
-#define SEGMENT_CPU_LDT2        0x0040 /* On x86_64, an LDT requires two consecutive entries. */
-#else /* __x86_64__ */
-#define SEGMENT_KERNEL_FSBASE   0x0040 /* Ring #0 fs-base (%fs; Pointers to the `struct task' of the current thread)
-                                        * NOTE: This segment's base address is updated during every task-switch,
-                                        *       and represents the linear base address of the current task. */
-#endif /* !__x86_64__ */
-#define SEGMENT_CPU_TSS         0x0048 /* TSS segment of the current CPU (%tr; aka. `ltr') */
-#ifdef __x86_64__
-#define SEGMENT_CPU_TSS2        0x0050 /* On x86_64, a TSS requires two consecutive entries. */
-#else /* __x86_64__ */
-#define SEGMENT_CPU_TSS_DF      0x0050 /* TSS segment of the current CPU when handling #DF faults. */
-#endif /* !__x86_64__ */
-#ifdef __x86_64__
-#define SEGMENT_KERNEL_CODE32   0x0058 /* Ring #0 32-bit code segment (%cs) */
-#define SEGMENT_KERNEL_DATA32   0x0060 /* Ring #0 32-bit data segment (%ss) */
-#define SEGMENT_USER_CODE64     0x0068 /* Ring #3 64-bit code segment (%cs) */
-#define SEGMENT_USER_CODE64_RPL 0x006b /* SEGMENT_USER_CODE64 | 3 */
-#define SEGMENT_USER_DATA64     0x0070 /* Ring #3 64-bit data segment (%ss, %ds, %es) */
-#define SEGMENT_USER_DATA64_RPL 0x0073 /* SEGMENT_USER_DATA64 | 3 */
+#define SEGMENT_USER_CODE64     0x0058 /* Ring #3 64-bit code segment (%cs) */
+#define SEGMENT_USER_CODE64_RPL 0x005b /* SEGMENT_USER_CODE64 | 3 */
+#define SEGMENT_USER_DATA64     0x0060 /* Ring #3 64-bit data segment (%ss, %ds, %es) */
+#define SEGMENT_USER_DATA64_RPL 0x0063 /* SEGMENT_USER_DATA64 | 3 */
+#define SEGMENT_KERNEL_CODE32   0x0068 /* Ring #0 32-bit code segment (%cs) */
+#define SEGMENT_KERNEL_DATA32   0x0070 /* Ring #0 32-bit data segment (%ss) */
 #define SEGMENT_COUNT           15
 #else /* __x86_64__ */
 #define SEGMENT_COUNT           11
