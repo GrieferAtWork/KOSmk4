@@ -398,7 +398,7 @@ PRIVATE struct conf const confs[] = {
  *       long as one of the following prefixes could be removed from `name':
  *       "_POSIX_", "_"
  * If no such configuration name exists, return `NULL' instead. */
-PRIVATE struct conf const *CC
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) struct conf const *CC
 findconf(char const *__restrict name) {
 	unsigned int i;
 again:

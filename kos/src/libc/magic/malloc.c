@@ -207,7 +207,7 @@ memcdup:([nonnull] void const *__restrict ptr, int needle, size_t n_bytes) -> vo
 [section(.text.crt.heap.rare_helpers)]
 [requires($has_function(realloc))][guard]
 [dependency_include(<hybrid/__overflow.h>)][userimpl]
-reallocarray:(void *ptr, size_t elem_count, size_t elem_size)
+reallocarray:(void *ptr, $size_t elem_count, $size_t elem_size)
 		-> [realloc(mallptr, elem_count * elem_size)] void * {
 	size_t total_bytes;
 	if (__hybrid_overflow_umul(elem_count, elem_size, &total_bytes))

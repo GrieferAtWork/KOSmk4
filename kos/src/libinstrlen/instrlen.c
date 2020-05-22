@@ -136,7 +136,7 @@ NOTHROW_NCX(CC predmaxone)(void const *pc, instrlen_isa_t isa) {
 	TRY
 #endif /* __NON_CALL_EXCEPTIONS */
 	{
-		for (; result < (byte_t *)pc; ++result) {
+		for (; (uintptr_t)result < (uintptr_t)pc; ++result) {
 			byte_t *nextptr;
 			nextptr = libil_instruction_succ(result, isa);
 			if (nextptr == (byte_t *)pc)

@@ -1832,7 +1832,7 @@ void *__NOTHROW_NCX(__LIBCCALL calloc)(__SIZE_TYPE__ __num_bytes) { return (call
 [section(.text.crt.heap.rare_helpers)][userimpl]
 [requires($has_function(realloc) && $has_function(free))]
 [ATTR_WUNUSED][ATTR_MALL_DEFAULT_ALIGNED][ATTR_ALLOC_SIZE((2))]
-reallocf:(void *mallptr, size_t num_bytes) -> void * {
+reallocf:(void *mallptr, $size_t num_bytes) -> void * {
 	void *result;
 	result = realloc(mallptr, num_bytes);
 	if unlikely(!result)
@@ -1846,7 +1846,7 @@ reallocf:(void *mallptr, size_t num_bytes) -> void * {
 [section(.text.crt.heap.rare_helpers)][userimpl]
 [requires($has_function(recallocv) && $has_function(calloc) && $has_function(malloc_usable_size))]
 [ATTR_WUNUSED][ATTR_MALL_DEFAULT_ALIGNED][ATTR_ALLOC_SIZE((3, 4))]
-recallocarray:(void *mallptr, size_t old_elem_count, size_t new_elem_count, size_t elem_size) -> void * {
+recallocarray:(void *mallptr, $size_t old_elem_count, $size_t new_elem_count, $size_t elem_size) -> void * {
 	if (mallptr != NULL && old_elem_count != 0) {
 		void *result;
 		size_t oldusable, newneeded;
@@ -1880,7 +1880,7 @@ recallocarray:(void *mallptr, size_t old_elem_count, size_t new_elem_count, size
 @@while still containing its previous contents.
 [section(.text.crt.heap.rare_helpers)]
 [requires($has_function(free))][userimpl]
-freezero:(void *mallptr, size_t size) {
+freezero:(void *mallptr, $size_t size) {
 	if likely(mallptr) {
 		explicit_bzero(mallptr, size);
 		free(mallptr);

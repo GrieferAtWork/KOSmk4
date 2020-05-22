@@ -1158,7 +1158,7 @@ PRIVATE ATTR_UNUSED struct {
 #undef IOCTL
 };
 
-PRIVATE ATTR_UNUSED WUNUSED char const *CC
+PRIVATE ATTR_UNUSED ATTR_CONST WUNUSED char const *CC
 get_ioctl_command_name(syscall_ulong_t command) {
 	unsigned int i;
 	char const *result;
@@ -1254,7 +1254,7 @@ print_ioctl_command(pformatprinter printer, void *arg,
 				temp = DOPRINT("R");
 			} else if (dir == _IOC_WRITE) {
 				temp = DOPRINT("W");
-			} else if (dir == (_IOC_WRITE | _IOC_READ)) {
+			} else /*if (dir == (_IOC_WRITE | _IOC_READ))*/ {
 				temp = DOPRINT("WR");
 			}
 			if unlikely(temp < 0)

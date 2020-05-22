@@ -341,7 +341,7 @@ NOTHROW(FCALL vga_backlog_setscrollpos)(unsigned int pos) {
 
 
 
-PUBLIC unsigned int
+PUBLIC ATTR_PURE WUNUSED unsigned int
 NOTHROW(FCALL dbg_getscroll)(void) {
 	return vga_backlog_scrollpos;
 }

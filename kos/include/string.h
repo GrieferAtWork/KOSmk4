@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xde13932d */
+/* HASH CRC-32:0xe9eef883 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -6781,11 +6781,11 @@ extern "C++" {
 /* Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
  * If found, return a pointer to its location within `str', else return `NULL'
  * This function originates from BSD, but is also provided as a KOS extension */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,strnstr,(char *__haystack, char *__needle, size_t __haystack_maxlen),strnstr,(__haystack, __needle, __haystack_maxlen))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,strnstr,(char *__haystack, char *__needle, __SIZE_TYPE__ __haystack_maxlen),strnstr,(__haystack, __needle, __haystack_maxlen))
 /* Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
  * If found, return a pointer to its location within `str', else return `NULL'
  * This function originates from BSD, but is also provided as a KOS extension */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char const *,__NOTHROW_NCX,strnstr,(char const *__haystack, char const *__needle, size_t __haystack_maxlen),strnstr,(__haystack, __needle, __haystack_maxlen))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char const *,__NOTHROW_NCX,strnstr,(char const *__haystack, char const *__needle, __SIZE_TYPE__ __haystack_maxlen),strnstr,(__haystack, __needle, __haystack_maxlen))
 }
 #else /* LIBC: strnstr */
 #include <local/string/strnstr.h>
@@ -6793,11 +6793,11 @@ extern "C++" {
 /* Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
  * If found, return a pointer to its location within `str', else return `NULL'
  * This function originates from BSD, but is also provided as a KOS extension */
-__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL strnstr)(char *__haystack, char *__needle, size_t __haystack_maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strnstr))(__haystack, __needle, __haystack_maxlen); }
+__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL strnstr)(char *__haystack, char *__needle, __SIZE_TYPE__ __haystack_maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strnstr))(__haystack, __needle, __haystack_maxlen); }
 /* Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
  * If found, return a pointer to its location within `str', else return `NULL'
  * This function originates from BSD, but is also provided as a KOS extension */
-__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char const *__NOTHROW_NCX(__LIBCCALL strnstr)(char const *__haystack, char const *__needle, size_t __haystack_maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strnstr))(__haystack, __needle, __haystack_maxlen); }
+__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char const *__NOTHROW_NCX(__LIBCCALL strnstr)(char const *__haystack, char const *__needle, __SIZE_TYPE__ __haystack_maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strnstr))(__haystack, __needle, __haystack_maxlen); }
 }
 #endif /* strnstr... */
 #else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
@@ -6805,13 +6805,13 @@ __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char const *__NOT
 /* Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
  * If found, return a pointer to its location within `str', else return `NULL'
  * This function originates from BSD, but is also provided as a KOS extension */
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,strnstr,(char const *__haystack, char const *__needle, size_t __haystack_maxlen),(__haystack,__needle,__haystack_maxlen))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,strnstr,(char const *__haystack, char const *__needle, __SIZE_TYPE__ __haystack_maxlen),(__haystack,__needle,__haystack_maxlen))
 #else /* LIBC: strnstr */
 #include <local/string/strnstr.h>
 /* Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
  * If found, return a pointer to its location within `str', else return `NULL'
  * This function originates from BSD, but is also provided as a KOS extension */
-__NAMESPACE_LOCAL_USING_OR_IMPL(strnstr, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL strnstr)(char const *__haystack, char const *__needle, size_t __haystack_maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strnstr))(__haystack, __needle, __haystack_maxlen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(strnstr, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL strnstr)(char const *__haystack, char const *__needle, __SIZE_TYPE__ __haystack_maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strnstr))(__haystack, __needle, __haystack_maxlen); })
 #endif /* strnstr... */
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRING_H_PROTO */
 #endif /* __USE_BSD || __USE_KOS */

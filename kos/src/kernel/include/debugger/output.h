@@ -102,7 +102,7 @@ typedef struct {
  *       be clamped to that value before being applied.
  * @param: pos: The position to which to scroll.
  * @return: * : The position that has been set. */
-FUNDEF unsigned int NOTHROW(FCALL dbg_getscroll)(void);
+FUNDEF ATTR_PURE WUNUSED unsigned int NOTHROW(FCALL dbg_getscroll)(void);
 FUNDEF unsigned int NOTHROW(FCALL dbg_setscroll)(unsigned int pos);
 
 /* The max line to which scrolling it possible. */

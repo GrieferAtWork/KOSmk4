@@ -133,7 +133,7 @@ dbg_relocate_hookpointers(struct dbg_hookhdr const *__restrict self,
 		newme.dc_name = (char *)((byte_t *)me->dc_name + loadaddr);
 		if unlikely(!ADDR_ISKERN(newme.dc_name))
 			goto err; /* Shouldn't happen */
-		*(void **)&newme.dc_main = (char *)((byte_t *)*(void **)&newme.dc_main + loadaddr);
+		*(void **)&newme.dc_main = (char *)((byte_t *)*(void **)&me->dc_main + loadaddr);
 		if unlikely(!ADDR_ISKERN(*(void **)&newme.dc_main))
 			goto err; /* Shouldn't happen */
 		if (newme.dc_size >= offsetafter(struct dbg_commandhook, dc_help)) {
@@ -141,7 +141,7 @@ dbg_relocate_hookpointers(struct dbg_hookhdr const *__restrict self,
 			if unlikely(newme.dc_help && !ADDR_ISKERN(newme.dc_help))
 				goto err; /* Shouldn't happen */
 			if (newme.dc_size >= offsetafter(struct dbg_commandhook, dc_auto)) {
-				*(void **)&newme.dc_auto = (char *)((byte_t *)*(void **)&newme.dc_auto + loadaddr);
+				*(void **)&newme.dc_auto = (char *)((byte_t *)*(void **)&me->dc_auto + loadaddr);
 				if unlikely(newme.dc_auto && !ADDR_ISKERN(*(void **)&newme.dc_auto))
 					goto err; /* Shouldn't happen */
 			}
@@ -161,7 +161,7 @@ dbg_relocate_hookpointers(struct dbg_hookhdr const *__restrict self,
 		newme.di_type = me->di_type;
 		newme.di_flag = me->di_flag & ~DBG_HOOKFLAG_RELATIVE;
 		newme.di_size = sizeof(newme);
-		*(void **)&newme.di_func = (char *)((byte_t *)*(void **)&newme.di_func + loadaddr);
+		*(void **)&newme.di_func = (char *)((byte_t *)*(void **)&me->di_func + loadaddr);
 		if unlikely(!ADDR_ISKERN(*(void **)&newme.di_func))
 			goto err; /* Shouldn't happen */
 		result = dbg_overwrite((struct dbg_hookhdr *)me,

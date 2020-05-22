@@ -5423,9 +5423,9 @@ __SYSDECL_BEGIN
 @@If found, return a pointer to its location within `str', else return `NULL'
 @@This function originates from BSD, but is also provided as a KOS extension
 [ATTR_WUNUSED][ATTR_PURE]
-strnstr:([nonnull] char const *haystack, [nonnull] char const *needle, size_t haystack_maxlen) -> char *
-	[([nonnull] char *haystack, [nonnull] char *needle, size_t haystack_maxlen) -> char *]
-	[([nonnull] char const *haystack, [nonnull] char const *needle, size_t haystack_maxlen) -> char const *]
+strnstr:([nonnull] char const *haystack, [nonnull] char const *needle, $size_t haystack_maxlen) -> char *
+	[([nonnull] char *haystack, [nonnull] char *needle, $size_t haystack_maxlen) -> char *]
+	[([nonnull] char const *haystack, [nonnull] char const *needle, $size_t haystack_maxlen) -> char const *]
 {
 	char ch, needle_start = *needle++;
 	while (haystack_maxlen-- && (ch = *haystack++) != '\0') {
