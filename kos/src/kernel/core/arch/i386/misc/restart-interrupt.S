@@ -17,27 +17,20 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_KERNEL_RESTART_INTERRUPT_H
-#define GUARD_KERNEL_INCLUDE_KERNEL_RESTART_INTERRUPT_H 1
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_MISC_RESTART_INTERRUPT_S
+#define GUARD_KERNEL_CORE_ARCH_I386_MISC_RESTART_INTERRUPT_S 1
+#define __ASSEMBLER__ 1
 
 #include <kernel/compiler.h>
 
-#include <kernel/arch/restart-interrupt.h>
+#include <kernel/restart-interrupt.h>
 
-DECL_BEGIN
+#include <hybrid/host.h>
 
-#ifndef KERNEL_INTERRUPT_CALLBACK_CC
-#define KERNEL_INTERRUPT_CALLBACK_CC FCALL
-#endif /* !KERNEL_INTERRUPT_CALLBACK_CC */
+#include <asm/cfi.h>
+#include <asm/instr/compat.h>
+#include <kos/kernel/cpu-state-asm.h>
 
-#ifdef __CC__
-
-/* Callback prototype for `kernel_restart_interrupt()' */
-#ifndef __kernel_interrupt_callback_t_defined
-#define __kernel_interrupt_callback_t_defined 1
-typedef struct icpustate *
-(KERNEL_INTERRUPT_CALLBACK_CC *kernel_interrupt_callback_t)(struct icpustate *__restrict state);
-#endif /* !__kernel_interrupt_callback_t_defined */
 
 /* Hard-set the current stack depth to `state' and invoke `cb()' by passing `state' to it.
  * Once `cb()' returns, the cpu state returned by it is loaded, and execution is resumed.
@@ -46,15 +39,46 @@ typedef struct icpustate *
  *          function does not return in any way that is observable to the caller.
  *          Rather, it behaves similar to `longjmp()', in that `cb()' is made to return to
  *          the origin of `state' after being injected ontop of that location. */
-#ifndef __kernel_restart_interrupt_defined
-#define __kernel_restart_interrupt_defined 1
-FUNDEF ATTR_NORETURN void KERNEL_INTERRUPT_CALLBACK_CC
-kernel_restart_interrupt(struct icpustate *__restrict state,
-                         kernel_interrupt_callback_t cb);
-#endif /* !__kernel_restart_interrupt_defined */
+/* FUNDEF ATTR_NORETURN void FCALL
+ * kernel_restart_interrupt(struct icpustate *__restrict state,
+ *                          kernel_interrupt_callback_t cb); */
+.section .text
+PUBLIC_FUNCTION(kernel_restart_interrupt)
+	.cfi_startproc simple
+	.cfi_signal_frame
+	.cfi_def_cfa %R_fcall0P, OFFSET_ICPUSTATE_IRREGS
+#ifdef __x86_64__
+	ASM_CFI_REL_OFFSET_RESTORE_ICPUSTATE(0)
+#else /* __x86_64__ */
+	.cfi_restore_iret_eip
+	.cfi_restore_iret_cs
+	.cfi_restore_iret_eflags
+	.cfi_restore_iret_esp
+	.cfi_restore_iret_ss
+	.cfi_restore_iret_es_or_offset (OFFSET_ICPUSTATE_ES - OFFSET_ICPUSTATE_IRREGS)
+	.cfi_restore_iret_ds_or_offset (OFFSET_ICPUSTATE_DS - OFFSET_ICPUSTATE_IRREGS)
+	.cfi_restore_iret_fs_or_offset (OFFSET_ICPUSTATE_FS - OFFSET_ICPUSTATE_IRREGS)
+	.cfi_restore_iret_gs
+	.cfi_rel_offset %edi, (OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EDI)
+	.cfi_rel_offset %esi, (OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_ESI)
+	.cfi_rel_offset %ebp, (OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EBP)
+	.cfi_rel_offset %ebx, (OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EBX)
+	.cfi_rel_offset %edx, (OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EDX)
+	.cfi_rel_offset %ecx, (OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_ECX)
+	.cfi_rel_offset %eax, (OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EAX)
+#endif /* !__x86_64__ */
+	movP   %R_fcall0P, %Psp
+	.cfi_def_cfa_register %Psp
+	callP  *%R_fcall1P /* %Pax = (*cb)(state); */
+	movP   %Pax, %Psp
+#ifdef __x86_64__
+	EXTERN(libcpu_apply_icpustate_rsp)
+	jmp    libcpu_apply_icpustate_rsp
+#else /* __x86_64__ */
+	EXTERN(libcpu_apply_icpustate_esp)
+	jmp    libcpu_apply_icpustate_esp
+#endif /* !__x86_64__ */
+	.cfi_endproc
+END(kernel_restart_interrupt)
 
-#endif /* __CC__ */
-
-DECL_END
-
-#endif /* !GUARD_KERNEL_INCLUDE_KERNEL_RESTART_INTERRUPT_H */
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_MISC_RESTART_INTERRUPT_S */

@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_MISC_VBOXGDB32_S
 #define GUARD_KERNEL_CORE_ARCH_I386_MISC_VBOXGDB32_S 1
+#define __ASSEMBLER__ 1
 
 #include <kernel/compiler.h>
 #include <kernel/vboxgdb.h>
