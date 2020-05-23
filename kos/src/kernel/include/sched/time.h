@@ -55,8 +55,9 @@ struct realtime_clock_struct {
 	 *        hardware to generate an interrupt), but return earlier if a sporadic
 	 *        interrupt happens before then.
 	 * NOTE: This function is only ever called with preemption enabled!
-	 * @return: true:  The given `abs_time' has expired.
-	 * @return: false: A sporadic interrupt happened. */
+	 * @return: true:  The given `abs_time' (may have) expired.
+	 * @return: false: A sporadic interrupt happened, or some necessary
+	 *                 hardware context/lock could not be acquired. */
 	bool /*NOTHROW*/(KCALL *rc_waitfor)(struct realtime_clock_struct *__restrict self,
 	                                    struct timespec const *__restrict abs_time);
 	/* [0..1] Optional finalizer callback. */

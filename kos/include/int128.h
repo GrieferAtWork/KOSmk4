@@ -27,11 +27,9 @@
 #include <bits/types.h>
 
 /* HINT: If your compiling your program with C++, you can enable c++ operator
- *       integration for (u)int128_t for (most) standard operators by pre-defining
- *       a macro `#define WANT_INT128_CXX_INTEGRATION 1' before #including any
- *       system header:
- * 
- */
+ *       integration for (u)int128_t for (most) standard operators by pre-
+ *       defining a macro `#define WANT_INT128_CXX_INTEGRATION 1' at the
+ *       start of your source file. */
 
 #ifdef __CC__
 __SYSDECL_BEGIN
@@ -481,65 +479,375 @@ void int128_sub128(uint128_t &__var, uint128_t __value);
 
 /* VAR == VALUE */
 #ifdef __CHAR_UNSIGNED__
-void uint128_eq(int128_t &__var, char __value);
-void uint128_eq(uint128_t &__var, char __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_eq(int128_t const &__var, char __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_eq(uint128_t const &__var, char __value);
 #endif /* __CHAR_UNSIGNED__ */
-void uint128_eq(int128_t &__var, unsigned char __value);
-void uint128_eq(uint128_t &__var, unsigned char __value);
-void uint128_eq(int128_t &__var, unsigned short __value);
-void uint128_eq(uint128_t &__var, unsigned short __value);
-void uint128_eq(int128_t &__var, unsigned int __value);
-void uint128_eq(uint128_t &__var, unsigned int __value);
-void uint128_eq(int128_t &__var, unsigned long __value);
-void uint128_eq(uint128_t &__var, unsigned long __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_eq(int128_t const &__var, unsigned char __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_eq(uint128_t const &__var, unsigned char __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_eq(int128_t const &__var, unsigned short __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_eq(uint128_t const &__var, unsigned short __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_eq(int128_t const &__var, unsigned int __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_eq(uint128_t const &__var, unsigned int __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_eq(int128_t const &__var, unsigned long __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_eq(uint128_t const &__var, unsigned long __value);
 #ifdef __COMPILER_HAVE_LONGLONG
-void uint128_eq(int128_t &__var, __ULONGLONG __value);
-void uint128_eq(uint128_t &__var, __ULONGLONG __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_eq(int128_t const &__var, __ULONGLONG __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_eq(uint128_t const &__var, __ULONGLONG __value);
 #endif /* __COMPILER_HAVE_LONGLONG */
-void uint128_eq8(int128_t &__var, __UINT8_TYPE__ __value);
-void uint128_eq8(uint128_t &__var, __UINT8_TYPE__ __value);
-void uint128_eq16(int128_t &__var, __UINT16_TYPE__ __value);
-void uint128_eq16(uint128_t &__var, __UINT16_TYPE__ __value);
-void uint128_eq32(int128_t &__var, __UINT32_TYPE__ __value);
-void uint128_eq32(uint128_t &__var, __UINT32_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_eq8(int128_t const &__var, __UINT8_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_eq8(uint128_t const &__var, __UINT8_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_eq16(int128_t const &__var, __UINT16_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_eq16(uint128_t const &__var, __UINT16_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_eq32(int128_t const &__var, __UINT32_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_eq32(uint128_t const &__var, __UINT32_TYPE__ __value);
 #ifdef __UINT64_TYPE__
-void uint128_eq64(int128_t &__var, __UINT64_TYPE__ __value);
-void uint128_eq64(uint128_t &__var, __UINT64_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_eq64(int128_t const &__var, __UINT64_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_eq64(uint128_t const &__var, __UINT64_TYPE__ __value);
 #endif /* __UINT64_TYPE__ */
-void uint128_eq128(int128_t &__var, int128_t __value);
-void uint128_eq128(uint128_t &__var, int128_t __value);
-void uint128_eq128(int128_t &__var, uint128_t __value);
-void uint128_eq128(uint128_t &__var, uint128_t __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_eq128(int128_t const &__var, int128_t __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_eq128(uint128_t const &__var, int128_t __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_eq128(int128_t const &__var, uint128_t __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_eq128(uint128_t const &__var, uint128_t __value);
 #ifndef __CHAR_UNSIGNED__
-void int128_eq(int128_t &__var, char __value);
-void int128_eq(uint128_t &__var, char __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_eq(int128_t const &__var, char __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_eq(uint128_t const &__var, char __value);
 #endif /* !__CHAR_UNSIGNED__ */
-void int128_eq(int128_t &__var, signed char __value);
-void int128_eq(uint128_t &__var, signed char __value);
-void int128_eq(int128_t &__var, short __value);
-void int128_eq(uint128_t &__var, short __value);
-void int128_eq(int128_t &__var, int __value);
-void int128_eq(uint128_t &__var, int __value);
-void int128_eq(int128_t &__var, long __value);
-void int128_eq(uint128_t &__var, long __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_eq(int128_t const &__var, signed char __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_eq(uint128_t const &__var, signed char __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_eq(int128_t const &__var, short __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_eq(uint128_t const &__var, short __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_eq(int128_t const &__var, int __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_eq(uint128_t const &__var, int __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_eq(int128_t const &__var, long __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_eq(uint128_t const &__var, long __value);
 #ifdef __COMPILER_HAVE_LONGLONG
-void int128_eq(int128_t &__var, __LONGLONG __value);
-void int128_eq(uint128_t &__var, __LONGLONG __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_eq(int128_t const &__var, __LONGLONG __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_eq(uint128_t const &__var, __LONGLONG __value);
 #endif /* __COMPILER_HAVE_LONGLONG */
-void int128_eq8(int128_t &__var, __UINT8_TYPE__ __value);
-void int128_eq8(uint128_t &__var, __UINT8_TYPE__ __value);
-void int128_eq16(int128_t &__var, __UINT16_TYPE__ __value);
-void int128_eq16(uint128_t &__var, __UINT16_TYPE__ __value);
-void int128_eq32(int128_t &__var, __UINT32_TYPE__ __value);
-void int128_eq32(uint128_t &__var, __UINT32_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_eq8(int128_t const &__var, __UINT8_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_eq8(uint128_t const &__var, __UINT8_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_eq16(int128_t const &__var, __UINT16_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_eq16(uint128_t const &__var, __UINT16_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_eq32(int128_t const &__var, __UINT32_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_eq32(uint128_t const &__var, __UINT32_TYPE__ __value);
 #ifdef __UINT64_TYPE__
-void int128_eq64(int128_t &__var, __UINT64_TYPE__ __value);
-void int128_eq64(uint128_t &__var, __UINT64_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_eq64(int128_t const &__var, __UINT64_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_eq64(uint128_t const &__var, __UINT64_TYPE__ __value);
 #endif /* __UINT64_TYPE__ */
-void int128_eq128(int128_t &__var, int128_t __value);
-void int128_eq128(uint128_t &__var, int128_t __value);
-void int128_eq128(int128_t &__var, uint128_t __value);
-void int128_eq128(uint128_t &__var, uint128_t __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_eq128(int128_t const &__var, int128_t __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_eq128(uint128_t const &__var, int128_t __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_eq128(int128_t const &__var, uint128_t __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_eq128(uint128_t const &__var, uint128_t __value);
+
+/* VAR != VALUE */
+#ifdef __CHAR_UNSIGNED__
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ne(int128_t const &__var, char __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ne(uint128_t const &__var, char __value);
+#endif /* __CHAR_UNSIGNED__ */
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ne(int128_t const &__var, unsigned char __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ne(uint128_t const &__var, unsigned char __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ne(int128_t const &__var, unsigned short __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ne(uint128_t const &__var, unsigned short __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ne(int128_t const &__var, unsigned int __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ne(uint128_t const &__var, unsigned int __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ne(int128_t const &__var, unsigned long __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ne(uint128_t const &__var, unsigned long __value);
+#ifdef __COMPILER_HAVE_LONGLONG
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ne(int128_t const &__var, __ULONGLONG __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ne(uint128_t const &__var, __ULONGLONG __value);
+#endif /* __COMPILER_HAVE_LONGLONG */
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ne8(int128_t const &__var, __UINT8_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ne8(uint128_t const &__var, __UINT8_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ne16(int128_t const &__var, __UINT16_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ne16(uint128_t const &__var, __UINT16_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ne32(int128_t const &__var, __UINT32_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ne32(uint128_t const &__var, __UINT32_TYPE__ __value);
+#ifdef __UINT64_TYPE__
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ne64(int128_t const &__var, __UINT64_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ne64(uint128_t const &__var, __UINT64_TYPE__ __value);
+#endif /* __UINT64_TYPE__ */
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ne128(int128_t const &__var, int128_t __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ne128(uint128_t const &__var, int128_t __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ne128(int128_t const &__var, uint128_t __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ne128(uint128_t const &__var, uint128_t __value);
+#ifndef __CHAR_UNSIGNED__
+__ATTR_WUNUSED __ATTR_PURE bool int128_ne(int128_t const &__var, char __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_ne(uint128_t const &__var, char __value);
+#endif /* !__CHAR_UNSIGNED__ */
+__ATTR_WUNUSED __ATTR_PURE bool int128_ne(int128_t const &__var, signed char __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_ne(uint128_t const &__var, signed char __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_ne(int128_t const &__var, short __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_ne(uint128_t const &__var, short __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_ne(int128_t const &__var, int __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_ne(uint128_t const &__var, int __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_ne(int128_t const &__var, long __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_ne(uint128_t const &__var, long __value);
+#ifdef __COMPILER_HAVE_LONGLONG
+__ATTR_WUNUSED __ATTR_PURE bool int128_ne(int128_t const &__var, __LONGLONG __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_ne(uint128_t const &__var, __LONGLONG __value);
+#endif /* __COMPILER_HAVE_LONGLONG */
+__ATTR_WUNUSED __ATTR_PURE bool int128_ne8(int128_t const &__var, __UINT8_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_ne8(uint128_t const &__var, __UINT8_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_ne16(int128_t const &__var, __UINT16_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_ne16(uint128_t const &__var, __UINT16_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_ne32(int128_t const &__var, __UINT32_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_ne32(uint128_t const &__var, __UINT32_TYPE__ __value);
+#ifdef __UINT64_TYPE__
+__ATTR_WUNUSED __ATTR_PURE bool int128_ne64(int128_t const &__var, __UINT64_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_ne64(uint128_t const &__var, __UINT64_TYPE__ __value);
+#endif /* __UINT64_TYPE__ */
+__ATTR_WUNUSED __ATTR_PURE bool int128_ne128(int128_t const &__var, int128_t __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_ne128(uint128_t const &__var, int128_t __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_ne128(int128_t const &__var, uint128_t __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_ne128(uint128_t const &__var, uint128_t __value);
+
+/* VAR < VALUE */
+#ifdef __CHAR_UNSIGNED__
+__ATTR_WUNUSED __ATTR_PURE bool uint128_lo(int128_t const &__var, char __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_lo(uint128_t const &__var, char __value);
+#endif /* __CHAR_UNSIGNED__ */
+__ATTR_WUNUSED __ATTR_PURE bool uint128_lo(int128_t const &__var, unsigned char __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_lo(uint128_t const &__var, unsigned char __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_lo(int128_t const &__var, unsigned short __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_lo(uint128_t const &__var, unsigned short __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_lo(int128_t const &__var, unsigned int __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_lo(uint128_t const &__var, unsigned int __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_lo(int128_t const &__var, unsigned long __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_lo(uint128_t const &__var, unsigned long __value);
+#ifdef __COMPILER_HAVE_LONGLONG
+__ATTR_WUNUSED __ATTR_PURE bool uint128_lo(int128_t const &__var, __ULONGLONG __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_lo(uint128_t const &__var, __ULONGLONG __value);
+#endif /* __COMPILER_HAVE_LONGLONG */
+__ATTR_WUNUSED __ATTR_PURE bool uint128_lo8(int128_t const &__var, __UINT8_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_lo8(uint128_t const &__var, __UINT8_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_lo16(int128_t const &__var, __UINT16_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_lo16(uint128_t const &__var, __UINT16_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_lo32(int128_t const &__var, __UINT32_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_lo32(uint128_t const &__var, __UINT32_TYPE__ __value);
+#ifdef __UINT64_TYPE__
+__ATTR_WUNUSED __ATTR_PURE bool uint128_lo64(int128_t const &__var, __UINT64_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_lo64(uint128_t const &__var, __UINT64_TYPE__ __value);
+#endif /* __UINT64_TYPE__ */
+__ATTR_WUNUSED __ATTR_PURE bool uint128_lo128(int128_t const &__var, int128_t __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_lo128(uint128_t const &__var, int128_t __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_lo128(int128_t const &__var, uint128_t __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_lo128(uint128_t const &__var, uint128_t __value);
+#ifndef __CHAR_UNSIGNED__
+__ATTR_WUNUSED __ATTR_PURE bool int128_lo(int128_t const &__var, char __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_lo(uint128_t const &__var, char __value);
+#endif /* !__CHAR_UNSIGNED__ */
+__ATTR_WUNUSED __ATTR_PURE bool int128_lo(int128_t const &__var, signed char __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_lo(uint128_t const &__var, signed char __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_lo(int128_t const &__var, short __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_lo(uint128_t const &__var, short __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_lo(int128_t const &__var, int __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_lo(uint128_t const &__var, int __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_lo(int128_t const &__var, long __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_lo(uint128_t const &__var, long __value);
+#ifdef __COMPILER_HAVE_LONGLONG
+__ATTR_WUNUSED __ATTR_PURE bool int128_lo(int128_t const &__var, __LONGLONG __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_lo(uint128_t const &__var, __LONGLONG __value);
+#endif /* __COMPILER_HAVE_LONGLONG */
+__ATTR_WUNUSED __ATTR_PURE bool int128_lo8(int128_t const &__var, __UINT8_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_lo8(uint128_t const &__var, __UINT8_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_lo16(int128_t const &__var, __UINT16_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_lo16(uint128_t const &__var, __UINT16_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_lo32(int128_t const &__var, __UINT32_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_lo32(uint128_t const &__var, __UINT32_TYPE__ __value);
+#ifdef __UINT64_TYPE__
+__ATTR_WUNUSED __ATTR_PURE bool int128_lo64(int128_t const &__var, __UINT64_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_lo64(uint128_t const &__var, __UINT64_TYPE__ __value);
+#endif /* __UINT64_TYPE__ */
+__ATTR_WUNUSED __ATTR_PURE bool int128_lo128(int128_t const &__var, int128_t __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_lo128(uint128_t const &__var, int128_t __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_lo128(int128_t const &__var, uint128_t __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_lo128(uint128_t const &__var, uint128_t __value);
+
+/* VAR <= VALUE */
+#ifdef __CHAR_UNSIGNED__
+__ATTR_WUNUSED __ATTR_PURE bool uint128_le(int128_t const &__var, char __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_le(uint128_t const &__var, char __value);
+#endif /* __CHAR_UNSIGNED__ */
+__ATTR_WUNUSED __ATTR_PURE bool uint128_le(int128_t const &__var, unsigned char __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_le(uint128_t const &__var, unsigned char __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_le(int128_t const &__var, unsigned short __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_le(uint128_t const &__var, unsigned short __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_le(int128_t const &__var, unsigned int __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_le(uint128_t const &__var, unsigned int __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_le(int128_t const &__var, unsigned long __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_le(uint128_t const &__var, unsigned long __value);
+#ifdef __COMPILER_HAVE_LONGLONG
+__ATTR_WUNUSED __ATTR_PURE bool uint128_le(int128_t const &__var, __ULONGLONG __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_le(uint128_t const &__var, __ULONGLONG __value);
+#endif /* __COMPILER_HAVE_LONGLONG */
+__ATTR_WUNUSED __ATTR_PURE bool uint128_le8(int128_t const &__var, __UINT8_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_le8(uint128_t const &__var, __UINT8_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_le16(int128_t const &__var, __UINT16_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_le16(uint128_t const &__var, __UINT16_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_le32(int128_t const &__var, __UINT32_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_le32(uint128_t const &__var, __UINT32_TYPE__ __value);
+#ifdef __UINT64_TYPE__
+__ATTR_WUNUSED __ATTR_PURE bool uint128_le64(int128_t const &__var, __UINT64_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_le64(uint128_t const &__var, __UINT64_TYPE__ __value);
+#endif /* __UINT64_TYPE__ */
+__ATTR_WUNUSED __ATTR_PURE bool uint128_le128(int128_t const &__var, int128_t __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_le128(uint128_t const &__var, int128_t __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_le128(int128_t const &__var, uint128_t __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_le128(uint128_t const &__var, uint128_t __value);
+#ifndef __CHAR_UNSIGNED__
+__ATTR_WUNUSED __ATTR_PURE bool int128_le(int128_t const &__var, char __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_le(uint128_t const &__var, char __value);
+#endif /* !__CHAR_UNSIGNED__ */
+__ATTR_WUNUSED __ATTR_PURE bool int128_le(int128_t const &__var, signed char __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_le(uint128_t const &__var, signed char __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_le(int128_t const &__var, short __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_le(uint128_t const &__var, short __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_le(int128_t const &__var, int __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_le(uint128_t const &__var, int __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_le(int128_t const &__var, long __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_le(uint128_t const &__var, long __value);
+#ifdef __COMPILER_HAVE_LONGLONG
+__ATTR_WUNUSED __ATTR_PURE bool int128_le(int128_t const &__var, __LONGLONG __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_le(uint128_t const &__var, __LONGLONG __value);
+#endif /* __COMPILER_HAVE_LONGLONG */
+__ATTR_WUNUSED __ATTR_PURE bool int128_le8(int128_t const &__var, __UINT8_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_le8(uint128_t const &__var, __UINT8_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_le16(int128_t const &__var, __UINT16_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_le16(uint128_t const &__var, __UINT16_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_le32(int128_t const &__var, __UINT32_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_le32(uint128_t const &__var, __UINT32_TYPE__ __value);
+#ifdef __UINT64_TYPE__
+__ATTR_WUNUSED __ATTR_PURE bool int128_le64(int128_t const &__var, __UINT64_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_le64(uint128_t const &__var, __UINT64_TYPE__ __value);
+#endif /* __UINT64_TYPE__ */
+__ATTR_WUNUSED __ATTR_PURE bool int128_le128(int128_t const &__var, int128_t __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_le128(uint128_t const &__var, int128_t __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_le128(int128_t const &__var, uint128_t __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_le128(uint128_t const &__var, uint128_t __value);
+
+/* VAR > VALUE */
+#ifdef __CHAR_UNSIGNED__
+__ATTR_WUNUSED __ATTR_PURE bool uint128_gr(int128_t const &__var, char __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_gr(uint128_t const &__var, char __value);
+#endif /* __CHAR_UNSIGNED__ */
+__ATTR_WUNUSED __ATTR_PURE bool uint128_gr(int128_t const &__var, unsigned char __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_gr(uint128_t const &__var, unsigned char __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_gr(int128_t const &__var, unsigned short __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_gr(uint128_t const &__var, unsigned short __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_gr(int128_t const &__var, unsigned int __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_gr(uint128_t const &__var, unsigned int __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_gr(int128_t const &__var, unsigned long __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_gr(uint128_t const &__var, unsigned long __value);
+#ifdef __COMPILER_HAVE_LONGLONG
+__ATTR_WUNUSED __ATTR_PURE bool uint128_gr(int128_t const &__var, __ULONGLONG __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_gr(uint128_t const &__var, __ULONGLONG __value);
+#endif /* __COMPILER_HAVE_LONGLONG */
+__ATTR_WUNUSED __ATTR_PURE bool uint128_gr8(int128_t const &__var, __UINT8_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_gr8(uint128_t const &__var, __UINT8_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_gr16(int128_t const &__var, __UINT16_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_gr16(uint128_t const &__var, __UINT16_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_gr32(int128_t const &__var, __UINT32_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_gr32(uint128_t const &__var, __UINT32_TYPE__ __value);
+#ifdef __UINT64_TYPE__
+__ATTR_WUNUSED __ATTR_PURE bool uint128_gr64(int128_t const &__var, __UINT64_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_gr64(uint128_t const &__var, __UINT64_TYPE__ __value);
+#endif /* __UINT64_TYPE__ */
+__ATTR_WUNUSED __ATTR_PURE bool uint128_gr128(int128_t const &__var, int128_t __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_gr128(uint128_t const &__var, int128_t __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_gr128(int128_t const &__var, uint128_t __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_gr128(uint128_t const &__var, uint128_t __value);
+#ifndef __CHAR_UNSIGNED__
+__ATTR_WUNUSED __ATTR_PURE bool int128_gr(int128_t const &__var, char __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_gr(uint128_t const &__var, char __value);
+#endif /* !__CHAR_UNSIGNED__ */
+__ATTR_WUNUSED __ATTR_PURE bool int128_gr(int128_t const &__var, signed char __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_gr(uint128_t const &__var, signed char __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_gr(int128_t const &__var, short __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_gr(uint128_t const &__var, short __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_gr(int128_t const &__var, int __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_gr(uint128_t const &__var, int __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_gr(int128_t const &__var, long __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_gr(uint128_t const &__var, long __value);
+#ifdef __COMPILER_HAVE_LONGLONG
+__ATTR_WUNUSED __ATTR_PURE bool int128_gr(int128_t const &__var, __LONGLONG __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_gr(uint128_t const &__var, __LONGLONG __value);
+#endif /* __COMPILER_HAVE_LONGLONG */
+__ATTR_WUNUSED __ATTR_PURE bool int128_gr8(int128_t const &__var, __UINT8_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_gr8(uint128_t const &__var, __UINT8_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_gr16(int128_t const &__var, __UINT16_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_gr16(uint128_t const &__var, __UINT16_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_gr32(int128_t const &__var, __UINT32_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_gr32(uint128_t const &__var, __UINT32_TYPE__ __value);
+#ifdef __UINT64_TYPE__
+__ATTR_WUNUSED __ATTR_PURE bool int128_gr64(int128_t const &__var, __UINT64_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_gr64(uint128_t const &__var, __UINT64_TYPE__ __value);
+#endif /* __UINT64_TYPE__ */
+__ATTR_WUNUSED __ATTR_PURE bool int128_gr128(int128_t const &__var, int128_t __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_gr128(uint128_t const &__var, int128_t __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_gr128(int128_t const &__var, uint128_t __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_gr128(uint128_t const &__var, uint128_t __value);
+
+/* VAR >= VALUE */
+#ifdef __CHAR_UNSIGNED__
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ge(int128_t const &__var, char __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ge(uint128_t const &__var, char __value);
+#endif /* __CHAR_UNSIGNED__ */
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ge(int128_t const &__var, unsigned char __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ge(uint128_t const &__var, unsigned char __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ge(int128_t const &__var, unsigned short __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ge(uint128_t const &__var, unsigned short __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ge(int128_t const &__var, unsigned int __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ge(uint128_t const &__var, unsigned int __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ge(int128_t const &__var, unsigned long __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ge(uint128_t const &__var, unsigned long __value);
+#ifdef __COMPILER_HAVE_LONGLONG
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ge(int128_t const &__var, __ULONGLONG __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ge(uint128_t const &__var, __ULONGLONG __value);
+#endif /* __COMPILER_HAVE_LONGLONG */
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ge8(int128_t const &__var, __UINT8_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ge8(uint128_t const &__var, __UINT8_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ge16(int128_t const &__var, __UINT16_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ge16(uint128_t const &__var, __UINT16_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ge32(int128_t const &__var, __UINT32_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ge32(uint128_t const &__var, __UINT32_TYPE__ __value);
+#ifdef __UINT64_TYPE__
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ge64(int128_t const &__var, __UINT64_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ge64(uint128_t const &__var, __UINT64_TYPE__ __value);
+#endif /* __UINT64_TYPE__ */
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ge128(int128_t const &__var, int128_t __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ge128(uint128_t const &__var, int128_t __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ge128(int128_t const &__var, uint128_t __value);
+__ATTR_WUNUSED __ATTR_PURE bool uint128_ge128(uint128_t const &__var, uint128_t __value);
+#ifndef __CHAR_UNSIGNED__
+__ATTR_WUNUSED __ATTR_PURE bool int128_ge(int128_t const &__var, char __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_ge(uint128_t const &__var, char __value);
+#endif /* !__CHAR_UNSIGNED__ */
+__ATTR_WUNUSED __ATTR_PURE bool int128_ge(int128_t const &__var, signed char __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_ge(uint128_t const &__var, signed char __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_ge(int128_t const &__var, short __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_ge(uint128_t const &__var, short __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_ge(int128_t const &__var, int __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_ge(uint128_t const &__var, int __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_ge(int128_t const &__var, long __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_ge(uint128_t const &__var, long __value);
+#ifdef __COMPILER_HAVE_LONGLONG
+__ATTR_WUNUSED __ATTR_PURE bool int128_ge(int128_t const &__var, __LONGLONG __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_ge(uint128_t const &__var, __LONGLONG __value);
+#endif /* __COMPILER_HAVE_LONGLONG */
+__ATTR_WUNUSED __ATTR_PURE bool int128_ge8(int128_t const &__var, __UINT8_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_ge8(uint128_t const &__var, __UINT8_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_ge16(int128_t const &__var, __UINT16_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_ge16(uint128_t const &__var, __UINT16_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_ge32(int128_t const &__var, __UINT32_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_ge32(uint128_t const &__var, __UINT32_TYPE__ __value);
+#ifdef __UINT64_TYPE__
+__ATTR_WUNUSED __ATTR_PURE bool int128_ge64(int128_t const &__var, __UINT64_TYPE__ __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_ge64(uint128_t const &__var, __UINT64_TYPE__ __value);
+#endif /* __UINT64_TYPE__ */
+__ATTR_WUNUSED __ATTR_PURE bool int128_ge128(int128_t const &__var, int128_t __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_ge128(uint128_t const &__var, int128_t __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_ge128(int128_t const &__var, uint128_t __value);
+__ATTR_WUNUSED __ATTR_PURE bool int128_ge128(uint128_t const &__var, uint128_t __value);
 
 /* Perform inplace-shift operations in `VAR'
  * NOTES:
@@ -755,6 +1063,56 @@ __ATTR_WUNUSED __ATTR_PURE bool int128_is64bit(int128_t const &__var);   /* VAR 
 #define int128_eq16(var, v)                 __hybrid_int128_eq16(var, v)
 #define int128_eq32(var, v)                 __hybrid_int128_eq32(var, v)
 #define int128_eq128(var, v)                __hybrid_int128_eq128(var, v)
+#define uint128_ne(var, v)                  __hybrid_uint128_ne(var, v)
+#define uint128_ne8(var, v)                 __hybrid_uint128_ne8(var, v)
+#define uint128_ne16(var, v)                __hybrid_uint128_ne16(var, v)
+#define uint128_ne32(var, v)                __hybrid_uint128_ne32(var, v)
+#define uint128_ne128(var, v)               __hybrid_uint128_ne128(var, v)
+#define int128_ne(var, v)                   __hybrid_int128_ne(var, v)
+#define int128_ne8(var, v)                  __hybrid_int128_ne8(var, v)
+#define int128_ne16(var, v)                 __hybrid_int128_ne16(var, v)
+#define int128_ne32(var, v)                 __hybrid_int128_ne32(var, v)
+#define int128_ne128(var, v)                __hybrid_int128_ne128(var, v)
+#define uint128_lo(var, v)                  __hybrid_uint128_lo(var, v)
+#define uint128_lo8(var, v)                 __hybrid_uint128_lo8(var, v)
+#define uint128_lo16(var, v)                __hybrid_uint128_lo16(var, v)
+#define uint128_lo32(var, v)                __hybrid_uint128_lo32(var, v)
+#define uint128_lo128(var, v)               __hybrid_uint128_lo128(var, v)
+#define int128_lo(var, v)                   __hybrid_int128_lo(var, v)
+#define int128_lo8(var, v)                  __hybrid_int128_lo8(var, v)
+#define int128_lo16(var, v)                 __hybrid_int128_lo16(var, v)
+#define int128_lo32(var, v)                 __hybrid_int128_lo32(var, v)
+#define int128_lo128(var, v)                __hybrid_int128_lo128(var, v)
+#define uint128_le(var, v)                  __hybrid_uint128_le(var, v)
+#define uint128_le8(var, v)                 __hybrid_uint128_le8(var, v)
+#define uint128_le16(var, v)                __hybrid_uint128_le16(var, v)
+#define uint128_le32(var, v)                __hybrid_uint128_le32(var, v)
+#define uint128_le128(var, v)               __hybrid_uint128_le128(var, v)
+#define int128_le(var, v)                   __hybrid_int128_le(var, v)
+#define int128_le8(var, v)                  __hybrid_int128_le8(var, v)
+#define int128_le16(var, v)                 __hybrid_int128_le16(var, v)
+#define int128_le32(var, v)                 __hybrid_int128_le32(var, v)
+#define int128_le128(var, v)                __hybrid_int128_le128(var, v)
+#define uint128_gr(var, v)                  __hybrid_uint128_gr(var, v)
+#define uint128_gr8(var, v)                 __hybrid_uint128_gr8(var, v)
+#define uint128_gr16(var, v)                __hybrid_uint128_gr16(var, v)
+#define uint128_gr32(var, v)                __hybrid_uint128_gr32(var, v)
+#define uint128_gr128(var, v)               __hybrid_uint128_gr128(var, v)
+#define int128_gr(var, v)                   __hybrid_int128_gr(var, v)
+#define int128_gr8(var, v)                  __hybrid_int128_gr8(var, v)
+#define int128_gr16(var, v)                 __hybrid_int128_gr16(var, v)
+#define int128_gr32(var, v)                 __hybrid_int128_gr32(var, v)
+#define int128_gr128(var, v)                __hybrid_int128_gr128(var, v)
+#define uint128_ge(var, v)                  __hybrid_uint128_ge(var, v)
+#define uint128_ge8(var, v)                 __hybrid_uint128_ge8(var, v)
+#define uint128_ge16(var, v)                __hybrid_uint128_ge16(var, v)
+#define uint128_ge32(var, v)                __hybrid_uint128_ge32(var, v)
+#define uint128_ge128(var, v)               __hybrid_uint128_ge128(var, v)
+#define int128_ge(var, v)                   __hybrid_int128_ge(var, v)
+#define int128_ge8(var, v)                  __hybrid_int128_ge8(var, v)
+#define int128_ge16(var, v)                 __hybrid_int128_ge16(var, v)
+#define int128_ge32(var, v)                 __hybrid_int128_ge32(var, v)
+#define int128_ge128(var, v)                __hybrid_int128_ge128(var, v)
 #ifdef __UINT64_TYPE__
 #define int128_vec64(var)                   __hybrid_int128_vec64(var)
 #define uint128_vec64(var)                  __hybrid_uint128_vec64(var)
@@ -776,6 +1134,16 @@ __ATTR_WUNUSED __ATTR_PURE bool int128_is64bit(int128_t const &__var);   /* VAR 
 #define int128_sub64(var, v)                __hybrid_int128_sub64(var, v)
 #define uint128_eq64(var, v)                __hybrid_uint128_eq64(var, v)
 #define int128_eq64(var, v)                 __hybrid_int128_eq64(var, v)
+#define uint128_ne64(var, v)                __hybrid_uint128_ne64(var, v)
+#define int128_ne64(var, v)                 __hybrid_int128_ne64(var, v)
+#define uint128_lo64(var, v)                __hybrid_uint128_lo64(var, v)
+#define int128_lo64(var, v)                 __hybrid_int128_lo64(var, v)
+#define uint128_le64(var, v)                __hybrid_uint128_le64(var, v)
+#define int128_le64(var, v)                 __hybrid_int128_le64(var, v)
+#define uint128_gr64(var, v)                __hybrid_uint128_gr64(var, v)
+#define int128_gr64(var, v)                 __hybrid_int128_gr64(var, v)
+#define uint128_ge64(var, v)                __hybrid_uint128_ge64(var, v)
+#define int128_ge64(var, v)                 __hybrid_int128_ge64(var, v)
 #endif /* __UINT64_TYPE__ */
 #endif /* !__INTELLISENSE__ || !__cplusplus */
 

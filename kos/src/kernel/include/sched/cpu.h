@@ -151,13 +151,14 @@ DATDEF ATTR_PERCPU quantum_diff_t volatile thiscpu_quantum_length;
 FUNDEF NOBLOCK WUNUSED qtime_t NOTHROW(KCALL cpu_quantum_time)(void); /* TODO: Remove this function */
 
 
-/* Return the result of `(a * b) / c' */
+/* Return the result of `((a * b) + c - 1) / c' */
 FUNDEF NOBLOCK ATTR_CONST u64
 NOTHROW(KCALL __umuldiv64)(u64 a, u32 b, u32 c);
 LOCAL NOBLOCK ATTR_CONST u64
 NOTHROW(KCALL umuldiv64)(u64 a, u32 b, u32 c) {
 	u64 result;
-	if (!__hybrid_overflow_umul(a, b, &result))
+	if (!__hybrid_overflow_umul(a, b, &result) &&
+	    !__hybrid_overflow_uadd(result, c - 1, &result))
 		return result / c;
 	return __umuldiv64(a, b, c);
 }

@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_SRC_SCHED_TIME_C
 #define GUARD_KERNEL_SRC_SCHED_TIME_C 1
+#define WANT_INT128_CXX_INTEGRATION 1
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -38,6 +39,7 @@
 
 #include <kos/jiffies.h>
 
+#include <int128.h>
 #include <assert.h>
 #include <inttypes.h>
 #include <stdint.h>
@@ -1551,7 +1553,7 @@ PRIVATE ATTR_PERTASK struct qtick this_quantum_spent = { 0, 1 };
 PRIVATE ATTR_PERTASK struct qtick this_quantum_start = { 0, 1 };
 
 
-/* Perform for task activity by logging a switch from
+/* Account for task activity by logging a switch from
  * `oldthread' to `newthread' taking place at the specified time. */
 PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL cpu_account_activity)(struct task *__restrict oldthread,
@@ -1616,8 +1618,8 @@ NOTHROW(KCALL task_quantum_tick_of)(struct task const *__restrict thread) {
 		 *        yes.2: Read the thread's `this_quantum_start' field
 		 *        yes.3: Memory barrier
 		 *        yes.4: Atomically re-read the quantum-start-version field
-		 *               If version changed: Go to set #yes.1
-		 *               If unchanged changed: Go to set #no.2
+		 *               If changed:   Go to step #yes.1
+		 *               If unchanged: Go to step #no.2
 		 */
 		result = FORTASK(thread, this_quantum_start);
 	}
@@ -1625,20 +1627,128 @@ NOTHROW(KCALL task_quantum_tick_of)(struct task const *__restrict thread) {
 }
 
 
-/* Return the result of `(a * b) / c' */
+
+
+/* Return the greatest value `x', such that:
+ * >> (a % x) == 0 && (b % x) == 0
+ * If no other value exists with this property, return `1' */
+PRIVATE NOBLOCK ATTR_CONST u32
+NOTHROW(KCALL greatest_common_divisor)(u32 a, u32 b) {
+	u32 temp;
+	for (;;) {
+		if (!a)
+			return b;
+		temp = b % a;
+		b    = a;
+		a    = temp;
+	}
+} 
+
+
+
+#ifndef __UINT128_TYPE__
+/* https://stackoverflow.com/questions/5284898/implement-division-with-bit-wise-operator */
+PRIVATE NOBLOCK ATTR_CONST uint128_t
+NOTHROW(KCALL div128)(uint128_t a,
+                      uint128_t b) {
+	unsigned int n_pwr = 0;
+	unsigned int i;
+	uint128_t res, mask;
+	mask = 0;
+	for (i = 0; i < 128; ++i) {
+		if (b & mask)
+			n_pwr = i;
+		mask <<= 1;
+	}
+	res = 0;
+	i = 128 - n_pwr;
+	b <<= i;
+	mask = 1;
+	mask <<= i;
+	for (;;) {
+		if (b <= a) {
+			res += mask;
+			a -= b;
+		}
+		if (!i)
+			break;
+		--i;
+		b >>= 1;
+		mask >>= 1;
+	}
+	/* HINT: `a' is the remainder! */
+	return res;
+}
+#endif /* !__UINT128_TYPE__ */
+
+
+/* Return the result of `((a * b) + c - 1) / c' */
 PUBLIC NOBLOCK ATTR_CONST u64
 NOTHROW(KCALL __umuldiv64)(u64 a, u32 b, u32 c) {
+	/* XXX: This function really shouldn't go here!
+	 *      Instead, maybe it should even go into
+	 *      some (possibly dedicated) <hybrid/...> header? */
 	u64 result;
-	/* Simplify: (a * 4) / 2 == (b * 2) / 1 */
-	assert(c != 0);
-	while ((b & 1) == 0 &&
-	       (c & 1) == 0) {
-		b >>= 1;
-		c >>= 1;
+again:
+	if (!OVERFLOW_UMUL(a, b, &result)) {
+		if (!OVERFLOW_UADD(result, c - 1, &result))
+			return result / c;
+		/* Very close to the  */
+		result = (u64)-1 / c;
+		if ((c % b) != 0)
+			++result;
+		return result;
+
 	}
-	if (!OVERFLOW_UMUL(a, b, &result))
-		return result / c;
-	assert_failed("TODO");
+	{
+		u32 gcd;
+		gcd = greatest_common_divisor(b, c);
+		if (gcd > 1) {
+			/* Simplify: (b * 4) / 2 == (c * 2) / 1 */
+			b /= gcd;
+			c /= gcd;
+			goto again;
+		}
+	}
+	/* Well $h1t!
+	 * Use (expensive) 128-bit arithmetic as a fallback... */
+	{
+		uint128_t mulres, temp;
+		uint128_t result;
+#ifdef __UINT128_TYPE__
+		mulres = (uint128_t)a * b;
+#else /* __UINT128_TYPE__ */
+		{
+			unsigned int i;
+			temp = a;
+			mulres = 0;
+			for (i = 0; i < 32; ++i, temp <<= 1) {
+				if (!(b & ((u32)1 << i)))
+					continue;
+				mulres += temp;
+			}
+		}
+#endif /* !__UINT128_TYPE__ */
+
+		/* At this point, `mulres == a * b' */
+		temp = mulres;
+		temp += c - 1;
+		if (temp < mulres)
+			uint128_setmax(temp); /* Overflow during the add */
+		/* At this point, `temp == a * b + c - 1'
+		 * Now we must divide `temp' by `c' */
+#ifdef __UINT128_TYPE__
+		result = temp / c;
+#else /* __UINT128_TYPE__ */
+		result = div128(temp, (uint128_t)c);
+#endif /* !__UINT128_TYPE__ */
+		/* If the 128-bit result fits into 64 bits, return it unaltered.
+		 * Otherwise, clamp to the max possible value. */
+		if (uint128_is64bit(result))
+			return uint128_get64(result);
+		/* Clamp */
+		return UINT64_MAX;
+	}
 }
 
 

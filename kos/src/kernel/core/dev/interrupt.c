@@ -1196,15 +1196,17 @@ NOTHROW(KCALL isr_handler)(size_t index) {
 }
 
 
-#define DEFINE_ISR_HANDLER(index)                                            \
-	INTERN NOBLOCK void NOTHROW(KCALL kernel_isr_generic_##index##h)(void) { \
-		isr_handler(0x##index);                                              \
+#define DEFINE_ISR_HANDLER(index)                                                        \
+	INTERN ATTR_WEAK NOBLOCK ATTR_SECTION(".text.kernel.kernel_isr_generic_" #index "h") \
+	void NOTHROW(KCALL kernel_isr_generic_##index##h)(void) {                            \
+		isr_handler(0x##index);                                                          \
 	}
 ISR_GENERIC_VECTOR_ENUM(DEFINE_ISR_HANDLER)
 #undef DEFINE_ISR_HANDLER
-#define DEFINE_ISR_HANDLER(index)                                             \
-	INTERN NOBLOCK void NOTHROW(KCALL kernel_isr_specific_##index##h)(void) { \
-		isr_handler(ISR_GENERIC_VECTOR_COUNT + 0x##index);                    \
+#define DEFINE_ISR_HANDLER(index)                                                         \
+	INTERN ATTR_WEAK NOBLOCK ATTR_SECTION(".text.kernel.kernel_isr_specific_" #index "h") \
+	void NOTHROW(KCALL kernel_isr_specific_##index##h)(void) {                            \
+		isr_handler(ISR_GENERIC_VECTOR_COUNT + 0x##index);                                \
 	}
 ISR_SPECIFIC_VECTOR_ENUM(DEFINE_ISR_HANDLER)
 #undef DEFINE_ISR_HANDLER

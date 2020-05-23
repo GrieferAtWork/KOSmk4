@@ -17,30 +17,34 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_SCHED_SIGNAL_INTERN_H
-#define GUARD_KERNEL_INCLUDE_SCHED_SIGNAL_INTERN_H 1
+#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_NMI_H
+#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_NMI_H 1
 
 #include <kernel/compiler.h>
 
 #include <kernel/types.h>
-#include <sched/pertask.h>
-#include <sched/signal.h>
+#include <stdbool.h>
 
 DECL_BEGIN
 
 #ifdef __CC__
 
-struct task_connections;
-
-/* Active connections of the current thread */
-DATDEF ATTR_PERTASK struct task_connections this_connections;
-
-#ifdef CONFIG_BUILDING_KERNEL_CORE
-INTDEF NOBLOCK void NOTHROW(KCALL pertask_init_task_connections)(struct task *__restrict self);
-#endif /* CONFIG_BUILDING_KERNEL_CORE */
+/* Get/Set NMI (non-maskable interrupt) being enabled
+ * These interrupts should normally be enabled in all situations,
+ * and should only be disabled momentarily, and when absolutely
+ * necessary.
+ * Also note that NMI enable/disable is controlled globally, and
+ * not, say, per-CPU!
+ * @param: enabled: The new nmi-enabled state (if different from `return',
+ *                  the state was changed)
+ * @return: * :     The NMI-enabled state prior to the call being made. */
+FUNDEF NOBLOCK ATTR_PURE WUNUSED bool
+NOTHROW(KCALL x86_get_nmi_enabled)(void);
+FUNDEF NOPREEMPT NOBLOCK bool
+NOTHROW(KCALL x86_set_nmi_enabled_nopr)(bool enabled);
 
 #endif /* __CC__ */
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_INCLUDE_SCHED_SIGNAL_INTERN_H */
+#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_NMI_H */

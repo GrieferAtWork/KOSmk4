@@ -25,9 +25,15 @@
 #ifdef __CC__
 DECL_BEGIN
 
+struct cmos_realtime_clock_struct;
+/* The CMOS realtime clock driver descriptor structure */
+DATDEF struct cmos_realtime_clock_struct cmos_realtime_clock;
+
 struct realtime_clock_struct;
-DATDEF struct realtime_clock_struct x86_cmos_realtime_clock;
-#define ARCH_DEFAULT_REALTIME_CLOCK (&x86_cmos_realtime_clock)
+
+/* Define CMOS as the architecture default realtime clock. */
+#define ARCH_DEFAULT_REALTIME_CLOCK \
+	((struct realtime_clock_struct *)&cmos_realtime_clock)
 
 DECL_END
 #endif /* __CC__ */

@@ -79,12 +79,12 @@ FUNDEF NOBLOCK bool KCALL isr_unregister_any(isr_greedy_function_t func) THROWS(
 FUNDEF NOBLOCK bool KCALL isr_unregister_any_at(isr_vector_t vector, isr_function_t func) THROWS(E_BADALLOC) ASMNAME("isr_unregister_any_at");
 FUNDEF NOBLOCK bool KCALL isr_unregister_any_at(isr_vector_t vector, isr_greedy_function_t func) THROWS(E_BADALLOC) ASMNAME("isr_unregister_any_at");
 }
-#else
+#else /* __cplusplus && !__NO_ASMNAME */
 FUNDEF NOBLOCK bool KCALL isr_unregister(void *func, void *arg) THROWS(E_BADALLOC);
 FUNDEF NOBLOCK bool KCALL isr_unregister_at(isr_vector_t vector, void *func, void *arg) THROWS(E_BADALLOC);
 FUNDEF NOBLOCK bool KCALL isr_unregister_any(void *func) THROWS(E_BADALLOC);
 FUNDEF NOBLOCK bool KCALL isr_unregister_any_at(isr_vector_t vector, void *func) THROWS(E_BADALLOC);
-#endif
+#endif /* !__cplusplus || __NO_ASMNAME */
 
 struct isr_vector_handler {
 	isr_function_t        ivh_fun; /* [1..1][const] Handler function. */

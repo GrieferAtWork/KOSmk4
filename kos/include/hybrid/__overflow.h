@@ -293,7 +293,7 @@ extern "C++" {
 	__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __ATTR_PURE __BOOL                                \
 	__NOTHROW_NCX(__IMPL_HYBRID_OVERFLOW_NAME(__impl_hybrid_overflow_ssub, opn, n))              \
 	(__INT##opn##_TYPE__ __x, __INT##opn##_TYPE__ __y, __INT##n##_TYPE__ *__restrict __res) {    \
-		*__res = (__INT##n##_TYPE__)(__x + __y);                                                 \
+		*__res = (__INT##n##_TYPE__)(__x - __y);                                                 \
 		if ((__y > 0 && __x < (__INT##opn##_MIN__ + __y)) ||                                     \
 		    (__y < 0 && __x > (__INT##opn##_MAX__ + __y)))                                       \
 			return 1;                                                                            \
