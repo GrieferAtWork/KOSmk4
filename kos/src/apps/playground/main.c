@@ -352,6 +352,41 @@ int main_logtime(int argc, char *argv[], char *envp[]) {
 
 
 /************************************************************************/
+int main_sleep(int argc, char *argv[], char *envp[]) {
+	(void)argc, (void)argv, (void)envp;
+	for (;;) {
+		char buf[26];
+		struct timeval now;
+		struct timespec delay;
+		gettimeofday(&now, NULL);
+		ctime_r(&now.tv_sec, buf);
+		while (*buf && isspace(strend(buf)[-1]))
+			strend(buf)[-1] = '\0';
+		printf(AC_CUP("", "") "%s  [usec:%.6u]" AC_EL(""),
+		       buf, (unsigned int)now.tv_usec);
+		fflush(stdout);
+		delay.tv_sec  = 0;
+		delay.tv_nsec = 0;
+		delay.add_microseconds(1000000 - now.tv_usec);
+		/* TODO: Improve nanosleep() to be as precise as possible.
+		 *       The precision error can easily be determined by
+		 *       running this program (`playground sleep'), and
+		 *       looking at the printed `usec:...' value.
+		 *       Currently, it hovers between 0 and 0.05 seconds,
+		 *       which makes a lot of sense since 0.05 = 20 = HZ,
+		 *       with the error being produced by the kernel only
+		 *       checking for wake-ups every time a preemptive
+		 *       interrupt is fired. */
+		nanosleep(&delay, NULL);
+	}
+	return 0;
+}
+/************************************************************************/
+
+
+
+
+/************************************************************************/
 static int my_static = 0;
 int main_dl(int argc, char *argv[], char *envp[]) {
 	(void)argc, (void)argv, (void)envp;
@@ -625,6 +660,7 @@ PRIVATE DEF defs[] = {
 	{ "fpu", &main_fpu },
 	{ "fork", &main_fork },
 	{ "logtime", &main_logtime },
+	{ "sleep", &main_sleep },
 	{ "dl", &main_dl },
 	{ "ustring", &main_ustring },
 	{ "float", &main_float },

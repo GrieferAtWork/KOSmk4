@@ -20,6 +20,8 @@
 #ifndef _KOS_JIFFIES_H
 #define _KOS_JIFFIES_H 1
 
+/* TODO: Get rid of this header */
+
 #include <__stdinc.h>
 #include <bits/types.h>
 #include <features.h>

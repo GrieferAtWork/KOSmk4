@@ -38,6 +38,7 @@
 
 #include <assert.h>
 #include <signal.h>
+#include <stdint.h>
 
 DECL_BEGIN
 
@@ -722,68 +723,75 @@ again_already_disabled:
 		goto again;
 	}
 	{
-		struct task *iter;
-		iter = me->c_sleeping;
-		for (; iter; iter = iter->t_sched.s_asleep.ss_tmonxt,
-		             assert(iter != me->c_sleeping)) {
-			assert(iter->t_sched.s_asleep.ss_pself);
-			assert(*iter->t_sched.s_asleep.ss_pself == iter);
-			if (iter->t_sched.s_asleep.ss_timeout.q_jtime == (jtime_t)-1)
-				continue;
-			/* Must keep jiffies running so-as to be able to service timeouts. */
-#if 0 /* TODO: Make use of hardware timeouts */
-			{
-				bool did_time_out;
-				struct timespec timeout;
-				REF struct realtime_clock_struct *rtc;
-				struct task *sleep_iter;
-				rtc = realtime_clock.get_nopr();
-				if (!rtc)
-					goto do_idle_wait;
-				if (!rtc->rc_waitfor) {
-					decref_unlikely(rtc);
-					goto do_idle_wait;
-				}
-				timeout = cpu_quantum_time_to_realtime_nopr(&iter->t_sched.s_asleep.ss_timeout);
-				/* Disable preemptive interrupts while we wait using the RTC.
-				 * If we left them enabled, then `rc_waitfor' would return
-				 * immediately after the first preemptive interrupt fired,
-				 * however the intend of this code is to make use of RTC
-				 * functionality to reduce power usage when all the system
-				 * is doing is serving a call to something like `nanosleep()',
-				 * while no other threads are running anywhere on the system. */
-				cpu_disable_preemptive_interrupts_nopr();
-				me->c_override = &FORCPU(me, thiscpu_idle);
-				PREEMPTION_ENABLE();
-				did_time_out = (*rtc->rc_waitfor)(rtc, &timeout);
+		struct task *sleeper;
+		sleeper = me->c_sleeping;
+		if (sleeper && sleeper->t_sched.s_asleep.ss_timeout.tv_sec != INT64_MAX) {
+#if 0 /* TODO */
+			bool did_time_out;
+			REF struct realtime_clock_struct *rtc;
+			struct task *sleep_iter;
+			rtc = realtime_clock.get_nopr();
+			if (!rtc)
+				goto do_idle_wait;
+			if (!rtc->rc_waitfor) {
 				decref_unlikely(rtc);
-				PREEMPTION_DISABLE();
-				me->c_override = NULL;
-				cpu_enable_preemptive_interrupts_nopr();
-				PREEMPTION_ENABLE();
-				if (!did_time_out)
-					goto again;
-				/* The timeout has expired. -> Timeout any thread who's timeout has expired. */
-				PREEMPTION_DISABLE();
-				cpu_timeout_sleeping_threads(me);
-				/* Check if there are any threads that were timed out. */
-				assert(me->c_current == &FORCPU(me, thiscpu_idle));
-				if (FORCPU(me, thiscpu_idle).t_sched.s_running.sr_runnxt != &FORCPU(me, thiscpu_idle))
-					goto yield_and_return;
-				/* Fallthrough: Do an IDLE wait (this could happen if the RTC and CPU clock are
-				 *              out of sync, in which case we should wait for preemption to fix
-				 *              this issue for us) */
+				goto do_idle_wait;
 			}
+			/* TODO: Keep preemptive interrupts enabled and use them if
+			 *       the delay until the sleeping thread's timeout has
+			 *       expired is smaller than 4 seconds.
+			 *       In this case, don't use the realtime clock's rc_waitfor
+			 *       function, but instead keep on doing `PREEMPTION_ENABLE_WAIT()'
+			 *       until the remaining no more preemptive interrupts will happen
+			 *       before the timeout expired. At that point, loop until the
+			 *       timeout has actually expired, at which point the task will
+			 *       finally get woken up! */
+
+			/* Disable preemptive interrupts while we wait using the RTC.
+			 * If we left them enabled, then `rc_waitfor' would return
+			 * immediately after the first preemptive interrupt fired,
+			 * however the intend of this code is to make use of RTC
+			 * functionality to reduce power usage when all the system
+			 * is doing is serving a call to something like `nanosleep()',
+			 * while no other threads are running anywhere on the system. */
+			cpu_disable_preemptive_interrupts_nopr();
+			me->c_override = &FORCPU(me, thiscpu_idle);
+			PREEMPTION_ENABLE();
+			did_time_out = (*rtc->rc_waitfor)(rtc, &sleeper->t_sched.s_asleep.ss_timeout);
+			decref_unlikely(rtc);
+			PREEMPTION_DISABLE();
+			me->c_override = NULL;
+			cpu_enable_preemptive_interrupts_nopr();
+			PREEMPTION_ENABLE();
+			if (!did_time_out)
+				goto again;
+			/* The timeout has expired. -> Timeout any thread who's timeout has expired. */
+			PREEMPTION_DISABLE();
+			/* TODO: Manually re-schedule all threads where `TIMEOUT < realtime()' */
+
+			/* Check if there are any threads that were timed out. */
+			assert(me->c_current == &FORCPU(me, thiscpu_idle));
+			if (FORCPU(me, thiscpu_idle).t_sched.s_running.sr_runnxt != &FORCPU(me, thiscpu_idle))
+				goto yield_and_return;
+			/* Fallthrough: Do an IDLE wait (this could happen if the RTC and CPU clock are
+			 *              out of sync, in which case we should wait for preemption to fix
+			 *              this issue for us) */
 do_idle_wait:
 #endif
+			assert(!FORCPU(me, arch_cpu_preemptive_interrupts_disabled));
+			/* Must keep jiffies running so-as to be able to service timeouts. */
 			PREEMPTION_ENABLE_WAIT();
 			goto again;
 		}
 	}
 #ifndef CONFIG_NO_SMP
 	if (cpu_online_count > 1) {
-		/* NOTE: Don't disable preemptive interrupts, so-as to keep jiffies running. */
+		/* NOTE: Don't disable preemptive interrupts, so-as to keep jiffies running.
+		 *       XXX: Make `jiffies' no longer be a public symbol, and remove this
+		 *            piece of code. - use the `cpu_online_count <= 1' path for all
+		 *            cases! */
 		/* Re-enable preemption until the end of the current quantum. */
+		assert(!FORCPU(me, arch_cpu_preemptive_interrupts_disabled));
 		PREEMPTION_ENABLE_WAIT_DISABLE();
 	} else
 #endif /* !CONFIG_NO_SMP */
@@ -820,9 +828,9 @@ yield_and_return:
 	FORCPU(me, thiscpu_idle).t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv = FORCPU(me, thiscpu_idle).t_sched.s_running.sr_runprv;
 	FORCPU(me, thiscpu_idle).t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt = FORCPU(me, thiscpu_idle).t_sched.s_running.sr_runnxt;
 	/* Without the RUNNING flag, setup a special case of sleeping (outside of the chain) */
-	FORCPU(me, thiscpu_idle).t_sched.s_asleep.ss_pself           = NULL;
-	FORCPU(me, thiscpu_idle).t_sched.s_asleep.ss_tmonxt          = NULL;
-	FORCPU(me, thiscpu_idle).t_sched.s_asleep.ss_timeout.q_jtime = (jtime_t)-1;
+	FORCPU(me, thiscpu_idle).t_sched.s_asleep.ss_pself          = NULL;
+	FORCPU(me, thiscpu_idle).t_sched.s_asleep.ss_tmonxt         = NULL;
+	FORCPU(me, thiscpu_idle).t_sched.s_asleep.ss_timeout.tv_sec = INT64_MAX;
 	cpu_assert_integrity(/*ignored_thread:*/ THIS_TASK);
 	/* Switch context to the next task. */
 	cpu_run_current_and_remember_nopr(&FORCPU(me, thiscpu_idle));

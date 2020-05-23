@@ -95,7 +95,7 @@ __TIMEVAL_CXX_DECL_BEGIN
 /* timeval for x86_64 */
 struct timevalx64 /*[PREFIX(tv_)]*/ {
 	__INT64_TYPE__  tv_sec;   /* Seconds */
-	__UINT64_TYPE__ tv_usec;  /* Micro seconds (<= 1000000 == 1_000_000) */
+	__UINT64_TYPE__ tv_usec;  /* Micro seconds (< 1000000 == 1_000_000) */
 	__TIMEVAL_CXX_SUPPORT(struct timevalx64, __INT64_TYPE__, __UINT64_TYPE__)
 };
 __TIMEVAL_CXX_SUPPORT2(struct timevalx64, __INT64_TYPE__, __UINT64_TYPE__)
@@ -103,7 +103,7 @@ __TIMEVAL_CXX_SUPPORT2(struct timevalx64, __INT64_TYPE__, __UINT64_TYPE__)
 #ifdef __timevalx64_alt
 struct __timevalx64_alt {
 	__INT64_TYPE__  tv_sec;   /* Seconds */
-	__UINT64_TYPE__ tv_usec;  /* Micro seconds (<= 1000000 == 1_000_000) */
+	__UINT64_TYPE__ tv_usec;  /* Micro seconds (< 1000000 == 1_000_000) */
 	__TIMEVAL_CXX_SUPPORT(struct __timevalx64_alt, __INT64_TYPE__, __UINT64_TYPE__)
 };
 __TIMEVAL_CXX_SUPPORT2(struct __timevalx64_alt, __INT64_TYPE__, __UINT64_TYPE__)

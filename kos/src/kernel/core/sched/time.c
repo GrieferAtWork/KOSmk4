@@ -40,6 +40,7 @@
 
 #include <assert.h>
 #include <inttypes.h>
+#include <stdint.h>
 
 /* How many ticks to wait before performing another realtime re-sync */
 #ifndef CPU_RESYNC_DELAY_IN_TICKS
@@ -651,6 +652,80 @@ NOTHROW(FCALL cpu_quantum_elapsed_nopr)(struct cpu *__restrict me,
 }
 
 
+PRIVATE NOPREEMPT NOBLOCK NONNULL((1)) struct timespec
+NOTHROW(FCALL realtime_at)(struct cpu *__restrict me,
+                           jtime_t cpu_jtime,
+                           quantum_diff_t cpu_qtime) {
+	struct timespec resync_real; /* CPU last resync realtime */
+	jtime_t         resync_cpuj; /* CPU last resync jiffies */
+	quantum_diff_t  resync_cpuq; /* CPU last resync quantum */
+	quantum_diff_t  cpu_qoffs;   /* CPU quantum offset */
+	quantum_diff_t  cpu_qsize;   /* CPU time quantum size */
+	resync_real = FORCPU(me, thiscpu_last_resync.ct_real);
+	resync_cpuj = FORCPU(me, thiscpu_last_resync.ct_cpuj);
+	resync_cpuq = FORCPU(me, thiscpu_last_resync.ct_cpuq);
+	cpu_qoffs   = FORCPU(me, thiscpu_quantum_offset);
+	cpu_qsize   = FORCPU(me, thiscpu_quantum_length);
+	/* Calculate the whole quantum offset:
+	 *   - cpu_qoffs: Addend
+	 *   - cpu_qtime: Real, current quantum time */
+	if unlikely(OVERFLOW_UADD(cpu_qtime, cpu_qoffs, &cpu_qtime)) {
+		quantum_diff_t num_jiffies;
+		num_jiffies = ((quantum_diff_t)-1) / cpu_qsize;
+		cpu_jtime  += num_jiffies;
+		cpu_qtime  -= num_jiffies * cpu_qsize;
+	}
+	/* Right now, our cpu's quantum time is:
+	 * >> cpu_jtime * cpu_qsize + cpu_qtime
+	 * Which is expressed in `1 / (cpu_qsize * HZ)'-th seconds;
+	 *
+	 * With this in mind, subtract the timestamp of the last
+	 * realtime resync from the current cpu-local quantum time.
+	 * WARNING: Due to resync-offsets, this subtraction may produce a negative result! */
+	cpu_jtime -= resync_cpuj;
+	if (OVERFLOW_USUB(cpu_qtime, resync_cpuq, &cpu_qtime)) {
+		quantum_diff_t num_jiffies;
+		num_jiffies = ((quantum_diff_t)-1) / cpu_qsize;
+		cpu_jtime  -= num_jiffies;
+		cpu_qtime  += num_jiffies * cpu_qsize;
+	}
+	if unlikely(cpu_qtime >= cpu_qsize) {
+		cpu_jtime += cpu_qtime / cpu_qsize;
+		cpu_qtime = (cpu_qtime % cpu_qsize);
+	}
+	/* The current realtime is now described by:
+	 * >> cpu_resync.ct_real + QUANTUM_TO_SECONDS(cpu_jtime * cpu_qsize + cpu_qtime);
+	 * To calculate that timestamp, start by dealing with `cpu_jtime', which is known
+	 * to be in units of 1/HZ seconds!
+	 * Though still note that `cpu_jtime' may be negative! */
+	if unlikely((signed_jtime_t)cpu_jtime < 0) {
+		intptr_t nsecs_addend;
+		cpu_jtime = (jtime_t)-(signed_jtime_t)cpu_jtime;
+		resync_real.tv_sec -= cpu_jtime / HZ;
+		nsecs_addend = (uintptr_t)(((u64)cpu_qtime * (__NSECS_PER_SEC / HZ)) / cpu_qsize);
+		nsecs_addend -= ((intptr_t)cpu_jtime % HZ) * (__NSECS_PER_SEC / HZ);
+		/* Also deal with the quantum offset. */
+		if unlikely(nsecs_addend >= 0) {
+			resync_real.add_nanoseconds((uintptr_t)nsecs_addend);
+		} else {
+			resync_real.sub_nanoseconds((uintptr_t)-nsecs_addend);
+		}
+	} else {
+		u64 nsecs;
+		resync_real.tv_sec += cpu_jtime / HZ;
+		nsecs = resync_real.tv_nsec;
+		/* Also deal with the quantum offsets. */
+		nsecs += (cpu_jtime % HZ) * (__NSECS_PER_SEC / HZ);
+		nsecs += ((u64)cpu_qtime * (__NSECS_PER_SEC / HZ)) / cpu_qsize;
+		if (nsecs > __NSECS_PER_SEC) {
+			resync_real.tv_sec += (time_t)(nsecs / __NSECS_PER_SEC);
+			nsecs %= __NSECS_PER_SEC;
+		}
+		resync_real.tv_nsec = (syscall_ulong_t)nsecs;
+	}
+	return resync_real;
+}
+
 /* Wake-up all timeout-sleeping threads from `me' who's
  * timeout has expired, or will expire over the course
  * of the next CPU tick.
@@ -663,46 +738,24 @@ NOTHROW(FCALL cpu_timeout_sleeping_threads)(struct cpu *__restrict me,
                                             quantum_diff_t cpu_qelapsed) {
 	/* Check for sleeping threads that should be woken. */
 	if (me->c_sleeping != NULL) {
-		qtime_t cpu_now;
+		struct timespec now;
 		struct task *next;
 		struct task *lsleeper; /* First sleeping thread to wake up */
 		struct task *rsleeper; /* Last sleeping thread to wake up */
+
 		lsleeper = me->c_sleeping;
 #ifndef __OPTIMIZE_SIZE__
 		/* Check for simple case: None of the waiting threads use any timeouts */
-		if (lsleeper->t_sched.s_asleep.ss_timeout.q_jtime == (jtime_t)-1)
+		if (lsleeper->t_sched.s_asleep.ss_timeout.tv_sec == INT64_MAX)
 			return;
 #endif /* !__OPTIMIZE_SIZE__ */
-		/* Calculate the exact timestamp for the current CPU time,
-		 * by adding the current quantum offset to `cpu_now.q_qtime'
-		 * Note that we also add (quantum_length - elapsed) onto
-		 * this, so-as to wake threads that may be sleeping with
-		 * small offsets earlier than necessary, rather than to
-		 * keep them sleeping longer than requested (after all:
-		 * in the worst case, we can only ever check for threads
-		 * timing out every `FORCPU(me, thiscpu_quantum_length)'
-		 * quantum units, or once every tick) */
-		cpu_now.q_jtime = cpu_jtime;
-		cpu_now.q_qtime = cpu_qelapsed;
-		cpu_now.q_qsize = FORCPU(me, thiscpu_quantum_length);
-		/* Essentially the same as `cpu_now.q_qtime += cpu_now.q_qsize'
-		 * XXX: Maybe add a special case where we temporarily change the
-		 *      quantum length such that it perfectly matching the wake-up
-		 *      time of the next sleeping thread? */
-		++cpu_now.q_jtime;
-		if (OVERFLOW_UADD(cpu_now.q_qtime, FORCPU(me, thiscpu_quantum_offset), &cpu_now.q_qtime)) {
-			quantum_diff_t num_jiffies;
-			num_jiffies = ((quantum_diff_t)-1) / cpu_now.q_qsize;
-			cpu_now.q_jtime += num_jiffies;
-			cpu_now.q_qtime -= num_jiffies * cpu_now.q_qsize;
-		}
-		if (cpu_now.q_qtime >= cpu_now.q_qsize) {
-			cpu_now.q_jtime += cpu_now.q_qtime / cpu_now.q_qsize;
-			cpu_now.q_qtime = (cpu_now.q_qtime % cpu_now.q_qsize);
-		}
-		/* Wake up all threads with a `timeout < (cpu_now.q_jtime * cpu_now.q_qsize + cpu_now.q_qtime)'
+
+		/* Calculate the realtime for the given `cpu_jtime + cpu_qelapsed' */
+		now = realtime_at(me, cpu_jtime, cpu_qelapsed);
+
+		/* Wake up all threads with a `timeout <= now'
 		 * NOTE: Sleeping threads are sorted such that the next thread to time-out appears first. */
-		if (lsleeper->t_sched.s_asleep.ss_timeout >= cpu_now)
+		if (lsleeper->t_sched.s_asleep.ss_timeout > now)
 			return; /* Special (and simple) case: All thread timeouts are still in the future. */
 		for (rsleeper = lsleeper;;) {
 			STATIC_ASSERT(offsetof(struct task, t_sched.s_running.sr_runprv) !=
@@ -711,7 +764,7 @@ NOTHROW(FCALL cpu_timeout_sleeping_threads)(struct cpu *__restrict me,
 			next = rsleeper->t_sched.s_asleep.ss_tmonxt;
 			if (!next)
 				break; /* No more threads to wake up. */
-			if (next->t_sched.s_asleep.ss_timeout >= cpu_now)
+			if (next->t_sched.s_asleep.ss_timeout > now)
 				break; /* This thread shouldn't be woken up, yet. */
 			rsleeper->t_sched.s_running.sr_runnxt = next;
 			next->t_sched.s_running.sr_runprv     = rsleeper;
@@ -1355,44 +1408,21 @@ PUBLIC bool NOTHROW(FCALL task_sleep)(struct timespec const *abs_timeout) {
 	struct task *me = THIS_TASK;
 	struct cpu *mycpu;
 	if (abs_timeout) {
-		struct timespec now;
-		struct timespec offset_from_now;
-		qtime_t quantum_timeout, now_qtime;
 		/* Check if we should immediately time out. */
 		if (!abs_timeout->tv_sec && !abs_timeout->tv_nsec)
 			goto do_return_false;
-		PREEMPTION_DISABLE();
-		/* TODO: This time conversion should be done better!
-		 *       Also: Why not make it so that thread timeouts
-		 *             are stored as actual timespec structures?
-		 *             That way, we don't have to convert anything here,
-		 *             and timeouts wouldn't be affected by preemptive
-		 *             interrupts getting disabled in the mean time, or
-		 *             even more importantly: the thread being off-loaded
-		 *             to a different CPU! */
-		now       = realtime();
-		now_qtime = cpu_quantum_time();
-		if (*abs_timeout <= now)
-			goto do_return_false;
-		offset_from_now = *abs_timeout - now;
-		quantum_timeout = now_qtime;
-		quantum_timeout.add_seconds(offset_from_now.tv_sec);
-		quantum_timeout.add_nanoseconds(offset_from_now.tv_nsec);
 		/* Check if the given timeout has already expired. */
-		if (now_qtime >= quantum_timeout) {
+		if (realtime() >= *abs_timeout) {
 do_return_false:
 			PREEMPTION_ENABLE();
 			return false;
 		}
 		/* Save the timeout to-be used. */
-		me->t_sched.s_asleep.ss_timeout = quantum_timeout;
+		me->t_sched.s_asleep.ss_timeout = *abs_timeout;
 	} else {
-		me->t_sched.s_asleep.ss_timeout.q_jtime = (jtime_t)-1;
-		me->t_sched.s_asleep.ss_timeout.q_qtime = 0;
-		me->t_sched.s_asleep.ss_timeout.q_qsize = 1;
-		PREEMPTION_DISABLE();
+		me->t_sched.s_asleep.ss_timeout.tv_sec = INT64_MAX;
 	}
-
+	PREEMPTION_DISABLE();
 	mycpu = me->t_cpu;
 	cpu_assert_running(me);
 	if unlikely(me == mycpu->c_override)
