@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa3b6f780 */
+/* HASH CRC-32:0xa7b1335e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@
 /* Repeat `CH' a number of `NUM_REPETITIONS' times
  * The usual format-printer rules apply, and this function
  * is allowed to call `PRINTER' as often as it chooses */
-__CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,,__localdep_format_repeat,(__pformatprinter __printer, void *__arg, char __ch, __SIZE_TYPE__ __num_repetitions),format_repeat,(__printer,__arg,__ch,__num_repetitions)) __THROWS(...)
+__CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_repeat,(__pformatprinter __printer, void *__arg, char __ch, __SIZE_TYPE__ __num_repetitions),format_repeat,(__printer,__arg,__ch,__num_repetitions))
 #else /* LIBC: format_repeat */
 #include <local/format-printer/format_repeat.h>
 /* Repeat `CH' a number of `NUM_REPETITIONS' times
@@ -81,7 +81,7 @@ __LOCAL_LIBC(format_hexdump) __ATTR_NONNULL((1)) __SSIZE_TYPE__
                                                __SIZE_TYPE__ __size,
                                                __SIZE_TYPE__ __linesize,
                                                unsigned int __flags) __THROWS(...) {
-#line 540 "kos/src/libc/magic/format-printer.c"
+#line 543 "kos/src/libc/magic/format-printer.c"
 #ifndef __DECIMALS_SELECTOR
 #define __LOCAL_DECIMALS_SELECTOR_DEFINED 1
 #define __DECIMALS_SELECTOR  __decimals
@@ -134,7 +134,7 @@ __LOCAL_LIBC(format_hexdump) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 				__value >>= 4;
 			}
 			__buffer[0] = '+';
-			__temp = (*__printer)(__arg, __buffer, 2 + __offset_digits);
+			__temp = (*__printer)(__arg, __buffer, (__SIZE_TYPE__)2 + __offset_digits);
 			if __unlikely(__temp < 0)
 				goto __err;
 			__result += __temp;

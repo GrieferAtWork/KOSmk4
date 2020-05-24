@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x884f701d */
+/* HASH CRC-32:0xe8f254b7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ __SYSDECL_BEGIN
 
 #ifdef __CRT_HAVE_feraiseexcept
 /* Raise the supported exceptions represented by EXCEPTS */
-__CREDIRECT(,int,,__libc_core_feraiseexcept,(int __excepts),feraiseexcept,(__excepts)) __THROWS(...)
+__CREDIRECT(,int,__THROWING,__libc_core_feraiseexcept,(int __excepts),feraiseexcept,(__excepts))
 #else /* LIBC: feraiseexcept */
 #include <local/fenv/feraiseexcept.h>
 /* Raise the supported exceptions represented by EXCEPTS */

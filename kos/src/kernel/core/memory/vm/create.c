@@ -39,7 +39,7 @@
 
 DECL_BEGIN
 
-typedef void (KCALL *pervm_init_t)(struct vm *__restrict self) THROWS(...);
+typedef void (KCALL *pervm_init_t)(struct vm *__restrict self) /*THROWS(...)*/;
 typedef NOBLOCK /*ATTR_NOTHROW*/ void (KCALL *pervm_fini_t)(struct vm *__restrict self);
 INTDEF pervm_init_t __kernel_pervm_init_start[];
 INTDEF pervm_init_t __kernel_pervm_init_end[];

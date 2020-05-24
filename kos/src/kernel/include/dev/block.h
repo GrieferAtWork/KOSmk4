@@ -307,8 +307,8 @@ block_device_lookup_name(USER CHECKED char const *name)
 extern "C++" {
 FUNDEF WUNUSED REF struct basic_block_device *KCALL
 block_device_lookup(USER CHECKED char const *name)
-		ASMNAME("block_device_lookup_name")
-		THROWS(E_WOULDBLOCK, E_SEGFAULT);
+		THROWS(E_WOULDBLOCK, E_SEGFAULT)
+		ASMNAME("block_device_lookup_name");
 }
 #endif /* __cplusplus */
 

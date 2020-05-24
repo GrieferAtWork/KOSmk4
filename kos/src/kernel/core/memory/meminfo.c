@@ -55,16 +55,16 @@ DECL_BEGIN
 #if PMEMZONE_ISFREEBIT == 0
 #if __SIZEOF_POINTER__ == 4
 #define PMEMBITSET_FREEMASK   __UINTPTR_C(0x55555555)
-#else
+#else /* __SIZEOF_POINTER__ == 4 */
 #define PMEMBITSET_FREEMASK   __UINTPTR_C(0x5555555555555555)
-#endif
-#else
+#endif /* __SIZEOF_POINTER__ != 4 */
+#else /* PMEMZONE_ISFREEBIT == 0 */
 #if __SIZEOF_POINTER__ == 4
 #define PMEMBITSET_FREEMASK   __UINTPTR_C(0xAAAAAAAA)
-#else
+#else /* __SIZEOF_POINTER__ == 4 */
 #define PMEMBITSET_FREEMASK   __UINTPTR_C(0xAAAAAAAAAAAAAAAA)
-#endif
-#endif
+#endif /* __SIZEOF_POINTER__ != 4 */
+#endif /* PMEMZONE_ISFREEBIT != 0 */
 #define PMEMBITSET_UNDFMASK   (~PMEMBITSET_FREEMASK)
 STATIC_ASSERT_MSG(PMEMZONE_BITSPERPAGE == 2,"Must re-do the logic above");
 STATIC_ASSERT((BITSOF(uintptr_t) % PMEMZONE_BITSPERPAGE) == 0);
@@ -82,8 +82,9 @@ PRIVATE ATTR_FREERODATA struct pmemzone const empty_mzone = {
 	.mz_zero  = 0,
 	.mz_free  = { 0, 0 },
 };
+
 PRIVATE ATTR_FREERODATA struct pmemzone const *const empty_mzone_vec[] = {
-	[0] = &empty_mzone
+	/*[0] = */ &empty_mzone
 };
 
 PUBLIC ATTR_SECTION(".data.hot") struct pmem mzones = {

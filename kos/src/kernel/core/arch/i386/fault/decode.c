@@ -239,6 +239,7 @@ modrm_getrmw(struct icpustate *__restrict state,
 	return *(u16 *)addr;
 }
 
+
 DECL_END
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_FAULT_DECODE_C */

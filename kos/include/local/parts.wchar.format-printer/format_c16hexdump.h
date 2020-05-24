@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd0567a */
+/* HASH CRC-32:0xaa43aee2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -92,7 +92,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(format_c16hexdump))(__pc16formatprint
                                                                __SIZE_TYPE__ __size,
                                                                __SIZE_TYPE__ __linesize,
                                                                unsigned int __flags) {
-#line 540 "kos/src/libc/magic/format-printer.c"
+#line 543 "kos/src/libc/magic/format-printer.c"
 #ifndef __DECIMALS_SELECTOR
 #define __LOCAL_DECIMALS_SELECTOR_DEFINED 1
 #define __DECIMALS_SELECTOR  __decimals
@@ -145,7 +145,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(format_c16hexdump))(__pc16formatprint
 				__value >>= 4;
 			}
 			__buffer[0] = '+';
-			__temp = (*__printer)(__arg, __buffer, 2 + __offset_digits);
+			__temp = (*__printer)(__arg, __buffer, (__SIZE_TYPE__)2 + __offset_digits);
 			if __unlikely(__temp < 0)
 				goto __err;
 			__result += __temp;

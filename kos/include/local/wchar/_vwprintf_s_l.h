@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd3933945 */
+/* HASH CRC-32:0x4f42be4b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,9 +27,9 @@
 #ifndef ____localdep_vwprintf_s_defined
 #define ____localdep_vwprintf_s_defined 1
 #ifdef __CRT_HAVE_vwprintf_s
-__CREDIRECT(__ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,,__localdep_vwprintf_s,(__WCHAR_TYPE__ const *__format, __builtin_va_list __args),vwprintf_s,(__format,__args)) __THROWS(...)
+__CREDIRECT(__ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep_vwprintf_s,(__WCHAR_TYPE__ const *__format, __builtin_va_list __args),vwprintf_s,(__format,__args))
 #elif defined(__CRT_HAVE_vwprintf)
-__CREDIRECT(__ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,,__localdep_vwprintf_s,(__WCHAR_TYPE__ const *__format, __builtin_va_list __args),vwprintf,(__format,__args)) __THROWS(...)
+__CREDIRECT(__ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep_vwprintf_s,(__WCHAR_TYPE__ const *__format, __builtin_va_list __args),vwprintf,(__format,__args))
 #elif (defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_vfwprintf)) && !defined(__NO_STDSTREAMS)
 #include <local/wchar/vwprintf.h>
 #define __localdep_vwprintf_s (*(__STDC_INT_AS_SSIZE_T(__LIBCCALL*)(__WCHAR_TYPE__ const *, __builtin_va_list))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vwprintf)))

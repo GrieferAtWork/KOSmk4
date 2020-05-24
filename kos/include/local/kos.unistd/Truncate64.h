@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaed7057 */
+/* HASH CRC-32:0xcb9768d2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@
 #ifdef __CRT_HAVE_Truncate
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),,__localdep_Truncate32,(char const *__file, __pos32_t __length),Truncate,(__file,__length)) __THROWS(...)
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__THROWING,__localdep_Truncate32,(char const *__file, __pos32_t __length),Truncate,(__file,__length))
 #else /* LIBC: Truncate */
 #undef ____localdep_Truncate32_defined
 #endif /* Truncate32... */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3bdef90a */
+/* HASH CRC-32:0xc73065e6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ __CREDIRECT(,int *,__NOTHROW_NCX,__localdep___p__crtDbgFlag,(void),__p__crtDbgFl
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_CrtSetDbgFlag) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_CrtSetDbgFlag))(int __new_flag) {
-#line 260 "kos/src/libc/magic/crtdbg.c"
+#line 262 "kos/src/libc/magic/crtdbg.c"
 	int __result, *__ptr;
 	__ptr = __localdep___p__crtDbgFlag();
 	__result = *__ptr;

@@ -62,13 +62,22 @@ final global OPT_COMPILE_INCPATH: string = "COMPILE.incpath";
 @@Option: {string: string | none}
 @@Mapping of additional, predefined macros
 final global OPT_COMPILE_MACROS: string = "COMPILE.macros";
+@@Option: {string...}
+@@Additional arguments to pass to clang-tidy
+final global OPT_COMPILE_CLANG_TIDY_ARGS: string = "COMPILE.clang-tidy.args";
+@@Option: {string...}
+@@Additional arguments to pass as compiler arguments to clang-tidy
+final global OPT_COMPILE_CLANG_TIDY_CC_ARGS: string = "COMPILE.clang-tidy.args.cc";
 @@Option: string
 @@Override for the output location of the object file
 @@NOTE: When set, only a single object file may be created by COMPILE
 @@      Otherwise, you will get a multiple-producers error.
 final global OPT_COMPILE_OBJFILE: string = "COMPILE.objfile";
 @@Option: {string...}
-@@List of ["E", "S"] (E: PREPROCESS; S: ASSEMBLE)
+@@List of @["E", "S", "clang-tidy=..."]
+@@   - @"E":              PREPROCESS
+@@   - @"S":              ASSEMBLE
+@@   - @"clang-tidy=...": Run clang-tidy executable "..."
 @@additional actions to perform with COMPILE
 final global OPT_COMPILE_SECONDARY: string = "COMPILE.secondary";
 @@Option: string
@@ -280,6 +289,7 @@ final local function COMPILE_split(self: BoundStep): {BoundStep...} {
 		yield self.createChildStep(f);
 }
 
+global _saved_clang_tidy_module;
 final local function COMPILE_run(self: BoundStep): {Waitable...} {
 	local toolchain = self.toolchain;
 	local config = toolchain.config;
@@ -334,8 +344,29 @@ final local function COMPILE_run(self: BoundStep): {Waitable...} {
 				macros:   options.get(OPT_COMPILE_MACROS)
 			);
 		}
+		if (x.startswith("clang-tidy=")) {
+			if (_saved_clang_tidy_module !is bound)
+				_saved_clang_tidy_module = import("..toolchain.clang_tidy");
+			if (_saved_clang_tidy_module.shouldRunClangTidy(self, options)) {
+				yield _saved_clang_tidy_module.createClangTidyProcess(
+					step:         self,
+					toolchain:    toolchain,
+					options:      options,
+					srcFile:      srcFile,
+					ctoFile:      config.getBuildArtifact(group, srcFile, ".ctout"),
+					depFile:      config.getDependencyFilename(group, srcFile),
+					ccFlags:      options.get(OPT_COMPILE_CCFLAGS),
+					ppFlags:      options.get(OPT_COMPILE_PPFLAGS),
+					language:     options.get(OPT_COMPILE_LANGUAGE),
+					incPath:      group.fixFilenames(options.get(OPT_COMPILE_INCPATH)),
+					macros:       options.get(OPT_COMPILE_MACROS),
+					clangTidyExe: x[11:]
+				);
+			}
+		}
 	}
 }
+
 final local function COMPILE_getRequiredFiles(self: BoundStep): {string...} {
 	local srcFile = self.userData;
 	local toolchain = self.toolchain;
@@ -379,6 +410,12 @@ final local function COMPILE_getProducedFiles(self: BoundStep): {string...} {
 			yield config.getPreprocessedFilename(group, srcFile);
 		if (x == "S")
 			yield config.getAssembledFilename(group, srcFile);
+		if (x.startswith("clang-tidy=")) {
+			if (_saved_clang_tidy_module !is bound)
+				_saved_clang_tidy_module = import("..toolchain.clang_tidy");
+			if (_saved_clang_tidy_module.shouldRunClangTidy(self, options))
+				yield config.getBuildArtifact(group, srcFile, ".ctout");
+		}
 	}
 }
 final local function COMPILE_getProducedOutputFiles(self: BoundStep): {string...} {
@@ -398,6 +435,12 @@ final local function COMPILE_getProducedOutputFiles(self: BoundStep): {string...
 			yield config.getPreprocessedFilename(group, srcFile);
 		if (x == "S")
 			yield config.getAssembledFilename(group, srcFile);
+		if (x.startswith("clang-tidy=")) {
+			if (_saved_clang_tidy_module !is bound)
+				_saved_clang_tidy_module = import("..toolchain.clang_tidy");
+			if (_saved_clang_tidy_module.shouldRunClangTidy(self, options))
+				yield config.getBuildArtifact(group, srcFile, ".ctout");
+		}
 	}
 }
 final local function COMPILE_tostr(self: BoundStep): string {

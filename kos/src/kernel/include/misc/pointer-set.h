@@ -252,8 +252,7 @@ pointer_set_reset_rehash(struct pointer_set *__restrict self,
 LOCAL bool
 NOTHROW(KCALL pointer_set_reset_rehash_nx)(struct pointer_set *__restrict self,
                                            size_t min_allocation,
-                                           gfp_t flags DFL(GFP_NORMAL))
-		THROWS(E_BADALLOC, E_WOULDBLOCK) {
+                                           gfp_t flags DFL(GFP_NORMAL)) {
 	size_t new_mask;
 	uintptr_t *new_map;
 	new_mask = 1;

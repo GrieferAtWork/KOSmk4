@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcd42fe23 */
+/* HASH CRC-32:0x62dbf73c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -93,6 +93,7 @@ __LOCAL_LIBC(format_escape) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 
 
 
+
 		__UINT32_TYPE__ __ch = __localdep_unicode_readutf8_n((char const **)&__text, __textend);
 
 		if __unlikely(__ch < 32 || __ch >= 127  || __ch == '\'' ||
@@ -115,6 +116,7 @@ __default_ctrl:
 __encode_oct:
 					if (__text < __textend) {
 						char const *__new_text = __text;
+
 
 
 
@@ -252,6 +254,7 @@ __special_control:
 __encode_hex:
 				if (__text < __textend) {
 					char const *__new_text = __text;
+
 
 
 

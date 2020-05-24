@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x940fb64b */
+/* HASH CRC-32:0xf11b4320 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_CrtReportBlockType) __ATTR_PURE __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_CrtReportBlockType))(void const *__ptr) {
-#line 593 "kos/src/libc/magic/crtdbg.c"
+#line 594 "kos/src/libc/magic/crtdbg.c"
 	__COMPILER_IMPURE();
 	return __ptr ? 1 /*_NORMAL_BLOCK*/ : 0 /*_FREE_BLOCK*/;
 }

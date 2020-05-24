@@ -110,7 +110,7 @@ struct inode_type {
 		 *                        The new attributes cannot be stored by the file system. */
 		NONNULL((1))
 		void (KCALL *a_maskattr)(struct inode *__restrict self)
-				THROWS(E_FSERROR_UNSUPPORTED_OPERATION, ...);
+				/*THROWS(E_FSERROR_UNSUPPORTED_OPERATION, ...)*/;
 
 		/* [0..1]
 		 * Query information about hard limits on various filesystem objects.

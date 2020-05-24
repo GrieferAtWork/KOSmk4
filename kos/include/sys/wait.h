@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x155987d4 */
+/* HASH CRC-32:0x5365dc18 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -84,8 +84,8 @@ __SYSDECL_BEGIN
 #   define __WAIT_STATUS_DEFN void *
 #else /* __NO_ATTR_TRANSPARENT_UNION */
 typedef union {
-	union wait *__uptr;
-	int        *__iptr;
+	union wait *__uptr_;
+	int        *__iptr_;
 } __WAIT_STATUS __ATTR_TRANSPARENT_UNION;
 #   define __WAIT_STATUS_DEFN int *
 #endif /* !__NO_ATTR_TRANSPARENT_UNION */

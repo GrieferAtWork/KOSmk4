@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbfa2f672 */
+/* HASH CRC-32:0x139c7ec3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@
 #ifdef __CRT_HAVE_FTruncate
 /* >> ftruncate(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
-__CREDIRECT(,int,,__localdep_FTruncate32,(__fd_t __fd, __pos32_t __length),FTruncate,(__fd,__length)) __THROWS(...)
+__CREDIRECT(,int,__THROWING,__localdep_FTruncate32,(__fd_t __fd, __pos32_t __length),FTruncate,(__fd,__length))
 #else /* LIBC: FTruncate */
 #undef ____localdep_FTruncate32_defined
 #endif /* FTruncate32... */
@@ -41,11 +41,11 @@ __CREDIRECT(,int,,__localdep_FTruncate32,(__fd_t __fd, __pos32_t __length),FTrun
 #ifdef __CRT_HAVE_FTruncate64
 /* >> ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
-__CREDIRECT_VOID(,,__localdep_FTruncate64,(__fd_t __fd, __pos64_t __length),FTruncate64,(__fd,__length)) __THROWS(...)
+__CREDIRECT_VOID(,__THROWING,__localdep_FTruncate64,(__fd_t __fd, __pos64_t __length),FTruncate64,(__fd,__length))
 #elif defined(__CRT_HAVE_FTruncate) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
-__CREDIRECT_VOID(,,__localdep_FTruncate64,(__fd_t __fd, __pos64_t __length),FTruncate,(__fd,__length)) __THROWS(...)
+__CREDIRECT_VOID(,__THROWING,__localdep_FTruncate64,(__fd_t __fd, __pos64_t __length),FTruncate,(__fd,__length))
 #elif defined(__CRT_HAVE_FTruncate)
 #include <local/kos.unistd/FTruncate64.h>
 /* >> ftruncate64(2)

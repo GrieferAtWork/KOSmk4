@@ -40,6 +40,12 @@ DECL_BEGIN
 
 #ifdef __CC__
 
+#ifndef __COMPILER_ASM_BUFFER
+#define __COMPILER_ASM_BUFFER(T, s, p) (*(T *)(p))
+#endif /* !__COMPILER_ASM_BUFFER */
+
+
+
 /* Assembly function:
  * >> PUBLIC_FUNCTION(x86_nopf_rep_movsb)
  * >>     cld

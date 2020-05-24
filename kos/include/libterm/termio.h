@@ -136,14 +136,14 @@ typedef __ATTR_NONNULL((1)) __ssize_t
 (LIBTERM_CC *PTERMINAL_OWRITE)(struct terminal *__restrict self,
                                __USER __CHECKED void const *src,
                                __size_t num_bytes, iomode_t mode)
-		__KERNEL_SELECT(__THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, E_BADALLOC, ...),
-		                __THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, ...));
+/*		__KERNEL_SELECT(__THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, E_BADALLOC, ...),
+		                __THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, ...))*/;
 typedef __ATTR_NONNULL((1)) __ssize_t
 (LIBTERM_CC *PTERMINAL_IWRITE)(struct terminal *__restrict self,
                                __USER __CHECKED void const *src,
                                __size_t num_bytes, iomode_t mode)
-		__KERNEL_SELECT(__THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, E_BADALLOC, ...),
-		                __THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, ...));
+/*		__KERNEL_SELECT(__THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, E_BADALLOC, ...),
+		                __THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, ...))*/;
 #ifdef LIBTERM_WANT_PROTOTYPES
 LIBTERM_DECL __ATTR_NONNULL((1)) __ssize_t LIBTERM_CC
 terminal_owrite(struct terminal *__restrict self,
@@ -168,7 +168,7 @@ typedef __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t)
 (LIBTERM_CC *PTERMINAL_IREAD)(struct terminal *__restrict self,
                               __USER __CHECKED void *dst,
                               __size_t num_bytes, iomode_t mode)
-		__THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT);
+		/*__THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT)*/;
 #ifdef LIBTERM_WANT_PROTOTYPES
 LIBTERM_DECL __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t) LIBTERM_CC
 terminal_iread(struct terminal *__restrict self,
@@ -185,8 +185,8 @@ typedef __ATTR_NONNULL((1, 2)) __ssize_t
 (LIBTERM_CC *PTERMINAL_SETIOS)(struct terminal *__restrict self,
                                struct termios const *__restrict tio,
                                struct termios *old_tio)
-		__KERNEL_SELECT(__THROWS(E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, ...),
-		                __THROWS(E_WOULDBLOCK, E_INTERRUPT, ...));
+/*		__KERNEL_SELECT(__THROWS(E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, ...),
+		                __THROWS(E_WOULDBLOCK, E_INTERRUPT, ...))*/;
 #ifdef LIBTERM_WANT_PROTOTYPES
 LIBTERM_DECL __ATTR_NONNULL((1, 2)) __ssize_t LIBTERM_CC
 terminal_setios(struct terminal *__restrict self,
@@ -202,8 +202,8 @@ terminal_setios(struct terminal *__restrict self,
  * @return: <0: [USERSPACE] An error occurred (s.a. `errno') */
 typedef __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t)
 (LIBTERM_CC *PTERMINAL_FLUSH_ICANON)(struct terminal *__restrict self, iomode_t mode)
-		__KERNEL_SELECT(__THROWS(E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, ...),
-		                __THROWS(E_WOULDBLOCK, E_INTERRUPT, ...));
+/*		__KERNEL_SELECT(__THROWS(E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, ...),
+		                __THROWS(E_WOULDBLOCK, E_INTERRUPT, ...))*/;
 #ifdef LIBTERM_WANT_PROTOTYPES
 LIBTERM_DECL __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t) LIBTERM_CC
 terminal_flush_icanon(struct terminal *__restrict self, iomode_t mode)
@@ -221,9 +221,9 @@ terminal_flush_icanon(struct terminal *__restrict self, iomode_t mode)
 
 /* Poll the given terminal for various operations being non-blocking.
  * @return: * : One of `TERMINAL_POLL_*' */
-typedef __ATTR_NONNULL((1)) int (LIBTERM_CC *PTERMINAL_POLL_IREAD)(struct terminal *__restrict self) __THROWS(E_WOULDBLOCK, E_BADALLOC);
-typedef __ATTR_NONNULL((1)) int (LIBTERM_CC *PTERMINAL_POLL_IWRITE)(struct terminal *__restrict self) __THROWS(E_WOULDBLOCK, E_BADALLOC);
-typedef __ATTR_NONNULL((1)) int (LIBTERM_CC *PTERMINAL_POLL_OWRITE)(struct terminal *__restrict self) __THROWS(E_WOULDBLOCK, E_BADALLOC);
+typedef __ATTR_NONNULL((1)) int (LIBTERM_CC *PTERMINAL_POLL_IREAD)(struct terminal *__restrict self) /*__THROWS(E_WOULDBLOCK, E_BADALLOC)*/;
+typedef __ATTR_NONNULL((1)) int (LIBTERM_CC *PTERMINAL_POLL_IWRITE)(struct terminal *__restrict self) /*__THROWS(E_WOULDBLOCK, E_BADALLOC)*/;
+typedef __ATTR_NONNULL((1)) int (LIBTERM_CC *PTERMINAL_POLL_OWRITE)(struct terminal *__restrict self) /*__THROWS(E_WOULDBLOCK, E_BADALLOC)*/;
 #ifdef LIBTERM_WANT_PROTOTYPES
 LIBTERM_DECL __ATTR_NONNULL((1)) int LIBTERM_CC terminal_poll_iread(struct terminal *__restrict self) __THROWS(E_WOULDBLOCK, E_BADALLOC);
 LIBTERM_DECL __ATTR_NONNULL((1)) int LIBTERM_CC terminal_poll_iwrite(struct terminal *__restrict self) __THROWS(E_WOULDBLOCK, E_BADALLOC);

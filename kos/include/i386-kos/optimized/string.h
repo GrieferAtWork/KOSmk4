@@ -33,6 +33,11 @@
 #include <asm/intrin.h>
 #endif /* !__COMPILER_HAVE_GCC_ASM */
 
+#ifndef __COMPILER_ASM_BUFFER
+#define __COMPILER_ASM_BUFFER(T, s, p) (*(T *)(p))
+#endif /* !__COMPILER_ASM_BUFFER */
+
+
 __SYSDECL_BEGIN
 __NAMESPACE_FAST_BEGIN
 

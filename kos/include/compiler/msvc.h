@@ -240,6 +240,7 @@
 #define __ATTR_NOPLT                      /* nothing */
 #define __NO_ATTR_NONNULL                 1
 #define __ATTR_NONNULL(ppars)             /* Nothing */
+#define __ATTR_NONNULL_CXX(ppars)         /* Nothing */
 #define __NO_ATTR_WUNUSED                 1
 #define __ATTR_WUNUSED                    /* Nothing */
 #define __NO_ATTR_TRANSPARENT_UNION       1
@@ -269,11 +270,16 @@ template<> struct __msvc_static_if<true> { bool __is_true__(); };
 #endif /* !__cplusplus */
 
 #define __NO_builtin_types_compatible_p   1
-#define __builtin_types_compatible_p(...) 0
+#define __builtin_types_compatible_p(...) 1
 
+#ifdef __clang__
+#define __XBLOCK   /* Nothing */
+#define __XRETURN  /* Nothing */
+#else /* __clang__ */
 #define __NO_XBLOCK   1
 #define __XBLOCK(...) do __VA_ARGS__ __WHILE0
 #define __XRETURN     /* Nothing */
+#endif /* !__clang__ */
 
 #undef __builtin_assume_has_sideeffects
 #define __builtin_assume(x) __assume(x)

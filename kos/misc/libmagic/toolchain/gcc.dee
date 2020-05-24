@@ -55,7 +55,7 @@ final global EXE_FORMAT = "{}{}";
 #endif
 
 @@Join sub-process arguments for gcc or g++
-local function joinGccArguments(args: {string...}, Wx: string, Xxxx: string): {string...} {
+function joinGccArguments(args: {string...}, Wx: string, Xxxx: string): {string...} {
 	local temp = "";
 	for (local x: args) {
 		if ("," in x) {
@@ -74,7 +74,7 @@ local function joinGccArguments(args: {string...}, Wx: string, Xxxx: string): {s
 		yield Wx + temp;
 }
 
-local function getCCForLanguage(language: string): (string, {string...}) {
+function getCCForLanguage(language: string): (string, {string...}) {
 	local cc = {
 		"c"                  : ("gcc", { "-x", "c" }),
 		"assembler"          : ("gcc", { "-x", "assembler" }),
@@ -92,7 +92,8 @@ local function getCCForLanguage(language: string): (string, {string...}) {
 		throw Error("Unknown language {}".format({ language }));
 	return cc;
 }
-local function getLanguageFromExtension(fileExt: string): string {
+
+function getLanguageFromExtension(fileExt: string): string {
 	return {
 		"s"   : "assembler",
 		"S"   : "assembler-with-cpp",
@@ -102,7 +103,7 @@ local function getLanguageFromExtension(fileExt: string): string {
 	}.get(fileExt, fileExt);
 }
 
-local function getCCForLanguageAndSrcFile(
+function getCCForLanguageAndSrcFile(
 	srcFile: string, language: string | none): (string, {string...}) {
 	if (language is none)
 		language = getLanguageFromExtension(fs.extof(srcFile));
@@ -171,7 +172,7 @@ local function splitCommandline(cmdline: string): {string...} {
 		yield cmdline[cmd_start:];
 }
 
-local function constructMacroDefinitions(macros: {string: string | none}): {string...} {
+function constructMacroDefinitions(macros: {string: string | none}): {string...} {
 	for (local name, val: macros) {
 		if (val !is none && val != "1")
 			yield "-D{}={}".format({ name, val });
@@ -181,12 +182,14 @@ local function constructMacroDefinitions(macros: {string: string | none}): {stri
 	}
 }
 
-local function normalizeFilenameForLog(filename: string) {
-	return fs.abspath(normalizePath(filename.strip(), false), ROOTDIR)
+function normalizeFilenameForLog(filename: string) {
+	filename = normalizePath(filename.strip(), false);
+	if (!fs.isabs(filename))
+		filename = fs.abspath(filename, ROOTDIR);
 #ifdef __WINDOWS__
-		.replace("\\", "/")
+	filename = filename.replace("\\", "/");
 #endif
-		;
+	return filename;
 }
 
 global class GCCToolchain: Toolchain {
@@ -195,7 +198,7 @@ global class GCCToolchain: Toolchain {
 	{}
 
 	@@options Set to @none to lazily load from @(step.group.options)
-	private function createWaitableProcess(
+	function createWaitableProcess(
 			step: BoundStep,
 			options: {string: Object} | none,
 			kind: string,
@@ -396,6 +399,7 @@ global class GCCToolchain: Toolchain {
 					}
 					local col = l.find(":");
 					if (col >= 0 && !l.isanyspace(0, col)) {
+again_handle_col:
 						local filename = l[:col];
 						local line, column = none;
 						local col2 = l.find(":", col + 1);
@@ -411,6 +415,12 @@ global class GCCToolchain: Toolchain {
 										column = none;
 									}
 								}
+							} else if (
+									(line.startswith("/") ||
+									line.startswith("\\"))&&
+									!l.isanyspace(0, col2)) {
+								col = col2;
+								goto again_handle_col;
 							} else {
 								col2 = col;
 								line = none;

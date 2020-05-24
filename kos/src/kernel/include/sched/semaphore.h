@@ -72,7 +72,7 @@ NOBLOCK(FCALL semaphore_trywait)(struct semaphore *__restrict self) {
 LOCAL NONNULL((1)) bool
 (FCALL semaphore_wait)(struct semaphore *__restrict self,
                        struct timespec const *abs_timeout DFL(__NULLPTR))
-                       THROWS(E_BADALLOC,E_WOULDBLOCK) {
+                       THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	uintptr_t count;
 again:
 	do {

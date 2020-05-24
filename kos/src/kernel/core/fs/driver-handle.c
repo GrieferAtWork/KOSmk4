@@ -60,8 +60,9 @@ NOTHROW(KCALL hop_driver_getstate)(struct driver const *__restrict self) {
 	return ATOMIC_READ(self->d_flags);
 }
 
-PRIVATE NOBLOCK uintptr_t
-NOTHROW(KCALL hop_driver_getflags)(struct driver *__restrict self) {
+PRIVATE NOBLOCK uintptr_t KCALL
+hop_driver_getflags(struct driver *__restrict self)
+		THROWS(...) {
 	uintptr_t result = 0;
 	if (driver_getfile(self) != NULL)
 		result |= HOP_DRIVER_FLAG_HAS_FILE;

@@ -362,7 +362,7 @@ libvio_readb(struct vio_args *__restrict args, vio_addr_t addr) {
 	if (ops->vo_and.f_byte) return (*ops->vo_and.f_byte)(args, addr, (u8)~0, false);
 	if (ops->vo_and.f_word) { word x = { (*ops->vo_and.f_word)(args, AW, (u16)~0, false) }; return B1; }
 	if (ops->vo_and.f_dword) { dword x = { (*ops->vo_and.f_dword)(args, AL, (u32)~0, false) }; return B3; }
-	IQ(if (ops->vo_and.f_qword) { qword x = { (*ops->vo_and.f_qword)(args, AQ, (u64)~0, false) }; return B7; })
+	IQ(if (ops->vo_and.f_qword) { qword x = { (*ops->vo_and.f_qword)(args, AQ, ~(u64)0, false) }; return B7; })
 	if (ops->vo_or.f_byte) return (*ops->vo_or.f_byte)(args, addr, 0, false);
 	if (ops->vo_or.f_word) { word x = { (*ops->vo_or.f_word)(args, AW, 0, false) }; return B1; }
 	if (ops->vo_or.f_dword) { dword x = { (*ops->vo_or.f_dword)(args, AL, 0, false) }; return B3; }
@@ -403,7 +403,7 @@ libvio_readw(struct vio_args *__restrict args, vio_addr_t addr) {
 		if (ops->vo_cmpxch.f_qword) { qword x = { (*ops->vo_cmpxch.f_qword)(args, AQ, 0, 0, false) }; return W7; }
 		if (ops->vo_add.f_qword) { qword x = { (*ops->vo_add.f_qword)(args, AQ, 0, false) }; return W7; }
 		if (ops->vo_sub.f_qword) { qword x = { (*ops->vo_sub.f_qword)(args, AQ, 0, false) }; return W7; }
-		if (ops->vo_and.f_qword) { qword x = { (*ops->vo_and.f_qword)(args, AQ, (u64)~0, false) }; return W7; }
+		if (ops->vo_and.f_qword) { qword x = { (*ops->vo_and.f_qword)(args, AQ, ~(u64)0, false) }; return W7; }
 		if (ops->vo_or.f_qword) { qword x = { (*ops->vo_or.f_qword)(args, AQ, 0, false) }; return W7; }
 		if (ops->vo_xor.f_qword) { qword x = { (*ops->vo_xor.f_qword)(args, AQ, 0, false) }; return W7; }
 	}
@@ -470,7 +470,7 @@ libvio_readw(struct vio_args *__restrict args, vio_addr_t addr) {
 		READ_2X_READQ(vo_cmpxch, 0, 0, false)
 		READ_2X_READQ(vo_add, 0, false)
 		READ_2X_READQ(vo_sub, 0, false)
-		READ_2X_READQ(vo_and, (u64)~0, false)
+		READ_2X_READQ(vo_and, ~(u64)0, false)
 		READ_2X_READQ(vo_or, 0, false)
 		READ_2X_READQ(vo_xor, 0, false)
 	}
@@ -497,7 +497,7 @@ libvio_readl(struct vio_args *__restrict args, vio_addr_t addr) {
 		if (ops->vo_cmpxch.f_qword) { qword x = { (*ops->vo_cmpxch.f_qword)(args, AQ, 0, 0, false) }; return L7; }
 		if (ops->vo_add.f_qword) { qword x = { (*ops->vo_add.f_qword)(args, AQ, 0, false) }; return L7; }
 		if (ops->vo_sub.f_qword) { qword x = { (*ops->vo_sub.f_qword)(args, AQ, 0, false) }; return L7; }
-		if (ops->vo_and.f_qword) { qword x = { (*ops->vo_and.f_qword)(args, AQ, (u64)~0, false) }; return L7; }
+		if (ops->vo_and.f_qword) { qword x = { (*ops->vo_and.f_qword)(args, AQ, ~(u64)0, false) }; return L7; }
 		if (ops->vo_or.f_qword) { qword x = { (*ops->vo_or.f_qword)(args, AQ, 0, false) }; return L7; }
 		if (ops->vo_xor.f_qword) { qword x = { (*ops->vo_xor.f_qword)(args, AQ, 0, false) }; return L7; }
 	}
@@ -546,7 +546,7 @@ libvio_readl(struct vio_args *__restrict args, vio_addr_t addr) {
 	READ_2X_READQ(vo_cmpxch, 0, 0, false)
 	READ_2X_READQ(vo_add, 0, false)
 	READ_2X_READQ(vo_sub, 0, false)
-	READ_2X_READQ(vo_and, (u64)~0, false)
+	READ_2X_READQ(vo_and, ~(u64)0, false)
 	READ_2X_READQ(vo_or, 0, false)
 	READ_2X_READQ(vo_xor, 0, false)
 #undef READ_2X_READQ
@@ -610,7 +610,7 @@ libvio_readw_aligned(struct vio_args *__restrict args, vio_addr_t addr) {
 	if (ops->vo_cmpxch.f_qword) { qword x = { (*ops->vo_cmpxch.f_qword)(args, AQ, 0, 0, false) }; return W6; }
 	if (ops->vo_add.f_qword) { qword x = { (*ops->vo_add.f_qword)(args, AQ, 0, false) }; return W6; }
 	if (ops->vo_sub.f_qword) { qword x = { (*ops->vo_sub.f_qword)(args, AQ, 0, false) }; return W6; }
-	if (ops->vo_and.f_qword) { qword x = { (*ops->vo_and.f_qword)(args, AQ, (u64)~0, false) }; return W6; }
+	if (ops->vo_and.f_qword) { qword x = { (*ops->vo_and.f_qword)(args, AQ, ~(u64)0, false) }; return W6; }
 	if (ops->vo_or.f_qword) { qword x = { (*ops->vo_or.f_qword)(args, AQ, 0, false) }; return W6; }
 	if (ops->vo_xor.f_qword) { qword x = { (*ops->vo_xor.f_qword)(args, AQ, 0, false) }; return W6; }
 #endif /* LIBVIO_CONFIG_HAVE_QWORD */
@@ -648,7 +648,7 @@ libvio_readl_aligned(struct vio_args *__restrict args, vio_addr_t addr) {
 	if (ops->vo_cmpxch.f_qword) { qword x = { (*ops->vo_cmpxch.f_qword)(args, AQ, 0, 0, false) }; return L4; }
 	if (ops->vo_add.f_qword) { qword x = { (*ops->vo_add.f_qword)(args, AQ, 0, false) }; return L4; }
 	if (ops->vo_sub.f_qword) { qword x = { (*ops->vo_sub.f_qword)(args, AQ, 0, false) }; return L4; }
-	if (ops->vo_and.f_qword) { qword x = { (*ops->vo_and.f_qword)(args, AQ, (u64)~0, false) }; return L4; }
+	if (ops->vo_and.f_qword) { qword x = { (*ops->vo_and.f_qword)(args, AQ, ~(u64)0, false) }; return L4; }
 	if (ops->vo_or.f_qword) { qword x = { (*ops->vo_or.f_qword)(args, AQ, 0, false) }; return L4; }
 	if (ops->vo_xor.f_qword) { qword x = { (*ops->vo_xor.f_qword)(args, AQ, 0, false) }; return L4; }
 #endif /* LIBVIO_CONFIG_HAVE_QWORD */
@@ -697,7 +697,7 @@ libvio_readq(struct vio_args *__restrict args, vio_addr_t addr) {
 		if (ops->vo_cmpxch.f_qword) return (*ops->vo_cmpxch.f_qword)(args, addr, 0, 0, false);
 		if (ops->vo_add.f_qword) return (*ops->vo_add.f_qword)(args, addr, 0, false);
 		if (ops->vo_sub.f_qword) return (*ops->vo_sub.f_qword)(args, addr, 0, false);
-		if (ops->vo_and.f_qword) return (*ops->vo_and.f_qword)(args, addr, (u64)~0, false);
+		if (ops->vo_and.f_qword) return (*ops->vo_and.f_qword)(args, addr, ~(u64)0, false);
 		if (ops->vo_or.f_qword) return (*ops->vo_or.f_qword)(args, addr, 0, false);
 		if (ops->vo_xor.f_qword) return (*ops->vo_xor.f_qword)(args, addr, 0, false);
 	}
@@ -729,7 +729,7 @@ libvio_readq(struct vio_args *__restrict args, vio_addr_t addr) {
 	READ_2X_READQ(vo_cmpxch, 0, 0, false)
 	READ_2X_READQ(vo_add, 0, false)
 	READ_2X_READQ(vo_sub, 0, false)
-	READ_2X_READQ(vo_and, (u64)~0, false)
+	READ_2X_READQ(vo_and, ~(u64)0, false)
 	READ_2X_READQ(vo_or, 0, false)
 	READ_2X_READQ(vo_xor, 0, false)
 #undef READ_2X_READQ
@@ -818,7 +818,7 @@ libvio_readq_aligned(struct vio_args *__restrict args, vio_addr_t addr) {
 	if (ops->vo_cmpxch.f_qword) return (*ops->vo_cmpxch.f_qword)(args, addr, 0, 0, false);
 	if (ops->vo_add.f_qword) return (*ops->vo_add.f_qword)(args, addr, 0, false);
 	if (ops->vo_sub.f_qword) return (*ops->vo_sub.f_qword)(args, addr, 0, false);
-	if (ops->vo_and.f_qword) return (*ops->vo_and.f_qword)(args, addr, (u64)~0, false);
+	if (ops->vo_and.f_qword) return (*ops->vo_and.f_qword)(args, addr, ~(u64)0, false);
 	if (ops->vo_or.f_qword) return (*ops->vo_or.f_qword)(args, addr, 0, false);
 	if (ops->vo_xor.f_qword) return (*ops->vo_xor.f_qword)(args, addr, 0, false);
 #define READ_2X_READL(func, ...)                                      \

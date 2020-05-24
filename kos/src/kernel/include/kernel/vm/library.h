@@ -49,7 +49,7 @@ typedef ssize_t
                                          USER UNCHECKED void *loadaddr,
                                          USER UNCHECKED void *loadstart,
                                          bool filename_may_be_relative)
-		THROWS(E_SEGFAULT);
+		/*THROWS(E_SEGFAULT)*/;
 
 /* Using information set through `set_library_listdef(2)', try to enumerate
  * libraries that have been loaded by user-space into the given `effective_vm'.

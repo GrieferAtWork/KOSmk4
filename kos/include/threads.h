@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8bd97712 */
+/* HASH CRC-32:0x5afa43b5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -376,12 +376,12 @@ __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,mtx_destroy,(mtx_t *__restric
 /* Call function FUNC exactly once, even if invoked from several threads.
  * All calls must be made with the same FLAG object
  * s.a. `pthread_once()' */
-__CDECLARE_VOID(__ATTR_NONNULL((1, 2)),,call_once,(once_flag *__restrict __flag, __once_func_t __func),(__flag,__func)) __THROWS(...)
+__CDECLARE_VOID(__ATTR_NONNULL((1, 2)),__THROWING,call_once,(once_flag *__restrict __flag, __once_func_t __func),(__flag,__func))
 #elif defined(__CRT_HAVE_pthread_once)
 /* Call function FUNC exactly once, even if invoked from several threads.
  * All calls must be made with the same FLAG object
  * s.a. `pthread_once()' */
-__CREDIRECT_VOID(__ATTR_NONNULL((1, 2)),,call_once,(once_flag *__restrict __flag, __once_func_t __func),pthread_once,(__flag,__func)) __THROWS(...)
+__CREDIRECT_VOID(__ATTR_NONNULL((1, 2)),__THROWING,call_once,(once_flag *__restrict __flag, __once_func_t __func),pthread_once,(__flag,__func))
 #endif /* call_once... */
 
 

@@ -143,8 +143,8 @@ character_device_lookup_name(USER CHECKED char const *name)
 extern "C++" {
 FUNDEF WUNUSED REF struct character_device *KCALL
 character_device_lookup(USER CHECKED char const *name)
-		ASMNAME("character_device_lookup_name")
-		THROWS(E_WOULDBLOCK, E_SEGFAULT);
+		THROWS(E_WOULDBLOCK, E_SEGFAULT)
+		ASMNAME("character_device_lookup_name");
 }
 #endif /* __cplusplus */
 

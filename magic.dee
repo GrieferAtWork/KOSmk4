@@ -256,9 +256,11 @@ function main(argv: {string...}) {
 			break;
 		case "-E":
 			options.setdefault(OPT_COMPILE_SECONDARY, []).append("E");
+			CONFIG_EMULATOR_USED = none;
 			break;
 		case "-S":
 			options.setdefault(OPT_COMPILE_SECONDARY, []).append("S");
+			CONFIG_EMULATOR_USED = none;
 			break;
 		case "--run-only":
 			CONFIG_DONT_BUILD = true;
@@ -364,6 +366,22 @@ function main(argv: {string...}) {
 						CONFIG_MULTIBOOT_DRIVERS.append((name, cmdline));
 					}
 				}	break;
+
+				case "--clang-tidy":
+					options.setdefault(OPT_COMPILE_SECONDARY, [])
+						.append("clang-tidy=" + value);
+					/* Configure clang-tidy macros and options. */
+					options.setdefault(OPT_COMPILE_MACROS, Dict()).update({
+						"__KOS__" : "1",
+						"__ELF__" : "1",
+					});
+					options.setdefault(OPT_COMPILE_CLANG_TIDY_CC_ARGS, []).extend({
+						"-nostdinc",
+						"-isystem", "kos/include/i386-kos", /* FIXME: Don't hardcode here! */
+						"-isystem", "kos/include",
+					});
+					CONFIG_EMULATOR_USED = none;
+					break;
 
 				default:
 					goto _err_unknown_argument;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2aaacf9b */
+/* HASH CRC-32:0xf34d3324 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@
 /* >> read(2)
  * Read data from a given file descriptor `FD' and return the number of bytes read.
  * A return value of ZERO(0) is indicative of EOF */
-__CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,,__localdep_Read,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize),Read,(__fd,__buf,__bufsize)) __THROWS(...)
+__CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__THROWING,__localdep_Read,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize),Read,(__fd,__buf,__bufsize))
 #else /* LIBC: Read */
 #undef ____localdep_Read_defined
 #endif /* Read... */

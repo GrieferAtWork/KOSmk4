@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfe8854bc */
+/* HASH CRC-32:0x9778952b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1724,7 +1724,10 @@ struct format_c16aprintf_data {
 	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
 	__SIZE_TYPE__ ap_used;  /* Used buffer size */
 };
+#endif /* !__format_c32aprintf_data_defined */
 
+#ifndef __format_c32aprintf_data_defined
+#define __format_c32aprintf_data_defined 1
 struct format_c32aprintf_data {
 	char32_t     *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
 	__SIZE_TYPE__ ap_avail; /* Unused buffer size */

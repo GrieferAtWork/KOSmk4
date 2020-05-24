@@ -545,10 +545,12 @@
 #endif
 
 #if __has_attribute(__nonnull__)
-#define __ATTR_NONNULL(ppars) __attribute__((__nonnull__ ppars))
+#define __ATTR_NONNULL(ppars)     __attribute__((__nonnull__ ppars))
+#define __ATTR_NONNULL_CXX(ppars) __attribute__((__nonnull__ ppars))
 #else
-#define __NO_ATTR_NONNULL     1
-#define __ATTR_NONNULL(ppars) /* Nothing */
+#define __NO_ATTR_NONNULL         1
+#define __ATTR_NONNULL(ppars)     /* Nothing */
+#define __ATTR_NONNULL_CXX(ppars) /* Nothing */
 #endif
 
 #if __has_attribute(__warn_unused_result__)
@@ -691,12 +693,15 @@ __extension__ typedef unsigned long long __ulonglong_t;
 
 #define __COMPILER_HAVE_VARIABLE_LENGTH_ARRAYS 1
 
-#if 1
-#define __COMPILER_FLEXIBLE_ARRAY(T,x) T x[]
+#ifdef __INTELLISENSE__
+/* Intellisense doesn't get it, so try to work around that... */
+#define __COMPILER_FLEXIBLE_ARRAY(T, x) T x[1024]
 #elif 1
-#define __COMPILER_FLEXIBLE_ARRAY(T,x) __extension__ T x[0]
+#define __COMPILER_FLEXIBLE_ARRAY(T, x) T x[]
+#elif 1
+#define __COMPILER_FLEXIBLE_ARRAY(T, x) __extension__ T x[0]
 #else
-#define __COMPILER_FLEXIBLE_ARRAY(T,x) T x[1024]
+#define __COMPILER_FLEXIBLE_ARRAY(T, x) T x[1024]
 #endif
 
 #define __STATIC_IF(x)   if(x)

@@ -338,9 +338,9 @@ PUBLIC ATTR_RETNONNULL REF struct tty_device *KCALL
 tty_device_alloc(uintptr_half_t ihandle_typ, void *ihandle_ptr,
                  uintptr_half_t ohandle_typ, void *ohandle_ptr)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
-	typedef size_t (KCALL *phandle_read_function_t)(void *__restrict ptr, USER CHECKED void *, size_t, iomode_t);
-	typedef size_t (KCALL *phandle_write_function_t)(void *__restrict ptr, USER CHECKED void const *, size_t, iomode_t);
-	typedef poll_mode_t (KCALL *phandle_poll_function_t)(void *__restrict ptr, poll_mode_t);
+	typedef size_t (KCALL *phandle_read_function_t)(void *__restrict ptr, USER CHECKED void *, size_t, iomode_t) /*THROWS(...)*/;
+	typedef size_t (KCALL *phandle_write_function_t)(void *__restrict ptr, USER CHECKED void const *, size_t, iomode_t) /*THROWS(...)*/;
+	typedef poll_mode_t (KCALL *phandle_poll_function_t)(void *__restrict ptr, poll_mode_t) /*THROWS(...)*/;
 	REF struct tty_device *result;
 	assert(ihandle_typ < HANDLE_TYPE_COUNT);
 	assert(ohandle_typ < HANDLE_TYPE_COUNT);

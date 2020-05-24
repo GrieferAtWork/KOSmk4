@@ -491,7 +491,7 @@ again:
 	if (PREEMPTION_WASENABLED(preemption_was_enabled)) {
 		PREEMPTION_ENABLE();
 		task_pause();
-		task_yield();
+		task_tryyield();
 		PREEMPTION_DISABLE();
 		goto again;
 	}

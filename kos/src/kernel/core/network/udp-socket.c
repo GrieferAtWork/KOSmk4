@@ -141,7 +141,8 @@ udp_getsockname(struct socket *__restrict self,
 PRIVATE NONNULL((1)) socklen_t KCALL
 udp_getpeername(struct socket *__restrict self,
                 USER CHECKED struct sockaddr *addr,
-                socklen_t addr_len) {
+                socklen_t addr_len)
+		THROWS(E_INVALID_ARGUMENT_BAD_STATE) {
 	struct udp_socket *me;
 	USER CHECKED struct sockaddr_in *in;
 	me = (struct udp_socket *)self;
@@ -163,7 +164,8 @@ udp_getpeername(struct socket *__restrict self,
 PRIVATE NONNULL((1)) void KCALL
 udp_bind(struct socket *__restrict self,
          USER CHECKED struct sockaddr const *addr,
-         socklen_t addr_len) {
+         socklen_t addr_len) 
+		THROWS(E_INVALID_ARGUMENT_BAD_STATE) {
 	struct udp_socket *me;
 	USER CHECKED struct sockaddr_in const *in;
 	me = (struct udp_socket *)self;

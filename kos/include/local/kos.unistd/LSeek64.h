@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8a5f2710 */
+/* HASH CRC-32:0x6041c93d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@
 #ifdef __CRT_HAVE_LSeek
 /* >> lseek32(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
-__CREDIRECT(,__pos32_t,,__localdep_LSeek32,(__fd_t __fd, __off32_t __offset, int __whence),LSeek,(__fd,__offset,__whence)) __THROWS(...)
+__CREDIRECT(,__pos32_t,__THROWING,__localdep_LSeek32,(__fd_t __fd, __off32_t __offset, int __whence),LSeek,(__fd,__offset,__whence))
 #else /* LIBC: LSeek */
 #undef ____localdep_LSeek32_defined
 #endif /* LSeek32... */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x514f323e */
+/* HASH CRC-32:0x4640f55e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@
 /* >> execvp(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
-__CREDIRECT_VOID(__ATTR_NORETURN __ATTR_NONNULL((1, 2)),,__localdep_Execvp,(char const *__restrict __file, __TARGV),Execvp,(__file,)) __THROWS(...)
+__CREDIRECT_VOID(__ATTR_NORETURN __ATTR_NONNULL((1, 2)),__THROWING,__localdep_Execvp,(char const *__restrict __file, __TARGV),Execvp,(__file,))
 #else /* LIBC: Execvp */
 #undef ____localdep_Execvp_defined
 #endif /* Execvp... */

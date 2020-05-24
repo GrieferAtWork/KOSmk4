@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb5a1f463 */
+/* HASH CRC-32:0xb9458969 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@
 #ifndef ____localdep__vfwscanf_l_defined
 #define ____localdep__vfwscanf_l_defined 1
 #ifdef __CRT_HAVE__vfwscanf_l
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,,__localdep__vfwscanf_l,(__FILE *__stream, __WCHAR_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),_vfwscanf_l,(__stream,__format,__locale,__args)) __THROWS(...)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep__vfwscanf_l,(__FILE *__stream, __WCHAR_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),_vfwscanf_l,(__stream,__format,__locale,__args))
 #elif defined(__CRT_HAVE_vfwscanf)
 #include <local/wchar/_vfwscanf_l.h>
 #define __localdep__vfwscanf_l (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_vfwscanf_l))

@@ -132,7 +132,7 @@ DECL_BEGIN
  * @throw: E_BADALLOC:   [task_connect[_ghost]] Insufficient memory (only when there are
  *                        at least `CONFIG_TASK_STATIC_CONNECTIONS' connections already). */
 PUBLIC NONNULL((1)) void KCALL
-task_connect(struct sig *__restrict target) THROWS(E_BADALLOC) {
+task_connect(struct sig *__restrict target) /*THROWS(E_BADALLOC)*/ {
 	struct task_connection *con, *chain;
 	struct task_connections *mycons;
 	unsigned int i;
@@ -170,7 +170,7 @@ initialize_con:
 }
 
 PUBLIC NONNULL((1)) void KCALL
-task_connect_ghost(struct sig *__restrict target) THROWS(E_BADALLOC) {
+task_connect_ghost(struct sig *__restrict target) /*THROWS(E_BADALLOC)*/ {
 	struct task_connection *con, *chain;
 	struct task_connections *mycons;
 	unsigned int i;

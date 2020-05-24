@@ -182,6 +182,7 @@
 #define STATIC_ASSERT       __STATIC_ASSERT
 #define STATIC_ASSERT_MSG   __STATIC_ASSERT_MSG
 #define NONNULL             __ATTR_NONNULL
+#define NONNULL_CXX         __ATTR_NONNULL_CXX
 #define WUNUSED             __ATTR_WUNUSED
 #define UNUSED              __UNUSED
 #define IMPDAT              __IMPDAT

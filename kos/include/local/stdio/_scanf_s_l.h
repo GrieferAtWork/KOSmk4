@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5ea2b0d3 */
+/* HASH CRC-32:0xe3a14b1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,9 +27,9 @@
 #ifndef ____localdep__vscanf_s_l_defined
 #define ____localdep__vscanf_s_l_defined 1
 #ifdef __CRT_HAVE__vscanf_s_l
-__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(1, 3) __ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,,__localdep__vscanf_s_l,(char const *__restrict __format, __locale_t __locale, __builtin_va_list __args),_vscanf_s_l,(__format,__locale,__args)) __THROWS(...)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(1, 3) __ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep__vscanf_s_l,(char const *__restrict __format, __locale_t __locale, __builtin_va_list __args),_vscanf_s_l,(__format,__locale,__args))
 #elif defined(__CRT_HAVE__vscanf_l)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(1, 3) __ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,,__localdep__vscanf_s_l,(char const *__restrict __format, __locale_t __locale, __builtin_va_list __args),_vscanf_l,(__format,__locale,__args)) __THROWS(...)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(1, 3) __ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep__vscanf_s_l,(char const *__restrict __format, __locale_t __locale, __builtin_va_list __args),_vscanf_l,(__format,__locale,__args))
 #elif (!defined(__NO_STDSTREAMS) && ((((defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock))) || defined(__CRT_HAVE_vfscanf) || defined(__CRT_HAVE__vfscanf) || defined(__CRT_HAVE__vfscanf_s) || defined(__CRT_HAVE__IO_vfscanf) || defined(__CRT_HAVE_vfscanf_unlocked) || defined(__CRT_HAVE___vfscanf))) || defined(__CRT_HAVE_vscanf) || defined(__CRT_HAVE__vscanf) || defined(__CRT_HAVE_vscanf_unlocked)
 #include <local/stdio/_vscanf_l.h>
 #define __localdep__vscanf_s_l (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_vscanf_l))

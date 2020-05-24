@@ -34,6 +34,25 @@ __DECL_BEGIN
 
 #ifdef __COMPILER_HAVE_GCC_ASM
 
+/* clang defines a couple of these functions as its own intrinsics.
+ * Use macros to override those. */
+#if __has_builtin(__ud2)
+#undef __ud2
+#define __ud2 __x86_ud2
+#endif /* __has_builtin(__ud2) */
+
+#if __has_builtin(__rdtsc)
+#undef __rdtsc
+#define __rdtsc __x86_rdtsc
+#endif /* __has_builtin(__rdtsc) */
+
+
+
+#ifndef __COMPILER_ASM_BUFFER
+#define __COMPILER_ASM_BUFFER(T, s, p) (*(T *)(p))
+#endif /* !__COMPILER_ASM_BUFFER */
+
+
 /* `-fnon-call-exception' currently requires __asm__ to be marked as volatile.
  * s.a. the following bug report: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=94357 */
 #ifndef __asm_ncx_memop__
@@ -679,8 +698,13 @@ __FORCELOCAL __ATTR_WUNUSED __hybrid_uint128_t
 	                     , "+d" (__res.__q[1])
 	                     : "b" (__hybrid_uint128_vec64_significand(__newval, 0))
 	                     , "c" (__hybrid_uint128_vec64_significand(__newval, 1))
+#ifdef __clang__ /* bug??? */
+	                     , "a" (__hybrid_uint128_vec64_significand(__oldval, 0))
+	                     , "d" (__hybrid_uint128_vec64_significand(__oldval, 1))
+#else /* __clang__ */
 	                     , "1" (__hybrid_uint128_vec64_significand(__oldval, 0))
 	                     , "2" (__hybrid_uint128_vec64_significand(__oldval, 1))
+#endif /* !__clang__ */
 	                     : "cc");
 	return __res.__x;
 }

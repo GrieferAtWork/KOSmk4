@@ -147,12 +147,12 @@ NOTHROW(KCALL RegisterPCIDevice)(pci_addr_t addr) {
 				if (state & 1) {
 					/* I/O range. */
 					iter->pr_start = state & ~0x3;
-					iter->pr_size  = (~(maxsize & ~0x3)) + 1;
+					iter->pr_size  = (size_t)(~(maxsize & ~0x3)) + 1;
 					iter->pr_flags |= PCI_RESOURCE_FIO;
 				} else {
 					/* Memory range. */
 					iter->pr_start = state & ~0xf;
-					iter->pr_size  = (~(maxsize & ~0xf)) + 1;
+					iter->pr_size  = (size_t)(~(maxsize & ~0xf)) + 1;
 					iter->pr_flags |= PCI_RESOURCE_FMEM;
 					iter->pr_flags |= (state & 0x6); /* Memory type. */
 					/* A 64-bit memory range takes up 2 BARs. */
@@ -160,7 +160,7 @@ NOTHROW(KCALL RegisterPCIDevice)(pci_addr_t addr) {
 						++i, ++iter;
 				}
 				if (iter->pr_size)
-					iter->pr_align = 1 << (FFS(iter->pr_size) - 1);
+					iter->pr_align = (size_t)1 << (FFS(iter->pr_size) - 1);
 				else
 					iter->pr_flags = 0; /* Ignore this case */
 				/* Allocate PCI resources */
@@ -189,12 +189,12 @@ NOTHROW(KCALL RegisterPCIDevice)(pci_addr_t addr) {
 				if (state & 1) {
 					/* I/O range. */
 					iter->pr_start = state & ~0x3;
-					iter->pr_size  = (~(maxsize & 0x3)) + 1;
+					iter->pr_size  = (size_t)(~(maxsize & 0x3)) + 1;
 					iter->pr_flags |= PCI_RESOURCE_FIO;
 				} else {
 					/* Memory range. */
 					iter->pr_start = state & ~0xf;
-					iter->pr_size  = (~(maxsize & 0xf)) + 1;
+					iter->pr_size  = (size_t)(~(maxsize & 0xf)) + 1;
 					iter->pr_flags |= PCI_RESOURCE_FMEM;
 					iter->pr_flags |= (state & 0x6); /* Memory type. */
 					/* A 64-bit memory range takes up 2 BARs. */
@@ -202,7 +202,7 @@ NOTHROW(KCALL RegisterPCIDevice)(pci_addr_t addr) {
 						++i, ++iter;
 				}
 				if (iter->pr_size)
-					iter->pr_align = 1 << (FFS(iter->pr_size) - 1);
+					iter->pr_align = (size_t)1 << (FFS(iter->pr_size) - 1);
 				/* Allocate PCI resources */
 				// TODO: AllocatePCIDeviceRessource(result,iter);
 				state = (u32)((state & 1) | iter->pr_start);

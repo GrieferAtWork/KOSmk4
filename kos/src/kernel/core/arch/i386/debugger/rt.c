@@ -936,7 +936,7 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_fini(void) {
 		mythread->t_self = x86_dbg_hostbackup.dhs_taskself;
 	if (initok & INITOK_TASKFLAGS) {
 		if (!(x86_dbg_hostbackup.dhs_taskflags & TASK_FKEEPCORE))
-			ATOMIC_FETCHAND(mythread->t_self, ~TASK_FKEEPCORE);
+			ATOMIC_FETCHAND(mythread->t_flags, ~TASK_FKEEPCORE);
 	}
 	if (initok & INITOK_PSP0)
 		x86_load_psp0(mycpu, mythread);

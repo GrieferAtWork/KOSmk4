@@ -242,7 +242,8 @@ format_escape:([nonnull] pformatprinter printer, void *arg,
 		char const *old_text = text;
 @@if $wchar_function@@
 #if __SIZEOF_WCHAR_T__ == 2
-		uint32_t ch = unicode_readutf16_n((char16_t const **)&text, textend);
+		uint32_t ch = unicode_readutf16_n((char16_t const **)&text,
+		                                  (char16_t const *)textend);
 #else /* __SIZEOF_WCHAR_T__ == 2 */
 		uint32_t ch = (uint32_t)*text++;
 #endif /* __SIZEOF_WCHAR_T__ != 2 */
@@ -271,7 +272,8 @@ encode_oct:
 						char const *new_text = text;
 @@if $wchar_function@@
 #if __SIZEOF_WCHAR_T__ == 2
-						uint32_t next_ch = unicode_readutf16_n((char16_t const **)&new_text, textend);
+						uint32_t next_ch = unicode_readutf16_n((char16_t const **)&new_text,
+						                                       (char16_t const *)textend);
 #else
 						uint32_t next_ch = (uint32_t)*new_text++;
 #endif
@@ -408,7 +410,8 @@ encode_hex:
 					char const *new_text = text;
 @@if $wchar_function@@
 #if __SIZEOF_WCHAR_T__ == 2
-					uint32_t next_ch = unicode_readutf16_n((char16_t const **)&new_text, textend);
+					uint32_t next_ch = unicode_readutf16_n((char16_t const **)&new_text,
+					                                       (char16_t const *)textend);
 #else /* __SIZEOF_WCHAR_T__ == 2 */
 					uint32_t next_ch = (uint32_t)*new_text++;
 #endif /* __SIZEOF_WCHAR_T__ != 2 */
@@ -589,7 +592,7 @@ format_hexdump:([nonnull] pformatprinter printer, void *arg,
 				value >>= 4;
 			}
 			buffer[0] = '+';
-			temp = (*printer)(arg, buffer, 2 + offset_digits);
+			temp = (*printer)(arg, buffer, (size_t)2 + offset_digits);
 			if __unlikely(temp < 0)
 				goto err;
 			result += temp;

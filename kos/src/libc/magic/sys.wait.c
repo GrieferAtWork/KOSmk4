@@ -80,8 +80,8 @@ __SYSDECL_BEGIN
 #   define __WAIT_STATUS_DEFN void *
 #else /* __NO_ATTR_TRANSPARENT_UNION */
 typedef union {
-	union wait *__uptr;
-	int        *__iptr;
+	union wait *__uptr_;
+	int        *__iptr_;
 } __WAIT_STATUS __ATTR_TRANSPARENT_UNION;
 #   define __WAIT_STATUS_DEFN int *
 #endif /* !__NO_ATTR_TRANSPARENT_UNION */

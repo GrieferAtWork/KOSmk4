@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x276d6b04 */
+/* HASH CRC-32:0x51a3fe62 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sigfillset))(struct __sigset_struct *
 	__SIZE_TYPE__ __cnt;
 	__cnt = sizeof(__sigset_t) / sizeof(__ULONGPTR_TYPE__);
 	while (__cnt--)
-		__set->__val[__cnt] = ~0ul;
+		__set->__val[__cnt] = ~(__ULONGPTR_TYPE__)0;
 	return 0;
 }
 __NAMESPACE_LOCAL_END

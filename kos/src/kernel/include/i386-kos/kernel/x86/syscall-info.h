@@ -179,10 +179,10 @@ restore_exception:
 }
 
 /* 32-bit: ATTR_CDECL */
-LOCAL NONNULL((1, 2)) void
-NOTHROW(FCALL rpc_syscall_info_get32_cdecl_icpustate)(struct rpc_syscall_info *__restrict self,
-                                                      struct icpustate const *__restrict state,
-                                                      u32 sysno, bool enable_except) {
+LOCAL NONNULL((1, 2)) void FCALL
+rpc_syscall_info_get32_cdecl_icpustate(struct rpc_syscall_info *__restrict self,
+                                       struct icpustate const *__restrict state,
+                                       u32 sysno, bool enable_except) {
 	unsigned int regcount;
 	self->rsi_flags = RPC_SYSCALL_INFO_METHOD_CDECL_32;
 	if (enable_except)

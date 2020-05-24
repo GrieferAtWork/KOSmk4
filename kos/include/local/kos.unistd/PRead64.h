@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x191ce697 */
+/* HASH CRC-32:0xc3a4de38 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@
 #ifndef ____localdep_PRead32_defined
 #define ____localdep_PRead32_defined 1
 #ifdef __CRT_HAVE_PRead
-__CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,,__localdep_PRead32,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos32_t __offset),PRead,(__fd,__buf,__bufsize,__offset)) __THROWS(...)
+__CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__THROWING,__localdep_PRead32,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos32_t __offset),PRead,(__fd,__buf,__bufsize,__offset))
 #else /* LIBC: PRead */
 #undef ____localdep_PRead32_defined
 #endif /* PRead32... */

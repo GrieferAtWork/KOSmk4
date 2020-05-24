@@ -346,7 +346,7 @@ struct driver {
 	/* Module program headers */
 	ElfW(Half)   DRIVER_CONST d_phnum;      /* [const][valid_if(!DRIVER_FLAG_FINALIZED)][!0] (Max) number of program headers. */
 	byte_t                    d_pad3[sizeof(void *) - sizeof(ElfW(Half))];
-	ElfW(Phdr)   DRIVER_CONST d_phdr[];     /* [const][valid_if(!DRIVER_FLAG_FINALIZED)][d_phnum] Vector of program headers. */
+	COMPILER_FLEXIBLE_ARRAY(ElfW(Phdr)   DRIVER_CONST, d_phdr); /* [const][valid_if(!DRIVER_FLAG_FINALIZED)][d_phnum] Vector of program headers. */
 };
 
 #define driver_isfinalizing(self)                            \
@@ -494,15 +494,15 @@ driver_insmod(struct regular_node *__restrict driver_inode,
               USER CHECKED char const *driver_cmdline DFL(__NULLPTR),
               __BOOL *pnew_driver_loaded DFL(__NULLPTR),
               unsigned int flags DFL(DRIVER_INSMOD_FLAG_NORMAL))
-		ASMNAME("driver_insmod_file")
-		THROWS(E_SEGFAULT, E_NOT_EXECUTABLE, E_BADALLOC, E_IOERROR);
+		THROWS(E_SEGFAULT, E_NOT_EXECUTABLE, E_BADALLOC, E_IOERROR)
+		ASMNAME("driver_insmod_file");
 FUNDEF WUNUSED ATTR_RETNONNULL REF struct driver *KCALL
 driver_insmod(USER CHECKED byte_t *base, size_t num_bytes,
               USER CHECKED char const *driver_cmdline DFL(__NULLPTR),
               __BOOL *pnew_driver_loaded DFL(__NULLPTR),
               unsigned int flags DFL(DRIVER_INSMOD_FLAG_NORMAL))
-		ASMNAME("driver_insmod_blob")
-		THROWS(E_SEGFAULT, E_NOT_EXECUTABLE, E_BADALLOC, E_IOERROR);
+		THROWS(E_SEGFAULT, E_NOT_EXECUTABLE, E_BADALLOC, E_IOERROR)
+		ASMNAME("driver_insmod_blob");
 }
 #endif /* __cplusplus */
 
@@ -626,8 +626,8 @@ extern "C++" {
 FUNDEF NONNULL((1)) unsigned int KCALL
 driver_delmod(struct inode *__restrict driver_node,
               unsigned int flags DFL(DRIVER_DELMOD_FLAG_NORMAL))
-		ASMNAME("driver_delmod_inode")
-		THROWS(E_WOULDBLOCK);
+		THROWS(E_WOULDBLOCK)
+		ASMNAME("driver_delmod_inode");
 }
 #endif /* __cplusplus */
 

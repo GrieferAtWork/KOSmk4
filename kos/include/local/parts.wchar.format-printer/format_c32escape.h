@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x649ab855 */
+/* HASH CRC-32:0x1b29b4d1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -87,7 +87,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_c32escape))(__pc32formatprinte
 		__CHAR32_TYPE__ const *__old_text = __text;
 
 #if 4 == 2
-		__UINT32_TYPE__ __ch = __localdep_unicode_readutf16_n((__CHAR16_TYPE__ const **)&__text, __textend);
+		__UINT32_TYPE__ __ch = __localdep_unicode_readutf16_n((__CHAR16_TYPE__ const **)&__text,
+		                                  (__CHAR16_TYPE__ const *)__textend);
 #else /* __SIZEOF_WCHAR_T__ == 2 */
 		__UINT32_TYPE__ __ch = (__UINT32_TYPE__)*__text++;
 #endif /* __SIZEOF_WCHAR_T__ != 2 */
@@ -116,7 +117,8 @@ __encode_oct:
 						__CHAR32_TYPE__ const *__new_text = __text;
 
 #if 4 == 2
-						__UINT32_TYPE__ __next_ch = __localdep_unicode_readutf16_n((__CHAR16_TYPE__ const **)&__new_text, __textend);
+						__UINT32_TYPE__ __next_ch = __localdep_unicode_readutf16_n((__CHAR16_TYPE__ const **)&__new_text,
+						                                       (__CHAR16_TYPE__ const *)__textend);
 #else
 						__UINT32_TYPE__ __next_ch = (__UINT32_TYPE__)*__new_text++;
 #endif
@@ -253,7 +255,8 @@ __encode_hex:
 					__CHAR32_TYPE__ const *__new_text = __text;
 
 #if 4 == 2
-					__UINT32_TYPE__ __next_ch = __localdep_unicode_readutf16_n((__CHAR16_TYPE__ const **)&__new_text, __textend);
+					__UINT32_TYPE__ __next_ch = __localdep_unicode_readutf16_n((__CHAR16_TYPE__ const **)&__new_text,
+					                                       (__CHAR16_TYPE__ const *)__textend);
 #else /* __SIZEOF_WCHAR_T__ == 2 */
 					__UINT32_TYPE__ __next_ch = (__UINT32_TYPE__)*__new_text++;
 #endif /* __SIZEOF_WCHAR_T__ != 2 */

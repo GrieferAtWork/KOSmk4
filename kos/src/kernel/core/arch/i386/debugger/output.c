@@ -284,7 +284,7 @@ NOTHROW(FCALL vga_backlog_setscrollpos)(unsigned int pos) {
 		/* Part of the active screen is still visible */
 		memcpyw(vga_terminal_start + backlog_offset,
 		        vga_backlog_screen,
-		        (VGA_HEIGHT - pos) * VGA_WIDTH);
+		        (size_t)(VGA_HEIGHT - pos) * VGA_WIDTH);
 		backlog_src = vga_terminal_backlog_cur - backlog_offset;
 		if (backlog_src >= vga_terminal_backlog) {
 			memcpyw(vga_terminal_start,
@@ -489,7 +489,7 @@ NOTHROW(FCALL scroll_down_if_cur_end)(void) {
 		if (!vga_suppress_update)
 			VGA_TERMINAL_BACKLOG_ADDLINE(vga_terminal_start);
 		memmovew(vga_terminal_start, vga_terminal_2ndln,
-		         (VGA_HEIGHT - 1) * VGA_WIDTH);
+		         (size_t)(VGA_HEIGHT - 1) * VGA_WIDTH);
 		memsetw(vga_terminal_lastln + 1, VGA_EMPTY, VGA_WIDTH - 1);
 		vga_terminal_cur = vga_terminal_lastln + dbg_indent;
 	}
@@ -914,7 +914,7 @@ do_put_cp_ch:
 					if (!vga_suppress_update)
 						VGA_TERMINAL_BACKLOG_ADDLINE(vga_terminal_start);
 					memmovew(vga_terminal_start, vga_terminal_2ndln,
-					         (VGA_HEIGHT - 1) * VGA_WIDTH);
+					         (size_t)(VGA_HEIGHT - 1) * VGA_WIDTH);
 					memsetw(vga_terminal_lastln, VGA_EMPTY, VGA_WIDTH);
 					vga_terminal_cur = vga_terminal_lastln + dbg_indent;
 				} else {
@@ -1844,17 +1844,17 @@ dbg_getscreendata(int x, int y,
 	y_end = y + size_y;
 	if unlikely(y >= VGA_HEIGHT || x >= VGA_WIDTH ||
 	            x_end < 0 || y_end < 0) {
-		memsetw((u16 *)buf, VGA_EMPTY, size_x * size_y);
+		memsetw((u16 *)buf, VGA_EMPTY, (size_t)size_x * size_y);
 		return;
 	}
 	if (y < 0) {
-		memsetw((u16 *)buf, VGA_EMPTY, size_x * (unsigned int)-y);
+		memsetw((u16 *)buf, VGA_EMPTY, (size_t)size_x * (unsigned int)-y);
 		size_y += y;
 		y = 0;
 	}
 	if ((unsigned int)y_end > VGA_HEIGHT) {
 		memsetw((u16 *)buf + VGA_HEIGHT * size_x, VGA_EMPTY,
-		        ((unsigned int)y_end - VGA_HEIGHT) * size_x);
+		        (size_t)((unsigned int)y_end - VGA_HEIGHT) * size_x);
 		y_end  = VGA_HEIGHT;
 		size_y = VGA_HEIGHT - y;
 	}
@@ -1863,7 +1863,7 @@ dbg_getscreendata(int x, int y,
 	         : vga_terminal_start;
 	screen += y * VGA_WIDTH;
 	if (x == 0 && size_x == VGA_WIDTH) {
-		memcpyw(buf, screen, size_y * VGA_WIDTH);
+		memcpyw(buf, screen, (size_t)size_y * VGA_WIDTH);
 	} else {
 		unsigned int xhead, xcopy, xtail;
 		xcopy = size_x;
@@ -1879,9 +1879,9 @@ dbg_getscreendata(int x, int y,
 			xcopy = VGA_WIDTH;
 		}
 		while (size_y--) {
-			buf = mempsetw(buf, VGA_EMPTY, xhead);
-			buf = mempcpyw(buf, screen, xcopy);
-			buf = mempsetw(buf, VGA_EMPTY, xtail);
+			buf = mempsetw(buf, VGA_EMPTY, (size_t)xhead);
+			buf = mempcpyw(buf, screen, (size_t)xcopy);
+			buf = mempsetw(buf, VGA_EMPTY, (size_t)xtail);
 			screen += VGA_WIDTH;
 		}
 	}
@@ -1916,7 +1916,7 @@ dbg_setscreendata(int x, int y,
 	         : vga_terminal_start;
 	screen += y * VGA_WIDTH;
 	if (x == 0 && size_x == VGA_WIDTH) {
-		memcpyw(screen, buf, size_y * VGA_WIDTH);
+		memcpyw(screen, buf, (size_t)size_y * VGA_WIDTH);
 	} else {
 		unsigned int xhead, xcopy, xtail;
 		xcopy = size_x;
@@ -1933,7 +1933,7 @@ dbg_setscreendata(int x, int y,
 		}
 		while (size_y--) {
 			buf = (u16 *)buf + xhead;
-			mempcpyw(screen, buf, xcopy);
+			mempcpyw(screen, buf, (size_t)xcopy);
 			buf = (u16 *)buf + xcopy + xtail;
 			screen += VGA_WIDTH;
 		}
@@ -2014,7 +2014,7 @@ NOTHROW(FCALL dbg_hline)(int x, int y, unsigned int size_x, /*utf-32*/ char32_t 
 	        (unsigned int)x +
 	        (unsigned int)y * VGA_WIDTH,
 	        VGA_CHR(cp_ch),
-	        size_x);
+	        (size_t)size_x);
 done:
 	;
 }
@@ -2083,7 +2083,7 @@ NOTHROW(FCALL dbg_fillbox)(int x, int y,
 	if (!cp_ch)
 		cp_ch = '?';
 	if (x == 0 && size_x == VGA_WIDTH) {
-		memsetw(screen, VGA_CHR(cp_ch), size_y * VGA_WIDTH);
+		memsetw(screen, VGA_CHR(cp_ch), (size_t)size_y * VGA_WIDTH);
 	} else {
 		if (x < 0) {
 			size_x -= (unsigned int)-x;

@@ -115,6 +115,8 @@ typedef struct _CrtMemState {
 	__SIZE_TYPE__              lTotalCount;
 } _CrtMemState;
 
+typedef void (__ATTR_CDECL *_PFNCRTDOFORALLCLIENTOBJECTS)(void *, void *);
+
 
 #ifndef _DEBUG
 #ifndef _ASSERT
@@ -550,7 +552,6 @@ _CrtCheckMemory:() -> int {
 	return 0;
 }
 
-%typedef void (__ATTR_CDECL *_PFNCRTDOFORALLCLIENTOBJECTS)(void *, void *);
 [same_impl]
 _CrtDoForAllClientObjects:([nonnull] _PFNCRTDOFORALLCLIENTOBJECTS pfn, void *context) {
 	COMPILER_IMPURE();

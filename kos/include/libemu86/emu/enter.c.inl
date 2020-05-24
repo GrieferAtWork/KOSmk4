@@ -98,11 +98,11 @@ case EMU86_OPCODE_ENCODE(0xc8): {
 			if (EMU86_ISUSER()) {
 				size_t access_total;
 				if (IS_16BIT()) {
-					access_total = (nesting_level - 1) * 2;
+					access_total = (size_t)(nesting_level - 1) * 2;
 				} else IF_64BIT(IF_16BIT_OR_32BIT(if (EMU86_F_IS64(op_flags))) {
-					access_total = (nesting_level - 1) * 8;
+					access_total = (size_t)(nesting_level - 1) * 8;
 				} IF_16BIT_OR_32BIT(else)) IF_16BIT_OR_32BIT({
-					access_total = (nesting_level - 1) * 4;
+					access_total = (size_t)(nesting_level - 1) * 4;
 				});
 				EMU86_VALIDATE_READABLE(pbp_addr - access_total, access_total);
 			}

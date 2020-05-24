@@ -448,24 +448,24 @@ again_service_io:
 			addr += (lba_t)part_sectors;
 #if defined(DEFINE_IO_VECTOR) && defined(DEFINE_IO_PHYS)
 			if (buf == &view) {
-				aio_pbuffer_init_view_after(&view2, &view, part_sectors * ATA_SECTOR_SIZE(self));
+				aio_pbuffer_init_view_after(&view2, &view, (size_t)part_sectors * ATA_SECTOR_SIZE(self));
 				buf = &view2;
 			} else {
-				aio_pbuffer_init_view_after(&view, buf, part_sectors * ATA_SECTOR_SIZE(self));
+				aio_pbuffer_init_view_after(&view, buf, (size_t)part_sectors * ATA_SECTOR_SIZE(self));
 				buf = &view;
 			}
 #elif defined(DEFINE_IO_VECTOR)
 			if (buf == &view) {
-				aio_buffer_init_view_after(&view2, &view, part_sectors * ATA_SECTOR_SIZE(self));
+				aio_buffer_init_view_after(&view2, &view, (size_t)part_sectors * ATA_SECTOR_SIZE(self));
 				buf = &view2;
 			} else {
-				aio_buffer_init_view_after(&view, buf, part_sectors * ATA_SECTOR_SIZE(self));
+				aio_buffer_init_view_after(&view, buf, (size_t)part_sectors * ATA_SECTOR_SIZE(self));
 				buf = &view;
 			}
 #elif defined(DEFINE_IO_PHYS)
-			buf += (part_sectors * ATA_SECTOR_SIZE(self));
+			buf += (size_t)part_sectors * ATA_SECTOR_SIZE(self);
 #else
-			buf = (byte_t *)buf + (part_sectors * ATA_SECTOR_SIZE(self));
+			buf = (byte_t *)buf + ((size_t)part_sectors * ATA_SECTOR_SIZE(self));
 #endif
 		}
 	} EXCEPT {

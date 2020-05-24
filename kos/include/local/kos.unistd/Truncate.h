@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7671032e */
+/* HASH CRC-32:0x6684e83c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,11 +29,11 @@
 #ifdef __CRT_HAVE_Truncate64
 /* >> truncate64(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),,__localdep_Truncate64,(char const *__file, __pos64_t __length),Truncate64,(__file,__length)) __THROWS(...)
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__THROWING,__localdep_Truncate64,(char const *__file, __pos64_t __length),Truncate64,(__file,__length))
 #elif defined(__CRT_HAVE_Truncate) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> truncate64(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),,__localdep_Truncate64,(char const *__file, __pos64_t __length),Truncate,(__file,__length)) __THROWS(...)
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__THROWING,__localdep_Truncate64,(char const *__file, __pos64_t __length),Truncate,(__file,__length))
 #elif defined(__CRT_HAVE_Truncate)
 #include <local/kos.unistd/Truncate64.h>
 /* >> truncate64(2)
@@ -50,7 +50,7 @@ __CREDIRECT_VOID(__ATTR_NONNULL((1)),,__localdep_Truncate64,(char const *__file,
 #ifdef __CRT_HAVE_Truncate
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),,__localdep_Truncate32,(char const *__file, __pos32_t __length),Truncate,(__file,__length)) __THROWS(...)
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__THROWING,__localdep_Truncate32,(char const *__file, __pos32_t __length),Truncate,(__file,__length))
 #else /* LIBC: Truncate */
 #undef ____localdep_Truncate32_defined
 #endif /* Truncate32... */

@@ -80,7 +80,8 @@ __SYSDECL_BEGIN
 __SYSDECL_END
 #include "__atomic-libatomic.h"
 __SYSDECL_BEGIN
-#elif (defined(__GNUC__) && __GCC_VERSION_NUM >= 40700) || defined(____INTELLISENSE_STDINC_COMMON_H)
+#elif ((defined(__GNUC__) && __GCC_VERSION_NUM >= 40700) || \
+       defined(____INTELLISENSE_STDINC_COMMON_H) || defined(__clang__))
 
 /************************************************************************/
 /* __atomic_xxx()                                                       */

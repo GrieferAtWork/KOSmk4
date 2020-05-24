@@ -27,6 +27,7 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+#include <kos/anno.h>
 #include <bits/types.h>
 #if defined(__KOS__) && defined(__KERNEL__)
 #include <kernel/malloc.h>
@@ -45,26 +46,19 @@ struct nothrow_t {};
 __NAMESPACE_STD_END
 
 #if defined(__KOS__) && defined(__KERNEL__)
-#ifndef THROWS
-#define THROWS(...) /* nothing */
-#endif
-#ifndef NOBLOCK
-#define NOBLOCK     /* nothing */
-#endif
-
 __CXX_FORCEINLINE __ATTR_WUNUSED __ATTR_MALLOC __ATTR_ALLOC_SIZE((1)) __ATTR_RETNONNULL void *
-__KCALL operator new(__size_t __num_bytes) THROWS(E_BADALLOC) {
+__KCALL operator new(__size_t __num_bytes) __THROWS(E_BADALLOC) {
 	return kmalloc(__num_bytes, GFP_NORMAL);
 }
 __CXX_FORCEINLINE __ATTR_WUNUSED __ATTR_MALLOC __ATTR_ALLOC_SIZE((1)) __ATTR_RETNONNULL void *
-__KCALL operator new[](__size_t __num_bytes) THROWS(E_BADALLOC) {
+__KCALL operator new[](__size_t __num_bytes) __THROWS(E_BADALLOC) {
 	return kmalloc(__num_bytes, GFP_NORMAL);
 }
-__CXX_FORCEINLINE NOBLOCK void __KCALL
+__CXX_FORCEINLINE __NOBLOCK void __KCALL
 operator delete(void *__heap_ptr) __CXX_NOEXCEPT {
 	kfree(__heap_ptr);
 }
-__CXX_FORCEINLINE NOBLOCK void __KCALL
+__CXX_FORCEINLINE __NOBLOCK void __KCALL
 operator delete[](void *__heap_ptr) __CXX_NOEXCEPT {
 	kfree(__heap_ptr);
 }
@@ -76,11 +70,11 @@ __CXX_FORCEINLINE __ATTR_WUNUSED __ATTR_MALLOC __ATTR_ALLOC_SIZE((1))
 void *__KCALL operator new[](__size_t __num_bytes, std::nothrow_t const &) __CXX_NOEXCEPT {
 	return kmalloc_nx(__num_bytes, GFP_NORMAL);
 }
-__CXX_FORCEINLINE NOBLOCK void __KCALL
+__CXX_FORCEINLINE __NOBLOCK void __KCALL
 operator delete(void *__heap_ptr, std::nothrow_t const &) __CXX_NOEXCEPT {
 	kfree(__heap_ptr);
 }
-__CXX_FORCEINLINE NOBLOCK void __KCALL
+__CXX_FORCEINLINE __NOBLOCK void __KCALL
 operator delete[](void *__heap_ptr, std::nothrow_t const &) __CXX_NOEXCEPT {
 	kfree(__heap_ptr);
 }
@@ -130,7 +124,7 @@ __NAMESPACE_STD_END
 #endif /* !__std_align_val_t_defined */
 #if defined(__KOS__) && defined(__KERNEL__)
 __CXX_FORCEINLINE __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) __ATTR_ALLOC_ALIGN(2) __ATTR_RETNONNULL void *__KCALL
-operator new(__size_t __num_bytes, std::align_val_t __min_alignment) THROWS(E_BADALLOC) {
+operator new(__size_t __num_bytes, std::align_val_t __min_alignment) __THROWS(E_BADALLOC) {
 	return kmemalign((__size_t)__min_alignment, __num_bytes, GFP_NORMAL);
 }
 __CXX_FORCEINLINE __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) __ATTR_ALLOC_ALIGN(2) void *__KCALL
@@ -146,7 +140,7 @@ operator delete(void *__heap_ptr, std::align_val_t __UNUSED(__min_alignment), st
 	kfree(__heap_ptr);
 }
 __CXX_FORCEINLINE __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) __ATTR_ALLOC_ALIGN(2) __ATTR_RETNONNULL void *__KCALL
-operator new[](__size_t __num_bytes, std::align_val_t __min_alignment) THROWS(E_BADALLOC) {
+operator new[](__size_t __num_bytes, std::align_val_t __min_alignment) __THROWS(E_BADALLOC) {
 	return kmemalign((__size_t)__min_alignment, __num_bytes, GFP_NORMAL);
 }
 __CXX_FORCEINLINE __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) __ATTR_ALLOC_ALIGN(2) void *__KCALL

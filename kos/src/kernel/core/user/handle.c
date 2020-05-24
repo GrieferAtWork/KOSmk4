@@ -173,7 +173,7 @@ clear_unused_but_allocated_handle_vector_tail(struct handle *__restrict vector,
 
 
 PUBLIC ATTR_MALLOC ATTR_RETNONNULL REF struct handle_manager *KCALL
-handle_manager_clone(struct handle_manager *__restrict self) THROWS(E_BADALLOC,E_WOULDBLOCK) {
+handle_manager_clone(struct handle_manager *__restrict self) THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	REF struct handle_manager *result;
 	unsigned int cloexec_subtract; /* # of handles with both CLOFORK and CLOEXEC */
 	result = (REF struct handle_manager *)kmalloc(sizeof(struct handle_manager),

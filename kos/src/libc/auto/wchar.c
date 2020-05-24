@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x391a9615 */
+/* HASH CRC-32:0x612c5a48 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1813,7 +1813,7 @@ NOTHROW_NCX(LIBCCALL libc_wcsto32)(char32_t const *__restrict nptr,
                                    int base) {
 #line 1012 "kos/src/libc/magic/stdlib.c"
 	u32 result;
-	bool neg = 0;
+	bool neg = false;
 	while (*nptr == '-') {
 		neg = !neg;
 		++nptr;
@@ -1828,7 +1828,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsto32)(char16_t const *__restrict nptr,
                                    int base) {
 #line 1012 "kos/src/libc/magic/stdlib.c"
 	u32 result;
-	bool neg = 0;
+	bool neg = false;
 	while (*nptr == '-') {
 		neg = !neg;
 		++nptr;
@@ -1864,11 +1864,11 @@ NOTHROW_NCX(LIBCCALL libc_wcstou32)(char32_t const *__restrict nptr,
 	for (;;) {
 		char32_t ch = *nptr;
 		if (ch >= '0' && ch <= '9')
-			temp = (u64)(ch-'0');
+			temp = (u64)(ch - '0');
 		else if (ch >= 'a' && ch <= 'z')
-			temp = (u64)(10+(ch-'a'));
+			temp = (u64)10 + (ch - 'a');
 		else if (ch >= 'A' && ch <= 'Z')
-			temp = (u64)(10+(ch-'A'));
+			temp = (u64)10 + (ch - 'A');
 		else {
 			break;
 		}
@@ -1909,11 +1909,11 @@ NOTHROW_NCX(LIBDCALL libd_wcstou32)(char16_t const *__restrict nptr,
 	for (;;) {
 		char16_t ch = *nptr;
 		if (ch >= '0' && ch <= '9')
-			temp = (u64)(ch-'0');
+			temp = (u64)(ch - '0');
 		else if (ch >= 'a' && ch <= 'z')
-			temp = (u64)(10+(ch-'a'));
+			temp = (u64)10 + (ch - 'a');
 		else if (ch >= 'A' && ch <= 'Z')
-			temp = (u64)(10+(ch-'A'));
+			temp = (u64)10 + (ch - 'A');
 		else {
 			break;
 		}
@@ -1955,11 +1955,11 @@ NOTHROW_NCX(LIBCCALL libc_wcstou64)(char32_t const *__restrict nptr,
 	for (;;) {
 		char32_t ch = *nptr;
 		if (ch >= '0' && ch <= '9')
-			temp = (u64)(ch-'0');
+			temp = (u64)(ch - '0');
 		else if (ch >= 'a' && ch <= 'z')
-			temp = (u64)(10+(ch-'a'));
+			temp = (u64)10 + (ch - 'a');
 		else if (ch >= 'A' && ch <= 'Z')
-			temp = (u64)(10+(ch-'A'));
+			temp = (u64)10 + (ch - 'A');
 		else {
 			break;
 		}
@@ -2000,11 +2000,11 @@ NOTHROW_NCX(LIBDCALL libd_wcstou64)(char16_t const *__restrict nptr,
 	for (;;) {
 		char16_t ch = *nptr;
 		if (ch >= '0' && ch <= '9')
-			temp = (u64)(ch-'0');
+			temp = (u64)(ch - '0');
 		else if (ch >= 'a' && ch <= 'z')
-			temp = (u64)(10+(ch-'a'));
+			temp = (u64)10 + (ch - 'a');
 		else if (ch >= 'A' && ch <= 'Z')
-			temp = (u64)(10+(ch-'A'));
+			temp = (u64)10 + (ch - 'A');
 		else {
 			break;
 		}
@@ -2026,7 +2026,7 @@ NOTHROW_NCX(LIBCCALL libc_wcsto64)(char32_t const *__restrict nptr,
                                    int base) {
 #line 1071 "kos/src/libc/magic/stdlib.c"
 	u64 result;
-	bool neg = 0;
+	bool neg = false;
 	while (*nptr == '-') {
 		neg = !neg;
 		++nptr;
@@ -2041,7 +2041,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsto64)(char16_t const *__restrict nptr,
                                    int base) {
 #line 1071 "kos/src/libc/magic/stdlib.c"
 	u64 result;
-	bool neg = 0;
+	bool neg = false;
 	while (*nptr == '-') {
 		neg = !neg;
 		++nptr;

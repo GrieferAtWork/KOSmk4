@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x13a0238b */
+/* HASH CRC-32:0x6c2ceab4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ __LOCAL_LIBC(_aligned_msize_dbg) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) 
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_aligned_msize_dbg))(void *__ptr,
                                                                 __SIZE_TYPE__ __min_alignment,
                                                                 __SIZE_TYPE__ __offset) {
-#line 346 "kos/src/libc/magic/crtdbg.c"
+#line 348 "kos/src/libc/magic/crtdbg.c"
 	return __localdep__aligned_msize(__ptr, __min_alignment, __offset);
 }
 __NAMESPACE_LOCAL_END

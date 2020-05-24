@@ -929,7 +929,7 @@ __LOCAL __NOBLOCK __ATTR_RETNONNULL struct icpustate64 *
 __NOTHROW_NCX(fcpustate64_to_icpustate64_p)(struct fcpustate64 const *__restrict __self,
                                             void *__kernel_rsp) {
 	struct icpustate64 *__result;
-	__result = (struct icpustate64 *)(__kernel_rsp - SIZEOF_ICPUSTATE64);
+	__result = (struct icpustate64 *)((__byte_t *)__kernel_rsp - SIZEOF_ICPUSTATE64);
 	gpregs64_to_gpregsnsp64(&__self->fcs_gpregs, &__result->ics_gpregs);
 	__result->ics_irregs.ir_rip    = __self->fcs_rip;
 	__result->ics_irregs.ir_cs     = __self->fcs_sgregs.sg_cs16;
@@ -942,7 +942,7 @@ __LOCAL __NOBLOCK __ATTR_RETNONNULL struct scpustate64 *
 __NOTHROW_NCX(fcpustate64_to_scpustate64_p)(struct fcpustate64 const *__restrict __self,
                                             void *__kernel_rsp) {
 	struct scpustate64 *__result;
-	__result = (struct scpustate64 *)(__kernel_rsp - SIZEOF_SCPUSTATE64);
+	__result = (struct scpustate64 *)((__byte_t *)__kernel_rsp - SIZEOF_SCPUSTATE64);
 	__result->scs_sgbase = __self->fcs_sgbase;
 	__result->scs_sgregs.sg_gs = __self->fcs_sgregs.sg_gs;
 	__result->scs_sgregs.sg_fs = __self->fcs_sgregs.sg_fs;

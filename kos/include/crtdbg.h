@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x150f2cd9 */
+/* HASH CRC-32:0xbf422ebd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -121,6 +121,8 @@ typedef struct _CrtMemState {
 	__SIZE_TYPE__              lHighWaterCount;
 	__SIZE_TYPE__              lTotalCount;
 } _CrtMemState;
+
+typedef void (__ATTR_CDECL *_PFNCRTDOFORALLCLIENTOBJECTS)(void *, void *);
 
 
 #ifndef _DEBUG
@@ -653,7 +655,6 @@ __CDECLARE(,int,__NOTHROW_NCX,_CrtCheckMemory,(void),())
 #include <local/crtdbg/_CrtCheckMemory.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_CrtCheckMemory, __FORCELOCAL int __NOTHROW_NCX(__LIBCCALL _CrtCheckMemory)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtCheckMemory))(); })
 #endif /* _CrtCheckMemory... */
-typedef void (__ATTR_CDECL *_PFNCRTDOFORALLCLIENTOBJECTS)(void *, void *);
 #ifdef __CRT_HAVE__CrtDoForAllClientObjects
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,_CrtDoForAllClientObjects,(_PFNCRTDOFORALLCLIENTOBJECTS __pfn, void *__context),(__pfn,__context))
 #else /* LIBC: _CrtDoForAllClientObjects */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf2dad325 */
+/* HASH CRC-32:0x41117e55 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@
 #ifdef __CRT_HAVE_UnlinkAt
 /* >> unlinkat(2)
  * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
-__CREDIRECT_VOID(__ATTR_NONNULL((2)),,__localdep_UnlinkAt,(__fd_t __dfd, char const *__name, __atflag_t __flags),UnlinkAt,(__dfd,__name,__flags)) __THROWS(...)
+__CREDIRECT_VOID(__ATTR_NONNULL((2)),__THROWING,__localdep_UnlinkAt,(__fd_t __dfd, char const *__name, __atflag_t __flags),UnlinkAt,(__dfd,__name,__flags))
 #else /* LIBC: UnlinkAt */
 #undef ____localdep_UnlinkAt_defined
 #endif /* UnlinkAt... */

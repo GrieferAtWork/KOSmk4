@@ -138,12 +138,12 @@ typedef __NOCONNECT __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t)
 (LIBBUFFER_CC *PRINGBUFFER_READ)(struct ringbuffer *__restrict __self,
                                  __USER __CHECKED void *__dst,
                                  __size_t __num_bytes)
-		__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, ...);
+		/*__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, ...)*/;
 typedef __ATTR_NONNULL((1)) __size_t
 (LIBBUFFER_CC *PRINGBUFFER_READ_NONBLOCK)(struct ringbuffer *__restrict __self,
                                           __USER __CHECKED void *__dst,
                                           __size_t __num_bytes)
-		__THROWS(E_SEGFAULT, E_WOULDBLOCK);
+		/*__THROWS(E_SEGFAULT, E_WOULDBLOCK)*/;
 #ifdef LIBBUFFER_WANT_PROTOTYPES
 LIBBUFFER_DECL __NOCONNECT __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t) LIBBUFFER_CC
 ringbuffer_read(struct ringbuffer *__restrict __self,
@@ -175,20 +175,20 @@ typedef __NOCONNECT __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t)
 (LIBBUFFER_CC *PRINGBUFFER_WRITE)(struct ringbuffer *__restrict __self,
                                   __USER __CHECKED void const *__src,
                                   __size_t __num_bytes)
-		__KERNEL_SELECT(__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, ...),
-		                __THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, ...));
+/*		__KERNEL_SELECT(__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, ...),
+		                __THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, ...))*/;
 typedef __NOCONNECT __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t)
 (LIBBUFFER_CC *PRINGBUFFER_WRITESOME)(struct ringbuffer *__restrict __self,
                                       __USER __CHECKED void const *__src,
                                       __size_t __num_bytes)
-		__KERNEL_SELECT(__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, ...),
-		                __THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, ...));
+/*		__KERNEL_SELECT(__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, ...),
+		                __THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, ...))*/;
 typedef __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t)
 (LIBBUFFER_CC *PRINGBUFFER_WRITE_NONBLOCK)(struct ringbuffer *__restrict __self,
                                            __USER __CHECKED void const *__src,
                                            __size_t __num_bytes)
-		__KERNEL_SELECT(__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_BADALLOC),
-		                __THROWS(E_SEGFAULT, E_WOULDBLOCK));
+/*		__KERNEL_SELECT(__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_BADALLOC),
+		                __THROWS(E_SEGFAULT, E_WOULDBLOCK))*/;
 #ifdef LIBBUFFER_WANT_PROTOTYPES
 LIBBUFFER_DECL __NOCONNECT __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t) LIBBUFFER_CC
 ringbuffer_write(struct ringbuffer *__restrict __self,
@@ -212,7 +212,7 @@ typedef __ATTR_NONNULL((1)) __size_t
 (LIBBUFFER_CC *PRINGBUFFER_WRITE_NONBLOCK_NOALLOC)(struct ringbuffer *__restrict __self,
                                                    __USER __CHECKED void const *__src,
                                                    __size_t __num_bytes)
-		__THROWS(E_SEGFAULT, E_WOULDBLOCK);
+		/*__THROWS(E_SEGFAULT, E_WOULDBLOCK)*/;
 #ifdef LIBBUFFER_WANT_PROTOTYPES
 LIBBUFFER_DECL __ATTR_NONNULL((1)) __size_t LIBBUFFER_CC
 ringbuffer_write_nonblock_noalloc(struct ringbuffer *__restrict __self,
@@ -250,7 +250,7 @@ typedef __ATTR_NONNULL((1)) __size_t
 (LIBBUFFER_CC *PRINGBUFFER_UNREAD)(struct ringbuffer *__restrict __self,
                                    __size_t __num_bytes,
                                    __size_t *__p_rdtot /*__DFL(__NULLPTR)*/)
-		__THROWS(E_WOULDBLOCK);
+		/*__THROWS(E_WOULDBLOCK)*/;
 #ifdef LIBBUFFER_WANT_PROTOTYPES
 LIBBUFFER_DECL __ATTR_NONNULL((1)) __size_t LIBBUFFER_CC
 ringbuffer_unread(struct ringbuffer *__restrict __self,
@@ -266,7 +266,7 @@ typedef __ATTR_NONNULL((1)) __size_t
 (LIBBUFFER_CC *PRINGBUFFER_SKIPREAD)(struct ringbuffer *__restrict __self,
                                      __size_t __num_bytes,
                                      __size_t *__p_rdtot /*__DFL(__NULLPTR)*/)
-		__THROWS(E_WOULDBLOCK);
+		/*__THROWS(E_WOULDBLOCK)*/;
 #ifdef LIBBUFFER_WANT_PROTOTYPES
 LIBBUFFER_DECL __ATTR_NONNULL((1)) __size_t LIBBUFFER_CC
 ringbuffer_skipread(struct ringbuffer *__restrict __self,
@@ -283,7 +283,7 @@ ringbuffer_skipread(struct ringbuffer *__restrict __self,
 typedef __ATTR_NONNULL((1)) __size_t
 (LIBBUFFER_CC *PRINGBUFFER_RSEEK)(struct ringbuffer *__restrict __self,
                                   __ssize_t __offset)
-		__THROWS(E_WOULDBLOCK);
+		/*__THROWS(E_WOULDBLOCK)*/;
 #ifdef LIBBUFFER_WANT_PROTOTYPES
 LIBBUFFER_DECL __ATTR_NONNULL((1)) __size_t LIBBUFFER_CC
 ringbuffer_rseek(struct ringbuffer *__restrict __self, __ssize_t __offset)
@@ -297,7 +297,7 @@ typedef __ATTR_NONNULL((1)) __size_t
 (LIBBUFFER_CC *PRINGBUFFER_UNWRITE)(struct ringbuffer *__restrict __self,
                                     __size_t __num_bytes,
                                     __size_t *__p_wrtot /*__DFL(__NULLPTR)*/)
-		__THROWS(E_WOULDBLOCK);
+		/*__THROWS(E_WOULDBLOCK)*/;
 #ifdef LIBBUFFER_WANT_PROTOTYPES
 LIBBUFFER_DECL __ATTR_NONNULL((1)) __size_t LIBBUFFER_CC
 ringbuffer_unwrite(struct ringbuffer *__restrict __self,
@@ -312,7 +312,7 @@ ringbuffer_unwrite(struct ringbuffer *__restrict __self,
 typedef __ATTR_NONNULL((1)) __size_t
 (LIBBUFFER_CC *PRINGBUFFER_WSEEK)(struct ringbuffer *__restrict __self,
                                   __ssize_t __offset)
-		__THROWS(E_WOULDBLOCK);
+		/*__THROWS(E_WOULDBLOCK)*/;
 #ifdef LIBBUFFER_WANT_PROTOTYPES
 LIBBUFFER_DECL __ATTR_NONNULL((1)) __size_t LIBBUFFER_CC
 ringbuffer_wseek(struct ringbuffer *__restrict __self, __ssize_t __offset)
@@ -325,7 +325,7 @@ ringbuffer_wseek(struct ringbuffer *__restrict __self, __ssize_t __offset)
 typedef __ATTR_NONNULL((1)) __size_t
 (LIBBUFFER_CC *PRINGBUFFER_SETWRITTEN)(struct ringbuffer *__restrict __self,
                                        __size_t __num_bytes)
-		__THROWS(E_WOULDBLOCK);
+		/*__THROWS(E_WOULDBLOCK)*/;
 #ifdef LIBBUFFER_WANT_PROTOTYPES
 LIBBUFFER_DECL __ATTR_NONNULL((1)) __size_t LIBBUFFER_CC
 ringbuffer_setwritten(struct ringbuffer *__restrict __self, __size_t __num_bytes)
@@ -343,7 +343,7 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 typedef __ATTR_NONNULL((1)) poll_mode_t
 (LIBBUFFER_CC *PRINGBUFFER_POLL)(struct ringbuffer *__restrict __self,
                                  poll_mode_t __what)
-		__THROWS(E_BADALLOC, E_WOULDBLOCK);
+		/*__THROWS(E_BADALLOC, E_WOULDBLOCK)*/;
 #ifdef LIBBUFFER_WANT_PROTOTYPES
 LIBBUFFER_DECL __ATTR_NONNULL((1)) poll_mode_t LIBBUFFER_CC
 ringbuffer_poll(struct ringbuffer *__restrict __self,

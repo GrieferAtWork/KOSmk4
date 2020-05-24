@@ -297,13 +297,13 @@ stub_cls(struct ansitty *__restrict self,
 
 	case ANSITTY_CLS_AFTER:
 		GETSIZE(sxsy);
-		count = ((sxsy[1] - xy[1]) * sxsy[0]) - xy[0];
+		count = ((size_t)(sxsy[1] - xy[1]) * sxsy[0]) - xy[0];
 		break;
 
 	case ANSITTY_CLS_BEFORE:
 		GETSIZE(sxsy);
 		SETCURSOR(0, 0, false);
-		count = (xy[1] * sxsy[0]) + xy[0];
+		count = ((size_t)xy[1] * sxsy[0]) + xy[0];
 		break;
 
 	default:
@@ -1022,7 +1022,7 @@ PRIVATE struct ansi_palette const vga_pal = {
 };
 
 
-PRIVATE ATTR_CONST WUNUSED size_t CC
+PRIVATE ATTR_CONST WUNUSED unsigned int CC
 color_distance(uint8_t ra, uint8_t ga, uint8_t ba,
                uint8_t rb, uint8_t gb, uint8_t bb) {
 	unsigned int dist_r = (unsigned int)abs((int)ra - (int)rb);
@@ -1037,9 +1037,9 @@ color_distance(uint8_t ra, uint8_t ga, uint8_t ba,
 PRIVATE ATTR_CONST WUNUSED unsigned int CC
 get_index_for_color(uint8_t r, uint8_t g, uint8_t b) {
 	unsigned int i, winner_index = 0;
-	size_t winner_distance = (size_t)-1;
+	unsigned int winner_distance = (unsigned int)-1;
 	for (i = 0; i < COMPILER_LENOF(vga_pal.pal); ++i) {
-		size_t distance;
+		unsigned int distance;
 		distance = color_distance(r, g, b,
 		                          vga_pal.pal[i].r,
 		                          vga_pal.pal[i].g,

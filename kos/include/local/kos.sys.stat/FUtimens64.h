@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcd9617da */
+/* HASH CRC-32:0x83e947a1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@
 #ifndef ____localdep_FUtimens32_defined
 #define ____localdep_FUtimens32_defined 1
 #ifdef __CRT_HAVE_FUtimens
-__CREDIRECT_VOID(,,__localdep_FUtimens32,(__fd_t __fd, struct timespec const __times[2 /*or:3*/]),FUtimens,(__fd,__times)) __THROWS(...)
+__CREDIRECT_VOID(,__THROWING,__localdep_FUtimens32,(__fd_t __fd, struct timespec const __times[2 /*or:3*/]),FUtimens,(__fd,__times))
 #else /* LIBC: FUtimens */
 #undef ____localdep_FUtimens32_defined
 #endif /* FUtimens32... */

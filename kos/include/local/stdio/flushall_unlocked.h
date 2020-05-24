@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x155f2157 */
+/* HASH CRC-32:0x382b9fca */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,16 +27,16 @@
 #define ____localdep_fflush_unlocked_defined 1
 #ifdef __CRT_HAVE_fflush_unlocked
 /* Same as `fflush()', but performs I/O without acquiring a lock to `STREAM' */
-__CREDIRECT(,int,,__localdep_fflush_unlocked,(__FILE *__stream),fflush_unlocked,(__stream)) __THROWS(...)
+__CREDIRECT(,int,__THROWING,__localdep_fflush_unlocked,(__FILE *__stream),fflush_unlocked,(__stream))
 #elif defined(__CRT_HAVE__fflush_nolock)
 /* Same as `fflush()', but performs I/O without acquiring a lock to `STREAM' */
-__CREDIRECT(,int,,__localdep_fflush_unlocked,(__FILE *__stream),_fflush_nolock,(__stream)) __THROWS(...)
+__CREDIRECT(,int,__THROWING,__localdep_fflush_unlocked,(__FILE *__stream),_fflush_nolock,(__stream))
 #elif defined(__CRT_HAVE_fflush)
 /* Same as `fflush()', but performs I/O without acquiring a lock to `STREAM' */
-__CREDIRECT(,int,,__localdep_fflush_unlocked,(__FILE *__stream),fflush,(__stream)) __THROWS(...)
+__CREDIRECT(,int,__THROWING,__localdep_fflush_unlocked,(__FILE *__stream),fflush,(__stream))
 #elif defined(__CRT_HAVE__IO_fflush)
 /* Same as `fflush()', but performs I/O without acquiring a lock to `STREAM' */
-__CREDIRECT(,int,,__localdep_fflush_unlocked,(__FILE *__stream),_IO_fflush,(__stream)) __THROWS(...)
+__CREDIRECT(,int,__THROWING,__localdep_fflush_unlocked,(__FILE *__stream),_IO_fflush,(__stream))
 #else /* LIBC: fflush_unlocked */
 #include <local/stdio/fflush_unlocked.h>
 /* Same as `fflush()', but performs I/O without acquiring a lock to `STREAM' */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x31f26e82 */
+/* HASH CRC-32:0xc6bd1047 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -129,7 +129,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(feclearexcept, __FORCELOCAL int __NOTHROW(__LIBC
 __NAMESPACE_FAST_USING_OR_IMPL(feraiseexcept, __FORCELOCAL int (__LIBCCALL feraiseexcept)(int __excepts) __THROWS(...) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(feraiseexcept))(__excepts); })
 #elif defined(__CRT_HAVE_feraiseexcept)
 /* Raise the supported exceptions represented by EXCEPTS */
-__CDECLARE(,int,,feraiseexcept,(int __excepts),(__excepts)) __THROWS(...)
+__CDECLARE(,int,__THROWING,feraiseexcept,(int __excepts),(__excepts))
 #else /* LIBC: feraiseexcept */
 __NAMESPACE_STD_END
 #include <local/fenv/feraiseexcept.h>

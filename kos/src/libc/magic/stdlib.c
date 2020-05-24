@@ -114,13 +114,13 @@ typedef __WCHAR_TYPE__ wchar_t;
 #ifdef __NO_ATTR_TRANSPARENT_UNION
 #   define __WAIT_STATUS      void *
 #   define __WAIT_STATUS_DEFN void *
-#else
+#else /* __NO_ATTR_TRANSPARENT_UNION */
 typedef union {
-	union wait *__uptr;
-	int        *__iptr;
+	union wait *__uptr_;
+	int        *__iptr_;
 } __WAIT_STATUS __ATTR_TRANSPARENT_UNION;
 #   define __WAIT_STATUS_DEFN int *
-#endif
+#endif /* !__NO_ATTR_TRANSPARENT_UNION */
 #else /* __USE_MISC */
 #   define __WAIT_INT(status)  (status)
 #   define __WAIT_STATUS        int *
@@ -134,7 +134,7 @@ typedef union {
 #   define WIFSTOPPED(status)   __WIFSTOPPED(__WAIT_INT(status))
 #ifdef __WIFCONTINUED
 #   define WIFCONTINUED(status) __WIFCONTINUED(__WAIT_INT(status))
-#endif
+#endif /* __WIFCONTINUED */
 #endif /* !__WAIT_MACROS_DEFINED */
 #endif /* __USE_XOPEN || __USE_XOPEN2K8 */
 
@@ -985,11 +985,11 @@ strtou32:([nonnull] char const *__restrict nptr, char **endptr, int base) -> $ui
 	for (;;) {
 		char ch = *nptr;
 		if (ch >= '0' && ch <= '9')
-			temp = (u64)(ch-'0');
+			temp = (u64)(ch - '0');
 		else if (ch >= 'a' && ch <= 'z')
-			temp = (u64)(10+(ch-'a'));
+			temp = (u64)10 + (ch - 'a');
 		else if (ch >= 'A' && ch <= 'Z')
-			temp = (u64)(10+(ch-'A'));
+			temp = (u64)10 + (ch - 'A');
 		else {
 			break;
 		}
@@ -1010,7 +1010,7 @@ strtou32:([nonnull] char const *__restrict nptr, char **endptr, int base) -> $ui
 [if(__SIZEOF_INTMAX_T__ == 4), alias(strtoimax)]
 strto32:([nonnull] char const *__restrict nptr, char **endptr, int base) -> $int32_t {
 	u32 result;
-	bool neg = 0;
+	bool neg = false;
 	while (*nptr == '-') {
 		neg = !neg;
 		++nptr;
@@ -1045,11 +1045,11 @@ strtou64:([nonnull] char const *__restrict nptr, char **endptr, int base) -> $ui
 	for (;;) {
 		char ch = *nptr;
 		if (ch >= '0' && ch <= '9')
-			temp = (u64)(ch-'0');
+			temp = (u64)(ch - '0');
 		else if (ch >= 'a' && ch <= 'z')
-			temp = (u64)(10+(ch-'a'));
+			temp = (u64)10 + (ch - 'a');
 		else if (ch >= 'A' && ch <= 'Z')
-			temp = (u64)(10+(ch-'A'));
+			temp = (u64)10 + (ch - 'A');
 		else {
 			break;
 		}
@@ -1069,7 +1069,7 @@ strtou64:([nonnull] char const *__restrict nptr, char **endptr, int base) -> $ui
 [if(__SIZEOF_INTMAX_T__ == 8), alias(strtoimax)]
 strto64:([nonnull] char const *__restrict nptr, char **endptr, int base) -> $int64_t {
 	u64 result;
-	bool neg = 0;
+	bool neg = false;
 	while (*nptr == '-') {
 		neg = !neg;
 		++nptr;

@@ -78,46 +78,46 @@ struct handle_types {
 	 * @throws: E_WOULDBLOCK: `IO_NONBLOCK' was given and no data/space was available (at the moment)
 	 * @return: 0 : EOF has been reached
 	 * @return: * : The amount of read/written bytes (`<= num_bytes') */
-	size_t (WUNUSED NONNULL((1)) KCALL *h_read[HANDLE_TYPE_COUNT])(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
-	size_t (WUNUSED NONNULL((1)) KCALL *h_write[HANDLE_TYPE_COUNT])(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
+	size_t (WUNUSED NONNULL((1)) KCALL *h_read[HANDLE_TYPE_COUNT])(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) /*THROWS(...)*/;
+	size_t (WUNUSED NONNULL((1)) KCALL *h_write[HANDLE_TYPE_COUNT])(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) /*THROWS(...)*/;
 
 	/* Position-based read/write primitives.
 	 * @throws: * : Same as `h_read' / `h_write'
 	 * @return: * : Same as `h_read' / `h_write' */
-	size_t (WUNUSED NONNULL((1)) KCALL *h_pread[HANDLE_TYPE_COUNT])(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-	size_t (WUNUSED NONNULL((1)) KCALL *h_pwrite[HANDLE_TYPE_COUNT])(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+	size_t (WUNUSED NONNULL((1)) KCALL *h_pread[HANDLE_TYPE_COUNT])(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) /*THROWS(...)*/;
+	size_t (WUNUSED NONNULL((1)) KCALL *h_pwrite[HANDLE_TYPE_COUNT])(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) /*THROWS(...)*/;
 
 	/* Vector-based read/write primitives.
 	 * @throws: * : Same as `h_read' / `h_write'
 	 * @return: * : Same as `h_read' / `h_write' */
-	size_t (WUNUSED NONNULL((1, 2)) KCALL *h_readv[HANDLE_TYPE_COUNT])(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
-	size_t (WUNUSED NONNULL((1, 2)) KCALL *h_writev[HANDLE_TYPE_COUNT])(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
-	size_t (WUNUSED NONNULL((1, 2)) KCALL *h_preadv[HANDLE_TYPE_COUNT])(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-	size_t (WUNUSED NONNULL((1, 2)) KCALL *h_pwritev[HANDLE_TYPE_COUNT])(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+	size_t (WUNUSED NONNULL((1, 2)) KCALL *h_readv[HANDLE_TYPE_COUNT])(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode) /*THROWS(...)*/;
+	size_t (WUNUSED NONNULL((1, 2)) KCALL *h_writev[HANDLE_TYPE_COUNT])(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, iomode_t mode) /*THROWS(...)*/;
+	size_t (WUNUSED NONNULL((1, 2)) KCALL *h_preadv[HANDLE_TYPE_COUNT])(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) /*THROWS(...)*/;
+	size_t (WUNUSED NONNULL((1, 2)) KCALL *h_pwritev[HANDLE_TYPE_COUNT])(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) /*THROWS(...)*/;
 
 	/* Read a directory entry from the given handle.
 	 * @throws: E_WOULDBLOCK: `IO_NONBLOCK' was given and no data/space was available (at the moment)
 	 * @return: * : The required buffer size for the current entry */
 	size_t (WUNUSED NONNULL((1)) KCALL *h_readdir[HANDLE_TYPE_COUNT])(void *__restrict ptr, USER CHECKED struct dirent *buf,
 	                                                                  size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode)
-			THROWS(...);
+			/*THROWS(...)*/;
 
 	/* Seek within the data stream. */
 	pos_t (NONNULL((1)) KCALL *h_seek[HANDLE_TYPE_COUNT])(void *__restrict ptr,
 	                                                      off_t offset,
 	                                                      unsigned int whence)
-			THROWS(...);
+			/*THROWS(...)*/;
 
 	/* Perform an ioctl() operation.
 	 * @throws: E_WOULDBLOCK: `IO_NONBLOCK' was given and no data/space was available (at the moment)
 	 * @throws: E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND: [...] */
 	syscall_slong_t (NONNULL((1)) KCALL *h_ioctl[HANDLE_TYPE_COUNT])(void *__restrict ptr, syscall_ulong_t cmd,
 	                                                                 USER UNCHECKED void *arg, iomode_t mode)
-			THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...);
+			/*THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...)*/;
 
 	/* Change the effective size of the object (s.a. `ftruncate()'). */
 	void (NONNULL((1)) KCALL *h_truncate[HANDLE_TYPE_COUNT])(void *__restrict ptr, pos_t new_size)
-			THROWS(...);
+			/*THROWS(...)*/;
 
 	/* @param: pminoffset: Set to a base offset to-be added to the mmap file-offset when mapping memory.
 	 *                     Handle operators are not required to set this value.
@@ -130,34 +130,34 @@ struct handle_types {
 	(WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3)) KCALL *h_mmap[HANDLE_TYPE_COUNT])(void *__restrict ptr,
 	                                                                              pos_t *__restrict pminoffset,
 	                                                                              pos_t *__restrict pnumbytes)
-			THROWS(...);
+			/*THROWS(...)*/;
 
 	/* @return: * : The amount of newly allocated bytes. */
 	pos_t (NONNULL((1)) KCALL *h_allocate[HANDLE_TYPE_COUNT])(void *__restrict ptr,
 	                                                          fallocate_mode_t mode,
 	                                                          pos_t start, pos_t length)
-			THROWS(...);
+			/*THROWS(...)*/;
 
 	/* Synchronize data */
-	void (NONNULL((1)) KCALL *h_sync[HANDLE_TYPE_COUNT])(void *__restrict ptr) THROWS(...);
-	void (NONNULL((1)) KCALL *h_datasync[HANDLE_TYPE_COUNT])(void *__restrict ptr) THROWS(...);
+	void (NONNULL((1)) KCALL *h_sync[HANDLE_TYPE_COUNT])(void *__restrict ptr) /*THROWS(...)*/;
+	void (NONNULL((1)) KCALL *h_datasync[HANDLE_TYPE_COUNT])(void *__restrict ptr) /*THROWS(...)*/;
 
 	/* Gather stat-information (s.a. `fstat()')
 	 * NOTE: The given `result' will _NOT_ have been initialized already! */
 	void (NONNULL((1)) KCALL *h_stat[HANDLE_TYPE_COUNT])(void *__restrict ptr,
 	                                                     USER CHECKED struct stat *result)
-			THROWS(...);
+			/*THROWS(...)*/;
 
 	/* @return: * : Set of available signals. */
 	poll_mode_t (WUNUSED NONNULL((1)) KCALL *h_poll[HANDLE_TYPE_COUNT])(void *__restrict ptr,
 	                                                                    poll_mode_t what)
-			THROWS(...);
+			/*THROWS(...)*/;
 
 	/* Implement handle control operations (s.a. `<kos/hop/[...].h>')
 	 * @throws: E_WOULDBLOCK: `IO_NONBLOCK' was given and no data/space was available (at the moment) */
 	syscall_slong_t (NONNULL((1)) KCALL *h_hop[HANDLE_TYPE_COUNT])(void *__restrict ptr, syscall_ulong_t cmd,
 	                                                               USER UNCHECKED void *arg, iomode_t mode)
-			THROWS(...);
+			/*THROWS(...)*/;
 }
 #ifdef __INTELLISENSE__
 	const handle_type_db;
@@ -311,7 +311,7 @@ DEFINE_REFCOUNT_FUNCTIONS(struct handle_manager, hm_refcnt, handle_manager_destr
 /* Allocate a new or / copy the given (which won't
  * copy any `IO_CLOFORK' handle) handle manager */
 FUNDEF ATTR_MALLOC ATTR_RETNONNULL REF struct handle_manager *KCALL
-handle_manager_alloc(void) THROWS(E_BADALLOC,E_WOULDBLOCK);
+handle_manager_alloc(void) THROWS(E_BADALLOC, E_WOULDBLOCK);
 FUNDEF ATTR_MALLOC ATTR_RETNONNULL REF struct handle_manager *KCALL
 handle_manager_clone(struct handle_manager *__restrict self)
 		THROWS(E_BADALLOC, E_WOULDBLOCK);

@@ -137,7 +137,7 @@ template<class T> struct atomic_ref {
 	}
 
 	/* Return a reference to the current pointed-to value */
-	__CXX_CLASSMEMBER NONNULL((1)) NOBLOCK_IF(!PREEMPTION_ENABLED())
+	__CXX_CLASSMEMBER NONNULL_CXX((1)) NOBLOCK_IF(!PREEMPTION_ENABLED())
 	void KCALL set(T *__restrict new_pointer) __CXX_NOEXCEPT {
 		REF T *old_pointer;
 		old_pointer = this->exchange(new_pointer);
@@ -145,7 +145,7 @@ template<class T> struct atomic_ref {
 	}
 
 	/* Return a reference to the current pointed-to value */
-	__CXX_CLASSMEMBER NONNULL((1)) NOBLOCK_IF(!PREEMPTION_ENABLED())
+	__CXX_CLASSMEMBER NONNULL_CXX((1)) NOBLOCK_IF(!PREEMPTION_ENABLED())
 	void KCALL set_inherit_new(REF T *__restrict new_pointer) __CXX_NOEXCEPT {
 		REF T *old_pointer;
 		old_pointer = this->exchange_inherit_new(new_pointer);
@@ -153,14 +153,14 @@ template<class T> struct atomic_ref {
 	}
 
 	/* Return a reference to the current pointed-to value */
-	__CXX_CLASSMEMBER ATTR_LEAF WUNUSED ATTR_RETNONNULL NONNULL((1)) NOBLOCK_IF(!PREEMPTION_ENABLED())
+	__CXX_CLASSMEMBER ATTR_LEAF WUNUSED ATTR_RETNONNULL NONNULL_CXX((1)) NOBLOCK_IF(!PREEMPTION_ENABLED())
 	REF T *KCALL exchange(T *__restrict new_pointer) __CXX_NOEXCEPT {
 		REFCNT_METHODS(T)::incref(new_pointer);
 		return exchange_inherit_new(new_pointer);
 	}
 
 	/* Return a reference to the current pointed-to value */
-	__CXX_CLASSMEMBER ATTR_LEAF WUNUSED ATTR_RETNONNULL NONNULL((1)) NOBLOCK_IF(!PREEMPTION_ENABLED())
+	__CXX_CLASSMEMBER ATTR_LEAF WUNUSED ATTR_RETNONNULL NONNULL_CXX((1)) NOBLOCK_IF(!PREEMPTION_ENABLED())
 	REF T *KCALL exchange_inherit_new(REF T *__restrict new_pointer) __CXX_NOEXCEPT {
 		REF T *old_pointer;
 #ifdef CONFIG_NO_SMP
@@ -179,7 +179,7 @@ template<class T> struct atomic_ref {
 	}
 
 	/* Atomic compare-exchange */
-	__CXX_CLASSMEMBER NONNULL((1, 2)) NOBLOCK_IF(!PREEMPTION_ENABLED())
+	__CXX_CLASSMEMBER NONNULL_CXX((1, 2)) NOBLOCK_IF(!PREEMPTION_ENABLED())
 	bool KCALL cmpxch(T *__restrict old_pointer,
 	                  T *__restrict new_pointer) __CXX_NOEXCEPT {
 #ifdef CONFIG_NO_SMP
@@ -211,7 +211,7 @@ template<class T> struct atomic_ref {
 	}
 
 	/* Atomic compare-exchange */
-	__CXX_CLASSMEMBER NONNULL((1, 2)) NOBLOCK_IF(!PREEMPTION_ENABLED())
+	__CXX_CLASSMEMBER NONNULL_CXX((1, 2)) NOBLOCK_IF(!PREEMPTION_ENABLED())
 	bool KCALL cmpxch_inherit_new(T *__restrict old_pointer,
 	                              /*inherit(on_success)*/ REF T *__restrict new_pointer) __CXX_NOEXCEPT {
 #ifdef CONFIG_NO_SMP

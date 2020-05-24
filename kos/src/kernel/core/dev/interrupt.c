@@ -571,23 +571,23 @@ again_get_old_state:
 
 FUNDEF bool KCALL
 isr_unregister_(void *func, void *arg)
-		ASMNAME("isr_unregister")
-		THROWS(E_BADALLOC);
+		THROWS(E_BADALLOC)
+		ASMNAME("isr_unregister");
 
 FUNDEF bool KCALL
 isr_unregister_at_(isr_vector_t vector, void *func, void *arg)
-		ASMNAME("isr_unregister_at")
-		THROWS(E_BADALLOC);
+		THROWS(E_BADALLOC)
+		ASMNAME("isr_unregister_at");
 
 FUNDEF bool KCALL
 isr_unregister_any_(void *func)
-		ASMNAME("isr_unregister_any")
-		THROWS(E_BADALLOC);
+		THROWS(E_BADALLOC)
+		ASMNAME("isr_unregister_any");
 
 FUNDEF bool KCALL
 isr_unregister_any_at_(isr_vector_t vector, void *func)
-		ASMNAME("isr_unregister_any_at")
-		THROWS(E_BADALLOC);
+		THROWS(E_BADALLOC)
+		ASMNAME("isr_unregister_any_at");
 
 PRIVATE NOBLOCK bool KCALL
 isr_unregister_impl(size_t index, void *func, void *arg, bool ignore_arg)

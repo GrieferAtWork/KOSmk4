@@ -307,6 +307,8 @@ local replacement_words: {string: string} = {
 	"va_end" : "__builtin_va_end",
 	"va_arg" : "__builtin_va_arg",
 	"bool" : "__BOOL",
+	"true" : "1",
+	"false" : "0",
 	"NULL" : "__NULLPTR",
 	"COMPILER_IMPURE" : "__COMPILER_IMPURE",
 };
@@ -4784,7 +4786,7 @@ class Function {
 		local anno = getThrowsAnnotationsExpanded();
 		if (!anno) {
 			if (anno === false)
-				return false;
+				return;
 			for (local at: attr_tags) {
 				if (at.strip() in nothrow_attributes)
 					return; /* Function has a nothrow annotation */
@@ -5819,13 +5821,14 @@ do_return_crt:
 						}
 						if (is_nothrow)
 							fp << "__";
+						else if (hasThrowsAnnotation()) {
+							fp << "__THROWING";
+						}
 						fp << is_nothrow << "," << my_name << ",(";
 						print_argument_list(fp, args, key_underscore, "", transform_argument_types);
 						fp << ")," << key_asmname(asmname) << ",(";
 						print_argument_name_list(fp, args, key_underscore);
-						fp << "))";
-						printThrowsAnnotation(fp);
-						fp << "\n";
+						fp << "))\n";
 					}
 				}
 				fp << "}\n";
@@ -6044,7 +6047,6 @@ skip_alias_redirections:
 						}
 						local args_prefix = "(__LIBCCALL {})(".format({ my_name });
 						if (is_nothrow) args_prefix = "__" + is_nothrow + args_prefix;
-						//if (is_nothrow) args_prefix = "__" + is_nothrow + "(" + args_prefix;
 						for (local args, return_type: extended_overloads) {
 							File.Writer return_type_fp;
 							File.Writer function_decl_fp;
@@ -6058,7 +6060,6 @@ skip_alias_redirections:
 								function_decl_fp, args, key_underscore,
 								(single_line_local_wrappers ? "" : " " * #args_prefix),
 								transform_argument_types);
-							//if (is_nothrow) function_decl_fp << ")";
 							function_decl_fp << ")";
 							printThrowsAnnotation(function_decl_fp);
 							print_doc(fp);
@@ -6246,14 +6247,15 @@ skip_alias_redirections:
 					}
 					if (is_nothrow)
 						fp << "__" << is_nothrow;
+					else if (hasThrowsAnnotation()) {
+						fp << "__THROWING";
+					}
 					fp << "," << my_name << ",(";
 					local a = args_for(alias_name);
 					print_argument_list(fp, a, key_underscore, "", transform_argument_types);
 					fp << "),(";
 					print_argument_name_list(fp, a, key_underscore, false);
-					fp << "))";
-					printThrowsAnnotation(fp);
-					fp << "\n";
+					fp << "))\n";
 				}
 			} else {
 				if (args_is_varargs) {
@@ -6287,6 +6289,9 @@ skip_alias_redirections:
 						}
 						if (is_nothrow)
 							fp << "__" << is_nothrow;
+						else if (hasThrowsAnnotation()) {
+							fp << "__THROWING";
+						}
 						fp << "," << my_name << ",(";
 						local a = args_for(alias_name)[:-1];
 						print_argument_list(fp, a, key_underscore, "", transform_argument_types);
@@ -6298,9 +6303,7 @@ skip_alias_redirections:
 								(is_word
 									? replace_word(word, transform_argument_types)
 									: word)) + ...);
-						fp << "))";
-						printThrowsAnnotation(fp);
-						fp << "\n";
+						fp << "))\n";
 					} else if (get_asmnamef_for(alias_name) !is none) {
 						local is_nothrow = "";
 						local is_void_return = false;
@@ -6331,15 +6334,16 @@ skip_alias_redirections:
 						}
 						if (is_nothrow)
 							fp << "__" << is_nothrow;
+						else if (hasThrowsAnnotation()) {
+							fp << "__THROWING";
+						}
 						fp << "," << my_name << ",(";
 						local a = args_for(alias_name);
 						print_argument_list(fp, a, key_underscore, "", transform_argument_types);
 						fp << ")," << alias_name << "," << get_asmnamef_for(alias_name) << ",(";
 						a = a[:-1];
 						print_argument_name_list(fp, a, key_underscore, false);
-						fp << ")," << key_underscore(a[#a-1][1]) << ")";
-						printThrowsAnnotation(fp);
-						fp << "\n";
+						fp << ")," << key_underscore(a[#a-1][1]) << ")\n";
 					} else {
 						/* Printed by print_redirection_extra_cond():
 						 * >> fp << " && !defined(__NO_ASMNAME)\n"; */
@@ -6386,14 +6390,15 @@ skip_alias_redirections:
 					}
 					if (is_nothrow)
 						fp << "__" << is_nothrow;
+					else if (hasThrowsAnnotation()) {
+						fp << "__THROWING";
+					}
 					fp << "," << my_name << ",(";
 					local a = args_for(alias_name);
 					print_argument_list(fp, a, key_underscore, "", transform_argument_types);
 					fp << ")," << key_asmname(asmname) << ",(";
 					print_argument_name_list(fp, a, key_underscore, false);
-					fp << "))";
-					printThrowsAnnotation(fp);
-					fp << "\n";
+					fp << "))\n";
 				}
 			}
 		}
@@ -6463,6 +6468,9 @@ skip_alias_redirections:
 					fp << ",";
 					if (is_nothrow)
 						fp << "__" << is_nothrow;
+					else if (hasThrowsAnnotation()) {
+						fp << "__THROWING";
+					}
 					fp << "," << my_name << ",(";
 					print_argument_list(fp, args, key_underscore, "", transform_argument_types);
 					fp << "),";
@@ -6472,7 +6480,6 @@ skip_alias_redirections:
 						fp, impl, key_identity, key_identity,
 						key_underscore, transform_argument_types, none);
 					fp << ")";
-					printThrowsAnnotation(fp);
 				}
 				fp << "\n";
 			}

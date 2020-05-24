@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb182b57c */
+/* HASH CRC-32:0x12d91b2d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@
 #define ____localdep_Malloc_defined 1
 #ifdef __CRT_HAVE_Malloc
 /* @throws: E_BADALLOC: ... */
-__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,,__localdep_Malloc,(__SIZE_TYPE__ __num_bytes),Malloc,(__num_bytes)) __THROWS(E_BADALLOC)
+__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__THROWING,__localdep_Malloc,(__SIZE_TYPE__ __num_bytes),Malloc,(__num_bytes))
 #else /* LIBC: Malloc */
 #undef ____localdep_Malloc_defined
 #endif /* Malloc... */

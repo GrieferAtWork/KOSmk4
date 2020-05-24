@@ -22,7 +22,7 @@
 
 #include "../__stdinc.h"
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && !defined(__clang__)
 /* MSVC already has this kind of functionality built into the compiler. */
 #define __HYBRID_FUNCPTR32(return, cc, name, args) return (CC * __ptr32 name)args
 #define __HYBRID_FUNCPTR64(return, cc, name, args) return (CC * __ptr64 name)args

@@ -159,8 +159,6 @@ dmesg_getpacket(USER CHECKED struct syslog_packet *buf,
                 USER CHECKED unsigned int *plevel,
                 u16 msg_buflen, unsigned int nth);
 
-
-
 #endif /* __CC__ */
 
 

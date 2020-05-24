@@ -514,7 +514,7 @@ class Config {
 	public final member VERBOSE: bool = false;
 
 	@@Return the location of a some build artifact
-	private final function getBuildArtifact(group: Group, srcFile: string, ext: string): string {
+	final function getBuildArtifact(group: Group, srcFile: string, ext: string): string {
 		return joinpath(BUILD_PATH, group.name, srcFile.replace("/", ".") + ext);
 	}
 

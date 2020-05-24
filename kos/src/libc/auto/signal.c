@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x904cb623 */
+/* HASH CRC-32:0xec85130a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,7 +49,7 @@ NOTHROW_NCX(LIBCCALL libc_sigfillset)(sigset_t *set) {
 	size_t cnt;
 	cnt = sizeof(__sigset_t) / sizeof(ulongptr_t);
 	while (cnt--)
-		set->__val[cnt] = ~0ul;
+		set->__val[cnt] = ~(__ULONGPTR_TYPE__)0;
 	return 0;
 }
 

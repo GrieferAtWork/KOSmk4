@@ -70,12 +70,12 @@ struct tty_device
 	REF void             *t_ohandle_ptr; /* [1..1][const] Output handle pointer. */
 	/* [1..1][const] Input handle read operator callback. */
 	size_t (KCALL *t_ihandle_read)(void *__restrict ptr, USER CHECKED void *dst,
-	                               size_t num_bytes, iomode_t mode) THROWS(...);
+	                               size_t num_bytes, iomode_t mode) /*THROWS(...)*/;
 	/* [1..1][const] Input handle poll operator callback. */
-	poll_mode_t (KCALL *t_ihandle_poll)(void *__restrict ptr, poll_mode_t what) THROWS(...);
+	poll_mode_t (KCALL *t_ihandle_poll)(void *__restrict ptr, poll_mode_t what) /*THROWS(...)*/;
 	/* [1..1][const] Output handle write operator callback. */
 	size_t (KCALL *t_ohandle_write)(void *__restrict ptr, USER CHECKED void const *src,
-	                                size_t num_bytes, iomode_t mode) THROWS(...);
+	                                size_t num_bytes, iomode_t mode) /*THROWS(...)*/;
 };
 
 

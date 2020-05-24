@@ -1,0 +1,16 @@
+---
+Checks:          '-*,bugprone-argument-comment,bugprone-bool-pointer-implicit-conversion,bugprone-copy-constructor-init,bugprone-dynamic-static-initializers,bugprone-infinite-loop,bugprone-integer-division,bugprone-lambda-function-name,bugprone-macro-repeated-side-effects,bugprone-misplaced-operator-in-strlen-in-alloc,bugprone-exception-escape,bugprone-misplaced-pointer-arithmetic-in-alloc,bugprone-misplaced-widening-cast,bugprone-move-forwarding-reference,bugprone-multiple-statement-macro,bugprone-posix-return,bugprone-suspicious-missing-comma,bugprone-suspicious-string-compare,bugprone-swapped-arguments,bugprone-terminating-continue,bugprone-too-small-loop-variable,clang-analyzer-core.uninitialized.CapturedBlockVariable,clang-analyzer-cplusplus.InnerPointer,clang-analyzer-nullability.NullableReturnedFromNonnull,readability-avoid-const-params-in-decls,readability-const-return-type,readability-misleading-indentation,readability-named-parameter,clang-analyzer-core-*'
+WarningsAsErrors: ''
+AnalyzeTemporaryDtors: false
+FormatStyle:     file
+CheckOptions:
+  - key:             bugprone-argument-comment.IgnoreSingleArgument
+    value:           false
+  - key:             bugprone-misplaced-widening-cast.CheckImplicitCasts
+    value:           1
+  - key:             bugprone-suspicious-string-compare.WarnOnLogicalNotComparison
+    value:           1
+# - key:             readability-braces-around-statements.ShortStatementLines
+#   value:           2
+...
+

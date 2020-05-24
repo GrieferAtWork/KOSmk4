@@ -442,7 +442,7 @@ again:
 		if (PREEMPTION_WASENABLED(was)) {
 			PREEMPTION_ENABLE();
 			while ((final_state = ATOMIC_READ(data.ar_status)) == EXEC_ASYNC_STATUS_PENDING)
-				task_yield();
+				task_tryyield();
 		} else {
 			while ((final_state = ATOMIC_READ(data.ar_status)) == EXEC_ASYNC_STATUS_PENDING)
 				task_pause();
@@ -660,7 +660,7 @@ again:
 		if (PREEMPTION_WASENABLED(was)) {
 			PREEMPTION_ENABLE();
 			while ((final_state = ATOMIC_READ(data.ar_status)) == EXEC_ASYNC_STATUS_PENDING)
-				task_yield();
+				task_tryyield();
 		} else {
 			while ((final_state = ATOMIC_READ(data.ar_status)) == EXEC_ASYNC_STATUS_PENDING)
 				task_pause();

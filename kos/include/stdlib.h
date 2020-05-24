@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7be7ce0 */
+/* HASH CRC-32:0xdb78580 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -229,13 +229,13 @@ typedef __WCHAR_TYPE__ wchar_t;
 #ifdef __NO_ATTR_TRANSPARENT_UNION
 #   define __WAIT_STATUS      void *
 #   define __WAIT_STATUS_DEFN void *
-#else
+#else /* __NO_ATTR_TRANSPARENT_UNION */
 typedef union {
-	union wait *__uptr;
-	int        *__iptr;
+	union wait *__uptr_;
+	int        *__iptr_;
 } __WAIT_STATUS __ATTR_TRANSPARENT_UNION;
 #   define __WAIT_STATUS_DEFN int *
-#endif
+#endif /* !__NO_ATTR_TRANSPARENT_UNION */
 #else /* __USE_MISC */
 #   define __WAIT_INT(status)  (status)
 #   define __WAIT_STATUS        int *
@@ -249,7 +249,7 @@ typedef union {
 #   define WIFSTOPPED(status)   __WIFSTOPPED(__WAIT_INT(status))
 #ifdef __WIFCONTINUED
 #   define WIFCONTINUED(status) __WIFCONTINUED(__WAIT_INT(status))
-#endif
+#endif /* __WIFCONTINUED */
 #endif /* !__WAIT_MACROS_DEFINED */
 #endif /* __USE_XOPEN || __USE_XOPEN2K8 */
 
@@ -331,7 +331,7 @@ typedef void (*__LIBCCALL __atexit_func_t)(void);
 typedef int (__LIBCCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
 #endif /* !__compar_d_fn_t_defined */
 #ifdef __CRT_HAVE_qsort_r
-__CDECLARE_VOID(__ATTR_NONNULL((1, 4)),,qsort_r,(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_d_fn_t __cmp, void *__arg),(__pbase,__item_count,__item_size,__cmp,__arg)) __THROWS(...)
+__CDECLARE_VOID(__ATTR_NONNULL((1, 4)),__THROWING,qsort_r,(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_d_fn_t __cmp, void *__arg),(__pbase,__item_count,__item_size,__cmp,__arg))
 #else /* LIBC: qsort_r */
 #include <local/stdlib/qsort_r.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(qsort_r, __FORCELOCAL __ATTR_NONNULL((1, 4)) void (__LIBCCALL qsort_r)(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_d_fn_t __cmp, void *__arg) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(qsort_r))(__pbase, __item_count, __item_size, __cmp, __arg); })
@@ -368,7 +368,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(bsearch_r, __FORCELOCAL __ATTR_WUNUSED __ATTR_NO
 
 __NAMESPACE_STD_BEGIN
 #ifdef __CRT_HAVE_qsort
-__CDECLARE_VOID(__ATTR_NONNULL((1, 4)),,qsort,(void *__pbase, size_t __item_count, size_t __item_size, __compar_fn_t __cmp),(__pbase,__item_count,__item_size,__cmp)) __THROWS(...)
+__CDECLARE_VOID(__ATTR_NONNULL((1, 4)),__THROWING,qsort,(void *__pbase, size_t __item_count, size_t __item_size, __compar_fn_t __cmp),(__pbase,__item_count,__item_size,__cmp))
 #else /* LIBC: qsort */
 __NAMESPACE_STD_END
 #include <local/stdlib/qsort.h>
@@ -685,15 +685,15 @@ __CREDIRECT_VOID(__ATTR_NORETURN,,abort,(void),"?terminate@@YAXXZ",())
 #ifdef __exit_defined
 __NAMESPACE_GLB_USING(exit)
 #elif __has_builtin(__builtin_exit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exit)
-__CEIDECLARE(__ATTR_NORETURN,void,,exit,(int __status),{ __builtin_exit(__status); }) __THROWS(...)
+__CEIDECLARE(__ATTR_NORETURN,void,__THROWING,exit,(int __status),{ __builtin_exit(__status); })
 #elif defined(__CRT_HAVE_exit)
-__CDECLARE_VOID(__ATTR_NORETURN,,exit,(int __status),(__status)) __THROWS(...)
+__CDECLARE_VOID(__ATTR_NORETURN,__THROWING,exit,(int __status),(__status))
 #elif defined(__CRT_HAVE_quick_exit)
-__CREDIRECT_VOID(__ATTR_NORETURN,,exit,(int __status),quick_exit,(__status)) __THROWS(...)
+__CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,exit,(int __status),quick_exit,(__status))
 #elif defined(__CRT_HAVE__exit)
-__CREDIRECT_VOID(__ATTR_NORETURN,,exit,(int __status),_exit,(__status)) __THROWS(...)
+__CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,exit,(int __status),_exit,(__status))
 #elif defined(__CRT_HAVE__Exit)
-__CREDIRECT_VOID(__ATTR_NORETURN,,exit,(int __status),_Exit,(__status)) __THROWS(...)
+__CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,exit,(int __status),_Exit,(__status))
 #else /* LIBC: exit */
 #undef __std_exit_defined
 #endif /* exit... */
@@ -712,13 +712,13 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,atexit,(__atexit_func_t __func
 #ifndef __std_quick_exit_defined
 #define __std_quick_exit_defined 1
 #ifdef __CRT_HAVE_quick_exit
-__CDECLARE_VOID(__ATTR_NORETURN,,quick_exit,(int __status),(__status)) __THROWS(...)
+__CDECLARE_VOID(__ATTR_NORETURN,__THROWING,quick_exit,(int __status),(__status))
 #elif defined(__CRT_HAVE_exit)
-__CREDIRECT_VOID(__ATTR_NORETURN,,quick_exit,(int __status),exit,(__status)) __THROWS(...)
+__CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,quick_exit,(int __status),exit,(__status))
 #elif defined(__CRT_HAVE__exit)
-__CREDIRECT_VOID(__ATTR_NORETURN,,quick_exit,(int __status),_exit,(__status)) __THROWS(...)
+__CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,quick_exit,(int __status),_exit,(__status))
 #elif defined(__CRT_HAVE__Exit)
-__CREDIRECT_VOID(__ATTR_NORETURN,,quick_exit,(int __status),_Exit,(__status)) __THROWS(...)
+__CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,quick_exit,(int __status),_Exit,(__status))
 #else /* LIBC: quick_exit */
 #undef __std_quick_exit_defined
 #endif /* quick_exit... */
@@ -3497,7 +3497,7 @@ __CDECLARE_VOID(,__NOTHROW_NCX,_beep,(unsigned int __freq, unsigned int __durati
 #ifndef ___wperror_defined
 #define ___wperror_defined 1
 #ifdef __CRT_HAVE__wperror
-__CDECLARE_VOID(__ATTR_COLD,,_wperror,(__WCHAR_TYPE__ const *__restrict __message),(__message)) __THROWS(...)
+__CDECLARE_VOID(__ATTR_COLD,__THROWING,_wperror,(__WCHAR_TYPE__ const *__restrict __message),(__message))
 #else /* LIBC: _wperror */
 #undef ___wperror_defined
 #endif /* _wperror... */

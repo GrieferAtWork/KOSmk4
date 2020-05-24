@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3b21ba12 */
+/* HASH CRC-32:0x2a4a17cc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,11 +62,11 @@ NOTHROW_NCX(LIBCCALL libc_strtou32)(char const *__restrict nptr,
 	for (;;) {
 		char ch = *nptr;
 		if (ch >= '0' && ch <= '9')
-			temp = (u64)(ch-'0');
+			temp = (u64)(ch - '0');
 		else if (ch >= 'a' && ch <= 'z')
-			temp = (u64)(10+(ch-'a'));
+			temp = (u64)10 + (ch - 'a');
 		else if (ch >= 'A' && ch <= 'Z')
-			temp = (u64)(10+(ch-'A'));
+			temp = (u64)10 + (ch - 'A');
 		else {
 			break;
 		}
@@ -88,7 +88,7 @@ NOTHROW_NCX(LIBCCALL libc_strto32)(char const *__restrict nptr,
                                    int base) {
 #line 1012 "kos/src/libc/magic/stdlib.c"
 	u32 result;
-	bool neg = 0;
+	bool neg = false;
 	while (*nptr == '-') {
 		neg = !neg;
 		++nptr;
@@ -124,11 +124,11 @@ NOTHROW_NCX(LIBCCALL libc_strtou64)(char const *__restrict nptr,
 	for (;;) {
 		char ch = *nptr;
 		if (ch >= '0' && ch <= '9')
-			temp = (u64)(ch-'0');
+			temp = (u64)(ch - '0');
 		else if (ch >= 'a' && ch <= 'z')
-			temp = (u64)(10+(ch-'a'));
+			temp = (u64)10 + (ch - 'a');
 		else if (ch >= 'A' && ch <= 'Z')
-			temp = (u64)(10+(ch-'A'));
+			temp = (u64)10 + (ch - 'A');
 		else {
 			break;
 		}
@@ -150,7 +150,7 @@ NOTHROW_NCX(LIBCCALL libc_strto64)(char const *__restrict nptr,
                                    int base) {
 #line 1071 "kos/src/libc/magic/stdlib.c"
 	u64 result;
-	bool neg = 0;
+	bool neg = false;
 	while (*nptr == '-') {
 		neg = !neg;
 		++nptr;

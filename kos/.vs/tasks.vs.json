@@ -68,6 +68,23 @@
 		},
 
 		{
+			"taskName": "clang-tidy",
+			"appliesTo": "*",
+			"type": "launch",
+			"contextType": "custom",
+			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
+			"workingDirectory": "${workspaceRoot}\\..",
+			"command": "deemon",
+			"args": [
+				"magic.dee",
+				"--target=${env.TARGET}",
+				"--config=${env.CONFIG}",
+				"--clang-tidy=D:\\LLVM10\\bin\\clang-tidy.exe",
+				"--vsgengroup-of=${file}"
+			]
+		},
+
+		{
 			"taskName": "rebuild single",
 			"appliesTo": "*",
 			"type": "launch",

@@ -248,6 +248,7 @@
 #define __ATTR_NOPLT             /* nothing */
 #define __NO_ATTR_NONNULL        1
 #define __ATTR_NONNULL(ppars)    /* Nothing */
+#define __ATTR_NONNULL_CXX(ppars)/* Nothing */
 #define __NO_ATTR_WUNUSED        1
 #define __ATTR_WUNUSED           /* Nothing */
 #define __NO_ATTR_TRANSPARENT_UNION 1
@@ -261,7 +262,7 @@
 #define __builtin_choose_expr(c, tt, ff) ((c) ? (tt) : (ff))
 #define __NO_builtin_choose_expr 1
 #define __NO_builtin_types_compatible_p   1
-#define __builtin_types_compatible_p(...) 0
+#define __builtin_types_compatible_p(...) 1
 #undef __builtin_assume_has_sideeffects
 #define __builtin_assume(x)      /* nothing */
 #define __builtin_unreachable()  /* nothing */

@@ -127,18 +127,18 @@ FUNDEF NOBLOCK void NOTHROW(KCALL vpage_ffree_untraced)(VIRT /*page-aligned*/ vo
 /* Allocate/Reallocate/Free virtual kernel memory.
  * @throw: E_BADALLOC:   Not enough available memory.
  * @throw: E_WOULDBLOCK: The operation would have blocked. */
-FUNDEF WUNUSED ATTR_MALLOC ATTR_RETNONNULL VIRT void *KCALL __os_malloc(size_t n_bytes, gfp_t flags) ASMNAME("kmalloc") THROWS(E_BADALLOC,E_WOULDBLOCK);
+FUNDEF WUNUSED ATTR_MALLOC ATTR_RETNONNULL VIRT void *KCALL __os_malloc(size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC, E_WOULDBLOCK) ASMNAME("kmalloc");
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
-FUNDEF WUNUSED ATTR_MALLOC ATTR_RETNONNULL VIRT void *KCALL __os_malloc_noslab(size_t n_bytes, gfp_t flags) ASMNAME("kmalloc_noslab") THROWS(E_BADALLOC,E_WOULDBLOCK);
+FUNDEF WUNUSED ATTR_MALLOC ATTR_RETNONNULL VIRT void *KCALL __os_malloc_noslab(size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC, E_WOULDBLOCK) ASMNAME("kmalloc_noslab");
 #else /* CONFIG_USE_SLAB_ALLOCATORS */
-FUNDEF WUNUSED ATTR_MALLOC ATTR_RETNONNULL VIRT void *KCALL __os_malloc_noslab(size_t n_bytes, gfp_t flags) ASMNAME("kmalloc") THROWS(E_BADALLOC,E_WOULDBLOCK);
+FUNDEF WUNUSED ATTR_MALLOC ATTR_RETNONNULL VIRT void *KCALL __os_malloc_noslab(size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC, E_WOULDBLOCK) ASMNAME("kmalloc");
 #endif /* !CONFIG_USE_SLAB_ALLOCATORS */
-FUNDEF WUNUSED ATTR_MALLOC ATTR_RETNONNULL VIRT void *KCALL __os_memalign(size_t min_alignment, size_t n_bytes, gfp_t flags) ASMNAME("kmemalign") THROWS(E_BADALLOC,E_WOULDBLOCK);
-FUNDEF WUNUSED ATTR_MALLOC ATTR_RETNONNULL VIRT void *KCALL __os_memalign_offset(size_t min_alignment, ptrdiff_t offset, size_t n_bytes, gfp_t flags) ASMNAME("kmemalign_offset") THROWS(E_BADALLOC,E_WOULDBLOCK);
-FUNDEF WUNUSED ATTR_RETNONNULL VIRT void *KCALL __os_realloc(VIRT void *ptr, size_t n_bytes, gfp_t flags) ASMNAME("krealloc") THROWS(E_BADALLOC,E_WOULDBLOCK);
-FUNDEF WUNUSED ATTR_RETNONNULL VIRT void *KCALL __os_realign(VIRT void *ptr, size_t min_alignment, size_t n_bytes, gfp_t flags) ASMNAME("krealign") THROWS(E_BADALLOC,E_WOULDBLOCK);
-FUNDEF WUNUSED ATTR_RETNONNULL VIRT void *KCALL __os_realign_offset(VIRT void *ptr, size_t min_alignment, ptrdiff_t offset, size_t n_bytes, gfp_t flags) ASMNAME("krealign_offset") THROWS(E_BADALLOC,E_WOULDBLOCK);
-FUNDEF VIRT void *KCALL __os_realloc_in_place(VIRT void *ptr, size_t n_bytes, gfp_t flags) ASMNAME("krealloc_in_place") THROWS(E_BADALLOC,E_WOULDBLOCK);
+FUNDEF WUNUSED ATTR_MALLOC ATTR_RETNONNULL VIRT void *KCALL __os_memalign(size_t min_alignment, size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC, E_WOULDBLOCK) ASMNAME("kmemalign");
+FUNDEF WUNUSED ATTR_MALLOC ATTR_RETNONNULL VIRT void *KCALL __os_memalign_offset(size_t min_alignment, ptrdiff_t offset, size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC, E_WOULDBLOCK) ASMNAME("kmemalign_offset");
+FUNDEF WUNUSED ATTR_RETNONNULL VIRT void *KCALL __os_realloc(VIRT void *ptr, size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC, E_WOULDBLOCK) ASMNAME("krealloc");
+FUNDEF WUNUSED ATTR_RETNONNULL VIRT void *KCALL __os_realign(VIRT void *ptr, size_t min_alignment, size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC, E_WOULDBLOCK) ASMNAME("krealign");
+FUNDEF WUNUSED ATTR_RETNONNULL VIRT void *KCALL __os_realign_offset(VIRT void *ptr, size_t min_alignment, ptrdiff_t offset, size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC, E_WOULDBLOCK) ASMNAME("krealign_offset");
+FUNDEF VIRT void *KCALL __os_realloc_in_place(VIRT void *ptr, size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC, E_WOULDBLOCK) ASMNAME("krealloc_in_place");
 FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL __os_malloc_usable_size)(VIRT void *ptr) ASMNAME("kmalloc_usable_size");
 FUNDEF NOBLOCK void NOTHROW(KCALL __os_free)(VIRT void *ptr) ASMNAME("kfree");
 FUNDEF NOBLOCK void NOTHROW(KCALL __os_ffree)(VIRT void *ptr, gfp_t flags) ASMNAME("kffree");
@@ -157,10 +157,10 @@ FUNDEF VIRT void *NOTHROW(KCALL __os_realloc_in_place_nx)(VIRT void *ptr, size_t
 
 #ifndef __OMIT_KMALLOC_CONSTANT_P_WRAPPERS
 #ifdef __INTELLISENSE__
-FORCELOCAL WUNUSED ATTR_MALLOC ATTR_RETNONNULL VIRT void *KCALL kcalloc(size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC,E_WOULDBLOCK);
-FORCELOCAL WUNUSED ATTR_RETNONNULL VIRT void *KCALL krecalign(VIRT void *ptr, size_t min_alignment, size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC,E_WOULDBLOCK);
-FORCELOCAL WUNUSED ATTR_RETNONNULL VIRT void *KCALL krecalloc(VIRT void *ptr, size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC,E_WOULDBLOCK);
-FORCELOCAL VIRT void *KCALL krecalloc_in_place(VIRT void *ptr, size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC,E_WOULDBLOCK);
+FORCELOCAL WUNUSED ATTR_MALLOC ATTR_RETNONNULL VIRT void *KCALL kcalloc(size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC, E_WOULDBLOCK);
+FORCELOCAL WUNUSED ATTR_RETNONNULL VIRT void *KCALL krecalign(VIRT void *ptr, size_t min_alignment, size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC, E_WOULDBLOCK);
+FORCELOCAL WUNUSED ATTR_RETNONNULL VIRT void *KCALL krecalloc(VIRT void *ptr, size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC, E_WOULDBLOCK);
+FORCELOCAL VIRT void *KCALL krecalloc_in_place(VIRT void *ptr, size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC, E_WOULDBLOCK);
 FORCELOCAL WUNUSED ATTR_MALLOC VIRT void *NOTHROW(KCALL kcalloc_nx)(size_t n_bytes, gfp_t flags);
 FORCELOCAL WUNUSED VIRT void *NOTHROW(KCALL krecalign_nx)(VIRT void *ptr, size_t min_alignment, size_t n_bytes, gfp_t flags);
 FORCELOCAL WUNUSED VIRT void *NOTHROW(KCALL krecalloc_nx)(VIRT void *ptr, size_t n_bytes, gfp_t flags);
@@ -428,7 +428,7 @@ FUNDEF NOBLOCK void NOTHROW(KCALL mall_validate_padding)(void);
  *    (Or just use `heap_free()' to have that be done automatically for you)
  * @return: base: Successfully started tracing the given pointer.
  * @return: NULL: Pointer tracing failed (not enough available memory) */
-FUNDEF NOBLOCK_IF(flags & GFP_ATOMIC) ATTR_RETNONNULL void *KCALL mall_trace(void *base, size_t num_bytes, gfp_t flags) THROWS(E_BADALLOC,E_WOULDBLOCK);
+FUNDEF NOBLOCK_IF(flags & GFP_ATOMIC) ATTR_RETNONNULL void *KCALL mall_trace(void *base, size_t num_bytes, gfp_t flags) THROWS(E_BADALLOC, E_WOULDBLOCK);
 FUNDEF NOBLOCK_IF(flags & GFP_ATOMIC) void *NOTHROW(KCALL mall_trace_nx)(void *base, size_t num_bytes, gfp_t flags);
 FUNDEF NOBLOCK_IF(flags & GFP_ATOMIC) void NOTHROW(KCALL mall_print_traceback)(void *ptr, gfp_t flags);
 FUNDEF NOBLOCK_IF(flags & GFP_ATOMIC) void NOTHROW(KCALL mall_untrace)(void *ptr, gfp_t flags);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfc7f6879 */
+/* HASH CRC-32:0xce1f161 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,7 +56,7 @@
  * @return: 0 :  No data could be scanned.
  * @return: * :  The total number of successfully scanned arguments.
  * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
-__CREDIRECT(__ATTR_LIBC_SCANF(4, 0) __ATTR_NONNULL((1, 2, 4)),__SSIZE_TYPE__,,__localdep_format_vscanf,(__pformatgetc __pgetc, __pformatungetc __pungetc, void *__arg, char const *__restrict __format, __builtin_va_list __args),format_vscanf,(__pgetc,__pungetc,__arg,__format,__args)) __THROWS(...)
+__CREDIRECT(__ATTR_LIBC_SCANF(4, 0) __ATTR_NONNULL((1, 2, 4)),__SSIZE_TYPE__,__THROWING,__localdep_format_vscanf,(__pformatgetc __pgetc, __pformatungetc __pungetc, void *__arg, char const *__restrict __format, __builtin_va_list __args),format_vscanf,(__pgetc,__pungetc,__arg,__format,__args))
 #else /* LIBC: format_vscanf */
 #include <local/format-printer/format_vscanf.h>
 /* Generic scanf implementation
@@ -116,7 +116,7 @@ __LOCAL_LIBC(format_scanf) __ATTR_LIBC_SCANF(4, 5) __ATTR_NONNULL((1, 2, 4)) __S
                                               void *__arg,
                                               char const *__restrict __format,
                                               ...) __THROWS(...) {
-#line 974 "kos/src/libc/magic/format-printer.c"
+#line 977 "kos/src/libc/magic/format-printer.c"
 	__SSIZE_TYPE__ __result;
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __format);

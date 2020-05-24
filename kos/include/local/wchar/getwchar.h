@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1b37a508 */
+/* HASH CRC-32:0xe2b55a16 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,9 +30,9 @@
 #ifdef __std___localdep_fgetwc_defined
 __NAMESPACE_STD_USING(__localdep_fgetwc)
 #elif defined(__CRT_HAVE_fgetwc)
-__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,,__localdep_fgetwc,(__FILE *__restrict __stream),fgetwc,(__stream)) __THROWS(...)
+__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetwc,(__FILE *__restrict __stream),fgetwc,(__stream))
 #elif defined(__CRT_HAVE_getwc)
-__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,,__localdep_fgetwc,(__FILE *__restrict __stream),getwc,(__stream)) __THROWS(...)
+__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetwc,(__FILE *__restrict __stream),getwc,(__stream))
 #else /* LIBC: fgetwc */
 #undef ____localdep_fgetwc_defined
 #endif /* fgetwc... */

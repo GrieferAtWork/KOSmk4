@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe0f27afc */
+/* HASH CRC-32:0x83ac58de */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_CrtMemDumpStatistics) __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_CrtMemDumpStatistics))(_CrtMemState const *__state) {
-#line 620 "kos/src/libc/magic/crtdbg.c"
+#line 621 "kos/src/libc/magic/crtdbg.c"
 	__COMPILER_IMPURE();
 	(void)__state;
 }

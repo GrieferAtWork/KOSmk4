@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d9dce02 */
+/* HASH CRC-32:0x72b92e18 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -681,13 +681,13 @@ typedef void (__LIBCCALL *__pthread_once_routine_t)(void);
  * only once, even if pthread_once is executed several times with the
  * same ONCE_CONTROL argument. ONCE_CONTROL must point to a static or
  * extern variable initialized to PTHREAD_ONCE_INIT. */
-__CDECLARE(__ATTR_NONNULL((1, 2)),int,,pthread_once,(pthread_once_t *__once_control, __pthread_once_routine_t __init_routine),(__once_control,__init_routine)) __THROWS(...)
+__CDECLARE(__ATTR_NONNULL((1, 2)),int,__THROWING,pthread_once,(pthread_once_t *__once_control, __pthread_once_routine_t __init_routine),(__once_control,__init_routine))
 #elif defined(__CRT_HAVE_call_once)
 /* Guarantee that the initialization function INIT_ROUTINE will be called
  * only once, even if pthread_once is executed several times with the
  * same ONCE_CONTROL argument. ONCE_CONTROL must point to a static or
  * extern variable initialized to PTHREAD_ONCE_INIT. */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,,pthread_once,(pthread_once_t *__once_control, __pthread_once_routine_t __init_routine),call_once,(__once_control,__init_routine)) __THROWS(...)
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,pthread_once,(pthread_once_t *__once_control, __pthread_once_routine_t __init_routine),call_once,(__once_control,__init_routine))
 #endif /* pthread_once... */
 
 /* Functions for handling cancellation.

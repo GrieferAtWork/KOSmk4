@@ -69,11 +69,11 @@ FUNDEF NOBLOCK void FCALL x86_fxrstor(USER CHECKED struct xfpustate const *state
 struct xfpustate32;
 FUNDEF NOBLOCK void FCALL x86_fxsave32(USER CHECKED struct xfpustate32 *state) THROWS(E_SEGFAULT);
 FUNDEF NOBLOCK void FCALL x86_fxrstor32(USER CHECKED struct xfpustate32 const *state) THROWS(E_SEGFAULT);
-FUNDEF NOBLOCK void FCALL x86_fxsave64(USER CHECKED struct xfpustate *state) ASMNAME("x86_fxsave") THROWS(E_SEGFAULT);
-FUNDEF NOBLOCK void FCALL x86_fxrstor64(USER CHECKED struct xfpustate const *state) ASMNAME("x86_fxrstor") THROWS(E_SEGFAULT);
+FUNDEF NOBLOCK void FCALL x86_fxsave64(USER CHECKED struct xfpustate *state) THROWS(E_SEGFAULT) ASMNAME("x86_fxsave");
+FUNDEF NOBLOCK void FCALL x86_fxrstor64(USER CHECKED struct xfpustate const *state) THROWS(E_SEGFAULT) ASMNAME("x86_fxrstor");
 #else /* __x86_64__ */
-FUNDEF NOBLOCK void FCALL x86_fxsave32(USER CHECKED struct xfpustate *state) ASMNAME("x86_fxsave") THROWS(E_SEGFAULT);
-FUNDEF NOBLOCK void FCALL x86_fxrstor32(USER CHECKED struct xfpustate const *state) ASMNAME("x86_fxrstor") THROWS(E_SEGFAULT);
+FUNDEF NOBLOCK void FCALL x86_fxsave32(USER CHECKED struct xfpustate *state) THROWS(E_SEGFAULT) ASMNAME("x86_fxsave");
+FUNDEF NOBLOCK void FCALL x86_fxrstor32(USER CHECKED struct xfpustate const *state) THROWS(E_SEGFAULT) ASMNAME("x86_fxrstor");
 #endif /* !__x86_64__ */
 
 /* The value that will always be written to `struct xfpustate::fs_mxcsr_mask' */

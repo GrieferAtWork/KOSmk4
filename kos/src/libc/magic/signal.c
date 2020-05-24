@@ -253,7 +253,7 @@ sigfillset:([nonnull] sigset_t *set) -> int {
 	size_t cnt;
 	cnt = sizeof(__sigset_t) / sizeof(ulongptr_t);
 	while (cnt--)
-		set->@__val@[cnt] = ~0ul;
+		set->@__val@[cnt] = ~(__ULONGPTR_TYPE__)0;
 	return 0;
 }
 

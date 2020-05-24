@@ -92,7 +92,7 @@
 
 #if !__has_builtin(__builtin_types_compatible_p)
 #define __NO_builtin_types_compatible_p   1
-#define __builtin_types_compatible_p(...) 0
+#define __builtin_types_compatible_p(...) 1
 #endif /* !__has_builtin(__builtin_types_compatible_p) */
 
 #ifdef __STDC__
@@ -141,7 +141,7 @@
 #endif
 
 #if defined(__DCC_VERSION__) || defined(__TINYC__)
-#define __COMPILER_HAVE_TYPEOF   1
+#define __COMPILER_HAVE_TYPEOF 1
 #endif /* __DCC_VERSION__ || __TINYC__ */
 
 #if defined(__BORLANDC__) && __BORLANDC__ >= 0x599
@@ -617,10 +617,12 @@
 #endif
 
 #if __has_attribute(__nonnull__)
-#define __ATTR_NONNULL(ppars) __attribute__((__nonnull__ ppars))
+#define __ATTR_NONNULL(ppars)     __attribute__((__nonnull__ ppars))
+#define __ATTR_NONNULL_CXX(ppars) __attribute__((__nonnull__ ppars))
 #else
-#define __NO_ATTR_NONNULL     1
-#define __ATTR_NONNULL(ppars) /* Nothing */
+#define __NO_ATTR_NONNULL         1
+#define __ATTR_NONNULL(ppars)     /* Nothing */
+#define __ATTR_NONNULL_CXX(ppars) /* Nothing */
 #endif
 
 #if __has_attribute(__warn_unused_result__)
@@ -727,6 +729,11 @@ namespace __intern { template<class T> struct __compiler_alignof { char __x; T _
 #define __ATTR_FORCEINLINE __ATTR_INLINE /* Nothing */
 #endif /* !__always_inline__ */
 
+#define __ATTR_LEAF_P   __ATTR_LEAF
+#define __ATTR_PURE_P   __ATTR_PURE
+#define __ATTR_CONST_P  __ATTR_CONST
+
+
 #define __LOCAL        static __ATTR_INLINE
 #define __FORCELOCAL   static __ATTR_FORCEINLINE
 
@@ -830,6 +837,10 @@ namespace __intern { template<class T> struct __compiler_alignof { char __x; T _
 #endif /* (c_plusplus+0) == 0 */
 #endif /* c_plusplus && !__cplusplus */
 
+
+#ifndef __COMPILER_IGNORE_UNINITIALIZED
+#define __COMPILER_IGNORE_UNINITIALIZED(var) var
+#endif /* !__COMPILER_IGNORE_UNINITIALIZED */
 
 /* Define varargs macros expected by system headers. */
 #if __has_builtin(__builtin_va_list) || __has_builtin(__builtin_va_start)

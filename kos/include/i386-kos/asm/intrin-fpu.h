@@ -28,6 +28,11 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
+#ifndef __COMPILER_ASM_BUFFER
+#define __COMPILER_ASM_BUFFER(T, s, p) (*(T *)(p))
+#endif /* !__COMPILER_ASM_BUFFER */
+
+
 struct xfpustate;
 struct sfpustate;
 struct sfpuenv;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4e1f1bd9 */
+/* HASH CRC-32:0x62918922 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@
 #define ____localdep_UTimensAt32_defined 1
 #ifdef __CRT_HAVE_UTimensAt
 /* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
-__CREDIRECT_VOID(__ATTR_NONNULL((2)),,__localdep_UTimensAt32,(__fd_t __dirfd, char const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags),UTimensAt,(__dirfd,__filename,__times,__flags)) __THROWS(...)
+__CREDIRECT_VOID(__ATTR_NONNULL((2)),__THROWING,__localdep_UTimensAt32,(__fd_t __dirfd, char const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags),UTimensAt,(__dirfd,__filename,__times,__flags))
 #else /* LIBC: UTimensAt */
 #undef ____localdep_UTimensAt32_defined
 #endif /* UTimensAt32... */

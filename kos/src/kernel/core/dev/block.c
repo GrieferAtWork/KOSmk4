@@ -1544,14 +1544,14 @@ do_dump_block_device(struct basic_block_device *__restrict self) {
 	u64 total_bytes_adj = (u64)self->bd_total_bytes;
 	char const *total_bytes_name = DBGSTR("b");
 	REF struct driver *drv;
-	if (total_bytes_adj >= 1024 * 1024 * 1024) {
-		total_bytes_adj /= 1024 * 1024 * 1024;
+	if (total_bytes_adj >= (u64)1024 * 1024 * 1024) {
+		total_bytes_adj /= (u64)1024 * 1024 * 1024;
 		total_bytes_name = DBGSTR("GiB");
-	} else if (total_bytes_adj >= 1024 * 1024) {
-		total_bytes_adj /= 1024 * 1024;
+	} else if (total_bytes_adj >= (u64)1024 * 1024) {
+		total_bytes_adj /= (u64)1024 * 1024;
 		total_bytes_name = DBGSTR("MiB");
-	} else if (total_bytes_adj >= 1024) {
-		total_bytes_adj /= 1024;
+	} else if (total_bytes_adj >= (u64)1024) {
+		total_bytes_adj /= (u64)1024;
 		total_bytes_name = DBGSTR("KiB");
 	}
 	drv = driver_at_address(block_device_ispartition(self)

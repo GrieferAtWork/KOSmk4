@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f4495ee */
+/* HASH CRC-32:0x3d7f773 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,9 +26,9 @@
 #ifndef ____localdep_crt_flushall_defined
 #define ____localdep_crt_flushall_defined 1
 #ifdef __CRT_HAVE__flushall
-__CREDIRECT(,int,,__localdep_crt_flushall,(void),_flushall,()) __THROWS(...)
+__CREDIRECT(,int,__THROWING,__localdep_crt_flushall,(void),_flushall,())
 #elif defined(__CRT_HAVE__IO_flush_all)
-__CREDIRECT(,int,,__localdep_crt_flushall,(void),_IO_flush_all,()) __THROWS(...)
+__CREDIRECT(,int,__THROWING,__localdep_crt_flushall,(void),_IO_flush_all,())
 #else /* LIBC: _flushall */
 #undef ____localdep_crt_flushall_defined
 #endif /* crt_flushall... */

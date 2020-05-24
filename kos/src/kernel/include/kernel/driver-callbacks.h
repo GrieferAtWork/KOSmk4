@@ -59,8 +59,8 @@ FUNDEF NOBLOCK void NOTHROW(KCALL callback_list_detroy)(struct callback_list_str
 DEFINE_REFCOUNT_FUNCTIONS(struct callback_list_struct,cl_refcnt,callback_list_detroy);
 
 typedef ATOMIC_REF(struct callback_list_struct) __callback_list_t;
-FUNDEF __BOOL KCALL __callback_list_insert(__callback_list_t *__restrict self, void (*func)(), struct driver *__restrict orig) ASMNAME("callback_list_insert") THROWS(E_BADALLOC, E_WOULDBLOCK);
-FUNDEF __BOOL KCALL __callback_list_remove(__callback_list_t *__restrict self, void (*func)()) ASMNAME("callback_list_remove") THROWS(E_BADALLOC, E_WOULDBLOCK);
+FUNDEF __BOOL KCALL __callback_list_insert(__callback_list_t *__restrict self, void (*func)(), struct driver *__restrict orig) THROWS(E_BADALLOC, E_WOULDBLOCK) ASMNAME("callback_list_insert");
+FUNDEF __BOOL KCALL __callback_list_remove(__callback_list_t *__restrict self, void (*func)()) THROWS(E_BADALLOC, E_WOULDBLOCK) ASMNAME("callback_list_remove");
 DATDEF struct callback_list_struct __callback_list_empty ASMNAME("callback_list_empty");
 
 #if defined(__cplusplus) && defined(__COMPILER_HAVE_CXX_VARIABLE_TEMPLATES)

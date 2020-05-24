@@ -1,0 +1,230 @@
+/* Copyright (c) 2019-2020 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+import * from deemon;
+import * from ..libmagic;
+import * from ..steps.c;
+import * from .gcc;
+import ipc;
+import fs;
+
+function joinClangTidyAndTeeOutputIntoCtoFile(
+		clangTidyProc: ipc.Process,
+		ctoFile: string,
+		clangTidyStdout: ipc.Pipe,
+		FORMAT_ERRORS: bool) {
+	local teeBuffer;
+	try {
+		teeBuffer = File.Writer();
+		clangTidyStdout = File.Buffer(clangTidyStdout, "ro,c,none");
+		for (local l: clangTidyStdout) {
+			teeBuffer.write(l);
+			/* Filter certain lines. */
+			local strippedLine = l.strip();
+			if (strippedLine.endswith(" warning generated.") ||
+			    strippedLine.endswith(" warnings generated.") ||
+			    strippedLine.endswith(" error generated.") ||
+			    strippedLine.endswith(" errors generated."))
+				continue;
+			if (strippedLine.startswith("Suppressed "))
+				continue;
+			if (FORMAT_ERRORS) {
+				/* Format errors */
+				if (l.startswith("error:") || l.startswith("warning:"))
+					goto normal_line;
+				if (l.startswith("In file included from ")) {
+					try {
+						local filename, line = l.scanf("In file included from %[^:]:%[^,:]")...;
+						print normalizeFilenameForLog(filename.decode("utf-8")),;
+						print "(",;
+						print line.strip().rstrip(","),;
+						print "): In file included from here...";
+						continue;
+					} catch (...) {
+					}
+				} else if (l.startswith("                 from")) {
+					try {
+						local filename, line = l.scanf(" from %[^:]:%[^:]")...;
+						print normalizeFilenameForLog(filename.decode("utf-8")),;
+						print "(",;
+						print line.rstrip().rstrip(",").rstrip(),;
+						print "): ... Which was included here";
+						continue;
+					} catch (...) {
+					}
+				} else if (l.startswith("    inlined from")) {
+					try {
+						local fundecl, filename, line, column;
+						try {
+							fundecl, filename, line, column =
+								l.scanf(" inlined from '%[^']' at %[^:]:%[^:]:%[^:]:")...;
+							column = column.strip().rstrip(",").rstrip();
+						} catch (...) {
+							fundecl, filename, line =
+								l.scanf(" inlined from '%[^']' at %[^:]:%[^:]:")...;
+							column = none;
+						}
+						print normalizeFilenameForLog(filename.decode("utf-8")),;
+						print "(",;
+						print line.strip(),;
+						if (column) {
+							print ",",;
+							print column,;
+						}
+						print "): inlined from '",;
+						print fundecl,;
+						print "':";
+						continue;
+					} catch (...) {
+					}
+				}
+				local col = l.find(":");
+				if (col >= 0 && !l.isanyspace(0, col)) {
+again_handle_col:
+					local filename = l[:col];
+					local line, column = none;
+					local col2 = l.find(":", col + 1);
+					if (col2 >= 0) {
+						line = l[col + 1:col2];
+						if (line.isdigit()) {
+							local col3 = l.find(":", col2 + 1);
+							if (col3 >= 0) {
+								column = l[col2 + 1:col3];
+								if (column.isdigit()) {
+									col2 = col3;
+								} else {
+									column = none;
+								}
+							}
+						} else if (
+								(line.startswith("/") ||
+								line.startswith("\\"))&&
+								!l.isanyspace(0, col2)) {
+							col = col2;
+							goto again_handle_col;
+						} else {
+							col2 = col;
+							line = none;
+						}
+					} else {
+						line = none;
+						col2 = col;
+					}
+					print normalizeFilenameForLog(filename.decode("utf-8")),;
+					if (line !is none) {
+						print "(",;
+						print line,;
+						if (column !is none) {
+							print ",",;
+							print column,;
+						}
+						print ")",;
+					}
+					print l[col2:].rstrip();
+					continue;
+				}
+normal_line:
+				print l.rstrip();
+			} else {
+				print l,;
+			}
+		}
+		clangTidyStdout.close();
+	} catch (...) {
+		clangTidyProc.terminate(1);
+		throw;
+	}
+	/* Join the clang-tidy process, and check its exit code. */
+	joinProcess(clangTidyProc);
+	/* If clang-tidy didn't exit with an error status code,
+	 * write its entire stdout output into the cto file. */
+	with (local fp = File.open(ctoFile, "wb"))
+		fp << teeBuffer.string;
+}
+
+function shouldRunClangTidy(step: BoundStep, options: {string: Object}): bool {
+	local language = options.get(OPT_COMPILE_LANGUAGE);
+	if (language is none)
+		language = getLanguageFromExtension(fs.extof(step.userData));
+	return language in ["c", "c++"];
+}
+
+function createClangTidyProcess(
+		step:         BoundStep,
+		toolchain:    Toolchain,
+		options:      {string: Object},
+		srcFile:      string,           /* "kos/src/kernel/core/arch/i386/boot/boot.c" */
+		ctoFile:      string,           /* "build/i386-kos-nOD/kernel/kos.src.kernel.core.arch.i386.boot.boot.c.ctout" */
+		depFile:      string,           /* "build/i386-kos-nOD/kernel/kos.src.kernel.core.arch.i386.boot.boot.c.MF" */
+		ccFlags:      {string...},      /* options.get(OPT_COMPILE_CCFLAGS) */
+		ppFlags:      {string...},      /* options.get(OPT_COMPILE_PPFLAGS) */
+		language:     string,           /* "c" */
+		incPath:      string,           /* { "kos/src/kernel/include/i386-kos", "Ikos/src/kernel/include" } */
+		macros:       {string: string}, /* { "__KOS__" : "1" } */
+		clangTidyExe: string        /* /path/to/clang-tidy.exe */
+		): Waitable {
+	if (language is none)
+		language = getLanguageFromExtension(fs.extof(srcFile));
+	local args   = List(options.get(OPT_COMPILE_CLANG_TIDY_ARGS));
+	local ccargs = List(options.get(OPT_COMPILE_CLANG_TIDY_CC_ARGS));
+	args.append("-header-filter=.*");
+	args.append("-system-headers");
+	if (incPath) {
+		local len = #ccargs;
+		for (local x: incPath)
+			ccargs.insert(len, "-I" + x);
+	}
+	ccargs.extend(getCCForLanguage(language)[1]); /* -x c, -x c++, etc... */
+	for (local flag: ccFlags) {
+		if (flag.startswith("-W"))
+			continue; /* Warning options (ignore) */
+		if (flag.startswith("-f"))
+			continue; /* Feature options (ignore) */
+		if (flag.startswith("-m"))
+			continue; /* Machine options (ignore) */
+		ccargs.append(flag);
+	}
+	ccargs.extend({ "-MMD", "-MF", depFile });
+	ccargs.append("-D__clang_tidy__");
+	if (macros)
+		ccargs.extend(constructMacroDefinitions(macros));
+	if (ppFlags)
+		ccargs.extend(joinGccArguments(ppFlags, "-Wp", "-Xpreprocessor"));
+	local proc = ipc.Process(clangTidyExe, { args..., srcFile, "--", ccargs... });
+	local r, w = ipc.Pipe.new()...;
+	proc.stdout = w;
+	proc.stderr = w;
+	if (toolchain.config.VERBOSE)
+		print "Exec", repr proc.cmdline;
+	proc.start();
+	local thr;
+	try {
+		w.close();
+		thr = Thread(joinClangTidyAndTeeOutputIntoCtoFile, (
+			proc, ctoFile, r, toolchain.config.FORMAT_ERRORS));
+		thr.start();
+	} catch (...) {
+		proc.terminate(1);
+		throw;
+	}
+	return WaitableJoin(thr);
+}
+
+

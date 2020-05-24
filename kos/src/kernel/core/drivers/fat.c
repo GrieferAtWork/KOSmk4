@@ -63,15 +63,15 @@ PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL Fat_FinalizeNode)(struct inode *__restrict self);
 
 /* The fat get/set implementation for different table sizes. */
-PRIVATE WUNUSED ATTR_PURE NONNULL((1)) FatClusterIndex KCALL Fat12_GetFatIndirection(FatSuperblock const *__restrict self, FatClusterIndex index);
-PRIVATE WUNUSED ATTR_PURE NONNULL((1)) FatClusterIndex KCALL Fat16_GetFatIndirection(FatSuperblock const *__restrict self, FatClusterIndex index);
-PRIVATE WUNUSED ATTR_PURE NONNULL((1)) FatClusterIndex KCALL Fat32_GetFatIndirection(FatSuperblock const *__restrict self, FatClusterIndex index);
-PRIVATE void KCALL Fat16_SetFatIndirection(FatSuperblock *__restrict self, FatClusterIndex index, FatClusterIndex indirection_target);
-PRIVATE void KCALL Fat12_SetFatIndirection(FatSuperblock *__restrict self, FatClusterIndex index, FatClusterIndex indirection_target);
-PRIVATE void KCALL Fat32_SetFatIndirection(FatSuperblock *__restrict self, FatClusterIndex index, FatClusterIndex indirection_target);
-PRIVATE WUNUSED ATTR_PURE NONNULL((1)) FatSectorIndex KCALL Fat12_GetTableSector(FatSuperblock const *__restrict self, FatClusterIndex id);
-PRIVATE WUNUSED ATTR_PURE NONNULL((1)) FatSectorIndex KCALL Fat16_GetTableSector(FatSuperblock const *__restrict self, FatClusterIndex id);
-PRIVATE WUNUSED ATTR_PURE NONNULL((1)) FatSectorIndex KCALL Fat32_GetTableSector(FatSuperblock const *__restrict self, FatClusterIndex id);
+PRIVATE WUNUSED ATTR_PURE NONNULL((1)) FatClusterIndex KCALL Fat12_GetFatIndirection(FatSuperblock const *__restrict self, FatClusterIndex index) THROWS(...);
+PRIVATE WUNUSED ATTR_PURE NONNULL((1)) FatClusterIndex KCALL Fat16_GetFatIndirection(FatSuperblock const *__restrict self, FatClusterIndex index) THROWS(...);
+PRIVATE WUNUSED ATTR_PURE NONNULL((1)) FatClusterIndex KCALL Fat32_GetFatIndirection(FatSuperblock const *__restrict self, FatClusterIndex index) THROWS(...);
+PRIVATE void KCALL Fat16_SetFatIndirection(FatSuperblock *__restrict self, FatClusterIndex index, FatClusterIndex indirection_target) THROWS(...);
+PRIVATE void KCALL Fat12_SetFatIndirection(FatSuperblock *__restrict self, FatClusterIndex index, FatClusterIndex indirection_target) THROWS(...);
+PRIVATE void KCALL Fat32_SetFatIndirection(FatSuperblock *__restrict self, FatClusterIndex index, FatClusterIndex indirection_target) THROWS(...);
+PRIVATE WUNUSED ATTR_PURE NONNULL((1)) FatSectorIndex KCALL Fat12_GetTableSector(FatSuperblock const *__restrict self, FatClusterIndex id) THROWS(...);
+PRIVATE WUNUSED ATTR_PURE NONNULL((1)) FatSectorIndex KCALL Fat16_GetTableSector(FatSuperblock const *__restrict self, FatClusterIndex id) THROWS(...);
+PRIVATE WUNUSED ATTR_PURE NONNULL((1)) FatSectorIndex KCALL Fat32_GetTableSector(FatSuperblock const *__restrict self, FatClusterIndex id) THROWS(...);
 
 INTDEF struct inode_type Fat_FileNodeOperators;
 INTDEF struct inode_type Fat_DirectoryNodeOperators;
@@ -102,7 +102,8 @@ INTDEF struct inode_type Fat32_RootDirectoryNodeOperators;
 INTERN NONNULL((1)) void KCALL
 Fat32_VReadFromINode(struct inode *__restrict self,
                      CHECKED USER byte_t *buf,
-                     size_t bufsize, pos_t pos) {
+                     size_t bufsize, pos_t pos)
+		THROWS(...) {
 	FatSuperblock *fat = (FatSuperblock *)self->i_super;
 	assert(fat != self || fat->f_type == FAT32);
 	if (bufsize) {
@@ -152,7 +153,8 @@ Fat32_VReadFromINode(struct inode *__restrict self,
 INTERN NONNULL((1)) size_t KCALL
 Fat32_VTryReadFromINode(struct inode *__restrict self,
                         CHECKED USER byte_t *buf,
-                        size_t bufsize, pos_t pos) {
+                        size_t bufsize, pos_t pos)
+		THROWS(...) {
 	size_t result      = bufsize;
 	FatSuperblock *fat = (FatSuperblock *)self->i_super;
 	assert(fat != self || fat->f_type == FAT32);
@@ -201,7 +203,8 @@ Fat32_VTryReadFromINode(struct inode *__restrict self,
 INTERN NONNULL((1)) void KCALL
 Fat32_VWriteToINode(struct inode *__restrict self,
                     CHECKED USER byte_t const *buf,
-                    size_t bufsize, pos_t pos) {
+                    size_t bufsize, pos_t pos)
+		THROWS(...) {
 	FatSuperblock *fat = (FatSuperblock *)self->i_super;
 	assert(fat != self || fat->f_type == FAT32);
 	if (bufsize) {
@@ -245,7 +248,8 @@ Fat32_VWriteToINode(struct inode *__restrict self,
 INTERN NONNULL((1)) void KCALL
 Fat16_VReadFromRootDirectory(FatSuperblock *__restrict self,
                              CHECKED USER byte_t *buf,
-                             size_t bufsize, pos_t pos) {
+                             size_t bufsize, pos_t pos)
+		THROWS(...) {
 	size_t max_read;
 	assert(self->i_super == self);
 	assert(self->f_type != FAT32);
@@ -271,7 +275,8 @@ Fat16_VReadFromRootDirectory(FatSuperblock *__restrict self,
 INTERN NONNULL((1)) size_t KCALL
 Fat16_VTryReadFromRootDirectory(FatSuperblock *__restrict self,
                                 CHECKED USER byte_t *buf,
-                                size_t bufsize, pos_t pos) {
+                                size_t bufsize, pos_t pos)
+		THROWS(...) {
 	size_t max_read;
 	assert(self->i_super == self);
 	assert(self->f_type != FAT32);
@@ -293,7 +298,8 @@ Fat16_VTryReadFromRootDirectory(FatSuperblock *__restrict self,
 INTERN NONNULL((1)) void KCALL
 Fat16_VWriteToRootDirectory(FatSuperblock *__restrict self,
                             CHECKED USER byte_t const *buf,
-                            size_t bufsize, pos_t pos) {
+                            size_t bufsize, pos_t pos)
+		THROWS(...) {
 	size_t max_write;
 	assert(self->i_super == self);
 	assert(self->f_type != FAT32);
@@ -317,7 +323,8 @@ too_large:
 INTERN NONNULL((1)) void KCALL
 Fat_VReadFromINode(struct inode *__restrict self,
                    CHECKED USER byte_t *buf,
-                   size_t bufsize, pos_t pos) {
+                   size_t bufsize, pos_t pos)
+		THROWS(...) {
 	if (self != self->i_super ||
 	    ((FatSuperblock *)self)->f_type == FAT32) {
 		Fat32_VReadFromINode(self, buf, bufsize, pos);
@@ -329,7 +336,8 @@ Fat_VReadFromINode(struct inode *__restrict self,
 INTERN NONNULL((1)) size_t KCALL
 Fat_VTryReadFromINode(struct inode *__restrict self,
                       CHECKED USER byte_t *buf,
-                      size_t bufsize, pos_t pos) {
+                      size_t bufsize, pos_t pos)
+		THROWS(...) {
 	if (self != self->i_super ||
 	    ((FatSuperblock *)self)->f_type == FAT32) {
 		return Fat32_VTryReadFromINode(self, buf, bufsize, pos);
@@ -341,7 +349,8 @@ Fat_VTryReadFromINode(struct inode *__restrict self,
 INTERN NONNULL((1)) void KCALL
 Fat_VWriteToINode(struct inode *__restrict self,
                   CHECKED USER byte_t const *buf,
-                  size_t bufsize, pos_t pos) {
+                  size_t bufsize, pos_t pos)
+		THROWS(...) {
 	if (self != self->i_super ||
 	    ((FatSuperblock *)self)->f_type == FAT32) {
 		Fat32_VWriteToINode(self, buf, bufsize, pos);
@@ -357,7 +366,8 @@ Fat_VWriteToINode(struct inode *__restrict self,
 
 /* Returns the absolute on-disk position of `pos' in `self' */
 INTERN NONNULL((1)) pos_t KCALL
-Fat_GetAbsDiskPos(struct inode *__restrict self, pos_t pos) {
+Fat_GetAbsDiskPos(struct inode *__restrict self, pos_t pos)
+		THROWS(...) {
 	if (self != self->i_super ||
 	    ((FatSuperblock *)self->i_super)->f_type == FAT32) {
 		FatSuperblock *fat = (FatSuperblock *)self->i_super;
@@ -379,7 +389,8 @@ LOCAL NONNULL((1, 2, 3)) void KCALL
 preallocate_cluster_vector_entries(struct inode *__restrict node,
                                    FatNode *__restrict data,
                                    FatSuperblock *__restrict fat,
-                                   size_t min_num_clusters) {
+                                   size_t min_num_clusters)
+		THROWS(...) {
 	size_t new_alloc;
 	VERIFY_INODE_FSDATA(node);
 	assert(data == node->i_fsdata);
@@ -418,7 +429,8 @@ allocate_smallest_possible:
 
 LOCAL NONNULL((1)) void KCALL
 zero_initialize_cluster(FatSuperblock *__restrict fat,
-                        FatClusterIndex cluster) {
+                        FatClusterIndex cluster)
+		THROWS(...) {
 	/* TODO */
 	(void)fat;
 	(void)cluster;
@@ -429,7 +441,8 @@ zero_initialize_cluster(FatSuperblock *__restrict fat,
  * chain for) the `nth_cluster' of the given `node' */
 INTERN NONNULL((1)) FatClusterIndex KCALL
 Fat_GetFileCluster(struct inode *__restrict node,
-                   size_t nth_cluster, unsigned int mode) {
+                   size_t nth_cluster, unsigned int mode)
+		THROWS(...) {
 	FatClusterIndex result;
 	FatNode *data;
 	FatSuperblock *fat;
@@ -589,7 +602,8 @@ create_more_clusters_already_locked:
 PRIVATE NONNULL((1, 3)) u32 KCALL
 FatDirectory_AllocateFreeRange(struct directory_node *__restrict self,
                                u32 entry_count,
-                               bool *__restrict pis_directory_end) {
+                               bool *__restrict pis_directory_end)
+		THROWS(...) {
 	/* XXX: Search through available free ranges and return the first
 	 *      one with at least `entry_count' free slots and set
 	 *     `*pis_directory_end' to `false'.  Otherwise return the
@@ -698,7 +712,8 @@ typedef struct ATTR_PACKED {
 
 PRIVATE NONNULL((1, 2)) REF struct directory_entry *KCALL
 Fat_ReadDirectory(struct directory_node *__restrict self,
-                  pos_t *__restrict pentry_pos) {
+                  pos_t *__restrict pentry_pos)
+		THROWS(...) {
 	REF struct directory_entry *result;
 	pos_t pos = *pentry_pos;
 	ATTR_ALIGNED(2) FatFileStorage filestorage;
@@ -797,9 +812,8 @@ continue_reading:
 					continue;
 				}
 				memmovedown(lfn_name, lfn_name + UNICODE_16TO8_MAXBUF(LFN_NAME),
-				            ((LFN_SEQNUM_MAXCOUNT - 1) - index) *
-				            UNICODE_16TO8_MAXBUF(LFN_NAME),
-				            sizeof(char));
+				            (size_t)(LFN_SEQNUM_MAXCOUNT - 1) - index,
+				            UNICODE_16TO8_MAXBUF(LFN_NAME) * sizeof(char));
 				lfn_valid |= mask;
 				lfn_valid >>= 1;
 			}
@@ -964,7 +978,8 @@ PRIVATE time_t const time_monthstart_yday[2][13] = {
 
 
 LOCAL ATTR_CONST time_t KCALL
-Fat_DecodeFileDate(FatFileDate self) {
+Fat_DecodeFileDate(FatFileDate self)
+		THROWS(...) {
 	time_t result;
 	unsigned int year;
 	year   = self.fd_year + 1980;
@@ -974,8 +989,8 @@ Fat_DecodeFileDate(FatFileDate self) {
 	return result * SECONDS_PER_DAY;
 }
 
-LOCAL ATTR_CONST FatFileDate KCALL
-Fat_EncodeFileDate(time_t tmt) {
+LOCAL ATTR_CONST FatFileDate
+NOTHROW(KCALL Fat_EncodeFileDate)(time_t tmt) {
 	FatFileDate result;
 	unsigned int year;
 	u8 i;
@@ -995,15 +1010,15 @@ Fat_EncodeFileDate(time_t tmt) {
 	return result;
 }
 
-LOCAL ATTR_CONST time_t KCALL
-Fat_DecodeFileTime(FatFileTime self) {
+LOCAL ATTR_CONST time_t
+NOTHROW(KCALL Fat_DecodeFileTime)(FatFileTime self) {
 	return ((time_t)self.ft_hour * 60 * 60) +
 	       ((time_t)self.ft_min * 60) +
 	       ((time_t)self.ft_sec * 2);
 }
 
-LOCAL ATTR_CONST FatFileTime KCALL
-Fat_EncodeFileTime(time_t tmt) {
+LOCAL ATTR_CONST FatFileTime
+NOTHROW(KCALL Fat_EncodeFileTime)(time_t tmt) {
 	FatFileTime result;
 	result.ft_sec  = (tmt % 60) / 2;
 	result.ft_min  = ((tmt / 60) % 60);
@@ -1013,8 +1028,7 @@ Fat_EncodeFileTime(time_t tmt) {
 
 
 PRIVATE NONNULL((1)) void
-(KCALL Fat_MaskINodeAttributes)(struct inode *__restrict self)
-		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, ...) {
+NOTHROW(KCALL Fat_MaskINodeAttributes)(struct inode *__restrict self) {
 	FatSuperblock *super = (FatSuperblock *)self->i_super;
 	{
 		FatFileTime temp_time;
@@ -1064,7 +1078,8 @@ PRIVATE NONNULL((1)) void
 
 PRIVATE NONNULL((1, 2)) void KCALL
 Fat_LoadINodeFromFatFile(struct inode *__restrict self,
-                         FatFile const *__restrict file) {
+                         FatFile const *__restrict file)
+		THROWS(...) {
 	FatNode *data;
 	FatSuperblock *super;
 	VERIFY_INODE_FSDATA(self);
@@ -1144,9 +1159,9 @@ Fat_LoadINodeFromFatFile(struct inode *__restrict self,
 
 }
 
-PRIVATE NONNULL((1, 2)) void KCALL
-Fat_SaveINodeToFatFile(struct inode const *__restrict self,
-                       FatFile *__restrict file) {
+PRIVATE NONNULL((1, 2)) void
+NOTHROW(KCALL Fat_SaveINodeToFatFile)(struct inode const *__restrict self,
+                                      FatFile *__restrict file) {
 	FatSuperblock *super;
 	FatNode *data;
 	u32 cluster;
@@ -1376,7 +1391,8 @@ Fat_DoTruncateINode(struct inode *__restrict self,
 }
 
 PRIVATE NONNULL((1)) void KCALL
-Fat_TruncateINode(struct inode *__restrict self, pos_t new_size) {
+Fat_TruncateINode(struct inode *__restrict self, pos_t new_size)
+		THROWS(...) {
 	if (new_size > self->i_filesize)
 		return; /* File extending is done lazily. */
 	Fat_DoTruncateINode(self,
@@ -2519,7 +2535,7 @@ Fat_OpenSuperblock(FatSuperblock *__restrict self, UNCHECKED USER char *args)
 	self->f_fat_start   = (FatSectorIndex)LETOH16(disk_header.bpb.bpb_reserved_sectors);
 	self->f_sec4clus    = (size_t)disk_header.bpb.bpb_sectors_per_cluster;
 	self->f_fat_count   = (u32)disk_header.bpb.bpb_fatc;
-	self->f_clustersize = (size_t)(self->f_sec4clus << FAT_SECTORSHIFT(self));
+	self->f_clustersize = (size_t)self->f_sec4clus << FAT_SECTORSHIFT(self);
 
 	/* Figure out what kind of FAT filesystem this is. */
 	if (!disk_header.bpb.bpb_sectors_per_fat || !disk_header.bpb.bpb_maxrootsize) {
@@ -2796,13 +2812,13 @@ PRIVATE struct superblock_type Fat_SuperblockType = {
 	/*.st_flags             = */ SUPERBLOCK_TYPE_FNORMAL,
 	/*.st_sizeof_superblock = */ sizeof(FatSuperblock),
 	{
-		/*.st_open = */ (void(KCALL *)(struct superblock *__restrict,UNCHECKED USER char *))&Fat_OpenSuperblock
+		/*.st_open = */ (void(KCALL *)(struct superblock *__restrict,UNCHECKED USER char *) THROWS(...))&Fat_OpenSuperblock
 	},
 	/*.st_functions = */ {
 		/*.f_fini     = */ (void(KCALL *)(struct superblock *__restrict))&Fat_FinalizeSuperblock,
-		/*.f_opennode = */ (void(KCALL *)(struct superblock *__restrict,struct inode *__restrict,struct directory_node *__restrict,struct directory_entry *__restrict))&Fat_OpenINode,
-		/*.f_sync     = */ (void(KCALL *)(struct superblock *__restrict,USER CHECKED struct statfs *))&Fat_StatSuperblock,
-		/*.f_sync     = */ (void(KCALL *)(struct superblock *__restrict))&Fat_SynchronizeSuperblock
+		/*.f_opennode = */ (void(KCALL *)(struct superblock *__restrict,struct inode *__restrict,struct directory_node *__restrict,struct directory_entry *__restrict) THROWS(...))&Fat_OpenINode,
+		/*.f_sync     = */ (void(KCALL *)(struct superblock *__restrict,USER CHECKED struct statfs *) THROWS(...))&Fat_StatSuperblock,
+		/*.f_sync     = */ (void(KCALL *)(struct superblock *__restrict) THROWS(...))&Fat_SynchronizeSuperblock
 	}
 };
 

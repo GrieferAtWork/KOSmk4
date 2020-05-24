@@ -245,8 +245,8 @@ NOTHROW(KCALL task_popconnections)(struct task_connections *__restrict cons);
 /* Connect the calling thread to a given signal.
  * @throw: E_BADALLOC:   [task_connect[_ghost]] Insufficient memory (only when there are
  *                        at least `CONFIG_TASK_STATIC_CONNECTIONS' connections already). */
-FUNDEF NONNULL((1)) void KCALL task_connect(struct sig *__restrict target) THROWS(E_BADALLOC);
-FUNDEF NONNULL((1)) void KCALL task_connect_ghost(struct sig *__restrict target) THROWS(E_BADALLOC);
+FUNDEF NONNULL((1)) void KCALL task_connect(struct sig *__restrict target) /*THROWS(E_BADALLOC)*/;
+FUNDEF NONNULL((1)) void KCALL task_connect_ghost(struct sig *__restrict target) /*THROWS(E_BADALLOC)*/;
 FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(KCALL task_connect_c)(struct task_connection *__restrict con, struct sig *__restrict target);
 FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(KCALL task_connect_ghost_c)(struct task_connection *__restrict con, struct sig *__restrict target);
 

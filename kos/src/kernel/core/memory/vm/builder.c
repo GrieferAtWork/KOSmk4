@@ -491,7 +491,7 @@ vmb_apply(struct vmb *__restrict self,
           struct vm *__restrict target,
           unsigned int additional_actions,
           struct vm_execinfo_struct *execinfo)
-		THROWS(E_BADALLOC,E_WOULDBLOCK) {
+		THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	struct vm_node *node;
 	struct pointer_set locked_parts;
 	struct vm_execinfo_struct old_execinfo;

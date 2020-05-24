@@ -100,7 +100,8 @@ free_nodes_chain(struct vm_node *chain) {
 
 
 typedef void (KCALL *pervm_clone_t)(struct vm *__restrict newvm,
-                                    struct vm *__restrict oldvm) THROWS(...);
+                                    struct vm *__restrict oldvm)
+		/*THROWS(...)*/;
 INTDEF pervm_clone_t __kernel_pervm_clone_start[];
 INTDEF pervm_clone_t __kernel_pervm_clone_end[];
 PUBLIC CALLBACK_LIST(void FCALL(struct vm * /*newvm*/, struct vm * /*oldvm*/)) vm_onclone_callbacks = CALLBACK_LIST_INIT;

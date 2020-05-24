@@ -19,6 +19,9 @@
  */
 #ifndef ____INTELLISENSE_STDINC_SYNTAX_GCC_H
 #define ____INTELLISENSE_STDINC_SYNTAX_GCC_H 1
+#undef clang
+#undef __clang
+#undef __clang__
 
 /*
  * While the `linux-gcc-x86' intellisense driver is _extremely_ welcome if you ask me,

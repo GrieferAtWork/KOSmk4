@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x299f2def */
+/* HASH CRC-32:0x60670fa2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -751,15 +751,15 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(link, __FORCELOCAL __ATTR_NONNULL((1, 2)) int __
 #ifdef __std_exit_defined
 __NAMESPACE_STD_USING(exit)
 #elif __has_builtin(__builtin_exit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exit)
-__CEIDECLARE(__ATTR_NORETURN,void,,exit,(int __status),{ __builtin_exit(__status); }) __THROWS(...)
+__CEIDECLARE(__ATTR_NORETURN,void,__THROWING,exit,(int __status),{ __builtin_exit(__status); })
 #elif defined(__CRT_HAVE_exit)
-__CDECLARE_VOID(__ATTR_NORETURN,,exit,(int __status),(__status)) __THROWS(...)
+__CDECLARE_VOID(__ATTR_NORETURN,__THROWING,exit,(int __status),(__status))
 #elif defined(__CRT_HAVE_quick_exit)
-__CREDIRECT_VOID(__ATTR_NORETURN,,exit,(int __status),quick_exit,(__status)) __THROWS(...)
+__CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,exit,(int __status),quick_exit,(__status))
 #elif defined(__CRT_HAVE__exit)
-__CREDIRECT_VOID(__ATTR_NORETURN,,exit,(int __status),_exit,(__status)) __THROWS(...)
+__CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,exit,(int __status),_exit,(__status))
 #elif defined(__CRT_HAVE__Exit)
-__CREDIRECT_VOID(__ATTR_NORETURN,,exit,(int __status),_Exit,(__status)) __THROWS(...)
+__CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,exit,(int __status),_Exit,(__status))
 #else /* LIBC: exit */
 #undef __exit_defined
 #endif /* exit... */
