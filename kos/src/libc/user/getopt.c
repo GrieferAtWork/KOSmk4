@@ -157,7 +157,7 @@ process_long_option(int argc, char **argv, char const *optstring,
 		;
 	namelen = nameend - __nextchar;
 	for (p = longopts, n_options = 0; p->name; p++, n_options++) {
-		if (!strncmp(p->name, __nextchar, namelen) &&
+		if (strncmp(p->name, __nextchar, namelen) == 0 &&
 		    namelen == strlen(p->name)) {
 			pfound       = p;
 			option_index = n_options;
@@ -170,7 +170,7 @@ process_long_option(int argc, char **argv, char const *optstring,
 		int ambig_fallback       = 0;
 		int indfound             = -1;
 		for (p = longopts, option_index = 0; p->name; p++, option_index++) {
-			if (!strncmp(p->name, __nextchar, namelen)) {
+			if (!trncmp(p->name, __nextchar, namelen) == 0) {
 				if (pfound == NULL) {
 					pfound   = p;
 					indfound = option_index;
@@ -322,7 +322,7 @@ _getopt_internal_r(int argc, char **argv, char const *optstring,
 				++optind;
 			__last_nonopt = optind;
 		}
-		if (optind != argc && !strcmp(argv[optind], "--")) {
+		if (optind != argc && strcmp(argv[optind], "--") == 0) {
 			++optind;
 			if (__first_nonopt != __last_nonopt && __last_nonopt != optind) {
 				exchange(argv);

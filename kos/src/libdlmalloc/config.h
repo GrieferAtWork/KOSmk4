@@ -131,13 +131,17 @@
 #endif /* HAVE_MREMAP */
 #endif /* CONFIG_DLMALLOC_FREESTANDING_SYSTEM_CALLS */
 
-#include <hybrid/compiler.h>
-#include <hybrid/typecore.h>
-#include <asm/pagesize.h>
-#include <dlfcn.h>
 #include <__crt.h>
-#include <string.h>
+#include <hybrid/compiler.h>
+
+#include <hybrid/host.h>
+#include <hybrid/typecore.h>
+
+#include <asm/pagesize.h>
+
 #include <assert.h>
+#include <dlfcn.h>
+#include <string.h>
 #include <unistd.h>
 
 /* Configure dlmalloc to be a lot more tame in regards to allocations */
@@ -170,26 +174,26 @@ DECL_BEGIN
 
 /* Declare exported functions within individual sections. */
 
-DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlmalloc") void *dlmalloc(size_t);
-DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlfree") void dlfree(void *);
-DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlcalloc") void *dlcalloc(size_t, size_t);
-DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlrealloc") void *dlrealloc(void *, size_t);
-DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlrealloc_in_place") void *dlrealloc_in_place(void *, size_t);
-DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlmemalign") void *dlmemalign(size_t, size_t);
-DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlposix_memalign") int dlposix_memalign(void **, size_t, size_t);
-DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlvalloc") void *dlvalloc(size_t);
-DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlmallopt") int dlmallopt(int, int);
+DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlmalloc") void *dlmalloc(size_t bytes);
+DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlfree") void dlfree(void *mem);
+DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlcalloc") void *dlcalloc(size_t n_elements, size_t elem_size);
+DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlrealloc") void *dlrealloc(void *oldmem, size_t bytes);
+DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlrealloc_in_place") void *dlrealloc_in_place(void *oldmem, size_t bytes);
+DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlmemalign") void *dlmemalign(size_t alignment, size_t bytes);
+DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlposix_memalign") int dlposix_memalign(void **pp, size_t alignment, size_t bytes);
+DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlvalloc") void *dlvalloc(size_t bytes);
+DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlmallopt") int dlmallopt(int param_number, int value);
 DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlmalloc_footprint") size_t dlmalloc_footprint(void);
 DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlmalloc_max_footprint") size_t dlmalloc_max_footprint(void);
 DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlmalloc_footprint_limit") size_t dlmalloc_footprint_limit(void);
 DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlmalloc_set_footprint_limit") size_t dlmalloc_set_footprint_limit(size_t bytes);
 DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlmallinfo") struct mallinfo dlmallinfo(void);
-DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlindependent_calloc") void **dlindependent_calloc(size_t, size_t, void **);
-DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlindependent_comalloc") void **dlindependent_comalloc(size_t, size_t *, void **);
-DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlbulk_free") size_t dlbulk_free(void **, size_t n_elements);
-DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlpvalloc") void *dlpvalloc(size_t);
-DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlmalloc_trim") int dlmalloc_trim(size_t);
-DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlmalloc_usable_size") size_t dlmalloc_usable_size(void *);
+DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlindependent_calloc") void **dlindependent_calloc(size_t n_elements, size_t elem_size, void *chunks[]);
+DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlindependent_comalloc") void **dlindependent_comalloc(size_t n_elements, size_t sizes[], void *chunks[]);
+DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlbulk_free") size_t dlbulk_free(void *array[], size_t nelem);
+DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlpvalloc") void *dlpvalloc(size_t bytes);
+DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlmalloc_trim") int dlmalloc_trim(size_t pad);
+DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlmalloc_usable_size") size_t dlmalloc_usable_size(void *mem);
 
 #ifdef DL_REGISTER_CACHE
 DL_REGISTER_CACHE(dl_clear_caches) {

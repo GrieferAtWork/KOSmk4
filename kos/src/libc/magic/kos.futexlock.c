@@ -603,7 +603,7 @@ futexlock_timedwaitwhile_allbits64:([nonnull] lfutex_t *ulockaddr, [nonnull] lfu
 [overload_alias] futexlock_waitwhile_anybit:(*) = futexlock_timedwaitwhile_anybit;
 [overload_alias] futexlock_waitwhile_allbits:(*) = futexlock_timedwaitwhile_allbits;
 
-%#ifdef __USE_TIME64
+%#if defined(__USE_TIME64) && !((defined(__USE_TIME_BITS64) || defined(_TIMESPEC_MATCHES_TIMESPEC64)) && defined(__USE_STRUCT64_MACRO))
 [overload_alias] futexlock_waitwhile:(*) = futexlock_timedwaitwhile64;
 [overload_alias] futexlock_waituntil:(*) = futexlock_timedwaituntil64;
 [overload_alias] futexlock_waitwhile_equal:(*) = futexlock_timedwaitwhile64;
@@ -619,7 +619,7 @@ futexlock_timedwaitwhile_allbits64:([nonnull] lfutex_t *ulockaddr, [nonnull] lfu
 [overload_alias] futexlock_waituntil_exactbits:(*) = futexlock_timedwaituntil_exactbits64;
 [overload_alias] futexlock_waitwhile_anybit:(*) = futexlock_timedwaitwhile_anybit64;
 [overload_alias] futexlock_waitwhile_allbits:(*) = futexlock_timedwaitwhile_allbits64;
-%#endif /* __USE_TIME64 */
+%#endif /* __USE_TIME64 && !((__USE_TIME_BITS64 || _TIMESPEC_MATCHES_TIMESPEC64) && __USE_STRUCT64_MACRO) */
 
 %} /* extern "C++" */
 %{

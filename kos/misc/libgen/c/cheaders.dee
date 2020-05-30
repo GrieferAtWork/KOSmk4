@@ -1,0 +1,1765 @@
+global COPYRIGHT =
+"/* Copyright (c) 2019-2020 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */";
+
+
+
+/* Definitions for data structures used to represent pre-parsed C headers
+ * definition files, as well as helper functions used to construct system
+ * headers, as well as automatic/user implementations */
+
+import * from deemon;
+import * from .parser;
+import * from .writer;
+import * from .escape;
+import * from .globals;
+import * from .namespace;
+import * from .namespace;
+
+global Function;
+global SystemHeader;
+global LocalFunction;
+
+global final LIBC_DECLS = { "__LIBC", "LIBC" };
+global final NAMESPACE_IMPORT_DECL = "__FORCELOCAL";
+global final LOCAL_NAMESPACE_NAME = "local";
+
+global final function keyLocalDep(symbolName: string): string {
+	return "__localdep_" + symbolName;
+}
+
+class CType {
+	this = default;
+
+	@@A string to insert before the name of the associated variable (e.g. @"fd_t")
+	@@NOTE: This string will have already been stripped of leading/trailing spaces
+	public member beforeName: string | UserString;
+
+	@@A string to insert after the name of the associated variable (e.g. @"[2]")
+	@@NOTE: This string will have already been stripped of leading/trailing spaces
+	public member afterName: string | UserString = "";
+
+	@@Returns @true if @this @CType is implicitly convertible to @other
+	function implicitlyConvertibleTo(other: CType): bool {
+		/* TODO: This can be done better! */
+		return beforeName == other.beforeName &&
+		       afterName == other.afterName;
+	}
+
+	@@Returns @true if @this @CType is @"void"
+	public property isVoid: bool = {
+		get(): bool {
+			return beforeName == "void" && !afterName;
+		}
+	}
+
+	@@Returns @true if @this @CType is a pointer
+	public property isPointer: bool = {
+		get(): bool {
+			return str(beforeName).endswith("*");
+		}
+	}
+
+
+	@@Prints the c-cast prefix (e.g. @"(int)") for @this
+	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
+	public function cprintCCastPrefix(fp: CWriter, escapeMode: int) {
+		fp << "(";
+		/* TODO: This doesn't work for array types! */
+		/* TODO: This doesn't work for things like __restrict */
+		cprint(fp, escapeMode);
+		fp << ")";
+	}
+
+	@@Output @this @CType to a @CWriter
+	@@Returns @true if the type string must be followed by whitespace if
+	@@immediatly succeeded by a keyword. Returns @false otherwise.
+	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
+	public function cprint(fp: CWriter, escapeMode: int, name: string | UserString = ""): bool {
+		local beforeNameStr = str beforeName;
+		local afterNameStr = str afterName;
+		escapeTextIntoFile(fp, beforeName, escapeMode);
+		if (name) {
+			if (!beforeNameStr.endswith("*"))
+				fp << " ";
+			escapeTextIntoFile(fp, name, escapeMode);
+		}
+		if (afterNameStr) {
+			if (!afterNameStr.startswith(")"))
+				fp << " ";
+			escapeTextIntoFile(fp, afterName, escapeMode);
+		}
+		if (afterNameStr)
+			return true;
+		if (name)
+			return true;
+		if (beforeNameStr)
+			return !beforeNameStr.endswith("*");
+		return false;
+	}
+
+}
+
+
+class Argument {
+	this = default;
+
+	@@Argument name (fully escaped; empty string if the argument is unnamed)
+	@@NOTE: Ellipsis arguments have this field set to @""
+	public member name: string | UserString;
+
+	@@The argument name that should be combined with @ctype in the prototype
+	@@Usually this is the same as @name, but in the case of functions such
+	@@as @"execv", this would be an empty string to accout for the fact that
+	@@the set @ctype is actually the name of a macro that already includes
+	@@the name of the argument (meaning that the name mustn't be written twice)
+	public member protoTypeName: string | UserString;
+
+	@@C Typing of this argument.
+	@@NOTE: Ellipsis arguments have this field set to @CType("...")
+	public member ctype: CType;
+
+	@@Output @this @Argument to a @CWriter
+	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
+	public function cprint(fp: CWriter, escapeMode: int) {
+		ctype.cprint(fp, escapeMode, protoTypeName);
+	}
+}
+
+class FunctionPrototype {
+	this = default;
+
+	@@List of attributes that should be applied to this function (e.g. @{ "ATTR_NORETURN" })
+	public member attributes: {(string | UserString)...} = ();
+
+	@@The nothrow behavior of this function. Should be one of:
+	@@  - @"":                   Unspecified (assume THROWING, but don't warn if used from NOTHROW)
+	@@  - @"NOTHROW":            Function doesn't throw
+	@@  - @"NOTHROW_NCX":        Function is nothrow when: #if !defined(__NON_CALL_EXCEPTIONS)
+	@@  - @"NOTHROW_RPC":        Function is nothrow when: #if !defined(__NON_CALL_EXCEPTIONS) && defined(__NO_RPC_EXCEPTIONS)
+	@@  - @"NOTHROW_RPC_KOS":    Function is nothrow when: #if !defined(__NON_CALL_EXCEPTIONS) && defined(__NO_RPC_EXCEPTIONS) && defined(__KOS__)
+	@@  - @"NOTHROW_RPC_NOKOS":  Function is nothrow when: #if !defined(__NON_CALL_EXCEPTIONS) && defined(__NO_RPC_EXCEPTIONS) && !defined(__KOS__)
+	@@  - @"NOTHROW_RPC_PURE":   Function is nothrow when: #if defined(__NO_RPC_EXCEPTIONS)
+	@@  - @"THROWS(...)":        Function can throw and should be warned about if used from NOTHROW.
+	@@                           The given @"..." is a comma-seperated list of `E_*' codes from <kos/except.h>
+	public member nothrow: string | UserString = "";
+
+	@@Calling convention of this function prototype (e.g. @"ATTR_CDECL")
+	@@Set to an empty string to use the default calling convention.
+	public member cc: string | UserString = "";
+
+	@@The type that is returned by this function prototype
+	public member returnType: CType;
+
+	@@The actual List of arguments
+	public member argv: {Argument...} = ();
+
+	@@When set to non-@none, these are the types of the arguments passed through ellipsis
+	@@This information can be helpful when trying to construct an argument list
+	public member ellipsisArgumentTypes: {CType...} = none;
+
+	@@Returns @true if @cc matches the libc calling convention
+	public property ccIsLibcCall: bool = {
+		get(): bool {
+			return cc in ["LIBCCALL", "__LIBCCALL"];
+		}
+	}
+
+	@@Returns @true if this prototype contains a @"ATTR_NORETURN" attribute
+	public property isNoreturn: bool = {
+		get(): bool {
+			for (local at: attributes) {
+				if (at in ["ATTR_NORETURN", "__ATTR_NORETURN"])
+					return true;
+			}
+			return false;
+		}
+	}
+
+	@@Returns @true if @nothrow describes @"THROWS(...)"
+	public property isNothrowThrowing: bool = {
+		get(): bool {
+			if (m_isNothrowThrowing !is bound) {
+				local nts = str nothrow;
+				m_isNothrowThrowing =
+					nts.startswith("THROWS(") ||
+					nts.startswith("__THROWS(");
+			}
+			return m_isNothrowThrowing;
+		}
+	}
+	private member m_isNothrowThrowing: bool;
+
+	@@Returns @"__THROWING" or @"THROWING" based on the escape-state of @nothrow
+	@@The caller must ensure that @isNothrowThrowing is @true
+	public property nothrowThrowingSpec: string = {
+		get(): bool {
+			local nts = str nothrow;
+			if (nts.startswith("THROWS("))
+				return "THROWING";
+			return "__THROWING";
+		}
+	}
+
+
+	public property argsByName: {string: Argument} = {
+		get(): {string: Argument} {
+			if (m_argsByName !is bound) {
+				m_argsByName = Dict();
+				for (local a: argv) {
+					if (a.name)
+						m_argsByName[a.name] = a;
+				}
+			}
+			return m_argsByName;
+		}
+	}
+	private member m_argsByName: {string: Argument};
+
+	public operator # (): string -> #argv;
+	public operator [] (i: int): Argument -> argv[i];
+
+	@@Evaluate to @true if @this @FunctionPrototype ends with an ellipsis argument (i.e. @"...")
+	public property hasEllipsis: bool = {
+		get(): bool {
+			return argv && argv.last.ctype.beforeName == "...";
+		}
+	}
+
+	@@Print the attribute list (returns @false if
+	@@nothing was printed, and @true otherwise)
+	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
+	public function cprintAttributeList(fp: CWriter, escapeMode: int): bool {
+		local isFirst = true;
+		for (local attr: attributes) {
+			if (!isFirst)
+				fp << " ";
+			escapeTextIntoFile(fp, attr, escapeMode);
+			isFirst = false;
+		}
+		return !isFirst;
+	}
+
+	@@Output the argument list including types to @fp
+	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
+	public function cprintArgumentListWithTypes(fp: CWriter, escapeMode: int) {
+		local isFirst = true;
+		fp << "(";
+		if (!argv)
+			fp << "void";
+		else {
+			for (local arg: argv) {
+				if (!isFirst)
+					fp << ", ";
+				arg.cprint(fp, escapeMode);
+				isFirst = false;
+			}
+		}
+		fp << ")";
+	}
+
+	@@Output the argument list excluding types to @fp
+	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
+	public function cprintArgumentListWithoutTypes(fp: CWriter, escapeMode: int) {
+		local isFirst = true;
+		fp << "(";
+		for (local arg: argv) {
+			if (!isFirst)
+				fp << ",";
+			escapeTextIntoFile(fp, arg.protoTypeName, escapeMode);
+			isFirst = false;
+		}
+		fp << ")";
+	}
+
+	@@Print a declaration akin to:
+	@@> __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) size_t __NOTHROW_NCX(__LIBCCALL strlen)(char const *__restrict __str) __CASMNAME_SAME("open");
+	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
+	public function cprintDeclarationWithOptionalAsmname(
+			fp: CWriter, escapeMode: int, decl: string, exposedName: string, assemblyName: string) {
+		local isLibcLinkage = decl in LIBC_DECLS && ccIsLibcCall;
+		if (isLibcLinkage) {
+			cprintDeclarationCDECLARE(fp, escapeMode, decl, exposedName, assemblyName);
+			return;
+		}
+		/* Same symbol name -> declare normally */
+		cprintDeclarationWithoutTerminator(fp, escapeMode, decl, exposedName);
+		if (isLibcLinkage) {
+			fp << " __CASMNAME";
+			local suffix = "";
+			if (assemblyName.startswith("DOS$")) {
+				suffix       = "_DOS";
+				assemblyName = assemblyName[4:];
+			} else if (assemblyName.startswith("KOS$")) {
+				suffix       = "_KOS";
+				assemblyName = assemblyName[4:];
+			}
+			if (exposedName == assemblyName)
+				fp << "_SAME";
+			fp << suffix << "(" << repr(assemblyName) << ")";
+		} else if (exposedName != assemblyName) {
+			fp << " __ASMNAME(" << repr(assemblyName) << ")";
+		}
+		fp << ";\n";
+	}
+
+	@@Print a declaration akin to:
+	@@> __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,wcslen,(__WCHAR_TYPE__ const *__restrict __str),(__str))
+	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
+	public function cprintDeclarationCDECLARE(
+			fp: CWriter, escapeMode: int, decl: string,
+			exposedName: string, assemblyName: string) {
+		if (exposedName != assemblyName) {
+			return cprintRedirectDeclaration(
+				fp, escapeMode, decl, exposedName, assemblyName);
+		}
+		/* Special case: Make use of __CDECLARE */
+		local isVoidReturn = returnType.isVoid;
+		fp << "__CDECLARE";
+		if (isVoidReturn)
+			fp << "_VOID";
+		fp << "(";
+		/* Attributes */
+		cprintAttributeList(fp, escapeMode);
+		fp << ",";
+		/* Return type */
+		if (!isVoidReturn) {
+			returnType.cprint(fp, escapeMode);
+			fp << ",";
+		}
+		/* NOTHROW behavior */
+		escapeTextIntoFile(fp, isNothrowThrowing
+			? nothrowThrowingSpec
+			: nothrow, escapeMode);
+		/* Exposed name */
+		fp << "," << exposedName << ",";
+		cprintArgumentListWithTypes(fp, escapeMode);
+		fp << ",";
+		cprintArgumentListWithoutTypes(fp, escapeMode);
+		fp << ")\n";
+	}
+
+	@@Print a declaration akin to:
+	@@> __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) size_t
+	@@> __NOTHROW_NCX(__LIBCCALL strlen)(char const *__restrict __str)
+	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
+	public function cprintDeclarationWithoutTerminator(
+			fp: CWriter, escapeMode: int, decl: string, exposedName: string) {
+		/* Same symbol name -> declare normally */
+		escapeTextIntoFile(fp, decl, escapeMode);
+		if (decl)
+			fp << " ";
+		if (cprintAttributeList(fp, escapeMode))
+			fp << " ";
+		if (returnType.cprint(fp, escapeMode))
+			fp << " ";
+		if (!isNothrowThrowing)
+			escapeTextIntoFile(fp, nothrow, escapeMode);
+		fp << "(";
+		escapeTextIntoFile(fp, cc, escapeMode);
+		if (cc)
+			fp << " ";
+		fp << exposedName << ")";
+		cprintArgumentListWithTypes(fp, escapeMode);
+		if (isNothrowThrowing)
+			escapeTextIntoFile(fp, nothrowThrowingSpec, escapeMode);
+	}
+
+	@@Print a declaration akin to:
+	@@> FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
+	@@> __NOTHROW_NCX(__LIBCCALL wcslen)(wchar_t const *__restrict __string) {
+	@@> return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslen))(__string); }
+	@@If the types from @callToPrototype different from those in @this prototype,
+	@@insert casts where- and as necessary.
+	@@NOTE: This function will not print a trailing line-feed after the declaration!
+	@@@param: escapeMode:      One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
+	@@@param: decl:            In the above example: @"FORCELOCAL"
+	@@@param: exposedName:     In the above example: @"wcslen"
+	@@@param: callToName:      In the above example: @"(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslen))"
+	@@@param: callToPrototype: In the above example: @(allLocalFunctionsByName["wcslen"].prototype)
+	public function cprintCallToAliasDeclaration(
+			fp: CWriter, escapeMode: int, decl: string, exposedName: string,
+			callToName: string, callToPrototype: FunctionPrototype) {
+		cprintDeclarationWithoutTerminator(fp, escapeMode, decl, exposedName);
+		fp << " { return ";
+		if (!callToPrototype.returnType.implicitlyConvertibleTo(returnType))
+			returnType.cprintCCastPrefix(fp, escapeMode);
+		fp << callToName << "(";
+		local argc = #callToPrototype.argv;
+		local isFirst = true;
+		for (local argi: [:argc]) {
+			if (!isFirst)
+				fp << ", ";
+			isFirst = false;
+			local arg = callToPrototype.argv[argi];
+			if (argi >= #argv) {
+				/* Shouldn't happen... */
+				arg.ctype.cprintCCastPrefix(fp, escapeMode);
+				fp << "0";
+				continue;
+			}
+			local myArg = this.argv[argi];
+			if (!myArg.ctype.implicitlyConvertibleTo(arg.ctype))
+				arg.ctype.cprintCCastPrefix(fp, escapeMode);
+			escapeTextIntoFile(fp, myArg.name, escapeMode);
+		}
+		fp << "); }";
+	}
+
+	@@Print a declaration akin to:
+	@@> __REDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_NONNULL((1)),size_t,__NOTHROW_NCX,
+	@@>            __LIBCCALL,strlen,(char const *__str),strlen_alias,(__str))
+	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
+	public function cprintRedirectDeclaration(
+			fp: CWriter, escapeMode: int, decl: string,
+			exposedName: string, assemblyName: string) {
+		local isLibcLinkage = decl in LIBC_DECLS && ccIsLibcCall;
+		fp << (isLibcLinkage ? "__CREDIRECT" : "__REDIRECT");
+		local isVoidReturn = returnType.isVoid;
+		if (isVoidReturn)
+			fp << "_VOID";
+		if (assemblyName.startswith("DOS$")) {
+			fp << "_DOS";
+			assemblyName = assemblyName[4:];
+		} else if (assemblyName.startswith("KOS$")) {
+			fp << "_KOS";
+			assemblyName = assemblyName[4:];
+		}
+		fp << "(";
+		/* Linkage */
+		if (!isLibcLinkage)
+			fp << decl << ",";
+		/* Attributes */
+		cprintAttributeList(fp, escapeMode);
+		/* Return type */
+		fp << ",";
+		if (!isVoidReturn) {
+			returnType.cprint(fp, escapeMode);
+			fp << ",";
+		}
+		/* NOTHROW behavior */
+		escapeTextIntoFile(fp, isNothrowThrowing
+			? nothrowThrowingSpec
+			: nothrow, escapeMode);
+		fp << ",";
+		/* Calling convention */
+		if (!isLibcLinkage) {
+			escapeTextIntoFile(fp, cc, escapeMode);
+			fp << ",";
+		}
+		/* Exposed symbol name */
+		fp << exposedName << ",";
+		/* Argument list */
+		cprintArgumentListWithTypes(fp, escapeMode);
+		/* Assembly import symbol name */
+		fp << "," << assemblyName << ",";
+		/* Argument names */
+		cprintArgumentListWithoutTypes(fp, escapeMode);
+		fp << ")\n";
+	}
+
+	@@Print a redirection- or declaration-binding, based on
+	@@the exposed- and assembly name being the same
+	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
+	public function cprintRedirectionBinding(
+			fp: CWriter, escapeMode: int, decl: string,
+			exposedName: string, assemblyName: string) {
+		if (exposedName != assemblyName) {
+			cprintRedirectDeclaration(
+				fp, escapeMode, decl, exposedName, assemblyName);
+			return;
+		}
+		cprintDeclarationWithOptionalAsmname(
+			fp, escapeMode, decl, exposedName, assemblyName);
+	}
+
+}
+
+
+global LocalFunction;
+class LocalFunctionImplementation {
+	this = default;
+
+	@@The actual local implementation body of this function
+	@@NOTE: This string has already been fully escaped!
+	public member implementation: string | UserString;
+
+	@@Preprocessor conditions that must be met in order
+	@@for this local function implementation to be chosed.
+	public member ppCond: string = "1";
+
+	@@Headers that must be included before @ppCond can be evaluated
+	@@These headers are included at the global namespace scope!
+	public member ppCondIncludes: {(string | UserString)...} = ();
+
+	@@A piece of code that must be written before @ppCond can be evaluated
+	@@This code is inserted at the global namespace scope!
+	public member ppCondPrefix: string | UserString = "";
+
+	@@Headers that must be included before @implementation can be generated
+	@@These headers are included at the global namespace scope!
+	public member implementationIncludes: {(string | UserString)...} = ();
+
+	@@A piece of code that must be written before @implementation can be generated
+	@@This code is inserted at the global namespace scope!
+	public member implementationPrefix: string | UserString = "";
+
+	@@Other functions for which prototypes (though not necessarily c++ overloads) must
+	@@be provided in order to use this implementation. Functions that appear in this
+	@@list will be linked locally by their specified names.
+	@@This mapping usually takes the form @("__localdep_strlen" : "strlen")
+	@@NOTE: When this points to a Callable object, then that function is
+	@@      invoked and should then return one of the other accepted types.
+	@@NOTE: Additionally, this member may also be assigned a Callable object,
+	@@      in which case that object's return value is used as the dependencies
+	@@      @Mapping
+	public member dependencies
+		: {string: (string | UserString | Function | Callable)} | Callable = none;
+
+	@@Same as @dependencies, but enumerate the actual Function objects
+	public property dependencyFunctions: {string: Function} = {
+		get(): {Function...} {
+			if (m_dependencyFunctions !is bound) {
+				m_dependencyFunctions = Dict();
+				local usedDeps = dependencies;
+				if (usedDeps is Callable)
+					usedDeps = usedDeps();
+				for (local name, elem: usedDeps) {
+					if (elem !is Function) {
+						if (elem is Callable)
+							elem = elem();
+						elem = findFunctionByName(elem);
+					}
+					m_dependencyFunctions[name] = elem;
+				}
+			}
+			return m_dependencyFunctions;
+		}
+	}
+	private member m_dependencyFunctions: {string: Function};
+
+	@@Print everything necessary for this implmentation following the assumption that the
+	@@caller already printed @requiresIncludes, @requiresPrefix and @requiresCondition
+	@@@param: dependencyDecl: Declaration prefix for dependencies (usually @"__LIBC")
+	@@@param: escapeMode:     One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
+	@@@param: keyDependency:  Transformation key for the names of dependent functions
+	public function cprintLocalFunctionImplementation(
+			fp: CWriter, escapeMode: int, name: string,
+			prototype: FunctionPrototype, dependencyDecl: string,
+			documentation: string, namespace: Namespace,
+			keyDependency: Callable with string) {
+		for (local inc: implementationIncludes.sorted())
+			fp.ppInclude(inc);
+		fp.forceStartOfLine();
+		local oldNs = fp.namespace;
+		fp.namespace = namespace;
+		/* Bind dependent functions. */
+		for (local depName, depFun: dependencyFunctions) {
+			fp << "/* Dependency: "
+				<< depFun.name << " from "
+				<< depFun.originalSystemHeaderName << " */\n";
+			depName = keyDependency(depName);
+			depFun.cprintHeaderDeclaration(fp, escapeMode, dependencyDecl,
+				exposedName: depName,
+				guardName:   namespace.keyDefaultGuard(depName),
+				preferBindingMacros: true);
+		}
+		if (implementationPrefix) {
+			fp.namespace = GLOBAL_NAMESPACE;
+			escapeTextIntoFile(fp, implementationPrefix, escapeMode);
+			fp.namespace = namespace;
+		}
+		if (documentation)
+			fp.printComment(documentation);
+		fp << "__LOCAL_LIBC(" << name << ") ";
+		if (prototype.cprintAttributeList(fp, escapeMode))
+			fp << " ";
+		prototype.returnType.cprint(fp, escapeMode);
+		fp << "\n";
+		if (!prototype.isNothrowThrowing)
+			escapeTextIntoFile(fp, prototype.nothrow, escapeMode);
+		fp << "(";
+		escapeTextIntoFile(fp, prototype.cc, escapeMode);
+		if (prototype.cc)
+			fp << " ";
+		local csymbolName = namespace.keyCSymbolName(name);
+		fp << csymbolName << ")";
+		prototype.cprintArgumentListWithTypes(fp, escapeMode);
+		if (prototype.isNothrowThrowing) {
+			fp << " ";
+			escapeTextIntoFile(fp, prototype.nothrow, escapeMode);
+		}
+		fp << " ";
+		escapeTextIntoFile(fp, implementation, escapeMode,
+			keyEscape: [](keyword: string): string {
+				if (keyword == name)
+					return csymbolName;
+				if (keyword in dependencyFunctions)
+					return keyDependency(keyword);
+				return none;
+			},
+			forceKeyEscape: true
+		);
+		fp << "\n";
+		fp.namespace = oldNs;
+	}
+}
+
+class LocalFunction {
+	this = default;
+
+	public operator == (other: Function): bool -> this === other;
+	public operator != (other: Function): bool -> this !== other;
+	public operator hash (): int -> Object.id(this);
+
+	@@Name of this local function (e.g. "strlen")
+	public member name: string | UserString;
+
+	@@Name of this declaring system header (e.g. "string" for <string.h>)
+	public member originalSystemHeaderName: string | UserString;
+
+	@@Headers that must be included before @prototype can be printed
+	public member declarationIncludes: {(string | UserString)...} = ();
+
+	@@A piece of code that must be written before @prototype can be printed
+	public member declarationPrefix: string | UserString = "";
+
+	@@The prototype adhered to by all local implementation variants
+	public member prototype: FunctionPrototype | Callable;
+
+	@@The different, possible methods by which this function can be implemented.
+	@@During compile-time, the first variant is chosen for which
+	@@the @requiresCondition evaluates to a true-expression
+	public member implementations: {(LocalFunctionImplementation | Callable)...} | Callable = ();
+
+	@@Same as @implementations, but ensure that all @Callable objects are invoked properly
+	public property functionImplementations: {LocalFunctionImplementation...} = {
+		get(): {LocalFunctionImplementation...} {
+			if (m_functionImplementations !is bound) {
+				local usedImpl = implementations;
+				if (usedImpl is Callable)
+					usedImpl = usedImpl();
+				local resultImpl = [];
+				for (local x: usedImpl) {
+					if (x is Callable) {
+						x = x();
+						if (x is Sequence) {
+							resultImpl.extend(x);
+						} else {
+							resultImpl.append(x);
+						}
+					} else {
+						resultImpl.append(x);
+					}
+				}
+				m_functionImplementations = resultImpl;
+				return resultImpl;
+			}
+			return m_functionImplementations;
+		}
+	}
+	private member m_functionImplementations: {LocalFunctionImplementation...};
+
+	@@The documentation text of this function
+	public member documentation: string | UserString = "";
+
+	@@@param: dependencyDecl: Declaration prefix for dependencies (usually @"__LIBC")
+	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
+	public function cprintLocalFunctionHeader(
+			fp: CWriter, escapeMode: int, dependencyDecl: string,
+			keyDependency: Callable with string = none, printCopyright: bool = true) {
+		if (keyDependency is none)
+			keyDependency = keyLocalDep;
+		if (printCopyright)
+			fp << COPYRIGHT << "\n";
+		if (prototype is Callable)
+			prototype = prototype();
+		local localNamespace = NAMESPACES[LOCAL_NAMESPACE_NAME];
+		local localGuardName = localNamespace.keyDefaultGuard(name);
+		fp.ppIfndef(localGuardName);
+		fp.ppDefine(localGuardName, "1");
+		fp.ppInclude("<__crt.h>");
+		/* Print out the declaration prefix. */
+		for (local x: declarationIncludes)
+			fp.ppInclude(x);
+		if (declarationPrefix)
+			fp << declarationPrefix;
+		fp.forceStartOfLine();
+		/* Go through individual implementations and print them. */
+		local isFirst = true;
+		local numNeededEndif = [];
+		for (local impl: functionImplementations) {
+			local usedPpCond = expandPreprocessorConditionString(impl.ppCond);
+			if (impl.ppCondPrefix ||
+			    (impl.ppCondIncludes && !fp.wereAllHeadersAlreadyIncluded(impl.ppCondIncludes))) {
+				if (!isFirst) {
+					fp.ppElse();
+					numNeededEndif.last = false;
+				}
+				/* Include the preprocessor-condition prefix texts. */
+				for (local x: impl.ppCondIncludes.sorted())
+					fp.ppInclude(x);
+				escapeTextIntoFile(fp, impl.ppCondPrefix, escapeMode);
+				fp.ppIf(usedPpCond);
+				++numNeededEndif;
+				numNeededEndif.pushback(true);
+			} else if (isFirst) {
+				fp.ppIf(usedPpCond);
+				numNeededEndif.pushback(true);
+			} else {
+				fp.ppElif(usedPpCond);
+			}
+			impl.cprintLocalFunctionImplementation(
+				fp, escapeMode, name, prototype,
+				dependencyDecl, documentation,
+				localNamespace, keyDependency);
+		}
+		while (numNeededEndif) {
+			local l = numNeededEndif.popback();
+			if (l) {
+				fp.ppElse();
+				fp.ppUndef(localGuardName);
+			}
+			fp.ppEndif();
+		}
+		fp.ppEndif();
+	}
+
+	@@Print a binding for this function
+	@@@param: preferBindingMacros: Prefer function bindings to be done with macros, rather than
+	@@                             through use of inline functions.
+	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
+	public function cprintFunctionBinding(
+			fp: CWriter, escapeMode: int, decl: string, exposedName: string,
+			prototypes: {FunctionPrototype...}, documentation: string,
+			preferBindingMacros: bool) {
+		if (prototype is Callable)
+			prototype = prototype();
+		local oldNs = fp.namespace;
+		fp.namespace = GLOBAL_NAMESPACE;
+		/* Include the local-header for this function */
+		fp.ppInclude("<local/{}/{}.h>".format({ originalSystemHeaderName, name }));
+		/* Remember that we'll be needing the local implementation of this function */
+		neededLocalFunction.insert(this);
+		fp.namespace = oldNs;
+		local localNamespace = NAMESPACES[LOCAL_NAMESPACE_NAME];
+		local callToLocalName = localNamespace.keyCSymbolName(name);
+		if (oldNs === GLOBAL_NAMESPACE) {
+			if (localNamespace.prefix)
+				callToLocalName = "{} {}".format({ localNamespace.prefix, callToLocalName });
+			callToLocalName = "({})".format({ callToLocalName });
+		}
+		if (preferBindingMacros) {
+			/* TODO: Need to cast arguments if prototypes don't match up */
+			fp << "#define " << exposedName << " " << callToLocalName;
+			return;
+		}
+		for (local ptype: prototypes) {
+			if (exposedName == name) {
+				localNamespace.keyUsingOrImpl(fp, exposedName, []{
+					ptype.cprintCallToAliasDeclaration(
+						fp, escapeMode, NAMESPACE_IMPORT_DECL,
+						exposedName, callToLocalName, prototype);
+				});
+			} else {
+				ptype.cprintCallToAliasDeclaration(
+					fp, escapeMode, NAMESPACE_IMPORT_DECL,
+					exposedName, callToLocalName, prototype);
+				fp << "\n";
+			}
+		}
+	}
+
+}
+
+class InlineFunction {
+	this = default;
+
+	@@Inline mode. One of:
+	@@  - @"LOCAL"
+	@@  - @"FORCELOCAL"
+	@@  - @"__EXTERNINLINE"
+	public member mode: string = "LOCAL";
+
+	@@Name of the assembly symbol against which
+	@@to link in case @(mode == "__EXTERNINLINE")
+	public member externInlineAsmname: string | UserString;
+
+	@@The actual local implementation body of this function
+	@@NOTE: This string has already been fully escaped!
+	public member implementation: string | UserString;
+
+	@@Name of the function itself within the implementation
+	public member implementationName: string | UserString;
+
+	@@Headers that must be included before @implementation can be generated
+	@@These headers are included at the global namespace scope!
+	public member implementationIncludes: {(string | UserString)...} = ();
+
+	@@A piece of code that must be written before @implementation can be generated
+	@@This code is inserted at the global namespace scope!
+	public member implementationPrefix: string | UserString = "";
+
+	@@Dependencies of this inline implementation
+	public member dependencies
+		: {string: (string | UserString | Function | Callable)} | Callable = none;
+
+	@@Same as @dependencies, but enumerate the actual Function objects
+	public property dependencyFunctions: {string: Function} = {
+		get(): {Function...} {
+			if (m_dependencyFunctions !is bound) {
+				m_dependencyFunctions = Dict();
+				local usedDeps = dependencies;
+				if (usedDeps is Callable)
+					usedDeps = usedDeps();
+				for (local name, elem: usedDeps) {
+					if (elem !is Function) {
+						if (elem is Callable)
+							elem = elem();
+						elem = findFunctionByName(elem);
+					}
+					m_dependencyFunctions[name] = elem;
+				}
+			}
+			return m_dependencyFunctions;
+		}
+	}
+	private member m_dependencyFunctions: {string: Function};
+
+	@@Bind the inline function's body.
+	@@@param: preferBindingMacros: Prefer function bindings to be done with macros, rather than
+	@@                             through use of inline functions.
+	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
+	public function cprintFunctionBinding(
+			fp: CWriter, escapeMode: int, decl: string, exposedName: string,
+			prototypes: {FunctionPrototype...}, documentation: string,
+			preferBindingMacros: bool, keyDependency: Callable with string = none,
+			dependenciesNamespace: Namespace = none, dependencyDecl: string = "__LIBC") {
+		if (implementationIncludes || implementationPrefix) {
+			local oldNs = fp.namespace;
+			fp.namespace = GLOBAL_NAMESPACE;
+			for (local x: implementationIncludes)
+				fp.ppInclude(x);
+			if (implementationPrefix)
+				fp << implementationPrefix;
+			fp.namespace = oldNs;
+		}
+		/* Bind dependent functions. */
+		local deps = dependencyFunctions;
+		local depKey = none;
+		if (deps) {
+			if (dependenciesNamespace is none)
+				dependenciesNamespace = NAMESPACES["local"];
+			if (keyDependency is none)
+				keyDependency = keyLocalDep;
+			depKey = [](keyword: string): string {
+				if (keyword == implementationName)
+					return exposedName;
+				if (keyword in deps) {
+					local res = keyDependency(keyword);
+					if (fp.namespace === dependenciesNamespace)
+						return res;
+					return "({} {})".format({ dependenciesNamespace.prefix, res });
+				}
+				return none;
+			};
+			local oldNs = fp.namespace;
+			fp.namespace = dependenciesNamespace;
+			for (local depName, depFun: deps) {
+				depName = keyDependency(depName);
+				depFun.cprintHeaderDeclaration(fp, escapeMode, dependencyDecl,
+					exposedName: depName,
+					guardName:   dependenciesNamespace.keyDefaultGuard(depName),
+					preferBindingMacros: true);
+			}
+			fp.namespace = oldNs;
+		} else {
+			depKey = [](keyword: string): string {
+				if (keyword == implementationName)
+					return exposedName;
+				return none;
+			};
+		}
+		for (local prototype: prototypes) {
+			if (documentation)
+				fp.printComment(documentation);
+			if (mode == "__EXTERNINLINE") {
+				local assemblyName = str externInlineAsmname;
+				local isLibcLinkage = decl in LIBC_DECLS && prototype.ccIsLibcCall;
+				local isRedirect = exposedName != assemblyName;
+				fp << (isLibcLinkage
+				       ? isRedirect ? "__CEIREDIRECT" : "__CEIDECLARE"
+				       : isRedirect ? "__EIREDIRECT" : "__EIDECLARE");
+				if (isRedirect) {
+					if (assemblyName.startswith("DOS$")) {
+						fp << "_DOS";
+						assemblyName = assemblyName[4:];
+					} else if (assemblyName.startswith("KOS$")) {
+						fp << "_KOS";
+						assemblyName = assemblyName[4:];
+					}
+				}
+				fp << "(";
+				if (!isLibcLinkage)
+					fp << decl << ","; /* Declaration linkage */
+				/* Attribute list */
+				prototype.cprintAttributeList(fp, escapeMode);
+				fp << ",";
+				/* Return type */
+				prototype.returnType.cprint(fp, escapeMode);
+				fp << ",";
+				/* NOTHROW behavior */
+				escapeTextIntoFile(fp, prototype.isNothrowThrowing
+					? prototype.nothrowThrowingSpec
+					: prototype.nothrow, escapeMode);
+				/* Exposed name */
+				fp << "," << exposedName << ",";
+				prototype.cprintArgumentListWithTypes(fp, escapeMode);
+				fp << ",";
+				if (isRedirect)
+					fp << assemblyName << ",";
+				/* Inline implementation */
+				escapeTextIntoFile(fp, implementation, escapeMode,
+					keyEscape: depKey,
+					forceKeyEscape: true);
+				fp << ")\n";
+			} else {
+				/* Generic inlining (use the inlining mode as declaration prefix) */
+				prototype.cprintDeclarationWithoutTerminator(
+					fp, escapeMode, this.mode, exposedName);
+				fp << " ";
+				escapeTextIntoFile(fp, implementation, escapeMode,
+					keyEscape: depKey,
+					forceKeyEscape: true);
+				fp << "\n";
+			}
+		}
+	}
+
+}
+
+
+class FunctionBinding {
+	this = default;
+
+	@@Preprocessor condition that must be evaluate to true at compile-time
+	@@in order for this binding to be considered usable by the hosting compiler.
+	public member ppCond: string | UserString = "1";
+
+	@@Headers that must be included before @ppCond can be evaluated
+	@@These headers are included at the global namespace scope!
+	public member ppCondIncludes: {(string | UserString)...} = ();
+
+	@@A piece of code that must be written before @ppCond can be evaluated
+	@@This code is inserted at the global namespace scope!
+	public member ppCondPrefix: string | UserString = "";
+
+	@@Prototype selectors (usually simply @({ "1", { <primaryPrototype> } }))
+	@@This is a list of pairs (ppCond, prototypes) to select which prototypes
+	@@should be used to bind the function.
+	@@Different prototypes can be provided with a dependency on some preprocessor
+	@@expression in order to support CORRECT_ISO_CXX_OVERLOADS declarations.
+	@@NOTE: In practice, the preprocessor conditions for prototype selection
+	@@      should always be done such that a prototype will exist in all
+	@@      conditions. However, this is not a requirement.
+	public member prototypes: {(string | UserString, {FunctionPrototype...})...} | Callable = ();
+
+	@@The actual binding provided by this function:
+	@@  - @LocalFunction:  Provide a local function implementation, via inclusion of
+	@@                     <local/@(binding.originalSystemHeaderName)/@(binding.name).h>
+	@@  - @InlineFunction: Provide an in-line function implementation, possibly alongside
+	@@                     support for @"__EXTERNINLINE"
+	@@  - @string:         External assembly symbol (bind the function against
+	@@                     an assembly symbol by the name of @binding)
+	@@  - @UserString:     Same as @string
+	@@  - @Namespace:      Import an existing declaration from some other namespace
+	@@  - @Callable:       A callback that takes no arguments, and returns one of the above
+	public member binding: LocalFunction | InlineFunction | string | UserString | Namespace | Callable;
+
+	@@Simple helper to peek if the ppCond part of @this binding is known already
+	@@Note that it may become known at a later point in time, and that this function
+	@@may not necessary detect it as being known. Only note that a return value
+	@@other than @none indicates a guarantied, known value
+	public function getRequiresConstant(): bool | none {
+		if (prototypes is Callable)
+			prototypes = prototypes();
+		if (!prototypes || ppCond == "0")
+			return false;
+		local hasBindablePrototype = false;
+		for (local protoCond, none: prototypes) {
+			if (protoCond == "1") {
+				/* Universal prototype */
+				if (ppCond == "1")
+					return true;
+				return none;
+			} else if (protoCond != "0") {
+				hasBindablePrototype = true;
+			}
+		}
+		if (!hasBindablePrototype)
+			return false;
+		return none;
+	}
+
+	@@Print requires-conditions for this function (has used by @"$has_function(...)")
+	public function cprintRequires(fp: CWriter | File) {
+		if (prototypes is Callable)
+			prototypes = prototypes();
+		if (!prototypes || ppCond == "0") {
+			fp << "0";
+			return;
+		}
+		local hasUniversalPrototype = false;
+		for (local protoCond, none: prototypes) {
+			if (protoCond == "1") {
+				hasUniversalPrototype = true;
+				break;
+			}
+		}
+		if (hasUniversalPrototype) {
+			printPreprocessorConditionString(fp, ppCond);
+			return;
+		}
+		if (ppCond != "1") {
+			fp << "((";
+			printPreprocessorConditionString(fp, ppCond);
+			fp << ")&&";
+		}
+		local hasMultiplePrototypes = 0;
+		for (local protoCond, none: prototypes) {
+			if (protoCond != "0")
+				++hasMultiplePrototypes;
+		}
+		if (hasMultiplePrototypes > 1)
+			fp << "(";
+		local isFirst = true;
+		for (local protoCond, none: prototypes) {
+			if (protoCond == "0")
+				continue;
+			if (!isFirst)
+				fp << "||";
+			fp << "(";
+			printPreprocessorConditionString(fp, protoCond);
+			fp << ")";
+			isFirst = false;
+		}
+		if (hasMultiplePrototypes > 1)
+			fp << ")";
+		if (ppCond != "1")
+			fp << ")";
+	}
+
+	@@Print a normal binding, as may be found in `<string.h>`
+	@@NOTE: The caller is responsible to ensure that @ppCond evaluates to non-zero at compile-time
+	@@@param: escapeMode:          One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
+	@@@param: decl:                Declaration prefix (e.g. @"__LIBC")
+	@@@param: exposedName:         The name by which to expose this binding (e.g. @"strlen")
+	@@@param: documentation:       A human-readable description of the associated function
+	@@@param: guardName:           The name of a macro that must be #undef'd if no prototype
+	@@                             has been exposed at compile-time. Set to @none if no such macro exists
+	@@@param: preferBindingMacros: Prefer function bindings to be done with macros, rather than
+	@@                             through use of inline functions.
+	public function cprintBindFunction(
+			fp: CWriter, escapeMode: int, decl: string, exposedName: string,
+			guardName: string | none = none, documentation: string = "",
+			preferBindingMacros: bool = false) {
+		local usedBinding = binding;
+		if (usedBinding is Callable)
+			usedBinding = binding = usedBinding();
+		if (usedBinding is Namespace) {
+			assert usedBinding !== fp.namespace, "The caller must check this!";
+			local nsCName = usedBinding.keyCSymbolName(exposedName);
+			if (nsCName == exposedName) {
+				/* Simple case: C doesn't perform any name mangling.
+				 * This is the case for functions imported from  */
+				usedBinding.keyUsing(fp, nsCName);
+			} else {
+				usedBinding.keyUsingOrImpl(fp, nsCName, []{
+					fp << "/* TODO: IMPORT-MANGLED-C-FUNCTION-FROM-NAMESPACE */";
+				});
+			}
+			return;
+		}
+		local isFirst = true;
+		if (prototypes is Callable)
+			prototypes = prototypes();
+		for (local ppCond, associatedPrototypes: prototypes) {
+			ppCond = expandPreprocessorConditionString(ppCond);
+			if (isFirst)
+				fp.ppIf(ppCond);
+			else {
+				fp.ppElif(ppCond);
+			}
+			isFirst = false;
+			if (usedBinding !is string && usedBinding !is UserString) {
+				usedBinding.cprintFunctionBinding(
+					fp, escapeMode, decl, exposedName, associatedPrototypes,
+					documentation, preferBindingMacros);
+			} else {
+				usedBinding = str usedBinding;
+				for (local ptype: associatedPrototypes) {
+					if (documentation)
+						fp.printComment(documentation);
+					ptype.cprintRedirectionBinding(
+						fp, escapeMode, decl,
+						exposedName, usedBinding);
+				}
+			}
+		}
+		if (guardName !is none) {
+			if (!isFirst)
+				fp.ppElse();
+			fp.ppUndef(guardName);
+		}
+		if (!isFirst)
+			fp.ppEndif();
+	}
+}
+
+
+
+
+class Function {
+	this = default;
+
+	public operator == (other: Function): bool -> this === other;
+	public operator != (other: Function): bool -> this !== other;
+	public operator hash (): int -> Object.id(this);
+
+	@@Name of the function in public headers (e.g. @"strlen")
+	public member name: string | UserString;
+
+	@@Name of the original defining system header (may differ from the containing
+	@@header in case @"%[insert:extern(...)]" was used to inject a foreign function)
+	public member originalSystemHeaderName: string | UserString;
+
+	@@Ordered list of bindings with which this function is exposed in system headers
+	@@This list is enumerated, and the first binding who's @FunctionBinding.ppCond
+	@@field evaluates to @true will then be used as the binding exposed.
+	public member bindings: {(FunctionBinding | Callable)...} | Callable = [];
+
+	@@The documentation text of this function
+	public member documentation: string | UserString = "";
+
+	@@Same as @bindings, however Callable objects will have been flattened
+	public property functionBindings: {FunctionBinding...} = {
+		get(): {FunctionBinding...} {
+			if (m_functionBindings !is bound) {
+				local usedBindings = bindings;
+				if (usedBindings is Callable)
+					usedBindings = usedBindings();
+				local newBindings = List();
+				for (local bind: usedBindings) {
+					if (bind is Callable) {
+						bind = bind();
+						if (bind is Sequence)
+							newBindings.extend(bind);
+						else if (bind !is none) {
+							newBindings.append(bind);
+						}
+					} else {
+						newBindings.append(bind);
+					}
+				}
+				m_functionBindings = newBindings;
+				return newBindings;
+			}
+			return m_functionBindings;
+		}
+	}
+	private member m_functionBindings: {FunctionBinding...};
+
+//TODO:	@@Find identical bindings, and merge them into a single one
+//TODO:	public function resolveDuplicateBindings() {
+//TODO:		if (#functionBindings <= 1)
+//TODO:			return;
+//TODO:		//public member binding: LocalFunction | InlineFunction | string | UserString | Namespace | Callable;
+//TODO:	}
+
+	@@Print requires-conditions for this function (has used by @"$has_function(...)")
+	public function cprintRequires(fp: CWriter | File) {
+		local usedBindings = functionBindings;
+		if (!usedBindings) {
+no_usable_bindings:
+			fp << "0";
+			return;
+		}
+		local hasUsableBindings = 0;
+		local hasUnusableBindings = false;
+		for (local bind: usedBindings) {
+			local c = bind.getRequiresConstant();
+			if (c === true) {
+				fp << "1";
+				return;
+			}
+			if (c === false)
+				hasUnusableBindings = true;
+			if (c is none)
+				++hasUsableBindings;
+		}
+		if (!hasUsableBindings)
+			goto no_usable_bindings;
+		if (hasUsableBindings == 1) {
+			local bind;
+			for (bind: usedBindings) {
+				if (bind.getRequiresConstant() is none)
+					break;
+			}
+			bind.cprintRequires(fp);
+		} else {
+			fp << "(";
+			local isFirst = true;
+			for (local bind: usedBindings) {
+				if (hasUnusableBindings) {
+					if (bind.getRequiresConstant() === false)
+						continue;
+				}
+				if (!isFirst)
+					fp << "||";
+				bind.cprintRequires(fp);
+				isFirst = false;
+			}
+			fp << ")";
+		}
+	}
+
+	@@Print this function's normal declaration, as might be found in `<string.h>`
+	@@@param: escapeMode:          One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
+	@@@param: decl:                The declaration prefix (e.g. @"__LIBC") with which to link
+	@@@param: exposedName:         The name under which functions should be exposed (or @none
+	@@                             if @this.name should be used instead)
+	@@@param: guardName:           The name of a guard that should be used to wrap the declaration
+	@@                             When set to @true, use fp.namespace.keyDefaultGuard(exposedName)
+	@@@param: preferBindingMacros: Prefer function bindings to be done with macros, rather than
+	@@                             through use of inline functions.
+	public function cprintHeaderDeclaration(
+			fp: CWriter, escapeMode: int, decl: string = "__LIBC",
+			exposedName: string = none, guardName: string | bool = none,
+			preferBindingMacros: bool = false) {
+		local usedBindings = functionBindings;
+		if (!usedBindings)
+			return; /* No bindings -> Noop */
+		if (exposedName is none)
+			exposedName = this.name;
+		if (guardName is bool) {
+			guardName = guardName
+				? fp.namespace.keyDefaultGuard(exposedName)
+				: none;
+		}
+		if (guardName !is none) {
+			if (#usedBindings == 1) {
+				/* Try to optimize special case: Only 1 binding
+				 * Instead of writing something like this:
+				 * >> #ifndef __wcslen_defined
+				 * >> #define __wcslen_defined 1
+				 * >> #if $has_function(wcslen) || defined(__std_wcslen_defined)
+				 * >> __NAMESPACE_STD_USING(wcslen)
+				 * >> #else // <$has_function(wcslen)> || __std_wcslen_defined
+				 * >> #undef __wcslen_defined
+				 * >> #endif // !<$has_function(wcslen)> && !__std_wcslen_defined
+				 * >> #endif // !__wcslen_defined
+				 *
+				 * Write the following instead:
+				 * >> #if !defined(__wcslen_defined) && (defined(__std_wcslen_defined) || $has_function(wcslen))
+				 * >> #define __wcslen_defined 1
+				 * >> __NAMESPACE_STD_USING(wcslen)
+				 * >> #endif // !__wcslen_defined && (__std_wcslen_defined || $has_function(wcslen)) */
+				local bind = usedBindings.first;
+				/* Special case: Can't bind against a declaration from the current namespace! */
+				if (bind.binding is Callable)
+					bind.binding = bind.binding();
+				if (bind.binding is Namespace && bind.binding === fp.namespace)
+					return;
+				if (bind.ppCondPrefix ||
+				    (bind.ppCondIncludes && !fp.wereAllHeadersAlreadyIncluded(bind.ppCondIncludes)))
+					goto normal_guardName_binding;
+				fp.ppIf("!defined({}) && ({})".format({
+					guardName,
+					expandPreprocessorConditionString(bind.ppCond)
+				}));
+				fp.ppDefine(guardName, "1");
+				bind.cprintBindFunction(
+					fp, escapeMode, decl, exposedName, guardName,
+					documentation, preferBindingMacros);
+				fp.ppEndif();
+				return;
+			}
+normal_guardName_binding:
+			fp.ppIfndef(guardName);
+			fp.ppDefine(guardName, "1");
+		}
+		local isFirst = true;
+		local numNeededEndif = [];
+		for (local bind: usedBindings) {
+			/* Special case: Can't bind against a declaration from the current namespace! */
+			if (bind.binding is Namespace && bind.binding === fp.namespace)
+				continue;
+			local usedPpCond = expandPreprocessorConditionString(bind.ppCond);
+			if (bind.ppCondPrefix ||
+			    (bind.ppCondIncludes && !fp.wereAllHeadersAlreadyIncluded(bind.ppCondIncludes))) {
+				if (!isFirst) {
+					fp.ppElse();
+					numNeededEndif.last = false;
+				}
+				/* Include the preprocessor-condition prefix texts. */
+				local oldNs = fp.namespace;
+				fp.namespace = GLOBAL_NAMESPACE;
+				for (local x: bind.ppCondIncludes.sorted())
+					fp.ppInclude(x);
+				escapeTextIntoFile(fp, bind.ppCondPrefix, escapeMode);
+				fp.namespace = oldNs;
+				fp.ppIf(usedPpCond);
+				numNeededEndif.pushback(true);
+			} else if (isFirst) {
+				fp.ppIf(usedPpCond);
+				numNeededEndif.pushback(true);
+			} else {
+				fp.ppElif(usedPpCond);
+			}
+			bind.cprintBindFunction(
+				fp, escapeMode, decl, exposedName, guardName,
+				documentation, preferBindingMacros);
+			isFirst = false;
+		}
+		while (numNeededEndif) {
+			local l = numNeededEndif.popback();
+			if (l && guardName !is none) {
+				fp.ppElse();
+				fp.ppUndef(guardName);
+			}
+			fp.ppEndif();
+		}
+		if (guardName !is none)
+			fp.ppEndif();
+	}
+
+}
+
+
+@@An optional wrapper for exposing a @Function within headers
+class ExposedFunction {
+	this = default;
+
+	@@The associated function
+	public member func: Function;
+
+	@@Declaration prefix for this function exposure
+	public member decl: string = "__LIBC";
+
+	@@The actual, exposed name of the function (or @none to use @func.name instead)
+	public member exposedName: string = none;
+
+	@@The name of a guard that should be used to wrap
+	@@the declaration. Set to @false to not provide a guard
+	@@NOTE: When set to @true, use fp.namespace.keyDefaultGuard(exposedName)
+	public member guardName: string | bool = false;
+
+	@@Prefer function bindings to be done with macros,
+	@@rather than through use of inline functions.
+	public member preferBindingMacros: bool = false;
+
+	@@An override for the active namespace during function declaration
+	public member namespaceOverride: Namespace | UserString | string | none = none;
+
+	@@Print this function's normal declaration, as might be found in `<string.h>`
+	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
+	public function cprintHeaderDeclaration(fp: CWriter, escapeMode: int) {
+		local oldNs = fp.namespace;
+		if (namespaceOverride !is none)
+			fp.namespace = namespaceOverride;
+		func.cprintHeaderDeclaration(
+			fp, escapeMode, decl, exposedName,
+			guardName, preferBindingMacros);
+		fp.namespace = oldNs;
+	}
+
+}
+
+
+
+
+
+@@Implementation of a function within its associated library
+class LibraryFunctionImplementation {
+	this = default;
+
+	@@The actual local implementation body of this function
+	@@NOTE: This string has already been fully escaped!
+	public member implementation: string | UserString;
+
+	@@Name of the function itself within the implementation
+	public member implementationName: string | UserString;
+
+	@@Headers that must be included before @implementation can be generated
+	@@These headers are included at the global namespace scope!
+	public member implementationIncludes: {(string | UserString)...} = ();
+
+	@@A piece of code that must be written before @implementation can be generated
+	@@This code is inserted at the global namespace scope!
+	public member implementationPrefix: string | UserString = "";
+
+	@@Name of the section in which this function's body should be
+	@@placed in order to provide the libc auto- or user-implementations
+	public member implementationSection: string | UserString | none = none;
+
+	@@Dependencies of this implementation
+	public member dependencies
+		: {string: (string | UserString | Function | Callable)} | Callable = none;
+
+	@@Same as @dependencies, but enumerate the actual Function objects
+	public property dependencyFunctions: {string: Function} = {
+		get(): {Function...} {
+			if (m_dependencyFunctions !is bound) {
+				m_dependencyFunctions = Dict();
+				local usedDeps = dependencies;
+				if (usedDeps is Callable)
+					usedDeps = usedDeps();
+				for (local name, elem: usedDeps) {
+					if (elem !is Function) {
+						if (elem is Callable)
+							elem = elem();
+						elem = findFunctionByName(elem);
+					}
+					m_dependencyFunctions[name] = elem;
+				}
+			}
+			return m_dependencyFunctions;
+		}
+	}
+	private member m_dependencyFunctions: {string: Function};
+}
+
+class LibraryFunctionBinding {
+	this = default;
+
+	@@Preprocessor condition that must be evaluate to true at compile-time in
+	@@order for this implementation to be considered usable by the hosting compiler.
+	public member ppCond: string | UserString = "1";
+
+	@@Prototype used for the library implementation
+	public member prototype: FunctionPrototype | Callable;
+
+	@@Binding, which is either a @LibraryFunctionImplementation,
+	@@specifying how the function should actually be implemented,
+	@@or is the symbol name of some other function for which this
+	@@one should be defined as an INTERN-ALIAS
+	public member binding: LibraryFunctionImplementation | string | UserString | Callable;
+}
+
+class LibraryFunction {
+	this = default;
+
+	public operator == (other: Function): bool -> this === other;
+	public operator != (other: Function): bool -> this !== other;
+	public operator hash (): int -> Object.id(this);
+
+	@@Name of the function in public headers (e.g. @"strlen")
+	public member name: string | UserString;
+
+	@@Name of the original defining system header (may differ from the containing
+	@@header in case @"%[insert:extern(...)]" was used to inject a foreign function)
+	public member originalSystemHeaderName: string | UserString;
+
+	@@The documentation text of this function
+	public member documentation: string | UserString = "";
+
+	@@The different ways by which this library function can be implemented.
+	public member bindings: {(LibraryFunctionBinding | Callable)...} = [];
+
+	@@Pairs of @(ppCond, symbolName) of how @this Binding should be exported from the library.
+	public member exportSymbolNames: {(string | UserString, string | UserString)...} = [];
+
+	@@Make sure that @bindings doesn't contain any @Callable objects
+	private member m_didFlattenBindings: bool = false;
+	private function f_flattenBindings() {
+		if (m_didFlattenBindings)
+			return;
+		for (local bind: bindings) {
+			if (bind !is Callable)
+				continue;
+			local newBindings = List();
+			for (local bind: bindings) {
+				if (bind !is Callable) {
+					newBindings.append(bind);
+					continue;
+				}
+				bind = bind();
+				if (bind is Sequence) {
+					newBindings.extend(bind);
+				} else if (bind !is none) {
+					newBindings.append(bind);
+				}
+			}
+			bindings = newBindings;
+			break;
+		}
+		m_didFlattenBindings = true;
+	}
+
+	@@Print the in-library declaration of this function
+	public function cprintInLibraryDeclaration(
+			fp: CWriter, escapeMode: int, decl: string) {
+		local isFirst = true;
+		f_flattenBindings();
+		for (local bind: bindings) {
+			if (isFirst) {
+				fp.ppIf(bind.ppCond);
+			} else {
+				fp.ppElIf(bind.ppCond);
+			}
+			local proto = bind.prototype;
+			if (proto is Callable)
+				proto = bind.prototype = proto();
+			proto.cprintDeclarationWithoutTerminator(
+				fp, escapeMode, decl: decl, exposedName: this.name);
+			fp << ";\n";
+			isFirst = false;
+		}
+		if (!isFirst)
+			fp.ppEndif();
+	}
+
+	@@Print the in-library auto-implementation of this function
+	public function cprintInLibraryAutoImplementation(
+			fp: CWriter, escapeMode: int, decl: string) {
+		local isFirst = true;
+		f_flattenBindings();
+		for (local bind: bindings) {
+			if (isFirst) {
+				fp.ppIf(bind.ppCond);
+				isFirst = false;
+			} else {
+				fp.ppElIf(bind.ppCond);
+			}
+			local impl = bind.binding;
+			if (impl is Callable)
+				impl = bind.binding = impl();
+			if (impl is LibraryFunctionImplementation) {
+				for (local x: impl.implementationIncludes)
+					fp.ppInclude(x);
+				fp << impl.implementationPrefix;
+				/* TODO: Include @impl.implementationSection as @"ATTR_SECTION(...)"! */
+				local proto = bind.prototype;
+				if (proto is Callable)
+					proto = bind.prototype = proto();
+				proto.cprintDeclarationWithoutTerminator(
+					fp, escapeMode, decl: decl, exposedName: this.name);
+				local usedImpl = impl.implementation;
+				if (usedImpl is Callable)
+					usedImpl = impl.implementation = usedImpl();
+				escapeTextIntoFile(fp, usedImpl, escapeMode,
+					[](keyword: string): string {
+						if (keyword == impl.implementationName)
+							return this.name;
+						local depFun = impl.dependencyFunctions.get(keyword);
+						if (depFun !is none)
+							return depFun.name;
+						return none;
+					},
+				);
+				fp.forceStartOfLine();
+			} else {
+				fp << "DEFINE_" << decl << "_ALIAS("
+					<< this.name << ", "
+					<< impl << ");\n";
+			}
+		}
+		if (!isFirst)
+			fp.ppEndif();
+	}
+
+	@@Print the in-library export table of this function
+	public function cprintInLibraryExports(
+			fp: CWriter, escapeMode: int) {
+		local hasUsableExport = false;
+		for (local ppCond, none: exportSymbolNames) {
+			if (ppCond != "0") {
+				hasUsableExport = true;
+				break;
+			}
+		}
+		if (!hasUsableExport)
+			return;
+		f_flattenBindings();
+		local hasUniversalBinding = false;
+		for (local bind: bindings) {
+			if (bind.ppCond == "1") {
+				hasUniversalBinding = true;
+				break;
+			}
+		}
+		if (!hasUniversalBinding) {
+			File.Writer mergedCond;
+			local isFirst = true;
+			for (local bind: bindings) {
+				if (!isFirst)
+					mergedCond << "||";
+				mergedCond << "(" << bind.ppCond << ")";
+				isFirst = false;
+			}
+			fp.ppIf(mergedCond.string);
+		}
+		for (local ppCond, symbolName: exportSymbolNames) {
+			fp.ppIf(ppCond);
+			fp << "DEFINE_PUBLIC_ALIAS(" << symbolName << ", " << this.name << ");\n";
+			fp.ppEndif();
+		}
+		if (!hasUniversalBinding)
+			fp.ppEndif();
+	}
+}
+
+
+
+class SystemHeader {
+	this = default;
+
+	@@Name of @this system header (e.g. @"sys.stat" for <sys/stat.h>)
+	public member name: string;
+
+	@@Functions declared in this system header
+	@@If a function is declared multiple times under the same name,
+	@@it will appear as @DuplicateFunctionMarker in this mapping
+	public member functionsByName: {string: (Function | _DuplicateFunctionMarker)} = Dict();
+
+	@@Same as @functionsByName, but for local functions
+	@@Duplicate entires aren't allowed
+	public member localFunctionsByName: {string: LocalFunction} = Dict();
+
+	@@Output order of <string.h> (when empty, don't generate that header)
+	@@This is one of:
+	@@  - @Function:            Call @Function.cprintHeaderDeclaration(fp, escapeMode) (other arguments are defaulted)
+	@@  - @ExposedFunction:     Call @ExposedFunction.cprintHeaderDeclaration(fp, escapeMode)
+	@@  - @string, @UserString: Insert the string as-is
+	@@  - @Callable:            Invoke @Callable(fp, escapeMode)
+	public member order_header: {(Function | ExposedFunction | string | UserString | Callable)...} = [];
+
+	@@Output order of <libc/string.h> (when empty, don't generate that header)
+	public member order_libcHeader: {(Function | string | UserString)...} = [];
+
+	@@Output order of <libc/core/string.h> (when empty, don't generate that header)
+	public member order_libcCoreHeader: {(Function | string | UserString)...} = [];
+
+	@@Output order of /src/libc/auto/string.h (when empty, don't generate that header)
+	public member order_libcAutoHeader: {(LibraryFunction | string | UserString)...} = [];
+
+	@@Output order of /src/libc/auto/string.c (when empty, don't generate that header)
+	public member order_libcAutoSource: {(LibraryFunction | string | UserString)...} = [];
+
+	@@Output order of /src/libc/user/string.h (when empty, don't generate that header)
+	public member order_libcUserHeader: {(LibraryFunction | string | UserString)...} = [];
+
+	@@Output order of /src/libc/user/string.c (when empty, don't generate that header)
+	public member order_libcUserSource: {LibraryFunction...} = [];
+
+	@@Print the contents of the exposed header (such as `<string.h>`),
+	@@excluding the leading/trailing COPYRIGHT
+	public function cprintHeader(fp: CWriter, escapeMode: int) {
+		for (local part: order_header) {
+			if (part is Function || part is ExposedFunction) {
+				part.cprintHeaderDeclaration(fp, escapeMode);
+			} else if (part is Callable) {
+				part(fp, escapeMode);
+			} else {
+				fp << part;
+			}
+		}
+	}
+
+	@@Print the header /kos/src/libc/auto/string.h
+	public function cprintLibraryAutoHeader(
+			fp: CWriter, escapeMode: int, decl: string = "INTDEF") {
+		for (local part: order_libcAutoHeader) {
+			if (part is LibraryFunction) {
+				part.cprintInLibraryDeclaration(fp, escapeMode, decl);
+			} else {
+				fp << part;
+			}
+		}
+	}
+
+	@@Print the implementations from /kos/src/libc/auto/string.c
+	public function cprintLibraryAutoSourceImplementations(
+			fp: CWriter, escapeMode: int, decl: string = "INTERN") {
+		for (local part: order_libcAutoSource) {
+			if (part is LibraryFunction) {
+				part.cprintInLibraryAutoImplementation(fp, escapeMode, decl);
+			} else {
+				fp << part;
+			}
+		}
+	}
+
+	@@Print the export table from /kos/src/libc/auto/string.c
+	public function cprintLibraryAutoSourceExports(
+			fp: CWriter, escapeMode: int) {
+		for (local part: order_libcAutoSource) {
+			if (part is LibraryFunction) {
+				part.cprintInLibraryExports(fp, escapeMode);
+			} else {
+				fp << part;
+			}
+		}
+	}
+
+	@@Print the header /kos/src/libc/user/string.h
+	public function cprintLibraryUserHeader(
+			fp: CWriter, escapeMode: int, decl: string = "INTDEF") {
+		for (local part: order_libcUserHeader) {
+			if (part is LibraryFunction) {
+				part.cprintInLibraryDeclaration(fp, escapeMode, decl);
+			} else {
+				fp << part;
+			}
+		}
+	}
+
+	@@Print the source /kos/src/libc/user/string.c
+	public function cprintLibraryUserSourceImplementations(
+			fp: CWriter, escapeMode: int, decl: string = "INTERN") {
+		/* TODO: This needs special handling! */
+		for (local part: order_libcUserSource) {
+			if (part is LibraryFunction) {
+				part.cprintInLibraryAutoImplementation(fp, escapeMode, decl);
+			} else {
+				fp << part;
+			}
+		}
+	}
+
+	@@Print the export table from /kos/src/libc/user/string.c
+	public function cprintLibraryUserSourceExports(
+			fp: CWriter, escapeMode: int) {
+		for (local part: order_libcUserSource) {
+			if (part is LibraryFunction) {
+				part.cprintInLibraryExports(fp, escapeMode);
+			} else {
+				fp << part;
+			}
+		}
+	}
+}
+
+
+
+
+
+
+

@@ -241,14 +241,7 @@ mbrtowc:([nullable] wchar_t *pwc,
 	return error;
 }
 
-[impl_prefix(
-#if __SIZEOF_WCHAR_T__ == 2
-#ifndef ____local_wcrtomb_ps_defined
-#define ____local_wcrtomb_ps_defined 1
-@__LOCAL_LIBC_DATA@(wcrtomb_ps) mbstate_t wcrtomb_ps = @__MBSTATE_INIT@;
-#endif /* !____local_wcrtomb_ps_defined */
-#endif /* __SIZEOF_WCHAR_T__ == 2 */
-)][std][wchar]
+[std][wchar]
 [dependency_include(<parts/errno.h>)]
 wcrtomb:(char *__restrict str, wchar_t wc,
          [nullable] mbstate_t *mbs) -> size_t {
@@ -256,8 +249,10 @@ wcrtomb:(char *__restrict str, wchar_t wc,
 	size_t result;
 #if __SIZEOF_WCHAR_T__ == 2
 	/* unicode_c16toc8() */
-	if (!mbs)
+	if (!mbs) {
+		static mbstate_t wcrtomb_ps = @__MBSTATE_INIT@;
 		mbs = &wcrtomb_ps;
+	}
 	if (!str) {
 		mbs->@__word@ = 0;
 		return 1;

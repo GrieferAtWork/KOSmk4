@@ -1068,7 +1068,7 @@ futex_setspin:(unsigned int new_spin) -> unsigned int;
 [overload_alias] futex_waituntil_exactbits:(*) = futex_timedwaituntil_exactbits;
 [overload_alias] futex_waitwhile_anybit:(*) = futex_timedwaitwhile_anybit;
 [overload_alias] futex_waitwhile_allbits:(*) = futex_timedwaitwhile_allbits;
-%#ifdef __USE_TIME64
+%#if defined(__USE_TIME64) && !((defined(__USE_TIME_BITS64) || defined(_TIMESPEC_MATCHES_TIMESPEC64)) && defined(__USE_STRUCT64_MACRO))
 [overload_alias] futex_waitwhile:(*) = futex_timedwaitwhile64;
 [overload_alias] futex_waituntil:(*) = futex_timedwaituntil64;
 [overload_alias] futex_waitwhile_equal:(*) = futex_timedwaitwhile64;
@@ -1084,7 +1084,7 @@ futex_setspin:(unsigned int new_spin) -> unsigned int;
 [overload_alias] futex_waituntil_exactbits:(*) = futex_timedwaituntil_exactbits64;
 [overload_alias] futex_waitwhile_anybit:(*) = futex_timedwaitwhile_anybit64;
 [overload_alias] futex_waitwhile_allbits:(*) = futex_timedwaitwhile_allbits64;
-%#endif /* __USE_TIME64 */
+%#endif /* __USE_TIME64 && !((__USE_TIME_BITS64 || _TIMESPEC_MATCHES_TIMESPEC64) && __USE_STRUCT64_MACRO) */
 
 %} /* extern "C++" */
 %{

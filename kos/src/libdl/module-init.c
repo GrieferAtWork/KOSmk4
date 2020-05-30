@@ -67,8 +67,7 @@ INTERN char *dl_library_path = NULL;
 /* Run library initializers for `self' */
 PRIVATE NONNULL((1)) void CC
 DlModule_ElfRunInitializers(DlModule *__restrict self) {
-	uint16_t dyni;
-	size_t i;
+	size_t i, dyni;
 	uintptr_t init_func           = 0;
 	uintptr_t *preinit_array_base = NULL;
 	size_t preinit_array_size     = 0;

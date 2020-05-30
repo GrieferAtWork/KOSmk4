@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7750db93 */
+/* HASH CRC-32:0x6564e01e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1659,7 +1659,7 @@ extern "C++" {
  * @return: -1:EINTR:  Operation was interrupted */
 __FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL futexlock_waitwhile_allbits)(lfutex_t *__ulockaddr, lfutex_t *__uaddr, lfutex_t __bitmask, struct timespec const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futexlock_timedwaitwhile_allbits))(__ulockaddr, __uaddr, __bitmask, __rel_timeout); }
 #endif /* futexlock_waitwhile_allbits... */
-#ifdef __USE_TIME64
+#if defined(__USE_TIME64) && !((defined(__USE_TIME_BITS64) || defined(_TIMESPEC_MATCHES_TIMESPEC64)) && defined(__USE_STRUCT64_MACRO))
 #ifdef __CRT_HAVE_futexlock_timedwaitwhile64
 /* Wait if `*uaddr == equal_to_value'
  * @return: 0: Did wait
@@ -2068,7 +2068,7 @@ extern "C++" {
  * @return: -1:EINTR:  Operation was interrupted */
 __FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL futexlock_waitwhile_allbits)(lfutex_t *__ulockaddr, lfutex_t *__uaddr, lfutex_t __bitmask, struct timespec64 const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futexlock_timedwaitwhile_allbits64))(__ulockaddr, __uaddr, __bitmask, __rel_timeout); }
 #endif /* futexlock_waitwhile_allbits... */
-#endif /* __USE_TIME64 */
+#endif /* __USE_TIME64 && !((__USE_TIME_BITS64 || _TIMESPEC_MATCHES_TIMESPEC64) && __USE_STRUCT64_MACRO) */
 } /* extern "C++" */
 #else /* __cplusplus */
 #define __PRIVATE_futexlock_waitwhile_2(ulockaddr, uaddr, equal_to_value)                            futexlock_waitwhile(ulockaddr, uaddr, equal_to_value)

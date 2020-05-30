@@ -372,6 +372,7 @@
 #endif
 
 
+#ifndef __UNUSED
 #ifdef __INTELLISENSE__
 #define __UNUSED         /* Nothing */
 #elif defined(__cplusplus) || defined(__DEEMON__)
@@ -386,6 +387,7 @@
 #else
 #define __UNUSED(name)   name
 #endif
+#endif /* !__UNUSED */
 
 
 #define ____PRIVATE_VREDIRECT_UNPACK(...)  __VA_ARGS__

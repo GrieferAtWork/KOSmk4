@@ -342,7 +342,7 @@
 #ifndef __LOCAL_LIBC_CONST_DATA
 #ifdef __cplusplus
 #if !defined(__NO_ATTR_SELECTANY) && 1
-#define __LOCAL_LIBC_CONST_DATA(name) __ATTR_SELECTANY __ATTR_UNUSED __LOCAL_LIBC_CONST_DATA_SECTION(name)
+#define __LOCAL_LIBC_CONST_DATA(name) extern __ATTR_SELECTANY __ATTR_UNUSED __LOCAL_LIBC_CONST_DATA_SECTION(name)
 #elif !defined(__NO_ATTR_WEAK) && 1
 #define __LOCAL_LIBC_CONST_DATA(name) extern __INTERN __ATTR_WEAK __ATTR_UNUSED __LOCAL_LIBC_CONST_DATA_SECTION(name)
 #else
@@ -368,71 +368,99 @@ typedef void *__locale_t;
 
 #ifndef __CC__
 #define __CASMNAME(x)                                                                                   /* nothing */
-#define __CASMNAME_SAME(x)                                                                              /* nothing */
 #define __CASMNAME_DOS(x)                                                                               /* nothing */
+#define __CASMNAME_KOS(x)                                                                               /* nothing */
+#define __CASMNAME_SAME(x)                                                                              /* nothing */
 #define __CASMNAME_SAME_DOS(x)                                                                          /* nothing */
+#define __CASMNAME_SAME_KOS(x)                                                                          /* nothing */
 #define __CDECLARE(attr,Treturn,nothrow,name,param,args)                                                /* nothing */
 #define __CDECLARE_VOID(attr,nothrow,name,param,args)                                                   /* nothing */
 #define __CREDIRECT(attr,Treturn,nothrow,name,param,asmname,args)                                       /* nothing */
-#define __CREDIRECT_VOID(attr,nothrow,name,param,asmname,args)                                          /* nothing */
-#define __CVREDIRECT(attr,Treturn,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes)    /* nothing */
-#define __CVREDIRECT_VOID(attr,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes)       /* nothing */
-#define __CVFREDIRECT(attr,Treturn,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) /* nothing */
-#define __CVFREDIRECT_VOID(attr,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)    /* nothing */
-#define __CXREDIRECT(attr,Treturn,nothrow,name,param,asmname,code)                                      /* nothing */
-#define __CXREDIRECT_VOID(attr,nothrow,name,param,asmname,code)                                         /* nothing */
 #define __CREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,args)                                   /* nothing */
+#define __CREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,args)                                   /* nothing */
+#define __CREDIRECT_VOID(attr,nothrow,name,param,asmname,args)                                          /* nothing */
 #define __CREDIRECT_VOID_DOS(attr,nothrow,name,param,asmname,args)                                      /* nothing */
+#define __CREDIRECT_VOID_KOS(attr,nothrow,name,param,asmname,args)                                      /* nothing */
+#define __CVREDIRECT(attr,Treturn,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes)    /* nothing */
 #define __CVREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes) /* nothing */
+#define __CVREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes) /* nothing */
+#define __CVREDIRECT_VOID(attr,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes)       /* nothing */
 #define __CVREDIRECT_VOID_DOS(attr,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes)   /* nothing */
+#define __CVREDIRECT_VOID_KOS(attr,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes)   /* nothing */
+#define __CVFREDIRECT(attr,Treturn,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) /* nothing */
 #define __CVFREDIRECT_DOS(attr,Treturn,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) /* nothing */
+#define __CVFREDIRECT_KOS(attr,Treturn,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) /* nothing */
+#define __CVFREDIRECT_VOID(attr,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)    /* nothing */
 #define __CVFREDIRECT_VOID_DOS(attr,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) /* nothing */
+#define __CVFREDIRECT_VOID_KOS(attr,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) /* nothing */
+#define __CXREDIRECT(attr,Treturn,nothrow,name,param,asmname,code)                                      /* nothing */
 #define __CXREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,code)                                  /* nothing */
+#define __CXREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,code)                                  /* nothing */
+#define __CXREDIRECT_VOID(attr,nothrow,name,param,asmname,code)                                         /* nothing */
 #define __CXREDIRECT_VOID_DOS(attr,nothrow,name,param,asmname,code)                                     /* nothing */
+#define __CXREDIRECT_VOID_KOS(attr,nothrow,name,param,asmname,code)                                     /* nothing */
 #define __CEIDECLARE(attr,Treturn,nothrow,name,param,...)                                               /* nothing */
-#define __CEIREDIRECT(attr,Treturn,nothrow,name,param,asmname,...)                                      /* nothing */
 #define __CEIDECLARE_DOS(attr,Treturn,nothrow,name,param,...)                                           /* nothing */
+#define __CEIDECLARE_KOS(attr,Treturn,nothrow,name,param,...)                                           /* nothing */
+#define __CEIREDIRECT(attr,Treturn,nothrow,name,param,asmname,...)                                      /* nothing */
 #define __CEIREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,...)                                  /* nothing */
+#define __CEIREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,...)                                  /* nothing */
 #elif defined(__BUILDING_LIBC) && defined(__KOS__)
 #define __CASMNAME(x)                                                                                   __ASMNAME("libc_" x)
-#define __CASMNAME_SAME(x)                                                                              __ASMNAME("libc_" x)
 #define __CASMNAME_DOS(x)                                                                               __ASMNAME("libd_" x)
+#define __CASMNAME_KOS(x)                                                                               __ASMNAME("libc_" x)
+#define __CASMNAME_SAME(x)                                                                              __ASMNAME("libc_" x)
 #define __CASMNAME_SAME_DOS(x)                                                                          __ASMNAME("libd_" x)
+#define __CASMNAME_SAME_KOS(x)                                                                          __ASMNAME("libc_" x)
 #define __CDECLARE(attr,Treturn,nothrow,name,param,args)                                                __INTDEF attr Treturn nothrow(__LIBCCALL name) param __ASMNAME("libc_" #name);
 #define __CDECLARE_VOID(attr,nothrow,name,param,args)                                                   __INTDEF attr void nothrow(__LIBCCALL name) param __ASMNAME("libc_" #name);
 #define __CREDIRECT(attr,Treturn,nothrow,name,param,asmname,args)                                       __INTDEF attr Treturn nothrow(__LIBCCALL name) param __ASMNAME("libc_" #asmname);
-#define __CREDIRECT_VOID(attr,nothrow,name,param,asmname,args)                                          __INTDEF attr void nothrow(__LIBCCALL name) param __ASMNAME("libc_" #asmname);
-#define __CVREDIRECT(attr,Treturn,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes)    __INTDEF attr Treturn nothrow(__LIBCCALL name)(____PRIVATE_VREDIRECT_UNPACK param, ...) __ASMNAME("libc_" #asmname);
-#define __CVREDIRECT_VOID(attr,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes)       __INTDEF attr void nothrow(__LIBCCALL name)(____PRIVATE_VREDIRECT_UNPACK param, ...) __ASMNAME("libc_" #asmname);
-#define __CVFREDIRECT(attr,Treturn,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) __INTDEF attr Treturn nothrow(__VLIBCCALL name) paramf __ASMNAME("libc_" #asmnamef);
-#define __CVFREDIRECT_VOID(attr,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)    __INTDEF attr void nothrow(__VLIBCCALL name) paramf __ASMNAME("libc_" #asmnamef);
-#define __CXREDIRECT(attr,Treturn,nothrow,name,param,asmname,code)                                      __INTDEF attr Treturn nothrow(__LIBCCALL name) param __ASMNAME("libc_" #asmname);
-#define __CXREDIRECT_VOID(attr,nothrow,name,param,asmname,code)                                         __INTDEF attr void nothrow(__LIBCCALL name) param __ASMNAME("libc_" #asmname);
 #define __CREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,args)                                   __INTDEF attr Treturn nothrow(__LIBDCALL name) param __ASMNAME("libd_" #asmname);
+#define __CREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,args)                                   __INTDEF attr Treturn nothrow(__LIBCCALL name) param __ASMNAME("libc_" #asmname);
+#define __CREDIRECT_VOID(attr,nothrow,name,param,asmname,args)                                          __INTDEF attr void nothrow(__LIBCCALL name) param __ASMNAME("libc_" #asmname);
 #define __CREDIRECT_VOID_DOS(attr,nothrow,name,param,asmname,args)                                      __INTDEF attr void nothrow(__LIBDCALL name) param __ASMNAME("libd_" #asmname);
+#define __CREDIRECT_VOID_KOS(attr,nothrow,name,param,asmname,args)                                      __INTDEF attr void nothrow(__LIBCCALL name) param __ASMNAME("libc_" #asmname);
+#define __CVREDIRECT(attr,Treturn,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes)    __INTDEF attr Treturn nothrow(__LIBCCALL name)(____PRIVATE_VREDIRECT_UNPACK param, ...) __ASMNAME("libc_" #asmname);
 #define __CVREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes) __INTDEF attr Treturn nothrow(__LIBDCALL name)(____PRIVATE_VREDIRECT_UNPACK param, ...) __ASMNAME("libd_" #asmname);
+#define __CVREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes) __INTDEF attr Treturn nothrow(__LIBCCALL name)(____PRIVATE_VREDIRECT_UNPACK param, ...) __ASMNAME("libc_" #asmname);
+#define __CVREDIRECT_VOID(attr,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes)       __INTDEF attr void nothrow(__LIBCCALL name)(____PRIVATE_VREDIRECT_UNPACK param, ...) __ASMNAME("libc_" #asmname);
 #define __CVREDIRECT_VOID_DOS(attr,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes)   __INTDEF attr void nothrow(__LIBDCALL name)(____PRIVATE_VREDIRECT_UNPACK param, ...) __ASMNAME("libd_" #asmname);
+#define __CVREDIRECT_VOID_KOS(attr,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes)   __INTDEF attr void nothrow(__LIBCCALL name)(____PRIVATE_VREDIRECT_UNPACK param, ...) __ASMNAME("libc_" #asmname);
+#define __CVFREDIRECT(attr,Treturn,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) __INTDEF attr Treturn nothrow(__VLIBCCALL name) paramf __ASMNAME("libc_" #asmnamef);
 #define __CVFREDIRECT_DOS(attr,Treturn,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) __INTDEF attr Treturn nothrow(__VLIBDCALL name) paramf __ASMNAME("libd_" #asmnamef);
+#define __CVFREDIRECT_KOS(attr,Treturn,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) __INTDEF attr Treturn nothrow(__VLIBCCALL name) paramf __ASMNAME("libc_" #asmnamef);
+#define __CVFREDIRECT_VOID(attr,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)    __INTDEF attr void nothrow(__VLIBCCALL name) paramf __ASMNAME("libc_" #asmnamef);
 #define __CVFREDIRECT_VOID_DOS(attr,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) __INTDEF attr void nothrow(__VLIBDCALL name) paramf __ASMNAME("libd_" #asmnamef);
+#define __CVFREDIRECT_VOID_KOS(attr,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) __INTDEF attr void nothrow(__VLIBCCALL name) paramf __ASMNAME("libc_" #asmnamef);
+#define __CXREDIRECT(attr,Treturn,nothrow,name,param,asmname,code)                                      __INTDEF attr Treturn nothrow(__LIBCCALL name) param __ASMNAME("libc_" #asmname);
 #define __CXREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,code)                                  __INTDEF attr Treturn nothrow(__LIBDCALL name) param __ASMNAME("libd_" #asmname);
+#define __CXREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,code)                                  __INTDEF attr Treturn nothrow(__LIBCCALL name) param __ASMNAME("libc_" #asmname);
+#define __CXREDIRECT_VOID(attr,nothrow,name,param,asmname,code)                                         __INTDEF attr void nothrow(__LIBCCALL name) param __ASMNAME("libc_" #asmname);
 #define __CXREDIRECT_VOID_DOS(attr,nothrow,name,param,asmname,code)                                     __INTDEF attr void nothrow(__LIBDCALL name) param __ASMNAME("libd_" #asmname);
+#define __CXREDIRECT_VOID_KOS(attr,nothrow,name,param,asmname,code)                                     __INTDEF attr void nothrow(__LIBCCALL name) param __ASMNAME("libc_" #asmname);
 #ifdef __NO_EXTERNINLINE
 #ifdef __NO_INLINE__
 #define __CEIDECLARE(attr,Treturn,nothrow,name,param,...)              __INTDEF attr Treturn nothrow(__LIBCCALL name) param __ASMNAME("libc_" #name);
-#define __CEIREDIRECT(attr,Treturn,nothrow,name,param,asmname,...)     __INTDEF attr Treturn nothrow(__LIBCCALL name) param __ASMNAME("libc_" #asmname);
 #define __CEIDECLARE_DOS(attr,Treturn,nothrow,name,param,...)          __INTDEF attr Treturn nothrow(__LIBDCALL name) param __ASMNAME("libd_" #name);
+#define __CEIDECLARE_KOS(attr,Treturn,nothrow,name,param,...)          __INTDEF attr Treturn nothrow(__LIBCCALL name) param __ASMNAME("libc_" #name);
+#define __CEIREDIRECT(attr,Treturn,nothrow,name,param,asmname,...)     __INTDEF attr Treturn nothrow(__LIBCCALL name) param __ASMNAME("libc_" #asmname);
 #define __CEIREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,...) __INTDEF attr Treturn nothrow(__LIBDCALL name) param __ASMNAME("libd_" #asmname);
+#define __CEIREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,...) __INTDEF attr Treturn nothrow(__LIBCCALL name) param __ASMNAME("libc_" #asmname);
 #else /* __NO_INLINE__ */
 #define __CEIDECLARE(attr,Treturn,nothrow,name,param,...)              __LOCAL attr Treturn nothrow(__LIBCCALL name) param __VA_ARGS__
-#define __CEIREDIRECT(attr,Treturn,nothrow,name,param,asmname,...)     __LOCAL attr Treturn nothrow(__LIBCCALL name) param __VA_ARGS__
 #define __CEIDECLARE_DOS(attr,Treturn,nothrow,name,param,...)          __LOCAL attr Treturn nothrow(__LIBDCALL name) param __VA_ARGS__
+#define __CEIDECLARE_KOS(attr,Treturn,nothrow,name,param,...)          __LOCAL attr Treturn nothrow(__LIBCCALL name) param __VA_ARGS__
+#define __CEIREDIRECT(attr,Treturn,nothrow,name,param,asmname,...)     __LOCAL attr Treturn nothrow(__LIBCCALL name) param __VA_ARGS__
 #define __CEIREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,...) __LOCAL attr Treturn nothrow(__LIBDCALL name) param __VA_ARGS__
+#define __CEIREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,...) __LOCAL attr Treturn nothrow(__LIBCCALL name) param __VA_ARGS__
 #endif /* !__NO_INLINE__ */
 #else /* __NO_EXTERNINLINE */
 #define __CEIDECLARE(attr,Treturn,nothrow,name,param,...)              __INTDEF attr Treturn nothrow(__LIBCCALL name) param __ASMNAME("libc_" #name); __EXTERNINLINE attr Treturn nothrow(__LIBCCALL name) param __VA_ARGS__
-#define __CEIREDIRECT(attr,Treturn,nothrow,name,param,asmname,...)     __INTDEF attr Treturn nothrow(__LIBCCALL name) param __ASMNAME("libc_" #asmname); __EXTERNINLINE attr Treturn nothrow(__LIBCCALL name) param __VA_ARGS__
 #define __CEIDECLARE_DOS(attr,Treturn,nothrow,name,param,...)          __INTDEF attr Treturn nothrow(__LIBDCALL name) param __ASMNAME("libd_" #name); __EXTERNINLINE attr Treturn nothrow(__LIBDCALL name) param __VA_ARGS__
+#define __CEIDECLARE_KOS(attr,Treturn,nothrow,name,param,...)          __INTDEF attr Treturn nothrow(__LIBCCALL name) param __ASMNAME("libc_" #name); __EXTERNINLINE attr Treturn nothrow(__LIBDCALL name) param __VA_ARGS__
+#define __CEIREDIRECT(attr,Treturn,nothrow,name,param,asmname,...)     __INTDEF attr Treturn nothrow(__LIBCCALL name) param __ASMNAME("libc_" #asmname); __EXTERNINLINE attr Treturn nothrow(__LIBCCALL name) param __VA_ARGS__
 #define __CEIREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,...) __INTDEF attr Treturn nothrow(__LIBDCALL name) param __ASMNAME("libd_" #asmname); __EXTERNINLINE attr Treturn nothrow(__LIBDCALL name) param __VA_ARGS__
+#define __CEIREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,...) __INTDEF attr Treturn nothrow(__LIBCCALL name) param __ASMNAME("libc_" #asmname); __EXTERNINLINE attr Treturn nothrow(__LIBDCALL name) param __VA_ARGS__
 #endif /* !__NO_EXTERNINLINE */
 #else /* __BUILDING_LIBC... */
 #define __CASMNAME                                                                                      __ASMNAME
@@ -449,26 +477,46 @@ typedef void *__locale_t;
 #define __CXREDIRECT_VOID(attr,nothrow,name,param,asmname,code)                                         __XREDIRECT_VOID(__LIBC,attr,nothrow,__LIBCCALL,name,param,asmname,code)
 #ifdef __PE__
 #define __CASMNAME_DOS                                                                                  __ASMNAME
+#define __CASMNAME_KOS(x)                                                                               __ASMNAME("KOS$" x)
 #define __CASMNAME_SAME_DOS(x)                                                                          /* nothing */
+#define __CASMNAME_SAME_KOS(x)                                                                          __ASMNAME("KOS$" x)
 #define __CREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,args)                                   __REDIRECT(__LIBC,attr,Treturn,nothrow,__LIBDCALL,name,param,asmname,args)
+#define __CREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,args)                                   __REDIRECT(__LIBC,attr,Treturn,nothrow,__LIBCCALL,name,param,KOS$##asmname,args)
 #define __CREDIRECT_VOID_DOS(attr,nothrow,name,param,asmname,args)                                      __REDIRECT_VOID(__LIBC,attr,nothrow,__LIBDCALL,name,param,asmname,args)
+#define __CREDIRECT_VOID_KOS(attr,nothrow,name,param,asmname,args)                                      __REDIRECT_VOID(__LIBC,attr,nothrow,__LIBCCALL,name,param,KOS$##asmname,args)
 #define __CVREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes) __VREDIRECT(__LIBC,attr,Treturn,nothrow,__LIBDCALL,name,param,asmname,args,before_va_start,varcount,vartypes)
+#define __CVREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes) __VREDIRECT(__LIBC,attr,Treturn,nothrow,__LIBCCALL,name,param,KOS$##asmname,args,before_va_start,varcount,vartypes)
 #define __CVREDIRECT_VOID_DOS(attr,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes)   __VREDIRECT_VOID(__LIBC,attr,nothrow,__LIBDCALL,name,param,asmname,args,before_va_start,varcount,vartypes)
+#define __CVREDIRECT_VOID_KOS(attr,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes)   __VREDIRECT_VOID(__LIBC,attr,nothrow,__LIBCCALL,name,param,KOS$##asmname,args,before_va_start,varcount,vartypes)
 #define __CVFREDIRECT_DOS(attr,Treturn,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) __VFREDIRECT(__LIBC,attr,Treturn,nothrow,__VLIBDCALL,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)
+#define __CVFREDIRECT_KOS(attr,Treturn,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) __VFREDIRECT(__LIBC,attr,Treturn,nothrow,__VLIBCCALL,name,paramf,KOS$##asmnamef,vparamf,KOS$##vasmnamef,args,before_va_start)
 #define __CVFREDIRECT_VOID_DOS(attr,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) __VFREDIRECT_VOID(__LIBC,attr,nothrow,__VLIBDCALL,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)
+#define __CVFREDIRECT_VOID_KOS(attr,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) __VFREDIRECT_VOID(__LIBC,attr,nothrow,__VLIBCCALL,name,paramf,KOS$##asmnamef,vparamf,KOS$##vasmnamef,args,before_va_start)
 #define __CXREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,code)                                  __XREDIRECT(__LIBC,attr,Treturn,nothrow,__LIBDCALL,name,param,asmname,code)
+#define __CXREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,code)                                  __XREDIRECT(__LIBC,attr,Treturn,nothrow,__LIBCCALL,name,param,KOS$##asmname,code)
 #define __CXREDIRECT_VOID_DOS(attr,nothrow,name,param,asmname,code)                                     __XREDIRECT_VOID(__LIBC,attr,nothrow,__LIBDCALL,name,param,asmname,code)
+#define __CXREDIRECT_VOID_KOS(attr,nothrow,name,param,asmname,code)                                     __XREDIRECT_VOID(__LIBC,attr,nothrow,__LIBCCALL,name,param,KOS$##asmname,code)
 #else /* __PE__ */
 #define __CASMNAME_DOS(x)                                                                               __ASMNAME("DOS$" x)
+#define __CASMNAME_KOS                                                                                  __ASMNAME
 #define __CASMNAME_SAME_DOS(x)                                                                          __ASMNAME("DOS$" x)
+#define __CASMNAME_SAME_KOS(x)                                                                          /* nothing */
 #define __CREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,args)                                   __REDIRECT(__LIBC,attr,Treturn,nothrow,__LIBDCALL,name,param,DOS$##asmname,args)
+#define __CREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,args)                                   __REDIRECT(__LIBC,attr,Treturn,nothrow,__LIBCCALL,name,param,asmname,args)
 #define __CREDIRECT_VOID_DOS(attr,nothrow,name,param,asmname,args)                                      __REDIRECT_VOID(__LIBC,attr,nothrow,__LIBDCALL,name,param,DOS$##asmname,args)
+#define __CREDIRECT_VOID_KOS(attr,nothrow,name,param,asmname,args)                                      __REDIRECT_VOID(__LIBC,attr,nothrow,__LIBCCALL,name,param,asmname,args)
 #define __CVREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes) __VREDIRECT(__LIBC,attr,Treturn,nothrow,__LIBDCALL,name,param,DOS$##asmname,args,before_va_start,varcount,vartypes)
+#define __CVREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes) __VREDIRECT(__LIBC,attr,Treturn,nothrow,__LIBCCALL,name,param,asmname,args,before_va_start,varcount,vartypes)
 #define __CVREDIRECT_VOID_DOS(attr,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes)   __VREDIRECT_VOID(__LIBC,attr,nothrow,__LIBDCALL,name,param,DOS$##asmname,args,before_va_start,varcount,vartypes)
+#define __CVREDIRECT_VOID_KOS(attr,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes)   __VREDIRECT_VOID(__LIBC,attr,nothrow,__LIBCCALL,name,param,asmname,args,before_va_start,varcount,vartypes)
 #define __CVFREDIRECT_DOS(attr,Treturn,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) __VFREDIRECT(__LIBC,attr,Treturn,nothrow,__VLIBDCALL,name,paramf,DOS$##asmnamef,vparamf,DOS$##vasmnamef,args,before_va_start)
+#define __CVFREDIRECT_KOS(attr,Treturn,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) __VFREDIRECT(__LIBC,attr,Treturn,nothrow,__VLIBCCALL,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)
 #define __CVFREDIRECT_VOID_DOS(attr,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) __VFREDIRECT_VOID(__LIBC,attr,nothrow,__VLIBDCALL,name,paramf,DOS$##asmnamef,vparamf,DOS$##vasmnamef,args,before_va_start)
+#define __CVFREDIRECT_VOID_KOS(attr,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) __VFREDIRECT_VOID(__LIBC,attr,nothrow,__VLIBCCALL,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)
 #define __CXREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,code)                                  __XREDIRECT(__LIBC,attr,Treturn,nothrow,__LIBDCALL,name,param,DOS$##asmname,code)
+#define __CXREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,code)                                  __XREDIRECT(__LIBC,attr,Treturn,nothrow,__LIBCCALL,name,param,asmname,code)
 #define __CXREDIRECT_VOID_DOS(attr,nothrow,name,param,asmname,code)                                     __XREDIRECT_VOID(__LIBC,attr,nothrow,__LIBDCALL,name,param,DOS$##asmname,code)
+#define __CXREDIRECT_VOID_KOS(attr,nothrow,name,param,asmname,code)                                     __XREDIRECT_VOID(__LIBC,attr,nothrow,__LIBCCALL,name,param,asmname,code)
 #endif /* !__PE__ */
 #ifdef __NO_EXTERNINLINE
 #ifdef __NO_INLINE__
@@ -486,26 +534,37 @@ typedef void *__locale_t;
 #ifdef __NO_INLINE__
 #define __CEIDECLARE_DOS(attr,Treturn,nothrow,name,param,...)          __LIBC attr Treturn nothrow(__LIBDCALL name) param;
 #ifdef __NO_ASMNAME
+#define __CEIDECLARE_KOS(attr,Treturn,nothrow,name,param,...)          __LOCAL attr Treturn nothrow(__LIBCCALL name) param __VA_ARGS__
 #define __CEIREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,...) __LOCAL attr Treturn nothrow(__LIBDCALL name) param __VA_ARGS__
+#define __CEIREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,...) __LOCAL attr Treturn nothrow(__LIBCCALL name) param __VA_ARGS__
 #else /* __NO_ASMNAME */
+#define __CEIDECLARE_KOS(attr,Treturn,nothrow,name,param,...)          __LIBC attr Treturn nothrow(__LIBCCALL name) param __ASMNAME("KOS$" #name);
 #define __CEIREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,...) __LIBC attr Treturn nothrow(__LIBDCALL name) param __ASMNAME(#asmname);
+#define __CEIREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,...) __LIBC attr Treturn nothrow(__LIBCCALL name) param __ASMNAME("KOS$" #asmname);
 #endif /* !__NO_ASMNAME */
 #else /* __NO_INLINE__ */
-#define __CEIDECLARE_DOS(attr,Treturn,nothrow,name,param,...)          __LOCAL attr Treturn nothrow(__LIBDCALL name) param __VA_ARGS__
-#define __CEIREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,...) __LOCAL attr Treturn nothrow(__LIBDCALL name) param __VA_ARGS__
+#define __CEIDECLARE_DOS(attr,Treturn,nothrow,name,param,...)          __LOCAL attr Treturn nothrow(__LIBCCALL name) param __VA_ARGS__
+#define __CEIDECLARE_KOS(attr,Treturn,nothrow,name,param,...)          __LOCAL attr Treturn nothrow(__LIBDCALL name) param __VA_ARGS__
+#define __CEIREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,...) __LOCAL attr Treturn nothrow(__LIBCCALL name) param __VA_ARGS__
+#define __CEIREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,...) __LOCAL attr Treturn nothrow(__LIBDCALL name) param __VA_ARGS__
 #endif /* !__NO_INLINE__ */
 #else /* __PE__ */
 #ifdef __NO_INLINE__
+#define __CEIDECLARE_KOS(attr,Treturn,nothrow,name,param,...)          __LIBC attr Treturn nothrow(__LIBCCALL name) param;
 #ifdef __NO_ASMNAME
 #define __CEIDECLARE_DOS(attr,Treturn,nothrow,name,param,...)          __LOCAL attr Treturn nothrow(__LIBDCALL name) param __VA_ARGS__
+#define __CEIREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,...) __LOCAL attr Treturn nothrow(__LIBCCALL name) param __VA_ARGS__
 #define __CEIREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,...) __LOCAL attr Treturn nothrow(__LIBDCALL name) param __VA_ARGS__
 #else /* __NO_ASMNAME */
 #define __CEIDECLARE_DOS(attr,Treturn,nothrow,name,param,...)          __LIBC attr Treturn nothrow(__LIBDCALL name) param __ASMNAME("DOS$" #name);
+#define __CEIREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,...) __LIBC attr Treturn nothrow(__LIBCCALL name) param __ASMNAME(#asmname);
 #define __CEIREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,...) __LIBC attr Treturn nothrow(__LIBDCALL name) param __ASMNAME("DOS$" #asmname);
 #endif /* !__NO_ASMNAME */
 #else /* __NO_INLINE__ */
-#define __CEIDECLARE_DOS(attr,Treturn,nothrow,name,param,...)          __LOCAL attr Treturn nothrow(__LIBDCALL name) param __VA_ARGS__
-#define __CEIREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,...) __LOCAL attr Treturn nothrow(__LIBDCALL name) param __VA_ARGS__
+#define __CEIDECLARE_KOS(attr,Treturn,nothrow,name,param,...)          __LOCAL attr Treturn nothrow(__LIBDCALL name) param __VA_ARGS__
+#define __CEIDECLARE_DOS(attr,Treturn,nothrow,name,param,...)          __LOCAL attr Treturn nothrow(__LIBCCALL name) param __VA_ARGS__
+#define __CEIREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,...) __LOCAL attr Treturn nothrow(__LIBDCALL name) param __VA_ARGS__
+#define __CEIREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,...) __LOCAL attr Treturn nothrow(__LIBCCALL name) param __VA_ARGS__
 #endif /* !__NO_INLINE__ */
 #endif /* !__PE__ */
 #else /* __NO_EXTERNINLINE */
@@ -513,10 +572,14 @@ typedef void *__locale_t;
 #define __CEIREDIRECT(attr,Treturn,nothrow,name,param,asmname,...)     __LIBC attr Treturn nothrow(__LIBCCALL name) param __ASMNAME(#asmname); __EXTERNINLINE attr Treturn nothrow(__LIBCCALL name) param __VA_ARGS__
 #ifdef __PE__
 #define __CEIDECLARE_DOS(attr,Treturn,nothrow,name,param,...)          __LIBC attr Treturn nothrow(__LIBDCALL name) param; __EXTERNINLINE attr Treturn nothrow(__LIBDCALL name) param __VA_ARGS__
+#define __CEIDECLARE_KOS(attr,Treturn,nothrow,name,param,...)          __LIBC attr Treturn nothrow(__LIBCCALL name) param __ASMNAME("KOS$" #name); __EXTERNINLINE attr Treturn nothrow(__LIBCCALL name) param __VA_ARGS__
 #define __CEIREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,...) __LIBC attr Treturn nothrow(__LIBDCALL name) param __ASMNAME(#asmname); __EXTERNINLINE attr Treturn nothrow(__LIBDCALL name) param __VA_ARGS__
+#define __CEIREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,...) __LIBC attr Treturn nothrow(__LIBCCALL name) param __ASMNAME("KOS$" #asmname); __EXTERNINLINE attr Treturn nothrow(__LIBCCALL name) param __VA_ARGS__
 #else /* __PE__ */
 #define __CEIDECLARE_DOS(attr,Treturn,nothrow,name,param,...)          __LIBC attr Treturn nothrow(__LIBDCALL name) param __ASMNAME("DOS$" #name); __EXTERNINLINE attr Treturn nothrow(__LIBDCALL name) param __VA_ARGS__
+#define __CEIDECLARE_KOS(attr,Treturn,nothrow,name,param,...)          __LIBC attr Treturn nothrow(__LIBCCALL name) param; __EXTERNINLINE attr Treturn nothrow(__LIBCCALL name) param __VA_ARGS__
 #define __CEIREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,...) __LIBC attr Treturn nothrow(__LIBDCALL name) param __ASMNAME("DOS$" #asmname); __EXTERNINLINE attr Treturn nothrow(__LIBDCALL name) param __VA_ARGS__
+#define __CEIREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,...) __LIBC attr Treturn nothrow(__LIBCCALL name) param __ASMNAME(#asmname); __EXTERNINLINE attr Treturn nothrow(__LIBCCALL name) param __VA_ARGS__
 #endif /* !__PE__ */
 #endif /* !__NO_EXTERNINLINE */
 #endif /* !__BUILDING_LIBC... */

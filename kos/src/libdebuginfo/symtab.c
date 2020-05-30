@@ -71,8 +71,8 @@ NOTHROW_NCX(CC libdi_symtab_scantable)(byte_t const *__restrict symtab_start,
 			    iter->st_shndx == SHN_ABS)
 				continue;
 			if ((iter->st_value == module_relative_pc) ||
-			    (module_relative_pc >= iter->st_value &&
-			     module_relative_pc < iter->st_value + iter->st_size))
+			    (module_relative_pc >= (uintptr_t)iter->st_value &&
+			     module_relative_pc < (uintptr_t)iter->st_value + iter->st_size))
 				return (byte_t *)iter; /* Perfect match! */
 		}
 		/* Fallback: return the nearest symbol. */

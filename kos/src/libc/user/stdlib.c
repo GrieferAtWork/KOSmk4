@@ -1561,9 +1561,8 @@ NOTHROW_RPC(LIBCCALL libc_frealpathat)(fd_t dirfd,
 				                         flags | AT_READLINK_REQSIZE);
 				if unlikely(E_ISERR(result))
 					goto err_buffer_result_errno;
-				if
-					likely((size_t)result <= buflen)
-				break;
+				if likely((size_t)result <= buflen)
+					break;
 				/* Allocate the required amount of memory. */
 				resolved = (char *)realloc(buffer, (size_t)result);
 				if unlikely(!resolved) {

@@ -604,7 +604,7 @@ CC find_rparen(char const *pattern_iter, char const *pattern_end) {
 		} else if (ch == '[') {
 			while (pattern_iter < pattern_end) {
 				ch = *pattern_iter++;
-				/* */ if (ch == '\\' && pattern_iter < pattern_end)
+				if (ch == '\\' && pattern_iter < pattern_end)
 					++pattern_iter;
 				else if (ch == ']')
 					break;
@@ -631,7 +631,7 @@ CC find_rparen_escaped(char const *pattern_iter, char const *pattern_end) {
 		} else if (ch == '[') {
 			while (pattern_iter < pattern_end) {
 				ch = *pattern_iter++;
-				/* */ if (ch == '\\' && pattern_iter < pattern_end)
+				if (ch == '\\' && pattern_iter < pattern_end)
 					++pattern_iter;
 				else if (ch == ']')
 					break;
@@ -678,7 +678,7 @@ handle_pipe:
 		else if (ch == '[') {
 			while (pattern_iter < pattern_end) {
 				ch = *pattern_iter++;
-				/* */ if (ch == '\\' && pattern_iter < pattern_end)
+				if (ch == '\\' && pattern_iter < pattern_end)
 					++pattern_iter;
 				else if (ch == ']')
 					break;

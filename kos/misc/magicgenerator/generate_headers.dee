@@ -3051,8 +3051,7 @@ again_enum_name:
 					for (local x: get_tag_operand().split(","))
 						intern_aliases.append((" && ".join(conditions), Cell(x.strip())));
 					break;
-				case "nocrt":       /* [nocrt] The function isn't exported under its primary name. */
-				case "alias_only":  /* [alias_only] Only consider alias names */
+				case "nocrt": /* [nocrt] The function isn't exported under its primary name. */
 					nocrt = true;
 					break;
 				case "alias":       /* [alias(foo)] Define the name of an alias of the function */
@@ -7389,6 +7388,16 @@ for (local comnam, none: components) {
 		try fs.mkdir("include" + part); catch (...);
 	}
 }
+
+
+print repr(functions["wfaccessat"].get_dependency_string());
+print repr(functions["c16faccessat"].get_dependency_string());
+print repr(functions["c32faccessat"].get_dependency_string());
+print repr(functions["wfaccessat"]);
+print repr(functions["c16faccessat"]);
+print repr(functions["c32faccessat"]);
+return;
+
 
 
 /* Write local implementations of component functions. */

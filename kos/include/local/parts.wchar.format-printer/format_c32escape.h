@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1b29b4d1 */
+/* HASH CRC-32:0x3ff9edbb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -80,7 +80,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_c32escape))(__pc32formatprinte
 	if __likely(!(__flags & 0x0001)) {
 		__temp = (*__printer)(__arg, __quote, 1);
 		if __unlikely(__temp < 0)
-		goto __err;
+			goto __err;
 		__result += __temp;
 	}
 	while (__text < __textend) {
@@ -302,7 +302,7 @@ __encode_uni:
 __print_encoded:
 				__temp = (*__printer)(__arg, __encoded_text, __encoded_text_size);
 				if __unlikely(__temp < 0)
-				goto __err;
+					goto __err;
 				__result += __temp;
 			}
 			__flush_start = __text;

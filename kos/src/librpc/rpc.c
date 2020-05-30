@@ -37,7 +37,7 @@
 
 #ifdef __KERNEL__
 #include <kernel/except.h>
-#endif
+#endif /* __KERNEL__ */
 
 DECL_BEGIN
 

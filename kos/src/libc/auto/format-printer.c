@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe38e45d2 */
+/* HASH CRC-32:0x7c9368b8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -172,7 +172,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_escape") ssize_t
 	if __likely(!(flags & 0x0001)) {
 		temp = (*printer)(arg, quote, 1);
 		if __unlikely(temp < 0)
-		goto err;
+			goto err;
 		result += temp;
 	}
 	while (text < textend) {
@@ -394,7 +394,7 @@ encode_uni:
 print_encoded:
 				temp = (*printer)(arg, encoded_text, encoded_text_size);
 				if __unlikely(temp < 0)
-				goto err;
+					goto err;
 				result += temp;
 			}
 			flush_start = text;

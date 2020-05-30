@@ -676,6 +676,8 @@ namespace __intern { template<class T> struct __compiler_alignof { char __x; T _
  * ALLOW THIS TO BE DONE!!!! */
 #undef __COMPILER_FLEXIBLE_ARRAY
 #define __COMPILER_FLEXIBLE_ARRAY(T, x) T x[1024]
+#undef __UNUSED
+#define __UNUSED(x) x __attribute__((__unused__))
 #endif /* __clang_tidy__ */
 
 #define __STATIC_IF(x)   if(x)

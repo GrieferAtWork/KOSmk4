@@ -1,0 +1,156 @@
+/* Copyright (c) 2019-2020 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+import * from deemon;
+import * from .parser;
+import functools;
+
+class Namespace {
+	this = default;
+
+	@@The name of this namespace
+	public member name: string;
+
+	@@String inserted (at the start of its own line)
+	@@in order to enter the namespace
+	@@e.g. @"__NAMESPACE_FAST_BEGIN"
+	public member enter: string;
+
+	@@String inserted (at the start of its own line)
+	@@in order to exit the namespace
+	@@e.g. @"__NAMESPACE_FAST_END"
+	public member leave: string;
+
+	@@Namespace prefix
+	@@e.g. @"__NAMESPACE_FAST_SYM"
+	public member prefix: string;
+
+	@@Namespace using (at the start of its own line)
+	@@> [](fp: File, name: string) {
+	@@>     fp << "__NAMESPACE_FAST_USING(" << name << ")\n";
+	@@> };
+	public member keyUsing: Callable with string;
+
+	@@Namespace using, or implementation begin (at the start of its own line)
+	@@> [](fp: File, name: string, impl: Callable) {
+	@@>     fp << "__NAMESPACE_FAST_USING_OR_IMPL(" << name << ", ";
+	@@>     impl();
+	@@>     fp << ")\n";
+	@@> };
+	public member keyUsingOrImpl: Callable with string;
+
+	@@A key function that returns the transformed symbol name from
+	@@within the namespace for C. When compiling under c++, this is
+	@@always assumed to be equal to the symbol's actual name. Otherwise,
+	@@this assumption is only made on a per-symbol basis when this function
+	@@returns an equal string for some given symbol name.
+	@@e.g. @([](name) -> "__LIBC_FAST_NAME({})".format({ name }))
+	public member keyCSymbolName: Callable with string;
+
+	@@Returns the macro name for the default guard for the given symbol
+	@@e.g. @([](name) -> "__fast_{}_defined".format({ name }))
+	public member keyDefaultGuard: Callable with string;
+}
+
+local function _globalNamespaceUsing(fp: File, name: string, ...) {
+	fp << "__NAMESPACE_GLB_USING(" << name << ")\n";
+}
+local function _stdNamespaceUsing(fp: File, name: string, ...) {
+	fp << "__NAMESPACE_STD_USING(" << name << ")\n";
+}
+
+global final GLOBAL_NAMESPACE: Namespace = Namespace(
+	name: "", enter: "", leave: "", prefix: "",
+	keyUsing:       _globalNamespaceUsing,
+	keyUsingOrImpl: _globalNamespaceUsing,
+	keyCSymbolName: functools.identity,
+	keyDefaultGuard: [](symbolName: string): string {
+		return "__{}_defined".format({ symbolName });
+	});
+
+
+global NAMESPACES: {string: Namespace} = Dict {
+	""    : GLOBAL_NAMESPACE,
+	"std" : Namespace(
+		name:           "std",
+		enter:          "__NAMESPACE_STD_BEGIN\n",
+		leave:          "__NAMESPACE_STD_END\n",
+		prefix:         "__NAMESPACE_STD_SYM",
+		keyUsing:       _stdNamespaceUsing,
+		keyUsingOrImpl: _stdNamespaceUsing,
+		keyCSymbolName: functools.identity,
+		keyDefaultGuard: [](symbolName: string) {
+			return "__std_{}_defined".format({ symbolName });
+		}),
+	"local" : Namespace(
+		name:     "local",
+		enter:    "__NAMESPACE_LOCAL_BEGIN\n",
+		leave:    "__NAMESPACE_LOCAL_END\n",
+		prefix:   "__NAMESPACE_LOCAL_SYM",
+		keyUsing: [](fp: File, name: string) {
+			fp << "__NAMESPACE_LOCAL_USING(" << name << ")\n";
+		},
+		keyUsingOrImpl: [](fp: File, name: string, impl: Callable) {
+			fp << "__NAMESPACE_LOCAL_USING_OR_IMPL(" << name << ", ";
+			impl();
+			fp << ")\n";
+		},
+		keyCSymbolName: [](symbolName: string): string {
+			return "__LIBC_LOCAL_NAME({})".format({ symbolName });
+		},
+		keyDefaultGuard: [](symbolName: string): string {
+			return "__local_{}_defined".format({ symbolName });
+		}),
+	"fast" : Namespace(
+		name:     "fast",
+		enter:    "__NAMESPACE_FAST_BEGIN\n",
+		leave:    "__NAMESPACE_FAST_END\n",
+		prefix:   "__NAMESPACE_FAST_SYM",
+		keyUsing: [](fp: File, name: string) {
+			fp << "__NAMESPACE_FAST_USING(" << name << ")\n";
+		},
+		keyUsingOrImpl: [](fp: File, name: string, impl: Callable) {
+			fp << "__NAMESPACE_FAST_USING_OR_IMPL(" << name << ", ";
+			impl();
+			fp << ")\n";
+		},
+		keyCSymbolName: [](symbolName: string): string {
+			return "__LIBC_FAST_NAME({})".format({ symbolName });
+		},
+		keyDefaultGuard: [](symbolName: string): string {
+			return "__fast_{}_defined".format({ symbolName });
+		}),
+};
+
+
+@@Return a namespace, given its name
+function getNamespaceByName(name: string | UserString): Namespace {
+	try {
+		return NAMESPACES[str name];
+	} catch (Error as e) {
+		if (name is UserString)
+			name.err(e.message);
+		throw;
+	}
+}
+
+
+
+

@@ -1,0 +1,115 @@
+global COPYRIGHT =
+"/* Copyright (c) 2019-2020 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */";
+
+import * from deemon;
+import * from ..libgen.c.cheaders;
+import * from ..libgen.c.escape;
+import * from ..libgen.c.parser;
+import * from ..libgen.c.writer;
+import * from ..libgen.c.loader;
+import * from ..libgen.c.globals;
+import Function from ..libgen.c.cheaders;
+
+
+local startLine = __LINE__;
+local headerDef = loadSystemHeaderDefinitions(CParser(r"
+
+%{
+__SYSDECL_BEGIN
+
+}
+
+//%[define_ccompat_header(cwchar)]
+//%[insert:std]
+
+[[if(__SIZEOF_WCHAR_T__ == 2), alias(memcpyw)]]
+[[if(__SIZEOF_WCHAR_T__ == 4), alias(memcpyl)]]
+[[wchar, nonnull]] $wchar_t *
+wmemcpy([[nonnull]] $wchar_t *__restrict dst,
+        [[nonnull]] $wchar_t const *__restrict src,
+        size_t num_chars) {
+	size_t i;
+	for (i = 0; i < num_chars; ++i)
+		dst[i] = src[i];
+	return dst;
+}
+
+%
+%
+c16memcpy(*) %{uchar(wmemcpy)}
+c32memcpy(*) %{uchar(wmemcpy)}
+
+//%
+//[[if(__SIZEOF_WCHAR_T__ == 2), alias(wmemcpy)]][[alias(DOS$wmemcpy)]]
+//[[if(__SIZEOF_WCHAR_T__ == 2), bind_local_function(wmemcpy)]]
+//[[nocrt, cc(LIBDCALL), nonnull]] char16_t *
+//c16memcpy([[nonnull]] char16_t *__restrict dst,
+//          [[nonnull]] char16_t const *__restrict src,
+//          size_t num_chars) {
+//	size_t i;
+//	for (i = 0; i < num_chars; ++i)
+//		dst[i] = src[i];
+//	return dst;
+//}
+
+%{
+
+__SYSDECL_END
+}
+
+".unifylines(), firstLineOffset: startLine), headerName: "wchar");
+
+while (functionLinkageSteps)
+	functionLinkageSteps.popfront()();
+
+local fp = CWriter(File.stdout);
+
+print "HEADER:";
+headerDef.cprintHeader(fp, ESCAPE_MODE_PART);
+print #headerDef.functionsByName["c16memcpy"].functionBindings;
+print #headerDef.functionsByName["c32memcpy"].functionBindings;
+
+print "AUTO:";
+headerDef.cprintLibraryAutoHeader(fp, ESCAPE_MODE_NONE);
+headerDef.cprintLibraryAutoSourceImplementations(fp, ESCAPE_MODE_NONE);
+headerDef.cprintLibraryAutoSourceExports(fp, ESCAPE_MODE_NONE);
+
+print "USER:";
+headerDef.cprintLibraryUserHeader(fp, ESCAPE_MODE_NONE);
+headerDef.cprintLibraryUserSourceImplementations(fp, ESCAPE_MODE_NONE);
+headerDef.cprintLibraryUserSourceExports(fp, ESCAPE_MODE_NONE);
+//
+//print "LOCAL:foo:";
+//allLocalFunctionsByName["foo"].cprintLocalFunctionHeader(
+//	fp, ESCAPE_MODE_FULL, "__LIBC", printCopyright: false);
+
+//fp.namespace = "";
+//for (local x: neededLocalFunction.sorted([](x) -> x.name)) {
+//	x.cprintLocalFunctionHeader(
+//		fp, ESCAPE_MODE_FULL, "__LIBC", false);
+//}
+print "DONE";
+
+//localWcslen.implementations[0].dependencies["__localdep_wcslen"] = wcslen;
+//localWcslen.cprintLocalFunctionHeader(writer, dependencyDecl: "__LIBC");
+//print repr allSystemHeaders;
+
+

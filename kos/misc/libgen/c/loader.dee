@@ -1,0 +1,2703 @@
+/* Copyright (c) 2019-2020 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+import * from deemon;
+import * from .cheaders;
+import * from .parser;
+import * from .escape;
+import * from .writer;
+import * from .globals;
+import * from .namespace;
+import * from .wchar;
+import Function from .cheaders;
+
+/* How auto vs. user implementation is selected:
+ * >> if (HAS_MAGIC_IMPLEMENTION_BODY) {
+ * >>     if (HAS_ANNOTATION("crt_userimpl")) {
+ * >>         return USE_USER_IMPL;
+ * >>     } else {
+ * >>         return USE_AUTO_IMPL;
+ * >>     }
+ * >> } else {
+ * >>     return USE_USER_IMPL;
+ * >> } */
+
+
+/* How [wchar] and associated %{uchar} functions are handled:
+ * >> [[wchar, ATTR_WUNUSED]]
+ * >> size_t wcslen([[nonnull]] wchar_t const *__restrict str) {
+ * >> 	size_t result = 0;
+ * >> 	while (str[result])
+ * >> 		++result;
+ * >> 	return result;
+ * >> }
+ * >>
+ * >> c16len(*) %{uchar}
+ * >> c32len(*) %{uchar}
+ * ============================================ EXPANDED ============================================
+ * >> [[if(defined(__CRT_HAVE_DOS$wcslen) && __SIZEOF_WCHAR_T__ == 2), raw_alias(DOS$wcslen)]]
+ * >> [[if(defined(__CRT_HAVE_DOS$wcslen) && __SIZEOF_WCHAR_T__ == 4), raw_alias(KOS$wcslen)]]
+ * >> [[ATTR_WUNUSED]]
+ * >> size_t wcslen([[nonnull]] wchar_t const *__restrict str) {
+ * >> 	size_t result = 0;
+ * >> 	while (str[result])
+ * >> 		++result;
+ * >> 	return result;
+ * >> }
+ * >>
+ * >>
+ * >> [[if(__SIZEOF_WCHAR_T__ == 2), alias(wcslen)]][[alias(DOS$wcslen)]]
+ * >> [[if(__SIZEOF_WCHAR_T__ == 2), bind_local_function(wcslen)]][[nocrt]][[ATTR_WUNUSED]]
+ * >> size_t c16len([[nonnull]] char16_t const *__restrict str) {
+ * >> 	size_t result = 0;
+ * >> 	while (str[result])
+ * >> 		++result;
+ * >> 	return result;
+ * >> }
+ * >>
+ * >> [[if(__SIZEOF_WCHAR_T__ == 4), alias(wcslen)]][[alias(KOS$wcslen)]]
+ * >> [[if(__SIZEOF_WCHAR_T__ == 4), bind_local_function(wcslen)]][[nocrt]][[ATTR_WUNUSED]]
+ * >> size_t c32len([[nonnull]] char32_t const *__restrict str) {
+ * >> 	size_t result = 0;
+ * >> 	while (str[result])
+ * >> 		++result;
+ * >> 	return result;
+ * >> }
+ * ============================================ HEADER ============================================
+ * >> #ifdef __CRT_HAVE_wcslen
+ * >> __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),size_t,,wcslen,(wchar_t const *__restrict __str),(__str))
+ * >> #elif defined(__CRT_HAVE_DOS$wcslen) && __SIZEOF_WCHAR_T__ == 2
+ * >> __CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1)),size_t,,wcslen,(wchar_t const *__restrict __str),wcslen,(__str))
+ * >> #elif defined(__CRT_HAVE_DOS$wcslen) && __SIZEOF_WCHAR_T__ == 4
+ * >> __CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_NONNULL((1)),size_t,,wcslen,(wchar_t const *__restrict __str),wcslen,(__str))
+ * >> #else // ...
+ * >> #include <local/wchar/wcslen.h>
+ * >> __NAMESPACE_LOCAL_USING_OR_IMPL(wcslen, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) size_t (__LIBCCALL wcslen)(wchar_t const *__restrict __str) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslen))(str); })
+ * >> #endif // !...
+ * >>
+ * >> #if defined(__CRT_HAVE_wcslen) && (__SIZEOF_WCHAR_T__ == 2)
+ * >> __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),size_t,,c16len,(char16_t const *__restrict __str),wcslen,(__str))
+ * >> #elif defined(__CRT_HAVE_DOS$wcslen)
+ * >> __CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1)),size_t,,c16len,(char16_t const *__restrict __str),wcslen,(__str))
+ * >> #elif __SIZEOF_WCHAR_T__ == 2
+ * >> #include <local/wchar/wcslen.h>
+ * >> __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) size_t (__LIBCCALL c16len)(char16_t const *__restrict __str) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslen))((wchar_t const *__restrict)str); }
+ * >> #else // ...
+ * >> #include <local/wchar/c16len.h>
+ * >> __NAMESPACE_LOCAL_USING_OR_IMPL(c16len, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) size_t (__LIBCCALL c16len)(char16_t const *__restrict __str) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16len))(str); })
+ * >> #endif // !...
+ * >>
+ * >> #if defined(__CRT_HAVE_wcslen) && (__SIZEOF_WCHAR_T__ == 4)
+ * >> __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),size_t,,c32len,(char32_t const *__restrict __str),wcslen,(__str))
+ * >> #elif defined(__CRT_HAVE_DOS$wcslen)
+ * >> __CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1)),size_t,,c32len,(char32_t const *__restrict __str),wcslen,(__str))
+ * >> #elif __SIZEOF_WCHAR_T__ == 4
+ * >> #include <local/wchar/wcslen.h>
+ * >> __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) size_t (__LIBCCALL c32len)(char32_t const *__restrict __str) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslen))((wchar_t const *__restrict)str); }
+ * >> #else // ...
+ * >> #include <local/wchar/c32len.h>
+ * >> __NAMESPACE_LOCAL_USING_OR_IMPL(c32len, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) size_t (__LIBCCALL c32len)(char32_t const *__restrict __str) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32len))(str); })
+ * >> #endif // !...
+ */
+
+
+global final CXX_SYSTEM_HEADER_START = "#ifndef __CXX_SYSTEM_HEADER\n";
+global final CXX_SYSTEM_HEADER_END   = "#endif /* !__CXX_SYSTEM_HEADER */\n";
+
+
+
+@@Construct a preprocessor expression to check if the to-be linked CRT is exporting @symbolName
+function keyCrtHave(symbolName: string | UserString): string {
+	/* Special case: When wishing to test for KOS-specific symbols, we
+	 *               must actually look out for the DOS-variants, since
+	 *               linking against KOS-symbols only works for PE applications,
+	 *               however CRT feature files are written from the perspective
+	 *               of an ELF program. */
+	local usedSymbolName = str symbolName;
+	if (usedSymbolName.startswith("KOS$")) {
+		/* Technically, this should be:
+		 * >> defined(__KOS__) && defined(__PE__) && defined(__CRT_HAVE_{usedSymbolName[4:]}) */
+		usedSymbolName = "DOS$" + usedSymbolName[4:];
+	}
+	return "defined(__CRT_HAVE_{})".format({ usedSymbolName });
+}
+
+
+@@Replace a @"defined(__CRT_HAVE_xxx)" sub-part of @ppCond
+function replaceCrtHaveFromPreprocessorCondition(
+		ppCond: string,
+		oldSymbolName: string | UserString,
+		newSymbolName: string | UserString): string {
+	local oldHave = keyCrtHave(oldSymbolName);
+	local newHave = keyCrtHave(newSymbolName);
+	if (oldHave !in ppCond) {
+		if (ppCond in ["", "1"])
+			return newHave;
+		if (ppCond in ["0"])
+			return ppCond;
+		return "({}) && {}".format({ ppCond, newHave });
+	}
+	return ppCond.replace(oldHave, newHave);
+}
+
+
+function parseCTypeAndName(self: CParser): (CType, UserString | string) {
+	local ctype: CType;
+	local varname: UserString | string;
+	local tok = self.tok;
+	if (isCString(tok)) {
+		local typename = tok.decode("c-escape");
+		tok = self.next();
+		if (isCString(tok))
+			varname = tok.decode("c-escape");
+		else {
+			if (!tok.issymbol())
+				self.err("Expected keyword or string to variable name");
+			varname = self.userTok;
+		}
+		tok   = self.next();
+		ctype = CType(typename);
+		if (isCString(tok)) {
+			ctype.afterName = tok.decode("c-escape");
+			self.next();
+		} else if (tok in "[(") {
+			local afterNameStart = self.tokStart;
+			self.skipPair();
+			ctype.afterName = self.getUserString(
+				afterNameStart, self.tokEnd);
+			self.next();
+		}
+	} else if (tok == "...") {
+		/* Ellipsis argument */
+		ctype   = CType("...");
+		varname = "";
+		self.next();
+	} else {
+		if (!tok.issymbol())
+			self.err("Expected keyword or string for typename, but got {!r}".format({ tok }));
+		local typenameStart = self.tokStart;
+		local typenameEnd = self.tokEnd;
+		tok = self.next();
+		for (;;) {
+			if (tok in ["struct", "union", "class", "enum"]) {
+				self.next();
+				typenameEnd = self.tokEnd;
+				tok = self.next();
+				continue;
+			}
+			if (tok in cLanguageKeywords) {
+continue_typename_expression:
+				typenameEnd = self.tokEnd;
+				tok = self.next();
+				continue;
+			}
+			if (tok in "*&")
+				goto continue_typename_expression;
+			break;
+		}
+		if (tok.issymbol() || isCString(tok)) {
+			ctype = CType(self.getUserString(typenameStart, typenameEnd));
+			if (isCString(tok))
+				varname = tok.decode("c-escape");
+			else {
+				varname = self.userTok;
+			}
+			tok = self.next();
+			if (tok in "[(" || tok.issymbol()) {
+				local suffixStart = self.tokStart;
+				for (;;) {
+					if (tok in "[(") {
+						self.skipPair();
+						tok = self.next();
+						continue;
+					}
+					if (tok.issymbol()) {
+						tok = self.next();
+						continue;
+					}
+					break;
+				}
+				ctype.afterName = self.getUserString(
+					suffixStart, self.tokStart);
+			} else if (isCString(tok)) {
+				ctype.afterName = tok.decode("c-escape");
+				tok = self.next();
+			}
+		} else if (tok in "([") {
+			/* Inner variable name: "int (*foo)(int x)"
+			 * Must split into: "int (*", "foo", ")(int x)" */
+			final local PAREN_TABLE = {
+				"(" : ")",
+				"[" : "]",
+				"{" : "}",
+			};
+			local unwindStack = [PAREN_TABLE[tok]];
+			for (;;) {
+				typenameEnd = self.tokEnd;
+				tok = self.next();
+				if (tok in "*&")
+					continue;
+				if (tok in "([") {
+					unwindStack.pushback(PAREN_TABLE[tok]);
+					continue;
+				}
+				if (tok in cLanguageKeywords)
+					continue;
+				break;
+			}
+			ctype = CType(self.getUserString(typenameStart, typenameEnd));
+			if (isCString(tok)) {
+				varname = tok.decode("c-escape");
+				self.next();
+			} else if (tok.issymbol()) {
+				varname = self.userTok;
+			} else {
+				varname = "";
+			}
+			local afterNameStart = self.tokStart;
+			local afterNameEnd = afterNameStart;
+			while (unwindStack) {
+				if (tok == unwindStack.last) {
+					unwindStack.popback();
+				} else if (tok in "([") {
+					self.skipPair();
+				} else if (tok in cLanguageKeywords) {
+				} else {
+					self.err("Unmatched {!r} in ctype expression"
+						.format({ unwindStack.last }));
+				}
+				afterNameEnd = self.tokEnd;
+				tok = self.next();
+			}
+			ctype.afterName = self.getUserString(afterNameStart, afterNameEnd);
+		} else {
+			varname = "";
+		}
+	}
+	return (ctype, varname);
+}
+
+
+
+
+
+
+@@Parse the contents of an argument list, starting after the leading @"(",
+@@such that @self.next() will return the first token _after_ that @"(", and
+@@stopping such that @self.tok will point at the first character after the
+@@trailing @")"
+@@NOTE: Optionally, the current token may be a @"[" upon entry, in which case
+@@      @defaultAttributes will not be used, but attributes will rather be
+@@      read from the initial tag-list (unless one of the tags is @"[*]")
+@@@param: defaultAttributes:             Default function prototype attributes
+@@@param: functionArgumentNamesOverride: Names specified via @"[argument_names(...)]"
+function parseArgumentList(
+		self: CParser, result: FunctionPrototype,
+		defaultAttributes: {(string | UserString)...} = (),
+		functionArgumentNamesOverride: {(string | UserString)...} = none) {
+	local tok = self.tok;
+	if (tok == "[") {
+		local numRBracket = 1;
+		result.attributes = List();
+		do {
+again_parse_annotations:
+			tok = self.next();
+			while (tok != "]") {
+				switch (tok) {
+
+				case "[":
+					++numRBracket;
+					goto again_parse_annotations;
+
+				case "*":
+					result.attributes.extend(defaultAttributes);
+					tok = self.next();
+					break;
+
+				case "argument_names":
+					self.next();
+					self.skip("(");
+					functionArgumentNamesOverride = List(
+						parserCStringOrFunctionLikeExpressionList(self));
+					tok = self.skip(")");
+					break;
+
+				case "cc":
+					self.next();
+					self.skip("(");
+					result.cc = parserCStringOrAllUntilRParen(self);
+					tok = self.skip(")");
+					break;
+
+				case "vartypes":
+					self.next();
+					self.skip("(");
+					result.ellipsisArgumentTypes = [];
+					while (self.tok != ")") {
+						local typ, none = parseCTypeAndName(self)...;
+						result.ellipsisArgumentTypes.append(typ);
+						if (self.tok == ")")
+							break;
+						self.skip(",");
+					}
+					tok = self.next();
+					break;
+
+				default:
+					result.attributes.append(
+						parserCStringOrAllUntilRParen(self));
+					break;
+				}
+				if (tok != ",")
+					break;
+				tok = self.next();
+			}
+again_skip_annotation_rbracket:
+			tok = self.skip("]");
+			if (numRBracket > 1) {
+				--numRBracket;
+				if (tok != ",")
+					goto again_skip_annotation_rbracket;
+				goto again_parse_annotations;
+			}
+		} while (tok == "[");
+	} else {
+		result.attributes = defaultAttributes;
+	}
+	tok = self.skip("(");
+	local nonNullArguments: {int...} = none;
+	result.argv = [];
+	while (tok != ")") {
+		while (tok == "[") {
+			local numRBracket = 1;
+again_parse_arg_annotations:
+			tok = self.next();
+			while (tok != "]") {
+				switch (tok) {
+
+				case "[":
+					++numRBracket;
+					goto again_parse_arg_annotations;
+
+				case "nullable":
+				case "null":
+					tok = self.next();
+					break;
+
+				case "nonnull":
+					if (nonNullArguments is none)
+						nonNullArguments = HashSet();
+					nonNullArguments.insert(#result.argv + 1);
+					tok = self.next();
+					break;
+
+				default:
+					self.err("Unknown argument attribute {!r}"
+						.format({ tok }));
+					break;
+				}
+				if (tok != ",")
+					break;
+				tok = self.next();
+			}
+again_skip_arg_annotation_rbracket:
+			tok = self.skip("]");
+			if (numRBracket > 1) {
+				--numRBracket;
+				if (tok != ",")
+					goto again_skip_arg_annotation_rbracket;
+				goto again_parse_arg_annotations;
+			}
+		}
+		local typ, name = parseCTypeAndName(self)...;
+		local arg = Argument(name: name, protoTypeName: name, ctype: typ);
+		if (functionArgumentNamesOverride !is none) {
+			local argi = #result.argv;
+			if (argi >= #functionArgumentNamesOverride)
+				self.err("Too few function argument name overrides were given");
+			arg.name = functionArgumentNamesOverride[argi];
+		}
+		result.argv.append(arg);
+		tok = self.tok;
+		if (tok != ",")
+			break;
+		tok = self.next();
+	}
+	self.skip(")");
+	if (nonNullArguments) {
+		local attrib = "ATTR_NONNULL(({}))"
+			.format({ ", ".join(nonNullArguments.sorted()) });
+		if (result.attributes === defaultAttributes)
+			result.attributes = List(defaultAttributes);
+		result.attributes.append(attrib);
+	}
+}
+
+@@Same as @parseArgumentList, but also parse an optional trailing @"-> TYPE"
+@@or @": TYPE" suffix, and throw an error if such a suffix is present, but
+@@some other return type had already been defined.
+@@Upon return, @self will point at the first character after the return type
+function parseArgumentListAndOptionalTrailingReturnType(
+		self: CParser, result: FunctionPrototype,
+		defaultAttributes: {(string | UserString)...} = (),
+		functionArgumentNamesOverride: {(string | UserString)...} = none) {
+	parseArgumentList(self, result, defaultAttributes, functionArgumentNamesOverride);
+	if (self.tok in ["->", ":"]) {
+		local tok = self.next();
+		if (result.returnType is bound)
+			self.err("A return type was already defined");
+		while (tok == "[") {
+			local numRBracket = 1;
+again_parse_annotations:
+			tok = self.next();
+			while (tok != "]") {
+				switch (tok) {
+
+				case "[":
+					++numRBracket;
+					goto again_parse_annotations;
+
+				case "nullable":
+				case "null":
+					tok = self.next();
+					break;
+
+				case "nonnull":
+					if (result.attributes === defaultAttributes)
+						result.attributes = List(defaultAttributes);
+					result.attributes.append("ATTR_RETNONNULL");
+					tok = self.next();
+					break;
+
+				default:
+					self.err("Unknown return type attribute");
+					break;
+				}
+				if (tok != ",")
+					break;
+				tok = self.next();
+			}
+again_skip_annotation_rbracket:
+			tok = self.skip("]");
+			if (numRBracket > 1) {
+				--numRBracket;
+				if (tok != ",")
+					goto again_skip_annotation_rbracket;
+				goto again_parse_annotations;
+			}
+		}
+		if (!tok.issymbol())
+			self.err("Expected a keyword for function return type");
+		local returnTypeStart = self.tokStart;
+		local returnTypeEnd;
+		for (;;) {
+			returnTypeEnd = self.tokEnd;
+			tok = self.next();
+			if (!tok.issymbol()) {
+				if (tok in "*&")
+					continue;
+				if (tok in "([") {
+					self.skipPair(tok);
+					continue;
+				}
+				break;
+			}
+		}
+		result.returnType = CType(
+			self.getUserString(
+				returnTypeStart, returnTypeEnd));
+	}
+}
+
+
+function constructAliasConditions(
+		ppCond: string | none,
+		assemblyName: string | UserString): string {
+	local hasAssemblyName = keyCrtHave(assemblyName);
+	if (ppCond is none || ppCond == "1")
+		return hasAssemblyName;
+	return "{} && ({})".format({ hasAssemblyName, ppCond });
+}
+
+class FunctionFeatures {
+	this = default;
+
+	/* Declaration features */
+	public member decl: UserString | string = "__LIBC";              /* [decl(...)]             Declaration prefix */
+	public member std: bool = false;                                 /* [std]                   Expose as part of the std:: namespace */
+	public member namespaces: {string...} = ("",);                   /* [[no_]ignore]           Namespaces from which to import the function */
+	public member libc: bool = false;                                /* [[no_]libc]             Export in <libc/string.h> */
+	public member inline: UserString | string | none = none;         /* [[no_]inline]           Use the associated body for inline implementations, rather than including <local/...> headers */
+	public member inlineTruncate: bool = false;                      /* [[no_]inline_truncate]  Truncate spaces and new-lines from inline implementations */
+	public member noExternInline: bool = false;                      /* [[no_]extern_inline]    For use with @inline: Don't convert inline */
+	public member noLocal: bool = false;                             /* [[no_]local]            Prevent the creation of a LocalFunction for */
+	public member requires: UserString | string = "1";               /* [[no_]requires(...)]    A preprocessor condition that must be true in order to use the local/inline implementation */
+	public member requiresIncludes: {(UserString | string)...} = (); /* [requires_include(...)] Headers that must be #include'ed before @requires can be used */
+	public member requiresPrefix: UserString | string = "";          /* [requires_prefix(...)]  A piece of text that must be inserted before @requires can be used */
+	public member implIncludes: {(UserString | string)...} = ();     /* [impl_include(...)]     Headers that must be #include'ed before the local implementation can be used */
+	public member implPrefix: UserString | string = "";              /* [impl_prefix(...)]      A piece of text that must be inserted before the local implementation can be used */
+	public member macroBinding: bool = false;                        /* [[no_]macros]           Allow the use of macros when declaring this function */
+	public member guard: bool = false;                               /* [[no_]guard]            Surround the declaration of the function with a guard */
+	public member guardNames: {string: (UserString | string | none)} = none; /* Guard names in different namespaces */
+	public member exposedName: UserString | string | none = none;    /* [[no_]exposed_name(...)] The name under which the function will be exposed in system headers. */
+	public member forcedDependencies: {(UserString | string)...} | none = none; /* [dependency(...)] Force dependencies on the given set of functions. */
+	public member unforcedDependencies: {(UserString | string)...} | none = none; /* [not_dependency(...)] Force a given set of functions to not be considered dependencies. */
+	public member noAutoDependencyScanning: bool = false;            /* [[no_]auto_dependency_scanning] Automatically scan for dependencies */
+
+	/* WCHAR function features */
+	public member wchar: bool = false;         /* [[no_]wchar]       Expose and implement as a wchar-function */
+	public member wchar_noAlias: bool = false; /* [[no_]wchar_alias] Prevent duplication of function aliases */
+
+	/* CRT Features */
+	public member crt_name: UserString | string | none = none;       /* [[no_]crt_name(...)]   Symbol name override for the default CRT function binding */
+	public member crt_noImpl: bool = false;                          /* [[no_]crt_impl]        Don't implement function within the CRT */
+	public member crt_noSelfImport: bool = false;                    /* [[no_]crt_self_import] Prevent importing from ASMNAME(crt_name || current.name) */
+	public member crt_noSelfExport: bool = false;                    /* [[no_]crt_self_export] Prevent exporting as ASMNAME(crt_name || current.name) */
+	public member crt_userimpl: bool = false;                        /* [[no_]userimpl]        Prevent implementation in libc/auto and always use libc/user */
+	public member crt_kernel: bool = false;                          /* [[no_]kernel]          Also export in kernel-space */
+	public member crt_kosSection: UserString | string | none = none; /* [kos_section(...)]     Section name for the KOS implementation */
+	public member crt_dosSection: UserString | string | none = none; /* [dos_section(...)]     Section name for the DOS implementation (if @wchar) */
+	public member crt_dosname: UserString | string | none = none;    /* [dosname(...)]         Same as @crt_name, but only for the DOS variant */
+
+	@@Enable a given namespace binding (via `using`)
+	public function addNamespaceUsingBinding(name: string) {
+		if (namespaces == ("",))
+			namespaces = ("", name,);
+		else if (name in namespaces)
+			;
+		else {
+			namespaces = List(namespaces);
+			namespaces.append(name);
+		}
+	}
+
+	@@Prevent a given namespace binding (via `using`)
+	public function delNamespaceUsingBinding(name: string) {
+		if (name !in namespaces)
+			;
+		else if (#namespaces == 2 && "" in namespaces) {
+			namespaces = ("", );
+		} else {
+			namespaces = List(namespaces);
+			namespaces.remove(name);
+		}
+	}
+
+	@@Set the name of a guard (to-be used when @guard
+	@@is true) for a given namespace @namespaceName
+	public function setNamespaceGuardName(
+			namespaceName: string, guardName: string | UserString | none) {
+		if (guardName is none) {
+			if (namespaceName !in guardNames)
+				return;
+			guardNames = Dict(guardNames);
+			del guardNames[namespaceName];
+		} else {
+			guardNames = Dict(guardNames);
+			guardNames[namespaceName] = guardName;
+		}
+	}
+
+	@@Try to parse a feature attribute
+	@@@return: true:  Success
+	@@@return: false: Unknown attribute
+	public function tryParseAttribute(
+			self: CParser, ppCond: string | UserString | none = none): bool {
+		local tok = self.tok;
+		@@Simple annotations that only entail setting the value of some field.
+		@@This is a mapping of: @(tagName: (fieldName, toBeAssignedValue))
+		final local SIMPLE_SETFIELD_ANNOTATIONS: {string: (string, Object)} = {
+			"nodecl"                      : ("decl", "__LIBC"),
+			"no_decl"                     : ("decl", "__LIBC"),
+			"ignore"                      : ("namespaces", ()),
+			"no_ignore"                   : ("namespaces", ("",)),
+			"libc"                        : ("libc", true),
+			"nolibc"                      : ("libc", false),
+			"no_libc"                     : ("libc", false),
+			"inline"                      : ("inline", "LOCAL"),
+			"forceinline"                 : ("inline", "FORCELOCAL"),
+			"force_inline"                : ("inline", "FORCELOCAL"),
+			"noinline"                    : ("inline", none),
+			"no_inline"                   : ("inline", none),
+			"inline_truncate"             : ("inlineTruncate", true),
+			"no_inline_truncate"          : ("inlineTruncate", false),
+			"extern_inline"               : ("noExternInline", false),
+			"no_extern_inline"            : ("noExternInline", true),
+			"local"                       : ("noLocal", false),
+			"noLocal"                     : ("noLocal", true),
+			"no_local"                    : ("noLocal", true),
+			"norequires"                  : ("requires", "1"),
+			"no_requires"                 : ("requires", "1"),
+			"no_requires_include"         : ("requiresIncludes", ()),
+			"no_requires_prefix"          : ("requiresPrefix", ""),
+			"no_impl_include"             : ("implIncludes", ()),
+			"no_impl_prefix"              : ("implPrefix", ""),
+			"macro"                       : ("macroBinding", true),
+			"macros"                      : ("macroBinding", true),
+			"no_macro"                    : ("macroBinding", false),
+			"no_macros"                   : ("macroBinding", false),
+			"allow_macros"                : ("macroBinding", true), /* Deprecated name */
+			"disallow_macros"             : ("macroBinding", false), /* Deprecated name */
+			"noguard"                     : ("guard", false),
+			"no_guard"                    : ("guard", false),
+			"default_guard_names"         : ("guardNames", none),
+			"default_exposed_name"        : ("exposedName", none),
+			"wchar"                       : ("wchar", true),
+			"no_wchar"                    : ("wchar", false),
+			"wchar_alias"                 : ("wchar_noAlias", false),
+			"no_wchar_alias"              : ("wchar_noAlias", true),
+			"default_crt_name"            : ("crt_name", none),
+			"default_dosname"             : ("crt_dosname", none),
+			"crt_impl"                    : ("crt_noImpl", false),
+			"no_crt_impl"                 : ("crt_noImpl", true),
+			"crt_self_import"             : ("crt_noSelfImport", false),
+			"no_crt_self_import"          : ("crt_noSelfImport", true),
+			"crt_self_export"             : ("crt_noSelfExport", false),
+			"no_crt_self_export"          : ("crt_noSelfExport", true),
+			"userimpl"                    : ("crt_userimpl", true),
+			"no_userimpl"                 : ("crt_userimpl", false),
+			"kernel"                      : ("crt_kernel", true),
+			"nokernel"                    : ("crt_kernel", false),
+			"no_kernel"                   : ("crt_kernel", false),
+			"default_kos_section"         : ("crt_kosSection", none),
+			"default_dos_section"         : ("crt_dosSection", none),
+			"auto_dependency_scanning"    : ("noAutoDependencyScanning", false),
+			"no_auto_dependency_scanning" : ("noAutoDependencyScanning", true),
+		};
+
+		switch (tok) {
+
+		case "crt":
+			crt_noImpl       = false;
+			crt_noSelfImport = false;
+			crt_noSelfExport = false;
+			goto oneword_nocond;
+
+		case "static":
+			/* static function:
+			 *   - Doesn't actually exist in libc
+			 *   - Isn't actually exposed in system headers
+			 *   - Can only be used lazily as a dependency from other functions
+			 *   - HINT: Can be used in conjunction with [[inline]]
+			 */
+			namespaces   = ();
+			libc         = false;
+			noLocal      = false;
+			macroBinding = true;
+			guard        = false;
+			/* FALLTHRU */
+		case "nocrt":
+		case "no_crt":
+			crt_noImpl       = true;
+			crt_noSelfImport = true;
+			crt_noSelfExport = true;
+			goto oneword_nocond;
+
+		case "hidden":
+			delNamespaceUsingBinding("");
+			goto oneword_nocond;
+
+		case "exposed":
+			addNamespaceUsingBinding("");
+			goto oneword_nocond;
+
+		case "std":
+			std = true;                      /* Expose as part of std:: */
+			addNamespaceUsingBinding("std"); /* Allow importing from std:: */
+			goto oneword_nocond;
+
+		case "nostd":
+		case "no_std":
+			std = false;                     /* Don't expose as part of std:: */
+			delNamespaceUsingBinding("std"); /* Disallow importing from std:: */
+			goto oneword_nocond;
+
+		case "fast":
+			addNamespaceUsingBinding("fast");
+			goto oneword_nocond;
+
+		case "nofast":
+			delNamespaceUsingBinding("fast");
+			goto oneword_nocond;
+
+		case "requires": {
+			if (ppCond !is none)
+				goto err_unexpected_if;
+			self.next();
+			self.skip("(");
+			local addend = parserCStringOrAllUntilRParen(self);
+			self.skip(")");
+			if (requires is UserString || requires != "1")
+				addend = "({}) && ({})".format({ requires, addend });
+			requires = addend;
+		}	break;
+
+		case "requires_include": {
+			if (ppCond !is none)
+				goto err_unexpected_if;
+			self.next();
+			self.skip("(");
+			if (requiresIncludes !is HashSet)
+				requiresIncludes = HashSet(requiresIncludes);
+			requiresIncludes.insert(parserCStringOrAllUntilRParen(self));
+			self.skip(")");
+		}	break;
+
+		case "requires_prefix": {
+			if (ppCond !is none)
+				goto err_unexpected_if;
+			self.next();
+			self.skip("(");
+			local addend = parserCStringOrAllUntilRParen(self);
+			self.skip(")");
+			if (requiresPrefix) {
+				requiresPrefix = str requiresPrefix;
+				if (!requiresPrefix.endswith("\n"))
+					requiresPrefix += "\n";
+				requiresPrefix += addend;
+			} else {
+				requiresPrefix = addend;
+			}
+		}	break;
+
+		case "impl_include": {
+			if (ppCond !is none)
+				goto err_unexpected_if;
+			self.next();
+			self.skip("(");
+			if (implIncludes !is HashSet)
+				implIncludes = HashSet(implIncludes);
+			implIncludes.insert(parserCStringOrAllUntilRParen(self));
+			self.skip(")");
+		}	break;
+
+		case "no_impl_prefix":
+			implPrefix = "";
+			goto oneword_nocond;
+
+		case "impl_prefix": {
+			if (ppCond !is none)
+				goto err_unexpected_if;
+			self.next();
+			self.skip("(");
+			local addend = parserCStringOrAllUntilRParen(self);
+			self.skip(")");
+			if (implPrefix) {
+				implPrefix = str implPrefix;
+				if (!implPrefix.endswith("\n"))
+					implPrefix += "\n";
+				implPrefix += addend;
+			} else {
+				implPrefix = addend;
+			}
+		}	break;
+
+		case "section": {
+			if (ppCond !is none)
+				goto err_unexpected_if;
+			self.next();
+			self.skip("(");
+			local sectionNameStart = self.tokStart;
+			local sectionName = parserCStringOrAllUntilRParen(self);
+			self.skip(")");
+			local strSectionName = str sectionName;
+			if (strSectionName.startswith("{") && strSectionName.endswith("}") &&
+			    strSectionName.findmatch("{", "}", 1) == #strSectionName - 1) {
+				if ("|" !in strSectionName)
+					self.errAt(sectionNameStart, "Missing '|' in [section({!r})]"
+						.format({ strSectionName }));
+				local a, none, b = strSectionName[1:-1].partition("|")...;
+				crt_kosSection = a.strip();
+				crt_dosSection = b.strip();
+			} else {
+				crt_kosSection = sectionName;
+			}
+		}	break;
+
+		case "kos_section":
+		case "dos_section": {
+			if (ppCond !is none)
+				goto err_unexpected_if;
+			self.next();
+			self.skip("(");
+			local name = parserCStringOrAllUntilRParen(self);
+			if (tok == "kos_section")
+				crt_kosSection = name;
+			else {
+				crt_dosSection = name;
+			}
+			self.skip(")");
+		}	break;
+
+		case "decl": {
+			if (ppCond !is none)
+				goto err_unexpected_if;
+			self.next();
+			self.skip("(");
+			decl = parserCStringOrAllUntilRParen(self);
+			self.skip(")");
+		}	break;
+
+		case "guard":
+			if (ppCond !is none)
+				goto err_unexpected_if;
+			guard = true;
+			tok = self.next();
+			if (tok == "(") {
+				/* Define the name for the GLOBAL_NAMESPACE guard. */
+				self.next();
+				guardNames = Dict(guardNames);
+				setNamespaceGuardName(
+					"" /* GLOBAL_NAMESPACE.name */,
+					parserCStringOrAllUntilRParen(self));
+				self.skip(")");
+			}
+			break;
+
+//	TODO: guardNames
+
+		case "exposed_name":
+			if (ppCond !is none)
+				goto err_unexpected_if;
+			self.next();
+			self.skip("(");
+			exposedName = parserCStringOrAllUntilRParen(self);
+			self.skip(")");
+			break;
+
+		case "crt_name":
+			if (ppCond !is none)
+				goto err_unexpected_if;
+			self.next();
+			self.skip("(");
+			crt_name = parserCStringOrAllUntilRParen(self);
+			self.skip(")");
+			break;
+
+		case "dependency":
+		case "not_dependency": {
+			local my = tok;
+			local myField, otField, ot = {
+				"dependency"     : ("forcedDependencies", "unforcedDependencies", "not_dependency"),
+				"not_dependency" : ("unforcedDependencies", "forcedDependencies", "dependency"),
+			}[tok]...;
+			local other = this.operator . (otField);
+			local field = HashSet(this.operator . (myField));
+			this.operator . (myField) = field;
+			self.next();
+			self.skip("(");
+			for (;;) {
+				if (isCString(tok))
+					tok = tok.decode("c-escape");
+				else if (!tok.issymbol()) {
+					self.err("Expected keyword or string after [{}(...)]"
+						.format({ my }));
+				}
+				if (tok in other) {
+					self.err("[{0}({2!r})] was already declared as [{1}({2!r})]"
+						.format({ my, ot, tok }));
+				}
+				field.insert(tok);
+				tok = self.next();
+				if (tok != ",")
+					break;
+				self.next();
+			}
+			self.skip(")");
+		}	break;
+
+		case "without_dependency":
+		case "without_not_dependency": {
+			local my = tok;
+			local myField, ot = {
+				"without_dependency"     : ("forcedDependencies", "without_not_dependency"),
+				"without_not_dependency" : ("unforcedDependencies", "without_dependency"),
+			}[tok]...;
+			local field = HashSet(this.operator . (myField));
+			this.operator . (myField) = field;
+			self.next();
+			self.skip("(");
+			for (;;) {
+				if (isCString(tok))
+					tok = tok.decode("c-escape");
+				else if (!tok.issymbol()) {
+					self.err("Expected keyword or string after [{}(...)]"
+						.format({ my }));
+				}
+				field.remove(tok);
+				tok = self.next();
+				if (tok != ",")
+					break;
+				self.next();
+			}
+			self.skip(")");
+		}	break;
+
+
+		default: {
+			local op = SIMPLE_SETFIELD_ANNOTATIONS.get(tok);
+			if (op !is none) {
+				this.operator . (op[0]) = op[1];
+oneword_nocond:
+				if (ppCond !is none) {
+err_unexpected_if:
+					self.err("Annotation [{}] cannot be used with [if(...)]"
+						.format({ tok }));
+				}
+				self.next();
+				break;
+			}
+			return false;
+		}	break;
+
+		}
+		return true;
+	}
+
+	@@Assert that all annotations that are only valid when a
+	@@function body is present match the annotations of @other
+	public function assertDefaultAttributesWithoutImplementation(
+			other: FunctionFeatures): string {
+		if (crt_kernel !== other.crt_kernel)
+			return "[no_]kernel";
+		if (inline !== other.inline)
+			return "[no_]inline";
+		if (crt_userimpl !== other.crt_userimpl)
+			return "[no_]userimpl";
+		if (noLocal !== other.noLocal)
+			return "[no_]local";
+		if (noExternInline !== other.noExternInline)
+			return "[no_]extern_inline";
+		if (requires !== other.requires)
+			return "[no_]requires";
+		if (requiresIncludes !== other.requiresIncludes)
+			return "[no_]requires_include";
+		if (requiresPrefix !== other.requiresPrefix)
+			return "[no_]requires_prefix";
+		if (implIncludes !== other.implIncludes)
+			return "[no_]impl_include";
+		if (implPrefix !== other.implPrefix)
+			return "[no_]impl_prefix";
+		if (crt_dosSection !== other.crt_dosSection)
+			return "[no_]dos_section";
+		if (crt_kosSection !== other.crt_kosSection)
+			return "[no_]kos_section";
+		if (noAutoDependencyScanning !== other.noAutoDependencyScanning)
+			return "[no_]auto_dependency_scanning";
+		if (forcedDependencies !== other.forcedDependencies)
+			return "[without_]dependency";
+		if (unforcedDependencies !== other.unforcedDependencies)
+			return "[without_]not_dependency";
+		return none;
+	}
+	public function assertAllDefaultAttributesWithoutImplementation(
+			self: CParser, other: FunctionFeatures) {
+		local altered = assertDefaultAttributesWithoutImplementation(other);
+		if (altered !is none)
+			self.err("Annotation [{}] requires the presence of a function body"
+				.format({ altered }));
+	}
+
+}
+
+function truncateInlineFunctionImplementation(text: string): string {
+	if ("\n#" in text || text.startswith("#"))
+		return text; /* XXX: This could be done better... */
+	local result = text.replace("\n", " ").replace("\t", " ");
+	for (;;) {
+		local newText = result.replace("  ", " ");
+		if (result == newText)
+			break;
+		result = newText;
+	}
+	return result;
+}
+
+function defineFunctionInMapping(
+		mapping: {string: Function} | {string: LocalFunction},
+		func: Function | LocalFunction) {
+	local name = func.name;
+	if (name in mapping) {
+		mapping[name] = DuplicateFunctionMarker;
+	} else {
+		mapping[name] = func;
+	}
+}
+
+function defineFunctionInMappingNoDuplicates(
+		mapping: {string: Function} | {string: LocalFunction},
+		func: Function | LocalFunction): bool {
+	local name = func.name;
+	if (name in mapping)
+		return false;
+	mapping[name] = func;
+	return true;
+}
+
+
+@@Print a default, stub-library-implementation for a given @prototype
+function printDefaultLibraryImplementationForPrototype(
+		fp: File, prototype: FunctionPrototype,
+		functionName: string | UserString) {
+	fp << "{\n";
+	for (local a: prototype.argv)
+		fp << "\t(void)" << a.name << ";\n";
+	fp << "\tCRT_UNIMPLEMENTED(" << repr(functionName) << "); /* TO" "DO */\n"
+		"\tlibc_seterrno(ENOSYS);\n";
+	if (prototype.isNoreturn) {
+		fp << "\tfor (;;) {\n"
+			"\t}\n";
+	} else {
+		local returnType = prototype.returnType;
+		if (returnType.isVoid) {
+			/* No return statement in void-functions */
+		} else if (returnType.isPointer) {
+			fp << "\treturn NULL;\n";
+		} else {
+			fp << "\treturn 0;\n";
+		}
+	}
+	fp << "}";
+}
+
+@@Return a default, stub-library-implementation for a given @prototype
+function getDefaultLibraryImplementationForPrototype(
+		prototype: FunctionPrototype,
+		functionName: string | UserString): string {
+	local fp = File.Writer();
+	printDefaultLibraryImplementationForPrototype(fp, prototype, functionName);
+	return fp.string;
+}
+
+@@Scan for references to dependent functions within the given @text
+@@@param: prototype: The primary function prototype.
+@@                   Used to detect references to arguments, and prevent those
+@@                   from ever being considered references to dependencies.
+@@@param: features:  Extended function features to take into consideration
+function scanForNamesOfDependentFunctions(
+		text: string | UserString,
+		prototype: FunctionPrototype | Callable,
+		features: FunctionFeatures): Callable {
+	local forcedDependencies = features.forcedDependencies;
+	local unforcedDependencies = features.unforcedDependencies;
+	local noAutoDependencyScanning = features.noAutoDependencyScanning;
+	return []{
+		local usedPrototype = prototype;
+		if (usedPrototype is Callable)
+			usedPrototype = usedPrototype();
+		/* Always include forced dependencies */
+		for (local dep: features.forcedDependencies)
+			yield dep;
+		/* Check if we're supposed to do automatic dependency scanning? */
+		if (noAutoDependencyScanning)
+			return;
+		local parser = CParser(text);
+		local knownNonDependencies: {string...} = none;
+		local prevToken;
+		local tok = none;
+		for (;;) {
+next_token:
+			prevToken = tok;
+			tok = parser.next();
+with_next_token:
+			if (!tok)
+				break;
+			if (!tok.issymbol())
+				continue; /* Dependent functions must always have keyword names */
+			if (tok.startswith("$"))
+				continue; /* Functions cannot start with a '$', since that would interfere with escape rules */
+			if (tok in cLanguageKeywords)
+				continue; /* C language keywords can never be dependencies */
+			if (tok in unforcedDependencies)
+				continue; /* Explicitly not a dependencies of this function */
+			if (tok in keywordEscapes)
+				continue; /* Keywords that can be escaped further cannot refer to dependable functions */
+			if (tok in features.forcedDependencies)
+				continue; /* Already a dependency */
+			if (tok in usedPrototype.argsByName)
+				continue; /* Argument name -> Not a dependency */
+			if (tok in knownNonDependencies)
+				continue; /* Already a known non-dependency */
+			/* Check if there is a function by this name. */
+			local func = allFunctionsByName.get(tok);
+			if (func is none)
+				continue;
+			if (knownNonDependencies is none)
+				knownNonDependencies = HashSet();
+			if (func === DuplicateFunctionMarker) {
+				/* Check for header-specific, explicit dependencies */
+				for (local dep: forcedDependencies) {
+					if ("." !in dep)
+						continue;
+					if (tok == dep.rpartition(".")[2]) {
+						knownNonDependencies.insert(tok);
+						prevToken = tok;
+						goto next_token;
+					}
+				}
+				/* Error, unless the function was explicitly annotated as _NOT_ being a dependency! */
+				parser.err("Ambiguous dependency {0!r} (consider clarifying with "
+					"[dependency({0!r})] or [not_dependency({0!r})])"
+					.format({ tok }));
+				continue;
+			}
+			/* don't assume a dependency based on the next word:
+			 * int error;                  // Not a dependency on error()
+			 * int error = 5;              // Not a dependency on error()
+			 * printf("%d, %d", error, 5); // Not a dependency on error()
+			 * printf("%d", error);        // Not a dependency on error()
+			 * printf("%d", &error);       // Is a dependency on error() (unless 'error' was already used in a different context)
+			 */
+			if (prevToken == "&") {
+				knownNonDependencies.insert(tok);
+				yield (tok, func);
+				goto next_token;
+			}
+			prevToken = tok;
+			tok = parser.next();
+			if (tok in [")", ";", ",", "="]) {
+				knownNonDependencies.insert(prevToken);
+				goto with_next_token;
+			}
+			/* Yield items in pairs of @(dependencyName, dependencyFunc) */
+			yield (prevToken, func);
+			goto with_next_token;
+		}
+	};
+}
+
+
+
+
+@@Load system header definitions
+@@@param: customDirectivesParser: A custom callback that is invoked to parse otherwise
+@@                                unrecognized directives. Upon entry, the parser will
+@@                                point at the directive's name, and upon exit, the
+@@                                parser should point at the trailing @"," or @"]"
+function loadSystemHeaderDefinitions(
+		self: CParser, headerName: string,
+		customDirectivesParser: Callable with CParser = none): SystemHeader {
+	final local result: SystemHeader = SystemHeader(name: headerName);
+	allSystemHeaders[headerName] = result;
+	local defaultFeatures: FunctionFeatures = FunctionFeatures();
+	local pushedDefaultFeatures: {FunctionFeatures...} = none;
+	local tok = self.next();
+	@@Elements inserted at @"%[insert:std]"
+	@@Set to non-@none once a @"%[insert:std]" directive has been reached
+	local result_order_headerStd: {(Function | ExposedFunction | string | UserString | Callable)...} = none;
+	@@Additional elements inserted at the front of @result.order_header
+	local result_order_headerCCompat: {(Function | ExposedFunction | string | UserString | Callable)...} = none;
+	@@Set to @true while inside of a @"#ifndef __CXX_SYSTEM_HEADER"-block
+	local result_order_header_in_CXX_SYSTEM_HEADER: bool = false;
+	@@The C-compatibility mode header name of the generated system header (or @none if not defined)
+	@@NOTE: This header name may only be defined _before_ the @"%[insert:std]" directive is reached
+	local result_ccompatHeaderName: string | UserString = none;
+	@@The name of the guard to-be used for the resulting header
+	local result_headerGuardName: string | UserString = none;
+	/* Standard system header prefix */
+	result.order_header.append(
+		"#include {0[0]}\n"
+		"#include {0[1]}\n"
+		"\n"
+		"#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER\n"
+		"#pragma GCC system_header\n"
+		"#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */\n"
+		"\n"
+		.format({
+			"." in headerName
+				? ('<__stdinc.h>', '<__crt.h>')
+				: ('"__stdinc.h"', '"__crt.h"')
+			}));
+	while (tok) {
+		if (tok == "%") {
+			/* Directive / text-injections */
+			local nextCh = self.text[self.tokEnd];
+			switch (nextCh) {
+
+			case "[":
+				/* %[directive...] */
+				self.next();
+				tok = self.next();
+				switch (tok) {
+
+				case "define_ccompat_header": {
+					if (result_ccompatHeaderName !is none)
+						self.err("Duplicate '%[define_ccompat_header(...)]' directive");
+					if (result_order_headerStd !is none)
+						self.err("Directive '%[define_ccompat_header(...)]' must come before '%[insert:std]'");
+					self.next();
+					self.skip("(");
+					result_ccompatHeaderName = parserCStringOrFunctionLikeExpression(self);
+					self.skip(")");
+				}	break;
+
+				case "define_system_header_guard": {
+					self.next();
+					self.skip("(");
+					result_headerGuardName = parserCStringOrFunctionLikeExpression(self);
+					self.skip(")");
+				}	break;
+
+				case "define_replacement": {
+					self.next();
+					self.skip("(");
+					local replArgs = str parserCStringOrAllUntilRParen(self);
+					if ("=" !in replArgs)
+						self.err("Missing '=' in '%[define_replacement({!r})]'"
+							.format({ replArgs }));
+					local a, none, b = replArgs.partition("=")...;
+					a = a.strip();
+					b = b.strip();
+					if (a in keywordEscapes) {
+						if (keywordEscapes[a] != b)
+							self.err("Replacement re-definition: {!r} defined as {!r} (was: {!r})"
+								.format({ a, b, keywordEscapes[a] }));
+					} else {
+						keywordEscapes[a] = b;
+					}
+					self.skip(")");
+				}	break;
+
+				case "pushdefault":
+				case "push_default":
+					if (pushedDefaultFeatures is none)
+						pushedDefaultFeatures = [];
+					pushedDefaultFeatures.pushback(copy defaultFeatures);
+					break;
+
+				case "popdefault":
+				case "pop_default":
+					if (!pushedDefaultFeatures)
+						self.err("%[popdefault] without %[pushdefault]");
+					defaultFeatures = pushedDefaultFeatures.popback();
+					break;
+
+				case "default_impl_section":
+					self.tok = "section"; /* Deprecated alias for "%[default:section(...)]" */
+					defaultFeatures.tryParseAttribute(self, none);
+					break;
+
+				case "default":
+					/* %[default:...] Set default function annotations */
+					self.next();
+					self.skip(":");
+again_parse_default_annotation:
+					if (!defaultFeatures.tryParseAttribute(self, none)) {
+						self.err(
+							"Unknown function annotation {!r}, or "
+							"annotation cannot be assigned a default value"
+							.format({ self.tok }));
+					}
+					if (self.tok == ",") {
+						self.next();
+						if (self.tok != "]")
+							goto again_parse_default_annotation;
+					}
+					break;
+
+				case "insert":
+					self.next();
+					tok = self.skip(":");
+					switch (tok) {
+
+					case "std":
+						/* %[insert:std] */
+						if (result_order_headerStd !is none)
+							self.err("Multiple '%[insert:std]' directives");
+						else {
+							assert result_order_headerStd is none;
+							assert result_order_headerCCompat is none;
+							assert result_order_header_in_CXX_SYSTEM_HEADER === false;
+							result_order_headerStd = [];
+							if (result_ccompatHeaderName !is none)
+								result_order_headerCCompat = [];
+							/* Inject a printer callback for generating std:: declarations */
+							result.order_header.append([](fp: CWriter, escapeMode: int) {
+								local oldNs = fp.namespace;
+								fp.namespace = NAMESPACES["std"];
+								for (local part: result_order_headerStd) {
+									if (part is Function || part is ExposedFunction) {
+										part.cprintHeaderDeclaration(fp, escapeMode);
+									} else if (part is Callable) {
+										part(fp, escapeMode);
+									} else {
+										fp << part;
+									}
+								}
+								fp.namespace = oldNs;
+							});
+						}
+						self.next();
+						break;
+
+					default:
+						self.err("Unknown operand for insert-directive: {!r}"
+							.format({ tok }));
+					}
+					break;
+
+				default:
+					if (customDirectivesParser !is none) {
+						customDirectivesParser(self);
+					} else {
+						self.err("Unknown directive: {!r}"
+							.format({ tok }));
+					}
+					break;
+				}
+				self.skip("]");
+				break;
+
+			case "(": {
+				/* %(std, c, ...){ ... } */
+				local tagList: {string...} = HashSet();
+				final local KNOWN_STRING_TAGS: {string...} = {
+					"c",            /* C-part in <string.h> */
+					"std",          /* std:: -part in <string.h> */
+					"ccompat",      /* c-compat-part in <string.h> */
+					"libc_fast",    /* <libc/string.h> */
+					"libc_core",    /* <libc/core/string.h> */
+					"auto_header",  /* /kos/src/libc/auto/string.h */
+					"auto_source",  /* /kos/src/libc/auto/string.c */
+					"user",         /* /kos/src/libc/user/string.h */
+				};
+				self.next();
+				tok = self.next();
+				while (tok !in ["", ")"]) {
+					if (isCString(tok))
+						tok = tok.decode("c-escape");
+					else if (!tok.issymbol()) {
+						self.err("Expected keyword or string in embedded string tag list, but got {!r}"
+							.format({ tok }));
+					}
+					if (tok !in KNOWN_STRING_TAGS) {
+						self.err("Unknown tag for embedded strings: {!r}"
+							.format({ tok }));
+					}
+					tagList.insert(tok);
+					tok = self.next();
+					if (tok != ",")
+						break;
+					tok = self.next();
+				}
+				if (tok != ")") {
+					self.err("Unexpected token (expected {!r}, but got {!r})"
+						.format({ ")", tok }));
+				}
+				local textStart = self.tokEnd;
+				local textEnd = textStart;
+				if (textStart + 1 < self.end) {
+					if (self.text[textStart] == "{") {
+						/* Block-string: %(tags...){ TEXT } */
+						textStart = textStart + 1;
+						self.next();
+						tok = self.next();
+						while (tok !in ["", "}"]) {
+							if (tok in "({[")
+								self.skipPair();
+							tok = self.next();
+						}
+						textEnd = self.tokStart;
+						if (self.text.islf(textStart))
+							++textStart;
+						self.skip("}");
+					} else {
+						/* Single-line: %(tags...)TEXT  */
+						textEnd = self.text.find("\n", textStart, self.end);
+						if (textEnd < 0)
+							textEnd = self.end;
+						else {
+							++textEnd;
+						}
+						self.tokEnd = textEnd;
+						self.next();
+					}
+				} else {
+					self.next();
+				}
+				local text = self.getUserString(textStart, textEnd);
+				/* Insert strings where appropriate */
+				if ("c" in tagList) {
+					if (result_order_header_in_CXX_SYSTEM_HEADER) {
+						result.order_header.append(CXX_SYSTEM_HEADER_END);
+						result_order_header_in_CXX_SYSTEM_HEADER = false;
+					}
+					result.order_header.append(text);
+				}
+				if ("std" in tagList) {
+					if (result_order_headerStd is none) {
+						self.errAt(textStart,
+							"Text cannot be inserted into 'std' "
+							"before '%[insert:std]' has been encountered");
+					}
+					result_order_headerStd.append(text);
+				}
+				if ("ccompat" in tagList) {
+					if (result_order_headerStd is none || result_order_headerCCompat is none) {
+						self.errAt(textStart,
+							"Text cannot be inserted into 'ccompat' before both "
+							"'%[insert:std]' and '%[define_ccompat_header()]' "
+							"have been encountered");
+					}
+					result_order_headerCCompat.append(text);
+				}
+				if ("libc_fast" in tagList)
+					result.order_libcHeader.append(text);
+				if ("libc_core" in tagList)
+					result.order_libcCoreHeader.append(text);
+				if ("auto_header" in tagList)
+					result.order_libcAutoHeader.append(text);
+				if ("auto_source" in tagList)
+					result.order_libcAutoSource.append(text);
+				if ("user" in tagList)
+					result.order_libcUserHeader.append(text);
+			}	break;
+
+			case "{": {
+				/* %{ ... }  (Same as %(c){ ... }) */
+				self.next();
+				local textStart = self.tokEnd;
+				tok = self.next();
+				while (tok !in ["", "}"]) {
+					if (tok in "({[")
+						self.skipPair();
+					tok = self.next();
+				}
+				if (result_order_header_in_CXX_SYSTEM_HEADER) {
+					result.order_header.append(CXX_SYSTEM_HEADER_END);
+					result_order_header_in_CXX_SYSTEM_HEADER = false;
+				}
+				if (self.text.islf(textStart))
+					++textStart;
+				result.order_header.append(
+					self.getUserString(textStart, self.tokStart));
+				self.skip("}");
+			}	break;
+
+			default: {
+				/* Anything else following a %-character is a single-line,
+				 * default target embedded string destined for <string.h> */
+				local textStart = self.tokEnd;
+				local textEnd = self.text.find("\n", textStart, self.end);
+				if (textEnd < 0)
+					textEnd = self.end;
+				else {
+					++textEnd;
+				}
+				if (result_order_header_in_CXX_SYSTEM_HEADER) {
+					result.order_header.append(CXX_SYSTEM_HEADER_END);
+					result_order_header_in_CXX_SYSTEM_HEADER = false;
+				}
+				result.order_header.append(
+					self.getUserString(textStart, textEnd));
+				self.tokEnd = textEnd;
+				self.next();
+			}	break;
+			}
+			tok = self.tok;
+			continue;
+		}
+		if (tok == ";") {
+			tok = self.next();
+			continue;
+		}
+		local currentFeatures = copy defaultFeatures;
+		local current = Function(originalSystemHeaderName: headerName);
+		local currentLibraryFunction = LibraryFunction(originalSystemHeaderName: headerName);
+		local currentDosLibraryFunction: LibraryFunction = none;
+		local currentPrototype = FunctionPrototype(cc: "LIBCCALL");
+		local currentPrototypes = { ("1", { currentPrototype }) };
+		/* # of leading entires in @current.bindings that should appear before the self-binding */
+		local numPreferredBindings = 0;
+		@@Additional function bindings that will be
+		local lateFunctionBindings: {FunctionBinding...} = ();
+		local defaultAttributes: {UserString...} = none;
+		local functionArgumentNamesOverride: {(string | UserString)...} = none;
+continue_current:
+		if (tok == "[") {
+			local scopeConditions = [];
+			local currentConditions = none;
+again_parse_annotations:
+			tok = self.next();
+			while (tok != "]") {
+				switch (tok) {
+
+				case "if": {
+					/* Conditional annotations */
+					self.next();
+					self.skip("(");
+					local ppAddend = parserCStringOrAllUntilRParen(self);
+					self.skip(")");
+					if (currentConditions is none)
+						currentConditions = ppAddend;
+					else {
+						currentConditions = "({}) && ({})"
+							.format({ currentConditions, ppAddend });
+					}
+				}	break;
+
+				case "[":
+					scopeConditions.pushback(currentConditions);
+					goto again_parse_annotations;
+
+				case "nullable":
+				case "null":
+					if (currentConditions !is none)
+						goto illegal_annotation_with_condition;
+					self.next();
+					break;
+
+				case "nonnull":
+					if (currentConditions !is none)
+						goto illegal_annotation_with_condition;
+					if (defaultAttributes is none)
+						defaultAttributes = List();
+					defaultAttributes.append("ATTR_RETNONNULL");
+					self.next();
+					break;
+
+				case "argument_names":
+					if (currentConditions !is none)
+						goto illegal_annotation_with_condition;
+					self.next();
+					self.skip("(");
+					functionArgumentNamesOverride = List(
+						parserCStringOrFunctionLikeExpressionList(self));
+					self.skip(")");
+					break;
+
+				case "cc":
+					if (currentConditions !is none)
+						goto illegal_annotation_with_condition;
+					self.next();
+					self.skip("(");
+					currentPrototype.cc = parserCStringOrAllUntilRParen(self);
+					self.skip(")");
+					break;
+
+				case "vartypes":
+					if (currentConditions !is none)
+						goto illegal_annotation_with_condition;
+					self.next();
+					self.skip("(");
+					currentPrototype.ellipsisArgumentTypes = [];
+					while (self.tok != ")") {
+						local typ, none = parseCTypeAndName(self)...;
+						currentPrototype.ellipsisArgumentTypes.append(typ);
+						if (self.tok == ")")
+							break;
+						self.skip(",");
+					}
+					self.next();
+					break;
+
+				case "attribute":
+				case "attributes":
+					if (currentConditions !is none)
+						goto illegal_annotation_with_condition;
+					if (defaultAttributes is none)
+						defaultAttributes = [];
+					self.next();
+					self.skip("(");
+					defaultAttributes.append(
+						parserCStringOrAllUntilRParen(self));
+					self.skip(")");
+					break;
+
+				/* TODO: intern_alias */
+				/* TODO: alt_variant_of */
+				/* TODO: export_alias */
+
+				case "export_as":
+				case "alternate_name":  /* Deprecated alias */
+				case "alternate_names": /* Deprecated alias */
+					self.next();
+					tok = self.skip("(");
+					while (tok !in ["", ")"]) {
+						if (isCString(tok))
+							tok = tok.decode("c-escape");
+						else if (!tok.issymbol()) {
+							self.err("Expected string or keyword for [export_as(...)], but got {!r}"
+								.format({ tok }));
+						}
+						currentLibraryFunction.exportSymbolNames
+							.append((currentConditions, tok));
+						tok = self.next();
+						if (tok != ",")
+							break;
+						tok = self.next();
+					}
+					self.skip(")");
+					break;
+
+				case "alias":
+				case "raw_alias":
+				case "preferred_alias":
+				case "preferred_raw_alias": {
+					self.next();
+					self.skip("(");
+					local assemblyName = parserCStringOrFunctionLikeExpression(self);
+					self.skip(")");
+					local ppCond = currentConditions;
+					if (tok in ["alias", "preferred_alias"])
+						ppCond = constructAliasConditions(ppCond, assemblyName);
+					local binding = FunctionBinding(
+						ppCond:     ppCond,
+						prototypes: currentPrototypes,
+						binding:    assemblyName);
+					if (tok in ["preferred_alias", "preferred_raw_alias"]) {
+						current.bindings.insert(numPreferredBindings, binding);
+						++numPreferredBindings;
+					} else {
+						current.bindings.append(binding);
+					}
+				}	break;
+
+				case "bind_local_function":
+				case "preferred_bind_local_function": {
+					self.next();
+					self.skip("(");
+					local functionName = parserCStringOrFunctionLikeExpression(self);
+					self.skip(")");
+					local binding = FunctionBinding(
+						ppCond:     currentConditions is none ? "1" : currentConditions,
+						prototypes: currentPrototypes,
+						binding:    [] -> findLocalFunctionByName(functionName));
+					if (tok in ["preferred_bind_local_function"]) {
+						current.bindings.insert(numPreferredBindings, binding);
+						++numPreferredBindings;
+					} else {
+						current.bindings.append(binding);
+					}
+				}	break;
+
+				case "inline":
+				case "preferred_inline": {
+					if (self.next() == "(") {
+						/* With arguments: Define an inline function implementation */
+						self.next();
+						local impl = parserCStringOrAllUntilRParen(self);
+						if (currentFeatures.inlineTruncate)
+							impl = truncateInlineFunctionImplementation(str(impl));
+						self.skip(")");
+						local binding = FunctionBinding(
+							ppCond:     currentConditions is none ? "1" : currentConditions,
+							prototypes: currentPrototypes,
+							binding:    InlineFunction(implementation: impl));
+						if (tok in ["preferred_inline"]) {
+							current.bindings.insert(numPreferredBindings, binding);
+							++numPreferredBindings;
+						} else {
+							current.bindings.append(binding);
+						}
+					} else {
+						if (tok == "preferred_inline")
+							self.skip("(");
+						if (currentConditions !is none)
+							goto illegal_annotation_with_condition;
+						currentFeatures.inline = "LOCAL";
+					}
+				}	break;
+
+				default:
+					if (isCString(tok)) {
+						if (currentConditions !is none)
+							goto illegal_annotation_with_condition;
+						if (defaultAttributes is none)
+							defaultAttributes = [];
+						defaultAttributes.append(tok.decode("c-escape"));
+						self.next();
+					} else if (!currentFeatures.tryParseAttribute(self, currentConditions)) {
+						if (tok.startswith("ATTR_")) {
+							/* Attribute annotation. */
+							if (currentConditions !is none)
+								goto illegal_annotation_with_condition;
+							if (defaultAttributes is none)
+								defaultAttributes = [];
+							defaultAttributes.append(parserCStringOrAllUntilRParen(self));
+						} else {
+							self.err("Unknown function annotation {!r}"
+								.format({ tok }));
+						}
+					}
+					break;
+illegal_annotation_with_condition:
+					self.err("Annotation [{}] cannot be used [if(...)]"
+						.format({ tok }));
+					break;
+				}
+				tok = self.tok;
+				if (tok != ",")
+					break;
+				tok = self.next();
+			}
+again_skip_annotation_rbracket:
+			tok = self.skip("]");
+			if (scopeConditions) {
+				currentConditions = scopeConditions.popback();
+				if (tok != ",")
+					goto again_skip_annotation_rbracket;
+				goto again_parse_annotations;
+			}
+			goto continue_current;
+		}
+		if (tok == "@") {
+			/* TODO: Documentation string */
+			goto continue_current;
+		}
+		/* Either the function's return type, or its name */
+		if (!tok.issymbol()) {
+			self.err("Unexpected top-level token {!r}"
+				.format({ tok }));
+		}
+		local currentNameTokStart;
+		{
+			local returnTypeStart = self.tokStart;
+			local returnTypeEnd = returnTypeStart;
+			local lastKeyword;
+			for (;;) {
+				local kwdEnd = self.tokEnd;
+				currentNameTokStart = self.tokStart;
+				lastKeyword = tok;
+				tok = self.next();
+				if (!tok.issymbol() || !tok) {
+					if (tok in "*&")
+						continue;
+					if (tok in "[{") {
+						self.skipPair(tok);
+						continue;
+					}
+					break;
+				}
+				returnTypeEnd = kwdEnd;
+			}
+			/* lastKeyword is the function's name, and the string between
+			 * returnTypeStart...returnTypeEnd is the (preliminary) return type. */
+			current.name = lastKeyword;
+			if (tok == ":")
+				tok = self.next();
+			if (tok != "(")
+				self.err("Expected '(' after function name {!r}, but got {!r}"
+					.format({ lastKeyword, tok }));
+			if (returnTypeEnd > returnTypeStart) {
+				currentPrototype.returnType = CType(
+					self.getUserString(returnTypeStart, returnTypeEnd));
+			}
+		}
+
+		/* Bind the function against its own symbol */
+		if (!currentFeatures.crt_noSelfImport) {
+			local usedCrtName = currentFeatures.crt_name;
+			if (usedCrtName is none)
+				usedCrtName = current.name;
+			current.bindings.insert(
+				numPreferredBindings, FunctionBinding(
+					ppCond:     keyCrtHave(usedCrtName),
+					prototypes: currentPrototypes,
+					binding:    usedCrtName));
+		}
+
+		/* If the function isn't being exported from libc, then make sure
+		 * that certain attributes that would affect its export behavior
+		 * havn't been set. */
+		if (currentFeatures.crt_noImpl) {
+			if (currentFeatures.crt_kosSection != defaultFeatures.crt_kosSection ||
+			    currentFeatures.crt_dosSection != defaultFeatures.crt_dosSection) {
+				self.errAt(currentNameTokStart,
+					"[section({!r})] used with [nocrt] or [crt_noImpl]"
+					.format({ currentFeatures.crt_kosSection }));
+			}
+			if (currentLibraryFunction.exportSymbolNames) {
+				self.errAt(currentNameTokStart,
+					"[export_as(...)] used with [nocrt] or [crt_noImpl]");
+			}
+		}
+
+		if (currentFeatures.wchar) {
+			if (!currentFeatures.wchar_noAlias) {
+				/* For every assembly-binding, create 2 additional bindings:
+				 * >> [[if(COND), alias(NAME)]]
+				 * Extend by:
+				 * >> [[if(COND && __SIZEOF_WCHAR_T__ == 2), alias(DOS$NAME)]]
+				 * >> [[if(COND && __SIZEOF_WCHAR_T__ == 4), alias(KOS$NAME)]] */
+				for (local i = 0; i < #current.bindings;) {
+					local bind = current.bindings[i];
+					local symbolName = bind.binding;
+					if (symbolName !is string &&
+						symbolName !is UserString) {
+						++i;
+						continue;
+					}
+					/* Don't alias 
+					 * XXX: This is imprecise, but will work for now!
+					 *      In a perfect world, we would have to check if:
+					 * >> oldCond = optimize(bind.ppCond);
+					 * >> newCond16 = optimize("(" + bind.ppCond + ")&&(__SIZEOF_WCHAR_T__==2)");
+					 * >> newCond32 = optimize("(" + bind.ppCond + ")&&(__SIZEOF_WCHAR_T__==4)");
+					 * >> shouldEmit16 = newCond16 != "0" && newCond16 != oldCond;
+					 * >> shouldEmit32 = newCond32 != "0" && newCond32 != oldCond;
+					 * Such that we don't emit the alias if:
+					 *   - The resulting condition becomes impossible
+					 *     -> e.g.: "__SIZEOF_WCHAR_T__ == 4 && __SIZEOF_WCHAR_T__ == 2"
+					 *              optimized to:
+					 *              "0"
+					 *   - The resulting condition doesn't differ from the old condition
+					 *     -> e.g.: "__SIZEOF_WCHAR_T__ == 2 && __SIZEOF_WCHAR_T__ == 2"
+					 *              optimized to:
+					 *              "__SIZEOF_WCHAR_T__ == 2"
+					 *              With wouldn't differ from @oldCond
+					 *
+					 * However, since this would require _a_ _very_ _smart_ optimizer to do
+					 * the job for us, this isn't actually feasable, so we simply skip doing
+					 * the binding if the old condition already references "__SIZEOF_WCHAR_T__"
+					 */
+					if (bind.ppCond && "__SIZEOF_WCHAR_T__" in str(bind.ppCond)) {
+						++i;
+						continue;
+					}
+					symbolName = str symbolName;
+					local dosSymbolName = symbolName;
+					if (currentFeatures.crt_dosname !is none) {
+						local mySymbolName = currentFeatures.crt_name;
+						if (mySymbolName is none)
+							mySymbolName = current.name;
+						if (dosSymbolName == mySymbolName)
+							dosSymbolName = currentFeatures.crt_dosname;
+					}
+					dosSymbolName = "DOS$" + dosSymbolName;
+					local kosSymbolName = "KOS$" + symbolName;
+					local cDosPrototypes = Cell();
+					local cKosPrototypes = Cell();
+					local bindProtos = bind.prototypes;
+					function getDosPrototypes() {
+						if (!cDosPrototypes) {
+							local result = replaceWcharPrototypes(
+								bindProtos, WCHAR_REPLACEMENT_CHAR16);
+							cDosPrototypes.value = result;
+							return result;
+						}
+						return cDosPrototypes.value;
+					}
+					function getKosPrototypes() {
+						if (!cKosPrototypes) {
+							local result = replaceWcharPrototypes(
+								bindProtos, WCHAR_REPLACEMENT_CHAR32);
+							cKosPrototypes.value = result;
+							return result;
+						}
+						return cKosPrototypes.value;
+					}
+					
+					local dosBinding = FunctionBinding(
+						ppCond: "({}) && __SIZEOF_WCHAR_T__ == 2".format({
+							replaceCrtHaveFromPreprocessorCondition(
+								bind.ppCond, symbolName, dosSymbolName)
+						}),
+						ppCondIncludes: bind.ppCondIncludes,
+						ppCondPrefix:   bind.ppCondPrefix,
+						prototypes:     getDosPrototypes,
+						binding:        dosSymbolName);
+					local kosBinding = FunctionBinding(
+						ppCond: "({}) && __SIZEOF_WCHAR_T__ == 4".format({
+							replaceCrtHaveFromPreprocessorCondition(
+								bind.ppCond, symbolName, kosSymbolName)
+						}),
+						ppCondIncludes: bind.ppCondIncludes,
+						ppCondPrefix:   bind.ppCondPrefix,
+						prototypes:     getKosPrototypes,
+						binding:        kosSymbolName);
+					current.bindings.insert(i + 1, kosBinding);
+					current.bindings.insert(i + 2, dosBinding);
+					i += 3;
+				}
+			}
+		} else { /* currentFeatures.wchar */
+			if (currentFeatures.crt_dosname !== defaultFeatures.crt_dosname) {
+				self.err("Function {!r} has a [dosname()] annotation, but no [wchar]"
+					.format({ current.name }));
+			}
+		} /* !currentFeatures.wchar */
+
+		/* Check for special case: @"dstFunction(*) = srcFunction;"
+		 * This case is handled by:
+		 * >> currentPrototypes = none;
+		 * >> goto handle_eq_after_prototype; */
+		if (currentPrototype.returnType !is bound) {
+			local temp = self.tokStart;
+			if (self.next() == "*") {
+				self.next();
+				tok = self.skip(")");
+				currentPrototype  = none;
+				currentPrototypes = none;
+				if (tok == "=")
+					goto handle_eq_after_prototype;
+				if (tok == "%")
+					goto handle_percent_after_prototype;
+				self.err("Expected '=' or '%' after '{}(*)', but got {!r}"
+					.format({ current.name, tok }));
+			}
+			self.tokEnd = temp;
+			tok = self.next();
+			assert tok == "(";
+		}
+
+		/* Right now, `tok == "("', pointing at the '('-character
+		 * before the argument list. So parse that argument list */
+		parseArgumentListAndOptionalTrailingReturnType(
+			self, currentPrototype, defaultAttributes);
+		tok = self.tok;
+		/* Default to having a void returnType */
+		if (currentPrototype.returnType !is bound)
+			currentPrototype.returnType = CType("void");
+		if (tok == "[") {
+			/* TODO: C++ overloads */
+			local newCurrentPrototypes = { ("1", { currentPrototype }) };
+
+			/* When updating `currentPrototypes', must also update
+			 * all `current.bindings' that were already using those
+			 * the current set of prototypes  */
+			for (local binding: current.bindings) {
+				if (binding.prototypes === currentPrototypes)
+					binding.prototypes = newCurrentPrototypes;
+			}
+			currentPrototypes = newCurrentPrototypes;
+		}
+
+		/* Right now, @tok points at the first token after the prototype
+		 * This is going to be one of:
+		 *   "{"  - function implementation
+		 *   "%"  - automatic implementation generator
+		 *   "="  - Aliasing definition
+		 *   ";"  - No implementation
+		 */
+		switch (tok) {
+			local primaryImplementation: UserString;
+
+		case "%": {
+handle_percent_after_prototype:
+			tok = self.next();
+			primaryImplementation = none;
+			/* Auto-generated implementation in `primaryImplementation',
+			 * and possibly `currentPrototypes' */
+			switch (tok) {
+
+			case "{":
+				tok = self.next();
+				switch (tok) {
+
+				case "uchar": {
+					local has16 = "16" in current.name;
+					local has32 = "32" in current.name;
+					if (has16 && !has32)
+						tok = "uchar16";
+					else if (has32 && !has16)
+						tok = "uchar32";
+					else {
+						self.err("Unable to determine uchar behavior from function name {!r}"
+							.format({ current.name }));
+					}
+				}	/* FALLTHRU */
+				case "uchar16":
+				case "uchar32": {
+					local ucharFunctionName = current.name;
+					local mode = tok;
+					if (currentFeatures.wchar) {
+						self.err("uchar function {!r} cannot have the [wchar] annotation"
+							.format({ ucharFunctionName }));
+					}
+					local wcsFunctionName = none;
+					tok = self.next();
+					if (tok == "(") {
+						tok = self.next();
+						if (tok == "*") {
+							self.next();
+						} else if (tok == "%") {
+							self.next();
+							self.skip("auto");
+						} else {
+							if (isCString(tok)) {
+								wcsFunctionName = tok.decode("c-escape");
+							} else if (tok.issymbol()) {
+								wcsFunctionName = self.userTok;
+							} else {
+								self.err("Expected string or keyword in '%{uchar(...)}', but got {!r}"
+									.format({ tok }));
+							}
+							self.next();
+						}
+						self.skip(")");
+					}
+					if (wcsFunctionName is none) {
+						wcsFunctionName = ucharFunctionName;
+						if (wcsFunctionName.startswith("c16") || wcsFunctionName.startswith("c32"))
+							wcsFunctionName = "wcs" + wcsFunctionName[3:];
+						else {
+							self.errAt(currentNameTokStart,
+								"Unable to determine uchar base name for {!r} (consider using '%{uchar(base)}')"
+								.format({ wcsFunctionName }));
+						}
+					}
+					if (#current.bindings > 1)
+						self.errAt(currentNameTokStart, "%{uchar} functions {!r} has custom bindings"
+							.format({ ucharFunctionName }));
+					mode = { "uchar16" : WCHAR_REPLACEMENT_CHAR16,
+					         "uchar32" : WCHAR_REPLACEMENT_CHAR32 }[mode];
+					local feat_inline         = currentFeatures.inline;
+					local feat_noExternInline = currentFeatures.noExternInline;
+					local feat_noLocal        = currentFeatures.noExternInline;
+					local xcLocalFunction: LocalFunction = none;
+					if (feat_inline is none && !feat_noLocal) {
+						xcLocalFunction = LocalFunction(
+							name:                     ucharFunctionName,
+							originalSystemHeaderName: headerName);
+						defineFunctionInMapping(allLocalFunctionsByName, xcLocalFunction);
+						if (!defineFunctionInMappingNoDuplicates(result.localFunctionsByName, xcLocalFunction))
+							self.errAt(currentNameTokStart, "Duplicate local function: {!r}"
+								.format({ xcLocalFunction.name }));
+					}
+					/* Lazily construct function bindings upon first access */
+					current.bindings = [](): {FunctionBinding...} {
+						@@The wchar function descriptor
+						local wcharFunction: WcharFunction =
+							getWcharFunctionByNameWithParserAndErrorAt(
+								wcsFunctionName, self, currentNameTokStart);
+						/* Remember the used uchar16/uchar32 system header names
+						 * This is important for dynamic implementation transformations. */
+						if (wcharFunction.wc_header_uchar[mode] !is none) {
+							self.errAt(currentNameTokStart,
+								"Duplicate declaration of %{{uchar{}}} variant of [wchar] function {!r}"
+								.format({ WCHAR_REPLACEMENT_WIDTH[mode], wcsFunctionName }));
+						}
+						wcharFunction.wc_header_uchar[mode] = current;
+						@@The referenced [wchar]-Function
+						local wc: Function = wcharFunction.wc_func;
+						@@The Xchar-function implementation
+						local xc: XcharImplementation = wcharFunction.getXCharImplementation(ucharFunctionName, mode);
+						/* Figure out which prototypes should be used */
+						local usedPrototype: FunctionPrototype = currentPrototype;
+						local usedPrototypes: {(string, {FunctionPrototype...})...} = currentPrototypes;
+						if (usedPrototype is none)
+							usedPrototype = xc.prototype;
+						if (usedPrototypes is none)
+							usedPrototypes = xc.prototypes;
+						/* Enumerate bindings of the underlying [wchar] Function to construct
+						 * new, transformed bindings for our new the Xchar function. */
+						local basicBindings = [];
+						for (local wc_bind/*:FunctionBinding*/ : wc.functionBindings) {
+							local wc_bind_binding = wc_bind.binding;
+							if (wc_bind_binding is Callable)
+								wc_bind_binding = wc_bind.binding = wc_bind_binding();
+							/* Ignore namespace bindings (though we could theoretically bind these as well...) */
+							if (wc_bind_binding is Namespace)
+								continue;
+							/* At this point, @wc_bind_binding is one of:
+							 *  - LocalFunction       : Local function implementation
+							 *  - InlineFunction      : Inline implementation
+							 *  - string | UserString : Link against some assembly symbol
+							 *
+							 * The preprocessor conditions required by @wc_bind must
+							 * be transformed as follows:
+							 *
+							 * >> local myCond;
+							 * >> local assme = wc_bind.ppCond REQUIRES THAT "__SIZEOF_WCHAR_T__ == SIZEOF(mode))";
+							 * >> local assot = wc_bind.ppCond REQUIRES THAT "__SIZEOF_WCHAR_T__ != SIZEOF(mode))";
+							 * >> if (assme) {
+							 * >>     myCond = wc_bind.ppCond WITHOUT "__SIZEOF_WCHAR_T__ == SIZEOF(mode))";
+							 * >> } else if (assot) {
+							 * >>     continue; // Ignore this binding
+							 * >> } else {
+							 * >>     myCond = "(" + wc_bind.ppCond + ") && __SIZEOF_WCHAR_T__ == SIZEOF(mode))";
+							 * >> }
+							 * >> basicBindings.append(FunctionBinding(myCond, TRANSFORM(wc_bind_binding), ...));
+							 */
+						}
+						/* Last cast: Directly implement the Xchar function */
+						if (xc.impl is none) {
+							yield basicBindings...;
+						} else {
+							local implBinding = FunctionBinding(
+								ppCond:         xc.ppCond,
+								ppCondIncludes: xc.ppCondIncludes,
+								ppCondPrefix:   xc.ppCondPrefix,
+								prototypes:     usedPrototypes);
+							if (feat_inline !is none) {
+								if (!feat_noExternInline) {
+									/* Create extern-inline bindings */
+									for (local i = 0; i < #basicBindings;) {
+										local existingBinding = basicBindings[i];
+										if (existingBinding.binding !is string &&
+										    existingBinding.binding !is UserString) {
+											++i;
+											continue;
+										}
+										/* Construct, and inject a new binding that  */
+										local eiBinding = FunctionBinding(
+											ppCondIncludes: (existingBinding.ppCondIncludes as Set) | xc.ppCondIncludes,
+											ppCondPrefix:   existingBinding.ppCondPrefix + xc.ppCondPrefix,
+											prototypes:     existingBinding.prototypes,
+											binding:        InlineFunction(
+												mode:                   "__EXTERNINLINE",
+												externInlineAsmname:    existingBinding.binding,
+												implementation:         xc.impl,
+												implementationName:     xc.name,
+												implementationIncludes: xc.implIncludes,
+												implementationPrefix:   xc.implPrefix,
+												dependencies:           xc.dependencies));
+										if (xc.ppCond == "1") {
+											eiBinding.ppCond = existingBinding.ppCond;
+											basicBindings[i] = eiBinding;
+											++i;
+										} else {
+											eiBinding.ppCond = "{} && ({})".format({
+												existingBinding.ppCond,
+												xc.ppCond
+											});
+											basicBindings.insert(i, eiBinding);
+											i += 2;
+										}
+									}
+								}
+								implBinding.binding = InlineFunction(
+									mode:                   feat_inline,
+									implementation:         xc.impl,
+									implementationName:     xc.name,
+									implementationIncludes: xc.implIncludes,
+									implementationPrefix:   xc.implPrefix,
+									dependencies:           xc.dependencies);
+							} else if (!feat_noLocal) {
+								assert xcLocalFunction !is none;
+								xcLocalFunction.prototype = usedPrototype;
+								xcLocalFunction.implementations = {
+									LocalFunctionImplementation(
+										implementation:         xc.impl,
+										ppCond:                 xc.ppCond,
+										ppCondIncludes:         xc.ppCondIncludes,
+										ppCondPrefix:           xc.ppCondPrefix,
+										implementationIncludes: xc.implIncludes,
+										implementationPrefix:   xc.implPrefix,
+										dependencies:           xc.dependencies)
+								};
+								xcLocalFunction.documentation = wc.documentation;
+								implBinding.binding = xcLocalFunction;
+							}
+							yield basicBindings...;
+							yield implBinding;
+						}
+					};
+					self.skip("}");
+					goto done_function;
+				}	break;
+
+				default:
+					self.err("Unknown code generator function: {!r}"
+						.format({ tok }));
+				}
+				self.skip("}");
+				break;
+
+			default:
+				self.err("Unexpected token {!r} after '%', following function declaration"
+					.format({ tok }));
+				break;
+			}
+			if (primaryImplementation is none)
+				self.err("Unable to generate automatic implementation");
+			if (currentPrototype is none)
+				self.err("Prototype cannot be deduced in this context");
+			if (currentPrototypes is none)
+				currentPrototypes = { ("1", { currentPrototype }) };
+			goto with_primaryImplementation;
+		}
+
+		case ";": {
+			self.next();
+			primaryImplementation = none;
+			goto with_primaryImplementation;
+		}	break;
+
+		case "{": {
+			{
+				local primaryImplementationStart = self.tokStart;
+				self.skipPair();
+				primaryImplementation = self.getUserString(
+					primaryImplementationStart, self.tokEnd);
+				self.next();
+			}
+with_primaryImplementation:
+			local implementationDependencies = none;
+			if (primaryImplementation is none) {
+				currentFeatures.assertAllDefaultAttributesWithoutImplementation(
+					self, defaultFeatures);
+			} else if (currentFeatures.inline !is none || !currentFeatures.noLocal) {
+				local implBinding = FunctionBinding(
+					ppCond:         currentFeatures.requires,
+					ppCondIncludes: currentFeatures.requiresIncludes,
+					ppCondPrefix:   currentFeatures.requiresPrefix,
+					prototypes:     currentPrototypes);
+				implementationDependencies =
+					scanForNamesOfDependentFunctions(
+						primaryImplementation,
+						currentPrototype,
+						currentFeatures);
+				if (currentFeatures.inline !is none) {
+					/* Bind the primary implementations as inline */
+					local inlineImplementation = primaryImplementation;
+					if (currentFeatures.inlineTruncate) {
+						if (primaryImplementation is UserString || primaryImplementation is string) {
+							inlineImplementation = truncateInlineFunctionImplementation(str(primaryImplementation));
+						} else /* if (primaryImplementation is Callable) */ {
+							inlineImplementation = [] ->
+								truncateInlineFunctionImplementation(primaryImplementation());
+						}
+					}
+					if (!currentFeatures.noExternInline) {
+						/* Create secondary inline-bindings for all __EXTERNINLINE */
+						for (local i = 0; i < #current.bindings;) {
+							local existingBinding = current.bindings[i];
+							if (existingBinding.binding !is string &&
+							    existingBinding.binding !is UserString) {
+								++i;
+								continue;
+							}
+							/* Construct, and inject a new binding that  */
+							local eiBinding = FunctionBinding(
+								ppCondIncludes: (existingBinding.ppCondIncludes as Set) | currentFeatures.requiresIncludes,
+								ppCondPrefix:   existingBinding.ppCondPrefix + currentFeatures.requiresPrefix,
+								prototypes:     existingBinding.prototypes,
+								binding:        InlineFunction(
+									mode:                   "__EXTERNINLINE",
+									externInlineAsmname:    existingBinding.binding,
+									implementation:         inlineImplementation,
+									implementationName:     current.name,
+									implementationIncludes: currentFeatures.implIncludes,
+									implementationPrefix:   currentFeatures.implPrefix,
+									dependencies:           implementationDependencies));
+							if (currentFeatures.requires == "1") {
+								eiBinding.ppCond = existingBinding.ppCond;
+								current.bindings[i] = eiBinding;
+								++i;
+							} else {
+								eiBinding.ppCond = "{} && ({})".format({
+									existingBinding.ppCond,
+									currentFeatures.requires
+								});
+								current.bindings.insert(i, eiBinding);
+								i += 2;
+							}
+						}
+					}
+					implBinding.binding = InlineFunction(
+						mode:                   currentFeatures.inline,
+						implementation:         inlineImplementation,
+						implementationName:     current.name,
+						implementationIncludes: currentFeatures.implIncludes,
+						implementationPrefix:   currentFeatures.implPrefix,
+						dependencies:           implementationDependencies);
+				} else {
+					/* Construct a local function object */
+					local localFunc = LocalFunction(
+						name:                     current.name,
+						originalSystemHeaderName: headerName,
+						prototype:                currentPrototype,
+						implementations: {
+							LocalFunctionImplementation(
+								implementation:         primaryImplementation,
+								ppCond:                 currentFeatures.requires,
+								ppCondIncludes:         currentFeatures.requiresIncludes,
+								ppCondPrefix:           currentFeatures.requiresPrefix,
+								implementationIncludes: currentFeatures.implIncludes,
+								implementationPrefix:   currentFeatures.implPrefix,
+								dependencies:           implementationDependencies)
+						},
+						documentation: current.documentation);
+					defineFunctionInMapping(allLocalFunctionsByName, localFunc);
+					if (!defineFunctionInMappingNoDuplicates(result.localFunctionsByName, localFunc))
+						self.errAt(currentNameTokStart, "Duplicate local function: {!r}"
+							.format({ localFunc.name }));
+					implBinding.binding = localFunc;
+				}
+				current.bindings.append(implBinding);
+			}
+			local wcsCurrent;
+			if (currentFeatures.wchar) {
+				if (implementationDependencies is none) {
+					if (primaryImplementation is none)
+						implementationDependencies = none;
+					else {
+						/* Automatically detect dependencies */
+						implementationDependencies =
+							scanForNamesOfDependentFunctions(
+								primaryImplementation,
+								currentPrototype,
+								currentFeatures);
+					}
+				}
+				wcsCurrent = WcharFunction(
+					wc_func:           current,
+					wc_name:           current.name,
+					wc_impl:           primaryImplementation,
+					wc_implIncludes:   currentFeatures.implIncludes,
+					wc_implPrefix:     currentFeatures.implPrefix,
+					wc_prototype:      currentPrototype,
+					wc_prototypes:     currentPrototypes,
+					wc_dependencies:   implementationDependencies,
+					wc_ppCond:         currentFeatures.requires,
+					wc_ppCondIncludes: currentFeatures.requiresIncludes,
+					wc_ppCondPrefix:   currentFeatures.requiresPrefix);
+				if (wcsCurrent.wc_name in allWcharFunctionsByName)
+					self.errAt(currentNameTokStart, "Duplicate [wchar] function {!r}"
+						.format({ wcsCurrent.wc_name }));
+				allWcharFunctionsByName[wcsCurrent.wc_name] = wcsCurrent;
+			}
+			if (!currentFeatures.crt_noImpl) {
+				local crtName = currentFeatures.crt_name;
+				if (crtName is none)
+					crtName = current.name;
+				if (!currentLibraryFunction.documentation)
+					currentLibraryFunction.documentation = current.documentation;
+				if (currentFeatures.wchar) {
+					/* Create 2 new functions that are then exported from libc. */
+					local dosCrtName = currentFeatures.crt_dosname;
+					if (dosCrtName is none)
+						dosCrtName = crtName;
+					local kosVariant = currentLibraryFunction;
+					local dosVariant = currentDosLibraryFunction;
+					if (dosVariant is none)
+						dosVariant = LibraryFunction();
+					if (dosVariant.originalSystemHeaderName !is bound)
+						dosVariant.originalSystemHeaderName = kosVariant.originalSystemHeaderName;
+					if (!dosVariant.documentation)
+						dosVariant.documentation = kosVariant.documentation;
+					kosVariant.name = "libc_" + crtName;
+					dosVariant.name = "libd_" + dosCrtName;
+					if (!currentFeatures.crt_noSelfExport) {
+						kosVariant.exportSymbolNames.append(("1", crtName));
+						dosVariant.exportSymbolNames.append(("1", "DOS$" + dosCrtName));
+					}
+					function createXCharBinding(
+							functionName: string | UserString,
+							crtName: string | UserString, mode: int,
+							implSection: UserString | string | none): Callable {
+						return []{
+							local xc = wcsCurrent.getXCharImplementation(
+								functionName, mode);
+							local imp = xc.impl;
+							if (imp is none) {
+								imp = getDefaultLibraryImplementationForPrototype(
+									wcsCurrent.prototype, crtName);
+							}
+							return LibraryFunctionBinding(
+								prototype: xc.prototype,
+								binding: LibraryFunctionImplementation(
+									implementation:         imp,
+									implementationName:     xc.name,
+									implementationIncludes: xc.implIncludes,
+									implementationPrefix:   xc.implPrefix,
+									implementationSection:  implSection,
+									dependencies:           xc.dependencies));
+						};
+					}
+					/* Link the Xchar-implementations.
+					 * NOTE: This has to happen delayed, so that everything will be
+					 *       available once the implementation gets generated. */
+					dosVariant.bindings.append(createXCharBinding(
+						dosVariant.name, dosCrtName, WCHAR_REPLACEMENT_CHAR16,
+						currentFeatures.crt_dosSection));
+					kosVariant.bindings.append(createXCharBinding(
+						kosVariant.name, crtName, WCHAR_REPLACEMENT_CHAR32,
+						currentFeatures.crt_kosSection));
+					/* Insert the library implementations into the system header order */
+					if (currentFeatures.crt_userimpl || primaryImplementation is none) {
+						result.order_libcUserHeader.extend({ dosVariant, kosVariant });
+						result.order_libcUserSource.extend({ dosVariant, kosVariant });
+					} else {
+						result.order_libcAutoHeader.extend({ dosVariant, kosVariant });
+						result.order_libcAutoSource.extend({ dosVariant, kosVariant });
+					}
+					goto done_currentLibraryFunction;
+				} else {
+					/* Create a default implementation for user-sources */
+					local usedImpl = primaryImplementation;
+					if (usedImpl is none) {
+						if (currentPrototype is Callable) {
+							usedImpl = []-> getDefaultLibraryImplementationForPrototype(
+								currentPrototype(), crtName);
+						} else {
+							usedImpl = getDefaultLibraryImplementationForPrototype(
+								currentPrototype, crtName);
+						}
+					}
+					local libImpl = LibraryFunctionBinding(
+						prototype: currentPrototype,
+						binding: LibraryFunctionImplementation(
+							implementation:         usedImpl,
+							implementationIncludes: currentFeatures.implIncludes,
+							implementationPrefix:   currentFeatures.implPrefix,
+							implementationSection:  currentFeatures.crt_kosSection));
+					currentLibraryFunction.bindings.append(libImpl);
+				}
+				if (!currentFeatures.crt_noSelfExport) {
+					currentLibraryFunction.exportSymbolNames
+						.append(("1", crtName));
+				}
+				currentLibraryFunction.name = "libc_" + crtName;
+				if (currentFeatures.crt_userimpl || primaryImplementation is none) {
+					result.order_libcUserHeader.append(currentLibraryFunction);
+					result.order_libcUserSource.append(currentLibraryFunction);
+				} else {
+					result.order_libcAutoHeader.append(currentLibraryFunction);
+					result.order_libcAutoSource.append(currentLibraryFunction);
+				}
+done_currentLibraryFunction:
+				currentLibraryFunction = none;
+			}
+		}	break;
+
+		case "=": {
+handle_eq_after_prototype:
+			if (currentFeatures.wchar)
+				self.err("[wchar] cannot be used with alias bindings");
+			currentFeatures.assertAllDefaultAttributesWithoutImplementation(
+				self, defaultFeatures);
+			local boundFunctionName = self.next();
+			if (isCString(boundFunctionName))
+				boundFunctionName = boundFunctionName.decode("c-escape");
+			else if (!boundFunctionName.issymbol()) {
+				self.err("Expected keyword or string after =, but got {!r}"
+					.format({ boundFunctionName }));
+			}
+			/* #1 Lookup a function @boundFunctionName
+			 * #2 Create copies of all of the bindings of @boundFunctionName, such
+			 *    that these copies use @currentPrototypes for prototyping, unless
+			 *    @currentPrototypes is set to @none, in which case prototypes are
+			 *    also copied.
+			 * #3 Use the binding copies for @current.bindings */
+			local boundFunctionNameStart = self.tokStart;
+			functionLinkageSteps.append([]{
+				local boundFunction;
+				try {
+					boundFunction = findLocalFunctionByName(boundFunctionName);
+				} catch (Error as e) {
+					self.errAt(e.message);
+				}
+				/* TODO: Steps #2 and #3 */
+				self.errAt(boundFunctionNameStart,
+					"TODO: Alias function declaration {!r} = {!r}"
+					.format({ current.name, boundFunctionName }));
+			});
+			self.next();
+			self.skip(";");
+		}	break;
+
+		default:
+			self.err("Unexpected token {!r} when function implementation, or ';' was expected"
+				.format({ tok }));
+		}
+done_function:
+		if (currentLibraryFunction !is none) {
+			/* Assert that no annotations added any special features to the library
+			 * function in situations where the library function isn't actually being
+			 * used */
+			if (currentLibraryFunction.exportSymbolNames)
+				self.errAt(currentNameTokStart, "[export_as(...)] used, but function's isn't actually being exported");
+			/* Don't assert this: `alt_variant_of()' would still be allowed here! */
+//			if (currentLibraryFunction.bindings)
+//				self.errAt(currentNameTokStart, "[intern_alias(...)] or [alt_variant_of(...)] used, but function's isn't actually being exported");
+		}
+
+		/* Register the function, and insert it into listings where it should show up */
+		defineFunctionInMapping(result.functionsByName, current);
+		defineFunctionInMapping(allFunctionsByName, current);
+		if (currentFeatures.namespaces) {
+			local exposedName = currentFeatures.exposedName;
+			if (exposedName is none)
+				exposedName = current.name;
+			local gblGuard = false;
+			if (currentFeatures.guard) {
+				/* Add namespace import bindings for all defined namespaces. */
+				local nsBindingIndex = 0;
+				for (local ns: currentFeatures.namespaces) {
+					if (ns !is Namespace)
+						ns = getNamespaceByName(ns);
+					local nsGuard = currentFeatures.guardNames.get(ns.name);
+					if (nsGuard is none)
+						nsGuard = ns.keyDefaultGuard(exposedName);
+					if (ns === GLOBAL_NAMESPACE)
+						gblGuard = nsGuard;
+					current.bindings.insert(nsBindingIndex, FunctionBinding(
+						ppCond:     "defined({})".format({ nsGuard }),
+						prototypes: currentPrototypes,
+						binding:    ns,
+					));
+					++nsBindingIndex;
+				}
+				if (gblGuard === false)
+					gblGuard = GLOBAL_NAMESPACE.keyDefaultGuard(exposedName);
+			}
+			local func = current;
+			if (currentFeatures.decl != "__LIBC" || exposedName != func.name ||
+			    gblGuard !== false || currentFeatures.macroBinding) {
+				/* Need a custom @ExposedFunction */
+				func = ExposedFunction(
+					func:                func,
+					decl:                currentFeatures.decl,
+					exposedName:         exposedName,
+					guardName:           gblGuard,
+					preferBindingMacros: currentFeatures.macroBinding);
+			}
+			if (currentFeatures.std) {
+				if (result_order_headerStd is none) {
+					self.errAt(currentNameTokStart,
+						"Function {!r} was marked as `[std]', but "
+						"'%[insert:std]' hasn't been encountered, yet"
+						.format({ current.name }));
+				}
+				result_order_headerStd.append(func);
+				/* Insert a std-using directive at the current location */
+				if (!result_order_header_in_CXX_SYSTEM_HEADER) {
+					result.order_header.append(CXX_SYSTEM_HEADER_START);
+					result_order_header_in_CXX_SYSTEM_HEADER = true;
+				}
+				local gblGuard = false;
+				local importCondition = "$has_function({})".format({ current.name });
+				local nsStd = NAMESPACES["std"];
+				if (currentFeatures.guard) {
+					local stdGuard = currentFeatures.guardNames.get("std");
+					gblGuard = currentFeatures.guardNames.get("");
+					if (stdGuard is none)
+						stdGuard = nsStd.keyDefaultGuard(exposedName);
+					if (gblGuard is none)
+						gblGuard = GLOBAL_NAMESPACE.keyDefaultGuard(exposedName);
+					importCondition = "defined({}) || {}"
+						.format({ stdGuard, importCondition });
+				}
+				local importFunction = Function(
+					name: exposedName,
+					originalSystemHeaderName: headerName,
+					bindings: { FunctionBinding(
+						ppCond:     importCondition,
+						prototypes: currentPrototypes,
+						binding:    nsStd, /* Bind against the std:: namespace export */
+					) });
+				if (gblGuard !== false) {
+					importFunction = ExposedFunction(
+						func: importFunction,
+						decl: currentFeatures.decl, /* This one should go unused... */
+						exposedName: exposedName,
+						guardName: gblGuard);
+				}
+				result.order_header.append(importFunction);
+				if (result_ccompatHeaderName !is none)
+					result_order_headerCCompat.append(importFunction);
+			} else {
+				if (result_order_header_in_CXX_SYSTEM_HEADER) {
+					result.order_header.append(CXX_SYSTEM_HEADER_END);
+					result_order_header_in_CXX_SYSTEM_HEADER = false;
+				}
+				result.order_header.append(func);
+			}
+		}
+		if (currentFeatures.libc) {
+			result.order_libcHeader.append(current);
+			result.order_libcCoreHeader.append(current);
+		}
+		tok = self.tok;
+	}
+	/* Finalize @result.order_header */
+	if (result_order_header_in_CXX_SYSTEM_HEADER) {
+		result.order_header.append(CXX_SYSTEM_HEADER_END);
+		result_order_header_in_CXX_SYSTEM_HEADER = false;
+	}
+	if (result_headerGuardName is none) {
+		result_headerGuardName = "_{}_H"
+			.format({ headerName.replace(".", "_").upper() });
+	}
+	if (result_ccompatHeaderName !is none) {
+		if (result_order_headerCCompat is none) {
+			local errobj = result_ccompatHeaderName;
+			if (errobj !is UserString)
+				errobj = self;
+			errobj.err("'%[define_ccompat_header({!r})]' used without '%[insert:std]'"
+				.format({ result_ccompatHeaderName }));
+		}
+		local guard_CXX_STDONLY = "_CXX_STDONLY_{}"
+			.format({ str(result_ccompatHeaderName).upper() });
+		result.order_header.insert(0,
+			"#ifndef {0}\n"
+			"#define {0} 1\n"
+			"\n"
+			"#ifdef {1}\n"
+			"#ifdef __CXX_SYSTEM_HEADER\n"
+			"#undef {0} /* Allow the C-header to be re-included to import all std::-symbols into the global namespace. */\n"
+			"#else /* __CXX_SYSTEM_HEADER */\n"
+			"/* Import all symbols into the global namespace when re-including \"{2}.h\" after \"{3}\" */\n"
+			.format({
+				result_headerGuardName, guard_CXX_STDONLY,
+				headerName.replace(".", "/"),
+				result_ccompatHeaderName
+			}));
+		result.order_header.insert(1,
+			"#undef {0}\n"
+			"#endif /* !__CXX_SYSTEM_HEADER */\n"
+			"#else /* {0} */\n"
+			.format({ guard_CXX_STDONLY }));
+		result.order_header.insertall(1, result_order_headerCCompat);
+		result.order_header.append(
+			"\n"
+			"#ifdef __CXX_SYSTEM_HEADER\n"
+			"#define {1} 1\n"
+			"#undef {0}\n"
+			"#endif /* __CXX_SYSTEM_HEADER */\n"
+			"#endif /* !{1} */\n"
+			"#endif /* !{0} */\n"
+			.format({
+				result_headerGuardName,
+				guard_CXX_STDONLY,
+			}));
+	} else {
+		result.order_header.insert(0,
+			"#ifndef {0}\n"
+			"#define {0} 1\n"
+			"\n".format({ result_headerGuardName }));
+		result.order_header.append(
+			"\n"
+			"#endif /* !{} */\n"
+			.format({ result_headerGuardName }));
+	}
+	return result;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

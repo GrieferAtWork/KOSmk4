@@ -1,0 +1,454 @@
+/* Copyright (c) 2019-2020 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+import * from deemon;
+
+
+global CParser;
+class UserString {
+	this = default;
+
+	@@The parser that can be used to provide a file/line/column
+	@@reference for the start of the referenced text.
+	public member parser: CParser;
+
+	@@Starting offset in @parser for where the text begins.
+	public member start: int;
+
+	@@The actual text represented by this UserString
+	public member text: string;
+
+	@@Return a (line, column) pair describing the origin of
+	@@this UserString within the file @filename
+	public property lc: (int, int) = {
+		get(): (int, int) {
+			return parser.lcAt(start);
+		}
+	}
+
+	@@Print an error @message and throw an @Error
+	function err(message: string) {
+		parser.errAt(start, message);
+	}
+
+	@@Simple alias for @(parser.filename)
+	public property filename: string = {
+		get(): string {
+			return parser.filename;
+		}
+	}
+
+	public operator bool(): bool {
+		return !!text;
+	}
+
+	public operator str(): string {
+		return text;
+	}
+
+	public operator repr(): string {
+		return repr text;
+	}
+
+	public operator == (other: UserString | string): bool {
+		if (other is UserString)
+			other = other.text;
+		return text == other;
+	}
+	public operator != (other: UserString | string): bool {
+		if (other is UserString)
+			other = other.text;
+		return text != other;
+	}
+	public operator hash(): int {
+		return text.operator hash();
+	}
+}
+
+
+@@Check if the given @tok represents a C-style escaped string
+function isCString(tok: string): bool {
+	if (#tok < 2)
+		return false;
+	local ch0 = tok.first;
+	if (ch0 !in "'\"")
+		return false;
+	return tok.last == ch0;
+}
+
+
+
+@@Helper class for tokenizing C-like source code
+class CParser {
+	this(text: string | UserString | CParser | File,
+	     filename: string = "?", start: int = 0, end: int = -1,
+	     firstLineOffset: int = 0, firstLineColOffset: int = 0) {
+		_firstLineOffset    = firstLineOffset;
+		_firstLineColOffset = firstLineColOffset;
+		this.text           = text;
+		this.tokEnd            = start;
+		this.end            = end;
+		this.filename       = filename;
+		if (text is CParser) {
+			this.text = text.text;
+			if (end < 0 || end > text.end)
+				this.end = text.end;
+			_firstLineOffset    = text._firstLineOffset + firstLineOffset;
+			_firstLineColOffset = text._firstLineColOffset + firstLineColOffset;
+			if (filename in ["", "?"])
+				this.filename = text.filename;
+		} else if (text is UserString) {
+			local startLine, startCol = text.lc...;
+			_firstLineOffset = startLine - 1 + firstLineOffset;
+			_firstLineColOffset = startCol - 1 + firstLineColOffset;
+			this.text = text.text;
+			if (filename in ["", "?"])
+				this.filename = text.filename;
+			if (end < 0 || end > #this.text)
+				this.end = #this.text;
+		} else if (text is File) {
+			this.text = text.readall();
+			if (filename in ["", "?"])
+				this.filename = text.filename;
+			if (end < 0 || end > #this.text)
+				this.end = #this.text;
+		} else {
+			if (end < 0 || end > #text)
+				this.end = #text;
+		}
+	}
+
+	@@Return a UserString for the given sub-range
+	public function getUserString(start: int, end: int): UserString {
+		return UserString(this, start, text[start:end]);
+	}
+
+	@@Returns the current token as a @UserString
+	public property userTok: UserString = {
+		get(): UserString {
+			return UserString(this, this.tokStart, this.tok);
+		}
+	}
+
+	public operator str(): string -> text[:end];
+
+	@@Offset added to line number counters (aka. line-number at @text[0])
+	private member _firstLineOffset: int;
+
+	@@Offset added to the column offset of the first line
+	private member _firstLineColOffset: int;
+
+	@@[const] The text that is being parsed
+	public member text: string;
+
+	@@[const] The filename of the underlying source file
+	public member filename: string;
+
+	@@Starting position of the token last returned from @next()
+	public member tokStart: int;
+
+	@@The last-parsed token
+	public member tok: string;
+
+	@@End offset of the last-parsed token
+	public member tokEnd: int;
+
+	@@[const] End index of @text
+	public member end: int;
+
+	@@Return a pair of (line, column) (both of which are 1-based)
+	@@for the source location described by @offset
+	@@The given @offset should be a value relative
+	@@to the current, or any past value for @tokEnd
+	public function lcAt(offset: int): (int, int) {
+		local numLines = text.count("\n", 0, offset);
+		if (numLines == 0)
+			return (_firstLineOffset + 1, _firstLineColOffset + 1 + offset);
+		local startOfLine = text.rindex("\n", 0, offset);
+		return (_firstLineOffset + 1 + numLines, offset - startOfLine);
+	}
+
+	@@Print an error @message at offset @offset and throw an @Error object
+	public function errAt(offset: int, message: string) {
+		local l, c = lcAt(offset)...;
+		local text = "{}({},{}) : Error : {}".format({ filename, l, c, message });
+		print text;
+		throw Error(text);
+	}
+
+	@@Print an error @message at the offset of the current tok
+	public function err(message: string) {
+		return errAt(tokStart, message);
+	}
+
+	@@Assert that @(this.tok == tok), and throw an error message if that isn't
+	@@the case. Afterwards, advance the current token by @(return this.tok())
+	public function skip(tok: string): string {
+		if (this.tok != tok)
+			err("Unexpected token (expected {!r}, but got {!r})".format({ tok, this.tok }));
+		return this.next();
+	}
+
+	@@Skip pairs of @open/@close tokens, where the caller should position
+	@@the parser such that it points to the first token after an initial
+	@@instance of @open, where this function will then proceed to skip
+	@@ahead until the first unmached instance of @close, such that upon
+	@@return, @this.tok will evaluate to @close
+	@@ - When @open is @none, use @tok instead before calling @next
+	@@ - When @close is @none, automatically deduce from @open
+	@@If no maching instance exists, an error will be thrown
+	public function skipPair(open: string = none, close: string = none): string {
+		local recursion = 0;
+		local tok = this.tok;
+		local startPos = this.tokStart;
+		if (open is none) {
+			open = tok;
+			tok  = next();
+		}
+		if (close is none) {
+			close = {
+				"(" : ")", "[" : "]",
+				"{" : "}", "<" : ">"
+			}[open];
+		}
+		for (;;) {
+			if (tok == open)
+				++recursion;
+			else if (tok == close) {
+				if (!recursion)
+					break;
+				--recursion;
+			} else if (!tok) {
+				errAt(startPos, "Token {!r} is not matched by another {!r}"
+					.format({ open, close }));
+			}
+			tok = next();
+		}
+		return tok;
+	}
+
+
+	@@Read the next token and return it as a string from start to finish
+	@@Note that this function will skip whitespace and new lines, as well
+	@@as C and C++-style comments.
+	@@When the end of the file is reached, and empty string is returned
+	public function next(): string {
+		local i = this.tokEnd;
+		for (;;) {
+again:
+			if (i >= end) {
+				this.tokEnd = i;
+				return this.tok = "";
+			}
+			local start = i;
+			local ch = text[i];
+			++i;
+			if (ch.isspace())
+				continue;
+			if (ch.issymstrt() || ch.isalnum()) {
+				while (i < end && text.issymcont(i))
+					++i;
+done:
+				this.tokEnd = i;
+				this.tokStart = start;
+				local result = text[start:i];
+				this.tok = result;
+				/* Check for wide/utf-16/utf-32 strings */
+				if (result !in ["L", "u", "U"])
+					return result;
+				if (i < end && text[i] in "\'\"") {
+					/* Yup! it's a string constant */
+					next(); /* cheat a bit to load the string */
+					this.tokStart = start;
+					result = text[start:this.tokEnd];
+					this.tok = result;
+				}
+				return result;
+			}
+			if (i < end) {
+				/* Check for multi-character tokens */
+				local nextCh = text[i];
+				switch (ch) {
+
+				case "/":
+					/* Deal with comments. */
+					if (nextCh == "/") {
+						i = text.find("\n", i, end);
+						if (i < 0)
+							i = end;
+						goto again;
+					}
+					if (nextCh == "*") {
+						i = text.find("*/", i, end);
+						if (i < 0)
+							i = end;
+						else {
+							i += 2;
+						}
+						goto again;
+					}
+					break;
+
+				case "\"":
+				case "\'": {
+					local endCh = ch;
+					/* String literal */
+					for (;;) {
+						++i;
+						if (nextCh == "\\") {
+							++i;
+						} else if (nextCh == endCh) {
+							break;
+						}
+						if (i >= end)
+							errAt(start, "Incomplete string literal");
+						nextCh = text[i];
+					}
+				}	goto done;
+
+				case "-":
+					if (nextCh in ">-=") {
+twochar:
+						++i;
+						goto done;
+					}
+					break;
+
+				case "+":
+					if (nextCh in "+=")
+						goto twochar;
+					break;
+
+				case "<":
+					if (nextCh in "<=")
+						goto twochar;
+					break;
+
+				case ">":
+					if (nextCh in ">=")
+						goto twochar;
+					break;
+
+				case ":":
+					if (nextCh in ":=")
+						goto twochar;
+					break;
+
+				case "@":
+					if (nextCh in "@")
+						goto twochar;
+					break;
+
+				case "=":
+				case "!":
+					if (nextCh in "=")
+						goto twochar;
+					break;
+
+				case ".":
+					if (nextCh == ".") {
+						if (i + 1 < end && text[i + 1] == ".") {
+							i += 2;
+							goto done;
+						}
+						goto twochar;
+					}
+					break;
+
+				default:
+					break;
+				}
+			}
+			goto done;
+		}
+	}
+
+	public operator iter() -> this;
+	public operator next() -> next();
+}
+
+
+
+@@Parse a function like expression such as @"foo(bar, foobar)" or a C-string, such as @"\"foo\""
+@@Return with the current token set to the first token after the expression/c-string
+function parserCStringOrFunctionLikeExpression(self: CParser): UserString | string {
+	local tok = self.tok;
+	if (tok.issymbol()) {
+		local exprStart = self.tokStart;
+		for (;;) {
+			tok = self.next();
+			if (tok.issymbol())
+				continue;
+			if (tok in "([{") {
+				self.skipPair();
+				continue;
+			}
+			break;
+		}
+		return self.getUserString(
+			exprStart, self.tokStart);
+	}
+	if (isCString(tok)) {
+		self.next();
+		return tok.decode("c-escape");
+	}
+	self.err("Expected keyword or string");
+}
+
+@@Parse a C-String, or everything else until a trailing @")", @"]" or @"}"
+function parserCStringOrAllUntilRParen(self: CParser): UserString | string {
+	local tok = self.tok;
+	if (isCString(tok)) {
+		self.next();
+		return tok.decode("c-escape");
+	}
+	local resultStart = self.tokStart;
+	local resultEnd = self.tokEnd;
+	for (;;) {
+		if (tok in "([{") {
+			self.skipPair();
+			resultEnd = self.tokEnd;
+			tok = self.next();
+			continue;
+		}
+		if (tok in ")]},")
+			break;
+		resultEnd = self.tokEnd;
+		tok = self.next();
+	}
+	return self.getUserString(resultStart, resultEnd);
+}
+
+
+@@Same as @parserCStringOrFunctionLikeExpression, but parse
+@@multiple such expressions, which must be seperated by @","-tokens
+@@Stop if the token at the start of an element would be a @"]", @"}"
+@@or @")", or if some element isn't followed with a @","-token
+function parserCStringOrFunctionLikeExpressionList(self: CParser): {(UserString | string)...} {
+	for (;;) {
+		if (self.tok in "]})")
+			break;
+		yield parserCStringOrFunctionLikeExpression(self);
+		if (self.tok != ",")
+			break;
+		self.next();
+	}
+}
+

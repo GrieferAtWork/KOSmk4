@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2a715d20 */
+/* HASH CRC-32:0x57cf446d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -231,7 +231,7 @@ NOTHROW_NCX(LIBCCALL libc_format_wescape)(pc32formatprinter printer,
 	if __likely(!(flags & 0x0001)) {
 		temp = (*printer)(arg, quote, 1);
 		if __unlikely(temp < 0)
-		goto err;
+			goto err;
 		result += temp;
 	}
 	while (text < textend) {
@@ -453,7 +453,7 @@ encode_uni:
 print_encoded:
 				temp = (*printer)(arg, encoded_text, encoded_text_size);
 				if __unlikely(temp < 0)
-				goto err;
+					goto err;
 				result += temp;
 			}
 			flush_start = text;
@@ -527,7 +527,7 @@ NOTHROW_NCX(LIBDCALL libd_format_wescape)(pc16formatprinter printer,
 	if __likely(!(flags & 0x0001)) {
 		temp = (*printer)(arg, quote, 1);
 		if __unlikely(temp < 0)
-		goto err;
+			goto err;
 		result += temp;
 	}
 	while (text < textend) {
@@ -749,7 +749,7 @@ encode_uni:
 print_encoded:
 				temp = (*printer)(arg, encoded_text, encoded_text_size);
 				if __unlikely(temp < 0)
-				goto err;
+					goto err;
 				result += temp;
 			}
 			flush_start = text;

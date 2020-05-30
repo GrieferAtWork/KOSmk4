@@ -235,7 +235,7 @@ format_escape:([nonnull] pformatprinter printer, void *arg,
 	if __likely(!(flags & FORMAT_ESCAPE_FPRINTRAW)) {
 		temp = (*printer)(arg, quote, 1);
 		if __unlikely(temp < 0)
-		goto err;
+			goto err;
 		result += temp;
 	}
 	while (text < textend) {
@@ -457,7 +457,7 @@ encode_uni:
 print_encoded:
 				temp = (*printer)(arg, encoded_text, encoded_text_size);
 				if __unlikely(temp < 0)
-				goto err;
+					goto err;
 				result += temp;
 			}
 			flush_start = text;

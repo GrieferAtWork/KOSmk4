@@ -1,0 +1,342 @@
+/* Copyright (c) 2019-2020 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+import * from deemon;
+import * from .namespace;
+import * from ..optiexpr;
+import functools;
+
+class IfDefStackEntry {
+	this = default;
+	public member cond: string | none = none;    /* Condition to print for #else or #endif (or none if not set) */
+	public member didWriteIf: bool = false;      /* #if, #ifdef or #ifndef was printed */
+	public member didWriteElse: bool = false;    /* #else was printed */
+	public member encounteredElse: bool = false; /* ppElse() was called */
+	public member encounteredIf0: bool = false;  /* m_IfdefDead was incremented because of ppElif("0") or ppIf("0") */
+	public member encounteredIf1: bool = false;  /* didWriteElse is true because of ppElif("1") or ppIf("1") */
+	public member includedHeaders: {string...} = HashSet(); /* Set of header names known to have been included */
+}
+
+
+@@Helper class for generating C code
+class CWriter {
+
+	@@@param: fp: The underlying file to which to output generated text
+	this(fp: File) {
+		this.fp = fp;
+	}
+
+	@@Set to true if the character written to @fp was a new-line
+	private member m_AfterNewLines: bool = true;
+
+	@@The underlying file to which to output generated text
+	public member fp: File;
+
+	@@Returns @true if the output is ignored within the current context.
+	@@This can happen following something like @ppIf("0"), and will
+	@@continue on until the corresponding call to @ppEndif()
+	public property isdeadcode: bool = {
+		get(): bool -> m_IfdefDead != 0;
+	}
+
+	@@Stack of active #if-directives
+	private member m_IfdefStack: {IfDefStackEntry...} = [];
+	@@Set of header included at the global scope
+	private member m_GlobalHeaderIncludes: {string...} = HashSet();
+
+	@@Check if a given @header was already included
+	public function wasHeaderAlreadyIncluded(header: string): bool {
+		for (local ste: m_IfdefStack) {
+			if (header in ste.includedHeaders)
+				return true;
+		}
+		return header in m_GlobalHeaderIncludes;
+	}
+
+	@@Check if all of the given headers were already included
+	public function wereAllHeadersAlreadyIncluded(headers: {string...}): bool {
+		for (local h: headers) {
+			if (!wasHeaderAlreadyIncluded(h))
+				return false;
+		}
+		return true;
+	}
+
+	@@Remember the inclusion of a given @header
+	private function f_RememberHeaderAlreadyIncluded(header: string) {
+		local set = m_IfdefStack
+			? m_IfdefStack.last.includedHeaders
+			: m_GlobalHeaderIncludes;
+		set.insert(header);
+	}
+
+	@@Non-zero if no text should current be emit
+	private member m_IfdefDead: int = 0;
+
+	private function doPrintIf(cond: string) {
+		if (!m_AfterNewLines)
+			fp << "\n";
+		if (cond.startswith("defined(") && cond.endswith(")") &&
+		    cond.findmatch("(", ")", 8) == #cond - 1) {
+			fp << "#ifdef " << cond[8:-1].strip();
+		} else if (cond.startswith("!defined(") && cond.endswith(")") &&
+		           cond.findmatch("(", ")", 9) == #cond - 1) {
+			fp << "#ifndef " << cond[9:-1].strip();
+		} else {
+			fp << "#if " << cond;
+		}
+		fp << "\n";
+		m_AfterNewLines = true;
+	}
+
+	@@Insert a preprocessor directive `#if cond`
+	public function ppIf(cond: string): CWriter {
+		if (m_IfdefDead)
+			cond = "0"; /* Speed up some code... (and won't make a difference...) */
+		if (cond !is string)
+			cond = str cond;
+		cond = optimizePreprocessorExpression(cond);
+		local ent = IfDefStackEntry(cond: cond);
+		if (cond == "1") {
+			ent.encounteredIf1 = true;
+		} else if (cond == "0") {
+			ent.encounteredIf0 = true;
+			++m_IfdefDead;
+		} else {
+			ent.didWriteIf = true;
+			ent.cond = cond;
+			if (!m_IfdefDead)
+				doPrintIf(cond);
+		}
+		m_IfdefStack.pushback(ent);
+		return this;
+	}
+
+	@@Insert a `#elif` directive
+	public function ppElif(cond: string): CWriter {
+		if (!m_IfdefStack)
+			throw Error("#ifdef-stack is empty");
+		local ent = m_IfdefStack.last;
+		if (ent.encounteredElse)
+			throw Error("#elif after #else");
+		if (ent.encounteredIf1) {
+			/* A universal true-branch was already written.
+			 * Ignore this #elif directive entirely! */
+dont_emit_branch:
+			if (!ent.encounteredIf0) {
+				++m_IfdefDead;
+				ent.encounteredIf0 = true;
+			}
+			goto done;
+		}
+		if (cond !is string)
+			cond = str cond;
+		cond = optimizePreprocessorExpression(cond);
+		if (cond == "0") {
+			/* Special case: Don't do anything and ignore
+			 * everything until the next #elif or #else */
+			goto dont_emit_branch;
+		}
+		/* Mark the end of a potential preceding `#if 0` / `#elif 0` branch. */
+		if (ent.encounteredIf0) {
+			ent.encounteredIf0 = false;
+			--m_IfdefDead;
+		}
+		if (cond == "1") {
+			/* Special case: Universal true-branch
+			 * (must be printed the same as #else) */
+			ent.encounteredIf1 = true;
+			if (!ent.didWriteIf)
+				goto done; /* No preceding #if-branch -> can directly inline this #elif */
+			/* A preceding #if was already written (follow up with a #else) */
+			assert !ent.didWriteElse;
+			ent.didWriteElse = true;
+			if (!m_IfdefDead) {
+				if (!m_AfterNewLines)
+					fp << "\n";
+				local condText = "...";
+				if (ent.cond !is none) {
+					condText = optimizePreprocessorExpressionAndRemoveDefined(ent.cond);
+					ent.cond = "!({})".format({ ent.cond });
+				}
+				fp << "#else /* " << condText << " */\n";
+				ent.includedHeaders.clear();
+				m_AfterNewLines = true;
+			}
+			goto done;
+		}
+		assert !ent.didWriteElse;
+		/* If we havn't yet written a #if branch, do so now */
+		if (!ent.didWriteIf) {
+			ent.didWriteIf = true;
+			if (!m_IfdefDead)
+				doPrintIf(cond);
+			goto done;
+		}
+		/* Regular case: Print the #elif as an actual #elif */
+		if (!m_IfdefDead) {
+			if (!m_AfterNewLines)
+				fp << "\n";
+			fp << "#elif " << cond << "\n";
+			ent.includedHeaders.clear();
+			/* Delete the saved condition so that "..."
+			 * will appear as comment in generated code. */
+			ent.cond = none;
+			m_AfterNewLines = true;
+		}
+done:
+		return this;
+	}
+
+	@@Insert a `#else` directive
+	public function ppElse(): CWriter {
+		ppElif("1");
+		m_IfdefStack.last.encounteredElse = true;
+		return this;
+	}
+
+	@@Insert a `#endif` directive
+	public function ppEndif(): CWriter {
+		if (!m_IfdefStack)
+			throw Error("#ifdef-stack is empty");
+		local ent = m_IfdefStack.popback();
+		if (ent.encounteredIf0) {
+			ent.encounteredIf0 = false;
+			--m_IfdefDead;
+		}
+		if (ent.didWriteIf) {
+			/* Output an #endif directive */
+			if (!m_IfdefDead) {
+				if (!m_AfterNewLines)
+					fp << "\n";
+				local condText = "...";
+				if (ent.cond !is none) {
+					condText = optimizePreprocessorExpressionAndRemoveDefined(ent.cond);
+				} else if (ent.didWriteElse) {
+					condText = "!...";
+				}
+				fp << "#endif /* " << condText << " */\n";
+				m_AfterNewLines = true;
+			}
+		}
+		return this;
+	}
+
+	public function ppIfdef(macroName: string): CWriter {
+		return ppIf("defined({})".format({ macroName }));
+	}
+
+	public function ppIfndef(macroName: string): CWriter {
+		return ppIf("!defined({})".format({ macroName }));
+	}
+
+	public function ppInclude(header: string): CWriter {
+		/* Include include some given header once, based on that header
+		 * having previously been #included at the current, or some
+		 * previous #ifdef-stack-level */
+		if (wasHeaderAlreadyIncluded(header))
+			return;
+		f_RememberHeaderAlreadyIncluded(header);
+		if (!m_AfterNewLines)
+			this << "\n";
+		return this << "#include " << header << "\n";
+	}
+
+	public function ppUndef(macroName: string): CWriter {
+		if (!m_AfterNewLines)
+			this << "\n";
+		return this << "#undef " << macroName << "\n";
+	}
+
+	public function ppDefine(macroName: string, macroValue: string): CWriter {
+		if (!m_AfterNewLines)
+			this << "\n";
+		this << "#define " << macroName;
+		if (!macroValue.startswith("("))
+			this << " ";
+		return this << macroValue << "\n";
+	}
+
+	public function forceStartOfLine(): CWriter {
+		return m_AfterNewLines ? this : (this << "\n");
+	}
+
+	@@Print @text as a C or C++ comment, preferring C comments.
+	public function printComment(text: string): CWriter {
+		/* TODO */
+		return this;
+	}
+
+	@@Append the given @text
+	public operator << (text: string | Bytes): CWriter {
+		if (!m_IfdefDead) {
+			local typ = type text;
+			if (typ !== string && typ !== Bytes)
+				text = str text;
+			fp << text;
+			if (text)
+				m_AfterNewLines = text.islf(#text - 1);
+		}
+		return this;
+	}
+
+	private member m_CurrentNamespace: Namespace = GLOBAL_NAMESPACE;
+
+	@@Get/Set the current namespace
+	public property namespace: Namespace = {
+		get(): Namespace {
+			return m_CurrentNamespace;
+		}
+		set(namespace: Namespace) {
+			if (namespace !is Namespace)
+				namespace = NAMESPACES[str namespace];
+			if (m_CurrentNamespace === namespace)
+				return;
+			if (!m_AfterNewLines)
+				this << "\n";
+			/* TODO: Delay the printing of these strings, such that
+			 *       they are not actually be printed if nothing happened
+			 *       between entering and leaving the namespace! */
+			this << m_CurrentNamespace.leave << namespace.enter;
+			m_CurrentNamespace = namespace;
+		}
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

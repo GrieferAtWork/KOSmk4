@@ -168,7 +168,7 @@ NOTHROW_NCX(CC FUNC(libjson_decode_INTO))(IF_DECODE(struct json_parser *__restri
 				memcpy(dst, &value, sizeof(value));
 			} else
 #ifdef __COMPILER_HAVE_LONGLONG
-				if (type == JSON_TYPE_FLOAT)
+			if (type == JSON_TYPE_FLOAT)
 #endif /* __COMPILER_HAVE_LONGLONG */
 			{
 				float temp = (float)value;

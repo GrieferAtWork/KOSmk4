@@ -1,0 +1,599 @@
+/* Copyright (c) 2019-2020 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+import * from deemon;
+import * from .parser;
+import * from .globals;
+import * from .writer;
+
+#define Function         Object /* Function from .cheaders */
+#define LocalFunction    Object /* LocalFunction from .cheaders */
+#define SystemHeader     Object /* SystemHeader from .cheaders */
+
+
+@@Replace:
+@@   - @"$size_t" -> "$size_t"
+@@   - @"size_t"  -> "size_t"
+@@   - @"foo"     -> "foo"
+global final ESCAPE_MODE_KEEP = -1;
+
+@@Replace:
+@@   - @"$size_t" -> "size_t"
+@@   - @"size_t"  -> "size_t"
+@@   - @"foo"     -> "foo"
+global final ESCAPE_MODE_NONE = 0;
+
+@@Replace:
+@@   - @"$size_t" -> "__SIZE_TYPE__"
+@@   - @"size_t"  -> "size_t"
+@@   - @"foo"     -> "__foo"
+global final ESCAPE_MODE_PART = 1;
+
+@@Replace:
+@@   - @"$size_t" -> "__SIZE_TYPE__"
+@@   - @"size_t"  -> "__SIZE_TYPE__"
+@@   - @"foo"     -> "__foo"
+global final ESCAPE_MODE_FULL = 2;
+
+global final cLanguageKeywords: {string...} = HashSet({
+	"if", "else", "while", "for", "return", "do", "switch",
+	"case", "default", "goto", "continue", "break", "sizeof",
+	"alignof", "struct", "union", "extern", "void", "char",
+	"int", "short", "long", "signed", "unsigned", "const",
+	"__const", "__const__", "volatile", "__volatile", "__volatile__",
+	"static", "_Pragma", "typedef", "float", "double", "restrict",
+	"__restrict", "attribute", "__attribute", "__attribute__",
+	"_declspec", "__declspec", "char16_t", "char32_t", "wchar_t",
+	"inline", "__inline", "__inline__", "__extension__",
+});
+
+@@Special replacements for certain keywords during escaping.
+@@By default, all keywords are escaped by either:
+@@  - Inserting 2 leading "__"
+@@  - Inserting 1 leading "_", and having the following character be upper-case
+@@Keywords that already appear escaped are not re-escaped
+global final keywordEscapes: {string: string} = Dict({
+	"size_t" : "__SIZE_TYPE__",
+	"ssize_t" : "__SSIZE_TYPE__",
+	"intptr_t" : "__INTPTR_TYPE__",
+	"uintptr_t" : "__UINTPTR_TYPE__",
+	"ptrdiff_t" : "__PTRDIFF_TYPE__",
+	"byte_t" : "__BYTE_TYPE__",
+	"int8_t" : "__INT8_TYPE__",
+	"int16_t" : "__INT16_TYPE__",
+	"int32_t" : "__INT32_TYPE__",
+	"int64_t" : "__INT64_TYPE__",
+	"uint8_t" : "__UINT8_TYPE__",
+	"uint16_t" : "__UINT16_TYPE__",
+	"uint32_t" : "__UINT32_TYPE__",
+	"uint64_t" : "__UINT64_TYPE__",
+	"wchar_t" : "__WCHAR_TYPE__",
+	"char16_t" : "__CHAR16_TYPE__",
+	"char32_t" : "__CHAR32_TYPE__",
+	"s8" : "__INT8_TYPE__",
+	"s16" : "__INT16_TYPE__",
+	"s32" : "__INT32_TYPE__",
+	"s64" : "__INT64_TYPE__",
+	"u8" : "__UINT8_TYPE__",
+	"u16" : "__UINT16_TYPE__",
+	"u32" : "__UINT32_TYPE__",
+	"u64" : "__UINT64_TYPE__",
+	"va_list" : "__builtin_va_list",
+	"va_start" : "__builtin_va_start",
+	"va_copy" : "__builtin_va_copy",
+	"va_end" : "__builtin_va_end",
+	"va_arg" : "__builtin_va_arg",
+	"bool" : "__BOOL",
+	"true" : "1",
+	"false" : "0",
+	"NULL" : "__NULLPTR",
+	"WUNUSED" : "__ATTR_WUNUSED",
+	"NONNULL" : "__ATTR_NONNULL",
+});
+
+
+
+
+@@Lookup a function, given its name
+function findFunctionByName(name: string | UserString): Function {
+	local usedName = name;
+	if (usedName !is string)
+		usedName = usedName.text;
+	local result: Function;
+	try {
+		if ("." in usedName) {
+			/* Header-Specific function name. */
+			local headerName;
+			headerName, none, usedName = usedName.rpartition(".")...;
+			result = allSystemHeaders[headerName].functionsByName[usedName];
+		} else {
+			result = allFunctionsByName[usedName];
+		}
+		if (result == DuplicateFunctionMarker)
+			throw Error("Ambiguous Function: {!r}".format({ name }));
+	} catch (Error as e) {
+		if (name is UserString)
+			name.err(e.message);
+		throw;
+	}
+	return result;
+}
+
+@@Lookup a local function, given its name
+function findLocalFunctionByName(name: string | UserString): LocalFunction {
+	local usedName = name;
+	if (usedName !is string)
+		usedName = usedName.text;
+	local result: LocalFunction;
+	try {
+		if ("." in usedName) {
+			/* Header-Specific function name. */
+			local headerName;
+			headerName, none, usedName = usedName.rpartition(".")...;
+			result = allSystemHeaders[headerName].localFunctionsByName[usedName];
+		} else {
+			result = allLocalFunctionsByName[usedName];
+		}
+		if (result == DuplicateFunctionMarker)
+			throw Error("Ambiguous local function: {!r}".format({ name }));
+	} catch (e...) {
+		if (name is UserString)
+			name.err(e.message);
+		throw;
+	}
+	return result;
+}
+
+
+
+
+@@Escape the given keyword if it isn't already escaped
+function escapeKeywordIfNotAlreadyEscaped(
+		word: string | UserString): string {
+	if (word is UserString)
+		word = word.text;
+	if (word.startswith("__"))
+		return word;
+	if (word.startswith("_") && #word >= 2 && word.isupper(1))
+		return word;
+	return "__" + word;
+}
+
+
+@@Skip ahead until after the next next @"@@else", @"@@endif", @"@@elif"
+@@@return: 0: Returned after @"@@else"
+@@@return: 1: Returned after @"@@endif"
+@@@return: 2: Returned after @"@@elif"
+function skipEscapingPreproessorBlock(self: CParser): int {
+	local start = self.tokStart;
+	local recursion = 0;
+	for (;;) {
+		local tok = self.next();
+		if (tok != "@@") {
+			if (!tok)
+				self.errAt(start, "Unmatched conditional block");
+			continue;
+		}
+		tok = self.next();
+		if (tok == "if")
+			++recursion;
+		else if (tok == "endif") {
+			if (recursion == 0) {
+				self.next();
+				return 1; /* @@endif */
+			}
+			--recursion;
+		} else if (recursion == 0) {
+			if (tok == "elif") {
+				self.next();
+				return 2;
+			}
+			if (tok == "else") {
+				self.next();
+				return 0;
+			}
+		}
+		/* Parse the remainder of the directive */
+		do {
+			tok = self.next();
+		} while (tok !in ["", "@@"]);
+	}
+}
+
+@@Escape keywords from the given text via the given @keyEscape.
+@@If the given callback returns @none for some given word, then
+@@use @keywordEscapes and @escapeKeywordIfNotAlreadyEscaped instead.
+@@Language keywords are not passed to @keyEscape
+@@@param: mode:           One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
+@@@param: evalEnviron:    Global variables during execution of directives
+@@                        When not given, then an anonymous @Dict() is used instead.
+@@@param: forceKeyEscape: When set to @true, force use of @keyEscape for _all_ keywords
+@@                        before doing anything else, irregardless of what @mode is, except
+@@                        for when @mode is set to @ESCAPE_MODE_KEEP
+function escapeTextIntoFile(
+		fp: File | CWriter, text: string | CParser | UserString,
+		mode: int, keyEscape: Callable with string = none,
+		evalEnviron: {string: Object} | none = none,
+		forceKeyEscape: bool = false) {
+	/* Check for simple case: @text is a single keyword */
+	{
+		local usedText = text;
+		if (usedText is UserString)
+			usedText = usedText.text;
+		if (usedText is string) {
+			if (!usedText)
+				return;
+			if (usedText.issymbol()) {
+				if (mode == ESCAPE_MODE_KEEP) {
+single_dont_escape:
+					fp << usedText;
+				} else {
+					local escapedTok;
+					if (forceKeyEscape) {
+						escapedTok = keyEscape(usedText);
+						if (escapedTok !is none)
+							goto single_got_escapedTok;
+					}
+					if (mode != ESCAPE_MODE_FULL) {
+						if (mode == ESCAPE_MODE_NONE) {
+							escapedTok = usedText;
+							if (escapedTok.startswith("$"))
+								escapedTok = usedText[1:];
+						} else {
+							/* mode == ESCAPE_MODE_PART */
+							if (usedText.startswith("$"))
+								goto single_do_escape_keyword;
+							/* Do a partial escape */
+							if (!forceKeyEscape) {
+								escapedTok = keyEscape(usedText);
+								if (escapedTok !is none)
+									goto got_escapedTok;
+							}
+							if (usedText in keywordEscapes || usedText in cLanguageKeywords)
+								escapedTok = usedText;
+							else {
+								escapedTok = escapeKeywordIfNotAlreadyEscaped(usedText);
+							}
+						}
+					} else {
+single_do_escape_keyword:
+						if (usedText.startswith("$"))
+							usedText = usedText[1:];
+						/* Escape this keyword */
+						if (!forceKeyEscape) {
+							escapedTok = keyEscape(usedText);
+							if (escapedTok !is none)
+								goto got_escapedTok;
+						}
+						escapedTok = keywordEscapes.get(usedText);
+						if (escapedTok is none) {
+							if (usedText in cLanguageKeywords)
+								goto single_dont_escape;
+							escapedTok = escapeKeywordIfNotAlreadyEscaped(usedText);
+						}
+					}
+single_got_escapedTok:
+					fp << escapedTok;
+				}
+				return;
+			}
+		}
+	}
+	
+	local self = CParser(text);
+	local flushStart = self.tokEnd;
+	@@Stack for @@if ...@@, @@elif ...@@, @@else@@ and @@endif@@
+	@@Elements are:
+	@@  - @false  If no @@else@@ has been encountered, yet
+	@@  - @true   If @@else@@ was encountered
+	local ppStack: {bool...} = none;
+	for (;;) {
+		local tok = self.next();
+again_handle_tok:
+		switch (tok) {
+
+		case "":
+			goto done;
+
+		case "@": {
+			/* Escaped text sequence */
+			if (flushStart < self.tokStart)
+				fp << self.text[flushStart:self.tokStart];
+			/* Find the next @-character */
+			flushStart = self.tokEnd;
+			local escapeEnd = self.text.find("@", flushStart);
+			if (escapeEnd < 0)
+				self.errAt(self.tokStart, "Unmatched @-character");
+			fp << self.text[flushStart:escapeEnd];
+			flushStart = escapeEnd + 1;
+			self.tokEnd = flushStart;
+		}	continue;
+
+		case "@@": {
+			/* Formating directive */
+			if (flushStart < self.tokStart)
+				fp << self.text[flushStart:self.tokStart];
+			local skipStart = self.tokStart;
+			tok = self.next();
+			switch (tok) {
+
+			case "exec": {
+				self.next();
+				local exprStart = self.tokStart;
+				local exprEnd   = exprStart;
+				while (self.tok !in ["", "@@"]) {
+					exprEnd = self.tokEnd;
+					self.next();
+				}
+				if (evalEnviron is none)
+					evalEnviron = Dict();
+				local evalExpr = self.text[exprStart:exprEnd];
+				try {
+					exec(evalExpr, globals: evalEnviron);
+				} catch (Error as e) {
+					self.errAt(exprStart, e);
+					throw;
+				}
+			}	break;
+
+			case "if":
+			case "elif": {
+				self.next();
+parse_if_or_elif_condition:
+				local exprStart = self.tokStart;
+				local exprEnd   = exprStart;
+				while (self.tok !in ["", "@@"]) {
+					exprEnd = self.tokEnd;
+					self.next();
+				}
+				if (evalEnviron is none)
+					evalEnviron = Dict();
+				local evalExpr = self.text[exprStart:exprEnd];
+				local evalResult;
+				try {
+					evalResult = !!exec(evalExpr, globals: evalEnviron);
+				} catch (Error as e) {
+					self.errAt(exprStart, e);
+					throw;
+				}
+				if (evalResult) {
+					if (tok == "if") {
+						if (ppStack is none)
+							ppStack = [];
+						ppStack.pushback(false);
+					} else {
+						if (!ppStack)
+							self.errAt(exprStart, "elif without if");
+						if (ppStack.last)
+							self.errAt(exprStart, "elif after else");
+					}
+				} else {
+					self.next();
+					/* Skip the current block */
+					local nextPart = skipEscapingPreproessorBlock(self);
+					if (nextPart == 0) {
+						/* @@else@@ encountered */
+						if (ppStack is none)
+							ppStack = [];
+						ppStack.pushback(true);
+					} else if (nextPart == 1) {
+						/* @@endif@@ encountered */
+					} else {
+						/* @@elif ... encountered
+						 * Act as though the skipped block didn't exist,
+						 * at this elif's condition was replacing the
+						 * original if/elif's condition. */
+						goto parse_if_or_elif_condition;
+					}
+				}
+			}	break;
+
+			case "else": {
+				if (!ppStack)
+					self.err("else without if");
+				if (ppStack.last)
+					self.err("else after else");
+				self.next();
+				self.skip("@@");
+				ppStack.last = true;
+				/* Skip the current block */
+				local nextPart = skipEscapingPreproessorBlock(self);
+				if (nextPart == 0) {
+					self.err("else after else");
+				} else if (nextPart == 1) {
+					/* @@endif@@ encountered */
+				} else {
+					self.err("elif after else");
+				}
+			}	break;
+
+			case "endif": {
+				if (!ppStack)
+					self.err("endif without if");
+				ppStack.popback();
+				self.next();
+			}	break;
+
+			/* TODO: @@insert copy({basefunc}, {copymode})@@ */
+			/* TODO: @@yield {expr}@@ */
+			/* TODO: @@has_function({name})@@ */
+			/* TODO: @@crt_has_function({name})@@ */
+			/* TODO: @@pp_if {expr}@@  (where {expr} is handled the same way that [requires()] is
+			 *                          handled, meaning that $has_function() is allowed)
+			 *                          Also note that the expression is optimized before
+			 *                          being printed, and that constant expression 0/1
+			 *                          will cause the associated blocks to be skipped,
+			 *                          the same way this is done for @@if {expr}@@. */
+			/* TODO: @@pp_elif {expr}@@ */
+			/* TODO: @@pp_else@@ */
+			/* TODO: @@pp_endif@@  */
+
+			/* TODO: @@if_has_function({name})@@             (Deprecated alias for @@pp_if   $has_function({name})@@) */
+			/* TODO: @@elif_has_function({name})@@           (Deprecated alias for @@pp_elif $has_function({name})@@) */
+			/* TODO: @@else_has_function({name})@@           (Deprecated alias for @@pp_else@@) */
+			/* TODO: @@endif_has_function({name})@@          (Deprecated alias for @@pp_endif@@) */
+			/* TODO: @@if_crt_has_function({name})@@         (Deprecated alias for @@pp_if   $crt_has_function({name})@@) */
+			/* TODO: @@elif_crt_has_function({name})@@       (Deprecated alias for @@pp_elif $crt_has_function({name})@@) */
+			/* TODO: @@else_crt_has_function({name})@@       (Deprecated alias for @@pp_else@@) */
+			/* TODO: @@endif_crt_has_function({name})@@      (Deprecated alias for @@pp_endif@@) */
+			/* TODO: @@if_not_has_function({name})@@         (Deprecated alias for @@pp_if   !$has_function({name})@@) */
+			/* TODO: @@elif_not_has_function({name})@@       (Deprecated alias for @@pp_elif !$has_function({name})@@) */
+			/* TODO: @@else_not_has_function({name})@@       (Deprecated alias for @@pp_else@@) */
+			/* TODO: @@endif_not_has_function({name})@@      (Deprecated alias for @@pp_endif@@) */
+			/* TODO: @@if_not_crt_has_function({name})@@     (Deprecated alias for @@pp_if   !$crt_has_function({name})@@) */
+			/* TODO: @@elif_not_crt_has_function({name})@@   (Deprecated alias for @@pp_elif !$crt_has_function({name})@@) */
+			/* TODO: @@else_not_crt_has_function({name})@@   (Deprecated alias for @@pp_else@@) */
+			/* TODO: @@endif_not_crt_has_function({name})@@  (Deprecated alias for @@pp_endif@@) */
+
+			default:
+				self.err("Unknown directive: {!r}"
+					.format({ tok }));
+				break;
+			}
+			flushStart = self.tokEnd;
+			tok = self.skip("@@");
+			/* Even though we do remove directives, we do keep their lines,
+			 * such that #line directives over generated code remain consistent
+			 * with their origins. */
+			{
+				local count = self.text.count("\n", skipStart, flushStart);
+				if (count)
+					fp << ("\n" * count);
+			}
+		}	goto again_handle_tok;
+
+		default:
+			if (tok.issymbol() && mode != ESCAPE_MODE_KEEP) {
+				local escapedTok;
+				if (forceKeyEscape) {
+					escapedTok = keyEscape(tok);
+					if (escapedTok !is none)
+						goto got_escapedTok;
+				}
+				if (mode != ESCAPE_MODE_FULL) {
+					if (mode == ESCAPE_MODE_NONE) {
+						escapedTok = tok;
+						if (escapedTok.startswith("$"))
+							escapedTok = tok[1:];
+					} else {
+						/* mode == ESCAPE_MODE_PART */
+						if (tok.startswith("$"))
+							goto do_escape_keyword;
+						/* Do a partial escape */
+						if (!forceKeyEscape) {
+							escapedTok = keyEscape(tok);
+							if (escapedTok !is none)
+								goto got_escapedTok;
+						}
+						if (tok in keywordEscapes || tok in cLanguageKeywords)
+							escapedTok = tok;
+						else {
+							escapedTok = escapeKeywordIfNotAlreadyEscaped(tok);
+						}
+					}
+				} else {
+do_escape_keyword:
+					if (tok.startswith("$")) {
+						/* Deal with special control macros, such as $has_function() */
+						switch (tok) {
+
+						case "$has_function": {
+							if (flushStart < self.tokStart)
+								fp << self.text[flushStart:self.tokStart];
+							self.next();
+							tok = self.skip("(");
+							if (isCString(tok))
+								tok = tok.decode("c-escape");
+							local fun;
+							try {
+								fun = findFunctionByName(tok);
+							} catch (Error as e) {
+								self.err(e.message);
+							}
+							self.next();
+							tok = self.skip(")");
+							/* Print requires-conditions for this function */
+							fun.cprintRequires(fp);
+							flushStart = self.tokEnd;
+						}	goto again_handle_tok;
+
+						/* TODO: $crt_has_function(...) */
+
+						default:
+							break;
+						}
+						tok = tok[1:];
+					}
+					/* Escape this keyword */
+					if (!forceKeyEscape) {
+						escapedTok = keyEscape(tok);
+						if (escapedTok !is none)
+							goto got_escapedTok;
+					}
+					escapedTok = keywordEscapes.get(tok);
+					if (escapedTok is none) {
+						if (tok in cLanguageKeywords)
+							continue;
+						escapedTok = escapeKeywordIfNotAlreadyEscaped(tok);
+					}
+				}
+got_escapedTok:
+				if (flushStart < self.tokStart)
+					fp << self.text[flushStart:self.tokStart];
+				fp << escapedTok;
+				flushStart = self.tokEnd;
+			}
+			break;
+		}
+	}
+done:
+	if (flushStart < self.end)
+		fp << self.text[flushStart:self.end];
+}
+
+@@Helper wrapper for @escapeTextIntoFile
+function escapeText(text: string | CParser | UserString, mode: int,
+		keyEscape: Callable with string = none): string | UserString {
+	File.Writer result;
+	escapeTextIntoFile(result, text, mode, keyEscape);
+	result = result.string;
+	/* Allow for better string re-use */
+	if (text is string) {
+		if (result == text)
+			result = text;
+	} else if (text is UserString) {
+		if (result == text.text)
+			result = text;
+	}
+	return result;
+}
+
+
+function printPreprocessorConditionString(
+		fp: File | CWriter, text: string | CParser | UserString) {
+	escapeTextIntoFile(fp, text, ESCAPE_MODE_FULL, identity from functools);
+}
+
+function expandPreprocessorConditionString(
+		text: string | CParser | UserString): string {
+	local resultFp = File.Writer();
+	escapeTextIntoFile(resultFp, text, ESCAPE_MODE_FULL, identity from functools);
+	return resultFp.string;
+}
