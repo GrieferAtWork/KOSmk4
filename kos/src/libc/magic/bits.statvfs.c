@@ -51,22 +51,58 @@
 #define _STATVFSBUF_F_UNUSED 1
 #endif /* __SIZEOF_SYSCALL_LONG_T__ == 4 */
 
-}%[enum @macro @undef {
-	ST_RDONLY      = 1     /* Mount read-only.  */
-	ST_NOSUID      = 2     /* Ignore suid and sgid bits.  */
-%#ifdef __USE_GNU
-	ST_NODEV       = 4     /* Disallow access to device special files.  */
-	ST_NOEXEC      = 8     /* Disallow program execution.  */
-	ST_SYNCHRONOUS = 16    /* Writes are synced at once.  */
-	ST_MANDLOCK    = 64    /* Allow mandatory locks on an FS.  */
-	ST_WRITE       = 128   /* Write on file/directory/symlink.  */
-	ST_APPEND      = 256   /* Append-only file.  */
-	ST_IMMUTABLE   = 512   /* Immutable file.  */
-	ST_NOATIME     = 1024  /* Do not update access times.  */
-	ST_NODIRATIME  = 2048  /* Do not update directory access times.  */
-	ST_RELATIME    = 4096  /* Update atime relative to mtime/ctime.  */
-%#endif /* __USE_GNU */
-}]%{
+/*[[[enum]]]*/
+#ifdef __CC__
+enum {
+	ST_RDONLY      = 1,     /* Mount read-only.  */
+	ST_NOSUID      = 2,     /* Ignore suid and sgid bits.  */
+#ifdef __USE_GNU
+	ST_NODEV       = 4,     /* Disallow access to device special files.  */
+	ST_NOEXEC      = 8,     /* Disallow program execution.  */
+	ST_SYNCHRONOUS = 16,    /* Writes are synced at once.  */
+	ST_MANDLOCK    = 64,    /* Allow mandatory locks on an FS.  */
+	ST_WRITE       = 128,   /* Write on file/directory/symlink.  */
+	ST_APPEND      = 256,   /* Append-only file.  */
+	ST_IMMUTABLE   = 512,   /* Immutable file.  */
+	ST_NOATIME     = 1024,  /* Do not update access times.  */
+	ST_NODIRATIME  = 2048,  /* Do not update directory access times.  */
+	ST_RELATIME    = 4096,  /* Update atime relative to mtime/ctime.  */
+#endif /* __USE_GNU */
+};
+#endif /* __CC__ */
+/*[[[AUTO]]]*/
+#ifdef __COMPILER_PREFERR_ENUMS
+#define ST_RDONLY      ST_RDONLY      /* Mount read-only.  */
+#define ST_NOSUID      ST_NOSUID      /* Ignore suid and sgid bits.  */
+#ifdef __USE_GNU
+#define ST_NODEV       ST_NODEV       /* Disallow access to device special files.  */
+#define ST_NOEXEC      ST_NOEXEC      /* Disallow program execution.  */
+#define ST_SYNCHRONOUS ST_SYNCHRONOUS /* Writes are synced at once.  */
+#define ST_MANDLOCK    ST_MANDLOCK    /* Allow mandatory locks on an FS.  */
+#define ST_WRITE       ST_WRITE       /* Write on file/directory/symlink.  */
+#define ST_APPEND      ST_APPEND      /* Append-only file.  */
+#define ST_IMMUTABLE   ST_IMMUTABLE   /* Immutable file.  */
+#define ST_NOATIME     ST_NOATIME     /* Do not update access times.  */
+#define ST_NODIRATIME  ST_NODIRATIME  /* Do not update directory access times.  */
+#define ST_RELATIME    ST_RELATIME    /* Update atime relative to mtime/ctime.  */
+#endif /* __USE_GNU */
+#else /* __COMPILER_PREFERR_ENUMS */
+#define ST_RDONLY      1    /* Mount read-only.  */
+#define ST_NOSUID      2    /* Ignore suid and sgid bits.  */
+#ifdef __USE_GNU
+#define ST_NODEV       4    /* Disallow access to device special files.  */
+#define ST_NOEXEC      8    /* Disallow program execution.  */
+#define ST_SYNCHRONOUS 16   /* Writes are synced at once.  */
+#define ST_MANDLOCK    64   /* Allow mandatory locks on an FS.  */
+#define ST_WRITE       128  /* Write on file/directory/symlink.  */
+#define ST_APPEND      256  /* Append-only file.  */
+#define ST_IMMUTABLE   512  /* Immutable file.  */
+#define ST_NOATIME     1024 /* Do not update access times.  */
+#define ST_NODIRATIME  2048 /* Do not update directory access times.  */
+#define ST_RELATIME    4096 /* Update atime relative to mtime/ctime.  */
+#endif /* __USE_GNU */
+#endif /* !__COMPILER_PREFERR_ENUMS */
+/*[[[end]]]*/
 
 
 #ifdef __CC__

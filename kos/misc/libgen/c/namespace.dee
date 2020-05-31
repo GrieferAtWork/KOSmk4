@@ -28,14 +28,14 @@ class Namespace {
 	@@The name of this namespace
 	public member name: string;
 
-	@@String inserted (at the start of its own line)
-	@@in order to enter the namespace
-	@@e.g. @"__NAMESPACE_FAST_BEGIN"
+	@@String inserted (at the start of its own line) in order to enter the namespace
+	@@NOTE: If non-empty, this string _MUST_ end with a new-line!
+	@@e.g. @"__NAMESPACE_FAST_BEGIN\n"
 	public member enter: string;
 
-	@@String inserted (at the start of its own line)
-	@@in order to exit the namespace
-	@@e.g. @"__NAMESPACE_FAST_END"
+	@@String inserted (at the start of its own line) in order to exit the namespace
+	@@NOTE: If non-empty, this string _MUST_ end with a new-line!
+	@@e.g. @"__NAMESPACE_FAST_END\n"
 	public member leave: string;
 
 	@@Namespace prefix

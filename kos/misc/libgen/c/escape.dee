@@ -22,6 +22,7 @@ import * from deemon;
 import * from .parser;
 import * from .globals;
 import * from .writer;
+import * from ..optiexpr;
 
 #define Function         Object /* Function from .cheaders */
 #define LocalFunction    Object /* LocalFunction from .cheaders */
@@ -108,6 +109,7 @@ global final keywordEscapes: {string: string} = Dict({
 	"NONNULL" : "__ATTR_NONNULL",
 });
 
+global expandPreprocessorConditionString;
 
 
 
@@ -185,10 +187,11 @@ function skipEscapingPreproessorBlock(self: CParser): int {
 	local start = self.tokStart;
 	local recursion = 0;
 	for (;;) {
-		local tok = self.next();
+		local tok = self.tok;
 		if (tok != "@@") {
 			if (!tok)
 				self.errAt(start, "Unmatched conditional block");
+			tok = self.next();
 			continue;
 		}
 		tok = self.next();
@@ -214,8 +217,11 @@ function skipEscapingPreproessorBlock(self: CParser): int {
 		do {
 			tok = self.next();
 		} while (tok !in ["", "@@"]);
+		tok = self.next();
 	}
 }
+
+
 
 @@Escape keywords from the given text via the given @keyEscape.
 @@If the given callback returns @none for some given word, then
@@ -296,7 +302,7 @@ single_got_escapedTok:
 			}
 		}
 	}
-	
+
 	local self = CParser(text);
 	local flushStart = self.tokEnd;
 	@@Stack for @@if ...@@, @@elif ...@@, @@else@@ and @@endif@@
@@ -304,6 +310,8 @@ single_got_escapedTok:
 	@@  - @false  If no @@else@@ has been encountered, yet
 	@@  - @true   If @@else@@ was encountered
 	local ppStack: {bool...} = none;
+	local oldKeepNewLinesFromDeadCode: bool | none = none;
+	local mustFlushFp: bool = false;
 	for (;;) {
 		local tok = self.next();
 again_handle_tok:
@@ -385,7 +393,7 @@ parse_if_or_elif_condition:
 							self.errAt(exprStart, "elif after else");
 					}
 				} else {
-					self.next();
+					self.skip("@@");
 					/* Skip the current block */
 					local nextPart = skipEscapingPreproessorBlock(self);
 					if (nextPart == 0) {
@@ -431,36 +439,151 @@ parse_if_or_elif_condition:
 				self.next();
 			}	break;
 
+			{
+				local numLines;
+				local cond;
+			case "pp_if":
+			case "pp_elif": {
+				self.next();
+				local exprStart = self.tokStart;
+				local exprEnd = exprStart;
+				while (self.tok !in ["", "@@"]) {
+					exprEnd = self.tokEnd;
+					self.next();
+				}
+				cond = self.text[exprStart:exprEnd];
+handle_pp_if__pp_elif_cond:
+				cond = expandPreprocessorConditionString(cond);
+				if (tok == "pp_if") {
+					if (oldKeepNewLinesFromDeadCode is none) {
+						if (fp !is CWriter) {
+							fp = CWriter(fp);
+							mustFlushFp = true;
+						}
+						oldKeepNewLinesFromDeadCode = fp.keepNewLinesFromDeadCode;
+						if (!fp.isDeadCode)
+							fp.keepNewLinesFromDeadCode = true;
+					}
+					numLines = fp.ppIf(cond);
+				} else {
+					if (oldKeepNewLinesFromDeadCode is none)
+						self.err("@@pp_elif@@ without @@pp_if@@");
+					numLines = fp.ppElif(cond);
+				}
+handle_numLines_after_pp_directive:
+				flushStart = self.tokEnd;
+				tok = self.skip("@@");
+				/* Even though we do remove directives, we do keep their lines,
+				 * such that #line directives over generated code remain consistent
+				 * with their origins. */
+				local count = self.text.count("\n", skipStart, flushStart);
+				if (count > numLines) {
+					fp << ("\n" * (count - numLines));
+				} else if (count < numLines) {
+					numLines -= count;
+					/* Try to skip up to @numLines lines from follow-up text
+					 * -> Figure out the # of new-lines between the current flush-start,
+					 *    and the next of the first token to follow after the directive */
+					count = self.text.count("\n", flushStart, self.tokEnd);
+					if (count) {
+						if (count <= numLines) {
+							/* Use the end of the last line-feed as the new flush-start */
+							flushStart = self.text.rindex("\n", flushStart, self.tokEnd) + 1;
+						} else {
+							/* There are @count line-feeds in total, but we
+							 * only need to skip the first  @numLines of them! */
+							while (numLines) {
+								--numLines;
+								flushStart = self.text.index(
+									"\n", flushStart, self.tokEnd) + 1;
+							}
+						}
+					}
+				}
+			}	goto again_handle_tok;
+
+			case "pp_else":
+				if (oldKeepNewLinesFromDeadCode is none)
+					self.err("@@pp_else@@ without @@pp_if@@");
+				numLines = fp.ppElse();
+				self.next();
+				goto handle_numLines_after_pp_directive;
+
+			case "pp_endif":
+				if (oldKeepNewLinesFromDeadCode is none)
+					self.err("@@pp_endif@@ without @@pp_if@@");
+				numLines = fp.ppEndif();
+				self.next();
+				goto handle_numLines_after_pp_directive;
+
+			/* Deprecated preprocessor functions */
+			case "if_has_function":              /* (Deprecated alias for @@pp_if   $has_function({name})@@) */
+			case "if_crt_has_function":          /* (Deprecated alias for @@pp_if   $crt_has_function({name})@@) */
+			case "if_not_has_function":          /* (Deprecated alias for @@pp_if   !$has_function({name})@@) */
+			case "if_not_crt_has_function":      /* (Deprecated alias for @@pp_if   !$crt_has_function({name})@@) */
+			case "elif_has_function":            /* (Deprecated alias for @@pp_elif $has_function({name})@@) */
+			case "elif_crt_has_function":        /* (Deprecated alias for @@pp_elif $crt_has_function({name})@@) */
+			case "elif_not_has_function":        /* (Deprecated alias for @@pp_elif !$has_function({name})@@) */
+			case "elif_not_crt_has_function":    /* (Deprecated alias for @@pp_elif !$crt_has_function({name})@@) */
+			case "else_has_function":            /* (Deprecated alias for @@pp_else@@) */
+			case "else_crt_has_function":        /* (Deprecated alias for @@pp_else@@) */
+			case "else_not_has_function":        /* (Deprecated alias for @@pp_else@@) */
+			case "else_not_crt_has_function":    /* (Deprecated alias for @@pp_else@@) */
+			case "endif_has_function":           /* (Deprecated alias for @@pp_endif@@) */
+			case "endif_crt_has_function":       /* (Deprecated alias for @@pp_endif@@) */
+			case "endif_not_has_function":       /* (Deprecated alias for @@pp_endif@@) */
+			case "endif_not_crt_has_function": { /* (Deprecated alias for @@pp_endif@@) */
+				local functionName;
+				self.next();
+				self.skip("(");
+				functionName = self.tok;
+				if (isCString(functionName))
+					functionName = functionName.decode("c-escape");
+				else if (!functionName.issymbol()) {
+					self.err("Expected keyword or string in '@@{}(...)@@', but got {!r}"
+						.format({ tok, functionName }));
+				}
+				self.next();
+				self.skip(")");
+				if (tok in ["else_has_function", "else_crt_has_function",
+				            "else_not_has_function", "else_not_crt_has_function"]) {
+					if (oldKeepNewLinesFromDeadCode is none) {
+						self.err("@@{}@@ without @@pp_if@@"
+							.format({ tok }));
+					}
+					numLines = fp.ppElse();
+					goto handle_numLines_after_pp_directive;
+				}
+				if (tok in ["endif_has_function", "endif_crt_has_function",
+				            "endif_not_has_function", "endif_not_crt_has_function"]) {
+					if (oldKeepNewLinesFromDeadCode is none) {
+						self.err("@@{}@@ without @@pp_if@@"
+							.format({ tok }));
+					}
+					numLines = fp.ppEndif();
+					goto handle_numLines_after_pp_directive;
+				}
+				/* construct the condition string, and if vs. elif */
+				tok, cond = {
+					"if_has_function"           : ("pp_if",   "$has_function({})"),
+					"if_crt_has_function"       : ("pp_if",   "$crt_has_function({})"),
+					"if_not_has_function"       : ("pp_if",   "!$has_function({})"),
+					"if_not_crt_has_function"   : ("pp_if",   "!$crt_has_function({})"),
+					"elif_has_function"         : ("pp_elif", "$has_function({})"),
+					"elif_crt_has_function"     : ("pp_elif", "$crt_has_function({})"),
+					"elif_not_has_function"     : ("pp_elif", "!$has_function({})"),
+					"elif_not_crt_has_function" : ("pp_elif", "!$crt_has_function({})"),
+				}[tok]...;
+				cond = cond.format({ functionName });
+				goto handle_pp_if__pp_elif_cond;
+			}	break;
+
+			}
+
 			/* TODO: @@insert copy({basefunc}, {copymode})@@ */
 			/* TODO: @@yield {expr}@@ */
 			/* TODO: @@has_function({name})@@ */
 			/* TODO: @@crt_has_function({name})@@ */
-			/* TODO: @@pp_if {expr}@@  (where {expr} is handled the same way that [requires()] is
-			 *                          handled, meaning that $has_function() is allowed)
-			 *                          Also note that the expression is optimized before
-			 *                          being printed, and that constant expression 0/1
-			 *                          will cause the associated blocks to be skipped,
-			 *                          the same way this is done for @@if {expr}@@. */
-			/* TODO: @@pp_elif {expr}@@ */
-			/* TODO: @@pp_else@@ */
-			/* TODO: @@pp_endif@@  */
-
-			/* TODO: @@if_has_function({name})@@             (Deprecated alias for @@pp_if   $has_function({name})@@) */
-			/* TODO: @@elif_has_function({name})@@           (Deprecated alias for @@pp_elif $has_function({name})@@) */
-			/* TODO: @@else_has_function({name})@@           (Deprecated alias for @@pp_else@@) */
-			/* TODO: @@endif_has_function({name})@@          (Deprecated alias for @@pp_endif@@) */
-			/* TODO: @@if_crt_has_function({name})@@         (Deprecated alias for @@pp_if   $crt_has_function({name})@@) */
-			/* TODO: @@elif_crt_has_function({name})@@       (Deprecated alias for @@pp_elif $crt_has_function({name})@@) */
-			/* TODO: @@else_crt_has_function({name})@@       (Deprecated alias for @@pp_else@@) */
-			/* TODO: @@endif_crt_has_function({name})@@      (Deprecated alias for @@pp_endif@@) */
-			/* TODO: @@if_not_has_function({name})@@         (Deprecated alias for @@pp_if   !$has_function({name})@@) */
-			/* TODO: @@elif_not_has_function({name})@@       (Deprecated alias for @@pp_elif !$has_function({name})@@) */
-			/* TODO: @@else_not_has_function({name})@@       (Deprecated alias for @@pp_else@@) */
-			/* TODO: @@endif_not_has_function({name})@@      (Deprecated alias for @@pp_endif@@) */
-			/* TODO: @@if_not_crt_has_function({name})@@     (Deprecated alias for @@pp_if   !$crt_has_function({name})@@) */
-			/* TODO: @@elif_not_crt_has_function({name})@@   (Deprecated alias for @@pp_elif !$crt_has_function({name})@@) */
-			/* TODO: @@else_not_crt_has_function({name})@@   (Deprecated alias for @@pp_else@@) */
-			/* TODO: @@endif_not_crt_has_function({name})@@  (Deprecated alias for @@pp_endif@@) */
 
 			default:
 				self.err("Unknown directive: {!r}"
@@ -482,6 +605,36 @@ parse_if_or_elif_condition:
 		default:
 			if (tok.issymbol() && mode != ESCAPE_MODE_KEEP) {
 				local escapedTok;
+				if (tok.startswith("$")) {
+					/* Deal with special control macros, such as $has_function() */
+					switch (tok) {
+
+					case "$has_function": {
+						if (flushStart < self.tokStart)
+							fp << self.text[flushStart:self.tokStart];
+						self.next();
+						tok = self.skip("(");
+						if (isCString(tok))
+							tok = tok.decode("c-escape");
+						local fun;
+						try {
+							fun = findFunctionByName(tok);
+						} catch (Error as e) {
+							self.err(e.message);
+						}
+						self.next();
+						tok = self.skip(")");
+						/* Print requires-conditions for this function */
+						fun.cprintRequires(fp);
+						flushStart = self.tokEnd;
+					}	goto again_handle_tok;
+
+					/* TODO: $crt_has_function(...) */
+
+					default:
+						break;
+					}
+				}
 				if (forceKeyEscape) {
 					escapedTok = keyEscape(tok);
 					if (escapedTok !is none)
@@ -495,7 +648,7 @@ parse_if_or_elif_condition:
 					} else {
 						/* mode == ESCAPE_MODE_PART */
 						if (tok.startswith("$"))
-							goto do_escape_keyword;
+							goto do_escape_keyword_dollar;
 						/* Do a partial escape */
 						if (!forceKeyEscape) {
 							escapedTok = keyEscape(tok);
@@ -509,36 +662,8 @@ parse_if_or_elif_condition:
 						}
 					}
 				} else {
-do_escape_keyword:
 					if (tok.startswith("$")) {
-						/* Deal with special control macros, such as $has_function() */
-						switch (tok) {
-
-						case "$has_function": {
-							if (flushStart < self.tokStart)
-								fp << self.text[flushStart:self.tokStart];
-							self.next();
-							tok = self.skip("(");
-							if (isCString(tok))
-								tok = tok.decode("c-escape");
-							local fun;
-							try {
-								fun = findFunctionByName(tok);
-							} catch (Error as e) {
-								self.err(e.message);
-							}
-							self.next();
-							tok = self.skip(")");
-							/* Print requires-conditions for this function */
-							fun.cprintRequires(fp);
-							flushStart = self.tokEnd;
-						}	goto again_handle_tok;
-
-						/* TODO: $crt_has_function(...) */
-
-						default:
-							break;
-						}
+do_escape_keyword_dollar:
 						tok = tok[1:];
 					}
 					/* Escape this keyword */
@@ -566,6 +691,10 @@ got_escapedTok:
 done:
 	if (flushStart < self.end)
 		fp << self.text[flushStart:self.end];
+	if (oldKeepNewLinesFromDeadCode !is none)
+		fp.keepNewLinesFromDeadCode = oldKeepNewLinesFromDeadCode;
+	if (mustFlushFp)
+		fp.flush();
 }
 
 @@Helper wrapper for @escapeTextIntoFile

@@ -124,7 +124,10 @@ class CParser {
 			if (end < 0 || end > #this.text)
 				this.end = #this.text;
 		} else if (text is File) {
-			this.text = text.readall();
+			this.text = text
+				.readall()
+				.unifylines()
+				.decode("utf-8");
 			if (filename in ["", "?"])
 				this.filename = text.filename;
 			if (end < 0 || end > #this.text)
@@ -165,7 +168,7 @@ class CParser {
 	public member tokStart: int;
 
 	@@The last-parsed token
-	public member tok: string;
+	public member tok: string = "";
 
 	@@End offset of the last-parsed token
 	public member tokEnd: int;
@@ -388,7 +391,7 @@ twochar:
 
 @@Parse a function like expression such as @"foo(bar, foobar)" or a C-string, such as @"\"foo\""
 @@Return with the current token set to the first token after the expression/c-string
-function parserCStringOrFunctionLikeExpression(self: CParser): UserString | string {
+function parseCStringOrFunctionLikeExpression(self: CParser): UserString | string {
 	local tok = self.tok;
 	if (tok.issymbol()) {
 		local exprStart = self.tokStart;
@@ -409,11 +412,12 @@ function parserCStringOrFunctionLikeExpression(self: CParser): UserString | stri
 		self.next();
 		return tok.decode("c-escape");
 	}
-	self.err("Expected keyword or string");
+	self.err("Expected keyword or string, but got {!r}"
+		.format({ tok }));
 }
 
 @@Parse a C-String, or everything else until a trailing @")", @"]" or @"}"
-function parserCStringOrAllUntilRParen(self: CParser): UserString | string {
+function parseCStringOrAllUntilRParen(self: CParser): UserString | string {
 	local tok = self.tok;
 	if (isCString(tok)) {
 		self.next();
@@ -437,18 +441,35 @@ function parserCStringOrAllUntilRParen(self: CParser): UserString | string {
 }
 
 
-@@Same as @parserCStringOrFunctionLikeExpression, but parse
+@@Same as @parseCStringOrFunctionLikeExpression, but parse
 @@multiple such expressions, which must be seperated by @","-tokens
 @@Stop if the token at the start of an element would be a @"]", @"}"
 @@or @")", or if some element isn't followed with a @","-token
-function parserCStringOrFunctionLikeExpressionList(self: CParser): {(UserString | string)...} {
+function parseCStringOrFunctionLikeExpressionList(self: CParser): {(UserString | string)...} {
 	for (;;) {
 		if (self.tok in "]})")
 			break;
-		yield parserCStringOrFunctionLikeExpression(self);
+		yield parseCStringOrFunctionLikeExpression(self);
 		if (self.tok != ",")
 			break;
 		self.next();
 	}
+}
+
+@@Require either a string- or keyword-token, where a string
+@@token will be decoded using @string.decode("c-escape"), and
+@@a keyword token will be returned as-is.
+@@If the current token is neither or these, throw and error instead
+function parseCStringOrKeyword(self: CParser): string {
+	local tok = self.tok;
+	if (tok.issymbol()) {
+	} else if (isCString(tok)) {
+		tok = tok.decode("c-escape");
+	} else {
+		self.err("Expected keyword or C-string, but got {!r}"
+			.format({ tok }));
+	}
+	self.next();
+	return tok;
 }
 

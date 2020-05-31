@@ -45,9 +45,5 @@ global allSystemHeaders: {string: SystemHeader} = Dict();
 @@HashSet of all functions for which the <local/header/function.h> file was ever used
 global neededLocalFunction: {LocalFunction...} = HashSet();
 
-@@List of functions that need to be called (in
-@@any order) after the initial parsing phase.
-global functionLinkageSteps: {Callable...} = Deque();
-
 
 

@@ -67,9 +67,9 @@ function replaceWcharTextKeyword(keyword: string, mode: int): string {
 	repl = allWcharFunctionsByName.get(keyword);
 	if (repl !is none) {
 		/* Yes, this is a [wchar]-function! */
-		repl = repl.wc_header_uchar_name[mode];
+		repl = repl.wc_header_uchar[mode];
 		if (repl !is none)
-			return repl;
+			return repl.name;
 		repl = allWcharFunctionsByName[keyword];
 		/* Complain if referencing a [wchar] function function some uchar
 		 * variant, but no uchar variant exists for that referenced function. */

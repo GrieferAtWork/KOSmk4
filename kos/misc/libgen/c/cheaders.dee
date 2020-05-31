@@ -563,7 +563,7 @@ class LocalFunctionImplementation {
 	public function cprintLocalFunctionImplementation(
 			fp: CWriter, escapeMode: int, name: string,
 			prototype: FunctionPrototype, dependencyDecl: string,
-			documentation: string, namespace: Namespace,
+			doc: string, namespace: Namespace,
 			keyDependency: Callable with string) {
 		for (local inc: implementationIncludes.sorted())
 			fp.ppInclude(inc);
@@ -586,8 +586,8 @@ class LocalFunctionImplementation {
 			escapeTextIntoFile(fp, implementationPrefix, escapeMode);
 			fp.namespace = namespace;
 		}
-		if (documentation)
-			fp.printComment(documentation);
+		if (doc)
+			fp.printComment(doc);
 		fp << "__LOCAL_LIBC(" << name << ") ";
 		if (prototype.cprintAttributeList(fp, escapeMode))
 			fp << " ";
@@ -678,7 +678,17 @@ class LocalFunction {
 	private member m_functionImplementations: {LocalFunctionImplementation...};
 
 	@@The documentation text of this function
-	public member documentation: string | UserString = "";
+	public member documentation: string | UserString | Callable = "";
+
+	@@Helper wrapper for @documentation to automatically unwind callable objects
+	public property documentationString: string | UserString = {
+		get(): string | UserString {
+			local result = documentation;
+			if (result is Callable)
+				documentation = result = result();
+			return result;
+		}
+	}
 
 	@@@param: dependencyDecl: Declaration prefix for dependencies (usually @"__LIBC")
 	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
@@ -705,6 +715,7 @@ class LocalFunction {
 		/* Go through individual implementations and print them. */
 		local isFirst = true;
 		local numNeededEndif = [];
+		local doc = documentationString;
 		for (local impl: functionImplementations) {
 			local usedPpCond = expandPreprocessorConditionString(impl.ppCond);
 			if (impl.ppCondPrefix ||
@@ -728,7 +739,7 @@ class LocalFunction {
 			}
 			impl.cprintLocalFunctionImplementation(
 				fp, escapeMode, name, prototype,
-				dependencyDecl, documentation,
+				dependencyDecl, doc,
 				localNamespace, keyDependency);
 		}
 		while (numNeededEndif) {
@@ -748,7 +759,7 @@ class LocalFunction {
 	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
 	public function cprintFunctionBinding(
 			fp: CWriter, escapeMode: int, decl: string, exposedName: string,
-			prototypes: {FunctionPrototype...}, documentation: string,
+			prototypes: {FunctionPrototype...}, doc: string,
 			preferBindingMacros: bool) {
 		if (prototype is Callable)
 			prototype = prototype();
@@ -768,10 +779,14 @@ class LocalFunction {
 		}
 		if (preferBindingMacros) {
 			/* TODO: Need to cast arguments if prototypes don't match up */
+			if (doc)
+				fp.printComment(doc);
 			fp << "#define " << exposedName << " " << callToLocalName;
 			return;
 		}
 		for (local ptype: prototypes) {
+			if (doc)
+				fp.printComment(doc);
 			if (exposedName == name) {
 				localNamespace.keyUsingOrImpl(fp, exposedName, []{
 					ptype.cprintCallToAliasDeclaration(
@@ -849,7 +864,7 @@ class InlineFunction {
 	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
 	public function cprintFunctionBinding(
 			fp: CWriter, escapeMode: int, decl: string, exposedName: string,
-			prototypes: {FunctionPrototype...}, documentation: string,
+			prototypes: {FunctionPrototype...}, doc: string,
 			preferBindingMacros: bool, keyDependency: Callable with string = none,
 			dependenciesNamespace: Namespace = none, dependencyDecl: string = "__LIBC") {
 		if (implementationIncludes || implementationPrefix) {
@@ -898,8 +913,8 @@ class InlineFunction {
 			};
 		}
 		for (local prototype: prototypes) {
-			if (documentation)
-				fp.printComment(documentation);
+			if (doc)
+				fp.printComment(doc);
 			if (mode == "__EXTERNINLINE") {
 				local assemblyName = str externInlineAsmname;
 				local isLibcLinkage = decl in LIBC_DECLS && prototype.ccIsLibcCall;
@@ -1071,14 +1086,14 @@ class FunctionBinding {
 	@@@param: escapeMode:          One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
 	@@@param: decl:                Declaration prefix (e.g. @"__LIBC")
 	@@@param: exposedName:         The name by which to expose this binding (e.g. @"strlen")
-	@@@param: documentation:       A human-readable description of the associated function
+	@@@param: doc:                 A human-readable description of the associated function
 	@@@param: guardName:           The name of a macro that must be #undef'd if no prototype
 	@@                             has been exposed at compile-time. Set to @none if no such macro exists
 	@@@param: preferBindingMacros: Prefer function bindings to be done with macros, rather than
 	@@                             through use of inline functions.
 	public function cprintBindFunction(
 			fp: CWriter, escapeMode: int, decl: string, exposedName: string,
-			guardName: string | none = none, documentation: string = "",
+			guardName: string | none = none, doc: string = "",
 			preferBindingMacros: bool = false) {
 		local usedBinding = binding;
 		if (usedBinding is Callable)
@@ -1111,12 +1126,12 @@ class FunctionBinding {
 			if (usedBinding !is string && usedBinding !is UserString) {
 				usedBinding.cprintFunctionBinding(
 					fp, escapeMode, decl, exposedName, associatedPrototypes,
-					documentation, preferBindingMacros);
+					doc, preferBindingMacros);
 			} else {
 				usedBinding = str usedBinding;
 				for (local ptype: associatedPrototypes) {
-					if (documentation)
-						fp.printComment(documentation);
+					if (doc)
+						fp.printComment(doc);
 					ptype.cprintRedirectionBinding(
 						fp, escapeMode, decl,
 						exposedName, usedBinding);
@@ -1156,7 +1171,17 @@ class Function {
 	public member bindings: {(FunctionBinding | Callable)...} | Callable = [];
 
 	@@The documentation text of this function
-	public member documentation: string | UserString = "";
+	public member documentation: string | UserString | Callable = "";
+
+	@@Helper wrapper for @documentation to automatically unwind callable objects
+	public property documentationString: string | UserString = {
+		get(): string | UserString {
+			local result = documentation;
+			if (result is Callable)
+				documentation = result = result();
+			return result;
+		}
+	}
 
 	@@Same as @bindings, however Callable objects will have been flattened
 	public property functionBindings: {FunctionBinding...} = {
@@ -1297,7 +1322,7 @@ no_usable_bindings:
 				fp.ppDefine(guardName, "1");
 				bind.cprintBindFunction(
 					fp, escapeMode, decl, exposedName, guardName,
-					documentation, preferBindingMacros);
+					documentationString, preferBindingMacros);
 				fp.ppEndif();
 				return;
 			}
@@ -1335,7 +1360,7 @@ normal_guardName_binding:
 			}
 			bind.cprintBindFunction(
 				fp, escapeMode, decl, exposedName, guardName,
-				documentation, preferBindingMacros);
+				documentationString, preferBindingMacros);
 			isFirst = false;
 		}
 		while (numNeededEndif) {
@@ -1358,7 +1383,7 @@ class ExposedFunction {
 	this = default;
 
 	@@The associated function
-	public member func: Function;
+	public member func: Function | Callable;
 
 	@@Declaration prefix for this function exposure
 	public member decl: string = "__LIBC";
@@ -1384,6 +1409,8 @@ class ExposedFunction {
 		local oldNs = fp.namespace;
 		if (namespaceOverride !is none)
 			fp.namespace = namespaceOverride;
+		if (func is Callable)
+			func = func();
 		func.cprintHeaderDeclaration(
 			fp, escapeMode, decl, exposedName,
 			guardName, preferBindingMacros);
@@ -1461,6 +1488,7 @@ class LibraryFunctionBinding {
 	@@or is the symbol name of some other function for which this
 	@@one should be defined as an INTERN-ALIAS
 	public member binding: LibraryFunctionImplementation | string | UserString | Callable;
+
 }
 
 class LibraryFunction {
@@ -1473,52 +1501,68 @@ class LibraryFunction {
 	@@Name of the function in public headers (e.g. @"strlen")
 	public member name: string | UserString;
 
+	@@Preprocessor condition that must be evaluate to true at compile-time
+	@@in order for this library function to actually be implemented.
+	public member ppCond: string | UserString = "1";
+
 	@@Name of the original defining system header (may differ from the containing
 	@@header in case @"%[insert:extern(...)]" was used to inject a foreign function)
 	public member originalSystemHeaderName: string | UserString;
 
 	@@The documentation text of this function
-	public member documentation: string | UserString = "";
+	public member documentation: string | UserString | Callable = "";
+
+	@@Helper wrapper for @documentation to automatically unwind callable objects
+	public property documentationString: string | UserString = {
+		get(): string | UserString {
+			local result = documentation;
+			if (result is Callable)
+				documentation = result = result();
+			return result;
+		}
+	}
 
 	@@The different ways by which this library function can be implemented.
-	public member bindings: {(LibraryFunctionBinding | Callable)...} = [];
+	public member bindings: {(LibraryFunctionBinding | Callable)...} | Callable = [];
+
+	@@Helper wrapper for @bindings that automates invocation of Callable objects
+	public property libraryFunctionBinding: {LibraryFunctionBinding...} = {
+		get(): {LibraryFunctionBinding...} {
+			if (m_libraryFunctionBinding !is bound) {
+				local usedBindings = bindings;
+				if (usedBindings is Callable)
+					usedBindings = usedBindings();
+				local newBindings = [];
+				for (local b: usedBindings) {
+					if (b is Callable)
+						b = b();
+					if (b is Sequence) {
+						newBindings.extend(b);
+					} else if (b !is none) {
+						newBindings.append(b);
+					}
+				}
+				m_libraryFunctionBinding = newBindings;
+				return newBindings;
+			}
+			return m_libraryFunctionBinding;
+		}
+	}
+	private member m_libraryFunctionBinding: {LibraryFunctionBinding...};
 
 	@@Pairs of @(ppCond, symbolName) of how @this Binding should be exported from the library.
 	public member exportSymbolNames: {(string | UserString, string | UserString)...} = [];
 
-	@@Make sure that @bindings doesn't contain any @Callable objects
-	private member m_didFlattenBindings: bool = false;
-	private function f_flattenBindings() {
-		if (m_didFlattenBindings)
-			return;
-		for (local bind: bindings) {
-			if (bind !is Callable)
-				continue;
-			local newBindings = List();
-			for (local bind: bindings) {
-				if (bind !is Callable) {
-					newBindings.append(bind);
-					continue;
-				}
-				bind = bind();
-				if (bind is Sequence) {
-					newBindings.extend(bind);
-				} else if (bind !is none) {
-					newBindings.append(bind);
-				}
-			}
-			bindings = newBindings;
-			break;
-		}
-		m_didFlattenBindings = true;
-	}
-
 	@@Print the in-library declaration of this function
 	public function cprintInLibraryDeclaration(
 			fp: CWriter, escapeMode: int, decl: string) {
+		local usedBindings = libraryFunctionBinding;
+		if (!usedBindings)
+			return;
+		fp.ppIf(ppCond);
 		local isFirst = true;
-		f_flattenBindings();
-		for (local bind: bindings) {
+		local doc = documentationString;
+		for (local bind: usedBindings) {
 			if (isFirst) {
 				fp.ppIf(bind.ppCond);
 			} else {
@@ -1527,6 +1571,8 @@ class LibraryFunction {
 			local proto = bind.prototype;
 			if (proto is Callable)
 				proto = bind.prototype = proto();
+			if (doc)
+				fp.printComment(doc);
 			proto.cprintDeclarationWithoutTerminator(
 				fp, escapeMode, decl: decl, exposedName: this.name);
 			fp << ";\n";
@@ -1534,14 +1580,19 @@ class LibraryFunction {
 		}
 		if (!isFirst)
 			fp.ppEndif();
+		fp.ppEndif();
 	}
 
 	@@Print the in-library auto-implementation of this function
 	public function cprintInLibraryAutoImplementation(
 			fp: CWriter, escapeMode: int, decl: string) {
+		local usedBindings = libraryFunctionBinding;
+		if (!usedBindings)
+			return;
+		fp.ppIf(ppCond);
 		local isFirst = true;
-		f_flattenBindings();
-		for (local bind: bindings) {
+		local doc = documentationString;
+		for (local bind: usedBindings) {
 			if (isFirst) {
 				fp.ppIf(bind.ppCond);
 				isFirst = false;
@@ -1559,6 +1610,8 @@ class LibraryFunction {
 				local proto = bind.prototype;
 				if (proto is Callable)
 					proto = bind.prototype = proto();
+				if (doc)
+					fp.printComment(doc);
 				proto.cprintDeclarationWithoutTerminator(
 					fp, escapeMode, decl: decl, exposedName: this.name);
 				local usedImpl = impl.implementation;
@@ -1583,6 +1636,7 @@ class LibraryFunction {
 		}
 		if (!isFirst)
 			fp.ppEndif();
+		fp.ppEndif();
 	}
 
 	@@Print the in-library export table of this function
@@ -1597,9 +1651,10 @@ class LibraryFunction {
 		}
 		if (!hasUsableExport)
 			return;
-		f_flattenBindings();
+		local usedBindings = libraryFunctionBinding;
+		fp.ppIf(ppCond);
 		local hasUniversalBinding = false;
-		for (local bind: bindings) {
+		for (local bind: usedBindings) {
 			if (bind.ppCond == "1") {
 				hasUniversalBinding = true;
 				break;
@@ -1608,7 +1663,7 @@ class LibraryFunction {
 		if (!hasUniversalBinding) {
 			File.Writer mergedCond;
 			local isFirst = true;
-			for (local bind: bindings) {
+			for (local bind: usedBindings) {
 				if (!isFirst)
 					mergedCond << "||";
 				mergedCond << "(" << bind.ppCond << ")";
@@ -1623,6 +1678,7 @@ class LibraryFunction {
 		}
 		if (!hasUniversalBinding)
 			fp.ppEndif();
+		fp.ppEndif();
 	}
 }
 

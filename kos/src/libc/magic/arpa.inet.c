@@ -130,7 +130,7 @@ inet_addr:([nonnull] char const *__restrict cp) -> in_addr_t {
 @@Convert Internet number in IN to ASCII representation. The return
 @@value is a pointer to an internal array containing the string
 [ATTR_WUNUSED]
-inet_ntoa:(struct in_addr inaddr) -> [nonnull] char * {
+[nonnull] char *inet_ntoa(struct in_addr inaddr) {
 	static char buf[16];
 	return inet_ntoa_r(inaddr, buf);
 }
@@ -140,7 +140,7 @@ inet_ntoa:(struct in_addr inaddr) -> [nonnull] char * {
 @@Re-entrant version of `inet_ntoa()'
 [dependency_include(<netinet/in.h>)]
 [dependency_include(<hybrid/__byteswap.h>)]
-inet_ntoa_r:(struct in_addr inaddr, [nonnull] char buf[16]) -> [nonnull] char * {
+[nonnull] char *inet_ntoa_r(struct in_addr inaddr, [nonnull] char buf[16]) {
 	uint32_t addr = __hybrid_betoh32(inaddr.@s_addr@);
 	sprintf(buf, "%u.%u.%u.%u",
 	        (unsigned int)(u8)((addr & __UINT32_C(0xff000000)) >> 24),

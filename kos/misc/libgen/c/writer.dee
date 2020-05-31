@@ -21,7 +21,316 @@
 import * from deemon;
 import * from .namespace;
 import * from ..optiexpr;
+import * from collections;
 import functools;
+
+
+/* CGenerator part IDs */
+global final CGP_STRING  = 0; /* +string | +File.Writer */
+global final CGP_IF      = 1; /* +string */
+global final CGP_ELIF    = 2; /* +string */
+global final CGP_ELSE    = 3; /* +string */
+global final CGP_ENDIF   = 4; /* +string */
+global final CGP_NSENTER = 5; /* +Namespace */
+global final CGP_NSLEAVE = 6; /* +Namespace */
+global final CGP_FORCENL = 7; /* +none */
+
+@@All generator part ids that always end with a new-line
+global final CGPS_FORCENL: {int...} = {
+	CGP_IF, CGP_ELIF, CGP_ELSE, CGP_ENDIF,
+	CGP_NSENTER, CGP_NSLEAVE, CGP_FORCENL
+};
+
+@@C Code generator
+@@This class performs optimizations to delete unnecessary preprocessor
+@@open/close directives such as:
+@@> #ifndef __KERNEL__
+@@> DEFINE_PUBLIC_ALIAS(DOS$wmemcpy, libd_wmemcpy);
+@@> #endif /* !__KERNEL__ */
+@@> #ifndef __KERNEL__
+@@> DEFINE_PUBLIC_ALIAS(wmemcpy, libc_wmemcpy);
+@@> #endif /* !__KERNEL__ */
+@@Which will instead be printed as:
+@@> #ifndef __KERNEL__
+@@> DEFINE_PUBLIC_ALIAS(DOS$wmemcpy, libd_wmemcpy);
+@@> DEFINE_PUBLIC_ALIAS(wmemcpy, libc_wmemcpy);
+@@> #endif /* !__KERNEL__ */
+class CGenerator {
+	this = default;
+
+	@@The underlying file to which to output generated text
+	public member fp: File;
+
+	@@Set to @true if the last thing written to @fp was a new-line character
+	@@Also set to @true upon construction (i.e. for our purposes, the start of
+	@@a file is assumed to begin with a new-line character)
+	public member fpAfterNewline: bool = true;
+
+	@@List of pending components
+	@@This is a list of @(CGP_*, arg), where @arg depends on the type code
+	public member pendingParts: {(int, Object)...} = [];
+
+	@@Return a file printer with which simple strings can be appened
+	@@Note that after any of the other add* functions are called, this
+	@@property must be re-read to obtain a new printer!
+	public property addPrinter: File = {
+		get(): File {
+			local result;
+			if (pendingParts) {
+				local last = pendingParts.last;
+				if (last[0] == CGP_STRING) {
+					result = last[1];
+					if (result is File.Writer)
+						return result;
+				}
+			} else {
+				/* XXX: Let the caller write to @fp directly?
+				 *      Though we would still have to keep
+				 *      track of @fpAfterNewline */
+			}
+			result = File.Writer();
+			pendingParts.append((CGP_STRING, result));
+			return result;
+		}
+	}
+
+	@@Optimize a potential trailing string parts
+	private function optimizeTrailingStrings() {
+		if (pendingParts) {
+			local last = pendingParts.last;
+			if (last[0] == CGP_STRING) {
+				local s = last[1];
+				if (s is File.Writer) {
+					s                 = s.string;
+					pendingParts.last = (CGP_STRING, s);
+				}
+				if (!s)
+					pendingParts.popback();
+			}
+		}
+	}
+
+	/* Helper functions for appending certain components */
+	public function addPpIf(cond: string): CGenerator {
+		optimizeTrailingStrings();
+		if (#pendingParts >= 2) {
+			local i = none;
+			local prevPartType = pendingParts.last[0];
+			if (prevPartType == CGP_FORCENL) {
+				i = #pendingParts - 2;
+				prevPartType = pendingParts[i][0];
+				--i;
+			}
+			if (prevPartType == CGP_ENDIF) {
+				if (i is none)
+					i = #pendingParts - 2;
+				local recursion = 0;
+				for (;;) {
+					prevPartType = pendingParts[i][0];
+					if (prevPartType in [CGP_ELSE, CGP_ELIF]) {
+						if (recursion == 0)
+							goto do_append;
+					} else if (prevPartType == CGP_ENDIF) {
+						++recursion;
+					} else if (prevPartType == CGP_IF) {
+						if (recursion) {
+							--recursion;
+						} else {
+							if (pendingParts[i][1] != cond)
+								goto do_append;
+							/* Optimize:
+							 * >> #if FOO
+							 * >> A
+							 * >> #endif
+							 * >> #if FOO
+							 * >> B
+							 * Into:
+							 * >> #if FOO
+							 * >> A
+							 * >> B */
+							pendingParts.popback();
+							goto done;
+						}
+					}
+					if (!i)
+						break;
+					--i;
+				}
+			}
+		}
+do_append:
+		pendingParts.append((CGP_IF, cond));
+done:
+		return this;
+	}
+
+	public function addPpElif(cond: string): CGenerator {
+		optimizeTrailingStrings();
+		pendingParts.append((CGP_ELIF, cond));
+		return this;
+	}
+
+	public function addPpElse(comment: string): CGenerator {
+		optimizeTrailingStrings();
+		pendingParts.append((CGP_ELSE, comment));
+		return this;
+	}
+
+	public function addPpEndif(comment: string): CGenerator {
+		optimizeTrailingStrings();
+		pendingParts.append((CGP_ENDIF, comment));
+		return this;
+	}
+
+	public function addNsEnter(ns: Namespace): CGenerator {
+		optimizeTrailingStrings();
+		if (ns === GLOBAL_NAMESPACE)
+			goto done;
+		if (pendingParts) {
+			local last = pendingParts.last;
+			if (last[0] == CGP_NSLEAVE && last[1] === ns) {
+				pendingParts.popback();
+				goto done;
+			}
+		}
+		pendingParts.append((CGP_NSENTER, ns));
+done:
+		return this;
+	}
+
+	public function addNsLeave(ns: Namespace): CGenerator {
+		optimizeTrailingStrings();
+		if (ns === GLOBAL_NAMESPACE)
+			goto done;
+		if (pendingParts) {
+			local last = pendingParts.last;
+			if (last[0] == CGP_NSENTER && last[1] === ns) {
+				pendingParts.popback();
+				goto done;
+			}
+		}
+		pendingParts.append((CGP_NSLEAVE, ns));
+done:
+		return this;
+	}
+
+	public function addForceNl(): bool {
+		optimizeTrailingStrings();
+		if (pendingParts) {
+			local last = pendingParts.last;
+			local typ = last[0];
+			if (typ in CGPS_FORCENL)
+				goto nope;
+			if (typ == CGP_STRING && str(last[1]).endswith("\n"))
+				goto nope;
+		}
+		pendingParts.append((CGP_FORCENL, none));
+		return true;
+nope:
+		return false;
+	}
+
+
+	@@Flush all @pendingParts to be printed to @fp
+	public function flush() {
+		optimizeTrailingStrings();
+		local fp = this.fp;
+		for (local code, arg: pendingParts) {
+			switch (code) {
+
+			default:
+				if (arg is File.Writer)
+					arg = arg.string;
+				if (arg) {
+					fp << arg;
+					fpAfterNewline = arg.endswith("\n");
+				}
+				break;
+
+			case CGP_IF:
+				arg = str arg;
+				if (!fpAfterNewline) {
+					fp << "\n";
+					fpAfterNewline = true;
+				}
+				/* Try to optimize into #ifdef and #ifndef */
+				if (arg.startswith("defined(") && arg.endswith(")") &&
+				    arg.findmatch("(", ")", 8) == #arg - 1) {
+					fp << "#ifdef " << arg[8:-1].strip();
+				} else if (arg.startswith("!defined(") && arg.endswith(")") &&
+				           arg.findmatch("(", ")", 9) == #arg - 1) {
+					fp << "#ifndef " << arg[9:-1].strip();
+				} else {
+					fp << "#if " << arg;
+				}
+				fp << "\n";
+				break;
+
+			case CGP_ELIF:
+				arg = str arg;
+				if (!fpAfterNewline) {
+					fp << "\n";
+					fpAfterNewline = true;
+				}
+				fp << "#elif " << arg << "\n";
+				break;
+
+			case CGP_ELSE:
+				arg = str arg;
+				if (!fpAfterNewline) {
+					fp << "\n";
+					fpAfterNewline = true;
+				}
+				if (arg) {
+					fp << "#else /* " << arg << " */\n";
+				} else {
+					fp << "#else\n";
+				}
+				break;
+
+			case CGP_ENDIF:
+				arg = str arg;
+				if (!fpAfterNewline) {
+					fp << "\n";
+					fpAfterNewline = true;
+				}
+				if (arg) {
+					fp << "#endif /* " << arg << " */\n";
+				} else {
+					fp << "#endif\n";
+				}
+				break;
+
+			case CGP_NSENTER:
+				if (!fpAfterNewline) {
+					fp << "\n";
+					fpAfterNewline = true;
+				}
+				fp << arg.enter;
+				break;
+
+			case CGP_NSLEAVE:
+				if (!fpAfterNewline) {
+					fp << "\n";
+					fpAfterNewline = true;
+				}
+				fp << arg.leave;
+				break;
+
+			case CGP_FORCENL:
+				if (!fpAfterNewline) {
+					fp << "\n";
+					fpAfterNewline = true;
+				}
+				break;
+
+			}
+		}
+		pendingParts.clear();
+	}
+
+}
+
 
 class IfDefStackEntry {
 	this = default;
@@ -39,20 +348,33 @@ class IfDefStackEntry {
 class CWriter {
 
 	@@@param: fp: The underlying file to which to output generated text
-	this(fp: File) {
-		this.fp = fp;
+	this(fp: File, keepNewLinesFromDeadCode: bool = false) {
+		this.keepNewLinesFromDeadCode = keepNewLinesFromDeadCode;
+		this.generator = CGenerator(fp: fp);
 	}
 
-	@@Set to true if the character written to @fp was a new-line
-	private member m_AfterNewLines: bool = true;
+	@@The underlying generator used to produce output
+	public member generator: CGenerator;
 
-	@@The underlying file to which to output generated text
-	public member fp: File;
+	@@Flush all output of the CWriter to the bound file
+	@@NOTE: Doing this will prevent any further optimizations to be
+	@@      done on anything that has already been written at this time.
+	@@      As such, you should only call this function once no more
+	@@      text is going to be written, or if you know for sure that
+	@@      no further optimizations are possible, or don't wish any
+	@@      further optimizations to be performed.
+	public function flush(): CWriter {
+		generator.flush();
+		return this;
+	}
+
+	@@When @true, new-lines from dead code will be kept
+	public member keepNewLinesFromDeadCode: bool;
 
 	@@Returns @true if the output is ignored within the current context.
 	@@This can happen following something like @ppIf("0"), and will
 	@@continue on until the corresponding call to @ppEndif()
-	public property isdeadcode: bool = {
+	public property isDeadCode: bool = {
 		get(): bool -> m_IfdefDead != 0;
 	}
 
@@ -90,24 +412,19 @@ class CWriter {
 	@@Non-zero if no text should current be emit
 	private member m_IfdefDead: int = 0;
 
-	private function doPrintIf(cond: string) {
-		if (!m_AfterNewLines)
-			fp << "\n";
-		if (cond.startswith("defined(") && cond.endswith(")") &&
-		    cond.findmatch("(", ")", 8) == #cond - 1) {
-			fp << "#ifdef " << cond[8:-1].strip();
-		} else if (cond.startswith("!defined(") && cond.endswith(")") &&
-		           cond.findmatch("(", ")", 9) == #cond - 1) {
-			fp << "#ifndef " << cond[9:-1].strip();
-		} else {
-			fp << "#if " << cond;
-		}
-		fp << "\n";
-		m_AfterNewLines = true;
+	@@@return: * : The # of printed new-line characters
+	private function doPrintIf(cond: string): int {
+		local result = 1;
+		if (generator.addForceNl())
+			result = 2;
+		generator.addPpIf(cond);
+		return result;
 	}
 
 	@@Insert a preprocessor directive `#if cond`
-	public function ppIf(cond: string): CWriter {
+	@@@return: * : The # of printed new-line characters
+	public function ppIf(cond: string): int {
+		local result = 0;
 		if (m_IfdefDead)
 			cond = "0"; /* Speed up some code... (and won't make a difference...) */
 		if (cond !is string)
@@ -123,14 +440,16 @@ class CWriter {
 			ent.didWriteIf = true;
 			ent.cond = cond;
 			if (!m_IfdefDead)
-				doPrintIf(cond);
+				result = doPrintIf(cond);
 		}
 		m_IfdefStack.pushback(ent);
-		return this;
+		return result;
 	}
 
 	@@Insert a `#elif` directive
-	public function ppElif(cond: string): CWriter {
+	@@@return: * : The # of printed new-line characters
+	public function ppElif(cond: string): int {
+		local result = 0;
 		if (!m_IfdefStack)
 			throw Error("#ifdef-stack is empty");
 		local ent = m_IfdefStack.last;
@@ -169,16 +488,16 @@ dont_emit_branch:
 			assert !ent.didWriteElse;
 			ent.didWriteElse = true;
 			if (!m_IfdefDead) {
-				if (!m_AfterNewLines)
-					fp << "\n";
+				result = 1;
+				if (generator.addForceNl())
+					result = 2;
 				local condText = "...";
 				if (ent.cond !is none) {
 					condText = optimizePreprocessorExpressionAndRemoveDefined(ent.cond);
 					ent.cond = "!({})".format({ ent.cond });
 				}
-				fp << "#else /* " << condText << " */\n";
+				generator.addPpElse(condText);
 				ent.includedHeaders.clear();
-				m_AfterNewLines = true;
 			}
 			goto done;
 		}
@@ -187,33 +506,36 @@ dont_emit_branch:
 		if (!ent.didWriteIf) {
 			ent.didWriteIf = true;
 			if (!m_IfdefDead)
-				doPrintIf(cond);
+				result = doPrintIf(cond);
 			goto done;
 		}
 		/* Regular case: Print the #elif as an actual #elif */
 		if (!m_IfdefDead) {
-			if (!m_AfterNewLines)
-				fp << "\n";
-			fp << "#elif " << cond << "\n";
+			result = 1;
+			if (generator.addForceNl())
+				result = 2;
+			generator.addPpElif(cond);
 			ent.includedHeaders.clear();
 			/* Delete the saved condition so that "..."
 			 * will appear as comment in generated code. */
 			ent.cond = none;
-			m_AfterNewLines = true;
 		}
 done:
-		return this;
+		return result;
 	}
 
 	@@Insert a `#else` directive
-	public function ppElse(): CWriter {
-		ppElif("1");
+	@@@return: * : The # of printed new-line characters
+	public function ppElse(): int {
+		local result = ppElif("1");
 		m_IfdefStack.last.encounteredElse = true;
-		return this;
+		return result;
 	}
 
 	@@Insert a `#endif` directive
-	public function ppEndif(): CWriter {
+	@@@return: * : The # of printed new-line characters
+	public function ppEndif(): int {
+		local result = 0;
 		if (!m_IfdefStack)
 			throw Error("#ifdef-stack is empty");
 		local ent = m_IfdefStack.popback();
@@ -224,77 +546,127 @@ done:
 		if (ent.didWriteIf) {
 			/* Output an #endif directive */
 			if (!m_IfdefDead) {
-				if (!m_AfterNewLines)
-					fp << "\n";
+				result = 1;
+				if (generator.addForceNl())
+					result = 2;
 				local condText = "...";
 				if (ent.cond !is none) {
 					condText = optimizePreprocessorExpressionAndRemoveDefined(ent.cond);
 				} else if (ent.didWriteElse) {
 					condText = "!...";
 				}
-				fp << "#endif /* " << condText << " */\n";
-				m_AfterNewLines = true;
+				generator.addPpEndif(condText);
 			}
 		}
-		return this;
+		return result;
 	}
 
-	public function ppIfdef(macroName: string): CWriter {
+	@@@return: * : The # of printed new-line characters
+	public function ppIfdef(macroName: string): int {
 		return ppIf("defined({})".format({ macroName }));
 	}
 
-	public function ppIfndef(macroName: string): CWriter {
+	@@@return: * : The # of printed new-line characters
+	public function ppIfndef(macroName: string): int {
 		return ppIf("!defined({})".format({ macroName }));
 	}
 
 	public function ppInclude(header: string): CWriter {
+		if (m_IfdefDead)
+			goto done;
 		/* Include include some given header once, based on that header
 		 * having previously been #included at the current, or some
 		 * previous #ifdef-stack-level */
 		if (wasHeaderAlreadyIncluded(header))
 			return;
 		f_RememberHeaderAlreadyIncluded(header);
-		if (!m_AfterNewLines)
-			this << "\n";
-		return this << "#include " << header << "\n";
+		generator.addForceNl();
+		generator.addPrinter << "#include " << header << "\n";
+done:
+		return this;
 	}
 
 	public function ppUndef(macroName: string): CWriter {
-		if (!m_AfterNewLines)
-			this << "\n";
-		return this << "#undef " << macroName << "\n";
+		if (m_IfdefDead)
+			goto done;
+		generator.addForceNl();
+		generator.addPrinter << "#undef " << macroName << "\n";
+done:
+		return this;
 	}
 
 	public function ppDefine(macroName: string, macroValue: string): CWriter {
-		if (!m_AfterNewLines)
-			this << "\n";
-		this << "#define " << macroName;
+		if (m_IfdefDead)
+			goto done;
+		generator.addForceNl();
+		local p = generator.addPrinter
+			<< "#define " << macroName;
 		if (!macroValue.startswith("("))
-			this << " ";
-		return this << macroValue << "\n";
+			p << " ";
+		p << macroValue << "\n";
+done:
+		return this;
 	}
 
 	public function forceStartOfLine(): CWriter {
-		return m_AfterNewLines ? this : (this << "\n");
+		if (m_IfdefDead)
+			goto done;
+		generator.addForceNl();
+done:
+		return this;
 	}
 
 	@@Print @text as a C or C++ comment, preferring C comments.
 	public function printComment(text: string): CWriter {
-		/* TODO */
+		generator.addForceNl();
+		File.Writer tempfp;
+		text = text.rstrip();
+		if ("*/" in text) {
+			/* Must use //-style comments (ugh... I don't like those.
+			 * Why? Because those can't be parsed in reverse, where-as / * ... * / can be...) */
+			for (local l: text.splitlines(false)) {
+				l = l.rstrip();
+				if (!l) {
+					this << "//\n";
+				} else {
+					this << "// " << l << "\n";
+				}
+			}
+		} else {
+			/* Print comments that look just like this one does,
+			 * with every line starting with " * ", except for the
+			 * first one, and the trailing * / being appeneded onto
+			 * the last line. */
+			local isFirst = true;
+			local p = this << "/*";
+			for (local l: text.splitlines(false)) {
+				l = l.rstrip();
+				if (!isFirst)
+					p << "\n *";
+				if (l)
+					p << " " << l;
+				isFirst = false;
+			}
+			p << " */\n";
+		}
 		return this;
 	}
 
 	@@Append the given @text
-	public operator << (text: string | Bytes): CWriter {
-		if (!m_IfdefDead) {
-			local typ = type text;
-			if (typ !== string && typ !== Bytes)
+	public operator << (text: string | Bytes): CWriter | File | none {
+		/* If we're not inside of dead code, simply  */
+		if (!m_IfdefDead)
+			return generator.addPrinter << text;
+		if (keepNewLinesFromDeadCode) {
+			if (text !is Bytes)
 				text = str text;
-			fp << text;
-			if (text)
-				m_AfterNewLines = text.islf(#text - 1);
+			local c = text.count("\n");
+			if (c) {
+				generator.addPrinter << ("\n" * c);
+			}
+			return this;
 		}
-		return this;
+		return none;
 	}
 
 	private member m_CurrentNamespace: Namespace = GLOBAL_NAMESPACE;
@@ -309,12 +681,8 @@ done:
 				namespace = NAMESPACES[str namespace];
 			if (m_CurrentNamespace === namespace)
 				return;
-			if (!m_AfterNewLines)
-				this << "\n";
-			/* TODO: Delay the printing of these strings, such that
-			 *       they are not actually be printed if nothing happened
-			 *       between entering and leaving the namespace! */
-			this << m_CurrentNamespace.leave << namespace.enter;
+			generator.addNsLeave(m_CurrentNamespace);
+			generator.addNsEnter(namespace);
 			m_CurrentNamespace = namespace;
 		}
 	}

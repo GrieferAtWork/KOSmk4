@@ -50,7 +50,9 @@ __SYSDECL_BEGIN
 
 
 /* Kinds of resource limit. */
-}%[enum @guard @undef @macro __rlimit_resource {
+/*[[[enum]]]*/
+#ifdef __CC__
+enum __rlimit_resource {
 	RLIMIT_CPU        = 0,  /* Per-process CPU limit, in seconds. */
 	RLIMIT_FSIZE      = 1,  /* Largest file that can be created, in bytes. */
 	RLIMIT_DATA       = 2,  /* Maximum size of data segment, in bytes. */
@@ -76,13 +78,69 @@ __SYSDECL_BEGIN
 	                         * before being forcibly descheduled. */
 	RLIMIT_NLIMITS    = 16,
 	RLIM_NLIMITS      = 16
-}]%{
+};
+#endif /* __CC__ */
+/*[[[AUTO]]]*/
+#ifdef __COMPILER_PREFERR_ENUMS
+#define RLIMIT_CPU        RLIMIT_CPU        /* Per-process CPU limit, in seconds. */
+#define RLIMIT_FSIZE      RLIMIT_FSIZE      /* Largest file that can be created, in bytes. */
+#define RLIMIT_DATA       RLIMIT_DATA       /* Maximum size of data segment, in bytes. */
+#define RLIMIT_STACK      RLIMIT_STACK      /* Maximum size of stack segment, in bytes. */
+#define RLIMIT_CORE       RLIMIT_CORE       /* Largest core file that can be created, in bytes. */
+#define RLIMIT_RSS        RLIMIT_RSS        /* Largest resident set size, in bytes. This affects swapping;
+                                             * processes that are exceeding their resident set size will
+                                             * be more likely to have physical memory taken from them. */
+#define RLIMIT_NPROC      RLIMIT_NPROC      /* Number of processes. */
+#define RLIMIT_NOFILE     RLIMIT_NOFILE     /* Number of open files. */
+#define RLIMIT_OFILE      RLIMIT_OFILE      /* BSD name for RLIMIT_NOFILE. */
+#define RLIMIT_MEMLOCK    RLIMIT_MEMLOCK    /* Locked-in-memory address space. */
+#define RLIMIT_AS         RLIMIT_AS         /* Address space limit. */
+#define RLIMIT_LOCKS      RLIMIT_LOCKS      /* Maximum number of file locks. */
+#define RLIMIT_SIGPENDING RLIMIT_SIGPENDING /* Maximum number of pending signals. */
+#define RLIMIT_MSGQUEUE   RLIMIT_MSGQUEUE   /* Maximum bytes in POSIX message queues. */
+#define RLIMIT_NICE       RLIMIT_NICE       /* Maximum nice priority allowed to raise to. Nice levels
+                                             * 19 .. -20 correspond to 0 .. 39 values of this resource
+                                             * limit. */
+#define RLIMIT_RTPRIO     RLIMIT_RTPRIO     /* Maximum realtime priority allowed for non-privileged processes. */
+#define RLIMIT_RTTIME     RLIMIT_RTTIME     /* Maximum CPU time in µs that a process scheduled under a real-time
+                                             * scheduling policy may consume without making a blocking system call
+                                             * before being forcibly descheduled. */
+#define RLIMIT_NLIMITS    RLIMIT_NLIMITS
+#define RLIM_NLIMITS      RLIM_NLIMITS
+#else /* __COMPILER_PREFERR_ENUMS */
+#define RLIMIT_CPU        0  /* Per-process CPU limit, in seconds. */
+#define RLIMIT_FSIZE      1  /* Largest file that can be created, in bytes. */
+#define RLIMIT_DATA       2  /* Maximum size of data segment, in bytes. */
+#define RLIMIT_STACK      3  /* Maximum size of stack segment, in bytes. */
+#define RLIMIT_CORE       4  /* Largest core file that can be created, in bytes. */
+#define RLIMIT_RSS        5  /* Largest resident set size, in bytes. This affects swapping;
+                              * processes that are exceeding their resident set size will
+                              * be more likely to have physical memory taken from them. */
+#define RLIMIT_NPROC      6  /* Number of processes. */
+#define RLIMIT_NOFILE     7  /* Number of open files. */
+#define RLIMIT_OFILE      7  /* BSD name for RLIMIT_NOFILE. */
+#define RLIMIT_MEMLOCK    8  /* Locked-in-memory address space. */
+#define RLIMIT_AS         9  /* Address space limit. */
+#define RLIMIT_LOCKS      10 /* Maximum number of file locks. */
+#define RLIMIT_SIGPENDING 11 /* Maximum number of pending signals. */
+#define RLIMIT_MSGQUEUE   12 /* Maximum bytes in POSIX message queues. */
+#define RLIMIT_NICE       13 /* Maximum nice priority allowed to raise to. Nice levels
+                              * 19 .. -20 correspond to 0 .. 39 values of this resource
+                              * limit. */
+#define RLIMIT_RTPRIO     14 /* Maximum realtime priority allowed for non-privileged processes. */
+#define RLIMIT_RTTIME     15 /* Maximum CPU time in µs that a process scheduled under a real-time
+                              * scheduling policy may consume without making a blocking system call
+                              * before being forcibly descheduled. */
+#define RLIMIT_NLIMITS    16
+#define RLIM_NLIMITS      16
+#endif /* !__COMPILER_PREFERR_ENUMS */
+/*[[[end]]]*/
 
 /* Value to indicate that there is no limit. */
 #define RLIM_INFINITY     (__CCAST(__FS_TYPE(rlim))-1)
 #ifdef __USE_LARGEFILE64
 #define RLIM64_INFINITY   (__CCAST(__rlim64_t)-1)
-#endif
+#endif /* __USE_LARGEFILE64 */
 
 /* We can represent all limits. */
 #ifndef RLIM_SAVED_MAX
@@ -95,21 +153,53 @@ __SYSDECL_BEGIN
 
 /* The type of the WHICH argument to `getpriority' and `setpriority',
  * indicating what flavor of entity the WHO argument specifies. */
-}%[enum @guard @undef @macro __priority_which {
+/*[[[enum]]]*/
+#ifdef __CC__
+enum __priority_which {
 	PRIO_PROCESS = 0, /* WHO is a process ID. */
 	PRIO_PGRP    = 1, /* WHO is a process group ID. */
 	PRIO_USER    = 2  /* WHO is a user ID. */
-}]%{
+};
+#endif /* __CC__ */
+/*[[[AUTO]]]*/
+#ifdef __COMPILER_PREFERR_ENUMS
+#define PRIO_PROCESS PRIO_PROCESS /* WHO is a process ID. */
+#define PRIO_PGRP    PRIO_PGRP    /* WHO is a process group ID. */
+#define PRIO_USER    PRIO_USER    /* WHO is a user ID. */
+#else /* __COMPILER_PREFERR_ENUMS */
+#define PRIO_PROCESS 0 /* WHO is a process ID. */
+#define PRIO_PGRP    1 /* WHO is a process group ID. */
+#define PRIO_USER    2 /* WHO is a user ID. */
+#endif /* !__COMPILER_PREFERR_ENUMS */
+/*[[[end]]]*/
 
 
 /* Whose usage statistics do you want?  */
-}%[enum @guard @undef @macro __rusage_who {
-	RUSAGE_SELF     =  0, /* The calling process. */
-	RUSAGE_CHILDREN = -1, /* All of its terminated child processes. */
-%#ifdef __USE_GNU
-	RUSAGE_THREAD   =  1  /* The calling thread. */
-%#endif /* __USE_GNU */
-}]%{
+/*[[[enum]]]*/
+#ifdef __CC__
+enum __rusage_who {
+	RUSAGE_SELF     =  0,   /* The calling process. */
+	RUSAGE_CHILDREN = (-1), /* All of its terminated child processes. */
+#ifdef __USE_GNU
+	RUSAGE_THREAD   =  1    /* The calling thread. */
+#endif /* __USE_GNU */
+};
+#endif /* __CC__ */
+/*[[[AUTO]]]*/
+#ifdef __COMPILER_PREFERR_ENUMS
+#define RUSAGE_SELF     RUSAGE_SELF     /* The calling process. */
+#define RUSAGE_CHILDREN RUSAGE_CHILDREN /* All of its terminated child processes. */
+#ifdef __USE_GNU
+#define RUSAGE_THREAD   RUSAGE_THREAD   /* The calling thread. */
+#endif /* __USE_GNU */
+#else /* __COMPILER_PREFERR_ENUMS */
+#define RUSAGE_SELF     0    /* The calling process. */
+#define RUSAGE_CHILDREN (-1) /* All of its terminated child processes. */
+#ifdef __USE_GNU
+#define RUSAGE_THREAD   1    /* The calling thread. */
+#endif /* __USE_GNU */
+#endif /* !__COMPILER_PREFERR_ENUMS */
+/*[[[end]]]*/
 
 /* Priority limits. */
 #ifndef PRIO_MIN
