@@ -47,3 +47,54 @@ global neededLocalFunction: {LocalFunction...} = HashSet();
 
 
 
+
+@@Lookup a function, given its name
+function findFunctionByName(name: string | UserString): Function {
+	local usedName = name;
+	if (usedName !is string)
+		usedName = usedName.text;
+	local result: Function;
+	try {
+		if ("." in usedName) {
+			/* Header-Specific function name. */
+			local headerName;
+			headerName, none, usedName = usedName.rpartition(".")...;
+			result = allSystemHeaders[headerName].functionsByName[usedName];
+		} else {
+			result = allFunctionsByName[usedName];
+		}
+		if (result == DuplicateFunctionMarker)
+			throw Error("Ambiguous Function: {!r}".format({ name }));
+	} catch (Error as e) {
+		if (name is UserString)
+			name.err(e.message);
+		throw;
+	}
+	return result;
+}
+
+@@Lookup a local function, given its name
+function findLocalFunctionByName(name: string | UserString): LocalFunction {
+	local usedName = name;
+	if (usedName !is string)
+		usedName = usedName.text;
+	local result: LocalFunction;
+	try {
+		if ("." in usedName) {
+			/* Header-Specific function name. */
+			local headerName;
+			headerName, none, usedName = usedName.rpartition(".")...;
+			result = allSystemHeaders[headerName].localFunctionsByName[usedName];
+		} else {
+			result = allLocalFunctionsByName[usedName];
+		}
+		if (result == DuplicateFunctionMarker)
+			throw Error("Ambiguous local function: {!r}".format({ name }));
+	} catch (e...) {
+		if (name is UserString)
+			name.err(e.message);
+		throw;
+	}
+	return result;
+}
+

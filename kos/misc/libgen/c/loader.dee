@@ -26,6 +26,7 @@ import * from .writer;
 import * from .globals;
 import * from .namespace;
 import * from .wchar;
+import * from .generator;
 import Function from .cheaders;
 
 /* How auto vs. user implementation is selected:
@@ -175,24 +176,6 @@ final global KNOWN_STRING_TAGS: {string...} = {
 };
 
 
-
-@@Construct a preprocessor expression to check if the to-be linked CRT is exporting @symbolName
-function keyCrtHave(symbolName: string | UserString): string {
-	/* Special case: When wishing to test for KOS-specific symbols, we
-	 *               must actually look out for the DOS-variants, since
-	 *               linking against KOS-symbols only works for PE applications,
-	 *               however CRT feature files are written from the perspective
-	 *               of an ELF program. */
-	local usedSymbolName = str symbolName;
-	if (usedSymbolName.startswith("KOS$")) {
-		/* Technically, this should be:
-		 * >> defined(__KOS__) && defined(__PE__) && defined(__CRT_HAVE_{usedSymbolName[4:]}) */
-		usedSymbolName = "DOS$" + usedSymbolName[4:];
-	}
-	return "defined(__CRT_HAVE_{})".format({ usedSymbolName });
-}
-
-
 @@Replace a @"defined(__CRT_HAVE_xxx)" sub-part of @ppCond
 function replaceCrtHaveFromPreprocessorCondition(
 		ppCond: string,
@@ -205,7 +188,7 @@ function replaceCrtHaveFromPreprocessorCondition(
 			return newHave;
 		if (ppCond in ["0"])
 			return ppCond;
-		return "({}) && {}".format({ ppCond, newHave });
+		return "({})&&{}".format({ ppCond, newHave });
 	}
 	return ppCond.replace(oldHave, newHave);
 }
@@ -673,7 +656,7 @@ class FunctionFeatures {
 	public member namespaces: {string...} = ("",);                   /* [[no_]ignore]           Namespaces from which to import the function */
 	public member libc: bool = false;                                /* [[no_]libc]             Export in <libc/string.h> */
 	public member inline: UserString | string | none = none;         /* [[no_]inline]           Use the associated body for inline implementations, rather than including <local/...> headers */
-	public member inlineTruncate: bool = false;                      /* [[no_]inline_truncate]  Truncate spaces and new-lines from inline implementations */
+	public member noInlineTruncate: bool = false;                    /* [[no_]inline_truncate]  Truncate spaces and new-lines from inline implementations */
 	public member noExternInline: bool = false;                      /* [[no_]extern_inline]    For use with @inline: Don't convert inline */
 	public member noLocal: bool = false;                             /* [[no_]local]            Prevent the creation of a LocalFunction for */
 	public member requires: UserString | string = "1";               /* [[no_]requires(...)]    A preprocessor condition that must be true in order to use the local/inline implementation */
@@ -761,11 +744,10 @@ class FunctionFeatures {
 			"no_libc"                     : ("libc", false),
 			"inline"                      : ("inline", "LOCAL"),
 			"forceinline"                 : ("inline", "FORCELOCAL"),
-			"force_inline"                : ("inline", "FORCELOCAL"),
 			"noinline"                    : ("inline", none),
 			"no_inline"                   : ("inline", none),
-			"inline_truncate"             : ("inlineTruncate", true),
-			"no_inline_truncate"          : ("inlineTruncate", false),
+			"inline_truncate"             : ("noInlineTruncate", false),
+			"no_inline_truncate"          : ("noInlineTruncate", true),
 			"extern_inline"               : ("noExternInline", false),
 			"no_extern_inline"            : ("noExternInline", true),
 			"local"                       : ("noLocal", false),
@@ -1194,25 +1176,21 @@ function truncateInlineFunctionImplementation(text: string): string {
 	return result;
 }
 
+@@Add @func to @mapping under @mapping[func.name]
+@@If another object was already bound to under that key,
+@@replace the existing object with @DuplicateFunctionMarker.
+@@NOTE: This function operates atomically between multiple threads,
+@@      which is required when multiple system header definition
+@@      source files are loaded by seperate threads.
 function defineFunctionInMapping(
 		mapping: {string: Function} | {string: LocalFunction},
 		func: Function | LocalFunction) {
-	local name = func.name;
-	if (name in mapping) {
-		mapping[name] = DuplicateFunctionMarker;
-	} else {
-		mapping[name] = func;
+	for (;;) {
+		if (mapping.setnew(func.name, func))
+			break;
+		if (mapping.setold(func.name, DuplicateFunctionMarker))
+			break;
 	}
-}
-
-function defineFunctionInMappingNoDuplicates(
-		mapping: {string: Function} | {string: LocalFunction},
-		func: Function | LocalFunction): bool {
-	local name = func.name;
-	if (name in mapping)
-		return false;
-	mapping[name] = func;
-	return true;
 }
 
 
@@ -1256,7 +1234,7 @@ function getDefaultLibraryImplementationForPrototype(
 @@                   from ever being considered references to dependencies.
 @@@param: features:  Extended function features to take into consideration
 function scanForNamesOfDependentFunctions(
-		text: string | UserString,
+		text: string | UserString | Callable,
 		prototype: FunctionPrototype | Callable,
 		features: FunctionFeatures): Callable {
 	local forcedDependencies = features.forcedDependencies;
@@ -1272,7 +1250,7 @@ function scanForNamesOfDependentFunctions(
 		/* Check if we're supposed to do automatic dependency scanning? */
 		if (noAutoDependencyScanning)
 			return;
-		local parser = CParser(text);
+		local parser = CParser(text is Callable ? text() : text);
 		local knownNonDependencies: {string...} = none;
 		local prevToken;
 		local tok = none;
@@ -1540,6 +1518,219 @@ do_push_macroList:
 		self.next();
 	}
 
+	public function parseDirective_define_header_guard() {
+		self.next();
+		self.skip("(");
+		result_headerGuardName = parseCStringOrFunctionLikeExpression(self);
+		self.skip(")");
+	}
+
+	public function parseDirective_define_ccompat_header() {
+		if (result_ccompatHeaderName !is none)
+			self.err("Duplicate '%[define_ccompat_header(...)]' directive");
+		if (result_order_headerStd !is none)
+			self.err("Directive '%[define_ccompat_header(...)]' must come before '%[insert:std]'");
+		self.next();
+		self.skip("(");
+		result_ccompatHeaderName = parseCStringOrFunctionLikeExpression(self);
+		self.skip(")");
+	}
+
+	public function parseDirective_define_system_header_guard() {
+		self.next();
+		self.skip("(");
+		result_headerGuardName = parseCStringOrFunctionLikeExpression(self);
+		self.skip(")");
+	}
+
+	public function parseDirective_pushdefault() {
+		return parseDirective_push_default();
+	}
+	public function parseDirective_push_default() {
+		if (pushedDefaultFeatures is none)
+			pushedDefaultFeatures = [];
+		pushedDefaultFeatures.pushback(copy defaultFeatures);
+	}
+
+	public function parseDirective_popdefault() {
+		return parseDirective_pop_default();
+	}
+	public function parseDirective_pop_default() {
+		if (!pushedDefaultFeatures)
+			self.err("%[popdefault] without %[pushdefault]");
+		defaultFeatures = pushedDefaultFeatures.popback();
+	}
+
+	public function parseDirective_default_impl_section() {
+		self.tok = "section"; /* Deprecated alias for "%[default:section(...)]" */
+		defaultFeatures.tryParseAttribute(self, none);
+	}
+
+	public function parseDirective_default() {
+		/* %[default:...] Set default function annotations */
+		self.next();
+		self.skip(":");
+again_parse_default_annotation:
+		if (!defaultFeatures.tryParseAttribute(self, none)) {
+			self.err(
+				"Unknown function annotation {!r}, or "
+				"annotation cannot be assigned a default value"
+				.format({ self.tok }));
+		}
+		if (self.tok == ",") {
+			self.next();
+			if (self.tok != "]")
+				goto again_parse_default_annotation;
+		}
+	}
+
+	public function parseDirective_insert() {
+		self.next();
+		local tok = self.skip(":");
+		local cbAttrib = "parseInsertDirective_" + tok;
+		if (hasattr(this, cbAttrib))
+			return this.operator . (cbAttrib)();
+		self.err("Unknown operand for insert-directive: {!r}"
+			.format({ tok }));
+	}
+
+	public function parseInsertDirective_extern() {
+		local self = this.self;
+		self.next();
+		self.skip("(");
+		local functionNameStart = self.tokStart;
+		local functionName = parseCStringOrKeyword(self);
+		/* Only insert into "c" namespace! */
+		if (result_order_header_in_CXX_SYSTEM_HEADER) {
+			result.order_header.append(CXX_SYSTEM_HEADER_END);
+			result_order_header_in_CXX_SYSTEM_HEADER = false;
+		}
+		result.order_header.append(ExposedFunction(
+			func: [] {
+				try {
+					return findFunctionByName(functionName);
+				} catch (Error as e) {
+					self.errAt(functionNameStart, e.message);
+				}
+			},
+			exposedName:       functionName,
+			guardName:         true,
+			namespaceOverride: GLOBAL_NAMESPACE,
+			));
+		self.skip(")");
+	}
+
+	public function parseInsertDirective_std() {
+		/* %[insert:std] */
+		if (result_order_headerStd !is none)
+			self.err("Multiple '%[insert:std]' directives");
+		else {
+			assert result_order_headerStd is none;
+			assert result_order_headerCCompat is none;
+			assert result_order_header_in_CXX_SYSTEM_HEADER === false;
+			result_order_headerStd = [];
+			if (result_ccompatHeaderName !is none)
+				result_order_headerCCompat = [];
+			/* Inject a printer callback for generating std:: declarations */
+			result.order_header.append([](fp: CWriter, escapeMode: int) {
+				local oldNs = fp.namespace;
+				fp.namespace = NAMESPACES["std"];
+				for (local part: result_order_headerStd) {
+					if (part is Function || part is ExposedFunction) {
+						part.cprintHeaderDeclaration(fp, escapeMode);
+					} else if (part is Callable) {
+						part(fp, escapeMode);
+					} else {
+						fp << part;
+					}
+				}
+				fp.namespace = oldNs;
+			});
+		}
+		self.next();
+	}
+
+	public function parseDirective_define_wchar_replacement_header() {
+		return parseDirective_define_wchar_replacement(true);
+	}
+	public function parseDirective_define_wchar_replacement(header: bool = false) {
+		local tok = self.tok;
+		local map = header
+			? wcharReplacementHeaders
+			: wcharReplacementEscapes;
+		self.next();
+		self.skip("(");
+		local orig = parseCStringOrKeyword(self);
+		self.skip("=");
+		local c16 = parseCStringOrKeyword(self);
+		self.skip(",");
+		local c32 = parseCStringOrKeyword(self);
+		local newRepl = (c16, c32);
+		local ok, oldRepl = map.setnew_ex(orig, newRepl)...;
+		if (!ok && oldRepl != newRepl) {
+			self.err("wchar re-definition: {!r} defined as "
+				"(c16:{!r},c32:{!r}) (was: (c16:{!r},c32:{!r}))"
+				.format({ orig, c16, c32, oldRepl[0], oldRepl[1] }));
+		}
+		self.skip(")");
+	}
+
+	public function parseDirective_define_replacement() {
+		self.next();
+		self.skip("(");
+		local a = parseCStringOrKeyword(self);
+		self.skip("=");
+		local b = parseCStringOrKeyword(self);
+		local ok, oldRepl = keywordEscapes.setnew_ex(a, b)...;
+		if (!ok && oldRepl != b) {
+			self.err("Replacement re-definition: {!r} defined as {!r} (was: {!r})"
+				.format({ a, b, oldRepl }));
+		}
+		self.skip(")");
+	}
+
+	public function parseDirective_define_str2wcs_replacement() {
+		self.next();
+		self.skip("(");
+		local a = parseCStringOrKeyword(self);
+		self.skip("=");
+		local b = parseCStringOrKeyword(self);
+		local ok, oldRepl = str2wcsReplacementEscapes.setnew_ex(a, b)...;
+		if (!ok && oldRepl != b) {
+			self.err("str2wcs replacement re-definition: {!r} defined as {!r} (was: {!r})"
+				.format({ a, b, oldRepl }));
+		}
+		self.skip(")");
+	}
+
+	@@Define simple textual replacement macros
+	@@>%[define(MACRO_NAME = TEXT INSERTED AS REPLACEMENT)]
+	@@This differs from @"%[define_replacement(...)]", in that the keyword
+	@@is replaced in all situations, regardless of escape mode, as well as
+	@@the fact that the replacement text will be re-parsed for further macros,
+	@@as well as replacements.
+	@@Note that macros defined using this directive are expanded at the same
+	@@time as special builtin macros such as @"$has_function"
+	public function parseDirective_define() {
+		self.next();
+		self.skip("(");
+		local a = parseCStringOrKeyword(self);
+		self.skip("=");
+		local b = parseCStringOrAllUntilRParen(self);
+		local ok, oldDecl = keywordMacros.setnew_ex(a, b)...;
+		if (!ok) {
+			if (oldDecl !is string) {
+				self.err("macro re-definition: {!r} defined as {!r} (was: <Custom Function>)"
+					.format({ a, b }));
+			} else if (oldDecl != b) {
+				self.err("macro re-definition: {!r} defined as {!r} (was: {!r})"
+					.format({ a, b, oldDecl }));
+			}
+		}
+		self.skip(")");
+	}
+
+
 	@@Parse a directive. Upon entry, the parser will
 	@@point at the directive's name, and upon exit, the
 	@@parser should point at the trailing @"," or @"]"
@@ -1547,179 +1738,17 @@ do_push_macroList:
 		/* %[directive...] */
 		local self = this.self;
 		local tok = self.tok;
-		switch (tok) {
-
-		case "[":
+		if (tok == "[") {
 			self.next();
 			parseDirectives();
 			self.skip("]");
-			break;
-
-		case "define_header_guard": {
-			self.next();
-			self.skip("(");
-			result_headerGuardName = parseCStringOrFunctionLikeExpression(self);
-			self.skip(")");
-		}	break;
-
-		case "define_ccompat_header": {
-			if (result_ccompatHeaderName !is none)
-				self.err("Duplicate '%[define_ccompat_header(...)]' directive");
-			if (result_order_headerStd !is none)
-				self.err("Directive '%[define_ccompat_header(...)]' must come before '%[insert:std]'");
-			self.next();
-			self.skip("(");
-			result_ccompatHeaderName = parseCStringOrFunctionLikeExpression(self);
-			self.skip(")");
-		}	break;
-
-		case "define_system_header_guard": {
-			self.next();
-			self.skip("(");
-			result_headerGuardName = parseCStringOrFunctionLikeExpression(self);
-			self.skip(")");
-		}	break;
-
-		case "define_wchar_replacement":
-		case "define_wchar_replacement_header": {
-			local map = tok == "define_wchar_replacement"
-				? wcharReplacementEscapes
-				: wcharReplacementHeaders;
-			self.next();
-			self.skip("(");
-			local replArgs = str parseCStringOrAllUntilRParen(self);
-			if ("=" !in replArgs) {
-				self.err("Missing '=' in '%[{}({!r})]'"
-					.format({ tok, replArgs }));
-			}
-			local orig, none, repl = replArgs.partition("=")...;
-			if ("," !in repl) {
-				self.err("Missing ',' in '%[{}({!r})]'"
-					.format({ tok, replArgs }));
-			}
-			local c16, none, c32 = repl.partition(",")...;
-			orig = orig.strip();
-			c16  = c16.strip();
-			c32  = c32.strip();
-			local prev = map.get(orig);
-			if (prev !is none) {
-				if (prev[0] != c16 || prev[1] != c32) {
-					self.err("wchar re-definition: {!r} defined as "
-						"(16: {!r}, 32: {!r}) (was: (16: {!r}, 32: {!r}))"
-						.format({ orig, c16, c32, prev[0], prev[1] }));
-				}
-			} else {
-				map[orig] = (c16, c32);
-			}
-			self.skip(")");
-		}	break;
-
-		case "define_replacement": {
-			self.next();
-			self.skip("(");
-			local replArgs = str parseCStringOrAllUntilRParen(self);
-			if ("=" !in replArgs)
-				self.err("Missing '=' in '%[define_replacement({!r})]'"
-					.format({ replArgs }));
-			local a, none, b = replArgs.partition("=")...;
-			a = a.strip();
-			b = b.strip();
-			if (a in keywordEscapes) {
-				if (keywordEscapes[a] != b)
-					self.err("Replacement re-definition: {!r} defined as {!r} (was: {!r})"
-						.format({ a, b, keywordEscapes[a] }));
-			} else {
-				keywordEscapes[a] = b;
-			}
-			self.skip(")");
-		}	break;
-
-		case "pushdefault":
-		case "push_default":
-			if (pushedDefaultFeatures is none)
-				pushedDefaultFeatures = [];
-			pushedDefaultFeatures.pushback(copy defaultFeatures);
-			break;
-
-		case "popdefault":
-		case "pop_default":
-			if (!pushedDefaultFeatures)
-				self.err("%[popdefault] without %[pushdefault]");
-			defaultFeatures = pushedDefaultFeatures.popback();
-			break;
-
-		case "default_impl_section":
-			self.tok = "section"; /* Deprecated alias for "%[default:section(...)]" */
-			defaultFeatures.tryParseAttribute(self, none);
-			break;
-
-		case "default":
-			/* %[default:...] Set default function annotations */
-			self.next();
-			self.skip(":");
-again_parse_default_annotation:
-			if (!defaultFeatures.tryParseAttribute(self, none)) {
-				self.err(
-					"Unknown function annotation {!r}, or "
-					"annotation cannot be assigned a default value"
-					.format({ self.tok }));
-			}
-			if (self.tok == ",") {
-				self.next();
-				if (self.tok != "]")
-					goto again_parse_default_annotation;
-			}
-			break;
-
-		case "insert":
-			self.next();
-			tok = self.skip(":");
-			switch (tok) {
-
-			case "std":
-				/* %[insert:std] */
-				if (result_order_headerStd !is none)
-					self.err("Multiple '%[insert:std]' directives");
-				else {
-					assert result_order_headerStd is none;
-					assert result_order_headerCCompat is none;
-					assert result_order_header_in_CXX_SYSTEM_HEADER === false;
-					result_order_headerStd = [];
-					if (result_ccompatHeaderName !is none)
-						result_order_headerCCompat = [];
-					/* Inject a printer callback for generating std:: declarations */
-					result.order_header.append([](fp: CWriter, escapeMode: int) {
-						local oldNs = fp.namespace;
-						fp.namespace = NAMESPACES["std"];
-						for (local part: result_order_headerStd) {
-							if (part is Function || part is ExposedFunction) {
-								part.cprintHeaderDeclaration(fp, escapeMode);
-							} else if (part is Callable) {
-								part(fp, escapeMode);
-							} else {
-								fp << part;
-							}
-						}
-						fp.namespace = oldNs;
-					});
-				}
-				self.next();
-				break;
-
-			default:
-				self.err("Unknown operand for insert-directive: {!r}"
-					.format({ tok }));
-			}
-			break;
-
-		default: {
+		} else {
 			local cbAttrib = "parseDirective_" + tok;
 			if (hasattr(this, cbAttrib))
 				return this.operator . (cbAttrib)();
 			/* Give a custom directives parser a chance */
 			if (!customDirectivesParser(this))
 				self.err("Unknown directive: {!r}".format({ tok }));
-		}	break;
 		}
 	}
 
@@ -1799,7 +1828,8 @@ function loadSystemHeaderDefinitions(
 		self: CParser, headerName: string,
 		customDirectivesParser: Callable with LoaderContext = none): SystemHeader {
 	final local result: SystemHeader = SystemHeader(name: headerName);
-	allSystemHeaders[headerName] = result;
+	if (!allSystemHeaders.setnew(headerName, result))
+		throw Error("Duplicate system header: {!r}".format({ headerName }));
 	final local context: LoaderContext = LoaderContext(
 		self: self, result: result, customDirectivesParser: customDirectivesParser);
 	local tok = self.tok;
@@ -1944,10 +1974,10 @@ function loadSystemHeaderDefinitions(
 		}
 		local currentFeatures = copy context.defaultFeatures;
 		local current = Function(originalSystemHeaderName: headerName);
-		local currentLibraryFunction = LibraryFunction(originalSystemHeaderName: headerName);
-		local currentDosLibraryFunction: LibraryFunction = none;
 		local currentPrototype = FunctionPrototype(cc: DEFAULT_CC, nothrow: DEFAULT_NOTHROW);
 		local currentPrototypes = { ("1", { currentPrototype }) };
+		local currentLibraryFunction = LibraryFunction(originalSystemHeaderName: headerName);
+		local currentDosLibraryFunction: LibraryFunction = none;
 		/* # of leading entires in @current.bindings that should appear before the self-binding */
 		local numPreferredBindings = 0;
 		@@Additional function bindings that will be
@@ -2096,9 +2126,8 @@ again_parse_annotations:
 					}
 					currentLibraryFunction.bindings.append(
 						LibraryFunctionBinding(
-							ppCond:    currentConditions,
-							prototype: currentPrototype,
-							binding:   "libc_" + tok));
+							ppCond:  currentConditions,
+							binding: "libc_" + tok));
 					self.next();
 					self.skip(")");
 				}	break;
@@ -2203,19 +2232,65 @@ again_parse_annotations:
 					}
 				}	break;
 
+				case "inline_as":
+					self.next();
+					self.skip("(");
+					self.inline = parseCStringOrKeyword(self);
+					self.skip(")");
+					break;
+
 				case "inline":
-				case "preferred_inline": {
+				case "forceinline":
+				case "extern_inline":
+				case "raw_extern_inline":
+				case "preferred_inline":
+				case "preferred_forceinline":
+				case "preferred_extern_inline":
+				case "preferred_raw_extern_inline":
+					/* >> '[' 'inline'      ']'    // Defaultable
+					 * >> '[' 'forceinline' ']'    // Defaultable
+					 * >> '[' [IF(...),] ('preferred_inline' | 'inline') '(' BODY ')' ']'
+					 * >> '[' [IF(...),] ('preferred_forceinline' | 'forceinline') '(' BODY ')' ']'
+					 * >> '[' [IF(...),] ('preferred_extern_inline' | 'extern_inline') '(' SYMBOL_NAME ',' BODY ')' ']'
+					 * >> '[' [IF(...),] ('preferred_raw_extern_inline' | 'raw_extern_inline') '(' SYMBOL_NAME ',' BODY ')' ']'
+					 */
 					if (self.next() == "(") {
 						/* With arguments: Define an inline function implementation */
+						local externSymbolName;
 						self.next();
-						local impl = parseCStringOrAllUntilRParen(self);
-						if (currentFeatures.inlineTruncate)
-							impl = truncateInlineFunctionImplementation(str(impl));
+						if (tok.endswith("extern_inline")) {
+							externSymbolName = parseCStringOrKeyword(self);
+							self.skip(",");
+						}
+						local body = parseCStringOrAllUntilRParen(self);
+						if (!currentFeatures.noInlineTruncate)
+							body = truncateInlineFunctionImplementation(str(body));
 						self.skip(")");
+						local bindingCond = currentConditions is none ? "1" : currentConditions;
+						if (!tok.endswith("raw_extern_inline")) {
+							local ppHave = keyCrtHave(externSymbolName);
+							if (bindingCond == "1")
+								bindingCond = ppHave;
+							else {
+								bindingCond = "({})&&{}".format({ bindingCond, ppHave });
+							}
+						}
 						local binding = FunctionBinding(
-							ppCond:     currentConditions is none ? "1" : currentConditions,
+							ppCond:     bindingCond,
 							prototypes: currentPrototypes,
-							binding:    InlineFunction(implementation: impl));
+							binding:    []{
+							local ifun = InlineFunction(
+								impl: FunctionImplementation(
+									body: body,
+									name: current.name));
+							if (tok.endswith("extern_inline")) {
+								ifun.mode                = "__EXTERNINLINE";
+								ifun.externInlineAsmname = externSymbolName;
+							} else if ("force" in tok) {
+								ifun.mode = "FORCELOCAL";
+							}
+							return ifun;
+						});
 						if (tok.startswith("preferred_")) {
 							current.bindings.insert(numPreferredBindings, binding);
 							++numPreferredBindings;
@@ -2223,13 +2298,82 @@ again_parse_annotations:
 							current.bindings.append(binding);
 						}
 					} else {
-						if (tok == "preferred_inline")
+						if (tok !in ["inline", "forceinline"])
 							self.skip("(");
 						if (currentConditions !is none)
 							goto illegal_annotation_with_condition;
-						currentFeatures.inline = "LOCAL";
+						currentFeatures.inline = {
+							"inline"      : "LOCAL",
+							"forceinline" : "FORCELOCAL"
+						}[tok];
 					}
+					break;
+
+				case "crtbuiltin": {
+					/* >> [[crtbuiltin]] size_t strlen(char const *__restrict str);
+					 * Same as:
+					 * >> [[if(__has_builtin(__builtin_strlen) && defined(__LIBC_BIND_CRTBUILTINS)),
+					 * >>   preferred_extern_inline(strlen, { return __builtin_strlen(str); })
+					 * >> ]] strlen(char const *__restrict str);
+					 * HEADER:
+					 * >> #if __has_builtin(__builtin_strlen) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strlen)
+					 * >> __CEIDECLARE(,size_t,__NOTHROW_NCX,strlen,(char const *__restrict __str),{ return __builtin_strlen(__str); })
+					 * >> #elif defined(__CRT_HAVE_strlen)
+					 * >> __CDECLARE(,size_t,__NOTHROW_NCX,strlen,(char const *__restrict __str),(__str))
+					 * >> #endif // ...
+					 */
+					local asmnameOverride = none;
+					if (self.next() == "(") {
+						asmnameOverride = parseCStringOrKeyword(self);
+						self.skip(")");
+					}
+					current.bindings.insert(numPreferredBindings, []{
+						local asmname = asmnameOverride;
+						if (asmname is none)
+							asmname = current.name;
+						local builtinName = "__builtin_" + asmname;
+						local bindingCond =
+							"__has_builtin({})&&"
+							"defined(__LIBC_BIND_CRTBUILTINS)&&"
+							"{}".format({ builtinName, keyCrtHave(asmname) });
+						if (currentConditions !is none)
+							bindingCond = "({})&&{}".format({ currentConditions, bindingCond });
+						File.Writer bodyFp;
+						bodyFp << "{ return " << builtinName << "(";
+						/* Print argument names */
+						local isFirst = true;
+						/* TODO: currentPrototype can't be used if the function ends up
+						 *       inheriting some other function's prototypes:
+						 * >> [[crtbuiltin]] wcslen(*) %{generate(str2wcs)} */
+						for (local a: currentPrototype.argv) {
+							if (!isFirst)
+								bodyFp << ", ";
+							isFirst = false;
+							bodyFp << a.name;
+						}
+						bodyFp << "); }";
+						return FunctionBinding(
+							ppCond:     bindingCond,
+							/* TODO: currentPrototypes can't be used if the function ends up
+							 *       inheriting some other function's prototypes:
+							 * >> [[crtbuiltin]] wcslen(*) %{generate(str2wcs)}
+							 * HINT: Completeness could can be detected by:
+							 *    >> (for (local none, ps: currentPrototypes)
+							 *    >>     for (local p: ps)
+							 *    >>         p.returnType is bound
+							 *    >> ) && ...;
+							 */
+							prototypes: currentPrototypes,
+							binding:    InlineFunction(
+								mode: "__EXTERNINLINE",
+								impl: FunctionImplementation(
+									body: bodyFp.string,
+									name: current.name),
+								externInlineAsmname: asmname));
+					});
+					++numPreferredBindings;
 				}	break;
+
 
 				{
 					local wholeCond;
@@ -2295,9 +2439,8 @@ again_parse_annotations:
 do_handle_alt_variant_of:
 					currentLibraryFunction.bindings.append(
 						LibraryFunctionBinding(
-							ppCond:    wholeCond,
-							prototype: currentPrototype,
-							binding:   "libc_" + assemblyName));
+							ppCond:  wholeCond,
+							binding: "libc_" + assemblyName));
 					local binding = FunctionBinding(
 						ppCond:     constructAliasConditions(wholeCond, assemblyName),
 						prototypes: currentPrototypes,
@@ -2391,6 +2534,7 @@ again_skip_annotation_rbracket:
 			self.err("Unexpected top-level token {!r}"
 				.format({ tok }));
 		}
+		local currentName;
 		local currentNameTokStart;
 		{
 			local returnTypeStart = self.tokStart;
@@ -2414,7 +2558,7 @@ again_skip_annotation_rbracket:
 			}
 			/* lastKeyword is the function's name, and the string between
 			 * returnTypeStart...returnTypeEnd is the (preliminary) return type. */
-			current.name = lastKeyword;
+			current.name = currentName = lastKeyword;
 			if (tok == ":")
 				tok = self.next();
 			if (tok != "(")
@@ -2430,7 +2574,7 @@ again_skip_annotation_rbracket:
 		if (!currentFeatures.crt_noSelfImport) {
 			local usedCrtName = currentFeatures.crt_name;
 			if (usedCrtName is none)
-				usedCrtName = current.name;
+				usedCrtName = currentName;
 			current.bindings.insert(
 				numPreferredBindings, FunctionBinding(
 					ppCond:     keyCrtHave(usedCrtName),
@@ -2463,6 +2607,10 @@ again_skip_annotation_rbracket:
 				 * >> [[if(COND && __SIZEOF_WCHAR_T__ == 4), alias(KOS$NAME)]] */
 				for (local i = 0; i < #current.bindings;) {
 					local bind = current.bindings[i];
+					if (bind is Callable) {
+						++i;
+						continue;
+					}
 					local symbolName = bind.binding;
 					if (symbolName !is string &&
 						symbolName !is UserString) {
@@ -2501,7 +2649,7 @@ again_skip_annotation_rbracket:
 					if (currentFeatures.crt_dosname !is none) {
 						local mySymbolName = currentFeatures.crt_name;
 						if (mySymbolName is none)
-							mySymbolName = current.name;
+							mySymbolName = currentName;
 						if (dosSymbolName == mySymbolName)
 							dosSymbolName = currentFeatures.crt_dosname;
 					}
@@ -2555,7 +2703,7 @@ again_skip_annotation_rbracket:
 		} else { /* currentFeatures.wchar */
 			if (currentFeatures.crt_dosname !== context.defaultFeatures.crt_dosname) {
 				self.err("Function {!r} has a [dosname()] annotation, but no [wchar]"
-					.format({ current.name }));
+					.format({ currentName }));
 			}
 		} /* !currentFeatures.wchar */
 
@@ -2566,14 +2714,14 @@ again_skip_annotation_rbracket:
 			if (currentLibraryFunction.ppCond == "1")
 				currentLibraryFunction.ppCond = IFNDEF_KERNEL;
 			else {
-				currentLibraryFunction.ppCond = "({}) && {}"
+				currentLibraryFunction.ppCond = "({})&&{}"
 					.format({ currentLibraryFunction.ppCond, IFNDEF_KERNEL });
 			}
 			if (currentDosLibraryFunction !is none) {
 				if (currentDosLibraryFunction.ppCond == "1")
 					currentDosLibraryFunction.ppCond = IFNDEF_KERNEL;
 				else {
-					currentDosLibraryFunction.ppCond = "({}) && {}"
+					currentDosLibraryFunction.ppCond = "({})&&{}"
 						.format({ currentDosLibraryFunction.ppCond, IFNDEF_KERNEL });
 				}
 			}
@@ -2593,41 +2741,45 @@ again_skip_annotation_rbracket:
 				if (currentPrototype.returnType is bound) {
 					self.errAt(currentNameTokStart,
 						"Function {!r} has an automatic prototype, but return type was set to {!r}"
-							.format({ current.name, currentPrototype.returnType }));
+							.format({ currentName, currentPrototype.returnType }));
 				}
 				if (currentPrototype.cc != DEFAULT_CC) {
 					self.errAt(currentNameTokStart,
 						"Function {!r} has an automatic prototype, but explicit CC {!r}"
-							.format({ current.name, currentPrototype.cc }));
+							.format({ currentName, currentPrototype.cc }));
 				}
 				if (currentPrototype.nothrow != DEFAULT_NOTHROW) {
 					self.errAt(currentNameTokStart,
 						"Function {!r} has an automatic prototype, but explicit NOTHROW {!r}"
-							.format({ current.name, currentPrototype.nothrow }));
+							.format({ currentName, currentPrototype.nothrow }));
 				}
 				if (currentPrototype.ellipsisArgumentTypes) {
 					self.errAt(currentNameTokStart,
 						"Function {!r} has an automatic prototype, but explicit ellipsis arguments {!r}"
-							.format({ current.name, currentPrototype.ellipsisArgumentTypes }));
+							.format({ currentName, currentPrototype.ellipsisArgumentTypes }));
 				}
 				if (defaultAttributes !is none && defaultAttributes) {
 					self.errAt(currentNameTokStart,
 						"Function {!r} has an automatic prototype, but explicit attributes {!r}"
-							.format({ current.name, defaultAttributes }));
+							.format({ currentName, defaultAttributes }));
 				}
 				if (functionArgumentNamesOverride !is none) {
 					self.errAt(currentNameTokStart,
 						"Function {!r} has an automatic prototype, but explicit argument names {!r}"
-							.format({ current.name, functionArgumentNamesOverride }));
+							.format({ currentName, functionArgumentNamesOverride }));
 				}
 				currentPrototype  = none;
 				currentPrototypes = none;
+				for (local binding: current.bindings) {
+					if (binding !is Callable)
+						binding.prototypes = none;
+				}
 				if (tok == "=")
 					goto handle_eq_after_prototype;
 				if (tok == "%")
 					goto handle_percent_after_prototype;
 				self.err("Expected '=' or '%' after '{}(*)', but got {!r}"
-					.format({ current.name, tok }));
+					.format({ currentName, tok }));
 			}
 			self.tokEnd = temp;
 			tok = self.next();
@@ -2685,39 +2837,157 @@ again_skip_annotation_rbracket:
 		 *   ";"  - No implementation
 		 */
 		switch (tok) {
-			local primaryImplementation: UserString;
+			local loaderImpl: none | Callable | LoaderFunctionImplementation;
 
 		case "%": {
 handle_percent_after_prototype:
 			tok = self.next();
-			primaryImplementation = none;
-			/* Auto-generated implementation in `primaryImplementation',
-			 * and possibly `currentPrototypes' */
+			loaderImpl = none;
+			/* Auto-generated implementation in `hdrImpls' and
+			 * `libImpls', and possibly `currentPrototype' and
+			 * `currentPrototypes' */
 			switch (tok) {
 
 			case "{":
 				tok = self.next();
 				switch (tok) {
 
+				case "copy": /* Deprecated alias */
+				case "generate": {
+					/* Syntax:
+					 * >> wcslen(*) %{generate(str2wcs)}
+					 * >> wcslen(*) %{generate(str2wcs(*))}
+					 * >> wcslen(*) %{generate(str2wcs(%auto))}
+					 * >> wcslen(*) %{generate(str2wcs(strlen))} */
+					if (currentFeatures.requires is Callable || currentFeatures.requires != "1")
+						self.err("Function {!r} has a generated implementation, but uses [requires({!r})]"
+							.format({ currentName, currentFeatures.requires }));
+					if (currentFeatures.requiresIncludes is Callable || currentFeatures.requiresIncludes)
+						self.err("Function {!r} has a generated implementation, but uses [requires_include({!r})]"
+							.format({ currentName, currentFeatures.requiresIncludes }));
+					if (currentFeatures.requiresPrefix is Callable || currentFeatures.requiresPrefix)
+						self.err("Function {!r} has a generated implementation, but uses [requires_prefix({!r})]"
+							.format({ currentName, currentFeatures.requiresPrefix }));
+					if (currentFeatures.implIncludes is Callable || currentFeatures.implIncludes)
+						self.err("Function {!r} has a generated implementation, but uses [impl_include({!r})]"
+							.format({ currentName, currentFeatures.implIncludes }));
+					if (currentFeatures.implPrefix is Callable || currentFeatures.implPrefix)
+						self.err("Function {!r} has a generated implementation, but uses [impl_prefix({!r})]"
+							.format({ currentName, currentFeatures.implPrefix }));
+					self.next();
+					tok = self.skip("(");
+					if (!tok.issymbol()) {
+						self.err("Expected keyword in %{{generate(...)}}, but got {!r}"
+							.format({ tok }));
+					}
+					local gennetatorName = tok;
+					local gen: Generator = generators.get(gennetatorName);
+					if (gen is none) {
+						self.err("Unknown generator {!r}"
+							.format({ gennetatorName }));
+					}
+					tok = self.next();
+					local baseFunctionName = none;
+					if (tok == "(") {
+						/* Explicit function name, or * or %auto */
+						tok = self.next();
+						if (tok == "*") {
+							self.next();
+						} else if (tok == "%") {
+							self.next();
+							self.skip("auto");
+						} else {
+							baseFunctionName = parseCStringOrKeyword(self);
+						}
+						tok = self.skip(")");
+					}
+					/* Check if we're supposed to automatically deduce
+					 * the name of the underlying base-function. */
+					if (baseFunctionName is none) {
+						baseFunctionName = gen.getDefaultBaseFunctionName(currentName);
+						if (baseFunctionName is none) {
+							self.errAt(currentNameTokStart,
+								"Unable to deduce automatic base function name for "
+								"generator {!r} from current function name {!r}"
+								.format({ gennetatorName, currentName }));
+						}
+					}
+					/* Hint at the generator about the replacement. */
+					gen.registerFunctionPairing(currentName, baseFunctionName);
+					local baseLocalFunctionCell: Cell with LocalFunction = Cell();
+					function getBaseLocalFunction(): LocalFunction {
+						if (!baseLocalFunctionCell) {
+							local result: LocalFunction;
+							try {
+								result = findLocalFunctionByName(baseFunctionName);
+							} catch (Error as e) {
+								self.errAt(currentNameTokStart, e.message);
+							}
+							baseLocalFunctionCell.value = result;
+							return result;
+						}
+						return baseLocalFunctionCell.value;
+					}
+					if (currentPrototype is none) {
+						local replacedPrototypeCell: Cell with FunctionPrototype = Cell();
+						currentPrototype = []{
+							if (!replacedPrototypeCell) {
+								local result = gen.replaceFunctionPrototype(
+									getBaseLocalFunction().functionPrototype);
+								replacedPrototypeCell.value = result;
+								return result;
+							}
+							return replacedPrototypeCell.value;
+						};
+					}
+					/* TODO: Inherit getBaseLocalFunction().declarationIncludes */
+					/* TODO: Inherit getBaseLocalFunction().declarationPrefix */
+					if (currentPrototypes is none) {
+						currentPrototypes = [] -> {
+							("1", {
+								currentPrototype is Callable
+									? currentPrototype()
+									: currentPrototype
+							}),
+						};
+						for (local binding: current.bindings) {
+							if (binding is Callable)
+								continue;
+							if (binding.prototypes is none)
+								binding.prototypes = currentPrototypes;
+						}
+					}
+					/* Define the generator for the converted function implementations */
+					loaderImpl = [](): LoaderFunctionImplementation {
+						local baseLocalFunction: LocalFunction = getBaseLocalFunction();
+						return LoaderFunctionImplementation(
+							ppCond:         gen.replaceText(baseLocalFunction.ppCond),
+							ppCondIncludes: gen.replaceHeaderList(baseLocalFunction.ppCondIncludes),
+							ppCondPrefix:   gen.replaceText(baseLocalFunction.ppCondPrefix),
+							impl:           gen.replaceFunctionImplementation(
+								baseLocalFunction.functionImpl, currentName));
+					};
+					self.skip(")");
+				}	break;
+
 				case "uchar": {
-					local has16 = "16" in current.name;
-					local has32 = "32" in current.name;
+					local has16 = "16" in currentName;
+					local has32 = "32" in currentName;
 					if (has16 && !has32)
 						tok = "uchar16";
 					else if (has32 && !has16)
 						tok = "uchar32";
 					else {
 						self.err("Unable to determine uchar behavior from function name {!r}"
-							.format({ current.name }));
+							.format({ currentName }));
 					}
 				}	/* FALLTHRU */
 				case "uchar16":
 				case "uchar32": {
-					local ucharFunctionName = current.name;
 					local mode = tok;
 					if (currentFeatures.wchar) {
 						self.err("uchar function {!r} cannot have the [wchar] annotation"
-							.format({ ucharFunctionName }));
+							.format({ currentName }));
 					}
 					local wcsFunctionName = none;
 					tok = self.next();
@@ -2742,7 +3012,7 @@ handle_percent_after_prototype:
 						self.skip(")");
 					}
 					if (wcsFunctionName is none) {
-						wcsFunctionName = ucharFunctionName;
+						wcsFunctionName = currentName;
 						if (wcsFunctionName.startswith("c16") || wcsFunctionName.startswith("c32"))
 							wcsFunctionName = "wcs" + wcsFunctionName[3:];
 						else {
@@ -2752,23 +3022,23 @@ handle_percent_after_prototype:
 						}
 					}
 					currentFeatures.assertAllDefaultAttributesWithoutImplementation(
-						self, context.defaultFeatures, current.name);
+						self, context.defaultFeatures, currentName);
 					currentFeatures.assertAllSymbolicAliasOnly(
-						self, context.defaultFeatures, current.name);
+						self, context.defaultFeatures, currentName);
 					if (currentLibraryFunction.exportSymbolNames) {
 						self.errAt(currentNameTokStart,
 							"[export_as(...)] used with %{{uchar}} function {!r}"
-								.format({ current.name }));
+								.format({ currentName }));
 					}
 					if (currentLibraryFunction.bindings) {
 						self.errAt(currentNameTokStart,
 							"[intern_alias(...)] or [alt_variant_of(...)] "
 							"used with %{{uchar}} function {!r}"
-							.format({ current.name }));
+							.format({ currentName }));
 					}
 					if (#current.bindings > (currentFeatures.crt_noSelfImport ? 0 : 1))
 						self.errAt(currentNameTokStart, "%{{uchar}} function {!r} has custom bindings"
-							.format({ ucharFunctionName }));
+							.format({ currentName }));
 					mode = { "uchar16" : WCHAR_REPLACEMENT_CHAR16,
 					         "uchar32" : WCHAR_REPLACEMENT_CHAR32 }[mode];
 					local feat_inline         = currentFeatures.inline;
@@ -2777,10 +3047,10 @@ handle_percent_after_prototype:
 					local xcLocalFunction: LocalFunction = none;
 					if (feat_inline is none && !feat_noLocal) {
 						xcLocalFunction = LocalFunction(
-							name:                     ucharFunctionName,
+							name:                     currentName,
 							originalSystemHeaderName: headerName);
 						defineFunctionInMapping(allLocalFunctionsByName, xcLocalFunction);
-						if (!defineFunctionInMappingNoDuplicates(result.localFunctionsByName, xcLocalFunction))
+						if (!result.localFunctionsByName.setnew(xcLocalFunction.name, xcLocalFunction))
 							self.errAt(currentNameTokStart, "Duplicate local function: {!r}"
 								.format({ xcLocalFunction.name }));
 					}
@@ -2801,7 +3071,7 @@ handle_percent_after_prototype:
 						@@The referenced [wchar]-Function
 						local wc: Function = wcharFunction.wc_func;
 						@@The Xchar-function implementation
-						local xc: XcharImplementation = wcharFunction.getXCharImplementation(ucharFunctionName, mode);
+						local xc: XcharImplementation = wcharFunction.getXCharImplementation(currentName, mode);
 						/* Figure out which prototypes should be used */
 						local usedPrototype: FunctionPrototype = currentPrototype;
 						local usedPrototypes: {(string, {FunctionPrototype...})...} = currentPrototypes;
@@ -2813,9 +3083,7 @@ handle_percent_after_prototype:
 						 * new, transformed bindings for our new the Xchar function. */
 						local basicBindings = [];
 						for (local wc_bind/*:FunctionBinding*/ : wc.functionBindings) {
-							local wc_bind_binding = wc_bind.binding;
-							if (wc_bind_binding is Callable)
-								wc_bind_binding = wc_bind.binding = wc_bind_binding();
+							local wc_bind_binding = wc_bind.functionBinding;
 							/* Ignore namespace bindings (though we could theoretically bind these as well...) */
 							if (wc_bind_binding is Namespace)
 								continue;
@@ -2839,15 +3107,19 @@ handle_percent_after_prototype:
 							 * >> }
 							 * >> basicBindings.append(FunctionBinding(myCond, TRANSFORM(wc_bind_binding), ...));
 							 */
+							/* TODO */
 						}
 						/* Last cast: Directly implement the Xchar function */
-						if (xc.impl is none) {
+						local xcImpl: none | Callable | LoaderFunctionImplementation = xc.loaderImpl;
+						if (xcImpl is Callable)
+							xcImpl = xcImpl();
+						if (xcImpl is none) {
 							yield basicBindings...;
 						} else {
 							local implBinding = FunctionBinding(
-								ppCond:         xc.ppCond,
-								ppCondIncludes: xc.ppCondIncludes,
-								ppCondPrefix:   xc.ppCondPrefix,
+								ppCond:         xcImpl.ppCond,
+								ppCondIncludes: xcImpl.ppCondIncludes,
+								ppCondPrefix:   xcImpl.ppCondPrefix,
 								prototypes:     usedPrototypes);
 							if (feat_inline !is none) {
 								if (!feat_noExternInline) {
@@ -2861,25 +3133,21 @@ handle_percent_after_prototype:
 										}
 										/* Construct, and inject a new binding that  */
 										local eiBinding = FunctionBinding(
-											ppCondIncludes: (existingBinding.ppCondIncludes as Set) | xc.ppCondIncludes,
-											ppCondPrefix:   existingBinding.ppCondPrefix + xc.ppCondPrefix,
+											ppCondIncludes: (existingBinding.ppCondIncludes as Set) | xcImpl.ppCondIncludes,
+											ppCondPrefix:   existingBinding.ppCondPrefix + xcImpl.ppCondPrefix,
 											prototypes:     existingBinding.prototypes,
 											binding:        InlineFunction(
-												mode:                   "__EXTERNINLINE",
-												externInlineAsmname:    existingBinding.binding,
-												implementation:         xc.impl,
-												implementationName:     xc.name,
-												implementationIncludes: xc.implIncludes,
-												implementationPrefix:   xc.implPrefix,
-												dependencies:           xc.dependencies));
-										if (xc.ppCond == "1") {
+												mode:                "__EXTERNINLINE",
+												impl:                xcImpl.impl,
+												externInlineAsmname: existingBinding.binding));
+										if (xcImpl.ppCond == "1") {
 											eiBinding.ppCond = existingBinding.ppCond;
 											basicBindings[i] = eiBinding;
 											++i;
 										} else {
 											eiBinding.ppCond = "{} && ({})".format({
 												existingBinding.ppCond,
-												xc.ppCond
+												xcImpl.ppCond
 											});
 											basicBindings.insert(i, eiBinding);
 											i += 2;
@@ -2887,26 +3155,15 @@ handle_percent_after_prototype:
 									}
 								}
 								implBinding.binding = InlineFunction(
-									mode:                   feat_inline,
-									implementation:         xc.impl,
-									implementationName:     xc.name,
-									implementationIncludes: xc.implIncludes,
-									implementationPrefix:   xc.implPrefix,
-									dependencies:           xc.dependencies);
+									mode: feat_inline, impl: xcImpl.impl);
 							} else if (!feat_noLocal) {
 								assert xcLocalFunction !is none;
-								xcLocalFunction.prototype = usedPrototype;
-								xcLocalFunction.implementations = {
-									LocalFunctionImplementation(
-										implementation:         xc.impl,
-										ppCond:                 xc.ppCond,
-										ppCondIncludes:         xc.ppCondIncludes,
-										ppCondPrefix:           xc.ppCondPrefix,
-										implementationIncludes: xc.implIncludes,
-										implementationPrefix:   xc.implPrefix,
-										dependencies:           xc.dependencies)
-								};
-								xcLocalFunction.documentation = wc.documentation;
+								xcLocalFunction.prototype      = usedPrototype;
+								xcLocalFunction.impl           = xcImpl.impl;
+								xcLocalFunction.ppCond         = xcImpl.ppCond;
+								xcLocalFunction.ppCondIncludes = xcImpl.ppCondIncludes;
+								xcLocalFunction.ppCondPrefix   = xcImpl.ppCondPrefix;
+								xcLocalFunction.documentation  = wc.documentation;
 								implBinding.binding = xcLocalFunction;
 							}
 							yield basicBindings...;
@@ -2929,7 +3186,7 @@ handle_percent_after_prototype:
 					.format({ tok }));
 				break;
 			}
-			if (primaryImplementation is none)
+			if (loaderImpl is none)
 				self.err("Unable to generate automatic implementation");
 			if (currentPrototype is none)
 				self.err("Prototype cannot be deduced in this context");
@@ -2940,148 +3197,179 @@ handle_percent_after_prototype:
 
 		case ";": {
 			self.next();
-			primaryImplementation = none;
+			loaderImpl = none;
 			goto with_primaryImplementation;
 		}	break;
 
 		case "{": {
 			{
-				local primaryImplementationStart = self.tokStart;
+				local bodyStart = self.tokStart;
 				self.skipPair();
-				primaryImplementation = self.getUserString(
-					primaryImplementationStart, self.tokEnd);
+				local body = self.getUserString(bodyStart, self.tokEnd);
 				self.next();
-			}
-with_primaryImplementation:
-			local implementationDependencies = none;
-			if (primaryImplementation is none) {
-				currentFeatures.assertAllDefaultAttributesWithoutImplementation(
-					self, context.defaultFeatures, current.name);
-			} else if (currentFeatures.inline !is none || !currentFeatures.noLocal) {
-				local implBinding = FunctionBinding(
+				loaderImpl = LoaderFunctionImplementation(
 					ppCond:         currentFeatures.requires,
 					ppCondIncludes: currentFeatures.requiresIncludes,
 					ppCondPrefix:   currentFeatures.requiresPrefix,
-					prototypes:     currentPrototypes);
-				implementationDependencies =
-					scanForNamesOfDependentFunctions(
-						primaryImplementation,
-						currentPrototype,
-						currentFeatures);
-				if (currentFeatures.inline !is none) {
-					/* Bind the primary implementations as inline */
-					local inlineImplementation = primaryImplementation;
-					if (currentFeatures.inlineTruncate) {
-						if (primaryImplementation is UserString || primaryImplementation is string) {
-							inlineImplementation = truncateInlineFunctionImplementation(str(primaryImplementation));
-						} else /* if (primaryImplementation is Callable) */ {
-							inlineImplementation = [] ->
-								truncateInlineFunctionImplementation(primaryImplementation());
-						}
-					}
-					if (!currentFeatures.noExternInline) {
-						/* Create secondary inline-bindings for all __EXTERNINLINE */
-						for (local i = 0; i < #current.bindings;) {
-							local existingBinding = current.bindings[i];
-							if (existingBinding.binding !is string &&
-							    existingBinding.binding !is UserString) {
-								++i;
-								continue;
+					impl:           FunctionImplementation(
+						body:         body,
+						name:         currentName,
+						implIncludes: currentFeatures.implIncludes,
+						implPrefix:   currentFeatures.implPrefix,
+						dependencies: scanForNamesOfDependentFunctions(
+							body, currentPrototype, currentFeatures))
+				);
+			}
+with_primaryImplementation:
+			if (loaderImpl is none) {
+				currentFeatures.assertAllDefaultAttributesWithoutImplementation(
+					self, context.defaultFeatures, currentName);
+			} else if (currentFeatures.inline !is none || !currentFeatures.noLocal) {
+				local existingBindings = current.bindings;
+				if (loaderImpl is Callable || existingBindings is Callable) {
+					/* Must implement indirectly! */
+					local feat_inline = currentFeatures.inline;
+					local feat_noExternInline   = currentFeatures.noExternInline;
+					local feat_noInlineTruncate = currentFeatures.noInlineTruncate;
+					current.bindings = []{
+						local usedImpl: LoaderFunctionImplementation = loaderImpl;
+						local usedExistingBindings = existingBindings;
+						if (usedImpl is Callable)
+							usedImpl = usedImpl();
+						if (usedExistingBindings is Callable)
+							usedExistingBindings = usedExistingBindings();
+						local funImpl: FunctionImplementation = usedImpl.impl;
+						local implBinding = FunctionBinding(
+							ppCond:         usedImpl.ppCond,
+							ppCondIncludes: usedImpl.ppCondIncludes,
+							ppCondPrefix:   usedImpl.ppCondPrefix,
+							prototypes:     currentPrototypes);
+						if (feat_inline !is none) {
+							/* Bind the primary implementations as inline */
+							local inlImpl = funImpl;
+							if (!feat_noInlineTruncate)
+								inlImpl = inlImpl.truncateBodyForInline();
+							if (!feat_noExternInline) {
+								/* Create secondary inline-bindings for all __EXTERNINLINE */
+								for (local existingBinding /*: FunctionBinding*/: usedExistingBindings) {
+									if (existingBinding is Callable)
+										existingBinding = existingBinding();
+									if (type(existingBinding.binding) !in [string, UserString]) {
+										yield existingBinding;
+										continue;
+									}
+									/* Construct, and inject a new binding that  */
+									yield FunctionBinding(
+										ppCond:         implBinding.ppCond == "1"
+										                ? existingBinding.ppCond
+										                : "{} && ({})".format({ existingBinding.ppCond, implBinding.ppCond }),
+										ppCondIncludes: (existingBinding.ppCondIncludes as Set) | implBinding.ppCondIncludes,
+										ppCondPrefix:   existingBinding.ppCondPrefix + implBinding.ppCondPrefix,
+										prototypes:     existingBinding.prototypes,
+										binding:        InlineFunction(
+											mode:                "__EXTERNINLINE",
+											impl:                inlImpl,
+											externInlineAsmname: existingBinding.binding));
+								}
 							}
-							/* Construct, and inject a new binding that  */
-							local eiBinding = FunctionBinding(
-								ppCondIncludes: (existingBinding.ppCondIncludes as Set) | currentFeatures.requiresIncludes,
-								ppCondPrefix:   existingBinding.ppCondPrefix + currentFeatures.requiresPrefix,
-								prototypes:     existingBinding.prototypes,
-								binding:        InlineFunction(
-									mode:                   "__EXTERNINLINE",
-									externInlineAsmname:    existingBinding.binding,
-									implementation:         inlineImplementation,
-									implementationName:     current.name,
-									implementationIncludes: currentFeatures.implIncludes,
-									implementationPrefix:   currentFeatures.implPrefix,
-									dependencies:           implementationDependencies));
-							if (currentFeatures.requires == "1") {
-								eiBinding.ppCond = existingBinding.ppCond;
-								current.bindings[i] = eiBinding;
-								++i;
-							} else {
-								eiBinding.ppCond = "{} && ({})".format({
-									existingBinding.ppCond,
-									currentFeatures.requires
-								});
-								current.bindings.insert(i, eiBinding);
-								i += 2;
-							}
+							implBinding.binding = InlineFunction(
+								mode: feat_inline, impl: inlImpl);
+						} else {
+							yield usedExistingBindings...;
+							/* Construct a local function object */
+							local localFunc = LocalFunction(
+								name:                     currentName,
+								originalSystemHeaderName: headerName,
+								prototype:                currentPrototype,
+								impl:                     funImpl,
+								documentation:            current.documentation);
+							defineFunctionInMapping(allLocalFunctionsByName, localFunc);
+							if (!result.localFunctionsByName.setnew(localFunc.name, localFunc))
+								self.errAt(currentNameTokStart, "Duplicate local function: {!r}"
+									.format({ localFunc.name }));
+							implBinding.binding = localFunc;
 						}
-					}
-					implBinding.binding = InlineFunction(
-						mode:                   currentFeatures.inline,
-						implementation:         inlineImplementation,
-						implementationName:     current.name,
-						implementationIncludes: currentFeatures.implIncludes,
-						implementationPrefix:   currentFeatures.implPrefix,
-						dependencies:           implementationDependencies);
+						yield implBinding;
+					};
 				} else {
-					/* Construct a local function object */
-					local localFunc = LocalFunction(
-						name:                     current.name,
-						originalSystemHeaderName: headerName,
-						prototype:                currentPrototype,
-						implementations: {
-							LocalFunctionImplementation(
-								implementation:         primaryImplementation,
-								ppCond:                 currentFeatures.requires,
-								ppCondIncludes:         currentFeatures.requiresIncludes,
-								ppCondPrefix:           currentFeatures.requiresPrefix,
-								implementationIncludes: currentFeatures.implIncludes,
-								implementationPrefix:   currentFeatures.implPrefix,
-								dependencies:           implementationDependencies)
-						},
-						documentation: current.documentation);
-					defineFunctionInMapping(allLocalFunctionsByName, localFunc);
-					if (!defineFunctionInMappingNoDuplicates(result.localFunctionsByName, localFunc))
-						self.errAt(currentNameTokStart, "Duplicate local function: {!r}"
-							.format({ localFunc.name }));
-					implBinding.binding = localFunc;
+					local funImpl = loaderImpl.impl;
+					local implBinding = FunctionBinding(
+						ppCond:         loaderImpl.ppCond,
+						ppCondIncludes: loaderImpl.ppCondIncludes,
+						ppCondPrefix:   loaderImpl.ppCondPrefix,
+						prototypes:     currentPrototypes);
+					if (currentFeatures.inline !is none) {
+						/* Bind the primary implementations as inline */
+						local inlImpl = funImpl;
+						if (!currentFeatures.noInlineTruncate)
+							inlImpl = funImpl.truncateBodyForInline();
+						if (!currentFeatures.noExternInline) {
+							/* Create secondary inline-bindings for all __EXTERNINLINE */
+							local n = #existingBindings;
+							for (local i = 0; i < n;) {
+								local existingBinding: FunctionBinding = existingBindings[i];
+								if (type(existingBinding.binding) !in [string, UserString]) {
+									++i;
+									continue;
+								}
+								/* Construct, and inject a new binding that  */
+								local eiBinding = FunctionBinding(
+									ppCondIncludes: (existingBinding.ppCondIncludes as Set) | implBinding.ppCondIncludes,
+									ppCondPrefix:   existingBinding.ppCondPrefix + implBinding.ppCondPrefix,
+									prototypes:     existingBinding.prototypes,
+									binding:        InlineFunction(
+										mode:                "__EXTERNINLINE",
+										impl:                inlImpl,
+										externInlineAsmname: existingBinding.binding));
+								if (implBinding.ppCond == "1") {
+									eiBinding.ppCond = existingBinding.ppCond;
+									existingBindings[i] = eiBinding;
+									++i;
+								} else {
+									eiBinding.ppCond = "{} && ({})".format({
+										existingBinding.ppCond,
+										implBinding.ppCond
+									});
+									existingBindings.insert(i, eiBinding);
+									i += 2;
+								}
+							}
+						}
+						implBinding.binding = InlineFunction(
+							mode: currentFeatures.inline, impl: inlImpl);
+					} else {
+						/* Construct a local function object */
+						local localFunc = LocalFunction(
+							name:                     currentName,
+							originalSystemHeaderName: headerName,
+							prototype:                currentPrototype,
+							impl:                     funImpl,
+							documentation:            current.documentation);
+						defineFunctionInMapping(allLocalFunctionsByName, localFunc);
+						if (!result.localFunctionsByName.setnew(localFunc.name, localFunc))
+							self.errAt(currentNameTokStart, "Duplicate local function: {!r}"
+								.format({ localFunc.name }));
+						implBinding.binding = localFunc;
+					}
+					current.bindings.append(implBinding);
 				}
-				current.bindings.append(implBinding);
 			}
 			local wcsCurrent;
 			if (currentFeatures.wchar) {
-				if (implementationDependencies is none) {
-					if (primaryImplementation is none)
-						implementationDependencies = none;
-					else {
-						/* Automatically detect dependencies */
-						implementationDependencies =
-							scanForNamesOfDependentFunctions(
-								primaryImplementation,
-								currentPrototype,
-								currentFeatures);
-					}
-				}
 				wcsCurrent = WcharFunction(
-					wc_func:           current,
-					wc_name:           current.name,
-					wc_impl:           primaryImplementation,
-					wc_implIncludes:   currentFeatures.implIncludes,
-					wc_implPrefix:     currentFeatures.implPrefix,
-					wc_prototype:      currentPrototype,
-					wc_prototypes:     currentPrototypes,
-					wc_dependencies:   implementationDependencies,
-					wc_ppCond:         currentFeatures.requires,
-					wc_ppCondIncludes: currentFeatures.requiresIncludes,
-					wc_ppCondPrefix:   currentFeatures.requiresPrefix);
-				if (wcsCurrent.wc_name in allWcharFunctionsByName)
+					wc_func:       current,
+					wc_loaderImpl: loaderImpl,
+					wc_prototype:  currentPrototype,
+					wc_prototypes: currentPrototypes);
+				if (currentName in allWcharFunctionsByName)
 					self.errAt(currentNameTokStart, "Duplicate [wchar] function {!r}"
-						.format({ wcsCurrent.wc_name }));
-				allWcharFunctionsByName[wcsCurrent.wc_name] = wcsCurrent;
+						.format({ currentName }));
+				allWcharFunctionsByName[currentName] = wcsCurrent;
 			}
 			if (!currentFeatures.crt_noImpl) {
 				local crtName = currentFeatures.crt_name;
 				if (crtName is none)
-					crtName = current.name;
+					crtName = currentName;
 				if (currentLibraryFunction.documentation is string && !currentLibraryFunction.documentation)
 					currentLibraryFunction.documentation = current.documentation;
 				if (currentFeatures.wchar) {
@@ -3089,54 +3377,55 @@ with_primaryImplementation:
 					local dosCrtName = currentFeatures.crt_dosname;
 					if (dosCrtName is none)
 						dosCrtName = crtName;
-					local kosVariant = currentLibraryFunction;
-					local dosVariant = currentDosLibraryFunction;
+					local kosVariant: LibraryFunction = currentLibraryFunction;
+					local dosVariant: LibraryFunction = currentDosLibraryFunction;
 					if (dosVariant is none)
 						dosVariant = LibraryFunction(ppCond: currentLibraryFunction.ppCond);
 					if (dosVariant.originalSystemHeaderName !is bound)
 						dosVariant.originalSystemHeaderName = kosVariant.originalSystemHeaderName;
-					if (dosVariant.documentation is string && !dosVariant.documentation)
-						dosVariant.documentation = kosVariant.documentation;
-					kosVariant.name = "libc_" + crtName;
-					dosVariant.name = "libd_" + dosCrtName;
+					local kosVariantName = "libc_" + crtName;
+					local dosVariantName = "libd_" + dosCrtName;
 					if (!currentFeatures.crt_noSelfExport) {
 						kosVariant.exportSymbolNames.append(("1", crtName));
 						dosVariant.exportSymbolNames.append(("1", "DOS$" + dosCrtName));
 					}
+					kosVariant.name = kosVariantName;
+					dosVariant.name = dosVariantName;
+					dosVariant.prototype = [] -> wcsCurrent.getXCharImplementation(
+						kosVariantName, WCHAR_REPLACEMENT_CHAR16).prototype;
+					kosVariant.prototype = [] -> wcsCurrent.getXCharImplementation(
+						dosVariantName, WCHAR_REPLACEMENT_CHAR32).prototype;
+					if (dosVariant.documentation is string && !dosVariant.documentation)
+						dosVariant.documentation = kosVariant.documentation;
 					function createXCharBinding(
 							functionName: string | UserString,
 							crtName: string | UserString, mode: int,
 							implSection: UserString | string | none): Callable {
 						return []{
-							local xc = wcsCurrent.getXCharImplementation(
-								functionName, mode);
-							local imp = xc.impl;
-							if (imp is none) {
-								imp = getDefaultLibraryImplementationForPrototype(
-									wcsCurrent.prototype, crtName);
-							}
+							local xc: XcharImplementation = wcsCurrent
+								.getXCharImplementation(functionName, mode);
+							local xcLoaderImpl: LoaderFunctionImplementation = xc.loaderImpl;
+							if (xcLoaderImpl is Callable)
+								xcLoaderImpl = xcLoaderImpl();
 							return LibraryFunctionBinding(
-								prototype: xc.prototype,
-								binding: LibraryFunctionImplementation(
-									implementation:         imp,
-									implementationName:     xc.name,
-									implementationIncludes: xc.implIncludes,
-									implementationPrefix:   xc.implPrefix,
-									implementationSection:  implSection,
-									dependencies:           xc.dependencies));
+								binding: xcLoaderImpl is none
+									? getDefaultLibraryImplementationForPrototype(
+										wcsCurrent.prototype, crtName)
+									: xcLoaderImpl.impl,
+								implSection: implSection);
 						};
 					}
 					/* Link the Xchar-implementations.
 					 * NOTE: This has to happen delayed, so that everything will be
 					 *       available once the implementation gets generated. */
 					dosVariant.bindings.append(createXCharBinding(
-						dosVariant.name, dosCrtName, WCHAR_REPLACEMENT_CHAR16,
+						dosVariantName, dosCrtName, WCHAR_REPLACEMENT_CHAR16,
 						currentFeatures.crt_dosSection));
 					kosVariant.bindings.append(createXCharBinding(
-						kosVariant.name, crtName, WCHAR_REPLACEMENT_CHAR32,
+						kosVariantName, crtName, WCHAR_REPLACEMENT_CHAR32,
 						currentFeatures.crt_kosSection));
 					/* Insert the library implementations into the system header order */
-					if (currentFeatures.crt_userimpl || primaryImplementation is none) {
+					if (currentFeatures.crt_userimpl || loaderImpl is none) {
 						result.order_libcUserHeader.extend({ dosVariant, kosVariant });
 						result.order_libcUserSource.extend({ dosVariant, kosVariant });
 					} else {
@@ -3146,31 +3435,37 @@ with_primaryImplementation:
 					goto done_currentLibraryFunction;
 				} else {
 					/* Create a default implementation for user-sources */
-					local usedImpl = primaryImplementation;
-					if (usedImpl is none) {
+					local libImpl;
+					if (loaderImpl is none) {
+						local defaultImpl: FunctionImplementation | Callable;
 						if (currentPrototype is Callable) {
-							usedImpl = []-> getDefaultLibraryImplementationForPrototype(
+							defaultImpl = [] -> getDefaultLibraryImplementationForPrototype(
 								currentPrototype(), crtName);
 						} else {
-							usedImpl = getDefaultLibraryImplementationForPrototype(
+							defaultImpl = getDefaultLibraryImplementationForPrototype(
 								currentPrototype, crtName);
 						}
+						libImpl = LibraryFunctionBinding(
+							binding:     defaultImpl,
+							implSection: currentFeatures.crt_kosSection);
+					} else {
+						libImpl = LibraryFunctionBinding(
+							binding: loaderImpl is Callable
+								? [] -> loaderImpl().impl
+								: loaderImpl.impl
+								,
+							implSection: currentFeatures.crt_kosSection);
 					}
-					local libImpl = LibraryFunctionBinding(
-						prototype: currentPrototype,
-						binding: LibraryFunctionImplementation(
-							implementation:         usedImpl,
-							implementationIncludes: currentFeatures.implIncludes,
-							implementationPrefix:   currentFeatures.implPrefix,
-							implementationSection:  currentFeatures.crt_kosSection));
 					currentLibraryFunction.bindings.append(libImpl);
 				}
+				if (currentLibraryFunction.prototype !is bound)
+					currentLibraryFunction.prototype = currentPrototype;
 				if (!currentFeatures.crt_noSelfExport) {
 					currentLibraryFunction.exportSymbolNames
 						.append(("1", crtName));
 				}
 				currentLibraryFunction.name = "libc_" + crtName;
-				if (currentFeatures.crt_userimpl || primaryImplementation is none) {
+				if (currentFeatures.crt_userimpl || loaderImpl is none) {
 					result.order_libcUserHeader.append(currentLibraryFunction);
 					result.order_libcUserSource.append(currentLibraryFunction);
 				} else {
@@ -3187,12 +3482,12 @@ handle_eq_after_prototype:
 			if (currentFeatures.wchar)
 				self.err("[wchar] cannot be used with alias bindings");
 			currentFeatures.assertAllDefaultAttributesWithoutImplementation(
-				self, context.defaultFeatures, current.name);
+				self, context.defaultFeatures, currentName);
 			currentFeatures.assertAllSymbolicAliasOnly(
-				self, context.defaultFeatures, current.name);
+				self, context.defaultFeatures, currentName);
 			if (#current.bindings > (currentFeatures.crt_noSelfImport ? 0 : 1))
 				self.errAt(currentNameTokStart, "Aliasing function {!r} has custom bindings {!r}"
-					.format({ current.name, current.bindings }));
+					.format({ currentName, current.bindings }));
 			if (currentLibraryFunction.exportSymbolNames) {
 				self.errAt(currentNameTokStart,
 					"[export_as(...)] used with aliasing function {!r}"
@@ -3202,7 +3497,7 @@ handle_eq_after_prototype:
 				self.errAt(currentNameTokStart,
 					"[intern_alias(...)] or [alt_variant_of(...)] "
 					"used with aliasing function {!r}"
-					.format({ current.name }));
+					.format({ currentName }));
 			}
 			local boundFunctionName = self.next();
 			if (isCString(boundFunctionName))
@@ -3272,7 +3567,7 @@ done_function:
 		if (currentFeatures.namespaces) {
 			local exposedName = currentFeatures.exposedName;
 			if (exposedName is none)
-				exposedName = current.name;
+				exposedName = currentName;
 			local gblGuard = false;
 			if (currentFeatures.guard) {
 				/* Add namespace import bindings for all defined namespaces. */
@@ -3325,7 +3620,7 @@ done_function:
 					self.errAt(currentNameTokStart,
 						"Function {!r} was marked as `[std]', but "
 						"'%[insert:std]' hasn't been encountered, yet"
-						.format({ current.name }));
+						.format({ currentName }));
 				}
 				context.result_order_headerStd.append(func);
 				/* Insert a std-using directive at the current location */
@@ -3334,7 +3629,7 @@ done_function:
 					context.result_order_header_in_CXX_SYSTEM_HEADER = true;
 				}
 				local gblGuard = false;
-				local importCondition = "$has_function({})".format({ current.name });
+				local importCondition = "$has_function({})".format({ currentName });
 				local nsStd = NAMESPACES["std"];
 				if (currentFeatures.guard) {
 					local stdGuard = currentFeatures.guardNames.get("std");

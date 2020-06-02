@@ -55,11 +55,25 @@
 
 __SYSDECL_BEGIN
 
-}%[enum @undef @macro @typedef(__itimer_which_t) __itimer_which {
+/*[[[enum]]]*/
+#ifdef __CC__
+typedef enum __itimer_which {
 	ITIMER_REAL    = 0,
 	ITIMER_VIRTUAL = 1,
 	ITIMER_PROF    = 2
-}]%{
+} __itimer_which_t;
+#endif /* __CC__ */
+/*[[[AUTO]]]*/
+#ifdef __COMPILER_PREFERR_ENUMS
+#define ITIMER_REAL    ITIMER_REAL
+#define ITIMER_VIRTUAL ITIMER_VIRTUAL
+#define ITIMER_PROF    ITIMER_PROF
+#else /* __COMPILER_PREFERR_ENUMS */
+#define ITIMER_REAL    0
+#define ITIMER_VIRTUAL 1
+#define ITIMER_PROF    2
+#endif /* !__COMPILER_PREFERR_ENUMS */
+/*[[[end]]]*/
 
 #ifdef __CC__
 

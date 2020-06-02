@@ -39,14 +39,9 @@ struct _diskfree_t {
 
 }
 
-[section(.text.crt.dos.fs.basic_property)]
-[cp] _getcwd:(char *buf, size_t bufsize) -> char * = getcwd;
-
-[section(.text.crt.dos.fs.basic_property)]
-[cp] _chdir:([nonnull] char const *path) -> int = chdir;
-
-%[default_impl_section(.text.crt.dos.fs.modify)]
-[cp] _rmdir:([nonnull] char const *path) -> int = rmdir;
+_getcwd(*) = getcwd;
+_chdir(*) = chdir;
+_rmdir(*) = rmdir;
 
 %[default_impl_section(.text.crt.dos.fs.property)]
 %#define _getdcwd_nolock _getdcwd
@@ -63,16 +58,17 @@ struct _diskfree_t {
 %#endif /* !_GETDISKFREE_DEFINED */
 
 /* A small hand full of functions defined in '<direct.h>' */
-%[insert:extern(getcwd)]
-%[insert:extern(rmdir)]
+%[insert:extern(getcwd)];
+%[insert:extern(rmdir)];
 
-%[default_impl_section(.text.crt.dos.fs.modify)]
-[cp][noexport][requires(defined(__CRT_HAVE_mkdir))]
-_mkdir:([nonnull] char const *path) -> int {
+[[section(.text.crt.dos.fs.modify)]]
+[[cp, userimpl, requires($has_function(mkdir))]]
+int _mkdir([[nonnull]] char const *path) {
 	return mkdir(path, 0755);
 }
 
-[cp][guard][noexport] mkdir:([nonnull] char const *path) -> int = _mkdir;
+[[guard, exposed_name("mkdir")]] nt_mkdir(*) = _mkdir;
+
 
 %{
 #endif /* __CC__ */

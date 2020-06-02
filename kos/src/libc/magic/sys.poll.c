@@ -19,7 +19,7 @@
  */
 
 %[define_replacement(nfds_t = __UINTPTR_TYPE__)]
-%[define_replacement(sigset_t = struct __sigset_struct)]
+%[define_replacement(sigset_t = "struct __sigset_struct")]
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(time_t   = __TM_TYPE(time))]
 %[define_replacement(time32_t = __time32_t)]

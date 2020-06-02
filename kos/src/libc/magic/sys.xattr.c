@@ -46,10 +46,22 @@
 __SYSDECL_BEGIN
 
 #ifndef __USE_KERNEL_XATTR_DEFS
-}%[enum @macro {
-	XATTR_CREATE  = 1,  /* set value, fail if attr already exists. */
-	XATTR_REPLACE = 2   /* set value, fail if attr does not exist. */
-}]%{
+/*[[[enum]]]*/
+#ifdef __CC__
+enum {
+	XATTR_CREATE  = 1, /* set value, fail if attr already exists. */
+	XATTR_REPLACE = 2  /* set value, fail if attr does not exist. */
+};
+#endif /* __CC__ */
+/*[[[AUTO]]]*/
+#ifdef __COMPILER_PREFERR_ENUMS
+#define XATTR_CREATE  XATTR_CREATE  /* set value, fail if attr already exists. */
+#define XATTR_REPLACE XATTR_REPLACE /* set value, fail if attr does not exist. */
+#else /* __COMPILER_PREFERR_ENUMS */
+#define XATTR_CREATE  1 /* set value, fail if attr already exists. */
+#define XATTR_REPLACE 2 /* set value, fail if attr does not exist. */
+#endif /* !__COMPILER_PREFERR_ENUMS */
+/*[[[end]]]*/
 #endif /* !__USE_KERNEL_XATTR_DEFS */
 
 #ifdef __CC__

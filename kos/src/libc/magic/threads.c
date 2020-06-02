@@ -77,20 +77,52 @@ __SYSDECL_BEGIN
 #endif /* !TSS_DTOR_ITERATIONS */
 
 /* Exit and error codes.  */
-}%[enum @undef @macro {
+/*[[[enum]]]*/
+#ifdef __CC__
+enum {
 	thrd_success  = __thrd_success,
 	thrd_busy     = __thrd_busy,
 	thrd_error    = __thrd_error,
 	thrd_nomem    = __thrd_nomem,
 	thrd_timedout = __thrd_timedout
-}]%{
+};
+#endif /* __CC__ */
+/*[[[AUTO]]]*/
+#ifdef __COMPILER_PREFERR_ENUMS
+#define thrd_success  thrd_success
+#define thrd_busy     thrd_busy
+#define thrd_error    thrd_error
+#define thrd_nomem    thrd_nomem
+#define thrd_timedout thrd_timedout
+#else /* __COMPILER_PREFERR_ENUMS */
+#define thrd_success  __thrd_success
+#define thrd_busy     __thrd_busy
+#define thrd_error    __thrd_error
+#define thrd_nomem    __thrd_nomem
+#define thrd_timedout __thrd_timedout
+#endif /* !__COMPILER_PREFERR_ENUMS */
+/*[[[end]]]*/
 
 /* Mutex types.  */
-}%[enum @undef @macro {
+/*[[[enum]]]*/
+#ifdef __CC__
+enum {
 	mtx_plain     = __mtx_plain,
 	mtx_recursive = __mtx_recursive,
 	mtx_timed     = __mtx_timed
-}]%{
+};
+#endif /* __CC__ */
+/*[[[AUTO]]]*/
+#ifdef __COMPILER_PREFERR_ENUMS
+#define mtx_plain     mtx_plain
+#define mtx_recursive mtx_recursive
+#define mtx_timed     mtx_timed
+#else /* __COMPILER_PREFERR_ENUMS */
+#define mtx_plain     __mtx_plain
+#define mtx_recursive __mtx_recursive
+#define mtx_timed     __mtx_timed
+#endif /* !__COMPILER_PREFERR_ENUMS */
+/*[[[end]]]*/
 
 
 #ifdef __CC__

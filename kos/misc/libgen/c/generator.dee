@@ -1,0 +1,271 @@
+/* Copyright (c) 2019-2020 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+import * from deemon;
+import * from .cheaders;
+import * from .parser;
+import * from .globals;
+import * from .namespace;
+import Function from .cheaders;
+
+global Generator;
+global generators;
+
+@@Generators can be used to convert implementations
+@@and prototypes of one function into those of another
+@@function. Examples include str2wcs or double2float
+class Generator {
+	this = default;
+
+	@@Returns the default name of the base function, given the
+	@@name of the function who's implementation is being generated.
+	@@> function getDefaultBaseFunctionName(name: string): string | none;
+	@@If the name could not be deduced, the function should return @none instead
+	public member getDefaultBaseFunctionName: Callable with string;
+
+	@@Register the pairing of two functions
+	@@This information may be used by the generator to improve generated code
+	@@> function registerFunctionPairing(generatedFunctionName: string, baseFunctionName: string);
+	public member registerFunctionPairing: Callable with (string, string) = none;
+
+	@@Replace text, as in prototype typenames, or the body of a function
+	@@> function replaceText(text: string | CParser | UserString): string | UserString;
+	public member replaceText: Callable with (string | CParser | UserString);
+
+	@@Same as @replaceText, but is optional and used to convert documentation strings
+	@@> function replaceDocumentation(text: string | CParser | UserString): string | UserString;
+	public member replaceDocumentation: Callable with (string | CParser | UserString) = none;
+
+	public function replaceStringList(strings: {string...}): {string...} {
+		local result = [];
+		for (local s: strings)
+			result.append(replaceText(s));
+		return result;
+	}
+
+	public function replaceHeaderList(strings: {string...}): {string...} {
+		/* TODO */
+		return strings;
+	}
+
+	public function replaceCType(
+			self: CType): CType {
+		local newBeforeName = replaceText(self.beforeName);
+		local newAfterName = replaceText(self.afterName);
+		if (newBeforeName === self.beforeName &&
+		    newAfterName === self.afterName)
+			return self;
+		return CType(
+			beforeName: newBeforeName,
+			afterName:  newAfterName);
+	}
+
+	public function replaceArgument(self: Argument): Argument {
+		local newName          = replaceText(self.name);
+		local newProtoTypeName = replaceText(self.protoTypeName);
+		local newCtype         = replaceCType(self.ctype);
+		if (newName === self.name &&
+		    newProtoTypeName === self.protoTypeName &&
+		    newCtype === self.ctype)
+			return self;
+		return Argument(
+			name:          newName,
+			protoTypeName: newProtoTypeName,
+			ctype:         newCtype);
+	}
+
+	public function replaceCTypeList(
+			self: {CType...}): {CType...} {
+		local changed = false;
+		local result = [];
+		for (local ct: self) {
+			local repl = replaceCType(ct);
+			if (repl !== ct)
+				changed = true;
+			result.append(repl);
+		}
+		if (!changed)
+			return self;
+		return result;
+	}
+
+	public function replaceArgumentList(self: {Argument...}): {Argument...} {
+		local changed = false;
+		local result = [];
+		for (local a: self) {
+			local repl = replaceArgument(a);
+			if (repl !== a)
+				changed = true;
+			result.append(repl);
+		}
+		if (!changed)
+			return self;
+		return result;
+	}
+
+	public function replaceFunctionPrototype(
+			self: FunctionPrototype): FunctionPrototype {
+		local newAttributes            = replaceStringList(self.attributes);
+		local newNothrow               = replaceText(self.nothrow);
+		local newCc                    = replaceText(self.cc);
+		local newReturnType            = replaceCType(self.returnType);
+		local newArgv                  = replaceArgumentList(self.argv);
+		local newEllipsisArgumentTypes = replaceCTypeList(self.ellipsisArgumentTypes);
+		if (newAttributes === self.attributes && newNothrow === self.nothrow &&
+		    newCc === self.cc && newReturnType === self.returnType && newArgv === self.argv &&
+		    newEllipsisArgumentTypes === self.ellipsisArgumentTypes)
+			return self;
+		return FunctionPrototype(
+			attributes:            newAttributes,
+			nothrow:               newNothrow,
+			cc:                    newCc,
+			returnType:            newReturnType,
+			argv:                  newArgv,
+			ellipsisArgumentTypes: newEllipsisArgumentTypes);
+	}
+
+	public function replaceFunctionImplementation(
+			self: FunctionImplementation,
+			newFunctionName: string): FunctionImplementation {
+		return FunctionImplementation(
+			body:         replaceText(self.body),
+			name:         newFunctionName,
+			implIncludes: replaceHeaderList(self.implIncludes),
+			implPrefix:   replaceText(self.implPrefix),
+			dependencies: none /* TODO */);
+	}
+
+}
+
+
+@@Replacements for str2wcs-related keywords
+global final str2wcsReplacementEscapes: {string: string} = Dict({
+	"char"            : "wchar_t",
+	"__SIZEOF_CHAR__" : "__SIZEOF_WCHAR_T__",
+});
+
+@@str2wcs will convert all keywords starting with @"str" with @"wcs"
+@@This is a list of keywords that aren't replaced like that.
+global final str2wcsNotFunctionNameKeywords: {string...} = {
+	"string", "stringp", "stretch", "str", "struct"
+};
+
+
+function str2wcs_getDefaultBaseFunctionName(name: string): string | none {
+	if (name.startswith("wcs"))
+		return "str" + name[3:];
+	return none;
+}
+
+function str2wcs_registerFunctionPairing(
+		generatedFunctionName: string, baseFunctionName: string) {
+	if (generatedFunctionName !in str2wcsReplacementEscapes)
+		str2wcsReplacementEscapes[generatedFunctionName] = baseFunctionName;
+}
+
+function str2wcs_replaceWord(
+		word: string | UserString): string | UserString {
+	/* Check for explicit replacements */
+	local usedWord = str word;
+	local result = str2wcsReplacementEscapes.get(usedWord);
+	if (result !is none)
+		return result;
+	/* Deal with automatic function-name replacements. */
+	if (usedWord.startswith("str") && usedWord !in str2wcsNotFunctionNameKeywords)
+		return "wcs" + usedWord[3:];
+	if (usedWord.startswith("__CRT_HAVE_")) {
+		local substr = usedWord[11:];
+		result = str2wcs_replaceWord(substr);
+		if (result !== substr)
+			return "__CRT_HAVE_" + result;
+	}
+	return word;
+}
+
+function str2wcs_replaceText(
+		text: string | CParser | UserString): string | UserString {
+	{
+		/* Quick check: Singular keyword */
+		local usedText = text;
+		if (usedText is UserString)
+			usedText = usedText.text;
+		if (usedText is string) {
+			if (!usedText)
+				return text; /* Special case: Empty string */
+			/* Simple case: replace-single-keyword */
+			if (usedText.issymbol())
+				return str2wcs_replaceWord(text);
+			/* Optimization for things such as "0", "1", etc...
+			 * (very likely in case of preprocessor conditions) */
+			if (usedText.isnumeric())
+				return text;
+		}
+	}
+	local fp = File.Writer();
+	local self = CParser(text);
+	local flushStart = self.tokEnd;
+	for (;;) {
+		local tok = self.next();
+		if (!tok)
+			break;
+		if (!tok.issymbol())
+			continue;
+		if (tok in ["signed", "unsigned"]) {
+			/* Special case: Must not replace "char" after "signed" or "unsigned"
+			 * -> Handle this by simply treaking these keywords as escape prefixes
+			 *    for the following token. */
+			self.next();
+			continue;
+		}
+		local repl = str2wcs_replaceWord(tok);
+		if (repl === tok)
+			continue;
+		/* Insert the keyword replacement */
+		if (flushStart < self.tokStart)
+			fp << self.text[flushStart:self.tokStart];
+		fp << repl;
+		flushStart = self.tokEnd;
+	}
+	if (flushStart < self.end)
+		fp << self.text[flushStart:self.end];
+	return fp.string;
+}
+
+
+
+global final generators: {string: Generator} = Dict({
+	"str2wcs" : Generator(
+		getDefaultBaseFunctionName: str2wcs_getDefaultBaseFunctionName,
+		registerFunctionPairing:    str2wcs_registerFunctionPairing,
+		replaceText:                str2wcs_replaceText),
+});
+
+
+
+
+
+
+
+
+
+
+
+
+

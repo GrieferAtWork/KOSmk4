@@ -76,6 +76,7 @@ local function _stdNamespaceUsing(fp: File, name: string, ...) {
 	fp << "__NAMESPACE_STD_USING(" << name << ")\n";
 }
 
+@@The default, global/root namespace (the only existing namespace in C)
 global final GLOBAL_NAMESPACE: Namespace = Namespace(
 	name: "", enter: "", leave: "", prefix: "",
 	keyUsing:       _globalNamespaceUsing,
@@ -85,10 +86,31 @@ global final GLOBAL_NAMESPACE: Namespace = Namespace(
 		return "__{}_defined".format({ symbolName });
 	});
 
+@@The namespace used to encapsulate <local/...> functions
+global final LOCAL_NAMESPACE: Namespace = Namespace(
+	name:     "local",
+	enter:    "__NAMESPACE_LOCAL_BEGIN\n",
+	leave:    "__NAMESPACE_LOCAL_END\n",
+	prefix:   "__NAMESPACE_LOCAL_SYM",
+	keyUsing: [](fp: File, name: string) {
+		fp << "__NAMESPACE_LOCAL_USING(" << name << ")\n";
+	},
+	keyUsingOrImpl: [](fp: File, name: string, impl: Callable) {
+		fp << "__NAMESPACE_LOCAL_USING_OR_IMPL(" << name << ", ";
+		impl();
+		fp << ")\n";
+	},
+	keyCSymbolName: [](symbolName: string): string {
+		return "__LIBC_LOCAL_NAME({})".format({ symbolName });
+	},
+	keyDefaultGuard: [](symbolName: string): string {
+		return "__local_{}_defined".format({ symbolName });
+	});
 
 global NAMESPACES: {string: Namespace} = Dict {
-	""    : GLOBAL_NAMESPACE,
-	"std" : Namespace(
+	""      : GLOBAL_NAMESPACE,
+	"local" : LOCAL_NAMESPACE,
+	"std"   : Namespace(
 		name:           "std",
 		enter:          "__NAMESPACE_STD_BEGIN\n",
 		leave:          "__NAMESPACE_STD_END\n",
@@ -99,26 +121,7 @@ global NAMESPACES: {string: Namespace} = Dict {
 		keyDefaultGuard: [](symbolName: string) {
 			return "__std_{}_defined".format({ symbolName });
 		}),
-	"local" : Namespace(
-		name:     "local",
-		enter:    "__NAMESPACE_LOCAL_BEGIN\n",
-		leave:    "__NAMESPACE_LOCAL_END\n",
-		prefix:   "__NAMESPACE_LOCAL_SYM",
-		keyUsing: [](fp: File, name: string) {
-			fp << "__NAMESPACE_LOCAL_USING(" << name << ")\n";
-		},
-		keyUsingOrImpl: [](fp: File, name: string, impl: Callable) {
-			fp << "__NAMESPACE_LOCAL_USING_OR_IMPL(" << name << ", ";
-			impl();
-			fp << ")\n";
-		},
-		keyCSymbolName: [](symbolName: string): string {
-			return "__LIBC_LOCAL_NAME({})".format({ symbolName });
-		},
-		keyDefaultGuard: [](symbolName: string): string {
-			return "__local_{}_defined".format({ symbolName });
-		}),
-	"fast" : Namespace(
+	"fast"  : Namespace(
 		name:     "fast",
 		enter:    "__NAMESPACE_FAST_BEGIN\n",
 		leave:    "__NAMESPACE_FAST_END\n",

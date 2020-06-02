@@ -2272,13 +2272,31 @@ __LIBC int (signgam);
 
 /* All floating-point numbers can be put in one of these categories. */
 /* NOTE: These values must match the declarations from <libm/fdlibm.h>! */
-}%[enum @undef @macro {
+/*[[[enum]]]*/
+#ifdef __CC__
+enum {
 	FP_NAN       = 0,
 	FP_INFINITE  = 1,
 	FP_ZERO      = 2,
 	FP_SUBNORMAL = 3,
 	FP_NORMAL    = 4
-}]%{
+};
+#endif /* __CC__ */
+/*[[[AUTO]]]*/
+#ifdef __COMPILER_PREFERR_ENUMS
+#define FP_NAN       FP_NAN
+#define FP_INFINITE  FP_INFINITE
+#define FP_ZERO      FP_ZERO
+#define FP_SUBNORMAL FP_SUBNORMAL
+#define FP_NORMAL    FP_NORMAL
+#else /* __COMPILER_PREFERR_ENUMS */
+#define FP_NAN       0
+#define FP_INFINITE  1
+#define FP_ZERO      2
+#define FP_SUBNORMAL 3
+#define FP_NORMAL    4
+#endif /* !__COMPILER_PREFERR_ENUMS */
+/*[[[end]]]*/
 
 
 

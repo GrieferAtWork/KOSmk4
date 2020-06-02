@@ -21,8 +21,8 @@
 %[define_ccompat_header(cctype)]
 %[define_replacement(locale_t = __locale_t)]
 
-%[define_str2wcs_replacement(tolower  = (wchar_t)towlower)]
-%[define_str2wcs_replacement(toupper  = (wchar_t)towupper)]
+%[define_str2wcs_replacement(tolower  = "(wchar_t)towlower")]
+%[define_str2wcs_replacement(toupper  = "(wchar_t)towupper")]
 %[define_str2wcs_replacement(isalnum  = iswalnum)]
 %[define_str2wcs_replacement(isalpha  = iswalpha)]
 %[define_str2wcs_replacement(isupper  = iswupper)]
@@ -49,24 +49,26 @@ __SYSDECL_BEGIN
 }
 
 %[default_impl_section(.text.crt.unicode.static.ctype)]
-[ignore][user][ATTR_CONST][ATTR_WUNUSED][nothrow] __locale_ctype_ptr:() -> char const *;
+[ignore][ATTR_CONST][ATTR_WUNUSED][nothrow] __locale_ctype_ptr:() -> char const *;
 %[default_impl_section(.text.crt.unicode.locale.ctype)]
-[ignore][user][ATTR_PURE][ATTR_WUNUSED] __locale_ctype_ptr_l:($locale_t locale) -> char const *;
+[ignore][ATTR_PURE][ATTR_WUNUSED] __locale_ctype_ptr_l:($locale_t locale) -> char const *;
 %[default_impl_section(.text.crt.unicode.static.ctype)]
-[ignore][user][ATTR_PURE][ATTR_WUNUSED][nothrow] __ctype_b_loc:() -> $uint16_t const **;
-[ignore][user][ATTR_PURE][ATTR_WUNUSED][nothrow] __ctype_tolower_loc:() -> $int32_t const **;
-[ignore][user][ATTR_PURE][ATTR_WUNUSED][nothrow] __ctype_toupper_loc:() -> $int32_t const **;
-[ignore][user][ATTR_CONST][ATTR_WUNUSED][nothrow] _isctype:(int ch, int mask) -> int;
+[ignore][ATTR_PURE][ATTR_WUNUSED][nothrow] __ctype_b_loc:() -> $uint16_t const **;
+[ignore][ATTR_PURE][ATTR_WUNUSED][nothrow] __ctype_tolower_loc:() -> $int32_t const **;
+[ignore][ATTR_PURE][ATTR_WUNUSED][nothrow] __ctype_toupper_loc:() -> $int32_t const **;
+[ignore][ATTR_CONST][ATTR_WUNUSED][nothrow] _isctype:(int ch, int mask) -> int;
 %[default_impl_section(.text.crt.unicode.locale.ctype)]
-[ignore][user][ATTR_PURE][ATTR_WUNUSED] _isctype_l:(int ch, int mask, $locale_t locale) -> int;
+[ignore][ATTR_PURE][ATTR_WUNUSED] _isctype_l:(int ch, int mask, $locale_t locale) -> int;
 %[default_impl_section(.text.crt.unicode.static.ctype)]
 
 %[insert:std]
 
 
-[ATTR_CONST][ATTR_WUNUSED][libc][nothrow][libc_impl({
+[ATTR_CONST][ATTR_WUNUSED][libc][nothrow]
+[crtbuiltin][std][kernel] iscntrl:(int ch) -> int {
+@@pp_ifdef __BUILDING_LIBC@@
 	return (u8)ch <= 0x1f || (u8)ch == 0x7f;
-})][crtbuiltin][std][kernel] iscntrl:(int ch) -> int {
+@@pp_else@@
 #if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
 #include <hybrid/byteorder.h>
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -81,12 +83,15 @@ __SYSDECL_BEGIN
 #else
 	return (u8)ch <= 0x1f || (u8)ch == 0x7f;
 #endif
+@@pp_endif@@
 }
 
 
-[ATTR_CONST][ATTR_WUNUSED][libc][nothrow][libc_impl({
+[ATTR_CONST][ATTR_WUNUSED][libc][nothrow]
+[crtbuiltin][std][kernel] isspace:(int ch) -> int {
+@@pp_ifdef __BUILDING_LIBC@@
 	return ((u8)ch >= 0x09 && (u8)ch <= 0x0d) || (u8)ch == 0x20;
-})][crtbuiltin][std][kernel] isspace:(int ch) -> int {
+@@pp_else@@
 #if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
 #include <hybrid/byteorder.h>
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -101,11 +106,14 @@ __SYSDECL_BEGIN
 #else
 	return ((u8)ch >= 0x09 && (u8)ch <= 0x0d) || (u8)ch == 0x20;
 #endif
+@@pp_endif@@
 }
 
-[ATTR_CONST][ATTR_WUNUSED][libc][nothrow][libc_impl({
+[ATTR_CONST][ATTR_WUNUSED][libc][nothrow]
+[crtbuiltin][std][kernel] isupper:(int ch) -> int {
+@@pp_ifdef __BUILDING_LIBC@@
 	return (u8)ch >= 0x41 && (u8)ch <= 0x5a;
-})][crtbuiltin][std][kernel] isupper:(int ch) -> int {
+@@pp_else@@
 #if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
 #include <hybrid/byteorder.h>
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -120,12 +128,15 @@ __SYSDECL_BEGIN
 #else
 	return (u8)ch >= 0x41 && (u8)ch <= 0x5a;
 #endif
+@@pp_endif@@
 }
 
 
-[ATTR_CONST][ATTR_WUNUSED][libc][nothrow][libc_impl({
+[ATTR_CONST][ATTR_WUNUSED][libc][nothrow]
+[crtbuiltin][std][kernel] islower:(int ch) -> int {
+@@pp_ifdef __BUILDING_LIBC@@
 	return (u8)ch >= 0x61 && (u8)ch <= 0x7a;
-})][crtbuiltin][std][kernel] islower:(int ch) -> int {
+@@pp_else@@
 #if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
 #include <hybrid/byteorder.h>
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -140,11 +151,14 @@ __SYSDECL_BEGIN
 #else
 	return (u8)ch >= 0x61 && (u8)ch <= 0x7a;
 #endif
+@@pp_endif@@
 }
 
-[ATTR_CONST][ATTR_WUNUSED][libc][nothrow][libc_impl({
+[ATTR_CONST][ATTR_WUNUSED][libc][nothrow]
+[crtbuiltin][std][kernel] isalpha:(int ch) -> int {
+@@pp_ifdef __BUILDING_LIBC@@
 	return libc_isupper(ch) || libc_islower(ch);
-})][crtbuiltin][std][kernel] isalpha:(int ch) -> int {
+@@pp_else@@
 #if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
 #include <hybrid/byteorder.h>
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -159,11 +173,14 @@ __SYSDECL_BEGIN
 #else
 	return isupper(ch) || islower(ch);
 #endif
+@@pp_endif@@
 }
 
-[ATTR_CONST][ATTR_WUNUSED][libc][nothrow][libc_impl({
+[ATTR_CONST][ATTR_WUNUSED][libc][nothrow]
+[crtbuiltin][std][kernel] isdigit:(int ch) -> int {
+@@pp_ifdef __BUILDING_LIBC@@
 	return (u8)ch >= 0x30 && (u8)ch <= 0x39;
-})][crtbuiltin][std][kernel] isdigit:(int ch) -> int {
+@@pp_else@@
 #if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
 #include <hybrid/byteorder.h>
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -178,13 +195,16 @@ __SYSDECL_BEGIN
 #else
 	return (u8)ch >= 0x30 && (u8)ch <= 0x39;
 #endif
+@@pp_endif@@
 }
 
-[ATTR_CONST][ATTR_WUNUSED][libc][nothrow][libc_impl({
-	return libc_isdigit(ch) ||
+[ATTR_CONST][ATTR_WUNUSED][libc][nothrow]
+[crtbuiltin][std][kernel] isxdigit:(int ch) -> int {
+@@pp_ifdef __BUILDING_LIBC@@
+	return isdigit(ch) ||
 	       ((u8)ch >= 0x41 && (u8)ch <= 0x46) ||
 	       ((u8)ch >= 0x61 && (u8)ch <= 0x66);
-})][crtbuiltin][std][kernel] isxdigit:(int ch) -> int {
+@@pp_else@@
 #if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
 #include <hybrid/byteorder.h>
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -201,11 +221,14 @@ __SYSDECL_BEGIN
 	       ((u8)ch >= 0x41 && (u8)ch <= 0x46) ||
 	       ((u8)ch >= 0x61 && (u8)ch <= 0x66);
 #endif
+@@pp_endif@@
 }
 
-[ATTR_CONST][ATTR_WUNUSED][libc][nothrow][libc_impl({
-	return libc_isupper(ch) || libc_islower(ch) || libc_isdigit(ch);
-})][crtbuiltin][std][kernel] isalnum:(int ch) -> int {
+[ATTR_CONST][ATTR_WUNUSED][libc][nothrow]
+[crtbuiltin][std][kernel] isalnum:(int ch) -> int {
+@@pp_ifdef __BUILDING_LIBC@@
+	return isupper(ch) || islower(ch) || isdigit(ch);
+@@pp_else@@
 #if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
 #include <hybrid/byteorder.h>
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -220,14 +243,17 @@ __SYSDECL_BEGIN
 #else
 	return isupper(ch) || islower(ch) || isdigit(ch);
 #endif
+@@pp_endif@@
 }
 
-[ATTR_CONST][ATTR_WUNUSED][libc][nothrow][libc_impl({
+[ATTR_CONST][ATTR_WUNUSED][libc][nothrow]
+[crtbuiltin][std][kernel] ispunct:(int ch)  -> int {
+@@pp_ifdef __BUILDING_LIBC@@
 	return ((u8)ch >= 0x21 && (u8)ch <= 0x2f) ||
 	       ((u8)ch >= 0x3a && (u8)ch <= 0x40) ||
 	       ((u8)ch >= 0x5b && (u8)ch <= 0x60) ||
 	       ((u8)ch >= 0x7b && (u8)ch <= 0x7e);
-})][crtbuiltin][std][kernel] ispunct:(int ch)  -> int {
+@@pp_else@@
 #if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
 #include <hybrid/byteorder.h>
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -245,11 +271,14 @@ __SYSDECL_BEGIN
 	       ((u8)ch >= 0x5b && (u8)ch <= 0x60) ||
 	       ((u8)ch >= 0x7b && (u8)ch <= 0x7e);
 #endif
+@@pp_endif@@
 }
 
-[ATTR_CONST][ATTR_WUNUSED][libc][nothrow][libc_impl({
+[ATTR_CONST][ATTR_WUNUSED][libc][nothrow]
+[crtbuiltin][std][kernel] isgraph:(int ch) -> int {
+@@pp_ifdef __BUILDING_LIBC@@
 	return (u8)ch >= 0x21 && (u8)ch <= 0x7e;
-})][crtbuiltin][std][kernel] isgraph:(int ch) -> int {
+@@pp_else@@
 #if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
 #include <hybrid/byteorder.h>
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -264,11 +293,14 @@ __SYSDECL_BEGIN
 #else
 	return (u8)ch >= 0x21 && (u8)ch <= 0x7e;
 #endif
+@@pp_endif@@
 }
 
-[ATTR_CONST][ATTR_WUNUSED][libc][nothrow][libc_impl({
+[ATTR_CONST][ATTR_WUNUSED][libc][nothrow]
+[crtbuiltin][std][kernel] isprint:(int ch) -> int {
+@@pp_ifdef __BUILDING_LIBC@@
 	return (u8)ch >= 0x20 && (u8)ch <= 0x7e;
-})][crtbuiltin][std][kernel] isprint:(int ch) -> int {
+@@pp_else@@
 #if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
 #include <hybrid/byteorder.h>
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -283,32 +315,44 @@ __SYSDECL_BEGIN
 #else
 	return (u8)ch >= 0x20 && (u8)ch <= 0x7e;
 #endif
+@@pp_endif@@
 }
 
-[ATTR_CONST][ATTR_WUNUSED][libc][nothrow][libc_impl({
+[[ATTR_CONST, ATTR_WUNUSED, libc, nothrow, crtbuiltin, std, kernel]]
+[[if(!defined(__KERNEL__)), export_alias(_tolower)]]
+int tolower(int ch) {
+@@pp_ifdef __BUILDING_LIBC@@
 	return isupper(ch) ? ((u8)ch+0x20) : ch;
-})][crtbuiltin][std][kernel][nokern_export_alias(_tolower)] tolower:(int ch) -> int {
-#if (@@has_function(__ctype_tolower_loc)@@) && defined(__CRT_CYG)
+@@pp_else@@
+@@pp_if $has_function(__ctype_tolower_loc) && defined(__CRT_CYG)@@
 	return ch >= -128 && ch < 256 ? (*__ctype_tolower_loc())[ch] : ch;
-#else
+@@pp_else@@
 	return isupper(ch) ? ((u8)ch+0x20) : ch;
-#endif
+@@pp_endif@@
+@@pp_endif@@
 }
-[ATTR_CONST][ATTR_WUNUSED][libc][nothrow][libc_impl({
+
+[[ATTR_CONST, ATTR_WUNUSED, libc, nothrow, crtbuiltin, std, kernel]]
+[[if(!defined(__KERNEL__)), export_alias(_toupper)]]
+toupper:(int ch) -> int {
+@@pp_ifdef __BUILDING_LIBC@@
 	return islower(ch) ? ((u8)ch-0x20) : ch;
-})][crtbuiltin][std][kernel][nokern_export_alias(_toupper)] toupper:(int ch) -> int {
-#if (@@has_function(__ctype_toupper_loc)@@) && defined(__CRT_CYG)
+@@pp_else@@
+@@pp_if $has_function(__ctype_toupper_loc) && defined(__CRT_CYG)@@
 	return ch >= -128 && ch < 256 ? (*__ctype_toupper_loc())[ch] : ch;
-#else
+@@pp_else@@
 	return islower(ch) ? ((u8)ch-0x20) : ch;
-#endif
+@@pp_endif@@
+@@pp_endif@@
 }
 
 
 %#ifdef __USE_ISOC99
-[ATTR_CONST][ATTR_WUNUSED][libc][nothrow][libc_impl({
+[ATTR_CONST][ATTR_WUNUSED][libc][nothrow]
+[crtbuiltin][std][kernel] isblank:(int ch) -> int {
+@@pp_ifdef __BUILDING_LIBC@@
 	return (u8)ch == 0x09 || (u8)ch == 0x20;
-})][crtbuiltin][std][kernel] isblank:(int ch) -> int {
+@@pp_else@@
 #if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
 #include <hybrid/byteorder.h>
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -321,6 +365,7 @@ __SYSDECL_BEGIN
 #else
 	return (u8)ch == 0x09 || (u8)ch == 0x20;
 #endif
+@@pp_endif@@
 }
 %{
 #endif /* __USE_ISOC99 */
@@ -330,12 +375,13 @@ __SYSDECL_BEGIN
 
 %[default_impl_section(.text.crt.unicode.locale.ctype)]
 
-[ATTR_PURE][ATTR_WUNUSED][libc_impl({
+[ATTR_PURE][ATTR_WUNUSED][export_alias(__iscntrl_l)]
+iscntrl_l:(int ch, __locale_t locale) -> int {
+@@pp_ifdef __BUILDING_LIBC@@
 	(void)locale;
 	COMPILER_IMPURE();
 	return iscntrl(ch);
-})][export_alias(__iscntrl_l)]
-iscntrl_l:(int ch, __locale_t locale) -> int {
+@@pp_else@@
 #if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
 #include <hybrid/byteorder.h>
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -352,15 +398,17 @@ iscntrl_l:(int ch, __locale_t locale) -> int {
 	COMPILER_IMPURE();
 	return iscntrl(ch);
 #endif
+@@pp_endif@@
 }
 
 
-[ATTR_PURE][ATTR_WUNUSED][libc_impl({
+[ATTR_PURE][ATTR_WUNUSED][export_alias(__isspace_l)]
+isspace_l:(int ch, __locale_t locale) -> int {
+@@pp_ifdef __BUILDING_LIBC@@
 	(void)locale;
 	COMPILER_IMPURE();
 	return isspace(ch);
-})][export_alias(__isspace_l)]
-isspace_l:(int ch, __locale_t locale) -> int {
+@@pp_else@@
 #if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
 #include <hybrid/byteorder.h>
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -377,14 +425,16 @@ isspace_l:(int ch, __locale_t locale) -> int {
 	COMPILER_IMPURE();
 	return isspace(ch);
 #endif
+@@pp_endif@@
 }
 
-[ATTR_PURE][ATTR_WUNUSED][libc_impl({
+[ATTR_PURE][ATTR_WUNUSED][export_alias(__isupper_l)]
+isupper_l:(int ch, __locale_t locale) -> int {
+@@pp_ifdef __BUILDING_LIBC@@
 	(void)locale;
 	COMPILER_IMPURE();
 	return isupper(ch);
-})][export_alias(__isupper_l)]
-isupper_l:(int ch, __locale_t locale) -> int {
+@@pp_else@@
 #if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
 #include <hybrid/byteorder.h>
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -401,14 +451,16 @@ isupper_l:(int ch, __locale_t locale) -> int {
 	COMPILER_IMPURE();
 	return isupper(ch);
 #endif
+@@pp_endif@@
 }
 
-[ATTR_PURE][ATTR_WUNUSED][libc_impl({
+[ATTR_PURE][ATTR_WUNUSED][export_alias(__islower_l)]
+islower_l:(int ch, __locale_t locale) -> int {
+@@pp_ifdef __BUILDING_LIBC@@
 	(void)locale;
 	COMPILER_IMPURE();
 	return islower(ch);
-})][export_alias(__islower_l)]
-islower_l:(int ch, __locale_t locale) -> int {
+@@pp_else@@
 #if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
 #include <hybrid/byteorder.h>
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -425,14 +477,16 @@ islower_l:(int ch, __locale_t locale) -> int {
 	COMPILER_IMPURE();
 	return islower(ch);
 #endif
+@@pp_endif@@
 }
 
-[ATTR_PURE][ATTR_WUNUSED][libc_impl({
+[ATTR_PURE][ATTR_WUNUSED][export_alias(__isalpha_l)]
+isalpha_l:(int ch, __locale_t locale) -> int {
+@@pp_ifdef __BUILDING_LIBC@@
 	(void)locale;
 	COMPILER_IMPURE();
 	return isalpha(ch);
-})][export_alias(__isalpha_l)]
-isalpha_l:(int ch, __locale_t locale) -> int {
+@@pp_else@@
 #if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
 #include <hybrid/byteorder.h>
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -449,14 +503,16 @@ isalpha_l:(int ch, __locale_t locale) -> int {
 	COMPILER_IMPURE();
 	return isalpha(ch);
 #endif
+@@pp_endif@@
 }
 
-[ATTR_PURE][ATTR_WUNUSED][libc_impl({
+[ATTR_PURE][ATTR_WUNUSED][export_alias(__isdigit_l)]
+isdigit_l:(int ch, __locale_t locale) -> int {
+@@pp_ifdef __BUILDING_LIBC@@
 	(void)locale;
 	COMPILER_IMPURE();
 	return isdigit(ch);
-})][export_alias(__isdigit_l)]
-isdigit_l:(int ch, __locale_t locale) -> int {
+@@pp_else@@
 #if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
 #include <hybrid/byteorder.h>
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -473,14 +529,16 @@ isdigit_l:(int ch, __locale_t locale) -> int {
 	COMPILER_IMPURE();
 	return isdigit(ch);
 #endif
+@@pp_endif@@
 }
 
-[ATTR_PURE][ATTR_WUNUSED][libc_impl({
+[ATTR_PURE][ATTR_WUNUSED][export_alias(__isxdigit_l)]
+isxdigit_l:(int ch, __locale_t locale) -> int {
+@@pp_ifdef __BUILDING_LIBC@@
 	(void)locale;
 	COMPILER_IMPURE();
 	return isxdigit(ch);
-})][export_alias(__isxdigit_l)]
-isxdigit_l:(int ch, __locale_t locale) -> int {
+@@pp_else@@
 #if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
 #include <hybrid/byteorder.h>
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -497,14 +555,16 @@ isxdigit_l:(int ch, __locale_t locale) -> int {
 	COMPILER_IMPURE();
 	return isxdigit(ch);
 #endif
+@@pp_endif@@
 }
 
-[ATTR_PURE][ATTR_WUNUSED][libc_impl({
+[ATTR_PURE][ATTR_WUNUSED][export_alias(__isalnum_l)]
+isalnum_l:(int ch, __locale_t locale) -> int {
+@@pp_ifdef __BUILDING_LIBC@@
 	(void)locale;
 	COMPILER_IMPURE();
 	return isalnum(ch);
-})][export_alias(__isalnum_l)]
-isalnum_l:(int ch, __locale_t locale) -> int {
+@@pp_else@@
 #if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
 #include <hybrid/byteorder.h>
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -521,14 +581,16 @@ isalnum_l:(int ch, __locale_t locale) -> int {
 	COMPILER_IMPURE();
 	return isalnum(ch);
 #endif
+@@pp_endif@@
 }
 
-[ATTR_PURE][ATTR_WUNUSED][libc_impl({
+[ATTR_PURE][ATTR_WUNUSED][export_alias(__ispunct_l)]
+ispunct_l:(int ch, __locale_t locale) -> int {
+@@pp_ifdef __BUILDING_LIBC@@
 	(void)locale;
 	COMPILER_IMPURE();
 	return ispunct(ch);
-})][export_alias(__ispunct_l)]
-ispunct_l:(int ch, __locale_t locale) -> int {
+@@pp_else@@
 #if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
 #include <hybrid/byteorder.h>
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -545,14 +607,16 @@ ispunct_l:(int ch, __locale_t locale) -> int {
 	COMPILER_IMPURE();
 	return ispunct(ch);
 #endif
+@@pp_endif@@
 }
 
-[ATTR_PURE][ATTR_WUNUSED][libc_impl({
+[ATTR_PURE][ATTR_WUNUSED][export_alias(__isgraph_l)]
+isgraph_l:(int ch, __locale_t locale) -> int {
+@@pp_ifdef __BUILDING_LIBC@@
 	(void)locale;
 	COMPILER_IMPURE();
 	return isgraph(ch);
-})][export_alias(__isgraph_l)]
-isgraph_l:(int ch, __locale_t locale) -> int {
+@@pp_else@@
 #if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
 #include <hybrid/byteorder.h>
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -569,14 +633,16 @@ isgraph_l:(int ch, __locale_t locale) -> int {
 	COMPILER_IMPURE();
 	return isgraph(ch);
 #endif
+@@pp_endif@@
 }
 
-[ATTR_PURE][ATTR_WUNUSED][libc_impl({
+[ATTR_PURE][ATTR_WUNUSED][export_alias(__isprint_l)]
+isprint_l:(int ch, __locale_t locale) -> int {
+@@pp_ifdef __BUILDING_LIBC@@
 	(void)locale;
 	COMPILER_IMPURE();
 	return isprint(ch);
-})][export_alias(__isprint_l)]
-isprint_l:(int ch, __locale_t locale) -> int {
+@@pp_else@@
 #if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
 #include <hybrid/byteorder.h>
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -593,14 +659,16 @@ isprint_l:(int ch, __locale_t locale) -> int {
 	COMPILER_IMPURE();
 	return isprint(ch);
 #endif
+@@pp_endif@@
 }
 
-[ATTR_PURE][ATTR_WUNUSED][libc_impl({
+[ATTR_PURE][ATTR_WUNUSED][export_alias(__isblank_l)]
+isblank_l:(int ch, __locale_t locale) -> int {
+@@pp_ifdef __BUILDING_LIBC@@
 	(void)locale;
 	COMPILER_IMPURE();
 	return isblank(ch);
-})][export_alias(__isblank_l)]
-isblank_l:(int ch, __locale_t locale) -> int {
+@@pp_else@@
 #if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
 #include <hybrid/byteorder.h>
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -615,6 +683,7 @@ isblank_l:(int ch, __locale_t locale) -> int {
 	COMPILER_IMPURE();
 	return isblank(ch);
 #endif
+@@pp_endif@@
 }
 
 
@@ -993,15 +1062,15 @@ __NAMESPACE_INT_END
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN)
 }
-%[default_impl_section(.text.crt.unicode.static.ctype)]
+%[default_impl_section(.text.crt.unicode.static.ctype)];
 
 @@Returns non-zero if `(C & ~0x7f) == 0'
-[ATTR_CONST][nothrow] isascii:(int c) -> int {
+[[ATTR_CONST, nothrow]] int isascii(int c) {
 	return (c & ~0x7f) == 0;
 }
 
 @@Re-returns `C & 0x7f'
-[ATTR_CONST][nothrow] toascii:(int c) -> int {
+[[ATTR_CONST, nothrow]] int toascii(int c) {
 	return c & 0x7f;
 }
 

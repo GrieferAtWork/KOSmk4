@@ -52,7 +52,9 @@
 
 __SYSDECL_BEGIN
 
-}%[enum @guard @undef @macro EPOLL_EVENTS {
+/*[[[enum]]]*/
+#ifdef __CC__
+enum EPOLL_EVENTS {
 	EPOLLIN       = 0x00000001,
 	EPOLLPRI      = 0x00000002,
 	EPOLLOUT      = 0x00000004,
@@ -67,14 +69,62 @@ __SYSDECL_BEGIN
 	EPOLLWAKEUP   = 0x20000000,
 	EPOLLONESHOT  = 0x40000000,
 	EPOLLET       = 0x80000000
-}]%{
+};
+#endif /* __CC__ */
+/*[[[AUTO]]]*/
+#ifdef __COMPILER_PREFERR_ENUMS
+#define EPOLLIN      EPOLLIN
+#define EPOLLPRI     EPOLLPRI
+#define EPOLLOUT     EPOLLOUT
+#define EPOLLERR     EPOLLERR
+#define EPOLLHUP     EPOLLHUP
+#define EPOLLRDNORM  EPOLLRDNORM
+#define EPOLLRDBAND  EPOLLRDBAND
+#define EPOLLWRNORM  EPOLLWRNORM
+#define EPOLLWRBAND  EPOLLWRBAND
+#define EPOLLMSG     EPOLLMSG
+#define EPOLLRDHUP   EPOLLRDHUP
+#define EPOLLWAKEUP  EPOLLWAKEUP
+#define EPOLLONESHOT EPOLLONESHOT
+#define EPOLLET      EPOLLET
+#else /* __COMPILER_PREFERR_ENUMS */
+#define EPOLLIN      0x00000001
+#define EPOLLPRI     0x00000002
+#define EPOLLOUT     0x00000004
+#define EPOLLERR     0x00000008
+#define EPOLLHUP     0x00000010
+#define EPOLLRDNORM  0x00000040
+#define EPOLLRDBAND  0x00000080
+#define EPOLLWRNORM  0x00000100
+#define EPOLLWRBAND  0x00000200
+#define EPOLLMSG     0x00000400
+#define EPOLLRDHUP   0x00002000
+#define EPOLLWAKEUP  0x20000000
+#define EPOLLONESHOT 0x40000000
+#define EPOLLET      0x80000000
+#endif /* !__COMPILER_PREFERR_ENUMS */
+/*[[[end]]]*/
 
 /* Valid opcodes ( "op" parameter ) to issue to epoll_ctl().  */
-}%[enum @guard @undef @macro __epoll_ctl {
+/*[[[enum]]]*/
+#ifdef __CC__
+enum __epoll_ctl {
 	EPOLL_CTL_ADD = 1, /* Add a file descriptor to the interface.  */
 	EPOLL_CTL_DEL = 2, /* Remove a file descriptor from the interface.  */
 	EPOLL_CTL_MOD = 3  /* Change file descriptor epoll_event structure.  */
-}]%{
+};
+#endif /* __CC__ */
+/*[[[AUTO]]]*/
+#ifdef __COMPILER_PREFERR_ENUMS
+#define EPOLL_CTL_ADD EPOLL_CTL_ADD /* Add a file descriptor to the interface.  */
+#define EPOLL_CTL_DEL EPOLL_CTL_DEL /* Remove a file descriptor from the interface.  */
+#define EPOLL_CTL_MOD EPOLL_CTL_MOD /* Change file descriptor epoll_event structure.  */
+#else /* __COMPILER_PREFERR_ENUMS */
+#define EPOLL_CTL_ADD 1 /* Add a file descriptor to the interface.  */
+#define EPOLL_CTL_DEL 2 /* Remove a file descriptor from the interface.  */
+#define EPOLL_CTL_MOD 3 /* Change file descriptor epoll_event structure.  */
+#endif /* !__COMPILER_PREFERR_ENUMS */
+/*[[[end]]]*/
 
 #ifdef __CC__
 

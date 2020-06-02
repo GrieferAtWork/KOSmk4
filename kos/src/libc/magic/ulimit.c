@@ -48,12 +48,28 @@ __SYSDECL_BEGIN
 
 /* Constants used as the first parameter for `ulimit'.
  * They denote limits which can be set or retrieved using this function. */
-}%[enum @macro @undef {
+/*[[[enum]]]*/
+#ifdef __CC__
+enum {
 	UL_GETFSIZE     = 1, /* Return limit on the size of a file, in units of 512 bytes. */
 	UL_SETFSIZE     = 2, /* Set limit on the size of a file to second argument. */
 	__UL_GETMAXBRK  = 3, /* Return the maximum possible address of the data segment. */
 	__UL_GETOPENMAX = 4  /* Return the maximum number of files that the calling process can open. */
-}]%{
+};
+#endif /* __CC__ */
+/*[[[AUTO]]]*/
+#ifdef __COMPILER_PREFERR_ENUMS
+#define UL_GETFSIZE     UL_GETFSIZE     /* Return limit on the size of a file, in units of 512 bytes. */
+#define UL_SETFSIZE     UL_SETFSIZE     /* Set limit on the size of a file to second argument. */
+#define __UL_GETMAXBRK  __UL_GETMAXBRK  /* Return the maximum possible address of the data segment. */
+#define __UL_GETOPENMAX __UL_GETOPENMAX /* Return the maximum number of files that the calling process can open. */
+#else /* __COMPILER_PREFERR_ENUMS */
+#define UL_GETFSIZE     1 /* Return limit on the size of a file, in units of 512 bytes. */
+#define UL_SETFSIZE     2 /* Set limit on the size of a file to second argument. */
+#define __UL_GETMAXBRK  3 /* Return the maximum possible address of the data segment. */
+#define __UL_GETOPENMAX 4 /* Return the maximum number of files that the calling process can open. */
+#endif /* !__COMPILER_PREFERR_ENUMS */
+/*[[[end]]]*/
 
 #ifdef __CC__
 }

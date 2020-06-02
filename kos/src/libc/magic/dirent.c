@@ -19,15 +19,15 @@
  */
 
 %[define_replacement(fd_t       = __fd_t)]
-%[define_replacement(off_t      = __FS_TYPE(off))]
-%[define_replacement(pos_t      = __FS_TYPE(pos))]
+%[define_replacement(off_t      = "__FS_TYPE(off)")]
+%[define_replacement(pos_t      = "__FS_TYPE(pos)")]
 %[define_replacement(off32_t    = __off32_t)]
 %[define_replacement(off64_t    = __off64_t)]
 %[define_replacement(pos32_t    = __pos32_t)]
 %[define_replacement(pos64_t    = __pos64_t)]
 %[define_replacement(atflag_t   = __atflag_t)]
 %[define_replacement(oflag_t    = __oflag_t)]
-%[define_replacement(DIR        = struct __dirstream)]
+%[define_replacement(DIR        = "struct __dirstream")]
 %[default_impl_section(.text.crt.fs.dir)]
 
 
@@ -42,7 +42,9 @@ __SYSDECL_BEGIN
 
 #ifdef __USE_MISC
 #ifndef DT_UNKNOWN
-}%[enum @macro {
+/*[[[enum]]]*/
+#ifdef __CC__
+enum {
 	DT_UNKNOWN = __DT_UNKNOWN,
 	DT_FIFO    = __DT_FIFO,
 	DT_CHR     = __DT_CHR,
@@ -52,7 +54,31 @@ __SYSDECL_BEGIN
 	DT_LNK     = __DT_LNK,
 	DT_SOCK    = __DT_SOCK,
 	DT_WHT     = __DT_WHT
-}]%{
+};
+#endif /* __CC__ */
+/*[[[AUTO]]]*/
+#ifdef __COMPILER_PREFERR_ENUMS
+#define DT_UNKNOWN DT_UNKNOWN
+#define DT_FIFO    DT_FIFO
+#define DT_CHR     DT_CHR
+#define DT_DIR     DT_DIR
+#define DT_BLK     DT_BLK
+#define DT_REG     DT_REG
+#define DT_LNK     DT_LNK
+#define DT_SOCK    DT_SOCK
+#define DT_WHT     DT_WHT
+#else /* __COMPILER_PREFERR_ENUMS */
+#define DT_UNKNOWN __DT_UNKNOWN
+#define DT_FIFO    __DT_FIFO
+#define DT_CHR     __DT_CHR
+#define DT_DIR     __DT_DIR
+#define DT_BLK     __DT_BLK
+#define DT_REG     __DT_REG
+#define DT_LNK     __DT_LNK
+#define DT_SOCK    __DT_SOCK
+#define DT_WHT     __DT_WHT
+#endif /* !__COMPILER_PREFERR_ENUMS */
+/*[[[end]]]*/
 #endif /* !DT_UNKNOWN */
 
 /* Convert between stat structure types and directory types. */
@@ -110,11 +136,10 @@ typedef struct __dirstream DIR;
 
 %[define(DEFINE_STRUCT_DIRSTREAM = struct __dirstream;)]
 
-
 @@Open and return a new directory stream for reading, referring to `name'
-[cp][ATTR_WUNUSED][noexport][decl_prefix(DEFINE_STRUCT_DIRSTREAM)]
-[requires(defined(__CRT_AT_FDCWD) && $has_function(opendirat))]
-opendir:([nonnull] char const *name) -> DIR * {
+[[cp, ATTR_WUNUSED, decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
+[[userimpl, requires(defined(__CRT_AT_FDCWD) && $has_function(opendirat))]]
+DIR *opendir([nonnull] char const *name) {
 	/* TODO: Emulate using DOS's _find* functions */
 	/* TODO: Emulate using fdopendir(open(name, 0)) */
 	return opendirat(__CRT_AT_FDCWD, name);
@@ -124,25 +149,25 @@ opendir:([nonnull] char const *name) -> DIR * {
 %
 %#if defined(__USE_KOS) && defined(__USE_ATFILE)
 @@Directory-handle-relative, and flags-enabled versions of `opendir(3)'
-[cp][ATTR_WUNUSED][decl_prefix(DEFINE_STRUCT_DIRSTREAM)]
-[requires($has_function(fdopendir) && $has_function(openat))]
-fopendirat:($fd_t dirfd, [nonnull] char const *name, $oflag_t oflags) -> DIR * {
+[[cp, ATTR_WUNUSED, decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
+[[userimpl, requires($has_function(fdopendir) && $has_function(openat))]]
+DIR *fopendirat($fd_t dirfd, [nonnull] char const *name, $oflag_t oflags) {
 	DIR *result;
 	fd_t fd = openat(dirfd, name, oflags);
 	if unlikely(fd < 0)
 		return NULL;
 	result = fdopendir(fd);
-@@if_has_function(close)@@
+@@pp_if $has_function(close)@@
 	if unlikely(!result)
 		close(fd);
-@@endif_has_function(close)@@
+@@pp_endif@@
 	return result;
 }
 
 @@Directory-handle-relative, and flags-enabled versions of `opendir(3)'
-[cp][ATTR_WUNUSED][noexport][decl_prefix(DEFINE_STRUCT_DIRSTREAM)]
-[requires($has_function(fopendirat))]
-opendirat:($fd_t dirfd, [nonnull] char const *name) -> DIR * {
+[[cp, ATTR_WUNUSED, decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
+[[userimpl, requires($has_function(fopendirat))]]
+DIR *opendirat($fd_t dirfd, [nonnull] char const *name) {
 	return fopendirat(dirfd, name, 0);
 }
 %#endif /* __USE_KOS && __USE_ATFILE */
@@ -236,10 +261,9 @@ dirfd:([nonnull] DIR __KOS_FIXED_CONST *__restrict dirp) -> $fd_t;
 
 %
 @@Scan a directory `DIR' for all contained directory entries
-[cp][noexport]
-[if(!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias(scandir)]
-[if(defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias(scandir64)]
-[requires(defined(__CRT_AT_FDCWD) && $has_function(scandirat))]
+[[if(!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias(scandir)]]
+[[if(defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias(scandir64)]]
+[[cp, noexport, userimpl, requires(defined(__CRT_AT_FDCWD) && $has_function(scandirat))]]
 scandir:([nonnull] char const *__restrict dir,
          [nonnull] struct dirent ***__restrict namelist,
          __scandir_selector_t selector, __scandir_cmp_t cmp) -> int {
@@ -277,7 +301,7 @@ alphasort64:([nonnull] struct dirent64 const **e1, [nonnull] struct dirent64 con
 
 @@64-bit variant of `scandir()'
 [cp][dirent64_variant_of(scandir)]
-[requires(defined(__CRT_AT_FDCWD) && $has_function(scandirat64))]
+[[userimpl, requires(defined(__CRT_AT_FDCWD) && $has_function(scandirat64))]]
 scandir64:(
 	[nonnull] char const *__restrict dir,
 	[nonnull] struct dirent64 ***__restrict namelist,
@@ -338,9 +362,8 @@ versionsort64:([nonnull] struct dirent64 const **e1, [nonnull] struct dirent64 c
 @@                   stream will only be advanced when this value is >= 'BUFSIZE'
 @@@return: 0 : The end of the directory has been reached.
 @@@return: -1: Failed to read a directory entry for some reason (s.a.: `errno')
-[cp][ATTR_WUNUSED]
-[if(defined(_DIRENT_MATCHES_DIRENT64)), alias(kreaddir64)]
-[noexport][requires($has_function(kreaddirf))]
+[[if(defined(_DIRENT_MATCHES_DIRENT64)), alias(kreaddir64)]]
+[[cp, ATTR_WUNUSED, userimpl, requires($has_function(kreaddirf))]]
 kreaddir:($fd_t fd, struct dirent *buf, size_t bufsize, unsigned int mode) -> $ssize_t {
 	return kreaddirf(fd, buf, bufsize, mode, 0);
 }
@@ -353,21 +376,21 @@ kreaddir:($fd_t fd, struct dirent *buf, size_t bufsize, unsigned int mode) -> $s
 @@                   stream will only be advanced when this value is >= 'BUFSIZE'
 @@@return: 0 : The end of the directory has been reached.
 @@@return: -1: Failed to read a directory entry for some reason (s.a.: `errno')
-[cp][ATTR_WUNUSED]
-[if(defined(_DIRENT_MATCHES_DIRENT64)), alias(kreaddirf64)]
+[[cp, ATTR_WUNUSED]]
+[[if(defined(_DIRENT_MATCHES_DIRENT64)), alias(kreaddirf64)]]
 kreaddirf:($fd_t fd, struct dirent *buf, size_t bufsize, unsigned int mode, $oflag_t flags) -> $ssize_t;
 
 %#ifdef __USE_LARGEFILE64
 
 @@64-bit variant of `kreaddir()'
-[cp][ATTR_WUNUSED][dirent64_variant_of(kreaddir)]
-[noexport][requires($has_function(kreaddirf64))]
+[[cp, ATTR_WUNUSED, dirent64_variant_of(kreaddir)]]
+[[userimpl, requires($has_function(kreaddirf64))]]
 kreaddir64:($fd_t fd, struct dirent64 *buf, size_t bufsize, unsigned int mode) -> $ssize_t {
 	return kreaddirf64(fd, buf, bufsize, mode, 0);
 }
 
 @@64-bit variant of `kreaddirf()'
-[cp][ATTR_WUNUSED][dirent64_variant_of(kreaddirf)]
+[[cp, ATTR_WUNUSED, dirent64_variant_of(kreaddirf)]]
 kreaddirf64:($fd_t fd, struct dirent64 *buf, size_t bufsize, unsigned int mode, $oflag_t flags) -> $ssize_t;
 
 %#endif /* __USE_LARGEFILE64 */

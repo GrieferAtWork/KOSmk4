@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
-%[define_replacement(sigset_t = struct __sigset_struct)]
+%[define_replacement(sigset_t = "struct __sigset_struct")]
 %[default_impl_section(.text.crt.database.shadow)]
 
 

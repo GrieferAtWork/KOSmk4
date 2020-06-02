@@ -3481,7 +3481,7 @@ again_enum_name:
 								repl_dict[usedName] = WeakReplacement(prefix + funname);
 						}
 						convert_body = descr["convert_body"];
-						convert_doc = descr["convert_doc"];
+						convert_doc  = descr["convert_doc"];
 					}
 					block = CopyFunctionBody(name, convert_body);
 					if (doc !is CopyFunctionBody && !doc)

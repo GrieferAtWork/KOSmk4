@@ -151,6 +151,7 @@ class CParser {
 	}
 
 	public operator str(): string -> text[:end];
+	public operator repr(): string -> "CParser({!r})".format({ str this });
 
 	@@Offset added to line number counters (aka. line-number at @text[0])
 	private member _firstLineOffset: int;

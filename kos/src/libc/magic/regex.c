@@ -151,14 +151,16 @@ __LIBC reg_syntax_t re_syntax_options;
 
 /* If any error codes are removed, changed, or added, update the
    `re_error_msg' table in regex.c. */
-}%[enum @typedef(reg_errcode_t) {
-%#if defined(_XOPEN_SOURCE) || defined(__USE_XOPEN2K)
+/*[[[enum]]]*/
+#ifdef __CC__
+typedef enum {
+#if defined(_XOPEN_SOURCE) || defined(__USE_XOPEN2K)
 	REG_ENOSYS   = -1, /* Returned when libc.so fails to load `libregex.so' for some reason */
-%#endif /* _XOPEN_SOURCE || __USE_XOPEN2K */
+#endif /* _XOPEN_SOURCE || __USE_XOPEN2K */
 	REG_NOERROR  = 0,  /* Success. */
 	REG_NOMATCH  = 1,  /* Didn't find a match (for regexec). */
 
-%	/* POSIX */
+	/* POSIX */
 	REG_BADPAT   = 2,  /* Invalid pattern. */
 	REG_ECOLLATE = 3,  /* Inalid collating element. */
 	REG_ECTYPE   = 4,  /* Invalid character class name. */
@@ -172,11 +174,61 @@ __LIBC reg_syntax_t re_syntax_options;
 	REG_ESPACE   = 12, /* Ran out of memory. */
 	REG_BADRPT   = 13, /* No preceding re for repetition op. */
 
-%	/* GNU-specific errors */
+	/* GNU-specific errors */
 	REG_EEND     = 14, /* Premature end. */
 	REG_ESIZE    = 15, /* Compiled pattern bigger than 2^16 bytes. */
 	REG_ERPAREN  = 16  /* Unmatched ) or \); not returned from regcomp. */
-}]%{
+} reg_errcode_t;
+#endif /* __CC__ */
+/*[[[AUTO]]]*/
+#ifdef __COMPILER_PREFERR_ENUMS
+#if defined(_XOPEN_SOURCE) || defined(__USE_XOPEN2K)
+#define REG_ENOSYS   REG_ENOSYS   /* Returned when libc.so fails to load `libregex.so' for some reason */
+#endif /* _XOPEN_SOURCE || __USE_XOPEN2K */
+#define REG_NOERROR  REG_NOERROR  /* Success. */
+#define REG_NOMATCH  REG_NOMATCH  /* Didn't find a match (for regexec). */
+	/* POSIX */
+#define REG_BADPAT   REG_BADPAT   /* Invalid pattern. */
+#define REG_ECOLLATE REG_ECOLLATE /* Inalid collating element. */
+#define REG_ECTYPE   REG_ECTYPE   /* Invalid character class name. */
+#define REG_EESCAPE  REG_EESCAPE  /* Trailing backslash. */
+#define REG_ESUBREG  REG_ESUBREG  /* Invalid back reference. */
+#define REG_EBRACK   REG_EBRACK   /* Unmatched left bracket. */
+#define REG_EPAREN   REG_EPAREN   /* Parenthesis imbalance. */
+#define REG_EBRACE   REG_EBRACE   /* Unmatched \{. */
+#define REG_BADBR    REG_BADBR    /* Invalid contents of \{\}. */
+#define REG_ERANGE   REG_ERANGE   /* Invalid range end. */
+#define REG_ESPACE   REG_ESPACE   /* Ran out of memory. */
+#define REG_BADRPT   REG_BADRPT   /* No preceding re for repetition op. */
+	/* GNU-specific errors */
+#define REG_EEND     REG_EEND     /* Premature end. */
+#define REG_ESIZE    REG_ESIZE    /* Compiled pattern bigger than 2^16 bytes. */
+#define REG_ERPAREN  REG_ERPAREN  /* Unmatched ) or \); not returned from regcomp. */
+#else /* __COMPILER_PREFERR_ENUMS */
+#if defined(_XOPEN_SOURCE) || defined(__USE_XOPEN2K)
+#define REG_ENOSYS   -1 /* Returned when libc.so fails to load `libregex.so' for some reason */
+#endif /* _XOPEN_SOURCE || __USE_XOPEN2K */
+#define REG_NOERROR  0  /* Success. */
+#define REG_NOMATCH  1  /* Didn't find a match (for regexec). */
+	/* POSIX */
+#define REG_BADPAT   2  /* Invalid pattern. */
+#define REG_ECOLLATE 3  /* Inalid collating element. */
+#define REG_ECTYPE   4  /* Invalid character class name. */
+#define REG_EESCAPE  5  /* Trailing backslash. */
+#define REG_ESUBREG  6  /* Invalid back reference. */
+#define REG_EBRACK   7  /* Unmatched left bracket. */
+#define REG_EPAREN   8  /* Parenthesis imbalance. */
+#define REG_EBRACE   9  /* Unmatched \{. */
+#define REG_BADBR    10 /* Invalid contents of \{\}. */
+#define REG_ERANGE   11 /* Invalid range end. */
+#define REG_ESPACE   12 /* Ran out of memory. */
+#define REG_BADRPT   13 /* No preceding re for repetition op. */
+	/* GNU-specific errors */
+#define REG_EEND     14 /* Premature end. */
+#define REG_ESIZE    15 /* Compiled pattern bigger than 2^16 bytes. */
+#define REG_ERPAREN  16 /* Unmatched ) or \); not returned from regcomp. */
+#endif /* !__COMPILER_PREFERR_ENUMS */
+/*[[[end]]]*/
 
 
 #ifndef __RE_TRANSLATE_TYPE

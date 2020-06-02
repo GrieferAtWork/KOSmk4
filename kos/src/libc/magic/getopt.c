@@ -47,11 +47,25 @@
 __SYSDECL_BEGIN
 
 /* Names for the values of the `has_arg' field of `struct option'. */
-}%[enum @undef @macro {
+/*[[[enum]]]*/
+#ifdef __CC__
+enum {
 	no_argument       = 0,
 	required_argument = 1,
 	optional_argument = 2
-}]%{
+};
+#endif /* __CC__ */
+/*[[[AUTO]]]*/
+#ifdef __COMPILER_PREFERR_ENUMS
+#define no_argument       no_argument
+#define required_argument required_argument
+#define optional_argument optional_argument
+#else /* __COMPILER_PREFERR_ENUMS */
+#define no_argument       0
+#define required_argument 1
+#define optional_argument 2
+#endif /* !__COMPILER_PREFERR_ENUMS */
+/*[[[end]]]*/
 
 #ifdef __CC__
 

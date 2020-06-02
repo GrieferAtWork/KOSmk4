@@ -24,6 +24,7 @@ import * from ..optiexpr;
 import * from collections;
 import functools;
 
+#define UserString Object  /* UserString from .parser */
 
 /* CGenerator part IDs */
 global final CGP_STRING  = 0; /* +string | +File.Writer */

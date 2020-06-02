@@ -58,12 +58,28 @@ __SYSDECL_BEGIN
 #endif
 
 
-}%[enum{
+/*[[[enum]]]*/
+#ifdef __CC__
+enum {
 	AFORK = 0x01, /* Has executed fork, but no exec. */
 	ASU   = 0x02, /* Used super-user privileges. */
 	ACORE = 0x08, /* Dumped core. */
 	AXSIG = 0x10  /* Killed by a signal. */
-}]%{
+};
+#endif /* __CC__ */
+/*[[[AUTO]]]*/
+#ifdef __COMPILER_PREFERR_ENUMS
+#define AFORK AFORK /* Has executed fork, but no exec. */
+#define ASU   ASU   /* Used super-user privileges. */
+#define ACORE ACORE /* Dumped core. */
+#define AXSIG AXSIG /* Killed by a signal. */
+#else /* __COMPILER_PREFERR_ENUMS */
+#define AFORK 0x01 /* Has executed fork, but no exec. */
+#define ASU   0x02 /* Used super-user privileges. */
+#define ACORE 0x08 /* Dumped core. */
+#define AXSIG 0x10 /* Killed by a signal. */
+#endif /* !__COMPILER_PREFERR_ENUMS */
+/*[[[end]]]*/
 
 #ifdef __CC__
 

@@ -70,18 +70,46 @@ __SYSDECL_BEGIN
 }%[push_macro @undef { preorder postorder endorder leaf VISIT }]%{
 
 /* Action which shall be performed in the call the hsearch. */
-}%[enum @typedef(ACTION) {
-	FIND  = 0
+/*[[[enum]]]*/
+#ifdef __CC__
+typedef enum {
+	FIND  = 0,
 	ENTER = 1
-}]%{
+} ACTION;
+#endif /* __CC__ */
+/*[[[AUTO]]]*/
+#ifdef __COMPILER_PREFERR_ENUMS
+#define FIND  FIND
+#define ENTER ENTER
+#else /* __COMPILER_PREFERR_ENUMS */
+#define FIND  0
+#define ENTER 1
+#endif /* !__COMPILER_PREFERR_ENUMS */
+/*[[[end]]]*/
 
 /* For tsearch */
-}%[enum @typedef(VISIT) {
-	preorder  = 0
-	postorder = 1
-	endorder  = 2
+/*[[[enum]]]*/
+#ifdef __CC__
+typedef enum {
+	preorder  = 0,
+	postorder = 1,
+	endorder  = 2,
 	leaf      = 3
-}]%{
+} VISIT;
+#endif /* __CC__ */
+/*[[[AUTO]]]*/
+#ifdef __COMPILER_PREFERR_ENUMS
+#define preorder  preorder
+#define postorder postorder
+#define endorder  endorder
+#define leaf      leaf
+#else /* __COMPILER_PREFERR_ENUMS */
+#define preorder  0
+#define postorder 1
+#define endorder  2
+#define leaf      3
+#endif /* !__COMPILER_PREFERR_ENUMS */
+/*[[[end]]]*/
 
 
 #ifdef __CC__

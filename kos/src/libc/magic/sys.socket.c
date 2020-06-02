@@ -66,11 +66,25 @@
 __SYSDECL_BEGIN
 
 #ifndef SHUT_RD
-}%[enum @macro {
+/*[[[enum]]]*/
+#ifdef __CC__
+enum {
 	SHUT_RD   = 0, /* No more receptions. */
 	SHUT_WR   = 1, /* No more transmissions. */
 	SHUT_RDWR = 2  /* No more receptions or transmissions. */
-}]%{
+};
+#endif /* __CC__ */
+/*[[[AUTO]]]*/
+#ifdef __COMPILER_PREFERR_ENUMS
+#define SHUT_RD   SHUT_RD   /* No more receptions. */
+#define SHUT_WR   SHUT_WR   /* No more transmissions. */
+#define SHUT_RDWR SHUT_RDWR /* No more receptions or transmissions. */
+#else /* __COMPILER_PREFERR_ENUMS */
+#define SHUT_RD   0 /* No more receptions. */
+#define SHUT_WR   1 /* No more transmissions. */
+#define SHUT_RDWR 2 /* No more receptions or transmissions. */
+#endif /* !__COMPILER_PREFERR_ENUMS */
+/*[[[end]]]*/
 #endif /* !SHUT_RD */
 
 
