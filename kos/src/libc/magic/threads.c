@@ -176,14 +176,15 @@ thrd_current:() -> thrd_t = pthread_self;
 @@@return:     0: The (relative) time specified by `time_point' has elapsed
 @@@return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
 @@@return: <= -2: Some other error occurred
+[no_crt_self_import]
 [if(defined(__USE_TIME_BITS64)), preferred_alias(thrd_sleep64)]
 [if(!defined(__USE_TIME_BITS64)), preferred_alias(thrd_sleep)]
 [requires($has_function(thrd_sleep32) || $has_function(crt_thrd_sleep64) || $has_function(nanosleep))]
 [dependency_include(<asm/threads.h>)]
 [dependency_include(<parts/errno.h>)]
-[decl_include(<bits/timespec.h>)][cp]
-thrd_sleep:([nonnull] struct timespec const *time_point,
-            [nullable] struct timespec *remaining) -> int {
+[decl_include("<bits/timespec.h>")][cp]
+thrd_sleep:([[nonnull]] struct timespec const *time_point,
+            [[nullable]] struct timespec *remaining) -> int {
 @@if_has_function(thrd_sleep32)@@
 	int result;
 	struct timespec32 tp32, rem32;
@@ -221,19 +222,19 @@ thrd_sleep:([nonnull] struct timespec const *time_point,
 
 %#ifdef __USE_TIME64
 [ignore][doc_alias(thrd_sleep)]
-[decl_include(<bits/timespec.h>)][cp]
-thrd_sleep32:([nonnull] struct $timespec32 const *time_point,
-              [nullable] struct $timespec32 *remaining) -> int = thrd_sleep?;
+[decl_include("<bits/timespec.h>")][cp]
+thrd_sleep32:([[nonnull]] struct $timespec32 const *time_point,
+              [[nullable]] struct $timespec32 *remaining) -> int = thrd_sleep?;
 [ignore][doc_alias(thrd_sleep)]
-[decl_include(<bits/timespec.h>)][cp]
-crt_thrd_sleep64:([nonnull] struct timespec64 const *time_point,
-                  [nullable] struct timespec64 *remaining) -> int = thrd_sleep64?;
+[decl_include("<bits/timespec.h>")][cp]
+crt_thrd_sleep64:([[nonnull]] struct timespec64 const *time_point,
+                  [[nullable]] struct timespec64 *remaining) -> int = thrd_sleep64?;
 
 [doc_alias(thrd_sleep)]
 [requires($has_function(thrd_sleep32) || $has_function(nanosleep64))]
-[decl_include(<bits/timespec.h>)][cp][time64_variant_of(thrd_sleep)]
-thrd_sleep64:([nonnull] struct timespec64 const *time_point,
-              [nullable] struct timespec64 *remaining) -> int {
+[decl_include("<bits/timespec.h>")][cp][time64_variant_of(thrd_sleep)]
+thrd_sleep64:([[nonnull]] struct timespec64 const *time_point,
+              [[nullable]] struct timespec64 *remaining) -> int {
 @@if_has_function(nanosleep64)@@
 	int error;
 	error = nanosleep64(time_point, remaining);
@@ -328,7 +329,7 @@ thrd_join:(thrd_t thr, int *res) -> int {
 [decl_include(<bits/pthreadvalues.h>)]
 [decl_include(<bits/pthreadtypes.h>)]
 [same_impl][requires($has_function(pthread_mutex_init))]
-mtx_init:([nonnull] mtx_t *__restrict mutex, int type) -> int {
+mtx_init:([[nonnull]] mtx_t *__restrict mutex, int type) -> int {
 	int error;
 	if (type == mtx_plain) {
 		error = pthread_mutex_init((pthread_mutex_t *)mutex, NULL);
@@ -356,7 +357,7 @@ mtx_init:([nonnull] mtx_t *__restrict mutex, int type) -> int {
 [decl_include(<bits/threads.h>)][cp]
 [decl_include(<bits/pthreadtypes.h>)]
 [same_impl][requires($has_function(pthread_mutex_lock))]
-mtx_lock:([nonnull] mtx_t *__restrict mutex) -> int {
+mtx_lock:([[nonnull]] mtx_t *__restrict mutex) -> int {
 	int error;
 	error = pthread_mutex_lock((pthread_mutex_t *)mutex);
 	if likely(!error)
@@ -368,14 +369,15 @@ mtx_lock:([nonnull] mtx_t *__restrict mutex) -> int {
 @@is unlocked or time pointed by TIME_POINT is reached.
 @@In case the mutex is unlock, the current thread will not be blocked
 @@s.a. `pthread_mutex_timedlock()'
+[no_crt_self_import]
 [if(defined(__USE_TIME_BITS64)), preferred_alias(mtx_timedlock64)]
 [if(!defined(__USE_TIME_BITS64)), preferred_alias(mtx_timedlock)]
 [dependency_include(<asm/threads.h>)]
 [decl_include(<bits/threads.h>)][cp]
 [decl_include(<bits/pthreadtypes.h>)]
 [same_impl][requires($has_function(pthread_mutex_timedlock))]
-mtx_timedlock:([nonnull] mtx_t *__restrict mutex,
-               [nonnull] struct timespec const *__restrict time_point) -> int {
+mtx_timedlock:([[nonnull]] mtx_t *__restrict mutex,
+               [[nonnull]] struct timespec const *__restrict time_point) -> int {
 	int error;
 	error = pthread_mutex_timedlock((pthread_mutex_t *)mutex, time_point);
 	if likely(!error)
@@ -389,8 +391,8 @@ mtx_timedlock:([nonnull] mtx_t *__restrict mutex,
 [decl_include(<bits/threads.h>)][cp]
 [decl_include(<bits/pthreadtypes.h>)]
 [same_impl][requires($has_function(pthread_mutex_timedlock64))]
-mtx_timedlock64:([nonnull] mtx_t *__restrict mutex,
-                 [nonnull] struct timespec64 const *__restrict time_point) -> int {
+mtx_timedlock64:([[nonnull]] mtx_t *__restrict mutex,
+                 [[nonnull]] struct timespec64 const *__restrict time_point) -> int {
 	int error;
 	error = pthread_mutex_timedlock64((pthread_mutex_t *)mutex, time_point);
 	if likely(!error)
@@ -408,7 +410,7 @@ mtx_timedlock64:([nonnull] mtx_t *__restrict mutex,
 [decl_include(<bits/threads.h>)]
 [decl_include(<bits/pthreadtypes.h>)]
 [same_impl][requires($has_function(pthread_mutex_trylock))]
-mtx_trylock:([nonnull] mtx_t *__restrict mutex) -> int {
+mtx_trylock:([[nonnull]] mtx_t *__restrict mutex) -> int {
 	int error;
 	error = pthread_mutex_trylock((pthread_mutex_t *)mutex);
 	if likely(!error)
@@ -423,7 +425,7 @@ mtx_trylock:([nonnull] mtx_t *__restrict mutex) -> int {
 [decl_include(<bits/threads.h>)]
 [decl_include(<bits/pthreadtypes.h>)]
 [same_impl][requires($has_function(pthread_mutex_unlock))]
-mtx_unlock:([nonnull] mtx_t *__restrict mutex) -> int {
+mtx_unlock:([[nonnull]] mtx_t *__restrict mutex) -> int {
 	int error;
 	error = pthread_mutex_unlock((pthread_mutex_t *)mutex);
 	if likely(!error)
@@ -434,7 +436,7 @@ mtx_unlock:([nonnull] mtx_t *__restrict mutex) -> int {
 @@Destroy the mutex object pointed by MUTEX
 @@s.a. `pthread_mutex_destroy()'
 [decl_include(<bits/threads.h>)]
-mtx_destroy:([nonnull] mtx_t *__restrict mutex) = pthread_mutex_destroy;
+mtx_destroy:([[nonnull]] mtx_t *__restrict mutex) = pthread_mutex_destroy;
 
 
 
@@ -442,8 +444,8 @@ mtx_destroy:([nonnull] mtx_t *__restrict mutex) = pthread_mutex_destroy;
 @@All calls must be made with the same FLAG object
 @@s.a. `pthread_once()'
 [decl_include(<bits/threads.h>)][throws]
-call_once:([nonnull] once_flag *__restrict flag,
-           [nonnull] __once_func_t func) = pthread_once;
+call_once:([[nonnull]] once_flag *__restrict flag,
+           [[nonnull]] __once_func_t func) = pthread_once;
 
 %
 %
@@ -456,7 +458,7 @@ call_once:([nonnull] once_flag *__restrict flag,
 [decl_include(<bits/threads.h>)]
 [decl_include(<bits/pthreadtypes.h>)]
 [same_impl][requires($has_function(pthread_cond_init))]
-cnd_init:([nonnull] cnd_t *__restrict cond) -> int {
+cnd_init:([[nonnull]] cnd_t *__restrict cond) -> int {
 	int error;
 	error = pthread_cond_init((pthread_cond_t *)cond, NULL);
 	if likely(!error)
@@ -470,7 +472,7 @@ cnd_init:([nonnull] cnd_t *__restrict cond) -> int {
 [decl_include(<bits/threads.h>)]
 [decl_include(<bits/pthreadtypes.h>)]
 [same_impl][requires($has_function(pthread_cond_signal))]
-cnd_signal:([nonnull] cnd_t *__restrict cond) -> int {
+cnd_signal:([[nonnull]] cnd_t *__restrict cond) -> int {
 	int error;
 	error = pthread_cond_signal((pthread_cond_t *)cond);
 	if likely(!error)
@@ -484,7 +486,7 @@ cnd_signal:([nonnull] cnd_t *__restrict cond) -> int {
 [decl_include(<bits/threads.h>)]
 [decl_include(<bits/pthreadtypes.h>)]
 [same_impl][requires($has_function(pthread_cond_broadcast))]
-cnd_broadcast:([nonnull] cnd_t *__restrict cond) -> int {
+cnd_broadcast:([[nonnull]] cnd_t *__restrict cond) -> int {
 	int error;
 	error = pthread_cond_broadcast((pthread_cond_t *)cond);
 	if likely(!error)
@@ -498,8 +500,8 @@ cnd_broadcast:([nonnull] cnd_t *__restrict cond) -> int {
 [decl_include(<bits/threads.h>)]
 [decl_include(<bits/pthreadtypes.h>)]
 [same_impl][requires($has_function(pthread_cond_wait))][cp]
-cnd_wait:([nonnull] cnd_t *__restrict cond,
-          [nonnull] mtx_t *__restrict mutex) -> int {
+cnd_wait:([[nonnull]] cnd_t *__restrict cond,
+          [[nonnull]] mtx_t *__restrict mutex) -> int {
 	int error;
 	error = pthread_cond_wait((pthread_cond_t *)cond,
 	                          (pthread_mutex_t *)mutex);
@@ -511,16 +513,17 @@ cnd_wait:([nonnull] cnd_t *__restrict cond,
 @@Block current thread on the condition variable until condition variable
 @@pointed by COND is signaled or time pointed by TIME_POINT is reached
 @@s.a. `pthread_cond_timedwait()'
+[no_crt_self_import]
 [if(defined(__USE_TIME_BITS64)), preferred_alias(cnd_timedwait64)]
 [if(!defined(__USE_TIME_BITS64)), preferred_alias(cnd_timedwait)]
 [dependency_include(<asm/threads.h>)]
 [decl_include(<bits/threads.h>)][cp]
 [decl_include(<bits/pthreadtypes.h>)]
-[decl_include(<bits/timespec.h>)]
+[decl_include("<bits/timespec.h>")]
 [same_impl][requires($has_function(pthread_cond_timedwait))]
-cnd_timedwait:([nonnull] cnd_t *__restrict cond,
-               [nonnull] mtx_t *__restrict mutex,
-               [nonnull] struct timespec const *__restrict time_point) -> int {
+cnd_timedwait:([[nonnull]] cnd_t *__restrict cond,
+               [[nonnull]] mtx_t *__restrict mutex,
+               [[nonnull]] struct timespec const *__restrict time_point) -> int {
 	int error;
 	error = pthread_cond_timedwait((pthread_cond_t *)cond,
 	                               (pthread_mutex_t *)mutex,
@@ -537,11 +540,11 @@ cnd_timedwait:([nonnull] cnd_t *__restrict cond,
 [dependency_include(<asm/threads.h>)]
 [decl_include(<bits/threads.h>)][cp]
 [decl_include(<bits/pthreadtypes.h>)]
-[decl_include(<bits/timespec.h>)]
+[decl_include("<bits/timespec.h>")]
 [same_impl][requires($has_function(pthread_cond_timedwait))]
-cnd_timedwait64:([nonnull] cnd_t *__restrict cond,
-                 [nonnull] mtx_t *__restrict mutex,
-                 [nonnull] struct timespec64 const *__restrict time_point) -> int {
+cnd_timedwait64:([[nonnull]] cnd_t *__restrict cond,
+                 [[nonnull]] mtx_t *__restrict mutex,
+                 [[nonnull]] struct timespec64 const *__restrict time_point) -> int {
 	int error;
 	error = pthread_cond_timedwait64((pthread_cond_t *)cond,
 	                                 (pthread_mutex_t *)mutex,

@@ -87,18 +87,20 @@ __SYSDECL_BEGIN
 #endif /* !__PIO_OFFSET */
 }
 
-[if(defined(__USE_FILE_OFFSET64)), preferred_alias(wtruncate64)]
-[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(wtruncate)]
-[wchar][attribute(*)] wtruncate:(*) %{copy(truncate, str2wcs)}
+[[wchar, no_crt_self_import]]
+[[if(defined(__USE_FILE_OFFSET64)), preferred_alias(wtruncate64)]]
+[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(wtruncate)]]
+wtruncate(*) %{copy(truncate, str2wcs)}
 
-[doc_alias(truncate)][section(.text.crt.wchar.fs.modify)][ignore][wchar]
-wtruncate32:($wchar_t const *file, $pos32_t length) -> int = wtruncate?;
+[[doc_alias(truncate), wchar, ignore, nocrt, alias(wtruncate)]]
+int wtruncate32($wchar_t const *file, $pos32_t length);
+
 %[define_str2wcs_replacement(truncate32 = wtruncate32)]
 
 
 %#ifdef __USE_LARGEFILE64
-[wchar][attribute(*)][off64_variant_of(wtruncate)]
-wtruncate64:(*) %{copy(truncate64, str2wcs)}
+[[wchar, off64_variant_of(wtruncate)]]
+wtruncate64(*) %{generate(str2wcs(truncate64))}
 %#endif /* __USE_LARGEFILE64 */
 %#endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K8 */
 

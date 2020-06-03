@@ -80,7 +80,7 @@ struct signalfd_siginfo {
 
 
 @@Request notification for delivery of signals in MASK to be performed using descriptor FD
-signalfd:($fd_t fd, [nonnull] sigset_t const *mask, int flags) -> $fd_t;
+signalfd:($fd_t fd, [[nonnull]] sigset_t const *mask, int flags) -> $fd_t;
 
 
 %{

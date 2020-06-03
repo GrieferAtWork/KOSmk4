@@ -516,9 +516,10 @@ freeaddrinfo:(struct addrinfo *ai);
 @@longest time the function keeps waiting before returning with an error.
 @@This function is not part of POSIX and therefore no official
 @@cancellation point
-[cp][requires(defined(__CRT_HAVE_gai_suspend64) || defined(__CRT_HAVE_gai_suspend))]
+[cp, no_crt_self_import]
 [if(defined(__USE_TIME_BITS64)), preferred_alias(gai_suspend64)]
 [if(!defined(__USE_TIME_BITS64)), preferred_alias(gai_suspend)]
+[userimpl, requires(defined(__CRT_HAVE_gai_suspend64) || defined(__CRT_HAVE_gai_suspend))]
 gai_suspend:(struct gaicb const *const list[], int ent, struct timespec const *timeout) -> int {
 #ifdef __CRT_HAVE_gai_suspend
 	struct __timespec32 tmo32;

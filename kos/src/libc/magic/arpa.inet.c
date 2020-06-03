@@ -120,7 +120,7 @@ inet_makeaddr:($uint32_t net, $uint32_t host) -> struct in_addr {
 @@    0x123    (hex)
 @@    0123     (oct)
 [ATTR_PURE][dependency_include(<netinet/in.h>)]
-inet_addr:([nonnull] char const *__restrict cp) -> in_addr_t {
+inet_addr:([[nonnull]] char const *__restrict cp) -> in_addr_t {
 	struct @in_addr@ addr;
 	if (!inet_paton((char const **)&cp, &addr, 0) || *cp)
 		return @INADDR_NONE@;
@@ -130,7 +130,7 @@ inet_addr:([nonnull] char const *__restrict cp) -> in_addr_t {
 @@Convert Internet number in IN to ASCII representation. The return
 @@value is a pointer to an internal array containing the string
 [ATTR_WUNUSED]
-[nonnull] char *inet_ntoa(struct in_addr inaddr) {
+[[nonnull]] char *inet_ntoa(struct in_addr inaddr) {
 	static char buf[16];
 	return inet_ntoa_r(inaddr, buf);
 }
@@ -140,7 +140,7 @@ inet_addr:([nonnull] char const *__restrict cp) -> in_addr_t {
 @@Re-entrant version of `inet_ntoa()'
 [dependency_include(<netinet/in.h>)]
 [dependency_include(<hybrid/__byteswap.h>)]
-[nonnull] char *inet_ntoa_r(struct in_addr inaddr, [nonnull] char buf[16]) {
+[[nonnull]] char *inet_ntoa_r(struct in_addr inaddr, [[nonnull]] char buf[16]) {
 	uint32_t addr = __hybrid_betoh32(inaddr.@s_addr@);
 	sprintf(buf, "%u.%u.%u.%u",
 	        (unsigned int)(u8)((addr & __UINT32_C(0xff000000)) >> 24),
@@ -155,7 +155,7 @@ inet_addr:([nonnull] char const *__restrict cp) -> in_addr_t {
 @@the return value is in host-endian, rather than net-endian
 [ATTR_PURE][dependency_include(<netinet/in.h>)]
 [dependency_include(<hybrid/__byteswap.h>)]
-inet_network:([nonnull] char const *__restrict cp) -> $uint32_t {
+inet_network:([[nonnull]] char const *__restrict cp) -> $uint32_t {
 	struct @in_addr@ addr;
 	if (!inet_paton((char const **)&cp, &addr, 1) || *cp)
 		return @INADDR_NONE@;
@@ -179,8 +179,8 @@ inet_network:([nonnull] char const *__restrict cp) -> $uint32_t {
 @@    0123     (oct)
 @@@return: 0: Bad input format
 @@@return: 1: Success
-inet_aton:([nonnull] char const *__restrict cp,
-           [nonnull] struct in_addr *__restrict inp) -> int {
+inet_aton:([[nonnull]] char const *__restrict cp,
+           [[nonnull]] struct in_addr *__restrict inp) -> int {
 	return inet_paton((char const **)&cp, inp, 0) && !*cp;
 }
 
@@ -199,8 +199,8 @@ inet_aton:([nonnull] char const *__restrict cp,
 @@@return: 0: Bad input format
 @@@return: 1: Success
 [ATTR_WUNUSED][dependency_include(<hybrid/__byteswap.h>)]
-inet_paton:([nonnull] char const **__restrict pcp,
-            [nonnull] struct in_addr *__restrict inp,
+inet_paton:([[nonnull]] char const **__restrict pcp,
+            [[nonnull]] struct in_addr *__restrict inp,
             int network_addr) -> int {
 	uint32_t result;
 	uint32_t parts[4];

@@ -303,7 +303,7 @@ _calloc_dbg:($size_t count, $size_t num_bytes,
 
 [ATTR_ALLOC_SIZE((2))]
 [guard][ATTR_WUNUSED][userimpl][requires($has_function(calloc))]
-_realloc_dbg:([nullable] void *ptr, $size_t num_bytes,
+_realloc_dbg:([[nullable]] void *ptr, $size_t num_bytes,
               int block_type, char const *filename, int line) -> void * {
 	(void)block_type;
 	(void)filename;
@@ -313,7 +313,7 @@ _realloc_dbg:([nullable] void *ptr, $size_t num_bytes,
 
 [ATTR_ALLOC_SIZE((2, 3))]
 [guard][ATTR_WUNUSED][userimpl][requires($has_function(recallocv))]
-_recalloc_dbg:([nullable] void *ptr, $size_t count, $size_t num_bytes,
+_recalloc_dbg:([[nullable]] void *ptr, $size_t count, $size_t num_bytes,
                int block_type, char const *filename, int line) -> void * {
 	(void)block_type;
 	(void)filename;
@@ -323,7 +323,7 @@ _recalloc_dbg:([nullable] void *ptr, $size_t count, $size_t num_bytes,
 
 [ATTR_ALLOC_SIZE((2))]
 [guard][ATTR_WUNUSED][userimpl][requires($has_function(realloc_in_place))]
-_expand_dbg:([nonnull] void *ptr, $size_t num_bytes,
+_expand_dbg:([[nonnull]] void *ptr, $size_t num_bytes,
              int block_type, char const *filename, int line) -> void * {
 	(void)block_type;
 	(void)filename;
@@ -332,19 +332,19 @@ _expand_dbg:([nonnull] void *ptr, $size_t num_bytes,
 }
 
 [guard][userimpl][requires($has_function(free))]
-_free_dbg:([nullable] void *ptr, int block_type) {
+_free_dbg:([[nullable]] void *ptr, int block_type) {
 	(void)block_type;
 	free(ptr);
 }
 
 [guard][ATTR_WUNUSED][userimpl][requires($has_function(_msize))][ATTR_PURE]
-_msize_dbg:([nonnull] void *ptr, int block_type) -> $size_t {
+_msize_dbg:([[nonnull]] void *ptr, int block_type) -> $size_t {
 	(void)block_type;
 	return _msize(ptr);
 }
 
 [guard][ATTR_WUNUSED][userimpl][requires($has_function(_aligned_msize))][ATTR_PURE]
-_aligned_msize_dbg:([nonnull] void *ptr, $size_t min_alignment, $size_t offset) -> $size_t {
+_aligned_msize_dbg:([[nonnull]] void *ptr, $size_t min_alignment, $size_t offset) -> $size_t {
 	return _aligned_msize(ptr, min_alignment, offset);
 }
 
@@ -359,7 +359,7 @@ _aligned_malloc_dbg:($size_t num_bytes, $size_t min_alignment,
 
 [ATTR_ALLOC_SIZE((2))][ATTR_ALLOC_ALIGN(3)]
 [guard][ATTR_WUNUSED][userimpl][requires($has_function(_aligned_realloc))]
-_aligned_realloc_dbg:([nullable] void *ptr, $size_t num_bytes,
+_aligned_realloc_dbg:([[nullable]] void *ptr, $size_t num_bytes,
                       $size_t min_alignment, char const *filename, int line) -> void * {
 	(void)filename;
 	(void)line;
@@ -368,7 +368,7 @@ _aligned_realloc_dbg:([nullable] void *ptr, $size_t num_bytes,
 
 [ATTR_ALLOC_SIZE((2, 3))][ATTR_ALLOC_ALIGN(4)]
 [guard][ATTR_WUNUSED][userimpl][requires($has_function(_aligned_recalloc))]
-_aligned_recalloc_dbg:([nullable] void *ptr, $size_t count, $size_t num_bytes,
+_aligned_recalloc_dbg:([[nullable]] void *ptr, $size_t count, $size_t num_bytes,
                        $size_t min_alignment, char const *filename, int line) -> void * {
 	(void)filename;
 	(void)line;
@@ -386,7 +386,7 @@ _aligned_offset_malloc_dbg:($size_t num_bytes, $size_t min_alignment, $size_t of
 
 [ATTR_ALLOC_SIZE((2))]
 [guard][ATTR_WUNUSED][userimpl][requires($has_function(_aligned_offset_realloc))]
-_aligned_offset_realloc_dbg:([nullable] void *ptr, $size_t num_bytes,
+_aligned_offset_realloc_dbg:([[nullable]] void *ptr, $size_t num_bytes,
                              $size_t min_alignment, $size_t offset,
                              char const *filename, int line) -> void * {
 	(void)filename;
@@ -396,7 +396,7 @@ _aligned_offset_realloc_dbg:([nullable] void *ptr, $size_t num_bytes,
 
 [ATTR_ALLOC_SIZE((2, 3))]
 [guard][ATTR_WUNUSED][userimpl][requires($has_function(_aligned_offset_recalloc))]
-_aligned_offset_recalloc_dbg:([nullable] void *ptr, $size_t count,
+_aligned_offset_recalloc_dbg:([[nullable]] void *ptr, $size_t count,
                               $size_t num_bytes, $size_t min_alignment,
                               $size_t offset, char const *filename, int line) -> void * {
 	(void)filename;
@@ -405,7 +405,7 @@ _aligned_offset_recalloc_dbg:([nullable] void *ptr, $size_t count,
 }
 
 [guard][userimpl][requires($has_function(_aligned_free))]
-_aligned_free_dbg:([nullable] void *ptr) {
+_aligned_free_dbg:([[nullable]] void *ptr) {
 	_aligned_free(ptr);
 }
 
@@ -453,7 +453,7 @@ _wtempnam_dbg:(__WCHAR16_TYPE__ const *dir_name,
 
 [guard][ATTR_WUNUSED][userimpl][requires($has_function(_fullpath))]
 _fullpath_dbg:([outp_opt(bufsize)] char *full_path,
-               [nonnull] char const *path, $size_t bufsize,
+               [[nonnull]] char const *path, $size_t bufsize,
                int block_type, char const *filename, int line) -> char * {
 	(void)block_type;
 	(void)filename;
@@ -463,7 +463,7 @@ _fullpath_dbg:([outp_opt(bufsize)] char *full_path,
 
 [guard][ATTR_WUNUSED][userimpl]
 _wfullpath_dbg:([outp_opt(buflen)] __WCHAR16_TYPE__ *full_path,
-                [nonnull] __WCHAR16_TYPE__ const *path, $size_t buflen,
+                [[nonnull]] __WCHAR16_TYPE__ const *path, $size_t buflen,
                 int block_type, char const *filename, int line) -> __WCHAR16_TYPE__ * {
 	(void)block_type;
 	(void)filename;
@@ -523,8 +523,8 @@ _wgetdcwd_dbg:(int driveno, [outp_opt(buflen)] __WCHAR16_TYPE__ *buf,
 [guard][ATTR_WUNUSED] _wgetdcwd_lk_dbg:(int driveno, [outp_opt(buflen)] __WCHAR16_TYPE__ *buf, __STDC_INT_AS_SIZE_T buflen, int block_type, char const *filename, int line) -> __WCHAR16_TYPE__ * = _wgetdcwd_dbg;
 
 [guard][attribute(@_Check_return_wat_@)][userimpl][requires($has_function(_dupenv_s))]
-_dupenv_s_dbg:([nullable] char **pbuf, [nullable] $size_t *pbufsize,
-               [nonnull] char const *varname,
+_dupenv_s_dbg:([[nullable]] char **pbuf, [[nullable]] $size_t *pbufsize,
+               [[nonnull]] char const *varname,
                int block_type, char const *filename, int line) -> $errno_t {
 	(void)block_type;
 	(void)filename;
@@ -533,8 +533,8 @@ _dupenv_s_dbg:([nullable] char **pbuf, [nullable] $size_t *pbufsize,
 }
 
 [guard][attribute(@_Check_return_wat_@)][userimpl]
-_wdupenv_s_dbg:([nullable] __WCHAR16_TYPE__ **pbuf, [nullable] $size_t *pbuflen,
-                [nonnull] __WCHAR16_TYPE__ const *varname,
+_wdupenv_s_dbg:([[nullable]] __WCHAR16_TYPE__ **pbuf, [[nullable]] $size_t *pbuflen,
+                [[nonnull]] __WCHAR16_TYPE__ const *varname,
                 int block_type, char const *filename, int line) -> $errno_t {
 	(void)block_type;
 	(void)filename;
@@ -553,7 +553,7 @@ _CrtCheckMemory:() -> int {
 }
 
 [userimpl]
-_CrtDoForAllClientObjects:([nonnull] _PFNCRTDOFORALLCLIENTOBJECTS pfn, void *context) {
+_CrtDoForAllClientObjects:([[nonnull]] _PFNCRTDOFORALLCLIENTOBJECTS pfn, void *context) {
 	COMPILER_IMPURE();
 	(void)pfn;
 	(void)context;
@@ -576,8 +576,8 @@ _CrtIsValidHeapPointer:(void const *heap_ptr) -> int {
 
 [userimpl]
 _CrtIsMemoryBlock:(void const *ptr, __STDC_UINT_AS_SIZE_T num_bytes,
-                   [nullable] __LONG32_TYPE__ *prequest_number,
-                   [nullable] char **filename, [nullable] int *line) -> int {
+                   [[nullable]] __LONG32_TYPE__ *prequest_number,
+                   [[nullable]] char **filename, [[nullable]] int *line) -> int {
 	(void)ptr;
 	(void)num_bytes;
 	if (prequest_number)
@@ -596,14 +596,14 @@ _CrtReportBlockType:(void const *ptr) -> int {
 }
 
 [userimpl]
-_CrtMemCheckpoint:([nonnull] /*out*/ _CrtMemState *state) {
+_CrtMemCheckpoint:([[nonnull]] /*out*/ _CrtMemState *state) {
 	memset(state, 0, sizeof(*state));
 }
 
 [userimpl]
-_CrtMemDifference:([nonnull] /*out*/ _CrtMemState *state,
-                   [nonnull] _CrtMemState const *old_state,
-                   [nonnull] _CrtMemState const *new_state) -> int {
+_CrtMemDifference:([[nonnull]] /*out*/ _CrtMemState *state,
+                   [[nonnull]] _CrtMemState const *old_state,
+                   [[nonnull]] _CrtMemState const *new_state) -> int {
 	(void)old_state;
 	(void)new_state;
 	memset(state, 0, sizeof(*state));
@@ -611,13 +611,13 @@ _CrtMemDifference:([nonnull] /*out*/ _CrtMemState *state,
 }
 
 [userimpl]
-_CrtMemDumpAllObjectsSince:([nonnull] _CrtMemState const *state) {
+_CrtMemDumpAllObjectsSince:([[nonnull]] _CrtMemState const *state) {
 	COMPILER_IMPURE();
 	(void)state;
 }
 
 [userimpl]
-_CrtMemDumpStatistics:([nonnull] _CrtMemState const *state) {
+_CrtMemDumpStatistics:([[nonnull]] _CrtMemState const *state) {
 	COMPILER_IMPURE();
 	(void)state;
 }

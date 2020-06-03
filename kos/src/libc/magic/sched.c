@@ -38,7 +38,9 @@
 
 __SYSDECL_BEGIN
 
-#ifdef __USE_GNU
+}
+%#ifdef __USE_GNU
+%{
 
 #ifdef __CC__
 typedef __cpu_set_t cpu_set_t;
@@ -76,8 +78,9 @@ typedef __cpu_set_t cpu_set_t;
 #define CPU_ALLOC(count)                              __CPU_ALLOC(count)
 #define CPU_FREE(cpuset)                               __CPU_FREE(cpuset)
 
-#ifdef __CC__
 }
+%#ifdef __CC__
+
 
 %[default_impl_section(.text.crt.sched.param)]
 sched_setparam:($pid_t pid, struct sched_param const *param) -> int;
@@ -103,7 +106,7 @@ sched_getaffinity:($pid_t pid, $size_t cpusetsize, cpu_set_t *cpuset) -> int;
 [ignore]
 sched_rr_get_interval32:($pid_t pid, struct $timespec32 *tms) -> int = sched_rr_get_interval?;
 
-[noexport]
+[noexport, no_crt_self_import]
 [if(defined(__USE_TIME_BITS64)), preferred_alias(sched_rr_get_interval64)]
 [if(!defined(__USE_TIME_BITS64)), preferred_alias(sched_rr_get_interval)]
 [requires($has_function(sched_rr_get_interval32) ||
@@ -140,9 +143,9 @@ sched_rr_get_interval64:($pid_t pid, struct $timespec64 *tms) -> int {
 %#endif /* __USE_TIME64 */
 
 
+%#endif /* __CC__ */
+%#endif /* __USE_GNU */
 %{
-#endif /* __CC__ */
-#endif /* __USE_GNU */
 
 __SYSDECL_END
 

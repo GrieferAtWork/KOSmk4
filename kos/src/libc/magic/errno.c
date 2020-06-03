@@ -20,7 +20,6 @@
 
 %[define_replacement(errno_t = __errno_t)]
 %[default_impl_section(.text.crt.errno.utility)]
-%[define_ccompat_header(cerrno)]
 
 %[define_replacement(EPERM           = __EPERM)]           /* Operation not permitted */
 %[define_replacement(ENOENT          = __ENOENT)]          /* No such file or directory */
@@ -692,9 +691,11 @@ typedef __errno_t errno_t;
 #define errno __errno
 #else /* __errno */
 }
-[guard][alias(_errno, __errno)][ATTR_WUNUSED]
-[ATTR_CONST][section(.text.crt.errno_access)]
-__errno_location:() -> [nonnull] $errno_t *;
+
+[[guard, alias(_errno, __errno), ATTR_WUNUSED]]
+[[ATTR_CONST, section(.text.crt.errno_access)]]
+[[nonnull]] $errno_t *__errno_location();
+
 %{
 #ifdef ____errno_location_defined
 #define errno     (*__errno_location())
@@ -766,8 +767,8 @@ __LIBC char *__progname;
 #else /* ... */
 }
 @@Alias for `strchr(argv[0], '/') ? strchr(argv[0], '/') + 1 : argv[0]', as passed to main()
-[guard][ATTR_WUNUSED][ATTR_CONST]
-__p_program_invocation_short_name:() -> [nonnull] char **;
+[[guard, ATTR_WUNUSED, ATTR_CONST]]
+[[nonnull]] char **__p_program_invocation_short_name();
 %{
 #ifdef ____p__pgmptr_defined
 #define program_invocation_name (*__p__pgmptr())

@@ -74,7 +74,7 @@ sl_init:() -> struct _stringlist * {
 @@Append a given `NAME' to `SL'. `NAME' is considered
 @@inherited if the StringList is destroyed with `1'
 [requires($has_function(realloc))][decl_prefix(DEFINE_STRINGLIST)][userimpl]
-sl_add:([nonnull] struct _stringlist *sl, [nonnull] char *name) -> int {
+sl_add:([[nonnull]] struct _stringlist *sl, [[nonnull]] char *name) -> int {
 	if unlikely(sl->@sl_cur@ >= sl->@sl_max@) {
 		char **new_vector;
 		size_t new_alloc;
@@ -94,7 +94,7 @@ sl_add:([nonnull] struct _stringlist *sl, [nonnull] char *name) -> int {
 @@string pointers (as previously added with `sl_add()') will also
 @@be `free(3)'ed.
 [requires($has_function(free))][decl_prefix(DEFINE_STRINGLIST)][userimpl]
-sl_free:([nullable] struct _stringlist *sl, int all) {
+sl_free:([[nullable]] struct _stringlist *sl, int all) {
 	if unlikely(!sl)
 		return;
 	if likely(sl->@sl_str@) {
@@ -113,8 +113,8 @@ sl_free:([nullable] struct _stringlist *sl, int all) {
 @@pointer originally passed to `sl_add()' to insert that string).
 @@If `SL' doesn't contain an equivalent string, return `NULL' instead.
 [decl_prefix(DEFINE_STRINGLIST)][userimpl][ATTR_PURE]
-sl_find:([nonnull] struct _stringlist __KOS_FIXED_CONST *sl,
-         [nonnull] char const *name) -> [nullable] char * {
+sl_find:([[nonnull]] struct _stringlist __KOS_FIXED_CONST *sl,
+         [[nonnull]] char const *name) -> [[nullable]] char * {
 	size_t i;
 	for (i = 0; i < sl->@sl_cur@; ++i) {
 		char *s = sl->@sl_str@[i];

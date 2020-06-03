@@ -20,16 +20,5 @@
  */
 #ifndef _CXX_CERRNO
 #define _CXX_CERRNO 1
-#ifndef _ERRNO_H
-#ifdef __CXX_SYSTEM_HEADER
 #include "errno.h"
-#else /* __CXX_SYSTEM_HEADER */
-#include "features.h"
-#ifndef __USE_BROKEN_CCOMPAT
-#define __CXX_SYSTEM_HEADER 1
-#endif /* !__USE_BROKEN_CCOMPAT */
-#include "errno.h"
-#undef __CXX_SYSTEM_HEADER
-#endif /* !__CXX_SYSTEM_HEADER */
-#endif /* !_ERRNO_H */
 #endif /* !_CXX_CERRNO */

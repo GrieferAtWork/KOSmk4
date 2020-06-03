@@ -320,6 +320,8 @@ done:
 							++i;
 						} else if (nextCh == endCh) {
 							break;
+						} else if (nextCh.islf()) {
+							errAt(start, "String literal terminated by new-line");
 						}
 						if (i >= end)
 							errAt(start, "Incomplete string literal");

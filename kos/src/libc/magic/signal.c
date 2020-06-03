@@ -241,7 +241,7 @@ sigpause:(int signo)-> int = __xpg_sigpause?;
 kill:($pid_t pid, int signo) -> int;
 
 [decl_include(<bits/sigset.h>)]
-sigemptyset:([nonnull] sigset_t *set) -> int {
+sigemptyset:([[nonnull]] sigset_t *set) -> int {
 	size_t cnt;
 	cnt = sizeof(__sigset_t) / sizeof(ulongptr_t);
 	while (cnt--)
@@ -249,7 +249,7 @@ sigemptyset:([nonnull] sigset_t *set) -> int {
 	return 0;
 }
 [decl_include(<bits/sigset.h>)]
-sigfillset:([nonnull] sigset_t *set) -> int {
+sigfillset:([[nonnull]] sigset_t *set) -> int {
 	size_t cnt;
 	cnt = sizeof(__sigset_t) / sizeof(ulongptr_t);
 	while (cnt--)
@@ -259,7 +259,7 @@ sigfillset:([nonnull] sigset_t *set) -> int {
 
 @@@param signo: One of `SIG*'
 [decl_include(<bits/sigset.h>)][alias(__sigaddset)]
-sigaddset:([nonnull] sigset_t *set, int signo) -> int {
+sigaddset:([[nonnull]] sigset_t *set, int signo) -> int {
 	ulongptr_t mask = @__sigmask@(signo);
 	ulongptr_t word = @__sigword@(signo);
 	set->@__val@[word] |= mask;
@@ -268,7 +268,7 @@ sigaddset:([nonnull] sigset_t *set, int signo) -> int {
 
 @@@param signo: One of `SIG*'
 [decl_include(<bits/sigset.h>)][alias(__sigdelset)]
-sigdelset:([nonnull] sigset_t *set, int signo) -> int {
+sigdelset:([[nonnull]] sigset_t *set, int signo) -> int {
 	ulongptr_t mask = @__sigmask@(signo);
 	ulongptr_t word = @__sigword@(signo);
 	set->@__val@[word] &= ~mask;
@@ -278,7 +278,7 @@ sigdelset:([nonnull] sigset_t *set, int signo) -> int {
 @@@param signo: One of `SIG*'
 [decl_include(<bits/sigset.h>)]
 [ATTR_WUNUSED][ATTR_PURE][alias(__sigismember)]
-sigismember:([nonnull] sigset_t const *set, int signo) -> int {
+sigismember:([[nonnull]] sigset_t const *set, int signo) -> int {
 	ulongptr_t mask = @__sigmask@(signo);
 	ulongptr_t word = @__sigword@(signo);
 	return (set->@__val@[word] & mask) != 0;
@@ -288,20 +288,20 @@ sigismember:([nonnull] sigset_t const *set, int signo) -> int {
 sigprocmask:(int how, sigset_t const *__restrict set, sigset_t *__restrict oset) -> int;
 
 [cp][export_alias(__sigsuspend)]
-sigsuspend:([nonnull] sigset_t const *set) -> int;
+sigsuspend:([[nonnull]] sigset_t const *set) -> int;
 
 @@@param signo: One of `SIG*'
 [export_alias(__sigaction)]
 sigaction:(int signo, struct sigaction const *__restrict act, struct sigaction *__restrict oact) -> int;
 
-sigpending:([nonnull] sigset_t *set) -> int;
+sigpending:([[nonnull]] sigset_t *set) -> int;
 
 @@@param signo: One of `SIG*'
-[cp] sigwait:([nonnull] sigset_t const *__restrict set, [nonnull] int *__restrict signo) -> int;
+[cp] sigwait:([[nonnull]] sigset_t const *__restrict set, [[nonnull]] int *__restrict signo) -> int;
 
 %#ifdef __USE_GNU
 [decl_include(<bits/sigset.h>)][ATTR_WUNUSED][ATTR_PURE]
-sigisemptyset:([nonnull] sigset_t const *set) -> int {
+sigisemptyset:([[nonnull]] sigset_t const *set) -> int {
 	size_t i;
 	for (i = 0; i < sizeof(sigset_t) / sizeof(ulongptr_t); ++i)
 		if (set->@__val@[i])
@@ -309,9 +309,9 @@ sigisemptyset:([nonnull] sigset_t const *set) -> int {
 	return 1;
 }
 [decl_include(<bits/sigset.h>)]
-sigandset:([nonnull] sigset_t *set,
-           [nonnull] sigset_t const *left,
-           [nonnull] sigset_t const *right) -> int {
+sigandset:([[nonnull]] sigset_t *set,
+           [[nonnull]] sigset_t const *left,
+           [[nonnull]] sigset_t const *right) -> int {
 	size_t i;
 	for (i = 0; i < sizeof(__sigset_t) / sizeof(ulongptr_t); ++i)
 		set->@__val@[i] = left->@__val@[i] & right->@__val@[i];
@@ -319,9 +319,9 @@ sigandset:([nonnull] sigset_t *set,
 }
 
 [decl_include(<bits/sigset.h>)]
-sigorset:([nonnull] sigset_t *set,
-          [nonnull] sigset_t const *left,
-          [nonnull] sigset_t const *right) -> int {
+sigorset:([[nonnull]] sigset_t *set,
+          [[nonnull]] sigset_t const *left,
+          [[nonnull]] sigset_t const *right) -> int {
 	size_t i;
 	for (i = 0; i < sizeof(__sigset_t) / sizeof(ulongptr_t); ++i)
 		set->@__val@[i] = left->@__val@[i] | right->@__val@[i];
@@ -330,18 +330,18 @@ sigorset:([nonnull] sigset_t *set,
 %#endif /* __USE_GNU */
 
 %#ifdef __USE_POSIX199309
-[cp] sigwaitinfo:([nonnull] sigset_t const *__restrict set, [nullable] siginfo_t *__restrict info) -> int;
+[cp] sigwaitinfo:([[nonnull]] sigset_t const *__restrict set, [[nullable]] siginfo_t *__restrict info) -> int;
 
 [cp][ignore]
-sigtimedwait32:([nonnull] sigset_t const *__restrict set, [nullable] siginfo_t *__restrict info, [nullable] struct $timespec32 const *timeout) -> int = sigtimedwait?;
+sigtimedwait32:([[nonnull]] sigset_t const *__restrict set, [[nullable]] siginfo_t *__restrict info, [[nullable]] struct $timespec32 const *timeout) -> int = sigtimedwait?;
 
-[cp][noexport]
+[cp][no_crt_self_import]
 [if(defined(__USE_TIME_BITS64)), preferred_alias(sigtimedwait64)]
 [if(!defined(__USE_TIME_BITS64)), preferred_alias(sigtimedwait)]
-[requires(defined(__CRT_HAVE_sigtimedwait) || defined(__CRT_HAVE_sigtimedwait64))]
-sigtimedwait:([nonnull] sigset_t const *__restrict set,
-              [nullable] siginfo_t *__restrict info,
-              [nullable] struct timespec const *timeout) -> int {
+[userimpl, requires(defined(__CRT_HAVE_sigtimedwait) || defined(__CRT_HAVE_sigtimedwait64))]
+sigtimedwait:([[nonnull]] sigset_t const *__restrict set,
+              [[nullable]] siginfo_t *__restrict info,
+              [[nullable]] struct timespec const *timeout) -> int {
 #ifdef __CRT_HAVE_sigtimedwait64
 	struct timespec64 tmv;
 	if (!timeout)
@@ -366,9 +366,9 @@ sigqueue:($pid_t pid, int signo, union sigval const val) -> int;
 
 [time64_variant_of(sigtimedwait)]
 [cp][noexport][requires(defined(__CRT_HAVE_sigtimedwait))]
-sigtimedwait64:([nonnull] sigset_t const *__restrict set,
-                [nullable] siginfo_t *__restrict info,
-                [nullable] struct $timespec64 const *timeout) -> int {
+sigtimedwait64:([[nonnull]] sigset_t const *__restrict set,
+                [[nullable]] siginfo_t *__restrict info,
+                [[nullable]] struct $timespec64 const *timeout) -> int {
 	struct timespec32 tmv;
 	if (!timeout)
 		return sigtimedwait32(set, info, NULL);

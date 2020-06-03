@@ -25,6 +25,7 @@ import * from collections;
 import functools;
 
 #define UserString Object  /* UserString from .parser */
+global CWriter;
 
 /* CGenerator part IDs */
 global final CGP_STRING  = 0; /* +string | +File.Writer */
@@ -341,8 +342,9 @@ class IfDefStackEntry {
 	public member encounteredElse: bool = false; /* ppElse() was called */
 	public member encounteredIf0: bool = false;  /* m_IfdefDead was incremented because of ppElif("0") or ppIf("0") */
 	public member encounteredIf1: bool = false;  /* didWriteElse is true because of ppElif("1") or ppIf("1") */
-	public member includedHeaders: {string...} = HashSet(); /* Set of header names known to have been included */
+	public member printedPrefixes: {string...} = HashSet(); /* Set of prefix strings that have already been printed. */
 }
+
 
 
 @@Helper class for generating C code
@@ -381,34 +383,6 @@ class CWriter {
 
 	@@Stack of active #if-directives
 	private member m_IfdefStack: {IfDefStackEntry...} = [];
-	@@Set of header included at the global scope
-	private member m_GlobalHeaderIncludes: {string...} = HashSet();
-
-	@@Check if a given @header was already included
-	public function wasHeaderAlreadyIncluded(header: string): bool {
-		for (local ste: m_IfdefStack) {
-			if (header in ste.includedHeaders)
-				return true;
-		}
-		return header in m_GlobalHeaderIncludes;
-	}
-
-	@@Check if all of the given headers were already included
-	public function wereAllHeadersAlreadyIncluded(headers: {string...}): bool {
-		for (local h: headers) {
-			if (!wasHeaderAlreadyIncluded(h))
-				return false;
-		}
-		return true;
-	}
-
-	@@Remember the inclusion of a given @header
-	private function f_RememberHeaderAlreadyIncluded(header: string) {
-		local set = m_IfdefStack
-			? m_IfdefStack.last.includedHeaders
-			: m_GlobalHeaderIncludes;
-		set.insert(header);
-	}
 
 	@@Non-zero if no text should current be emit
 	private member m_IfdefDead: int = 0;
@@ -498,7 +472,7 @@ dont_emit_branch:
 					ent.cond = "!({})".format({ ent.cond });
 				}
 				generator.addPpElse(condText);
-				ent.includedHeaders.clear();
+				ent.printedPrefixes.clear();
 			}
 			goto done;
 		}
@@ -516,7 +490,7 @@ dont_emit_branch:
 			if (generator.addForceNl())
 				result = 2;
 			generator.addPpElif(cond);
-			ent.includedHeaders.clear();
+			ent.printedPrefixes.clear();
 			/* Delete the saved condition so that "..."
 			 * will appear as comment in generated code. */
 			ent.cond = none;
@@ -572,21 +546,6 @@ done:
 		return ppIf("!defined({})".format({ macroName }));
 	}
 
-	public function ppInclude(header: string): CWriter {
-		if (m_IfdefDead)
-			goto done;
-		/* Include include some given header once, based on that header
-		 * having previously been #included at the current, or some
-		 * previous #ifdef-stack-level */
-		if (wasHeaderAlreadyIncluded(header))
-			return;
-		f_RememberHeaderAlreadyIncluded(header);
-		generator.addForceNl();
-		generator.addPrinter << "#include " << header << "\n";
-done:
-		return this;
-	}
-
 	public function ppUndef(macroName: string): CWriter {
 		if (m_IfdefDead)
 			goto done;
@@ -617,6 +576,63 @@ done:
 		return this;
 	}
 
+	@@Set of prefix strings printed at the global scope
+	private member m_GlobalPrintedPrefixes: {string...} = HashSet();
+
+	@@Check if a given @prefix was already printed
+	public function wasPrefixPrinted(prefix: string): bool {
+		for (local ste: m_IfdefStack) {
+			if (prefix in ste.printedPrefixes)
+				return true;
+		}
+		return prefix in m_GlobalPrintedPrefixes;
+	}
+
+	@@Check if all of the given prefixes were already printed
+	public function wereAllPrefixesAlreadyPrinted(prefixes: {string...}): bool {
+		for (local p: prefixes) {
+			if (!wasPrefixPrinted(p))
+				return false;
+		}
+		return true;
+	}
+
+	@@Check if all of the given prefixes were already printed
+	public function printPrefix(prefix: string): CWriter {
+		if (!wasPrefixPrinted(prefix)) {
+			f_RememberPrefixAlreadyPrinted(prefix);
+			generator.addForceNl();
+			generator.addPrinter << prefix;
+		}
+		return this;
+	}
+
+	public function ppInclude(header: string): CWriter {
+		return printPrefix("#include {}\n".format({ header }));
+	}
+
+	@@Check if a given @header was already included
+	public function wasHeaderAlreadyIncluded(header: string): bool {
+		return wasPrefixPrinted("#include {}\n".format({ header }));
+	}
+
+	@@Check if all of the given headers were already included
+	public function wereAllHeadersAlreadyIncluded(headers: {string...}): bool {
+		for (local h: headers) {
+			if (!wasHeaderAlreadyIncluded(h))
+				return false;
+		}
+		return true;
+	}
+
+	@@Remember the inclusion of a given @header
+	private function f_RememberPrefixAlreadyPrinted(prefix: string) {
+		local set = m_IfdefStack
+			? m_IfdefStack.last.printedPrefixes
+			: m_GlobalPrintedPrefixes;
+		set.insert(prefix);
+	}
+
 	@@Print @text as a C or C++ comment, preferring C comments.
 	public function printComment(text: string): CWriter {
 		generator.addForceNl();
@@ -624,7 +640,8 @@ done:
 		text = text.rstrip();
 		if ("*/" in text) {
 			/* Must use //-style comments (ugh... I don't like those.
-			 * Why? Because those can't be parsed in reverse, where-as / * ... * / can be...) */
+			 * Why? Because those can't be parsed in reverse,
+			 *      where-as / * ... * / can be...) */
 			for (local l: text.splitlines(false)) {
 				l = l.rstrip();
 				if (!l) {

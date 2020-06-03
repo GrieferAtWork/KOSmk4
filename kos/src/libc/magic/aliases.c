@@ -99,19 +99,19 @@ endaliasent:();
 
 @@Get the next entry from the alias data base and put it in RESULT_BUF
 [cp_kos] getaliasent_r:(
-	[nonnull] struct aliasent *__restrict result_buf,
-	[nonnull] char *__restrict buffer, size_t buflen,
-	[nonnull] struct aliasent **__restrict result) -> int;
+	[[nonnull]] struct aliasent *__restrict result_buf,
+	[[nonnull]] char *__restrict buffer, size_t buflen,
+	[[nonnull]] struct aliasent **__restrict result) -> int;
 
 @@Get alias entry corresponding to NAME
-[cp_kos] getaliasbyname:([nonnull] char const *name) -> struct aliasent *;
+[cp_kos] getaliasbyname:([[nonnull]] char const *name) -> struct aliasent *;
 
 @@Get alias entry corresponding to NAME and put it in RESULT_BUF
 [cp_kos] getaliasbyname_r:(
-	[nonnull] char const *__restrict name,
-	[nonnull] struct aliasent *__restrict result_buf,
-	[nonnull] char *__restrict buffer, size_t buflen,
-	[nonnull] struct aliasent **__restrict result) -> int;
+	[[nonnull]] char const *__restrict name,
+	[[nonnull]] struct aliasent *__restrict result_buf,
+	[[nonnull]] char *__restrict buffer, size_t buflen,
+	[[nonnull]] struct aliasent **__restrict result) -> int;
 
 
 

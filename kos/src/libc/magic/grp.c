@@ -96,7 +96,7 @@ __NAMESPACE_STD_USING(FILE)
 [cp] getgrgid:($gid_t gid) -> struct group *;
 
 @@Search for an entry with a matching group name
-[cp] getgrnam:([nonnull] char const *__restrict name) -> struct group *;
+[cp] getgrnam:([[nonnull]] char const *__restrict name) -> struct group *;
 
 %
 %#if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
@@ -113,44 +113,44 @@ __NAMESPACE_STD_USING(FILE)
 %
 %#ifdef __USE_GNU
 @@Write the given entry onto the given stream
-[cp] putgrent:([nonnull] struct group const *__restrict entry,
-               [nonnull] $FILE *__restrict stream) -> int;
+[cp] putgrent:([[nonnull]] struct group const *__restrict entry,
+               [[nonnull]] $FILE *__restrict stream) -> int;
 %#endif /* __USE_GNU */
 
 %
 %#ifdef __USE_POSIX
 [doc_alias(getgrgid)][cp]
-getgrgid_r:($gid_t gid, [nonnull] struct group *__restrict resultbuf,
+getgrgid_r:($gid_t gid, [[nonnull]] struct group *__restrict resultbuf,
             [outp(buflen)] char *__restrict buffer, size_t buflen,
-            [nonnull] struct group **__restrict result) -> int;
+            [[nonnull]] struct group **__restrict result) -> int;
 [doc_alias(getgrnam)][cp]
-getgrnam_r:([nonnull] char const *__restrict name,
-            [nonnull] struct group *__restrict resultbuf,
+getgrnam_r:([[nonnull]] char const *__restrict name,
+            [[nonnull]] struct group *__restrict resultbuf,
             [outp(buflen)] char *__restrict buffer, size_t buflen,
-            [nonnull] struct group **__restrict result) -> int;
+            [[nonnull]] struct group **__restrict result) -> int;
 
 %
 %#ifdef __USE_GNU
 [doc_alias(getgrent)][cp]
-getgrent_r:([nonnull] struct group *__restrict resultbuf,
+getgrent_r:([[nonnull]] struct group *__restrict resultbuf,
             [outp(buflen)] char *__restrict buffer, size_t buflen,
-            [nonnull] struct group **__restrict result) -> int;
+            [[nonnull]] struct group **__restrict result) -> int;
 %#endif /* __USE_GNU */
 
 %
 %#ifdef __USE_MISC
 [doc_alias(fgetgrent)][cp]
-fgetgrent_r:([nonnull] $FILE *__restrict stream,
-             [nonnull] struct group *__restrict resultbuf,
+fgetgrent_r:([[nonnull]] $FILE *__restrict stream,
+             [[nonnull]] struct group *__restrict resultbuf,
              [outp(buflen)] char *__restrict buffer, size_t buflen,
-             [nonnull] struct group **__restrict result) -> int;
+             [[nonnull]] struct group **__restrict result) -> int;
 %#endif /* __USE_MISC */
 %#endif /* __USE_POSIX */
 
 %
 %#ifdef __USE_MISC
 @@Read a group entry from STREAM
-[cp] fgetgrent:([nonnull] $FILE *__restrict stream) -> struct group *;
+[cp] fgetgrent:([[nonnull]] $FILE *__restrict stream) -> struct group *;
 
 @@Set the group set for the current user to GROUPS (N of them)
 [cp] setgroups:(size_t count, [inp_opt(count)] $gid_t const *groups) -> int;
@@ -158,13 +158,13 @@ fgetgrent_r:([nonnull] $FILE *__restrict stream,
 @@Store at most *NGROUPS members of the group set for USER into
 @@*GROUPS. Also include GROUP. The actual number of groups found is
 @@returned in *NGROUPS.  Return -1 if the if *NGROUPS is too small
-[cp] getgrouplist:([nonnull] char const *user, $gid_t group,
-                   [outp(*ngroups)] $gid_t *groups, [nonnull] int *ngroups) -> int;
+[cp] getgrouplist:([[nonnull]] char const *user, $gid_t group,
+                   [outp(*ngroups)] $gid_t *groups, [[nonnull]] int *ngroups) -> int;
 
 @@Initialize the group set for the current user
 @@by reading the group database and using all groups
 @@of which USER is a member. Also include GROUP.
-[cp] initgroups:([nonnull] char const *user, $gid_t group) -> int;
+[cp] initgroups:([[nonnull]] char const *user, $gid_t group) -> int;
 %#endif /* __USE_MISC */
 
 

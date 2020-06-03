@@ -30,7 +30,7 @@ __SYSDECL_BEGIN
 #ifdef __CC__
 }
 
-[cp] sysinfo:([nonnull] struct sysinfo *info) -> int;
+[cp] sysinfo:([[nonnull]] struct sysinfo *info) -> int;
 [cp][ATTR_WUNUSED] get_nprocs_conf:() -> int;
 [cp][ATTR_WUNUSED] get_nprocs:() -> int;
 [cp][ATTR_WUNUSED] get_phys_pages:() -> __INTPTR_TYPE__;

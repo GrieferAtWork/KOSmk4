@@ -61,21 +61,21 @@ __SYSDECL_BEGIN
 [cp_kos][section(.text.crt.io.tty)] login_tty:($fd_t fd) -> int;
 
 @@Write the given entry into utmp and wtmp
-[cp_kos] login:([nonnull] struct utmp const *entry);
+[cp_kos] login:([[nonnull]] struct utmp const *entry);
 
 @@Write the utmp entry to say the user on UT_LINE has logged out
-[cp_kos] logout:([nonnull] char const *ut_line) -> int;
+[cp_kos] logout:([[nonnull]] char const *ut_line) -> int;
 
 @@Append to wtmp an entry for the current time and the given info
-[cp_kos] logwtmp:([nonnull] char const *ut_line,
-                  [nonnull] char const *ut_name,
-                  [nonnull] char const *ut_host);
+[cp_kos] logwtmp:([[nonnull]] char const *ut_line,
+                  [[nonnull]] char const *ut_name,
+                  [[nonnull]] char const *ut_host);
 
 @@Append entry UTMP to the wtmp-like file WTMP_FILE
-[cp_kos] updwtmp:([nonnull] char const *wtmp_file, [nonnull] struct utmp const *utmp);
+[cp_kos] updwtmp:([[nonnull]] char const *wtmp_file, [[nonnull]] struct utmp const *utmp);
 
 @@Change name of the utmp file to be examined
-[cp_kos] utmpname:([nonnull] char const *file) -> int;
+[cp_kos] utmpname:([[nonnull]] char const *file) -> int;
 
 @@Read next entry from a utmp-like file
 [cp_kos] getutent:() -> struct utmp *;
@@ -88,25 +88,25 @@ endutent:();
 
 @@Search forward from the current point in the utmp file
 @@until the next entry with a ut_type matching ID->ut_type
-[cp_kos] getutid:([nonnull] struct utmp const *id) -> struct utmp *;
+[cp_kos] getutid:([[nonnull]] struct utmp const *id) -> struct utmp *;
 
 @@Search forward from the current point in the utmp file
 @@until the next entry with a ut_line matching LINE->ut_line
-[cp_kos] getutline:([nonnull] struct utmp const *line) -> struct utmp *;
+[cp_kos] getutline:([[nonnull]] struct utmp const *line) -> struct utmp *;
 
 @@Write out entry pointed to by UTMP_PTR into the utmp file
-[cp_kos] pututline:([nonnull] struct utmp const *utmp_ptr) -> struct utmp *;
+[cp_kos] pututline:([[nonnull]] struct utmp const *utmp_ptr) -> struct utmp *;
 
 %
 %#ifdef __USE_MISC
 @@Reentrant versions of the file for handling utmp files
-[cp_kos] getutent_r:([nonnull] struct utmp *buffer, [nonnull] struct utmp **result) -> int;
+[cp_kos] getutent_r:([[nonnull]] struct utmp *buffer, [[nonnull]] struct utmp **result) -> int;
 [cp_kos][doc_alias(getutent_r)]
-getutid_r:([nonnull] struct utmp const *id, [nonnull] struct utmp *buffer, [nonnull] struct utmp **result) -> int;
+getutid_r:([[nonnull]] struct utmp const *id, [[nonnull]] struct utmp *buffer, [[nonnull]] struct utmp **result) -> int;
 [cp_kos][doc_alias(getutent_r)]
-getutline_r:([nonnull] struct utmp const *line,
-             [nonnull] struct utmp *buffer,
-             [nonnull] struct utmp **result) -> int;
+getutline_r:([[nonnull]] struct utmp const *line,
+             [[nonnull]] struct utmp *buffer,
+             [[nonnull]] struct utmp **result) -> int;
 %#endif /* __USE_MISC */
 
 

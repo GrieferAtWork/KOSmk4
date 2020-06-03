@@ -72,45 +72,45 @@ enum {
 @@Set the attribute NAME of the file pointed to by PATH to VALUE
 @@(which is SIZE bytes long). Return 0 on success, -1 for errors
 @@@param: flags: 0, or a one of `XATTR_*'
-[cp] setxattr:([nonnull] char const *path, [nonnull] char const *name,
+[cp] setxattr:([[nonnull]] char const *path, [[nonnull]] char const *name,
                [inp(bufsize)] void const *buf, size_t bufsize, int flags) -> int;
 
 @@Set the attribute NAME of the file pointed to by PATH to VALUE (which is
 @@SIZE bytes long), not following symlinks for the last pathname component.
 @@Return 0 on success, -1 for errors
 @@@param: flags: 0, or a one of `XATTR_*'
-[cp] lsetxattr:([nonnull] char const *path, [nonnull] char const *name,
+[cp] lsetxattr:([[nonnull]] char const *path, [[nonnull]] char const *name,
                 [inp(bufsize)] void const *buf, size_t bufsize, int flags) -> int;
 
 @@Set the attribute NAME of the file descriptor FD to VALUE
 @@(which is SIZE bytes long). Return 0 on success, -1 for errors
 @@@param: flags: 0, or a one of `XATTR_*'
-[cp] fsetxattr:($fd_t fd, [nonnull] char const *name,
+[cp] fsetxattr:($fd_t fd, [[nonnull]] char const *name,
                 [inp(bufsize)] void const *buf, size_t bufsize, int flags) -> int;
 
 @@Get the attribute NAME of the file pointed to by PATH to VALUE
 @@(which is SIZE bytes long). Return 0 on success, -1 for errors
-[cp] getxattr:([nonnull] char const *path, [nonnull] char const *name,
+[cp] getxattr:([[nonnull]] char const *path, [[nonnull]] char const *name,
 			   [outp(bufsize)] void *buf, size_t bufsize) -> ssize_t;
 
 @@Get the attribute NAME of the file pointed to by PATH to VALUE (which is
 @@SIZE bytes long), not following symlinks for the last pathname component.
 @@Return 0 on success, -1 for errors
-[cp] lgetxattr:([nonnull] char const *path, [nonnull] char const *name, [outp(bufsize)] void *buf, size_t bufsize) -> ssize_t;
+[cp] lgetxattr:([[nonnull]] char const *path, [[nonnull]] char const *name, [outp(bufsize)] void *buf, size_t bufsize) -> ssize_t;
 
 @@Get the attribute NAME of the file descriptor FD to VALUE
 @@(which is SIZE bytes long). Return 0 on success, -1 for errors
-[cp] fgetxattr:($fd_t fd, [nonnull] char const *name, [outp(bufsize)] void *buf, size_t bufsize) -> ssize_t;
+[cp] fgetxattr:($fd_t fd, [[nonnull]] char const *name, [outp(bufsize)] void *buf, size_t bufsize) -> ssize_t;
 
 @@List attributes of the file pointed to by PATH into the
 @@user-supplied buffer LIST (which is SIZE bytes big).
 @@Return 0 on success, -1 for errors
-[cp] listxattr:([nonnull] char const *path, [outp(listbufsize)] char *listbuf, size_t listbufsize) -> ssize_t;
+[cp] listxattr:([[nonnull]] char const *path, [outp(listbufsize)] char *listbuf, size_t listbufsize) -> ssize_t;
 
 @@List attributes of the file pointed to by PATH into the user-supplied
 @@buffer LIST (which is SIZE bytes big), not following symlinks for the
 @@last pathname component. Return 0 on success, -1 for errors
-[cp] llistxattr:([nonnull] char const *path, [outp(listbufsize)] char *listbuf, size_t listbufsize) -> ssize_t;
+[cp] llistxattr:([[nonnull]] char const *path, [outp(listbufsize)] char *listbuf, size_t listbufsize) -> ssize_t;
 
 @@List attributes of the file descriptor FD into the user-supplied buffer
 @@LIST (which is SIZE bytes big). Return 0 on success, -1 for errors
@@ -118,16 +118,16 @@ enum {
 
 @@Remove the attribute NAME from the file pointed to by PATH.
 @@Return 0 on success, -1 for errors
-[cp] removexattr:([nonnull] char const *path, [nonnull] char const *name) -> int;
+[cp] removexattr:([[nonnull]] char const *path, [[nonnull]] char const *name) -> int;
 
 @@Remove the attribute NAME from the file pointed to by PATH, not
 @@following symlinks for the last pathname component.
 @@Return 0 on success, -1 for errors
-[cp] lremovexattr:([nonnull] char const *path, [nonnull] char const *name) -> int;
+[cp] lremovexattr:([[nonnull]] char const *path, [[nonnull]] char const *name) -> int;
 
 @@Remove the attribute NAME from the file descriptor FD.
 @@Return 0 on success, -1 for errors
-[cp] fremovexattr:($fd_t fd, [nonnull] char const *name) -> int;
+[cp] fremovexattr:($fd_t fd, [[nonnull]] char const *name) -> int;
 
 
 %{

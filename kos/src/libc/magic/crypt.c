@@ -53,13 +53,13 @@ __SYSDECL_BEGIN
 }
 
 @@Setup DES tables according KEY
-setkey:([nonnull] char const *key);
+setkey:([[nonnull]] char const *key);
 
 @@Encrypt at most 8 characters from KEY using salt to perturb DES
-[guard] crypt:([nonnull] char const *key, [nonnull] char const *salt) -> char *;
+[guard] crypt:([[nonnull]] char const *key, [[nonnull]] char const *salt) -> char *;
 
 @@Encrypt data in BLOCK in place if EDFLAG is zero; otherwise decrypt block in place
-[guard] encrypt:([nonnull] char *glibc_block, int edflag);
+[guard] encrypt:([[nonnull]] char *glibc_block, int edflag);
 
 %
 %#ifdef __USE_GNU
@@ -83,11 +83,11 @@ struct crypt_data {
 %
 
 [doc_alias(crypt)]
-crypt_r:([nonnull] char const *key, [nonnull] char const *salt, [nonnull] struct crypt_data *__restrict data) -> char *;
+crypt_r:([[nonnull]] char const *key, [[nonnull]] char const *salt, [[nonnull]] struct crypt_data *__restrict data) -> char *;
 [doc_alias(setkey)]
-setkey_r:([nonnull] char const *key, [nonnull] struct crypt_data *__restrict data);
+setkey_r:([[nonnull]] char const *key, [[nonnull]] struct crypt_data *__restrict data);
 [doc_alias(encrypt)]
-encrypt_r:([nonnull] char *glibc_block, int edflag, [nonnull] struct crypt_data *__restrict data);
+encrypt_r:([[nonnull]] char *glibc_block, int edflag, [[nonnull]] struct crypt_data *__restrict data);
 %#endif /* __USE_GNU */
 
 %{

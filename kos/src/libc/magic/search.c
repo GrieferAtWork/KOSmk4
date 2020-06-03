@@ -133,7 +133,7 @@ struct qelem {
 }
 
 @@Insert ELEM into a doubly-linked list, after PREV
-insque:([nonnull] void *__restrict elem, void *prev) {
+insque:([[nonnull]] void *__restrict elem, void *prev) {
 	struct link {
 		struct link *l_forw; /* [0..1] Forward link */
 		struct link *l_back; /* [0..1] Backward link */
@@ -153,7 +153,7 @@ insque:([nonnull] void *__restrict elem, void *prev) {
 }
 
 @@Unlink ELEM from the doubly-linked list that it is in
-remque:([nonnull] void *__restrict elem) {
+remque:([[nonnull]] void *__restrict elem) {
 	struct link {
 		struct link *l_forw; /* [0..1] Forward link */
 		struct link *l_back; /* [0..1] Backward link */

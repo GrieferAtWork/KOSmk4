@@ -217,9 +217,9 @@ wctob:(wint_t ch) -> int {
 #endif /* !____local_mbrtowc_ps_defined */
 )][std][wchar][export_alias(__mbrtowc)]
 [dependency_include(<parts/errno.h>)]
-mbrtowc:([nullable] wchar_t *pwc,
+mbrtowc:([[nullable]] wchar_t *pwc,
          [inp_opt(maxlen)] char const *__restrict str, size_t maxlen,
-         [nullable] mbstate_t *mbs) -> size_t {
+         [[nullable]] mbstate_t *mbs) -> size_t {
 	size_t error;
 	if (!mbs)
 		mbs = &mbrtowc_ps;
@@ -244,7 +244,7 @@ mbrtowc:([nullable] wchar_t *pwc,
 [std][wchar]
 [dependency_include(<parts/errno.h>)]
 wcrtomb:(char *__restrict str, wchar_t wc,
-         [nullable] mbstate_t *mbs) -> size_t {
+         [[nullable]] mbstate_t *mbs) -> size_t {
 	char *endptr;
 	size_t result;
 #if __SIZEOF_WCHAR_T__ == 2
@@ -292,15 +292,15 @@ wcrtomb:(char *__restrict str, wchar_t wc,
 
 [std][ATTR_WUNUSED][wchar][export_alias(__mbrlen)]
 mbrlen:([inp_opt(maxlen)] char const *__restrict str, size_t maxlen,
-        [nullable] mbstate_t *mbs) -> size_t {
+        [[nullable]] mbstate_t *mbs) -> size_t {
 	wchar_t wc;
 	return mbrtowc(&wc, str, maxlen, mbs);
 }
 
 [std][wchar]
 mbsrtowcs:([outp(dstlen)] wchar_t *__restrict dst,
-           [nonnull] char const **__restrict psrc, size_t dstlen,
-           [nullable] mbstate_t *mbs) -> size_t {
+           [[nonnull]] char const **__restrict psrc, size_t dstlen,
+           [[nullable]] mbstate_t *mbs) -> size_t {
 	size_t result = 0;
 	char const *src = *psrc;
 	while (dstlen) {
@@ -322,8 +322,8 @@ mbsrtowcs:([outp(dstlen)] wchar_t *__restrict dst,
 
 [std][wchar]
 wcsrtombs:([outp(dstlen)] char *dst,
-           [nonnull] wchar_t const **__restrict psrc, size_t dstlen,
-           [nullable] mbstate_t *mbs) -> size_t {
+           [[nonnull]] wchar_t const **__restrict psrc, size_t dstlen,
+           [[nullable]] mbstate_t *mbs) -> size_t {
 	size_t result = 0;
 	wchar_t const *src = *psrc;
 	while (dstlen) {
@@ -351,7 +351,7 @@ wcsrtombs:([outp(dstlen)] char *dst,
 [if(__SIZEOF_LONG__ == 8), alias(wcsto64, _wcstoi64)]
 [if(__SIZEOF_LONG__ == __SIZEOF_INTMAX_T__), alias(wcstoimax)]
 [section({.text.crt.wchar.unicode.static.convert|.text.crt.dos.wchar.unicode.static.convert})]
-wcstol:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr, int base) -> long %{copy(%auto, str2wcs)}
+wcstol:([[nonnull]] wchar_t const *__restrict nptr, [[nullable]] wchar_t **endptr, int base) -> long %{generate(str2wcs)}
 
 [std][wchar][guard][std_guard]
 [if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias(wcstoull), alias(wcstouq)]
@@ -359,11 +359,11 @@ wcstol:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr, i
 [if(__SIZEOF_LONG__ == 8), alias(wcstou64, _wcstoui64)]
 [if(__SIZEOF_LONG__ == __SIZEOF_INTMAX_T__), alias(wcstoumax)]
 [section({.text.crt.wchar.unicode.static.convert|.text.crt.dos.wchar.unicode.static.convert})]
-wcstoul:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr, int base) -> unsigned long %{copy(%auto, str2wcs)}
+wcstoul:([[nonnull]] wchar_t const *__restrict nptr, [[nullable]] wchar_t **endptr, int base) -> unsigned long %{generate(str2wcs)}
 
 [std][ATTR_WUNUSED][ATTR_PURE][decl_include(<bits/mbstate.h>)]
 [section({.text.crt.wchar.unicode.static.mbs|.text.crt.dos.wchar.unicode.static.mbs})]
-mbsinit:([nullable] mbstate_t const *mbs) -> int {
+mbsinit:([[nullable]] mbstate_t const *mbs) -> int {
 	return !mbs || __MBSTATE_ISINIT(mbs);
 }
 
@@ -429,20 +429,20 @@ wmemset:([outp(num_chars)] wchar_t *dst, wchar_t filler, size_t num_chars) -> wc
 
 [std][std_guard][ATTR_RETNONNULL][wchar]
 [section({.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory})]
-wcscpy:([nonnull] wchar_t *__restrict buf, [nonnull] wchar_t const *__restrict src) -> wchar_t * {
+wcscpy:([[nonnull]] wchar_t *__restrict buf, [[nonnull]] wchar_t const *__restrict src) -> wchar_t * {
 	return wmemcpy(buf, src, wcslen(src) + 1);
 }
 
 [std][std_guard][ATTR_RETNONNULL][wchar]
 [section({.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory})]
-wcscat:([nonnull] wchar_t *__restrict buf, [nonnull] wchar_t const *__restrict src) -> wchar_t * {
+wcscat:([[nonnull]] wchar_t *__restrict buf, [[nonnull]] wchar_t const *__restrict src) -> wchar_t * {
 	wmemcpy(wcsend(buf), src, wcslen(src) + 1);
 	return buf;
 }
 
 [std][std_guard][ATTR_RETNONNULL][wchar]
 [section({.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory})]
-wcsncat:([nonnull] wchar_t *__restrict buf,
+wcsncat:([[nonnull]] wchar_t *__restrict buf,
          [inp(wcsnlen(src, buflen))] wchar_t const *__restrict src,
          $size_t buflen) -> wchar_t * {
 	size_t srclen = wcsnlen(src, buflen);
@@ -454,7 +454,7 @@ wcsncat:([nonnull] wchar_t *__restrict buf,
 
 [std][std_guard][ATTR_RETNONNULL][wchar]
 [section({.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory})]
-wcsncpy:([nonnull] wchar_t *__restrict buf,
+wcsncpy:([[nonnull]] wchar_t *__restrict buf,
          [inp(wcsnlen(src, buflen))] wchar_t const *__restrict src,
          $size_t buflen) -> wchar_t * {
 	size_t srclen = wcsnlen(src, buflen);
@@ -466,19 +466,19 @@ wcsncpy:([nonnull] wchar_t *__restrict buf,
 
 [std][std_guard][ATTR_WUNUSED][ATTR_PURE][wchar]
 [section({.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory})]
-wcscmp:([nonnull] wchar_t const *s1, [nonnull] wchar_t const *s2) -> int %{copy(%auto, str2wcs)}
+wcscmp:([[nonnull]] wchar_t const *s1, [[nonnull]] wchar_t const *s2) -> int %{generate(str2wcs)}
 
 [std][std_guard][ATTR_WUNUSED][ATTR_PURE][wchar]
 [section({.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory})]
-wcsncmp:([nonnull] wchar_t const *s1, [nonnull] wchar_t const *s2, $size_t maxlen) -> int %{copy(%auto, str2wcs)}
+wcsncmp:([[nonnull]] wchar_t const *s1, [[nonnull]] wchar_t const *s2, $size_t maxlen) -> int %{generate(str2wcs)}
 
 [std][std_guard][ATTR_WUNUSED][ATTR_PURE][wchar]
 [section({.text.crt.wchar.unicode.static.memory|.text.crt.dos.wchar.unicode.static.memory})]
-wcscoll:([nonnull] wchar_t const *s1, [nonnull] wchar_t const *s2) -> int %{copy(%auto, str2wcs)}
+wcscoll:([[nonnull]] wchar_t const *s1, [[nonnull]] wchar_t const *s2) -> int %{generate(str2wcs)}
 
 [std][std_guard][wchar]
 [section({.text.crt.wchar.unicode.static.memory|.text.crt.dos.wchar.unicode.static.memory})]
-wcsxfrm:([nonnull] wchar_t *dst, [inp(maxlen)] wchar_t const *__restrict src, $size_t maxlen) -> $size_t %{copy(%auto, str2wcs)}
+wcsxfrm:([[nonnull]] wchar_t *dst, [inp(maxlen)] wchar_t const *__restrict src, $size_t maxlen) -> $size_t %{generate(str2wcs)}
 
 
 %[default_impl_section({.text.crt.wchar.FILE.locked.read.getc|.text.crt.dos.wchar.FILE.locked.read.getc})]
@@ -488,8 +488,8 @@ wcsxfrm:([nonnull] wchar_t *dst, [inp(maxlen)] wchar_t const *__restrict src, $s
 getwchar:() -> wint_t {
 	return fgetwc(stdin);
 }
-[cp_stdio][std][std_guard][wchar][alias(getwc)] fgetwc:([nonnull] FILE *__restrict stream) -> wint_t;
-[cp_stdio][std][std_guard][wchar] getwc:([nonnull] FILE *__restrict stream) -> wint_t = fgetwc;
+[cp_stdio][std][std_guard][wchar][alias(getwc)] fgetwc:([[nonnull]] FILE *__restrict stream) -> wint_t;
+[cp_stdio][std][std_guard][wchar] getwc:([[nonnull]] FILE *__restrict stream) -> wint_t = fgetwc;
 
 [section({.text.crt.wchar.FILE.locked.write.putc|.text.crt.dos.wchar.FILE.locked.write.putc})]
 [cp_stdio][std][std_guard][wchar][requires_include(<__crt.h>)]
@@ -501,11 +501,11 @@ putwchar:(wchar_t wc) -> wint_t {
 
 [section({.text.crt.wchar.FILE.locked.write.putc|.text.crt.dos.wchar.FILE.locked.write.putc})]
 [cp_stdio][std][std_guard][wchar][alias(putwc)]
-fputwc:(wchar_t wc, [nonnull] FILE *stream) -> wint_t;
+fputwc:(wchar_t wc, [[nonnull]] FILE *stream) -> wint_t;
 
 [section({.text.crt.wchar.FILE.locked.write.putc|.text.crt.dos.wchar.FILE.locked.write.putc})]
 [cp_stdio][std][std_guard][wchar]
-putwc:(wchar_t wc, [nonnull] FILE *stream) -> wint_t = fputwc;
+putwc:(wchar_t wc, [[nonnull]] FILE *stream) -> wint_t = fputwc;
 
 
 
@@ -517,7 +517,7 @@ putwc:(wchar_t wc, [nonnull] FILE *stream) -> wint_t = fputwc;
 [dependency_include(<asm/stdio.h>)][same_impl]
 fgetws:([outp(bufsize)] wchar_t *__restrict buf,
         __STDC_INT_AS_SIZE_T bufsize,
-        [notnull] FILE *__restrict stream) -> wchar_t * {
+        [[nonnull]] FILE *__restrict stream) -> wchar_t * {
 	size_t n;
 	if unlikely(!buf || !bufsize) {
 		/* The buffer cannot be empty! */
@@ -561,7 +561,7 @@ fgetws:([outp(bufsize)] wchar_t *__restrict buf,
 [cp_stdio][std][std_guard][wchar][same_impl]
 [requires($has_function(file_wprinter))][alias(fputws_unlocked, _fputws_nolock)]
 [if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(fputws_unlocked, _fputws_nolock)]
-fputws:([nonnull] wchar_t const *__restrict string, [nonnull] FILE *__restrict stream) -> __STDC_INT_AS_SIZE_T {
+fputws:([[nonnull]] wchar_t const *__restrict string, [[nonnull]] FILE *__restrict stream) -> __STDC_INT_AS_SIZE_T {
 	__STDC_INT_AS_SIZE_T result;
 	result = file_wprinter(stream, string, wcslen(string));
 	return result;
@@ -570,13 +570,13 @@ fputws:([nonnull] wchar_t const *__restrict string, [nonnull] FILE *__restrict s
 [section({.text.crt.wchar.FILE.locked.write.putc|.text.crt.dos.wchar.FILE.locked.write.putc})]
 [std][std_guard][wchar][alias(ungetwc_unlocked)]
 [if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(ungetwc_unlocked)]
-ungetwc:(wint_t wc, [nonnull] FILE *stream) -> wint_t;
+ungetwc:(wint_t wc, [[nonnull]] FILE *stream) -> wint_t;
 
 [section({.text.crt.wchar.unicode.static.format.strftime|.text.crt.dos.wchar.unicode.static.format.strftime})]
 [std][std_guard][wchar][same_impl]
 wcsftime:([outp(min(return,buflen))] wchar_t *__restrict buf, size_t buflen,
-          [nonnull] wchar_t const *__restrict format,
-          [nonnull] struct tm const *__restrict tp) -> size_t {
+          [[nonnull]] wchar_t const *__restrict format,
+          [[nonnull]] struct tm const *__restrict tp) -> size_t {
 	if (buflen)
 		*buf = 0;
 	/* TODO */
@@ -590,43 +590,43 @@ wcsftime:([outp(min(return,buflen))] wchar_t *__restrict buf, size_t buflen,
 %(std)#if !defined(__USE_DOS) || defined(__USE_ISOC95)
 [std][std_guard][wchar][noexport][nouser]
 [if(!defined(__CRT_DOS_PRIMARY)), preferred_alias(wcstok)][alias(wcstok_s)]
-wcstok:([nullable] wchar_t *string,
-        [nonnull] wchar_t const *__restrict delim,
-        [nonnull] wchar_t **__restrict save_ptr) -> wchar_t *
+wcstok:([[nullable]] wchar_t *string,
+        [[nonnull]] wchar_t const *__restrict delim,
+        [[nonnull]] wchar_t **__restrict save_ptr) -> wchar_t *
 	%{copy(strtok_r, str2wcs)}
 %(std)#endif
 
 [std][std_guard][ATTR_WUNUSED][ATTR_PURE][wchar]
-wcslen:([nonnull] wchar_t const *__restrict string) -> $size_t %{copy(%auto, str2wcs)}
+wcslen:([[nonnull]] wchar_t const *__restrict string) -> $size_t %{generate(str2wcs)}
 
 [std][std_guard][ATTR_WUNUSED][ATTR_PURE][wchar]
-wcsspn:([nonnull] wchar_t const *haystack, [nonnull] wchar_t const *accept) -> $size_t %{copy(%auto, str2wcs)}
+wcsspn:([[nonnull]] wchar_t const *haystack, [[nonnull]] wchar_t const *accept) -> $size_t %{generate(str2wcs)}
 [std][std_guard][ATTR_WUNUSED][ATTR_PURE][wchar]
-wcscspn:([nonnull] wchar_t const *haystack, [nonnull] wchar_t const *reject) -> $size_t %{copy(%auto, str2wcs)}
+wcscspn:([[nonnull]] wchar_t const *haystack, [[nonnull]] wchar_t const *reject) -> $size_t %{generate(str2wcs)}
 
 [std][std_guard][ATTR_WUNUSED][ATTR_PURE][wchar]
-wcschr:([nonnull] wchar_t const *__restrict haystack, wchar_t needle) -> wchar_t *
-	[([nonnull] wchar_t *__restrict haystack, wchar_t needle) -> wchar_t *]
-	[([nonnull] wchar_t const *__restrict haystack, wchar_t needle) -> wchar_t const *]
-	%{copy(%auto, str2wcs)}
+wcschr:([[nonnull]] wchar_t const *__restrict haystack, wchar_t needle) -> wchar_t *
+	[([[nonnull]] wchar_t *__restrict haystack, wchar_t needle) -> wchar_t *]
+	[([[nonnull]] wchar_t const *__restrict haystack, wchar_t needle) -> wchar_t const *]
+	%{generate(str2wcs)}
 
 [std][std_guard][ATTR_WUNUSED][ATTR_PURE][wchar]
-wcsrchr:([nonnull] wchar_t const *__restrict haystack, wchar_t needle) -> wchar_t *
-	[([nonnull] wchar_t *__restrict haystack, wchar_t needle) -> wchar_t *]
-	[([nonnull] wchar_t const *__restrict haystack, wchar_t needle) -> wchar_t const *]
-	%{copy(%auto, str2wcs)}
+wcsrchr:([[nonnull]] wchar_t const *__restrict haystack, wchar_t needle) -> wchar_t *
+	[([[nonnull]] wchar_t *__restrict haystack, wchar_t needle) -> wchar_t *]
+	[([[nonnull]] wchar_t const *__restrict haystack, wchar_t needle) -> wchar_t const *]
+	%{generate(str2wcs)}
 
 [std][std_guard][ATTR_WUNUSED][ATTR_PURE][wchar]
-wcspbrk:([nonnull] wchar_t const *haystack, [nonnull] wchar_t const *accept) -> wchar_t *
-	[([nonnull] wchar_t *haystack, [nonnull] wchar_t const *accept) -> wchar_t *]
-	[([nonnull] wchar_t const *haystack, [nonnull] wchar_t const *accept) -> wchar_t const *]
-	%{copy(%auto, str2wcs)}
+wcspbrk:([[nonnull]] wchar_t const *haystack, [[nonnull]] wchar_t const *accept) -> wchar_t *
+	[([[nonnull]] wchar_t *haystack, [[nonnull]] wchar_t const *accept) -> wchar_t *]
+	[([[nonnull]] wchar_t const *haystack, [[nonnull]] wchar_t const *accept) -> wchar_t const *]
+	%{generate(str2wcs)}
 
 [std][std_guard][ATTR_WUNUSED][ATTR_PURE][alias(wcswcs)][wchar]
-wcsstr:([nonnull] wchar_t const *haystack, [nonnull] wchar_t const *needle) -> wchar_t *
-	[([nonnull] wchar_t *haystack, [nonnull] wchar_t *needle) -> wchar_t *]
-	[([nonnull] wchar_t const *haystack, [nonnull] wchar_t const *needle) -> wchar_t const *]
-	%{copy(%auto, str2wcs)}
+wcsstr:([[nonnull]] wchar_t const *haystack, [[nonnull]] wchar_t const *needle) -> wchar_t *
+	[([[nonnull]] wchar_t *haystack, [[nonnull]] wchar_t *needle) -> wchar_t *]
+	[([[nonnull]] wchar_t const *haystack, [[nonnull]] wchar_t const *needle) -> wchar_t const *]
+	%{generate(str2wcs)}
 
 [std][ATTR_WUNUSED][ATTR_PURE][wchar]
 [if(__SIZEOF_WCHAR_T__ == 2), alias(memchrw)]
@@ -647,7 +647,7 @@ wmemchr:([inp(num_chars)] wchar_t const *__restrict haystack, wchar_t needle, si
 %(std)#if defined(__USE_ISOC95) || defined(__USE_UNIX98)
 [std][std_guard]
 [section({.text.crt.wchar.FILE.locked.utility|.text.crt.dos.wchar.FILE.locked.utility})]
-fwide:([nonnull] FILE *fp, int mode) -> int {
+fwide:([[nonnull]] FILE *fp, int mode) -> int {
 	(void)fp;
 	(void)mode;
 	COMPILER_IMPURE();
@@ -659,18 +659,18 @@ fwide:([nonnull] FILE *fp, int mode) -> int {
 %(std)#if defined(__USE_ISOC95) || defined(__USE_UNIX98) || defined(__USE_DOS)
 [cp_stdio][std][std_guard][ATTR_LIBC_WPRINTF(2, 3)][wchar]
 [section({.text.crt.wchar.FILE.locked.write.printf|.text.crt.dos.wchar.FILE.locked.write.printf})]
-fwprintf:([nonnull] FILE *__restrict stream, [nonnull] wchar_t const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T
+fwprintf:([[nonnull]] FILE *__restrict stream, [[nonnull]] wchar_t const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T
 	%{auto_block(printf(vfwprintf))}
 
 [cp_stdio][std][std_guard][ATTR_LIBC_WPRINTF(2, 0)][wchar][requires_dependency(file_wprinter)]
 [section({.text.crt.wchar.FILE.locked.write.printf|.text.crt.dos.wchar.FILE.locked.write.printf})][same_impl]
-vfwprintf:([nonnull] FILE *__restrict stream, [nonnull] wchar_t const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T {
+vfwprintf:([[nonnull]] FILE *__restrict stream, [[nonnull]] wchar_t const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T {
 	return (__STDC_INT_AS_SSIZE_T)format_vwprintf(&file_wprinter, stream, format, args);
 }
 
 [cp_stdio][std][std_guard][ATTR_LIBC_WPRINTF(1, 2)][wchar]
 [section({.text.crt.wchar.FILE.locked.write.printf|.text.crt.dos.wchar.FILE.locked.write.printf})]
-wprintf:([nonnull] wchar_t const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T
+wprintf:([[nonnull]] wchar_t const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T
 	%{auto_block(printf(vwprintf))}
 
 [cp_stdio][std][std_guard][ATTR_LIBC_WPRINTF(1, 0)][wchar]
@@ -678,28 +678,28 @@ wprintf:([nonnull] wchar_t const *__restrict format, ...) -> __STDC_INT_AS_SIZE_
 [requires($has_function(vfwprintf) && !defined(__NO_STDSTREAMS))]
 [dependency_include(<local/stdstreams.h>)][same_impl]
 [section({.text.crt.wchar.FILE.locked.write.printf|.text.crt.dos.wchar.FILE.locked.write.printf})]
-vwprintf:([nonnull] wchar_t const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T {
+vwprintf:([[nonnull]] wchar_t const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T {
 	return vfwprintf(stdout, format, args);
 }
 
 [cp_stdio][std][std_guard][ATTR_LIBC_WSCANF(2, 3)][wchar]
 [section({.text.crt.wchar.FILE.locked.read.scanf|.text.crt.dos.wchar.FILE.locked.read.scanf})]
-fwscanf:([nonnull] FILE *__restrict stream, [nonnull] wchar_t const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T
+fwscanf:([[nonnull]] FILE *__restrict stream, [[nonnull]] wchar_t const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T
 	%{auto_block(printf(vfwscanf))}
 [cp_stdio][std][std_guard][ATTR_LIBC_WSCANF(1, 2)][wchar]
 [section({.text.crt.wchar.FILE.locked.read.scanf|.text.crt.dos.wchar.FILE.locked.read.scanf})]
-wscanf:([nonnull] wchar_t const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T
+wscanf:([[nonnull]] wchar_t const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T
 	%{auto_block(printf(vwscanf))}
 
 [std][std_guard][ATTR_LIBC_WSCANF(2, 3)][wchar]
 [section({.text.crt.wchar.unicode.static.format.scanf|.text.crt.dos.wchar.unicode.static.format.scanf})]
-swscanf:([nonnull] wchar_t const *__restrict src, [nonnull] wchar_t const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T
+swscanf:([[nonnull]] wchar_t const *__restrict src, [[nonnull]] wchar_t const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T
 	%{auto_block(printf(vswscanf))}
 
 [std][std_guard][ATTR_LIBC_WPRINTF(3, 0)][wchar]
 [section({.text.crt.wchar.unicode.static.format.printf|.text.crt.dos.wchar.unicode.static.format.printf})]
 vswprintf:([outp_opt(min(return+1,buflen))] wchar_t *__restrict buf, size_t buflen,
-           [nonnull] wchar_t const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T {
+           [[nonnull]] wchar_t const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T {
 	if (buflen)
 		*buf = 0;
 	/* TODO: format_wprintf() */
@@ -711,7 +711,7 @@ vswprintf:([outp_opt(min(return+1,buflen))] wchar_t *__restrict buf, size_t bufl
 [std][std_guard][ATTR_LIBC_WPRINTF(3, 4)][wchar][export_alias(_swprintf)]
 [section({.text.crt.wchar.unicode.static.format.printf|.text.crt.dos.wchar.unicode.static.format.printf})]
 swprintf:([outp_opt(min(return+1,buflen))] wchar_t *__restrict buf, size_t buflen,
-          [nonnull] wchar_t const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T
+          [[nonnull]] wchar_t const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T
 	%{auto_block(printf(vswprintf))}
 
 %(std)#endif /* __USE_ISOC95 || __USE_UNIX98 || __USE_DOS */
@@ -721,18 +721,18 @@ swprintf:([outp_opt(min(return+1,buflen))] wchar_t *__restrict buf, size_t bufle
 
 %(std,c,ccompat)#ifndef __NO_FPU
 [std][wchar][guard][std_guard]
-wcstod:([notnull] wchar_t const *__restrict nptr,
-        [nullable] wchar_t **endptr) -> double %{copy(%auto, str2wcs)}
+wcstod:([[nonnull]] wchar_t const *__restrict nptr,
+        [[nullable]] wchar_t **endptr) -> double %{generate(str2wcs)}
 %(std,c,ccompat)#endif /* !__NO_FPU */
 %(std)#ifdef __USE_ISOC99
 %(std,c,compat)#ifndef __NO_FPU
 [std][guard][std_guard][ATTR_PURE][wchar]
-wcstof:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr) -> float
-	%{copy(%auto, str2wcs)}
+wcstof:([[nonnull]] wchar_t const *__restrict nptr, [[nullable]] wchar_t **endptr) -> float
+	%{generate(str2wcs)}
 %(std)#ifdef __COMPILER_HAVE_LONGDOUBLE
 [std][guard][std_guard][ATTR_PURE][wchar]
-wcstold:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr) -> __LONGDOUBLE
-	%{copy(%auto, str2wcs)}
+wcstold:([[nonnull]] wchar_t const *__restrict nptr, [[nullable]] wchar_t **endptr) -> __LONGDOUBLE
+	%{generate(str2wcs)}
 %(std,c,compat)#endif /* !__NO_FPU */
 %(std)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
@@ -741,19 +741,19 @@ wcstold:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr) 
 [if(__SIZEOF_LONG_LONG__ == 8), alias(wcsto64, _wcstoi64)]
 [if(__SIZEOF_LONG_LONG__ == 4), alias(wcsto32)]
 [if(__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias(wcstoimax)]
-wcstoll:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr, int base) -> __LONGLONG %{copy(%auto, str2wcs)}
+wcstoll:([[nonnull]] wchar_t const *__restrict nptr, [[nullable]] wchar_t **endptr, int base) -> __LONGLONG %{generate(str2wcs)}
 
 [std][guard][std_guard][wchar][alias(wcstouq)]
 [if(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias(wcstoul)]
 [if(__SIZEOF_LONG_LONG__ == 4), alias(wcstou32)]
 [if(__SIZEOF_LONG_LONG__ == 8), alias(wcstou64, _wcstoui64)]
 [if(__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias(wcstoumax)]
-wcstoull:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr, int base) -> __ULONGLONG %{copy(%auto, str2wcs)}
+wcstoull:([[nonnull]] wchar_t const *__restrict nptr, [[nullable]] wchar_t **endptr, int base) -> __ULONGLONG %{generate(str2wcs)}
 
 %[default_impl_section({.text.crt.wchar.FILE.locked.read.scanf|.text.crt.dos.wchar.FILE.locked.read.scanf})]
 [cp_stdio][std][std_guard][ATTR_WUNUSED][ATTR_LIBC_WSCANF(2, 0)][wchar]
-vfwscanf:([nonnull] FILE *__restrict stream,
-          [nonnull] wchar_t const *__restrict format, $va_list args)
+vfwscanf:([[nonnull]] FILE *__restrict stream,
+          [[nonnull]] wchar_t const *__restrict format, $va_list args)
 		-> __STDC_INT_AS_SIZE_T;
 /* TODO: format_scanf() implementation for `vfwscanf'! */
 
@@ -761,14 +761,14 @@ vfwscanf:([nonnull] FILE *__restrict stream,
 [requires_include(<__crt.h>)]
 [requires($has_function(vfwscanf) && !defined(__NO_STDSTREAMS))]
 [dependency_include(<local/stdstreams.h>)][wchar][same_impl]
-vwscanf:([nonnull] wchar_t const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T {
+vwscanf:([[nonnull]] wchar_t const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T {
 	return vfwscanf(stdin, format, args);
 }
 
 %[default_impl_section({.text.crt.wchar.unicode.static.format.scanf|.text.crt.dos.wchar.unicode.static.format.scanf})]
 [std][std_guard][ATTR_WUNUSED][ATTR_LIBC_WSCANF(2, 0)][wchar]
-vswscanf:([nonnull] wchar_t const *__restrict src,
-          [nonnull] wchar_t const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T {
+vswscanf:([[nonnull]] wchar_t const *__restrict src,
+          [[nonnull]] wchar_t const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T {
 	/* TODO: format_wscanf() */
 	(void)src;
 	(void)format;
@@ -825,44 +825,44 @@ __NAMESPACE_STD_USING(wcstok)
 
 [ATTR_WUNUSED][alias(*)]
 __mbrlen:([inp(maxlen)] char const *__restrict str, $size_t maxlen,
-          [nullable] $mbstate_t *mbs) -> $size_t = mbrlen;
+          [[nullable]] $mbstate_t *mbs) -> $size_t = mbrlen;
 
 
 %
 %#ifdef __USE_XOPEN2K8
 [alias(_wcsicmp, wcsicmp)][ATTR_WUNUSED][ATTR_PURE][wchar]
 [section({.text.crt.wchar.unicode.static.memory|.text.crt.dos.wchar.unicode.static.memory})]
-wcscasecmp:([nonnull] wchar_t const *s1, [nonnull] wchar_t const *s2) -> int %{copy(%auto, str2wcs)}
+wcscasecmp:([[nonnull]] wchar_t const *s1, [[nonnull]] wchar_t const *s2) -> int %{generate(str2wcs)}
 
 [alias(_wcsnicmp, wcsnicmp)][ATTR_WUNUSED][ATTR_PURE][wchar]
 [section({.text.crt.wchar.unicode.static.memory|.text.crt.dos.wchar.unicode.static.memory})]
-wcsncasecmp:([nonnull] wchar_t const *s1, [nonnull] wchar_t const *s2, $size_t maxlen) -> int %{copy(%auto, str2wcs)}
+wcsncasecmp:([[nonnull]] wchar_t const *s1, [[nonnull]] wchar_t const *s2, $size_t maxlen) -> int %{generate(str2wcs)}
 
 [alias(_wcsicmp_l, wcsicmp_l)][ATTR_WUNUSED][ATTR_PURE][wchar][export_alias(__wcscasecmp_l)]
 [section({.text.crt.wchar.unicode.locale.memory|.text.crt.dos.wchar.unicode.locale.memory})]
-wcscasecmp_l:([nonnull] wchar_t const *s1, [nonnull] wchar_t const *s2, $locale_t locale) -> int %{copy(%auto, str2wcs)}
+wcscasecmp_l:([[nonnull]] wchar_t const *s1, [[nonnull]] wchar_t const *s2, $locale_t locale) -> int %{generate(str2wcs)}
 
 [alias(_wcsnicmp_l, wcsnicmp_l)][ATTR_WUNUSED][ATTR_PURE][wchar][export_alias(__wcsncasecmp_l)]
 [section({.text.crt.wchar.unicode.locale.memory|.text.crt.dos.wchar.unicode.locale.memory})]
-wcsncasecmp_l:([nonnull] wchar_t const *s1, [nonnull] wchar_t const *s2, $size_t maxlen, $locale_t locale) -> int %{copy(%auto, str2wcs)}
+wcsncasecmp_l:([[nonnull]] wchar_t const *s1, [[nonnull]] wchar_t const *s2, $size_t maxlen, $locale_t locale) -> int %{generate(str2wcs)}
 
 [alias(_wcscoll_l)][ATTR_WUNUSED][ATTR_PURE][wchar][export_alias(__wcscoll_l)]
 [section({.text.crt.wchar.unicode.locale.memory|.text.crt.dos.wchar.unicode.locale.memory})]
-wcscoll_l:([nonnull] wchar_t const *s1, [nonnull] wchar_t const *s2, $locale_t locale) -> int %{copy(%auto, str2wcs)}
+wcscoll_l:([[nonnull]] wchar_t const *s1, [[nonnull]] wchar_t const *s2, $locale_t locale) -> int %{generate(str2wcs)}
 
 [alias(_wcsxfrm_l)][requires($has_function(wcsxfrm))][wchar][same_impl][export_alias(__wcsxfrm_l)]
 [section({.text.crt.wchar.unicode.locale.memory|.text.crt.dos.wchar.unicode.locale.memory})]
-wcsxfrm_l:(wchar_t *dst, [nonnull] wchar_t const *__restrict src, $size_t maxlen, $locale_t locale) -> $size_t %{copy(%auto, str2wcs)}
+wcsxfrm_l:(wchar_t *dst, [[nonnull]] wchar_t const *__restrict src, $size_t maxlen, $locale_t locale) -> $size_t %{generate(str2wcs)}
 
 [ATTR_RETNONNULL][wchar]
 [section({.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory})]
-wcpcpy:([nonnull] wchar_t *__restrict dst, [nonnull] wchar_t const *__restrict src) -> wchar_t * {
+wcpcpy:([[nonnull]] wchar_t *__restrict dst, [[nonnull]] wchar_t const *__restrict src) -> wchar_t * {
 	return wmempcpy(dst, src, wcslen(src) + 1);
 }
 
 [ATTR_RETNONNULL][wchar]
 [section({.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory})]
-wcpncpy:([nonnull] wchar_t *__restrict buf, [nonnull] wchar_t const *__restrict src, $size_t buflen) -> wchar_t * {
+wcpncpy:([[nonnull]] wchar_t *__restrict buf, [[nonnull]] wchar_t const *__restrict src, $size_t buflen) -> wchar_t * {
 	$size_t srclen = wcsnlen(src, buflen);
 	wmemcpy(buf, src, srclen);
 	wmemset(buf + srclen, '\0', ($size_t)(buflen - srclen));
@@ -870,14 +870,14 @@ wcpncpy:([nonnull] wchar_t *__restrict buf, [nonnull] wchar_t const *__restrict 
 }
 
 [wchar][section({.text.crt.wchar.unicode.static.mbs|.text.crt.dos.wchar.unicode.static.mbs})]
-mbsnrtowcs:([nullable] wchar_t *dst,
-            [nonnull] char const **__restrict psrc, $size_t nmc, $size_t len,
-            [nullable] $mbstate_t *mbs) -> $size_t;
+mbsnrtowcs:([[nullable]] wchar_t *dst,
+            [[nonnull]] char const **__restrict psrc, $size_t nmc, $size_t len,
+            [[nullable]] $mbstate_t *mbs) -> $size_t;
 
 [wchar][section({.text.crt.wchar.unicode.static.mbs|.text.crt.dos.wchar.unicode.static.mbs})]
-wcsnrtombs:([nullable] char *dst,
-            [nonnull] wchar_t const **__restrict psrc, $size_t nwc, $size_t len,
-            [nullable] $mbstate_t *mbs) -> $size_t;
+wcsnrtombs:([[nullable]] char *dst,
+            [[nonnull]] wchar_t const **__restrict psrc, $size_t nwc, $size_t len,
+            [[nullable]] $mbstate_t *mbs) -> $size_t;
 
 [wchar][section({.text.crt.wchar.FILE.locked.access|.text.crt.dos.wchar.FILE.locked.access})]
 open_wmemstream:(wchar_t **bufloc, $size_t *sizeloc) -> $FILE *;
@@ -888,12 +888,12 @@ open_wmemstream:(wchar_t **bufloc, $size_t *sizeloc) -> $FILE *;
 
 [guard][ATTR_WUNUSED][ATTR_PURE][wchar]
 [section({.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory})]
-wcsnlen:([nonnull] wchar_t const *__restrict string, $size_t maxlen) -> $size_t %{copy(%auto, str2wcs)}
+wcsnlen:([[nonnull]] wchar_t const *__restrict string, $size_t maxlen) -> $size_t %{generate(str2wcs)}
 
 [requires($has_function(malloc))][ATTR_WUNUSED][dosname(_wcsdup)]
 [ATTR_MALL_DEFAULT_ALIGNED][ATTR_MALLOC][wchar][guard]
 [section({.text.crt.wchar.heap.strdup|.text.crt.dos.wchar.heap.strdup})][same_impl]
-wcsdup:([nonnull] wchar_t const *__restrict string) -> wchar_t * %{copy(%auto, str2wcs)}
+wcsdup:([[nonnull]] wchar_t const *__restrict string) -> wchar_t * %{generate(str2wcs)}
 
 %#endif /* __USE_XOPEN2K8 || __USE_DOS */
 
@@ -938,9 +938,9 @@ wcswidth:([inp(num_chars)] wchar_t const *__restrict string, $size_t num_chars) 
 @@If no such needle exists, return `NULL'
 [guard][ATTR_WUNUSED][ATTR_PURE][wchar]
 [section({.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory})]
-wcswcs:([nonnull] wchar_t const *haystack, [nonnull] wchar_t const *needle) -> wchar_t *
-	[([nonnull] wchar_t *haystack, [nonnull] wchar_t *needle) -> wchar_t *]
-	[([nonnull] wchar_t const *haystack, [nonnull] wchar_t const *needle) -> wchar_t const *]
+wcswcs:([[nonnull]] wchar_t const *haystack, [[nonnull]] wchar_t const *needle) -> wchar_t *
+	[([[nonnull]] wchar_t *haystack, [[nonnull]] wchar_t *needle) -> wchar_t *]
+	[([[nonnull]] wchar_t const *haystack, [[nonnull]] wchar_t const *needle) -> wchar_t const *]
 	= wcsstr;
 %#endif /* __USE_XOPEN || __USE_DOS */
 
@@ -949,10 +949,10 @@ wcswcs:([nonnull] wchar_t const *haystack, [nonnull] wchar_t const *needle) -> w
 @@Same as `wcschr', but return `wcsend(STR)', rather than `NULL' if `NEEDLE' wasn't found.
 [ATTR_PURE][ATTR_WUNUSED][wchar]
 [section({.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory})]
-wcschrnul:([nonnull] wchar_t const *haystack, wchar_t needle) -> wchar_t *
-	[([nonnull] wchar_t *__restrict haystack, wchar_t needle) -> wchar_t *]
-	[([nonnull] wchar_t const *__restrict haystack, wchar_t needle) -> wchar_t const *]
-	%{copy(%auto, str2wcs)}
+wcschrnul:([[nonnull]] wchar_t const *haystack, wchar_t needle) -> wchar_t *
+	[([[nonnull]] wchar_t *__restrict haystack, wchar_t needle) -> wchar_t *]
+	[([[nonnull]] wchar_t const *__restrict haystack, wchar_t needle) -> wchar_t const *]
+	%{generate(str2wcs)}
 
 
 
@@ -988,10 +988,10 @@ wmempmove:([outp(num_chars)] wchar_t *dst,
 
 [ATTR_PURE][ATTR_WUNUSED][wchar][export_alias(_wcstol_l, __wcstol_l)]
 [section({.text.crt.wchar.unicode.locale.convert|.text.crt.dos.wchar.unicode.locale.convert})]
-wcstol_l:([notnull] wchar_t const *__restrict nptr, wchar_t **__restrict endptr, int base, $locale_t locale) -> long %{copy(%auto, str2wcs)}
+wcstol_l:([[nonnull]] wchar_t const *__restrict nptr, wchar_t **__restrict endptr, int base, $locale_t locale) -> long %{generate(str2wcs)}
 [ATTR_PURE][ATTR_WUNUSED][wchar][export_alias(_wcstoul_l, __wcstoul_l)]
 [section({.text.crt.wchar.unicode.locale.convert|.text.crt.dos.wchar.unicode.locale.convert})]
-wcstoul_l:([notnull] wchar_t const *__restrict nptr, wchar_t **__restrict endptr, int base, $locale_t locale) -> unsigned long %{copy(%auto, str2wcs)}
+wcstoul_l:([[nonnull]] wchar_t const *__restrict nptr, wchar_t **__restrict endptr, int base, $locale_t locale) -> unsigned long %{generate(str2wcs)}
 
 [wchar]
 [if(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias(wcstol)]
@@ -999,7 +999,7 @@ wcstoul_l:([notnull] wchar_t const *__restrict nptr, wchar_t **__restrict endptr
 [if(__SIZEOF_LONG_LONG__ == 8), alias(wcsto64, _wcstoi64)]
 [if(__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias(wcstoimax)]
 [section({.text.crt.wchar.unicode.static.convert|.text.crt.dos.wchar.unicode.static.convert})]
-wcstoq:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr, int base) -> __LONGLONG = wcstoll;
+wcstoq:([[nonnull]] wchar_t const *__restrict nptr, [[nullable]] wchar_t **endptr, int base) -> __LONGLONG = wcstoll;
 
 [wchar]
 [if(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias(wcstoul)]
@@ -1007,35 +1007,35 @@ wcstoq:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr, i
 [if(__SIZEOF_LONG_LONG__ == 8), alias(wcstou64, _wcstoui64)]
 [if(__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias(wcstoumax)]
 [section({.text.crt.wchar.unicode.static.convert|.text.crt.dos.wchar.unicode.static.convert})]
-wcstouq:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr, int base) -> __ULONGLONG = wcstoull;
+wcstouq:([[nonnull]] wchar_t const *__restrict nptr, [[nullable]] wchar_t **endptr, int base) -> __ULONGLONG = wcstoull;
 
 [wchar][export_alias(_wcstoll_l, __wcstoll_l)]
 [if(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias(wcstol_l, _wcstol_l, __wcstol_l)]
 [if(__SIZEOF_LONG_LONG__ == 8), alias(_wcstoi64_l)]
 [if(__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias(wcstoimax_l, _wcstoimax_l, __wcstoimax_l)]
 [section({.text.crt.wchar.unicode.locale.convert|.text.crt.dos.wchar.unicode.locale.convert})]
-wcstoll_l:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr, int base, $locale_t locale) -> __LONGLONG %{copy(%auto, str2wcs)}
+wcstoll_l:([[nonnull]] wchar_t const *__restrict nptr, [[nullable]] wchar_t **endptr, int base, $locale_t locale) -> __LONGLONG %{generate(str2wcs)}
 
 [wchar][export_alias(__wcstoull_l)]
 [if(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias(wcstoul_l, _wcstoul_l, __wcstoul_l)]
 [if(__SIZEOF_LONG_LONG__ == 8), alias(_wcstoui64_l)]
 [if(__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias(wcstoumax_l, _wcstoumax_l, __wcstoumax_l)]
 [section({.text.crt.wchar.unicode.locale.convert|.text.crt.dos.wchar.unicode.locale.convert})]
-wcstoull_l:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr, int base, $locale_t locale) -> __ULONGLONG %{copy(%auto, str2wcs)}
+wcstoull_l:([[nonnull]] wchar_t const *__restrict nptr, [[nullable]] wchar_t **endptr, int base, $locale_t locale) -> __ULONGLONG %{generate(str2wcs)}
 
 %#ifndef __NO_FPU
 [alias(_wcstof_l)][ATTR_PURE][ATTR_WUNUSED][wchar][export_alias(_wcstof_l, __wcstof_l)]
 [section({.text.crt.wchar.unicode.locale.convert|.text.crt.dos.wchar.unicode.locale.convert})]
-wcstof_l:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr, $locale_t locale) -> float %{copy(%auto, str2wcs)}
+wcstof_l:([[nonnull]] wchar_t const *__restrict nptr, [[nullable]] wchar_t **endptr, $locale_t locale) -> float %{generate(str2wcs)}
 
 [alias(_wcstod_l)][ATTR_PURE][ATTR_WUNUSED][wchar][export_alias(_wcstod_l, __wcstod_l)]
 [section({.text.crt.wchar.unicode.locale.convert|.text.crt.dos.wchar.unicode.locale.convert})]
-wcstod_l:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr, $locale_t locale) -> double %{copy(%auto, str2wcs)}
+wcstod_l:([[nonnull]] wchar_t const *__restrict nptr, [[nullable]] wchar_t **endptr, $locale_t locale) -> double %{generate(str2wcs)}
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
 [alias(_wcstold_l)][ATTR_PURE][ATTR_WUNUSED][wchar][export_alias(_wcstold_l, __wcstold_l)]
 [section({.text.crt.wchar.unicode.locale.convert|.text.crt.dos.wchar.unicode.locale.convert})]
-wcstold_l:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr, $locale_t locale) -> __LONGDOUBLE %{copy(%auto, str2wcs)}
+wcstold_l:([[nonnull]] wchar_t const *__restrict nptr, [[nullable]] wchar_t **endptr, $locale_t locale) -> __LONGDOUBLE %{generate(str2wcs)}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* !__NO_FPU */
 
@@ -1055,25 +1055,25 @@ putwchar_unlocked:(wchar_t wc) -> $wint_t {
 
 [cp_stdio][alias(fgetwc_unlocked, _fgetwc_nolock)][wchar]
 [section({.text.crt.wchar.FILE.unlocked.read.getc|.text.crt.dos.wchar.FILE.unlocked.read.getc})]
-getwc_unlocked:([notnull] $FILE *__restrict stream) -> $wint_t = fgetwc_unlocked;
+getwc_unlocked:([[nonnull]] $FILE *__restrict stream) -> $wint_t = fgetwc_unlocked;
 
 [cp_stdio][alias(fputwc_unlocked, _fputwc_nolock)][wchar]
 [section({.text.crt.wchar.FILE.unlocked.write.putc|.text.crt.dos.wchar.FILE.unlocked.write.putc})]
-putwc_unlocked:(wchar_t wc, [notnull] $FILE *__restrict stream) -> $wint_t = fputwc_unlocked;
+putwc_unlocked:(wchar_t wc, [[nonnull]] $FILE *__restrict stream) -> $wint_t = fputwc_unlocked;
 
 [cp_stdio][wchar][dosname(_fgetwc_nolock)]
 [section({.text.crt.wchar.FILE.unlocked.read.getc|.text.crt.dos.wchar.FILE.unlocked.read.getc})]
-fgetwc_unlocked:([notnull] $FILE *__restrict stream) -> $wint_t;
+fgetwc_unlocked:([[nonnull]] $FILE *__restrict stream) -> $wint_t;
 
 [cp_stdio][wchar][dosname(_fputwc_nolock)]
 [section({.text.crt.wchar.FILE.unlocked.write.putc|.text.crt.dos.wchar.FILE.unlocked.write.putc})]
-fputwc_unlocked:(wchar_t wc, [notnull] $FILE *__restrict stream) -> $wint_t;
+fputwc_unlocked:(wchar_t wc, [[nonnull]] $FILE *__restrict stream) -> $wint_t;
 
 [cp_stdio][alias(fgetws)][wchar][dosname(_fgetws_nolock)][same_impl]
 [section({.text.crt.wchar.FILE.unlocked.read.read|.text.crt.dos.wchar.FILE.unlocked.read.read})]
 [requires($has_function(fgetwc_unlocked) && $has_function(ungetwc_unlocked) && $has_function(ferror_unlocked))][same_impl]
 [dependency_include(<asm/stdio.h>)][dependency_include(<parts/errno.h>)]
-fgetws_unlocked:([outp(bufsize)] wchar_t *__restrict buf, __STDC_INT_AS_SIZE_T bufsize, [notnull] $FILE *__restrict stream) -> wchar_t * {
+fgetws_unlocked:([outp(bufsize)] wchar_t *__restrict buf, __STDC_INT_AS_SIZE_T bufsize, [[nonnull]] $FILE *__restrict stream) -> wchar_t * {
 	$size_t n;
 	if unlikely(!buf || !bufsize) {
 		/* The buffer cannot be empty! */
@@ -1113,7 +1113,7 @@ fgetws_unlocked:([outp(bufsize)] wchar_t *__restrict buf, __STDC_INT_AS_SIZE_T b
 
 [section({.text.crt.wchar.FILE.unlocked.write.write|.text.crt.dos.wchar.FILE.unlocked.write.write})]
 [cp_stdio][dosname(_fputws_nolock)][wchar][same_impl][requires($has_function(file_wprinter_unlocked))]
-fputws_unlocked:([notnull] wchar_t const *__restrict string, [notnull] $FILE *__restrict stream) -> __STDC_INT_AS_SIZE_T {
+fputws_unlocked:([[nonnull]] wchar_t const *__restrict string, [[nonnull]] $FILE *__restrict stream) -> __STDC_INT_AS_SIZE_T {
 	__STDC_INT_AS_SIZE_T result;
 	result = file_wprinter_unlocked(stream, string, wcslen(string));
 	return result;
@@ -1123,8 +1123,8 @@ fputws_unlocked:([notnull] wchar_t const *__restrict string, [notnull] $FILE *__
 [wchar][same_impl][export_alias(__wcsftime_l)][dependency_prefix(DEFINE_STRUCT_TM)]
 [section({.text.crt.wchar.unicode.locale.format.strftime|.text.crt.dos.wchar.unicode.locale.format.strftime})]
 wcsftime_l:([outp(maxsize)] wchar_t *__restrict buf, $size_t maxsize,
-            [notnull] wchar_t const *__restrict format,
-            [notnull] __STRUCT_TM const *__restrict tp, $locale_t locale) -> $size_t {
+            [[nonnull]] wchar_t const *__restrict format,
+            [[nonnull]] __STRUCT_TM const *__restrict tp, $locale_t locale) -> $size_t {
 	(void)locale;
 	return wcsftime(buf, maxsize, format, tp);
 }
@@ -1147,7 +1147,7 @@ wcsftime_l:([outp(maxsize)] wchar_t *__restrict buf, $size_t maxsize,
 [if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(file_wprinter_unlocked)]
 [alias(file_wprinter_unlocked)][same_impl][requires($has_function(fputwc))]
 [dependency_include(<asm/stdio.h>)][wchar]
-file_wprinter:([nonnull] void *arg,
+file_wprinter:([[nonnull]] void *arg,
                [inp(datalen)] wchar_t const *__restrict data,
                $size_t datalen) -> $ssize_t {
 	$size_t i;
@@ -1163,7 +1163,7 @@ file_wprinter:([nonnull] void *arg,
 [cp_stdio][alias(file_wprinter)][noexport]
 [same_impl][requires($has_function(fputwc_unlocked))]
 [dependency_include(<asm/stdio.h>)][wchar]
-file_wprinter_unlocked:([nonnull] void *arg,
+file_wprinter_unlocked:([[nonnull]] void *arg,
                         [inp(datalen)] wchar_t const *__restrict data,
                         $size_t datalen) -> $ssize_t {
 	$size_t i;
@@ -1177,12 +1177,12 @@ file_wprinter_unlocked:([nonnull] void *arg,
 
 [alias(ungetwc)][dosname(_ungetwc_nolock)]
 [wchar][user][section({.text.crt.wchar.FILE.unlocked.write.putc|.text.crt.dos.wchar.FILE.unlocked.write.putc})]
-ungetwc_unlocked:($wint_t ch, [nonnull] $FILE *__restrict stream) -> $wint_t;
+ungetwc_unlocked:($wint_t ch, [[nonnull]] $FILE *__restrict stream) -> $wint_t;
 
 [cp_stdio][ATTR_LIBC_WPRINTF(2, 0)][wchar][requires_dependency(file_wprinter_unlocked)]
 [section({.text.crt.wchar.FILE.unlocked.write.printf|.text.crt.dos.wchar.FILE.unlocked.write.printf})][same_impl]
-vfwprintf_unlocked:([nonnull] $FILE *__restrict stream,
-                    [nonnull] wchar_t const *__restrict format,
+vfwprintf_unlocked:([[nonnull]] $FILE *__restrict stream,
+                    [[nonnull]] wchar_t const *__restrict format,
                     $va_list args) -> __STDC_INT_AS_SIZE_T {
 	return (__STDC_INT_AS_SSIZE_T)format_vwprintf(&file_wprinter_unlocked,
 	                                              stream, format, args);
@@ -1190,43 +1190,43 @@ vfwprintf_unlocked:([nonnull] $FILE *__restrict stream,
 
 [cp_stdio][ATTR_LIBC_WPRINTF(2, 3)][wchar]
 [section({.text.crt.wchar.FILE.unlocked.write.printf|.text.crt.dos.wchar.FILE.unlocked.write.printf})]
-fwprintf_unlocked:([nonnull] $FILE *__restrict stream,
-                   [nonnull] wchar_t const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T
+fwprintf_unlocked:([[nonnull]] $FILE *__restrict stream,
+                   [[nonnull]] wchar_t const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T
 	%{auto_block(printf(vfwprintf_unlocked))}
 
 [cp_stdio][ATTR_LIBC_WPRINTF(1, 2)][wchar]
 [section({.text.crt.wchar.FILE.unlocked.write.printf|.text.crt.dos.wchar.FILE.unlocked.write.printf})]
-wprintf_unlocked:([nonnull] wchar_t const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T
+wprintf_unlocked:([[nonnull]] wchar_t const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T
 	%{auto_block(printf(vwprintf_unlocked))}
 
 [cp_stdio][ATTR_LIBC_WPRINTF(1, 0)][wchar][requires_include(<__crt.h>)]
 [requires($has_function(vfwprintf_unlocked) && !defined(__NO_STDSTREAMS))]
 [dependency_include(<local/stdstreams.h>)][same_impl]
 [section({.text.crt.wchar.FILE.unlocked.write.printf|.text.crt.dos.wchar.FILE.unlocked.write.printf})]
-vwprintf_unlocked:([nonnull] wchar_t const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T {
+vwprintf_unlocked:([[nonnull]] wchar_t const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T {
 	return vfwprintf_unlocked(stdout, format, args);
 }
 
 %[default_impl_section({.text.crt.wchar.FILE.unlocked.read.scanf|.text.crt.dos.wchar.FILE.unlocked.read.scanf})]
 [cp_stdio][ATTR_WUNUSED][ATTR_LIBC_WSCANF(2, 0)][wchar][alias(vfwscanf)]
-vfwscanf_unlocked:([nonnull] $FILE *__restrict stream,
-                   [nonnull] wchar_t const *__restrict format, $va_list args)
+vfwscanf_unlocked:([[nonnull]] $FILE *__restrict stream,
+                   [[nonnull]] wchar_t const *__restrict format, $va_list args)
 		-> __STDC_INT_AS_SIZE_T;
 /* TODO: Inline implementation for `vfwscanf_unlocked()' */
 
 [cp_stdio][ATTR_LIBC_SCANF(1, 0)][ATTR_WUNUSED][user][wchar]
 [requires($has_function(vfwscanf_unlocked) && !defined(__NO_STDSTREAMS))]
 [dependency_include(<local/stdstreams.h>)][same_impl]
-vwscanf_unlocked:([nonnull] wchar_t const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T {
+vwscanf_unlocked:([[nonnull]] wchar_t const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T {
 	return vfwscanf_unlocked(stdin, format, args);
 }
 
 [cp_stdio][ATTR_LIBC_SCANF(2, 3)][ATTR_WUNUSED][user][wchar]
-fwscanf_unlocked:([nonnull] $FILE *__restrict stream, [nonnull] wchar_t const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T
+fwscanf_unlocked:([[nonnull]] $FILE *__restrict stream, [[nonnull]] wchar_t const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T
 	%{auto_block(printf(vfwscanf_unlocked))}
 
 [cp_stdio][ATTR_LIBC_SCANF(1, 2)][ATTR_WUNUSED][user][wchar]
-wscanf_unlocked:([nonnull] wchar_t const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T
+wscanf_unlocked:([[nonnull]] wchar_t const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T
 	%{auto_block(printf(vwscanf_unlocked))}
 
 
@@ -1241,10 +1241,10 @@ wscanf_unlocked:([nonnull] wchar_t const *__restrict format, ...) -> __STDC_INT_
 @@Same as `STR+wcslen(STR)'
 [ATTR_WUNUSED][ATTR_PURE][wchar][ATTR_RETNONNULL]
 [section({.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory})]
-wcsend:([notnull] wchar_t const *__restrict string) -> wchar_t *
-	[([notnull] wchar_t *__restrict string) -> wchar_t *]
-	[([notnull] wchar_t const *__restrict string) -> wchar_t const *]
-	%{copy(%auto, str2wcs)}
+wcsend:([[nonnull]] wchar_t const *__restrict string) -> wchar_t *
+	[([[nonnull]] wchar_t *__restrict string) -> wchar_t *]
+	[([[nonnull]] wchar_t const *__restrict string) -> wchar_t const *]
+	%{generate(str2wcs)}
 
 @@Same as `STR+wcsnlen(STR, MAX_CHARS)'
 [ATTR_WUNUSED][ATTR_PURE][wchar]
@@ -1252,7 +1252,7 @@ wcsend:([notnull] wchar_t const *__restrict string) -> wchar_t *
 wcsnend:([inp(maxlen)] wchar_t const *__restrict string, $size_t maxlen) -> wchar_t *
 	[([inp(maxlen)] wchar_t *__restrict string, $size_t maxlen) -> wchar_t *]
 	[([inp(maxlen)] wchar_t const *__restrict string, $size_t maxlen) -> wchar_t const *]
-	%{copy(%auto, str2wcs)}
+	%{generate(str2wcs)}
 
 
 [wchar][ATTR_LEAF][ATTR_WUNUSED]
@@ -1260,14 +1260,14 @@ wcsnend:([inp(maxlen)] wchar_t const *__restrict string, $size_t maxlen) -> wcha
 [if(__SIZEOF_LONG_LONG__ == 4), alias(wcstoll, wcstoq)]
 [if(__SIZEOF_INTMAX_T__ == 4), alias(wcstoimax)]
 [section({.text.crt.wchar.unicode.static.convert|.text.crt.dos.wchar.unicode.static.convert})]
-wcsto32:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr, int base) -> $int32_t %{copy(%auto, str2wcs)}
+wcsto32:([[nonnull]] wchar_t const *__restrict nptr, [[nullable]] wchar_t **endptr, int base) -> $int32_t %{generate(str2wcs)}
 
 [wchar][ATTR_LEAF][ATTR_WUNUSED]
 [if(__SIZEOF_LONG__ == 4), alias(wcstoul)]
 [if(__SIZEOF_LONG_LONG__ == 4), alias(wcstoull, wcstouq)]
 [if(__SIZEOF_INTMAX_T__ == 4), alias(wcstoumax)]
 [section({.text.crt.wchar.unicode.static.convert|.text.crt.dos.wchar.unicode.static.convert})]
-wcstou32:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr, int base) -> $uint32_t %{copy(%auto, str2wcs)}
+wcstou32:([[nonnull]] wchar_t const *__restrict nptr, [[nullable]] wchar_t **endptr, int base) -> $uint32_t %{generate(str2wcs)}
 
 %
 %#ifdef __UINT64_TYPE__
@@ -1276,14 +1276,14 @@ wcstou32:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr,
 [if(__SIZEOF_LONG_LONG__ == 8), alias(wcstoull), alias(wcstouq)]
 [if(__SIZEOF_INTMAX_T__ == 8), alias(wcstoumax)]
 [section({.text.crt.wchar.unicode.static.convert|.text.crt.dos.wchar.unicode.static.convert})]
-wcstou64:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr, int base) -> $uint64_t %{copy(%auto, str2wcs)}
+wcstou64:([[nonnull]] wchar_t const *__restrict nptr, [[nullable]] wchar_t **endptr, int base) -> $uint64_t %{generate(str2wcs)}
 
 [wchar][ATTR_LEAF][ATTR_WUNUSED][export_alias(_wcstoi64)]
 [if(__SIZEOF_LONG__ == 8), alias(wcstol)]
 [if(__SIZEOF_LONG_LONG__ == 8), alias(wcstoll), alias(wcstoq)]
 [if(__SIZEOF_INTMAX_T__ == 8), alias(wcstoimax)]
 [section({.text.crt.wchar.unicode.static.convert|.text.crt.dos.wchar.unicode.static.convert})]
-wcsto64:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr, int base) -> $int64_t %{copy(%auto, str2wcs)}
+wcsto64:([[nonnull]] wchar_t const *__restrict nptr, [[nullable]] wchar_t **endptr, int base) -> $int64_t %{generate(str2wcs)}
 %#endif /* __UINT64_TYPE__ */
 
 %
@@ -1293,14 +1293,14 @@ wcsto64:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr, 
 [if(__SIZEOF_LONG_LONG__ == 4), alias(wcstoll_l, _wcstoll_l, __wcstoll_l)]
 [if(__SIZEOF_INTMAX_T__ == 4), alias(wcstoimax_l, _wcstoimax_l, __wcstoimax_l)]
 [section({.text.crt.wchar.unicode.locale.convert|.text.crt.dos.wchar.unicode.locale.convert})]
-wcsto32_l:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr, int base, $locale_t locale) -> $int32_t %{copy(%auto, str2wcs)}
+wcsto32_l:([[nonnull]] wchar_t const *__restrict nptr, [[nullable]] wchar_t **endptr, int base, $locale_t locale) -> $int32_t %{generate(str2wcs)}
 
 [wchar][ATTR_LEAF][ATTR_WUNUSED]
 [if(__SIZEOF_LONG__ == 4), alias(wcstoul_l, _wcstoul_l, __wcstoul_l)]
 [if(__SIZEOF_LONG_LONG__ == 4), alias(wcstoull_l, _wcstoull_l, __wcstoull_l)]
 [if(__SIZEOF_INTMAX_T__ == 4), alias(wcstoumax_l, _wcstoumax_l, __wcstoumax_l)]
 [section({.text.crt.wchar.unicode.locale.convert|.text.crt.dos.wchar.unicode.locale.convert})]
-wcstou32_l:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr, int base, $locale_t locale) -> $uint32_t %{copy(%auto, str2wcs)}
+wcstou32_l:([[nonnull]] wchar_t const *__restrict nptr, [[nullable]] wchar_t **endptr, int base, $locale_t locale) -> $uint32_t %{generate(str2wcs)}
 
 %
 %#ifdef __UINT64_TYPE__
@@ -1309,14 +1309,14 @@ wcstou32_l:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endpt
 [if(__SIZEOF_LONG_LONG__ == 8), alias(wcstoll_l, _wcstoll_l, __wcstoll_l)]
 [if(__SIZEOF_INTMAX_T__ == 8), alias(wcstoimax_l, _wcstoimax_l, __wcstoimax_l)]
 [section({.text.crt.wchar.unicode.locale.convert|.text.crt.dos.wchar.unicode.locale.convert})]
-wcsto64_l:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr, int base, $locale_t locale) -> $int64_t %{copy(%auto, str2wcs)}
+wcsto64_l:([[nonnull]] wchar_t const *__restrict nptr, [[nullable]] wchar_t **endptr, int base, $locale_t locale) -> $int64_t %{generate(str2wcs)}
 
 [wchar][ATTR_LEAF][ATTR_WUNUSED][alias(_wcstoui64_l)]
 [if(__SIZEOF_LONG__ == 8), alias(wcstoul_l, _wcstoul_l, __wcstoul_l)]
 [if(__SIZEOF_LONG_LONG__ == 8), alias(wcstoull_l, _wcstoull_l, __wcstoull_l)]
 [if(__SIZEOF_INTMAX_T__ == 8), alias(wcstoumax_l, _wcstoumax_l, __wcstoumax_l)]
 [section({.text.crt.wchar.unicode.locale.convert|.text.crt.dos.wchar.unicode.locale.convert})]
-wcstou64_l:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr, int base, $locale_t locale) -> $uint64_t %{copy(%auto, str2wcs)}
+wcstou64_l:([[nonnull]] wchar_t const *__restrict nptr, [[nullable]] wchar_t **endptr, int base, $locale_t locale) -> $uint64_t %{generate(str2wcs)}
 %#endif /* __UINT64_TYPE__ */
 %#endif /* __USE_XOPEN2K8 */
 
@@ -1326,17 +1326,17 @@ wcstou64_l:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endpt
 %
 [alias(_wcsncoll)][ATTR_WUNUSED][ATTR_PURE][wchar]
 [section({.text.crt.wchar.unicode.static.memory|.text.crt.dos.wchar.unicode.static.memory})]
-wcsncoll:([inp(maxlen)] wchar_t const *s1, [inp(maxlen)] wchar_t const *s2, $size_t maxlen) -> int %{copy(%auto, str2wcs)}
+wcsncoll:([inp(maxlen)] wchar_t const *s1, [inp(maxlen)] wchar_t const *s2, $size_t maxlen) -> int %{generate(str2wcs)}
 
 [alias(_wcsicoll, wcsicoll, wcscasecmp, _wcsicmp, wcsicmp)][wchar]
 [ATTR_WUNUSED][ATTR_PURE]
 [section({.text.crt.wchar.unicode.static.memory|.text.crt.dos.wchar.unicode.static.memory})]
-wcscasecoll:([notnull] wchar_t const *s1, [notnull] wchar_t const *s2) -> int %{copy(%auto, str2wcs)}
+wcscasecoll:([[nonnull]] wchar_t const *s1, [[nonnull]] wchar_t const *s2) -> int %{generate(str2wcs)}
 
 [alias(_wcsnicoll, wcsncasecmp, _wcsnicmp, wcsnicmp)][wchar]
 [ATTR_WUNUSED][ATTR_PURE]
 [section({.text.crt.wchar.unicode.static.memory|.text.crt.dos.wchar.unicode.static.memory})]
-wcsncasecoll:([inp(maxlen)] wchar_t const *s1, [inp(maxlen)] wchar_t const *s2, $size_t maxlen) -> int %{copy(%auto, str2wcs)}
+wcsncasecoll:([inp(maxlen)] wchar_t const *s1, [inp(maxlen)] wchar_t const *s2, $size_t maxlen) -> int %{generate(str2wcs)}
 
 [ATTR_RETNONNULL][wchar][ATTR_LEAF]
 [section({.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory})]
@@ -1352,29 +1352,29 @@ wcsnrev:([inoutp(maxlen)] wchar_t *__restrict str, $size_t maxlen) -> wchar_t * 
 
 [ATTR_RETNONNULL][ATTR_LEAF]
 [section({.text.crt.wchar.unicode.static.memory|.text.crt.dos.wchar.unicode.static.memory})]
-wcsnlwr:([inoutp(maxlen)] wchar_t *__restrict str, $size_t maxlen) -> wchar_t * %{copy(%auto, str2wcs)}
+wcsnlwr:([inoutp(maxlen)] wchar_t *__restrict str, $size_t maxlen) -> wchar_t * %{generate(str2wcs)}
 
 [ATTR_RETNONNULL][wchar][ATTR_LEAF]
 [section({.text.crt.wchar.unicode.static.memory|.text.crt.dos.wchar.unicode.static.memory})]
-wcsnupr:([inoutp(maxlen)] wchar_t *__restrict str, $size_t maxlen) -> wchar_t * %{copy(%auto, str2wcs)}
+wcsnupr:([inoutp(maxlen)] wchar_t *__restrict str, $size_t maxlen) -> wchar_t * %{generate(str2wcs)}
 
 [ATTR_WUNUSED][ATTR_PURE][alias(wcswcs)][wchar]
 [section({.text.crt.wchar.unicode.static.memory|.text.crt.dos.wchar.unicode.static.memory})]
-wcscasestr:([nonnull] wchar_t const *haystack, [nonnull] wchar_t const *needle) -> wchar_t *
-	[([nonnull] wchar_t *haystack, [nonnull] wchar_t *needle) -> wchar_t *]
-	[([nonnull] wchar_t const *haystack, [nonnull] wchar_t const *needle) -> wchar_t const *]
-	%{copy(%auto, str2wcs)}
+wcscasestr:([[nonnull]] wchar_t const *haystack, [[nonnull]] wchar_t const *needle) -> wchar_t *
+	[([[nonnull]] wchar_t *haystack, [[nonnull]] wchar_t *needle) -> wchar_t *]
+	[([[nonnull]] wchar_t const *haystack, [[nonnull]] wchar_t const *needle) -> wchar_t const *]
+	%{generate(str2wcs)}
 
 @@Same as wcscpy, but return a pointer after the last written character
 [ATTR_RETNONNULL][wchar][ATTR_LEAF]
 [section({.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory})]
-wcspcpy:([nonnull] wchar_t *__restrict buf, [nonnull] wchar_t const *__restrict src) -> wchar_t * {
+wcspcpy:([[nonnull]] wchar_t *__restrict buf, [[nonnull]] wchar_t const *__restrict src) -> wchar_t * {
 	return wmempcpy(buf, src, wcslen(src) + 1);
 }
 @@Same as wcsncpy, but return a pointer after the last written character
 [ATTR_RETNONNULL][wchar][ATTR_LEAF]
 [section({.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory})]
-wcspncpy:([outp(buflen)] wchar_t *__restrict buf, [nonnull] wchar_t const *__restrict src, $size_t buflen) -> wchar_t * {
+wcspncpy:([outp(buflen)] wchar_t *__restrict buf, [[nonnull]] wchar_t const *__restrict src, $size_t buflen) -> wchar_t * {
 	$size_t srclen = wcsnlen(src, buflen);
 	wmemcpy(buf, src, srclen);
 	return wmempset(buf+srclen, '\0', buflen - srclen);
@@ -1401,7 +1401,7 @@ wmempset:([outp(num_chars)] wchar_t *dst, wchar_t filler, $size_t num_chars) -> 
 wcsnchr:([inp(maxlen)] wchar_t const *__restrict haystack, wchar_t needle, $size_t maxlen) -> wchar_t *
 	[([inp(maxlen)] wchar_t *__restrict haystack, wchar_t needle, $size_t maxlen) -> wchar_t *]
 	[([inp(maxlen)] wchar_t const *__restrict haystack, wchar_t needle, $size_t maxlen) -> wchar_t const *]
-	%{copy(%auto, str2wcs)}
+	%{generate(str2wcs)}
 
 @@Same as `wcsrchr', but don't exceed `MAX_CHARS' characters.
 [ATTR_WUNUSED][ATTR_PURE][wchar]
@@ -1409,30 +1409,30 @@ wcsnchr:([inp(maxlen)] wchar_t const *__restrict haystack, wchar_t needle, $size
 wcsnrchr:([inp(maxlen)] wchar_t const *__restrict haystack, wchar_t needle, $size_t maxlen) -> wchar_t *
 	[([inp(maxlen)] wchar_t *__restrict haystack, wchar_t needle, $size_t maxlen) -> wchar_t *]
 	[([inp(maxlen)] wchar_t const *__restrict haystack, wchar_t needle, $size_t maxlen) -> wchar_t const *]
-	%{copy(%auto, str2wcs)}
+	%{generate(str2wcs)}
 
 [wchar][ATTR_LEAF]
 [section({.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory})]
-wcssep:([nonnull] wchar_t **__restrict stringp,
-        [nonnull] wchar_t const *__restrict delim) -> wchar_t * %{copy(%auto, str2wcs)}
+wcssep:([[nonnull]] wchar_t **__restrict stringp,
+        [[nonnull]] wchar_t const *__restrict delim) -> wchar_t * %{generate(str2wcs)}
 
 [ATTR_RETNONNULL][wchar][ATTR_LEAF]
 [section({.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory})]
-wcsfry:([nonnull] wchar_t *__restrict string) -> wchar_t * %{copy(%auto, str2wcs)}
+wcsfry:([[nonnull]] wchar_t *__restrict string) -> wchar_t * %{generate(str2wcs)}
 
 [requires($has_function(malloc))][ATTR_WUNUSED]
 [ATTR_MALL_DEFAULT_ALIGNED][ATTR_MALLOC][wchar]
 [section({.text.crt.wchar.heap.strdup|.text.crt.dos.wchar.heap.strdup})][same_impl]
-wcsndup:([inp(max_chars)] wchar_t const *__restrict string, $size_t max_chars) -> wchar_t * %{copy(%auto, str2wcs)}
+wcsndup:([inp(max_chars)] wchar_t const *__restrict string, $size_t max_chars) -> wchar_t * %{generate(str2wcs)}
 
 
 @@Same as `wcsrchr', but return `STR-1', rather than `NULL' if `NEEDLE' wasn't found.
 [ATTR_WUNUSED][ATTR_PURE][ATTR_RETNONNULL][wchar]
 [section({.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory})]
-wcsrchrnul:([nonnull] wchar_t const *__restrict haystack, wchar_t needle) -> wchar_t *
-	[([nonnull] wchar_t *__restrict haystack, wchar_t needle) -> wchar_t *]
-	[([nonnull] wchar_t const *__restrict haystack, wchar_t needle) -> wchar_t const *]
-	%{copy(%auto, str2wcs)}
+wcsrchrnul:([[nonnull]] wchar_t const *__restrict haystack, wchar_t needle) -> wchar_t *
+	[([[nonnull]] wchar_t *__restrict haystack, wchar_t needle) -> wchar_t *]
+	[([[nonnull]] wchar_t const *__restrict haystack, wchar_t needle) -> wchar_t const *]
+	%{generate(str2wcs)}
 
 @@Same as `wcsnchr', but return `wcsnend(STR, MAX_CHARS)', rather than `NULL' if `NEEDLE' wasn't found.
 [ATTR_WUNUSED][ATTR_PURE][ATTR_RETNONNULL][wchar]
@@ -1440,7 +1440,7 @@ wcsrchrnul:([nonnull] wchar_t const *__restrict haystack, wchar_t needle) -> wch
 wcsnchrnul:([inp(maxlen)] wchar_t const *__restrict haystack, wchar_t needle, $size_t maxlen) -> wchar_t *
 	[([inp(maxlen)] wchar_t *__restrict haystack, wchar_t needle, $size_t maxlen) -> wchar_t *]
 	[([inp(maxlen)] wchar_t const *__restrict haystack, wchar_t needle, $size_t maxlen) -> wchar_t const *]
-	%{copy(%auto, str2wcs)}
+	%{generate(str2wcs)}
 
 @@Same as `wcsnrchr', but return `STR-1', rather than `NULL' if `NEEDLE' wasn't found.
 [ATTR_WUNUSED][ATTR_PURE][ATTR_RETNONNULL][wchar]
@@ -1448,27 +1448,27 @@ wcsnchrnul:([inp(maxlen)] wchar_t const *__restrict haystack, wchar_t needle, $s
 wcsnrchrnul:([inp(maxlen)] wchar_t const *__restrict haystack, wchar_t needle, $size_t maxlen) -> wchar_t *
 	[([inp(maxlen)] wchar_t *__restrict haystack, wchar_t needle, $size_t maxlen) -> wchar_t *]
 	[([inp(maxlen)] wchar_t const *__restrict haystack, wchar_t needle, $size_t maxlen) -> wchar_t const *]
-	%{copy(%auto, str2wcs)}
+	%{generate(str2wcs)}
 
 @@Same as `wcschrnul', but return the offset from `STR', rather than the actual address
 [ATTR_WUNUSED][ATTR_PURE][wchar]
 [section({.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory})]
-wcsoff:([nonnull] wchar_t const *__restrict haystack, wchar_t needle) -> $size_t %{copy(%auto, str2wcs)}
+wcsoff:([[nonnull]] wchar_t const *__restrict haystack, wchar_t needle) -> $size_t %{generate(str2wcs)}
 
 @@Same as `wcsrchrnul', but return the offset from `STR', rather than the actual address
 [ATTR_WUNUSED][ATTR_PURE][wchar]
 [section({.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory})]
-wcsroff:([nonnull] wchar_t const *__restrict haystack, wchar_t needle) -> $size_t %{copy(%auto, str2wcs)}
+wcsroff:([[nonnull]] wchar_t const *__restrict haystack, wchar_t needle) -> $size_t %{generate(str2wcs)}
 
 @@Same as `wcsnchrnul', but return the offset from `STR', rather than the actual address
 [ATTR_WUNUSED][ATTR_PURE][wchar]
 [section({.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory})]
-wcsnoff:([inp(maxlen)] wchar_t const *__restrict haystack, wchar_t needle, $size_t maxlen) -> $size_t %{copy(%auto, str2wcs)}
+wcsnoff:([inp(maxlen)] wchar_t const *__restrict haystack, wchar_t needle, $size_t maxlen) -> $size_t %{generate(str2wcs)}
 
 @@Same as `wcsnrchrnul', but return the offset from `STR', rather than the actual address
 [ATTR_WUNUSED][ATTR_PURE][wchar]
 [section({.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory})]
-wcsnroff:([inp(maxlen)] wchar_t const *__restrict haystack, wchar_t needle, $size_t maxlen) -> $size_t %{copy(%auto, str2wcs)}
+wcsnroff:([inp(maxlen)] wchar_t const *__restrict haystack, wchar_t needle, $size_t maxlen) -> $size_t %{generate(str2wcs)}
 
 [section({.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory})]
 [dependency_include(<parts/malloca.h>)]
@@ -1489,7 +1489,7 @@ fuzzy_wmemcmp:([inp(s1_chars)] wchar_t const *s1, $size_t s1_chars,
 [dependency_include(<parts/malloca.h>)][wchar]
 [same_impl][requires($has_function(fuzzy_wmemcmp))][export]
 [section({.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory})]
-fuzzy_wcscmp:([nonnull] wchar_t const *s1, [nonnull] wchar_t const *s2) -> $size_t {
+fuzzy_wcscmp:([[nonnull]] wchar_t const *s1, [[nonnull]] wchar_t const *s2) -> $size_t {
 	return fuzzy_wmemcmp(s1, wcslen(s1), s2, wcslen(s2));
 }
 [ATTR_WUNUSED][ATTR_PURE]
@@ -1513,7 +1513,7 @@ fuzzy_wmemcasecmp:([inp(s1_bytes)] wchar_t const *s1, $size_t s1_bytes,
 [dependency_include(<parts/malloca.h>)][wchar]
 [same_impl][requires($has_function(fuzzy_wmemcasecmp))][export]
 [section({.text.crt.wchar.unicode.static.memory|.text.crt.dos.wchar.unicode.static.memory})]
-fuzzy_wcscasecmp:([nonnull] wchar_t const *s1, [nonnull] wchar_t const *s2) -> $size_t {
+fuzzy_wcscasecmp:([[nonnull]] wchar_t const *s1, [[nonnull]] wchar_t const *s2) -> $size_t {
 	return fuzzy_wmemcasecmp(s1, wcslen(s1), s2, wcslen(s2));
 }
 
@@ -1528,16 +1528,16 @@ fuzzy_wcsncasecmp:([inp(s1_maxlen)] wchar_t const *s1, $size_t s1_maxlen,
 
 [ATTR_WUNUSED][ATTR_PURE][wchar]
 [section({.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory})]
-wildwcscmp:([nonnull] wchar_t const *pattern, [nonnull] wchar_t const *string) -> int %{copy(wildstrcmp, str2wcs)}
+wildwcscmp:([[nonnull]] wchar_t const *pattern, [[nonnull]] wchar_t const *string) -> int %{copy(wildstrcmp, str2wcs)}
 
 [ATTR_WUNUSED][ATTR_PURE][wchar]
 [section({.text.crt.wchar.unicode.static.memory|.text.crt.dos.wchar.unicode.static.memory})]
-wildwcscasecmp:([nonnull] wchar_t const *pattern, [nonnull] wchar_t const *string) -> int
+wildwcscasecmp:([[nonnull]] wchar_t const *pattern, [[nonnull]] wchar_t const *string) -> int
 	%{copy(wildstrcasecmp, str2wcs)}
 
 [ATTR_WUNUSED][ATTR_PURE][wchar]
 [section({.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory})]
-wcsverscmp:([nonnull] wchar_t const *s1, [nonnull] wchar_t const *s2) -> int %{copy(%auto, str2wcs)}
+wcsverscmp:([[nonnull]] wchar_t const *s1, [[nonnull]] wchar_t const *s2) -> int %{generate(str2wcs)}
 
 
 
@@ -1550,41 +1550,41 @@ wcsverscmp:([nonnull] wchar_t const *s1, [nonnull] wchar_t const *s2) -> int %{c
 [section({.text.crt.wchar.unicode.locale.memory|.text.crt.dos.wchar.unicode.locale.memory})]
 wcsncoll_l:([inp(maxlen)] wchar_t const *s1,
             [inp(maxlen)] wchar_t const *s2,
-            $size_t maxlen, $locale_t locale) -> int %{copy(%auto, str2wcs)}
+            $size_t maxlen, $locale_t locale) -> int %{generate(str2wcs)}
 
 [alias(_wcsicoll_l, wcscasecmp_l, _wcsicmp_l)]
 [ATTR_WUNUSED][ATTR_PURE][wchar]
 [section({.text.crt.wchar.unicode.locale.memory|.text.crt.dos.wchar.unicode.locale.memory})]
-wcscasecoll_l:([nonnull] wchar_t const *s1, [nonnull] wchar_t const *s2, $locale_t locale) -> int %{copy(%auto, str2wcs)}
+wcscasecoll_l:([[nonnull]] wchar_t const *s1, [[nonnull]] wchar_t const *s2, $locale_t locale) -> int %{generate(str2wcs)}
 
 [alias(_wcsnicoll_l, wcsncasecmp_l, _wcsnicmp_l)]
 [ATTR_WUNUSED][ATTR_PURE][wchar]
 [section({.text.crt.wchar.unicode.locale.memory|.text.crt.dos.wchar.unicode.locale.memory})]
 wcsncasecoll_l:([inp(maxlen)] wchar_t const *s1,
-                [inp(maxlen)] wchar_t const *s2, $size_t maxlen, $locale_t locale) -> int %{copy(%auto, str2wcs)}
+                [inp(maxlen)] wchar_t const *s2, $size_t maxlen, $locale_t locale) -> int %{generate(str2wcs)}
 
 [alias(_wcslwr_l)][ATTR_RETNONNULL][wchar]
 [section({.text.crt.wchar.unicode.locale.memory|.text.crt.dos.wchar.unicode.locale.memory})]
-wcslwr_l:([nonnull] wchar_t *__restrict str, $locale_t locale) -> wchar_t * %{copy(%auto, str2wcs)}
+wcslwr_l:([[nonnull]] wchar_t *__restrict str, $locale_t locale) -> wchar_t * %{generate(str2wcs)}
 
 [alias(_wcsupr_l)][ATTR_RETNONNULL][wchar]
 [section({.text.crt.wchar.unicode.locale.memory|.text.crt.dos.wchar.unicode.locale.memory})]
-wcsupr_l:([nonnull] wchar_t *__restrict str, $locale_t locale) -> wchar_t * %{copy(%auto, str2wcs)}
+wcsupr_l:([[nonnull]] wchar_t *__restrict str, $locale_t locale) -> wchar_t * %{generate(str2wcs)}
 
 [ATTR_RETNONNULL][wchar]
 [section({.text.crt.wchar.unicode.locale.memory|.text.crt.dos.wchar.unicode.locale.memory})]
-wcsnlwr_l:([inoutp(maxlen)] wchar_t *__restrict str, $size_t maxlen, $locale_t locale) -> wchar_t * %{copy(%auto, str2wcs)}
+wcsnlwr_l:([inoutp(maxlen)] wchar_t *__restrict str, $size_t maxlen, $locale_t locale) -> wchar_t * %{generate(str2wcs)}
 
 [ATTR_RETNONNULL][wchar]
 [section({.text.crt.wchar.unicode.locale.memory|.text.crt.dos.wchar.unicode.locale.memory})]
-wcsnupr_l:([inoutp(maxlen)] wchar_t *__restrict str, $size_t maxlen, $locale_t locale) -> wchar_t * %{copy(%auto, str2wcs)}
+wcsnupr_l:([inoutp(maxlen)] wchar_t *__restrict str, $size_t maxlen, $locale_t locale) -> wchar_t * %{generate(str2wcs)}
 
 [ATTR_WUNUSED][ATTR_PURE][alias(wcswcs)][wchar]
 [section({.text.crt.wchar.unicode.locale.memory|.text.crt.dos.wchar.unicode.locale.memory})]
-wcscasestr_l:([nonnull] wchar_t const *haystack, [nonnull] wchar_t const *needle, $locale_t locale) -> wchar_t *
-	[([nonnull] wchar_t *haystack, [nonnull] wchar_t *needle, $locale_t locale) -> wchar_t *]
-	[([nonnull] wchar_t const *haystack, [nonnull] wchar_t const *needle, $locale_t locale) -> wchar_t const *]
-	%{copy(%auto, str2wcs)}
+wcscasestr_l:([[nonnull]] wchar_t const *haystack, [[nonnull]] wchar_t const *needle, $locale_t locale) -> wchar_t *
+	[([[nonnull]] wchar_t *haystack, [[nonnull]] wchar_t *needle, $locale_t locale) -> wchar_t *]
+	[([[nonnull]] wchar_t const *haystack, [[nonnull]] wchar_t const *needle, $locale_t locale) -> wchar_t const *]
+	%{generate(str2wcs)}
 
 [dependency_include(<parts/malloca.h>)]
 [same_impl][requires(!defined(__NO_MALLOCA))][export]
@@ -1598,7 +1598,7 @@ fuzzy_wmemcasecmp_l:([inp(s1_bytes)] wchar_t const *s1, $size_t s1_bytes,
 [dependency_include(<parts/malloca.h>)][wchar]
 [same_impl][requires($has_function(fuzzy_wmemcasecmp_l))][export]
 [section({.text.crt.wchar.unicode.locale.memory|.text.crt.dos.wchar.unicode.locale.memory})]
-fuzzy_wcscasecmp_l:([nonnull] wchar_t const *s1, [nonnull] wchar_t const *s2, $locale_t locale) -> $size_t {
+fuzzy_wcscasecmp_l:([[nonnull]] wchar_t const *s1, [[nonnull]] wchar_t const *s2, $locale_t locale) -> $size_t {
 	return fuzzy_wmemcasecmp_l(s1, wcslen(s1), s2, wcslen(s2), locale);
 }
 [ATTR_WUNUSED][ATTR_PURE]
@@ -1612,7 +1612,7 @@ fuzzy_wcsncasecmp_l:([inp(s1_maxlen)] wchar_t const *s1, $size_t s1_maxlen,
 
 [ATTR_WUNUSED][ATTR_PURE][wchar]
 [section({.text.crt.wchar.unicode.locale.memory|.text.crt.dos.wchar.unicode.locale.memory})]
-wildwcscasecmp_l:([nonnull] wchar_t const *pattern, [nonnull] wchar_t const *string, $locale_t locale) -> int
+wildwcscasecmp_l:([[nonnull]] wchar_t const *pattern, [[nonnull]] wchar_t const *string, $locale_t locale) -> int
 	%{copy(wildstrcasecmp_l, str2wcs)}
 
 %#endif /* __USE_XOPEN2K8 */
@@ -1652,12 +1652,12 @@ wildwcscasecmp_l:([nonnull] wchar_t const *pattern, [nonnull] wchar_t const *str
 [ATTR_NONNULL((1, 3))][dependency_include(<parts/errno.h>)][wchar]
 [section(.text.crt.dos.wchar.string.memory)][guard]
 wcscat_s:(wchar_t *dst, $size_t dstsize, wchar_t const *src) -> $errno_t
-	%{copy(%auto, str2wcs)}
+	%{generate(str2wcs)}
 
 [dependency_include(<parts/errno.h>)][wchar]
 [section(.text.crt.dos.wchar.string.memory)][guard]
 wcscpy_s:(wchar_t *dst, $rsize_t dstsize, wchar_t const *src) -> $errno_t
-	%{copy(%auto, str2wcs)}
+	%{generate(str2wcs)}
 
 %{
 #ifndef __wcsnlen_s_defined
@@ -1671,11 +1671,11 @@ __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL wcsnlen_s)(wchar_t const *__str, __SIZE_T
 
 [section(.text.crt.dos.wchar.string.memory)][wchar][guard]
 wcsncat_s:(wchar_t *dst, $rsize_t dstsize, wchar_t const *src, $rsize_t maxlen) -> $errno_t
-	%{copy(%auto, str2wcs)}
+	%{generate(str2wcs)}
 
 [section(.text.crt.dos.wchar.string.memory)][wchar][guard]
 wcsncpy_s:(wchar_t *dst, $rsize_t dstsize, wchar_t const *src, $rsize_t maxlen) -> $errno_t
-	%{copy(%auto, str2wcs)}
+	%{generate(str2wcs)}
 
 [ATTR_NONNULL((2, 3))][wchar][noexport][nouser]
 [section(.text.crt.dos.wchar.string.memory)][guard]
@@ -1778,7 +1778,7 @@ wmemmove_s:(wchar_t *dst, rsize_t dstlength, wchar_t const *src, rsize_t srcleng
 [alias(_wcsnset)][ATTR_RETNONNULL][ATTR_NONNULL((1))][wchar]
 [section(.text.crt.dos.wchar.string.memory)][guard]
 wcsnset:(wchar_t *__restrict str, wchar_t ch, $size_t maxlen) -> wchar_t *
-	%{copy(%auto, str2wcs)}
+	%{generate(str2wcs)}
 
 [alias(_wcsrev)][ATTR_RETNONNULL][ATTR_NONNULL((1))][wchar][guard]
 [section(.text.crt.dos.wchar.string.memory)][doc_alias(strrev)]
@@ -1796,15 +1796,15 @@ wcsrev:(wchar_t *__restrict str) -> wchar_t * {
 
 [alias(_wcsset)][ATTR_RETNONNULL][ATTR_NONNULL((1))][wchar]
 [section(.text.crt.dos.wchar.string.memory)][guard]
-wcsset:(wchar_t *__restrict str, wchar_t ch) -> wchar_t * %{copy(%auto, str2wcs)}
+wcsset:(wchar_t *__restrict str, wchar_t ch) -> wchar_t * %{generate(str2wcs)}
 
 [alias(_wcslwr)][ATTR_RETNONNULL][ATTR_NONNULL((1))][wchar]
 [section(.text.crt.dos.wchar.unicode.static.memory)][guard]
-wcslwr:(wchar_t *__restrict str) -> wchar_t * %{copy(%auto, str2wcs)}
+wcslwr:(wchar_t *__restrict str) -> wchar_t * %{generate(str2wcs)}
 
 [alias(_wcsupr)][ATTR_RETNONNULL][ATTR_NONNULL((1))][wchar]
 [section(.text.crt.dos.wchar.unicode.static.memory)][guard]
-wcsupr:(wchar_t *__restrict str) -> wchar_t * %{copy(%auto, str2wcs)}
+wcsupr:(wchar_t *__restrict str) -> wchar_t * %{generate(str2wcs)}
 %#endif /* __USE_DOS || __USE_KOS */
 
 
@@ -1814,35 +1814,35 @@ wcsupr:(wchar_t *__restrict str) -> wchar_t * %{copy(%auto, str2wcs)}
 
 %#ifdef __USE_DOS_SLIB
 %[default_impl_section(.text.crt.dos.wchar.FILE.locked.write.printf)]
-[guard][wchar] vswprintf_s:([outp(wchar_count)] wchar_t *dst, $size_t wchar_count, [nonnull] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T = vswprintf;
-[guard][wchar] swprintf_s:([outp(wchar_count)] wchar_t *dst, $size_t wchar_count, [nonnull] wchar_t const *format, ...) -> __STDC_INT_AS_SSIZE_T = swprintf;
-[guard][wchar][cp_stdio] vfwprintf_s:([nonnull] $FILE *stream, [nonnull] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T = vfwprintf;
-[guard][wchar][cp_stdio] fwprintf_s:([nonnull] $FILE *stream, [nonnull] wchar_t const *format, ...) -> __STDC_INT_AS_SSIZE_T = fwprintf;
-[guard][wchar][cp_stdio] vwprintf_s:([nonnull] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T = vwprintf;
-[guard][wchar][cp_stdio] wprintf_s:([nonnull] wchar_t const *format, ...) -> __STDC_INT_AS_SSIZE_T = wprintf;
+[guard][wchar] vswprintf_s:([outp(wchar_count)] wchar_t *dst, $size_t wchar_count, [[nonnull]] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T = vswprintf;
+[guard][wchar] swprintf_s:([outp(wchar_count)] wchar_t *dst, $size_t wchar_count, [[nonnull]] wchar_t const *format, ...) -> __STDC_INT_AS_SSIZE_T = swprintf;
+[guard][wchar][cp_stdio] vfwprintf_s:([[nonnull]] $FILE *stream, [[nonnull]] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T = vfwprintf;
+[guard][wchar][cp_stdio] fwprintf_s:([[nonnull]] $FILE *stream, [[nonnull]] wchar_t const *format, ...) -> __STDC_INT_AS_SSIZE_T = fwprintf;
+[guard][wchar][cp_stdio] vwprintf_s:([[nonnull]] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T = vwprintf;
+[guard][wchar][cp_stdio] wprintf_s:([[nonnull]] wchar_t const *format, ...) -> __STDC_INT_AS_SSIZE_T = wprintf;
 
 %[default_impl_section(.text.crt.dos.wchar.FILE.locked.read.scanf)]
-[guard][ATTR_WUNUSED] vswscanf_s:([nonnull] wchar_t const *src, [nonnull] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T = vswscanf;
-[guard][ATTR_WUNUSED] swscanf_s:([nonnull] wchar_t const *src, [nonnull] wchar_t const *format, ...) -> __STDC_INT_AS_SSIZE_T = swscanf;
-[guard][ATTR_WUNUSED][cp_stdio] vfwscanf_s:([nonnull] $FILE *stream, [nonnull] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T = vfwscanf;
-[guard][ATTR_WUNUSED][cp_stdio] fwscanf_s:([nonnull] $FILE *stream, [nonnull] wchar_t const *format, ...) -> __STDC_INT_AS_SSIZE_T = fwscanf;
-[guard][ATTR_WUNUSED][cp_stdio] vwscanf_s:([nonnull] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T = vwscanf;
-[guard][ATTR_WUNUSED][cp_stdio] wscanf_s:([nonnull] wchar_t const *format, ...) -> __STDC_INT_AS_SSIZE_T = wscanf;
+[guard][ATTR_WUNUSED] vswscanf_s:([[nonnull]] wchar_t const *src, [[nonnull]] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T = vswscanf;
+[guard][ATTR_WUNUSED] swscanf_s:([[nonnull]] wchar_t const *src, [[nonnull]] wchar_t const *format, ...) -> __STDC_INT_AS_SSIZE_T = swscanf;
+[guard][ATTR_WUNUSED][cp_stdio] vfwscanf_s:([[nonnull]] $FILE *stream, [[nonnull]] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T = vfwscanf;
+[guard][ATTR_WUNUSED][cp_stdio] fwscanf_s:([[nonnull]] $FILE *stream, [[nonnull]] wchar_t const *format, ...) -> __STDC_INT_AS_SSIZE_T = fwscanf;
+[guard][ATTR_WUNUSED][cp_stdio] vwscanf_s:([[nonnull]] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T = vwscanf;
+[guard][ATTR_WUNUSED][cp_stdio] wscanf_s:([[nonnull]] wchar_t const *format, ...) -> __STDC_INT_AS_SSIZE_T = wscanf;
 
 %#endif /* __USE_DOS_SLIB */
 
 %[default_impl_section(.text.crt.dos.wchar.FILE.locked.write.printf)]
 [guard][wchar][ATTR_WUNUSED][same_impl]
-_vscwprintf:([nonnull] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+_vscwprintf:([[nonnull]] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T {
 	return vswprintf(NULL, 0, format, args);
 }
 
 [guard][wchar][ATTR_WUNUSED]
-_scwprintf:([nonnull] wchar_t const *format, ...)
+_scwprintf:([[nonnull]] wchar_t const *format, ...)
 		-> int %{auto_block(printf(%auto))}
 
 [guard][wchar][ATTR_WUNUSED]
-_vscwprintf_p:([nonnull] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+_vscwprintf_p:([[nonnull]] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T {
 	/* TODO */
 	(void)format;
 	(void)args;
@@ -1851,57 +1851,57 @@ _vscwprintf_p:([nonnull] wchar_t const *format, $va_list args) -> __STDC_INT_AS_
 }
 
 [guard][wchar][ATTR_WUNUSED]
-_scwprintf_p:([nonnull] wchar_t const *format, ...)
+_scwprintf_p:([[nonnull]] wchar_t const *format, ...)
 		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
 
 [guard][wchar][ATTR_WUNUSED]
-_vscwprintf_l:([nonnull] wchar_t const *format,
-               [nullable] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+_vscwprintf_l:([[nonnull]] wchar_t const *format,
+               [[nullable]] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
 	(void)locale;
 	return _vscwprintf(format, args);
 }
 
 [guard][wchar][ATTR_WUNUSED]
-_scwprintf_l:([nonnull] wchar_t const *format,
-              [nullable] $locale_t locale, ...)
+_scwprintf_l:([[nonnull]] wchar_t const *format,
+              [[nullable]] $locale_t locale, ...)
 		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
 
 [guard][wchar][ATTR_WUNUSED]
-_vscwprintf_p_l:([nonnull] wchar_t const *format,
-                 [nullable] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+_vscwprintf_p_l:([[nonnull]] wchar_t const *format,
+                 [[nullable]] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
 	(void)locale;
 	return _vscwprintf_p(format, args);
 }
 
 [guard][wchar][ATTR_WUNUSED]
-_scwprintf_p_l:([nonnull] wchar_t const *format,
-                [nullable] $locale_t locale, ...)
+_scwprintf_p_l:([[nonnull]] wchar_t const *format,
+                [[nullable]] $locale_t locale, ...)
 		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
 
 [guard][wchar]
 _vswprintf_c:([outp(bufsize)] wchar_t *buf, $size_t bufsize,
-              [nonnull] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T = vswprintf;
+              [[nonnull]] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T = vswprintf;
 
 [guard][wchar]
 _swprintf_c:([outp(bufsize)] wchar_t *buf, $size_t bufsize,
-             [nonnull] wchar_t const *format, ...) = swprintf;
+             [[nonnull]] wchar_t const *format, ...) = swprintf;
 
 [guard][wchar]
 _vsnwprintf_s:([outp_opt(min(return,bufsize,buflen))] wchar_t *buf, $size_t bufsize, $size_t buflen,
-               [nonnull] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+               [[nonnull]] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T {
 	(void)buflen;
 	return vswprintf(buf, bufsize, format, args);
 }
 
 [guard][wchar]
 _snwprintf_s:([outp_opt(min(return,bufsize,buflen))] wchar_t *buf, $size_t bufsize,
-              $size_t buflen, [nonnull] wchar_t const *format, ...)
+              $size_t buflen, [[nonnull]] wchar_t const *format, ...)
 		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
 
 
 [guard][wchar][cp_stdio]
-_vfwprintf_p:([nonnull] $FILE *stream,
-              [nonnull] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+_vfwprintf_p:([[nonnull]] $FILE *stream,
+              [[nonnull]] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T {
 	/* TODO */
 	(void)stream;
 	(void)format;
@@ -1911,24 +1911,24 @@ _vfwprintf_p:([nonnull] $FILE *stream,
 }
 
 [guard][wchar][cp_stdio]
-_fwprintf_p:([nonnull] $FILE *stream,
-             [nonnull] wchar_t const *format, ...)
+_fwprintf_p:([[nonnull]] $FILE *stream,
+             [[nonnull]] wchar_t const *format, ...)
 		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
 
 [guard][wchar][cp_stdio]
 [same_impl][requires(!defined(__NO_STDSTREAMS) && $has_function(_vfwprintf_p))]
 [dependency_include(<local/stdstreams.h>)]
-_vwprintf_p:([nonnull] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+_vwprintf_p:([[nonnull]] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T {
 	return _vfwprintf_p(stdout, format, args);
 }
 
 [guard][wchar][cp_stdio]
-_wprintf_p:([nonnull] wchar_t const *format, ...)
+_wprintf_p:([[nonnull]] wchar_t const *format, ...)
 		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
 
 [guard][wchar]
 _vswprintf_p:([outp(bufsize)] wchar_t *buf, $size_t bufsize,
-              [nonnull] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+              [[nonnull]] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T {
 	/* TODO */
 	(void)buf;
 	(void)bufsize;
@@ -1940,158 +1940,158 @@ _vswprintf_p:([outp(bufsize)] wchar_t *buf, $size_t bufsize,
 
 [guard][wchar]
 _swprintf_p:([outp(bufsize)] wchar_t *dst, $size_t bufsize,
-             [nonnull] wchar_t const *format, ...)
+             [[nonnull]] wchar_t const *format, ...)
 		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
 
 [guard][wchar][cp_stdio][same_impl][requires($has_function(vwprintf))]
-_vwprintf_l:([nonnull] wchar_t const *format,
-             [nullable] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+_vwprintf_l:([[nonnull]] wchar_t const *format,
+             [[nullable]] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
 	(void)locale;
 	return vwprintf(format, args);
 }
 
 [guard][wchar][cp_stdio]
-_wprintf_l:([nonnull] wchar_t const *format, [nullable] $locale_t locale, ...)
+_wprintf_l:([[nonnull]] wchar_t const *format, [[nullable]] $locale_t locale, ...)
 		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
 
 
 [guard][wchar][cp_stdio][same_impl][requires($has_function(_vwprintf_p))]
-_vwprintf_p_l:([nonnull] wchar_t const *format,
-               [nullable] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+_vwprintf_p_l:([[nonnull]] wchar_t const *format,
+               [[nullable]] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
 	(void)locale;
 	return _vwprintf_p(format, args);
 }
 
 [guard][wchar][cp_stdio]
-_wprintf_p_l:([nonnull] wchar_t const *format, [nullable] $locale_t locale, ...)
+_wprintf_p_l:([[nonnull]] wchar_t const *format, [[nullable]] $locale_t locale, ...)
 		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
 
 
 [guard][wchar][cp_stdio][same_impl][requires($has_function(vwprintf_s))]
-_vwprintf_s_l:([nonnull] wchar_t const *format,
-               [nullable] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+_vwprintf_s_l:([[nonnull]] wchar_t const *format,
+               [[nullable]] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
 	(void)locale;
 	return vwprintf_s(format, args);
 }
 
 [guard][wchar][cp_stdio]
-_wprintf_s_l:([nonnull] wchar_t const *format, [nullable] $locale_t locale, ...)
+_wprintf_s_l:([[nonnull]] wchar_t const *format, [[nullable]] $locale_t locale, ...)
 		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
 
 
 [guard][wchar][cp_stdio][same_impl][requires($has_function(vfwprintf))]
-_vfwprintf_l:([nonnull] $FILE *stream, [nonnull] wchar_t const *format,
-              [nullable] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+_vfwprintf_l:([[nonnull]] $FILE *stream, [[nonnull]] wchar_t const *format,
+              [[nullable]] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
 	(void)locale;
 	return vfwprintf(stream, format, args);
 }
 
 [guard][wchar][cp_stdio]
-_fwprintf_l:([nonnull] $FILE *stream, [nonnull] wchar_t const *format,
-             [nullable] $locale_t locale, ...)
+_fwprintf_l:([[nonnull]] $FILE *stream, [[nonnull]] wchar_t const *format,
+             [[nullable]] $locale_t locale, ...)
 		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
 
 
 [guard][wchar][cp_stdio][same_impl][requires($has_function(_vfwprintf_p))]
-_vfwprintf_p_l:([nonnull] $FILE *stream,
-                [nonnull] wchar_t const *format,
-                [nullable] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+_vfwprintf_p_l:([[nonnull]] $FILE *stream,
+                [[nonnull]] wchar_t const *format,
+                [[nullable]] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
 	(void)locale;
 	return _vfwprintf_p(stream, format, args);
 }
 
 [guard][wchar][cp_stdio]
-_fwprintf_p_l:([nonnull] $FILE *stream,
-               [nonnull] wchar_t const *format,
-               [nullable] $locale_t locale, ...)
+_fwprintf_p_l:([[nonnull]] $FILE *stream,
+               [[nonnull]] wchar_t const *format,
+               [[nullable]] $locale_t locale, ...)
 		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
 
 
 [guard][wchar][cp_stdio][same_impl][requires($has_function(vfwprintf_s))]
-_vfwprintf_s_l:([nonnull] $FILE *stream,
-                [nonnull] wchar_t const *format,
-                [nullable] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+_vfwprintf_s_l:([[nonnull]] $FILE *stream,
+                [[nonnull]] wchar_t const *format,
+                [[nullable]] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
 	(void)locale;
 	return vfwprintf_s(stream, format, args);
 }
 
 [guard][wchar][cp_stdio]
-_fwprintf_s_l:([nonnull] $FILE *stream,
-               [nonnull] wchar_t const *format,
-               [nullable] $locale_t locale, ...)
+_fwprintf_s_l:([[nonnull]] $FILE *stream,
+               [[nonnull]] wchar_t const *format,
+               [[nullable]] $locale_t locale, ...)
 		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
 
 
 [guard][wchar]
 _vswprintf_c_l:([outp(bufsize)] wchar_t *dst, $size_t bufsize,
-                [nonnull] wchar_t const *format,
-                [nullable] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+                [[nonnull]] wchar_t const *format,
+                [[nullable]] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
 	(void)locale;
 	return _vswprintf_c(dst, bufsize, format, args);
 }
 
 [guard][wchar]
 _swprintf_c_l:([outp(bufsize)] wchar_t *dst, $size_t bufsize,
-               [nonnull] wchar_t const *format,
-               [nullable] $locale_t locale, ...)
+               [[nonnull]] wchar_t const *format,
+               [[nullable]] $locale_t locale, ...)
 		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
 
 
 [guard][wchar]
 _vswprintf_p_l:([outp(bufsize)] wchar_t *dst, $size_t bufsize,
-                [nonnull] wchar_t const *format,
-                [nullable] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+                [[nonnull]] wchar_t const *format,
+                [[nullable]] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
 	(void)locale;
 	return _vswprintf_p(dst, bufsize, format, args);
 }
 
 [guard][wchar]
 _swprintf_p_l:([outp(bufsize)] wchar_t *dst, $size_t bufsize,
-               [nonnull] wchar_t const *format,
-               [nullable] $locale_t locale, ...)
+               [[nonnull]] wchar_t const *format,
+               [[nullable]] $locale_t locale, ...)
 		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
 
 
 [guard][wchar]
 _vswprintf_s_l:([outp(wchar_count)] wchar_t *dst, $size_t wchar_count,
-                [nonnull] wchar_t const *format,
-                [nullable] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+                [[nonnull]] wchar_t const *format,
+                [[nullable]] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
 	(void)locale;
 	return vswprintf_s(dst, wchar_count, format, args);
 }
 
 [guard][wchar]
 _swprintf_s_l:([outp(wchar_count)] wchar_t *dst, $size_t wchar_count,
-               [nonnull] wchar_t const *format, [nullable] $locale_t locale, ...)
+               [[nonnull]] wchar_t const *format, [[nullable]] $locale_t locale, ...)
 		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
 
 
 [guard][wchar]
 _vsnwprintf_l:([outp(bufsize)] wchar_t *dst, $size_t bufsize,
-               [nonnull] wchar_t const *format,
-               [nullable] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+               [[nonnull]] wchar_t const *format,
+               [[nullable]] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
 	(void)locale;
 	return vswprintf(dst, bufsize, format, args);
 }
 
 [guard][wchar]
 _snwprintf_l:([outp(bufsize)] wchar_t *dst, $size_t bufsize,
-              [nonnull] wchar_t const *format, [nullable] $locale_t locale, ...)
+              [[nonnull]] wchar_t const *format, [[nullable]] $locale_t locale, ...)
 		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
 
 
 [guard][wchar]
 _vsnwprintf_s_l:([outp(wchar_count)] wchar_t *dst, $size_t wchar_count,
-                 $size_t bufsize, [nonnull] wchar_t const *format,
-                 [nullable] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+                 $size_t bufsize, [[nonnull]] wchar_t const *format,
+                 [[nullable]] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
 	(void)locale;
 	return _vsnwprintf_s(dst, wchar_count, bufsize, format, args);
 }
 
 [guard][wchar]
 _snwprintf_s_l:([outp(wchar_count)] wchar_t *dst, $size_t wchar_count,
-                $size_t bufsize, [nonnull] wchar_t const *format,
-                [nullable] $locale_t locale, ...)
+                $size_t bufsize, [[nonnull]] wchar_t const *format,
+                [[nullable]] $locale_t locale, ...)
 		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
 
 
@@ -2099,40 +2099,40 @@ _snwprintf_s_l:([outp(wchar_count)] wchar_t *dst, $size_t wchar_count,
 %[default_impl_section(.text.crt.dos.wchar.FILE.locked.read.scanf)]
 
 [ignore][wchar][cp_stdio][ATTR_WUNUSED][same_impl][requires($has_function(vfwscanf))]
-_vfwscanf_l:([nonnull] $FILE *stream, [nonnull] wchar_t const *format,
-             [nullable] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+_vfwscanf_l:([[nonnull]] $FILE *stream, [[nonnull]] wchar_t const *format,
+             [[nullable]] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
 	(void)locale;
 	return vfwscanf(stream, format, args);
 }
 
 [guard][wchar][cp_stdio][ATTR_WUNUSED]
-_fwscanf_l:([nonnull] $FILE *stream, [nonnull] wchar_t const *format,
-            [nullable] $locale_t locale, ...)
+_fwscanf_l:([[nonnull]] $FILE *stream, [[nonnull]] wchar_t const *format,
+            [[nullable]] $locale_t locale, ...)
 		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
 
-[ignore][wchar][cp_stdio][ATTR_WUNUSED] _vfwscanf_s_l:([nonnull] $FILE *stream, [nonnull] wchar_t const *format, [nullable] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T = _vfwscanf_l;
-[guard][wchar][cp_stdio][ATTR_WUNUSED] _fwscanf_s_l:([nonnull] $FILE *stream, [nonnull] wchar_t const *format, [nullable] $locale_t locale, ...) -> __STDC_INT_AS_SSIZE_T = _fwscanf_l;
+[ignore][wchar][cp_stdio][ATTR_WUNUSED] _vfwscanf_s_l:([[nonnull]] $FILE *stream, [[nonnull]] wchar_t const *format, [[nullable]] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T = _vfwscanf_l;
+[guard][wchar][cp_stdio][ATTR_WUNUSED] _fwscanf_s_l:([[nonnull]] $FILE *stream, [[nonnull]] wchar_t const *format, [[nullable]] $locale_t locale, ...) -> __STDC_INT_AS_SSIZE_T = _fwscanf_l;
 
 [ignore][wchar][ATTR_WUNUSED]
-_vswscanf_l:([nonnull] wchar_t const *src,
-             [nonnull] wchar_t const *format,
-             [nullable] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+_vswscanf_l:([[nonnull]] wchar_t const *src,
+             [[nonnull]] wchar_t const *format,
+             [[nullable]] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
 	(void)locale;
 	return vswscanf(src, format, args);
 }
 
 [guard][wchar][ATTR_WUNUSED]
-_swscanf_l:([nonnull] wchar_t const *src,
-            [nonnull] wchar_t const *format,
-            [nullable] $locale_t locale, ...)
+_swscanf_l:([[nonnull]] wchar_t const *src,
+            [[nonnull]] wchar_t const *format,
+            [[nullable]] $locale_t locale, ...)
 		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
 
-[ignore][wchar][ATTR_WUNUSED] _vswscanf_s_l:([nonnull] wchar_t const *src, [nonnull] wchar_t const *format, [nullable] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T = _vswscanf_l;
-[guard][wchar][ATTR_WUNUSED] _swscanf_s_l:([nonnull] wchar_t const *src, [nonnull] wchar_t const *format, [nullable] $locale_t locale, ...) -> __STDC_INT_AS_SSIZE_T = _swscanf_l;
+[ignore][wchar][ATTR_WUNUSED] _vswscanf_s_l:([[nonnull]] wchar_t const *src, [[nonnull]] wchar_t const *format, [[nullable]] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T = _vswscanf_l;
+[guard][wchar][ATTR_WUNUSED] _swscanf_s_l:([[nonnull]] wchar_t const *src, [[nonnull]] wchar_t const *format, [[nullable]] $locale_t locale, ...) -> __STDC_INT_AS_SSIZE_T = _swscanf_l;
 
 [ignore][wchar][ATTR_WUNUSED]
 _vsnwscanf:([inp(bufsize)] wchar_t const *src, $size_t bufsize,
-            [nonnull] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+            [[nonnull]] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T {
 	/* TODO */
 	(void)src;
 	(void)bufsize;
@@ -2144,12 +2144,12 @@ _vsnwscanf:([inp(bufsize)] wchar_t const *src, $size_t bufsize,
 
 [guard][wchar][ATTR_WUNUSED]
 _snwscanf:([inp(bufsize)] wchar_t const *src, $size_t bufsize,
-           [nonnull] wchar_t const *format, ...)
+           [[nonnull]] wchar_t const *format, ...)
 		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
 
 [ignore][wchar][ATTR_WUNUSED]
 _vsnwscanf_l:([inp(bufsize)] wchar_t const *src, $size_t bufsize,
-              [nonnull] wchar_t const *format, [nullable] $locale_t locale,
+              [[nonnull]] wchar_t const *format, [[nullable]] $locale_t locale,
               $va_list args) -> __STDC_INT_AS_SSIZE_T {
 	(void)locale;
 	return _vsnwscanf(src, bufsize, format, args);
@@ -2157,15 +2157,15 @@ _vsnwscanf_l:([inp(bufsize)] wchar_t const *src, $size_t bufsize,
 
 [guard][wchar][ATTR_WUNUSED]
 _snwscanf_l:([inp(bufsize)] wchar_t const *src, $size_t bufsize,
-             [nonnull] wchar_t const *format, [nullable] $locale_t locale, ...)
+             [[nonnull]] wchar_t const *format, [[nullable]] $locale_t locale, ...)
 		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
 
-[ignore][wchar][ATTR_WUNUSED] _vsnwscanf_s:([inp(bufsize)] wchar_t const *src, $size_t bufsize, [nonnull] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T = _vsnwscanf;
-[guard][wchar][ATTR_WUNUSED] _snwscanf_s:([inp(bufsize)] wchar_t const *src, $size_t bufsize, [nonnull] wchar_t const *format, ...) -> __STDC_INT_AS_SSIZE_T = _snwscanf;
+[ignore][wchar][ATTR_WUNUSED] _vsnwscanf_s:([inp(bufsize)] wchar_t const *src, $size_t bufsize, [[nonnull]] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T = _vsnwscanf;
+[guard][wchar][ATTR_WUNUSED] _snwscanf_s:([inp(bufsize)] wchar_t const *src, $size_t bufsize, [[nonnull]] wchar_t const *format, ...) -> __STDC_INT_AS_SSIZE_T = _snwscanf;
 
 [ignore][wchar][ATTR_WUNUSED][same_impl]
 _vsnwscanf_s_l:([inp(bufsize)] wchar_t const *src, $size_t bufsize,
-                [nonnull] wchar_t const *format, [nullable] $locale_t locale,
+                [[nonnull]] wchar_t const *format, [[nullable]] $locale_t locale,
                 $va_list args) -> __STDC_INT_AS_SSIZE_T {
 	(void)locale;
 	return _vsnwscanf_s(src, bufsize, format, args);
@@ -2173,27 +2173,27 @@ _vsnwscanf_s_l:([inp(bufsize)] wchar_t const *src, $size_t bufsize,
 
 [guard][wchar][ATTR_WUNUSED]
 _snwscanf_s_l:([inp(bufsize)] wchar_t const *src, $size_t bufsize,
-               [nonnull] wchar_t const *format, [nullable] $locale_t locale, ...)
+               [[nonnull]] wchar_t const *format, [[nullable]] $locale_t locale, ...)
 		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
 
 [ignore][wchar][cp_stdio][ATTR_WUNUSED][requires($has_function(vwscanf))][same_impl]
-_vwscanf_l:([nonnull] wchar_t const *format, [nullable] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+_vwscanf_l:([[nonnull]] wchar_t const *format, [[nullable]] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
 	(void)locale;
 	return vwscanf(format, args);
 }
 [guard][wchar][cp_stdio][ATTR_WUNUSED][same_impl]
-_wscanf_l:([nonnull] wchar_t const *format, [nullable] $locale_t locale, ...)
+_wscanf_l:([[nonnull]] wchar_t const *format, [[nullable]] $locale_t locale, ...)
 		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
 
-[ignore][wchar][cp_stdio][ATTR_WUNUSED] _vwscanf_s_l:([nonnull] wchar_t const *format, [nullable] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T = _vwscanf_l;
-[guard][wchar][cp_stdio][ATTR_WUNUSED] _wscanf_s_l:([nonnull] wchar_t const *format, [nullable] $locale_t locale, ...) -> __STDC_INT_AS_SSIZE_T = _wscanf_l;
+[ignore][wchar][cp_stdio][ATTR_WUNUSED] _vwscanf_s_l:([[nonnull]] wchar_t const *format, [[nullable]] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T = _vwscanf_l;
+[guard][wchar][cp_stdio][ATTR_WUNUSED] _wscanf_s_l:([[nonnull]] wchar_t const *format, [[nullable]] $locale_t locale, ...) -> __STDC_INT_AS_SSIZE_T = _wscanf_l;
 
 
 %[default_impl_section(.text.crt.dos.wchar.FILE.locked.access)]
-[guard][wchar][ATTR_WUNUSED] _wfsopen:([nonnull] wchar_t const *filename, [nonnull] wchar_t const *mode, int sh_flag) -> $FILE *;
-[guard][wchar][ATTR_WUNUSED] _wfdopen:($fd_t fd, [nonnull] wchar_t const *mode) -> $FILE *;
-[guard][wchar] _wfopen_s:([nonnull] $FILE **pstream, [nonnull] wchar_t const *filename, [nonnull] wchar_t const *mode) -> $errno_t;
-[guard][wchar] _wfreopen_s:([nonnull] $FILE **pstream, [nonnull] wchar_t const *filename, [nonnull] wchar_t const *mode, $FILE *stream) -> $errno_t;
+[guard][wchar][ATTR_WUNUSED] _wfsopen:([[nonnull]] wchar_t const *filename, [[nonnull]] wchar_t const *mode, int sh_flag) -> $FILE *;
+[guard][wchar][ATTR_WUNUSED] _wfdopen:($fd_t fd, [[nonnull]] wchar_t const *mode) -> $FILE *;
+[guard][wchar] _wfopen_s:([[nonnull]] $FILE **pstream, [[nonnull]] wchar_t const *filename, [[nonnull]] wchar_t const *mode) -> $errno_t;
+[guard][wchar] _wfreopen_s:([[nonnull]] $FILE **pstream, [[nonnull]] wchar_t const *filename, [[nonnull]] wchar_t const *mode, $FILE *stream) -> $errno_t;
 [guard][wchar][alias(*)][attribute(*)] _wfopen:(*) = wfopen;
 [guard][wchar][alias(*)][attribute(*)] _wfreopen:(*) = wfreopen;
 
@@ -2210,14 +2210,14 @@ _wscanf_l:([nonnull] wchar_t const *format, [nullable] $locale_t locale, ...)
 [requires_include(<__crt.h>)]
 [requires($has_function(fputws) && !defined(__NO_STDSTREAMS))]
 [section(.text.crt.dos.wchar.FILE.locked.write.write)][same_impl]
-[guard][wchar] _putws:([nonnull] wchar_t const *string) -> __STDC_INT_AS_SIZE_T {
+[guard][wchar] _putws:([[nonnull]] wchar_t const *string) -> __STDC_INT_AS_SIZE_T {
 	return fputws(string, stdout);
 }
 
 [section(.text.crt.dos.wchar.fs.utility)]
 [guard][wchar][ATTR_WUNUSED]
-_wtempnam:([nullable] wchar_t const *directory,
-           [nullable] wchar_t const *file_prefix) -> wchar_t *;
+_wtempnam:([[nullable]] wchar_t const *directory,
+           [[nullable]] wchar_t const *file_prefix) -> wchar_t *;
 
 %#ifndef _CRT_WPERROR_DEFINED
 %#define _CRT_WPERROR_DEFINED

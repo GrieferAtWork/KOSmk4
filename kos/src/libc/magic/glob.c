@@ -154,10 +154,13 @@ typedef struct __glob64_struct {
 
 typedef int (__LIBCCALL *__glob_errfunc_t)(char const *__path, int __flags);
 
-}
+};
 
-[doc_alias(glob)][ignore] glob32:([nonnull] char const *__restrict pattern, int flags, __glob_errfunc_t errfunc, [nonnull] void *__restrict pglob) -> int = glob?;
-[doc_alias(globfree)][ignore] globfree32:(void *pglob) = globfree?;
+[[ignore, nocrt, doc_alias(glob), alias(glob)]]
+int glob32([[nonnull]] char const *__restrict pattern, int flags, __glob_errfunc_t errfunc,
+           [[nonnull]] void *__restrict pglob);
+[[ignore, nocrt, doc_alias(globfree), alias(globfree)]]
+void globfree32(void *pglob);
 
 
 @@Do glob searching for PATTERN, placing results in PGLOB.
@@ -168,68 +171,70 @@ typedef int (__LIBCCALL *__glob_errfunc_t)(char const *__path, int __flags);
 @@`glob' returns GLOB_ABEND; if it returns zero, the error is ignored.
 @@If memory cannot be allocated for PGLOB, GLOB_NOSPACE is returned.
 @@Otherwise, `glob' returns zero
-[if(defined(__USE_FILE_OFFSET64)), preferred_alias(glob64)]
-[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(glob)][noexport][user]
-glob:([nonnull] char const *__restrict pattern, int flags,
-      [nullable] __glob_errfunc_t errfunc,
-      [nonnull] glob_t *__restrict pglob) -> int {
-#if defined(__CRT_HAVE_glob)
+[[if(defined(__USE_FILE_OFFSET64)), preferred_alias(glob64)]]
+[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(glob)]]
+[[userimpl, no_crt_self_import]]
+glob:([[nonnull]] char const *__restrict pattern, int flags,
+      [[nullable]] __glob_errfunc_t errfunc,
+      [[nonnull]] glob_t *__restrict pglob) -> int {
+@@pp_if $has_function(glob32)@@
 	return glob32(pattern, flags, errfunc, pglob);
-#elif defined(__CRT_HAVE_glob64)
+@@pp_elif $has_function(glob64)@@
 	return glob64(pattern, flags, errfunc, (struct __glob64_struct *)pglob);
-#else
+@@pp_else@@
 	(void)pattern;
 	(void)flags;
 	(void)errfunc;
 	(void)pglob;
 	COMPILER_IMPURE();
 	return @GLOB_NOSYS@;
-#endif
+@@pp_endif@@
 }
 
 
 
 
 @@Free storage allocated in PGLOB by a previous `glob' call
-[if(defined(__USE_FILE_OFFSET64)), preferred_alias(globfree64)]
-[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(globfree)][noexport][user]
-globfree:([nonnull] glob_t *pglob) {
-#if defined(__CRT_HAVE_globfree)
+[[if(defined(__USE_FILE_OFFSET64)), preferred_alias(globfree64)]]
+[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(globfree)]]
+[[userimpl, no_crt_self_import]]
+globfree([[nonnull]] glob_t *pglob) {
+@@pp_if $has_function(globfree32)@@
 	globfree32(pglob);
-#elif defined(__CRT_HAVE_globfree64)
+@@pp_elif $has_function(globfree64)@@
 	globfree64((struct __glob64_struct *)pglob);
-#else
+@@pp_else@@
 	COMPILER_IMPURE();
 	(void)pglob;
-#endif
+@@pp_endif@@
 }
 
 %
 %#ifdef __USE_LARGEFILE64
-[doc_alias(glob)][decl_prefix(struct __glob64_struct;)][noexport][user]
-glob64:([nonnull] const char *__restrict pattern, int flags,
-        [nullable] __glob_errfunc_t errfunc,
-        [nonnull] struct __glob64_struct *__restrict pglob) -> int {
-#if defined(__CRT_HAVE_glob)
+[doc_alias(glob)][decl_prefix(struct __glob64_struct;)][userimpl]
+glob64:([[nonnull]] const char *__restrict pattern, int flags,
+        [[nullable]] __glob_errfunc_t errfunc,
+        [[nonnull]] struct __glob64_struct *__restrict pglob) -> int {
+@@pp_if_has_function(glob32)@@
 	return glob32(pattern, flags, errfunc, pglob);
-#else
+@@pp_else@@
 	(void)pattern;
 	(void)flags;
 	(void)errfunc;
 	(void)pglob;
 	COMPILER_IMPURE();
 	return @GLOB_NOSYS@;
-#endif
+@@pp_endif@@
 }
 
-[doc_alias(globfree)][decl_prefix(struct __glob64_struct;)][noexport][user]
-globfree64:([nonnull] struct __glob64_struct *pglob) {
-#if defined(__CRT_HAVE_globfree)
+[[doc_alias(globfree), decl_prefix(struct __glob64_struct;), userimpl]]
+void globfree64([[nonnull]] struct __glob64_struct *pglob) {
+@@pp_if_has_function(globfree32)@@
 	globfree32(pglob);
-#else
+@@pp_else@@
 	COMPILER_IMPURE();
 	(void)pglob;
-#endif
+@@pp_endif@@
 }
 %#endif /* __USE_LARGEFILE64 */
 

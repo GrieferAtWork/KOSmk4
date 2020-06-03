@@ -75,7 +75,7 @@ typedef __SIZE_TYPE__ size_t;
 realloc_in_place:(void *__restrict mallptr, size_t n_bytes) -> void *;
 
 [section(.text.crt.heap.rare_helpers)]
-crt_posix_memalign:([nonnull] void **__restrict pp, size_t alignment, size_t n_bytes) -> int = posix_memalign?;
+crt_posix_memalign:([[nonnull]] void **__restrict pp, size_t alignment, size_t n_bytes) -> int = posix_memalign?;
 
 %
 [ATTR_WUNUSED][ATTR_ALLOC_ALIGN(1)][ATTR_ALLOC_SIZE((2))]
@@ -105,7 +105,7 @@ valloc:($size_t n_bytes) -> void * {
 [dependency_include(<parts/errno.h>)]
 [requires($has_function(memalign))][noexport][guard]
 [section(.text.crt.heap.rare_helpers)][crtbuiltin]
-posix_memalign:([nonnull] void **__restrict pp, $size_t alignment, $size_t n_bytes) -> int {
+posix_memalign:([[nonnull]] void **__restrict pp, $size_t alignment, $size_t n_bytes) -> int {
 	void *result;
 	size_t d = alignment / sizeof(void *);
 	size_t r = alignment % sizeof(void *);
@@ -128,9 +128,7 @@ posix_memalign:([nonnull] void **__restrict pp, $size_t alignment, $size_t n_byt
 	return 0;
 }
 
-[guard][preferred_alias(free)]
-[section(.text.crt.heap.rare_helpers)]
-cfree:(void *__restrict mallptr);
+cfree(*) = free;
 
 %
 [section(.text.crt.dos.heap)][ignore]
@@ -171,18 +169,18 @@ mallopt:(int parameter_number, int parameter_value) -> int {
 
 [ATTR_WUNUSED][ATTR_MALL_DEFAULT_ALIGNED][ATTR_ALLOC_SIZE((2))]
 [ATTR_MALLOC][section(.text.crt.heap.rare_helpers)]
-__memdup:([nonnull] void const *__restrict ptr, size_t n_bytes) -> void * = memdup;
+__memdup:([[nonnull]] void const *__restrict ptr, size_t n_bytes) -> void * = memdup;
 
 [ATTR_WUNUSED][ATTR_MALL_DEFAULT_ALIGNED][ATTR_ALLOC_SIZE((2))]
 [ATTR_MALLOC][section(.text.crt.heap.rare_helpers)]
-__memcdup:([nonnull] void const *__restrict ptr, int needle, size_t n_bytes) -> void * = memcdup;
+__memcdup:([[nonnull]] void const *__restrict ptr, int needle, size_t n_bytes) -> void * = memcdup;
 
 %
 %#ifdef __USE_KOS
 [ATTR_WUNUSED][ATTR_MALL_DEFAULT_ALIGNED][ATTR_ALLOC_SIZE((2))]
 [ATTR_MALLOC][alias(__memdup)][requires($has_function(malloc))]
 [section(.text.crt.heap.rare_helpers)][userimpl]
-memdup:([nonnull] void const *__restrict ptr, size_t n_bytes) -> void * {
+memdup:([[nonnull]] void const *__restrict ptr, size_t n_bytes) -> void * {
 	void *result;
 	result = malloc(n_bytes);
 	if likely(result)
@@ -193,7 +191,7 @@ memdup:([nonnull] void const *__restrict ptr, size_t n_bytes) -> void * {
 [ATTR_WUNUSED][ATTR_MALL_DEFAULT_ALIGNED][ATTR_ALLOC_SIZE((2))]
 [ATTR_MALLOC][alias(__memcdup)][requires($has_function(memdup))]
 [section(.text.crt.heap.rare_helpers)][userimpl]
-memcdup:([nonnull] void const *__restrict ptr, int needle, size_t n_bytes) -> void * {
+memcdup:([[nonnull]] void const *__restrict ptr, int needle, size_t n_bytes) -> void * {
 	if likely(n_bytes) {
 		void const *endaddr;
 		endaddr = memchr(ptr, needle, n_bytes - 1);

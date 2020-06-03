@@ -141,7 +141,7 @@ setlogmask:(int mask) -> int;
 
 [ATTR_LIBC_PRINTF(2,3)]
 [cp][requires($has_function(vsyslog))]
-syslog:(int level, [nonnull] char const *format, ...) {
+syslog:(int level, [[nonnull]] char const *format, ...) {
 	va_list args;
 	va_start(args,format);
 	vsyslog(level,format,args);
@@ -151,7 +151,7 @@ syslog:(int level, [nonnull] char const *format, ...) {
 %
 %#ifdef __USE_MISC
 [cp][ATTR_LIBC_PRINTF(2,0)][requires_dependency(syslog_printer)]
-vsyslog:(int level, [nonnull] char const *format, $va_list args) {
+vsyslog:(int level, [[nonnull]] char const *format, $va_list args) {
 	format_vprintf(&syslog_printer,
 	              (void *)(uintptr_t)(unsigned int)level,
 	               format,
@@ -162,7 +162,7 @@ vsyslog:(int level, [nonnull] char const *format, $va_list args) {
 %
 %#ifdef __USE_KOS
 @@Helper functions for printing to the system log
-[cp] syslog_printer:(void *arg, [nonnull] char const *__restrict data, $size_t datalen) -> $ssize_t;
+[cp] syslog_printer:(void *arg, [[nonnull]] char const *__restrict data, $size_t datalen) -> $ssize_t;
 %#define SYSLOG_PRINTER_CLOSURE(level) ((void *)(__uintptr_t)(int)(level))
 %#endif /* __USE_KOS */
 

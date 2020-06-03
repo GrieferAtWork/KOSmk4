@@ -72,7 +72,7 @@ preadv32:($fd_t fd, [inp(count)] struct iovec const *iov,
 pwritev32:($fd_t fd, [inp(count)] struct iovec const *iov,
            __STDC_INT_AS_SIZE_T count, $off32_t offset) -> ssize_t = pwritev?;
 
-[cp][ATTR_WUNUSED][decl_include(<bits/uio.h>)]
+[cp][ATTR_WUNUSED][decl_include(<bits/uio.h>), no_crt_self_import]
 [if(defined(__USE_FILE_OFFSET64)), preferred_alias(preadv64)]
 [if(!defined(__USE_FILE_OFFSET64)), preferred_alias(preadv)]
 [requires($has_function(preadv32) || $has_function(preadv64))]
@@ -84,7 +84,7 @@ preadv:($fd_t fd, [inp(count)] struct iovec const *iov, __STDC_INT_AS_SIZE_T cou
 @@endif_has_function(preadv64)@@
 }
 
-[cp][decl_include(<bits/uio.h>)]
+[cp][decl_include(<bits/uio.h>), no_crt_self_import]
 [if(defined(__USE_FILE_OFFSET64)), preferred_alias(pwritev64)]
 [if(!defined(__USE_FILE_OFFSET64)), preferred_alias(pwritev)]
 [requires($has_function(pwritev32) || $has_function(pwritev64))]

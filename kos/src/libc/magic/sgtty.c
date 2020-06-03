@@ -52,10 +52,10 @@ struct sgttyb;
 }
 
 @@Fill in *PARAMS with terminal parameters associated with FD
-gtty:($fd_t fd, [nonnull] struct sgttyb *params) -> int;
+gtty:($fd_t fd, [[nonnull]] struct sgttyb *params) -> int;
 
 @@Set the terminal parameters associated with FD to *PARAMS
-stty:($fd_t fd, [nonnull] struct sgttyb const *params)  -> int;
+stty:($fd_t fd, [[nonnull]] struct sgttyb const *params)  -> int;
 
 %{
 #endif /* __CC__ */

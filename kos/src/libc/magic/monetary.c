@@ -45,13 +45,13 @@ typedef __ssize_t ssize_t;
 }
 
 [ATTR_LIBC_STRFMON(3, 4)]
-strfmon:([nonnull] char *__restrict s, size_t maxsize,
-         [nonnull] char const *__restrict format, ...) -> ssize_t;
+strfmon:([[nonnull]] char *__restrict s, size_t maxsize,
+         [[nonnull]] char const *__restrict format, ...) -> ssize_t;
 
 %#ifdef __USE_XOPEN2K8
 [ATTR_LIBC_STRFMON(4, 5)][export_alias(__strfmon_l)]
-strfmon_l:([nonnull] char *__restrict s, size_t maxsize, $locale_t loc,
-           [nonnull] const char *__restrict format, ...) -> ssize_t;
+strfmon_l:([[nonnull]] char *__restrict s, size_t maxsize, $locale_t loc,
+           [[nonnull]] const char *__restrict format, ...) -> ssize_t;
 %#endif /* __USE_XOPEN2K8 */
 
 

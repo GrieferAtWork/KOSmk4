@@ -36,26 +36,26 @@ typedef __SIZE_TYPE__ size_t;
 }
 
 [guard][crtbuiltin]
-bcopy:([nonnull] void const *src,
-       [nonnull] void *dst, $size_t num_bytes) {
+bcopy:([[nonnull]] void const *src,
+       [[nonnull]] void *dst, $size_t num_bytes) {
 	memmove(dst, src, num_bytes);
 }
 
 [guard][crtbuiltin][export_alias(__bzero, explicit_bzero)]
-bzero:([nonnull] void *__restrict dst, $size_t num_bytes) {
+bzero:([[nonnull]] void *__restrict dst, $size_t num_bytes) {
 	memset(dst, 0, num_bytes);
 }
 
 [guard][ATTR_WUNUSED][ATTR_PURE][crtbuiltin]
-bcmp:([nonnull] void const *s1,
-      [nonnull] void const *s2,
+bcmp:([[nonnull]] void const *s1,
+      [[nonnull]] void const *s2,
       $size_t num_bytes) -> int = memcmp;
 
 
 [guard][ATTR_WUNUSED][ATTR_PURE][crtbuiltin]
-index:([nonnull] char const *__restrict haystack, int needle) -> char *
-	[([nonnull] char *__restrict haystack, int needle) -> char *]
-	[([nonnull] char const *__restrict haystack, int needle) -> char const *]
+index:([[nonnull]] char const *__restrict haystack, int needle) -> char *
+	[([[nonnull]] char *__restrict haystack, int needle) -> char *]
+	[([[nonnull]] char const *__restrict haystack, int needle) -> char const *]
 {
 	for (; *haystack; ++haystack) {
 		if (*haystack == needle)
@@ -67,9 +67,9 @@ index:([nonnull] char const *__restrict haystack, int needle) -> char *
 }
 
 [guard][ATTR_WUNUSED][ATTR_PURE][crtbuiltin]
-rindex:([nonnull] char const *__restrict haystack, int needle) -> char *
-	[([nonnull] char *__restrict haystack, int needle) -> char *]
-	[([nonnull] char const *__restrict haystack, int needle) -> char const *]
+rindex:([[nonnull]] char const *__restrict haystack, int needle) -> char *
+	[([[nonnull]] char *__restrict haystack, int needle) -> char *]
+	[([[nonnull]] char const *__restrict haystack, int needle) -> char const *]
 {
 	char const *result = NULL;
 	for (; *haystack; ++haystack) {
@@ -98,7 +98,7 @@ rindex:([nonnull] char const *__restrict haystack, int needle) -> char *
 @@uses of this function when they (think) that clearing the memory
 @@wouldn't have any visible side-effects (though those side-effects
 @@may be a security-concious application trying to wipe sensitive data)
-[nocrt][noexport][nouser]
+[nocrt][noexport][nouser, no_crt_self_import]
 [preferred_alias(bzero, explicit_bzero)][alias(__bzero)]
 explicit_bzero:(void *buf, size_t len) {
 	void *volatile vbuf = buf;

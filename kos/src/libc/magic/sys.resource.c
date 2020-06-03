@@ -68,20 +68,22 @@ typedef int __priority_which_t;
 
 @@Put the soft and hard limits for RESOURCE in *RLIMITS.
 @@Returns 0 if successful, -1 if not (and sets errno)
+[no_crt_self_import]
 [if(defined(__USE_FILE_OFFSET64)), preferred_alias(getrlimit64)]
 [if(!defined(__USE_FILE_OFFSET64)), preferred_alias(getrlimit, __getrlimit)]
-getrlimit:(__rlimit_resource_t resource, [nonnull] struct rlimit *rlimits) -> int;
+getrlimit:(__rlimit_resource_t resource, [[nonnull]] struct rlimit *rlimits) -> int;
 
 @@Set the soft and hard limits for RESOURCE to *RLIMITS.
 @@Only the super-user can increase hard limits.
 @@Return 0 if successful, -1 if not (and sets errno)
+[no_crt_self_import]
 [if(defined(__USE_FILE_OFFSET64)), preferred_alias(setrlimit64)]
 [if(!defined(__USE_FILE_OFFSET64)), preferred_alias(setrlimit)]
-setrlimit:(__rlimit_resource_t resource, [nonnull] struct rlimit const *rlimits) -> int;
+setrlimit:(__rlimit_resource_t resource, [[nonnull]] struct rlimit const *rlimits) -> int;
 
 @@Return resource usage information on process indicated by WHO
 @@and put it in *USAGE. Returns 0 for success, -1 for failure
-getrusage:(__rusage_who_t who, [nonnull] struct rusage *usage) -> int;
+getrusage:(__rusage_who_t who, [[nonnull]] struct rusage *usage) -> int;
 
 %/* TODO: getrusage64() (__USE_TIME64 & __USE_TIME_BITS64 integration) */
 
@@ -98,9 +100,9 @@ setpriority:(__priority_which_t which, id_t who, int prio) -> int;
 %
 %#ifdef __USE_LARGEFILE64
 [off64_variant_of(getrlimit)]
-getrlimit64:(__rlimit_resource_t resource, [nonnull] struct rlimit64 *rlimits) -> int;
+getrlimit64:(__rlimit_resource_t resource, [[nonnull]] struct rlimit64 *rlimits) -> int;
 [off64_variant_of(setrlimit)]
-setrlimit64:(__rlimit_resource_t resource, [nonnull] struct rlimit64 const *rlimits) -> int;
+setrlimit64:(__rlimit_resource_t resource, [[nonnull]] struct rlimit64 const *rlimits) -> int;
 %#endif /* __USE_LARGEFILE64 */
 
 

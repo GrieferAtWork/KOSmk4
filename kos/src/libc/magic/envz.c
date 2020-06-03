@@ -56,10 +56,10 @@ __SYSDECL_BEGIN
 @@Returns a pointer to the entry in `ENVZ' for `NAME', or `NULL' if there is none
 @@Note that if `name' contains a `=' character, only characters leading up to this
 @@position are actually compared!
-[ATTR_PURE][ATTR_WUNUSED]
-envz_entry:([inp_opt(envz_len)] char const *__restrict envz, size_t envz_len, [nonnull] char const *__restrict name) -> char *
-	[([inp_opt(envz_len)] char *__restrict envz, size_t envz_len, [nonnull] char const *__restrict name) -> char *]
-	[([inp_opt(envz_len)] char const *__restrict envz, size_t envz_len, [nonnull] char const *__restrict name) -> char const *]
+[ATTR_PURE][ATTR_WUNUSED] char *
+envz_entry([inp_opt(envz_len)] char const *__restrict envz, size_t envz_len, [[nonnull]] char const *__restrict name)
+	[([inp_opt(envz_len)] char *__restrict envz, size_t envz_len, [[nonnull]] char const *__restrict name): char *]
+	[([inp_opt(envz_len)] char const *__restrict envz, size_t envz_len, [[nonnull]] char const *__restrict name): char const *]
 {
 	size_t namelen;
 	char *envz_end = (char *)(envz + envz_len);
@@ -75,10 +75,10 @@ envz_entry:([inp_opt(envz_len)] char const *__restrict envz, size_t envz_len, [n
 
 @@Returns a pointer to the value portion of the entry
 @@in `ENVZ' for `NAME', or `NULL' if there is none.
-[ATTR_PURE][ATTR_WUNUSED]
-envz_get:(char const *__restrict envz, size_t envz_len, char const *__restrict name) -> char *
-	[(char *__restrict envz, size_t envz_len, char const *__restrict name) -> char *]
-	[(char const *__restrict envz, size_t envz_len, char const *__restrict name) -> char const *]
+[ATTR_PURE][ATTR_WUNUSED] char *
+envz_get([inp_opt(envz_len)] char const *__restrict envz, size_t envz_len, [[nonnull]] char const *__restrict name)
+	[([inp_opt(envz_len)] char *__restrict envz, size_t envz_len, [[nonnull]] char const *__restrict name): char *]
+	[([inp_opt(envz_len)] char const *__restrict envz, size_t envz_len, [[nonnull]] char const *__restrict name): char const *]
 {
 	char *result;
 	result = (char *)envz_entry(envz, envz_len, name);
@@ -97,9 +97,9 @@ envz_get:(char const *__restrict envz, size_t envz_len, char const *__restrict n
 @@because when merging with another envz, the null entry can override an
 @@entry in the other one. Such entries can be removed with `envz_strip()'
 [requires($has_function(realloc) && $has_function(argz_add))]
-[dependency_include(<parts/errno.h>)][same_impl]
-envz_add:([nonnull] char **__restrict penvz, [nonnull] size_t *__restrict penvz_len,
-          [nonnull] char const *__restrict name, [nullable] char const *value) -> error_t {
+[dependency_include(<parts/errno.h>)][userimpl]
+envz_add:([[nonnull]] char **__restrict penvz, [[nonnull]] size_t *__restrict penvz_len,
+          [[nonnull]] char const *__restrict name, [[nullable]] char const *value) -> error_t {
 	char *new_envz;
 	size_t namelen, valuelen, morelen;
 	envz_remove(penvz, penvz_len, name);
@@ -130,9 +130,9 @@ envz_add:([nonnull] char **__restrict penvz, [nonnull] size_t *__restrict penvz_
 @@Adds each entry in `ENVZ2' to `ENVZ & ENVZ_LEN', as if with `envz_add()'.
 @@If `OVERRIDE' is true, then values in `ENVZ2' will supersede those
 @@with the same name in `ENV', otherwise they don't
-[requires($has_function(argz_append))][same_impl]
-envz_merge:([nonnull] char **__restrict penvz, [nonnull] size_t *__restrict penvz_len,
-            [nonnull] char const *__restrict envz2, size_t envz2_len, int override_) -> error_t {
+[requires($has_function(argz_append))][userimpl]
+envz_merge:([[nonnull]] char **__restrict penvz, [[nonnull]] size_t *__restrict penvz_len,
+            [[nonnull]] char const *__restrict envz2, size_t envz2_len, int override_) -> error_t {
 	error_t result = 0;
 	while (envz2_len && result == 0) {
 		char *existing = envz_entry(*penvz, *penvz_len, envz2);
@@ -151,18 +151,20 @@ envz_merge:([nonnull] char **__restrict penvz, [nonnull] size_t *__restrict penv
 
 @@Remove the entry for `NAME' from `ENVZ & ENVZ_LEN', if any
 [userimpl]
-envz_remove:([nonnull] char **__restrict penvz, [nonnull] size_t *__restrict penvz_len,
-             [nonnull] char const *__restrict name) {
+envz_remove:([[nonnull]] char **__restrict penvz,
+             [[nonnull]] size_t *__restrict penvz_len,
+             [[nonnull]] char const *__restrict name) {
 	char *entry;
 	entry = envz_entry(*penvz, *penvz_len, name);
 	if (entry)
 		argz_delete(penvz, penvz_len, entry);
 }
 
+
 @@Remove entries that have no value attached
 [userimpl]
-envz_strip:([nonnull] char **__restrict penvz,
-            [nonnull] size_t *__restrict penvz_len) {
+envz_strip:([[nonnull]] char **__restrict penvz,
+            [[nonnull]] size_t *__restrict penvz_len) {
 	char *start, *ptr, *end;
 	size_t oldlen, newlen;
 	ptr = start = *penvz;
@@ -184,11 +186,11 @@ envz_strip:([nonnull] char **__restrict penvz,
 	newlen = (size_t)(end - start);
 	if (newlen < oldlen) {
 		*penvz_len = newlen;
-@@if_has_function(realloc)@@
+@@pp_if_has_function(realloc)@@
 		start = (char *)realloc(start, newlen);
 		if likely(start)
 			*penvz = start;
-@@endif_has_function(realloc)@@
+@@pp_endif@@
 	}
 }
 

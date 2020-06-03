@@ -40,8 +40,8 @@ typedef __TM_TYPE(time) time_t;
 
 }
 
-[doc_alias(ftime)][ignore] crt_ftime32:([nonnull] struct __timeb32 *timebuf) -> int = ftime?;
-[doc_alias(ftime)][ignore] crt_ftime64:([nonnull] struct __timeb64 *timebuf) -> int = ftime64?;
+[doc_alias(ftime)][ignore] crt_ftime32:([[nonnull]] struct __timeb32 *timebuf) -> int = ftime?;
+[doc_alias(ftime)][ignore] crt_ftime64:([[nonnull]] struct __timeb64 *timebuf) -> int = ftime64?;
 
 %#ifdef __USE_DOS
 %#ifndef __errno_t_defined
@@ -49,10 +49,10 @@ typedef __TM_TYPE(time) time_t;
 %typedef int errno_t;
 %#endif /* !__errno_t_defined */
 
-[doc_alias(ftime)][ignore] crt_dos_ftime32:([nonnull] struct __timeb32 *timebuf) = _ftime32?;
-[doc_alias(ftime)][ignore] crt_dos_ftime64:([nonnull] struct __timeb64 *timebuf) = _ftime64?;
-[doc_alias(ftime)][ignore] crt_ftime32_s:([nonnull] struct __timeb32 *timebuf) -> errno_t = _ftime32_s?;
-[doc_alias(ftime)][ignore] crt_ftime64_s:([nonnull] struct __timeb64 *timebuf) -> errno_t = _ftime64_s?;
+[doc_alias(ftime)][ignore] crt_dos_ftime32:([[nonnull]] struct __timeb32 *timebuf) = _ftime32?;
+[doc_alias(ftime)][ignore] crt_dos_ftime64:([[nonnull]] struct __timeb64 *timebuf) = _ftime64?;
+[doc_alias(ftime)][ignore] crt_ftime32_s:([[nonnull]] struct __timeb32 *timebuf) -> errno_t = _ftime32_s?;
+[doc_alias(ftime)][ignore] crt_ftime64_s:([[nonnull]] struct __timeb64 *timebuf) -> errno_t = _ftime64_s?;
 
 
 
@@ -60,7 +60,7 @@ typedef __TM_TYPE(time) time_t;
 [requires($has_function(crt_ftime32_s) || $has_function(crt_ftime32) ||
           $has_function(crt_dos_ftime64) || $has_function(crt_ftime64_s) ||
           $has_function(crt_ftime64))]
-_ftime32:([nonnull] struct __timeb32 *timebuf) {
+_ftime32:([[nonnull]] struct __timeb32 *timebuf) {
 #if @@has_function(crt_ftime32_s)@@
 	if unlikely(crt_ftime32_s(timebuf))
 		memset(timebuf, 0, sizeof(*timebuf));
@@ -97,7 +97,7 @@ _ftime32:([nonnull] struct __timeb32 *timebuf) {
 [requires($has_function(crt_ftime64_s) || $has_function(crt_ftime64) ||
           $has_function(crt_dos_ftime32) || $has_function(crt_ftime32_s) ||
           $has_function(crt_ftime32))]
-_ftime64:([nonnull] struct __timeb64 *timebuf) {
+_ftime64:([[nonnull]] struct __timeb64 *timebuf) {
 #if @@has_function(crt_ftime64_s)@@
 	if unlikely(crt_ftime64_s(timebuf))
 		memset(timebuf,0,sizeof(*timebuf));
@@ -134,7 +134,7 @@ _ftime64:([nonnull] struct __timeb64 *timebuf) {
           $has_function(crt_ftime64) || $has_function(crt_dos_ftime32) ||
           $has_function(crt_dos_ftime64))]
 [dependency_include(<parts/errno.h>)][dos_variant]
-_ftime32_s:([nonnull] struct __timeb32 *timebuf) -> errno_t {
+_ftime32_s:([[nonnull]] struct __timeb32 *timebuf) -> errno_t {
 #if @@has_function(crt_ftime32)@@
 	return crt_ftime32(timebuf) ? 0 : __libc_geterrno_or(@EPERM@);
 #elif @@has_function(crt_ftime64_s)@@ || @@has_function(crt_ftime64)@@
@@ -171,7 +171,7 @@ _ftime32_s:([nonnull] struct __timeb32 *timebuf) -> errno_t {
           $has_function(crt_ftime32) || $has_function(crt_dos_ftime64) ||
           $has_function(crt_dos_ftime32))]
 [dependency_include(<parts/errno.h>)]
-_ftime64_s:([nonnull] struct __timeb64 *timebuf) -> errno_t {
+_ftime64_s:([[nonnull]] struct __timeb64 *timebuf) -> errno_t {
 #if @@has_function(crt_ftime64)@@
 	return crt_ftime64(timebuf) ? 0 : __libc_geterrno_or(@EPERM@);
 #elif @@has_function(crt_ftime32_s)@@ || @@has_function(crt_ftime32)@@
@@ -210,13 +210,14 @@ _ftime64_s:([nonnull] struct __timeb64 *timebuf) -> errno_t {
 %
 %
 @@Fill in TIMEBUF with information about the current time
+[no_crt_self_import]
 [if(defined(__USE_TIME_BITS64)), preferred_alias(ftime64)]
 [if(!defined(__USE_TIME_BITS64)), preferred_alias(ftime)]
 [requires($has_function(crt_ftime32_s) || $has_function(crt_ftime64_s) ||
           $has_function(crt_dos_ftime32) || $has_function(crt_dos_ftime64) ||
           $has_function(crt_ftime32) || $has_function(crt_ftime64))]
 [dependency_include(<parts/errno.h>)]
-ftime:([nonnull] struct timeb *timebuf) -> int {
+ftime:([[nonnull]] struct timeb *timebuf) -> int {
 #if (@@has_function(crt_ftime32_s)@@) && !defined(__USE_TIME_BITS64)
 	errno_t error = crt_ftime32_s(timebuf);
 	if unlikely(error) {
@@ -308,7 +309,7 @@ ftime:([nonnull] struct timeb *timebuf) -> int {
           $has_function(crt_ftime32) || $has_function(crt_ftime32_s) ||
           $has_function(crt_dos_ftime32))]
 [time64_variant_of(ftime)][dependency_include(<parts/errno.h>)]
-ftime64:([nonnull] struct timeb64 *timebuf) -> int {
+ftime64:([[nonnull]] struct timeb64 *timebuf) -> int {
 #if @@has_function(crt_ftime64_s)@@
 	errno_t error = crt_ftime64_s(timebuf);
 	if unlikely(error) {

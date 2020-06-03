@@ -73,7 +73,7 @@ __SYSDECL_BEGIN
 @@Match NAME against the filename pattern PATTERN,
 @@returning zero if it matches, FNM_NOMATCH if not
 [ATTR_WUNUSED][ATTR_PURE]
-fnmatch:([nonnull] char const *pattern, [nonnull] char const *name, int match_flags) -> int {
+fnmatch:([[nonnull]] char const *pattern, [[nonnull]] char const *name, int match_flags) -> int {
 	char card_post;
 	for (;;) {
 		if (!*name) {

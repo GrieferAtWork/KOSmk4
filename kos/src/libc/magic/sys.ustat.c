@@ -32,7 +32,7 @@ __SYSDECL_BEGIN
 }
 
 [decl_include(<bits/ustat.h>)]
-ustat:($dev_t dev, [nonnull] struct ustat *ubuf) -> int;
+ustat:($dev_t dev, [[nonnull]] struct ustat *ubuf) -> int;
 
 %{
 #endif /* __CC__ */

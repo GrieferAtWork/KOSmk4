@@ -53,24 +53,25 @@ __SYSDECL_BEGIN
 }
 
 @@Return information about the filesystem on which FILE resides
+[alternate_name(__statfs), no_crt_self_import]
 [if(!defined(__USE_FILE_OFFSET64)), preferred_alias(statfs, __statfs)]
 [if(defined(__USE_FILE_OFFSET64)), preferred_alias(statfs64)]
-[alternate_name(__statfs)]
-statfs:([nonnull] char const *file, [nonnull] struct statfs *buf) -> int;
+statfs:([[nonnull]] char const *file, [[nonnull]] struct statfs *buf) -> int;
 
 @@Return information about the filesystem containing the file FILDES refers to
+[no_crt_self_import]
 [if(!defined(__USE_FILE_OFFSET64)), preferred_alias(fstatfs)]
 [if(defined(__USE_FILE_OFFSET64)), preferred_alias(fstatfs64)]
-fstatfs:($fd_t filedes, [nonnull] struct statfs *buf) -> int;
+fstatfs:($fd_t filedes, [[nonnull]] struct statfs *buf) -> int;
 
 %
 %#ifdef __USE_LARGEFILE64
 %#ifndef statfs64
 [statfs64_variant_of(statfs)]
-statfs64:([nonnull] const char *file, [nonnull] struct statfs64 *buf) -> int;
+statfs64:([[nonnull]] const char *file, [[nonnull]] struct statfs64 *buf) -> int;
 %#endif /* !statfs64 */
 [statfs64_variant_of(fstatfs)]
-fstatfs64:($fd_t filedes, [nonnull] struct statfs64 *buf) -> int;
+fstatfs64:($fd_t filedes, [[nonnull]] struct statfs64 *buf) -> int;
 %#endif /* __USE_LARGEFILE64 */
 
 

@@ -115,7 +115,7 @@ typedef __pformatungetc pformatungetc;
 #include @<bits/format-printer.h>@
 @@endif@@
 )][kernel][throws]
-format_repeat:([nonnull] pformatprinter printer, void *arg, char ch, $size_t num_repetitions) -> $ssize_t {
+format_repeat:([[nonnull]] pformatprinter printer, void *arg, char ch, $size_t num_repetitions) -> $ssize_t {
 #ifndef FORMAT_REPEAT_BUFSIZE
 #define FORMAT_REPEAT_BUFSIZE 64
 #endif /* !FORMAT_REPEAT_BUFSIZE */
@@ -213,7 +213,7 @@ err:
 #include @<bits/format-printer.h>@
 @@endif@@
 )]
-format_escape:([nonnull] pformatprinter printer, void *arg,
+format_escape:([[nonnull]] pformatprinter printer, void *arg,
                /*utf-8*/ char const *__restrict text,
                $size_t textlen, unsigned int flags) -> $ssize_t {
 #define escape_tooct(c) ('0' + (char)(unsigned char)(c))
@@ -537,7 +537,7 @@ err:
 #include @<bits/format-printer.h>@
 @@endif@@
 )][kernel][throws]
-format_hexdump:([nonnull] pformatprinter printer, void *arg,
+format_hexdump:([[nonnull]] pformatprinter printer, void *arg,
                 void const *__restrict data, $size_t size,
                 $size_t linesize, unsigned int flags) -> $ssize_t {
 #ifndef DECIMALS_SELECTOR
@@ -849,8 +849,8 @@ err:
 #include @<bits/format-printer.h>@
 @@endif@@
 )][ATTR_LIBC_PRINTF(3, 0)][throws][kernel]
-format_vprintf:([nonnull] pformatprinter printer, void *arg,
-                [nonnull] char const *__restrict format, __builtin_va_list args) -> $ssize_t {
+format_vprintf:([[nonnull]] pformatprinter printer, void *arg,
+                [[nonnull]] char const *__restrict format, __builtin_va_list args) -> $ssize_t {
 #ifndef __INTELLISENSE__
 #define @__CHAR_TYPE@                 char
 #define @__CHAR_SIZE@                 __SIZEOF_CHAR__
@@ -902,8 +902,8 @@ format_vprintf:([nonnull] pformatprinter printer, void *arg,
 #include @<bits/format-printer.h>@
 @@endif@@
 )][doc_alias(format_vprintf)][kernel]
-format_printf:([nonnull] pformatprinter printer, void *arg,
-               [nonnull] char const *__restrict format, ...) -> $ssize_t {
+format_printf:([[nonnull]] pformatprinter printer, void *arg,
+               [[nonnull]] char const *__restrict format, ...) -> $ssize_t {
 	ssize_t result;
 	va_list args;
 	va_start(args, format);
@@ -949,9 +949,9 @@ format_printf:([nonnull] pformatprinter printer, void *arg,
 #include @<bits/format-printer.h>@
 @@endif@@
 )][ATTR_LIBC_SCANF(4, 0)][throws][kernel]
-format_vscanf:([nonnull] pformatgetc pgetc,
-               [nonnull] pformatungetc pungetc, void *arg,
-               [nonnull] char const *__restrict format, $va_list args) -> $ssize_t {
+format_vscanf:([[nonnull]] pformatgetc pgetc,
+               [[nonnull]] pformatungetc pungetc, void *arg,
+               [[nonnull]] char const *__restrict format, $va_list args) -> $ssize_t {
 #define @__CHAR_TYPE@      char
 #define @__CHAR_SIZE@      __SIZEOF_CHAR__
 #define @__FORMAT_PGETC@   pgetc
@@ -971,9 +971,9 @@ format_vscanf:([nonnull] pformatgetc pgetc,
 #include @<bits/format-printer.h>@
 @@endif@@
 )][doc_alias(format_vscanf)][kernel]
-format_scanf:([nonnull] pformatgetc pgetc,
-              [nonnull] pformatungetc pungetc, void *arg,
-              [nonnull] char const *__restrict format, ...) -> $ssize_t {
+format_scanf:([[nonnull]] pformatgetc pgetc,
+              [[nonnull]] pformatungetc pungetc, void *arg,
+              [[nonnull]] char const *__restrict format, ...) -> $ssize_t {
 	ssize_t result;
 	va_list args;
 	va_start(args, format);
@@ -989,8 +989,8 @@ format_scanf:([nonnull] pformatgetc pgetc,
 @@Format-printer implementation for printing to a string buffer like `sprintf' would
 @@WARNING: No trailing NUL-character is implicitly appended
 [kernel]
-format_sprintf_printer:([nonnull] /*char ***/ void *arg,
-                        [nonnull] /*utf-8*/ char const *__restrict data, $size_t datalen) -> $ssize_t {
+format_sprintf_printer:([[nonnull]] /*char ***/ void *arg,
+                        [[nonnull]] /*utf-8*/ char const *__restrict data, $size_t datalen) -> $ssize_t {
 @@if $wchar_function@@
 	*(wchar_t **)arg = (wchar_t *)wmempcpy(*(wchar_t **)arg, data, datalen);
 @@else@@
@@ -1021,8 +1021,8 @@ struct format_snprintf_data {
 @@NOTE: The number of written characters is `ORIG_BUFSIZE - ARG->sd_bufsiz'
 @@NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively the sum of return values of all calls to `format_snprintf_printer()'
 [dependency_include(<hybrid/typecore.h>)][kernel]
-format_snprintf_printer:([nonnull] /*struct format_snprintf_data**/ void *arg,
-                         [nonnull] /*utf-8*/ char const *__restrict data, $size_t datalen) -> $ssize_t {
+format_snprintf_printer:([[nonnull]] /*struct format_snprintf_data**/ void *arg,
+                         [[nonnull]] /*utf-8*/ char const *__restrict data, $size_t datalen) -> $ssize_t {
 	struct format_snprintf_data_ {
 		char         *sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
 		__SIZE_TYPE__ sd_bufsiz; /* Remaining buffer size. */
@@ -1045,7 +1045,7 @@ format_snprintf_printer:([nonnull] /*struct format_snprintf_data**/ void *arg,
 
 @@Returns the width (number of characters; not bytes) of the given unicode string
 [dependency_include(<local/unicode_utf8seqlen.h>)][kernel][ATTR_PURE]
-format_width:(void *arg, [nonnull] /*utf-8*/ char const *__restrict data, $size_t datalen) -> $ssize_t {
+format_width:(void *arg, [[nonnull]] /*utf-8*/ char const *__restrict data, $size_t datalen) -> $ssize_t {
 	size_t result = 0;
 	char const *iter, *end;
 	(void)arg;
@@ -1145,34 +1145,34 @@ struct format_aprintf_data {
 [dependency_include(<hybrid/typecore.h>)][userimpl]
 [ATTR_WUNUSED][ATTR_MALL_DEFAULT_ALIGNED][ATTR_MALLOC]
 [dependency_prefix(DEFINE_FORMAT_APRINTF_DATA)]
-format_aprintf_pack:([nonnull] struct format_aprintf_data *__restrict self,
-                     [nullable] $size_t *pstrlen) -> char * {
+format_aprintf_pack:([[nonnull]] struct format_aprintf_data *__restrict self,
+                     [[nullable]] $size_t *pstrlen) -> char * {
 	/* Free unused buffer memory. */
 	char *result;
 	if (self->@ap_avail@ != 0) {
-@@if_has_function(realloc)@@
+@@pp_if_has_function(realloc)@@
 		char *newbuf;
 		newbuf = (char *)realloc(self->@ap_base@,
 		                         (self->@ap_used@ + 1) *
 		                         sizeof(char));
 		if likely(newbuf)
 			self->@ap_base@ = newbuf;
-@@endif_has_function(realloc)@@
+@@pp_endif@@
 	} else {
 		if unlikely(!self->@ap_used@) {
 			/* Special case: Nothing was printed. */
 			__hybrid_assert(!self->@ap_base@);
-@@if_has_function(malloc)@@
+@@pp_if $has_function(malloc)@@
 			self->@ap_base@ = (char *)malloc(1 * sizeof(char));
 			if unlikely(!self->@ap_base@)
 				return NULL;
-@@elif_has_function(realloc)@@
+@@pp_elif $has_function(realloc)@@
 			self->@ap_base@ = (char *)realloc(NULL, 1 * sizeof(char));
 			if unlikely(!self->@ap_base@)
 				return NULL;
-@@else_has_function(realloc)@@
+@@pp_else@@
 			return NULL;
-@@endif_has_function(realloc)@@
+@@pp_endif@@
 		}
 	}
 	result = self->@ap_base@;
@@ -1180,17 +1180,17 @@ format_aprintf_pack:([nonnull] struct format_aprintf_data *__restrict self,
 	result[self->@ap_used@] = '\0'; /* NUL-terminate */
 	if (pstrlen)
 		*pstrlen = self->@ap_used@;
-#ifndef NDEBUG
-#if __SIZEOF_POINTER__ == 4
+@@pp_ifndef NDEBUG@@
+@@pp_if __SIZEOF_POINTER__ == 4@@
 	self->@ap_base@  = (char *)__UINT32_C(0xcccccccc);
 	self->@ap_avail@ = __UINT32_C(0xcccccccc);
 	self->@ap_used@  = __UINT32_C(0xcccccccc);
-#elif __SIZEOF_POINTER__ == 8
+@@pp_elif __SIZEOF_POINTER__ == 8@@
 	self->@ap_base@  = (char *)__UINT64_C(0xcccccccccccccccc);
 	self->@ap_avail@ = __UINT64_C(0xcccccccccccccccc);
 	self->@ap_used@  = __UINT64_C(0xcccccccccccccccc);
-#endif /* __SIZEOF_POINTER__ == ... */
-#endif /* !NDEBUG */
+@@pp_endif@@
+@@pp_endif@@
 	return result;
 }
 
@@ -1201,11 +1201,11 @@ format_aprintf_pack:([nonnull] struct format_aprintf_data *__restrict self,
 @@the format_aprintf buffer `self' is finalized, or some other function is used
 @@to append additional data to the end of `self'
 @@@return: NULL: Failed to allocate additional memory
-[requires($has_function(realloc))][same_impl]
-[dependency_include(<hybrid/__assert.h>)][ATTR_WUNUSED]
-[dependency_prefix(DEFINE_FORMAT_APRINTF_DATA)]
-format_aprintf_alloc:([nonnull] struct format_aprintf_data *__restrict self,
-                      $size_t num_chars) -> [malloc(num_chars)] char * {
+[[userimpl, requires_function(realloc)]]
+[[dependency_include(<hybrid/__assert.h>), ATTR_WUNUSED]]
+[[dependency_prefix(DEFINE_FORMAT_APRINTF_DATA)]]
+format_aprintf_alloc:([[nonnull]] struct format_aprintf_data *__restrict self,
+                      $size_t num_chars) -> [[malloc(num_chars)]] char * {
 	char *result;
 	if (self->@ap_avail@ < num_chars) {
 		char *newbuf;
@@ -1235,9 +1235,9 @@ format_aprintf_alloc:([nonnull] struct format_aprintf_data *__restrict self,
 
 @@Print data to a dynamically allocated heap buffer. On error, -1 is returned
 @@This function is intended to be used as a pformatprinter-compatibile printer sink
-[requires($has_function(format_aprintf_alloc))][same_impl][ATTR_WUNUSED]
-format_aprintf_printer:([nonnull] /*struct format_aprintf_data **/ void *arg,
-                        [nonnull] /*utf-8*/ char const *__restrict data, $size_t datalen) -> $ssize_t {
+[userimpl, requires_function(format_aprintf_alloc)][ATTR_WUNUSED]
+format_aprintf_printer:([[nonnull]] /*struct format_aprintf_data **/ void *arg,
+                        [[nonnull]] /*utf-8*/ char const *__restrict data, $size_t datalen) -> $ssize_t {
 	char *buf;
 	buf = format_aprintf_alloc((struct @format_aprintf_data@ *)arg,
 	                           datalen);

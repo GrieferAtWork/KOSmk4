@@ -64,11 +64,11 @@ enum {
 
 [doc_alias(timerfd_settime)][ignore]
 timerfd_settime32:($fd_t ufd, int flags,
-                   [nonnull] struct __itimerspec32 const *utmr,
-                   [nullable] struct __itimerspec32 *otmr) -> int = timerfd_settime?;
+                   [[nonnull]] struct __itimerspec32 const *utmr,
+                   [[nullable]] struct __itimerspec32 *otmr) -> int = timerfd_settime?;
 
 [doc_alias(timerfd_gettime)][ignore]
-timerfd_gettime32:($fd_t ufd, [nonnull] struct __itimerspec32 *__restrict otmr) -> int = timerfd_gettime?;
+timerfd_gettime32:($fd_t ufd, [[nonnull]] struct __itimerspec32 *__restrict otmr) -> int = timerfd_gettime?;
 
 
 @@Return file descriptor for new interval timer source
@@ -77,12 +77,13 @@ timerfd_gettime32:($fd_t ufd, [nonnull] struct __itimerspec32 *__restrict otmr) 
 @@Set next expiration time of interval timer source UFD to UTMR.
 @@If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout utmr
 @@is absolute. Optionally return the old expiration time in OTMR
+[no_crt_self_import]
 [if(defined(__USE_TIME_BITS64)), preferred_alias(timerfd_settime64)]
 [if(!defined(__USE_TIME_BITS64)), preferred_alias(timerfd_settime)]
 [requires(defined(__CRT_HAVE_timerfd_settime) || defined(__CRT_HAVE_timerfd_settime64))]
 timerfd_settime:($fd_t ufd, int flags,
-                 [nonnull] struct itimerspec const *utmr,
-                 [nullable] struct itimerspec *otmr) -> int {
+                 [[nonnull]] struct itimerspec const *utmr,
+                 [[nullable]] struct itimerspec *otmr) -> int {
 #ifdef __CRT_HAVE_timer_settime
 	int result;
 	struct __itimerspec32 utmr32, otmr32;
@@ -117,10 +118,11 @@ timerfd_settime:($fd_t ufd, int flags,
 }
 
 @@Return the next expiration time of UFD
+[no_crt_self_import]
 [if(defined(__USE_TIME_BITS64)), preferred_alias(timerfd_gettime64)]
 [if(!defined(__USE_TIME_BITS64)), preferred_alias(timerfd_gettime)]
 [requires(defined(__CRT_HAVE_timerfd_gettime) || defined(__CRT_HAVE_timerfd_gettime64))]
-timerfd_gettime:($fd_t ufd, [nonnull] struct itimerspec *__restrict otmr) -> int {
+timerfd_gettime:($fd_t ufd, [[nonnull]] struct itimerspec *__restrict otmr) -> int {
 #ifdef __CRT_HAVE_timer_settime
 	int result;
 	struct __itimerspec32 otmr32;
@@ -151,8 +153,8 @@ timerfd_gettime:($fd_t ufd, [nonnull] struct itimerspec *__restrict otmr) -> int
 [requires(defined(__CRT_HAVE_timerfd_settime))]
 [time64_variant_of(timerfd_settime)]
 timerfd_settime64:($fd_t ufd, int flags,
-                   [nonnull] struct itimerspec64 const *utmr,
-                   [nullable] struct itimerspec64 *otmr) -> int {
+                   [[nonnull]] struct itimerspec64 const *utmr,
+                   [[nullable]] struct itimerspec64 *otmr) -> int {
 	int result;
 	struct __itimerspec32 utmr32, otmr32;
 	utmr32.it_interval.@tv_sec@  = (__time32_t)utmr->it_interval.@tv_sec@;
@@ -171,7 +173,7 @@ timerfd_settime64:($fd_t ufd, int flags,
 
 [time64_variant_of(timerfd_gettime)]
 [requires(defined(__CRT_HAVE_timerfd_gettime))]
-timerfd_gettime64:($fd_t ufd, [nonnull] struct itimerspec64 *__restrict otmr) -> int {
+timerfd_gettime64:($fd_t ufd, [[nonnull]] struct itimerspec64 *__restrict otmr) -> int {
 	int result;
 	struct __itimerspec32 otmr32;
 	result = timerfd_gettime32(timerid, &otmr32);

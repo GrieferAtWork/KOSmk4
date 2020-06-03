@@ -548,7 +548,7 @@ typedef __mode_t mode_t; /* INode type (Set of `S_*' from `<fcntl.h>' or `<sys/s
 @@              with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
 @@              MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
 @@              MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_DONT_OVERRIDE'
-[section(.text.crt.heap.mman)]
+[section(.text.crt.heap.mman), no_crt_self_import]
 [if(defined(__USE_FILE_OFFSET64)), preferred_alias(mmap64)]
 [if(!defined(__USE_FILE_OFFSET64)), preferred_alias(mmap)]
 [alias_args(mmap64:(void *addr, size_t len, int prot, int flags, $fd_t fd, $off64_t offset) -> void *)]
@@ -564,39 +564,39 @@ mmap:(void *addr, size_t len, int prot, int flags, $fd_t fd, $off_t offset) -> v
 
 @@Unmap memory from `addr...+=len'
 [section(.text.crt.heap.mman)]
-munmap:([nonnull] void *addr, size_t len) -> int;
+munmap:([[nonnull]] void *addr, size_t len) -> int;
 
 @@@param prot: Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|
 @@             PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED|PROT_GROWSUP|
 @@             PROT_GROWSDOWN'
 [section(.text.crt.system.mman)]
-mprotect:([nonnull] void *addr, size_t len, int prot) -> int;
+mprotect:([[nonnull]] void *addr, size_t len, int prot) -> int;
 
 @@@param flags: Set of `MS_ASYNC|MS_INVALIDATE|MS_SYNC'
-[cp] msync:([nonnull] void *addr, size_t len, int flags) -> int;
-mlock:([nonnull] void const *addr, size_t len) -> int;
-munlock:([nonnull] void const *addr, size_t len) -> int;
+[cp] msync:([[nonnull]] void *addr, size_t len, int flags) -> int;
+mlock:([[nonnull]] void const *addr, size_t len) -> int;
+munlock:([[nonnull]] void const *addr, size_t len) -> int;
 
 @@@param flags: Set of `MCL_CURRENT|MCL_FUTURE|MCL_ONFAULT'
 mlockall:(int flags) -> int;
 
 munlockall:() -> int;
-[cp] shm_open:([nonnull] char const *name, $oflag_t oflags, mode_t mode) -> int;
-[cp] shm_unlink:([nonnull] char const *name) -> int;
+[cp] shm_open:([[nonnull]] char const *name, $oflag_t oflags, mode_t mode) -> int;
+[cp] shm_unlink:([[nonnull]] char const *name) -> int;
 
 %
 %#ifdef __USE_MISC
 
 [noexport]
 [export_alias(__madvise)]
-madvise:([nonnull] void *addr, size_t len, int advice) -> int {
+madvise:([[nonnull]] void *addr, size_t len, int advice) -> int {
 	/* Implement as a no-op, since this function is merely meant as a hint */
 	(void)addr;
 	(void)len;
 	(void)advice;
 	return 0;
 }
-mincore:([nonnull] void *start, size_t len, unsigned char *vec) -> int;
+mincore:([[nonnull]] void *start, size_t len, unsigned char *vec) -> int;
 
 %#endif /* __USE_MISC */
 
@@ -615,7 +615,7 @@ mmap64:(void *addr, size_t len, int prot, int flags, $fd_t fd, $off64_t offset) 
 %#ifdef __USE_XOPEN2K
 
 [noexport]
-posix_madvise:([nonnull] void *addr, size_t len, int advice) -> int {
+posix_madvise:([[nonnull]] void *addr, size_t len, int advice) -> int {
 	/* Implement as a no-op, since this function is merely meant as a hint */
 	(void)addr;
 	(void)len;

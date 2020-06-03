@@ -166,6 +166,10 @@ class Argument {
 	public function cprint(fp: CWriter, escapeMode: int) {
 		ctype.cprint(fp, escapeMode, protoTypeName);
 	}
+
+	public operator hash(): int -> Object.id(this);
+	public operator == (other: Argument): bool -> this === other;
+	public operator != (other: Argument): bool -> this !== other;
 }
 
 class FunctionPrototype {
@@ -199,6 +203,11 @@ class FunctionPrototype {
 	@@When set to non-@none, these are the types of the arguments passed through ellipsis
 	@@This information can be helpful when trying to construct an argument list
 	public member ellipsisArgumentTypes: {CType...} = none;
+
+	@@Pieces of code that must be written before @this @FunctionPrototype can be printed
+	@@NOTE: These prefixes are only printed in local function implementations, as well as
+	@@      their dependencies, as well as the dependencies of inline functions
+	public member declPrefix: {(string | UserString)...} = ();
 
 	@@Returns @true if this prototype contains a @"ATTR_NORETURN" attribute
 	public property isNoreturn: bool = {
@@ -242,8 +251,9 @@ class FunctionPrototype {
 			if (m_argsByName !is bound) {
 				m_argsByName = Dict();
 				for (local a: argv) {
-					if (a.name)
-						m_argsByName[a.name] = a;
+					local usedName = str a.name;
+					if (usedName)
+						m_argsByName[usedName] = a;
 				}
 			}
 			return m_argsByName;
@@ -524,13 +534,9 @@ class FunctionImplementation {
 	@@Name of the function itself within the implementation
 	public member name: string | UserString;
 
-	@@Headers that must be included before @impl can be generated
-	@@These headers are included at the global namespace scope!
-	public member implIncludes: {(string | UserString)...} = ();
-
-	@@A piece of code that must be written before @impl can be generated
+	@@Pieces of code that must be written before @impl can be generated
 	@@This code is inserted at the global namespace scope!
-	public member implPrefix: string | UserString = "";
+	public member implPrefix: {(string | UserString)...} = ();
 
 	@@Other functions for which prototypes (though not necessarily c++ overloads) must
 	@@be provided in order to use this implementation. Functions that appear in this
@@ -594,8 +600,7 @@ class FunctionImplementation {
 		return result;
 	}
 
-	@@Print everything necessary for this implmentation following the assumption that the
-	@@caller already printed @ppCondIncludes, @ppCondPrefix and @ppCond
+	@@Print everything necessary for this implmentation
 	@@@param: dependencyDecl: Declaration prefix for dependencies (usually @"__LIBC")
 	@@@param: escapeMode:     One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
 	@@@param: keyDependency:  Transformation key for the names of dependent functions
@@ -604,8 +609,6 @@ class FunctionImplementation {
 			prototype: FunctionPrototype, dependencyDecl: string,
 			doc: string, namespace: Namespace,
 			keyDependency: Callable with string) {
-		for (local inc: implIncludes.sorted())
-			fp.ppInclude(inc);
 		fp.forceStartOfLine();
 		local oldNs = fp.namespace;
 		fp.namespace = namespace;
@@ -616,14 +619,17 @@ class FunctionImplementation {
 				<< depFun.name << " from "
 				<< depFun.originalSystemHeaderName << " */\n";
 			depName = keyDependency(depName);
-			depFun.cprintHeaderDeclaration(fp, escapeMode, dependencyDecl,
+			depFun.cprintHeaderDeclaration(
+				fp, escapeMode, dependencyDecl,
 				exposedName: depName,
 				guardName:   namespace.keyDefaultGuard(depName),
-				preferBindingMacros: true);
+				preferBindingMacros:      true,
+				printDeclarationPrefixes: true);
 		}
 		if (implPrefix) {
 			fp.namespace = GLOBAL_NAMESPACE;
-			escapeTextIntoFile(fp, implPrefix, escapeMode);
+			for (local x: implPrefix)
+				escapeNonRepeatingTextIntoFile(fp, x, escapeMode);
 			fp.namespace = namespace;
 		}
 		if (doc)
@@ -669,8 +675,7 @@ class LoaderFunctionImplementation {
 	this = default;
 	public member impl: FunctionImplementation;
 	public member ppCond: string | UserString = "1";
-	public member ppCondIncludes: {(string | UserString)...} = ();
-	public member ppCondPrefix: string | UserString = "";
+	public member ppCondPrefix: {(string | UserString)...} = ();
 }
 
 
@@ -688,12 +693,6 @@ class LocalFunction {
 	@@Name of this declaring system header (e.g. "string" for <string.h>)
 	public member originalSystemHeaderName: string | UserString;
 
-	@@Headers that must be included before @prototype can be printed
-	public member declarationIncludes: {(string | UserString)...} = ();
-
-	@@A piece of code that must be written before @prototype can be printed
-	public member declarationPrefix: string | UserString = "";
-
 	@@The prototype adhered to by all local implementation variants
 	public member prototype: FunctionPrototype | Callable;
 
@@ -701,13 +700,9 @@ class LocalFunction {
 	@@for this local function implementation to be chosed.
 	public member ppCond: string | UserString = "1";
 
-	@@Headers that must be included before @ppCond can be evaluated
-	@@These headers are included at the global namespace scope!
-	public member ppCondIncludes: {(string | UserString)...} = ();
-
-	@@A piece of code that must be written before @ppCond can be evaluated
+	@@Pieces of code that must be written before @ppCond can be evaluated
 	@@This code is inserted at the global namespace scope!
-	public member ppCondPrefix: string | UserString = "";
+	public member ppCondPrefix: {(string | UserString)...} = ();
 
 	@@The bound implementation for the local function
 	public member impl: FunctionImplementation | Callable;
@@ -759,17 +754,14 @@ class LocalFunction {
 		fp.ppIfndef(localGuardName);
 		fp.ppDefine(localGuardName, "1");
 		fp.ppInclude("<__crt.h>");
-		/* Print out the declaration prefix. */
-		for (local x: declarationIncludes)
-			fp.ppInclude(x);
-		if (declarationPrefix)
-			fp << declarationPrefix;
 		/* Include the preprocessor-condition prefix texts. */
-		fp.forceStartOfLine();
-		for (local x: ppCondIncludes.sorted())
-			fp.ppInclude(x);
-		escapeTextIntoFile(fp, ppCondPrefix, escapeMode);
+		for (local x: ppCondPrefix)
+			escapeNonRepeatingTextIntoFile(fp, x, escapeMode);
 		fp.ppIf(expandPreprocessorConditionString(ppCond));
+		/* Print out the declaration prefix. */
+		for (local x: usedPrototype.declPrefix)
+			escapeNonRepeatingTextIntoFile(fp, x, escapeMode);
+		fp.forceStartOfLine();
 		/* Print the binding */
 		functionImpl.cprintLocalFunctionImplementation(
 			fp, escapeMode, name, usedPrototype,
@@ -869,13 +861,11 @@ class InlineFunction {
 			dependenciesNamespace: Namespace = none, dependencyDecl: string = "__LIBC") {
 		local impl: FunctionImplementation = functionImpl;
 		local implName = impl.name;
-		if (impl.implIncludes || impl.implPrefix) {
+		if (impl.implPrefix) {
 			local oldNs = fp.namespace;
 			fp.namespace = GLOBAL_NAMESPACE;
-			for (local x: impl.implIncludes)
-				fp.ppInclude(x);
-			if (impl.implPrefix)
-				fp << impl.implPrefix;
+			for (local x: impl.implPrefix)
+				escapeNonRepeatingTextIntoFile(fp, x, escapeMode);
 			fp.namespace = oldNs;
 		}
 		/* Bind dependent functions. */
@@ -905,9 +895,10 @@ class InlineFunction {
 			for (local depName, depFun: deps) {
 				depName = keyDependency(depName);
 				depFun.cprintHeaderDeclaration(fp, escapeMode, dependencyDecl,
-					exposedName:         depName,
-					guardName:           dependenciesNamespace.keyDefaultGuard(depName),
-					preferBindingMacros: true);
+					exposedName:              depName,
+					guardName:                dependenciesNamespace.keyDefaultGuard(depName),
+					preferBindingMacros:      true,
+					printDeclarationPrefixes: true);
 			}
 			fp.namespace = oldNs;
 		} else {
@@ -988,13 +979,9 @@ class FunctionBinding {
 	@@in order for this binding to be considered usable by the hosting compiler.
 	public member ppCond: string | UserString = "1";
 
-	@@Headers that must be included before @ppCond can be evaluated
-	@@These headers are included at the global namespace scope!
-	public member ppCondIncludes: {(string | UserString)...} = ();
-
-	@@A piece of code that must be written before @ppCond can be evaluated
+	@@Pieces of code that must be written before @ppCond can be evaluated
 	@@This code is inserted at the global namespace scope!
-	public member ppCondPrefix: string | UserString = "";
+	public member ppCondPrefix: {(string | UserString)...} = ();
 
 	@@Prototype selectors (usually simply @({ "1", { <primaryPrototype> } }))
 	@@This is a list of pairs (ppCond, prototypes) to select which prototypes
@@ -1121,7 +1108,8 @@ class FunctionBinding {
 	public function cprintBindFunction(
 			fp: CWriter, escapeMode: int, decl: string, exposedName: string,
 			guardName: string | none = none, doc: string = "",
-			preferBindingMacros: bool = false) {
+			preferBindingMacros: bool = false,
+			printDeclarationPrefixes: bool = false) {
 		local usedBinding = functionBinding;
 		if (usedBinding is Namespace) {
 			assert usedBinding !== fp.namespace, "The caller must check this!";
@@ -1138,6 +1126,11 @@ class FunctionBinding {
 			return;
 		}
 		local isFirst = true;
+		if (printDeclarationPrefixes) {
+			/* TODO: Print declaration prefixes common to all of @functionPrototypes,
+			 *       so-long as at least one of @functionPrototypes has a ppCond that
+			 *       always evaluates to true */
+		}
 		for (local ppCond, associatedPrototypes: functionPrototypes) {
 			ppCond = expandPreprocessorConditionString(ppCond);
 			if (isFirst)
@@ -1146,6 +1139,13 @@ class FunctionBinding {
 				fp.ppElif(ppCond);
 			}
 			isFirst = false;
+			if (printDeclarationPrefixes) {
+				/* Print declaration prefixes */
+				for (local proto: associatedPrototypes) {
+					for (local x: proto.declPrefix)
+						escapeNonRepeatingTextIntoFile(fp, x, escapeMode);
+				}
+			}
 			if (usedBinding !is string && usedBinding !is UserString) {
 				usedBinding.cprintFunctionBinding(
 					fp, escapeMode, decl, exposedName, associatedPrototypes,
@@ -1300,7 +1300,8 @@ no_usable_bindings:
 	public function cprintHeaderDeclaration(
 			fp: CWriter, escapeMode: int, decl: string = "__LIBC",
 			exposedName: string = none, guardName: string | bool = none,
-			preferBindingMacros: bool = false) {
+			preferBindingMacros: bool = false,
+			printDeclarationPrefixes: bool = false) {
 		local usedBindings = functionBindings;
 		if (!usedBindings)
 			return; /* No bindings -> Noop */
@@ -1310,6 +1311,11 @@ no_usable_bindings:
 			guardName = guardName
 				? fp.namespace.keyDefaultGuard(exposedName)
 				: none;
+		}
+		if (printDeclarationPrefixes) {
+			/* TODO: Print declaration prefixes common to all bindings,
+			 *       when at least one one binding exists that can get
+			 *       bound unconditionally. */
 		}
 		if (guardName !is none) {
 			if (#usedBindings == 1) {
@@ -1335,9 +1341,10 @@ no_usable_bindings:
 					bind.binding = bind.binding();
 				if (bind.binding is Namespace && bind.binding === fp.namespace)
 					return;
-				if (bind.ppCondPrefix ||
-				    (bind.ppCondIncludes && !fp.wereAllHeadersAlreadyIncluded(bind.ppCondIncludes)))
-					goto normal_guardName_binding;
+				for (local x: bind.ppCondPrefix) {
+					if (!fp.wasPrefixPrinted(escapeText(x, escapeMode)))
+						goto normal_guardName_binding;
+				}
 				fp.ppIf("!defined({}) && ({})".format({
 					guardName,
 					expandPreprocessorConditionString(bind.ppCond)
@@ -1345,7 +1352,8 @@ no_usable_bindings:
 				fp.ppDefine(guardName, "1");
 				bind.cprintBindFunction(
 					fp, escapeMode, decl, exposedName, guardName,
-					documentationString, preferBindingMacros);
+					documentationString, preferBindingMacros,
+					printDeclarationPrefixes);
 				fp.ppEndif();
 				return;
 			}
@@ -1360,18 +1368,23 @@ normal_guardName_binding:
 			if (bind.binding is Namespace && bind.binding === fp.namespace)
 				continue;
 			local usedPpCond = expandPreprocessorConditionString(bind.ppCond);
-			if (bind.ppCondPrefix ||
-			    (bind.ppCondIncludes && !fp.wereAllHeadersAlreadyIncluded(bind.ppCondIncludes))) {
-				if (!isFirst) {
-					fp.ppElse();
-					numNeededEndif.last = false;
+			local oldNs: Namespace | none = none;
+			for (local x: bind.ppCondPrefix) {
+				local newText = escapeText(x, escapeMode);
+				if (fp.wasPrefixPrinted(newText))
+					continue;
+				if (oldNs is none) {
+					if (!isFirst) {
+						fp.ppElse();
+						numNeededEndif.last = false;
+					}
+					/* Include the preprocessor-condition prefix texts. */
+					fp.namespace = GLOBAL_NAMESPACE;
+					oldNs = fp.namespace;
 				}
-				/* Include the preprocessor-condition prefix texts. */
-				local oldNs = fp.namespace;
-				fp.namespace = GLOBAL_NAMESPACE;
-				for (local x: bind.ppCondIncludes.sorted())
-					fp.ppInclude(x);
-				escapeTextIntoFile(fp, bind.ppCondPrefix, escapeMode);
+				fp.forceStartOfLine() << newText;
+			}
+			if (oldNs !is none) {
 				fp.namespace = oldNs;
 				fp.ppIf(usedPpCond);
 				numNeededEndif.pushback(true);
@@ -1383,7 +1396,8 @@ normal_guardName_binding:
 			}
 			bind.cprintBindFunction(
 				fp, escapeMode, decl, exposedName, guardName,
-				documentationString, preferBindingMacros);
+				documentationString, preferBindingMacros,
+				printDeclarationPrefixes);
 			isFirst = false;
 		}
 		while (numNeededEndif) {
@@ -1423,6 +1437,9 @@ class ExposedFunction {
 	@@rather than through use of inline functions.
 	public member preferBindingMacros: bool = false;
 
+	@@Print @FunctionPrototype.declPrefix
+	public member printDeclarationPrefixes: bool = false;
+
 	@@An override for the active namespace during function declaration
 	public member namespaceOverride: Namespace | UserString | string | none = none;
 
@@ -1436,7 +1453,8 @@ class ExposedFunction {
 			func = func();
 		func.cprintHeaderDeclaration(
 			fp, escapeMode, decl, exposedName,
-			guardName, preferBindingMacros);
+			guardName, preferBindingMacros,
+			printDeclarationPrefixes);
 		fp.namespace = oldNs;
 	}
 
@@ -1596,9 +1614,8 @@ class LibraryFunction {
 			}
 			local impl: FunctionImplementation | string | UserString = bind.functionBinding;
 			if (impl is FunctionImplementation) {
-				for (local x: impl.implIncludes)
-					fp.ppInclude(x);
-				fp << impl.implPrefix;
+				for (local x: impl.implPrefix)
+					escapeNonRepeatingTextIntoFile(fp, x, escapeMode);
 				/* TODO: Include @impl.implementationSection as @"ATTR_SECTION(...)"! */
 				if (doc)
 					fp.printComment(doc);
@@ -1731,6 +1748,9 @@ class SystemHeader {
 	public function cprintLibraryAutoHeader(
 			fp: CWriter, escapeMode: int, decl: string = "INTDEF") {
 		/* TODO: Assume that "defined(__BUILDING_LIBC)" == "1" */
+		/* TODO: Assume that "defined(__CRT_HAVE_*)" == "1" for all symbols exported from libc
+		 *       In cases of conditional exports, "defined(__CRT_HAVE_*)" should instead be
+		 *       replaced by the export-condition */
 		for (local part: order_libcAutoHeader) {
 			if (part is LibraryFunction) {
 				part.cprintInLibraryDeclaration(fp, escapeMode, decl);
@@ -1744,6 +1764,9 @@ class SystemHeader {
 	public function cprintLibraryAutoSourceImplementations(
 			fp: CWriter, escapeMode: int, decl: string = "INTERN") {
 		/* TODO: Assume that "defined(__BUILDING_LIBC)" == "1" */
+		/* TODO: Assume that "defined(__CRT_HAVE_*)" == "1" for all symbols exported from libc
+		 *       In cases of conditional exports, "defined(__CRT_HAVE_*)" should instead be
+		 *       replaced by the export-condition */
 		for (local part: order_libcAutoSource) {
 			if (part is LibraryFunction) {
 				part.cprintInLibraryAutoImplementation(fp, escapeMode, decl);
@@ -1757,6 +1780,9 @@ class SystemHeader {
 	public function cprintLibraryAutoSourceExports(
 			fp: CWriter, escapeMode: int) {
 		/* TODO: Assume that "defined(__BUILDING_LIBC)" == "1" */
+		/* TODO: Assume that "defined(__CRT_HAVE_*)" == "1" for all symbols exported from libc
+		 *       In cases of conditional exports, "defined(__CRT_HAVE_*)" should instead be
+		 *       replaced by the export-condition */
 		for (local part: order_libcAutoSource) {
 			if (part is LibraryFunction) {
 				part.cprintInLibraryExports(fp, escapeMode);
@@ -1770,6 +1796,9 @@ class SystemHeader {
 	public function cprintLibraryUserHeader(
 			fp: CWriter, escapeMode: int, decl: string = "INTDEF") {
 		/* TODO: Assume that "defined(__BUILDING_LIBC)" == "1" */
+		/* TODO: Assume that "defined(__CRT_HAVE_*)" == "1" for all symbols exported from libc
+		 *       In cases of conditional exports, "defined(__CRT_HAVE_*)" should instead be
+		 *       replaced by the export-condition */
 		for (local part: order_libcUserHeader) {
 			if (part is LibraryFunction) {
 				part.cprintInLibraryDeclaration(fp, escapeMode, decl);
@@ -1783,6 +1812,9 @@ class SystemHeader {
 	public function cprintLibraryUserSourceImplementations(
 			fp: CWriter, escapeMode: int, decl: string = "INTERN") {
 		/* TODO: Assume that "defined(__BUILDING_LIBC)" == "1" */
+		/* TODO: Assume that "defined(__CRT_HAVE_*)" == "1" for all symbols exported from libc
+		 *       In cases of conditional exports, "defined(__CRT_HAVE_*)" should instead be
+		 *       replaced by the export-condition */
 		/* TODO: This needs special handling! */
 		for (local part: order_libcUserSource) {
 			if (part is LibraryFunction) {
@@ -1797,6 +1829,9 @@ class SystemHeader {
 	public function cprintLibraryUserSourceExports(
 			fp: CWriter, escapeMode: int) {
 		/* TODO: Assume that "defined(__BUILDING_LIBC)" == "1" */
+		/* TODO: Assume that "defined(__CRT_HAVE_*)" == "1" for all symbols exported from libc
+		 *       In cases of conditional exports, "defined(__CRT_HAVE_*)" should instead be
+		 *       replaced by the export-condition */
 		for (local part: order_libcUserSource) {
 			if (part is LibraryFunction) {
 				part.cprintInLibraryExports(fp, escapeMode);

@@ -48,7 +48,7 @@ Valloc:(size_t num_bytes) -> [nonnull, memalign(getpagesize(), num_bytes)] void 
 %
 %#ifdef __USE_KOS
 [throws(E_BADALLOC)][requires($has_function(Malloc))][section(.text.crt.except.heap.rare_helpers)]
-Memdup:([nonnull] void const *__restrict ptr, size_t num_bytes) -> [nonnull, malloc(num_bytes)] void * {
+Memdup:([[nonnull]] void const *__restrict ptr, size_t num_bytes) -> [nonnull, malloc(num_bytes)] void * {
 	void *result;
 	result = Malloc(num_bytes);
 	memcpy(result, ptr, num_bytes);
@@ -57,7 +57,7 @@ Memdup:([nonnull] void const *__restrict ptr, size_t num_bytes) -> [nonnull, mal
 
 @@@throws: E_BADALLOC: ...
 [throws(E_BADALLOC)][requires($has_function(Memdup))][section(.text.crt.except.heap.rare_helpers)]
-Memcdup:([nonnull] void const *__restrict ptr, int needle, size_t num_bytes) -> [nonnull, malloc(?)] void * {
+Memcdup:([[nonnull]] void const *__restrict ptr, int needle, size_t num_bytes) -> [nonnull, malloc(?)] void * {
 	if likely(num_bytes) {
 		void const *endaddr;
 		endaddr = memchr(ptr, needle, num_bytes - 1);

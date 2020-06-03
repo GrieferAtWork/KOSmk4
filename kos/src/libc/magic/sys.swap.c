@@ -37,9 +37,9 @@ __SYSDECL_BEGIN
 }
 
 @@@param swapflags: Set of `SWAP_FLAG_*'
-[cp] swapon:([nonnull] char const *path, int swapflags) -> int;
+[cp] swapon:([[nonnull]] char const *path, int swapflags) -> int;
 
-[cp] swapoff:([nonnull] char const *path) -> int;
+[cp] swapoff:([[nonnull]] char const *path) -> int;
 
 %{
 

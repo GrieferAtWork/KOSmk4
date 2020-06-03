@@ -89,8 +89,8 @@ __LIBC int error_one_per_line;
 @@The message is printed as: `<program_invocation_short_name>: <format...>[: <strerror(errnum)>]\n'
 @@Also note that `stdout' is flushed before the message is printed.
 @@If `STATUS' is non-zero, follow up with a call to `exit(status)'
-[ATTR_LIBC_PRINTF(3, 4)][fast][libc][same_impl][throws]
-[decl_include(<bits/types.h>)]
+[[ATTR_LIBC_PRINTF(3, 4), fast, libc, userimpl, throws]]
+[decl_include("<bits/types.h>")]
 [dependency_include(<local/stdstreams.h>)]
 [requires_include(<__crt.h>)]
 [requires_include(<local/program_invocation_name.h>)]
@@ -131,8 +131,8 @@ error:(int status, $errno_t errnum, const char *format, ...) {
 @@The message is printed as: `<program_invocation_short_name>:<filename>:<line>: <format...>[: <strerror(errnum)>]\n'
 @@Additionally, when `error_one_per_line' is non-zero, consecutive calls to this function that
 @@pass the same values for `filename' and `line' will not produce the error message.
-[ATTR_LIBC_PRINTF(5, 6)][fast][libc][same_impl][throws]
-[decl_include(<bits/types.h>)]
+[ATTR_LIBC_PRINTF(5, 6)][fast][libc][userimpl][throws]
+[decl_include("<bits/types.h>")]
 [dependency_include(<local/stdstreams.h>)]
 [requires_include(<__crt.h>)]
 [requires_include(<local/program_invocation_name.h>)]

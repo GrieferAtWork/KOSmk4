@@ -39,18 +39,18 @@ __SYSDECL_BEGIN
 
 [section({.text.crt.wchar.fs.modify|.text.crt.dos.wchar.fs.modify})]
 [guard][wchar][dosname(_wremove)]
-wremove:([nonnull] wchar_t const *filename) -> int;
+wremove:([[nonnull]] wchar_t const *filename) -> int;
 
 %[default_impl_section({.text.crt.wchar.FILE.locked.access|.text.crt.dos.wchar.FILE.locked.access})]
 [wchar][ATTR_WUNUSED][dosname(_wfopen)]
-wfopen:([nonnull] wchar_t const *filename, [nonnull] wchar_t const *mode) -> $FILE *;
+wfopen:([[nonnull]] wchar_t const *filename, [[nonnull]] wchar_t const *mode) -> $FILE *;
 
 [wchar][ATTR_WUNUSED][dosname(_wfreopen)]
-wfreopen:([nonnull] wchar_t const *filename, [nonnull] wchar_t const *mode, $FILE *stream) -> $FILE *;
+wfreopen:([[nonnull]] wchar_t const *filename, [[nonnull]] wchar_t const *mode, $FILE *stream) -> $FILE *;
 
 [section({.text.crt.wchar.FILE.locked.access|.text.crt.dos.wchar.FILE.locked.access})]
 [guard][wchar][ATTR_WUNUSED][dosname(_wpopen)]
-wpopen:([nonnull] wchar_t const *command, [nonnull] wchar_t const *mode) -> $FILE *;
+wpopen:([[nonnull]] wchar_t const *command, [[nonnull]] wchar_t const *mode) -> $FILE *;
 
 
 %{

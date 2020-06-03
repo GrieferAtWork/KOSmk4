@@ -51,7 +51,7 @@ typedef __key_t key_t;
 }
 
 @@Generates key for System V style IPC
-[cp] ftok:([nonnull] char const *pathname, int proj_id) -> key_t;
+[cp] ftok:([[nonnull]] char const *pathname, int proj_id) -> key_t;
 
 %{
 

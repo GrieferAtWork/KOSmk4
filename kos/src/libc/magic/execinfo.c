@@ -51,17 +51,17 @@ __SYSDECL_BEGIN
 @@Store up to SIZE return address of the current program state
 @@in ARRAY and return the exact number of values stored
 [export_alias(__backtrace)]
-backtrace:([nonnull] void **array, int size) -> int;
+backtrace:([[nonnull]] void **array, int size) -> int;
 
 @@Return names of functions from the backtrace list
 @@in ARRAY in a newly malloc()ed memory block
 [export_alias(__backtrace_symbols)]
-backtrace_symbols:([nonnull] void *const *array, int size) -> char **;
+backtrace_symbols:([[nonnull]] void *const *array, int size) -> char **;
 
 @@This function is similar to backtrace_symbols()
 @@but it writes the result immediately to a file
 [export_alias(__backtrace_symbols_fd)]
-backtrace_symbols_fd:([nonnull] void *const *array, int size, $fd_t fd);
+backtrace_symbols_fd:([[nonnull]] void *const *array, int size, $fd_t fd);
 
 
 %{

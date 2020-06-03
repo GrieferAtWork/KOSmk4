@@ -54,7 +54,7 @@ global final ESCAPE_MODE_PART = 1;
 @@   - @"foo"     -> "__foo"
 global final ESCAPE_MODE_FULL = 2;
 
-global final cLanguageKeywords: {string...} = HashSet({
+global cLanguageKeywords: {string...} = HashSet({
 	"if", "else", "while", "for", "return", "do", "switch",
 	"case", "default", "goto", "continue", "break", "sizeof",
 	"alignof", "struct", "union", "extern", "void", "char",
@@ -71,7 +71,7 @@ global final cLanguageKeywords: {string...} = HashSet({
 @@  - Inserting 2 leading "__"
 @@  - Inserting 1 leading "_", and having the following character be upper-case
 @@Keywords that already appear escaped are not re-escaped
-global final keywordEscapes: {string: string} = Dict({
+global keywordEscapes: {string: string} = Dict({
 	"size_t" : "__SIZE_TYPE__",
 	"ssize_t" : "__SSIZE_TYPE__",
 	"intptr_t" : "__INTPTR_TYPE__",
@@ -548,6 +548,8 @@ handle_numLines_after_pp_directive:
 				goto handle_numLines_after_pp_directive;
 
 			/* Deprecated preprocessor functions */
+			case "pp_if_has_function":           /* alias for @@pp_if $has_function({name})@@ */
+			case "pp_elif_has_function":         /* alias for @@pp_elif $has_function({name})@@ */
 			case "if_has_function":              /* (Deprecated alias for @@pp_if   $has_function({name})@@) */
 			case "if_crt_has_function":          /* (Deprecated alias for @@pp_if   $crt_has_function({name})@@) */
 			case "if_not_has_function":          /* (Deprecated alias for @@pp_if   !$has_function({name})@@) */
@@ -596,10 +598,12 @@ handle_numLines_after_pp_directive:
 				}
 				/* construct the condition string, and if vs. elif */
 				tok, cond = {
+					"pp_if_has_function"        : ("pp_if",   "$has_function({})"),
 					"if_has_function"           : ("pp_if",   "$has_function({})"),
 					"if_crt_has_function"       : ("pp_if",   "$crt_has_function({})"),
 					"if_not_has_function"       : ("pp_if",   "!$has_function({})"),
 					"if_not_crt_has_function"   : ("pp_if",   "!$crt_has_function({})"),
+					"pp_elif_has_function"      : ("pp_elif", "$has_function({})"),
 					"elif_has_function"         : ("pp_elif", "$has_function({})"),
 					"elif_crt_has_function"     : ("pp_elif", "$crt_has_function({})"),
 					"elif_not_has_function"     : ("pp_elif", "!$has_function({})"),
@@ -727,9 +731,13 @@ done:
 
 @@Helper wrapper for @escapeTextIntoFile
 function escapeText(text: string | CParser | UserString, mode: int,
-		keyEscape: Callable with string = none): string | UserString {
+		keyEscape: Callable with string = none,
+		evalEnviron: {string: Object} | none = none,
+		forceKeyEscape: bool = false): string | UserString {
 	File.Writer result;
-	escapeTextIntoFile(result, text, mode, keyEscape);
+	escapeTextIntoFile(
+		result, text, mode, keyEscape,
+		evalEnviron, forceKeyEscape);
 	result = result.string;
 	/* Allow for better string re-use */
 	if (text is string) {
@@ -740,6 +748,22 @@ function escapeText(text: string | CParser | UserString, mode: int,
 			result = text;
 	}
 	return result;
+}
+
+function escapeNonRepeatingTextIntoFile(
+		fp: File | CWriter, text: string | CParser | UserString,
+		mode: int, keyEscape: Callable with string = none,
+		evalEnviron: {string: Object} | none = none,
+		forceKeyEscape: bool = false) {
+	if (fp is CWriter) {
+		local newText = escapeText(
+			text, mode, keyEscape, evalEnviron, forceKeyEscape);
+		fp.forceStartOfLine();
+		fp.printPrefix(str newText);
+	} else {
+		escapeTextIntoFile(
+			fp, text, mode, keyEscape, evalEnviron, forceKeyEscape);
+	}
 }
 
 
@@ -754,3 +778,4 @@ function expandPreprocessorConditionString(
 	escapeTextIntoFile(resultFp, text, ESCAPE_MODE_FULL, identity from functools);
 	return resultFp.string;
 }
+

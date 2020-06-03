@@ -387,10 +387,14 @@ again_parse_annotations:
 
 				case "throws":
 					self.next();
-					self.skip("(");
-					result.nothrow = "THROWS({})"
-						.format({ parseCStringOrAllUntilRParen(self) });
-					self.skip(")");
+					if (self.tok == "(") {
+						self.next();
+						result.nothrow = "THROWS({})"
+							.format({ parseCStringOrAllUntilRParen(self) });
+						self.skip(")");
+					} else {
+						result.nothrow = "THROWS(...)";
+					}
 					break;
 
 				case "nothrow":
@@ -416,6 +420,25 @@ again_parse_annotations:
 						self.skip(",");
 					}
 					tok = self.next();
+					break;
+
+				case "decl_prefix":
+					self.next();
+					self.skip("(");
+					if (result.declPrefix !is List)
+						result.declPrefix = List(result.declPrefix);
+					result.declPrefix.append(parseCStringOrAllUntilRParen(self));
+					self.skip(")");
+					break;
+
+				case "decl_include":
+					self.next();
+					self.skip("(");
+					if (result.declPrefix !is List)
+						result.declPrefix = List(result.declPrefix);
+					result.declPrefix.append(
+						"#include " + parseCStringOrAllUntilRParen(self));
+					self.skip(")");
 					break;
 
 				default:
@@ -577,17 +600,42 @@ again_parse_annotations:
 					++numRBracket;
 					goto again_parse_annotations;
 
+				case "malloc": {
+					self.next();
+					self.skip("(");
+					local argumentIndex;
+					local argumentNameStart = self.tokStart;
+					local argumentName = parseCStringOrKeyword(self);
+					try {
+						argumentIndex = result.argv.index(result.argsByName[argumentName]);
+					} catch (Error as e) {
+						print repr result.argsByName;
+						self.errAt(argumentNameStart, e.message);
+					}
+					if (result.attributes === defaultAttributes)
+						result.attributes = List(defaultAttributes);
+					result.attributes.append("ATTR_MALLOC");
+					result.attributes.append("ATTR_MALL_DEFAULT_ALIGNED");
+					result.attributes.append("ATTR_ALLOC_SIZE(({}))"
+						.format({ argumentIndex + 1 }));
+					self.skip(")");
+				}	break;
+
 				default: {
 					local anno = SIMPLE_RETURN_TYPE_ATTRIBUTE_ANNOTATIONS.get(tok);
-					if (anno is none)
-						self.err("Unknown return type attribute");
+					if (anno is none) {
+						self.err("Unknown return type attribute {!r}"
+							.format({ tok }));
+					}
 					if (anno) {
 						if (result.attributes === defaultAttributes)
 							result.attributes = List(defaultAttributes);
 						result.attributes.append(anno);
 					}
+					self.next();
 				}	break;
 				}
+				tok = self.tok;
 				if (tok != ",")
 					break;
 				tok = self.next();
@@ -660,10 +708,8 @@ class FunctionFeatures {
 	public member noExternInline: bool = false;                      /* [[no_]extern_inline]    For use with @inline: Don't convert inline */
 	public member noLocal: bool = false;                             /* [[no_]local]            Prevent the creation of a LocalFunction for */
 	public member requires: UserString | string = "1";               /* [[no_]requires(...)]    A preprocessor condition that must be true in order to use the local/inline implementation */
-	public member requiresIncludes: {(UserString | string)...} = (); /* [requires_include(...)] Headers that must be #include'ed before @requires can be used */
-	public member requiresPrefix: UserString | string = "";          /* [requires_prefix(...)]  A piece of text that must be inserted before @requires can be used */
-	public member implIncludes: {(UserString | string)...} = ();     /* [impl_include(...)]     Headers that must be #include'ed before the local implementation can be used */
-	public member implPrefix: UserString | string = "";              /* [impl_prefix(...)]      A piece of text that must be inserted before the local implementation can be used */
+	public member requiresPrefix: {(UserString | string)...} = ();   /* [requires_prefix(...)]  A piece of text that must be inserted before @requires can be used */
+	public member implPrefix: {(UserString | string)...} = ();       /* [impl_prefix(...)]      A piece of text that must be inserted before the local implementation can be used */
 	public member macroBinding: bool = false;                        /* [[no_]macros]           Allow the use of macros when declaring this function */
 	public member guard: bool = false;                               /* [[no_]guard]            Surround the declaration of the function with a guard */
 	public member guardNames: {string: (UserString | string | none)} = none; /* Guard names in different namespaces */
@@ -755,9 +801,7 @@ class FunctionFeatures {
 			"no_local"                    : ("noLocal", true),
 			"norequires"                  : ("requires", "1"),
 			"no_requires"                 : ("requires", "1"),
-			"no_requires_include"         : ("requiresIncludes", ()),
 			"no_requires_prefix"          : ("requiresPrefix", ""),
-			"no_impl_include"             : ("implIncludes", ()),
 			"no_impl_prefix"              : ("implPrefix", ""),
 			"macro"                       : ("macroBinding", true),
 			"macros"                      : ("macroBinding", true),
@@ -781,6 +825,8 @@ class FunctionFeatures {
 			"no_crt_self_import"          : ("crt_noSelfImport", true),
 			"crt_self_export"             : ("crt_noSelfExport", false),
 			"no_crt_self_export"          : ("crt_noSelfExport", true),
+			"noexport"                    : ("crt_userimpl", true), /* TODO: Deprecated */
+			"export"                      : ("crt_userimpl", false), /* TODO: Deprecated */
 			"userimpl"                    : ("crt_userimpl", true),
 			"no_userimpl"                 : ("crt_userimpl", false),
 			"kernel"                      : ("crt_kernel", true),
@@ -859,44 +905,33 @@ class FunctionFeatures {
 			requires = addend;
 		}	break;
 
+		case "requires_function": {
+			if (ppCond !is none)
+				goto err_unexpected_if;
+			self.next();
+			self.skip("(");
+			while (self.tok !in ["", ")"]) {
+				local addend = "$has_function({})".format({ parseCStringOrKeyword(self) });
+				if (requires is UserString || requires != "1")
+					addend = "({}) && ({})".format({ requires, addend });
+				requires = addend;
+				if (self.tok != ",")
+					break;
+				self.next();
+			}
+			self.skip(")");
+		}	break;
+
 		case "requires_include": {
 			if (ppCond !is none)
 				goto err_unexpected_if;
 			self.next();
 			self.skip("(");
-			if (requiresIncludes !is HashSet)
-				requiresIncludes = HashSet(requiresIncludes);
-			requiresIncludes.insert(parseCStringOrAllUntilRParen(self));
-			self.skip(")");
-		}	break;
-
-		case "requires_prefix": {
-			if (ppCond !is none)
-				goto err_unexpected_if;
-			self.next();
-			self.skip("(");
-			local addend = parseCStringOrAllUntilRParen(self);
-			self.skip(")");
-			if (requiresPrefix) {
-				requiresPrefix = str requiresPrefix;
-				if (!requiresPrefix.endswith("\n"))
-					requiresPrefix += "\n";
-				requiresPrefix += addend;
-			} else {
-				requiresPrefix = addend;
-			}
-		}	break;
-
-		case "dependency_include": /* Deprecated alias */
-		case "impl_include": {
-			if (ppCond !is none)
-				goto err_unexpected_if;
-			self.next();
-			tok = self.skip("(");
-			if (implIncludes !is HashSet)
-				implIncludes = HashSet(implIncludes);
+			if (requiresPrefix !is List)
+				requiresPrefix = List(requiresPrefix);
 			while (tok !in ["", ")"]) {
-				implIncludes.insert(parseCStringOrAllUntilRParen(self));
+				requiresPrefix.append(
+					"#include " + parseCStringOrAllUntilRParen(self));
 				tok = self.tok;
 				if (tok != ",")
 					break;
@@ -905,9 +940,35 @@ class FunctionFeatures {
 			self.skip(")");
 		}	break;
 
-		case "no_impl_prefix":
-			implPrefix = "";
-			goto oneword_nocond;
+		case "requires_prefix": {
+			if (ppCond !is none)
+				goto err_unexpected_if;
+			self.next();
+			self.skip("(");
+			if (requiresPrefix !is List)
+				requiresPrefix = List(requiresPrefix);
+			requiresPrefix.append(parseCStringOrAllUntilRParen(self));
+			self.skip(")");
+		}	break;
+
+		case "dependency_include": /* Deprecated alias */
+		case "impl_include": {
+			if (ppCond !is none)
+				goto err_unexpected_if;
+			self.next();
+			tok = self.skip("(");
+			if (implPrefix !is List)
+				implPrefix = List(implPrefix);
+			while (tok !in ["", ")"]) {
+				implPrefix.append(
+					"#include " + parseCStringOrAllUntilRParen(self));
+				tok = self.tok;
+				if (tok != ",")
+					break;
+				tok = self.next();
+			}
+			self.skip(")");
+		}	break;
 
 		case "dependency_prefix": /* Deprecated alias */
 		case "impl_prefix": {
@@ -915,16 +976,10 @@ class FunctionFeatures {
 				goto err_unexpected_if;
 			self.next();
 			self.skip("(");
-			local addend = parseCStringOrAllUntilRParen(self);
+			if (implPrefix !is List)
+				implPrefix = List(implPrefix);
+			implPrefix.append(parseCStringOrAllUntilRParen(self));
 			self.skip(")");
-			if (implPrefix) {
-				implPrefix = str implPrefix;
-				if (!implPrefix.endswith("\n"))
-					implPrefix += "\n";
-				implPrefix += addend;
-			} else {
-				implPrefix = addend;
-			}
 		}	break;
 
 		case "section": {
@@ -1105,12 +1160,8 @@ err_unexpected_if:
 			return "[no_]extern_inline";
 		if (requires !== defaultFeatures.requires)
 			return "[no_]requires";
-		if (requiresIncludes !== defaultFeatures.requiresIncludes)
-			return "[no_]requires_include";
 		if (requiresPrefix !== defaultFeatures.requiresPrefix)
 			return "[no_]requires_prefix";
-		if (implIncludes !== defaultFeatures.implIncludes)
-			return "[no_]impl_include";
 		if (implPrefix !== defaultFeatures.implPrefix)
 			return "[no_]impl_prefix";
 		if (noAutoDependencyScanning !== defaultFeatures.noAutoDependencyScanning)
@@ -1533,6 +1584,7 @@ do_push_macroList:
 		self.next();
 		self.skip("(");
 		result_ccompatHeaderName = parseCStringOrFunctionLikeExpression(self);
+		result_order_headerCCompat = [];
 		self.skip(")");
 	}
 
@@ -1626,11 +1678,8 @@ again_parse_default_annotation:
 			self.err("Multiple '%[insert:std]' directives");
 		else {
 			assert result_order_headerStd is none;
-			assert result_order_headerCCompat is none;
 			assert result_order_header_in_CXX_SYSTEM_HEADER === false;
 			result_order_headerStd = [];
-			if (result_ccompatHeaderName !is none)
-				result_order_headerCCompat = [];
 			/* Inject a printer callback for generating std:: declarations */
 			result.order_header.append([](fp: CWriter, escapeMode: int) {
 				local oldNs = fp.namespace;
@@ -1671,6 +1720,20 @@ again_parse_default_annotation:
 			self.err("wchar re-definition: {!r} defined as "
 				"(c16:{!r},c32:{!r}) (was: (c16:{!r},c32:{!r}))"
 				.format({ orig, c16, c32, oldRepl[0], oldRepl[1] }));
+		}
+		self.skip(")");
+	}
+
+	public function parseDirective_define_c_language_keyword() {
+		local self = this.self;
+		self.next();
+		self.skip("(");
+		while (self.tok !in ["", ")"]) {
+			local kwd = str parseCStringOrKeyword(self);
+			cLanguageKeywords.insert(kwd);
+			if (self.tok != ",")
+				break;
+			self.next();
 		}
 		self.skip(")");
 	}
@@ -1772,11 +1835,9 @@ again_parse_default_annotation:
 
 	@@Insert text at the @"ccompat" location
 	public function insertText_ccompat(text: string | UserString) {
-		if (result_order_headerStd is none ||
-		    result_order_headerCCompat is none) {
-			self.err("Text cannot be inserted into 'ccompat' before both "
-			         "'%[insert:std]' and '%[define_ccompat_header()]' "
-			         "have been encountered");
+		if (result_order_headerCCompat is none) {
+			self.err("Text cannot be inserted into 'ccompat' before "
+			         "'%[define_ccompat_header()]' has been encountered");
 		}
 		result_order_headerCCompat.append(text);
 	}
@@ -2067,10 +2128,14 @@ again_parse_annotations:
 					if (currentConditions !is none)
 						goto illegal_annotation_with_condition;
 					self.next();
-					self.skip("(");
-					currentPrototype.nothrow = "THROWS({})"
-						.format({ parseCStringOrAllUntilRParen(self) });
-					self.skip(")");
+					if (self.tok == "(") {
+						self.next();
+						currentPrototype.nothrow = "THROWS({})"
+							.format({ parseCStringOrAllUntilRParen(self) });
+						self.skip(")");
+					} else {
+						currentPrototype.nothrow = "THROWS(...)";
+					}
 					break;
 
 				case "nothrow":
@@ -2092,14 +2157,38 @@ again_parse_annotations:
 					self.next();
 					self.skip("(");
 					currentPrototype.ellipsisArgumentTypes = [];
-					while (self.tok != ")") {
+					while (self.tok !in ["", ")"]) {
 						local typ, none = parseCTypeAndName(self)...;
 						currentPrototype.ellipsisArgumentTypes.append(typ);
-						if (self.tok == ")")
+						if (self.tok != ",")
 							break;
-						self.skip(",");
+						self.next();
 					}
+					self.skip(")");
+					break;
+
+				case "decl_prefix":
 					self.next();
+					self.skip("(");
+					if (currentPrototype.declPrefix !is List)
+						currentPrototype.declPrefix = List(currentPrototype.declPrefix);
+					currentPrototype.declPrefix.append(parseCStringOrAllUntilRParen(self));
+					self.skip(")");
+					break;
+
+				case "decl_include":
+					self.next();
+					self.skip("(");
+					if (currentPrototype.declPrefix !is List)
+						currentPrototype.declPrefix = List(currentPrototype.declPrefix);
+					while (self.tok !in ["", ")"]) {
+						currentPrototype.declPrefix.append(
+							"#include " + parseCStringOrAllUntilRParen(self));
+						if (self.tok != ",")
+							break;
+						self.next();
+					}
+					self.skip(")");
 					break;
 
 				case "attribute":
@@ -2194,43 +2283,53 @@ again_parse_annotations:
 				case "alias":
 				case "raw_alias":
 				case "preferred_alias":
-				case "preferred_raw_alias": {
+				case "preferred_raw_alias":
 					self.next();
 					self.skip("(");
-					local assemblyName = parseCStringOrFunctionLikeExpression(self);
-					self.skip(")");
-					local ppCond = currentConditions;
-					if (!tok.endswith("raw_alias"))
-						ppCond = constructAliasConditions(ppCond, assemblyName);
-					local binding = FunctionBinding(
-						ppCond:     ppCond,
-						prototypes: currentPrototypes,
-						binding:    assemblyName);
-					if (tok.startswith("preferred_")) {
-						current.bindings.insert(numPreferredBindings, binding);
-						++numPreferredBindings;
-					} else {
-						current.bindings.append(binding);
+					while (self.tok !in ["", ")"]) {
+						local assemblyName = parseCStringOrFunctionLikeExpression(self);
+						local ppCond = currentConditions;
+						if (!tok.endswith("raw_alias"))
+							ppCond = constructAliasConditions(ppCond, assemblyName);
+						local binding = FunctionBinding(
+							ppCond:     ppCond,
+							prototypes: currentPrototypes,
+							binding:    assemblyName);
+						if (tok.startswith("preferred_")) {
+							current.bindings.insert(numPreferredBindings, binding);
+							++numPreferredBindings;
+						} else {
+							current.bindings.append(binding);
+						}
+						if (self.tok != ",")
+							break;
+						self.next();
 					}
-				}	break;
+					self.skip(")");
+					break;
 
 				case "bind_local_function":
-				case "preferred_bind_local_function": {
+				case "preferred_bind_local_function":
 					self.next();
 					self.skip("(");
-					local functionName = parseCStringOrFunctionLikeExpression(self);
-					self.skip(")");
-					local binding = FunctionBinding(
-						ppCond:     currentConditions is none ? "1" : currentConditions,
-						prototypes: currentPrototypes,
-						binding:    [] -> findLocalFunctionByName(functionName));
-					if (tok.startswith("preferred_")) {
-						current.bindings.insert(numPreferredBindings, binding);
-						++numPreferredBindings;
-					} else {
-						current.bindings.append(binding);
+					while (self.tok !in ["", ")"]) {
+						local functionName = parseCStringOrFunctionLikeExpression(self);
+						local binding = FunctionBinding(
+							ppCond:     currentConditions is none ? "1" : currentConditions,
+							prototypes: currentPrototypes,
+							binding:    [] -> findLocalFunctionByName(functionName));
+						if (tok.startswith("preferred_")) {
+							current.bindings.insert(numPreferredBindings, binding);
+							++numPreferredBindings;
+						} else {
+							current.bindings.append(binding);
+						}
+						if (self.tok != ",")
+							break;
+						self.next();
 					}
-				}	break;
+					self.skip(")");
+					break;
 
 				case "inline_as":
 					self.next();
@@ -2395,13 +2494,13 @@ again_parse_annotations:
 					if (currentConditions !is none)
 						goto illegal_annotation_with_condition;
 					wholeCond = {
-						"rlim64_variant_of" : "__SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__",
-						"time64_variant_of" : "__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__",
-						"off64_variant_of" : "__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__",
+						"rlim64_variant_of"      : "__SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__",
+						"time64_variant_of"      : "__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__",
+						"off64_variant_of"       : "__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__",
 						"largefile64_variant_of" : "!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0",
-						"dirent64_variant_of" : "defined(_DIRENT_MATCHES_DIRENT64)",
-						"statfs64_variant_of" : "defined(_STATFS_MATCHES_STATFS64)",
-						"longdouble_variant_of" : "defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)",
+						"dirent64_variant_of"    : "defined(_DIRENT_MATCHES_DIRENT64)",
+						"statfs64_variant_of"    : "defined(_STATFS_MATCHES_STATFS64)",
+						"longdouble_variant_of"  : "defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)",
 					}[tok.lsstrip("preferred_")];
 					self.next();
 					self.skip("(");
@@ -2569,6 +2668,7 @@ again_skip_annotation_rbracket:
 					self.getUserString(returnTypeStart, returnTypeEnd));
 			}
 		}
+		//print("Function: ", headerName, "::", currentName);
 
 		/* Bind the function against its own symbol */
 		if (!currentFeatures.crt_noSelfImport) {
@@ -2682,19 +2782,17 @@ again_skip_annotation_rbracket:
 							replaceCrtHaveFromPreprocessorCondition(
 								bind.ppCond, symbolName, dosSymbolName)
 						}),
-						ppCondIncludes: bind.ppCondIncludes,
-						ppCondPrefix:   bind.ppCondPrefix,
-						prototypes:     getDosPrototypes,
-						binding:        dosSymbolName);
+						ppCondPrefix: bind.ppCondPrefix,
+						prototypes:   getDosPrototypes,
+						binding:      dosSymbolName);
 					local kosBinding = FunctionBinding(
 						ppCond: "({}) && __SIZEOF_WCHAR_T__ == 4".format({
 							replaceCrtHaveFromPreprocessorCondition(
 								bind.ppCond, symbolName, kosSymbolName)
 						}),
-						ppCondIncludes: bind.ppCondIncludes,
-						ppCondPrefix:   bind.ppCondPrefix,
-						prototypes:     getKosPrototypes,
-						binding:        kosSymbolName);
+						ppCondPrefix: bind.ppCondPrefix,
+						prototypes:   getKosPrototypes,
+						binding:      kosSymbolName);
 					current.bindings.insert(i + 1, kosBinding);
 					current.bindings.insert(i + 2, dosBinding);
 					i += 3;
@@ -2757,6 +2855,11 @@ again_skip_annotation_rbracket:
 					self.errAt(currentNameTokStart,
 						"Function {!r} has an automatic prototype, but explicit ellipsis arguments {!r}"
 							.format({ currentName, currentPrototype.ellipsisArgumentTypes }));
+				}
+				if (currentPrototype.declPrefix) {
+					self.errAt(currentNameTokStart,
+						"Function {!r} has an automatic prototype, but an explicit [decl_prefix({!r})]"
+							.format({ currentName, currentPrototype.declPrefix }));
 				}
 				if (defaultAttributes !is none && defaultAttributes) {
 					self.errAt(currentNameTokStart,
@@ -2859,19 +2962,13 @@ handle_percent_after_prototype:
 					 * >> wcslen(*) %{generate(str2wcs(*))}
 					 * >> wcslen(*) %{generate(str2wcs(%auto))}
 					 * >> wcslen(*) %{generate(str2wcs(strlen))} */
-					if (currentFeatures.requires is Callable || currentFeatures.requires != "1")
+					if (currentFeatures.requires != "1")
 						self.err("Function {!r} has a generated implementation, but uses [requires({!r})]"
 							.format({ currentName, currentFeatures.requires }));
-					if (currentFeatures.requiresIncludes is Callable || currentFeatures.requiresIncludes)
-						self.err("Function {!r} has a generated implementation, but uses [requires_include({!r})]"
-							.format({ currentName, currentFeatures.requiresIncludes }));
-					if (currentFeatures.requiresPrefix is Callable || currentFeatures.requiresPrefix)
+					if (currentFeatures.requiresPrefix)
 						self.err("Function {!r} has a generated implementation, but uses [requires_prefix({!r})]"
 							.format({ currentName, currentFeatures.requiresPrefix }));
-					if (currentFeatures.implIncludes is Callable || currentFeatures.implIncludes)
-						self.err("Function {!r} has a generated implementation, but uses [impl_include({!r})]"
-							.format({ currentName, currentFeatures.implIncludes }));
-					if (currentFeatures.implPrefix is Callable || currentFeatures.implPrefix)
+					if (currentFeatures.implPrefix)
 						self.err("Function {!r} has a generated implementation, but uses [impl_prefix({!r})]"
 							.format({ currentName, currentFeatures.implPrefix }));
 					self.next();
@@ -2940,8 +3037,6 @@ handle_percent_after_prototype:
 							return replacedPrototypeCell.value;
 						};
 					}
-					/* TODO: Inherit getBaseLocalFunction().declarationIncludes */
-					/* TODO: Inherit getBaseLocalFunction().declarationPrefix */
 					if (currentPrototypes is none) {
 						currentPrototypes = [] -> {
 							("1", {
@@ -2961,10 +3056,9 @@ handle_percent_after_prototype:
 					loaderImpl = [](): LoaderFunctionImplementation {
 						local baseLocalFunction: LocalFunction = getBaseLocalFunction();
 						return LoaderFunctionImplementation(
-							ppCond:         gen.replaceText(baseLocalFunction.ppCond),
-							ppCondIncludes: gen.replaceHeaderList(baseLocalFunction.ppCondIncludes),
-							ppCondPrefix:   gen.replaceText(baseLocalFunction.ppCondPrefix),
-							impl:           gen.replaceFunctionImplementation(
+							ppCond:       gen.replaceText(baseLocalFunction.ppCond),
+							ppCondPrefix: gen.replaceTextArray(baseLocalFunction.ppCondPrefix),
+							impl:         gen.replaceFunctionImplementation(
 								baseLocalFunction.functionImpl, currentName));
 					};
 					self.skip(")");
@@ -3117,10 +3211,9 @@ handle_percent_after_prototype:
 							yield basicBindings...;
 						} else {
 							local implBinding = FunctionBinding(
-								ppCond:         xcImpl.ppCond,
-								ppCondIncludes: xcImpl.ppCondIncludes,
-								ppCondPrefix:   xcImpl.ppCondPrefix,
-								prototypes:     usedPrototypes);
+								ppCond:       xcImpl.ppCond,
+								ppCondPrefix: xcImpl.ppCondPrefix,
+								prototypes:   usedPrototypes);
 							if (feat_inline !is none) {
 								if (!feat_noExternInline) {
 									/* Create extern-inline bindings */
@@ -3133,8 +3226,7 @@ handle_percent_after_prototype:
 										}
 										/* Construct, and inject a new binding that  */
 										local eiBinding = FunctionBinding(
-											ppCondIncludes: (existingBinding.ppCondIncludes as Set) | xcImpl.ppCondIncludes,
-											ppCondPrefix:   existingBinding.ppCondPrefix + xcImpl.ppCondPrefix,
+											ppCondPrefix:   (existingBinding.ppCondPrefix as Sequence) + xcImpl.ppCondPrefix,
 											prototypes:     existingBinding.prototypes,
 											binding:        InlineFunction(
 												mode:                "__EXTERNINLINE",
@@ -3158,12 +3250,11 @@ handle_percent_after_prototype:
 									mode: feat_inline, impl: xcImpl.impl);
 							} else if (!feat_noLocal) {
 								assert xcLocalFunction !is none;
-								xcLocalFunction.prototype      = usedPrototype;
-								xcLocalFunction.impl           = xcImpl.impl;
-								xcLocalFunction.ppCond         = xcImpl.ppCond;
-								xcLocalFunction.ppCondIncludes = xcImpl.ppCondIncludes;
-								xcLocalFunction.ppCondPrefix   = xcImpl.ppCondPrefix;
-								xcLocalFunction.documentation  = wc.documentation;
+								xcLocalFunction.prototype     = usedPrototype;
+								xcLocalFunction.impl          = xcImpl.impl;
+								xcLocalFunction.ppCond        = xcImpl.ppCond;
+								xcLocalFunction.ppCondPrefix  = xcImpl.ppCondPrefix;
+								xcLocalFunction.documentation = wc.documentation;
 								implBinding.binding = xcLocalFunction;
 							}
 							yield basicBindings...;
@@ -3208,13 +3299,11 @@ handle_percent_after_prototype:
 				local body = self.getUserString(bodyStart, self.tokEnd);
 				self.next();
 				loaderImpl = LoaderFunctionImplementation(
-					ppCond:         currentFeatures.requires,
-					ppCondIncludes: currentFeatures.requiresIncludes,
-					ppCondPrefix:   currentFeatures.requiresPrefix,
-					impl:           FunctionImplementation(
+					ppCond:       currentFeatures.requires,
+					ppCondPrefix: currentFeatures.requiresPrefix,
+					impl:         FunctionImplementation(
 						body:         body,
 						name:         currentName,
-						implIncludes: currentFeatures.implIncludes,
 						implPrefix:   currentFeatures.implPrefix,
 						dependencies: scanForNamesOfDependentFunctions(
 							body, currentPrototype, currentFeatures))
@@ -3240,10 +3329,9 @@ with_primaryImplementation:
 							usedExistingBindings = usedExistingBindings();
 						local funImpl: FunctionImplementation = usedImpl.impl;
 						local implBinding = FunctionBinding(
-							ppCond:         usedImpl.ppCond,
-							ppCondIncludes: usedImpl.ppCondIncludes,
-							ppCondPrefix:   usedImpl.ppCondPrefix,
-							prototypes:     currentPrototypes);
+							ppCond:       usedImpl.ppCond,
+							ppCondPrefix: usedImpl.ppCondPrefix,
+							prototypes:   currentPrototypes);
 						if (feat_inline !is none) {
 							/* Bind the primary implementations as inline */
 							local inlImpl = funImpl;
@@ -3260,13 +3348,12 @@ with_primaryImplementation:
 									}
 									/* Construct, and inject a new binding that  */
 									yield FunctionBinding(
-										ppCond:         implBinding.ppCond == "1"
-										                ? existingBinding.ppCond
-										                : "{} && ({})".format({ existingBinding.ppCond, implBinding.ppCond }),
-										ppCondIncludes: (existingBinding.ppCondIncludes as Set) | implBinding.ppCondIncludes,
-										ppCondPrefix:   existingBinding.ppCondPrefix + implBinding.ppCondPrefix,
-										prototypes:     existingBinding.prototypes,
-										binding:        InlineFunction(
+										ppCond:       implBinding.ppCond == "1"
+										              ? existingBinding.ppCond
+										              : "{} && ({})".format({ existingBinding.ppCond, implBinding.ppCond }),
+										ppCondPrefix: (existingBinding.ppCondPrefix as Sequence) + implBinding.ppCondPrefix,
+										prototypes:   existingBinding.prototypes,
+										binding:      InlineFunction(
 											mode:                "__EXTERNINLINE",
 											impl:                inlImpl,
 											externInlineAsmname: existingBinding.binding));
@@ -3294,10 +3381,9 @@ with_primaryImplementation:
 				} else {
 					local funImpl = loaderImpl.impl;
 					local implBinding = FunctionBinding(
-						ppCond:         loaderImpl.ppCond,
-						ppCondIncludes: loaderImpl.ppCondIncludes,
-						ppCondPrefix:   loaderImpl.ppCondPrefix,
-						prototypes:     currentPrototypes);
+						ppCond:       loaderImpl.ppCond,
+						ppCondPrefix: loaderImpl.ppCondPrefix,
+						prototypes:   currentPrototypes);
 					if (currentFeatures.inline !is none) {
 						/* Bind the primary implementations as inline */
 						local inlImpl = funImpl;
@@ -3314,10 +3400,9 @@ with_primaryImplementation:
 								}
 								/* Construct, and inject a new binding that  */
 								local eiBinding = FunctionBinding(
-									ppCondIncludes: (existingBinding.ppCondIncludes as Set) | implBinding.ppCondIncludes,
-									ppCondPrefix:   existingBinding.ppCondPrefix + implBinding.ppCondPrefix,
-									prototypes:     existingBinding.prototypes,
-									binding:        InlineFunction(
+									ppCondPrefix: (existingBinding.ppCondPrefix as Sequence) + implBinding.ppCondPrefix,
+									prototypes:   existingBinding.prototypes,
+									binding:      InlineFunction(
 										mode:                "__EXTERNINLINE",
 										impl:                inlImpl,
 										externInlineAsmname: existingBinding.binding));
@@ -3533,11 +3618,10 @@ handle_eq_after_prototype:
 						if (otherBind.binding is Callable)
 							otherBind.binding = otherBind.binding();
 						yield FunctionBinding(
-							ppCond:         otherBind.ppCond,
-							ppCondIncludes: otherBind.ppCondIncludes,
-							ppCondPrefix:   otherBind.ppCondPrefix,
-							prototypes:     currentPrototypes,
-							binding:        otherBind.binding);
+							ppCond:       otherBind.ppCond,
+							ppCondPrefix: otherBind.ppCondPrefix,
+							prototypes:   currentPrototypes,
+							binding:      otherBind.binding);
 					}
 				};
 			}

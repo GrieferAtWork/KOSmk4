@@ -100,7 +100,7 @@ __NAMESPACE_STD_USING(FILE)
 }
 
 [cp] getpwuid:($uid_t uid) -> struct passwd *;
-[cp] getpwnam:([nonnull] char const *name) -> struct passwd *;
+[cp] getpwnam:([[nonnull]] char const *name) -> struct passwd *;
 
 %#if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
 @@Rewind the password-file stream
@@ -118,12 +118,12 @@ __NAMESPACE_STD_USING(FILE)
 [cp] getpwuid:($uid_t uid) -> struct passwd *;
 
 @@Search for an entry with a matching username
-[cp] getpwnam:([nonnull] const char *name) -> struct passwd *;
+[cp] getpwnam:([[nonnull]] const char *name) -> struct passwd *;
 
 %
 %#ifdef __USE_MISC
 @@Read an entry from STREAM
-[cp] fgetpwent:([nonnull] $FILE *__restrict stream) -> struct passwd *;
+[cp] fgetpwent:([[nonnull]] $FILE *__restrict stream) -> struct passwd *;
 
 @@Write the given entry onto the given stream
 [cp] putpwent:(struct passwd const *__restrict p, $FILE *__restrict f) -> int;
@@ -133,25 +133,25 @@ __NAMESPACE_STD_USING(FILE)
 %#ifdef __USE_POSIX
 [cp][doc_alias(getpwuid)]
 getpwuid_r:(__uid_t __uid,
-            [nonnull] struct passwd *__restrict resultbuf,
+            [[nonnull]] struct passwd *__restrict resultbuf,
             [outp(buflen)] char *__restrict buffer, size_t buflen,
-            [nonnull] struct passwd **__restrict result) -> int;
+            [[nonnull]] struct passwd **__restrict result) -> int;
 [cp][doc_alias(getpwnam)]
-getpwnam_r:([nonnull] const char *__restrict name,
-            [nonnull] struct passwd *__restrict resultbuf,
+getpwnam_r:([[nonnull]] const char *__restrict name,
+            [[nonnull]] struct passwd *__restrict resultbuf,
             [outp(buflen)] char *__restrict buffer, size_t buflen,
-            [nonnull] struct passwd **__restrict result) -> int;
+            [[nonnull]] struct passwd **__restrict result) -> int;
 %#ifdef __USE_MISC
 [cp][doc_alias(getpwent)]
-getpwent_r:([nonnull] struct passwd *__restrict resultbuf,
+getpwent_r:([[nonnull]] struct passwd *__restrict resultbuf,
             [outp(buflen)] char *__restrict buffer, size_t buflen,
-            [nonnull] struct passwd **__restrict result) -> int;
+            [[nonnull]] struct passwd **__restrict result) -> int;
 @@Read an entry from STREAM. This function is not standardized and probably never will
 [cp][doc_alias(fgetpwent)]
-fgetpwent_r:([nonnull] $FILE *__restrict stream,
-             [nonnull] struct passwd *__restrict resultbuf,
+fgetpwent_r:([[nonnull]] $FILE *__restrict stream,
+             [[nonnull]] struct passwd *__restrict resultbuf,
              [outp(buflen)] char *__restrict buffer, size_t buflen,
-             [nonnull] struct passwd **__restrict result) -> int;
+             [[nonnull]] struct passwd **__restrict result) -> int;
 %#endif /* __USE_MISC */
 %#endif	/* __USE_POSIX */
 

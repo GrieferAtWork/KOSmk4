@@ -521,7 +521,7 @@ struct sched_param {
 
 [section(.text.crt.sched.access)]
 [vartypes($pid_t,void *,$pid_t)][export_alias(__clone)]
-clone:([nonnull] __clone_func_t fn, void *child_stack, int flags,
+clone:([[nonnull]] __clone_func_t fn, void *child_stack, int flags,
        void *arg, ... /* pid_t *ptid, void *newtls, pid_t *ctid */) -> $pid_t;
 
 @@>> unshare(2)

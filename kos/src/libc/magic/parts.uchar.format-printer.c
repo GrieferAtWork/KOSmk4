@@ -109,16 +109,13 @@ struct format_c32snprintf_data {
 }
 
 [attribute(*)] format_c16snprintf_printer:(*) %{uchar(format_wsnprintf_printer)}
-[attribute(*)] format_c32snprintf_printer:(*) %{uchar(format_wsnprintf_printer)}
+format_c32snprintf_printer:(*) %{uchar(format_wsnprintf_printer)}
 
-[attribute(*)] format_c16width:(*) %{uchar(format_wwidth)}
-[preferred_alias(format_length)][attribute(*)] format_c32width:(*) %{uchar(format_wwidth)}
+format_c16width(*) %{uchar(format_wwidth)}
+format_c32width(*) %{uchar(format_wwidth)}
 
-[noexport][nocrt][nouser]
-format_c16length:(void *arg, char16_t const *__restrict data, $size_t datalen) -> $ssize_t = format_length;
-[noexport][nocrt][nouser]
-format_c32length:(void *arg, char32_t const *__restrict data, $size_t datalen) -> $ssize_t = format_length;
-
+$ssize_t format_c16length(void *arg, char16_t const *__restrict data, $size_t datalen) = format_length;
+$ssize_t format_c32length(void *arg, char32_t const *__restrict data, $size_t datalen) = format_length;
 
 
 %[define_wchar_replacement(__format_waprintf_data_defined = __format_c16aprintf_data_defined, __format_c32aprintf_data_defined)]

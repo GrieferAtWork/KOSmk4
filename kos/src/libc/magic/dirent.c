@@ -139,7 +139,7 @@ typedef struct __dirstream DIR;
 @@Open and return a new directory stream for reading, referring to `name'
 [[cp, ATTR_WUNUSED, decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
 [[userimpl, requires(defined(__CRT_AT_FDCWD) && $has_function(opendirat))]]
-DIR *opendir([nonnull] char const *name) {
+DIR *opendir([[nonnull]] char const *name) {
 	/* TODO: Emulate using DOS's _find* functions */
 	/* TODO: Emulate using fdopendir(open(name, 0)) */
 	return opendirat(__CRT_AT_FDCWD, name);
@@ -151,7 +151,7 @@ DIR *opendir([nonnull] char const *name) {
 @@Directory-handle-relative, and flags-enabled versions of `opendir(3)'
 [[cp, ATTR_WUNUSED, decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
 [[userimpl, requires($has_function(fdopendir) && $has_function(openat))]]
-DIR *fopendirat($fd_t dirfd, [nonnull] char const *name, $oflag_t oflags) {
+DIR *fopendirat($fd_t dirfd, [[nonnull]] char const *name, $oflag_t oflags) {
 	DIR *result;
 	fd_t fd = openat(dirfd, name, oflags);
 	if unlikely(fd < 0)
@@ -167,7 +167,7 @@ DIR *fopendirat($fd_t dirfd, [nonnull] char const *name, $oflag_t oflags) {
 @@Directory-handle-relative, and flags-enabled versions of `opendir(3)'
 [[cp, ATTR_WUNUSED, decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
 [[userimpl, requires($has_function(fopendirat))]]
-DIR *opendirat($fd_t dirfd, [nonnull] char const *name) {
+DIR *opendirat($fd_t dirfd, [[nonnull]] char const *name) {
 	return fopendirat(dirfd, name, 0);
 }
 %#endif /* __USE_KOS && __USE_ATFILE */
@@ -175,29 +175,29 @@ DIR *opendirat($fd_t dirfd, [nonnull] char const *name) {
 %
 @@Close a directory stream previously returned by `opendir(3)' and friends
 [decl_prefix(DEFINE_STRUCT_DIRSTREAM)]
-closedir:([nonnull] DIR *dirp) -> int;
+closedir:([[nonnull]] DIR *dirp) -> int;
 
 
 %
 %#ifdef __USE_BSD
 @@Same as `closedir()', but instead of closing the underlying file descriptor, return it
 [ATTR_WUNUSED][decl_prefix(DEFINE_STRUCT_DIRSTREAM)]
-fdclosedir:([nonnull] DIR *dirp) -> $fd_t;
+fdclosedir:([[nonnull]] DIR *dirp) -> $fd_t;
 %#endif /* __USE_BSD */
 
 %
 @@Read and return the next pending directory entry of the given directory stream `DIRP'
 @@@EXCEPT: Returns NULL for end-of-directory; throws an error if something else went wrong
-[cp][decl_prefix(DEFINE_STRUCT_DIRSTREAM)]
+[[cp, decl_prefix(DEFINE_STRUCT_DIRSTREAM), no_crt_self_import]]
 [if(!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias(readdir)]
 [if(defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias(readdir64)]
-readdir:([nonnull] DIR *__restrict dirp) -> struct dirent *;
+readdir:([[nonnull]] DIR *__restrict dirp) -> struct dirent *;
 
 %
 @@Rewind the given directory stream in such a way that the next call
 @@to `readdir(3)' will once again return the first directory entry
 [decl_prefix(DEFINE_STRUCT_DIRSTREAM)]
-rewinddir:([nonnull] DIR *__restrict dirp);
+rewinddir:([[nonnull]] DIR *__restrict dirp);
 
 %
 %#ifdef __USE_XOPEN2K8
@@ -210,18 +210,18 @@ rewinddir:([nonnull] DIR *__restrict dirp);
 @@64-bit equivalent of `readdir(3)'
 @@@EXCEPT: Returns NULL for end-of-directory; throws an error if something else went wrong
 [cp][dirent64_variant_of(readdir)][decl_prefix(DEFINE_STRUCT_DIRSTREAM)]
-readdir64:([nonnull] DIR *__restrict dirp) -> struct dirent64 *;
+readdir64:([[nonnull]] DIR *__restrict dirp) -> struct dirent64 *;
 %#endif /* __USE_LARGEFILE64 */
 
 
 %#ifdef __USE_POSIX
 @@Reentrant version of `readdir(3)' (Using this is not recommended in KOS)
-[if(!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias(readdir_r)]
-[if(defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias(readdir64_r)]
-[cp][decl_prefix(DEFINE_STRUCT_DIRSTREAM)]
-readdir_r:([nonnull] DIR *__restrict dirp,
-           [nonnull] struct dirent *__restrict entry,
-           [nonnull] struct dirent **__restrict result) -> int;
+[[cp, decl_prefix(DEFINE_STRUCT_DIRSTREAM), no_crt_self_import]]
+[[if(!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias(readdir_r)]]
+[[if(defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias(readdir64_r)]]
+readdir_r:([[nonnull]] DIR *__restrict dirp,
+           [[nonnull]] struct dirent *__restrict entry,
+           [[nonnull]] struct dirent **__restrict result) -> int;
 
 %
 %#ifdef __USE_LARGEFILE64
@@ -230,9 +230,9 @@ readdir_r:([nonnull] DIR *__restrict dirp,
 @@>> Instead, simply use `readdir()' / `readdir64()', which will automatically (re-)allocate an internal,
 @@   per-directory buffer of sufficient size to house any directory entry (s.a.: `READDIR_DEFAULT')
 [cp][decl_prefix(DEFINE_STRUCT_DIRSTREAM)][dirent64_variant_of(readdir_r)]
-readdir64_r:([nonnull] DIR *__restrict dirp,
-             [nonnull] struct dirent64 *__restrict entry,
-             [nonnull] struct dirent64 **__restrict result) -> int;
+readdir64_r:([[nonnull]] DIR *__restrict dirp,
+             [[nonnull]] struct dirent64 *__restrict entry,
+             [[nonnull]] struct dirent64 **__restrict result) -> int;
 %#endif /* __USE_LARGEFILE64 */
 %#endif /* __USE_POSIX */
 
@@ -241,19 +241,21 @@ readdir64_r:([nonnull] DIR *__restrict dirp,
 
 @@Get the directory stream position
 [decl_prefix(DEFINE_STRUCT_DIRSTREAM)]
-seekdir:([nonnull] DIR *__restrict dirp, long int pos);
+seekdir:([[nonnull]] DIR *__restrict dirp, long int pos);
 
 @@Get the directory stream position
 [decl_prefix(DEFINE_STRUCT_DIRSTREAM)]
-telldir:([nonnull] DIR *__restrict dirp) -> long int;
+telldir:([[nonnull]] DIR *__restrict dirp) -> long int;
 
 %#endif /* __USE_MISC || __USE_XOPEN */
+
+%[define_c_language_keyword(__KOS_FIXED_CONST)]
 
 %
 %#ifdef __USE_XOPEN2K8
 @@Return the underlying file descriptor of the given directory stream
 [ATTR_PURE][decl_prefix(DEFINE_STRUCT_DIRSTREAM)]
-dirfd:([nonnull] DIR __KOS_FIXED_CONST *__restrict dirp) -> $fd_t;
+dirfd:([[nonnull]] DIR __KOS_FIXED_CONST *__restrict dirp) -> $fd_t;
 
 
 %typedef int (*__scandir_selector_t)(struct dirent const *);
@@ -261,11 +263,11 @@ dirfd:([nonnull] DIR __KOS_FIXED_CONST *__restrict dirp) -> $fd_t;
 
 %
 @@Scan a directory `DIR' for all contained directory entries
+[[cp, userimpl, requires(defined(__CRT_AT_FDCWD) && $has_function(scandirat)), no_crt_self_import]]
 [[if(!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias(scandir)]]
 [[if(defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias(scandir64)]]
-[[cp, noexport, userimpl, requires(defined(__CRT_AT_FDCWD) && $has_function(scandirat))]]
-scandir:([nonnull] char const *__restrict dir,
-         [nonnull] struct dirent ***__restrict namelist,
+scandir:([[nonnull]] char const *__restrict dir,
+         [[nonnull]] struct dirent ***__restrict namelist,
          __scandir_selector_t selector, __scandir_cmp_t cmp) -> int {
 	return scandirat(__CRT_AT_FDCWD, dir, namelist, selector, cmp);
 }
@@ -273,13 +275,13 @@ scandir:([nonnull] char const *__restrict dir,
 %
 @@Sort the 2 given directory entries `E1' and `E2' the same way `strcmp(3)' would
 [ATTR_PURE][if(defined(_DIRENT_MATCHES_DIRENT64)), alias(alphasort64)]
-alphasort:([nonnull] struct dirent const **e1, [nonnull] struct dirent const **e2) -> int {
+alphasort:([[nonnull]] struct dirent const **e1, [[nonnull]] struct dirent const **e2) -> int {
 	return strcoll((*e1)->@d_name@, (*e2)->@d_name@);
 }
 %#ifdef __USE_LARGEFILE64
 @@64-bit variant of `alphasort()'
 [ATTR_PURE][dirent64_variant_of(alphasort)]
-alphasort64:([nonnull] struct dirent64 const **e1, [nonnull] struct dirent64 const **e2) -> int {
+alphasort64:([[nonnull]] struct dirent64 const **e1, [[nonnull]] struct dirent64 const **e2) -> int {
 	return strcoll((*e1)->@d_name@, (*e2)->@d_name@);
 }
 %#endif /* __USE_LARGEFILE64 */
@@ -287,12 +289,12 @@ alphasort64:([nonnull] struct dirent64 const **e1, [nonnull] struct dirent64 con
 %
 %#ifdef __USE_GNU
 @@Scan a directory `DIRFD:DIR' for all contained directory entries
-[if(!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias(scandirat)]
-[if(defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias(scandirat64)]
-[cp] scandirat:(
-	$fd_t dirfd, [nonnull] char const *__restrict dir,
-	[nonnull] struct dirent ***__restrict namelist,
-	__scandir_selector_t selector, __scandir_cmp_t cmp) -> int;
+[[cp, no_crt_self_import]]
+[[if(!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias(scandirat)]]
+[[if(defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias(scandirat64)]]
+scandirat:($fd_t dirfd, [[nonnull]] char const *__restrict dir,
+           [[nonnull]] struct dirent ***__restrict namelist,
+           __scandir_selector_t selector, __scandir_cmp_t cmp) -> int;
 
 %
 %#ifdef __USE_LARGEFILE64
@@ -303,8 +305,8 @@ alphasort64:([nonnull] struct dirent64 const **e1, [nonnull] struct dirent64 con
 [cp][dirent64_variant_of(scandir)]
 [[userimpl, requires(defined(__CRT_AT_FDCWD) && $has_function(scandirat64))]]
 scandir64:(
-	[nonnull] char const *__restrict dir,
-	[nonnull] struct dirent64 ***__restrict namelist,
+	[[nonnull]] char const *__restrict dir,
+	[[nonnull]] struct dirent64 ***__restrict namelist,
 	__scandir64_selector_t selector, __scandir64_cmp_t cmp) -> int {
 	return scandirat64(__CRT_AT_FDCWD, dir, namelist, selector, cmp);
 }
@@ -312,8 +314,8 @@ scandir64:(
 @@64-bit variant of `scandirat()'
 [cp][dirent64_variant_of(scandirat)]
 scandirat64:(
-	$fd_t dirfd, [nonnull] char const *__restrict dir,
-	[nonnull] struct dirent64 ***__restrict namelist,
+	$fd_t dirfd, [[nonnull]] char const *__restrict dir,
+	[[nonnull]] struct dirent64 ***__restrict namelist,
 	__scandir64_selector_t selector, __scandir64_cmp_t cmp) -> int;
 
 %#endif /* __USE_LARGEFILE64 */
@@ -323,16 +325,17 @@ scandirat64:(
 %
 %#ifdef __USE_MISC
 @@Linux's underlying system call for reading the entries of a directory
-[if(!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias(getdirentries)]
-[if(defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias(getdirentries64)]
-[alias_args(getdirentries:($fd_t fd, [nonnull] char *__restrict buf, size_t nbytes, [nonnull] $off32_t *__restrict basep) -> $ssize_t)]
-[alias_args(getdirentries64:($fd_t fd, [nonnull] char *__restrict buf, size_t nbytes, [nonnull] $off64_t *__restrict basep) -> $ssize_t)]
-[cp] getdirentries:($fd_t fd, [nonnull] char *__restrict buf, size_t nbytes, [nonnull] $off_t *__restrict basep) -> $ssize_t;
+[[if(!defined(__USE_FILE_OFFSET64) || (defined(_DIRENT_MATCHES_DIRENT64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)), preferred_alias(getdirentries)]]
+[[if(defined(__USE_FILE_OFFSET64) || (defined(_DIRENT_MATCHES_DIRENT64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)), preferred_alias(getdirentries64)]]
+[[cp, no_crt_self_import]] $ssize_t
+getdirentries($fd_t fd, [[nonnull]] char *__restrict buf, size_t nbytes,
+              [[nonnull]] $off_t *__restrict basep);
 
 %#ifdef __USE_LARGEFILE64
 @@64-bit variant of `getdirentries()'
-[dirent64_variant_of(getdirentries)][cp]
-getdirentries64:($fd_t fd, [nonnull] char *__restrict buf, size_t nbytes, [nonnull] $off64_t *__restrict basep) -> $ssize_t;
+[[dirent64_variant_of(getdirentries), cp]] $ssize_t
+getdirentries64($fd_t fd, [[nonnull]] char *__restrict buf, size_t nbytes,
+                [[nonnull]] $off64_t *__restrict basep);
 %#endif /* __USE_LARGEFILE64 */
 %#endif /* __USE_MISC */
 
@@ -340,13 +343,13 @@ getdirentries64:($fd_t fd, [nonnull] char *__restrict buf, size_t nbytes, [nonnu
 %#ifdef __USE_GNU
 @@Sort the 2 given directory entries `E1' and `E2' the same way `strvercmp(3)' would.
 [ATTR_PURE][if(defined(_DIRENT_MATCHES_DIRENT64)), alias(versionsort64)]
-versionsort:([nonnull] struct dirent const **e1, [nonnull] struct dirent const **e2) -> int {
+versionsort:([[nonnull]] struct dirent const **e1, [[nonnull]] struct dirent const **e2) -> int {
 	return strverscmp((*e1)->@d_name@, (*e2)->@d_name@);
 }
 %#ifdef __USE_LARGEFILE64
 @@64-bit variant of `versionsort()'
 [ATTR_PURE][dirent64_variant_of(versionsort)]
-versionsort64:([nonnull] struct dirent64 const **e1, [nonnull] struct dirent64 const **e2) -> int {
+versionsort64:([[nonnull]] struct dirent64 const **e1, [[nonnull]] struct dirent64 const **e2) -> int {
 	return strverscmp((*e1)->@d_name@, (*e2)->@d_name@);
 }
 %#endif /* __USE_LARGEFILE64 */

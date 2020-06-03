@@ -170,23 +170,22 @@ function replaceWcharText(
 }
 
 
-@@Replace the names of system headers
-function replaceWcharHeaders(
-		headerList: {(string | UserString)...},
-		mode: int): {(string | UserString)...} {
-	for (local h: headerList) {
-		local repl = wcharReplacementHeaders.get(h);
-		if (repl !is none)
-			h = repl[mode];
-		yield h;
-	}
-}
-
 function replaceWcharTextArray(
 		textArray: {(string | CParser | UserString)...},
 		mode: int): {(string | UserString)...} {
-	for (local text: textArray)
-		yield replaceWcharText(text, mode);
+	if (!textArray)
+		return textArray;
+	local result = [];
+	local changed = false;
+	for (local text: textArray) {
+		local repl = replaceWcharText(text, mode);
+		if (repl !== text)
+			changed = true;
+		result.append(repl);
+	}
+	if (!changed)
+		return textArray;
+	return result;
 }
 
 function replaceWcharCType(self: CType, mode: int): CType {
@@ -213,7 +212,8 @@ function replaceWcharPrototype(self: FunctionPrototype, mode: int): FunctionProt
 		attributes: replaceWcharTextArray(self.attributes, mode),
 		nothrow:    replaceWcharText(self.nothrow, mode),
 		cc:         replaceWcharText(self.cc, mode),
-		returnType: replaceWcharCType(self.returnType, mode));
+		returnType: replaceWcharCType(self.returnType, mode),
+		declPrefix: replaceWcharTextArray(self.declPrefix, mode));
 	local argv = [];
 	for (local a: self.argv)
 		argv.append(replaceWcharArgument(a, mode));
@@ -245,11 +245,10 @@ function replaceWcharFunctionImplementation(
 		self: FunctionImplementation, mode: int,
 		functionName: string | UserString): FunctionImplementation {
 	local result = FunctionImplementation(
-		body:             replaceWcharText(self.body, mode),
-		name:             functionName,
-		implIncludes:     replaceWcharHeaders(self.implIncludes, mode),
-		implPrefix:       replaceWcharText(self.implPrefix, mode),
-		dependencies:     ());
+		body:         replaceWcharText(self.body, mode),
+		name:         functionName,
+		implPrefix:   replaceWcharTextArray(self.implPrefix, mode),
+		dependencies: ());
 	local deps: {string: Function} = self.dependencyFunctions;
 	if (deps) {
 		local newDeps = [];
@@ -273,8 +272,8 @@ function replaceWcharFunctionImplementation(
 
 class XcharImplementation {
 	this = default;
-	public member loaderImpl: none | Callable | LoaderFunctionImplementation; /* Implementation */
-	public member prototype: FunctionPrototype;       /* Primary prototype */
+	public member loaderImpl: none | Callable | LoaderFunctionImplementation;     /* Implementation */
+	public member prototype: FunctionPrototype;                                   /* Primary prototype */
 	public member prototypes: {(string | UserString, {FunctionPrototype...})...}; /* Extended prototypes */
 }
 
@@ -343,10 +342,9 @@ class WcharFunction {
 			result.prototypes = replaceWcharPrototypes(wcPrototypes, mode);
 got_result_prototypes:
 			result.loaderImpl = LoaderFunctionImplementation(
-				impl:           replaceWcharFunctionImplementation(wcLoaderImpl.impl, mode, functionName),
-				ppCond:         replaceWcharText(wcLoaderImpl.ppCond, mode),
-				ppCondIncludes: replaceWcharHeaders(wcLoaderImpl.ppCondIncludes, mode),
-				ppCondPrefix:   replaceWcharText(wcLoaderImpl.ppCondPrefix, mode));;
+				impl:         replaceWcharFunctionImplementation(wcLoaderImpl.impl, mode, functionName),
+				ppCond:       replaceWcharText(wcLoaderImpl.ppCond, mode),
+				ppCondPrefix: replaceWcharTextArray(wcLoaderImpl.ppCondPrefix, mode));;
 			m_cx_cache[pair] = result;
 		}
 		return result;

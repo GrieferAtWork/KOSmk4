@@ -1,3 +1,4 @@
+#if 0
 local copyright =
 "/* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
@@ -9327,8 +9328,4 @@ print;
 print "DONE";
 print "    You may now resume programming";
 
-
-
-
-
-
+#endif

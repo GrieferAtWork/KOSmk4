@@ -62,21 +62,23 @@ typedef __FS_TYPE(fsfilcnt) fsfilcnt_t; /* Type to count file system inodes.  */
 
 
 @@Return information about the filesystem on which FILE resides
+[no_crt_self_import]
 [if(!defined(__USE_FILE_OFFSET64)), preferred_alias(statvfs)]
 [if(defined(__USE_FILE_OFFSET64)), preferred_alias(statvfs64)]
-statvfs:([nonnull] char const *file, [nonnull] struct statvfs *buf) -> int;
+statvfs:([[nonnull]] char const *file, [[nonnull]] struct statvfs *buf) -> int;
 
 @@Return information about the filesystem containing the file FILDES refers to
+[no_crt_self_import]
 [if(!defined(__USE_FILE_OFFSET64)), preferred_alias(fstatvfs)]
 [if(defined(__USE_FILE_OFFSET64)), preferred_alias(fstatvfs64)]
-fstatvfs:($fd_t filedes, [nonnull] struct statvfs *buf) -> int;
+fstatvfs:($fd_t filedes, [[nonnull]] struct statvfs *buf) -> int;
 
 %
 %#ifdef __USE_LARGEFILE64
 [off64_variant_of(statvfs)]
-statvfs64:([nonnull] const char *file, [nonnull] struct statvfs64 *buf) -> int;
+statvfs64:([[nonnull]] const char *file, [[nonnull]] struct statvfs64 *buf) -> int;
 [off64_variant_of(fstatvfs)]
-fstatvfs64:($fd_t filedes, [nonnull] struct statvfs64 *buf) -> int;
+fstatvfs64:($fd_t filedes, [[nonnull]] struct statvfs64 *buf) -> int;
 %#endif /* __USE_LARGEFILE64 */
 
 

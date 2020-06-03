@@ -136,21 +136,20 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 #endif /* __STDC_WANT_DEC_FP__ */
 
 
-#ifdef __USE_DOS
-
-#ifdef __CC__
 }
+%#ifdef __USE_DOS
+%#ifdef __CC__
 
-_clearfp:() -> $uint32_t;
-_controlfp:($uint32_t newval, $uint32_t mask) -> $uint32_t;
-_set_controlfp:($uint32_t newval, $uint32_t mask);
-_controlfp_s:($uint32_t *pcurrent, $uint32_t newval, $uint32_t mask) -> $errno_t;
-_statusfp:() -> $uint32_t;
-_fpreset:() = fpreset;
-_statusfp2:($uint32_t *x86_stat, $uint32_t *sse2_stat);
+$uint32_t _clearfp();
+$uint32_t _controlfp($uint32_t newval, $uint32_t mask);
+_set_controlfp($uint32_t newval, $uint32_t mask);
+$errno_t _controlfp_s($uint32_t *pcurrent, $uint32_t newval, $uint32_t mask);
+$uint32_t _statusfp();
+_fpreset(*) = fpreset;
+_statusfp2($uint32_t *x86_stat, $uint32_t *sse2_stat);
 
+%#endif /* __CC__ */
 %{
-#endif /* __CC__ */
 #define _clear87        _clearfp
 #define _status87       _statusfp
 
@@ -231,19 +230,22 @@ __fpecode:() -> int *;
 #ifdef __CC__
 }
 
-[attribute(*)][alias(*)] _copysign:(*) = copysign;
-[ATTR_WUNUSED][ATTR_CONST][nothrow] _chgsign:(double x) -> double {
+_copysign:(*) = copysign;
+
+[ATTR_WUNUSED][ATTR_CONST][nothrow]
+double _chgsign(double x) {
 	return -x;
 }
-[attribute(*)][alias(*)] _scalb:(*) = scalb;
-[attribute(*)][alias(*)] _logb:(*) = logb;
-[attribute(*)][alias(*)] _nextafter:(*) = nextafter;
-[attribute(*)][alias(*)] _finite:(*) = finite;
-[attribute(*)][alias(*)] _isnan:(*) = isnan;
-[ATTR_WUNUSED][ATTR_CONST][nothrow] _fpclass:(double x) -> int;
+
+_scalb:(*) = scalb;
+_logb:(*) = logb;
+_nextafter:(*) = nextafter;
+_finite:(*) = finite;
+_isnan:(*) = isnan;
+[ATTR_WUNUSED][ATTR_CONST][nothrow] int _fpclass(double x);
 %#if defined(__x86_64__) || defined(__i386__)
-[attribute(*)][alias(*)] _scalbf:(*) = scalbf;
-%#endif
+_scalbf:(*) = scalbf;
+%#endif /* __x86_64__ || __i386__ */
 
 %{
 #endif /* __CC__ */
@@ -262,7 +264,7 @@ __fpecode:() -> int *;
 #ifdef __CC__
 }
 
-[alias(_fpreset)] fpreset:();
+[alias(_fpreset)] fpreset();
 
 %{
 
@@ -319,8 +321,8 @@ __fpecode:() -> int *;
 #define FPE_STACKUNDERFLOW _FPE_STACKUNDERFLOW
 #define FPE_EXPLICITGEN    _FPE_EXPLICITGEN
 
-#endif /* __USE_DOS */
 }
+%#endif /* __USE_DOS */
 
 %{
 

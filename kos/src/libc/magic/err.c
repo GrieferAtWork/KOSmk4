@@ -30,20 +30,25 @@
 %
 
 @@Print to stderr: `<program_invocation_short_name>: <format...>: strerror(errno)\n'
-[ATTR_LIBC_PRINTF(1, 2)][cp_stdio]
-warn:(char const *format, ...) %{auto_block(printf(vwarn))}
+[[ATTR_LIBC_PRINTF(1, 2), cp_stdio, userimpl, requires_function(vwarn)]]
+warn:(char const *format, ...) {
+	va_list args;
+	va_start(args, format);
+	vwarn(format, args);
+	va_end(args);
+}
 
-[doc_alias(warn)][ATTR_LIBC_PRINTF(1, 0)][same_impl][cp_stdio]
-[decl_include(<local/stdstreams.h>)]
-[dependency_include(<parts/errno.h>)]
-[requires_include(<__crt.h>)]
-[requires_include(<local/program_invocation_name.h>)]
+[doc_alias(warn)][ATTR_LIBC_PRINTF(1, 0)][userimpl][cp_stdio]
+[impl_include(<local/stdstreams.h>, <parts/errno.h>)]
+[requires_include(<__crt.h>, <local/program_invocation_name.h>)]
 [requires(!defined(__NO_STDSTREAMS) && defined(__LOCAL_program_invocation_short_name) &&
           $has_function(fprintf) && $has_function(vfprintf) &&
           $has_function(strerror))]
-[user_impl({
+vwarn:(char const *format, $va_list args) {
 	int errval = @__libc_geterrno_or@(0);
+@@pp_if $has_function(flockfile) && $has_function(funlockfile)@@
 	flockfile(stderr);
+@@pp_endif@@
 	fprintf(stderr, "%s: ", @__LOCAL_program_invocation_short_name@);
 	if (format) {
 		vfprintf(stderr, format, args);
@@ -51,72 +56,72 @@ warn:(char const *format, ...) %{auto_block(printf(vwarn))}
 	} else {
 		fprintf(stderr, "%s\n", strerror(errval));
 	}
+@@pp_if $has_function(flockfile) && $has_function(funlockfile)@@
 	funlockfile(stderr);
-})] vwarn:(char const *format, $va_list args) {
-	int errval = @__libc_geterrno_or@(0);
-#if (@@has_function(flockfile)@@) && (@@has_function(funlockfile)@@)
-	flockfile(stderr);
-#endif /* ... */
-	fprintf(stderr, "%s: ", @__LOCAL_program_invocation_short_name@);
-	if (format) {
-		vfprintf(stderr, format, args);
-		fprintf(stderr, ": %s\n", strerror(errval));
-	} else {
-		fprintf(stderr, "%s\n", strerror(errval));
-	}
-#if (@@has_function(flockfile)@@) && (@@has_function(funlockfile)@@)
-	funlockfile(stderr);
-#endif /* ... */
+@@pp_endif@@
 }
 
 
 @@Print to stderr: `<program_invocation_short_name>: <format...>\n'
-[ATTR_LIBC_PRINTF(1, 2)][cp_stdio]
-warnx:(char const *format, ...) %{auto_block(printf(vwarnx))}
+[[ATTR_LIBC_PRINTF(1, 2), cp_stdio]]
+[[userimpl, requires_function(vwarnx)]]
+warnx:(char const *format, ...)  {
+	va_list args;
+	va_start(args, format);
+	vwarnx(format, args);
+	va_end(args);
+}
 
-[doc_alias(warnx)][ATTR_LIBC_PRINTF(1, 0)][same_impl][cp_stdio]
-[decl_include(<local/stdstreams.h>)][requires_include(<__crt.h>)]
-[requires_include(<local/program_invocation_name.h>)]
+[doc_alias(warnx)][ATTR_LIBC_PRINTF(1, 0)][userimpl][cp_stdio]
+[userimpl][impl_include(<local/stdstreams.h>)]
+[requires_include(<__crt.h>, <local/program_invocation_name.h>)]
 [requires(!defined(__NO_STDSTREAMS) && defined(__LOCAL_program_invocation_short_name) &&
           $has_function(fprintf) && $has_function(vfprintf) && $has_function(fputc))]
-[user_impl({
+vwarnx:(char const *format, $va_list args) {
+@@pp_if $has_function(flockfile) && $has_function(funlockfile)@@
 	flockfile(stderr);
+@@pp_endif@@
 	fprintf(stderr, "%s: ", @__LOCAL_program_invocation_short_name@);
 	if (format)
 		vfprintf(stderr, format, args);
 	fputc('\n', stderr);
+@@pp_if $has_function(flockfile) && $has_function(funlockfile)@@
 	funlockfile(stderr);
-})] vwarnx:(char const *format, $va_list args) {
-#if (@@has_function(flockfile)@@) && (@@has_function(funlockfile)@@)
-	flockfile(stderr);
-#endif /* ... */
-	fprintf(stderr, "%s: ", @__LOCAL_program_invocation_short_name@);
-	if (format)
-		vfprintf(stderr, format, args);
-	fputc('\n', stderr);
-#if (@@has_function(flockfile)@@) && (@@has_function(funlockfile)@@)
-	funlockfile(stderr);
-#endif /* ... */
+@@pp_endif@@
 }
 
 
 @@Same as `warn()', but follow up by calling `exit(status)'
-[ATTR_NORETURN][ATTR_LIBC_PRINTF(2, 3)][throws]
-err:(int status, char const *format, ...) %{auto_block(printf(verr))}
+[[throws]]
+[[ATTR_NORETURN, ATTR_LIBC_PRINTF(2, 3)]]
+[[userimpl, requires_function(verr)]]
+err:(int status, char const *format, ...) {
+	va_list args;
+	va_start(args, format);
+	verr(status, format, args);
+}
 
-[doc_alias(err)][ATTR_NORETURN][ATTR_LIBC_PRINTF(2, 0)][same_impl][throws]
-[requires($has_function(vwarn) && $has_function(exit))]
+[[doc_alias(err), throws]]
+[[ATTR_NORETURN, ATTR_LIBC_PRINTF(2, 0)]]
+[[userimpl, requires_function(vwarn, exit)]]
 verr:(int status, char const *format, $va_list args) {
 	vwarn(format, args);
 	exit(status);
 }
 
 @@Same as `warnx()', but follow up by calling `exit(status)'
-[ATTR_NORETURN][ATTR_LIBC_PRINTF(2, 3)][throws]
-errx:(int status, char const *format, ...) %{auto_block(printf(verrx))}
+[[throws]]
+[[userimpl, requires_function(verrx)]]
+[[ATTR_NORETURN, ATTR_LIBC_PRINTF(2, 3)]]
+errx:(int status, char const *format, ...) {
+	va_list args;
+	va_start(args, format);
+	verrx(status, format, args);
+}
 
-[doc_alias(err)][ATTR_NORETURN][ATTR_LIBC_PRINTF(2, 0)][same_impl][throws]
-[requires($has_function(vwarnx) && $has_function(exit))]
+[[doc_alias(err), throws]]
+[[userimpl, requires_function(vwarnx, exit)]]
+[[ATTR_NORETURN, ATTR_LIBC_PRINTF(2, 0)]]
 verrx:(int status, char const *format, $va_list args) {
 	vwarnx(format, args);
 	exit(status);

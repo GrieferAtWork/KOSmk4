@@ -39,15 +39,15 @@ __SYSDECL_BEGIN
 }
 
 [cp][ignore][alias(_wutime32)][wchar]
-crt_wutime32:([nonnull] $wchar_t const *filename, [nullable] struct __utimbuf32 const *file_times) -> int = wutime?;
+crt_wutime32:([[nonnull]] $wchar_t const *filename, [[nullable]] struct __utimbuf32 const *file_times) -> int = wutime?;
 [cp][ignore][alias(_wutime64)][wchar]
-crt_wutime64:([nonnull] $wchar_t const *filename, [nullable] struct __utimbuf64 const *file_times) -> int = wutime64?;
+crt_wutime64:([[nonnull]] $wchar_t const *filename, [[nullable]] struct __utimbuf64 const *file_times) -> int = wutime64?;
 
-[cp][alternate_names(_wutime32)][wchar]
+[cp][alternate_names(_wutime32)][wchar, no_crt_self_import]
 [if(defined(__USE_TIME_BITS64)), preferred_alias(wutime64, _wutime64)]
 [if(!defined(__USE_TIME_BITS64)), preferred_alias(wutime, _wutime32)]
 [requires(defined(__CRT_HAVE_wutime) || defined(__CRT_HAVE__wutime32) || defined(__CRT_HAVE_wutime64) || defined(__CRT_HAVE__wutime64))]
-wutime:([nonnull] wchar_t const *filename, [nullable] struct utimbuf const *file_times) -> int {
+wutime:([[nonnull]] wchar_t const *filename, [[nullable]] struct utimbuf const *file_times) -> int {
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma @push_macro@("actime")
 #pragma @push_macro@("modtime")
@@ -79,7 +79,7 @@ wutime:([nonnull] wchar_t const *filename, [nullable] struct utimbuf const *file
 %#ifdef __USE_TIME64
 [cp][alias(_wutime64)][wchar][time64_variant_of(wutime)]
 [requires(defined(__CRT_HAVE_wutime) || defined(__CRT_HAVE__wutime32))]
-wutime64:([nonnull] $wchar_t const *filename, [nullable] struct utimbuf64 const *file_times) -> int {
+wutime64:([[nonnull]] $wchar_t const *filename, [[nullable]] struct utimbuf64 const *file_times) -> int {
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma @push_macro@("actime")
 #pragma @push_macro@("modtime")

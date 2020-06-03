@@ -54,17 +54,18 @@ __SYSDECL_BEGIN
 }
 
 [ignore][doc_alias(sendfile)]
-sendfile32:($fd_t out_fd, $fd_t in_fd, [nullable] $off32_t *offset, size_t count) -> ssize_t = sendfile?;
+sendfile32:($fd_t out_fd, $fd_t in_fd, [[nullable]] $off32_t *offset, size_t count) -> ssize_t = sendfile?;
 
 
 @@Send up to COUNT bytes from file associated with IN_FD starting at *OFFSET
 @@to descriptor OUT_FD. Set *OFFSET to the IN_FD's file position following the
 @@read bytes. If OFFSET is a null pointer, use the normal file position instead.
 @@Return the number of written bytes, or -1 in case of error
+[no_crt_self_import]
 [if(defined(__USE_FILE_OFFSET64)), preferred_alias(sendfile64)]
 [if(!defined(__USE_FILE_OFFSET64)), preferred_alias(sendfile)]
 [requires(defined(__CRT_HAVE_sendfile) || defined(__CRT_HAVE_sendfile64))]
-sendfile:($fd_t out_fd, $fd_t in_fd, [nullable] off_t *offset, size_t count) -> ssize_t {
+sendfile:($fd_t out_fd, $fd_t in_fd, [[nullable]] off_t *offset, size_t count) -> ssize_t {
 #ifdef __CRT_HAVE_sendfile64
 	ssize_t result;
 	if (offset) {
@@ -90,7 +91,7 @@ sendfile:($fd_t out_fd, $fd_t in_fd, [nullable] off_t *offset, size_t count) -> 
 
 %#ifdef __USE_LARGEFILE64
 [off64_variant_of(sendfile)][doc_alias(sendfile)][requires(defined(__CRT_HAVE_sendfile))]
-sendfile64:($fd_t out_fd, $fd_t in_fd, [nullable] $off64_t *offset, size_t count) -> ssize_t {
+sendfile64:($fd_t out_fd, $fd_t in_fd, [[nullable]] $off64_t *offset, size_t count) -> ssize_t {
 	ssize_t result;
 	if (offset) {
 		off32_t temp = (off32_t)*offset;

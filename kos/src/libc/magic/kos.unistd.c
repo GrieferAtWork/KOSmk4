@@ -48,31 +48,31 @@ typedef __pos64_t pos64_t; /* File/device position */
 
 %[default_impl_section(.text.crt.except.fs.exec.exec)]
 
-[throws][cp][ATTR_NORETURN][doc_alias(execv)]   Execv:([notnull] char const *__restrict path, [notnull] @__TARGV@);
-[throws][cp][ATTR_NORETURN][doc_alias(execve)]  Execve:([notnull] char const *__restrict path, [notnull] @__TARGV@, [notnull] @__TENVP@);
-[throws][cp][ATTR_NORETURN][doc_alias(execvp)]  Execvp:([notnull] char const *__restrict file, [notnull] @__TARGV@);
+[throws][cp][ATTR_NORETURN][doc_alias(execv)]   Execv:([[nonnull]] char const *__restrict path, [[nonnull]] @__TARGV@);
+[throws][cp][ATTR_NORETURN][doc_alias(execve)]  Execve:([[nonnull]] char const *__restrict path, [[nonnull]] @__TARGV@, [[nonnull]] @__TENVP@);
+[throws][cp][ATTR_NORETURN][doc_alias(execvp)]  Execvp:([[nonnull]] char const *__restrict file, [[nonnull]] @__TARGV@);
 
 [throws][cp][dependency_include(<parts/redirect-exec.h>)][doc_alias(execl)]
 [requires_dependency(Execv)][ATTR_SENTINEL][ATTR_NORETURN][allow_macros]
-Execl:([notnull] char const *__restrict path, char const *args, ... /*, (char *)NULL*/) {
+Execl:([[nonnull]] char const *__restrict path, char const *args, ... /*, (char *)NULL*/) {
 	__REDIRECT_XEXECL(char, Execv, path, args)
 }
 
 [throws][cp][dependency_include(<parts/redirect-exec.h>)][doc_alias(execle)]
 [requires_dependency(Execve)][ATTR_SENTINEL_O(1)][ATTR_NORETURN][allow_macros]
-Execle:([notnull] char const *__restrict path, char const *args, ... /*, (char *)NULL, (char **)environ*/) {
+Execle:([[nonnull]] char const *__restrict path, char const *args, ... /*, (char *)NULL, (char **)environ*/) {
 	__REDIRECT_XEXECLE(char, Execve, path, args)
 }
 
 [throws][cp][dependency_include(<parts/redirect-exec.h>)][doc_alias(execlp)]
 [requires_dependency(Execvp)][ATTR_SENTINEL][ATTR_NORETURN][allow_macros]
-Execpl:([notnull] char const *__restrict file, char const *args, ... /*, (char *)NULL*/) {
+Execpl:([[nonnull]] char const *__restrict file, char const *args, ... /*, (char *)NULL*/) {
 	__REDIRECT_XEXECL(char, Execvp, file, args)
 }
 
 [throws][cp][dependency_include(<parts/redirect-exec.h>)][doc_alias(execle)]
 [requires_dependency(Execvpe)][ATTR_SENTINEL_O(1)][ATTR_NORETURN][allow_macros]
-Execlpe:([notnull] char const *__restrict file, char const *args, ... /*, (char *)NULL, (char **)environ*/) {
+Execlpe:([[nonnull]] char const *__restrict file, char const *args, ... /*, (char *)NULL, (char **)environ*/) {
 	__REDIRECT_XEXECLE(char, Execvpe, file, args)
 }
 
@@ -80,7 +80,7 @@ Execlpe:([notnull] char const *__restrict file, char const *args, ... /*, (char 
 %
 [throws][doc_alias(pipe)]
 [section(.text.crt.except.io.access)]
-Pipe:([notnull] $fd_t pipedes[2]);
+Pipe:([[nonnull]] $fd_t pipedes[2]);
 
 
 %
@@ -128,19 +128,19 @@ FPathConf:($fd_t fd, int name) -> long int;
 %
 [throws][cp][noexport][doc_alias(chown)]
 [requires(defined(__CRT_AT_FDCWD) && $has_function(FChownAt))]
-Chown:([notnull] char const *file, $uid_t owner, $gid_t group) {
+Chown:([[nonnull]] char const *file, $uid_t owner, $gid_t group) {
 	FChownAt(__CRT_AT_FDCWD, file, owner, group, 0);
 }
 
 %
 [throws][cp][noexport][doc_alias(pathconf)]
 [section(.text.crt.except.fs.property)]
-PathConf:([notnull] char const *path, int name) -> long int;
+PathConf:([[nonnull]] char const *path, int name) -> long int;
 
 %
 [throws][cp][noexport][doc_alias(link)]
 [requires(defined(__CRT_AT_FDCWD) && $has_function(LinkAt))]
-Link:([notnull] char const *from, [notnull] char const *to) {
+Link:([[nonnull]] char const *from, [[nonnull]] char const *to) {
 	LinkAt(__CRT_AT_FDCWD, from, __CRT_AT_FDCWD, to, 0);
 }
 
@@ -197,13 +197,11 @@ ReadAll:($fd_t fd, [outp(bufsize)] void *buf, size_t bufsize) -> size_t {
 LSeek32:($fd_t fd, $off32_t offset, int whence) -> $pos32_t = LSeek?;
 
 %
-[throws][noexport][doc_alias(lseek)]
-[if(defined(__USE_FILE_OFFSET64)), preferred_alias(LSeek64)]
-[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(LSeek)]
-[alias_args(LSeek64:($fd_t fd, $off64_t offset, int whence) -> $pos64_t)]
-[alias_args(LSeek:($fd_t fd, $off32_t offset, int whence) -> $pos32_t)]
-[requires($has_function(LSeek32) || $has_function(LSeek64))]
-[section(.text.crt.except.io.seek)]
+[[throws, doc_alias(lseek), no_crt_self_import]]
+[[if(defined(__USE_FILE_OFFSET64)), preferred_alias(LSeek64)]]
+[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(LSeek)]]
+[[userimpl, requires($has_function(LSeek32) || $has_function(LSeek64))]]
+[[section(.text.crt.except.io.seek)]]
 LSeek:($fd_t fd, $off_t offset, int whence) -> $pos_t {
 @@if_has_function(LSeek32)@@
 	return LSeek32(fd, ($off32_t)offset, whence);
@@ -223,7 +221,7 @@ Dup2:($fd_t oldfd, $fd_t newfd) -> $fd_t;
 %
 [throws][cp][doc_alias(chdir)]
 [section(.text.crt.except.fs.basic_property)]
-Chdir:([notnull] char const *path);
+Chdir:([[nonnull]] char const *path);
 
 %
 [throws][cp][doc_alias(getcwd)]
@@ -235,14 +233,14 @@ GetCwd:([outp_opt(bufsize)] char *buf, size_t bufsize) -> char *;
 %
 [throws][cp][doc_alias(unlink)][noexport]
 [requires(defined(__CRT_AT_FDCWD) && $has_function(UnlinkAt))]
-Unlink:([notnull] char const *file) {
+Unlink:([[nonnull]] char const *file) {
 	UnlinkAt(__CRT_AT_FDCWD, file, 0);
 }
 
 %
 [throws][cp][doc_alias(rmdir)][noexport]
 [requires(defined(__CRT_AT_FDCWD) && $has_function(UnlinkAt))]
-Rmdir:([notnull] char const *path) {
+Rmdir:([[nonnull]] char const *path) {
 	UnlinkAt(__CRT_AT_FDCWD, path, 0x0200); /* AT_REMOVEDIR */
 }
 
@@ -252,27 +250,27 @@ Rmdir:([notnull] char const *path) {
 
 %
 [throws][cp][doc_alias(fchownat)]
-FChownAt:($fd_t dfd, [notnull] char const *file, $uid_t owner, $gid_t group, $atflag_t flags);
+FChownAt:($fd_t dfd, [[nonnull]] char const *file, $uid_t owner, $gid_t group, $atflag_t flags);
 
 %
 [throws][cp][doc_alias(linkat)]
-LinkAt:($fd_t fromfd, [notnull] char const *from, $fd_t tofd, [notnull] char const *to, $atflag_t flags);
+LinkAt:($fd_t fromfd, [[nonnull]] char const *from, $fd_t tofd, [[nonnull]] char const *to, $atflag_t flags);
 
 %
 [throws][cp][doc_alias(symlinkat)]
-SymlinkAt:([notnull] char const *link_text, $fd_t tofd, [notnull] char const *target_path);
+SymlinkAt:([[nonnull]] char const *link_text, $fd_t tofd, [[nonnull]] char const *target_path);
 
 %[default_impl_section(.text.crt.except.fs.property)]
 
 %
 [throws][cp][doc_alias(readlinkat)]
-ReadlinkAt:($fd_t dfd, [notnull] char const *__restrict path,
+ReadlinkAt:($fd_t dfd, [[nonnull]] char const *__restrict path,
             [outp(buflen)] char *__restrict buf, size_t buflen) -> size_t;
 
 %
 %#ifdef __USE_KOS
 [throws][cp][doc_alias(freadlinkat)]
-FReadlinkAt:($fd_t dfd, [notnull] char const *__restrict path,
+FReadlinkAt:($fd_t dfd, [[nonnull]] char const *__restrict path,
              [outp(buflen)] char *__restrict buf, size_t buflen, $atflag_t flags) -> size_t;
 %#endif /* __USE_KOS */
 
@@ -280,7 +278,7 @@ FReadlinkAt:($fd_t dfd, [notnull] char const *__restrict path,
 
 %
 [throws][cp][doc_alias(unlinkat)]
-UnlinkAt:($fd_t dfd, [notnull] char const *name, $atflag_t flags);
+UnlinkAt:($fd_t dfd, [[nonnull]] char const *name, $atflag_t flags);
 %#endif /* __USE_ATFILE */
 
 
@@ -301,11 +299,11 @@ LSeek64:($fd_t fd, $off64_t offset, int whence) -> $pos64_t {
 %#if defined(__USE_UNIX98) || defined(__USE_XOPEN2K8)
 
 %
-[throws][cp][noexport][doc_alias(pread)]
-[if(defined(__USE_FILE_OFFSET64)), preferred_alias(PRead64)]
-[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(PRead)]
-[requires($has_function(PRead32) || $has_function(PRead64))]
-[section(.text.crt.except.io.read)]
+[[throws, cp, doc_alias(pread), no_crt_self_import]]
+[[if(defined(__USE_FILE_OFFSET64)), preferred_alias(PRead64)]]
+[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(PRead)]]
+[[section(.text.crt.except.io.read)]]
+[[userimpl, requires($has_function(PRead32) || $has_function(PRead64))]]
 PRead:($fd_t fd, [outp(bufsize)] void *buf, size_t bufsize, pos_t offset) -> size_t {
 @@if_has_function(PRead32)@@
 	return PRead32(fd, buf, bufsize, (pos32_t)offset);
@@ -314,11 +312,11 @@ PRead:($fd_t fd, [outp(bufsize)] void *buf, size_t bufsize, pos_t offset) -> siz
 @@endif_has_function(PRead32)@@
 }
 
-[throws][cp][noexport][doc_alias(pwrite)]
-[if(defined(__USE_FILE_OFFSET64)), preferred_alias(PWrite64)]
-[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(PWrite)]
-[requires($has_function(PWrite32) || $has_function(PWrite64))]
-[section(.text.crt.except.io.write)]
+[[throws, cp, doc_alias(pwrite), no_crt_self_import]]
+[[if(defined(__USE_FILE_OFFSET64)), preferred_alias(PWrite64)]]
+[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(PWrite)]]
+[[userimpl, requires($has_function(PWrite32) || $has_function(PWrite64))]]
+[[section(.text.crt.except.io.write)]]
 PWrite:($fd_t fd, [inp(bufsize)] void const *buf, size_t bufsize, pos_t offset) -> size_t {
 @@if_has_function(PWrite32)@@
 	return PWrite32(fd, buf, bufsize, (pos32_t)offset);
@@ -330,12 +328,11 @@ PWrite:($fd_t fd, [inp(bufsize)] void const *buf, size_t bufsize, pos_t offset) 
 
 %
 %#ifdef __USE_KOS
-[throws][cp][doc_alias(preadall)]
-[if(defined(__USE_FILE_OFFSET64)), preferred_alias(PReadAll64)]
-[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(PReadAll)]
-[requires($has_function(PReadAll32) || $has_function(PReadAll64))]
-[dependency_include(<parts/errno.h>)]
-[section(.text.crt.except.io.read)]
+[[throws, cp, doc_alias(preadall), no_crt_self_import]]
+[[if(defined(__USE_FILE_OFFSET64)), preferred_alias(PReadAll64)]]
+[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(PReadAll)]]
+[[userimpl, requires($has_function(PReadAll32) || $has_function(PReadAll64))]]
+[[section(.text.crt.except.io.read)]]
 PReadAll:($fd_t fd, [outp(bufsize)] void *buf, size_t bufsize, pos_t offset) -> size_t {
 @@if_has_function(PReadAll32)@@
 	return PReadAll32(fd, buf, bufsize, (pos32_t)offset);
@@ -404,7 +401,7 @@ PReadAll64:($fd_t fd, [inp(bufsize)] void *buf, size_t bufsize, pos64_t offset) 
 %#ifdef __USE_GNU
 
 [doc_alias(pipe2)][throws][noexport][section(.text.crt.except.io.access)]
-Pipe2:([notnull] $fd_t pipedes[2], $oflag_t flags);
+Pipe2:([[nonnull]] $fd_t pipedes[2], $oflag_t flags);
 
 [doc_alias(dup3)][throws][noexport][section(.text.crt.except.io.access)]
 Dup3:($fd_t oldfd, $fd_t newfd, $oflag_t flags) -> $fd_t;
@@ -457,7 +454,7 @@ FChdir:($fd_t fd);
 [throws][cp][noexport][doc_alias(lchown)]
 [requires(defined(__CRT_AT_FDCWD) && $has_function(FChownAt))]
 [section(.text.crt.except.fs.modify)]
-LChown:([notnull] char const *file, $uid_t owner, $gid_t group) {
+LChown:([[nonnull]] char const *file, $uid_t owner, $gid_t group) {
 	FChownAt(__CRT_AT_FDCWD, file, owner, group, 0x0100); /* AT_SYMLINK_NOFOLLOW */
 }
 
@@ -466,12 +463,12 @@ LChown:([notnull] char const *file, $uid_t owner, $gid_t group) {
 %#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
 
 %
-[throws][doc_alias(truncate)][noexport]
-[if(defined(__USE_FILE_OFFSET64)), preferred_alias(Truncate64)]
-[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(Truncate)]
-[section(.text.crt.except.fs.modify)]
-[requires($has_function(Truncate32) || $has_function(Truncate64))]
-Truncate:([notnull] char const *file, pos_t length) {
+[[throws, doc_alias(truncate), no_crt_self_import]]
+[[if(defined(__USE_FILE_OFFSET64)), preferred_alias(Truncate64)]]
+[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(Truncate)]]
+[[section(.text.crt.except.fs.modify)]]
+[[userimpl, requires($has_function(Truncate32) || $has_function(Truncate64))]]
+Truncate:([[nonnull]] char const *file, pos_t length) {
 @@if_has_function(Truncate32)@@
 	Truncate64(file, (__pos64_t)length);
 @@else_has_function(Truncate32)@@
@@ -480,7 +477,7 @@ Truncate:([notnull] char const *file, pos_t length) {
 }
 
 [throws][doc_alias(Truncate)][section(.text.crt.except.fs.modify)]
-[ignore] Truncate32:([notnull] char const *file, $pos32_t length) = Truncate?;
+[ignore] Truncate32:([[nonnull]] char const *file, $pos32_t length) = Truncate?;
 
 %
 %#ifdef __USE_LARGEFILE64
@@ -488,7 +485,7 @@ Truncate:([notnull] char const *file, pos_t length) {
 [off64_variant_of(Truncate)][noexport]
 [section(.text.crt.except.fs.modify)]
 [requires($has_function(Truncate32))]
-Truncate64:([notnull] char const *file, pos64_t length) {
+Truncate64:([[nonnull]] char const *file, pos64_t length) {
 	Truncate32(file, (__pos32_t)length);
 }
 %#endif /* __USE_LARGEFILE64 */
@@ -500,14 +497,14 @@ Truncate64:([notnull] char const *file, pos64_t length) {
 %
 [throws][cp][guard][doc_alias(fexecve)][ATTR_NORETURN]
 [argument_names(fd, ___argv, ___envp)][section(.text.crt.except.fs.exec.exec)]
-FExecve:($fd_t fd, [notnull] @__TARGV@, [notnull] @__TENVP@);
+FExecve:($fd_t fd, [[nonnull]] @__TARGV@, [[nonnull]] @__TENVP@);
 
 %#endif /* __USE_XOPEN2K8 */
 
 %#ifdef __USE_GNU
 [throws][cp][doc_alias(execvpe)][ATTR_NORETURN]
 [section(.text.crt.except.fs.exec.exec)]
-Execvpe:([notnull] char const *__restrict file, [notnull] @__TARGV@, [notnull] @__TENVP@);
+Execvpe:([[nonnull]] char const *__restrict file, [[nonnull]] @__TARGV@, [[nonnull]] @__TENVP@);
 %#endif /* __USE_GNU */
 
 %
@@ -538,7 +535,7 @@ Nice:(int inc) -> int {
 %#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
 [throws][doc_alias(symlink)][cp][noexport][section(.text.crt.except.fs.modify)]
 [requires(defined(__CRT_AT_FDCWD) && $has_function(SymlinkAt))]
-Symlink:([notnull] char const *link_text, [notnull] char const *target_path) {
+Symlink:([[nonnull]] char const *link_text, [[nonnull]] char const *target_path) {
 	SymlinkAt(link_text, __CRT_AT_FDCWD, target_path);
 }
 
@@ -546,7 +543,7 @@ Symlink:([notnull] char const *link_text, [notnull] char const *target_path) {
 [throws][cp][noexport][doc_alias(readlink)]
 [requires(defined(__CRT_AT_FDCWD) && $has_function(ReadlinkAt))]
 [section(.text.crt.except.fs.property)]
-Readlink:([notnull] char const *__restrict path,
+Readlink:([[nonnull]] char const *__restrict path,
           [outp(buflen)] char *__restrict buf, size_t buflen) -> size_t {
 	ReadlinkAt(__CRT_AT_FDCWD, path, buf, buflen);
 }
@@ -571,14 +568,14 @@ SetHostName:([inp(len)] char const *name, size_t len);
 GetDomainName:([outp(buflen)] char *name, size_t buflen);
 
 %
-[throws][doc_alias(setdomainname)][section(.text.crt.except.system.configuration)]
+[[throws, doc_alias(setdomainname), section(.text.crt.except.system.configuration)]]
 SetDomainName:([inp(len)] char const *name, size_t len);
 
-[throws][section(.text.crt.except.system.utility)][cp]
+[[throws, section(.text.crt.except.system.utility), cp]]
 Syscall:(__syscall_ulong_t sysno, ...) -> __syscall_slong_t;
 
 %#ifdef __USE_KOS
-[throws][section(.text.crt.except.system.utility)][cp][preferred_alias(Syscall)]
+[[throws, section(.text.crt.except.system.utility), cp, preferred_alias(Syscall)]]
 Syscall64:(__syscall_ulong_t sysno, ...) -> __LONG64_TYPE__;
 %#endif /* __USE_KOS */
 
@@ -588,7 +585,7 @@ Syscall64:(__syscall_ulong_t sysno, ...) -> __LONG64_TYPE__;
 %#if defined(__USE_MISC) || \
 %   (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K))
 [throws][cp][doc_alias(chroot)][section(.text.crt.except.fs.utility)]
-ChRoot:([nonnull] char const *__restrict path);
+ChRoot:([[nonnull]] char const *__restrict path);
 %#endif /* ... */
 
 
@@ -597,11 +594,11 @@ ChRoot:([nonnull] char const *__restrict path);
 [throws][doc_alias(ftruncate32)][section(.text.crt.except.io.write)][ignore]
 FTruncate32:($fd_t fd, __pos32_t length) -> int = FTruncate?;
 
-[throws][doc_alias(ftruncate)][noexport]
-[if(defined(__USE_FILE_OFFSET64)), preferred_alias(FTruncate64)]
-[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(FTruncate)]
-[requires($has_function(FTruncate32) || $has_function(FTruncate64))]
-[section(.text.crt.except.io.write)]
+[[throws, doc_alias(ftruncate), no_crt_self_import]]
+[[if(defined(__USE_FILE_OFFSET64)), preferred_alias(FTruncate64)]]
+[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(FTruncate)]]
+[[userimpl, requires($has_function(FTruncate32) || $has_function(FTruncate64))]]
+[[section(.text.crt.except.io.write)]]
 FTruncate:($fd_t fd, pos_t length) {
 @@if_has_function(FTruncate32)@@
 	FTruncate32(fd, (__pos32_t)length);

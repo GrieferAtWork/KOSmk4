@@ -333,7 +333,7 @@ exp:(double x) -> double {
 [requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]
-frexp:(double x, [nonnull] int *pexponent) -> double {
+frexp:(double x, [[nonnull]] int *pexponent) -> double {
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	return (double)__ieee754_frexp((__IEEE754_DOUBLE_TYPE__)x, pexponent);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
@@ -381,7 +381,7 @@ log10:(double x) -> double; /* TODO */
 [requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]
-modf:(double x, [nonnull] double *iptr) -> double {
+modf:(double x, [[nonnull]] double *iptr) -> double {
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	return (double)__ieee754_modf((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__ *)iptr);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
@@ -397,7 +397,7 @@ modf:(double x, [nonnull] double *iptr) -> double {
 expf:(float x) -> float %{auto_block(mathfun)}
 
 [std][ATTR_WUNUSED][alias(__frexpf)][crtbuiltin]
-frexpf:(float x, [nonnull] int *pexponent) -> float %{auto_block(mathfun)}
+frexpf:(float x, [[nonnull]] int *pexponent) -> float %{auto_block(mathfun)}
 
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__ldexpf)][nothrow][crtbuiltin]
 ldexpf:(float x, int exponent) -> float %{auto_block(mathfun)}
@@ -410,7 +410,7 @@ logf:(float x) -> float %{auto_block(math)} /* TODO */
 log10f:(float x) -> float %{auto_block(math)} /* TODO */
 
 [std][alias(__modff)][crtbuiltin]
-modff:(float x, [nonnull] float *iptr) -> float %{auto_block(mathfun)}
+modff:(float x, [[nonnull]] float *iptr) -> float %{auto_block(mathfun)}
 
 
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
@@ -419,7 +419,7 @@ modff:(float x, [nonnull] float *iptr) -> float %{auto_block(mathfun)}
 expl:(__LONGDOUBLE x) -> __LONGDOUBLE %{auto_block(mathfun)}
 
 [std][ATTR_WUNUSED][alias(__frexpl)][crtbuiltin]
-frexpl:(__LONGDOUBLE x, [nonnull] int *pexponent) -> __LONGDOUBLE %{auto_block(mathfun)}
+frexpl:(__LONGDOUBLE x, [[nonnull]] int *pexponent) -> __LONGDOUBLE %{auto_block(mathfun)}
 
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__ldexpl)][nothrow][crtbuiltin]
 ldexpl:(__LONGDOUBLE x, int exponent) -> __LONGDOUBLE %{auto_block(mathfun)}
@@ -432,7 +432,7 @@ logl:(__LONGDOUBLE x) -> __LONGDOUBLE %{auto_block(math)} /* TODO */
 log10l:(__LONGDOUBLE x) -> __LONGDOUBLE %{auto_block(math)} /* TODO */
 
 [std][alias(__modfl)][crtbuiltin]
-modfl:(__LONGDOUBLE x, [nonnull] __LONGDOUBLE *iptr) -> __LONGDOUBLE %{auto_block(mathfun)}
+modfl:(__LONGDOUBLE x, [[nonnull]] __LONGDOUBLE *iptr) -> __LONGDOUBLE %{auto_block(mathfun)}
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 
@@ -1150,16 +1150,16 @@ lrintf:(float x) -> long int %{auto_block(mathfun)}
 lroundf:(float x) -> long int %{auto_block(mathfun)}
 
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__fdimf)][crtbuiltin]
-fdimf:(float x, float y) -> float %{copy(%auto, math)} /* TODO */
+fdimf:(float x, float y) -> float %{generate(math)} /* TODO */
 
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__fmaxf)][crtbuiltin]
-fmaxf:(float x, float y) -> float %{copy(%auto, math)} /* TODO */
+fmaxf:(float x, float y) -> float %{generate(math)} /* TODO */
 
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__fminf)][crtbuiltin]
-fminf:(float x, float y) -> float %{copy(%auto, math)} /* TODO */
+fminf:(float x, float y) -> float %{generate(math)} /* TODO */
 
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__fmaf)][crtbuiltin]
-fmaf:(float x, float y, float z) -> float %{copy(%auto, math)} /* TODO */
+fmaf:(float x, float y, float z) -> float %{generate(math)} /* TODO */
 
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGLONG
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__llrintf)][crtbuiltin]
@@ -1206,16 +1206,16 @@ lrintl:(__LONGDOUBLE x) -> long int %{auto_block(mathfun)}
 lroundl:(__LONGDOUBLE x) -> long int %{auto_block(mathfun)}
 
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__fdiml)][crtbuiltin]
-fdiml:(__LONGDOUBLE x, __LONGDOUBLE y) -> __LONGDOUBLE %{copy(%auto, math)} /* TODO */
+fdiml:(__LONGDOUBLE x, __LONGDOUBLE y) -> __LONGDOUBLE %{generate(math)} /* TODO */
 
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__fmaxl)][crtbuiltin]
-fmaxl:(__LONGDOUBLE x, __LONGDOUBLE y) -> __LONGDOUBLE %{copy(%auto, math)} /* TODO */
+fmaxl:(__LONGDOUBLE x, __LONGDOUBLE y) -> __LONGDOUBLE %{generate(math)} /* TODO */
 
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__fminl)][crtbuiltin]
-fminl:(__LONGDOUBLE x, __LONGDOUBLE y) -> __LONGDOUBLE %{copy(%auto, math)} /* TODO */
+fminl:(__LONGDOUBLE x, __LONGDOUBLE y) -> __LONGDOUBLE %{generate(math)} /* TODO */
 
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__fmal)][crtbuiltin]
-fmal:(__LONGDOUBLE x, __LONGDOUBLE y, __LONGDOUBLE z) -> __LONGDOUBLE %{copy(%auto, math)}
+fmal:(__LONGDOUBLE x, __LONGDOUBLE y, __LONGDOUBLE z) -> __LONGDOUBLE %{generate(math)}
 
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGLONG
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__llrintl)][crtbuiltin]
@@ -1386,7 +1386,7 @@ llroundl:(__LONGDOUBLE x) -> __LONGLONG %{auto_block(mathfun)}
 @@Cosine and sine of X
 [alias(__sincos)][nothrow]
 [attribute(@__DECL_SIMD_sincos@)][decl_include(<bits/math-vector.h>)][crtbuiltin]
-sincos:(double x, [nonnull] double *psinx, [nonnull] double *pcosx); /* TODO */
+sincos:(double x, [[nonnull]] double *psinx, [[nonnull]] double *pcosx); /* TODO */
 
 @@A function missing in all standards: compute exponent to base ten
 [ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__exp10)][crtbuiltin]
@@ -1402,7 +1402,7 @@ pow10:(double x) -> double {
 [alias(__sincosf)][nothrow][doc_alias(sincos)]
 [attribute(@__DECL_SIMD_sincosf@)][decl_include(<bits/math-vector.h>)]
 [requires($has_function(sincos))][crtbuiltin]
-sincosf:(float x, [nonnull] float *psinx, [nonnull] float *pcosx)
+sincosf:(float x, [[nonnull]] float *psinx, [[nonnull]] float *pcosx)
 %{auto_block(any({
 	double sinx, cosx;
 	sincos((double)x, &sinx, &cosx);
@@ -1424,7 +1424,7 @@ pow10f:(float x) -> float {
 [attribute(@__DECL_SIMD_sincosl@)][decl_include(<bits/math-vector.h>)]
 [if(defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), alias(__sincos, sincos)]
 [requires($has_function(sincos))][crtbuiltin]
-sincosl:(__LONGDOUBLE x, [nonnull] __LONGDOUBLE *psinx, [nonnull] __LONGDOUBLE *pcosx)
+sincosl:(__LONGDOUBLE x, [[nonnull]] __LONGDOUBLE *psinx, [[nonnull]] __LONGDOUBLE *pcosx)
 %{auto_block(any({
 	double sinx, cosx;
 	sincos((double)x, &sinx, &cosx);

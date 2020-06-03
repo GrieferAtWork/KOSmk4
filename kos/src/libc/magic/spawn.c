@@ -127,116 +127,116 @@ typedef struct {
 @@Before running the process perform the actions described in FILE-ACTIONS.
 @@This function is a possible cancellation point and therefore not marked with __THROW
 [cp]
-posix_spawn:([nonnull] pid_t *__restrict pid,
-             [nonnull] char const *__restrict path,
-             [nullable] posix_spawn_file_actions_t const *file_actions,
-             [nullable] posix_spawnattr_t const *attrp,
-             [nonnull] @__TARGV@,
-             [nonnull] @__TENVP@) -> int;
+posix_spawn:([[nonnull]] pid_t *__restrict pid,
+             [[nonnull]] char const *__restrict path,
+             [[nullable]] posix_spawn_file_actions_t const *file_actions,
+             [[nullable]] posix_spawnattr_t const *attrp,
+             [[nonnull]] @__TARGV@,
+             [[nonnull]] @__TENVP@) -> int;
 
 %
 @@Similar to `posix_spawn' but search for FILE in the PATH.
 @@This function is a possible cancellation point and therefore not marked with __THROW
 [cp]
-posix_spawnp:([nonnull] pid_t *__restrict pid,
-              [nonnull] const char *__restrict file,
-              [nullable] posix_spawn_file_actions_t const *file_actions,
-              [nullable] posix_spawnattr_t const *attrp,
-              [nonnull] @__TARGV@,
-              [nonnull] @__TENVP@) -> int;
+posix_spawnp:([[nonnull]] pid_t *__restrict pid,
+              [[nonnull]] const char *__restrict file,
+              [[nullable]] posix_spawn_file_actions_t const *file_actions,
+              [[nullable]] posix_spawnattr_t const *attrp,
+              [[nonnull]] @__TARGV@,
+              [[nonnull]] @__TENVP@) -> int;
 
 %
 @@Initialize data structure with attributes for `spawn' to default values
-posix_spawnattr_init:([nonnull] posix_spawnattr_t *__restrict attr) -> int;
+posix_spawnattr_init:([[nonnull]] posix_spawnattr_t *__restrict attr) -> int;
 
 %
 @@Free resources associated with ATTR
-posix_spawnattr_destroy:([nonnull] posix_spawnattr_t *__restrict attr) -> int;
+posix_spawnattr_destroy:([[nonnull]] posix_spawnattr_t *__restrict attr) -> int;
 
 %
 @@Store signal mask for signals with default handling from ATTR in SIGDEFAULT
-posix_spawnattr_getsigdefault:([nonnull] posix_spawnattr_t const *__restrict attr,
-                               [nonnull] sigset_t *__restrict sigdefault) -> int;
+posix_spawnattr_getsigdefault:([[nonnull]] posix_spawnattr_t const *__restrict attr,
+                               [[nonnull]] sigset_t *__restrict sigdefault) -> int;
 
 %
 @@Set signal mask for signals with default handling in ATTR to SIGDEFAULT
-posix_spawnattr_setsigdefault:([nonnull] posix_spawnattr_t *__restrict attr,
-                               [nonnull] sigset_t const *__restrict sigdefault) -> int;
+posix_spawnattr_setsigdefault:([[nonnull]] posix_spawnattr_t *__restrict attr,
+                               [[nonnull]] sigset_t const *__restrict sigdefault) -> int;
 
 %
 @@Store signal mask for the new process from ATTR in SIGMASK
-posix_spawnattr_getsigmask:([nonnull] posix_spawnattr_t const *__restrict attr,
-                            [nonnull] sigset_t *__restrict sigmask) -> int;
+posix_spawnattr_getsigmask:([[nonnull]] posix_spawnattr_t const *__restrict attr,
+                            [[nonnull]] sigset_t *__restrict sigmask) -> int;
 
 %
 @@Set signal mask for the new process in ATTR to SIGMASK
-posix_spawnattr_setsigmask:([nonnull] posix_spawnattr_t *__restrict attr,
-                            [nonnull] sigset_t const *__restrict sigmask) -> int;
+posix_spawnattr_setsigmask:([[nonnull]] posix_spawnattr_t *__restrict attr,
+                            [[nonnull]] sigset_t const *__restrict sigmask) -> int;
 
 %
 @@Get flag word from the attribute structure
-posix_spawnattr_getflags:([nonnull] posix_spawnattr_t const *__restrict attr,
-                          [nonnull] $int16_t *__restrict flags) -> int;
+posix_spawnattr_getflags:([[nonnull]] posix_spawnattr_t const *__restrict attr,
+                          [[nonnull]] $int16_t *__restrict flags) -> int;
 
 %
 @@Store flags in the attribute structure
-posix_spawnattr_setflags:([nonnull] posix_spawnattr_t *__restrict attr,
+posix_spawnattr_setflags:([[nonnull]] posix_spawnattr_t *__restrict attr,
                           short int flags) -> int;
 
 %
 @@Get process group ID from the attribute structure
-posix_spawnattr_getpgroup:([nonnull] posix_spawnattr_t const *__restrict attr,
-                           [nonnull] pid_t *__restrict pgroup) -> int;
+posix_spawnattr_getpgroup:([[nonnull]] posix_spawnattr_t const *__restrict attr,
+                           [[nonnull]] pid_t *__restrict pgroup) -> int;
 
 %
 @@Store process group ID in the attribute structure
-posix_spawnattr_setpgroup:([nonnull] posix_spawnattr_t *__restrict attr, pid_t pgroup) -> int;
+posix_spawnattr_setpgroup:([[nonnull]] posix_spawnattr_t *__restrict attr, pid_t pgroup) -> int;
 
 %
 @@Get scheduling policy from the attribute structure
-posix_spawnattr_getschedpolicy:([nonnull] posix_spawnattr_t const *__restrict attr,
-                                [nonnull] int *__restrict schedpolicy) -> int;
+posix_spawnattr_getschedpolicy:([[nonnull]] posix_spawnattr_t const *__restrict attr,
+                                [[nonnull]] int *__restrict schedpolicy) -> int;
 
 %
 @@Store scheduling policy in the attribute structure
-posix_spawnattr_setschedpolicy:([nonnull] posix_spawnattr_t *__restrict attr,
+posix_spawnattr_setschedpolicy:([[nonnull]] posix_spawnattr_t *__restrict attr,
                                 int schedpolicy) -> int;
 
 %
 @@Get scheduling parameters from the attribute structure
-posix_spawnattr_getschedparam:([nonnull] posix_spawnattr_t const *__restrict attr,
-                               [nonnull] struct sched_param *__restrict schedparam) -> int;
+posix_spawnattr_getschedparam:([[nonnull]] posix_spawnattr_t const *__restrict attr,
+                               [[nonnull]] struct sched_param *__restrict schedparam) -> int;
 
 %
 @@Store scheduling parameters in the attribute structure
-posix_spawnattr_setschedparam:([nonnull] posix_spawnattr_t *__restrict attr,
-                               [nonnull] struct sched_param const *__restrict schedparam) -> int;
+posix_spawnattr_setschedparam:([[nonnull]] posix_spawnattr_t *__restrict attr,
+                               [[nonnull]] struct sched_param const *__restrict schedparam) -> int;
 
 
 %
 @@Initialize data structure for file attribute for `spawn' call
-posix_spawn_file_actions_init:([nonnull] posix_spawn_file_actions_t *__restrict file_actions) -> int;
+posix_spawn_file_actions_init:([[nonnull]] posix_spawn_file_actions_t *__restrict file_actions) -> int;
 
 %
 @@Free resources associated with FILE-ACTIONS
-posix_spawn_file_actions_destroy:([nonnull] posix_spawn_file_actions_t *__restrict file_actions) -> int;
+posix_spawn_file_actions_destroy:([[nonnull]] posix_spawn_file_actions_t *__restrict file_actions) -> int;
 
 %
 @@Add an action to FILE-ACTIONS which tells the implementation
 @@to call `open' for the given file during the `spawn' call
-posix_spawn_file_actions_addopen:([nonnull] posix_spawn_file_actions_t *__restrict file_actions,
-                                  $fd_t fd, [nonnull] char const *__restrict path,
+posix_spawn_file_actions_addopen:([[nonnull]] posix_spawn_file_actions_t *__restrict file_actions,
+                                  $fd_t fd, [[nonnull]] char const *__restrict path,
                                   $oflag_t oflags, mode_t mode) -> int;
 
 %
 @@Add an action to FILE-ACTIONS which tells the implementation to
 @@call `close' for the given file descriptor during the `spawn' call
-posix_spawn_file_actions_addclose:([nonnull] posix_spawn_file_actions_t *__restrict file_actions, $fd_t fd) -> int;
+posix_spawn_file_actions_addclose:([[nonnull]] posix_spawn_file_actions_t *__restrict file_actions, $fd_t fd) -> int;
 
 %
 @@Add an action to FILE-ACTIONS which tells the implementation to
 @@call `dup2' for the given file descriptors during the `spawn' call
-posix_spawn_file_actions_adddup2:([nonnull] posix_spawn_file_actions_t *__restrict file_actions,
+posix_spawn_file_actions_adddup2:([[nonnull]] posix_spawn_file_actions_t *__restrict file_actions,
                                   $fd_t fd, $fd_t newfd) -> int;
 
 

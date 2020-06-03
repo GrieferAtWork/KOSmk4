@@ -170,7 +170,7 @@ process_long_option(int argc, char **argv, char const *optstring,
 		int ambig_fallback       = 0;
 		int indfound             = -1;
 		for (p = longopts, option_index = 0; p->name; p++, option_index++) {
-			if (!trncmp(p->name, __nextchar, namelen) == 0) {
+			if (strncmp(p->name, __nextchar, namelen) == 0) {
 				if (pfound == NULL) {
 					pfound   = p;
 					indfound = option_index;

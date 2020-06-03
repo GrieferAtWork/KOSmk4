@@ -97,7 +97,7 @@ feraiseexcept:(int excepts) -> int {
 @@Store implementation-defined representation of the exception
 @@flags indicated by EXCEPTS in the object pointed to by FLAGP
 [std][fast][dependency_include(<bits/fenv-inline.h>)]
-fegetexceptflag:([nonnull] fexcept_t *flagp, int excepts) -> int {
+fegetexceptflag:([[nonnull]] fexcept_t *flagp, int excepts) -> int {
 #ifdef @__inline_fegetexceptflag@
 	@__inline_fegetexceptflag@(flagp, excepts);
 #else /* __inline_fegetexceptflag */
@@ -110,7 +110,7 @@ fegetexceptflag:([nonnull] fexcept_t *flagp, int excepts) -> int {
 @@Set complete status for exceptions indicated by EXCEPTS according
 @@to the representation in the object pointed to by FLAGP
 [std][fast][dependency_include(<bits/fenv-inline.h>)]
-fesetexceptflag:([nonnull] fexcept_t const *flagp, int excepts) -> int {
+fesetexceptflag:([[nonnull]] fexcept_t const *flagp, int excepts) -> int {
 #ifdef @__inline_fesetexceptflag@
 	@__inline_fesetexceptflag@(flagp, excepts);
 #else /* __inline_fesetexceptflag */
@@ -155,7 +155,7 @@ fesetround:(int rounding_direction) -> int {
 
 @@Store the current floating-point environment in the object pointed to by ENVP
 [std][fast][dependency_include(<bits/fenv-inline.h>)]
-fegetenv:([nonnull] fenv_t *envp) -> int {
+fegetenv:([[nonnull]] fenv_t *envp) -> int {
 	@__inline_fegetenv@(envp);
 	return 0;
 }
@@ -163,14 +163,14 @@ fegetenv:([nonnull] fenv_t *envp) -> int {
 @@Save the current environment in the object pointed to by ENVP, clear
 @@exception flags and install a non-stop mode (if available) for all exceptions
 [std][fast][dependency_include(<bits/fenv-inline.h>)]
-feholdexcept:([nonnull] fenv_t *envp) -> int {
+feholdexcept:([[nonnull]] fenv_t *envp) -> int {
 	@__inline_feholdexcept@(envp);
 	return 0;
 }
 
 @@Establish the floating-point environment represented by the object pointed to by ENVP
 [std][fast][dependency_include(<bits/fenv-inline.h>)]
-fesetenv:([nonnull] fenv_t const *envp) -> int {
+fesetenv:([[nonnull]] fenv_t const *envp) -> int {
 	@__inline_fesetenv@(envp);
 	return 0;
 }
@@ -179,7 +179,7 @@ fesetenv:([nonnull] fenv_t const *envp) -> int {
 @@represented by object pointed to by ENVP and raise exceptions
 @@according to saved exceptions
 [std][fast][dependency_include(<bits/fenv-inline.h>)]
-feupdateenv:([nonnull] fenv_t const *envp) -> int {
+feupdateenv:([[nonnull]] fenv_t const *envp) -> int {
 	@__inline_feupdateenv@(envp);
 	return 0;
 }

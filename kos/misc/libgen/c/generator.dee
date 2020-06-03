@@ -53,16 +53,20 @@ class Generator {
 	@@> function replaceDocumentation(text: string | CParser | UserString): string | UserString;
 	public member replaceDocumentation: Callable with (string | CParser | UserString) = none;
 
-	public function replaceStringList(strings: {string...}): {string...} {
+	public function replaceTextArray(strings: {string...}): {string...} {
+		if (!strings)
+			return strings;
 		local result = [];
-		for (local s: strings)
-			result.append(replaceText(s));
+		local changed = false;
+		for (local s: strings) {
+			local repl = replaceText(s);
+			if (repl !== s)
+				changed = true;
+			result.append(repl);
+		}
+		if (!changed)
+			return strings;
 		return result;
-	}
-
-	public function replaceHeaderList(strings: {string...}): {string...} {
-		/* TODO */
-		return strings;
 	}
 
 	public function replaceCType(
@@ -122,15 +126,18 @@ class Generator {
 
 	public function replaceFunctionPrototype(
 			self: FunctionPrototype): FunctionPrototype {
-		local newAttributes            = replaceStringList(self.attributes);
+		local newAttributes            = replaceTextArray(self.attributes);
 		local newNothrow               = replaceText(self.nothrow);
 		local newCc                    = replaceText(self.cc);
 		local newReturnType            = replaceCType(self.returnType);
 		local newArgv                  = replaceArgumentList(self.argv);
 		local newEllipsisArgumentTypes = replaceCTypeList(self.ellipsisArgumentTypes);
+		local newDeclPrefix            = replaceTextArray(self.declPrefix);
 		if (newAttributes === self.attributes && newNothrow === self.nothrow &&
-		    newCc === self.cc && newReturnType === self.returnType && newArgv === self.argv &&
-		    newEllipsisArgumentTypes === self.ellipsisArgumentTypes)
+		    newCc === self.cc && newReturnType === self.returnType &&
+		    newArgv === self.argv &&
+		    newEllipsisArgumentTypes === self.ellipsisArgumentTypes &&
+		    newDeclPrefix === self.newDeclPrefix)
 			return self;
 		return FunctionPrototype(
 			attributes:            newAttributes,
@@ -138,7 +145,8 @@ class Generator {
 			cc:                    newCc,
 			returnType:            newReturnType,
 			argv:                  newArgv,
-			ellipsisArgumentTypes: newEllipsisArgumentTypes);
+			ellipsisArgumentTypes: newEllipsisArgumentTypes,
+			declPrefix:            newDeclPrefix);
 	}
 
 	public function replaceFunctionImplementation(
@@ -147,7 +155,6 @@ class Generator {
 		return FunctionImplementation(
 			body:         replaceText(self.body),
 			name:         newFunctionName,
-			implIncludes: replaceHeaderList(self.implIncludes),
 			implPrefix:   replaceText(self.implPrefix),
 			dependencies: none /* TODO */);
 	}

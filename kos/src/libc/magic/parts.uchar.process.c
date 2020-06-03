@@ -59,42 +59,42 @@ __SYSDECL_BEGIN
 
 [attribute(*)][argument_names(path, ___argv)]
 [if(__SIZEOF_WCHAR_T__ == 2), alias(_wexecv)][alias(DOS$_wexecv)]
-c16execv:(char16_t const *__restrict path, [nonnull] @__T16ARGV@) -> int %{uchar(wexecv)}
+c16execv:(char16_t const *__restrict path, [[nonnull]] @__T16ARGV@) -> int %{uchar(wexecv)}
 
 [attribute(*)][argument_names(path, ___argv)]
 [if(__SIZEOF_WCHAR_T__ == 4), alias(_wexecv)]
-c32execv:(char32_t const *__restrict path, [nonnull] @__T32ARGV@) -> int %{uchar(wexecv)}
+c32execv:(char32_t const *__restrict path, [[nonnull]] @__T32ARGV@) -> int %{uchar(wexecv)}
 
 [attribute(*)][argument_names(path, ___argv, ___envp)]
 [if(__SIZEOF_WCHAR_T__ == 2), alias(_wexecve)][alias(DOS$_wexecve)]
-c16execve:(char16_t const *__restrict path, [nonnull] @__T16ARGV@, [nonnull] @__T16ENVP@) -> int %{uchar(wexecve)}
+c16execve:(char16_t const *__restrict path, [[nonnull]] @__T16ARGV@, [[nonnull]] @__T16ENVP@) -> int %{uchar(wexecve)}
 
 [attribute(*)][argument_names(path, ___argv, ___envp)]
 [if(__SIZEOF_WCHAR_T__ == 4), alias(_wexecve)]
-c32execve:(char32_t const *__restrict path, [nonnull] @__T32ARGV@, [nonnull] @__T32ENVP@) -> int %{uchar(wexecve)}
+c32execve:(char32_t const *__restrict path, [[nonnull]] @__T32ARGV@, [[nonnull]] @__T32ENVP@) -> int %{uchar(wexecve)}
 
 [attribute(*)][argument_names(path, ___argv)]
 [if(__SIZEOF_WCHAR_T__ == 2), alias(_wexecvp)][alias(DOS$_wexecvp)]
-c16execvp:(char16_t const *__restrict path, [nonnull] @__T16ARGV@) -> int %{uchar(wexecvp)}
+c16execvp:(char16_t const *__restrict path, [[nonnull]] @__T16ARGV@) -> int %{uchar(wexecvp)}
 
 [attribute(*)][argument_names(path, ___argv)]
 [if(__SIZEOF_WCHAR_T__ == 4), alias(_wexecvp)]
-c32execvp:(char32_t const *__restrict path, [nonnull] @__T32ARGV@) -> int %{uchar(wexecvp)}
+c32execvp:(char32_t const *__restrict path, [[nonnull]] @__T32ARGV@) -> int %{uchar(wexecvp)}
 
 [attribute(*)][argument_names(path, ___argv, ___envp)]
 [if(__SIZEOF_WCHAR_T__ == 2), alias(_wexecvpe)][alias(DOS$_wexecvpe)]
-c16execvpe:(char16_t const *__restrict path, [nonnull] @__T16ARGV@, [nonnull] @__T16ENVP@) -> int %{uchar(wexecvpe)}
+c16execvpe:(char16_t const *__restrict path, [[nonnull]] @__T16ARGV@, [[nonnull]] @__T16ENVP@) -> int %{uchar(wexecvpe)}
 
 [attribute(*)][argument_names(path, ___argv, ___envp)]
 [if(__SIZEOF_WCHAR_T__ == 4), alias(_wexecvpe)]
-c32execvpe:(char32_t const *__restrict path, [nonnull] @__T32ARGV@, [nonnull] @__T32ENVP@) -> int %{uchar(wexecvpe)}
+c32execvpe:(char32_t const *__restrict path, [[nonnull]] @__T32ARGV@, [[nonnull]] @__T32ENVP@) -> int %{uchar(wexecvpe)}
 
 
 [cp][dependency_include(<parts/redirect-exec.h>)]
 [requires_dependency(c16execv)][ATTR_SENTINEL][allow_macros]
 [if(__SIZEOF_WCHAR_T__ == 2), preferred_alias(wexecl, _wexecl)]
 [preferred_alias(DOS$_wexecl)][nocrt][noexport][nouser][doc_alias(wexecl)]
-c16execl:([nonnull] char16_t const *__restrict path, char16_t const *args, ... /*, (char16_t *)NULL*/) -> int {
+c16execl:([[nonnull]] char16_t const *__restrict path, char16_t const *args, ... /*, (char16_t *)NULL*/) -> int {
 	__REDIRECT_EXECL(char16_t, c16execv, path, args)
 }
 
@@ -102,7 +102,7 @@ c16execl:([nonnull] char16_t const *__restrict path, char16_t const *args, ... /
 [requires_dependency(c32execv)][ATTR_SENTINEL][allow_macros]
 [if(__SIZEOF_WCHAR_T__ == 4), preferred_alias(wexecl, _wexecl)]
 [nocrt][noexport][nouser][doc_alias(wexecl)]
-c32execl:([nonnull] char32_t const *__restrict path, char32_t const *args, ... /*, (char32_t *)NULL*/) -> int {
+c32execl:([[nonnull]] char32_t const *__restrict path, char32_t const *args, ... /*, (char32_t *)NULL*/) -> int {
 	__REDIRECT_EXECL(char32_t, c32execv, path, args)
 }
 
@@ -110,7 +110,7 @@ c32execl:([nonnull] char32_t const *__restrict path, char32_t const *args, ... /
 [requires_dependency(c16execvp)][ATTR_SENTINEL][allow_macros]
 [if(__SIZEOF_WCHAR_T__ == 2), preferred_alias(wexeclp, _wexeclp)]
 [preferred_alias(DOS$_wexeclp)][nocrt][noexport][nouser][doc_alias(wexeclp)]
-c16execlp:([nonnull] char16_t const *__restrict file, char16_t const *args, ... /*, (char16_t *)NULL*/) -> int {
+c16execlp:([[nonnull]] char16_t const *__restrict file, char16_t const *args, ... /*, (char16_t *)NULL*/) -> int {
 	__REDIRECT_EXECL(char16_t, c16execvp, file, args)
 }
 
@@ -118,7 +118,7 @@ c16execlp:([nonnull] char16_t const *__restrict file, char16_t const *args, ... 
 [requires_dependency(c32execvp)][ATTR_SENTINEL][allow_macros]
 [if(__SIZEOF_WCHAR_T__ == 4), preferred_alias(wexeclp, _wexeclp)]
 [nocrt][noexport][nouser][doc_alias(wexeclp)]
-c32execlp:([nonnull] char32_t const *__restrict file, char32_t const *args, ... /*, (char32_t *)NULL*/) -> int {
+c32execlp:([[nonnull]] char32_t const *__restrict file, char32_t const *args, ... /*, (char32_t *)NULL*/) -> int {
 	__REDIRECT_EXECL(char32_t, c32execvp, file, args)
 }
 
@@ -129,7 +129,7 @@ c32execlp:([nonnull] char32_t const *__restrict file, char32_t const *args, ... 
 [requires_dependency(c16execve)][ATTR_SENTINEL_O(1)][allow_macros]
 [if(__SIZEOF_WCHAR_T__ == 2), preferred_alias(wexecle, _wexecle)]
 [preferred_alias(DOS$_wexecle)][nocrt][noexport][nouser][doc_alias(wexecle)]
-c16execle:([nonnull] char16_t const *__restrict path, char16_t const *args, ... /*, (char16_t *)NULL, char16_t **environ*/) -> int {
+c16execle:([[nonnull]] char16_t const *__restrict path, char16_t const *args, ... /*, (char16_t *)NULL, char16_t **environ*/) -> int {
 	__REDIRECT_EXECLE(char16_t, c16execve, path, args)
 }
 
@@ -137,7 +137,7 @@ c16execle:([nonnull] char16_t const *__restrict path, char16_t const *args, ... 
 [requires_dependency(c32execve)][ATTR_SENTINEL_O(1)][allow_macros]
 [if(__SIZEOF_WCHAR_T__ == 4), preferred_alias(wexecle, _wexecle)]
 [nocrt][noexport][nouser][doc_alias(wexecle)]
-c32execle:([nonnull] char32_t const *__restrict path, char32_t const *args, ... /*, (char32_t *)NULL, char32_t **environ*/) -> int {
+c32execle:([[nonnull]] char32_t const *__restrict path, char32_t const *args, ... /*, (char32_t *)NULL, char32_t **environ*/) -> int {
 	__REDIRECT_EXECLE(char32_t, c32execve, path, args)
 }
 
@@ -145,7 +145,7 @@ c32execle:([nonnull] char32_t const *__restrict path, char32_t const *args, ... 
 [requires_dependency(c16execvpe)][ATTR_SENTINEL_O(1)][allow_macros]
 [if(__SIZEOF_WCHAR_T__ == 2), preferred_alias(wexeclpe, _wexeclpe)]
 [preferred_alias(DOS$_wexeclpe)][nocrt][noexport][nouser][doc_alias(wexeclpe)]
-c16execlpe:([nonnull] char16_t const *__restrict file, char16_t const *args, ... /*, (char16_t *)NULL, char16_t **environ*/) -> int {
+c16execlpe:([[nonnull]] char16_t const *__restrict file, char16_t const *args, ... /*, (char16_t *)NULL, char16_t **environ*/) -> int {
 	__REDIRECT_EXECLE(char16_t, c16execvpe, file, args)
 }
 
@@ -153,7 +153,7 @@ c16execlpe:([nonnull] char16_t const *__restrict file, char16_t const *args, ...
 [requires_dependency(c32execvpe)][ATTR_SENTINEL_O(1)][allow_macros]
 [if(__SIZEOF_WCHAR_T__ == 4), preferred_alias(wexeclpe, _wexeclpe)]
 [nocrt][noexport][nouser][doc_alias(wexeclpe)]
-c32execlpe:([nonnull] char32_t const *__restrict file, char32_t const *args, ... /*, (char32_t *)NULL, char32_t **environ*/) -> int {
+c32execlpe:([[nonnull]] char32_t const *__restrict file, char32_t const *args, ... /*, (char32_t *)NULL, char32_t **environ*/) -> int {
 	__REDIRECT_EXECLE(char32_t, c32execvpe, file, args)
 }
 
@@ -162,42 +162,42 @@ c32execlpe:([nonnull] char32_t const *__restrict file, char32_t const *args, ...
 
 [attribute(*)][argument_names(mode, path, ___argv)]
 [if(__SIZEOF_WCHAR_T__ == 2), alias(_wspawnv)][alias(DOS$_wspawnv)]
-c16spawnv:(int mode, [nonnull] char16_t const *__restrict path, [nonnull] @__T16ARGV@) -> $pid_t %{uchar(wspawnv)}
+c16spawnv:(int mode, [[nonnull]] char16_t const *__restrict path, [[nonnull]] @__T16ARGV@) -> $pid_t %{uchar(wspawnv)}
 
 [attribute(*)][argument_names(mode, path, ___argv)]
 [if(__SIZEOF_WCHAR_T__ == 4), alias(_wspawnv)]
-c32spawnv:(int mode, [nonnull] char32_t const *__restrict path, [nonnull] @__T32ARGV@) -> $pid_t %{uchar(wspawnv)}
+c32spawnv:(int mode, [[nonnull]] char32_t const *__restrict path, [[nonnull]] @__T32ARGV@) -> $pid_t %{uchar(wspawnv)}
 
 [attribute(*)][argument_names(mode, path, ___argv, ___envp)]
 [if(__SIZEOF_WCHAR_T__ == 2), alias(_wspawnve)][alias(DOS$_wspawnve)]
-c16spawnve:(int mode, [nonnull] char16_t const *__restrict path, [nonnull] @__T16ARGV@, [nonnull] @__T16ENVP@) -> $pid_t %{uchar(wspawnve)}
+c16spawnve:(int mode, [[nonnull]] char16_t const *__restrict path, [[nonnull]] @__T16ARGV@, [[nonnull]] @__T16ENVP@) -> $pid_t %{uchar(wspawnve)}
 
 [attribute(*)][argument_names(mode, path, ___argv, ___envp)]
 [if(__SIZEOF_WCHAR_T__ == 4), alias(_wspawnve)]
-c32spawnve:(int mode, [nonnull] char32_t const *__restrict path, [nonnull] @__T32ARGV@, [nonnull] @__T32ENVP@) -> $pid_t %{uchar(wspawnve)}
+c32spawnve:(int mode, [[nonnull]] char32_t const *__restrict path, [[nonnull]] @__T32ARGV@, [[nonnull]] @__T32ENVP@) -> $pid_t %{uchar(wspawnve)}
 
 [attribute(*)][argument_names(mode, path, ___argv)]
 [if(__SIZEOF_WCHAR_T__ == 2), alias(_wspawnvp)][alias(DOS$_wspawnvp)]
-c16spawnvp:(int mode, [nonnull] char16_t const *__restrict path, [nonnull] @__T16ARGV@) -> $pid_t %{uchar(wspawnvp)}
+c16spawnvp:(int mode, [[nonnull]] char16_t const *__restrict path, [[nonnull]] @__T16ARGV@) -> $pid_t %{uchar(wspawnvp)}
 
 [attribute(*)][argument_names(mode, path, ___argv)]
 [if(__SIZEOF_WCHAR_T__ == 4), alias(_wspawnvp)]
-c32spawnvp:(int mode, [nonnull] char32_t const *__restrict path, [nonnull] @__T32ARGV@) -> $pid_t %{uchar(wspawnvp)}
+c32spawnvp:(int mode, [[nonnull]] char32_t const *__restrict path, [[nonnull]] @__T32ARGV@) -> $pid_t %{uchar(wspawnvp)}
 
 [attribute(*)][argument_names(mode, path, ___argv, ___envp)]
 [if(__SIZEOF_WCHAR_T__ == 2), alias(_wspawnvpe)][alias(DOS$_wspawnvpe)]
-c16spawnvpe:(int mode, [nonnull] char16_t const *__restrict path, [nonnull] @__T16ARGV@, [nonnull] @__T16ENVP@) -> $pid_t %{uchar(wspawnvpe)}
+c16spawnvpe:(int mode, [[nonnull]] char16_t const *__restrict path, [[nonnull]] @__T16ARGV@, [[nonnull]] @__T16ENVP@) -> $pid_t %{uchar(wspawnvpe)}
 
 [attribute(*)][argument_names(mode, path, ___argv, ___envp)]
 [if(__SIZEOF_WCHAR_T__ == 4), alias(_wspawnvpe)]
-c32spawnvpe:(int mode, [nonnull] char32_t const *__restrict path, [nonnull] @__T32ARGV@, [nonnull] @__T32ENVP@) -> $pid_t %{uchar(wspawnvpe)}
+c32spawnvpe:(int mode, [[nonnull]] char32_t const *__restrict path, [[nonnull]] @__T32ARGV@, [[nonnull]] @__T32ENVP@) -> $pid_t %{uchar(wspawnvpe)}
 
 
 [cp][dependency_include(<parts/redirect-exec.h>)]
 [requires_dependency(c16spawnv)][ATTR_SENTINEL][allow_macros]
 [if(__SIZEOF_WCHAR_T__ == 2), preferred_alias(wspawnl, _wspawnl)]
 [preferred_alias(DOS$_wspawnl)][nocrt][noexport][nouser][doc_alias(wspawnl)]
-c16spawnl:(int mode, [nonnull] char16_t const *__restrict path, char16_t const *args, ... /*, (char16_t *)NULL*/) -> $pid_t {
+c16spawnl:(int mode, [[nonnull]] char16_t const *__restrict path, char16_t const *args, ... /*, (char16_t *)NULL*/) -> $pid_t {
 	__REDIRECT_SPAWNL(char16_t, c16spawnv, mode, path, args)
 }
 
@@ -205,7 +205,7 @@ c16spawnl:(int mode, [nonnull] char16_t const *__restrict path, char16_t const *
 [requires_dependency(c32spawnv)][ATTR_SENTINEL][allow_macros]
 [if(__SIZEOF_WCHAR_T__ == 4), preferred_alias(wspawnl, _wspawnl)]
 [nocrt][noexport][nouser][doc_alias(wspawnl)]
-c32spawnl:(int mode, [nonnull] char32_t const *__restrict path, char32_t const *args, ... /*, (char32_t *)NULL*/) -> $pid_t {
+c32spawnl:(int mode, [[nonnull]] char32_t const *__restrict path, char32_t const *args, ... /*, (char32_t *)NULL*/) -> $pid_t {
 	__REDIRECT_SPAWNL(char32_t, c32spawnv, mode, path, args)
 }
 
@@ -213,7 +213,7 @@ c32spawnl:(int mode, [nonnull] char32_t const *__restrict path, char32_t const *
 [requires_dependency(c16spawnvp)][ATTR_SENTINEL][allow_macros]
 [if(__SIZEOF_WCHAR_T__ == 2), preferred_alias(wspawnlp, _wspawnlp)]
 [preferred_alias(DOS$_wspawnlp)][nocrt][noexport][nouser][doc_alias(wspawnlp)]
-c16spawnlp:(int mode, [nonnull] char16_t const *__restrict file, char16_t const *args, ... /*, (char16_t *)NULL*/) -> $pid_t {
+c16spawnlp:(int mode, [[nonnull]] char16_t const *__restrict file, char16_t const *args, ... /*, (char16_t *)NULL*/) -> $pid_t {
 	__REDIRECT_SPAWNL(char16_t, c16spawnvp, mode, file, args)
 }
 
@@ -221,7 +221,7 @@ c16spawnlp:(int mode, [nonnull] char16_t const *__restrict file, char16_t const 
 [requires_dependency(c32spawnvp)][ATTR_SENTINEL][allow_macros]
 [if(__SIZEOF_WCHAR_T__ == 4), preferred_alias(wspawnlp, _wspawnlp)]
 [nocrt][noexport][nouser][doc_alias(wspawnlp)]
-c32spawnlp:(int mode, [nonnull] char32_t const *__restrict file, char32_t const *args, ... /*, (char32_t *)NULL*/) -> $pid_t {
+c32spawnlp:(int mode, [[nonnull]] char32_t const *__restrict file, char32_t const *args, ... /*, (char32_t *)NULL*/) -> $pid_t {
 	__REDIRECT_SPAWNL(char32_t, c32spawnvp, mode, file, args)
 }
 
@@ -232,7 +232,7 @@ c32spawnlp:(int mode, [nonnull] char32_t const *__restrict file, char32_t const 
 [requires_dependency(c16spawnve)][ATTR_SENTINEL_O(1)][allow_macros]
 [if(__SIZEOF_WCHAR_T__ == 2), preferred_alias(wspawnle, _wspawnle)]
 [preferred_alias(DOS$_wspawnle)][nocrt][noexport][nouser][doc_alias(wspawnle)]
-c16spawnle:(int mode, [nonnull] char16_t const *__restrict path, char16_t const *args, ... /*, (char16_t *)NULL, char16_t **environ*/) -> $pid_t {
+c16spawnle:(int mode, [[nonnull]] char16_t const *__restrict path, char16_t const *args, ... /*, (char16_t *)NULL, char16_t **environ*/) -> $pid_t {
 	__REDIRECT_SPAWNLE(char16_t, c16spawnve, mode, path, args)
 }
 
@@ -240,7 +240,7 @@ c16spawnle:(int mode, [nonnull] char16_t const *__restrict path, char16_t const 
 [requires_dependency(c32spawnve)][ATTR_SENTINEL_O(1)][allow_macros]
 [if(__SIZEOF_WCHAR_T__ == 4), preferred_alias(wspawnle, _wspawnle)]
 [nocrt][noexport][nouser][doc_alias(wspawnle)]
-c32spawnle:(int mode, [nonnull] char32_t const *__restrict path, char32_t const *args, ... /*, (char32_t *)NULL, char32_t **environ*/) -> $pid_t {
+c32spawnle:(int mode, [[nonnull]] char32_t const *__restrict path, char32_t const *args, ... /*, (char32_t *)NULL, char32_t **environ*/) -> $pid_t {
 	__REDIRECT_SPAWNLE(char32_t, c32spawnve, mode, path, args)
 }
 
@@ -248,7 +248,7 @@ c32spawnle:(int mode, [nonnull] char32_t const *__restrict path, char32_t const 
 [requires_dependency(c16spawnvpe)][ATTR_SENTINEL_O(1)][allow_macros]
 [if(__SIZEOF_WCHAR_T__ == 2), preferred_alias(wspawnlpe, _wspawnlpe)]
 [preferred_alias(DOS$_wspawnlpe)][nocrt][noexport][nouser][doc_alias(wspawnlpe)]
-c16spawnlpe:(int mode, [nonnull] char16_t const *__restrict file, char16_t const *args, ... /*, (char16_t *)NULL, char16_t **environ*/) -> $pid_t {
+c16spawnlpe:(int mode, [[nonnull]] char16_t const *__restrict file, char16_t const *args, ... /*, (char16_t *)NULL, char16_t **environ*/) -> $pid_t {
 	__REDIRECT_SPAWNLE(char16_t, c16spawnvpe, mode, file, args)
 }
 
@@ -256,7 +256,7 @@ c16spawnlpe:(int mode, [nonnull] char16_t const *__restrict file, char16_t const
 [requires_dependency(c32spawnvpe)][ATTR_SENTINEL_O(1)][allow_macros]
 [if(__SIZEOF_WCHAR_T__ == 4), preferred_alias(wspawnlpe, _wspawnlpe)]
 [nocrt][noexport][nouser][doc_alias(wspawnlpe)]
-c32spawnlpe:(int mode, [nonnull] char32_t const *__restrict file, char32_t const *args, ... /*, (char32_t *)NULL, char32_t **environ*/) -> $pid_t {
+c32spawnlpe:(int mode, [[nonnull]] char32_t const *__restrict file, char32_t const *args, ... /*, (char32_t *)NULL, char32_t **environ*/) -> $pid_t {
 	__REDIRECT_SPAWNLE(char32_t, c32spawnvpe, mode, file, args)
 }
 
