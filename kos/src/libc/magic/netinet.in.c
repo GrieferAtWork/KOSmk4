@@ -329,9 +329,9 @@ ntohq:($uint64_t netlong) -> $uint64_t {
 %
 %#ifdef __USE_MISC
 @@Bind socket to a privileged IP port
-[cp] bindresvport:($fd_t sockfd, struct sockaddr_in *sock_in) -> int;
+[[cp]] bindresvport:($fd_t sockfd, struct sockaddr_in *sock_in) -> int;
 @@The IPv6 version of this function
-[cp] bindresvport6:($fd_t sockfd, struct sockaddr_in6 *sock_in) -> int;
+[[cp]] bindresvport6:($fd_t sockfd, struct sockaddr_in6 *sock_in) -> int;
 %#endif /* __USE_MISC */
 
 %

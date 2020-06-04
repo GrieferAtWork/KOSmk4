@@ -45,16 +45,16 @@ _rmdir(*) = rmdir;
 
 %[default_impl_section(.text.crt.dos.fs.property)]
 %#define _getdcwd_nolock _getdcwd
-[cp] _getdcwd:(int drive, char *buf, size_t size) -> char *;
+[[cp]] _getdcwd:(int drive, char *buf, size_t size) -> char *;
 
-[cp] _chdrive:(int drive) -> int;
-[cp] _getdrive:() -> int;
-[cp] _getdrives:() -> __ULONG32_TYPE__;
+[[cp]] _chdrive:(int drive) -> int;
+[[cp]] _getdrive:() -> int;
+[[cp]] _getdrives:() -> __ULONG32_TYPE__;
 
 %
 %#ifndef _GETDISKFREE_DEFINED
 %#define _GETDISKFREE_DEFINED 1
-[cp][guard] _getdiskfree:(unsigned int drive, struct _diskfree_t *diskfree) -> unsigned int;
+[[cp]][guard] _getdiskfree:(unsigned int drive, struct _diskfree_t *diskfree) -> unsigned int;
 %#endif /* !_GETDISKFREE_DEFINED */
 
 /* A small hand full of functions defined in '<direct.h>' */

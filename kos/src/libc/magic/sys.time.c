@@ -162,8 +162,8 @@ gettimeofday:([[nonnull]] struct timeval *__restrict tv, [[nullable]] __timezone
 		return gettimeofday32(NULL, tz);
 	result = gettimeofday32(&tv32, tz);
 	if likely(!result) {
-		tv->@tv_sec@  = (time64_t)tv32.@tv_sec@;
-		tv->@tv_usec@ = tv32.@tv_usec@;
+		tv->tv_sec  = (time64_t)tv32.tv_sec;
+		tv->tv_usec = tv32.tv_usec;
 	}
 	return result;
 #else /* __CRT_HAVE_gettimeofday */
@@ -173,8 +173,8 @@ gettimeofday:([[nonnull]] struct timeval *__restrict tv, [[nullable]] __timezone
 		return gettimeofday64(NULL, tz);
 	result = gettimeofday64(&tv64, tz);
 	if likely(!result) {
-		tv->@tv_sec@  = (time32_t)tv64.@tv_sec@;
-		tv->@tv_usec@ = tv64.@tv_usec@;
+		tv->tv_sec  = (time32_t)tv64.tv_sec;
+		tv->tv_usec = tv64.tv_usec;
 	}
 	return result;
 #endif /* !__CRT_HAVE_gettimeofday */
@@ -193,10 +193,10 @@ getitimer:(__itimer_which_t which, [[nonnull]] struct itimerval *curr_value) -> 
 	struct __itimerval32 tv32;
 	result = getitimer32(which, &tv32);
 	if likely(!result) {
-		curr_value->@it_interval@.@tv_sec@  = (time64_t)tv32.@it_interval@.@tv_sec@;
-		curr_value->@it_interval@.@tv_usec@ = tv32.@it_interval@.@tv_usec@;
-		curr_value->@it_value@.@tv_sec@     = (time64_t)tv32.@it_value@.@tv_sec@;
-		curr_value->@it_value@.@tv_usec@    = tv32.@it_value@.@tv_usec@;
+		curr_value->@it_interval@.tv_sec  = (time64_t)tv32.@it_interval@.tv_sec;
+		curr_value->@it_interval@.tv_usec = tv32.@it_interval@.tv_usec;
+		curr_value->@it_value@.tv_sec     = (time64_t)tv32.@it_value@.tv_sec;
+		curr_value->@it_value@.tv_usec    = tv32.@it_value@.tv_usec;
 	}
 	return result;
 #else /* __CRT_HAVE_getitimer */
@@ -204,10 +204,10 @@ getitimer:(__itimer_which_t which, [[nonnull]] struct itimerval *curr_value) -> 
 	struct __timeval64 tv64;
 	result = getitimer64(which, &tv64);
 	if likely(!result) {
-		curr_value->@it_interval@.@tv_sec@  = (time32_t)tv64.@it_interval@.@tv_sec@;
-		curr_value->@it_interval@.@tv_usec@ = tv64.@it_interval@.@tv_usec@;
-		curr_value->@it_value@.@tv_sec@     = (time32_t)tv64.@it_value@.@tv_sec@;
-		curr_value->@it_value@.@tv_usec@    = tv64.@it_value@.@tv_usec@;
+		curr_value->@it_interval@.tv_sec  = (time32_t)tv64.@it_interval@.tv_sec;
+		curr_value->@it_interval@.tv_usec = tv64.@it_interval@.tv_usec;
+		curr_value->@it_value@.tv_sec     = (time32_t)tv64.@it_value@.tv_sec;
+		curr_value->@it_value@.tv_usec    = tv64.@it_value@.tv_usec;
 	}
 	return result;
 #endif /* !__CRT_HAVE_getitimer */
@@ -225,31 +225,31 @@ setitimer:(__itimer_which_t which,
 #ifdef __CRT_HAVE_setitimer
 	int result;
 	struct __itimerval32 new32, old32;
-	new32.@it_interval@.@tv_sec@  = (time32_t)newval->@it_interval@.@tv_sec@;
-	new32.@it_interval@.@tv_usec@ = newval->@it_interval@.@tv_usec@;
-	new32.@it_value@.@tv_sec@     = (time32_t)newval->@it_value@.@tv_sec@;
-	new32.@it_value@.@tv_usec@    = newval->@it_value@.@tv_usec@;
+	new32.@it_interval@.tv_sec  = (time32_t)newval->@it_interval@.tv_sec;
+	new32.@it_interval@.tv_usec = newval->@it_interval@.tv_usec;
+	new32.@it_value@.tv_sec     = (time32_t)newval->@it_value@.tv_sec;
+	new32.@it_value@.tv_usec    = newval->@it_value@.tv_usec;
 	result = setitimer32(which, &new32, oldval ? &old32 : NULL);
 	if (likely(!result) && oldval) {
-		oldval->@it_interval@.@tv_sec@  = (time64_t)old32.@it_interval@.@tv_sec@;
-		oldval->@it_interval@.@tv_usec@ = old32.@it_interval@.@tv_usec@;
-		oldval->@it_value@.@tv_sec@     = (time64_t)old32.@it_value@.@tv_sec@;
-		oldval->@it_value@.@tv_usec@    = old32.@it_value@.@tv_usec@;
+		oldval->@it_interval@.tv_sec  = (time64_t)old32.@it_interval@.tv_sec;
+		oldval->@it_interval@.tv_usec = old32.@it_interval@.tv_usec;
+		oldval->@it_value@.tv_sec     = (time64_t)old32.@it_value@.tv_sec;
+		oldval->@it_value@.tv_usec    = old32.@it_value@.tv_usec;
 	}
 	return result;
 #else /* __CRT_HAVE_setitimer */
 	int result;
 	struct __itimerval64 new64, old64;
-	new64.@it_interval@.@tv_sec@  = (time64_t)newval->@it_interval@.@tv_sec@;
-	new64.@it_interval@.@tv_usec@ = newval->@it_interval@.@tv_usec@;
-	new64.@it_value@.@tv_sec@     = (time64_t)newval->@it_value@.@tv_sec@;
-	new64.@it_value@.@tv_usec@    = newval->@it_value@.@tv_usec@;
+	new64.@it_interval@.tv_sec  = (time64_t)newval->@it_interval@.tv_sec;
+	new64.@it_interval@.tv_usec = newval->@it_interval@.tv_usec;
+	new64.@it_value@.tv_sec     = (time64_t)newval->@it_value@.tv_sec;
+	new64.@it_value@.tv_usec    = newval->@it_value@.tv_usec;
 	result = setitimer64(which, &new64, oldval ? &old64 : NULL);
 	if (likely(!result) && oldval) {
-		oldval->@it_interval@.@tv_sec@  = (time32_t)old64.@it_interval@.@tv_sec@;
-		oldval->@it_interval@.@tv_usec@ = old64.@it_interval@.@tv_usec@;
-		oldval->@it_value@.@tv_sec@     = (time32_t)old64.@it_value@.@tv_sec@;
-		oldval->@it_value@.@tv_usec@    = old64.@it_value@.@tv_usec@;
+		oldval->@it_interval@.tv_sec  = (time32_t)old64.@it_interval@.tv_sec;
+		oldval->@it_interval@.tv_usec = old64.@it_interval@.tv_usec;
+		oldval->@it_value@.tv_sec     = (time32_t)old64.@it_value@.tv_sec;
+		oldval->@it_value@.tv_usec    = old64.@it_value@.tv_usec;
 	}
 	return result;
 #endif /* !__CRT_HAVE_setitimer */
@@ -268,19 +268,19 @@ utimes:([[nonnull]] char const *file, [[nullable]] struct timeval const tvp[2]) 
 	struct __timeval32 tv32[2];
 	if (!tvp)
 		return utimes32(file, NULL);
-	tv32[0].@tv_sec@  = (time32_t)tvp[0].@tv_sec@;
-	tv32[0].@tv_usec@ = tvp[0].@tv_usec@;
-	tv32[1].@tv_sec@  = (time32_t)tvp[1].@tv_sec@;
-	tv32[1].@tv_usec@ = tvp[1].@tv_usec@;
+	tv32[0].tv_sec  = (time32_t)tvp[0].tv_sec;
+	tv32[0].tv_usec = tvp[0].tv_usec;
+	tv32[1].tv_sec  = (time32_t)tvp[1].tv_sec;
+	tv32[1].tv_usec = tvp[1].tv_usec;
 	return utimes32(file, tv32);
 #else /* __CRT_HAVE_utimes */
 	struct __timeval64 tv64[2];
 	if (!tvp)
 		return utimes64(file, NULL);
-	tv64[0].@tv_sec@  = (time64_t)tvp[0].@tv_sec@;
-	tv64[0].@tv_usec@ = tvp[0].@tv_usec@;
-	tv64[1].@tv_sec@  = (time64_t)tvp[1].@tv_sec@;
-	tv64[1].@tv_usec@ = tvp[1].@tv_usec@;
+	tv64[0].tv_sec  = (time64_t)tvp[0].tv_sec;
+	tv64[0].tv_usec = tvp[0].tv_usec;
+	tv64[1].tv_sec  = (time64_t)tvp[1].tv_sec;
+	tv64[1].tv_usec = tvp[1].tv_usec;
 	return utimes64(file, tv64);
 #endif /* !__CRT_HAVE_utimes */
 }
@@ -297,19 +297,19 @@ futimesat:($fd_t fd, [[nonnull]] char const *file, [[nullable]] struct timeval c
 	struct __timeval32 tv32[2];
 	if (!tvp)
 		return futimesat32(fd, file, NULL);
-	tv32[0].@tv_sec@  = (time32_t)tvp[0].@tv_sec@;
-	tv32[0].@tv_usec@ = tvp[0].@tv_usec@;
-	tv32[1].@tv_sec@  = (time32_t)tvp[1].@tv_sec@;
-	tv32[1].@tv_usec@ = tvp[1].@tv_usec@;
+	tv32[0].tv_sec  = (time32_t)tvp[0].tv_sec;
+	tv32[0].tv_usec = tvp[0].tv_usec;
+	tv32[1].tv_sec  = (time32_t)tvp[1].tv_sec;
+	tv32[1].tv_usec = tvp[1].tv_usec;
 	return futimesat32(fd, file, tv32);
 #else /* __CRT_HAVE_utimes */
 	struct __timeval64 tv64[2];
 	if (!tvp)
 		return futimesat64(fd, file, NULL);
-	tv64[0].@tv_sec@  = (time64_t)tvp[0].@tv_sec@;
-	tv64[0].@tv_usec@ = tvp[0].@tv_usec@;
-	tv64[1].@tv_sec@  = (time64_t)tvp[1].@tv_sec@;
-	tv64[1].@tv_usec@ = tvp[1].@tv_usec@;
+	tv64[0].tv_sec  = (time64_t)tvp[0].tv_sec;
+	tv64[0].tv_usec = tvp[0].tv_usec;
+	tv64[1].tv_sec  = (time64_t)tvp[1].tv_sec;
+	tv64[1].tv_usec = tvp[1].tv_usec;
 	return futimesat64(fd, file, tv64);
 #endif /* !__CRT_HAVE_utimes */
 }
@@ -328,15 +328,15 @@ settimeofday:([[nullable]] struct timeval const *tv, [[nullable]] struct timezon
 	struct __timeval32 tv32;
 	if (!tv)
 		return settimeofday32(NULL, tz);
-	tv32.@tv_sec@  = (time32_t)tv->@tv_sec@;
-	tv32.@tv_usec@ = tv->@tv_usec@;
+	tv32.tv_sec  = (time32_t)tv->tv_sec;
+	tv32.tv_usec = tv->tv_usec;
 	return settimeofday32(&tv32, tz);
 #else /* __CRT_HAVE_settimeofday */
 	struct __timeval64 tv64;
 	if (!tv)
 		return settimeofday64(NULL, tz);
-	tv64.@tv_sec@  = (time64_t)tv->@tv_sec@;
-	tv64.@tv_usec@ = tv->@tv_usec@;
+	tv64.tv_sec  = (time64_t)tv->tv_sec;
+	tv64.tv_usec = tv->tv_usec;
 	return settimeofday64(&tv64, tz);
 #endif /* !__CRT_HAVE_settimeofday */
 }
@@ -354,26 +354,26 @@ adjtime:([[nullable]] struct timeval const *delta, [[nullable]] struct timeval *
 	int result;
 	struct __timeval32 delta32, olddelta32;
 	if (delta) {
-		delta32.@tv_sec@  = (time32_t)delta->@tv_sec@;
-		delta32.@tv_usec@ = delta->@tv_usec@;
+		delta32.tv_sec  = (time32_t)delta->tv_sec;
+		delta32.tv_usec = delta->tv_usec;
 	}
 	result = adjtime32(which, delta ? &delta32 : NULL, olddelta ? &olddelta32 : NULL);
 	if (likely(!result) && olddelta) {
-		olddelta->@tv_sec@  = (time64_t)olddelta32.@tv_sec@;
-		olddelta->@tv_usec@ = olddelta32.@tv_usec@;
+		olddelta->tv_sec  = (time64_t)olddelta32.tv_sec;
+		olddelta->tv_usec = olddelta32.tv_usec;
 	}
 	return result;
 #else /* __CRT_HAVE_adjtime */
 	int result;
 	struct __timeval64 delta64, olddelta64;
 	if (delta) {
-		delta64.@tv_sec@  = (time64_t)delta->@tv_sec@;
-		delta64.@tv_usec@ = delta->@tv_usec@;
+		delta64.tv_sec  = (time64_t)delta->tv_sec;
+		delta64.tv_usec = delta->tv_usec;
 	}
 	result = adjtime64(which, delta ? &delta64 : NULL, olddelta ? &olddelta64 : NULL);
 	if (likely(!result) && olddelta) {
-		olddelta->@tv_sec@  = (time32_t)olddelta64.@tv_sec@;
-		olddelta->@tv_usec@ = olddelta64.@tv_usec@;
+		olddelta->tv_sec  = (time32_t)olddelta64.tv_sec;
+		olddelta->tv_usec = olddelta64.tv_usec;
 	}
 	return result;
 #endif /* !__CRT_HAVE_adjtime */
@@ -389,19 +389,19 @@ lutimes:([[nonnull]] char const *file, [[nullable]] struct timeval const tvp[2])
 	struct __timeval32 tv32[2];
 	if (!tvp)
 		return lutimes32(file, NULL);
-	tv32[0].@tv_sec@  = (time32_t)tvp[0].@tv_sec@;
-	tv32[0].@tv_usec@ = tvp[0].@tv_usec@;
-	tv32[1].@tv_sec@  = (time32_t)tvp[1].@tv_sec@;
-	tv32[1].@tv_usec@ = tvp[1].@tv_usec@;
+	tv32[0].tv_sec  = (time32_t)tvp[0].tv_sec;
+	tv32[0].tv_usec = tvp[0].tv_usec;
+	tv32[1].tv_sec  = (time32_t)tvp[1].tv_sec;
+	tv32[1].tv_usec = tvp[1].tv_usec;
 	return lutimes32(file, tv32);
 #else /* __CRT_HAVE_utimes */
 	struct __timeval64 tv64[2];
 	if (!tvp)
 		return lutimes64(file, NULL);
-	tv64[0].@tv_sec@  = (time64_t)tvp[0].@tv_sec@;
-	tv64[0].@tv_usec@ = tvp[0].@tv_usec@;
-	tv64[1].@tv_sec@  = (time64_t)tvp[1].@tv_sec@;
-	tv64[1].@tv_usec@ = tvp[1].@tv_usec@;
+	tv64[0].tv_sec  = (time64_t)tvp[0].tv_sec;
+	tv64[0].tv_usec = tvp[0].tv_usec;
+	tv64[1].tv_sec  = (time64_t)tvp[1].tv_sec;
+	tv64[1].tv_usec = tvp[1].tv_usec;
 	return lutimes64(file, tv64);
 #endif /* !__CRT_HAVE_utimes */
 }
@@ -417,19 +417,19 @@ futimes:($fd_t fd, [[nullable]] struct timeval const tvp[2]) -> int {
 	struct __timeval32 tv32[2];
 	if (!tvp)
 		return futimes32(fd, NULL);
-	tv32[0].@tv_sec@  = (time32_t)tvp[0].@tv_sec@;
-	tv32[0].@tv_usec@ = tvp[0].@tv_usec@;
-	tv32[1].@tv_sec@  = (time32_t)tvp[1].@tv_sec@;
-	tv32[1].@tv_usec@ = tvp[1].@tv_usec@;
+	tv32[0].tv_sec  = (time32_t)tvp[0].tv_sec;
+	tv32[0].tv_usec = tvp[0].tv_usec;
+	tv32[1].tv_sec  = (time32_t)tvp[1].tv_sec;
+	tv32[1].tv_usec = tvp[1].tv_usec;
 	return futimes32(fd, tv32);
 #else /* __CRT_HAVE_utimes */
 	struct __timeval64 tv64[2];
 	if (!tvp)
 		return futimes64(fd, NULL);
-	tv64[0].@tv_sec@  = (time64_t)tvp[0].@tv_sec@;
-	tv64[0].@tv_usec@ = tvp[0].@tv_usec@;
-	tv64[1].@tv_sec@  = (time64_t)tvp[1].@tv_sec@;
-	tv64[1].@tv_usec@ = tvp[1].@tv_usec@;
+	tv64[0].tv_sec  = (time64_t)tvp[0].tv_sec;
+	tv64[0].tv_usec = tvp[0].tv_usec;
+	tv64[1].tv_sec  = (time64_t)tvp[1].tv_sec;
+	tv64[1].tv_usec = tvp[1].tv_usec;
 	return futimes64(fd, tv64);
 #endif /* !__CRT_HAVE_utimes */
 }
@@ -460,10 +460,10 @@ getitimer64:(__itimer_which_t which, [[nonnull]] struct itimerval64 *curr_value)
 	struct __itimerval32 tv32;
 	result = getitimer32(which, &tv32);
 	if likely(!result) {
-		curr_value->@it_interval@.@tv_sec@  = (time64_t)tv32.@it_interval@.@tv_sec@;
-		curr_value->@it_interval@.@tv_usec@ = tv32.@it_interval@.@tv_usec@;
-		curr_value->@it_value@.@tv_sec@     = (time64_t)tv32.@it_value@.@tv_sec@;
-		curr_value->@it_value@.@tv_usec@    = tv32.@it_value@.@tv_usec@;
+		curr_value->@it_interval@.tv_sec  = (time64_t)tv32.@it_interval@.tv_sec;
+		curr_value->@it_interval@.tv_usec = tv32.@it_interval@.tv_usec;
+		curr_value->@it_value@.tv_sec     = (time64_t)tv32.@it_value@.tv_sec;
+		curr_value->@it_value@.tv_usec    = tv32.@it_value@.tv_usec;
 	}
 	return result;
 }
@@ -475,16 +475,16 @@ setitimer64:(__itimer_which_t which,
              [[nullable]] struct itimerval64 *oldval) -> int {
 	int result;
 	struct __itimerval32 new32, old32;
-	new32.@it_interval@.@tv_sec@  = (time32_t)newval->@it_interval@.@tv_sec@;
-	new32.@it_interval@.@tv_usec@ = newval->@it_interval@.@tv_usec@;
-	new32.@it_value@.@tv_sec@     = (time32_t)newval->@it_value@.@tv_sec@;
-	new32.@it_value@.@tv_usec@    = newval->@it_value@.@tv_usec@;
+	new32.@it_interval@.tv_sec  = (time32_t)newval->@it_interval@.tv_sec;
+	new32.@it_interval@.tv_usec = newval->@it_interval@.tv_usec;
+	new32.@it_value@.tv_sec     = (time32_t)newval->@it_value@.tv_sec;
+	new32.@it_value@.tv_usec    = newval->@it_value@.tv_usec;
 	result = setitimer32(which, &new32, oldval ? &old32 : NULL);
 	if (likely(!result) && oldval) {
-		oldval->@it_interval@.@tv_sec@  = (time64_t)old32.@it_interval@.@tv_sec@;
-		oldval->@it_interval@.@tv_usec@ = old32.@it_interval@.@tv_usec@;
-		oldval->@it_value@.@tv_sec@     = (time64_t)old32.@it_value@.@tv_sec@;
-		oldval->@it_value@.@tv_usec@    = old32.@it_value@.@tv_usec@;
+		oldval->@it_interval@.tv_sec  = (time64_t)old32.@it_interval@.tv_sec;
+		oldval->@it_interval@.tv_usec = old32.@it_interval@.tv_usec;
+		oldval->@it_value@.tv_sec     = (time64_t)old32.@it_value@.tv_sec;
+		oldval->@it_value@.tv_usec    = old32.@it_value@.tv_usec;
 	}
 	return result;
 }
@@ -497,10 +497,10 @@ utimes64:([[nonnull]] char const *file,
 	struct __timeval32 tv32[2];
 	if (!tvp)
 		return utimes32(file, NULL);
-	tv32[0].@tv_sec@  = (time32_t)tvp[0].@tv_sec@;
-	tv32[0].@tv_usec@ = tvp[0].@tv_usec@;
-	tv32[1].@tv_sec@  = (time32_t)tvp[1].@tv_sec@;
-	tv32[1].@tv_usec@ = tvp[1].@tv_usec@;
+	tv32[0].tv_sec  = (time32_t)tvp[0].tv_sec;
+	tv32[0].tv_usec = tvp[0].tv_usec;
+	tv32[1].tv_sec  = (time32_t)tvp[1].tv_sec;
+	tv32[1].tv_usec = tvp[1].tv_usec;
 	return utimes32(file, tv32);
 }
 
@@ -512,8 +512,8 @@ settimeofday64:([[nullable]] struct timeval64 const *tv, [[nullable]] struct tim
 	struct __timeval32 tv32;
 	if (!tv)
 		return settimeofday32(NULL, tz);
-	tv32.@tv_sec@  = (time32_t)tv->@tv_sec@;
-	tv32.@tv_usec@ = tv->@tv_usec@;
+	tv32.tv_sec  = (time32_t)tv->tv_sec;
+	tv32.tv_usec = tv->tv_usec;
 	return settimeofday32(&tv32, tz);
 }
 
@@ -523,13 +523,13 @@ adjtime64:([[nullable]] struct timeval64 const *delta, [[nullable]] struct timev
 	int result;
 	struct __timeval32 delta32, olddelta32;
 	if (delta) {
-		delta32.@tv_sec@  = (time32_t)delta->@tv_sec@;
-		delta32.@tv_usec@ = delta->@tv_usec@;
+		delta32.tv_sec  = (time32_t)delta->tv_sec;
+		delta32.tv_usec = delta->tv_usec;
 	}
 	result = adjtime32(which, delta ? &delta32 : NULL, olddelta ? &olddelta32 : NULL);
 	if (likely(!result) && olddelta) {
-		olddelta->@tv_sec@  = (time64_t)olddelta32.@tv_sec@;
-		olddelta->@tv_usec@ = olddelta32.@tv_usec@;
+		olddelta->tv_sec  = (time64_t)olddelta32.tv_sec;
+		olddelta->tv_usec = olddelta32.tv_usec;
 	}
 	return result;
 }
@@ -540,10 +540,10 @@ lutimes64:([[nonnull]] char const *file, [[nullable]] struct timeval64 const tvp
 	struct __timeval32 tv32[2];
 	if (!tvp)
 		return lutimes32(file, NULL);
-	tv32[0].@tv_sec@  = (time32_t)tvp[0].@tv_sec@;
-	tv32[0].@tv_usec@ = tvp[0].@tv_usec@;
-	tv32[1].@tv_sec@  = (time32_t)tvp[1].@tv_sec@;
-	tv32[1].@tv_usec@ = tvp[1].@tv_usec@;
+	tv32[0].tv_sec  = (time32_t)tvp[0].tv_sec;
+	tv32[0].tv_usec = tvp[0].tv_usec;
+	tv32[1].tv_sec  = (time32_t)tvp[1].tv_sec;
+	tv32[1].tv_usec = tvp[1].tv_usec;
 	return lutimes32(file, tv32);
 }
 
@@ -554,10 +554,10 @@ futimes64:($fd_t fd, [[nullable]] struct timeval64 const tvp[2]) -> int {
 	struct __timeval32 tv32[2];
 	if (!tvp)
 		return futimes32(fd, NULL);
-	tv32[0].@tv_sec@  = (time32_t)tvp[0].@tv_sec@;
-	tv32[0].@tv_usec@ = tvp[0].@tv_usec@;
-	tv32[1].@tv_sec@  = (time32_t)tvp[1].@tv_sec@;
-	tv32[1].@tv_usec@ = tvp[1].@tv_usec@;
+	tv32[0].tv_sec  = (time32_t)tvp[0].tv_sec;
+	tv32[0].tv_usec = tvp[0].tv_usec;
+	tv32[1].tv_sec  = (time32_t)tvp[1].tv_sec;
+	tv32[1].tv_usec = tvp[1].tv_usec;
 	return futimes32(fd, tv32);
 }
 
@@ -571,10 +571,10 @@ futimesat64:($fd_t fd, [[nonnull]] char const *file, [[nullable]] struct timeval
 	struct __timeval32 tv32[2];
 	if (!tvp)
 		return futimesat32(fd, file, NULL);
-	tv32[0].@tv_sec@  = (time32_t)tvp[0].@tv_sec@;
-	tv32[0].@tv_usec@ = tvp[0].@tv_usec@;
-	tv32[1].@tv_sec@  = (time32_t)tvp[1].@tv_sec@;
-	tv32[1].@tv_usec@ = tvp[1].@tv_usec@;
+	tv32[0].tv_sec  = (time32_t)tvp[0].tv_sec;
+	tv32[0].tv_usec = tvp[0].tv_usec;
+	tv32[1].tv_sec  = (time32_t)tvp[1].tv_sec;
+	tv32[1].tv_usec = tvp[1].tv_usec;
 	return futimesat32(fd, file, tv32);
 }
 %#endif /* __USE_GNU */

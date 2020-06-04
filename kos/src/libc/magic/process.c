@@ -39,23 +39,20 @@ __SYSDECL_BEGIN
 #define WAIT_GRANDCHILD 1
 
 
-}
-
-
-%{
-
 #ifndef __TARGV
 #ifdef __USE_DOS
-#   define __TARGV  char const *const *___argv
-#   define __TENVP  char const *const *___envp
-#else
-#   define __TARGV  char *const ___argv[__restrict_arr]
-#   define __TENVP  char *const ___envp[__restrict_arr]
-#endif
+#define __TARGV  char const *const *___argv
+#define __TENVP  char const *const *___envp
+#else /* __USE_DOS */
+#define __TARGV  char *const ___argv[__restrict_arr]
+#define __TENVP  char *const ___envp[__restrict_arr]
+#endif /* !__USE_DOS */
 #endif /* !__TARGV */
 
 /* DOS */
-#ifdef __USE_DOS
+}
+%#ifdef __USE_DOS
+%{
 #define _P_WAIT          P_WAIT
 #define _P_NOWAIT        P_NOWAIT
 #define _P_OVERLAY       P_OVERLAY
@@ -67,7 +64,9 @@ __SYSDECL_BEGIN
 #define OLD_P_OVERLAY    _OLD_P_OVERLAY
 
 
-#ifdef __CC__
+}
+%#ifdef __CC__
+%{
 
 #ifndef __intptr_t_defined
 #define __intptr_t_defined 1
@@ -84,16 +83,21 @@ typedef __WCHAR_TYPE__ wchar_t;
 
 }
 
+
 %[default_impl_section(.text.crt.dos.sched.thread)]
 %typedef void (__LIBCCALL *__dos_beginthread_entry_t)(void *__arg);
 %typedef __UINT32_TYPE__ (__ATTR_STDCALL *__dos_beginthreadex_entry_t)(void *__arg);
 %
-_beginthread:(__dos_beginthread_entry_t entry, $u32 stacksz, void *arg) -> uintptr_t;
-_beginthreadex:(void *sec, $u32 stacksz, __dos_beginthreadex_entry_t entry, void *arg, $u32 flags, $u32 *threadaddr) -> uintptr_t;
-[userimpl][requires($has_function(_endthreadex))] _endthread:() {
+
+uintptr_t _beginthread(__dos_beginthread_entry_t entry, $u32 stacksz, void *arg);
+uintptr_t _beginthreadex(void *sec, $u32 stacksz, __dos_beginthreadex_entry_t entry, void *arg, $u32 flags, $u32 *threadaddr);
+
+[[userimpl, requires($has_function(_endthreadex))]]
+void _endthread() {
 	_endthreadex(0);
 }
-_endthreadex:($u32 exitcode);
+
+void _endthreadex($u32 exitcode);
 
 %[default_impl_section(.text.crt.sched.process)]
 
@@ -102,8 +106,7 @@ _endthreadex:($u32 exitcode);
 %#define _CRT_TERMINATE_DEFINED 1
 %[insert:extern(exit)]
 %[insert:extern(abort)]
-[guard][alias(quick_exit)][alias(exit)][ATTR_NORETURN][throws()]
-[crtbuiltin] _exit:(int status) = _Exit;
+_exit(*) = _Exit;
 %#endif /* !_CRT_TERMINATE_DEFINED */
 
 %[default_impl_section(.text.crt.dos.sched.process)]
@@ -114,25 +117,25 @@ _endthreadex:($u32 exitcode);
 [guard][ATTR_WUNUSED] _getpid:() -> $pid_t = getpid;
 
 %[default_impl_section(.text.crt.dos.fs.exec.exec)]
-[alias(*)][attribute(*)] _execv:(*) = execv;
-[alias(*)][attribute(*)] _execvp:(*) = execvp;
-[alias(*)][attribute(*)] _execve:(*) = execve;
-[alias(*)][attribute(*)] _execvpe:(*) = execvpe;
-[alias(*)][attribute(*)] _execl:(*) = execl;
-[alias(*)][attribute(*)] _execlp:(*) = execlp;
-[alias(*)][attribute(*)] _execle:(*) = execle;
-[alias(*)][attribute(*)] _execlpe:(*) = execlpe;
+_execv(*) = execv;
+_execvp(*) = execvp;
+_execve(*) = execve;
+_execvpe(*) = execvpe;
+_execl(*) = execl;
+_execlp(*) = execlp;
+_execle(*) = execle;
+_execlpe(*) = execlpe;
 
 %[default_impl_section(.text.crt.dos.fs.exec.spawn)]
-[alias(*)][attribute(*)] _cwait:(int *tstat, intptr_t pid, int action) -> intptr_t = cwait;
-[alias(*)][attribute(*)][argument_names(mode, path, ___argv)]          _spawnv:(int mode, char const *__restrict path, @__TARGV@) -> intptr_t = spawnv;
-[alias(*)][attribute(*)][argument_names(mode, file, ___argv)]          _spawnvp:(int mode, char const *__restrict file, @__TARGV@) -> intptr_t = spawnvp;
-[alias(*)][attribute(*)][argument_names(mode, path, ___argv, ___envp)] _spawnve:(int mode, char const *__restrict path, @__TARGV@, @__TENVP@) -> intptr_t = spawnve;
-[alias(*)][attribute(*)][argument_names(mode, file, ___argv, ___envp)] _spawnvpe:(int mode, char const *__restrict file, @__TARGV@, @__TENVP@) -> intptr_t = spawnvpe;
-[alias(*)][attribute(*)][allow_macros] _spawnl:(int mode, char const *__restrict path, char const *args, ... /*, (char *)NULL*/) -> intptr_t = spawnl;
-[alias(*)][attribute(*)][allow_macros] _spawnlp:(int mode, char const *__restrict file, char const *args, ... /*, (char *)NULL*/) -> intptr_t = spawnlp;
-[alias(*)][attribute(*)][allow_macros] _spawnle:(int mode, char const *__restrict path, char const *args, ... /*, (char *)NULL, (char **)environ*/) -> intptr_t = spawnle;
-[alias(*)][attribute(*)][allow_macros] _spawnlpe:(int mode, char const *__restrict file, char const *args, ... /*, (char *)NULL, (char **)environ*/) -> intptr_t = spawnlpe;
+_cwait(*) = cwait;
+[[argument_names(mode, path, ___argv)]]          _spawnv(int mode, char const *__restrict path, __TARGV) -> intptr_t = spawnv;
+[[argument_names(mode, file, ___argv)]]          _spawnvp(int mode, char const *__restrict file, __TARGV) -> intptr_t = spawnvp;
+[[argument_names(mode, path, ___argv, ___envp)]] _spawnve(int mode, char const *__restrict path, __TARGV, __TENVP) -> intptr_t = spawnve;
+[[argument_names(mode, file, ___argv, ___envp)]] _spawnvpe(int mode, char const *__restrict file, __TARGV, __TENVP) -> intptr_t = spawnvpe;
+[[allow_macros]] _spawnl(int mode, char const *__restrict path, char const *args, ... /*, (char *)NULL*/) -> intptr_t = spawnl;
+[[allow_macros]] _spawnlp(int mode, char const *__restrict file, char const *args, ... /*, (char *)NULL*/) -> intptr_t = spawnlp;
+[[allow_macros]] _spawnle(int mode, char const *__restrict path, char const *args, ... /*, (char *)NULL, (char **)environ*/) -> intptr_t = spawnle;
+[[allow_macros]] _spawnlpe(int mode, char const *__restrict file, char const *args, ... /*, (char *)NULL, (char **)environ*/) -> intptr_t = spawnlpe;
 
 %[default_impl_section(.text.crt.fs.exec.system)]
 %[insert:extern(system)]
@@ -165,12 +168,12 @@ typedef __intptr_t intptr_t;
 
 #ifndef __TWARGV
 #ifdef __USE_DOS
-#   define __TWARGV wchar_t const *const *__restrict ___argv
-#   define __TWENVP wchar_t const *const *__restrict ___envp
-#else
-#   define __TWARGV wchar_t *const ___argv[__restrict_arr]
-#   define __TWENVP wchar_t *const ___envp[__restrict_arr]
-#endif
+#define __TWARGV wchar_t const *const *__restrict ___argv
+#define __TWENVP wchar_t const *const *__restrict ___envp
+#else /* __USE_DOS */
+#define __TWARGV wchar_t *const ___argv[__restrict_arr]
+#define __TWENVP wchar_t *const ___envp[__restrict_arr]
+#endif /* !__USE_DOS */
 #endif /* !__TWARGV */
 
 }
@@ -179,30 +182,30 @@ typedef __intptr_t intptr_t;
 %#ifndef _WPROCESS_DEFINED
 %#define _WPROCESS_DEFINED 1
 %[default_impl_section({.text.crt.wchar.fs.exec.exec|.text.crt.dos.wchar.fs.exec.exec})]
-[alias(*)][attribute(*)] _wexecv:(*) = wexecv;
-[alias(*)][attribute(*)] _wexecvp:(*) = wexecvp;
-[alias(*)][attribute(*)] _wexecve:(*) = wexecve;
-[alias(*)][attribute(*)] _wexecvpe:(*) = wexecvpe;
-[alias(*)][attribute(*)] _wexecl:(*) = wexecl;
-[alias(*)][attribute(*)] _wexeclp:(*) = wexeclp;
-[alias(*)][attribute(*)] _wexecle:(*) = wexecle;
-[alias(*)][attribute(*)] _wexeclpe:(*) = wexeclpe;
+_wexecv(*) = wexecv;
+_wexecvp(*) = wexecvp;
+_wexecve(*) = wexecve;
+_wexecvpe(*) = wexecvpe;
+_wexecl(*) = wexecl;
+_wexeclp(*) = wexeclp;
+_wexecle(*) = wexecle;
+_wexeclpe(*) = wexeclpe;
 
 %[default_impl_section({.text.crt.wchar.fs.exec.spawn|.text.crt.dos.wchar.fs.exec.spawn})]
-[alias(*)][attribute(*)][argument_names(mode, path, ___argv)]          _wspawnv:(int mode, wchar_t const *__restrict path, @__TWARGV@) -> intptr_t = wspawnv;
-[alias(*)][attribute(*)][argument_names(mode, path, ___argv)]          _wspawnvp:(int mode, wchar_t const *__restrict path, @__TWARGV@) -> intptr_t = wspawnvp;
-[alias(*)][attribute(*)][argument_names(mode, path, ___argv, ___envp)] _wspawnve:(int mode, wchar_t const *__restrict path, @__TWARGV@, @__TWENVP@) -> intptr_t = wspawnve;
-[alias(*)][attribute(*)][argument_names(mode, path, ___argv, ___envp)] _wspawnvpe:(int mode, wchar_t const *__restrict path, @__TWARGV@, @__TWENVP@) -> intptr_t = wspawnvpe;
-[alias(*)][attribute(*)][allow_macros] _wspawnl:(int mode, wchar_t const *__restrict path, wchar_t const *args, ... /*, (wchar_t *)NULL*/) -> intptr_t = wspawnl;
-[alias(*)][attribute(*)][allow_macros] _wspawnlp:(int mode, wchar_t const *__restrict path, wchar_t const *args, ... /*, (wchar_t *)NULL*/) -> intptr_t = wspawnlp;
-[alias(*)][attribute(*)][allow_macros] _wspawnle:(int mode, wchar_t const *__restrict path, wchar_t const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) -> intptr_t = wspawnle;
-[alias(*)][attribute(*)][allow_macros] _wspawnlpe:(int mode, wchar_t const *__restrict path, wchar_t const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) -> intptr_t = wspawnlpe;
+[[argument_names(mode, path, ___argv)]]          _wspawnv:(int mode, wchar_t const *__restrict path, __TWARGV) -> intptr_t = wspawnv;
+[[argument_names(mode, path, ___argv)]]          _wspawnvp:(int mode, wchar_t const *__restrict path, __TWARGV) -> intptr_t = wspawnvp;
+[[argument_names(mode, path, ___argv, ___envp)]] _wspawnve:(int mode, wchar_t const *__restrict path, __TWARGV, __TWENVP) -> intptr_t = wspawnve;
+[[argument_names(mode, path, ___argv, ___envp)]] _wspawnvpe:(int mode, wchar_t const *__restrict path, __TWARGV, __TWENVP) -> intptr_t = wspawnvpe;
+[[allow_macros]] _wspawnl:(int mode, wchar_t const *__restrict path, wchar_t const *args, ... /*, (wchar_t *)NULL*/) -> intptr_t = wspawnl;
+[[allow_macros]] _wspawnlp:(int mode, wchar_t const *__restrict path, wchar_t const *args, ... /*, (wchar_t *)NULL*/) -> intptr_t = wspawnlp;
+[[allow_macros]] _wspawnle:(int mode, wchar_t const *__restrict path, wchar_t const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) -> intptr_t = wspawnle;
+[[allow_macros]] _wspawnlpe:(int mode, wchar_t const *__restrict path, wchar_t const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) -> intptr_t = wspawnlpe;
 %#endif /* !_WPROCESS_DEFINED */
 
 %
 %#ifndef _CRT_WSYSTEM_DEFINED
 %#define _CRT_WSYSTEM_DEFINED 1
-[guard][alias(*)][attribute(*)] _wsystem:(*) = wsystem;
+[guard] _wsystem(*) = wsystem;
 %#endif /* !_CRT_WSYSTEM_DEFINED */
 
 
@@ -225,39 +228,39 @@ typedef __intptr_t intptr_t;
 %[insert:extern(execle)]
 %[insert:extern(execlpe)]
 
-%[default_impl_section(.text.crt.dos.fs.exec.spawn)]
-[cp][alias(_cwait)] cwait:(int *tstat, $pid_t pid, int action) -> $pid_t;
+%[default_impl_section(".text.crt.dos.fs.exec.spawn")]
+[[cp]][alias(_cwait)] cwait:(int *tstat, $pid_t pid, int action) -> $pid_t;
 
 %[default_impl_section(.text.crt.fs.exec.spawn)]
-[cp][guard][argument_names(mode, path, ___argv)][alias(_spawnv)]
-spawnv:(int mode, [[nonnull]] char const *__restrict path, [[nonnull]] @__TARGV@) -> $pid_t;
-[cp][guard][argument_names(mode, file, ___argv)][alias(_spawnvp)]
-spawnvp:(int mode, [[nonnull]] char const *__restrict file, [[nonnull]] @__TARGV@) -> $pid_t;
-[cp][guard][argument_names(mode, path, ___argv, ___envp)][alias(_spawnve)]
-spawnve:(int mode, [[nonnull]] char const *__restrict path, [[nonnull]] @__TARGV@, [[nonnull]] @__TENVP@) -> $pid_t;
-[cp][guard][argument_names(mode, file, ___argv, ___envp)][alias(_spawnvpe)]
-spawnvpe:(int mode, [[nonnull]] char const *__restrict file, [[nonnull]] @__TARGV@, [[nonnull]] @__TENVP@) -> $pid_t;
+[[cp, guard, argument_names(mode, path, ___argv), export_alias("_spawnv")]]
+$pid_t spawnv(int mode, [[nonnull]] char const *__restrict path, [[nonnull]] __TARGV);
+[[cp, guard, argument_names(mode, file, ___argv), export_alias("_spawnvp")]]
+$pid_t spawnvp(int mode, [[nonnull]] char const *__restrict file, [[nonnull]] __TARGV);
+[[cp, guard, argument_names(mode, path, ___argv, ___envp), export_alias("_spawnve")]]
+$pid_t spawnve(int mode, [[nonnull]] char const *__restrict path, [[nonnull]] __TARGV, [[nonnull]] __TENVP);
+[[cp, guard, argument_names(mode, file, ___argv, ___envp), export_alias("_spawnvpe")]]
+$pid_t spawnvpe(int mode, [[nonnull]] char const *__restrict file, [[nonnull]] __TARGV, [[nonnull]] __TENVP);
 
-[cp][guard][dependency_include("<parts/redirect-exec.h>")]
-[requires_dependent_function(spawnv)][ATTR_SENTINEL][alias(_spawnl)][allow_macros]
+[[cp, guard, allow_macros, ATTR_SENTINEL, impl_include("<parts/redirect-exec.h>")]]
+[[userimpl, requires_dependent_function("spawnv"), export_alias("_spawnl")]]
 spawnl:(int mode, [[nonnull]] char const *__restrict path, char const *args, ... /*, (char *)NULL*/) -> $pid_t {
 	__REDIRECT_SPAWNL(char, spawnv, mode, path, args)
 }
 
-[cp][guard][dependency_include("<parts/redirect-exec.h>")]
-[requires_dependent_function(spawnvp)][ATTR_SENTINEL][alias(_spawnlp)][allow_macros]
+[[cp, guard, allow_macros, ATTR_SENTINEL, impl_include("<parts/redirect-exec.h>")]]
+[[userimpl, requires_dependent_function("spawnvp"), export_alias("_spawnlp")]]
 spawnlp:(int mode, [[nonnull]] char const *__restrict file, char const *args, ... /*, (char *)NULL*/) -> $pid_t {
 	__REDIRECT_SPAWNLP(char, spawnvp, mode, file, args)
 }
 
-[cp][guard][dependency_include("<parts/redirect-exec.h>")]
-[requires_dependent_function(spawnve)][ATTR_SENTINEL_O(1)][alias(_spawnle)][allow_macros]
+[[cp, guard, allow_macros, ATTR_SENTINEL_O(1), impl_include("<parts/redirect-exec.h>")]]
+[[userimpl, requires_dependent_function("spawnve"), export_alias("_spawnle")]]
 spawnle:(int mode, [[nonnull]] char const *__restrict path, char const *args, ... /*, (char *)NULL, char **environ*/) -> $pid_t {
 	__REDIRECT_SPAWNLE(char, spawnve, mode, path, args)
 }
 
-[cp][guard][dependency_include("<parts/redirect-exec.h>")]
-[requires_dependent_function(spawnvpe)][ATTR_SENTINEL_O(1)][alias(_spawnlpe)][allow_macros]
+[[cp, guard, allow_macros, ATTR_SENTINEL_O(1), impl_include("<parts/redirect-exec.h>")]]
+[[userimpl, requires_dependent_function("spawnvpe"), export_alias("_spawnlpe")]]
 spawnlpe:(int mode, [[nonnull]] char const *__restrict file, char const *args, ... /*, (char *)NULL, char **environ*/) -> $pid_t {
 	__REDIRECT_SPAWNLPE(char, spawnvpe, mode, file, args)
 }

@@ -221,15 +221,15 @@ int lfutexexpr(void *base, $size_t exprc, [[nonnull]] struct lfutexexpr const *e
 	struct timespec32 tms32;
 	if (!timeout)
 		return lfutexexpr32(base, exprc, exprv, NULL, 0);
-	tms32.@tv_sec@  = (__time32_t)timeout->@tv_sec@;
-	tms32.@tv_nsec@ = timeout->@tv_nsec@;
+	tms32.tv_sec  = (__time32_t)timeout->tv_sec;
+	tms32.tv_nsec = timeout->tv_nsec;
 	return lfutexexpr32(base, exprc, exprv, &tms32, timeout_flags);
 @@else_has_function(lfutexexpr32)@@
 	struct timespec64 tms64;
 	if (!timeout)
 		return lfutexexpr64(base, exprc, exprv, NULL, 0);
-	tms64.@tv_sec@  = (__time64_t)timeout->@tv_sec@;
-	tms64.@tv_nsec@ = timeout->@tv_nsec@;
+	tms64.tv_sec  = (__time64_t)timeout->tv_sec;
+	tms64.tv_nsec = timeout->tv_nsec;
 	return lfutexexpr64(base, exprc, exprv, &tms64, timeout_flags);
 @@endif_has_function(lfutexexpr32)@@
 }
@@ -273,22 +273,22 @@ lfutexlockexpr:([[nonnull]] lfutex_t *ulockaddr, void *base,
 	struct timespec32 tms32;
 	if (!timeout)
 		return lfutexlockexpr32(ulockaddr, base, exprc, exprv, NULL, 0);
-	tms32.@tv_sec@  = (__time32_t)timeout->@tv_sec@;
-	tms32.@tv_nsec@ = timeout->@tv_nsec@;
+	tms32.tv_sec  = (__time32_t)timeout->tv_sec;
+	tms32.tv_nsec = timeout->tv_nsec;
 	return lfutexlockexpr32(ulockaddr, base, exprc, exprv, &tms32, timeout_flags);
 @@else_has_function(lfutexlockexpr32)@@
 	struct timespec64 tms64;
 	if (!timeout)
 		return lfutexlockexpr64(ulockaddr, base, exprc, exprv, NULL, 0);
-	tms64.@tv_sec@  = (__time64_t)timeout->@tv_sec@;
-	tms64.@tv_nsec@ = timeout->@tv_nsec@;
+	tms64.tv_sec  = (__time64_t)timeout->tv_sec;
+	tms64.tv_nsec = timeout->tv_nsec;
 	return lfutexlockexpr64(ulockaddr, base, exprc, exprv, &tms64, timeout_flags);
 @@endif_has_function(lfutexlockexpr32)@@
 }
 
 %
 %#ifdef __USE_TIME64
-[cp][time64_variant_of(lfutexexpr)]
+[[cp]][time64_variant_of(lfutexexpr)]
 [requires($has_function(lfutexexpr32))]
 [decl_include("<bits/timespec.h>")]
 [decl_include("<kos/bits/futex-expr.h>")]
@@ -297,12 +297,12 @@ lfutexexpr64:(void *base, $size_t exprc, [[nonnull]] struct lfutexexpr const *ex
 	struct timespec32 tms32;
 	if (!timeout)
 		return lfutexexpr32(base, exprc, exprv, NULL, 0);
-	tms32.@tv_sec@  = (__time32_t)timeout->@tv_sec@;
-	tms32.@tv_nsec@ = timeout->@tv_nsec@;
+	tms32.tv_sec  = (__time32_t)timeout->tv_sec;
+	tms32.tv_nsec = timeout->tv_nsec;
 	return lfutexexpr32(base, exprc, exprv, &tms32, timeout_flags);
 }
 
-[cp][time64_variant_of(lfutexlockexpr)]
+[[cp]][time64_variant_of(lfutexlockexpr)]
 [requires($has_function(lfutexlockexpr32))]
 [section(.text.crt.sched.futexlockexpr)]
 [decl_include("<bits/types.h>")]
@@ -314,8 +314,8 @@ lfutexlockexpr64:([[nonnull]] lfutex_t *ulockaddr, void *base,
 	struct timespec32 tms32;
 	if (!timeout)
 		return lfutexlockexpr32(ulockaddr, base, exprc, exprv, NULL, 0);
-	tms32.@tv_sec@  = (__time32_t)timeout->@tv_sec@;
-	tms32.@tv_nsec@ = timeout->@tv_nsec@;
+	tms32.tv_sec  = (__time32_t)timeout->tv_sec;
+	tms32.tv_nsec = timeout->tv_nsec;
 	return lfutexlockexpr32(ulockaddr, base, exprc, exprv, &tms32, timeout_flags);
 }
 %#endif /* __USE_TIME64 */

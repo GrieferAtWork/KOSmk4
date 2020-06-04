@@ -182,11 +182,11 @@ epoll_ctl:($fd_t epfd, enum __epoll_ctl op, $fd_t fd, struct epoll_event *event)
 @@events. The "maxevents" is the maximum number of events to be
 @@returned (usually size of "events"). The "timeout" parameter
 @@specifies the maximum wait time in milliseconds (-1 == infinite).
-[cp] epoll_wait:($fd_t epfd, struct epoll_event *events, int maxevents, int timeout) -> int;
+[[cp]] epoll_wait:($fd_t epfd, struct epoll_event *events, int maxevents, int timeout) -> int;
 
 @@Same as epoll_wait, but the thread's signal mask is temporarily
 @@and atomically replaced with the one provided as parameter
-[cp] epoll_pwait:($fd_t epfd, struct epoll_event *events, int maxevents, int timeout, sigset_t const *ss) -> int;
+[[cp]] epoll_pwait:($fd_t epfd, struct epoll_event *events, int maxevents, int timeout, sigset_t const *ss) -> int;
 
 
 

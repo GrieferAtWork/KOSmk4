@@ -381,7 +381,7 @@ crt_ftello64:([[nonnull]] $FILE *__restrict stream) -> $off64_t = ftello?;
 %[default_impl_section(.text.crt.fs.modify)]
 
 @@Remove a file or directory `FILENAME'
-[cp][std][std_guard][same_impl]
+[[cp]][std][std_guard][same_impl]
 [requires(defined(__CRT_AT_FDCWD) && $has_function(removeat))]
 remove:([[nonnull]] char const *filename) -> int {
 	return removeat(__CRT_AT_FDCWD, filename);
@@ -389,7 +389,7 @@ remove:([[nonnull]] char const *filename) -> int {
 
 @@Rename a given file `OLDNAME' to `NEWNAME_OR_PATH', or in the event
 @@that `NEWNAME_OR_PATH' refers to a directory, place the file within.
-[cp][std][std_guard][same_impl]
+[[cp]][std][std_guard][same_impl]
 [requires(defined(__CRT_AT_FDCWD) && $has_function(renameat))]
 rename:([[nonnull]] char const *oldname, [[nonnull]] char const *newname_or_path) -> int {
 	return renameat(__CRT_AT_FDCWD, oldname, __CRT_AT_FDCWD, newname_or_path);
@@ -725,22 +725,22 @@ ferror:([[nonnull]] FILE __KOS_FIXED_CONST *__restrict stream) -> int;
 @@>>     fprintf(stderr, "%s\n", strerror(errno));
 @@>> }
 %[default_impl_section(.text.crt.errno.utility)]
-[cp][std][std_guard] perror:([[nullable]] char const *message);
+[[cp]][std][std_guard] perror:([[nullable]] char const *message);
 
 %[default_impl_section(.text.crt.FILE.locked.access)]
 @@Create and return a new file-stream for accessing a temporary file for reading/writing
-[cp][if(defined(__USE_FILE_OFFSET64)), preferred_alias(tmpfile64)]
+[[cp]][if(defined(__USE_FILE_OFFSET64)), preferred_alias(tmpfile64)]
 [alias(tmpfile64)][std][ATTR_WUNUSED]
 tmpfile:() -> FILE *;
 
 @@Create and return a new file-stream for accessing `FILENAME'
-[cp][std][ATTR_WUNUSED][export_alias(_IO_fopen)][alias(fopen64)]
+[[cp]][std][ATTR_WUNUSED][export_alias(_IO_fopen)][alias(fopen64)]
 [if(defined(__USE_FILE_OFFSET64)), preferred_alias(fopen64)]
 fopen:([[nonnull]] char const *__restrict filename,
        [[nonnull]] char const *__restrict modes) -> FILE *;
 
 @@Re-open the given `STREAM' as a file-stream for accessing `FILENAME'
-[cp][std]
+[[cp]][std]
 [if(defined(__USE_STDIO_UNLOCKED) && defined(__USE_FILE_OFFSET64)), preferred_alias(freopen64_unlocked)]
 [if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(freopen_unlocked)]
 [if(defined(__USE_FILE_OFFSET64)), preferred_alias(freopen64)]
@@ -1051,7 +1051,7 @@ snprintf:([outp_opt(min(return, buflen))] char *__restrict buf, size_t buflen,
 %
 %#ifdef __USE_XOPEN2K8
 [section(.text.crt.io.write)]
-[cp][same_impl][requires($has_function(write))][dependency(write)][impl_prefix(
+[[cp]][same_impl][requires($has_function(write))][dependency(write)][impl_prefix(
 __LOCAL_LIBC(@vdprintf_printer@) __ssize_t (__LIBCCALL __vdprintf_printer)(void *__arg, char const *__restrict __data, __size_t __datalen) {
 	return (__ssize_t)write((int)(unsigned int)(__UINTPTR_TYPE__)__arg, __data, __datalen);
 }
@@ -1063,7 +1063,7 @@ vdprintf:($fd_t fd, [[nonnull]] char const *__restrict format, $va_list args) ->
 	                      args);
 }
 
-[cp][ATTR_LIBC_PRINTF(2, 3)]
+[[cp]][ATTR_LIBC_PRINTF(2, 3)]
 [section(.text.crt.io.write)]
 dprintf:($fd_t fd, [[nonnull]] char const *__restrict format, ...) -> __STDC_INT_AS_SSIZE_T
 %{
@@ -1073,7 +1073,7 @@ dprintf:($fd_t fd, [[nonnull]] char const *__restrict format, ...) -> __STDC_INT
 
 %
 %#ifdef __USE_ATFILE
-[cp][same_impl][requires($has_function(frenameat))]
+[[cp]][same_impl][requires($has_function(frenameat))]
 [section(.text.crt.fs.modify)]
 renameat:($fd_t oldfd, [[nonnull]] char const *oldname,
           $fd_t newfd, [[nonnull]] char const *newname_or_path) -> int {
@@ -1084,11 +1084,11 @@ renameat:($fd_t oldfd, [[nonnull]] char const *oldname,
 %#ifdef __USE_KOS
 @@Remove a file or directory `FILENAME' relative to a given base directory `DIRFD'
 [section(.text.crt.fs.modify)]
-[cp] removeat:($fd_t dirfd, [[nonnull]] char const *filename) -> int;
+[[cp]] removeat:($fd_t dirfd, [[nonnull]] char const *filename) -> int;
 
 @@@param flags: Set of `0|AT_DOSPATH'
 [section(.text.crt.fs.modify)]
-[cp] frenameat:($fd_t oldfd, [[nonnull]] char const *oldname,
+[[cp]] frenameat:($fd_t oldfd, [[nonnull]] char const *oldname,
                 $fd_t newfd, [[nonnull]] char const *newname_or_path, $atflag_t flags) -> int;
 
 %#endif /* __USE_KOS */
@@ -1357,7 +1357,7 @@ putchar_unlocked:(int ch) -> int {
 
 %[default_impl_section(.text.crt.FILE.locked.utility)]
 @@Acquire a lock to `STREAM' and block until doing so succeeds
-[cp][alias(_lock_file)][export_alias(_IO_flockfile)]
+[[cp]][alias(_lock_file)][export_alias(_IO_flockfile)]
 flockfile:([[nonnull]] $FILE *__restrict stream);
 
 @@Release a previously acquired lock from `STREAM'
@@ -1390,7 +1390,7 @@ ftrylockfile:([[nonnull]] $FILE *__restrict stream) -> int;
 %#ifdef __USE_POSIX2
 %[default_impl_section(.text.crt.FILE.locked.access)]
 @@Open and return a new process I/O stream for executing `COMMAND'
-[cp][alias(_popen)][ATTR_WUNUSED][export_alias(_IO_popen)]
+[[cp]][alias(_popen)][ATTR_WUNUSED][export_alias(_IO_popen)]
 popen:([[nonnull]] char const *command, [[nonnull]] char const *modes) -> $FILE *;
 
 @@Close a process I/O file `STREAM'
@@ -1601,7 +1601,7 @@ ftello:([[nonnull]] $FILE *__restrict stream) -> $off_t {
 %#ifdef __USE_LARGEFILE64
 %[default_impl_section(.text.crt.FILE.locked.access)]
 @@64-bit variant of `tmpfile'
-[cp][alias(tmpfile)][ATTR_WUNUSED]
+[[cp]][alias(tmpfile)][ATTR_WUNUSED]
 [largefile64_variant_of(tmpfile)] tmpfile64:() -> $FILE *;
 
 %[default_impl_section(.text.crt.FILE.locked.seek.seek)]
@@ -1645,12 +1645,12 @@ ftello64:([[nonnull]] $FILE *__restrict stream) -> $off64_t {
 %[default_impl_section(.text.crt.FILE.locked.access)]
 
 @@64-bit variant of `fopen'
-[cp][alias(fopen)][ATTR_WUNUSED][user][largefile64_variant_of(fopen)]
+[[cp]][alias(fopen)][ATTR_WUNUSED][user][largefile64_variant_of(fopen)]
 fopen64:([[nonnull]] char const *__restrict filename,
          [[nonnull]] char const *__restrict modes) -> $FILE * = fopen;
 
 @@64-bit variant of `freopen'
-[cp][user][largefile64_variant_of(freopen)]
+[[cp]][user][largefile64_variant_of(freopen)]
 [if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(freopen64_unlocked)]
 [alias(freopen, freopen_unlocked, freopen64_unlocked)]
 freopen64:([[nonnull]] char const *__restrict filename,
@@ -1731,7 +1731,7 @@ file_printer_unlocked:([[nonnull]] void *arg, [inp(datalen)] char const *__restr
 %#ifdef __USE_GNU
 %[default_impl_section(.text.crt.heap.strdup)]
 @@Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR'
-[ATTR_LIBC_PRINTF(2, 3)][ATTR_WUNUSED][same_impl][dependency_include(<hybrid/__assert.h>)]
+[ATTR_LIBC_PRINTF(2, 3)][ATTR_WUNUSED][same_impl][impl_include("<hybrid/__assert.h>")]
 [requires($has_function(format_aprintf_pack) && $has_function(format_aprintf_printer) && $has_function(free))]
 [dependency_prefix(
 #ifndef __format_aprintf_data_defined
@@ -1786,23 +1786,23 @@ __asprintf:([[nonnull]] char **__restrict pstr, [[nonnull]] char const *__restri
 [if(defined(__USE_STDIO_UNLOCKED) && defined(__USE_FILE_OFFSET64)), preferred_alias(fdreopen64_unlocked)]
 [if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(fdreopen_unlocked)]
 [if(defined(__USE_FILE_OFFSET64)), preferred_alias(fdreopen64)]
-[cp][alias(fdreopen64, fdreopen_unlocked, fdreopen64_unlocked)]
+[[cp]][alias(fdreopen64, fdreopen_unlocked, fdreopen64_unlocked)]
 fdreopen:($fd_t fd, [[nonnull]] char const *__restrict modes,
           [[nonnull]] $FILE *__restrict stream) -> $FILE *;
 
 
 %[default_impl_section(.text.crt.FILE.unlocked.access)]
-[cp][user][alias(fdreopen)][doc_alias(fdreopen)]
+[[cp]][user][alias(fdreopen)][doc_alias(fdreopen)]
 fdreopen_unlocked:($fd_t fd, [[nonnull]] char const *__restrict modes,
                    [[nonnull]] $FILE *__restrict stream) -> $FILE * = fdreopen;
 
-[cp][user][if(defined(__USE_FILE_OFFSET64)), preferred_alias(freopen64_unlocked)]
+[[cp]][user][if(defined(__USE_FILE_OFFSET64)), preferred_alias(freopen64_unlocked)]
 [alias(freopen64_unlocked, freopen, freopen64)][doc_alias(freopen)]
 freopen_unlocked:([[nonnull]] char const *__restrict filename,
                   [[nonnull]] char const *__restrict modes,
                   [[nonnull]] $FILE *__restrict stream) -> $FILE * = freopen;
 
-[cp][user][alias(freopen64, freopen_unlocked, freopen)][doc_alias(freopen)]
+[[cp]][user][alias(freopen64, freopen_unlocked, freopen)][doc_alias(freopen)]
 freopen64_unlocked:([[nonnull]] char const *__restrict filename,
                     [[nonnull]] char const *__restrict modes,
                     [[nonnull]] $FILE *__restrict stream) -> $FILE * = freopen64;
@@ -2194,7 +2194,7 @@ __NAMESPACE_STD_USING(FILE)
 [attribute(*)][alias(*)] _pclose:(*) = pclose;
 
 [section(.text.crt.dos.FILE.locked.access)]
-[cp][ATTR_WUNUSED][requires($has_function(fopen))]
+[[cp]][ATTR_WUNUSED][requires($has_function(fopen))]
 _fsopen:([[nonnull]] char const *filename, [[nonnull]] char const *modes, int sflag) -> $FILE * {
 	(void)sflag;
 	return fopen(filename, modes);
@@ -2221,7 +2221,7 @@ _fsopen:([[nonnull]] char const *filename, [[nonnull]] char const *modes, int sf
 
 %[default_impl_section(.text.crt.dos.FILE.utility)]
 %
-[cp] _rmtmp:() -> int;
+[[cp]] _rmtmp:() -> int;
 
 %
 [section(.text.crt.dos.FILE.locked.read.read)]
@@ -2632,12 +2632,12 @@ _fprintf_p_l:([[nonnull]] $FILE *__restrict stream,
 
 %
 %#ifdef __USE_DOS_SLIB
-[cp][section(.text.crt.dos.FILE.locked.access)]
+[[cp]][section(.text.crt.dos.FILE.locked.access)]
 fopen_s:([[nonnull]] $FILE **pstream,
          [[nonnull]] char const *filename,
          [[nonnull]] char const *modes) -> errno_t;
 
-[cp][section(.text.crt.dos.FILE.locked.access)]
+[[cp]][section(.text.crt.dos.FILE.locked.access)]
 freopen_s:([[nonnull]] $FILE **pstream,
            [[nonnull]] char const *filename,
            [[nonnull]] char const *modes,
@@ -2657,7 +2657,7 @@ clearerr_s:([[nonnull]] $FILE *__restrict stream) -> errno_t {
 	return 0;
 }
 
-[cp][impl_include("<parts/errno.h>")]
+[[cp]][impl_include("<parts/errno.h>")]
 [same_impl][requires($has_function(tmpfile))]
 [section(.text.crt.dos.FILE.locked.access)]
 tmpfile_s:([[nonnull]] $FILE **pstream) -> errno_t {
@@ -2679,7 +2679,7 @@ tmpfile_s:([[nonnull]] $FILE **pstream) -> errno_t {
 	return 0;
 }
 
-[cp][ATTR_WUNUSED]
+[[cp]][ATTR_WUNUSED]
 [same_impl][requires($has_function(fread))]
 [impl_include("<parts/errno.h>")]
 [section(.text.crt.dos.FILE.locked.read.read)]
@@ -2690,7 +2690,7 @@ fread_s:([outp(min(return*elemsize,elemcount*elemsize,bufsize))] void *__restric
 }
 
 %[default_impl_section(.text.crt.dos.FILE.locked.read.read)]
-[cp][ATTR_WUNUSED]
+[[cp]][ATTR_WUNUSED]
 [requires_include(<__crt.h>)]
 [same_impl][requires(!defined(__NO_STDSTREAMS) && $has_function(fgets))]
 [dependency_include(<local/stdstreams.h>)]
@@ -2744,7 +2744,7 @@ _wperror:($wchar_t const *__restrict message);
 [nocrt][attribute(*)][alias(*)] _putchar_nolock:(*) = putchar_unlocked;
 
 %[default_impl_section(.text.crt.dos.FILE.locked.utility)]
-[cp] _lock_file:([[nonnull]] $FILE *__restrict stream) = flockfile;
+[[cp]] _lock_file:([[nonnull]] $FILE *__restrict stream) = flockfile;
 _unlock_file:([[nonnull]] $FILE *__restrict stream) = funlockfile;
 
 [attribute(*)][alias(*)] _fclose_nolock:($FILE *__restrict stream) -> int = fclose;

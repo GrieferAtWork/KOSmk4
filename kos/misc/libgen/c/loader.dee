@@ -811,7 +811,7 @@ class FunctionFeatures {
 	public member crt_kernel: bool = false;                          /* [[no_]kernel]          Also export in kernel-space */
 	public member crt_kosSection: UserString | string | none = none; /* [kos_section(...)]     Section name for the KOS implementation */
 	public member crt_dosSection: UserString | string | none = none; /* [dos_section(...)]     Section name for the DOS implementation (if @wchar) */
-	public member crt_dosname: UserString | string | none = none;    /* [[default_]dosname(...)]         Same as @crt_name, but only for the DOS variant */
+	public member crt_dosname: UserString | string | none = none;    /* [[default_]crt_dosname(...)] Same as @crt_name, but only for the DOS variant */
 
 	@@Enable a given namespace binding (via `using`)
 	public function addNamespaceUsingBinding(name: string) {
@@ -1124,7 +1124,7 @@ class FunctionFeatures {
 				goto err_unexpected_if;
 			self.next();
 			self.skip("(");
-			decl = parseCStringOrAllUntilRParen(self);
+			decl = parseCStringOrKeyword(self);
 			self.skip(")");
 		}	break;
 
@@ -1139,7 +1139,7 @@ class FunctionFeatures {
 				guardNames = Dict(guardNames);
 				setNamespaceGuardName(
 					"" /* GLOBAL_NAMESPACE.name */,
-					parseCStringOrAllUntilRParen(self));
+					parseCStringOrKeyword(self));
 				self.skip(")");
 			}
 			break;
@@ -1151,7 +1151,7 @@ class FunctionFeatures {
 				goto err_unexpected_if;
 			self.next();
 			self.skip("(");
-			exposedName = parseCStringOrAllUntilRParen(self);
+			exposedName = parseCStringOrKeyword(self);
 			self.skip(")");
 			break;
 
@@ -1160,7 +1160,16 @@ class FunctionFeatures {
 				goto err_unexpected_if;
 			self.next();
 			self.skip("(");
-			crt_name = parseCStringOrAllUntilRParen(self);
+			crt_name = parseCStringOrKeyword(self);
+			self.skip(")");
+			break;
+
+		case "crt_dosname":
+			if (ppCond !is none)
+				goto err_unexpected_if;
+			self.next();
+			self.skip("(");
+			crt_dosname = parseCStringOrKeyword(self);
 			self.skip(")");
 			break;
 
@@ -1979,6 +1988,45 @@ again_parse_default_annotation:
 		if (!ok && oldRepl != b) {
 			self.err("str2wcs replacement re-definition: {!r} defined as {!r} (was: {!r})"
 				.format({ a, b, oldRepl }));
+		}
+		self.skip(")");
+	}
+
+	public function parseDirective_define_double_replacement() {
+		local tok = self.tok;
+		self.next();
+		self.skip("(");
+		local orig = parseCStringOrKeyword(self);
+		self.skip("=");
+		local flt = parseCStringOrKeyword(self);
+		self.skip(",");
+		local ldbl = parseCStringOrKeyword(self);
+		local newRepl = (flt, ldbl);
+		local ok, oldRepl = mathReplacementEscapes.setnew_ex(orig, newRepl)...;
+		if (!ok && oldRepl != newRepl) {
+			self.err("%[define_double_replacement]: "
+			         "Re-definition of {!r} as {!r} (was: {!r})"
+				.format({ orig, flt, ldbl, oldRepl[0], oldRepl[1] }));
+		}
+		self.skip(")");
+	}
+
+	public function parseDirective_define_double2ldouble_replacement() {
+		return parseDirective_define_double2float_replacement(MATH_REPLACEMENT_MODE_LDBL);
+	}
+	public function parseDirective_define_double2float_replacement(mode: int = none) {
+		local tok = self.tok;
+		self.next();
+		self.skip("(");
+		local origStart = self.tokStart;
+		local orig = parseCStringOrKeyword(self);
+		self.skip("=");
+		local repl = parseCStringOrKeyword(self);
+		try {
+			math_defineReplacement(orig, repl,
+				mode is none ? MATH_REPLACEMENT_MODE_FLOAT : mode);
+		} catch (Error as e) {
+			self.errAt(origStart, e.message);
 		}
 		self.skip(")");
 	}

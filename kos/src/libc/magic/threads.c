@@ -182,29 +182,29 @@ thrd_current:() -> thrd_t = pthread_self;
 [requires($has_function(thrd_sleep32) || $has_function(crt_thrd_sleep64) || $has_function(nanosleep))]
 [dependency_include(<asm/threads.h>)]
 [impl_include("<parts/errno.h>")]
-[decl_include("<bits/timespec.h>")][cp]
+[decl_include("<bits/timespec.h>")][[cp]]
 thrd_sleep:([[nonnull]] struct timespec const *time_point,
             [[nullable]] struct timespec *remaining) -> int {
 @@if_has_function(thrd_sleep32)@@
 	int result;
 	struct timespec32 tp32, rem32;
-	tp32.@tv_sec@  = (time32_t)time_point->@tv_sec@;
-	tp32.@tv_nsec@ = time_point->@tv_nsec@;
+	tp32.tv_sec  = (time32_t)time_point->tv_sec;
+	tp32.tv_nsec = time_point->tv_nsec;
 	result = thrd_sleep32(&tp32, remaining ? &rem32 : NULL);
 	if (result == -1 && remaining) {
-		remaining->@tv_sec@ = (time64_t)rem32.@tv_sec@;
-		remaining->@tv_nsec@ = rem32.@tv_nsec@;
+		remaining->tv_sec = (time64_t)rem32.tv_sec;
+		remaining->tv_nsec = rem32.tv_nsec;
 	}
 	return result;
 @@elif_has_function(crt_thrd_sleep64)@@
 	int result;
 	struct timespec64 tp64, rem64;
-	tp64.@tv_sec@  = (time64_t)time_point->@tv_sec@;
-	tp64.@tv_nsec@ = time_point->@tv_nsec@;
+	tp64.tv_sec  = (time64_t)time_point->tv_sec;
+	tp64.tv_nsec = time_point->tv_nsec;
 	result = crt_thrd_sleep64(&tp64, remaining ? &rem64 : NULL);
 	if (result == -1 && remaining) {
-		remaining->@tv_sec@ = (time32_t)rem64.@tv_sec@;
-		remaining->@tv_nsec@ = rem64.@tv_nsec@;
+		remaining->tv_sec = (time32_t)rem64.tv_sec;
+		remaining->tv_nsec = rem64.tv_nsec;
 	}
 	return result;
 @@else_has_function(crt_thrd_sleep64)@@
@@ -222,17 +222,17 @@ thrd_sleep:([[nonnull]] struct timespec const *time_point,
 
 %#ifdef __USE_TIME64
 [ignore][doc_alias(thrd_sleep)]
-[decl_include("<bits/timespec.h>")][cp]
+[decl_include("<bits/timespec.h>")][[cp]]
 thrd_sleep32:([[nonnull]] struct $timespec32 const *time_point,
               [[nullable]] struct $timespec32 *remaining) -> int = thrd_sleep?;
 [ignore][doc_alias(thrd_sleep)]
-[decl_include("<bits/timespec.h>")][cp]
+[decl_include("<bits/timespec.h>")][[cp]]
 crt_thrd_sleep64:([[nonnull]] struct timespec64 const *time_point,
                   [[nullable]] struct timespec64 *remaining) -> int = thrd_sleep64?;
 
 [doc_alias(thrd_sleep)]
 [requires($has_function(thrd_sleep32) || $has_function(nanosleep64))]
-[decl_include("<bits/timespec.h>")][cp][time64_variant_of(thrd_sleep)]
+[decl_include("<bits/timespec.h>")][[cp]][time64_variant_of(thrd_sleep)]
 thrd_sleep64:([[nonnull]] struct timespec64 const *time_point,
               [[nullable]] struct timespec64 *remaining) -> int {
 @@if_has_function(nanosleep64)@@
@@ -249,12 +249,12 @@ thrd_sleep64:([[nonnull]] struct timespec64 const *time_point,
 	int result;
 	struct timespec32 tp32;
 	struct timespec32 rem32;
-	tp32.@tv_sec@  = (time32_t)time_point->@tv_sec@;
-	tp32.@tv_nsec@ = time_point->@tv_nsec@;
+	tp32.tv_sec  = (time32_t)time_point->tv_sec;
+	tp32.tv_nsec = time_point->tv_nsec;
 	result = thrd_sleep32(&tp32, remaining ? &rem32 : NULL);
 	if (result == -1 && remaining) {
-		remaining->@tv_sec@ = (time64_t)rem32.@tv_sec@;
-		remaining->@tv_nsec@ = rem32.@tv_nsec@;
+		remaining->tv_sec = (time64_t)rem32.tv_sec;
+		remaining->tv_nsec = rem32.tv_nsec;
 	}
 	return result;
 @@endif_has_function(nanosleep64)@@
@@ -288,7 +288,7 @@ thrd_detach:(thrd_t thr) -> int {
 @@s.a. `pthread_join()'
 [dependency_include(<asm/threads.h>)]
 [decl_include(<hybrid/typecore.h>)]
-[decl_include(<bits/threads.h>)][cp]
+[decl_include(<bits/threads.h>)][[cp]]
 [same_impl][requires($has_function(pthread_join))]
 thrd_join:(thrd_t thr, int *res) -> int {
 	int error;
@@ -327,7 +327,7 @@ thrd_join:(thrd_t thr, int *res) -> int {
 [dependency_include(<asm/threads.h>)]
 [decl_include(<bits/threads.h>)]
 [decl_include(<bits/pthreadvalues.h>)]
-[decl_include(<bits/pthreadtypes.h>)]
+[decl_include("<bits/pthreadtypes.h>")]
 [same_impl][requires($has_function(pthread_mutex_init))]
 mtx_init:([[nonnull]] mtx_t *__restrict mutex, int type) -> int {
 	int error;
@@ -354,8 +354,8 @@ mtx_init:([[nonnull]] mtx_t *__restrict mutex, int type) -> int {
 @@unlocked.  In that case current thread will not be blocked
 @@s.a. `pthread_mutex_lock()'
 [dependency_include(<asm/threads.h>)]
-[decl_include(<bits/threads.h>)][cp]
-[decl_include(<bits/pthreadtypes.h>)]
+[decl_include(<bits/threads.h>)][[cp]]
+[decl_include("<bits/pthreadtypes.h>")]
 [same_impl][requires($has_function(pthread_mutex_lock))]
 mtx_lock:([[nonnull]] mtx_t *__restrict mutex) -> int {
 	int error;
@@ -373,8 +373,8 @@ mtx_lock:([[nonnull]] mtx_t *__restrict mutex) -> int {
 [if(defined(__USE_TIME_BITS64)), preferred_alias(mtx_timedlock64)]
 [if(!defined(__USE_TIME_BITS64)), preferred_alias(mtx_timedlock)]
 [dependency_include(<asm/threads.h>)]
-[decl_include(<bits/threads.h>)][cp]
-[decl_include(<bits/pthreadtypes.h>)]
+[decl_include(<bits/threads.h>)][[cp]]
+[decl_include("<bits/pthreadtypes.h>")]
 [same_impl][requires($has_function(pthread_mutex_timedlock))]
 mtx_timedlock:([[nonnull]] mtx_t *__restrict mutex,
                [[nonnull]] struct timespec const *__restrict time_point) -> int {
@@ -388,8 +388,8 @@ mtx_timedlock:([[nonnull]] mtx_t *__restrict mutex,
 %#ifdef __USE_TIME64
 [time64_variant_of(mtx_timedlock)]
 [dependency_include(<asm/threads.h>)]
-[decl_include(<bits/threads.h>)][cp]
-[decl_include(<bits/pthreadtypes.h>)]
+[decl_include(<bits/threads.h>)][[cp]]
+[decl_include("<bits/pthreadtypes.h>")]
 [same_impl][requires($has_function(pthread_mutex_timedlock64))]
 mtx_timedlock64:([[nonnull]] mtx_t *__restrict mutex,
                  [[nonnull]] struct timespec64 const *__restrict time_point) -> int {
@@ -408,7 +408,7 @@ mtx_timedlock64:([[nonnull]] mtx_t *__restrict mutex,
 @@s.a. `pthread_mutex_trylock()'
 [dependency_include(<asm/threads.h>)]
 [decl_include(<bits/threads.h>)]
-[decl_include(<bits/pthreadtypes.h>)]
+[decl_include("<bits/pthreadtypes.h>")]
 [same_impl][requires($has_function(pthread_mutex_trylock))]
 mtx_trylock:([[nonnull]] mtx_t *__restrict mutex) -> int {
 	int error;
@@ -423,7 +423,7 @@ mtx_trylock:([[nonnull]] mtx_t *__restrict mutex) -> int {
 @@s.a. `pthread_mutex_unlock()'
 [dependency_include(<asm/threads.h>)]
 [decl_include(<bits/threads.h>)]
-[decl_include(<bits/pthreadtypes.h>)]
+[decl_include("<bits/pthreadtypes.h>")]
 [same_impl][requires($has_function(pthread_mutex_unlock))]
 mtx_unlock:([[nonnull]] mtx_t *__restrict mutex) -> int {
 	int error;
@@ -456,7 +456,7 @@ call_once:([[nonnull]] once_flag *__restrict flag,
 @@s.a. `pthread_cond_init()'
 [dependency_include(<asm/threads.h>)]
 [decl_include(<bits/threads.h>)]
-[decl_include(<bits/pthreadtypes.h>)]
+[decl_include("<bits/pthreadtypes.h>")]
 [same_impl][requires($has_function(pthread_cond_init))]
 cnd_init:([[nonnull]] cnd_t *__restrict cond) -> int {
 	int error;
@@ -470,7 +470,7 @@ cnd_init:([[nonnull]] cnd_t *__restrict cond) -> int {
 @@s.a. `pthread_cond_signal()'
 [dependency_include(<asm/threads.h>)]
 [decl_include(<bits/threads.h>)]
-[decl_include(<bits/pthreadtypes.h>)]
+[decl_include("<bits/pthreadtypes.h>")]
 [same_impl][requires($has_function(pthread_cond_signal))]
 cnd_signal:([[nonnull]] cnd_t *__restrict cond) -> int {
 	int error;
@@ -484,7 +484,7 @@ cnd_signal:([[nonnull]] cnd_t *__restrict cond) -> int {
 @@s.a. `pthread_cond_broadcast()'
 [dependency_include(<asm/threads.h>)]
 [decl_include(<bits/threads.h>)]
-[decl_include(<bits/pthreadtypes.h>)]
+[decl_include("<bits/pthreadtypes.h>")]
 [same_impl][requires($has_function(pthread_cond_broadcast))]
 cnd_broadcast:([[nonnull]] cnd_t *__restrict cond) -> int {
 	int error;
@@ -498,8 +498,8 @@ cnd_broadcast:([[nonnull]] cnd_t *__restrict cond) -> int {
 @@s.a. `pthread_cond_wait()'
 [dependency_include(<asm/threads.h>)]
 [decl_include(<bits/threads.h>)]
-[decl_include(<bits/pthreadtypes.h>)]
-[same_impl][requires($has_function(pthread_cond_wait))][cp]
+[decl_include("<bits/pthreadtypes.h>")]
+[same_impl][requires($has_function(pthread_cond_wait))][[cp]]
 cnd_wait:([[nonnull]] cnd_t *__restrict cond,
           [[nonnull]] mtx_t *__restrict mutex) -> int {
 	int error;
@@ -517,8 +517,8 @@ cnd_wait:([[nonnull]] cnd_t *__restrict cond,
 [if(defined(__USE_TIME_BITS64)), preferred_alias(cnd_timedwait64)]
 [if(!defined(__USE_TIME_BITS64)), preferred_alias(cnd_timedwait)]
 [dependency_include(<asm/threads.h>)]
-[decl_include(<bits/threads.h>)][cp]
-[decl_include(<bits/pthreadtypes.h>)]
+[decl_include(<bits/threads.h>)][[cp]]
+[decl_include("<bits/pthreadtypes.h>")]
 [decl_include("<bits/timespec.h>")]
 [same_impl][requires($has_function(pthread_cond_timedwait))]
 cnd_timedwait:([[nonnull]] cnd_t *__restrict cond,
@@ -538,8 +538,8 @@ cnd_timedwait:([[nonnull]] cnd_t *__restrict cond,
 %#ifdef __USE_TIME64
 [time64_variant_of(cnd_timedwait)]
 [dependency_include(<asm/threads.h>)]
-[decl_include(<bits/threads.h>)][cp]
-[decl_include(<bits/pthreadtypes.h>)]
+[decl_include(<bits/threads.h>)][[cp]]
+[decl_include("<bits/pthreadtypes.h>")]
 [decl_include("<bits/timespec.h>")]
 [same_impl][requires($has_function(pthread_cond_timedwait))]
 cnd_timedwait64:([[nonnull]] cnd_t *__restrict cond,
@@ -571,7 +571,7 @@ cnd_destroy:(cnd_t *COND) = pthread_cond_destroy;
 @@s.a. `pthread_key_create()'
 [dependency_include(<asm/threads.h>)]
 [decl_include(<bits/threads.h>)]
-[decl_include(<bits/pthreadtypes.h>)]
+[decl_include("<bits/pthreadtypes.h>")]
 [same_impl][requires($has_function(pthread_key_create))]
 tss_create:(tss_t *tss_id, tss_dtor_t destructor) -> int {
 	int error;
@@ -592,7 +592,7 @@ tss_get:(tss_t tss_id) -> void * = pthread_getspecific;
 @@s.a. `pthread_setspecific()'
 [dependency_include(<asm/threads.h>)]
 [decl_include(<bits/threads.h>)]
-[decl_include(<bits/pthreadtypes.h>)]
+[decl_include("<bits/pthreadtypes.h>")]
 [same_impl][requires($has_function(pthread_setspecific))]
 tss_set:(tss_t tss_id, void *val) -> int {
 	int error;

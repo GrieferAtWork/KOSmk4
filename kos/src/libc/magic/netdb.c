@@ -22,6 +22,9 @@
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(time32_t = __time32_t)]
 %[define_replacement(time64_t = __time64_t)]
+%[define_replacement(tv_sec = tv_sec)]
+%[define_replacement(tv_nsec = tv_nsec)]
+%[define_replacement(tv_usec = tv_usec)]
 
 %{
 #include <features.h>
@@ -255,7 +258,7 @@ struct gaicb {
 %#ifdef __USE_MISC
 @@Print error indicated by `h_errno' variable on standard error.
 @@STR, if non-null, is printed before the error string
-[cp] herror:(char const *str);
+[[cp]] herror:(char const *str);
 
 @@Return string associated with error ERR_NUM
 [ATTR_CONST][ATTR_WUNUSED] hstrerror:(int err_num) -> char const *;
@@ -264,19 +267,19 @@ struct gaicb {
 
 @@Open host data base files and mark them as staying
 @@open even after a later search if STAY_OPEN is non-zero
-[cp] sethostent:(int stay_open);
+[[cp]] sethostent:(int stay_open);
 
 @@Close host data base files and clear `stay open' flag
-/*[cp]*/ endhostent:();
+/*[[cp]]*/ endhostent:();
 
 @@Get next entry from host data base file. Open data base if necessary
-[cp] gethostent:() -> struct hostent *;
+[[cp]] gethostent:() -> struct hostent *;
 
 @@Return entry from host data base which address match ADDR with length LEN and type TYPE
-[cp] gethostbyaddr:(void const *addr, socklen_t len, int type) -> struct hostent *;
+[[cp]] gethostbyaddr:(void const *addr, socklen_t len, int type) -> struct hostent *;
 
 @@Return entry from host data base for host with NAME
-[cp] gethostbyname:(char const *name) -> struct hostent *;
+[[cp]] gethostbyname:(char const *name) -> struct hostent *;
 
 %#ifdef __USE_MISC
 @@Return entry from host data base for host with NAME. AF must be
@@ -284,35 +287,35 @@ struct gaicb {
 @@for IPv6.
 @@This function is not part of POSIX and therefore no official
 @@cancellation point
-[cp] gethostbyname2:(char const *name, int af) -> struct hostent *;
+[[cp]] gethostbyname2:(char const *name, int af) -> struct hostent *;
 
 @@Reentrant versions of the functions above. The additional arguments
 @@specify a buffer of BUFLEN starting at BUF. The last argument is a
 @@pointer to a variable which gets the value which would be stored in
 @@the global variable `herrno' by the non-reentrant functions.
 @@These functions are not part of POSIX and therefore no official cancellation point
-[cp] gethostent_r:(struct hostent *__restrict result_buf, char *__restrict buf, size_t buflen, struct hostent **__restrict result, int *__restrict h_errnop) -> int;
-[doc_alias(gethostent_r)][cp] gethostbyaddr_r:(void const *__restrict addr, socklen_t len, int type, struct hostent *__restrict result_buf, char *__restrict buf, size_t buflen, struct hostent **__restrict result, int *__restrict h_errnop) -> int;
-[doc_alias(gethostent_r)][cp] gethostbyname_r:(char const *__restrict name, struct hostent *__restrict result_buf, char *__restrict buf, size_t buflen, struct hostent **__restrict result, int *__restrict h_errnop) -> int;
-[doc_alias(gethostent_r)][cp] gethostbyname2_r:(char const *__restrict name, int af, struct hostent *__restrict result_buf, char *__restrict buf, size_t buflen, struct hostent **__restrict result, int *__restrict h_errnop) -> int;
+[[cp]] gethostent_r:(struct hostent *__restrict result_buf, char *__restrict buf, size_t buflen, struct hostent **__restrict result, int *__restrict h_errnop) -> int;
+[doc_alias(gethostent_r)][[cp]] gethostbyaddr_r:(void const *__restrict addr, socklen_t len, int type, struct hostent *__restrict result_buf, char *__restrict buf, size_t buflen, struct hostent **__restrict result, int *__restrict h_errnop) -> int;
+[doc_alias(gethostent_r)][[cp]] gethostbyname_r:(char const *__restrict name, struct hostent *__restrict result_buf, char *__restrict buf, size_t buflen, struct hostent **__restrict result, int *__restrict h_errnop) -> int;
+[doc_alias(gethostent_r)][[cp]] gethostbyname2_r:(char const *__restrict name, int af, struct hostent *__restrict result_buf, char *__restrict buf, size_t buflen, struct hostent **__restrict result, int *__restrict h_errnop) -> int;
 %#endif /* __USE_MISC */
 
 
 @@Open network data base files and mark them as staying
 @@open even after a later search if STAY_OPEN is non-zero
-[cp] setnetent:(int stay_open);
+[[cp]] setnetent:(int stay_open);
 
 @@Close network data base files and clear `stay open' flag
 [cp_nokos] endnetent:();
 
 @@Get next entry from network data base file. Open data base if necessary
-[cp] getnetent:() -> struct netent *;
+[[cp]] getnetent:() -> struct netent *;
 
 @@Return entry from network data base which address match NET and type TYPE
-[cp] getnetbyaddr:(uint32_t net, int type) -> struct netent *;
+[[cp]] getnetbyaddr:(uint32_t net, int type) -> struct netent *;
 
 @@Return entry from network data base for network with NAME
-[cp] getnetbyname:(char const *name) -> struct netent *;
+[[cp]] getnetbyname:(char const *name) -> struct netent *;
 
 %
 %#ifdef __USE_MISC
@@ -323,27 +326,27 @@ struct gaicb {
 @@non-reentrant functions.
 @@These functions are not part of POSIX and therefore no official
 @@cancellation point
-[cp] getnetent_r:(struct netent *__restrict result_buf, char *__restrict buf, size_t buflen, struct netent **__restrict result, int *__restrict h_errnop) -> int;
-[doc_alias(getnetent_r)][cp] getnetbyaddr_r:(uint32_t net, int type, struct netent *__restrict result_buf, char *__restrict buf, size_t buflen, struct netent **__restrict result, int *__restrict h_errnop) -> int;
-[doc_alias(getnetent_r)][cp] getnetbyname_r:(char const *__restrict name, struct netent *__restrict result_buf, char *__restrict buf, size_t buflen, struct netent **__restrict result, int *__restrict h_errnop) -> int;
+[[cp]] getnetent_r:(struct netent *__restrict result_buf, char *__restrict buf, size_t buflen, struct netent **__restrict result, int *__restrict h_errnop) -> int;
+[doc_alias(getnetent_r)][[cp]] getnetbyaddr_r:(uint32_t net, int type, struct netent *__restrict result_buf, char *__restrict buf, size_t buflen, struct netent **__restrict result, int *__restrict h_errnop) -> int;
+[doc_alias(getnetent_r)][[cp]] getnetbyname_r:(char const *__restrict name, struct netent *__restrict result_buf, char *__restrict buf, size_t buflen, struct netent **__restrict result, int *__restrict h_errnop) -> int;
 %#endif /* __USE_MISC */
 
 
 @@Open service data base files and mark them as staying open even
 @@after a later search if STAY_OPEN is non-zero
-[cp] setservent:(int stay_open);
+[[cp]] setservent:(int stay_open);
 
 @@Close service data base files and clear `stay open' flag
 [cp_nokos] endservent:();
 
 @@Get next entry from service data base file. Open data base if necessary
-[cp] getservent:() -> struct servent *;
+[[cp]] getservent:() -> struct servent *;
 
 @@Return entry from network data base for network with NAME and protocol PROTO
-[cp] getservbyname:(char const *name, char const *proto) -> struct servent *;
+[[cp]] getservbyname:(char const *name, char const *proto) -> struct servent *;
 
 @@Return entry from service data base which matches port PORT and protocol PROTO
-[cp] getservbyport:(int port, char const *proto) -> struct servent *;
+[[cp]] getservbyport:(int port, char const *proto) -> struct servent *;
 
 %
 %#ifdef __USE_MISC
@@ -351,27 +354,27 @@ struct gaicb {
 @@arguments specify a buffer of BUFLEN starting at BUF.
 @@These functions are not part of POSIX and therefore no official
 @@cancellation point
-[cp] getservent_r:(struct servent *__restrict result_buf, char *__restrict buf, size_t buflen, struct servent **__restrict result) -> int;
-[doc_alias(getservent_r)][cp] getservbyname_r:(char const *__restrict name, char const *__restrict __proto, struct servent *__restrict result_buf, char *__restrict buf, size_t buflen, struct servent **__restrict result) -> int;
-[doc_alias(getservent_r)][cp] getservbyport_r:(int __port, char const *__restrict __proto, struct servent *__restrict result_buf, char *__restrict buf, size_t buflen, struct servent **__restrict result) -> int;
+[[cp]] getservent_r:(struct servent *__restrict result_buf, char *__restrict buf, size_t buflen, struct servent **__restrict result) -> int;
+[doc_alias(getservent_r)][[cp]] getservbyname_r:(char const *__restrict name, char const *__restrict __proto, struct servent *__restrict result_buf, char *__restrict buf, size_t buflen, struct servent **__restrict result) -> int;
+[doc_alias(getservent_r)][[cp]] getservbyport_r:(int __port, char const *__restrict __proto, struct servent *__restrict result_buf, char *__restrict buf, size_t buflen, struct servent **__restrict result) -> int;
 %#endif /* __USE_MISC */
 
 
 @@Open protocol data base files and mark them as staying open even
 @@after a later search if STAY_OPEN is non-zero
-[cp] setprotoent:(int stay_open);
+[[cp]] setprotoent:(int stay_open);
 
 @@Close protocol data base files and clear `stay open' flag
 [cp_nokos] endprotoent:();
 
 @@Get next entry from protocol data base file. Open data base if necessary
-[cp] getprotoent:() -> struct protoent *;
+[[cp]] getprotoent:() -> struct protoent *;
 
 @@Return entry from protocol data base for network with NAME
-[cp] getprotobyname:(char const *name) -> struct protoent *;
+[[cp]] getprotobyname:(char const *name) -> struct protoent *;
 
 @@Return entry from protocol data base which number is PROTO
-[cp] getprotobynumber:(int proto) -> struct protoent *;
+[[cp]] getprotobynumber:(int proto) -> struct protoent *;
 
 %
 %#ifdef __USE_MISC
@@ -379,14 +382,14 @@ struct gaicb {
 @@arguments specify a buffer of BUFLEN starting at BUF.
 @@These functions are not part of POSIX and therefore no official
 @@cancellation point
-[cp] getprotoent_r:(struct protoent *__restrict result_buf, char *__restrict buf, size_t buflen, struct protoent **__restrict result) -> int;
-[doc_alias(getprotoent_r)][cp] getprotobyname_r:(char const *__restrict name, struct protoent *__restrict result_buf, char *__restrict buf, size_t buflen, struct protoent **__restrict result) -> int;
-[doc_alias(getprotoent_r)][cp] getprotobynumber_r:(int __proto, struct protoent *__restrict result_buf, char *__restrict buf, size_t buflen, struct protoent **__restrict result) -> int;
+[[cp]] getprotoent_r:(struct protoent *__restrict result_buf, char *__restrict buf, size_t buflen, struct protoent **__restrict result) -> int;
+[doc_alias(getprotoent_r)][[cp]] getprotobyname_r:(char const *__restrict name, struct protoent *__restrict result_buf, char *__restrict buf, size_t buflen, struct protoent **__restrict result) -> int;
+[doc_alias(getprotoent_r)][[cp]] getprotobynumber_r:(int __proto, struct protoent *__restrict result_buf, char *__restrict buf, size_t buflen, struct protoent **__restrict result) -> int;
 
 @@Establish network group NETGROUP for enumeration.
 @@This function is not part of POSIX and therefore no official
 @@cancellation point
-[cp] setnetgrent:(char const *netgroup) -> int;
+[[cp]] setnetgrent:(char const *netgroup) -> int;
 
 @@Free all space allocated by previous `setnetgrent' call.
 @@This function is not part of POSIX and therefore no official
@@ -397,17 +400,17 @@ struct gaicb {
 @@and return pointers to elements in HOSTP, USERP, and DOMAINP.
 @@This function is not part of POSIX and therefore no official
 @@cancellation point
-[cp] getnetgrent:(char **__restrict hostp, char **__restrict userp, char **__restrict domainp) -> int;
+[[cp]] getnetgrent:(char **__restrict hostp, char **__restrict userp, char **__restrict domainp) -> int;
 
 @@Test whether NETGROUP contains the triple (HOST, USER, DOMAIN).
 @@This function is not part of POSIX and therefore no official
 @@cancellation point
-[cp] innetgr:(char const *netgroup, char const *host, char const *user, char const *domain) -> int;
+[[cp]] innetgr:(char const *netgroup, char const *host, char const *user, char const *domain) -> int;
 
 @@Reentrant version of `getnetgrent' where result is placed in BUFFER.
 @@This function is not part of POSIX and therefore no official
 @@cancellation point
-[cp] getnetgrent_r:(char **__restrict hostp, char **__restrict userp, char **__restrict domainp, char *__restrict buf, size_t buflen) -> int;
+[[cp]] getnetgrent_r:(char **__restrict hostp, char **__restrict userp, char **__restrict domainp, char *__restrict buf, size_t buflen) -> int;
 %#endif /* __USE_MISC */
 
 %
@@ -420,13 +423,13 @@ struct gaicb {
 @@official host name.
 @@This function is not part of POSIX and therefore no official
 @@cancellation point
-[cp] rcmd:(char **__restrict ahost, $uint16_t rport, char const *__restrict locuser, char const *__restrict remuser, char const *__restrict cmd, int *__restrict fd2p) -> int;
+[[cp]] rcmd:(char **__restrict ahost, $uint16_t rport, char const *__restrict locuser, char const *__restrict remuser, char const *__restrict cmd, int *__restrict fd2p) -> int;
 
 @@This is the equivalent function where the protocol can be selected
 @@and which therefore can be used for IPv6.
 @@This function is not part of POSIX and therefore no official
 @@cancellation point
-[cp] rcmd_af:(char **__restrict ahost, $uint16_t rport, char const *__restrict locuser, char const *__restrict remuser, char const *__restrict cmd, int *__restrict fd2p, sa_family_t af) -> int;
+[[cp]] rcmd_af:(char **__restrict ahost, $uint16_t rport, char const *__restrict locuser, char const *__restrict remuser, char const *__restrict cmd, int *__restrict fd2p, sa_family_t af) -> int;
 
 @@Call `rexecd' at port RPORT on remote machine *AHOST to execute
 @@CMD. The process runs at the remote machine using the ID of user
@@ -435,26 +438,26 @@ struct gaicb {
 @@returns *AHOST contains the official host name.
 @@This function is not part of POSIX and therefore no official
 @@cancellation point
-[cp] rexec:(char **__restrict ahost, int rport, char const *__restrict name, char const *__restrict pass, char const *__restrict cmd, int *__restrict fd2p) -> int;
+[[cp]] rexec:(char **__restrict ahost, int rport, char const *__restrict name, char const *__restrict pass, char const *__restrict cmd, int *__restrict fd2p) -> int;
 
 @@This is the equivalent function where the protocol can be selected
 @@and which therefore can be used for IPv6.
 @@This function is not part of POSIX and therefore no official
 @@cancellation point
-[cp] rexec_af:(char **__restrict ahost, int rport, char const *__restrict name, char const *__restrict pass, char const *__restrict cmd, int *__restrict fd2p, sa_family_t af) -> int;
+[[cp]] rexec_af:(char **__restrict ahost, int rport, char const *__restrict name, char const *__restrict pass, char const *__restrict cmd, int *__restrict fd2p, sa_family_t af) -> int;
 
 @@Check whether user REMUSER on system RHOST is allowed to login as LOCUSER.
 @@If SUSER is not zero the user tries to become superuser. Return 0 if
 @@it is possible.
 @@This function is not part of POSIX and therefore no official
 @@cancellation point
-[cp] ruserok:(char const *rhost, int suser, char const *remuser, char const *locuser) -> int;
+[[cp]] ruserok:(char const *rhost, int suser, char const *remuser, char const *locuser) -> int;
 
 @@This is the equivalent function where the protocol can be selected
 @@and which therefore can be used for IPv6.
 @@This function is not part of POSIX and therefore no official
 @@cancellation point
-[cp] ruserok_af:(char const *rhost, int suser, char const *remuser, char const *locuser, sa_family_t af) -> int;
+[[cp]] ruserok_af:(char const *rhost, int suser, char const *remuser, char const *locuser, sa_family_t af) -> int;
 
 @@Check whether user REMUSER on system indicated by IPv4 address
 @@RADDR is allowed to login as LOCUSER. Non-IPv4 (e.g., IPv6) are
@@ -462,27 +465,27 @@ struct gaicb {
 @@superuser. Return 0 if it is possible.
 @@This function is not part of POSIX and therefore no official
 @@cancellation point
-[cp] iruserok:(uint32_t raddr, int suser, char const *remuser, char const *locuser) -> int;
+[[cp]] iruserok:(uint32_t raddr, int suser, char const *remuser, char const *locuser) -> int;
 
 @@This is the equivalent function where the pfamiliy if the address
 @@pointed to by RADDR is determined by the value of AF. It therefore
 @@can be used for IPv6
 @@This function is not part of POSIX and therefore no official
 @@cancellation point
-[cp] iruserok_af:(void const *raddr, int suser, char const *remuser, char const *locuser, sa_family_t af) -> int;
+[[cp]] iruserok_af:(void const *raddr, int suser, char const *remuser, char const *locuser, sa_family_t af) -> int;
 
 @@Try to allocate reserved port, returning a descriptor for a socket opened
 @@at this port or -1 if unsuccessful. The search for an available port
 @@will start at ALPORT and continues with lower numbers.
 @@This function is not part of POSIX and therefore no official
 @@cancellation point
-[cp] rresvport:(int *alport) -> int;
+[[cp]] rresvport:(int *alport) -> int;
 
 @@This is the equivalent function where the protocol can be selected
 @@and which therefore can be used for IPv6.
 @@This function is not part of POSIX and therefore no official
 @@cancellation point
-[cp] rresvport_af:(int *alport, sa_family_t af) -> int;
+[[cp]] rresvport_af:(int *alport, sa_family_t af) -> int;
 %#endif /* __USE_MISC */
 
 
@@ -490,7 +493,7 @@ struct gaicb {
 %/* Extension from POSIX.1:2001. */
 %#ifdef __USE_XOPEN2K
 @@Translate name of a service location and/or a service name to set of socket addresses
-[cp] getaddrinfo:(char const *__restrict name, char const *__restrict service, const struct addrinfo *__restrict req, struct addrinfo **__restrict pai) -> int;
+[[cp]] getaddrinfo:(char const *__restrict name, char const *__restrict service, const struct addrinfo *__restrict req, struct addrinfo **__restrict pai) -> int;
 
 @@Free `addrinfo' structure AI including associated storage
 freeaddrinfo:(struct addrinfo *ai);
@@ -499,7 +502,7 @@ freeaddrinfo:(struct addrinfo *ai);
 [ATTR_CONST][ATTR_WUNUSED] gai_strerror:(int ecode) -> char const *;
 
 @@Translate a socket address to a location and service name
-[cp] getnameinfo:(struct sockaddr const *__restrict sa, socklen_t salen, char *__restrict host, socklen_t hostlen, char *__restrict serv, socklen_t servlen, int flags) -> int;
+[[cp]] getnameinfo:(struct sockaddr const *__restrict sa, socklen_t salen, char *__restrict host, socklen_t hostlen, char *__restrict serv, socklen_t servlen, int flags) -> int;
 %#endif /* __USE_XOPEN2K */
 
 %
@@ -509,7 +512,7 @@ freeaddrinfo:(struct addrinfo *ai);
 @@queueing the requests and signal completion according to SIG.
 @@This function is not part of POSIX and therefore no official
 @@cancellation point
-[cp] getaddrinfo_a:(int mode, struct gaicb *list[__restrict_arr], int ent, struct sigevent *__restrict sig) -> int;
+[[cp]] getaddrinfo_a:(int mode, struct gaicb *list[__restrict_arr], int ent, struct sigevent *__restrict sig) -> int;
 
 @@Suspend execution of the thread until at least one of the ENT requests
 @@in LIST is handled. If TIMEOUT is not a null pointer it specifies the
@@ -525,30 +528,31 @@ gai_suspend:(struct gaicb const *const list[], int ent, struct timespec const *t
 	struct __timespec32 tmo32;
 	if (!timeout)
 		return crt_gai_suspend(list, ent, NULL);
-	tmo32.@tv_sec@  = (time32_t)timeout->@tv_sec@;
-	tmo32.@tv_nsec@ = timeout->@tv_nsec@;
+	tmo32.tv_sec  = (time32_t)timeout->tv_sec;
+	tmo32.tv_nsec = timeout->tv_nsec;
 	return crt_gai_suspend(list, ent, &tmo32);
 #else
 	struct __timespec64 tmo64;
 	if (!timeout)
 		return gai_suspend64(list, ent, NULL);
-	tmo64.@tv_sec@  = (time64_t)timeout->@tv_sec@;
-	tmo64.@tv_nsec@ = timeout->@tv_nsec@;
+	tmo64.tv_sec  = (time64_t)timeout->tv_sec;
+	tmo64.tv_nsec = timeout->tv_nsec;
 	return gai_suspend64(list, ent, &tmo64);
 #endif
 }
 
 %
 %#ifdef __USE_TIME64
-[ignore][cp][doc_alias(gai_suspend)]
-crt_gai_suspend:(struct gaicb const *const list[], int ent, struct __timespec32 const *timeout) -> int = gai_suspend?;
-[cp][requires(defined(__CRT_HAVE_gai_suspend))][time64_variant_of(gai_suspend)]
-gai_suspend64:(struct gaicb const *const list[], int ent, struct timespec64 const *timeout) -> int {
+[[cp, doc_alias(gai_suspend), ignore, nocrt, alias(gai_suspend)]]
+int crt_gai_suspend(struct gaicb const *const list[], int ent, struct __timespec32 const *timeout);
+
+[[cp, userimpl, requires_function(crt_gai_suspend), time64_variant_of(gai_suspend)]]
+int gai_suspend64(struct gaicb const *const list[], int ent, struct timespec64 const *timeout) {
 	struct __timespec32 tmo32;
 	if (!timeout)
 		return crt_gai_suspend(list, ent, NULL);
-	tmo32.@tv_sec@  = (time32_t)timeout->@tv_sec@;
-	tmo32.@tv_nsec@ = timeout->@tv_nsec@;
+	tmo32.tv_sec  = (time32_t)timeout->tv_sec;
+	tmo32.tv_nsec = timeout->tv_nsec;
 	return crt_gai_suspend(list, ent, &tmo32);
 }
 %#endif /* __USE_TIME64 */

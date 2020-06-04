@@ -38,27 +38,27 @@ __SYSDECL_BEGIN
 
 %#ifdef __USE_KOS
 %[default_impl_section({.text.crt.wchar.unicode.static.convert|.text.crt.dos.wchar.unicode.static.convert})]
-[wchar][ATTR_WUNUSED][ATTR_PURE][dosname(_wtoi)]
-[if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias(wtol, _wtol)]
-[if(__SIZEOF_INT__ == __SIZEOF_LONG_LONG__), alias(wtoll, _wtoll)]
-[if(__SIZEOF_INT__ == 8), alias(_wtoi64)]
-wtoi:([[nonnull]] wchar_t const *nptr) -> int %{copy(atoi, str2wcs)}
+[wchar][ATTR_WUNUSED][ATTR_PURE][crt_dosname("_wtoi")]
+[if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias("wtol", "_wtol")]
+[if(__SIZEOF_INT__ == __SIZEOF_LONG_LONG__), alias("wtoll", "_wtoll")]
+[if(__SIZEOF_INT__ == 8), alias("_wtoi64")]
+wtoi:([[nonnull]] wchar_t const *nptr) -> int %{generate(str2wcs("atoi"))}
 
-[wchar][ATTR_WUNUSED][ATTR_PURE][dosname(_wtol)]
+[wchar][ATTR_WUNUSED][ATTR_PURE][crt_dosname("_wtol")]
 [alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_INT__, wtoi)]
-[if(__SIZEOF_LONG__ == __SIZEOF_INT__), alias(_wtoi)]
-[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias(wtoll, _wtoll)]
-[if(__SIZEOF_LONG__ == 8), alias(_wtoi64)]
-wtol:([[nonnull]] wchar_t const *nptr) -> long %{copy(atol, str2wcs)}
+[if(__SIZEOF_LONG__ == __SIZEOF_INT__), alias("_wtoi")]
+[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("wtoll", "_wtoll")]
+[if(__SIZEOF_LONG__ == 8), alias("_wtoi64")]
+wtol:([[nonnull]] wchar_t const *nptr) -> long %{generate(str2wcs("atol"))}
 
 %#ifdef __LONGLONG
-[wchar][ATTR_WUNUSED][ATTR_PURE][dosname(_wtoll)]
-[alt_variant_of(__SIZEOF_LONG_LONG__ == __SIZEOF_INT__, wtoi)]
-[if (__SIZEOF_LONG_LONG__ == __SIZEOF_INT__), alias(_wtoi)]
-[alt_variant_of(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__, wtol)]
-[if (__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias(_wtol)]
-[if(__SIZEOF_LONG_LONG__ == 8), alias(_wtoi64)]
-wtoll:([[nonnull]] wchar_t const *nptr) -> __LONGLONG %{copy(atoll, str2wcs)}
+[wchar][ATTR_WUNUSED][ATTR_PURE][crt_dosname("_wtoll")]
+[alt_variant_of(__SIZEOF_LONG_LONG__ == __SIZEOF_INT__, "wtoi")]
+[if (__SIZEOF_LONG_LONG__ == __SIZEOF_INT__), alias("_wtoi")]
+[alt_variant_of(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__, "wtol")]
+[if (__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias("_wtol")]
+[if(__SIZEOF_LONG_LONG__ == 8), alias("_wtoi64")]
+wtoll:([[nonnull]] wchar_t const *nptr) -> __LONGLONG %{generate(str2wcs("atoll"))}
 %#endif /* __LONGLONG */
 %#endif /* __USE_KOS */
 

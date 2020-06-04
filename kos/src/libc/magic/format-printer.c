@@ -1141,7 +1141,7 @@ struct format_aprintf_data {
 @@                 but may differ from `strlen(return)' when NUL characters were
 @@                 printed to the aprintf-printer at one point.
 @@                 (e.g. `format_aprintf_printer(&my_printer, "\0", 1)')
-[dependency_include(<hybrid/__assert.h>)]
+[impl_include("<hybrid/__assert.h>")]
 [dependency_include(<hybrid/typecore.h>)][userimpl]
 [ATTR_WUNUSED][ATTR_MALL_DEFAULT_ALIGNED][ATTR_MALLOC]
 [dependency_prefix(DEFINE_FORMAT_APRINTF_DATA)]
@@ -1202,7 +1202,7 @@ format_aprintf_pack:([[nonnull]] struct format_aprintf_data *__restrict self,
 @@to append additional data to the end of `self'
 @@@return: NULL: Failed to allocate additional memory
 [[userimpl, requires_function(realloc)]]
-[[dependency_include(<hybrid/__assert.h>), ATTR_WUNUSED]]
+[[impl_include("<hybrid/__assert.h>"), ATTR_WUNUSED]]
 [[dependency_prefix(DEFINE_FORMAT_APRINTF_DATA)]]
 format_aprintf_alloc:([[nonnull]] struct format_aprintf_data *__restrict self,
                       $size_t num_chars) -> [[malloc(num_chars)]] char * {

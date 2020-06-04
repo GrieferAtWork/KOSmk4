@@ -488,10 +488,10 @@ fstatat64:($fd_t dirfd, [[nonnull]] char const *__restrict filename,
 
 %[default_impl_section(.text.crt.fs.modify)]
 
-[cp][ignore] dos_mkdir:([[nonnull]] char const *pathname) -> int = _mkdir?;
+[[cp]][ignore] dos_mkdir:([[nonnull]] char const *pathname) -> int = _mkdir?;
 
 %
-[cp][guard][noexport]
+[[cp]][guard][noexport]
 [requires(defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir))]
 mkdir:([[nonnull]] char const *pathname, $mode_t mode) -> int {
 	(void)mode;
@@ -499,13 +499,13 @@ mkdir:([[nonnull]] char const *pathname, $mode_t mode) -> int {
 }
 
 %
-[cp][guard][alias(_chmod)]
+[[cp]][guard][alias(_chmod)]
 chmod:([[nonnull]] char const *filename, $mode_t mode) -> int;
 
 
 %
 %#ifdef __USE_MISC
-[cp][guard]
+[[cp]][guard]
 [if(defined(__CRT_DOS_PRIMARY)), alias(_chmod, chmod)]
 lchmod:([[nonnull]] char const *filename, $mode_t mode) -> int;
 %#endif /* __USE_MISC */
@@ -533,40 +533,40 @@ getumask:() -> $mode_t {
 %
 %#if defined(__USE_KOS) && defined(__USE_ATFILE)
 @@@param flags: Set of `0|AT_DOSPATH'
-[cp] fmkdirat:($fd_t dirfd, [[nonnull]] char const *pathname, $mode_t mode, $atflag_t flags) -> int;
+[[cp]] fmkdirat:($fd_t dirfd, [[nonnull]] char const *pathname, $mode_t mode, $atflag_t flags) -> int;
 
 @@@param flags: Set of `0|AT_DOSPATH'
-[cp] fmknodat:($fd_t dirfd, [[nonnull]] char const *nodename, $mode_t mode, $dev_t dev, $atflag_t flags) -> int;
+[[cp]] fmknodat:($fd_t dirfd, [[nonnull]] char const *nodename, $mode_t mode, $dev_t dev, $atflag_t flags) -> int;
 %#endif
 
 
 %
-[cp] mkfifo:([[nonnull]] char const *fifoname, $mode_t mode) -> int;
+[[cp]] mkfifo:([[nonnull]] char const *fifoname, $mode_t mode) -> int;
 
 %
 %#ifdef __USE_ATFILE
 @@@param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_DOSPATH'
-[cp] fchmodat:($fd_t dirfd, [[nonnull]] char const *filename, $mode_t mode, $atflag_t flags) -> int;
-[cp] mkdirat:($fd_t dirfd, [[nonnull]] char const *pathname, $mode_t mode) -> int;
-[cp] mkfifoat:($fd_t dirfd, [[nonnull]] char const *fifoname, $mode_t mode) -> int;
+[[cp]] fchmodat:($fd_t dirfd, [[nonnull]] char const *filename, $mode_t mode, $atflag_t flags) -> int;
+[[cp]] mkdirat:($fd_t dirfd, [[nonnull]] char const *pathname, $mode_t mode) -> int;
+[[cp]] mkfifoat:($fd_t dirfd, [[nonnull]] char const *fifoname, $mode_t mode) -> int;
 %#endif /* __USE_ATFILE */
 
 %
 %#ifdef __USE_POSIX
-[cp] fchmod:($fd_t fd, $mode_t mode) -> int;
+[[cp]] fchmod:($fd_t fd, $mode_t mode) -> int;
 %#endif /* __USE_POSIX */
 
 %
 %#if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
-[cp] mknod:([[nonnull]] char const *nodename, $mode_t mode, $dev_t dev) -> int;
+[[cp]] mknod:([[nonnull]] char const *nodename, $mode_t mode, $dev_t dev) -> int;
 %#ifdef __USE_ATFILE
-[cp] mknodat:($fd_t dirfd, [[nonnull]] char const *nodename, $mode_t mode, $dev_t dev) -> int;
+[[cp]] mknodat:($fd_t dirfd, [[nonnull]] char const *nodename, $mode_t mode, $dev_t dev) -> int;
 %#endif /* __USE_ATFILE */
 %#endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 
 %[default_impl_section(.text.crt.fs.modify_time)]
 @@@param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH'
-[cp][ignore]
+[[cp]][ignore]
 utimensat32:($fd_t dirfd, [[nonnull]] char const *filename,
              [[nullable]] struct timespec const times[2 /*or:3*/], $atflag_t flags) -> int = utimensat?;
 
@@ -584,23 +584,23 @@ utimensat:($fd_t dirfd, [[nonnull]] char const *filename,
 	struct timespec64 tms[3];
 	if (!times)
 		return utimensat64(dirfd, filename, NULL, flags);
-	tms[0].@tv_sec@  = (__time64_t)times[0].@tv_sec@;
-	tms[0].@tv_nsec@ = times[0].@tv_nsec@;
-	tms[1].@tv_sec@  = (__time64_t)times[1].@tv_sec@;
-	tms[1].@tv_nsec@ = times[1].@tv_nsec@;
+	tms[0].tv_sec  = (__time64_t)times[0].tv_sec;
+	tms[0].tv_nsec = times[0].tv_nsec;
+	tms[1].tv_sec  = (__time64_t)times[1].tv_sec;
+	tms[1].tv_nsec = times[1].tv_nsec;
 	if (flags & 0x0200) /* AT_CHANGE_CTIME */ {
-		tms[2].@tv_sec@  = (__time64_t)times[2].@tv_sec@;
-		tms[2].@tv_nsec@ = times[2].@tv_nsec@;
+		tms[2].tv_sec  = (__time64_t)times[2].tv_sec;
+		tms[2].tv_nsec = times[2].tv_nsec;
 	}
 	return utimensat64(dirfd, filename, tms, flags);
 #else
 	struct timespec64 tms[2];
 	if (!times)
 		return utimensat64(dirfd, filename, NULL, flags);
-	tms[0].@tv_sec@  = (__time64_t)times[0].@tv_sec@;
-	tms[0].@tv_nsec@ = times[0].@tv_nsec@;
-	tms[1].@tv_sec@  = (__time64_t)times[1].@tv_sec@;
-	tms[1].@tv_nsec@ = times[1].@tv_nsec@;
+	tms[0].tv_sec  = (__time64_t)times[0].tv_sec;
+	tms[0].tv_nsec = times[0].tv_nsec;
+	tms[1].tv_sec  = (__time64_t)times[1].tv_sec;
+	tms[1].tv_nsec = times[1].tv_nsec;
 	return utimensat64(dirfd, filename, tms, flags);
 #endif
 #else /* __CRT_HAVE_utimensat64 */
@@ -608,23 +608,23 @@ utimensat:($fd_t dirfd, [[nonnull]] char const *filename,
 	struct @__timespec32@ tms[3];
 	if (!times)
 		return utimensat32(dirfd, filename, NULL, flags);
-	tms[0].@tv_sec@  = (__time32_t)times[0].@tv_sec@;
-	tms[0].@tv_nsec@ = times[0].@tv_nsec@;
-	tms[1].@tv_sec@  = (__time32_t)times[1].@tv_sec@;
-	tms[1].@tv_nsec@ = times[1].@tv_nsec@;
+	tms[0].tv_sec  = (__time32_t)times[0].tv_sec;
+	tms[0].tv_nsec = times[0].tv_nsec;
+	tms[1].tv_sec  = (__time32_t)times[1].tv_sec;
+	tms[1].tv_nsec = times[1].tv_nsec;
 	if (flags & 0x0200) /* AT_CHANGE_CTIME */ {
-		tms[2].@tv_sec@  = (__time32_t)times[2].@tv_sec@;
-		tms[2].@tv_nsec@ = times[2].@tv_nsec@;
+		tms[2].tv_sec  = (__time32_t)times[2].tv_sec;
+		tms[2].tv_nsec = times[2].tv_nsec;
 	}
 	return utimensat32(dirfd, filename, tms, flags);
 #else
 	struct @__timespec32@ tms[2];
 	if (!times)
 		return utimensat32(dirfd, filename, NULL, flags);
-	tms[0].@tv_sec@  = (__time32_t)times[0].@tv_sec@;
-	tms[0].@tv_nsec@ = times[0].@tv_nsec@;
-	tms[1].@tv_sec@  = (__time32_t)times[1].@tv_sec@;
-	tms[1].@tv_nsec@ = times[1].@tv_nsec@;
+	tms[0].tv_sec  = (__time32_t)times[0].tv_sec;
+	tms[0].tv_nsec = times[0].tv_nsec;
+	tms[1].tv_sec  = (__time32_t)times[1].tv_sec;
+	tms[1].tv_nsec = times[1].tv_nsec;
 	return utimensat32(dirfd, filename, tms, flags);
 #endif
 #endif /* !__CRT_HAVE_utimensat64 */
@@ -632,37 +632,37 @@ utimensat:($fd_t dirfd, [[nonnull]] char const *filename,
 
 %#ifdef __USE_TIME64
 [time64_variant_of(utimensat)]
-[cp][noexport][requires(defined(__CRT_HAVE_utimensat))]
+[[cp]][noexport][requires(defined(__CRT_HAVE_utimensat))]
 utimensat64:($fd_t dirfd, [[nonnull]] char const *filename,
              [[nullable]] struct timespec64 const times[2 /*or:3*/], $atflag_t flags) -> int {
 #if defined(__KOS__) && __KOS_VERSION__ >= 300
 	struct timespec32 tms[3];
 	if (!times)
 		return utimensat32(dirfd, filename, NULL, flags);
-	tms[0].@tv_sec@  = (__time32_t)times[0].@tv_sec@;
-	tms[0].@tv_nsec@ = times[0].@tv_nsec@;
-	tms[1].@tv_sec@  = (__time32_t)times[1].@tv_sec@;
-	tms[1].@tv_nsec@ = times[1].@tv_nsec@;
+	tms[0].tv_sec  = (__time32_t)times[0].tv_sec;
+	tms[0].tv_nsec = times[0].tv_nsec;
+	tms[1].tv_sec  = (__time32_t)times[1].tv_sec;
+	tms[1].tv_nsec = times[1].tv_nsec;
 	if (flags & 0x0200) /* AT_CHANGE_CTIME */ {
-		tms[2].@tv_sec@  = (__time32_t)times[2].@tv_sec@;
-		tms[2].@tv_nsec@ = times[2].@tv_nsec@;
+		tms[2].tv_sec  = (__time32_t)times[2].tv_sec;
+		tms[2].tv_nsec = times[2].tv_nsec;
 	}
 	return utimensat32(dirfd, filename, tms, flags);
 #else
 	struct timespec32 tms[2];
 	if (!times)
 		return utimensat32(dirfd, filename, NULL, flags);
-	tms[0].@tv_sec@  = (__time32_t)times[0].@tv_sec@;
-	tms[0].@tv_nsec@ = times[0].@tv_nsec@;
-	tms[1].@tv_sec@  = (__time32_t)times[1].@tv_sec@;
-	tms[1].@tv_nsec@ = times[1].@tv_nsec@;
+	tms[0].tv_sec  = (__time32_t)times[0].tv_sec;
+	tms[0].tv_nsec = times[0].tv_nsec;
+	tms[1].tv_sec  = (__time32_t)times[1].tv_sec;
+	tms[1].tv_nsec = times[1].tv_nsec;
 	return utimensat32(dirfd, filename, tms, flags);
 #endif
 }
 %#endif /* __USE_TIME64 */
 %#endif /* __USE_ATFILE */
 
-[cp][ignore] futimens32:($fd_t fd, [[nullable]] struct timespec const times[2 /*or:3*/]) -> int = futimens?;
+[[cp]][ignore] futimens32:($fd_t fd, [[nullable]] struct timespec const times[2 /*or:3*/]) -> int = futimens?;
 
 %
 %#ifdef __USE_XOPEN2K8
@@ -675,34 +675,34 @@ futimens:($fd_t fd, [[nullable]] struct timespec const times[2 /*or:3*/]) -> int
 	struct timespec64 tms[2];
 	if (!times)
 		return futimens64(fd, NULL);
-	tms[0].@tv_sec@  = (__time64_t)times[0].@tv_sec@;
-	tms[0].@tv_nsec@ = times[0].@tv_nsec@;
-	tms[1].@tv_sec@  = (__time64_t)times[1].@tv_sec@;
-	tms[1].@tv_nsec@ = times[1].@tv_nsec@;
+	tms[0].tv_sec  = (__time64_t)times[0].tv_sec;
+	tms[0].tv_nsec = times[0].tv_nsec;
+	tms[1].tv_sec  = (__time64_t)times[1].tv_sec;
+	tms[1].tv_nsec = times[1].tv_nsec;
 	return futimens64(fd, tms);
 #else /* __CRT_HAVE_utimensat64 */
 	struct timespec32 tms[2];
 	if (!times)
 		return futimens32(fd, NULL);
-	tms[0].@tv_sec@  = (__time32_t)times[0].@tv_sec@;
-	tms[0].@tv_nsec@ = times[0].@tv_nsec@;
-	tms[1].@tv_sec@  = (__time32_t)times[1].@tv_sec@;
-	tms[1].@tv_nsec@ = times[1].@tv_nsec@;
+	tms[0].tv_sec  = (__time32_t)times[0].tv_sec;
+	tms[0].tv_nsec = times[0].tv_nsec;
+	tms[1].tv_sec  = (__time32_t)times[1].tv_sec;
+	tms[1].tv_nsec = times[1].tv_nsec;
 	return futimens32(fd, tms);
 #endif /* !__CRT_HAVE_utimensat64 */
 }
 
 %#ifdef __USE_TIME64
 [time64_variant_of(futimens)]
-[cp][noexport][requires(defined(__CRT_HAVE_futimens))]
+[[cp]][noexport][requires(defined(__CRT_HAVE_futimens))]
 futimens64:($fd_t fd, [[nullable]] struct timespec64 const times[2 /*or:3*/]) -> int {
 	struct timespec32 tms[2];
 	if (!times)
 		return futimens32(fd, NULL);
-	tms[0].@tv_sec@  = (__time32_t)times[0].@tv_sec@;
-	tms[0].@tv_nsec@ = times[0].@tv_nsec@;
-	tms[1].@tv_sec@  = (__time32_t)times[1].@tv_sec@;
-	tms[1].@tv_nsec@ = times[1].@tv_nsec@;
+	tms[0].tv_sec  = (__time32_t)times[0].tv_sec;
+	tms[0].tv_nsec = times[0].tv_nsec;
+	tms[1].tv_sec  = (__time32_t)times[1].tv_sec;
+	tms[1].tv_nsec = times[1].tv_nsec;
 	return futimens32(fd, tms);
 }
 %#endif /* __USE_TIME64 */

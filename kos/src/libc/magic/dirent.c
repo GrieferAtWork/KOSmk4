@@ -209,7 +209,7 @@ rewinddir:([[nonnull]] DIR *__restrict dirp);
 %#ifdef __USE_LARGEFILE64
 @@64-bit equivalent of `readdir(3)'
 @@@EXCEPT: Returns NULL for end-of-directory; throws an error if something else went wrong
-[cp][dirent64_variant_of(readdir)][decl_prefix(DEFINE_STRUCT_DIRSTREAM)]
+[[cp]][dirent64_variant_of(readdir)][decl_prefix(DEFINE_STRUCT_DIRSTREAM)]
 readdir64:([[nonnull]] DIR *__restrict dirp) -> struct dirent64 *;
 %#endif /* __USE_LARGEFILE64 */
 
@@ -229,7 +229,7 @@ readdir_r:([[nonnull]] DIR *__restrict dirp,
 @@      kernel does not impose a limit on the length of a single directory entry name (s.a. 'kreaddir')
 @@>> Instead, simply use `readdir()' / `readdir64()', which will automatically (re-)allocate an internal,
 @@   per-directory buffer of sufficient size to house any directory entry (s.a.: `READDIR_DEFAULT')
-[cp][decl_prefix(DEFINE_STRUCT_DIRSTREAM)][dirent64_variant_of(readdir_r)]
+[[cp]][decl_prefix(DEFINE_STRUCT_DIRSTREAM)][dirent64_variant_of(readdir_r)]
 readdir64_r:([[nonnull]] DIR *__restrict dirp,
              [[nonnull]] struct dirent64 *__restrict entry,
              [[nonnull]] struct dirent64 **__restrict result) -> int;
@@ -302,7 +302,7 @@ scandirat:($fd_t dirfd, [[nonnull]] char const *__restrict dir,
 %typedef int (*__scandir64_cmp_t)(struct dirent64 const **, struct dirent64 const **);
 
 @@64-bit variant of `scandir()'
-[cp][dirent64_variant_of(scandir)]
+[[cp]][dirent64_variant_of(scandir)]
 [[userimpl, requires(defined(__CRT_AT_FDCWD) && $has_function(scandirat64))]]
 scandir64:(
 	[[nonnull]] char const *__restrict dir,
@@ -312,7 +312,7 @@ scandir64:(
 }
 
 @@64-bit variant of `scandirat()'
-[cp][dirent64_variant_of(scandirat)]
+[[cp]][dirent64_variant_of(scandirat)]
 scandirat64:(
 	$fd_t dirfd, [[nonnull]] char const *__restrict dir,
 	[[nonnull]] struct dirent64 ***__restrict namelist,

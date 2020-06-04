@@ -89,50 +89,50 @@ struct spwd {
 
 @@Open database for reading.
 @@This function is not part of POSIX and therefore no official cancellation point
-[cp] setspent:();
+[[cp]] setspent:();
 
 @@Close database.
 [cp_nokos] endspent:();
 
 @@Get next entry from database, perhaps after opening the file.
 @@This function is not part of POSIX and therefore no official cancellation point
-[cp] getspent:() -> struct spwd *;
+[[cp]] getspent:() -> struct spwd *;
 
 @@Get shadow entry matching NAME.
 @@This function is not part of POSIX and therefore no official cancellation point
-[cp] getspnam:([[nonnull]] char const *__restrict name) -> struct spwd *;
+[[cp]] getspnam:([[nonnull]] char const *__restrict name) -> struct spwd *;
 
 @@Read shadow entry from STRING.
 @@This function is not part of POSIX and therefore no official cancellation point
-[cp] sgetspent:([[nonnull]] char const *__restrict string) -> struct spwd *;
+[[cp]] sgetspent:([[nonnull]] char const *__restrict string) -> struct spwd *;
 
 @@Read next shadow entry from STREAM.
 @@This function is not part of POSIX and therefore no official cancellation point
-[cp] fgetspent:([[nonnull]] $FILE *__restrict stream) -> struct spwd *;
+[[cp]] fgetspent:([[nonnull]] $FILE *__restrict stream) -> struct spwd *;
 
 @@Write line containing shadow password entry to stream.
 @@This function is not part of POSIX and therefore no official cancellation point
-[cp] putspent:([[nonnull]] struct spwd const *__restrict p,
+[[cp]] putspent:([[nonnull]] struct spwd const *__restrict p,
                [[nonnull]] $FILE *__restrict stream) -> int;
 
 %
 %#ifdef __USE_MISC
 @@Reentrant versions of some of the functions above.
 @@These functions are not part of POSIX and therefore no official cancellation point
-[cp] getspent_r:([[nonnull]] struct spwd *__restrict result_buf,
-                 [outp(buflen)] char *__restrict buffer, size_t buflen,
+[[cp]] getspent_r:([[nonnull]] struct spwd *__restrict result_buf,
+                 [[outp(buflen)]] char *__restrict buffer, size_t buflen,
                  [[nonnull]] struct spwd **__restrict result) -> int;
-[cp][doc_alias(getspent_r)]
+[[cp]][doc_alias(getspent_r)]
 getspnam_r:([[nonnull]] char const *__restrict name,
             [[nonnull]] struct spwd *__restrict result_buf,
             [[nonnull]] char *__restrict buffer, size_t buflen,
             [[nonnull]] struct spwd **__restrict result) -> int;
-[cp][doc_alias(getspent_r)]
+[[cp]][doc_alias(getspent_r)]
 sgetspent_r:([[nonnull]] char const *__restrict string,
              [[nonnull]] struct spwd *__restrict result_buf,
              [[nonnull]] char *__restrict buffer, size_t buflen,
              [[nonnull]] struct spwd **__restrict result) -> int;
-[cp][doc_alias(getspent_r)]
+[[cp]][doc_alias(getspent_r)]
 fgetspent_r:([[nonnull]] $FILE *__restrict stream,
              [[nonnull]] struct spwd *__restrict result_buf,
              [[nonnull]] char *__restrict buffer, size_t buflen,

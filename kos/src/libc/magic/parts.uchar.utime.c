@@ -36,17 +36,17 @@ __SYSDECL_BEGIN
 
 }
 
-[ignore][alias(*)][attribute(*)] crt_c16utime32:(*) %{uchar16(crt_wutime32)}
-[ignore][alias(*)][attribute(*)] crt_c16utime64:(*) %{uchar16(crt_wutime64)}
-[ignore][alias(*)][attribute(*)] crt_c32utime32:(*) %{uchar32(crt_wutime32)}
-[ignore][alias(*)][attribute(*)] crt_c32utime64:(*) %{uchar32(crt_wutime64)}
+[ignore] crt_c16utime32:(*) %{uchar16(crt_wutime32)}
+[ignore] crt_c16utime64:(*) %{uchar16(crt_wutime64)}
+[ignore] crt_c32utime32:(*) %{uchar32(crt_wutime32)}
+[ignore] crt_c32utime64:(*) %{uchar32(crt_wutime64)}
 
 
-[attribute(*)][alias(*)] c16utime:(*) %{uchar(wutime)}
-[attribute(*)][alias(*)] c32utime:(*) %{uchar(wutime)}
+c16utime:(*) %{uchar(wutime)}
+c32utime:(*) %{uchar(wutime)}
 %#ifdef __USE_TIME64
-[attribute(*)][alias(*)] c16utime64:(*) %{uchar(wutime64)}
-[attribute(*)][alias(*)] c32utime64:(*) %{uchar(wutime64)}
+c16utime64:(*) %{uchar(wutime64)}
+c32utime64:(*) %{uchar(wutime64)}
 %#endif /* __USE_TIME64 */
 
 %{

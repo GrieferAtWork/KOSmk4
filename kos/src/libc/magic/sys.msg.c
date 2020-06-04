@@ -96,10 +96,10 @@ msgctl:(int msqid, int cmd, struct msqid_ds *buf) -> int;
 msgget:(key_t key, int msgflg) -> int;
 
 @@Receive message from message queue
-[cp] msgrcv:(int msqid, void *msgp, size_t msgsz, $longptr_t msgtyp, int msgflg) -> ssize_t;
+[[cp]] msgrcv:(int msqid, void *msgp, size_t msgsz, $longptr_t msgtyp, int msgflg) -> ssize_t;
 
 @@Send message to message queue
-[cp] msgsnd:(int msqid, const void *msgp, size_t msgsz, int msgflg) -> int;
+[[cp]] msgsnd:(int msqid, const void *msgp, size_t msgsz, int msgflg) -> int;
 
 %{
 

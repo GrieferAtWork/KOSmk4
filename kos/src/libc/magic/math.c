@@ -121,18 +121,18 @@ __SYSDECL_BEGIN
 %[insert:std]
 
 @@Arc cosine of X
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__acos)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__acos)][nothrow][crtbuiltin]
 acos:(double x) -> double; /* TODO */
 
 @@Arc sine of X
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__asin)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__asin)][nothrow][crtbuiltin]
 asin:(double x) -> double; /* TODO */
 
 @@Arc tangent of X
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__atan)][nothrow][crtbuiltin]
-[impl_include("<libm/fcomp.h>")][impl_include(<libm/fabs.h>)]
-[impl_include("<libm/matherr.h>")][impl_include(<libm/inf.h>)]
-[requires_include("<ieee754.h>")][impl_include(<libm/atan.h>)]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__atan)][nothrow][crtbuiltin]
+[impl_include("<libm/fcomp.h>")][impl_include("<libm/fabs.h>")]
+[impl_include("<libm/matherr.h>")][impl_include("<libm/inf.h>")]
+[requires_include("<ieee754.h>")][impl_include("<libm/atan.h>")]
 [requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]
@@ -148,9 +148,9 @@ atan:(double x) -> double {
 }
 
 @@Arc tangent of Y/X
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__atan2)][nothrow][crtbuiltin]
-[impl_include(<bits/huge_val.h>)][impl_include("<libm/matherr.h>")]
-[requires_include("<ieee754.h>")][impl_include(<libm/atan2.h>)]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__atan2)][nothrow][crtbuiltin]
+[impl_include("<bits/huge_val.h>")][impl_include("<libm/matherr.h>")]
+[requires_include("<ieee754.h>")][impl_include("<libm/atan2.h>")]
 [requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]
@@ -161,64 +161,64 @@ atan2:(double y, double x) -> double {
 }
 
 @@Cosine of X
-[attribute(@__DECL_SIMD_cos@)][decl_include(<bits/math-vector.h>)]
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__cos)][nothrow][crtbuiltin]
+[attribute("__DECL_SIMD_cos")][decl_include("<bits/math-vector.h>")]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__cos)][nothrow][crtbuiltin]
 cos:(double x) -> double; /* TODO */
 
 @@Sine of X
-[attribute(@__DECL_SIMD_sin@)][decl_include(<bits/math-vector.h>)]
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__sin)][nothrow][crtbuiltin]
+[attribute("__DECL_SIMD_sin")][decl_include("<bits/math-vector.h>")]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__sin)][nothrow][crtbuiltin]
 sin:(double x) -> double; /* TODO */
 
 @@Tangent of X
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__tan)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__tan)][nothrow][crtbuiltin]
 tan:(double x) -> double; /* TODO */
 
 
 
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__acosf)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__acosf)][nothrow][crtbuiltin]
 acosf:(float x) -> float; /* TODO */
 
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__asinf)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__asinf)][nothrow][crtbuiltin]
 asinf:(float x) -> float; /* TODO */
 
-[std][ATTR_WUNUSED][ATTR_CONST][alias(__atanf)][nothrow][crtbuiltin]
-atanf:(float x) -> float %{auto_block(mathfun)}
+[std][ATTR_WUNUSED][ATTR_CONST][export_alias(__atanf)][nothrow][crtbuiltin]
+atanf:(float x) -> float %{generate(double2float)}
 
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__atan2f)][nothrow][crtbuiltin]
-atan2f:(float y, float x) -> float %{auto_block(mathfun)}
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__atan2f)][nothrow][crtbuiltin]
+atan2f:(float y, float x) -> float %{generate(double2float)}
 
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__cosf)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__cosf)][nothrow][crtbuiltin]
 cosf:(float x) -> float; /* TODO */
 
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__sinf)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__sinf)][nothrow][crtbuiltin]
 sinf:(float x) -> float; /* TODO */
 
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__tanf)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__tanf)][nothrow][crtbuiltin]
 tanf:(float x) -> float; /* TODO */
 
 
 
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__acosl)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__acosl)][nothrow][crtbuiltin]
 acosl:(__LONGDOUBLE x) -> __LONGDOUBLE; /* TODO */
 
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__asinl)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__asinl)][nothrow][crtbuiltin]
 asinl:(__LONGDOUBLE x) -> __LONGDOUBLE; /* TODO */
 
-[std][ATTR_WUNUSED][ATTR_CONST][alias(__atanl)][nothrow][crtbuiltin]
-atanl:(__LONGDOUBLE x) -> __LONGDOUBLE %{auto_block(mathfun)}
+[std][ATTR_WUNUSED][ATTR_CONST][export_alias(__atanl)][nothrow][crtbuiltin]
+atanl:(__LONGDOUBLE x) -> __LONGDOUBLE %{generate(double2ldouble)}
 
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__atan2l)][nothrow][crtbuiltin]
-atan2l:(__LONGDOUBLE y, __LONGDOUBLE x) -> __LONGDOUBLE %{auto_block(mathfun)}
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__atan2l)][nothrow][crtbuiltin]
+atan2l:(__LONGDOUBLE y, __LONGDOUBLE x) -> __LONGDOUBLE %{generate(double2ldouble)}
 
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__cosl)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__cosl)][nothrow][crtbuiltin]
 cosl:(__LONGDOUBLE x) -> __LONGDOUBLE; /* TODO */
 
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__sinl)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__sinl)][nothrow][crtbuiltin]
 sinl:(__LONGDOUBLE x) -> __LONGDOUBLE; /* TODO */
 
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__tanl)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__tanl)][nothrow][crtbuiltin]
 tanl:(__LONGDOUBLE x) -> __LONGDOUBLE; /* TODO */
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
@@ -226,36 +226,36 @@ tanl:(__LONGDOUBLE x) -> __LONGDOUBLE; /* TODO */
 %(std, c)/* Hyperbolic functions. */
 
 @@Hyperbolic cosine of X
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__cosh)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__cosh)][nothrow][crtbuiltin]
 cosh:(double x) -> double; /* TODO */
 
 @@Hyperbolic sine of X
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__sinh)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__sinh)][nothrow][crtbuiltin]
 sinh:(double x) -> double; /* TODO */
 
 @@Hyperbolic tangent of X
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__tanh)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__tanh)][nothrow][crtbuiltin]
 tanh:(double x) -> double; /* TODO */
 
 
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__coshf)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__coshf)][nothrow][crtbuiltin]
 coshf:(float x) -> float; /* TODO */
 
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__sinhf)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__sinhf)][nothrow][crtbuiltin]
 sinhf:(float x) -> float; /* TODO */
 
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__tanhf)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__tanhf)][nothrow][crtbuiltin]
 tanhf:(float x) -> float; /* TODO */
 
 
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__coshl)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__coshl)][nothrow][crtbuiltin]
 coshl:(__LONGDOUBLE x) -> __LONGDOUBLE; /* TODO */
 
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__sinhl)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__sinhl)][nothrow][crtbuiltin]
 sinhl:(__LONGDOUBLE x) -> __LONGDOUBLE; /* TODO */
 
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__tanhl)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__tanhl)][nothrow][crtbuiltin]
 tanhl:(__LONGDOUBLE x) -> __LONGDOUBLE; /* TODO */
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
@@ -263,36 +263,36 @@ tanhl:(__LONGDOUBLE x) -> __LONGDOUBLE; /* TODO */
 %(std, c)
 %(std, c, ccompat)#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
 @@Hyperbolic arc cosine of X
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__acosh)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__acosh)][nothrow][crtbuiltin]
 acosh:(double x) -> double; /* TODO */
 
 @@Hyperbolic arc sine of X
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__asinh)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__asinh)][nothrow][crtbuiltin]
 asinh:(double x) -> double; /* TODO */
 
 @@Hyperbolic arc tangent of X
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__atanh)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__atanh)][nothrow][crtbuiltin]
 atanh:(double x) -> double; /* TODO */
 
 
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__acoshf)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__acoshf)][nothrow][crtbuiltin]
 acoshf:(float x) -> float; /* TODO */
 
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__asinhf)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__asinhf)][nothrow][crtbuiltin]
 asinhf:(float x) -> float; /* TODO */
 
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__atanhf)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__atanhf)][nothrow][crtbuiltin]
 atanhf:(float x) -> float; /* TODO */
 
 
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__acoshl)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__acoshl)][nothrow][crtbuiltin]
 acoshl:(__LONGDOUBLE x) -> __LONGDOUBLE; /* TODO */
 
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__asinhl)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__asinhl)][nothrow][crtbuiltin]
 asinhl:(__LONGDOUBLE x) -> __LONGDOUBLE; /* TODO */
 
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__atanhl)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__atanhl)][nothrow][crtbuiltin]
 atanhl:(__LONGDOUBLE x) -> __LONGDOUBLE; /* TODO */
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %(std, c, ccompat)#endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
@@ -301,8 +301,8 @@ atanhl:(__LONGDOUBLE x) -> __LONGDOUBLE; /* TODO */
 %(std, c)/* Exponential and logarithmic functions. */
 
 @@Exponential function of X
-[attribute(@__DECL_SIMD_exp@)][decl_include(<bits/math-vector.h>)]
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__exp)][nothrow][crtbuiltin]
+[attribute("__DECL_SIMD_exp")][decl_include("<bits/math-vector.h>")]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__exp)][nothrow][crtbuiltin]
 [impl_include("<libm/signbit.h>")]
 [impl_include("<libm/matherr.h>")][impl_include(<libm/finite.h>)]
 [requires_include("<ieee754.h>")][impl_include(<libm/exp.h>)]
@@ -324,7 +324,7 @@ exp:(double x) -> double {
 }
 
 @@Break VALUE into a normalized fraction and an integral power of 2
-[std][ATTR_WUNUSED][alias(__frexp)][crtbuiltin]
+[std][ATTR_WUNUSED][export_alias(__frexp)][crtbuiltin]
 [requires_include("<ieee754.h>")][impl_include(<libm/frexp.h>)]
 [requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
@@ -340,7 +340,7 @@ frexp:(double x, [[nonnull]] int *pexponent) -> double {
 }
 
 @@X times (two to the EXP power)
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__ldexp)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__ldexp)][nothrow][crtbuiltin]
 [impl_include("<parts/errno.h>")][impl_include(<libm/finite.h>)]
 [requires_include("<ieee754.h>")][impl_include(<libm/ldexp.h>)]
 [requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
@@ -363,16 +363,16 @@ ldexp:(double x, int exponent) -> double {
 }
 
 @@Natural logarithm of X
-[attribute(@__DECL_SIMD_log@)][decl_include(<bits/math-vector.h>)]
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__log)][nothrow][crtbuiltin]
+[attribute("__DECL_SIMD_log")][decl_include("<bits/math-vector.h>")]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__log)][nothrow][crtbuiltin]
 log:(double x) -> double; /* TODO */
 
 @@Base-ten logarithm of X
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__log10)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__log10)][nothrow][crtbuiltin]
 log10:(double x) -> double; /* TODO */
 
 @@Break VALUE into integral and fractional parts
-[std][ATTR_WUNUSED][alias(__modf)][crtbuiltin]
+[std][ATTR_WUNUSED][export_alias(__modf)][crtbuiltin]
 [requires_include("<ieee754.h>")][impl_include(<libm/modf.h>)]
 [requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
@@ -388,54 +388,54 @@ modf:(double x, [[nonnull]] double *iptr) -> double {
 }
 
 
-[attribute(@__DECL_SIMD_expf@)][decl_include(<bits/math-vector.h>)]
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__expf)][nothrow][crtbuiltin]
-expf:(float x) -> float %{auto_block(mathfun)}
+[attribute("__DECL_SIMD_expf")][decl_include("<bits/math-vector.h>")]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__expf)][nothrow][crtbuiltin]
+expf:(float x) -> float %{generate(double2float)}
 
-[std][ATTR_WUNUSED][alias(__frexpf)][crtbuiltin]
-frexpf:(float x, [[nonnull]] int *pexponent) -> float %{auto_block(mathfun)}
+[std][ATTR_WUNUSED][export_alias(__frexpf)][crtbuiltin]
+frexpf:(float x, [[nonnull]] int *pexponent) -> float %{generate(double2float)}
 
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__ldexpf)][nothrow][crtbuiltin]
-ldexpf:(float x, int exponent) -> float %{auto_block(mathfun)}
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__ldexpf)][nothrow][crtbuiltin]
+ldexpf:(float x, int exponent) -> float %{generate(double2float)}
 
-[attribute(@__DECL_SIMD_logf@)][decl_include(<bits/math-vector.h>)]
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__logf)][nothrow][crtbuiltin]
+[attribute("__DECL_SIMD_logf")][decl_include("<bits/math-vector.h>")]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__logf)][nothrow][crtbuiltin]
 logf:(float x) -> float; /* TODO */
 
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__log10f)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__log10f)][nothrow][crtbuiltin]
 log10f:(float x) -> float; /* TODO */
 
-[std][alias(__modff)][crtbuiltin]
-modff:(float x, [[nonnull]] float *iptr) -> float %{auto_block(mathfun)}
+[std][export_alias(__modff)][crtbuiltin]
+modff:(float x, [[nonnull]] float *iptr) -> float %{generate(double2float)}
 
 
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
-[attribute(@__DECL_SIMD_expl@)][decl_include(<bits/math-vector.h>)]
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__expl)][nothrow][crtbuiltin]
-expl:(__LONGDOUBLE x) -> __LONGDOUBLE %{auto_block(mathfun)}
+[attribute("__DECL_SIMD_expl")][decl_include("<bits/math-vector.h>")]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__expl)][nothrow][crtbuiltin]
+expl:(__LONGDOUBLE x) -> __LONGDOUBLE %{generate(double2ldouble)}
 
-[std][ATTR_WUNUSED][alias(__frexpl)][crtbuiltin]
-frexpl:(__LONGDOUBLE x, [[nonnull]] int *pexponent) -> __LONGDOUBLE %{auto_block(mathfun)}
+[std][ATTR_WUNUSED][export_alias(__frexpl)][crtbuiltin]
+frexpl:(__LONGDOUBLE x, [[nonnull]] int *pexponent) -> __LONGDOUBLE %{generate(double2ldouble)}
 
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__ldexpl)][nothrow][crtbuiltin]
-ldexpl:(__LONGDOUBLE x, int exponent) -> __LONGDOUBLE %{auto_block(mathfun)}
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__ldexpl)][nothrow][crtbuiltin]
+ldexpl:(__LONGDOUBLE x, int exponent) -> __LONGDOUBLE %{generate(double2ldouble)}
 
-[attribute(@__DECL_SIMD_logl@)][decl_include(<bits/math-vector.h>)]
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__logl)][nothrow][crtbuiltin]
+[attribute("__DECL_SIMD_logl")][decl_include("<bits/math-vector.h>")]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__logl)][nothrow][crtbuiltin]
 logl:(__LONGDOUBLE x) -> __LONGDOUBLE; /* TODO */
 
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__log10l)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__log10l)][nothrow][crtbuiltin]
 log10l:(__LONGDOUBLE x) -> __LONGDOUBLE; /* TODO */
 
-[std][alias(__modfl)][crtbuiltin]
-modfl:(__LONGDOUBLE x, [[nonnull]] __LONGDOUBLE *iptr) -> __LONGDOUBLE %{auto_block(mathfun)}
+[std][export_alias(__modfl)][crtbuiltin]
+modfl:(__LONGDOUBLE x, [[nonnull]] __LONGDOUBLE *iptr) -> __LONGDOUBLE %{generate(double2ldouble)}
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 
 %(std, c)
 %(std, c, ccompat)#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
 @@Return exp(X) - 1
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__expm1)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__expm1)][nothrow][crtbuiltin]
 [impl_include("<libm/matherr.h>")][impl_include("<libm/signbit.h>")]
 [impl_include(<libm/finite.h>)]
 [requires_include("<ieee754.h>")][impl_include(<libm/expm1.h>)]
@@ -456,32 +456,32 @@ expm1:(double x) -> double {
 }
 
 @@Return log(1 + X)
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__log1p)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__log1p)][nothrow][crtbuiltin]
 log1p:(double x) -> double; /* TODO */
 
 @@Return the base 2 signed integral exponent of X
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__logb, _logb)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__logb, _logb)][nothrow][crtbuiltin]
 logb:(double x) -> double; /* TODO */
 
 
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__expm1f)][nothrow][crtbuiltin]
-expm1f:(float x) -> float %{auto_block(mathfun)}
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__expm1f)][nothrow][crtbuiltin]
+expm1f:(float x) -> float %{generate(double2float)}
 
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__log1pf)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__log1pf)][nothrow][crtbuiltin]
 log1pf:(float x) -> float; /* TODO */
 
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__logbf)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__logbf)][nothrow][crtbuiltin]
 logbf:(float x) -> float; /* TODO */
 
 
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__expm1l)][nothrow][crtbuiltin]
-expm1l:(__LONGDOUBLE x) -> __LONGDOUBLE %{auto_block(mathfun)}
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__expm1l)][nothrow][crtbuiltin]
+expm1l:(__LONGDOUBLE x) -> __LONGDOUBLE %{generate(double2ldouble)}
 
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__log1pl)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__log1pl)][nothrow][crtbuiltin]
 log1pl:(__LONGDOUBLE x) -> __LONGDOUBLE; /* TODO */
 
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__logbl)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__logbl)][nothrow][crtbuiltin]
 logbl:(__LONGDOUBLE x) -> __LONGDOUBLE; /* TODO */
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %(std, c, ccompat)#endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
@@ -489,26 +489,26 @@ logbl:(__LONGDOUBLE x) -> __LONGDOUBLE; /* TODO */
 %(std, c)
 %(std, c, ccompat)#ifdef __USE_ISOC99
 @@Compute base-2 exponential of X
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__exp2)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__exp2)][nothrow][crtbuiltin]
 exp2:(double x) -> double; /* TODO */
 
 @@Compute base-2 logarithm of X
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__log2)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__log2)][nothrow][crtbuiltin]
 log2:(double x) -> double; /* TODO */
 
 
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__exp2f)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__exp2f)][nothrow][crtbuiltin]
 exp2f:(float x) -> float; /* TODO */
 
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__log2f)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__log2f)][nothrow][crtbuiltin]
 log2f:(float x) -> float; /* TODO */
 
 
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__exp2l)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__exp2l)][nothrow][crtbuiltin]
 exp2l:(__LONGDOUBLE x) -> __LONGDOUBLE; /* TODO */
 
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__log2l)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__log2l)][nothrow][crtbuiltin]
 log2l:(__LONGDOUBLE x) -> __LONGDOUBLE; /* TODO */
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %(std, c, ccompat)#endif /* __USE_ISOC99 */
@@ -517,9 +517,9 @@ log2l:(__LONGDOUBLE x) -> __LONGDOUBLE; /* TODO */
 %(std, c)/* Power functions. */
 
 @@Return X to the Y power
-[attribute(@__DECL_SIMD_pow@)][decl_include(<bits/math-vector.h>)]
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__pow)][nothrow][crtbuiltin]
-[impl_include(<libm/finite.h>)][impl_include(<libm/isnan.h>)]
+[attribute("__DECL_SIMD_pow")][decl_include("<bits/math-vector.h>")]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__pow)][nothrow][crtbuiltin]
+[impl_include(<libm/finite.h>)][impl_include("<libm/isnan.h>")]
 [impl_include("<libm/matherr.h>")]
 [requires_include("<ieee754.h>")][impl_include(<libm/pow.h>)]
 [requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
@@ -578,8 +578,8 @@ pow:(double x, double y) -> double {
 
 
 @@Return the square root of X
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__sqrt)][nothrow][crtbuiltin]
-[impl_include("<libm/fcomp.h>")][impl_include("<libm/nan.h">)]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__sqrt)][nothrow][crtbuiltin]
+[impl_include("<libm/fcomp.h>")][impl_include("<libm/nan.h>")]
 [impl_include("<libm/matherr.h>")]
 [requires_include("<ieee754.h>")][impl_include("<libm/sqrt.h>")]
 [requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
@@ -591,34 +591,34 @@ sqrt:(double x) -> double {
 	return __LIBM_MATHFUN(@sqrt@, x);
 }
 
-[attribute(@__DECL_SIMD_powf@)][decl_include(<bits/math-vector.h>)]
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__powf)][nothrow][crtbuiltin]
-powf:(float x, float y) -> float %{auto_block(mathfun)}
+[attribute("__DECL_SIMD_powf")][decl_include("<bits/math-vector.h>")]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__powf)][nothrow][crtbuiltin]
+powf:(float x, float y) -> float %{generate(double2float)}
 
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__sqrtf)][nothrow][crtbuiltin]
-sqrtf:(float x) -> float %{auto_block(mathfun)}
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__sqrtf)][nothrow][crtbuiltin]
+sqrtf:(float x) -> float %{generate(double2float)}
 
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
-[attribute(@__DECL_SIMD_powl@)][decl_include(<bits/math-vector.h>)]
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__powl)][nothrow][crtbuiltin]
-powl:(__LONGDOUBLE x, __LONGDOUBLE y) -> __LONGDOUBLE  %{auto_block(mathfun)}
+[attribute("__DECL_SIMD_powl")][decl_include("<bits/math-vector.h>")]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__powl)][nothrow][crtbuiltin]
+powl:(__LONGDOUBLE x, __LONGDOUBLE y) -> __LONGDOUBLE %{generate(double2ldouble)}
 
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__sqrtl)][nothrow][crtbuiltin]
-sqrtl:(__LONGDOUBLE x) -> __LONGDOUBLE %{auto_block(mathfun)}
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__sqrtl)][nothrow][crtbuiltin]
+sqrtl:(__LONGDOUBLE x) -> __LONGDOUBLE %{generate(double2ldouble)}
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 
 %(std, c)
 %(std, c, ccompat)#if defined(__USE_XOPEN) || defined(__USE_ISOC99)
 @@Return `sqrt(X*X + Y*Y)'
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__hypot)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__hypot)][nothrow][crtbuiltin]
 hypot:(double x, double y) -> double; /* TODO */
 
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__hypotf)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__hypotf)][nothrow][crtbuiltin]
 hypotf:(float x, float y) -> float;
 
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__hypotl)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][export_alias(__hypotl)][nothrow][crtbuiltin]
 hypotl:(__LONGDOUBLE x, __LONGDOUBLE y) -> __LONGDOUBLE;
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %(std, c, ccompat)#endif /* __USE_XOPEN || __USE_ISOC99 */
@@ -627,7 +627,7 @@ hypotl:(__LONGDOUBLE x, __LONGDOUBLE y) -> __LONGDOUBLE;
 %(std, c)
 %(std, c, ccompat)#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
 @@Return the cube root of X
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__cbrt)][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__cbrt)][crtbuiltin]
 [requires_include("<ieee754.h>")][impl_include(<libm/cbrt.h>)]
 [requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
@@ -636,12 +636,12 @@ cbrt:(double x) -> double {
 	return __LIBM_MATHFUN(@cbrt@, x);
 }
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__cbrtf)][crtbuiltin]
-cbrtf:(float x) -> float %{auto_block(mathfun)}
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__cbrtf)][crtbuiltin]
+cbrtf:(float x) -> float %{generate(double2float)}
 
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__cbrtl)][crtbuiltin]
-cbrtl:(__LONGDOUBLE x) -> __LONGDOUBLE %{auto_block(mathfun)}
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__cbrtl)][crtbuiltin]
+cbrtl:(__LONGDOUBLE x) -> __LONGDOUBLE %{generate(double2ldouble)}
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %(std, c, ccompat)#endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
 
@@ -649,7 +649,7 @@ cbrtl:(__LONGDOUBLE x) -> __LONGDOUBLE %{auto_block(mathfun)}
 %(std, c)/* Nearest integer, absolute value, and remainder functions. */
 
 @@Smallest integral value not less than X
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__ceil)]
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__ceil)]
 [impl_include(<hybrid/typecore.h>)][crtbuiltin]
 [impl_include(<libm/ceil.h>)]
 ceil:(double x) -> double {
@@ -665,8 +665,8 @@ ceil:(double x) -> double {
 }
 
 @@Absolute value of X
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__fabs)][crtbuiltin]
-[impl_include(<libm/fabs.h>)]
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__fabs)][crtbuiltin]
+[impl_include("<libm/fabs.h>")]
 fabs:(double x) -> double {
 #ifdef __LIBM_MATHFUN
 	return __LIBM_MATHFUN(@fabs@, x);
@@ -676,7 +676,7 @@ fabs:(double x) -> double {
 }
 
 @@Largest integer not greater than X
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__floor)]
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__floor)]
 [impl_include(<hybrid/typecore.h>)][crtbuiltin]
 [impl_include(<libm/floor.h>)]
 floor:(double x) -> double {
@@ -693,8 +693,8 @@ floor:(double x) -> double {
 
 
 @@Floating-point modulo remainder of X/Y
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__fmod)][crtbuiltin]
-[impl_include(<libm/isinf.h>)][impl_include("<libm/fcomp.h>")]
+[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][export_alias(__fmod)][crtbuiltin]
+[impl_include("<libm/isinf.h>")][impl_include("<libm/fcomp.h>")]
 [impl_include("<libm/matherr.h>")]
 [requires_include("<ieee754.h>")][impl_include(<libm/fmod.h>)]
 [requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
@@ -708,37 +708,37 @@ fmod:(double x, double y) -> double {
 	return __LIBM_MATHFUN2(@fmod@, x, y);
 }
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__ceilf)][crtbuiltin]
-ceilf:(float x) -> float %{auto_block(mathfun)}
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__ceilf)][crtbuiltin]
+ceilf:(float x) -> float %{generate(double2float)}
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__fabsf)][crtbuiltin]
-fabsf:(float x) -> float %{auto_block(mathfun)}
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__fabsf)][crtbuiltin]
+fabsf:(float x) -> float %{generate(double2float)}
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__floorf)][crtbuiltin]
-floorf:(float x) -> float %{auto_block(mathfun)}
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__floorf)][crtbuiltin]
+floorf:(float x) -> float %{generate(double2float)}
 
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__fmodf)][crtbuiltin]
-fmodf:(float x, float y) -> float %{auto_block(mathfun)}
+[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][export_alias(__fmodf)][crtbuiltin]
+fmodf:(float x, float y) -> float %{generate(double2float)}
 
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__ceill)][crtbuiltin]
-ceill:(__LONGDOUBLE x) -> __LONGDOUBLE %{auto_block(mathfun)}
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__ceill)][crtbuiltin]
+ceill:(__LONGDOUBLE x) -> __LONGDOUBLE %{generate(double2ldouble)}
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__fabsl)][crtbuiltin]
-fabsl:(__LONGDOUBLE x) -> __LONGDOUBLE %{auto_block(mathfun)}
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__fabsl)][crtbuiltin]
+fabsl:(__LONGDOUBLE x) -> __LONGDOUBLE %{generate(double2ldouble)}
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__floorl)][crtbuiltin]
-floorl:(__LONGDOUBLE x) -> __LONGDOUBLE %{auto_block(mathfun)}
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__floorl)][crtbuiltin]
+floorl:(__LONGDOUBLE x) -> __LONGDOUBLE %{generate(double2ldouble)}
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__fmodl)][crtbuiltin]
-fmodl:(__LONGDOUBLE x, __LONGDOUBLE y) -> __LONGDOUBLE %{auto_block(mathfun)}
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__fmodl)][crtbuiltin]
+fmodl:(__LONGDOUBLE x, __LONGDOUBLE y) -> __LONGDOUBLE %{generate(double2ldouble)}
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 
 %(std, c)
 %(std, c, ccompat)#ifdef __USE_ISOC99
 @@Return X with its signed changed to Y's
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__copysign, _copysign)]
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__copysign, _copysign)]
 [impl_include(<libm/copysign.h>)][crtbuiltin]
 copysign:(double num, double sign) -> double {
 #ifdef __LIBM_MATHFUN2
@@ -751,8 +751,8 @@ copysign:(double num, double sign) -> double {
 }
 
 @@Return representation of qNaN for double type
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__nan)][crtbuiltin]
-[requires_include("<ieee754.h>")][impl_include("<libm/nan.h">)]
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__nan)][crtbuiltin]
+[requires_include("<ieee754.h>")][impl_include("<libm/nan.h>")]
 [requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]
@@ -760,18 +760,18 @@ nan:(char const *tagb) -> double {
 	return __LIBM_MATHFUN1I(@nan@, tagb);
 }
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__copysignf)][crtbuiltin]
-copysignf:(float num, float sign) -> float %{auto_block(mathfun)}
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__copysignf)][crtbuiltin]
+copysignf:(float num, float sign) -> float %{generate(double2float)}
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__nanf)][crtbuiltin]
-nanf:(char const *tagb) -> float %{auto_block(mathfun)}
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__nanf)][crtbuiltin]
+nanf:(char const *tagb) -> float %{generate(double2float)}
 
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__copysignl)][crtbuiltin]
-copysignl:(__LONGDOUBLE num, __LONGDOUBLE sign) -> __LONGDOUBLE %{auto_block(mathfun)}
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__copysignl)][crtbuiltin]
+copysignl:(__LONGDOUBLE num, __LONGDOUBLE sign) -> __LONGDOUBLE %{generate(double2ldouble)}
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__nanl)][crtbuiltin]
-nanl:(char const *tagb) -> __LONGDOUBLE %{auto_block(mathfun)}
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__nanl)][crtbuiltin]
+nanl:(char const *tagb) -> __LONGDOUBLE %{generate(double2ldouble)}
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %(std, c, ccompat)#endif /* __USE_ISOC99 */
 
@@ -780,48 +780,57 @@ nanl:(char const *tagb) -> __LONGDOUBLE %{auto_block(mathfun)}
 %(std, c)
 %(std, c)/* Error and gamma functions. */
 %(std, c, ccompat)#if defined(__USE_XOPEN) || defined(__USE_ISOC99)
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__erf)][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][export_alias(__erf)][crtbuiltin]
 erf:(double x) -> double; /* TODO */
 
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__erfc)][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][export_alias(__erfc)][crtbuiltin]
 erfc:(double x) -> double; /* TODO */
 
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__lgamma, __gamma, gamma)][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][crtbuiltin]
+[[if(__has_builtin(__builtin_gamma) && defined(__LIBC_BIND_CRTBUILTINS)),
+  preferred_extern_inline(gamma, { return __builtin_gamma(x); })]]
+[export_alias(gamma, __lgamma, __gamma)]
 lgamma:(double x) -> double; /* TODO */
 
 
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__erff)][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][export_alias(__erff)][crtbuiltin]
 erff:(float x) -> float; /* TODO */
 
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__erfcf)][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][export_alias(__erfcf)][crtbuiltin]
 erfcf:(float x) -> float; /* TODO */
 
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__lgammaf, __gammaf, gammaf)][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][crtbuiltin]
+[[if(__has_builtin(__builtin_gammaf) && defined(__LIBC_BIND_CRTBUILTINS)),
+  preferred_extern_inline(gammaf, { return __builtin_gammaf(x); })]]
+[export_alias(gammaf, __lgammaf, __gammaf)]
 lgammaf:(float x) -> float; /* TODO */
 
 
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__erfl)][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][export_alias(__erfl)][crtbuiltin]
 erfl:(__LONGDOUBLE x) -> __LONGDOUBLE; /* TODO */
 
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__erfcl)][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][export_alias(__erfcl)][crtbuiltin]
 erfcl:(__LONGDOUBLE x) -> __LONGDOUBLE; /* TODO */
 
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__lgammal, __gammal, gammal)][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][crtbuiltin]
+[[if(__has_builtin(__builtin_gammal) && defined(__LIBC_BIND_CRTBUILTINS)),
+  preferred_extern_inline(gammal, { return __builtin_gammal(x); })]]
+[export_alias(gammal, __lgammal, __gammal)]
 lgammal:(__LONGDOUBLE x) -> __LONGDOUBLE; /* TODO */
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %(std, c, ccompat)#endif /* __USE_XOPEN || __USE_ISOC99 */
 
 %(std, c, ccompat)#ifdef __USE_ISOC99
 @@True gamma function
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__tgamma)][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][export_alias(__tgamma)][crtbuiltin]
 tgamma:(double x) -> double; /* TODO */
 
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__tgammaf)][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][export_alias(__tgammaf)][crtbuiltin]
 tgammaf:(float x) -> float; /* TODO */
 
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__tgammal)][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][export_alias(__tgammal)][crtbuiltin]
 tgammal:(__LONGDOUBLE x) -> __LONGDOUBLE; /* TODO */
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %(std, c, ccompat)#endif /* __USE_ISOC99 */
@@ -830,8 +839,11 @@ tgammal:(__LONGDOUBLE x) -> __LONGDOUBLE; /* TODO */
 %(std, c, ccompat)#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
 
 @@Return the integer nearest X in the direction of the prevailing rounding mode
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__rint)][crtbuiltin]
-[requires_include("<ieee754.h>")][impl_include(<libm/rint.h>)]
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][crtbuiltin]
+[[if(__has_builtin(__builtin_nearbyint) && defined(__LIBC_BIND_CRTBUILTINS)),
+  preferred_extern_inline(nearbyint, { return __builtin_nearbyint(x); })]]
+[export_alias(nearbyint, __rint, __nearbyint)]
+[requires_include("<ieee754.h>")][impl_include("<libm/rint.h>")]
 [requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]
@@ -841,8 +853,11 @@ rint:(double x) -> double {
 
 
 @@Return X + epsilon if X < Y, X - epsilon if X > Y
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__nextafter, _nextafter)][crtbuiltin]
-[requires_include("<ieee754.h>")][impl_include(<libm/nextafter.h>)]
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][crtbuiltin]
+[[if(__has_builtin(__builtin_nexttoward) && defined(__LIBC_BIND_CRTBUILTINS)),
+  preferred_extern_inline(nexttoward, { return __builtin_nexttoward(x); })]]
+[export_alias(nexttoward, __nextafter, _nextafter, __nexttoward)]
+[requires_include("<ieee754.h>")][impl_include("<libm/nextafter.h>")]
 [requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]
@@ -851,10 +866,13 @@ nextafter:(double x, double y) -> double {
 }
 
 @@Return the remainder of integer division X/P with infinite precision
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__remainder, drem, __drem)]
-[crtbuiltin][impl_include("<libm/matherr.h>")][crtbuiltin]
-[impl_include(<libm/isnan.h>)][impl_include(<libm/isinf.h>)]
-[requires_include("<ieee754.h>")][impl_include(<libm/remainder.h>)]
+[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][crtbuiltin]
+[[if(__has_builtin(__builtin_drem) && defined(__LIBC_BIND_CRTBUILTINS)),
+  preferred_extern_inline(drem, { return __builtin_drem(x, p); })]]
+[export_alias(drem, __remainder, __drem)]
+[impl_include("<libm/matherr.h>")][crtbuiltin]
+[impl_include("<libm/isnan.h>")][impl_include("<libm/isinf.h>")]
+[requires_include("<ieee754.h>")][impl_include("<libm/remainder.h>")]
 [requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]
@@ -867,7 +885,7 @@ remainder:(double x, double p) -> double {
 }
 
 @@Return the binary exponent of X, which must be nonzero
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__ilogb)][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][export_alias(__ilogb)][crtbuiltin]
 [impl_include(<libm/ilogb.h>)][impl_include("<libm/matherr.h>")]
 [requires_include("<ieee754.h>")]
 [requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
@@ -881,31 +899,49 @@ ilogb:(double x) -> int {
 	return result;
 }
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__rintf)][crtbuiltin]
-rintf:(float x) -> float %{auto_block(mathfun)}
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][crtbuiltin]
+[[if(__has_builtin(__builtin_nearbyintf) && defined(__LIBC_BIND_CRTBUILTINS)),
+  preferred_extern_inline(nearbyintf, { return __builtin_nearbyintf(x); })]]
+[export_alias(nearbyintf, __rintf, __nearbyintf)]
+rintf:(float x) -> float %{generate(double2float)}
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__nextafterf)][crtbuiltin]
-nextafterf:(float x, float y) -> float %{auto_block(mathfun)}
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][crtbuiltin]
+[[if(__has_builtin(__builtin_nexttowardf) && defined(__LIBC_BIND_CRTBUILTINS)),
+  preferred_extern_inline(nexttowardf, { return __builtin_nexttowardf(x); })]]
+[export_alias(nexttowardf, __nextafterf, __nexttowardf)]
+nextafterf:(float x, float y) -> float %{generate(double2float)}
 
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__remainderf, dremf, __dremf)][crtbuiltin]
-remainderf:(float x, float p) -> float %{auto_block(mathfun)}
+[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][crtbuiltin]
+[[if(__has_builtin(__builtin_dremf) && defined(__LIBC_BIND_CRTBUILTINS)),
+  preferred_extern_inline(dremf, { return __builtin_dremf(x, p); })]]
+[export_alias(dremf, __remainderf, __dremf)]
+remainderf:(float x, float p) -> float %{generate(double2float)}
 
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__ilogbf)][crtbuiltin]
-ilogbf:(float x) -> int %{auto_block(mathfun)}
+[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][export_alias(__ilogbf)][crtbuiltin]
+ilogbf:(float x) -> int %{generate(double2float)}
 
 
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__rintl)][crtbuiltin]
-rintl:(__LONGDOUBLE x) -> __LONGDOUBLE %{auto_block(mathfun)}
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][crtbuiltin]
+[[if(__has_builtin(__builtin_nearbyintl) && defined(__LIBC_BIND_CRTBUILTINS)),
+  preferred_extern_inline(nearbyintl, { return __builtin_nearbyintl(x); })]]
+[export_alias(nearbyintl, __rintl, __nearbyintl)]
+rintl:(__LONGDOUBLE x) -> __LONGDOUBLE %{generate(double2ldouble)}
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__nextafterl, __nexttowardl)][crtbuiltin]
-nextafterl:(__LONGDOUBLE x, __LONGDOUBLE y) -> __LONGDOUBLE %{auto_block(mathfun)}
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][crtbuiltin]
+[[if(__has_builtin(__builtin_nexttowardl) && defined(__LIBC_BIND_CRTBUILTINS)),
+  preferred_extern_inline(nexttowardl, { return __builtin_nexttowardl(x); })]]
+[export_alias(nexttowardl, __nextafterl, __nexttowardl)]
+nextafterl:(__LONGDOUBLE x, __LONGDOUBLE y) -> __LONGDOUBLE %{generate(double2ldouble)}
 
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__remainderl, dreml, __dreml)][crtbuiltin]
-remainderl:(__LONGDOUBLE x, __LONGDOUBLE p) -> __LONGDOUBLE %{auto_block(mathfun)}
+[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][crtbuiltin]
+[[if(__has_builtin(__builtin_dreml) && defined(__LIBC_BIND_CRTBUILTINS)),
+  preferred_extern_inline(dreml, { return __builtin_dreml(x, p); })]]
+[export_alias(dreml, __remainderl, __dreml)]
+remainderl:(__LONGDOUBLE x, __LONGDOUBLE p) -> __LONGDOUBLE %{generate(double2ldouble)}
 
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__ilogbl)][crtbuiltin]
-ilogbl:(__LONGDOUBLE x) -> int %{auto_block(mathfun)}
+[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][export_alias(__ilogbl)][crtbuiltin]
+ilogbl:(__LONGDOUBLE x) -> int %{generate(double2ldouble)}
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %(std, c, ccompat)#endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
 
@@ -914,7 +950,7 @@ ilogbl:(__LONGDOUBLE x) -> int %{auto_block(mathfun)}
 %(std, c)
 %(std, c, ccompat)#ifdef __USE_ISOC99
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__nexttoward)][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__nexttoward)][crtbuiltin]
 [requires_include("<ieee754.h>")][impl_include(<libm/nexttoward.h>)]
 [requires(((defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
             defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)) &&
@@ -933,8 +969,8 @@ nexttoward:(double x, __LONGDOUBLE y) -> double {
 }
 
 @@Return X times (2 to the Nth power)
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__scalbn)][crtbuiltin]
-[if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias(scalbln, __scalbln)]
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__scalbn)][crtbuiltin]
+[if(__SIZEOF_INT__ == __SIZEOF_LONG__), export_alias(scalbln, __scalbln)]
 [requires_include("<ieee754.h>")][impl_include(<libm/scalbn.h>)]
 [requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
@@ -949,9 +985,9 @@ scalbn:(double x, int n) -> double {
 #endif /* !... */
 }
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__scalbln)][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__scalbln)][crtbuiltin]
 [alt_variant_of(__SIZEOF_INT__ == __SIZEOF_LONG__, scalbn)][doc_alias(scalbn)]
-[if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias(__scalbn)]
+[if(__SIZEOF_INT__ == __SIZEOF_LONG__), export_alias(__scalbn)]
 [requires_include("<ieee754.h>")][impl_include(<libm/scalbn.h>)]
 [requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
@@ -966,13 +1002,10 @@ scalbln:(double x, long int n) -> double {
 #endif /* !... */
 }
 
-@@Round X to integral value in floating-point format using current
-@@rounding direction, but do not raise inexact exception
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__nearbyint)][crtbuiltin]
-nearbyint:(double x) -> double = rint;
+nearbyint(*) = rint;
 
 @@Round X to nearest integral value, rounding halfway cases away from zero
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__round)]
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__round)]
 [impl_include(<hybrid/typecore.h>)][crtbuiltin]
 [impl_include(<libm/round.h>)]
 round:(double x) -> double {
@@ -996,7 +1029,7 @@ round:(double x) -> double {
 
 @@Round X to the integral value in floating-point
 @@format nearest but not larger in magnitude
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__trunc)]
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__trunc)]
 [impl_include(<hybrid/typecore.h>)][crtbuiltin]
 [impl_include(<libm/trunc.h>)]
 trunc:(double x) -> double {
@@ -1010,14 +1043,14 @@ trunc:(double x) -> double {
 @@Compute remainder of X and Y and put in *QUO a value with sign
 @@of x/y and magnitude congruent `mod 2^n' to the magnitude of
 @@the integral quotient x/y, with n >= 3
-[std][ATTR_WUNUSED][nothrow][alias(__remquo)][crtbuiltin]
+[std][ATTR_WUNUSED][nothrow][export_alias(__remquo)][crtbuiltin]
 remquo:(double x, double y, int *pquo) -> double; /* TODO */
 
 @@Round X to nearest integral value according to current rounding direction
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__lrint)]
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__lrint)]
 [impl_include(<hybrid/typecore.h>)][crtbuiltin]
 [impl_include(<libm/lrint.h>)]
-[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias(llrint)]
+[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), export_alias(llrint)]
 lrint:(double x) -> long int {
 #ifdef __LIBM_MATHFUNI
 	return __LIBM_MATHFUNI(@lrint@, x);
@@ -1027,10 +1060,10 @@ lrint:(double x) -> long int {
 }
 
 @@Round X to nearest integral value, rounding halfway cases away from zero
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__lround)]
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__lround)]
 [impl_include(<hybrid/typecore.h>)][crtbuiltin]
 [impl_include(<libm/lround.h>)]
-[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias(llround)]
+[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), export_alias(llround)]
 lround:(double x) -> long int {
 #ifdef __LIBM_MATHFUNI
 	return __LIBM_MATHFUNI(@lround@, x);
@@ -1040,28 +1073,28 @@ lround:(double x) -> long int {
 }
 
 @@Return positive difference between X and Y
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__fdim)][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__fdim)][crtbuiltin]
 fdim:(double x, double y) -> double {
 	/* TODO: ieee754-specific function */
 	return fabs(y - x);
 }
 
 @@Return maximum numeric value from X and Y
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__fmax)][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__fmax)][crtbuiltin]
 fmax:(double x, double y) -> double {
 	/* TODO: ieee754-specific function */
 	return x < y ? y : x;
 }
 
 @@Return minimum numeric value from X and Y
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__fmin)][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__fmin)][crtbuiltin]
 fmin:(double x, double y) -> double {
 	/* TODO: ieee754-specific function */
 	return x < y ? x : y;
 }
 
 @@Multiply-add function computed as a ternary operation
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__fma)][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__fma)][crtbuiltin]
 fma:(double x, double y, double z) -> double {
 	/* TODO: ieee754-specific function */
 	return (x * y) + z;
@@ -1069,7 +1102,7 @@ fma:(double x, double y, double z) -> double {
 
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGLONG
 @@Round X to nearest integral value according to current rounding direction
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__llrint)]
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__llrint)]
 [impl_include(<hybrid/typecore.h>)][crtbuiltin]
 [impl_include(<libm/lrint.h>)]
 [alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__, lrint)]
@@ -1082,7 +1115,7 @@ llrint:(double x) -> __LONGLONG {
 }
 
 @@Round X to nearest integral value, rounding halfway cases away from zero
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__llround)]
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__llround)]
 [impl_include(<hybrid/typecore.h>)][crtbuiltin]
 [impl_include(<libm/lround.h>)]
 [alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__, lround)]
@@ -1095,7 +1128,7 @@ llround:(double x) -> __LONGLONG {
 }
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGLONG */
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__nexttowardf)][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__nexttowardf)][crtbuiltin]
 [requires_include("<ieee754.h>")][impl_include(<libm/nexttoward.h>)]
 [requires(((defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) ||
             defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)) &&
@@ -1115,112 +1148,107 @@ nexttowardf:(float x, __LONGDOUBLE y) -> float {
 
 
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__scalbnf)][crtbuiltin]
-[if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias(scalblnf, __scalblnf)]
-scalbnf:(float x, int n) -> float %{auto_block(mathfun)}
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__scalbnf)][crtbuiltin]
+[if(__SIZEOF_INT__ == __SIZEOF_LONG__), export_alias(scalblnf, __scalblnf)]
+scalbnf:(float x, int n) -> float %{generate(double2float)}
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__scalblnf)][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__scalblnf)][crtbuiltin]
 [alt_variant_of(__SIZEOF_INT__ == __SIZEOF_LONG__, scalbnf)]
-[if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias(__scalbnf)]
-scalblnf:(float x, long int n) -> float %{auto_block(mathfun)}
+[if(__SIZEOF_INT__ == __SIZEOF_LONG__), export_alias(__scalbnf)]
+scalblnf:(float x, long int n) -> float %{generate(double2float)}
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow]
-[alias(__nearbyintf)][doc_alias(nearbyint)][crtbuiltin]
-nearbyintf:(float x) -> float = rintf;
+nearbyintf(*) = rintf;
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__roundf)][crtbuiltin]
-roundf:(float x) -> float %{auto_block(mathfun)}
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__roundf)][crtbuiltin]
+roundf:(float x) -> float %{generate(double2float)}
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__truncf)][crtbuiltin]
-truncf:(float x) -> float %{auto_block(mathfun)}
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__truncf)][crtbuiltin]
+truncf:(float x) -> float %{generate(double2float)}
 
-[std][ATTR_WUNUSED][nothrow][alias(__remquof)][crtbuiltin]
+[std][ATTR_WUNUSED][nothrow][export_alias(__remquof)][crtbuiltin]
 remquof:(float x, float y, int *pquo) -> float; /* TODO */
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__lrintf)][crtbuiltin]
-[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias(llrintf)]
-lrintf:(float x) -> long int %{auto_block(mathfun)}
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__lrintf)][crtbuiltin]
+[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), export_alias(llrintf)]
+lrintf:(float x) -> long int %{generate(double2float)}
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__lroundf)][crtbuiltin]
-[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias(llroundf)]
-lroundf:(float x) -> long int %{auto_block(mathfun)}
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__lroundf)][crtbuiltin]
+[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), export_alias(llroundf)]
+lroundf:(float x) -> long int %{generate(double2float)}
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__fdimf)][crtbuiltin]
-fdimf:(float x, float y) -> float %{generate(math)} /* TODO */
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__fdimf)][crtbuiltin]
+fdimf:(float x, float y) -> float %{generate(double2float)}
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__fmaxf)][crtbuiltin]
-fmaxf:(float x, float y) -> float %{generate(math)} /* TODO */
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__fmaxf)][crtbuiltin]
+fmaxf:(float x, float y) -> float %{generate(double2float)}
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__fminf)][crtbuiltin]
-fminf:(float x, float y) -> float %{generate(math)} /* TODO */
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__fminf)][crtbuiltin]
+fminf:(float x, float y) -> float %{generate(double2float)}
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__fmaf)][crtbuiltin]
-fmaf:(float x, float y, float z) -> float %{generate(math)} /* TODO */
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__fmaf)][crtbuiltin]
+fmaf:(float x, float y, float z) -> float %{generate(double2float)}
 
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGLONG
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__llrintf)][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__llrintf)][crtbuiltin]
 [alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__, lrintf)]
-llrintf:(float x) -> __LONGLONG %{auto_block(mathfun)}
+llrintf:(float x) -> __LONGLONG %{generate(double2float)}
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__llroundf)][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__llroundf)][crtbuiltin]
 [alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__, lroundf)]
-llroundf:(float x) -> __LONGLONG %{auto_block(mathfun)}
+llroundf:(float x) -> __LONGLONG %{generate(double2float)}
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGLONG */
 
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__nexttowardl)][crtbuiltin]
-nexttowardl:(__LONGDOUBLE x, __LONGDOUBLE y) -> __LONGDOUBLE = nextafterl;
+nexttowardl(*) = nextafterl;
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__scalbnl)][crtbuiltin]
-[if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias(scalblnl, __scalblnl)]
-scalbnl:(__LONGDOUBLE x, int n) -> __LONGDOUBLE %{auto_block(mathfun)}
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__scalbnl)][crtbuiltin]
+[if(__SIZEOF_INT__ == __SIZEOF_LONG__), export_alias(scalblnl, __scalblnl)]
+scalbnl:(__LONGDOUBLE x, int n) -> __LONGDOUBLE %{generate(double2ldouble)}
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__scalblnl)][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__scalblnl)][crtbuiltin]
 [alt_variant_of(__SIZEOF_INT__ == __SIZEOF_LONG__, scalbnl)]
-[if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias(__scalbnl)]
-scalblnl:(__LONGDOUBLE x, long int n) -> __LONGDOUBLE %{auto_block(mathfun)}
+[if(__SIZEOF_INT__ == __SIZEOF_LONG__), export_alias(__scalbnl)]
+scalblnl:(__LONGDOUBLE x, long int n) -> __LONGDOUBLE %{generate(double2ldouble)}
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow]
-[alias(__nearbyintl)][doc_alias(nearbyint)][crtbuiltin]
-nearbyintl:(__LONGDOUBLE x) -> __LONGDOUBLE = rintl;
+nearbyintl(*) = rintl;
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__roundl)][crtbuiltin]
-roundl:(__LONGDOUBLE x) -> __LONGDOUBLE %{auto_block(mathfun)}
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__roundl)][crtbuiltin]
+roundl:(__LONGDOUBLE x) -> __LONGDOUBLE %{generate(double2ldouble)}
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__truncl)][crtbuiltin]
-truncl:(__LONGDOUBLE x) -> __LONGDOUBLE %{auto_block(mathfun)}
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__truncl)][crtbuiltin]
+truncl:(__LONGDOUBLE x) -> __LONGDOUBLE %{generate(double2ldouble)}
 
-[std][ATTR_WUNUSED][nothrow][alias(__remquol)][crtbuiltin]
+[std][ATTR_WUNUSED][nothrow][export_alias(__remquol)][crtbuiltin]
 remquol:(__LONGDOUBLE x, __LONGDOUBLE y, int *pquo) -> __LONGDOUBLE; /* TODO */
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__lrintl)][crtbuiltin]
-[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias(llrintl)]
-lrintl:(__LONGDOUBLE x) -> long int %{auto_block(mathfun)}
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__lrintl)][crtbuiltin]
+[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), export_alias(llrintl)]
+lrintl:(__LONGDOUBLE x) -> long int %{generate(double2ldouble)}
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__lroundl)][crtbuiltin]
-[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias(llroundl)]
-lroundl:(__LONGDOUBLE x) -> long int %{auto_block(mathfun)}
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__lroundl)][crtbuiltin]
+[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), export_alias(llroundl)]
+lroundl:(__LONGDOUBLE x) -> long int %{generate(double2ldouble)}
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__fdiml)][crtbuiltin]
-fdiml:(__LONGDOUBLE x, __LONGDOUBLE y) -> __LONGDOUBLE %{generate(math)} /* TODO */
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__fdiml)][crtbuiltin]
+fdiml:(__LONGDOUBLE x, __LONGDOUBLE y) -> __LONGDOUBLE %{generate(double2ldouble)}
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__fmaxl)][crtbuiltin]
-fmaxl:(__LONGDOUBLE x, __LONGDOUBLE y) -> __LONGDOUBLE %{generate(math)} /* TODO */
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__fmaxl)][crtbuiltin]
+fmaxl:(__LONGDOUBLE x, __LONGDOUBLE y) -> __LONGDOUBLE %{generate(double2ldouble)}
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__fminl)][crtbuiltin]
-fminl:(__LONGDOUBLE x, __LONGDOUBLE y) -> __LONGDOUBLE %{generate(math)} /* TODO */
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__fminl)][crtbuiltin]
+fminl:(__LONGDOUBLE x, __LONGDOUBLE y) -> __LONGDOUBLE %{generate(double2ldouble)}
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__fmal)][crtbuiltin]
-fmal:(__LONGDOUBLE x, __LONGDOUBLE y, __LONGDOUBLE z) -> __LONGDOUBLE %{generate(math)}
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__fmal)][crtbuiltin]
+fmal:(__LONGDOUBLE x, __LONGDOUBLE y, __LONGDOUBLE z) -> __LONGDOUBLE %{generate(double2ldouble)}
 
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGLONG
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__llrintl)][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__llrintl)][crtbuiltin]
 [alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__, lrintl)]
-llrintl:(__LONGDOUBLE x) -> __LONGLONG %{auto_block(mathfun)}
+llrintl:(__LONGDOUBLE x) -> __LONGLONG %{generate(double2ldouble)}
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__llroundl)][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__llroundl)][crtbuiltin]
 [alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__, lroundl)]
-llroundl:(__LONGDOUBLE x) -> __LONGLONG %{auto_block(mathfun)}
+llroundl:(__LONGDOUBLE x) -> __LONGLONG %{generate(double2ldouble)}
 
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGLONG */
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
@@ -1231,143 +1259,143 @@ llroundl:(__LONGDOUBLE x) -> __LONGLONG %{auto_block(mathfun)}
 /* C++ overload aliases */
 %(std)#if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_MATH_H_PROTO)
 %(std)extern "C++" {
-[std][overload_alias] acos:(*) = acosf;
-[std][overload_alias] asin:(*) = asinf;
-[std][overload_alias] atan:(*) = atanf;
-[std][overload_alias] atan2:(*) = atan2f;
-[std][overload_alias] cos:(*) = cosf;
-[std][overload_alias] sin:(*) = sinf;
-[std][overload_alias] tan:(*) = tanf;
-[std][overload_alias] cosh:(*) = coshf;
-[std][overload_alias] sinh:(*) = sinhf;
-[std][overload_alias] tanh:(*) = tanhf;
-[std][overload_alias] exp:(*) = expf;
-[std][overload_alias] frexp:(*) = frexpf;
-[std][overload_alias] ldexp:(*) = ldexpf;
-[std][overload_alias] log:(*) = logf;
-[std][overload_alias] log10:(*) = log10f;
-[std][overload_alias] modf:(*) = modff;
-[std][overload_alias] pow:(*) = powf;
-[std][overload_alias] sqrt:(*) = sqrtf;
-[std][overload_alias] ceil:(*) = ceilf;
-[std][overload_alias] fabs:(*) = fabsf;
-[std][overload_alias] floor:(*) = floorf;
-[std][overload_alias] fmod:(*) = fmodf;
+%[insert:std_function(acos = acosf, externLinkageOverride: "C++")]
+%[insert:std_function(asin = asinf, externLinkageOverride: "C++")]
+%[insert:std_function(atan = atanf, externLinkageOverride: "C++")]
+%[insert:std_function(atan2 = atan2f, externLinkageOverride: "C++")]
+%[insert:std_function(cos = cosf, externLinkageOverride: "C++")]
+%[insert:std_function(sin = sinf, externLinkageOverride: "C++")]
+%[insert:std_function(tan = tanf, externLinkageOverride: "C++")]
+%[insert:std_function(cosh = coshf, externLinkageOverride: "C++")]
+%[insert:std_function(sinh = sinhf, externLinkageOverride: "C++")]
+%[insert:std_function(tanh = tanhf, externLinkageOverride: "C++")]
+%[insert:std_function(exp = expf, externLinkageOverride: "C++")]
+%[insert:std_function(frexp = frexpf, externLinkageOverride: "C++")]
+%[insert:std_function(ldexp = ldexpf, externLinkageOverride: "C++")]
+%[insert:std_function(log = logf, externLinkageOverride: "C++")]
+%[insert:std_function(log10 = log10f, externLinkageOverride: "C++")]
+%[insert:std_function(modf = modff, externLinkageOverride: "C++")]
+%[insert:std_function(pow = powf, externLinkageOverride: "C++")]
+%[insert:std_function(sqrt = sqrtf, externLinkageOverride: "C++")]
+%[insert:std_function(ceil = ceilf, externLinkageOverride: "C++")]
+%[insert:std_function(fabs = fabsf, externLinkageOverride: "C++")]
+%[insert:std_function(floor = floorf, externLinkageOverride: "C++")]
+%[insert:std_function(fmod = fmodf, externLinkageOverride: "C++")]
 
-%(std, c)#ifdef __COMPILER_HAVE_LONGDOUBLE
-[std][overload_alias] acos:(*) = acosl;
-[std][overload_alias] asin:(*) = asinl;
-[std][overload_alias] atan:(*) = atanl;
-[std][overload_alias] atan2:(*) = atan2l;
-[std][overload_alias] cos:(*) = cosl;
-[std][overload_alias] sin:(*) = sinl;
-[std][overload_alias] tan:(*) = tanl;
-[std][overload_alias] cosh:(*) = coshl;
-[std][overload_alias] sinh:(*) = sinhl;
-[std][overload_alias] tanh:(*) = tanhl;
-[std][overload_alias] exp:(*) = expl;
-[std][overload_alias] frexp:(*) = frexpl;
-[std][overload_alias] ldexp:(*) = ldexpl;
-[std][overload_alias] log:(*) = logl;
-[std][overload_alias] log10:(*) = log10l;
-[std][overload_alias] modf:(*) = modfl;
-[std][overload_alias] pow:(*) = powl;
-[std][overload_alias] sqrt:(*) = sqrtl;
-[std][overload_alias] ceil:(*) = ceill;
-[std][overload_alias] fabs:(*) = fabsl;
-[std][overload_alias] floor:(*) = floorl;
-[std][overload_alias] fmod:(*) = fmodl;
-%(std, c)#endif /* __COMPILER_HAVE_LONGDOUBLE */
-
-
-%(std, c)#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
-[std][overload_alias] acosh:(*) = acoshf;
-[std][overload_alias] asinh:(*) = asinhf;
-[std][overload_alias] atanh:(*) = atanhf;
-[std][overload_alias] expm1:(*) = expm1f;
-[std][overload_alias] log1p:(*) = log1pf;
-[std][overload_alias] logb:(*) = logbf;
-[std][overload_alias] cbrt:(*) = cbrtf;
-[std][overload_alias] rint:(*) = rintf;
-[std][overload_alias] nextafter:(*) = nextafterf;
-[std][overload_alias] remainder:(*) = remainderf;
-[std][overload_alias] ilogb:(*) = ilogbf;
-%(std, c)#ifdef __COMPILER_HAVE_LONGDOUBLE
-[std][overload_alias] acosh:(*) = acoshl;
-[std][overload_alias] asinh:(*) = asinhl;
-[std][overload_alias] atanh:(*) = atanhl;
-[std][overload_alias] expm1:(*) = expm1l;
-[std][overload_alias] log1p:(*) = log1pl;
-[std][overload_alias] logb:(*) = logbl;
-[std][overload_alias] cbrt:(*) = cbrtl;
-[std][overload_alias] rint:(*) = rintl;
-[std][overload_alias] nextafter:(*) = nextafterl;
-[std][overload_alias] remainder:(*) = remainderl;
-[std][overload_alias] ilogb:(*) = ilogbl;
-%(std, c)#endif /* __COMPILER_HAVE_LONGDOUBLE */
-%(std, c)#endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
+%(std)#ifdef __COMPILER_HAVE_LONGDOUBLE
+%[insert:std_function(acos = acosl, externLinkageOverride: "C++")]
+%[insert:std_function(asin = asinl, externLinkageOverride: "C++")]
+%[insert:std_function(atan = atanl, externLinkageOverride: "C++")]
+%[insert:std_function(atan2 = atan2l, externLinkageOverride: "C++")]
+%[insert:std_function(cos = cosl, externLinkageOverride: "C++")]
+%[insert:std_function(sin = sinl, externLinkageOverride: "C++")]
+%[insert:std_function(tan = tanl, externLinkageOverride: "C++")]
+%[insert:std_function(cosh = coshl, externLinkageOverride: "C++")]
+%[insert:std_function(sinh = sinhl, externLinkageOverride: "C++")]
+%[insert:std_function(tanh = tanhl, externLinkageOverride: "C++")]
+%[insert:std_function(exp = expl, externLinkageOverride: "C++")]
+%[insert:std_function(frexp = frexpl, externLinkageOverride: "C++")]
+%[insert:std_function(ldexp = ldexpl, externLinkageOverride: "C++")]
+%[insert:std_function(log = logl, externLinkageOverride: "C++")]
+%[insert:std_function(log10 = log10l, externLinkageOverride: "C++")]
+%[insert:std_function(modf = modfl, externLinkageOverride: "C++")]
+%[insert:std_function(pow = powl, externLinkageOverride: "C++")]
+%[insert:std_function(sqrt = sqrtl, externLinkageOverride: "C++")]
+%[insert:std_function(ceil = ceill, externLinkageOverride: "C++")]
+%[insert:std_function(fabs = fabsl, externLinkageOverride: "C++")]
+%[insert:std_function(floor = floorl, externLinkageOverride: "C++")]
+%[insert:std_function(fmod = fmodl, externLinkageOverride: "C++")]
+%(std)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 
-%(std, c)#ifdef __USE_ISOC99
-[std][overload_alias] exp2:(*) = exp2f;
-[std][overload_alias] log2:(*) = log2f;
-[std][overload_alias] copysign:(*) = copysignf;
-[std][overload_alias] tgamma:(*) = tgammaf;
-[std][overload_alias] nexttoward:(*) = nexttowardf;
-[std][overload_alias] scalbn:(*) = scalbnf;
-[std][overload_alias] scalbln:(*) = scalblnf;
-[std][overload_alias] nearbyint:(*) = rintf;
-[std][overload_alias] round:(*) = roundf;
-[std][overload_alias] trunc:(*) = truncf;
-[std][overload_alias] remquo:(*) = remquof;
-[std][overload_alias] lrint:(*) = lrintf;
-[std][overload_alias] lround:(*) = lroundf;
-[std][overload_alias] fdim:(*) = fdimf;
-[std][overload_alias] fmax:(*) = fmaxf;
-[std][overload_alias] fmin:(*) = fminf;
-[std][overload_alias] fma:(*) = fmaf;
-%(std, c)#ifdef __COMPILER_HAVE_LONGLONG
-[std][overload_alias] llrint:(*) = llrintf;
-[std][overload_alias] llround:(*) = llroundf;
-%(std, c)#endif /* __COMPILER_HAVE_LONGLONG */
-%(std, c)#ifdef __COMPILER_HAVE_LONGDOUBLE
-[std][overload_alias] exp2:(*) = exp2l;
-[std][overload_alias] log2:(*) = log2l;
-[std][overload_alias] copysign:(*) = copysignl;
-[std][overload_alias] tgamma:(*) = tgammal;
-[std][overload_alias] nexttoward:(*) = nextafterl;
-[std][overload_alias] scalbn:(*) = scalbnl;
-[std][overload_alias] scalbln:(*) = scalblnl;
-[std][overload_alias] nearbyint:(*) = rintl;
-[std][overload_alias] round:(*) = roundl;
-[std][overload_alias] trunc:(*) = truncl;
-[std][overload_alias] remquo:(*) = remquol;
-[std][overload_alias] lrint:(*) = lrintl;
-[std][overload_alias] lround:(*) = lroundl;
-[std][overload_alias] fdim:(*) = fdiml;
-[std][overload_alias] fmax:(*) = fmaxl;
-[std][overload_alias] fmin:(*) = fminl;
-[std][overload_alias] fma:(*) = fmal;
-%(std, c)#ifdef __COMPILER_HAVE_LONGLONG
-[std][overload_alias] llrint:(*) = llrintl;
-[std][overload_alias] llround:(*) = llroundl;
-%(std, c)#endif /* __COMPILER_HAVE_LONGLONG */
-%(std, c)#endif /* __COMPILER_HAVE_LONGDOUBLE */
-%(std, c)#endif /* __USE_ISOC99 */
+%(std)#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
+%[insert:std_function(acosh = acoshf, externLinkageOverride: "C++")]
+%[insert:std_function(asinh = asinhf, externLinkageOverride: "C++")]
+%[insert:std_function(atanh = atanhf, externLinkageOverride: "C++")]
+%[insert:std_function(expm1 = expm1f, externLinkageOverride: "C++")]
+%[insert:std_function(log1p = log1pf, externLinkageOverride: "C++")]
+%[insert:std_function(logb = logbf, externLinkageOverride: "C++")]
+%[insert:std_function(cbrt = cbrtf, externLinkageOverride: "C++")]
+%[insert:std_function(rint = rintf, externLinkageOverride: "C++")]
+%[insert:std_function(nextafter = nextafterf, externLinkageOverride: "C++")]
+%[insert:std_function(remainder = remainderf, externLinkageOverride: "C++")]
+%[insert:std_function(ilogb = ilogbf, externLinkageOverride: "C++")]
+%(std)#ifdef __COMPILER_HAVE_LONGDOUBLE
+%[insert:std_function(acosh = acoshl, externLinkageOverride: "C++")]
+%[insert:std_function(asinh = asinhl, externLinkageOverride: "C++")]
+%[insert:std_function(atanh = atanhl, externLinkageOverride: "C++")]
+%[insert:std_function(expm1 = expm1l, externLinkageOverride: "C++")]
+%[insert:std_function(log1p = log1pl, externLinkageOverride: "C++")]
+%[insert:std_function(logb = logbl, externLinkageOverride: "C++")]
+%[insert:std_function(cbrt = cbrtl, externLinkageOverride: "C++")]
+%[insert:std_function(rint = rintl, externLinkageOverride: "C++")]
+%[insert:std_function(nextafter = nextafterl, externLinkageOverride: "C++")]
+%[insert:std_function(remainder = remainderl, externLinkageOverride: "C++")]
+%[insert:std_function(ilogb = ilogbl, externLinkageOverride: "C++")]
+%(std)#endif /* __COMPILER_HAVE_LONGDOUBLE */
+%(std)#endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
 
 
-%(std, c)#if defined(__USE_XOPEN) || defined(__USE_ISOC99)
-[std][overload_alias] hypot:(*) = hypotf;
-[std][overload_alias] erf:(*) = erff;
-[std][overload_alias] erfc:(*) = erfcf;
-[std][overload_alias] lgamma:(*) = lgammaf;
-%(std, c)#ifdef __COMPILER_HAVE_LONGDOUBLE
-[std][overload_alias] hypot:(*) = hypotl;
-[std][overload_alias] erf:(*) = erfl;
-[std][overload_alias] erfc:(*) = erfcl;
-[std][overload_alias] lgamma:(*) = lgammal;
-%(std, c)#endif /* __COMPILER_HAVE_LONGDOUBLE */
-%(std, c)#endif /* __USE_XOPEN || __USE_ISOC99 */
+%(std)#ifdef __USE_ISOC99
+%[insert:std_function(exp2 = exp2f, externLinkageOverride: "C++")]
+%[insert:std_function(log2 = log2f, externLinkageOverride: "C++")]
+%[insert:std_function(copysign = copysignf, externLinkageOverride: "C++")]
+%[insert:std_function(tgamma = tgammaf, externLinkageOverride: "C++")]
+%[insert:std_function(nexttoward = nexttowardf, externLinkageOverride: "C++")]
+%[insert:std_function(scalbn = scalbnf, externLinkageOverride: "C++")]
+%[insert:std_function(scalbln = scalblnf, externLinkageOverride: "C++")]
+%[insert:std_function(nearbyint = rintf, externLinkageOverride: "C++")]
+%[insert:std_function(round = roundf, externLinkageOverride: "C++")]
+%[insert:std_function(trunc = truncf, externLinkageOverride: "C++")]
+%[insert:std_function(remquo = remquof, externLinkageOverride: "C++")]
+%[insert:std_function(lrint = lrintf, externLinkageOverride: "C++")]
+%[insert:std_function(lround = lroundf, externLinkageOverride: "C++")]
+%[insert:std_function(fdim = fdimf, externLinkageOverride: "C++")]
+%[insert:std_function(fmax = fmaxf, externLinkageOverride: "C++")]
+%[insert:std_function(fmin = fminf, externLinkageOverride: "C++")]
+%[insert:std_function(fma = fmaf, externLinkageOverride: "C++")]
+%(std)#ifdef __COMPILER_HAVE_LONGLONG
+%[insert:std_function(llrint = llrintf, externLinkageOverride: "C++")]
+%[insert:std_function(llround = llroundf, externLinkageOverride: "C++")]
+%(std)#endif /* __COMPILER_HAVE_LONGLONG */
+%(std)#ifdef __COMPILER_HAVE_LONGDOUBLE
+%[insert:std_function(exp2 = exp2l, externLinkageOverride: "C++")]
+%[insert:std_function(log2 = log2l, externLinkageOverride: "C++")]
+%[insert:std_function(copysign = copysignl, externLinkageOverride: "C++")]
+%[insert:std_function(tgamma = tgammal, externLinkageOverride: "C++")]
+%[insert:std_function(nexttoward = nextafterl, externLinkageOverride: "C++")]
+%[insert:std_function(scalbn = scalbnl, externLinkageOverride: "C++")]
+%[insert:std_function(scalbln = scalblnl, externLinkageOverride: "C++")]
+%[insert:std_function(nearbyint = rintl, externLinkageOverride: "C++")]
+%[insert:std_function(round = roundl, externLinkageOverride: "C++")]
+%[insert:std_function(trunc = truncl, externLinkageOverride: "C++")]
+%[insert:std_function(remquo = remquol, externLinkageOverride: "C++")]
+%[insert:std_function(lrint = lrintl, externLinkageOverride: "C++")]
+%[insert:std_function(lround = lroundl, externLinkageOverride: "C++")]
+%[insert:std_function(fdim = fdiml, externLinkageOverride: "C++")]
+%[insert:std_function(fmax = fmaxl, externLinkageOverride: "C++")]
+%[insert:std_function(fmin = fminl, externLinkageOverride: "C++")]
+%[insert:std_function(fma = fmal, externLinkageOverride: "C++")]
+%(std)#ifdef __COMPILER_HAVE_LONGLONG
+%[insert:std_function(llrint = llrintl, externLinkageOverride: "C++")]
+%[insert:std_function(llround = llroundl, externLinkageOverride: "C++")]
+%(std)#endif /* __COMPILER_HAVE_LONGLONG */
+%(std)#endif /* __COMPILER_HAVE_LONGDOUBLE */
+%(std)#endif /* __USE_ISOC99 */
+
+
+%(std)#if defined(__USE_XOPEN) || defined(__USE_ISOC99)
+%[insert:std_function(hypot = hypotf, externLinkageOverride: "C++")]
+%[insert:std_function(erf = erff, externLinkageOverride: "C++")]
+%[insert:std_function(erfc = erfcf, externLinkageOverride: "C++")]
+%[insert:std_function(lgamma = lgammaf, externLinkageOverride: "C++")]
+%(std)#ifdef __COMPILER_HAVE_LONGDOUBLE
+%[insert:std_function(hypot = hypotl, externLinkageOverride: "C++")]
+%[insert:std_function(erf = erfl, externLinkageOverride: "C++")]
+%[insert:std_function(erfc = erfcl, externLinkageOverride: "C++")]
+%[insert:std_function(lgamma = lgammal, externLinkageOverride: "C++")]
+%(std)#endif /* __COMPILER_HAVE_LONGDOUBLE */
+%(std)#endif /* __USE_XOPEN || __USE_ISOC99 */
 
 
 %(std)} /* extern "C++" */
@@ -1380,58 +1408,56 @@ llroundl:(__LONGDOUBLE x) -> __LONGLONG %{auto_block(mathfun)}
 %
 %#ifdef __USE_GNU
 @@Cosine and sine of X
-[alias(__sincos)][nothrow]
-[attribute(@__DECL_SIMD_sincos@)][decl_include(<bits/math-vector.h>)][crtbuiltin]
+[export_alias(__sincos)][nothrow]
+[attribute("__DECL_SIMD_sincos")][decl_include("<bits/math-vector.h>")][crtbuiltin]
 sincos:(double x, [[nonnull]] double *psinx, [[nonnull]] double *pcosx); /* TODO */
 
 @@A function missing in all standards: compute exponent to base ten
-[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__exp10)][crtbuiltin]
+[ATTR_WUNUSED][ATTR_MCONST][nothrow][export_alias(__exp10)][crtbuiltin]
 exp10:(double x) -> double; /* TODO */
 
 @@Another name occasionally used
-[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__pow10)]
-[requires($has_function(pow))][crtbuiltin]
-pow10:(double x) -> double {
+[[crtbuiltin, ATTR_WUNUSED, ATTR_MCONST, nothrow, export_alias(__pow10)]]
+[[userimpl, requires($has_function(pow))]]
+double pow10(double x) {
 	return pow(10.0, x);
 }
 
-[alias(__sincosf)][nothrow][doc_alias(sincos)]
-[attribute(@__DECL_SIMD_sincosf@)][decl_include(<bits/math-vector.h>)]
-[requires($has_function(sincos))][crtbuiltin]
-sincosf:(float x, [[nonnull]] float *psinx, [[nonnull]] float *pcosx)
-%{auto_block(any({
+[[crtbuiltin, export_alias(__sincosf), nothrow, doc_alias(sincos)]]
+[[attribute("__DECL_SIMD_sincosf"), decl_include("<bits/math-vector.h>")]]
+[[userimpl, requires_function(sincos)]]
+void sincosf(float x, [[nonnull]] float *psinx, [[nonnull]] float *pcosx) {
 	double sinx, cosx;
 	sincos((double)x, &sinx, &cosx);
 	*psinx = (float)sinx;
 	*pcosx = (float)cosx;
-}))}
+}
 
-[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__exp10f)][crtbuiltin]
+[ATTR_WUNUSED][ATTR_MCONST][nothrow][export_alias(__exp10f)][crtbuiltin]
 exp10f:(float x) -> float; /* TODO */
 
-[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__pow10f)]
-[requires($has_function(powf))][crtbuiltin]
+[[crtbuiltin, export_alias(__pow10f), ATTR_WUNUSED, ATTR_MCONST, nothrow]]
+[[userimpl, requires_function("powf")]]
 pow10f:(float x) -> float {
 	return powf(10.0f, x);
 }
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[alias(__sincosl)][nothrow][doc_alias(sincos)]
-[attribute(@__DECL_SIMD_sincosl@)][decl_include(<bits/math-vector.h>)]
-[if(defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), alias(__sincos, sincos)]
-[requires($has_function(sincos))][crtbuiltin]
-sincosl:(__LONGDOUBLE x, [[nonnull]] __LONGDOUBLE *psinx, [[nonnull]] __LONGDOUBLE *pcosx)
-%{auto_block(any({
+[[crtbuiltin,  export_alias(__sincosl), nothrow, doc_alias(sincos)]]
+[[attribute("__DECL_SIMD_sincosl"), decl_include("<bits/math-vector.h>")]]
+[[if(defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), export_alias(__sincos, sincos)]]
+[[userimpl, requires_function("sincos")]]
+void sincosl(__LONGDOUBLE x, [[nonnull]] __LONGDOUBLE *psinx, [[nonnull]] __LONGDOUBLE *pcosx) {
 	double sinx, cosx;
 	sincos((double)x, &sinx, &cosx);
 	*psinx = (__LONGDOUBLE)sinx;
 	*pcosx = (__LONGDOUBLE)cosx;
-}))}
+}
 
-[crtbuiltin][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__exp10l)]
+[crtbuiltin][ATTR_WUNUSED][ATTR_MCONST][nothrow][export_alias(__exp10l)]
 exp10l:(__LONGDOUBLE x) -> __LONGDOUBLE; /* TODO */
 
-[crtbuiltin][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__pow10l)]
+[crtbuiltin][ATTR_WUNUSED][ATTR_MCONST][nothrow][export_alias(__pow10l)]
 pow10l:(__LONGDOUBLE x) -> __LONGDOUBLE; /* TODO */
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_GNU */
@@ -1442,8 +1468,8 @@ pow10l:(__LONGDOUBLE x) -> __LONGDOUBLE; /* TODO */
 
 %#if !defined(__cplusplus) || !defined(__CORRECT_ISO_CPP11_MATH_H_PROTO_FP) /* isinf conflicts with C++11. */
 @@Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity
-[ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__isinf)]
-[requires_include("<ieee754.h>")][impl_include(<libm/isinf.h>)][crtbuiltin]
+[ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__isinf)]
+[requires_include("<ieee754.h>")][impl_include("<libm/isinf.h>")][crtbuiltin]
 [requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]
@@ -1456,17 +1482,17 @@ isinf:(double x) -> int {
 }
 %#endif /* !__cplusplus || !__CORRECT_ISO_CPP11_MATH_H_PROTO_FP */
 
-[ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__isinff)][crtbuiltin]
-isinff:(float x) -> int %{auto_block(mathfun)}
+[ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__isinff)][crtbuiltin]
+isinff:(float x) -> int %{generate(double2float)}
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__isinfl)][crtbuiltin]
-[if(defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), alias(__isinf, isinf)]
-isinfl:(__LONGDOUBLE x) -> int %{auto_block(mathfun)}
+[ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__isinfl)][crtbuiltin]
+[if(defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), export_alias(__isinf, isinf)]
+isinfl:(__LONGDOUBLE x) -> int %{generate(double2ldouble)}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 @@Return nonzero if VALUE is finite and not NaN
-[ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__finite, _finite)][crtbuiltin]
+[ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__finite, _finite)][crtbuiltin]
 [requires_include("<ieee754.h>")][impl_include(<libm/finite.h>)]
 [requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
@@ -1480,10 +1506,10 @@ finite:(double x) -> int {
 #endif /* !__LIBM_MATHFUNI */
 }
 
-[attribute(*)][alias(*)] drem:(*) = remainder;
+drem:(*) = remainder;
 
 @@Return the fractional part of X after dividing out `ilogb(X)'
-[ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__significand)][crtbuiltin]
+[ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__significand)][crtbuiltin]
 [requires_include("<ieee754.h>")][impl_include(<libm/significand.h>)]
 [requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
@@ -1492,23 +1518,23 @@ significand:(double x) -> double {
 	return __LIBM_MATHFUN(@significand@, x);
 }
 
-[ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__finitef)][crtbuiltin]
-finitef:(float x) -> int  %{auto_block(mathfun)}
+[ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__finitef)][crtbuiltin]
+finitef:(float x) -> int %{generate(double2float)}
 
-[attribute(*)][alias(*)] dremf:(*) = remainderf;
+dremf(*) = remainderf;
 
-[ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__significandf)][crtbuiltin]
-significandf:(float x) -> float %{auto_block(mathfun)}
+[ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__significandf)][crtbuiltin]
+significandf:(float x) -> float %{generate(double2float)}
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__finitel)][crtbuiltin]
-[if(defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), alias(__finite, finite)]
-finitel:(__LONGDOUBLE x) -> int %{auto_block(mathfun)}
+[ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__finitel)][crtbuiltin]
+[if(defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), export_alias(__finite, finite)]
+finitel:(__LONGDOUBLE x) -> int %{generate(double2ldouble)}
 
-[attribute(*)][alias(*)] dreml:(*) = remainderl;
+dreml(*) = remainderl;
 
-[ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__significandl)][crtbuiltin]
-significandl:(__LONGDOUBLE x) -> __LONGDOUBLE %{auto_block(mathfun)}
+[ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__significandl)][crtbuiltin]
+significandl:(__LONGDOUBLE x) -> __LONGDOUBLE %{generate(double2ldouble)}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_MISC */
 
@@ -1516,8 +1542,8 @@ significandl:(__LONGDOUBLE x) -> __LONGDOUBLE %{auto_block(mathfun)}
 %#if defined(__USE_MISC) || (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K))
 %#if !defined(__cplusplus) || !defined(__CORRECT_ISO_CPP11_MATH_H_PROTO_FP) /* isnan conflicts with C++11. */
 @@Return nonzero if VALUE is not a number
-[ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__isnan, _isnan)][crtbuiltin]
-[requires_include("<ieee754.h>")][impl_include(<libm/isnan.h>)]
+[ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__isnan, _isnan)][crtbuiltin]
+[requires_include("<ieee754.h>")][impl_include("<libm/isnan.h>")]
 [requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]
@@ -1526,13 +1552,13 @@ isnan:(double x) -> int {
 }
 %#endif /* !cplusplus || !__CORRECT_ISO_CPP11_MATH_H_PROTO_FP */
 
-[ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__isnanf)][crtbuiltin]
-isnanf:(float x) -> int %{auto_block(mathfun)}
+[ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__isnanf)][crtbuiltin]
+isnanf:(float x) -> int %{generate(double2float)}
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__isnanl)][crtbuiltin]
-[if(defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), alias(__isnan, _isnan, isnan)]
-isnanl:(__LONGDOUBLE x) -> int %{auto_block(mathfun)}
+[ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(__isnanl)][crtbuiltin]
+[if(defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), export_alias(__isnan, _isnan, isnan)]
+isnanl:(__LONGDOUBLE x) -> int %{generate(double2ldouble)}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 %#endif /* __USE_MISC || (__USE_XOPEN && !__USE_XOPEN2K) */
@@ -1540,61 +1566,61 @@ isnanl:(__LONGDOUBLE x) -> int %{auto_block(mathfun)}
 %
 %/* Bessel functions. */
 %#if defined(__USE_MISC) || (defined(__USE_XOPEN) && __MATH_DECLARING_DOUBLE)
-[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__j0)][crtbuiltin]
+[ATTR_WUNUSED][ATTR_MCONST][nothrow][export_alias(__j0)][crtbuiltin]
 j0:(double x) -> double; /* TODO */
 
-[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__j1)][crtbuiltin]
+[ATTR_WUNUSED][ATTR_MCONST][nothrow][export_alias(__j1)][crtbuiltin]
 j1:(double x) -> double; /* TODO */
 
-[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__jn)][crtbuiltin]
+[ATTR_WUNUSED][ATTR_MCONST][nothrow][export_alias(__jn)][crtbuiltin]
 jn:(int n, double x) -> double; /* TODO */
 
-[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__y0)][crtbuiltin]
+[ATTR_WUNUSED][ATTR_MCONST][nothrow][export_alias(__y0)][crtbuiltin]
 y0:(double x) -> double; /* TODO */
 
-[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__y1)][crtbuiltin]
+[ATTR_WUNUSED][ATTR_MCONST][nothrow][export_alias(__y1)][crtbuiltin]
 y1:(double x) -> double; /* TODO */
 
-[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__yn)][crtbuiltin]
+[ATTR_WUNUSED][ATTR_MCONST][nothrow][export_alias(__yn)][crtbuiltin]
 yn:(int n, double x) -> double; /* TODO */
 
 
-[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__j0f)][crtbuiltin]
+[ATTR_WUNUSED][ATTR_MCONST][nothrow][export_alias(__j0f)][crtbuiltin]
 j0f:(float x) -> float; /* TODO */
 
-[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__j1f)][crtbuiltin]
+[ATTR_WUNUSED][ATTR_MCONST][nothrow][export_alias(__j1f)][crtbuiltin]
 j1f:(float x) -> float; /* TODO */
 
-[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__jnf)][crtbuiltin]
+[ATTR_WUNUSED][ATTR_MCONST][nothrow][export_alias(__jnf)][crtbuiltin]
 jnf:(int n, float x) -> float; /* TODO */
 
-[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__y0f)][crtbuiltin]
+[ATTR_WUNUSED][ATTR_MCONST][nothrow][export_alias(__y0f)][crtbuiltin]
 y0f:(float x) -> float; /* TODO */
 
-[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__y1f)][crtbuiltin]
+[ATTR_WUNUSED][ATTR_MCONST][nothrow][export_alias(__y1f)][crtbuiltin]
 y1f:(float x) -> float; /* TODO */
 
-[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__ynf)][crtbuiltin]
+[ATTR_WUNUSED][ATTR_MCONST][nothrow][export_alias(__ynf)][crtbuiltin]
 ynf:(int n, float x) -> float; /* TODO */
 
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__j0l)][crtbuiltin]
+[ATTR_WUNUSED][ATTR_MCONST][nothrow][export_alias(__j0l)][crtbuiltin]
 j0l:(__LONGDOUBLE x) -> __LONGDOUBLE; /* TODO */
 
-[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__j1l)][crtbuiltin]
+[ATTR_WUNUSED][ATTR_MCONST][nothrow][export_alias(__j1l)][crtbuiltin]
 j1l:(__LONGDOUBLE x) -> __LONGDOUBLE; /* TODO */
 
-[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__jnl)][crtbuiltin]
+[ATTR_WUNUSED][ATTR_MCONST][nothrow][export_alias(__jnl)][crtbuiltin]
 jnl:(int n, __LONGDOUBLE x) -> __LONGDOUBLE; /* TODO */
 
-[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__y0l)][crtbuiltin]
+[ATTR_WUNUSED][ATTR_MCONST][nothrow][export_alias(__y0l)][crtbuiltin]
 y0l:(__LONGDOUBLE x) -> __LONGDOUBLE; /* TODO */
 
-[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__y1l)][crtbuiltin]
+[ATTR_WUNUSED][ATTR_MCONST][nothrow][export_alias(__y1l)][crtbuiltin]
 y1l:(__LONGDOUBLE x) -> __LONGDOUBLE; /* TODO */
 
-[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__ynl)][crtbuiltin]
+[ATTR_WUNUSED][ATTR_MCONST][nothrow][export_alias(__ynl)][crtbuiltin]
 ynl:(int n, __LONGDOUBLE x) -> __LONGDOUBLE; /* TODO */
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_MISC || (__USE_XOPEN && __MATH_DECLARING_DOUBLE) */
@@ -1602,16 +1628,15 @@ ynl:(int n, __LONGDOUBLE x) -> __LONGDOUBLE; /* TODO */
 
 %
 %#if defined(__USE_MISC) || (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K))
-@@Obsolete alias for `lgamma'
-[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__gamma, __lgamma)][crtbuiltin]
-gamma:(double x) -> double = lgamma;
+@@Obsolete export_alias for `lgamma'
+gamma(*) = lgamma;
 
-[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__gammaf, __lgammaf)][crtbuiltin]
-gammaf:(float x) -> float = lgammaf;
+@@Obsolete export_alias for `lgammaf'
+gammaf(*) = lgammaf;
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__gammal, __lgammal)][crtbuiltin]
-gammal:(__LONGDOUBLE x) -> __LONGDOUBLE = lgammal;
+@@Obsolete export_alias for `lgammal'
+gammal(*) = lgammal;
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_MISC || (__USE_XOPEN && !__USE_XOPEN2K) */
 
@@ -1619,24 +1644,24 @@ gammal:(__LONGDOUBLE x) -> __LONGDOUBLE = lgammal;
 @@Reentrant version of lgamma. This function uses the global variable
 @@`signgam'. The reentrant version instead takes a pointer and stores
 @@the value through it
-[ATTR_WUNUSED][alias(__lgamma_r)][crtbuiltin]
+[ATTR_WUNUSED][export_alias(__lgamma_r)][crtbuiltin]
 lgamma_r:(double x, int *signgamp) -> double; /* TODO */
 
-[ATTR_WUNUSED][alias(__lgammaf_r)][crtbuiltin]
-lgammaf_r:(float x, int *signgamp) -> float %{auto_block(math(float, lgamma_r))} /* TODO */
+[ATTR_WUNUSED][export_alias(__lgammaf_r)][crtbuiltin]
+lgammaf_r:(float x, int *signgamp) -> float /*TODO:%{generate(double2float(lgamma_r)))}*/;
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[ATTR_WUNUSED][alias(__lgammal_r)][crtbuiltin]
-lgammal_r:(__LONGDOUBLE x, int *signgamp) -> __LONGDOUBLE %{auto_block(math(__LONGDOUBLE, lgamma_r))} /* TODO */
+[ATTR_WUNUSED][export_alias(__lgammal_r)][crtbuiltin]
+lgammal_r:(__LONGDOUBLE x, int *signgamp) -> __LONGDOUBLE /*TODO:%{generate(double2ldouble(lgamma_r)))}*/;
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_MISC */
 
 %
 %#if defined(__USE_MISC) || (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K8))
 @@Return X times (2 to the Nth power)
-[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__scalb, _scalb)][crtbuiltin]
-[impl_include(<libm/isnan.h>)]
-[impl_include(<libm/finite.h>)][impl_include(<libm/isinf.h>)]
+[ATTR_WUNUSED][ATTR_MCONST][nothrow][export_alias(__scalb, _scalb)][crtbuiltin]
+[impl_include("<libm/isnan.h>")]
+[impl_include(<libm/finite.h>)][impl_include("<libm/isinf.h>")]
 [impl_include("<libm/matherr.h>")][impl_include("<parts/errno.h>")]
 [requires_include("<ieee754.h>")][impl_include(<libm/scalb.h>)]
 [requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
@@ -1687,14 +1712,14 @@ scalb:(double x, double fn) -> double {
 %#endif /* __USE_MISC || (__USE_XOPEN_EXTENDED && !__USE_XOPEN2K8) */
 
 %#ifdef __USE_MISC
-[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__scalbf, _scalbf)][crtbuiltin]
-scalbf:(float x, float fn) -> float %{auto_block(mathfun)}
+[ATTR_WUNUSED][ATTR_MCONST][nothrow][export_alias(__scalbf, _scalbf)][crtbuiltin]
+scalbf:(float x, float fn) -> float %{generate(double2float)}
 
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__scalbl)][crtbuiltin]
-[if(defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), alias(_scalb)]
-scalbl:(__LONGDOUBLE x, __LONGDOUBLE fn) -> __LONGDOUBLE %{auto_block(mathfun)}
+[ATTR_WUNUSED][ATTR_MCONST][nothrow][export_alias(__scalbl)][crtbuiltin]
+[if(defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), export_alias(_scalb)]
+scalbl:(__LONGDOUBLE x, __LONGDOUBLE fn) -> __LONGDOUBLE %{generate(double2ldouble)}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_MISC */
 
@@ -1709,352 +1734,352 @@ scalbl:(__LONGDOUBLE x, __LONGDOUBLE fn) -> __LONGDOUBLE %{auto_block(mathfun)}
 %
 %
 %#if 1 /* GLIBc aliases */
-[attribute(*)][alias(*)] __acos:(*) = acos;
-[attribute(*)][alias(*)] __asin:(*) = asin;
-[attribute(*)][alias(*)] __atan:(*) = atan;
-[attribute(*)][alias(*)] __atan2:(*) = atan2;
-[attribute(*)][alias(*)] __cos:(*) = cos;
-[attribute(*)][alias(*)] __sin:(*) = sin;
-[attribute(*)][alias(*)] __tan:(*) = tan;
-[attribute(*)][alias(*)] __cosh:(*) = cosh;
-[attribute(*)][alias(*)] __sinh:(*) = sinh;
-[attribute(*)][alias(*)] __tanh:(*) = tanh;
-[attribute(*)][alias(*)] __acosf:(*) = acosf;
-[attribute(*)][alias(*)] __asinf:(*) = asinf;
-[attribute(*)][alias(*)] __atanf:(*) = atanf;
-[attribute(*)][alias(*)] __atan2f:(*) = atan2f;
-[attribute(*)][alias(*)] __cosf:(*) = cosf;
-[attribute(*)][alias(*)] __sinf:(*) = sinf;
-[attribute(*)][alias(*)] __tanf:(*) = tanf;
-[attribute(*)][alias(*)] __coshf:(*) = coshf;
-[attribute(*)][alias(*)] __sinhf:(*) = sinhf;
-[attribute(*)][alias(*)] __tanhf:(*) = tanhf;
+__acos(*) = acos;
+__asin(*) = asin;
+__atan(*) = atan;
+__atan2(*) = atan2;
+__cos(*) = cos;
+__sin(*) = sin;
+__tan(*) = tan;
+__cosh(*) = cosh;
+__sinh(*) = sinh;
+__tanh(*) = tanh;
+__acosf(*) = acosf;
+__asinf(*) = asinf;
+__atanf(*) = atanf;
+__atan2f(*) = atan2f;
+__cosf(*) = cosf;
+__sinf(*) = sinf;
+__tanf(*) = tanf;
+__coshf(*) = coshf;
+__sinhf(*) = sinhf;
+__tanhf(*) = tanhf;
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[attribute(*)][alias(*)] __acosl:(*) = acosl;
-[attribute(*)][alias(*)] __asinl:(*) = asinl;
-[attribute(*)][alias(*)] __atanl:(*) = atanl;
-[attribute(*)][alias(*)] __atan2l:(*) = atan2l;
-[attribute(*)][alias(*)] __cosl:(*) = cosl;
-[attribute(*)][alias(*)] __sinl:(*) = sinl;
-[attribute(*)][alias(*)] __tanl:(*) = tanl;
-[attribute(*)][alias(*)] __coshl:(*) = coshl;
-[attribute(*)][alias(*)] __sinhl:(*) = sinhl;
-[attribute(*)][alias(*)] __tanhl:(*) = tanhl;
+__acosl(*) = acosl;
+__asinl(*) = asinl;
+__atanl(*) = atanl;
+__atan2l(*) = atan2l;
+__cosl(*) = cosl;
+__sinl(*) = sinl;
+__tanl(*) = tanl;
+__coshl(*) = coshl;
+__sinhl(*) = sinhl;
+__tanhl(*) = tanhl;
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#ifdef __USE_GNU
-[attribute(*)][alias(*)] __sincos:(*) = sincos;
-[attribute(*)][alias(*)] __sincosf:(*) = sincosf;
+__sincos(*) = sincos;
+__sincosf(*) = sincosf;
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[attribute(*)][alias(*)] __sincosl:(*) = sincosl;
+__sincosl(*) = sincosl;
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_GNU */
 
 %#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
-[attribute(*)][alias(*)] __acosh:(*) = acosh;
-[attribute(*)][alias(*)] __asinh:(*) = asinh;
-[attribute(*)][alias(*)] __atanh:(*) = atanh;
-[attribute(*)][alias(*)] __acoshf:(*) = acoshf;
-[attribute(*)][alias(*)] __asinhf:(*) = asinhf;
-[attribute(*)][alias(*)] __atanhf:(*) = atanhf;
+__acosh(*) = acosh;
+__asinh(*) = asinh;
+__atanh(*) = atanh;
+__acoshf(*) = acoshf;
+__asinhf(*) = asinhf;
+__atanhf(*) = atanhf;
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[attribute(*)][alias(*)] __acoshl:(*) = acoshl;
-[attribute(*)][alias(*)] __asinhl:(*) = asinhl;
-[attribute(*)][alias(*)] __atanhl:(*) = atanhl;
+__acoshl(*) = acoshl;
+__asinhl(*) = asinhl;
+__atanhl(*) = atanhl;
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
 
-[attribute(*)][alias(*)] __exp:(*) = exp;
-[attribute(*)][alias(*)] __frexp:(*) = frexp;
-[attribute(*)][alias(*)] __ldexp:(*) = ldexp;
-[attribute(*)][alias(*)] __log:(*) = log;
-[attribute(*)][alias(*)] __log10:(*) = log10;
-[attribute(*)][alias(*)] __modf:(*) = modf;
-[attribute(*)][alias(*)] __expf:(*) = expf;
-[attribute(*)][alias(*)] __frexpf:(*) = frexpf;
-[attribute(*)][alias(*)] __ldexpf:(*) = ldexpf;
-[attribute(*)][alias(*)] __logf:(*) = logf;
-[attribute(*)][alias(*)] __log10f:(*) = log10f;
-[attribute(*)][alias(*)] __modff:(*) = modff;
+__exp(*) = exp;
+__frexp(*) = frexp;
+__ldexp(*) = ldexp;
+__log(*) = log;
+__log10(*) = log10;
+__modf(*) = modf;
+__expf(*) = expf;
+__frexpf(*) = frexpf;
+__ldexpf(*) = ldexpf;
+__logf(*) = logf;
+__log10f(*) = log10f;
+__modff(*) = modff;
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[attribute(*)][alias(*)] __expl:(*) = expl;
-[attribute(*)][alias(*)] __frexpl:(*) = frexpl;
-[attribute(*)][alias(*)] __ldexpl:(*) = ldexpl;
-[attribute(*)][alias(*)] __logl:(*) = logl;
-[attribute(*)][alias(*)] __log10l:(*) = log10l;
-[attribute(*)][alias(*)] __modfl:(*) = modfl;
+__expl(*) = expl;
+__frexpl(*) = frexpl;
+__ldexpl(*) = ldexpl;
+__logl(*) = logl;
+__log10l(*) = log10l;
+__modfl(*) = modfl;
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 %
 %#ifdef __USE_GNU
-[attribute(*)][alias(*)] __exp10:(*) = exp10;
-[attribute(*)][alias(*)] __pow10:(*) = pow10;
-[attribute(*)][alias(*)] __exp10f:(*) = exp10f;
-[attribute(*)][alias(*)] __pow10f:(*) = pow10f;
+__exp10(*) = exp10;
+__pow10(*) = pow10;
+__exp10f(*) = exp10f;
+__pow10f(*) = pow10f;
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[attribute(*)][alias(*)] __exp10l:(*) = exp10l;
-[attribute(*)][alias(*)] __pow10l:(*) = pow10l;
+__exp10l(*) = exp10l;
+__pow10l(*) = pow10l;
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_GNU */
 
 %
 %#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
-[attribute(*)][alias(*)] __expm1:(*) = expm1;
-[attribute(*)][alias(*)] __log1p:(*) = log1p;
-[attribute(*)][alias(*)] __logb:(*) = logb;
-[attribute(*)][alias(*)] __expm1f:(*) = expm1f;
-[attribute(*)][alias(*)] __log1pf:(*) = log1pf;
-[attribute(*)][alias(*)] __logbf:(*) = logbf;
+__expm1(*) = expm1;
+__log1p(*) = log1p;
+__logb(*) = logb;
+__expm1f(*) = expm1f;
+__log1pf(*) = log1pf;
+__logbf(*) = logbf;
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[attribute(*)][alias(*)] __expm1l:(*) = expm1l;
-[attribute(*)][alias(*)] __log1pl:(*) = log1pl;
-[attribute(*)][alias(*)] __logbl:(*) = logbl;
+__expm1l(*) = expm1l;
+__log1pl(*) = log1pl;
+__logbl(*) = logbl;
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
 
 %
 %#ifdef __USE_ISOC99
-[attribute(*)][alias(*)] __exp2:(*) = exp2;
-[attribute(*)][alias(*)] __log2:(*) = log2;
-[attribute(*)][alias(*)] __exp2f:(*) = exp2f;
-[attribute(*)][alias(*)] __log2f:(*) = log2f;
+__exp2(*) = exp2;
+__log2(*) = log2;
+__exp2f(*) = exp2f;
+__log2f(*) = log2f;
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[attribute(*)][alias(*)] __exp2l:(*) = exp2l;
-[attribute(*)][alias(*)] __log2l:(*) = log2l;
+__exp2l(*) = exp2l;
+__log2l(*) = log2l;
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_ISOC99 */
 
-[attribute(*)][alias(*)] __pow:(*) = pow;
-[attribute(*)][alias(*)] __sqrt:(*) = sqrt;
-[attribute(*)][alias(*)] __powf:(*) = powf;
-[attribute(*)][alias(*)] __sqrtf:(*) = sqrtf;
+__pow(*) = pow;
+__sqrt(*) = sqrt;
+__powf(*) = powf;
+__sqrtf(*) = sqrtf;
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[attribute(*)][alias(*)] __powl:(*) = powl;
-[attribute(*)][alias(*)] __sqrtl:(*) = sqrtl;
+__powl(*) = powl;
+__sqrtl(*) = sqrtl;
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 %
 %#if defined(__USE_XOPEN) || defined(__USE_ISOC99)
-[attribute(*)][alias(*)] __hypot:(*) = hypot;
-[attribute(*)][alias(*)] __hypotf:(*) = hypotf;
+__hypot(*) = hypot;
+__hypotf(*) = hypotf;
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[attribute(*)][alias(*)] __hypotl:(*) = hypotl;
+__hypotl(*) = hypotl;
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_XOPEN || __USE_ISOC99 */
 
 %
 %#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
-[attribute(*)][alias(*)] __cbrt:(*) = cbrt;
-[attribute(*)][alias(*)] __cbrtf:(*) = cbrtf;
+__cbrt(*) = cbrt;
+__cbrtf(*) = cbrtf;
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[attribute(*)][alias(*)] __cbrtl:(*) = cbrtl;
+__cbrtl(*) = cbrtl;
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
 
-[attribute(*)][alias(*)] __ceil:(*) = ceil;
-[attribute(*)][alias(*)] __fabs:(*) = fabs;
-[attribute(*)][alias(*)] __floor:(*) = floor;
-[attribute(*)][alias(*)] __fmod:(*) = fmod;
-[attribute(*)][alias(*)] __isinf:(*) = isinf;
-[attribute(*)][alias(*)] __finite:(*) = finite;
-[attribute(*)][alias(*)] __ceilf:(*) = ceilf;
-[attribute(*)][alias(*)] __fabsf:(*) = fabsf;
-[attribute(*)][alias(*)] __floorf:(*) = floorf;
-[attribute(*)][alias(*)] __fmodf:(*) = fmodf;
-[attribute(*)][alias(*)] __isinff:(*) = isinff;
-[attribute(*)][alias(*)] __finitef:(*) = finitef;
+__ceil(*) = ceil;
+__fabs(*) = fabs;
+__floor(*) = floor;
+__fmod(*) = fmod;
+__isinf(*) = isinf;
+__finite(*) = finite;
+__ceilf(*) = ceilf;
+__fabsf(*) = fabsf;
+__floorf(*) = floorf;
+__fmodf(*) = fmodf;
+__isinff(*) = isinff;
+__finitef(*) = finitef;
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[attribute(*)][alias(*)] __ceill:(*) = ceill;
-[attribute(*)][alias(*)] __fabsl:(*) = fabsl;
-[attribute(*)][alias(*)] __floorl:(*) = floorl;
-[attribute(*)][alias(*)] __fmodl:(*) = fmodl;
-[attribute(*)][alias(*)] __isinfl:(*) = isinfl;
-[attribute(*)][alias(*)] __finitel:(*) = finitel;
+__ceill(*) = ceill;
+__fabsl(*) = fabsl;
+__floorl(*) = floorl;
+__fmodl(*) = fmodl;
+__isinfl(*) = isinfl;
+__finitel(*) = finitel;
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 %#ifdef __USE_MISC
-[attribute(*)][alias(*)] __drem:(*) = remainder;
-[attribute(*)][alias(*)] __significand:(*) = significand;
-[attribute(*)][alias(*)] __dremf:(*) = remainderf;
-[attribute(*)][alias(*)] __significandf:(*) = significandf;
+__drem(*) = remainder;
+__significand(*) = significand;
+__dremf(*) = remainderf;
+__significandf(*) = significandf;
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[attribute(*)][alias(*)] __dreml:(*) = remainderl;
-[attribute(*)][alias(*)] __significandl:(*) = significandl;
+__dreml(*) = remainderl;
+__significandl(*) = significandl;
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_MISC */
 
 %
 %#ifdef __USE_ISOC99
-[attribute(*)][alias(*)] __copysign:(*) = copysign;
-[attribute(*)][alias(*)] __nan:(*) = nan;
-[attribute(*)][alias(*)] __copysignf:(*) = copysignf;
-[attribute(*)][alias(*)] __nanf:(*) = nanf;
+__copysign(*) = copysign;
+__nan(*) = nan;
+__copysignf(*) = copysignf;
+__nanf(*) = nanf;
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[attribute(*)][alias(*)] __copysignl:(*) = copysignl;
-[attribute(*)][alias(*)] __nanl:(*) = nanl;
+__copysignl(*) = copysignl;
+__nanl(*) = nanl;
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_ISOC99 */
 
 %
-[attribute(*)][alias(*)] __isnan:(*) = isnan;
-[attribute(*)][alias(*)] __isnanf:(*) = isnanf;
+__isnan(*) = isnan;
+__isnanf(*) = isnanf;
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[attribute(*)][alias(*)] __isnanl:(*) = isnanl;
+__isnanl(*) = isnanl;
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 %
 %/* Bessel functions. */
 %#if defined(__USE_MISC) || defined(__USE_XOPEN)
-[attribute(*)][alias(*)] __j0:(*) = j0;
-[attribute(*)][alias(*)] __j1:(*) = j1;
-[attribute(*)][alias(*)] __jn:(*) = jn;
-[attribute(*)][alias(*)] __y0:(*) = y0;
-[attribute(*)][alias(*)] __y1:(*) = y1;
-[attribute(*)][alias(*)] __yn:(*) = yn;
+__j0(*) = j0;
+__j1(*) = j1;
+__jn(*) = jn;
+__y0(*) = y0;
+__y1(*) = y1;
+__yn(*) = yn;
 %#endif /* __USE_MISC || __USE_XOPEN */
 %#ifdef __USE_MISC
-[attribute(*)][alias(*)] __j0f:(*) = j0f;
-[attribute(*)][alias(*)] __j1f:(*) = j1f;
-[attribute(*)][alias(*)] __jnf:(*) = jnf;
-[attribute(*)][alias(*)] __y0f:(*) = y0f;
-[attribute(*)][alias(*)] __y1f:(*) = y1f;
-[attribute(*)][alias(*)] __ynf:(*) = ynf;
+__j0f(*) = j0f;
+__j1f(*) = j1f;
+__jnf(*) = jnf;
+__y0f(*) = y0f;
+__y1f(*) = y1f;
+__ynf(*) = ynf;
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[attribute(*)][alias(*)] __j0l:(*) = j0l;
-[attribute(*)][alias(*)] __j1l:(*) = j1l;
-[attribute(*)][alias(*)] __jnl:(*) = jnl;
-[attribute(*)][alias(*)] __y0l:(*) = y0l;
-[attribute(*)][alias(*)] __y1l:(*) = y1l;
-[attribute(*)][alias(*)] __ynl:(*) = ynl;
+__j0l(*) = j0l;
+__j1l(*) = j1l;
+__jnl(*) = jnl;
+__y0l(*) = y0l;
+__y1l(*) = y1l;
+__ynl(*) = ynl;
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_MISC */
 
 %
 %#if defined(__USE_XOPEN) || defined(__USE_ISOC99)
-[attribute(*)][alias(*)] __erf:(*) = erf;
-[attribute(*)][alias(*)] __erfc:(*) = erfc;
-[attribute(*)][alias(*)] __lgamma:(*) = lgamma;
-[attribute(*)][alias(*)] __erff:(*) = erff;
-[attribute(*)][alias(*)] __erfcf:(*) = erfcf;
-[attribute(*)][alias(*)] __lgammaf:(*) = lgammaf;
+__erf(*) = erf;
+__erfc(*) = erfc;
+__lgamma(*) = lgamma;
+__erff(*) = erff;
+__erfcf(*) = erfcf;
+__lgammaf(*) = lgammaf;
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[attribute(*)][alias(*)] __erfl:(*) = erfl;
-[attribute(*)][alias(*)] __erfcl:(*) = erfcl;
-[attribute(*)][alias(*)] __lgammal:(*) = lgammal;
+__erfl(*) = erfl;
+__erfcl(*) = erfcl;
+__lgammal(*) = lgammal;
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_XOPEN || __USE_ISOC99 */
 
 %
 %#ifdef __USE_ISOC99
-[attribute(*)][alias(*)] __tgamma:(*) = tgamma;
-[attribute(*)][alias(*)] __tgammaf:(*) = tgammaf;
+__tgamma(*) = tgamma;
+__tgammaf(*) = tgammaf;
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[attribute(*)][alias(*)] __tgammal:(*) = tgammal;
+__tgammal(*) = tgammal;
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_ISOC99 */
 
 %
 %#if defined(__USE_MISC) || (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K))
-[attribute(*)][alias(*)] __gamma:(*) = lgamma;
-[attribute(*)][alias(*)] __gammaf:(*) = lgammaf;
+__gamma(*) = lgamma;
+__gammaf(*) = lgammaf;
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[attribute(*)][alias(*)] __gammal:(*) = lgammal;
+__gammal(*) = lgammal;
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_MISC || (__USE_XOPEN && !__USE_XOPEN2K) */
 
 %#ifdef __USE_MISC
-[attribute(*)][alias(*)] __lgamma_r:(*) = lgamma_r;
-[attribute(*)][alias(*)] __lgammaf_r:(*) = lgammaf_r;
+__lgamma_r(*) = lgamma_r;
+__lgammaf_r(*) = lgammaf_r;
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[attribute(*)][alias(*)] __lgammal_r:(*) = lgammal_r;
+__lgammal_r(*) = lgammal_r;
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_MISC */
 
 %
 %#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
-[attribute(*)][alias(*)] __rint:(*) = rint;
-[attribute(*)][alias(*)] __nextafter:(*) = nextafter;
-[attribute(*)][alias(*)] __remainder:(*) = remainder;
-[attribute(*)][alias(*)] __ilogb:(*) = ilogb;
-[attribute(*)][alias(*)] __rintf:(*) = rintf;
-[attribute(*)][alias(*)] __nextafterf:(*) = nextafterf;
-[attribute(*)][alias(*)] __remainderf:(*) = remainderf;
-[attribute(*)][alias(*)] __ilogbf:(*) = ilogbf;
+__rint(*) = rint;
+__nextafter(*) = nextafter;
+__remainder(*) = remainder;
+__ilogb(*) = ilogb;
+__rintf(*) = rintf;
+__nextafterf(*) = nextafterf;
+__remainderf(*) = remainderf;
+__ilogbf(*) = ilogbf;
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[attribute(*)][alias(*)] __rintl:(*) = rintl;
-[attribute(*)][alias(*)] __nextafterl:(*) = nextafterl;
-[attribute(*)][alias(*)] __remainderl:(*) = remainderl;
-[attribute(*)][alias(*)] __ilogbl:(*) = ilogbl;
+__rintl(*) = rintl;
+__nextafterl(*) = nextafterl;
+__remainderl(*) = remainderl;
+__ilogbl(*) = ilogbl;
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
 
 
 %
 %#ifdef __USE_ISOC99
-[attribute(*)][alias(*)] __nexttoward:(*) = nexttoward;
-[attribute(*)][alias(*)] __scalbn:(*) = scalbn;
-[attribute(*)][alias(*)] __scalbln:(*) = scalbln;
-[attribute(*)][alias(*)] __nearbyint:(*) = rint;
-[attribute(*)][alias(*)] __round:(*) = round;
-[attribute(*)][alias(*)] __trunc:(*) = trunc;
-[attribute(*)][alias(*)] __remquo:(*) = remquo;
-[attribute(*)][alias(*)] __lrint:(*) = lrint;
-[attribute(*)][alias(*)] __lround:(*) = lround;
-[attribute(*)][alias(*)] __fdim:(*) = fdim;
-[attribute(*)][alias(*)] __fmax:(*) = fmax;
-[attribute(*)][alias(*)] __fmin:(*) = fmin;
-[attribute(*)][alias(*)] __fma:(*) = fma;
+__nexttoward(*) = nexttoward;
+__scalbn(*) = scalbn;
+__scalbln(*) = scalbln;
+__nearbyint(*) = rint;
+__round(*) = round;
+__trunc(*) = trunc;
+__remquo(*) = remquo;
+__lrint(*) = lrint;
+__lround(*) = lround;
+__fdim(*) = fdim;
+__fmax(*) = fmax;
+__fmin(*) = fmin;
+__fma(*) = fma;
 
-[attribute(*)][alias(*)] __nexttowardf:(*) = nexttowardf;
-[attribute(*)][alias(*)] __scalbnf:(*) = scalbnf;
-[attribute(*)][alias(*)] __scalblnf:(*) = scalblnf;
-[attribute(*)][alias(*)] __nearbyintf:(*) = rintf;
-[attribute(*)][alias(*)] __roundf:(*) = roundf;
-[attribute(*)][alias(*)] __truncf:(*) = truncf;
-[attribute(*)][alias(*)] __remquof:(*) = remquof;
-[attribute(*)][alias(*)] __lrintf:(*) = lrintf;
-[attribute(*)][alias(*)] __lroundf:(*) = lroundf;
-[attribute(*)][alias(*)] __fdimf:(*) = fdimf;
-[attribute(*)][alias(*)] __fmaxf:(*) = fmaxf;
-[attribute(*)][alias(*)] __fminf:(*) = fminf;
-[attribute(*)][alias(*)] __fmaf:(*) = fmaf;
+__nexttowardf(*) = nexttowardf;
+__scalbnf(*) = scalbnf;
+__scalblnf(*) = scalblnf;
+__nearbyintf(*) = rintf;
+__roundf(*) = roundf;
+__truncf(*) = truncf;
+__remquof(*) = remquof;
+__lrintf(*) = lrintf;
+__lroundf(*) = lroundf;
+__fdimf(*) = fdimf;
+__fmaxf(*) = fmaxf;
+__fminf(*) = fminf;
+__fmaf(*) = fmaf;
 
 %#ifdef __COMPILER_HAVE_LONGLONG
-[attribute(*)][alias(*)] __llrint:(*) = llrint;
-[attribute(*)][alias(*)] __llround:(*) = llround;
-[attribute(*)][alias(*)] __llrintf:(*) = llrintf;
-[attribute(*)][alias(*)] __llroundf:(*) = llroundf;
+__llrint(*) = llrint;
+__llround(*) = llround;
+__llrintf(*) = llrintf;
+__llroundf(*) = llroundf;
 %#endif /* __COMPILER_HAVE_LONGLONG */
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[attribute(*)][alias(*)] __nexttowardl:(*) = nextafterl;
-[attribute(*)][alias(*)] __scalbnl:(*) = scalbnl;
-[attribute(*)][alias(*)] __scalblnl:(*) = scalblnl;
-[attribute(*)][alias(*)] __nearbyintl:(*) = rintl;
-[attribute(*)][alias(*)] __roundl:(*) = roundl;
-[attribute(*)][alias(*)] __truncl:(*) = truncl;
-[attribute(*)][alias(*)] __remquol:(*) = remquol;
-[attribute(*)][alias(*)] __lrintl:(*) = lrintl;
-[attribute(*)][alias(*)] __lroundl:(*) = lroundl;
-[attribute(*)][alias(*)] __fdiml:(*) = fdiml;
-[attribute(*)][alias(*)] __fmaxl:(*) = fmaxl;
-[attribute(*)][alias(*)] __fminl:(*) = fminl;
-[attribute(*)][alias(*)] __fmal:(*) = fmal;
+__nexttowardl(*) = nextafterl;
+__scalbnl(*) = scalbnl;
+__scalblnl(*) = scalblnl;
+__nearbyintl(*) = rintl;
+__roundl(*) = roundl;
+__truncl(*) = truncl;
+__remquol(*) = remquol;
+__lrintl(*) = lrintl;
+__lroundl(*) = lroundl;
+__fdiml(*) = fdiml;
+__fmaxl(*) = fmaxl;
+__fminl(*) = fminl;
+__fmal(*) = fmal;
 %#ifdef __COMPILER_HAVE_LONGLONG
-[attribute(*)][alias(*)] __llrintl:(*) = llrintl;
-[attribute(*)][alias(*)] __llroundl:(*) = llroundl;
+__llrintl(*) = llrintl;
+__llroundl(*) = llroundl;
 %#endif /* __COMPILER_HAVE_LONGLONG */
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_ISOC99 */
 
 %
 %#if defined(__USE_MISC) || (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K8))
-[attribute(*)][alias(*)] __scalb:(*) = scalb;
+__scalb(*) = scalb;
 %#endif /* __USE_MISC || (__USE_XOPEN_EXTENDED && !__USE_XOPEN2K8) */
 %#ifdef __USE_MISC
-[attribute(*)][alias(*)] __scalbf:(*) = scalbf;
+__scalbf(*) = scalbf;
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[attribute(*)][alias(*)] __scalbl:(*) = scalbl;
+__scalbl(*) = scalbl;
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_MISC */
 %#endif /* GLIBc aliases */
@@ -2097,17 +2122,17 @@ __signbit:(double x) -> int {
 
 
 [ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(_fdclass, fpclassifyf)]
-__fpclassifyf:(float x) -> int %{auto_block(mathfun)}
+__fpclassifyf:(float x) -> int %{generate(double2float)}
 
 [ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(_fdsign)]
-__signbitf:(float x) -> int %{auto_block(mathfun)}
+__signbitf:(float x) -> int %{generate(double2float)}
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
 [ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(_ldclass, fpclassifyl)]
-__fpclassifyl:(__LONGDOUBLE x) -> int %{auto_block(mathfun)}
+__fpclassifyl:(__LONGDOUBLE x) -> int %{generate(double2ldouble)}
 
 [ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(_ldsign)]
-__signbitl:(__LONGDOUBLE x) -> int %{auto_block(mathfun)}
+__signbitl:(__LONGDOUBLE x) -> int %{generate(double2ldouble)}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_ISOC99 */
 
@@ -2129,26 +2154,25 @@ __issignaling:(double x) -> int {
 }
 
 [ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(issignalingf)]
-__issignalingf:(float x) -> int %{auto_block(mathfun)}
+__issignalingf:(float x) -> int %{generate(double2float)}
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
 [ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(issignalingl)]
-__issignalingl:(__LONGDOUBLE x) -> int %{auto_block(mathfun)}
+__issignalingl:(__LONGDOUBLE x) -> int %{generate(double2ldouble)}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_GNU */
 
-[ignore][nouser][noexport][ATTR_WUNUSED][ATTR_CONST]
-_dpcomp:(double x, double y) -> int; /* TODO */
+[[ATTR_WUNUSED, ATTR_CONST, ignore, nocrt, alias(_dpcomp)]]
+int _dpcomp:(double x, double y) /* TODO */;
+[[ATTR_WUNUSED, ATTR_CONST, ignore, nocrt, alias(_fdpcomp)]]
+int _fdpcomp:(float x, float y) /*TODO:%{generate(double2float(_dpcomp))}*/;
+[[ATTR_WUNUSED, ATTR_CONST, ignore, nocrt, alias(_ldpcomp)]]
+int _ldpcomp:(__LONGDOUBLE x, __LONGDOUBLE y) /*TODO:%{generate(double2ldouble(_dpcomp))}*/;
 
-[ignore][nouser][noexport][ATTR_WUNUSED][ATTR_CONST]
-_fdpcomp:(float x, float y) -> int %{auto_block(math(float, _dpcomp))}
-[ignore][nouser][noexport][ATTR_WUNUSED][ATTR_CONST]
-_ldpcomp:(__LONGDOUBLE x, __LONGDOUBLE y) -> int %{auto_block(math(__LONGDOUBLE, _dpcomp))}
-
-[nocrt][nouser][noexport][attribute(*)] __dos_dpcomp:(*) = _dpcomp;
-[nocrt][nouser][noexport][attribute(*)] __dos_fdpcomp:(*) = _fdpcomp;
+__dos_dpcomp(*) = _dpcomp;
+__dos_fdpcomp(*) = _fdpcomp;
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[nocrt][nouser][noexport][attribute(*)] __dos_ldpcomp:(*) = _ldpcomp;
+__dos_ldpcomp(*) = _ldpcomp;
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 

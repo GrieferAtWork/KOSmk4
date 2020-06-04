@@ -87,31 +87,31 @@ timerfd_settime:($fd_t ufd, int flags,
 #ifdef __CRT_HAVE_timer_settime
 	int result;
 	struct __itimerspec32 utmr32, otmr32;
-	utmr32.it_interval.@tv_sec@  = (__time32_t)utmr->it_interval.@tv_sec@;
-	utmr32.it_interval.@tv_nsec@ = utmr->it_interval.@tv_nsec@;
-	utmr32.it_value.@tv_sec@     = (__time32_t)utmr->it_value.@tv_sec@;
-	utmr32.it_value.@tv_nsec@    = utmr->it_value.@tv_nsec@;
+	utmr32.it_interval.tv_sec  = (__time32_t)utmr->it_interval.tv_sec;
+	utmr32.it_interval.tv_nsec = utmr->it_interval.tv_nsec;
+	utmr32.it_value.tv_sec     = (__time32_t)utmr->it_value.tv_sec;
+	utmr32.it_value.tv_nsec    = utmr->it_value.tv_nsec;
 	result = timerfd_settime32(ufd, flags, &utmr32, otmr ? &otmr32 : NULL);
 	if (!result && otmr) {
-		otmr->it_interval.@tv_sec@  = (__time64_t)otmr32.it_interval.@tv_sec@;
-		otmr->it_interval.@tv_nsec@ = otmr32.it_interval.@tv_nsec@;
-		otmr->it_value.@tv_sec@     = (__time64_t)otmr32.it_value.@tv_sec@;
-		otmr->it_value.@tv_nsec@    = otmr32.it_value.@tv_nsec@;
+		otmr->it_interval.tv_sec  = (__time64_t)otmr32.it_interval.tv_sec;
+		otmr->it_interval.tv_nsec = otmr32.it_interval.tv_nsec;
+		otmr->it_value.tv_sec     = (__time64_t)otmr32.it_value.tv_sec;
+		otmr->it_value.tv_nsec    = otmr32.it_value.tv_nsec;
 	}
 	return result;
 #else
 	int result;
 	struct __itimerspec64 utmr64, otmr64;
-	utmr64.it_interval.@tv_sec@  = (__time64_t)utmr->it_interval.@tv_sec@;
-	utmr64.it_interval.@tv_nsec@ = utmr->it_interval.@tv_nsec@;
-	utmr64.it_value.@tv_sec@     = (__time64_t)utmr->it_value.@tv_sec@;
-	utmr64.it_value.@tv_nsec@    = utmr->it_value.@tv_nsec@;
+	utmr64.it_interval.tv_sec  = (__time64_t)utmr->it_interval.tv_sec;
+	utmr64.it_interval.tv_nsec = utmr->it_interval.tv_nsec;
+	utmr64.it_value.tv_sec     = (__time64_t)utmr->it_value.tv_sec;
+	utmr64.it_value.tv_nsec    = utmr->it_value.tv_nsec;
 	result = timerfd_settime64(timerid, flags, &utmr64, otmr ? &otmr64 : NULL);
 	if (!result && otmr) {
-		otmr->it_interval.@tv_sec@  = (__time32_t)otmr64.it_interval.@tv_sec@;
-		otmr->it_interval.@tv_nsec@ = otmr64.it_interval.@tv_nsec@;
-		otmr->it_value.@tv_sec@     = (__time32_t)otmr64.it_value.@tv_sec@;
-		otmr->it_value.@tv_nsec@    = otmr64.it_value.@tv_nsec@;
+		otmr->it_interval.tv_sec  = (__time32_t)otmr64.it_interval.tv_sec;
+		otmr->it_interval.tv_nsec = otmr64.it_interval.tv_nsec;
+		otmr->it_value.tv_sec     = (__time32_t)otmr64.it_value.tv_sec;
+		otmr->it_value.tv_nsec    = otmr64.it_value.tv_nsec;
 	}
 	return result;
 #endif
@@ -128,10 +128,10 @@ timerfd_gettime:($fd_t ufd, [[nonnull]] struct itimerspec *__restrict otmr) -> i
 	struct __itimerspec32 otmr32;
 	result = timerfd_gettime32(timerid, &otmr32);
 	if (!result) {
-		otmr->it_interval.@tv_sec@  = (__time64_t)otmr32.it_interval.@tv_sec@;
-		otmr->it_interval.@tv_nsec@ = otmr32.it_interval.@tv_nsec@;
-		otmr->it_value.@tv_sec@     = (__time64_t)otmr32.it_value.@tv_sec@;
-		otmr->it_value.@tv_nsec@    = otmr32.it_value.@tv_nsec@;
+		otmr->it_interval.tv_sec  = (__time64_t)otmr32.it_interval.tv_sec;
+		otmr->it_interval.tv_nsec = otmr32.it_interval.tv_nsec;
+		otmr->it_value.tv_sec     = (__time64_t)otmr32.it_value.tv_sec;
+		otmr->it_value.tv_nsec    = otmr32.it_value.tv_nsec;
 	}
 	return result;
 #else
@@ -139,10 +139,10 @@ timerfd_gettime:($fd_t ufd, [[nonnull]] struct itimerspec *__restrict otmr) -> i
 	struct __itimerspec64 otmr64;
 	result = timerfd_gettime64(timerid, &otmr64);
 	if (!result) {
-		otmr->it_interval.@tv_sec@  = (__time32_t)otmr64.it_interval.@tv_sec@;
-		otmr->it_interval.@tv_nsec@ = otmr64.it_interval.@tv_nsec@;
-		otmr->it_value.@tv_sec@     = (__time32_t)otmr64.it_value.@tv_sec@;
-		otmr->it_value.@tv_nsec@    = otmr64.it_value.@tv_nsec@;
+		otmr->it_interval.tv_sec  = (__time32_t)otmr64.it_interval.tv_sec;
+		otmr->it_interval.tv_nsec = otmr64.it_interval.tv_nsec;
+		otmr->it_value.tv_sec     = (__time32_t)otmr64.it_value.tv_sec;
+		otmr->it_value.tv_nsec    = otmr64.it_value.tv_nsec;
 	}
 	return result;
 #endif
@@ -157,16 +157,16 @@ timerfd_settime64:($fd_t ufd, int flags,
                    [[nullable]] struct itimerspec64 *otmr) -> int {
 	int result;
 	struct __itimerspec32 utmr32, otmr32;
-	utmr32.it_interval.@tv_sec@  = (__time32_t)utmr->it_interval.@tv_sec@;
-	utmr32.it_interval.@tv_nsec@ = utmr->it_interval.@tv_nsec@;
-	utmr32.it_value.@tv_sec@     = (__time32_t)utmr->it_value.@tv_sec@;
-	utmr32.it_value.@tv_nsec@    = utmr->it_value.@tv_nsec@;
+	utmr32.it_interval.tv_sec  = (__time32_t)utmr->it_interval.tv_sec;
+	utmr32.it_interval.tv_nsec = utmr->it_interval.tv_nsec;
+	utmr32.it_value.tv_sec     = (__time32_t)utmr->it_value.tv_sec;
+	utmr32.it_value.tv_nsec    = utmr->it_value.tv_nsec;
 	result = timerfd_settime32(ufd, flags, &utmr32, otmr ? &otmr32 : NULL);
 	if (!result && otmr) {
-		otmr->it_interval.@tv_sec@  = (__time64_t)otmr32.it_interval.@tv_sec@;
-		otmr->it_interval.@tv_nsec@ = otmr32.it_interval.@tv_nsec@;
-		otmr->it_value.@tv_sec@     = (__time64_t)otmr32.it_value.@tv_sec@;
-		otmr->it_value.@tv_nsec@    = otmr32.it_value.@tv_nsec@;
+		otmr->it_interval.tv_sec  = (__time64_t)otmr32.it_interval.tv_sec;
+		otmr->it_interval.tv_nsec = otmr32.it_interval.tv_nsec;
+		otmr->it_value.tv_sec     = (__time64_t)otmr32.it_value.tv_sec;
+		otmr->it_value.tv_nsec    = otmr32.it_value.tv_nsec;
 	}
 	return result;
 }
@@ -178,10 +178,10 @@ timerfd_gettime64:($fd_t ufd, [[nonnull]] struct itimerspec64 *__restrict otmr) 
 	struct __itimerspec32 otmr32;
 	result = timerfd_gettime32(timerid, &otmr32);
 	if (!result) {
-		otmr->it_interval.@tv_sec@  = (__time64_t)otmr32.it_interval.@tv_sec@;
-		otmr->it_interval.@tv_nsec@ = otmr32.it_interval.@tv_nsec@;
-		otmr->it_value.@tv_sec@     = (__time64_t)otmr32.it_value.@tv_sec@;
-		otmr->it_value.@tv_nsec@    = otmr32.it_value.@tv_nsec@;
+		otmr->it_interval.tv_sec  = (__time64_t)otmr32.it_interval.tv_sec;
+		otmr->it_interval.tv_nsec = otmr32.it_interval.tv_nsec;
+		otmr->it_value.tv_sec     = (__time64_t)otmr32.it_value.tv_sec;
+		otmr->it_value.tv_nsec    = otmr32.it_value.tv_nsec;
 	}
 	return result;
 }

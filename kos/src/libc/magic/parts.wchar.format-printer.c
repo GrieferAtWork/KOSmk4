@@ -85,17 +85,17 @@ typedef __pwformatprinter pwformatprinter;
 
 }
 
-[attribute(*)][wchar] format_wrepeat:(*) %{copy(format_repeat, str2wcs)}
-[attribute(*)][wchar] format_wescape:(*) %{copy(format_escape, str2wcs)}
-[attribute(*)][wchar] format_whexdump:(*) %{copy(format_hexdump, str2wcs)}
+[wchar] format_wrepeat:(*) %{generate(str2wcs("format_repeat"))}
+[wchar] format_wescape:(*) %{generate(str2wcs("format_escape"))}
+[wchar] format_whexdump:(*) %{generate(str2wcs("format_hexdump"))}
 
 %
 %
 %
 %
 
-[attribute(*)][wchar] format_vwprintf:(*) %{copy(format_vprintf, str2wcs)}
-[attribute(*)][wchar] format_wprintf:(*) %{copy(format_printf, str2wcs)}
+[wchar] format_vwprintf:(*) %{generate(str2wcs("format_vprintf"))}
+[wchar] format_wprintf:(*) %{generate(str2wcs("format_printf"))}
 
 
 %
@@ -106,7 +106,7 @@ typedef __pwformatprinter pwformatprinter;
 [wchar]
 format_wsprintf_printer:([[nonnull]] /*wchar_t ***/ void *arg,
                          [[nonnull]] wchar_t const *__restrict data, $size_t datalen) -> $ssize_t
-	%{copy(format_sprintf_printer, str2wcs)}
+	%{generate(str2wcs("format_sprintf_printer"))}
 
 %{
 
@@ -129,10 +129,10 @@ struct format_wsnprintf_data {
 @@WARNING: No trailing NUL-character is implicitly appended
 @@NOTE: The number of written characters is `ORIG_BUFSIZE - ARG->sd_bufsiz'
 @@NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively the sum of return values of all calls to `format_snprintf_printer()'
-[wchar][dependency_include(<hybrid/typecore.h>)]
+[wchar]
 format_wsnprintf_printer:([[nonnull]] /*struct format_wsnprintf_data**/ void *arg,
                           [[nonnull]] wchar_t const *__restrict data, $size_t datalen) -> $ssize_t
-	%{copy(format_snprintf_printer, str2wcs)}
+	%{generate(str2wcs("format_snprintf_printer"))}
 
 
 [doc_alias(format_width)][ATTR_PURE]
@@ -166,8 +166,9 @@ format_wwidth:(void *arg, [[nonnull]] wchar_t const *__restrict data, $size_t da
 #endif
 }
 
-[noexport][nocrt][nouser][ATTR_CONST]
-format_wlength:(void *arg, wchar_t const *__restrict data, $size_t datalen) -> $ssize_t = format_length;
+
+[[ATTR_CONST]]
+$ssize_t format_wlength(void *arg, wchar_t const *__restrict data, $size_t datalen) = format_length;
 
 
 
@@ -243,9 +244,8 @@ struct format_waprintf_data {
 @@                 but may differ from `wcslen(return)' when NUL characters were
 @@                 printed to the waprintf-printer at one point.
 @@                 (e.g. `format_waprintf_printer(&my_printer, L"\0", 1)')
-[requires($has_function(realloc))][same_impl][user]
-[dependency_include(<hybrid/__assert.h>)]
-[dependency_include(<hybrid/typecore.h>)][wchar]
+[requires_function("realloc")][userimpl]
+[impl_include("<hybrid/__assert.h>")][wchar]
 [ATTR_WUNUSED][ATTR_MALL_DEFAULT_ALIGNED][ATTR_MALLOC]
 [dependency_prefix(DEFINE_FORMAT_WAPRINTF_DATA)]
 format_waprintf_pack:([[nonnull]] struct format_waprintf_data *__restrict self,
@@ -296,11 +296,11 @@ format_waprintf_pack:([[nonnull]] struct format_waprintf_data *__restrict self,
 @@the format_aprintf buffer `self' is finalized, or some other function is used
 @@to append additional data to the end of `self'
 @@@return: NULL: Failed to allocate additional memory
-[requires($has_function(realloc))][same_impl][wchar]
-[dependency_include(<hybrid/__assert.h>)][ATTR_WUNUSED]
+[requires_function("realloc")][userimpl][wchar]
+[impl_include("<hybrid/__assert.h>")][ATTR_WUNUSED]
 [dependency_prefix(DEFINE_FORMAT_WAPRINTF_DATA)]
 format_waprintf_alloc:([[nonnull]] struct format_waprintf_data *__restrict self,
-                       $size_t num_wchars) -> [malloc(num_wchars * sizeof(wchar_t))] wchar_t * {
+                       $size_t num_wchars) -> [malloc /*(num_wchars * sizeof(wchar_t))*/] wchar_t * {
 	wchar_t *result;
 	if (self->@ap_avail@ < num_wchars) {
 		wchar_t *newbuf;
@@ -328,7 +328,7 @@ format_waprintf_alloc:([[nonnull]] struct format_waprintf_data *__restrict self,
 }
 
 @@Print data to a dynamically allocated heap buffer. On error, -1 is returned
-[requires($has_function(format_waprintf_alloc))][same_impl][wchar][ATTR_WUNUSED]
+[requires_function("format_waprintf_alloc")][userimpl][wchar][ATTR_WUNUSED]
 format_waprintf_printer:([[nonnull]] /*struct format_waprintf_data **/ void *arg,
                          [[nonnull]] wchar_t const *__restrict data, $size_t datalen) -> $ssize_t {
 	wchar_t *buf;

@@ -573,7 +573,7 @@ munmap:([[nonnull]] void *addr, size_t len) -> int;
 mprotect:([[nonnull]] void *addr, size_t len, int prot) -> int;
 
 @@@param flags: Set of `MS_ASYNC|MS_INVALIDATE|MS_SYNC'
-[cp] msync:([[nonnull]] void *addr, size_t len, int flags) -> int;
+[[cp]] msync:([[nonnull]] void *addr, size_t len, int flags) -> int;
 mlock:([[nonnull]] void const *addr, size_t len) -> int;
 munlock:([[nonnull]] void const *addr, size_t len) -> int;
 
@@ -581,8 +581,8 @@ munlock:([[nonnull]] void const *addr, size_t len) -> int;
 mlockall:(int flags) -> int;
 
 munlockall:() -> int;
-[cp] shm_open:([[nonnull]] char const *name, $oflag_t oflags, mode_t mode) -> int;
-[cp] shm_unlink:([[nonnull]] char const *name) -> int;
+[[cp]] shm_open:([[nonnull]] char const *name, $oflag_t oflags, mode_t mode) -> int;
+[[cp]] shm_unlink:([[nonnull]] char const *name) -> int;
 
 %
 %#ifdef __USE_MISC

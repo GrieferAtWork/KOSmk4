@@ -36,25 +36,25 @@ __SYSDECL_BEGIN
 
 }
 
-[alias(*)][attribute(*)] c16stol:(*) %{uchar(wcstol)}
-[alias(*)][attribute(*)] c32stol:(*) %{uchar(wcstol)}
-[alias(*)][attribute(*)] c16stoul:(*) %{uchar(wcstoul)}
-[alias(*)][attribute(*)] c32stoul:(*) %{uchar(wcstoul)}
+c16stol:(*) %{uchar(wcstol)}
+c32stol:(*) %{uchar(wcstol)}
+c16stoul:(*) %{uchar(wcstoul)}
+c32stoul:(*) %{uchar(wcstoul)}
 
-[alias(*)][attribute(*)] c16stoll:(*) %{uchar(wcstoll)}
-[alias(*)][attribute(*)] c32stoll:(*) %{uchar(wcstoll)}
-[alias(*)][attribute(*)] c16stoull:(*) %{uchar(wcstoull)}
-[alias(*)][attribute(*)] c32stoull:(*) %{uchar(wcstoull)}
+c16stoll:(*) %{uchar(wcstoll)}
+c32stoll:(*) %{uchar(wcstoll)}
+c16stoull:(*) %{uchar(wcstoull)}
+c32stoull:(*) %{uchar(wcstoull)}
 
 %#ifndef __NO_FPU
-[alias(*)][attribute(*)] c16stod:(*) %{uchar(wcstod)}
-[alias(*)][attribute(*)] c32stod:(*) %{uchar(wcstod)}
+c16stod:(*) %{uchar(wcstod)}
+c32stod:(*) %{uchar(wcstod)}
 %#ifdef __USE_ISOC99
-[alias(*)][attribute(*)] c16stof:(*) %{uchar(wcstof)}
-[alias(*)][attribute(*)] c32stof:(*) %{uchar(wcstof)}
+c16stof:(*) %{uchar(wcstof)}
+c32stof:(*) %{uchar(wcstof)}
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[alias(*)][attribute(*)] c16stold:(*) %{uchar(wcstold)}
-[alias(*)][attribute(*)] c32stold:(*) %{uchar(wcstold)}
+c16stold:(*) %{uchar(wcstold)}
+c32stold:(*) %{uchar(wcstold)}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* !__USE_ISOC99 */
 %#endif /* !__NO_FPU */
@@ -62,27 +62,27 @@ __SYSDECL_BEGIN
 
 %
 %#ifdef __USE_GNU
-//[alias(*)][attribute(*)] c16stoq:(*) = c16stoll;
-//[alias(*)][attribute(*)] c32stoq:(*) = c32stoll;
-//[alias(*)][attribute(*)] c16stouq:(*) = c16stoull;
-//[alias(*)][attribute(*)] c32stouq:(*) = c32stoull;
-[alias(*)][attribute(*)] c16stol_l:(*) %{uchar(wcstol_l)}
-[alias(*)][attribute(*)] c32stol_l:(*) %{uchar(wcstol_l)}
-[alias(*)][attribute(*)] c16stoul_l:(*) %{uchar(wcstoul_l)}
-[alias(*)][attribute(*)] c32stoul_l:(*) %{uchar(wcstoul_l)}
-[alias(*)][attribute(*)] c16stoll_l:(*) %{uchar(wcstoll_l)}
-[alias(*)][attribute(*)] c32stoll_l:(*) %{uchar(wcstoll_l)}
-[alias(*)][attribute(*)] c16stoull_l:(*) %{uchar(wcstoull_l)}
-[alias(*)][attribute(*)] c32stoull_l:(*) %{uchar(wcstoull_l)}
+c16stoq:(*) = c16stoll;
+c32stoq:(*) = c32stoll;
+c16stouq:(*) = c16stoull;
+c32stouq:(*) = c32stoull;
+c16stol_l:(*) %{uchar(wcstol_l)}
+c32stol_l:(*) %{uchar(wcstol_l)}
+c16stoul_l:(*) %{uchar(wcstoul_l)}
+c32stoul_l:(*) %{uchar(wcstoul_l)}
+c16stoll_l:(*) %{uchar(wcstoll_l)}
+c32stoll_l:(*) %{uchar(wcstoll_l)}
+c16stoull_l:(*) %{uchar(wcstoull_l)}
+c32stoull_l:(*) %{uchar(wcstoull_l)}
 
 %#ifndef __NO_FPU
-[alias(*)][attribute(*)] c16stof_l:(*) %{uchar(wcstof_l)}
-[alias(*)][attribute(*)] c32stof_l:(*) %{uchar(wcstof_l)}
-[alias(*)][attribute(*)] c16stod_l:(*) %{uchar(wcstod_l)}
-[alias(*)][attribute(*)] c32stod_l:(*) %{uchar(wcstod_l)}
+c16stof_l:(*) %{uchar(wcstof_l)}
+c32stof_l:(*) %{uchar(wcstof_l)}
+c16stod_l:(*) %{uchar(wcstod_l)}
+c32stod_l:(*) %{uchar(wcstod_l)}
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[alias(*)][attribute(*)] c16stold_l:(*) %{uchar(wcstold_l)}
-[alias(*)][attribute(*)] c32stold_l:(*) %{uchar(wcstold_l)}
+c16stold_l:(*) %{uchar(wcstold_l)}
+c32stold_l:(*) %{uchar(wcstold_l)}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* !__NO_FPU */
 %#endif /* __USE_GNU */
@@ -90,21 +90,21 @@ __SYSDECL_BEGIN
 
 %
 %#ifdef __USE_KOS
-[attribute(*)] c16sto32:(*) %{uchar16(wcsto32)}
-[attribute(*)] c32sto32:(*) %{uchar32(wcsto32)}
-[attribute(*)] c16stou32:(*) %{uchar16(wcstou32)}
-[attribute(*)] c32stou32:(*) %{uchar32(wcstou32)}
-[attribute(*)] c16sto64:(*) %{uchar16(wcsto64)}
-[attribute(*)] c32sto64:(*) %{uchar32(wcsto64)}
-[attribute(*)] c16stou64:(*) %{uchar16(wcstou64)}
-[attribute(*)] c32stou64:(*) %{uchar32(wcstou64)}
+c16sto32:(*) %{uchar16(wcsto32)}
+c32sto32:(*) %{uchar32(wcsto32)}
+c16stou32:(*) %{uchar16(wcstou32)}
+c32stou32:(*) %{uchar32(wcstou32)}
+c16sto64:(*) %{uchar16(wcsto64)}
+c32sto64:(*) %{uchar32(wcsto64)}
+c16stou64:(*) %{uchar16(wcstou64)}
+c32stou64:(*) %{uchar32(wcstou64)}
 
-[attribute(*)] c16toi:(*) %{uchar16(wtoi)}
-[attribute(*)] c32toi:(*) %{uchar32(wtoi)}
-[attribute(*)] c16tol:(*) %{uchar16(wtol)}
-[attribute(*)] c32tol:(*) %{uchar32(wtol)}
-[attribute(*)] c16toll:(*) %{uchar16(wtoll)}
-[attribute(*)] c32toll:(*) %{uchar32(wtoll)}
+c16toi:(*) %{uchar16(wtoi)}
+c32toi:(*) %{uchar32(wtoi)}
+c16tol:(*) %{uchar16(wtol)}
+c32tol:(*) %{uchar32(wtol)}
+c16toll:(*) %{uchar16(wtoll)}
+c32toll:(*) %{uchar32(wtoll)}
 %#endif /* __USE_KOS */
 
 

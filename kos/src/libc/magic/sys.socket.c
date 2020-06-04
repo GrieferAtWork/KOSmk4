@@ -188,7 +188,7 @@ getsockname:($fd_t sockfd, [outp(*addr_len)] __SOCKADDR_ARG addr,
 @@For connectionless socket types, just set the default address to send to
 @@and the only address from which to accept transmissions.
 @@Return 0 on success, -1 for errors
-[cp][export_alias(__connect)]
+[[cp]][export_alias(__connect)]
 connect:($fd_t sockfd, [inp(addr_len)] __CONST_SOCKADDR_ARG addr,
          socklen_t addr_len) -> int;
 
@@ -200,7 +200,7 @@ getpeername:($fd_t sockfd, [outp(*addr_len)] __SOCKADDR_ARG addr,
 @@Send BUFSIZE bytes of BUF to socket FD.  Returns the number sent or -1
 @@@param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
 @@                           MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
-[cp][export_alias(__send)]
+[[cp]][export_alias(__send)]
 send:($fd_t sockfd, [inp(bufsize)] void const *buf,
       size_t bufsize, __STDC_INT_AS_UINT_T msg_flags) -> ssize_t;
 
@@ -208,7 +208,7 @@ send:($fd_t sockfd, [inp(bufsize)] void const *buf,
 @@Returns the number read or -1 for errors
 @@@param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
 @@                           MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
-[cp][ATTR_WUNUSED][export_alias(__recv)]
+[[cp]][ATTR_WUNUSED][export_alias(__recv)]
 recv:($fd_t sockfd, [[outp(bufsize)]] void *buf, size_t bufsize,
       __STDC_INT_AS_UINT_T msg_flags) -> ssize_t;
 
@@ -216,7 +216,7 @@ recv:($fd_t sockfd, [[outp(bufsize)]] void *buf, size_t bufsize,
 @@(which is ADDR_LEN bytes long). Returns the number sent, or -1 for errors.
 @@@param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
 @@                           MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
-[cp]
+[[cp]]
 sendto:($fd_t sockfd, [inp(bufsize)] void const *buf, size_t bufsize, __STDC_INT_AS_UINT_T msg_flags,
         [inp_opt(addr_len)] __CONST_SOCKADDR_ARG addr, socklen_t addr_len) -> ssize_t;
 
@@ -226,7 +226,7 @@ sendto:($fd_t sockfd, [inp(bufsize)] void const *buf, size_t bufsize, __STDC_INT
 @@Returns the number of bytes read or -1 for errors
 @@@param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
 @@                           MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
-[cp][ATTR_WUNUSED]
+[[cp]][ATTR_WUNUSED]
 recvfrom:($fd_t sockfd, [[outp(bufsize)]] void *__restrict buf, size_t bufsize, __STDC_INT_AS_UINT_T msg_flags,
           [outp_opt(*addr_len)] __SOCKADDR_ARG addr, [[nullable]] socklen_t *__restrict addr_len) -> ssize_t;
 
@@ -234,7 +234,7 @@ recvfrom:($fd_t sockfd, [[outp(bufsize)]] void *__restrict buf, size_t bufsize, 
 @@Returns the number of bytes sent, or -1 for errors
 @@@param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
 @@                           MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
-[cp]
+[[cp]]
 sendmsg:($fd_t sockfd, [[nonnull]] struct msghdr const *message,
          __STDC_INT_AS_UINT_T msg_flags) -> ssize_t;
 
@@ -243,7 +243,7 @@ sendmsg:($fd_t sockfd, [[nonnull]] struct msghdr const *message,
 @@@param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
 @@                           MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
 @@                           MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
-[cp][ATTR_WUNUSED]
+[[cp]][ATTR_WUNUSED]
 recvmsg:($fd_t sockfd, [[nonnull]] struct msghdr *message,
          __STDC_INT_AS_UINT_T msg_flags) -> ssize_t;
 
@@ -272,7 +272,7 @@ listen:($fd_t sockfd, __STDC_INT_AS_UINT_T max_backlog) -> int;
 @@set *ADDR (which is *ADDR_LEN bytes long) to the address of the
 @@connecting peer and *ADDR_LEN to the address's actual length, and
 @@return the new socket's descriptor, or -1 for errors
-[cp]
+[[cp]]
 accept:($fd_t sockfd, [outp(*addr_len)] __SOCKADDR_ARG addr,
         socklen_t *__restrict addr_len) -> $fd_t;
 
@@ -288,7 +288,7 @@ shutdown:($fd_t sockfd, __STDC_INT_AS_UINT_T how) -> int;
 %#ifdef __USE_GNU
 @@Similar to 'accept(2)' but takes an additional parameter to specify socket flags.
 @@@param: sock_flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK'
-[cp]
+[[cp]]
 accept4:($fd_t sockfd, [outp(*addr_len)] __SOCKADDR_ARG addr,
          socklen_t *__restrict addr_len, __STDC_INT_AS_UINT_T sock_flags) -> $fd_t;
 
@@ -296,14 +296,14 @@ accept4:($fd_t sockfd, [outp(*addr_len)] __SOCKADDR_ARG addr,
 @@Returns the number of datagrams successfully written or -1 for errors
 @@@param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
 @@                           MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
-[cp][export_alias(__sendmmsg)]
+[[cp]][export_alias(__sendmmsg)]
 sendmmsg:($fd_t sockfd, [[nonnull]] struct mmsghdr *vmessages,
           __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags) -> int;
 
 @@@param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
 @@                           MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
 @@                           MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
-[cp][ignore][doc_alias(recvmmsg)]
+[[cp]][ignore][doc_alias(recvmmsg)]
 recvmmsg32:($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages,
             __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags,
             [[nullable]] struct $timespec32 *tmo) = recvmmsg?;
@@ -324,29 +324,29 @@ recvmmsg:($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages,
 	struct timespec64 tmo64;
 	if (!tmo)
 		return recvmmsg64(sockfd, vmessages, vlen, msg_flags, NULL);
-	tmo32.@tv_sec@  = (time64_t)tmo->@tv_sec@,
-	tmo32.@tv_nsec@ = tmo->@tv_nsec@;
+	tmo32.tv_sec  = (time64_t)tmo->tv_sec,
+	tmo32.tv_nsec = tmo->tv_nsec;
 	return recvmmsg64(sockfd, vmessages, vlen, msg_flags, &tmo64);
 #else /* __CRT_HAVE_recvmmsg64 */
 	struct timespec32 tmo32;
 	if (!tmo)
 		return recvmmsg32(sockfd, vmessages, vlen, msg_flags, NULL);
-	tmo32.@tv_sec@  = (time32_t)tmo->@tv_sec@,
-	tmo32.@tv_nsec@ = tmo->@tv_nsec@;
+	tmo32.tv_sec  = (time32_t)tmo->tv_sec,
+	tmo32.tv_nsec = tmo->tv_nsec;
 	return recvmmsg32(sockfd, vmessages, vlen, msg_flags, &tmo32);
 #endif /* !__CRT_HAVE_recvmmsg64 */
 }
 
 %#ifdef __USE_TIME64
-[cp][requires($has_function(recvmmsg32))][time64_variant_of(recvmmsg)]
+[[cp]][requires($has_function(recvmmsg32))][time64_variant_of(recvmmsg)]
 recvmmsg64:($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages,
             __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags,
             [[nullable]] struct $timespec64 *tmo) -> int {
 	struct timespec32 tmo32;
 	if (!tmo)
 		return recvmmsg32(sockfd, vmessages, vlen, msg_flags, NULL);
-	tmo32.@tv_sec@  = (time32_t)tmo->@tv_sec@,
-	tmo32.@tv_nsec@ = tmo->@tv_nsec@;
+	tmo32.tv_sec  = (time32_t)tmo->tv_sec,
+	tmo32.tv_nsec = tmo->tv_nsec;
 	return recvmmsg32(sockfd, vmessages, vlen, msg_flags, &tmo32);
 }
 %#endif /* __USE_TIME64 */

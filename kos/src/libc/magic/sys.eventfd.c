@@ -62,7 +62,7 @@ typedef uint64_t eventfd_t;
 [ATTR_WUNUSED] eventfd:(unsigned int count, int flags) -> $fd_t;
 
 @@Read event counter and possibly wait for events
-[cp][requires($has_function(read))]
+[[cp]][requires($has_function(read))]
 [impl_include("<parts/errno.h>")]
 eventfd_read:($fd_t fd, eventfd_t *value) -> int %{auto_block(any({
 	ssize_t error;
@@ -77,7 +77,7 @@ eventfd_read:($fd_t fd, eventfd_t *value) -> int %{auto_block(any({
 }))}
 
 @@Increment event counter
-[cp][requires($has_function(write))]
+[[cp]][requires($has_function(write))]
 [impl_include("<parts/errno.h>")]
 eventfd_write:($fd_t fd, eventfd_t value) -> int %{auto_block(any({
 	ssize_t error;

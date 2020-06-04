@@ -22,7 +22,7 @@
 %[define_replacement(cpu_set_t = __cpu_set_t)]
 %[define_replacement(timespec32 = __timespec32)]
 %[define_replacement(timespec64 = __timespec64)]
-%[define_replacement(time_t = __TM_TYPE(time))]
+%[define_replacement(time_t = "__TM_TYPE(time)")]
 %[define_replacement(time32_t = __time32_t)]
 %[define_replacement(time64_t = __time64_t)]
 
@@ -82,62 +82,70 @@ typedef __cpu_set_t cpu_set_t;
 %#ifdef __CC__
 
 
-%[default_impl_section(.text.crt.sched.param)]
-sched_setparam:($pid_t pid, struct sched_param const *param) -> int;
-[export_alias(__sched_getparam)] sched_getparam:($pid_t pid, struct sched_param *param) -> int;
-[export_alias(__sched_setscheduler)] sched_setscheduler:($pid_t pid, int policy, struct sched_param const *param) -> int;
-[export_alias(__sched_getscheduler)] sched_getscheduler:($pid_t pid) -> int;
+%[default_impl_section(.text.crt.sched.param)];
 
-%[default_impl_section(.text.crt.sched.thread)]
+int sched_setparam($pid_t pid, struct sched_param const *param);
+
+[[export_alias("__sched_getparam")]]
+int sched_getparam($pid_t pid, struct sched_param *param);
+[[export_alias("__sched_setscheduler")]]
+int sched_setscheduler($pid_t pid, int policy, struct sched_param const *param);
+[[export_alias("__sched_getscheduler")]]
+int sched_getscheduler($pid_t pid);
+
 %
+%[default_impl_section(.text.crt.sched.thread)];
 
 @@@return: 1: Another thread was executed prior to the function returning
 @@            The thread may not necessarily be apart of the calling process
 @@@return: 0: The function returned immediately when no other thread was executed
-[alias(pthread_yield)][export_alias(__sched_yield)] sched_yield:() -> int;
+[[export_alias("thrd_yield", "pthread_yield", "__sched_yield")]]
+int sched_yield();
 
-%[default_impl_section(.text.crt.sched.param)]
-[export_alias(__sched_get_priority_max)] sched_get_priority_max:(int algorithm) -> int;
-[export_alias(__sched_get_priority_min)] sched_get_priority_min:(int algorithm) -> int;
+%[default_impl_section(.text.crt.sched.param)];
 
-sched_setaffinity:($pid_t pid, $size_t cpusetsize, cpu_set_t const *cpuset) -> int;
-sched_getaffinity:($pid_t pid, $size_t cpusetsize, cpu_set_t *cpuset) -> int;
+[[export_alias("__sched_get_priority_max")]]
+int sched_get_priority_max(int algorithm);
+[[export_alias("__sched_get_priority_min")]]
+int sched_get_priority_min(int algorithm);
 
-[ignore]
-sched_rr_get_interval32:($pid_t pid, struct $timespec32 *tms) -> int = sched_rr_get_interval?;
+int sched_setaffinity($pid_t pid, $size_t cpusetsize, cpu_set_t const *cpuset);
+int sched_getaffinity($pid_t pid, $size_t cpusetsize, cpu_set_t *cpuset);
 
-[noexport, no_crt_self_import]
-[if(defined(__USE_TIME_BITS64)), preferred_alias(sched_rr_get_interval64)]
-[if(!defined(__USE_TIME_BITS64)), preferred_alias(sched_rr_get_interval)]
-[requires($has_function(sched_rr_get_interval32) ||
-          $has_function(sched_rr_get_interval64))]
-sched_rr_get_interval:($pid_t pid, struct timespec *tms) -> int {
-@@if_has_function(sched_rr_get_interval32)@@
+[[ignore, nocrt, alias("sched_rr_get_interval")]]
+int sched_rr_get_interval32($pid_t pid, struct $timespec32 *tms);
+
+[[no_crt_self_import]]
+[[if(defined(__USE_TIME_BITS64)), preferred_alias(sched_rr_get_interval64)]]
+[[if(!defined(__USE_TIME_BITS64)), preferred_alias(sched_rr_get_interval)]]
+[[userimpl, requires($has_function(sched_rr_get_interval32) || $has_function(sched_rr_get_interval64))]]
+int sched_rr_get_interval($pid_t pid, struct timespec *tms) {
+@@pp_if $has_function(sched_rr_get_interval32)@@
 	struct timespec32 tms32;
 	if (!tms)
 		return sched_rr_get_interval32(pid, NULL);
-	tms32.@tv_sec@  = (time32_t)tms->@tv_sec@;
-	tms32.@tv_bsec@ = tms->@tv_bsec@;
+	tms32.tv_sec  = (time32_t)tms->tv_sec;
+	tms32.tv_nsec = tms->tv_nsec;
 	return sched_rr_get_interval32(pid, &tms32);
-@@else_has_function(sched_rr_get_interval32)@@
+@@pp_else@@
 	struct timespec64 tms64;
 	if (!tms)
 		return sched_rr_get_interval64(pid, NULL);
-	tms64.@tv_sec@  = (time64_t)tms->@tv_sec@;
-	tms64.@tv_bsec@ = tms->@tv_bsec@;
+	tms64.tv_sec  = (time64_t)tms->tv_sec;
+	tms64.tv_nsec = tms->tv_nsec;
 	return sched_rr_get_interval64(pid, &tms64);
-@@endif_has_function(sched_rr_get_interval32)@@
+@@pp_endif@@
 }
 
 %#ifdef __USE_TIME64
-[time64_variant_of(sched_rr_get_interval)]
-[noexport][requires($has_function(sched_rr_get_interval32))]
+[[time64_variant_of(sched_rr_get_interval)]]
+[[userimpl, requires_function(sched_rr_get_interval32)]]
 sched_rr_get_interval64:($pid_t pid, struct $timespec64 *tms) -> int {
 	struct timespec32 tms32;
 	if (!tms)
 		return sched_rr_get_interval32(pid, NULL);
-	tms32.@tv_sec@  = (time32_t)tms->@tv_sec@;
-	tms32.@tv_bsec@ = tms->@tv_bsec@;
+	tms32.tv_sec  = (time32_t)tms->tv_sec;
+	tms32.tv_nsec = tms->tv_nsec;
 	return sched_rr_get_interval32(pid, &tms32);
 }
 %#endif /* __USE_TIME64 */

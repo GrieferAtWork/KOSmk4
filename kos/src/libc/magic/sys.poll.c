@@ -73,17 +73,17 @@ typedef __sigset_t sigset_t;
 }
 
 @@@param timeout: Timeout in milliseconds (or negative for infinity)
-[export_alias(__poll)][cp]
+[export_alias(__poll)][[cp]]
 poll:([inp(nfds)] struct pollfd *fds, nfds_t nfds, int timeout) -> int;
 
 %#ifdef __USE_GNU
 
-[cp][ignore]
+[[cp]][ignore]
 ppoll32:([inp(nfds)] struct pollfd *fds, nfds_t nfds,
          [[nullable]] struct $timespec32 const *timeout,
          [[nullable]] $sigset_t const *ss) -> int = ppoll?;
 
-[cp][noexport, no_crt_self_import]
+[[cp]][noexport, no_crt_self_import]
 [if(defined(__USE_TIME_BITS64)), preferred_alias(ppoll)]
 [if(!defined(__USE_TIME_BITS64)), preferred_alias(ppoll64)]
 [requires($has_function(ppoll32) || $has_function(ppoll64))]
@@ -94,15 +94,15 @@ ppoll:([inp(nfds)] struct pollfd *fds, nfds_t nfds,
 	struct timespec32 tmo32;
 	if (!timeout)
 		return ppoll32(fds, nfds, NULL, ss);
-	tmo32.@tv_sec@  = (time32_t)timeout->@tv_sec@;
-	tmo32.@tv_nsec@ = timeout->@tv_nsec@;
+	tmo32.tv_sec  = (time32_t)timeout->tv_sec;
+	tmo32.tv_nsec = timeout->tv_nsec;
 	return ppoll32(fds, nfds, &tmo32, ss);
 @@else_has_function(ppoll32)@@
 	struct timespec64 tmo64;
 	if (!timeout)
 		return ppoll64(fds, nfds, NULL, ss);
-	tmo64.@tv_sec@  = (time64_t)timeout->@tv_sec@;
-	tmo64.@tv_nsec@ = timeout->@tv_nsec@;
+	tmo64.tv_sec  = (time64_t)timeout->tv_sec;
+	tmo64.tv_nsec = timeout->tv_nsec;
 	return ppoll64(fds, nfds, &tmo64, ss);
 @@endif_has_function(ppoll32)@@
 }
@@ -110,15 +110,15 @@ ppoll:([inp(nfds)] struct pollfd *fds, nfds_t nfds,
 %
 %#ifdef __USE_TIME64
 [time64_variant_of(ppoll)]
-[cp][noexport][requires($has_function(ppoll32))]
+[[cp]][noexport][requires($has_function(ppoll32))]
 ppoll64:([inp(nfds)] struct pollfd *fds, nfds_t nfds,
          [[nullable]] struct timespec64 const *timeout,
          [[nullable]] $sigset_t const *ss) -> int {
 	struct timespec32 tmo32;
 	if (!timeout)
 		return ppoll32(fds, nfds, NULL, ss);
-	tmo32.@tv_sec@  = (time32_t)timeout->@tv_sec@;
-	tmo32.@tv_nsec@ = timeout->@tv_nsec@;
+	tmo32.tv_sec  = (time32_t)timeout->tv_sec;
+	tmo32.tv_nsec = timeout->tv_nsec;
 	return ppoll32(fds, nfds, &tmo32, ss);
 }
 %#endif /* __USE_TIME64 */

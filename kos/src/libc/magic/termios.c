@@ -82,7 +82,7 @@ tcgetattr:($fd_t fd, [[nonnull]] struct termios *__restrict termios_p) -> int;
 tcsetattr:($fd_t fd, int optional_actions, [[nonnull]] struct termios const *__restrict termios_p) -> int;
 
 tcsendbreak:($fd_t fd, int duration) -> int;
-[cp] tcdrain:($fd_t fd) -> int;
+[[cp]] tcdrain:($fd_t fd) -> int;
 tcflush:($fd_t fd, int queue_selector) -> int;
 tcflow:($fd_t fd, int action) -> int;
 

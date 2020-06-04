@@ -93,8 +93,8 @@ lfutexlock:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_t *uaddr,
 	va_end(args);
 	if (!timeout || !@LFUTEX_USES_TIMEOUT@(futex_op))
 		return lfutexlock32(ulockaddr, uaddr, futex_op, val, (struct timespec32 *)NULL, val2);
-	tms32.@tv_sec@  = (__time32_t)timeout->@tv_sec@;
-	tms32.@tv_nsec@ = timeout->@tv_nsec@;
+	tms32.tv_sec  = (__time32_t)timeout->tv_sec;
+	tms32.tv_nsec = timeout->tv_nsec;
 	return lfutexlock32(ulockaddr, uaddr, futex_op, val, &tms32, val2);
 @@else_has_function(lfutexlock32)@@
 	va_list args;
@@ -107,8 +107,8 @@ lfutexlock:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_t *uaddr,
 	va_end(args);
 	if (!timeout || !@LFUTEX_USES_TIMEOUT@(futex_op))
 		return lfutexlock64(ulockaddr, uaddr, futex_op, val, (struct timespec64 const *)NULL, val2);
-	tms64.@tv_sec@  = (__time64_t)timeout->@tv_sec@;
-	tms64.@tv_nsec@ = timeout->@tv_nsec@;
+	tms64.tv_sec  = (__time64_t)timeout->tv_sec;
+	tms64.tv_nsec = timeout->tv_nsec;
 	return lfutexlock64(ulockaddr, uaddr, futex_op, val, &tms64, val2);
 @@endif_has_function(lfutexlock32)@@
 }
@@ -116,7 +116,7 @@ lfutexlock:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_t *uaddr,
 
 %
 %#ifdef __USE_TIME64
-[cp][time64_variant_of(lfutexlock)][vartypes(void *, $uintptr_t)]
+[[cp]][time64_variant_of(lfutexlock)][vartypes(void *, $uintptr_t)]
 [decl_include("<bits/types.h>")][dependency_include("<bits/timespec.h>")]
 [requires($has_function(lfutexlock32))]
 lfutexlock64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_t *uaddr, $syscall_ulong_t futex_op, lfutex_t val, /*struct timespec64 const *timeout, lfutex_t val2*/...) -> $ssize_t {
@@ -130,8 +130,8 @@ lfutexlock64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_t *uaddr, $sys
 	va_end(args);
 	if (!timeout || !@LFUTEX_USES_TIMEOUT@(futex_op))
 		return lfutexlock32(ulockaddr, uaddr, futex_op, val, (struct timespec32 *)NULL, val2);
-	tms32.@tv_sec@  = (__time32_t)timeout->@tv_sec@;
-	tms32.@tv_nsec@ = timeout->@tv_nsec@;
+	tms32.tv_sec  = (__time32_t)timeout->tv_sec;
+	tms32.tv_nsec = timeout->tv_nsec;
 	return lfutexlock32(ulockaddr, uaddr, futex_op, val, &tms32, val2);
 }
 %#endif /* __USE_TIME64 */
@@ -162,7 +162,7 @@ futexlock_wakeall:([[nonnull]] lfutex_t *ulockaddr) -> $ssize_t {
 	return futex_wakeall(ulockaddr);
 }
 
-[cp][requires($has_function(lfutexlock64))][doc_alias(futex_waitwhile)]
+[[cp]][requires($has_function(lfutexlock64))][doc_alias(futex_waitwhile)]
 [impl_include("<kos/bits/futex.h>")]
 [decl_include("<bits/types.h>")][dependency_include("<bits/timespec.h>")]
 futexlock_waitwhile:([[nonnull]] lfutex_t *ulockaddr,
@@ -170,7 +170,7 @@ futexlock_waitwhile:([[nonnull]] lfutex_t *ulockaddr,
 	return lfutexlock64(ulockaddr, uaddr, @LFUTEX_WAIT_WHILE@, equal_to_value, (struct timespec64 const *)NULL);
 }
 
-[cp][requires($has_function(lfutexlock64))][doc_alias(futex_waituntil)]
+[[cp]][requires($has_function(lfutexlock64))][doc_alias(futex_waituntil)]
 [impl_include("<kos/bits/futex.h>")]
 [decl_include("<bits/types.h>")][dependency_include("<bits/timespec.h>")]
 futexlock_waituntil:([[nonnull]] lfutex_t *ulockaddr,
@@ -181,7 +181,7 @@ futexlock_waituntil:([[nonnull]] lfutex_t *ulockaddr,
 futexlock_waitwhile_equal(*) = futexlock_waitwhile;
 futexlock_waitwhile_notequal(*) = futexlock_waituntil;
 
-[cp][requires($has_function(lfutexlock64))][doc_alias(futex_waitwhile_above)]
+[[cp]][requires($has_function(lfutexlock64))][doc_alias(futex_waitwhile_above)]
 [impl_include("<kos/bits/futex.h>")]
 [decl_include("<bits/types.h>")][dependency_include("<bits/timespec.h>")]
 futexlock_waitwhile_above:([[nonnull]] lfutex_t *ulockaddr,
@@ -189,7 +189,7 @@ futexlock_waitwhile_above:([[nonnull]] lfutex_t *ulockaddr,
 	return lfutexlock64(ulockaddr, uaddr, @LFUTEX_WAIT_WHILE_ABOVE@, above_value, (struct timespec64 const *)NULL);
 }
 
-[cp][requires($has_function(lfutexlock64))][doc_alias(futex_waitwhile_below)]
+[[cp]][requires($has_function(lfutexlock64))][doc_alias(futex_waitwhile_below)]
 [impl_include("<kos/bits/futex.h>")]
 [decl_include("<bits/types.h>")][dependency_include("<bits/timespec.h>")]
 futexlock_waitwhile_below:([[nonnull]] lfutex_t *ulockaddr,
@@ -197,7 +197,7 @@ futexlock_waitwhile_below:([[nonnull]] lfutex_t *ulockaddr,
 	return lfutexlock64(ulockaddr, uaddr, @LFUTEX_WAIT_WHILE_BELOW@, below_value, (struct timespec64 const *)NULL);
 }
 
-[cp][requires($has_function(lfutexlock64))][doc_alias(futex_waitwhile_aboveequal)]
+[[cp]][requires($has_function(lfutexlock64))][doc_alias(futex_waitwhile_aboveequal)]
 [impl_include("<kos/bits/futex.h>")]
 [decl_include("<bits/types.h>")][dependency_include("<bits/timespec.h>")]
 futexlock_waitwhile_aboveequal:([[nonnull]] lfutex_t *ulockaddr,
@@ -207,7 +207,7 @@ futexlock_waitwhile_aboveequal:([[nonnull]] lfutex_t *ulockaddr,
 	return lfutexlock64(ulockaddr, uaddr, @LFUTEX_WAIT_WHILE_ABOVE@, above_equal_value - 1, (struct timespec64 const *)NULL);
 }
 
-[cp][requires($has_function(lfutexlock64))][doc_alias(futex_waitwhile_belowequal)]
+[[cp]][requires($has_function(lfutexlock64))][doc_alias(futex_waitwhile_belowequal)]
 [impl_include("<kos/bits/futex.h>")]
 [decl_include("<bits/types.h>")][dependency_include("<bits/timespec.h>")]
 futexlock_waitwhile_belowequal:([[nonnull]] lfutex_t *ulockaddr,
@@ -217,7 +217,7 @@ futexlock_waitwhile_belowequal:([[nonnull]] lfutex_t *ulockaddr,
 	return lfutexlock64(ulockaddr, uaddr, @LFUTEX_WAIT_WHILE_BELOW@, below_equal_value + 1, (struct timespec64 const *)NULL);
 }
 
-[cp][requires($has_function(lfutexlock64))][doc_alias(futex_waitwhile_cmpxch)]
+[[cp]][requires($has_function(lfutexlock64))][doc_alias(futex_waitwhile_cmpxch)]
 [impl_include("<kos/bits/futex.h>")]
 [decl_include("<bits/types.h>")][dependency_include("<bits/timespec.h>")]
 futexlock_waitwhile_cmpxch:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_t *uaddr,
@@ -225,7 +225,7 @@ futexlock_waitwhile_cmpxch:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_
 	return lfutexlock64(ulockaddr, uaddr, @LFUTEX_WAIT_WHILE_CMPXCH@, old_value, (struct timespec64 const *)NULL, new_value);
 }
 
-[cp][requires($has_function(lfutexlock64))][doc_alias(futex_waituntil_cmpxch)]
+[[cp]][requires($has_function(lfutexlock64))][doc_alias(futex_waituntil_cmpxch)]
 [impl_include("<kos/bits/futex.h>")]
 [decl_include("<bits/types.h>")][dependency_include("<bits/timespec.h>")]
 futexlock_waituntil_cmpxch:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_t *uaddr,
@@ -233,14 +233,14 @@ futexlock_waituntil_cmpxch:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_
 	return lfutexlock64(ulockaddr, uaddr, @LFUTEX_WAIT_UNTIL_CMPXCH@, old_value, (struct timespec64 const *)NULL, new_value);
 }
 
-[cp][requires($has_function(lfutexlock64))][doc_alias(futex_waitlock)]
+[[cp]][requires($has_function(lfutexlock64))][doc_alias(futex_waitlock)]
 [impl_include("<kos/bits/futex.h>")]
 [decl_include("<bits/types.h>")][dependency_include("<bits/timespec.h>")]
 futexlock_waitlock:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_t *uaddr) -> int {
 	return lfutexlock64(ulockaddr, uaddr, @LFUTEX_WAIT_LOCK@, 0, (struct timespec64 const *)NULL);
 }
 
-[cp][requires($has_function(lfutexlock64))][doc_alias(futex_waitwhile_exactbits)]
+[[cp]][requires($has_function(lfutexlock64))][doc_alias(futex_waitwhile_exactbits)]
 [impl_include("<kos/bits/futex.h>")]
 [decl_include("<bits/types.h>")][dependency_include("<bits/timespec.h>")]
 futexlock_waitwhile_exactbits:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_t *uaddr,
@@ -248,7 +248,7 @@ futexlock_waitwhile_exactbits:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfut
 	return lfutexlock64(ulockaddr, uaddr, @LFUTEX_WAIT_WHILE_BITMASK@, bitmask, (struct timespec64 const *)NULL, setmask);
 }
 
-[cp][requires($has_function(lfutexlock64))][doc_alias(futex_waituntil_exactbits)]
+[[cp]][requires($has_function(lfutexlock64))][doc_alias(futex_waituntil_exactbits)]
 [impl_include("<kos/bits/futex.h>")]
 [decl_include("<bits/types.h>")][dependency_include("<bits/timespec.h>")]
 futexlock_waituntil_exactbits:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_t *uaddr,
@@ -256,14 +256,14 @@ futexlock_waituntil_exactbits:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfut
 	return lfutexlock64(ulockaddr, uaddr, @LFUTEX_WAIT_UNTIL_BITMASK@, bitmask, (struct timespec64 const *)NULL, setmask);
 }
 
-[cp][requires($has_function(lfutexlock64))][doc_alias(futex_waitwhile_anybit)]
+[[cp]][requires($has_function(lfutexlock64))][doc_alias(futex_waitwhile_anybit)]
 [impl_include("<kos/bits/futex.h>")]
 [decl_include("<bits/types.h>")][dependency_include("<bits/timespec.h>")]
 futexlock_waitwhile_anybit:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_t *uaddr, lfutex_t bitmask) -> int {
 	return lfutexlock64(ulockaddr, uaddr, @LFUTEX_WAIT_UNTIL_BITMASK@, bitmask, (struct timespec64 const *)NULL, 0);
 }
 
-[cp][requires($has_function(lfutexlock64))][doc_alias(futex_waitwhile_allbits)]
+[[cp]][requires($has_function(lfutexlock64))][doc_alias(futex_waitwhile_allbits)]
 [impl_include("<kos/bits/futex.h>")]
 [decl_include("<bits/types.h>")][dependency_include("<bits/timespec.h>")]
 futexlock_waitwhile_allbits:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_t *uaddr, lfutex_t bitmask) -> int {
@@ -427,7 +427,7 @@ futexlock_timedwaitwhile_allbits:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] l
 
 %
 %#ifdef __USE_TIME64
-[cp][requires($has_function(lfutexlock64))][time64_variant_of(futexlock_timedwaitwhile)]
+[[cp]][requires($has_function(lfutexlock64))][time64_variant_of(futexlock_timedwaitwhile)]
 [impl_include("<kos/bits/futex.h>")]
 [decl_include("<bits/types.h>", "<bits/timespec.h>")]
 futexlock_timedwaitwhile64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_t *uaddr,
@@ -435,7 +435,7 @@ futexlock_timedwaitwhile64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_
 	return lfutexlock64(ulockaddr, uaddr, @LFUTEX_WAIT_WHILE@, equal_to_value, rel_timeout);
 }
 
-[cp][requires($has_function(lfutexlock64))][time64_variant_of(futexlock_timedwaituntil)]
+[[cp]][requires($has_function(lfutexlock64))][time64_variant_of(futexlock_timedwaituntil)]
 [impl_include("<kos/bits/futex.h>")]
 [decl_include("<bits/types.h>", "<bits/timespec.h>")]
 futexlock_timedwaituntil64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_t *uaddr,
@@ -446,7 +446,7 @@ futexlock_timedwaituntil64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_
 futexlock_timedwaitwhile_equal64(*) = futexlock_timedwaitwhile64;
 futexlock_timedwaitwhile_notequal64(*) = futexlock_timedwaituntil64;
 
-[cp][requires($has_function(lfutexlock64))][time64_variant_of(futexlock_timedwaitwhile_above)]
+[[cp]][requires($has_function(lfutexlock64))][time64_variant_of(futexlock_timedwaitwhile_above)]
 [impl_include("<kos/bits/futex.h>")]
 [decl_include("<bits/types.h>", "<bits/timespec.h>")]
 futexlock_timedwaitwhile_above64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_t *uaddr,
@@ -454,7 +454,7 @@ futexlock_timedwaitwhile_above64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] l
 	return lfutexlock64(ulockaddr, uaddr, @LFUTEX_WAIT_WHILE_ABOVE@, above_value, rel_timeout);
 }
 
-[cp][requires($has_function(lfutexlock64))][time64_variant_of(futexlock_timedwaitwhile_below)]
+[[cp]][requires($has_function(lfutexlock64))][time64_variant_of(futexlock_timedwaitwhile_below)]
 [impl_include("<kos/bits/futex.h>")]
 [decl_include("<bits/types.h>", "<bits/timespec.h>")]
 futexlock_timedwaitwhile_below64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_t *uaddr,
@@ -462,7 +462,7 @@ futexlock_timedwaitwhile_below64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] l
 	return lfutexlock64(ulockaddr, uaddr, @LFUTEX_WAIT_WHILE_BELOW@, below_value, rel_timeout);
 }
 
-[cp][requires($has_function(lfutexlock64))][time64_variant_of(futexlock_timedwaitwhile_aboveequal)]
+[[cp]][requires($has_function(lfutexlock64))][time64_variant_of(futexlock_timedwaitwhile_aboveequal)]
 [impl_include("<kos/bits/futex.h>")]
 [decl_include("<bits/types.h>", "<bits/timespec.h>")]
 futexlock_timedwaitwhile_aboveequal64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_t *uaddr,
@@ -472,7 +472,7 @@ futexlock_timedwaitwhile_aboveequal64:([[nonnull]] lfutex_t *ulockaddr, [[nonnul
 	return lfutexlock64(ulockaddr, uaddr, @LFUTEX_WAIT_WHILE_ABOVE@, above_equal_value - 1, rel_timeout);
 }
 
-[cp][requires($has_function(lfutexlock64))][time64_variant_of(futexlock_timedwaitwhile_belowequal)]
+[[cp]][requires($has_function(lfutexlock64))][time64_variant_of(futexlock_timedwaitwhile_belowequal)]
 [impl_include("<kos/bits/futex.h>")]
 [decl_include("<bits/types.h>", "<bits/timespec.h>")]
 futexlock_timedwaitwhile_belowequal64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_t *uaddr,
@@ -482,7 +482,7 @@ futexlock_timedwaitwhile_belowequal64:([[nonnull]] lfutex_t *ulockaddr, [[nonnul
 	return lfutexlock64(ulockaddr, uaddr, @LFUTEX_WAIT_WHILE_BELOW@, below_equal_value + 1, rel_timeout);
 }
 
-[cp][requires($has_function(lfutexlock64))][time64_variant_of(futexlock_timedwaitwhile_cmpxch)]
+[[cp]][requires($has_function(lfutexlock64))][time64_variant_of(futexlock_timedwaitwhile_cmpxch)]
 [impl_include("<kos/bits/futex.h>")]
 [decl_include("<bits/types.h>", "<bits/timespec.h>")]
 futexlock_timedwaitwhile_cmpxch64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_t *uaddr,
@@ -491,7 +491,7 @@ futexlock_timedwaitwhile_cmpxch64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] 
 	return lfutexlock64(ulockaddr, uaddr, @LFUTEX_WAIT_WHILE_CMPXCH@, old_value, rel_timeout, new_value);
 }
 
-[cp][requires($has_function(lfutexlock64))][time64_variant_of(futexlock_timedwaituntil_cmpxch)]
+[[cp]][requires($has_function(lfutexlock64))][time64_variant_of(futexlock_timedwaituntil_cmpxch)]
 [impl_include("<kos/bits/futex.h>")]
 [decl_include("<bits/types.h>", "<bits/timespec.h>")]
 futexlock_timedwaituntil_cmpxch64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_t *uaddr,
@@ -500,7 +500,7 @@ futexlock_timedwaituntil_cmpxch64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] 
 	return lfutexlock64(ulockaddr, uaddr, @LFUTEX_WAIT_UNTIL_CMPXCH@, old_value, rel_timeout, new_value);
 }
 
-[cp][requires($has_function(lfutexlock64))][time64_variant_of(futexlock_timedwaitlock)]
+[[cp]][requires($has_function(lfutexlock64))][time64_variant_of(futexlock_timedwaitlock)]
 [impl_include("<kos/bits/futex.h>")]
 [decl_include("<bits/types.h>", "<bits/timespec.h>")]
 futexlock_timedwaitlock64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_t *uaddr,
@@ -508,7 +508,7 @@ futexlock_timedwaitlock64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_t
 	return lfutexlock64(ulockaddr, uaddr, @LFUTEX_WAIT_LOCK@, 0, rel_timeout);
 }
 
-[cp][requires($has_function(lfutexlock64))][time64_variant_of(futexlock_timedwaitwhile_exactbits)]
+[[cp]][requires($has_function(lfutexlock64))][time64_variant_of(futexlock_timedwaitwhile_exactbits)]
 [impl_include("<kos/bits/futex.h>")]
 [decl_include("<bits/types.h>", "<bits/timespec.h>")]
 futexlock_timedwaitwhile_exactbits64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_t *uaddr,
@@ -517,7 +517,7 @@ futexlock_timedwaitwhile_exactbits64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull
 	return lfutexlock64(ulockaddr, uaddr, @LFUTEX_WAIT_WHILE_BITMASK@, bitmask, rel_timeout, setmask);
 }
 
-[cp][requires($has_function(lfutexlock64))][time64_variant_of(futexlock_timedwaituntil_exactbits)]
+[[cp]][requires($has_function(lfutexlock64))][time64_variant_of(futexlock_timedwaituntil_exactbits)]
 [impl_include("<kos/bits/futex.h>")]
 [decl_include("<bits/types.h>", "<bits/timespec.h>")]
 futexlock_timedwaituntil_exactbits64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_t *uaddr,
@@ -526,7 +526,7 @@ futexlock_timedwaituntil_exactbits64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull
 	return lfutexlock64(ulockaddr, uaddr, @LFUTEX_WAIT_UNTIL_BITMASK@, bitmask, rel_timeout, setmask);
 }
 
-[cp][requires($has_function(lfutexlock64))][time64_variant_of(futexlock_timedwaitwhile_anybit)]
+[[cp]][requires($has_function(lfutexlock64))][time64_variant_of(futexlock_timedwaitwhile_anybit)]
 [impl_include("<kos/bits/futex.h>")]
 [decl_include("<bits/types.h>", "<bits/timespec.h>")]
 futexlock_timedwaitwhile_anybit64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_t *uaddr,
@@ -534,7 +534,7 @@ futexlock_timedwaitwhile_anybit64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] 
 	return lfutexlock64(ulockaddr, uaddr, @LFUTEX_WAIT_UNTIL_BITMASK@, bitmask, rel_timeout, 0);
 }
 
-[cp][requires($has_function(lfutexlock64))][time64_variant_of(futexlock_timedwaitwhile_allbits)]
+[[cp]][requires($has_function(lfutexlock64))][time64_variant_of(futexlock_timedwaitwhile_allbits)]
 [impl_include("<kos/bits/futex.h>")]
 [decl_include("<bits/types.h>", "<bits/timespec.h>")]
 futexlock_timedwaitwhile_allbits64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_t *uaddr,

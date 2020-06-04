@@ -80,7 +80,7 @@ typedef __errno_t error_t;
 @@`ENOMEM' is returned, otherwise `0'. The result can be destroyed using `free()'
 [export_alias(__argz_create)][userimpl][requires_function("malloc")]
 [impl_include("<parts/errno.h>")]
-[dependency_include(<hybrid/__assert.h>)]
+[impl_include("<hybrid/__assert.h>")]
 argz_create:([[nonnull]] char *const argv[],
              [[nonnull]] char **__restrict pargz,
              [[nonnull]] size_t *__restrict pargz_len) -> error_t {
@@ -242,7 +242,7 @@ __argz_stringify:(*) = argz_stringify;
 
 @@Append `BUF', of length `BUF_LEN' to the argz vector in `PARGZ & PARGZ_LEN'
 [export_alias(__argz_create_sep)][userimpl]
-[requires($has_function(realloc))]
+[requires_function("realloc")]
 [impl_include("<parts/errno.h>")]
 argz_append:([[nonnull]] char **__restrict pargz, [[nonnull]] size_t *__restrict pargz_len,
              [inp_opt(buf_len)] char const *__restrict buf, size_t buf_len) -> error_t {
@@ -275,7 +275,7 @@ __argz_add:(*) = argz_add;
 
 @@Append `SEP' separated list in `STRING' to the argz vector in `PARGZ & PARGZ_LEN'
 [export_alias(__argz_add_sep)][userimpl]
-[requires($has_function(realloc))]
+[requires_function("realloc")]
 [impl_include("<parts/errno.h>")]
 argz_add_sep:([[nonnull]] char **__restrict pargz, [[nonnull]] size_t *__restrict pargz_len,
               [[nonnull]] char const *__restrict string, int sep) -> error_t {

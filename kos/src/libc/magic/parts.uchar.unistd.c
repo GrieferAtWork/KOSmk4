@@ -39,60 +39,60 @@ __SYSDECL_BEGIN
 
 }
 
-[attribute(*)] c16ttyname:(*) %{uchar(wttyname)}
-[attribute(*)] c32ttyname:(*) %{uchar(wttyname)}
-[attribute(*)] c16ttyname_r:(*) %{uchar(wttyname_r)}
-[attribute(*)] c32ttyname_r:(*) %{uchar(wttyname_r)}
-[attribute(*)] c16getlogin:(*) %{uchar(wgetlogin)}
-[attribute(*)] c32getlogin:(*) %{uchar(wgetlogin)}
-[attribute(*)] c16chown:(*) %{uchar(wchown)}
-[attribute(*)] c32chown:(*) %{uchar(wchown)}
-[attribute(*)] c16pathconf:(*) %{uchar(wpathconf)}
-[attribute(*)] c32pathconf:(*) %{uchar(wpathconf)}
-[attribute(*)] c16link:(*) %{uchar(wlink)}
-[attribute(*)] c32link:(*) %{uchar(wlink)}
-[attribute(*)] c16access:(*) %{uchar(waccess)}
-[attribute(*)] c32access:(*) %{uchar(waccess)}
-[attribute(*)] c16chdir:(*) %{uchar(wchdir)}
-[attribute(*)] c32chdir:(*) %{uchar(wchdir)}
-[attribute(*)] c16getcwd:(*) %{uchar(wgetcwd)}
-[attribute(*)] c32getcwd:(*) %{uchar(wgetcwd)}
-[attribute(*)] c16unlink:(*) %{uchar(wunlink)}
-[attribute(*)] c32unlink:(*) %{uchar(wunlink)}
-[attribute(*)] c16rmdir:(*) %{uchar(wrmdir)}
-[attribute(*)] c32rmdir:(*) %{uchar(wrmdir)}
+c16ttyname:(*) %{uchar(wttyname)}
+c32ttyname:(*) %{uchar(wttyname)}
+c16ttyname_r:(*) %{uchar(wttyname_r)}
+c32ttyname_r:(*) %{uchar(wttyname_r)}
+c16getlogin:(*) %{uchar(wgetlogin)}
+c32getlogin:(*) %{uchar(wgetlogin)}
+c16chown:(*) %{uchar(wchown)}
+c32chown:(*) %{uchar(wchown)}
+c16pathconf:(*) %{uchar(wpathconf)}
+c32pathconf:(*) %{uchar(wpathconf)}
+c16link:(*) %{uchar(wlink)}
+c32link:(*) %{uchar(wlink)}
+c16access:(*) %{uchar(waccess)}
+c32access:(*) %{uchar(waccess)}
+c16chdir:(*) %{uchar(wchdir)}
+c32chdir:(*) %{uchar(wchdir)}
+c16getcwd:(*) %{uchar(wgetcwd)}
+c32getcwd:(*) %{uchar(wgetcwd)}
+c16unlink:(*) %{uchar(wunlink)}
+c32unlink:(*) %{uchar(wunlink)}
+c16rmdir:(*) %{uchar(wrmdir)}
+c32rmdir:(*) %{uchar(wrmdir)}
 
 %#ifdef __USE_GNU
-[attribute(*)] c16euidaccess:(*) %{uchar(weuidaccess)}
-[attribute(*)] c32euidaccess:(*) %{uchar(weuidaccess)}
-//TODO:This is broken:[attribute(*)][alias(*)] c16eaccess:(*) = c16euidaccess;
-//TODO:This is broken:[attribute(*)][alias(*)] c32eaccess:(*) = c32euidaccess;
-[attribute(*)] c16get_current_dir_name:(*) %{uchar(wget_current_dir_name)}
-[attribute(*)] c32get_current_dir_name:(*) %{uchar(wget_current_dir_name)}
+c16euidaccess:(*) %{uchar(weuidaccess)}
+c32euidaccess:(*) %{uchar(weuidaccess)}
+c16eaccess:(*) = c16euidaccess;
+c32eaccess:(*) = c32euidaccess;
+c16get_current_dir_name:(*) %{uchar(wget_current_dir_name)}
+c32get_current_dir_name:(*) %{uchar(wget_current_dir_name)}
 %#endif /* __USE_GNU */
 
 
 %#ifdef __USE_ATFILE
-[attribute(*)] c16faccessat:(*) %{uchar(wfaccessat)}
-[attribute(*)] c32faccessat:(*) %{uchar(wfaccessat)}
-[attribute(*)] c16fchownat:(*) %{uchar(wfchownat)}
-[attribute(*)] c32fchownat:(*) %{uchar(wfchownat)}
-[attribute(*)] c16linkat:(*) %{uchar(wlinkat)}
-[attribute(*)] c32linkat:(*) %{uchar(wlinkat)}
-[attribute(*)] c16symlinkat:(*) %{uchar(wsymlinkat)}
-[attribute(*)] c32symlinkat:(*) %{uchar(wsymlinkat)}
-[attribute(*)] c16readlinkat:(*) %{uchar(wreadlinkat)}
-[attribute(*)] c32readlinkat:(*) %{uchar(wreadlinkat)}
+c16faccessat:(*) %{uchar(wfaccessat)}
+c32faccessat:(*) %{uchar(wfaccessat)}
+c16fchownat:(*) %{uchar(wfchownat)}
+c32fchownat:(*) %{uchar(wfchownat)}
+c16linkat:(*) %{uchar(wlinkat)}
+c32linkat:(*) %{uchar(wlinkat)}
+c16symlinkat:(*) %{uchar(wsymlinkat)}
+c32symlinkat:(*) %{uchar(wsymlinkat)}
+c16readlinkat:(*) %{uchar(wreadlinkat)}
+c32readlinkat:(*) %{uchar(wreadlinkat)}
 %#ifdef __USE_KOS
-[attribute(*)] c16freadlinkat:(*) %{uchar(wfreadlinkat)}
-[attribute(*)] c32freadlinkat:(*) %{uchar(wfreadlinkat)}
+c16freadlinkat:(*) %{uchar(wfreadlinkat)}
+c32freadlinkat:(*) %{uchar(wfreadlinkat)}
 %#endif /* __USE_KOS */
-[attribute(*)] c16unlinkat:(*) %{uchar(wunlinkat)}
-[attribute(*)] c32unlinkat:(*) %{uchar(wunlinkat)}
+c16unlinkat:(*) %{uchar(wunlinkat)}
+c32unlinkat:(*) %{uchar(wunlinkat)}
 %#endif /* __USE_ATFILE */
 
-[attribute(*)] c16lchown:(*) %{uchar(wlchown)}
-[attribute(*)] c32lchown:(*) %{uchar(wlchown)}
+c16lchown:(*) %{uchar(wlchown)}
+c32lchown:(*) %{uchar(wlchown)}
 
 %#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
 %{
@@ -100,73 +100,65 @@ __SYSDECL_BEGIN
 #ifdef __USE_KOS
 #define __PIO_OFFSET     __FS_TYPE(pos)
 #define __PIO_OFFSET64   __pos64_t
-#else
+#else /* __USE_KOS */
 #define __PIO_OFFSET     __FS_TYPE(off)
 #define __PIO_OFFSET64   __off64_t
-#endif
+#endif /* !__USE_KOS */
 #endif /* !__PIO_OFFSET */
 }
 
-[if(defined(__USE_FILE_OFFSET64) && __SIZEOF_WCHAR_T__ == 2), preferred_alias(wtruncate64)]
-[if(defined(__USE_FILE_OFFSET64)), preferred_alias(DOS$wtruncate64)]
-[if(!defined(__USE_FILE_OFFSET64) && __SIZEOF_WCHAR_T__ == 2), preferred_alias(wtruncate)]
-[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(DOS$wtruncate)]
-[attribute(*)] c16truncate:(*) %{uchar(wtruncate)}
+c16truncate:(*) %{uchar(wtruncate)}
+c32truncate:(*) %{uchar(wtruncate)}
 
-[if(defined(__USE_FILE_OFFSET64) && __SIZEOF_WCHAR_T__ == 4), preferred_alias(wtruncate64)]
-[if(!defined(__USE_FILE_OFFSET64) && __SIZEOF_WCHAR_T__ == 4), preferred_alias(wtruncate)]
-[attribute(*)] c32truncate:(*) %{uchar(wtruncate)}
-
-
-[ignore][attribute(*)] c16truncate32:(*) %{uchar16(wtruncate32)}
-[ignore][attribute(*)] c32truncate32:(*) %{uchar32(wtruncate32)}
+[ignore] c16truncate32:(*) %{uchar16(wtruncate32)}
+[ignore] c32truncate32:(*) %{uchar32(wtruncate32)}
 
 %#ifdef __USE_LARGEFILE64
-[attribute(*)] c16truncate64:(*) %{uchar(wtruncate64)}
-[attribute(*)] c32truncate64:(*) %{uchar(wtruncate64)}
+c16truncate64:(*) %{uchar(wtruncate64)}
+c32truncate64:(*) %{uchar(wtruncate64)}
 %#endif /* __USE_LARGEFILE64 */
 %#endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K8 */
 
 %#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
-[attribute(*)] c16symlink:(*) %{uchar(wsymlink)}
-[attribute(*)] c32symlink:(*) %{uchar(wsymlink)}
-[attribute(*)] c16readlink:(*) %{uchar(wreadlink)}
-[attribute(*)] c32readlink:(*) %{uchar(wreadlink)}
+c16symlink:(*) %{uchar(wsymlink)}
+c32symlink:(*) %{uchar(wsymlink)}
+c16readlink:(*) %{uchar(wreadlink)}
+c32readlink:(*) %{uchar(wreadlink)}
 %#endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
 
 %#if defined(__USE_REENTRANT) || defined(__USE_POSIX199506)
-[attribute(*)] c16getlogin_r:(*) %{uchar(wgetlogin_r)}
-[attribute(*)] c32getlogin_r:(*) %{uchar(wgetlogin_r)}
+c16getlogin_r:(*) %{uchar(wgetlogin_r)}
+c32getlogin_r:(*) %{uchar(wgetlogin_r)}
 %#endif /* __USE_REENTRANT || __USE_POSIX199506 */
 
 %
 %#if defined(__USE_UNIX98) || defined(__USE_XOPEN2K)
-[attribute(*)] c16gethostname:(*) %{uchar(wgethostname)}
-[attribute(*)] c32gethostname:(*) %{uchar(wgethostname)}
+c16gethostname:(*) %{uchar(wgethostname)}
+c32gethostname:(*) %{uchar(wgethostname)}
 %#endif /* __USE_UNIX98 || __USE_XOPEN2K */
 
 %#ifdef __USE_MISC
-[attribute(*)] c16setlogin:(*) %{uchar(wsetlogin)}
-[attribute(*)] c32setlogin:(*) %{uchar(wsetlogin)}
-[attribute(*)] c16sethostname:(*) %{uchar(wsethostname)}
-[attribute(*)] c32sethostname:(*) %{uchar(wsethostname)}
-[attribute(*)] c16getdomainname:(*) %{uchar(wgetdomainname)}
-[attribute(*)] c32getdomainname:(*) %{uchar(wgetdomainname)}
-[attribute(*)] c16setdomainname:(*) %{uchar(wsetdomainname)}
-[attribute(*)] c32setdomainname:(*) %{uchar(wsetdomainname)}
+c16setlogin:(*) %{uchar(wsetlogin)}
+c32setlogin:(*) %{uchar(wsetlogin)}
+c16sethostname:(*) %{uchar(wsethostname)}
+c32sethostname:(*) %{uchar(wsethostname)}
+c16getdomainname:(*) %{uchar(wgetdomainname)}
+c32getdomainname:(*) %{uchar(wgetdomainname)}
+c16setdomainname:(*) %{uchar(wsetdomainname)}
+c32setdomainname:(*) %{uchar(wsetdomainname)}
 %#endif /* __USE_MISC */
 
 %#if defined(__USE_MISC) || \
 %   (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K))
-[attribute(*)] c16chroot:(*) %{uchar(wchroot)}
-[attribute(*)] c32chroot:(*) %{uchar(wchroot)}
+c16chroot:(*) %{uchar(wchroot)}
+c32chroot:(*) %{uchar(wchroot)}
 %#endif /* ... */
 
 %
 %#if (defined(_EVERY_SOURCE) || \
 %     (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K)))
-[attribute(*)] c16ctermid:(*) %{uchar(wctermid)}
-[attribute(*)] c32ctermid:(*) %{uchar(wctermid)}
+c16ctermid:(*) %{uchar(wctermid)}
+c32ctermid:(*) %{uchar(wctermid)}
 %#endif /* _EVERY_SOURCE || (__USE_XOPEN && !__USE_XOPEN2K) */
 
 

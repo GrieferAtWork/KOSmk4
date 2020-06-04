@@ -99,59 +99,60 @@ __NAMESPACE_STD_USING(FILE)
 
 }
 
-[cp] getpwuid:($uid_t uid) -> struct passwd *;
-[cp] getpwnam:([[nonnull]] char const *name) -> struct passwd *;
+[[cp]] getpwuid:($uid_t uid) -> struct passwd *;
+[[cp]] getpwnam:([[nonnull]] char const *name) -> struct passwd *;
 
 %#if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
 @@Rewind the password-file stream
-[cp] setpwent:();
+[[cp]] setpwent:();
 
 @@Close the password-file stream
-[cp_nokos] endpwent:();
+[[cp_nokos]] endpwent:();
 
 @@Read an entry from the password-file stream, opening it if necessary
-[cp] getpwent:() -> struct passwd *;
+[[cp]] getpwent:() -> struct passwd *;
 %#endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 
 
 @@Search for an entry with a matching user ID
-[cp] getpwuid:($uid_t uid) -> struct passwd *;
+[[cp]] getpwuid:($uid_t uid) -> struct passwd *;
 
 @@Search for an entry with a matching username
-[cp] getpwnam:([[nonnull]] const char *name) -> struct passwd *;
+[[cp]] getpwnam:([[nonnull]] const char *name) -> struct passwd *;
 
 %
 %#ifdef __USE_MISC
 @@Read an entry from STREAM
-[cp] fgetpwent:([[nonnull]] $FILE *__restrict stream) -> struct passwd *;
+[[cp]] fgetpwent:([[nonnull]] $FILE *__restrict stream) -> struct passwd *;
 
 @@Write the given entry onto the given stream
-[cp] putpwent:(struct passwd const *__restrict p, $FILE *__restrict f) -> int;
+[[cp]] putpwent:(struct passwd const *__restrict p, $FILE *__restrict f) -> int;
 %#endif /* __USE_MISC */
 
 %
 %#ifdef __USE_POSIX
-[cp][doc_alias(getpwuid)]
+[[cp]][doc_alias(getpwuid)]
 getpwuid_r:(__uid_t __uid,
             [[nonnull]] struct passwd *__restrict resultbuf,
-            [outp(buflen)] char *__restrict buffer, size_t buflen,
+            [[outp(buflen)]] char *__restrict buffer, size_t buflen,
             [[nonnull]] struct passwd **__restrict result) -> int;
-[cp][doc_alias(getpwnam)]
+[[cp]][doc_alias(getpwnam)]
 getpwnam_r:([[nonnull]] const char *__restrict name,
             [[nonnull]] struct passwd *__restrict resultbuf,
-            [outp(buflen)] char *__restrict buffer, size_t buflen,
+            [[outp(buflen)]] char *__restrict buffer, size_t buflen,
             [[nonnull]] struct passwd **__restrict result) -> int;
 %#ifdef __USE_MISC
-[cp][doc_alias(getpwent)]
+[[cp]][doc_alias(getpwent)]
 getpwent_r:([[nonnull]] struct passwd *__restrict resultbuf,
-            [outp(buflen)] char *__restrict buffer, size_t buflen,
+            [[outp(buflen)]] char *__restrict buffer, size_t buflen,
             [[nonnull]] struct passwd **__restrict result) -> int;
+
 @@Read an entry from STREAM. This function is not standardized and probably never will
-[cp][doc_alias(fgetpwent)]
-fgetpwent_r:([[nonnull]] $FILE *__restrict stream,
-             [[nonnull]] struct passwd *__restrict resultbuf,
-             [outp(buflen)] char *__restrict buffer, size_t buflen,
-             [[nonnull]] struct passwd **__restrict result) -> int;
+[[cp]]
+int fgetpwent_r([[nonnull]] $FILE *__restrict stream,
+                [[nonnull]] struct passwd *__restrict resultbuf,
+                [[outp(buflen)]] char *__restrict buffer, size_t buflen,
+                [[nonnull]] struct passwd **__restrict result);
 %#endif /* __USE_MISC */
 %#endif	/* __USE_POSIX */
 
@@ -159,7 +160,7 @@ fgetpwent_r:([[nonnull]] $FILE *__restrict stream,
 @@Re-construct the password-file line for the given uid in the
 @@given buffer. This knows the format that the caller will
 @@expect, but this need not be the format of the password file
-[cp] getpw:(__uid_t uid, char *buffer) -> int;
+[[cp]] int getpw(__uid_t uid, char *buffer);
 %#endif /* __USE_GNU */
 
 

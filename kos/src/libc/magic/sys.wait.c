@@ -104,7 +104,7 @@ typedef union {
 }
 
 @@Wait for any child process (same as `waitpid(-1, STAT_LOC, 0);')
-[cp][export_alias(__wait)]
+[[cp]][export_alias(__wait)]
 wait:([[nullable]] __WAIT_STATUS stat_loc) -> $pid_t;
 
 @@Wait for a child process:
@@ -113,7 +113,7 @@ wait:([[nullable]] __WAIT_STATUS stat_loc) -> $pid_t;
 @@ - `pid == 0':  Wait for any child process whose process group ID is that of the caller
 @@ - `pid > 0':   Wait for the child whose process ID is equal to `PID'
 @@@param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted)
-[cp][export_alias(__waitpid)]
+[[cp]][export_alias(__waitpid)]
 waitpid:($pid_t pid, [[nullable]] __WAIT_STATUS stat_loc, int options) -> $pid_t;
 
 %
@@ -123,21 +123,21 @@ waitpid:($pid_t pid, [[nullable]] __WAIT_STATUS stat_loc, int options) -> $pid_t
 %typedef __id_t id_t;
 %#endif /* !__id_t_defined */
 @@@param options: At least one of `WEXITED|WSTOPPED|WCONTINUED', optionally or'd with `WNOHANG|WNOWAIT'
-[cp] waitid:(idtype_t idtype, id_t id, [[nullable]] siginfo_t *infop, int options) -> int;
+[[cp]] waitid:(idtype_t idtype, id_t id, [[nullable]] siginfo_t *infop, int options) -> int;
 %#endif /* __USE_XOPEN || __USE_XOPEN2K8 */
 
 %
 %#if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
 %struct rusage;
 
-[decl_include(<bits/rusage-struct.h>)][ignore][cp][doc_alias(wait3)]
+[decl_include(<bits/rusage-struct.h>)][ignore][[cp]][doc_alias(wait3)]
 wait3_32:([[nullable]] __WAIT_STATUS stat_loc, int options, [[nullable]] struct $rusage32 *usage) -> $pid_t = wait3?;
 
 @@Same as `waitpid(-1,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
 @@@param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted)
 [no_crt_self_import]
 [if(defined(__USE_TIME_BITS64)), preferred_alias(wait3_64)]
-[if(!defined(__USE_TIME_BITS64)), preferred_alias(wait3)][cp]
+[if(!defined(__USE_TIME_BITS64)), preferred_alias(wait3)][[cp]]
 [requires($has_function(wait3_32) || $has_function(wait3_64))]
 [decl_prefix(struct rusage;)]
 [impl_include(<bits/rusage-struct.h>)]
@@ -178,13 +178,13 @@ wait3_64:([[nullable]] __WAIT_STATUS stat_loc, int options, [[nullable]] struct 
 %
 %#ifdef __USE_MISC
 
-[decl_include(<bits/rusage-struct.h>)][ignore][cp][doc_alias(wait4)][cp]
+[decl_include(<bits/rusage-struct.h>)][ignore][[cp]][doc_alias(wait4)][[cp]]
 wait4_32:($pid_t pid, [[nullable]] __WAIT_STATUS stat_loc, int options, [[nullable]] struct $rusage32 *usage) -> $pid_t = wait4?;
 
 @@Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
 @@@param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted)
 [if(defined(__USE_TIME_BITS64)), preferred_alias(wait4_64)]
-[if(!defined(__USE_TIME_BITS64)), preferred_alias(wait4)][cp]
+[if(!defined(__USE_TIME_BITS64)), preferred_alias(wait4)][[cp]]
 [requires($has_function(wait4_32) || $has_function(wait4_64))]
 [decl_prefix(struct rusage;)]
 [impl_include(<bits/rusage-struct.h>)]

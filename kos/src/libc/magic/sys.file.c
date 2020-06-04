@@ -55,7 +55,7 @@ __SYSDECL_BEGIN
 }
 
 %/* Apply or remove an advisory lock, according to OPERATION, on the file FD refers to.  */
-[cp] flock:($fd_t fd, int operation) -> int;
+[[cp]] flock:($fd_t fd, int operation) -> int;
 
 %{
 

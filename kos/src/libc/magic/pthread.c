@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
-%[default_impl_section(.text.crt.sched.pthread)]
+%[default_impl_section(".text.crt.sched.pthread")]
 %[define_replacement(clockid_t = __clockid_t)]
 %[define_replacement(pthread_t = __pthread_t)]
 %[define_replacement(pthread_attr_t = __pthread_attr_t)]
@@ -362,7 +362,7 @@ typedef __pthread_barrierattr_t pthread_barrierattr_t;
 @@Create a new thread, starting with execution of START-ROUTINE
 @@getting passed ARG. Creation attributed come from ATTR. The new
 @@handle is stored in *NEWTHREAD
-[decl_include(<bits/pthreadtypes.h>)]
+[decl_include("<bits/pthreadtypes.h>")]
 [decl_prefix(
 #ifndef ____pthread_start_routine_t_defined
 #define ____pthread_start_routine_t_defined 1
@@ -381,13 +381,13 @@ pthread_create:([[nonnull]] pthread_t *__restrict newthread, pthread_attr_t cons
 @@Make calling thread wait for termination of the thread THREAD. The
 @@exit status of the thread is stored in *THREAD_RETURN, if THREAD_RETURN
 @@is not NULL
-[decl_include(<bits/pthreadtypes.h>)]
-[cp] pthread_join:(pthread_t pthread, void **thread_return) -> int;
+[decl_include("<bits/pthreadtypes.h>")]
+[[cp]] pthread_join:(pthread_t pthread, void **thread_return) -> int;
 
 %#ifdef __USE_GNU
 @@Check whether thread THREAD has terminated. If yes return the status of
 @@the thread in *THREAD_RETURN, if THREAD_RETURN is not NULL
-[decl_include(<bits/pthreadtypes.h>)]
+[decl_include("<bits/pthreadtypes.h>")]
 pthread_tryjoin_np:(pthread_t pthread, void **thread_return) -> int;
 
 %
@@ -397,8 +397,8 @@ pthread_tryjoin_np:(pthread_t pthread, void **thread_return) -> int;
 @@until TIMEOUT. The exit status of the thread is stored in
 @@*THREAD_RETURN, if THREAD_RETURN is not NULL.
 [if(defined(__USE_TIME_BITS64)), preferred_alias(pthread_timedjoin64_np)]
-[if(!defined(__USE_TIME_BITS64)), preferred_alias(pthread_timedjoin_np)][cp]
-[decl_include(<bits/pthreadtypes.h>), no_crt_self_import]
+[if(!defined(__USE_TIME_BITS64)), preferred_alias(pthread_timedjoin_np)][[cp]]
+[decl_include("<bits/pthreadtypes.h>"), no_crt_self_import]
 [decl_include("<bits/timespec.h>")]
 [requires(defined(__CRT_HAVE_pthread_timedjoin_np) || defined(__CRT_HAVE_pthread_timedjoin64_np))]
 pthread_timedjoin_np:(pthread_t pthread, void **thread_return,
@@ -406,36 +406,36 @@ pthread_timedjoin_np:(pthread_t pthread, void **thread_return,
 #ifdef __CRT_HAVE_pthread_timedjoin_np
 	int result;
 	struct timespec32 abstime32;
-	abstime32.@tv_sec@  = (time32_t)abstime->@tv_sec@;
-	abstime32.@tv_nsec@ = abstime->@tv_nsec@;
+	abstime32.tv_sec  = (time32_t)abstime->tv_sec;
+	abstime32.tv_nsec = abstime->tv_nsec;
 	result = pthread_timedjoin32_np(pthread, thread_return, &abstime32);
 	return result;
 #else /* __CRT_HAVE_pthread_timedjoin_np */
 	int result;
 	struct timespec64 abstime64;
-	abstime64.@tv_sec@  = (time64_t)abstime->@tv_sec@;
-	abstime64.@tv_nsec@ = abstime->@tv_nsec@;
+	abstime64.tv_sec  = (time64_t)abstime->tv_sec;
+	abstime64.tv_nsec = abstime->tv_nsec;
 	result = pthread_timedjoin64_np(pthread, thread_return, &abstime32);
 	return result;
 #endif /* !__CRT_HAVE_pthread_timedjoin_np */
 }
 
 %#ifdef __USE_TIME64
-[decl_include(<bits/pthreadtypes.h>)][doc_alias(pthread_timedjoin_np)]
-[decl_include("<bits/timespec.h>")][ignore][cp]
-pthread_timedjoin32_np:(pthread_t pthread, void **thread_return,
-                        struct timespec32 const *abstime) -> int = pthread_timedjoin_np?;
+[[cp, ignore, doc_alias(pthread_timedjoin_np), nocrt, alias(pthread_timedjoin_np)]]
+[[decl_include("<bits/pthreadtypes.h>", "<bits/timespec.h>")]]
+int pthread_timedjoin32_np(pthread_t pthread, void **thread_return,
+                           struct timespec32 const *abstime);
 
-[cp][time64_variant_of(pthread_timedjoin_np)]
-[decl_include(<bits/pthreadtypes.h>)]
-[decl_include("<bits/timespec.h>")]
-[requires($has_function(pthread_timedjoin32_np))]
+
+[[cp, time64_variant_of(pthread_timedjoin_np)]]
+[[decl_include("<bits/pthreadtypes.h>", "<bits/timespec.h>")]]
+[[userimpl, requires_function(pthread_timedjoin32_np)]]
 pthread_timedjoin64_np:(pthread_t pthread, void **thread_return,
                         struct timespec64 const *abstime) -> int {
 	int result;
 	struct timespec32 abstime32;
-	abstime32.@tv_sec@  = (time32_t)abstime->@tv_sec@;
-	abstime32.@tv_nsec@ = abstime->@tv_nsec@;
+	abstime32.tv_sec  = (time32_t)abstime->tv_sec;
+	abstime32.tv_nsec = abstime->tv_nsec;
 	result = pthread_timedjoin32_np(pthread, thread_return, &abstime32);
 	return result;
 }
@@ -604,7 +604,7 @@ pthread_setschedprio:(pthread_t target_thread, int prio) -> int;
 
 %#ifdef __USE_GNU
 @@Get thread name visible in the kernel and its interfaces
-pthread_getname_np:(pthread_t target_thread, [outp(buflen)] char *buf, size_t buflen) -> int;
+pthread_getname_np:(pthread_t target_thread, [[outp(buflen)]] char *buf, size_t buflen) -> int;
 
 %
 @@Set thread name visible in the kernel and its interfaces
@@ -685,7 +685,7 @@ pthread_cancel:(pthread_t pthread) -> int;
 %
 @@Test for pending cancellation for the current thread and terminate
 @@the thread as per pthread_exit(PTHREAD_CANCELED) if it has been canceled
-[cp] pthread_testcancel:();
+[[cp]] pthread_testcancel:();
 
 %
 %/* Cancellation handling with integration into exception handling. */
@@ -919,14 +919,15 @@ __pthread_unwind_next:([[nonnull]] __pthread_unwind_buf_t *buf);
 %
 %/* Function used in the macros. */
 %struct __jmp_buf_tag;
-[alias(sigsetjmp)][noexport][nouser]
-__sigsetjmp:([[nonnull]] struct __jmp_buf_tag *env, int savemask) -> int;
+[[alias(sigsetjmp), no_crt_impl, decl_prefix(struct __jmp_buf_tag;)]]
+int __sigsetjmp([[nonnull]] struct __jmp_buf_tag *env, int savemask);
 
 %
 %/* Mutex handling. */
 %
 @@Initialize a mutex
-pthread_mutex_init:([[nonnull]] pthread_mutex_t *mutex, pthread_mutexattr_t const *mutexattr) -> int;
+int pthread_mutex_init([[nonnull]] pthread_mutex_t *mutex,
+                       pthread_mutexattr_t const *mutexattr);
 
 %
 @@Destroy a mutex
@@ -945,8 +946,8 @@ pthread_mutex_lock:([[nonnull]] pthread_mutex_t *mutex) -> int;
 %#ifdef __USE_XOPEN2K
 @@Wait until lock becomes available, or specified time passes
 [if(defined(__USE_TIME_BITS64)), preferred_alias(pthread_mutex_timedlock64)]
-[if(!defined(__USE_TIME_BITS64)), preferred_alias(pthread_mutex_timedlock)][cp]
-[decl_include(<bits/pthreadtypes.h>), no_crt_self_import]
+[if(!defined(__USE_TIME_BITS64)), preferred_alias(pthread_mutex_timedlock)][[cp]]
+[decl_include("<bits/pthreadtypes.h>"), no_crt_self_import]
 [decl_include("<bits/timespec.h>")]
 [requires(defined(__CRT_HAVE_pthread_mutex_timedlock) || defined(__CRT_HAVE_pthread_mutex_timedlock64))]
 pthread_mutex_timedlock:([[nonnull]] pthread_mutex_t *__restrict mutex,
@@ -954,39 +955,35 @@ pthread_mutex_timedlock:([[nonnull]] pthread_mutex_t *__restrict mutex,
 #ifdef __CRT_HAVE_pthread_mutex_timedlock
 	int result;
 	struct timespec32 abstime32;
-	abstime32.@tv_sec@  = (time32_t)abstime->@tv_sec@;
-	abstime32.@tv_nsec@ = abstime->@tv_nsec@;
+	abstime32.tv_sec  = (time32_t)abstime->tv_sec;
+	abstime32.tv_nsec = abstime->tv_nsec;
 	result = pthread_mutex_timedlock32(mutex, &abstime32);
 	return result;
 #else /* __CRT_HAVE_pthread_mutex_timedlock */
 	int result;
 	struct timespec64 abstime64;
-	abstime64.@tv_sec@  = (time64_t)abstime->@tv_sec@;
-	abstime64.@tv_nsec@ = abstime->@tv_nsec@;
+	abstime64.tv_sec  = (time64_t)abstime->tv_sec;
+	abstime64.tv_nsec = abstime->tv_nsec;
 	result = pthread_mutex_timedlock64(mutex, &abstime64);
 	return result;
 #endif /* !__CRT_HAVE_pthread_mutex_timedlock */
 }
 
 %#ifdef __USE_TIME64
-[ignore][cp][doc_alias(pthread_mutex_timedlock)]
-[decl_include(<bits/pthreadtypes.h>)]
-[decl_include("<bits/timespec.h>")]
-pthread_mutex_timedlock32:([[nonnull]] pthread_mutex_t *__restrict mutex,
-                           [[nonnull]] struct timespec const *__restrict abstime)
-		-> int = pthread_mutex_timedlock?;
+[[cp, doc_alias(pthread_mutex_timedlock), ignore, nocrt, alias(pthread_mutex_timedlock)]]
+[[decl_include("<bits/pthreadtypes.h>", "<bits/timespec.h>")]]
+int pthread_mutex_timedlock32([[nonnull]] pthread_mutex_t *__restrict mutex,
+                              [[nonnull]] struct timespec const *__restrict abstime);
 
-[doc_alias(pthread_mutex_timedlock)][cp]
-[time64_variant_of(pthread_mutex_timedlock)]
-[decl_include(<bits/pthreadtypes.h>)]
-[decl_include("<bits/timespec.h>")]
-[requires($has_function(pthread_mutex_timedlock32))]
-pthread_mutex_timedlock64:([[nonnull]] pthread_mutex_t *__restrict mutex,
-                           [[nonnull]] struct timespec64 const *__restrict abstime) -> int {
+[[cp, doc_alias(pthread_mutex_timedlock), time64_variant_of(pthread_mutex_timedlock)]]
+[[decl_include("<bits/pthreadtypes.h>", "<bits/timespec.h>")]]
+[[userimpl, requires($has_function(pthread_mutex_timedlock32))]]
+int pthread_mutex_timedlock64([[nonnull]] pthread_mutex_t *__restrict mutex,
+                              [[nonnull]] struct timespec64 const *__restrict abstime) {
 	int result;
 	struct timespec32 abstime32;
-	abstime32.@tv_sec@  = (time32_t)abstime->@tv_sec@;
-	abstime32.@tv_nsec@ = abstime->@tv_nsec@;
+	abstime32.tv_sec  = (time32_t)abstime->tv_sec;
+	abstime32.tv_nsec = abstime->tv_nsec;
 	result = pthread_mutex_timedlock32(mutex, &abstime32);
 	return result;
 }
@@ -1106,7 +1103,7 @@ pthread_rwlock_destroy:([[nonnull]] pthread_rwlock_t *rwlock) -> int;
 
 %
 @@Acquire read lock for RWLOCK
-[cp] pthread_rwlock_rdlock:([[nonnull]] pthread_rwlock_t *rwlock) -> int;
+[[cp]] pthread_rwlock_rdlock:([[nonnull]] pthread_rwlock_t *rwlock) -> int;
 
 %
 @@Try to acquire read lock for RWLOCK
@@ -1118,23 +1115,23 @@ pthread_rwlock_tryrdlock:([[nonnull]] pthread_rwlock_t *rwlock) -> int;
 @@Try to acquire read lock for RWLOCK or return after specfied time
 [if(defined(__USE_TIME_BITS64)), preferred_alias(pthread_rwlock_timedrdlock64)]
 [if(!defined(__USE_TIME_BITS64)), preferred_alias(pthread_rwlock_timedrdlock)]
-[decl_include(<bits/pthreadtypes.h>), no_crt_self_import]
-[decl_include("<bits/timespec.h>")][cp]
+[decl_include("<bits/pthreadtypes.h>"), no_crt_self_import]
+[decl_include("<bits/timespec.h>")][[cp]]
 [requires(defined(__CRT_HAVE_pthread_rwlock_timedrdlock) || defined(__CRT_HAVE_pthread_rwlock_timedrdlock64))]
 pthread_rwlock_timedrdlock:([[nonnull]] pthread_rwlock_t *__restrict rwlock,
                             [[nonnull]] struct timespec const *__restrict abstime) -> int {
 #ifdef __CRT_HAVE_pthread_rwlock_timedrdlock
 	int result;
 	struct timespec32 abstime32;
-	abstime32.@tv_sec@  = (time32_t)abstime->@tv_sec@;
-	abstime32.@tv_nsec@ = abstime->@tv_nsec@;
+	abstime32.tv_sec  = (time32_t)abstime->tv_sec;
+	abstime32.tv_nsec = abstime->tv_nsec;
 	result = pthread_rwlock_timedrdlock32(rwlock, &abstime32);
 	return result;
 #else /* __CRT_HAVE_pthread_rwlock_timedrdlock */
 	int result;
 	struct timespec64 abstime64;
-	abstime64.@tv_sec@  = (time64_t)abstime->@tv_sec@;
-	abstime64.@tv_nsec@ = abstime->@tv_nsec@;
+	abstime64.tv_sec  = (time64_t)abstime->tv_sec;
+	abstime64.tv_nsec = abstime->tv_nsec;
 	result = pthread_rwlock_timedrdlock64(rwlock, &abstime32);
 	return result;
 #endif /* !__CRT_HAVE_pthread_rwlock_timedrdlock */
@@ -1142,24 +1139,20 @@ pthread_rwlock_timedrdlock:([[nonnull]] pthread_rwlock_t *__restrict rwlock,
 
 %#ifdef __USE_TIME64
 
-[cp][doc_alias(pthread_rwlock_timedrdlock)]
-[decl_include(<bits/pthreadtypes.h>)]
-[decl_include("<bits/timespec.h>")]
-pthread_rwlock_timedrdlock32:([[nonnull]] pthread_rwlock_t *__restrict rwlock,
-                              [[nonnull]] struct timespec32 const *__restrict abstime)
-		-> int = pthread_rwlock_timedrdlock?;
+[[cp, doc_alias(pthread_rwlock_timedrdlock), ignore, nocrt, alias(pthread_rwlock_timedrdlock)]]
+[[decl_include("<bits/pthreadtypes.h>", "<bits/timespec.h>")]]
+int pthread_rwlock_timedrdlock32([[nonnull]] pthread_rwlock_t *__restrict rwlock,
+                                 [[nonnull]] struct timespec32 const *__restrict abstime);
 
-[cp][doc_alias(pthread_rwlock_timedrdlock)]
-[time64_variant_of(pthread_rwlock_timedrdlock)]
-[decl_include(<bits/pthreadtypes.h>)]
-[decl_include("<bits/timespec.h>")]
-[requires($has_function(pthread_rwlock_timedrdlock32))]
-pthread_rwlock_timedrdlock64:([[nonnull]] pthread_rwlock_t *__restrict rwlock,
-                              [[nonnull]] struct timespec64 const *__restrict abstime) -> int {
+[[cp, doc_alias(pthread_rwlock_timedrdlock), time64_variant_of(pthread_rwlock_timedrdlock)]]
+[[decl_include("<bits/pthreadtypes.h>", "<bits/timespec.h>")]]
+[[userimpl, requires($has_function(pthread_rwlock_timedrdlock32))]]
+int pthread_rwlock_timedrdlock64([[nonnull]] pthread_rwlock_t *__restrict rwlock,
+                                 [[nonnull]] struct timespec64 const *__restrict abstime) {
 	int result;
 	struct timespec32 abstime32;
-	abstime32.@tv_sec@  = (time32_t)abstime->@tv_sec@;
-	abstime32.@tv_nsec@ = abstime->@tv_nsec@;
+	abstime32.tv_sec  = (time32_t)abstime->tv_sec;
+	abstime32.tv_nsec = abstime->tv_nsec;
 	result = pthread_rwlock_timedrdlock32(rwlock, &abstime32);
 	return result;
 }
@@ -1170,7 +1163,7 @@ pthread_rwlock_timedrdlock64:([[nonnull]] pthread_rwlock_t *__restrict rwlock,
 
 %
 @@Acquire write lock for RWLOCK
-[cp] pthread_rwlock_wrlock:([[nonnull]] pthread_rwlock_t *rwlock) -> int;
+[[cp]] pthread_rwlock_wrlock:([[nonnull]] pthread_rwlock_t *rwlock) -> int;
 
 %
 @@Try to acquire write lock for RWLOCK
@@ -1182,23 +1175,23 @@ pthread_rwlock_trywrlock:([[nonnull]] pthread_rwlock_t *rwlock) -> int;
 @@Try to acquire write lock for RWLOCK or return after specfied time
 [if(defined(__USE_TIME_BITS64)), preferred_alias(pthread_rwlock_timedwrlock64)]
 [if(!defined(__USE_TIME_BITS64)), preferred_alias(pthread_rwlock_timedwrlock)]
-[decl_include(<bits/pthreadtypes.h>), no_crt_self_import]
-[decl_include("<bits/timespec.h>")][cp]
+[decl_include("<bits/pthreadtypes.h>"), no_crt_self_import]
+[decl_include("<bits/timespec.h>")][[cp]]
 [requires(defined(__CRT_HAVE_pthread_rwlock_timedwrlock) || defined(__CRT_HAVE_pthread_rwlock_timedwrlock64))]
 pthread_rwlock_timedwrlock:([[nonnull]] pthread_rwlock_t *__restrict rwlock,
                             [[nonnull]] struct timespec const *__restrict abstime) -> int {
 #ifdef __CRT_HAVE_pthread_rwlock_timedwrlock
 	int result;
 	struct timespec32 abstime32;
-	abstime32.@tv_sec@  = (time32_t)abstime->@tv_sec@;
-	abstime32.@tv_nsec@ = abstime->@tv_nsec@;
+	abstime32.tv_sec  = (time32_t)abstime->tv_sec;
+	abstime32.tv_nsec = abstime->tv_nsec;
 	result = pthread_rwlock_timedwrlock32(rwlock, &abstime32);
 	return result;
 #else /* __CRT_HAVE_pthread_rwlock_timedwrlock */
 	int result;
 	struct timespec64 abstime64;
-	abstime64.@tv_sec@  = (time64_t)abstime->@tv_sec@;
-	abstime64.@tv_nsec@ = abstime->@tv_nsec@;
+	abstime64.tv_sec  = (time64_t)abstime->tv_sec;
+	abstime64.tv_nsec = abstime->tv_nsec;
 	result = pthread_rwlock_timedwrlock64(rwlock, &abstime32);
 	return result;
 #endif /* !__CRT_HAVE_pthread_rwlock_timedwrlock */
@@ -1206,24 +1199,21 @@ pthread_rwlock_timedwrlock:([[nonnull]] pthread_rwlock_t *__restrict rwlock,
 
 %#ifdef __USE_TIME64
 
-[cp][doc_alias(pthread_rwlock_timedwrlock)]
-[decl_include(<bits/pthreadtypes.h>)]
-[decl_include("<bits/timespec.h>")]
-pthread_rwlock_timedwrlock32:([[nonnull]] pthread_rwlock_t *__restrict rwlock,
-                              [[nonnull]] struct timespec32 const *__restrict abstime)
-		-> int = pthread_rwlock_timedwrlock?;
+[[cp, doc_alias(pthread_rwlock_timedwrlock), ignore, nocrt, alias("pthread_rwlock_timedwrlock")]]
+[[decl_include("<bits/pthreadtypes.h>", "<bits/timespec.h>")]]
+int pthread_rwlock_timedwrlock32([[nonnull]] pthread_rwlock_t *__restrict rwlock,
+                                 [[nonnull]] struct timespec32 const *__restrict abstime);
 
-[cp][doc_alias(pthread_rwlock_timedwrlock)]
-[time64_variant_of(pthread_rwlock_timedwrlock)]
-[decl_include(<bits/pthreadtypes.h>)]
-[decl_include("<bits/timespec.h>")]
-[requires($has_function(pthread_rwlock_timedwrlock32))]
-pthread_rwlock_timedwrlock64:([[nonnull]] pthread_rwlock_t *__restrict rwlock,
-                              [[nonnull]] struct timespec64 const *__restrict abstime) -> int {
+[[cp, doc_alias(pthread_rwlock_timedwrlock)]]
+[[time64_variant_of(pthread_rwlock_timedwrlock)]]
+[[decl_include("<bits/pthreadtypes.h>", "<bits/timespec.h>")]]
+[[userimpl, requires_function(pthread_rwlock_timedwrlock32)]]
+int pthread_rwlock_timedwrlock64([[nonnull]] pthread_rwlock_t *__restrict rwlock,
+                                 [[nonnull]] struct timespec64 const *__restrict abstime) {
 	int result;
 	struct timespec32 abstime32;
-	abstime32.@tv_sec@  = (time32_t)abstime->@tv_sec@;
-	abstime32.@tv_nsec@ = abstime->@tv_nsec@;
+	abstime32.tv_sec  = (time32_t)abstime->tv_sec;
+	abstime32.tv_nsec = abstime->tv_nsec;
 	result = pthread_rwlock_timedwrlock32(rwlock, &abstime32);
 	return result;
 }
@@ -1289,7 +1279,7 @@ pthread_cond_broadcast:([[nonnull]] pthread_cond_t *cond) -> int;
 %
 @@Wait for condition variable COND to be signaled or broadcast.
 @@MUTEX is assumed to be locked before.
-[cp] pthread_cond_wait:([[nonnull]] pthread_cond_t *__restrict cond,
+[[cp]] pthread_cond_wait:([[nonnull]] pthread_cond_t *__restrict cond,
                         [[nonnull]] pthread_mutex_t *__restrict mutex) -> int;
 
 %
@@ -1298,8 +1288,8 @@ pthread_cond_broadcast:([[nonnull]] pthread_cond_t *cond) -> int;
 @@absolute time specification; zero is the beginning of the epoch
 @@(00:00:00 GMT, January 1, 1970).
 [if(defined(__USE_TIME_BITS64)), preferred_alias(pthread_cond_timedwait64)]
-[if(!defined(__USE_TIME_BITS64)), preferred_alias(pthread_cond_timedwait)][cp]
-[decl_include(<bits/pthreadtypes.h>), no_crt_self_import]
+[if(!defined(__USE_TIME_BITS64)), preferred_alias(pthread_cond_timedwait)][[cp]]
+[decl_include("<bits/pthreadtypes.h>"), no_crt_self_import]
 [decl_include("<bits/timespec.h>")]
 [requires(defined(__CRT_HAVE_pthread_cond_timedwait) || defined(__CRT_HAVE_pthread_cond_timedwait64))]
 pthread_cond_timedwait:([[nonnull]] pthread_cond_t *__restrict cond,
@@ -1308,40 +1298,37 @@ pthread_cond_timedwait:([[nonnull]] pthread_cond_t *__restrict cond,
 #ifdef __CRT_HAVE_pthread_cond_timedwait
 	int result;
 	struct timespec32 abstime32;
-	abstime32.@tv_sec@  = (time32_t)abstime->@tv_sec@;
-	abstime32.@tv_nsec@ = abstime->@tv_nsec@;
+	abstime32.tv_sec  = (time32_t)abstime->tv_sec;
+	abstime32.tv_nsec = abstime->tv_nsec;
 	result = pthread_cond_timedwait32(cond, mutex, &abstime32);
 	return result;
 #else /* __CRT_HAVE_pthread_cond_timedwait */
 	int result;
 	struct timespec64 abstime64;
-	abstime64.@tv_sec@  = (time64_t)abstime->@tv_sec@;
-	abstime64.@tv_nsec@ = abstime->@tv_nsec@;
+	abstime64.tv_sec  = (time64_t)abstime->tv_sec;
+	abstime64.tv_nsec = abstime->tv_nsec;
 	result = pthread_cond_timedwait64(cond, mutex, &abstime64);
 	return result;
 #endif /* !__CRT_HAVE_pthread_cond_timedwait */
 }
 
 %#ifdef __USE_TIME64
-[ignore][cp]
-[decl_include(<bits/pthreadtypes.h>)]
-[decl_include("<bits/timespec.h>")]
-pthread_cond_timedwait32:([[nonnull]] pthread_cond_t *__restrict cond,
-                          [[nonnull]] pthread_mutex_t *__restrict mutex,
-                          [[nonnull]] struct timespec32 const *__restrict abstime)
-		-> int = pthread_cond_timedwait?;
+[[cp, ignore, nocrt, alias("pthread_cond_timedwait")]]
+[[decl_include("<bits/pthreadtypes.h>", "<bits/timespec.h>")]]
+int pthread_cond_timedwait32([[nonnull]] pthread_cond_t *__restrict cond,
+                              [[nonnull]] pthread_mutex_t *__restrict mutex,
+                              [[nonnull]] struct timespec32 const *__restrict abstime);
 
-[cp][doc_alias(pthread_cond_timedwait)][time64_variant_of(pthread_cond_timedwait)]
-[decl_include(<bits/pthreadtypes.h>)]
-[decl_include("<bits/timespec.h>")]
-[requires($has_function(pthread_cond_timedwait32))]
-pthread_cond_timedwait64:([[nonnull]] pthread_cond_t *__restrict cond,
-                          [[nonnull]] pthread_mutex_t *__restrict mutex,
-                          [[nonnull]] struct timespec64 const *__restrict abstime) -> int {
+[[cp, doc_alias("pthread_cond_timedwait"), time64_variant_of(pthread_cond_timedwait)]]
+[[decl_include("<bits/pthreadtypes.h>", "<bits/timespec.h>")]]
+[[userimpl, requires($has_function(pthread_cond_timedwait32))]]
+int pthread_cond_timedwait64([[nonnull]] pthread_cond_t *__restrict cond,
+                             [[nonnull]] pthread_mutex_t *__restrict mutex,
+                             [[nonnull]] struct timespec64 const *__restrict abstime) {
 	int result;
 	struct timespec32 abstime32;
-	abstime32.@tv_sec@  = (time32_t)abstime->@tv_sec@;
-	abstime32.@tv_nsec@ = abstime->@tv_nsec@;
+	abstime32.tv_sec  = (time32_t)abstime->tv_sec;
+	abstime32.tv_nsec = abstime->tv_nsec;
 	result = pthread_cond_timedwait32(cond, mutex, &abstime32);
 	return result;
 }
@@ -1456,7 +1443,7 @@ pthread_barrier_destroy:([[nonnull]] pthread_barrier_t *barrier) -> int;
 
 %
 @@Wait on barrier BARRIER
-[cp] pthread_barrier_wait:([[nonnull]] pthread_barrier_t *barrier) -> int;
+[[cp]] pthread_barrier_wait:([[nonnull]] pthread_barrier_t *barrier) -> int;
 
 %
 @@Initialize barrier attribute ATTR

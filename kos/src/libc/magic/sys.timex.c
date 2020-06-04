@@ -127,8 +127,8 @@ adjtimex:([[nonnull]] struct timex *__restrict ntx) -> int {
 	int result;
 #if defined(__CRT_HAVE_adjtimex) || defined(__CRT_HAVE___adjtimex)
 	struct __timex32 nxtalt;
-	nxtalt.@time@.@tv_sec@  = (time32_t)ntx->@time@.@tv_sec@;
-	nxtalt.@time@.@tv_nsec@ = ntx->@time@.@tv_nsec@;
+	nxtalt.@time@.tv_sec  = (time32_t)ntx->@time@.tv_sec;
+	nxtalt.@time@.tv_nsec = ntx->@time@.tv_nsec;
 	nxtalt.@offset@    = (time32_t)ntx->@offset@;
 	nxtalt.@freq@      = (time32_t)ntx->@freq@;
 	nxtalt.@maxerror@  = (time32_t)ntx->@maxerror@;
@@ -148,8 +148,8 @@ adjtimex:([[nonnull]] struct timex *__restrict ntx) -> int {
 /*	nxtalt.@tai@       = (time32_t)ntx->@tai@; */
 #else /* __CRT_HAVE_adjtimex || __CRT_HAVE___adjtimex */
 	struct __timex64 nxtalt;
-	nxtalt.@time@.@tv_sec@  = (time64_t)ntx->@time@.@tv_sec@;
-	nxtalt.@time@.@tv_nsec@ = ntx->@time@.@tv_nsec@;
+	nxtalt.@time@.tv_sec  = (time64_t)ntx->@time@.tv_sec;
+	nxtalt.@time@.tv_nsec = ntx->@time@.tv_nsec;
 	nxtalt.@offset@    = (time64_t)ntx->@offset@;
 	nxtalt.@freq@      = (time64_t)ntx->@freq@;
 	nxtalt.@maxerror@  = (time64_t)ntx->@maxerror@;
@@ -177,8 +177,8 @@ adjtimex:([[nonnull]] struct timex *__restrict ntx) -> int {
 #endif /* !__CRT_HAVE_adjtimex && !__CRT_HAVE___adjtimex */
 	if likely(result == 0) {
 #if defined(__CRT_HAVE_adjtimex) || defined(__CRT_HAVE___adjtimex)
-		ntx->@time@.@tv_sec@  = (time64_t)nxtalt.@time@.@tv_sec@;
-		ntx->@time@.@tv_nsec@ = nxtalt.@time@.@tv_nsec@;
+		ntx->@time@.tv_sec  = (time64_t)nxtalt.@time@.tv_sec;
+		ntx->@time@.tv_nsec = nxtalt.@time@.tv_nsec;
 		ntx->@offset@    = (time64_t)nxtalt.@offset@;
 		ntx->@freq@      = (time64_t)nxtalt.@freq@;
 		ntx->@maxerror@  = (time64_t)nxtalt.@maxerror@;
@@ -197,8 +197,8 @@ adjtimex:([[nonnull]] struct timex *__restrict ntx) -> int {
 		ntx->@stbcnt@    = (time64_t)nxtalt.@stbcnt@;
 		ntx->@tai@       = (time64_t)nxtalt.@tai@;
 #else /* __CRT_HAVE_adjtimex || __CRT_HAVE___adjtimex */
-		ntx->@time@.@tv_sec@  = (time32_t)nxtalt.@time@.@tv_sec@;
-		ntx->@time@.@tv_nsec@ = nxtalt.@time@.@tv_nsec@;
+		ntx->@time@.tv_sec  = (time32_t)nxtalt.@time@.tv_sec;
+		ntx->@time@.tv_nsec = nxtalt.@time@.tv_nsec;
 		ntx->@offset@    = (time32_t)nxtalt.@offset@;
 		ntx->@freq@      = (time32_t)nxtalt.@freq@;
 		ntx->@maxerror@  = (time32_t)nxtalt.@maxerror@;
@@ -233,8 +233,8 @@ ntp_gettime:([[nonnull]] struct ntptimeval *__restrict ntv) -> int {
 	struct __ntptimeval32 ntv32;
 	int result = ntp_gettime32(&ntv32);
 	if likely(result == 0) {
-		ntv->@time@.@tv_sec@   = (time64_t)ntv32.@time@.@tv_sec@;
-		ntv->@time@.@tv_nsec@  = ntv32.@time@.@tv_nsec@;
+		ntv->@time@.tv_sec   = (time64_t)ntv32.@time@.tv_sec;
+		ntv->@time@.tv_nsec  = ntv32.@time@.tv_nsec;
 		ntv->@maxerror@        = ntv32.@maxerror@;
 		ntv->@esterror@        = ntv32.@esterror@;
 		ntv->@tai@             = ntv32.@tai@;
@@ -248,8 +248,8 @@ ntp_gettime:([[nonnull]] struct ntptimeval *__restrict ntv) -> int {
 	struct __ntptimeval64 ntv64;
 	int result = ntp_gettime64(&ntv64);
 	if likely(result == 0) {
-		ntv->@time@.@tv_sec@   = (time32_t)ntv64.@time@.@tv_sec@;
-		ntv->@time@.@tv_nsec@  = ntv64.@time@.@tv_nsec@;
+		ntv->@time@.tv_sec   = (time32_t)ntv64.@time@.tv_sec;
+		ntv->@time@.tv_nsec  = ntv64.@time@.tv_nsec;
 		ntv->@maxerror@        = ntv64.@maxerror@;
 		ntv->@esterror@        = ntv64.@esterror@;
 		ntv->@tai@             = ntv64.@tai@;
@@ -270,8 +270,8 @@ ntp_adjtime:([[nonnull]] struct timex *__restrict tntx) -> int {
 	int result;
 #ifdef __CRT_HAVE_ntp_adjtime
 	struct __timex32 nxtalt;
-	nxtalt.@time@.@tv_sec@  = (time32_t)ntx->@time@.@tv_sec@;
-	nxtalt.@time@.@tv_nsec@ = ntx->@time@.@tv_nsec@;
+	nxtalt.@time@.tv_sec  = (time32_t)ntx->@time@.tv_sec;
+	nxtalt.@time@.tv_nsec = ntx->@time@.tv_nsec;
 	nxtalt.@offset@    = (time32_t)ntx->@offset@;
 	nxtalt.@freq@      = (time32_t)ntx->@freq@;
 	nxtalt.@maxerror@  = (time32_t)ntx->@maxerror@;
@@ -291,8 +291,8 @@ ntp_adjtime:([[nonnull]] struct timex *__restrict tntx) -> int {
 /*	nxtalt.@tai@       = (time32_t)ntx->@tai@; */
 #else /* __CRT_HAVE_ntp_adjtime */
 	struct __timex64 nxtalt;
-	nxtalt.@time@.@tv_sec@  = (time64_t)ntx->@time@.@tv_sec@;
-	nxtalt.@time@.@tv_nsec@ = ntx->@time@.@tv_nsec@;
+	nxtalt.@time@.tv_sec  = (time64_t)ntx->@time@.tv_sec;
+	nxtalt.@time@.tv_nsec = ntx->@time@.tv_nsec;
 	nxtalt.@offset@    = (time64_t)ntx->@offset@;
 	nxtalt.@freq@      = (time64_t)ntx->@freq@;
 	nxtalt.@maxerror@  = (time64_t)ntx->@maxerror@;
@@ -320,8 +320,8 @@ ntp_adjtime:([[nonnull]] struct timex *__restrict tntx) -> int {
 #endif /* !__CRT_HAVE_ntp_adjtime */
 	if likely(result == 0) {
 #ifdef __CRT_HAVE_ntp_adjtime
-		ntx->@time@.@tv_sec@  = (time64_t)nxtalt.@time@.@tv_sec@;
-		ntx->@time@.@tv_nsec@ = nxtalt.@time@.@tv_nsec@;
+		ntx->@time@.tv_sec  = (time64_t)nxtalt.@time@.tv_sec;
+		ntx->@time@.tv_nsec = nxtalt.@time@.tv_nsec;
 		ntx->@offset@    = (time64_t)nxtalt.@offset@;
 		ntx->@freq@      = (time64_t)nxtalt.@freq@;
 		ntx->@maxerror@  = (time64_t)nxtalt.@maxerror@;
@@ -340,8 +340,8 @@ ntp_adjtime:([[nonnull]] struct timex *__restrict tntx) -> int {
 		ntx->@stbcnt@    = (time64_t)nxtalt.@stbcnt@;
 		ntx->@tai@       = (time64_t)nxtalt.@tai@;
 #else /* __CRT_HAVE_ntp_adjtime */
-		ntx->@time@.@tv_sec@  = (time32_t)nxtalt.@time@.@tv_sec@;
-		ntx->@time@.@tv_nsec@ = nxtalt.@time@.@tv_nsec@;
+		ntx->@time@.tv_sec  = (time32_t)nxtalt.@time@.tv_sec;
+		ntx->@time@.tv_nsec = nxtalt.@time@.tv_nsec;
 		ntx->@offset@    = (time32_t)nxtalt.@offset@;
 		ntx->@freq@      = (time32_t)nxtalt.@freq@;
 		ntx->@maxerror@  = (time32_t)nxtalt.@maxerror@;
@@ -373,8 +373,8 @@ ntp_adjtime:([[nonnull]] struct timex *__restrict tntx) -> int {
 adjtimex64:([[nonnull]] struct timex64 *__restrict ntx) -> int {
 	int result;
 	struct __timex32 nxtalt;
-	nxtalt.@time@.@tv_sec@  = (time32_t)ntx->@time@.@tv_sec@;
-	nxtalt.@time@.@tv_nsec@ = ntx->@time@.@tv_nsec@;
+	nxtalt.@time@.tv_sec  = (time32_t)ntx->@time@.tv_sec;
+	nxtalt.@time@.tv_nsec = ntx->@time@.tv_nsec;
 	nxtalt.@modes@     = ntx->@modes@;
 	nxtalt.@offset@    = (time32_t)ntx->@offset@;
 	nxtalt.@freq@      = (time32_t)ntx->@freq@;
@@ -396,8 +396,8 @@ adjtimex64:([[nonnull]] struct timex64 *__restrict ntx) -> int {
 /*	nxtalt.@tai@       = (time32_t)ntx->@tai@; */
 	result = adjtimex32(&nxtalt);
 	if likely(result == 0) {
-		ntx->@time@.@tv_sec@  = (time64_t)nxtalt.@time@.@tv_sec@;
-		ntx->@time@.@tv_nsec@ = nxtalt.@time@.@tv_nsec@;
+		ntx->@time@.tv_sec  = (time64_t)nxtalt.@time@.tv_sec;
+		ntx->@time@.tv_nsec = nxtalt.@time@.tv_nsec;
 		ntx->@modes@     = nxtalt.@modes@;
 		ntx->@offset@    = (time64_t)nxtalt.@offset@;
 		ntx->@freq@      = (time64_t)nxtalt.@freq@;
@@ -426,8 +426,8 @@ adjtimex64:([[nonnull]] struct timex64 *__restrict ntx) -> int {
 ntp_adjtime64:([[nonnull]] struct timex64 *__restrict tntx) -> int {
 	int result;
 	struct __timex32 nxtalt;
-	nxtalt.@time@.@tv_sec@  = (time32_t)tntx->@time@.@tv_sec@;
-	nxtalt.@time@.@tv_nsec@ = tntx->@time@.@tv_nsec@;
+	nxtalt.@time@.tv_sec  = (time32_t)tntx->@time@.tv_sec;
+	nxtalt.@time@.tv_nsec = tntx->@time@.tv_nsec;
 	nxtalt.@modes@     = tntx->@modes@;
 	nxtalt.@offset@    = (time32_t)tntx->@offset@;
 	nxtalt.@freq@      = (time32_t)tntx->@freq@;
@@ -449,8 +449,8 @@ ntp_adjtime64:([[nonnull]] struct timex64 *__restrict tntx) -> int {
 /*	nxtalt.@tai@       = (time32_t)tntx->@tai@; */
 	result = ntp_adjtime32(&nxtalt);
 	if likely(result == 0) {
-		tntx->@time@.@tv_sec@  = (time64_t)nxtalt.@time@.@tv_sec@;
-		tntx->@time@.@tv_nsec@ = nxtalt.@time@.@tv_nsec@;
+		tntx->@time@.tv_sec  = (time64_t)nxtalt.@time@.tv_sec;
+		tntx->@time@.tv_nsec = nxtalt.@time@.tv_nsec;
 		tntx->@modes@     = nxtalt.@modes@;
 		tntx->@offset@    = (time64_t)nxtalt.@offset@;
 		tntx->@freq@      = (time64_t)nxtalt.@freq@;
@@ -482,8 +482,8 @@ ntp_gettime64:([[nonnull]] struct ntptimeval64 *__restrict ntv) -> int {
 	struct __ntptimeval32 ntv32;
 	int result = ntp_gettime32(&ntv32);
 	if likely(result == 0) {
-		ntv->@time@.@tv_sec@   = (time64_t)ntv32.@time@.@tv_sec@;
-		ntv->@time@.@tv_nsec@  = ntv32.@time@.@tv_nsec@;
+		ntv->@time@.tv_sec   = (time64_t)ntv32.@time@.tv_sec;
+		ntv->@time@.tv_nsec  = ntv32.@time@.tv_nsec;
 		ntv->@maxerror@        = ntv32.@maxerror@;
 		ntv->@esterror@        = ntv32.@esterror@;
 		ntv->@tai@             = ntv32.@tai@;

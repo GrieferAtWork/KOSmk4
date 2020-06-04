@@ -1374,7 +1374,7 @@ wcspcpy:([[nonnull]] wchar_t *__restrict buf, [[nonnull]] wchar_t const *__restr
 @@Same as wcsncpy, but return a pointer after the last written character
 [ATTR_RETNONNULL][wchar][ATTR_LEAF]
 [section({.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory})]
-wcspncpy:([outp(buflen)] wchar_t *__restrict buf, [[nonnull]] wchar_t const *__restrict src, $size_t buflen) -> wchar_t * {
+wcspncpy:([[outp(buflen)]] wchar_t *__restrict buf, [[nonnull]] wchar_t const *__restrict src, $size_t buflen) -> wchar_t * {
 	$size_t srclen = wcsnlen(src, buflen);
 	wmemcpy(buf, src, srclen);
 	return wmempset(buf+srclen, '\0', buflen - srclen);

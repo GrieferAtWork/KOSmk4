@@ -1132,7 +1132,7 @@ mempmovedownb:([[nonnull]] /*aligned(1)*/ void *dst,
 
 @@Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_WORDS')
 [fast][libc][kernel][ATTR_LEAF][alias(memmovew)][if(__SIZEOF_WCHAR_T__ == 2), alias(wmemmove)]
-[dependency_include(<hybrid/__assert.h>)]
+[impl_include("<hybrid/__assert.h>")]
 memmoveupw:([[nonnull]] /*aligned(2)*/ void *dst,
             [[nonnull]] /*aligned(2)*/ void const *src,
             $size_t n_words) -> [== dst] $uint16_t * {
@@ -1147,7 +1147,7 @@ memmoveupw:([[nonnull]] /*aligned(2)*/ void *dst,
 
 @@Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_WORDS')
 [fast][libc][kernel][ATTR_LEAF][alias(memmovew)][if(__SIZEOF_WCHAR_T__ == 2), alias(wmemmove)]
-[dependency_include(<hybrid/__assert.h>)]
+[impl_include("<hybrid/__assert.h>")]
 memmovedownw:([[nonnull]] /*aligned(2)*/ void *dst,
               [[nonnull]] /*aligned(2)*/ void const *src,
               $size_t n_words) -> [== dst] $uint16_t * {
@@ -1178,7 +1178,7 @@ mempmovedownw:([[nonnull]] /*aligned(2)*/ void *dst,
 
 @@Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_DWORDS')
 [fast][libc][kernel][if(__SIZEOF_WCHAR_T__ == 4), alias(wmemmove)][alias(memmovel)][ATTR_LEAF]
-[dependency_include(<hybrid/__assert.h>)]
+[impl_include("<hybrid/__assert.h>")]
 memmoveupl:([[nonnull]] /*aligned(4)*/ void *dst,
             [[nonnull]] /*aligned(4)*/ void const *src,
             $size_t n_dwords) -> [== dst] $uint32_t * {
@@ -1678,7 +1678,7 @@ mempmoveq:([[nonnull]] /*aligned(8)*/ void *__restrict dst,
 
 @@Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_QWORDS')
 [fast][libc][kernel][ATTR_LEAF][alias(memmoveq)]
-[dependency_include(<hybrid/__assert.h>)]
+[impl_include("<hybrid/__assert.h>")]
 memmoveupq:([[nonnull]] /*aligned(8)*/ void *dst,
             [[nonnull]] /*aligned(8)*/ void const *src,
             $size_t n_qwords) -> [== dst] $uint64_t * {
@@ -1704,7 +1704,7 @@ memmoveupq:([[nonnull]] /*aligned(8)*/ void *dst,
 
 @@Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_QWORDS')
 [fast][libc][kernel][ATTR_LEAF][alias(memmoveq)]
-[dependency_include(<hybrid/__assert.h>)]
+[impl_include("<hybrid/__assert.h>")]
 memmovedownq:([[nonnull]] /*aligned(8)*/ void *dst,
               [[nonnull]] /*aligned(8)*/ void const *src,
               $size_t n_qwords) -> [== dst] $uint64_t * {
@@ -2421,7 +2421,7 @@ rawmemrxlenq:([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint6
 @@Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !N_BYTES')
 @@@return: * : Always re-returns `dst'
 [fast][libc][kernel][ATTR_LEAF]
-[dependency_include(<hybrid/__assert.h>)]
+[impl_include("<hybrid/__assert.h>")]
 memmoveup:([[nonnull]] void *dst, [[nonnull]] void const *src, $size_t n_bytes) -> [== dst] void * {
 	byte_t *pdst, *psrc;
 	pdst = (byte_t *)dst + n_bytes;
@@ -2435,7 +2435,7 @@ memmoveup:([[nonnull]] void *dst, [[nonnull]] void const *src, $size_t n_bytes) 
 @@Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !N_BYTES')
 @@@return: * : Always re-returns `dst'
 [fast][libc][kernel][ATTR_LEAF]
-[dependency_include(<hybrid/__assert.h>)]
+[impl_include("<hybrid/__assert.h>")]
 memmovedown:([[nonnull]] void *dst, [[nonnull]] void const *src, $size_t n_bytes) -> [== dst] void * {
 	byte_t *pdst, *psrc;
 	pdst = (byte_t *)dst;
@@ -5118,10 +5118,10 @@ strncpy_s:(char *dst, $size_t dstsize, char const *src, $size_t maxlen) -> $errn
 [alias(*)][attribute(*)] _strnicoll:(*) = strncasecoll;
 [alias(*)][attribute(*)] _strnicoll_l:(*) = strncasecoll_l;
 
-[section(.text.crt.dos.errno)][cp][ATTR_WUNUSED]
+[section(.text.crt.dos.errno)][[cp]][ATTR_WUNUSED]
 _strerror:(char const *message) -> char *;
 
-[section(.text.crt.dos.errno)][cp][dos_variant]
+[section(.text.crt.dos.errno)][[cp]][dos_variant]
 _strerror_s:([[nonnull]] char *__restrict buf, $size_t buflen, char const *message) -> $errno_t;
 
 [impl_include("<parts/errno.h>")]

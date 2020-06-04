@@ -356,7 +356,7 @@ class Function {
 
 	member declFilename: string;
 	member declLine: int;
-	member isCp: bool = false;       /* [cp] */
+	member isCp: bool = false;       /* [[cp]] */
 	member isNoReturn: bool = false; /* [noreturn] */
 	member isNoExcept: bool = false; /* [noexcept] */
 

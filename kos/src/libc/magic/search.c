@@ -192,6 +192,11 @@ struct _ENTRY;
 
 }
 
+%[define_replacement(ENTRY = "struct entry")]
+%[define_replacement(VISIT = int)]
+%[define_replacement(ACTION = int)]
+
+
 @@Search for entry matching ITEM.key in internal hash table.
 @@If ACTION is `FIND' return found entry or signal error by returning NULL.
 @@If ACTION is `ENTER' replace existing data (if any) with ITEM.data
@@ -210,8 +215,7 @@ struct @hsearch_data@ {
 #define __local_htab_defined 1
 @__LOCAL_LIBC_DATA@(htab) struct @hsearch_data@ htab = {NULL, 0, 0};
 #endif /* !__local_htab_defined */
-)][requires($has_function(hsearch_r))]
-[user][noexport][same_impl]
+)][requires($has_function(hsearch_r))][userimpl]
 hsearch:(ENTRY item, ACTION action) -> ENTRY * {
 	@ENTRY@ *result;
 	hsearch_r(item, action, &result, &htab);
@@ -234,8 +238,7 @@ struct @hsearch_data@ {
 #define __local_htab_defined 1
 @__LOCAL_LIBC_DATA@(htab) struct @hsearch_data@ htab = {NULL, 0, 0};
 #endif /* !__local_htab_defined */
-)][requires($has_function(hcreate_r))]
-[user][noexport][same_impl]
+)][requires($has_function(hcreate_r))][userimpl]
 hcreate:(size_t nel) -> int {
 	return hcreate_r(nel, &htab);
 }
@@ -256,8 +259,7 @@ struct @hsearch_data@ {
 #define __local_htab_defined 1
 @__LOCAL_LIBC_DATA@(htab) struct @hsearch_data@ htab = {NULL, 0, 0};
 #endif /* !__local_htab_defined */
-)][requires($has_function(hdestroy_r))]
-[user][noexport][same_impl]
+)][requires($has_function(hdestroy_r))][userimpl]
 hdestroy:() {
 	hdestroy_r(&htab);
 }
@@ -350,11 +352,9 @@ hsearch_r:(ENTRY item, ACTION action, ENTRY **retval, struct hsearch_data *htab)
 	return 0;
 }
 
-[doc_alias(hsearch_r)]
-[requires($has_function(calloc))][same_impl]
-[dependency_include(<hybrid/limitcore.h>)]
-[impl_include("<parts/errno.h>")]
-hcreate_r:(size_t nel, struct hsearch_data *htab) -> int {
+[[userimpl, requires_function(calloc), doc_alias(hsearch_r)]]
+[[impl_include("<hybrid/limitcore.h>", "<parts/errno.h>")]]
+int hcreate_r(size_t nel, struct hsearch_data *htab) {
 	typedef struct {
 		unsigned int used;
 		@ENTRY@        entry;
@@ -370,7 +370,7 @@ hcreate_r:(size_t nel, struct hsearch_data *htab) -> int {
 	if (nel < 3)
 		nel = 3;
 	for (nel |= 1; ; nel += 2) {
-		if (@__UINT_MAX__@ - 2 < nel) {
+		if (UINT_MAX - 2 < nel) {
 #ifdef ENOMEM
 			__libc_seterrno(ENOMEM);
 #endif /* ENOMEM */
@@ -386,9 +386,9 @@ hcreate_r:(size_t nel, struct hsearch_data *htab) -> int {
 		return 0;
 	return 1;
 }
-[doc_alias(hsearch_r)]
-[requires($has_function(free))][same_impl]
-[impl_include("<parts/errno.h>")]
+
+[[doc_alias(hsearch_r), impl_include("<parts/errno.h>")]]
+[[userimpl, requires($has_function(free))]]
 hdestroy_r:(struct hsearch_data *htab) {
 	if (htab == NULL) {
 #ifdef EINVAL
@@ -415,7 +415,7 @@ hdestroy_r:(struct hsearch_data *htab) {
 @@comparison values that determined which way was taken in the tree to reach
 @@ROOTP. MODE is 1 if we need not do the split, but must check for two red
 @@edges between GPARENTP and ROOTP
-[ignore]
+[[ignore, nocrt]]
 maybe_split_for_insert:(void **rootp, void **parentp, void **gparentp, int p_r, int gp_r, int mode) {
 	typedef struct node_struct {
 		void const         *key;
@@ -473,8 +473,8 @@ maybe_split_for_insert:(void **rootp, void **parentp, void **gparentp, int p_r, 
 
 @@Search for an entry matching the given KEY in the tree
 @@pointed to by *ROOTP and insert a new element if not found
-[requires_function("malloc")][same_impl][export_alias(__tsearch)]
-tsearch:(void const *key, void **vrootp, __compar_fn_t compar) -> void * {
+[[userimpl, requires_function("malloc"), export_alias("__tsearch")]]
+void *tsearch(void const *key, void **vrootp, __compar_fn_t compar) {
 	typedef struct node_struct {
 		void const         *key;
 		struct node_struct *left_node;
@@ -525,8 +525,8 @@ tsearch:(void const *key, void **vrootp, __compar_fn_t compar) -> void * {
 
 @@Search for an entry matching the given KEY in the tree pointed
 @@to by *ROOTP. If no matching entry is available return NULL
-[export_alias(__tfind)]
-tfind:(void const *key, void *const *vrootp, __compar_fn_t compar) -> void * {
+[[export_alias("__tfind")]]
+void *tfind(void const *key, void *const *vrootp, __compar_fn_t compar) {
 	typedef struct node_struct {
 		void const         *key;
 		struct node_struct *left_node;
@@ -549,9 +549,9 @@ tfind:(void const *key, void *const *vrootp, __compar_fn_t compar) -> void * {
 }
 
 @@Remove the element matching KEY from the tree pointed to by *ROOTP
-[requires($has_function(free))][same_impl]
-[dependency_include(<hybrid/typecore.h>)]
-[dependency_include(<malloca.h>)][export_alias(__tdelete)]
+[[export_alias(__tdelete)]]
+[[dependency_include(<hybrid/typecore.h>, <malloca.h>)]]
+[[userimpl, requires_function(free)]]
 tdelete:(void const *__restrict key, void **__restrict vrootp, __compar_fn_t compar) -> void * {
 	typedef struct node_struct {
 		void const         *key;
@@ -772,7 +772,7 @@ typedef void (*__free_fn_t) (void *__nodep);
 }
 
 @@Destroy the whole tree, call FREEFCT for each node or leaf
-[requires($has_function(free))][same_impl]
+[requires($has_function(free))][userimpl]
 tdestroy:(void *root, __free_fn_t freefct) {
 again:
 	if (root) {
@@ -797,9 +797,9 @@ again:
 
 
 @@Perform linear search for KEY by comparing by COMPAR in an array [BASE, BASE+NMEMB*SIZE)
-lfind:(void const *key, void const *base, size_t *nmemb, size_t size, __compar_fn_t compar) -> void *
-	[(void const *key, void *base, size_t *nmemb, size_t size, __compar_fn_t compar) -> void *]
-	[(void const *key, void const *base, size_t *nmemb, size_t size, __compar_fn_t compar) -> void const *]
+void *lfind:(void const *key, void const *base, size_t *nmemb, size_t size, __compar_fn_t compar)
+	[(void const *key, void *base, size_t *nmemb, size_t size, __compar_fn_t compar): void *]
+	[(void const *key, void const *base, size_t *nmemb, size_t size, __compar_fn_t compar): void const *]
 {
 	size_t i, count = *nmemb;
 	void const *result = base;

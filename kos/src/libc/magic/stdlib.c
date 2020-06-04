@@ -718,7 +718,7 @@ wcstombs:(char *__restrict dst, wchar_t const *__restrict src, size_t dstlen) ->
 	return wcsrtombs(dst, (wchar_t const **)&src, dstlen, NULL);
 }
 
-[section(.text.crt.fs.exec.system)][cp][std][std_guard]
+[section(.text.crt.fs.exec.system)][[cp]][std][std_guard]
 system:([[nullable]] char const *__restrict command) -> int;
 
 
@@ -1360,7 +1360,7 @@ rand_r:([[nonnull]] unsigned int *__restrict pseed) -> int {
 %#ifdef __USE_MISC
 %[insert:extern(cfree)]
 %#ifndef __NO_FPU
-[cp] getloadavg:(double loadavg[], int nelem) -> int;
+[[cp]] getloadavg:(double loadavg[], int nelem) -> int;
 %#endif /* !__NO_FPU */
 %#endif /* __USE_MISC */
 
@@ -1452,7 +1452,7 @@ setstate:([[nonnull]] char *statebuf) -> char *;
 @@@param: resolved: A buffer of `PATH_MAX' bytes to-be filled with the resulting
 @@                  path, or NULL to automatically `malloc()'ate and return a
 @@                  buffer of sufficient size.
-[section(.text.crt.fs.property)][cp][ATTR_WUNUSED]
+[section(.text.crt.fs.property)][[cp]][ATTR_WUNUSED]
 realpath:([[nonnull]] char const *__restrict filename, char *resolved) -> char *;
 %#endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 
@@ -1467,7 +1467,7 @@ realpath:([[nonnull]] char const *__restrict filename, char *resolved) -> char *
 @@NOTE: You may also pass `NULL' for `resolved' to have a buffer of `buflen'
 @@      bytes automatically allocated in the heap, ontop of which you may also
 @@      pass `0' for `buflen' to automatically determine the required buffer size.
-[section(.text.crt.fs.property)][cp][ATTR_WUNUSED]
+[section(.text.crt.fs.property)][[cp]][ATTR_WUNUSED]
 frealpath:($fd_t fd, char *resolved, $size_t buflen) -> char *;
 %#endif /* __USE_MISC || __USE_XOPEN_EXTENDED || __USE_KOS */
 
@@ -1479,7 +1479,7 @@ frealpath:($fd_t fd, char *resolved, $size_t buflen) -> char *;
 @@NOTE: You may also pass `NULL' for `resolved' to have a buffer of `buflen'
 @@      bytes automatically allocated in the heap, ontop of which you may also
 @@      pass `0' for `buflen' to automatically determine the required buffer size.
-[section(.text.crt.fs.property)][cp][ATTR_WUNUSED]
+[section(.text.crt.fs.property)][[cp]][ATTR_WUNUSED]
 frealpath4:($fd_t fd, char *resolved, $size_t buflen, $atflag_t flags) -> char *;
 
 @@Returns the absolute filesystem path for the specified file
@@ -1490,7 +1490,7 @@ frealpath4:($fd_t fd, char *resolved, $size_t buflen, $atflag_t flags) -> char *
 @@      bytes automatically allocated in the heap, ontop of which you may also
 @@      pass `0' for `buflen' to automatically determine the required buffer size.
 @@@param flags: Set of `0|AT_ALTPATH|AT_SYMLINK_FOLLOW|AT_DOSPATH'
-[section(.text.crt.fs.property)][cp][ATTR_WUNUSED]
+[section(.text.crt.fs.property)][[cp]][ATTR_WUNUSED]
 frealpathat:($fd_t dirfd, [[nonnull]] char const *filename,
              char *resolved, $size_t buflen, $atflag_t flags) -> char *;
 %#endif /* __USE_KOS */
@@ -1641,7 +1641,7 @@ unlockpt:($fd_t fd) -> int;
 
 %
 %#ifdef __USE_XOPEN2KXSI
-[cp][ATTR_WUNUSED] posix_openpt:($oflag_t oflags) -> int;
+[[cp]][ATTR_WUNUSED] posix_openpt:($oflag_t oflags) -> int;
 %#endif /* __USE_XOPEN2KXSI */
 
 
@@ -1725,28 +1725,28 @@ secure_getenv:([[nonnull]] char const *varname) -> char *;
 %[default_impl_section(.text.crt.io.tty)]
 ptsname_r:($fd_t fd, [[nonnull]] char *buf, $size_t buflen) -> int;
 
-[cp] getpt:() -> int;
+[[cp]] getpt:() -> int;
 
 %[default_impl_section(.text.crt.fs.property)]
 @@Return the result of `realpath(filename)' as a `malloc()'-allocated buffer
 @@Upon error, `NULL' is returned instead
-[cp][ATTR_MALLOC][ATTR_WUNUSED]
+[[cp]][ATTR_MALLOC][ATTR_WUNUSED]
 canonicalize_file_name:([[nonnull]] char const *filename) -> char *;
 
 %[default_impl_section(.text.crt.fs.utility)]
 [if(defined(__USE_FILE_OFFSET64)), preferred_alias(mkostemp64)]
-[cp][ATTR_WUNUSED][alias(mkostemp64)]
+[[cp]][ATTR_WUNUSED][alias(mkostemp64)]
 mkostemp:([[nonnull]] char *template_, int flags) -> int;
 
 [if(defined(__USE_FILE_OFFSET64)), preferred_alias(mkostemps64)]
-[cp][ATTR_WUNUSED][alias(mkostemps64)]
+[[cp]][ATTR_WUNUSED][alias(mkostemps64)]
 mkostemps:([[nonnull]] char *template_, int suffixlen, int flags) -> int;
 
 %#ifdef __USE_LARGEFILE64
-[cp][ATTR_WUNUSED][largefile64_variant_of(mkostemp)]
+[[cp]][ATTR_WUNUSED][largefile64_variant_of(mkostemp)]
 mkostemp64:([[nonnull]] char *template_, int flags) -> int;
 
-[cp][ATTR_WUNUSED][largefile64_variant_of(mkostemps)]
+[[cp]][ATTR_WUNUSED][largefile64_variant_of(mkostemps)]
 mkostemps64:([[nonnull]] char *template_, int suffixlen, int flags) -> int;
 %#endif /* __USE_LARGEFILE64 */
 %#endif /* __USE_GNU */
@@ -2941,7 +2941,7 @@ _aligned_free:(void *aligned_mallptr) {
 %
 %#define _CVTBUFSIZE   349
 %[default_impl_section(.text.crt.dos.fs.utility)]
-[cp] _fullpath:(char *buf, char const *path, $size_t buflen) -> char *;
+[[cp]] _fullpath:(char *buf, char const *path, $size_t buflen) -> char *;
 
 %[default_impl_section(.text.crt.unicode.static.convert)]
 
@@ -3103,14 +3103,14 @@ _putenv_s:(char const *varname, char const *val) -> errno_t {
 }
 
 %[default_impl_section(.text.crt.dos.fs.utility)]
-[cp][requires($has_function(_searchenv_s))][same_impl]
+[[cp]][requires($has_function(_searchenv_s))][same_impl]
 _searchenv:([[nonnull]] char const *file,
             [[nonnull]] char const *envvar,
             [[nonnull]] char *__restrict resultpath) {
 	_searchenv_s(file, envvar, resultpath, ($size_t)-1);
 }
 
-[cp]
+[[cp]]
 _searchenv_s:([[nonnull]] char const *file,
               [[nonnull]] char const *envvar,
               [[nonnull]] char *__restrict resultpath,
@@ -3287,7 +3287,7 @@ _beep:(unsigned int freq, unsigned int duration);
 %#endif /* !_CRT_WPERROR_DEFINED */
 
 %[default_impl_section(.text.crt.dos.system)]
-[cp] _sleep:($u32 duration) = sleep;
+[[cp]] _sleep:($u32 duration) = sleep;
 
 %
 %{

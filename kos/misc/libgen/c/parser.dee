@@ -266,7 +266,7 @@ again:
 			++i;
 			if (ch.isspace())
 				continue;
-			if (ch.issymstrt() || ch.isalnum()) {
+			if (ch.issymstrt()) {
 				while (i < end && text.issymcont(i))
 					++i;
 done:
@@ -285,6 +285,12 @@ done:
 					this.tok = result;
 				}
 				return result;
+			}
+			if (ch.isnumeric()) {
+				/* Integer constant / float */
+				while (i < end && (text.issymcont(i) || text[i] in "."))
+					++i;
+				goto done;
 			}
 			if (i < end) {
 				/* Check for multi-character tokens */

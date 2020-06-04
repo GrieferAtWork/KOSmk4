@@ -211,16 +211,16 @@ __SYSDECL_BEGIN
 
 
 /* Mount a filesystem. */
-[cp]
+[[cp]]
 mount:([[nullable]] char const *special_file, [[nullable]] char const *dir,
        [[nullable]] char const *fstype, unsigned long int mountflags,
        [[nullable]] void const *data) -> int;
 
-[cp][noexport][crt_requires(umount2)]
+[[cp]][noexport][crt_requires(umount2)]
 umount:([[nullable]] char const *special_file) -> int {
 	return umount2(special_file, 0);
 }
-[cp] umount2:([[nullable]] char const *special_file, int flags) -> int;
+[[cp]] umount2:([[nullable]] char const *special_file, int flags) -> int;
 
 %{
 #endif /* __CC__ */

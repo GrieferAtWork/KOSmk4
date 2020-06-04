@@ -597,7 +597,7 @@ __NAMESPACE_LOCAL_END
 [dependency_prefix(
 #include <parts/errno.h>
 )][std][std_guard]
-asctime_s:([outp(buflen)] char *__restrict buf, size_t buflen,
+asctime_s:([[outp(buflen)]] char *__restrict buf, size_t buflen,
            [[nonnull]] struct tm const *__restrict tp) -> $errno_t {
 	if (buflen < 26)
 		return __ERANGE;
@@ -958,7 +958,7 @@ timelocal64:([[nonnull]] __STRUCT_TM *tp) -> $time64_t = mktime64;
 %
 %#ifdef __USE_POSIX199309
 
-[ignore][cp][doc_alias(nanosleep)][export_alias(__nanosleep)]
+[ignore][[cp]][doc_alias(nanosleep)][export_alias(__nanosleep)]
 nanosleep32:([[nonnull]] struct timespec const *requested_time,
              [[nullable]] struct $timespec32 *remaining) -> int = nanosleep?;
 
@@ -967,29 +967,29 @@ nanosleep32:([[nonnull]] struct timespec const *requested_time,
 [if(defined(__USE_TIME_BITS64)), preferred_alias(nanosleep64)]
 [if(!defined(__USE_TIME_BITS64)), preferred_alias(nanosleep)]
 [requires($has_function(nanosleep32) || $has_function(nanosleep64))]
-[cp][export_alias(__nanosleep)]
+[[cp]][export_alias(__nanosleep)]
 nanosleep:([[nonnull]] struct timespec const *requested_time,
            [[nullable]] struct timespec *remaining) -> int {
 @@if_has_function(nanosleep32)@@
 	int result;
 	struct @__timespec32@ req32, rem32;
-	req32.@tv_sec@  = (__time32_t)requested_time->@tv_sec@;
-	req32.@tv_nsec@ = requested_time->@tv_nsec@;
+	req32.tv_sec  = (__time32_t)requested_time->tv_sec;
+	req32.tv_nsec = requested_time->tv_nsec;
 	result = nanosleep32(&req32, &rem32);
 	if (!result && remaining) {
-		remaining->@tv_sec@  = (__time64_t)rem32.@tv_sec@;
-		remaining->@tv_nsec@ = rem32.@tv_nsec@;
+		remaining->tv_sec  = (__time64_t)rem32.tv_sec;
+		remaining->tv_nsec = rem32.tv_nsec;
 	}
 	return result;
 @@else_has_function(nanosleep32)@@
 	int result;
 	struct @__timespec64@ req64, rem64;
-	req64.@tv_sec@  = (__time64_t)requested_time->@tv_sec@;
-	req64.@tv_nsec@ = requested_time->@tv_nsec@;
+	req64.tv_sec  = (__time64_t)requested_time->tv_sec;
+	req64.tv_nsec = requested_time->tv_nsec;
 	result = nanosleep64(&req64, &rem64);
 	if (!result && remaining) {
-		remaining->@tv_sec@  = (__time32_t)rem64.@tv_sec@;
-		remaining->@tv_nsec@ = rem64.@tv_nsec@;
+		remaining->tv_sec  = (__time32_t)rem64.tv_sec;
+		remaining->tv_nsec = rem64.tv_nsec;
 	}
 	return result;
 @@endif_has_function(nanosleep32)@@
@@ -1010,8 +1010,8 @@ clock_getres:(clockid_t clock_id, [[nonnull]] struct timespec *res) -> int {
 	struct @__timespec32@ res32;
 	result = clock_getres32(clock_id, &res32);
 	if (!result) {
-		res->@tv_sec@  = (__time64_t)res32.@tv_sec@;
-		res->@tv_nsec@ = res32.@tv_nsec@;
+		res->tv_sec  = (__time64_t)res32.tv_sec;
+		res->tv_nsec = res32.tv_nsec;
 	}
 	return result;
 @@else_has_function(clock_getres32)@@
@@ -1019,8 +1019,8 @@ clock_getres:(clockid_t clock_id, [[nonnull]] struct timespec *res) -> int {
 	struct @__timespec64@ res64;
 	result = clock_getres64(clock_id, &res64);
 	if (!result) {
-		res->@tv_sec@  = (__time32_t)res64.@tv_sec@;
-		res->@tv_nsec@ = res64.@tv_nsec@;
+		res->tv_sec  = (__time32_t)res64.tv_sec;
+		res->tv_nsec = res64.tv_nsec;
 	}
 	return result;
 @@endif_has_function(clock_getres32)@@
@@ -1041,8 +1041,8 @@ clock_gettime:(clockid_t clock_id, [[nonnull]] struct timespec *tp) -> int {
 	struct @__timespec32@ res32;
 	result = clock_gettime32(clock_id, &res32);
 	if (!result) {
-		tp->@tv_sec@  = (__time64_t)res32.@tv_sec@;
-		tp->@tv_nsec@ = res32.@tv_nsec@;
+		tp->tv_sec  = (__time64_t)res32.tv_sec;
+		tp->tv_nsec = res32.tv_nsec;
 	}
 	return result;
 @@else_has_function(clock_gettime32)@@
@@ -1050,8 +1050,8 @@ clock_gettime:(clockid_t clock_id, [[nonnull]] struct timespec *tp) -> int {
 	struct @__timespec64@ res64;
 	result = clock_gettime64(clock_id, &res64);
 	if (!result) {
-		tp->@tv_sec@  = (__time32_t)res64.@tv_sec@;
-		tp->@tv_nsec@ = res64.@tv_nsec@;
+		tp->tv_sec  = (__time32_t)res64.tv_sec;
+		tp->tv_nsec = res64.tv_nsec;
 	}
 	return result;
 @@endif_has_function(clock_gettime32)@@
@@ -1071,13 +1071,13 @@ clock_settime32:(clockid_t clock_id, [[nonnull]] struct $timespec32 const *tp) -
 clock_settime:(clockid_t clock_id, [[nonnull]] struct timespec const *tp) -> int {
 @@if_has_function(clock_settime32)@@
 	struct @__timespec32@ tp32;
-	tp32.@tv_sec@  = (__time32_t)tp->@tv_sec@;
-	tp32.@tv_nsec@ = tp->@tv_nsec@;
+	tp32.tv_sec  = (__time32_t)tp->tv_sec;
+	tp32.tv_nsec = tp->tv_nsec;
 	return clock_settime32(clock_id, &tp32);
 @@else_has_function(clock_settime32)@@
 	struct @__timespec64@ tp64;
-	tp64.@tv_sec@  = (__time64_t)tp->@tv_sec@;
-	tp64.@tv_nsec@ = tp->@tv_nsec@;
+	tp64.tv_sec  = (__time64_t)tp->tv_sec;
+	tp64.tv_nsec = tp->tv_nsec;
 	return clock_settime64(clock_id, &tp64);
 @@endif_has_function(clock_settime32)@@
 }
@@ -1111,31 +1111,31 @@ timer_settime:(timer_t timerid, int flags,
 @@if_has_function(timer_settime32)@@
 	int result;
 	struct __itimerspec32 value32, ovalue32;
-	value32.it_interval.@tv_sec@  = (__time32_t)value->it_interval.@tv_sec@;
-	value32.it_interval.@tv_nsec@ = value->it_interval.@tv_nsec@;
-	value32.it_value.@tv_sec@     = (__time32_t)value->it_value.@tv_sec@;
-	value32.it_value.@tv_nsec@    = value->it_value.@tv_nsec@;
+	value32.it_interval.tv_sec  = (__time32_t)value->it_interval.tv_sec;
+	value32.it_interval.tv_nsec = value->it_interval.tv_nsec;
+	value32.it_value.tv_sec     = (__time32_t)value->it_value.tv_sec;
+	value32.it_value.tv_nsec    = value->it_value.tv_nsec;
 	result = timer_settime32(timerid, flags, &value32, ovalue ? &ovalue32 : NULL);
 	if (!result && ovalue) {
-		ovalue->it_interval.@tv_sec@  = (__time64_t)ovalue32.it_interval.@tv_sec@;
-		ovalue->it_interval.@tv_nsec@ = ovalue32.it_interval.@tv_nsec@;
-		ovalue->it_value.@tv_sec@     = (__time64_t)ovalue32.it_value.@tv_sec@;
-		ovalue->it_value.@tv_nsec@    = ovalue32.it_value.@tv_nsec@;
+		ovalue->it_interval.tv_sec  = (__time64_t)ovalue32.it_interval.tv_sec;
+		ovalue->it_interval.tv_nsec = ovalue32.it_interval.tv_nsec;
+		ovalue->it_value.tv_sec     = (__time64_t)ovalue32.it_value.tv_sec;
+		ovalue->it_value.tv_nsec    = ovalue32.it_value.tv_nsec;
 	}
 	return result;
 @@else_has_function(timer_settime32)@@
 	int result;
 	struct __itimerspec64 value64, ovalue64;
-	value64.it_interval.@tv_sec@  = (__time64_t)value->it_interval.@tv_sec@;
-	value64.it_interval.@tv_nsec@ = value->it_interval.@tv_nsec@;
-	value64.it_value.@tv_sec@     = (__time64_t)value->it_value.@tv_sec@;
-	value64.it_value.@tv_nsec@    = value->it_value.@tv_nsec@;
+	value64.it_interval.tv_sec  = (__time64_t)value->it_interval.tv_sec;
+	value64.it_interval.tv_nsec = value->it_interval.tv_nsec;
+	value64.it_value.tv_sec     = (__time64_t)value->it_value.tv_sec;
+	value64.it_value.tv_nsec    = value->it_value.tv_nsec;
 	result = timer_settime64(timerid, flags, &value64, ovalue ? &ovalue64 : NULL);
 	if (!result && ovalue) {
-		ovalue->it_interval.@tv_sec@  = (__time32_t)ovalue64.it_interval.@tv_sec@;
-		ovalue->it_interval.@tv_nsec@ = ovalue64.it_interval.@tv_nsec@;
-		ovalue->it_value.@tv_sec@     = (__time32_t)ovalue64.it_value.@tv_sec@;
-		ovalue->it_value.@tv_nsec@    = ovalue64.it_value.@tv_nsec@;
+		ovalue->it_interval.tv_sec  = (__time32_t)ovalue64.it_interval.tv_sec;
+		ovalue->it_interval.tv_nsec = ovalue64.it_interval.tv_nsec;
+		ovalue->it_value.tv_sec     = (__time32_t)ovalue64.it_value.tv_sec;
+		ovalue->it_value.tv_nsec    = ovalue64.it_value.tv_nsec;
 	}
 	return result;
 @@endif_has_function(timer_settime32)@@
@@ -1157,10 +1157,10 @@ timer_gettime:(timer_t timerid, [[nonnull]] struct itimerspec *value) -> int {
 	struct __itimerspec32 value32;
 	result = timer_gettime32(timerid, &value32);
 	if (!result) {
-		value->it_interval.@tv_sec@  = (__time64_t)value32.it_interval.@tv_sec@;
-		value->it_interval.@tv_nsec@ = value32.it_interval.@tv_nsec@;
-		value->it_value.@tv_sec@     = (__time64_t)value32.it_value.@tv_sec@;
-		value->it_value.@tv_nsec@    = value32.it_value.@tv_nsec@;
+		value->it_interval.tv_sec  = (__time64_t)value32.it_interval.tv_sec;
+		value->it_interval.tv_nsec = value32.it_interval.tv_nsec;
+		value->it_value.tv_sec     = (__time64_t)value32.it_value.tv_sec;
+		value->it_value.tv_nsec    = value32.it_value.tv_nsec;
 	}
 	return result;
 @@else_has_function(timer_gettime32)@@
@@ -1168,10 +1168,10 @@ timer_gettime:(timer_t timerid, [[nonnull]] struct itimerspec *value) -> int {
 	struct __itimerspec64 value64;
 	result = timer_gettime64(timerid, &value64);
 	if (!result) {
-		value->it_interval.@tv_sec@  = (__time32_t)value64.it_interval.@tv_sec@;
-		value->it_interval.@tv_nsec@ = value64.it_interval.@tv_nsec@;
-		value->it_value.@tv_sec@     = (__time32_t)value64.it_value.@tv_sec@;
-		value->it_value.@tv_nsec@    = value64.it_value.@tv_nsec@;
+		value->it_interval.tv_sec  = (__time32_t)value64.it_interval.tv_sec;
+		value->it_interval.tv_nsec = value64.it_interval.tv_nsec;
+		value->it_value.tv_sec     = (__time32_t)value64.it_value.tv_sec;
+		value->it_value.tv_nsec    = value64.it_value.tv_nsec;
 	}
 	return result;
 @@endif_has_function(timer_gettime32)@@
@@ -1183,7 +1183,7 @@ timer_getoverrun:(timer_t timerid) -> int;
 
 %
 %#ifdef __USE_XOPEN2K
-[ignore][cp][doc_alias(clock_nanosleep)][alias(__clock_nanosleep)]
+[ignore][[cp]][doc_alias(clock_nanosleep)][alias(__clock_nanosleep)]
 clock_nanosleep32:(clockid_t clock_id, int flags,
                    [[nonnull]] struct $timespec32 const *__restrict requested_time,
                    [[nullable]] struct $timespec32 *remaining) -> int = clock_nanosleep?;
@@ -1194,29 +1194,29 @@ clock_nanosleep32:(clockid_t clock_id, int flags,
 [if(!defined(__USE_TIME_BITS64)), preferred_alias(clock_nanosleep, __clock_nanosleep)]
 [requires($has_function(clock_nanosleep32) || $has_function(clock_nanosleep64))]
 [alternate_name(__clock_nanosleep)]
-[cp] clock_nanosleep:(clockid_t clock_id, int flags,
+[[cp]] clock_nanosleep:(clockid_t clock_id, int flags,
                       [[nonnull]] struct timespec const *__restrict requested_time,
                       [[nullable]] struct timespec *remaining) -> int {
 @@if_has_function(clock_nanosleep32)@@
 	int result;
 	struct @__timespec32 @req32, rem32;
-	req32.@tv_sec@  = (__time32_t)requested_time->@tv_sec@;
-	req32.@tv_nsec@ = requested_time->@tv_nsec@;
+	req32.tv_sec  = (__time32_t)requested_time->tv_sec;
+	req32.tv_nsec = requested_time->tv_nsec;
 	result = clock_nanosleep32(clock_id, flags, &req32, &rem32);
 	if (!result && remaining) {
-		remaining->@tv_sec@  = (__time64_t)rem32.@tv_sec@;
-		remaining->@tv_nsec@ = rem32.@tv_nsec@;
+		remaining->tv_sec  = (__time64_t)rem32.tv_sec;
+		remaining->tv_nsec = rem32.tv_nsec;
 	}
 	return result;
 @@else_has_function(clock_nanosleep32)@@
 	int result;
 	struct @__timespec64 @req64, rem64;
-	req64.@tv_sec@  = (__time64_t)requested_time->@tv_sec@;
-	req64.@tv_nsec@ = requested_time->@tv_nsec@;
+	req64.tv_sec  = (__time64_t)requested_time->tv_sec;
+	req64.tv_nsec = requested_time->tv_nsec;
 	result = clock_nanosleep64(clock_id, flags, &req64, &rem64);
 	if (!result && remaining) {
-		remaining->@tv_sec@  = (__time32_t)rem64.@tv_sec@;
-		remaining->@tv_nsec@ = rem64.@tv_nsec@;
+		remaining->tv_sec  = (__time32_t)rem64.tv_sec;
+		remaining->tv_nsec = rem64.tv_nsec;
 	}
 	return result;
 @@endif_has_function(clock_nanosleep32)@@
@@ -1229,17 +1229,17 @@ clock_getcpuclockid:(pid_t pid, clockid_t *clock_id) -> int;
 
 %
 %#ifdef __USE_TIME64
-[requires($has_function(nanosleep32))][cp][time64_variant_of(nanosleep)]
+[requires($has_function(nanosleep32))][[cp]][time64_variant_of(nanosleep)]
 nanosleep64:([[nonnull]] struct $timespec64 const *__restrict requested_time,
 			 [[nullable]] struct $timespec64 *remaining) -> int {
 	int result;
 	struct @__timespec32@ req32, rem32;
-	req32.@tv_sec@  = (__time32_t)requested_time->@tv_sec@;
-	req32.@tv_nsec@ = requested_time->@tv_nsec@;
+	req32.tv_sec  = (__time32_t)requested_time->tv_sec;
+	req32.tv_nsec = requested_time->tv_nsec;
 	result = nanosleep32(&req32, &rem32);
 	if (!result && remaining) {
-		remaining->@tv_sec@  = (__time64_t)rem32.@tv_sec@;
-		remaining->@tv_nsec@ = rem32.@tv_nsec@;
+		remaining->tv_sec  = (__time64_t)rem32.tv_sec;
+		remaining->tv_nsec = rem32.tv_nsec;
 	}
 	return result;
 }
@@ -1250,8 +1250,8 @@ clock_getres64:(clockid_t clock_id, [[nonnull]] struct $timespec64 *res) -> int 
 	struct @__timespec32@ res32;
 	result = clock_getres32(clock_id, &res32);
 	if (!result) {
-		res->@tv_sec@  = (__time64_t)res32.@tv_sec@;
-		res->@tv_nsec@ = res32.@tv_nsec@;
+		res->tv_sec  = (__time64_t)res32.tv_sec;
+		res->tv_nsec = res32.tv_nsec;
 	}
 	return result;
 }
@@ -1262,8 +1262,8 @@ clock_gettime64:(clockid_t clock_id, [[nonnull]] struct $timespec64 *tp) -> int 
 	struct @__timespec32@ res32;
 	result = clock_gettime32(clock_id, &res32);
 	if (!result) {
-		tp->@tv_sec@  = (__time64_t)res32.@tv_sec@;
-		tp->@tv_nsec@ = res32.@tv_nsec@;
+		tp->tv_sec  = (__time64_t)res32.tv_sec;
+		tp->tv_nsec = res32.tv_nsec;
 	}
 	return result;
 }
@@ -1271,8 +1271,8 @@ clock_gettime64:(clockid_t clock_id, [[nonnull]] struct $timespec64 *tp) -> int 
 [requires($has_function(clock_settime32))][time64_variant_of(clock_settime)]
 clock_settime64:(clockid_t clock_id, [[nonnull]] struct $timespec64 const *tp) -> int {
 	struct @__timespec32@ tp32;
-	tp32.@tv_sec@  = (__time32_t)tp->@tv_sec@;
-	tp32.@tv_nsec@ = tp->@tv_nsec@;
+	tp32.tv_sec  = (__time32_t)tp->tv_sec;
+	tp32.tv_nsec = tp->tv_nsec;
 	return clock_settime32(clock_id, &tp32);
 }
 
@@ -1283,16 +1283,16 @@ timer_settime64:(timer_t timerid, int flags,
                  [[nullable]] struct $itimerspec64 *__restrict ovalue) -> int {
 	int result;
 	struct __itimerspec32 value32, ovalue32;
-	value32.it_interval.@tv_sec@  = (__time32_t)value->it_interval.@tv_sec@;
-	value32.it_interval.@tv_nsec@ = value->it_interval.@tv_nsec@;
-	value32.it_value.@tv_sec@     = (__time32_t)value->it_value.@tv_sec@;
-	value32.it_value.@tv_nsec@    = value->it_value.@tv_nsec@;
+	value32.it_interval.tv_sec  = (__time32_t)value->it_interval.tv_sec;
+	value32.it_interval.tv_nsec = value->it_interval.tv_nsec;
+	value32.it_value.tv_sec     = (__time32_t)value->it_value.tv_sec;
+	value32.it_value.tv_nsec    = value->it_value.tv_nsec;
 	result = timer_settime32(timerid, flags, &value32, ovalue ? &ovalue32 : NULL);
 	if (!result && ovalue) {
-		ovalue->it_interval.@tv_sec@  = (__time64_t)ovalue32.it_interval.@tv_sec@;
-		ovalue->it_interval.@tv_nsec@ = ovalue32.it_interval.@tv_nsec@;
-		ovalue->it_value.@tv_sec@     = (__time64_t)ovalue32.it_value.@tv_sec@;
-		ovalue->it_value.@tv_nsec@    = ovalue32.it_value.@tv_nsec@;
+		ovalue->it_interval.tv_sec  = (__time64_t)ovalue32.it_interval.tv_sec;
+		ovalue->it_interval.tv_nsec = ovalue32.it_interval.tv_nsec;
+		ovalue->it_value.tv_sec     = (__time64_t)ovalue32.it_value.tv_sec;
+		ovalue->it_value.tv_nsec    = ovalue32.it_value.tv_nsec;
 	}
 	return result;
 }
@@ -1304,28 +1304,28 @@ timer_gettime64:(timer_t timerid, [[nonnull]] struct $itimerspec64 *value) -> in
 	struct __itimerspec32 value32;
 	result = timer_gettime32(timerid, &value32);
 	if (!result) {
-		value->it_interval.@tv_sec@  = (__time64_t)value32.it_interval.@tv_sec@;
-		value->it_interval.@tv_nsec@ = value32.it_interval.@tv_nsec@;
-		value->it_value.@tv_sec@     = (__time64_t)value32.it_value.@tv_sec@;
-		value->it_value.@tv_nsec@    = value32.it_value.@tv_nsec@;
+		value->it_interval.tv_sec  = (__time64_t)value32.it_interval.tv_sec;
+		value->it_interval.tv_nsec = value32.it_interval.tv_nsec;
+		value->it_value.tv_sec     = (__time64_t)value32.it_value.tv_sec;
+		value->it_value.tv_nsec    = value32.it_value.tv_nsec;
 	}
 	return result;
 }
 
 %
 %#ifdef __USE_XOPEN2K
-[requires($has_function(clock_nanosleep32))][cp][time64_variant_of(clock_nanosleep)]
+[requires($has_function(clock_nanosleep32))][[cp]][time64_variant_of(clock_nanosleep)]
 clock_nanosleep64:(clockid_t clock_id, int flags,
                    [[nonnull]] struct $timespec64 const *requested_time,
                    [[nullable]] struct $timespec64 *remaining) -> int {
 	int result;
 	struct @__timespec32@ req32, rem32;
-	req32.@tv_sec@  = (__time32_t)requested_time->@tv_sec@;
-	req32.@tv_nsec@ = requested_time->@tv_nsec@;
+	req32.tv_sec  = (__time32_t)requested_time->tv_sec;
+	req32.tv_nsec = requested_time->tv_nsec;
 	result = clock_nanosleep32(clock_id, flags, &req32, &rem32);
 	if (!result && remaining) {
-		remaining->@tv_sec@  = (__time64_t)rem32.@tv_sec@;
-		remaining->@tv_nsec@ = rem32.@tv_nsec@;
+		remaining->tv_sec  = (__time64_t)rem32.tv_sec;
+		remaining->tv_nsec = rem32.tv_nsec;
 	}
 	return result;
 }
@@ -1723,7 +1723,7 @@ gmtime64_r:([[nonnull]] $time64_t const *__restrict timer, [[nonnull]] __STRUCT_
 %#endif /* __USE_TIME64 */
 
 [ignore][dependency_prefix(DEFINE_STRUCT_TM)][doc_alias(asctime_r)]
-crt_asctime_s:([outp(buflen)] char *__restrict buf, $size_t buflen,
+crt_asctime_s:([[outp(buflen)]] char *__restrict buf, $size_t buflen,
                [[nonnull]] __STRUCT_TM const *__restrict tp) -> $errno_t = asctime_s?;
 
 %[define(DEFINE_TIME_ABBR_WDAY_NAMES =

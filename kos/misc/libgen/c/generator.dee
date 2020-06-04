@@ -163,14 +163,14 @@ class Generator {
 
 
 @@Replacements for str2wcs-related keywords
-global final str2wcsReplacementEscapes: {string: string} = Dict({
+global str2wcsReplacementEscapes: {string: string} = Dict({
 	"char"            : "wchar_t",
 	"__SIZEOF_CHAR__" : "__SIZEOF_WCHAR_T__",
 });
 
 @@str2wcs will convert all keywords starting with @"str" with @"wcs"
 @@This is a list of keywords that aren't replaced like that.
-global final str2wcsNotFunctionNameKeywords: {string...} = {
+global str2wcsNotFunctionNameKeywords: {string...} = {
 	"string", "stringp", "stretch", "str", "struct"
 };
 
@@ -232,8 +232,14 @@ function str2wcs_replaceText(
 		local tok = self.next();
 		if (!tok)
 			break;
-		if (!tok.issymbol())
+		if (!tok.issymbol()) {
+			if (tok == "@") {
+				do {
+					tok = self.next();
+				} while (tok !in ["", "@"]);
+			}
 			continue;
+		}
 		if (tok in ["signed", "unsigned"]) {
 			/* Special case: Must not replace "char" after "signed" or "unsigned"
 			 * -> Handle this by simply treaking these keywords as escape prefixes
@@ -250,18 +256,185 @@ function str2wcs_replaceText(
 		fp << repl;
 		flushStart = self.tokEnd;
 	}
-	if (flushStart < self.end)
+	if (flushStart < self.end) {
+		if (flushStart == 0)
+			return text;
 		fp << self.text[flushStart:self.end];
+	}
 	return fp.string;
 }
 
 
 
-global final generators: {string: Generator} = Dict({
+
+@@Replacements for double2float and double2ldouble-related keywords
+global mathReplacementEscapes: {string: (string, string)} = Dict({
+	"double" : ("float", "__LONGDOUBLE"),
+});
+global final MATH_REPLACEMENT_NAMES: (string, string) = { "float", "ldouble" };
+global final MATH_REPLACEMENT_SUFFIX: (string, string) = { "f", "L" };
+global final MATH_REPLACEMENT_MODE_FLOAT: int = 0;
+global final MATH_REPLACEMENT_MODE_LDBL:  int = 1;
+
+@@@param: mode: Either @MATH_REPLACEMENT_MODE_FLOAT, or @MATH_REPLACEMENT_MODE_LDBL
+function math_replaceWord(
+		word: string | UserString,
+		mode: int): string | UserString {
+	/* Check for explicit replacements */
+	local usedWord = str word;
+	local result = mathReplacementEscapes.get(usedWord);
+	if (result !is none)
+		return result[mode];
+	if (usedWord.startswith("__CRT_HAVE_")) {
+		local substr = usedWord[11:];
+		result = math_replaceWord(substr, mode);
+		if (result !== substr)
+			return "__CRT_HAVE_" + result;
+	}
+	return word;
+}
+
+@@@param: mode: Either @MATH_REPLACEMENT_MODE_FLOAT, or @MATH_REPLACEMENT_MODE_LDBL
+function math_replaceText(
+		text: string | CParser | UserString,
+		mode: int): string | UserString {
+	{
+		/* Quick check: Singular keyword */
+		local usedText = text;
+		if (usedText is UserString)
+			usedText = usedText.text;
+		if (usedText is string) {
+			if (!usedText)
+				return text; /* Special case: Empty string */
+			/* Simple case: replace-single-keyword */
+			if (usedText.issymbol())
+				return str2wcs_replaceWord(text);
+			/* Optimization for things such as "0", "1", etc...
+			 * (very likely in case of preprocessor conditions) */
+			if (usedText.isnumeric())
+				return text;
+		}
+	}
+	local fp = File.Writer();
+	local self = CParser(text);
+	local flushStart = self.tokEnd;
+	for (;;) {
+		local repl;
+		local tok = self.next();
+		if (!tok)
+			break;
+		if (!tok.issymbol()) {
+			if (tok == "@") {
+				do {
+					tok = self.next();
+				} while (tok !in ["", "@"]);
+			} else if ("." in tok && tok.isnumeric(0)) {
+				if (!tok.endswith("f") && !tok.endswith("L")) {
+					repl = tok + MATH_REPLACEMENT_SUFFIX[mode];
+					goto do_insert_repl;
+				}
+			}
+			continue;
+		}
+		repl = math_replaceWord(tok, mode);
+		if (repl === tok)
+			continue;
+		/* Insert the keyword replacement */
+do_insert_repl:
+		if (flushStart < self.tokStart)
+			fp << self.text[flushStart:self.tokStart];
+		fp << repl;
+		flushStart = self.tokEnd;
+	}
+	if (flushStart < self.end) {
+		if (flushStart == 0)
+			return text;
+		fp << self.text[flushStart:self.end];
+	}
+	return fp.string;
+}
+
+function double2float_replaceText(
+		text: string | CParser | UserString): string | UserString {
+	return math_replaceText(text, MATH_REPLACEMENT_MODE_FLOAT);
+}
+
+function double2ldouble_replaceText(
+		text: string | CParser | UserString): string | UserString {
+	return math_replaceText(text, MATH_REPLACEMENT_MODE_FLOAT);
+}
+
+@@@param: mode: Either @MATH_REPLACEMENT_MODE_FLOAT, or @MATH_REPLACEMENT_MODE_LDBL
+function math_defineReplacement(
+		keyword: string, repl: string, mode: int) {
+	for (;;) {
+		local existing = mathReplacementEscapes.get(keyword);
+		if (existing !is none) {
+			local oldDef = existing[mode];
+			if (oldDef !is none) {
+				if (oldDef != repl) {
+err_redef:
+					throw Error(
+						"%[define_double2{}_replacement]: "
+						"Re-definition of {!r} as {!r} (was: {!r})"
+						.format({ MATH_REPLACEMENT_NAMES[mode], keyword, repl, oldDef }));
+				}
+				return;
+			}
+		}
+		local newDef = mode == MATH_REPLACEMENT_MODE_FLOAT
+			? (repl, existing[1])
+			: (existing[0], repl);
+		if (existing is none) {
+			if (!mathReplacementEscapes.setnew(keyword, newDef))
+				continue;
+		} else {
+			local ok, realExisting = mathReplacementEscapes
+				.setold_ex(keyword, newDef)...;
+			if (!ok)
+				continue;
+			if (existing != realExisting) {
+				existing = realExisting;
+				goto err_redef;
+			}
+		}
+		break;
+	}
+}
+
+function double2float_defineReplacement(keyword: string, repl: string) {
+	return math_defineReplacement(keyword, repl, MATH_REPLACEMENT_MODE_FLOAT);
+}
+function double2ldouble_defineReplacement(keyword: string, repl: string) {
+	return math_defineReplacement(keyword, repl, MATH_REPLACEMENT_MODE_LDBL);
+}
+function double2float_getDefaultBaseFunctionName(name: string): string {
+	if (name.endswith("f"))
+		return name[:-1];
+	return none;
+}
+function double2ldouble_getDefaultBaseFunctionName(name: string): string {
+	if (name.endswith("l"))
+		return name[:-1];
+	return none;
+}
+
+
+
+
+global generators: {string: Generator} = Dict({
 	"str2wcs" : Generator(
 		getDefaultBaseFunctionName: str2wcs_getDefaultBaseFunctionName,
 		registerFunctionPairing:    str2wcs_registerFunctionPairing,
 		replaceText:                str2wcs_replaceText),
+	"double2float" : Generator(
+		getDefaultBaseFunctionName: double2float_getDefaultBaseFunctionName,
+		registerFunctionPairing:    double2float_defineReplacement,
+		replaceText:                double2float_replaceText),
+	"double2ldouble" : Generator(
+		getDefaultBaseFunctionName: double2ldouble_getDefaultBaseFunctionName,
+		registerFunctionPairing:    double2ldouble_defineReplacement,
+		replaceText:                double2ldouble_replaceText),
 });
 
 

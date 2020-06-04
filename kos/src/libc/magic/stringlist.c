@@ -73,7 +73,7 @@ sl_init:() -> struct _stringlist * {
 
 @@Append a given `NAME' to `SL'. `NAME' is considered
 @@inherited if the StringList is destroyed with `1'
-[requires($has_function(realloc))][decl_prefix(DEFINE_STRINGLIST)][userimpl]
+[requires_function("realloc")][decl_prefix(DEFINE_STRINGLIST)][userimpl]
 sl_add:([[nonnull]] struct _stringlist *sl, [[nonnull]] char *name) -> int {
 	if unlikely(sl->@sl_cur@ >= sl->@sl_max@) {
 		char **new_vector;

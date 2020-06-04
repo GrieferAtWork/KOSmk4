@@ -70,18 +70,18 @@ typedef __t_uscalar_t t_uscalar_t;
 [nothrow] isastream:($fd_t fildes) -> int;
 
 @@Receive next message from a STREAMS file
-[cp] getmsg:($fd_t fildes, struct strbuf *__restrict ctlptr, struct strbuf *__restrict dataptr, int *__restrict flagsp) -> int;
+[[cp]] getmsg:($fd_t fildes, struct strbuf *__restrict ctlptr, struct strbuf *__restrict dataptr, int *__restrict flagsp) -> int;
 
 @@Receive next message from a STREAMS file, with *FLAGSP allowing to control which message.
-[cp] getpmsg:($fd_t fildes, struct strbuf *__restrict ctlptr, struct strbuf *__restrict dataptr, int *__restrict bandp, int *__restrict flagsp) -> int;
+[[cp]] getpmsg:($fd_t fildes, struct strbuf *__restrict ctlptr, struct strbuf *__restrict dataptr, int *__restrict bandp, int *__restrict flagsp) -> int;
 
 %[insert:extern(ioctl)]
 
 @@Send a message on a STREAM
-[cp] putmsg:($fd_t fildes, struct strbuf const *ctlptr, struct strbuf const *dataptr, int flags) -> int;
+[[cp]] putmsg:($fd_t fildes, struct strbuf const *ctlptr, struct strbuf const *dataptr, int flags) -> int;
 
 @@Send a message on a STREAM to the BAND
-[cp] putpmsg:($fd_t fildes, struct strbuf const *ctlptr, struct strbuf const *dataptr, int band, int flags) -> int;
+[[cp]] putpmsg:($fd_t fildes, struct strbuf const *ctlptr, struct strbuf const *dataptr, int band, int flags) -> int;
 
 @@Attach a STREAMS-based file descriptor FILDES to a file PATH in the file system name space
 [cp_kos] fattach:($fd_t fildes, [[nonnull]] char const *__restrict path) -> int;

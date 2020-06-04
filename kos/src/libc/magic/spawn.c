@@ -20,7 +20,7 @@
 
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(oflag_t = __oflag_t)]
-%[default_impl_section(.text.crt.fs.exec.posix_spawn)]
+%[default_impl_section(".text.crt.fs.exec.posix_spawn")]
 
 %{
 #include <features.h>
@@ -126,91 +126,89 @@ typedef struct {
 @@Spawn a new process executing PATH with the attributes describes in *ATTRP.
 @@Before running the process perform the actions described in FILE-ACTIONS.
 @@This function is a possible cancellation point and therefore not marked with __THROW
-[cp]
-posix_spawn:([[nonnull]] pid_t *__restrict pid,
-             [[nonnull]] char const *__restrict path,
-             [[nullable]] posix_spawn_file_actions_t const *file_actions,
-             [[nullable]] posix_spawnattr_t const *attrp,
-             [[nonnull]] @__TARGV@,
-             [[nonnull]] @__TENVP@) -> int;
+[[cp]]
+int posix_spawn([[nonnull]] pid_t *__restrict pid,
+                [[nonnull]] char const *__restrict path,
+                [[nullable]] posix_spawn_file_actions_t const *file_actions,
+                [[nullable]] posix_spawnattr_t const *attrp,
+                [[nonnull]] __TARGV, [[nonnull]] __TENVP);
 
 %
 @@Similar to `posix_spawn' but search for FILE in the PATH.
 @@This function is a possible cancellation point and therefore not marked with __THROW
-[cp]
-posix_spawnp:([[nonnull]] pid_t *__restrict pid,
-              [[nonnull]] const char *__restrict file,
-              [[nullable]] posix_spawn_file_actions_t const *file_actions,
-              [[nullable]] posix_spawnattr_t const *attrp,
-              [[nonnull]] @__TARGV@,
-              [[nonnull]] @__TENVP@) -> int;
+[[cp]]
+int posix_spawnp([[nonnull]] pid_t *__restrict pid,
+                 [[nonnull]] const char *__restrict file,
+                 [[nullable]] posix_spawn_file_actions_t const *file_actions,
+                 [[nullable]] posix_spawnattr_t const *attrp,
+                 [[nonnull]] __TARGV, [[nonnull]] __TENVP);
 
 %
 @@Initialize data structure with attributes for `spawn' to default values
-posix_spawnattr_init:([[nonnull]] posix_spawnattr_t *__restrict attr) -> int;
+int posix_spawnattr_init([[nonnull]] posix_spawnattr_t *__restrict attr);
 
 %
 @@Free resources associated with ATTR
-posix_spawnattr_destroy:([[nonnull]] posix_spawnattr_t *__restrict attr) -> int;
+int posix_spawnattr_destroy([[nonnull]] posix_spawnattr_t *__restrict attr);
 
 %
 @@Store signal mask for signals with default handling from ATTR in SIGDEFAULT
-posix_spawnattr_getsigdefault:([[nonnull]] posix_spawnattr_t const *__restrict attr,
-                               [[nonnull]] sigset_t *__restrict sigdefault) -> int;
+int posix_spawnattr_getsigdefault([[nonnull]] posix_spawnattr_t const *__restrict attr,
+                                  [[nonnull]] sigset_t *__restrict sigdefault);
 
 %
 @@Set signal mask for signals with default handling in ATTR to SIGDEFAULT
-posix_spawnattr_setsigdefault:([[nonnull]] posix_spawnattr_t *__restrict attr,
-                               [[nonnull]] sigset_t const *__restrict sigdefault) -> int;
+int posix_spawnattr_setsigdefault([[nonnull]] posix_spawnattr_t *__restrict attr,
+                                  [[nonnull]] sigset_t const *__restrict sigdefault);
 
 %
 @@Store signal mask for the new process from ATTR in SIGMASK
-posix_spawnattr_getsigmask:([[nonnull]] posix_spawnattr_t const *__restrict attr,
-                            [[nonnull]] sigset_t *__restrict sigmask) -> int;
+int posix_spawnattr_getsigmask([[nonnull]] posix_spawnattr_t const *__restrict attr,
+                               [[nonnull]] sigset_t *__restrict sigmask);
 
 %
 @@Set signal mask for the new process in ATTR to SIGMASK
-posix_spawnattr_setsigmask:([[nonnull]] posix_spawnattr_t *__restrict attr,
-                            [[nonnull]] sigset_t const *__restrict sigmask) -> int;
+int posix_spawnattr_setsigmask([[nonnull]] posix_spawnattr_t *__restrict attr,
+                               [[nonnull]] sigset_t const *__restrict sigmask);
 
 %
 @@Get flag word from the attribute structure
-posix_spawnattr_getflags:([[nonnull]] posix_spawnattr_t const *__restrict attr,
-                          [[nonnull]] $int16_t *__restrict flags) -> int;
+int posix_spawnattr_getflags([[nonnull]] posix_spawnattr_t const *__restrict attr,
+                             [[nonnull]] $int16_t *__restrict flags);
 
 %
 @@Store flags in the attribute structure
-posix_spawnattr_setflags:([[nonnull]] posix_spawnattr_t *__restrict attr,
-                          short int flags) -> int;
+int posix_spawnattr_setflags([[nonnull]] posix_spawnattr_t *__restrict attr,
+                             short int flags);
 
 %
 @@Get process group ID from the attribute structure
-posix_spawnattr_getpgroup:([[nonnull]] posix_spawnattr_t const *__restrict attr,
-                           [[nonnull]] pid_t *__restrict pgroup) -> int;
+int posix_spawnattr_getpgroup([[nonnull]] posix_spawnattr_t const *__restrict attr,
+                              [[nonnull]] pid_t *__restrict pgroup);
 
 %
-@@Store process group ID in the attribute structure
-posix_spawnattr_setpgroup:([[nonnull]] posix_spawnattr_t *__restrict attr, pid_t pgroup) -> int;
+@@Store rocess group ID in the attribute structure
+int posix_spawnattr_setpgroup([[nonnull]] posix_spawnattr_t *__restrict attr, pid_t pgroup);
 
 %
 @@Get scheduling policy from the attribute structure
-posix_spawnattr_getschedpolicy:([[nonnull]] posix_spawnattr_t const *__restrict attr,
-                                [[nonnull]] int *__restrict schedpolicy) -> int;
+int posix_spawnattr_getschedpolicy([[nonnull]] posix_spawnattr_t const *__restrict attr,
+                                   [[nonnull]] int *__restrict schedpolicy);
 
 %
 @@Store scheduling policy in the attribute structure
-posix_spawnattr_setschedpolicy:([[nonnull]] posix_spawnattr_t *__restrict attr,
-                                int schedpolicy) -> int;
+int posix_spawnattr_setschedpolicy([[nonnull]] posix_spawnattr_t *__restrict attr,
+                                   int schedpolicy);
 
 %
 @@Get scheduling parameters from the attribute structure
-posix_spawnattr_getschedparam:([[nonnull]] posix_spawnattr_t const *__restrict attr,
-                               [[nonnull]] struct sched_param *__restrict schedparam) -> int;
+int posix_spawnattr_getschedparam([[nonnull]] posix_spawnattr_t const *__restrict attr,
+                                  [[nonnull]] struct sched_param *__restrict schedparam);
 
 %
 @@Store scheduling parameters in the attribute structure
-posix_spawnattr_setschedparam:([[nonnull]] posix_spawnattr_t *__restrict attr,
-                               [[nonnull]] struct sched_param const *__restrict schedparam) -> int;
+int posix_spawnattr_setschedparam([[nonnull]] posix_spawnattr_t *__restrict attr,
+                                  [[nonnull]] struct sched_param const *__restrict schedparam);
 
 
 %
